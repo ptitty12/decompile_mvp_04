@@ -87,6 +87,8 @@ def main() -> None:
     ap.add_argument("branches", nargs="*", help="worker branches; none = verify the current branch's own commits")
     ap.add_argument("--push", action="store_true")
     ap.add_argument("--allow", action="append", default=[], help="extra allowed path prefix")
+    ap.add_argument("--head-only", action="store_true",
+                    help="lead mode, skeleton-only setup batches: verify only HEAD against origin/main")
     a = ap.parse_args()
     allowed = ALLOWED_DEFAULT + tuple(a.allow)
 
@@ -103,7 +105,7 @@ def main() -> None:
         work = git("rev-parse", "--abbrev-ref", "HEAD")
         if not git("rev-list", f"{base}..HEAD"):
             raise SystemExit("no commits to verify")
-        finish(base, work, a.push)
+        finish(base, work, a.push, a.head_only)
         return
     git("checkout", "-q", "-B", "integrate/auto", "origin/main")
 
@@ -147,13 +149,19 @@ def main() -> None:
     finish(base, "integrate/auto", a.push)
 
 
-def finish(base: str, branch: str, push: bool) -> None:
-    """Build, verify every first-parent commit since `base`, push if asked and all pass."""
+def finish(base: str, branch: str, push: bool, head_only: bool = False) -> None:
+    """Build, verify every first-parent commit since `base` (or only HEAD), push if asked and all pass."""
     if not build_ok():
         raise SystemExit("build check failed; not pushing")
     head = git("rev-parse", "HEAD")
     ok = True
-    for c in git("rev-list", "--first-parent", "--reverse", f"{base}..HEAD").splitlines():
+    commits = git("rev-list", "--first-parent", "--reverse", f"{base}..HEAD").splitlines()
+    if head_only:
+        # Setup batches that only add skeleton units: one verify of HEAD against base.
+        print(f"  head-only: {len(commits)} commits, verifying HEAD against {base[:7]}")
+        ok = verify(base)
+        commits = []
+    for c in commits:
         git("checkout", "-q", "-f", "--detach", c)  # -f: content was checked clean at start
         print(f"  {git('log', '--oneline', '-1', c)[:70]}")
         ok = verify(f"{c}~1") and ok
