@@ -357,6 +357,9 @@ cflags_libgcc = ["-O2", "-G0"]
 # exception tables in the binary. See docs/DECISIONS.md.
 cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
+# EA shared libraries (ProDG 3.9.3). Provisional: -G0 not yet confirmed for these.
+cflags_ealib = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions"]
+
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
@@ -389,6 +392,15 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
+        ],
+    },
+    {
+        "lib": "ealibs",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_ealib,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "ealibs/tu_803D9FE8.cpp"),
         ],
     },
 ]
