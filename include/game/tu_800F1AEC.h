@@ -114,7 +114,7 @@ public:
     virtual void v85();
     virtual void v86();
     virtual void v87();
-    virtual void v88();
+    virtual int v88(int a);
     virtual void v89();
     virtual void v90();
     virtual void v91(int a, int b, int c);
@@ -191,7 +191,7 @@ public:
     virtual void v29();
     virtual void v30();
     virtual void v31();
-    virtual void v32();
+    virtual int v32(int a, int b);
     virtual void v33();
     virtual void v34();
     virtual void v35();
@@ -339,7 +339,7 @@ public:
     virtual void w8();
     virtual void w9();
     virtual void w10(int a);
-    virtual void w11();
+    virtual void w11(int a);
     virtual void w12();
     virtual void w13();
     virtual void w14();
@@ -366,6 +366,20 @@ struct UiScr2A8 : UiObj {
     char pad270[0x2A8 - 0x270];
     UiObjB* m2A8;
     int m2AC;
+};
+
+/* Third object kind: vptr at +0x10 (returned by fn_804D2ED0). Virtuals are placeholders. */
+struct UiXBase {
+    char pad0[0x10];
+};
+class UiX : public UiXBase {
+public:
+    virtual void x1();
+    virtual void x2();
+    virtual void x3();
+    virtual void x4();
+    virtual void x5(int a);
+    virtual void x6();
 };
 
 struct UiV_134 : UiObj {
@@ -648,14 +662,37 @@ struct UiV_25Ci_260i : UiObj {
     int m260;
 };
 
+struct UiV_2F0i : UiObj {
+    char pad40[0x2F0 - 0x40];
+    int m2F0;
+};
+
+struct UiV_194i_1A8i_1ACi_1B8i_1BCi : UiObj {
+    char pad40[0x194 - 0x40];
+    int m194;
+    char pad198[0x1A8 - 0x198];
+    int m1A8;
+    int m1AC;
+    char pad1B0[0x1B8 - 0x1B0];
+    int m1B8;
+    int m1BC;
+};
+
 
 /* fn_800B555C(): global input/menu state; +0x570 is the current player/slot index
  * compared by the button handlers. */
 struct Ui800B555C {
-    char pad0[0x570];
+    int m0;
+    unsigned int m4;
+    char pad8[0x570 - 8];
     int m570;
+    char pad574[0x664 - 0x574];
+    int m664;
 };
 Ui800B555C* fn_800B555C();
+int fn_800B57EC(Ui800B555C* p);
+UiX* fn_804D2ED0(UiObj* self, int a);
+UiObj* fn_8051F42C(UiX* x);
 
 int fn_800F5AE0(UiObj* self, int a);
 int fn_800F7C34(UiScr13C* self, int a);
@@ -786,6 +823,8 @@ struct Ui8011AA24 {
     Ui700* m700;
     char m704[0x788 - 0x704];
     int m788;
+    char pad78C[4];
+    int m790;
 };
 Ui8011AA24* fn_8011AA24(int a);
 struct Ui800C33D0 {
@@ -1008,6 +1047,49 @@ void fn_802D7A74();
 void fn_802D8294(int a);
 UiObj* fn_800C8044(int a);
 
+struct Ui144 {
+    char pad0[0x38];
+    int m38;
+};
+struct Ui138 {
+    char pad0[0x198];
+    int m198;
+};
+struct Ui4078 : UiObj {
+    char pad40[0x138 - 0x40];
+    Ui138* m138;
+};
+void fn_8055AC44(char* p, int a);
+void fn_800EB56C(UiObj* self);
+void fn_804D292C(Ui144* p, int a);
+void fn_80086EC0(Ui806192E0_C* p, int a, int b);
+void fn_8012E1C4(Ui138* p, int a, int b);
+
+int fn_8007E48C(int a, int b, int c);
+int fn_8040ABA0();
+
+struct UiV4 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+struct UiCopy {
+    char pad0[0x8C];
+    UiV4 m8C;
+    UiV4 m9C;
+    char padAC[0xCC - 0xAC];
+    UiV4 mCC;
+};
+void fn_800FF0C4(int a, UiObj* b);
+void fn_801A9D1C(Ui3C4* q, int a, int b);
+void fn_801A9D2C(Ui3C4* q, int a, int b);
+void fn_801A9CFC(Ui3C4* q, int a, int b);
+void fn_801A9D0C(Ui3C4* q, int a, int b);
+void fn_80106890(UiObj* self);
+int fn_8011B5A4();
+void fn_800FEC24(UiV_0i_4i* self, int a, int b);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -1049,7 +1131,7 @@ void fn_8035686C(UiScrRaw* self, int a);
 void fn_802D7ACC();
 void fn_8037893C(char* a, int b, int c, int d, int e);
 void fn_801A3704(Ui8011AA24* a, int b);
-UiObj* fn_804D2D50(UiObj* self);
+UiV_2F0i* fn_804D2D50(UiObj* self);
 UiObj* fn_804D2CE0(UiObj* self);
 void fn_80096830(char* e, int v);
 void fn_804D3328(UiObj* self, int a);
@@ -1070,5 +1152,8 @@ UiObj* fn_800C8038(int a);
 UiObj* fn_800C8044(int a);
 void fn_80100A08(UiV_30b* self, int a);
 void fn_80100668(UiV_2Ci* self, int a);
+void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(UiObj*, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
+int fn_800C8060(int a);
+void fn_80100A98(UiWM* self, int a, int b);
 
 #endif
