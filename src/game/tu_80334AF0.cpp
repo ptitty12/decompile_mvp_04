@@ -4,6 +4,7 @@
  * object is extern by its lbl_ name.
  */
 #include "game/tu_80331C60.h"
+#include "game/chooser.h"
 
 extern "C" {
 void fn_8032FB78(void* item, int v);
@@ -15,6 +16,24 @@ UnkC128* fn_803349B8(Menu* p);
 }
 
 struct V2F { float x; float y; };
+struct Unk80084910_N;
+void fn_800860E0(Unk80084910_N* o, char* buf);
+void fn_80086140(Unk80084910_N* o, char* buf);
+extern "C" int fn_8033E958(const char* fmt, ...);
+extern const char lbl_805EF344[], lbl_805EF348[], lbl_805EF390[], lbl_805EF3A0[], lbl_805EF3B0[], lbl_805EF3C8[], lbl_805EF3E4[], lbl_805EBC74[];
+extern const char lbl_805EF400[], lbl_805EF410[], lbl_805EF41C[], lbl_805EF42C[], lbl_805EF438[], lbl_805EF448[];
+extern const char lbl_805EF648[], lbl_805EF66C[], lbl_805EF680[], lbl_805EF694[], lbl_805EF6A8[], lbl_805EF6BC[];
+struct I3 { int a[3]; };
+extern const I3 lbl_805EFA78;
+extern "C" {
+void fn_802AE408(void* a, void* b);
+void fn_802AD538(void* a, int k);
+void fn_8037C9F4(Unk8037C7FC* a, int v);
+}
+struct Unk8061E978 { char pad0[8]; void* m8; };
+extern Unk8061E978* lbl_8061E978;
+void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& pos, float* ang);
+
 /* Enum item: m4C is the chosen index, m60 the value table. */
 struct MIE { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 inline int EnumVal(MIE* i) { return i->m60[i->m4C]; }
@@ -124,6 +143,19 @@ void fn_803361B0(Menu* p)
 
 void fn_8033635C() {}
 
+void fn_80336360()
+{
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    UnkObj65C* o = lbl_80620804 > 12 ? 0 : m->m65C[lbl_80620804];
+    Unk80273498_Vec3 w;
+    Unk80273498_Vec3 v = {0.0f, 0.0f, 0.0f};
+    v.x = lbl_80691BEC.x;
+    v.y = o->m64;
+    v.z = lbl_80691BEC.y;
+    w = v;
+    fn_80299B98((Unk80270BA0_X*)o, w, 0);
+}
+
 void fn_80336418()
 {
     UnkMgr8* m = lbl_8061B8C0->m8;
@@ -180,6 +212,25 @@ void fn_80336848()
     lbl_8061D41C = 0;
 }
 
+void fn_803368B0()
+{
+    fn_8033E958(lbl_805EF344);
+    fn_8033E958(lbl_805EF348);
+    fn_8033E958(lbl_805EF390, lbl_8061D404);
+    fn_8033E958(lbl_805EF3A0, lbl_8061D408);
+    fn_8033E958(lbl_805EF3B0, lbl_8061D400);
+    fn_8033E958(lbl_805EF3C8, lbl_8061D3FC);
+    fn_8033E958(lbl_805EF3E4, lbl_8061D3F8);
+    fn_8033E958(lbl_805EBC74);
+    fn_8033E958(lbl_805EF400, lbl_8061D40C);
+    fn_8033E958(lbl_805EF410, lbl_8061D410);
+    fn_8033E958(lbl_805EF41C, lbl_8061D414);
+    fn_8033E958(lbl_805EF42C, lbl_8061D418);
+    fn_8033E958(lbl_805EF438, lbl_8061D41C);
+    fn_8033E958(lbl_805EBC74);
+    fn_8033E958(lbl_805EF448);
+}
+
 void fn_80336D88(Menu* p)
 {
     p->m204 = 0;
@@ -234,8 +285,45 @@ void fn_80337488()
     lbl_8062083C = 0;
 }
 
+void fn_803374A0()
+{
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    if (m) {
+        UnkB6F8* b6 = m->m6F8;
+        if (b6) {
+            UnkC128* o = b6->m10;
+            if (o) {
+                char buf[0x10];
+                fn_8033E958(lbl_805EF648);
+                Unk80084910_N* a = (Unk80084910_N*)((char*)o + 0x78);
+                Unk80084910_N* b = (Unk80084910_N*)((char*)o + 0x80);
+                fn_800860E0(a, buf);
+                fn_8033E958(lbl_805EF66C, buf);
+                fn_80086140(a, buf);
+                fn_8033E958(lbl_805EF680, buf);
+                fn_800860E0(b, buf);
+                fn_8033E958(lbl_805EF694, buf);
+                fn_80086140(b, buf);
+                fn_8033E958(lbl_805EF6A8, buf);
+                fn_8033E958(lbl_805EF6BC);
+            }
+        }
+    }
+}
+
 int fn_80337830(int i) { return lbl_806E2A50[i]; }
 
 int fn_80337844(int i) { return lbl_806E3864[i]; }
+
+void fn_80338054(int idx)
+{
+    if (idx == 0) {
+        fn_802AE408(lbl_8061E978, lbl_8061E978->m8);
+    } else {
+        I3 t = lbl_805EFA78;
+        fn_8037C9F4(fn_8037C7FC(), t.a[idx]);
+    }
+    fn_802AD538(lbl_8061E978, 0);
+}
 
 }
