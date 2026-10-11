@@ -159,11 +159,24 @@ class Unk8016FF40 {
 public:
     Unk8016FF40();
     virtual ~Unk8016FF40();
+    int fn_80170044(int x);
+    int fn_80170218(Unk8016FF40* other);
+    int fn_80170248();
+    void fn_801702A4();
+    void fn_80170420(int p, int n, int* out);
     int m0;
     int m4;
     int m8[4];
-    char pad18[0x50 - 0x18];
-    char m50[0xB0];
+    unsigned short m18[0x1B];
+    char pad4E[2];
+    int m50[4];                  /* 0x50..0x100 is cleared as one 0xB0-byte block */
+    int m60[4];
+    char pad70[4];
+    int m74;
+    unsigned short m78[0xB];
+    unsigned short m8E[0x10];
+    unsigned short mAE[0x1B];
+    char mE4[0x1C];
     Unk8016FF40_Entry m100;
     Unk8016FF40_Entry* m108[6];
     int m120;
@@ -172,9 +185,10 @@ public:
 extern "C" {
 Unk8016FF40_Entry* fn_80170034(Unk8016FF40* info, int idx);
 void fn_8017008C(Unk8016FF40* info, const char* name);
-void fn_801700D8(Unk8016FF40* info, const char* name);
+void fn_801700D8(Unk8016FF40* info, unsigned short* ws);
 void fn_80170158(Unk8016FF40* info, unsigned short* ws);
 void fn_801701B4(Unk8016FF40* info, unsigned short* ws, int a);
+void fn_8017037C(Unk8016FF40* info);
 }
 
 #endif
