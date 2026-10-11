@@ -381,3 +381,38 @@ Recipes that matched 18 parked functions (details in each unit's comments):
   fn_80054684, fn_8005CDC4). Retail puts the index in r9 and the element
   address in r11; ours uses r0/r9. Element addresses formed as `add off,base`
   in retail vs `add base,off` (fn_80056A68, fn_80056AC0).
+
+## Range-09 recipes (screen classes, 2026-10-11)
+
+- Families that match first try:
+  - vptr store plus base dtor with the in-charge arg passed through;
+  - deleting dtor `if (c & 1) fn_80377408(p)`;
+  - `this->sN()` thunks;
+  - an 8-byte struct passed by value;
+  - `new (lbl_806EF9B4)` factories;
+  - lazy singleton getters.
+- Out-of-line base ctor from an extern "C" ctor:
+  `new (p) Unk8037B3E8(hash); *(const void**)p = vtbl; return p;`, with
+  `inline void* operator new(unsigned, void*)`.
+- Explicit dtor of a global with in-charge 2: `lbl.Unk8001FE34::~Unk8001FE34();`.
+  The qualified name stops virtual dispatch.
+- `delete p->m8[i]` on a class with a virtual dtor calls slot 1 with arg 3.
+  Declare `virtual ~VT18();` as slot 1.
+- `int a = c ? f(x) : 0; int r = a;` keeps the ternary in r3 and copies it to
+  the callee-saved accumulator after the join.
+- Retail's separate callee-saved `lis` registers for stores around calls:
+  `T** a = &lbl_X;` locals at the top, then `*a = f(...)`.
+- `(float)(unsigned)x` uses the 0x43300000_00000000 constant; the signed form
+  uses xoris. Assign to a float local before dividing to get `stfs/lfs`.
+- An empty function with float params stores each param.
+- Hex digit: `int t=c-0x30; int r=c-0x57; if ((unsigned char)t<=9) r=t; return r;`.
+- `if (b<0) return -1; return f(..)` vs `r=-1; if(..) r=f()` swap the
+  callee-saved order.
+- `if (c != 0) return 1; return 0;` in a nested branch avoids the cross-jump of
+  identical `li r3,0; blr` tails.
+- Indexed address shapes:
+  - `char* b = p + K; int o = i*S; *(int*)(b+o)` gives `addi; lwzx`;
+  - `p + K + i*S` gives `add; lwz K(r)`;
+  - `(char*)(i*0x18 + (int)p + 0x30)` gives retail's operand order.
+- A function whose r3 is never set before a call has an unused first
+  parameter. Variadic callees show `crclr cr1eq`.

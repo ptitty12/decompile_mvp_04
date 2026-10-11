@@ -57,6 +57,40 @@ Commit each time the unit gains matched functions:
 `match(<UNIT>): <function names> [N/M funcs]`, with evidence for any names in
 the body and the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
 
+## Range workers (several code-only units)
+
+Range workers get a list of `unit:start-end` lines instead of one unit.
+- Generate the families first: boilerplate, accessors, forwarders and
+  dtor/ctor clones, from a script in your scratch folder.
+- Then do the rest smallest first.
+- Skip functions over ~0x400 bytes, and those that need inline-asm-only
+  instructions (mftb, mfcr/mtcrf).
+- New types go in `include/game/tu_<first unit addr>.h`.
+- Commit each unit with its own renames, after VERIFY PASS.
+
+## Quick tips (details in docs/PATTERNS.md)
+
+- Call arguments are evaluated left to right. A nested call hoisted into a
+  local (`int k = f(); g(base, 5, k);`) moves before the address setup.
+- Store order: the last-written statement is emitted first. For independent
+  stores, brute-force the orderings with an itertools.permutations script.
+- vptr at +0x3C: use a data-only base plus a virtuals class. A virtual call
+  through a subobject: `((VT24*)&p->mDC)->s9(...)`. Member-pointer dispatch:
+  `extern float (Cls::*tbl[])(int);`.
+- Existing family headers to reuse: table classes in
+  include/game/tu_80090880.h, screen-class vptr families in
+  include/game/tu_80144CF0.h.
+- Enum loops over 0..N: `volatile int sp8` with a saturating increment.
+- Switch trees: if the pivot is off, use an enum-typed index with a negative
+  enumerator. To stop case merging, give each empty case a dead
+  `T* q = &r->field;`.
+- Loop bounds like `Db() ? Db()->m4 : 0` go in an inline accessor.
+  `if (c) return cheap; <rest>` puts the cheap return last.
+- Callee-saved `lis` registers around calls: `T** a = &lbl_X;` locals at the
+  top of the function.
+- m2c drops or invents register args: count `li r4/r5` before each call.
+- Keep .text order with `python tools/match/sort_functions.py src/<UNIT>`.
+
 ## Finish with a report (this is all the lead reads)
 
 ```
