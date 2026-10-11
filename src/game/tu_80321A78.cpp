@@ -220,6 +220,7 @@ int fn_80323830() { return lbl_8062014C; }
 
 int fn_8032383C() { return 0xE33E6A08; }
 
+/* near-miss: retail has a frame and a call (17 insns); this leaf version is shorter and only approximates the control flow */
 float fn_80323848(FxV* self) {
     if (self->m44 == 0 && self->m48 != 0) return fn_80323848(self->m48);
     return self->m4C;
