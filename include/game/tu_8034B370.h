@@ -276,6 +276,25 @@ struct Unk80353A9C_R {
     }
 };
 
+/* Three-int accumulator (fn_8035300C / fn_80353110: clear the output, ask
+ * fn_800838E0 for a list of up to 128 ids, and for each live id add the
+ * triple that fn_80083838 / fn_8008388C fills in). */
+struct Unk8035300C_V3 {
+    int x;
+    int y;
+    int z;
+    inline void Add(const Unk8035300C_V3& o)
+    {
+        x += o.x;
+        y += o.y;
+        z += o.z;
+    }
+};
+extern "C" void* fn_8040B320(void* dst, int c, unsigned n); /* memset */
+extern "C" int fn_800838E0(int a, int b, int c, int d, int* list);
+extern "C" void fn_80083838(int a, int b, int c, int d, Unk8035300C_V3* out);
+extern "C" void fn_8008388C(int a, int b, int c, int d, Unk8035300C_V3* out);
+
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
 

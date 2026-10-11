@@ -127,6 +127,42 @@ void fn_80353000(Unk8034151C* t)
     t->m9A = 0;
 }
 
+bool fn_8035300C(int a, int b, int c, int d, Unk8035300C_V3* out)
+{
+    int list[128];
+    fn_8040B320(out, 0, 12);
+    bool got = false;
+    int n = fn_800838E0(a, b, c, d, list);
+    for (int i = 0; i < n; i++) {
+        Unk8035300C_V3 tmp;
+        fn_8040B320(&tmp, 0, 12);
+        if (list[i] != 0) {
+            fn_80083838(a, b, c, list[i], &tmp);
+            out->Add(tmp);
+            got |= 1;
+        }
+    }
+    return got;
+}
+
+bool fn_80353110(int a, int b, int c, int d, Unk8035300C_V3* out)
+{
+    int list[128];
+    fn_8040B320(out, 0, 12);
+    bool got = false;
+    int n = fn_800838E0(a, b, c, d, list);
+    for (int i = 0; i < n; i++) {
+        Unk8035300C_V3 tmp;
+        fn_8040B320(&tmp, 0, 12);
+        if (list[i] != 0) {
+            fn_8008388C(a, b, c, list[i], &tmp);
+            out->Add(tmp);
+            got |= 1;
+        }
+    }
+    return got;
+}
+
 void fn_80353214(void)
 {
 }
