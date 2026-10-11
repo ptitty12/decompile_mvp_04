@@ -9,6 +9,7 @@
 #define GAME_TU_80090880_H
 
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
+void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 
 /*
  * Database object built by fn_803779B8 (size 0x18, vptr at +0x14).
@@ -49,6 +50,7 @@ struct Rec {
     int m14;
     int m18;
     int m1C;
+    Rec(const char* name, DbObj* db, int c); /* fn_80071604 */
     virtual ~Rec();
     virtual void v2(int id);
     virtual int v3(int a);
@@ -65,6 +67,7 @@ struct Rec {
 /* Record collection with a row pointer after the vptr (+0x24). */
 struct RecT : Rec {
     char* m24;
+    RecT(const char* name, DbObj* db, int c) : Rec(name, db, c) {}
 };
 
 struct RowRef;
@@ -74,6 +77,8 @@ char* fn_8040B61C(char* dst, const char* src); /* strcpy */
 char* fn_80402CAC(char* s);
 int fn_804089B4(char* dst, const char* fmt, ...); /* sprintf */
 void fn_804031BC(char* dst, const char* src);
+int fn_800736EC(const char* s);
+void fn_8040074C(void* p, unsigned n); /* bzero */
 void fn_800716BC(Rec* r);            /* release */
 int fn_80071718(Rec* r);             /* next free id, -1 if none */
 int fn_80071784(Rec* r, int row);    /* row -> id */
@@ -415,6 +420,19 @@ struct Tbl800956D8 : TblBase {
     virtual void v8();
     virtual void v9();
     virtual void v10(int a, TblBase* b);
+};
+
+/* Rec subclasses of the colour/attribute tables (entries of 4 bytes at +0x24). */
+struct RecA : Rec {
+    int* m24;
+    RecA(const char* name, DbObj* db, int c);
+    virtual ~RecA();
+};
+
+struct RecB : Rec {
+    int* m24;
+    RecB(const char* name, DbObj* db, int c);
+    virtual ~RecB();
 };
 
 extern "C" {
