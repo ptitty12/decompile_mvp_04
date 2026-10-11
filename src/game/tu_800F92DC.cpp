@@ -43,6 +43,25 @@ UiScrRaw* fn_800F945C(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+extern char lbl_805B97B4[];
+extern char lbl_805BE6BC[];
+void fn_800F95E4(UiObj* self, int a, int b)
+{
+    if (fn_800F9B70(self, b) != 0 && a == 0) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        if (UiGetMsgMgr()->mBC != 0 || fn_800B57EC(fn_800B555C()) != 0) {
+            fn_8040B830(p->name, lbl_805B97B4, 15);
+            p->name[15] = 0;
+        } else {
+            fn_8040B830(p->name, lbl_805BE6BC, 15);
+            p->name[15] = 0;
+        }
+        fn_800B7B4C(UiGetMsgMgr(), &m, self);
+    }
+}
+
 int fn_800F9B70(UiObj* self, int a)
 {
     int v = fn_800B555C()->m570;
@@ -89,6 +108,33 @@ void fn_800F9E4C(UiScrRaw* self, int a)
     fn_8035686C(self, a);
 }
 
+extern char lbl_805BEC18[];
+extern char lbl_805BEC28[];
+extern char lbl_805BEC38[];
+void fn_800FAF38(UiV_138i_13Ci* self, char* out)
+{
+    if (self->m138 != 0) {
+        self->m138 = 0;
+        lbl_8061B8C0->m24 = 1;
+        fn_802D7ADC();
+        fn_8040B830(out, lbl_805BEC18, 16);
+    } else {
+        switch (self->m13C) {
+        case 0xC7:
+            *out = 0;
+            break;
+        case 0x36:
+            fn_8040B830(out, lbl_805BEC28, 16);
+            break;
+        case 0xA0:
+            fn_8011AA24(0);
+            if (UiGetMsgMgr()->mBC == 0)
+                fn_8040B830(out, lbl_805BEC38, 16);
+            break;
+        }
+    }
+}
+
 extern char lbl_805BEAE0[];
 void fn_800FB02C(UiObj* self)
 {
@@ -104,6 +150,34 @@ void fn_800FB02C(UiObj* self)
 int fn_800FC084()
 {
     return 1;
+}
+
+void fn_800FC08C(UiV_13Ci* self, int id, int* msg)
+{
+    if (id == 0x93) {
+        int* p;
+        if (msg != 0) {
+            p = 0;
+            if (id == *msg)
+                p = msg;
+        } else
+            p = 0;
+        fn_800FCB38(self, p);
+        return;
+    }
+    if (id == 0x94) {
+        int* p;
+        if (msg != 0) {
+            p = 0;
+            if (id == *msg)
+                p = msg;
+        } else
+            p = 0;
+        fn_800FCD0C(self, p);
+        return;
+    }
+    self->m13C = id;
+    fn_800B7ADC(UiGetMsgMgr(), self);
 }
 
 void fn_800FC160(UiV_1E8i_1ECi_1F0i_1F4i_1F8i_1FCi_200i_204i_208i_20Ci_210i_214i_218i_21Ci_220i_224i_228i_22Ci* self)
