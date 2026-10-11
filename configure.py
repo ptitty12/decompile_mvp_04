@@ -854,6 +854,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "db/tu_8052A220.cpp"),
             Object(NonMatching, "db/tu_8052CA60.cpp"),
+            Object(NonMatching, "db/tu_8052E4C0.cpp"),
         ],
     },
     {
