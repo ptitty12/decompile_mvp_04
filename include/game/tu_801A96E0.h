@@ -1,6 +1,8 @@
 #ifndef GAME_TU_801A96E0_H
 #define GAME_TU_801A96E0_H
 
+#include "game/tu_8019F8C0.h"
+
 /*
  * Declarations for game/tu_801A96E0.cpp (reconstructed; placeholders only).
  * One object (about 0x88 bytes, fields from 0xC) is seen through several
@@ -17,8 +19,9 @@ struct Unk801A96E0_Sel {   /* fn_801A9B78..fn_801A9BC0 */
     int m28;
 };
 
-struct Unk801A96E0_Init {  /* fn_801AA248, fn_801AB188, fn_801AA570 */
-    char pad0[0xC];
+struct Unk801A96E0_Init {  /* fn_801AA248, fn_801AB188, fn_801AA570, fn_801A99B4.. */
+    char pad0[8];
+    Unk8019F8C0_Owner* m8;
     int mC;
     int m10;
     int m14[4];

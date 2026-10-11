@@ -13,15 +13,47 @@ void fn_801AB2EC(void* p);
 void fn_801AB188(void* p, int v);
 void fn_801AB470(void* p);
 extern float lbl_805CEEF8;
+extern int lbl_80620388;
+extern unsigned lbl_8062038C;
+extern unsigned lbl_80620390;
+extern unsigned lbl_806203A4;
+extern unsigned lbl_806203A8;
+int fn_801A9B78(Unk801A96E0_Sel* a, int b);
+int fn_801A9B90(Unk801A96E0_Sel* a, int b);
+int fn_801A9BA8(Unk801A96E0_Sel* a, int b);
+int fn_801A9BC0(Unk801A96E0_Sel* a, int b, int c);
+int fn_801A99B4(Unk801A96E0_Init* o);
+int fn_801A9A20(Unk801A96E0_Init* o);
+int fn_801A9A8C(Unk801A96E0_Init* o);
 void fn_801A9684(void* p);
 void fn_801AA038(void* p, int n);
 void fn_801AA284(void* p, int n);
-void fn_801AB470(void* p);
 void fn_801AB5CC(void* p);
-void fn_801A96E0(void* p)
-{
-    fn_801A9684(p);
-}
+
+struct Unk801A9CFC_T {
+    char pad0[0x38];
+    int m38[1];
+};
+
+struct Unk801A9D0C_T {
+    char pad0[0x40];
+    int m40[1];
+};
+
+struct Unk801A9D1C_T {
+    char pad0[0x48];
+    int m48[1];
+};
+
+struct Unk801A9D2C_T {
+    char pad0[0x50];
+    int m50[1];
+};
+
+struct Unk801AB460_T {
+    char pad0[0x2C];
+    int m2C[1];
+};
 
 void fn_801A9700(void* p)
 {
@@ -41,6 +73,61 @@ void fn_801A987C(void* p)
 void fn_801A98A0(void* p)
 {
     fn_801AA284(p, 1);
+}
+
+void fn_801A9980(void* p)
+{
+    fn_801AA088(p);
+    fn_801AB49C(p);
+}
+
+int fn_801A99B4(Unk801A96E0_Init* o)
+{
+    if (lbl_80620388 == 1) {
+        unsigned v = lbl_8062038C;
+        if (v > 1) {
+            return v;
+        }
+    }
+    int f = o->m8->m6F8->m14[2].m8 == 0;
+    return fn_801A9B78((Unk801A96E0_Sel*)o, o->m38[f]);
+}
+
+int fn_801A9A20(Unk801A96E0_Init* o)
+{
+    if (lbl_80620388 == 1) {
+        unsigned v = lbl_80620390;
+        if (v > 1) {
+            return v;
+        }
+    }
+    int f = o->m8->m6F8->m14[2].m8 == 0;
+    return fn_801A9B90((Unk801A96E0_Sel*)o, o->m40[f]);
+}
+
+int fn_801A9A8C(Unk801A96E0_Init* o)
+{
+    if (lbl_80620388 == 1) {
+        unsigned v = lbl_806203A4;
+        if (v > 1) {
+            return v;
+        }
+    }
+    int f = o->m8->m6F8->m14[2].m8 == 0;
+    return fn_801A9BA8((Unk801A96E0_Sel*)o, o->m48[f]);
+}
+
+int fn_801A9AF8(Unk801A96E0_Init* o)
+{
+    if (lbl_80620388 == 1) {
+        unsigned v = lbl_806203A8;
+        if (v > 1) {
+            return v;
+        }
+    }
+    int f = o->m8->m6F8->m14[2].m8 == 0;
+    int a = fn_801A9A8C(o);
+    return fn_801A9BC0((Unk801A96E0_Sel*)o, a, o->m50[f]);
 }
 
 int fn_801A9B78(Unk801A96E0_Sel* a, int b)
@@ -78,40 +165,20 @@ int fn_801A9BC0(Unk801A96E0_Sel* a, int b, int c)
     return 2;
 }
 
-struct Unk801A9CFC_T {
-    char pad0[0x38];
-    int m38[1];
-};
-
 void fn_801A9CFC(Unk801A9CFC_T* p, int i, int v)
 {
     p->m38[i] = v;
 }
-
-struct Unk801A9D0C_T {
-    char pad0[0x40];
-    int m40[1];
-};
 
 void fn_801A9D0C(Unk801A9D0C_T* p, int i, int v)
 {
     p->m40[i] = v;
 }
 
-struct Unk801A9D1C_T {
-    char pad0[0x48];
-    int m48[1];
-};
-
 void fn_801A9D1C(Unk801A9D1C_T* p, int i, int v)
 {
     p->m48[i] = v;
 }
-
-struct Unk801A9D2C_T {
-    char pad0[0x50];
-    int m50[1];
-};
 
 void fn_801A9D2C(Unk801A9D2C_T* p, int i, int v)
 {
@@ -131,6 +198,11 @@ void fn_801AA038(void* p)
     fn_801AB2EC(p);
     fn_801AB188(p, 0);
     fn_801AB470(p);
+}
+
+void fn_801A96E0(void* p)
+{
+    fn_801A9684(p);
 }
 
 void fn_801AA248(Unk801A96E0_Init* p)
@@ -161,21 +233,16 @@ int fn_801AAE18() { return 0; }
 
 int fn_801AAE20() { return 0; }
 
-struct Unk801AB460_T {
-    char pad0[0x2C];
-    int m2C[1];
-};
-
-int fn_801AB460(Unk801AB460_T* p, int i)
-{
-    return p->m2C[i];
-}
-
 void fn_801AB188(Unk801A96E0_Init* p, int v)
 {
     for (int i = 0; i < 4; i++) {
         p->m14[i] = v;
     }
+}
+
+int fn_801AB460(Unk801AB460_T* p, int i)
+{
+    return p->m2C[i];
 }
 
 /* near-miss: same stores; retail's store order is 0x78, 0x6C, 0x7C, 0x68, 0x70, 0x74 (no permutation found, 2 slots differ). */
@@ -197,10 +264,3 @@ void fn_801AB618(void* p)
 }
 
 void fn_801AB638() {}
-
-
-void fn_801A9980(void* p)
-{
-    fn_801AA088(p);
-    fn_801AB49C(p);
-}
