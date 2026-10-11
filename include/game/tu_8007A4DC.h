@@ -116,7 +116,10 @@ struct Unk8007A4DC_Screen {
     int fn_80072894(int a);
     int fn_800728BC(int a);
     int fn_800728E4(int a);
+    void fn_80072ABC();
     int fn_80073710(int a, int x, int i);
+    float fn_80073820(int a, int b, int i);
+    void fn_8007389C(int a, int b, int i, int c);
     int fn_80073914(int a, int b, int i);
     void fn_80073994(int a, int b, int i, int c);
     void fn_800743A0(int a, int b, int i, int j, int c);
@@ -132,6 +135,7 @@ struct Unk8007A4DC_Screen {
     void fn_80075048(int a, int b, int i, int c);
     void fn_800755FC(int a, int b, int i, int j, int c);
     void fn_8007575C(int a, int b, int i, int j, int c);
+    int fn_800764F4(const char* a, const char* b, int c);
     int fn_8007661C(int b);
     void fn_80077CF8();
     void fn_80077D38(int a, int b);

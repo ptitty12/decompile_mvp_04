@@ -20,6 +20,42 @@ Unk80071FA0_Obj* fn_80071FA0(void* p);
 void fn_80071E2C(Unk80071604* self, int a, Unk80070DDC_Stream* io);
 Unk8006902C_Ctx* fn_8006F594(void* p);
 extern char lbl_80649EF0[];
+extern char lbl_8064AE28[];
+extern const char lbl_805B3B4C[];
+unsigned fn_8007366C(const char* a, const char* b);
+extern const char lbl_805B3C54[];
+extern const float lbl_805B3CE4;
+extern Obj* lbl_80619948;
+void* operator new[](unsigned int size, int heap);
+void fn_8040074C(void* p, unsigned n);
+void fn_80071688(Unk80071604* self, int chrg);
+Unk80071604* fn_80071604(Unk80071604* self, const char* name, Obj* type, unsigned count);
+int fn_800A22F0(Obj* o, char* buf);
+struct Unk80071170_Rec {
+    unsigned f0 : 12;
+    unsigned f1 : 14;
+    unsigned p0 : 6;
+    unsigned f2 : 13;
+    unsigned f3 : 10;
+    unsigned p1 : 9;
+    unsigned f4 : 12;
+    unsigned f5 : 12;
+    unsigned p2 : 8;
+    unsigned f6 : 11;
+    unsigned p3 : 21;
+};
+struct Unk80073820_WBase {
+    char pad0[0x20];
+};
+struct Unk80073820_W : Unk80073820_WBase {
+    virtual int v08();
+    virtual int v10(int i);
+    virtual int v18(int a);
+    virtual int v20();
+    virtual int v28(int a, int b);
+    virtual int v30(int a, int b, char* c);
+    virtual float v38(int a, int b);
+};
 void fn_80083DF4(Unk8007A4DC_Obj1E8* o);
 void fn_80083E18(Unk8007A4DC_Obj1E8* o);
 int fn_800956B8(Handle* h, int a, int b);
@@ -123,6 +159,65 @@ void fn_80070F64(Unk80070ED8_Mgr* self, int chrg)
     }
     if (chrg & 1)
         delete self;
+}
+
+Unk80071604* fn_80071020(Unk80071604* self, const char* name, Obj* type, unsigned count)
+{
+    fn_80071604(self, name, type, count);
+    self->m20 = lbl_8064AE28;
+    self->m24 = 0;
+    self->m24 = (char*)operator new[](self->m1C << 4, 0);
+    fn_8040074C(self->m24, self->m1C << 4);
+    self->m14 = fn_8007366C(lbl_805B3B4C, lbl_805B3C54);
+    return self;
+}
+
+void fn_800710A0(Unk80071604* self, int chrg)
+{
+    self->m20 = lbl_8064AE28;
+    if (self->m24) {
+        delete[] self->m24;
+        self->m24 = 0;
+    }
+    fn_80071688(self, chrg);
+}
+
+void fn_800710FC(Unk80071604* self, unsigned i)
+{
+    if (i < self->m1C)
+        fn_8040074C(self->m24 + (i << 4), 16);
+}
+
+unsigned fn_80071170(void* l, int k, unsigned c)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    unsigned r = 0;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0:
+            r = ((Unk80071170_Rec*)a->m24)[c].f0;
+            break;
+        case 1:
+            r = ((Unk80071170_Rec*)a->m24)[c].f1;
+            break;
+        case 2:
+            r = ((Unk80071170_Rec*)a->m24)[c].f2;
+            break;
+        case 3:
+            r = ((Unk80071170_Rec*)a->m24)[c].f3;
+            break;
+        case 4:
+            r = ((Unk80071170_Rec*)a->m24)[c].f4;
+            break;
+        case 5:
+            r = ((Unk80071170_Rec*)a->m24)[c].f5;
+            break;
+        case 6:
+            r = ((Unk80071170_Rec*)a->m24)[c].f6;
+            break;
+        }
+    }
+    return r;
 }
 
 void fn_800715A8(Unk80071604* self, int a, Unk80070DDC_Stream* io)
@@ -283,6 +378,22 @@ void fn_80072A84(Unk80072A84* o)
     fn_8052DE9C(o->m20);
 }
 
+void Unk8007A4DC_Screen::fn_80072ABC()
+{
+    Obj* g = lbl_80619948;
+    if (g) {
+        unsigned n = fn_8007B1EC();
+        unsigned i;
+        for (i = 0; i < n; i++) {
+            if (fn_8007A8DC(0, i) == 0) {
+                char buf[0x80];
+                fn_8007A914(1, i, buf);
+                fn_8007A94C(0, i, fn_800A22F0(g, buf));
+            }
+        }
+    }
+}
+
 void Unk8007B2B0_Screen::fn_80072B60()
 {
     fn_80072BD0();
@@ -396,4 +507,21 @@ unsigned fn_8007366C(const char* a, const char* b)
 unsigned fn_800736EC(const char* s)
 {
     return fn_80071ED4(s, 0);
+}
+
+float Unk8007A4DC_Screen::fn_80073820(int a, int b, int i)
+{
+    if (i <= 1) {
+        W* w = m190[i].m0;
+        return ((Unk80073820_W*)w)->v38(a, fn_80071814(w, b));
+    }
+    return lbl_805B3CE4;
+}
+
+void Unk8007A4DC_Screen::fn_8007389C(int a, int b, int i, int c)
+{
+    if (i <= 1) {
+        W* w = m190[i].m0;
+        w->v40(a, fn_80071814(w, b), c);
+    }
 }
