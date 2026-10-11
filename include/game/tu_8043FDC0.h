@@ -593,7 +593,9 @@ void fn_80450EF8(FeScr6* s);
 void fn_80450C4C(FeScr6* s);
 void fn_804509E0(FeScr6* s, int a, int b);
 void fn_8045081C(FeObj* o, int a);
-void fn_80451028(FeScr6* s, int a);
+void fn_80451028(FeScr6* s);
+void fn_80450B44(FeScr6* s, int b);
+void fn_8045124C(FeScr6* s, int b);
 void fn_8044F284(int a, void* b);
 void fn_8044F3F8(int a, int b);
 void fn_80450FCC(FeScr6* s);
@@ -1157,4 +1159,24 @@ struct FeS0_8 {
 extern int lbl_80621650[];
 
 int fn_80075808(int a);
+
+extern "C" {
+int fn_80329E74(int* p);
+int fn_8056ADD4(int a, int b, int* arr, int cnt, int v);
+int fn_8057CF60(Unk8007F198_B* s, int a);
+int fn_8056A580(int a, int b, int c, int d);
+void fn_80450750(FeScr6* s);
+}
+
+extern "C" {
+int fn_8057CE00(int a);
+void fn_804513E0(FeScr6* s, FeObj* o, int v, int a);
+}
+
+int fn_8007FBDC(Unk8007F198_C* s, int a, int b);
+extern "C" {
+void fn_8045156C(FeScr6* s, FeObj* o, int f, int v, int a);
+int fn_8032A0C0(char* buf, ...);
+void fn_800DD344(char* a, char* b);
+}
 #endif

@@ -221,10 +221,77 @@ extern "C" FE_OVERLAY void fn_8045077C(FeScr6* self)
     self->m18C->m2F0 = fn_8045081C;
 }
 
+/* near-miss: retail keeps five callee-saved registers (lbl_8061A32C hi, lbl_80619948 hi and the zero for the name terminator are separate); ours uses four (3 slots, 4 spellings tried) */
+extern "C" FE_OVERLAY void fn_8045081C(FeObj* s, int a)
+{
+    UiMsg m;
+    FeObj* cal = fn_800B7AB8(UiGetMsgMgr(), "DAYSGAMES");
+    UiMsg* p = &m;
+    ((FeObj1*)cal)->v80(1);
+    fn_8035682C(p);
+    if (fn_800A2EB4(lbl_80619948) != 0) {
+        if (fn_805562B8(fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0)) != 0) {
+            fn_8040B830(p->name, "WINNER", 15);
+            p->name[15] = 0;
+        } else {
+            fn_8040B830(p->name, "PLAYOFFEND", 15);
+            p->name[15] = 0;
+        }
+    } else if (fn_800A2E6C(lbl_80619948) == 0 && fn_800B56C4(fn_800B555C()) != 0) {
+        fn_8040B830(p->name, "SEASONEND", 15);
+        p->name[15] = 0;
+    } else {
+        fn_8040B830(p->name, "BACKTOMAIN", 15);
+        p->name[15] = 0;
+    }
+    fn_800B7B4C(UiGetMsgMgr(), &m, cal);
+}
+
 extern "C" FE_OVERLAY void fn_80450988(FeScr6* self, int a)
 {
     self->m198 = a;
     fn_804509E0(self, ((FeObjI*)self->m188)->v60(), self->m198);
+}
+
+extern "C" FE_OVERLAY void fn_804509E0(FeScr6* self, int a, int b)
+{
+    fn_80450B44(self, b);
+    fn_8045124C(self, b);
+    if (self->m17C <= 0) {
+        ((FeObj1*)((FeObj*)self)->v32("NOGAMESTODAY", 1))->v8(1);
+    } else {
+        ((FeObj1*)((FeObj*)self)->v32("NOGAMESTODAY", 1))->v8(0);
+        int n = ((FeObjI*)self->m188)->v59();
+        int k = a;
+        if (k >= n)
+            k = n - 1;
+        ((FeObj2*)self->m188)->v67(k, 0);
+        ((FeObj1*)self)->v69((int)self->m188);
+    }
+    fn_80451028(self);
+    ((FeObj1*)self->m188)->v14(1);
+}
+
+extern "C" FE_OVERLAY void fn_80450B44(FeScr6* self, int a)
+{
+    int* arr = (int*)&self->m134;
+    int i;
+    int d;
+    fn_80450750(self);
+    FeState* st = fn_800B555C();
+    int g28 = lbl_80619948->m28;
+    d = st->m14;
+    int x = fn_80329E74(&d);
+    self->m17C = fn_8056ADD4(g28, x, arr, 0x12, fn_800B555C()->m608);
+    int r = fn_8057CF60(fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0), a);
+    self->m184 = 0;
+    for (i = 0; i < self->m17C; i++) {
+        if (fn_8056A580(g28, a, arr[i], r) == 1) {
+            self->m184 = 1;
+            break;
+        }
+    }
+    ((FeObj2*)self->m188)->v79(self->m17C, 0);
 }
 
 extern "C" FE_OVERLAY int fn_80450C44(void)
@@ -293,7 +360,7 @@ extern "C" FE_OVERLAY void fn_80451004(FeScr6* self)
 }
 
 /* near-miss: 6 slots; retail keeps the byte offset in r0 and the array base in r9 */
-extern "C" FE_OVERLAY void fn_80451028(FeScr6* self, int a)
+extern "C" FE_OVERLAY void fn_80451028(FeScr6* self)
 {
     fn_80124FA8(self->m194, self);
     fn_80125154(self->m194, 0);
@@ -335,6 +402,53 @@ extern "C" FE_OVERLAY int fn_80451210(FeW188* self)
 {
     self->m188->v53();
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_8045124C(FeScr6* self, int a)
+{
+    if (fn_8057CE00(a) >= 0) {
+        int cur = ((FeObjI*)self->m188)->v60();
+        fn_80450B44(self, a);
+        int n;
+        if (((FeObjI*)self->m188)->v59() - 1 > 0)
+            n = ((FeObjI*)self->m188)->v59() - 1;
+        else
+            n = 0;
+        int k = cur;
+        if (k > n)
+            k = n;
+        ((FeObj2*)self->m188)->v67(k, 0);
+    }
+    int m;
+    if (self->m17C <= ((FeObjI*)self->m188)->v62())
+        m = self->m17C;
+    else
+        m = ((FeObjI*)self->m188)->v62();
+    int i = 0;
+    if (i < m) {
+        int off = 0;
+        do {
+            FeObj* cell = fn_800C8044(((FeObjP2*)self->m188)->v73(i, 0));
+            i++;
+            fn_804513E0(self, cell, FeGetI((char*)&self->m134, off), a);
+            off += 4;
+        } while (i < m);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804513E0(FeScr6* self, FeObj* o, int v, int a)
+{
+    char b8[0x18];
+    char b20[8];
+    fn_8045156C(self, fn_800C8044(o->v32("AWAY", 1)), 1, v, a);
+    fn_8045156C(self, fn_800C8044(o->v32("HOME", 1)), 0, v, a);
+    if (fn_8007FDA8((Unk8007F198_C*)lbl_8061930C, v, a) != 0) {
+        ((FeObj1*)fn_800C8040(o->v32("TIME", 1)))->v29(0xCF5);
+    } else {
+        fn_8032A0C0(b20, fn_8007FBDC((Unk8007F198_C*)lbl_8061930C, v, a));
+        fn_800DD344(b20, b8);
+        ((FeObj1*)fn_800C8040(o->v32("TIME", 1)))->v28((int)b8);
+    }
 }
 
 extern int lbl_8062164C;
@@ -379,5 +493,5 @@ extern "C" FE_OVERLAY void fn_80451D40(FeScr6* self)
 extern "C" FE_OVERLAY void fn_80451E10(FeScr6* self, int a)
 {
     if (a == (int)self->m188)
-        fn_80451028(self, a);
+        ((void (*)(FeScr6*, int))fn_80451028)(self, a);
 }
