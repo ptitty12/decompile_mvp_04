@@ -419,7 +419,10 @@ void fn_8040B830(void* dst, const char* src, int n);
 /* Game-state object returned by fn_8011AA24(i) (i = 0..2, table at lbl_8061B8C0+8; 0 otherwise).
  * Evidence: fn_801142C4, fn_8010EAF4, fn_8010F9CC read +0x6F8 (->+0x10/+0x14/+0x124), +0x700, +0x704, +0x708. */
 struct UnkGameP10 {
-    char pad0[0x124];
+    char pad0[0x6C];
+    int m6C;
+    int m70;
+    char pad74[0xB0];
     int m124;
 };
 struct UnkGameP6F8 {
