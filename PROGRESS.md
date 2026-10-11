@@ -28,3 +28,4 @@
   - original-asm SDK functions policy;
   - push + create unit issues;
   - review the Phase 1 pipeline choices.
+- 2026-10-10 | W4 (Sonnet 5.5) | ealib/tu_8036FEA0 .. tu_80376598 (issues #66-#76) | matched 22 funcs (11x static-init pair), 0 abandoned; 44 large funcs (0x224-0x8x0 param-table ctors/creators) not attempted | none | none
