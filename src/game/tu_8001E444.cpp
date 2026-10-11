@@ -32,6 +32,33 @@ extern "C" void fn_8001E810(Unk8001E444_Obj* x)
     fn_8004390C(fn_8001D1A4(x, x->m130->m704, b, a));
 }
 
+/* near-miss: 64/66 insns. Retail keeps lbl_805A5360/lbl_805A5368 in f30/f31 across both calls
+ * (they are stored with the local triple at sp8..sp10) and reloads the other constants; two
+ * fewer instructions here (the float temporaries are scheduled differently). Tried array,
+ * Vec3 and const-float locals. */
+extern "C" int fn_8001EB78(Unk8001E444_Obj* x)
+{
+    Unk801A4B34_Vec3 a;
+    a.x = lbl_805A5360;
+    a.y = lbl_805A5364;
+    a.z = lbl_805A5368;
+    int r = 0;
+    Unk801A4B34_Vec3 b;
+    b.x = fn_80254330(x->m130->m588, 0);
+    b.y = lbl_805A536C;
+    b.z = lbl_805A5370;
+    float v1 = fn_80254330(x->m130->m588, 1);
+    if (!(b.x > a.z))
+        r = 2;
+    else if (!(b.x < a.x))
+        r = 1;
+    if (!(v1 > lbl_805A5370) && !(b.x <= lbl_805A5364))
+        r |= 0x10;
+    else if (!(v1 < lbl_805A536C))
+        r |= 8;
+    return r;
+}
+
 extern "C" void fn_8001EC80(Unk8001E444_Obj* x)
 {
     int sz;
@@ -78,6 +105,69 @@ extern "C" int fn_8001EDE4(Unk8001E444_Obj* x)
         return 2;
     }
     return 0;
+}
+
+/* near-miss: 99/99 insns, branch targets only: retail shares one `li r30,4` block between the
+ * cases 0, 1 and 2 (separate compares, one body); here the three identical bodies are not
+ * cross-jumped. Fallthrough labels give a range compare instead; default/if-chain forms differ more. */
+extern "C" int fn_8001EE28(Unk8001E444_Obj* x)
+{
+    int r = 0;
+    int buf[3];
+    int* b = buf;
+    Unk801A4B34_Pos* pp = x->m130->m44C->m6CC;
+    int pl = x->m130->m44C->m700->m3B0;
+    fn_80235C18(b, pl);
+    if (fn_8022EC70(pl) != 0)
+        return 0x2000;
+    int c = fn_8018CE28(pp, ((Unk80023F98_Pl*)x->m3B0)->fn_vslot24(), b);
+    switch (c) {
+    case 0:
+        r = 4;
+        break;
+    case 1:
+        r = 4;
+        break;
+    case 2:
+        r = 4;
+        break;
+    case 3:
+        r = 1;
+        break;
+    case 4:
+        r = 0x10;
+        break;
+    case 5:
+        r = 8;
+        break;
+    case 6:
+        r = 2;
+        break;
+    case 7:
+        r = 0x22;
+        break;
+    case 8:
+        r = 0x42;
+        break;
+    }
+    if (fn_8022EAF4(pl, b) != 0) {
+        r |= 0x1800;
+        switch (c) {
+        case 1:
+            r |= 0x180;
+            break;
+        case 2:
+            r |= 0x600;
+            break;
+        case 7:
+            r |= 0x80;
+            break;
+        case 8:
+            r |= 0x400;
+            break;
+        }
+    }
+    return r;
 }
 
 extern "C" int fn_8001EFB4(Unk8001E444_Obj* x)
@@ -212,31 +302,4 @@ extern "C" void fn_8001F5CC(Unk8001E444_Obj* x)
 extern "C" void fn_8001F614(Unk8001E444_Obj* x)
 {
     fn_80046160(x->m0, x->m130->m44C->m6F8->m10->m1C);
-}
-
-/* near-miss: 64/66 insns. Retail keeps lbl_805A5360/lbl_805A5368 in f30/f31 across both calls
- * (they are stored with the local triple at sp8..sp10) and reloads the other constants; two
- * fewer instructions here (the float temporaries are scheduled differently). Tried array,
- * Vec3 and const-float locals. */
-extern "C" int fn_8001EB78(Unk8001E444_Obj* x)
-{
-    Unk801A4B34_Vec3 a;
-    a.x = lbl_805A5360;
-    a.y = lbl_805A5364;
-    a.z = lbl_805A5368;
-    int r = 0;
-    Unk801A4B34_Vec3 b;
-    b.x = fn_80254330(x->m130->m588, 0);
-    b.y = lbl_805A536C;
-    b.z = lbl_805A5370;
-    float v1 = fn_80254330(x->m130->m588, 1);
-    if (!(b.x > a.z))
-        r = 2;
-    else if (!(b.x < a.x))
-        r = 1;
-    if (!(v1 > lbl_805A5370) && !(b.x <= lbl_805A5364))
-        r |= 0x10;
-    else if (!(v1 < lbl_805A536C))
-        r |= 8;
-    return r;
 }
