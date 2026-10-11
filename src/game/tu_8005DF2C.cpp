@@ -252,9 +252,9 @@ float fn_8005EA90(void* a, int b, int c, Ctx* ctx)
 
 float fn_8005EB38(void* a, int b, int c, Ctx* ctx)
 {
-    float result = 100.0f;
+    float result = 0.0f;
     if (!fn_802F92CC(ctx->m130->m44C->m720))
-        result = 0.0f;
+        result = 100.0f;
     return result;
 }
 
