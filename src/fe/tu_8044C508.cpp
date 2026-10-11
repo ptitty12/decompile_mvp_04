@@ -312,6 +312,52 @@ extern "C" FE_OVERLAY void fn_8044E83C(FeScr2* self, int a, int b)
     fn_80445564(self, a, b);
 }
 
+extern "C" FE_OVERLAY void fn_8044E9B8(FeScr2* self, int k)
+{
+    int d;
+    switch (k) {
+    case 0: {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "VIEWDAYSGAMES", 15);
+        p->name[15] = 0;
+        FeTimer* t = fn_80446AD4(self);
+        fn_800B555C()->m14 = *(int*)&t->mC;
+        ((FeObj*)self)->v40();
+        ((FeObj1*)self)->v80(1);
+        fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        break;
+    }
+    case 1: {
+        d = *(int*)&fn_80446AD4(self)->mC;
+        int x = fn_80329E74(&d);
+        fn_80470404(self->m164, x, 1, 0, 0, 0);
+        break;
+    }
+    case 2: {
+        d = *(int*)&fn_80446AD4(self)->mC;
+        int x = fn_80329E74(&d);
+        fn_80470478(self->m164, x, 1, 0, 0, 1);
+        break;
+    }
+    case 3: {
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        lbl_80621644 = lbl_80621644 ^ 1;
+        int id = 0x170E;
+        if (lbl_80621644 != 0) {
+            id = 0x170F;
+        }
+        fn_801251CC(self->m170, 2, id, 3);
+        fn_80445DA8(self);
+        break;
+    }
+    default:
+        fn_80446B60(self, k);
+        break;
+    }
+}
+
 /*
  * Front-end overlay code, .frontend_codeoverlay 0x8044C508-0x8044F550 (code-only unit;
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.

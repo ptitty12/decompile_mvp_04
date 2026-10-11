@@ -517,7 +517,9 @@ struct FeScr2 : FeObj {
     short m150;
     unsigned short m152;
     int m154, m158, m15C;
-    char pad160[0x170 - 0x160];
+    int m160;
+    FeObj* m164;
+    char pad168[0x170 - 0x168];
     FeObj* m170;
     char pad174[0x6EC - 0x174];
     FeObj* m6EC;
@@ -637,6 +639,9 @@ struct FeScr8b : FeObj {
     FeObj* m13C[4];
     char pad14C_[0];
     int m14C;
+    int m150;
+    int m154;
+    int m158;
 };
 struct FeScr8Raw {
     char pad0[0x3C];
@@ -1232,5 +1237,14 @@ void fn_80444850(FeTimerRaw* t);
 void fn_80445DA8(FeScr2* s);
 int fn_80445D5C(int a, int idx);
 int fn_80445D7C(int a, int idx);
+}
+
+extern "C" void fn_8045AF68(void* s, int a);
+
+extern int lbl_80621644;
+extern "C" {
+void fn_80470404(FeObj* o, int a, int b, int c, int d, int e);
+void fn_80470478(FeObj* o, int a, int b, int c, int d, int e);
+void fn_80446B60(FeScr2* s, int k);
 }
 #endif
