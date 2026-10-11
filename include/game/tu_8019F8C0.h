@@ -89,7 +89,9 @@ struct Unk8019F8C0_Ring {
 struct Unk8019F8C0_Inner {
     unsigned char m0;
     unsigned char m1;
-    char pad2[6];
+    unsigned char m2;
+    unsigned char m3;
+    char pad4[4];
     int m8;
     char padC[0x108 - 0xC];
     int m108;
@@ -101,6 +103,8 @@ struct Unk8019F8C0_Inner {
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
     int GetM1() { return m1; }
+    int GetM2() { return m2; }
+    int GetM3() { return m3; }
 };
 
 struct Unk8019F8C0_Obj4A4 {
@@ -164,6 +168,23 @@ public:
     virtual void fn_vslot5();
     virtual void fn_vslot6();
     virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24(int a);
 };
 
 /* State-machine style object with a vptr at +8 (fn_801A4CE8 result, Sub::m3C). */
