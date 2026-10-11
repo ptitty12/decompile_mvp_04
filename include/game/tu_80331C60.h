@@ -71,7 +71,7 @@ struct Unk3B4 { char pad0[0x1C]; int m1C; };
 struct Unk404 { char pad0[4]; float m4; float m8; };
 struct Unk8017DD64_T { char pad0[0x3B0]; void* m3B0; Unk3B4* m3B4; char pad3B8[0x4C]; Unk404* m404; };
 struct UnkObj65C { char pad0[0x60]; float m60; float m64; float m68; };
-struct UnkMgr8 { char pad0[0x65C]; UnkObj65C* m65C[13]; char pad690[0x68]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; char pad704[0xC]; void* m710; char pad714[0x24]; void* m738; };
+struct UnkMgr8 { char pad0[0x4C]; unsigned int m4C; char pad50[0x65C - 0x50]; UnkObj65C* m65C[13]; char pad690[0x68]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; char pad704[0xC]; void* m710; char pad714[0x24]; void* m738; };
 struct UnkGm { char pad0[0x8]; UnkMgr8* m8; UnkMgr8* mC; char pad10[0x14]; int m24; };
 /* result of fn_801A4CE8(mgr, 1): option record with fields at +0xC, +0x10, +0xA0 */
 struct UnkOpt { char pad0[0xC]; int mC; int m10; char pad14[0x8C]; int mA0; };

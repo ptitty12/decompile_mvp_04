@@ -41,18 +41,18 @@ struct Unk308 { char pad0[0x300]; int m300; char pad304[4]; int m308; int m30C; 
 extern Unk308* lbl_8061EA68;
 extern int lbl_80621574, lbl_80621578;
 struct Unk3D40 { char pad0[0x3D40]; int m3D40; };
-struct UnkMgr4C { char pad0[0x4C]; unsigned int m4C; };
-struct UnkGm4C { char pad0[8]; UnkMgr4C* m8; };
-extern UnkGm4C* lbl_8068B618;
-extern int lbl_80620860;
+extern UnkGm* lbl_8068B618;
+extern int lbl_80620860, lbl_80620864, lbl_80620868;
 struct Unk588 { char pad0[0x588]; int m588; };
 extern "C" {
 Unk588* fn_801A4910(UnkMgr8* m, int a, int b);
 void fn_802542E8(void* p, int k, void* buf);
 }
 extern "C" {
-void fn_801A0790(UnkMgr4C* m, float f);
-Unk3D40* fn_801A6D84(UnkMgr4C* m, int i);
+void fn_801A0790(UnkMgr8* m, float f);
+Unk3D40* fn_801A6D84(UnkMgr8* m, int i);
+void fn_80086EC0(void* o, int a, int b);
+void fn_801A23B8(UnkMgr8* m, int k);
 }
 extern char* lbl_8061E978;
 extern const char lbl_805F2FB0[];
@@ -117,9 +117,36 @@ extern "C" void fn_803397B0(Menu* p)
 
 extern "C" void fn_80339828() {}
 
+extern "C" void fn_8033982C()
+{
+    UnkMgr8* m = lbl_8068B618->m8;
+    fn_80331294(lbl_8061B998 + 0x24);
+    if (m) {
+        int v = lbl_80620868;
+        if (v > 0)
+            *(int*)((char*)m->m6F8->m10 + 0x1C) = v;
+        fn_801A0790(m, (float)m->m4C * 0.016666668f + 4500.0f);
+        int i = 0;
+        do {
+            Unk3D40* o = fn_801A6D84(m, i);
+            if (o)
+                o->m3D40 = 1;
+            i++;
+        } while (i <= 5);
+        fn_80086EC0(m->m6F8->m10, 0, -1);
+        fn_80086EC0(m->m6F8->m10, 1, -1);
+        fn_801A23B8(m, 1);
+    }
+    lbl_80620860 = 1;
+    if (lbl_80620864 <= 0)
+        lbl_80620864 = 255;
+    lbl_8061B8C0->m24 = 0;
+    fn_802D7ACC();
+}
+
 extern "C" void fn_80339968()
 {
-    UnkMgr4C* m = lbl_8068B618->m8;
+    UnkMgr8* m = lbl_8068B618->m8;
     lbl_80620860 = 0;
     fn_801A0790(m, (float)m->m4C * 0.016666668f);
     int i = 0;
@@ -149,7 +176,6 @@ extern "C" void fn_80339A08()
 }
 
 Rec24* fn_8033ACE8() { return &lbl_80691BF4[lbl_80691DF4]; }
-
 
 extern "C" void fn_8033AE60()
 {
