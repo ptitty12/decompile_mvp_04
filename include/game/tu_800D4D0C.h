@@ -1,6 +1,7 @@
 #ifndef GAME_TU_800D4D0C_H
 #define GAME_TU_800D4D0C_H
 
+
 /*
  * Types for game/tu_800D4D0C.cpp (reconstructed; nothing here comes from
  * original headers; names are placeholders: Unk<addr>, m<offset>, vslotN).
@@ -234,4 +235,27 @@ struct Unk800D7008_Obj {
     float m60;
 };
 
+inline void* operator new(unsigned int, void* p) { return p; }
+/* Chooser/object root (ctor 0x8037B3E8): only its constructor is called here. */
+class Unk8037B3E8 {
+public:
+    Unk8037B3E8(unsigned int hash);
+};
+extern "C" void fn_8033CCE0(void* p);
+extern char lbl_806557A8[];
+extern char lbl_8065BDF8[];
+extern char lbl_806578D8[];
+struct Unk800D697C_Obj {
+    char m0[0x60];
+    float m60;
+    char m64[0xC8 - 0x64];
+    int mC8;
+    int mCC;
+    float mD0;
+};
+struct UiScrRaw2 {
+    char pad0[0x3C];
+    const void* m3C;
+    void fn_800D0D9C(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l);
+};
 #endif

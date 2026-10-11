@@ -305,6 +305,13 @@ int fn_800D641C(Unk800D4D0C_D* t, int x)
     return -1;
 }
 
+UiScrRaw2* fn_800D649C(UiScrRaw2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k)
+{
+    self->fn_800D0D9C(a, 7, b, c, d, e, f, g, h, i, j, k);
+    self->m3C = lbl_806578D8;
+    return self;
+}
+
 /* near-miss: register allocation differs (this in r30 instead of r31, vptr of a loaded early) */
 void fn_800D6528(Unk800D4D0C_D* t)
 {
@@ -378,6 +385,18 @@ void fn_800D689C(Unk800D4D0C_D* t)
     }
 }
 
+void* fn_800D697C(Unk800D697C_Obj* p)
+{
+    new (p) Unk8037B3E8(0x6D896082);
+    *(const void**)p = lbl_8065BDF8;
+    fn_8033CCE0((char*)p + 0xB0);
+    fn_8033CCE0((char*)p + 0xBC);
+    p->mC8 = 1;
+    p->mCC = 0;
+    p->mD0 = p->m60;
+    return p;
+}
+
 void fn_800D6F9C()
 {
 }
@@ -410,6 +429,12 @@ float fn_800D7008(Unk800D7008_Obj* t, int a)
         }
     }
     return s;
+}
+
+Unk800D7624::Unk800D7624()
+{
+    new (this) Unk8037B3E8(0x6BC2DEDF);
+    *(const void**)this = lbl_806557A8;
 }
 
 int fn_800D7898(int n)
