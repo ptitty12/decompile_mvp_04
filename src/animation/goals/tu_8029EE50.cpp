@@ -5,6 +5,11 @@
  * .text 0x8029EE50-0x802A3704 only: this region's data is interleaved with
  * other parts of the TU, so every data object it uses is declared extern by
  * its lbl_ name (no .rodata/.data split for this unit).
+ *
+ * Status: 22/33 match. Near-misses carry a note above them. Not written (the
+ * original assembly stays): fn_8029EFAC and fn_8029FB9C (about 760 instructions
+ * each, the goal state functions), fn_802A1D7C (496, float compares kept as
+ * values) and fn_802A30B0 (214, a dozen by-value Vec3 temporaries).
  */
 #include "game/goals/tu_8029EE50.h"
 
@@ -35,6 +40,12 @@ void fn_8029EF28(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link)
     }
 }
 
+/* near-miss: 395 of 395 instructions, 84%. The prologue and the three
+ * fn_8029CFDC argument copies match (FlatPosOf, non-const lbl_805DED34/4C). Retail
+ * keeps the results of the two AngleDiff calls in named float slots (+0x48 and
+ * +0x4C, one store/reload pair each); naming them here grows the frame to 184.
+ * The operator- temporary of `zero - pos` also lands at +0x68 here, +0x58 in
+ * retail, and the loads of the global zero vector are scheduled later. */
 int fn_802A0754(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80271DBC_Link* link = x->m618;
@@ -189,6 +200,10 @@ int fn_802A1070(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
     return 0xB;
 }
 
+/* near-miss: 240 of 240 instructions, 97.2%. Retail's first store of the int slot
+ * at +0x158 is `li r9,0x158; stwx r11,r30,r9` (the same idiom as in fn_80280F08,
+ * tu_8027FD64.cpp, and fn_802977FC, tu_8028F178.cpp); here it folds into
+ * `stw r11,0x158(r30)`, which also lets the next float store move up. */
 int fn_802A11FC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80271DBC_Link* link = x->m618;
@@ -279,6 +294,12 @@ int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, unsigned int has
     return 0;
 }
 
+/* near-miss: 379 of 379 instructions, about 80%. The control flow, the register
+ * assignment (r22-r31) and the first 44 frame offsets match. Retail's frame is
+ * 312 bytes, here 280: retail allocates the by-value Vec3 temporaries of the
+ * Scale/Dir inlines at +0x80/+0x90 and the Dir frame at +0xA0 (here they are packed
+ * lower), and it keeps h2, eps and len at +0xF8/+0xFC/+0x100 above the operator+
+ * result. */
 int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80273498_Vec3 pos = FlatPosOf(x);
@@ -538,6 +559,10 @@ void fn_802A28EC(Unk8029B70C_Goal* g, Unk80270BA0_X* a, Unk80273498_Pos* b)
     }
 }
 
+/* near-miss: 70 of 70 instructions, 95%. Same instructions as retail; the 3600.0f
+ * constant load is scheduled before the vector subtraction here and after it in
+ * retail, and the two position pointers take their registers in the other order.
+ * Tried: no named Vec3, a by-value LenSq, a float local, `>` instead of `!(<=)`. */
 void fn_802A2A64(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80273498_Pos* p)
 {
     if (x && p) {
@@ -687,6 +712,13 @@ void fn_802A2F20(Unk802A2F20_Goal* g)
     g->m48 = 0;
 }
 
+/* near-miss: 90 of 90 instructions, 95%. The code is identical; only the registers
+ * differ. Retail keeps the goal in r3 (never copied), the player in r10 and the link
+ * in r8; here the link takes r3, the goal r10 and the player r8 (global allocation
+ * priority of the link pseudo). 36 spellings (link local at the top, after the kind
+ * or absent; `cur` local or inline; three forms of the return value; int or unsigned
+ * hash) compile to the same registers. The case order 1,2,5,6,3,7,4,8,9 is
+ * retail's block order. */
 int fn_802A2F2C(Unk802A2F20_Goal* g, Unk80270BA0_X* x)
 {
     int kind = g->m48;
@@ -743,6 +775,12 @@ void fn_802A309C(Unk802A309C_Goal* g)
     g->m50 = 0;
 }
 
+/* near-miss: 170 of 170 instructions, 97.8%. Retail copies the vector `v` into
+ * x->m960 with loads straight off the frame (8/12/16(r1)); here the second and
+ * third word come through the pointer register that the initial copy of the
+ * global created (4/8(r27)). Tried: a by-value or const& SetPos inline and all 24
+ * orders of the four head statements. The second ratio test is an if/else chain
+ * because `switch (n) { case 2: break; case 1: ... }` drops the empty case. */
 inline void Unk802A3408_SetM320(Unk80270BA0_X* x, const Unk80273498_Vec3& v)
 {
     ((Unk802A3408_Player*)x)->m320 = v;

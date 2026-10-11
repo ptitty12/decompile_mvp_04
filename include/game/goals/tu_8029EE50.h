@@ -154,8 +154,8 @@ UNK8029B70C_MIRROR(Unk8029B70C_Mirror50, float, 0x50)
 UNK8029B70C_MIRROR(Unk8029B70C_Mirror110, float, 0x110)
 
 int fn_8029CFDC(Unk8029B70C_Goal* g, const Unk80273498_Vec3* a, const Unk80273498_Vec3* b);
-extern const Unk80273498_Vec3 lbl_805DED34;     /* (1080, 0, 1080) */
-extern const Unk80273498_Vec3 lbl_805DED4C;     /* (7.5, 0, 7.5) */
+extern Unk80273498_Vec3 lbl_805DED34;     /* (1080, 0, 1080) */
+extern Unk80273498_Vec3 lbl_805DED4C;     /* (7.5, 0, 7.5) */
 extern float lbl_8061E7D4;
 extern float lbl_8061E7D8;
 
