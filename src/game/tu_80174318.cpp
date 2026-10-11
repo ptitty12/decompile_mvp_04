@@ -18,12 +18,44 @@ void fn_80174318(Unk80174318_T* p, int state, Unk80174318_Fn f)
     p->m74 = g;
 }
 
+/* near-miss: retail copies the loaded value into r3 separately (mr r3,r0; 22 instrs); the copy is
+ * coalesced here (21). */
+int fn_801743E0(int* arr)
+{
+    int r;
+    for (int i = 0; i < 1; i++) {
+        int v = arr[i];
+        r = v;
+        if (v != 0) {
+            r = fn_8000587C(v);
+            arr[i] = 0;
+        }
+    }
+    return r;
+}
+
+void fn_80174438(Unk80174438_T* p)
+{
+    for (unsigned int i = 0; i <= 3; i++) {
+        Unk8016FF40* o = p->m8[i];
+        if (o != 0) {
+            delete o;
+            p->m8[i] = 0;
+        }
+    }
+}
+
 void fn_801744AC(Unk80174318_T* p)
 {
     for (int i = 0; i < 4; i++) {
         p->m1C[i].m0 = 0;
         p->m1C[i].m4 = 0;
     }
+}
+
+void fn_801744D8(Unk80173274_T* p, int a, int b, int c)
+{
+    ((Unk80170518*)fn_80173274(p))->fn_80005F4C(a, b, c);
 }
 
 void fn_80174760(Unk80174318_T* p)
@@ -39,6 +71,17 @@ int fn_801747A0()
 void fn_80174824(int a)
 {
     fn_80402CAC(lbl_8061C674, a);
+}
+
+void fn_801748D8(Unk801748D8_Obj* o)
+{
+    if (lbl_8061C674 != 0) {
+        fn_803EDA0C(lbl_8061C674);
+        lbl_8061C674 = 0;
+    }
+    if (o != 0) {
+        o->vslot2();
+    }
 }
 
 int fn_801757C0(void* p, int a)

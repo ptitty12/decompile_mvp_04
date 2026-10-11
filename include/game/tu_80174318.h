@@ -100,4 +100,38 @@ void fn_80177BCC(void* self, void* a);
 void fn_80177B74(Unk80177B74_T* p, void* a, int c);
 void fn_80177BF4(Unk80177B74_T* p, void* a);
 
+/* Record with a virtual destructor (vptr at +0x124, see tu_8016F9A8.h), deleted through the
+ * in_chrg 3 call. */
+class Unk8016FF40 {
+public:
+    virtual ~Unk8016FF40();
+    char pad4[0x124];
+};
+struct Unk80174438_T {
+    char pad0[8];
+    Unk8016FF40* m8[4];
+};
+/* State machine base (vptr at +0xD4, see tu_80170044.h): only slot 8 is used here. */
+class Unk80170518 {
+public:
+    char pad0[0xD4];
+    virtual void fn_80005B88(void* a);
+    virtual int fn_8000850C(int a);
+    virtual int fn_80005B74(int a);
+    virtual int fn_801757C8();
+    virtual void fn_80005A7C(void* a);
+    virtual int fn_80005E8C();
+    virtual void fn_80005A50();
+    virtual void fn_80005F4C(int a, int b, int c);
+};
+class Unk801748D8_Obj {
+public:
+    virtual void vslot1();
+    virtual void vslot2();
+};
+struct Unk80173274_T;
+int fn_80173274(Unk80173274_T* p);
+int fn_8000587C(int p);
+void fn_803EDA0C(int a);
+
 #endif
