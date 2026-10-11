@@ -95,7 +95,7 @@ extern "C" void fn_80023E18(Unk80023AC4_Obj* x)
 extern "C" void fn_80023ED8(Unk80023AC4_Obj* x)
 {
     for (int i = 0; i < x->m260; i++)
-        x->m1E4[i].m0 = -1;
+        x->m1D0[i].m14 = -1;
     x->m6CC = (float)x->m80[0]->m4C * lbl_805A6088;
     fn_800243D4(x);
     x->fn_800233B4(0, 10, 0);

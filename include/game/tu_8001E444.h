@@ -38,10 +38,20 @@ struct Unk8001F5CC_Ent {
     char pad234[0xE64 - 0x234];
 };
 
+/* Sum of the 128 bytes at Ent+0x1B4 (fn_8001F788, fn_8002A2D4). */
+inline unsigned Unk8001F5CC_RowSum(const Unk8001F5CC_Ent* e)
+{
+    unsigned s = 0;
+    for (int i = 0; i < 0x80; i++)
+        s += e->m1B4[(unsigned char)i];
+    return s;
+}
+
 /* Pointed to by Unk8001F5CC_Tbl::m14: two entities, then a selector at +0x1CD0. */
 struct Unk8001F218_Pair {
     Unk8001F5CC_Ent e[2];
-    char pad1CC8[8];
+    unsigned char m1CC8;
+    char pad1CC9[7];
     int m1CD0;
 };
 
@@ -92,7 +102,9 @@ struct Unk801A4B34_Pos {
     int m458;
     char pad45C[4];
     int m460;
-    char pad464[0x708 - 0x464];
+    char pad464[0x590 - 0x464];
+    unsigned m590;
+    char pad594[0x708 - 0x594];
     int m708;
 };
 
@@ -122,7 +134,11 @@ struct Unk8001F2C4_World {
     char pad0[0x48];
     unsigned m48;
     unsigned m4C;
-    char pad50[0x6CC - 0x50];
+    char pad50[0x684 - 0x50];
+    int m684;
+    int m688;
+    int m68C;
+    char pad690[0x6CC - 0x690];
     Unk801A4B34_Pos* m6CC;
     char pad6D0[0x6F8 - 0x6D0];
     Unk8001F5CC_Tbl* m6F8;

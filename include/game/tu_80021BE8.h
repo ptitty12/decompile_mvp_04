@@ -16,6 +16,7 @@ void fn_800222B4(Unk8001F2C4_World* ctx, int* outX, int* outY, Unk801A4B34_Vec3 
 void fn_800412AC(Unk8004072C_Obj* o, int kind, int x, int y, int p, int q);
 int fn_801C3F00(Unk8001F2C4_Inner* v);
 void fn_80021C1C(void* x, Unk8001F2C4_World* ctx);
+void fn_800220EC(void* x, Unk8001F2C4_World* ctx);
 void fn_80022080(void* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p);
 int fn_8016ADC4();
 }

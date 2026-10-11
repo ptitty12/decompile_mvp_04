@@ -106,7 +106,7 @@ extern "C" void fn_80022080(void* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p)
     fn_800412AC(fn_8004072C(), 0xB, sx, sy, 0, 0);
 }
 
-extern "C" void fn_800220EC()
+extern "C" void fn_800220EC(void* x, Unk8001F2C4_World* ctx)
 {
     fn_800412AC(fn_8004072C(), 0x33, 0x64, 1, 0, 0);
 }
