@@ -22,11 +22,109 @@ inline float LengthSq(Unk80273498_Vec3 v)
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
+inline Unk80273498_Vec3 operator*(const Unk80273498_Vec3& v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Normalize(const Unk80273498_Vec3& v, float len)
+{
+    float inv = 1.0f / len;
+    Unk80273498_Vec3 r;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline void SetVec(Unk80273498_Vec3* dst, Unk80273498_Vec3 v)
+{
+    *dst = v;
+}
+
 inline void Scale(Unk80273498_Vec3* v, float s)
 {
     v->x = v->x * s;
     v->y = v->y * s;
     v->z = v->z * s;
+}
+
+/* near-miss (307 vs 295 instructions): the control flow and arithmetic are
+ * right but the frame is 8 bytes bigger and the d == 3 branch's temporaries
+ * (n, the normalised vector, the two operator* results) land in other slots;
+ * the entry loop uses indexed loads where retail steps a pointer by 6, and the
+ * [0,1] clamp branches differently. Tried: rec/no rec variable, operator* by
+ * value/reference, named temporaries for the two products. */
+Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float* e)
+{
+    int idx = fn_802871D8(a);
+    Unk80287600_Rec* rec = &lbl_806E07E0[idx];
+    int count = rec->count;
+    float pos[2];
+
+    fn_802872AC(pos, idx, b, c, d);
+    if (a == 7) {
+        pos[0] = *e * 0.15915494f + 0.5f;
+        pos[0] = pos[0] > 1.0f ? 1.0f : (!(pos[0] >= 0.0f) ? 0.0f : pos[0]);
+    }
+    if (x->fn_vslot4()) {
+        pos[0] = 1.0f - pos[0];
+    }
+
+    float da;
+    float db;
+    float d2;
+    float bestd = 10.0f;
+    const float inv255 = 0.003921569f;
+    int best = -1;
+    Unk80287600_Entry* p = rec->e;
+
+    for (int i = 0; i < count; i++) {
+        da = (float)p->m4 * inv255 - pos[0];
+        db = (float)p->m5 * inv255 - pos[1];
+        d2 = da * da + db * db;
+        if (!(d2 >= bestd)) {
+            bestd = d2;
+            best = i;
+        }
+        p++;
+    }
+
+    Unk80287600_Vec4 v;
+    const float frame = 0.016666668f;
+    const float two = 2.0f;
+
+    v.w = (float)lbl_806E07E0[idx].e[best].m3 * frame;
+    v.x = two * (float)lbl_806E07E0[idx].e[best].m0;
+    v.y = two * (float)lbl_806E07E0[idx].e[best].m1;
+    v.z = two * (float)lbl_806E07E0[idx].e[best].m2;
+    if ((unsigned int)(c - 4) <= 2) {
+        if ((unsigned int)(d - 2) <= 1) {
+            v.y = -v.y;
+        }
+    } else if (d == 3) {
+        float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+        Unk80273498_Vec3 n;
+
+        if (len != 0.0f) {
+            n = Normalize(v, len);
+        } else {
+            n = lbl_806055AC;
+        }
+        float one = 1.0f;
+        float twelve = 12.0f;
+        Unk80273498_Vec3 off = (n * one) * twelve;
+
+        v.x = v.x + off.x;
+        v.y = v.y + off.y;
+        v.z = v.z + off.z;
+    }
+    fn_80287A9C(x, &v);
+    return v;
 }
 
 void fn_80287A9C(Unk80270BA0_X* x, Unk80273498_Vec3* v)
@@ -182,11 +280,18 @@ float Unk80287D70::fn_80288E88(Unk80270BA0_X* x)
     return a;
 }
 
+/* near-miss (195 vs 196 instructions, ~96%). The extra `case 0/1/2:` labels make
+ * g++ balance the case tree around 8 as retail does (as in fn_80289268). Left:
+ * the ctx pointer `c` lands in r6 instead of r3, and retail's case 9 shares one
+ * `r = 0x94C34DBD` block between the "not 2" and "predicate failed" paths with
+ * the success block first; here the success path is inverted (ble) and
+ * `r = 0x18A18DEB` is hoisted above the compare. Tried: if/else (duplicates the
+ * constant), goto, repeating x->m44C->m6CC (worse). */
 unsigned int Unk80287D70::fn_80288F1C(Unk80270BA0_X* x, int kind)
 {
     Unk80271DBC_Link* link = x->m618;
-    int h1 = link->m83C;
     int h0 = link->m838;
+    int h1 = link->m83C;
     unsigned int r;
 
     switch (kind) {
@@ -196,23 +301,24 @@ unsigned int Unk80287D70::fn_80288F1C(Unk80270BA0_X* x, int kind)
     case 9: {
         Unk80273498_Pos* c = x->m44C->m6CC;
 
-        r = 0x94C34DBD;
         if (c->m38C == 2) {
             Unk80273498_Vec3 p = c->m60;
 
             p.y = 0.0f;
             float len2 = LengthSq(p - lbl_805DED4C);
-            if (!(len2 > 9216.0f)) {
+            if (!(len2 >= 9216.0f)) {
                 r = 0x0AB6992B;
-            } else {
-                float a = c->m3F4;
-                float b = fn_80190F0C();
+                break;
+            }
+            float a = c->m3F4;
+            float b = fn_80190F0C();
 
-                if (fn_801D0294((char*)x->m44C->m700->m3A4 + 0x28C) == 0 && !(a > b)) {
-                    r = 0x18A18DEB;
-                }
+            if (fn_801D0294((char*)x->m44C->m700->m3A4 + 0x28C) == 0 && !(a > b)) {
+                r = 0x18A18DEB;
+                break;
             }
         }
+        r = 0x94C34DBD;
         break;
     }
     case 6:
@@ -241,7 +347,7 @@ unsigned int Unk80287D70::fn_80288F1C(Unk80270BA0_X* x, int kind)
             r = 0x7942CA79;
         } else {
             r = 0xFA52B1B5;
-            x->m948 = fn_80289334();
+            SetVec(&x->m948, fn_80289334());
         }
         break;
     case 5:
@@ -255,6 +361,9 @@ unsigned int Unk80287D70::fn_80288F1C(Unk80270BA0_X* x, int kind)
     case 4:
         r = 0xBC3E4517;
         break;
+    case 0:
+    case 1:
+    case 2:
     default:
         r = 0xEA68D008;
         break;

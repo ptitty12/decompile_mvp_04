@@ -22,6 +22,35 @@ struct Unk80287D70_Ctx {
     Unk80270BA0_X* mC;
 };
 
+/* Table of 6 records (0x98 bytes) built by the static initializer fn_802AA7A4:
+ * up to 25 six-byte entries (three signed offsets, a frame count, two unsigned
+ * coordinates scaled by 1/255) and the entry count at +0x96. */
+struct Unk80287600_Entry {
+    signed char m0;
+    signed char m1;
+    signed char m2;
+    unsigned char m3;
+    unsigned char m4;
+    unsigned char m5;
+};
+struct Unk80287600_Rec {
+    Unk80287600_Entry e[25];
+    unsigned char count;
+    char pad97;
+};
+extern Unk80287600_Rec lbl_806E07E0[];
+
+/* Vec3 plus a time. */
+struct Unk80287600_Vec4 : public Unk80273498_Vec3 {
+    float w;
+};
+
+void fn_80287A9C(Unk80270BA0_X* x, Unk80273498_Vec3* v);
+int fn_802871D8(int a);
+void fn_802872AC(float* out, int idx, int b, int c, int d, ...);
+float fn_804028E4(float x);               /* square root */
+Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float* e);
+
 /* State record passed to fn_80386188 (offsets +0xD4 time, +0xD8 valid flag). */
 struct Unk80287C70_State {
     char pad0[0xD4];
