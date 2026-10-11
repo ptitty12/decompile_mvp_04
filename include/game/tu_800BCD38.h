@@ -409,6 +409,9 @@ struct Unk800C68B4_List {
     Unk800C7B40_Widget* fn_800C68D0(const char* name);
     void fn_800C694C(const char* name);
     void fn_800C696C();
+    void fn_800C6A94(void (Unk800C7B40_Widget::*f)());
+    void fn_800C6B5C(void (Unk800C7B40_Widget::*f)());
+    void fn_800C6C24(int a, int (Unk800C7B40_Widget::*f)(int));
 };
 
 extern "C" {

@@ -524,6 +524,30 @@ void Unk800C68B4_List::fn_800C696C()
     }
 }
 
+void Unk800C68B4_List::fn_800C6A94(void (Unk800C7B40_Widget::*f)())
+{
+    for (int i = 0; i < m1C4; i++)
+        (m34[i]->*f)();
+}
+
+void Unk800C68B4_List::fn_800C6B5C(void (Unk800C7B40_Widget::*f)())
+{
+    for (int i = 0; i < m1C4; i++)
+        (m34[i]->*f)();
+}
+
+/* near-miss: same instructions as retail but the register split differs (retail: base r8, widget r10, index r11; here r10/r11/r9);
+ * tried loop shapes, local widget, ptmf copy, break/return forms. */
+void Unk800C68B4_List::fn_800C6C24(int a, int (Unk800C7B40_Widget::*f)(int))
+{
+    for (int i = m1C4 - 1; i >= 0; i--) {
+        if (m34[i]->b1) {
+            if ((m34[i]->*f)(a))
+                return;
+        }
+    }
+}
+
 extern "C" void fn_800C69DC(Unk800C6794_Obj* o)
 {
     Unk800C6794_Pair p = lbl_805BC06C;
