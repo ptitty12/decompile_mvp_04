@@ -6,6 +6,7 @@
 
 extern const Unk80174318_Fn lbl_805CB1CC;
 extern int lbl_8061C668;
+extern const Unk80174318_Fn lbl_805CB1D4;
 extern int lbl_8061C674;
 extern char lbl_8065FCF0[];
 
@@ -23,6 +24,11 @@ void fn_801744AC(Unk80174318_T* p)
         p->m1C[i].m0 = 0;
         p->m1C[i].m4 = 0;
     }
+}
+
+void fn_80174760(Unk80174318_T* p)
+{
+    fn_80174318(p, 6, lbl_805CB1D4);
 }
 
 int fn_801747A0()
@@ -172,15 +178,44 @@ void fn_8017739C(Unk80176C0C_Entry* p, int a)
     }
 }
 
+void fn_80177A0C(void* self)
+{
+    fn_80177C34(self, 0);
+    fn_80177C74(self, 0);
+}
+
+void fn_80177A48(Unk80177B74_T* p, void* a, void* b, int c)
+{
+    fn_80177BCC(p, b);
+    fn_80177B74(p, a, c);
+}
+
 void fn_80177B40(void* self)
 {
     fn_80177974(self);
     fn_80177A0C(self);
 }
 
+void fn_80177B74(Unk80177B74_T* p, void* a, int c)
+{
+    if (a && p->m40 != 0) {
+        fn_80177BF4(p, a);
+        fn_8017757C(p, c);
+        fn_801773E4(p);
+    }
+}
+
 void fn_80177BCC(void* self, void* a)
 {
     if (a) {
         fn_80177C34(self, a);
+    }
+}
+
+void fn_80177BF4(Unk80177B74_T* p, void* a)
+{
+    if (a != p->mC) {
+        fn_80177900(p, p->mC);
+        p->mC = a;
     }
 }

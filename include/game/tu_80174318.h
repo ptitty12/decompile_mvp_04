@@ -86,5 +86,18 @@ extern int lbl_8061B9C8;
 void fn_80177974(void* self);
 void fn_80177A0C(void* self);
 void fn_80177C34(void* self, void* b);
+void fn_80177C74(void* self, int a);
+void fn_80177900(void* self, void* a);
+void fn_8017757C(void* self, int a);
+void fn_801773E4(void* self);
+struct Unk80177B74_T {
+    char pad0[0xC];
+    void* mC;
+    char pad10[0x40 - 0x10];
+    int m40;
+};
+void fn_80177BCC(void* self, void* a);
+void fn_80177B74(Unk80177B74_T* p, void* a, int c);
+void fn_80177BF4(Unk80177B74_T* p, void* a);
 
 #endif
