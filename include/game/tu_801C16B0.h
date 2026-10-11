@@ -25,6 +25,14 @@ struct Unk801C16B0_Sub8 {
 struct Unk801C16B0_M4 {
     char pad0[8];
     Unk801C16B0_Sub8 s8;
+    char pad18[0x3B0 - 0x18];
+    void* m3B0;
+};
+
+/* Pair of vectors at Z::m29C (stride 0x18); Z::m29C[1].a is at +0x2B4. */
+struct Unk801C16B0_VP {
+    Vec3 a;
+    Vec3 b;
 };
 
 /* Sub-object at Z::m28C: a flag word and a mode (fn_801C2724). */
@@ -38,17 +46,32 @@ struct Unk801C16B0_Mode {
 struct Unk801C16B0_Z {
     char pad0[4];
     Unk801C16B0_M4* m4;
-    char pad8[0xE0 - 8];
+    char m8[0xE0 - 8];
     char mE0[4];
     char padE4[0x124 - 0xE4];
     int m124;
-    char pad128[0x204 - 0x128];
+    int m128;
+    int m12C;
+    int m130;
+    char pad134[0x150 - 0x134];
+    float m150[2];
+    char pad158[0x1AC - 0x158];
+    int m1AC;
+    char pad1B0[0x1C8 - 0x1B0];
+    int m1C8;
+    int m1CC;
+    char pad1D0[0x1DC - 0x1D0];
+    float m1DC;
+    char pad1E0[0x204 - 0x1E0];
     Unk801B7FB0_P* m204;
     int m208;
     char m20C[4];
     char pad210[0x288 - 0x210];
     int m288;
     Unk801C16B0_Mode m28C;
+    float m294;
+    char pad298[0x29C - 0x298];
+    Unk801C16B0_VP m29C[3];
 };
 
 #endif
