@@ -87,3 +87,24 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
   `tools/scout/rename.py <unit> --write` first.
 - For scoring source variants, a difflib ratio over instruction lists works
   (a full-text ratio doesn't, because of relocations).
+
+## EA libraries (-O2), learned by W4 (2026-10-11)
+
+- EA lib code is `-O2`: `-Os` doesn't hoist invariant `lis`/`li` into
+  callee-saved registers or produce pre-tested loops.
+- `extern volatile PPCWGPipe GXWGFifo;` gives `lis 0xcc01` / `-0x8000(rX)`
+  (a literal 0xCC008000 gives `lis`/`ori`). objdiff accepts the HA/LO relocs.
+- An if/else-if chain gives a linear `cmpwi` chain; a switch gives a binary
+  search.
+- Stack objects must have their real size, or the frame and `&v` addressing change.
+- `GXColor c = {0xff,0xff,0xff,0xff};` by value gives lis/stw/3x stb plus a temp copy.
+- An `unsigned char` loop var with `int next = i + 1;` before the inner loop
+  and `i = next;` after gives the early `addi` and late `clrlwi`.
+- `per = x / m; per = per / 12 * 12;` as two statements gives retail's quotient
+  register; `n *= m; n += 3;` gives in-place mullw/addi.
+- Loading call arguments into locals before an if hoists the loads above the
+  branch, as retail does.
+- A 64-byte struct assignment compiles to the 24+24+16 word-copy loop.
+- Clone families: write one unit, then generate the others by substituting
+  the relocated symbols (derive the map from the asm); don't hand-port.
+
