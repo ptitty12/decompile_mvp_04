@@ -45,8 +45,13 @@ struct Unk802D5D24_C {
     char pad0[0x1CD0];
     int m1CD0;
 };
+struct Unk802D5D24_D {
+    char pad0[0x124];
+    int m124;
+};
 struct Unk802D5D24_B {
-    char pad0[0x14];
+    char pad0[0x10];
+    Unk802D5D24_D* m10;
     Unk802D5D24_C* m14;
 };
 struct Unk802D58E8_Owner {
@@ -64,8 +69,24 @@ struct Unk802D58E8_Flags {
     char pad0[0x2C];
     int m2C;
 };
-struct Unk802D58E8 {
-    char pad0[0x18];
+/* vptr at +8: eight data bytes, then the virtuals (fn_802D5C94 calls slot 9), then the camera's own data from +0xC. */
+struct Unk802D58E8_Base {
+    char pad0[8];
+};
+class Unk802D58E8_Virt : public Unk802D58E8_Base {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual int s9();
+};
+struct Unk802D58E8 : public Unk802D58E8_Virt {
+    char pad0C[0x18 - 0xC];
     int m18;
     char pad1C[0x44];
     Unk802D58E8_Owner* m60;
@@ -84,7 +105,10 @@ struct Unk802D58E8 {
     int mA0;
     char mA4[0x1F];
     char mC3;
-    char padC4[0x160 - 0xC4];
+    char padC4[0x154 - 0xC4];
+    int m154;
+    int m158;
+    char pad15C[4];
     int m160;
 };
 

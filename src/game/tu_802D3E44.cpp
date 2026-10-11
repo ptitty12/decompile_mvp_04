@@ -27,6 +27,7 @@ void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
 void fn_8040B830(char* dst, const char* src, int n);
 unsigned int fn_80378568(const char* token, int len);
 void fn_802D6008(Unk802D58E8* o, int k, int a, int b);
+void fn_802D5D24(Unk802D58E8* o, int* p);
 int fn_801A2034(Unk802D58E8_Owner* ow, int f);
 
 void fn_8037B424(void* p, int c);
@@ -170,6 +171,21 @@ int fn_802D5C64(Unk802D5C64* o)
 {
     if (o->m7C == 2 && o->m14 == 0 && o->m28 == 0) {
         return 1;
+    }
+    return 0;
+}
+
+int fn_802D5C94(Unk802D58E8* o)
+{
+    if (o->s9() != 0) {
+        int sp8 = o->m60->m6F8->m10->m124;
+        fn_802D5D24(o, &sp8);
+        if (o->m154 != 0) {
+            sp8 = o->m158;
+        }
+        if (sp8 == 5) {
+            return 1;
+        }
     }
     return 0;
 }
