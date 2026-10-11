@@ -98,7 +98,10 @@ void fn_80125844(Scr* self, int i, int c);
 int fn_80125890(Scr* self, int i);
 void fn_80125A20(Scr* self, int a);
 void fn_80125C84(Unk80126064_Scr* self, int a);
+int fn_80126034();
 void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_8012611C(Scr* self);
+int fn_80127550(Scr* self, Wid* a);
 }
 // PROTOS-END
 extern "C" {
@@ -117,6 +120,12 @@ void fn_801254EC(Scr* self, int a, int b, int c, int d);
 int fn_80125890(Scr* self, int i);
 void fn_800ECF18(Scr* self);
 void fn_800ED310(Scr* self);
+int fn_800ED00C();
+void fn_800ED254(Scr* self);
+void fn_800C3BE0(int a);
+int fn_800C33D0();
+extern const char lbl_805C0424[];
+extern const char lbl_805C0438[];
 }
 
 extern "C" {
@@ -315,6 +324,7 @@ int fn_80125890(Scr* self, int i)
 }
 
 /* near-miss: retail keeps `a` in r30 and `self` in r31 (swapped here). */
+
 void fn_80125A20(Scr* self, int a)
 {
     fn_800ED310(self);
@@ -333,6 +343,14 @@ void fn_80125C84(Unk80126064_Scr* self, int a)
 }
 
 /* near-miss: store scheduling of the leading constant stores differs (same stores). */
+
+int fn_80126034()
+{
+    if (fn_800ED00C() == 0)
+        return 0;
+    return 1;
+}
+
 void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -362,6 +380,21 @@ void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int 
     self->m188 = 0;
     self->m190 = 1;
     return self;
+}
+
+void fn_8012611C(Scr* self)
+{
+    fn_800ED254(self);
+    fn_800C3BE0(fn_800C33D0());
+}
+
+int fn_80127550(Scr* self, Wid* a)
+{
+    if (a == fn_800C8044(self->fn_vslot32(lbl_805C0424, 1)))
+        return self->m17C[0];
+    if (a == fn_800C8044(self->fn_vslot32(lbl_805C0438, 1)))
+        return self->m17C[1];
+    return 0;
 }
 
 }
