@@ -10,6 +10,7 @@ typedef Unk800C7B40_Widget Wid;
 
 
 extern const char lbl_805BA6D8[];
+extern const char lbl_805B955C[];
 extern const char lbl_805BFB3C[];
 extern const char lbl_805BFB4C[];
 extern const char lbl_805BE1B0[];
@@ -43,7 +44,9 @@ void fn_80117B60(int a, Scr* b);
 void* fn_80117D20(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_80117D70(Unk80117D20_Scr* self);
 void fn_80117EA0(Unk80117D20_Scr* self, Wid* w, int v);
+void fn_80117F48(Unk80117D20_Scr* self);
 void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_80118144(Unk80117D20_Scr* self, Wid* w, int v);
 void fn_801181EC(Scr* self);
 void fn_80119F48(char* buf, float v);
 void fn_8011A0A4(int v, Unk800C7B40_Widget* w, const char* name);
@@ -58,10 +61,13 @@ void fn_8011A468(int a, Unk800C7B40_Widget* w, const char* name);
 // PROTOS-END
 extern "C" {
 void fn_800ED310(Scr* self);
-void fn_800ECAA4(Scr* self);
+void fn_800ECAA4(void* self);
 void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_8011AD00(int a);
 void fn_800ECF18(void* self);
+void fn_8035682C(void* name);
+void fn_8040B830(void* dst, const char* src, int n);
+void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
 void fn_80116100(Scr* self);
 void fn_80116268(Scr* self);
 void fn_801164AC(Scr* self);
@@ -258,12 +264,42 @@ void fn_80117EA0(Unk80117D20_Scr* self, Wid* w, int v)
     }
 }
 
+void fn_80117F48(Unk80117D20_Scr* self)
+{
+    fn_800ECAA4(self);
+    int v = *(int*)self->m134;
+    if (v == 0) {
+        char nm[16];
+        char* np = nm;
+        fn_8035682C(np);
+        fn_8040B830(np, lbl_805B955C, 0xF);
+        np[15] = v;
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+        fn_800B7B4C(lbl_8061A32C, np, self);
+    }
+}
+
 void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->m130 = 0;
     self->SetVptr(lbl_8064E630);
     return self;
+}
+
+void fn_80118144(Unk80117D20_Scr* self, Wid* w, int v)
+{
+    int t = w->m1C;
+    if (t == 9) {
+        if (v != 0) {
+            UnkSub* s = (UnkSub*)((char*)fn_800C8054(w) + 0x98);
+            s->fn_vslot20(v, 0);
+        }
+    } else if (t == 3 || t == 8) {
+        for (Wid* c = ((UnkGroupW*)w)->m40; c != 0; c = (Wid*)c->m8)
+            fn_80118144(self, c, v);
+    }
 }
 
 void fn_801181EC(Scr* self)
