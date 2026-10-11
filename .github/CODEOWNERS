@@ -1,0 +1,11 @@
+# Owner review required for verification-critical paths.
+# Enable branch protection on
+# `main` with "Require review from Code Owners".
+/tools/verify/                 @ptitty12
+/.github/                      @ptitty12
+/.claude/                      @ptitty12
+/config/GV4E69/build.sha1      @ptitty12
+/config/GV4E69/ldscript.ld     @ptitty12
+/config/GV4E69/dol_layout.txt  @ptitty12
+/tools/mkdol.py                @ptitty12
+/tools/project.py              @ptitty12

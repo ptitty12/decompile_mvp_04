@@ -3,7 +3,7 @@
 # (python tools/verify/verify.py --print-protected).
 507ea4ffa0e0fd459e630dfe012e7961460c5a2a1520eda1b1e20bedbe11419a  tools/verify/verify.py
 b94b0cd0ca6201c23b2274c9f97cc65831f9d83463535d2844dd1d0f4a031d9b  tools/verify/pragma_allowlist.txt
-e65c1df6283380c4418d4b97ce6a54185cd458c13e47ca954625f2cbd37edc7f  .github/workflows/build.yml
+566e1aa48d7eb45a710aa2bcad88a6ff7468a8aef396dd78b60e69fef99986e2  .github/workflows/build.yml
 50da84df4259acf26c9bdfd06547550fe647b84ef6ed33019361ed93058e7b92  .claude/settings.json
 507e485ef7d4385c4c420b20bdebfd8e11bcc07bd3e46329fcca96d709628ece  config/GV4E69/build.sha1
 b37c8f0f6237ee9a0c88704926b551c0462a67ac916e02eabde42cc27ed11c69  config/GV4E69/ldscript.ld

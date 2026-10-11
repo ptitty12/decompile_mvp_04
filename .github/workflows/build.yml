@@ -29,6 +29,9 @@ jobs:
 
   build:
     needs: integrity
+    # Opt-in: set the repository variable GV4E69_SELF_HOSTED=true once a runner exists,
+    # otherwise this job would sit queued forever.
+    if: vars.GV4E69_SELF_HOSTED == 'true'
     runs-on: [self-hosted, windows, gv4e69]
     steps:
       - uses: actions/checkout@v4

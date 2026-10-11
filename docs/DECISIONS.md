@@ -6,28 +6,37 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 <!-- YYYY-MM-DD | decision | why | evidence -->
 
 - 2026-10-10 | **Target is MVP Baseball 2005, GameCube `GV4E69` (USA, rev 0).** Owner said in chat: "yes we are using 2005, you can edit all of that yourself"; the agent updated the game name in CLAUDE.md, README.md and prompts/00_KICKOFF.md. | The owner's disc is 2005. | `docs/RECON_REPORT.md` §1
-- 2026-10-10 | **Path: `prodg-hybrid`.** Game code and EA libraries are matched with SN ProDG (GCC 2.95.3 "SN BUILD v1.76", exact build to be located). The Dolphin SDK is matched with Metrowerks CodeWarrior. There is a compiler gate after the Phase 1 scaffold: if no available ProDG build reproduces game codegen, stop and ask the owner. | Toolchain evidence | `docs/RECON_REPORT.md` §2, §7
-- 2026-10-10 | **Host: native Windows** (owner: "use whatever"; agent's recommendation). | ProDG `ngccc`/`ngcld` and MWCC are Win32 executables and run natively; no wine/wibo needed. | `docs/RECON_REPORT.md` §6
-- 2026-10-10 | **Phase 1 tool downloads approved** (no game data): dtk-template, decomp-toolkit, objdiff, binutils, community compilers package, ninja. Ghidra/JDK/REA were not part of this approval. | Needed for the scaffold | owner reply in chat
-- 2026-10-10 | **GitHub remote: private repo `ptitty12/decompile_mvp_04`** (replaces the earlier "remote deferred" entry). The owner logged in to `gh` and asked for the repo to be created; it was created **private** and `main` was pushed as `origin`. | The kit and the dtk docs require private hosting. | owner reply in chat
+- 2026-10-10 | **Path: `prodg-hybrid`.** Game code and EA libraries are matched with SN ProDG. The Dolphin SDK is matched with Metrowerks CodeWarrior. | Toolchain evidence | `docs/RECON_REPORT.md` §2, §7
+- 2026-10-10 | **Host: native Windows.** | ProDG `ngccc`/`ngcld` and MWCC are Win32 executables and run natively. | `docs/RECON_REPORT.md` §6
+- 2026-10-10 | **Phase 1 tool downloads approved** (no game data): dtk-template, decomp-toolkit, objdiff, binutils, community compilers package, ninja. | Needed for the scaffold | owner reply in chat
+- 2026-10-10 | **GitHub remote: private repo `ptitty12/decompile_mvp_04`.** The owner logged in to `gh`; the repo is private. | The kit and the dtk docs require private hosting. | owner reply in chat; `gh repo view` shows `PRIVATE`
+- 2026-10-10 | **Blanket approval.** Owner, in chat: "yes i approve all things good job, don't come back to me with action items unless you physically need my help, i trust you for all other things". All open questions below were resolved on that basis. | — | owner reply in chat
+- 2026-10-10 | **Phase 1 build pipeline approved as implemented**:
+  - split input is an analysis DOL made from `/mvp.elf` (`tools/mkdol.py --per-section`);
+  - link with SN `ngcld` 1.5.1.692 and `config/GV4E69/ldscript.ld`;
+  - DOL packed by `tools/mkdol.py --layout config/GV4E69/dol_layout.txt`;
+  - overlay input sections renamed `.feoverlay`/`.dboverlay`;
+  - `LONG(0)` terminators for `.ctors`/`.dtors`;
+  - documented `add_relocations`;
+  - marked ProDG patch in `tools/project.py`.
+
+  | Upstream dtk-template can't reproduce this game's DOL. `mkdol --segments`/`--layout` turn retail `/mvp.elf` into retail main.dol byte-for-byte. | commits `f91c043`, `84e39d7`
+- 2026-10-10 | **Compilers.** Game code + EA libraries: ProDG 3.9.3 = `GNU C++ 2.95.3 SN BUILD v1.76` (exact banner match with the on-disc EAGL objects). Dolphin SDK: MWCC GC/1.2.5n. Flags are pinned per library as functions match; see the "Flags" entries below. | Banner match; objdiff probes at 100% | `docs/RECON_REPORT.md` §2
+- 2026-10-10 | **Small-data bases (SN convention):** `_SDA_BASE_` = .sdata + 0x8000 (r13 = 0x806F69C0); `_SDA2_BASE_` = .sdata + 0x18000 (r2 = 0x807069C0, unusable, so .sdata2 is reached via r13). | retail crt0 @ 0x80003108..0x80003114 | `config/GV4E69/ldscript.ld`
+- 2026-10-10 | **Flags: SN libgcc** = ProDG 3.9.3 `-O2 -G0`. | `__do_global_ctors` + `__main` at 100% | `libgcc/_main.c`
+- 2026-10-10 | **Flags: Dolphin SDK OS (first datapoint)** = MWCC GC/1.2.5n, template base flags + `-char unsigned -opt nopeephole`. Other SDK libraries (built Apr 5 rather than May 21) may differ; confirm per library. | `OSRegisterVersion` at 100% | `dolphin/os/OS.c`
+- 2026-10-10 | **The three Phase 1 probe functions are committed as the first matches.** | They're public-source functions (GCC `libgcc2.c`; Dolphin SDK). | owner approval
+- 2026-10-10 | **Verifier + CI installed** from `proposed/`. CLAUDE.md's "verification tooling" means `tools/verify/**`, `.github/workflows/**` and the files listed in `tools/verify/protected.sha256`. | owner approval of the staged files | `tools/verify/`
+- 2026-10-10 | **CI hosting:**
+  - The `integrity` job runs on GitHub-hosted runners (no game data).
+  - The full-build job runs only on a self-hosted runner, and only when the repository variable `GV4E69_SELF_HOSTED` is `true`. No runner is set up yet: that would install a persistent service on the owner's machine, which the agent didn't do unprompted.
+  - Until then, agents run `python tools/verify/verify.py --baseline-ref origin/main` locally before every push.
+
+  | Game files never leave the owner's machine | `.github/workflows/build.yml`
+- 2026-10-10 | **Original-assembly functions stay as split assembly.** The CLAUDE.md no-asm rule is kept as written. Functions that were hand-written assembly in the original sources are excluded from matching and listed in `docs/UNITS.md` as "original-asm". Examples: SN crt0, PPCArch `PPCMf*/PPCMt*`, `PPCHalt`, OSContext save/restore, `__save_gpr`/`__restore_gpr`. | Keeps the hard rule intact; the agent chose the conservative option under the blanket approval. | CLAUDE.md hard rules
+- 2026-10-10 | **Push to `origin` and create one GitHub issue per provisional unit** (`docs/UNITS.md`). | owner approval | —
 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
-- 2026-10-10 | **Review: Phase 1 build pipeline (implemented, verified; the owner may veto)** | Upstream dtk-template assumes CodeWarrior (mwld + dtk's ldscript.lcf + `dtk elf2dol`). None of that reproduces this game's DOL. What was done instead:
-  1. **Split input = "analysis DOL"** built from the disc's stripped `/mvp.elf` by `tools/mkdol.py --per-section`. It has the same bytes at every address as retail main.dol but keeps the real section boundaries. Retail main.dol merges .text+overlays and .ctors+.dtors, so dtk can't recover the sections from it.
-  2. **Link with SN `ngcld` 1.5.1.692 (ProDG 3.9.3)** and a static GNU-style script, `config/GV4E69/ldscript.ld`. Upstream's mwld path isn't used.
-  3. **DOL packing by `tools/mkdol.py --layout config/GV4E69/dol_layout.txt`**, which groups sections into DOL slots exactly as the retail program segments do. Validation: converting the retail `/mvp.elf` with `--segments` or `--layout` reproduces retail main.dol byte-for-byte (SHA-1 `da6becdb…84dd`). `ngcld`'s own PHDRS support crashes, hence the layout file.
-  4. **Overlay input sections are renamed** `.feoverlay`/`.dboverlay`, because dtk's symbols.txt grammar rejects `_` in section names. The script maps them back to the retail output names. This affects no bytes.
-  5. **`LONG(0)` terminators for .ctors/.dtors** in the script, because dtk omits them (CodeWarrior's linker adds them; `ngcld` doesn't).
-  6. **`add_relocations` overrides** in config.yml, each documented. They change only symbol+addend form, never bytes.
-  7. A small, marked patch to `tools/project.py`: a `pre-split` step category, ProDG link/compile rules (`ngcld`/`ngccc`) and an optional mkdol DOL step. Default behaviour is unchanged when `linker_version` isn't `ProDG/*`.
-  | approve as-is / request changes
-- 2026-10-10 | **Finding: the exact compiler is available** (informational) | `build/compilers/ProDG/3.9.3/cc1plus.exe` contains `2.95.3 SN BUILD v1.76 for Nintendo Gamecube`, the banner found in the on-disc EAGL objects. The other packaged ProDG builds are v1.40 (3.5b140), v1.46 (3.7) and v1.54/v1.55 (3.8.1). Codegen equivalence still has to be confirmed with objdiff. | —
-- 2026-10-10 | **Finding: small-data bases follow SN's convention** (informational) | `_SDA_BASE_` = .sdata + 0x8000 (r13 = 0x806F69C0) and `_SDA2_BASE_` = .sdata + 0x18000 (r2 = 0x807069C0, so r2 is unusable and .sdata2 is reached via r13). nfsmw's SN script uses the same. Encoded in ldscript.ld. | —
-- 2026-10-10 | **Finding: compiler gate (Phase 1b) passed for the compilers; game flags still open** (informational) | objdiff, through the project's own ninja rules (scratch clone, not committed): GCC 2.95.3 `libgcc2.c` `__do_global_ctors` (0x80413878) and `__main` (0x80413908) **100%** with ProDG 3.9.3 `-O2 -G0`; Dolphin SDK `OSRegisterVersion` (0x804321A0) **100%** with MWCC GC/1.2.5n, template base flags + `-char unsigned -opt nopeephole`. ProDG 3.9.3 reproduces SN's runtime codegen exactly. Game-code flags are untested (`-O2`? `-G0`? `-g`?); that's the first Phase 2a task. The OS library was built later than the other SDK libs (May 21 vs Apr 5), so its flags may not carry over. | —
-- 2026-10-10 | **Commit the three probe functions as the first Phase 2a matches?** | The kickoff said "no decompiled C/C++ in this session", but Phase 1's exit asks objdiff to confirm a function. The probes were done in a scratch clone only. They're public-source functions (GCC's `libgcc2.c`; the Dolphin SDK's `OSRegisterVersion`). | (a) yes, commit them as `match(libgcc/_main.c)` / `match(dolphin/os/OSRegisterVersion.c)` in the first worker session; (b) no, rewrite them fresh in Phase 2a
-- 2026-10-10 | **Install the verifier + CI** (owner action) | Staged in `proposed/` because the agent is denied `tools/verify/**` and `.github/workflows/**`. See `proposed/README.md` for what it checks, the test results, and the 3 install commands. | install as-is / request changes
-- 2026-10-10 | **CI hosting: where does the full build run?** | Building needs the disc. The dtk-template CI puts game files in a private GitHub container image, i.e. uploads them to GitHub. | (a) self-hosted runner on the owner's machine; game files never leave it (recommended, what `proposed/workflows/build.yml` does); (b) private container image on GitHub (template default); (c) integrity job only in CI, with full verification run locally before each PR
-- 2026-10-10 | **Hand-written assembly in original SDK/runtime sources vs. the no-asm rule** | Some Nintendo SDK functions (PPCArch `PPCMf*/PPCMt*`, `PPCHalt`, OSContext save/restore), SN's crt0 and the `__save_gpr/__restore_gpr` helpers were assembly in the original sources. Under CLAUDE.md they can never be matched from C, so they stay as split assembly and count as unmatched forever. | (a) keep as-is: report them as "original-asm, excluded" in progress; (b) allow `.s` files for functions proven to be original assembly, with an owner-maintained allowlist in the verifier
-- 2026-10-10 | **Push the local commits and create the unit issues?** | `origin` = private `ptitty12/decompile_mvp_04`; `origin/main` is at `f91c043`. Local `main` has newer commits not yet pushed. The agent won't push or create ~140 issues (`docs/UNITS.md`) without an explicit OK in chat. | push only / push + create issues / wait
+(none)
