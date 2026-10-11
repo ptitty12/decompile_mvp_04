@@ -766,6 +766,7 @@ config.libs = [
         "cflags": cflags_game,
         "progress_category": "game",
         "objects": [
+            Object(NonMatching, "fe/tu_8043FDC0.cpp"),
         ],
     },
     {
