@@ -31,7 +31,7 @@ void fn_80313E94(FxCtx* c, int v);
 void fn_80313F28(FxCtx* c, const void* s);
 void fn_80330B48(void* p);
 int fn_804089B4(char* buf, const char* fmt, ...);
-void fn_803144A0(FxCtx* c, const char* s, int a, float x, float y, int b);
+void fn_803144A0(FxCtx* c, const char* s, float x, float y, int a, int b);
 // PROTOS-BEGIN
 void fn_8032B6C0();
 void fn_8032B748();
@@ -152,11 +152,10 @@ void fn_8032DB00(FxLabelD* self) {
     fn_80313F28(lbl_8061FEDC, buf);
 }
 
-/* near-miss: argument evaluation order (r5 before f1/f2) */
 void fn_8032DB5C(FxLabelD* self) {
     char buf[0x38];
     fn_804089B4(buf, lbl_805ED8C0, self->s6());
-    fn_803144A0(lbl_8061FEDC, buf, self->mC, self->m0, self->m4, 0x16);
+    fn_803144A0(lbl_8061FEDC, buf, self->m0, self->m4, self->mC, 0x16);
 }
 
 typedef void (*FxCb)();
