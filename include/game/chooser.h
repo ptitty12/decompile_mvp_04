@@ -96,6 +96,8 @@ struct Unk80270BA0_X;
 struct Unk8027107C_Inner {
     char pad0[0x128];
     int m128;
+    char pad12C[0x14C - 0x12C];
+    float m14C;                /* read by the warps (tu_802A4584.cpp) */
 };
 struct Unk8027107C_Outer {
     char pad0[0x3A4];
@@ -120,7 +122,7 @@ class Unk80270BA0_XVirt : public Unk80270BA0_XBase {
 public:
     virtual void fn_vslot1();
     virtual void fn_vslot2();
-    virtual void fn_vslot3();
+    virtual void fn_vslot3(Unk80273498_Vec3* v);   /* v: used by the warps (tu_802A4584.cpp) */
     virtual int fn_vslot4();
 };
 
@@ -145,15 +147,21 @@ public:
  * cCircleChooser's slot 17 (0x802726BC) reads m40, mE0, mE8, m100, m108,
  * m140 and m190. */
 struct Unk802726BC_Angles {
-    char pad0[0x40];
+    char pad0[0x8];
+    float m8[2];               /* read by the warps (tu_802A4584.cpp) */
+    char padC[0x40 - 0x10];
     float m40[2];
-    char pad48[0xE0 - 0x48];
+    float m48[2];              /* read by the warps */
+    float m50[2];              /* read by the warps */
+    char pad58[0xD8 - 0x58];
+    float mD8[2];              /* read by the warps */
     float mE0[2];
     float mE8[2];
     char padF0[0x100 - 0xF0];
     float m100[2];
     float m108[2];
-    char pad110[0x140 - 0x110];
+    float m110[2];             /* read by the warps */
+    char pad118[0x140 - 0x118];
     float m140[2];
     char pad148[0x190 - 0x148];
     int m190;
@@ -163,7 +171,9 @@ struct Unk802726BC_Angles {
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
 struct Unk80271DBC_Link {
-    char pad0[0x880];
+    char pad0[0x85C];
+    int m85C;                  /* tested by the warps (tu_802A4584.cpp) */
+    char pad860[0x880 - 0x860];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -177,7 +187,20 @@ public:
     int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
     char pad720[0x734 - 0x720];
     Unk802726BC_Angles m734;
-    char pad8C8[0xB4C - 0x8C8];
+    char pad8C8[0x948 - 0x8C8];
+    /* 0x948..0x978: read and written by the warps (tu_802A4584.cpp) */
+    Unk80273498_Vec3 m948;
+    float m954;
+    int m958;
+    int m95C;
+    Unk80273498_Vec3 m960;
+    float m96C;
+    float m970;
+    int m974;
+    int m978;
+    char pad97C[0xAB4 - 0x97C];
+    float mAB4;
+    char padAB8[0xB4C - 0xAB8];
     int mB4C;
     int mB50;
 };
@@ -228,6 +251,10 @@ public:
     virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
     void fn_8037B6B0(const char* name, int* field, const char* values);
     void fn_8037B728(const char* name, const char* name2, void* list, int flags);
+    /* Attribute registration used by the warps (tu_802A4584.cpp). */
+    void fn_8037B458(const char* name, int* field, int a, const char* b);               /* flag */
+    void fn_8037B50C(const char* name, float* field, const char* range, int a);         /* float */
+    void fn_8037B638(const char* name, int* field, const char* values);                 /* enum list */
 };
 
 #endif /* GAME_CHOOSER_H */
