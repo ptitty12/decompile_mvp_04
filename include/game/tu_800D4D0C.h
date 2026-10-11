@@ -258,4 +258,11 @@ struct UiScrRaw2 {
     const void* m3C;
     void fn_800D0D9C(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l);
 };
+extern const char lbl_805BC1A8[];
+extern const char lbl_805BC9DC[];
+extern const char lbl_805BD02C[];
+extern const char lbl_805BD034[];
+extern const char lbl_805BD07C[];
+char* fn_804031BC(char* dst, const char* src);
+int fn_80403DE4(char* dst, const char* fmt, ...);
 #endif

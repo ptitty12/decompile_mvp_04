@@ -189,13 +189,12 @@ void* fn_800D5B68(Unk800D4D0C_D* t, int idx)
     return fn_80090880(lbl_8061977C, t->m108[idx]);
 }
 
-/* near-miss: loop/check layout differs (checks for 2..4 placed after the 0/1 checks) */
+/* near-miss: loop/check layout differs (retail places the checks for 2..4 before the loop increment, 29 slots; tried while/for/do-while and an if-else v= chain) */
 int fn_800D5B9C(Unk800D4D0C_D* t)
 {
     if (t->m104 == -1) {
         int c = t->vslot32();
-        int i = 0;
-        while (i <= 0x7B) {
+        for (int i = 0; i <= 0x7B; i++) {
             int a = fn_800E18F8(i);
             int b = fn_800E1930(i);
             int d = fn_800E1968(i);
@@ -221,7 +220,6 @@ int fn_800D5B9C(Unk800D4D0C_D* t)
                 t->m104 = 4;
                 break;
             }
-            i++;
         }
     }
     return t->m104;
@@ -540,6 +538,60 @@ float fn_800D7FB4(char* t, int idx, float x)
         return fn_800D7EC8(r1, r2);
     }
     return x;
+}
+
+inline int KeyAt8108(char* base, int off)
+{
+    return *(int*)(base + off);
+}
+
+void fn_800D8108(int tbl, int idx, int a, char* out, float f)
+{
+    int off = idx * 12;
+    Unk800D8304_Row* row = &lbl_8061AC5C[idx];
+    unsigned fl = row->m4;
+    int v0 = KeyAt8108((char*)tbl + 8, off);
+    int v1 = KeyAt8108((char*)tbl + 0xC, off);
+    char b1[0x28];
+    char b2[0x3C];
+    if (fl & 0x80000) {
+        fn_804031BC(b1, lbl_805BD07C);
+        fn_80403DE4(out, b1, a, v0);
+        return;
+    }
+    if (fl & 0x100000) {
+        fn_804031BC(b1, lbl_805BD07C);
+        fn_80403DE4(out, b1, a, v1);
+        return;
+    }
+    if (fl & 0x200000) {
+        fn_804031BC(b1, lbl_805BD07C);
+        fn_80403DE4(out, b1, (int)f, v0);
+        return;
+    }
+    if (fl & 0x400000) {
+        fn_804031BC(b1, lbl_805BD07C);
+        fn_80403DE4(out, b1, (int)f, v1);
+        return;
+    }
+    if (fl & 0x800000) {
+        fn_804031BC(b1, lbl_805BC1A8);
+        fn_80403DE4(out, b1, (int)f);
+        return;
+    }
+    if (fl & 0x1000000) {
+        fn_804089B4(b2, lbl_805BD034, f);
+        fn_804031BC(out, b2);
+        return;
+    }
+    if (fl & 0x2000000) {
+        fn_804089B4(b2, lbl_805BD02C, f);
+        if (b2[0] == 0x30)
+            b2[0] = 0x20;
+        fn_804031BC(out, b2);
+        return;
+    }
+    fn_804031BC(out, lbl_805BC9DC);
 }
 
 int fn_800D8304(void* t, int idx)
