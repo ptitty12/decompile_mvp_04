@@ -407,6 +407,16 @@ extern "C" DB_OVERLAY void* fn_805311A4(void* self, const void* src)
     return self;
 }
 
+extern "C" DB_OVERLAY Unk8052DC94_Out* fn_805311D8(Unk8052DC94_Out* self, Unk8052FF10_Rec* src)
+{
+    unsigned short ha = fn_80329FA0(1).m2;
+    unsigned short hb = fn_80329FA0(src->f0).m2;
+    self->b0 = hb - ha;
+    self->fa = src->f11;
+    self->fb = src->f12;
+    return self;
+}
+
 extern "C" DB_OVERLAY int fn_8053125C()
 {
     return 5;
