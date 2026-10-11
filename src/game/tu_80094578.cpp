@@ -624,7 +624,6 @@ extern "C" int fn_80097238(Obj3* o, int key)
     return -1;
 }
 
-/* near-miss (6 of 30 slots): the iterator is reloaded from its stack slot where retail keeps one copy */
 extern "C" int fn_80097288(Obj3* o, int key)
 {
     volatile int sp = 0;
@@ -632,11 +631,14 @@ extern "C" int fn_80097288(Obj3* o, int key)
     do {
         if (key == fn_80097210(o, i))
             return sp;
-        int t = sp + 1;
-        if (sp > 9)
-            t = sp;
-        i = t;
+        int c = sp;
+        int t;
+        if (c > 9)
+            t = c;
+        else
+            t = c + 1;
         sp = t;
+        i = t;
     } while (i <= 9);
     return -1;
 }
