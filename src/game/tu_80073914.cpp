@@ -83,6 +83,16 @@ void Unk8007A4DC_Screen::fn_800743A0(int a, int b, int i, int j, int c)
     }
 }
 
+int Unk8007A4DC_Screen::fn_80074428(int a, int b, int c, int d)
+{
+    if (d <= 1) {
+        if (c <= 1)
+            return m190[c].m4[d]->v28(a, b);
+        return fn_800739E0(a, fn_80072894(b), c, d);
+    }
+    return fn_80074428(a, b, c, 0) + fn_80074428(a, b, c, 1);
+}
+
 void Unk8007A4DC_Screen::fn_80074500(int a, int b, int i, int j, int c)
 {
     if (j <= 1 && i <= 1)
@@ -158,6 +168,16 @@ void Unk8007A4DC_Screen::fn_800755FC(int a, int b, int i, int j, int c)
         W* w = m1CC[i].m4[j];
         w->v40(a, fn_80071814(w, b), c);
     }
+}
+
+int Unk8007A4DC_Screen::fn_80075684(int a, int b, int c, int d)
+{
+    if (d <= 1) {
+        if (c <= 1)
+            return m1CC[c].m4[d]->v28(a, b);
+        return fn_80075094(a, fn_800728E4(b), c, d);
+    }
+    return fn_80075684(a, b, c, 0) + fn_80075684(a, b, c, 1);
 }
 
 void Unk8007A4DC_Screen::fn_8007575C(int a, int b, int i, int j, int c)
