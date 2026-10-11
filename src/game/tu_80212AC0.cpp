@@ -74,6 +74,7 @@ void fn_80213FAC(Task* t, int x)
     }
 }
 
+/* near-miss: 5 slots: a/b swap r29/r30 (retail keeps a in r30, b in r29) */
 void fn_8021458C(Task* t, int a, int b)
 {
     if (fn_802142C8(t) == 1 && fn_801F0E78(t) == -1) {
@@ -112,6 +113,7 @@ void fn_80214C68(Task* t, int a, int b)
     fn_80214F1C(t, 1, 2, -1.0f);
 }
 
+/* near-miss: best variant is 22 slots off: retail stores both float constants to locals and selects the third from registers */
 int fn_80215E94(void*, PosObj* a, Vec3f* b, int flag)
 {
     Vec3f pa = a->m60;
@@ -128,6 +130,7 @@ int fn_80215E94(void*, PosObj* a, Vec3f* b, int flag)
     return d2 < th;
 }
 
+/* near-miss: 2 slots: retail emits li r4,0 before mr r3,r30 for the first fn_8026D8BC call */
 int fn_80215F40(Task* t, void* obj, int, int, int k, int* out)
 {
     *out = 0;
