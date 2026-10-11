@@ -807,6 +807,14 @@ struct FxItem3 {
     FxWid3* m74;
 };
 struct FxOne { int v; };
+/* Float slider widget (value pointer +0x48, fallback value +0x4C, vptr +8; fn_8032E968). */
+class FxSldF : public FxLabelV {
+public:
+    int mC;
+    char pad10[0x38];
+    float* m48;
+    float m4C;
+};
 // STRUCTS-END
 
 extern int lbl_8061FF50;

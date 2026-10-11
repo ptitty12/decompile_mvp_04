@@ -19,6 +19,8 @@ extern int lbl_806203F4;
 extern int lbl_806203F8;
 extern int lbl_806203FC;
 
+extern const char lbl_805ED994[];
+extern const float lbl_805ED99C;
 extern "C" {
 void fn_801A750C(void* v, int a);
 float fn_801C3370(void* p);
@@ -34,7 +36,7 @@ void fn_8033E958(const char* fmt, ...);
 void* fn_8040B830(void* dst, const void* src, int n);
 void fn_8032D8F8(float f);
 void fn_80313E94(FxCtx* c, int v);
-void fn_80313F28(FxCtx* c, const void* s);
+float fn_80313F28(FxCtx* c, const void* s);
 void fn_80330B48(void* p);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_803144A0(FxCtx* c, const char* s, float x, float y, int a, int b);
@@ -53,7 +55,7 @@ void fn_8032D7C4();
 void fn_8032D868(FxCmd* self, int a);
 void fn_8032D880(FxCmd* self, const void* src);
 int fn_8032D8C8();
-void fn_8032D8D0();
+void fn_8032D8D0(void* unused);
 void fn_8032DA14(FxLabelD* self);
 void fn_8032DA64(FxLabelD* self);
 int fn_8032DAB4(FxCmd* self, int b);
@@ -64,6 +66,7 @@ void fn_8032E054(FxInt2* out, FxCmd* src);
 void fn_8032E088(FxCmd* self, FxInt2* v);
 void fn_8032E2FC(FxF3* out, FxCmd* src);
 void fn_8032E344(FxCmd* self, FxInt3* v);
+void fn_8032E968(FxSldF* self);
 // PROTOS-END
 }
 
@@ -188,7 +191,7 @@ void fn_8032D880(FxCmd* self, const void* src) {
 
 int fn_8032D8C8() { return 0; }
 
-void fn_8032D8D0() { fn_8032D8F8(lbl_805ED8BC); }
+void fn_8032D8D0(void* unused) { fn_8032D8F8(lbl_805ED8BC); }
 
 void fn_8032DA14(FxLabelD* self) {
     FxCtx* c = lbl_8061FEDC;
@@ -265,4 +268,12 @@ void fn_8032E344(FxCmd* self, FxInt3* v) {
     } else {
         *(FxInt3*)&self->m4C = *v;
     }
+}
+
+void fn_8032E968(FxSldF* self) {
+    char buf[0x30];
+    fn_804089B4(buf, lbl_805ED994, self->m48 == 0 ? self->m4C : *self->m48);
+    float w = lbl_805ED99C - fn_80313F28(lbl_8061FEDC, buf);
+    fn_8032D8D0(self);
+    fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
 }
