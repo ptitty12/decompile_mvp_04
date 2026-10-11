@@ -80,6 +80,13 @@ struct Unk801B7FB0_B {
 };
 
 
+/* Flag word at P::mB3C (fn_801C8014 tests bit 4 from the top). */
+struct Unk801B7FB0_Bits {
+    unsigned a : 4;
+    unsigned f : 1;
+    unsigned rest : 27;
+};
+
 struct Unk801B7FB0_Sub58C {
     char pad0[0xC];
     float mC;
@@ -198,7 +205,9 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char mA0C[4];
     char padA10[0xA4];
     float mAB4;
-    char padAB8[0xB4];
+    char padAB8[0x84];
+    Unk801B7FB0_Bits mB3C;
+    char padB40[0x2C];
     int mB6C;
     char padB70[0x10];
     float mB80;
