@@ -51,11 +51,13 @@ struct Unk800C7B40_Data {
     float m38;
 };
 
+// GEN-CLASSES-BEGIN
+struct Unk800C7B40_Widget;
+struct UnkLabel;
 /* Virtual part of the widget base; data that follows the vptr (+0x40 on) belongs to the
  * derived classes. Slots 2..127; unproven signatures are left as `void f()`. */
 struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual ~Unk800C7B40_Widget();
-    // BEGIN-SLOTS
     virtual void fn_vslot2();
     virtual void fn_vslot3();
     virtual void fn_vslot4();
@@ -182,9 +184,142 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot125();
     virtual void fn_vslot126();
     virtual void fn_vslot127();
-    // END-SLOTS
     void SetVptr(const void* v) { *(const void**)((char*)this + 0x3C) = v; }
 };
+
+/* Text-label widget (same data part and vptr offset as the base, own slot table): slot 30
+ * sets the text (fn_8011A0A4 passes a char buffer). */
+struct UnkLabel : Unk800C7B40_Data {
+    virtual ~UnkLabel();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28(const void* v);
+    virtual void fn_vslot29();
+    virtual void fn_vslot30(const char* s);
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+    virtual void fn_vslot41();
+    virtual void fn_vslot42();
+    virtual void fn_vslot43();
+    virtual void fn_vslot44();
+    virtual void fn_vslot45();
+    virtual void fn_vslot46();
+    virtual void fn_vslot47();
+    virtual void fn_vslot48();
+    virtual void fn_vslot49();
+    virtual void fn_vslot50();
+    virtual void fn_vslot51();
+    virtual void fn_vslot52();
+    virtual void fn_vslot53();
+    virtual void fn_vslot54();
+    virtual void fn_vslot55();
+    virtual void fn_vslot56();
+    virtual void fn_vslot57();
+    virtual void fn_vslot58();
+    virtual void fn_vslot59();
+    virtual void fn_vslot60();
+    virtual void fn_vslot61();
+    virtual void fn_vslot62();
+    virtual void fn_vslot63();
+    virtual void fn_vslot64();
+    virtual void fn_vslot65();
+    virtual void fn_vslot66();
+    virtual void fn_vslot67();
+    virtual void fn_vslot68();
+    virtual void fn_vslot69();
+    virtual void fn_vslot70();
+    virtual void fn_vslot71();
+    virtual void fn_vslot72();
+    virtual void fn_vslot73();
+    virtual void fn_vslot74();
+    virtual void fn_vslot75();
+    virtual void fn_vslot76();
+    virtual void fn_vslot77();
+    virtual void fn_vslot78();
+    virtual void fn_vslot79();
+    virtual void fn_vslot80();
+    virtual void fn_vslot81();
+    virtual void fn_vslot82();
+    virtual void fn_vslot83();
+    virtual void fn_vslot84();
+    virtual void fn_vslot85();
+    virtual void fn_vslot86();
+    virtual void fn_vslot87();
+    virtual void fn_vslot88();
+    virtual void fn_vslot89();
+    virtual void fn_vslot90();
+    virtual void fn_vslot91();
+    virtual void fn_vslot92();
+    virtual void fn_vslot93();
+    virtual void fn_vslot94();
+    virtual void fn_vslot95();
+    virtual void fn_vslot96();
+    virtual void fn_vslot97();
+    virtual void fn_vslot98();
+    virtual void fn_vslot99();
+    virtual void fn_vslot100();
+    virtual void fn_vslot101();
+    virtual void fn_vslot102();
+    virtual void fn_vslot103();
+    virtual void fn_vslot104();
+    virtual void fn_vslot105();
+    virtual void fn_vslot106();
+    virtual void fn_vslot107();
+    virtual void fn_vslot108();
+    virtual void fn_vslot109();
+    virtual void fn_vslot110();
+    virtual void fn_vslot111();
+    virtual void fn_vslot112();
+    virtual void fn_vslot113();
+    virtual void fn_vslot114();
+    virtual void fn_vslot115();
+    virtual void fn_vslot116();
+    virtual void fn_vslot117();
+    virtual void fn_vslot118();
+    virtual void fn_vslot119();
+    virtual void fn_vslot120();
+    virtual void fn_vslot121();
+    virtual void fn_vslot122();
+    virtual void fn_vslot123();
+    virtual void fn_vslot124();
+    virtual void fn_vslot125();
+    virtual void fn_vslot126();
+    virtual void fn_vslot127();
+    void SetVptr(const void* v) { *(const void**)((char*)this + 0x3C) = v; }
+};
+// GEN-CLASSES-END
 
 /* Front-end screen (TITLESLIDE-derived, vtable lbl_806508D0, ctor fn_8010FBB0). Fields are the
  * offsets seen in this unit; m148/m14C are two widgets chosen by the mode word at m140. */
@@ -213,6 +348,39 @@ struct Unk8010E0F4_Scr : Unk800C7B40_Widget {
     Unk800C7B40_Widget* m240;
 };
 
+/* Second front-end screen (TITLESLIDE-derived, vtable lbl_80650628, ctor fn_80114A20 in
+ * tu_8011243C.cpp): the same code as screen A at shifted offsets (A 0x134->0x184,
+ * 0x150->0x198, 0x154->0x19C, 0x168->0x1B8, 0x16C->0x1BC), found by aligning the asm of
+ * the cloned functions. Evidence for the rest: ctor fn_80114A20 stores m130, m17C (a second
+ * vptr), m1A0..m1BC and calls fn_80134E38 on the member at +0x134. */
+struct Unk80114A20_Scr : Unk800C7B40_Widget {
+    char pad40[0xF0];
+    int m130;
+    char m134[0x48];
+    const void* m17C;
+    int m180;
+    int m184;
+    char pad188[0x10];
+    Unk800C7B40_Widget* m198;
+    Unk800C7B40_Widget* m19C;
+    int m1A0;
+    int m1A4;
+    int m1A8;
+    int m1AC;
+    int m1B0;
+    int m1B4;
+    int m1B8;
+    int m1BC[25];
+};
+
+/* Small front-end screens (ctors fn_80117D20 / fn_80117FDC): widget base, value at +0x130, and
+ * for the first one a second word at +0x134. */
+struct Unk80117D20_Scr : Unk800C7B40_Widget {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+};
+
 /* Front-end state object returned by fn_800B555C; +0x570 is compared against ids. */
 struct UnkFEState {
     char pad0[0x570];
@@ -224,7 +392,7 @@ extern "C" UnkFEState* fn_800B555C();
 extern "C" {
 Unk800C7B40_Widget* fn_800C8034(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8038(Unk800C7B40_Widget* p);
-Unk800C7B40_Widget* fn_800C8040(Unk800C7B40_Widget* p);
+UnkLabel* fn_800C8040(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8044(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8048(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8054(Unk800C7B40_Widget* p);
@@ -242,7 +410,7 @@ struct UnkFEMgr {
 extern UnkFEMgr* lbl_8061A32C;
 extern "C" {
 void* fn_800B64BC(void* p);
-void fn_800B7B4C(UnkFEMgr* m, const char* name, void* obj);
+void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
 Unk800C7B40_Widget* fn_800B7AB8(UnkFEMgr* m, const char* name);
 void fn_8035682C(void* name);
 void fn_8040B830(void* dst, const char* src, int n);
@@ -257,13 +425,17 @@ struct UnkGameP10 {
 struct UnkGameP6F8 {
     char pad0[0x10];
     UnkGameP10* m10;
-    char pad14[4];
+    void* m14;
+};
+struct UnkGameP700 {
+    char pad0[0x3C4];
+    int m3C4;
 };
 struct UnkGame {
     char pad0[0x6F8];
     UnkGameP6F8* m6F8;
     char pad6FC[4];
-    int m700;
+    UnkGameP700* m700;
     int m704;
     int m708;
 };
@@ -278,9 +450,14 @@ struct UnkMgrB {
     char pad0[0x600];
     int m600;
 };
+struct UnkMgrC {
+    char pad0[0x74];
+    int m74;
+};
 struct UnkMgrA {
     char pad0[0xC];
     UnkMgrB* mC;
+    UnkMgrC* m10;
 };
 struct UnkMgr {
     char pad0[4];
