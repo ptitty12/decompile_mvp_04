@@ -6,6 +6,49 @@
 
 extern const char lbl_805B3B4C[];
 
+/* near-miss (18 of 27 slots): retail jumps to the shared fn_8009D0D4 tail differently */
+extern "C" void fn_8009CBC8(void* o, int x);
+extern "C" void fn_8009CF6C(void* o, int x);
+extern "C" void fn_8009D0D4(void* o);
+
+extern "C" void fn_8009CB5C(void* o, int kind, int x)
+{
+    if (kind != 0) {
+        switch (kind) {
+        case 1:
+            fn_8009CBC8(o, x);
+            break;
+        case 2:
+            fn_8009CF6C(o, x);
+            break;
+        }
+        fn_8009D0D4(o);
+    }
+}
+
+extern "C" int fn_8009CDC8(void* self, int* arr)
+{
+    int best = 0;
+    int idx = -1;
+    volatile int sp8 = 0;
+    int i = 0;
+    do {
+        int v = arr[i];
+        if (v > best) {
+            best = v;
+            idx = i;
+        }
+        int t;
+        if (i > 9)
+            t = i;
+        else
+            t = i + 1;
+        sp8 = t;
+        i = t;
+    } while (i <= 9);
+    return idx;
+}
+
 /* near-miss: retail indexes (o + 0x40A)[base + slot * 0x34] and returns -1 first */
 extern "C" int fn_8009DC00(char* o, int slot, int base, int kind)
 {
@@ -67,4 +110,35 @@ extern "C" void fn_8009DDA8(Unk8009DDA8* p, unsigned i)
 {
     if (i < p->m1C)
         fn_8040074C(&p->m24[i], 0x3C);
+}
+
+/* near-miss (39 of 50 slots): retail tests kind linearly (1, <1, 2, 3), the switch makes a binary tree */
+struct Unk8009E93C {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    char* m24;
+};
+
+extern "C" char* fn_8040B61C(char* dst, const char* src);
+
+extern "C" char* fn_8009E93C(Unk8009E93C* p, int kind, unsigned idx, char* out)
+{
+    if (idx < p->m1C) {
+        switch (kind) {
+        default:
+            fn_8040B61C(out, p->m24 + idx * 0x3C + 0x10);
+            break;
+        case 1:
+            fn_8040B61C(out, p->m24 + idx * 0x3C + 0x14);
+            break;
+        case 2:
+            fn_8040B61C(out, p->m24 + idx * 0x3C + 0x28);
+            break;
+        case 3:
+            fn_8040B61C(out, p->m24 + idx * 0x3C + 0x2C);
+            break;
+        }
+    }
+    return out;
 }
