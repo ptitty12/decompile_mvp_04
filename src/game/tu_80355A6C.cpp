@@ -7,6 +7,8 @@
 
 int fn_80355A6C(Cont* self) { return self->m14.m4; }
 
+/* near-miss: retail re-reads the int-list count (v->m4) at the loop bottom; ours hoists it into a register
+   (inline Count(), while form and v->m0[i] data reads tried; the last gives 14 slots, this form 19) */
 int fn_80355A74(Cont* self, int idx)
 {
     IntVec* v = &self->m14;
@@ -62,84 +64,84 @@ void fn_80355BE4(Cont* self, unsigned k, Rec1C* rec)
 
 void* fn_80355D08(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D240);
     return self;
 }
 
 void* fn_80355D44(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D1D0);
     return self;
 }
 
 void* fn_80355D80(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D2B0);
     return self;
 }
 
 void* fn_80355DBC(void* self)
 {
-    fn_80355D80(self);
+    fn_80355D80__FPv(self);
     PUT(0, lbl_8065D198);
     return self;
 }
 
 void* fn_80355DF8(void* self)
 {
-    fn_80355D80(self);
+    fn_80355D80__FPv(self);
     PUT(0, lbl_8065D160);
     return self;
 }
 
 void* fn_80355E34(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D278);
     return self;
 }
 
 void* fn_80355E70(void* self)
 {
-    fn_80355E34(self);
+    fn_80355E34__FPv(self);
     PUT(0, lbl_8065D128);
     return self;
 }
 
 void* fn_80355EAC(void* self)
 {
-    fn_80355E34(self);
+    fn_80355E34__FPv(self);
     PUT(0, lbl_8065D0F0);
     return self;
 }
 
 void* fn_80355EE8(void* self)
 {
-    fn_80355D80(self);
+    fn_80355D80__FPv(self);
     PUT(0, lbl_8065D0B8);
     return self;
 }
 
 void* fn_80355F24(void* self)
 {
-    fn_80355D80(self);
+    fn_80355D80__FPv(self);
     PUT(0, lbl_8065D080);
     return self;
 }
 
 void* fn_80355F60(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D048);
     return self;
 }
 
 void* fn_80355F9C(void* self)
 {
-    fn_8035709C(self);
+    fn_8035709C__FPv(self);
     PUT(0, lbl_8065D010);
     return self;
 }

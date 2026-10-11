@@ -96,9 +96,75 @@ public:
     virtual int s25();
     virtual int s26();
     virtual int s27();
-    virtual int s28();
+    virtual int s28(char* a);
     virtual int s29(int a);
 };
+
+/* Small widget seen as plain data: three words, then the vptr at +0xC (ctor 0x800FEC00). */
+struct UiWRaw {
+    int m0;
+    int m4;
+    int m8;
+    const void* mC;
+    UiWRaw();
+};
+
+/* Message manager singleton (lbl_8061A32C), 0xD8 bytes, ctor fn_800B64BC; created lazily. */
+void* operator new(unsigned int size, int heap);
+struct UiMsg {
+    char name[16];
+};
+struct UiMsgMgr {
+    char pad0[0xD8];
+    UiMsgMgr();
+};
+extern UiMsgMgr* lbl_8061A32C;
+inline UiMsgMgr* UiGetMsgMgr()
+{
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = new (0) UiMsgMgr;
+    return lbl_8061A32C;
+}
+
+/* chain of three pointers read by the party-select helpers (fn_803571B4, fn_803571D8) */
+struct Unk1CD0 {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk14 {
+    char pad0[0x14];
+    Unk1CD0* m14;
+};
+struct Unk6F8 {
+    char pad0[0x6F8];
+    Unk14* m6F8;
+};
+extern float lbl_805C2CC8;
+
+/* "Action" objects of the menu tables (vtables 0x8065D010..): m4 selects the mode,
+ * m8 the target handle that fn_8011BC98 resolves (fn_8035799C). */
+struct Unk704 {
+    char pad0[0x704];
+    int m704;
+};
+struct Act {
+    int m0;
+    int m4;
+    void* m8;
+};
+struct Unk8017A930_T;
+struct Unk8017DD64_T;
+struct Unk80090880;
+struct Scr700 : Unk6F8 {
+    char pad6FC[4];
+    void* m700;
+};
+
+/* 24-byte value (six words) copied out of lbl_805EBA10 by the list constructors */
+struct Unk805EBA10 {
+    int m0, m4, m8, mC, m10, m14;
+};
+extern Unk805EBA10 lbl_805EBA10;
 
 /* retail data objects */
 extern char lbl_805B955C[];
@@ -110,7 +176,6 @@ extern char lbl_805BEEAC[];
 extern char lbl_805BEEB8[];
 extern char lbl_805BEEC4[];
 extern char lbl_805BEED4[];
-extern char lbl_805C2CC8[];
 extern char lbl_805C4544[];
 extern char lbl_805C4554[];
 extern char lbl_805C4570[];
@@ -186,32 +251,19 @@ extern char lbl_805C5FAC[];
 extern char lbl_805C5FB0[];
 extern char lbl_805C5FB4[];
 extern char lbl_805C5FB8[];
-extern char lbl_805CADB4[];
-extern char lbl_805CADB8[];
-extern char lbl_805CADBC[];
 extern char lbl_805CB03C[];
-extern char lbl_805CFFE4[];
-extern char lbl_805CFFE8[];
-extern char lbl_805CFFEC[];
-extern char lbl_805CFFF4[];
-extern char lbl_805D30A4[];
 extern char lbl_805D30A8[];
 extern char lbl_805D30AC[];
-extern char lbl_805EBA10[];
 extern char lbl_805F31CC[];
 extern char lbl_805F31EC[];
 extern char lbl_805F320C[];
 extern char lbl_805F321C[];
 extern char lbl_8060558C[];
-extern char lbl_806055AC[];
-extern char lbl_8061977C[];
-extern char lbl_8061A32C[];
 extern char lbl_8061BC34[];
 extern char lbl_8061BC8C[];
 extern char lbl_806204F0[];
 extern char lbl_80620804[];
 extern char lbl_80620808[];
-extern char lbl_8062087C[];
 extern char lbl_80649C48[];
 extern char lbl_80649DA0[];
 extern char lbl_80649DB8[];
@@ -290,10 +342,6 @@ extern char lbl_80666DD0[];
 extern char lbl_80666E20[];
 extern char lbl_80666E70[];
 extern char lbl_806841F8[];
-extern char lbl_8068B87C[];
-extern char lbl_8068B880[];
-extern char lbl_8068B884[];
-extern char lbl_8068B8A8[];
 extern char lbl_8068B8AC[];
 extern char lbl_8068BBE0[];
 extern char lbl_80691BEC[];
@@ -312,39 +360,237 @@ extern char lbl_80691CEC[];
 extern char lbl_80691CF0[];
 extern char lbl_80691CF4[];
 extern char lbl_80691D14[];
-extern char lbl_8069429C[];
 
 
 /* callees outside this range */
+extern Unk80090880* lbl_8061977C;
+extern Unk803442CC lbl_8068B87C;
+extern float lbl_805CADB8;
+extern float lbl_805CADBC;
+extern int lbl_8062087C;
+extern int lbl_8068B880;
+void* fn_80090880(Unk80090880*, int);
 extern "C" void fn_800AB308(void*, int);
 extern "C" void fn_800B62FC(void*, int);
+extern "C" void fn_800B7B4C(UiMsgMgr*, UiMsg*, void*);
 extern "C" void fn_800C6808(void*, int);
 extern "C" void fn_800D0D64(void*, int);
 extern "C" void fn_800D0E24(void*, int);
 extern "C" void fn_800D3A38(void*, int);
+extern "C" void fn_800DE274(void*, void*, int);
 extern "C" void fn_800EC704(void*, int);
+extern "C" void fn_800ECF18(void*);
 void fn_800FEB30(const char*, int);
-void fn_800FF590(UiPtr0*);
-extern "C" void fn_8011BD0C(void*, int);
-extern "C" void fn_8011BD3C(void*, int);
-extern "C" void fn_8011BD94(void*, int);
-extern "C" void fn_8011BE1C(void*, int);
-extern "C" void fn_8011BF1C(void*, int);
+int fn_800FF590(UiPtr0*);
+extern "C" Unk704* fn_8011BC98(void*);
+extern "C" int fn_8011BD0C(void*, int);
+extern "C" int fn_8011BD3C(void*, int);
+extern "C" int fn_8011BD94(void*, int);
+extern "C" int fn_8011BE1C(void*, int);
+extern "C" int fn_8011BF1C(void*, int);
 extern "C" void fn_80134EC8(void*, int);
+extern "C" void fn_8014D9C4(void*);
+extern "C" void fn_80151048(void*, int);
+void fn_8017045C();
+void fn_80170488();
+void fn_801704C0();
+int fn_8017C974(Unk8017A930_T*);
+void fn_8017CA14(Unk8017A930_T*, int);
+extern "C" void fn_8017CD04(void*, int, int);
+extern "C" void fn_8017D378(void*, int);
+void fn_8017D640(Unk8017A930_T*, int, char*, int, int);
+int fn_8017DD64(Unk8017DD64_T*, int);
+extern "C" void fn_8017DF2C(void*, void*);
+extern "C" int fn_801C1638(void*, int);
+extern "C" void fn_802B9300(void*, int, int);
+extern "C" void fn_802B96C4(void*, int);
 extern "C" void fn_80328374(void*, int);
+extern "C" void* fn_8032F19C(void*, const char*, void*, int);
 extern "C" void fn_80330778(void*, int);
+extern "C" void fn_80330ACC(void*, void*);
+extern "C" void fn_8033CD28(void*, int);
+extern "C" void fn_8033D14C(float, float, float, float, float);
 Unk803442CC* fn_803445A8(Unk803442CC*);
 extern "C" void fn_80377408(void*);
+extern "C" void fn_80377488(void*);
+extern "C" void fn_803785E4(void*);
 extern "C" void fn_80378620(void*, int);
+extern "C" void fn_8037936C(void*, void*);
 extern "C" void fn_8037B424(void*, int);
+extern "C" void fn_803DF74C(void*);
+extern "C" int fn_803ED5E0(const void*, int, int, int, int);
+extern "C" void fn_803EDA0C(int);
+extern "C" void fn_803FFE3C(void*, void (*)(void*), void*, int, int, int);
+extern "C" void fn_803FFEB8(void*);
+extern "C" void fn_803FFFA8(int);
+extern "C" void fn_80400068(void*, int);
+extern "C" void fn_80400114(void*, int);
+extern "C" void fn_804007D4(void*);
+extern "C" void fn_804007FC(void*);
+extern "C" void fn_80400828(void*);
+extern "C" void fn_8040084C(void*);
+extern "C" int fn_80403DE4(char*, const void*, ...);
+extern "C" int fn_80409CF0(void (*)());
+extern "C" void fn_8040B190(void*, const void*, int);
+extern "C" void* fn_8040B320(void*, int, int, ...);
 extern "C" char* fn_8040B61C(char*, const char*);
+extern "C" char* fn_8040B830(char*, const char*, unsigned);
+struct Unk54;
+
+struct Unk803579D4 {
+    int m0;
+    int m4;
+    int m8;
+    int* mC;
+    int* m10;
+    int* m14;
+};
+
+struct Unk803596DC_V {
+    int m0;
+    int m4;
+    int m8;
+    void Clear() { m0 = 0; m4 = 0; m8 = 0; }
+};
+struct Unk803596DC {
+    char m0;
+    char pad1[0x3B];
+    int m3C;
+    int m40;
+    Unk803596DC_V m44;
+    Unk805EBA10 m50;
+    Unk805EBA10 m68;
+    Unk805EBA10 m80;
+    int m98;
+    int m9C;
+    void Init()
+    {
+        m0 = 0;
+        m3C = 0;
+        m40 = 0;
+        m44.Clear();
+        m50 = lbl_805EBA10;
+        m68 = lbl_805EBA10;
+        m80 = lbl_805EBA10;
+        m98 = 0;
+        m9C = 0xae;
+    }
+};
+struct Unk803597C4 {
+    Unk803596DC m0[8];
+};
+inline void* operator new(unsigned int, void* p) { return p; }
+void* fn_8035A148(void*);
+/* reference-counted singleton of 0x24 bytes: vptr (data object lbl_8065EDB8), 0x1C bytes at +4,
+ * count at +0x20 (fn_80359C58, fn_80359CF8, fn_80359D78, fn_80359D8C). */
+struct Unk80359C58 {
+    const void* m0;
+    char m4[0x1C];
+    int m20;
+    Unk80359C58()
+    {
+        fn_8035A148(this);
+        m0 = lbl_8065EDB8;
+        fn_8040B320(m4, 0, 0x1C);
+        m20 = 1;
+        fn_8040B320(m4, 0, 0x1C);
+        fn_804007D4(m4);
+    }
+};
+class Unk80359D8C_VT {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual ~Unk80359D8C_VT();
+};
+class Unk80359FB0_VT {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual ~Unk80359FB0_VT();
+};
+extern Unk80359C58 lbl_8068B884;
+extern int lbl_8068B8A8;
+struct Unk80359A40 {
+    int m0;
+    int m4;
+    float m8;
+    int mC;
+    int m10;
+};
+struct Unk806055AC {
+    int m0;
+    int m4;
+    int m8;
+};
+extern Unk806055AC lbl_806055AC;
+struct Unk80379324_V4 {
+    float x, y, z, w;
+};
+extern Unk80379324_V4 lbl_8069429C;
+extern float lbl_805CFFE4;
+extern float lbl_805CFFE8;
+extern float lbl_805CFFEC;
+struct Unk8035A618_S {
+    int m0;
+    char pad4[0x5C];
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    float m70;
+    float m74;
+    float m78;
+    Unk80379324_V4 m7C;
+    float m8C;
+    float m90;
+    float m94;
+};
+struct Unk8035A900_E {
+    Unk806055AC m0;
+    Unk806055AC mC;
+    int m18;
+};
+struct Unk8035A900 {
+    int cnt;
+    int m4;
+    Unk8035A900_E* m8;
+};
+extern float lbl_805CFFF4;
+extern float lbl_805D30A4;
+struct Unk8035ABB0 {
+    float m0;
+    Unk806055AC m4;
+    Unk80379324_V4 m10;
+};
+struct Unk8035AC10 {
+    char pad0[0x10];
+    Unk806055AC m10;
+    int m1C;
+};
+struct Unk8035B1C8 {
+    int m0;
+    float m4;
+    int m8;
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    float m24;
+};
 
 /* functions of this range */
-int fn_80355A6C(Cont* self);
-int fn_80355A74(Cont* self, int idx);
-int fn_80355AD0(Cont* self);
-Rec1C* fn_80355B48(Cont* self, unsigned k);
-inline void SetRec(Cont0* c, unsigned i, Rec1C v);
 void* fn_80355D08(void*);
 void* fn_80355D44(void*);
 void* fn_80355D80(void*);
@@ -374,7 +620,6 @@ void fn_80356190(void*, int);
 void fn_803561B0(void*, int);
 void fn_803561D0(void*, int);
 void fn_803561F0(void*, int);
-void fn_80356228(char* self, int c);
 void fn_80356278(void*, int);
 void fn_803562AC(void*, int);
 void fn_803562CC(void*, int);
@@ -395,7 +640,6 @@ void fn_8035649C(void*, int);
 void fn_803564BC(void*, int);
 void fn_803564DC(void*, int);
 void fn_803564FC(void*, int);
-void fn_8035651C(char* self, int c);
 void fn_80356578(void*, int);
 void fn_80356598(void*, int);
 void fn_803565B8(void*, int);
@@ -415,7 +659,6 @@ void fn_80356758(void*, int);
 void fn_80356778(void*, int);
 extern "C" void* fn_80356798(void*);
 void fn_803567C8(void*, int);
-void* fn_803567FC(char* self, const char* s);
 extern "C" void fn_8035682C(char* p);
 extern "C" void fn_80356838(void*, int);
 extern "C" void fn_8035686C(void*, int);
@@ -460,7 +703,7 @@ void fn_80356F9C(void*, int);
 void fn_80356FBC(void*, int);
 void* fn_8035709C(void*);
 int fn_80357104();
-void fn_80357154(UiPtr0* p);
+void fn_8035710C(void* self);
 int fn_8035719C();
 int fn_803571A4();
 int fn_803571AC();
@@ -487,7 +730,9 @@ void fn_80357860(void*, int, int);
 int fn_8035788C(void*, VT3C*);
 void fn_803578C8(void*, void*, int);
 int fn_80357938(void*, VT3C*);
+Unk704* fn_8035799C(Act* self);
 void* fn_803579C0(void*);
+extern "C" void fn_803579D4(Unk803579D4* o);
 extern "C" void* fn_80357A5C(void*);
 void* fn_80357A70(void*);
 void fn_80357AAC(void*, int);
@@ -516,19 +761,30 @@ void fn_8035864C(void*, int);
 void fn_80358868(void*, int);
 void fn_80358F54(void*, int);
 void fn_8035929C(void*, int);
+void fn_803592CC(void* self);
 void fn_803595C4(void*, int);
 void fn_803595E4(void*, int);
 extern "C" void fn_80359604(void*, int);
+extern "C" void fn_803596DC(Unk803596DC* s);
+extern "C" void fn_80359910(int* self);
+extern "C" void fn_80359948(void* p, int v);
 void fn_803599C0(void*, int);
 void fn_803599F4();
+extern "C" void fn_80359A40(Unk80359A40* s);
 void fn_80359A64(void*, int);
 void fn_80359A98(void*, int);
+void fn_80359B04(char* self);
+void fn_80359B3C(int* p);
 void fn_80359B48(void*, int);
 extern "C" void fn_80359B78(void*, int);
+extern "C" Unk803442CC* fn_80359BAC();
+extern "C" Unk80359C58* fn_80359C58();
 void fn_8035A020(void*, int);
+extern "C" void fn_8035A09C(char* self, int unused);
 void* fn_8035A134(void*);
 void* fn_8035A148(void*);
 Unk803442CC* fn_8035A15C(Unk803442CC* self);
+void fn_8035A198(void* t);
 int fn_8035A1F4();
 int fn_8035A1FC();
 int fn_8035A204();
@@ -561,8 +817,10 @@ void fn_8035A564(void*, int);
 void fn_8035A584(void*, int);
 extern "C" void fn_8035A5A4(void*, int);
 void fn_8035A5C4(void*, int);
+extern "C" void fn_8035A618(Unk8035A618_S* s);
 void fn_8035A688(void*, int);
 void fn_8035A7D8(void*, int);
+extern "C" void fn_8035A900(Unk8035A900* s);
 void fn_8035A994(void*, int);
 void fn_8035A9C8(void*, int);
 void fn_8035A9FC(void*, int);
@@ -573,6 +831,8 @@ void fn_8035AACC(void*, int);
 extern "C" void* fn_8035AB00(void*);
 void fn_8035AB14(void*, int);
 void fn_8035AB44(void*, int);
+extern "C" void fn_8035ABB0(Unk8035ABB0* s);
+void* fn_8035AC10(Unk8035AC10* s, Unk8035AC10* o);
 void fn_8035AD80();
 void fn_8035AD84();
 void fn_8035AD88(void*, int);
@@ -595,6 +855,8 @@ void fn_8035B09C(void*, int);
 void fn_8035B0D0(void*, int);
 void fn_8035B104(void*, int);
 void fn_8035B138(void*, int);
+extern "C" void fn_8035B16C(char* self, int c);
+extern "C" void fn_8035B1C8(Unk8035B1C8* s);
 extern "C" int fn_8035B3BC(void*);
 void fn_8035B404(void*, int);
 void fn_8035B438(void*, int);
@@ -602,6 +864,7 @@ void fn_8035B46C(void*, int);
 void fn_8035B4A0(void*, int);
 void fn_8035B4D4(void*, int);
 void fn_8035B508(void*, int);
+extern "C" void* fn_8035B53C(char* self);
 void fn_8035B570(void*, int);
 void fn_8035B5A4(void*, int);
 void fn_8035B5D8(void*, int);
