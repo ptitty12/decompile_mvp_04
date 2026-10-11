@@ -397,6 +397,7 @@ struct Unk800C5E74_Obj : Unk800C5E74_Data {
     void fn_800C5EB0();
     void fn_800C6604();
     void fn_800C6624();
+    void fn_800C650C(Unk800C1BE4_Widget* a, const char* n1, Unk800C1BE4_Widget* b, const char* n2, float f, int flag);
 };
 
 /* Name/handle list at +0x34 (count at +0x1C4) used by fn_800C16CC and fn_800C68D0. */
@@ -1066,7 +1067,7 @@ struct Unk800C1BE4_Widget : Unk800C7B40_Data {
     virtual void fn_vslot25();
     virtual void fn_vslot26();
     virtual void fn_vslot27();
-    virtual void fn_vslot28(const char* name, int a);
+    virtual Unk800C1BE4_Widget* fn_vslot28(const char* name, int a);
     virtual void fn_vslot29();
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
     virtual Unk800C7B40_Widget* fn_vslot31(const char* name, int a, int b);

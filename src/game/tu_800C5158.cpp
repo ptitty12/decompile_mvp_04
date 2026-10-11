@@ -15,6 +15,10 @@ extern "C" void fn_800C5010(Unk800C341C_Mgr* m);
 extern "C" void fn_800C5080(Unk800C341C_Mgr* m);
 extern char lbl_805B6F58;
 extern "C" {
+void fn_800C4F64(Unk800C341C_Mgr* m, const char* name);
+void fn_800C4FA8(Unk800C341C_Mgr* m, const char* name);
+char* fn_8040B61C(char* dst, const char* src);
+void fn_800C2B94(Unk800C2250_File* f, int i);
 int fn_800C5980(Unk800C341C_Mgr* m);
 int fn_800C59E8(Unk800C341C_Mgr* m);
 int fn_802B9804(const char* path, int a);
@@ -65,6 +69,24 @@ extern "C" void fn_800C56C0(Unk800C341C_Mgr* m, int idx)
     r->m404 = 0;
     r->m408 = 0.0f;
     r->m40C = 0;
+}
+
+/* near-miss: 2 slots (retail loads the slot-28 delta into r0 and the pfn into r9; ours swaps them) and the loop-back to the fn_800C2998 call */
+extern "C" void fn_800C5798(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w)
+{
+    Unk800C2250_File* f = &m->files[0];
+    w->fn_vslot28(&lbl_805B6F58, 0);
+    w->fn_vslot8(0);
+    for (int i = 0; i < 10; i++) {
+        if (fn_800C2EF0(f) && (!fn_800C2F08(f) || fn_800C2F44(f))) {
+            int r = fn_800C2998(f, w);
+            while (r != -1) {
+                fn_800C2B94(f, r);
+                r = fn_800C2EF0(f) ? fn_800C2998(f, w) : -1;
+            }
+        }
+        f++;
+    }
 }
 
 extern "C" int fn_800C587C(Unk800C341C_Mgr* m)
@@ -235,6 +257,23 @@ Unk800C5E74_Obj::~Unk800C5E74_Obj()
     fn_800C6624();
 }
 
+void Unk800C5E74_Obj::fn_800C650C(Unk800C1BE4_Widget* a, const char* n1, Unk800C1BE4_Widget* b, const char* n2, float f, int flag)
+{
+    if (m2C != 0)
+        fn_800C5010(fn_800C33D0());
+    m2C = 0;
+    a->fn_vslot8(1);
+    b->fn_vslot8(0);
+    fn_800C435C(fn_800C33D0(), (int)a, 1.0f, n1, flag);
+    fn_800C435C(fn_800C33D0(), (int)b, 1.0f, n2, flag);
+    m0 = (int)a;
+    m34 = f;
+    fn_8040B61C(&m4, n1);
+    fn_8040B61C(&m18, n2);
+    m14 = (int)b;
+    m30 = 1;
+}
+
 void Unk800C5E74_Obj::fn_800C6604()
 {
     m34 = -m34;
@@ -254,6 +293,28 @@ void Unk800C5E74_Obj::fn_800C6624()
     m0 = 0;
     m14 = 0;
     m28 = 0;
+}
+
+extern "C" void fn_800C6698(Unk800C5E74_Obj* o)
+{
+    int z = o->m2C;
+    if (z != 0) {
+        if (fn_8040B574(&o->m4, &lbl_805B6F58) != 0)
+            fn_800C4F64(fn_800C33D0(), &o->m4);
+        if (fn_8040B574(&o->m18, &lbl_805B6F58) != 0)
+            fn_800C4F64(fn_800C33D0(), &o->m18);
+    } else {
+        if (fn_8040B574(&o->m4, &lbl_805B6F58) != 0)
+            fn_800C4FA8(fn_800C33D0(), &o->m4);
+        if (fn_8040B574(&o->m18, &lbl_805B6F58) != 0)
+            fn_800C4FA8(fn_800C33D0(), &o->m18);
+        o->m30 = 0;
+    }
+    o->m4 = lbl_805B6F58;
+    o->m18 = lbl_805B6F58;
+    o->m10 = -1;
+    o->m0 = 0;
+    o->m14 = 0;
 }
 
 extern "C" Unk800C6794_Raw* fn_800C6794(Unk800C6794_Raw* o, const char* name)
@@ -397,6 +458,21 @@ extern "C" void fn_800C70B8(Unk800D1614_Obj* o, int v)
         o->m48->fn_vslot14(v);
         o->m48->fn_vslot24(v);
     }
+}
+
+extern "C" void fn_800C7490(Unk800C7A4C_Group* g, int v)
+{
+    g->m2E = v;
+    if (g->m40 != 0)
+        g->m40->fn_vslot18(v);
+    if (g->m44 != 0)
+        g->m44->fn_vslot18(v);
+    if (g->m48 != 0)
+        g->m48->fn_vslot18(v);
+    if (g->m4C != 0)
+        g->m4C->fn_vslot18(v);
+    if (g->m50 != 0)
+        g->m50->fn_vslot18(v);
 }
 
 void Unk800C7A4C_Group::fn_800C7584(Unk800C7B40_Widget* c)
