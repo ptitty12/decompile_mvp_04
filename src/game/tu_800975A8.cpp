@@ -83,6 +83,18 @@ extern "C" int fn_80099278(Obj3* o, int k, int p)
     return base + r;
 }
 
+extern "C" void fn_800994D4(char* o, int x)
+{
+    unsigned a = fn_8009764C(o, 2, x, 0) + 1;
+    unsigned b = fn_8009764C(o, 1, x, 0);
+    if (a > 2) {
+        a = 0;
+        b += 1;
+    }
+    fn_800975A8(o, 2, x, a, 0);
+    fn_800975A8(o, 1, x, b, 0);
+}
+
 /* near-miss: retail lays out the c <= 1 branch first */
 struct Unk80099570 {
     char pad0[0xCC4];
@@ -165,6 +177,21 @@ extern "C" int fn_800997DC(Obj3* o, ByteVec* v)
         } while (i < v->m4);
     }
     return 0;
+}
+
+extern "C" void fn_80080828(void* p, int a, int k, int b);
+extern "C" int fn_80099620(Obj3* o);
+extern "C" void fn_80099A44(Obj3* o, int k, int slot);
+
+extern "C" void fn_800999CC(Obj3* o, int k, int slot)
+{
+    if (o->m17C[slot] != k) {
+        fn_80099A44(o, k, slot);
+        o->m3E8[k].m4 = 2;
+        fn_80080828((char*)o + 0x95C, 0, k, 1);
+    }
+    if (!fn_80099620(o))
+        o->m234 = 0;
 }
 
 /* near-miss: retail hoists the count before an entry jump to the loop test */
