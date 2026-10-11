@@ -179,7 +179,7 @@ struct Unk80021A60_Data {
     Unk80021BE8_Ent e[10];
     int m78;
     int m7C;
-    int m80[3];
+    Unk8001F2C4_World* m80[3];
     Unk8002118C* m8C;
     float m90;
     float m94;

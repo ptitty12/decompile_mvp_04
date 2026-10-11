@@ -70,23 +70,53 @@ struct Unk801A4B34_Vec3 {
     float y;
     float z;
 };
+extern "C" float fn_804028E4(float x);
+/* Euclidean length through a const reference (the sqrt of retail's fn_804028E4). */
+inline float Unk801A4B34_Len(const Unk801A4B34_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
 
 /* Character-like object returned by fn_801A4B34/fn_801A497C (position at +0x60). */
 struct Unk801A4B34_Pos {
     char pad0[0x60];
     Unk801A4B34_Vec3 m60;
-    char pad6C[0x458 - 0x6C];
+    char pad6C[0x388 - 0x6C];
+    int m388;
+    int m38C;
+    char pad390[0x3E8 - 0x390];
+    float m3E8;
+    char pad3EC[0x3F4 - 0x3EC];
+    float m3F4;
+    char pad3F8[0x458 - 0x3F8];
     int m458;
+    char pad45C[4];
+    int m460;
+    char pad464[0x708 - 0x464];
+    int m708;
+};
+
+/* Object at Outer+0x3A4 (fn_800243D4 reads a float at +0x1F8, fn_800245D0 passes +0x28C on). */
+struct Unk8001F2C4_Inner {
+    char pad0[0x1F8];
+    float m1F8;
+    char pad1FC[0x28C - 0x1FC];
+    char m28C[4];
 };
 
 struct Unk8001F2C4_Outer {
     char pad0[0x3A4];
-    int m3A4;
+    Unk8001F2C4_Inner* m3A4;
+    char pad3A8[8];
+    int m3B0;
 };
 
 /* Game context (same object as Unk8014D8AC_Ctx in chooser.h). */
 struct Unk8001F2C4_World {
-    char pad0[0x6CC];
+    char pad0[0x48];
+    unsigned m48;
+    unsigned m4C;
+    char pad50[0x6CC - 0x50];
     Unk801A4B34_Pos* m6CC;
     char pad6D0[0x6F8 - 0x6D0];
     Unk8001F5CC_Tbl* m6F8;
@@ -97,6 +127,7 @@ struct Unk8001F2C4_World {
     char pad724[0x780 - 0x724];
     int m780;
     int m784;
+    int m788;
     void fn_801A6D84(int a);
 };
 
