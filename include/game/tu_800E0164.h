@@ -84,4 +84,18 @@ void fn_801254EC(int o, int a, int b, char* p, int c);
 void fn_80125C84(int o, int a);
 void fn_80125CF8(int o);
 int fn_8007CF44(Unk8007B2B0_Screen* s, unsigned h, int a, int b);
+extern "C" int fn_800DC0F4(char* arr, int idx, int b);
+void fn_800DC3D8(int* a, int* b, int c);
+void fn_800E0C38(UiS* self, int a, int b, int c);
+void fn_800E1388(UiS* self, int a, int b, int c);
+extern char lbl_805BDBF4[];
+extern char lbl_805BDC04[];
+extern char lbl_805BB0FC[];
+extern float lbl_805BDD94;
+extern float lbl_805BDD98;
+void fn_802B91C0();
+void fn_802B9218();
+void fn_802B03F4(int g);
+void fn_802B0388(int g, char* s, int a);
+void fn_80316614(int g, int a, float f);
 #endif

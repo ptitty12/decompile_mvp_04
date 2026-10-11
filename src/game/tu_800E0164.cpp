@@ -54,6 +54,24 @@ void fn_800E02D4(UiS* self)
     ((UiSub*)((char*)self + 0xDC))->v6(5);
 }
 
+extern "C" void fn_800E0AD4(UiS* self, int a1, int a2, int a3, int a4)
+{
+    UiS* w1 = fn_800C8060(self->v32(lbl_805BDBF4, 1));
+    UiS* w2 = fn_800C8060(self->v32(lbl_805BDC04, 1));
+    int o = 0;
+    int s = 5;
+    fn_800DC3D8(&o, &s, a1);
+    if (fn_800DC0F4((char*)o, s, a1) != 0) {
+        w1->v8(0);
+        w2->v8(1);
+        fn_800E1388(self, a1, a3, a4);
+        return;
+    }
+    w1->v8(1);
+    w2->v8(0);
+    fn_800E0C38(self, a1, a2, a3);
+}
+
 int fn_800E18B0(int x)
 {
     return fn_800E1B68(fn_80075D80(x));
@@ -280,6 +298,34 @@ void fn_800E29CC(int a)
         fn_800B555C()->m4E8 = s;
         fn_8007DB74((Unk8007B2B0_Screen*)lbl_8061930C, a);
     }
+}
+
+void fn_800E2A58(int unused)
+{
+    char* nm = lbl_805BB0FC;
+    int i = 0;
+    fn_802B91C0();
+    int g = lbl_8061E978;
+    fn_802B03F4(g);
+    int p = fn_802B9804((int)nm, 0x100);
+    int n = fn_803FC4C0();
+    int d = n / 11;
+    char buf[0x80];
+    float f1 = lbl_805BDD94;
+    float f2 = lbl_805BDD98;
+    int sp90;
+    fn_803FED48((int)nm, 0x100, 0, &sp90);
+    for (; i < n; i++) {
+        fn_802B0388(g, fn_803FC548(p, i, buf), 1);
+        if (i % d == 1) {
+            f1 += f2;
+            fn_80316614((int)lbl_8061FEDC, 4, f1);
+        }
+    }
+    fn_803FEDB8(sp90, 0x64);
+    if (p != 0)
+        fn_80377488(p);
+    fn_802B9218();
 }
 
 int fn_800E2B84()
