@@ -25,6 +25,8 @@ extern int lbl_806EF9B4;   /* default heap passed to new */
 // STRUCTS-BEGIN
 struct Vtx16 { float x; float y; float z; float w; };
 struct FxRec;
+struct FxPart;
+struct FxPart24;
 /* Particle/effect-style object (vtable lbl_806658C0, vptr at +0x18).
  * Evidence: fn_80317B88 (dtor), fn_803188C4/fn_803188FC (slots at m124, counts m118..m120). */
 struct Fx {
@@ -46,9 +48,9 @@ struct Fx {
     int m11C;
     int m120;
     int m124[6];
-    char* m13C;
-    char* m140;
-    char* m144;
+    FxPart* m13C;
+    FxPart* m140;
+    FxPart24* m144;
     int* m148[6];
     char pad160[0x10];
 };
@@ -194,6 +196,11 @@ struct FxCfg7 {
     int m14;
     int m18;
 };
+/* 0x24-byte record of Fx::m144 (id at +0x20; fn_803188FC removes entries by id). */
+struct FxPart24 {
+    char pad0[0x20];
+    int m20;
+};
 struct FxV3 { float x; float y; float z; };
 class FxEObj;
 /* Per-effect record of the FxD class (0x128 bytes; array at FxD::m24, kind at +0x38,
@@ -322,6 +329,10 @@ class FxIObj {
 public:
     int m0;
     virtual ~FxIObj();
+    virtual void s2(float a, float b, float c);
+    virtual void s3(float a, float b);
+    virtual void s4(int a);
+    virtual void s5();
 };
 /* Helper object with its vptr at +4 (deleted in fn_8031D014).
  * Chooser-derived settings object (hash 0xE33E6A08, size 0x20; ctor fn_8031D988, factory fn_8031DB7C). */

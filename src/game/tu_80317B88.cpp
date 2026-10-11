@@ -87,6 +87,7 @@ void fn_8031883C(Fx* self);
 void fn_80318890(Fx* self);
 void fn_803188C4(Fx* self);
 void fn_803188F0(Fx* self);
+void fn_803188FC(Fx* self, int id);
 void fn_803191AC(Fx* self, int tex);
 FxList* fn_80319218(FxList* self);
 void fn_8031925C(Unk802A6334* self);
@@ -169,6 +170,45 @@ void fn_803188C4(Fx* self) {
 }
 
 void fn_803188F0(Fx* self) { self->m11C = 0; }
+
+void fn_803188FC(Fx* self, int id) {
+    int i = 0;
+    while (i < self->m118) {
+        FxPart* d = &self->m13C[i];
+        if (d->m90 == id) {
+            int n = --self->m118;
+            FxPart* s = (FxPart*)(n * 0x98 + (int)self->m13C);
+            *d = *s;
+        } else {
+            i++;
+        }
+    }
+    i = 0;
+    while (i < self->m11C) {
+        FxPart* d = &self->m140[i];
+        if (d->m90 == id) {
+            int n = --self->m11C;
+            FxPart* s = (FxPart*)(n * 0x98 + (int)self->m140);
+            *d = *s;
+        } else {
+            i++;
+        }
+    }
+    i = 0;
+    while (i < self->m120) {
+        FxPart24* d = &self->m144[i];
+        if (d->m20 == id) {
+            int n = --self->m120;
+            FxPart24* s = (FxPart24*)(n * 0x24 + (int)self->m144);
+            *d = *s;
+        } else {
+            i++;
+        }
+    }
+    self->m124[id] = 0;
+    lbl_8061FF50 = 0;
+    self->m24 = 0;
+}
 
 /* Texture-state refresh: rebuilds the vertex description (fn_803191AC, fn_8031A760). */
 void fn_803191AC(Fx* self, int tex) {

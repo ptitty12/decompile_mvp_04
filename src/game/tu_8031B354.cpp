@@ -16,6 +16,10 @@ extern const float lbl_805EA654;
 extern const float lbl_805EA658;
 extern const float lbl_805EA668;
 extern const float lbl_805EA56C;
+extern const float lbl_805EA6A0;
+extern const float lbl_805EA6A4;
+extern const float lbl_805EA6B0;
+extern const float lbl_805EA6B4;
 extern const float lbl_805EA570;
 extern const float lbl_805EA574;
 extern const float lbl_805EA578;
@@ -37,6 +41,8 @@ extern FxHooks lbl_80699B94;
 extern int lbl_8061E9F4;
 
 extern "C" {
+void fn_8031259C(FxCtx* c);
+void fn_803125D0(FxCtx* c);
 void fn_8014D9EC(void* p, float a, float b, float c, float d, float e);
 void fn_80314B4C(FxCtx* p);
 void fn_80314854(FxCtx* p);
@@ -66,6 +72,7 @@ void fn_8031BE94();
 void fn_8031BF58(FxD* self, int i);
 void fn_8031BF80(FxD* self, int i, int a, float f, FxSrcD* b);
 void fn_8031BFAC(FxD* self, int i);
+void fn_8031BFD8(FxD* self, int i);
 int fn_8031C074(FxItemD* self, float t);
 int fn_8031C1E4(FxD* self, int id);
 FxRec2* fn_8031C228(FxD* self, const char* name);
@@ -95,7 +102,10 @@ void fn_8031D014(FxI* self);
 void fn_8031D0A4(FxI* self, int a);
 void fn_8031D0F0();
 void fn_8031D134(FxI* self);
+void fn_8031D494(FxI* self, float a, float b, float c, float d);
+void fn_8031D54C(FxI* self);
 void fn_8031D610(FxI* self);
+void fn_8031D61C(FxI* self);
 // PROTOS-END
 }
 
@@ -220,6 +230,18 @@ void fn_8031BF80(FxD* self, int i, int a, float f, FxSrcD* b) {
 void fn_8031BFAC(FxD* self, int i) {
     int off = i * 12 + 0xA4;
     *(FxSlotD*)((char*)self + off) = self->aA4[1];
+}
+
+void fn_8031BFD8(FxD* self, int i) {
+    FxSrcD* src = self->aA4[i].m4;
+    for (int k = 0; k < 5; k++) {
+        self->a68[k].m0 = 0;
+        self->a68[k].m4 = lbl_805EA5DC;
+        self->a68[k].m8 = 1;
+    }
+    if (src) {
+        for (int j = 0; j < src->m0; j++) self->a68[j] = (&src->m4)[j];
+    }
 }
 
 int fn_8031C074(FxItemD* self, float t) {
@@ -448,4 +470,30 @@ void fn_8031D134(FxI* self) {
     self->m0 = 0;
 }
 
+void fn_8031D494(FxI* self, float a, float b, float c, float d) {
+    self->m24 = a;
+    self->m28 = b;
+    self->m2C = c / self->m14;
+    self->m30 = d / self->m18;
+    self->m10->s2(self->m24, self->m28, lbl_805EA6A0);
+    self->m10->s3(self->m2C, self->m30);
+}
+
+void fn_8031D54C(FxI* self) {
+    self->m28 = self->m24 = lbl_805EA6A4;
+    self->m2C = (float)(lbl_8061FEDC->m28 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14) * lbl_805EA6B0;
+    self->m30 = (float)(lbl_8061FEDC->m28 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18) * lbl_805EA6B4;
+}
+
 void fn_8031D610(FxI* self) { self->m1A8 = 1; }
+
+void fn_8031D61C(FxI* self) {
+    fn_8031259C(lbl_8061FEDC);
+    if (self->m40) {
+        self->m10->s5();
+    } else {
+        self->m10->s4(self->m48);
+        self->m40 = 1;
+    }
+    fn_803125D0(lbl_8061FEDC);
+}
