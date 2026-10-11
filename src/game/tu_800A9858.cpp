@@ -143,8 +143,11 @@ int fn_80409CF0(void (*f)());
 
 extern const char* lbl_80619D04;
 extern const char lbl_805B8C84[];
+extern "C" void fn_80378E48(char** s, int* n, int delim, char** tok, int* used);
 void* fn_800AA874(char* p, int i);
 void* fn_800AAF1C(UnkFEObj* self);
+int fn_800AAF5C(char* self, char* a);
+void fn_800AB01C(char* p, int* a);
 struct FEPair8 {
     UnkFEL* m0;
     int m4;
@@ -152,10 +155,10 @@ struct FEPair8 {
 struct FEMsg16 {
     char name[16];
 };
+FEPair8 fn_800AA8C4(UnkFEL* o, FEMsg16* name, int* z);
 extern "C" {
 void fn_8035682C(FEMsg16* m);
 void fn_8040B830(char* dst, const char* src, int n);
-FEPair8 fn_800AA8C4(void* o, FEMsg16* m, int* z, ...);
 }
 
 struct Unk8007F198_C;
@@ -519,7 +522,7 @@ UnkFEL* fn_800AA1A8(void* unused, int idx, const char* name)
     fn_8035682C(p);
     fn_8040B830(p->name, name, 0xF);
     p->name[15] = 0;
-    FEPair8 ret = fn_800AA8C4(o, p, &z);
+    FEPair8 ret = fn_800AA8C4((UnkFEL*)o, p, &z);
     return ret.m0;
 }
 
@@ -708,6 +711,52 @@ void* fn_800AA874(char* p, int i)
 void fn_800AA898(char* a, char* b)
 {
     fn_800AAAD8(b + 4, a + 4);
+}
+
+/* near-miss (55/55 insns, callee-saved register numbering only): retail pr=r24 name=r25 n=r26 z=r27; all 720 orders of the six prologue statements tried. The caller fn_800AA1A8 emits `crclr cr1eq`, so retail declares this callee variadic at that call */
+FEPair8 fn_800AA8C4(UnkFEL* o, FEMsg16* name, int* z)
+{
+    FEPair8 res;
+    FEPair8* pr = &res;
+    res.m0 = 0;
+    pr->m4 = 0;
+    UnkFEVec* v = &o->m4;
+    int n = v->m4;
+    for (int i = 0; i < n; i++) {
+        void* e = fn_800AAA8C((char*)v, i);
+        if (fn_800AAF5C((char*)e, (char*)name)) {
+            fn_800AB01C((char*)e, z);
+            res.m0 = (UnkFEL*)fn_800AAF1C((UnkFEObj*)e);
+            pr->m4 = i;
+            break;
+        }
+    }
+    if (res.m0 != 0) {
+        if (o->m18 != res.m0->m18) {
+            fn_800AA46C((UnkFEA*)fn_800AA19C(), res.m0, o);
+        }
+    }
+    return res;
+}
+
+void fn_800AA9A0(UnkFEVec* self, char* s, int n)
+{
+    int used = 0;
+    char* tok;
+    int tmp[100];
+    if (self->m4 > 0) {
+        fn_80377408(self->m8);
+        self->m8 = 0;
+        self->m4 = 0;
+    }
+    while (fn_80378E48(&s, &n, 0x2C, &tok, &used), used > 0) {
+        tmp[self->m4] = fn_80378568(tok, used);
+        self->m4 = self->m4 + 1;
+    }
+    self->m8 = (int*)fn_803774A8(self->m4 * 4, lbl_806EF9B4);
+    for (int i = 0; i < self->m4; i++) {
+        self->m8[i] = tmp[i];
+    }
 }
 
 void* fn_800AAA8C(char* p, int i)
