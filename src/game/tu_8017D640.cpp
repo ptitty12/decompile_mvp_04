@@ -4,10 +4,23 @@
  */
 #include "game/tu_8017D640.h"
 
+extern const float lbl_805CCB84;
+
 struct Unk8017DD64_T {
     char pad0[4];
     Unk8017DD64_Ctx* m4;
 };
+
+int fn_8017D640(Unk8017A930_T* p, int a, char* b, int c, int d)
+{
+    fn_8017C72C(p);
+    int r = fn_8017E374(p, a, b, c, c, d);
+    if (r == 1) {
+        fn_80252C1C(b + 0x480);
+        fn_801A6820(p->m4);
+    }
+    return r;
+}
 
 int fn_8017DD64(Unk8017DD64_T* p, int idx)
 {
@@ -21,6 +34,93 @@ int fn_8017ED94(Unk8017DD64_Ctx* p)
         return p->m704;
     }
     return 0;
+}
+
+int fn_8017DCCC(Unk8017DD64_T* p, Unk8017DCCC_Obj* b)
+{
+    int r = 0;
+    if (b) {
+        int off = b->m708 * 0xE64;
+        Unk8017DD64_Item* it = (Unk8017DD64_Item*)((char*)p->m4->m6F8->m14 + off);
+        int n = it->m78;
+        if (n > 0) {
+            r = b->m704 == fn_80099B50(it, 0);
+        }
+        if (n > 1) {
+            if (b->m704 == fn_80099B50(it, 1)) {
+                r = 1;
+            }
+        }
+    }
+    return r;
+}
+
+void fn_8017DD80(Unk8017DD64_T* p, int idx, int* out0, int* out1)
+{
+    *out0 = 0;
+    *out1 = 0;
+    int off = idx * 0xE64;
+    Unk8017DD64_Item* it = (Unk8017DD64_Item*)((char*)p->m4->m6F8->m14 + off);
+    int n = it->m78;
+    if (n > 0) {
+        int h = fn_80099B50(it, 0);
+        *out0 = fn_801A49F0(p->m4, idx, h);
+    }
+    if (n > 1) {
+        int h = fn_80099B50(it, 1);
+        *out1 = fn_801A49F0(p->m4, idx, h);
+    }
+}
+
+/* near-miss: retail keeps the counter in a stack slot (reloaded and stored each pass) and
+ * hoists p->m4 + 0x65C above the range test; a volatile counter and an inlined step
+ * both differ by 15+ slots after 8 variants. */
+int fn_8017E264(Unk8017DD64_T* p)
+{
+    volatile int sp = 0;
+    int i = 0;
+    int r;
+    do {
+        int* t = p->m4->m65C;
+        int x = 0;
+        if ((unsigned)i <= 12) {
+            x = t[i];
+        }
+        r = x;
+        if (x) {
+            r = fn_802491D8(x);
+        }
+        int n = sp + 1;
+        if (sp > 0x15) {
+            n = sp;
+        }
+        sp = n;
+        i = n;
+    } while (i <= 12);
+    return r;
+}
+
+/* near-miss: the arguments are copied to r28..r31 before the first load in retail; 3 slots differ. */
+void fn_8017E2E8(Unk8017E2E8_T* p, int a, int b, int c)
+{
+    void* x = p->m3B0;
+    fn_8023522C(x);
+    fn_801DBE30(p->m3B8, a, b, c);
+    fn_8017F67C(p->m24, a, b, c);
+    switch (a) {
+    case 0x2D:
+    case 0x2F:
+    case 0x9F:
+        fn_801ABC14(p->m3C8);
+        break;
+    }
+}
+
+Unk8017EDF0::Unk8017EDF0(Unk8017EE58_Ctx* ctx, int b)
+{
+    m0 = ctx;
+    m4 = b;
+    fn_8017EE24(this);
 }
 
 Unk8017EDF0::~Unk8017EDF0() {}
@@ -100,12 +200,35 @@ Unk8017EF7C::Unk8017EF7C() : Unk8037B3E8(0xEF8A9748) {}
 
 Unk8017EF7C::~Unk8017EF7C() {}
 
+void fn_8017F3B4(int a)
+{
+    fn_8037C7FC()->fn_8037CE98(0xEF8A9748, a, 0);
+}
+
 Unk8037B3E8* Unk8017EF7C::fn_vslot5()
 {
     return new (lbl_806EF9B4) Unk8017EF7C;
 }
 
 void fn_8017F424() {}
+
+Unk8017F628::~Unk8017F628() {}
+
+void fn_8017F744(Unk8017F744_T* p)
+{
+    Unk8017F744_Ctx* c = p->m0;
+    p->m4 = c->m700;
+    p->m8 = c->m6F8;
+    fn_80034CA4(p->m10);
+    p->m48 = 0;
+    p->m1DC = -1;
+    p->m30 = p->m2C = p->m28 = p->m24 = p->m20;
+    p->m44 = p->m40 = p->m3C = p->m38 = p->m34 = lbl_805CCB84;
+    for (int i = 0; i < 100; i++) {
+        p->m4C[i] = p->m20;
+    }
+    p->m1E0 = 1;
+}
 
 void fn_8017F8A0(Unk8017F8A0_T* p)
 {
@@ -172,4 +295,17 @@ void* fn_80180088(void* p)
 {
     fn_801800B8(p);
     return p;
+}
+
+void fn_801800B8(Unk801800B8_T* p, int a)
+{
+    p->m58 = a;
+    int base = 0;
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 10; j++) {
+            p->m24[j + base] = 0;
+        }
+        base += 10;
+    }
+    p->m20 = 0;
 }
