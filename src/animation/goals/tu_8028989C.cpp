@@ -514,8 +514,6 @@ int fn_8028AB04(Unk8028989C_Goal* g, int k)
 float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, float dist, Unk80273498_Vec3* out, int c,
                   int n)
 {
-    /* near-miss (5 insns): the dist spill sits after the parameter moves; retail
-     * tests dist < 0.0f with `blt` twice (a dead second branch). */
     float rem = 0.0f;
     int flags = 0;
     int s22 = fn_8028AB04(g, k);
@@ -539,7 +537,7 @@ float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, 
     fn_80386188(x->m618, q, hash, lbl_806242B0, &tmp, n, c, out, 0, 0, flags | 2);
     rem -= tmp;
     q->AddD4(tmp);
-    if (!(dist >= 0.0f && rem <= 0.0001f)) {
+    if (dist < 0.0f || (!(dist < 0.0f) && !(rem <= 0.0001f))) {
         if (g->m28) {
             q->mA4 = g->GetM10();
             flags |= 0x10;
