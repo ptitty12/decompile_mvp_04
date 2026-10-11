@@ -19,6 +19,8 @@ extern int lbl_806202F4;
 extern int lbl_806202FC;
 extern FxSing* lbl_80620304;
 extern int lbl_806202A8;
+extern int lbl_80691AF0;
+extern unsigned short lbl_80691AF2;
 extern int lbl_806202F8;
 extern int lbl_80620300;
 extern int lbl_8061B9C8;
@@ -99,6 +101,7 @@ int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim);
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim);
 int fn_80329DF0(void* a, int* out, int c);
 int fn_80329E50();
+FxDate fn_80329FA0(char* p);
 FxMS fn_8032A0C0(int t);
 int fn_8032A118(FxMS v);
 int fn_8032A130(int month0, int day, int year);
@@ -544,6 +547,44 @@ int fn_80329DF0(void* a, int* out, int c) {
 int fn_80329E50() {
     fn_803EDA0C();
     return 1;
+}
+
+/* near-miss: loop structure and registers match; retail stores the three result fields straight into the stack slot, ours goes through an address register (addi r9,r1,8) */
+FxDate fn_80329FA0(char* p) {
+    int days = (int)p;
+    if (days <= 0) return *(FxDate*)&lbl_80691AF0;
+    unsigned year = lbl_80691AF2;
+    int done = 0;
+    do {
+        int len = fn_8032A338((unsigned short)year) == 1 ? 0x5B5 : 0x5B4;
+        if (days <= len) {
+            while (!done) {
+                int yl = fn_8032A338((unsigned short)year) == 1 ? 0x16E : 0x16D;
+                if (days <= yl) {
+                    done = 1;
+                } else {
+                    days -= yl;
+                    year++;
+                }
+            }
+        } else {
+            days -= len;
+            year += 4;
+        }
+    } while (!done);
+    int m = 0;
+    int ml;
+    unsigned short y16;
+    while (days > (ml = fn_8032A2CC(m, y16 = year))) {
+        days -= ml;
+        int t = m + 1;
+        m = t - t / 12 * 12;
+    }
+    FxDate d;
+    d.b = days;
+    d.a = m + 1;
+    d.c = y16;
+    return d;
 }
 
 FxMS fn_8032A0C0(int t) {

@@ -807,6 +807,31 @@ struct FxItem3 {
     FxWid3* m74;
 };
 struct FxOne { int v; };
+/* Wider view of the embedded helper at FxCmd+0x48 (vptr at its +0x10); fn_8032FF54 uses v0, v2, v9, v11. */
+class FxEmb2 {
+public:
+    char pad0[0x4];
+    int m4;
+    char pad8[0x8];
+    virtual void v0();
+    virtual void v1();
+    virtual int v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11(int a);
+};
+struct FxCmd2 {
+    char pad0[0x4c];
+    int m4C;
+    char pad50[0x18];
+    int m68;
+};
 /* Actor reached through the name-slot lookup fn_803285A0 (two fields written by fn_803294E8). */
 struct FxActS {
     char pad0[0x54c];
