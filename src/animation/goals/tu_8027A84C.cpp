@@ -9,8 +9,8 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 18/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * AD3C, B1A0, B924). Not attempted: fn_8027B55C (242 insns),
+ * Status: 19/25 match. Near-misses are noted above their functions (fn_8027A84C,
+ * AD3C, B1A0). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -380,32 +380,32 @@ void Unk8027A84C::fn_8027B31C(int state, const Unk80273498_Vec3* pos, float angl
     }
 }
 
-/* near-miss: same instructions; stack slots differ (retail: Vec3 at sp+0x10, thresholds at
- * sp+0x20, d2 at sp+0x2c). 36 declaration-placement variants tried. */
+/* The thresholds are three float scalars: a freed temp slot is only reused for
+ * the same mode, so they get fresh slots (0x20..0x28) and v (BLKmode) reuses the
+ * first call's Vec3 temp at 0x10, as in retail (a float[3] took that slot). */
 int Unk8027A84C::fn_8027B924(Unk80270BA0_X* x, Unk8018959C_Obj* o, float f)
 {
     if (o->m36C == 0) {
         float vy = fn_8018959C(f, o).y;
         if (!(vy >= 12.0f)) {
-            float th[3];
-            th[0] = lbl_8061E6A0 * (lbl_8061E6A0 * 309.76f);
-            th[1] = lbl_8061E6A4 * (lbl_8061E6A4 * 309.76f);
-            th[2] = lbl_8061E6A8 * (lbl_8061E6A8 * 309.76f);
+            float t0 = lbl_8061E6A0 * (lbl_8061E6A0 * 309.76f);
+            float t1 = lbl_8061E6A4 * (lbl_8061E6A4 * 309.76f);
+            float t2 = lbl_8061E6A8 * (lbl_8061E6A8 * 309.76f);
             Unk80273498_Vec3 v = fn_80189618(f, o);
             float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
-            if (!(d2 >= th[0])) {
+            if (!(d2 >= t0)) {
                 return 1;
             }
-            if (d2 < th[1]) {
+            if (d2 < t1) {
                 return 2;
             }
             if (fn_8024D41C(x)) {
                 return 0;
             }
-            if (d2 < th[1]) {
+            if (d2 < t1) {
                 return 0;
             }
-            if (d2 < th[2]) {
+            if (d2 < t2) {
                 return 3;
             }
         }
