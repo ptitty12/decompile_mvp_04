@@ -305,6 +305,7 @@ public:
     void fn_80385344(const char* name);
     int fn_803851A0(int a, int b);
     void fn_803852FC(int a);
+    int fn_803852E4();         /* returns m0C ? m0C->m4 : 0 (cHandChooser slot 15, 0x802AC9A4) */
     char pad0[0x10];
 };
 
