@@ -37,6 +37,11 @@ animation/choosers/tu_80271F14.cpp:
 	.rodata     start:0x805DC70C end:0x805DC7E4
 	.data       start:0x8061E66C end:0x8061E670
 
+animation/choosers/tu_80272B20.cpp:
+	.text       start:0x80272B20 end:0x80275F24
+	.rodata     start:0x805DC7E4 end:0x805DCCB0
+	.data       start:0x8061E670 end:0x8061E674
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C

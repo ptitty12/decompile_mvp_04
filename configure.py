@@ -409,6 +409,7 @@ config.libs = [
             Object(Matching, "animation/choosers/tu_80271940.cpp"),
             Object(Matching, "animation/choosers/tu_80271C64.cpp"),
             Object(NonMatching, "animation/choosers/tu_80271F14.cpp"),
+            Object(NonMatching, "animation/choosers/tu_80272B20.cpp"),
         ],
     },
     {
