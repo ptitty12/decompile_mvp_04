@@ -66,6 +66,11 @@ extern const char lbl_805BA230[];
 Unk8001C314* fn_8001C394();
 
 extern const char lbl_80658730[];
+extern const char lbl_805BFD3C[];
+extern const char lbl_805C0240[];
+extern const char lbl_80658A18[];
+extern const float lbl_805C00F8;
+extern int lbl_8061B3B8;
 extern int lbl_8061977C;
 extern const char lbl_805C0028[];
 extern const char lbl_805BC1A8[];
@@ -98,6 +103,9 @@ extern const char lbl_805C00E0[];
 // PROTOS-BEGIN
 extern "C" {
 void fn_8011C5E8(Unk80117D20_Scr* self);
+void fn_8011C6D0(Scr* self);
+void fn_8011C768(Scr* self);
+void* fn_8011C800(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_8011D0D0(Scr* self);
 void fn_8011D614(Scr* self, int a);
 void fn_8011D67C(Scr* self, int unused, int a);
@@ -114,6 +122,7 @@ void fn_8011E3B4();
 void fn_8011E3F4(Scr* self);
 void fn_8011E414(Scr* self);
 void fn_8011E434(Scr* self, int a);
+void* fn_8011E5BC(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_8011EEB0(Scr* self, int a);
 void fn_8011EF64(Scr* self, int a);
 void fn_8011F020(Scr* self);
@@ -127,6 +136,7 @@ void fn_8011F410(Scr* self);
 Wid* fn_8011F4B8(Scr* self, int i);
 Wid* fn_8011F548(Scr* self, int i);
 Wid* fn_8011F5D8(Scr* self, int i);
+void fn_8011FFB4(Scr* self);
 void fn_8012004C(Scr* self, int a, int b);
 void fn_801200C4(Scr* self, int a);
 void fn_801203D0();
@@ -143,6 +153,11 @@ void fn_8011C15C(Scr* self);
 void fn_8011F0F4(Scr* self);
 void fn_803FFC58(void* p, int c, int n);
 void fn_8011C04C(Scr* self);
+void fn_8035682C(void* name);
+void fn_8040B830(void* dst, const char* src, int n);
+void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
+int fn_8011B5A4();
+void* fn_8011BFAC(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_8011B148(int a, Wid* w1, int* p1, Wid* w2, int* p2);
 int fn_80090880(int mgr, int id);
@@ -182,6 +197,57 @@ void fn_8011C5E8(Unk80117D20_Scr* self)
     if (lbl_8061A32C == 0)
         lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
     fn_801389A4(fn_800B7AB8(lbl_8061A32C, lbl_805BA230), 0);
+}
+
+void fn_8011C6D0(Scr* self)
+{
+    self->fn_vslot89();
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805BFD3C, 0xF);
+    np[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, 0);
+}
+
+void fn_8011C768(Scr* self)
+{
+    self->fn_vslot89();
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805B97B4, 0xF);
+    np[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, 0);
+}
+
+void* fn_8011C800(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_8011BFAC(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80658730);
+    self->m138 = 0;
+    self->m1A4 = 0;
+    self->m1A8 = 0;
+    self->m1AC = 0;
+    self->m1B0 = 0;
+    self->m1B4 = 0;
+    self->m1B8 = 0;
+    self->m1BC = 0;
+    self->m1C0 = 0;
+    self->m1C4 = 0;
+    self->m1C8 = 0;
+    self->m1CC = 0;
+    self->m1D0 = 0;
+    self->m1D4 = 0;
+    self->m1D8 = -1;
+    self->m1DC = 5;
+    lbl_8061B3B8 = fn_8011B5A4();
+    fn_803FFC58((char*)self + 0x13C, 0, 0x68);
+    return self;
 }
 
 void fn_8011D0D0(Scr* self)
@@ -347,6 +413,28 @@ void fn_8011E434(Scr* self, int a)
     self->m1D4 = a;
 }
 
+void* fn_8011E5BC(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_8011BFAC(self, a, b, c, d, e, f, g, h);
+    self->m1A8 = 0;
+    self->m1AC = 0;
+    self->m1B0 = 0;
+    self->m1B4 = 0;
+    self->m1B8 = 0;
+    self->m1BC = 0;
+    self->m1C0 = 0;
+    self->m1C4 = 0;
+    self->m1C8 = 0;
+    self->m1CC = 0;
+    self->m1DC = 0;
+    self->m1E0 = 0;
+    self->SetVptr(lbl_80658A18);
+    *(float*)&self->m1D8 = lbl_805C00F8;
+    fn_803FFC58((char*)self + 0x138, 0, 0x70);
+    self->m1D4 = 0;
+    return self;
+}
+
 void fn_8011EEB0(Scr* self, int a)
 {
     self->m1B4->fn_vslot8(a);
@@ -489,6 +577,19 @@ Wid* fn_8011F5D8(Scr* self, int i)
     default:
         return 0;
     }
+}
+
+void fn_8011FFB4(Scr* self)
+{
+    self->fn_vslot89();
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805C0240, 0xF);
+    np[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, 0);
 }
 
 void fn_8012004C(Scr* self, int a, int b)
