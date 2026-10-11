@@ -13,6 +13,7 @@
 struct Unk8003DF80_Pl {
     char pad0[0x704];
     int m704;
+    int m708;
 };
 
 #endif

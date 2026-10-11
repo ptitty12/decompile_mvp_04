@@ -95,6 +95,8 @@ struct Unk8003B3F4_Sub14 {
     unsigned char m1CC8;
     char pad1CC9[7];
     int m1CD0;
+    char pad1CD4[0x1D50 - 0x1CD4];
+    int m1D50;
 };
 struct Unk8003EAB0_Sub10 {
     char pad0[0x1C];
