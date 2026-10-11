@@ -12,6 +12,8 @@ extern Unk80040640* lbl_806177D4;
 extern Unk80040640_Tbl* lbl_806177D8;
 extern int lbl_806177DC;
 extern Unk805AEAB8_Ent lbl_805AEAB8[];
+extern Unk805AF688_Ent lbl_805AF688[];
+extern Unk805AF370_Ent lbl_805AF370[];
 extern char lbl_806872A4[];
 extern char lbl_806872AC[];
 void fn_803A8B4C();
@@ -22,6 +24,16 @@ void fn_800410D8(Unk80040640* self, int a);
 int fn_80040E9C(Unk80040640* self, int a);
 void fn_80040C58(Unk80040640* self, int a);
 void fn_80040DCC(Unk80040640* self, int a, int b);
+int fn_800415C0(Unk80040640* self, int id, int a, int b, int c, int d);
+int fn_80041350(Unk80040640* self, int id);
+int fn_80041418(Unk80040640* self, int i);
+void fn_80041478(Unk80040640* self, int id);
+int fn_803A8548(int a, int b);
+void fn_803A975C();
+int fn_803A85B0(int a, int b, void* out);
+void fn_803A979C();
+void fn_803A9204(void* p);
+void fn_8006772C();
 
 int fn_802B96C4(const char* name, int a);
 int fn_802B9764(const char* name);
@@ -299,6 +311,95 @@ void fn_80040DCC(Unk80040640* self, int a, int b)
             fn_80040E9C(self, 13);
         }
     }
+}
+
+int fn_800412AC(Unk80040640* self, int id, int a, int b, int c, int d)
+{
+    int r = -1;
+    int ok = 0;
+    if (self->m5C4 == 1)
+        ok = self->m5F4 >= 0;
+    if (ok == 1 && id >= 0 && id <= 0xb4) {
+        switch (lbl_805AEAB8[lbl_805AF688[id].mC].m54) {
+        case 0:
+            r = fn_80041350(self, id);
+            break;
+        case 1:
+            r = fn_800415C0(self, id, a, b, c, d);
+            break;
+        }
+    }
+    return r;
+}
+
+int fn_80041350(Unk80040640* self, int id)
+{
+    int ret = -1;
+    int a = lbl_805AF688[id].mC;
+    int r30 = fn_80041418(self, a);
+    int r31 = lbl_805AF688[id].m8;
+    if (r30 >= 0 || (r30 = fn_80041418(self, lbl_805AEAB8[a].m50), r31 = lbl_805AF688[id].m10, r30 >= 0)) {
+        fn_80041478(self, id);
+        if (fn_803A8548(r30, r31) != 0) {
+            fn_803A975C();
+            ret = fn_803A85B0(r30, r31, &self->m600);
+            fn_803A979C();
+        }
+    }
+    return ret;
+}
+
+/* near-miss: 23/24 slots; same mulli/mr/add pattern as fn_80040C58 (idx*0x3C
+ * kept in two registers). */
+int fn_80041418(Unk80040640* self, int i)
+{
+    int r = -1;
+    int ok = 0;
+    if (self->m5C4 == 1)
+        ok = self->m5F4 >= 0;
+    if (ok == 1 && i >= 0 && i <= 0x11) {
+        if (self->m0[i].m8 == 1)
+            r = self->m0[i].m4;
+    }
+    return r;
+}
+
+/* near-miss: 33/33 slots, 2 differ: retail stores m5 (stb 0x605) before the
+ * lwzx of the table entry, here after. 2,520 statement orders were tried. */
+void fn_80041478(Unk80040640* self, int id)
+{
+    int t;
+    fn_803A9204(&self->m600);
+    t = lbl_805AF688[id].m14;
+    self->m600.m5 = 0;
+    if (t > -1)
+        self->m600.m0 = (unsigned char)self->m438[t];
+    self->m600.m2 = 0x3c;
+    self->m600.m3 = 0x7f;
+    self->m600.m8 = 0;
+    self->m600.mA = 0;
+}
+
+int fn_800414FC(Unk80040640* self, int a, int idx)
+{
+    int v;
+    if (a <= 100) {
+        v = a;
+        if (v < 0)
+            v = 0;
+    } else {
+        v = 100;
+    }
+    if (idx <= 0x62) {
+        self->m438[idx] = ((v << 7) - v) / 100;
+        if (self->m5D0 == 1) {
+            int (*fp)(int) = lbl_805AF370[idx].m0;
+            v = ((v << 15) - v) / 100;
+            if (fp != 0 && fp != (int (*)(int))fn_8006772C)
+                v = fp(v);
+        }
+    }
+    return v;
 }
 
 /* near-miss: 60/57 slots. Retail does not keep the "t < 0" compare in cr4

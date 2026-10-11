@@ -38,6 +38,47 @@ struct Unk80040640_Tbl {
     int m200;
 };
 
+/* 0x7C-byte table entry at 0x805AEAB8; fn_80040BE8 reads the word at
+ * +0x30 + a * 4 of every entry. */
+struct Unk805AEAB8_Ent {
+    char pad0[0x30];
+    int m30[8];
+    int m50;
+    int m54;
+    char pad58[0x78 - 0x58];
+    int m78;
+};
+
+/* 0x18-byte table entry at 0x805AF688 (fn_800412AC, fn_80041350, fn_80041478). */
+struct Unk805AF688_Ent {
+    char pad0[8];
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+/* Entry of the 8-byte table at 0x805AF370: callback invoked by fn_800414FC. */
+struct Unk805AF370_Ent {
+    int (*m0)(int);
+    int m4;
+};
+
+/* Playback request block at +0x600 of the manager (fn_80041478 fills it). */
+struct Unk80040640_Req {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned char m2;
+    unsigned char m3;
+    unsigned char m4;
+    unsigned char m5;
+    unsigned char pad6[2];
+    unsigned short m8;
+    unsigned short mA;
+    char padC[0x18 - 0xC];
+};
+
+
 /* The singleton (ctor 0x80040640, size 0x618) returned by fn_8004072C. */
 class Unk80040640 {
 public:
@@ -54,14 +95,7 @@ public:
     int m5F4;
     int m5F8;
     int m5FC;
-    char pad600[0x18];
-};
-
-/* 0x7C-byte table entry at 0x805AEAB8; fn_80040BE8 reads the word at
- * +0x30 + a * 4 of every entry. */
-struct Unk805AEAB8_Ent {
-    char pad0[0x30];
-    int m30[19];
+    Unk80040640_Req m600;
 };
 
 #endif
