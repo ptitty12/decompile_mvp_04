@@ -206,7 +206,7 @@ void Tbl8009101C::v5()
     if (!m0)
         m0 = fn_803779B8(operator new(0x18, 0), 0x7E, 0, 0, lbl_805B5748, 0x1C7);
     if (!m8)
-        m8 = fn_8009DCD4(operator new(0x28, 0), lbl_805B5784, m0, 0x7E);
+        m8 = new (0) RecC(lbl_805B5784, m0, 0x7E);
     if (!mC)
         mC = fn_8053BB80(operator new(0x58, 0), lbl_805B5790, m0, 0x7E);
     if (!m10[0])

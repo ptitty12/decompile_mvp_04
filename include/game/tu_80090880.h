@@ -435,6 +435,17 @@ struct RecB : Rec {
     virtual ~RecB();
 };
 
+/* Rec subclass with 0x3C-byte entries (vtable lbl_8064B4D8). */
+struct Ent3C {
+    int w[15];
+};
+
+struct RecC : Rec {
+    Ent3C* m24;
+    RecC(const char* name, DbObj* db, int c);
+    virtual ~RecC();
+};
+
 extern "C" {
 void fn_8052FB70(Obj0C* o);
 void fn_8053BE58(Obj58* o);
@@ -443,7 +454,6 @@ void fn_8053B548(char* p, int v);
 Rec* fn_8052E654(void* mem, const char* name, DbObj* db, int c);
 Rec* fn_8052F454(void* mem, const char* name, DbObj* db, int c);
 Obj0C* fn_8052FA84(void* mem, int v);
-Rec* fn_8009DCD4(void* mem, const char* name, DbObj* db, int c);
 Obj58* fn_8053BB80(void* mem, const char* name, DbObj* db, int c);
 RowRef* fn_80085C00(Rec* r, int row);
 void fn_80085C10(char* dst, RowRef* src);
