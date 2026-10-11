@@ -33,6 +33,7 @@ extern "C" UnkFEA* fn_800AA19C();
 extern "C" void fn_800AA2FC(UnkFEA* s, int a, int b, int c);
 int fn_800AA550(UnkFEA* s, int a, int b);
 struct UnkFEArr {          /* fn_800AB098 / fn_800AB0C4: one-element array, count, pointer */
+    UnkFEArr();
     int m0[1];
     int m4;
     int m8;
@@ -643,13 +644,12 @@ void fn_800AB01C(char* p, int* a)
     fn_800A9328((UnkFEObj*)(p + 0x60), a);
 }
 
-/* near-miss: the pointer copies come out as `mr r9,r3` / `mr r11,r9` instead of retail's `mr r11,r3` / `mr r9,r3` (2 slots) */
-void fn_800AB098(UnkFEArr* a)
+UnkFEArr::UnkFEArr()
 {
-    a->m4 = 0;
-    a->m8 = 0;
+    m4 = 0;
+    m8 = 0;
     for (int i = 0; i <= 0; i++) {
-        a->m0[i] = 0;
+        m0[i] = 0;
     }
 }
 
