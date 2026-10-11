@@ -852,6 +852,7 @@ config.libs = [
         "cflags": cflags_game,
         "progress_category": "game",
         "objects": [
+            Object(NonMatching, "db/tu_8052A220.cpp"),
         ],
     },
     {
