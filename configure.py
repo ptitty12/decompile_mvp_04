@@ -390,6 +390,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
             Object(Matching, "animation/choosers/tu_80271748.cpp"),
+            Object(Matching, "animation/choosers/tu_80271940.cpp"),
         ],
     },
 ]
