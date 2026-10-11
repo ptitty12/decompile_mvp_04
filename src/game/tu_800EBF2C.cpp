@@ -32,7 +32,7 @@ extern "C" void fn_800EC1B8(UiScrRaw* self)
 
 void fn_800EC1E8(void* t)
 {
-    fn_800ECE34(t);
+    fn_800ECE34((UiS*)t);
 }
 
 void fn_800EC208(UiS* self)
@@ -176,6 +176,25 @@ extern "C" void fn_800ECAA4(UiS* self)
     }
 }
 
+void fn_800ECC9C(UiS* self, UiS* node, UiRec12* arr, int n)
+{
+    for (; node != 0; node = (UiS*)node->m8) {
+        if (node->m24 & 0x200000) {
+            for (int i = 0; i < n; i++) {
+                UiRec12* r = &arr[i];
+                UiS* a = ((UiS**)((char*)self + 0x68))[r->m0];
+                UiS* b = ((UiS**)((char*)self + 0x68))[r->m4];
+                UiS* x = a->v30((char*)node + 0xC, 1);
+                UiS* y = b->v30((char*)node + 0xC, 1);
+                if (x != 0 && y != 0)
+                    ((UiVH*)node)->v7(x, y, r->m8);
+            }
+        }
+        if (node->m1C == 3 || node->m1C == 0xB)
+            fn_800ECC9C(self, node->m40, arr, n);
+    }
+}
+
 extern "C" void fn_800ECDCC(UiS* self, int flag)
 {
     fn_800C7E0C(self, flag);
@@ -186,6 +205,20 @@ extern "C" void fn_800ECDCC(UiS* self, int flag)
         r = fn_800ED2B0(self, lbl_805BE190);
     if (r != 0)
         fn_800CFB38(r);
+}
+
+extern "C" void fn_800ECE34(UiS* self)
+{
+    fn_800CEF98(self);
+    fn_800B83F8(fn_800B8144(), 0, 0);
+    UiS* w = self->v30(lbl_805BE19C, 0);
+    if (w != 0) {
+        UiS* t = fn_800C8044(w);
+        UiS* a = ((UiVG*)t)->v31(4, 1);
+        UiS* b = ((UiVG*)t)->v31(2, 1);
+        if (b != 0 && a != 0)
+            fn_800DD204(fn_800C8040(a), fn_800C8038(b));
+    }
 }
 
 extern char lbl_805BE1C4[];
@@ -338,6 +371,31 @@ void fn_800ED930(UiS* self)
     self->m140 = w->v75();
 }
 
+void fn_800ED9BC(UiS* self)
+{
+    int v = fn_800C8060(self->v32(lbl_805BE1C4, 1))->v77();
+    if (v != self->m13C) {
+        UiS* w = fn_800C8060(self->v32(lbl_805BE1CC, 1));
+        ((UiVG*)w)->v78(v);
+        w->v14(1);
+        w->v14(0);
+    }
+}
+
+int fn_800EDAB4(UiS* self, int a)
+{
+    if (self->m138 == 0 && fn_800B555C()->m570 == a) {
+        fn_800B7ADC(UiGetMsgMgr(), self);
+        UiEvtPlain e;
+        e.vt = lbl_80649DA0;
+        e.id = 0x9E;
+        e.vt = lbl_8065B888;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, (UiEvtRaw*)&e, 0, 0);
+        e.vt = lbl_80649DA0;
+    }
+    return 1;
+}
+
 int fn_800EDB78(Unk800EDB78_T* t)
 {
     if (t->m138 == 0) {
@@ -361,4 +419,13 @@ void fn_800EDC24(void* t, char* c)
 void fn_800EDF5C(void* t)
 {
     fn_800ED254((UiS*)t);
+}
+
+int fn_800EDF7C(UiS* self, int a)
+{
+    if (self->m138 != 0 || fn_800B555C()->m570 == a) {
+        fn_800C8060(self->v32(lbl_805BE1CC, 1))->v50();
+        fn_800C8060(self->v32(lbl_805BE1C4, 1))->v50();
+    }
+    return 1;
 }
