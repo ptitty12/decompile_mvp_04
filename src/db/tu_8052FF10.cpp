@@ -55,6 +55,70 @@ extern "C" DB_OVERLAY void fn_8052FFE8(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x2C, 0x2C);
 }
 
+extern "C" DB_OVERLAY unsigned fn_80530134(Unk80071604* self, unsigned kind, unsigned i)
+{
+    unsigned r = 0;
+    if (i < self->m1C) {
+        switch (kind) {
+        case 0:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f0;
+            break;
+        case 1:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f1;
+            break;
+        case 2:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f2;
+            break;
+        case 3:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f3;
+            break;
+        case 4:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f4;
+            break;
+        case 5:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f5;
+            break;
+        case 6:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f6;
+            break;
+        case 7:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f7;
+            break;
+        case 8:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f8;
+            break;
+        case 9:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f9;
+            break;
+        case 10:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f10;
+            break;
+        case 11:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f11;
+            break;
+        case 12:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f12;
+            break;
+        case 13:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f13;
+            break;
+        case 14:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f14;
+            break;
+        case 15:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f15;
+            break;
+        case 16:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f16;
+            break;
+        case 17:
+            r = ((Unk8052FF10_Rec*)self->m24)[i].f17;
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" DB_OVERLAY char* fn_80530398(Unk80071604* self, int kind, unsigned i, char* out)
 {
     if (i < self->m1C) {
@@ -76,6 +140,124 @@ extern "C" DB_OVERLAY float fn_80530418(Unk8052CF34_Obj* o, int i, int a)
 {
     float r = (o->*lbl_80601344[i])(a);
     return r;
+}
+
+extern "C" DB_OVERLAY void fn_805304B0(Unk80071604* self, unsigned kind, unsigned i, int v)
+{
+    if (i < self->m1C) {
+        switch (kind) {
+        case 0: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            if (!(v > 0xFFFF))
+                v = v >? 0;
+            else
+                v = 0xFFFF;
+            e->f0 = v;
+            break;
+        }
+        case 1: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x1 ? 0x1 : (v >? 0);
+            e->f1 = v;
+            break;
+        }
+        case 2: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x3f ? 0x3f : (v >? 0);
+            e->f2 = v;
+            break;
+        }
+        case 3: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0xff ? 0xff : (v >? 0);
+            e->f3 = v;
+            break;
+        }
+        case 4: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x7f ? 0x7f : (v >? 0);
+            e->f4 = v;
+            break;
+        }
+        case 5: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x3ff ? 0x3ff : (v >? 0);
+            e->f5 = v;
+            break;
+        }
+        case 6: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0xf ? 0xf : (v >? 0);
+            e->f6 = v;
+            break;
+        }
+        case 7: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x7 ? 0x7 : (v >? 0);
+            e->f7 = v;
+            break;
+        }
+        case 8: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0xf ? 0xf : (v >? 0);
+            e->f8 = v;
+            break;
+        }
+        case 9: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x1 ? 0x1 : (v >? 0);
+            e->f9 = v;
+            break;
+        }
+        case 10: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x1 ? 0x1 : (v >? 0);
+            e->f10 = v;
+            break;
+        }
+        case 11: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0xff ? 0xff : (v >? 0);
+            e->f11 = v;
+            break;
+        }
+        case 12: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x7 ? 0x7 : (v >? 0);
+            e->f12 = v;
+            break;
+        }
+        case 13: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x64 ? 0x64 : (v >? 0);
+            e->f13 = v;
+            break;
+        }
+        case 14: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x64 ? 0x64 : (v >? 0);
+            e->f14 = v;
+            break;
+        }
+        case 15: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x64 ? 0x64 : (v >? 0);
+            e->f15 = v;
+            break;
+        }
+        case 16: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            v = v > 0x64 ? 0x64 : (v >? 0);
+            e->f16 = v;
+            break;
+        }
+        case 17: {
+            Unk8052FF10_Rec* e = (Unk8052FF10_Rec*)(i * 0x2C + (int)self->m24);
+            e->f17 = v > 100 ? 100 : (v >? 0);
+            break;
+        }
+        }
+    }
 }
 
 extern "C" DB_OVERLAY void fn_8053095C(Unk80071604* self, int kind, unsigned i, const char* src, int n)
