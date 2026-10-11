@@ -269,3 +269,56 @@ int fn_8005AB44(Unk8005BA1C_Voice* v)
     }
     return r;
 }
+
+Unk8005ADD0_Obj::Unk8005ADD0_Obj()
+    : m78(0x7F), m7C(0), mA4(0)
+{
+    m10C = 0;
+    m108 = -1;
+    for (int i = 0; i < 8; i++) {
+        mE8[i] = -1;
+    }
+    for (int j = 0; j < 9; j++) {
+        m80[j] = j;
+        mC[j].mState = 0;
+        mC[j].mHandle = -1;
+        mC[j].mMode = -1;
+    }
+    fn_8005B658(this);
+    mA8 = m80[mA4];
+}
+
+/* near-miss (3 slots): retail also stores the base class vtable (lbl_80649DB8) into
+ * the vptr before calling the base destructor fn_80378620; this build omits that store. */
+Unk8005ADD0_Obj::~Unk8005ADD0_Obj()
+{
+}
+
+Unk8005ADD0_Obj* fn_8005ACE4(void)
+{
+    if (lbl_80618F88 == 0) {
+        lbl_80618F88 = new (0) Unk8005ADD0_Obj;
+    }
+    return lbl_80618F88;
+}
+
+void fn_8005AD30(void)
+{
+}
+
+void fn_8005AD34(Unk8005ADD0_Obj* o)
+{
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1) {
+        for (int i = 0; i < 8; i++) {
+            fn_8005AEB0(o, i);
+        }
+    }
+    if (lbl_80618F88 != 0) {
+        delete lbl_80618F88;
+        lbl_80618F88 = 0;
+    }
+}
