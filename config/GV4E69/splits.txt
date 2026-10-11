@@ -62,6 +62,11 @@ animation/choosers/tu_80279AE4.cpp:
 	.rodata     start:0x805DCEE8 end:0x805DCF60
 	.data       start:0x8061E69C end:0x8061E6A0
 
+animation/goals/tu_8027A84C.cpp:
+	.text       start:0x8027A84C end:0x8027C728
+	.rodata     start:0x805DCF60 end:0x805DD040
+	.data       start:0x8061E6A0 end:0x8061E6C8
+
 animation/warps/tu_802A3704.cpp:
 	.text       start:0x802A3704 end:0x802A4584
 	.rodata     start:0x805DE11C end:0x805DE2F8
