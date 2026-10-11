@@ -548,7 +548,6 @@ int cPlayerAttributes::fn_cslot8() /* 80154510 */
 {
 }
 
-/* near-miss: the 11 zeroing stores are scheduled in a different order than retail (0x60 first, 0x5C last); ascending source order tried */
 int cPlayerAttributes::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80154514 */
 {
     Unk8016C788_Obj* o = fn_8016C788(ctx, a);
@@ -561,10 +560,10 @@ int cPlayerAttributes::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f
         s->m50 = 0;
         s->m54 = 0;
         s->m58 = 0;
-        s->m5C = 0;
-        s->m60 = 0;
         s->m64 = 0;
         s->m68 = 0;
+        s->m5C = 0;
+        s->m60 = 0;
     }
     if (m8 != 0) {
         Unk80189300* p = ctx->mA4C->m6CC;
