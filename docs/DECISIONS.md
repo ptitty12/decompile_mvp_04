@@ -46,14 +46,13 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 - 2026-10-10 | **No human in the loop: agents push straight to `main`.** Owner, in chat: "i never need to code review anything, you can push straight, there should be no human in the loop". This replaces the PR and review steps in `prompts/10_WORKER.md`. The gate is the verifier: `python tools/verify/verify.py --baseline-ref origin/main` must PASS on the exact commit being pushed. Never force-push; rebase on `origin/main` if it moved, then verify again. One unit per commit (CLAUDE.md); close or update unit issues with `gh`. | owner reply in chat | —
 - 2026-10-10 | **SDK units that contain original-assembly functions or unreproduced data stay NonMatching (not linked).** Their C functions count as matched when objdiff reports 100%. Example: `dolphin/os/OS.c` (its .sdata/.data must be complete, and its exception-vector functions are original asm). | Linking a partial MWCC unit shifts .sdata (8-byte section alignment). | commit `17f0041`
 
+- 2026-10-10 | **Verifier rename/code-less-unit fix installed by the owner** (commit `87d2cc9`): functions missing by name fall back to (unit, address, size); code-less units are skipped at the unit level. | Two false positives blocked pushing new units. | Tested PASS on both false-positive cases, FAIL on synthetic real drops.
+- 2026-10-10 | **The lead holds full decision authority.** Owner in chat: "yeah i have faith in you do whatever you have fill authority" (after approving the Opus-lead + Sonnet-worker plan with "go"). Decisions taken under it are marked *[lead, owner authority]*. Protected files (`tools/verify/**`, `.github/workflows/**`, `.claude/**`) still need the owner's own hands: agents are denied edits there by `.claude/settings.json`. | Owner wants the project to run without owner steps. | chat, 2026-10-10
+- 2026-10-10 | **Pragmas approved** *[lead, owner authority]*, exact lines for `tools/verify/pragma_allowlist.txt` (owner paste pending; protected file):
+  - `#pragma cplusplus on` / `#pragma cplusplus reset` and `#pragma dont_inline on` / `#pragma dont_inline reset`: MWCC switches used by the public Dolphin SDK reconstructions we port (W2's pad/si/vi/dsp; `include/libc/math.h`). They reproduce the SDK's own build settings and generate no code by themselves.
+  - `#pragma interface` / `#pragma implementation` (g++): every chooser and chooser-helper vtable, the slot 3/4 getters and the implicit dtors sit in one TU at 0x802AC8xx in reverse declaration order (vtables 0x80661EA0..0x80662538). A ProDG 3.9.3 scratch test reproduces this: with `#pragma interface` in the header, the TU defining the class's virtuals emits no vtable, and a TU with a bare `#pragma implementation` emits the vtables in reverse declaration order. This is the only non-trick way to link the helper-class units (cCircleChooser, cLinearChooser, ...). Planned layout: class declarations in `include/game/choosers.h` (`#pragma interface`), implementation TU `src/animation/choosers/choosers.cpp` (bare `#pragma implementation`, same basename).
+  | Needed to land W2 (80 SDK functions) and to link helper-class units. | W2 builds byte-identical; scratch test above.
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
-- 2026-10-10 | **BLOCKING: install `proposed/verify-rename-fix.patch` (verifier false positives).**
-  - Context: `verify.py` (protected) reports two non-regressions as regressions:
-    1. renamed functions (keyed by name; a corrected parameter type renames a still-100% function);
-    2. dtk's code-less auto data units, which count as "100% matched code" and vanish when a new unit claims their range.
-  - (2) blocks pushing nearly every new unit. `animation/choosers/tu_80271748.cpp` (cEventChooser, 5/5, the first unit **linked** from C++, main.dol identical) is committed locally on `match/batch-01` but unpushed for this reason.
-  - Earlier, commits `778e804`/`5c6901b` reached main on a failed gate (issue 1, no real regression). Pushes are gated on the verifier's exit code since then.
-  - Fix: fall back to (unit, address, size) for functions, and skip code-less units at the unit level. Tested on real reports: PASS for both false-positive cases, FAIL for a real drop.
-  - Options: install (3 steps in `proposed/README.md`) / keep as is (new units can't be pushed)
