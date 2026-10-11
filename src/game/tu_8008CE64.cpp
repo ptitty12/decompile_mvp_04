@@ -252,6 +252,13 @@ extern "C" void fn_80402DE4(const void* p, int n);
 
 
 
+extern int lbl_805B6B90[];
+
+
+extern int lbl_805B6D70[];
+extern float lbl_805B6C80[][5];
+
+
 char* fn_8008D738(Unk8008CE64_K<Unk8008CE64_T3C>* self, int t, unsigned i, char* buf)
 {
     if (i < self->m1C) {
@@ -271,6 +278,33 @@ float fn_8008D7B8(Unk8008CE64_Obj* o, int i, int a)
 {
     float r = (o->*lbl_805B6C50[i])(a);
     return r;
+}
+
+void fn_8008E690(Unk8008CE64_K<Unk8008CE64_T3C>* self, signed char t, unsigned i, const char* str, int n)
+{
+    if (i < self->m1C) {
+        if (n <= 0)
+            n = fn_8040B6A0(str);
+        int mx = lbl_805B6B90[t] - 1;
+        if (n > mx)
+            n = mx;
+        switch (t) {
+        case 0: {
+            int o = i * 0x3C;
+            fn_8040B830((char*)self->m24 + o + 0x1F, str, n);
+            char* d = (char*)(o + (int)self->m24 + 0x1F);
+            d[n] = 0;
+            break;
+        }
+        case 1: {
+            int o = i * 0x3C;
+            fn_8040B830((char*)self->m24 + o + 0x2B, str, n);
+            char* d = (char*)(o + (int)self->m24 + 0x2B);
+            d[n] = 0;
+            break;
+        }
+        }
+    }
 }
 
 float fn_8008E77C(G* self, int a)
@@ -438,36 +472,37 @@ char* fn_8008F99C(Unk8008CE64_K<Unk8008CE64_T1C>* self, int t, unsigned i, char*
     return buf;
 }
 
-/* near-miss: clamp arms and the store registers/address order differ (35 vs 37 slots). */
 void fn_8008FA1C(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i, int v)
 {
     if (i < self->m1C) {
         switch (t) {
         case 0: {
-            Unk8008CE64_E1C* e = (Unk8008CE64_E1C*)(i * 0x1C + (int)self->m24);
-            if (!(v > 0xFFFF)) {
+            Unk8008CE64_E1C* b = self->m24;
+            Unk8008CE64_E1C* p = (Unk8008CE64_E1C*)(i * 0x1C + (int)b);
+            if (v <= 0xFFFF) {
                 if (v < 0)
                     v = 0;
+                p->h0 = v;
             } else
-                v = 0xFFFF;
-            e->h0 = v;
+                p->h0 = 0xFFFF;
             break;
         }
         case 1: {
-            Unk8008CE64_E1C* e = (Unk8008CE64_E1C*)(i * 0x1C + (int)self->m24);
-            if (!(v > 1)) {
-                if (v < 0)
-                    v = 0;
+            Unk8008CE64_E1C* p = (Unk8008CE64_E1C*)(i * 0x1C + (int)self->m24);
+            int w;
+            if (v <= 1) {
+                w = v;
+                if (w < 0)
+                    w = 0;
             } else
-                v = 1;
-            e->f = v;
+                w = 1;
+            p->f = w;
             break;
         }
         }
     }
 }
 
-/* near-miss: register assignment of the parameters differs. */
 void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i, const char* str, int n)
 {
     if (i < self->m1C) {
@@ -478,18 +513,20 @@ void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i
             int m = n;
             if (m > 10)
                 m = 10;
-            char* dst = (char*)self->m24 + i * 0x1C + 3;
-            fn_8040B830(dst, str, m);
-            dst[m] = 0;
+            int o = i * 0x1C;
+            fn_8040B830((char*)self->m24 + o + 3, str, m);
+            char* d = (char*)(o + (int)self->m24 + 3);
+            d[m] = 0;
             break;
         }
         case 1: {
             int m = n;
             if (m > 13)
                 m = 13;
-            char* dst = (char*)self->m24 + i * 0x1C + 0xE;
-            fn_8040B830(dst, str, m);
-            dst[m] = 0;
+            int o = i * 0x1C;
+            fn_8040B830((char*)self->m24 + o + 0xE, str, m);
+            char* d = (char*)(o + (int)self->m24 + 0xE);
+            d[m] = 0;
             break;
         }
         }
@@ -657,6 +694,30 @@ int fn_8008FF98(int t)
         return 0x5AA9;
     }
     return 0;
+}
+
+int fn_8009005C(int a, float f)
+{
+    int row = 0;
+    int i = 0;
+    float acc = 0.0f;
+    int n = 12;
+    if (a >= lbl_805B6D70[0]) {
+    top:
+        i++;
+        if (i >= n)
+            goto done;
+        if (a >= lbl_805B6D70[i])
+            goto top;
+        row = i;
+    }
+done:
+    for (i = 0; i < 5; i++) {
+        acc += lbl_805B6C80[row][i];
+        if (f < acc)
+            return i;
+    }
+    return 4;
 }
 
 void fn_8009010C()
