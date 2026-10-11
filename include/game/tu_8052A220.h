@@ -297,6 +297,71 @@ struct Unk8052F5CC_Rec {
     unsigned p3 : 21;
 };
 
+/*
+ * Weighted-table classes of 0x80531A20..0x80534078: each is a header of 8 bytes followed by a
+ * float array (the shapes are placeholders named by their dimensions).
+ */
+template <int R, int C>
+struct Unk80531A20_Tbl {
+    char pad0[8];
+    float m8[R][C];
+};
+struct Unk80531A20_T14 {
+    char pad0[8];
+    float m8[14];
+    float m40[14][5];
+};
+struct Unk80531D2C_T3 {
+    char pad0[8];
+    float m8[5][8][20];
+};
+struct Unk805325F8_T20 {
+    char pad0[8];
+    float m8[20];
+};
+struct Unk80532A18_T4 {
+    char pad0[8];
+    float m8[7][3][2][2];
+};
+/* 16-byte records at +8 (fn_80532D68 sets one, fn_80532DA0 reads the float, fn_80532E34 clears 15). */
+struct Unk80532D68_Rec {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+};
+struct Unk80532D68_T {
+    char pad0[8];
+    Unk80532D68_Rec m8[15];
+};
+/* 12-byte records at +8 (fn_805334B0 fills one for index c - 0x42; fn_805334EC/fn_8053350C read). */
+struct Unk805334B0_Rec {
+    float m0;
+    int m4;
+    int m8;
+};
+struct Unk805334B0_T {
+    char pad0[8];
+    Unk805334B0_Rec m8[19];
+};
+
+struct Unk805337C8_Rec {
+    float m0;
+    int m4;
+};
+struct Unk805337C8_T {
+    char pad0[8];
+    Unk805337C8_Rec m8[3][14];
+};
+struct Unk80533B74_T {
+    char pad0[8];
+    int m8[19][14];
+};
+struct Unk80533E14_T {
+    char pad0[8];
+    float m8[14][14];
+};
+
 /* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */
 struct Unk8052CF34_Obj {
     virtual float M(int a);
