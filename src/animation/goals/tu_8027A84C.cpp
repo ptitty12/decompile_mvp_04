@@ -9,8 +9,8 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 19/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * AD3C, B1A0). Not attempted: fn_8027B55C (242 insns),
+ * Status: 20/25 match. Near-misses are noted above their functions (fn_8027A84C,
+ * B1A0). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -209,8 +209,26 @@ void Unk8027A84C::fn_8027AC90(Unk8037B128_Mtx* m, int n, int unused, Unk80273498
     }
 }
 
-/* near-miss: heading temp slot and the else-branch position copy (retail copies m60 through a
- * 0x28 temp into a slot at sp+8; mine adds one more copy). 24 variants tried. */
+/* The heading goes through SetF (its float parameter sits in a BLKmode inline
+ * frame, which reuses pos's freed slot at 0x8), and the else-branch position is
+ * FlatX60(x): the m60 copy into FlatY's by-value parameter happens inside an
+ * inline, so it gets direct stores to 0x28, as in retail. */
+inline void SetF(float* p, float v)
+{
+    *p = v;
+}
+
+inline Unk80273498_Vec3 FlatY(Unk80273498_Vec3 v)
+{
+    v.y = 0.0f;
+    return v;
+}
+
+inline Unk80273498_Vec3 FlatX60(Unk80270BA0_X* x)
+{
+    return FlatY(x->m60);
+}
+
 void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_Vec3* outPos, float* outHeading,
                               float* outSpeed, int* outA, int* outB, int* outC)
 {
@@ -221,8 +239,7 @@ void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_
             *outPos = pos;
         }
         if (outHeading) {
-            float h = fn_8037B1F0(&o->mtx);
-            *outHeading = h;
+            SetF(outHeading, fn_8037B1F0(&o->mtx));
         }
         if (outSpeed) {
             *outSpeed = o->mD0;
@@ -232,10 +249,7 @@ void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_
         }
     } else {
         if (outPos) {
-            Unk80273498_Vec3 t = x->m60;
-            t.y = 0.0f;
-            Unk80273498_Vec3 pos = t;
-            *outPos = pos;
+            *outPos = FlatX60(x);
         }
         if (outHeading) {
             *outHeading = fn_80382BB8(x->m618);
