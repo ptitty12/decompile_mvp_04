@@ -163,4 +163,20 @@ struct Unk802D62A8 {
     const void* m8;
 };
 
+/* Replay camera setup (fn_802D5F74): +0x6C sub-camera, +0x164 camera record looked up by name; the record's +0x5C / +0x70 / +0x74 floats are copied
+ * from a second named record. */
+struct Unk802D5F74_Rec {
+    char pad0[0x5C];
+    float m5C;
+    char pad60[0x10];
+    float m70;
+    float m74;
+};
+struct Unk802D5F74 {
+    char pad0[0x6C];
+    struct Unk802CBD04* m6C;
+    char pad70[0x164 - 0x70];
+    Unk802D5F74_Rec* m164;
+};
+
 #endif

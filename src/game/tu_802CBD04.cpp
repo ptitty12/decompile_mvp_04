@@ -131,9 +131,9 @@ int fn_802CC8EC(Unk802CBD04* o)
     return r;
 }
 
-void fn_802CF168(void* o)
+void* fn_802CF168(void* o)
 {
-    fn_8037CF5C(fn_8037C7FC(), 0xB38E54D3, o);
+    return fn_8037CF5C(fn_8037C7FC(), 0xB38E54D3, o);
 }
 
 void fn_802CF1A4(void* o)
