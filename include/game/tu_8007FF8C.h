@@ -179,4 +179,12 @@ struct Unk8007FF8C_VObj {
     Unk8007FF8C_VT* m4;
 };
 
+/* Object type of the pointer-to-member table lbl_805B6B50: the member
+ * functions are unknown, only the call shape is. It needs a virtual function,
+ * or the compiler drops the virtual-call half of the member-pointer call. */
+struct Unk8007FF8C_PObj {
+    virtual float M(int a);
+};
+typedef float (Unk8007FF8C_PObj::*Unk8007FF8C_Pmf)(int);
+
 #endif
