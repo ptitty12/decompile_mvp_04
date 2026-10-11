@@ -303,6 +303,7 @@ int fn_800D641C(Unk800D4D0C_D* t, int x)
     return -1;
 }
 
+/* near-miss: 1 slot; retail schedules `mr r3,r30` after the other argument moves (tried free-function and method-call forms) */
 UiScrRaw2* fn_800D649C(UiScrRaw2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k)
 {
     self->fn_800D0D9C(a, 7, b, c, d, e, f, g, h, i, j, k);
