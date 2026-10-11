@@ -82,6 +82,7 @@ extern const float lbl_805B9D30;
 extern const float lbl_805B9D34;
 extern const float lbl_805B9D38;
 extern const char lbl_805B99E8[];
+extern const char lbl_805B955C[];
 extern const char lbl_805B99F0[];
 extern int lbl_80619F24[];
 extern Unk800B555C* lbl_8061A304;
@@ -237,6 +238,9 @@ void fn_800B33D4(GObj6* self);
 void fn_800B5170(GObj5* self);
 FEMgrB8* fn_800B64BC(FEMgrB8* p);
 void fn_800B7FC4(FEMgrB8* mgr);
+void fn_8035682C(UiMsgBuf* m);
+void fn_8040B830(char* dst, const char* src, int n);
+void fn_800B7B4C(FEMgrB8* mgr, UiMsgBuf* m, void* ctx);
 void fn_8011C4A8(void* o, int a, int b);
 void* fn_800B7AB8(FEMgrB8* mgr, const char* name);
 void fn_8011D850(void* w, int a, int b);
@@ -274,7 +278,6 @@ inline int FEIsBC(int v)
 }
 
 
-
 /* ---- unit prototypes ---- */
 extern "C" {
 int fn_800B2AAC(GObj* self, int k);
@@ -299,6 +302,7 @@ void fn_800B385C(UnkAt5C* p);
 void fn_800B3868();
 int fn_800B386C(UnkAtA8* p);
 float fn_800B3890(GObj* self);
+int fn_800B4B28(GObj5C* self, int k);
 int fn_800B4C64();
 void* fn_800B4CFC(UnkAt1C24* p);
 int fn_800B4D18(GObj2* self, int a);
@@ -549,6 +553,34 @@ extern "C" float fn_800B3890(GObj* self)
 {
     float t = (float)self->mA8 * lbl_805B9D30 + lbl_805B9D34;
     return t <? lbl_805B9D38;
+}
+
+extern "C" int fn_800B4B28(GObj5C* self, int k)
+{
+    int r = 0;
+    switch (k) {
+    case 1:
+        if (GetMgr()->mBC != 0) {
+            fn_800B7FC4(GetMgr());
+        }
+        break;
+    case 4:
+        if (GetMgr()->mA0 != 0) {
+            if (self->m5C == 0) {
+                UiMsgBuf m;
+                UiMsgBuf* p = &m;
+                fn_8035682C(p);
+                fn_8040B830(p->name, lbl_805B955C, 0xF);
+                p->name[15] = 0;
+                fn_800B7B4C(GetMgr(), p, 0);
+            }
+        }
+        break;
+    default:
+        r = 1;
+        break;
+    }
+    return r;
 }
 
 extern "C" int fn_800B4C64()
