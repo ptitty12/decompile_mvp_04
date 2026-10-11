@@ -352,6 +352,9 @@ config.warn_missing_source = False
 # SN's libgcc (GCC 2.95.3 runtime as shipped with ProDG). See docs/DECISIONS.md.
 cflags_libgcc = ["-O2", "-G0"]
 
+# Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
+cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
+
 # Units not listed here are linked from the dtk split (assembly).
 config.libs = [
     {
@@ -361,6 +364,17 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(Matching, "libgcc/_main.c"),
+        ],
+    },
+    {
+        "lib": "dolphin_os",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_os,
+        "progress_category": "sdk",
+        "objects": [
+            # Code-matched, not linkable: OS.c's .sdata/.data (__OSVersion, OSInit strings)
+            # and original-assembly functions must be reproduced before it can link.
+            Object(NonMatching, "dolphin/os/OS.c"),
         ],
     },
 ]
