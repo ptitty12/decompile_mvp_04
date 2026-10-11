@@ -27,12 +27,37 @@ public:
     int fn_8014D8AC(int max, const char* file, int line);
 };
 
-/* Object passed to the choosers' pick functions; only +0x554 is used here. */
+/* Three floats (x, y, z) at +0x60 of the player objects (Unk80270BA0_X) and
+ * of the position holders below. Evidence: fn_80273498 and fn_80272E28 in
+ * animation/choosers/tu_80272B20.cpp read 0x60/0x64/0x68 as a vector. */
+struct Unk80273498_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+
+/* Position holders reached through Unk8014D8AC_Ctx::m54C (+0xC -> object) and
+ * m6CC (object), both read by fn_80273498 (tu_80272B20.cpp). */
+struct Unk80273498_Pos {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+};
+struct Unk80273498_Ref {
+    char pad0[0xC];
+    Unk80273498_Pos* mC;
+};
+
+/* Object passed to the choosers' pick functions; only +0x54C, +0x554, +0x6CC,
+ * +0x6F4 and +0x700 are used here. */
 struct Unk8027107C_Outer;
 struct Unk8014D8AC_Ctx {
-    char pad0[0x554];
+    char pad0[0x54C];
+    Unk80273498_Ref* m54C;
+    char pad550[4];
     Unk8014D8AC* m554;
-    char pad558[0x6F4 - 0x558];
+    char pad558[0x6CC - 0x558];
+    Unk80273498_Pos* m6CC;
+    char pad6D0[0x6F4 - 0x6D0];
     int m6F4;
     char pad6F8[0x700 - 0x6F8];
     Unk8027107C_Outer* m700;
@@ -45,11 +70,13 @@ public:
 };
 Unk8037C7FC* fn_8037C7FC();
 
-/* Base of the helper list classes (ctor 0x80356798). */
+/* Base of the helper list classes (ctor 0x80356798). Its vtable 0x8065F9B0
+ * has one slot, 0x8035B104; the helper in tu_80272B20.cpp overrides it with
+ * its parse function (buf, len), which is why it has these parameters. */
 class Unk80356798 {
 public:
     Unk80356798();
-    virtual void fn_vslot1();
+    virtual void fn_vslot1(char* buf, int len);
 };
 
 /* Result record filled by the choosers' vtable slot 17. */
@@ -81,7 +108,9 @@ int fn_8024D9A0(Unk80270BA0_X* x, int* out);
 
 /* Base part of Unk80270BA0_X that precedes its vtable pointer (at +0x98). */
 struct Unk80270BA0_XBase {
-    char pad0[0x98];
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;      /* position */
+    char pad6C[0x98 - 0x6C];
 };
 
 /* g++ 2.95 places the vtable pointer after the data of the class that
