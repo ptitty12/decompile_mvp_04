@@ -4,6 +4,11 @@
  */
 #include "game/tu_801AB63C.h"
 
+struct Unk801AB63C_E {
+    int m0;
+    int m4;
+};
+
 void fn_801AB964(Unk801AB63C_P* p);
 void fn_801ABA0C(Unk801AB63C_P* p);
 void fn_8017DD80(void* a, int x, int* b, int* c);
@@ -35,6 +40,17 @@ void fn_801AE3F0(Unk801AB63C_Ent* e, Unk801AB63C_Q* q, int n);
 void fn_801AE494(Unk801AB63C_Ent* e, int* a, int* b);
 void fn_801AE4DC(Unk801AB63C_Ent* e, int a);
 void fn_801AE4DC(Unk801AB63C_Ent* e, Unk801AB63C_Q* q);
+
+void fn_801AB63C(Unk801AB63C_P* p)
+{
+    Unk8019F8C0_Inner* m = p->m8->m6F8->m14;
+    int t = m[2].m8;
+    if (fn_801ABCDC(p, t == 0) == 1) {
+        fn_801ACF2C(p);
+        fn_801AD118(p);
+    }
+    p->m5C = 0;
+}
 
 void fn_801AB6A0(Unk801AB63C_P* p)
 {
@@ -228,19 +244,38 @@ int fn_801AE130(Unk801AB63C_P* p, Unk801AB63C_Q* q)
 
 void fn_801AE17C() {}
 
-void fn_801AB63C(Unk801AB63C_P* p)
-{
-    Unk8019F8C0_Inner* m = p->m8->m6F8->m14;
-    int t = m[2].m8;
-    if (fn_801ABCDC(p, t != 0) == 1) {
-        fn_801ACF2C(p);
-        fn_801AD118(p);
-    }
-    p->m5C = 0;
-}
-
 void fn_801AE2A4(int* p, int a, int b)
 {
     p[1] = b;
     p[0] = a;
+}
+
+void fn_801AE2B0(Unk801AB63C_E* e)
+{
+    e->m0 = 0;
+    e->m4 = 0;
+}
+
+int fn_801AE2C0(Unk801AB63C_E* e)
+{
+    int r = 0;
+    if (e->m4 && e->m0) {
+        r = 1;
+    }
+    return r;
+}
+
+int fn_801AE2E8(Unk801AB63C_E* e, int v)
+{
+    return e->m0 == v;
+}
+
+int fn_801AE2FC(Unk801AB63C_E* e)
+{
+    return e->m0;
+}
+
+int fn_801AE304(Unk801AB63C_E* e)
+{
+    return e->m4;
 }
