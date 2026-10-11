@@ -320,6 +320,53 @@ int fn_8007AA84(void* g, int a, int b, int c);
 unsigned fn_8007E0E4(void* g, int a, int b);
 
 }
+/* The screen seen through a vtable declaration where slot 40 takes no argument (r4 is left as is). */
+struct Unk80139090_VData {
+    char pad0[0x3C];
+};
+struct Unk80139090_V : Unk80139090_VData {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+};
+extern const char lbl_805B955C[];
 
 struct UnkW140 : Unk800C7B40_Widget {
     char pad40[0x100];
@@ -592,6 +639,28 @@ extern "C" void fn_80139034()
     int v = fn_800B555C()->m554;
     fn_80081004(b->m14, v, 1);
     fn_80081004(a->m14, v, 1);
+}
+
+extern "C" void fn_80139090(Scr* x, int k)
+{
+    char buf[16];
+    char* p = buf;
+    fn_8035682C(p);
+    switch (k) {
+    case 0:
+        fn_8040B830(p, lbl_805BE138, 15);
+        p[15] = k;
+        FE();
+        fn_800B7B4C(lbl_8061A32C, p, x);
+        break;
+    case 1:
+        fn_8040B830(p, lbl_805B955C, 15);
+        p[15] = 0;
+        FE();
+        fn_800B7B4C(lbl_8061A32C, p, x);
+        ((Unk80139090_V*)x)->fn_vslot40();
+        break;
+    }
 }
 
 extern "C" int fn_80139194(UnkW140* x)
