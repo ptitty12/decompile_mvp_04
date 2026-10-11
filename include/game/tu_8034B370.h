@@ -18,6 +18,8 @@ struct Unk803BA44C_Obj {
 extern "C" int fn_803BA44C(void* list, int* count);
 extern "C" int fn_803BA378(void* list);
 
+extern "C" void fn_8040074C(void* p, unsigned n); /* bzero */
+
 /* Ring / array containers (fn_80353244 .. fn_80353F58 and the clones at
  * 0x80354xxx, 0x80355xxx, five instantiations of the same template): m0 is the
  * element buffer, m4 the element count, mC the cursor; a polymorphic variant
@@ -29,6 +31,12 @@ struct Unk80353E68 {
     unsigned m4;
     int m8;
     unsigned mC;
+    inline void Clear()
+    {
+        fn_8040074C(m0, m8 << 2);
+        m4 = 0;
+        mC = 0;
+    }
 };
 struct Unk80353ECC : Unk80353E68 {
     virtual void v1();
@@ -42,6 +50,23 @@ struct Unk80353ECC : Unk80353E68 {
     virtual void v9();
     virtual void v10();
 };
+
+/* Byte-element variant of the ring (fn_80353234, fn_80353DAC, fn_80354FD4). */
+struct Unk80353234 {
+    unsigned char* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+    inline void Clear()
+    {
+        fn_8040074C(m0, m8);
+        m4 = 0;
+        mC = 0;
+    }
+};
+void fn_80341598(Unk8034151C* t, int v);
+void fn_8034166C(Unk803415F0* t, int v);
+extern "C" void* fn_8040B190(void* dst, const void* src, int n); /* memcpy */
 
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
