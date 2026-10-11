@@ -255,34 +255,33 @@ extern "C" void fn_801312B8(Scr* x, int a, int b)
 
 extern "C" int fn_80131378() { return 0; }
 
-/* near-miss: 52/52 insns; same store-order problem as fn_8012E7FC (the -1 stores for +0x2F0/+0x2F4 land next to each other). */
 extern "C" Scr* fn_80131380(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC150(self, a, 0, c, d, e, f, g, h);
     self->SetVptr(lbl_80659AD0);
-    self->m2F4 = -1;
-    self->m308 = lbl_805C0B78;
-    self->m324 = 1;
-    self->mE14 = 0;
     self->m2DC = 0;
     self->m2E0 = 0;
     self->m2E4 = 0;
     self->m2E8 = 0;
     self->m2EC = 0;
     self->m2F0 = -1;
+    self->m2F4 = -1;
     self->m2F8 = 0;
     self->m2FC = 0;
     self->m300 = 0;
     self->m304 = 0;
+    self->m308 = lbl_805C0B78;
     self->m310 = 0;
     self->m314 = 0;
     self->m318 = 0;
     self->m31C = 0;
+    self->m324 = 1;
     self->m328 = 0;
     self->mE04 = 0;
     self->mE08 = 0;
     self->mE0C = 0;
     self->mE10 = 0;
+    self->mE14 = 0;
     fn_800ED310(self, 0);
     fn_800ECDCC(self, 0);
     return self;
