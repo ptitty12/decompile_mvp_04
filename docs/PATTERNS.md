@@ -416,3 +416,33 @@ Recipes that matched 18 parked functions (details in each unit's comments):
   - `(char*)(i*0x18 + (int)p + 0x30)` gives retail's operand order.
 - A function whose r3 is never set before a call has an unused first
   parameter. Variadic callees show `crclr cr1eq`.
+
+## Range-00 recipes (2026-10-11)
+
+- Stack-slot loop counters (`lwz r9,N(r1); cmpwi; addi; ble; mr; stw`, about
+  a dozen functions): use `template<int MAX> Unk8006A138_It`
+  (include/game/clampiter.h). A user-declared dtor keeps it in the frame.
+  - `Next()` is `int t; if (v > MAX) t = v; else t = v + 1; v = t; return t;`.
+  - Drive the loop with `idx = it.Next()`, or read `it.v` in the body
+    (fn_80079BF8, fn_8007C328).
+  - Construct the iterator after the other loads.
+  - Do-while with an early exit:
+    `do { r = f(arr[j]); j = it.Next(); } while (j <= 3 && r != 0);`
+- Frame slot order: address-taken plain ints go above objects with dtors.
+  Declaring temporaries as `int t[4]` places them at declaration (retail:
+  temporaries at 8..0x14, iterator at 0x18).
+- Recursive dispatch with `d > 1` laid out last:
+  `if (d <= 1) { if (c <= 1) return vcall; return other; } return rec(0) + rec(1);`
+  (fn_80074428, fn_80075684).
+- `mr r0,r3; mr r3,r30; cmplw; bge; mr r3,r0` max blocks need an explicit copy:
+  `unsigned t = a; if (t < b) t = b; sum = t;`. `?:` and `>?` give another
+  schedule.
+- `*out` in an argument list is evaluated before a later call. Force the call
+  first with a named temporary: `int h = f() | 0x100; g(*out, h);` (fn_80073610).
+- Arity from callers: if callers set r4/r5 that the callee never reads, the
+  callee still takes them. Fix the header and let rename.py re-pin. A result
+  used right after a call (`slwi r3,r3,2`) means the callee returns int.
+- Still unreproduced (escalated to Opus):
+  - dead `cmpwi r4,N` before a constant `li r3,0; blr` (fn_8006FB10 family);
+  - lwzx base/index order in the roster walk family (fn_80077238 and six more);
+  - cr7/mfcr compare reuse.
