@@ -168,6 +168,7 @@ struct Unk8007A4DC_Screen {
     void fn_80077DAC();
     int fn_80078A64(int a, int b, int c);
     void fn_80078AE0(int a, int* o1, int* o2, int* o3, int* o4);
+    void fn_80078C04(int a, int* o1, int* o2, int* o3, int* o4);
     int fn_80078D00(int a);
     void fn_8007A008(int a);
     void fn_8007A06C(int a);
@@ -402,6 +403,8 @@ struct Unk8007B2B0_Screen {
     int fn_80075948(int a);
     int fn_80075C64(int id);
     int fn_80078A38(int a);
+    int fn_80079094(int a, int b, int c, int d, int e, int kind);
+    int fn_80079264(int a, int b, int c, int d, int e);
     float fn_800799D0(int n);
     float fn_80079A1C();
     int fn_80079A58(float f);

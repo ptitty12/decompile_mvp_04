@@ -3,6 +3,13 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8007A4DC.h"
+#include "game/clampiter.h"
+int fn_80083FC0(int x);
+void fn_800B555C(void);
+int fn_800B5758(void);
+int fn_8009047C(int k, int e);
+float fn_80090380(int k, int e);
+extern float lbl_805B4070;
 
 void fn_8009532C(Handle* h);
 void fn_80095EE4(Handle* h);
@@ -229,6 +236,33 @@ void Unk8007A4DC_Screen::fn_80078AE0(int a, int* o1, int* o2, int* o3, int* o4)
     }
 }
 
+/* near-miss (5 slots): same code, but retail stores the four sums' temporaries (t[0..3]) after
+ * `*o4 = 0` and the iterator, we store them before `*o4`. The array keeps the temporaries in
+ * frame order (8..0x14, iterator at 0x18) as retail has them. */
+void Unk8007A4DC_Screen::fn_80078C04(int a, int* o1, int* o2, int* o3, int* o4)
+{
+    *o1 = 0;
+    *o2 = 0;
+    *o3 = 0;
+    int t[4];
+    t[0] = 0;
+    t[1] = 0;
+    t[2] = 0;
+    t[3] = 0;
+    *o4 = 0;
+    Unk8006A138_It<3> it(0);
+    int j = 0;
+    while (j <= 3) {
+        int k = C2()->fn_8007B320(fn_80083FC0(j), a);
+        fn_80078AE0(k, &t[0], &t[1], &t[2], &t[3]);
+        *o1 += t[0];
+        *o2 += t[1];
+        *o3 += t[2];
+        *o4 += t[3];
+        j = it.Next();
+    }
+}
+
 /* near-miss: 3 slots; retail evaluates `spC == 6` through cr7 (cmpwi cr7 / mfcr / extrwi),
  * we get xori/subfic/adde. */
 int Unk8007A4DC_Screen::fn_80078D00(int a)
@@ -279,6 +313,40 @@ int fn_8007900C(void* self, int x)
         i++;
     }
     return cnt;
+}
+
+int Unk8007B2B0_Screen::fn_80079094(int a, int b, int c, int d, int e, int kind)
+{
+    int arr[4];
+    int r;
+    if (kind == 3) {
+        arr[0] = fn_8007B320(3, b);
+        arr[1] = fn_8007B320(2, b);
+        arr[2] = fn_8007B320(1, b);
+        arr[3] = fn_8007B320(0, b);
+    } else if (kind == 2) {
+        arr[0] = fn_8007B320(2, b);
+        arr[1] = fn_8007B320(1, b);
+        arr[2] = fn_8007B320(3, b);
+        arr[3] = fn_8007B320(0, b);
+    } else if (kind == 1) {
+        arr[0] = fn_8007B320(1, b);
+        arr[1] = fn_8007B320(0, b);
+        arr[2] = fn_8007B320(2, b);
+        arr[3] = fn_8007B320(3, b);
+    } else {
+        arr[0] = fn_8007B320(0, b);
+        arr[1] = fn_8007B320(1, b);
+        arr[2] = fn_8007B320(2, b);
+        arr[3] = fn_8007B320(3, b);
+    }
+    Unk8006A138_It<3> it(0);
+    int j = 0;
+    do {
+        r = fn_80079264(a, arr[j], c, d, e);
+        j = it.Next();
+    } while (j <= 3 && r != 0);
+    return r;
 }
 
 void fn_80079240(Unk80079240_Obj* o)
@@ -339,6 +407,27 @@ float Unk8007B2B0_Screen::fn_80079B5C(int a, int kind)
     }
     float r = (float)fn_8007B3E0(sel, a) * m204;
     return r;
+}
+
+float Unk8007B2B0_Screen::fn_80079BF8(int a)
+{
+    fn_800B555C();
+    if (fn_800B5758() == 0)
+        return lbl_805B4070;
+    Unk8007B2B0_Screen* o = lbl_8061930C->C2();
+    float sum = lbl_805B4070;
+    Unk8006A138_It<4> it(0);
+    int idx = 0;
+    while (idx <= 4) {
+        int n = fn_8008FBE8(idx);
+        for (int i = 0; i < n; i++) {
+            int e = o->fn_8007B380(fn_8008FE14(fn_8008FC40(it.v, i)), a);
+            if (e != 0 && fn_8009047C(it.v, e) > 0)
+                sum += fn_80090380(it.v, e);
+        }
+        idx = it.Next();
+    }
+    return sum;
 }
 
 float Unk8007B2B0_Screen::fn_80079E74(int a)
