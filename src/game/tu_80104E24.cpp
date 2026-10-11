@@ -207,6 +207,21 @@ int fn_8010671C()
     return 0;
 }
 
+extern char lbl_805B955C[];
+int fn_801067EC(UiObj* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        fn_80106890(self);
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, lbl_805B955C, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+    }
+    return 1;
+}
+
 void fn_80106FB4(UiV_134* self, int a)
 {
     fn_800ED310(self);
