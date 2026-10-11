@@ -119,8 +119,22 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-10 | matcher | SDK units can't be linked piecemeal (data alignment), so they count as code-matched only | — | affects how SDK progress is measured
 - 2026-10-10 | matcher | Windows shell escaping slows commands down | wrapper scripts (10) | small but constant
 - 2026-10-10 | progress session | Every match edits configure.py, splits.txt and symbols.txt | serialize shared-file edits (5) | blocks parallel work until solved
+- 2026-10-10 | matcher (playeridchooser) | The first game unit was compiled at -O2, which is wrong. Sweeping 14 flag sets on one near-miss found **-Os** in under a minute and fixed about 6 near-misses at once. Rule of thumb: when 2+ functions in a new library miss on register allocation, sweep flags before rewriting source | measure (13), permuter queue (1) | high, once per library
+- 2026-10-10 | matcher | Near-misses solved by compiling many whole-function rewrites per run (`tools/match/variants.py`). The three hard ones (an initializer-list member, a local `const char*` for `__FILE__`, a temp for a call result) each took 1–2 runs | permuter (1), tight loop (10) | medium: about 2–5 min per near-miss
+- 2026-10-10 | matcher | Recurring GCC 2.95 `-Os` clues, worth a cookbook (`docs/PATTERNS.md`):
+  - an arg register (r4) loaded and never reloaded means the value is a call argument (e.g. `hash(token, len)`);
+  - `lis r5` scheduled before `lwz r3` means r3 is a method's object pointer;
+  - a second `li rX,0` used for only one field means that field is in the ctor initializer list;
+  - the field written last in source is hoisted above the vptr store;
+  - a value recomputed inside a loop means it was a loop-local pointer in source.
+
+  | cookbook (3) | medium
+- 2026-10-10 | matcher | Timing for playeridchooser.cpp: 19/26 functions in about 80 min, including about 35 min of unit setup (boundaries, names, ABI). Boilerplate took about 1–2 min per function once the first of its kind matched. Loops of 0x100–0x1AC bytes took about 5–10 min each | measure (13), scout (2) | baseline for per-tier rates
+- 2026-10-10 | matcher | g++ 2.95 emits vtables in `.gnu.linkonce.d._vt.*` sections. The ldscript has no rule for them yet, so the first C++ unit to link (Matching) will need one | — | one-off, blocks linking C++ units
+- 2026-10-10 | matcher | A partial MWCC SDK unit can't link: its .sdata is 8-aligned, and OS.c's data must be complete first. SDK progress therefore counts code only until whole units are done | — | affects SDK planning
 
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
-(nothing yet)
+- 2026-10-10 | 10 | `tools/match/` helpers: `diff_unit.py` (rebuild one unit and diff each function), `variants.py` (score N rewrites per compile), and asm show/summary scripts | rebuild+diff loop **1.9 s**; a variants run takes about 5 s for 7–10 variants
+- 2026-10-10 | 3 | Reused the chooser "quartet" recipe (ctor / attribute registration / dtor / factory) from ICommonPlayerID on cSignatureChooser | 4/4 matched on the first compile, about 1 min per function

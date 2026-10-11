@@ -24,6 +24,13 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 - 2026-10-10 | **Compilers.** Game code + EA libraries: ProDG 3.9.3 = `GNU C++ 2.95.3 SN BUILD v1.76` (exact banner match with the on-disc EAGL objects). Dolphin SDK: MWCC GC/1.2.5n. Flags are pinned per library as functions match; see the "Flags" entries below. | Banner match; objdiff probes at 100% | `docs/RECON_REPORT.md` §2
 - 2026-10-10 | **Small-data bases (SN convention):** `_SDA_BASE_` = .sdata + 0x8000 (r13 = 0x806F69C0); `_SDA2_BASE_` = .sdata + 0x18000 (r2 = 0x807069C0, unusable, so .sdata2 is reached via r13). | retail crt0 @ 0x80003108..0x80003114 | `config/GV4E69/ldscript.ld`
 - 2026-10-10 | **Flags: SN libgcc** = ProDG 3.9.3 `-O2 -G0`. | `__do_global_ctors` + `__main` at 100% | `libgcc/_main.c`
+- 2026-10-10 | **Flags: game code** = ProDG 3.9.3 `-Os -G0 -fno-rtti -fno-exceptions` (`cflags_game` in configure.py). Evidence:
+  - `-Os`: `-O2` gave wrong register choices (r30/r31 swapped) in fn_802709D0; `-Os` matched every function tried.
+  - `-G0`: no r13 small-data use anywhere in game .text or the overlays.
+  - no RTTI: empty RTTI vtable slots.
+  - no EH: no exception tables in the binary.
+
+  EA shared libraries do use r13 small data, so their flags differ (TBD). | 19 functions at 100% in `animation/choosers/playeridchooser.cpp` | commit `6ea98bd`
 - 2026-10-10 | **Flags: Dolphin SDK OS (first datapoint)** = MWCC GC/1.2.5n, template base flags + `-char unsigned -opt nopeephole`. Other SDK libraries (built Apr 5 rather than May 21) may differ; confirm per library. | `OSRegisterVersion` at 100% | `dolphin/os/OS.c`
 - 2026-10-10 | **The three Phase 1 probe functions are committed as the first matches.** | They're public-source functions (GCC `libgcc2.c`; Dolphin SDK). | owner approval
 - 2026-10-10 | **Verifier + CI installed** from `proposed/`. CLAUDE.md's "verification tooling" means `tools/verify/**`, `.github/workflows/**` and the files listed in `tools/verify/protected.sha256`. | owner approval of the staged files | `tools/verify/`
