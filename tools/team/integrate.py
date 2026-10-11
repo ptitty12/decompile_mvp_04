@@ -3,6 +3,7 @@
 Run from an integration worktree (one with orig/ and a working build), e.g.:
 
     python tools/team/integrate.py work/circle work/linear --push
+    python tools/team/integrate.py --push      # lead mode: verify and push the current branch's own commits
 
 Steps:
 1. Fetch, then start `integrate/auto` from origin/main (refuses a dirty tree).
@@ -83,16 +84,27 @@ def verify(baseline: str) -> bool:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("branches", nargs="+")
+    ap.add_argument("branches", nargs="*", help="worker branches; none = verify the current branch's own commits")
     ap.add_argument("--push", action="store_true")
     ap.add_argument("--allow", action="append", default=[], help="extra allowed path prefix")
     a = ap.parse_args()
     allowed = ALLOWED_DEFAULT + tuple(a.allow)
 
-    if git("status", "--porcelain"):
-        raise SystemExit("working tree is dirty; refusing")
+    # Content check: `git status` here sometimes flags splits.txt as modified
+    # when its bytes equal HEAD's (merge-driver attributes), so compare content.
+    if run("git", "diff", "--quiet", "HEAD", "--", check=False).returncode != 0:
+        raise SystemExit("working tree has uncommitted changes; refusing")
     git("fetch", "-q", "origin")
     base = git("rev-parse", "origin/main")
+    if not a.branches:
+        # Lead mode: the current branch's commits on top of origin/main.
+        if git("merge-base", "HEAD", "origin/main") != base:
+            raise SystemExit("current branch is not on top of origin/main; rebase first")
+        work = git("rev-parse", "--abbrev-ref", "HEAD")
+        if not git("rev-list", f"{base}..HEAD"):
+            raise SystemExit("no commits to verify")
+        finish(base, work, a.push)
+        return
     git("checkout", "-q", "-B", "integrate/auto", "origin/main")
 
     merged, refused = [], []
@@ -121,26 +133,35 @@ def main() -> None:
         print("REFUSED", line)
     if not merged:
         raise SystemExit("nothing merged")
+    finish(base, "integrate/auto", a.push)
+
+
+def finish(base: str, branch: str, push: bool) -> None:
+    """Build, verify every first-parent commit since `base`, push if asked and all pass."""
     if not build_ok():
         raise SystemExit("build check failed; not pushing")
-
     head = git("rev-parse", "HEAD")
     ok = True
     for c in git("rev-list", "--first-parent", "--reverse", f"{base}..HEAD").splitlines():
         git("checkout", "-q", "--detach", c)
         print(f"  {git('log', '--oneline', '-1', c)[:70]}")
         ok = verify(f"{c}~1") and ok
-    git("checkout", "-q", "integrate/auto")
+    git("checkout", "-q", branch)
     if git("rev-parse", "HEAD") != head:
         raise SystemExit("HEAD moved during verification")
     if not ok:
         raise SystemExit("verification failed; not pushing")
+    if not build_ok():
+        raise SystemExit("rebuild at HEAD failed; not pushing")
     print("all commits VERIFY PASS")
-    if a.push:
+    if push:
         git("fetch", "-q", "origin")
         if git("rev-parse", "origin/main") != base:
             raise SystemExit("origin/main moved; rerun to rebase")
-        print(git("push", "origin", "HEAD:main"))
+        r = run("git", "push", "origin", "HEAD:main", check=False)
+        print((r.stdout + r.stderr).strip())
+        if r.returncode != 0:
+            raise SystemExit("push failed")
 
 
 if __name__ == "__main__":
