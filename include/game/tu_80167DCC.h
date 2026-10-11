@@ -28,6 +28,7 @@ public:
 /* One of the three script slots of the manager (stride 0xA5C); +0xA20 is the
  * hash of the slot's current script. */
 struct Unk8016ACAC_Slot {
+    void fn_8016B3A8();
     void fn_8016C448();
     void fn_8016D368(float* t);
     void fn_8016A6AC();
@@ -76,7 +77,6 @@ public:
     int fn_8016AF9C();
     int fn_8016B174();
     void fn_8016B2B8();
-    void fn_8016B2F0();
     int fn_8016C39C();
     int fn_8016C344();
     int fn_8016C764(int idx);
@@ -84,6 +84,17 @@ public:
     void fn_8016A7A8(Unk8016D9A0_Rec* rec);
     void fn_8016A814(Unk8016D9A0_Rec* rec);
     int fn_8016B9F4();
+    void fn_8016B1D4();
+    void fn_8016B2F0();
+    void fn_8016B95C();
+    void fn_8016B8CC(int x);
+    void fn_8016BA48(int x, int a, int b, Unk8015AB2C_Blk blk, int c);
+    void fn_8016BB50(const char* name, int a, int b, Unk8015AB2C_Blk blk, int c);
+    void fn_8016BCCC();
+    void fn_8016C4FC();
+    void fn_8016BBF4(Unk8016D9A0_Rec* rec);
+    void fn_8016A708();
+    void fn_8016BF30(char* elem);
     void fn_8016C4A0();
     void fn_8016A880();
     void fn_8016D128();
@@ -93,7 +104,8 @@ public:
     Unk8016ACAC_Slot m1E28[3];
     Unk801527C8_Actor* m3D3C;
     int m3D40;
-    char pad3D44[0x3D90 - 0x3D44];
+    int m3D44;
+    Unk8015AB2C_Blk m3D48;
     int m3D90;
     char m3D94[8][0xA0];
     Unk801527C8_Actor* m4294;

@@ -4,6 +4,9 @@
  */
 #include "game/tu_80167DCC.h"
 
+extern float lbl_805CAD10;
+extern float lbl_805CAD14;
+
 extern float lbl_805C943C;
 
 extern const char lbl_805C7994[];
@@ -17,6 +20,16 @@ int fn_8040B6A0(const char* s);
 extern void* lbl_8061E978;
 void fn_802AEBF0(void* mgr, const char* s);
 int fn_8016DB74(const char* s);
+void fn_80030938();
+void fn_80031088();
+Unk8016D9A0_Rec fn_8016DC5C();
+Unk801A6D84_Obj* fn_801A6D84(Unk801527C8_Actor* a, int i);
+void fn_802D7ADC();
+struct Unk8068B618_Obj {
+    char pad0[0x2C];
+    int m2C;
+};
+extern Unk8068B618_Obj* lbl_8068B618;
 void fn_8017C72C(Unk801527C8_Slots* s);
 int fn_80169DC4(char* b);
 void fn_8016C4A0(void* p);
@@ -353,10 +366,93 @@ int Unk8016ACAC::fn_8016B174() /* 8016B174 */
     return fn_8016DB74((char*)this + 4);
 }
 
+void Unk8016ACAC::fn_8016B1D4() /* 8016B1D4 */
+{
+    Unk8016ACAC_Slot* s0 = m1E28;
+    int a = s0->mLists[0].fn_8016C1EC();
+    if ((void*)fn_801A6D84(m3D3C, 1) == (void*)this) {
+        if (a != 0) {
+            int b = fn_8016B174();
+            float f = s0->mLists[0].fn_8016BF94();
+            if (b != 0) {
+                if (!(f <= lbl_805CAD10) && !(f >= lbl_805CAD14)) {
+                    fn_8016B95C();
+                }
+            }
+        }
+    }
+    for (int i = 0; i < 3; i++) {
+        m1E28[i].fn_8016B3A8();
+    }
+    int c = s0->mLists[0].fn_8016C1EC();
+    if (a != 0 && c == 0) {
+        fn_8016BCCC();
+    }
+}
+
 void Unk8016ACAC::fn_8016B2B8() /* 8016B2B8 */
 {
     fn_8016B2F0();
     m3D90 = fn_8016C39C();
+}
+
+void Unk8016ACAC::fn_8016B2F0() /* 8016B2F0 */
+{
+    if (m3D40 == 0) {
+        if (m4298 > 0) {
+            m4298 = m4298 - 1;
+            if (m4298 > 0) {
+                return;
+            }
+            fn_8016C4FC();
+            fn_80030938();
+            fn_80031088();
+        }
+        int s = fn_8016C344();
+        fn_8016B1D4();
+        if (fn_8016C344() == 0) {
+            Unk8016D9A0* q = &m4;
+            if (q->m1E00 != 0) {
+                Unk8016D9A0_Rec rec = fn_8016DC5C();
+                fn_8016BBF4(&rec);
+            } else if (s != 0) {
+                fn_8016A880();
+            }
+        }
+    }
+}
+
+void Unk8016ACAC::fn_8016B8CC(int x) /* 8016B8CC */
+{
+    if (m1E28[0].mLists[0].fn_8016C1EC() != 0) {
+        int idx = -1;
+        for (int i = 1; i <= 2; i++) {
+            if (m1E28[i].mLists[0].fn_8016C1EC() == 0) {
+                idx = i;
+                break;
+            }
+        }
+        if (idx != -1) {
+            m1E28[idx].mLists[0].fn_8016C004(x, 1);
+        }
+    }
+}
+
+void Unk8016ACAC::fn_8016B95C() /* 8016B95C */
+{
+    if ((void*)fn_801A6D84(m3D3C, 1) == (void*)this) {
+        Unk801527C8_Actor* o = fn_801A04A8(m3D3C, 5);
+        if (o != 0) {
+            Unk8016ACAC* p = (Unk8016ACAC*)o->m40;
+            if (p != 0) {
+                if (p->m3D90 != 0) {
+                    p->fn_8016C4A0();
+                }
+            }
+        }
+        lbl_80619D10->fn_v23(0xE);
+        ((Unk8016DBAC_Obj*)&m4)->fn_8016DBAC();
+    }
 }
 
 int Unk8016ACAC::fn_8016B9F4() /* 8016B9F4 */
@@ -366,4 +462,44 @@ int Unk8016ACAC::fn_8016B9F4() /* 8016B9F4 */
         r = 1;
     }
     return r;
+}
+
+void Unk8016ACAC::fn_8016BA48(int x, int a, int b, Unk8015AB2C_Blk blk, int c) /* 8016BA48 */
+{
+    if (m3D40 == 0) {
+        if (fn_801A04A8(m3D3C, 1) == m4294) {
+            fn_802D7ADC();
+        }
+        m3D44 = b;
+        if (c == 0) {
+            m3D48 = blk;
+        }
+        if (a != 0) {
+            if (fn_801A04A8(m3D3C, 1) == m4294) {
+                lbl_8068B618->m2C = 10;
+            }
+        }
+        m1E28[0].mLists[0].fn_8016C004(x, 1);
+        m3D90 = fn_8016C39C();
+    }
+}
+
+void Unk8016ACAC::fn_8016BB50(const char* name, int a, int b, Unk8015AB2C_Blk blk, int c) /* 8016BB50 */
+{
+    fn_8016BA48(fn_80378568(name, 0), a, b, blk, c);
+}
+
+/* near-miss: retail forms the destination of the 0x500-byte copy in its own register and builds the element pointer (this+0x3D94) only after the copy; here the pointer is shared. 6 forms tried */
+void Unk8016ACAC::fn_8016BBF4(Unk8016D9A0_Rec* rec) /* 8016BBF4 */
+{
+    *(Unk8016D9A0_Rec*)m3D94 = *rec;
+    fn_8016A708();
+    char* p = m3D94[0];
+    int off = 0;
+    for (int i = 8; i != 0; i--, p += 0xA0, off += 0xA0) {
+        if (fn_8040B6A0(p) != 0 && *(int*)((char*)this + 0x3DD0 + off) != 0) {
+            fn_8016BF30(p);
+        }
+    }
+    fn_8016BCCC();
 }
