@@ -87,7 +87,9 @@ struct Unk8019F8C0_Inner {
     unsigned char m1;
     char pad2[6];
     int m8;
-    char padC[0x168 - 0xC];
+    char padC[0x108 - 0xC];
+    int m108;
+    char pad10C[0x168 - 0x10C];
     Unk8019F8C0_Ring m168;
     char pad178[0x3E4 - 0x178];
     unsigned char m3E4;
@@ -113,6 +115,8 @@ struct Unk8019F8C0_Mgr10 {
     char pad0[0x6C];
     int m6C;
     int m70;
+    char pad74[0x22C - 0x74];
+    int m22C;
 };
 
 struct Unk8019F8C0_Mgr {
@@ -143,7 +147,7 @@ struct Unk8019F8C0_Sub {
     char pad10[0x38 - 0x10];
     int m38;
     void* m3C;
-    char pad40[0x44 - 0x40];
+    Unk8019F8C0_Ref* m40;
     int m44;
     int m48;
     float m4C;
