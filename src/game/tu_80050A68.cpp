@@ -63,12 +63,13 @@ void fn_800518C8()
 {
 }
 
-/* near-miss: same entry-base shape as fn_80051014 (one insn fewer here) */
 void fn_80051E68(Unk800493D4_Sm* s, int idx)
 {
-    char* b = (char*)s + 8;
-    if (fn_8005000C(s, idx, 0x2E) >= 0 && *(int*)(b + idx * 0x48) != 0)
-        fn_80017C2C();
+    if (fn_8005000C(s, idx, 0x2E) >= 0) {
+        char* b = (char*)s + 8;
+        if (*(int*)(b + idx * 0x48) != 0)
+            fn_80017C2C();
+    }
 }
 
 void fn_80051F18()
