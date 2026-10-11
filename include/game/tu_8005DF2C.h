@@ -48,9 +48,13 @@ struct Unk8005DF2C_Stat {
 };
 
 struct Unk8005DF2C_Y {
-    char pad0[0x177];
+    char pad0[0x8C];
+    char m8C;
+    char pad8D[0xEA];
     unsigned char m177;
-    char pad178[0x3C];
+    char pad178[0x20];
+    int m198;
+    char pad19C[0x18];
     unsigned char m1B4[128];
     char pad234[0x1];
     unsigned char m235;
