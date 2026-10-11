@@ -123,9 +123,11 @@ struct Unk8001F8B8_Obj {
     int m284;
 };
 
+/* C++ linkage on purpose: the animation units declare it that way (chooser.h). */
+int fn_8025416C(void* p, int n);
+
 extern "C" {
 float fn_80254474(void* p, int a, int b);
-int fn_8025416C(void* p, int a);
 float fn_8025454C(void* p, int a);
 void fn_8009E1D4(void* p, int a, int b);
 void fn_80045024(int a);
