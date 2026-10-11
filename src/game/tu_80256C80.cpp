@@ -2,3 +2,415 @@
  * Game code, .text 0x80256C80-0x8025877C (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/tu_8024EF40.h"
+
+typedef Unk8024EF40_A A;
+typedef Unk8024EF40_P P;
+typedef Unk8024EF40_W W;
+
+extern "C++" {
+void fn_8025707C(Unk80256C80_M* self);
+extern char lbl_80660F68[];
+extern char lbl_80661818[];
+extern int lbl_8061D5FC;
+void* fn_8037D768(void* x);
+float fn_80382BB8(void* p);
+void fn_8023ECD4(int self, int k, int b);
+void fn_8037EB3C(void* p, int a);
+void fn_8037B424(void* self, int a);
+void fn_80255974(int a, int b);
+void fn_8035AB00(void* self);
+struct Unk8025CDFC_Obj {
+    char d[0x548];
+};
+Unk80256C80_Inner* fn_8025CDFC(Unk8025CDFC_Obj* p, Unk80256C80_M* m, int a, int b);
+void fn_8025CF64(Unk80256C80_Inner* i, int a);
+void fn_80377408(void* p);
+void fn_80265858(Unk80256C80_Inner* i);
+void fn_802649B4(Unk80256C80_Inner* i);
+void fn_80265A80(Unk80256C80_Inner* i);
+void fn_8026BA30(Unk80256C80_Inner* i);
+void fn_80269DE4(void* p);
+typedef Unk80256C80_M M;
+typedef Unk80256C80_Inner I;
+typedef Unk8024EF40_Q Q;
+Unk8024EF40_Q* fn_802570D4(Unk80256C80_M* self);
+void* fn_801A4B34(void* w);
+inline P* Roster(Q* q, unsigned i) { if (i <= 0xC) return q->m65C[i]; return 0; }
+int fn_80258740(void* list, P* p);
+P* fn_8026B918(I* i, unsigned pos);
+int fn_8026B8E4(I* i, unsigned pos);
+int fn_80254984(A* a);
+int fn_80254A34(A* a);
+int fn_801A2034(int a);
+int fn_8035E69C(void* p, int a);
+int fn_8035E630(void* p, int a);
+int fn_8035E8CC(void* p, int a);
+void fn_80264844(I* i);
+int fn_80254EA4(A* a, int b);
+int fn_8014E310(int a);
+void fn_8025480C(A* a, int b);
+void fn_8025D054(I* i, int a);
+void fn_8025EA9C(I* i);
+void fn_8025E924(I* i, int a, int b);
+void fn_8025ED44(I* i);
+void fn_8025E7E4(I* i);
+void fn_8025E4B4(I* i);
+void fn_8026BAD8(I* i);
+void fn_80268928(void* p);
+void fn_80259E3C(void* p);
+void fn_802449F4(P* p);
+void fn_80255910(A* a);
+int fn_801C1950(int a);
+int fn_8017C94C(Unk8024EF40_Ctx* c);
+int fn_801BBF04(int a);
+int fn_80259330(M* self);
+int fn_802676C0(void* p);
+int fn_80266784(void* p);
+void fn_802683CC(void* p, P* q);
+void fn_80269E24(void* p, int a);
+void fn_80268144(void* p);
+int fn_8035E318(A* a);
+}
+
+void fn_80256C80(Unk80256A90_V* self)
+{
+    self->v3();
+}
+
+struct Unk80256CB4_S350 {
+    char pad0[0x350];
+    float m350;
+};
+void fn_80256CB4(Unk80256CB4_S350* self, float f)
+{
+    SetF(&self->m350, f);
+}
+
+struct Unk80256CD4_Vec3 {
+    float m0;
+    float m4;
+    float m8;
+};
+struct Unk80256CD4_O {
+    char pad0[0x320];
+    Unk80256CD4_Vec3 m320;
+    Unk80256CD4_Vec3 m32C;
+    Unk80256CD4_Vec3 m338;
+};
+Unk80256CD4_Vec3 fn_80256CD4(Unk80256CD4_O* o)
+{
+    return o->m320;
+}
+
+Unk80256CD4_Vec3 fn_80256CF8(Unk80256CD4_O* o)
+{
+    return o->m338;
+}
+
+Unk80256CD4_Vec3 fn_80256D1C(Unk80256CD4_O* o)
+{
+    return o->m32C;
+}
+
+struct Unk80256D40_Mtx {
+    int m0;
+    char pad4[0x1C];
+    char m20[4];
+};
+char* fn_80256D40(Unk80256D40_Mtx* x)
+{
+    if (x->m0 == 0)
+        fn_8037D768(x);
+    x->m0 = 1;
+    return x->m20;
+}
+
+struct Unk80256D84_Data {
+    char pad0[0x98];
+};
+struct Unk80256D84_V : Unk80256D84_Data {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual Unk80256D40_Mtx* v6();
+};
+char* fn_80256D84(Unk80256D84_V* self)
+{
+    Unk80256D40_Mtx* m = self->v6();
+    if (m->m0 == 0)
+        fn_8037D768(m);
+    m->m0 = 1;
+    return m->m20;
+}
+
+struct Unk80256DE0_S618 {
+    char pad0[0x618];
+    void* m618;
+};
+float fn_80256DE0(Unk80256DE0_S618* self)
+{
+    return fn_80382BB8(self->m618);
+}
+
+struct Unk80256E04_SAB8 {
+    char pad0[0x618];
+    int m618[4];
+    char pad628[0xAB8 - 0x628];
+    int mAB8;
+};
+int fn_80256E04(Unk80256E04_SAB8* self)
+{
+    return self->mAB8;
+}
+
+int fn_80256E0C(Unk80256E04_SAB8* self, int i)
+{
+    return self->m618[i];
+}
+
+void fn_80256E1C(int self, int b)
+{
+    fn_8023ECD4(self, 0, b);
+}
+
+void fn_80256E44(int self, int b)
+{
+    fn_8023ECD4(self, 1, b);
+}
+
+void fn_80256E6C(int self, int b)
+{
+    fn_8023ECD4(self, 2, b);
+}
+
+void fn_80256E94(int self, int b)
+{
+    fn_8023ECD4(self, 3, b);
+}
+
+int fn_80256EBC()
+{
+    return 0;
+}
+
+struct Unk80256EC4_S {
+    char pad0[0x240];
+    int m240;
+    char pad244[0x618 - 0x244];
+    void* m618;
+};
+void fn_80256EC4(Unk80256EC4_S* self, int a)
+{
+    self->m240 = a;
+    fn_8037EB3C(self->m618, a ^ 1);
+}
+
+void fn_80256EF8(const void** self, int a)
+{
+    *self = lbl_80660F68;
+    fn_8037B424(self, a);
+}
+
+int fn_80256F28()
+{
+    return lbl_8061D5FC;
+}
+
+int fn_80256F34()
+{
+    return 0x4DACE415;
+}
+
+void fn_80256F40()
+{
+}
+
+void fn_80256F44()
+{
+    fn_80255974(1, 0xFFFF);
+}
+
+void fn_80256F70()
+{
+    fn_80255974(0, 0xFFFF);
+}
+
+void fn_80256F9C(Unk80256C80_M* self, int a)
+{
+    self->m0 = lbl_80661818;
+    if (self->m4 != 0)
+        delete self->m4;
+    if (a & 1)
+        fn_80377408(self);
+}
+
+Unk80256C80_M* fn_8025700C(Unk80256C80_M* self, int a, int b)
+{
+    fn_8035AB00(self);
+    self->m0 = lbl_80661818;
+    self->m4 = fn_8025CDFC(new (0) Unk8025CDFC_Obj, self, a, b);
+    self->m10 = a;
+    fn_8025707C(self);
+    return self;
+}
+
+void fn_8025707C(Unk80256C80_M* self, int a)
+{
+    self->m1C = 0;
+    self->mC = 0;
+    self->m14 = 0;
+    self->m18 = 0;
+    self->m20 = -1;
+    self->m8 = 1;
+    fn_8025CF64(self->m4, a);
+    self->m1C = 0;
+}
+
+Unk8024EF40_Q* fn_802570D4(Unk80256C80_M* self)
+{
+    return self->m4->m1EC;
+}
+
+void fn_802570E0(Unk80256C80_M* self)
+{
+    fn_80265858(self->m4);
+}
+
+void fn_80257104(Unk80256C80_M* self)
+{
+    fn_802649B4(self->m4);
+    fn_80265A80(self->m4);
+}
+
+void fn_80257234(Unk80256C80_M* self)
+{
+    fn_8026BA30(self->m4);
+}
+
+void fn_802572CC(Unk80256C80_M* self)
+{
+    fn_80269DE4((char*)self->m4 + 0x190);
+}
+
+/* near-miss: retail loads each roster slot into r0 and copies it to r3 (3 extra mr); ours loads straight into r3 */
+P* fn_80257B40(M* self)
+{
+    P* r = fn_802570D4(self)->m65C[12];
+    if (r == 0) {
+        r = fn_802570D4(self)->m65C[11];
+        if (r == 0) {
+            r = fn_802570D4(self)->m65C[10];
+            if (r == 0) {
+                r = (P*)fn_801A4B34(fn_802570D4(self));
+                if (r == 0 || r->m458 != 9)
+                    r = 0;
+            }
+        }
+    }
+    return r;
+}
+
+void fn_80257DD8(M* self)
+{
+    fn_80264844(self->m4);
+}
+
+/* near-miss: retail tests the slot at the loop top (cmpwi/bne after the first call, back edge to it); ours rotates the test to the bottom with an entry jump. `for(;;) { if (r) break; ... }` and do/while variants tried */
+P* fn_80257DFC(M* self, P* p, int a)
+{
+    unsigned i = p->m458;
+    if (i - 9 > 2)
+        return 0;
+    P* r;
+    if (a != 0) {
+        r = (P*)fn_8026B8E4(self->m4, i);
+    } else {
+        int o = i * 4;
+        r = (P*)fn_8026B8E4(self->m4, i);
+        while (r == 0) {
+            i += 1;
+            o += 4;
+            if (i - 9 > 3)
+                break;
+            Q* q = fn_802570D4(self);
+            if (i <= 0xC)
+                r = *(P**)((char*)q + 0x65C + o);
+        }
+    }
+    return r;
+}
+
+P* fn_80257EA8(M* self, int a)
+{
+    if (a >= 0) {
+        unsigned i = 9;
+        int o = 0x24;
+        for (;;) {
+            Q* q = fn_802570D4(self);
+            P* r = 0;
+            if (i <= 0xC)
+                r = *(P**)((char*)q + 0x65C + o);
+            if (r != 0 && fn_80254EA4(&r->m58C, 0) == a)
+                return r;
+            i += 1;
+            o += 4;
+            if ((int)i > 0xC)
+                break;
+        }
+    }
+    return 0;
+}
+
+void fn_80258000(M* self)
+{
+    I* i = self->m4;
+    i->m194 = 0;
+    fn_8025D054(self->m4, 4);
+    fn_8025EA9C(self->m4);
+}
+
+void fn_80258048(M* self)
+{
+    fn_8025D054(self->m4, 5);
+}
+
+void fn_80258070(M* self, int a)
+{
+    fn_8025E924(self->m4, a, 1);
+}
+
+void fn_80258354(M* self)
+{
+    fn_8025D054(self->m4, 6);
+    fn_8025ED44(self->m4);
+}
+
+void fn_802585E8(M* self)
+{
+    self->m4->m194 = 0;
+}
+
+void fn_80258644(M* self)
+{
+    fn_8025E7E4(self->m4);
+}
+
+/* near-miss: 14 vs 15 instructions; retail loads m38 before m30 and computes lo + 1 before the bgtlr, ours schedules the loads the other way round */
+int fn_80258740(void* list, P* p)
+{
+    A* a = &p->m58C;
+    int lo = a->m38;
+    int hi = a->m30;
+    int d = hi - lo;
+    if (d > 1) {
+        if (hi > lo)
+            return lo + 1;
+        return lo;
+    }
+    if (d < 0)
+        return lo;
+    return hi;
+}
