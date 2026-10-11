@@ -18,4 +18,32 @@ struct Unk803BA44C_Obj {
 int fn_803BA44C(void* list, int* count);
 int fn_803BA378(void* list);
 
+/* Ring / array containers (fn_80353244 .. fn_80353F58 and the clones at
+ * 0x80354xxx, 0x80355xxx, five instantiations of the same template): m0 is the
+ * element buffer, m4 the element count, mC the cursor; a polymorphic variant
+ * has its vptr at +0x10 (Unk80353ECC). Evidence: the getter/setter pair
+ * fn_80353244 / fn_80353DA4, the wrap-around steps fn_80353880 / fn_80353F00
+ * (unsigned modulo of mC by m4) and the virtual wrappers fn_80353ECC / F24. */
+struct Unk80353E68 {
+    int* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+};
+struct Unk80353ECC : Unk80353E68 {
+    virtual void v1();
+    virtual void v2();
+    virtual int v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+};
+
+void fn_80377408(void* p);
+void fn_80377488(void* p);
+
 #endif
