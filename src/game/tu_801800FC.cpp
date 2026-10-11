@@ -200,6 +200,38 @@ extern "C" int fn_801808A4(Unk801808A4_Ctx* self, Unk801800FC* rec)
     return changed;
 }
 
+//@80180A34
+/* near-miss: 73 vs 72 insns: the loop and the virtual calls match; retail copies the
+ * incoming index (r4) into r5 at entry (mr r5,r4 first) where this copies it in the arm that
+ * calls fn_801A49F0. A local copy of the parameter did not move it. */
+extern "C" int fn_80180A34(Unk801808A4_Ctx* self, int x)
+{
+    int idx = x;
+    Unk80270BA0_X* target = 0;
+    int side = 0;
+    if (self->m6F8->m14->m1CD0)
+        side = 1;
+    if (idx != 0)
+        target = fn_801A49F0(self, side, idx);
+    Unk80270BA0_X* cur = fn_801A4B34(self);
+    if (target == cur)
+        return 0;
+    if (target == 0)
+        return 0;
+    int n = 0;
+    fn_80180620(cur);
+    int cnt = self->m6F8->m14->m0[side].m16C;
+    while (cur != target && n < cnt) {
+        cur->fn_vslot8(1);
+        n++;
+        fn_801A4C84(self);
+        cur = fn_801A4B34(self);
+    }
+    fn_802547C0((char*)target + 0x58C, 0);
+    target->fn_vslot8(0);
+    return (int)target;
+}
+
 //@80180B58
 void Unk80180FE8::fn_vslot2()
 {
@@ -387,6 +419,39 @@ extern "C" void fn_80182E30(Unk80181140* o, float f)
 {
     if (o->m378 != f)
         o->m378 = f;
+}
+
+//@80182E54
+extern "C" void fn_80182E54(Unk80181140* o)
+{
+    int flag = 0;
+    Unk8014D8AC_Ctx* c = (Unk8014D8AC_Ctx*)o->mBC;
+    Unk80273498_Pos* p = c->m54C->mC;
+    if (p != 0) {
+        char* q = *(char**)((char*)p + 0xA0);
+        if (q != 0)
+            flag = *(int*)(q + 0x10);
+    }
+    if (c->m6F4 == 7) {
+        Unk80182E54_X* x = fn_801A4CE8(c, 1);
+        if (c->m6CC->m38C == 1) {
+            if (x->v9() == 0 && x->m94 == 0)
+                flag = 1;
+        }
+    }
+    Unk80182E54_EV* e = (Unk80182E54_EV*)fn_80319330((char*)o + 0x244, 12);
+    if (e != 0 && lbl_8061C8F8 != 0 && flag == 0) {
+        if (o->m374 != 0)
+            o->m374->h2 = 1;
+    } else {
+        if (o->m374 != 0)
+            o->m374->h2 = 0;
+    }
+    if (e != 0 && lbl_8061C8FC != 0) {
+        fn_8031259C(lbl_8061FEDC);
+        e->v4();
+        fn_803125D0(lbl_8061FEDC);
+    }
 }
 
 //@80183918

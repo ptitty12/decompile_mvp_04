@@ -112,7 +112,7 @@ struct Unk80181140 {
     int m360;
     Unk80183918_Vec3 m364;
     int m370;
-    int m374;
+    struct Unk80182E54_H* m374;
     float m378;
     Unk801855FC_E m37C[8];
     int m53C;
@@ -166,7 +166,47 @@ inline Unk80183918_Vec3 Unk80182464_Pos(const Unk80182464_Rec* r)
     return r->m4;
 }
 
+struct Unk80182E54_H {
+    short h0;
+    short h2;
+};
+struct Unk80182E54_Base8 {
+    char pad0[8];
+};
+class Unk80182E54_XV : public Unk80182E54_Base8 {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual int v9();
+};
+struct Unk80182E54_X : public Unk80182E54_XV {
+    char pad0C[0x94 - 0xC];
+    int m94;
+};
+class Unk80182E54_EV : public Unk80182E54_Base8 {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+};
+extern int lbl_8061C8F8;
+extern int lbl_8061C8FC;
+extern void* lbl_8061FEDC;
+
 extern "C" {
+Unk80270BA0_X* fn_801A4B34(Unk801808A4_Ctx* c);
+void fn_801A4C84(Unk801808A4_Ctx* c);
+Unk80182E54_X* fn_801A4CE8(void* c, int a);
+void fn_8031259C(void* p);
+void fn_803125D0(void* p);
+void* fn_80319330(void* p, int k);
 int fn_80183EA0(void* a, void* b, int c);
 void fn_80308C60(void* a, int b, int c);
 void fn_8030AC88(void* p);
