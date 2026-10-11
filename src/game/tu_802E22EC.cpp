@@ -88,7 +88,7 @@ Unk802E4B98::~Unk802E4B98()
     fn_802E4D30();
 }
 
-void Unk802E313C::fn_802E35DC(int a, int b)
+void Unk802E313C::fn_802E35DC(char* a, int b)
 {
     for (int i = 0; i < m60; i++) {
         m64[i]->s6(a, b);
@@ -143,9 +143,22 @@ Unk802DE2C8_Pool::Unk802DE2C8_Pool()
     m14 = 0;
 }
 
-Unk802DE2C8_List::~Unk802DE2C8_List()
+Unk802DE2C8_Pool::~Unk802DE2C8_Pool()
 {
     lbl_8061F68C->s2(m0 == 0, "/mvp2004/source/common/geomlib/geomlib.cpp", 62);
+}
+
+void Unk802E3980_Mgr::fn_802E3980()
+{
+    if (m0) {
+        delete[] m0;
+    }
+    m4 = 0;
+    m0 = 0;
+    if (lbl_8061F688) {
+        delete lbl_8061F688;
+    }
+    lbl_8061F688 = 0;
 }
 
 void Unk802E3A44_Blk::fn_802E3A44()
