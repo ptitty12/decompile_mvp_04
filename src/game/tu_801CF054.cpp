@@ -7,6 +7,14 @@
 #include "game/goals/tu_8027C728.h"
 
 typedef Unk801CF054_Y Y;
+struct Unk801CF054_Tbl4 {
+    Vec3 v[4];
+};
+extern Unk801CF054_Tbl4 lbl_805D1D5C;
+extern "C" int fn_801CF96C(Unk801C16B0_Z* z, float f, float* out);
+extern int lbl_8062036C;
+extern float lbl_80620370;
+extern "C" int fn_802536D0(Unk801B7FB0_P* p);
 struct Unk801CF054_T {
     char pad0[8];
     Unk801B7FB0_P* m8[3];
@@ -83,6 +91,41 @@ extern "C" void fn_801CF304(Z* z)
             fn_8037893C(&z->m204->m704, 0x56, 0, 0, 0);
         }
     }
+}
+
+extern "C" void fn_801CF68C(Z* z, float* a, float* b, float* c)
+{
+    int r = fn_802536D0(fn_801A4B34(z->m204));
+    Unk801CF054_Tbl4 t = lbl_805D1D5C;
+    *a = t.v[r].x;
+    *b = t.v[r].y;
+    *c = t.v[r].z;
+}
+
+extern "C" float fn_801CF8CC(float x)
+{
+    float a = 0.033333335f;
+    float b = 0.008333334f;
+    float c = 0.19f;
+    if (lbl_8062036C != 0)
+        c = lbl_80620370;
+    else
+        lbl_80620370 = c;
+    if (!(x >= 0.0f))
+        c = x * 0.008333334f + c;
+    else
+        c = x * 0.033333335f + c;
+    return c;
+}
+
+extern "C" void fn_801CFB28(Z* z, float a, float b, float c)
+{
+    float oa, ob, oc;
+    int r1 = fn_801CF96C(z, a, &oa);
+    int r2 = fn_801CF96C(z, b, &ob);
+    int r3 = fn_801CF96C(z, c, &oc);
+    if (r1 && r2 && r3)
+        fn_80187D20(z->m204->m6CC, 1, oa, ob, oc);
 }
 
 extern "C" void fn_801D0288(Y* y) { y->m1F4 = 1; }
