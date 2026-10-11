@@ -12,14 +12,17 @@
  * disc, wrong disc, retry, fatal error) to rows 0..4 of the UTF-16 message
  * table below (the six texts are the disc-error messages); fn_800042B0
  * shows / hides the message screen, fn_8000446C is the loop that polls it.
- * The static initializer builds thirteen unit vectors between five points of
- * a 1080 x 1080 area (the four corners at 7.5 / 1072.5 or 1080 and the centre),
- * five (month, day, 2005) records and the hash of "test".
+ * The static initializer builds thirteen unit vectors between five points
+ * (x, 0, z) inside a 1080-unit square (four near the corners, one at the
+ * centre), five (month, day, 2005)-looking records and the hash of "test".
  */
 
 #include "game/tu_800042B0.h"
 
 struct Unk8061FEDC;
+/* Object returned by fn_80020BCC for the hash lbl_806869AC. Only m4 is used here: fn_80004850
+ * passes m4 * 19 / 20 - 1 (at least 0) to fn_8002114C when the screen opens, fn_800048D0
+ * passes 100 when it closes (a 0..100 level being ducked and restored). */
 struct Unk806869AC {
     int m0;
     int m4;
@@ -348,6 +351,8 @@ void fn_800048D0()
     }
 }
 
+/* ---- static initializer: thirteen unit vectors, five dates, one hash ---- */
+
 struct Vec3 {
     float x;
     float y;
@@ -355,7 +360,7 @@ struct Vec3 {
 };
 
 float fn_804028E4(float x);               /* square root */
-extern const Vec3 lbl_806055AC;           /* zero vector */
+extern const Vec3 lbl_806055AC;           /* shared 0xC-byte constant: the fallback for a zero-length vector */
 
 inline Vec3 VSub(const Vec3& a, const Vec3& b)
 {
@@ -381,6 +386,8 @@ inline float LengthR(const Vec3& v)
     return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
+/* v is a const reference to the by-value copy retail makes of VSub's result: with a by-value
+ * parameter here, the compiler folds &v into frame offsets and the registers differ. */
 inline Vec3 VUnit(const Vec3& v)
 {
     float len = LengthR(v);
@@ -390,18 +397,23 @@ inline Vec3 VUnit(const Vec3& v)
     return lbl_806055AC;
 }
 
-struct Unk8068699x {
+/* Four bytes: month-like value (3..11), day-like value (1..31), 2005. The parameter order
+ * (day, month, year) is the one that reproduces retail's register allocation; the other
+ * orders that do are (day, year, month) and (year, day, month). */
+struct Unk80686998 {
     unsigned char m0;
     unsigned char m1;
     unsigned short m2;
-    Unk8068699x(int a, int b, int c)
+    Unk80686998(int day, int month, int year)
     {
-        m0 = a;
-        m1 = b;
-        m2 = c;
+        m0 = month;
+        m1 = day;
+        m2 = year;
     }
 };
 
+/* Corner points (retail .rodata 0x805A3410..0x805A343C) and the centre (0x805A3440). The centre is
+ * a separate object: its address is not derived from the corners' (separate lis in retail). */
 static const Vec3 lbl_805A3410[4] = {
     { 7.5f, 0.0f, 1072.5f },
     { 1080.0f, 0.0f, 1080.0f },
@@ -424,9 +436,9 @@ Vec3 lbl_80686974 = VUnit(VSub(lbl_805A3410[3], lbl_805A3410[0]));
 Vec3 lbl_80686980 = VUnit(VSub(lbl_805A3410[2], lbl_805A3410[0]));
 Vec3 lbl_8068698C = VUnit(VSub(lbl_805A3410[0], lbl_805A3410[2]));
 
-Unk8068699x lbl_80686998(3, 1, 2005);
-Unk8068699x lbl_8068699C(3, 29, 2005);
-Unk8068699x lbl_806869A0(5, 15, 2005);
-Unk8068699x lbl_806869A4(7, 31, 2005);
-Unk8068699x lbl_806869A8(11, 1, 2005);
+Unk80686998 lbl_80686998(1, 3, 2005);
+Unk80686998 lbl_8068699C(29, 3, 2005);
+Unk80686998 lbl_806869A0(15, 5, 2005);
+Unk80686998 lbl_806869A4(31, 7, 2005);
+Unk80686998 lbl_806869A8(1, 11, 2005);
 Unk806869AC_Id lbl_806869AC("test", 0);
