@@ -15,7 +15,52 @@ Unk80178A64::~Unk80178A64() {}
 
 void fn_80178BB8() {}
 
+void fn_80178BBC(Unk80178BBC_T* p)
+{
+    if (p->m14C != 0) {
+        Unk80177C34_Sub* s = p->mC;
+        for (int i = 0; i < 2; i++) {
+            fn_80179784(s);
+            s++;
+        }
+    }
+}
+
 void fn_80178C08() {}
+
+void fn_80178C0C(Unk80178BBC_T* p)
+{
+    Unk80177C34_Sub* s = p->mC;
+    Unk80178BBC_Entry* e = p->m134;
+    for (int i = 0; i < 2; i++) {
+        fn_80179BBC(e);
+        e++;
+        fn_80179250(s);
+        s++;
+    }
+}
+
+void fn_80178C5C(Unk80178BBC_T* p)
+{
+    if (p->m14C != 0) {
+        Unk80177C34_Sub* s = p->mC;
+        for (int i = 0; i < 2; i++) {
+            fn_801797A4(s);
+            s++;
+        }
+    }
+}
+
+void fn_80178CA8(Unk80178BBC_T* p)
+{
+    if (p->m14C != 0) {
+        Unk80177C34_Sub* s = p->mC;
+        for (int i = 0; i < 2; i++) {
+            fn_8017946C(s);
+            s++;
+        }
+    }
+}
 
 void fn_80178CF4() {}
 
@@ -26,11 +71,136 @@ void fn_80178D9C(unsigned* p)
     }
 }
 
+int fn_80178DB4(Unk80178BBC_T* p)
+{
+    if (p->m14C == 0) {
+        return 0;
+    }
+    Unk80177C34_Ctx* c = p->m8;
+    int t = c->m564->m14;
+    if (t == 9 || t == 2 || t == 1) {
+        if (c->m744->m20 == 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+/* near-miss: p and o swap callee-saved registers (r29/r30) in retail; 2 slots plus the address add order. */
+int fn_80178E08(Unk80178BBC_T* p, Unk80179284_Ctx* o)
+{
+    unsigned sp = o->m708;
+    fn_80178D9C(&sp);
+    int r = fn_8017995C(p->mC[sp].m0, (int)o);
+    return r == -1 ? 0 : 1;
+}
+
+int fn_80178E6C(Unk80178BBC_T* p, unsigned a, unsigned b)
+{
+    if (a > 1 || b > 8) {
+        return 0;
+    }
+    return fn_80179990(p->mC[a].m0, b);
+}
+
+void fn_80178EBC(Unk80178BBC_T* p, Unk80179284_Ctx* o)
+{
+    unsigned sp = o->m708;
+    fn_80178D9C(&sp);
+    fn_80179284((Unk80179284_T*)&p->mC[sp], o);
+}
+
+void fn_80178F10(Unk80178BBC_T* p, Unk80179284_Ctx* o)
+{
+    unsigned sp = o->m708;
+    fn_80178D9C(&sp);
+    fn_80179648(&p->mC[sp], o);
+}
+
+void fn_80178F64(Unk80178BBC_T* p, Unk80179284_Ctx* o)
+{
+    unsigned sp = o->m708;
+    fn_80178D9C(&sp);
+    int k = 0;
+    if (p->m8->m6F8->m14->m1CD0 != 0) {
+        k = 1;
+    }
+    if (sp == k) {
+        fn_80178D9C(&sp);
+        fn_80179BE0(&p->m134[sp], o);
+    }
+}
+
+void fn_80178FF0(Unk80178BBC_T* p)
+{
+    int k = 0;
+    if (p->m8->m6F8->m14->m1CD0 != 0) {
+        k = 1;
+    }
+    unsigned sp = k;
+    fn_80178D9C(&sp);
+    fn_80179CD0(&p->m134[sp]);
+}
+
+int fn_80179058(Unk80178BBC_T* p)
+{
+    int k = 0;
+    if (p->m8->m6F8->m14->m1CD0 != 0) {
+        k = 1;
+    }
+    unsigned sp = k;
+    fn_80178D9C(&sp);
+    return *(int*)((char*)p + sp * 12 + 0x134);
+}
+
+/* near-miss: retail stores the integer argument before spilling the float one (2 slots swapped). */
+void fn_801790BC(Unk80178BBC_T* p, int a, int b, float f)
+{
+    unsigned sp = a;
+    fn_80178D9C(&sp);
+    fn_801799AC(&p->mC[sp], b, f);
+}
+
+void fn_80179114(Unk80178BBC_T* p, int a)
+{
+    unsigned sp = a;
+    fn_80178D9C(&sp);
+    *(int*)((char*)p + sp * 0x94 + 0x98) = 1;
+}
+
+int fn_8017915C(Unk80178BBC_T* p, int a)
+{
+    unsigned sp = a;
+    fn_80178D9C(&sp);
+    return *(int*)((char*)p + sp * 0x94 + 0x9C);
+}
+
+Unk80177C34_Sub* fn_801791A0(Unk80177C34_Sub* p)
+{
+    p->m84 = 0;
+    p->m88 = 0;
+    fn_80179208(p);
+    return p;
+}
+
 void fn_801791DC(Unk801791DC_T* p, int a, int b)
 {
     p->m84 = a;
     p->m88 = b;
     fn_80179250(p);
+}
+
+void fn_80179208(void* self)
+{
+    Unk80177C34_Sub* p = (Unk80177C34_Sub*)self;
+    for (int i = 0; i < 25; i++) {
+        p->m20[i] = 0;
+    }
+    for (int i = 0; i < 8; i++) {
+        p->m0[i] = 0;
+    }
+    p->m8C = 0;
+    p->m90 = 0;
 }
 
 void fn_80179250(void* self)
@@ -53,6 +223,16 @@ int fn_80179284(Unk80179284_T* p, Unk80179284_Ctx* ctx)
 int fn_80179464()
 {
     return 6;
+}
+
+void fn_8017946C(Unk80177C34_Sub* p)
+{
+    Unk80177C34_Rec* r = p->m88->m6F8->m14;
+    int off = p->m84 * 0xE64;
+    if (((Unk80177C34_Rec*)((char*)r + off))->m108 != 0) {
+        p->m90 = 1;
+    }
+    fn_801794B8(p);
 }
 
 void fn_80179784()
