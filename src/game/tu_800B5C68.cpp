@@ -85,6 +85,15 @@ extern const char lbl_805BA46C[];
 extern const char lbl_805BA474[];
 extern const char lbl_805BA488[];
 extern int lbl_8061A324;
+extern const char lbl_805BA24C[];
+extern "C" {
+int fn_803AC11C();
+void fn_8033E958(const char* fmt, ...);
+void fn_8031D134(Unk8031CECC* o);
+void fn_8031D014(Unk8031CECC* o);
+void fn_8031D2DC(Unk8031CECC* o, char* s, int a, int b);
+}
+
 extern "C" {
 int fn_8057F14C(int a);
 int fn_8057FD34(int a);
@@ -252,6 +261,7 @@ Unk8031CECC* fn_8031D6B0(Unk8031CECC* o);
 
 
 
+
 /* ---- unit prototypes ---- */
 extern "C" {
 int fn_800B5C68();
@@ -292,6 +302,7 @@ void fn_800B8194();
 void fn_800B81BC(int a);
 void fn_800B8268(float a, float b, float c, float d);
 void fn_800B82AC();
+void fn_800B82D0(FEObj20* self, int to, int flag);
 void fn_800B83F8(FEObj20* self, int a, int b);
 void fn_800B8494(FEObj20* self);
 void fn_800B84FC(FEObj20* self);
@@ -734,6 +745,56 @@ extern "C" void fn_800B8268(float a, float b, float c, float d)
 extern "C" void fn_800B82AC()
 {
     fn_8031D54C(fn_8031CECC());
+}
+
+/* near-miss (73 vs 74 insns): retail keeps two separate -1 constants (r28, r29) set before the first call; ours merges them */
+extern "C" void fn_800B82D0(FEObj20* self, int to, int flag)
+{
+    if (self->m0 == 0) {
+        if ((unsigned)to > 7) {
+            if (to != self->m8) {
+                if (to != -3) {
+                    int f = 0;
+                    if ((unsigned)(to - 9) <= 0x2F) {
+                        int ok = fn_803AC11C();
+                        f = 1;
+                        if (ok == 0) {
+                            to = -1;
+                            fn_8033E958(lbl_805BA24C);
+                        }
+                    }
+                    int m1 = -1;
+                    int m2 = -1;
+                    self->m8 = m1;
+                    fn_8031D134(fn_8031CECC());
+                    fn_8031D014(fn_8031CECC());
+                    if (to == -1) {
+                        if (self->m8 != -1) {
+                            self->m10 = self->m8;
+                        }
+                        void (*cb)() = self->m1C;
+                        self->m8 = m2;
+                        if (cb != 0) {
+                            cb();
+                            self->m1C = 0;
+                        }
+                    } else {
+                        int w = to;
+                        if (to == -2) {
+                            w = self->m10;
+                        }
+                        if ((unsigned)w > 0x3A) {
+                            self->m8 = m1;
+                        } else {
+                            char* str = fn_800B859C((int)self, w);
+                            fn_8031D2DC(fn_8031CECC(), str, f, 0);
+                            self->m8 = w;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 extern "C" void fn_800B83F8(FEObj20* self, int a, int b)
