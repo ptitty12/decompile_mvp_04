@@ -700,6 +700,9 @@ game/tu_8021F080.cpp:
 game/tu_8022309C.cpp:
 	.text       start:0x8022309C end:0x80227564
 
+game/tu_80227564.cpp:
+	.text       start:0x80227564 end:0x8022BB90
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
