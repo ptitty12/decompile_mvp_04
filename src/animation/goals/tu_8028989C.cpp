@@ -58,6 +58,15 @@ static inline Unk80273498_Vec3 VSub(Unk80273498_Vec3 a, const Unk80273498_Vec3& 
 /* The int/float angle setters index with an explicit byte offset (retail forms
  * (m190 * 4 + const) in a register, base register kept apart). For ints the
  * first store goes through a zero index variable. */
+static inline Unk80273498_Vec3 VSubR(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 static inline void SetAngleI(Unk802726BC_Angles* p, int v)
 {
     int i = 0;
@@ -88,12 +97,18 @@ static inline void SetAngleF48(Unk802726BC_Angles* p, float v)
     if (p->m190 == 1) {
         p->m48[0] = v;
     }
-    p->m48[p->m190] = v;
+    int off = p->m190 * 4 + 72;
+    *(float*)((char*)p + off) = v;
 }
 
 static inline void SetAngleF48b(Unk802726BC_Angles* p, float v)
 {
     SetAngleF48(p, v);
+}
+
+static inline void SetM10(Unk8028989C_Goal* g, Unk80273498_Vec3 a)
+{
+    g->m10 = a;
 }
 
 static inline void SetPair(float* dst, float v)
@@ -131,11 +146,11 @@ void fn_802898FC(Unk8028989C_Goal* g, float f)
 
 Unk8028989C_Goal* fn_80289944(Unk8028989C_Goal* g, float f, Unk8014E388_H** p, int n)
 {
-    /* near-miss: retail reloads all three words of w; here y and z are forwarded. */
+    /* near-miss: retail computes g + 16 (addi) before reloading f (lfs); here the two
+     * are swapped (2 insns). */
     Unk80273498_Vec3 v = fn_8014E388(*p);
     v.y = 0.0f;
-    Unk80273498_Vec3 w = v;
-    g->m10 = w;
+    SetM10(g, v);
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 2;
@@ -204,9 +219,9 @@ int fn_80289B78(Unk8028989C_Goal* g)
 
 int fn_80289B98(Unk8028989C_Goal* g, Unk80270BA0_X* x)
 {
-    /* near-miss: retail clamps m64 with a single store through f0 (see
-     * fn_802898FC) and stores the float argument of the second SetAngleF48b
-     * call in each arm of the ternary. */
+    /* near-miss: retail clamps m64 with a single store through f0 (fmr f0,f12 /
+     * fmr f0,f13; see fn_802898FC); the register allocation of the VSubR call
+     * (address registers) also differs. */
     Unk80271DBC_Link* link = x->m618;
     Unk80273498_Vec3 pos = FlatPos(x);
     float t = (float)UnkCtx4C(x->m44C) * 0.016666668f;
@@ -229,13 +244,15 @@ int fn_80289B98(Unk8028989C_Goal* g, Unk80270BA0_X* x)
             g->m64 = 0.1f;
         }
     }
-    {
-        SetAngleF48b(&x->m734, g->m64 > 0.0f ? g->m64 : -1.0f);
+    if (!(g->m64 <= 0.0f)) {
+        SetAngleF48b(&x->m734, g->m64);
+    } else {
+        SetAngleF48b(&x->m734, -1.0f);
     }
     if (link->m838 == 0x7873C72B) {
         g->m70 = 1;
     }
-    float len = LenSq(VSub(pos, g->m54));
+    float len = LenSq(VSubR(pos, g->m54));
     if (len > (((unsigned int)(g->m48 - 3) <= 3) ? g->m68 : g->m68 * 0.5f)) {
         fn_80242E6C(x);
         return 2;
