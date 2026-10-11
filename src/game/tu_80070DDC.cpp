@@ -3,8 +3,12 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80070DDC.h"
+#include "game/tu_8000E618.h"
 
 void* operator new(unsigned int size, int heap);
+void* fn_803774A8(unsigned n, int heap);
+unsigned fn_800734D4(void* self, unsigned flags);
+Unk8000E618* fn_8000E65C();
 void fn_80377E90(Obj* list, int* a, int* b, int idx);
 void fn_80377DBC(Obj* list, int* a, int* b, int idx);
 char* fn_8040B61C(char* dst, const char* src);
@@ -533,6 +537,61 @@ void fn_80072E44(void* self, int a, Unk80070DDC_Stream* io)
 {
     int magic = 0xBEEFF00D;
     io->v08(a, &magic, 4);
+}
+
+unsigned fn_800734D4(void* self, unsigned flags)
+{
+    unsigned a;
+    unsigned b;
+    unsigned t;
+    unsigned sum = 0;
+    if (flags & 0x10000000) {
+        a = fn_800734D4(self, 0x01101311);
+        b = fn_800734D4(self, 0x02131311);
+        t = a;
+        if (t < b)
+            t = b;
+        sum = t;
+    }
+    if (flags & 0x20000000) {
+        a = fn_800734D4(self, 0x01101311);
+        unsigned b2 = fn_800734D4(self, 0x02131311);
+        if (a > b2)
+            a = b2;
+        sum += a;
+    }
+    if (flags & 0x11)
+        sum += 0x400;
+    if (flags & 0x100)
+        sum += 0xE4C00;
+    if (flags & 0x1000)
+        sum += 0x3D800;
+    if (flags & 0x2000)
+        sum += 0x1B5800;
+    if (flags & 0x100000)
+        sum += 0x400;
+    if (flags & 0x200000)
+        sum += 0x800;
+    if (flags & 0x400000)
+        sum += 0x2000;
+    if (flags & 0x200)
+        sum += 0x64000;
+    if (flags & 0x10000)
+        sum += 0x400;
+    if (flags & 0x20000)
+        sum += 0x13400;
+    return sum;
+}
+
+int fn_80073610(void* self, int* out, int b)
+{
+    int r = 0;
+    *out = fn_800734D4(self, b);
+    if (*out != 0) {
+        int h = fn_8000E65C()->fn_8000E6F0() | 0x100;
+        r = (int)fn_803774A8(*out, h);
+    }
+    return r;
 }
 
 /* near-miss: 2 slots (li r5,127 / addi r3 order in the memset call setup). */
