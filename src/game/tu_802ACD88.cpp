@@ -55,6 +55,7 @@ extern const char lbl_805DFFC0[];
 extern char lbl_8060D190[];
 extern Unk802ACD88_G* lbl_80626DD0;
 extern const char* lbl_8061C728[];
+extern const char lbl_805E00B4[];
 extern const char lbl_805DFC08[];
 extern const char lbl_805DFFD0[];
 extern const char lbl_805E0004[];
@@ -79,6 +80,12 @@ void* fn_802AFA54(Mgr* m, const char* s);
 void fn_803DDA8C(void* a, void* b);
 void fn_802AF1C4(Mgr* m, void* a, int b);
 void fn_802BBA88(void* p);
+int fn_8040B6A0(const char* s);
+void fn_80379094(const char* s, int len, int a);
+void fn_80378EF8(const char* s, int len, char* buf, int cap, int* n);
+int fn_8033E958(const char* fmt, ...);
+char* fn_8040B8FC(const char* s, int c);
+int fn_802AF6F8(Mgr* m, char* buf, int flag);
 void fn_802B7C50(void* p);
 void fn_802C40BC(void* p);
 void fn_802C40DC(void* p);
@@ -316,6 +323,25 @@ int fn_802AEBCC(void* a, void* b)
 int fn_802AEBF0(void* a, void* b)
 {
     return fn_802AF624(a, b, 0);
+}
+
+/* near-miss (parked, 2 insns swapped): retail saves flag (r5) to r30 before s (r4) to r31 in the prologue; every loop shape tried gives the opposite order */
+int fn_802AF624(Mgr* m, const char* s, int flag)
+{
+    char buf[0x1388];
+    int n = 0;
+    while (fn_80379094(s, fn_8040B6A0(s), 0), *s != 0) {
+        fn_80378EF8(s, fn_8040B6A0(s), buf, 0x1388, &n);
+        s += n;
+        if (n != 0) {
+            fn_8033E958(lbl_805E00B4, buf);
+            char* p = fn_8040B8FC(buf, 0x2F);
+            if (p != 0)
+                *p = 0;
+            fn_802AF6F8(m, buf, flag);
+        }
+    }
+    return 1;
 }
 
 int fn_802AFB50(Mgr* m)
