@@ -347,3 +347,37 @@ Recipes that matched 18 parked functions (details in each unit's comments):
 - Open: retail recomputes `addi rX,r1,buf` per use of `&buf` across calls
   (strcpy chains); ours keeps it in a saved register (fn_800A3DF8 and two
   v8 name-swap methods in tu_80094578).
+
+## Switch trees (sweep-5 report, 2026-10-11)
+
+- Enum-typed switch index: with an `int` index and every case value in
+  0..127, g++ 2.95 uses its ASCII cost table (alnum cost 16, punct 8) to pick
+  the pivot. With an enum index it balances by node count. If the target's
+  root is the middle by count and yours is not, declare
+  `enum E { E_Neg = -1, E_Lo = lo, E_Hi = hi };` and write `switch ((E)kind)`.
+  The negative enumerator keeps the compares signed (`cmpwi`). This matched
+  fn_80059BDC (49 cases) in one shot.
+- group_case_nodes merges consecutive values whose labels are adjacent, or
+  whose bodies only jump to the same label, into range tests. To keep one
+  compare per value:
+  - give each empty case a non-jump first insn, such as a dead
+    `T* q = &r->field;` that is eliminated later;
+  - never let consecutive values share a label (duplicate the body).
+  Cases that `return 0` start with `li` and stay unmerged (fn_80055204, fn_80054DEC).
+- Open: fn_80055D84 balances as if the case list were two nodes longer than
+  the 33 visible values.
+- If the target holds the switch index in r4 and yours is in r0, the original
+  passed the index to a call in the default branch (a vararg diagnostic
+  `fn_8033E958(fmt, kind)`). global-alloc then prefers r4.
+- Per-case locals: one `q` declared in each case matched; a single shared `q`
+  swapped the obj/q registers.
+- A set difference of the target's `cmpwi` immediates against the source's
+  `case` values tells at once whether a switch near-miss is a case-set problem
+  or a tree problem.
+- Compiler dumps: run cc1plus with `-dg -dl -dr -ds -dR` (SN_NGC_PATH set) to
+  get `.lreg` (pseudos, uses, live length) and `.greg` ("Register
+  dispositions") for allocation questions.
+- Open (several units): SumRow-style byte-index loops (fn_80053220,
+  fn_80054684, fn_8005CDC4). Retail puts the index in r9 and the element
+  address in r11; ours uses r0/r9. Element addresses formed as `add off,base`
+  in retail vs `add base,off` (fn_80056A68, fn_80056AC0).
