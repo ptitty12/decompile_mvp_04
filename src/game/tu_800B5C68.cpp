@@ -5,6 +5,7 @@
 #include "game/tu_800A8684.h"
 #include "game/tu_8007A4DC.h"
 #include "game/tu_800BCD38.h"
+#include "game/tu_8001B190.h"
 
 /* Block returned by fn_8007FE04 (lbl_8061930C's inner object): +0x74 receives the
  * fn_80086DD8 result (fn_800B80A4), +0x22C is read by fn_8007FDF8 and fn_800B8044. */
@@ -61,6 +62,10 @@ public:
 struct S74 {
     char pad0[0x74];
     int m74;
+    char pad78[0x18C - 0x78];
+    int m18C;
+    char pad190[0x22C - 0x190];
+    int m22C;
 };
 struct S10 {
     char pad0[0x10];
@@ -80,6 +85,31 @@ extern const char lbl_805BA46C[];
 extern const char lbl_805BA474[];
 extern const char lbl_805BA488[];
 extern int lbl_8061A324;
+extern "C" {
+int fn_8057F14C(int a);
+int fn_8057FD34(int a);
+int fn_80580140();
+int fn_80580C50();
+int fn_805806CC();
+int fn_8057E070(int a);
+int fn_800B57EC();
+}
+
+Unk8001BC8C* fn_8001BC4C();
+void fn_8001BD18();
+struct Unk8008CE64_Own;
+void fn_80090814(Unk8008CE64_Own* o, int a, int b);
+extern void* lbl_80619948;
+extern "C" {
+void fn_8037CC30(void* o);
+void* fn_8037C7FC();
+void fn_800C3774(Unk800C341C_Mgr* m);
+void fn_800C3BE0(Unk800C341C_Mgr* m);
+Unk800C5E74_Obj* fn_800C5E28();
+void fn_802B0778(void* o);
+void fn_800A18C0(void* o);
+}
+
 struct Unk80090880;
 struct FEUsh {
     unsigned short m0;
@@ -220,6 +250,8 @@ Unk8031CECC* fn_8031D6B0(Unk8031CECC* o);
 
 
 
+
+
 /* ---- unit prototypes ---- */
 extern "C" {
 int fn_800B5C68();
@@ -238,7 +270,9 @@ void fn_800B6384(FEElem* self, const char* s);
 void fn_800B6458(FEV64* self, const char* a);
 FEMgr* fn_800B64BC(FEMgr* self);
 void fn_800B6560(FEMgr* self, int c);
+void fn_800B65C0(FEMgr* self);
 void fn_800B66CC();
+int fn_800B6C30();
 void fn_800B7280(FEMgr* self, int a);
 void fn_800B7598(void* self, int k);
 void fn_800B7614(void* self, int a);
@@ -453,12 +487,62 @@ extern "C" void fn_800B6560(FEMgr* self, int c)
     fn_80328374(self, c);
 }
 
+extern "C" void fn_800B65C0(FEMgr* self)
+{
+    if (self->mA0 != 0) {
+        fn_800C6A38(self->mA0);
+        delete (FEV1C8*)self->mA0;
+        self->mA0 = 0;
+        fn_802BA708((char*)lbl_8061E978 + 0xFAB0);
+    }
+    fn_8037CC30(fn_8037C7FC());
+    fn_800B86A0(&self->m38);
+    fn_800B82D0(fn_800B8144(), -1, 1);
+    fn_8001BC4C()->fn_8001BDAC(0xB2);
+    fn_8001BC4C();
+    fn_8001BD18();
+    fn_800C3774(fn_800C33D0());
+    fn_800C3BE0(fn_800C33D0());
+    fn_800C5E28()->fn_800C6624();
+    fn_800C3A4C(fn_800C33D0());
+    fn_802B0778(lbl_8061E978);
+    if (lbl_8061A334 == 0) {
+        fn_800A18C0(lbl_80619948);
+        fn_80090814((Unk8008CE64_Own*)lbl_8061977C, 1, 0);
+    }
+}
+
 extern "C" void fn_800B66CC()
 {
     if (lbl_8061A32C) {
         delete (FEMgrV*)lbl_8061A32C;
     }
     lbl_8061A32C = 0;
+}
+
+extern "C" int fn_800B6C30()
+{
+    int total = 0;
+    S74* g = lbl_806192E0->m4->m10;
+    if (g->m74 == 1) {
+        total = fn_8057F14C(0);
+        total += fn_8057F14C(1);
+    } else if (g->m74 == 2) {
+        total = fn_8057FD34(0);
+        total += fn_8057FD34(1);
+    } else if (g->m74 == 5 || (fn_800B555C(), fn_800B57EC() == 0 && fn_800B555C()->m660 == 4)) {
+        total = fn_80580140();
+    } else if (g->m74 == 6 || (fn_800B555C(), fn_800B57EC() == 0 && fn_800B555C()->m660 == 5)) {
+        if (g->m18C == 0) {
+            total = fn_80580C50();
+        } else {
+            total = fn_805806CC();
+        }
+    } else if (g->m22C == 0) {
+        total = fn_8057E070(0);
+        total += fn_8057E070(1);
+    }
+    return total > 0;
 }
 
 extern "C" void fn_800B7280(FEMgr* self, int a)
