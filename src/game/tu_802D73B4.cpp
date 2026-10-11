@@ -316,7 +316,6 @@ float fn_802D7E88(int a, int b)
     return 6.2831855f;
 }
 
-/* near-miss: the index of m8[idx] is in r0 here, r11 in retail (2 slots); about 10 index forms tried */
 int fn_802D7EE4(int a)
 {
     int idx = fn_802D7AC8(a);
@@ -324,7 +323,7 @@ int fn_802D7EE4(int a)
     if (idx == -1) {
         r = 0;
     } else {
-        r = lbl_8061EDF8->m8[idx]->s20();
+        r = Unk802D73B4_PadAt(lbl_8061EDF8, idx)->s20();
     }
     return r;
 }

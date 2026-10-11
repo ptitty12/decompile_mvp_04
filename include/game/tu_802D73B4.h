@@ -117,6 +117,11 @@ public:
     void fn_802D8AD8(int a, int b);
 };
 
+inline Unk802D73B4_Pad* Unk802D73B4_PadAt(Unk802D73B4_Mgr* m, int i)
+{
+    return m->m8[i];
+}
+
 /* Owner of the manager (vtable lbl_806647D0: slot 1 is fn_802D7464). */
 class Unk802D73B4_W {
 public:
