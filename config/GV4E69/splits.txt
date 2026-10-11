@@ -406,6 +406,9 @@ game/tu_800DC0F4.cpp:
 game/tu_800E0164.cpp:
 	.text       start:0x800E0164 end:0x800E4234
 
+game/tu_800E4234.cpp:
+	.text       start:0x800E4234 end:0x800E8890
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
