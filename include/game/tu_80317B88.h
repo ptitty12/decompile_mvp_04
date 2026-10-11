@@ -12,6 +12,16 @@
 void* operator new(unsigned int size, int heap);      /* 0x80377428 */
 inline void* operator new(unsigned int, void* p) { return p; }
 
+#ifndef GAME_CHOOSER_H
+/* Chooser base (ctor 0x8037B3E8); only the constructor is used here. */
+class Unk8037B3E8 {
+public:
+    Unk8037B3E8(unsigned int hash);
+    virtual ~Unk8037B3E8();
+};
+extern int lbl_806EF9B4;   /* default heap passed to new */
+#endif
+
 // STRUCTS-BEGIN
 struct Vtx16 { float x; float y; float z; float w; };
 struct FxRec;
@@ -303,6 +313,108 @@ public:
     int m0;
     virtual ~FxIObj();
 };
+/* Helper object with its vptr at +4 (deleted in fn_8031D014).
+ * Chooser-derived settings object (hash 0xE33E6A08, size 0x20; ctor fn_8031D988, factory fn_8031DB7C). */
+struct FxK {
+    const void* m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+};
+class FxLObj3C {
+public:
+    char pad0[8];
+    virtual ~FxLObj3C();
+};
+class FxLObj40 {
+public:
+    char pad0[0x42A4];
+    virtual ~FxLObj40();
+};
+struct FxLOwner;
+/* Two-level pointer chain read by fn_8031E2C8 (FxL::mC -> +0xA0 -> +0x1C). */
+struct FxN {
+    char pad0[0x1c];
+    int m1C;
+};
+struct FxM {
+    char pad0[0xa0];
+    FxN* mA0;
+};
+/* Object with vptr lbl_80665CF8 at +0 (ctor fn_8031DD54, dtor fn_8031DE38). */
+struct FxL {
+    const void* m0;
+    int m4;
+    void* m8;
+    FxM* mC;
+    void* m10;
+    char pad14[0x4];
+    float m18;
+    void* m1C;
+    int m20;
+    char pad24[0x8];
+    int m2C;
+    float m30;
+    int m34;
+    int m38;
+    FxLObj3C* m3C;
+    FxLObj40* m40;
+    int m44;
+    int m48;
+    float m4C;
+    float m50;
+    int m54;
+    int m58;
+};
+/* Box of four floats at lbl_8068F1D4 (default value returned by fn_8031E1D4). */
+struct FxBox {
+    char pad0[0x4];
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+};
+struct FxQ2;
+/* Object of fn_8031F080: an int stack (count at +0x5C, entries from +0x64). */
+struct FxQ {
+    char pad0[0xc];
+    FxQ2* mC;
+    char pad10[0x4c];
+    int m5C;
+    char pad60[0x4];
+    int a64[8];
+};
+struct FxVec { int x; int y; int z; };
+/* Helper reached through FxQ::mC (vector at +0x60 is copied by fn_8031F0A0). */
+struct FxQ2 {
+    char pad0[0x60];
+    FxVec m60;
+    char pad64[0x8];
+};
+struct FxS {
+    int m0;
+    int m4;
+    const void* m8;
+    FxS(int a);
+};
+struct FxT {
+    const void* m0;
+    FxT();
+};
+/* Small object with vptr lbl_80665110 at +8 (ctor fn_8031F0C4, dtor fn_8031F0EC).
+ * Sort record of fn_8031F170 (key m8, secondary key m10). */
+struct FxR {
+    char pad0[0x8];
+    int m8;
+    char padC[0x4];
+    float m10;
+};
+struct FxColor { float a; float b; float c; float d; };
+struct FxMat { float m[16]; };
 // STRUCTS-END
 
 extern int lbl_8061FF50;
