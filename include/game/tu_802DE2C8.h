@@ -36,7 +36,6 @@ struct Unk802DE2C8_List {
     Unk802DE2C8_Node* m0;
     Unk802DE2C8_Node* m4;
     int m8;
-    ~Unk802DE2C8_List();
     int fn_802E0400(Unk802DE2C8_Node* n);
     int fn_802E04BC(Unk802DE2C8_Node* n);
     void fn_802E056C();
@@ -50,6 +49,7 @@ struct Unk802DE2C8_Pool {
     Unk802DE2C8_Node* m10;
     Unk802DE2C8_Node* m14;
     Unk802DE2C8_Pool();
+    ~Unk802DE2C8_Pool();
 };
 extern Unk802DE2C8_Pool* lbl_8061F688;
 
@@ -63,19 +63,6 @@ struct Unk802E21FC_R {
     int mC;
 };
 void fn_802E21FC(Unk802E21FC_R* d, Unk802E21FC_R* s);
-struct Unk802E22C4_E {
-    char pad0[8];
-    int m8;
-    int mC;
-    char pad10[0x18C - 0x10];
-};
-struct Unk802E22C4_T {
-    char pad0[8];
-    int m8;
-    int mC;
-    char pad10[0x60 - 0x10];
-    Unk802E22C4_E m60[2];
-};
 
 /* Axis-aligned box at +0x30 of the collider objects (min xyz at +0/4/8, max xyz
  * at +0x10/0x14/0x18; fn_802E0914). */
@@ -118,7 +105,6 @@ struct Unk802E0914_Out {
     int m4;
     int m8;
 };
-
 void fn_802DD224(int a, int b);
 void fn_802DF870(void* a, void* b, void* c);
 void fn_802DFD04(void* a, void* b, void* c);

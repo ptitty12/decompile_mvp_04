@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_802DE2C8.h"
+#include "game/tu_802E22EC.h"
 
 void Unk803414A4::vslot46()
 {
@@ -161,6 +162,10 @@ void fn_802E21FC(Unk802E21FC_R* d, Unk802E21FC_R* s)
     d->m8 = s->m8;
     d->mC = s->mC;
     d->m1 = s->m1;
+}
+
+Unk802E22C4_T::~Unk802E22C4_T()
+{
 }
 
 void fn_802E22C4(Unk802E22C4_T* t)

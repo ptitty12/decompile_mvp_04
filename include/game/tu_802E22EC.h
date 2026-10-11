@@ -61,6 +61,19 @@ public:
     static void* operator new(unsigned size, const char* tag) { return lbl_8061F68C->s4(size, tag); }
 };
 
+/* Two-element array at +0x60 of the type with vtable lbl_80664BD8 (fn_802E22C4, fn_802E2218);
+ * elements are 0x18C-byte shapes. */
+class Unk802E22C4_E : public Unk802E22EC_B {
+public:
+    char pad60[0x18C - 0x60];
+};
+class Unk802E22C4_T : public Unk802E22EC_B {
+public:
+    Unk802E22C4_E m60[2];
+    virtual ~Unk802E22C4_T();
+};
+void fn_802E22C4(Unk802E22C4_T* t);
+
 /* Box shared with the collider code (include/game/tu_802DE2C8.h): min xyz at +0/4/8,
  * max xyz at +0x10/0x14/0x18, at +0x30 of every shape. fn_8035F4EC is its copy
  * constructor. */
@@ -122,6 +135,26 @@ struct Unk802E5714_E {
 struct Unk802E5714_F {
     float m[4];
     Unk802E5714_F() {}
+};
+
+/* 0x90-byte elements of the array at +0 of the manager (fn_802E3980): vptr at +0x74. */
+class Unk802E3980_ED {
+public:
+    char pad0[0x74];
+};
+class Unk802E3980_EV : public Unk802E3980_ED {
+public:
+    virtual ~Unk802E3980_EV() {}
+};
+class Unk802E3980_E : public Unk802E3980_EV {
+public:
+    char pad78[0x90 - 0x78];
+    static void operator delete[](void* p) { lbl_8061F68C->s5(p); }
+};
+struct Unk802E3980_Mgr {
+    Unk802E3980_E* m0;
+    int m4;
+    void fn_802E3980();
 };
 
 /* Allocator block (fn_802E3A44 resets it). */
