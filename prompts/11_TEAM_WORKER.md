@@ -89,6 +89,9 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
 - Callee-saved `lis` registers around calls: `T** a = &lbl_X;` locals at the
   top of the function.
 - m2c drops or invents register args: count `li r4/r5` before each call.
+- If only the callee-saved registers are permuted, run
+  `python tools/match/passthru.py .`: a callee that reads r4/r5 the caller
+  never sets takes the caller's parameters, so pass them through.
 - Keep .text order with `python tools/match/sort_functions.py src/<UNIT>`.
 
 ## Finish with a report (this is all the lead reads)
