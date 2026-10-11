@@ -27,6 +27,11 @@ animation/choosers/tu_80271940.cpp:
 	.rodata     start:0x805DC67C end:0x805DC6C4
 	.data       start:0x8061E654 end:0x8061E660
 
+animation/choosers/tu_80271C64.cpp:
+	.text       start:0x80271C64 end:0x80271F14
+	.rodata     start:0x805DC6C4 end:0x805DC70C
+	.data       start:0x8061E660 end:0x8061E66C
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
