@@ -918,6 +918,9 @@ animation/tu_802AC2CC.cpp:
 game/tu_802ACD88.cpp:
 	.text       start:0x802ACD88 end:0x802B0ACC
 
+game/tu_802B0ACC.cpp:
+	.text       start:0x802B0ACC end:0x802B5234
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C
