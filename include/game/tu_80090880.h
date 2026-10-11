@@ -445,8 +445,6 @@ Rec* fn_8052F454(void* mem, const char* name, DbObj* db, int c);
 Obj0C* fn_8052FA84(void* mem, int v);
 Rec* fn_8009DCD4(void* mem, const char* name, DbObj* db, int c);
 Obj58* fn_8053BB80(void* mem, const char* name, DbObj* db, int c);
-Rec* fn_8009FCB8(void* mem, const char* name, DbObj* db, int c);
-Rec* fn_800A06A4(void* mem, const char* name, DbObj* db, int c);
 RowRef* fn_80085C00(Rec* r, int row);
 void fn_80085C10(char* dst, RowRef* src);
 Rec* fn_80084A10(void* mem, const char* name, DbObj* db, int c);

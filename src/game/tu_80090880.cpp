@@ -210,11 +210,11 @@ void Tbl8009101C::v5()
     if (!mC)
         mC = fn_8053BB80(operator new(0x58, 0), lbl_805B5790, m0, 0x7E);
     if (!m10[0])
-        m10[0] = fn_8009FCB8(operator new(0x28, 0), lbl_805B2CB0, m0, 0x7E);
+        m10[0] = new (0) RecA(lbl_805B2CB0, m0, 0x7E);
     if (!m10[1])
-        m10[1] = fn_8009FCB8(operator new(0x28, 0), lbl_805B579C, m0, 0x7E);
+        m10[1] = new (0) RecA(lbl_805B579C, m0, 0x7E);
     if (!m18)
-        m18 = fn_800A06A4(operator new(0x28, 0), lbl_805B2CB0, m0, 0x7E);
+        m18 = new (0) RecB(lbl_805B2CB0, m0, 0x7E);
 }
 
 void Tbl8009101C::v6()
