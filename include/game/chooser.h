@@ -38,9 +38,16 @@ struct Unk80273498_Vec3 {
 
 /* Position holders reached through Unk8014D8AC_Ctx::m54C (+0xC -> object) and
  * m6CC (object), both read by fn_80273498 (tu_80272B20.cpp). */
+struct Unk80270BA0_X;
 struct Unk80273498_Pos {
     char pad0[0x60];
     Unk80273498_Vec3 m60;
+    char pad6C[0x374 - 0x6C];
+    Unk80270BA0_X* m374;
+    char pad378[0x38C - 0x378];
+    int m38C;
+    char pad390[0x3D0 - 0x390];
+    Unk80273498_Vec3 m3D0;
 };
 struct Unk80273498_Ref {
     char pad0[0xC];
@@ -55,7 +62,9 @@ struct Unk8014D8AC_Ctx {
     Unk80273498_Ref* m54C;
     char pad550[4];
     Unk8014D8AC* m554;
-    char pad558[0x6CC - 0x558];
+    char pad558[0x65C - 0x558];
+    Unk80273498_Pos* m65C[13];
+    char pad690[0x6CC - 0x690];
     Unk80273498_Pos* m6CC;
     char pad6D0[0x6F4 - 0x6D0];
     int m6F4;
@@ -104,21 +113,29 @@ struct Unk8027107C_Outer {
     Unk8027107C_Inner* m3A4;
     char pad3A8[0x3B0 - 0x3A8];
     int m3B0;
+    char pad3B4[8];
+    int m3BC;
 };
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out);
 
-/* 4x4 matrix of floats (64 bytes). Evidence: block-copied 0x40 bytes at
- * Unk80270BA0_XBase+0x20 and from/to +0 of the path query objects in
- * animation/choosers/tu_80279AE4.cpp. */
+/* 4x4 float matrix (64 bytes): rows 0..2 the axes, row 3 (+0x30) the
+ * position (fn_8037B128 reads +0x30..+0x38). Block-copied 0x40 bytes at
+ * Unk80270BA0_XBase+0x20 (tu_80279AE4.cpp path queries; fn_8027AAB0 in
+ * animation/goals/tu_8027A84C.cpp). Two workers named it independently;
+ * both names and views are kept. */
 struct Unk80270BA0_Mtx {
-    float m[16];
+    union {
+        float m[16];
+        float r[4][4];
+    };
     float fn_8037B1F0();       /* reads m[0] and m[2] (0x8037B1F0) */
 };
+typedef Unk80270BA0_Mtx Unk8037B128_Mtx;
 
 /* Base part of Unk80270BA0_X that precedes its vtable pointer (at +0x98).
  * m0 is a "matrix valid" flag: 0x8035EB7C calls fn_8037D768(x) when it is 0,
- * then sets it and copies the matrix at +0x20 (tu_80279AE4.cpp). */
+ * then sets it and copies the matrix at +0x20 (tu_80279AE4.cpp, fn_8027AAB0). */
 struct Unk80270BA0_XBase {
     int m0;
     char pad4[0x20 - 0x4];
@@ -143,7 +160,10 @@ class Unk80270BA0_XMid : public Unk80270BA0_XVirt {
 public:
     char pad9C[0x44C - 0x9C];
     Unk8014D8AC_Ctx* m44C;
-    char pad450[0x488 - 0x450];
+    int m450;
+    char pad454[4];
+    int m458;
+    char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
     char m588[0x5F0 - 0x588];
@@ -191,7 +211,10 @@ struct Unk802726BC_Angles {
 struct Unk80271DBC_Link {
     char pad0[0x830];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
-    char pad834[0x880 - 0x834];
+    char pad834[4];
+    int m838;
+    int m83C;
+    char pad840[0x880 - 0x840];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -207,11 +230,15 @@ public:
     Unk802726BC_Angles m734;
     char pad8C8[0x8E8 - 0x8C8];
     float m8E8;                /* sqrt'ed by the path query constructors (tu_80279AE4.cpp) */
-    char pad8EC[0x93C - 0x8EC];
+    char pad8EC[0x908 - 0x8EC];
+    Unk80273498_Pos* m908;
+    char pad90C[0x93C - 0x90C];
     Unk80273498_Vec3 m93C;     /* copied into the path query's +0xA4 */
     char pad948[0xAB4 - 0x948];
     float mAB4;
-    char padAB8[0xB4C - 0xAB8];
+    char padAB8[0xB3C - 0xAB8];
+    int mB3C;
+    char padB40[0xB4C - 0xB40];
     int mB4C;
     int mB50;
 };
