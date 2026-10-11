@@ -131,6 +131,11 @@ struct FEEv {
     int m18;
 };
 extern FEV18* lbl_80619D10;
+struct FEOb232C {
+    char pad0[0x118];
+    int a[5];
+    int b[5];
+};
 struct FEOb107 {
     char pad0[0x10];
     FEV3Cz* m10;
@@ -304,6 +309,7 @@ void fn_8011A0A4(void* o, void* a, const char* s);
 
 
 
+
 /* ---- unit prototypes ---- */
 extern "C" {
 void fn_800AF544(UnkAt2C* p);
@@ -341,6 +347,7 @@ int fn_800B2204(FEOb210* self);
 int fn_800B2238(FEOb2390* self);
 void fn_800B228C(FEOb118* self);
 void fn_800B22B0(FEStats* self, FEEv* e);
+void fn_800B232C(FEOb232C* self);
 void fn_800B2390(FEOb2390* self);
 void fn_800B243C(void* p);
 void fn_800B245C(FEOb245* self);
@@ -704,6 +711,17 @@ extern "C" void fn_800B22B0(FEStats* self, FEEv* e)
     int v = e->m0;
     self->m118 = self->m118 >? v;
     self->m11C += e->m0;
+}
+
+extern "C" void fn_800B232C(FEOb232C* self)
+{
+    for (int i = 0; i < 5; i++) {
+        if (i == 0) {
+            self->b[i] = self->a[i] >? self->b[i];
+        } else {
+            self->b[i] = self->b[i] + self->a[i];
+        }
+    }
 }
 
 extern "C" void fn_800B2390(FEOb2390* self)
