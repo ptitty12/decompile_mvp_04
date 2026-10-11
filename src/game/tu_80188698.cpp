@@ -127,6 +127,27 @@ extern "C" int fn_80189698(Unk80188698* o, float t)
     return r;
 }
 
+//@80189C38
+/* near-miss: 74/74 insns, ~35 slots differ: same instruction sequence (mBFC reloaded for each of
+ * the three stores, signed int-to-float conversion, 16-byte and 12-byte result copies) but
+ * retail keeps the loop index (r25) and byte offset (r26) in separate registers, keeps the
+ * e+4 pointer in r27 and has a 104-byte frame (one more saved register and 8 more local bytes). */
+extern "C" void fn_80189C38(Unk80188698* o)
+{
+    if (o->mBFC != 0) {
+        float s = o->m41C + 0.1f;
+        float base = s * 0.008333334f;
+        int off = 0;
+        for (int i = 0; i <= 0x77; i++) {
+            float t = base * (float)i;
+            *(Unk80183918_Vec3*)((char*)o->mBFC + off + 4) = fn_80196AC0(o->m448, t);
+            *(Unk80189C38_Vec4*)((char*)o->mBFC + off + 0x10) = fn_801971B8(o->m448, t);
+            *(float*)((char*)o->mBFC + off) = t;
+            off += 0x20;
+        }
+    }
+}
+
 //@80189D60
 extern "C" float fn_80189D60(Unk80188698* o)
 {

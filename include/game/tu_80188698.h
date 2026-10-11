@@ -49,7 +49,8 @@ struct Unk80188698 {
     float m3F8;
     char pad3FC[0x418 - 0x3FC];
     float m418;
-    char pad41C[0x448 - 0x41C];
+    float m41C;
+    char pad420[0x448 - 0x420];
     Unk80195404* m448;
     Unk80188944_Ctx* m44C;
     char pad450[0x4A4 - 0x450];
@@ -83,7 +84,11 @@ extern Unk80181140_F lbl_805CDB6C;
 extern Unk80181140_F lbl_805CDB78;
 extern Unk80183918_Vec3 lbl_806055AC;
 
+struct Unk80189C38_Vec4 {
+    float m[4];
+};
 extern "C" {
+Unk80189C38_Vec4 fn_801971B8(Unk80195404* p, float t);
 void fn_8019E114(void* a, void* b, int c, int d, int e, float f);
 void fn_8019DF6C(void* a, void* b, int c, int d, float f);
 void fn_8019DE2C(void* a, void* b, int c, int d);
