@@ -161,8 +161,8 @@ public:
     virtual void vslot44(Unk8000B258_State* s);
     virtual void vslot45(const Unk8000B258_State* s);
     virtual void vslot46();
-    virtual void vslot47();
-    virtual void vslot48();
+    virtual int vslot47();
+    virtual int vslot48();
 };
 
 class Unk8000B258 : public Unk803414A4 {
