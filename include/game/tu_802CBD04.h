@@ -84,4 +84,32 @@ struct Unk802CF70C_Flags {
     int m24;
 };
 
+/* Camera object seen by the attribute-registration slot (fn_802CF368, fn_802CF4B4): the root class Unk8037B3E8 (chooser.h) contributes
+ * only the vptr, the camera's own data starts at +4. */
+struct Unk802CF4B4_Self {
+    const void* vptr;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    int m1C;
+};
+
+#include "game/chooser.h"
+/* Camera base (mid class, vtable 0x806646F0) as seen by its attribute-registration slot fn_802CF368. */
+class Unk802CF368_Self : public Unk8037B3E8 {
+public:
+    Unk802CF368_Self(const char* name);   /* never defined here; only the registration slot is */
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    void fn_8037B548(const char* name, int a);   /* begin/flag registration used with a null default */
+};
+
 #endif

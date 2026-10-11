@@ -2,9 +2,32 @@
  * Game code, .text 0x802CBD04-0x802CFED4 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/chooser.h"
 #include "game/tu_802CBD04.h"
 
 extern int lbl_8061ECAC[];
+extern const char lbl_805E2568[];
+extern const char lbl_805E331C[];
+extern const char lbl_805E32DC[];
+extern const char lbl_805E32E8[];
+extern const char lbl_805E32F8[];
+extern const char lbl_805E3308[];
+extern const char lbl_805E3310[];
+extern const char lbl_805E3320[];
+extern const char lbl_805E3330[];
+extern const char lbl_805E3334[];
+extern const char lbl_805E3340[];
+extern const char lbl_805E26D8[];
+extern const char lbl_805E3358[];
+extern const char lbl_805E3364[];
+extern const char lbl_805E3374[];
+extern const char lbl_805E3384[];
+extern const char lbl_805E3390[];
+extern const char lbl_805E33A8[];
+extern const char lbl_805E33C0[];
+extern const char lbl_805E33D0[];
+extern const char lbl_805E33E4[];
+extern const char lbl_805E33FC[];
 extern Unk802CF70C_Flags* lbl_8061B8C0;
 float fn_802CF5CC(int a, int b, float x, float y, float z);
 void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
@@ -13,10 +36,7 @@ void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk80
 void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
 void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
 void fn_802CC748(int e, int a, int b, Unk802CBD04_Vec3* v);
-struct Unk8037C7FC;
-extern "C" Unk8037C7FC* fn_8037C7FC();
 extern "C" void* fn_8037CF5C(Unk8037C7FC* c, unsigned int hash, void* obj);
-extern "C" void* fn_8037CE98(Unk8037C7FC* c, unsigned int hash, void* obj, int z);
 
 float fn_802CBD90(Unk802CBD04* o)
 {
@@ -113,7 +133,33 @@ void fn_802CF168(void* o)
 
 void fn_802CF1A4(void* o)
 {
-    fn_8037CE98(fn_8037C7FC(), 0xB38E54D3, o, 0);
+    fn_8037C7FC()->fn_8037CE98(0xB38E54D3, (int)o, 0);
+}
+
+void fn_802CF368(Unk802CF368_Self* o)
+{
+    o->fn_8037B458(lbl_805E32DC, &o->m8, lbl_805E2568, lbl_805E26D8);
+    o->fn_8037B458(lbl_805E32E8, &o->mC, lbl_805E2568, lbl_805E26D8);
+    o->fn_8037B458(lbl_805E32F8, &o->m4, lbl_805E2568, lbl_805E26D8);
+    o->fn_8037B458(lbl_805E3308, &o->m10, lbl_805E2568, lbl_805E26D8);
+    o->fn_8037B458(lbl_805E3310, &o->m14, lbl_805E2568, lbl_805E331C);
+    o->fn_8037B458(lbl_805E3320, &o->m18, lbl_805E2568, lbl_805E26D8);
+    o->fn_8037B458(lbl_805E3330, &o->m1C, lbl_805E2568, lbl_805E331C);
+    o->fn_8037B548(lbl_805E3334, 0);
+    o->fn_8037B548(lbl_805E3340, 0);
+}
+
+void fn_802CF4B4(Unk802CF4B4_Self* self, Unk8037B3E8* reg)
+{
+    reg->fn_8037B7E8(lbl_805E3358);
+    reg->fn_8037B458(lbl_805E3364, (int*)self, lbl_805E26D8, lbl_805E26D8);
+    reg->fn_8037B50C(lbl_805E3374, &self->m4, lbl_805E3384, 0);
+    reg->fn_8037B50C(lbl_805E3390, &self->m8, lbl_805E3384, 0);
+    reg->fn_8037B50C(lbl_805E33A8, &self->mC, lbl_805E33C0, 0);
+    reg->fn_8037B50C(lbl_805E33D0, &self->m10, lbl_805E3384, 0);
+    reg->fn_8037B50C(lbl_805E33E4, &self->m14, lbl_805E3384, 0);
+    reg->fn_8037B50C(lbl_805E33FC, &self->m18, lbl_805E33C0, 0);
+    reg->fn_8037B830(lbl_805E3358);
 }
 
 void fn_802CF70C(Unk802CF70C_In* a, Unk802CF70C_Out* o, int p, int q)
