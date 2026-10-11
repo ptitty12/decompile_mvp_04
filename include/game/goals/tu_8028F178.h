@@ -106,6 +106,9 @@ struct Unk8028F178_Goal {
 
     /* Vector at +0x10 returned by value (a temp copy, as in fn_8028F610). */
     Unk80273498_Vec3 fn_GetM10() { return m10; }
+
+    /* Vector result of the goal at 0x80286E70 (tu_80283934 or later unit). */
+    Unk80273498_Vec3 fn_80286E70();
 };
 
 /* Same object as Unk8014D8AC_Ctx (reached through Unk80270BA0_X::m44C) with the
@@ -138,6 +141,9 @@ int fn_8026DC18(Unk80270BA0_X* x, void* a);
 int fn_8026D7E0(Unk80270BA0_X* x, void* a);
 int fn_8026D6AC(Unk80270BA0_X* x, void* a);
 float fn_80248FC8(Unk80270BA0_X* x, int a);
+float fn_802966DC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_8027B55C(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int b, int c,
+                int* d, int* e, float f);
 
 /* fn_8028F220 looks up a cMatrixChooser by hash and runs its fn_8026FB80 once (flag in
  * lbl_8061E770, result floats in lbl_806E0B70). Evidence: the vtable slot 4 call (class-name hash)

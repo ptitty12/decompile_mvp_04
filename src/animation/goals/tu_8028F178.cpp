@@ -78,6 +78,11 @@ inline Unk80273498_Vec3 GetPos(const Unk8037B128_Mtx* m)
     return v;
 }
 
+inline float YawOf(Unk80273498_Vec3 d)
+{
+    return fn_80410CE8(d.x, d.z);
+}
+
 inline float RSub(float b, float a)
 {
     float r = a - b;
@@ -424,6 +429,68 @@ int fn_8028FE98(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
         result = 8;
     } else {
         result = ((Unk8027A84C*)g)->fn_8027B2CC(x) ? 0x20 : 0x10;
+    }
+    return result;
+}
+
+int fn_80290274(Unk8028F178_Goal* g, int kind, Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
+{
+    int result = 0;
+    Unk80273498_Vec3 pos0;
+    float h0;
+    int hash0 = 0;
+    ((Unk8027A84C*)g)->fn_8027AD3C(x, o, &pos0, &h0, 0, 0, &hash0, 0);
+    switch (kind) {
+    case 1:
+        result = 0;
+        break;
+    case 2:
+        result = 0;
+        break;
+    case 4:
+        if (!fn_80297668(g)) {
+            Unk80273498_Vec3 pos;
+            float heading;
+            ((Unk8027A84C*)g)->fn_8027AD3C(x, o, &pos, &heading, 0, 0, 0, 0);
+            float a = YawOf(fn_80297614(g) - pos);
+            float diff = AngleDiff(heading, a);
+            if (!(Abs(diff) <= 0.39269912f)) {
+                result = 3;
+            }
+        }
+        break;
+    case 8:
+    case 0x10:
+    case 0x20: {
+        int flagB = 0;
+        int flagA = 0;
+        Unk80273498_Vec3 tgt = fn_80297614(g);
+        Unk8028F178_Owner* owner = g->m48->m44;
+        Unk8028F178_Goal* ng = 0;
+        if (owner->m10 == 6) {
+            ng = (Unk8028F178_Goal*)owner->m18;
+        }
+        if (ng && ng->m28) {
+            tgt = ng->fn_80286E70();
+        }
+        float f = fn_802966DC(g, x);
+        Unk80273498_Vec3 gp = fn_80297614(g);
+        if (fn_8027B55C(g, x, 0, &gp, &tgt, 0, 0, &flagB, &flagA, f)) {
+            if (flagA != 0) {
+                result = 4;
+            } else if (flagB != 0) {
+                result = 2;
+            } else if (fn_80297740(g) <= 1 || g->m34 <= 1) {
+                result = 4;
+            } else {
+                result = 1;
+            }
+        }
+        break;
+    }
+    default:
+        result = 0;
+        break;
     }
     return result;
 }
