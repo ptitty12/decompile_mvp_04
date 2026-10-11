@@ -187,6 +187,14 @@ extern "C" FE_OVERLAY int fn_8045364C(FeScr_8044974C* self)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_8045369C(FeScr7* self)
+{
+    int v = ((FeSub*)&self->m158->mDC)->s5();
+    fn_800D0074(&self->m14C->m98, v, 1);
+    fn_800D0074(&self->m150->mDC, v, 1);
+    fn_80453D84(self, ((FeSub*)&self->m14C->m98)->s21());
+}
+
 extern "C" void fn_80453D84(FeScr_8044974C* self, int a);
 extern "C" void fn_80453980(FeScr_8044974C* self);
 extern "C" FE_OVERLAY void fn_80453BA8(FeScr_8044974C* self, int a, int b)
