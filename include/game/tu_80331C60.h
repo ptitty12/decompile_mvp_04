@@ -118,6 +118,11 @@ inline MIV* IAt(Menu* p, int off) { return (MIV*)((char*)p + off); }
 
 extern UnkGm* lbl_8061B8C0;
 
+/* Button item (0x4C bytes): +0/+4 floats, vptr at +8, +0xC flag, callback at +0x48. Evidence: the
+ * inline base-item ctor in fn_80332978 stores m0, m4, vptr and mC, then fn_8032D868 sets the
+ * name and fn_8033FBD8 the callback. */
+struct ItemB { float m0; float m4; const void* m8; int mC; char pad10[0x38]; void* m48; };
+
 extern "C" void fn_803E4A50(void* p);
 /* Base-menu constructor body, as inlined into the derived menu constructors
  * (fn_8033648C, fn_80334BC0, ...): the vptr is set to the base vtable before the

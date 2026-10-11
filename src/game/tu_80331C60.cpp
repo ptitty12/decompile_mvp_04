@@ -118,10 +118,6 @@ extern float lbl_80620540, lbl_80620544;
 struct MIE2 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 inline int EnumVal2(MIE2* i) { return i->m60[i->m4C]; }
 inline MIE2* EAt2(Menu* p, int off) { return (MIE2*)((char*)p + off); }
-/* Button item (0x4C bytes): +0/+4 floats, vptr at +8, +0xC flag, callback at +0x48. Evidence: the
- * inline base-item ctor in fn_80332978 stores m0, m4, vptr and mC, then fn_8032D868 sets the
- * name and fn_8033FBD8 the callback. */
-struct ItemB { float m0; float m4; const void* m8; int mC; char pad10[0x38]; void* m48; };
 extern const char lbl_80666E70[], lbl_80666DD0[], lbl_80666E20[], lbl_80666138[];
 extern const char lbl_805EDE40[], lbl_805EDE5C[], lbl_805EDE78[], lbl_805EDE94[], lbl_805EDEAC[], lbl_805EDEC4[], lbl_805EDEDC[], lbl_805EDEF0[], lbl_805EDF08[];
 extern int lbl_80620530[];
@@ -131,8 +127,42 @@ void fn_8032F428(void* item, const char* name, const void* tbl, int n, int cur);
 void fn_8033FBD8(void* item, void* cb);
 void fn_80332930();
 void fn_80332954();
-void fn_80333848(void* menu, Menu* owner);
+Menu* fn_80333848(Menu* p, int a);
 }
+extern const char lbl_805EECE0[], lbl_805EECF4[], lbl_80665FF8[];
+extern int lbl_806205B4[];
+extern const char* lbl_806205C4[];
+extern "C" {
+MItem* fn_8032EC38(void* mem, const char* name, int a, int b, int c, int d);
+}
+inline void LabelInit(ItemB* it, const char* name)
+{
+    it->m8 = lbl_80666EC0;
+    it->m0 = 0.0f;
+    it->m4 = 0.0f;
+    it->m8 = lbl_80666E70;
+    it->mC = 0;
+    fn_8032D868(it, name);
+}
+extern float lbl_8061E6A0, lbl_8061E6A4, lbl_8061E6A8, lbl_8061E6AC, lbl_8061E6B0;
+extern const char lbl_805EE138[], lbl_805EE144[], lbl_805EE150[], lbl_805EE160[], lbl_805EE16C[], lbl_80666188[];
+extern "C" void fn_8032E894(void* item, const char* name, float* val, float a, float b, float c, float d);
+extern const char lbl_805EE194[], lbl_805EE1A8[], lbl_805EE1BC[], lbl_805EE1D8[];
+extern const char* lbl_80620430[];
+extern const char lbl_80666048[];
+extern const char lbl_805EE1EC[], lbl_805EE204[], lbl_805EE218[], lbl_805EE234[], lbl_805EE248[], lbl_805EE25C[], lbl_80666098b[];
+extern const char* lbl_8062046C[];
+extern const char* lbl_806204A8[];
+inline void SetNameIf(void* it, const char* n)
+{
+    if (n)
+        fn_8032D868(it, n);
+}
+extern const char lbl_805EDF78[], lbl_805EDF8C[], lbl_805EDFA4[], lbl_805EDFB4[], lbl_805EDFC0[], lbl_805EDFCC[], lbl_805EDFD8[], lbl_805EDFE8[], lbl_805EDFF8[], lbl_805EE008[], lbl_805EE018[], lbl_805EE030[], lbl_805EE040[], lbl_805EE054[], lbl_805EE068[], lbl_805EE07C[], lbl_805EE094[], lbl_805EE0AC[], lbl_805EE0C8[], lbl_805EE0DC[], lbl_805EE0F0[];
+extern const char lbl_806660E8[];
+extern int lbl_8062054C[];
+extern const float lbl_805EE128, lbl_805EE12C, lbl_805EE130, lbl_805EE134;
+extern "C" void fn_8032E70C(void* item, const char* name, float a, float b, float c, float d);
 extern const char lbl_805EDDD4[];
 extern int lbl_80691DD8;
 extern "C" {
@@ -489,7 +519,7 @@ Menu* fn_80332978(Menu* p, int a)
     fn_8032D868(bC, lbl_805EDEDC);
     bC->m48 = (char*)p + 0x520;
     bC->m8 = lbl_80666E20;
-    fn_80333848((char*)p + 0x520, p);
+    fn_80333848((Menu*)((char*)p + 0x520), (int)p);
     fn_8032F120((char*)p + 0x9F4, lbl_805EDEF0, 0);
     fn_8032F120((char*)p + 0xA48, lbl_805EDF08, 0);
     fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
@@ -530,6 +560,79 @@ void fn_80332CA0(Menu* p)
 }
 
 void fn_80332DB8() {}
+
+/* near-miss: 242/242 instructions, 22 slots: only the `li r5,K` / `mr r3,<item>` order of the
+ * eleven fn_8032F120 calls differs (see fn_80333A70). */
+Menu* fn_80332DBC(Menu* p, int a)
+{
+    void* i0 = (char*)p + 0X2E0;
+    void* i1 = (char*)p + 0X334;
+    void* i2 = (char*)p + 0X394;
+    void* i3 = (char*)p + 0X3E8;
+    void* i4 = (char*)p + 0X43C;
+    void* i5 = (char*)p + 0X490;
+    void* i6 = (char*)p + 0X4E4;
+    void* i7 = (char*)p + 0X538;
+    void* i8 = (char*)p + 0X58C;
+    void* i9 = (char*)p + 0X5E0;
+    void* i10 = (char*)p + 0X634;
+    void* i11 = (char*)p + 0X688;
+    void* i12 = (char*)p + 0X6DC;
+    void* i13 = (char*)p + 0X730;
+    void* i14 = (char*)p + 0X784;
+    void* i15 = (char*)p + 0X7D8;
+    void* i16 = (char*)p + 0X82C;
+    void* i17 = (char*)p + 0X880;
+    void* i18 = (char*)p + 0X8D4;
+    void* i19 = (char*)p + 0X938;
+    void* i20 = (char*)p + 0X99C;
+    MenuInit(p, a);
+    p->m2DC = lbl_806660E8;
+    fn_8032F120(i0, lbl_805EDF78, 0);
+    fn_8032F428(i1, lbl_805EDF8C, lbl_8062054C, 4, 0);
+    fn_8032F120(i2, lbl_805EDFA4, 1);
+    fn_8032F120(i3, lbl_805EDFB4, 1);
+    fn_8032F120(i4, lbl_805EDFC0, 1);
+    fn_8032F120(i5, lbl_805EDFCC, 1);
+    fn_8032F120(i6, lbl_805EDFD8, 1);
+    fn_8032F120(i7, lbl_805EDFE8, 1);
+    fn_8032F120(i8, lbl_805EDFF8, 1);
+    fn_8032F120(i9, lbl_805EE008, 1);
+    fn_8032F120(i10, lbl_805EE018, 1);
+    fn_8032F120(i11, lbl_805EE030, 1);
+    fn_8032F120(i12, lbl_805EE040, 1);
+    fn_8032F120(i13, lbl_805EE054, 1);
+    fn_8032F120(i14, lbl_805EE068, 1);
+    fn_8032F120(i15, lbl_805EE07C, 0);
+    fn_8032F120(i16, lbl_805EE094, 1);
+    fn_8032F120(i17, lbl_805EE0AC, 1);
+    fn_8032E70C(i18, lbl_805EE0C8, 0.33f, 0.01f, 0.0f, 1.0f);
+    fn_8032E70C(i19, lbl_805EE0DC, 0.33f, 0.01f, 0.0f, 1.0f);
+    fn_8032EC38(i20, lbl_805EE0F0, 0, 1, 0, 0x200);
+    fn_80330ACC(p, (MItem*)i0);
+    fn_80330ACC(p, (MItem*)i1);
+    fn_80330ACC(p, (MItem*)i2);
+    fn_80330ACC(p, (MItem*)i3);
+    fn_80330ACC(p, (MItem*)i4);
+    fn_80330ACC(p, (MItem*)i5);
+    fn_80330ACC(p, (MItem*)i6);
+    fn_80330ACC(p, (MItem*)i7);
+    fn_80330ACC(p, (MItem*)i8);
+    fn_80330ACC(p, (MItem*)i9);
+    fn_80330ACC(p, (MItem*)i10);
+    fn_80330ACC(p, (MItem*)i11);
+    fn_80330ACC(p, (MItem*)i12);
+    fn_80330ACC(p, (MItem*)i13);
+    fn_80330ACC(p, (MItem*)i14);
+    fn_80330ACC(p, (MItem*)i15);
+    fn_80330ACC(p, (MItem*)i16);
+    fn_80330ACC(p, (MItem*)i17);
+    fn_80330ACC(p, (MItem*)i18);
+    fn_80330ACC(p, (MItem*)i19);
+    fn_80330ACC(p, (MItem*)i20);
+    lbl_8061651C = 0;
+    return p;
+}
 
 void fn_80333184(Menu* p, int k)
 {
@@ -594,6 +697,24 @@ void fn_803337EC()
     fn_8005C410(fn_8005BA9C(), 1, lbl_80620544);
 }
 
+Menu* fn_80333848(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666188;
+    fn_8032E894((char*)p + 0x2E0, lbl_805EE138, &lbl_8061E6A0, lbl_8061E6A0, 0.1f, 0.0f, 100.0f);
+    fn_8032E894((char*)p + 0x344, lbl_805EE144, &lbl_8061E6A4, lbl_8061E6A4, 0.1f, 0.0f, 100.0f);
+    fn_8032E894((char*)p + 0x3A8, lbl_805EE150, &lbl_8061E6A8, lbl_8061E6A8, 0.1f, 0.0f, 100.0f);
+    fn_8032E894((char*)p + 0x40C, lbl_805EE160, &lbl_8061E6AC, lbl_8061E6AC, 0.1f, 0.0f, 100.0f);
+    fn_8032E894((char*)p + 0x470, lbl_805EE16C, &lbl_8061E6B0, lbl_8061E6B0, 0.1f, 0.0f, 100.0f);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x344));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x3A8));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x40C));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x470));
+    p->m174 = 0;
+    return p;
+}
+
 void fn_803339D4(Menu* p, int k) { fn_80330BC8(p, k); }
 
 void fn_803339F4(Menu* p)
@@ -606,6 +727,32 @@ void fn_803339F4(Menu* p)
 }
 
 void fn_80333A6C() {}
+
+/* near-miss: 2 slots, only `li r5,0` / `mr r3,<item>` swapped in the first call (retail issues the
+ * li first). Same effect as fn_80331DB8 and fn_80332DBC; free-function, reference-parameter and
+ * method-call spellings all give the other order. */
+Menu* fn_80333A70(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666048;
+    fn_8032F120((char*)p + 0x2E0, lbl_805EE194, 0);
+    fn_8032F120((char*)p + 0x334, lbl_805EE1A8, 0);
+    ItemB* l0 = (ItemB*)((char*)p + 0x388);
+    LabelInit(l0, lbl_805EE1BC);
+    ItemB* l1 = (ItemB*)((char*)p + 0x3D0);
+    LabelInit(l1, lbl_805EE1D8);
+    fn_80330ACC(p, (MItem*)l0);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)l1);
+    for (int i = 0; i < 15; i++) {
+        char* b = (char*)p + 0x418;
+        int off = i * 4;
+        MItem* it = fn_8032EC38(operator new(0x68, 0), lbl_80620430[i], 0x3C, 1, 0, 100);
+        *(MItem**)(b + off) = it;
+        fn_80330ACC(p, it);
+    }
+    return p;
+}
 
 void fn_80333BE8(Menu* p, int c)
 {
@@ -686,6 +833,42 @@ void fn_80333F3C(Menu* p)
 void fn_80333FB4() {}
 
 void fn_80333FB8(Menu* p, int k) { fn_80330BC8(p, k); }
+
+Menu* fn_80333FD8(Menu* p, int a)
+{
+    int i;
+    MenuInit(p, a);
+    p->m2DC = lbl_80666098;
+    fn_8032F120((char*)p + 0x2E0, lbl_805EE1EC, 0);
+    ItemB* l0 = (ItemB*)((char*)p + 0x3AC);
+    LabelInit(l0, lbl_805EE204);
+    fn_8032EC38((char*)p + 0x3F4, lbl_805EE218, 0, 1, -5, 5);
+    ItemB* l1 = (ItemB*)((char*)p + 0x45C);
+    LabelInit(l1, lbl_805EE234);
+    fn_8032EC38((char*)p + 0x4A4, lbl_805EE218, 0, 1, -5, 5);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)l0);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x3F4));
+    for (i = 0; i < 15; i++) {
+        char* b = (char*)p + 0x334;
+        int off = i * 4;
+        MItem* it = fn_8032EC38(operator new(0x68, 0), lbl_8062046C[i], 0x3C, 1, 0, 100);
+        *(MItem**)(b + off) = it;
+        fn_80330ACC(p, it);
+    }
+    fn_80330ACC(p, (MItem*)l1);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x4A4));
+    for (i = 0; i < 15; i++) {
+        char* b = (char*)p + 0x370;
+        int off = i * 4;
+        MItem* it = fn_8032EC38(operator new(0x68, 0), lbl_806204A8[i], 0x3C, 1, 0, 100);
+        *(MItem**)(b + off) = it;
+        fn_80330ACC(p, it);
+    }
+    SetNameIf(*(void**)((char*)p + 0x334), lbl_805EE248);
+    SetNameIf(*(void**)((char*)p + 0x370), lbl_805EE25C);
+    return p;
+}
 
 void fn_8033421C(Menu* p, int c)
 {
@@ -780,6 +963,25 @@ void fn_80334604(Menu* p)
     fn_8009DC48(m->m6F8->m14, GetV2(IAt(p, 0x3F4)));
     fn_8009DC48((char*)m->m6F8->m14 + 0xE64, GetV2(IAt(p, 0x4A4)));
     fn_8017E264(m->m700);
+}
+
+Menu* fn_80334714(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80665FF8;
+    ItemB* i0 = (ItemB*)((char*)p + 0x2E0);
+    LabelInit(i0, lbl_805EECE0);
+    fn_8032F428((char*)p + 0x328, lbl_805EECF4, lbl_806205B4, 4, 0);
+    fn_80330ACC(p, (MItem*)i0);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x328));
+    for (int i = 0; i < 0x59; i++) {
+        char* b = (char*)p + 0x388;
+        int off = i * 4;
+        MItem* it = fn_8032EC38(operator new(0x68, 0), lbl_806205C4[i], 0, 1, 0, 100);
+        *(MItem**)(b + off) = it;
+        fn_80330ACC(p, it);
+    }
+    return p;
 }
 
 void fn_80334848(Menu* p, int c)
