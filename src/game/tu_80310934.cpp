@@ -192,6 +192,7 @@ inline void CopyV3(Unk80310934_V3* d, const Unk80310934_V3* s)
     *d = *s;
 }
 
+/* near-miss: retail copies the 12 bytes with plain displacements off r3; ours forms two address registers (inline CopyV3 tried) */
 void fn_80311F10(Unk80310934_Cp* p)
 {
     CopyV3(&p->m20, &p->m3C);
@@ -202,6 +203,7 @@ Unk80310934_O1C* fn_80311F2C()
     return (Unk80310934_O1C*)fn_8037C7FC()->fn_8037CE98(0x10B3208E, lbl_8061FE88, 0);
 }
 
+/* near-miss: retail computes addi r3,r30,4 before the store of 0 to +0 */
 void* fn_80311F64(Unk80310934_I0* p)
 {
     void* q = (char*)p + 4;
@@ -245,6 +247,7 @@ inline void ClearZ(Unk80310934_Z* z)
     z->m0 = 0;
 }
 
+/* near-miss: retail copies r3 to r9 first and stores +4..+0x18 before +0 */
 void fn_80312064(Unk80310934_Z* p)
 {
     ClearZ(p);
