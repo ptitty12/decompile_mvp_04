@@ -19,8 +19,7 @@ animation/choosers/playeridchooser.cpp:
 
 ealibs/tu_803D7ED4.cpp:
 	.text       start:0x803D7ED4 end:0x803D8234
-	.ctors      start:0x805A2CD0 end:0x805A2CD4
-	.bss        start:0x806AA910 end:0x806AA920
+	.ctors      start:0x805A2CD4 end:0x805A2CD8
 
 ealibs/tu_803D9FE8.cpp:
 	.text       start:0x803D9FE8 end:0x803DA188
