@@ -349,6 +349,62 @@ int fn_8006FB28(void* l, int k, int c)
     return r;
 }
 
+/* near-miss: 2 slots; case 0 loads m24 after the c*4 shift where retail loads it first. */
+void fn_8006FC40(void* l, int k, int c, int v)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    if ((unsigned)c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0: {
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+                r->b0 = v;
+            } else {
+                r->b0 = 0xFF;
+            }
+            return;
+        }
+        case 1: {
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+                r->b1 = v;
+            } else {
+                r->b1 = 0xFF;
+            }
+            return;
+        }
+        case 2: {
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f2 = v;
+            return;
+        }
+        case 3: {
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            int t;
+            if (v <= 0xFF) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0xFF;
+            }
+            r->f3 = t;
+            return;
+        }
+        }
+    }
+}
+
 float fn_8006FD44(W* w, int a)
 {
     float x = (float)w->v28(1, a);
