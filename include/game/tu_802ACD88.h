@@ -37,4 +37,44 @@ struct Unk802B5234_V3 {
     float z;
 };
 
+/* Name/value table (fn_802B1D44 ctor, fn_802B1E38 insert, fn_802B1EE8 lookup):
+   32 records {char name[0x14]; int val;} of 0x18 bytes, count at +0x300. */
+struct Unk802B0ACC_Rec {
+    char name[0x14];
+    int val;
+};
+
+struct Unk802B0ACC_T {
+    Unk802B0ACC_Rec e[32];
+    int m300;
+    int m304;
+    int m308;
+    int m30C;
+    int m310;
+    int m314;
+    int m318;
+    int m31C;
+    int m320;
+    int m324;
+    int m328;
+    struct {
+        int a;
+        int b;
+    } g[20];
+    char pad3CC_[0x3CC - 0x32C - 0xA0];
+    char m3CC[0x18];
+    int m3E4;
+    char pad3E8[4];
+    int m3EC;
+    int m3F0;
+    int m3F4;
+};
+
+struct Unk802B0ACC_V4 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+
 #endif /* GAME_TU_802ACD88_H */
