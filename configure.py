@@ -357,9 +357,8 @@ cflags_libgcc = ["-O2", "-G0"]
 # exception tables in the binary. See docs/DECISIONS.md.
 cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
-# EA shared libraries (ProDG 3.9.3). Unlike game code they use r13 small data, so no -G0.
-cflags_ealib = ["-Os", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
-# EA shared libraries (ProDG 3.9.3). Provisional: -G0 not yet confirmed for these.
+# EA shared libraries (ProDG 3.9.3). Provisional: -G0 is what the matched units
+# were verified with; W5 reported r13 small-data use in places, so confirm per unit.
 cflags_ealib = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions"]
 
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
@@ -409,19 +408,6 @@ config.libs = [
             Object(Matching, "animation/choosers/tu_80271748.cpp"),
             Object(Matching, "animation/choosers/tu_80271940.cpp"),
             Object(Matching, "animation/choosers/tu_80271C64.cpp"),
-            Object(NonMatching, "ealib/tu_8036E65C.cpp"),
-            Object(NonMatching, "ealib/tu_8036D8AC.cpp"),
-            Object(NonMatching, "ealib/tu_8036CC08.cpp"),
-            Object(NonMatching, "ealib/tu_8036BECC.cpp"),
-            Object(NonMatching, "ealib/tu_8036AEE4.cpp"),
-            Object(NonMatching, "ealib/tu_8036A490.cpp"),
-            Object(NonMatching, "ealib/tu_80369878.cpp"),
-            Object(NonMatching, "ealib/tu_80368E64.cpp"),
-            Object(NonMatching, "ealib/tu_803682A8.cpp"),
-            Object(NonMatching, "ealib/tu_80367658.cpp"),
-            Object(NonMatching, "ealib/tu_80367140.cpp"),
-            Object(NonMatching, "ealib/tu_803666EC.cpp"),
-            Object(NonMatching, "ealib/tu_803663B0.cpp"),
         ],
     },
     {
@@ -430,6 +416,19 @@ config.libs = [
         "cflags": cflags_ealib,
         "progress_category": "game",
         "objects": [
+            Object(NonMatching, "ealib/tu_803663B0.cpp"),
+            Object(NonMatching, "ealib/tu_803666EC.cpp"),
+            Object(NonMatching, "ealib/tu_80367140.cpp"),
+            Object(NonMatching, "ealib/tu_80367658.cpp"),
+            Object(NonMatching, "ealib/tu_803682A8.cpp"),
+            Object(NonMatching, "ealib/tu_80368E64.cpp"),
+            Object(NonMatching, "ealib/tu_80369878.cpp"),
+            Object(NonMatching, "ealib/tu_8036A490.cpp"),
+            Object(NonMatching, "ealib/tu_8036AEE4.cpp"),
+            Object(NonMatching, "ealib/tu_8036BECC.cpp"),
+            Object(NonMatching, "ealib/tu_8036CC08.cpp"),
+            Object(NonMatching, "ealib/tu_8036D8AC.cpp"),
+            Object(NonMatching, "ealib/tu_8036E65C.cpp"),
             Object(NonMatching, "ealib/tu_8036FEA0.cpp"),
             Object(NonMatching, "ealib/tu_803708F4.cpp"),
             Object(NonMatching, "ealib/tu_80371348.cpp"),
