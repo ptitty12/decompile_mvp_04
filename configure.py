@@ -348,9 +348,22 @@ def MatchingFor(*versions):
 
 config.warn_missing_config = True
 config.warn_missing_source = False
-# No translation units are configured yet: every object is linked from the
-# dtk split (assembly). Units are added here as they are identified/matched.
-config.libs = []
+
+# SN's libgcc (GCC 2.95.3 runtime as shipped with ProDG). See docs/DECISIONS.md.
+cflags_libgcc = ["-O2", "-G0"]
+
+# Units not listed here are linked from the dtk split (assembly).
+config.libs = [
+    {
+        "lib": "libgcc",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_libgcc,
+        "progress_category": "sdk",
+        "objects": [
+            Object(Matching, "libgcc/_main.c"),
+        ],
+    },
+]
 
 
 # Optional callback to adjust link order. This can be used to add, remove, or reorder objects.
