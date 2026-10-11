@@ -693,10 +693,11 @@ extern "C" DB_OVERLAY unsigned fn_8052FDC8(Unk8052FA84_List* self)
 
 extern "C" DB_OVERLAY void fn_8052FDD8(Unk8052FA84_List* self, int a, int c)
 {
+    Unk8052E4C0_Obj* o = self->m4;
     int t = 0;
     if (c != 0)
         t = 1;
-    self->m4->flag = t;
+    o->flag = t;
 }
 
 extern "C" DB_OVERLAY unsigned fn_8052FDFC(Unk8052FA84_List* self)
