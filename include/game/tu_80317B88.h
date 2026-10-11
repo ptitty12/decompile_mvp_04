@@ -512,6 +512,9 @@ struct FxAIC {
 struct FxAIB {
     char pad0[0x564];
     FxAIC* m564;
+    char pad568[0xf4];
+    int a65C[13];
+    char pad690[0x10];
 };
 /* Two-level record walked by fn_80326DF0 / fn_80326E64 (ring of 16-byte entries). */
 struct FxRingH {
@@ -541,6 +544,40 @@ struct FxEnt {
 };
 struct FxPtr { FxZT* m0; };
 typedef int (*FxPred)(FxZ*, int);
+/* Pointer holder passed by pointer to the struct-returning lookups (fn_80326F44 ..).
+ * Base of the effect classes (ctor fn_803282A8 / fn_80328318, dtor fn_80328374; vptr at +0x18,
+ * vtables lbl_80664020 -> lbl_80666F98 while the dtor runs). */
+struct FxBase {
+    char pad0[0x14];
+    int m14;
+    const void* m18;
+    int m1C;
+    int m20;
+    char pad24[0x1c];
+};
+struct FxMS {
+    unsigned char m;
+    unsigned char s;
+};
+struct FxSing {
+    int m0;
+    int m4;
+    const void* m8;
+    FxSing();
+};
+class FxSingV {
+public:
+    int m0;
+    int m4;
+    virtual ~FxSingV();
+};
+/* Minutes / seconds pair packed in a halfword (fn_8032A0C0, fn_8032A118, fn_8032A278).
+ * Singleton helper with vptr lbl_80665E60 at +8 (ctor fn_80329908, dtor fn_80329924).
+ * Entry of the 0xFA-element table at lbl_806E2274 (fn_803296E8 searches for a free one). */
+struct FxSlot8 {
+    int m0;
+    int m4;
+};
 // STRUCTS-END
 
 extern int lbl_8061FF50;
