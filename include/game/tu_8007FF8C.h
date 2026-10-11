@@ -187,4 +187,23 @@ struct Unk8007FF8C_PObj {
 };
 typedef float (Unk8007FF8C_PObj::*Unk8007FF8C_Pmf)(int);
 
+/* Store-only variant of the counter above: the slot is written, but the loop
+ * reads the value it passes in (see Unk8008CE64_IterW). */
+template <int N>
+struct Unk8007FF8C_IterW {
+    int i;
+    Unk8007FF8C_IterW() { i = 0; }
+    ~Unk8007FF8C_IterW() {}
+    int Next(int c)
+    {
+        int n;
+        if (c > N)
+            n = c;
+        else
+            n = c + 1;
+        i = n;
+        return n;
+    }
+};
+
 #endif

@@ -252,11 +252,11 @@ void fn_8007FB6C(C* self, int idx)
     fn_8052BD40(self->mC[idx]);
 }
 
-/* near-miss: three slots differ (register choice for the base and the sum;
- * retail keeps b*12+4 in its own register and uses lwzx). */
 int fn_8007FB98(C* self, int a, int b, int c)
 {
-    return ((Unk8007F198_Sub*)((char*)self->mC[c]->m8 + a * 0x1C + 4) + b)->w0;
+    char* base = (char*)(a * 0x1C + (int)self->mC[c]->m8);
+    int o = b * 12 + 4;
+    return *(int*)(base + o);
 }
 
 unsigned fn_8007FBC0(C* self, int a, int c)
@@ -279,10 +279,10 @@ int fn_8007FC20(C* self, int a, int c)
     return self->mC[c]->m8[a].w0.c;
 }
 
-/* near-miss: the sub-entry address is summed in other registers (4 slots). */
 int fn_8007FC40(C* self, int a, int b, int n, int c)
 {
-    Unk8007F198_Sub* s = ((Unk8007F198_Sub*)((char*)self->mC[c]->m8 + a * 0x1C + 4) + b);
+    char* base = (char*)(a * 0x1C + (int)self->mC[c]->m8);
+    Unk8007F198_Sub* s = (Unk8007F198_Sub*)(base + 4) + b;
     int r = 0;
     switch (n) {
     case 0: r = s->w1.n20; break;
