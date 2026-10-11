@@ -28,6 +28,7 @@ void fn_8035686C(void* p, int chrg);
 extern char lbl_8064B298[];
 extern char lbl_806646F0[];
 extern char lbl_80665DC0[];
+extern char lbl_80666548[];
 #include "game/chooser.h"
 void fn_803E47E8(void* p);
 void fn_802D1278(void* p);
@@ -51,6 +52,30 @@ inline void Unk8035FAA0_Inl(char* p)
     *(const void**)(p + 0x58) = lbl_8064B298;
     *(const void**)(p + 0x8) = lbl_80666EC0;
 }
+struct Unk80330870 {
+    char pad0[0x2E0];
+    ~Unk80330870();
+};
+struct Unk8035FC78_VB {
+    char pad0[8];
+    virtual ~Unk8035FC78_VB();
+};
+struct Unk8035FC78_E : Unk8035FC78_VB {
+    char pad1[0x68 - 0xC];
+};
+struct Unk8035FC78_M {
+    int m0;
+    int m4;
+    const void* m8;
+    ~Unk8035FC78_M() { m8 = lbl_80666EC0; }
+};
+struct Unk8035FC78 : Unk80330870 {
+    Unk8035FC78_E m2E0[32];
+    Unk8035FC78_M mFE0;
+    char padFEC[0x1300 + 4 - 0xFEC];
+    ~Unk8035FC78();
+};
+void fn_80359604(void* p, int chrg);
 
 void fn_8035F69C(Unk8035F69C* s)
 {
@@ -264,6 +289,76 @@ void fn_8035FC14(U* self, int chrg)
     PUT(0x424, lbl_80666EC0);
     PUT(0x3d0, lbl_80666EC0);
     PUT(0x37c, lbl_80666EC0);
+    PUT(0x2e8, lbl_80666EC0);
+    fn_80330870(self, chrg);
+}
+
+Unk8035FC78::~Unk8035FC78()
+{
+    CPUT(0x1300, lbl_80666EC0);
+    CPUT(0x1298, lbl_80666EC0);
+    CPUT(0x1230, lbl_80666EC0);
+    CPUT(0x11C8, lbl_80666EC0);
+    CPUT(0x1160, lbl_80666EC0);
+    CPUT(0x10F8, lbl_80666EC0);
+    CPUT(0x1090, lbl_80666EC0);
+    CPUT(0x103C, lbl_80666EC0);
+}
+
+/* near-miss: 2 slots; retail emits stw 0x1118 before addi r9,r9,lbl_80666548@l (after lis r9 / addi r11,this+0x524); ours puts the addi first. Tried the vptr in a local before or after s0. */
+void fn_8035FD1C(U* self, int chrg)
+{
+    PUT(0x1598, lbl_80666EC0);
+    PUT(0x1544, lbl_80666EC0);
+    PUT(0x14f0, lbl_80666EC0);
+    PUT(0x148c, lbl_80666EC0);
+    PUT(0x1438, lbl_80666EC0);
+    PUT(0x13e4, lbl_80666EC0);
+    PUT(0x1390, lbl_80666EC0);
+    PUT(0x133c, lbl_80666EC0);
+    PUT(0x12e8, lbl_80666EC0);
+    PUT(0x1294, lbl_80666EC0);
+    PUT(0x1240, lbl_80666EC0);
+    PUT(0x11ec, lbl_80666EC0);
+    PUT(0x1198, lbl_80666EC0);
+    fn_80359604((char*)self + 0x1174, 2);
+    char* s0 = (char*)self + 0x524;
+    PUT(0x1118, lbl_80666EC0);
+    PUT(0x10b4, lbl_80666EC0);
+    PUT(0x1050, lbl_80666EC0);
+    PUT(0xfec, lbl_80666EC0);
+    PUT(0xf98, lbl_80666EC0);
+    PUT(0xf44, lbl_80666EC0);
+    PUT(0xef0, lbl_80666EC0);
+    PUT(0xe9c, lbl_80666EC0);
+    PUT(0xe48, lbl_80666EC0);
+    PUT(0xdf4, lbl_80666EC0);
+    PUT(0xda0, lbl_80666EC0);
+    PUT(0xd4c, lbl_80666EC0);
+    PUT(0xcf8, lbl_80666EC0);
+    PUT(0xca4, lbl_80666EC0);
+    PUT(0xc50, lbl_80666EC0);
+    PUT(0xbfc, lbl_80666EC0);
+    PUT(0xba8, lbl_80666EC0);
+    PUT(0xb54, lbl_80666EC0);
+    PUT(0xb00, lbl_80666EC0);
+    PUT(0xaac, lbl_80666EC0);
+    PUT(0xa58, lbl_80666EC0);
+    PUT(0xa04, lbl_80666EC0);
+    PUT(0x9b0, lbl_80666EC0);
+    PUT(0x95c, lbl_80666EC0);
+    PUT(0x908, lbl_80666EC0);
+    *(const void**)(s0 + 0x2DC) = lbl_80666548;
+    PUT(0x8b4, lbl_80666EC0);
+    PUT(0x860, lbl_80666EC0);
+    PUT(0x80c, lbl_80666EC0);
+    fn_80330870(s0, 2);
+    PUT(0x4e0, lbl_80666EC0);
+    PUT(0x48c, lbl_80666EC0);
+    PUT(0x438, lbl_80666EC0);
+    PUT(0x3e4, lbl_80666EC0);
+    PUT(0x390, lbl_80666EC0);
+    PUT(0x33c, lbl_80666EC0);
     PUT(0x2e8, lbl_80666EC0);
     fn_80330870(self, chrg);
 }
