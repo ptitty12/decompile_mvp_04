@@ -73,4 +73,58 @@ struct Unk80089894_PackTab {
     Unk80089894_Pack* m24;
 };
 
+/* Second 12-byte packed record layout (fn_8008BF58): three words split into
+ * 8/6/9/7/2, 8/6/6/7/5 and 5/10/17 bits. */
+struct Unk80089894_PackB {
+    unsigned a0 : 8;
+    unsigned a1 : 6;
+    unsigned a2 : 9;
+    unsigned a3 : 7;
+    unsigned a4 : 2;
+    unsigned b0 : 8;
+    unsigned b1 : 6;
+    unsigned b2 : 6;
+    unsigned b3 : 7;
+    unsigned b4 : 5;
+    unsigned c0 : 5;
+    unsigned c1 : 10;
+    unsigned c2 : 17;
+};
+
+struct Unk80089894_PackTabB {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk80089894_PackB* m24;
+};
+
+/* Third 12-byte packed record layout (fn_8008B42C): 8/9/2/6/6/1, 8/8/7/7/2 and
+ * 6/6/6/6/6/2 bits. */
+struct Unk80089894_PackC {
+    unsigned a0 : 8;
+    unsigned a1 : 9;
+    unsigned a2 : 2;
+    unsigned a3 : 6;
+    unsigned a4 : 6;
+    unsigned a5 : 1;
+    unsigned b0 : 8;
+    unsigned b1 : 8;
+    unsigned b2 : 7;
+    unsigned b3 : 7;
+    unsigned b4 : 2;
+    unsigned c0 : 6;
+    unsigned c1 : 6;
+    unsigned c2 : 6;
+    unsigned c3 : 6;
+    unsigned c4 : 6;
+    unsigned c5 : 2;
+};
+
+struct Unk80089894_PackTabC {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk80089894_PackC* m24;
+};
+
 #endif
