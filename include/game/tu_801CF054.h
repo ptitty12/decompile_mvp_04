@@ -15,7 +15,7 @@ struct Unk801CF054_Y {
     char pad8[0x28 - 8];
     int m28;
     void* m2C;
-    void* m30;
+    Unk801B7FB0_P* m30;
     void* m34;
     int m38;
     char pad3C[8];
@@ -23,6 +23,12 @@ struct Unk801CF054_Y {
     char m6C[4];
     char pad70[0x1F4 - 0x70];
     int m1F4;
+};
+
+/* Object at game->mC->mC (Unk80087A58_O in game/tu_80087A58.h): only +0x174C is read here. */
+struct Unk801CF054_O {
+    char pad0[0x174C];
+    int m174C;
 };
 
 #endif

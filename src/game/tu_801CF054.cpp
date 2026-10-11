@@ -5,8 +5,16 @@
 #include "game/tu_801CF054.h"
 
 typedef Unk801CF054_Y Y;
+typedef Unk801B7FB0_P P;
+extern const char lbl_805D26C8[];
+extern float lbl_805D26E8;
+extern float lbl_805D26EC;
+extern float lbl_805D26F0;
 
 extern "C" {
+void fn_801D04C0(Y* y);
+int fn_801A2034(Unk801B7FB0_P* p, int k);
+void fn_80303CA0(const char* fmt, ...);
 void fn_8035B1C8(void* p);
 void fn_801D6FE4(void* p);
 void fn_801D5CF0(Y* y);
@@ -32,6 +40,7 @@ extern "C" int fn_801D0294(Y* y)
         return 0;
     }
 }
+
 extern "C" int fn_801D02E0(Y* y)
 {
     switch (y->m4) {
@@ -49,6 +58,7 @@ extern "C" int fn_801D02E0(Y* y)
         return 0;
     }
 }
+
 extern "C" int fn_801D0314(Y* y)
 {
     switch (y->m4) {
@@ -68,6 +78,7 @@ extern "C" int fn_801D0314(Y* y)
         return 0;
     }
 }
+
 extern "C" int fn_801D0368(Y* y)
 {
     switch (y->m4) {
@@ -108,6 +119,35 @@ extern "C" void fn_801D03FC(Y* y, void* a, Unk801B7FB0_P* p)
 }
 
 extern "C" void fn_801D043C(void) {}
+
+extern "C" void fn_801D0440(Y* y)
+{
+    if (y->m38 == 0) {
+        P* c = y->m30->m6CC;
+        if (c->m38C == 2 && !(c->m3F4 <= 0.033333335f || c->m3F4 >= 0.5f)) {
+            fn_801D04C0(y);
+            y->m38 = 1;
+        }
+    }
+}
+
+extern "C" int fn_801D0BB0(Y* y)
+{
+    int e = y->m30->m6F8->m14->m1CD0 == 0;
+    int ok = fn_801A2034(y->m30, e) != -1 ? 1 : 0;
+    if (!ok)
+        return 2;
+    return y->m30->m6F8->m10->m14[e];
+}
+
+extern "C" int fn_801D112C(Y* y)
+{
+    int v = ((Unk801CF054_O*)y->m30->m6F8->mC->mC)->m174C;
+    if (v)
+        fn_80303CA0("CPU sees obvious repeat pitch", lbl_805D26E8, lbl_805D26EC, lbl_805D26F0);
+    return v;
+}
+
 extern "C" int fn_801D0C30(void) { return 1; }
 
 extern "C" int fn_801D1198(Y* y) { return fn_8022F138(((Unk801C16B0_M4*)y->m34)->m3B0) != 0; }
