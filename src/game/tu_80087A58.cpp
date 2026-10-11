@@ -378,7 +378,7 @@ extern float lbl_805B4758;
 
 
 extern "C" void* fn_803774A8(unsigned size, int heap);
-void fn_80089368(void* p);
+void* fn_80089368(void* p);
 void fn_8008928C(O* o);
 
 
@@ -387,6 +387,12 @@ extern float lbl_805B486C;
 
 extern "C" int fn_80353D9C(void* p);
 void fn_80087D5C(H* h, int a, int b, int c);
+
+
+
+
+
+extern "C" void fn_8040B320(void* p, int v, int n);
 
 
 void fn_80087A58(O* s, int a, char v, int w, int flag)
@@ -636,6 +642,20 @@ int fn_800882D0(O* o)
     return Cnt14(&o->mF60);
 }
 
+/* near-miss (24 slots): retail keeps o in r12 and the entry offset as a separate counter. */
+inline E* AtE3(H* h, unsigned i) { return &h->e[i]; }
+int fn_80088314(O* o, int a, int b)
+{
+    int n = 0;
+    unsigned cnt = o->mF60.m7D0;
+    for (unsigned i = 0; i < cnt; i++) {
+        E* e = AtE3(&o->mF60, i);
+        if (e->m10 == 14 && e->m0 != a && o->mF5C[e->m8 + e->mC - 1].m0 == b)
+            n++;
+    }
+    return n;
+}
+
 int fn_8008838C(O* o, int a, int b)
 {
     int n = 0;
@@ -777,6 +797,83 @@ int fn_80089348(void* x, int t, int* out)
         return 2;
     }
     return 3;
+}
+
+/* near-miss (many slots): retail walks the outer loop on a pointer compared against base + 0xC00 with
+ * a byte-offset counter; the mid/inner loops are count-down (addic./bdnz) and the entry is written
+ * through stwu r9,0x50(r11). Not reproduced. */
+void* fn_80089368(void* pp)
+{
+    char* p = (char*)pp;
+    fn_8040B320(p + 0x50, 0, 0xF00);
+    char* q = p;
+    int off = 0;
+    do {
+        int b = 0;
+        int boff = 0;
+        char* cnt = off + p;
+        do {
+            int c = 0;
+            *cnt = 0;
+            int coff = 0;
+            do {
+                int* e = (int*)(coff + (boff + (int)q));
+                e[0x50 / 4] = 0;
+                int k = 0;
+                int koff = 0;
+                do {
+                    *(int*)((char*)e + 0x50 + 4 + koff) = 0;
+                    koff += 4;
+                    k++;
+                } while (k < 5);
+                coff += 0x18;
+                c++;
+            } while (c < 2);
+            b++;
+            boff += 0x30;
+            cnt++;
+        } while (b <= 15);
+        q += 0x300;
+        off += 0x10;
+    } while (q <= p + 0xC00);
+    return p;
+}
+
+void fn_800895F8(char* base, int a, int b, int c, Unk80087A58_V2* v)
+{
+    Unk80087A58_V2 p = *v;
+    int k = fn_80089114(base, &p);
+    int o = fn_80089304(base, c) * 4;
+    char* e = (char*)(k * 0x18 + (b * 0x30 + (a * 0x300 + (int)base)));
+    e += 0x50;
+    char* b4 = e + 4;
+    *(int*)(b4 + o) = *(int*)(b4 + o) + 1;
+    *(int*)e = *(int*)e + 1;
+    int idx = b + a * 0x10;
+    base[idx] = base[idx] + 1;
+}
+
+/* near-miss (3 slots, register only): retail keeps the else-branch byte offset in r10, here r0. */
+void fn_800896AC(char* base, int a, int b, int c, Unk80087A58_V2* v)
+{
+    Unk80087A58_V2 p = *v;
+    int k = fn_80089114(base, &p);
+    int extra = 0;
+    int t = fn_80089348(base, c, &extra);
+    char* e = (char*)(k * 0x18 + (b * 0x30 + (a * 0x300 + (int)base)));
+    e += 0x50;
+    if (extra != 0 && t == 2) {
+        int o = t * 4;
+        char* b4 = e + 4;
+        *(int*)(b4 + o) = *(int*)(b4 + o) + extra;
+    } else {
+        int o = t * 4;
+        char* b4 = e + 4;
+        *(int*)(b4 + o) = *(int*)(b4 + o) + 1;
+    }
+    *(int*)e = *(int*)e + 1;
+    int idx = b + a * 0x10;
+    base[idx] = base[idx] + 1;
 }
 
 Unk80087A58_X* fn_80089798()
