@@ -27,7 +27,8 @@ struct Unk801AB63C_P {
     int m0;
     void* m4;
     Unk8019F8C0_Owner* m8;
-    char padC[0x18 - 0xC];
+    int mC;
+    char pad10[0x18 - 0x10];
     int m18;
     int m1C;
     int m20[8];
