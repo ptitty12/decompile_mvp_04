@@ -578,6 +578,80 @@ struct FxSlot8 {
     int m0;
     int m4;
 };
+struct FxView7;
+struct FxView74;
+struct FxView74 {
+    char pad0[0x20];
+    int m20;
+};
+struct FxView7 {
+    char pad0[0x3a4];
+    void* m3A4;
+};
+struct FxView {
+    char pad0[0x700];
+    FxView7* m700;
+    char pad704[0x40];
+    FxView74* m744;
+};
+struct FxApp {
+    char pad0[0x8];
+    FxView* m8;
+    char padC[0x18];
+    int m24;
+};
+class FxPageV {
+public:
+    char pad0[8];
+    virtual ~FxPageV();
+    virtual void s2();
+    virtual void s3();
+};
+/* UI page set (screens in the array from +0; current index at +0x174; fn_8032BA7C swaps pages). */
+struct FxPages {
+    FxPageV* a0[2];
+    char pad8[0x16c];
+    int m174;
+    char pad178[0x8c];
+    int m204;
+    int m208;
+    char pad20C[0x4];
+};
+/* Command object (fn_8032D868 / fn_8032D880). */
+struct FxCmd {
+    char pad0[0x10];
+    char m10[48];
+    int m40;
+    int m44;
+    void* m48;
+    int m4C;
+    int m50;
+};
+struct FxInt2 { int a; int b; };
+struct FxInt3 { int a; int b; int c; };
+class FxLabelV {
+public:
+    float m0;
+    float m4;
+    virtual ~FxLabelV();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+};
+class FxLabelD : public FxLabelV {
+public:
+    int mC;
+};
+struct FxF3 { float x; float y; float z; };
 // STRUCTS-END
 
 extern int lbl_8061FF50;
