@@ -143,10 +143,10 @@ def finish(base: str, branch: str, push: bool) -> None:
     head = git("rev-parse", "HEAD")
     ok = True
     for c in git("rev-list", "--first-parent", "--reverse", f"{base}..HEAD").splitlines():
-        git("checkout", "-q", "--detach", c)
+        git("checkout", "-q", "-f", "--detach", c)  # -f: content was checked clean at start
         print(f"  {git('log', '--oneline', '-1', c)[:70]}")
         ok = verify(f"{c}~1") and ok
-    git("checkout", "-q", branch)
+    git("checkout", "-q", "-f", branch)
     if git("rev-parse", "HEAD") != head:
         raise SystemExit("HEAD moved during verification")
     if not ok:
