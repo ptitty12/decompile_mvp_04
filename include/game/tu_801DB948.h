@@ -126,6 +126,18 @@ public:
     int m38C;
 };
 
+/* Record returned by fn_80244C84 (kind at +0x10, a sub-record at +0x18 with a flag at +0x4C). */
+struct Unk801DB948_QS {
+    char pad0[0x4C];
+    int m4C;
+};
+struct Unk801DB948_Q {
+    char pad0[0x10];
+    int m10;
+    char pad14[4];
+    Unk801DB948_QS m18;
+};
+
 /* Result of fn_801A6DB8 (flags at +4 and +0xC). */
 struct Unk801DB948_Rt {
     int m0;
@@ -136,12 +148,16 @@ struct Unk801DB948_Rt {
 
 /* Level-three object reached from the controller context (Game::m700). */
 struct Unk801DB948_J {
-    char pad0[0x3B0];
+    char pad0[0x3A4];
+    void* m3A4;
+    char pad3A8[0x3B0 - 0x3A8];
     int m3B0;
     int m3B4;
     Unk801DB948* m3B8;
     int m3BC;
-    char pad3C0[0x418 - 0x3C0];
+    char pad3C0[4];
+    int m3C4;
+    char pad3C8[0x418 - 0x3C8];
     int m418;
 };
 
@@ -153,7 +169,9 @@ struct Unk801DB948_Game {
     char m560[1];
     char pad561[0x660 - 0x561];
     Unk80270BA0_X* m660;
-    char pad664[0x6B8 - 0x664];
+    char pad664[0x688 - 0x664];
+    int m688;
+    char pad68C[0x6B8 - 0x68C];
     void* m6B8;
     char pad6BC[0x6CC - 0x6BC];
     Unk801DB948_Obj* m6CC;
@@ -223,8 +241,20 @@ struct Unk801DD660_Sub2 {
 };
 
 /* 0xAC-byte record of the table at Unk801DD660::m16C. */
+struct Unk801DB948_Vec4 : public Unk801DB948_Vec3 {
+    int w;
+};
+
 struct Unk801DD660_Rec {
-    char pad0[0xAC];
+    char pad0[4];
+    int m4;
+    char pad8[4];
+    int mC;
+    char pad10[0x28 - 0x10];
+    Unk801DB948_Vec3 m28;
+    char pad34[0x64 - 0x34];
+    Unk801DB948_Vec3 m64;
+    char pad70[0xAC - 0x70];
 };
 
 /* 0x60C-byte table (nine records), built by the out-of-line ctor fn_8035B718. */
@@ -265,9 +295,11 @@ struct Unk801DD660 : public Unk801DD660_Virt {
     int m168;
     Unk8035B718 m16C;
     float m778;
-    char pad77C[0x78C - 0x77C];
+    Unk801DB948_Vec3 m77C;
+    int m788;
     int m78C;
-    char pad790[0x798 - 0x790];
+    float m790;
+    char pad794[4];
     int m798;
     char pad79C[0x7B4 - 0x79C];
     int m7B4;
