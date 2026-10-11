@@ -308,6 +308,29 @@ void fn_801B4B88(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
     }
 }
 
+void fn_801B4C6C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    int inc = 0;
+    int s = fn_8025416C((char*)q + 0x588, 0x16);
+    if (s > 2) {
+        if (s == 4) {
+            inc = -30;
+        } else if (s == 3) {
+            inc = -15;
+        }
+        unsigned a = fn_801B608C(p, q);
+        unsigned b = fn_801B380C(p, q);
+        if (fn_801B3FD8(p, q) == 0) {
+            if (a <= b) {
+                inc = inc / 2;
+            } else {
+                inc = 0;
+            }
+        }
+        *acc += inc;
+    }
+}
+
 void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
 {
     if (q->m708 == (p->m8->m6F8->m14[2].m8 == 0)) {
