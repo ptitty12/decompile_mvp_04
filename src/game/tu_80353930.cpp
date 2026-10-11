@@ -15,6 +15,11 @@ struct DtorAt10 { char pad[0x10]; const void* m; };
 extern char lbl_80649EC0[];
 struct DtorAt8 { char pad[0x8]; const void* m; };
 
+Unk80353930::Unk80353930()
+{
+    fn_80355354(this);
+}
+
 void fn_80353984(DtorAt7E0* self, int chrg)
 {
     self->m = lbl_8064A208;
@@ -211,6 +216,26 @@ int fn_80353FB4(Unk80353E68* s, int v)
             return i;
     }
     return -1;
+}
+
+Unk803541D4_E fn_803541D4(Unk803541D4* s)
+{
+    s->mC = 0;
+    return s->m0[0];
+}
+
+Unk803541D4_E fn_80354244(Unk803541D4* s)
+{
+    int i = 0;
+    if (s->m4 != 0)
+        i = s->m4 - 1;
+    s->mC = i;
+    return s->m0[i];
+}
+
+Unk803541D4_E fn_803542CC(Unk803541D4* s)
+{
+    return s->m0[s->mC];
 }
 
 int fn_80354340(Unk80353E68* s)
