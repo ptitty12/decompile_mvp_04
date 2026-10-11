@@ -91,6 +91,7 @@ void fn_8032FB24(FxListD* self);
 void fn_8032FB78(FxListD* self, int a);
 int fn_8032FBCC(int* a, int* b);
 void fn_8032FC0C(int a, char** names, int n);
+void fn_8032FF54(FxCmd2* self, int a);
 int fn_80330018(FxCmd* self, int k);
 void fn_80330778(FxStackG* self, int a);
 void fn_80330870(FxModal* self, int a);
@@ -229,6 +230,18 @@ void fn_8032FC0C(int a, char** names, int n) {
     fn_8035F8CC(idx, a, n);
     fn_8035F95C(idx, names, n);
     if (idx) fn_80377488(idx);
+}
+
+/* near-miss: body matches but the register pair is swapped (retail self=r31, embedded pointer=r30); tried keeping the pointer lazy, member access (turns the calls static), and bound/operand order */
+void fn_8032FF54(FxCmd2* self, int a) {
+    FxEmb2* e = (FxEmb2*)((char*)self + 0x48);
+    e->v0();
+    self->m68 = 0;
+    while (self->m68 < e->m4 && e->v2() != a) {
+        e->v9();
+        self->m68++;
+    }
+    e->v11(self->m68);
 }
 
 /* near-miss: switch tree (retail splits at <3 / >4 and reuses the compare with 3 in cr7) */
