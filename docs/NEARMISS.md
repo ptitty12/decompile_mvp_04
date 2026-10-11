@@ -22,9 +22,19 @@ our C++ game units as they are.
 | fn_803DA038 | ealibs/tu_803D9FE8.cpp | 95% | see W5 notes in git log | W5 |
 | fn_8001ADF4, fn_8001AE3C, fn_8001AE84 + 14 in tu_8001B190 (trace wrappers, family B, K != 0, N == 0) | game/tu_8001A6B8.cpp, game/tu_8001B190.cpp | same insns, 2 slots differ | retail emits `li r5` before `li r3` (sched1 order). These `li`s are ready at block start, so adjust_priority never boosts r5. A later r5 reference (any third argument to lbl_80624408) gives retail's order but costs a visible move (PATTERNS, "Hard-case families") | earlier sweep list, then tag-as-id forms, unused/this params, struct return, uninitialised arg, -O2, no sched1 (Opus) |
 | fn_802735F4 (cLinearChooser slot 17, 0x2930) | animation/choosers/tu_80272B20.cpp | not attempted | 10.5 KB, float-heavy switch; notes in the worker report: sets helper+0x10, calls fn_80272E28 with a [0,1]-clamped value, fn_8027342C, fn_80273498, fn_8026D504 | none (tier C) |
+| fn_8028F178 | animation/goals/tu_8028F178.cpp | 32/32, 2 differ (with a `*(char**)` read of m44->m14) | the float parameter's stfs must sit between `lwz r11,0x44(r3)` and `lwz r0,0x14(r11)`; see PATTERNS, "Hard-case families 2" | alias-type casts of the m14 read, sched dumps (Opus 2) |
+| fn_8006FB10, fn_8006FB1C, fn_8006FF9C, fn_8006FFD0, fn_80071138, fn_80071154 | game/tu_8006D05C.cpp, game/tu_80070DDC.cpp | not written; best 5 of 13 slots differ (fn_8006FF9C, unsigned switch) | dead compares survive only when the jumps become redundant after reload (jump2 cross-jumping); ours merges the `return 0` bodies before flow | if/switch/ternary forms, signed/unsigned index, default forms (Opus 2) |
+| v8__11Tbl80094800, v8__11Tbl800956D8 | game/tu_80094578.cpp | 77 vs 78, 64 vs 65 insns | &buf (char[0x14] at frame offset 16) is a force_operand pseudo that CSE keeps in r28; retail rematerialises `addi r3,r1,24` per call (and saves r29-r31 with r31 unused) | struct/array/&buf[0] forms (Opus 2) |
+| fn_80097318 (+ clones 97380, 973E8, 97450, 974B8) | game/tu_80094578.cpp | 22 vs 26 insns | retail's loop re-reads +0, +4, +0x3E8 every pass and keeps the index as an int with clrlwi per use; ours hoists and rotates the loop differently | read only (Opus 2) |
+| fn_80079F54 | game/tu_80077238.cpp | 15/15, 3 differ | fmadds operand/register order: retail loads m204 before the int->float conversion and m1F4 after it | operand orders, float temp (Opus 2) |
 
 Matched by the near-miss sweep (W4, 2026-10-11; recipes in PATTERNS.md,
 "Near-miss sweep"): cTimeWarp::cTimeWarp, fn_8027F504, fn_8027FC80,
 fn_8027EC58, fn_80280F08, fn_80282B78, fn_80296624, fn_802958F4, fn_802966DC,
 fn_8027A9AC, fn_8027AAB0, fn_8028BDB8, fn_8026FB80, fn_8027BA64, fn_802855C4,
 fn_8027B924, fn_8027AD3C, fn_8027B1A0.
+
+Matched by Opus hard-case families 2 (2026-10-11; recipes in PATTERNS.md, "Hard-case
+families 2"): fn_8004961C, fn_8004A8F8, fn_8004B538, fn_800488C4, fn_80051E68,
+fn_80051014, fn_8006473C, fn_80088EFC, fn_80077238, fn_80077320, fn_80077404,
+fn_80077684, fn_8007776C, fn_80077850, fn_80077934, fn_80078D00, fn_800A3DF8.
