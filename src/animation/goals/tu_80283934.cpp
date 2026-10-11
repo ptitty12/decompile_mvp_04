@@ -186,12 +186,21 @@ inline float Speed(const Unk80283934_Ent* e)
     return (e->m18C & 0x80000) ? e->m74 : -1.0f;
 }
 
-/* near-miss: 120 of 120 instructions, 11 differ. Pos0 (an inline getter) makes
- * the g->m10 copy direct sp stores, as in retail (see fn_80286E70), and Speed
- * keeps fold from distributing "- u" into the ternary arms. Left: t and u sit at
- * 0x48/0x4C (retail 0x38, reusing operator-'s inline frame, and 0x48), the
- * m9C compare operand order (retail loads o first but compares g, o), and two
- * scratch registers. Needed: `(float)fabs(t)` (see header) for the compare. */
+/* The |dt| test goes through an inline AbsF(float): its parameter slot is in an
+ * inline frame, which reuses operator-'s frame at 0x38 (a float local would not:
+ * freed slots are reused only for the same mode), and u gets a fresh 0x48.
+ * o->m9C is read into a local first (retail loads o, then g, compares g, o).
+ * near-miss: 120 of 120 instructions, 6 differ: the eq scratch of the first
+ * return is r11 (retail r9) and Speed's entity pointer is r9 with its andis.
+ * scratch r11 (retail r3 / r9). Probably one cascade from reload's choice of the
+ * eq scratch (spill registers ordered by use count). Pos0 (an inline getter)
+ * makes the g->m10 copy direct sp stores; Speed keeps fold from distributing
+ * "- u" into the ternary arms. */
+inline float AbsF(float v)
+{
+    return (float)fabs(v);
+}
+
 int fn_802857C4(Unk80283934_Goal* g, const Unk80283934_Goal* o)
 {
     if (o) {
@@ -200,13 +209,16 @@ int fn_802857C4(Unk80283934_Goal* g, const Unk80283934_Goal* o)
             return g->m78 == om;
         }
         if (g->m28 && o->m28 && ((g->mE8 >> 12) & 1) == ((o->mE8 >> 12) & 1)
-            && ((g->mE8 >> 13) & 1) == ((o->mE8 >> 13) & 1) && o->m9C == g->m9C) {
+            && ((g->mE8 >> 13) & 1) == ((o->mE8 >> 13) & 1)) {
+            int o9 = o->m9C;
+            if (g->m9C != o9) {
+                return 0;
+            }
             Vec3 pa = Pos0(g);
             Vec3 pb = fn_80286E70(o);
             Vec3 d = pa - pb;
             if (!(d.x * d.x + d.y * d.y + d.z * d.z >= 144.0f)) {
-                float t = g->m84 - fn_80286F9C(o);
-                if (!((float)fabs(t) > 0.35f)) {
+                if (!(AbsF(g->m84 - fn_80286F9C(o)) > 0.35f)) {
                     if (g->m4->m18C & 0x80000) {
                         float u = g->m84 - fn_80286F9C(o);
                         fn_8028F588(Speed(g->m4) - u);
