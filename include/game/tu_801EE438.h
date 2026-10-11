@@ -43,11 +43,39 @@ struct Unk801EE438_It {            /* iterator (24 bytes) filled by fn_8014E09C;
     int m14;
 };
 
+struct Unk801EE438_Player {         /* G->m8[i] */
+    char pad0[0x460];
+    int m460;                       /* index */
+    char pad464[0x4D8 - 0x464];
+    int m4D8;                       /* sub-object starts here (address passed to fn_8024FC74) */
+};
+
+struct Unk801EE438_Game {           /* G->m4 */
+    char pad0[0x36C];
+    Unk801EE438_Player* m36C;
+    char pad370[0x374 - 0x370];
+    Unk801EE438_Player* m374;
+    Unk801EE438_Player* m378;
+    char pad37C[0x38C - 0x37C];
+    int m38C;
+};
+
+struct Unk801EE438_Sub6A8 {        /* fn_80204AC8(&G->m6A8) */
+    int m0;
+};
+
 struct Unk801EE438_G {
     void* m0;
-    char pad4[0x30 - 4];
+    Unk801EE438_Game* m4;
+    Unk801EE438_Player* m8[10];
     int m30;
-    char pad34[0xC0 - 0x34];
+    char pad34[0x54 - 0x34];
+    int m54;
+    char pad58[0x5C - 0x58];
+    int m5C;
+    char pad60[0xA4 - 0x60];
+    int mA4;
+    char padA8[0xC0 - 0xA8];
     Unk801EE438_Sub mC0;
     Unk801EE438_Sub mD4;
     char padE8[0x1B8 - 0xE8];
@@ -58,11 +86,16 @@ struct Unk801EE438_G {
     int m1C8;
     int m1CC;
     int m1D0;
-    char pad1D4[0xCA8 - 0x1D4];
+    char pad1D4[0x6A8 - 0x1D4];
+    Unk801EE438_Sub6A8 m6A8;
+    char pad6AC[0xCA4 - 0x6AC];
+    int mCA4;
     Unk801EE438_Slot mCA8[9];
     int m3A5C;
     Unk801EE438_Slot* m3A60;
     int m3A64;
+    int m3A68;
+    int m3A6C;
 };
 
 struct Unk801EE438_Scr {
@@ -72,6 +105,12 @@ struct Unk801EE438_Scr {
 
 struct Unk801EE438_Scr;
 extern "C" {
+void fn_80201738(Unk801EE438_G* g);
+void fn_802121D0(int* s);
+void fn_80204AC8(Unk801EE438_Sub6A8* s);
+Unk801EE438_Player* fn_801EDE4C(Unk801EE438_Scr* p, Unk801EE438_Game* g);
+void fn_801F2668(Unk801EE438_Scr* p, void* out, void* v, int k);
+void fn_8024FC74(void* sub, int a);
 void fn_8014E09C(Unk801EE438_It* it, void* owner, int k);
 void fn_8014E108(Unk801EE438_It* it);
 void fn_80205450(Unk801EE438_G* g, int i);
