@@ -5,6 +5,15 @@
 #include "game/tu_800F1AEC.h"
 
 
+void fn_8010A0A4(UiV_138_13C* self)
+{
+    self->m13C->v16(0);
+    self->m13C->v8(0);
+    self->m13C = 0;
+    self->v16(1);
+    self->m138->v16(1);
+}
+
 int fn_8010A6C0()
 {
     Ui700* o = fn_8011AA24(0)->m700;
@@ -66,14 +75,29 @@ void fn_8010AEE4(int unused, UiObj* list, int a, int b)
 
 void fn_8010B060(int unused, UiObj* list, int a, char* ctx)
 {
-    fn_8025416C(ctx + 0x588, 5);
-    list->v44(a, 0, fn_800E5F38(), 5);
+    int t = fn_8025416C(ctx + 0x588, 5);
+    list->v44(a, 0, fn_800E5F38(t), 5);
+}
+
+/* near-miss: right length; the id selection chain is laid out differently (retail loads each id into r4 and branches to the shared call setup) */
+void fn_8010B0CC(int unused, UiObj* list, int a, Ui8010B1E0* ctx)
+{
+    int idx = ctx->m708;
+    int pid = ctx->m704;
+    char* e = (char*)fn_8011AA24(0)->m6F8->m14 + idx * 0xE64;
+    int id = fn_80097318(e, pid) != 0 ? 0xE80
+             : fn_80097380(e, pid) != 0 ? 0xE83
+             : fn_800973E8(e, pid) != 0 ? 0xE84
+             : fn_80097450(e, pid) != 0 ? 0xE85
+             : fn_800974B8(e, pid) != 0 ? 0xE7F
+                                        : 0xBBC;
+    list->v43(a, 0, fn_80090880(lbl_8061977C, id), 5);
 }
 
 void fn_8010B1E0(int unused, UiObj* list, int a, Ui8010B1E0* ctx, int b)
 {
-    fn_80097288(b, ctx->m704);
-    list->v44(a, 0, fn_800E5E4C(), 5);
+    int r = fn_80097288(b, ctx->m704);
+    list->v44(a, 0, fn_800E5E4C(r), 5);
 }
 
 void fn_8010B24C(int unused, UiObj* list, int a, char* ctx)
@@ -136,6 +160,22 @@ void fn_8010B658(int unused, UiObj* list, int a)
         list->v91(a, i, 0);
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_8065B888[];
+int fn_8010C738(UiObj* a, int b)
+{
+    if (fn_800B555C()->m570 == b) {
+        fn_800B7ADC(UiGetMsgMgr(), a);
+        UiEvtRaw e;
+        e.vt = lbl_80649DA0;
+        e.id = 0x9E;
+        e.vt = lbl_8065B888;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
+        e.vt = lbl_80649DA0;
+    }
+    return 1;
+}
+
 int fn_8010D1C8()
 {
     return 0;
@@ -143,6 +183,18 @@ int fn_8010D1C8()
 
 void fn_8010D1D0()
 {
+}
+
+extern char lbl_805BACD0[];
+void fn_8010D258()
+{
+    UiV_140i_148_14C* o = fn_800B7AB8(UiGetMsgMgr(), lbl_805BACD0);
+    o->v16(1);
+    if (o->m140 == 0 || o->m140 == 2)
+        o->m148->v14(1);
+    else if (o->m140 == 1)
+        o->m14C->v14(1);
+    fn_8010D33C(o, 0);
 }
 
 void fn_8010D8B4(void* self, char* out)
