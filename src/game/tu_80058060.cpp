@@ -18,16 +18,7 @@ Unk8005BA1C_Voice::Unk8005BA1C_Voice(int unused, int vol, int a3, int a4, int a5
     m28 = -1;
     m2C = -1;
     fn_803A9204(&m50, m18);
-    int v;
-    if (vol <= 0x7F) {
-        v = vol;
-        if (v < 0) {
-            v = 0;
-        }
-    } else {
-        v = 0x7F;
-    }
-    m50 = v;
+    m50 = vol <= 0x7F ? (vol < 0 ? 0 : vol) : 0x7F;
 }
 
 int fn_8005A118(Unk8005BA1C_Voice* v, float f)
