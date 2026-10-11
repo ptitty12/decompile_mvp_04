@@ -77,7 +77,7 @@ public:
     virtual void s11();
     virtual void s12();
     virtual int s13(int a, int b, int c);
-    virtual void s14();
+    virtual int s14(int a);
     virtual int s15(int a, int b, int c);
 };
 struct UnkAt10 {
@@ -193,6 +193,8 @@ void fn_80377488(void* p);
 
 
 
+
+
 /* ---- unit prototypes ---- */
 extern "C" {
 void fn_800AB0E8(UnkFEArr* a, int i);
@@ -214,6 +216,8 @@ FEO8* fn_800AB80C(UnkFETable* t, int i, int j);
 int fn_800AB850(UnkFETable* t, int i);
 void fn_800AB878(UnkFE28* self, int a);
 int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d);
+int fn_800AB9A8(UnkFETable* t, int k);
+int fn_800ABA88(UnkFETable* t, int a, int b, int c);
 void fn_800ABB20(UnkFE40* self, int a, int b, char* s, int d);
 int fn_800ABB94(void* self, int k);
 int fn_800ABC30(UnkFETable* t, int i);
@@ -450,6 +454,42 @@ extern "C" int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d)
         }
     }
     return 0;
+}
+
+extern "C" int fn_800AB9A8(UnkFETable* t, int k)
+{
+    if (k == 1) {
+        fn_800AB80C(t, 0, 0)->s14(1);
+    } else {
+        for (int i = 0; i < t->m24; i++) {
+            int n = fn_800AB850(t, i);
+            for (int j = 0; j < n; j++) {
+                int r = fn_800AB80C(t, i, j)->s14(k);
+                if (r == 2) {
+                    continue;
+                }
+                if (r != 0) {
+                    continue;
+                }
+                break;
+            }
+        }
+    }
+}
+
+extern "C" int fn_800ABA88(UnkFETable* t, int a, int b, int c)
+{
+    int n = fn_800AB850(t, 0);
+    for (int i = 0; i < n; i++) {
+        int r = fn_800AB80C(t, 0, i)->s15(a, b, c);
+        if (r == 2) {
+            continue;
+        }
+        if (r != 0) {
+            continue;
+        }
+        break;
+    }
 }
 
 extern "C" void fn_800ABB20(UnkFE40* self, int a, int b, char* s, int d)
