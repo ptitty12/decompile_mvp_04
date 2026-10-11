@@ -253,14 +253,26 @@ void Unk8027A05C::fn_8027A078()
     mA0 = 0;
 }
 
+/* One-float wrapper: -ffloat-store keeps plain float variables in memory but lets
+ * a struct holding one float live in a register, which is what retail's clamp
+ * (an "fmr" select with no store) needs. */
+struct Unk8027A0B8_Float {
+    float f;
+};
+
 void Unk8027A05C::fn_8027A0B8(float a, float b, float c)
 {
     float t = (a - c) / (b - c) * 255.0f;
     unsigned char r;
-    if (t > 255.0f) {
-        r = 255;
+    if (!(t > 255.0f)) {
+        Unk8027A0B8_Float u;
+        u.f = t;
+        if (!(u.f >= 0.0f)) {
+            u.f = 0.0f;
+        }
+        r = (int)u.f;
     } else {
-        r = (int)(!(t >= 0.0f) ? 0.0f : t);
+        r = 255;
     }
     fn_8027A148(r);
 }
