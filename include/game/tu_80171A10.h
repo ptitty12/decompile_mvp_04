@@ -70,7 +70,7 @@ struct Unk80171A10_Svc {
 int fn_80173274(Unk80173274_T* p);
 void fn_80172D00(Unk80171A10_Menu* p);
 int fn_80172D44(Unk80171A10_Menu* p, int a);
-void fn_801728A0(Unk80171A10_Menu* p, int a, int b);
+
 void fn_80174438(Unk80171A10_Menu* p);
 extern "C" int fn_80090880(int a, int b);
 extern int lbl_8061977C;

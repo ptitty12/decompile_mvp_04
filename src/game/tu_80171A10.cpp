@@ -13,6 +13,10 @@ struct Unk80171A10_Holder {
 
 void fn_80171FE8(Unk80171A10_Holder* h);
 
+void fn_801728E8(Unk80171A10_Menu* p, Unk8016FF40* info);
+
+void fn_801726E8(Unk80171A10_Menu* p);
+
 Unk801714E0* fn_80172058(Unk80171A10_Holder* h, const unsigned short* s, int a);
 
 void fn_801720A8(Unk80171A10_Holder* h, Unk801714E0* n, const unsigned short* s, int id);
@@ -27,6 +31,23 @@ Unk80171760* fn_80171A10(Unk80171A10_Holder* h, int a)
     h->m4->m4 = 0;
     h->m4->m0 = a;
     return h->m4;
+}
+
+/* near-miss: retail keeps the zero for m8/m0 in r30 across the calls (3 saved registers, the CE4 result
+ * reuses r30); here the zero is rematerialized (r11). 4 variants tried. */
+Unk80171760* fn_80171C20(Unk80171A10_Holder* h, int a)
+{
+    if (a != 0x11) {
+        fn_80171FE8(h);
+        h->m4 = new (0x100) Unk80171760;
+        h->m4->fn_801718A8(0);
+        h->m4->m4 = 1;
+        h->m4->m8 = 0;
+        h->m4->m0 = 0;
+        h->m4->fn_8017181C((const unsigned short*)h->m0->fn_80170CE4(a));
+        return h->m4;
+    }
+    return 0;
 }
 
 /* near-miss: retail stores the zero text terminator through r3 (li r3,0; sth) and then reloads r3 with the
@@ -140,6 +161,13 @@ void fn_80172334(Unk80171A10_Menu* p, int a, int b, const unsigned short* c, con
     fn_80174318(p, 0, lbl_805CB114);
 }
 
+Unk80171760* fn_801723B8(Unk80171A10_Menu* p)
+{
+    fn_80171FE8((Unk80171A10_Holder*)p->m3C);
+    fn_801726E8(p);
+    return ((Unk80171A10_Holder*)p->m3C)->m4;
+}
+
 int fn_80172514(Unk80171A10_Menu* p)
 {
     if (p->m70 <= 0xA) {
@@ -184,6 +212,13 @@ void fn_80172678(Unk80171A10_Menu* p)
     p->m80 = 0;
     p->m4 = 1;
     p->m18 = 4;
+}
+
+void fn_801728A0(Unk80171A10_Menu* p, Unk8016FF40* info, int st)
+{
+    p->m110 = st;
+    fn_801728E8(p, info);
+    ((Unk80170518*)fn_80173274((Unk80173274_T*)p))->fn_80170668(info, p->m110);
 }
 
 void fn_80172D00(Unk80171A10_Menu* p)
