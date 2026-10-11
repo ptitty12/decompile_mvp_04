@@ -298,28 +298,29 @@ int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, unsigned int has
     return 0;
 }
 
-/* near-miss: 379 of 379 instructions, about 80%. The control flow, the register
- * assignment (r22-r31) and the first 44 frame offsets match. Retail's frame is
- * 312 bytes, here 280: retail allocates the by-value Vec3 temporaries of the
- * Scale/Dir inlines at +0x80/+0x90 and the Dir frame at +0xA0 (here they are packed
- * lower), and it keeps h2, eps and len at +0xF8/+0xFC/+0x100 above the operator+
- * result. */
+/* near-miss: 379 of 379 instructions, 99.6% by objdiff; the remaining difference is
+ * the frame (304 bytes, retail 312). The control flow, registers and the first
+ * 50 frame offsets match. Found here: the nested Scale(Scale(Dir())) call only gets
+ * retail's frame order when the vector is a class with a user-declared copy
+ * constructor (Unk802A1790_V3), so that each by-value argument is a real
+ * temporary allocated outermost first; the position `a` is one variable reused
+ * for the later probe. Still different: the by-value float of the second probe is
+ * allocated at +0xE8 (the temporary of the operator+ result), retail puts it at +0xF8
+ * with the temporary still live, and retail compares m720 before f at the end. */
 int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80273498_Vec3 pos = FlatPosOf(x);
     Unk802A1790_Pos* p = (Unk802A1790_Pos*)x->m44C->m6CC;
     Unk80273498_Vec3 ppos = p->m60;
     if (p->m36C == 0) {
-        {
-            Unk80273498_Vec3 a = pos;
-            Unk80273498_Vec3 b = ppos;
-            if (!fn_8029CFDC(g, &a, &b)) {
-                if (!(ppos.y <= 120.0f)) {
-                    fn_80189618(&a, (Unk8018959C_Obj*)p, 0.0f);
-                    float yaw = Unk802A1790_Yaw(-a);
-                    g->m70 = yaw;
-                    g->mD0.f2 = 1;
-                }
+        Unk80273498_Vec3 a = pos;
+        Unk80273498_Vec3 b = ppos;
+        if (!fn_8029CFDC(g, &a, &b)) {
+            if (!(ppos.y <= 120.0f)) {
+                fn_80189618(&a, (Unk8018959C_Obj*)p, 0.0f);
+                float yaw = Unk802A1790_Yaw(-a);
+                g->m70 = yaw;
+                g->mD0.f2 = 1;
             }
         }
         int flagB = 0;
@@ -344,18 +345,15 @@ int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
                     c = 1;
                 }
                 if (c) {
-                    Unk80273498_Vec3 w = x->m60;
+                    a = x->m60;
                     float h = 0.0f;
-                    fn_80191068(p, &w, 0, &h, lbl_8061E858, lbl_8061E85C);
+                    fn_80191068(p, &a, 0, &h, lbl_8061E858, lbl_8061E85C);
                     if (!(h >= lbl_8061E850)) {
                         if (fn_8026D654(x, 0)) {
                             flagB = 1;
                         } else {
                             float ang = fn_80382BB8(x->m618);
-                            Unk80273498_Vec3 off = Unk802A1790_Scale(Unk802A1790_Scale(Unk802A1790_Dir(ang), f), 0.35f);
-                            float h2 = 0.0f;
-                            Unk802A1790_Probe(p, w + off, &h2);
-                            if (!(h2 <= lbl_8061E854)) {
+                            if (Unk802A1790_Probe(p, a + Unk802A1790_Scale(Unk802A1790_Scale(Unk802A1790_Dir(ang), f), 0.35f), 0.0f)) {
                                 float eps = 65.0f;
                                 flagB = 1;
                                 Unk80273498_Vec3 v;

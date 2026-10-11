@@ -199,21 +199,38 @@ inline float Unk802A1790_Yaw(Unk80273498_Vec3 v)
     return fn_80410CE8(v.x, v.z);
 }
 
-inline Unk80273498_Vec3 Unk802A1790_Dir(float a)
+/* Vector class with a user-declared copy constructor: its by-value copies are
+ * real temporaries that the compiler allocates outermost first, which gives
+ * retail's frame layout for the nested Scale(Scale(Dir())) call in fn_802A1790. */
+struct Unk802A1790_V3 : public Unk80273498_Vec3 {
+    Unk802A1790_V3() {}
+    Unk802A1790_V3(const Unk802A1790_V3& o) : Unk80273498_Vec3(o) {}
+};
+
+inline Unk802A1790_V3 Unk802A1790_Dir(float a)
 {
-    Unk80273498_Vec3 r;
+    Unk802A1790_V3 r;
     r.x = fn_8041171C(a);
     r.y = 0.0f;
     r.z = fn_80411554(a);
     return r;
 }
 
-inline Unk80273498_Vec3 Unk802A1790_Scale(Unk80273498_Vec3 v, float s)
+inline Unk802A1790_V3 Unk802A1790_Scale(Unk802A1790_V3 v, float s)
 {
-    Unk80273498_Vec3 r;
+    Unk802A1790_V3 r;
     r.x = v.x * s;
     r.y = v.y * s;
     r.z = v.z * s;
+    return r;
+}
+
+inline Unk802A1790_V3 operator+(const Unk80273498_Vec3& a, const Unk802A1790_V3& b)
+{
+    Unk802A1790_V3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
     return r;
 }
 
@@ -223,14 +240,16 @@ int fn_8026D654(Unk80270BA0_X* x, int a);
 void fn_80191068(Unk802A1790_Pos* p, Unk80273498_Vec3* v, int a, float* out, float f1, float f2);
 extern float lbl_8061E858;
 extern float lbl_8061E85C;
-/* The second probe of fn_802A1790 takes its position by value (a copy in the
- * inline's own frame). */
-inline void Unk802A1790_Probe(Unk802A1790_Pos* p, Unk80273498_Vec3 v, float* out)
-{
-    fn_80191068(p, &v, 0, out, lbl_8061E858, lbl_8061E85C);
-}
 extern float lbl_8061E850;
 extern float lbl_8061E854;
+/* The second probe of fn_802A1790: the position and the result float are
+ * by-value parameters (copies in the inline's own frame) and the compare is
+ * inside. */
+inline int Unk802A1790_Probe(Unk802A1790_Pos* p, Unk802A1790_V3 v, float h)
+{
+    fn_80191068(p, &v, 0, &h, lbl_8061E858, lbl_8061E85C);
+    return !(h <= lbl_8061E854);
+}
 
 /* Writes the vector through the first argument (fn_802A1790). The same
  * address is declared in tu_8027A84C.h as returning the vector by value; the
