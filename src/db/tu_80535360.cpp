@@ -367,6 +367,62 @@ extern "C" DB_OVERLAY void fn_80536624(Unk805352B0_List* self, int mode)
     }
 }
 
+extern "C" char* fn_8040B448(char* dst, const char* src);
+extern "C" int fn_8040B6A0(const char* s);
+extern "C" int fn_8040B3B4(const char* a, const char* b);
+extern const char lbl_805FEC38[];
+
+/* near-miss: control flow and call sequence match; retail keeps the chosen child in its own
+ * register (r23) apart from the loop index (r31, reused for the second key id), ours folds
+ * them together so the register numbers and the c == last branch layout differ. */
+extern "C" DB_OVERLAY void fn_805366FC(Unk805352B0_List* self, int root, int last, int mode)
+{
+    char bufA[0x80];
+    char bufB[0x80];
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int j = root;
+    int done = 0;
+    unsigned c;
+    for (c = j * 2; c <= last && !done; c = j * 2) {
+        unsigned child;
+        if (c == last) {
+            child = c;
+        } else {
+            int a = sc->fn_8007A11C(self->At(c));
+            sc->fn_8007A914(1, a, bufA);
+            fn_8040B448(bufA, lbl_805FEC38);
+            sc->fn_8007A914(0, a, bufA + fn_8040B6A0(bufA));
+            int b = sc->fn_8007A11C(self->At(c + 1));
+            sc->fn_8007A914(1, b, bufB);
+            fn_8040B448(bufB, lbl_805FEC38);
+            sc->fn_8007A914(0, b, bufB + fn_8040B6A0(bufB));
+            int r = fn_8040B3B4(bufA, bufB);
+            if ((mode == 1 && r < 0) || (mode == 0 && r > 0))
+                child = j * 2;
+            else
+                child = j * 2 + 1;
+        }
+        int a = sc->fn_8007A11C(self->At(j));
+        sc->fn_8007A914(1, a, bufA);
+        fn_8040B448(bufA, lbl_805FEC38);
+        sc->fn_8007A914(0, a, bufA + fn_8040B6A0(bufA));
+        int b = sc->fn_8007A11C(self->At(child));
+        sc->fn_8007A914(1, b, bufB);
+        fn_8040B448(bufB, lbl_805FEC38);
+        sc->fn_8007A914(0, b, bufB + fn_8040B6A0(bufB));
+        int r = fn_8040B3B4(bufB, bufA);
+        if ((mode == 1 && r < 0) || (mode == 0 && r > 0)) {
+            int x = self->At(j);
+            int y = self->At(child);
+            self->Set(j, y);
+            self->Set(child, x);
+            j = child;
+        } else {
+            done = 1;
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80536990(Unk805352B0_List* self, int mode)
 {
     int keys[3250];
