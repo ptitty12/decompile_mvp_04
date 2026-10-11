@@ -261,6 +261,7 @@ Unk8031CECC* fn_8031D6B0(Unk8031CECC* o);
 /* ---- generated externs ---- */
 
 
+
 /* ---- unit prototypes ---- */
 extern "C" {
 int fn_800B5C68();
@@ -282,9 +283,9 @@ void fn_800B66CC();
 void fn_800B7280(FEMgr* self, int a);
 void fn_800B7598(void* self, int k);
 void fn_800B7614(void* self, int a);
-void fn_800B7A94(FEMgr* p, const char* s);
 void fn_800B7618(FEMgr* self, const char* name);
 void fn_800B7700(FEMgr* self);
+void fn_800B7A94(FEMgr* p, const char* s);
 void fn_800B7AB8(FEMgr* p, const char* s);
 void fn_800B7ADC(FEMgr* self, FEV3C* obj);
 int fn_800B7CDC(void* self, int a, int b);
@@ -511,11 +512,8 @@ extern "C" void fn_800B7598(void* self, int k)
     }
 }
 
-extern "C" void fn_800B7614(void* self, int a) {}
-
-extern "C" void fn_800B7A94(FEMgr* p, const char* s)
+extern "C" void fn_800B7614(void* self, int a)
 {
-    p->mA0->fn_800C68D0(s);
 }
 
 extern "C" void fn_800B7618(FEMgr* self, const char* name)
@@ -548,6 +546,11 @@ extern "C" void fn_800B7700(FEMgr* self)
         fn_800B7598(self, self->mA4->m14);
     }
     fn_800B7618(self, self->mA4->m20);
+}
+
+extern "C" void fn_800B7A94(FEMgr* p, const char* s)
+{
+    p->mA0->fn_800C68D0(s);
 }
 
 extern "C" void fn_800B7AB8(FEMgr* p, const char* s)
