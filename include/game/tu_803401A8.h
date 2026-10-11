@@ -27,6 +27,7 @@ struct Unk803B9D60_Rec {
     int m4;
     int m8;
     int mC;
+    int m10;
 };
 
 struct Unk803B9D60_Alloc {
