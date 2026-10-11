@@ -19,7 +19,10 @@ struct Unk8005EDCC_G;
 
 struct Unk8005EDCC_Ent {
     int m0;
-    char pad4[0x10];
+    int m4;
+    int m8;
+    int mC;
+    int m10;
     int m14;
 };
 

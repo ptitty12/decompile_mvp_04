@@ -118,7 +118,9 @@ struct Unk8005DF2C_Ctx {
     Unk8005DF2C_Tri m318[1];
     char pad324[0xC];
     Unk8005DF2C_Tri m330[1];
-    char pad33C[0x74];
+    char pad33C[0xC];
+    Unk8005DF2C_Tri m348[1];
+    char pad354[0x5C];
     Unk8005DF2C_O3B0* m3B0;
     int m3B4;
     int m3B8;
@@ -215,7 +217,8 @@ struct Unk8005DF2C_P {
     Unk8005DF2C_Rec m4[1];
     char pad4C[0x98C];
     int m9D8;
-    char pad9DC[0x38];
+    int m9DC;
+    char pad9E0[0x34];
     int mA14;
 };
 
