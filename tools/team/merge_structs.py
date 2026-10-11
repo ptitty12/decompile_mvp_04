@@ -31,7 +31,8 @@ COMMENT = re.compile(r"^\s*(/\*|\*|//)|^\s*$")
 def pad_span(ln):
     m = PAD_RANGE.match(ln)
     if m:
-        return int(m.group(1), 16), int(m.group(2), 16)
+        # Trust the range expression, not the name (names can be stale).
+        return int(m.group(3), 16), int(m.group(2), 16)
     m = PAD_SIZE.match(ln)
     if m:
         a = int(m.group(1), 16)
@@ -112,8 +113,8 @@ def resolve(text):
                     merged.append(fields[off])
                     # The field runs to the next field, or to where a pad on either side begins.
                     nxt = offs[k + 1] if k + 1 < len(offs) else hunk_end
-                    pad_after = [a for a in (re.findall(r"char\s+pad([0-9A-Fa-f]+)", "".join(parts["ours"] + parts["theirs"]))) if off < int(a, 16) <= nxt]
-                    pos = min([int(a, 16) for a in pad_after] + [nxt])
+                    pad_after = [pad_span(x)[0] for x in parts["ours"] + parts["theirs"] if pad_span(x) and off < pad_span(x)[0] <= nxt]
+                    pos = min(pad_after + [nxt])
                 if pos < hunk_end:
                     merged.append(f"{indent}char pad{pos:X}[0x{hunk_end:X} - 0x{pos:X}];\n")
         if merged is not None:
