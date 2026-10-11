@@ -135,6 +135,13 @@ extern "C" Vec3* fn_801C34D0(Vec3* out, Z* z)
     return out;
 }
 
+extern "C" float fn_801C36AC(Z* z)
+{
+    const float k = 2.0f;
+    float r = fn_801C34F4(z);
+    return r + k;
+}
+
 extern "C" int fn_801C38F0(Z* z, float f)
 {
     if (fn_801A6DB8(z->m204)->m4 != 0 && fn_801A4B34(z->m204)->m5CC != 0 && fn_8017C94C(z->m204->m700) != 1) {
@@ -249,19 +256,7 @@ extern "C" void fn_801C4D04(void)
 
 extern "C" void fn_801C53D8(void) {}
 
-extern "C" float fn_801C36AC(Z* z)
-{
-    const float k = 2.0f;
-    float r = fn_801C34F4(z);
-    return r + k;
-}
-
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
-
-extern "C" Vec3 fn_801C5C70(void* u, const Vec3* i, const Vec3* n)
-{
-    return *i - Scale(n, (n->z * i->z + (n->x * i->x + n->y * i->y)) * 2.0f);
-}
 
 extern "C" Vec3 fn_801C5BD4(Z* z)
 {
@@ -270,6 +265,11 @@ extern "C" Vec3 fn_801C5BD4(Z* z)
     if (!(t >= 0.0f))
         t = 0.0f;
     return fn_80189618(c, t);
+}
+
+extern "C" Vec3 fn_801C5C70(void* u, const Vec3* i, const Vec3* n)
+{
+    return *i - Scale(n, (n->z * i->z + (n->x * i->x + n->y * i->y)) * 2.0f);
 }
 
 extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c)
