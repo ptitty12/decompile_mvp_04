@@ -1416,6 +1416,9 @@ game/tu_803401A8.cpp:
 fe/tu_80529364.cpp:
 	.feoverlay  start:0x80529364 end:0x8052A208
 
+db/tu_805A2604.cpp:
+	.dboverlay  start:0x805A2604 end:0x805A2BB0
+
 game/tu_803414A4.cpp:
 	.text       start:0x803414A4 end:0x80341B78
 
