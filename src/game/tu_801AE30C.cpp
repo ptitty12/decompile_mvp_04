@@ -4,6 +4,7 @@
  */
 #include "game/tu_801A57C8.h"
 #include "game/tu_801AB63C.h"
+#include "game/chooser.h"
 
 void fn_801AE5F0(void* p);
 void fn_801AE6A8(void* p);
@@ -17,6 +18,41 @@ void fn_801B2428(void* p);
 int fn_801B1380(Unk801AB63C_P* p);
 void fn_801B1FE8(void* p);
 
+/* Script-command style classes (hash 0xE608C67F, size 0xB4, vtable 0x8065FB08;
+ * hash 0xEA9F4BCE, size 0x88, vtable 0x8065FB68); slot 2 registers the attributes. */
+class Unk801B03DC : public Unk8037B3E8 {
+public:
+    Unk801B03DC();
+    virtual void fn_vslot2();
+    virtual Unk8037B3E8* fn_vslot5();
+    virtual void fn_vslot8();
+    char m4[0xB0];
+};
+
+class Unk801B0B08 : public Unk8037B3E8 {
+public:
+    Unk801B0B08();
+    virtual void fn_vslot2();
+    virtual Unk8037B3E8* fn_vslot5();
+    virtual void fn_vslot8();
+    char m4[0x84];
+};
+
+extern int lbl_8068BEC4;
+extern int lbl_8068BEC8;
+extern int lbl_806EF9B4;
+
+Unk801B03DC* fn_801B0AD0();
+Unk801B0B08* fn_801B1090();
+
+int fn_8006BE18(void* p);
+void fn_801B445C(Unk801AB63C_P* p, int f);
+int fn_801AED58(int a, Unk801AB63C_P* q);
+void fn_801AE6A8(Unk801AB63C_P* p);
+int fn_8014D8AC(void* a, int b, const char* c, int d);
+int fn_80259C28(void* a, void* q);
+extern char lbl_805CF058[];
+
 struct Unk801AE30C_Pair {
     int m0;
     char m4[8];
@@ -25,6 +61,11 @@ struct Unk801AE30C_Pair {
 struct Unk801AE30C_Clr {
     int m0;
     char m4[2][8];
+};
+
+struct Unk801AE30C_St {
+    char pad0[0x14];
+    int m14;
 };
 
 void fn_801AE360(Unk801AE30C_Clr* p)
@@ -47,6 +88,13 @@ void fn_801AE494(Unk801AE30C_Pair* p, int* a, int* b)
     *b = fn_801AE304(p->mC);
 }
 
+Unk801AE5C0::Unk801AE5C0(int a, int b) : Unk801B5A44(a, b)
+{
+    m10 = fn_801B1090();
+    mC = fn_801B0AD0();
+    Init();
+}
+
 Unk801AE5C0::~Unk801AE5C0() {}
 
 void fn_801AE688(void* p)
@@ -65,11 +113,6 @@ void fn_801B0334(void* p)
     fn_801AE6A8(p);
 }
 
-struct Unk801AE30C_St {
-    char pad0[0x14];
-    int m14;
-};
-
 void fn_801B03B8(Unk801AE30C_St* p)
 {
     int s = p->m14;
@@ -78,15 +121,33 @@ void fn_801B03B8(Unk801AE30C_St* p)
     }
 }
 
-void Unk801B10C8::Init()
+Unk801B03DC::Unk801B03DC() : Unk8037B3E8(0xE608C67Fu) {}
+
+Unk8037B3E8* Unk801B03DC::fn_vslot5()
 {
-    Setup();
-    fn_801B2428(this);
+    return new (lbl_806EF9B4) Unk801B03DC;
 }
 
-void fn_801B0ACC() {}
+void Unk801B03DC::fn_vslot8() {}
 
-void fn_801B108C() {}
+Unk801B03DC* fn_801B0AD0()
+{
+    return (Unk801B03DC*)fn_8037C7FC()->fn_8037CE98(0xE608C67F, lbl_8068BEC4, 0);
+}
+
+Unk801B0B08::Unk801B0B08() : Unk8037B3E8(0xEA9F4BCEu) {}
+
+Unk8037B3E8* Unk801B0B08::fn_vslot5()
+{
+    return new (lbl_806EF9B4) Unk801B0B08;
+}
+
+void Unk801B0B08::fn_vslot8() {}
+
+Unk801B0B08* fn_801B1090()
+{
+    return (Unk801B0B08*)fn_8037C7FC()->fn_8037CE98(0xEA9F4BCE, lbl_8068BEC8, 0);
+}
 
 Unk801B10C8::Unk801B10C8(int a, int b) : Unk801B2490(a, b)
 {
@@ -94,6 +155,12 @@ Unk801B10C8::Unk801B10C8(int a, int b) : Unk801B2490(a, b)
 }
 
 Unk801B10C8::~Unk801B10C8() {}
+
+void Unk801B10C8::Init()
+{
+    Setup();
+    fn_801B2428(this);
+}
 
 void fn_801B1170(void* p)
 {
@@ -127,6 +194,17 @@ void fn_801B12C0(Unk801AB63C_P* p)
             f = 1;
         }
         fn_801B25E4(p, f);
+    }
+}
+
+void fn_801B131C(Unk801AB63C_P* p)
+{
+    if (fn_8006BE18(p->m8->m6F8) == 0) {
+        int f = 0;
+        if (p->m8->m6F8->m14[2].m8 != 0) {
+            f = 1;
+        }
+        fn_801B445C(p, f);
     }
 }
 

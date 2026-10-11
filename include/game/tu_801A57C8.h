@@ -77,6 +77,9 @@ public:
     Unk801AE5C0(int a, int b);
     virtual void fn_vslot1();
     virtual ~Unk801AE5C0();
+    void Init();
+    void* mC;
+    void* m10;
 };
 
 class Unk801A9610 : public Unk801B5A44 {
