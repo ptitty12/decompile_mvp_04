@@ -4,6 +4,8 @@
  */
 
 
+extern "C" int fn_800A2AE8();
+extern "C" int fn_80329FA0(void* out, ...);
 extern int lbl_8061930C;
 extern "C" unsigned fn_8007F198(int g, int team);
 extern "C" int fn_8007F24C(int g, int team, int j);
@@ -35,9 +37,18 @@ extern "C" int fn_80075948(int g, int a);
 extern "C" int fn_8007B510(int g, int a, int b);
 extern "C" void fn_8007B570(int g, int a, int b, int c);
 extern "C" void fn_800A6D60(void* p);
+extern "C" void fn_80403144(void* dst, const void* src);
+extern "C" int fn_800A71F8(int a);
 extern "C" void fn_80400560(void* p, int n);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
+
+extern "C" int fn_800A4EA4()
+{
+    unsigned char b;
+    fn_80329FA0(&b, fn_800A2AE8());
+    return b > 7;
+}
 
 struct Unk800A641C_Pl {
     char pad0[0x198];
@@ -339,6 +350,20 @@ extern "C" void fn_800A724C(char* o, int a, Unk800A724C_Stream* s)
     s->v1(a, o, 0xF0);
     s->v1(a, o + 0xF0, 0x438);
     s->v1(a, o + 0x528, 0xC);
+}
+
+/* near-miss (7 of 43 slots): address-arithmetic operand order in the index expressions */
+
+extern "C" void fn_800A7404(char* o, int i, int kind, int j, void* out, int* res)
+{
+    int k = fn_800A71F8(kind);
+    char* base = o + 0x528;
+    if (j < (signed char)base[k + i * 4]) {
+        *res = *(int*)(o + (j * 4 + k * 0x14 + i * 0x50));
+        fn_80403144(out, o + (i * 0x168 + 0xF0) + k * 0x5A + j * 0x12);
+    } else {
+        *res = -1;
+    }
 }
 
 struct Unk800A74B0 {

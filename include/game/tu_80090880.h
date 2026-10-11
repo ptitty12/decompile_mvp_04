@@ -121,7 +121,7 @@ struct TblBase {
     int Fn90A90(int key, int flag);
 };
 
-/* BEGIN GENERATED (scratch generator; do not edit by hand) */
+/* BEGIN table classes */
 
 struct RowRef;
 extern "C" {
@@ -469,6 +469,6 @@ extern "C" Rec* fn_800897B8(void* mem, const char* name, DbObj* db, int c);
 extern "C" Rec* fn_8008B254(void* mem, const char* name, DbObj* db, int c);
 extern "C" Rec* fn_8008BDDC(void* mem, const char* name, DbObj* db, int c);
 extern "C" Rec* fn_8008AB04(void* mem, const char* name, DbObj* db, int c);
-/* END GENERATED */
+/* END table classes */
 
 #endif
