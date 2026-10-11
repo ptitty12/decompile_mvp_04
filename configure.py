@@ -889,6 +889,7 @@ config.libs = [
             Object(NonMatching, "db/tu_805942E0.cpp"),
             Object(NonMatching, "db/tu_80596D88.cpp"),
             Object(NonMatching, "db/tu_80599594.cpp"),
+            Object(NonMatching, "db/tu_8059A728.cpp"),
         ],
     },
     {
