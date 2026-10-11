@@ -107,7 +107,7 @@ extern "C" Unk800C7B40_Widget* fn_800CF5AC(Unk800C7B40_Widget* w, const char* a,
 /* near-miss: same null check as fn_800CF5AC (slot 30) */
 extern "C" Unk800C7B40_Widget* fn_800CF738(Unk800C7B40_Widget* w, const char* a, int b)
 {
-    Unk800C7B40_Widget* r = w->fn_vslot30(a);
+    Unk800C7B40_Widget* r = w->fn_vslot30(a, b);
     return r ? r : 0;
 }
 
