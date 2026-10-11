@@ -78,12 +78,14 @@ void fn_803318CC();
 
 // FUNCS-BEGIN
 
+/* near-miss: argument evaluation order and frame size */
 void fn_8032ED80(FxListD* self) {
     char buf[0x38];
     fn_804089B4(buf, lbl_805ED9C0, self->s6(), self->m48 ? *self->m48 : self->m4C);
     fn_80313F28(lbl_8061FEDC, buf);
 }
 
+/* near-miss: retail keeps the first of the two vptr stores; ours drops it */
 FxListD* fn_8032F120(FxListD* self, int a, int b) {
     *(const void**)((char*)self + 8) = lbl_80666EC0;
     self->mC = 0;
@@ -141,6 +143,7 @@ int fn_8032FBCC(int* a, int* b) {
     return fn_8040B574(lbl_80691DC4[*a], lbl_80691DC4[*b]);
 }
 
+/* near-miss: store order of lbl_80620410 / lbl_80620414 clears */
 void fn_80330870(FxModal* self, int a) {
     *(const void**)((char*)self + 0x2DC) = lbl_80666A18;
     if (self == lbl_80620410) {
@@ -238,6 +241,7 @@ void fn_80331568() {
     fn_80331508();
 }
 
+/* near-miss: lis order of the eight global stores */
 void fn_803318CC() {
     lbl_8061FE90 = 1;
     lbl_8061FDCC = 0;
