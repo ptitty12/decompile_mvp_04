@@ -131,6 +131,27 @@ struct FEEv {
     int m18;
 };
 extern FEV18* lbl_80619D10;
+struct FEOb107 {
+    char pad0[0x10];
+    FEV3Cz* m10;
+    char pad14[0x20 - 0x14];
+    int m20;
+};
+extern const char lbl_805B9A04[];
+extern "C" FEV3Cz* fn_800C8044(FEV3Cz* o);
+extern "C" void fn_800FC1F0(FEV3Cz* o, int a, int b);
+struct FEOb1DBC {
+    char pad0[0x20];
+    int m20;
+    int m24;
+    int m28;
+    char pad2C[0x60 - 0x2C];
+    int m60;
+    char pad64[0x70 - 0x64];
+    int m70;
+    char pad74[0x110 - 0x74];
+    int m110;
+};
 struct Unk8019F8C0_Owner;
 int fn_801A2034(Unk8019F8C0_Owner* o, int k);
 struct FEOb245 {
@@ -252,7 +273,6 @@ void fn_802B09CC(void* o, const char* s, int a, int b, int c);
 void fn_800AF110(void* p);
 void fn_800FC6B4(void* p);
 void* fn_800AF010(void* p, int k);
-void fn_800B1DBC(void* p, int a);
 void fn_800AE96C(char* p);
 void fn_800AEBAC(char* p);
 void fn_800B1D90(FEOb110* p);
@@ -269,6 +289,8 @@ void fn_8011A0A4(void* o, void* a, const char* s);
 }
 
 /* ---- generated externs ---- */
+
+
 
 
 
@@ -302,8 +324,10 @@ void fn_800B06AC(FEObj10v* self, int a, int b);
 void fn_800B06F8(FEObj10v* self, int a);
 void fn_800B0738(FEObj10v* self, float* a, float* b, float* c, float* d);
 void fn_800B07A0(FEObj10v* self);
+void fn_800B07E0(FEOb107* self, int a, int b);
 void fn_800B0884(UnkAt10P* p);
 void fn_800B1D90(FEOb110* self);
+void fn_800B1DBC(FEOb1DBC* self, int lvl);
 void fn_800B1E84(FEOb7C* self);
 void fn_800B1F04(FEOb1F04* self);
 int fn_800B1FCC(FEOb210* self);
@@ -482,6 +506,17 @@ extern "C" void fn_800B07A0(FEObj10v* self)
     }
 }
 
+extern "C" void fn_800B07E0(FEOb107* self, int a, int b)
+{
+    if (self->m10) {
+        if (a != 10 && a != 11) {
+            fn_800C8044(self->m10->s32(lbl_805B9A04, 1))->s8(0);
+            self->m20 = 0;
+        }
+        fn_800FC1F0(self->m10, a, b);
+    }
+}
+
 extern "C" void fn_800B0884(UnkAt10P* p)
 {
     if (p->m10) {
@@ -496,6 +531,29 @@ extern "C" void fn_800B1D90(FEOb110* self)
     }
     self->m110 = 0;
     self->mD4 = 0;
+}
+
+extern "C" void fn_800B1DBC(FEOb1DBC* self, int lvl)
+{
+    int t[6] = {1000, 2500, 4000, 6000, 8000, 10000};
+    for (int i = 0; i < 6; i++) {
+        int v = 30 - lvl * 5;
+        v -= i * 2;
+        int w = 15;
+        if (w < v) {
+            w = v;
+        }
+        int o = i * 0xC;
+        char* b24 = (char*)self + 0x24;
+        char* b20 = (char*)self + 0x20;
+        char* b28 = (char*)self + 0x28;
+        *(int*)(b24 + o) = w;
+        *(int*)(b20 + o) = t[i];
+        *(int*)(b28 + o) = 0;
+    }
+    self->m60 = 0;
+    self->m110 = 0;
+    self->m70 = 0;
 }
 
 extern "C" void fn_800B1E84(FEOb7C* self)
@@ -652,7 +710,7 @@ extern "C" void fn_800B2390(FEOb2390* self)
 {
     fn_800B228C((FEOb118*)self);
     fn_800B1F04((FEOb1F04*)self);
-    fn_800B1DBC(self, self->m114);
+    fn_800B1DBC((FEOb1DBC*)self, self->m114);
     fn_800B1E84((FEOb7C*)self);
     self->m74 = 0;
     self->m68 = lbl_805B9B78;
