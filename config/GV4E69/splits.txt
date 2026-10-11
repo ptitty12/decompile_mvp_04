@@ -47,6 +47,12 @@ game/tu_8000D650.cpp:
 	.data       start:0x806164B8 end:0x806164C0
 	.bss        start:0x80686B94 end:0x80686C30
 
+game/tu_8000E618.cpp:
+	.text       start:0x8000E618 end:0x8000F598
+	.rodata     start:0x805A430C end:0x805A4984
+	.data       start:0x806164C0 end:0x806164E8
+	.bss        start:0x80686C30 end:0x80686CCC
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
