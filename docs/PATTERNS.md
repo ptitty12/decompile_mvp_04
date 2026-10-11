@@ -250,7 +250,8 @@ the families with example addresses; ask the lead if you need it.
 - Trace wrappers come in two families: A `fn_80056C9C(K); lbl_80624408(fn_80391C04(0, 0, LINE), N, a..);`
   and B `lbl_80624408(fn_80391C04(K, 0, LINE), N, a..);` (no fn_80056C9C). LINE > 0x7FFF
   loads as `li r5,0; ori r5,r5,LINE`. Generators: scratchpad S0/gen.py, S8/gen.py.
-  Open: family B with K != 0 and N == 0 has `li r5` before `li r3` in retail (not reproduced).
+  Open: family B with K != 0 and N == 0 has `li r5` before `li r3` in retail (not reproduced;
+  mechanism under "Hard-case families" below).
 - Float parameters compared against double literals: write `x < 0.2`, not `0.2f`, when retail
   loads an 8-byte constant (`lfd`).
 - Byte tables: use `unsigned char*` (plain char is signed and adds `extsb`).
@@ -317,3 +318,65 @@ Recipes that matched 18 parked functions (details in each unit's comments):
   an inline taking `&mC` lets the bottom test reuse the body's pointer.
 - Check case routing against the asm: fn_8028C264's switch had 6 of 11 hashes
   going to the success path, not to `fail`.
+
+## Hard-case families (Opus, 2026-10-11)
+
+### Pass-through arguments (vcall family and 3 more, 13 functions)
+- Tell: only the callee-saved registers are permuted, and a callee reads an
+  argument register that the caller never sets before the call (the caller's
+  own parameter is still in it). Example: fn_80071E2C does `mr r30,r5` and
+  calls through r5's vtable, but the old source called `fn_80071E2C(self)`.
+- Recipe: pass that parameter. `fn_80071E2C(self, a, obj)` (10 vcall
+  wrappers), `fn_8007A6A0(self, 4, b)` (fn_80080374), `fn_80039DBC(s, i)`
+  (fn_800393B0), `fn_800999CC(sub, v, q)` (fn_80081BA8). The argument moves
+  cost nothing (reload_cse deletes `mr r4,r28` when r4 still holds the value).
+- Why it matters: in a single-block function local-alloc assigns the
+  callee-saved registers. Its priority is
+  `floor_log2(refs) * refs / (death - birth)`, where birth and death are 2 x
+  the insn index after sched1. The extra use is one more ref on that pseudo.
+  r31 is never used there (local-alloc skips the eliminable frame pointer), so
+  the order is r30, r29, r28. vcall: obj goes from 3 refs to 4 (8/20 beats
+  self's 8/24), and a goes from 2 to 3.
+- To find more: `scratchpad/W7s3/passthru.py <repo>` lists unmatched
+  functions whose first call reads an argument register the caller never set
+  (uses build/GV4E69/report.json). Not every hit is a fix: the tu_8007DB74
+  hits (fn_805A19C8 reads r4) differ in other ways.
+
+### CSV row loaders (tu_80037250, 12 functions)
+- Tell: retail keeps `&n` and `&cur` in callee-saved registers set once before
+  the loop. Our version recomputes `addi rX,r1,k` at the top of every
+  iteration.
+- Recipe: use pointer locals. `unsigned int* pn = &n;` goes before the
+  fn_802B9300 call (pn is its argument). `const char** pc = &cur;` goes first
+  inside `if (n != 0)`. Pass pc/pn everywhere.
+- Why: loop.c can't hoist the address computations. The while loop is rotated
+  (entry jump to the bottom test), so scan_loop starts at the test. After its
+  first conditional jump every body insn is "maybe never" executed, and an
+  address pseudo used in several blocks of the body is not movable.
+- Locals that retail stores 0 into right after the fn_802B9300 call (they share
+  the `n = 0` register, which stays in r30 across the call) are declared with
+  `= 0` after `end` (fn_80037D0C, fn_80037EE0, fn_800380D4, fn_80038424).
+
+### Trace wrappers, family B with K != 0 and N == 0 (17 functions, still open)
+- The order of the three `li`s before fn_80391C04 is decided by haifa sched1's
+  rank_for_schedule. The criteria, in order: priority, register weight (before
+  reload), class relative to the last scheduled insn, number of dependents,
+  then lower LUID.
+- adjust_priority raises an insn to max_priority when it becomes ready after
+  another insn is scheduled, kills no register, and sets a register with
+  REG_N_SETS == 1. Insns ready at block start never get this boost.
+- After a call (family A: fn_80056C9C; the vcall-style wrappers),
+  `li r5,LINE` is the only argument register set once, so it is boosted.
+  sched1 emits r5, r4, r3, and sched2 turns that into retail's
+  `li r4; li r5; li r3`. That is why every family-A and N >= 1 wrapper
+  matches.
+- Family B with N == 0 has nothing before the `li`s. All three are ready at
+  start with equal priority. r4 has an extra dependent (the outer `li r4,0`),
+  so the order is r4, then r3 before r5 by LUID.
+- Retail behaves as if r5 had a later reference. Passing any third argument
+  to lbl_80624408 reproduces retail's pre-call order exactly, for both small
+  and big LINE (li/ori), but the argument itself costs a visible `mr`/`li r5`.
+- No zero-cost source form has been found. Tried, beyond the earlier list: a
+  `(id >> 13, 0, id)` tag (inline, macro, local), unused/`this` parameters,
+  struct return (it returns through a hidden pointer here), an uninitialised
+  third argument (callee-saved copy), -O2, and no sched1.
