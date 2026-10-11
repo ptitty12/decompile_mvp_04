@@ -191,9 +191,17 @@ def load_report(path: Path):
     units, funcs = {}, {}
     for u in r.get("units", []):
         m = u.get("measures", {})
+        # Units without code (dtk's data-only auto splits) are skipped: their
+        # matched_code is trivially 100% and they vanish when a unit claims them.
+        if int(m.get("total_code") or 0) == 0:
+            continue
         units[u["name"]] = (float(m.get("fuzzy_match_percent") or 0), float(m.get("matched_code_percent") or 0))
         for f in u.get("functions", []):
-            funcs[(u["name"], f["name"])] = float(f.get("fuzzy_match_percent") or 0)
+            # (percent, address within the unit, size): address+size identify a
+            # function across renames (e.g. a mangled name changing when a
+            # parameter type is corrected).
+            funcs[(u["name"], f["name"])] = (float(f.get("fuzzy_match_percent") or 0),
+                                             f.get("address"), f.get("size"))
     return units, funcs
 
 
@@ -207,14 +215,24 @@ def check_regressions(current: Path, baseline: Path) -> None:
             regs.append(f"unit {k}: matched code {mc:.2f}% -> {nmc:.2f}%")
         elif nfz + 1e-9 < fz:
             regs.append(f"unit {k}: fuzzy {fz:.2f}% -> {nfz:.2f}%")
-    for k, v in bf.items():
-        nv = cf.get(k, 0.0)
+    by_addr = {(unit, a, s): (name, p) for (unit, name), (p, a, s) in cf.items() if a is not None}
+    renamed = []
+    for k, (v, addr, size) in bf.items():
+        if k in cf:
+            nv = cf[k][0]
+        elif addr is not None and (k[0], addr, size) in by_addr:
+            new_name, nv = by_addr[(k[0], addr, size)]
+            renamed.append(f"{k[1]} -> {new_name}")
+        else:
+            nv = 0.0
         if nv + 1e-9 < v:
             regs.append(f"function {k[1]} ({k[0]}): {v:.2f}% -> {nv:.2f}%")
+    for line in renamed[:50]:
+        print(f"renamed (same unit, address and size): {line}")
     if regs:
         fail(f"{len(regs)} match regression(s) vs baseline:\n  " + "\n  ".join(regs[:200]))
-    matched = sum(1 for v in cf.values() if v >= 100.0)
-    print(f"regressions: none ({matched} functions at 100%, baseline had {sum(1 for v in bf.values() if v >= 100.0)})")
+    matched = sum(1 for v in cf.values() if v[0] >= 100.0)
+    print(f"regressions: none ({matched} functions at 100%, baseline had {sum(1 for v in bf.values() if v[0] >= 100.0)})")
 
 
 def main() -> None:
