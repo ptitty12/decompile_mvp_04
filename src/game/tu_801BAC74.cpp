@@ -31,7 +31,7 @@ extern "C" int fn_801BAC74(A* a, unsigned i, int* p, float f) { return fn_801BA1
 
 extern "C" void fn_801BAE90(A* a)
 {
-    void* v = a->m14->m680;
+    void* v = a->m14->m65C[9];
     if (v) {
         for (int i = 0; i <= 3; i++) {
             P* p = fn_801A4C74(a->m14, i);
