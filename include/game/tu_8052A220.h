@@ -203,6 +203,60 @@ struct Unk805312AC_Tbl {
     unsigned char m17[1];
 };
 
+/*
+ * Unk8052E4C0_Obj (0x388 bytes): a 10x10 int table at +0, then 25 five-word entries from
+ * +0x190 (fn_8052E560 appends one, fn_8052E5FC resets them), then a flag bit and a
+ * 5-bit entry count at +0x384 (bits 0 and 1..5).
+ * Unk8052FA84_List: count at +0, array of Unk8052E4C0_Obj at +4, vptr at +8
+ * (virtual 2 at vtable +0x10 takes an index).
+ */
+struct Unk8052E4C0_Ent {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+struct Unk8052E4C0_Obj {
+    int m0[10][10];
+    Unk8052E4C0_Ent m190[25];
+    unsigned flag : 1;
+    unsigned n : 5;
+    unsigned rest : 26;
+    Unk8052E4C0_Obj();
+};
+extern "C" Unk8052E4C0_Obj* fn_8052E4C0(Unk8052E4C0_Obj* self);
+inline Unk8052E4C0_Obj::Unk8052E4C0_Obj() { fn_8052E4C0(this); }
+struct Unk8052FA84_ListData {
+    int m0;
+    Unk8052E4C0_Obj* m4;
+};
+struct Unk8052FA84_List : Unk8052FA84_ListData {
+    virtual int v08();
+    virtual void v10(int i);
+};
+
+/* 16-byte element of the third record table (fn_8052E654 family is 0x54; this one is
+ * fn_8052F5CC / fn_8052F79C's): thirteen fields, 7 bits each except fields 11 and 12 (11 bits). */
+struct Unk8052F5CC_Rec {
+    unsigned f0 : 7;
+    unsigned f1 : 7;
+    unsigned f2 : 7;
+    unsigned f3 : 7;
+    unsigned p0 : 4;
+    unsigned f4 : 7;
+    unsigned f5 : 7;
+    unsigned f6 : 7;
+    unsigned f7 : 7;
+    unsigned p1 : 4;
+    unsigned f8 : 7;
+    unsigned f9 : 7;
+    unsigned f10 : 7;
+    unsigned f11 : 11;
+    unsigned f12 : 11;
+    unsigned p3 : 21;
+};
+
 /* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */
 struct Unk8052CF34_Obj {
     virtual float M(int a);
