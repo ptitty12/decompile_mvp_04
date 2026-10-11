@@ -29,6 +29,7 @@ cd "<WORKTREE>" && export PATH="/c/Users/Patrick Taylor/AppData/Local/Microsoft/
 python configure.py > /dev/null && ninja > /dev/null     # once at the start
 python tools/scout/packet.py <START> <END>                 # unit overview
 python tools/match/asm_show.py build/GV4E69/asm show fn_XXXXXXXX
+python tools/match/m2c_draft.py <UNIT_NO_EXT> fn_XXXXXXXX   # first-draft C (m2c); a start, not a match
 python tools/match/diff_unit.py <UNIT_NO_EXT>              # rebuild + per-function result
 python tools/match/diff_unit.py <UNIT_NO_EXT> fn_XXXXXXXX  # side-by-side diff of one function
 python tools/verify/verify.py --baseline-ref origin/main   # before every commit; must print VERIFY PASS
