@@ -26,6 +26,28 @@ int fn_800FE390(UiV_1DCi* self)
     return r;
 }
 
+/* near-miss: same code; the scaled index lands in r0 here (retail r11) */
+extern char lbl_805BE138[];
+void fn_800FEB30(const char* s, int idx)
+{
+    const char* name = s;
+    if (name == 0)
+        name = lbl_805BE138;
+    else {
+        int pid = ((Ui6F8_10b*)fn_8011AA24(0)->m6F8->m10)->a6C[idx];
+        fn_800B555C()->m570 = pid;
+        fn_802DC9C0();
+        lbl_8061B8C0->m24 = 1;
+        fn_802D7ADC();
+    }
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    fn_8040B830(p->name, name, 15);
+    p->name[15] = 0;
+    fn_800B7B4C(UiGetMsgMgr(), &m, 0);
+}
+
 extern char lbl_80659A60[];
 UiWRaw::UiWRaw()
 {
@@ -57,6 +79,18 @@ void fn_800FECB0(UiV_0* self)
 {
     UiObj* o = self->m0;
     o->v67(1, fn_80101254(o));
+}
+
+extern char lbl_805BEF1C[];
+extern char lbl_805BEF28[];
+extern char lbl_805B6F58[];
+void fn_800FF0C4(int a, UiObj* obj)
+{
+    if (a == 0)
+        fn_800C8040(obj->v32((int)lbl_805BEF1C, 1))->v29(0x4F8C);
+    else
+        fn_800C8040(obj->v32((int)lbl_805BEF1C, 1))->v29(0x4F8D);
+    fn_800C8040(obj->v32((int)lbl_805BEF28, 1))->v30((int)lbl_805B6F58);
 }
 
 extern char lbl_806599F0[];

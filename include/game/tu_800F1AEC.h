@@ -55,7 +55,7 @@ public:
     virtual void v26();
     virtual void v27();
     virtual void v28(char* s);
-    virtual void v29();
+    virtual void v29(int a);
     virtual void v30(int a);
     virtual void v31();
     virtual int v32(int a, int b);
@@ -1382,6 +1382,11 @@ void fn_8010325C(UiObj* self, int a, int b, int c);
 
 void fn_800DFF0C(short* dst, const short* src);
 int fn_80403DE4(short* buf, const short* fmt, ...);
+
+struct Ui6F8_10b {
+    char pad0[0x6C];
+    int a6C[8];
+};
 
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
