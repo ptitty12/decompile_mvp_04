@@ -30,9 +30,8 @@ float fn_804028E4(float x);
 int fn_80255028(Unk8027C728_Track* t);
 int fn_80254EA4(Unk8027C728_Track* t, int a);
 Vec3 fn_8014E388(int idx);
-Vec3 fn_80379530(const Vec3& a, const Vec3& b, const Vec3& c, int d, float e, float f);
+Vec3 fn_80379530(const Vec3& a, const Vec3& b, const Vec3& c, float e, float f, int d);
 float fn_80410CE8(float y, float x);
-float fn_80410634(float x);
 float fn_80382BB8(Unk8027C728_Link* link);
 void fn_8027AC90(void* base, Unk80279BB8* out, int n, void* b, Vec3* arr);
 Vec3 fn_8037B128();
@@ -671,7 +670,12 @@ inline bool operator==(const Vec3& a, const Vec3& b)
 
 inline float Dist2(const Vec3& a, const Vec3& b)
 {
-    return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
+    return (b.x - a.x) * (b.x - a.x) + (b.z - a.z) * (b.z - a.z);
+}
+
+inline float Atan2(const Vec3& a, const Vec3& b)
+{
+    return fn_80410CE8(b.x - a.x, b.z - a.z);
 }
 
 inline float AngleDiff(float a, float b)
@@ -681,9 +685,8 @@ inline float AngleDiff(float a, float b)
     return d;
 }
 
-/* near-miss (76%): float register allocation and the first early exit differ
- * (retail keeps the track index in r3 with li r3,0 hoisted above the first
- * beq, and keeps q.x in f11 across the expression chain). */
+/* d2 is computed before lim is stored: a store to the stack between the
+ * comparisons and the loads of q would stop retail sharing the q.x load. */
 int fn_8027D708(void*, Player* pa, Player* pb)
 {
     Unk8027C728_Track* trk = &pb->m58C;
@@ -691,29 +694,30 @@ int fn_8027D708(void*, Player* pa, Player* pb)
     if (a == fn_80254EA4(trk, 0)) {
         return 0;
     }
-    if (trk->m38 == 3) {
+    int cur = trk->m38;
+    if (cur == 3) {
         return 0;
     }
-    int next = trk->m38;
-    if (next == a) {
-        next = a + 1;
-    }
+    int next = cur == a ? a + 1 : cur;
     Vec3 posA = pa->m60;
     Vec3 posB = pb->m60;
     Vec3 p0 = fn_8014E388(next);
     Vec3 p1 = fn_8014E388(a);
-    Vec3 q = fn_80379530(p0, p1, posA, 0, 0.0f, 0.0f);
+    Vec3 q = fn_80379530(p0, p1, posA, 0.0f, 0.0f, 0);
     if (!(q == p0)) {
         if (!(q == p1)) {
+            float d2 = Dist2(posA, q);
             const float lim = 9216.0f;
-            float d2 = Dist2(q, posA);
+            float ang;
+            float adiff;
+            float diff;
             if (!(d2 > lim)) {
-                float ang = fn_80410CE8(p1.x - posA.x, p1.z - posA.z);
-                float diff = AngleDiff(ang, fn_80382BB8(pa->m618));
-                float adiff = __builtin_fabsf(diff);
+                ang = Atan2(posA, p1);
+                diff = AngleDiff(ang, fn_80382BB8(pa->m618));
+                adiff = __builtin_fabsf(diff);
                 if (!(adiff > 0.7853982f)) {
-                    float da = Dist2(posA, p1);
-                    float db = Dist2(posB, p1);
+                    float da = Dist2(p1, posA);
+                    float db = Dist2(p1, posB);
                     return db < da;
                 }
             }
