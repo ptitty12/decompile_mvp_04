@@ -411,6 +411,7 @@ void fn_8031CBF8(void* unused, float* out) {
     out[6] = lbl_805EA634;
 }
 
+/* near-miss: retail copies the repeated float argument through an fmr chain (f3<-f2, f5<-f3); ours takes it straight from f1 */
 void* fn_8031CC2C(void* self, float t) {
     fn_8014D9EC(self, lbl_805EA650, lbl_805EA650, lbl_805EA650, t, lbl_805EA650);
     return self;
