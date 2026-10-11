@@ -15,11 +15,8 @@ extern "C" int fn_80190E40(Unk80190EB4_Obj* o, int** pp)
     fn_8026CA8C(o);
     int* p = *pp;
     int v = fn_80188EF4(o);
-    int* q = p + 1;
     *p = o->m36C;
-    *q = o->m4D4;
-    q[1] = v;
-    *pp = (int*)((char*)q + 8);
+    *pp = Unk80190E40_Put(p + 1, o->m4D4, v);
     return 1;
 }
 
@@ -147,9 +144,10 @@ extern "C" void fn_80191AD8(Unk80191AD8_S* s, int mode)
 //@80191B70
 extern "C" Unk80191B70_S* fn_80191B70(Unk80191B70_S* s)
 {
-    fn_8037936C(&s->m4, lbl_8069429C);
-    s->m4.m10 = lbl_806055AC;
-    s->m4.m1C = 0;
+    Unk80191B70_Sub* sub = &s->m4;
+    fn_8037936C(sub, lbl_8069429C);
+    *(Unk80183918_Vec3*)((char*)s + 0x14) = lbl_806055AC;
+    sub->m1C = 0;
     s->m78 = 0;
     return s;
 }
@@ -157,11 +155,35 @@ extern "C" Unk80191B70_S* fn_80191B70(Unk80191B70_S* s)
 //@80191BE0
 extern "C" Unk80191B70_S* fn_80191BE0(Unk80191B70_S* s, void* owner)
 {
-    fn_8037936C(&s->m4, lbl_8069429C);
-    s->m4.m10 = lbl_806055AC;
-    s->m4.m1C = 0;
-    fn_80191C5C(s, owner);
+    Unk80191B70_Sub* sub = &s->m4;
+    fn_8037936C(sub, lbl_8069429C);
+    *(Unk80183918_Vec3*)((char*)s + 0x14) = lbl_806055AC;
+    sub->m1C = 0;
+    fn_80191C5C((Unk80191C5C_S*)s, owner);
     return s;
+}
+
+//@80191C5C
+/* near-miss: 54/54 insns, 2 slots differ: the m70 and m0 stores swap places (400 orders of the
+ * last eight stores sampled). */
+extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
+{
+    s->m24 = 0;
+    s->m20 = 3;
+    s->m28 = lbl_806055AC;
+    s->m34 = lbl_806055AC;
+    s->m40 = lbl_806055AC;
+    s->m4C = lbl_806055AC;
+    s->m58 = 0.0f;
+    s->m5C = 1.0f;
+    s->m64 = 0;
+    s->m68 = 0;
+    s->m6C = 0;
+    s->m60 = 0.0f;
+    s->m78 = (char*)owner + 0xD4;
+    s->m74 = 0;
+    s->m0 = owner;
+    s->m70 = 0;
 }
 
 //@80193750

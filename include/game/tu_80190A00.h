@@ -42,6 +42,13 @@ public:
 };
 extern "C" void* fn_80191800(Unk80191720* self);
 
+inline int* Unk80190E40_Put(int* q, int b, int v)
+{
+    *q = b;
+    q[1] = v;
+    return q + 2;
+}
+
 /* Player-like object with the vtable at +0x98 (slot 9 takes one argument). */
 struct Unk80190EB4_Base {
     char pad0[0x98];
@@ -108,8 +115,7 @@ struct Unk80191AD8_Q {
 };
 /* Record built by fn_80191B70 / fn_80191BE0 / fn_80191C5C. */
 struct Unk80191B70_Sub {
-    char pad0[0x10];
-    Unk80183918_Vec3 m10;
+    char pad0[0x1C];
     int m1C;
 };
 struct Unk80191B70_S {
@@ -118,12 +124,31 @@ struct Unk80191B70_S {
     char pad24[0x78 - 0x24];
     void* m78;
 };
+struct Unk80191C5C_S {
+    void* m0;
+    char pad4[0x20 - 4];
+    int m20;
+    int m24;
+    Unk80183918_Vec3 m28;
+    Unk80183918_Vec3 m34;
+    Unk80183918_Vec3 m40;
+    Unk80183918_Vec3 m4C;
+    float m58;
+    float m5C;
+    float m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    void* m78;
+};
 extern char lbl_8069429C[];
 
 extern "C" {
 void fn_8037936C(void* p, const char* s);
 float fn_80193880(Unk80193750_H* h, int k, float t);
-void fn_80191C5C(Unk80191B70_S* s, void* owner);
+void fn_80191C5C(Unk80191C5C_S* s, void* owner);
 void fn_8026CA8C(void* o);
 void fn_8026CB30(void* o);
 int fn_80188EF4(void* o);
