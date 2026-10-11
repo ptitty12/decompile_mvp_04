@@ -114,6 +114,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cReleaseBall();
+    virtual ~cReleaseBall() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -128,6 +129,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSwingContactPhase();
+    virtual ~cSwingContactPhase() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -137,6 +139,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSwingMisTimedNonContactPhase();
+    virtual ~cSwingMisTimedNonContactPhase() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -146,6 +149,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSwingSweetSpot();
+    virtual ~cSwingSweetSpot() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -155,6 +159,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSwingBreaksStrikePlane();
+    virtual ~cSwingBreaksStrikePlane() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -164,6 +169,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSwingComplete();
+    virtual ~cSwingComplete() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -173,6 +179,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cCatchBall();
+    virtual ~cCatchBall() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual void fn_evslot12(void* a, int b, float f1, float f2);
@@ -197,6 +204,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cTouchBase();
+    virtual ~cTouchBase() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -210,6 +218,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cFirstTouchBase();
+    virtual ~cFirstTouchBase() {}
     virtual void fn_vslot2();                       /* empty, own function (0x802A80AC) */
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -220,6 +229,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cTagRunner();
+    virtual ~cTagRunner() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -234,6 +244,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cBlend1();
+    virtual ~cBlend1() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -243,6 +254,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cBlend2();
+    virtual ~cBlend2() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -252,6 +264,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cBlend3();
+    virtual ~cBlend3() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -261,6 +274,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cLeft();
+    virtual ~cLeft() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -274,6 +288,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSlide();
+    virtual ~cSlide() {}
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
 };
@@ -283,6 +298,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cDirtEvent();
+    virtual ~cDirtEvent() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -305,6 +321,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSpectacularAnimation();
+    virtual ~cSpectacularAnimation() {}
     virtual void fn_vslot2();                       /* empty, own function (0x802A86F0) */
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -315,6 +332,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cSignatureHRToFirstCelebration();
+    virtual ~cSignatureHRToFirstCelebration() {}
     virtual void fn_vslot2();                       /* empty, own function (0x802A8768) */
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -325,6 +343,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cAccessorize();
+    virtual ~cAccessorize() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -339,6 +358,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cRight();
+    virtual ~cRight() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual char fn_evslot14();
@@ -352,6 +372,7 @@ public:
     virtual const char* fn_vslot3();
     virtual int fn_vslot4();
     cHitByPitch();
+    virtual ~cHitByPitch() {}
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();              /* 0x802A89C8 (second half) */
     virtual char fn_evslot14();
