@@ -37,6 +37,20 @@ struct Unk801CAFA0_G {
 extern Unk801CAFA0_G lbl_8068C420;
 int fn_80289248(Unk80270BA0_X* x);
 extern V2 lbl_8060558C;
+extern int lbl_8068C6C8;
+extern V2 lbl_80691DBC;
+extern "C" {
+void fn_801CCE0C(Z* z);
+void fn_801CB344(Z* z);
+void fn_801CB324(Z* z);
+void fn_801CD0F0(Z* z);
+void fn_801CB148(Z* z);
+void fn_801CD400(Z* z);
+void fn_801C90AC(Z* z);
+void fn_801CA144(Z* z);
+void fn_801CA654(Z* z);
+int fn_801CDA84(Z* z);
+}
 extern float lbl_805D1C18;
 
 extern "C" void fn_801CB324(Z* z) { fn_801CB360(z); }
@@ -102,6 +116,43 @@ extern "C" float fn_801CD068(Z* z)
         r = !(v > 1.0f) ? (v >? lo) : 1.0f;
     }
     return r;
+}
+
+/* near-miss (62 vs 61 instructions): retail emits the 0..3 case block before the case 6 test. */
+extern "C" void fn_801CD2CC(Z* z)
+{
+    fn_801CCE0C(z);
+    if (z->m1A8 == 4) {
+        fn_801CB344(z);
+    } else {
+        int one = 1;
+        z->m120 = one;
+        if (fn_801CDA84(z) == 0)
+            z->m1A8 = one;
+        switch (z->m1A8) {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            fn_801CB324(z);
+            break;
+        case 4:
+            break;
+        case 6:
+            z->m1AC = one;
+            fn_801CD0F0(z);
+            lbl_8068C6C8 = z->m130;
+            fn_801CB148(z);
+            if (z->m130 == 5)
+                fn_801CD400(z);
+            else
+                fn_801C90AC(z);
+            fn_801CA144(z);
+            fn_801CA654(z);
+            lbl_80691DBC = *(V2*)z->m150;
+            break;
+        }
+    }
 }
 
 extern "C" float fn_801CD3C0(Z* z)
