@@ -118,14 +118,25 @@ def main() -> None:
         r = run("git", "merge", "--no-ff", "--no-edit", b, check=False)
         if r.returncode != 0:
             conflicted = git("diff", "--name-only", "--diff-filter=U").splitlines()
-            if conflicted == ["configure.py"]:
-                print(f"{b}: configure.py union-resolved ({union_resolve(Path('configure.py'))} hunks)")
-                git("add", "configure.py")
-                git("commit", "-q", "--no-edit")
-            else:
+            unresolved = []
+            for f in conflicted:
+                if f == "configure.py":
+                    print(f"{b}: configure.py union-resolved ({union_resolve(Path(f))} hunks)")
+                elif f.startswith("include/") and f.endswith(".h"):
+                    r = run(sys.executable, "tools/team/merge_structs.py", f, check=False)
+                    print(f"{b}: {r.stdout.strip()}")
+                    if r.returncode != 0:
+                        unresolved.append(f)
+                        continue
+                else:
+                    unresolved.append(f)
+                    continue
+                git("add", f)
+            if unresolved:
                 git("merge", "--abort")
-                refused.append(f"{b}: conflicts in {', '.join(conflicted)}")
+                refused.append(f"{b}: conflicts in {', '.join(unresolved)}")
                 continue
+            git("commit", "-q", "--no-edit")
         merged.append(b)
         print(f"merged {b} ({len(files)} files)")
 
