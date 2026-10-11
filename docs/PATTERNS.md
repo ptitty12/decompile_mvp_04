@@ -570,3 +570,41 @@ Open (not reproduced):
   sp+8 and message at sp+0x10; we get the reverse).
 - Ternary-chain id selection passed to a call (fn_8010B0CC): right length, different branch layout.
 - fn_800F5250/fn_800F5480, fn_800F3FCC, fn_800F3100, fn_80100BA4 (+2): see the near-miss comments.
+
+## Range-08 recipes (UI widgets, vptr +0x3C, 2026-10-11)
+
+- Vcall wrapper family: `lwz r3,OFF(r3)` then a vcall on that member, with
+  optional `li r4,K` and `li r3,1`. The slot is the vtable byte offset / 8
+  (the dtor is slot 1). A script matched about 50.
+  - A wrapper that does not set r4 before an int-taking slot forwards its own
+    second parameter: `void f(W* x, int a) { x->vslotN(a); }`.
+  - The same slot called with another arity: cast to a second class declared
+    with that signature (fn_80139090).
+- Constructors: write the vptr store, then fields in ascending offset order
+  (constants included). The last-written store is hoisted above the vptr
+  store, so permute only the last 2 or 3 stores (fn_8012E7FC, fn_80131380,
+  fn_80137F4C, fn_80136A9C, fn_80135538).
+- Sub-object at +0xDC with its vptr at +0x100 (or +0x98 with +0xBC): declare a
+  class with a 0x24-byte data pad plus its virtuals, and use a fresh
+  `((Sub*)((char*)p + 0xDC))->fn()` at every use. A cached `Sub*` local
+  changes allocation, and a by-value member is devirtualised.
+- Derived widget data members go in a derived struct, or the vptr moves.
+- `x = (a || b) ? 1 : 0` built as `li 1 / b / li 0` is an inline returning
+  `if (..) return 1; return 0;`.
+- `li r0,0; beq; li r0,1` after a call: `int ok = f(); int t = 0; if (ok) t = 1;`.
+  `int t = 0;` before the call puts t in a callee-saved register (fn_8014241C).
+- Stride tables (0x1C, 0x234): an inline `KeyAt(char* base, int off)` that
+  takes the base pointer keeps `x+K` in a register (`addi; lwzx/stwx`).
+  `const float&` store parameters do the same for float copies (fn_80142254).
+- Two `subic.` count-down copy loops share one function-scope counter
+  (fn_8013CF6C). Loop-scope counters give bdnz.
+- `char* p = buf;` caches the buffer address in a callee-saved register
+  (fn_8013A35C). A byte-offset `int* p = &x->m190; *(int*)((char*)p + which)`
+  keeps the index unfolded (fn_8012DEF4).
+- sprintf-style switch: one function-scope `int n;` assigned in each case,
+  then the call after the switch (fn_8013B218).
+- `bl fn_803774A8(size, heap)` is a plain extern "C" call, not `new[]`.
+- Open:
+  - a local struct whose address goes to two calls: retail rematerialises
+    `addi rX,r1,8` after the call (fn_80134F48, fn_80134F98);
+  - r4 moved before r3, suspected method calls into unmatched units (fn_80132630).
