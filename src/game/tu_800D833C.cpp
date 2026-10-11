@@ -83,6 +83,37 @@ int fn_800D87C4(Unk800D876C_A* t)
     return 0;
 }
 
+/* near-miss: three separate return paths; retail loads the 1 result before the final compare and keeps the sprintf buffer address last */
+int fn_800D8820(Unk800D876C_A* t)
+{
+    int r;
+    if (lbl_8061ADE4 != 0) {
+        if (lbl_8061ADE8 != 0 && lbl_8062151C == 0) {
+            lbl_8061ADE8 = lbl_8062151C;
+            int sp20 = lbl_8062151C;
+            char buf[0x18];
+            fn_804089B4(buf, lbl_805BD4B4, lbl_805BD4B8);
+            fn_803FEBDC(buf, 6, 0x64, &sp20);
+            fn_803FEC9C(sp20, 0x64);
+            r = 1;
+        } else
+            r = 0;
+    } else {
+        Unk800DB5F4_S* g = fn_800B555C();
+        int f = 0;
+        if (fn_800B59DC(g) != 0 || fn_800B5A70(fn_800B555C()) != 0 || fn_800B5B40(fn_800B555C()) != 0)
+            f = 1;
+        int m = 0x3C;
+        if (f != 0)
+            m = 0xA;
+        int e = t->m4;
+        r = 1;
+        if (e == -1 || !(lbl_8061A328 > e + m * 0xE10))
+            r = 0;
+    }
+    return r;
+}
+
 void fn_800D92D8(void* t)
 {
     int r = fn_8040ABA0() % 3;
@@ -110,15 +141,37 @@ static inline int Adv9C18()
     return t;
 }
 
-/* near-miss: 48/48 insns, switch tree differs only in the order of the cmpwi 10/34 pair
- * (adding dummy cases 0..9 gets within 3 slots; the real case set is unknown) */
+Unk80084910_N fn_800D9978(int a, int b)
+{
+    char buf[0x40] = "";
+    Unk80084910_N r;
+    int ok = 0;
+    Unk80084910_N* rp = &r;
+    rp->m0 = ok;
+    rp->m4 = ok;
+    do {
+        int rnd;
+        do {
+            rnd = fn_8040ABA0() % 15;
+            r.m0 = b;
+            r.m4 = rnd;
+            fn_80086078(&r, buf);
+        } while (fn_803FEE14(buf, 0x64) == 0);
+        ok = 1;
+        if (fn_802C3A2C(b, rnd) == 0)
+            ok = 0;
+    } while (ok == 0);
+    return r;
+}
+
+enum E9A64 { E9A64_Neg = -1, E9A64_Lo = 10, E9A64_Hi = 85 };
 int fn_800D9A64(int unused)
 {
     int r;
     int ok;
     do {
         r = fn_8040ABA0() % 87;
-        switch (r) {
+        switch ((E9A64)r) {
         case 10:
         case 34:
         case 37:

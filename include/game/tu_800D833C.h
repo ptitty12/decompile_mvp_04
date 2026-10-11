@@ -134,4 +134,24 @@ int fn_8008CFD8(char* p, int a, int b);
 int fn_80099570(void* p, int a, int b, int c);
 void fn_800D8EE0(void* t, int a);
 void fn_800D9360(void* t, int a);
+int fn_800B59DC(Unk800DB5F4_S* p);
+int fn_800B5A70(Unk800DB5F4_S* p);
+int fn_800B5B40(Unk800DB5F4_S* p);
+int fn_804089B4(char* dst, const char* fmt, ...);
+void fn_803FEBDC(char* s, int a, int b, int* c);
+void fn_803FEC9C(int a, int b);
+extern char lbl_805BD4B4[];
+extern char lbl_805BD4B8[];
+extern int lbl_8061ADE4;
+extern int lbl_8061ADE8;
+extern int lbl_8062151C;
+struct Unk80084910_N {
+    int m0;
+    int m4;
+};
+void fn_80086078(Unk80084910_N* n, char* s);
+int fn_803FEE14(char* s, int a);
+int fn_802C3A2C(int a, int b);
+extern char lbl_805B9A30[];
+Unk80084910_N fn_800D9978(int a, int b);
 #endif
