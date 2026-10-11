@@ -47,6 +47,13 @@ void fn_80353C60(void* ctx, int k);
 void fn_80353CB4(void* ctx, int k);
 void fn_80089164(void* ctx);
 extern int* lbl_8061B9C4;
+extern const float lbl_805B3B7C;
+extern const float lbl_805B3B60;
+void fn_80071E2C(Unk80071604* self, int a, Unk80070DDC_Stream* io);
+float fn_8007057C(void* self, int a);
+float fn_800706C0(void* self, int a);
+float fn_80070880(void* self, int a);
+float fn_80070BC8(void* self, int a);
 int fn_80080724(void* l, int k, int c);
 void fn_80080828(void* l, int k, int c, int v);
 int fn_800968C0(Unk8006902C_Side* s, int e, int k);
@@ -314,6 +321,22 @@ int fn_8006FB28(void* l, int k, int c)
     return r;
 }
 
+float fn_8006FD44(W* w, int a)
+{
+    float x = (float)w->v28(1, a);
+    float s = x + (float)w->v28(2, a);
+    float r = lbl_805B3B60;
+    if (!(s <= lbl_805B3B60))
+        r = x / s;
+    return r;
+}
+
+void fn_8006FE2C(Unk80071604* self, int a, Unk80070DDC_Stream* io)
+{
+    fn_80071E2C(self, a, io);
+    io->v08(a, self->m24, self->m1C << 2);
+}
+
 Unk80071604* fn_8006FE88(Unk80071604* self, const char* name, Obj* type, unsigned count)
 {
     fn_80071604(self, name, type, count);
@@ -339,4 +362,27 @@ void fn_8006FF60(Unk80071604* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(self->m24 + i * 12, 12);
+}
+
+float fn_80070810(void* self, int a)
+{
+    float x = fn_8007057C(self, a);
+    float y = fn_800706C0(self, a);
+    float r = lbl_805B3B7C;
+    if (!(y <= lbl_805B3B7C))
+        r = x / y;
+    return r;
+}
+
+float fn_80070CC4(void* self, int a)
+{
+    float r = fn_80070880(self, a) + fn_80070BC8(self, a);
+    return r;
+}
+
+float fn_80070D18(W* w, int a)
+{
+    float x = (float)w->v28(6, a);
+    float y = (float)w->v28(10, a);
+    return x + y;
 }
