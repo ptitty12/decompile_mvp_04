@@ -16,6 +16,22 @@ void fn_8037893C(void* a, int b, void* c, void* d, int e);
 void fn_801AA038(void* p, int n);
 void fn_801AA248(void* p);
 extern Unk801A57C8_G lbl_8068BF34;
+void fn_8023C514(void* a, Unk8019F8C0_Owner* o);
+void fn_8033E958(const char* s, ...);
+void fn_801A5394(Unk8019F8C0_Owner* o);
+void fn_801A5708(Unk8019F8C0_Owner* o);
+void fn_801A57B4(Unk8019F8C0_Owner* o);
+void fn_801A5014(Unk8019F8C0_Owner* o);
+void fn_8006F918(int a, int b);
+int fn_800A8874(void* m, int a, int b, int c);
+void fn_801A594C(Unk8019F8C0_Owner* o, int i);
+void fn_801A5D3C(Unk8019F8C0_Owner* o);
+void fn_801A5C1C(Unk8019F8C0_Owner* o);
+void fn_801A5B44(Unk8019F8C0_Owner* o);
+void fn_80378A34(void* a, void* b);
+extern char lbl_8068CCA8[];
+extern char lbl_805CEA04[];
+extern char lbl_805CEA28[];
 void fn_8028709C(void* x, unsigned h);
 int fn_801A2034(Unk8019F8C0_Owner* o, int i);
 void fn_801A7764(void* w, int t);
@@ -52,6 +68,38 @@ void fn_801A6240(Unk8019F8C0_Owner* o)
         fn_8028709C(t, 0xBEE24601u);
         fn_8028709C(t, 0x52D3659Du);
     }
+}
+
+void fn_801A642C(Unk8019F8C0_Owner* o)
+{
+    fn_8023C514(lbl_8068CCA8, o);
+    fn_8033E958(lbl_805CEA04);
+    fn_801A5394(o);
+    fn_801A5708(o);
+    fn_801A57B4(o);
+    fn_801A5014(o);
+    Unk8019F8C0_Mgr* m = o->m6F8;
+    int t = m->mC;
+    fn_8006F918(t, fn_800A8874(m, 0x64, 0, 0));
+    volatile int c = 0;
+    int i = 0;
+    do {
+        fn_801A594C(o, i);
+        int w = c;
+        int n;
+        if (w > 1) {
+            n = w;
+        } else {
+            n = w + 1;
+        }
+        c = n;
+        i = n;
+    } while (i <= 1);
+    fn_801A5D3C(o);
+    fn_801A5C1C(o);
+    fn_801A5B44(o);
+    fn_80378A34(o->m24, o->m704);
+    fn_8033E958(lbl_805CEA28);
 }
 
 void fn_801A6528(Unk8019F8C0_Owner* o)

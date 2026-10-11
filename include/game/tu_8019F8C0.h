@@ -127,7 +127,8 @@ struct Unk8019F8C0_Mgr10 {
 };
 
 struct Unk8019F8C0_Mgr {
-    char pad0[0x10];
+    char pad0[0xC];
+    int mC;
     Unk8019F8C0_Mgr10* m10;
     Unk8019F8C0_Inner* m14;
 };
@@ -216,7 +217,9 @@ struct Unk8019F8C0_Sub {
  * 0x58C, 0x618, 0x65C, 0x680, 0x6C4..0x6DC, 0x6F8, 0x700, 0x704 (inline), 0x710. */
 struct Unk8019F8C0_Owner {
 /*BEGIN Unk8019F8C0_Owner*/
-    char pad0[0x30];
+    char pad0[0x24];
+    char m24[4];
+    char pad28[0x8];
     Unk8019F8C0_Sub* m30[6];
     int m48;
     int m4C;
