@@ -128,6 +128,222 @@ static inline void StF(char* b, int off, const float& v)
 {
     *(float*)(b + off) = v;
 }
+struct UnkDC_Data {
+    char pad0[0x24];
+};
+struct UnkDC : UnkDC_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6(int a);
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual int fn_vslot11();
+    virtual void fn_vslot12();
+    virtual int fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+};
+struct UnkDC_Owner : Unk800C7B40_Widget {
+    char pad40[0x9C];
+};
+/* Screen class of this unit as seen by fn_80141724: the controls at +0x154/+0x170/+0x178/+0x17C have a second base at +0xDC. */
+struct Unk80141724 : Unk800C7B40_Widget {
+    char pad40[0xF4];
+    int m134;
+    Unk800C7B40_Widget* m138;
+    char pad13C[0x18];
+    UnkDC_Owner* m154;
+    char pad158[0x18];
+    UnkDC_Owner* m170;
+    char pad174[0x4];
+    UnkDC_Owner* m178;
+    UnkDC_Owner* m17C;
+    char pad180[0x5C];
+    int m1DC[1];
+    char pad1E0[0xDC];
+    int m2BC;
+};
+extern "C" {
+int fn_800ED4F0(void* x, int a);
+void fn_8013F60C(int a, int b, void* c, void* d);
+void fn_8013F91C(void* x, int a);
+void fn_801413E8(void* x, int a);
+void fn_800C5E28();
+void fn_800C6698();
+void fn_8013E240(void* x);
+void fn_801407AC(void* x);
+
+}
+extern const int lbl_805C2074[];
+struct Unk80141214_CtlData {
+    char pad0[0x3C];
+};
+struct Unk80141214_Ctl : Unk80141214_CtlData {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+    virtual void fn_vslot41();
+    virtual void fn_vslot42();
+    virtual void fn_vslot43();
+    virtual void fn_vslot44();
+    virtual void fn_vslot45();
+    virtual void fn_vslot46();
+    virtual void fn_vslot47();
+    virtual void fn_vslot48();
+    virtual void fn_vslot49();
+    virtual void fn_vslot50();
+    virtual void fn_vslot51(int a, int b);
+};
+/* Screen class as seen by fn_80141214. */
+struct Unk80141214 : Unk800C7B40_Widget {
+    char pad40[0x120];
+    Unk800C7B40_Widget* m160;
+    Unk80141214_Ctl* m164;
+    char pad168[0x4];
+    Unk800C7B40_Widget* m16C;
+};
+extern "C" {
+void* fn_800B555C();
+int fn_800B57EC(void* s);
+}
+extern "C" void fn_80141214(void* x, int idx);
+struct Unk8061930C_Inner {
+    char pad0[0x42C];
+    int m42C;
+};
+/* Screen class as seen by fn_80141084. */
+struct Unk80141084 : Unk800C7B40_Widget {
+    char pad40[0xF4];
+    int m134;
+    char pad138[0x1C];
+    UnkDC_Owner* m154;
+    char pad158[0x54];
+    int m1AC;
+};
+extern "C" {
+void fn_80125084(int a, int b);
+void fn_80125128(int a, int b);
+void fn_801251CC(int a, int b, int c, int d);
+int fn_800B5634(void* s);
+int fn_800B56C4(void* s);
+int fn_80140250(void* x, int a);
+}
+struct Unk80142F50_Slot {
+    char pad0[0x110];
+    short m110;
+    short m112;
+};
+struct Unk80142F50_Mgr {
+    int m0;
+    struct Unk80142F50_Inner {
+        char pad0[0x10];
+        Unk80142F50_Slot* m10;
+    }* m4;
+};
+extern Unk80142F50_Mgr* lbl_806192E0;
+struct Unk80142544_WData {
+    char pad0[0x3C];
+};
+struct Unk80142544_W : Unk80142544_WData {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28(const char* name);
+};
+/* Screen class as seen by fn_80142544. */
+struct Unk80142544 : Unk800C7B40_Widget {
+    char pad40[0x100];
+    Unk800C7B40_Widget* m140;
+    int m144;
+    int m148;
+};
+extern const char lbl_805BF1A0[];
+extern const char lbl_805C2BF4[];
+extern const char lbl_805C2BFC[];
+extern const char lbl_805C2C00[];
+extern const char lbl_805C2C0C[];
+extern const char lbl_805B6F58[];
+extern const int lbl_805C3C3C[];
+extern int lbl_8061A328;
+extern int lbl_8061977C;
+extern "C" {
+void fn_800ECE34(void* x);
+Unk800C7B40_Widget* fn_800C8044(Unk800C7B40_Widget* p);
+Unk80142544_W* fn_800C8040(Unk800C7B40_Widget* p);
+Unk800C7B40_Widget* fn_800C8058(Unk800C7B40_Widget* p);
+void fn_804031BC(char* dst, const char* src);
+void fn_800DFEAC(char* buf, const char* s);
+void fn_800DFF0C(char* buf, int v);
+
+int fn_80143114(void* x);
+void fn_801431A4(void* x);
+}
 
 struct UnkP0 {
     const void* m0;
@@ -187,8 +403,84 @@ extern "C" void* fn_80140718()
     return fn_80090880(lbl_8061977C, o->fn_vslot3(v));
 }
 
+extern "C" void fn_80141084(Unk80141084* x)
+{
+    if (fn_80140250(x, ((UnkDC*)((char*)x->m154 + 0xDC))->fn_vslot11()) != 0) {
+        fn_80125084(x->m1AC, 2);
+        fn_80125084(x->m1AC, 0);
+    } else {
+        fn_801251CC(x->m1AC, 2, x->m134 == 1 ? 0x351C : 0x351B, 2);
+        fn_80125128(x->m1AC, 0);
+    }
+    if (((UnkDC*)((char*)x->m154 + 0xDC))->fn_vslot11() == 0x37) {
+        if (((Unk8061930C_Inner*)lbl_8061930C->m34)->m42C == 0) {
+            fn_80125084(x->m1AC, 2);
+            fn_80125084(x->m1AC, 0);
+        } else {
+            fn_80125128(x->m1AC, 0);
+            fn_801251CC(x->m1AC, 2, x->m134 == 1 ? 0x351C : 0x351B, 2);
+        }
+        if (fn_800B56C4(fn_800B555C()) != 0 || fn_800B5634(fn_800B555C()) != 0) {
+            fn_801251CC(x->m1AC, 3, 0x5D79, 3);
+            return;
+        }
+        fn_80125084(x->m1AC, 3);
+        return;
+    }
+    fn_801251CC(x->m1AC, 3, 0x3CA5, 4);
+}
+
+extern "C" void fn_80141214(void* xp, int idx)
+{
+    Unk80141214* x = (Unk80141214*)xp;
+    int n = 0x4D46;
+    int t = lbl_805C2004[idx];
+    ((UnkDC*)((char*)x->m164 + 0xDC))->fn_vslot15();
+    x->m164->fn_vslot51(t + 0x4D27, 0);
+    x->m164->fn_vslot51(0x3C90, 0);
+    do {
+        x->m164->fn_vslot51(n, 0);
+        n = n + 1;
+    } while (n <= 0x4D4C);
+    if (fn_800B57EC(fn_800B555C()) != 0) {
+        ((UnkDC*)((char*)x->m164 + 0xDC))->fn_vslot6(1);
+    } else {
+        ((UnkDC*)((char*)x->m164 + 0xDC))->fn_vslot6(0);
+    }
+    if (idx == 0x1E || idx == 0xA || idx == 0x19 || idx == 0x27) {
+        x->m16C->fn_vslot16(0);
+        x->m160->fn_vslot16(0);
+        return;
+    }
+    x->m16C->fn_vslot16(1);
+    x->m160->fn_vslot16(1);
+}
+
 extern const int lbl_805C3C00[];
 extern "C" int fn_80141710(int i) { return lbl_805C3C00[i]; }
+
+extern "C" void fn_80141724(Unk80141724* x)
+{
+    int idx = x->m1DC[fn_800ED4F0(x, x->m2BC)];
+    ((UnkDC*)((char*)x->m154 + 0xDC))->fn_vslot8(idx);
+    int sel = fn_800ED4F0(x, 3);
+    fn_80141214(x, idx);
+    ((UnkDC*)((char*)x->m170 + 0xDC))->fn_vslot6(lbl_805C2074[idx]);
+    fn_8013F60C(idx, sel, x->m17C, x->m178);
+    fn_8013F91C(x, idx);
+    if (x->m138->fn_vslot60() == 0) {
+        if (((UnkDC*)((char*)x->m17C + 0xDC))->fn_vslot13() == 1) {
+            x->m138->fn_vslot68(1);
+        }
+    }
+    fn_801413E8(x, idx);
+    fn_800C5E28();
+    fn_800C6698();
+    fn_8013E240(x);
+    if (x->m134 == 1) {
+        fn_801407AC(x);
+    }
+}
 
 struct Unk8014188C {
     char pad0[0x1D4];
@@ -320,6 +612,37 @@ extern "C" Unk801418B4* fn_8014241C(Unk801418B4* self, int a, int b, int c, int 
     return self;
 }
 
+extern "C" void fn_80142544(Unk80142544* x)
+{
+    fn_800ECE34(x);
+    x->fn_vslot8(0);
+    x->m140 = fn_800C8044(x->fn_vslot32(lbl_805BF1A0, 1));
+    x->m144 = x->m140->m26;
+    x->m148 = x->m140->m28;
+    ((UnkDC*)((char*)fn_800C8058(x->m140->fn_vslot32(lbl_805C2BF4, 1)) + 0xDC))->fn_vslot6(lbl_80687CC8.m0 - 1);
+    char buf[104];
+    fn_804031BC(buf, lbl_805B6F58);
+    fn_800DFEAC(buf, lbl_805C2BFC);
+    fn_800DFF0C(buf, (int)fn_80090880(lbl_8061977C, lbl_805C3C3C[lbl_80687CC8.m0 - 1]));
+    fn_800DFEAC(buf, lbl_805C2BFC);
+    fn_800C8040(x->m140->fn_vslot32(lbl_805C2C00, 1))->fn_vslot28(buf);
+    ((UnkDC*)((char*)fn_800C8058(x->m140->fn_vslot32(lbl_805C2C0C, 1)) + 0xDC))->fn_vslot6(lbl_80687CC8.m0 - 1);
+    if (fn_80143114(x) == 0 || lbl_8061A328 <= lbl_80687CC8.m10) {
+        x->fn_vslot8(0);
+    } else {
+        fn_801431A4(x);
+    }
+    Unk80142F50_Slot* s = lbl_806192E0->m4->m10;
+    int a = s->m110;
+    int b = s->m112;
+    if ((unsigned)(a - 0xF) <= 0x262) {
+        x->m140->fn_vslot9(a);
+    }
+    if ((unsigned)(b - 8) <= 0x1D0) {
+        x->m140->fn_vslot10(b);
+    }
+}
+
 extern "C" void fn_801427C8(Unk800C7B40_Widget* x)
 {
     fn_800ECF18(x);
@@ -334,18 +657,6 @@ extern "C" void fn_80142F08(Unk800C7B40_Widget* x)
     fn_800ED254(x);
 }
 
-struct Unk80142F50_Slot {
-    char pad0[0x110];
-    short m110;
-    short m112;
-};
-struct Unk80142F50_Mgr {
-    int m0;
-    struct Unk80142F50_Inner {
-        char pad0[0x10];
-        Unk80142F50_Slot* m10;
-    }* m4;
-};
 struct Unk80142F50 : Unk800C7B40_Widget {
     char pad40[0x100];
     Unk800C7B40_Data* m140;
@@ -355,7 +666,6 @@ struct Unk80142F50 : Unk800C7B40_Widget {
     int pad154;
     int m158;
 };
-extern Unk80142F50_Mgr* lbl_806192E0;
 extern "C" void fn_80142F50(Unk80142F50* x)
 {
     Unk80142F50_Slot* s = lbl_806192E0->m4->m10;
