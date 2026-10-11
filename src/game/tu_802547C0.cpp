@@ -469,7 +469,6 @@ void fn_802569F0(int self, Unk802569F0_Ref* p)
     fn_80244858(p->m4);
 }
 
-/* Object with its vptr at +0x98 (the data before it belongs to a non-polymorphic base). */
 struct Unk80256A14_Vec3 {
     float m0;
     float m4;
@@ -493,40 +492,6 @@ int fn_80256A88(Unk80256A88_SA08* self)
 {
     return self->mA08;
 }
-
-struct Unk80256A90_Data {
-    char pad0[0x98];
-};
-struct Unk80256A90_V : Unk80256A90_Data {
-    virtual void v1();
-    virtual void v2();
-    virtual void v3();
-    virtual void v4();
-    virtual void v5(int a);
-    virtual void v6();
-    virtual void v7();
-    virtual void v8();
-    virtual void v9();
-    virtual void v10();
-    virtual void v11();
-    virtual void v12();
-    virtual void v13();
-    virtual void v14();
-    virtual void v15();
-    virtual void v16();
-    virtual void v17();
-    virtual void v18();
-    virtual void v19();
-    virtual void v20();
-    virtual void v21();
-    virtual void v22();
-    virtual void v23();
-    virtual void v24();
-    virtual void v25();
-    virtual void v26();
-    virtual void v27();
-    virtual void v28();
-};
 
 void fn_80256A90(Unk80256A90_V* self)
 {
