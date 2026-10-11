@@ -59,13 +59,12 @@ void fn_802803A4(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c, int d)
     }
 }
 
-inline float Dist2D(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
-{
-    float dx = a.x - b.x;
-    float dz = a.z - b.z;
-    return dx * dx + dz * dz;
-}
-
+/* near-miss: 92 of 92 instructions, but the position copy, distance test and
+ * their stack temporaries differ from retail (retail keeps two Vec3 copies at
+ * sp+0x10 and sp+0x20 and has no dx/dz locals). Tried: an inline by-value
+ * Dist2D and getter (extra temp copies), locals for dx/dz, and the order of
+ * the zeroing store. The first SetSlot168 store folds its constant index into
+ * a displacement here, retail keeps `li r9,0x168; stwx`. */
 void fn_80280F08(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
 {
     int zero = 0;
@@ -83,11 +82,13 @@ void fn_80280F08(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
             active = 1;
         }
         if (active) {
-            Unk80273498_Vec3 w = ctx->m680->m60;
+            Unk80273498_Vec3 pos = ctx->m680->m60;
+            float dx = pos.x - lbl_805DED28.x;
+            float dz = pos.z - lbl_805DED28.z;
+            float d2 = dx * dx + dz * dz;
 
-            w.y = 0.0f;
-            float d2 = Dist2D(w, lbl_805DED28);
-            if (!(d2 <= lbl_8061E6D0 * 144.0f * lbl_8061E6D0)) {
+            pos.y = 0.0f;
+            if (!(d2 <= lbl_8061E6D0 * (lbl_8061E6D0 * 144.0f))) {
                 int one = 1;
 
                 if (p->m190 == 1) {
@@ -116,6 +117,12 @@ float fn_802816D0(Unk8027FD64_Goal* g, Unk8014D8AC_Ctx* ctx)
     return result;
 }
 
+/* near-miss: 56 of 56 instructions, 6 differ in registers and order only.
+ * Retail clears bits 4/5 in r0 and tests bit 14 on that cleared word (andis.
+ * r9,r0,2); here the test reads the original word in r11 (combine folds the
+ * cleared copy away), and the spill of f1 is placed earlier. Tried: statement
+ * orders of the clears, m94 store and test, a local for the call result, a
+ * reference for the flag word. */
 void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)
 {
     float lim = 76176.0f;

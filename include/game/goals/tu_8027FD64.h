@@ -75,9 +75,15 @@ struct Unk8027FD64_Outer700 {
     char pad0[0x3B4];
     void* m3B4;
 };
+/* Position holder at Unk8027FD64_Ctx::m680 (vector at +0x60, returned by value). */
+struct Unk8027FD64_Holder680 {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+    Unk80273498_Vec3 fn_GetPos() { return m60; }
+};
 struct Unk8027FD64_Ctx {
     char pad0[0x680];
-    Unk80273498_Pos* m680;
+    Unk8027FD64_Holder680* m680;
     char pad684[0x6CC - 0x684];
     Unk8027FD64_Pos6CC* m6CC;
     char pad6D0[0x6F8 - 0x6D0];
