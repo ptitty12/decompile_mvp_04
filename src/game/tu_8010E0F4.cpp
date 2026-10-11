@@ -60,7 +60,7 @@ void fn_80131F34(Unk800C7B40_Widget* w, Scr* self, void (*cb)(int, Scr*), int a,
 
 // PROTOS-BEGIN
 extern "C" {
-int fn_8010E0F4(Scr* self, int a);
+int fn_8010E0F4(Scr* self, Unk800C7B40_Widget* a);
 int fn_8010E40C(Scr* self, Scr* a, int b, int c);
 void fn_8010E4BC(Scr* self);
 int fn_8010E4FC(Scr* self, int a);
@@ -95,7 +95,7 @@ Unk800C7B40_Widget* fn_80110D90(Scr* self, int a);
 
 extern "C" {
 
-int fn_8010E0F4(Scr* self, int a)
+int fn_8010E0F4(Scr* self, Unk800C7B40_Widget* a)
 {
     if (a == self->fn_vslot29(lbl_805BFA5C) || a == self->fn_vslot29(lbl_805BFA70)) {
         fn_8010F1E4(self);

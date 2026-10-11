@@ -85,7 +85,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot26();
     virtual void fn_vslot27();
     virtual void fn_vslot28();
-    virtual int fn_vslot29(const char* name);
+    virtual Unk800C7B40_Widget* fn_vslot29(const char* name);
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
     virtual void fn_vslot31();
     virtual Unk800C7B40_Widget* fn_vslot32(const char* name, int a);
@@ -140,7 +140,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot81();
     virtual void fn_vslot82();
     virtual void fn_vslot83();
-    virtual void fn_vslot84();
+    virtual void fn_vslot84(int a);
     virtual void fn_vslot85();
     virtual void fn_vslot86();
     virtual void fn_vslot87();
@@ -381,9 +381,27 @@ struct Unk80117D20_Scr : Unk800C7B40_Widget {
     int m134;
 };
 
+/* DIFFICULTY screen (vtable lbl_8064FE18, ctor fn_80120450 in tu_8011C5E8.cpp); methods in tu_8012068C.cpp.
+ * m134/m138/m13C are looked up by name in fn_8012068C (group, SG1 label, TL1 label). */
+struct Unk80120450_Diff : Unk800C7B40_Widget {
+    char pad40[0xF0];
+    int m130;
+    Unk800C7B40_Widget* m134;
+    Unk800C7B40_Widget* m138;
+    Unk800C7B40_Widget* m13C;
+};
+
 /* Front-end state object returned by fn_800B555C; +0x570 is compared against ids. */
+struct UnkFESub {
+    char pad0[0x4D4];
+    int m4D4;
+    int m4D8;
+    int m4DC;
+};
 struct UnkFEState {
-    char pad0[0x570];
+    char pad0[8];
+    UnkFESub m8;
+    char pad4E8[0x88];
     int m570;
 };
 extern "C" UnkFEState* fn_800B555C();
@@ -442,6 +460,15 @@ struct UnkGame {
     int m704;
     int m708;
 };
+/* lbl_8061B8C0 -> object whose +8 is an array of the three game-state objects (+0x24 a flag). */
+struct UnkGameTbl {
+    int m0;
+    int m4;
+    UnkGame* m8[3];
+    char pad14[0x10];
+    int m24;
+};
+extern UnkGameTbl* lbl_8061B8C0;
 extern "C" {
 UnkGame* fn_8011AA24(int i);
 void* fn_801A4CE8(UnkGame* g, int a);

@@ -7,13 +7,6 @@
 
 typedef Unk800C7B40_Widget Wid;
 
-/* lbl_8061B8C0 -> object whose +8 is an array of the three game-state objects. */
-struct UnkGameTbl {
-    int m0;
-    int m4;
-    UnkGame* m8[3];
-};
-extern UnkGameTbl* lbl_8061B8C0;
 
 // PROTOS-BEGIN
 extern "C" {
