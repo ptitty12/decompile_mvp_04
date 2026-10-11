@@ -68,11 +68,12 @@ void fn_8032850C(int p);
 int fn_803285A0(int n);
 int fn_803285F4(int n);
 int fn_80328648(int n);
+void fn_80328690(FxBase* self, int a);
 void fn_803289C0(int a);
 void fn_80329498();
 void fn_803296AC();
 void fn_803296BC(int a);
-int fn_803296E8();
+int fn_803296E8(void* unused);
 void fn_80329924(FxSing* self, int a);
 FxSing* fn_80329988();
 void fn_803299D4(FxSing* self);
@@ -256,6 +257,21 @@ int fn_80328648(int n) {
     return -1;
 }
 
+/* near-miss: retail keeps two separate -1 constants (list tail index in r29, search cursor stored to sp+8); ours merges them */
+void fn_80328690(FxBase* self, int a) {
+    self->m20 = a;
+    int last = -1;
+    int row = fn_80328648(self->m1C);
+    int cur = -1;
+    int tmp;
+    while (fn_803283D8(row, a, &cur, &tmp)) last = cur;
+    cur = fn_803296E8(self);
+    if (last > 0) lbl_806E2274[last].m4 = cur;
+    else lbl_806E2184[row][a] = cur;
+    lbl_806E2274[cur].m4 = 0;
+    lbl_806E2274[cur].m0 = (int)self;
+}
+
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
 /* near-miss: callee-saved lis registers for lbl_806202FC / lbl_806202F4 swapped */
@@ -270,7 +286,7 @@ void fn_803296AC() { lbl_806202FC = 1; }
 
 void fn_803296BC(int a) { fn_80320DD0(&lbl_80691AEC, a); }
 
-int fn_803296E8() {
+int fn_803296E8(void* unused) {
     int i = lbl_806202F0;
     if (i <= 0xF9) {
         do {
