@@ -220,10 +220,6 @@ struct Unk8019E490_G {
     void* m8;
     void* mC;
 };
-struct Unk8019E490_B {
-    char pad0[0x6C];
-    int m6C;
-};
 extern Unk8019E490_G* lbl_8061B8C0;
 extern float lbl_8068BEB0;
 extern float lbl_8068BEB4;
@@ -246,7 +242,6 @@ void fn_8017AFA0(void* p);
 void fn_80157734(void* p);
 int fn_8011AA4C(void* p);
 Unk8019E490_Rec* fn_801A04A8(void* p, int a);
-Unk8019E490_B* fn_801A6DB8(void* o);
 void fn_8031E1D4(void* p, const char* s);
 void fn_8017B238(void* p);
 int fn_801A2034(void* c, int a);
