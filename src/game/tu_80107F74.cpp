@@ -5,6 +5,13 @@
 #include "game/tu_800F1AEC.h"
 
 
+extern int lbl_8061A330;
+void fn_80108034(UiV_134f_198i* self, float f)
+{
+    fn_800DC50C(self->m198, self->m134, f);
+    lbl_8061A330 = 1;
+}
+
 extern char lbl_8064F0D0[];
 UiScrRaw* fn_80108214(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -92,6 +99,16 @@ void fn_8010878C(UiV_134* self, char* out)
     fn_8040B830(out, o->v33(5, 1)->name, 16);
 }
 
+void fn_801089E4(UiObj* self, int a)
+{
+    int v = fn_801059E4();
+    if (a == 1)
+        v = v == 0;
+    Ui8011AA24* o = fn_8011AA24(0);
+    o->m788 = v;
+    fn_801A3704(o, 1);
+}
+
 extern char lbl_8064EE28[];
 UiScrRaw* fn_80108A38(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -101,6 +118,11 @@ UiScrRaw* fn_80108A38(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m134 = 0;
     self->m138 = 0;
     return self;
+}
+
+void fn_80108DB0(int a, UiObj* obj)
+{
+    obj->v67(2, fn_800B555C()->m570);
 }
 
 void fn_80108E04(UiObj* self)
