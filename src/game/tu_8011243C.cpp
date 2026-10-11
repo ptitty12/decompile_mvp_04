@@ -9,6 +9,19 @@ typedef Unk8010E0F4_Scr UnkScrA;
 typedef Unk80114A20_Scr Scr;
 
 extern const char lbl_805BE138[];
+extern const char lbl_805B955C[];
+extern const char lbl_8065B888[];
+extern const char lbl_80649DA0[];
+struct UnkEv {
+    int m0;
+    const void* m4;
+    UnkEv(int t)
+    {
+        m0 = t;
+        m4 = lbl_8065B888;
+    }
+    ~UnkEv() { m4 = lbl_80649DA0; }
+};
 extern const char lbl_8065C4E0[];
 extern const char lbl_80650610[];
 extern const char lbl_80650628[];
@@ -28,6 +41,8 @@ void fn_801145C0(UnkScrA* self);
 void fn_80114664(UnkScrA* self, int b);
 void fn_801147E4(int a, UnkScrA* b);
 void fn_80114840(int a, UnkScrA* b);
+void fn_8011489C(UnkScrA* self);
+void fn_8011496C(UnkScrA* self);
 void fn_80114A00(UnkScrA* self);
 void* fn_80114A20(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_80114D14(Scr* self, int a);
@@ -46,6 +61,7 @@ int fn_80115924(Scr* self, int a);
 // PROTOS-END
 extern "C" {
 void fn_800ED310(UnkScrA* self);
+void fn_8037893C(void* a, int b, void* ev, int c, int d);
 void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_80134E38(void* p, int a);
 void fn_800ECAA4(UnkScrA* self);
@@ -163,6 +179,36 @@ void fn_80114840(int a, UnkScrA* b)
         }
     }
     fn_801145C0(b);
+}
+
+void fn_8011489C(UnkScrA* self)
+{
+    char nm[16];
+    char* np = nm;
+    fn_8011452C(self);
+    fn_80114528(self);
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805BADC8, 0xF);
+    np[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, self);
+    UnkEv ev(0x9E);
+    fn_8037893C((char*)fn_8011AA24(0) + 0x704, ev.m0, &ev, 0, 0);
+}
+
+void fn_8011496C(UnkScrA* self)
+{
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805B955C, 0xF);
+    np[15] = 0;
+    fn_8011452C(self);
+    fn_80114528(self);
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, self);
 }
 
 void fn_80114A00(UnkScrA* self)
