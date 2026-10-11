@@ -7,6 +7,12 @@
  * Declarations for game/tu_801AB63C.cpp (reconstructed; placeholders only).
  */
 
+/* Two-word pair (fn_801AE2B0.. helpers). */
+struct Unk801AB63C_E {
+    int m0;
+    int m4;
+};
+
 /* Entry of the 0x14-byte table at +0x60 of the controller (fn_801AE008, fn_801AE018). */
 struct Unk801AB63C_Ent {
     int m0;
@@ -32,9 +38,12 @@ struct Unk801AB63C_P {
 
 /* Argument object read by the controller: index at +0x708, flags at +0x4D0. */
 struct Unk801AB63C_Q {
-    char pad0[0x4D0];
+    char pad0[0x44C];
+    Unk8019F8C0_Owner* m44C;
+    char pad450[0x4D0 - 0x450];
     int m4D0;
-    char pad4D4[0x708 - 0x4D4];
+    char pad4D4[0x704 - 0x4D4];
+    int m704;
     int m708;
 };
 
