@@ -678,9 +678,9 @@ extern "C" int fn_800971C8(Obj3* o, int x)
 extern "C" int fn_80097210(Obj3* o, int i)
 {
     unsigned char s = o->m17C[i];
-    if (s == 0xFF)
-        return 0;
-    return o->m3E8[s].m0;
+    if (s != 0xFF)
+        return o->m3E8[s].m0;
+    return 0;
 }
 
 extern "C" int fn_80097238(Obj3* o, int key)
