@@ -15,6 +15,7 @@ typedef Unk8027C728_Base Base;
 typedef Unk80273498_Vec3 Vec3;
 
 extern const Vec3 lbl_806055AC;
+extern const Vec3 lbl_806055AC;
 extern char lbl_806EF9C7;
 extern char lbl_8061EC9C[];
 
@@ -719,6 +720,46 @@ int fn_8027D708(void*, Player* pa, Player* pb)
         }
     }
     return 0;
+}
+
+/* Zeroes the flag word with word masks (an AND against a register constant is
+ * what retail has for the multi-run masks; bit-field stores would give rlwinm
+ * pairs): 0x001E6000 = bits 11-14 and 17-18, 0xA2E002FF keeps bits 0, 2, 6,
+ * 8-10, 22 and the low byte. */
+void fn_8027D9A4(Unk8027D9A4* d)
+{
+    d->m0 = 4;
+    d->f2 = 0;
+    d->f6 = 0;
+    d->m78 = 0;
+    d->m7C = 0;
+    d->m84 = 0.0f;
+    d->m80 = 0.0f;
+    d->f22 = 0;
+    d->m88 = 0.0f;
+    d->m90 = 0.0f;
+    d->m8C = 0.0f;
+    d->m98 = 0.0f;
+    d->m9C = -1;
+    d->mA0 = -1;
+    d->mA4 = lbl_806055AC;
+    d->f0 = 0;
+    d->f8 = 0;
+    d->f9 = 0;
+    d->f10 = 0;
+    d->mB0 = lbl_806055AC;
+    d->mBC = lbl_806055AC;
+    d->mE8 &= ~0x001E6000u;
+    d->mCC = 1000.0f;
+    d->m94 = 5;
+    d->f3 = 0;
+    d->f7 = 0;
+    d->mD0 = -1.0f;
+    d->mE8 &= 0xA2E002FFu;
+    d->mC8 = -1.0f;
+    d->mE4 = 0;
+    d->mD4 = 0.0f;
+    d->mD8 = lbl_806055AC;
 }
 
 inline void SetVec(Vec3* dst, Vec3 v)
