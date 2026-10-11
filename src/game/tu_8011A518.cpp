@@ -7,6 +7,13 @@
 
 typedef Unk800C7B40_Widget Wid;
 
+struct Unk8068B618 {
+    char pad0[0x24];
+    int m24;
+};
+extern Unk8068B618* lbl_8068B618;
+extern char* lbl_8061A328;
+
 struct UnkPair {
     int m0;
     int m4;
@@ -77,6 +84,12 @@ int fn_8011BD94(UnkGame* g, int a);
 int fn_8011BF1C(UnkGame* g, int a);
 void* fn_8011BFAC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_8011BFFC(void* self, int a);
+void fn_8011C04C(Unk800C7B40_Widget* self);
+void fn_8011C114(void* self);
+int fn_8011C3B4();
+int fn_8011C3EC(Wid* self, int a);
+void fn_8011C4A8(Wid* self, int a);
+void fn_8011C534(Unk80117D20_Scr* self);
 }
 // PROTOS-END
 extern "C" {
@@ -96,12 +109,34 @@ int fn_8011BB54(void* a, int b);
 int fn_8006BC74(void* a, int b);
 int fn_8006A1B4(void* p);
 void* fn_8004072C();
+int* fn_800ED2B0(void* container, const char* name);
+void fn_800CFB38(int* p);
+int fn_800412AC(void* o, int a, int b, int c, int d, int e);
+void fn_801389A4(void* w, int a);
+Wid* fn_800B7AB8(UnkFEMgr* m, const char* name);
+UnkGameP10* fn_8011AC90(int i);
+void fn_8035682C(void* name);
+void fn_8040B830(void* dst, const char* src, int n);
+void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
+void fn_800ED254(void* self);
+void fn_802DC9C0();
+void fn_802D7ADC();
+void fn_802D8294(int a);
+void fn_802D7A64();
+void fn_802D7ACC();
+void fn_802D7A74();
+void fn_800ECF18(void* self);
+void fn_800AB618(int a);
 int fn_8017C8C0(UnkGameP700* a);
 int fn_8017C8C8(UnkGameP700* a);
 int fn_80081B60(void* a);
 void fn_800AB6B8(int a);
 void fn_8035686C(void* self, int a);
 extern const int lbl_80619D10;
+extern const char lbl_805BEAE0[];
+extern const char lbl_805BE5E4[];
+extern const char lbl_805BE690[];
+extern const char lbl_805BA230[];
 void fn_8017DD80(UnkGameP700* a, int b, int* c, int* d);
 int fn_80097148(void* p, unsigned char i);
 int fn_801A49F0(void* g, int a, int b);
@@ -564,6 +599,77 @@ void fn_8011BFFC(void* self, int a)
     *(const void**)((char*)self + 0x3C) = lbl_8065A918;
     fn_800AB6B8(lbl_80619D10);
     fn_8035686C(self, a);
+}
+
+void fn_8011C04C(Unk800C7B40_Widget* self)
+{
+    fn_800ECF18(self);
+    fn_800B555C()->m570 = -1;
+    fn_802D7ACC();
+    fn_802D8294(1);
+    fn_802D7A74();
+    lbl_8061B8C0->m24 = 0;
+    fn_802D7ACC();
+    fn_800C8044(self->fn_vslot32(lbl_805BEAE0, 1))->fn_vslot8(lbl_806192E0->m4->m10->m120 == 1);
+    fn_800AB618(lbl_80619D10);
+}
+
+void fn_8011C114(void* self)
+{
+    fn_800ED254(self);
+    fn_802DC9C0();
+    lbl_8061B8C0->m24 = 1;
+    fn_802D7ADC();
+    fn_802D8294(2);
+    fn_802D7A64();
+    fn_802D7ADC();
+}
+
+int fn_8011C3B4()
+{
+    return fn_8011AA24(0)->m65C != 0;
+}
+
+int fn_8011C3EC(Wid* self, int a)
+{
+    int r = 0;
+    if (self->fn_vslot88() != 0) {
+        UnkGameP10* p0 = fn_8011AC90(0);
+        UnkGameP10* p1 = fn_8011AC90(1);
+        if (a == p0->m70 || a == p0->m6C || a == p1->m70 || a == p1->m6C)
+            r = 1;
+    } else {
+        UnkGameP10* p = fn_8011AA24(0)->m6F8->m10;
+        if (a == p->m70 || a == p->m6C)
+            r = 1;
+    }
+    return r;
+}
+
+void fn_8011C4A8(Wid* self, int a)
+{
+    if (a == 0xA0) {
+        char name[16];
+        char* np = name;
+        fn_8035682C(np);
+        fn_8040B830(np, lbl_805BE5E4, 0xF);
+        np[15] = 0;
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+        fn_800B7B4C(lbl_8061A32C, np, self);
+    }
+}
+
+void fn_8011C534(Unk80117D20_Scr* self)
+{
+    fn_800CFB38(fn_800ED2B0(self, lbl_805BE690));
+    fn_800412AC(fn_8004072C(), 0x12, 0, 0, 0, 0);
+    self->m134 = (int)(lbl_8061A328 + 0x78);
+    lbl_8068B618->m24 = 1;
+    fn_802D7ADC();
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_801389A4(fn_800B7AB8(lbl_8061A32C, lbl_805BA230), 0);
 }
 
 }

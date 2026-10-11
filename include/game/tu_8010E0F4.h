@@ -147,7 +147,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot85();
     virtual void fn_vslot86();
     virtual void fn_vslot87();
-    virtual void fn_vslot88();
+    virtual int fn_vslot88();
     virtual void fn_vslot89();
     virtual void fn_vslot90();
     virtual void fn_vslot91();
@@ -618,7 +618,9 @@ struct UnkGameP700 {
     int m3CC;
 };
 struct UnkGame {
-    char pad0[0x6F8];
+    char pad0[0x65C];
+    int m65C;
+    char pad660[0x98];
     UnkGameP6F8* m6F8;
     char pad6FC[4];
     UnkGameP700* m700;
@@ -650,6 +652,8 @@ struct UnkMgrB {
 struct UnkMgrC {
     char pad0[0x74];
     int m74;
+    char pad78[0xA8];
+    int m120;
 };
 struct UnkMgrA {
     char pad0[0xC];
