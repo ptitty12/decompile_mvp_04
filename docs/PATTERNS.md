@@ -245,3 +245,24 @@ known recipe; generate the members with a script once one matches.
 `python <scratchpad>/tools/families.py . LO HI` (lead's scratch tool) lists
 the families with example addresses; ask the lead if you need it.
 
+## Game-code sweep notes (sweep workers, 2026-10-11)
+
+- Trace wrappers come in two families: A `fn_80056C9C(K); lbl_80624408(fn_80391C04(0, 0, LINE), N, a..);`
+  and B `lbl_80624408(fn_80391C04(K, 0, LINE), N, a..);` (no fn_80056C9C). LINE > 0x7FFF
+  loads as `li r5,0; ori r5,r5,LINE`. Generators: scratchpad S0/gen.py, S8/gen.py.
+  Open: family B with K != 0 and N == 0 has `li r5` before `li r3` in retail (not reproduced).
+- Float parameters compared against double literals: write `x < 0.2`, not `0.2f`, when retail
+  loads an 8-byte constant (`lfd`).
+- Byte tables: use `unsigned char*` (plain char is signed and adds `extsb`).
+- Table rows: keep `lbl_X[idx].mXX` in each expression for retail's `addi base,off; lwzx`;
+  a cached element pointer gives `lwz off(rX)`.
+- Slot arrays with a 0x1C stride: `char* b = (char*)t + 0xC; *(int*)(b + i*0x1C)`.
+- `int f = a < K; r = f << n;` gives the `fcmpu cr7; mfcr; rlwinm` bit extraction;
+  `(unsigned)a <= K ? mask : 0` gives `subfic/subfe/nand`.
+- `a == 0 ? 2 : 1` gives `li 1; bnelr; li 2`; the if-return spelling gives the opposite order.
+- A virtual call taking a by-value POD temporary: declare the parameter `const Z&` and give Z an
+  inline ctor `Z() : m0(0), m4(0), m8(0) {}` (by-value gives an extra memset and copy).
+- A global struct (`lbl.m0`) keeps its load after `this->` stores; a scalar global gets hoisted.
+- Functions whose code needs instructions only inline asm emits (`mftb`, `mfspr`, ...) stay as
+  original asm: CLAUDE.md forbids asm. Note them in the unit.
+
