@@ -152,6 +152,7 @@ void fn_8032DB00(FxLabelD* self) {
     fn_80313F28(lbl_8061FEDC, buf);
 }
 
+/* near-miss: argument evaluation order (r5 before f1/f2) */
 void fn_8032DB5C(FxLabelD* self) {
     char buf[0x38];
     fn_804089B4(buf, lbl_805ED8C0, self->s6());
@@ -185,6 +186,7 @@ void fn_8032E088(FxCmd* self, FxInt2* v) {
     else *(FxInt2*)&self->m4C = t;
 }
 
+/* near-miss: order of the three loads/stores in the struct copy */
 void fn_8032E2FC(FxF3* out, FxCmd* src) {
     FxF3* p = (FxF3*)src->m48;
     if (p) {
