@@ -207,11 +207,36 @@ int fn_8059FE24(Entry* e, int a);
 int fn_8059FE48(Entry* e, int a);
 
 void fn_800759F8(Unk8007B2B0_Screen* s, int a);
+int fn_8008FBE8(int k);
+int fn_8008FC40(int k, int j);
+int fn_8008FE14(int x);
+int fn_8008FD78(int x);
+int fn_80079ADC(float f);
+void fn_80090540(int o, int a, int t);
+void fn_800905FC(int o, int a, int t);
+void fn_80590C24(void* p);
+struct Unk8007B2B0_Pair {
+    float m0;
+    int m4;
+};
+struct Unk8007B2B0_Clamp {
+    int v;
+    void Next() { v = v > 9 ? v : v + 1; }
+};
+int fn_800909A4(Handle* h, int a, Obj* o);
+void fn_8009230C(Handle* h, int r, int c);
+void fn_80092C30(Handle* h, int r, int c);
+void fn_80093554(Handle* h, int r, int c);
+void fn_80093E78(Handle* h, int r, int c);
+void fn_8009479C(Handle* h, int r, int c);
+int fn_800918AC(Handle* h, int a);
 
 struct Unk8007B2B0_Screen {
     char pad0[0x8];
     EntryTable* m8;
-    char padC[0x2C];
+    char padC[0x24];
+    void* m30;
+    char pad34[0x4];
     Handle m38;
     char pad3C[0x4];
     W* m40;
@@ -295,6 +320,20 @@ struct Unk8007B2B0_Screen {
     int fn_8007BBFC(int a, int b, int c);
     int fn_8007BC64(int a, int b, char* c);
     int fn_8007BC9C();
+    int fn_8007BCAC(int a, int b, int* c);
+    int fn_8007BD94(int a);
+    int fn_8007BE10(int a, int b);
+    int fn_8007BEA0(int a, int c);
+    int fn_8007BEF4(int a, int c);
+    int fn_8007BF44(int a, int c);
+    int fn_8007BF94(int a, int c);
+    int fn_8007BFE4(int a, int c);
+    int fn_8007C034(int a, int b);
+    void fn_8007C088(int a, int b);
+    void fn_8007C134();
+    int fn_8007C1D0(int a, int b, int d, Unk8007B2B0_Pair* e);
+    int fn_8007C288(int a, int b, Unk8007B2B0_Pair* c, int d, int e, int f);
+    void fn_8007C328(int a, int b);
     int fn_8007C3E8();
     int fn_8007C434(int a);
     int fn_8007C458();
@@ -378,6 +417,7 @@ struct Unk8007B2B0_Screen {
     int fn_8007DADC(unsigned i);
     void fn_8007DB0C(unsigned i);
     void fn_8007DB40(unsigned i);
+    int fn_80079ADC(float f);
     Entry* At(unsigned i) { return i < m8->count ? &m8->e[i] : 0; }
 };
 
