@@ -4,6 +4,50 @@
  */
 #include "game/tu_8043FDC0.h"
 
+extern "C" FE_OVERLAY int fn_8044C508(FeScr_8044974C* self, int a)
+{
+    char buf[0x7D0];
+    if (fn_8007F3A0((Unk8007F198_A*)lbl_8061930C, a) != 4)
+        return 1;
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+    fn_800E4234(a, 4, buf);
+    fn_800DFF0C(buf, (char*)fn_80090880(lbl_8061977C, 0x4F40));
+    self->m244 = a;
+    const char* s1 = fn_80090880(lbl_8061977C, 0x4558);
+    const char* s2 = fn_80090880(lbl_8061977C, 0x4DA6);
+    const char* s3 = fn_80090880(lbl_8061977C, 0x4F41);
+    fn_801321D4(p, self, (FeCb)fn_8044C644, 0, buf, 3, -1, 1, s1, s2, s3, 0, 0, 0);
+    p->v86();
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8044C644(int a, FeScr_8044974C* self)
+{
+    if (a != 0) {
+        if (a == 1) {
+            if (lbl_8061930C->fn_80075948(self->m244) == 0)
+                fn_8055F5A0(self->m244);
+            else
+                fn_8055EAFC(self->m244);
+            fn_8044B79C(self);
+            fn_8044B050(self);
+            fn_8044ADA4(self);
+        } else if (a == 2) {
+            UiMsg m;
+            UiMsg* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, "BACK", 15);
+            p->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        }
+    }
+}
+
+/*
+ * Front-end overlay code, .frontend_codeoverlay 0x8044C508-0x8044F550 (code-only unit;
+ * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
+ */
+
 extern "C" void fn_80444890(FeX24* self);
 extern "C" FE_OVERLAY void fn_8044C77C(FeX24* self)
 {
