@@ -194,7 +194,10 @@ analysis_elf = analysis_dir / "mvp.elf"
 analysis_dol = analysis_dir / "main_sections.dol"
 disc_exts = (".iso", ".gcm", ".ciso", ".rvz", ".wia", ".wbfs", ".gcz", ".nfs", ".tgc")
 discs = sorted(p for p in orig_dir.glob("*") if p.suffix.lower() in disc_exts)
-dtk_exe = config.build_dir / "tools" / ("dtk.exe" if is_windows() else "dtk")
+if args.dtk is not None and args.dtk.is_file():
+    dtk_exe = args.dtk
+else:
+    dtk_exe = config.build_dir / "tools" / ("dtk.exe" if is_windows() else "dtk")
 config.custom_build_rules = [
     {
         "name": "extract_disc_file",
