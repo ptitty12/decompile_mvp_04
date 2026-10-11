@@ -551,13 +551,13 @@ float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, 
     return rem;
 }
 
-int fn_8028ADB8(Unk8028989C_Goal* g, Unk8028989C_Goal* o, float f, Unk80270BA0_X* x)
+int fn_8028ADB8(Unk8028989C_Goal* g, Unk8028989C_Goal* o, Unk80270BA0_X* x)
 {
     if (o && o->m28 && g->m28) {
-        fn_80249298(x, g->m40, 1);
+        float r = fn_80249298(x, g->m40, 1);
         Unk80273498_Vec3 a = o->GetM10();
         Unk80273498_Vec3 b = g->GetM10();
-        if ((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < f) {
+        if ((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < r) {
             return 1;
         }
     }

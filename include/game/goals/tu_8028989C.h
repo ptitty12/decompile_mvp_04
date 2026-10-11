@@ -134,7 +134,7 @@ float fn_80410CE8(float x, float z);                       /* heading of (x, z) 
 void fn_80244858(Unk80270BA0_X* x, float angle);
 void fn_80242E6C(Unk80270BA0_X* x);
 void fn_80381E9C(Unk80271DBC_Link* link, int hash, int a, int b);
-void fn_80249298(Unk80270BA0_X* x, int a, int b);
+float fn_80249298(Unk80270BA0_X* x, int a, int b);
 void fn_80249B40(Unk80270BA0_X* x, int a, int b, int c, float f);
 float fn_80382BD8(Unk80271DBC_Link* link, int a);
 struct Unk8028989C_Goal;
