@@ -2,3 +2,549 @@
  * Database overlay code, .database_codeoverlay 0x8053CC9C-0x8053E240 (code-only unit;
  * placeholder TU). Define every function DB_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
+#include "game/db_8053967C.h"
+
+typedef Db8053CC9C_Rec R2C;
+typedef Unk80084910_K<Unk80084910_T8> K8;
+typedef Unk80084910_VObj VObj;
+typedef Unk80084910_G G;
+
+extern char lbl_80684380[];
+extern char lbl_80684310[];
+extern const char lbl_805FE19C[];
+extern int lbl_806015D8[];
+extern DbPmf lbl_806015A8[];
+extern const float lbl_805FEDA0;
+extern Db8053CC9C_A5 lbl_805FEDA4;
+
+extern "C" {
+
+DB_OVERLAY Unk80071604* fn_8053CC9C(Unk80071604* self, const char* name, Obj* type, unsigned count)
+{
+    fn_80071604(self, name, type, count);
+    self->m20 = lbl_80684380;
+    self->m24 = 0;
+    self->m24 = (char*)operator new[](self->m1C * 0x2C, 0);
+    fn_8040074C(self->m24, self->m1C * 0x2C);
+    self->m14 = fn_8007366C(lbl_805FE19C, lbl_805FE19C);
+    return self;
+}
+
+DB_OVERLAY void fn_8053CD18(Unk80071604* self, int chrg)
+{
+    self->m20 = lbl_80684380;
+    if (self->m24) {
+        delete[] self->m24;
+        self->m24 = 0;
+    }
+    fn_80071688(self, chrg);
+}
+
+DB_OVERLAY void fn_8053CD74(Unk80071604* self, unsigned i)
+{
+    if (i < self->m1C)
+        fn_8040074C(self->m24 + i * 0x2C, 0x2C);
+}
+
+/* near-miss: retail loads r3 = 0 first and compares cases 0..14 linearly (beqlr); the
+ * switch below scores 13 slots out of range */
+DB_OVERLAY int fn_8053CDB0(void* self, int k)
+{
+    int r = 0;
+    switch (k) {
+    case 0: r = 0; break;
+    case 1: break;
+    case 2: r = 0; break;
+    case 3: break;
+    case 4: r = 0; break;
+    case 5: break;
+    case 6: r = 0; break;
+    case 7: break;
+    case 8: r = 0; break;
+    case 9: break;
+    case 10: r = 0x64; break;
+    case 11: r = 0x64; break;
+    case 12: r = 0x64; break;
+    case 13: r = 0x64; break;
+    case 14: r = 0x64; break;
+    }
+    return r;
+}
+
+DB_OVERLAY int fn_8053CE9C(void* l, int k, unsigned c)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    unsigned r = 0;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0:
+            r = ((R2C*)a->m24)[c].f0;
+            break;
+        case 1:
+            r = ((R2C*)a->m24)[c].f1;
+            break;
+        case 2:
+            r = ((R2C*)a->m24)[c].f2;
+            break;
+        case 3:
+            r = ((R2C*)a->m24)[c].f3;
+            break;
+        case 4:
+            r = ((R2C*)a->m24)[c].f4;
+            break;
+        case 5:
+            r = ((R2C*)a->m24)[c].f5;
+            break;
+        case 6:
+            r = ((R2C*)a->m24)[c].f6;
+            break;
+        case 7:
+            r = ((R2C*)a->m24)[c].f7;
+            break;
+        case 8:
+            r = ((R2C*)a->m24)[c].f8;
+            break;
+        case 9:
+            r = ((R2C*)a->m24)[c].f9;
+            break;
+        case 10:
+            r = ((R2C*)a->m24)[c].f10;
+            break;
+        case 11:
+            r = ((R2C*)a->m24)[c].f11;
+            break;
+        case 12:
+            r = ((R2C*)a->m24)[c].f12;
+            break;
+        case 13:
+            r = ((R2C*)a->m24)[c].f13;
+            break;
+        case 14:
+            r = ((R2C*)a->m24)[c].f14;
+            break;
+        }
+    }
+    return r;
+}
+
+DB_OVERLAY char* fn_8053D090(void* l, int k, unsigned c, char* out)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    if (c < a->m1C) {
+        switch (k) {
+        case 0:
+            fn_8040B61C(out, a->m24 + c * 0x2C + 0xE);
+            break;
+        case 1:
+            fn_8040B61C(out, a->m24 + c * 0x2C + 0x1A);
+            break;
+        }
+    }
+    return out;
+}
+
+DB_OVERLAY float fn_8053D110(void* o, int i, int a)
+{
+    float r = (((DbPObj*)o)->*lbl_806015A8[i])(a);
+    return r;
+}
+
+DB_OVERLAY void fn_8053D1A8(void* l, int k, unsigned c, int v)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0xffff) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xffff;
+            }
+            r->f0 = v;
+            return;
+        }
+        case 1: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x3f) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x3f;
+            }
+            r->f1 = v;
+            return;
+        }
+        case 2: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            int t;
+            if (v <= 0xff) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0xff;
+            }
+            r->f2 = t;
+            return;
+        }
+        case 3: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x1;
+            }
+            r->f3 = v;
+            return;
+        }
+        case 4: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x1;
+            }
+            r->f4 = v;
+            return;
+        }
+        case 5: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7;
+            }
+            r->f5 = v;
+            return;
+        }
+        case 6: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x1;
+            }
+            r->f6 = v;
+            return;
+        }
+        case 7: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x7f) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7f;
+            }
+            r->f7 = v;
+            return;
+        }
+        case 8: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x3f) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x3f;
+            }
+            r->f8 = v;
+            return;
+        }
+        case 9: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            int t;
+            if (v <= 0xff) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0xff;
+            }
+            r->f9 = t;
+            return;
+        }
+        case 10: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x64;
+            }
+            r->f10 = v;
+            return;
+        }
+        case 11: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x64;
+            }
+            r->f11 = v;
+            return;
+        }
+        case 12: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x64;
+            }
+            r->f12 = v;
+            return;
+        }
+        case 13: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x64;
+            }
+            r->f13 = v;
+            return;
+        }
+        case 14: {
+            R2C* r = (R2C*)(c * 0x2C + (int)a->m24);
+            int t;
+            if (v <= 0x64) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0x64;
+            }
+            r->f14 = t;
+            return;
+        }
+        }
+    }
+}
+
+
+DB_OVERLAY void fn_8053D580(Unk80071604* a, signed char k, unsigned c, const char* src, int n)
+{
+    if (c < a->m1C) {
+        if (n <= 0)
+            n = fn_8040B6A0(src);
+        int lim = lbl_806015D8[k] - 1;
+        if (n > lim)
+            n = lim;
+        switch (k) {
+        case 0:
+            fn_8040B830(a->m24 + c * 0x2C + 0xE, src, n);
+            {
+                char* q = (char*)(c * 0x2C + (int)a->m24) + 0xE;
+                q[n] = 0;
+            }
+            break;
+        case 1:
+            fn_8040B830(a->m24 + c * 0x2C + 0x1A, src, n);
+            {
+                char* q = (char*)(c * 0x2C + (int)a->m24) + 0x1A;
+                q[n] = 0;
+            }
+            break;
+        }
+    }
+}
+
+DB_OVERLAY float fn_8053D66C(G* self, int a)
+{
+    float r = (float)(self->m20->pfn((char*)self + self->m20->delta, 1, a) + 0x30);
+    return r;
+}
+
+DB_OVERLAY float fn_8053D6D8(G* self, int a)
+{
+    float r = (float)(self->m20->pfn((char*)self + self->m20->delta, 2, a) + 0x64);
+    return r;
+}
+
+DB_OVERLAY float fn_8053D744(G* self, int a)
+{
+    unsigned char buf;
+    fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
+    return (float)buf;
+}
+
+DB_OVERLAY float fn_8053D7B4(G* self, int a)
+{
+    Db8053CC9C_Buf3 buf;
+    fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
+    return (float)buf.b;
+}
+
+DB_OVERLAY float fn_8053D830(G* self, int a)
+{
+    Db8053CC9C_Buf2 buf;
+    fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
+    return (float)buf.b;
+}
+
+DB_OVERLAY float fn_8053D8AC(G* self, int a)
+{
+    int v = self->m20->pfn((char*)self + self->m20->delta, 9, a);
+    float r = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80079A90(v);
+    return r;
+}
+
+DB_OVERLAY void fn_8053D900(Unk80071604* self, int a, VObj* obj)
+{
+    fn_80071E2C(self, a, (Unk80070DDC_Stream*)obj);
+    Unk80084910_VT* vt = obj->m4;
+    vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0x2C);
+}
+
+DB_OVERLAY Unk80071604* fn_8053D95C(Unk80071604* self, const char* name, Obj* type, unsigned count)
+{
+    fn_80071604(self, name, type, count);
+    self->m20 = lbl_80684310;
+    self->m24 = 0;
+    self->m24 = (char*)operator new[](self->m1C * 8, 0);
+    fn_8040074C(self->m24, self->m1C * 8);
+    self->m14 = fn_8007366C(lbl_805FE19C, lbl_805FE19C);
+    return self;
+}
+
+DB_OVERLAY void fn_8053D9D8(Unk80071604* self, int chrg)
+{
+    self->m20 = lbl_80684310;
+    if (self->m24) {
+        delete[] self->m24;
+        self->m24 = 0;
+    }
+    fn_80071688(self, chrg);
+}
+
+DB_OVERLAY void fn_8053DA34(Unk80071604* self, unsigned i)
+{
+    if (i < self->m1C)
+        fn_8040074C(self->m24 + i * 8, 8);
+}
+
+DB_OVERLAY int fn_8053DA70(void* self)
+{
+    return 0;
+}
+
+DB_OVERLAY int fn_8053DA78(void* self)
+{
+    return 0;
+}
+
+DB_OVERLAY int fn_8053DA80(void* self)
+{
+    return 0;
+}
+
+DB_OVERLAY int fn_8053DA88(void* self, int a, int b, int c)
+{
+    return c;
+}
+
+DB_OVERLAY float fn_8053DA90()
+{
+    float f;
+    return f = lbl_805FEDA0;
+}
+
+DB_OVERLAY void fn_8053DAAC()
+{
+}
+
+DB_OVERLAY void fn_8053DAB0()
+{
+}
+
+DB_OVERLAY void fn_8053DAB4(Unk80071604* self, int a, VObj* obj)
+{
+    fn_80071E2C(self, a, (Unk80070DDC_Stream*)obj);
+    Unk80084910_VT* vt = obj->m4;
+    vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 8);
+}
+
+DB_OVERLAY Unk80084910_T8* fn_8053DB10(K8* self, int i)
+{
+    return &self->m24[i];
+}
+
+DB_OVERLAY Unk80084910_T8* fn_8053DB20(K8* self, int i)
+{
+    return &self->m24[i];
+}
+
+/* near-miss: only the frame addresses differ. Retail reads the two 4-byte stack buffers
+ * (fn_80329FA0 output at sp+0xC, the date at sp+0x10) straight from the frame; ours forms
+ * them in callee-saved registers (addi rX,r1,12). Tried: arrays, scalars, structs. */
+DB_OVERLAY R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src)
+{
+    fn_8040074C(dst, 0x2C);
+    fn_800901C0(dst->name1, lbl_806015D8[0], (src->w4 >> 19) & 0x3FF, dst->name2, lbl_806015D8[1],
+                (src->w4 >> 8) & 0x3FF);
+    Db8053CC9C_Buf3 buf;
+    fn_80329FA0(&buf, 1);
+    unsigned short yr = *(unsigned char*)src + buf.b;
+    unsigned mon = ((src->w0 >> 10) & 0xF) % 12;
+    unsigned dim = fn_8032A2CC(mon, yr);
+    Db8053CC9C_Date d;
+    d.m0 = mon + 1;
+    d.m2 = yr;
+    d.m1 = ((src->w0 >> 4) & 0x1F) % dim + 1;
+    dst->f0 = fn_80329E74(d);
+    dst->f6 = (src->w0 >> 14) & 1;
+    dst->f9 = (src->w0 >> 18) & 0x3F;
+    dst->f5 = (src->w0 >> 15) & 7;
+    dst->f1 = (src->w0 & 7) + 0x15;
+    dst->f2 = (src->w4 >> 29) * 5 + 0x50;
+    dst->f7 = (src->w4 & 0x7F) % 100;
+    dst->f8 = (src->w0 >> 8) & 0x3F;
+    dst->f10 = fn_80090244((src->w0 >> 3) & 0x7F);
+    dst->f11 = fn_80090244((src->w4 >> 24) & 0x7F);
+    dst->f12 = fn_80090244((src->w4 >> 16) & 0x7F);
+    dst->f13 = fn_80090244((src->w4 >> 8) & 0x7F);
+    dst->f14 = fn_80090244(src->w4 & 0x7F);
+    return dst;
+}
+
+DB_OVERLAY void* fn_8053DD34(void* self, int a)
+{
+    fn_803FFA60(self, a, 8);
+    return self;
+}
+
+/* near-miss: same stack-buffer addressing as fn_8053DB30 (retail: addi r3,r1,8 / addi r3,r1,12
+ * per call, halfwords read from the frame); ours also narrows the subtraction to bytes. */
+DB_OVERLAY Db8053CC9C_SrcBits* fn_8053DD68(Db8053CC9C_SrcBits* dst, Db8053CC9C_Src2* src)
+{
+    Db8053CC9C_Buf3 b1;
+    Db8053CC9C_Buf3 b2;
+    fn_80329FA0(&b1, 1);
+    unsigned short y1 = b1.b;
+    fn_80329FA0(&b2, src->f0);
+    dst->yr = b2.b - y1;
+    dst->g1 = src->f9;
+    dst->g2 = src->f5;
+    return dst;
+}
+
+DB_OVERLAY int fn_8053DDE8()
+{
+    return 5;
+}
+
+DB_OVERLAY int fn_8053DDF0(int i)
+{
+    Db8053CC9C_A5 a = lbl_805FEDA4;
+    return a.w[i];
+}
+
+}
