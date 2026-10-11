@@ -41,6 +41,10 @@ struct Unk80273498_Vec3 {
 struct Unk80273498_Pos {
     char pad0[0x60];
     Unk80273498_Vec3 m60;
+    char pad6C[0x38C - 0x6C];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
 };
 struct Unk80273498_Ref {
     char pad0[0xC];
@@ -136,6 +140,25 @@ public:
     virtual void fn_vslot2();
     virtual void fn_vslot3();
     virtual int fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual int fn_vslot23();
 };
 
 /* Data of the player object between its vptr and its second base. */
@@ -143,10 +166,14 @@ class Unk80270BA0_XMid : public Unk80270BA0_XVirt {
 public:
     char pad9C[0x44C - 0x9C];
     Unk8014D8AC_Ctx* m44C;
-    char pad450[0x488 - 0x450];
+    char pad450[0x458 - 0x450];
+    int m458;
+    char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
-    char m588[0x5F0 - 0x588];
+    char m588[0x594 - 0x588];
+    float m594;
+    char pad598[0x5F0 - 0x598];
 };
 
 /* Second argument of vtable slot 17; only its first virtual is used here. */
@@ -191,7 +218,10 @@ struct Unk802726BC_Angles {
 struct Unk80271DBC_Link {
     char pad0[0x830];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
-    char pad834[0x880 - 0x834];
+    char pad834[4];
+    int m838;
+    int m83C;
+    char pad840[0x880 - 0x840];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -209,7 +239,8 @@ public:
     float m8E8;                /* sqrt'ed by the path query constructors (tu_80279AE4.cpp) */
     char pad8EC[0x93C - 0x8EC];
     Unk80273498_Vec3 m93C;     /* copied into the path query's +0xA4 */
-    char pad948[0xAB4 - 0x948];
+    Unk80273498_Vec3 m948;
+    char pad954[0xAB4 - 0x954];
     float mAB4;
     char padAB8[0xB4C - 0xAB8];
     int mB4C;
