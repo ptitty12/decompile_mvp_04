@@ -34,6 +34,24 @@ extern "C" FE_OVERLAY FeScrRaw* fn_8044F634(FeScrRaw* self, int a, int b, int c,
     return self;
 }
 
+extern "C" FE_OVERLAY void fn_8044F884(FeScr6* self, int k)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    if (k == 4) {
+        fn_8040B830(p->name, (char*)lbl_80621648, 15);
+        p->name[15] = 0;
+    } else {
+        FeObjQ* cell = (FeObjQ*)fn_800C8060(((FeObj*)self)->v32("CELL", 1));
+        FeObjQ* o = cell->v70();
+        UiItemN* it = o->v33(5, 1);
+        fn_8040B830(p->name, it->name, 15);
+        p->name[15] = 0;
+    }
+    fn_800B7B4C(UiGetMsgMgr(), &m, self);
+}
+
 extern "C" FE_OVERLAY int fn_8044F984(FeW138* self)
 {
     self->m138->v50();
@@ -89,6 +107,24 @@ extern "C" FE_OVERLAY void fn_8044FBA4(FeScr6* self)
     self->m10F0 = fn_800B7AB8(UiGetMsgMgr(), "BATPITCHSTATS");
 }
 
+/* near-miss: popup args built in r4 by retail, in r3 here (call result is saved and reloaded); 4 slots */
+extern "C" FE_OVERLAY void fn_8045017C(FeScr6* self, int a)
+{
+    if (a != 1) {
+        if (a == 4) {
+            FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+            fn_80131F34(p, self, (FeCb)fn_804502F4, fn_80528918, 0x38C2, 2, -1, 1, 0x35E9, 0x26DF, 0, 0, 0, 0);
+            p->v86();
+        } else {
+            fn_804D1CB8(self);
+        }
+    } else {
+        FeSt8* q = (FeSt8*)((char*)fn_800B555C() + 8);
+        q->m4F4 = fn_804D1278(self);
+        ((FeObj*)self)->v88();
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80450284(FeScr6* self)
 {
     if (((FeObjI*)self->m134)->v59() > 0) {
@@ -108,6 +144,14 @@ extern "C" FE_OVERLAY void fn_804502F4(int a, FeScr6* b)
     }
     fn_8044FE0C(b);
     fn_80450388(b);
+}
+
+extern "C" FE_OVERLAY void fn_80450388(FeScr6* self)
+{
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_80131F34(p, self, (FeCb)fn_80528920, 0, 0x1FED, 1, -1, 1, 0x26DE, 0, 0, 0, 0, 0);
+    ((FeObj1*)p)->v84(0);
+    p->v86();
 }
 
 extern "C" FE_OVERLAY void fn_80450460(FeScr6* self, int a)
@@ -188,10 +232,32 @@ extern "C" FE_OVERLAY int fn_80450C44(void)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_80450D78(FeScr6* self, int a)
+{
+    fn_800ED310(self, a);
+    ((FeObj1*)fn_800B7AB8(UiGetMsgMgr(), "FTOPBAR"))->v16(a);
+    if (a != 0)
+        ((FeObj1*)self->m188)->v14(1);
+    else
+        ((FeObj1*)self->m188)->v14(0);
+}
+
 extern "C" FE_OVERLAY void fn_80450E44(FeScr6* self, int a)
 {
     ((FeObj1*)fn_800C8040(((FeObj*)self)->v32("DATE", 1)))->v8(a);
     ((FeObj1*)fn_800C8040(((FeObj*)self)->v32("DATESHADOW", 1)))->v8(a);
+}
+
+extern "C" FE_OVERLAY void fn_80450EF8(FeScr6* self)
+{
+    char buf[0x40];
+    int d;
+    FeObj* date = fn_800C8040(((FeObj*)self)->v32("DATE", 1));
+    FeObj* shadow = fn_800C8040(((FeObj*)self)->v32("DATESHADOW", 1));
+    d = fn_800B555C()->m14;
+    fn_800DD44C(&d, buf, 1);
+    ((FeObj1*)date)->v28((int)buf);
+    ((FeObj1*)shadow)->v28((int)buf);
 }
 
 extern "C" FE_OVERLAY void fn_80450FCC(FeScr6* self)
@@ -205,11 +271,52 @@ extern "C" FE_OVERLAY void fn_80451004(FeScr6* self)
     fn_80125BC0(self->m194);
 }
 
+extern "C" FE_OVERLAY int fn_8045115C(FeW188* self)
+{
+    self->m188->v50();
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_80451198(FeW188* self)
+{
+    self->m188->v51();
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_804511D4(FeW188* self)
+{
+    self->m188->v52();
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_80451210(FeW188* self)
+{
+    self->m188->v53();
+    return 1;
+}
+
 extern int lbl_8062164C;
 extern "C" FE_OVERLAY void fn_80451C78(void)
 {
     int z = 0;
     lbl_8062164C = z;
+}
+
+extern "C" FE_OVERLAY void fn_80451D40(FeScr6* self)
+{
+    int t = lbl_8062164C;
+    if (t == 0) {
+        lbl_8062164C = -1;
+        fn_804509E0(self, ((FeObjI*)self->m188)->v60(), self->m198);
+        if (self->m180 != 0) {
+            UiMsg m;
+            UiMsg* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, "PLAY", 15);
+            p->name[15] = t;
+            fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        }
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80451E10(FeScr6* self, int a)
