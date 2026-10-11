@@ -1026,6 +1026,9 @@ game/tu_80331C60.cpp:
 game/tu_80334AF0.cpp:
 	.text       start:0x80334AF0 end:0x80338ECC
 
+game/tu_80338ECC.cpp:
+	.text       start:0x80338ECC end:0x8033CED8
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C

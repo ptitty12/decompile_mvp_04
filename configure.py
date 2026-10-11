@@ -683,6 +683,7 @@ config.libs = [
             Object(NonMatching, "game/tu_8032ECD8.cpp"),
             Object(NonMatching, "game/tu_80331C60.cpp"),
             Object(NonMatching, "game/tu_80334AF0.cpp"),
+            Object(NonMatching, "game/tu_80338ECC.cpp"),
             Object(NonMatching, "animation/choosers/tu_8026DDE8.cpp"),
             Object(NonMatching, "animation/choosers/randomchooser.cpp"),
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
