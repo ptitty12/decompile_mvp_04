@@ -15,6 +15,10 @@ typedef Unk8026C414_V3 V3;
 extern "C++" {
 int fn_8026D55C(O* self, X* ctx);
 void fn_8026AA0C(int a, int b);
+int fn_80247858(O* o, float* f);
+void fn_8037D92C(M* m, char** pp);
+void fn_8037DAD0(M* m, char** pp);
+int fn_8026CE60(int a, float* v);
 void fn_8031925C(void* x);
 /* near-miss: retail emits the flag read-modify-write before loading the 0.0f constant; ours hoists the lfs and orders the stores differently */
 void fn_8026CB30(M* self, int i);
@@ -40,6 +44,25 @@ void fn_8026CA5C(M* self)
 {
     if (self->m240 == 0)
         fn_8031925C(self->m244);
+}
+
+/* near-miss (parked, same 41 insns): scheduling/register differences around the packed-word build (retail builds the bool with li r7,0 / beq / li r7,1 and forms &p in r30 up front) */
+int fn_8026CA8C(M* self, char** pp)
+{
+    Unk8026CA8C_W w;
+    char* p = *pp;
+    w.f0 = self->m264;
+    w.f1 = self->m268;
+    w.f4 = self->m354;
+    w.f22 = self->m6C != 0;
+    *(Unk8026CA8C_W*)p = w;
+    p += 4;
+    if (self->m264 == 0) {
+        fn_8037D92C(self, &p);
+        fn_8037DAD0(self, &p);
+    }
+    *pp = p;
+    return 1;
 }
 
 /* near-miss: retail emits the flag read-modify-write before loading the 0.0f constant; ours hoists the lfs and orders the stores differently */
@@ -80,6 +103,20 @@ void fn_8026CE18(M* self, int i)
 {
     fn_8026CB30(self, i);
     ((Unk8026C414_VT98*)self)->s9(1);
+}
+
+int fn_8026CF70(O* self, Unk8026CF70_P* p, int* out1, int* out2, float* fp)
+{
+    *out1 = fn_80247858(self, fp);
+    *out2 = 1;
+    int r = 0;
+    if (!(*fp >= 230400.0f)) {
+        if (*out1 == p->m5BC) {
+            *out2 = fn_8026CE60(*out1, p->m60);
+            r = 1;
+        }
+    }
+    return r;
 }
 
 float fn_8026D504(O* self, X* ctx)

@@ -48,12 +48,28 @@ struct Unk8026C414_E {
     int m1C;
 };
 
+/* Packed header word written by fn_8026CA8C (bit numbers are MSB-first). */
+struct Unk8026CA8C_W {
+    unsigned f0 : 1;
+    unsigned f1 : 3;
+    unsigned f4 : 8;
+    unsigned f12 : 10;
+    unsigned f22 : 1;
+    unsigned f23 : 9;
+};
+
 struct Unk8026C414_M {
-    char pad0[0xC4];
+    char pad0[0x6C];
+    int m6C;
+    char pad70[0xC4 - 0x70];
     Unk8026C414_E e[6];
     char pad184[0x240 - 0x184];
     int m240;
-    char m244[4];
+    char m244[0x264 - 0x244];
+    int m264;
+    int m268;
+    char pad26C[0x354 - 0x26C];
+    int m354;
 };
 
 /* vptr at +0x98 of the mover. */
@@ -69,6 +85,13 @@ public:
     virtual int s7();
     virtual int s8();
     virtual int s9(int a);
+};
+
+struct Unk8026CF70_P {
+    char pad0[0x60];
+    float m60[3];
+    char pad6C[0x5BC - 0x6C];
+    int m5BC;
 };
 
 #endif /* GAME_TU_8026C414_H */
