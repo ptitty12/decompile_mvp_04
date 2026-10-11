@@ -23,6 +23,7 @@ struct Unk801B7FB0_Team {
     char pad234[0xC30];
 };
 
+
 struct Unk801B7FB0_Teams {
     Unk801B7FB0_Team t[2];
     unsigned char m1CC8;
@@ -33,10 +34,12 @@ struct Unk801B7FB0_Teams {
     int m1CD0;
 };
 
+
 struct Unk801B7FB0_GM {
     char pad0[0xC];
     Unk80087A58_O* mC;
 };
+
 
 struct Unk801B7FB0_Game {
     char pad0[0xC];
@@ -46,12 +49,14 @@ struct Unk801B7FB0_Game {
 };
 
 
+
 struct Unk801B7FB0_Ump {
     int m0;
     Unk801B7FB0_P* m4;
     Unk801B7FB0_P* m8;
     float mC;
 };
+
 
 struct Unk801B7FB0_B {
     int m0;
@@ -69,10 +74,22 @@ struct Unk801B7FB0_B {
     int m30;
 };
 
+
 struct Unk801B7FB0_Sub58C {
     char pad0[0xC];
     float mC;
     int m10;
+};
+
+
+struct Unk801B7FB0_M934 {
+    char pad0[0x10];
+    int m10;
+};
+
+struct Unk801B7FB0_Link {
+    char pad0[0x838];
+    int m838;
 };
 
 struct Unk801B7FB0_PBase {
@@ -83,11 +100,12 @@ struct Unk801B7FB0_PBase {
     char pad6C[0x2C];
 };
 
+
 struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
     virtual void v1();
     virtual void v2();
     virtual void v3();
-    virtual void v4();
+    virtual int v4();
     virtual void v5();
     virtual void v6();
     virtual void v7();
@@ -107,7 +125,7 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
     virtual void v21();
     virtual void v22();
     virtual void v23();
-    virtual void v24();
+    virtual int v24();
     virtual void v25();
     virtual void v26();
     virtual void v27();
@@ -125,6 +143,7 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
     virtual void v39();
     virtual void v40();
 };
+
 
 struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char pad9C[0x2D0];
@@ -146,7 +165,10 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     float m5A0;
     char pad5A4[0x24];
     int m5C8;
-    char pad5CC[0x90];
+    int m5CC;
+    char pad5D0[0x48];
+    Unk801B7FB0_Link* m618;
+    char pad61C[0x40];
     Unk801B7FB0_P* m65C[13];
     char pad690[0x3C];
     Unk801B7FB0_P* m6CC;
@@ -161,7 +183,13 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     int m730;
     char pad734[0x1F8];
     int m92C;
-    char pad930[0x184];
+    char pad930[0x4];
+    Unk801B7FB0_M934* m934;
+    char pad938[0xCC];
+    int mA04;
+    char padA08[0x4];
+    char mA0C[4];
+    char padA10[0xA4];
     float mAB4;
     char padAB8[0xB4];
     int mB6C;
@@ -170,11 +198,13 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     float mB84;
     Unk801B7FB0_Ump* mB88;
 };
+
 struct Unk801B7FB0_Slot {
     void* m0;
     int m4;
     float m8;
 };
+
 
 struct Unk801B7FB0_Ai {
     void* m0;
@@ -195,6 +225,7 @@ struct Unk801B7FB0_Ai {
     int m68;
     char pad6C[0x4];
 };
+
 /* Stack event object (same shape as Unk8002F894_Obj): id at +0, vptr at +4 (stored
  * twice: base vtable, then the derived one), two payload words. */
 extern char lbl_80649DA0[];
