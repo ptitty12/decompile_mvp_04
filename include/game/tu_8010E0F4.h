@@ -92,7 +92,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
     virtual void fn_vslot31();
     virtual Unk800C7B40_Widget* fn_vslot32(const char* name, int a);
-    virtual void fn_vslot33();
+    virtual Unk800C7B40_Widget* fn_vslot33(int a, int b);
     virtual void fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
@@ -532,6 +532,11 @@ struct Unk80120450_Diff : Unk800C7B40_Widget {
 /* Container widget: first child at +0x40, siblings chained through Data::m8 (fn_80117EA0 walks them). */
 struct UnkGroupW : Unk800C7B40_Widget {
     Unk800C7B40_Widget* m40;
+};
+
+/* 0xC8-byte text argument block filled by fn_800DE274 / fn_80403DE4 and handed to UnkLabel slot 28. */
+struct UnkTextArg {
+    char b[0xC8];
 };
 
 /* Front-end state object returned by fn_800B555C; +0x570 is compared against ids. */

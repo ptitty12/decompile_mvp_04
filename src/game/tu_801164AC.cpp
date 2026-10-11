@@ -9,9 +9,6 @@ typedef Unk80114A20_Scr Scr;
 typedef Unk800C7B40_Widget Wid;
 
 
-struct UnkTextArg {
-    char b[0xC8];
-};
 extern const char lbl_805BA6D8[];
 extern const char lbl_805BFB3C[];
 extern const char lbl_805BFB4C[];
