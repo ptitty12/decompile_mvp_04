@@ -791,9 +791,28 @@ extern const float lbl_805ADE14;
 class Unk8005BA1C_Voice {
 public:
     int m0;
-    char pad4[0x24];
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
     int m28;
-    char pad2C[0x68 - 0x2C];
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    char pad3C[4];
+    int m40;
+    char pad44[4];
+    int m48;
+    char pad4C[4];
+    char m50;
+    char pad51[0x68 - 0x51];
+    Unk8005BA1C_Voice(int unused, int vol, int a3, int a4, int a5, int a6, int a7);
     virtual ~Unk8005BA1C_Voice();
 };
 struct Unk8005BA1C_Slot {
@@ -816,7 +835,11 @@ struct Unk8005BA1C_Obj {
 };
 /* unit 0x8005C514 */
 struct Unk805B09F4_E {
-    char pad0[0xD4];
+    char pad0[0x7E];
+    char m7E[0x46];
+    int mC4;
+    int mC8;
+    char padCC[8];
     int mD4;
 };
 extern Unk805B09F4_E lbl_805B09F4[];
@@ -832,14 +855,9 @@ struct Unk805AE420_Row {
 };
 extern Unk805AE420_Row lbl_805AE420[];
 
-int fn_8005A3E8(void* p, int a, int b);
-int fn_8005A674(void* p, int a, int b);
-int fn_8005A780(void* p, int a);
-int fn_8005A8B4(void* p);
-int fn_8005A94C(void* p);
+int fn_8005A3E8(Unk8005BA1C_Voice* v, int ch, int x);
+int fn_8005A780(Unk8005BA1C_Voice* v, int a);
 void fn_8005A240(void* p);
-int fn_8005AB44(void* p);
-void fn_8005A9A8(void* p);
 int fn_803AB528(int a, int b);
 int fn_80097520(Unk80052794_Row* r, int k);
 int fn_8001F984(Unk80052794_Obj* obj);
@@ -882,7 +900,7 @@ extern const float lbl_805ADCD4;
 extern const float lbl_805ADCD8;
 extern const float lbl_805ADCDC;
 
-int fn_8005A4F8(void* p, int a, int b, int c);
+int fn_8005A4F8(Unk8005BA1C_Voice* v, int ch, int a, int b);
 /* 0x8005C97C: queue of 0x50-byte records (+0 key, +4 a 0x4C-byte block) */
 struct Unk8005C97C_Sub {
     int w[19];
@@ -949,6 +967,50 @@ struct Unk805B10B4_Row {
 extern Unk805B10B4_Row lbl_805B10B4[];
 int fn_8005A010(Unk8005BA1C_Voice* v, int a, int b);
 void fn_8005A2E4(void* p, int a);
-int fn_8005A118(void* p, float f);
+
+/* unit 0x80058060 */
+extern const char lbl_80649A60_unused[];
+extern const double lbl_805ADC50;
+extern float lbl_805ADC60;
+void fn_803A975C(void);
+void fn_803A979C(void);
+int fn_803AB8A4(int h, void* p);
+int fn_803AB644(int h, void* p);
+int fn_803AB278(int h);
+void fn_803AAA3C(int h);
+void fn_803AA95C(int h);
+int fn_803AB858(int h, int v);
+void* fn_8004072C(void);
+void fn_8004181C(void* self, int a, int b, int c, int d, int e, int f);
+int fn_80038EB4(void);
+void fn_800396D0(int a, int b);
+int fn_803927D0(int h);
+void fn_803A9204(void* p, int a);
+int fn_8005A19C(Unk8005BA1C_Voice* v);
+int fn_8005A118(Unk8005BA1C_Voice* v, float f);
+int fn_8005A5FC(Unk8005BA1C_Voice* v, int k);
+int fn_8005A94C(Unk8005BA1C_Voice* v);
+int fn_8005AB44(Unk8005BA1C_Voice* v);
+int fn_8005AAA8(Unk8005BA1C_Voice* v);
+void fn_8005A9A8(Unk8005BA1C_Voice* v);
+void fn_8005AA00(Unk8005BA1C_Voice* v);
+int fn_8005A8B4(Unk8005BA1C_Voice* v);
+void fn_8005A814(Unk8005BA1C_Voice* v, int a);
+int fn_8005A674(Unk8005BA1C_Voice* v, int a, int b);
+
+int fn_803AB9F0(int h, int a, float f);
+int fn_803AAFB8(int h, int a, int b);
+struct Unk800475EC_E {
+    int m0;
+    char pad4[0x18];
+};
+struct Unk800475EC_T {
+    char pad0[0x18];
+    Unk800475EC_E e[8];
+};
+Unk800475EC_T* fn_800475EC(void);
+int fn_803AAA18(int h, int a, int name, int x);
+int fn_800412AC(void* self, int a, int b, int c, int d, int e);
+extern char lbl_805B0780[][0x42];
 
 #endif
