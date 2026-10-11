@@ -1,0 +1,11 @@
+# Owner review required for verification-critical paths.
+# Replace @OWNER with your GitHub username, then enable branch protection on
+# `main` with "Require review from Code Owners".
+/tools/verify/                 @OWNER
+/.github/                      @OWNER
+/.claude/                      @OWNER
+/config/GV4E69/build.sha1      @OWNER
+/config/GV4E69/ldscript.ld     @OWNER
+/config/GV4E69/dol_layout.txt  @OWNER
+/tools/mkdol.py                @OWNER
+/tools/project.py              @OWNER

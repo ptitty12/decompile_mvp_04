@@ -1,0 +1,70 @@
+name: Build
+
+# Two jobs:
+#  - integrity: runs on GitHub-hosted runners, needs no game data. Fails if any
+#    protected verification file changed (tools/verify/protected.sha256).
+#  - build: runs on the OWNER'S self-hosted runner, so game files never leave
+#    the owner's machine. Full build + retail hash check + hard-rule scan +
+#    match-regression check against the base commit.
+#
+# Self-hosted runner setup (owner, once): register a Windows runner with the
+# labels `self-hosted, windows, gv4e69`, put ninja and Python 3 on its PATH,
+# and set the environment variable GV4E69_ORIG to a directory holding the disc
+# image (the same contents as orig/GV4E69/ locally).
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  integrity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify protected files
+        run: python3 tools/verify/verify.py --integrity-only
+
+  build:
+    needs: integrity
+    runs-on: [self-hosted, windows, gv4e69]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Link original files
+        shell: pwsh
+        run: |
+          if (-not $env:GV4E69_ORIG) { throw "GV4E69_ORIG is not set on this runner" }
+          New-Item -ItemType Directory -Force orig | Out-Null
+          if (-not (Test-Path orig/GV4E69)) {
+            New-Item -ItemType Junction -Path orig/GV4E69 -Target $env:GV4E69_ORIG | Out-Null
+          }
+
+      - name: Pick regression baseline
+        id: base
+        shell: pwsh
+        run: |
+          $ref = "${{ github.event.pull_request.base.sha }}"
+          if (-not $ref) { $ref = "${{ github.event.before }}" }
+          if (-not $ref -or $ref -match '^0+$') { $ref = "" }
+          "ref=$ref" >> $env:GITHUB_OUTPUT
+
+      - name: Verify (build, retail hash, hard rules, regressions)
+        shell: pwsh
+        run: |
+          if ("${{ steps.base.outputs.ref }}") {
+            python tools/verify/verify.py --baseline-ref "${{ steps.base.outputs.ref }}"
+          } else {
+            python tools/verify/verify.py
+          }
+
+      - name: Upload progress report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GV4E69_report
+          path: build/GV4E69/report.json

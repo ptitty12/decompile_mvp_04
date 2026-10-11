@@ -1,0 +1,12 @@
+# SHA-256 (CRLF normalized to LF) of verification-critical files.
+# CI fails if any differs. Only the owner updates this file
+# (python tools/verify/verify.py --print-protected).
+a10e997a10ecb345c353e9f90e89009679dd62a82d9819fb50a25bdff644bb76  tools/verify/verify.py
+b94b0cd0ca6201c23b2274c9f97cc65831f9d83463535d2844dd1d0f4a031d9b  tools/verify/pragma_allowlist.txt
+e65c1df6283380c4418d4b97ce6a54185cd458c13e47ca954625f2cbd37edc7f  .github/workflows/build.yml
+50da84df4259acf26c9bdfd06547550fe647b84ef6ed33019361ed93058e7b92  .claude/settings.json
+507e485ef7d4385c4c420b20bdebfd8e11bcc07bd3e46329fcca96d709628ece  config/GV4E69/build.sha1
+b37c8f0f6237ee9a0c88704926b551c0462a67ac916e02eabde42cc27ed11c69  config/GV4E69/ldscript.ld
+a87b05dbf620bf90989d4987b3e073d56075147483b3f395393348aa09d8fd88  config/GV4E69/dol_layout.txt
+c9ac9e41283390b3c7a34e4bf7cf7aa141927dc5448ad6cc3c563a0273412684  tools/mkdol.py
+33e4a2828e3ce09e41b2b64f7456daab3765d4b0e47daaa6794d13f9008722f8  tools/project.py
