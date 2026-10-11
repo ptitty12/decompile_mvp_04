@@ -98,6 +98,39 @@ extern "C" int fn_80195FD8(Unk80194D44_O* o, float t)
     return 0;
 }
 
+//@8019755C
+extern "C" void fn_8019755C(Unk8019755C_Data* self, int chrg)
+{
+    self->m90 = lbl_8065F848;
+    if (self->m5C) {
+        fn_80377488(self->m5C);
+        self->m5C = 0;
+    }
+    if (self->m60) {
+        fn_80377488(self->m60);
+        self->m60 = 0;
+    }
+    if (self->m64) {
+        fn_80377488(self->m64);
+        self->m64 = 0;
+    }
+    if (self->m68) {
+        fn_80377488(self->m68);
+        self->m68 = 0;
+    }
+    if (chrg & 1)
+        fn_80377408(self);
+}
+
+//@80197B88
+extern "C" void fn_80197B88(Unk80197B88_O* o, Unk80197B88_P* p, void* out)
+{
+    Unk8018A254_Ret m;
+    fn_803DF4E4(&m, p->m48 * 57.295776f, p->m3C, p->m40, p->m44);
+    fn_803DFD90(&m, p->m0, p->m4, p->m8);
+    fn_803DF028(&m, o->m6C, o->m5C, 12, out, 12);
+}
+
 //@80197D94
 extern "C" int fn_80197D94(float* a, float* b)
 {
@@ -116,5 +149,23 @@ extern "C" int fn_80198188(Unk80198188_Ring* r)
     if (*(int*)(r->m4 + next * 128 + 0x60) != 0)
         return next;
     return 0;
+}
+
+//@80198C18
+extern "C" void fn_80198C18(Unk80198C18_Obj* self, int chrg)
+{
+    self->mB8 = lbl_806603D8;
+    self->m368 = lbl_806603B0;
+    char* s3 = self->m3FC;
+    self->m98 = lbl_80660468;
+    *(const void**)(s3 + 0x10) = lbl_806604C8;
+    if (*(void**)(s3 + 4))
+        fn_80377488(*(void**)(s3 + 4));
+    if (*(void**)(s3 + 8))
+        fn_80377488(*(void**)(s3 + 8));
+    void* sub = &self->m360;
+    *(const void**)((char*)sub + 8) = lbl_80649DB8;
+    fn_80378620(sub, 0);
+    fn_8026C864(self, chrg);
 }
 
