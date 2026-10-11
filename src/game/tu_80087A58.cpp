@@ -277,6 +277,93 @@ Unk80087A58_X* fn_80089798();
 Unk80087A58_K* fn_800897B8(Unk80087A58_K* self);
 void fn_80089838(Unk80087A58_K* self, int flags);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern float lbl_805B4868;
+double fabs(double);
+struct Unk80087A58_V2 {
+    float x;
+    float y;
+};
+
+void fn_80087A58(O* s, int a, char v, int w, int flag);
+char fn_80087A88(O* s, int a, int w, int flag);
+float fn_80087ABC(O* s, int a, int w);
+void fn_80087B10();
+Unk80087A58_X* fn_80087B14();
+int fn_80087B60(int t);
+int fn_80087BE8(int a, int b);
+void fn_80087C40(E* e);
+H* fn_80087C88(H* h);
+void fn_80087CC4(H* h);
+void fn_80087D08();
+void fn_80087D0C(H* h);
+int fn_80087E0C(H* h, int a, int b);
+E* fn_80087E5C(H* h, int a, int b, int k);
+void fn_80087F7C(H* h, int v);
+int fn_80087F94(H* h);
+void fn_8008801C();
+void fn_80088020();
+void fn_800881FC(void* s, int a, int b, int c, Unk80087A58_Rec* z);
+int fn_80088234(O* o, int v);
+int fn_80088280(O* o);
+int fn_800882D0(O* o);
+int fn_8008838C(O* o, int a, int b);
+int fn_80088640(O* o, int a, int b);
+float fn_80088E74(O* o);
+float fn_80088EA4(O* o);
+E* fn_80088EAC(O* o, int a, int b, int c);
+int fn_80088EDC(O* o, int i);
+int fn_80088EFC(O* o, int i);
+int fn_80088F48(O* o, int i);
+int fn_80088F84(O* o, int i);
+int fn_80088FBC(O* o, int i);
+int fn_80088FFC(O* o, int i);
+void fn_80089108(O* o);
+int fn_80089114(void* s, Unk80087A58_V2* v);
+int fn_80089304(void* x, int t);
+int fn_80089348(void* x, int t, int* out);
+Unk80087A58_X* fn_80089798();
+Unk80087A58_K* fn_800897B8(Unk80087A58_K* self);
+void fn_80089838(Unk80087A58_K* self, int flags);
+
 void fn_80087A58(O* s, int a, char v, int w, int flag)
 {
     int i = flag == 0 ? s->m14[w] : s->m234;
@@ -547,6 +634,23 @@ int fn_80088FFC(O* o, int i)
 void fn_80089108(O* o)
 {
     o->m1744 = 1;
+}
+
+/* near-miss: retail spills each coordinate to its own 8-byte-aligned slot and
+ * loads the constant after the first lfs; __builtin_fabs gives the fabs insn
+ * (plain fabs() is a call). One extra fmr here. */
+int fn_80089114(void* s, Unk80087A58_V2* v)
+{
+    int r = 0;
+    float a = v->x;
+    if (__builtin_fabs(a) > lbl_805B4868)
+        r = 1;
+    else {
+        float b = v->y;
+        if (!(__builtin_fabs(b) <= lbl_805B4868))
+            r = 1;
+    }
+    return r;
 }
 
 int fn_80089304(void* x, int t)
