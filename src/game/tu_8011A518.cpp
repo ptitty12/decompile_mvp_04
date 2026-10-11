@@ -42,6 +42,12 @@ extern const float lbl_805BFD34;
 extern const float lbl_805BFD38;
 
 
+/* Indexed int load whose index register is a separate temp (lwzx base,idx). */
+inline int AtD(int* p, int i)
+{
+    int off = i * 4;
+    return *(int*)((char*)p + off);
+}
 // PROTOS-BEGIN
 extern "C" {
 void fn_8011A518(UnkGame* g, Wid* w, const char* name);
@@ -244,7 +250,6 @@ int fn_8011AA4C()
     return lbl_806192E0->m4->m10->m74;
 }
 
-/* near-miss: one slot (lwzx operand order). An inline `int AtI(int* p, int i) { return p[i]; }` gives retail's r11 index register but flips the operands. */
 int fn_8011AB48(int a)
 {
     int r = -1;
@@ -260,11 +265,8 @@ int fn_8011AB48(int a)
     case 5:
     case 6:
     case 10:
-    {
-        char* b = (char*)fn_8011AA24(0)->m6F8->m10 + 0x6C;
-        r = *(int*)(b + a * 4);
+        r = AtD(&fn_8011AA24(0)->m6F8->m10->m6C, a);
         break;
-    }
     }
     return r;
 }
