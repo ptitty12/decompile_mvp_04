@@ -455,15 +455,21 @@ inline void Query(Unk80384070* r, Unk80270BA0_Obj* o, int ev, Unk80273498_Vec3* 
     r->fn_80384070(o, 1, &ev, out, outF, 0, t);
 }
 
-/* near-miss (464 vs 465 instructions, ~94% of the instruction sequence). Left:
- * - the callee-saved registers of st and x are swapped (retail: st r31, x r29);
- * - retail keeps x+0x734 in a register and indexes with (idx*4)+0x48; here the
- *   offset folds into x+0x77C (tried: reference, pointer, inline getter);
+/* The m48 history read goes through an inline taking &x->m734 (unflagged
+ * pointer: x+0x734 stays in a register and the index is (idx*4)+0x48, and the
+ * callee-saved numbering of st/x falls into place).
+ * near-miss (465 of 465 instructions, 20 differ). Left:
  * - the matrix, result and subtraction temporaries sit 0x20 lower than in
- *   retail, which keeps the debug block's locals (q, r, InRange's floats) alive
- *   to the end of the function. Declaring them at function scope fixes the
- *   slots but changes the register allocation (kept out: 86% overall);
- * - scheduling of the second Query call's argument setup. */
+ *   retail (retail does not reuse the debug block's slots for them);
+ *   declaring q/r at function scope makes it worse;
+ * - the second Query call moves `mr r3,r26` first (retail last); a direct
+ *   call, a local for the event and a reordered inline did not help. */
+inline float CurAngle48(Unk802726BC_Angles* p)
+{
+    float* q = &p->m48[p->m190];
+    return *q;
+}
+
 void cFudgePosRotWarp::fn_802A3D8C(const Unk80273498_Vec3& a, Unk802A3D8C_State* st, Unk80270BA0_X* x, int flag, int n, const Unk80273498_Vec3& pos, float yaw)
 {
     if (a.y == -1000.0f) {
@@ -542,8 +548,7 @@ void cFudgePosRotWarp::fn_802A3D8C(const Unk80273498_Vec3& a, Unk802A3D8C_State*
     if (flag && m10 == 0x971949A6) {
         Unk80189698_Ctx* c = x->m44C->m6CC;
         float d = v - start;
-        Unk802726BC_Angles& ang = x->m734;
-        float k = ang.m48[ang.m190];
+        float k = CurAngle48(&x->m734);
 
         d = d / owner->m4;
         if (!(k <= 0.0f)) {
