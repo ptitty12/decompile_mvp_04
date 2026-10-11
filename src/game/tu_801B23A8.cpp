@@ -558,22 +558,25 @@ int fn_801B3850(Unk801AB63C_P* a, Unk801B23A8_Q* q, int c)
     return x > y ? y : x;
 }
 
-/* near-miss: retail builds the 3/4 team index through a separate register (li r0,3 / li r0,4 / mr r4,r0). */
+inline Unk8019F8C0_Inner* Unk801B38A8_At(Unk8019F8C0_Inner* a, int i) { return &a[i]; }
+inline int Unk801B38A8_Other(int t)
+{
+    if (t > 2) {
+        int u = 3;
+        if (t == 3) {
+            u = 4;
+        }
+        return u;
+    }
+    return t == 0;
+}
 unsigned char fn_801B38A8(Unk801AB63C_P* p, int i, int flag)
 {
     if (flag == 1) {
-        if (i > 2) {
-            int r = 3;
-            if (i == 3) {
-                r = 4;
-            }
-            i = r;
-        } else {
-            i = i == 0;
-        }
+        i = Unk801B38A8_Other(i);
     }
     Unk8019F8C0_Inner* m = p->m8->m6F8->m14;
-    return m[i].m1B4[m[2].m0];
+    return Unk801B38A8_At(m, i)->m1B4[m[2].m0];
 }
 
 int fn_801B38FC(Unk801AB63C_P* a, Unk801B23A8_Q* q)
