@@ -20,7 +20,7 @@ void fn_800527B4(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 
 void fn_800527DC(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
-    if (fn_80054D98() != 0) {
+    if (fn_80054D98(ctx) != 0) {
         int a = fn_8001D780(obj);
         int b = fn_8001DCF8(obj);
         fn_80017978(a, b, fn_8001DA9C(obj));
@@ -67,7 +67,7 @@ void fn_80052908(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 void fn_80052E7C(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
     if (obj->m3D0 < *lbl_8061B9C4) {
-        fn_80058FE4(ctx->mA9C, 0);
+        fn_80058FE4(ctx->mA9C, 0, obj);
         if (obj->m3D0 == 2 && obj->m27C > 2 && fn_8040ABA0() % 10 <= 2) {
             int a = fn_8001D454(obj);
             fn_80017594(a, fn_8001DA4C(obj));
