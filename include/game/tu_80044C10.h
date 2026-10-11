@@ -22,6 +22,7 @@ struct Unk80044C10_D;
 struct Unk80044C10_C;
 struct Unk80044C10_B;
 class Unk80044C10_A;
+struct Unk8004763C_Slot;
 struct Unk8004763C;
 struct Unk80044C98_Arg;
 
@@ -43,7 +44,8 @@ struct Unk80044C10_Side {
 
 struct Unk80044C10_E {
     Unk80044C10_Side sides[2];
-    char pad1CC8[0x8];
+    unsigned char m1CC8;
+    char pad1CC9[0x7];
     int m1CD0;
 };
 
@@ -101,7 +103,9 @@ class Unk80044C10_A : public Unk80044C10_A_Vt {
 public:
     char pad9C[0x94];
     Unk80044C10_A* m130;
-    char pad134[0x318];
+    char pad134[0x280];
+    int m3B4;
+    char pad3B8[0x94];
     Unk80044C10_B* m44C;
     char pad450[0x8];
     int m458;
@@ -118,9 +122,31 @@ public:
     int m708;
 };
 
+struct Unk8004763C_Slot {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    char pad18[0x4];
+};
+
 struct Unk8004763C {
-    char pad0[0xB98];
+    Unk8004763C_Slot mSlots[8];
+    int mE0;
+    int mE4;
+    char padE8[0x4];
+    int mEC;
+    int mF0;
+    int mF4;
+    int mF8;
+    char mFC[0xA9C];
     void* mB98;
+    char padB9C[0x44];
+    int mBE0[8];
+    int mC00;
+    unsigned mC04;
     void fn_80047DE0(int a, int b, int c, int d);
 };
 
@@ -146,5 +172,24 @@ int fn_80043650(int a);
 Unk8004763C* fn_800475EC();
 void fn_80057C30(void* a, unsigned short b);
 void fn_8018CA5C(void* a, float* b, float* c, float* d);
+void* operator new(unsigned int size, int heap); /* 0x80377428 */
+Unk8004763C* fn_8004763C(Unk8004763C* t);
+void fn_8004778C(Unk8004763C* t, int flags);
+int fn_80047B08(Unk8004763C* t);
+void fn_80047CA4(Unk8004763C* t);
+void fn_80047D40(Unk8004763C* t, int i);
+int fn_80048294(Unk8004763C* t, int i);
+void fn_8004838C(Unk8004763C* t, int i);
+int fn_800484A8(Unk8004763C* t, int i);
+void fn_80048818(Unk8004763C* t, int i);
+void fn_80048A10(void* p);
+void fn_80048B2C(void* p, int flags);
+void fn_80048BC0(void* p);
+void fn_80048BE4(void* p);
+void fn_800490F4(void* p);
+void fn_80377408(void* p); /* __builtin_delete */
+void fn_80391348(unsigned a);
+void fn_803EE7BC();
+extern Unk8004763C* lbl_80617800;
 
 #endif
