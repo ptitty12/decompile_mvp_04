@@ -11,3 +11,15 @@
 
 # decomp-toolkit writes files with LF
 config/**/*.txt  text eol=lf
+
+# dtk config: merge by meaning, not line position (tools/swarm/merge_dtk.py;
+# drivers registered by tools/swarm/install_merge_drivers.py)
+config/GV4E69/symbols.txt merge=dtk-symbols
+config/GV4E69/splits.txt  merge=dtk-splits
+
+# Append-only logs: keep both sides of parallel appends
+PROGRESS.md       merge=union
+docs/SPEEDUPS.md  merge=union
+
+# Patches must keep their exact bytes (a CRLF checkout breaks git apply)
+*.patch -text
