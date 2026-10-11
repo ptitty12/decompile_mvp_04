@@ -619,24 +619,9 @@ float fn_8028F220(Unk80270BA0_X* x, int a, int b);
 float fn_80249070(Unk80270BA0_X* x);
 float fn_8024BF20(Unk80270BA0_X* x, float v);
 
-inline float Clamp01(float v)
-{
-    if (v > 1.0f) {
-        return 1.0f;
-    }
-    if (!(v >= 0.0f)) {
-        return 0.0f;
-    }
-    return v;
-}
-
-/* near-miss: 66 of 66 instructions, 10 differ. Retail's clamp ends with the
- * result in f0 (the register that holds t): "bgt L1; ...; bso L2; fmr f0,f13;
- * b L2; L1: fmr f0,f12; L2: stfs f0". Every ternary / if-else form tried (about
- * 190, see PATTERNS) puts the result in f13 after a hoisted "fmr f13,f0" (the
- * jump pass moves the else-value copy above the 0.0 compare) or uses a different
- * branch (bns instead of bgt). The same clamp appears about ten times in
- * cMatrixChooser::fn_vslot17, so that function is blocked on it too. */
+/* The clamp is g++'s minimum/maximum operator inside a ternary (see PATTERNS,
+ * "In-place float clamp"): MAX_EXPR compares its own result register, so the
+ * jump pass cannot hoist a copy of t above the 0.0 test. */
 float fn_8026FDB0(Unk80270BA0_Obj* obj)
 {
     Unk80270BA0_X* x = obj->fn_vslot1();
@@ -649,7 +634,7 @@ float fn_8026FDB0(Unk80270BA0_Obj* obj)
     float* q = &p->m8[p->m190];
     float v = fn_8024BF20(x, *q);
     float t = v / len;
-    t = (t <= 1.0f) ? (t >= 0.0f ? t : 0.0f) : 1.0f;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
     t = t * 0.0025399998f * scale;
     return t;
 }
