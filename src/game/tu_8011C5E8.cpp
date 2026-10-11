@@ -73,6 +73,15 @@ extern const float lbl_805C00F8;
 extern int lbl_8061B3B8;
 extern int lbl_8061977C;
 extern const char lbl_805C0028[];
+extern const char lbl_805BED00[];
+extern const char lbl_805BED0C[];
+extern const char lbl_805BED18[];
+extern const char lbl_805BED24[];
+extern const char lbl_805BED30[];
+extern const char lbl_805BED3C[];
+extern const char lbl_805C0250[];
+extern const char lbl_805BE0C8[];
+extern const float lbl_805C00EC;
 extern const char lbl_805BC1A8[];
 extern const char lbl_805C01F4[];
 extern const char lbl_805C0200[];
@@ -122,6 +131,7 @@ void fn_8011E3B4();
 void fn_8011E3F4(Scr* self);
 void fn_8011E414(Scr* self);
 void fn_8011E434(Scr* self, int a);
+void fn_8011E4E4(Scr* self, float f);
 void* fn_8011E5BC(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_8011EEB0(Scr* self, int a);
 void fn_8011EF64(Scr* self, int a);
@@ -136,9 +146,12 @@ void fn_8011F410(Scr* self);
 Wid* fn_8011F4B8(Scr* self, int i);
 Wid* fn_8011F548(Scr* self, int i);
 Wid* fn_8011F5D8(Scr* self, int i);
+int* fn_8011FAA4(Scr* self, int unused, int a, int b);
 void fn_8011FFB4(Scr* self);
 void fn_8012004C(Scr* self, int a, int b);
 void fn_801200C4(Scr* self, int a);
+void fn_80120144(Scr* self, float f);
+void fn_8012031C(Unk80117D20_Scr* self);
 void fn_801203D0();
 void fn_80120410(Scr* self);
 void fn_80120430(Scr* self);
@@ -174,7 +187,7 @@ void fn_8011FFB4(Scr* self);
 void fn_8011F410(Scr* self);
 extern int lbl_80619D10;
 int* fn_800ED2B0(Wid* container, const char* name);
-void fn_800CFB38(int* p);
+int* fn_800CFB38(int* p);
 void fn_800CFE84(int* p);
 void* fn_8004072C();
 int fn_800412AC(void* o, int a, int b, int c, int d, int e);
@@ -413,6 +426,14 @@ void fn_8011E434(Scr* self, int a)
     self->m1D4 = a;
 }
 
+void fn_8011E4E4(Scr* self, float f)
+{
+    char buf[0x20];
+    fn_804089B4(buf, lbl_805BE0C8, f * lbl_805C00EC);
+    fn_800C8048(self->m19C)->fn_vslot30(buf);
+    fn_800C8038(self->m1A0)->fn_vslot12((int)(f * (float)(int)self->m1BC));
+}
+
 void* fn_8011E5BC(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_8011BFAC(self, a, b, c, d, e, f, g, h);
@@ -579,6 +600,35 @@ Wid* fn_8011F5D8(Scr* self, int i)
     }
 }
 
+int* fn_8011FAA4(Scr* self, int unused, int a, int b)
+{
+    int c = 1;
+    if (self->m1A8->b0 || (c = 0, self->m1AC->b0)) {
+        const char* name;
+        if (a != 0) {
+            if (c != 0)
+                name = lbl_805BED00;
+            else
+                name = lbl_805BED0C;
+        } else if (b != 0) {
+            if (c != 0)
+                name = lbl_805BED18;
+            else
+                name = lbl_805BED24;
+        } else {
+            if (c != 0)
+                name = lbl_805BED30;
+            else
+                name = lbl_805BED3C;
+        }
+        int* p = fn_800ED2B0(self, name);
+        if (p != 0)
+            p = fn_800CFB38(p);
+        return p;
+    }
+    return (int*)self;
+}
+
 void fn_8011FFB4(Scr* self)
 {
     self->fn_vslot89();
@@ -607,6 +657,21 @@ void fn_801200C4(Scr* self, int a)
     int* p1 = fn_800ED2B0(self->m1B0, lbl_805C0008);
     Wid* w2 = fn_800C8054(self->m1A0);
     fn_8011B148(a, w1, p1, w2, fn_800ED2B0(self->m1B0, lbl_805C0018));
+}
+
+void fn_80120144(Scr* self, float f)
+{
+    char buf[0x40];
+    buf[0] = 0;
+    fn_804089B4(buf, lbl_805C0250, f);
+    ((UnkLabel*)self->m1B4)->fn_vslot30(buf);
+}
+
+void fn_8012031C(Unk80117D20_Scr* self)
+{
+    if (fn_800AEC80(fn_800AB5C8(lbl_80619D10))->mD8 == 0)
+        fn_800C8040(fn_800C8044(self->fn_vslot32(lbl_805B97B4, 0))->fn_vslot33(4, 1))->fn_vslot29((const char*)0x1907);
+    fn_8011C5E8(self);
 }
 
 void fn_801203D0()
