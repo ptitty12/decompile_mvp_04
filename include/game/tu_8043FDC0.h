@@ -11,13 +11,22 @@
 #include "game/tu_8001B190.h"
 
 void* operator new(unsigned int size, int heap);
+struct FeGame;
 
 /* Data part of the widget base (written by the common base ctor fn_800EC648, 0x3C bytes; +0x24
  * is a word of flag bits). */
 struct UiBase {
     char pad0[0x24];
     int m24;
-    char pad28[0x3C - 0x28];
+    short m28;
+    short m2A;
+    short m2C;
+    short m2E;
+    short m30;
+    short m32;
+    short m34;
+    short m36;
+    float m38;
 };
 
 /* Message manager singleton (lbl_8061A32C), 0xD8 bytes, ctor fn_800B64BC; created lazily. */
@@ -76,7 +85,7 @@ Unk8005ADD0_Obj* fn_8005ACE4();
 void fn_8005B9D4(Unk8005ADD0_Obj* o, int a);
 
 extern "C" {
-void fn_800A3DF4(int a);
+void fn_800A3DF4(FeGame* g);
 void fn_803FBFE0(const char* name, void* buf, int len);
 int fn_80401610(void* a, int b, void* c, int d);
 void fn_80377408(void* p);
@@ -86,7 +95,17 @@ void fn_800B8AF0(void* p);
 void fn_80331294(void* p);
 }
 unsigned fn_800734D4(void* s, unsigned flags);
-extern int lbl_80619948;
+/* lbl_80619948: the game/franchise object (fields as the front-end reads them). */
+struct FeGame {
+    char pad0[0x28];
+    int m28;
+    char pad2C[0x74 - 0x2C];
+    int m74;
+    char pad78[0x80 - 0x78];
+    int m80;
+    int m84;
+};
+extern FeGame* lbl_80619948;
 extern int lbl_80621608;
 extern int lbl_8061B998;
 extern "C" void fn_8043FF24(int a);
@@ -213,7 +232,7 @@ extern "C" {
 FeState* fn_800B555C();
 FeObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
 void fn_801251CC(FeObj* o, int a, int b, int c);
-int fn_800A1960(int a);
+int fn_800A1960(FeGame* g);
 int fn_80546B18(int a, int b, int c);
 void fn_80126CF4(void* o, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 int fn_800B5758(FeState* st);
@@ -271,4 +290,68 @@ void fn_80447E60(int a, FeScr_80447264* self);
 void fn_80448D68(int a, FeScr_80447264* self);
 }
 
+
+/* Roster-popup screen family (ctor fn_8044974C). */
+struct FeScrRawL {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138, m13C, m140, m144, m148, m14C, m150, m154, m158, m15C, m160, m164, m168, m16C, m170, m174;
+    char pad178[0x240 - 0x178];
+    int m240, m244, m248;
+};
+struct FeScr_8044974C : FeObj {
+    char pad40[0x130 - 0x40];
+    int m130;
+    FeObj* m134;
+    FeObj* m138;
+    FeObj* m13C;
+    FeObj* m140;
+    FeObj* m144;
+    FeObj* m148;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+    FeObj* m168;
+    int m16C;
+    int m170;
+    int m174;
+};
+extern "C" {
+void fn_8044B050(FeScr_8044974C* self);
+void fn_8044AD04(FeScr_8044974C* self);
+void fn_8044B454(FeScr_8044974C* self, int a);
+void fn_8044B6A4(FeScr_8044974C* self, FeObj* a);
+}
+
+/* Meter-bar class (ctor fn_80449034). */
+struct FeMeter : FeObj {
+    char pad40[0x2DC - 0x40];
+    int m2DC;
+    int m2E0;
+    int m2E4;
+    int m2E8;
+    int m2EC;
+    float m2F0;
+    int m2F4;
+    int m2F8;
+    int m2FC;
+    FeGame* m300;
+    FeObj* m304;
+    void (*m308)(int);
+    int m30C;
+};
+struct FeMeterRaw {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x2DC - 0x40];
+    int m2DC, m2E0, m2E4, m2E8, m2EC;
+    float m2F0;
+    int m2F4, m2F8, m2FC, m300, m304, m308, m30C;
+};
+extern "C" FeMeterRaw* fn_800EC150(FeMeterRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
 #endif
