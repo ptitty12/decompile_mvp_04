@@ -81,7 +81,9 @@ def functions(objdump, obj):
 
 def mask(word, reloc):
     op = word >> 26
-    if op in (16, 18):  # branches: keep opcode and AA/LK bits
+    if op == 16:  # bc: keep BO/BI (the branch sense) and AA/LK; mask the displacement
+        return word & 0xFFFF0003
+    if op == 18:  # b/bl: keep opcode and AA/LK bits
         return word & 0xFC000003
     if reloc:
         return word & 0xFFE00000 if op in (14, 15) else word & 0xFFFF0000
