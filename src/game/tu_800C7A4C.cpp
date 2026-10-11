@@ -147,7 +147,7 @@ extern "C" void fn_800C80C8(int* p)
     *p = -1;
 }
 
-extern "C" int fn_800C80D4()
+extern "C" int fn_800C80D4(void* w)
 {
     return 0;
 }
@@ -192,7 +192,7 @@ extern "C" Unk800D1614_Raw* fn_800C842C(Unk800D1614_Raw* self, int p1, int p2, i
 extern "C" void fn_800C8B9C(Unk800C7B40_Widget* w, int v)
 {
     if (w->b7)
-        w->fn_vslot14(fn_800C80D4());
+        w->fn_vslot14(fn_800C80D4(w));
     fn_800CF804(w, v);
 }
 

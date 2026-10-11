@@ -490,7 +490,7 @@ void fn_800CF804(Unk800C7B40_Widget* w, int v);
 void fn_80356838(void* o, int c);
 void fn_800C97A4(void* o, int c);
 void fn_800C7C04(Unk800C7B40_Widget* w);
-int fn_800C80D4();
+int fn_800C80D4(void* w);
 int fn_800C80DC(Unk800C7B40_Widget* w, int v);
 char* fn_8040B830(char* dst, const char* src, unsigned n); /* behaves like strncpy */
 int fn_8040B574(const char* a, const char* b);             /* behaves like strcmp */
@@ -2332,7 +2332,9 @@ struct Unk800C6E34_Raw : Unk800C7B40_Data {
 
 /* Message manager singleton (lbl_8061A32C, 0xD8 bytes, ctor fn_800B64BC) as used by the on-demand loader. */
 struct Unk800B64BC_Mgr {
-    char pad0[0xB8];
+    char pad0[0xA0];
+    char* mA0;
+    char pad_A4[0x14];
     int mB8;
     char padBC[0xD8 - 0xBC];
 };
@@ -2373,6 +2375,11 @@ struct Unk800C3FEC_Obj : Unk800C3FEC_V {
 class Unk8007B2B0_Screen {
 public:
     int fn_8007C514(int a, int b);
+};
+
+struct Unk800C77A0_Obj : Unk800C7B40_Widget {
+    char pad40[0x14];
+    int m54;
 };
 
 #endif
