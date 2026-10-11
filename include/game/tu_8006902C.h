@@ -1,6 +1,8 @@
 #ifndef GAME_TU_8006902C_H
 #define GAME_TU_8006902C_H
 
+#include "game/clampiter.h"
+
 /*
  * Game-session class at 0x80069F0C (size 0x5C: fn_80069F0C is called right
  * after `new (0) 0x5C`). Placeholder names; layouts come from the offsets the
@@ -109,7 +111,9 @@ struct Unk8006902C_Ev75C {
 struct Unk8006902C_Mode {
     char pad0[0x1C];
     int m1C;
-    char pad20[0x22C - 0x20];
+    char pad20[0x74 - 0x20];
+    int m74;
+    char pad78[0x22C - 0x78];
     int m22C;
 };
 
@@ -134,7 +138,9 @@ struct Unk8006902C_Side {
     unsigned char m235;
     char pad236[2];
     Unk8006902C_Entry m238[16];
-    char pad2B8[0x3E8 - 0x2B8];
+    char pad2B8[0x3E4 - 0x2B8];
+    unsigned char m3E4;
+    char pad3E5[3];
     Unk8006902C_Rec m3E8[16];
     char pad728[0x8FC - 0x728];
     char m8FC[0x30];
@@ -190,6 +196,8 @@ struct Unk80069F0C {
     void fn_8006A0C4(int a, int b, int c, int d);
     void fn_8006A12C(int a);
     int fn_8006A138();
+    void fn_8006B880();
+    void fn_8006B990();
     int fn_8006A1B4();
     int fn_8006BDCC();
     int fn_8006BE18();

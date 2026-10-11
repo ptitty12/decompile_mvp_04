@@ -3,6 +3,8 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8006902C.h"
+#include "game/tu_8007A4DC.h"
+extern Unk8007A4DC_Screen* lbl_8061930C;
 
 void* operator new(unsigned int size, int heap);
 void fn_8007824C(void* a, Unk80069F0C* b);
@@ -51,6 +53,11 @@ inline int SumBytes(Unk8006902C_Side* s)
         t += s->m1B4[(unsigned char)i];
     return t;
 }
+
+int fn_80075808(int id);
+void fn_80080DBC(Unk8006902C_Players* p);
+int fn_8008CFD8(void* attrs, int k, unsigned char j);
+void fn_80096EE8(Unk8006902C_Side* s, int a, int b);
 
 void fn_80069EE0(void)
 {
@@ -123,6 +130,30 @@ void Unk80069F0C::fn_8006A12C(int a)
     mC->m80 = a;
 }
 
+int Unk80069F0C::fn_8006A138()
+{
+    int ok = 1;
+    Unk8006A138_It<1> it(0);
+    int idx = 0;
+    while (idx <= 1) {
+        if (!fn_80075808(SideAt(idx * 0xE64)->m198))
+            ok = 0;
+        idx = it.Next();
+    }
+    return ok;
+}
+
+/* near-miss: 2 slots; retail compares 12 before 13 (cmpwi 12; beq; cmpwi 13), the switch tree tests 13 first. */
+int Unk80069F0C::fn_8006A1B4()
+{
+    switch (m10->m22C) {
+    case 0xC:
+    case 0xD:
+        return fn_8006A138();
+    }
+    return 0;
+}
+
 int Unk80069F0C::fn_8006A214()
 {
     return this == mC->m20;
@@ -144,6 +175,50 @@ int Unk80069F0C::fn_8006A238(int idx)
         total += fn_80097A9C(s, 0, fn_800968C0(s, e, 1), 2, 0);
     }
     return total;
+}
+
+/* near-miss: 3 slots; the order of the argument moves for the two fn_8007A94C calls differs. */
+void Unk80069F0C::fn_8006B880()
+{
+    Unk8007A4DC_Screen* o = lbl_8061930C;
+    Unk8006A138_It<1> it(0);
+    int idx = 0;
+    while (idx <= 1) {
+        Unk8006902C_Side* sd = SideAt(idx * 0xE64);
+        unsigned char j = 0;
+        unsigned char n = sd->m3E4;
+        for (; j < n; j++) {
+            char* attrs = sd->mC9C;
+            int a = fn_8008CFD8(attrs, 0x1E, j);
+            int b = fn_8008CFD8(attrs, 0x1F, j);
+            if (a != 0 && a != 0x31 && b > 0) {
+                Unk8006902C_Rec* rr = sd->m3E8;
+                int off = j * 0x34;
+                int e = o->fn_8007A11C(*(int*)((char*)rr + off));
+                o->fn_8007A94C(0x1E, e, a);
+                o->fn_8007A94C(0x1F, e, b);
+            }
+        }
+        idx = it.Next();
+    }
+}
+
+void Unk80069F0C::fn_8006B990()
+{
+    Unk8007A4DC_Screen* o = lbl_8061930C;
+    Unk8006A138_It<1> it(0);
+    int idx = 0;
+    while (idx <= 1) {
+        int id = SideAt(idx * 0xE64)->m198;
+        unsigned char j = 0;
+        unsigned n = o->fn_8007F198(id);
+        for (; j < n; j++) {
+            int e = o->fn_8007A11C(o->fn_8007F24C(id, j));
+            if (o->fn_8007A8DC(0x1E, e) == 0x31)
+                o->fn_8007A94C(0x1F, e, o->fn_8007A8DC(0x1F, e) - 1);
+        }
+        idx = it.Next();
+    }
 }
 
 int Unk80069F0C::fn_8006BDCC()
@@ -257,6 +332,24 @@ void Unk80069F0C::fn_8006C17C(Unk8006902C_EvC17C* ev)
         if (fn_80099620(s) == 0)
             s->m234 = 0;
     }
+}
+
+void Unk80069F0C::fn_8006C698()
+{
+    fn_80080DBC(m14.m0);
+    Unk8006A138_It<1> it(0);
+    int idx = 0;
+    while (idx <= 1) {
+        Unk8006902C_Side* sd = SideAt(idx * 0xE64);
+        if (sd->m198 != 0)
+            fn_80096EE8(sd, m10->m74, m10->m22C);
+        idx = it.Next();
+    }
+    Unk8006902C_Mode* md = m10;
+    int x = md->m74;
+    if ((unsigned)(x - 5) > 1 && x != 1 && md->m1C <= 8)
+        mC->m600 = 1;
+    m58 = 1;
 }
 
 void Unk80069F0C::fn_8006C75C(Unk8006902C_Ev75C* ev)
