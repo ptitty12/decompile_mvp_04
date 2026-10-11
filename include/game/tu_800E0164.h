@@ -1,6 +1,9 @@
 #ifndef GAME_TU_800E0164_H
 #define GAME_TU_800E0164_H
 
+#define GAME_LBL_8061930C_INT
+#include "game/tu_800EBF2C.h"
+
 /*
  * Declarations for game/tu_800E0164.cpp (reconstructed; placeholders only).
  */
@@ -37,4 +40,31 @@ int fn_802B041C(int a);
 void fn_800E2D8C(char* p);
 int fn_800E2B84();
 
+extern float lbl_805BDBB0;
+extern float lbl_805BDBB4;
+extern char lbl_8068B4C0[];
+float fn_8033CDC4(char* t, float f);
+extern int lbl_805C3BC0[];
+void fn_800E2A58(int a);
+void fn_800E2C80(char* p, int a);
+extern char lbl_805BA54C[];
+int fn_80084114(int a);
+int fn_80083F6C(int a);
+int fn_800E190C(int x);
+struct Ui800B555C_B {
+    char pad0[0x4C4];
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
+};
+void fn_8007DB74(Unk8007B2B0_Screen* s, int a);
+void fn_800E2F24(void* t, char* e, int r);
+void fn_800E31A8(void* t, char* e, int r);
+void fn_800E3D4C(void* t, int r);
+int fn_80097210(char* e, int a);
+extern int lbl_8061977C;
+int fn_80403144(unsigned short* dst, const unsigned short* src);
+int fn_8040321C(unsigned short* dst, unsigned short* fmt, unsigned short* a, unsigned short* b);
+unsigned short* fn_80090880(int obj, int id);
 #endif

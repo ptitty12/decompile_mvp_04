@@ -4,6 +4,16 @@
  */
 #include "game/tu_800E0164.h"
 
+float fn_800E0164(float f)
+{
+    float r = fn_8033CDC4(lbl_8068B4C0, f);
+    if (r > lbl_805BDBB0)
+        r = lbl_805BDBB0;
+    else if (!(r >= lbl_805BDBB4))
+        r = lbl_805BDBB4;
+    return r;
+}
+
 int fn_800E01C8(float f)
 {
     int r = (int)(f * lbl_805BDBB8 + lbl_805BDBBC);
@@ -33,6 +43,14 @@ int fn_800E027C(int a, unsigned int b)
         return 0;
     }
     return b;
+}
+
+void fn_800E02D4(UiS* self)
+{
+    ((UiSub*)((char*)self + 0xDC))->v15();
+    for (int i = 0; i <= 15; i++)
+        ((UiVD*)self)->v51(lbl_805C3BC0[i], i);
+    ((UiSub*)((char*)self + 0xDC))->v6(5);
 }
 
 int fn_800E18B0(int x)
@@ -101,6 +119,19 @@ int fn_800E19CC(int x)
     return r;
 }
 
+void fn_800E1A1C(int a, unsigned short* dst)
+{
+    int base = lbl_8061977C;
+    int v = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B8C4(0, a);
+    int w = fn_80084114(v);
+    unsigned short* s1 = fn_80090880(base, 0x2337);
+    unsigned short* s2 = fn_80090880(base, fn_800E190C(a));
+    unsigned short* s3 = fn_80090880(base, fn_80083F6C(w));
+    unsigned short buf[0x20];
+    fn_8040321C(buf, s1, s2, s3);
+    fn_80403144(dst, buf);
+}
+
 int fn_800E1AC8(int i)
 {
     return lbl_805C36C0[i];
@@ -140,6 +171,20 @@ void fn_800E2944(int a, int b)
     }
 }
 
+void fn_800E29CC(int a)
+{
+    if (a != -1) {
+        Ui800B555C_B* p = (Ui800B555C_B*)((char*)fn_800B555C() + 8);
+        p->m4D0 = (int)fn_80090880(lbl_8061977C, 0x60D);
+        p->m4C8 = 0x200000;
+        p->m4CC = 0;
+        p->m4C4 = 1;
+        void* s = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007CFDC(a);
+        fn_800B555C()->m4E8 = s;
+        fn_8007DB74((Unk8007B2B0_Screen*)lbl_8061930C, a);
+    }
+}
+
 int fn_800E2B84()
 {
     return fn_802B041C(lbl_8061E978);
@@ -150,8 +195,34 @@ int fn_800E2BAC()
     return fn_800E2B84();
 }
 
+void fn_800E2BCC()
+{
+    fn_8001BC4C()->fn_8001BDAC(0xB2);
+    fn_800E2A58(0x500);
+    fn_8001BC4C()->fn_8001BDAC(0xB1);
+}
+
 int fn_800E2C08()
 {
     fn_800E2D8C(lbl_805BA54C);
     return fn_800E2B84();
+}
+
+void fn_800E2C34()
+{
+    fn_8001BC4C()->fn_8001BDAC(0xB2);
+    fn_800E2C80(lbl_805BA54C, 0x400);
+    fn_800E2A58(0x500);
+    fn_8001BC4C()->fn_8001BDAC(0xB1);
+}
+
+int fn_800E2E8C(void* t, int idx, int b, int c)
+{
+    char* e = lbl_806192E0->m4->m14 + idx * 0xE64;
+    int r = fn_80097210(e, 0);
+    if (r != b || c != 0)
+        fn_800E2F24(t, e, r);
+    fn_800E31A8(t, e, r);
+    fn_800E3D4C(t, r);
+    return r;
 }
