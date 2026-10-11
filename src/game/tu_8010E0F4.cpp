@@ -14,6 +14,12 @@ inline void Init(char* n, const char* s)
 }
 struct UnkName {
     char s[16];
+    UnkName(const char* x)
+    {
+        fn_8035682C(this);
+        fn_8040B830(this, x, 0xF);
+        s[15] = 0;
+    }
 };
 
 struct Unk80687CB8 {
@@ -237,6 +243,7 @@ void fn_8010F494(Scr* self, int a)
         fn_8001BC4C()->fn_8001BDAC(a);
 }
 
+/* near-miss: the case 6/7 tails and the compare chain order differ from retail (switch layout). */
 int fn_8010F4D4(int a, int b)
 {
     switch (b) {
@@ -266,6 +273,7 @@ void fn_8010F550(Scr* self)
     fn_8012E1C4(w, 1, fn_8010F4D4(1, self->m144));
 }
 
+/* near-miss: retail stores m158 first and m168 last; the scheduler hoists m168 here (tried all positions of those two). */
 void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -282,6 +290,7 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     return self;
 }
 
+/* near-miss: 2 slots; retail loads the fn_8040B830 arguments as lis r4, li r5, addi r4, mr r3 (name pointer last). */
 int fn_8010FE70(Scr* self, int a)
 {
     if (fn_800B555C()->m570 == a) {
@@ -308,6 +317,7 @@ int fn_8010FE70(Scr* self, int a)
     return 1;
 }
 
+/* near-miss: same argument-order difference as fn_8010FE70 (name pointer copied last in retail). */
 void fn_8010FFD8(int a, Scr* b)
 {
     if (a == 1) {
