@@ -14,7 +14,19 @@ struct Unk8012B960_Btn : Unk800C7B40_Widget {
 };
 /* Screen with two button widgets at +0x188 / +0x18C (fn_8012B960, fn_8012BBF4 ...). */
 struct Unk8012B960_Scr : Unk800C7B40_Widget {
-    char pad40[0x144];
+    char pad40[0xF4];
+    int m134;
+    int m138;
+    int m13C;
+    char pad140[8];
+    int m148;
+    int m14C;
+    char pad150[0x14];
+    int m164;
+    int m168;
+    int m16C;
+    int m170;
+    char pad174[0x10];
     int m184;
     Unk8012B960_Btn* m188;
     Unk8012B960_Btn* m18C;
@@ -56,6 +68,7 @@ void fn_8012AF28(int a, int b, int c);
 void fn_8012B678(int a, int b, int c);
 int fn_8007AB9C(int a, int b, int c);
 int fn_8012E3F4(Scr* self);
+int fn_80126CF4(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 Wid* fn_8012B960(Scr* self, int id, int* out);
 int fn_8007AA84(int a, int b, int c, int d);
 int fn_8007A6A0(int a, int b, int c);
@@ -143,12 +156,12 @@ int fn_801296DC(int a, int b, int c)
     return 0;
 }
 
-/* near-miss: one instruction (lwzx operand order r30,r3 in retail). */
 void fn_8012981C(int a, int b, int* out)
 {
     for (int i = 0; i < 4; i++) {
-        const int* t = lbl_805C06A4;
-        out[i] = t[fn_8007AB9C(a, 6 + i * 5, b)];
+        const char* t = (const char*)lbl_805C06A4;
+        int off = fn_8007AB9C(a, 6 + i * 5, b) * 4;
+        out[i] = *(const int*)(t + off);
     }
 }
 
@@ -167,23 +180,18 @@ void fn_8012A490(int a, int b, int c)
     }
 }
 
-/* near-miss: retail loads the vptr after selecting the name (14 slots differ). */
 Wid* fn_8012B960(Scr* self, int id, int* out)
 {
-    const char* name;
     if (self->m188->m138 == id) {
         *out = 0;
-        name = lbl_805C0424;
-    } else if (self->m18C->m138 != id) {
-        return 0;
-    } else {
+        return fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+    } else if (self->m18C->m138 == id) {
         *out = 1;
-        name = lbl_805C0438;
+        return fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
     }
-    return fn_800C8044(self->fn_vslot32(name, 1));
+    return 0;
 }
 
-/* near-miss: retail loads the vptr inside each name arm (85 insns vs 84). */
 int fn_8012BBF4(Scr* self, int id)
 {
     int out;
@@ -199,7 +207,115 @@ int fn_8012BBF4(Scr* self, int id)
         return 1;
     }
     if (fn_8012E3F4(self) != 0) {
-        fn_800C8034(fn_800C8044(self->fn_vslot32(self->m184 == 0 ? lbl_805C0424 : lbl_805C0438, 1))->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
+        Wid* w;
+        if (self->m184 == 0)
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+        else
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+        fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
+    }
+    return 0;
+}
+
+int fn_8012B9EC(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0) {
+            fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(1);
+            if (out == 0) {
+                if (self->m164 != 0) {
+                    int a = self->m188->fn_vslot95();
+                    int b = self->m168;
+                    fn_80126CF4(self, a, b, self->m134, self->m16C, self->m170, 0, self->m138, self->m13C, self->m148, self->m14C);
+                    return 1;
+                }
+            } else if (self->m168 != 0) {
+                int b = self->m18C->fn_vslot95();
+                int a = self->m164;
+                fn_80126CF4(self, a, b, self->m134, self->m16C, self->m170, 0, self->m138, self->m13C, self->m148, self->m14C);
+                return 1;
+            }
+        }
+
+    } else if (self->m138 != 0 && fn_8012E3F4(self) != 0) {
+        Wid* w;
+        if (self->m184 == 0)
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+        else
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+        fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(1);
+    }
+    return 0;
+}
+
+int fn_8012BD48(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0) {
+            fn_800C8034(w->fn_vslot32(lbl_805C0890, 1))->fn_vslot15(1);
+            if (out == 0) {
+                if (self->m164 != 0) {
+                    int a = self->m188->fn_vslot94();
+                    int b = self->m168;
+                    fn_80126CF4(self, a, b, self->m134, self->m16C, self->m170, 0, self->m138, self->m13C, self->m148, self->m14C);
+                    return 1;
+                }
+            } else if (self->m168 != 0) {
+                int b = self->m18C->fn_vslot94();
+                int a = self->m164;
+                fn_80126CF4(self, a, b, self->m134, self->m16C, self->m170, 0, self->m138, self->m13C, self->m148, self->m14C);
+                return 1;
+            }
+        }
+
+    } else if (self->m138 != 0 && fn_8012E3F4(self) != 0) {
+        Wid* w;
+        if (self->m184 == 0)
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+        else
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+        fn_800C8034(w->fn_vslot32(lbl_805C0890, 1))->fn_vslot15(1);
+    }
+    return 0;
+}
+
+int fn_8012BF50(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0) {
+            fn_800C8034(w->fn_vslot32(lbl_805C0890, 1))->fn_vslot15(0);
+            return 1;
+        }
+        return 0;
+    }
+    if (fn_8012E3F4(self) != 0) {
+        Wid* w;
+        if (self->m184 == 0)
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+        else
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+        fn_800C8034(w->fn_vslot32(lbl_805C0890, 1))->fn_vslot15(0);
     }
     return 0;
 }
