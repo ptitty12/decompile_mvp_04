@@ -13,6 +13,8 @@ void fn_8021D5D4(Task* t);
 int fn_802055F4(TaskInner* in);
 void fn_801E8A3C(Obj3A64* p, int a, int b);
 void fn_8021C24C(Task* t, Player* p);
+void fn_801EE6F4(Task* t, int a);
+void fn_8021B430(Task* t, int a, int b, int c, int d, float f);
 void fn_801F0174(Task* t, int a, int b);
 }
 
@@ -127,6 +129,30 @@ void fn_8021DC7C(Task* t, int idx, RecQueue* q)
         e->m80 = lbl_805D6188.x;
         e->m9C = 0;
         e->mAC = 0;
+    }
+}
+
+extern Vec3f lbl_805D6198;
+inline int Is3(Obj4_36C* o) { return o->m38C == 3; }
+/* near-miss: 2 slots: retail emits mr r4,r30 before mr r3,r31 for the first fn_801EE6F4 call of the else-if arm */
+void fn_8021DFF4(Task* t, int idx, RecQueue* q)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    void* cur = ObjAt(in->m8, idx);
+    if (Is3(o) == 1) {
+        Rec* e = &q->e[0];
+        e->mA4 = 1;
+        e->m80 = lbl_805D6198.x;
+        e->m9C = 0;
+        e->mAC = 0;
+        fn_801EE6F4(t, idx);
+        fn_80205450(t->m9C, idx);
+        fn_802123D4(t, 1, 1);
+        fn_8021B430(t, 1, 1, 0, 0, 1.0f);
+    } else if ((void*)o->m36C == cur) {
+        fn_801EE6F4(t, idx);
+        fn_801F0174(t, idx, 0);
     }
 }
 
