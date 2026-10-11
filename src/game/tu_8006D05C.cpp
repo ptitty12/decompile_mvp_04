@@ -67,7 +67,6 @@ int fn_80099620(Unk8006902C_Side* s);
 int fn_8009764C(Unk8006902C_Side* s, int a, int b, int c);
 void fn_800975A8(Unk8006902C_Side* s, int a, int b, int c, int d);
 
-/* near-miss: 1 slot (lwzx operand order, r30/r3 swapped). */
 void Unk80069F0C::fn_8006D508()
 {
     m44 = 0;
@@ -80,7 +79,8 @@ void Unk80069F0C::fn_8006D508()
     Unk8006902C_Side* s = &m14.m0->s[side];
     int idx = fn_80353870(s);
     Unk8006902C_Rec* r = s->m3E8;
-    int e = *(int*)((char*)r + idx * 0x34);
+    int off = idx * 0x34;
+    int e = *(int*)((char*)r + off);
     if (mC->mC)
         fn_80089094(mC->mC, e);
 }
