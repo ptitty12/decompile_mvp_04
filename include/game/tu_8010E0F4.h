@@ -129,7 +129,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot67();
     virtual void fn_vslot68(int a);
     virtual void fn_vslot69();
-    virtual void fn_vslot70();
+    virtual Unk800C7B40_Widget* fn_vslot70();
     virtual void fn_vslot71();
     virtual void fn_vslot72();
     virtual Unk800C7B40_Widget* fn_vslot73(int idx, int a);
@@ -541,7 +541,11 @@ struct UnkTextArg {
 
 /* Front-end state object returned by fn_800B555C; +0x570 is compared against ids. */
 struct UnkFESub {
-    char pad0[0x4D4];
+    char pad0[0x4C4];
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
     int m4D4;
     int m4D8;
     int m4DC;
@@ -593,7 +597,8 @@ struct UnkGameP10 {
     char pad1C[0x50];
     int m6C;
     int m70;
-    char pad74[0xB0];
+    int m74;
+    char pad78[0xAC];
     int m124;
 };
 /* One 0xE64-byte per-team record of the array at +0x14 (+0x198 is a value used for display). */
