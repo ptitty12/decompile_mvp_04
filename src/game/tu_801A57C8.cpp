@@ -243,6 +243,8 @@ void* fn_802AE7D4(void* mgr, Unk8019F8C0_Owner* a, int i, Unk8019F8C0_Owner* c);
 int fn_804089B4(char* dst, const char* fmt, ...);
 extern char lbl_805CE8F8[];
 extern char lbl_805CE97C[];
+extern char lbl_805CE944[];
+extern char lbl_805CE96C[];
 extern char lbl_805CE9A0[];
 extern char lbl_805CE918[];
 extern char lbl_805CE924[];
@@ -306,6 +308,25 @@ void fn_801A5B44(Unk8019F8C0_Owner* o)
         i++;
     } while (i <= 3);
     fn_8033E958(lbl_805CE924);
+}
+
+void fn_801A5C1C(Unk8019F8C0_Owner* o)
+{
+    fn_8033E958(lbl_805CE944);
+    char buf[16];
+    Unk8006A138_It<1> it(0);
+    do {
+        int j = 0;
+        int off = 0;
+        do {
+            o->m6A0[it.v][j] = (int)fn_802AE610(lbl_8061E978, o, 0, o, it.v, 0);
+            fn_804089B4(buf, lbl_805CE96C, it.v, j);
+            ((Unk802AE610_Sub*)((char*)o->m6A0[it.v][j] + 0xA0))->fn_vslot4(buf);
+            ((Unk801A5A9C_V*)o->m6A0[it.v][j])->fn_vslot8(1);
+            j++;
+            off += 4;
+        } while (j <= 1);
+    } while (it.Next() <= 1);
 }
 
 void fn_801A5D3C(Unk8019F8C0_Owner* o)
