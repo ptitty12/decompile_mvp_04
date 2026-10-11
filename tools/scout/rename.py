@@ -32,6 +32,7 @@ Usage: python tools/scout/rename.py <unit> [--write] [--obj PATH] [--symbols PAT
 import argparse
 import re
 import struct
+import subprocess
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -147,13 +148,37 @@ def pair(src: List[Tuple[int, int, str]], dst: List[Tuple[int, int, str]]) -> Li
     return pairs
 
 
+_OBJ_SYMS: Optional[Dict[str, Path]] = None
+
+
+def object_symbols() -> Dict[str, Path]:
+    """Every symbol name (defined or undefined) in the compiled game objects."""
+    global _OBJ_SYMS
+    if _OBJ_SYMS is None:
+        _OBJ_SYMS = {}
+        nm = ROOT / "build" / "binutils" / "powerpc-eabi-nm.exe"
+        for o in sorted((ROOT / "build" / "GV4E69" / "src").rglob("*.o")):
+            out = subprocess.run([str(nm), str(o)], capture_output=True, text=True).stdout
+            for line in out.splitlines():
+                parts = line.split()
+                if parts:
+                    _OBJ_SYMS.setdefault(parts[-1], o)
+    return _OBJ_SYMS
+
+
 def referenced(name: str) -> Optional[Path]:
+    """Where `name` is still needed under that exact name, or None.
+
+    Source text alone (e.g. a C++ method called fn_80271FE8, whose symbol is
+    mangled) doesn't count: only a compiled object that defines or references
+    the plain symbol does.
+    """
     pat = re.compile(r"\b" + re.escape(name) + r"\b")
     for d in ("src", "include"):
         for p in (ROOT / d).rglob("*"):
             if p.is_file() and p.suffix in (".c", ".cpp", ".cp", ".h", ".hpp", ".inc"):
                 if pat.search(p.read_text(encoding="utf-8", errors="replace")):
-                    return p
+                    return object_symbols().get(name)
     return None
 
 
