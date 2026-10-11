@@ -438,7 +438,6 @@ extern "C" void fn_800D3A38(Unk800D3A38_Raw* o, int c)
         fn_80377408(o);
 }
 
-/* near-miss: retail holds o->m44 in r4 (callers of fn_80090880 pass the id in r4, but the symbol is declared with one parameter) and m68 in r0 */
 extern "C" char* fn_800D3EAC(Unk800D3EAC_Obj* o)
 {
     if (o->b68_0 || o->m44 == -1 || o->b68_2) {
