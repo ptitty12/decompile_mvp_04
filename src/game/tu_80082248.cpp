@@ -26,6 +26,86 @@ void fn_80082944(void* self, int a, Key* k);
 Tree* fn_80082318(Tree* t);
 void fn_80082DA8(Tree* t);
 
+
+
+
+
+
+
+
+void fn_8035300C();
+void fn_80353110();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void fn_80377408(void* p);
+
+void fn_80082308(Link* l);
+Tree* fn_80082318(Tree* self);
+void fn_800824D4(void* unused, Node* n);
+void fn_80082510(Tree* self);
+void fn_80082F4C(Tree* t, int key);
+int fn_80082FC4(Tree* t, Node* n);
+void fn_80083258(void* self, int a, int h, int b, Key* k, int c);
+void fn_8008395C();
+void fn_8008397C();
+int fn_80083AAC(short* a, short* b);
+Holder* fn_80083BEC(Holder* self);
+void fn_80083C54(Holder* self, int flags);
+void fn_80083CEC(Holder* self);
+void fn_80083DF4(Holder* self);
+void fn_80083E84(int t, int* a, int* b);
+void fn_80083EF8(int t, int* a, int* b);
+int fn_80083F6C(int t);
+int fn_80083FC0(int t);
+int fn_80084014(int t, int x);
+int fn_80084114(int t);
+int fn_800845E4(int t);
+int fn_80084600(int t);
+int fn_8008461C(int t);
+int fn_8008462C(int t);
+
+void fn_80082308(Link* l);
+Tree* fn_80082318(Tree* self);
+void fn_800824D4(void* unused, Node* n);
+void fn_80082510(Tree* self);
+void fn_80082F4C(Tree* t, int key);
+int fn_80082FC4(Tree* t, Node* n);
+void fn_80083258(void* self, int a, int h, int b, Key* k, int c);
+void fn_8008395C();
+void fn_8008397C();
+int fn_80083AAC(short* a, short* b);
+Holder* fn_80083BEC(Holder* self);
+void fn_80083C54(Holder* self, int flags);
+void fn_80083CEC(Holder* self);
+void fn_80083DF4(Holder* self);
+void fn_80083E84(int t, int* a, int* b);
+void fn_80083EF8(int t, int* a, int* b);
+int fn_80083F6C(int t);
+int fn_80083FC0(int t);
+int fn_80084014(int t, int x);
+int fn_80084114(int t);
+int fn_800844A8(int t);
+int fn_800845E4(int t);
+int fn_80084600(int t);
+int fn_8008461C(int t);
+int fn_8008462C(int t);
+int fn_80084660(int t);
+
 void fn_80082308(Link* l)
 {
     l->m4 = l->m4 & ~1;
@@ -33,7 +113,7 @@ void fn_80082308(Link* l)
 
 Tree* fn_80082318(Tree* self)
 {
-    self->m15F9C = lbl_80649ED8;
+    *(void**)((char*)self + 0x15F9C) = lbl_80649ED8;
     self->m0 = &lbl_8061932C;
     self->m4 = &lbl_8061932C;
     self->m15F98 = 0;
@@ -105,9 +185,6 @@ void fn_80083258(void* self, int a, int h, int b, Key* k, int c)
     fn_80082944(self, a, k);
 }
 
-void fn_8035300C();
-void fn_80353110();
-
 void fn_8008395C()
 {
     fn_8035300C();
@@ -133,6 +210,21 @@ Holder* fn_80083BEC(Holder* self)
     lbl_80619324 = new (0) char[0x64000];
     self->m0 = fn_80082318((Tree*)operator new(0x15FA0, 0));
     return self;
+}
+
+void fn_80083C54(Holder* self, int flags)
+{
+    self->m4 = lbl_80649F08;
+    if (self->m0) {
+        delete self->m0;
+        self->m0 = 0;
+    }
+    if (lbl_80619324) {
+        fn_80377408(lbl_80619324);
+        lbl_80619324 = 0;
+    }
+    if (flags & 1)
+        fn_80377408(self);
 }
 
 void fn_80083CEC(Holder* self)
@@ -223,6 +315,34 @@ int fn_80084114(int t)
     return 4;
 }
 
+int fn_800844A8(int t)
+{
+    switch (t) {
+    case 0:
+        return 0xA2;
+    case 1:
+        return 0xA2;
+    case 2:
+        return 0x90;
+    case 3:
+        return 0x90;
+    case 4:
+        return 0x8E;
+    case 5:
+        return 0x8C;
+    case 6:
+        return 0x8C;
+    case 7:
+        return 0x8C;
+    case 8:
+        return 0x8C;
+    case 9:
+        return 0x8C;
+    default:
+        return 0;
+    }
+}
+
 int fn_800845E4(int t)
 {
     if (t <= 2) {
@@ -251,4 +371,39 @@ int fn_8008461C(int t)
 int fn_8008462C(int t)
 {
     return t == 7;
+}
+
+/* near-miss: retail compares with a different chain (50 instructions, cror-free
+ * ranges); this if-ladder gives 43. */
+int fn_80084660(int t)
+{
+    int r = 0;
+    if (t <= 16) {
+        if (t < 15) {
+            if (t <= 8) {
+                if (t < 6) {
+                    if (t >= 0 && t > 2)
+                        r = 1;
+                } else
+                    r = 2;
+            } else if (t > 12)
+                r = 4;
+            else
+                r = 3;
+        } else
+            r = 5;
+    } else if (t <= 22) {
+        if (t < 21) {
+            if (t > 18)
+                r = 7;
+            else
+                r = 6;
+        } else
+            r = 8;
+    } else if (t > 24) {
+        if (t == 25)
+            r = 10;
+    } else
+        r = 9;
+    return r;
 }

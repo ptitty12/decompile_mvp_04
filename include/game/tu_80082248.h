@@ -33,7 +33,9 @@ struct Unk80082248_Tree {
     Unk80082248_Node* m4;
     char pad8[0x15F98 - 8];
     int m15F98;
-    void* m15F9C;
+    /* The vptr at +0x15F9C is the compiler's own (fn_80082318 stores it through
+     * a cast); fn_80083C54 deletes the tree through its virtual destructor. */
+    virtual ~Unk80082248_Tree() {}
 };
 
 /* Holder with a pointer to the tree at +0 and a vptr-like pointer at +4
