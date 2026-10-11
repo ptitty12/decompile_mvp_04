@@ -41,7 +41,7 @@ struct Unk8001D47C_Level {
     char pad0[0xC];
     Unk8001E0C8_Rec* mC;
     Unk8001D62C_Rec* m10;
-    char* m14;
+    unsigned char* m14;
 };
 
 struct Unk8001D47C_Mid {
@@ -99,7 +99,10 @@ public:
     void fn_8001DDD8();
     void fn_8001DE9C();
     void fn_8001E054();
-    void fn_8001E084();
+    int fn_8001E084();
+    int fn_8001D7F8();
+    int fn_8001D850();
+    void fn_8001DA7C();
     void fn_8001E0C8();
     void fn_8001E294();
     void fn_8001E2EC();
