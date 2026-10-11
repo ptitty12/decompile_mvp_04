@@ -56,13 +56,14 @@ float fn_804028E4(float x);
 
 extern "C" {
 
+extern Vec3f lbl_805D669C;
 void fn_8022BB90(void* a, void* b, RecQueue* q)
 {
     Rec* e = &q->e[0];
     e->mA4 = 1;
-    e->mAC = 0;
-    e->m80 = 0.0f;
+    e->m80 = lbl_805D669C.x;
     e->m9C = 0;
+    e->mAC = 0;
     fn_801F0174(a, b, 0);
 }
 
