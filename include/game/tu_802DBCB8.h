@@ -13,9 +13,23 @@ extern "C" void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
 void fn_80377408(void* p);                                          /* __builtin_delete */
 void* operator new[](unsigned int size, int heap);                  /* 0x803774A8 */
 extern int lbl_806EFA04;
+/* 12-byte record of the buffer at +0x10 of Unk802DC9F8 (frame, pad index, value, float). */
+struct Unk802DD0BC_Rec {
+    int m0;
+    short m4;
+    short m6;
+    float m8;
+};
 
 extern "C" int fn_802DC9C0();
-void fn_803FEC4C(int h, int pos, char* buf, int n, int mode);
+extern "C" {
+void fn_803FEBDC(int name, int mode, int bufsize, int* handle);   /* open */
+void fn_803FEC4C(int h, int pos, char* buf, int n, int mode);     /* read */
+int fn_803FEC74(int h, int pos, char* buf, int n, int mode);      /* write */
+void fn_803FEC9C(int h, int mode);                                /* close */
+int fn_804089B4(char* dst, const char* fmt, ...);                 /* sprintf */
+int fn_8040B6A0(const char* s);                                   /* strlen */
+}
 int fn_80409DAC(const char* s);
 int fn_802DCCCC(int h, int* pos, int* out);
 

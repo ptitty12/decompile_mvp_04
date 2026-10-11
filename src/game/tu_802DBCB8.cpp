@@ -71,7 +71,6 @@ float Unk803414A4::fn_802DC264(int a, int b, int c, int d, int e, float f)
     return res * f;
 }
 
-
 float Unk803414A4::fn_802DC3E8(int idx)
 {
     float res = 6.2831855f;
@@ -132,14 +131,14 @@ int Unk803414A4::fn_802DC5C0()
     return m1558.m0 == 2;
 }
 
-void Unk803414A4::fn_802DC5D4()
+void Unk803414A4::fn_802DC5D4(int name)
 {
-    m1558.fn_802DCBB8();
+    m1558.fn_802DCBB8(name);
 }
 
-void Unk803414A4::fn_802DC5F8()
+void Unk803414A4::fn_802DC5F8(int name)
 {
-    m1558.fn_802DCD60();
+    m1558.fn_802DCD60(name);
 }
 
 void Unk803414A4::fn_802DC8E4()
@@ -230,6 +229,27 @@ int Unk802DC9F8::fn_802DCB5C()
     return 1;
 }
 
+int Unk802DC9F8::fn_802DCBB8(int name)
+{
+    int h;
+    fn_803FEBDC(name, 6, 100, &h);
+    if (h != 0) {
+        char buf[0x100];
+        fn_804089B4(buf, "%d
+", m18);
+        int i = 0;
+        int pos = fn_803FEC74(h, 0, buf, fn_8040B6A0(buf), 100);
+        for (; i < m18; i++) {
+            int off = i * 12;
+            fn_804089B4(buf, "%d %d %d %d
+", *(int*)(m10 + off), *(short*)(m10 + off + 4), *(short*)(m10 + off + 6), *(int*)(m10 + off + 8));
+            pos += fn_803FEC74(h, pos, buf, fn_8040B6A0(buf), 100);
+        }
+        fn_803FEC9C(h, 100);
+    }
+    return 1;
+}
+
 int fn_802DCCCC(int h, int* pos, int* out)
 {
     char buf[0x14];
@@ -244,16 +264,44 @@ int fn_802DCCCC(int h, int* pos, int* out)
     return 1;
 }
 
-void Unk802DC9F8::fn_802DCE80()
+int Unk802DC9F8::fn_802DCD60(int name)
+{
+    int h;
+    fn_803FEBDC(name, 1, 100, &h);
+    if (h != 0) {
+        int pos = 0;
+        int count;
+        fn_802DCCCC(h, &pos, &count);
+        m18 = count;
+        for (int i = 0; i < m18; i++) {
+            int a;
+            int b;
+            int c;
+            int d;
+            fn_802DCCCC(h, &pos, &a);
+            fn_802DCCCC(h, &pos, &b);
+            fn_802DCCCC(h, &pos, &c);
+            fn_802DCCCC(h, &pos, &d);
+            ((int*)m10)[i * 3] = a;
+            ((short*)m10)[i * 6 + 2] = b;
+            ((short*)m10)[i * 6 + 3] = c;
+            ((float*)m10)[i * 3 + 2] = *(float*)&d;
+        }
+        fn_803FEC9C(h, 100);
+    }
+    return 1;
+}
+
+void Unk802DC9F8::fn_802DCE80(int frame)
 {
     switch (m0) {
     case 0:
         break;
     case 1:
-        fn_802DCEC4();
+        fn_802DCEC4(frame);
         break;
     case 2:
-        fn_802DD0BC();
+        fn_802DD0BC(frame);
         break;
     }
 }
@@ -374,4 +422,51 @@ void Unk803414A4::vslot44(Unk8000B258_State* s)
 void Unk803414A4::vslot45(const Unk8000B258_State* s)
 {
     vslot43(s);
+}
+
+void Unk802DC9F8::fn_802DCEC4(int frame)
+{
+    int i = 0;
+    int off = 0;
+    m4->vslot19(m20);
+    while (i < m4->vslot7()) {
+        float v = m4->vslot8(i);
+        float t = v * 255.0f + 0.5f;
+        short q = (short)t;
+        float u = (float)q * 0.003921569f;
+        m4->vslot9(i, u);
+        if (q != *(short*)(off + (int)mC)) {
+            m8 = m8 + 1;
+            *(int*)(m18 * 12 + (int)m10) = frame;
+            *(short*)(m18 * 12 + (int)m10 + 4) = i;
+            *(short*)(m18 * 12 + (int)m10 + 6) = q;
+            *(float*)(m18 * 12 + (int)m10 + 8) = m4->vslot18();
+            m20 = m4->vslot18();
+            m18 = m18 + 1;
+            *(short*)(off + (int)mC) = q;
+            *(int*)(off + (int)mC + 4) = frame;
+        }
+        off += 8;
+        i++;
+    }
+}
+
+/* near-miss: playback of the recorded frames; retail keeps the record index in a register through the
+   skip loop (mulli per iteration, no pointer bump) and re-reads m1C/m10 for the do-while (about 40 slots) */
+void Unk802DC9F8::fn_802DD0BC(int frame)
+{
+    if (m1C == m18) {
+        return;
+    }
+    m4->vslot19(m20);
+    while (*(int*)(m1C * 12 + (int)m10) < frame) {
+        m1C = m1C + 1;
+    }
+    while (*(int*)(m1C * 12 + (int)m10) == frame) {
+        m4->vslot9(*(short*)(m1C * 12 + (int)m10 + 4), (float)*(short*)(m1C * 12 + (int)m10 + 6) * 0.003921569f);
+        m4->vslot19(*(float*)(m1C * 12 + (int)m10 + 8));
+        int c = m1C;
+        m1C = c + 1;
+        m20 = *(float*)(c * 12 + (int)m10 + 8);
+    }
 }

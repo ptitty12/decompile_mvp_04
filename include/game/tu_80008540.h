@@ -60,11 +60,11 @@ struct Unk802DC9F8 {
     void fn_802DCA64(Unk803414A4* o);
     int fn_802DCA6C(int a);
     int fn_802DCB5C();
-    int fn_802DCBB8();
-    int fn_802DCD60();
-    void fn_802DCE80();
-    void fn_802DCEC4();
-    void fn_802DD0BC();
+    int fn_802DCBB8(int name);
+    int fn_802DCD60(int name);
+    void fn_802DCE80(int frame);
+    void fn_802DCEC4(int frame);
+    void fn_802DD0BC(int frame);
 };
 
 /* 0x24-byte record of the table at +0x10BC of Unk803414A4 (cleared by
@@ -112,8 +112,8 @@ public:
     void fn_802DC518(int a);
     void fn_802DC570();
     int fn_802DC5C0();
-    void fn_802DC5D4();
-    void fn_802DC5F8();
+    void fn_802DC5D4(int name);
+    void fn_802DC5F8(int name);
     void fn_802DC8E4();
     void fn_802DC974();
     virtual void vslot2();
