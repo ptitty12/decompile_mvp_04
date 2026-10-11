@@ -185,6 +185,12 @@ void fn_8010D1D0()
 {
 }
 
+void fn_8010D1D4(UiV_13C* self)
+{
+    fn_801268C4(self->m13C, fn_8011AA24(0)->m6F8, 5, 0, 5, 0, 1, 1, fn_8010D258, 0, 1, 0, 1, 0, 0);
+    fn_8010D258();
+}
+
 extern char lbl_805BACD0[];
 void fn_8010D258()
 {
