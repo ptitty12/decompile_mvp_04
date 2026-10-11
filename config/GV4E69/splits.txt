@@ -47,6 +47,11 @@ animation/choosers/randomloadedchooser.cpp:
 	.rodata     start:0x805DCE7C end:0x805DCEE8
 	.data       start:0x8061E698 end:0x8061E69C
 
+animation/choosers/tu_80279AE4.cpp:
+	.text       start:0x80279AE4 end:0x8027A84C
+	.rodata     start:0x805DCEE8 end:0x805DCF60
+	.data       start:0x8061E69C end:0x8061E6A0
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C

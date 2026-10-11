@@ -411,6 +411,7 @@ config.libs = [
             Object(NonMatching, "animation/choosers/tu_80271F14.cpp"),
             Object(NonMatching, "animation/choosers/tu_80272B20.cpp"),
             Object(NonMatching, "animation/choosers/randomloadedchooser.cpp"),
+            Object(NonMatching, "animation/choosers/tu_80279AE4.cpp"),
         ],
     },
     {
