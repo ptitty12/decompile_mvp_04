@@ -2,6 +2,14 @@
  * Game code, .text 0x803401A8-0x803414A4 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+extern char lbl_806661D8[];
+extern char lbl_80665E78[];
+extern char lbl_80665EC8[];
+extern char lbl_80666138[];
+extern char lbl_80665F58[];
+void fn_80328374(void* p, int chrg);
+void fn_80332614(void* p, int chrg);
+void fn_80332428(void* p, int chrg);
 extern char lbl_80665FA8[];
 extern char lbl_806660E8[];
 extern char lbl_80666188[];
@@ -113,6 +121,16 @@ void fn_80340BE4(Unk803401A8* self, int chrg)
 void fn_8034101C() {}
 void fn_80341020() {}
 
+void fn_80341024(Unk803401A8* self, int chrg)
+{
+    PUT(0x2DC, lbl_806661D8);
+    fn_80332614((char*)self + 0x83C, 2);
+    PUT(0x7F8, lbl_80666EC0);
+    fn_80332428((char*)self + 0x32C, 2);
+    PUT(0x2E8, lbl_80666EC0);
+    fn_80330870(self, chrg);
+}
+
 void fn_80341090(Unk803401A8* self, int chrg)
 {
     PUT(0x2DC, lbl_80666188);
@@ -120,6 +138,36 @@ void fn_80341090(Unk803401A8* self, int chrg)
     PUT(0x414, lbl_80666EC0);
     PUT(0x3B0, lbl_80666EC0);
     PUT(0x34C, lbl_80666EC0);
+    PUT(0x2E8, lbl_80666EC0);
+    fn_80330870(self, chrg);
+}
+
+extern char lbl_806661D8[];
+extern char lbl_80665E78[];
+extern char lbl_80665EC8[];
+void fn_80328374(void* p, int chrg);
+void fn_80332614(void* p, int chrg);
+void fn_80332428(void* p, int chrg);
+
+void fn_803410DC(Unk803401A8* self, int chrg)
+{
+    PUT(0x2DC, lbl_80666138);
+    PUT(0xA50, lbl_80666EC0);
+    char* s0 = (char*)self + 0x520;
+    PUT(0x9FC, lbl_80666EC0);
+    *(const void**)(s0 + 0x2DC) = lbl_80666188;
+    PUT(0x998, lbl_80666EC0);
+    PUT(0x934, lbl_80666EC0);
+    PUT(0x8D0, lbl_80666EC0);
+    PUT(0x86C, lbl_80666EC0);
+    PUT(0x808, lbl_80666EC0);
+    fn_80330870(s0, 2);
+    PUT(0x4DC, lbl_80666EC0);
+    PUT(0x488, lbl_80666EC0);
+    PUT(0x428, lbl_80666EC0);
+    PUT(0x3D4, lbl_80666EC0);
+    PUT(0x388, lbl_80666EC0);
+    PUT(0x33C, lbl_80666EC0);
     PUT(0x2E8, lbl_80666EC0);
     fn_80330870(self, chrg);
 }
@@ -158,6 +206,46 @@ void fn_80341204(Unk803401A8* self, int chrg)
     PUT(0x330, lbl_80666EC0);
     PUT(0x2E8, lbl_80666EC0);
     fn_80330870(self, chrg);
+}
+
+void fn_80341248(Unk803401A8* self, int chrg)
+{
+    PUT(0x2DC, lbl_80665F58);
+    PUT(0xD0C, lbl_80666EC0);
+    PUT(0xCA4, lbl_80666EC0);
+    char* s0 = (char*)self + 0x8E4;
+    *(const void**)(s0 + 0x2DC) = lbl_80665FA8;
+    PUT(0xC5C, lbl_80666EC0);
+    PUT(0xC14, lbl_80666EC0);
+    PUT(0xBCC, lbl_80666EC0);
+    fn_80330870(s0, 2);
+    PUT(0x8A0, lbl_80666EC0);
+    PUT(0x858, lbl_80666EC0);
+    PUT(0x7F0, lbl_80666EC0);
+    PUT(0x78C, lbl_80666EC0);
+    PUT(0x72C, lbl_80666EC0);
+    PUT(0x6D8, lbl_80666EC0);
+    PUT(0x684, lbl_80666EC0);
+    PUT(0x630, lbl_80666EC0);
+    PUT(0x5DC, lbl_80666EC0);
+    PUT(0x588, lbl_80666EC0);
+    PUT(0x534, lbl_80666EC0);
+    PUT(0x4E0, lbl_80666EC0);
+    PUT(0x48C, lbl_80666EC0);
+    PUT(0x438, lbl_80666EC0);
+    PUT(0x3E4, lbl_80666EC0);
+    PUT(0x390, lbl_80666EC0);
+    PUT(0x33C, lbl_80666EC0);
+    PUT(0x2E8, lbl_80666EC0);
+    fn_80330870(self, chrg);
+}
+
+void fn_80341308(Unk803401A8* self, int chrg)
+{
+    PUT(0x300, lbl_80665E78);
+    PUT(0x18, lbl_80665EC8);
+    fn_80330870((char*)self + 0x24, 0);
+    fn_80328374(self, chrg);
 }
 
 struct Unk803401A8_VT {
