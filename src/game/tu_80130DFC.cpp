@@ -205,6 +205,21 @@ struct Unk80132630_Cfg {
     float m230;
 };
 extern "C" void fn_80134A60(Scr* x, Unk80132630_Cfg* c, int a);
+/* Indexed access through a base pointer passed as an inline parameter (keeps `base` in a register). */
+static inline void SetAt(char* b, int off, int v)
+{
+    *(int*)(b + off) = v;
+}
+static inline int KeyAt(char* b, int off)
+{
+    return *(int*)(b + off);
+}
+extern "C" {
+int fn_80403060(const char* s);
+void fn_80403144(char* dst, const char* src);
+void fn_80134D68(Scr* x);
+}
+extern "C" void* fn_803774A8(unsigned n, int heap);
 
 struct UnkI188 {
     char pad0[0x188];
@@ -720,3 +735,54 @@ extern "C" void fn_80134680(Scr* x)
 extern "C" int fn_8013484C() { return 0; }
 
 extern "C" void fn_80134854() {}
+
+/* near-miss: 130/130 insns, 8 slots: operand order of the four add r3,r3,r31 (retail adds the scaled index first) and which of r0/r9 holds the index in the m2FC store */
+extern "C" int fn_80134858(Scr* x)
+{
+    if (x->m148 == 0) {
+        fn_80134D68(x);
+        return 0;
+    }
+    if (x->m328 == 0) {
+        x->m328 = (char*)fn_803774A8(2, 0x100);
+    }
+    char* b = (char*)x + 0x538;
+    int n = (fn_80403060(x->m328) + 1) * 2;
+    int idx = x->mE04 * 0x234;
+    SetAt(b, idx, (int)fn_803774A8(n, 0x100));
+    fn_80403144((char*)KeyAt(b, x->mE04 * 0x234), x->m328);
+    SetAt((char*)x + 0x53C, x->mE04 * 0x234, x->m2FC);
+    if (x->m2FC > 0) {
+        fn_80403144((char*)x + x->mE04 * 0x234 + 0x540, (char*)x + 0x32C);
+    }
+    if (x->m2FC > 1) {
+        fn_80403144((char*)x + x->mE04 * 0x234 + 0x5C2, (char*)x + 0x3AE);
+    }
+    if (x->m2FC > 2) {
+        fn_80403144((char*)x + x->mE04 * 0x234 + 0x644, (char*)x + 0x430);
+    }
+    if (x->m2FC > 3) {
+        fn_80403144((char*)x + x->mE04 * 0x234 + 0x6C6, (char*)x + 0x4B2);
+    }
+    char* p534 = (char*)x + 0x534;
+    char* p748 = (char*)x + 0x748;
+    char* p74C = (char*)x + 0x74C;
+    char* p754 = (char*)x + 0x754;
+    char* p750 = (char*)x + 0x750;
+    char* p758 = (char*)x + 0x758;
+    char* p75C = (char*)x + 0x75C;
+    char* p760 = (char*)x + 0x760;
+    char* p764 = (char*)x + 0x764;
+    SetAt(p534, x->mE04 * 0x234, x->m148);
+    SetAt(p748, x->mE04 * 0x234, (int)x->m2DC);
+    SetAt(p74C, x->mE04 * 0x234, (int)x->m2E0);
+    SetAt(p754, x->mE04 * 0x234, x->m2E4);
+    SetAt(p750, x->mE04 * 0x234, x->m2E8);
+    SetAt(p758, x->mE04 * 0x234, x->m300);
+    SetAt(p75C, x->mE04 * 0x234, x->m324);
+    SetAt(p760, x->mE04 * 0x234, x->m2F8);
+    *(float*)(p764 + x->mE04 * 0x234) = x->m308;
+    x->mE04 = x->mE04 + 1;
+    fn_80134D68(x);
+    return 1;
+}
