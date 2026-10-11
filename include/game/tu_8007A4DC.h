@@ -23,7 +23,7 @@
  * word at Entry+0x38.
  */
 struct Obj {
-    int m0;
+    char* m0;
     int m4;
 };
 struct Handle {
@@ -37,12 +37,13 @@ struct WBase {
     int m8;
     int mC;
     Obj* m10;
-    void* m14;
-    char pad18[8];
+    int m14;
+    int m18;
+    unsigned m1C;
 };
 struct W : WBase {
     virtual int v08();
-    virtual int v10();
+    virtual int v10(int i);
     virtual int v18(int a);
     virtual int v20();
     virtual int v28(int a, int b);
@@ -57,6 +58,7 @@ struct W : WBase {
     virtual int v70(int a, int b);
     virtual int v78(int a, int b, int c);
 };
+struct Unk8007A4DC_Obj1E8;
 struct Slot {
     W* m0;
     int m4;
@@ -107,7 +109,12 @@ struct Unk8007A4DC_Screen {
     W* m1C8;
     char pad1CC[0x18];
     W* m1E4;
+    Unk8007A4DC_Obj1E8* m1E8;
 
+    void fn_8007285C();
+    void fn_80072894(int a);
+    void fn_800728BC(int a);
+    void fn_800728E4(int a);
     int fn_8007A4DC(int a);
     int fn_8007A500(int a);
     int fn_8007A524(int a, int b, int i);
@@ -242,7 +249,8 @@ struct Unk8007B2B0_Screen {
     W* m40;
     W* m44;
     Unk8052_Obj* m48;
-    char pad4C[0x8];
+    Handle m4C;
+    char pad50[0x4];
     W* m54;
     char pad58[0x4];
     W* m5C[2];
@@ -281,7 +289,18 @@ struct Unk8007B2B0_Screen {
     W* m154;
     char pad158[0x14];
     Handle m16C;
+    char pad170[0x7C];
+    int m1EC;
 
+    void fn_8007290C(int a);
+    void fn_80072934(int a);
+    void fn_80072B60();
+    void fn_80072B98();
+    void fn_80072BD0();
+    void fn_80072C28();
+    void fn_80072CE8();
+    void fn_80072D68();
+    void fn_80072DC0();
     int fn_8007B2B0();
     int fn_8007B2FC(int a);
     int fn_8007B320(int a, int b);

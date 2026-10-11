@@ -14,9 +14,13 @@
  */
 struct Unk80069F0C;
 
+struct Unk8006902C_CtxC {
+    Unk80069F0C* m0;
+};
+
 struct Unk8006902C_Ctx {
     char pad0[0xC];
-    void* mC;
+    Unk8006902C_CtxC* mC;
     char pad10[0x10];
     Unk80069F0C* m20;
     int m24;
