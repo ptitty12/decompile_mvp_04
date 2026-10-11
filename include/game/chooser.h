@@ -111,6 +111,8 @@ struct Unk80270BA0_X;
 struct Unk8027107C_Inner {
     char pad0[0x128];
     int m128;
+    char pad12C[0x14C - 0x12C];
+    float m14C;                /* read by the warps (tu_802A4584.cpp) */
 };
 struct Unk8027107C_Outer {
     char pad0[0x3A4];
@@ -156,7 +158,7 @@ class Unk80270BA0_XVirt : public Unk80270BA0_XBase {
 public:
     virtual void fn_vslot1();
     virtual void fn_vslot2();
-    virtual void fn_vslot3();
+    virtual void fn_vslot3(const Unk80273498_Vec3& v);   /* v: used by the warps (tu_802A4584.cpp) */
     virtual int fn_vslot4();
     virtual void fn_vslot5();
     virtual void fn_vslot6();
@@ -209,19 +211,22 @@ public:
  * m140 and m190. */
 struct Unk802726BC_Angles {
     float m0[2];
-    float m8[2];
+    float m8[2];               /* read by the warps (tu_802A4584.cpp) */
     char pad10[0x30 - 0x10];
     float m30[2];              /* goal logic (fn_8027FC80) */
     float m38[2];
     float m40[2];
     float m48[2];              /* goal logic (fn_8027F504) */
-    char pad50[0xE0 - 0x50];
+    float m50[2];              /* read by the warps */
+    char pad58[0xD8 - 0x58];
+    float mD8[2];              /* read by the warps */
     float mE0[2];
     float mE8[2];
     char padF0[0x100 - 0xF0];
     float m100[2];
     float m108[2];
-    char pad110[0x120 - 0x110];
+    float m110[2];             /* read by the warps */
+    char pad118[0x120 - 0x118];
     int m120[2];               /* goal logic (fn_8027EC58) */
     char pad128[0x130 - 0x128];
     float m130[2];
@@ -238,12 +243,14 @@ struct Unk802726BC_Angles {
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
 struct Unk80271DBC_Link {
-    char pad0[0x830];
+    char pad0[0x830 - 0x0];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
-    char pad834[4];
+    char pad834[0x838 - 0x834];
     int m838;                  /* hash read by goal logic (fn_8027EA14) */
     int m83C;                  /* hash read by goal logic (fn_8027E084) */
-    char pad840[0x880 - 0x840];
+    char pad840[0x85C - 0x840];
+    int m85C;                  /* tested by the warps (tu_802A4584.cpp) */
+    char pad860[0x880 - 0x860];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -264,11 +271,17 @@ public:
     char pad90C[0x938 - 0x90C];
     int m938;                  /* goal logic (fn_8027F504) */
     Unk80273498_Vec3 m93C;     /* goal logic (fn_8027EB34): two target positions */
+    /* 0x948..0x978: read and written by the warps (tu_802A4584.cpp) */
     Unk80273498_Vec3 m948;
     float m954;                /* goal logic (fn_8027F504) */
     int m958;
     int m95C;
-    char pad960[0xAB4 - 0x960];
+    Unk80273498_Vec3 m960;
+    float m96C;
+    float m970;
+    int m974;
+    int m978;
+    char pad97C[0xAB4 - 0x97C];
     float mAB4;                /* goal logic (fn_8027FC80) */
     char padAB8[0xB3C - 0xAB8];
     int mB3C;
@@ -360,6 +373,12 @@ public:
     void fn_8037B6B0(const char* name, int* field, const char* values);
     void fn_8037B728(const char* name, const char* name2, void* list, int flags);
     void fn_8037B458(const char* name, int* field, const void* a, const void* b);
+    /* Attribute registration used by the warps (tu_802A4584.cpp). The two
+     * fn_8037B458 declarations are overloads only until its real parameter
+     * types are known; the calls compile to the same code either way. */
+    void fn_8037B458(const char* name, int* field, int a, const char* b);               /* flag */
+    void fn_8037B50C(const char* name, float* field, const char* range, int a);         /* float */
+    void fn_8037B638(const char* name, int* field, const char* values);                 /* enum list */
 };
 
 #endif /* GAME_CHOOSER_H */
