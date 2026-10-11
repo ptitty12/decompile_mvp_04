@@ -157,6 +157,21 @@ struct Unk802E3980_Mgr {
     void fn_802E3980();
 };
 
+/* Data file header checked by fn_802E3F00: magic 'GLIB' (0x474C4942), version 0x10100,
+ * offsets (relative to the header) at +8 and +0xC. */
+struct Unk802E3F00_Hdr {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk802E3F00_Ctx {
+    char pad0[0x24];
+    int m24;
+    void fn_802E3F00(Unk802E3F00_Hdr* h, int a, int b);
+    void fn_802E3FC4(Unk802E3F00_Hdr* h, int c, int a);
+};
+
 /* Allocator block (fn_802E3A44 resets it). */
 struct Unk802E3A44_Blk {
     int m0;
@@ -212,6 +227,65 @@ public:
     void fn_802E715C();
     void fn_802E624C(Unk802E6124* o, Unk802E4B98_V4* v);
     void fn_802E61BC(const Unk802E4B98_M* m, const Unk802E4B98_V4* v);
+};
+
+/* Type 5 (geomcone.cpp): two embedded 0x18C-byte child shapes at +0x60/+0x1EC and the
+ * scaled quantities at +0x378... (fn_802E247C). */
+struct Unk802E247C_V3 {
+    float x;
+    float y;
+    float z;
+    Unk802E247C_V3(float a, float b, float c)
+    {
+        x = a;
+        y = b;
+        z = c;
+    }
+};
+struct Unk802E247C_V4 {
+    float x;
+    float y;
+    float z;
+    float w;
+    Unk802E247C_V4() {}
+    Unk802E247C_V4(const Unk802E247C_V3& v, float ww)
+    {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        w = ww;
+    }
+    Unk802E247C_V4& operator=(const Unk802E247C_V4& o)
+    {
+        x = o.x;
+        y = o.y;
+        z = o.z;
+        w = o.w;
+        return *this;
+    }
+};
+class Unk802E247C_Child : public Unk802E22EC_B {
+public:
+    char pad60[0x184 - 0x60];
+    float m184;
+    float m188;
+};
+inline void Unk802E247C_SetR(Unk802E247C_Child* c, float v)
+{
+    c->m184 = v;
+    c->m188 = v * v;
+}
+class Unk802E247C : public Unk802E22EC_B {
+public:
+    Unk802E247C_Child m60[2];
+    Unk802E247C_V4 m378;
+    Unk802E247C_V4 m388;
+    float m398;
+    float m39C;
+    float m3A0;
+    float m3A4;
+    float m3A8;
+    void fn_802E247C(Unk802E247C* o, float* s);
 };
 
 #endif

@@ -16,6 +16,25 @@ Unk802E313C::~Unk802E313C()
     fn_802E3254();
 }
 
+/* near-miss: retail builds the scaled vector through three nested temporaries (V3 ctor params at 0x30..,
+   V3 at sp18, V4 at sp8 with w from a param slot) before the field-wise assignment; this version has
+   one level too many/few (96 vs 98 insns). Type 5 (geomcone.cpp). */
+void Unk802E247C::fn_802E247C(Unk802E247C* o, float* s)
+{
+    lbl_8061F68C->s2(o->m0 == 5, "/mvp2004/source/common/geomlib/geomcone.cpp", 74);
+    float sv = s[0];
+    m378 = Unk802E247C_V4(Unk802E247C_V3(o->m378.x * sv, o->m378.y * sv, o->m378.z * sv), o->m378.w);
+    m398 = o->m398 * s[0];
+    float u = o->m39C * s[1];
+    m3A4 = u * u;
+    m39C = u;
+    Unk802E247C_SetR(&m60[0], u);
+    u = o->m3A0 * s[1];
+    m3A8 = u * u;
+    m3A0 = u;
+    Unk802E247C_SetR(&m60[1], u);
+}
+
 void Unk802E313C::fn_802E3254()
 {
     for (int i = 0; i < m60; i++) {
@@ -168,6 +187,15 @@ void Unk802E3A44_Blk::fn_802E3A44()
     mC = 0;
     m10 = 0;
     m14 = 0;
+}
+
+void Unk802E3F00_Ctx::fn_802E3F00(Unk802E3F00_Hdr* h, int a, int b)
+{
+    lbl_8061F68C->s2(h->m0 == 0x474C4942 && h->m4 == 0x10100, "/mvp2004/source/common/geomlib/geomlib.cpp", 210);
+    h->m8 = (int)h + h->m8;
+    h->mC = (int)h + h->mC;
+    m24 = b;
+    fn_802E3FC4(h, h->mC, a);
 }
 
 void Unk802E4B98::fn_802E4D30()
