@@ -21,6 +21,10 @@ struct Unk80052794_Entry;
 struct Unk80052794_Row;
 struct Unk80052794_Rec;
 struct Unk80052794_Quad;
+struct Unk80056970_Obj;
+struct Unk80056970_Entry;
+struct Unk80057204_Mgr;
+struct Unk8061B8C0_A;
 struct Unk800B555C_Obj;
 
 struct Unk80052794_B3B0 {
@@ -342,7 +346,9 @@ void fn_800127E0(void);
 void fn_80014514(void);
 
 /* unit 0x8005371C */
-extern int lbl_80687600;
+extern Unk80056970_Obj* lbl_80687600;
+extern Unk80056970_Obj* lbl_80687604;
+extern Unk8061B8C0_A* lbl_8061B8C0;
 extern const float lbl_805A92D8;
 extern const float lbl_805A92F0;
 extern int lbl_80617F5C;
@@ -351,7 +357,7 @@ int fn_8005481C(Unk80052794_Ctx* ctx, int idx);
 int fn_80054750(Unk80052794_Ctx* ctx, int idx);
 void fn_800149CC(void);
 void fn_80014BFC(void);
-int fn_80056E34(int a, int b);
+Unk80056970_Entry* fn_80056E34(Unk80056970_Obj* r, int id);
 int fn_8001DA28(Unk80052794_Obj* obj);
 void fn_80013E5C(int a, int b);
 void fn_80015B2C(int a);
@@ -574,7 +580,7 @@ void fn_80046760(Unk80052794_Obj*);
 void fn_80046770(Unk80052794_Obj*);
 void fn_80051060(void);
 struct Unk80056970_Obj;
-void fn_80056A68(Unk80056970_Obj*);
+
 int fn_8006A1B4(Unk80052794_S6F8*);
 int fn_80076644(int, int, int);
 Unk80052794_S3B0* fn_801A497C(Unk80052794_S44C*, int, int);
@@ -586,18 +592,45 @@ void fn_8033E958(void*);
 void fn_803EE7BC(void);
 
 /* 0x80056970 */
-struct Unk80344584_Elem {
-    int m0;
+struct Unk80056970_Entry {
+    float m0;
     int m4;
     int m8;
-    Unk80344584_Elem(int x = -1);
+    Unk80056970_Entry(int x = -1);
 };
 struct Unk80056970_Obj {
-    int m0;
-    int m4;
-    int m8;
-    Unk80344584_Elem* mC;
+    unsigned m0;
+    unsigned m4;
+    unsigned m8;
+    Unk80056970_Entry* mC;
     void* m10;
+};
+/* Same layout as Unk80056970_Obj, but with the vptr at +0x10 (virtual dtor fn_80056A08). */
+struct Unk80056A08_Ring {
+    unsigned m0;
+    unsigned m4;
+    unsigned m8;
+    Unk80056970_Entry* mC;
+    virtual ~Unk80056A08_Ring();
+};
+struct Unk80057204_Mgr {
+    char pad0[0xB4];
+    unsigned* mB4;
+    char padB8[4];
+    int* mBC;
+    unsigned short mC0;
+    char padC2[0xF4 - 0xC2];
+    void** mF4;
+    char padF8[8];
+    int m100;
+};
+struct Unk8061B8C0_B {
+    char pad0[0x4C];
+    unsigned m4C;
+};
+struct Unk8061B8C0_A {
+    char pad0[8];
+    Unk8061B8C0_B* m8;
 };
 extern int lbl_80649C80;
 void* operator new[](unsigned n, int heap);
@@ -609,5 +642,32 @@ void fn_80046750(void* p);
 void fn_80046760(void* p);
 void fn_80046770(void* p);
 void fn_80055D84(Unk80052794_Rec* r);
+
+/* unit 0x80056A08 */
+extern const float lbl_805AB8B0;
+extern const double lbl_805AB8A8;
+extern const float lbl_805ADC18;
+extern const char lbl_805ADA74[];
+extern int lbl_80618CB0[];
+extern int lbl_80618F6C;
+extern int lbl_80618F70;
+extern int lbl_80618F74;
+extern int lbl_80618F78;
+extern int lbl_80618F7C;
+extern int lbl_80618F80;
+void fn_8033E958(const char* fmt, ...);
+void fn_80056A68(Unk80056970_Obj* r);
+void fn_80056AC0(Unk80056970_Obj* r, int id, float v);
+Unk80056970_Entry* fn_80056B30(Unk80056970_Obj* r);
+Unk80056970_Entry* fn_80056B94(Unk80056970_Obj* r);
+Unk80056970_Entry* fn_80056BE0(Unk80056970_Obj* r, unsigned idx);
+Unk80056970_Entry* fn_80056C3C(Unk80056970_Obj* r, Unk80056970_Entry* e);
+Unk80056970_Entry* fn_80056EE4(Unk80056970_Obj* r, int id, int* idxp);
+void fn_80056D78(Unk80056970_Obj* r, Unk80056970_Entry** out, Unk80056970_Entry** last);
+void* fn_800578E4(Unk80057204_Mgr* m, int a, int b);
+void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj);
+void fn_80055F18(Unk80052794_Rec* r);
+
+extern const float lbl_805AB8A4;
 
 #endif

@@ -474,7 +474,7 @@ Unk80056970_Obj* fn_80056970(Unk80056970_Obj* self, int n)
     self->m0 = 0;
     self->m10 = &lbl_80649C80;
     self->m4 = 0;
-    self->mC = new (0) Unk80344584_Elem[n];
+    self->mC = new (0) Unk80056970_Entry[n];
     fn_803EE7BC();
     fn_80056A68(self);
     return self;
