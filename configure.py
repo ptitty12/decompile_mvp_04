@@ -400,6 +400,7 @@ config.libs = [
         "cflags": cflags_ealib,
         "progress_category": "game",
         "objects": [
+            Object(NonMatching, "ealibs/tu_803D7ED4.cpp"),
             Object(NonMatching, "ealibs/tu_803D9FE8.cpp"),
         ],
     },
