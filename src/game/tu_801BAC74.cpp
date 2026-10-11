@@ -41,9 +41,45 @@ void fn_801BFBEC(void* o);
 void fn_801BDDC8(B* b, P* p);
 void* fn_80234E44(void* p);
 void fn_8017B9F8(int a);
+void fn_801BDB84(B* b, P* p, int a, int c, const Vec3* v);
+int fn_801BFAF8(const Vec3* v);
 void fn_801B9880(B* b, P* q);
 void fn_801B7FF8(P* p);
 void fn_801BB0C8(A* a);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inline P* Get(P* c, unsigned i)
+{
+    if (i <= 0xC)
+        return c->m65C[i];
+    return 0;
+}
+
+
+
+inline void NextR(int& r)
+{
+    int x = r;
+    int n = x + 1;
+    if (x > 0x15)
+        n = x;
+    r = n;
 }
 
 extern "C" int fn_801BAC74(A* a, unsigned i, int* p, float f) { return fn_801BA130(a->m8, i, p, f); }
@@ -100,7 +136,9 @@ extern "C" void fn_801BB13C(A* a)
 }
 
 extern "C" void fn_801BB194(A* a) { a->m8->m18 = 1; }
+
 extern "C" void fn_801BB1A4(A* a) { fn_801BDDC8(a->m8, a->m14->m6CC); }
+
 extern "C" void fn_801BB1D0(A* a) { a->m8->m1C = 1; }
 
 extern "C" void fn_801BB4D8(A* a, int x)
@@ -111,9 +149,13 @@ extern "C" void fn_801BB4D8(A* a, int x)
 }
 
 extern "C" int fn_801BB4EC(A* a) { return a->m8->m0 == -1 ? 0 : 1; }
+
 extern "C" int fn_801BB508(A* a) { return a->m8->m0 == 1; }
+
 extern "C" void fn_801BB520(A* a) { fn_801B9EC0(a->m8); }
+
 extern "C" void fn_801BB65C(A* a) { a->m1C = 1; }
+
 extern "C" void fn_801BB988(A* a) { a->m24 = 0; }
 
 extern "C" void fn_801BB994(A* a)
@@ -174,8 +216,11 @@ extern "C" void fn_801BBB34(A* a)
 }
 
 extern "C" int fn_801BBC0C(A* a) { return fn_801BA958(a->m8); }
+
 extern "C" int fn_801BBC30(A* a) { return fn_801BA974(a->m8); }
+
 extern "C" int fn_801BBC54(A* a) { return fn_801BA9A4(a->m8); }
+
 extern "C" int fn_801BBC78(A* a) { return fn_801BA9B8(a->m8); }
 
 extern "C" int fn_801BBED4(A* a)
@@ -187,16 +232,14 @@ extern "C" int fn_801BBED4(A* a)
 }
 
 extern "C" int fn_801BBEFC(A* a) { return a->m1C; }
+
 extern "C" int fn_801BBF04(A* a) { return a->m20; }
+
 extern "C" int fn_801BBF0C(A* a) { return a->m8->m18; }
+
 extern "C" int fn_801BBF18(A* a) { return a->m8->m1C; }
+
 extern "C" int fn_801BBF24(A* a) { return a->m8->m2C; }
-inline P* Get(P* c, unsigned i)
-{
-    if (i <= 0xC)
-        return c->m65C[i];
-    return 0;
-}
 
 extern "C" int fn_801BBF30(A* a, P* q)
 {
@@ -238,6 +281,19 @@ extern "C" void fn_801BC364(A* a)
         if (x > 0x15)
             n = x;
         i = n;
+    }
+}
+
+extern "C" void fn_801BC5B4(A* a, P* p, int x, Vec3* v)
+{
+    if (p->m38C == 1) {
+        int ok = 0;
+        if (fn_801BFAF8(v) == 1 || x == 10 || x == 12 || x == 3)
+            ok = 1;
+        if (ok == 1) {
+            Vec3 t = *v;
+            fn_801BDB84(a->m8, p, 1, 1, &t);
+        }
     }
 }
 
