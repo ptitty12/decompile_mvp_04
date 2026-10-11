@@ -93,6 +93,9 @@ fe/tu_80492680.cpp:
 fe/tu_804987EC.cpp:
 	.feoverlay  start:0x804987EC end:0x8049B0CC
 
+fe/tu_8049B0CC.cpp:
+	.feoverlay  start:0x8049B0CC end:0x8049E0BC
+
 game/tu_800034A0.cpp:
 	.text       start:0x800034A0 end:0x800042B0
 	.ctors      start:0x805A2BC4 end:0x805A2BC8
