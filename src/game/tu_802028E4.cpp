@@ -182,6 +182,38 @@ extern "C" void fn_80205684()
 {
 }
 
+/* near-miss (far): both 0x80-byte sum loops compile to retail's mtctr/bdnz shape; retail computes
+ * w + (m1CD0 == 0) * 0xE64 once before the first loop (subfic/adde, mulli, add) and keeps +0x1B4 inside the loop,
+ * ours branches on the flag and reorders the prologue loads. */
+extern "C" int fn_80205688(Scr* p)
+{
+    Unk802028E4_Y* y = p->m0->m0->m6F8;
+    if (y == 0)
+        return 1;
+    Unk802028E4_W* w = y->m14;
+    int total = y->m10->m1C;
+    int cur = w->m1CC8 + 1;
+    int a = 0;
+    int f = w->m1CD0 == 0;
+    Unk802028E4_Team* t = &w->m0[f];
+    for (int n = 0; n < 0x80; n++)
+        a += t->m1B4[(unsigned char)n];
+    int s = 0;
+    if (w->m1CD0 != 0)
+        s = 1;
+    int b = 0;
+    Unk802028E4_Team* u = &w->m0[s];
+    for (int n = 0; n < 0x80; n++)
+        b += u->m1B4[(unsigned char)n];
+    if (cur >= total - 1) {
+        if (a == b || a == b + 1)
+            return 3;
+    }
+    if (cur > total - 2 && a >= b + 3)
+        return 2;
+    return 1;
+}
+
 extern "C" void fn_80205A3C(Obj* o)
 {
     fn_80205A5C(o);
