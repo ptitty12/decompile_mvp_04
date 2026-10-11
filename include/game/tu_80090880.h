@@ -51,7 +51,7 @@ struct Rec {
     int m1C;
     virtual ~Rec();
     virtual void v2(int id);
-    virtual void v3();
+    virtual int v3(int a);
     virtual void v4();
     virtual int v5(int flag, int row);
     virtual void v6();
@@ -77,7 +77,7 @@ void fn_804031BC(char* dst, const char* src);
 void fn_800716BC(Rec* r);            /* release */
 int fn_80071718(Rec* r);             /* next free id, -1 if none */
 int fn_80071784(Rec* r, int row);    /* row -> id */
-int fn_80071814(Rec* r);             /* current id */
+int fn_80071814(Rec* r, int a);      /* current id */
 void fn_80377BEC(DbObj* d, int id);
 int fn_80377E04(DbObj* d, int* out, int id);
 void fn_80377CD8(DbObj* d, int a, int b, int c);
@@ -99,7 +99,7 @@ struct TblBase {
     TblBase();
     virtual ~TblBase();
     virtual int v2() = 0;
-    virtual void v3() = 0;
+    virtual void v3(int a) = 0;
     virtual int v4() = 0;
     virtual void v5() = 0;
     virtual void v6() = 0;
@@ -161,7 +161,7 @@ struct Tbl80091EAC : TblBase {
     Tbl80091EAC(int c);
     virtual ~Tbl80091EAC();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -178,7 +178,7 @@ struct Tbl80092370 : TblBase {
     Tbl80092370(const char* name, int c);
     virtual ~Tbl80092370();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -193,7 +193,7 @@ struct Tbl800927D0 : TblBase {
     Tbl800927D0(int c);
     virtual ~Tbl800927D0();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -210,7 +210,7 @@ struct Tbl80092C94 : TblBase {
     Tbl80092C94(const char* name, int c);
     virtual ~Tbl80092C94();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -225,7 +225,7 @@ struct Tbl800930F4 : TblBase {
     Tbl800930F4(int c);
     virtual ~Tbl800930F4();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -242,7 +242,7 @@ struct Tbl800935B8 : TblBase {
     Tbl800935B8(const char* name, int c);
     virtual ~Tbl800935B8();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -257,7 +257,7 @@ struct Tbl80093A18 : TblBase {
     Tbl80093A18(int c);
     virtual ~Tbl80093A18();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -274,7 +274,7 @@ struct Tbl80093EDC : TblBase {
     Tbl80093EDC(const char* name, int c);
     virtual ~Tbl80093EDC();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -289,7 +289,7 @@ struct Tbl8009433C : TblBase {
     Tbl8009433C(int c);
     virtual ~Tbl8009433C();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -331,7 +331,7 @@ struct Tbl80090B28 : TblBase {
     Tbl80090B28();
     virtual ~Tbl80090B28();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -347,7 +347,7 @@ struct Tbl8009101C : TblBase {
     Tbl8009101C();
     virtual ~Tbl8009101C();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -364,7 +364,7 @@ struct Tbl80091760 : TblBase {
     Tbl80091760(const char* name, int c);
     virtual ~Tbl80091760();
     virtual int v2();
-    virtual void v3();
+    virtual void v3(int a);
     virtual int v4();
     virtual void v5();
     virtual void v6();
@@ -373,6 +373,48 @@ struct Tbl80091760 : TblBase {
     virtual void v14(Tbl80091760* src);
     virtual void v15(Tbl80091760* src);
     virtual void v16(Tbl80091760* src);
+};
+
+struct Grp3 {
+    Rec* a;
+    Rec* b[2];
+};
+
+struct Tbl80094800 : TblBase {
+    Rec* m8;
+    Rec* mC[2];
+    Grp3 m14[2];
+    Rec* m2C[5];
+    Rec* m40;
+    Tbl80094800();
+    virtual ~Tbl80094800();
+    virtual int v2();
+    virtual void v3(int a);
+    virtual int v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10(int a, TblBase* b);
+    int Fn956B8(int a, int b);
+};
+
+struct Tbl800956D8 : TblBase {
+    Rec* m8;
+    Grp3 mC[2];
+    Rec* m24;
+    Tbl800956D8();
+    virtual ~Tbl800956D8();
+    virtual int v2();
+    virtual void v3(int a);
+    virtual int v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10(int a, TblBase* b);
 };
 
 extern "C" {
@@ -391,6 +433,16 @@ RowRef* fn_80085C00(Rec* r, int row);
 void fn_80085C10(char* dst, RowRef* src);
 Rec* fn_80084A10(void* mem, const char* name, DbObj* db, int c);
 }
+extern "C" Rec* fn_8008CAF8(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8008EA7C(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8006F9FC(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8006FE88(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_800805FC(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_80071020(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_800897B8(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8008B254(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8008BDDC(void* mem, const char* name, DbObj* db, int c);
+extern "C" Rec* fn_8008AB04(void* mem, const char* name, DbObj* db, int c);
 /* END GENERATED */
 
 #endif

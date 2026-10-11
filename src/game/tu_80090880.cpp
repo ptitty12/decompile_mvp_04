@@ -96,7 +96,7 @@ int Tbl80090B28::v2()
     m0->m4 = 0;
 }
 
-void Tbl80090B28::v3() {}
+void Tbl80090B28::v3(int a) {}
 
 int Tbl80090B28::v4()
 {
@@ -184,7 +184,7 @@ int Tbl8009101C::v2()
     m0->m4 = 0;
 }
 
-void Tbl8009101C::v3() {}
+void Tbl8009101C::v3(int a) {}
 
 int Tbl8009101C::v4()
 {
@@ -298,10 +298,10 @@ int Tbl80091760::v2()
         m0->m4 = 0;
 }
 
-void Tbl80091760::v3()
+void Tbl80091760::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80091760::v4()
@@ -412,10 +412,10 @@ int Tbl80091EAC::v2()
         m0->m4 = 0;
 }
 
-void Tbl80091EAC::v3()
+void Tbl80091EAC::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80091EAC::v4()
@@ -497,10 +497,10 @@ int Tbl80092370::v2()
         m0->m4 = 0;
 }
 
-void Tbl80092370::v3()
+void Tbl80092370::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80092370::v4()

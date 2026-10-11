@@ -9,10 +9,10 @@
 extern const char lbl_805B2CB0[];
 extern const char lbl_805B5748[];
 
-void Tbl800927D0::v3()
+void Tbl800927D0::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl800927D0::v4()
@@ -94,10 +94,10 @@ int Tbl80092C94::v2()
         m0->m4 = 0;
 }
 
-void Tbl80092C94::v3()
+void Tbl80092C94::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80092C94::v4()
@@ -165,10 +165,10 @@ int Tbl800930F4::v2()
         m0->m4 = 0;
 }
 
-void Tbl800930F4::v3()
+void Tbl800930F4::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl800930F4::v4()
@@ -250,10 +250,10 @@ int Tbl800935B8::v2()
         m0->m4 = 0;
 }
 
-void Tbl800935B8::v3()
+void Tbl800935B8::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl800935B8::v4()
@@ -321,10 +321,10 @@ int Tbl80093A18::v2()
         m0->m4 = 0;
 }
 
-void Tbl80093A18::v3()
+void Tbl80093A18::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80093A18::v4()
@@ -406,10 +406,10 @@ int Tbl80093EDC::v2()
         m0->m4 = 0;
 }
 
-void Tbl80093EDC::v3()
+void Tbl80093EDC::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl80093EDC::v4()
@@ -477,10 +477,10 @@ int Tbl8009433C::v2()
         m0->m4 = 0;
 }
 
-void Tbl8009433C::v3()
+void Tbl8009433C::v3(int a)
 {
     if (m8)
-        m8->v2(fn_80071814(m8));
+        m8->v2(fn_80071814(m8, a));
 }
 
 int Tbl8009433C::v4()
