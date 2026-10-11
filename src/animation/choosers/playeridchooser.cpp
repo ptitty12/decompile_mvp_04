@@ -1,3 +1,4 @@
+#line 1 "C:/mvp2004/source/common/animation/choosers/playeridchooser.cpp"
 /*
  * C:/mvp2004/source/common/animation/choosers/playeridchooser.cpp
  *
