@@ -6,7 +6,7 @@
 #ifndef GAME_TU_80275F24_H
 #define GAME_TU_80275F24_H
 
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 struct Unk80275F24_S {
     char pad0[4];
@@ -56,7 +56,7 @@ struct Unk80276DB8_Row {
 
 /* Chooser with the "LogicType"/"animlist"/"CatchInAirOnly" attributes (size 0x34,
  * ctor 0x80276DB8, dtor 0x80276F4C, slot 2 0x80276E40, factory 0x80276F9C). */
-class Unk80276DB8 : public Unk8037B3E8 {
+class Unk80276DB8 : public Unk80362C2C {
 public:
     Unk80276DB8();
     virtual ~Unk80276DB8();
