@@ -95,7 +95,9 @@ int fn_80080464(Unk8007A4DC_Screen* s, int a, int b);
 
 struct Unk8007A4DC_Screen {
     Owner* m0;
-    char pad4[0x178];
+    char pad4[0x48];
+    Handle m4C;
+    char pad50[0x12C];
     Handle m17C;
     char pad180[0x4];
     W* m184;
@@ -131,6 +133,20 @@ struct Unk8007A4DC_Screen {
     void fn_800755FC(int a, int b, int i, int j, int c);
     void fn_8007575C(int a, int b, int i, int j, int c);
     int fn_8007661C(int b);
+    void fn_80077CF8();
+    void fn_80077D38(int a, int b);
+    void fn_80077D60(int a, int b);
+    void fn_80077D88();
+    void fn_80077DAC();
+    void fn_8007A008(int a);
+    void fn_8007A06C(int a);
+    int fn_8007A11C(int a);
+    int fn_8007A168(int a);
+    int fn_8007A1B4(int a);
+    int fn_8007A1D8(int a);
+    int fn_8007A224(int a);
+    int fn_8007A270(int a);
+    void fn_8007A380();
     int fn_8007A4DC(int a);
     int fn_8007A500(int a);
     int fn_8007A524(int a, int b, int i);
@@ -176,6 +192,7 @@ struct Unk8007A4DC_Screen {
     int fn_8007B1EC();
     int fn_8007B238();
     int fn_8007B284(int a, int i);
+    Unk8007B2B0_Screen* C2() { return (Unk8007B2B0_Screen*)this; }
 };
 
 int fn_8052FC1C(Unk8052_Obj* o);
@@ -307,6 +324,12 @@ struct Unk8007B2B0_Screen {
     Handle m16C;
     char pad170[0x7C];
     int m1EC;
+    char pad1F0[0x4];
+    float m1F4;
+    float m1F8;
+    float m1FC;
+    float m200;
+    float m204;
 
     int fn_8007290C(int a);
     int fn_80072934(int a);
@@ -320,6 +343,17 @@ struct Unk8007B2B0_Screen {
     int fn_800757B8();
     int fn_80075948();
     int fn_80075C64(int id);
+    void fn_80078A38(int a);
+    float fn_800799D0(int n);
+    float fn_80079A1C();
+    int fn_80079A58(float f);
+    float fn_80079A90(int n);
+    float fn_80079B14(int a);
+    float fn_80079E74(int a);
+    float fn_80079EFC(int a);
+    float fn_80079F54(int n);
+    int fn_80079F90(float f);
+    int fn_8007A0D0(int a);
     int fn_8007B2B0();
     int fn_8007B2FC(int a);
     int fn_8007B320(int a, int b);
@@ -455,6 +489,7 @@ struct Unk8007B2B0_Screen {
     int fn_8007DADC(unsigned i);
     void fn_8007DB0C(unsigned i);
     void fn_8007DB40(unsigned i);
+    Unk8007A4DC_Screen* C1() { return (Unk8007A4DC_Screen*)this; }
     int fn_80079ADC(float f);
     Entry* At(unsigned i) { return i < m8->count ? &m8->e[i] : 0; }
 };
