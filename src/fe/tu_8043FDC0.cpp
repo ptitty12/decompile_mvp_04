@@ -103,6 +103,34 @@ extern "C" FE_OVERLAY void fn_80442364(void* self, int a)
     fn_80330BC8(self, a);
 }
 
+/* near-miss: i and y swap callee-saved registers (r30/r31) in every spelling tried (14 slots) */
+extern "C" FE_OVERLAY void fn_80442384(void* self, int a)
+{
+    char buf[0x68];
+    int y;
+    int i;
+    fn_80330F98(self, a);
+    y = 0x6E;
+    i = 0;
+    do {
+        i++;
+        fn_804089B4(buf, "Cat%d: %d", i, 0);
+        fn_80314688(lbl_8061FEDC, 0x96, y, buf, 1, 0x16);
+        y += 0x14;
+    } while (i <= 7);
+    y = 0x6E;
+    if (i <= 0xF) {
+        do {
+            i++;
+            fn_804089B4(buf, "Cat%d: %d", i, 0);
+            fn_80314688(lbl_8061FEDC, 0x1B8, y, buf, 1, 0x16);
+            y += 0x14;
+        } while (i <= 0xF);
+    }
+    fn_804089B4(buf, "Total Emails: %d", 0);
+    fn_80314688(lbl_8061FEDC, 0xF0, 0x15E, buf, 1, 0x16);
+}
+
 extern "C" FE_OVERLAY void fn_80442488(FeMenuEmail* self)
 {
     int z = 0;
@@ -140,6 +168,15 @@ extern "C" FE_OVERLAY FeMenuEmail* fn_80442594(FeMenuEmail* self, int a)
     return self;
 }
 
+extern "C" FE_OVERLAY void fn_80442840(FeMenuF* self)
+{
+    fn_805519A0(FeItemObj(&self->m474), 0, FeTunableGet(&self->m4D4));
+    fn_805519A0(FeItemObj(&self->m474), 1, FeTunableGet(&self->m538));
+    fn_805519A0(FeItemObj(&self->m474), 2, FeTunableGet(&self->m59C));
+    fn_805519A0(FeItemObj(&self->m474), 3, FeTunableGet(&self->m600));
+    fn_805519E0(self->m734, FeTunableGet(&self->m6CC));
+}
+
 extern void* lbl_806215DC;
 extern int lbl_806215E0;
 extern "C" void fn_80377488(void* p);
@@ -149,6 +186,34 @@ extern "C" FE_OVERLAY void fn_80442930(void)
     if (lbl_806215DC == 0) {
         lbl_806215DC = fn_803774A8(40000, 0x100);
         lbl_806215E0 = 0;
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80442D48(int a, float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8)
+{
+    int g = fn_800A2AE8(lbl_80619948);
+    int base = (int)lbl_806215DC;
+    if (base != 0) {
+        int i = lbl_806215E0;
+        int off = i * 0x28;
+        FeRec28* e = (FeRec28*)(off + base);
+        if (*(int*)(off + base) != g) {
+            e->m4 = f1;
+            e->m8 = f2;
+            e->mC = f3;
+            e->m10 = f4;
+            e->m14 = f5;
+            e->m18 = f6;
+            e->m1C = f7;
+            e->m20 = f8;
+            e->m24 = a;
+            *(int*)(off + base) = g;
+            lbl_806215E0 = i + 1;
+            if (i + 1 > 1000) {
+                fn_80442984();
+                lbl_806215E0 = 0;
+            }
+        }
     }
 }
 

@@ -508,12 +508,21 @@ struct FeTimerRaw {
 /* Screen of unit 804439E4 (ctor fn_80445104): fields as the functions prove. */
 struct FeScr2 : FeObj {
     char pad40[0x130 - 0x40];
-    int m130, m134, m138;
+    int m130;
+    FeObj* m134;
+    FeObj* m138;
     FeObj* m13C;
     int m140, m144, m148, m14C;
     short m150;
     unsigned short m152;
     int m154, m158, m15C;
+    char pad160[0x170 - 0x160];
+    FeObj* m170;
+    char pad174[0x6EC - 0x174];
+    FeObj* m6EC;
+    FeObj* m6F0;
+    FeObj* m6F4;
+    FeObj* m6F8;
 };
 struct FeRec1C {
     char pad0[0xC];
@@ -536,9 +545,11 @@ struct FePopupW : FeObj {
     char pad40[0x314 - 0x40];
     int m314;
 };
-struct FeSlotObj {
-    char pad0[0x2F0];
+struct FeSlotObj : FeObj {
+    char pad40[0x2F0 - 0x40];
     void (*m2F0)(FeObj*, int);
+    char pad2F4[0x30C - 0x2F4];
+    void (*m30C)();
 };
 struct FeScr6 : FeObj {
     char pad40[0x130 - 0x40];
@@ -552,7 +563,7 @@ struct FeScr6 : FeObj {
     int m184;
     FeObj* m188;
     FeSlotObj* m18C;
-    int m190;
+    FeObj* m190;
     FeObj* m194;
     int m198;
     char pad19C[0x10F0 - 0x19C];
@@ -879,6 +890,8 @@ void fn_8045499C(FeScr7* s, int a);
 void fn_80453F20(FeScr7* s, int a);
 void fn_80453980(FeScr7* s);
 void fn_80453FD4(FeScr7* s, FeObj* a);
+void fn_80454AE0(FeScr7* s, int a, int b);
+void fn_80454BB0(FeScr7* s, int a, int b);
 void fn_804540CC(FeScr7* s);
 }
 
@@ -1078,4 +1091,69 @@ void fn_8044E304(int a, FeObj* o);
 void fn_8044E398(int a, FeObj* o);
 void fn_804502F4(int a, FeScr6* b);
 }
+
+extern "C" void fn_800C1FC8(void* st, int a, int idx, int v);
+
+extern "C" {
+void fn_80330F98(void* menu, int a);
+int fn_804089B4(char* buf, const char* fmt, ...);
+void fn_80314688(void* o, int x, int y, char* s, int a, int b);
+}
+extern void* lbl_8061FEDC;
+
+/* Menu with five float tunables (fn_80442840): m474's value word holds the target object. */
+struct FeMenuF {
+    char pad0[0x474];
+    FeItem m474;
+    char pad4C8[0x4D4 - 0x4C8];
+    FeTunable m4D4;
+    char pad524[0x538 - 0x524];
+    FeTunable m538;
+    char pad588[0x59C - 0x588];
+    FeTunable m59C;
+    char pad5EC[0x600 - 0x5EC];
+    FeTunable m600;
+    char pad650[0x6CC - 0x650];
+    FeTunable m6CC;
+    char pad71C[0x734 - 0x71C];
+    void* m734;
+};
+inline void* FeItemObj(FeItem* it)
+{
+    return (void*)it->m4C;
+}
+extern "C" {
+void fn_805519A0(void* o, int k, float v);
+void fn_805519E0(void* o, float v);
+}
+
+/* 0x28-byte sample record kept in the buffer at lbl_806215DC (fn_80442D48). */
+struct FeRec28 {
+    int m0;
+    float m4, m8, mC, m10, m14, m18, m1C, m20;
+    int m24;
+};
+extern "C" void fn_80442984(void);
+
+extern "C" {
+void fn_80124FA8(FeObj* o, void* s);
+void fn_80125154(FeObj* o, int a);
+void fn_80451C78(void);
+}
+
+extern "C" {
+int fn_800A2EB4(FeGame* g);
+int fn_805562B8(Unk8007F198_B* o);
+int fn_800B56C4(FeState* s);
+}
+
+extern "C" void fn_80445564(FeScr2* s, int a, int b);
+
+struct FeS0_8 {
+    FeObj* m0;
+    int m4;
+    int m8;
+};
+
+extern int lbl_80621650[];
 #endif
