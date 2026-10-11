@@ -49,6 +49,13 @@ struct Unk805AEAB8_Ent {
     int m78;
 };
 
+/* 0xB0-byte table entry at 0x805B10B4; fn_80040CC8 reads the words at +0x38. */
+struct Unk805B10B4_Ent {
+    char pad0[0x38];
+    int m38[18];
+    char pad80[0xB0 - 0x80];
+};
+
 /* 0x18-byte table entry at 0x805AF688 (fn_800412AC, fn_80041350, fn_80041478). */
 struct Unk805AF688_Ent {
     char pad0[8];

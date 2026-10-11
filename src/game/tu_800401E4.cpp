@@ -13,6 +13,7 @@ extern Unk80040640_Tbl* lbl_806177D8;
 extern int lbl_806177DC;
 extern Unk805AEAB8_Ent lbl_805AEAB8[];
 extern Unk805AF688_Ent lbl_805AF688[];
+extern Unk805B10B4_Ent lbl_805B10B4[];
 extern Unk805AF370_Ent lbl_805AF370[];
 extern char lbl_806872A4[];
 extern char lbl_806872AC[];
@@ -293,6 +294,37 @@ void fn_80040C58(Unk80040640* self, int idx)
         self->m5F8 = -1;
     else if (idx == 12)
         self->m5FC = -1;
+}
+
+/* near-miss: 68/65 slots, structure right (any/fail flags, slot loop) but the
+ * register numbering differs: retail strength-reduces m0[i].m14 to a pointer
+ * starting at self+0x14 (stepping 0x3C) and keeps a in r28. An explicit
+ * `int* p = m0[0].m14; p += 15` version (66/65) copies the start pointer
+ * (mr r22,r30) because the m0[t] path shares its base. */
+int fn_80040CC8(Unk80040640* self, int a)
+{
+    int any = 0;
+    int fail = 0;
+    int i;
+    for (i = 0; i <= 0x11; i++) {
+        if (lbl_805B10B4[a].m38[i] == 1) {
+            if (fn_80040E9C(self, i) == 1) {
+                any = 1;
+                self->m0[i].m14[a] = 1;
+            } else {
+                int t = lbl_805AEAB8[i].m50;
+                if (t != -1 && fn_80040E9C(self, t) == 1) {
+                    any = 1;
+                    self->m0[t].m14[a] = 1;
+                } else {
+                    fail = 1;
+                }
+            }
+        }
+    }
+    if (any != 0 || fail != 1)
+        return fail ^ 1;
+    return -2;
 }
 
 void fn_80040DCC(Unk80040640* self, int a, int b)
