@@ -199,6 +199,18 @@ extern "C" FE_OVERLAY int fn_80446534(void)
     return 0;
 }
 
+/* near-miss: retail evaluates self->m144 before the MONTH lookup call (4 slots) */
+extern "C" FE_OVERLAY void fn_80446820(FeScr2* self)
+{
+    int a = ((FeObjI*)self->m138)->v60();
+    int idx = a * 7 + ((FeObjI*)self->m138)->v61();
+    char* st = (char*)fn_800B555C() + 8;
+    FeWidgetS* month = (FeWidgetS*)fn_800C8058(self->m134->v32("MONTH", 1));
+    int d = self->m144;
+    FeSub* s = (FeSub*)&month->mDC;
+    fn_800C1FC8(st, d, idx, s->s5());
+}
+
 extern "C" FE_OVERLAY int fn_804468F8(FeScr2* self, FeRec1C* rec)
 {
     if (rec->m1C == 1 && fn_8040B574(rec->mC, "SELECTED") == 0) {
@@ -214,8 +226,42 @@ extern "C" FE_OVERLAY void fn_80446974(FeScr2* self)
     self->m15C = ((FeObjI*)self->m13C)->v61();
 }
 
+/* near-miss: retail does not CSE m158/m15C with the vcall results x/y in the equal branch (1 slot) */
+extern "C" FE_OVERLAY void fn_804469DC(FeScr2* self, int a)
+{
+    int x = ((FeObjI*)self->m13C)->v60();
+    int y = ((FeObjI*)self->m13C)->v61();
+    if (self->m158 == x && self->m15C == y) {
+        if (a == 0)
+            return;
+        ((FeTimer*)((FeObjP2*)self)->v90(self->m158, self->m15C))->s4();
+    }
+    ((FeTimer*)((FeObjP2*)self)->v90(x, y))->s3();
+}
+
 extern "C" FE_OVERLAY FeTimer* fn_80446AD4(void* s)
 {
     FeScr2* self = (FeScr2*)s;
     return (FeTimer*)((FeObjP2*)self)->v90(((FeObjI*)self->m138)->v60(), ((FeObjI*)self->m138)->v61());
+}
+
+extern "C" FE_OVERLAY void fn_80446B60(FeScr2* self, int k)
+{
+    switch (k) {
+    case -2: {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "BACK", 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        break;
+    }
+    case -1: {
+        void* o = ((FeObjP2*)self)->v90(((FeObjI*)self->m13C)->v60(), ((FeObjI*)self->m13C)->v61());
+        ((FeObj2*)self->m138)->v67(((FeObjI*)self->m13C)->v60(), ((FeObjI*)self->m13C)->v61());
+        ((FeObj1*)self)->v86((int)o);
+        break;
+    }
+    }
 }
