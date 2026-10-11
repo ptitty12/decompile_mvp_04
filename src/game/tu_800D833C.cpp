@@ -228,6 +228,7 @@ int fn_800D9B9C(int unused)
     return r;
 }
 
+/* near-miss: 35 vs 36 insns; retail compares a register copy (`mr r0,r10`) of the wrapped counter after each step */
 int fn_800D9C18(int unused)
 {
     int r = Adv9C18();
@@ -419,6 +420,7 @@ void fn_800DBA74(Unk800DB840_Slot* o, int a, int idx, int b)
     }
 }
 
+/* near-miss: retail reloads lbl_8061930C for each method call (kept `lis` register); ours caches the pointer */
 extern "C" int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b)
 {
     int* g = &lbl_8061930C;
@@ -488,6 +490,7 @@ void fn_800DBDD0(Unk800DB840_Slot* o, int a, int idx, int b, int c, int d, int e
     }
 }
 
+/* near-miss: retail reloads lbl_8061930C for each method call (kept `lis` register); ours caches the pointer */
 int fn_800DBE54(Unk800DB840_Slot* o, int a, int idx, int b, int c)
 {
     int* g = &lbl_8061930C;
