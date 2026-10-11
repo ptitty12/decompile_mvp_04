@@ -5,11 +5,37 @@
 #include "game/tu_800F1AEC.h"
 
 
+void fn_80107F74(UiArr158* self, int i, int a)
+{
+    fn_800C8034(self->m158[i])->v15(a);
+}
+
+void fn_80107FC8(UiV_158_15C* self, int a)
+{
+    self->m158->v8(a ^ 1);
+    self->m15C->v8(a);
+}
+
 extern int lbl_8061A330;
 void fn_80108034(UiV_134f_198i* self, float f)
 {
     fn_800DC50C(self->m198, self->m134, f);
     lbl_8061A330 = 1;
+}
+
+extern char lbl_805BA240[];
+void fn_8010817C(int a, UiObj* b)
+{
+    int one = 1;
+    lbl_80620298 = one;
+    if (a == one) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, lbl_805BA240, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, b);
+    }
 }
 
 extern char lbl_8064F0D0[];
@@ -97,6 +123,21 @@ void fn_8010878C(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
     fn_8040B830(out, o->v33(5, 1)->name, 16);
+}
+
+void fn_80108958(UiObj* a, int b)
+{
+    switch (b) {
+    case 1:
+        break;
+    case 2:
+        fn_801089E4(a, 0);
+        break;
+    case 3:
+        fn_801089E4(a, 1);
+        break;
+    }
+    fn_800B7ADC(UiGetMsgMgr(), a);
 }
 
 void fn_801089E4(UiObj* self, int a)
@@ -199,6 +240,29 @@ void fn_801092E0(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
     fn_8040B830(out, o->v33(5, 1)->name, 16);
+}
+
+void fn_801094AC(UiObj* a, int b)
+{
+    if (b <= 3) {
+        if (b >= 0)
+            fn_800B7ADC(UiGetMsgMgr(), a);
+    }
+}
+
+extern char lbl_8064EB80[];
+extern char lbl_805B6F58[];
+UiScrRaw* fn_80109514(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_8064EB80;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 0;
+    self->m144 = (int)lbl_805B6F58;
+    return self;
 }
 
 void fn_80109640(UiObj* self)
