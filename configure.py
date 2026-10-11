@@ -403,6 +403,7 @@ config.libs = [
         "cflags": cflags_game,
         "progress_category": "game",
         "objects": [
+            Object(NonMatching, "game/tu_800034A0.cpp"),
             Object(NonMatching, "animation/choosers/tu_8026DDE8.cpp"),
             Object(NonMatching, "animation/choosers/randomchooser.cpp"),
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
