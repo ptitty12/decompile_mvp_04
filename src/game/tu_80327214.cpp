@@ -19,6 +19,11 @@ extern int lbl_806202F4;
 extern int lbl_806202FC;
 extern FxSing* lbl_80620304;
 extern int lbl_806202A8;
+extern int lbl_806202F8;
+extern int lbl_80620300;
+extern int lbl_8061B9C8;
+extern int lbl_80620168;
+extern int lbl_805EA810;
 extern char lbl_80691D18[];
 extern FxApp* lbl_8061B8C0;
 extern int lbl_8061B998;
@@ -27,6 +32,8 @@ extern const float lbl_805ECABC;
 extern int lbl_80691AEC;
 
 extern "C" {
+FxEffV* fn_80303AC4();
+void* fn_801A04A8(FxActS* a, int i);
 void fn_80325000(FxZT* t);
 void fn_8032713C(FxAI* self, int a, int b);
 void fn_80327354(int a, int b);
@@ -70,8 +77,11 @@ int fn_803285F4(int n);
 int fn_80328648(int n);
 void fn_80328690(FxBase* self, int a);
 void fn_80328760(FxBase* self);
+void fn_80328858(void* tab, int n, int a);
 void fn_803289C0(int a);
 void fn_80329498();
+void fn_803294E8();
+void fn_803295F0();
 void fn_803296AC();
 void fn_803296BC(int a);
 int fn_803296E8(void* unused);
@@ -100,6 +110,8 @@ char* fn_8032A394(char* base, int target);
 void fn_8032ABC8();
 // PROTOS-END
 }
+
+inline int AtD(int* p, int i) { int off = i * 4; return *(int*)((char*)p + off); }
 
 // FUNCS-BEGIN
 
@@ -298,6 +310,33 @@ void fn_80328760(FxBase* self) {
     }
 }
 
+void fn_80328858(void* tab, int n, int a) {
+    lbl_806202F8 = 1;
+    int row = fn_80328648(fn_803285A0(a));
+    FxEffV* h = fn_80303AC4();
+    h->s16(fn_803285A0(a));
+    FxActT* x = (FxActT*)fn_803285A0(a);
+    if (x) lbl_80620300 = x->m4C & 1;
+    int* r = lbl_806E2184[row];
+    for (int k = 0; k < 17; k++) {
+        int idx = r[AtD(&lbl_806202A8, k)];
+        while (idx > 0) {
+            FxSlot8* s = &lbl_806E2274[idx];
+            FxEffV* o = (FxEffV*)s->m0;
+            int nx = 0;
+            if (o) {
+                lbl_8061B9C8 = 1;
+                if (lbl_80620300 == 0) o->s5();
+                else o->s6();
+                nx = s->m4;
+            }
+            idx = nx;
+        }
+    }
+    lbl_8061B9C8 = 1;
+    lbl_806202F8 = 0;
+}
+
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
 /* near-miss: callee-saved lis registers for lbl_806202FC / lbl_806202F4 swapped */
@@ -306,6 +345,54 @@ void fn_80329498() {
     fn_80321628(&lbl_80691AEC, lbl_806202FC);
     lbl_806202F4 = 0;
     lbl_806202FC = 0;
+}
+
+void fn_803294E8() {
+    int g = 0;
+    do {
+        if (g > 0) {
+            FxActS* a = (FxActS*)fn_803285A0(g);
+            if (a) {
+                a->m54C = fn_801A04A8(a, 1);
+                a->m550 = 1;
+            }
+        }
+        int* row = lbl_806E2184[g];
+        for (int k = 0; k < lbl_805EA810; k++) {
+            int idx = row[AtD(&lbl_80620168, k)];
+            while (idx > 0) {
+                FxSlot8* s = &lbl_806E2274[idx];
+                FxEffV* o = (FxEffV*)s->m0;
+                int nx = 0;
+                if (o) {
+                    o->s13(-1);
+                    nx = s->m4;
+                }
+                idx = nx;
+            }
+        }
+        g++;
+    } while (g <= 2);
+}
+
+void fn_803295F0() {
+    for (int g = 0; g < 3; g++) {
+        int* row = lbl_806E2184[g];
+        for (int k = 0; k < 17; k++) {
+            int idx = row[AtD(&lbl_806202A8, k)];
+            while (idx > 0) {
+                FxSlot8* s = &lbl_806E2274[idx];
+                FxEffV* o = (FxEffV*)s->m0;
+                int nx = 0;
+                if (o) {
+                    o->s12();
+                    nx = s->m4;
+                }
+                idx = nx;
+            }
+        }
+    }
+    fn_803296AC();
 }
 
 void fn_803296AC() { lbl_806202FC = 1; }
