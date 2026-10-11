@@ -329,6 +329,17 @@ Unk8037B3E8* cGenericTimeWarp::fn_vslot5()
     return new (lbl_806EF9B4) cGenericTimeWarp;
 }
 
+float fn_804028E4(float x);               /* square root */
+float fn_8041171C(float x);               /* sine */
+float fn_80411554(float x);               /* cosine */
+extern float lbl_8061E88C;
+extern float lbl_8061E890;
+
+inline float Length(Unk80273498_Vec3 v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
 /* Class name; read by cCycleTimeSpaceWarp's vtable slot 3 (0x802ACC4C). */
 const char* lbl_8061E888 = "cCycleTimeSpaceWarp";
 
@@ -420,12 +431,63 @@ void cCycleTimeSpaceWarp::fn_vslot12(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, U
 
 void cCycleTimeSpaceWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk80270BA0_Obj* obj)
 {
+    Unk80270BA0_X* x = obj->fn_vslot1();
+
+    if (!(x->m71C & 0x800)) {
+        if (m8) {
+            Unk802726BC_Angles* p = &x->m734;
+            float* q = &p->mD8[p->m190];
+            float t = *q;
+
+            if (t != 1.0f) {
+                Unk80273498_Vec3 pos = x->m60;
+                float heading = fn_80382BB8(x->m618);
+                Unk80273498_Vec3 d = pos - m14;
+                float dh = heading - m20;
+
+                d.x *= t;
+                d.z *= t;
+                dh *= t;
+                Unk80273498_Vec3 target = m14 + d;
+                float newHeading = m20 + dh;
+                x->fn_vslot3(&target);
+                fn_80244858(x, newHeading);
+            }
+        } else if (m10) {
+            Unk802726BC_Angles* p = &x->m734;
+            float* q = &p->m110[p->m190];
+            float a = *q;
+            float sa = fn_8041171C(a);
+            float ca = fn_80411554(a);
+            Unk80273498_Vec3 pos = x->m60;
+            float len = Length(pos - m14);
+            float* r = &p->m50[p->m190];
+            float s = *r;
+
+            if (!(s <= 0.0f)) {
+                s = s > 2.5f ? 2.5f : (s >? 0.1f);
+                len = lbl_8061E890 * (lbl_8061E88C * s) + (1.0f - lbl_8061E890) * (len * s);
+            }
+            int n = h->count;
+            for (int i = 0; i < n; i++) {
+                Unk80273498_Vec3 v = lbl_806055AC;
+
+                v.x = len * sa;
+                v.z = len * ca;
+                Unk80273498_Vec3 target = m14 + v;
+                x->fn_vslot3(&target);
+            }
+        }
+    }
 }
 
 Unk8037B3E8* cCycleTimeSpaceWarp::fn_vslot5()
 {
     return new (lbl_806EF9B4) cCycleTimeSpaceWarp;
 }
+
+float lbl_8061E88C = 2.5000002f;
+float lbl_8061E890 = 0.0f;
 
 /* Class name; read by cLimbLockWarp's vtable slot 3 (0x802ACC64). */
 const char* lbl_8061E894 = "cLimbLockWarp";
