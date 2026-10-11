@@ -957,6 +957,9 @@ game/tu_802DBCB8.cpp:
 game/tu_802DE2C8.cpp:
 	.text       start:0x802DE2C8 end:0x802E22EC
 
+game/tu_802E22EC.cpp:
+	.text       start:0x802E22EC end:0x802E6464
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C
