@@ -87,6 +87,9 @@ fe/tu_80488CDC.cpp:
 fe/tu_8048E6A0.cpp:
 	.feoverlay  start:0x8048E6A0 end:0x80492680
 
+fe/tu_80492680.cpp:
+	.feoverlay  start:0x80492680 end:0x804987EC
+
 game/tu_800034A0.cpp:
 	.text       start:0x800034A0 end:0x800042B0
 	.ctors      start:0x805A2BC4 end:0x805A2BC8
