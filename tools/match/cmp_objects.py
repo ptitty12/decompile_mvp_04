@@ -30,7 +30,10 @@ def funcs(obj):
 
 def mask(w, reloc):
     op = w >> 26
-    if op in (16, 18):
+    if op == 16:
+        # bc: keep BO/BI (the branch sense); mask only the displacement.
+        return w & 0xFFFF0003
+    if op == 18:
         return w & 0xFC000003
     if reloc:
         return w & 0xFFE00000 if op in (14, 15) else w & 0xFFFF0000
