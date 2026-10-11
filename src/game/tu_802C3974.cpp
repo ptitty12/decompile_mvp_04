@@ -411,6 +411,28 @@ void fn_802C51C0(Unk802C3B60* o, int h, Unk802C51C0_Req* req, Unk802C610C_Cfg* c
     fn_803D74A0(h, lbl_805E14CC, v);
 }
 
+/* near-miss (39 vs 46 insns): retail masks each source value first (clrlwi) and then rlwimi-inserts it; C bit-fields (int/unsigned/short/char bases) and
+   explicit mask expressions both fail to reproduce that clrlwi + rlwimi pair. Store order of the first three zero words is also swapped (retail 0, 8, 4). */
+void fn_802C56F8(Unk802C56F8_Regs* out, Unk802C56F8_Cfg* c)
+{
+    out->w0 = 0;
+    out->w2 = 0;
+    out->w1 = 0;
+    out->a.f5 = c->m84;
+    if (c->m70 != 0) {
+        out->a.f3 = 1;
+    }
+    out->a.f1 = c->m24;
+    out->w2 = c->m20;
+    out->a.f4 = c->m60;
+    out->a.f2 = c->m64;
+    out->a.f0 = 1;
+    out->a.f6 = c->m2C;
+    out->b.g0 = c->m34;
+    out->b.g1 = c->m38;
+    out->b.g2 = c->m3C;
+}
+
 void fn_802C58E0(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
 {
     char buf[0x40] = "";

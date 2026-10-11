@@ -94,4 +94,52 @@ struct Unk802C51C0_Req {
     int m18;
 };
 
+/* Texture-format request words read by fn_802C56F8. */
+struct Unk802C56F8_Cfg {
+    char pad0[0x20];
+    int m20;
+    int m24;
+    char pad28[4];
+    int m2C;
+    char pad30[4];
+    int m34;
+    int m38;
+    int m3C;
+    char pad40[0x20];
+    int m60;
+    int m64;
+    char pad68[8];
+    int m70;
+    char pad74[0x10];
+    int m84;
+};
+/* Bit-field views of the first two words of the packed register block fn_802C56F8 fills (first field in the most significant bits). */
+struct Unk802C56F8_W0 {
+    unsigned f0 : 1;
+    unsigned f1 : 7;
+    unsigned f2 : 1;
+    unsigned f3 : 1;
+    unsigned f4 : 4;
+    unsigned f5 : 6;
+    unsigned f6 : 10;
+    unsigned pad : 2;
+};
+struct Unk802C56F8_W1 {
+    unsigned g0 : 3;
+    unsigned g1 : 3;
+    unsigned g2 : 4;
+    unsigned pad : 22;
+};
+struct Unk802C56F8_Regs {
+    union {
+        unsigned w0;
+        Unk802C56F8_W0 a;
+    };
+    union {
+        unsigned w1;
+        Unk802C56F8_W1 b;
+    };
+    unsigned w2;
+};
+
 #endif

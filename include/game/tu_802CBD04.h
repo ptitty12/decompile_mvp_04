@@ -97,6 +97,19 @@ struct Unk802CF4B4_Self {
     int m1C;
 };
 
+/* Six-float record with a leading flag word (ctor fn_802CF484 clears all of it; the camera ctor fn_802CF7A8 embeds it at +0x98). */
+class Unk802CF484 {
+public:
+    Unk802CF484();
+    int m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+};
+
 #include "game/chooser.h"
 /* Camera base (mid class, vtable 0x806646F0) as seen by its attribute-registration slot fn_802CF368. */
 class Unk802CF368_Self : public Unk8037B3E8 {
