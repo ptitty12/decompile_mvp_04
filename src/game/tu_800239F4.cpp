@@ -115,7 +115,7 @@ extern "C" void fn_80023E18(Unk80023AC4_Obj* x)
     float len = Unk801A4B34_Len(d) * lbl_805A6074;
     int t = (int)(len / p->m3E8 + lbl_805A6078);
     x->m1BC = t;
-    x->m2A4[x->m3D4].m14 = t;
+    x->m294[x->m3D4].m24 = t;
 }
 
 extern "C" void fn_80023ED8(Unk80023AC4_Obj* x)
@@ -133,10 +133,10 @@ extern "C" void fn_80023F98(Unk80023AC4_Obj* x)
 {
     if (x->m70C == 0) {
         Unk80023F98_Vec2 v = fn_80235BE0(x->m80[0]->m700->m3B0);
-        x->m2A4[x->m3D4].m0 = v;
-        x->m2A4[x->m3D4].m8 = v;
+        x->m294[x->m3D4].m10 = v;
+        x->m294[x->m3D4].m18 = v;
         if (x->m510->fn_vslot24() != 0)
-            x->m2A4[x->m3D4].m8.x = -v.x;
+            x->m294[x->m3D4].m18.x = -v.x;
         x->m70C = 1;
     }
 }

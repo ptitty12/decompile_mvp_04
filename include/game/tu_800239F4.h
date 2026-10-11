@@ -72,13 +72,14 @@ struct Unk80023F98_Vec2 {
     float y;
 };
 
-/* Entry of the stride-0x28 array at Obj+0x2A4 (fn_80023E18, fn_80023F98). */
+/* Entry of the stride-0x28 array at Obj+0x294 (fn_80023E18, fn_80023F98, fn_80029074). */
 struct Unk80023E18_Ent {
-    Unk80023F98_Vec2 m0;
-    Unk80023F98_Vec2 m8;
-    int m10;
-    int m14;
-    char pad18[0x10];
+    int m0;
+    char pad4[0xC];
+    Unk80023F98_Vec2 m10;
+    Unk80023F98_Vec2 m18;
+    int m20;
+    int m24;
 };
 
 struct Unk80023ED8_Pair {
@@ -166,6 +167,23 @@ int fn_8006BE18(Unk8001F5CC_Tbl* t);
 void fn_80344494(int* p, int a);
 void fn_8003F974(int a);
 void fn_80030274();
+void fn_800351F8(int a, int b, int c, int d, int e);
+void fn_80035090(int a, int b, int c, int d, int e);
+int fn_8022EA7C(int pl, Unk80023F98_Vec2* v, float f);
+int fn_8018B654(Unk801A4B34_Pos* p);
+void fn_8003BB78(int a, int b, int c, int d, int e);
+int fn_8002A3DC(Unk80023AC4_Obj* x);
+void fn_80030794(Unk80023AC4_Obj* x, int* p);
+void fn_80030778(Unk80023AC4_Obj* x, int* p, int n);
+int fn_8022ED28(int pl);
+int fn_8022EDC4(int pl);
+int fn_8022EECC(int pl);
+int fn_8022EF84(int pl);
+int fn_8022F024(int pl);
+int fn_8022EE5C(int pl);
+int fn_8022F0C4(int pl);
+void fn_800245D0(Unk80023AC4_Obj* x);
+extern int* lbl_8061B9C4;
 void fn_80057B54(int a, int b);
 void fn_8002870C(Unk80023AC4_Obj* x);
 void fn_800307B4(Unk80023AC4_Obj* x);
@@ -265,13 +283,14 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk80023ED8_Pair m270[3];
     char pad288[0x8];
     Unk801A4B34_Pos* m290;
-    char pad294[0x10];
-    Unk80023E18_Ent m2A4[1];
-    char pad2CC[0x108];
+    Unk80023E18_Ent m294[1];
+    char pad2BC[0x118];
     int m3D4;
     char pad3D8[0xC];
     int m3E4;
-    char pad3E8[0x128];
+    char pad3E8[0x10];
+    int m3F8[10][2];
+    char pad448[0xC8];
     Unk80023F98_Pl* m510;
     int m514;
     char pad518[0x4];
@@ -280,7 +299,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     char pad524[0x4];
     float m528;
     int m52C;
-    char pad530[0x34];
+    int m530;
+    char pad534[0x30];
     int m564;
     int m568;
     int m56C;
@@ -331,7 +351,9 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m77C[3];
     int m788[3];
     int m794;
-    char pad798[0x24];
+    char pad798[0x4];
+    int m79C;
+    char pad7A0[0x1C];
     int m7BC;
     char pad7C0[0x20];
     int m7E0;
