@@ -358,3 +358,21 @@ void Unk8007A4DC_Screen::fn_8007A380()
         fn_8007ACFC(0x1B, i, fn_8007ACC4(0, i));
     }
 }
+
+float Unk8007A4DC_Screen::fn_8007A3FC(int a, int b)
+{
+    W* w = m184;
+    return fn_8007189C(w, a, fn_80071814(w, b));
+}
+
+float Unk8007A4DC_Screen::fn_8007A444(int a, int b)
+{
+    W* w = m1C8;
+    return fn_8007189C(w, a, fn_80071814(w, b));
+}
+
+float Unk8007A4DC_Screen::fn_8007A48C(int a, int b, int i)
+{
+    W* w = m188[i];
+    return fn_8007189C(w, a, fn_80071814(w, b));
+}
