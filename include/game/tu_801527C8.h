@@ -185,6 +185,8 @@ struct Unk801527C8_Actor {
 struct Unk801527C8_Ctx {
     void fn_8016D2F4(const char* s);
     void fn_8016AC3C();
+    void fn_8016CE5C(int idx);
+    void fn_8016CF38(struct Unk8016C788_Obj* o);
     Unk80189300* fn_8016C804(int id);
     void* fn_8016C7A8(unsigned int idx);
     char pad0[0xA14];

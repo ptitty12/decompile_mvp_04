@@ -176,7 +176,6 @@ Unk8037B3E8* cScriptLoadAnimations::fn_vslot5() /* 80169878 */
     return new (lbl_806EF9B4) cScriptLoadAnimations;
 }
 
-/* near-miss: retail adds the +0x44 offset to the base before the indexed load (addi; lwzx) where this uses add; lwz 0x44(rX); 4 variants tried */
 int fn_80169DC4(char* base) /* 80169DC4 */
 {
     int p = (int)base;
@@ -184,7 +183,8 @@ int fn_80169DC4(char* base) /* 80169DC4 */
     int end = (int)base + 0x460;
     do {
         if (fn_8040B6A0((char*)p) != 0) {
-            int v = *(int*)(&base[0x44] + off);
+            int* q = (int*)(base + 0x44);
+            int v = *(int*)((char*)q + off);
             if ((unsigned int)(v - 0x2A) <= 0x30) {
                 return 1;
             }
@@ -198,7 +198,7 @@ int fn_80169DC4(char* base) /* 80169DC4 */
 void Unk8016ACAC_Slot::fn_8016A6AC() /* 8016A6AC */
 {
     for (int i = 0; i <= 12; i++) {
-        fn_8016CE5C(i + 2);
+        ((Unk801527C8_Ctx*)this)->fn_8016CE5C(i + 2);
     }
     mA20 = 0;
     ((Unk801527C8_Ctx*)this)->fn_8016AC3C();
@@ -227,7 +227,7 @@ void Unk8016ACAC::fn_8016A814(Unk8016D9A0_Rec* rec) /* 8016A814 */
     }
 }
 
-/* near-miss: retail keeps this in r28 and re-forms this+0xA24 for the byte store; one instruction more in retail; 2 variants tried */
+/* near-miss: retail keeps this in r28 and re-forms this+0xA24 for the byte store (one instruction more); base+offset-variable forms tried */
 void Unk801527C8_Ctx::fn_8016AC3C() /* 8016AC3C */
 {
     int off = 0;
@@ -235,7 +235,9 @@ void Unk801527C8_Ctx::fn_8016AC3C() /* 8016AC3C */
     for (int i = 4; i != 0; i--, p += 10, off += 10) {
         if (fn_8040B6A0(p) != 0) {
             fn_802AEBF0(lbl_8061E978, p);
-            mA24[0][off] = 0;
+            char* q = (char*)this;
+            q += 0xA24;
+            q[off] = 0;
         }
     }
 }

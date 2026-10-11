@@ -32,7 +32,6 @@ struct Unk8016ACAC_Slot {
     void fn_8016C448();
     void fn_8016D368(float* t);
     void fn_8016A6AC();
-    void fn_8016CE5C(int id);
     Unk8016C1C4_List mLists[15];
     char padA14[0xA20 - 0xA14];
     int mA20;
