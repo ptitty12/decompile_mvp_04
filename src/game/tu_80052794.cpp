@@ -247,39 +247,33 @@ void fn_80053220(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
     fn_80017904(a, b, c, d);
 }
 
-/* near-miss (5 slots): retail keeps ctx in r31 and idx in r30; this gets them swapped.
- * Retail forms r = ctx + idx * 0x48 once, then reads the type at r + 4 and the
- * other three fields through e = r + 4. */
 void fn_800533A0(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
     fn_800B555C();
     if (fn_800B57EC() != 0) {
-        int* r = (int*)((char*)ctx + idx * 0x48);
-        int* e = r + 1;
-        if (e[2] != 0) {
-            int x = fn_801A49F0(obj->m130->m44C, obj->m3B4, e[3]);
-            int a = fn_800463E4(r[1]);
-            int b = fn_800465D4(r[1], e[1]);
-            int c = fn_80046580(e[1]);
+        Unk80052794_Entry* e = EntryOf(ctx, idx);
+        if (e->m8 != 0) {
+            int x = fn_801A49F0(obj->m130->m44C, obj->m3B4, e->mC);
+            int a = fn_800463E4(e->m0);
+            int b = fn_800465D4(e->m0, e->m4);
+            int c = fn_80046580(e->m4);
             int d = fn_8001F45C(obj, x);
-            fn_80014A7C(a, b, c, d, 0, fn_800465C0(e[2]));
+            fn_80014A7C(a, b, c, d, 0, fn_800465C0(e->m8));
         }
     }
 }
 
-/* near-miss (5 slots): same ctx/idx register swap as fn_800533A0. */
 void fn_8005346C(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
     fn_800B555C();
     if (fn_800B57EC() != 0) {
-        int* r = (int*)((char*)ctx + idx * 0x48);
-        int* e = r + 1;
-        if (e[2] != 0) {
-            int a = fn_80046658(r[1]);
-            int b = fn_80046580(e[1]);
+        Unk80052794_Entry* e = EntryOf(ctx, idx);
+        if (e->m8 != 0) {
+            int a = fn_80046658(e->m0);
+            int b = fn_80046580(e->m4);
             int c = fn_8001E31C(obj);
-            int d = fn_800464C4(r[1]);
-            fn_80014A7C(0, a, b, c, d, fn_800465C0(e[2]));
+            int d = fn_800464C4(e->m0);
+            fn_80014A7C(0, a, b, c, d, fn_800465C0(e->m8));
         }
     }
 }
