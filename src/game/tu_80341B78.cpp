@@ -242,6 +242,43 @@ unsigned short fn_80341FF4(Unk80341FF4* self)
     return self->mC;
 }
 
+void* fn_803774A8(int size, int heap);
+void fn_803EE7BC();
+
+struct Unk80341FFC {
+    unsigned short* m0;
+    int* m4;
+    int m8;
+    unsigned short mC;
+    unsigned short mE;
+};
+
+void fn_80341FFC(Unk80341FFC* t, unsigned short* src)
+{
+    if (fn_80341FDC((Unk80341FDC*)t) != 0)
+        return;
+    int i;
+    t->mE = 0;
+    t->mC = t->m8;
+    for (i = 0; i < t->mC; i++) {
+        if (!(t->mE > src[i]))
+            t->mE = src[i] + 1;
+    }
+    t->m0 = (unsigned short*)fn_803774A8(t->m8 * 2, 0);
+    fn_803EE7BC();
+    t->m4 = (int*)fn_803774A8(t->mE * 4, 0);
+    fn_803EE7BC();
+    int k;
+    for (k = 0; k < t->mE; k++)
+        t->m4[k] = fn_80341FF4((Unk80341FF4*)t);
+    int j;
+    for (j = 0; j < t->mC; j++) {
+        unsigned short v = src[j];
+        t->m0[j] = v;
+        t->m4[v] = j;
+    }
+}
+
 int fn_80342128(Unk80341FDC* self) { return self->m0 == 0 ? 0 : 1; }
 unsigned char fn_80342140(Unk80341FDC* self) { return self->mC; }
 int fn_8034241C(Unk80341FDC* self) { return self->m0 == 0 ? 0 : 1; }
