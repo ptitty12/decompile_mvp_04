@@ -10,7 +10,7 @@ void fn_801B4300(void* p);
 int fn_801B5DE8(void* a, void* b, int c);
 int fn_801B5298(void* a, void* b);
 int fn_8025416C(void* a, int b);
-int fn_801B38A8(Unk801AB63C_P* a, int i, int flag);
+unsigned char fn_801B38A8(Unk801AB63C_P* a, int i, int flag);
 int fn_801B608C(Unk801AB63C_P* a, Unk801B23A8_Q* q);
 int fn_801B5F8C(Unk801AB63C_P* a, Unk801B23A8_Q* q);
 int fn_801B62E4(Unk801AB63C_P* a, int i);
@@ -20,6 +20,18 @@ int fn_800974B8(Unk8019F8C0_Inner* t, int v);
 int fn_80097450(Unk8019F8C0_Inner* t, int v);
 void fn_8017D640(void* a, int b, Unk801B23A8_Q* c, int d, int e);
 extern float lbl_805CF740;
+int fn_801B5FC4(void* a, int b);
+int fn_801B5EDC(void* a, int b, int c);
+Unk801B23A8_Q* fn_801B2F2C(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int d, int e);
+int fn_801B5F4C(Unk801AB63C_P* p);
+int fn_801B5120(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c);
+int fn_801B51E4(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+Unk801B23A8_Q* fn_801B2944(void* a, Unk801B23A8_Q* q, int b, int c, int d, int e, int f, int g);
+int fn_801B2AD4(void* p, Unk801B23A8_Q* q);
+int fn_801B6354(void* a, int b, int c);
+int fn_801B40F8(Unk801AB63C_P* a, Unk801B23A8_Q* q);
+int fn_801B4144(Unk801AB63C_P* a, Unk801B23A8_Q* q);
+int fn_8017DD64(void* a, int b);
 void fn_8017DD80(void* a, int x, Unk801B23A8_Q** b, Unk801B23A8_Q** c);
 Unk801B23A8_Q* fn_801B2DC4(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q);
 Unk801B23A8_Q* fn_801B2E10(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int d);
@@ -38,6 +50,22 @@ struct Unk801B2480_T {
 };
 
 void fn_801B2480(Unk801B2480_T* p, int i, int v);
+
+int fn_801B23A8(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int r = 4;
+    if (q->m460 == 0) {
+        r = 3;
+        if ((unsigned)(fn_801B5FC4(p, q->m708) - 1) <= 1) {
+            if (fn_801B5F4C(p) <= 0) {
+                r = 0;
+            } else if (fn_801B5F4C(p) <= 1) {
+                r = 1;
+            }
+        }
+    }
+    return r;
+}
 
 void fn_801B2428(Unk801B2480_T* p)
 {
@@ -79,9 +107,66 @@ void fn_801B25C4(void* p)
     fn_801B4300(p);
 }
 
+int fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int r = 0x78;
+    if (q != 0 && (fn_801B5DE8(p, q, 0) != 0 || q->m708 != (p->m8->m6F8->m14[2].m8 == 0))) {
+        if ((int)q->m4C4 < 0) {
+            r = fn_801B5120(p, q, 1);
+        } else if (fn_801B5F4C(p) > 2) {
+            r = fn_801B5120(p, q, 0);
+        } else {
+            r = fn_801B51E4(p, q);
+        }
+    }
+    return r;
+}
+
 int fn_801B28F8(void* a, void* b)
 {
     return fn_801B5DE8(a, b, 0) == 1 ? fn_801B5298(a, b) : 0;
+}
+
+/* near-miss: 2 slots differ (retail sets the return register to 0 before testing q). */
+int fn_801B2AD4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int r = 0;
+    int ret = 0;
+    if (q != 0) {
+        if (fn_801B40F8(p, q) != 0) {
+            int i = q->m708;
+            if (fn_801B5EDC(p, i, 1) == 2 && i == 0 && fn_8017DD64(p->m4, 0) == 2) {
+                Unk801B23A8_Q* a;
+                Unk801B23A8_Q* b;
+                fn_8017DD80(p->m4, q->m708, &a, &b);
+                if (fn_801B4144(p, a) != 0 && fn_801B4144(p, b) != 0) {
+                    r = 1;
+                }
+            }
+        }
+        ret = r;
+    }
+    return ret;
+}
+
+/* near-miss: 48/48 insns but register allocation differs (retail keeps q in r30, t in r29, p in r31;
+ * `li r3,0` is the pre-set result). */
+Unk801B23A8_Q* fn_801B2B9C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c)
+{
+    Unk801B23A8_Q* r = 0;
+    if (q != 0) {
+        Unk801B23A8_Q* t = fn_801B2944(p, q, 0, c, 0, 1, 1, 0);
+        if (t == 0 || fn_801B2AD4(p, t) != 0) {
+            return q;
+        }
+        if (fn_801B6354(p, q->m708, 5) != 1) {
+            r = fn_801B2F2C(p, t, q, c, 0);
+            if (r == q) {
+                r = 0;
+            }
+        }
+    }
+    return r;
 }
 
 int fn_801B2D48(int a, int b, int c, int d)
@@ -181,6 +266,24 @@ int fn_801B3850(Unk801AB63C_P* a, Unk801B23A8_Q* q, int c)
     int x = fn_801B38A8(a, q->m708, c);
     int y = fn_801B608C(a, q);
     return x > y ? y : x;
+}
+
+/* near-miss: retail builds the 3/4 team index through a separate register (li r0,3 / li r0,4 / mr r4,r0). */
+unsigned char fn_801B38A8(Unk801AB63C_P* p, int i, int flag)
+{
+    if (flag == 1) {
+        if (i > 2) {
+            int r = 3;
+            if (i == 3) {
+                r = 4;
+            }
+            i = r;
+        } else {
+            i = i == 0;
+        }
+    }
+    Unk8019F8C0_Inner* m = p->m8->m6F8->m14;
+    return m[i].m1B4[m[2].m0];
 }
 
 int fn_801B38FC(Unk801AB63C_P* a, Unk801B23A8_Q* q)
