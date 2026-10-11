@@ -10,11 +10,42 @@ typedef Unk802B0ACC_Rec Rec;
 typedef Unk802B0ACC_V4 V4;
 typedef Unk802B0ACC_F4 F4;
 
+struct Unk802B1F00_B {
+    char pad0[0x1F00];
+    unsigned int a1F00[30];
+};
+
+struct Unk802B0DB0_M {
+    char pad0[0x11E10];
+    void* a11E10[30];
+    void* a11E88[30];
+    unsigned int a11F00[30];
+};
+
+
 void* operator new(unsigned int size, int heap);
 void* operator new[](unsigned int size, int heap);
 
 extern int lbl_8061E970;
 extern char lbl_80664140[];
+extern const char lbl_805E0190[];
+extern const char lbl_805E019C[];
+extern const char lbl_805E01A8[];
+extern const char lbl_805E01B4[];
+extern const char lbl_805E01B8[];
+extern const char lbl_805E01C4[];
+extern const char lbl_805E01D0[];
+extern const char lbl_805E01DC[];
+extern const char lbl_805E01E8[];
+extern const char lbl_805E01F4[];
+extern const char lbl_805E01FC[];
+extern int* lbl_8061977C;
+extern const char* lbl_8061E97C[];
+extern const char lbl_805E0160[];
+extern const char lbl_805E0164[];
+extern const char lbl_805E0168[];
+extern const char lbl_805E016C[];
+extern const char lbl_805E0170[];
 extern const char lbl_805E0280[];
 extern const char lbl_805E028C[];
 extern const char lbl_805E029C[];
@@ -27,9 +58,14 @@ int fn_80377F00(void* t, int* a, int* b, int key, int c);
 void fn_803EB330(void* p);
 char* fn_8040B8FC(const char* s, int c);
 char* fn_8040B61C(char* d, const char* s);
+char* fn_8040B448(char* d, const char* s);
 unsigned int fn_80378568(const char* s, int n);
 int fn_8040B574(const char* a, const char* b);
 void fn_802B1D44(T* t);
+void* fn_802B98AC(const char* name, int a);
+int fn_800057D8();
+int fn_800057E4();
+void* fn_803EB2EC(void* p);
 void* fn_802B23F0(void* p, void* a);
 int fn_80075E7C(int a);
 int fn_8040ABA0();
@@ -74,6 +110,47 @@ void fn_802B0BB8(Mgr* m, int key, V4* val)
         *(V4*)((char*)m + 0x4038 + a * 0x1C) = *val;
 }
 
+/* near-miss (parked, 88 vs 86 insns): retail keeps m+0x10000 in r29 and re-forms each table address (+0x1E10 / +0x1E88) per use; the local buffer is ~100 bytes */
+void fn_802B0C44(Mgr* m, int t)
+{
+    Unk802B0DB0_M* mm = (Unk802B0DB0_M*)m;
+    if (mm->a11E10[t] == 0) {
+        const char* suf = 0;
+        switch (*lbl_8061977C) {
+        case 0:
+        case 1:
+            suf = lbl_805E0160;
+            break;
+        case 2:
+            suf = lbl_805E0164;
+            break;
+        case 3:
+        case 4:
+            suf = lbl_805E0168;
+            break;
+        case 5:
+            suf = lbl_805E016C;
+            break;
+        }
+        char buf[0x400];
+        fn_8040B61C(buf, lbl_8061E97C[t]);
+        fn_8040B448(buf, suf);
+        fn_8040B448(buf, lbl_805E0170);
+        if (t == 0x16)
+            mm->a11E10[0x16] = (void*)fn_800057D8();
+        else
+            mm->a11E10[t] = fn_802B98AC(buf, 0x400);
+    }
+    if (mm->a11E88[t] == 0) {
+        if (t == 0x16)
+            mm->a11E88[0x16] = (void*)fn_800057E4();
+        else
+            mm->a11E88[t] = fn_803EB2EC(mm->a11E10[t]);
+        float f = 0.0f;
+        *(float*)((char*)mm->a11E88[t] + 0x28) = f;
+    }
+}
+
 struct Unk802B3130_In {
     char pad0[0x9C];
     int m9C;
@@ -113,18 +190,6 @@ struct Unk802B2518_S {
 };
 
 extern Unk802B2518_W* lbl_8061E978;
-
-struct Unk802B1F00_B {
-    char pad0[0x1F00];
-    unsigned int a1F00[30];
-};
-
-struct Unk802B0DB0_M {
-    char pad0[0x11E10];
-    void* a11E10[30];
-    void* a11E88[30];
-    unsigned int a11F00[30];
-};
 
 extern T* lbl_8061EA68;
 extern void* lbl_8061EA74;
@@ -174,6 +239,33 @@ int fn_802B0E34(Mgr* m, const char* s)
         }
     }
     return r;
+}
+
+void* fn_802B11E0(Mgr* m, const char* s)
+{
+    if (fn_8040B574(s, lbl_805E0190) == 0)
+        return (char*)m + 0x3704;
+    if (fn_8040B574(s, lbl_805E019C) == 0)
+        return (char*)m + 0x3714;
+    if (fn_8040B574(s, lbl_805E01A8) == 0)
+        return (char*)m + 0x3724;
+    if (fn_8040B574(s, lbl_805E01B4) == 0)
+        return (char*)m + 0x3734;
+    if (fn_8040B574(s, lbl_805E01B8) == 0)
+        return (char*)m + 0x3744;
+    if (fn_8040B574(s, lbl_805E01C4) == 0)
+        return (char*)m + 0x3754;
+    if (fn_8040B574(s, lbl_805E01D0) == 0)
+        return (char*)m + 0x3764;
+    if (fn_8040B574(s, lbl_805E01DC) == 0)
+        return (char*)m + 0x3774;
+    if (fn_8040B574(s, lbl_805E01E8) == 0)
+        return (char*)m + 0x3784;
+    if (fn_8040B574(s, lbl_805E01F4) == 0)
+        return (char*)m + 0x3794;
+    if (fn_8040B574(s, lbl_805E01FC) == 0)
+        return (char*)m + 0x37a4;
+    return 0;
 }
 
 void fn_802B1CB4()
