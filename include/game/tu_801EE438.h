@@ -11,6 +11,14 @@
 #ifndef GAME_TU_801EE438_H
 #define GAME_TU_801EE438_H
 
+struct Unk801EE438_Player;
+
+struct Unk801EE438_Vec {           /* 12-byte vector, passed by value (copied by the caller) */
+    float m0;
+    float m4;
+    float m8;
+};
+
 struct Unk801EE438_Sub {           /* 0x14 bytes, G+0xC0 and G+0xD4 */
     int m0;
     int m4;
@@ -43,13 +51,6 @@ struct Unk801EE438_It {            /* iterator (24 bytes) filled by fn_8014E09C;
     int m14;
 };
 
-struct Unk801EE438_Player {         /* G->m8[i] */
-    char pad0[0x460];
-    int m460;                       /* index */
-    char pad464[0x4D8 - 0x464];
-    int m4D8;                       /* sub-object starts here (address passed to fn_8024FC74) */
-};
-
 struct Unk801EE438_Game {           /* G->m4 */
     char pad0[0x36C];
     Unk801EE438_Player* m36C;
@@ -64,12 +65,56 @@ struct Unk801EE438_Sub6A8 {        /* fn_80204AC8(&G->m6A8) */
     int m0;
 };
 
+struct Unk801EE438_Rec2C {         /* stride 0x2C, G+0x3DC (indices 9..12 used) */
+    int m0;
+    char pad4[0x24 - 4];
+    int m24;
+    char pad28[4];
+};
+
+struct Unk801EE438_Sub2B4 {        /* G+0x2B4 */
+    float m0;
+    char pad4[0x128 - 4];
+    Unk801EE438_Rec2C m128[8];     /* really indexed 9..12 (guarded); the tail overlaps m2AC */
+    char pad288[0x2AC - 0x288];
+    int m2AC;                      /* G+0x560 */
+    char pad2B0[0x364 - 0x2B0];
+};
+
+struct Unk801EE438_Rec5C {         /* stride 0x5C, G+0x6B8 (10 entries) */
+    char pad0[0x50];
+    float m50;
+    char pad54[0x5C - 0x54];
+};
+
+struct Unk801EE438_Player {         /* G->m8[i] */
+    char pad0[0x460];
+    int m460;                       /* index */
+    char pad464[0x4D8 - 0x464];
+    int m4D8;                       /* sub-object starts here (address passed to fn_8024FC74) */
+};
+
+struct Unk801EE438_O700 {
+    char pad0[0x3B4];
+    int m3B4;
+};
+
+struct Unk801EE438_Owner {
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x65C - 0x50];
+    Unk801EE438_Player* m65C[13];
+    char pad690[0x700 - 0x690];
+    Unk801EE438_O700* m700;
+};
+
 struct Unk801EE438_G {
-    void* m0;
+    Unk801EE438_Owner* m0;
     Unk801EE438_Game* m4;
     Unk801EE438_Player* m8[10];
     int m30;
-    char pad34[0x54 - 0x34];
+    int m34;
+    char pad38[0x54 - 0x38];
     int m54;
     char pad58[0x5C - 0x58];
     int m5C;
@@ -86,9 +131,16 @@ struct Unk801EE438_G {
     int m1C8;
     int m1CC;
     int m1D0;
-    char pad1D4[0x6A8 - 0x1D4];
+    char pad1D4[0x2B4 - 0x1D4];
+    Unk801EE438_Sub2B4 m2B4;
+    char pad618[0x6A8 - 0x618];
     Unk801EE438_Sub6A8 m6A8;
-    char pad6AC[0xCA4 - 0x6AC];
+    char pad6AC[0x6B8 - 0x6AC];
+    Unk801EE438_Rec5C m6B8[10];
+    char pad_A50[0xC88 - 0xA50];
+    int mC88;
+    int mC8C;
+    char padC90[0xCA4 - 0xC90];
     int mCA4;
     Unk801EE438_Slot mCA8[9];
     int m3A5C;
@@ -99,19 +151,35 @@ struct Unk801EE438_G {
 };
 
 struct Unk801EE438_Scr {
-    char pad0[0x9C];
+    Unk801EE438_G* m0;
+    char pad4[0x9C - 4];
     Unk801EE438_G* m9C;
 };
 
 struct Unk801EE438_Scr;
 extern "C" {
+int fn_80259C50(int h, int e);
+unsigned fn_8014E2B4(int e);
+int fn_80216590(Unk801EE438_Scr* p, int a, Unk801EE438_Vec v, int b, int c, int d);
+void fn_8020E074(Unk801EE438_Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7, int a8);
+void fn_8020E2A0(Unk801EE438_Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7, int a8, int a9);
+void fn_8020E71C(Unk801EE438_Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t);
+void fn_8020E8B4(Unk801EE438_Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7);
+int fn_80248488(int a, int b, int c, int d, int e, int f, int g);
+void fn_802049E8(Unk801EE438_Rec5C* r);
+void fn_80212054(Unk801EE438_Sub2B4* s);
+void fn_80209AC0(Unk801EE438_Scr* p, int a);
+void fn_80209EEC(Unk801EE438_Scr* p, int a);
+void fn_8020A654(Unk801EE438_Scr* p, int a);
+void fn_8020A90C(Unk801EE438_Scr* p, int a);
+void fn_8020B00C(Unk801EE438_Scr* p, int a);
 void fn_80201738(Unk801EE438_G* g);
 void fn_802121D0(int* s);
 void fn_80204AC8(Unk801EE438_Sub6A8* s);
 Unk801EE438_Player* fn_801EDE4C(Unk801EE438_Scr* p, Unk801EE438_Game* g);
 void fn_801F2668(Unk801EE438_Scr* p, void* out, void* v, int k);
 void fn_8024FC74(void* sub, int a);
-void fn_8014E09C(Unk801EE438_It* it, void* owner, int k);
+void fn_8014E09C(Unk801EE438_It* it, Unk801EE438_Owner* owner, int k);
 void fn_8014E108(Unk801EE438_It* it);
 void fn_80205450(Unk801EE438_G* g, int i);
 void fn_80211B58(Unk801EE438_Sub* s);
