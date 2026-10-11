@@ -104,7 +104,7 @@ static inline int CallSlot(I* self, int k, int a)
 void fn_80096AB4(void* p);
 void fn_80096C10(void* p);
 void fn_8009C398(void* p);
-void fn_800999CC(void* p, int v);
+void fn_800999CC(void* p, int v, int q); /* indexes +0x17C with r5 */
 void fn_80082034(Y* self);
 extern float lbl_805B40D4;
 
@@ -624,13 +624,13 @@ int fn_80081B60(Y* self)
     return 0;
 }
 
-/* near-miss: r29/r30 are swapped for tab and q, one extra lwz. */
+/* fn_800999CC indexes sub+0x17C with r5: q is passed through. */
 void fn_80081BA8(Y* self, int p, int q, int v)
 {
     char* sub = (char*)self + p * 0xE64;
     char* tab = sub + 0x17C;
     int old = (unsigned char)tab[q];
-    fn_800999CC(sub, v);
+    fn_800999CC(sub, v, q);
     if ((unsigned char)tab[q] == v) {
         int f = 0;
         if (self->z0.m8 != 0)
@@ -641,7 +641,8 @@ void fn_80081BA8(Y* self, int p, int q, int v)
             do {
                 if (fn_80081CF8(self, k)->m0 == old) {
                     int m4 = fn_80081CF8(self, it.i)->m4;
-                    fn_80081C94(self, it.i, v, fn_80081CF8(self, it.i)->m1, m4);
+                    int m1 = fn_80081CF8(self, it.i)->m1;
+                    fn_80081C94(self, it.i, v, m1, m4);
                 }
                 k = it.Next();
             } while (k <= 3);
