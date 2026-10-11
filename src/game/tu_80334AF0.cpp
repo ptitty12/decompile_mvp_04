@@ -67,6 +67,18 @@ inline int EnumVal(MIE* i) { return i->m60[i->m4C]; }
 inline MIE* EAt(Menu* p, int off) { return (MIE*)((char*)p + off); }
 
 extern const char lbl_80666778[];
+extern const char lbl_80665FA8[], lbl_80666E70[], lbl_805EBBF8[], lbl_80666EC0[];
+extern "C" void fn_8032D868(void* item, const char* name);
+/* inline base-item ctor + name, as emitted in the menu ctors */
+inline void LabelInit(ItemB* it, const char* name)
+{
+    it->m8 = lbl_80666EC0;
+    it->m0 = 0.0f;
+    it->m4 = 0.0f;
+    it->m8 = lbl_80666E70;
+    it->mC = 0;
+    fn_8032D868(it, name);
+}
 extern const char lbl_80666368[], lbl_805EF59C[], lbl_805EF5A4[], lbl_805EF5BC[], lbl_805F3504[];
 extern int lbl_8062080C, lbl_80620810;
 extern "C" {
@@ -121,6 +133,22 @@ void fn_80334B70(Menu* p, int k)
         fn_80334A60(p);
         fn_803349D0(p);
     }
+}
+
+Menu* fn_80334BC0(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80665FA8;
+    ItemB* i0 = (ItemB*)((char*)p + 0x2E0);
+    ItemB* i1 = (ItemB*)((char*)p + 0x328);
+    ItemB* i2 = (ItemB*)((char*)p + 0x370);
+    LabelInit(i0, lbl_805EBBF8);
+    LabelInit(i1, lbl_805EBBF8);
+    LabelInit(i2, lbl_805EBBF8);
+    fn_80330ACC(p, (MItem*)i0);
+    fn_80330ACC(p, (MItem*)i1);
+    fn_80330ACC(p, (MItem*)i2);
+    return p;
 }
 
 void fn_80334EB0() {}
