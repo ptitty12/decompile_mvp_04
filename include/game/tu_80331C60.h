@@ -88,6 +88,19 @@ inline int GetV2(MIV* i)
         return i->m4C;
     return *i->m48;
 }
+inline float GetVF2(MIV* i)
+{
+    if (!i->m48)
+        return *(float*)&i->m4C;
+    return *(float*)i->m48;
+}
+inline void SetVF(MIV* i, float v)
+{
+    if (!i->m48)
+        *(float*)&i->m4C = v;
+    else
+        *(float*)i->m48 = v;
+}
 inline void SetV(MIV* i, int v)
 {
     if (i->m48)

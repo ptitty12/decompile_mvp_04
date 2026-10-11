@@ -111,6 +111,9 @@ void fn_80087A58(Unk80087A58_O* s, int a, char v, int w, int flag);
 int fn_80087A88(Unk80087A58_O* s, int a, int w, int flag);
 void fn_80087B10();
 extern int lbl_806177DC;
+extern int lbl_806164F8, lbl_80616EE0, lbl_806177E0, lbl_806177E4, lbl_806177E8;
+extern int lbl_806177EC, lbl_8061651C, lbl_80616EE4, lbl_80616EE8, lbl_80620548;
+extern IntBox lbl_80687608, lbl_8068760C, lbl_80687610, lbl_80687614, lbl_80687618, lbl_8068761C, lbl_80687620, lbl_80687624;
 extern float lbl_80620540, lbl_80620544;
 struct MIE2 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 inline int EnumVal2(MIE2* i) { return i->m60[i->m4C]; }
@@ -457,6 +460,61 @@ void fn_80332CA0(Menu* p)
 }
 
 void fn_80332DB8() {}
+
+void fn_80333184(Menu* p, int k)
+{
+    fn_80330BC8(p, k);
+    lbl_806164F8 = GetV(IAt(p, 0X2E0));
+    lbl_806177DC = IAt(p, 0x334)->m4C;
+    lbl_80616EE0 = GetV(IAt(p, 0X394));
+    lbl_80687608.v = GetV(IAt(p, 0X3E8));
+    lbl_8068760C.v = GetV(IAt(p, 0X43C));
+    lbl_806177E0 = GetV(IAt(p, 0X490));
+    lbl_806177E4 = GetV(IAt(p, 0X4E4));
+    lbl_806177E8 = GetV(IAt(p, 0X538));
+    lbl_80687620.v = GetV(IAt(p, 0X58C));
+    lbl_80687610.v = GetV(IAt(p, 0X5E0));
+    lbl_80687614.v = GetV(IAt(p, 0X634));
+    lbl_80687618.v = GetV(IAt(p, 0X688));
+    lbl_806177EC = GetV(IAt(p, 0X6DC));
+    lbl_8068761C.v = GetV(IAt(p, 0X730));
+    lbl_80687624.v = GetV(IAt(p, 0X784));
+    lbl_8061651C = GetV(IAt(p, 0X7D8));
+    lbl_80616EE4 = GetV(IAt(p, 0X82C));
+    lbl_80616EE8 = GetV(IAt(p, 0X880));
+    lbl_80620540 = GetVF2(IAt(p, 0x8D4));
+    lbl_80620544 = GetVF2(IAt(p, 0x938));
+    lbl_80620548 = GetV2(IAt(p, 0x99C));
+}
+
+void fn_8033348C(Menu* p)
+{
+    SetV(IAt(p, 0X2E0), lbl_806164F8);
+    SetV(IAt(p, 0X3E8), lbl_80687608.v);
+    SetV(IAt(p, 0X394), lbl_80616EE0);
+    SetV(IAt(p, 0X43C), lbl_8068760C.v);
+    SetV(IAt(p, 0X490), lbl_806177E0);
+    SetV(IAt(p, 0X4E4), lbl_806177E4);
+    SetV(IAt(p, 0X538), lbl_806177E8);
+    SetV(IAt(p, 0X58C), lbl_80687620.v);
+    SetV(IAt(p, 0X5E0), lbl_80687610.v);
+    SetV(IAt(p, 0X634), lbl_80687614.v);
+    SetV(IAt(p, 0X688), lbl_80687618.v);
+    SetV(IAt(p, 0X6DC), lbl_806177EC);
+    SetV(IAt(p, 0X730), lbl_8068761C.v);
+    SetV(IAt(p, 0X784), lbl_80687624.v);
+    SetV(IAt(p, 0X7D8), lbl_8061651C);
+    SetV(IAt(p, 0X82C), lbl_80616EE4);
+    SetV(IAt(p, 0X880), lbl_80616EE8);
+    SetVF(IAt(p, 0x8D4), lbl_80620540);
+    SetVF(IAt(p, 0x938), lbl_80620544);
+    SetV(IAt(p, 0x99C), lbl_80620548);
+    p->m204 = 0;
+    p->m208 = 0;
+    p->items[p->m174]->s3();
+    p->m174 = 0;
+    p->items[p->m174]->s2();
+}
 
 void fn_803337EC()
 {
