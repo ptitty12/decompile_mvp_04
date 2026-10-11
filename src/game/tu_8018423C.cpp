@@ -11,6 +11,29 @@ extern "C" void fn_8018423C(Unk80181140* o, char* a, Unk8018423C_B* b)
         fn_8018405C(o, b, a + 0x28, 0);
 }
 
+//@80184278
+extern "C" void fn_80184278(Unk80181140* o)
+{
+    char* sub = (char*)o + 0x244;
+    void* a = fn_80319330(sub, 4);
+    void* b = fn_80319330(sub, 5);
+    if (a != 0 && b != 0) {
+        Unk80184278_Ctx* c = (Unk80184278_Ctx*)o->mBC;
+        char* pb = (char*)b + 0x28;
+        void* z = c->m734;
+        fn_8018405C(o, z, (char*)a + 0x28, 1);
+        fn_8018405C(o, z, pb, 0);
+        if (lbl_8061EA68 != 0 && lbl_8061EA68->m328 != 0) {
+            fn_8018423C(o, (char*)fn_80319330(sub, 6), c->m570[0]);
+            fn_8018423C(o, (char*)fn_80319330(sub, 7), c->m570[1]);
+            fn_8018423C(o, (char*)fn_80319330(sub, 8), c->m570[2]);
+            fn_8018423C(o, (char*)fn_80319330(sub, 9), c->m570[3]);
+            fn_8018423C(o, (char*)fn_80319330(sub, 10), c->m570[4]);
+            fn_8018423C(o, (char*)fn_80319330(sub, 11), c->m570[5]);
+        }
+    }
+}
+
 //@8018466C
 extern "C" void fn_8018466C(void* a, int idx)
 {

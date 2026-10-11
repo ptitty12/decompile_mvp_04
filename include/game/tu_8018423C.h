@@ -169,6 +169,13 @@ inline int Unk80185E28_Abs(int x)
     return -x;
 }
 
+/* Ctx fields used by fn_80184278: object at +0x734, a table of records at +0x570..+0x584. */
+struct Unk80184278_Ctx {
+    char pad0[0x570];
+    Unk8018423C_B* m570[6];
+    char pad588[0x734 - 0x588];
+    void* m734;
+};
 struct Unk8014D9EC_C {
     float m[4];
 };
@@ -183,7 +190,8 @@ struct Unk80186788_S {
     int m310;
     int m314;
     int m318;
-    char pad31C[0x32C - 0x31C];
+    char pad31C[0x328 - 0x31C];
+    int m328;
     Unk80186788_Pair m32C[20];
     char pad3CC[0x3F4 - 0x3CC];
     int m3F4;
@@ -193,6 +201,7 @@ extern Unk80181140_F lbl_805CD890;
 extern Unk80181140_F lbl_805CD894;
 
 extern "C" {
+void* fn_80319330(void* p, int k);
 void fn_8014D9EC(Unk8014D9EC_C* c, float a, float b, float d, float e, float f);
 int fn_8014DDAC(Unk8014D9EC_C* c);
 void fn_801A081C(Unk801808A4_Ctx* c, int v);
