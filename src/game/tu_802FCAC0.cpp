@@ -241,6 +241,7 @@ int fn_802FF3A0(void* a, Unk802FCAC0_S5C4* b)
     return 3;
 }
 
+/* near-miss: retail loads the bss Vec2 (lfs f11/f12) before the copy of the entry's Vec2 and uses sp+8/sp+0x10 for copy/result; ours loads after and swaps the slots (declaration order tried) */
 Unk802F8324_V2 fn_802FF624(Unk802FCAC0_Obj* o, int i)
 {
     Unk802F8324_V2 r;
@@ -311,6 +312,7 @@ float fn_802FFAC8()
     return lbl_8061F900;
 }
 
+/* near-miss: retail loads mC straight into r3 (subfic r3,r3,1); ours goes through r0 (5 spellings of (unsigned)v <= 1 tried) */
 int fn_802FFE94(Unk802FCAC0_P24* p)
 {
     return fn_801A2034(p->m24, 4) != -1 ? ((unsigned)p->m24->m6F8->m10->mC <= 1u) : 0;
