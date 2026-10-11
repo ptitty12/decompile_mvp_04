@@ -196,6 +196,42 @@ void fn_80335434(Menu* p)
     }
 }
 
+/* Reorders the menu's items to follow a delimited name list: each token is looked up by
+ * the item's s6() name and the matching item is moved to the next free front slot. */
+extern const char lbl_805EEF58[];
+extern "C" {
+int fn_8040B574(const char* a, const char* b);
+char* fn_8040B9B0(char* s, const char* delim);
+}
+
+extern "C" void fn_803354FC(Menu* p)
+{
+    char buf[0x400] = "";
+    buf[0] = 0;
+    int k = 0;
+    char* tok = fn_8040B9B0(buf, lbl_805EEF58);
+    while (tok) {
+        int i = 0;
+        MItem** pp = p->items;
+        while (i < p->m178) {
+            if (fn_8040B574(tok, (*pp)->s6()) == 0)
+                break;
+            pp++;
+            i++;
+        }
+        MItem* it = p->items[i];
+        if (i > k) {
+            do {
+                p->items[i] = p->items[i - 1];
+                i--;
+            } while (i > k);
+        }
+        p->items[i] = it;
+        k++;
+        tok = fn_8040B9B0(0, lbl_805EEF58);
+    }
+}
+
 Wrap* fn_80335604(Wrap* p, int a, int b)
 {
     fn_80328234(p, 12, 0);

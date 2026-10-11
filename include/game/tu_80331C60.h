@@ -24,6 +24,8 @@ public:
     virtual int s2();
     virtual int s3();
     virtual int s4();
+    virtual int s5();
+    virtual const char* s6();
 };
 
 /* Menu base: item pointers at +0, cursor +0x174, count +0x178, vptr +0x2DC. */
