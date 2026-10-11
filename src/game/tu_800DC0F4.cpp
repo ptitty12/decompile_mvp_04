@@ -56,6 +56,21 @@ void fn_800DC50C(UiS* self, float f1, float f2)
     self->v12((int)(f2 * f1));
 }
 
+/* near-miss: 6 slots; the clamp constants and the value use f13/f0 in the opposite assignment (compare operands swapped) */
+void fn_800DC580(UiS* self, float f)
+{
+    if (f > lbl_805BD8CC)
+        f = lbl_805BD8CC;
+    else if (!(f >= lbl_805BD8D0))
+        f = lbl_805BD8D0;
+    float w = self->v32(lbl_805BC188, 1)->m2A;
+    float h = *(short*)((char*)self->v32(lbl_805BC188, 1) + 0x26);
+    UiS* t = self->v32(lbl_805BD8C0, 1);
+    int a = (int)w - (int)(f * w);
+    t->v12(a);
+    t->v9((int)h + ((int)w - a));
+}
+
 void fn_800DC728(UiS* self, float f1, float f2)
 {
     self->v13((int)(f2 * f1));
@@ -78,6 +93,26 @@ void fn_800DD140(UiS* self)
     self->v10((480 - h) / 2);
 }
 
+void fn_800DD204(UiS* a, UiS* b)
+{
+    int g = lbl_8061E978;
+    int o = a->v34() * 4;
+    char* base = (char*)g + 0x11E88;
+    int e = *(int*)(base + o);
+    int r = a->v31();
+    float x;
+    float y;
+    fn_800D4254(r, e, &x, &y);
+    int c = 0x23;
+    if (!(y <= lbl_805BD900))
+        c = 0x2D;
+    b->v12((int)y + c);
+    a->v9(0x36);
+    a->v10(0x24);
+    b->v9(0x29);
+    b->v10(0x31);
+}
+
 void fn_800DD344(Udd344_T* t, void* dst)
 {
     unsigned char h = t->m0;
@@ -96,6 +131,28 @@ void fn_800DD344(Udd344_T* t, void* dst)
     else
         fn_80403DE4(buf, (const char*)fn_80090880(lbl_8061977C, 0x2332), hh, t->m1, fn_80090880(lbl_8061977C, 0x1A7B));
     fn_80403144(dst, buf);
+}
+
+void fn_800DD44C(Unk800DD610_P* t, void* dst, int mode)
+{
+    char b8[0x40];
+    char b48[0x18];
+    if (mode == 0) {
+        fn_80403DE4(b8, (const char*)fn_80090880(lbl_8061977C, 0x2333), t->m0, t->m1, t->m2);
+    } else if (mode == 1) {
+        const char* a = (const char*)fn_80090880(lbl_8061977C, 0x2336);
+        const char* x = (const char*)fn_80090880(lbl_8061977C, fn_800DD610(t));
+        const char* y = (const char*)fn_80090880(lbl_8061977C, fn_800DD5FC(t->m0 - 1));
+        fn_80403DE4(b8, a, x, y, fn_800DD6D4(t->m1), t->m2);
+    } else if (mode == 2) {
+        char* a = (char*)fn_80090880(lbl_8061977C, 0x2334);
+        char* y = (char*)fn_80090880(lbl_8061977C, fn_800DD5FC(t->m0 - 1));
+        fn_8040321C(b8, a, y, fn_800DD6D4(t->m1));
+    } else {
+        fn_804031BC(b48, lbl_805BD904);
+        fn_80403DE4(b8, b48, fn_80090880(lbl_8061977C, fn_800DD5E8(t->m0 - 1)), t->m1);
+    }
+    fn_80403144(dst, b8);
 }
 
 int fn_800DD5E8(int i)
@@ -133,6 +190,43 @@ int fn_800DD658(int x)
     default:
         return 0x1A7A;
     }
+}
+
+/* near-miss: 76 vs 75 insns; retail keeps the high half of lbl_806E02B8 in a callee-saved `lis` register (r30) for the three uses; tried a local pointer (worse) */
+char* fn_800DD6D4(int n)
+{
+    char a[0x10];
+    char b[0x10];
+    fn_804031BC(a, lbl_805BD90C);
+    if (n <= 0) {
+        fn_804031BC(lbl_806E02B8, lbl_805BD914);
+    } else {
+        switch (n) {
+        case 11:
+        case 12:
+        case 13:
+            fn_804031BC(b, lbl_805BD918);
+            break;
+        default:
+            switch (n % 10) {
+            case 1:
+                fn_804031BC(b, lbl_805BD91C);
+                break;
+            case 2:
+                fn_804031BC(b, lbl_805BD920);
+                break;
+            case 3:
+                fn_804031BC(b, lbl_805BD924);
+                break;
+            default:
+                fn_804031BC(b, lbl_805BD918);
+                break;
+            }
+            break;
+        }
+        fn_80403DE4(lbl_806E02B8, a, n, b);
+    }
+    return lbl_806E02B8;
 }
 
 void* fn_800DE160(int x)
@@ -220,6 +314,40 @@ extern "C" void fn_800DE440(int a0, int a1, int a2)
         fn_8040B61C(b38, fn_800E5F38(fn_800DBAE0(o, 5, s, a1)));
     }
     fn_800DE6A8(a0, b8, b20, a2, fn_800DBAE0(o, 4, s, a1), b38);
+}
+
+void fn_800DE538(int a0, int a1, int a2, int a3)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    char b8[0x18];
+    char b20[0x18];
+    switch (a1) {
+    case 0:
+        s->fn_8007C5DC(0, a2, b8);
+        s->fn_8007C5DC(1, a2, b20);
+        break;
+    case 1:
+        s->fn_8007C838(0, a2, b8);
+        s->fn_8007C838(1, a2, b20);
+        break;
+    case 2:
+        s->fn_8007CA5C(0, a2, b8);
+        s->fn_8007CA5C(1, a2, b20);
+        break;
+    case 3:
+        s->fn_8007CC80(0, a2, b8);
+        s->fn_8007CC80(1, a2, b20);
+        break;
+    case 4:
+        s->fn_8007CEA4(0, a2, b8);
+        s->fn_8007CEA4(1, a2, b20);
+        break;
+    default:
+        b8[0] = 0;
+        b20[0] = 0;
+        break;
+    }
+    fn_800DE6A8(a0, b8, b20, a3, 0, 0);
 }
 
 int fn_800DE930(int i)

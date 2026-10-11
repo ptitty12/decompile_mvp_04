@@ -80,4 +80,20 @@ struct UdE354_T {
     char pad0[0x14];
     char* m14;
 };
+extern char lbl_805BD90C[];
+extern char lbl_805BD904[];
+extern char lbl_805BD914[];
+extern char lbl_805BD918[];
+extern char lbl_805BD91C[];
+extern char lbl_805BD920[];
+extern char lbl_805BD924[];
+extern char lbl_806E02B8[];
+extern float lbl_805BD900;
+void fn_800D4254(int a, int e, float* x, float* y);
+int fn_800DD5E8(int i);
+int fn_800DD5FC(int i);
+int fn_800DD610(Unk800DD610_P* p);
+char* fn_800DD6D4(int n);
+extern float lbl_805BD8CC;
+extern float lbl_805BD8D0;
 #endif
