@@ -350,6 +350,97 @@ void fn_8005BE30(Unk8005BA1C_Obj* o)
     }
 }
 
+/* near-miss (121 vs 119 instructions): retail branches on 'any == 0' where this build emits an
+ * xori, and the callee-saved registers are numbered one lower. */
+int fn_8005BEE4(Unk8005BA1C_Obj* o, int ch)
+{
+    int r = 0;
+    int any = 0;
+    if (o->m0 == 0) {
+        o->mC[ch] = -3;
+    } else if (o->mC[ch] < 0) {
+        int once = 0;
+        for (int i = 0; i < 4; i++) {
+            if (lbl_805B10B4[ch].mA0[i] == 1) {
+                if (o->m30[i].m0 == 0) {
+                    any = 1;
+                } else {
+                    int k = lbl_805AE420[ch].e[i].m24;
+                    if (k == 0) {
+                        r = fn_8005A010(o->m30[i].m0, 0, ch);
+                    } else if (k == 1 && once == 0) {
+                        r = fn_8005A010(o->m30[i].m0, 1, ch);
+                        once = r;
+                    }
+                }
+            }
+        }
+        int v = 0;
+        if (r == 0 && any == 1) {
+            v = -2;
+        } else if (any == 0) {
+            v = 1;
+        }
+        o->mC[ch] = v;
+        o->m2C = -1;
+        for (int j = 0; j < 8; j++) {
+            if (o->mC[j] >= 0) {
+                o->m2C = o->mC[j];
+                break;
+            }
+        }
+    }
+    switch (o->mC[ch]) {
+    case -3:
+        return -3;
+    case -1:
+        return -1;
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    default:
+        return -2;
+    }
+}
+
+/* near-miss (98 vs 96 instructions): retail materialises the constant 0 once in r8 and copies it
+ * into the outer loop counter (mr r24,r8); this build emits a separate li. */
+void fn_8005C0C8(Unk8005BA1C_Obj* o, int ch)
+{
+    int r = 0;
+    if (o->m0 == 1) {
+        if (o->mC[ch] >= 0) {
+            o->mC[ch] = -1;
+            o->m2C = -1;
+            for (int i = 0; i < 4; i++) {
+                if (o->m30[i].m0 != 0) {
+                    if (lbl_805B10B4[ch].mA0[i] == 1) {
+                        fn_8005A19C(o->m30[i].m0);
+                    }
+                    for (int j = 0; j < 8; j++) {
+                        if (o->mC[j] >= 0 && lbl_805B10B4[j].mA0[i] == 1) {
+                            int k = lbl_805AE420[ch].e[i].m24;
+                            if (k == 0) {
+                                fn_8005A010(o->m30[i].m0, 0, ch);
+                            } else if (k == 1 && r == 0) {
+                                r = fn_8005A010(o->m30[i].m0, 1, ch);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            for (int j = 0; j < 8; j++) {
+                if (o->mC[j] >= 0) {
+                    o->m2C = o->mC[j];
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void fn_8005C250(Unk8005BA1C_Obj* o, int ch)
 {
     int r = 0;
