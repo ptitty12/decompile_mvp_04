@@ -232,6 +232,27 @@ extern "C" FE_OVERLAY int fn_80450C44(void)
     return 1;
 }
 
+/* near-miss: retail hoists the second lis lbl_8061A32C above the first vcall pair (7 slots) */
+extern "C" FE_OVERLAY void fn_80450C4C(FeScr6* self)
+{
+    if (self->m18C == 0) {
+        self->m18C = (FeSlotObj*)fn_800B7A94(UiGetMsgMgr(), "NOTIFIEDSIMPROG");
+        self->m18C->m30C = fn_80451C78;
+        ((FeObj1*)self->m18C)->v8(0);
+        ((FeObj1*)self->m18C)->v16(0);
+    }
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    self->m190 = p;
+    ((FeObj1*)p)->v16(0);
+    ((FeObj1*)self->m190)->v8(0);
+}
+
+inline int FeSlotAt(char* b, int k)
+{
+    int o = k * 4;
+    return *(int*)(b + o);
+}
+
 extern "C" FE_OVERLAY void fn_80450D78(FeScr6* self, int a)
 {
     fn_800ED310(self, a);
@@ -271,6 +292,27 @@ extern "C" FE_OVERLAY void fn_80451004(FeScr6* self)
     fn_80125BC0(self->m194);
 }
 
+/* near-miss: 6 slots; retail keeps the byte offset in r0 and the array base in r9 */
+extern "C" FE_OVERLAY void fn_80451028(FeScr6* self, int a)
+{
+    fn_80124FA8(self->m194, self);
+    fn_80125154(self->m194, 0);
+    if (self->m17C > 0
+        && fn_8007FDA8((Unk8007F198_C*)lbl_8061930C, FeSlotAt((char*)&self->m134, self->m17C - 1), self->m198) == 0)
+        fn_801251CC(self->m194, 0, 0x37E6, 1);
+    else
+        fn_80125084(self->m194, 0);
+    int e = FeGetI((char*)&self->m134, ((FeObjI*)self->m188)->v60() * 4);
+    if (e != -1 && fn_8007FDA8((Unk8007F198_C*)lbl_8061930C, e, self->m198) != 0)
+        fn_801251CC(self->m194, 3, 0x27D7, 5);
+    else
+        fn_80125084(self->m194, 3);
+    if (self->m184 != 0)
+        fn_801251CC(self->m194, 2, 0x23F3, 4);
+    else
+        fn_80125084(self->m194, 2);
+}
+
 extern "C" FE_OVERLAY int fn_8045115C(FeW188* self)
 {
     self->m188->v50();
@@ -300,6 +342,21 @@ extern "C" FE_OVERLAY void fn_80451C78(void)
 {
     int z = 0;
     lbl_8062164C = z;
+}
+
+extern "C" FE_OVERLAY void fn_80451C88(int a)
+{
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "DAYSGAMES");
+    switch (a) {
+    case 0:
+        ((FeObj2*)p)->v67(2, 0);
+        break;
+    case 1:
+        ((FeObj2*)p)->v67(3, 0);
+        break;
+    case 2:
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80451D40(FeScr6* self)
