@@ -12,7 +12,11 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
   in the unit at 0x802AC8xx, so g++ emits the vtable there, as in retail.
 - If vtable slot +0xC (the dtor) points into 0x802ACxxx, declare no destructor:
   the implicit one is emitted with the vtable.
-- Constructor: `cX::cX() : Unk8037B3E8(lbl_name)` or `: Unk8037B3E8(hash)`.
+- Constructor: `cX::cX() : Unk80362C2C(lbl_name)` or `: Unk80362C2C(hash)`,
+  with `#include "game/chooser_base.h"`. Unk80362C2C is the chooser base
+  (dtor 0x80362C2C); Unk8037B3E8 is the root (dtor 0x8037B424). Deriving
+  choosers straight from the root gives the wrong dtor call (fixed
+  2026-10-11, work/false-matches).
   Lazily hashed statics: `if (!a || !b) { a = fn_80378568("x", len); ... }`.
 - Slot 5 (factory): `return new (lbl_806EF9B4) cX;`. `new` has no null check.
 - Slot 2 (attributes): `fn_8037B6B0(lbl_805DC394, &m8, "EnumA,EnumB")` for an

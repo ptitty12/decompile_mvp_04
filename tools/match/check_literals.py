@@ -146,6 +146,20 @@ def main():
                     n = len(s) + 1 if s and all(32 <= c < 127 or c in (9, 10, 13) for c in s) else 4
                 mine = data[start:start + n]
                 theirs = dol.read_addr(addr_of[gname] + g[2], n)
+                dr = ours.relocs(sym[4]).get(start) if n == 4 else None
+                if dr and dr[1] == 1 and theirs is not None:
+                    # The word is a pointer filled in by a relocation (e.g. const char* p = "x"):
+                    # its bytes in the .o are not the value. Compare what the two pointers
+                    # point to instead (the C string, or 4 bytes).
+                    tsym = ours.syms[dr[0]]
+                    tdata = ours.sec_bytes(tsym[4]) if 0 < tsym[4] < len(ours.secs) else None
+                    if tdata is not None:
+                        tstart = tsym[1] + dr[2]
+                        end = tdata.find(b"\0", tstart)
+                        s = tdata[tstart:end] if end >= 0 else b""
+                        m = len(s) + 1 if s and all(32 <= c < 127 or c in (9, 10, 13) for c in s) else 4
+                        mine = tdata[tstart:tstart + m]
+                        theirs = dol.read_addr(struct.unpack(">I", theirs)[0], m)
                 checked += 1
                 if theirs is not None and mine != theirs:
                     bad += 1
