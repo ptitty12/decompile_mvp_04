@@ -38,9 +38,16 @@ struct Unk80273498_Vec3 {
 
 /* Position holders reached through Unk8014D8AC_Ctx::m54C (+0xC -> object) and
  * m6CC (object), both read by fn_80273498 (tu_80272B20.cpp). */
+struct Unk80270BA0_X;
 struct Unk80273498_Pos {
     char pad0[0x60];
     Unk80273498_Vec3 m60;
+    char pad6C[0x374 - 0x6C];
+    Unk80270BA0_X* m374;
+    char pad378[0x38C - 0x378];
+    int m38C;
+    char pad390[0x3D0 - 0x390];
+    Unk80273498_Vec3 m3D0;
 };
 struct Unk80273498_Ref {
     char pad0[0xC];
@@ -104,6 +111,8 @@ struct Unk8027107C_Outer {
     Unk8027107C_Inner* m3A4;
     char pad3A8[0x3B0 - 0x3A8];
     int m3B0;
+    char pad3B4[8];
+    int m3BC;
 };
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out);

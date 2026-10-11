@@ -21,6 +21,7 @@ extern float lbl_8061E6A0;
 extern float lbl_8061E6A4;
 extern float lbl_8061E6A8;
 float fn_80411554(float x);
+float fn_80410CE8(float y, float x);
 
 inline Unk80273498_Vec3 GetPos(const Unk8037B128_Mtx* m)
 {
@@ -34,6 +35,33 @@ inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_V
     r.x = a.x - b.x;
     r.y = a.y - b.y;
     r.z = a.z - b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = 0.0f;
+    r.z = fn_80411554(angle);
     return r;
 }
 
@@ -246,6 +274,43 @@ Unk80273498_Vec3 Unk8027A84C::fn_8027AF54(unsigned int idx)
     return v;
 }
 
+void Unk8027A84C::fn_8027AFA8(Unk8014D8AC_Ctx* ctx, Unk80270BA0_X* x, int a)
+{
+    if (ctx->m6F4 != 1 && fn_8024D4C0(x) == 0) {
+        int p0 = fn_801BBC30(ctx->m700->m3BC);
+        int p1 = fn_8018AD2C(ctx->m6CC);
+        int p2 = fn_801BBEFC(ctx->m700->m3BC);
+        int kind = x->m458;
+
+        if (p0 != 0 || p1 == 0) {
+            if (x->mB3C & 0x10000000) {
+                fn_80249B40(x, 0.2f, 0, 0, 0);
+                fn_80249DF8(x, 0);
+            }
+        } else if (x->m450 == 0) {
+            fn_80249DF8(x, 1);
+            Unk80273498_Pos* t = ctx->m6CC;
+            if (t->m38C == 3 && t->m374 != x) {
+                Unk80273498_Vec3 v = t->m3D0;
+                fn_80249958(x, &v, 0, 0.2f);
+                return;
+            }
+            if (p2 == 0 && kind != 1 && kind != 0xE) {
+                Unk80273498_Vec3 w = lbl_806055AC;
+                w.y = 36.0f;
+                Unk80273498_Vec3 w2 = w;
+                fn_80249958(x, &w2, 0, 0.2f);
+                return;
+            }
+            float f = 0.2f;
+            if (t->m38C == 1 && kind != 1 && kind != 0xE) {
+                f = 0.001f;
+            }
+            fn_80249B08(x, a, f);
+        }
+    }
+}
+
 /* near-miss: loop body identical; retail keeps the result in a callee-saved register
  * (mr r3,r29) while mine threads the constant (li r3,1). */
 int Unk8027A84C::fn_8027B1A0(Unk80270BA0_X* x, const Unk80273498_Vec3* pos)
@@ -291,6 +356,30 @@ Unk80273498_Pos* Unk8027A84C::fn_8027B304(Unk80270BA0_X* p)
     return p->m44C->m6CC;
 }
 
+
+void Unk8027A84C::fn_8027B31C(int state, const Unk80273498_Vec3* pos, float angle, const Unk80273498_Vec3* target,
+                              int flag, float* out1, float* out2, Unk80273498_Vec3* outPos)
+{
+    if (out1 || out2 || outPos) {
+        float dist = flag ? 36.0f : 60.0f;
+        if (fn_8027B2F0(state)) {
+            dist = flag ? 60.0f : 96.0f;
+        }
+        Unk80273498_Vec3 p = *pos + Direction(angle) * dist;
+        if (outPos) {
+            *outPos = p;
+        }
+        if (out2 || out1) {
+            float a = fn_80410CE8(target->x - p.x, target->z - p.z);
+            if (out1) {
+                *out1 = a;
+            }
+            if (out2) {
+                *out2 = AngleDiff(a, angle);
+            }
+        }
+    }
+}
 
 /* near-miss: same instructions; stack slots differ (retail: Vec3 at sp+0x10, thresholds at
  * sp+0x20, d2 at sp+0x2c). 36 declaration-placement variants tried. */

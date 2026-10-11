@@ -80,6 +80,14 @@ Unk80273498_Vec3 fn_8018959C(float f, Unk8018959C_Obj* o);
 Unk80273498_Vec3 fn_80189618(float f, Unk8018959C_Obj* o);
 int fn_8024D41C(Unk80270BA0_X* x);
 int fn_80380964(Unk80271DBC_Link* link);
+int fn_801BBC30(int v);
+int fn_801BBEFC(int v);
+int fn_8018AD2C(Unk80273498_Pos* p);
+void fn_80249B40(Unk80270BA0_X* x, float f, int a, int b, int c);
+void fn_80249DF8(Unk80270BA0_X* x, int a);
+void fn_80249958(Unk80270BA0_X* x, Unk80273498_Vec3* v, int a, float f);
+void fn_80249B08(Unk80270BA0_X* x, int a, float f);
+extern const Unk80273498_Vec3 lbl_806055AC;
 extern int lbl_8061B9C8;
 int fn_80386110(Unk80271DBC_Link* link, Unk8027A9AC_Req* req, int a, int b, float* c, int flags);
 int fn_8038614C(Unk80271DBC_Link* link, Unk8027A9AC_Req* req, int a, int b, float* c, int d, int e, int f, int flags);
@@ -140,6 +148,9 @@ struct Unk8027A84C {
     int fn_8027BA64(float a, float b, float c);
     void fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_Vec3* outPos, float* outHeading,
                      float* outSpeed, int* outA, int* outB, int* outC);
+    void fn_8027AFA8(Unk8014D8AC_Ctx* ctx, Unk80270BA0_X* x, int a);
+    void fn_8027B31C(int state, const Unk80273498_Vec3* pos, float angle, const Unk80273498_Vec3* target, int flag,
+                     float* out1, float* out2, Unk80273498_Vec3* outPos);
     int fn_8027BB88(Unk80270BA0_X* x, Unk8027BBA8_Obj* o, int a, int b, int c);
     int fn_8027BBA8(Unk80270BA0_X* x, Unk8027BBA8_Obj* o, int a, int b, int c);
 };
