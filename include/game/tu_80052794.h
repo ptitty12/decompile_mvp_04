@@ -124,8 +124,14 @@ struct Unk80052794_Row {
     char padD78[0xEC];
 };
 
+struct Unk80052794_SC {
+    char pad0[0xC];
+    int mC;
+};
+
 struct Unk80052794_S6F8 {
-    char pad0[0x10];
+    char pad0[0xC];
+    Unk80052794_SC* mC;
     Unk80052794_S10* m10;
     Unk80052794_Row* m14;
 };
@@ -188,20 +194,28 @@ struct Unk80052794_S44C {
 struct Unk80052794_S130 {
     char pad0[0x44C];
     Unk80052794_S44C* m44C;
-    char pad450[0x2B8];
+    char pad450[0x2B4];
+    int m704;
     int m708;
 };
 
 /* Class with a vptr at +0x98 (fn_80052A34 and fn_800543B4 call virtual slots 24 and 4 through it). */
 struct Unk80052794_S3B0 : Unk80052794_B3B0 {
-    char pad9C[0x3C4];
+    char pad9C[0x3B0];
+    int m44C;
+    char pad450[0x10];
     int m460;
     char pad464[0x124];
     char m588;
     char pad589[0x7];
     unsigned m590;
-    char pad594[0x174];
+    char pad594[0x170];
+    int m704;
     int m708;
+    char pad70C[0x2F8];
+    int mA04;
+    char padA08[0x4];
+    char mA0C;
 };
 
 struct Unk80052794_Obj13C {
@@ -228,24 +242,33 @@ struct Unk80052794_Obj {
     int m50;
     char pad54[0xB0];
     int m104;
-    char pad108[0x8];
+    int m108;
+    char pad10C[0x4];
     int m110;
     char pad114[0x4];
     int m118;
-    char pad11C[0x14];
+    char pad11C[0x4];
+    int m120;
+    char pad124[0xC];
     Unk80052794_S130* m130;
     char pad134[0x8];
     Unk80052794_Obj13C m13C[5];
     char pad204[0x70];
     int m274;
-    char pad278[0x4];
+    int m278;
     int m27C;
-    char pad280[0x130];
+    char pad280[0x40];
+    int m2C0[2];
+    char pad2C8[0x20];
+    int m2E8[2];
+    int m2F0[2];
+    char pad2F8[0xB8];
     Unk80052794_S3B0* m3B0;
     int m3B4;
     char pad3B8[0xC];
     int m3C4;
-    char pad3C8[0x8];
+    char pad3C8[0x4];
+    int m3CC;
     int m3D0;
     char pad3D4[0x8];
     int m3DC;
@@ -669,5 +692,89 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj);
 void fn_80055F18(Unk80052794_Rec* r);
 
 extern const float lbl_805AB8A4;
+
+/* unit 0x8005D268: score functions (this, a, b, obj) -> float */
+extern const float lbl_805ADCE0;
+extern const float lbl_805ADCE4;
+extern const float lbl_805ADCE8;
+extern const float lbl_805ADCEC;
+extern const float lbl_805ADCF0;
+extern const float lbl_805ADCF4;
+extern const float lbl_805ADCF8;
+extern const float lbl_805ADCFC;
+extern const float lbl_805ADD00;
+extern const float lbl_805ADD04;
+extern const float lbl_805ADD08;
+extern const float lbl_805ADD0C;
+extern const float lbl_805ADD10;
+extern const float lbl_805ADD7C;
+extern const float lbl_805ADD80;
+extern const float lbl_805ADD84;
+extern const float lbl_805ADD88;
+extern const float lbl_805ADD8C;
+extern const float lbl_805ADD90;
+extern const float lbl_805ADD94;
+extern const float lbl_805ADD98;
+extern const float lbl_805ADD9C;
+extern const float lbl_805ADDA0;
+extern const float lbl_805ADDA4;
+extern const float lbl_805ADDA8;
+extern const float lbl_805ADDAC;
+extern const float lbl_805ADDB0;
+extern const float lbl_805ADDB4;
+extern const float lbl_805ADDB8;
+extern const float lbl_805ADDEC;
+extern const float lbl_805ADDF0;
+extern const float lbl_805ADDF4;
+extern const float lbl_805ADDF8;
+extern const float lbl_805ADDFC;
+extern const float lbl_805ADE00;
+extern const float lbl_805ADE18;
+extern const float lbl_805ADE1C;
+extern const float lbl_805ADE20;
+extern const float lbl_805ADE24;
+void* fn_80057074(Unk80057204_Mgr* m, int k);
+void* fn_800570D8(Unk80057204_Mgr* m, int k);
+unsigned fn_803440F0(void* p, int x);
+unsigned fn_80344138(void* p, int x);
+float fn_8005CE4C(Unk80057204_Mgr* self);
+float fn_8005D6A0(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj);
+float fn_8025454C(void* p, int idx);
+int fn_80045F28(float x);
+extern const float lbl_805ADD28;
+extern const float lbl_805ADD2C;
+extern const float lbl_805ADD30;
+extern const float lbl_805ADD34;
+extern const float lbl_805ADD48;
+extern const float lbl_805ADD4C;
+extern const float lbl_805ADD50;
+extern const float lbl_805ADD54;
+extern const float lbl_805ADD68;
+extern const float lbl_805ADD6C;
+extern const float lbl_805ADD70;
+extern const float lbl_805ADD74;
+extern const float lbl_805ADD78;
+
+int fn_8005CDC4(Unk80057204_Mgr* self, Unk80052794_Obj* obj);
+Unk80052794_S3B0* fn_801A4B7C(Unk80052794_S44C* a, int b, int c);
+float fn_8024F20C(void* p, int a, int b, int c, int d);
+float fn_8024F048(void* p, int a, int b, int c, int d);
+int fn_8008838C(int p, int a, int b);
+int fn_80088F84(int p, int i);
+int fn_80088FFC(int p, int i);
+int fn_80044D90(int a, unsigned char b);
+void fn_8001CEA8(Unk80052794_Obj* obj, void* a, void* b);
+extern const float lbl_805ADDBC;
+extern const float lbl_805ADDC0;
+extern const float lbl_805ADDC4;
+extern const float lbl_805ADDD0;
+extern const float lbl_805ADDD4;
+extern const float lbl_805ADDD8;
+extern const float lbl_805ADDE8;
+extern const float lbl_805ADE04;
+extern const float lbl_805ADE08;
+extern const float lbl_805ADE0C;
+extern const float lbl_805ADE10;
+extern const float lbl_805ADE14;
 
 #endif
