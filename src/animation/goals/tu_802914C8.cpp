@@ -26,6 +26,98 @@ int Unk802914C8_Goal::fn_802931B0(Unk80270BA0_X* x)
     return fn_802931D0(x);
 }
 
+/* near-miss, about 97% (339 vs 339 instructions, 9 differ): everything but two
+ * spots matches. Retail tests `3 > mC` as `li r9,3; cmpw r9,r0; ble` (constant
+ * kept in a register) where mine gives `cmpwi r0,2; bgt` (about 10 spellings
+ * tried), and the final `mC = 4` picks r0/r9 the other way round. Needed here:
+ * LengthR (reference param), `hashB = link->m838; int h = hashB;`, and a
+ * second inline level in SetPairF (parameter slots 8 bytes apart). 8 attempts. */
+int Unk802914C8_Goal::fn_802931D0(Unk80270BA0_X* x)
+{
+    Unk80271DBC_Link* link = x->m618;
+    if (mC <= 2) {
+        fn_80380964(link);
+    }
+    Vec3 pos;
+    float heading;
+    int hashB;
+    fn_8027AD3C(x, 0, &pos, &heading, 0, 0, &hashB, 0);
+    float f24 = fn_80249298(x, fn_8029771C(), 0);
+    float f28 = fn_802958F4(x, 0, -1.0f);
+    Vec3 d = VSub(fn_80297614(), pos);
+    float dist = LengthR(d);
+    float ang = fn_80410CE8(d.x, d.z);
+    float f68 = fn_802963C4(x, 0, ang);
+    if (!fn_8026D9D0(x, 0) && !fn_8026D890(x, 0) && !fn_8026D940(x, 0) && !(dist >= f24)) {
+        if (fn_8029543C(x)) {
+            return 2;
+        }
+        return 1;
+    }
+    if (mC <= 1) {
+        if (fn_802908FC(x)) {
+            return 1;
+        }
+        int r = fn_80290274(m4C, x, 0);
+        if (r == 2) {
+            m50 = r;
+            return 1;
+        }
+    }
+    int z = fn_80290B78(x);
+    if (z != 0) {
+        return 1;
+    }
+    int k = fn_80296998(m4C, hashB);
+    float res = -1.0f;
+    if (mC <= 2) {
+        float v1 = fn_802962D0(x, 0);
+        res = fn_80296030(x, heading, v1, f68, ang, f28, -1.0f);
+    }
+    fn_80381E9C(link, k, 0, 0);
+    hashB = link->m838;
+    int h = hashB;
+    if (h != k) {
+        if (h == (int)0xECC40882 || h == (int)0x858075AA || h == 0x3453C76B || h == 0x44D39191
+            || h == (int)0xA713FF5B || h == (int)0xCA0C5FC1) {
+            if (mC <= 2) {
+                SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, res);
+            }
+            if (mC < 3) {
+                mC = 3;
+            }
+        } else if (h == 0x193EE819) {
+            SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, -1.0f);
+        }
+        return 1;
+    }
+    m50 = z;
+    if (mC <= 3) {
+        int r = fn_80290274(m4C, x, 0);
+        m50 = r;
+        if (r == 1 || r == 4) {
+            mC = z;
+            return 1;
+        }
+    }
+    if (mC > 3 && m88 != 0.0f) {
+    } else {
+        Vec3 v;
+        float outF = 0.0f;
+        fn_8027A9AC(x, k, lbl_806242B4, &outF, (int)&v, 0, 0);
+        v.y = 0.0f;
+        m88 = LengthR(v) / outF;
+    }
+    Unk802914C8_Angles* a = (Unk802914C8_Angles*)((char*)x + 0x734);
+    float q = f28 / m88;
+    SetPairF(a, 0x48, q);
+    SetPairF(a, 0x8, f28);
+    fn_80244858(x, ang);
+    SetPairF(a, 0, 0.0f);
+    mC = 4;
+    return 1;
+}
+
 float Unk802914C8_Goal::fn_8029589C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
 {
     float r = -1.0f;
@@ -89,6 +181,43 @@ int Unk802914C8_Goal::fn_80295F90(Unk80270BA0_X* x, float t)
     return r;
 }
 
+/* near-miss, about 87% (169 vs 168 instructions): slots match (SetPairF with two
+ * inline levels, AngleDiff computed into `ad` before the call) but the scheduler
+ * puts the `stfs` of each pair's parameter copy before the preceding `stwx`
+ * (retail after it), and the final clamp keeps its result in a separate float
+ * register (retail clamps res in place in f0). 8 attempts. */
+float Unk802914C8_Goal::fn_80296030(Unk80270BA0_X* x, float f1, float f2, float f3, float f4, float f5, float f6)
+{
+    Unk802914C8_Angles* a = (Unk802914C8_Angles*)((char*)x + 0x734);
+    int ret = fn_8027BA64(f1, f4, f3);
+    SetPairI(a, 0x158, ret);
+    SetPairF(a, 0x10, f2);
+    SetPairF(a, 0x140, f2);
+    int r2 = fn_80295F90(x, f5);
+    SetPairI(a, 0x18, r2);
+    SetPairF(a, 0x8, f5);
+    float ad = AngleDiff(f3, f4);
+    SetPairF(a, 0x100, ad);
+    float res = -1.0f;
+    if (f18C.f12) {
+        Unk802914C8_X* v = (Unk802914C8_X*)x;
+        float lo = (v->m720 + v->m724) * 0.5f;
+        float hi = v->m728;
+        res = 1.0f;
+        float q = f5 / lo;
+        if (q < 1.0f) {
+            res = q;
+        } else {
+            float q2 = f5 / hi;
+            if (!(q2 <= 1.0f)) {
+                res = q2;
+            }
+        }
+        res = !(res > 2.0f) ? (!(res >= 0.5f) ? 0.5f : res) : 2.0f;
+    }
+    return res;
+}
+
 float Unk802914C8_Goal::fn_802962D0(Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
 {
     Vec3 pos;
@@ -149,6 +278,53 @@ float Unk802914C8_Goal::fn_80296624(float v)
     }
     t = t * sign;
     return t;
+}
+
+/* near-miss, about 84% (150 vs 146 instructions): control flow, constants and
+ * stack slots of the scalars match. Retail copies the by-value operands
+ * (x->m60 via Flatten, this+0x10) into sp-relative temps with direct stores;
+ * mine goes through a pointer for the destination, as in fn_80286E70 of
+ * tu_80283934.cpp. 8 attempts. */
+float Unk802914C8_Goal::fn_802966DC(Unk80270BA0_X* x)
+{
+    Unk802914C8_X* v = (Unk802914C8_X*)x;
+    float r = 0.7853982f;
+    if (fn_8027B2CC(x)) {
+        r = 2.3561947f;
+        return r;
+    }
+    Unk8027A84C_Owner* o = m48->m44;
+    Unk802914C8_Goal* s = 0;
+    if (o->m10 == 10) {
+        s = (Unk802914C8_Goal*)o->m18;
+    }
+    if (s != 0) {
+        switch (s->m4C) {
+        case 2:
+        case 0x16:
+        case 0x17:
+            r = 1.3962636f;
+        }
+    }
+    o = m48->m44;
+    Unk802914C8_Goal* g6 = 0;
+    if (o->m10 == 6) {
+        g6 = (Unk802914C8_Goal*)o->m18;
+    }
+    if (g6 != 0 && f18C.f12 && m28 != 0) {
+        Vec3 pp = Flatten(x->m60);
+        float t = (float)x->m44C->m4C * 0.016666668f;
+        float rem = m74 - t;
+        if (!(rem <= 0.5f)) {
+            float dist = Length(VSubV(fn_Pos10(), pp));
+            float sp = dist / rem;
+            float lim = (v->m728 + v->m72C) * 0.5f;
+            if (!(sp <= lim)) {
+                r = 1.3962636f;
+            }
+        }
+    }
+    return r;
 }
 
 void Unk802914C8_Goal::fn_80296924(Unk80270BA0_X* x)
