@@ -32,4 +32,12 @@ struct Unk801B23A8_Q {
     int m708;
 };
 
+/* Controller seen through its slot table: m8 owner, 2 x 9 pointers at +0x14. */
+struct Unk801B23A8_V {
+    char pad0[8];
+    Unk8019F8C0_Owner* m8;
+    char padC[8];
+    Unk801B23A8_Q* m14[2][9];
+};
+
 #endif

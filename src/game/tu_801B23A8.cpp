@@ -20,6 +20,12 @@ int fn_800974B8(Unk8019F8C0_Inner* t, int v);
 int fn_80097450(Unk8019F8C0_Inner* t, int v);
 void fn_8017D640(void* a, int b, Unk801B23A8_Q* c, int d, int e);
 extern float lbl_805CF740;
+void fn_8017DD80(void* a, int x, Unk801B23A8_Q** b, Unk801B23A8_Q** c);
+Unk801B23A8_Q* fn_801B2DC4(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q);
+Unk801B23A8_Q* fn_801B2E10(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int d);
+Unk801B23A8_Q* fn_801B2C5C(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int e);
+Unk801B23A8_Q* fn_801B4368(Unk801B23A8_V* p, int team, int idx);
+void fn_801AE180(void* a, int b, int c, void* d);
 
 struct Unk801B2470_T {
     char pad0[0x5C];
@@ -84,6 +90,55 @@ int fn_801B2D48(int a, int b, int c, int d)
         return d;
     }
     return c;
+}
+
+Unk801B23A8_Q* fn_801B2D5C(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    Unk801B23A8_Q* a;
+    Unk801B23A8_Q* b;
+    fn_8017DD80(p->m4, q->m708, &a, &b);
+    Unk801B23A8_Q* r = a;
+    if (r == 0 && b == 0) {
+        return 0;
+    }
+    if (q == r) {
+        r = b;
+    }
+    return r;
+}
+
+Unk801B23A8_Q* fn_801B2DC4(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q)
+{
+    int x = p->m4C8;
+    Unk801B23A8_Q* r = 0;
+    int y = q->m4C8;
+    if (x != y) {
+        if (x == 0x13 || y == 0x13) {
+            r = q;
+            if (x == 0x13) {
+                r = p;
+            }
+        } else if (x == 0x12 || y == 0x12) {
+            r = q;
+        }
+    }
+    return r;
+}
+
+Unk801B23A8_Q* fn_801B2F2C(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int d, int e)
+{
+    Unk801B23A8_Q* r = fn_801B2DC4(a, p, q);
+    if (r == 0) {
+        if (d != 2) {
+            r = fn_801B2E10(a, p, q, d);
+        } else {
+            r = fn_801B2C5C(a, p, q, e);
+        }
+        if (r == 0) {
+            r = q;
+        }
+    }
+    return r;
 }
 
 float fn_801B3430(void* a, Unk801B23A8_Q* q)
@@ -174,6 +229,49 @@ int fn_801B4144(Unk801AB63C_P* a, Unk801B23A8_Q* q)
         r = 0;
     }
     return r;
+}
+
+void fn_801B4300(Unk801B23A8_V* p)
+{
+    for (int t = 0; t < 2; t++) {
+        Unk8019F8C0_Inner* e = &p->m8->m6F8->m14[t];
+        for (unsigned i = 0; i < e->m168.m4; i++) {
+            p->m14[t][i] = 0;
+        }
+    }
+}
+
+/* near-miss: retail loads p->m8 before copying team to r0 and compares the original register (r4);
+ * mine copies first and compares r0 (5 slots differ). Same team-resolve snippet as fn_801A2034. */
+Unk801B23A8_Q* fn_801B4368(Unk801B23A8_V* p, int team, int idx)
+{
+    Unk8019F8C0_Owner* o = p->m8;
+    int t = team;
+    if (team > 2) {
+        int f = 0;
+        if (o->m6F8->m14[2].m8 != 0) {
+            f = 1;
+        }
+        t = f;
+        if (team != 3) {
+            t ^= 1;
+        }
+    }
+    return p->m14[t][idx];
+}
+
+int fn_801B454C(Unk801B23A8_V* p, Unk801B23A8_Q* q)
+{
+    if (q) {
+        int t = q->m708;
+        Unk8019F8C0_Inner* e = &p->m8->m6F8->m14[t];
+        for (unsigned i = 0; i < e->m168.m4; i++) {
+            if (fn_801B4368(p, t, i) == q) {
+                return i;
+            }
+        }
+    }
+    return 0xFF;
 }
 
 void fn_801B45D8(Unk801AB63C_P* p, int a, Unk801B23A8_Q* c)
