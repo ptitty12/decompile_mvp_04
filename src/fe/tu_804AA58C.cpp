@@ -7,6 +7,14 @@
 
 extern "C" {
 
+FE_OVERLAY void fn_804AAA9C(void* x, int a)
+{
+    if (a == FeI(x, 0x140)) {
+        fn_804AB774(x);
+        fn_804AB860(x);
+    }
+}
+
 FE_OVERLAY int fn_804AABD8(void* x)
 {
     FeMem(x, 0x140)->fn_vslot50();
