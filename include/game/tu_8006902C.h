@@ -125,7 +125,9 @@ struct Unk8006902C_Entry {
 struct Unk8006902C_Rec {
     char pad0[0xA];
     unsigned char mA;
-    char padB[0x34 - 0xB];
+    char padB;
+    unsigned char mC[10];
+    char pad16[0x34 - 0x16];
 };
 
 struct Unk8006902C_Side {
@@ -231,6 +233,7 @@ struct Unk80069F0C {
     void fn_8006C038(void* a);
     void fn_8006C698();
     void fn_8006C75C(Unk8006902C_Ev75C* ev);
+    void fn_8006C810(Unk8006902C_Ev75C* ev);
     void fn_8006C7E8(int a);
 };
 

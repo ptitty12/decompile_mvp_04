@@ -368,6 +368,35 @@ void Unk80069F0C::fn_8006C7E8(int a)
     fn_80089108(mC->mC, a);
 }
 
+void Unk80069F0C::fn_8006C810(Unk8006902C_Ev75C* ev)
+{
+    fn_80081CCC(m14.m0, 0);
+    fn_80081CCC(m14.m0, 1);
+    fn_80081CCC(m14.m0, 2);
+    Unk8006902C_Players* p = m14.m0;
+    int si = p->m1CD0 == 0;
+    Unk8006A138_It<9> it(0);
+    Unk8006902C_Side* sd = &p->s[si];
+    int j = 0;
+    while (j <= 9) {
+        int k = sd->m17C[j];
+        if (k != 0xFF)
+            sd->m3E8[k].mC[j]++;
+        j = it.Next();
+    }
+    int r = fn_8006BE18();
+    if (r == 0) {
+        fn_80081D70(m14.m0);
+        m14.m0->m1CC9 = r;
+        int t = m14.m0->m1CD0 == 0;
+        if (t == 1) {
+            fn_8037893C(ev->m8, 0x35, 0, 0, 0);
+            m14.m0->m1CD0 = t;
+        } else
+            m14.m0->m1CD0 = r;
+    }
+}
+
 void Unk80069F0C::fn_8006C930()
 {
     if (fn_8006BE18() == 0)
