@@ -47,6 +47,37 @@ Unk8005BA1C_Voice::~Unk8005BA1C_Voice()
     fn_8005A19C(this);
 }
 
+void fn_80058060(Unk80057204_Mgr* m, int a)
+{
+    unsigned short n = m->mC0;
+    for (unsigned i = 0; i < n; i++) {
+        m->mF4[i]->v3(a);
+    }
+}
+
+Unk800580D4_Rec fn_800580D4(void* self, int kind)
+{
+    Unk800580D4_Rec e;
+    Unk8005C97C_Sub t = lbl_806875B4;
+    float f = lbl_805ADC2C;
+    e.m0 = f;
+    e.m4 = t;
+    switch (kind) {
+    case 0x38:
+        e.m0 = lbl_805ADC2C;
+        return e;
+    case 0x36:
+        e.m0 = lbl_805ADC2C;
+        return e;
+    case 0x37:
+        e.m0 = lbl_805ADC2C;
+        return e;
+    default:
+        e.m0 = lbl_805ADC2C;
+        return e;
+    }
+}
+
 int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
 {
     int ok = 0;
@@ -56,8 +87,8 @@ int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
         if (a == 0) {
             v->m0 = fn_803AA934(&v->m50, v->m10, v->mC, v->m4, v->m8);
         } else {
-            int cnt = 0;
             int sum = 0;
+            int cnt = 0;
             for (int i = 0; i < 4; i++) {
                 if (lbl_805AE420[ch].e[i].m24 == 1) {
                     cnt++;

@@ -658,6 +658,12 @@ struct Unk80056A08_Ring {
     Unk80056970_Entry* mC;
     virtual ~Unk80056A08_Ring();
 };
+class Unk80058060_Node {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(int a);
+};
 struct Unk80057204_Mgr {
     char pad0[0xB4];
     unsigned* mB4;
@@ -665,7 +671,7 @@ struct Unk80057204_Mgr {
     int* mBC;
     unsigned short mC0;
     char padC2[0xF4 - 0xC2];
-    void** mF4;
+    Unk80058060_Node** mF4;
     char padF8[8];
     int m100;
 };
@@ -1124,4 +1130,13 @@ void fn_8005A240(Unk8005BA1C_Voice* v);
 
 void fn_80392AA4(int h);
 void fn_80392A28(int h);
+struct Unk800580D4_Rec {
+    float m0;
+    Unk8005C97C_Sub m4;
+};
+extern const float lbl_805ADC2C;
+Unk800580D4_Rec fn_800580D4(void* self, int kind);
+
+void fn_80058060(Unk80057204_Mgr* m, int a);
+
 #endif
