@@ -69,6 +69,8 @@ struct Unk8027107C_Inner {
 struct Unk8027107C_Outer {
     char pad0[0x3A4];
     Unk8027107C_Inner* m3A4;
+    char pad3A8[0x3B0 - 0x3A8];
+    int m3B0;
 };
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out);
@@ -109,9 +111,16 @@ public:
 /* Object returned by Unk80270BA0_Obj::fn_vslot1() (a player?).
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
+struct Unk80271DBC_Link {
+    char pad0[0x880];
+    Unk8014D8AC_Ctx* m880;
+};
+
 class Unk80270BA0_X : public Unk80270BA0_XMid, public Unk80270BA0_Obj {
 public:
-    char pad5F4[0x708 - 0x5F4];
+    char pad5F4[0x618 - 0x5F4];
+    Unk80271DBC_Link* m618;
+    char pad61C[0x708 - 0x61C];
     int m708;
     char pad70C[0xB4C - 0x70C];
     int mB4C;
@@ -119,6 +128,9 @@ public:
 };
 
 int fn_8025416C(void* p, int n);
+int fn_8024DCFC(int a);
+int fn_8024D4C0(Unk80270BA0_X* x);
+int fn_8022E998(int a);
 
 /* Container embedded in event/hand/pitch choosers at +8 (ctor 0x80384F28,
  * dtor 0x8038501C). Size 0x10. */
