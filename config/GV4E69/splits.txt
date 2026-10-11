@@ -81,6 +81,11 @@ animation/goals/tu_8027FD64.cpp:
 	.rodata     start:0x805DD24C end:0x805DD3F4
 	.data       start:0x8061E6D0 end:0x8061E6D4
 
+animation/goals/tu_80283934.cpp:
+	.text       start:0x80283934 end:0x80287600
+	.rodata     start:0x805DD3F4 end:0x805DD54C
+	.data       start:0x8061E6D4 end:0x8061E700
+
 animation/warps/tu_802A3704.cpp:
 	.text       start:0x802A3704 end:0x802A4584
 	.rodata     start:0x805DE11C end:0x805DE2F8
