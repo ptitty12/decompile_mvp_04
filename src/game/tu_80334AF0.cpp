@@ -16,6 +16,33 @@ UnkC128* fn_803349B8(Menu* p);
 }
 
 struct V2F { float x; float y; };
+/* Menu object whose vptr (+0x2DC) is dispatched virtually: slot 6 is the key handler
+ * (fn_80330BC8 in the base vtable lbl_80666A18). */
+class MenuVT {
+public:
+    char pad0[0x2DC];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual void s6(int k);
+};
+/* Wrapper that embeds a menu at +0x24 and a screen vptr at +0x18. Evidence: fn_80335604
+ * (ctor), fn_803356D4 (key handler). */
+struct Wrap { char pad0[0x18]; const void* m18; char pad1C[8]; Menu sub; int m304; int m308; };
+extern "C" {
+void* fn_80328234(void* p, int a, int b);
+void fn_80330B48(int a);
+void fn_80331234(void* m);
+void fn_80331294(void* m);
+}
+extern MenuVT* lbl_80620410;
+struct Unk200 { char pad0[0x200]; int m200; };
+extern Unk200* lbl_80620410b;
+extern "C" { void fn_802D7ACC(); void fn_802D7ADC(); }
+extern int lbl_80620414, lbl_806204E4, lbl_8061B9BC;
+extern const char lbl_80665E78[], lbl_80665EC8[];
 struct Unk80084910_N;
 void fn_800860E0(Unk80084910_N* o, char* buf);
 void fn_80086140(Unk80084910_N* o, char* buf);
@@ -118,6 +145,59 @@ void fn_80335434(Menu* p)
     {
         float b = (float)GetV2(IAt(p, 0x7E8)) * 0.01f;
         c->m8 = b;
+    }
+}
+
+Wrap* fn_80335604(Wrap* p, int a, int b)
+{
+    fn_80328234(p, 12, 0);
+    Menu* sub = &p->sub;
+    MenuInit(sub, 0);
+    p->sub.m2DC = lbl_80665E78;
+    p->m18 = lbl_80665EC8;
+    p->m308 = b;
+    if (lbl_8061B9BC == 0)
+        lbl_806204E4 = lbl_8061B9BC;
+    p->m304 = a;
+    fn_80330B48(a);
+    if (p->m308) {
+        fn_80331234(sub);
+        int m = -1;
+        lbl_80620418 = m;
+    }
+    return p;
+}
+
+void fn_803356D4(Wrap* p, int ev)
+{
+    UnkGm* g = lbl_8061B8C0;
+    switch (ev) {
+    case 10: {
+        Unk200* cur = lbl_80620410b;
+        if (cur->m200)
+            fn_80330B48(cur->m200);
+        break;
+    }
+    case 11: {
+        int z = p->m308;
+        if (z == 0) {
+            fn_80330B48(p->m304);
+            if (lbl_80620414) {
+                fn_80331294(&p->sub);
+                g->m24 = z;
+                fn_802D7ACC();
+            } else {
+                fn_80331234(&p->sub);
+                g->m24 = 1;
+                fn_802D7ADC();
+            }
+        }
+        break;
+    }
+    default:
+        if (lbl_80620414)
+            lbl_80620410->s6(ev);
+        break;
     }
 }
 
