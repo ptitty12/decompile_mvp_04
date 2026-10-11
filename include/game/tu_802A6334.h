@@ -8,7 +8,7 @@
 #ifndef GAME_TU_802A6334_H
 #define GAME_TU_802A6334_H
 
-#include "game/chooser.h"
+#include "game/events.h"
 
 /* One node of the pool's lists (0x10 bytes, ctor inline; the four stores in
  * fn_802A64E8, fn_802A65E4 and fn_802A66A0 are its constructor/Clear).
@@ -55,14 +55,6 @@ public:
     Unk802A6334_Node* mC;
     Unk802A6334_Node* m10;
     Unk802A6334_Node* m14;
-};
-
-/* Mid class of the event classes (dtor 0x8038B7E4, vtable 0x806850A0, no data;
- * every static local of fn_802A70F8 derives from it, and their inlined dtors
- * leave only this class's vptr store before the root's dtor call). */
-class Unk8038B7E4 : public Unk8037B3E8 {
-public:
-    Unk8038B7E4(unsigned int hash) : Unk8037B3E8(hash) {}
 };
 
 #endif /* GAME_TU_802A6334_H */
