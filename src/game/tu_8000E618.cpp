@@ -13,10 +13,14 @@
  * built by fn_8000E788 = __static_initialization_and_destruction_0) that nothing
  * outside this unit reads.
  *
- * Only 0x805A430C-0x805A4360 of the .rodata range above is this unit's: the
- * string "virtual memory", 0.0f, 1.0f, the four corner points and the centre
- * point. From 0x805A4360 on is a string pool ("soa allocator NEW", source file
- * paths) that belongs to later code.
+ * The .rodata range above is only partly reproduced: the string "virtual
+ * memory", 0.0f, 1.0f, the four corner points and the centre point (up to
+ * 0x805A4360) are. The remaining 0x624 bytes (0x805A4360-0x805A4984: "soa
+ * allocator NEW", geomlib header paths, event class names such as
+ * "cSwingContactPhase", ...) are unreferenced string literals that retail
+ * pools after the table; tu_8000D650.cpp has a 0x23C-byte prefix of the same
+ * pool. They look like the strings of inline functions in headers this TU
+ * includes (expanded, never emitted), so they are left out here.
  */
 #include "game/tu_8000E618.h"
 
