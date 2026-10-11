@@ -198,6 +198,7 @@ extern "C" {
 void fn_80539C44(Db8053967C_List* l, int e);
 int fn_8053CA58(Db8053967C_Idx* x);
 int fn_8053CA8C(Db8053967C_Idx* x, int i);
+unsigned char fn_8053CAD4(Db8053967C_Idx* x, int i);
 unsigned fn_8053B6CC(Db8053967C_Rost* r, int id);
 unsigned char fn_8053B210(Db8053967C_Rost* r, int id);
 int fn_8053BA1C(Db8053967C_Rost* r, int h);
