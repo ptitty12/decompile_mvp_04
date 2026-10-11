@@ -444,8 +444,7 @@ struct Unk805352B0_List {
 struct Unk80534EA0_T {
     char m0[0x55F0];
     char m55F0[0x6D60];
-    int mC350[0x340 / 4];
-    char padC690[0xE290 - 0xC350 - 0x340];
+    int mC350[0x7D0];
     unsigned mE290;
 };
 

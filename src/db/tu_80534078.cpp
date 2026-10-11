@@ -24,7 +24,7 @@ extern int lbl_80622A48;
 extern "C" void fn_802B8E1C();
 extern "C" void fn_802B8E84();
 extern Unk8007A4DC_Screen* lbl_8061930C;
-extern "C" void fn_8053502C(Unk80534598_T* self, int a);
+extern "C" void fn_8053502C(Unk80534EA0_T* self, const char* path);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern "C" char* fn_8040B830(char* dst, const char* src, int n);
 extern "C" int fn_8040B6A0(const char* s);
@@ -340,9 +340,9 @@ extern "C" DB_OVERLAY void fn_80534C7C(Unk80534BAC_T* self, const char* path)
     fn_802B961C(buf, 14);
 }
 
-extern "C" DB_OVERLAY void fn_80534E80(Unk80534598_T* self, int a)
+extern "C" DB_OVERLAY void fn_80534E80(Unk80534EA0_T* self, const char* path)
 {
-    fn_8053502C(self, a);
+    fn_8053502C(self, path);
 }
 
 extern "C" DB_OVERLAY void fn_80534EA0(Unk80534EA0_T* self, char* dstA, unsigned nA, char* dstB, unsigned nB)
@@ -370,6 +370,65 @@ extern "C" DB_OVERLAY void fn_80534F64(Unk80534EA0_T* self, char* dstA, unsigned
     } else {
         fn_8040B61C(dstB, src);
     }
+}
+
+extern "C" DB_OVERLAY void fn_8053502C(Unk80534EA0_T* self, const char* path)
+{
+    unsigned n = 0;
+    char* buf = fn_802B9300(path, 0, 6, &n);
+    char* end = buf + n;
+    self->mE290 = 0;
+    if (buf != 0 && (int)n > 0) {
+        char* p = buf;
+        while (*p != 10 && p < end)
+            p++;
+        p++;
+        if (p < end) {
+            do {
+                char c = *p;
+                while (!((unsigned)(c - 0x61) <= 0x19 || (unsigned)(c - 0x41) <= 0x19))
+                    c = *++p;
+                char* q = p;
+                while (c != 0x2C && p < end)
+                    c = *++p;
+                int len1 = p - q;
+                c = *++p;
+                char* q2 = p;
+                while (c != 0x2C && p < end)
+                    c = *++p;
+                int len2 = p - q2;
+                p++;
+                int v = fn_80409DAC(p);
+                while (p < end && *p != 10)
+                    p++;
+                p++;
+                if (len1 <= 10) {
+                    fn_8040B830(self->m0 + self->mE290 * 11, q, len1);
+                    self->m0[len1 + self->mE290 * 11] = 0;
+                } else {
+                    fn_8040B830(self->m0 + self->mE290 * 11, q, 10);
+                    int o = self->mE290 * 11;
+                    char* nb = self->m0 + 10;
+                    nb[o] = 0;
+                }
+                if (len2 <= 13) {
+                    fn_8040B830(self->m55F0 + self->mE290 * 14, q2, len2);
+                    self->m55F0[len2 + self->mE290 * 14] = 0;
+                } else {
+                    fn_8040B830(self->m55F0 + self->mE290 * 14, q2, 13);
+                    int o = self->mE290 * 14;
+                    char* nb = self->m55F0 + 13;
+                    nb[o] = 0;
+                }
+                if (v != 0)
+                    self->mC350[self->mE290] = 1;
+                else
+                    self->mC350[self->mE290] = v;
+                self->mE290++;
+            } while (self->mE290 <= 0x7CF && p < end);
+        }
+    }
+    fn_802B961C(buf, 6);
 }
 
 extern "C" DB_OVERLAY void fn_805352B0(Unk805352B0_List* self)
