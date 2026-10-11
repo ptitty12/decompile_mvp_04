@@ -4,6 +4,13 @@
  */
 #include "game/tu_800BCD38.h"
 
+extern "C" void fn_80317120(int a, int b);
+
+inline int AbsI(int x)
+{
+    return x < 0 ? -x : x;
+}
+
 extern char lbl_80687A68[0x64];
 extern char lbl_80687ACC[0x64];
 extern char lbl_80687B30[0x64];
@@ -51,6 +58,88 @@ extern "C" float fn_800CB760(Unk800CB3A8_Grid* g, int row, int col)
     return g->fn_vslot73(row, col)->fn_vslot19();
 }
 
+extern "C" void fn_800CB7D8(Unk800CB3A8_Grid* g, int back)
+{
+    int step = 1;
+    int last = g->m50 - 1;
+    int old = g->m68;
+    int first = g->m60;
+    if (back != 0)
+        step = -1;
+    for (; first < g->m50 - 1; first++) {
+        if (g->fn_vslot123(first, g->m6C))
+            break;
+    }
+    for (; last > g->m60; last--) {
+        if (g->fn_vslot123(last, g->m6C))
+            break;
+    }
+    while (1) {
+        int v = g->m68 + step;
+        g->m68 = v;
+        if (v < g->m60) {
+            if (g->b80_0)
+                v = g->m50 - 1;
+            else
+                v = first;
+            g->m68 = v;
+        } else if (v >= g->m50) {
+            int w = last;
+            if (g->b80_0)
+                w = g->m60;
+            g->m68 = w;
+        }
+        if (g->m68 == old)
+            break;
+        if (g->m68 < g->m60)
+            continue;
+        if (g->fn_vslot123(g->m68, g->m6C))
+            break;
+    }
+    g->mF4->fn_vslot69(g);
+}
+
+extern "C" void fn_800CB954(Unk800CB3A8_Grid* g, int back)
+{
+    int step = 1;
+    int last = g->m54 - 1;
+    int old = g->m6C;
+    int first = g->m64;
+    if (back != 0)
+        step = -1;
+    for (; first < g->m54 - 1; first++) {
+        if (g->fn_vslot123(g->m68, first))
+            break;
+    }
+    for (; last > g->m64; last--) {
+        if (g->fn_vslot123(g->m68, last))
+            break;
+    }
+    while (1) {
+        int v = g->m6C + step;
+        g->m6C = v;
+        if (v < g->m64) {
+            if (g->b80_1)
+                v = g->m54 - 1;
+            else
+                v = first;
+            g->m6C = v;
+        } else if (v >= g->m54) {
+            int w = last;
+            if (g->b80_1)
+                w = g->m64;
+            g->m6C = w;
+        }
+        if (g->m6C == old)
+            break;
+        if (g->m6C < g->m64)
+            continue;
+        if (g->fn_vslot123(g->m68, g->m6C))
+            break;
+    }
+    g->mF4->fn_vslot69(g);
+}
+
 extern "C" void fn_800CBCE4(Unk800CB3A8_Grid* g, int a, int* arr, int c, int start, int end)
 {
     int last;
@@ -93,6 +182,65 @@ extern "C" void fn_800CBFE8(Unk800CB3A8_Grid* g, int a, int* arr, int c, int sta
         last = end;
     for (int i = start; i <= last; i++)
         g->fn_vslot43(a, i, arr[i - start], c);
+}
+
+extern "C" void fn_800CC08C(Unk800CB3A8_Grid* g, int row, int col, const char* str, int kind)
+{
+    if (g->b80_2) {
+        fn_804031BC(g->m90 + (row * g->m54 + col) * g->m44 * 2, str);
+    } else {
+        Unk800CC08C_W* w = (Unk800CC08C_W*)g->fn_vslot73(row, col);
+        switch (kind) {
+        case 2:
+            ((Unk800C1BE4_Widget*)fn_800C8038(w->fn_vslot33(2, 1)))->fn_vslot28(str, 1);
+            break;
+        case 4:
+            ((Unk800CC208_Sub*)fn_800C8040(w->fn_vslot33(4, 1)))->fn_vslot30(str);
+            break;
+        case 5:
+            ((Unk800CC208_Sub*)fn_800C8048(w->fn_vslot33(5, 1)))->fn_vslot30(str);
+            break;
+        }
+    }
+}
+
+extern "C" void fn_800CC208(Unk800CB3A8_Grid* g, int row, int col, const char* str, const char* extra)
+{
+    if (g->b80_2) {
+        fn_804031BC(g->m90 + (row * g->m54 + col) * g->m44 * 2, str);
+    } else {
+        Unk800C7B40_Widget* w = g->fn_vslot73(row, col);
+        ((Unk800CC208_Sub*)fn_800C8040(w->fn_vslot32(extra, 1)))->fn_vslot30(str);
+    }
+}
+
+extern "C" void fn_80403144(char* dst, const char* src);
+
+extern "C" void fn_800CC2D0(Unk800CB3A8_Grid* g, int row, int col, int id, const char* extra)
+{
+    if (g->b80_2) {
+        char* dst = g->m90 + (row * g->m54 + col) * g->m44 * 2;
+        fn_80403144(dst, fn_80090880(lbl_8061977C, id));
+    } else {
+        Unk800C7B40_Widget* w = g->fn_vslot73(row, col);
+        char buf[100];
+        fn_804089B4(buf, "%d", id);
+        ((Unk800CC208_Sub*)fn_800C8040(w->fn_vslot32(extra, 1)))->fn_vslot30(buf);
+    }
+}
+
+extern "C" char* fn_800CC3C8(Unk800CB3A8_Grid* g, int row, int col, int kind)
+{
+    if (g->b80_2)
+        return g->m90 + (row * g->m54 + col) * g->m44 * 2;
+    Unk800CC08C_W* w = (Unk800CC08C_W*)g->fn_vslot73(row, col);
+    switch (kind) {
+    case 4:
+        return ((Unk800CC3C8_Sub*)fn_800C8040(w->fn_vslot33(4, 1)))->fn_vslot31();
+    case 5:
+        return ((Unk800CC3C8_Sub*)fn_800C8048(w->fn_vslot33(5, 1)))->fn_vslot31();
+    }
+    return 0;
 }
 
 extern "C" void fn_800CC4C0(Unk800CB3A8_Grid* g, int a, int* arr, int c, int start, int end)
@@ -168,6 +316,18 @@ extern "C" char* fn_800CD44C(Unk800CB3A8_Grid* g, int id)
         v -= g->m70;
     fn_804089B4(lbl_80687B30, "Y%dHILITE", v);
     return lbl_80687B30;
+}
+
+extern "C" void fn_800CD4B8(Unk800CB3A8_Grid* g, int row, int col)
+{
+    g->fn_vslot14(0);
+    g->m68 = row;
+    g->m6C = col;
+    if (!g->fn_vslot123(row, col))
+        g->fn_vslot118(1);
+    g->fn_vslot120();
+    g->fn_vslot14(1);
+    g->mF4->fn_vslot69(g);
 }
 
 void Unk800CD5A4_Obj::fn_800CD5A4()
@@ -363,6 +523,17 @@ extern "C" void fn_800CEBFC(Unk800CB3A8_Grid* g, int id)
     g->fn_vslot30(buf, 1);
 }
 
+extern "C" void fn_800CEE28(Unk800CEE28_Obj* o, int v)
+{
+    fn_800C83B4(o, v);
+    if (o->m78 != 0) {
+        fn_800C80C0(o->m78->fn_vslot36(), v);
+        fn_800C80C0(o->m78->fn_vslot37(), v);
+        if (o->m78->fn_vslot31() != 0)
+            fn_800C80C0(o->m78->fn_vslot31(), v);
+    }
+}
+
 extern "C" Unk800D1614_Raw* fn_800CEEF0(Unk800D1614_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7,
                                         int s1, int s2, int s3, int s4, float f)
 {
@@ -385,6 +556,22 @@ extern "C" void fn_800CEFEC(Unk800CB3A8_Grid* g, int v)
     g->m2E = v;
     for (; c != 0; c = c->m8)
         c->fn_vslot18(v);
+}
+
+extern "C" void fn_800CF04C(Unk800CB3A8_Grid* g)
+{
+    Unk800C7B40_Widget* c = g->m40;
+    if (g->b9) {
+        int a = g->m26;
+        int e = a + g->m2A;
+        fn_80317120(1, AbsI(320 - a) > AbsI(320 - e) ? a : e);
+    }
+    for (; c != 0; c = c->m8) {
+        if (c->b0)
+            c->fn_vslot2();
+    }
+    if (g->b9)
+        fn_80317120(0, 0);
 }
 
 void Unk800C7A4C_Group::fn_800CF114(int v)
