@@ -15,6 +15,13 @@ struct Unk8006F6C0_Date {
     unsigned short m2;
 };
 extern Unk8006F6C0_Date lbl_806877AC;
+struct Unk8006FB28_Rec {
+    unsigned b0 : 8;
+    unsigned b1 : 8;
+    unsigned f2 : 7;
+    unsigned f3 : 8;
+    unsigned f4 : 1;
+};
 struct Unk8006F690_Obj {
     char pad0[8];
     void* m8;
@@ -282,6 +289,29 @@ void fn_8006FAD4(Unk80071604* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(self->m24 + i * 4, 4);
+}
+
+int fn_8006FB28(void* l, int k, int c)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    int r = 0;
+    if ((unsigned)c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0:
+            r = ((Unk8006FB28_Rec*)a->m24)[c].b0;
+            break;
+        case 1:
+            r = ((Unk8006FB28_Rec*)a->m24)[c].b1;
+            break;
+        case 2:
+            r = ((Unk8006FB28_Rec*)a->m24)[c].f2;
+            break;
+        case 3:
+            r = ((Unk8006FB28_Rec*)a->m24)[c].f3;
+            break;
+        }
+    }
+    return r;
 }
 
 Unk80071604* fn_8006FE88(Unk80071604* self, const char* name, Obj* type, unsigned count)
