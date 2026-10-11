@@ -483,6 +483,9 @@ int fn_8033E888(int a, int b)
     return (int)((float)(b - a + 1) * 0.0027378509f);
 }
 
+/* near-miss: 29 vs 28 instructions. Retail zeroes the {month, year, day} record with a single
+ * `li r4,0` and loads 3, 26 and 2005 early; mine zeroes twice (li r0 / li r11). Tried: ctor
+ * orders (24), setter inline, parameterised ctor, MakeDate() returning by value. */
 int fn_8033E8E8(int a)
 {
     UnkDate d;
