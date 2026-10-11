@@ -72,13 +72,52 @@ struct Unk8019F8C0_Glob {   /* *lbl_8061B8C0 */
     int m2C;
 };
 
+/* Ring cursor at +0x168 of a team element: byte table, count, cursor at +0xC. */
+struct Unk8019F8C0_Ring {
+    unsigned char* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+};
+
+/* Element of the array at m14 of the manager (stride 0xE64); element 2 also
+ * holds the flags read at 0x1CC9 / 0x1CD0 (evidence: fn_801A2034, fn_801A48F8). */
 struct Unk8019F8C0_Inner {
-    char pad0[0x1CD0];
-    int m1CD0;
+    char pad0[1];
+    unsigned char m1;
+    char pad2[6];
+    int m8;
+    char padC[0x168 - 0xC];
+    Unk8019F8C0_Ring m168;
+    char pad178[0x3E4 - 0x178];
+    unsigned char m3E4;
+    char pad3E5[0xE64 - 0x3E5];
+};
+
+struct Unk8019F8C0_Obj4A4 {
+    char pad0[0x4A4];
+    unsigned m4A4;
+};
+
+struct Unk8019F8C0_Ent {
+    int m0;
+    Unk8019F8C0_Obj4A4* m4;
+};
+
+struct Unk8019F8C0_Dev {
+    char padcc[0xCC];
+    int mCC;
+};
+
+struct Unk8019F8C0_Mgr10 {
+    char pad0[0x6C];
+    int m6C;
+    int m70;
 };
 
 struct Unk8019F8C0_Mgr {
-    char pad0[0x14];
+    char pad0[0x10];
+    Unk8019F8C0_Mgr10* m10;
     Unk8019F8C0_Inner* m14;
 };
 
@@ -103,7 +142,8 @@ struct Unk8019F8C0_Sub {
     Unk8019F8C0_V* mC;
     char pad10[0x38 - 0x10];
     int m38;
-    char pad3C[0x44 - 0x3C];
+    void* m3C;
+    char pad40[0x44 - 0x40];
     int m44;
     int m48;
     float m4C;
@@ -127,29 +167,41 @@ struct Unk8019F8C0_Owner {
     int m550;
     char pad554[0x8];
     int m55C;
-    char pad560[0x28];
+    char m560[0x28];
     void* m588;
     int m58C[2];
-    char pad594[0x84];
+    int m594[33];
     void* m618[3];
-    char pad624[0x38];
+    int m624[14];
     int m65C[13];
-    char pad690[0x34];
+    int m690[4];
+    int m6A0[2][2];
+    int m6B0[2];
+    int m6B8;
+    int m6BC;
+    int m6C0;
     int* m6C4;
     char pad6C8[0x4];
     int m6CC;
     int m6D0;
     int m6D4;
-    char pad6D8[0x4];
+    int m6D8;
     int m6DC;
-    char pad6E0[0x18];
+    Unk8019F8C0_Ent* m6E0;
+    char pad6E4[0x10];
+    int m6F4;
     Unk8019F8C0_Mgr* m6F8;
     int m6FC;
     Unk8019F8C0_Pl* m700;
     char m704[4];
     char pad708[0x8];
     void* m710;
-    char pad714[0x6C];
+    char pad714[0xC];
+    Unk8019F8C0_Dev* m720;
+    char pad724[0x1C];
+    int m740;
+    void* m744;
+    char pad748[0x38];
     int m780;
     int m784;
     int m788;
