@@ -317,3 +317,33 @@ Recipes that matched 18 parked functions (details in each unit's comments):
   an inline taking `&mC` lets the bottom test reuse the body's pointer.
 - Check case routing against the asm: fn_8028C264's switch had 6 of 11 hashes
   going to the success path, not to `fail`.
+
+## Range-02 recipes (tablemanager, game-flow; worker report 2026-10-11)
+
+- Volatile enum iterator: loops over a 0..N enum keep the counter in a
+  `volatile int sp8` slot with a saturating increment,
+  `c = sp8; if (c > N) t = c; else t = c + 1; sp8 = t; e = t;` (write `sp8`
+  before `e`). Test-first inner loops: `while (sp8 = t, e = t, e < cnt)`.
+  Nested loops: declare the inner volatile before the outer to get the slot
+  order (fn_80097238, fn_800A3270, fn_800A6114, fn_800A50F0).
+- Independent field stores (state setters) match in exactly one of the
+  24..144 orderings; an itertools.permutations script finds it in under a
+  minute (fn_800A2598, fn_800A2688, fn_800A2948).
+- A loop bound like `Db() ? Db()->m4 : 0` must be an inline accessor
+  (`inline int RowCount()`): the hand-inlined ternary does not give retail's
+  single-compare shape. `unsigned i` against it gives `cmplw`.
+- 0x30-byte record copies through pointer locals (`Row30* d = ..; Row30* s =
+  ..; *d = *s;`) give the 24+24 copy loop; a cast-assign does not.
+- `if (p->m9C == 1) return p->mA0; <rest>` puts the cheap return last as
+  retail does (fn_800A39C4); `if (m9C != 1) {...}` does not.
+- Boolean returns: `if (id != -1) { ..; return 1; } return 0;` vs
+  `int ok; if (id == -1) ok = 0; else {..} return ok;` are distinct shapes;
+  `int ret = 0; if (..) {..; ret = 1;} return ret;` gives `li r3,0` first.
+- Inline setter taking a float (`inline void SetM18(C* c, float v)`) adds the
+  spill slot at sp+0x10 (fn_800A5BB8).
+- `delete p` on a class with an extern non-virtual dtor: `cmpwi; li r4,3; bl
+  dtor` (fn_800A28C4). `new (0) int[n]` gives `__vn__FUii(n*4, 0)`;
+  `delete[] p` gives `__builtin_vec_delete`.
+- Open: retail recomputes `addi rX,r1,buf` per use of `&buf` across calls
+  (strcpy chains); ours keeps it in a saved register (fn_800A3DF8 and two
+  v8 name-swap methods in tu_80094578).
