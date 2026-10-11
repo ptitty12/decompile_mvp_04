@@ -158,9 +158,13 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
 
 
 struct Unk801B7FB0_P : public Unk801B7FB0_PV {
-    char pad9C[0x2D0];
+    char pad9C[0x1C8];
+    int m264;
+    char pad268[0x104];
     Unk801B7FB0_P* m36C;
-    char pad370[0x1C];
+    char pad370[0x8];
+    int m378;
+    char pad37C[0x10];
     int m38C;
     char pad390[0x60];
     float m3F0;
@@ -186,7 +190,9 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     Unk801B7FB0_P* m65C[13];
     char pad690[0x3C];
     Unk801B7FB0_P* m6CC;
-    char pad6D0[0x24];
+    char pad6D0[0x14];
+    Unk801B7FB0_P* m6E4;
+    char pad6E8[0xC];
     int m6F4;
     Unk801B7FB0_Game* m6F8;
     char pad6FC[0x4];
