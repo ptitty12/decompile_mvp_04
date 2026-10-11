@@ -204,6 +204,19 @@ extern "C" void fn_80339A08()
 
 Rec24* fn_8033ACE8() { return &lbl_80691BF4[lbl_80691DF4]; }
 
+/* near-miss: three Rec24 temps at sp+8/0x20/0x38 then copied to dst[0..2] (81 vs 87 insns;
+ * mine saves r21..r30 where the original needs only r24..r30). Tried temps declared first,
+ * struct return, *d++ stores, reversed temp order. */
+extern "C" void fn_8033AD04(Rec24* dst)
+{
+    Rec24 a = lbl_80691BF4[0];
+    Rec24 b = lbl_80691BF4[1];
+    Rec24 c = lbl_80691BF4[2];
+    dst[0] = a;
+    dst[1] = b;
+    dst[2] = c;
+}
+
 extern "C" void fn_8033AE60()
 {
     int z = 0;
@@ -289,6 +302,79 @@ extern "C" void fn_8033BC68()
 }
 
 static inline int LdX(char* b, int off) { return *(int*)(b + off); }
+/* Colour item at +0x2E0 holds a Vec3 of 0..255 floats; the manager's object at +0x6B8
+ * keeps the packed word (fn_801855A4 / fn_801855B4 live in tu_8018423C.cpp, which returns
+ * and takes the word through memory). Evidence: fn_8033C014 packs R<<24 | G<<16 | B<<8,
+ * fn_8033C288 unpacks it again. */
+struct MgrB8 { char pad0[0x6B8]; void* m6B8; };
+struct U32 { unsigned int v; };
+extern "C" {
+V3x fn_8032E2FC(void* item);
+void fn_8032E344(void* item, V3x v);
+U32 fn_801855A4(void* o, ...);
+void fn_801855B4(void* o, U32 v);
+}
+extern int lbl_80621548, lbl_8062154C, lbl_80621550, lbl_80621554, lbl_80621558, lbl_8062155C, lbl_80621560, lbl_80621564, lbl_80621568, lbl_80621570;
+
+extern "C" void fn_8033C014(Menu* p, int k)
+{
+    MgrB8* m = (MgrB8*)lbl_8061B8C0->m8;
+    if (m) {
+        void* o = m->m6B8;
+        if (o) {
+            void* it = (char*)p + 0x2E0;
+            unsigned char r = (unsigned char)fn_8032E2FC(it).x;
+            unsigned char g = (unsigned char)fn_8032E2FC(it).y;
+            unsigned char b = (unsigned char)fn_8032E2FC(it).z;
+            U32 c;
+            c.v = (r << 24) | (g << 16) | (b << 8);
+            fn_801855B4(o, c);
+        }
+    }
+    lbl_80621548 = GetV(IAt(p, 0x374));
+    lbl_8062154C = GetV(IAt(p, 0x3C8));
+    lbl_80621570 = GetV(IAt(p, 0x41C));
+    lbl_80621558 = GetV(IAt(p, 0x524)) ^ 1;
+    lbl_80621550 = GetV(IAt(p, 0x578));
+    lbl_80621554 = GetV(IAt(p, 0x5CC));
+    lbl_8062155C = GetV(IAt(p, 0x620));
+    lbl_80621560 = GetV(IAt(p, 0x674));
+    lbl_80621564 = GetV2(IAt(p, 0x6C8));
+    lbl_80621568 = GetV(IAt(p, 0x730));
+    int* q = &lbl_8062157C;
+    *q = GetV2(IAt(p, 0x470));
+    fn_80330BC8(p, k);
+}
+
+inline void SetVX(void* it, float a) { V3x v = fn_8032E2FC(it); v.x = a; fn_8032E344(it, v); }
+inline void SetVY(void* it, float a) { V3x v = fn_8032E2FC(it); v.y = a; fn_8032E344(it, v); }
+inline void SetVZ(void* it, float a) { V3x v = fn_8032E2FC(it); v.z = a; fn_8032E344(it, v); }
+
+extern "C" void fn_8033C288(Menu* p)
+{
+    SetV(IAt(p, 0x3C8), lbl_8062154C);
+    SetV(IAt(p, 0x730), lbl_80621568);
+    MgrB8* m = (MgrB8*)lbl_8061B8C0->m8;
+    if (m) {
+        void* o = m->m6B8;
+        if (o) {
+            U32 c = fn_801855A4(o);
+            void* it = (char*)p + 0x2E0;
+            unsigned char b = c.v;
+            unsigned g = (c.v >> 8) & 0xFF;
+            unsigned r = (c.v >> 16) & 0xFF;
+            SetVX(it, (float)r);
+            SetVY(it, (float)g);
+            SetVZ(it, (float)b);
+        }
+    }
+    p->m204 = 0;
+    p->m208 = 0;
+    p->items[p->m174]->s3();
+    p->m174 = 0;
+    p->items[p->m174]->s2();
+}
+
 /* near-miss: 179/179 insns, 10 diffs. The two 3-arg fn_8032F120 calls set r5 before r3
  * in the original (mine r3 first, same unsolved item-ctor arg order as fn_80331DB8), and
  * the loop givs are initialised/incremented in a different order. The index form
