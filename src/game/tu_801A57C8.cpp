@@ -173,6 +173,7 @@ class Unk8016ACAC {
 public:
     char pad0[4];
     int fn_8016AD44();
+    int fn_8016AEEC();
 };
 extern "C" void fn_80188044(int h, int v);
 extern "C" void fn_80188698(int h, float f);
@@ -263,6 +264,17 @@ struct Unk801A71D0_Obj {
     Unk801A71D0_Sub m58C;
 };
 
+struct Unk801A7950_C {
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
+};
+int fn_80326C20(void* p);
+float fn_80190F0C(Unk801A7950_C* c);
+extern float lbl_805CEAF4;
+extern float lbl_805CEB00;
+extern float lbl_805CEB04;
 struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
@@ -697,6 +709,39 @@ float fn_801A78E4(Unk801A57C8_Wrap* w)
         ok = 0;
     }
     return ok != 0 ? r.m4 : lbl_805CEAF0;
+}
+
+/* near-miss: same code; retail loads c->m3F4 into f31 before the fn_80190F0C call without a stack store (a register float
+ * temporary), ours loads it after the call (86 vs 88 insns). */
+int fn_801A7950(Unk801A57C8_Wrap* w)
+{
+    char* sub = (char*)w->m0 + 0x50;
+    if (!fn_80326C20(sub)) {
+        return 0;
+    }
+    if (!((Unk8016ACAC*)fn_801A6D84(w->m0, 1))->fn_8016AEEC()) {
+        return 0;
+    }
+    float a = fn_801A78E4(w);
+    if (a < lbl_805CEAF4) {
+        return 0;
+    }
+    float b = (float)fn_80326DF0(sub, 0) * lbl_805CEB00;
+    if (a < b) {
+        return 0;
+    }
+    Unk801A7950_C* c = (Unk801A7950_C*)w->m0->m6CC;
+    if (c->m38C == 2) {
+        if (!(c->m3F4 >= fn_80190F0C(c) + lbl_805CEB04)) {
+            return 0;
+        }
+    }
+    if (((Unk801A57C8_Mode*)w->m0->m560)->m4->m14 == 6) {
+        if (fn_801A4CE8(w->m0, 1)->fn_vslot9() == 0) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void fn_801A7AB0(Unk801A57C8_Wrap* w)
