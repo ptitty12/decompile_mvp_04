@@ -22,6 +22,11 @@ extern "C" int fn_801A9D9C(Unk801A96E0_Init* o, int i);
 int fn_801A9E98(Unk801A96E0_Init* o);
 int fn_801B5F8C(Unk801AB63C_P* p);
 int fn_801AB0D8(Unk801AB63C_P* p);
+int fn_801AAC4C(Unk801AB63C_P* p);
+int fn_801AAE28(Unk801AB63C_P* p);
+int fn_801AAE10(Unk801AB63C_P* p);
+int fn_801AAE18(Unk801AB63C_P* p);
+int fn_801AAE20(Unk801AB63C_P* p);
 int fn_801AB130(Unk801AB63C_P* p);
 int fn_801AB000(Unk801AB63C_P* p);
 int fn_801AAEF4(Unk801AB63C_P* p);
@@ -177,6 +182,9 @@ struct Unk801AB460_T {
     char pad0[0x2C];
     int m2C[1];
 };
+int fn_801AB460(Unk801AB460_T* p, int i);
+void fn_801AB338(Unk801A96E0_Init* o);
+void fn_801AB188(Unk801A96E0_Init* p, int v);
 
 void fn_801A96E0(void* p)
 {
@@ -454,6 +462,53 @@ int fn_801AA9B0(Unk801AB63C_P* p)
     return r;
 }
 
+int fn_801AAA34(Unk801AB63C_P* p)
+{
+    int r = 0;
+    if (fn_801AAC4C(p) == 1) {
+        r = 0xb;
+    }
+    if (r == 0) {
+        if (fn_801AAE10(p) == 1) {
+            r = 0xc;
+            if (fn_801B5AD0(p, 2) == 1) {
+                r = 0xd;
+            }
+        }
+    }
+    if (r == 0) {
+        if (fn_801AAE18(p) == 1) {
+            r = 8;
+            if (fn_801B5AD0(p, 2) == 1) {
+                r = 9;
+            }
+        }
+    }
+    if (r == 0) {
+        if (fn_801AAE20(p) == 1) {
+            r = 6;
+            if (fn_801B5AD0(p, 2) == 1) {
+                r = 7;
+            }
+        }
+    }
+    if (r == 0) {
+        if (fn_801AAE28(p) == 1) {
+            r = 4;
+            if (fn_801B5AD0(p, 2) == 1) {
+                r = 5;
+            }
+        }
+    }
+    if (r == 0) {
+        r = 2;
+        if (fn_801B5AD0(p, 2) == 1) {
+            r = 3;
+        }
+    }
+    return r;
+}
+
 int fn_801AAB68(Unk801AB63C_P* p)
 {
     int r = 2;
@@ -550,13 +605,6 @@ int fn_801AAE18() { return 0; }
 
 int fn_801AAE20() { return 0; }
 
-void fn_801AB188(Unk801A96E0_Init* p, int v)
-{
-    for (int i = 0; i < 4; i++) {
-        p->m14[i] = v;
-    }
-}
-
 int fn_801AAE28(Unk801AB63C_P* p)
 {
     int r = 0;
@@ -636,6 +684,53 @@ int fn_801AB130(Unk801AB63C_P* p)
 }
 
 /* The loop counter lives in memory (stack slot reloaded every iteration): a volatile local reproduces it. */
+void fn_801AB188(Unk801A96E0_Init* p, int v)
+{
+    for (int i = 0; i < 4; i++) {
+        p->m14[i] = v;
+    }
+}
+
+/* near-miss: same code; the iterator read is reloaded after the table store and the (a == 2 || a == 3) / range tests fold differently (22 slots). */
+void fn_801AB1A8(Unk801A96E0_Init* o)
+{
+    int arr[3];
+    fn_801AB338(o);
+    fn_801AB188(o, 1);
+    Unk8006A138_It<3> it(0);
+    int idx = 0;
+    do {
+        arr[it.v] = fn_801A96A8(fn_801A9D9C(o, idx));
+        idx = it.Next();
+    } while (idx <= 2);
+    int a = fn_801AB460((Unk801AB460_T*)o, 0);
+    if (a == 2 || a == 3) {
+        o->m14[arr[0]] = a;
+    } else {
+        o->m14[arr[0]] = 1;
+    }
+    int b = fn_801AB460((Unk801AB460_T*)o, 1);
+    if (b <= 3) {
+        if (b >= 2) {
+            o->m14[arr[1]] = 2;
+        } else {
+            o->m14[arr[1]] = 1;
+        }
+    } else {
+        o->m14[arr[1]] = 1;
+    }
+    int c = fn_801AB460((Unk801AB460_T*)o, 2);
+    if (c <= 3) {
+        if (c >= 2) {
+            o->m14[arr[2]] = 2;
+        } else {
+            o->m14[arr[2]] = 1;
+        }
+    } else {
+        o->m14[arr[2]] = 1;
+    }
+}
+
 void fn_801AB2EC(Unk801A96E0_Init* o)
 {
     volatile int c = 0;
