@@ -92,6 +92,13 @@ int fn_800FF590(UiPtr0* self)
     return self->m0->m2AC;
 }
 
+void fn_800FFAC0(UiCopy* self, UiV4* p)
+{
+    self->m9C = *p;
+    self->mCC = *p;
+    self->m8C = *p;
+}
+
 void fn_800FFE28(UiV_4b* self, int a)
 {
     self->m4->v8();
@@ -114,6 +121,15 @@ void fn_801002F4(UiV_4b* self, int a)
 {
     self->m4->v8();
     fn_801A3A54(fn_8011AA24(0), a);
+}
+
+extern char lbl_805BD828[];
+void fn_80100348(UiWM* self)
+{
+    Ui8011AA24* g = fn_8011AA24(0);
+    int b = self->m0->m2AC == 0;
+    g->m790 = b;
+    fn_800FF0C4(b, fn_800C8044(self->m4->v32((int)lbl_805BD828, 1)));
 }
 
 void fn_80100644(UiV_28i* self, int a)
@@ -149,6 +165,15 @@ void fn_801006D4(UiV_20i_24i_28i_2Ci* self, int idx)
     self->m24 = q->a40[idx];
 }
 
+void fn_8010098C(UiV_20i_24i_28i_2Ci* self, int a)
+{
+    Ui3C4* q = fn_8011AA24(0)->m700->m3C4;
+    fn_801A9D1C(q, a, self->m28);
+    fn_801A9D2C(q, a, self->m2C);
+    fn_801A9CFC(q, a, self->m20);
+    fn_801A9D0C(q, a, self->m24);
+}
+
 void fn_80100A08(UiV_30b* self, int a)
 {
     self->m30->v8();
@@ -158,6 +183,15 @@ void fn_80100A40(UiWM* self, int a)
 {
     self->m4->v8();
     fn_80100A08((UiV_30b*)((char*)self->m0 + 0x270), a);
+}
+
+extern char lbl_805BE1C4[];
+void fn_80100A98(UiWM* self, int a, int b)
+{
+    fn_800FEC24((UiV_0i_4i*)self, a, b);
+    self->w11(fn_800C8060(self->m4->v32((int)lbl_805BE1C4, 1)));
+    self->m10 = fn_8011AA24(0)->m700->m3C4;
+    self->m14 = fn_8011B5A4() == 0;
 }
 
 extern int lbl_805BF008[][2];
