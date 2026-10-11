@@ -109,7 +109,9 @@ public:
     int m460;
     char pad464[0x70];
     int m4D4;
-    char pad4D8[0x1F4];
+    char pad4D8[0xB0];
+    char m588[1];
+    char pad589[0x143];
     void* m6CC;
     char pad6D0[0x34];
     int m704;
