@@ -224,9 +224,7 @@ int fn_8008F940(void* self);
 int fn_8008F948(void* self);
 unsigned fn_8008F950(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i);
 char* fn_8008F99C(Unk8008CE64_K<Unk8008CE64_T1C>* self, int t, unsigned i, char* buf);
-/* near-miss: clamp arms and the store registers/address order differ (35 vs 37 slots). */
 void fn_8008FA1C(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i, int v);
-/* near-miss: register assignment of the parameters differs. */
 void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i, const char* str, int n);
 void fn_8008FB90(Unk8008CE64_K<Unk8008CE64_T1C>* self, int a, VObj* obj);
 int fn_8008FBE8(int v);
