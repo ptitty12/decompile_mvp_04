@@ -18,6 +18,8 @@ extern int lbl_806EF9B4;          /* default heap passed to new */
 void fn_80378E48(char** cursor, int* remaining, char delim, char** token, int* tokenLen);
 unsigned int fn_80378568(const char* token, int len);
 int fn_80409DAC(const char* token);
+double fn_80409D88(const char* token);    /* string to double */
+double fn_80410634(double x);             /* rounds down (callers add 0.5 to round) */
 int fn_80383334(unsigned int hash);
 /* Random number generator (multi-word add-with-carry state at +0x4..+0x18). */
 class Unk8014D8AC {
@@ -55,8 +57,10 @@ struct Unk80270BA0_Result {
     unsigned int type : 4;
     unsigned int pad0 : 28;
     int id;
-    char pad8[0xC];
+    int m8;                    /* second id when type == 2 (0x802721E0) */
+    char padC[0x14 - 0xC];
     float m14;
+    float m18;                 /* second weight when type == 2 (0x802721E0) */
 };
 
 struct Unk80270BA0_X;
@@ -108,6 +112,24 @@ public:
     virtual Unk80270BA0_X* fn_vslot1();
 };
 
+/* Sub-object at Unk80270BA0_X+0x734: float pairs indexed by m190 (0 or 1).
+ * cCircleChooser's slot 17 (0x802726BC) reads m40, mE0, mE8, m100, m108,
+ * m140 and m190. */
+struct Unk802726BC_Angles {
+    char pad0[0x40];
+    float m40[2];
+    char pad48[0xE0 - 0x48];
+    float mE0[2];
+    float mE8[2];
+    char padF0[0x100 - 0xF0];
+    float m100[2];
+    float m108[2];
+    char pad110[0x140 - 0x110];
+    float m140[2];
+    char pad148[0x190 - 0x148];
+    int m190;
+};
+
 /* Object returned by Unk80270BA0_Obj::fn_vslot1() (a player?).
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
@@ -122,7 +144,11 @@ public:
     Unk80271DBC_Link* m618;
     char pad61C[0x708 - 0x61C];
     int m708;
-    char pad70C[0xB4C - 0x70C];
+    char pad70C[0x71C - 0x70C];
+    int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
+    char pad720[0x734 - 0x720];
+    Unk802726BC_Angles m734;
+    char pad8C8[0xB4C - 0x8C8];
     int mB4C;
     int mB50;
 };
@@ -131,6 +157,7 @@ int fn_8025416C(void* p, int n);
 int fn_8024DCFC(int a);
 int fn_8024D4C0(Unk80270BA0_X* x);
 int fn_8022E998(int a);
+float fn_8026D504(Unk80270BA0_X* x, int a);
 
 /* Container embedded in event/hand/pitch choosers at +8 (ctor 0x80384F28,
  * dtor 0x8038501C). Size 0x10. */
@@ -146,6 +173,7 @@ public:
 
 extern const char lbl_805DC0E4[];   /* 0x14-byte string in another unit's .rodata */
 extern const char lbl_805DC0F8[];   /* "cSubContainer" (same unit) */
+extern const char lbl_805DC394[];   /* "type": one copy, used by several units' slot 2 */
 
 /* Base of the choosers (ctor 0x8037B3E8, dtor 0x80362C2C). */
 class Unk8037B3E8 {
