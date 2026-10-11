@@ -33,7 +33,44 @@ void* fn_8035AC10(Unk8035AC10* s, Unk8035AC10* o)
     return s;
 }
 
-/* TODO fn_8035AC6C */
+struct Unk8035AC6C {
+    int m0;
+    Unk8035AC10 m4;
+    int m24;
+    Unk806055AC m28;
+    Unk806055AC m34;
+    Unk806055AC m40;
+    Unk806055AC m4C;
+    float m58;
+    float m5C;
+    float m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    Unk8035AC6C(const Unk8035AC6C& o);
+};
+Unk8035AC6C::Unk8035AC6C(const Unk8035AC6C& o)
+{
+    m0 = o.m0;
+    fn_8035AC10(&m4, (Unk8035AC10*)&o.m4);
+    m24 = o.m24;
+    m28 = o.m28;
+    m34 = o.m34;
+    m40 = o.m40;
+    m4C = o.m4C;
+    m58 = o.m58;
+    m5C = o.m5C;
+    m60 = o.m60;
+    m64 = o.m64;
+    m68 = o.m68;
+    m6C = o.m6C;
+    m70 = o.m70;
+    m74 = o.m74;
+    m78 = o.m78;
+}
 
 void fn_8035AD80() {}
 
