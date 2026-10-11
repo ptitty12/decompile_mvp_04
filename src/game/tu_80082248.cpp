@@ -153,6 +153,13 @@ void fn_80082A90(Node** root, Node** cur, P8* a, P8* b);
 void fn_800826D0(Node** root, Node** cur, P8* a, P8* b);
 
 
+extern "C" void fn_8040A208(void* base, int n, int size, int (*cmp)(short*, short*));
+extern "C" void* fn_803774A8(unsigned size, int heap);
+
+
+int fn_80072934(int self, unsigned char b);
+
+
 Rec* fn_80082248()
 {
     int start = lbl_80619328;
@@ -446,6 +453,42 @@ void fn_8008397C()
     fn_80353110();
 }
 
+int fn_8008399C(Holder* h, int key, int a, int* out)
+{
+    Node* n = fn_80082F4C(h->m0, key);
+    if (n == &lbl_8061932C)
+        return 0;
+    int own = out == 0;
+    if (own)
+        out = (int*)fn_803774A8(0x200, 0);
+    Key* l = (Key*)n->m14;
+    int cnt = 0;
+    if (l != 0) {
+        int* w = out;
+        do {
+            if (l->h4 == a) {
+                int id = fn_80072934(lbl_8061930C, l->b6);
+                int found = 0;
+                for (int j = cnt - 1; j >= 0; j--) {
+                    if (out[j] == id) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if (!found) {
+                    *w = id;
+                    cnt++;
+                    w++;
+                }
+            }
+            l = *(Key**)l;
+        } while (l != 0);
+    }
+    if (own && out)
+        fn_80377408(out);
+    return cnt;
+}
+
 int fn_80083AAC(short* a, short* b)
 {
     if (*a > *b)
@@ -453,6 +496,40 @@ int fn_80083AAC(short* a, short* b)
     if (*a < *b)
         return -1;
     return 0;
+}
+
+int fn_80083AD4(Holder* h, int key, unsigned short* out)
+{
+    Node* n = fn_80082F4C(h->m0, key);
+    if (n == &lbl_8061932C)
+        return 0;
+    int own = out == 0;
+    if (own)
+        out = (unsigned short*)fn_803774A8(0x3C, 0);
+    Key* l = (Key*)n->m14;
+    int cnt = 0;
+    if (l != 0) {
+        unsigned short* w = out;
+        do {
+            int found = 0;
+            for (int j = cnt - 1; j >= 0; j--) {
+                if (out[j] == l->h4) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (!found) {
+                cnt++;
+                *w = l->h4;
+                w++;
+            }
+            l = *(Key**)l;
+        } while (l != 0);
+    }
+    fn_8040A208(out, cnt, 2, fn_80083AAC);
+    if (own && out)
+        fn_80377408(out);
+    return cnt;
 }
 
 Holder* fn_80083BEC(Holder* self)
