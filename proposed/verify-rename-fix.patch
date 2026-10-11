@@ -1,10 +1,8 @@
+diff --git a/tools/verify/verify.py b/tools/verify/verify.py
+index 0c679fb..a71b7b9 100644
 --- a/tools/verify/verify.py
 +++ b/tools/verify/verify.py
-@@ -189,12 +189,16 @@
- def load_report(path: Path):
-     r = json.loads(path.read_text(encoding="utf-8"))
-     units, funcs = {}, {}
-     for u in r.get("units", []):
+@@ -193,7 +193,11 @@ def load_report(path: Path):
          m = u.get("measures", {})
          units[u["name"]] = (float(m.get("fuzzy_match_percent") or 0), float(m.get("matched_code_percent") or 0))
          for f in u.get("functions", []):
@@ -15,9 +13,9 @@
 +            funcs[(u["name"], f["name"])] = (float(f.get("fuzzy_match_percent") or 0),
 +                                             f.get("address"), f.get("size"))
      return units, funcs
-
-
-@@ -207,11 +211,26 @@
+ 
+ 
+@@ -207,14 +211,24 @@ def check_regressions(current: Path, baseline: Path) -> None:
              regs.append(f"unit {k}: matched code {mc:.2f}% -> {nmc:.2f}%")
          elif nfz + 1e-9 < fz:
              regs.append(f"unit {k}: fuzzy {fz:.2f}% -> {nfz:.2f}%")
@@ -43,3 +41,6 @@
 -    print(f"regressions: none ({matched} functions at 100%, baseline had {sum(1 for v in bf.values() if v >= 100.0)})")
 +    matched = sum(1 for v in cf.values() if v[0] >= 100.0)
 +    print(f"regressions: none ({matched} functions at 100%, baseline had {sum(1 for v in bf.values() if v[0] >= 100.0)})")
+ 
+ 
+ def main() -> None:
