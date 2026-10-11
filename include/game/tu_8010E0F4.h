@@ -595,7 +595,11 @@ struct UnkGameP10 {
 struct UnkPlayerRec {
     char pad0[0x198];
     int m198;
-    char pad19C[0xE64 - 0x19C];
+    char pad19C[0x3E4 - 0x19C];
+    unsigned char m3E4;
+    char pad3E5[3];
+    int m3E8[1];
+    char pad3EC[0xE64 - 0x3EC];
 };
 struct UnkTeamArr {
     UnkPlayerRec rec[2];
@@ -610,6 +614,8 @@ struct UnkGameP6F8 {
 struct UnkGameP700 {
     char pad0[0x3C4];
     int m3C4;
+    int m3C8;
+    int m3CC;
 };
 struct UnkGame {
     char pad0[0x6F8];
@@ -618,6 +624,8 @@ struct UnkGame {
     UnkGameP700* m700;
     int m704;
     int m708;
+    char pad70C[0x7C];
+    int m788;
 };
 /* lbl_8061B8C0 -> object whose +8 is an array of the three game-state objects (+0x24 a flag). */
 struct UnkGameTbl {

@@ -7,6 +7,22 @@
 
 typedef Unk800C7B40_Widget Wid;
 
+struct UnkPair {
+    int m0;
+    int m4;
+};
+/* Object with a counted list of {id, ?} pairs at +0x238 (count byte at +0x235). */
+struct UnkIdList {
+    char pad0[0x235];
+    unsigned char m235;
+    char pad236[2];
+    UnkPair m238[1];
+};
+struct UnkB6DB8 {
+    char pad0[0x14];
+    int m14;
+};
+
 /* Per-player stats holder: +0x44C the game object, +0x588 an embedded stat table. */
 struct UnkPlr {
     char pad0[0x44C];
@@ -37,10 +53,14 @@ int fn_8011AD00(int mode, int idx);
 void fn_8011AD88(int mode, int idx, int c);
 int fn_8011AE28(int mode, int idx);
 void fn_8011AEB0(int mode, int idx, int c);
+void fn_8011B3E8(int a, int* x, int* y);
+int fn_8011B494(int* p, int a, int c);
+int fn_8011B4E4();
 void fn_8011B5A4();
-int fn_8011B5D8(void* a, int* b);
-int fn_8011B604(void* a, int* b);
-int fn_8011B630(void* a, int* b);
+int fn_8011B5D8(UnkIdList* a, int* b);
+int fn_8011B604(UnkIdList* a, int* b);
+int fn_8011B630(UnkIdList* a, int* b);
+int fn_8011B65C(int a, UnkIdList* o, int* out);
 int fn_8011B6F8(int a, UnkPlr* p);
 int fn_8011B784(int a, UnkPlr* p, int c);
 float fn_8011B81C(int a, UnkPlr* p, int c);
@@ -50,9 +70,13 @@ int fn_8011B9F4(int a, UnkPlr* p);
 float fn_8011BA88(int a, UnkPlr* p);
 int fn_8011BB30(void* a, int b);
 int fn_8011BB54(void* a, int b);
+int fn_8011BC98(int a);
 int fn_8011BD0C(void* a, int b);
 int fn_8011BD3C(UnkGame* g, int b);
+int fn_8011BD94(UnkGame* g, int a);
+int fn_8011BF1C(UnkGame* g, int a);
 void* fn_8011BFAC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_8011BFFC(void* self, int a);
 }
 // PROTOS-END
 extern "C" {
@@ -62,11 +86,28 @@ int fn_8011B8C8(int a, UnkPlr* p);
 int fn_8011B9F4(int a, UnkPlr* p);
 float fn_8011BA88(int a, UnkPlr* p);
 void fn_801B5AD0(int a, int b);
-int fn_8011B65C(int a, void* b, int* c);
+int fn_8011B65C(int a, UnkIdList* b, int* c);
+int fn_800968C0(void* o, int id, int f);
+int fn_8009764C(void* o, int a, int b, int c);
+UnkB6DB8* fn_801A6DB8(UnkGame* g);
+int fn_801C1638(UnkGame* g, int i);
 int fn_8011BB78(void* a, int b, int c);
 int fn_8011BB54(void* a, int b);
 int fn_8006BC74(void* a, int b);
 int fn_8006A1B4(void* p);
+void* fn_8004072C();
+int fn_8017C8C0(UnkGameP700* a);
+int fn_8017C8C8(UnkGameP700* a);
+int fn_80081B60(void* a);
+void fn_800AB6B8(int a);
+void fn_8035686C(void* self, int a);
+extern const int lbl_80619D10;
+void fn_8017DD80(UnkGameP700* a, int b, int* c, int* d);
+int fn_80097148(void* p, unsigned char i);
+int fn_801A49F0(void* g, int a, int b);
+int fn_801B454C(int a, int b);
+int fn_8025416C(char* p, int a);
+int fn_8004181C(void* o, int a, int b, int c, int d, int e, int f);
 void fn_80086EC0(int a, int b);
 int fn_8011AA4C();
 int fn_800B55A8(UnkFEState* s);
@@ -267,24 +308,89 @@ void fn_8011AEB0(int mode, int idx, int c)
     }
 }
 
+void fn_8011B3E8(int a, int* x, int* y)
+{
+    if (fn_8001C394()->fn_8001CCD8() != 0 && a == 0) {
+        if (*x != -1) {
+            fn_8004181C(fn_8004072C(), 0xF, *x, 0, 0, 0, 0);
+            *x = -1;
+        }
+        if (*y != -1) {
+            fn_8004181C(fn_8004072C(), 0x10, *y, 0, 0, 0, 0);
+            *y = -1;
+        }
+    }
+}
+
+int fn_8011B494(int* p, int a, int c)
+{
+    int v = *p;
+    if (v > 0) {
+        *p = v - c;
+        *p = *p < 0 ? 0 : *p;
+    } else if (v < 0) {
+        *p = v + c;
+        *p = *p > 0 ? 0 : *p;
+    }
+    int r = a - *p;
+    if (r < 0)
+        r = 0;
+    return r;
+}
+
+int fn_8011B4E4()
+{
+    if (fn_801A6DB8(fn_8011AA24(0))->m14 != 0) {
+        int a = 1;
+        UnkGame* g = fn_8011AA24(0);
+        if (fn_801C1638(g, 0xA) == 0)
+            a = 0;
+        int b = fn_801C1638(g, 0xB) != 0;
+        int c = fn_801C1638(g, 0xC) != 0;
+        int r = 0;
+        if (a != 0 || b != 0 || c != 0)
+            r = 1;
+        return r;
+    }
+    return 0;
+}
+
 void fn_8011B5A4()
 {
     fn_801B5AD0(fn_8011AA24(0)->m700->m3C4, 2);
 }
 
-int fn_8011B5D8(void* a, int* b)
+int fn_8011B5D8(UnkIdList* a, int* b)
 {
     return fn_8011B65C(7, a, b);
 }
 
-int fn_8011B604(void* a, int* b)
+int fn_8011B604(UnkIdList* a, int* b)
 {
     return fn_8011B65C(3, a, b);
 }
 
-int fn_8011B630(void* a, int* b)
+int fn_8011B630(UnkIdList* a, int* b)
 {
     return fn_8011B65C(4, a, b);
+}
+
+int fn_8011B65C(int a, UnkIdList* o, int* out)
+{
+    int r = 0;
+    int i = 0;
+    if (r < o->m235) {
+        do {
+            int id = o->m238[(unsigned char)i].m0;
+            *out = id;
+            if (fn_8009764C(o, a, fn_800968C0(o, id, 1), 0) > 0) {
+                r = 1;
+                break;
+            }
+            i++;
+        } while (i < o->m235);
+    }
+    return r;
 }
 
 int fn_8011B6F8(int a, UnkPlr* p)
@@ -383,6 +489,24 @@ int fn_8011BB54(void* a, int b)
     return fn_8011BB78(a, b, 0);
 }
 
+int fn_8011BC98(int a)
+{
+    int x = 0;
+    int y = 0;
+    UnkGame* g = fn_8011AA24(0);
+    fn_8017DD80(g->m700, g->m788, &x, &y);
+    int r = 0;
+    switch (a) {
+    case 0:
+        r = x;
+        break;
+    case 1:
+        r = y;
+        break;
+    }
+    return r;
+}
+
 int fn_8011BD0C(void* a, int b)
 {
     if (fn_8011BB54(a, b) <= 0)
@@ -400,6 +524,32 @@ int fn_8011BD3C(UnkGame* g, int b)
     return r;
 }
 
+int fn_8011BD94(UnkGame* g, int a)
+{
+    if (a == (g->m6F8->m14->m1CD0 == 0))
+        return 0;
+    if (fn_8011BD0C(g, a) == 0)
+        return 0;
+    if (fn_8017C8C8(g->m700) != 0 || fn_8017C8C0(g->m700) != 0)
+        return 0;
+    return 1;
+}
+
+int fn_8011BF1C(UnkGame* g, int a)
+{
+    if (fn_80081B60(g->m6F8->m14) != 0)
+        return 0;
+    if (fn_8011BD0C(g, a) == 0)
+        return 0;
+    int n = fn_8011BB30(g, a);
+    int f = 0;
+    if (n > 0) {
+        if (fn_8006BC74(g->m6F8, a) != 0)
+            f = 1;
+    }
+    return f;
+}
+
 void* fn_8011BFAC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -407,6 +557,13 @@ void* fn_8011BFAC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int 
     self->SetVptr(lbl_8065A918);
     self->m134 = 0;
     return self;
+}
+
+void fn_8011BFFC(void* self, int a)
+{
+    *(const void**)((char*)self + 0x3C) = lbl_8065A918;
+    fn_800AB6B8(lbl_80619D10);
+    fn_8035686C(self, a);
 }
 
 }
