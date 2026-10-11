@@ -2320,4 +2320,59 @@ struct Unk800D028C_Raw : Unk800C7B40_Data {
 extern const char lbl_80656F80[];
 extern "C" void fn_800D03B4(Unk800D03B4_Obj* o);
 
+/* Raw view of Unk800C7A4C_Group for destructors (vptr stored by hand). */
+struct Unk800C6E34_Raw : Unk800C7B40_Data {
+    const void* m3C;
+    Unk800C7B40_Widget* m40;
+    Unk800C7B40_Widget* m44;
+    Unk800C7B40_Widget* m48;
+    Unk800C7B40_Widget* m4C;
+    Unk800C7B40_Widget* m50;
+};
+
+/* Message manager singleton (lbl_8061A32C, 0xD8 bytes, ctor fn_800B64BC) as used by the on-demand loader. */
+struct Unk800B64BC_Mgr {
+    char pad0[0xB8];
+    int mB8;
+    char padBC[0xD8 - 0xBC];
+};
+extern Unk800B64BC_Mgr* lbl_8061A32C;
+extern "C" Unk800B64BC_Mgr* fn_800B64BC(Unk800B64BC_Mgr* m);
+struct Unk800C3FEC_Tmp {
+    char pad0[0x2C];
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    char pad40[0xC0 - 0x40];
+};
+extern "C" void fn_80356930(Unk800C3FEC_Tmp* t);
+/* Object whose vptr is at +0x98 (slot 11 fills a temp from the object). */
+struct Unk800C3FEC_Data {
+    char pad0[0x98];
+};
+struct Unk800C3FEC_V : Unk800C3FEC_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11(Unk800C3FEC_Tmp* t, int a);
+};
+struct Unk800C3FEC_Obj : Unk800C3FEC_V {
+    char pad9C[0x668];
+    int m704;
+};
+
+class Unk8007B2B0_Screen {
+public:
+    int fn_8007C514(int a, int b);
+};
+
 #endif
