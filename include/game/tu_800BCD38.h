@@ -996,4 +996,28 @@ extern const char lbl_806571E8[];
 
 extern "C" Unk800D1614_Raw* fn_800CEEF0(Unk800D1614_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s1, int s2, int s3, int s4, float f);
 
+/* Name list (data up to +0x1C8, vptr at +0x1C8, vtable lbl_8065A470): ctor fn_800C6794. */
+struct Unk800C6794_Pair {
+    int a, b;
+};
+struct Unk800C6794_Data {
+    int m0;
+    int m4;
+    char m8[0x2C];
+    Unk800C7B40_Widget* m34[100];
+    int m1C4;
+};
+struct Unk800C6794_Raw : Unk800C6794_Data {
+    const void* m1C8;
+};
+struct Unk800C6794_Obj : Unk800C6794_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4(const Unk800C6794_Pair* p);
+};
+extern const char lbl_8065A470[];
+
+extern const char lbl_80657D88[];
+
 #endif
