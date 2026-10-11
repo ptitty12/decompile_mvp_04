@@ -160,6 +160,99 @@ int fn_800E1B68(int i)
     return lbl_805C38B0[i];
 }
 
+int fn_800E2400(int x)
+{
+    switch (x) {
+    case 30:
+        return 0x7E5;
+    case 31:
+    case 33:
+        return 0x7E4;
+    case 32:
+        return 0x7D6;
+    case 34:
+        return 0x7D1;
+    case 35:
+        return 0x7E7;
+    case 36:
+        return 0x3EB2;
+    case 37:
+    case 39:
+        return 0x5D2E;
+    case 38:
+        return 0x7D9;
+    case 40:
+        return 0x7ED;
+    case 41:
+        return 0x7EC;
+    case 42:
+        return 0x7DB;
+    case 43:
+        return 0x7E8;
+    case 44:
+        return 0x7D7;
+    case 45:
+        return 0x7E2;
+    }
+    return -1;
+}
+
+int fn_800E24F4(int x)
+{
+    switch (x) {
+    case 30:
+        return 0x44E6;
+    case 31:
+    case 33:
+        return 0x44E5;
+    case 32:
+        return 0x44D7;
+    case 34:
+        return 0x44DC;
+    case 35:
+        return 0x44E8;
+    case 36:
+        return 0x44EC;
+    case 37:
+    case 39:
+        return 0x5D2F;
+    case 38:
+        return 0x44DA;
+    case 40:
+        return 0x44DD;
+    case 41:
+        return 0x44E3;
+    case 42:
+    case 45:
+        return 0x44ED;
+    case 43:
+        return 0x44E9;
+    case 44:
+        return 0x44D8;
+    }
+    return -1;
+}
+
+void fn_800E25E0(int a, int b)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int h = s->fn_8007DA28();
+    if (h != -1) {
+        char buf[0x18];
+        fn_8007CF44(s, h, (int)buf, 0);
+        fn_801254EC(a, 1, 3, buf, b);
+        if (s->fn_8007DADC(h) != 0) {
+            fn_80125C84(a, 1);
+            fn_80125CF8(a);
+            return;
+        }
+        fn_80125C84(a, 0);
+        return;
+    }
+    fn_80125C84(a, 0);
+    fn_80125490(a, 1, 3, 0x3FB4, b);
+}
+
 void fn_800E2944(int a, int b)
 {
     int o = lbl_8061930C;
@@ -214,6 +307,50 @@ void fn_800E2C34()
     fn_800E2C80(lbl_805BA54C, 0x400);
     fn_800E2A58(0x500);
     fn_8001BC4C()->fn_8001BDAC(0xB1);
+}
+
+void fn_800E2C80(char* a, int b)
+{
+    int g = lbl_8061E978;
+    int p = fn_802B9804((int)a, 0x100);
+    int n = fn_803FC4C0();
+    if (fn_8040B574(a, lbl_805BA560) == 0) {
+        fn_80149F70(p, 2);
+        fn_8014A0EC();
+    } else if (fn_8040B574(a, lbl_805BA54C) == 0) {
+        fn_80149F70(p, 1);
+        fn_8014A0EC();
+    }
+    char buf[0x80];
+    int sp88;
+    fn_803FED48((int)a, 0x100, 0, &sp88);
+    for (int i = 0; i < n; i++)
+        fn_802B0140(g, fn_803FC548(p, i, buf), 1, b, 0);
+    fn_803FEDB8(sp88, 0x64);
+    if (p != 0)
+        fn_80377488(p);
+}
+
+void fn_800E2D8C(char* a)
+{
+    int g = lbl_8061E978;
+    int p = fn_802B9804((int)a, 0x100);
+    int n = fn_803FC4C0();
+    if (fn_8040B574(a, lbl_805BA560) == 0) {
+        fn_80149F70(p, 2);
+        fn_8014A0EC();
+    } else if (fn_8040B574(a, lbl_805BA54C) == 0) {
+        fn_80149F70(p, 1);
+        fn_8014A0EC();
+    }
+    char buf[0x80];
+    int sp88;
+    fn_803FED48((int)a, 0x100, 0, &sp88);
+    for (int i = 0; i < n; i++)
+        fn_802B0638(g, fn_803FC548(p, i, buf), 1);
+    fn_803FEDB8(sp88, 0x64);
+    if (p != 0)
+        fn_80377488(p);
 }
 
 int fn_800E2E8C(void* t, int idx, int b, int c)
