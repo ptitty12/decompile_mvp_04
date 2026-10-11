@@ -111,6 +111,15 @@ inline float Sign(float v)
         return -1.0f;
     return 1.0f;
 }
+inline SplVec3 SubV(const SplVec3& a, const SplVec3& b)
+{
+    SplVec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float LenSq(SplVec3 v) { return v.z * v.z + (v.x * v.x + v.y * v.y); }
 extern "C" float fn_804028E4(float x);
 extern "C" SplVec3 fn_8033D490(Spline* s, float t);
 extern "C" SplVec3 fn_8033D534(Spline* s, float t);
@@ -327,6 +336,129 @@ int fn_8033D79C(Spline* s, float* tp)
     *tp = *tp - (float)seg;
     *tp = *tp > (float)(s->m0 - 1) ? (float)(s->m0 - 1) : (*tp >? 0.0f);
     return seg;
+}
+
+/* Finds the parameter u whose point lies `len` away from the point at t (Newton-style step
+ * refinement with tolerance band [len^2*mB8, len^2*mB4]; mAC is the stored step).
+ * near-miss (173/173 instructions, stack slots all match): retail keeps `s` in r30 and the
+ * &A pointer in r31, mine has them swapped, which shifts most register operands. */
+extern "C" float fn_8033D860(Spline* s, int* out, float t, float len)
+{
+    if (!(t >= 0.0f)) {
+        *out = 0;
+        return 0.0f;
+    }
+    float maxT = (float)(s->m0 - 1);
+    if (!(t <= maxT)) {
+        *out = 0;
+        return maxT;
+    }
+    if (len == 0.0f) {
+        *out = 1;
+        return t;
+    }
+    SplVec3 B;
+    SplVec3 A = fn_8033D3EC(s, t);
+    float d2;
+    float step;
+    float u;
+    float len2;
+    float lo2;
+    float hi2;
+    int clipped = 0;
+    len2 = len * len;
+    lo2 = len2 * s->mB4;
+    hi2 = len2 * s->mB8;
+    if (s->mAC <= 0.0f || !(s->mAC < 1.0f))
+        step = 0.05f;
+    else
+        step = s->mAC;
+    int iter = 1;
+    A = fn_8033D3EC(s, t);
+    u = t + step;
+    int result;
+    goto test;
+loop:
+    B = fn_8033D3EC(s, u);
+    d2 = LenSq(SubV(A, B));
+    if (!(d2 < hi2) && d2 <= lo2) {
+        result = 1;
+        goto fin;
+    }
+    if (iter > 10) {
+        result = 1;
+        goto fin;
+    }
+    iter++;
+    step = step * fn_804028E4(len2 / d2);
+    u = t + step;
+test:
+    if (u <= maxT) {
+        clipped = 0;
+        goto loop;
+    }
+    u = maxT;
+    if (!clipped) {
+        clipped = 1;
+        goto loop;
+    }
+    result = 0;
+fin:
+    *out = result;
+    s->mAC = step;
+    return u;
+}
+
+extern "C" float fn_8033DB14(Spline* s, float t0, float len)
+{
+    SplVec3 cur;
+    SplVec3 prev;
+    float acc = 0.0f;
+    float t = t0;
+    float maxT = (float)(s->m0 - 1);
+    prev = fn_8033D3EC(s, t);
+    for (;;) {
+        t = t + 0.01f;
+        if (!(t < maxT))
+            return 1.0f;
+        cur = fn_8033D3EC(s, t);
+        float d = fn_804028E4(LenSq(SubV(cur, prev)));
+        if (acc + d >= len) {
+            float over = (acc + d - len) / d;
+            t = t - over * 0.01f;
+            return t;
+        }
+        acc = acc + d;
+        prev = cur;
+    }
+}
+
+/* Arc length of the spline from t0 to its end, summed in steps clamped to [0.001, 0.01].
+ * near-miss (164 vs 163 instructions): retail keeps the address of the int->float magic
+ * constant in r27 (one lis for both conversions) where mine reloads it; everything else,
+ * including the unrotated loop (goto form) and all stack slots, matches. */
+extern "C" float fn_8033DCD4(Spline* s, float t0)
+{
+    SplVec3 cur;
+    SplVec3 prev;
+    float acc = 0.0f;
+    float t = t0;
+    float maxT = (float)(s->m0 - 1);
+    prev = fn_8033D3EC(s, t);
+    float step = (maxT - t0) * 0.01f;
+    step = !(step > 0.01f) ? (step >? 0.001f) : 0.01f;
+loop:
+    t = t + step;
+    if (t >= maxT)
+        goto done;
+    cur = fn_8033D3EC(s, t);
+    acc = acc + fn_804028E4(LenSq(SubV(cur, prev)));
+    prev = cur;
+    goto loop;
+done:
+    cur = fn_8033D3EC(s, (float)(s->m0 - 1));
+    acc = acc + fn_804028E4(LenSq(SubV(cur, prev)));
+    return acc;
 }
 
 /* Curvature of the spline at t: |p''| / |p'|^2, signed by the y component of
