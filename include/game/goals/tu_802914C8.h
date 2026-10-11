@@ -231,9 +231,10 @@ inline Vec3 VScale(Vec3 v, float s)
     return r;
 }
 
+/* t first in the product: fmadds t, (b - a), a (fn_802958F4). */
 inline float Lerp(float a, float t, float b)
 {
-    return a + (b - a) * t;
+    return a + t * (b - a);
 }
 
 
