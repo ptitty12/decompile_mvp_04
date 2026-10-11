@@ -24,4 +24,25 @@ inline Vec3 operator-(const Vec3& a, const Vec3& b)
     return r;
 }
 
+/* Chooser class with six float attributes (ctor 0x801C0334, vtable 0x8065EF70, hash
+ * 0xD1E132A4, size 0x1C): slot 2 registers them (fn_801C0378), slot 5 is the factory
+ * (fn_801C04B0). Slots 3/4 are defined elsewhere, which keeps g++ from emitting the
+ * vtable in this unit. */
+class Unk801C0334 : public Unk8037B3E8 {
+public:
+    Unk801C0334();
+    virtual const char* fn_vslot3();
+    virtual int fn_vslot4();
+    virtual ~Unk801C0334();
+    virtual void fn_vslot2();
+    virtual Unk8037B3E8* fn_vslot5();
+
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+};
+
 #endif

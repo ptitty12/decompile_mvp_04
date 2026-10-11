@@ -33,6 +33,24 @@ void fn_801B8514(P* p);
 }
 
 extern Vec3 lbl_806055AC;
+extern const char lbl_805CF874[];
+extern const char lbl_805CFECC[];
+extern const char lbl_805CFED8[];
+extern const char lbl_805CFEE8[];
+extern const char lbl_805CFEF8[];
+extern const char lbl_805CFF08[];
+extern const char lbl_805CFF20[];
+extern const char lbl_805CFF38[];
+extern const char lbl_805CFF50[];
+extern const char lbl_805CF8A4[];
+extern int lbl_8068BF04;
+extern const char lbl_805CBCEC[];
+extern int lbl_8061CB4C;
+extern "C" {
+void fn_8040B320(void* p, int v, ...);
+const char* fn_801C160C(void);
+}
+
 inline Unk801B7FB0_Slot* At(Unk801B7FB0_Slot* a, int i) { return &a[i]; }
 extern "C" {
 int fn_80254EA4(void* p, int k);
@@ -241,20 +259,77 @@ extern "C" P* fn_801C01E4(O* o, int i)
     return fn_801A4C74(o->m0, j);
 }
 
+Unk801C0334::Unk801C0334()
+    : Unk8037B3E8(0xD1E132A4U)
+{
+}
+
+void Unk801C0334::fn_vslot2()
+{
+    fn_8037B7E4(lbl_805CF874);
+    fn_8037B7E8(lbl_805CFECC);
+    fn_8037B50C(lbl_805CFED8, &m4, lbl_805CFEE8, 0);
+    fn_8037B50C(lbl_805CFEF8, &m8, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CFF08, &mC, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CFF20, &m10, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CFF38, &m14, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CFF50, &m18, lbl_805CF8A4, 0);
+    fn_8037B830(lbl_805CFECC);
+}
+
+extern "C" int fn_801C0478()
+{
+    return fn_8037C7FC()->fn_8037CE98(0xD1E132A4U, lbl_8068BF04, 0);
+}
+
+Unk8037B3E8* Unk801C0334::fn_vslot5()
+{
+    return new (lbl_806EF9B4) Unk801C0334;
+}
+
 extern "C" void fn_801C156C(void) {}
+
 extern "C" void fn_801C1570(void) {}
+
 extern "C" void fn_801C1574(void) {}
+
 extern "C" int fn_801C1578(void) { return 0; }
+
+extern "C" Vec3 fn_801C1580(void)
+{
+    Vec3 v;
+    Vec3* p = &v;
+    fn_8040B320(p, 0, 12);
+    return *p;
+}
+
 extern "C" void fn_801C15DC(void) {}
+
+extern "C" const char* fn_801C15E0(void) { return fn_801C160C(); }
+
+extern "C" unsigned fn_801C1600(void) { return 0xEF8A9748; }
+
+extern "C" const char* fn_801C160C(void) { return lbl_805CBCEC; }
+
+extern "C" int fn_801C1618(void) { return lbl_8061CB4C; }
+
+extern "C" unsigned fn_801C1624(void) { return 0x575DF764; }
+
 extern "C" void fn_801C1630(void) {}
+
 extern "C" void fn_801C1634(void) {}
-extern "C" int fn_801C1690(void) { return 0; }
-extern "C" void fn_801C16A8(void) {}
-extern "C" void fn_801C16AC(void) {}
 
 extern "C" P* fn_801C1638(P* p, unsigned i)
 {
-    if (i > 0xC)
-        return 0;
-    return p->m65C[i];
+    if (i <= 0xC)
+        return p->m65C[i];
+    return 0;
 }
+
+extern "C" int fn_801C1690(void) { return 0; }
+
+extern "C" void fn_801C1698(float f) {}
+
+extern "C" void fn_801C16A8(void) {}
+
+extern "C" void fn_801C16AC(void) {}
