@@ -1,3 +1,9 @@
 # Owner-approved `#pragma` lines, one per line, exactly as written in source.
 # CLAUDE.md: pragmas need an approval recorded in docs/DECISIONS.md first.
 # (empty: no pragmas approved yet)
+#pragma cplusplus on
+#pragma cplusplus reset
+#pragma dont_inline on
+#pragma dont_inline reset
+#pragma interface
+#pragma implementation
