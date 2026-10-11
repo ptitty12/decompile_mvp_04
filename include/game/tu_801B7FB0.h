@@ -35,6 +35,11 @@ struct Unk801B7FB0_Teams {
 };
 
 
+struct Unk801B7FB0_Arr {
+    char pad0[0x14];
+    int m14[3];
+};
+
 struct Unk801B7FB0_GM {
     char pad0[0xC];
     Unk80087A58_O* mC;
@@ -44,7 +49,7 @@ struct Unk801B7FB0_GM {
 struct Unk801B7FB0_Game {
     char pad0[0xC];
     Unk801B7FB0_GM* mC;
-    char pad10[0x4];
+    Unk801B7FB0_Arr* m10;
     Unk801B7FB0_Teams* m14;
 };
 
