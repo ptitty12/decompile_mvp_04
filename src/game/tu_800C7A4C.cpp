@@ -94,6 +94,28 @@ extern "C" void fn_800C7EBC(Unk800C7B40_Data* w, int v)
     w->b2 = v;
 }
 
+extern int lbl_8061A328;
+
+extern "C" void fn_800C7EE8(Unk800C7B40_Widget* w)
+{
+    if (w->b6) {
+        int t = lbl_8061A328;
+        if (t >= w->m36) {
+            w->m26 = w->m30;
+            w->m28 = w->m32;
+            w->m30 = 0;
+            w->m32 = 0;
+            w->m34 = 0;
+            w->b6 = 0;
+            w->m36 = 0;
+        } else if (t >= w->m34 && t <= w->m36) {
+            w->m26 += (int)(((double)(w->m30 - w->m26) + 0.5) / (double)(w->m36 - t));
+            w->m28 += (int)(((double)(w->m32 - w->m28) + 0.5) / (double)(w->m36 - t));
+        }
+    }
+}
+
+
 extern "C" void fn_800C8010(Unk800C7B40_Data* w, int a, int b, int c, int d)
 {
     w->b6 = 1;
