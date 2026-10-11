@@ -91,6 +91,7 @@ public:
     int fn_80160F14();
     void fn_80161A34();
     int* fn_80161A5C(int a, int b);
+    void fn_801653B0(int id, float t);
     void fn_80165328(struct Unk80165328_Evt* e, float t);
     void fn_801654F0(struct Unk801654F0_Evt* e, float t);
     void fn_80165578(struct Unk80165578_Evt* e, float t);
@@ -104,6 +105,7 @@ public:
     void fn_80165B68(struct Unk80165B68_Evt* e, float t);
     void fn_80165BE0(struct Unk80165BE0_Evt* e, float t);
     void fn_80163A98();
+    void fn_80157410();
     void fn_801593D8();
     void fn_8015A1D4();
     void fn_8016CFC4(struct Unk8016C788_Obj* o);
@@ -132,12 +134,15 @@ public:
 
     char pad0[0xC];
     Unk801527C8_Actor* mC;
-    char pad10[0x30C - 0x10];
+    int m10, m14, m18, m1C, m20, m24, m28, m2C, m30, m34, m38, m3C, m40, m44, m48, m4C;
+    char pad50[0x30C - 0x50];
     int m30C[7];
     int m328;
     int m32C;
     float m330;
-    char pad334[0x5F4 - 0x334];
+    float m334;
+    float m338;
+    char pad33C[0x5F4 - 0x33C];
     Unk80359ACC m5F4;
 };
 

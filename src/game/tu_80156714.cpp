@@ -4,6 +4,8 @@
  */
 #include "game/tu_8015AA94.h"
 
+extern float lbl_805C8C1C;
+
 extern float lbl_805C8C04;
 
 extern float lbl_805C89F4;
@@ -288,6 +290,36 @@ int cSetDepthOfField::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2
 Unk8037B3E8* cSetDepthOfField::fn_vslot5() /* 801572CC */
 {
     return new (lbl_806EF9B4) cSetDepthOfField;
+}
+
+void Unk80159F28::fn_80157410() /* 80157410 */
+{
+    m34 = 2;
+    m40 = 5;
+    m10 = 0;
+    m4C = -1;
+    m14 = 0;
+    m18 = 0;
+    m1C = 0;
+    m44 = -1;
+    m20 = 0;
+    m24 = 0;
+    m28 = 0;
+    m2C = 0;
+    m30 = 0;
+    m38 = 0;
+    m3C = 0;
+    m32C = 0;
+    m330 = lbl_805C8C1C;
+    m334 = lbl_805C8C1C;
+    m338 = lbl_805C8C1C;
+    m48 = 0;
+    fn_80161A34();
+    for (int i = 0; i <= 6; i++) {
+        for (unsigned char j = 0; j <= 24; j++) {
+            *fn_80161A5C(i, j) = 0;
+        }
+    }
 }
 
 int fn_80157708(void* self, int v) /* 80157708 */
