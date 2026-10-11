@@ -225,12 +225,15 @@ struct FeState {
     int m588;
     char pad58C[4];
     int m590;
+    char pad594[0x608 - 0x594];
+    int m608;
 };
 
 typedef void (*FeCb)(int, void*);
 extern "C" {
 FeState* fn_800B555C();
 FeObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
+FeObj* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
 void fn_801251CC(FeObj* o, int a, int b, int c);
 int fn_800A1960(FeGame* g);
 int fn_80546B18(int a, int b, int c);
@@ -428,4 +431,262 @@ struct FeX14 {
     char pad0[0x14];
     int m14;
 };
+
+/* Timer-like object with its vptr at +0x20 (ctor fn_804447F0; fn_80444850 resets the fields). */
+class FeTimer {
+public:
+    int m0;
+    int m4;
+    int m8;
+    unsigned char mC;
+    unsigned char mD;
+    short mE;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+};
+struct FeBits4 {
+    unsigned char a;
+    unsigned char b;
+    short c;
+    void Clear()
+    {
+        a = 0;
+        c = 0;
+        b = 0;
+    }
+};
+struct FeTimerRaw {
+    int m0;
+    int m4;
+    int m8;
+    union {
+        FeBits4 mC4;
+        struct {
+            unsigned char mC;
+            unsigned char mD;
+            short mE;
+        };
+    };
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    const void* m20;
+};
+/* Screen of unit 804439E4 (ctor fn_80445104): fields as the functions prove. */
+struct FeScr2 : FeObj {
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138;
+    FeObj* m13C;
+    int m140, m144, m148, m14C, m150, m154, m158, m15C;
+};
+struct FeRec1C {
+    char pad0[0xC];
+    char mC[16];
+    int m1C;
+};
+extern "C" {
+int fn_800A2E6C(FeGame* g);
+int fn_800A2AE8(FeGame* g);
+int fn_8040B574(const char* a, const char* b);
+void fn_804A763C(FeObj* o, int a);
+void fn_80444FE4(FeTimer* t);
+void fn_80445BB4(FeScr2* s, int a);
+void fn_80445DA8(FeScr2* s);
+int fn_804464B0(FeScr2* s, int a);
+}
+
+/* Screens of unit 8044F550 (BATPITCHSTATS / GAMEGRID family). */
+struct FePopupW : FeObj {
+    char pad40[0x314 - 0x40];
+    int m314;
+};
+struct FeSlotObj {
+    char pad0[0x2F0];
+    void (*m2F0)(FeObj*, int);
+};
+struct FeScr6 : FeObj {
+    char pad40[0x130 - 0x40];
+    int m130;
+    FeObj* m134;
+    FeObj* m138;
+    FeObj* m13C;
+    char pad140[0x17C - 0x140];
+    int m17C;
+    char pad180[0x188 - 0x180];
+    FeObj* m188;
+    FeSlotObj* m18C;
+    int m190;
+    FeObj* m194;
+    int m198;
+    char pad19C[0x10F0 - 0x19C];
+    FeObj* m10F0;
+};
+struct FeScr6Raw {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    char pad134[0x17C - 0x134];
+    int m17C, m180, m184, m188, m18C, m190, m194, m198;
+    char pad19C[0x10F0 - 0x19C];
+    int m10F0;
+};
+extern "C" {
+FeScr6Raw* fn_804D1070(FeScr6Raw* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D10D8(void* self);
+int fn_804D1278(void* self);
+void fn_80123858(FeObj* o, int a, int b);
+void fn_801240C0(FeObj* o);
+void fn_80125BC0(FeObj* o);
+void fn_80132438(FeObj* p, void* self, int a, FeCb cb1, FeCb cb2, int b, int c, int d, float f);
+void fn_800ED310(void* self, int a);
+void fn_8044FE0C(FeScr6* s);
+void fn_80450388(FeScr6* s);
+void fn_80450EF8(FeScr6* s);
+void fn_80450C4C(FeScr6* s);
+void fn_804509E0(FeScr6* s, int a, int b);
+void fn_8045081C(FeObj* o, int a);
+void fn_80451028(FeScr6* s, int a);
+void fn_80450FCC(FeScr6* s);
+void fn_80450E44(FeScr6* s, int a);
+}
+
+/* Store through a base pointer and a byte offset: keeps `addi base` and the offset in separate registers. */
+inline void FeSetI(char* b, int o, int v)
+{
+    *(int*)(b + o) = v;
+}
+
+/* Position-picker screen of unit 80455038 (ctor fn_80455038; vtable lbl_8067B860). */
+inline int FeGetI(char* b, int o)
+{
+    return *(int*)(b + o);
+}
+struct FeScr8 : FeObj {
+    char pad40[0x130 - 0x40];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    int m144;
+    FeObj* m148[10];
+    FeObj* m170[10];
+    int m198[10];
+    FeObj* m1C0;
+    int m1C4;
+    int m1C8;
+    int m1CC;
+};
+/* Second screen of the unit (fn_80458AAC..): widget array at +0x13C indexed by m14C. */
+struct FeScr8b : FeObj {
+    char pad40[0x13C - 0x40];
+    FeObj* m13C[4];
+    char pad14C_[0];
+    int m14C;
+};
+struct FeScr8Raw {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138, m13C, m140, m144;
+    int m148[10];
+    int m170[10];
+    char pad198[0x1C0 - 0x198];
+    int m1C0, m1C4, m1C8, m1CC, m1D0;
+};
+extern int lbl_80621678;
+extern "C" {
+void fn_80457010(void* s, int a, int b);
+void fn_80456A00(void* s, int a);
+void fn_80456D6C(void* s, int a);
+void fn_80457B94(void* s, int a, int b, int c, int d);
+void fn_804589BC(void* s);
+void fn_80459FEC(void* s);
+void fn_80458BA4(void* s, int a);
+void fn_8045AB6C(void* s);
+void fn_8045AC2C(void* s);
+void fn_80125084(FeObj* o, int a);
+void fn_801250D8(FeObj* o);
+}
+
+/* Calendar screen of unit 8044C508 (ctor fn_8044D424): widget with FeSub members at +0x98 and +0xDC. */
+class FeSub1 {
+public:
+    char pad0[0x24];
+    virtual int s1(int a);
+    virtual int s2(int a);
+    virtual int s3(int a);
+    virtual int s4(int a);
+    virtual int s5(int a);
+    virtual int s6(int a);
+    virtual int s7(int a);
+    virtual int s8(int a);
+    virtual int s9(int a);
+    virtual int s10(int a);
+    virtual int s11(int a);
+    virtual int s12(int a);
+    virtual int s13(int a);
+    virtual int s14(int a);
+    virtual int s15(int a);
+    virtual int s16(int a);
+    virtual int s17(int a);
+    virtual int s18(int a);
+    virtual int s19(int a);
+    virtual int s20(int a);
+};
+struct FeWidgetS : FeObj {
+    char pad40[0x98 - 0x40];
+    FeSub m98;
+    char padC0[0xDC - 0xC0];
+    FeSub mDC;
+};
+struct FeScr5 : FeObj {
+    char pad40[0x144 - 0x40];
+    int m144;
+    char pad148[4];
+    int m14C;
+    char pad150[0x168 - 0x150];
+    FeWidgetS* m168;
+    FeWidgetS* m16C;
+    FeObj* m170;
+};
+struct Unk8007F198_B;
+extern "C" {
+FeTimer* fn_80446AD4(void* self);
+void fn_804454CC(void* self);
+void fn_8044DDFC(FeScr5* s);
+void fn_8044DCAC(FeScr5* s, int a);
+void fn_8044F45C(int a);
+void fn_8044F4CC(void* self);
+int fn_80329FA0(void* buf, ...);
+void fn_800A2F9C(FeGame* g, int a);
+void fn_80560A24(Unk8007F198_B* o);
+void fn_80449168(FeMeter* m, int a, int b, void (*cb)(int));
+}
+int fn_800DD5E8(int a);
+Unk8007F198_B* fn_8007F7D0(Unk8007F198_B* s, unsigned a);
 #endif
