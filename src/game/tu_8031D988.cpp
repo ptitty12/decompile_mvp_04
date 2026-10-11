@@ -30,6 +30,7 @@ extern const float lbl_805EA7C4;
 extern const float lbl_805EA7C8;
 extern const float lbl_805EA7CC;
 extern const float lbl_805EA750;
+extern int lbl_8061B884;
 extern const float lbl_805EA6D0;
 extern const float lbl_805EA6D4;
 extern const float lbl_805EA740;
@@ -125,6 +126,7 @@ void fn_8031F0A0(FxQ* self, FxVec* out);
 void fn_8031F0EC(FxS* self, int a);
 void fn_8031F13C(FxT* self, int a);
 int fn_8031F170(FxR* a, FxR* b);
+void fn_80320878(void* unused, FxVT8* o, int arg);
 // PROTOS-END
 }
 
@@ -364,4 +366,16 @@ int fn_8031F170(FxR* a, FxR* b) {
     if (a->m8 > b->m8) return 1;
     if (a->m10 < b->m10) return -1;
     return a->m10 > b->m10;
+}
+
+void fn_80320878(void* unused, FxVT8* o, int arg) {
+    if (o) {
+        int i = 0;
+        int lim = 3;
+        do {
+            o->s4(arg);
+            i++;
+            if (i >= lbl_8061B884) break;
+        } while (i < lim);
+    }
 }

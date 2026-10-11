@@ -442,6 +442,14 @@ struct FxR {
 };
 struct FxColor { float a; float b; float c; float d; };
 struct FxMat { float m[16]; };
+class FxVT8 {
+public:
+    char pad0[8];
+    virtual ~FxVT8();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4(int a);
+};
 struct FxU {
     int m0;
     int m4;
