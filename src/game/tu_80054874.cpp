@@ -380,15 +380,18 @@ int fn_80054DEC(int kind)
     }
 }
 
-/* near-miss: payload fillers match the retail calls, but retail's switch has one compare node
- * per kind (95 of them, the same set as fn_80054DEC) and this build merges consecutive kinds
- * that share a body into ranges (676 vs 736 instructions). Not matched. */
+/* Notes: every case needs its own 'q = &r->mC' (also the empty ones, which stops g++ merging
+ * consecutive empty cases into ranges) and consecutive kinds must not share one body
+ * (0x185/0x186 would merge into a range). Passing kind to the default-case diagnostic call is what
+ * puts the switch index in r4 instead of r0. */
 void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
 {
-    switch (r->m4) {
+    int kind = r->m4;
+    switch (kind) {
     case 0x5C:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001F984(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F984(obj);
         return;
     }
     case 0x74:
@@ -421,12 +424,14 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0x113:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001F218(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F218(obj);
         return;
     }
     case 0x112:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001EB78(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001EB78(obj);
         return;
     }
     case 0x114:
@@ -446,42 +451,50 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0x10D:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FC60(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FC60(obj);
         return;
     }
     case 0x108:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FC90(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FC90(obj);
         return;
     }
     case 0x10C:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FD44(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FD44(obj);
         return;
     }
     case 0x77:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FE14(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FE14(obj);
         return;
     }
     case 0x107:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FE1C(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FE1C(obj);
         return;
     }
     case 0x12A:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FE24(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FE24(obj);
         return;
     }
     case 0x11B:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001FE2C(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001FE2C(obj);
         return;
     }
     case 0x10F:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001ED28(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001ED28(obj);
         return;
     }
     case 0x10E:
@@ -493,28 +506,33 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0xED:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001E108(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001E108(obj);
         return;
     }
     case 0x1A7:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001E134(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001E134(obj);
         return;
     }
     case 0x9D:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001E294(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001E294(obj);
         return;
     }
     case 0xE7:
     {
-        ((Unk80052794_Payload*)&r->mC)->m10 = fn_8001E2EC(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m10 = fn_8001E2EC(obj);
         return;
     }
     case 0x115:
     case 0xF3:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001E664(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001E664(obj);
         return;
     }
     case 0xE8:
@@ -557,7 +575,8 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0x4B:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001D5D8(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001D5D8(obj);
         return;
     }
     case 0xA8:
@@ -570,7 +589,8 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0x8D:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001F954(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F954(obj);
         return;
     }
     case 0xC5:
@@ -656,7 +676,8 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     case 0x178:
     case 0x32:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001EDE4(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001EDE4(obj);
         return;
     }
     case 0x59:
@@ -670,15 +691,22 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     case 0x150:
     case 0x52:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001E054(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001E054(obj);
+        return;
+    }
+    case 0x186:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F4F0(obj);
         return;
     }
     case 0x185:
-    case 0x186:
     case 0x179:
     case 0x57:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001F4F0(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F4F0(obj);
         return;
     }
     case 0x53:
@@ -739,91 +767,204 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
     case 0x18F:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001F9B4(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001F9B4(obj);
         return;
     }
     case 0x116:
     {
-        ((Unk80052794_Payload*)&r->mC)->m4 = fn_8001DA28(obj);
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
+        q->m4 = fn_8001DA28(obj);
         return;
     }
     case 0x5:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x6:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x7:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x8:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xA:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xB:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xC:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xD:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xE:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xF:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x11:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x12:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x33:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x38:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x9E:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x9F:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xA0:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xC6:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xE4:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xF2:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xF4:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xF5:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0xFD:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x119:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x11F:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x120:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x149:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x17D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x17E:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x180:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x181:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x187:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x188:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x189:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x1B3:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x1B4:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     case 0x1C1:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&r->mC;
         return;
+    }
     default:
     {
-        fn_8033E958(lbl_805A931C);
+        fn_8033E958(lbl_805A931C, kind);
         return;
     }
     }
