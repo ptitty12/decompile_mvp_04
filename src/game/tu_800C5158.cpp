@@ -419,6 +419,24 @@ extern "C" Unk800D1614_Raw* fn_800C6D74(Unk800D1614_Raw* self, int p1, int p2, i
     return self;
 }
 
+extern "C" void fn_800C6E34(Unk800C6E34_Raw* o, int c)
+{
+    o->m3C = lbl_80657D88;
+    if (o->m40 != 0)
+        delete o->m40;
+    if (o->m44 != 0)
+        delete o->m44;
+    if (o->m48 != 0)
+        delete o->m48;
+    if (o->m4C != 0)
+        delete o->m4C;
+    if (o->m50 != 0)
+        delete o->m50;
+    o->m3C = lbl_8065CCE8;
+    if (c & 1)
+        fn_80377408(o);
+}
+
 extern "C" void fn_800C6F50(Unk800D1614_Obj* o)
 {
     if (o->b0) {
@@ -458,6 +476,38 @@ extern "C" void fn_800C70B8(Unk800D1614_Obj* o, int v)
         o->m48->fn_vslot14(v);
         o->m48->fn_vslot24(v);
     }
+}
+
+extern "C" void fn_800C7270(Unk800C7A4C_Group* g, int v)
+{
+    int d = v - g->m26;
+    g->m26 = v;
+    if (g->m40 != 0)
+        g->m40->fn_vslot9(g->m40->m26 + d);
+    if (g->m44 != 0)
+        g->m44->fn_vslot9(g->m44->m26 + d);
+    if (g->m48 != 0)
+        g->m48->fn_vslot9(g->m48->m26 + d);
+    if (g->m4C != 0)
+        g->m4C->fn_vslot9(g->m4C->m26 + d);
+    if (g->m50 != 0)
+        g->m50->fn_vslot9(g->m50->m26 + d);
+}
+
+extern "C" void fn_800C7380(Unk800C7A4C_Group* g, int v)
+{
+    int d = v - g->m28;
+    g->m28 = v;
+    if (g->m40 != 0)
+        g->m40->fn_vslot10(g->m40->m28 + d);
+    if (g->m44 != 0)
+        g->m44->fn_vslot10(g->m44->m28 + d);
+    if (g->m48 != 0)
+        g->m48->fn_vslot10(g->m48->m28 + d);
+    if (g->m4C != 0)
+        g->m4C->fn_vslot10(g->m4C->m28 + d);
+    if (g->m50 != 0)
+        g->m50->fn_vslot10(g->m50->m28 + d);
 }
 
 extern "C" void fn_800C7490(Unk800C7A4C_Group* g, int v)
