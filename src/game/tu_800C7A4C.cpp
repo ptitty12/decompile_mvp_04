@@ -6,6 +6,7 @@
 
 extern "C" void fn_800D0D64(void* p, int c);
 extern "C" void fn_800D0D90(void* p);
+extern "C" void fn_800D0D8C(void* p);
 extern "C" void fn_80377488(void* p); /* __builtin_vec_delete */
 
 void Unk800C7A4C_Group::fn_800C7A4C(int v)
@@ -345,6 +346,36 @@ extern "C" int fn_800C9968(Unk800CB3A8_Grid* g, int row, int col, int a, int b, 
     return 0;
 }
 
+extern "C" int fn_800CA670(Unk800CA670_Obj* o)
+{
+    fn_800D0D8C((char*)o + 0xA0);
+    if (o->b1 == 0)
+        return 0;
+    if (o->m50 - o->m60 <= 0)
+        return 0;
+    if (o->m54 == 1) {
+        Unk800C7B40_Widget* w = o->fn_vslot32(o->fn_vslot85(), 0);
+        for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
+            if (c->m1C == 11) {
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot41();
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot39();
+            }
+        }
+    }
+    int old = o->fn_vslot60();
+    o->fn_vslot14(0);
+    o->fn_vslot118(1);
+    if (o->m78 != 0)
+        o->m78->fn_vslot45();
+    o->fn_vslot14(1);
+    if (o->fn_vslot60() != old)
+        o->fn_vslot107(0x99);
+    Unk800C7B40_Widget* v = o->fn_vslot30("VSPIN", 0);
+    if (v != 0)
+        ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(v))->fn_vslot32("SG1", 1)))->fn_vslot40(1);
+    return 1;
+}
+
 extern "C" int fn_800CA8C8(Unk800CA8C8_Obj* o)
 {
     fn_800D0D90((char*)o + 0xA0);
@@ -358,6 +389,36 @@ extern "C" int fn_800CA8C8(Unk800CA8C8_Obj* o)
     return 1;
 }
 
+extern "C" int fn_800CA9A4(Unk800CA670_Obj* o)
+{
+    fn_800D0D8C((char*)o + 0xB4);
+    if (o->b1 == 0)
+        return 0;
+    if (o->m50 - o->m60 <= 0)
+        return 0;
+    if (o->m54 == 1) {
+        Unk800C7B40_Widget* w = o->fn_vslot32(o->fn_vslot85(), 0);
+        for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
+            if (c->m1C == 11) {
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot41();
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot39();
+            }
+        }
+    }
+    int old = o->fn_vslot60();
+    o->fn_vslot14(0);
+    o->fn_vslot118(0);
+    if (o->m78 != 0)
+        o->m78->fn_vslot47();
+    o->fn_vslot14(1);
+    if (o->fn_vslot60() != old)
+        o->fn_vslot107(0x9A);
+    Unk800C7B40_Widget* v = o->fn_vslot30("VSPIN", 0);
+    if (v != 0)
+        ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(v))->fn_vslot32("SG1", 1)))->fn_vslot38(1);
+    return 1;
+}
+
 extern "C" int fn_800CABFC(Unk800CA8C8_Obj* o)
 {
     fn_800D0D90((char*)o + 0xB4);
@@ -368,5 +429,87 @@ extern "C" int fn_800CABFC(Unk800CA8C8_Obj* o)
     Unk800C7B40_Widget* w = o->fn_vslot30("VSPIN", 0);
     if (w != 0)
         ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(w))->fn_vslot32("SG1", 1)))->fn_vslot39();
+    return 1;
+}
+
+extern "C" int fn_800CACD8(Unk800CAF58_Obj* o)
+{
+    fn_800D0D8C((char*)o + 0xDC);
+    if (!o->b1 || o->m54 - o->m64 <= 0)
+        return 0;
+    int old = o->fn_vslot61();
+    if (o->m54 == 1) {
+        Unk800C7B40_Widget* w = o->fn_vslot32(o->fn_vslot85(), 0);
+        for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
+            if (c->m1C == 11)
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot38(1);
+            if (c->m1C == 6)
+                ((Unk800C7B40_Widget*)fn_800C804C(c))->fn_vslot47();
+        }
+    } else {
+        o->fn_vslot14(0);
+        o->fn_vslot119(0);
+        o->fn_vslot14(1);
+    }
+    if (o->fn_vslot61() != old)
+        o->fn_vslot107(0x9A);
+    if (o->m7C != 0)
+        o->m7C->fn_vslot47();
+    Unk800C7B40_Widget* v = o->fn_vslot30("HSPIN", 0);
+    if (v != 0)
+        ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(v))->fn_vslot32("SG1", 1)))->fn_vslot38(0);
+    return 1;
+}
+
+extern "C" int fn_800CAF58(Unk800CAF58_Obj* o)
+{
+    fn_800D0D90((char*)o + 0xDC);
+    if (!o->b1)
+        return 0;
+    if (o->m54 == 1 && o->m50 > 0 && o->fn_vslot85()) {
+        Unk800C7B40_Widget* w = o->fn_vslot32(o->fn_vslot85(), 0);
+        for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
+            if (c->m1C == 11)
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot39();
+            if (c->m1C == 6)
+                ((Unk800C7B40_Widget*)fn_800C804C(c))->fn_vslot48();
+        }
+    }
+    if (o->m7C != 0)
+        o->m7C->fn_vslot48();
+    Unk800C7B40_Widget* v = o->fn_vslot30("HSPIN", 0);
+    if (v != 0)
+        ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(v))->fn_vslot32("SG1", 1)))->fn_vslot39();
+    return 1;
+}
+
+extern "C" int fn_800CB128(Unk800CAF58_Obj* o)
+{
+    fn_800D0D8C((char*)o + 0xC8);
+    if (o->b1 == 0)
+        return 0;
+    if (o->m54 - o->m64 <= 0)
+        return 0;
+    int old = o->fn_vslot61();
+    if (o->m54 == 1) {
+        Unk800C7B40_Widget* w = o->fn_vslot32(o->fn_vslot85(), 0);
+        for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
+            if (c->m1C == 11)
+                ((Unk800C7B40_Widget*)fn_800C805C(c))->fn_vslot40(1);
+            if (c->m1C == 6)
+                ((Unk800C7B40_Widget*)fn_800C804C(c))->fn_vslot45();
+        }
+    } else {
+        o->fn_vslot14(0);
+        o->fn_vslot119(1);
+        o->fn_vslot14(1);
+    }
+    if (o->fn_vslot61() != old)
+        o->fn_vslot107(0x99);
+    if (o->m7C != 0)
+        o->m7C->fn_vslot45();
+    Unk800C7B40_Widget* v = o->fn_vslot30("HSPIN", 0);
+    if (v != 0)
+        ((Unk800C7B40_Widget*)fn_800C805C(((Unk800C7B40_Widget*)fn_800C8044(v))->fn_vslot32("SG1", 1)))->fn_vslot40(0);
     return 1;
 }

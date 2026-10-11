@@ -283,8 +283,8 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot57();
     virtual void fn_vslot58();
     virtual void fn_vslot59();
-    virtual void fn_vslot60();
-    virtual void fn_vslot61();
+    virtual int fn_vslot60();
+    virtual int fn_vslot61();
     virtual void fn_vslot62();
     virtual void fn_vslot63();
     virtual void fn_vslot64();
@@ -308,7 +308,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot82();
     virtual void fn_vslot83();
     virtual void fn_vslot84();
-    virtual void fn_vslot85();
+    virtual const char* fn_vslot85();
     virtual void fn_vslot86();
     virtual void fn_vslot87();
     virtual void fn_vslot88();
@@ -330,7 +330,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot104();
     virtual void fn_vslot105();
     virtual void fn_vslot106();
-    virtual void fn_vslot107();
+    virtual void fn_vslot107(int a);
     virtual void fn_vslot108();
     virtual void fn_vslot109();
     virtual void fn_vslot110();
@@ -341,8 +341,8 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot115();
     virtual void fn_vslot116();
     virtual void fn_vslot117();
-    virtual void fn_vslot118();
-    virtual void fn_vslot119();
+    virtual void fn_vslot118(int a);
+    virtual void fn_vslot119(int a);
     virtual void fn_vslot120();
     virtual void fn_vslot121();
     virtual void fn_vslot122();
@@ -689,6 +689,7 @@ void* fn_800C8034(void* p);
 void* fn_800C8038(void* p);
 void* fn_800C8044(void* p);
 void* fn_800C8048(void* p);
+void* fn_800C804C(void* p);
 void* fn_800C8054(void* p);
 void* fn_800C805C(void* p);
 void fn_800C80C0(int* p, int v);
@@ -1208,6 +1209,28 @@ struct Unk800D3EAC_Obj : Unk800C7B40_Widget {
     int b68_1 : 1;
     int b68_2 : 1;
     int rest68 : 29;
+};
+
+/* Widget with a count/mode pair at +0x50/+0x54 and a helper widget at +0x7C (fn_800CAF58). */
+struct Unk800CAF58_Obj : Unk800C7B40_Widget {
+    char pad40[0x10];
+    int m50;
+    int m54;
+    char pad58[0xC];
+    int m64;
+    char pad68[0x14];
+    Unk800C7B40_Widget* m7C;
+};
+
+/* Vertical sibling of Unk800CAF58_Obj (fn_800CA670 / fn_800CA9A4). */
+struct Unk800CA670_Obj : Unk800C7B40_Widget {
+    char pad40[0x10];
+    int m50;
+    int m54;
+    char pad58[8];
+    int m60;
+    char pad64[0x14];
+    Unk800C7B40_Widget* m78;
 };
 
 #endif
