@@ -28,3 +28,4 @@
   - original-asm SDK functions policy;
   - push + create unit issues;
   - review the Phase 1 pipeline choices.
+- 2026-10-10 | Claude Sonnet 5.5 (W3) | ealib/tu_803663B0, 803666EC ... 8036E65C (12 units) | matched 24 funcs (12x __static_initialization_and_destruction_0 + 12x _GLOBAL_.I), setup fns (0x2b0-0xc40) not attempted | none | none

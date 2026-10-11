@@ -32,6 +32,71 @@ animation/choosers/tu_80271C64.cpp:
 	.rodata     start:0x805DC6C4 end:0x805DC70C
 	.data       start:0x8061E660 end:0x8061E66C
 
+ealib/tu_803663B0.cpp:
+	.text       start:0x803663B0 end:0x803666EC
+	.ctors      start:0x805A2C48 end:0x805A2C4C
+	.bss        start:0x80693C98 end:0x80693CAC
+
+ealib/tu_803666EC.cpp:
+	.text       start:0x803666EC end:0x80367140
+	.ctors      start:0x805A2C4C end:0x805A2C50
+	.bss        start:0x80693CAC end:0x80693CC0
+
+ealib/tu_80367140.cpp:
+	.text       start:0x80367140 end:0x80367658
+	.ctors      start:0x805A2C50 end:0x805A2C54
+	.bss        start:0x80693CC0 end:0x80693CD4
+
+ealib/tu_80367658.cpp:
+	.text       start:0x80367658 end:0x803682A8
+	.ctors      start:0x805A2C54 end:0x805A2C58
+	.bss        start:0x80693CD4 end:0x80693CE8
+
+ealib/tu_803682A8.cpp:
+	.text       start:0x803682A8 end:0x80368E64
+	.ctors      start:0x805A2C58 end:0x805A2C5C
+	.bss        start:0x80693CE8 end:0x80693CFC
+
+ealib/tu_80368E64.cpp:
+	.text       start:0x80368E64 end:0x80369878
+	.ctors      start:0x805A2C5C end:0x805A2C60
+	.bss        start:0x80693CFC end:0x80693D10
+
+ealib/tu_80369878.cpp:
+	.text       start:0x80369878 end:0x8036A490
+	.ctors      start:0x805A2C60 end:0x805A2C64
+	.bss        start:0x80693D10 end:0x80693D24
+
+ealib/tu_8036A490.cpp:
+	.text       start:0x8036A490 end:0x8036AEE4
+	.ctors      start:0x805A2C64 end:0x805A2C68
+	.bss        start:0x80693D24 end:0x80693D38
+
+ealib/tu_8036AEE4.cpp:
+	.text       start:0x8036AEE4 end:0x8036BECC
+	.ctors      start:0x805A2C68 end:0x805A2C6C
+	.bss        start:0x80693D38 end:0x80693D4C
+
+ealib/tu_8036BECC.cpp:
+	.text       start:0x8036BECC end:0x8036CC08
+	.ctors      start:0x805A2C6C end:0x805A2C70
+	.bss        start:0x80693D4C end:0x80693D60
+
+ealib/tu_8036CC08.cpp:
+	.text       start:0x8036CC08 end:0x8036D8AC
+	.ctors      start:0x805A2C70 end:0x805A2C74
+	.bss        start:0x80693D60 end:0x80693D74
+
+ealib/tu_8036D8AC.cpp:
+	.text       start:0x8036D8AC end:0x8036E65C
+	.ctors      start:0x805A2C74 end:0x805A2C78
+	.bss        start:0x80693D74 end:0x80693D88
+
+ealib/tu_8036E65C.cpp:
+	.text       start:0x8036E65C end:0x8036F44C
+	.ctors      start:0x805A2C78 end:0x805A2C7C
+	.bss        start:0x80693D88 end:0x80693D9C
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
