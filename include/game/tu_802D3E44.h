@@ -40,6 +40,8 @@ struct Unk802D5C64 {
 struct Unk802D5B64_View {
     int m0;
     int m4;
+    char pad8[0x38];
+    int m40;
 };
 struct Unk802D5D24_C {
     char pad0[0x1CD0];
@@ -177,6 +179,27 @@ struct Unk802D5F74 {
     struct Unk802CBD04* m6C;
     char pad70[0x164 - 0x70];
     Unk802D5F74_Rec* m164;
+};
+
+/* Debug HUD (fn_802D56CC): +0xC enable, +0x74 the sub-camera (position at +0x60, rotation at +0x70), +0xA0 / +0xA4 the camera name. */
+struct Unk802D56CC_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk802D56CC_Cam {
+    char pad0[0x60];
+    Unk802D56CC_Vec3 m60;
+    Unk802D56CC_Vec3 m70;
+};
+struct Unk802D56CC {
+    char pad0[0xC];
+    int mC;
+    char pad10[0x74 - 0x10];
+    Unk802D56CC_Cam* m74;
+    char pad78[0xA0 - 0x78];
+    int mA0;
+    char mA4[1];
 };
 
 #endif

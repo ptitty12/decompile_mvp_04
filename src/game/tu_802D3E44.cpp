@@ -18,6 +18,20 @@ extern const char lbl_805E270C[];
 extern const void* lbl_806646F0[];
 extern int lbl_8061EDB8;
 extern float lbl_8061EDE4;
+extern const char lbl_805E4210[];
+extern const char lbl_805E421C[];
+extern const char lbl_805E4230[];
+extern const char lbl_805E4244[];
+extern int lbl_8061EDC8;
+void fn_80303BC4(const char* fmt, ...);
+float fn_802CBD90(Unk802D56CC_Cam* c);
+void fn_802CC53C(Unk802D56CC_Cam* c);
+extern Unk802D5618_Blob lbl_8068B828;
+extern int lbl_80620150;
+void fn_8031E1A0(Unk802D5B64_View* v, int a);
+void fn_8031E1D4(Unk802D5B64_View* v, int a);
+void fn_8016BA48(int h, int c, int a, int b, Unk802D5618_Blob* blob, int d);
+void fn_8016C4A0(int h);
 extern char lbl_805E4284[];
 extern char lbl_805E4298[];
 void* fn_802CF168(void* name);
@@ -243,6 +257,39 @@ void fn_802D5618(Unk802D5618* o)
 {
     Unk802D5618_Blob tmp = *(Unk802D5618_Blob*)(o->m64->m40 + 0x3D48);
     *(Unk802D5618_Blob*)(o->m70 + 0x184) = tmp;
+}
+
+/* near-miss (68 vs 70 insns): the float constants are passed to a variadic printf-style call; as literals they are promoted to doubles (lfd), retail loads
+   them as floats (lfs) from separate 0x805E4250.. objects; extern const floats are CSE'd into f30/f31, plain extern floats too. */
+void fn_802D56CC(Unk802D56CC* o)
+{
+    if (o->mC != 0) {
+        fn_802CC53C(o->m74);
+        if (lbl_8061EDC8 != 0) {
+            fn_80303BC4(lbl_805E4210, 0.1f, 0.2f, fn_802CBD90(o->m74));
+            fn_80303BC4(lbl_805E421C, 0.1f, 0.23f, o->m74->m60.x, o->m74->m60.y, o->m74->m60.z);
+            fn_80303BC4(lbl_805E4230, 0.1f, 0.26f, o->m74->m70.x * 57.295776f, o->m74->m70.y * 57.295776f, o->m74->m70.z * 57.295776f);
+        }
+    }
+    if (o->mA0 != 0) {
+        fn_80303BC4(lbl_805E4244, 0.1f, 0.1f, o->mA4);
+    }
+}
+
+void fn_802D57E4(Unk802D58E8* o, int flag, int a, int b, int c)
+{
+    if (flag != 0) {
+        Unk802D5B64_View* t = fn_801A04A8(o->m60, 5);
+        fn_8031E1A0(t, b);
+        t->m4 = 1;
+        Unk802D5618_Blob blob = lbl_8068B828;
+        fn_8016BA48(t->m40, c, 0, 0, &blob, 0);
+        fn_8031E1A0(o->m64, a);
+    } else {
+        Unk802D5B64_View* t = fn_801A04A8(o->m60, 1);
+        fn_8031E1D4(t, lbl_80620150);
+        fn_8016C4A0(fn_801A04A8(o->m60, 0)->m40);
+    }
 }
 
 void fn_802D58E8(Unk802D58E8* o, int k)
