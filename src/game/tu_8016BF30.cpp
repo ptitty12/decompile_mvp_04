@@ -19,6 +19,7 @@ extern float lbl_805CAD70;
 extern float lbl_805CAD94;
 
 int fn_8040B6A0(const char* s);
+void* fn_803272D0(Unk801527C8_Sub* s, unsigned int idx);
 int fn_80169DC4(const char* b);
 int fn_8040B574(const char* a, const char* b);
 void fn_80359948(Unk8016C1C4_List* l, int a);
@@ -203,6 +204,27 @@ int Unk8016C1C4_List::fn_8016C798(int idx) /* 8016C798 */
     return *(int*)((char*)this + 0xA8 + idx * 0xAC);
 }
 
+inline void* GetPtr(void** arr, unsigned int i)
+{
+    return arr[i];
+}
+
+/* near-miss: same code; the shifted index lives in r0 here, retail uses r11 (inline index helper, ternary, cast forms tried) */
+void* Unk801527C8_Ctx::fn_8016C7A8(unsigned int idx) /* 8016C7A8 */
+{
+    if (mA54->m44 == 0) {
+        void* r;
+        Unk801527C8_Actor* a = mA4C;
+        if (idx <= 12) {
+            r = a->m65C[idx];
+        } else {
+            r = 0;
+        }
+        return r;
+    }
+    return fn_803272D0(&mA4C->m50, idx);
+}
+
 void Unk80159F28::fn_8016CFC4(Unk8016C788_Obj* o) /* 8016CFC4 */
 {
     if (o != 0) {
@@ -299,4 +321,59 @@ void Unk8016D9A0::fn_8016E18C() /* 8016E18C */
         m1E04[i] = 0;
     }
     m1E1C = 0;
+}
+
+/*
+ * Tail of the unity TU: virtual slot 3 (class-name string) / slot 4 (name hash)
+ * getters of the script classes whose vtables are emitted here (cLocationObject,
+ * cDepthOfFieldParameters, cActorScriptConditional, ...). The classes are declared
+ * in the previous range; these are written as free functions with the same code.
+ */
+extern const char* lbl_8061BE10;
+extern const char* lbl_8061BE18;
+extern const char lbl_805C626C[];
+extern const char lbl_805C7958[];
+
+void fn_8016F340() /* 8016F340 */
+{
+}
+
+const char* fn_8016F344() /* 8016F344 */
+{
+    return lbl_8061BE10;
+}
+
+int fn_8016F350() /* 8016F350 */
+{
+    return 0x149EF3D8;
+}
+
+const char* fn_8016F35C() /* 8016F35C */
+{
+    return lbl_805C626C;
+}
+
+int fn_8016F368() /* 8016F368 */
+{
+    return 0x916112DD;
+}
+
+const char* fn_8016F374() /* 8016F374 */
+{
+    return lbl_8061BE18;
+}
+
+int fn_8016F380() /* 8016F380 */
+{
+    return 0x37EF0C2A;
+}
+
+const char* fn_8016F3E8() /* 8016F3E8 */
+{
+    return lbl_805C7958;
+}
+
+int fn_8016F3F4() /* 8016F3F4 */
+{
+    return 0x323DA6EA;
 }
