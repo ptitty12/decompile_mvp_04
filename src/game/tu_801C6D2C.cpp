@@ -37,7 +37,7 @@ extern "C" void fn_801C6D2C(Z* z, float f)
         fn_801C6A34(z, f);
 }
 
-extern "C" int fn_801C8154(Z* z) { return z->m1DC > 0.0f; }
+extern "C" int fn_801C8154(Z* z) { return z->m1DC[0] > 0.0f; }
 
 extern "C" void fn_801C891C(void* self, void* q, const Vec3* axis, float angle)
 {
