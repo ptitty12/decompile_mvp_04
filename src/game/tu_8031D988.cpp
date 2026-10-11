@@ -29,6 +29,7 @@ extern const float lbl_805EA7C0;
 extern const float lbl_805EA7C4;
 extern const float lbl_805EA7C8;
 extern const float lbl_805EA7CC;
+extern const float lbl_805EA750;
 extern const float lbl_805EA6D0;
 extern const float lbl_805EA6D4;
 extern const float lbl_805EA740;
@@ -74,6 +75,8 @@ void fn_803125D0(FxCtx* c);
 void fn_8031259C(FxCtx* c);
 void fn_803E1578(void* p, int flags);
 void fn_80377408(void* p);
+float fn_80323848(void* p);
+int fn_80326E64(void* p, int a);
 void* fn_80314740(FxCtx* c);
 void fn_8014D9EC(void* p, float a, float b, float c, float d, float e);
 int fn_8014DDAC(void* p);
@@ -105,6 +108,7 @@ void fn_8031DF08(FxL* self);
 void fn_8031DF58(FxL* self, int a);
 void fn_8031DFA0(FxL* self, int a);
 void fn_8031DFEC(FxL* self, int a);
+void fn_8031E034(FxL* self);
 void fn_8031E110(FxL* self);
 void fn_8031E194(FxL* self);
 void fn_8031E1A0(FxL* self, const char* s);
@@ -232,6 +236,18 @@ void fn_8031DF58(FxL* self, int a) { self->m40 = (FxLObj40*)fn_8016A0D0(operator
 void fn_8031DFA0(FxL* self, int a) { self->m3C = (FxLObj3C*)fn_802D39EC(operator new(0x168, 0), a, self, 0); }
 
 void fn_8031DFEC(FxL* self, int a) { self->m3C = (FxLObj3C*)fn_802D61F8(operator new(0x168, 0), a, self); }
+
+void fn_8031E034(FxL* self) {
+    float v = (self->m44 != 0 || self->m48 == 0) ? self->m4C : fn_80323848((void*)self->m48);
+    float lim;
+    v = v + self->m50;
+    if (self->m44 != 0) {
+        lim = (float)fn_80326E64((char*)self->m1C + 0x50, 0) * lbl_805EA750;
+        if (!(v <= lim - lbl_805EA750)) v = lim - lbl_805EA750;
+    }
+    float w = v;
+    self->m4C = w;
+}
 
 void fn_8031E110(FxL* self) {
     FxCtx* c = lbl_8061FEDC;
