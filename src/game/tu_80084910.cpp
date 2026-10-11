@@ -29,6 +29,162 @@ int fn_80084600(int a);
 int fn_8008461C(int a);
 int fn_8008462C(int a);
 
+
+
+
+
+
+
+
+
+struct Unk80084910_Buf3 {
+    unsigned short a;
+    unsigned short b;
+};
+struct Unk80084910_Buf2 {
+    unsigned char a;
+    unsigned char b;
+    unsigned short pad;
+};
+void fn_80329FA0(void* out, int v, ...);
+extern double lbl_805B4438;
+
+
+
+
+
+
+float fn_80079A90(void* a, int v);
+
+
+
+
+
+
+
+
+
+
+extern float lbl_805B4460;
+
+
+
+
+
+
+
+void* fn_803FFA60(void* s, int a, int n);
+
+
+
+struct Unk80084910_N {
+    void* m0;
+    int m4;
+};
+
+extern char lbl_805B6B98[];
+extern char lbl_805B45CC[];
+extern char lbl_805B45D4[];
+extern char lbl_805B45E0[];
+extern char lbl_805B45E4[];
+extern char lbl_805B45EC[];
+extern char lbl_805B45F8[];
+int fn_804089B4(char* buf, const char* fmt, ...);
+int fn_800E1AC8(void* p);
+
+
+
+
+
+
+
+struct Unk80084910_P {
+    int m0;
+    int m4;
+};
+
+struct Unk80084910_R {
+    char pad0[0x78];
+    Unk80084910_P m78[2];
+    char pad88[0x39C - 0x88];
+    void* m39C;
+};
+
+extern char lbl_8064B5B8[];
+void fn_800864D4(Unk80084910_R* self, int a);
+
+
+struct Unk80084910_W {
+    char pad0[0x58];
+    int m58[1];
+};
+
+
+
+extern int lbl_80619418[];
+
+
+int fn_80403060(const short* s);
+void fn_8040316C(short* dst, const short* src, int n);
+
+struct Unk80084910_Str {
+    char pad0[0x204];
+    short m204[1];
+};
+
+
+struct Unk80084910_S {
+    char pad0[0x234];
+    int m234;
+};
+
+
+extern Unk80084910_Pmf lbl_805B6B60[];
+
+int fn_80084910(void* self, int a, int b, int c);
+int fn_80084954(void* self);
+int fn_80084978(void* self);
+int fn_8008499C(void* self);
+int fn_800849C0(int t);
+K30* fn_80084A10(K30* self);
+void fn_80084A8C(K30* self, int flags);
+void fn_80084AE8(K30* self, unsigned i);
+float fn_80084FEC(Unk80084910_PObj* o, int i, int a);
+float fn_8008574C(G* self, int a);
+float fn_800857B8(G* self, int a);
+float fn_80085824(G* self, int a);
+float fn_80085894(G* self, int a);
+float fn_80085910(G* self, int a);
+float fn_8008598C(G* self, int a);
+void fn_800859E0(K30* self, int a, VObj* obj);
+K8* fn_80085A3C(K8* self);
+void fn_80085AB8(K8* self, int flags);
+void fn_80085B14(K8* self, unsigned i);
+int fn_80085B50(void* self);
+int fn_80085B58(void* self);
+int fn_80085B60(void* self);
+int fn_80085B68(void* self, int a, int b, int c);
+float fn_80085B70();
+void fn_80085B8C();
+void fn_80085B90();
+void fn_80085B94(K8* self, int a, VObj* obj);
+T8* fn_80085BF0(K8* self, int i);
+T8* fn_80085C00(K8* self, int i);
+void* fn_80085EF8(void* self, int a);
+int fn_80085FB0();
+void fn_80085FF8(Unk80084910_N* self, int key);
+void fn_80086030(Unk80084910_N* self, char* buf);
+void fn_80086078(Unk80084910_N* self, char* buf);
+void fn_800860E0(Unk80084910_N* self, char* buf);
+void fn_80086140(Unk80084910_N* self, char* buf);
+void fn_800861A8(Unk80084910_N* self, char* buf);
+Unk80084910_R* fn_80086210(Unk80084910_R* self);
+void fn_80086D24(Unk80084910_W* self, int i, int v);
+int fn_80086D34(Unk80084910_W* self, int i);
+int fn_80086DD8(void* self, unsigned i);
+void fn_80086E58(Unk80084910_Str* self, const short* str);
+void fn_80087A50(Unk80084910_S* self, int v);
+
 int fn_80084910(void* self, int a, int b, int c)
 {
     return fn_8008453C(fn_80084660(self), a, b, c);
@@ -93,17 +249,11 @@ void fn_80084AE8(K30* self, unsigned i)
         fn_8040074C(&self->m24[i], 0x30);
 }
 
-struct Unk80084910_Buf3 {
-    unsigned short a;
-    unsigned short b;
-};
-struct Unk80084910_Buf2 {
-    unsigned char a;
-    unsigned char b;
-    unsigned short pad;
-};
-void fn_80329FA0(void* out, int v, ...);
-extern double lbl_805B4438;
+float fn_80084FEC(Unk80084910_PObj* o, int i, int a)
+{
+    float r = (o->*lbl_805B6B60[i])(a);
+    return r;
+}
 
 float fn_8008574C(G* self, int a)
 {
@@ -137,8 +287,6 @@ float fn_80085910(G* self, int a)
     fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
     return (float)buf.b;
 }
-
-float fn_80079A90(void* a, int v);
 
 float fn_8008598C(G* self, int a)
 {
@@ -203,8 +351,6 @@ int fn_80085B68(void* self, int a, int b, int c)
     return c;
 }
 
-extern float lbl_805B4460;
-
 float fn_80085B70()
 {
     float f;
@@ -237,8 +383,6 @@ T8* fn_80085C00(K8* self, int i)
     return &self->m24[i];
 }
 
-void* fn_803FFA60(void* s, int a, int n);
-
 void* fn_80085EF8(void* self, int a)
 {
     fn_803FFA60(self, a, 8);
@@ -249,21 +393,6 @@ int fn_80085FB0()
 {
     return 4;
 }
-
-struct Unk80084910_N {
-    void* m0;
-    int m4;
-};
-
-extern char lbl_805B6B98[];
-extern char lbl_805B45CC[];
-extern char lbl_805B45D4[];
-extern char lbl_805B45E0[];
-extern char lbl_805B45E4[];
-extern char lbl_805B45EC[];
-extern char lbl_805B45F8[];
-int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_800E1AC8(void* p);
 
 void fn_80085FF8(Unk80084910_N* self, int key)
 {
@@ -300,21 +429,6 @@ void fn_800861A8(Unk80084910_N* self, char* buf)
     fn_804089B4(buf, lbl_805B45F8, fn_800E1AC8(self->m0), lbl_805B6B98[self->m4], lbl_805B45E0);
 }
 
-struct Unk80084910_P {
-    int m0;
-    int m4;
-};
-
-struct Unk80084910_R {
-    char pad0[0x78];
-    Unk80084910_P m78[2];
-    char pad88[0x39C - 0x88];
-    void* m39C;
-};
-
-extern char lbl_8064B5B8[];
-void fn_800864D4(Unk80084910_R* self, int a);
-
 Unk80084910_R* fn_80086210(Unk80084910_R* self)
 {
     self->m39C = lbl_8064B5B8;
@@ -329,11 +443,6 @@ Unk80084910_R* fn_80086210(Unk80084910_R* self)
     return self;
 }
 
-struct Unk80084910_W {
-    char pad0[0x58];
-    int m58[1];
-};
-
 void fn_80086D24(Unk80084910_W* self, int i, int v)
 {
     self->m58[i] = v;
@@ -344,22 +453,12 @@ int fn_80086D34(Unk80084910_W* self, int i)
     return self->m58[i];
 }
 
-extern int lbl_80619418[];
-
 int fn_80086DD8(void* self, unsigned i)
 {
     if (i <= 0x17)
         return lbl_80619418[i];
     return 0;
 }
-
-int fn_80403060(const short* s);
-void fn_8040316C(short* dst, const short* src, int n);
-
-struct Unk80084910_Str {
-    char pad0[0x204];
-    short m204[1];
-};
 
 void fn_80086E58(Unk80084910_Str* self, const short* str)
 {
@@ -369,11 +468,6 @@ void fn_80086E58(Unk80084910_Str* self, const short* str)
     fn_8040316C(self->m204, str, n);
     self->m204[n - 1] = 0;
 }
-
-struct Unk80084910_S {
-    char pad0[0x234];
-    int m234;
-};
 
 void fn_80087A50(Unk80084910_S* self, int v)
 {

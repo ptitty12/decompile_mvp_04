@@ -56,4 +56,12 @@ struct Unk80084910_G {
     Unk80084910_VT2* m20;
 };
 
+/* Object type of the pointer-to-member table lbl_805B6B60 (see
+ * Unk80089894_Obj): a virtual function keeps the virtual-call half of the
+ * member-pointer call sequence. */
+struct Unk80084910_PObj {
+    virtual float M(int a);
+};
+typedef float (Unk80084910_PObj::*Unk80084910_Pmf)(int);
+
 #endif
