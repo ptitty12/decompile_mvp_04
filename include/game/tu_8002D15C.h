@@ -499,7 +499,9 @@ extern float lbl_80686DCC;
 extern int* lbl_8061B9C4;
 
 struct Unk8061B8C0 {
-    char pad0[0x24];
+    char pad0[8];
+    Unk8002D15C_Owner* m8;
+    char padC[0x24 - 0xC];
     int m24;
 };
 extern Unk8061B8C0* lbl_8061B8C0;

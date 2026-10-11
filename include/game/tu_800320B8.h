@@ -29,6 +29,24 @@ struct Unk8003265C_HEnt {
     Unk8003265C_Handler h;
 };
 extern Unk8003265C_HEnt lbl_80616B6C[];
+extern Unk8003265C_HEnt lbl_80616BA8[];
+
+struct Unk8003383C_Cc {
+    char pad0[0x60];
+    Unk8002D15C_Vec3 m60;
+    char pad6C[0x264 - 0x6C];
+    int m264;
+};
+
+struct Unk8003383C_Obj {
+    char pad0[0x120];
+    Unk8003383C_Cc* m120;
+};
+
+struct Unk8003383C_Owner730 {
+    char pad0[0x730];
+    int m730;
+};
 
 struct Unk8003265C : public Unk80021A60 {
     int mBC[2];
@@ -63,7 +81,14 @@ struct Unk8003265C_Vec3 {
     float m8;
 };
 
+extern char lbl_805A66EC[];
+extern char lbl_805A66F4[];
+extern char lbl_805A66FC[];
+
 extern "C" {
+int fn_8031C228(int h, const char* name);
+void fn_80041778(void* o, int a, int b, int c, int d, int e, int f);
+void fn_800222B4(Unk8002D15C_Owner* o, int* a, int* b, Unk8002D15C_Vec3 v);
 float fn_8018A214(Unk8003265C_P* p);
 Unk8003265C_Vec3 fn_8018959C(Unk8003265C_P* p, float f);
 void fn_803785E4(void* sub);

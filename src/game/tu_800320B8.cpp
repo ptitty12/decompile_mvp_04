@@ -309,6 +309,52 @@ extern "C" void fn_8003382C(void* self, float f)
 {
 }
 
+extern "C" void fn_8003383C(Unk8003265C* self)
+{
+    if (self->m128 == 1) {
+        Unk8002D15C_Owner* own = lbl_8061B8C0->m8;
+        int h = ((Unk8003383C_Owner730*)own)->m730;
+        Unk8003383C_Obj* ids[3];
+        ids[0] = (Unk8003383C_Obj*)fn_8031C228(h, lbl_805A66EC);
+        ids[1] = (Unk8003383C_Obj*)fn_8031C228(h, lbl_805A66F4);
+        ids[2] = (Unk8003383C_Obj*)fn_8031C228(h, lbl_805A66FC);
+        for (int i = 0; i < 3; i++) {
+            Unk8003383C_Obj* p = ids[i];
+            if (p != 0) {
+                Unk8003383C_Cc* c = p->m120;
+                if (c->m264 == 0) {
+                    Unk8002D15C_Vec3 v = c->m60;
+                    int a;
+                    int b;
+                    fn_800222B4(own, &a, &b, v);
+                    if (self->m144[i] == -1) {
+                        self->m144[i] = fn_800412AC(fn_8004072C(), self->m148[i], a, b, 0x32, 0);
+                    } else {
+                        fn_80041778(fn_8004072C(), self->m148[i], self->m144[i], a, b, 0x32, 0);
+                    }
+                }
+            }
+        }
+        if (self->mB4 != 0) {
+            for (int i = 0; i <= 9; i++) {
+                if (self->m0[i].m4 != 0) {
+                    int t = self->m0[i].m4 - 1;
+                    self->m0[i].m4 = t;
+                    if (t == 0) {
+                        for (int j = 0; j <= 4; j++) {
+                            if (lbl_80616BA8[j].id == self->m0[i].m0) {
+                                (self->*lbl_80616BA8[j].h)(i);
+                                break;
+                            }
+                        }
+                        self->mB4 = self->mB4 - 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_80033A88(Unk8003265C* self)
 {
     int a = self->m130;
