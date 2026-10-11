@@ -72,16 +72,18 @@ void fn_80172D00(Unk80171A10_Menu* p);
 int fn_80172D44(Unk80171A10_Menu* p, int a);
 void fn_801728A0(Unk80171A10_Menu* p, int a, int b);
 void fn_80174438(Unk80171A10_Menu* p);
+extern "C" int fn_80090880(int a, int b);
 extern int lbl_8061977C;
-int fn_80090880(int a, int b);
 void fn_80172B60(Unk80171A10_Menu* p, int a, int b);
 void fn_80174318(Unk80171A10_Menu* p, int state, Unk80171A10_Fn f);
 void fn_801743E0(Unk80171A10_Menu* p);
 void fn_80174438(Unk80171A10_Menu* p);
 void fn_801744AC(Unk80171A10_Menu* p);
+extern "C" {
 char* fn_8040B61C(char* dst, const char* src);
 void fn_80403144(unsigned short* dst, const unsigned short* src);
 int fn_80403060(const unsigned short* s);
+}
 
 
 #endif

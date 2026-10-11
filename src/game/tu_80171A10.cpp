@@ -3,6 +3,81 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80171A10.h"
+#include "game/tu_80170044.h"
+
+/* Popup holder (see Unk80171940 in tu_80170044.h): the dialog at +0 and the current popup at +4. */
+struct Unk80171A10_Holder {
+    Unk80170B44* m0;
+    Unk80171760* m4;
+};
+
+void fn_80171FE8(Unk80171A10_Holder* h);
+
+Unk801714E0* fn_80172058(Unk80171A10_Holder* h, const unsigned short* s, int a);
+
+void fn_801720A8(Unk80171A10_Holder* h, Unk801714E0* n, const unsigned short* s, int id);
+
+Unk80171760* fn_80171A10(Unk80171A10_Holder* h, int a)
+{
+    fn_80171FE8(h);
+    h->m4 = new (0x100) Unk80171760;
+    h->m4->fn_801718A8(0);
+    h->m4->fn_8017181C(0);
+    h->m4->m8 = 0;
+    h->m4->m4 = 0;
+    h->m4->m0 = a;
+    return h->m4;
+}
+
+/* near-miss: retail stores the zero text terminator through r3 (li r3,0; sth) and then reloads r3 with the
+ * holder; here it goes through r0 (26 vs 27 instrs). */
+Unk80171760* fn_80171A8C(Unk80171A10_Holder* h, const unsigned short* s)
+{
+    unsigned short z = 0;
+    fn_80171FE8(h);
+    Unk801714E0* n = fn_80172058(h, &z, 4);
+    if (n) {
+        fn_801720A8(h, n, s, 1);
+    }
+    return h->m4;
+}
+
+Unk80171760* fn_80171F80(Unk80171A10_Holder* h, const unsigned short* s)
+{
+    fn_80171FE8(h);
+    Unk801714E0* n = fn_80172058(h, s, 0);
+    fn_801720A8(h, n, (const unsigned short*)h->m0->fn_80170CE4(0xF), 2);
+    return h->m4;
+}
+
+void fn_80171FE8(Unk80171A10_Holder* h)
+{
+    if (h->m4 != 0) {
+        h->m4->fn_801718A8(0);
+        if (h->m4 != 0) {
+            delete h->m4;
+            h->m4 = 0;
+        }
+    }
+    fn_801715F8();
+}
+
+Unk801714E0* fn_80172058(Unk80171A10_Holder* h, const unsigned short* s, int a)
+{
+    Unk801714E0* n = new (0x100) Unk801714E0;
+    n->fn_8017158C(s);
+    n->m8 = a;
+    return n;
+}
+
+void fn_801720A8(Unk80171A10_Holder* h, Unk801714E0* n, const unsigned short* s, int id)
+{
+    h->m4 = new (0x100) Unk80171760;
+    h->m4->m0 = id;
+    h->m4->fn_801718A8((int)lbl_8061C66C);
+    h->m4->m4 = 1;
+    h->m4->fn_8017181C(s);
+}
 
 void fn_80172118() {}
 
