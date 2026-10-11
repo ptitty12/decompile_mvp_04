@@ -144,8 +144,8 @@ void fn_802E213C()
 {
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 12; j++) {
-            lbl_806E0B98[i][j] = fn_802E2134;
             lbl_806E0554[i][j] = fn_802E212C;
+            lbl_806E0B98[i][j] = fn_802E2134;
         }
     }
     lbl_8061F680 = 1;
