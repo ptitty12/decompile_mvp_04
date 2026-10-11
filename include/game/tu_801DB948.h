@@ -123,7 +123,11 @@ class Unk801DB948_Obj : public Unk801DB948_PlVirt {
 public:
     char pad9C[0x36C - 0x9C];
     Unk80270BA0_X* m36C;
-    char pad370[0x38C - 0x370];
+    char pad370[0x378 - 0x370];
+    Unk80270BA0_X* m378;
+    char pad37C[4];
+    int m380;
+    char pad384[0x38C - 0x384];
     int m38C;
 };
 
@@ -209,7 +213,7 @@ struct Unk801DD660_Ctx {
     void* mC;
     char pad10[0x30 - 0x10];
     int m30;
-    char pad34[4];
+    int m34;
     int m38;
     char pad3C[0x44 - 0x3C];
     int m44;
