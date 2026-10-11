@@ -60,7 +60,6 @@ int fn_8059394C(int* p, int i);
 int fn_8007B7A4(Unk8007B2B0_Screen* s, void* o);
 int fn_8007B7EC(Unk8007B2B0_Screen* s, void* o, int i);
 void* fn_8007F7D0(int s, unsigned i);
-float fn_80551A80(int a, int b);
 void fn_800DC580(void* w, float f);
 extern char lbl_805BC180[];
 extern unsigned char lbl_8060E9F1[];
@@ -115,4 +114,12 @@ struct Ue1E0 {
     int m1E0;
 };
 Ue1E0* fn_8007FE04(Unk8007B2B0_Screen* s);
+int fn_8007B7C8(Unk8007B2B0_Screen* s, void* o, int i);
+int fn_8007B834(Unk8007B2B0_Screen* s, void* o, int i);
+int fn_8007B858(Unk8007B2B0_Screen* s, void* o, int i);
+struct Ue6058_T {
+    int m[50];
+};
+extern Ue6058_T lbl_805BDF00;
+float fn_80551A80(int a, int b);
 #endif
