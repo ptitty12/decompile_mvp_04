@@ -70,6 +70,7 @@ struct Unk80038EB4_Tbl {
     char pad44B0[0x4DB0 - 0x44B0];
     int m4DB0[2][4][4];
     int m4E30[2][2][4];
+    int m4E70[2][2][4];
 };
 
 #endif /* GAME_TU_80034BBC_H */
