@@ -12,6 +12,11 @@ Sections:
 	.sbss       type:bss align:8
 	.sdata2     type:rodata align:8
 
+animation/choosers/tu_8026DDE8.cpp:
+	.text       start:0x8026DDE8 end:0x8026FEB8
+	.rodata     start:0x805DC360 end:0x805DC4A4
+	.data       start:0x8061E640 end:0x8061E644
+
 animation/choosers/playeridchooser.cpp:
 	.text       start:0x80270730 end:0x80271748
 	.rodata     start:0x805DC568 end:0x805DC644
