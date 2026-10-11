@@ -6,6 +6,11 @@
 #include "game/tu_802CBD04.h"
 
 extern const char lbl_805E4194[];
+extern const char lbl_805E414C[];
+extern const char lbl_805E415C[];
+extern const char lbl_805E416C[];
+extern const char lbl_805E4180[];
+extern "C" Unk802D4BD0_Obj* fn_801A4B34(void* owner);
 extern const char lbl_805E26DC[];
 extern const char lbl_805E26EC[];
 extern const char lbl_805E2700[];
@@ -29,15 +34,39 @@ const char* fn_802D7218();
 const char* fn_802D7288();
 const char* fn_802D7324();
 const char* fn_802D7394();
-void fn_802D4BD0(Unk802D58E8* o);
-void fn_802D4DE8(Unk802D58E8* o);
-void fn_802D4CC8(Unk802D58E8* o);
-void fn_802D4434(Unk802D58E8* o);
+const char* fn_802D4BD0(Unk802D58E8* o, int k);
 const char* fn_802D4CBC();
-
+void fn_802D4DE8(Unk802D58E8* o, int k);
+void fn_802D4CC8(Unk802D58E8* o, int k);
+void fn_802D4434(Unk802D58E8* o, int k);
 void fn_802D4280(Unk802D58E8* o)
 {
     fn_802D58E8(o, 1);
+}
+
+const char* fn_802D4BD0(Unk802D58E8* o, int k)
+{
+    switch (k) {
+    case 1:
+    case 3: {
+        Unk802D4BD0_Obj* t = fn_801A4B34(o->m60);
+        if (t != 0 && t->s5(1) == 1) {
+            return lbl_805E414C;
+        }
+        return lbl_805E415C;
+    }
+    case 2:
+    case 4: {
+        Unk802D4BD0_Obj* t = fn_801A4B34(o->m60);
+        if (t != 0 && t->s5(1) == 1) {
+            return lbl_805E416C;
+        }
+        return lbl_805E4180;
+    }
+    case 0:
+    default:
+        return 0;
+    }
 }
 
 const char* fn_802D4CBC()
@@ -45,24 +74,24 @@ const char* fn_802D4CBC()
     return lbl_805E4194;
 }
 
-void fn_802D4F64(Unk802D58E8* o)
+void fn_802D4F64(Unk802D58E8* o, int k)
 {
     switch (o->m60->m6F4) {
     case 2:
-        fn_802D4BD0(o);
+        fn_802D4BD0(o, k);
         break;
     case 3:
-        fn_802D4DE8(o);
+        fn_802D4DE8(o, k);
         break;
     case 4:
-        fn_802D4CC8(o);
+        fn_802D4CC8(o, k);
         break;
     case 9:
         fn_802D4CBC();
         break;
     case 0:
     default:
-        fn_802D4434(o);
+        fn_802D4434(o, k);
         break;
     }
 }

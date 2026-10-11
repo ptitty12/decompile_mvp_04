@@ -94,4 +94,18 @@ struct Unk802D5618 {
     char* m70;
 };
 
+/* Player/ball controller reached through fn_801A4B34: 0x98 bytes of data, then the vptr; fn_802D4BD0 and fn_802D4CC8 call virtual slot 5
+ * with an int argument and compare the result with 1. */
+struct Unk802D4BD0_Base {
+    char pad0[0x98];
+};
+class Unk802D4BD0_Obj : public Unk802D4BD0_Base {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual int s5(int a);
+};
+
 #endif
