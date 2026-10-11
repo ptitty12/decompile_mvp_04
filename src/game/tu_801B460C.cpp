@@ -22,6 +22,16 @@ public:
     virtual Unk8037B3E8* fn_vslot5();
 };
 
+struct Unk801B6A4C_T {
+    char pad0[0xB88];
+    void* mB88;
+};
+struct Unk801B6A44_T {
+    char pad0[0x70C];
+    unsigned char m70C;
+};
+void fn_8023DF58(void* p);
+void fn_801B905C(void* p);
 extern int lbl_8068BECC;
 extern int lbl_806EF9B4;
 
@@ -85,6 +95,17 @@ Unk801B64B0* fn_801B659C()
 Unk8037B3E8* Unk801B64B0::fn_vslot5()
 {
     return new (lbl_806EF9B4) Unk801B64B0;
+}
+
+int fn_801B6A44(Unk801B6A44_T* p)
+{
+    return p->m70C;
+}
+
+void fn_801B6A4C(Unk801B6A4C_T* p)
+{
+    fn_8023DF58(p);
+    fn_801B905C(p->mB88);
 }
 
 void fn_801B7F2C(void* p)
