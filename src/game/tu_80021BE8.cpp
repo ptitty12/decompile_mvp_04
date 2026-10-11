@@ -40,7 +40,7 @@ extern "C" void fn_80021D04(Unk8001E444_Obj* x, Unk8001F2C4_World* ctx, Unk801A4
     fn_800412AC(fn_8004072C(), 2, sx, sy, 0, 0);
 }
 
-extern "C" void fn_80021D6C(Unk8001E444_Obj* x, Unk8001F2C4_World* ctx, int n)
+extern "C" void fn_80021D6C(void* x, Unk8001F2C4_World* ctx, int n)
 {
     int sx, sy;
     int v = n;

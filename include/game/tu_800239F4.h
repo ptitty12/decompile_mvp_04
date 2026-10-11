@@ -18,11 +18,13 @@ struct Unk80023AC4_Obj;
 struct Unk8001CE80_Sub {
     char pad0[8];
     int m8;
-    char padC[0x40 - 0xC];
+    char padC[0x20 - 0xC];
+    int m20[4];
+    char pad30[0x40 - 0x30];
     int m40;
     int m44;
     int m48;
-    char pad4C[0x50 - 0x4C];
+    int m4C;
     int m50;
     int m54;
     char pad58[0x5C - 0x58];
@@ -66,6 +68,11 @@ public:
     virtual void fn_vslot22();
     virtual void fn_vslot23();
     virtual int fn_vslot24();
+};
+
+/* Record behind Obj::m6B8 (its first word is compared against 3 in fn_800256F8). */
+struct Unk800256F8_Rec {
+    int m0;
 };
 
 struct Unk80023F98_Vec2 {
@@ -116,14 +123,19 @@ struct Unk8002569C_Msg {
     int m8;
     int mC;
     int m10;
-    char pad14[4];
+    int m14;
     float m18;
     float m1C;
-    char pad20[8];
+    int m20;
+    int m24;
     int m28;
     int m2C;
     int m30;
     int m34;
+    int m38;
+    int m3C;
+    int m40;
+    int m44;
 };
 
 /* Checked cast of a message record to the layout for type id (null if the id differs). */
@@ -144,6 +156,7 @@ inline Unk8002569C_Msg* Unk8002569C_Cast(Unk8002569C_Msg* m, int id)
 extern "C" {
 void fn_8002A244(Unk80023AC4_Obj* x, int id, float duration);
 void fn_800289F8(Unk80023AC4_Obj* x);
+void fn_80021D6C(void* x, Unk8001F2C4_World* ctx, int n);
 int fn_803445A0(char* p);
 void fn_800488C4(Unk800475EC_Obj* o, int id, float f, int* a, Unk8001CE80_Sub* b, Unk8001F2C4_World* w);
 void fn_80039790(Unk80038EB4_Obj* o, float f);
@@ -161,6 +174,18 @@ int fn_8006BE18(Unk8001F5CC_Tbl* t);
 void fn_80344494(int* p, int a);
 void fn_8003F974(int a);
 void fn_80030274();
+float fn_8018CDB8(Unk801A4B34_Pos* p, int a, float f);
+void fn_803EE7BC();
+void fn_80048968(Unk800475EC_Obj* o);
+void fn_800396D0(Unk80038EB4_Obj* o, int a);
+Unk80038EB4_Obj* fn_8005BA9C();
+void fn_8005C250(Unk80038EB4_Obj* o, int a);
+void fn_8003968C(Unk80038EB4_Obj* o, int a);
+float fn_8017FA08(int a);
+void fn_80039854(Unk80038EB4_Obj* o, int a, float f);
+void fn_800398E4(Unk80038EB4_Obj* o, float f);
+void fn_800395B0(Unk80038EB4_Obj* o, int a);
+void fn_80048C08(char* p);
 void fn_8003EAB0(int a);
 int fn_801C3E28(Unk8001F2C4_Inner* v);
 Unk80038EB4_Obj* fn_80038EB4();
@@ -172,6 +197,14 @@ void fn_80035AE8(int a, int b, int c);
 void fn_8003CC0C(int a, int b);
 void fn_80048914(Unk800475EC_Obj* o, Unk8001F2C4_World* w);
 void fn_8003E8E4(int a);
+void fn_8003C9F4(int a);
+void fn_8018CA5C(Unk801A4B34_Pos* p, float* a, float* b, float* c);
+void fn_8002F160(Unk80023AC4_Obj* x);
+int fn_8024D408(Unk801A4B34_Pos* p);
+int fn_80257EA8(Unk8001F2C4_Rec* r, int a);
+void fn_8003CC54(int a, int b);
+void fn_8003CA24(int a, int b);
+void fn_8002C830(Unk80023AC4_Obj* x);
 void fn_8003538C(int a, int b, int c, int d);
 void fn_8002C6F8(Unk80023AC4_Obj* x);
 void fn_80026D7C(Unk80023AC4_Obj* x);
@@ -189,17 +222,17 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk80023AC4_Obj(); /* ctor is fn_800234D8 (tu_80021BE8.cpp), not defined here */
     char padBC[0xC];
     Unk8001F5CC_Tbl* mC8;
-    char padCC[0x4];
+    int mCC;
     int mD0;
     char padD4[0x8];
     int mDC;
     char padE0[0x14];
     int mF4;
-    char padF8[0x4];
+    int mF8;
     int mFC;
     int m100;
     int m104;
-    char pad108[0x4];
+    int m108;
     int m10C;
     char pad110[0x4];
     int m114;
@@ -207,7 +240,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m11C;
     char pad120[0x4];
     int m124;
-    int m128;
+    unsigned m128;
     int m12C;
     Unk80023AC4_Word m130;
     int m134;
@@ -217,7 +250,10 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m144;
     int m148;
     int m14C;
-    char pad150[0x10];
+    int m150;
+    char pad154[0x4];
+    int m158;
+    int m15C;
     Unk8001CE80_Sub m160;
     int m1BC;
     int m1C0[3];
@@ -238,7 +274,11 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     char pad3E8[0x128];
     Unk80023F98_Pl* m510;
     int m514;
-    char pad518[0x14];
+    char pad518[0x4];
+    int m51C;
+    float m520;
+    char pad524[0x4];
+    float m528;
     int m52C;
     char pad530[0x34];
     int m564;
@@ -252,7 +292,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m638;
     char pad63C[0x4];
     Unk801A4B34_Vec3 m640[9];
-    char pad6AC[0x10];
+    char pad6AC[0xC];
+    Unk800256F8_Rec* m6B8;
     Unk8002569C_Msg* m6BC;
     char pad6C0[0x8];
     int m6C8;
@@ -262,7 +303,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m6DC;
     int m6E0;
     int m6E4;
-    char pad6E8[0x8];
+    int m6E8;
+    char pad6EC[0x4];
     int m6F0;
     unsigned char m6F4;
     unsigned char m6F5;
@@ -270,7 +312,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m6F8;
     int m6FC;
     int m700;
-    char pad704[0x8];
+    int m704;
+    char pad708[0x4];
     int m70C;
     int m710;
     char pad714[0x4];

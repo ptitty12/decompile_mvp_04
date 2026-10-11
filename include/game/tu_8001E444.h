@@ -27,6 +27,7 @@ struct Unk8001E444_Char {
     char pad464[0x588 - 0x464];
     char m588[0x180];
     int m708;
+    int m70C;
 };
 
 /* Entity record, stride 0xE64 (fn_8001F5CC, fn_8001E4F4). */
@@ -87,6 +88,16 @@ inline float Unk801A4B34_Len(const Unk801A4B34_Vec3& v)
     return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
+/* Sub-record at Pos+0x58C (flags at +4, a count at +0x30, an id at +0x38). */
+struct Unk801A4B34_Rec58C {
+    int m0;
+    unsigned m4;
+    char pad8[0x30 - 8];
+    int m30;
+    char pad34[4];
+    int m38;
+};
+
 /* Character-like object returned by fn_801A4B34/fn_801A497C (position at +0x60). */
 struct Unk801A4B34_Pos {
     char pad0[0x60];
@@ -98,14 +109,17 @@ struct Unk801A4B34_Pos {
     float m3E8;
     char pad3EC[0x3F4 - 0x3EC];
     float m3F4;
-    char pad3F8[0x458 - 0x3F8];
+    char pad3F8[0x44C - 0x3F8];
+    struct Unk8001F2C4_World* m44C;
+    char pad450[0x458 - 0x450];
     int m458;
     char pad45C[4];
     int m460;
-    char pad464[0x590 - 0x464];
-    unsigned m590;
-    char pad594[0x708 - 0x594];
+    char pad464[0x58C - 0x464];
+    Unk801A4B34_Rec58C m58C;
+    char pad5C8[0x708 - 0x5C8];
     int m708;
+    unsigned char m70C;
 };
 
 /* Object at Outer+0x3A4 (fn_800243D4 reads a float at +0x1F8, fn_800245D0 passes +0x28C on). */
@@ -189,6 +203,8 @@ struct Unk8001E444_Obj {
     int m408;
     int m40C;
     int m410;
+    char pad414[0x444 - 0x414];
+    int m444;
 };
 
 struct Unk8001F764_Obj {
@@ -210,6 +226,7 @@ int fn_8025416C(void* p, int n);
 
 extern "C" {
 float fn_80254474(void* p, int a, int b);
+float fn_80254330(void* p, int a);
 float fn_8025454C(void* p, int a);
 void fn_8009E1D4(void* p, int a, int b);
 void fn_80045024(int a);
@@ -245,6 +262,7 @@ int fn_80097318(Unk8001F5CC_Ent* e, int a);
 void fn_80046DCC(float f);
 void fn_80046D30(float f);
 int fn_80097210(Unk8001F5CC_Ent* e, int a);
+int fn_80097A70(Unk8001F5CC_Ent* e, int a, int b, int c);
 int fn_800638F0(Unk8001F5CC_Tbl* t, Unk8001F218_Pair* base, int idx, int a, int* outSize, int** outArr);
 void fn_8004378C(int a);
 Unk801A4B34_Pos* fn_801A4B34(Unk8001F2C4_World* w);
