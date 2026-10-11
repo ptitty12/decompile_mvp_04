@@ -36,7 +36,10 @@ public:
     Unk8027DE3C_Owner* m4;
     char pad8[4];
     int mC;
-    char pad10[0x28 - 0x10];
+    char pad10[0x1C - 0x10];
+    float m1C;
+    char pad20[4];
+    float m24;
     int m28;
     char pad2C[0x78 - 0x2C];
     int m78;
@@ -75,6 +78,8 @@ public:
     void fn_8027EC58(Unk80270BA0_X* x, int h);
     int fn_8027EE9C(Unk80270BA0_X* x, int h);
     float fn_8027EF48(float a);
+    float fn_8027EFB8(Unk80270BA0_X* x, float a);
+    void fn_8027F504(Unk80270BA0_X* x, int h, float f);
     float fn_8027F28C(Unk80270BA0_X* x, float a);
     int fn_8027FC20(int a);
     int fn_8027FC80(Unk80270BA0_X* x);
@@ -89,6 +94,10 @@ public:
 };
 
 float __builtin_fabsf(float x);
+float fn_80410CE8(float a, float b);                           /* other unit */
+float fn_80382BB8(Unk80271DBC_Link* l);                        /* other unit (see tu_80272B20.cpp) */
+float fn_80382BD8(Unk80271DBC_Link* l, int a);                 /* other unit */
+extern float lbl_8061E6CC;                                     /* .data 0x8061E6CC = 0.6f */
 
 /* Same helper as in animation/choosers/tu_80271F14.cpp and tu_80272B20.cpp
  * (to be shared when the unity TU is assembled). */
@@ -118,6 +127,8 @@ public:
 };
 float fn_801DC5C4(int id);                                     /* other unit */
 Unk8027DE3C_Holder* fn_801DC570(int id);                       /* other unit */
+Unk80273498_Vec3 fn_80189618(Unk80273498_Pos* p, float f);     /* other unit */
+int fn_8026DAA4(Unk80270BA0_X* x, int a);                      /* other unit */
 Unk80273498_Vec3 fn_8018959C(Unk80273498_Pos* p, float f);     /* other unit */
 extern int lbl_806242B4;                                       /* other units' .data */
 

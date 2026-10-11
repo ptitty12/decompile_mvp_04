@@ -323,6 +323,135 @@ float Unk8027DE3C::fn_8027F28C(Unk80270BA0_X* x, float a)
     return (float)changed;
 }
 
+inline void SetAngle(Unk802726BC_Angles* p, float v)
+{
+    float t = v;
+    if (p->m190 == 1) {
+        p->m48[0] = t;
+    }
+    float* q = &p->m48[p->m190];
+    *q = t;
+}
+
+inline void SetFloat(float& dst, float v)
+{
+    dst = v;
+}
+
+inline float LenSq(Unk80273498_Vec3 v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+/* near-miss (about 87%): the first half is instruction-identical (f31 holds 1.3, the sret
+ * Vec3 is addressed from r1, LenSq/ball local give retail's frame). The clamps differ:
+ * retail edits the loaded value in place (one shared "fmr f0,f13" per clamp, stored once),
+ * ternaries here copy it into a second register. Tried: if-chain, nested ternaries with
+ * negated compares, register variable, hi/lim as separate statements. */
+float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
+{
+    float hi = 1.3f;
+    float lim = 0.5f;
+    if (!(mE8 & 0x2000000)) {
+        switch (m7C) {
+        case 2:
+        case 3:
+        case 4:
+            hi = 5.0f;
+            if (fn_8026DAA4(x, 0) != 0) {
+                hi = 1.3f;
+            }
+            break;
+        case 1: {
+            hi = 1.3f;
+            float t = fn_80286F9C() - (float)x->m44C->m4C * 0.016666668f;
+            Unk80273498_Pos* ball = fn_8027B304(x);
+            float lenSq = LenSq(fn_80189618(ball, t));
+            float r = 20.0f;
+            if (!(lenSq >= r * (r * 309.76f))) {
+                float c = 1.7f;
+                hi = c;
+            }
+            break;
+        }
+        }
+    }
+    if (mE8 & 0x20000) {
+        lim = 0.05f;
+        hi = 5.0f;
+    }
+    if (mE8 & 0x1000000) {
+        if (m7C == 1) {
+            lim = !(lim > 1.2f) ? (!(lim >= 0.8f) ? 0.8f : lim) : 1.2f;
+            hi = !(hi <= 1.2f) ? 1.2f : (!(hi >= 0.8f) ? 0.8f : hi);
+        } else {
+            lim = !(lim > 1.6f) ? (!(lim >= 0.8f) ? 0.8f : lim) : 1.6f;
+            hi = !(hi > 1.6f) ? (!(hi >= 0.8f) ? 0.8f : hi) : 1.6f;
+        }
+    }
+    if ((unsigned)(m78 - 0x1A) <= 1) {
+        lim = 0.6f;
+        hi = 1.5f;
+    }
+    if (mC <= 3) {
+        lim = !(lim >= 0.75f) ? 0.75f : lim;
+    }
+    float result = !(a > hi) ? (!(a >= lim) ? lim : a) : hi;
+    return result;
+}
+
+/* near-miss (about 87%, 180 vs 181 insns): same control flow and constants; differs
+ * in the stack slots of the SetAngle inline (retail 0x30/0x38, here 0x20/0x24), the
+ * register of the clamped value (retail keeps it in f0, here f13 plus a copy) and the
+ * li order of the two stores. Tried: named local vs inline for the 0.2 product,
+ * store order permutations, if-chain vs nested ternary clamp, open-coded SetAngle. */
+void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
+{
+    int a = 0;
+    int b = 1;
+    switch (h) {
+    case (int)0x9FE2E6D1:
+    case (int)0xCA50EF74:
+        if (mC > 3) {
+            break;
+        }
+    case 0x7942CA79:
+        a = 1;
+        break;
+    case (int)0xF90D27A1:
+    case (int)0xFA52B1B5:
+        a = 0;
+        break;
+    default:
+        b = 0;
+        break;
+    }
+    if (b != 0) {
+        x->m938 = 1;
+    }
+    if (a != 0) {
+        float side = 0.0f;
+        if (x->fn_vslot23() != 0) {
+            side = -side;
+        }
+        float ang = fn_80410CE8(m1C, m24) - side;
+        float cur = fn_80382BB8(x->m618);
+        float diff = AngleDiff(ang, cur);
+        x->m95C = 0;
+        x->m958 = 5;
+        SetFloat(x->m954, diff * 0.2f);
+    }
+    if (h == (int)0xA84A0C58 || h == (int)0xFA52B1B5 || h == (int)0xF90D27A1) {
+        if (!(f <= 0.0f)) {
+            float k = fn_80382BD8(x->m618, 0);
+            float w = lbl_8061E6CC * (1.0f - k);
+            float v = (mC8 + w) / f;
+            v = !(v <= 0.0f) ? (!(v > 5.0f) ? (!(v >= 1.0f) ? 1.0f : v) : 5.0f) : 5.0f;
+            SetAngle(&x->m734, v);
+        }
+    }
+}
+
 int Unk8027DE3C::fn_8027FC20(int a)
 {
     int r = 0;

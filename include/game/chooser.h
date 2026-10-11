@@ -126,6 +126,25 @@ public:
     virtual void fn_vslot2();
     virtual void fn_vslot3();
     virtual int fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual int fn_vslot23();          /* called by goal logic (fn_8027F504) */
 };
 
 /* Data of the player object between its vptr and its second base. */
@@ -153,7 +172,8 @@ struct Unk802726BC_Angles {
     float m30[2];              /* goal logic (fn_8027FC80) */
     char pad38[0x40 - 0x38];
     float m40[2];
-    char pad48[0xE0 - 0x48];
+    float m48[2];              /* goal logic (fn_8027F504) */
+    char pad50[0xE0 - 0x50];
     float mE0[2];
     float mE8[2];
     char padF0[0x100 - 0xF0];
@@ -188,10 +208,14 @@ public:
     int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
     char pad720[0x734 - 0x720];
     Unk802726BC_Angles m734;
-    char pad8C8[0x93C - 0x8C8];
+    char pad8C8[0x938 - 0x8C8];
+    int m938;                  /* goal logic (fn_8027F504) */
     Unk80273498_Vec3 m93C;     /* goal logic (fn_8027EB34): two target positions */
     Unk80273498_Vec3 m948;
-    char pad954[0xAB4 - 0x954];
+    float m954;                /* goal logic (fn_8027F504) */
+    int m958;
+    int m95C;
+    char pad960[0xAB4 - 0x960];
     float mAB4;                /* goal logic (fn_8027FC80) */
     char padAB8[0xB4C - 0xAB8];
     int mB4C;
