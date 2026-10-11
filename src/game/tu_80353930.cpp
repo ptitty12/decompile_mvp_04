@@ -12,6 +12,12 @@ extern char lbl_8064A170[];
 struct DtorAt30 { char pad[0x30]; const void* m; };
 extern char lbl_8064A030[];
 struct DtorAt10 { char pad[0x10]; const void* m; };
+extern char lbl_8064A0F0[];
+extern char lbl_8064B298[];
+struct Unk80353A9C { Unk80353A9C_R m0; Unk80353A9C_R m14; char m28[8]; char m30[0x120]; };
+extern char lbl_8064B698[];
+extern char lbl_8064B5D8[];
+#include "game/tu_80087A58.h"
 extern char lbl_80649EC0[];
 struct DtorAt8 { char pad[0x8]; const void* m; };
 
@@ -62,6 +68,22 @@ void fn_80353A68(DtorAt10* self, int chrg)
         fn_80377408(self);
 }
 
+Unk80353A9C* fn_80353A9C(Unk80353A9C* s)
+{
+    s->m0.Init(s->m30, 8, 0x120, lbl_8064A0F0);
+    s->m0.m10 = lbl_8064A030;
+    s->m14.Init(s->m28, 2, 8, lbl_8064B298);
+    return s;
+}
+
+Unk80353A9C* fn_80353B3C(Unk80353A9C* s)
+{
+    s->m0.Init(s->m30, 4, 0x70, lbl_8064B698);
+    s->m0.m10 = lbl_8064B5D8;
+    s->m14.Init(s->m28, 2, 8, lbl_8064B298);
+    return s;
+}
+
 int fn_80353BDC(Unk80353E68* s)
 {
     return s->m0[s->mC];
@@ -103,6 +125,13 @@ unsigned* fn_80353C50(Unk80353E68* s)
 int* fn_80353C58(Unk80353E68* s)
 {
     return &s->m8;
+}
+
+void* fn_80087B14();
+void fn_80353C60(Unk80087A58_O* o, int a)
+{
+    if (fn_80087B14() != 0)
+        o->mF5C[o->m8].b10.b = a;
 }
 
 int fn_80353D90(Unk80353E68* s)
