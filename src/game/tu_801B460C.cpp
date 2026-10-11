@@ -89,6 +89,21 @@ int fn_801B58D4(Unk801B460C_Tbl* t);
 int fn_8025416C(void* a, int b);
 int fn_80076644(int a, int b, int c);
 int fn_801B5F4C(Unk801AB63C_P* p);
+void fn_801B5498(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* a, int* b, int* c, int* d, int* e, int* f);
+struct Unk801B460C_Five {
+    int a[5];
+};
+struct Unk801B460C_F {
+    char pad0[0x40];
+    int m40;
+    int m44;
+    int m48;
+};
+extern Unk801B460C_Five lbl_805CF778;
+int fn_801C192C(void* a, int b);
+extern Unk801B460C_Five lbl_805CF78C;
+extern Unk801B460C_Five lbl_805CF7A0;
+int fn_801B3850(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c);
 void fn_801B484C(int* acc);
 void fn_801B48EC(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
 void fn_801B4AB4(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
@@ -115,6 +130,33 @@ extern int lbl_806EF9B4;
 
 int fn_801B5FC4(void* a, int b);
 
+/* near-miss: 72/72 insns; register numbering of the callee-saved set and the table-copy pointer (r6 vs r12)
+ * differ, same class as fn_801B4AB4. */
+void fn_801B48EC(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    Unk801B460C_Five tbl = lbl_805CF778;
+    Unk801B460C_F* f = (Unk801B460C_F*)((char*)q + 0x480);
+    int off = 0;
+    if (f->m44 >= 0) {
+        off = (f->m48 - 0xF) * 4;
+    }
+    int v = *(int*)((char*)&tbl + off);
+    int r = 0;
+    int t = fn_801B5FC4(p, q->m708);
+    if (fn_801C192C(p, t) != 0) {
+        int u = fn_801B608C(p, q);
+        int w = -t;
+        if (w > u) {
+            w = u;
+        }
+        if ((unsigned)(f->m48 - 0x10) <= 1 && f->m40 <= -5 && v < 0 && u < (int)fn_801B380C(p, q) * 2) {
+            v = -v;
+        }
+        r = v * w;
+    }
+    *acc += r;
+}
+
 void fn_801B4A0C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
 {
     if ((int)q->m4C4 < 0 && fn_801B3FD8(p, q) == 0) {
@@ -125,6 +167,71 @@ void fn_801B4A0C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
                 *acc += 3;
                 *acc -= r;
             }
+        }
+    }
+}
+
+/* near-miss: 53/53 insns; register allocation differs (retail: p r29, q r31, flag-block pointer in r4,
+ * table pointer r6; mine keeps the flag-block pointer in r30). ~3 forms tried. */
+void fn_801B4AB4(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    Unk801B460C_Five tbl = lbl_805CF78C;
+    Unk801B460C_F* f = (Unk801B460C_F*)((char*)q + 0x480);
+    int off = 0;
+    if (f->m44 >= 0) {
+        off = (f->m48 - 0xF) * 4;
+    }
+    int v = *(int*)((char*)&tbl + off);
+    fn_801B4A0C(p, q, &v);
+    int t = fn_801B608C(p, q);
+    *acc += v * (t - fn_801B3850(p, q, 1));
+}
+
+/* near-miss: same register-allocation difference as fn_801B4AB4. */
+void fn_801B4B88(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    if (q->m708 == (p->m8->m6F8->m14[2].m8 == 0)) {
+        Unk801B460C_Five tbl = lbl_805CF7A0;
+        Unk801B460C_F* f = (Unk801B460C_F*)((char*)q + 0x480);
+        int off = 0;
+        if (f->m44 >= 0) {
+            off = (f->m48 - 0xF) * 4;
+        }
+        int v = *(int*)((char*)&tbl + off);
+        fn_801B4A0C(p, q, &v);
+        *acc += fn_801B3850(p, q, 1) * v;
+    }
+}
+
+void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    if (q->m708 == (p->m8->m6F8->m14[2].m8 == 0)) {
+        int a;
+        int b;
+        int c;
+        int d;
+        int e;
+        int f;
+        fn_801B5498(p, q, &a, &b, &c, &d, &e, &f);
+        int r = 0;
+        if (c == 1) {
+            r = 5;
+        }
+        if (d == 1) {
+            r += 0xA;
+        }
+        if (e == 1) {
+            r += 0xF;
+        }
+        *acc += r;
+        if (r > 0) {
+            int s = 0;
+            if (b == 0 && (d != 0 || e != 0)) {
+                s = 0xF;
+            } else if (b <= 1) {
+                s = 0xA;
+            }
+            *acc += s;
         }
     }
 }
