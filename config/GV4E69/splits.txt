@@ -1412,12 +1412,16 @@ game/tu_8033FAFC.cpp:
 
 game/tu_803401A8.cpp:
 	.text       start:0x803401A8 end:0x803414A4
+	.ctors      start:0x805A2C3C end:0x805A2C40
+	.dtors      start:0x805A2D60 end:0x805A2D64
 
 fe/tu_80529364.cpp:
 	.feoverlay  start:0x80529364 end:0x8052A208
+	.ctors      start:0x805A2C40 end:0x805A2C44
 
 db/tu_805A2604.cpp:
 	.dboverlay  start:0x805A2604 end:0x805A2BB0
+	.ctors      start:0x805A2C44 end:0x805A2C48
 
 game/tu_803414A4.cpp:
 	.text       start:0x803414A4 end:0x80341B78
