@@ -9,6 +9,7 @@ typedef Unk801C16B0_Z Z;
 
 extern "C" {
 float fn_801C34F4(Z* z);
+int fn_801C4C3C(Z* z);
 Vec3 fn_801C5C70(void* u, const Vec3* i, const Vec3* n);
 int fn_801C3F00(Z* z);
 void fn_801CF1BC(Z* z);
@@ -84,6 +85,32 @@ struct Unk801C2C64_G {
     char pad64[0x2A0 - 0x64];
 };
 extern Unk801C2C64_G lbl_8068C420;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inline int HashOf(P* p) { return p->m618->m838; }
 
 extern "C" void fn_801C3330(Z* z)
 {
@@ -198,6 +225,25 @@ extern "C" int fn_801C3F60(Z* z)
     return 0;
 }
 
+/* near-miss (85 vs 86 instructions): g++ reuses the loaded +0x378 value for p after the equality test; retail keeps p. */
+extern "C" int fn_801C3FD0(Z* z, P* p)
+{
+    if (z->m4->m418 == 0) {
+        if (p->m264 != 0)
+            return 1;
+        if (fn_801C4C3C(z)) {
+            if (z->m204->m6E4->m378 == (int)p) {
+                if (fn_801C3F00(z) != 0 || HashOf(p) == (int)0x94C34DBD || HashOf(p) == 0x18A18DEB || HashOf(p) == 0x53CFCF84
+                    || HashOf(p) == 0x18AC23C2 || HashOf(p) == 0x0E29BCC7 || HashOf(p) == 0x0AB6992B || HashOf(p) == (int)0xB8C36BDD
+                    || HashOf(p) == (int)0x85882CD7 || HashOf(p) == (int)0xBB8F4C9B || HashOf(p) == (int)0x9E6889E3
+                    || HashOf(p) == (int)0x9913AB0D || HashOf(p) == 0x1BD7330D)
+                    return 0;
+            }
+        }
+    }
+    return 1;
+}
+
 extern "C" int fn_801C4128(Z* z) { return fn_801A2034(z->m204, 3) == -1; }
 
 extern "C" int fn_801C415C(Z* z)
@@ -227,6 +273,27 @@ extern "C" int fn_801C4474(Z* z)
         }
     }
     return 0;
+}
+
+extern "C" int fn_801C4A54(Z* z, int* a, int* b)
+{
+    int ok = 0;
+    int h = fn_801A2034(z->m204, 3);
+    if (fn_802D7DB4(h, 0xB8)) {
+        *a = 1;
+        ok = 1;
+    } else if (fn_802D7DB4(h, 0xB9)) {
+        P* c = z->m204->m6CC;
+        if (c->m38C == 2 && !(c->m3F4 <= 0.08f)) {
+            *a = 1;
+            *b = 1;
+            ok = 1;
+        } else {
+            *a = 2;
+            ok = 1;
+        }
+    }
+    return ok;
 }
 
 /* near-miss: same code, but retail puts the fn_801C34D0 result at 0x20 and the difference at 0x10. */
