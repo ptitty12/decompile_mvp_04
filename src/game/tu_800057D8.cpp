@@ -18,14 +18,21 @@ char* fn_8040B948(const char* hay, const char* needle); /* strstr */
 char* fn_8040B4D8(const char* s, int c);               /* strchr */
 int fn_8040B574(const char* a, const char* b);         /* strcmp */
 int fn_804089B4(char* dst, const char* fmt, ...);      /* sprintf */
-void fn_80402FCC(char* dst, const char* src);
+void fn_80402FCC(char* dst, const void* src);
 Unk80170034_Entry* fn_80170034(Unk80170034_Info* info, int idx);
 void fn_8017008C(Unk80170034_Info* info, const char* name);
 void fn_80436204(int a, int b, int c);
+void fn_80402EF8(void* dst, const char* src);
+void fn_80403144(void* dst, const void* src);
+int fn_80403060(const unsigned short* s);
+void* fn_803774A8(unsigned n, int heap);
+void fn_80170158(Unk80170034_Info* info, unsigned short* ws);
+void fn_801701B4(Unk80170034_Info* info, unsigned short* ws, int a);
 int fn_80400DAC();
 int fn_80400E84();
 void fn_803FFFA8(int a);
 int fn_8017037C(Unk80170034_Info* info);
+int fn_80170A1C(void* self);
 }
 extern int lbl_8061C668;
 
@@ -271,7 +278,7 @@ void Unk800058BC::fn_800061C8()
                 if (p) {
                     *p = 0;
                     for (int i = 0; i < m154; i++) {
-                        fn_80402FCC(b, (const char*)m204[i].m0);
+                        fn_80402FCC(b, (const void*)m204[i].m0);
                         if (fn_8040B574(a, b) == 0) {
                             if (m204[i].m4 == 0) {
                                 m204[i].m4 = 1;
@@ -316,6 +323,481 @@ void Unk800058BC::fn_800061C8()
             }
         } else {
             fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_8000643C()
+{
+    m64->vslot5(&m140);
+    fn_80400DAC();
+    m144 = &Unk800058BC::fn_800064A0;
+}
+
+void Unk800058BC::fn_800064A0()
+{
+    if (m144) {
+        int ms = fn_80400DAC() * 1000 / fn_80400E84();
+        Unk800074BC_Msg* msg = m64->vslot21(ms);
+        if (msg) {
+            switch (msg->m0) {
+            case 0x18:
+                fn_800074BC(msg);
+                break;
+            case 3: {
+                m34 = msg->m38;
+                m144 = 0;
+                mA0 = 0;
+                for (int i = 0; i < 4; i++) {
+                    mA4[i] = 0;
+                }
+                int code = msg->m4;
+                if (code == 0x18 || code == 3) {
+                    fn_8000643C();
+                } else {
+                    mC4 = code == 0;
+                }
+                break;
+            }
+            }
+        } else {
+            fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_800065B4()
+{
+    m110.m0 = lbl_806EEA1C;
+    m64->vslot9(&m140, &m110);
+    fn_80400DAC();
+    m150 = 0;
+    m144 = &Unk800058BC::fn_80006630;
+}
+
+void Unk800058BC::fn_80006630()
+{
+    if (m144) {
+        int ms = fn_80400DAC() * 1000 / fn_80400E84();
+        Unk800074BC_Msg* msg = m64->vslot21(ms);
+        if (msg) {
+            switch (msg->m0) {
+            case 0x18:
+                fn_800074BC(msg);
+                break;
+            case 0x19:
+                if (fn_8040B948(msg->m40, m50)) {
+                    if (m150 < m40) {
+                        fn_8017008C(m3C[m150], msg->m40);
+                        m3C[m150]->m0 = 1;
+                        m3C[m150]->m120 = msg->m48;
+                        m150++;
+                    } else {
+                        m30 = 8;
+                    }
+                }
+                break;
+            case 7: {
+                mA0 = 0;
+                m144 = 0;
+                for (int i = 0; i < 4; i++) {
+                    mA4[i] = 0;
+                }
+                int code = msg->m4;
+                if (code == 0x18 || code == 3) {
+                    fn_800065B4();
+                } else {
+                    int v = 0;
+                    if (code == 0xB || code == 0) {
+                        v = 1;
+                    }
+                    mC4 = v;
+                    if (v) {
+                        fn_800067FC();
+                    }
+                }
+                break;
+            }
+            }
+        } else {
+            fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_800067FC()
+{
+    char buf[0x20];
+    unsigned short ws1[0x1C];
+    unsigned short ws2[0x10];
+    int i;
+    for (i = 0; i < m150; i++) {
+        for (int j = 0; j < m150 - i - 1; j++) {
+            unsigned x = m3C[j]->m120;
+            unsigned y = m3C[j + 1]->m120;
+            if (x < y) {
+                fn_8040B61C(buf, m3C[j]->mE4);
+                fn_8017008C(m3C[j], m3C[j + 1]->mE4);
+                m3C[j]->m120 = y;
+                fn_8017008C(m3C[j + 1], buf);
+                m3C[j + 1]->m120 = x;
+            }
+        }
+    }
+    for (i = 0; i < m150; i++) {
+        fn_8040B61C(buf, m3C[i]->mE4);
+        char* p = fn_8040B948(buf, "_");
+        if (p) {
+            fn_8040B61C(buf, p + 1);
+        }
+        buf[fn_8040B6A0(buf) - fn_8040B6A0(lbl_80615844)] = 0;
+        fn_80402EF8(ws1, buf);
+        fn_80170158(m3C[i], ws1);
+        fn_80402EF8(ws2, m50);
+        fn_801701B4(m3C[i], ws2, m60);
+    }
+}
+
+void Unk800058BC::fn_800069B4()
+{
+    fn_80005D40();
+    m64->vslot8(&m140, &m110);
+    fn_80400DAC();
+    m144 = &Unk800058BC::fn_80006A2C;
+    lbl_8061C668 = 0;
+}
+
+void Unk800058BC::fn_80006A2C()
+{
+    if (m144) {
+        int ms = fn_80400DAC() * 1000 / fn_80400E84();
+        Unk800074BC_Msg* msg = m64->vslot21(ms);
+        lbl_8061C668 = mBC;
+        if (msg) {
+            switch (msg->m0) {
+            case 0x18:
+                fn_800074BC(msg);
+                break;
+            case 6: {
+                mA0 = 0;
+                m144 = 0;
+                for (int i = 0; i < 4; i++) {
+                    mA4[i] = 0;
+                }
+                lbl_8061C668 = 1;
+                m200 = 0;
+                int code = msg->m4;
+                if (code == 0x18 || code == 3) {
+                    fn_800069B4();
+                } else {
+                    int v = 1;
+                    if (code == 0x14) {
+                        v = 0;
+                    }
+                    mC4 = v;
+                }
+                break;
+            }
+            }
+        } else {
+            fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_80006B60()
+{
+    fn_80005D40();
+    m64->vslot6(&m140, &m110);
+    if (m244) {
+        m248 = 1;
+        for (int i = 0; i < m154; i++) {
+            m204[i].m4 = 0;
+        }
+    }
+    fn_80400DAC();
+    m144 = &Unk800058BC::fn_80006C14;
+}
+
+void Unk800058BC::fn_80006C14()
+{
+    if (m144) {
+        Unk800074BC_Msg* msg = m64->vslot21(fn_80400DAC() * 1000 / fn_80400E84());
+        if (msg) {
+            switch (msg->m0) {
+            case 0x18:
+                fn_800074BC(msg);
+                break;
+            case 13:
+                m14C = msg->m54;
+                break;
+            case 0x10:
+                break;
+            case 0x1A:
+                m200 = 1;
+                m44 = fn_80170034(m38, 0)->m0;
+                m48 = fn_80170034(m38, 0)->m4;
+                m64->vslot15(m14C, m44, m48);
+                break;
+            case 0x12:
+                if (m200 == 2) {
+                    m64->vslot22(2, 0);
+                } else {
+                    m200 = 2;
+                    m44 = fn_80170034(m38, 1)->m0;
+                    m48 = fn_80170034(m38, 1)->m4;
+                    m64->vslot15(m14C, m44, m48);
+                }
+                break;
+            case 0x1C:
+                if (m200 != 2 || fn_80170A1C(this) != 0 || m200 != 2) {
+                    m64->vslot22(7, 0);
+                } else {
+                    m64->vslot22(6, 0);
+                }
+                break;
+            case 4: {
+                mA0 = 0;
+                m144 = 0;
+                for (int i = 0; i < 4; i++) {
+                    mA4[i] = 0;
+                }
+                m200 = 0;
+                int code = msg->m4;
+                if (code == 0x18 || code == 3) {
+                    if (m248 == 0) {
+                        fn_80006B60();
+                    } else {
+                        fn_800060B4();
+                    }
+                } else {
+                    int t = m250;
+                    mC4 = code == 0;
+                    if (t) {
+                        m244 = t;
+                        m250 = 0;
+                    }
+                }
+                break;
+            }
+            }
+        } else {
+            fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_80006E94()
+{
+    fn_80005D40();
+    fn_8017037C(m38);
+    m64->vslot7(&m140, &m110);
+    fn_80400DAC();
+    m144 = &Unk800058BC::fn_80006F60;
+    lbl_8061C668 = 0;
+    Unk80170034_Entry* e = fn_80170034(m38, 0);
+    int sum = e->m4 + fn_80170034(m38, 1)->m4;
+    fn_80005F4C((int)m38->m8E, sum, 1);
+}
+
+void Unk800058BC::fn_80006F60()
+{
+    if (m144) {
+        int ms = fn_80400DAC() * 1000 / fn_80400E84();
+        Unk800074BC_Msg* msg = m64->vslot21(ms);
+        lbl_8061C668 = mBC;
+        if (msg) {
+            if (m1FC) {
+                delete m1FC;
+                m1FC = 0;
+            }
+            switch (msg->m0) {
+            case 0x18:
+                fn_800074BC(msg);
+                break;
+            case 13:
+                m14C = msg->m54;
+                break;
+            case 0x1B:
+                m200 = 1;
+                m44 = fn_80170034(m38, 0)->m0;
+                m48 = fn_80170034(m38, 0)->m4;
+                m64->vslot16(m14C, m44, m48);
+                break;
+            case 0x13:
+                if (m200 == 2) {
+                    m64->vslot22(1, 0);
+                } else {
+                    m200 = 2;
+                    m44 = fn_80170034(m38, 1)->m0;
+                    m48 = fn_80170034(m38, 1)->m4;
+                    m64->vslot16(m14C, m44, m48);
+                }
+                break;
+            case 5: {
+                mA0 = 0;
+                m144 = 0;
+                for (int i = 0; i < 4; i++) {
+                    mA4[i] = 0;
+                }
+                m200 = 0;
+                lbl_8061C668 = 1;
+                int code = msg->m4;
+                if (code == 0x18 || code == 3) {
+                    fn_80006E94();
+                } else {
+                    mC4 = code == 0;
+                }
+                break;
+            }
+            }
+        } else {
+            fn_803FFFA8(1);
+        }
+    }
+}
+
+void Unk800058BC::fn_80007184(Unk800074BC_Msg* msg)
+{
+    mA0 = msg->mC;
+    int* p = mA4;
+    mA4[0] = msg->m10 > 0 ? msg->m24 : 0;
+    p[1] = msg->m10 > 1 ? msg->m28 : 0;
+    p[2] = msg->m10 > 2 ? msg->m2C : 0;
+    p[3] = msg->m10 > 3 ? msg->m30 : 0;
+}
+
+void Unk800058BC::fn_800071F4(Unk800074BC_Msg* msg)
+{
+    char a[0x190];
+    char b[0x20];
+    int i = 0;
+    fn_80402FCC(a, (const void*)msg->mC);
+    for (i = 0; i < m154;) {
+        int n = m204[i].m8;
+        fn_80402FCC(b, (const void*)m204[i].m0);
+        i++;
+        fn_804089B4(a, "%s \n%s requires 1 file and %i blocks.", a, b, n);
+    }
+    fn_804089B4(a, "%s \nExisting files may be loaded and overwritten.", a);
+    m1FC = fn_803774A8((fn_8040B6A0(a) + 1) * 2, 0x100);
+    fn_80402EF8(m1FC, a);
+    mA0 = (int)m1FC;
+    int* p = mA4;
+    mA4[0] = msg->m10 > 0 ? msg->m24 : 0;
+    p[1] = msg->m10 > 1 ? msg->m28 : 0;
+    p[2] = msg->m10 > 2 ? msg->m2C : 0;
+    p[3] = msg->m10 > 3 ? msg->m30 : 0;
+}
+
+void Unk800058BC::fn_8000733C(Unk800074BC_Msg* msg)
+{
+    unsigned short w[0x190];
+    int found = 0;
+    fn_80403144(w, (const void*)msg->mC);
+    int n = fn_80403060(w);
+    unsigned short* s = (unsigned short*)m204[0].m0;
+    if (s[0] == 0x4F && s[1] == 0x70) {
+        for (int i = 0; i < n; i++) {
+            if (w[i] == 0x35) {
+                i += 2;
+                for (int j = i; j < n; j++) {
+                    unsigned short c = w[j];
+                    if (c == 0x4D) {
+                        found = 1;
+                    }
+                    if (found) {
+                        w[i++] = c;
+                    }
+                }
+                w[i] = 0;
+                break;
+            }
+        }
+    }
+    m1FC = fn_803774A8((fn_80403060(w) + 1) * 2, 0x100);
+    fn_80403144(m1FC, w);
+    mA0 = (int)m1FC;
+    int* p = mA4;
+    mA4[0] = msg->m10 > 0 ? msg->m24 : 0;
+    p[1] = msg->m10 > 1 ? msg->m28 : 0;
+    p[2] = msg->m10 > 2 ? msg->m2C : 0;
+    p[3] = msg->m10 > 3 ? msg->m30 : 0;
+}
+
+void Unk800058BC::fn_800074BC(Unk800074BC_Msg* msg)
+{
+    char buf[0x20];
+    if (msg && msg->m0 == 0x18) {
+        switch (msg->m8) {
+        case 0x13:
+            fn_800071F4(msg);
+            break;
+        case 0x14:
+            fn_8000733C(msg);
+            break;
+        default:
+            fn_80007184(msg);
+            break;
+        }
+        switch (msg->m8) {
+        case 0x11:
+        case 0x12:
+        case 0x13:
+            mBC = 1;
+            for (int i = 0; i < m154; i++) {
+                m204[i].m4 = 0;
+            }
+            break;
+        case 0x19:
+            if (m248) {
+                m64->vslot22(0xA, 0);
+                mA0 = 0;
+            } else {
+                mBC = 1;
+            }
+            break;
+        case 0xD:
+        case 0xE:
+        case 0x10:
+            if (m244 != 0 && m144 == &Unk800058BC::fn_800064A0) {
+                m64->vslot22(0xB, 0);
+                mA0 = 0;
+            } else {
+                mBC = 1;
+            }
+            break;
+        case 0xF:
+            if (m244 != 0 && m144 == &Unk800058BC::fn_800064A0) {
+                m64->vslot22(0xC, 0);
+                mA0 = 0;
+            } else {
+                mBC = 1;
+            }
+            break;
+        case 0x14:
+        case 0x15:
+        case 0x17:
+        case 0x18:
+        case 0x1B:
+        case 0x1C:
+        case 0x1E:
+        case 0x20:
+        case 0x22:
+        case 0x23:
+        case 0x24:
+        case 0x25:
+            mBC = 1;
+            break;
+        case 0x16:
+        case 0x1A:
+        case 0x1D:
+        case 0x1F:
+            break;
+        default:
+            fn_804089B4(buf, "Unhandled TRC msg: %d
+", msg->m8);
+            break;
         }
     }
 }

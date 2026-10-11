@@ -116,8 +116,8 @@ public:
     virtual void vslot12();
     virtual void vslot13();
     virtual void vslot14();
-    virtual void vslot15();
-    virtual void vslot16();
+    virtual void vslot15(int a, int b, int c);
+    virtual void vslot16(int a, int b, int c);
     virtual void vslot17();
     virtual void vslot18();
     virtual void vslot19();
@@ -252,7 +252,7 @@ public:
     Unk800058BC(int mode);
     virtual ~Unk800058BC();
     virtual void fn_80005B88(Unk80170034_Info* info);
-    virtual int fn_8000850C(int a);
+    virtual int fn_8000850C(int a) { return a; }
     virtual int fn_80005B74(int a);
     virtual void fn_80005A7C(Unk80170034_Info* info);
     virtual int fn_80005E8C();
