@@ -404,6 +404,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "animation/choosers/tu_8026DDE8.cpp"),
+            Object(NonMatching, "animation/choosers/randomchooser.cpp"),
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
             Object(Matching, "animation/choosers/tu_80271748.cpp"),
             Object(Matching, "animation/choosers/tu_80271940.cpp"),
