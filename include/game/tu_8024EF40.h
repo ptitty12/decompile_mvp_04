@@ -18,6 +18,11 @@
 struct Unk8024EF40_A;
 struct Unk8024EF40_P;
 
+/* Object at P+0x588: only the back pointer is read (fn_80253DB0 family). */
+struct Unk8024EF40_W {
+    Unk8024EF40_P* m0;
+};
+
 extern char lbl_80649DA0[];
 extern char lbl_80660EC0[];
 
@@ -26,9 +31,15 @@ struct Unk8024EF40_Pos {
     unsigned char m70C;
 };
 
+/* 0xE64-byte per-player record, array behind Q->m6F8->m14 indexed by P->m708
+   (fn_80253DB0 .. fn_80254618: `mulli r0,r0,0xe64`). Sub-objects at +0x118, +0xC74, +0xC9C. */
+struct Unk8024EF40_Ent {
+    char pad0[0xE64];
+};
+
 struct Unk8024EF40_Sub6F8 {
     char pad0[0x14];
-    void* m14;
+    Unk8024EF40_Ent* m14;
 };
 
 struct Unk8024EF40_Ctx {
@@ -41,7 +52,9 @@ struct Unk8024EF40_Ctx {
 struct Unk8024EF40_Q {
     char pad0[0x4C];
     unsigned int m4C;
-    char pad50[0x6CC - 0x50];
+    char pad50[0x554 - 0x50];
+    int m554;
+    char pad558[0x6CC - 0x558];
     Unk8024EF40_P* m6CC;
     char pad6D0[0x6F8 - 0x6D0];
     Unk8024EF40_Sub6F8* m6F8;
@@ -95,7 +108,8 @@ struct Unk8024EF40_P {
     Unk8024EF40_Q* m44C;
     char pad450[8];
     int m458;
-    char pad45C[0x58C - 0x45C];
+    char pad45C[0x588 - 0x45C];
+    Unk8024EF40_W m588;
     Unk8024EF40_A m58C;
     char pad5E0[0x708 - 0x5E0];
     int m708;
@@ -109,6 +123,21 @@ struct Unk8024EF40_P {
 inline float Secs(Unk8024EF40_Q* q)
 {
     return (float)q->m4C * 0.016666668f;
+}
+
+inline Unk8024EF40_Ent* EntOf(Unk8024EF40_P* p)
+{
+    return p->m44C->m6F8->m14 + p->m708;
+}
+
+/* Random percentage roll used by the injury checks (fn_80252460 family); the file
+   string and line are parameters of the inline (a hard-coded string changes the argument
+   setup order). */
+unsigned fn_8014D8AC(int seed, int max, const char* file, int line);
+inline float RandPct(Unk8024EF40_P* x, const char* f, int line)
+{
+    float k = 100.0f;
+    return (float)fn_8014D8AC(x->m44C->m554, 1000000, f, line) * k * 0.000001f;
 }
 
 #endif /* GAME_TU_8024EF40_H */
