@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">0.10% of code matched as of 2026-10-10: 46 of 24,158 functions, 6,044 of 5,896,176 code bytes, 200 units with code.</desc>
+<desc id="desc">0.18% of code matched as of 2026-10-10: 120 of 24,158 functions, 10,508 of 5,896,176 code bytes, 180 units with code.</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -26,14 +26,14 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="0.5" y="0.5" width="959" height="781" rx="8" class="border"/>
 <text x="24.0" y="40.0" class="t2" font-size="14" font-weight="600" text-anchor="start">MVP Baseball 2005 (GV4E69) decompilation</text>
 <text x="936.0" y="40.0" class="t3" font-size="12" font-weight="400" text-anchor="end">as of 2026-10-10</text>
-<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">0.10%</text>
+<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">0.18%</text>
 <text x="26.0" y="118.0" class="t2" font-size="13" font-weight="400" text-anchor="start">of code matched</text>
 <text x="300.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Functions matched</text>
-<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">46 / 24,158</text>
+<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">120 / 24,158</text>
 <text x="512.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
-<text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">6.0 KB / 5.90 MB</text>
+<text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">10.5 KB / 5.90 MB</text>
 <text x="724.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Data matched</text>
-<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">32 B / 1.37 MB</text>
+<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">612 B / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
 <rect x="24" y="140" width="2.0" height="12" class="b5" clip-path="url(#bar)"/>
@@ -66,113 +66,123 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="412.6" y="344.6" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_80176620_te…</text>
 <rect x="407.6" y="445.4" width="139.1" height="93.6" rx="2" class="b0"><title>auto_01_80069F0C_text: 256,428 bytes of code, 0.0% fuzzy match</title></rect>
 <text x="412.6" y="459.4" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_80069F0C_te…</text>
-<rect x="548.7" y="201.0" width="98.8" height="123.9" rx="2" class="b0"><title>auto_01_80271F14_text: 241,268 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="548.7" y="201.0" width="93.8" height="113.1" rx="2" class="b0"><title>auto_01_80279AE4_text: 209,572 bytes of code, 0.0% fuzzy match</title></rect>
 <text x="553.7" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8027…</text>
-<rect x="548.7" y="326.9" width="98.8" height="77.3" rx="2" class="b0"><title>auto_01_803414A4_text: 152,080 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="553.7" y="340.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8034…</text>
-<rect x="548.7" y="406.2" width="98.8" height="66.4" rx="2" class="b0"><title>auto_01_80303AC4_text: 131,104 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="553.7" y="420.2" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8030…</text>
-<rect x="548.7" y="474.6" width="98.8" height="64.4" rx="2" class="b0"><title>auto_01_80150E1C_text: 127,224 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="553.7" y="488.6" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8015…</text>
-<rect x="649.5" y="201.0" width="75.1" height="83.5" rx="2" class="b0"><title>auto_01_802ACDB4_text: 125,436 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="654.5" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="726.6" y="201.0" width="74.9" height="83.5" rx="2" class="b0"><title>auto_01_80413940_text: 125,016 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="731.6" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="803.5" y="201.0" width="66.3" height="83.5" rx="2" class="b0"><title>auto_01_8023BD88_text: 111,036 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="808.5" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
-<rect x="871.7" y="201.0" width="63.3" height="83.5" rx="2" class="b0"><title>auto_01_803BD944_text: 106,176 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="876.7" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
-<rect x="649.5" y="286.5" width="77.4" height="66.2" rx="2" class="b0"><title>auto_01_80328234_text: 102,936 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="654.5" y="300.5" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="649.5" y="354.7" width="77.4" height="62.7" rx="2" class="b0"><title>auto_01_801C19B4_text: 97,684 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="654.5" y="368.7" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="649.5" y="419.4" width="77.4" height="61.4" rx="2" class="b0"><title>auto_01_8038F73C_text: 95,768 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="654.5" y="433.4" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="649.5" y="482.8" width="77.4" height="56.2" rx="2" class="b0"><title>auto_01_802DE370_text: 87,840 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="654.5" y="496.8" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="728.9" y="286.5" width="78.4" height="55.3" rx="2" class="b0"><title>auto_01_80256F9C_text: 87,700 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="733.9" y="300.5" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
-<rect x="809.3" y="286.5" width="62.2" height="55.3" rx="2" class="b0"><title>auto_01_803A9830_text: 70,016 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="814.3" y="300.5" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
-<rect x="873.6" y="286.5" width="61.4" height="55.3" rx="2" class="b0"><title>auto_01_804027DC_text: 69,168 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="878.6" y="300.5" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
-<rect x="728.9" y="343.9" width="48.5" height="68.4" rx="2" class="b0"><title>auto_01_8037B3AC_text: 67,668 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="733.9" y="357.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="728.9" y="414.3" width="48.5" height="66.1" rx="2" class="b0"><title>auto_01_802F3ABC_text: 65,456 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="733.9" y="428.3" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="728.9" y="482.4" width="48.5" height="56.6" rx="2" class="b0"><title>auto_01_804321CC_text: 56,300 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="733.9" y="496.4" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="779.4" y="343.9" width="56.8" height="47.2" rx="2" class="b0"><title>auto_01_8022E680_text: 55,004 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="784.4" y="357.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_0…</text>
-<rect x="838.2" y="343.9" width="49.4" height="47.2" rx="2" class="b0"><title>auto_01_802CB808_text: 48,052 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="843.2" y="357.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="889.6" y="343.9" width="45.4" height="47.2" rx="2" class="b0"><title>auto_01_803F00FC_text: 44,396 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="779.4" y="393.1" width="40.9" height="42.9" rx="2" class="b0"><title>auto_01_80147EBC_text: 36,616 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="779.4" y="438.0" width="40.9" height="36.0" rx="2" class="b0"><title>auto_01_803FAE94_text: 31,004 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="779.4" y="476.0" width="40.9" height="33.0" rx="2" class="b0"><title>auto_01_802D73E8_text: 28,508 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="779.4" y="510.9" width="40.9" height="28.1" rx="2" class="b0"><title>auto_01_803E3C08_text: 24,512 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="393.1" width="34.0" height="31.1" rx="2" class="b0"><title>auto_01_8016FF40_text: 22,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="858.4" y="393.1" width="25.3" height="31.1" rx="2" class="b0"><title>auto_01_80377048_text: 17,208 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="885.7" y="393.1" width="24.4" height="31.1" rx="2" class="b0"><title>auto_01_8026C65C_text: 16,596 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="912.1" y="393.1" width="22.9" height="31.1" rx="2" class="b0"><title>auto_01_80008540_text: 15,704 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="426.2" width="25.0" height="26.0" rx="2" class="b0"><title>auto_01_803249D4_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="849.3" y="426.2" width="20.9" height="26.0" rx="2" class="b0"><title>auto_01_8038BC58_text: 12,200 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="872.2" y="426.2" width="20.7" height="26.0" rx="2" class="b0"><title>auto_01_803BA9DC_text: 12,092 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="894.9" y="426.2" width="19.7" height="26.0" rx="2" class="b0"><title>auto_01_800057D8_text: 11,580 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="916.6" y="426.2" width="18.4" height="26.0" rx="2" class="b0"><title>auto_01_803A6D80_text: 10,884 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="454.2" width="21.0" height="22.4" rx="2" class="b0"><title>auto_01_803ED700_text: 10,660 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="478.7" width="21.0" height="21.2" rx="2" class="b0"><title>auto_01_803EAF50_text: 10,116 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="501.8" width="21.0" height="19.8" rx="2" class="b0"><title>auto_01_803DE414_text: 9,532 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="822.3" y="523.7" width="21.0" height="15.3" rx="2" class="b0"><title>auto_01_803D8234_text: 7,560 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="845.3" y="454.2" width="16.1" height="19.4" rx="2" class="b0"><title>auto_01_803DBFF4_text: 7,348 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="845.3" y="475.6" width="16.1" height="18.0" rx="2" class="b0"><title>auto_01_803DA4EC_text: 6,876 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="845.3" y="495.6" width="16.1" height="13.6" rx="2" class="b0"><title>auto_01_800042B0_text: 5,372 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="845.3" y="511.2" width="16.1" height="13.4" rx="2" class="b0"><title>auto_01_803E0ACC_text: 5,280 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="845.3" y="526.6" width="16.1" height="12.4" rx="2" class="b0"><title>auto_01_8000C2C4_text: 4,960 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="454.2" width="15.0" height="13.0" rx="2" class="b0"><title>auto_01_803E9C20_text: 4,868 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="880.4" y="454.2" width="12.4" height="13.0" rx="2" class="b4"><title>animation/choosers/playeridchooser: 4,120 bytes of code, 99.9% fuzzy match</title></rect>
-<rect x="894.8" y="454.2" width="12.2" height="13.0" rx="2" class="b0"><title>auto_01_803E2248_text: 4,064 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="909.0" y="454.2" width="12.1" height="13.0" rx="2" class="b0"><title>auto_01_8036AEE4_text: 4,028 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="923.0" y="454.2" width="12.0" height="13.0" rx="2" class="b0"><title>auto_01_8000D650_text: 3,996 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="469.3" width="11.6" height="13.2" rx="2" class="b0"><title>auto_01_8000E618_text: 3,924 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="484.5" width="11.6" height="12.6" rx="2" class="b0"><title>auto_01_8006902C_text: 3,764 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="499.1" width="11.6" height="12.3" rx="2" class="b0"><title>auto_01_80323B3C_text: 3,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="513.4" width="11.6" height="11.8" rx="2" class="b0"><title>auto_01_800034A0_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="863.4" y="527.2" width="11.6" height="11.8" rx="2" class="b0"><title>auto_01_80175810_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="469.3" width="10.7" height="12.6" rx="2" class="b0"><title>auto_01_8036E65C_text: 3,524 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="889.6" y="469.3" width="10.5" height="12.6" rx="2" class="b0"><title>auto_01_8036D8AC_text: 3,460 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="902.1" y="469.3" width="10.1" height="12.6" rx="2" class="b0"><title>auto_01_8036BECC_text: 3,344 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="914.2" y="469.3" width="9.5" height="12.6" rx="2" class="b0"><title>auto_01_8036CC08_text: 3,192 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="925.8" y="469.3" width="9.2" height="12.6" rx="2" class="b0"><title>auto_01_80367658_text: 3,108 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="483.8" width="11.3" height="10.1" rx="2" class="b0"><title>auto_01_80369878_text: 3,052 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="495.9" width="11.3" height="9.7" rx="2" class="b0"><title>auto_01_803682A8_text: 2,960 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="507.6" width="11.3" height="9.4" rx="2" class="b0"><title>auto_01_80372F60_text: 2,892 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="519.1" width="11.3" height="9.3" rx="2" class="b0"><title>auto_01_80371D9C_text: 2,848 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.9" y="530.3" width="11.3" height="8.7" rx="2" class="b0"><title>auto_01_8038EC58_text: 2,700 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="890.2" y="483.8" width="9.7" height="10.1" rx="2" class="b0"><title>auto_01_80373AD8_text: 2,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="901.9" y="483.8" width="9.7" height="10.1" rx="2" class="b0"><title>auto_01_80374588_text: 2,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.6" y="483.8" width="9.7" height="10.1" rx="2" class="b0"><title>auto_01_80375038_text: 2,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="925.3" y="483.8" width="9.7" height="10.1" rx="2" class="b0"><title>auto_01_80375AE8_text: 2,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="890.2" y="495.9" width="10.2" height="9.6" rx="2" class="b0"><title>auto_01_80376598_text: 2,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="890.2" y="507.5" width="10.2" height="9.2" rx="2" class="b0"><title>auto_01_803666EC_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="890.2" y="518.7" width="10.2" height="9.2" rx="2" class="b0"><title>auto_01_8036A490_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="890.2" y="529.8" width="10.2" height="9.2" rx="2" class="b0"><title>auto_01_8036F44C_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="902.5" y="495.9" width="9.5" height="9.9" rx="2" class="b0"><title>auto_01_8036FEA0_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="914.0" y="495.9" width="9.5" height="9.9" rx="2" class="b0"><title>auto_01_803708F4_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="925.5" y="495.9" width="9.5" height="9.9" rx="2" class="b0"><title>auto_01_80371348_text: 2,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="902.5" y="507.8" width="8.6" height="10.6" rx="2" class="b0"><title>auto_01_80368E64_text: 2,536 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="902.5" y="520.4" width="8.6" height="9.7" rx="2" class="b0"><title>auto_01_803E3280_text: 2,352 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="902.5" y="532.0" width="8.6" height="7.0" rx="2" class="b0"><title>auto_01_803DDCD4_text: 1,812 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.1" y="507.8" width="6.8" height="8.0" rx="2" class="b0"><title>auto_01_803D7830_text: 1,656 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="921.8" y="507.8" width="6.5" height="8.0" rx="2" class="b0"><title>auto_01_803728E8_text: 1,612 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="930.3" y="507.8" width="4.7" height="8.0" rx="2" class="b0"><title>auto_01_80367140_text: 1,260 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.1" y="517.8" width="5.6" height="4.2" rx="2" class="b0"><title>auto_00_80003100_init: 896 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.1" y="524.0" width="5.6" height="3.7" rx="2" class="b0"><title>auto_01_803DA188_text: 824 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.1" y="529.7" width="5.6" height="3.7" rx="2" class="b0"><title>auto_01_803D7ED4_text: 820 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="913.1" y="535.4" width="5.6" height="3.6" rx="2" class="b5"><title>animation/choosers/tu_80271940: 804 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="920.6" y="517.8" width="4.1" height="3.9" rx="2" class="b5"><title>animation/choosers/tu_80271C64: 688 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="926.8" y="517.8" width="3.7" height="3.9" rx="2" class="b0"><title>auto_01_803E1F98_text: 644 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="932.5" y="517.8" width="2.5" height="3.9" rx="2" class="b5"><title>animation/choosers/tu_80271748: 504 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="548.7" y="316.1" width="93.8" height="81.1" rx="2" class="b0"><title>auto_01_803414A4_text: 151,296 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="553.7" y="330.1" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8034…</text>
+<rect x="548.7" y="399.2" width="93.8" height="70.0" rx="2" class="b0"><title>auto_01_80303AC4_text: 131,104 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="553.7" y="413.2" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8030…</text>
+<rect x="548.7" y="471.1" width="93.8" height="67.9" rx="2" class="b0"><title>auto_01_80150E1C_text: 127,224 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="553.7" y="485.1" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8015…</text>
+<rect x="644.5" y="201.0" width="77.8" height="80.7" rx="2" class="b0"><title>auto_01_802ACDB4_text: 125,436 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="649.5" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
+<rect x="724.3" y="201.0" width="72.5" height="80.7" rx="2" class="b0"><title>auto_01_80415814_text: 117,132 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="729.3" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_…</text>
+<rect x="798.8" y="201.0" width="68.6" height="80.7" rx="2" class="b0"><title>auto_01_8023BD88_text: 111,036 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="803.8" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_…</text>
+<rect x="869.4" y="201.0" width="65.6" height="80.7" rx="2" class="b0"><title>auto_01_803BD944_text: 106,176 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="874.4" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
+<rect x="644.5" y="283.7" width="76.5" height="66.9" rx="2" class="b0"><title>auto_01_80328234_text: 102,936 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="649.5" y="297.7" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
+<rect x="644.5" y="352.6" width="76.5" height="63.4" rx="2" class="b0"><title>auto_01_801C19B4_text: 97,684 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="649.5" y="366.6" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
+<rect x="644.5" y="418.0" width="76.5" height="62.1" rx="2" class="b0"><title>auto_01_8038F73C_text: 95,768 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="649.5" y="432.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
+<rect x="644.5" y="482.2" width="76.5" height="56.8" rx="2" class="b0"><title>auto_01_802DE370_text: 87,840 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="649.5" y="496.2" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01_8…</text>
+<rect x="723.0" y="283.7" width="61.7" height="70.4" rx="2" class="b0"><title>auto_01_80256F9C_text: 87,700 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="728.0" y="297.7" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_01…</text>
+<rect x="786.7" y="283.7" width="48.9" height="70.4" rx="2" class="b0"><title>auto_01_803A9830_text: 70,016 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="791.7" y="297.7" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
+<rect x="837.6" y="283.7" width="48.3" height="70.4" rx="2" class="b0"><title>auto_01_804027DC_text: 69,168 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="842.6" y="297.7" class="l0" font-size="11" font-weight="400" text-anchor="start">auto…</text>
+<rect x="887.8" y="283.7" width="47.2" height="70.4" rx="2" class="b0"><title>auto_01_8037B3AC_text: 67,668 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="723.0" y="356.0" width="48.3" height="66.5" rx="2" class="b0"><title>auto_01_802F3ABC_text: 65,456 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="728.0" y="370.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto…</text>
+<rect x="723.0" y="424.5" width="48.3" height="56.9" rx="2" class="b0"><title>auto_01_804321CC_text: 56,300 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="728.0" y="438.5" class="l0" font-size="11" font-weight="400" text-anchor="start">auto…</text>
+<rect x="723.0" y="483.4" width="48.3" height="55.6" rx="2" class="b0"><title>auto_01_8022E680_text: 55,004 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="728.0" y="497.4" class="l0" font-size="11" font-weight="400" text-anchor="start">auto…</text>
+<rect x="773.2" y="356.0" width="59.0" height="39.4" rx="2" class="b0"><title>auto_01_802CB808_text: 48,052 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="778.2" y="370.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_0…</text>
+<rect x="834.2" y="356.0" width="54.3" height="39.4" rx="2" class="b0"><title>auto_01_803F00FC_text: 44,396 bytes of code, 0.0% fuzzy match</title></rect>
+<text x="839.2" y="370.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
+<rect x="890.5" y="356.0" width="44.5" height="39.4" rx="2" class="b0"><title>auto_01_80147EBC_text: 36,616 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="773.2" y="397.5" width="37.1" height="39.7" rx="2" class="b0"><title>auto_01_803FAE94_text: 31,004 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="773.2" y="439.2" width="37.1" height="36.3" rx="2" class="b0"><title>auto_01_802D73E8_text: 28,508 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="773.2" y="477.5" width="37.1" height="31.0" rx="2" class="b0"><title>auto_01_803E3C08_text: 24,512 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="773.2" y="510.5" width="37.1" height="28.5" rx="2" class="b0"><title>auto_01_8016FF40_text: 22,692 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="397.5" width="31.6" height="25.0" rx="2" class="b0"><title>auto_01_80377048_text: 17,208 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="845.9" y="397.5" width="30.4" height="25.0" rx="2" class="b0"><title>auto_01_8026C65C_text: 16,596 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="878.3" y="397.5" width="28.6" height="25.0" rx="2" class="b0"><title>auto_01_80008540_text: 15,704 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="908.9" y="397.5" width="26.1" height="25.0" rx="2" class="b0"><title>auto_01_80275F24_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="424.4" width="26.7" height="24.4" rx="2" class="b0"><title>auto_01_803249D4_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="450.8" width="26.7" height="22.4" rx="2" class="b0"><title>animation/choosers/tu_80272B20: 13,316 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="475.2" width="26.7" height="20.4" rx="2" class="b0"><title>auto_01_8038BC58_text: 12,200 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="497.6" width="26.7" height="20.2" rx="2" class="b0"><title>auto_01_803BA9DC_text: 12,092 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="812.3" y="519.8" width="26.7" height="19.2" rx="2" class="b0"><title>auto_01_800057D8_text: 11,580 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="424.4" width="23.4" height="20.6" rx="2" class="b0"><title>auto_01_803A6D80_text: 10,884 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="866.4" y="424.4" width="22.8" height="20.6" rx="2" class="b0"><title>auto_01_803ED700_text: 10,660 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="891.2" y="424.4" width="21.6" height="20.6" rx="2" class="b0"><title>auto_01_803EAF50_text: 10,116 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="914.8" y="424.4" width="20.2" height="20.6" rx="2" class="b0"><title>auto_01_803DE414_text: 9,532 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="447.0" width="16.3" height="19.7" rx="2" class="b0"><title>auto_01_803D8234_text: 7,560 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="468.7" width="16.3" height="19.1" rx="2" class="b0"><title>auto_01_803DBFF4_text: 7,348 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="489.8" width="16.3" height="17.7" rx="2" class="b0"><title>auto_01_803DA4EC_text: 6,876 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="509.5" width="16.3" height="14.1" rx="2" class="b0"><title>auto_01_80413940_text: 5,608 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="841.0" y="525.6" width="16.3" height="13.4" rx="2" class="b0"><title>auto_01_800042B0_text: 5,372 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="859.3" y="447.0" width="15.6" height="13.8" rx="2" class="b0"><title>auto_01_803E0ACC_text: 5,280 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="876.9" y="447.0" width="14.5" height="13.8" rx="2" class="b0"><title>auto_01_8000C2C4_text: 4,960 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="893.5" y="447.0" width="14.2" height="13.8" rx="2" class="b0"><title>auto_01_803E9C20_text: 4,868 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.7" y="447.0" width="11.7" height="13.8" rx="2" class="b4"><title>animation/choosers/playeridchooser: 4,120 bytes of code, 99.9% fuzzy match</title></rect>
+<rect x="923.4" y="447.0" width="11.6" height="13.8" rx="2" class="b1"><title>ealib/tu_8036AEE4: 4,072 bytes of code, 3.4% fuzzy match</title></rect>
+<rect x="859.3" y="462.8" width="14.2" height="11.2" rx="2" class="b0"><title>auto_01_803E2248_text: 4,064 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="875.6" y="462.8" width="14.0" height="11.2" rx="2" class="b0"><title>auto_01_8000D650_text: 3,996 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="891.5" y="462.8" width="13.7" height="11.2" rx="2" class="b0"><title>auto_01_8000E618_text: 3,924 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="907.2" y="462.8" width="13.0" height="11.2" rx="2" class="b0"><title>auto_01_8006902C_text: 3,764 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="922.3" y="462.8" width="12.7" height="11.2" rx="2" class="b0"><title>auto_01_80323B3C_text: 3,692 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="859.3" y="475.9" width="12.2" height="11.2" rx="2" class="b1"><title>ealib/tu_8036E65C: 3,568 bytes of code, 3.9% fuzzy match</title></rect>
+<rect x="859.3" y="489.2" width="12.2" height="11.2" rx="2" class="b0"><title>auto_01_800034A0_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="859.3" y="502.3" width="12.2" height="11.2" rx="2" class="b0"><title>auto_01_80175810_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="859.3" y="515.5" width="12.2" height="11.0" rx="2" class="b1"><title>ealib/tu_8036D8AC: 3,504 bytes of code, 4.0% fuzzy match</title></rect>
+<rect x="859.3" y="528.5" width="12.2" height="10.5" rx="2" class="b1"><title>ealib/tu_8036BECC: 3,388 bytes of code, 4.1% fuzzy match</title></rect>
+<rect x="873.5" y="475.9" width="11.2" height="10.9" rx="2" class="b1"><title>ealib/tu_8036CC08: 3,236 bytes of code, 4.3% fuzzy match</title></rect>
+<rect x="886.7" y="475.9" width="10.8" height="10.9" rx="2" class="b1"><title>ealib/tu_80367658: 3,152 bytes of code, 4.4% fuzzy match</title></rect>
+<rect x="899.6" y="475.9" width="10.6" height="10.9" rx="2" class="b1"><title>ealib/tu_80369878: 3,096 bytes of code, 4.5% fuzzy match</title></rect>
+<rect x="912.2" y="475.9" width="10.6" height="10.9" rx="2" class="b0"><title>animation/choosers/tu_80271F14: 3,084 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="924.8" y="475.9" width="10.2" height="10.9" rx="2" class="b1"><title>ealib/tu_803682A8: 3,004 bytes of code, 4.7% fuzzy match</title></rect>
+<rect x="873.5" y="488.8" width="9.4" height="11.5" rx="2" class="b1"><title>ealib/tu_80372F60: 2,936 bytes of code, 4.8% fuzzy match</title></rect>
+<rect x="873.5" y="502.4" width="9.4" height="11.3" rx="2" class="b1"><title>ealib/tu_80371D9C: 2,892 bytes of code, 4.8% fuzzy match</title></rect>
+<rect x="873.5" y="515.7" width="9.4" height="10.6" rx="2" class="b1"><title>ealib/tu_80373AD8: 2,736 bytes of code, 5.1% fuzzy match</title></rect>
+<rect x="873.5" y="528.4" width="9.4" height="10.6" rx="2" class="b1"><title>ealib/tu_80374588: 2,736 bytes of code, 5.1% fuzzy match</title></rect>
+<rect x="884.9" y="488.8" width="11.1" height="9.0" rx="2" class="b1"><title>ealib/tu_80375038: 2,736 bytes of code, 5.1% fuzzy match</title></rect>
+<rect x="898.0" y="488.8" width="11.1" height="9.0" rx="2" class="b1"><title>ealib/tu_80375AE8: 2,736 bytes of code, 5.1% fuzzy match</title></rect>
+<rect x="911.1" y="488.8" width="11.1" height="9.0" rx="2" class="b1"><title>ealib/tu_80376598: 2,736 bytes of code, 5.1% fuzzy match</title></rect>
+<rect x="924.1" y="488.8" width="10.9" height="9.0" rx="2" class="b0"><title>auto_01_8038EC58_text: 2,700 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="884.9" y="499.9" width="11.5" height="8.3" rx="2" class="b0"><title>auto_01_8036F44C_text: 2,644 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="884.9" y="510.2" width="11.5" height="8.3" rx="2" class="b1"><title>ealib/tu_803666EC: 2,644 bytes of code, 5.3% fuzzy match</title></rect>
+<rect x="884.9" y="520.4" width="11.5" height="8.3" rx="2" class="b1"><title>ealib/tu_8036A490: 2,644 bytes of code, 5.3% fuzzy match</title></rect>
+<rect x="884.9" y="530.7" width="11.5" height="8.3" rx="2" class="b1"><title>ealib/tu_8036FEA0: 2,644 bytes of code, 5.3% fuzzy match</title></rect>
+<rect x="898.5" y="499.9" width="10.9" height="8.7" rx="2" class="b1"><title>ealib/tu_803708F4: 2,644 bytes of code, 5.3% fuzzy match</title></rect>
+<rect x="911.4" y="499.9" width="10.9" height="8.7" rx="2" class="b1"><title>ealib/tu_80371348: 2,644 bytes of code, 5.3% fuzzy match</title></rect>
+<rect x="924.4" y="499.9" width="10.6" height="8.7" rx="2" class="b1"><title>ealib/tu_80368E64: 2,580 bytes of code, 5.4% fuzzy match</title></rect>
+<rect x="898.5" y="510.6" width="9.1" height="9.1" rx="2" class="b0"><title>auto_01_803E3280_text: 2,352 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="898.5" y="521.7" width="9.1" height="8.7" rx="2" class="b1"><title>dolphin/ai/AI: 2,276 bytes of code, 6.7% fuzzy match</title></rect>
+<rect x="898.5" y="532.4" width="9.1" height="6.6" rx="2" class="b0"><title>auto_01_803DDCD4_text: 1,812 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.6" y="510.6" width="7.8" height="6.9" rx="2" class="b0"><title>auto_01_803D7830_text: 1,656 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="919.4" y="510.6" width="7.8" height="6.9" rx="2" class="b1"><title>ealib/tu_803728E8: 1,656 bytes of code, 8.5% fuzzy match</title></rect>
+<rect x="929.3" y="510.6" width="5.7" height="6.9" rx="2" class="b1"><title>ealib/tu_80367140: 1,304 bytes of code, 10.7% fuzzy match</title></rect>
+<rect x="909.6" y="519.5" width="4.5" height="5.3" rx="2" class="b0"><title>animation/choosers/randomloadedchooser: 908 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.6" y="526.8" width="4.5" height="5.2" rx="2" class="b0"><title>auto_00_80003100_init: 896 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.6" y="534.0" width="4.5" height="5.0" rx="2" class="b3"><title>ealibs/tu_803D7ED4: 864 bytes of code, 73.1% fuzzy match</title></rect>
+<rect x="916.1" y="519.5" width="5.0" height="4.2" rx="2" class="b1"><title>ealib/tu_803663B0: 828 bytes of code, 16.9% fuzzy match</title></rect>
+<rect x="923.2" y="519.5" width="5.0" height="4.2" rx="2" class="b0"><title>auto_01_803DA188_text: 824 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="930.2" y="519.5" width="4.8" height="4.2" rx="2" class="b5"><title>animation/choosers/tu_80271940: 804 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="916.1" y="525.7" width="4.3" height="3.7" rx="2" class="b5"><title>animation/choosers/tu_80271C64: 688 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="916.1" y="531.4" width="4.3" height="3.4" rx="2" class="b0"><title>auto_01_803E1F98_text: 644 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="916.1" y="536.8" width="4.3" height="2.2" rx="2" class="b5"><title>animation/choosers/tu_80271748: 504 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="922.4" y="525.7" width="4.7" height="1.3" rx="2" class="b4"><title>ealibs/tu_803D9FE8: 416 bytes of code, 98.9% fuzzy match</title></rect>
+<rect x="929.1" y="525.7" width="2.7" height="1.3" rx="2" class="b0"><title>auto_01_803E097C_text: 292 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="933.8" y="525.7" width="1.2" height="1.3" rx="2" class="b5"><title>libgcc/_main: 200 bytes of code, 100.0% fuzzy match</title></rect>
 </g>
 <text x="24.0" y="580.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code matched over time</text>
 <line x1="68" y1="740.0" x2="936" y2="740.0" class="axis" stroke-width="1"/>
@@ -185,6 +195,6 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="60.0" y="639.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0.75%</text>
 <line x1="68" y1="600.0" x2="936" y2="600.0" class="grid" stroke-width="1"/>
 <text x="60.0" y="604.0" class="t3" font-size="11" font-weight="400" text-anchor="end">1%</text>
-<circle cx="68.0" cy="725.6" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.10% of code, 46 / 24,158 functions</title></circle>
-<text x="78.0" y="717.6" class="t2" font-size="12" font-weight="400" text-anchor="start">0.10% on 2026-10-10; a point is added each day the numbers change</text>
+<circle cx="68.0" cy="715.0" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
+<text x="78.0" y="707.0" class="t2" font-size="12" font-weight="400" text-anchor="start">0.18% on 2026-10-10; a point is added each day the numbers change</text>
 </svg>
