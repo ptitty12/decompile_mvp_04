@@ -93,9 +93,14 @@ struct Unk801527C8_Ent3BC {
     int m24;
 };
 
+struct Unk801527C8_Obj3A4 {
+    char pad0[0x180];
+    float m180;
+};
+
 struct Unk801527C8_Slots {
     char pad0[0x3A4];
-    void* m3A4;
+    Unk801527C8_Obj3A4* m3A4;
     char pad3A8[4];
     void* m3AC;
     void* m3B0;
@@ -106,8 +111,19 @@ struct Unk801527C8_Slots {
 
 /* Sub-object at actor+0x50 (animation/state controller; passed to fn_80327274,
  * fn_803270C4, fn_80326E64). */
+/* 0x18-byte result of Sub::fn_80326F44 (animation sample: type word at +0, time at +4). */
+struct Unk80326F44_Out {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
 struct Unk801527C8_Sub {
     void fn_80326EF4(float t, float k, int id, int a, int b, int flags);
+    Unk80326F44_Out fn_80326F44(int id, int flag, float t);
     char pad0[0x40];
 };
 
@@ -123,9 +139,20 @@ public:
     virtual void fn_v3();
     virtual int fn_v4();
     virtual void fn_v5();
-    virtual void fn_v6();
+    virtual struct Unk801527C8_PosHolder* fn_v6();
     virtual void fn_v7();
     virtual void fn_v8(int a);
+};
+
+/* Object returned by slot 6 of Unk80189300; a position vector at +0x60. */
+struct Unk801527C8_PosHolder {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+};
+
+struct Unk801527C8_A50 {
+    char pad0[0x3D44];
+    int m3D44;
 };
 
 struct Unk801527C8_Actor {
@@ -158,6 +185,7 @@ struct Unk801527C8_Actor {
 struct Unk801527C8_Ctx {
     void fn_8016D2F4(const char* s);
     void fn_8016AC3C();
+    Unk80189300* fn_8016C804(int id);
     void* fn_8016C7A8(unsigned int idx);
     char pad0[0xA14];
     int mA14;
@@ -165,7 +193,7 @@ struct Unk801527C8_Ctx {
     char padA1C[0xA24 - 0xA1C];
     char mA24[4][10];
     Unk801527C8_Actor* mA4C;
-    void* mA50;
+    Unk801527C8_A50* mA50;
     Unk801527C8_Actor* mA54;
 };
 

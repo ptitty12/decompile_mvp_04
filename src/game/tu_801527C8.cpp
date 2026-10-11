@@ -2,7 +2,12 @@
  * Game code, .text 0x801527C8-0x801547AC (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
-#include "game/tu_801527C8.h"
+#include "game/tu_8016BF30.h"
+
+extern const char lbl_805C7ED0[];
+extern float lbl_805C7F0C;
+extern float lbl_805C7F18;
+extern float lbl_805C7F1C;
 
 extern const char lbl_805C7F58[];
 
@@ -113,6 +118,11 @@ inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
 }
+
+int fn_8023F1EC(Unk80189300* o);
+int fn_8023F1D4(Unk80189300* o);
+int fn_801A2034(Unk801527C8_Actor* a, int i);
+void fn_8018CA5C(Unk80189300* o, float* a, float* b, float* c);
 
 int cBlendDepthOfField::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801527C8 */
 {
@@ -275,6 +285,90 @@ void cGeneralScriptConditional::fn_vslot2() /* 80152D60 */
     fn_8037B830(lbl_805C7E74);
     fn_8037B728(lbl_805C770C, lbl_805C771C, &m50, lbl_805C7728);
     fn_8037B584(lbl_805C7994, 0, 0, lbl_805C7EA0);
+}
+
+/* near-miss: same instruction stream except the frame (retail 104 bytes: one extra 16-byte local below the others, so all slots shift);
+ * by-value getter for the position tried (adds a copy) */
+int cGeneralScriptConditional::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801530A4 */
+{
+    int r = 0;
+    if (mC != 0) {
+        Unk80189300* o = ctx->fn_8016C804(m14);
+        if (o != 0) {
+            r = m10 == (o->fn_v4() == 0);
+        }
+    } else if (m4 != 0) {
+        float one = lbl_805C7F0C;
+        const char* file = lbl_805C7ED0;
+        unsigned int n = ctx->mA4C->m554->fn_8014D8AC(1000000, file, 0xAF);
+        if (!((float)n * one * lbl_805C7F18 >= m8)) {
+            r = 1;
+        }
+    } else if (m1C != 0) {
+        float x, y, z;
+        fn_8018CA5C(ctx->mA4C->m6CC, &x, &y, &z);
+        switch (m24) {
+        case 0:
+            if (!(x <= lbl_805C7F1C)) {
+                r = 1;
+            }
+            break;
+        case 1:
+            if (!(x >= lbl_805C7F1C)) {
+                r = 1;
+            }
+            break;
+        }
+    } else if (m18 != 0) {
+        Unk80273498_Vec3 v = lbl_806055AC;
+        Unk80189300* o = ctx->fn_8016C804(m20);
+        v = o->fn_v6()->m60;
+        switch (m24) {
+        case 0:
+            if (!(v.x <= v.z)) {
+                r = 1;
+            }
+            break;
+        case 1:
+            if (!(v.x >= v.z)) {
+                r = 1;
+            }
+            break;
+        }
+    } else if (m28 != 0) {
+        Unk80189300* o = ctx->fn_8016C804(m2C);
+        if (o != 0) {
+            if (fn_8023F1EC(o) == m30) {
+                r = 1;
+            }
+        }
+    } else if (m34 != 0) {
+        Unk80189300* o = ctx->fn_8016C804(m38);
+        if (o != 0) {
+            if (fn_8023F1D4(o) == m3C) {
+                r = 1;
+            }
+        }
+    } else if (m40 != 0) {
+        if (ctx->mA50->m3D44 == 0) {
+            if (m44 != 0) {
+                r = 1;
+            }
+        } else if (m44 == 0) {
+            r = 1;
+        }
+    } else if (m48 != 0) {
+        if (fn_801A2034(ctx->mA4C, 3) == -1) {
+            if (m4C == 0) {
+                r = 1;
+            }
+        } else if (m4C != 0) {
+            r = 1;
+        }
+    }
+    if (r != 0) {
+        ((Unk8016C1C4_List*)ctx)->fn_8016C620(a, (int)&m50);
+    }
 }
 
 Unk8037B3E8* cGeneralScriptConditional::fn_vslot5() /* 801533D8 */
