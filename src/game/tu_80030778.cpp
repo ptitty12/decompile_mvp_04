@@ -170,7 +170,7 @@ extern "C" void fn_80031088(Unk80030884* self)
     }
 }
 
-extern "C" int fn_80031110(Unk800311D0* self, int a, int b)
+extern "C" int fn_80031110(Unk80021A60* self, int a, int b)
 {
     switch (self->m78) {
     case 2:
@@ -204,7 +204,7 @@ extern "C" int fn_80031110(Unk800311D0* self, int a, int b)
 extern "C" Unk800311D0* fn_800311D0(Unk800311D0* self)
 {
     fn_80021A60(self);
-    self->vptr = lbl_806498E0;
+    self->SetVptr(lbl_806498E0);
     self->m128 = 0;
     self->m12C = 0;
     self->m130 = 0;
@@ -231,7 +231,7 @@ extern "C" Unk800311D0* fn_800311D0(Unk800311D0* self)
 
 extern "C" void fn_800312A8(Unk800311D0* self, int chrg)
 {
-    self->vptr = lbl_806498E0;
+    self->SetVptr(lbl_806498E0);
     fn_8005B58C(fn_8005ACE4(), 0);
     fn_800396D0(fn_80038EB4(), 1);
     for (int i = 0; i < 3; i++) {

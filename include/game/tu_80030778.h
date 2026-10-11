@@ -30,13 +30,32 @@ struct Unk80030884 {
  * three owner slots at +0x80 and per-slot arrays. Plain struct here: the
  * vtable is data of another unit, so the vptr is stored by hand.
  */
-struct Unk800311D0 {
-    char pad0[0x78];
+/* 12-byte entry {id, countdown, extra} of the table at +0 used by the 0x150-byte object. */
+struct Unk80021A60_Ent {
+    int m0;
+    int m4;
+    int m8;
+};
+
+struct Unk80021A60 {
+    Unk80021A60_Ent m0[10];
     int m78;
     int m7C;
     Unk8002D15C_Owner* m80[3];
-    char pad8C[0xB8 - 0x8C];
-    const void* vptr;
+    char pad8C[0xB4 - 0x8C];
+    int mB4;
+    /* the vptr (+0xB8) belongs to the polymorphic base: it is only used for
+       virtual calls and pointers to member functions; constructors here store
+       it by hand through SetVptr (the vtables are data of other units) */
+    virtual ~Unk80021A60();
+    virtual void v2(int);
+    void SetVptr(const void* v)
+    {
+        *(const void**)((char*)this + 0xB8) = v;
+    }
+};
+
+struct Unk800311D0 : public Unk80021A60 {
     int mBC[3];
     int mC8[3];
     int mD4[3];
@@ -65,9 +84,9 @@ void fn_80030C90(Unk80030884* self, int i);
 Unk8002D15C_Vec3 fn_80196E3C(int a, float f);
 double fn_80410634(double x);
 void fn_80021EB4(void* self, void* o, int a, int b, int c);
-int fn_80031110(Unk800311D0* self, int a, int b);
-Unk800311D0* fn_80021A60(Unk800311D0* self);
-void fn_80021BB4(Unk800311D0* self, int chrg);
+int fn_80031110(Unk80021A60* self, int a, int b);
+Unk80021A60* fn_80021A60(Unk80021A60* self);
+void fn_80021BB4(Unk80021A60* self, int chrg);
 void* fn_8001C394();
 int fn_8001CC40(void* p, int a);
 void fn_8005B58C(void* p, int a);
