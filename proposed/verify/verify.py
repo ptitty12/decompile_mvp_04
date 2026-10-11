@@ -236,10 +236,11 @@ def main() -> None:
         print("VERIFY PASS (integrity only)")
         return
     check_hard_rules()
+    # Build the current tree first: it downloads the tools the baseline build reuses.
+    report = check_build()
     baseline = args.baseline
     if args.baseline_ref:
         baseline = baseline_from_ref(args.baseline_ref)
-    report = check_build()
     if baseline is not None:
         check_regressions(report, baseline)
     print("VERIFY PASS")

@@ -1,7 +1,7 @@
 # SHA-256 (CRLF normalized to LF) of verification-critical files.
 # CI fails if any differs. Only the owner updates this file
 # (python tools/verify/verify.py --print-protected).
-a10e997a10ecb345c353e9f90e89009679dd62a82d9819fb50a25bdff644bb76  tools/verify/verify.py
+507ea4ffa0e0fd459e630dfe012e7961460c5a2a1520eda1b1e20bedbe11419a  tools/verify/verify.py
 b94b0cd0ca6201c23b2274c9f97cc65831f9d83463535d2844dd1d0f4a031d9b  tools/verify/pragma_allowlist.txt
 e65c1df6283380c4418d4b97ce6a54185cd458c13e47ca954625f2cbd37edc7f  .github/workflows/build.yml
 50da84df4259acf26c9bdfd06547550fe647b84ef6ed33019361ed93058e7b92  .claude/settings.json
