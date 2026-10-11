@@ -101,4 +101,23 @@ struct Unk8008CE64_Iter {
     }
 };
 
+/* Store-only variant of the counter above (fn_8008FBE8, fn_8008FC40): the
+ * slot is written, but the loop reads the value it passes in. */
+template <int N>
+struct Unk8008CE64_IterW {
+    int i;
+    Unk8008CE64_IterW() { i = 0; }
+    ~Unk8008CE64_IterW() {}
+    int Next(int c)
+    {
+        int n;
+        if (c > N)
+            n = c;
+        else
+            n = c + 1;
+        i = n;
+        return n;
+    }
+};
+
 #endif

@@ -2,6 +2,7 @@
  * Game code, .text 0x8008CE64-0x80090880 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/tu_8007A4DC.h"
 #include "game/tu_8008CE64.h"
 
 void* operator new(unsigned int size, int heap);      /* 0x80377428 */
@@ -240,6 +241,16 @@ void fn_80090700();
 Unk8008CE64_Own* fn_80090744(Unk8008CE64_Own* self);
 void fn_8009075C(Unk8008CE64_Own* self, int flags);
 void fn_80090814(Unk8008CE64_Own* self, int a, int b);
+
+
+
+
+extern const char* lbl_80619764[];
+extern "C" void fn_80534F64(void* obj, int a, int b, int c, int d, int e, int f);
+extern "C" const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
+extern "C" void fn_80402DE4(const void* p, int n);
+
+
 
 char* fn_8008D738(Unk8008CE64_K<Unk8008CE64_T3C>* self, int t, unsigned i, char* buf)
 {
@@ -492,19 +503,34 @@ void fn_8008FB90(Unk8008CE64_K<Unk8008CE64_T1C>* self, int a, VObj* obj)
     vt->pfn((char*)obj + vt->delta, a, self->m24, 0x348);
 }
 
-/* near-miss: retail keeps v in r3 and the count in r10; here v moves to r10 and
- * the count takes r3, and i is reloaded from its slot in the loop. */
 int fn_8008FBE8(int v)
 {
-    Unk8008CE64_Iter<9> it;
     int n = 0;
     int k = 0;
+    Unk8008CE64_IterW<9> it;
     do {
         if (lbl_80619738[k] == v)
             n++;
-        k = it.Next();
+        k = it.Next(k);
     } while (k <= 9);
     return n;
+}
+
+int fn_8008FC40(int v, int nth)
+{
+    int cnt = 0;
+    int res = 10;
+    Unk8008CE64_Iter<9> it;
+    for (int k = 0; k <= 9; k = it.Next()) {
+        if (lbl_80619738[k] == v) {
+            if (cnt == nth) {
+                res = k;
+                break;
+            }
+            cnt++;
+        }
+    }
+    return res;
 }
 
 int fn_8008FCC8(int t)
@@ -541,6 +567,98 @@ int fn_8008FD14(int t)
     return 0;
 }
 
+int fn_8008FD78(int t)
+{
+    switch (t) {
+    case 0:
+        return 0;
+    case 1:
+        return 0;
+    case 2:
+        return 1;
+    case 3:
+        return 1;
+    case 4:
+        return 2;
+    case 5:
+        return 2;
+    case 6:
+        return 3;
+    case 7:
+        return 3;
+    case 8:
+        return 3;
+    case 9:
+        return 4;
+    }
+    return 5;
+}
+
+int fn_8008FE14(int t)
+{
+    switch (t) {
+    case 0:
+        return 4;
+    case 1:
+        return 5;
+    case 2:
+        return 6;
+    case 3:
+        return 7;
+    case 4:
+        return 8;
+    case 5:
+        return 9;
+    case 6:
+        return 10;
+    case 7:
+        return 11;
+    case 8:
+        return 12;
+    case 9:
+        return 13;
+    }
+    return 4;
+}
+
+int fn_8008FED8(int v)
+{
+    int tbl[10] = { 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 };
+    Unk8008CE64_IterW<9> it;
+    for (int k = 0; k <= 9; k = it.Next(k)) {
+        if (tbl[k] == v)
+            return k;
+    }
+    return 10;
+}
+
+int fn_8008FF98(int t)
+{
+    switch (t) {
+    case 0:
+        return 0x5AA0;
+    case 1:
+        return 0x5AA1;
+    case 2:
+        return 0x5AA2;
+    case 3:
+        return 0x5AA3;
+    case 4:
+        return 0x5AA4;
+    case 5:
+        return 0x5AA5;
+    case 6:
+        return 0x5AA6;
+    case 7:
+        return 0x5AA7;
+    case 8:
+        return 0x5AA8;
+    case 9:
+        return 0x5AA9;
+    }
+    return 0;
+}
+
 void fn_8009010C()
 {
     if (lbl_80619760 == 0)
@@ -563,11 +681,142 @@ int fn_800901A4()
     return 0;
 }
 
+void fn_800901C0(int a0, int a1, int a2, int a3, int a4, int a5)
+{
+    if (fn_800901A4() == 1) {
+        int m = *(int*)((char*)lbl_80619760 + 0xE290);
+        fn_80534F64(lbl_80619760, a0, a1, a2 % m, a3, a4, a5 % m);
+    }
+}
+
+int fn_80090244(int a)
+{
+    float z = 64.0f;
+    float f = (float)a * 0.5f;
+    return (int)(f + 36.0f);
+}
+
+int fn_800902B0(int t, int a)
+{
+    int r = 0;
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    switch (t) {
+    case 0:
+        r = s->fn_8007C514(2, a) != 0;
+        break;
+    case 1:
+        r = s->fn_8007C770(8, a) != 0;
+        break;
+    case 2:
+        r = s->fn_8007C994(1, a) != 0;
+        break;
+    case 3:
+        r = s->fn_8007CBB8(6, a) != 0;
+        break;
+    case 4:
+        r = s->fn_8007CDDC(5, a) != 0;
+        break;
+    }
+    return r;
+}
+
 float fn_80090380(void* a)
 {
     int v = fn_800903B8(a);
     float r = fn_80079A90(lbl_8061930C, v);
     return r;
+}
+
+int fn_800903B8(int t, int a)
+{
+    int r = 0;
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    switch (t) {
+    case 0:
+        r = s->fn_8007C514(15, a);
+        break;
+    case 1:
+        r = s->fn_8007C770(11, a);
+        break;
+    case 2:
+        r = s->fn_8007C994(11, a);
+        break;
+    case 3:
+        r = s->fn_8007CBB8(9, a);
+        break;
+    case 4:
+        r = s->fn_8007CDDC(8, a);
+        break;
+    }
+    return r;
+}
+
+int fn_8009047C(int t, int a)
+{
+    int r = 0;
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    switch (t) {
+    case 0:
+        r = s->fn_8007C514(16, a);
+        break;
+    case 1:
+        r = s->fn_8007C770(12, a);
+        break;
+    case 2:
+        r = s->fn_8007C994(12, a);
+        break;
+    case 3:
+        r = s->fn_8007CBB8(5, a);
+        break;
+    case 4:
+        r = s->fn_8007CDDC(9, a);
+        break;
+    }
+    return r;
+}
+
+void fn_80090540(int t, int a, int v)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    switch (t) {
+    case 0:
+        s->fn_8007C574(15, a, v);
+        break;
+    case 1:
+        s->fn_8007C7D0(11, a, v);
+        break;
+    case 2:
+        s->fn_8007C9F4(11, a, v);
+        break;
+    case 3:
+        s->fn_8007CC18(9, a, v);
+        break;
+    case 4:
+        s->fn_8007CE3C(8, a, v);
+        break;
+    }
+}
+
+void fn_800905FC(int t, int a, int v)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    switch (t) {
+    case 0:
+        s->fn_8007C574(16, a, v);
+        break;
+    case 1:
+        s->fn_8007C7D0(12, a, v);
+        break;
+    case 2:
+        s->fn_8007C9F4(12, a, v);
+        break;
+    case 3:
+        s->fn_8007CC18(5, a, v);
+        break;
+    case 4:
+        s->fn_8007CE3C(9, a, v);
+        break;
+    }
 }
 
 void fn_800906B8()
@@ -597,6 +846,19 @@ void fn_8009075C(Unk8008CE64_Own* self, int flags)
     fn_80090814(self, 1, 1);
     if (flags & 1)
         fn_80377408(self);
+}
+
+void fn_800907A4(Unk8008CE64_Own* p, int idx, int flag)
+{
+    void** slot = &p->m8;
+    if (flag != 0)
+        slot = &p->m4;
+    if (*slot == 0) {
+        p->m0 = idx;
+        const char* r = fn_802B9300(lbl_80619764[idx], 0, 0xE, 0);
+        *slot = (void*)r;
+        fn_80402DE4(r, 1);
+    }
 }
 
 void fn_80090814(Unk8008CE64_Own* self, int a, int b)
