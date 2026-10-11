@@ -94,6 +94,7 @@ void fn_8032ABC8();
 
 // FUNCS-BEGIN
 
+/* near-miss: retail indexes the table with a zero register (lwzx r3,r31,r0) */
 void fn_80327214(FxAI* self) {
     fn_803272F0(self);
     int old = self->m4B8;
@@ -121,6 +122,7 @@ int fn_803272D0(FxAI* self, unsigned i) {
     return 0;
 }
 
+/* near-miss: iterator body order */
 void fn_803272F0(FxAI* self) {
     Unk8006A138_It<0x15> it(0);
     int i = 0;
@@ -135,16 +137,7 @@ void fn_803272F0(FxAI* self) {
 
 void fn_80328208() { fn_80327354(1, 0xFFFF); }
 
-FxBase* fn_80328234(FxBase* self, int a, int b) {
-    self->m14 = 0;
-    self->m18 = lbl_80664020;
-    fn_8040B61C(self, lbl_805EBBF8);
-    self->m20 = 0;
-    self->m18 = lbl_80666F98;
-    fn_80328318(self, a, b);
-    return self;
-}
-
+/* near-miss: same as fn_80328234 */
 FxBase* fn_803282A8(FxBase* self, int a) {
     self->m14 = 0;
     self->m18 = lbl_80664020;
@@ -168,6 +161,7 @@ void fn_80328374(FxBase* self, int a) {
     if (a & 1) fn_80377408(self);
 }
 
+/* near-miss: retail keeps two copies of the fail block */
 int fn_803283D8(int a, int b, int* idx, int* out) {
     int i = *idx;
     if (i <= 0) {
@@ -235,6 +229,7 @@ int fn_80328648(int n) {
 
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
+/* near-miss: callee-saved lis registers for lbl_806202FC / lbl_806202F4 swapped */
 void fn_80329498() {
     lbl_806202F4 = 1;
     fn_80321628(&lbl_80691AEC, lbl_806202FC);
@@ -282,6 +277,7 @@ FxSing* fn_80329988() {
     return lbl_80620304;
 }
 
+/* near-miss: tail shape */
 void fn_803299D4(FxSing* self) {
     if (self->m4) {
         if (fn_80329AE4((void*)self->m4) && *(int*)self->m4 != 0xB) {
@@ -328,38 +324,7 @@ void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim) {
     }
 }
 
-int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
-    int len = 0;
-    fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
-    if ((unsigned)len < *n) {
-        fn_80379094(lbl_80691D18, len, 0);
-        *out = fn_80409D88(lbl_80691D18);
-        *cur = *cur + len + 1;
-        *n -= 1;
-        *n -= len;
-    } else {
-        *n = 0;
-    }
-    return 1;
-}
-
-int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
-    int len = 0;
-    int ok = 1;
-    fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
-    if ((unsigned)len < *n) {
-        fn_80379094(lbl_80691D18, len, 0);
-        *out = fn_80409DAC(lbl_80691D18);
-        if (*out < lo || *out > hi) ok = 0;
-        *cur = *cur + len + 1;
-        *n -= 1;
-        *n -= len;
-    } else {
-        *n = 0;
-    }
-    return ok;
-}
-
+/* near-miss: same as fn_80329B98 */
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim) {
     int len = 0;
     int ok = 1;
@@ -391,6 +356,7 @@ int fn_80329E50() {
     return 1;
 }
 
+/* near-miss: retail keeps the 2-byte result in a stack temp then copies it */
 void fn_8032A0C0(FxMS* out, int t) {
     FxMS r;
     r.m = 0;
@@ -405,6 +371,7 @@ int fn_8032A118(FxMS* p) {
     return (v >> 8) * 60 + (v & 0xFF);
 }
 
+/* near-miss: return value conversions (clrlwi) differ */
 unsigned char fn_8032A2CC(int a, int b) {
     if (a == 1) {
         int v = lbl_805F340C[a];
