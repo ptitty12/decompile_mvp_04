@@ -5,6 +5,12 @@
 #include "game/tu_800F1AEC.h"
 
 
+void fn_800F1AEC(UiObj* self)
+{
+    self->v80(1);
+    fn_800F1970(self);
+}
+
 extern char lbl_8061B340[];
 extern char lbl_8064BA88[];
 UiScrRaw* fn_800F1B38(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -14,6 +20,52 @@ UiScrRaw* fn_800F1B38(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m174 = 0;
     self->m178 = 0;
     return self;
+}
+
+void fn_800F1D98()
+{
+    lbl_806192E0->m4->m10->m1C = 9;
+    fn_8006C698(lbl_806192E0->m4);
+}
+
+int fn_800F1DD4(int a, int b, int c)
+{
+    if (b >= a)
+        return b - a;
+    return b + c - a;
+}
+
+void fn_800F26A0(UiScr168* self, int a)
+{
+    UiRing* r = (UiRing*)&self->m168;
+    if (self->entries[self->m168[r->mC]].m0 == a)
+        return;
+    while (1) {
+        r->mC = (r->mC + 1) % r->m4;
+        if (self->entries[self->m168[r->mC]].m0 == a)
+            break;
+    }
+}
+
+void fn_800F2878(UiObj* self, UiObj* other)
+{
+    fn_800F289C(other);
+}
+
+void fn_800F289C(UiObj* self)
+{
+    fn_804D2D50(self)->v16(0);
+    fn_804D2D50(self)->v8(0);
+    self->v16(1);
+    fn_804D2CE0(self)->v16(1);
+}
+
+void fn_800F2C84(UiV_174i_178i* self, int a)
+{
+    char* e = lbl_806192E0->m4->m14;
+    fn_80096830(e + 0xE64, self->m178);
+    fn_80096830(e, self->m174);
+    fn_804D3328(self, a);
 }
 
 extern char lbl_806549D8[];
@@ -58,6 +110,12 @@ int fn_800F36E0(UiV_134* self)
     return 1;
 }
 
+int fn_800F371C(UiObj* self)
+{
+    self->v67(1, 0);
+    return 1;
+}
+
 void fn_800F388C(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
@@ -83,6 +141,41 @@ void fn_800F3958(UiScrRaw* self)
     fn_8035686C(self);
 }
 
+extern char lbl_805B955C[];
+void fn_800F3D74(UiObj* self, int a)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    if (a == 0) {
+        fn_8040B830(p->name, lbl_805B955C, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+    }
+}
+
+/* near-miss: store order matches; the last three vtable/pointer values use r11/r9 where retail uses r10/r11 */
+extern char lbl_80654130[];
+extern char lbl_8064A550[];
+extern char lbl_806800B0[];
+extern char lbl_80655E98[];
+extern char lbl_80655BA8[];
+void fn_800F3FCC(UiScr3FCC* self, int a)
+{
+    self->m3C = lbl_80654130;
+    self->m7F0 = lbl_8064A550;
+    fn_804D3DD0(self->m678, 2);
+    fn_804D61F4(self->m4F0, 2);
+    fn_80360F48(self->m37C, 2);
+    UiSub1CC* p = &self->m1CC;
+    p->m3C = lbl_806800B0;
+    fn_800EC5F4(p, 2);
+    self->m1C8 = lbl_80655E98;
+    self->m184 = lbl_80655E98;
+    self->m3C = lbl_80655BA8;
+    fn_8035686C(self, a);
+}
+
 void fn_800F49FC(UiObj* self)
 {
     fn_800EBEA8(self);
@@ -94,6 +187,20 @@ void fn_800F4FD0(UiObj* self)
     fn_800EB7D4(self);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+extern char lbl_805BA6D8[];
+void fn_800F4FF8(UiObj* self)
+{
+    UiObj* o = fn_800B7AB8(UiGetMsgMgr(), lbl_805BA6D8);
+    fn_80131F34(o, self, fn_800F50B8, 0, 0x5B9A, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    o->v86();
+}
+
+void fn_800F50B8(int a, UiV_17Ci* b)
+{
+    if (a == 1)
+        fn_800EB968(b, -1, b->m17C);
 }
 
 extern char lbl_8061B380[];
@@ -125,6 +232,15 @@ UiScrRaw* fn_800F5388(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+void fn_800F53F0(UiV_13Ci* self)
+{
+    fn_804D3164(self);
+    fn_804D2DC0(self, 0x10F);
+    self->m13C = 1;
+    self->v87();
+    fn_804D3CA8(self, 1);
+}
+
 void fn_800F5454()
 {
     fn_8006C698(lbl_806192E0->m4);
@@ -142,5 +258,24 @@ UiScrRaw* fn_800F55B8(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->m3C = lbl_80651B88;
     self->m130 = 0;
+    return self;
+}
+
+void fn_800F5604(UiObj* self)
+{
+    if (fn_800EC8B8(self) != 0)
+        fn_800ECAA4(self);
+}
+
+extern char lbl_80650E20[];
+UiScr5640* fn_800F5640(UiScr5640* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_80650E20;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    for (int i = 0; i < 5; i++)
+        self->m13C[i] = 5;
     return self;
 }
