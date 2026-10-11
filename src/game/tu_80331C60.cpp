@@ -50,6 +50,9 @@ extern int lbl_8061D3A0, lbl_8068CD0C, lbl_8068B5D0, lbl_80691DE0, lbl_80691DE4;
 extern float lbl_806203BC, lbl_806203C0, lbl_806203C4;
 
 extern "C" {
+void fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
+void fn_8032D880(void* item, const char* s);
+int fn_80148404(UnkGm* g);
 UnkOpt* fn_801A4CE8(UnkMgr8* m, int k);
 void fn_80331508();
 void fn_80331568();
@@ -58,6 +61,7 @@ void fn_80330BC8(Menu* p, int k);
 void fn_802D7ACC();
 void fn_802D7ADC();
 int fn_802D7CE0(int a, int b);
+int fn_80332318(void* self, int a, int b);
 void fn_8040B6A0(char* s);
 int fn_8023C6C4(char* o, int i);
 int fn_8023C1D8(char* o);
@@ -108,7 +112,21 @@ int fn_80087A88(Unk80087A58_O* s, int a, int w, int flag);
 void fn_80087B10();
 extern int lbl_806177DC;
 extern float lbl_80620540, lbl_80620544;
+struct MIE2 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
+inline int EnumVal2(MIE2* i) { return i->m60[i->m4C]; }
+inline MIE2* EAt2(Menu* p, int off) { return (MIE2*)((char*)p + off); }
 extern const char lbl_805EDDD4[];
+extern int lbl_80691DD8;
+extern "C" {
+void fn_8032FB78(void* item, int v);
+void fn_80086EC0(void* o, int a, int b);
+void fn_801A23B8(UnkMgr8* m, int k);
+void fn_801A6820(UnkMgr8* m);
+}
+extern const char lbl_805EDD98[], lbl_805EDDA4[], lbl_805EDDB0[], lbl_805EDDBC[], lbl_805EDDC8[];
+extern int lbl_8062050C, lbl_80620520;
+extern const char lbl_805F3428[], lbl_805F343C[];
+extern const char lbl_80666318[];
 extern const char lbl_80666278[];
 extern const char lbl_80666228[];
 
@@ -140,6 +158,112 @@ void fn_80331D58()
     fn_801A4CE8(m, 1)->m10 = 0;
     fn_801A4CE8(m, 1)->mC = 0;
     fn_80331508();
+}
+
+/* near-miss: 9 slots, all the `mr r3,<item ptr>` placement (retail emits it after the other
+ * argument moves, which a free-function call does not; probably a ctor/method call whose
+ * callee fn_8032FAB0 is in an unmatched unit). */
+Menu* fn_80331DB8(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666318;
+    fn_8032FAB0((char*)p + 0x2E0, lbl_805EDD98, &lbl_8062050C, lbl_805F3428, 5, -1);
+    fn_8032FAB0((char*)p + 0x344, lbl_805EDDA4, &lbl_8062050C, lbl_805F3428, 5, -1);
+    fn_8032FAB0((char*)p + 0x3A8, lbl_805EDDB0, &lbl_80620520, lbl_805F343C, 3, -1);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x344));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x3A8));
+    if (fn_80148404(lbl_8061B8C0) == 1) {
+        fn_8032D880((char*)p + 0x2E0, lbl_805EDD98);
+        fn_8032D880((char*)p + 0x344, lbl_805EDDA4);
+    } else {
+        fn_8032D880((char*)p + 0x2E0, lbl_805EDDBC);
+        fn_8032D880((char*)p + 0x344, lbl_805EDDC8);
+    }
+    return p;
+}
+
+void fn_80331F0C(Menu* p)
+{
+    p->m204 = 0;
+    p->m208 = 0;
+    p->items[p->m174]->s3();
+    p->m174 = 0;
+    p->items[p->m174]->s2();
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    if (fn_80148404(lbl_8061B8C0) == 1) {
+        UnkC128* o = m->m6F8->m10;
+        int a = o->m6C;
+        int b = o->m70;
+        fn_8032FB78((char*)p + 0x2E0, a);
+        fn_8032FB78((char*)p + 0x344, b);
+        fn_8032FB78((char*)p + 0x3A8, lbl_80691DD8);
+    } else {
+        UnkMgr8* m2 = lbl_8061B8C0->mC;
+        int a = m->m6F8->m10->m70;
+        int b = m2->m6F8->m10->m70;
+        fn_8032FB78((char*)p + 0x2E0, a);
+        fn_8032FB78((char*)p + 0x344, b);
+    }
+}
+
+void fn_80332008(Menu* p)
+{
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    if (fn_80148404(lbl_8061B8C0) == 1) {
+        int a = EnumVal2(EAt2(p, 0x2E0));
+        int b = EnumVal2(EAt2(p, 0x344));
+        fn_80086EC0(m->m6F8->m10, 0, a);
+        fn_80086EC0(m->m6F8->m10, 1, b);
+        lbl_80691DD8 = EnumVal2(EAt2(p, 0x3A8));
+    } else {
+        UnkMgr8* m2 = lbl_8061B8C0->mC;
+        int a = EnumVal2(EAt2(p, 0x2E0));
+        int b = EnumVal2(EAt2(p, 0x344));
+        fn_80086EC0(m->m6F8->m10, 0, -1);
+        fn_80086EC0(m->m6F8->m10, 1, a);
+        fn_80086EC0(m2->m6F8->m10, 0, -1);
+        fn_80086EC0(m2->m6F8->m10, 1, b);
+        fn_801A23B8(m2, 0);
+    }
+    fn_801A23B8(m, 1);
+    fn_801A6820(m);
+}
+
+/* near-miss: loop entry. Retail enters the do-while at the call (skipping the r3/r4 moves,
+ * p and k are still in r3/r4) and keeps p in r30, k in r27; mine re-does the moves and
+ * allocates callee-saved registers differently. Tried do/while/for/goto shapes. */
+void fn_80332154(Menu* p, int k)
+{
+    MIE2* e0 = EAt2(p, 0x2E0);
+    MIE2* e1 = EAt2(p, 0x344);
+    int v0 = EnumVal2(e0);
+    int v1 = EnumVal2(e1);
+    int i = 0;
+    do {
+        fn_80330BC8(p, k);
+        if (fn_80332318(p, EnumVal2(e0), EnumVal2(e1)) != 0)
+            goto done;
+        i++;
+    } while (i <= 4);
+    fn_8032FB78(e0, v0);
+    fn_8032FB78(e1, v1);
+done:
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    if (fn_80148404(lbl_8061B8C0) == 1) {
+        int a = EnumVal2(EAt2(p, 0x2E0));
+        int b = EnumVal2(EAt2(p, 0x344));
+        fn_80086EC0(m->m6F8->m10, 0, a);
+        fn_80086EC0(m->m6F8->m10, 1, b);
+    } else {
+        UnkMgr8* m2 = lbl_8061B8C0->mC;
+        int a = EnumVal2(EAt2(p, 0x2E0));
+        int b = EnumVal2(EAt2(p, 0x344));
+        fn_80086EC0(m->m6F8->m10, 0, -1);
+        fn_80086EC0(m->m6F8->m10, 1, a);
+        fn_80086EC0(m2->m6F8->m10, 0, -1);
+        fn_80086EC0(m2->m6F8->m10, 1, b);
+    }
 }
 
 void fn_803322F8(Menu* p) { fn_80330F98(p); }
@@ -264,6 +388,9 @@ void fn_80332790(Menu* p)
 
 void fn_80332808() {}
 
+/* near-miss: 8 slots differ, only the register numbers of the lis'd global addresses
+ * (r4..r11 permuted). Searched ~1500 store orders; the float stores must keep source order
+ * 45.0, 25.0, 90.0 (pool order). */
 void fn_8033280C(int on)
 {
     UnkC128* c = lbl_8061B8C0->m8->m6F8->m10;

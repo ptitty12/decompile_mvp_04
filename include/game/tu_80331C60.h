@@ -64,12 +64,12 @@ MItem* fn_8032EB84(void* mem, const char* name, int* val, int a, int b, int c, i
 }
 
 /* Game manager chain used by the debug menus (lbl_8061B8C0 -> +8 -> +0x6F8 -> +0x10/+0x14). */
-struct UnkC128 { char pad0[0xC]; int mC; char pad10[4]; int m14[22]; int m6C; char pad70[0xB8]; int m128; };
+struct UnkC128 { char pad0[0xC]; int mC; char pad10[4]; int m14[22]; int m6C; int m70; char pad74[0xB4]; int m128; };
 struct UnkB14 { char pad0[0x114]; int m114; char pad118[0xE60]; int mF78; };
 struct UnkB6F8 { char pad0[0x10]; UnkC128* m10; UnkB14* m14; };
 struct Unk8017DD64_T { char pad0[0x3B0]; void* m3B0; };
 struct UnkMgr8 { char pad0[0x6F8]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; char pad704[0xC]; void* m710; };
-struct UnkGm { char pad0[0x8]; UnkMgr8* m8; char padC[0x18]; int m24; };
+struct UnkGm { char pad0[0x8]; UnkMgr8* m8; UnkMgr8* mC; char pad10[0x14]; int m24; };
 /* result of fn_801A4CE8(mgr, 1): option record with fields at +0xC, +0x10, +0xA0 */
 struct UnkOpt { char pad0[0xC]; int mC; int m10; char pad14[0x8C]; int mA0; };
 
@@ -101,5 +101,22 @@ inline MIV* IAt(Menu* p, int off) { return (MIV*)((char*)p + off); }
 
 
 extern UnkGm* lbl_8061B8C0;
+
+extern "C" void fn_803E4A50(void* p);
+/* Base-menu constructor body, as inlined into the derived menu constructors
+ * (fn_8033648C, fn_80334BC0, ...): the vptr is set to the base vtable before the
+ * +0x210 member is constructed, then to the derived one. */
+extern const char lbl_80666A18[];
+inline void MenuInit(Menu* p, int a)
+{
+    p->m174 = 0;
+    p->m178 = 0;
+    p->m1FC = 0;
+    p->m200 = a;
+    p->m2DC = lbl_80666A18;
+    fn_803E4A50((char*)p + 0x210);
+    p->m2D8 = 0;
+}
+
 
 #endif
