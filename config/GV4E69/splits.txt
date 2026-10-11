@@ -499,6 +499,9 @@ game/tu_80145858.cpp:
 game/tu_80145ECC.cpp:
 	.text       start:0x80145ECC end:0x801465AC
 
+game/tu_801465AC.cpp:
+	.text       start:0x801465AC end:0x80147748
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
