@@ -7,7 +7,7 @@
  */
 #include "game/tu_80052794.h"
 
-int fn_8005C514(Unk8005C514_Obj* o, int a, int b)
+int fn_8005C514(Unk8005BA1C_Obj* o, int a, int b)
 {
     int ok = 0;
     if (o->m0 == 1) {
@@ -22,7 +22,7 @@ int fn_8005C514(Unk8005C514_Obj* o, int a, int b)
     return -1;
 }
 
-int fn_8005C5B0(Unk8005C514_Obj* o, int a, int b, int c)
+int fn_8005C5B0(Unk8005BA1C_Obj* o, int a, int b, int c)
 {
     int ok = 0;
     if (o->m0 == 1) {
@@ -37,7 +37,7 @@ int fn_8005C5B0(Unk8005C514_Obj* o, int a, int b, int c)
     return -1;
 }
 
-int fn_8005C654(Unk8005C514_Obj* o, int a, int b, int c)
+int fn_8005C654(Unk8005BA1C_Obj* o, int a, int b, int c)
 {
     int ok = 0;
     if (o->m0 == 1) {
@@ -49,7 +49,7 @@ int fn_8005C654(Unk8005C514_Obj* o, int a, int b, int c)
     return 0;
 }
 
-int fn_8005C6E0(Unk8005C514_Obj* o, int a)
+int fn_8005C6E0(Unk8005BA1C_Obj* o, int a)
 {
     int r = -1;
     int ok = 0;
@@ -62,7 +62,7 @@ int fn_8005C6E0(Unk8005C514_Obj* o, int a)
     return r;
 }
 
-void fn_8005C75C(Unk8005C514_Obj* o, int a, int b)
+void fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b)
 {
     int ok = 0;
     if (o->m0 == 1) {
@@ -78,7 +78,7 @@ void fn_8005C75C(Unk8005C514_Obj* o, int a, int b)
     }
 }
 
-int fn_8005C7E8(Unk8005C514_Obj* o, int a)
+int fn_8005C7E8(Unk8005BA1C_Obj* o, int a)
 {
     int r = 3;
     if (o->m30[a].m0 != 0) {
@@ -87,7 +87,7 @@ int fn_8005C7E8(Unk8005C514_Obj* o, int a)
     return r;
 }
 
-int fn_8005C828(Unk8005C514_Obj* o, int a)
+int fn_8005C828(Unk8005BA1C_Obj* o, int a)
 {
     int r = -1;
     if (o->m30[a].m0 != 0) {
@@ -96,7 +96,7 @@ int fn_8005C828(Unk8005C514_Obj* o, int a)
     return r;
 }
 
-void fn_8005C868(Unk8005C514_Obj* o)
+void fn_8005C868(Unk8005BA1C_Obj* o)
 {
     if (o->m0 == 1 && o->m4 == 1) {
         int any = 0;
@@ -145,7 +145,7 @@ Unk8005CA60_Q::~Unk8005CA60_Q()
     }
 }
 
-void fn_8005CAC0(Unk8005C514_Obj* o)
+void fn_8005CAC0(Unk8005BA1C_Obj* o)
 {
     o->m4 = 0;
 }

@@ -21,6 +21,7 @@ struct Unk80052794_Entry;
 struct Unk80052794_Row;
 struct Unk80052794_Rec;
 struct Unk80052794_Quad;
+struct Unk8005BA1C_Obj;
 struct Unk80056970_Obj;
 struct Unk80056970_Entry;
 struct Unk80057204_Mgr;
@@ -665,6 +666,7 @@ struct Unk8061B8C0_A {
 };
 extern int lbl_80649C80;
 void* operator new[](unsigned n, int heap);
+void* operator new(unsigned int size, int heap);
 Unk80056970_Obj* fn_80056970(Unk80056970_Obj* self, int n);
 void fn_80056960(Unk80056970_Obj* self, int a);
 
@@ -785,19 +787,34 @@ extern const float lbl_805ADE0C;
 extern const float lbl_805ADE10;
 extern const float lbl_805ADE14;
 
-/* unit 0x8005C514 */
-struct Unk8005C514_Slot {
-    void* m0;
-    char pad4[0x10];
+/* Voice object stored in the slots: vptr at +0x68 (virtual dtor called through delete). */
+class Unk8005BA1C_Voice {
+public:
+    int m0;
+    char pad4[0x24];
+    int m28;
+    char pad2C[0x68 - 0x2C];
+    virtual ~Unk8005BA1C_Voice();
 };
-struct Unk8005C514_Obj {
+struct Unk8005BA1C_Slot {
+    Unk8005BA1C_Voice* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+struct Unk8005BA1C_Obj {
     int m0;
     int m4;
     int m8;
-    char padC[0x20];
+    int mC[8];
     int m2C;
-    Unk8005C514_Slot m30[4];
+    Unk8005BA1C_Slot m30[4];
+    void* m80;
+    Unk8005BA1C_Obj();
+    ~Unk8005BA1C_Obj();
 };
+/* unit 0x8005C514 */
 struct Unk805B09F4_E {
     char pad0[0xD4];
     int mD4;
@@ -808,17 +825,16 @@ struct Unk805AE420_E {
     int m18;
     int m1C;
     int m20;
-    char pad24[4];
+    int m24;
 };
 struct Unk805AE420_Row {
     Unk805AE420_E e[4];
 };
 extern Unk805AE420_Row lbl_805AE420[];
-int fn_8005C344(Unk8005C514_Obj* o, int k);
+
 int fn_8005A3E8(void* p, int a, int b);
 int fn_8005A674(void* p, int a, int b);
 int fn_8005A780(void* p, int a);
-void fn_8005A814(void* p, int a);
 int fn_8005A8B4(void* p);
 int fn_8005A94C(void* p);
 void fn_8005A240(void* p);
@@ -897,5 +913,42 @@ struct Unk8005CA60_Q {
     virtual ~Unk8005CA60_Q();
 };
 void fn_803EE7BC(void);
+
+/* unit 0x8005ADD0 */
+struct Unk8005ADD0_Chan {
+    int mState;
+    int mHandle;
+    int mMode;
+};
+struct Unk8005ADD0_Obj {
+    char pad0[0xC];
+    Unk8005ADD0_Chan mC[9];
+    int m78;
+    int m7C;
+    int m80[9];
+    int mA4;
+    int mA8;
+    char padAC[0xE8 - 0xAC];
+    int mE8[8];
+    int m108;
+    int m10C;
+};
+extern int lbl_805B1DC0[];
+extern Unk8005BA1C_Obj* lbl_80618F8C;
+int fn_8005C344(Unk8005BA1C_Obj* o, int k);
+void fn_8005B58C(Unk8005ADD0_Obj* o, int a);
+void fn_8005AF00(Unk8005ADD0_Obj* o, int a);
+void fn_8005B06C(Unk8005ADD0_Obj* o);
+void fn_8005A814(Unk8005BA1C_Voice* v, int a);
+Unk8005BA1C_Obj* fn_8005BA9C(void);
+
+struct Unk805B10B4_Row {
+    char pad0[0xA0];
+    int mA0[4];
+};
+extern Unk805B10B4_Row lbl_805B10B4[];
+int fn_8005A010(Unk8005BA1C_Voice* v, int a, int b);
+void fn_8005A2E4(void* p, int a);
+int fn_8005A118(void* p, float f);
 
 #endif
