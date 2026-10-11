@@ -95,6 +95,7 @@ struct Spline {
 };
 struct SplKnot { float m0; float m4; float m8; };
 struct UnkSplObj { char pad0[0x4]; SplKnot* m4; };
+struct UnkSplLoad { char pad0[0x4]; SplKnot* m4; int m8; };
 
 inline SplVec3 Cross(const SplVec3& a, const SplVec3& b)
 {
@@ -128,8 +129,56 @@ extern unsigned lbl_80621588, lbl_8062158C, lbl_80621590, lbl_80621594;
 extern unsigned lbl_80621598, lbl_8062159C, lbl_806215A0, lbl_806215A4;
 extern unsigned lbl_806215A8, lbl_806215AC, lbl_806215B0, lbl_806215B4;
 extern int lbl_8061A5A8, lbl_806EF9B4;
+extern "C" void fn_80378D70(const char* src, unsigned int len, char* dst, int cap, int delim, unsigned int* outn);
+extern "C" double fn_80409D88(const char* s);
+extern "C" int fn_80409DAC(const char* s);
+extern "C" void fn_80377488(void* p);
+extern "C" void* fn_803774A8(unsigned int size, int heap);
 
 extern "C" {
+/* near-miss: 13 slots differ (store/reload scheduling of the three element stores and the
+ * cursor update; register choice r9/r11). Tried: cursor update before/after the stores,
+ * index-first address operands, loop shapes. */
+extern "C" void fn_8033CED8(UnkSplLoad* o, const char* s, unsigned int len)
+{
+    const char* cur = s;
+    unsigned int n = 0;
+    char buf[0x20];
+    fn_80378D70(cur, len, buf, 0x19, 0x23, &n);
+    int cnt = fn_80409DAC(buf);
+    cur += n + 1;
+    if (cnt) {
+        o->m8 = cnt;
+        if (o->m4) {
+            fn_80377488(o->m4);
+            o->m4 = 0;
+        }
+        if (o->m8) {
+            o->m4 = (SplKnot*)fn_803774A8(o->m8 * 12, lbl_806EF9B4 | 0x100);
+            int i = 0;
+            if (i < o->m8) {
+                int off = 0;
+                do {
+                    fn_80378D70(cur, len, buf, 0x19, 0x2C, &n);
+                    i++;
+                    float a = (float)fn_80409D88(buf);
+                    cur += n + 1;
+                    fn_80378D70(cur, len, buf, 0x19, 0x2C, &n);
+                    float b = (float)fn_80409D88(buf);
+                    cur += n + 1;
+                    fn_80378D70(cur, len, buf, 0x19, 0x23, &n);
+                    float c = (float)fn_80409D88(buf);
+                    *(float*)(off + (int)o->m4) = a;
+                    *(float*)(off + (int)o->m4 + 4) = b;
+                    *(float*)(off + (int)o->m4 + 8) = c;
+                    cur += n + 1;
+                    off += 12;
+                } while (i < o->m8);
+            }
+        }
+    }
+}
+
 float fn_8033D084(UnkSplObj* o, int idx, float t)
 {
     float t2 = t * t;
