@@ -10,6 +10,9 @@ Types for game/tu_80050A68.cpp (see tu_800493D4.h for the Unk800493D4_Sm state m
 void fn_80011C38(Unk800493D4_Sm* s);
 void fn_80011BE4();
 void fn_80052FBC();
+/* Empty handler (blr at 0x80052FBC); fn_80051014 keeps s and idx live in r3/r4 up to
+ * the call, so it is called with the handler's (s, idx) arguments. */
+void fn_80052FBC(Unk800493D4_Sm* s, int idx);
 void fn_8000FD5C();
 void fn_8000F6D4(int a);
 void fn_8000FEBC();

@@ -23,13 +23,12 @@ void fn_80050FF4()
     fn_80011BE4();
 }
 
-/* near-miss: retail uses addi r9,r3,0x3c + lwzx for the entry pointer; one insn more here */
 void fn_80051014(Unk800493D4_Sm* s, int idx)
 {
     char* b = (char*)s + 0x3C;
-    Unk80044C10_E* e = (*(Unk80044C10_A**)(b + idx * 0x48))->m44C->m6F8->m14;
+    Unk80044C10_E* e = (*(Unk80044C10_B**)(b + idx * 0x48))->m6F8->m14;
     if (e->m1CC8 == 0 && e->m1CD0 == 1)
-        fn_80052FBC();
+        fn_80052FBC(s, idx);
 }
 
 void fn_80051168()
