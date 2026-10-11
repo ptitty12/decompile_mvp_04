@@ -9,7 +9,7 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 - 2026-10-10 | **Path: `prodg-hybrid`.** Game code and EA libraries are matched with SN ProDG (GCC 2.95.3 "SN BUILD v1.76", exact build to be located). The Dolphin SDK is matched with Metrowerks CodeWarrior. There is a compiler gate after the Phase 1 scaffold: if no available ProDG build reproduces game codegen, stop and ask the owner. | Toolchain evidence | `docs/RECON_REPORT.md` §2, §7
 - 2026-10-10 | **Host: native Windows** (owner: "use whatever"; agent's recommendation). | ProDG `ngccc`/`ngcld` and MWCC are Win32 executables and run natively; no wine/wibo needed. | `docs/RECON_REPORT.md` §6
 - 2026-10-10 | **Phase 1 tool downloads approved** (no game data): dtk-template, decomp-toolkit, objdiff, binutils, community compilers package, ninja. Ghidra/JDK/REA were not part of this approval. | Needed for the scaffold | owner reply in chat
-- 2026-10-10 | **GitHub remote deferred.** The owner will log in to GitHub later. Until then the repo stays local; GitHub issues, CI runs and pushes wait. | — | owner reply in chat
+- 2026-10-10 | **GitHub remote: private repo `ptitty12/decompile_mvp_04`** (replaces the earlier "remote deferred" entry). The owner logged in to `gh` and asked for the repo to be created; it was created **private** and `main` was pushed as `origin`. | The kit and the dtk docs require private hosting. | owner reply in chat
 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
