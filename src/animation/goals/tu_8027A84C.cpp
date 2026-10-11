@@ -9,8 +9,8 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 17/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * AD3C, B1A0, B924, BA64). Not attempted: fn_8027B55C (242 insns),
+ * Status: 18/25 match. Near-misses are noted above their functions (fn_8027A84C,
+ * AD3C, B1A0, B924). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -413,14 +413,18 @@ int Unk8027A84C::fn_8027B924(Unk80270BA0_X* x, Unk8018959C_Obj* o, float f)
     return 0;
 }
 
-/* near-miss: same instructions; stack slots differ (retail's inlined AngleDiff slots are not
- * shared between the two uses, frame 96 vs 72). */
+/* Each angle difference goes through an inline AbsF(float): its parameter slot
+ * (0x18, 0x30) is allocated with each AngleDiff frame, so the two inline
+ * frames are not shared (frame 0x60), and the compares are single precision. */
+inline float AbsF(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+
 int Unk8027A84C::fn_8027BA64(float a, float b, float c)
 {
-    float da = AngleDiff(b, a);
-    if (__builtin_fabs(da) > 0.7853982f) {
-        float db = AngleDiff(c, a);
-        if (__builtin_fabs(db) < 0.3926991f) {
+    if (!(AbsF(AngleDiff(b, a)) <= 0.7853982f)) {
+        if (AbsF(AngleDiff(c, a)) < 0.3926991f) {
             return 1;
         }
     }
