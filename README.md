@@ -14,7 +14,7 @@ split as units are carved out of the auto-generated ones. The daily numbers
 behind the line chart are in [`docs/progress/history.csv`](docs/progress/history.csv).
 
 The card updates itself. A scheduled task on the owner's PC runs
-`tools/progress_bot.py` every 30 minutes. When `main` has changed, it builds
+`tools/progress_bot.py` every 2 minutes. When `main` has changed, it builds
 `main` in a private worktree (`build/_progress/wt`), redraws the card if the
 numbers moved, runs `tools/verify/verify.py`, and pushes a
 `docs: update progress card` commit. Nothing needs doing by hand. Its log is

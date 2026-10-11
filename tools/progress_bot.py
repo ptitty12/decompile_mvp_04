@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Keep the README progress card current without anyone running anything.
 
-Registered by `--install` as a Windows scheduled task that runs every 30
+Registered by `--install` as a Windows scheduled task that runs every 2
 minutes while the owner is logged in (pythonw, no window). Each run:
 
   1. fetches origin/main and stops if that commit was already handled
@@ -19,7 +19,7 @@ minutes while the owner is logged in (pythonw, no window). Each run:
      main moved meanwhile the push is rejected and the next run starts over
      from the new main.
 
-A failed build or verify is logged and not retried until main changes again.
+A failed build or verify is logged and retried after 10 minutes, or sooner if main changes.
 Log: build/_progress/bot.log.
 
 Usage:
@@ -52,6 +52,7 @@ LOG = BOT_DIR / "bot.log"
 LOCK = BOT_DIR / "lock"
 DISC_IMAGES = {".iso", ".ciso", ".rvz", ".gcm", ".wbfs", ".wia", ".gcz", ".nfs", ".tgc"}
 COMMIT_SUBJECT = "docs: update progress card"
+RETRY_FAILED_AFTER = 10 * 60  # seconds before a failed build of the same commit is tried again
 
 # Sign git in with the gh CLI's token for fetch/push, without changing any config.
 GIT_AUTH = ["-c", "credential.helper=", "-c", "credential.helper=!gh auth git-credential"]
@@ -109,9 +110,10 @@ def save_state(**state: str) -> None:
 
 def prepare_worktree(target: str) -> None:
     if (WT / ".git").exists():
-        # Only docs/progress/ is ever modified here; put it back before moving on.
-        git(WT, "checkout", "--quiet", "HEAD", "--", "docs/progress")
-        git(WT, "checkout", "--quiet", "--detach", target)
+        # The build rewrites tracked files here (e.g. config/GV4E69/splits.txt) and the
+        # previous run may have been interrupted; this worktree is private, so discard
+        # whatever is left rather than letting the checkout abort.
+        git(WT, "checkout", "--quiet", "--force", "--detach", target)
     else:
         git(ROOT, "worktree", "prune")
         git(ROOT, "worktree", "add", "--detach", str(WT), target)
@@ -132,7 +134,11 @@ def bot(force: bool, push: bool, ref: str) -> None:
     git(ROOT, *GIT_AUTH, "fetch", "--quiet", "origin", "main")
     target = git(ROOT, "rev-parse", ref)
     state = load_state()
-    if not force and state.get("handled") == target:
+    failed_at = state.get("time", "") if str(state.get("result", "")).startswith("failed") else ""
+    retry = bool(failed_at) and (
+        datetime.datetime.now() - datetime.datetime.fromisoformat(failed_at)
+    ).total_seconds() > RETRY_FAILED_AFTER
+    if not force and not retry and state.get("handled") == target:
         log(f"origin/main {target[:10]} already handled ({state.get('result')}); nothing to do")
         return
 
@@ -212,7 +218,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     ap.add_argument("--no-push", action="store_true", help="do everything except the push")
     ap.add_argument("--ref", default="origin/main", help="build this ref instead (testing; never pushes)")
     ap.add_argument("--install", action="store_true", help="register the scheduled task")
-    ap.add_argument("--every", type=int, default=30, help="minutes between runs (with --install)")
+    ap.add_argument("--every", type=int, default=2, help="minutes between runs (with --install)")
     ap.add_argument("--uninstall", action="store_true", help="remove the scheduled task")
     args = ap.parse_args(argv)
 
