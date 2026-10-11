@@ -970,9 +970,11 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
 }
 
-/* near-miss: the case set (33 values, from the compares in retail) compiles to a
- * pruned 38-instruction tree; retail keeps a bare cmpwi for each empty case
- * (101 instructions, root 0xF4). Not matched. */
+/* near-miss (38 vs 101 instructions): the case set (33 values, from the compares in retail)
+ * compiles to a pruned tree here; retail keeps a bare cmpwi (then 'b end') for every empty
+ * case and its tree is balanced as if the case list were 2 nodes longer than the 33 visible
+ * ones (root 0xF4, not 0xFB). Tried: unused 'q = &r->mC' in the empty cases (as fn_80055204),
+ * an explicit 'default: break;'. Not matched. */
 void fn_80055D84(Unk80052794_Rec* r)
 {
     switch (r->m4) {
@@ -1047,6 +1049,11 @@ void fn_80055D84(Unk80052794_Rec* r)
         break;
     }
 }
+
+/* parked, not started (785 instructions): fn_80055F18 takes the 0x48-byte Rec by value (24-byte
+ * copy loop), calls fn_80055D84 on the copy, then runs the same 95-kind switch as fn_80055204
+ * (root 0xF4, one compare per kind) to call per-kind handlers with the copy's payload words.
+ * Use the fn_80055204 notes (own local per case, no shared labels for consecutive kinds). */
 
 void fn_8005695C(void)
 {
