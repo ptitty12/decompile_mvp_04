@@ -1,3 +1,4 @@
+#line 1 "C:/mvp2004/source/common/animation/choosers/randomloadedchooser.cpp"
 /*
  * C:/mvp2004/source/common/animation/choosers/randomloadedchooser.cpp
  * (path string at 0x805DCE8C, passed to the RNG's file/line arguments by
