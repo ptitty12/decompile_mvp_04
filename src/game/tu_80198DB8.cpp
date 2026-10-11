@@ -174,7 +174,7 @@ extern "C" void fn_8019B0E4(Unk8019B0E4_Obj* self, int chrg)
     self->m368 = lbl_8065F738;
     self->m3FC = lbl_8065F720;
     self->m98 = lbl_8065F7F0;
-    fn_8019755C((char*)self + 0x36C, 0);
+    fn_8019755C((Unk8019755C_Data*)((char*)self + 0x36C), 0);
     void* sub = &self->m360;
     *(const void**)((char*)sub + 8) = lbl_80649DB8;
     fn_80378620(sub, 0);

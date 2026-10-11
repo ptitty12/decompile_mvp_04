@@ -117,11 +117,12 @@ extern char lbl_805D057C[];
 extern char lbl_805D058C[];
 extern char lbl_805D059C[];
 
+struct Unk8019755C_Data;
 extern "C" {
+void fn_8019755C(Unk8019755C_Data* self, int chrg);
 void fn_80198F68(void* o);
 void fn_80199554(void* o);
 void fn_8019A44C(void* o, void* x);
-void fn_8019755C(void* p, int a);
 void fn_80328234(void* o, int a, void* owner);
 void fn_8019B2A0(struct Unk80198E5C_Obj* o);
 void fn_8030AC88(void* p);
