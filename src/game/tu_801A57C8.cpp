@@ -105,8 +105,15 @@ struct Unk801A745C_T {
     Unk8019F8C0_Owner* m0;
     char pad4[0x18 - 0x4];
     int m18;
+    int m1C;
+    char pad20[0x38 - 0x20];
+    int m38;
 };
 int fn_80326E64(void* p, int a);
+int fn_80326DF0(void* p, int a);
+extern float lbl_805CEAE8;
+extern float lbl_805CEAEC;
+void fn_801A0790(Unk8019F8C0_Owner* o, float v);
 extern "C" float fn_80189D60(int a);
 extern float lbl_805CEAA8;
 extern float lbl_805CEAAC;
@@ -257,6 +264,8 @@ struct Unk801A71D0_Obj {
 struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
+float fn_801A78E4(Unk801A57C8_Wrap* w);
+float fn_801A745C(Unk801A745C_T* t);
 struct Unk801A57C8_Timer {
     char pad0[0x28];
     int m28;
@@ -644,6 +653,18 @@ float fn_801A745C(Unk801A745C_T* t)
         }
     }
     return f;
+}
+
+void fn_801A7808(Unk801A745C_T* t)
+{
+    t->m1C = 1;
+    t->m38 = 2;
+    t->m18 = 1;
+    float a = fn_801A78E4((Unk801A57C8_Wrap*)t);
+    float b = (float)fn_80326DF0((char*)t->m0 + 0x50, 0) * lbl_805CEAE8;
+    float c = fn_801A745C(t);
+    a = !((a + lbl_805CEAEC) > c) ? ((a + lbl_805CEAEC) >? b) : c;
+    fn_801A0790(t->m0, a);
 }
 
 float fn_801A78E4(Unk801A57C8_Wrap* w)
