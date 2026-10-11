@@ -4,6 +4,7 @@
  */
 #include "game/tu_800E0164.h"
 
+/* near-miss: float constants and value use f13/f0 in the opposite assignment (compare operands swapped), clamp structure matches */
 float fn_800E0164(float f)
 {
     float r = fn_8033CDC4(lbl_8068B4C0, f);
@@ -119,6 +120,7 @@ int fn_800E19CC(int x)
     return r;
 }
 
+/* near-miss: 2 slots, `addi r3,r1,8` / `mr r5,r29` argument setup order */
 void fn_800E1A1C(int a, unsigned short* dst)
 {
     int base = lbl_8061977C;
@@ -233,6 +235,7 @@ int fn_800E24F4(int x)
     return -1;
 }
 
+/* near-miss: argument setup order of the two calls (mr r3,rX placement) */
 void fn_800E25E0(int a, int b)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
@@ -264,6 +267,7 @@ void fn_800E2944(int a, int b)
     }
 }
 
+/* near-miss: 3 slots, order of the constant loads (li 1 / lis 0x20 / li 0) before the three stores */
 void fn_800E29CC(int a)
 {
     if (a != -1) {
