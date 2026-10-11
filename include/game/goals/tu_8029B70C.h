@@ -80,11 +80,15 @@ struct Unk8029B70C_Goal {
     float m58;
     float m5C;
     Unk80273498_Pos* m60;
-    char pad64[0x6C - 0x64];
+    char pad64[0x68 - 0x64];
+    float m68;
     float m6C;
     float m70;
     float m74;
-    char pad78[0x9C - 0x78];
+    float m78;
+    char pad7C[0x88 - 0x7C];
+    float m88;
+    char pad8C[0x9C - 0x8C];
     Unk80273498_Vec3 m9C;
     float mA8;
     char padAC[0xB8 - 0xAC];
