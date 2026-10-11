@@ -21,6 +21,45 @@ extern float lbl_805CE6D4;
 
 void fn_8017C82C(void* p);
 int fn_80178EBC(Unk80178BBC_T* p, Unk80179284_Ctx* o);
+class Unk801A24FC_VB {
+public:
+    char pad0[0x98];
+};
+class Unk801A24FC_V : public Unk801A24FC_VB {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+int fn_80178E08(Unk80178BBC_T* p, Unk80179284_Ctx* o);
+extern "C" int fn_801A4910(Unk8019F8C0_Owner* o, int a, int b);
+void fn_8024BE80(void* o, int a);
+/* Objects with a vptr at +8 whose virtual 3 takes three ints. */
+class Unk801A4D1C_VB {
+public:
+    char pad0[8];
+};
+class Unk801A4D1C_V : public Unk801A4D1C_VB {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3(int a, int b, int c);
+};
+struct Unk801A4D1C_X {
+    char pad0[0x20];
+    int m20;
+    int m24;
+    int m28;
+};
+extern "C" Unk801A4D1C_X* fn_801A6DB8(Unk8019F8C0_Owner* o);
+void fn_8017E2E8(void* p, int a, int b, int c);
+void fn_800AB8C8(void* g, Unk8019F8C0_Owner* o, int a, int b, int c);
+extern void* lbl_80619D10;
 struct Unk801A22F4_Ctx {
     char pad0[0x458];
     int m458;
@@ -197,6 +236,38 @@ void fn_801A24AC(Unk8019F8C0_Owner* o)
             fn_8016B2B8(r);
         }
     } while (i <= 5);
+}
+
+/* near-miss: same code; retail's second scan loop is rotated (test at the bottom, no entry jump); ours keeps the jump (8 slots). */
+Unk801A22F4_Ctx* fn_801A24FC(Unk8019F8C0_Owner* o)
+{
+    Unk801A22F4_Ctx* r = 0;
+    int i;
+    for (i = 0; i <= 8; i++) {
+        Unk801A22F4_Ctx* c = (Unk801A22F4_Ctx*)fn_801A4910(o, 3, i);
+        if (c->m458 == 0x12) {
+            r = c;
+            break;
+        }
+    }
+    if (r == 0) {
+        for (i = 0; i <= 8; i++) {
+            Unk801A22F4_Ctx* c = (Unk801A22F4_Ctx*)fn_801A4910(o, 3, i);
+            int f = 0;
+            if (o->m700 && o->m700->m3AC && fn_80178E08(o->m700->m3AC, (Unk80179284_Ctx*)c)) {
+                f = 1;
+            }
+            if (c->m458 == 0xd && f == 0) {
+                r = c;
+                break;
+            }
+        }
+    }
+    if (r != 0) {
+        fn_8024BE80(r, 0x12);
+        ((Unk801A24FC_V*)r)->fn_vslot8(0);
+    }
+    return r;
 }
 
 void fn_801A27E0(void* p) {}
@@ -674,6 +745,22 @@ extern "C" Unk8019F8C0_M2* fn_801A4CE8(Unk8019F8C0_Owner* o, int i)
         return s->m3C;
     }
     return 0;
+}
+
+void fn_801A4D1C(Unk8019F8C0_Owner* o, int a, int b, int c)
+{
+    Unk801A4D1C_V* m = (Unk801A4D1C_V*)((Unk801A57C8_Mode*)o->m560)->m4;
+    if (m) {
+        m->fn_vslot3(a, 0, 0);
+    }
+    if (o->m700) {
+        fn_8017E2E8(o->m700, a, b, c);
+    }
+    if (!((a == 0x39 && fn_801A6DB8(o)->m20 == 0) || (a == 0x48 && fn_801A6DB8(o)->m28 == 0)
+          || (a == 0x45 && fn_801A6DB8(o)->m24 == 0) || (a == 0x41 && fn_801A6DB8(o)->m24 == 0))) {
+        ((Unk801A4D1C_V*)o->m6F8)->fn_vslot3(a, b, c);
+    }
+    fn_800AB8C8(lbl_80619D10, o, a, b, c);
 }
 
 void fn_801A4E4C(Unk8019F8C0_Owner* o)
