@@ -19,19 +19,23 @@ void fn_801F0EA8(Task* t, int a);
 void fn_801EE6F4(Task* t, int a);
 void fn_80213988(Task* t, int a, int b);
 void fn_8021D4A4(Task* t);
+int fn_801F0F30(Task* t);
+void fn_8022A71C(Task* t, int a, int b);
+int fn_802055F4(TaskInner* in);
 }
 
 extern "C" {
 
+extern Vec3f lbl_805D63F4;
 void fn_8022321C(Task* t, int idx, RecQueue* q)
 {
     Rec* e = &q->e[0];
-    void* o = t->m9C->m8[idx];
+    void* o = ObjAt(t->m9C->m8, idx);
     if (fn_8026D988(o, 0) == 1 || fn_8026DB3C(o, 0) == 1) {
         e->mA4 = 1;
-        e->mAC = 0;
-        e->m80 = 0.0f;
+        e->m80 = lbl_805D63F4.x;
         e->m9C = 0;
+        e->mAC = 0;
     }
 }
 
@@ -88,6 +92,24 @@ int fn_8022559C(Task* t)
         fn_802123D4(t, 0, 0);
         fn_80213B80(t, 3, 2, 3);
         return 1;
+    }
+    return 0;
+}
+
+int fn_80225614(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* c = in->m0->m6CC;
+    Obj36C* o = c->m374;
+    if (c->m36C == 0 && o != 0) {
+        int v = fn_80211BB0(&in->mC0, o->m460);
+        fn_80205450(t->m9C, a);
+        if (fn_802055F4(t->m9C) == 1 && (v != 3 || fn_801F0F30(t) == -1)) {
+            fn_802123D4(t, 0, 0);
+            fn_8022A71C(t, v, c->m378);
+            fn_8021D4A4(t);
+            return 1;
+        }
     }
     return 0;
 }
