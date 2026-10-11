@@ -801,3 +801,60 @@ void Unk800058BC::fn_800074BC(Unk800074BC_Msg* msg)
         }
     }
 }
+
+/*
+ * Static initializers: thirteen unit direction vectors (global Vec3 objects at
+ * 0x806869B0..0x80686A4C) built from five constant points (rodata 0x805A37C4:
+ * four in an array, the fifth at 0x805A37F4). The helpers are the inline
+ * vector operations, shaped to reproduce retail's stack temporaries
+ * (-ffloat-store gives every float local and by-value struct its own slot).
+ */
+struct Vec3 {
+    float x, y, z;
+};
+extern "C" float fn_804028E4(float x);
+extern const Vec3 lbl_806055AC;
+const Vec3 lbl_805A37C4[4] = { { 7.5f, 0.0f, 1072.5f }, { 1080.0f, 0.0f, 1080.0f }, { 1072.5f, 0.0f, 7.5f }, { 7.5f, 0.0f, 7.5f } };
+const Vec3 lbl_805A37F4 = { 513.3595f, 0.0f, 513.3595f };
+
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline Vec3 operator/(const Vec3& a, float s)
+{
+    Vec3 r;
+    float inv = 1.0f / s;
+    r.x = a.x * inv;
+    r.y = a.y * inv;
+    r.z = a.z * inv;
+    return r;
+}
+
+inline Vec3 Normalized(const Vec3& v)
+{
+    float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (len != 0.0f) {
+        return v / len;
+    }
+    return lbl_806055AC;
+}
+
+Vec3 lbl_806869B0 = Normalized(lbl_805A37F4 - lbl_805A37C4[3]);
+Vec3 lbl_806869BC = Normalized(lbl_805A37C4[3] - lbl_805A37F4);
+Vec3 lbl_806869C8 = Normalized(lbl_805A37C4[2] - lbl_805A37C4[1]);
+Vec3 lbl_806869D4 = Normalized(lbl_805A37C4[1] - lbl_805A37C4[2]);
+Vec3 lbl_806869E0 = Normalized(lbl_805A37C4[1] - lbl_805A37C4[0]);
+Vec3 lbl_806869EC = Normalized(lbl_805A37C4[0] - lbl_805A37C4[1]);
+Vec3 lbl_806869F8 = Normalized(lbl_805A37C4[2] - lbl_805A37C4[3]);
+Vec3 lbl_80686A04 = Normalized(lbl_805A37C4[3] - lbl_805A37C4[2]);
+Vec3 lbl_80686A10 = Normalized(lbl_805A37C4[3] - lbl_805A37C4[1]);
+Vec3 lbl_80686A1C = Normalized(lbl_805A37C4[0] - lbl_805A37C4[3]);
+Vec3 lbl_80686A28 = Normalized(lbl_805A37C4[3] - lbl_805A37C4[0]);
+Vec3 lbl_80686A34 = Normalized(lbl_805A37C4[2] - lbl_805A37C4[0]);
+Vec3 lbl_80686A40 = Normalized(lbl_805A37C4[0] - lbl_805A37C4[2]);
