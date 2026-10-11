@@ -40,6 +40,29 @@ struct Unk8028C6B8_Ctx {
     Unk8028C6B8_Pos6CC* m6CC;
 };
 
+/* Angle/state block at Unk80270BA0_X+0x734 (same object as Unk802726BC_Angles):
+ * pairs of slots indexed by m190 (0 or 1). Evidence: the slot writes in
+ * fn_8028C6B8 (float slots +0x98 and +0xB8, int slots +0xA0, +0xA8, +0xC8,
+ * +0xF0, +0x160, +0x180). */
+struct Unk8028C6B8_Angles {
+    char pad0[0x98];
+    float m98[2];
+    int mA0[2];
+    int mA8[2];
+    char padB0[0xB8 - 0xB0];
+    float mB8[2];
+    char padC0[0xC8 - 0xC0];
+    int mC8[2];
+    char padD0[0xF0 - 0xD0];
+    int mF0[2];
+    char padF8[0x160 - 0xF8];
+    int m160[2];
+    char pad168[0x180 - 0x168];
+    int m180[2];
+    char pad188[0x190 - 0x188];
+    int m190;
+};
+
 /* Link object at Unk80270BA0_X::m618 (same object as Unk80271DBC_Link):
  * fn_8028D4E4 and fn_8028C6B8 read an id at +0x838 and +0x83C. */
 struct Unk8028C6B8_Link {
@@ -67,6 +90,8 @@ struct Unk8028C6B8_X {
     int m708;
     char pad70C[0x724 - 0x70C];
     float m724;
+    char pad728[0x734 - 0x728];
+    Unk8028C6B8_Angles m734;
 
     /* Inline by-value getter: passing its result gives retail's direct temp. */
     Unk80273498_Vec3 fn_GetPos() { return m60; }
@@ -199,6 +224,7 @@ struct Unk8028C6B8_Goal {
     Unk8028C6B8_Goal* fn_8028EF98(float f);
     void fn_8028F0F4(Unk8028C6B8_X* x);
     void fn_8028D0EC(Unk8028C6B8_X* x, Unk8028C6B8_Ctx* ctx);
+    void fn_8028D200(Unk8028C6B8_X* x, int c);
     int fn_8028D8D8(Unk8028C6B8_X* x);
     void fn_8028D808(Unk8028C6B8_X* x, int c);
     int fn_8028D4E4(int mode, Unk8028C6B8_X* x, int c);

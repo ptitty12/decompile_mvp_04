@@ -31,6 +31,63 @@ inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_V
     return r;
 }
 
+extern Unk80273498_Vec3 lbl_806055AC;       /* 0xc bytes in another unit's .rodata (default direction) */
+float fn_8041171C(float x);
+float fn_80411554(float x);
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = 0.0f;
+    r.z = fn_80411554(angle);
+    return r;
+}
+
+/* Normalize and its helpers (fn_8028D200): the float parameters of the inline
+ * functions each get a stack slot, which is how the 0xa8/0xc0 slots arise. */
+inline float Unk8028D200_Recip(float x)
+{
+    return 1.0f / x;
+}
+
+inline Unk80273498_Vec3 Unk8028D200_Scale(const Unk80273498_Vec3& v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Unk8028D200_Normalize(const Unk80273498_Vec3& v)
+{
+    float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+
+    if (len != 0.0f) {
+        return Unk8028D200_Scale(v, Unk8028D200_Recip(len));
+    }
+    return lbl_806055AC;
+}
+
 /* Cross product with by-value parameters, as fn_8028D8D8 uses it. */
 inline Unk80273498_Vec3 Unk8028D8D8_Cross(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
 {
@@ -39,6 +96,367 @@ inline Unk80273498_Vec3 Unk8028D8D8_Cross(Unk80273498_Vec3 a, Unk80273498_Vec3 b
     r.y = a.x * b.z - b.x * a.z;
     r.z = b.x * a.y - a.x * b.y;
     return r;
+}
+
+/* Slot writes of fn_8028C6B8: `if (a->m190 == 1) a->field = v;` followed by the
+ * indexed store, with the index a->m190 read again (byte offset in a local, as
+ * in the other goal units). */
+inline void Unk8028C6B8_SetI(Unk8028C6B8_Angles* a, int base, int i, int v)
+{
+    int off = i * 4 + base;
+    *(int*)((char*)a + off) = v;
+}
+
+inline void Unk8028C6B8_SetIZ(Unk8028C6B8_Angles* a, int base, int i, int v)
+{
+    int off = i * 4 + base;
+    *(int*)(off + (char*)a) = v;
+}
+
+inline void Unk8028C6B8_SetF(Unk8028C6B8_Angles* a, int base, int i, float v)
+{
+    int off = i * 4 + base;
+    *(float*)((char*)a + off) = v;
+}
+
+inline void Unk8028C6B8_SetM98In(Unk8028C6B8_Angles* a, float v)
+{
+    if (a->m190 == 1) {
+        a->m98[0] = v;
+    }
+    int off = a->m190 * 4 + 0x98;
+    *(float*)((char*)a + off) = v;
+}
+
+inline void Unk8028C6B8_SetM98(Unk8028C6B8_Angles* a, float v)
+{
+    Unk8028C6B8_SetM98In(a, v);
+}
+
+inline void Unk8028C6B8_SetMB8In(Unk8028C6B8_Angles* a, float v)
+{
+    if (a->m190 == 1) {
+        a->mB8[0] = v;
+    }
+    int off = a->m190 * 4 + 0xB8;
+    *(float*)((char*)a + off) = v;
+}
+
+inline void Unk8028C6B8_SetMB8(Unk8028C6B8_Angles* a, float v)
+{
+    Unk8028C6B8_SetMB8In(a, v);
+}
+
+inline void Unk8028C6B8_SetA8(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->mA8[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0xA8, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_SetA8Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0xA8, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0xA8, a->m190, v);
+}
+
+inline void Unk8028C6B8_SetA0(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->mA0[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0xA0, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_SetA0Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0xA0, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0xA0, a->m190, v);
+}
+
+inline void Unk8028C6B8_SetC8(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->mC8[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0xC8, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_SetC8Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0xC8, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0xC8, a->m190, v);
+}
+
+inline void Unk8028C6B8_SetF0(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->mF0[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0xF0, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_SetF0Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0xF0, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0xF0, a->m190, v);
+}
+
+inline void Unk8028C6B8_Set160(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->m160[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0x160, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_Set160Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0x160, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0x160, a->m190, v);
+}
+
+inline void Unk8028C6B8_Set180(Unk8028C6B8_Angles* a, int v)
+{
+    if (a->m190 == 1) {
+        a->m180[0] = v;
+    }
+    Unk8028C6B8_SetI(a, 0x180, a->m190, v);
+}
+
+/* Same store for the constant 0: retail writes the first slot through a register
+ * index (li r9,N; stwx) only when the value is zero, which an index variable
+ * reproduces. */
+inline void Unk8028C6B8_Set180Z(Unk8028C6B8_Angles* a, int v)
+{
+    int zero = 0;
+    if (a->m190 == 1) {
+        Unk8028C6B8_SetIZ(a, 0x180, zero, v);
+    }
+    Unk8028C6B8_SetI(a, 0x180, a->m190, v);
+}
+
+/* near-miss: 653 of 653 instructions in the same order as retail; 4 differ by
+ * one register name. The first store of a zero-valued slot write (cases 9, 11
+ * and 22, and the C8 == 0 branch of case 19) is `li rN,off; stwx v,r30,rN`;
+ * retail uses r9 for rN, here the allocator picks r0. Tried: the index as a
+ * named variable, int/unsigned/long/const/register types, operand order of the
+ * address sum, integer base arithmetic, and a direct byte offset (which folds
+ * to a displacement and loses the stwx). */
+void Unk8028C6B8_Goal::fn_8028C6B8(Unk8028C6B8_X* x, int c)
+{
+    if (mC > 2) {
+        return;
+    }
+    if (x->m458 == 1) {
+        int v = 1;
+
+        if (m34 == 1) {
+            v = 0;
+        }
+        Unk8028C6B8_Angles* a = &x->m734;
+        if (a->m190 == 1) {
+            a->m180[0] = v;
+        }
+        Unk8028C6B8_SetI(a, 0x180, a->m190, v);
+    }
+    float heading;
+    Unk80273498_Vec3 pos;
+    int i60;
+
+    fn_8027AD3C(x, c, &pos, &heading, 0, 0, &i60, 0);
+    int id83C = x->m618->m83C;
+    if (mA8.f3) {
+        mA8.f4 = 1;
+    } else {
+        mA8.f4 = (i60 == 0x2D9F492A || id83C == 0x2D9F492A);
+    }
+    int m = fn_8028C560(m48, i60);
+    int e = fn_8028E73C(this, 5);
+    m8->fn_8027A17C(m, m, e, 0);
+    m8->fn_8027A078();
+    if (m5C == -1000.0f) {
+        m5C = fn_80248FC8(x, m38);
+    }
+    float a28 = 0.0f;
+    float a2c = 0.0f;
+    if (m28) {
+        Unk80273498_Vec3 d = fn_GetTarget() - pos;
+
+        a28 = fn_80410CE8(d.x, d.z);
+    } else {
+        a28 = heading;
+    }
+    if (m2C) {
+        a2c = fn_80410CE8(m1C.x, m1C.z);
+        m60 = AngleDiff(a28, a2c);
+    } else {
+        m60 = 0.0f;
+    }
+    Unk8028C6B8_Angles* ang = &x->m734;
+
+    m8->fn_8027A0B8(m60, 3.1415927f, -3.1415927f);
+    m8->fn_8027A0B8(m5C, 393.7008f, 0.0f);
+    Unk8028C6B8_SetM98(ang, m60);
+    Unk8028C6B8_SetMB8(ang, m5C);
+    if (mA8.f13 && c == 0) {
+        fn_8028D0EC(x, x->m44C);
+    }
+    int t3 = m50 == 3;
+    Unk8028C6B8_SetF0(ang, t3);
+    m8->fn_8027A148(t3);
+    switch (m48) {
+    case 0:
+    case 20:
+        m8->fn_8027A148(0);
+        break;
+    case 3:
+        Unk8028C6B8_SetM98(ang, m60);
+        break;
+    case 14:
+        Unk8028C6B8_SetA8(ang, 6);
+        m8->fn_8027A148(4);
+        if (mA8.f13) {
+            if (mA8.f14) {
+                Unk8028C6B8_SetA0(ang, 9);
+                m8->fn_8027A148(13);
+            } else {
+                Unk8028C6B8_SetA0(ang, 10);
+                m8->fn_8027A148(14);
+            }
+        }
+        break;
+    case 15:
+        Unk8028C6B8_SetA8(ang, 8);
+        m8->fn_8027A148(5);
+        if (mA8.f13) {
+            if (mA8.f14) {
+                Unk8028C6B8_SetA0(ang, 9);
+                m8->fn_8027A148(13);
+            } else {
+                Unk8028C6B8_SetA0(ang, 10);
+                m8->fn_8027A148(14);
+            }
+        }
+        break;
+    case 16:
+        Unk8028C6B8_SetA8(ang, 10);
+        m8->fn_8027A148(6);
+        if (mA8.f13) {
+            if (mA8.f14) {
+                Unk8028C6B8_SetA0(ang, 9);
+                m8->fn_8027A148(13);
+            } else {
+                Unk8028C6B8_SetA0(ang, 10);
+                m8->fn_8027A148(14);
+            }
+        }
+        break;
+    case 11:
+        Unk8028C6B8_SetA8Z(ang, 0);
+        m8->fn_8027A148(1);
+        break;
+    case 12:
+        Unk8028C6B8_SetA8(ang, 2);
+        m8->fn_8027A148(2);
+        break;
+    case 13:
+        Unk8028C6B8_SetA8(ang, 4);
+        m8->fn_8027A148(3);
+        break;
+    case 9:
+        Unk8028C6B8_SetMB8(ang, m5C);
+        Unk8028C6B8_SetA0Z(ang, 0);
+        m8->fn_8027A148(7);
+        break;
+    case 4:
+        Unk8028C6B8_SetMB8(ang, m5C);
+        Unk8028C6B8_SetA0(ang, 1);
+        m8->fn_8027A148(8);
+        break;
+    case 19:
+        if (!(m64 >= -24.0f)) {
+            Unk8028C6B8_SetA0(ang, 2);
+            Unk8028C6B8_SetC8(ang, 3);
+            m8->fn_8027A148(9);
+        } else if (!(m64 >= -12.0f)) {
+            Unk8028C6B8_SetA0(ang, 2);
+            Unk8028C6B8_SetC8(ang, 2);
+            m8->fn_8027A148(10);
+        } else if (!(m64 <= 24.0f)) {
+            Unk8028C6B8_SetA0(ang, 2);
+            Unk8028C6B8_SetC8Z(ang, 0);
+            m8->fn_8027A148(11);
+        } else {
+            Unk8028C6B8_SetA0(ang, 2);
+            Unk8028C6B8_SetC8(ang, 1);
+            m8->fn_8027A148(12);
+        }
+        break;
+    case 7:
+        Unk8028C6B8_SetA0(ang, 5);
+        m8->fn_8027A148(15);
+        break;
+    case 8:
+        Unk8028C6B8_SetA0(ang, 6);
+        m8->fn_8027A148(16);
+        break;
+    case 10:
+        break;
+    case 2:
+        m8->fn_8027A148(17);
+        break;
+    case 22:
+        Unk8028C6B8_Set160Z(ang, 0);
+        m8->fn_8027A148(18);
+        break;
+    case 23:
+        Unk8028C6B8_Set160(ang, 1);
+        m8->fn_8027A148(19);
+        break;
+    case 24:
+        m8->fn_8027A148(20);
+        Unk8028C6B8_Set160(ang, 2);
+        break;
+    case 25:
+        m8->fn_8027A148(21);
+        break;
+    case 17:
+    case 18:
+        m8->fn_8027A148(22);
+        break;
+    }
 }
 
 void Unk8028C6B8_Goal::fn_8028D0EC(Unk8028C6B8_X* x, Unk8028C6B8_Ctx* ctx)
@@ -58,6 +476,27 @@ void Unk8028C6B8_Goal::fn_8028D0EC(Unk8028C6B8_X* x, Unk8028C6B8_Ctx* ctx)
             }
         }
         mA8.f15 = 1;
+    }
+}
+
+/* near-miss: 185 of 185 instructions in the same order as retail; the 4 that
+ * differ swap two float stack slots (retail: Recip's parameter at sp+0xa8 and
+ * Scale's at sp+0xc0, here the reverse). Tried: named inv local, const
+ * parameter, parameter order, Recip with a result local, open-coded scaling. */
+void Unk8028C6B8_Goal::fn_8028D200(Unk8028C6B8_X* x, int c)
+{
+    if (m28) {
+        float heading;
+        Unk80273498_Vec3 pos;
+
+        fn_8027AD3C(x, c, &pos, &heading, 0, 0, 0, 0);
+        Unk80273498_Vec3 d = fn_GetTarget() - pos;
+        m6C = d.x * d.x + d.z * d.z;
+        d.y = 0.0f;
+        Unk80273498_Vec3 dir = Direction(heading);
+        m64 = dir.x * d.x + dir.y * d.y + dir.z * d.z;
+        Unk80273498_Vec3 e = fn_GetTarget() - (pos + Unk8028D200_Normalize(dir) * m64);
+        m68 = e.x * e.x + e.z * e.z;
     }
 }
 
