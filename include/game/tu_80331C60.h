@@ -20,7 +20,7 @@ extern "C" void fn_80377408(void* p); /* __builtin_delete */
 class MItem {
 public:
     char pad0[0x8];
-    virtual int s1();
+    virtual ~MItem();
     virtual int s2();
     virtual int s3();
     virtual int s4();
@@ -55,6 +55,7 @@ struct MenuD : Menu {
 extern "C" {
 void fn_80330ACC(Menu* m, MItem* it);
 void fn_80330870(Menu* m, int c);
+
 void fn_80330778(Menu* m, int c);
 void fn_8032F574(MItem* it, int idx);
 MItem* fn_8032FA3C(void* mem, const char* name, const void* a, const void* b, const void* c, int d, int e);
