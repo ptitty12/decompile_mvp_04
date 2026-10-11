@@ -152,10 +152,10 @@ public:
     virtual void fn_vslot10();
     virtual void fn_vslot11();
     virtual void fn_vslot12();
-    virtual void fn_vslot13();
-    virtual void fn_vslot14();
+    virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
+    virtual int fn_vslot14(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
     virtual void fn_vslot15();
-    virtual void fn_vslot16();
+    virtual void fn_vslot16(int a);
     virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
     void fn_8037B6B0(const char* name, int* field, const char* values);
     void fn_8037B728(const char* name, const char* name2, void* list, int flags);

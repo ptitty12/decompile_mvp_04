@@ -78,7 +78,7 @@ public:
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
     virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
-    int fn_8027101C(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
+    virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 
     int m4;                    /* "sigtype" enum */
     Unk8027130C m8;            /* "playerIDs"/"sigids" */
@@ -319,7 +319,7 @@ Unk8037B3E8* cSignatureChooser::fn_vslot5()
     return new (lbl_806EF9B4) cSignatureChooser;
 }
 
-int cSignatureChooser::fn_8027101C(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj)
+int cSignatureChooser::fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj)
 {
     if (m4 == 4 || m4 == 5) {
         return fn_vslot17(out, obj, 3, 0, 0, 0);
