@@ -65,6 +65,15 @@ struct Unk801EE438_Sub6A8 {        /* fn_80204AC8(&G->m6A8) */
     int m0;
 };
 
+struct Unk801EE438_Ent18 {         /* 0x18 bytes, G+0x1DC (9 entries) */
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+    float m10;
+    void* m14;
+};
+
 struct Unk801EE438_Rec2C {         /* stride 0x2C, G+0x3DC (indices 9..12 used) */
     int m0;
     char pad4[0x24 - 4];
@@ -79,6 +88,14 @@ struct Unk801EE438_Sub2B4 {        /* G+0x2B4 */
     char pad288[0x2AC - 0x288];
     int m2AC;                      /* G+0x560 */
     char pad2B0[0x364 - 0x2B0];
+};
+
+struct Unk801EE438_Rec14 {         /* stride 0x14, G+0x62C (4 entries) */
+    int m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
 };
 
 struct Unk801EE438_Rec5C {         /* stride 0x5C, G+0x6B8 (10 entries) */
@@ -104,7 +121,9 @@ struct Unk801EE438_Owner {
     unsigned m4C;
     char pad50[0x65C - 0x50];
     Unk801EE438_Player* m65C[13];
-    char pad690[0x700 - 0x690];
+    char pad690[0x6CC - 0x690];
+    int m6CC;
+    char pad6D0[0x700 - 0x6D0];
     Unk801EE438_O700* m700;
 };
 
@@ -114,11 +133,19 @@ struct Unk801EE438_G {
     Unk801EE438_Player* m8[10];
     int m30;
     int m34;
-    char pad38[0x54 - 0x38];
+    int m38;
+    char pad3C[0x44 - 0x3C];
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
     int m54;
-    char pad58[0x5C - 0x58];
+    int m58;
     int m5C;
-    char pad60[0xA4 - 0x60];
+    int m60;
+    char pad64[0x6C - 0x64];
+    int m6C;
+    char pad70[0xA4 - 0x70];
     int mA4;
     char padA8[0xC0 - 0xA8];
     Unk801EE438_Sub mC0;
@@ -131,9 +158,13 @@ struct Unk801EE438_G {
     int m1C8;
     int m1CC;
     int m1D0;
-    char pad1D4[0x2B4 - 0x1D4];
+    char pad1D4[0x1D8 - 0x1D4];
+    int m1D8;                      /* entry count */
+    Unk801EE438_Ent18 m1DC[9];
     Unk801EE438_Sub2B4 m2B4;
-    char pad618[0x6A8 - 0x618];
+    char pad618[0x62C - 0x618];
+    Unk801EE438_Rec14 m62C[4];
+    char pad67C[0x6A8 - 0x67C];
     Unk801EE438_Sub6A8 m6A8;
     char pad6AC[0x6B8 - 0x6AC];
     Unk801EE438_Rec5C m6B8[10];
@@ -154,6 +185,10 @@ struct Unk801EE438_Scr {
     Unk801EE438_G* m0;
     char pad4[0x9C - 4];
     Unk801EE438_G* m9C;
+    char padA0[0xE8 - 0xA0];
+    float mE8;
+    char padEC[0xF4 - 0xEC];
+    float mF4;
 };
 
 struct Unk801EE438_Scr;
