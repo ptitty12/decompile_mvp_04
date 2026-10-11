@@ -5,6 +5,7 @@
 #include "game/tu_800A8684.h"
 
 struct UnkFEArr {          /* one-element array, count, pointer (see fn_800AB0C4) */
+    UnkFEArr();
     int m0[1];
     int m4;
     int m8;
@@ -115,7 +116,7 @@ struct UnkFEObj8 {         /* vptr at +8 (lbl_8065B228 / lbl_8065B1E8), 0x28 byt
     float m24;
 };
 void fn_800AB0C4(UnkFEArr* a, int v);
-void fn_800AB098(UnkFEArr* a);
+void* operator new[](unsigned int size, int heap);
 void fn_800ADAD8(void* p);
 Unk80040640* fn_8004072C();
 void fn_800412AC(Unk80040640* o, int a, int b, int c, int d, int e);
@@ -129,6 +130,20 @@ extern const float lbl_805B95A0;
 extern FEV18* lbl_80619D10;
 extern UnkFE806192E0* lbl_806192E0;
 extern const char lbl_8065B8B8[];
+extern const char lbl_8065B780[];
+extern const char lbl_8065AD10[];
+extern const char lbl_8065ACD0[];
+struct FEOb12 {
+    int m0;
+    int m4;
+    const void* m8;
+};
+struct FEOb28 {
+    int m0;
+    int m4;
+    const void* m8;
+    const void* mC;
+};
 extern int lbl_80620860;
 extern const char lbl_8065B228[];
 extern const char lbl_8065B1E8[];
@@ -140,6 +155,9 @@ extern const char lbl_8065B0E8[];
 /* ---- generated externs ---- */
 
 extern "C" {
+FEOb12* fn_800AEFF4(FEOb12* self, int a, int b);
+void fn_800B0484(void* p);
+void fn_800B0564(void* p);
 void* fn_800AF020(void* p);
 int fn_800AB850(UnkFETable* t, int i);
 void fn_800AB0E8(UnkFEArr* a, int i);
@@ -173,8 +191,11 @@ void fn_80377488(void* p);
 
 
 
+
+
 /* ---- unit prototypes ---- */
 extern "C" {
+UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n);
 UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n);
 int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d);
 void fn_800ABC9C(UnkFETable* t);
@@ -232,6 +253,23 @@ void fn_800ACD48(UnkFE20* self);
 
 /* ---- functions ---- */
 
+/* near-miss (6 slots): retail copies the source pointer (mr r31,r30) after the loop pre-test and assigns n/i to r28/r27; only the register order differs */
+extern "C" UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n)
+{
+    fn_800AB1CC(self, src, n);
+    self->m18 = lbl_8065B780;
+    for (int i = 0; i < n; i++) {
+        FEOb28* o = (FEOb28*)operator new(0x28, 0x400);
+        fn_800AEFF4((FEOb12*)o, i, src[i]);
+        o->mC = lbl_8065ACD0;
+        o->m8 = lbl_8065AD10;
+        fn_800B0484(o);
+        fn_800B0564(o);
+        fn_800AB758(self, i, ((FEO8*)o)->s2(0));
+    }
+    return self;
+}
+
 extern "C" UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n)
 {
     fn_803282A8(self, 0);
@@ -244,16 +282,7 @@ extern "C" UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n)
     self->m444 = 0;
     lbl_80619D10 = (FEV18*)self;
     self->m24 = n;
-    UnkFEArr* arr = (UnkFEArr*)fn_803774A8(n * 0xC, 0x400);
-    UnkFEArr* p = arr;
-    int c = n - 1;
-    if (n != 0) {
-        do {
-            fn_800AB098(p);
-            p++;
-        } while (c-- != 0);
-    }
-    self->m440 = arr;
+    self->m440 = new (0x400) UnkFEArr[n];
     for (int i = 0; i < n; i++) {
         self->m440[i].m8 = src[i];
     }
