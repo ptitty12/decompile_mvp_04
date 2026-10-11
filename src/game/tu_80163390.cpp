@@ -4,6 +4,9 @@
  */
 #include "game/tu_80163390.h"
 
+extern float lbl_805C9100;
+extern float lbl_805C9104;
+
 extern float lbl_805C9204;
 extern float lbl_805C9208;
 
@@ -37,6 +40,7 @@ int fn_801DC10C(void* p);
 int fn_80259330(void* p);
 void fn_8016C4A0(void* p);
 void fn_80327214(Unk801527C8_Sub* s);
+void fn_80327274(Unk801527C8_Sub* s);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
 Unk801527C8_Actor* fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
 Unk801527C8_Actor* fn_801A4910(Unk801527C8_Actor* a, int k, int v);
@@ -58,6 +62,37 @@ void Unk80159F28::fn_80163A98() /* 80163A98 */
 
 void Unk80159F28::fn_80163AF0() /* 80163AF0 */
 {
+}
+
+void Unk80159F28::fn_80163AF4(int id) /* 80163AF4 */
+{
+    Unk801527C8_Actor* a = mC;
+    Unk801527C8_Sub* s = &a->m50;
+    float t = (float)*(unsigned int*)&a->m4C * lbl_805C9100;
+    switch (id) {
+    case 0x10:
+    case 0x3D:
+    case 0x44:
+    case 0x56:
+        s->fn_80326EF4(t, lbl_805C9104, id, -1, -1, 0);
+        break;
+    case 0x5A:
+        fn_80163A98();
+        s->fn_80326EF4(t, lbl_805C9104, 0x5A, -1, -1, 0);
+        break;
+    case 0x32:
+        fn_80327274(s);
+        break;
+    case 0x5B:
+        m10 = 1;
+        fn_80161A74();
+        break;
+    case 0x42: {
+        float u = a->m700->m3A4->m180 - lbl_805C9100;
+        s->fn_80326EF4(u, lbl_805C9104, 0x42, -1, -1, 0);
+        break;
+    }
+    }
 }
 
 /* near-miss: retail tests v > 7 first and handles 0/<0/>=2 with a compare chain; the switch below compiles to a different tree */
