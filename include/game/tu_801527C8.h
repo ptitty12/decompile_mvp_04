@@ -154,10 +154,13 @@ struct Unk801527C8_Actor {
 };
 
 struct Unk801527C8_Ctx {
+    void fn_8016D2F4(const char* s);
+    void fn_8016AC3C();
     char pad0[0xA14];
     int mA14;
     int mA18;
-    char padA1C[0xA4C - 0xA1C];
+    char padA1C[0xA24 - 0xA1C];
+    char mA24[4][10];
     Unk801527C8_Actor* mA4C;
     void* mA50;
     Unk801527C8_Actor* mA54;

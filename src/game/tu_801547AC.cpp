@@ -4,10 +4,23 @@
  */
 #include "game/tu_801527C8.h"
 
+extern float lbl_805C88D4;
+
+extern const char lbl_805C85FC[];
+extern float lbl_805C8630;
+extern float lbl_805C8640;
+
+extern float lbl_805C8514;
+extern float lbl_805C8518;
+extern float lbl_805C851C;
+
 extern float lbl_805C8418;
 extern float lbl_805C84F4;
 extern float lbl_805C8580;
 extern float lbl_805C8978;
+
+struct Unk802A2DA4_Goal;
+void fn_802A2DC0(Unk802A2DA4_Goal* g, float t);
 
 struct Unk8014E388 {
     char pad0[0x10];
@@ -120,20 +133,7 @@ extern const char lbl_805C60F8[];
 extern const char lbl_805C6240[];
 extern const char lbl_805C7988[];
 
-void fn_801A4F40(Unk801527C8_Actor* a);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
-int fn_80097190(Unk801527C8_Team* t, int a);
-int fn_80097300(Unk801527C8_Team* t, int a);
-int fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
-void fn_80178F64(void* p, int v);
-void fn_80327274(Unk801527C8_Sub* s);
-int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_80326E64(Unk801527C8_Sub* s, int a);
-void fn_8016D3DC(Unk801527C8_Ctx* ctx, int a);
-void fn_8016C660(Unk801527C8_Ctx* ctx, int a);
-void fn_801515AC(int* a, int* b, int* c);
-int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
-void fn_802B2518(void* o, int a, float t);
 
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
@@ -247,6 +247,24 @@ int cScriptReplay::fn_cslot8() /* 80154EB0 */
     }
 }
 
+inline void SetF(float* p, float v)
+{
+    *p = v;
+}
+
+int cScriptReplay::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80155288 */
+{
+    Unk801527C8_Actor* act = ctx->mA54;
+    float u = m14;
+    if (m18 != 0) {
+        float t = (f3 - f1) / f2;
+        t = !(t > lbl_805C8514) ? (t >? lbl_805C8518) : lbl_805C8514;
+        u = m1C.fn_8033CDC4(t) * lbl_805C851C;
+    }
+    SetF((float*)((char*)act + 0x50), u);
+    return 1;
+}
+
 Unk8037B3E8* cScriptReplay::fn_vslot5() /* 80155348 */
 {
     return new (lbl_806EF9B4) cScriptReplay;
@@ -357,6 +375,23 @@ void cScriptWaitGoal::fn_vslot2() /* 80155A68 */
     fn_8037B50C(lbl_805C805C, &m4, lbl_805C85CC, 0);
     fn_8037B50C(lbl_805C85D8, &m8, lbl_805C85CC, 0);
     fn_8037B584(lbl_805C7994, 0, 0, lbl_805C85E4);
+}
+
+int cScriptWaitGoal::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80155AE8 */
+{
+    float d = (m8 - m4) >? lbl_805C8630;
+    float k = d;
+    const char* file = lbl_805C85FC;
+    unsigned int n = ctx->mA4C->m554->fn_8014D8AC(1000000, file, 0x33);
+    mC = (float)n * k * lbl_805C8640 + m4;
+    Unk8016C788_Obj* o = fn_8016C788(ctx, a);
+    if (o != 0) {
+        Unk8027C728_Goal* g = fn_802448F4(o, 1);
+        g->m10 = 9;
+        fn_8027C728(g);
+        fn_802A2DC0((Unk802A2DA4_Goal*)g->m18, mC);
+        fn_8015152C(o, g);
+    }
 }
 
 Unk8037B3E8* cScriptWaitGoal::fn_vslot5() /* 80155BF8 */
@@ -512,6 +547,43 @@ void cTeleportActor::fn_vslot2() /* 80156274 */
 
 int cTeleportActor::fn_cslot8() /* 801563FC */
 {
+}
+
+struct Unk80150FC0_Marker {
+    char pad0[4];
+    Unk80273498_Vec3 m4;
+    float m10;
+};
+Unk80150FC0_Marker* fn_80150FC0(int id);
+void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
+void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& pos, float* ang);
+
+/* near-miss: the Vec3 sum is formed with all loads hoisted here; retail adds each component in place right after the copy (27 diff lines); 6 variants tried */
+int cTeleportActor::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80156400 */
+{
+    Unk8016C788_Obj* o = fn_8016C788(ctx, a);
+    if (o != 0) {
+        if (m10 != 0) {
+            fn_80244A64(o, 0, 0);
+        }
+        if (mC != 0) {
+            Unk80150FC0_Marker* mk = fn_80150FC0(m14);
+            if (mk == 0) {
+                fn_80299B98((Unk80270BA0_X*)o, lbl_806055AC, 0);
+            } else {
+                float* d = &m18;
+                Unk80273498_Vec3 v = mk->m4;
+                v.x = v.x + d[0];
+                v.y = v.y + d[1];
+                v.z = v.z + d[2];
+                float f = mk->m10 * lbl_805C88D4;
+                fn_80299B98((Unk80270BA0_X*)o, v, &f);
+            }
+        } else {
+            float f = m24.y * lbl_805C88D4;
+            fn_80299B98((Unk80270BA0_X*)o, *(Unk80273498_Vec3*)&m18, &f);
+        }
+    }
 }
 
 Unk8037B3E8* cTeleportActor::fn_vslot5() /* 80156534 */
