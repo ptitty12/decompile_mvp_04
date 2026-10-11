@@ -688,6 +688,9 @@ game/tu_8020EE9C.cpp:
 game/tu_80212AC0.cpp:
 	.text       start:0x80212AC0 end:0x80216CF4
 
+game/tu_80216CF4.cpp:
+	.text       start:0x80216CF4 end:0x8021ADDC
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
