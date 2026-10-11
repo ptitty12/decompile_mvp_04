@@ -10,7 +10,8 @@ Usage (from the repo root, after `python configure.py && ninja` once):
               (mangled) name, or a substring that matches exactly one function
   <file>      scratch sources (typically edited copies of src/<unit>.cpp, kept outside
               the repo), each compiled from the repo root with the unit's cflags from
-              build.ninja (or --flags), so -Iinclude resolves as in the real build
+              build.ninja (or --flags), so -Iinclude resolves as in the real build.
+              A directory stands for all .c/.cpp files in it (pipe through `sort -n`).
 
 Prints one line per file: the number of instruction slots that differ (0 = MATCH),
 the alignment-aware count (instructions outside the longest common subsequence, so one
@@ -134,10 +135,13 @@ def main():
         name = hits[0]
     target = tfuncs[name]
 
+    files = []
+    for f in a.files:  # a directory stands for every .c/.cpp file in it
+        files += sorted(str(p) for p in Path(f).iterdir() if p.suffix in (".c", ".cpp")) if os.path.isdir(f) else [f]
     env = dict(os.environ, SN_NGC_PATH=str(prodg))
     tmp = tempfile.mkdtemp(prefix="score_")
-    show = a.show or len(a.files) == 1
-    for i, src in enumerate(a.files):
+    show = a.show or len(files) == 1
+    for i, src in enumerate(files):
         obj = os.path.join(tmp, f"v{i}.o")
         r = subprocess.run([str(prodg / f"ngccc{EXE}"), *cflags, "-c", os.path.abspath(src), "-o", obj],
                            cwd=ROOT, env=env, capture_output=True, text=True)
