@@ -27,6 +27,7 @@ int fn_8053AD1C(Rec* r, int a);
 void fn_8053CC1C(Rec* r);
 
 int fn_8007DDC8(A* self, int a, int group, int idx);
+int fn_8007DDC8(A* self, int a, int group);
 int fn_8007DEAC(A* self, int a, int group);
 int fn_8007DF5C(A* self, int a, int group, int idx);
 int fn_8007E0E4(A* self, int a, int group);
@@ -328,7 +329,8 @@ int fn_8007E74C(A* self, int a, int idx)
     Tbl* t = self->m58;
     unsigned char n = idx;
     int i = fn_805A19C8(t);
-    return t->m10[i].m0[t->m10[i].m28[0].m0[n]];
+    int* p = t->m10[i].m0 + t->m10[i].m28[0].m0[n];
+    return *p;
 }
 
 unsigned fn_8007E7A8(A* self, int a)
@@ -405,7 +407,8 @@ int fn_8007EA4C(A* self, int a, int idx)
     Tbl* t = self->m58;
     unsigned char n = idx;
     int i = fn_805A19C8(t);
-    return t->m10[i].m0[t->m10[i].m28[1].m0[n]];
+    int* p = t->m10[i].m0 + t->m10[i].m28[1].m0[n];
+    return *p;
 }
 
 unsigned fn_8007EAA8(A* self, int a)
@@ -482,7 +485,8 @@ int fn_8007ED4C(A* self, int a, int idx)
     Tbl* t = self->m58;
     unsigned char n = idx;
     int i = fn_805A19C8(t);
-    return t->m10[i].m0[t->m10[i].m28[2].m0[n]];
+    int* p = t->m10[i].m0 + t->m10[i].m28[2].m0[n];
+    return *p;
 }
 
 unsigned fn_8007EDA8(A* self, int a)
@@ -559,7 +563,8 @@ int fn_8007F04C(A* self, int a, int idx)
     Tbl* t = self->m58;
     unsigned char n = idx;
     int i = fn_805A19C8(t);
-    return t->m10[i].m0[t->m10[i].m28[3].m0[n]];
+    int* p = t->m10[i].m0 + t->m10[i].m28[3].m0[n];
+    return *p;
 }
 
 unsigned fn_8007F0A8(A* self, int a)
