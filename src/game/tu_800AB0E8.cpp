@@ -50,6 +50,11 @@ struct Unk80040640;
 struct Unk80069F0C {
     void fn_8006C02C();
 };
+class FEO8D {
+public:
+    char pad0[8];
+    virtual ~FEO8D();
+};
 class FEO8 {
 public:
     char pad0[8];
@@ -155,8 +160,10 @@ void fn_80377488(void* p);
 }
 
 
+
 /* ---- unit prototypes ---- */
 extern "C" {
+void fn_800AB0E8(UnkFEArr* a, int i);
 int fn_800AB1AC(UnkFEArr* a, int i);
 void fn_800AB2B0();
 void fn_800AB308(UnkFETable* t, int c);
@@ -209,6 +216,20 @@ void fn_800ACD48(UnkFE20* self);
 /* ---- end prototypes ---- */
 
 /* ---- functions ---- */
+
+extern "C" void fn_800AB0E8(UnkFEArr* a, int i)
+{
+    if (i < a->m4 && i >= 0) {
+        FEO8D* o = (FEO8D*)a->m0[i];
+        delete o;
+        int k;
+        for (k = i; k < a->m4 - 1; k++) {
+            a->m0[k] = a->m0[k + 1];
+        }
+        a->m0[a->m4 - 1] = 0;
+        a->m4 = a->m4 - 1;
+    }
+}
 
 extern "C" int fn_800AB1AC(UnkFEArr* a, int i)
 {
