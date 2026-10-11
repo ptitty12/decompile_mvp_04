@@ -89,9 +89,30 @@ struct Unk8028F178_Goal {
     float m184;
     float m188;
     Unk8028F178_Flags m18C;
+
+    /* Vector at +0x10 returned by value (a temp copy, as in fn_8028F610). */
+    Unk80273498_Vec3 fn_GetM10() { return m10; }
+};
+
+/* Same object as Unk8014D8AC_Ctx (reached through Unk80270BA0_X::m44C) with the
+ * fields this unit reads; callers cast. Evidence: fn_8028F610 (+0x4C, a frame
+ * counter converted to seconds), fn_80290D3C (+0x4C, +0x6CC), fn_80291378. */
+struct Unk8028F178_Ctx {
+    char pad0[0x4C];
+    unsigned int m4C;
+    char pad50[0x6CC - 0x50];
+    Unk80273498_Pos* m6CC;
 };
 
 int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8028F178_Req* r, int a, int b, int c, int d, float f);
 void fn_802987C8(Unk8028F178_Goal* a, Unk8028F178_Goal* b);
+
+int fn_8029771C(Unk8028F178_Goal* g);
+float fn_80249298(Unk80270BA0_X* x, int a, int b);
+
+Unk80273498_Vec3 fn_80297614(Unk8028F178_Goal* g);
+int fn_80297668(Unk8028F178_Goal* g);
+Unk80273498_Vec3 fn_802976A8(Unk8028F178_Goal* g);
+int fn_8026DC18(Unk80270BA0_X* x, int a);
 
 #endif /* GAME_GOALS_TU_8028F178_H */
