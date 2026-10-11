@@ -29,9 +29,25 @@ struct Unk8002D15C_Msg {
     int m10;
     int m14;
     int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
 };
 
 struct Unk8002D15C;
+struct Unk8002F894_Obj;
+
+struct Unk8002D15C_P700 {
+    char pad0[0x3E0];
+    int m3E0;
+    float m3E4;
+};
+
+struct Unk8002D15C_P44C {
+    char pad0[0x700];
+    Unk8002D15C_P700* m700;
+};
 
 /* Sub-record at +0x58C of the players (flags word at +4, a count at +0x30). */
 struct Unk8002D15C_Sub58C {
@@ -43,13 +59,23 @@ struct Unk8002D15C_Sub58C {
 
 /* Per-player data (the object at +0x510 / +0x7A0 / +0x7A4 / +0x7CC). */
 struct Unk8002D15C_Player {
-    char pad0[0x460];
+    char pad0[0x44C];
+    Unk8002D15C_P44C* m44C;
+    char pad450[0x460 - 0x450];
     int m460;
     char pad464[0x588 - 0x464];
     char m588[4];
     Unk8002D15C_Sub58C m58C;
-    char pad5C0[0x708 - 0x5C0];
+    char pad5C0[0x704 - 0x5C0];
+    int m704;
     int m708;
+};
+
+/* Element (0xE64 bytes) of the per-player array behind Unk8002D15C_Sub6F8::m14. */
+struct Unk8002D15C_PI {
+    char pad0[0x238];
+    int m238;
+    char pad23C[0xE64 - 0x23C];
 };
 
 /* Table behind +0x6F8 of the owner: m10 points to ints at +0x6C. */
@@ -59,8 +85,45 @@ struct Unk8002D15C_Tbl10 {
 };
 
 struct Unk8002D15C_Data14 {
-    char pad0[0x1CD0];
+    char pad0[0x198];
+    int m198;
+    char pad19C[0xFFC - 0x19C];
+    int mFFC;
+    char padFFC[0x1CC8 - 0x1000];
+    unsigned char m1CC8;
+    unsigned char m1CC9;
+    unsigned char m1CCA;
+    unsigned char m1CCB;
+    char pad1CCC[4];
     int m1CD0;
+};
+
+struct Unk8002D15C_C8C {
+    char pad0[0x28];
+    int m28;
+};
+
+struct Unk8002D15C_C8 {
+    char pad0[0xC];
+    Unk8002D15C_C8C* mC;
+    char pad10[4];
+    Unk8002D15C_Data14* m14;
+};
+
+/* Object at +0x6C8 (virtual call through slot 12: reset). */
+struct Unk8002D15C_Obj6C8 {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
 };
 
 struct Unk8002D15C_Sub6F8 {
@@ -69,21 +132,61 @@ struct Unk8002D15C_Sub6F8 {
     Unk8002D15C_Data14* m14;
 };
 
+struct Unk8002D15C_Q700;
 /* Owner object at +0x80 of the handler object. */
 struct Unk8002D15C_Owner {
     char pad0[0x48];
     unsigned int m48;
-    char pad4C[0x6CC - 0x4C];
+    char pad4C[0x6BC - 0x4C];
+    int m6BC;
+    char pad6C0[0x6CC - 0x6C0];
     struct Unk8002D15C_Cc* m6CC;
     char pad6D0[0x6E4 - 0x6D0];
     char* m6E4;
     char pad6E8[0x6F8 - 0x6E8];
     Unk8002D15C_Sub6F8* m6F8;
+    char pad6FC[0x700 - 0x6FC];
+    Unk8002D15C_Q700* m700;
 };
 
 struct Unk8002D15C_Cc {
-    char pad0[0x3F4];
+    char pad0[0x60];
+    Unk8002D15C_Vec3 m60;
+    char pad6C[0x388 - 0x6C];
+    int m388;
+    int m38C;
+    char pad390[0x3F4 - 0x390];
     float m3F4;
+};
+
+struct Unk8002D15C_Q3B8 {
+    char pad0[4];
+    struct Unk8002D15C_Q4* m4;
+};
+struct Unk8002D15C_Q4 {
+    char pad0[0x9C];
+    int m9C;
+};
+struct Unk8002D15C_Q700 {
+    char pad0[0x3B8];
+    Unk8002D15C_Q3B8* m3B8;
+};
+
+struct Unk8002D15C_Tri {
+    int m0;
+    int m4;
+    int m8;
+};
+
+/* 0x24-byte entry of the table at +0x1D0 (four of them, count at +0x260). */
+struct Unk8002D15C_Ent {
+    int m0;
+    int m4;
+    int m8;
+    char padC[0x14 - 0xC];
+    int m14;
+    char pad18[0x20 - 0x18];
+    int m20;
 };
 
 struct Unk8002D15C_Pair {
@@ -94,54 +197,101 @@ struct Unk8002D15C_Pair {
 struct Unk8002D15C {
     char pad0[0x80];
     Unk8002D15C_Owner* m80;
-    char pad84[0xD0 - 0x84];
+    char pad84[0xC8 - 0x84];
+    Unk8002D15C_C8* mC8;
+    int mCC;
     int mD0;
     char padD4[0xE4 - 0xD4];
     int mE4;
     int mE8;
-    char padEC[0x12C - 0xEC];
+    char padEC[0xF0 - 0xEC];
+    int mF0;
+    char padF4[0x11C - 0xF4];
+    int m11C;
+    int m120;
+    int m124;
+    int m128;
     int m12C;
     int m130;
     int m134;
     int m138;
-    char pad13C[0x264 - 0x13C];
+    int m13C;
+    int m140;
+    int m144;
+    int m148;
+    int m14C;
+    char pad150[0x164 - 0x150];
+    int m164;
+    char pad168[0x16C - 0x168];
+    int m16C;
+    int m170[2];
+    int m178[2];
+    int m180[2];
+    int m188[2];
+    int m190[2];
+    char pad198[0x1D0 - 0x198];
+    Unk8002D15C_Ent m1D0[4];
+    int m260;
     int m264;
     char pad268[0x270 - 0x268];
     Unk8002D15C_Pair m270[3];
     char pad288[0x290 - 0x288];
     Unk8002D15C_Player* m290;
     char pad294[0x3F0 - 0x294];
-    int m3F0[32];
-    int m470[1];
-    char pad474[0x4C0 - 0x474];
+    int m3F0[2];
+    int m3F8[2];
+    int m400[2];
+    int m408[2];
+    int m410[2];
+    int m418[2];
+    int m420[2];
+    int m428[2];
+    int m430[2];
+    int m438[2];
+    int m440[2];
+    int m448[2];
+    int m450[2];
+    int m458[2];
+    int m460[2];
+    int m468[2];
+    int m470[2];
+    int m478[2][3];
+    int m490[2][3];
+    int m4A8[2][3];
     int m4C0;
     int m4C4;
-    char pad4C8[0x510 - 0x4C8];
+    int m4C8[2][3];
+    int m4E0[2][3];
+    int m4F8[2][3];
     Unk8002D15C_Player* m510;
     int m514;
     char pad518[0x524 - 0x518];
     int m524;
-    char pad528[0x530 - 0x528];
+    char pad528[0x52C - 0x528];
+    int m52C;
     int m530;
     char pad534[0x634 - 0x534];
     int m634;
     char pad638[0x6BC - 0x638];
     Unk8002D15C_Msg* m6BC;
-    char pad6C0[0x6C8 - 0x6C0];
+    float m6C0;
+    float m6C4;
     int m6C8;
     char pad6CC[0x6F0 - 0x6CC];
     int m6F0;
     char pad6F4[0x6FC - 0x6F4];
     unsigned int m6FC;
     int m700;
-    char pad704[0x7A0 - 0x704];
+    int m704;
+    int m708;
+    char pad70C[0x7A0 - 0x70C];
     Unk8002D15C_Player* m7A0;
     Unk8002D15C_Player* m7A4;
     int m7A8;
     int m7AC;
     int m7B0;
     int m7B4;
-    char pad7B8[0x7BC - 0x7B8];
+    Unk8002D15C_Player* m7B8;
     int m7BC;
     char pad7C0[0x7C8 - 0x7C0];
     int m7C8;
@@ -149,6 +299,9 @@ struct Unk8002D15C {
     int m7D0;
     int m7D4;
     int m7D8;
+    char pad7DC[0x7F0 - 0x7DC];
+    float m7F0;
+    int m7F4;
 };
 
 /* Checked cast of the current message: null unless it has the given id. */
@@ -172,19 +325,55 @@ int fn_80023430(Unk8002D15C* self, int a, int b, int c);
 void fn_80023490(Unk8002D15C* self, int a, int b);
 void fn_8002A244(Unk8002D15C* self, int id, float t);
 int fn_8002A2D4(Unk8002D15C* self);
+void fn_8003B394(int a, int b);
+void fn_8003B3B8(int a, int b);
+int fn_801A497C(Unk8002D15C_Owner* o, int a, int b);
+int fn_801A4B34(Unk8002D15C_Owner* o);
+float fn_804028E4(float x);
+int fn_80211DB8(int x);
+int fn_80211D78(int x);
+void fn_8003F14C(int a, int b);
 void fn_8002F1E4(Unk8002D15C* self);
 void fn_800303A4(Unk8002D15C* self, int a);
+void fn_80030380(Unk8002D15C* self, int a);
 void fn_8003049C(Unk8002D15C* self, int id, int a, int b);
 void fn_80035EEC(int a, int b, int c);
 void fn_80039A3C(int a, int b, int c);
 void fn_8003F460(int a, int b);
+void fn_8003F698(int a);
+void fn_8003FA44(int a);
+void fn_8003B0F4(int a, Unk8002D15C_Msg* m);
+void fn_80036064(int a, int b, int c, int d);
+void fn_8003C710(int a, int b);
+int fn_80038EB4();
+void fn_80039E2C(int a, int b);
+void fn_80039E94();
 void fn_8003F6D4(int a, int b);
-void fn_800475EC();
+char* fn_800475EC();
 void fn_80048968();
 void* fn_8005BA9C();
 void fn_8005C75C(void* p, int a, int b);
 int fn_8005C498(void* p, int a);
+void fn_803EE7BC();
+void fn_8003B23C(int a, int b, int c);
+void fn_8002F160(Unk8002D15C* self);
+void fn_80021BE8(Unk8002D15C* self);
+void fn_80048C08(void* p);
+void fn_8003968C(int a, int b);
+void fn_8017FA08(int a);
+void fn_80039790(int a);
+void fn_80035E94(int a);
+int fn_80030130(Unk8002D15C* self);
+Unk8002D15C_Vec3* fn_8019CF24(int a);
+Unk8002D15C_Vec3* fn_8019CF30(float f, int a);
 float fn_80253EC4(void* p, int a, int b, int c);
+int fn_80253E7C(void* p, int a, int b, int c);
+int fn_80253DF4(void* p, int a, int b);
+void fn_8003F250(int a, int b);
+void fn_8003F0D0(int a);
+void fn_8037893C(void* q, int id, Unk8002F894_Obj* o, int a, int b);
+void fn_803444D0(Unk8002F894_Obj* o, int a);
+void fn_8003F37C(int a, int b);
 }
 
 /*
@@ -197,6 +386,38 @@ inline void StartAnim(Unk8002D15C* self, int id)
 {
     fn_8002A244(self, id, (float)self->m80->m48 * (1.0f / 60.0f));
 }
+
+/* Event passed to fn_8002F894: m4 selects the action, m8 is the player. */
+struct Unk8002F894_Ev {
+    int m0;
+    int m4;
+    Unk8002D15C_Player* m8;
+};
+
+/* Local object built by fn_8002F894 (vptr at +4: two vtable stores, base then derived). */
+extern char lbl_80649D88[];
+extern char lbl_80649DA0[];
+struct Unk8002F894_Obj {
+    int m0;
+    const void* vptr;
+    Unk8002D15C_Player* m8;
+    int mC;
+    /* inline base constructor, then the derived one (second vtable store) */
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+        mC = 0;
+        m8 = 0;
+    }
+    void Derived()
+    {
+        vptr = lbl_80649D88;
+    }
+};
+
+extern float lbl_80686DCC;
+extern int* lbl_8061B9C4;
 
 struct Unk8061B8C0 {
     char pad0[0x24];
