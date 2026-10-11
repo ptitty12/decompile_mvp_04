@@ -483,8 +483,6 @@ extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s)
 
 extern "C" void fn_800D4254(const char* s, void* font, float* a, float* b);
 
-/* near-miss: same shape, but retail's switch tree has an extra 'ble' (<=1 -> default) and the result pseudo shares r3 with the first term
- * (mine uses r10 and no ble). Tried return-in-case, default label, int temporaries. */
 extern "C" int fn_800D43F0(Unk800D3F0C_Obj* o, int v)
 {
     float x;
@@ -496,11 +494,15 @@ extern "C" int fn_800D43F0(Unk800D3F0C_Obj* o, int v)
     fn_800D4254((const char*)v, arr[o->m48], &x, &y);
     r = 0;
     switch (o->m64) {
+    case 0:
+        break;
     case 1:
-        r = (int)(((float)o->m2A - y) * 0.5f) - (int)x;
+        r = (int)(((float)o->m2A - y) * 0.5f);
+        r -= (int)x;
         break;
     case 2:
-        r = (int)((float)o->m2A - y) - (int)x;
+        r = (int)((float)o->m2A - y);
+        r -= (int)x;
         break;
     }
     return r;
