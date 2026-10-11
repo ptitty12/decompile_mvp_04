@@ -91,12 +91,26 @@ public:
 };
 
 /* Object with a vptr at +0x3C (data-only base, then the virtuals); vtable 0x80660128. */
+struct Unk801A734C_V3 {
+    int m0;
+    int m4;
+    int m8;
+};
 class Unk801A734C_Base {
 public:
     int m0;
-    char pad4[0x28 - 0x4];
+    Unk801A734C_V3 m4;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    float m24;
     int m28;
-    char pad2C[0x3C - 0x2C];
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
 };
 
 class Unk801A734C : public Unk801A734C_Base {

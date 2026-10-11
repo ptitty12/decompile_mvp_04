@@ -194,7 +194,14 @@ def finish(base: str, branch: str, push: bool, head_only: bool = False) -> None:
     if push:
         git("fetch", "-q", "origin")
         if git("rev-parse", "origin/main") != base:
-            raise SystemExit("origin/main moved; rerun to rebase")
+            # The progress bot pushes docs/progress/ cards after every merge.
+            # Those files don't affect the build, so rebase over them without
+            # re-verifying; anything else means rerun.
+            moved = git("diff", "--name-only", base, "origin/main").splitlines()
+            if not moved or not all(f.startswith("docs/progress/") for f in moved):
+                raise SystemExit("origin/main moved; rerun to rebase")
+            git("rebase", "-q", "--rebase-merges", "origin/main")
+            print(f"rebased over {len(moved)} progress-card file(s)")
         r = run("git", "push", "origin", "HEAD:main", check=False)
         print((r.stdout + r.stderr).strip())
         if r.returncode != 0:

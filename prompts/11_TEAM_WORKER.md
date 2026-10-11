@@ -65,8 +65,12 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
   dtor/ctor clones, from a script in your scratch folder.
 - Then do the rest smallest first.
 - Skip functions over ~0x400 bytes, and those that need inline-asm-only
-  instructions (mftb, mfcr/mtcrf).
+  instructions (mftb, mfspr). A prologue mfcr/mtcrf is a CR save and IS
+  reproducible (a flag compare live across calls); see PATTERNS.
 - New types go in `include/game/tu_<first unit addr>.h`.
+- Overlay units (`src/fe/`, `src/db/`): every function definition carries
+  `FE_OVERLAY` / `DB_OVERLAY` from `include/game/overlay.h` (placement only;
+  without it objdiff can't pair the function). Same flags as game code.
 - Commit each unit with its own renames, after VERIFY PASS.
 
 ## Quick tips (details in docs/PATTERNS.md)

@@ -12,7 +12,11 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
   in the unit at 0x802AC8xx, so g++ emits the vtable there, as in retail.
 - If vtable slot +0xC (the dtor) points into 0x802ACxxx, declare no destructor:
   the implicit one is emitted with the vtable.
-- Constructor: `cX::cX() : Unk8037B3E8(lbl_name)` or `: Unk8037B3E8(hash)`.
+- Constructor: `cX::cX() : Unk80362C2C(lbl_name)` or `: Unk80362C2C(hash)`,
+  with `#include "game/chooser_base.h"`. Unk80362C2C is the chooser base
+  (dtor 0x80362C2C); Unk8037B3E8 is the root (dtor 0x8037B424). Deriving
+  choosers straight from the root gives the wrong dtor call (fixed
+  2026-10-11, work/false-matches).
   Lazily hashed statics: `if (!a || !b) { a = fn_80378568("x", len); ... }`.
 - Slot 5 (factory): `return new (lbl_806EF9B4) cX;`. `new` has no null check.
 - Slot 2 (attributes): `fn_8037B6B0(lbl_805DC394, &m8, "EnumA,EnumB")` for an
@@ -713,3 +717,119 @@ Matched 17 functions in 7 units with these recipes. Each recipe is one source ch
     spill moves to the first slot.
   - Retail has the spill one slot later. In sched1 it was issued after
     `lwz r11` and before `lwz r0`.
+
+## Ranges 10-19 recipes (2026-10-11, condensed from worker reports)
+
+Literals and constants
+- objdiff's 100% does not check literal values or call/global targets. Run
+  `tools/match/check_literals.py <unit>`. Write real literals with the values
+  read from the original data. Original strings may contain a literal
+  backslash (`"\n"`).
+- A `const float k = ...;` local (or a literal used several times) stays in
+  f31 across calls. An `extern const float` global may be hoisted above
+  earlier int stores. A float read from an aggregate global (`lbl.x`) may
+  alias, so it stays below earlier stores (reset-record family, range-17).
+  Try each spelling when a `lfs` sits in the wrong place.
+- Float locals take stack slots in reverse declaration order. An unused
+  `double d;` keeps a 0x10 frame. An unused `volatile int pad;` reproduces a
+  slot gap.
+
+Calls
+- The callee's return type matters: if its epilogue sets r3 (strcpy, `li r3,1`),
+  declare it int even when the result is ignored. A void call changes the
+  sched2 dependences, so two slots swap near the call (Hard-case families 2,
+  range-16).
+- Prototype parameter order drives argument evaluation order (`float k`
+  before `int flag` fixed fmr/mr order).
+- Struct-returning helpers reused for two calls: `Vec3* f(Vec3* out, ...)`
+  with `*out = ...; return out;`. A by-value return makes a second temp slot.
+- Declare C++ callees (mangled symbols) outside `extern "C"` blocks. Otherwise
+  the plain name is emitted, objdiff still says MATCH, and the link breaks.
+- RNG-percent families: `inline float RandPct(P* x, const char* file, int line)`.
+  Pass the file string and line as inline parameters, or the lis/li order
+  is wrong (range-19 injury family, range-15 RNG lerp).
+
+Indexing
+- Retail's base-first `lwzx base,idx` with an r9/r11 index temp comes from an
+  inline that takes the base pointer and does explicit byte arithmetic:
+  `inline int ObjAt(void** a, int i) { int o = i*4; return *(int*)((char*)a + o); }`.
+  The same applies to `KeyAt`, `AtD`, `Pick` and `T* q = base + i; return *q;`.
+  Plain `a[i]` gives the swapped order or r0.
+- Stride records: `Rec* b = i->arr; Rec* r = b + k;` gives `addi` first, then
+  `mulli/add`.
+
+Control flow
+- `if (d < 0) return -1; if (d > 0) return 1; return 0;` gives
+  `subf.; blt; li 1; bgtlr`.
+- A nested-ternary return gives `mr r3,r0` from r0 (fn_801F29AC).
+- A clamp with the high arm out of line:
+  `if (v <= 99) { if (v < 0) v = 0; } else v = 99;`.
+- `int g; if (i != 3) g = f ^ 1; else g = f;` gives `mr; beq; xori`.
+- Empty `for (j = 0; j < n; j++) {}` loops survive as `mtctr/bdnz`.
+- A volatile saturating counter also works counting down:
+  `while (sp8 = t, e = sp8, e > 0) { ...; c = sp8; t = c - 1; if (c <= -1) t = c; }`.
+- A member-pointer table entry is copied to a local before an earlier call:
+  `Pmf f = tbl[k]; call(); (s->*f)();`.
+
+Objects
+- Member arrays of classes with ctors (`Sub m4[2]` of `Ent m4[5]`) give a
+  do-while with post-decrement. Give Ent an inline ctor calling the extern.
+- Struct assignment via `Assign(const T* src, T* dst) { if (dst != src) memcpy(dst, src, sizeof *dst); }`
+  with (src, dst) parameter order.
+- Local struct slots follow declaration order, low to high.
+- Store-order search: hill-climbing over adjacent swaps (about 0.2 s per
+  compile, calling ngccc directly) solves 11-20 stores in minutes.
+  Plain permutations are enough up to about 6.
+
+Still open (Opus queue)
+- `t == 1 || t == 2` kept as two compares in retail (fold_range_test):
+  fn_80254964, fn_8025E5E0, fn_8025CDD8.
+- Loop test at the top with a back edge to it: fn_80255284, fn_80257DFC.
+- Dead `cmpwi` before a constant return (mechanism in Hard-case families 2).
+
+## Ranges 20-27 and second passes (2026-10-11, condensed)
+
+- mfcr/mtcrf in the prologue/epilogue is a CR save, and it is reproducible.
+  A flag compare that stays live across calls lands in cr2-cr4. Example:
+  `int own = out == 0;` with the write pointer declared inside the non-empty
+  branch (fn_8008399C, fn_80083AD4). Don't skip these as asm-only; only
+  mftb/mfspr-style instructions are.
+- Independent global stores: write them in source in the order of retail's
+  `lis` instructions (fn_803318CC: 8 stores, matched first try).
+- Packed-record getters/setters: the getter's shift/mask pairs give the bit
+  widths; an MSB-first bitfield struct with zero-width pads reproduces them.
+  Setters clamp `if (v <= MAX) { if (v < 0) v = 0; } else v = MAX;` (7-bit
+  percent fields clamp at 100). One generator pass per record type matched
+  functions of 234-912 instructions (tu_8008CE64, tu_80089894).
+- Store-only iterator slot:
+  `struct It { int i; ~It() {} int Next(int c) { n = c > N ? c : c + 1; i = n; return n; } };`
+  Write `k = it.Next(k)`, and declare `n` and `k` before `it`.
+- `int n = 12; ... if (i >= n) goto done;` keeps `cmpwi 12; bge` (not
+  `cmpwi 11; bgt`). A goto-shaped scan loop stops strength reduction.
+- Nested loops over the same count: write explicit pre-tests,
+  `while (1) { if (!(i < n)) break; ... }`. A plain `for` lets CSE merge the
+  inner and outer tests.
+- A function that falls off the end without `return` leaves the last call's
+  result in r3.
+- Member-array dtor loops: `X::~X() {}` with `Elem m[N]`, where
+  `struct Elem : ElemD { virtual ~Elem(); }`. This gives the guard, the
+  backward loop, the in-charge-0 vcall and the deleting tail. Nested arrays
+  use an inline `~Mid() {}` (range-27).
+- Ring step: `unsigned k = m4 - 1; mC = (mC + k) % m4;`. Without the named
+  temporary, fold reassociates it.
+- Hidden-pointer struct returns: a BLKmode local (e.g. `struct { char m0[6]; }`
+  or one with a dtor) gets a per-use `addi rX,r1,8`. An 8-byte DImode local
+  keeps its address in a saved register.
+- `new (heap) T[n]` for T with a ctor gives `__vn` plus the element ctor loop.
+  A function shaped `mr r9,r3; mr r11,r9` is often a real ctor.
+- Two bitfield read-modify-write groups: put a read of a global between
+  them, or the first store is merged away.
+- Global store with a branchy RHS: `int* q = &lbl_X; *q = ...;`.
+- Float exit tests `if (!(a <= b)) return X;` give `cror; bso` (retail
+  shape). `if (a > b)` gives a plain `ble`.
+- Open (Opus round 3):
+  - widget ctors keep the first of two vptr stores (about 25 functions);
+  - dead-cmpwi switch family (about 20; a hidden `default:` case shifts the
+    balance root);
+  - `li r5` before `mr r3` for 3-arg item ctor calls;
+  - sched1 constant hoisting.

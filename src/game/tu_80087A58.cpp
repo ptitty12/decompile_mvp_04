@@ -17,9 +17,18 @@ extern double lbl_805B4638;
 
 
 
+struct Unk80087A58_X3 {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk80087A58_X2 {
+    char pad0[0x14];
+    Unk80087A58_X3* m14;
+};
 struct Unk80087A58_X {
     char pad0[0x6F4];
     int m6F4;
+    Unk80087A58_X2* m6F8;
 };
 
 struct Unk80087A58_Y {
@@ -364,6 +373,28 @@ Unk80087A58_X* fn_80089798();
 Unk80087A58_K* fn_800897B8(Unk80087A58_K* self);
 void fn_80089838(Unk80087A58_K* self, int flags);
 
+extern float lbl_805B4758;
+
+
+
+extern "C" void* fn_803774A8(unsigned size, int heap);
+void* fn_80089368(void* p);
+void fn_8008928C(O* o);
+
+
+extern float lbl_805B486C;
+
+
+extern "C" int fn_80353D9C(void* p);
+void fn_80087D5C(H* h, int a, int b, int c);
+
+
+
+
+
+extern "C" void fn_8040B320(void* p, int v, int n);
+
+
 void fn_80087A58(O* s, int a, char v, int w, int flag)
 {
     int i = flag == 0 ? s->m14[w] : s->m234;
@@ -397,12 +428,28 @@ Unk80087A58_X* fn_80087B14()
     return p;
 }
 
-/* near-miss: retail's switch compares 4 then 6 (cases 3..6); two compare constants differ here. */
 int fn_80087B60(int t)
 {
     int r = 1;
-    if (t == 3 || (t > 4 && t <= 6))
+    if (t == 3)
         r = 0;
+    else if (t <= 3)
+        r = 1;
+    else if (t == 4)
+        r = 1;
+    else if (t <= 6)
+        r = 0;
+    return r;
+}
+
+inline float AbsF(float v) { return __builtin_fabs(v); }
+int fn_80087B8C(Unk80087A58_V2 v)
+{
+    int r = 0;
+    if (!(AbsF(v.x) > lbl_805B4758)) {
+        int f = AbsF(v.y) <= lbl_805B4758;
+        r = f;
+    }
     return r;
 }
 
@@ -415,18 +462,15 @@ int fn_80087BE8(int a, int b)
     return r;
 }
 
-/* near-miss: retail clears the hi and b fields with one store and the a and c
- * fields with a second store (two read-modify-write stores of the flag word,
- * before the 8-byte copy); here the four bitfield stores merge into one. */
 void fn_80087C40(E* e)
 {
     e->m4 = 0;
     e->m0 = 0;
     e->b10.hi = 0;
     e->b10.b = 0;
+    *(Unk80087A58_Pair*)&e->m8 = lbl_8060558C;
     e->b10.a = 0;
     e->b10.c = 0;
-    *(Unk80087A58_Pair*)&e->m8 = lbl_8060558C;
 }
 
 H* fn_80087C88(H* h)
@@ -465,6 +509,27 @@ void fn_80087D0C(H* h)
     }
 }
 
+/* near-miss (8 slots, register choice only): retail keeps the byte offset in r0 and the
+ * zero for the stb in r11; fn_80087D08 receives h (pass-through). */
+void fn_80087D08(H* h);
+inline void StI(char* b, int off, int v) { *(int*)(b + off) = v; }
+void fn_80087D5C(H* h, int a, int b, int c)
+{
+    int i = h->m7D0 - 1;
+    if (h->e[i].mC != 0 || h->e[i].m10 != 0)
+        i = fn_80087F94(h);
+    if (i > 99)
+        i = 99;
+    int off = i * 0x14;
+    ((E*)((char*)h + off))->mC = 0;
+    StI((char*)h, off, a);
+    StI((char*)h + 4, off, b);
+    StI((char*)h + 8, off, c);
+    StI((char*)h + 0x10, off, 0);
+    h->m7D4 = b;
+    fn_80087D08(h);
+}
+
 int fn_80087E0C(H* h, int a, int b)
 {
     int cnt = 0;
@@ -476,13 +541,13 @@ int fn_80087E0C(H* h, int a, int b)
     return cnt;
 }
 
-/* near-miss: same loop, but retail keeps h in r11 and the offset in r10. */
 E* fn_80087E5C(H* h, int a, int b, int k)
 {
-    E* p = h->e;
+    unsigned i = 0;
     int cnt = 0;
     unsigned n = h->m7D0;
-    for (unsigned i = 0; i < n; i++, p++) {
+    E* p = h->e;
+    for (; i < n; p++, i++) {
         if (a == h->e[i].m0 && h->e[i].m4 == b) {
             if (cnt == k)
                 return p;
@@ -505,6 +570,16 @@ int fn_80087F94(H* h)
         h->m7DC = 1;
     }
     return h->m7D0 - 1;
+}
+
+O* fn_80087FC0(O* o)
+{
+    o->m0 = 0;
+    fn_80089368((char*)o + 0xC);
+    fn_80087C88(&o->mF60);
+    o->mF5C = (E*)fn_803774A8(0x2EE0, 0);
+    fn_8008928C(o);
+    return o;
 }
 
 void fn_8008801C()
@@ -532,7 +607,6 @@ int fn_80088234(O* o, int v)
     return n;
 }
 
-/* near-miss: retail keeps &o->mF60 in r11 (addi) instead of folding it into displacements. */
 int fn_80088280(O* o)
 {
     H* h = &o->mF60;
@@ -543,22 +617,40 @@ int fn_80088280(O* o)
     int v = e->m10;
     if (v != 0)
         return v;
-    if (i > 0) {
-        E* f = &h->e[i - 1];
-        return f->m10;
-    }
-    return 0;
+    if (i <= 0)
+        return 0;
+    int j = i - 1;
+    E* f = &h->e[j];
+    return f->m10;
 }
 
-/* near-miss: same as fn_80088280: the history base is a real pointer in retail. */
+/* near-miss (2 slots): retail has add r9,r7,r11 + lwz 0x10(r9); here addi r9,r7,16 + lwzx. */
+inline int Cnt14(H* h)
+{
+    unsigned i = 0;
+    unsigned cnt = h->m7D0;
+    int n = 0;
+    for (; i < cnt; i++) {
+        if (h->e[i].m10 == 14)
+            n++;
+    }
+    return n;
+}
+
 int fn_800882D0(O* o)
 {
-    H* h = &o->mF60;
+    return Cnt14(&o->mF60);
+}
+
+/* near-miss (24 slots): retail keeps o in r12 and the entry offset as a separate counter. */
+inline E* AtE3(H* h, unsigned i) { return &h->e[i]; }
+int fn_80088314(O* o, int a, int b)
+{
     int n = 0;
-    unsigned cnt = h->m7D0;
+    unsigned cnt = o->mF60.m7D0;
     for (unsigned i = 0; i < cnt; i++) {
-        E* e = &h->e[i];
-        if (e->m10 == 14)
+        E* e = AtE3(&o->mF60, i);
+        if (e->m10 == 14 && e->m0 != a && o->mF5C[e->m8 + e->mC - 1].m0 == b)
             n++;
     }
     return n;
@@ -604,7 +696,6 @@ int fn_80088EDC(O* o, int i)
     return i;
 }
 
-/* near-miss: retail compares with cmpwi/cror/mfcr; the compiler here emits the sign-bit trick. */
 int fn_80088EFC(O* o, int i)
 {
     int k = fn_80088EDC(o, i);
@@ -632,26 +723,52 @@ int fn_80088FFC(O* o, int i)
     return o->mF5C[fn_80088EDC(o, i)].b10.a;
 }
 
+Unk80087A58_Pair* fn_8008903C(Unk80087A58_Pair* out, O* o, int i)
+{
+    int k = fn_80088EDC(o, i);
+    E* e = (E*)(k * 0x14 + (int)o->mF5C);
+    *out = *(Unk80087A58_Pair*)&e->m8;
+    return out;
+}
+
+void fn_80089094(O* o, int b)
+{
+    Unk80087A58_X* x = fn_80087B14();
+    if (x != 0) {
+        H* h = &o->mF60;
+        int f = 0;
+        if (x->m6F8->m14->m1CD0 != 0)
+            f = 1;
+        fn_80087D5C(h, f, b, fn_80353D9C(o));
+    }
+}
+
 void fn_80089108(O* o)
 {
     o->m1744 = 1;
 }
 
-/* near-miss: retail spills each coordinate to its own 8-byte-aligned slot and
- * loads the constant after the first lfs; __builtin_fabs gives the fabs insn
- * (plain fabs() is a call). One extra fmr here. */
 int fn_80089114(void* s, Unk80087A58_V2* v)
 {
     int r = 0;
-    float a = v->x;
-    if (__builtin_fabs(a) > lbl_805B4868)
+    if (AbsF(v->x) > lbl_805B4868)
         r = 1;
-    else {
-        float b = v->y;
-        if (!(__builtin_fabs(b) <= lbl_805B4868))
-            r = 1;
-    }
+    else if (!(AbsF(v->y) <= lbl_805B4868))
+        r = 1;
     return r;
+}
+
+void fn_8008928C(O* o)
+{
+    for (int i = 0; i < 600; i++)
+        fn_80087C40(&o->mF5C[i]);
+    H* h = &o->mF60;
+    fn_80087CC4(h);
+    o->m1744 = 1;
+    o->m4 = 0;
+    o->m8 = 0;
+    o->m1748 = lbl_805B486C;
+    fn_80087CC4(h);
 }
 
 int fn_80089304(void* x, int t)
@@ -679,6 +796,83 @@ int fn_80089348(void* x, int t, int* out)
         return 2;
     }
     return 3;
+}
+
+/* near-miss (many slots): retail walks the outer loop on a pointer compared against base + 0xC00 with
+ * a byte-offset counter; the mid/inner loops are count-down (addic./bdnz) and the entry is written
+ * through stwu r9,0x50(r11). Not reproduced. */
+void* fn_80089368(void* pp)
+{
+    char* p = (char*)pp;
+    fn_8040B320(p + 0x50, 0, 0xF00);
+    char* q = p;
+    int off = 0;
+    do {
+        int b = 0;
+        int boff = 0;
+        char* cnt = off + p;
+        do {
+            int c = 0;
+            *cnt = 0;
+            int coff = 0;
+            do {
+                int* e = (int*)(coff + (boff + (int)q));
+                e[0x50 / 4] = 0;
+                int k = 0;
+                int koff = 0;
+                do {
+                    *(int*)((char*)e + 0x50 + 4 + koff) = 0;
+                    koff += 4;
+                    k++;
+                } while (k < 5);
+                coff += 0x18;
+                c++;
+            } while (c < 2);
+            b++;
+            boff += 0x30;
+            cnt++;
+        } while (b <= 15);
+        q += 0x300;
+        off += 0x10;
+    } while (q <= p + 0xC00);
+    return p;
+}
+
+void fn_800895F8(char* base, int a, int b, int c, Unk80087A58_V2* v)
+{
+    Unk80087A58_V2 p = *v;
+    int k = fn_80089114(base, &p);
+    int o = fn_80089304(base, c) * 4;
+    char* e = (char*)(k * 0x18 + (b * 0x30 + (a * 0x300 + (int)base)));
+    e += 0x50;
+    char* b4 = e + 4;
+    *(int*)(b4 + o) = *(int*)(b4 + o) + 1;
+    *(int*)e = *(int*)e + 1;
+    int idx = b + a * 0x10;
+    base[idx] = base[idx] + 1;
+}
+
+/* near-miss (3 slots, register only): retail keeps the else-branch byte offset in r10, here r0. */
+void fn_800896AC(char* base, int a, int b, int c, Unk80087A58_V2* v)
+{
+    Unk80087A58_V2 p = *v;
+    int k = fn_80089114(base, &p);
+    int extra = 0;
+    int t = fn_80089348(base, c, &extra);
+    char* e = (char*)(k * 0x18 + (b * 0x30 + (a * 0x300 + (int)base)));
+    e += 0x50;
+    if (extra != 0 && t == 2) {
+        int o = t * 4;
+        char* b4 = e + 4;
+        *(int*)(b4 + o) = *(int*)(b4 + o) + extra;
+    } else {
+        int o = t * 4;
+        char* b4 = e + 4;
+        *(int*)(b4 + o) = *(int*)(b4 + o) + 1;
+    }
+    *(int*)e = *(int*)e + 1;
+    int idx = b + a * 0x10;
+    base[idx] = base[idx] + 1;
 }
 
 Unk80087A58_X* fn_80089798()

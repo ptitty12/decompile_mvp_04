@@ -56,7 +56,442 @@ struct Unk800B555C {
     int m4;
     int m8[0x180];
     int m608;
+    char pad60C[0x660 - 0x60C];
+    int m660;
+    char pad664[0x674 - 0x664];
+    int m674;
+    int m678;
+    int m67C;
+    float m680;
+    int m684;
+    char pad688[0x6A0 - 0x688];
+    const void* m6A0;
 };
 extern "C" Unk800B555C* fn_800B555C();
+
+
+/* ---- virtual-slot placeholder classes used by game/tu_800B5C68.cpp (added by pass 2) ---- */
+/* vptr at +0x3C (virtual N is at vtable +8N); only the slots called are typed. */
+class FEV3C {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79(char* a);
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90(int a, int b);
+    virtual void s91(int a, int b);
+    virtual void s92(int a, int b, int c);
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+};
+/* vptr at +0x64 (virtual N is at vtable +8N); only the slots called are typed. */
+class FEV64 {
+public:
+    char pad0[0x64];
+    virtual ~FEV64();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7(char* a);
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(char* a);
+};
+/* vptr at +0x18 (virtual N is at vtable +8N); only the slots called are typed. */
+class FEV18 {
+public:
+    char pad0[0x18];
+    virtual ~FEV18();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual int s17();
+    virtual void s18();
+    virtual int s19();
+    virtual int s20();
+};
+
+/* vptr at +0x3C, variant of FEV3C whose slots 85..91 have other signatures. */
+class FEV3Cq {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85(int a, int b);
+    virtual void s86(int a, int b);
+    virtual void s87(int a, int b);
+    virtual void s88(int a, int b, int c);
+    virtual void s89(int a);
+    virtual void s90(float* a, float* b, float* c, float* d);
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+};
+
+/* object with just a vptr at +0 (subobject at +0xC of the AF248 objects) */
+class FEV0b {
+public:
+    virtual void s1();
+    virtual void s2();
+};
+
+/* 0x68-byte sub-object of the manager (at +0x38): vptr at +0x64 (lbl_8065CBD0),
+ * ctor fn_800B85FC, dtor fn_800B8654, reset fn_800B86A0. */
+struct FEColor {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+/* Text-line table (fn_800B5E68): up to 0x2E4 element pointers, count at +0xB90, vptr at +0xB94. */
+struct FEList {
+    FEV64* m[0x2E4];
+    int mB90;
+    const void* mB94;
+};
+/* Element object, 0x68 bytes, vptr at +0x64 (ctor fn_800B622C, dtor fn_800B62FC): ints at
+ * 0..0x30, a count at +0x34, two colors at +0x40 and +0x50. */
+struct FEElem {
+    unsigned short* m[13];
+    int m34;
+    int m38;
+    int m3C;
+    FEColor m40;
+    FEColor m50;
+    int m60;
+    const void* m64;
+};
+extern const char lbl_806583A8[];
+extern const char lbl_80658680[];
+struct UiMsgBuf {
+    char name[16];
+};
+struct FEObj68 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    char m1C;
+    char pad1D[0x34 - 0x1D];
+    int m34;
+    int m38;
+    int m3C;
+    char m40;
+    char pad41[0x48 - 0x41];
+    int m48;
+    char pad4C[0x58 - 0x4C];
+    int m58;
+    int m5C;
+    int m60;
+    const void* m64;
+};
+
+class FEV3Cz;
+/* vptr at +0x3C: slot 8 takes an int, slot 32 (0x100) returns another such object. */
+class FEV3Cz {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual FEV3Cz* s32(const char* a, int b);
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+};
+/* vptr at +0x28 of an object whose subobject starts at +0xC (AF148): slot 2 */
+class FEV1C {
+public:
+    char pad0[0x1C];
+    virtual void s1();
+    virtual void s2();
+};
+
+class FEV3Cy;
+/* vptr at +0x3C: slot 30 (0xF0) looks up another such object by name. */
+class FEV3Cy {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual FEV3Cy* s30(const char* a, int b);
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+};
 
 #endif

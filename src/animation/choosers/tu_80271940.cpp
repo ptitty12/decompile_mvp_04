@@ -8,14 +8,14 @@
  * cHandChooser: vtable 0x80662290 slot 3 (0x802AC98C) returns the pointer at
  * 0x8061E654 -> "cHandChooser".
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 /* Class name; read by cHandChooser's vtable slot 3 (0x802AC98C). */
 const char* lbl_8061E654 = "cHandChooser";
 unsigned int lbl_8061E658 = 0;    /* hash of "Left" */
 unsigned int lbl_8061E65C = 0;    /* hash of "Right" */
 
-class cHandChooser : public Unk8037B3E8 {
+class cHandChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -35,7 +35,7 @@ public:
     Unk80384F28 m8;            /* "handanimpairlist"/"handanimpairs" */
 };
 
-cHandChooser::cHandChooser() : Unk8037B3E8(lbl_8061E654)
+cHandChooser::cHandChooser() : Unk80362C2C(lbl_8061E654)
 {
     if (!lbl_8061E658 || !lbl_8061E65C) {
         lbl_8061E658 = fn_80378568("Left", 4);

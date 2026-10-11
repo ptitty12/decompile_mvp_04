@@ -55,7 +55,8 @@ struct Unk8019F8C0_Ctrl {
 struct Unk8019F8C0_Pl {
     char pad0[0x3A4];
     void* m3A4;
-    char pad3A8[0x3B0 - 0x3A8];
+    char pad3A8[4];
+    struct Unk80178BBC_T* m3AC;
     Unk8019F8C0_Ctrl* m3B0;
     void* m3B4;
     int m3B8;
@@ -88,21 +89,35 @@ struct Unk8019F8C0_Ring {
 struct Unk8019F8C0_Inner {
     unsigned char m0;
     unsigned char m1;
-    char pad2[6];
+    unsigned char m2;
+    unsigned char m3;
+    char pad4[4];
     int m8;
-    char padC[0x108 - 0xC];
+    char padC[0x78 - 0xC];
+    int m78;
+    char pad7C[0x108 - 0x7C];
     int m108;
-    char pad10C[0x168 - 0x10C];
+    char pad10C[0x164 - 0x10C];
+    int m164;
     Unk8019F8C0_Ring m168;
-    char pad178[0x1B4 - 0x178];
+    char pad178[0x17C - 0x178];
+    unsigned char m17C[0x198 - 0x17C];
+    int m198;
+    char pad19C[4];
+    int m1A0;
+    char pad1A4[0x1B4 - 0x1A4];
     unsigned char m1B4[0x3E4 - 0x1B4];
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
     int GetM1() { return m1; }
+    int GetM2() { return m2; }
+    int GetM3() { return m3; }
 };
 
 struct Unk8019F8C0_Obj4A4 {
-    char pad0[0x4A4];
+    char pad0[0x3F4];
+    float m3F4;
+    char pad3F8[0x4A4 - 0x3F8];
     unsigned m4A4;
 };
 
@@ -160,6 +175,23 @@ public:
     virtual void fn_vslot5();
     virtual void fn_vslot6();
     virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24(int a);
 };
 
 /* State-machine style object with a vptr at +8 (fn_801A4CE8 result, Sub::m3C). */
@@ -251,7 +283,9 @@ struct Unk8019F8C0_Owner {
     int m6D8;
     int m6DC;
     Unk8019F8C0_Ent* m6E0;
-    char pad6E4[0x10];
+    struct Unk80198AA0* m6E4;
+    struct Unk80198AA0* m6E8;
+    char pad6EC[8];
     int m6F4;
     Unk8019F8C0_Mgr* m6F8;
     int m6FC;

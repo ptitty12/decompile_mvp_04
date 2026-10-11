@@ -687,9 +687,9 @@ void Unk800058BC::fn_800071F4(Unk800074BC_Msg* msg)
         int n = m204[i].m8;
         fn_80402FCC(b, (const void*)m204[i].m0);
         i++;
-        fn_804089B4(a, "%s \n%s requires 1 file and %i blocks.", a, b, n);
+        fn_804089B4(a, "%s \\n%s requires 1 file and %i blocks.", a, b, n);
     }
-    fn_804089B4(a, "%s \nExisting files may be loaded and overwritten.", a);
+    fn_804089B4(a, "%s \\nExisting files may be loaded and overwritten.", a);
     m1FC = fn_803774A8((fn_8040B6A0(a) + 1) * 2, 0x100);
     fn_80402EF8(m1FC, a);
     mA0 = (int)m1FC;

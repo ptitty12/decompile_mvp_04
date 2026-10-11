@@ -12,6 +12,354 @@ Sections:
 	.sbss       type:bss align:8
 	.sdata2     type:rodata align:8
 
+db/tu_8052A220.cpp:
+	.dboverlay  start:0x8052A220 end:0x8052CA60
+
+db/tu_8052CA60.cpp:
+	.dboverlay  start:0x8052CA60 end:0x8052E4C0
+
+db/tu_8052E4C0.cpp:
+	.dboverlay  start:0x8052E4C0 end:0x8052FF10
+
+db/tu_8052FF10.cpp:
+	.dboverlay  start:0x8052FF10 end:0x80531A20
+
+db/tu_80531A20.cpp:
+	.dboverlay  start:0x80531A20 end:0x80534078
+
+db/tu_80534078.cpp:
+	.dboverlay  start:0x80534078 end:0x80535360
+
+db/tu_80535360.cpp:
+	.dboverlay  start:0x80535360 end:0x8053967C
+
+db/tu_8053967C.cpp:
+	.dboverlay  start:0x8053967C end:0x8053CC9C
+
+db/tu_8053CC9C.cpp:
+	.dboverlay  start:0x8053CC9C end:0x8053E240
+
+db/tu_8053E240.cpp:
+	.dboverlay  start:0x8053E240 end:0x80541F40
+
+db/tu_80541F40.cpp:
+	.dboverlay  start:0x80541F40 end:0x805467E0
+
+db/tu_805467E0.cpp:
+	.dboverlay  start:0x805467E0 end:0x805495DC
+
+db/tu_805495DC.cpp:
+	.dboverlay  start:0x805495DC end:0x8054CBBC
+
+db/tu_8054CBBC.cpp:
+	.dboverlay  start:0x8054CBBC end:0x8054FA04
+
+db/tu_8054FA04.cpp:
+	.dboverlay  start:0x8054FA04 end:0x80554628
+
+db/tu_80554628.cpp:
+	.dboverlay  start:0x80554628 end:0x8055A3B0
+
+db/tu_8055A3B0.cpp:
+	.dboverlay  start:0x8055A3B0 end:0x8055F730
+
+db/tu_8055F730.cpp:
+	.dboverlay  start:0x8055F730 end:0x80563954
+
+db/tu_80563954.cpp:
+	.dboverlay  start:0x80563954 end:0x80565FD4
+
+db/tu_80565FD4.cpp:
+	.dboverlay  start:0x80565FD4 end:0x8056A248
+
+db/tu_8056A248.cpp:
+	.dboverlay  start:0x8056A248 end:0x8056BAEC
+
+db/tu_8056BAEC.cpp:
+	.dboverlay  start:0x8056BAEC end:0x8056EC68
+
+db/tu_8056EC68.cpp:
+	.dboverlay  start:0x8056EC68 end:0x805721F8
+
+db/tu_805721F8.cpp:
+	.dboverlay  start:0x805721F8 end:0x80574AE4
+
+db/tu_80574AE4.cpp:
+	.dboverlay  start:0x80574AE4 end:0x8057CDB8
+
+db/tu_8057CDB8.cpp:
+	.dboverlay  start:0x8057CDB8 end:0x8058154C
+
+db/tu_8058154C.cpp:
+	.dboverlay  start:0x8058154C end:0x80582578
+
+db/tu_80582578.cpp:
+	.dboverlay  start:0x80582578 end:0x80584CBC
+
+db/tu_80584CBC.cpp:
+	.dboverlay  start:0x80584CBC end:0x805881E4
+
+db/tu_805881E4.cpp:
+	.dboverlay  start:0x805881E4 end:0x8058BF2C
+
+db/tu_8058BF2C.cpp:
+	.dboverlay  start:0x8058BF2C end:0x8058E5B8
+
+db/tu_8058E5B8.cpp:
+	.dboverlay  start:0x8058E5B8 end:0x805902E0
+
+db/tu_805902E0.cpp:
+	.dboverlay  start:0x805902E0 end:0x8059377C
+
+db/tu_8059377C.cpp:
+	.dboverlay  start:0x8059377C end:0x805942E0
+
+db/tu_805942E0.cpp:
+	.dboverlay  start:0x805942E0 end:0x80596D88
+
+db/tu_80596D88.cpp:
+	.dboverlay  start:0x80596D88 end:0x80599594
+
+db/tu_80599594.cpp:
+	.dboverlay  start:0x80599594 end:0x8059A728
+
+db/tu_8059A728.cpp:
+	.dboverlay  start:0x8059A728 end:0x8059FE24
+
+db/tu_8059FE24.cpp:
+	.dboverlay  start:0x8059FE24 end:0x805A1A9C
+
+db/tu_805A1A9C.cpp:
+	.dboverlay  start:0x805A1A9C end:0x805A2604
+
+fe/tu_8043FDC0.cpp:
+	.feoverlay  start:0x8043FDC0 end:0x804439E4
+
+fe/tu_804439E4.cpp:
+	.feoverlay  start:0x804439E4 end:0x80446CE8
+
+fe/tu_80446CE8.cpp:
+	.feoverlay  start:0x80446CE8 end:0x80448E18
+
+fe/tu_80448E18.cpp:
+	.feoverlay  start:0x80448E18 end:0x8044C508
+
+fe/tu_8044C508.cpp:
+	.feoverlay  start:0x8044C508 end:0x8044F550
+
+fe/tu_8044F550.cpp:
+	.feoverlay  start:0x8044F550 end:0x80452120
+
+fe/tu_80452120.cpp:
+	.feoverlay  start:0x80452120 end:0x80455038
+
+fe/tu_80455038.cpp:
+	.feoverlay  start:0x80455038 end:0x80459228
+
+fe/tu_80459228.cpp:
+	.feoverlay  start:0x80459228 end:0x8045B134
+
+fe/tu_8045B134.cpp:
+	.feoverlay  start:0x8045B134 end:0x8045EDDC
+
+fe/tu_8045EDDC.cpp:
+	.feoverlay  start:0x8045EDDC end:0x80462504
+
+fe/tu_80462504.cpp:
+	.feoverlay  start:0x80462504 end:0x80464090
+
+fe/tu_80464090.cpp:
+	.feoverlay  start:0x80464090 end:0x804654A0
+
+fe/tu_804654A0.cpp:
+	.feoverlay  start:0x804654A0 end:0x8046C6F8
+
+fe/tu_8046C6F8.cpp:
+	.feoverlay  start:0x8046C6F8 end:0x8046F770
+
+fe/tu_8046F770.cpp:
+	.feoverlay  start:0x8046F770 end:0x80471EBC
+
+fe/tu_80471EBC.cpp:
+	.feoverlay  start:0x80471EBC end:0x804740A8
+
+fe/tu_804740A8.cpp:
+	.feoverlay  start:0x804740A8 end:0x80477068
+
+fe/tu_80477068.cpp:
+	.feoverlay  start:0x80477068 end:0x8047BB8C
+
+fe/tu_8047BB8C.cpp:
+	.feoverlay  start:0x8047BB8C end:0x8047D454
+
+fe/tu_8047D454.cpp:
+	.feoverlay  start:0x8047D454 end:0x80481634
+
+fe/tu_80481634.cpp:
+	.feoverlay  start:0x80481634 end:0x8048511C
+
+fe/tu_8048511C.cpp:
+	.feoverlay  start:0x8048511C end:0x80488CDC
+
+fe/tu_80488CDC.cpp:
+	.feoverlay  start:0x80488CDC end:0x8048E6A0
+
+fe/tu_8048E6A0.cpp:
+	.feoverlay  start:0x8048E6A0 end:0x80492680
+
+fe/tu_80492680.cpp:
+	.feoverlay  start:0x80492680 end:0x804987EC
+
+fe/tu_804987EC.cpp:
+	.feoverlay  start:0x804987EC end:0x8049B0CC
+
+fe/tu_8049B0CC.cpp:
+	.feoverlay  start:0x8049B0CC end:0x8049E0BC
+
+fe/tu_8049E0BC.cpp:
+	.feoverlay  start:0x8049E0BC end:0x804A2AB4
+
+fe/tu_804A2AB4.cpp:
+	.feoverlay  start:0x804A2AB4 end:0x804A721C
+
+fe/tu_804A721C.cpp:
+	.feoverlay  start:0x804A721C end:0x804AA58C
+
+fe/tu_804AA58C.cpp:
+	.feoverlay  start:0x804AA58C end:0x804ABCBC
+
+fe/tu_804ABCBC.cpp:
+	.feoverlay  start:0x804ABCBC end:0x804AECD0
+
+fe/tu_804AECD0.cpp:
+	.feoverlay  start:0x804AECD0 end:0x804B13FC
+
+fe/tu_804B13FC.cpp:
+	.feoverlay  start:0x804B13FC end:0x804B38C4
+
+fe/tu_804B38C4.cpp:
+	.feoverlay  start:0x804B38C4 end:0x804B4908
+
+fe/tu_804B4908.cpp:
+	.feoverlay  start:0x804B4908 end:0x804B7C98
+
+fe/tu_804B7C98.cpp:
+	.feoverlay  start:0x804B7C98 end:0x804B985C
+
+fe/tu_804B985C.cpp:
+	.feoverlay  start:0x804B985C end:0x804BB110
+
+fe/tu_804BB110.cpp:
+	.feoverlay  start:0x804BB110 end:0x804BE560
+
+fe/tu_804BE560.cpp:
+	.feoverlay  start:0x804BE560 end:0x804BFB3C
+
+fe/tu_804BFB3C.cpp:
+	.feoverlay  start:0x804BFB3C end:0x804C19EC
+
+fe/tu_804C19EC.cpp:
+	.feoverlay  start:0x804C19EC end:0x804C3ECC
+
+fe/tu_804C3ECC.cpp:
+	.feoverlay  start:0x804C3ECC end:0x804C713C
+
+fe/tu_804C713C.cpp:
+	.feoverlay  start:0x804C713C end:0x804C931C
+
+fe/tu_804C931C.cpp:
+	.feoverlay  start:0x804C931C end:0x804CB430
+
+fe/tu_804CB430.cpp:
+	.feoverlay  start:0x804CB430 end:0x804CE408
+
+fe/tu_804CE408.cpp:
+	.feoverlay  start:0x804CE408 end:0x804D08D0
+
+fe/tu_804D08D0.cpp:
+	.feoverlay  start:0x804D08D0 end:0x804D2AC0
+
+fe/tu_804D2AC0.cpp:
+	.feoverlay  start:0x804D2AC0 end:0x804D3E00
+
+fe/tu_804D3E00.cpp:
+	.feoverlay  start:0x804D3E00 end:0x804D6180
+
+fe/tu_804D6180.cpp:
+	.feoverlay  start:0x804D6180 end:0x804DA10C
+
+fe/tu_804DA10C.cpp:
+	.feoverlay  start:0x804DA10C end:0x804DC128
+
+fe/tu_804DC128.cpp:
+	.feoverlay  start:0x804DC128 end:0x804DDAB4
+
+fe/tu_804DDAB4.cpp:
+	.feoverlay  start:0x804DDAB4 end:0x804DE730
+
+fe/tu_804DE730.cpp:
+	.feoverlay  start:0x804DE730 end:0x804E02E0
+
+fe/tu_804E02E0.cpp:
+	.feoverlay  start:0x804E02E0 end:0x804E1A6C
+
+fe/tu_804E1A6C.cpp:
+	.feoverlay  start:0x804E1A6C end:0x804E5180
+
+fe/tu_804E5180.cpp:
+	.feoverlay  start:0x804E5180 end:0x804E750C
+
+fe/tu_804E750C.cpp:
+	.feoverlay  start:0x804E750C end:0x804EA2E4
+
+fe/tu_804EA2E4.cpp:
+	.feoverlay  start:0x804EA2E4 end:0x804ECDE0
+
+fe/tu_804ECDE0.cpp:
+	.feoverlay  start:0x804ECDE0 end:0x804F81E0
+
+fe/tu_804F81E0.cpp:
+	.feoverlay  start:0x804F81E0 end:0x804FE34C
+
+fe/tu_804FE34C.cpp:
+	.feoverlay  start:0x804FE34C end:0x804FF6B4
+
+fe/tu_804FF6B4.cpp:
+	.feoverlay  start:0x804FF6B4 end:0x805002DC
+
+fe/tu_805002DC.cpp:
+	.feoverlay  start:0x805002DC end:0x80505484
+
+fe/tu_80505484.cpp:
+	.feoverlay  start:0x80505484 end:0x80508C98
+
+fe/tu_80508C98.cpp:
+	.feoverlay  start:0x80508C98 end:0x8050C9DC
+
+fe/tu_8050C9DC.cpp:
+	.feoverlay  start:0x8050C9DC end:0x80512D10
+
+fe/tu_80512D10.cpp:
+	.feoverlay  start:0x80512D10 end:0x80516990
+
+fe/tu_80516990.cpp:
+	.feoverlay  start:0x80516990 end:0x80519600
+
+fe/tu_80519600.cpp:
+	.feoverlay  start:0x80519600 end:0x8051E878
+
+fe/tu_8051E878.cpp:
+	.feoverlay  start:0x8051E878 end:0x80520BE0
+
+fe/tu_80520BE0.cpp:
+	.feoverlay  start:0x80520BE0 end:0x805283C4
+
+fe/tu_805283C4.cpp:
+	.feoverlay  start:0x805283C4 end:0x80528B78
+
+fe/tu_80528B78.cpp:
+	.feoverlay  start:0x80528B78 end:0x80529364
+
 game/tu_800034A0.cpp:
 	.text       start:0x800034A0 end:0x800042B0
 	.ctors      start:0x805A2BC4 end:0x805A2BC8
@@ -1061,6 +1409,130 @@ game/tu_8033CED8.cpp:
 
 game/tu_8033FAFC.cpp:
 	.text       start:0x8033FAFC end:0x803401A8
+
+game/tu_803401A8.cpp:
+	.text       start:0x803401A8 end:0x803414A4
+	.ctors      start:0x805A2C3C end:0x805A2C40
+	.dtors      start:0x805A2D60 end:0x805A2D64
+
+fe/tu_80529364.cpp:
+	.feoverlay  start:0x80529364 end:0x8052A208
+	.ctors      start:0x805A2C40 end:0x805A2C44
+
+db/tu_805A2604.cpp:
+	.dboverlay  start:0x805A2604 end:0x805A2BB0
+	.ctors      start:0x805A2C44 end:0x805A2C48
+
+game/tu_803414A4.cpp:
+	.text       start:0x803414A4 end:0x80341B78
+
+game/tu_80341B78.cpp:
+	.text       start:0x80341B78 end:0x80344180
+
+game/tu_80344180.cpp:
+	.text       start:0x80344180 end:0x80344E90
+
+game/tu_80344E90.cpp:
+	.text       start:0x80344E90 end:0x8034699C
+
+game/tu_8034699C.cpp:
+	.text       start:0x8034699C end:0x80347F7C
+
+game/tu_80347F7C.cpp:
+	.text       start:0x80347F7C end:0x80349880
+
+game/tu_80349880.cpp:
+	.text       start:0x80349880 end:0x8034B370
+
+game/tu_8034B370.cpp:
+	.text       start:0x8034B370 end:0x8034B8C0
+
+game/tu_8034B8C0.cpp:
+	.text       start:0x8034B8C0 end:0x8034D550
+
+game/tu_8034D550.cpp:
+	.text       start:0x8034D550 end:0x8034F350
+
+game/tu_8034F350.cpp:
+	.text       start:0x8034F350 end:0x80351150
+
+game/tu_80351150.cpp:
+	.text       start:0x80351150 end:0x80352E64
+
+game/tu_80352E64.cpp:
+	.text       start:0x80352E64 end:0x80353930
+
+game/tu_80353930.cpp:
+	.text       start:0x80353930 end:0x803543FC
+
+game/tu_803543FC.cpp:
+	.text       start:0x803543FC end:0x80355A6C
+
+game/tu_80355A6C.cpp:
+	.text       start:0x80355A6C end:0x803560F8
+
+game/tu_803560F8.cpp:
+	.text       start:0x803560F8 end:0x8035688C
+
+game/tu_8035688C.cpp:
+	.text       start:0x8035688C end:0x8035726C
+
+game/tu_8035726C.cpp:
+	.text       start:0x8035726C end:0x80357A70
+
+game/tu_80357A70.cpp:
+	.text       start:0x80357A70 end:0x803597C4
+
+game/tu_803597C4.cpp:
+	.text       start:0x803597C4 end:0x8035A2D0
+
+game/tu_8035A2D0.cpp:
+	.text       start:0x8035A2D0 end:0x8035AB44
+
+game/tu_8035AB44.cpp:
+	.text       start:0x8035AB44 end:0x8035B60C
+
+game/tu_8035B60C.cpp:
+	.text       start:0x8035B60C end:0x8035BF0C
+
+game/tu_8035BF0C.cpp:
+	.text       start:0x8035BF0C end:0x8035DA48
+
+game/tu_8035DA48.cpp:
+	.text       start:0x8035DA48 end:0x8035E50C
+
+game/tu_8035E50C.cpp:
+	.text       start:0x8035E50C end:0x8035ECE4
+
+game/tu_8035ECE4.cpp:
+	.text       start:0x8035ECE4 end:0x8035F63C
+
+game/tu_8035F63C.cpp:
+	.text       start:0x8035F63C end:0x80360168
+
+game/tu_80360168.cpp:
+	.text       start:0x80360168 end:0x803606B0
+
+game/tu_803606B0.cpp:
+	.text       start:0x803606B0 end:0x80360C18
+
+game/tu_80360C18.cpp:
+	.text       start:0x80360C18 end:0x80361580
+
+game/tu_80361580.cpp:
+	.text       start:0x80361580 end:0x80361F98
+
+game/tu_80361F98.cpp:
+	.text       start:0x80361F98 end:0x80362A30
+
+game/tu_80362A30.cpp:
+	.text       start:0x80362A30 end:0x80362FB4
+
+game/tu_80362FB4.cpp:
+	.text       start:0x80362FB4 end:0x80365C10
+
+game/tu_80365C10.cpp:
+	.text       start:0x80365C10 end:0x803663B0
 
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC

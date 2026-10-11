@@ -11,7 +11,7 @@
  * (0x805DC394), which other choosers' slot 2 also passes, is defined here
  * as a global array.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 extern const char lbl_805DBC10[];   /* 0x148-byte tables in another unit's .rodata */
 extern const char lbl_805DBD58[];
@@ -293,7 +293,7 @@ void fn_801C3D44(Unk8027107C_Inner* p, float* a, float* b);
 float fn_8024BFEC(Unk80270BA0_X* x, float v);
 float fn_8026FDB0(Unk80270BA0_Obj* obj);
 
-class cMatrixChooser : public Unk8037B3E8 {
+class cMatrixChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -318,7 +318,7 @@ public:
     int m5C;
 };
 
-cMatrixChooser::cMatrixChooser() : Unk8037B3E8(lbl_8061E640)
+cMatrixChooser::cMatrixChooser() : Unk80362C2C(lbl_8061E640)
 {
     m8 = 3;
     m4 = 0;

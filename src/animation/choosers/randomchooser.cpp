@@ -14,7 +14,7 @@
  * "value >= 0.0 && value <= mAssetWeights[top]...". "a" and "weights"
  * (0x805DC538, 0x805DC53C) are global arrays: other units pass them too.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 /* Class name; read by cRandom's vtable slot 3 (0x802AC860). Defined first so
  * that "cRandom" is the first string in .rodata, as in retail. */
@@ -180,7 +180,7 @@ void Unk8026FEB8::fn_vslot1(char* buf, int len)
     }
 }
 
-class cRandom : public Unk8037B3E8 {
+class cRandom : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -197,7 +197,7 @@ public:
     Unk8026FEB8 m8;            /* "a"/"weights" */
 };
 
-cRandom::cRandom() : Unk8037B3E8(0x8EE57249), m4(0.0f)
+cRandom::cRandom() : Unk80362C2C(0x8EE57249), m4(0.0f)
 {
 }
 

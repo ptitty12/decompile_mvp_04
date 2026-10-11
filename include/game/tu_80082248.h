@@ -31,7 +31,7 @@ struct Unk80082248_Link {
 struct Unk80082248_Tree {
     Unk80082248_Node* m0;
     Unk80082248_Node* m4;
-    char pad8[0x15F98 - 8];
+    Unk80082248_Node m8[3750]; /* 0x18 bytes each, 0x15F90 in all (fn_8008241C) */
     int m15F98;
     /* The vptr at +0x15F9C is the compiler's own (fn_80082318 stores it through
      * a cast); fn_80083C54 deletes the tree through its virtual destructor. */
@@ -54,6 +54,41 @@ struct Unk80082248_Key {
     unsigned char b6;
     unsigned c : 2;
     unsigned rest : 6;
+};
+
+/* 0x14-byte record of the ring at lbl_80619324 (0x5000 of them): fn_80082248
+ * hands one out, fn_80083778 copies one whole. Word at +4 holds a 16-bit id,
+ * a byte, two 2-bit fields and the in-use flag in its low bit. */
+struct Unk80082248_Rec {
+    int m0;
+    unsigned short h4;
+    unsigned char b6;
+    unsigned c : 2;
+    unsigned d : 2;
+    unsigned e : 3;
+    unsigned used : 1;
+    int m8;
+    int mC;
+    int m10;
+};
+
+/* Three words copied out of a record (+8) by fn_80083838. */
+struct Unk80082248_V3 {
+    int m0;
+    int m4;
+    int m8;
+};
+
+/* Stream the save/load slots write through (same shape as Unk80070DDC_Stream:
+ * word at +0, vptr at +4, slot 1 = transfer(cursor, data, size), slot 2 = flag
+ * test). The base constructor is fn_80353218. */
+struct Unk80082248_Stream0 {
+    int m0;
+};
+struct Unk80082248_Stream : Unk80082248_Stream0 {
+    Unk80082248_Stream(); /* fn_80353218 */
+    virtual int v08(char** cursor, void* data, int size);
+    virtual int v10();
 };
 
 #endif

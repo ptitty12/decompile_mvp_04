@@ -38,9 +38,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parents[2]
-SYM_LINE = re.compile(r"^(\S+) = \.text:0x([0-9A-Fa-f]{8});(.*)$")
+SYM_LINE = re.compile(r"^(\S+) = \.(?:text|feoverlay|dboverlay):0x([0-9A-Fa-f]{8});(.*)$")
 ADDR_PREFIX = re.compile(r"^fn_([0-9A-Fa-f]{8})(?![0-9A-Fa-f])")
 SIZE_ATTR = re.compile(r"size:0x([0-9A-Fa-f]+)")
+# Code sections: .text, and the overlay sections code-only overlay units split.
+CODE_SECTIONS = (".text", ".feoverlay", ".dboverlay")
 
 
 def elf_text_functions(path: Path) -> List[Tuple[int, int, str]]:
@@ -64,7 +66,7 @@ def elf_text_functions(path: Path) -> List[Tuple[int, int, str]]:
         strtab = secs[s[6]]
         for i in range(s[5] // 16):
             st_name, value, size, info, _, shndx = struct.unpack_from(">IIIBBH", data, s[4] + i * 16)
-            if info & 0xF == 2 and 0 < shndx < len(names) and names[shndx] == ".text":
+            if info & 0xF == 2 and 0 < shndx < len(names) and names[shndx] in CODE_SECTIONS:
                 out.append((value, size, cstr(strtab[4] + st_name)))
     # Aliases at one address: keep the first name seen.
     seen, uniq = set(), []
@@ -80,7 +82,7 @@ def text_range(splits: Path, unit: str) -> Tuple[int, int]:
     for line in splits.read_text(encoding="utf-8").splitlines():
         if line and not line[0].isspace():
             cur = line.rstrip(":")
-        elif cur == unit and line.strip().startswith(".text"):
+        elif cur == unit and line.strip().startswith(CODE_SECTIONS):
             m = re.search(r"start:0x([0-9A-Fa-f]+) end:0x([0-9A-Fa-f]+)", line)
             if m:
                 return int(m.group(1), 16), int(m.group(2), 16)

@@ -100,6 +100,7 @@ public:
 /* Events whose slot 11 is the shared inline 0x8035EA80 (calls slot 14). */
 class Unk8035EA80 : public Unk8038B7E4 {
 public:
+    virtual ~Unk8035EA80() {}
     virtual int fn_vslot11();           /* 0x8035EA80 */
     virtual int fn_vslot14();
 };
@@ -116,6 +117,7 @@ public:
 /* Events whose slot 11 is the shared inline 0x8035EAB4 (calls slot 16). */
 class Unk8035EAB4 : public Unk8035EA44 {
 public:
+    virtual ~Unk8035EAB4() {}
     virtual int fn_vslot11();           /* 0x8035EAB4 */
     virtual int fn_vslot16();
 };
