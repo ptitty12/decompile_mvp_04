@@ -86,4 +86,12 @@ struct Unk802C610C_Cfg {
     int m80;
 };
 
+/* Optional player record for the cell-id formatter fn_802C51C0: +0x10 and +0x18 words. */
+struct Unk802C51C0_Req {
+    char pad0[0x10];
+    int m10;
+    char pad14[4];
+    int m18;
+};
+
 #endif

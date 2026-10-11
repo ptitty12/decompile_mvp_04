@@ -14,6 +14,10 @@ void* operator new(unsigned int n, int heap);
 void fn_802B961C(int p, int a);
 int fn_802C72F4(int a, int b, int c);
 void fn_802C3EC0(Unk802C3B60* o);
+extern const char lbl_805E15C4[];
+extern const char lbl_805E137C[];
+extern const char lbl_805E14CC[];
+Unk802C2188* fn_802C610C(Unk802C3B60* o, Unk802C610C_Cfg* c, int flag);
 extern const char lbl_805E15E8[];
 extern Unk802C60A4_Rgb lbl_805E2256[];
 char* fn_802C5970(char* buf, int a, int b, int c, int d);
@@ -55,6 +59,7 @@ int fn_802B9300(const char* name, int a, int b, int c);
 void fn_802C6404(Unk802C3B60* o);
 int fn_803EBD14(int h, int k);
 void fn_803D74A0(int a, int b, int c);
+void fn_803D74A0(int a, const char* b, int c);
 void fn_802C4CB4(int a, int b, int c, int d);
 void fn_802C51C0(int a, int b, int c, int d);
 int fn_802C440C(Unk802C3B60* o, int* p, int x);
@@ -387,6 +392,23 @@ void fn_802C44A8(int, int x, int h, int y, int z)
 void fn_802C44F0(int, int x, Unk802C2188* h, int y, int z)
 {
     fn_803D74A0(x, y, fn_802C2304(h, z));
+}
+
+void fn_802C51C0(Unk802C3B60* o, int h, Unk802C51C0_Req* req, Unk802C610C_Cfg* c)
+{
+    int v = 0;
+    int lod = fn_802C2304(fn_802C610C(o, c, 0), 0x16);
+    int x = 0;
+    if (req != 0) {
+        x = req->m18;
+        v = req->m10;
+    }
+    fn_803D74A0(h, lbl_805E15C4, x);
+    fn_803D74A0(h, lbl_805E137C, lod);
+    if (c->m68 == 0xE || c->m68 == 0x10 || c->m68 == 0x11) {
+        v = o->m238;
+    }
+    fn_803D74A0(h, lbl_805E14CC, v);
 }
 
 void fn_802C58E0(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
