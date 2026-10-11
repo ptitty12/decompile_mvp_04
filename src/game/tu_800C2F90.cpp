@@ -191,10 +191,17 @@ extern "C" void fn_800C313C(Unk800C2250_File* f)
     }
 }
 
-/* near-miss: 1 slot (retail ble where we emit blt after the case-3 beq); switch spellings tried: case order, if chain, enum index */
 extern "C" void fn_800C31FC(Unk800C2250_File* f)
 {
     switch (fn_800C2F74(f)) {
+    case 0:
+    case 1:
+    case 2:
+        break;
+    case 4:
+    case 5:
+        fn_802B0638(lbl_8061E978, fn_800C2F84(f), 0);
+        break;
     case 3:
         if (fn_800C33D0()->m0 != 0) {
             fn_803FB764(fn_800C2FE8(f), 0, 0);
@@ -207,12 +214,9 @@ extern "C" void fn_800C31FC(Unk800C2250_File* f)
             }
         }
         break;
-    case 4:
-    case 5:
-        fn_802B0638(lbl_8061E978, fn_800C2F84(f), 0);
-        break;
     }
 }
+
 
 extern "C" int fn_800C32C4(void* unused, int kind, void** out)
 {
@@ -619,7 +623,6 @@ extern "C" void fn_800C3DCC(Unk800C341C_Mgr* m, int w, Unk800C3FEC_Obj* obj)
     }
 }
 
-/* near-miss: 3 slots (prologue copy order: retail copies r5 before r3/r4) */
 extern "C" void fn_800C3ED4(Unk800C341C_Mgr* m, int w, int obj)
 {
     int x = 0;
