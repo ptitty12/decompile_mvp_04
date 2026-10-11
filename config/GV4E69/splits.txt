@@ -203,6 +203,9 @@ animation/tu_802A9A04.cpp:
 animation/tu_802AB810.cpp:
 	.text       start:0x802AB810 end:0x802AC2CC
 
+animation/tu_802AC2CC.cpp:
+	.text       start:0x802AC2CC end:0x802ACD88
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C
