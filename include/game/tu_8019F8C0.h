@@ -55,7 +55,8 @@ struct Unk8019F8C0_Ctrl {
 struct Unk8019F8C0_Pl {
     char pad0[0x3A4];
     void* m3A4;
-    char pad3A8[0x3B0 - 0x3A8];
+    char pad3A8[4];
+    struct Unk80178BBC_T* m3AC;
     Unk8019F8C0_Ctrl* m3B0;
     void* m3B4;
     int m3B8;
@@ -94,7 +95,8 @@ struct Unk8019F8C0_Inner {
     int m108;
     char pad10C[0x168 - 0x10C];
     Unk8019F8C0_Ring m168;
-    char pad178[0x1B4 - 0x178];
+    char pad178[0x17C - 0x178];
+    unsigned char m17C[0x1B4 - 0x17C];
     unsigned char m1B4[0x3E4 - 0x1B4];
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
@@ -102,7 +104,9 @@ struct Unk8019F8C0_Inner {
 };
 
 struct Unk8019F8C0_Obj4A4 {
-    char pad0[0x4A4];
+    char pad0[0x3F4];
+    float m3F4;
+    char pad3F8[0x4A4 - 0x3F8];
     unsigned m4A4;
 };
 
@@ -251,7 +255,9 @@ struct Unk8019F8C0_Owner {
     int m6D8;
     int m6DC;
     Unk8019F8C0_Ent* m6E0;
-    char pad6E4[0x10];
+    struct Unk80198AA0* m6E4;
+    struct Unk80198AA0* m6E8;
+    char pad6EC[8];
     int m6F4;
     Unk8019F8C0_Mgr* m6F8;
     int m6FC;
