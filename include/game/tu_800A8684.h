@@ -58,6 +58,14 @@ struct Unk800B555C {
     int m608;
     char pad60C[0x660 - 0x60C];
     int m660;
+    char pad664[0x674 - 0x664];
+    int m674;
+    int m678;
+    int m67C;
+    float m680;
+    int m684;
+    char pad688[0x6A0 - 0x688];
+    const void* m6A0;
 };
 extern "C" Unk800B555C* fn_800B555C();
 
@@ -146,6 +154,27 @@ public:
     virtual void s77();
     virtual void s78();
     virtual void s79(char* a);
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90(int a, int b);
+    virtual void s91(int a, int b);
+    virtual void s92(int a, int b, int c);
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
 };
 /* vptr at +0x64 (virtual N is at vtable +8N); only the slots called are typed. */
 class FEV64 {
@@ -171,6 +200,31 @@ public:
     virtual void s18();
     virtual void s19();
     virtual void s20(char* a);
+};
+/* vptr at +0x18 (virtual N is at vtable +8N); only the slots called are typed. */
+class FEV18 {
+public:
+    char pad0[0x18];
+    virtual ~FEV18();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual int s17();
+    virtual void s18();
+    virtual int s19();
+    virtual int s20();
 };
 
 #endif
