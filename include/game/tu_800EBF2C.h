@@ -75,7 +75,7 @@ public:
     virtual void v17();
     virtual void v18(int a);
     virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24();
-    virtual void v25(); virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29();
+    virtual void v25(); virtual void v26(); virtual void v27(); virtual void v28(char* s); virtual void v29(int a);
     virtual UiS* v30(const char* s, int a);
     virtual void v31();
     virtual UiS* v32(const char* s, int a);
@@ -152,6 +152,27 @@ public:
     virtual void v43(); virtual void v44(); virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48();
     virtual void v49(); virtual void v50();
     virtual void v51(int a, int b);
+};
+/* Variant of UiV: slot 68 takes one argument, slot 79 two. */
+class UiVF : public UiS0 {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5(); virtual void v6();
+    virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10(); virtual void v11(); virtual void v12();
+    virtual void v13();
+    virtual void v14(int a);
+    virtual void v15(); virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26();
+    virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30(); virtual void v31(); virtual void v32();
+    virtual void v33(); virtual void v34(); virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38();
+    virtual void v39(); virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49(); virtual void v50();
+    virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55(); virtual void v56();
+    virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60(); virtual void v61(); virtual void v62();
+    virtual void v63(); virtual void v64(); virtual void v65(); virtual void v66(); virtual void v67();
+    virtual void v68(int a);
+    virtual void v69(); virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74();
+    virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+    virtual void v79(int a, int b);
 };
 /* Data after the vptr (the vptr sits behind the data of the class that introduces the virtuals). */
 class UiS : public UiV {
@@ -304,21 +325,26 @@ UiS* fn_800C8060(UiS* p);
 struct Ui800B555C {
     int m0;
     int m4;
-    char pad8[0x4E8 - 8];
+    char pad8[0x4E8 - 0x8];
     void* m4E8;
     char pad4EC[0x518 - 0x4EC];
     int m518;
     char pad51C[0x520 - 0x51C];
     int m520;
     int m524;
-    char pad528[0x560 - 0x528];
+    char pad528[0x530 - 0x528];
+    int m530;
+    char pad534[0x560 - 0x534];
     int m560;
-    char pad564[0x564 - 0x564];
     int m564;
     int m568;
     char pad56C[0x570 - 0x56C];
     int m570;
-    char pad574[0x650 - 0x574];
+    char pad574[0x588 - 0x574];
+    int m588;
+    int m58C;
+    int m590;
+    char pad594[0x650 - 0x594];
     int m650;
 };
 void* operator new(unsigned int size, int heap);
