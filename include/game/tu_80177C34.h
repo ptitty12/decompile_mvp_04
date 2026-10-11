@@ -72,6 +72,11 @@ struct Unk80178BBC_T {
     Unk80178BBC_Entry m134[2];
     int m14C;
 };
+struct Unk80177C34_X {
+    char pad0[0x40];
+    void* m40;
+};
+void fn_80177900(void* self, void* a);
 void fn_80179784(void* p);
 void fn_8017946C(Unk80177C34_Sub* p);
 void fn_801797A4(void* p);

@@ -6,6 +6,14 @@
 
 extern char lbl_8065FBC8[];
 
+void fn_80177C34(Unk80177C34_X* p, void* a)
+{
+    if (a != p->m40) {
+        fn_80177900(p, p->m40);
+        p->m40 = a;
+    }
+}
+
 class Unk80178A64 {
 public:
     virtual ~Unk80178A64();
@@ -218,6 +226,24 @@ int fn_80179284(Unk80179284_T* p, Unk80179284_Ctx* ctx)
         }
     }
     return 0;
+}
+
+void fn_8017940C(Unk80177C34_Sub* p, int v)
+{
+    if (v != 0) {
+        int i = 0;
+        while (i <= 0x18) {
+            int cur = p->m20[i];
+            if (v == cur) {
+                break;
+            }
+            if (cur == 0) {
+                p->m20[i] = v;
+                break;
+            }
+            i++;
+        }
+    }
 }
 
 int fn_80179464()
