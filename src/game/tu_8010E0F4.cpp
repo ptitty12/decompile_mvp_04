@@ -33,6 +33,7 @@ extern const char* lbl_8061B3E0[];
 extern const char lbl_805BFA5C[];
 extern const char lbl_805BFA70[];
 extern const char lbl_806508D0[];
+extern const char lbl_805BE234[];
 extern const char lbl_805BA760[];
 extern const char lbl_805BC19C[];
 extern const char lbl_805BAF40[];
@@ -52,6 +53,11 @@ void fn_800EC648(Scr* self, int a, int b, int c, int d, int e, int f, int g, int
 void fn_801142C4(Scr* self);
 void fn_8011415C(Scr* self);
 void fn_800ED254(Scr* self);
+int fn_8006BC74(void* p);
+int fn_801059E4();
+int fn_8017E030(UnkGameP700* a, int b, int c);
+void fn_8010F2CC(Scr* self);
+int fn_8010EAF4(Scr* self);
 void fn_8010F9CC(Scr* self, int a);
 void fn_8012E1C4(Unk800C7B40_Widget* w, int a, int b);
 void fn_8010FFD8(int a, Scr* b);
@@ -71,7 +77,9 @@ int fn_8010E83C(Scr* self, int a);
 int fn_8010E8F0(Scr* self, int a);
 int fn_8010E998(Scr* self, int a);
 int fn_8010EA4C(Scr* self, int a);
+int fn_8010EAF4(Scr* self);
 void fn_8010EF84(Scr* self);
+void fn_8010F1E4(Scr* self);
 void fn_8010F290(Scr* self);
 void fn_8010F494(Scr* self, int a);
 int fn_8010F4D4(int a, int b);
@@ -224,10 +232,39 @@ int fn_8010EA4C(Scr* self, int a)
     return 1;
 }
 
+int fn_8010EAF4(Scr* self)
+{
+    int r27 = 0;
+    UnkGame* g = fn_8011AA24(0);
+    UnkGameP700* p700 = g->m700;
+    int t = fn_8017E030(p700, fn_801059E4(), 0);
+    UnkGameP6F8* p = g->m6F8;
+    int x = fn_800B555C()->m570 ^ ((int*)&p->m10->m6C)[self->m168];
+    int c = x == 0;
+    if (self->m144 != 3 && self->m144 != 6 && self->m144 != 7)
+        r27 = 1;
+    int f = 0;
+    if ((unsigned)(t - 1) <= 1 || fn_8006BC74(p) != 0)
+        f = 1;
+    int r = 0;
+    if (c != 0 && (r27 != 0 || f != 0))
+        r = 1;
+    return r;
+}
+
 void fn_8010EF84(Scr* self)
 {
     fn_8010EFD0(self, lbl_80687CB8.m0, 0);
     fn_8010EFD0(self, lbl_80687CB8.m8, 1);
+}
+
+void fn_8010F1E4(Scr* self)
+{
+    self->m168 = self->m168 == 0;
+    int v = fn_8011AA24(0)->m6F8->m14->rec[self->m168].m198;
+    UnkSub* s = (UnkSub*)((char*)fn_800C8054(self->fn_vslot32(lbl_805BE234, 1)) + 0x98);
+    s->fn_vslot20(v, 0);
+    fn_8010F2CC(self);
 }
 
 void fn_8010F290(Scr* self)
@@ -244,6 +281,7 @@ void fn_8010F494(Scr* self, int a)
 }
 
 /* near-miss: the case 6/7 tails and the compare chain order differ from retail (switch layout). */
+
 int fn_8010F4D4(int a, int b)
 {
     switch (b) {
@@ -274,6 +312,7 @@ void fn_8010F550(Scr* self)
 }
 
 /* near-miss: retail stores m158 first and m168 last; the scheduler hoists m168 here (tried all positions of those two). */
+
 void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -291,6 +330,7 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
 }
 
 /* near-miss: 2 slots; retail loads the fn_8040B830 arguments as lis r4, li r5, addi r4, mr r3 (name pointer last). */
+
 int fn_8010FE70(Scr* self, int a)
 {
     if (fn_800B555C()->m570 == a) {
@@ -318,6 +358,7 @@ int fn_8010FE70(Scr* self, int a)
 }
 
 /* near-miss: same argument-order difference as fn_8010FE70 (name pointer copied last in retail). */
+
 void fn_8010FFD8(int a, Scr* b)
 {
     if (a == 1) {
