@@ -1324,6 +1324,17 @@ void fn_800B5364();
 void fn_800FCB38(UiObj* self, int* m);
 void fn_800FCD0C(UiObj* self, int* m);
 
+void fn_802DC9C0();
+int fn_8011AA4C();
+void fn_80124FA8(UiObj* self);
+void fn_800F96E0(UiObj* self);
+void fn_800F988C(UiObj* self);
+
+void fn_800F8698(UiObj* self);
+void fn_800F8AD8(UiObj* self);
+
+void fn_801268C4(UiObj* o, Ui6F8* p, int a, int b, int c, int d, int e, int f, void (*cb)(), int g, int h, int i, int j, int k, int l);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -1389,5 +1400,6 @@ void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(UiObj*, UiObj*), int a, int b
 int fn_800C8060(int a);
 void fn_80100A98(UiWM* self, int a, int b);
 void fn_800F84F4(UiObj* self);
+void fn_8010D258();
 
 #endif

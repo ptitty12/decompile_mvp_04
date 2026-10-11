@@ -364,6 +364,34 @@ UiScrRaw* fn_800F8350(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+extern char lbl_805BA6D0[];
+void fn_800F83A8(UiV_134i* self)
+{
+    fn_800ECF18(self);
+    fn_802DC9C0();
+    lbl_8061B8C0->m24 = 1;
+    fn_802D7ADC();
+    UiObj* o = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    fn_80124FA8(o, self);
+    fn_801251CC(o, 0, 0x1A0A, 0);
+    fn_800C80C0(o, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
+    int k = fn_8011AA4C();
+    self->m134 = k;
+    switch (k) {
+    case 5:
+        fn_800F8698(self);
+        break;
+    case 6:
+        fn_800F8AD8(self);
+        break;
+    }
+    if (lbl_806192E0->m4->m10->m120 == 1) {
+        self->v8(0);
+        self->v67(0, fn_800B555C()->m570);
+    }
+}
+
 void fn_800F84F4(UiV_134i* self)
 {
     switch (self->m134) {
