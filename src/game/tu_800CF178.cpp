@@ -227,19 +227,19 @@ extern "C" void fn_800CFE84(Unk800CFB88_List* l)
 
 extern const char lbl_8065A370[];
 
-extern "C" void fn_800CFEEC(Unk800CFEEC_Raw* s, int flag)
+void Unk800CFEEC_Raw::fn_800CFEEC(int flag)
 {
-    s->m24 = lbl_8065A370;
-    s->m0 = 0;
-    s->m4 = 0;
-    s->mC = 0;
-    s->b0 = flag;
-    s->b1 = 0;
-    s->b2 = 1;
-    s->b3 = 0;
-    s->m20 = 0;
+    m24 = lbl_8065A370;
+    m0 = 0;
+    m4 = 0;
+    mC = 0;
+    b0 = flag;
+    b1 = 0;
+    b2 = 1;
+    b3 = 0;
+    m20 = 0;
     for (int i = 0; i < 4; i++)
-        s->m10[i] = 0;
+        m10[i] = 0;
 }
 
 extern "C" void fn_800CFF48(Unk800CFEEC_Data* c, int i)

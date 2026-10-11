@@ -513,6 +513,7 @@ struct Unk800CFEEC_Data {
 };
 struct Unk800CFEEC_Raw : Unk800CFEEC_Data {
     const void* m24;
+    void fn_800CFEEC(int flag);
 };
 struct Unk800CFEEC_Sel : Unk800CFEEC_Data {
     virtual int fn_vslot1();
@@ -528,7 +529,7 @@ struct Unk800CFEEC_Sel : Unk800CFEEC_Data {
     virtual void fn_vslot11();
     virtual void fn_vslot12();
     virtual int fn_vslot13();
-    virtual void fn_vslot14();
+    virtual void fn_vslot14(int a);
     virtual void fn_vslot15();
 };
 
@@ -540,6 +541,7 @@ Unk800D244C_Vec4 fn_802B0ACC(void* obj, const char* name);
 Unk800D244C_Vec4 fn_8014DBA0(int r, int g, int b, int a);
 }
 int fn_800E1990(int id);
+extern "C" double fn_80410634(double x);
 
 /* Two-button list selector: count m40, selected index m44, step widgets m48/m4C (fn_800D0F18 family). */
 struct Unk800D0F18_Obj : Unk800C7B40_Widget {
@@ -623,20 +625,28 @@ void fn_800C7EE8(Unk800C7B40_Widget* w);
 /* Selector-list widget: name buffer at +0x4A, flag word at +0x68, a Sel sub-object at +0x98 (its
  * vptr at +0xBC), five-byte names from +0xC0, id table at +0x17C, current value at +0x210. */
 struct Unk800D2338_Obj : Unk800C7B40_Widget {
-    char* m40;
-    int m44;
-    char pad48[2];
+    char m40[5];
+    char m45[5];
     char m4A[5];
-    char pad4F[0x15];
+    char pad4F[1];
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
     int m64;
     int b68_0 : 1;
     int b68_1 : 1;
     int b68_2 : 1;
-    int rest68 : 29;
+    int b68_3 : 1;
+    int b68_4 : 1;
+    int b68_5 : 1;
+    int rest68 : 26;
     char pad6C[0x10];
     int m7C;
     Unk800D244C_Vec4 m80;
-    char pad90[0x8];
+    float m90;
+    char pad94[4];
     char pad98[0x28];
     char mC0[0xBC];
     int m17C[0x20];
@@ -645,6 +655,8 @@ struct Unk800D2338_Obj : Unk800C7B40_Widget {
 };
 extern "C" {
 void fn_800D24A4(Unk800D2338_Obj* o);
+void fn_800C8118(Unk800D2338_Obj* o, Unk800D2338_Obj* a, Unk800D2338_Obj* b, float t);
+void fn_800D2614(Unk800D2338_Obj* o, float f);
 void fn_800D1D5C(Unk800D2338_Obj* o);
 void fn_800D2338(Unk800D2338_Obj* o, const char* name, int flag);
 int fn_800C8070(Unk800C7B40_Data* w);
@@ -653,6 +665,7 @@ int fn_800B548C(int id);
 void fn_804031BC(char* dst);
 int fn_804089B4(char* dst, const char* fmt, ...);
 int fn_8040B6A0(const char* s); /* behaves like strlen */
+char* fn_8040B61C(char* dst, const char* src); /* behaves like strcpy */
 int fn_80408A94(const char* s, const char* fmt, ...); /* behaves like sscanf */
 }
 int fn_800E1AC8(int id);
@@ -1152,6 +1165,49 @@ struct Unk800C1BE4_Widget : Unk800C7B40_Data {
     virtual void fn_vslot125(int a, int b, int c, int d, int e);
     virtual void fn_vslot126();
     virtual void fn_vslot127();
+};
+
+inline void* operator new(unsigned int, void* p)
+{
+    return p;
+}
+/* Widget whose constructor chain is fn_800D1758 -> fn_800D26C8 -> fn_800D30D4 / fn_800D3168. */
+struct Unk800D26C8_Raw : Unk800D1614_Raw {
+    char pad58[0x18];
+    int m70;
+    int m74;
+    char pad78[0x20];
+    Unk800CFEEC_Raw m98;
+    char padC0[0x150];
+    int m210;
+};
+extern char lbl_805B6F58;
+extern const char lbl_80658188[];
+extern const char lbl_80658248[];
+extern const char lbl_80657308[];
+extern const char lbl_806573C8[];
+extern const char lbl_80657078[];
+extern "C" {
+Unk800D26C8_Raw* fn_800D1758(Unk800D26C8_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                             int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, float f1, float f2);
+Unk800D26C8_Raw* fn_800D26C8(Unk800D26C8_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                             int s2, int s3, int s4, int s5, float f1, float f2);
+}
+
+struct Unk800D1CA4_Tbl {
+    const char* v[19];
+};
+extern const Unk800D1CA4_Tbl lbl_805BC8F0 __attribute__((aligned(4)));
+
+/* Widget with a name pointer at +0x40 and an id at +0x44 (fn_800D3EAC); flag word at +0x68 as in Unk800D2338_Obj. */
+struct Unk800D3EAC_Obj : Unk800C7B40_Widget {
+    char* m40;
+    int m44;
+    char pad48[0x20];
+    int b68_0 : 1;
+    int b68_1 : 1;
+    int b68_2 : 1;
+    int rest68 : 29;
 };
 
 #endif
