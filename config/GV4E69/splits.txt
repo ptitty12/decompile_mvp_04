@@ -54,6 +54,9 @@ db/tu_805495DC.cpp:
 db/tu_8054CBBC.cpp:
 	.dboverlay  start:0x8054CBBC end:0x8054FA04
 
+db/tu_8054FA04.cpp:
+	.dboverlay  start:0x8054FA04 end:0x80554628
+
 fe/tu_8043FDC0.cpp:
 	.feoverlay  start:0x8043FDC0 end:0x804439E4
 
