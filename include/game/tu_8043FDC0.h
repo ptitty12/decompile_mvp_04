@@ -291,6 +291,52 @@ void fn_80448D68(int a, FeScr_80447264* self);
 }
 
 
+
+/* Member object of a widget (at +0x98 or +0xDC) with its own vptr at +0x24 of the member (the
+ * widget's +0xBC / +0x100). Reach it with ((FeSub*)&w->mDC)->sN(): a fresh cast at every use. */
+class FeSub {
+public:
+    char pad0[0x24];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual int s18();
+    virtual int s19();
+    virtual int s20();
+    virtual int s21();
+    virtual int s22();
+    virtual int s23();
+    virtual int s24();
+    virtual int s25();
+    virtual int s26();
+    virtual int s27();
+    virtual int s28();
+    virtual int s29();
+    virtual int s30();
+};
+struct FeHolder {
+    char pad0[0x98];
+    FeSub m98;
+    char padC0[0xDC - 0xC0];
+    FeSub mDC;
+};
+extern "C" void fn_800D0074(FeSub* s, int v, int f);
+extern "C" int fn_800C8070(void* o);
+
 /* Roster-popup screen family (ctor fn_8044974C). */
 struct FeScrRawL {
     char pad0[0x3C];
@@ -309,19 +355,27 @@ struct FeScr_8044974C : FeObj {
     FeObj* m140;
     FeObj* m144;
     FeObj* m148;
-    int m14C;
-    int m150;
-    int m154;
-    int m158;
+    FeHolder* m14C;
+    FeHolder* m150;
+    FeHolder* m154;
+    FeHolder* m158;
     int m15C;
-    int m160;
+    FeObj* m160;
     int m164;
     FeObj* m168;
     int m16C;
     int m170;
     int m174;
+    char pad178[0x240 - 0x178];
+    int m240;
 };
 extern "C" {
+void fn_8044BF38(FeScr_8044974C* self, int a);
+void fn_8044C128(FeScr_8044974C* self, int a);
+int fn_8044C48C(FeScr_8044974C* self);
+void fn_8044B5F0(FeScr_8044974C* self, int a);
+void fn_8044ADA4(FeScr_8044974C* self);
+void fn_8044B79C(FeScr_8044974C* self);
 void fn_8044B050(FeScr_8044974C* self);
 void fn_8044AD04(FeScr_8044974C* self);
 void fn_8044B454(FeScr_8044974C* self, int a);
@@ -354,4 +408,24 @@ struct FeMeterRaw {
     int m2F4, m2F8, m2FC, m300, m304, m308, m30C;
 };
 extern "C" FeMeterRaw* fn_800EC150(FeMeterRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
+
+struct Unk8007F198_C;
+int fn_8007FDA8(Unk8007F198_C* s, int a, int b);
+extern int lbl_8062163C;
+struct FeX24 {
+    char pad0[0x24];
+    FeObj* m24;
+};
+struct FeW138 : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObj* m138;
+};
+struct FeW188 : FeObj {
+    char pad40[0x188 - 0x40];
+    FeObj* m188;
+};
+struct FeX14 {
+    char pad0[0x14];
+    int m14;
+};
 #endif
