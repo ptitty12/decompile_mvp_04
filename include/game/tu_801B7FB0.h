@@ -153,7 +153,9 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char pad390[0x60];
     float m3F0;
     float m3F4;
-    char pad3F8[0x54];
+    char pad3F8[0x40];
+    float m438;
+    char pad43C[0x10];
     Unk801B7FB0_P* m44C;
     char pad450[0x8];
     int m458;

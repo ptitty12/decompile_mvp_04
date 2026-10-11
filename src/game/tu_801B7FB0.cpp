@@ -3,6 +3,8 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801B7FB0.h"
+#include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_8027C728.h"
 
 typedef Unk801B7FB0_P P;
 typedef Unk801B7FB0_Ump U;
@@ -39,6 +41,34 @@ int fn_801C0478(A* a);
 void fn_801BAAC8(A* a);
 }
 
+/* Goal storage at goal+0x18 (full layout in goals/tu_80287600.h, which declares the
+ * vector below const; retail reloads it after calls, so only the method is declared). */
+class Unk80287D70 {
+public:
+    Unk80287D70* fn_80287DB8(int kind);
+};
+inline Vec3& L() { return (Vec3&)lbl_806055AC; }
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" Unk8027C728_Goal* fn_802448F4(P* p, int k);
+void fn_80299B98(P* p, const Vec3* pos, float* ang);
+float fn_80410CE8(float y, float x);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
+struct Unk801B7FB0_Tbl {
+    Vec3 v[2][4];
+};
+extern Unk801B7FB0_Tbl lbl_805CF9E4;
+extern "C" int fn_801B6A44(void);
+extern "C" void fn_801B8DF8(P* p, int a);
+extern "C" void fn_801B913C(U* u, const Vec3* pos, int k);
 extern int lbl_8061CB78;
 extern int lbl_8061CB7C;
 extern float lbl_8061CB84;
@@ -117,6 +147,8 @@ extern "C" void fn_801B8248(P* p, const Vec3* a)
     p->mB80 = 1.0f;
 }
 
+/* near-miss: retail loads the int argument (lwz r4) before the three lis for the float
+ * constants and the format string; the scheduler here puts it after. */
 extern "C" void fn_801B82AC(P* p, const Vec3* a, P* q, int flag)
 {
     Unk801B7FB0_Sub58C* s = &q->m58C;
@@ -168,6 +200,18 @@ extern "C" void fn_801B8514(P* p)
     fn_801B9620(p->mB88, &v, 0xF);
 }
 
+extern "C" void fn_801B8D1C(P* p, int a)
+{
+    int r = fn_801B6A44();
+    if (r == 2) {
+        fn_801B8DF8(p, a);
+        return;
+    }
+    Unk801B7FB0_Tbl tbl = lbl_805CF9E4;
+    Vec3 v = tbl.v[a][r];
+    fn_801B913C(p->mB88, &v, 1);
+}
+
 extern "C" void fn_801B9004(P* p) { p->mB88->m0 = 0; }
 extern "C" void fn_801B9014(U* u, P* p) { u->m4 = p; }
 extern "C" void fn_801B901C(U* u)
@@ -200,6 +244,68 @@ extern "C" void fn_801B905C(U* u)
                 o2->mB80 = 1.0f;
         }
     }
+}
+
+extern "C" void fn_801B913C(U* u, const Vec3* pos, int k)
+{
+    int two = 2;
+    int ten = 0xA;
+    float ang = fn_80410CE8(L().x - pos->x, L().z - pos->z);
+    fn_80299B98(u->m4, pos, &ang);
+    Unk8027C728_Goal* g = fn_802448F4(u->m4, 1);
+    g->m10 = two;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    fn_8027C728(g);
+    Unk8027A84C* b = (Unk8027A84C*)((Unk80287D70*)g->m18)->fn_80287DB8(0xF);
+    Vec3 v = L() - *pos;
+    b->fn_8027A898(&v);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = two;
+    g104->m38 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = two;
+    g104->m34 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+    g104->m40 = ten;
+    fn_8027D33C(g);
+}
+
+extern "C" void fn_801B9258(U* u)
+{
+    int two = 2;
+    int ten = 0xA;
+    Unk8027C728_Goal* g = fn_802448F4(u->m4, 1);
+    g->m10 = two;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    fn_8027C728(g);
+    Unk8027A84C* b = (Unk8027A84C*)((Unk80287D70*)g->m18)->fn_80287DB8(0xE);
+    Vec3 v = L() - u->m4->m60;
+    b->fn_8027A898(&v);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = two;
+    g104->m38 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = two;
+    g104->m34 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+    g104->m40 = ten;
+    fn_8027D33C(g);
+}
+
+extern "C" void fn_801B9348(U* u)
+{
+    int two = 2;
+    int ten = 0xA;
+    Unk8027C728_Goal* g = fn_802448F4(u->m4, 1);
+    g->m10 = two;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    fn_8027C728(g);
+    Unk8027A84C* b = (Unk8027A84C*)((Unk80287D70*)g->m18)->fn_80287DB8(0xF);
+    Vec3 v = L() - u->m4->m60;
+    b->fn_8027A898(&v);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = two;
+    g104->m38 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = two;
+    g104->m34 = two;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+    g104->m40 = ten;
+    fn_8027D33C(g);
 }
 
 extern "C" void fn_801B979C(U* u, P* p)
