@@ -4,6 +4,41 @@
  */
 #include "game/tu_801FA73C.h"
 
+struct Unk801FAFD0_Rec {           /* stride 0x5C, G+0x6B8 */
+    char pad0[0x50];
+    float m50;
+    char pad54[0x5C - 0x54];
+};
+
+struct Unk801FAFD0_G {
+    void* m0;                      /* owner */
+    char pad4[0x6B8 - 4];
+    Unk801FAFD0_Rec m6B8[10];
+    char padA50[0x3A64 - 0xA50];
+    int m3A64;
+};
+
+struct Unk801FAFD0_Scr {
+    Unk801FAFD0_G* m0;
+};
+
+struct Unk801FAFD0_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+extern const float lbl_805D5068;
+
+extern "C" {
+void fn_8014E09C(Unk801FAFD0_It* it, void* owner, int k);
+void fn_8014E108(Unk801FAFD0_It* it);
+void fn_80212A28(int g, int a, int b, int c, int d, float f);
+}
+
 extern float lbl_805D506C;
 extern float lbl_805D5070;
 extern float lbl_805D5074;
@@ -39,6 +74,22 @@ extern float lbl_805D50E8;
 extern float lbl_805D50EC;
 
 extern "C" {
+
+void fn_801FAFD0(Unk801FAFD0_Scr* p)
+{
+    Unk801FAFD0_It it;
+    fn_8014E09C(&it, p->m0->m0, 1);
+    Unk801FAFD0_It* ip = &it;
+    while (ip->m8 != 10) {
+                Unk801FAFD0_Rec* e = &p->m0->m6B8[ip->m8];
+        if (!(e->m50 <= lbl_805D5068)) {
+            fn_80205450((Unk801FA73C_List*)p->m0, ip->m8);
+            fn_80212A28(p->m0->m3A64, 1, 0, 2, 3, e->m50);
+        }
+        e->m50 = lbl_805D5068;
+        fn_8014E108(ip);
+    }
+}
 
 void fn_801FB084(Unk801FA73C_Scr* p)
 {
