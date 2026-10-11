@@ -12,7 +12,9 @@ extern Unk80089894_Pmf lbl_805B6BA8[];
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 void fn_80071604(void* self);
 void fn_80071688(void* self, int flags);
-void fn_80071E2C(void* self);
+/* fn_80071E2C is the base-class version of these functions: it takes the same
+ * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
+void fn_80071E2C(void* self, int a, void* obj);
 void* fn_8007366C(const char* a, const char* b);
 void fn_8040074C(void* p, int n);
 extern char lbl_805B3B4C[];
@@ -53,12 +55,10 @@ extern Unk80089894_Pmf lbl_805B6C18[];
 
 void fn_80089894(Unk80089894_K<Unk80089894_T14>* self, unsigned i);
 float fn_80089E48(Unk80089894_Obj* o, int i, int a);
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28 (self, a, obj here). */
 void fn_8008AAA8(Unk80089894_K<Unk80089894_T14>* self, int a, Unk80089894_VObj* obj);
 Unk80089894_K<Unk80089894_TC>* fn_8008AB04(Unk80089894_K<Unk80089894_TC>* self);
 void fn_8008AB80(Unk80089894_K<Unk80089894_TC>* self, int flags);
 void fn_8008ABDC(Unk80089894_K<Unk80089894_TC>* self, unsigned i);
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28 (self, a, obj here). */
 void fn_8008B1F8(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj);
 Unk80089894_K<Unk80089894_TC>* fn_8008B254(Unk80089894_K<Unk80089894_TC>* self);
 void fn_8008B2D0(Unk80089894_K<Unk80089894_TC>* self, int flags);
@@ -68,13 +68,11 @@ float fn_8008BC94();
 float fn_8008BD5C();
 float fn_8008BD68();
 float fn_8008BD74();
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28 (self, a, obj here). */
 void fn_8008BD80(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj);
 Unk80089894_K<Unk80089894_TC>* fn_8008BDDC(Unk80089894_K<Unk80089894_TC>* self);
 void fn_8008BE58(Unk80089894_K<Unk80089894_TC>* self, int flags);
 void fn_8008BEB4(Unk80089894_K<Unk80089894_TC>* self, unsigned i);
 float fn_8008C0DC(Unk80089894_Obj* o, int i, int a);
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28 (self, a, obj here). */
 void fn_8008CA9C(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj);
 Unk80089894_K<Unk80089894_T3C>* fn_8008CAF8(Unk80089894_K<Unk80089894_T3C>* self);
 void fn_8008CB74(Unk80089894_K<Unk80089894_T3C>* self, int flags);
@@ -198,7 +196,7 @@ float fn_80089E48(Unk80089894_Obj* o, int i, int a)
 
 void fn_8008AAA8(Unk80089894_K<Unk80089894_T14>* self, int a, Unk80089894_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80089894_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0x14);
 }
@@ -252,7 +250,7 @@ unsigned fn_8008AC94(Unk80089894_PackTab* self, unsigned t, unsigned i)
 
 void fn_8008B1F8(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80089894_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0xC);
 }
@@ -313,7 +311,7 @@ float fn_8008BD74()
 
 void fn_8008BD80(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80089894_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0xC);
 }
@@ -354,7 +352,7 @@ float fn_8008C0DC(Unk80089894_Obj* o, int i, int a)
 
 void fn_8008CA9C(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80089894_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0xC);
 }

@@ -51,7 +51,6 @@ typedef Unk8007FF8C_W W;
 unsigned fn_8007F198(void* self, int a);
 int fn_8007F24C(void* self, int a, int i);
 int fn_8007A6A0(void* self, int x, int v);
-int fn_8007A6A0(void* self, int x);
 void fn_8007A808(void* self, int x, int b, int v);
 int fn_8007AA10(void* self, int b);
 extern int lbl_805B62C8[];
@@ -82,7 +81,9 @@ extern char lbl_805B40B8[];
 
 
 
-void fn_80071E2C(I* self);
+/* fn_80071E2C is the base-class version of these functions: it takes the same
+ * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
+void fn_80071E2C(I* self, int a, Unk8007FF8C_VObj* obj);
 extern float lbl_805B40D0;
 
 /* Entry of the vtable behind Unk8007FF8C_I::m20 at +0x28: a this-adjustment
@@ -103,7 +104,7 @@ static inline int CallSlot(I* self, int k, int a)
 void fn_80096AB4(void* p);
 void fn_80096C10(void* p);
 void fn_8009C398(void* p);
-void fn_800999CC(void* p, int v);
+void fn_800999CC(void* p, int v, int q); /* indexes +0x17C with r5 */
 void fn_80082034(Y* self);
 extern float lbl_805B40D4;
 
@@ -331,10 +332,10 @@ int fn_800802B8(void* self, int a, int x)
     return x;
 }
 
-/* near-miss: same code; retail keeps a, b and the level in r28, r30, r29. */
+/* fn_8007A6A0 reads r5 (its third argument): b is passed through. */
 void fn_80080374(void* self, int a, int b)
 {
-    int lvl = fn_8007A6A0(self, 4);
+    int lvl = fn_8007A6A0(self, 4, b);
     if (fn_8008021C(self, a, b, lvl)) {
         int n = fn_800802B8(self, a, lvl);
         fn_8007A808(self, 4, b, n);
@@ -471,10 +472,9 @@ float fn_80080A08(I* self, int arg)
     return r;
 }
 
-/* near-miss: same code, but retail keeps self, obj and a in r29, r30, r28. */
 void fn_80080B3C(I* self, int a, Unk8007FF8C_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk8007FF8C_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 4);
 }
@@ -624,13 +624,13 @@ int fn_80081B60(Y* self)
     return 0;
 }
 
-/* near-miss: r29/r30 are swapped for tab and q, one extra lwz. */
+/* fn_800999CC indexes sub+0x17C with r5: q is passed through. */
 void fn_80081BA8(Y* self, int p, int q, int v)
 {
     char* sub = (char*)self + p * 0xE64;
     char* tab = sub + 0x17C;
     int old = (unsigned char)tab[q];
-    fn_800999CC(sub, v);
+    fn_800999CC(sub, v, q);
     if ((unsigned char)tab[q] == v) {
         int f = 0;
         if (self->z0.m8 != 0)
@@ -641,7 +641,8 @@ void fn_80081BA8(Y* self, int p, int q, int v)
             do {
                 if (fn_80081CF8(self, k)->m0 == old) {
                     int m4 = fn_80081CF8(self, it.i)->m4;
-                    fn_80081C94(self, it.i, v, fn_80081CF8(self, it.i)->m1, m4);
+                    int m1 = fn_80081CF8(self, it.i)->m1;
+                    fn_80081C94(self, it.i, v, m1, m4);
                 }
                 k = it.Next();
             } while (k <= 3);

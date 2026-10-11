@@ -123,7 +123,7 @@ void fn_80039C20(Unk80038570* s);
 void fn_80039F04(Unk80038570* s);
 void fn_80039F24();
 int fn_80039D38(Unk80038570* s, int i);
-void fn_80039DBC(Unk80038570* s, int* p);
+void fn_80039DBC(Unk80038570* s, int i); /* reads i from r4 (tu_80039B04.cpp) */
 void fn_80306AC0(int a, int b);
 void fn_803BA7C4(void* tbl, int* v);
 int fn_80039178(Unk80038570* s);

@@ -46,3 +46,4 @@
   - Incidents: a merge tool bug (stale pad name) and duplicate global __tcf_N names each broke the link checksum before push; both caught by the gate, fixed (tools updated), nothing bad reached main.
   - Not linkable yet: unity-TU parts; real TUs pending linkonce/rodata-pool questions (DECISIONS).
   | Owner: verify.py allowlist bug still open (DECISIONS); W2 (80 SDK functions) waits on it.
+- 2026-10-11 | Claude Opus 5.5 (hard-case matcher, work/opus-families) | game/tu_8007FF8C, tu_80084910, tu_80089894, tu_8008CE64, tu_80037250 | matched 25: the vcall family (10, pass-through arguments to fn_80071E2C), fn_80080374, fn_800393B0 and fn_80081BA8 (same mechanism), and the CSV loader family (12, pointer locals) | Trace wrappers family B with K != 0 and N == 0 (17 functions) stay open: mechanism found (sched1 adjust_priority), but no zero-cost source; see docs/NEARMISS.md | none
