@@ -1388,6 +1388,43 @@ struct Ui6F8_10b {
     int a6C[8];
 };
 
+struct Ui72F0 {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    float m134;
+    char pad138[0x140 - 0x138];
+    int m140;
+    char pad144[0x14C - 0x144];
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    int m170;
+    int m174;
+    int m178;
+    int m17C;
+    int m180;
+    int m184;
+    int m188;
+    int m18C;
+    char pad190[0x194 - 0x190];
+    int m194;
+    int m198;
+    int m19C;
+    char pad1A0[0x1A4 - 0x1A0];
+    int m1A4;
+    char pad1A8[0x1AC - 0x1A8];
+    int m1AC;
+};
+void fn_800EC648(Ui72F0* self, int a, int b, int c, int d, int e, int f, int g, int h);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);

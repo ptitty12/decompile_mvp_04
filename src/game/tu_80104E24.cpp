@@ -332,6 +332,41 @@ int fn_80107294(UiScr134* self, int a)
     return 1;
 }
 
+/* near-miss: ascending field order; the scheduler places the 0x188 store ahead of the 0x18C one, retail has it last */
+extern char lbl_8065B3E8[];
+extern float lbl_805BF798;
+Ui72F0* fn_801072F0(Ui72F0* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_8065B3E8;
+    self->m130 = 0;
+    self->m134 = lbl_805BF798;
+    self->m140 = 0;
+    self->m14C = 0;
+    self->m150 = 0;
+    self->m154 = 0;
+    self->m158 = 0;
+    self->m15C = 0;
+    self->m160 = 0;
+    self->m164 = 0;
+    self->m168 = 0;
+    self->m16C = 0;
+    self->m170 = 0;
+    self->m174 = 0;
+    self->m178 = 0;
+    self->m17C = 0;
+    self->m180 = 0;
+    self->m184 = 0;
+    self->m188 = 0;
+    self->m18C = 0;
+    self->m194 = 0;
+    self->m198 = 0;
+    self->m19C = 0;
+    self->m1A4 = 0;
+    self->m1AC = 0;
+    return self;
+}
+
 int fn_8010750C(UiScr8010750C* self, int a)
 {
     if (fn_800B555C()->m570 == a || self->m14C != 0)
