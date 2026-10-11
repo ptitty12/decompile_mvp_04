@@ -342,7 +342,6 @@ void fn_80125C84(Unk80126064_Scr* self, int a)
     fn_800C8038(fn_800C8044(self->m140)->fn_vslot32(lbl_805C0418, 1))->fn_vslot8(a);
 }
 
-/* near-miss: store scheduling of the leading constant stores differs (same stores). */
 
 int fn_80126034()
 {
@@ -355,11 +354,6 @@ void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int 
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->SetVptr(lbl_8064DB50);
-    self->m180 = 5;
-    self->m184 = 2;
-    self->m18C = 0;
-    self->m198 = -1;
-    self->m194 = 1;
     self->m130 = 0;
     self->m134 = 0;
     self->m138 = 0;
@@ -379,6 +373,11 @@ void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int 
     self->m17C = 5;
     self->m188 = 0;
     self->m190 = 1;
+    self->m180 = 5;
+    self->m184 = 2;
+    self->m18C = 0;
+    self->m198 = -1;
+    self->m194 = 1;
     return self;
 }
 
