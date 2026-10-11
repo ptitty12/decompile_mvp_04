@@ -78,6 +78,15 @@ void fn_800FF224(UiV_8_2Ci* self)
     self->m8->v79(0, 0);
 }
 
+int fn_800FF494(UiWM* self, int a)
+{
+    if ((UiObj*)a == self->m8) {
+        self->w6(fn_8011AA24(0), self->m0->m2AC);
+        return 1;
+    }
+    return 0;
+}
+
 int fn_800FF590(UiPtr0* self)
 {
     return self->m0->m2AC;
@@ -131,7 +140,95 @@ void fn_801006B0(UiV_24i* self, int a)
     fn_80100744(self);
 }
 
-void fn_80100A08(UiV_30b* self)
+void fn_801006D4(UiV_20i_24i_28i_2Ci* self, int idx)
+{
+    Ui3C4* q = fn_8011AA24(0)->m700->m3C4;
+    self->m28 = q->a48[idx];
+    self->m2C = q->a50[idx];
+    self->m20 = q->a38[idx];
+    self->m24 = q->a40[idx];
+}
+
+void fn_80100A08(UiV_30b* self, int a)
 {
     self->m30->v8();
+}
+
+void fn_80100A40(UiWM* self, int a)
+{
+    self->m4->v8();
+    fn_80100A08((UiV_30b*)((char*)self->m0 + 0x270), a);
+}
+
+extern int lbl_805BF008[][2];
+void fn_80100B38(UiWM* self)
+{
+    int row = self->m8->v60();
+    fn_80100644((UiV_28i*)((char*)self->m0 + 0x270), lbl_805BF008[row][self->m14]);
+}
+
+/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
+extern int lbl_805BF008[][2];
+void fn_80100BA4(UiWM* self)
+{
+    fn_80100A98(self);
+    int cur = self->m10->a48[self->m0->m2AC];
+    for (int i = 0; i < 8; i++) {
+        if (cur == lbl_805BF008[i][self->m14]) {
+            self->m8->v68();
+            self->w13();
+            break;
+        }
+    }
+}
+
+extern int lbl_805BF048[];
+void fn_80100C58(UiWM* self)
+{
+    int row = self->m8->v60();
+    fn_80100668((UiV_2Ci*)((char*)self->m0 + 0x270), lbl_805BF048[row]);
+}
+
+extern int lbl_805BF058[][2];
+void fn_80100E00(UiWM* self)
+{
+    int row = self->m8->v60();
+    fn_8010068C((UiV_20i*)((char*)self->m0 + 0x270), lbl_805BF058[row][self->m14]);
+}
+
+/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
+extern int lbl_805BF058[][2];
+void fn_80100E6C(UiWM* self)
+{
+    fn_80100A98(self);
+    int cur = self->m10->a38[self->m0->m2AC];
+    for (int i = 0; i < 10; i++) {
+        if (cur == lbl_805BF058[i][self->m14]) {
+            self->m8->v68();
+            self->w13();
+            break;
+        }
+    }
+}
+
+extern int lbl_805BF0A8[][2];
+void fn_80100F20(UiWM* self)
+{
+    int row = self->m8->v60();
+    fn_801006B0((UiV_24i*)((char*)self->m0 + 0x270), lbl_805BF0A8[row][self->m14]);
+}
+
+/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
+extern int lbl_805BF0A8[][2];
+void fn_80100F8C(UiWM* self)
+{
+    fn_80100A98(self);
+    int cur = self->m10->a40[self->m0->m2AC];
+    for (int i = 0; i < 4; i++) {
+        if (cur == lbl_805BF0A8[i][self->m14]) {
+            self->m8->v68();
+            self->w13();
+            break;
+        }
+    }
 }
