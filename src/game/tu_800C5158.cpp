@@ -15,6 +15,8 @@ extern "C" void fn_800C5010(Unk800C341C_Mgr* m);
 extern "C" void fn_800C5080(Unk800C341C_Mgr* m);
 extern char lbl_805B6F58;
 extern "C" {
+void fn_800C5798(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w);
+void fn_800C5574(Unk800C341C_Mgr* m, int kind, const char* name, int w, float t, int flag);
 void fn_800C4F64(Unk800C341C_Mgr* m, const char* name);
 void fn_800C4FA8(Unk800C341C_Mgr* m, const char* name);
 char* fn_8040B61C(char* dst, const char* src);
@@ -40,6 +42,52 @@ extern "C" int fn_800C5158(Unk800C341C_Mgr* m, const char* name)
     return fn_800C512C(m, idx);
 }
 
+extern "C" int fn_800C519C(Unk800C341C_Mgr* m, int kind)
+{
+    int* w = (int*)m;
+    switch (kind) {
+    case 0:
+        return 0;
+    case 1:
+        return w[20];
+    case 2:
+        return w[21];
+    case 4:
+        return w[22];
+    case 5:
+        return w[24];
+    case 6:
+        return w[23];
+    case 7:
+        return w[25];
+    case 8:
+        return w[26];
+    case 10:
+        return w[27];
+    case 11:
+        return w[28];
+    case 12:
+        return w[29];
+    case 13:
+        return w[30];
+    case 14:
+        return w[31];
+    case 15:
+        return w[32];
+    case 16:
+        return w[33];
+    case 17:
+        return w[34];
+    case 18:
+        return w[35];
+    case 19:
+        return w[36];
+    case 20:
+        return w[37];
+    }
+    return 0;
+}
+
 extern "C" int fn_800C52EC(void* unused, int idx, const char* name)
 {
     char a[0x400];
@@ -49,6 +97,83 @@ extern "C" int fn_800C52EC(void* unused, int idx, const char* name)
     fn_804089B4(b, "%s|%s", lbl_8061AB80[idx], a);
     int r = fn_803FAB68(b, 1, &out);
     return r != 0;
+}
+
+extern "C" {
+int fn_800C50EC(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w);
+int fn_800C22C0(Unk800C2250_File* f, int kind, const char* name, Unk800C1BE4_Widget* w, int flag, float t);
+void fn_800C2A1C(Unk800C2250_File* f, Unk800C1BE4_Widget* w, float t);
+int fn_800C58E8(Unk800C341C_Mgr* m, int kind);
+}
+
+extern const char lbl_805BBF4C[];
+extern const float lbl_805BBF54;
+
+/* near-miss: control flow matches; saved-register order differs (retail kind=r27 name=r28 idx=r31 w=r30) and our two fn_800C2A1C tails are not cross-jumped */
+extern "C" void fn_800C537C(Unk800C341C_Mgr* m, int kind, const char* name, int wi, float t, int flag)
+{
+    Unk800C1BE4_Widget* w = (Unk800C1BE4_Widget*)wi;
+    int idx = fn_800C5CF8(m, name);
+    if (idx != -1) {
+        if (wi != 0) {
+            if (fn_800C2998(&m->files[idx], w) == -1)
+                fn_800C5798(m, w);
+        }
+        fn_800C2A1C(&m->files[idx], w, t);
+    } else {
+        if (wi != 0) {
+            int j;
+            if (kind == 1 && fn_800C52EC(m, 1, name) == 0 && (j = fn_800C50EC(m, w)) != -1
+                && fn_8040B574(fn_800C2F84(&m->files[j]), lbl_805BBF4C) == 0) {
+                w->fn_vslot8(1);
+                w->fn_vslot20(lbl_805BBF54);
+                return;
+            }
+            fn_800C5798(m, w);
+        }
+        int k = fn_800C58E8(m, kind);
+        if (k == -1) {
+            fn_800C5574(m, kind, name, wi, t, flag);
+        } else {
+            Unk800C2250_File* f = &m->files[k];
+            int r = fn_800C22C0(f, kind, name, w, flag, t);
+            if (kind == 1 && r == 0) {
+                const char* nm = lbl_805BBF4C;
+                int q = fn_800C5CF8(m, nm);
+                if (q == -1)
+                    fn_800C22C0(f, 1, nm, w, flag, t);
+                else
+                    fn_800C2A1C(&m->files[q], w, t);
+            }
+        }
+    }
+}
+
+extern "C" void fn_8033E958(const char* fmt, ...);
+
+extern "C" void fn_800C5574(Unk800C341C_Mgr* m, int kind, const char* name, int w, float t, int flag)
+{
+    for (int i = 0; i < m->m5D94; i++) {
+        if (m->recs[i].m404 == w) {
+            m->recs[i].m0 = kind;
+            fn_8040B61C(&m->recs[i].m4, name);
+            m->recs[i].m404 = w;
+            m->recs[i].m408 = t;
+            m->recs[i].m40C = flag;
+            return;
+        }
+    }
+    if (m->m5D94 <= 11) {
+        m->recs[m->m5D94].m0 = kind;
+        fn_8040B61C(&m->recs[m->m5D94].m4, name);
+        m->recs[m->m5D94].m404 = w;
+        m->recs[m->m5D94].m408 = t;
+        m->recs[m->m5D94].m40C = flag;
+        m->m5D94 = m->m5D94 + 1;
+    } else {
+        fn_8033E958("=====>cOnDemandManager::AddToLoadQueue can't find slot for %s - IGNORING REQUEST
+", name);
+    }
 }
 
 /* near-miss: retail forms the record pointer with stwu r0,0x2cd4(r9) (update-form store); ours uses addi + stwx */
@@ -255,6 +380,29 @@ void Unk800C5E74_Obj::fn_800C5EB0()
 Unk800C5E74_Obj::~Unk800C5E74_Obj()
 {
     fn_800C6624();
+}
+
+extern "C" void fn_800C4EEC(Unk800C341C_Mgr* m, const char* name);
+
+extern "C" void fn_800C618C(Unk800C5E74_Obj* o)
+{
+    if (o->m10 != -1)
+        fn_800C512C(fn_800C33D0(), o->m10);
+    if (o->m28 != 0) {
+        ((Unk800C7B40_Widget*)o->m0)->fn_vslot8(1);
+        ((Unk800C7B40_Widget*)o->m0)->fn_vslot20(1.0f);
+        ((Unk800C7B40_Widget*)o->m14)->fn_vslot8(0);
+        ((Unk800C1BE4_Widget*)o->m14)->fn_vslot28(&lbl_805B6F58, 0);
+        if (o->m2C != 0)
+            fn_800C4F64(fn_800C33D0(), &o->m18);
+        else
+            fn_800C4FA8(fn_800C33D0(), &o->m18);
+        char z = lbl_805B6F58;
+        o->m28 = 0;
+        o->m18 = z;
+    }
+    if (o->m10 != -1)
+        fn_800C4EEC(fn_800C33D0(), &o->m4);
 }
 
 void Unk800C5E74_Obj::fn_800C650C(Unk800C1BE4_Widget* a, const char* n1, Unk800C1BE4_Widget* b, const char* n2, float f, int flag)
@@ -478,6 +626,21 @@ extern "C" void fn_800C70B8(Unk800D1614_Obj* o, int v)
     }
 }
 
+extern "C" void fn_800C7130(Unk800C7A4C_Group* g, int a, int b, int c, int d)
+{
+    fn_800C8010(g, a, b, c, d);
+    if (g->m40 != 0)
+        g->m40->fn_vslot5(a, b, c, d);
+    if (g->m44 != 0)
+        g->m44->fn_vslot5(a, b, c, d);
+    if (g->m48 != 0)
+        g->m48->fn_vslot5(a, b, c, d);
+    if (g->m4C != 0)
+        g->m4C->fn_vslot5(a, b, c, d);
+    if (g->m50 != 0)
+        g->m50->fn_vslot5(a, b, c, d);
+}
+
 extern "C" void fn_800C7270(Unk800C7A4C_Group* g, int v)
 {
     int d = v - g->m26;
@@ -558,6 +721,26 @@ void Unk800C7A4C_Group::fn_800C7734(Unk800C7B40_Widget* c)
     m50 = c;
     c->fn_vslot18(m2E);
     m50->fn_vslot8(1);
+}
+
+extern "C" void fn_800C77A0(Unk800C77A0_Obj* w, int v)
+{
+    if (w->m54 != 0 && fn_800C80D4(w) != 0) {
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = fn_800B64BC((Unk800B64BC_Mgr*)operator new(0xD8, 0));
+        Unk800CBAD0_Sub* t = *(Unk800CBAD0_Sub**)(lbl_8061A32C->mA0 + 0x1CC);
+        if (t != 0)
+            t->fn_vslot29(w->m54);
+    }
+    if (w->b7) {
+        fn_802D7EE4(fn_800C8070(w));
+        fn_802D7EE4(fn_800C8070(w));
+        if (fn_800C80D4(w) != 0 && !w->b3)
+            w->fn_vslot14(1);
+        else if (fn_800C80D4(w) == 0 && w->b3)
+            w->fn_vslot14(0);
+    }
+    fn_800C80DC(w, v);
 }
 
 extern "C" void fn_800C78DC(Unk800C7A4C_Group* g, float f)
