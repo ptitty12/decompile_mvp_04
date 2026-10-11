@@ -19,6 +19,12 @@ void fn_80104F0C(UiObj* self)
     fn_800ECF18(self);
 }
 
+void fn_80104F2C(UiObj* self)
+{
+    fn_800EC84C();
+    self->v8(0);
+}
+
 extern char lbl_80651E30[];
 UiScrRaw* fn_80104F74(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -42,6 +48,28 @@ UiScrRaw* fn_80105344(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+int fn_80105AB8()
+{
+    switch (lbl_8068B618->m8->m564->m14) {
+    case 6:
+    case 7:
+        return 0;
+    }
+    return 1;
+}
+
+void fn_80105C58(int a, int b)
+{
+    switch (a) {
+    case 0:
+        fn_80105CA4(b);
+        break;
+    case 1:
+        fn_80105CA8(b);
+        break;
+    }
+}
+
 void fn_80105C9C()
 {
 }
@@ -50,7 +78,7 @@ void fn_80105CA0()
 {
 }
 
-void fn_80105CA4()
+void fn_80105CA4(int a)
 {
 }
 
@@ -99,6 +127,11 @@ UiScrRaw* fn_80106278(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+void fn_80106580()
+{
+    fn_8017E264(fn_8011AA24(0)->m700);
+}
+
 int fn_8010671C()
 {
     return 0;
@@ -108,6 +141,11 @@ void fn_80106FB4(UiV_134* self, int a)
 {
     fn_800ED310(self);
     self->m134->v14(a);
+}
+
+void fn_80107004(UiV_140i* self)
+{
+    self->m140 = 1;
 }
 
 int fn_80107010(UiScr134* self, int a)
@@ -169,6 +207,11 @@ int fn_80107294(UiScr134* self, int a)
 void fn_80107570(void* self, char* out)
 {
     *out = 0;
+}
+
+void fn_80107C84(UiV_150i* self)
+{
+    self->m150 += 1;
 }
 
 void fn_80107DB0(UiObj* self)
