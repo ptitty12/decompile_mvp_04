@@ -139,6 +139,8 @@ class Unk80170B44 {
 public:
     Unk80170B44();
     virtual ~Unk80170B44();
+    void fn_80170D20(int a);
+    void fn_80170E0C(int a, const unsigned short* s);
     Unk80170B44* fn_80170C30(int idx);
     Unk80170B44* fn_80170C6C(int idx);
     Unk80170B44* fn_80170CA8(int idx);
@@ -153,7 +155,12 @@ public:
     int fn_80171308(int a, int b);
     int fn_801713D4(int idx);
     int fn_80171458(int idx);
-    char pad0[0x3C2];
+    char pad0[0x200];
+    unsigned short m200[45];
+    unsigned short m25A[45];
+    unsigned short m2B4[45];
+    unsigned short m30E[45];
+    unsigned short m368[45];
     unsigned short m3C2[45];
     unsigned short m41C[45];
     unsigned short m476[45];
@@ -199,7 +206,9 @@ class Unk80171760 {
 public:
     Unk80171760();
     virtual ~Unk80171760();
+    virtual void fn_vslot2();
     void fn_801717DC();
+    void fn_8017181C(const unsigned short* s);
     void fn_801718A8(int a);
     int fn_801718E8();
     void fn_8017191C(unsigned int i);

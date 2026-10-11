@@ -375,6 +375,38 @@ Unk80170B44* Unk80170B44::fn_80170CE4(int idx)
     return this;
 }
 
+void Unk80170B44::fn_80170D20(int a)
+{
+    fn_80403144(m200, (const unsigned short*)fn_80171308(a, 1));
+    fn_80403144(m25A, (const unsigned short*)fn_80171280(0));
+    fn_80403144(m2B4, (const unsigned short*)fn_80171280(1));
+    fn_80403144(m368, (const unsigned short*)fn_80171308(a, 0));
+    fn_80403144(m4D0, (const unsigned short*)fn_80171280(0xC));
+    int n = fn_80403060(m4D0);
+    for (int i = 0; i < n; i++) {
+        if (m4D0[i] == 0x20) {
+            m4D0[i] = 0xA0;
+        }
+    }
+}
+
+void Unk80170B44::fn_80170E0C(int a, const unsigned short* s)
+{
+    if (s) {
+        fn_80403144(m2B4, s);
+        int n = fn_80403060(m2B4);
+        for (int i = 0; i < n; i++) {
+            if (m2B4[i] == 0xA0) {
+                m2B4[i] = 0x20;
+            }
+        }
+    } else {
+        fn_80403144(m2B4, (const unsigned short*)fn_80171280(a + 2));
+    }
+    fn_80170FEC((const unsigned short*)fn_80171280(0x10));
+    fn_80403144(m30E, (const unsigned short*)this);
+}
+
 void Unk80170B44::fn_80170EC4(const unsigned short* s)
 {
     if (s) {
@@ -402,6 +434,46 @@ void Unk80170B44::fn_80170F2C(int a, int b, int c)
     }
     if (b > 0) {
         fn_80403DE4(m476, fn_80171280(0xD), b);
+    }
+}
+
+/* near-miss: same 58 instructions, but retail rotates the loop so the null test and the 0x100 bound sit
+ * at the bottom (entry `b` to the test); the while/do-while/for spellings tried here differ by 19+ slots. */
+void Unk80170B44::fn_80170FEC(const unsigned short* s)
+{
+    unsigned short* dst = (unsigned short*)this;
+    unsigned int i = 0;
+    const unsigned short* p = s;
+    while (i <= 0xFF) {
+        if (p == 0 || *p == 0) {
+            fn_8040074C(&dst[i], (0x100 - i) * 2);
+            return;
+        }
+        if (*p == 0x25) {
+            unsigned short c;
+            do {
+                c = p[1];
+                p++;
+            } while (c == 0x25);
+            unsigned short* slot = (unsigned short*)((char*)this + c * 0x5A - 0xEE0);
+            int len;
+            if (*slot != 0) {
+                len = fn_80403060(slot);
+                if (i + len > 0x100) {
+                    return;
+                }
+            } else {
+                len = 0;
+            }
+            if (len > 0) {
+                fn_80403144(&dst[i], slot);
+            }
+            i += len - 1;
+        } else {
+            dst[i] = *p;
+        }
+        i++;
+        p++;
     }
 }
 
@@ -614,6 +686,21 @@ void Unk80171760::fn_801717DC()
         delete mC;
         mC = 0;
     }
+}
+
+void Unk80171760::fn_8017181C(const unsigned short* s)
+{
+    if (s == 0) {
+        fn_vslot2();
+        return;
+    }
+    int n = fn_80403060(s);
+    if (mC) {
+        delete mC;
+        mC = 0;
+    }
+    mC = new (0x100) unsigned short[n + 1];
+    fn_80403144(mC, s);
 }
 
 void Unk80171760::fn_801718A8(int a)
