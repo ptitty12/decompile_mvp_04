@@ -67,6 +67,12 @@ animation/warps/tu_802A3704.cpp:
 	.rodata     start:0x805DE11C end:0x805DE2F8
 	.data       start:0x8061E86C end:0x8061E87C
 
+animation/warps/tu_802A4584.cpp:
+	.text       start:0x802A4584 end:0x802A6334
+	.rodata     start:0x805DE2F8 end:0x805DE56C
+	.data       start:0x8061E87C end:0x8061E97C
+	.bss        start:0x8068CE60 end:0x8068CE68
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C
