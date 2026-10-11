@@ -84,4 +84,11 @@ struct Unk802C3794_Img {
     short h;
 };
 
+Unk802C2188* fn_802C2188(Unk802C2188* o);
+int fn_802C2304(Unk802C2188* o, int i);
+void fn_802C2214(Unk802C2188* o, int c);
+void fn_802C2254(Unk802C2188* o);
+void fn_802C2314(Unk802C2188* o, Unk802C2188_Pair* a);
+void fn_802C23BC(Unk802C2188* o, Unk802C2188_Pair* a);
+
 #endif

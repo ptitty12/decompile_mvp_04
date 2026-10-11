@@ -43,7 +43,8 @@ struct Unk802CBD04 {
     float mA4;
     float mA8;
     float mAC;
-    char padB0[0xD8 - 0xB0];
+    char padB0[0xD4 - 0xB0];
+    int mD4;
     char* mD8;
     int mDC;
     int mE0;

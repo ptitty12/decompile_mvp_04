@@ -39,7 +39,7 @@ int fn_803FC410(int a, const char* name, int b, int* c, void* d);
 int fn_804017D0(int a);
 int fn_803ED604(const char* name, int a, int b);
 int fn_803EE310(int a);
-void fn_803FFA60(int a, int b);
+void fn_803FFA60(int a, int b, int n);
 int fn_803FBD28(int a, int b, int c);
 int fn_803FB954(int a);
 int fn_803FB9E8(int a);
@@ -138,7 +138,7 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
                     *outn = sp18;
                 }
                 h = fn_803ED604(name, sp18, size);
-                fn_803FFA60(a, sp18);
+                fn_803FFA60(h, a, sp18);
             }
             r = h;
             break;
@@ -165,6 +165,49 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
     }
     fn_8033E7A4();
     return (const char*)r;
+}
+
+/* near-miss (75 vs 76 insns): retail zeroes sp14 with its own li r0,0 and sp8/spC with a second li r9,0 (two constant registers); ours shares one. */
+int fn_802B94EC(int h, int dst, int max, int kind)
+{
+    int sp8;
+    int spC;
+    int sp10;
+    int sp14;
+    sp14 = 0;
+    spC = 0;
+    sp8 = 0;
+    fn_802B9D7C(kind, &sp8, &spC);
+    switch (spC) {
+    case 0:
+        break;
+    case 1:
+        if (sp8 == 0) {
+            goto L_call;
+        }
+        fn_803FC410(sp8, (const char*)h, 0, &sp10, &sp14);
+        if (sp14 > max) {
+            sp14 = max;
+        }
+        goto L_copy;
+    case 2:
+        if (sp8 == 0) {
+            goto L_call;
+        }
+        fn_803FC410(sp8, (const char*)h, 0, &sp10, &sp14);
+        if (fn_80401904(sp8 + sp10) != 0) {
+            fn_804017B0(sp8 + sp10, dst);
+            break;
+        }
+    L_copy:
+        fn_803FFA60(dst, sp8 + sp10, sp14);
+        break;
+    case 3:
+    L_call:
+        sp14 = fn_802B9250(h, dst, max);
+        break;
+    }
+    return sp14;
 }
 
 extern "C" void fn_802B961C(const char* p, int x)
@@ -715,6 +758,50 @@ void fn_802BA908(Unk802BA828* p)
     }
     p->m4 = d;
     p->m0 = v;
+}
+
+/* near-miss (8 slots): retail keeps the two spilled floats of each (x, y) pair at sp+0x10/0x14 (an 8-aligned pair); float locals land at 0xC/0x10.
+   Struct locals do not spill at all. */
+void fn_802BA96C(Unk802BA96C* p, int k, Unk802BA96C_Q* q, float dt)
+{
+    if (k == 0x64) {
+        p->m30 = &p->mC;
+    }
+    if (k == 0x62) {
+        p->m30 = &p->m18;
+    }
+    if (k == 0x63) {
+        p->m30 = &p->m24;
+    }
+    if (p->m30->m0 & 1) {
+        p->m30->m4 = p->m4 * q->m30 + p->m30->m4;
+        p->m30->m8 = p->m4 * q->m34 + p->m30->m8;
+        if (!(p->m30->m4 <= 1.0f)) {
+            p->m30->m4 = p->m30->m4 - 1.0f;
+        }
+        if (!(p->m30->m8 <= 1.0f)) {
+            p->m30->m8 = p->m30->m8 - 1.0f;
+        }
+        float vx = p->m30->m4;
+        float vy = p->m30->m8;
+        if (q->m3C != 0) {
+            q->m3C->x = vx;
+            q->m3C->y = vy;
+        }
+    }
+    float wx;
+    float wy;
+    if (p->m30->m0 & 2) {
+        wx = p->m30->m4;
+        wy = 0.5f;
+    } else {
+        wx = p->m30->m4;
+        wy = 0.0f;
+    }
+    if (q->m3C != 0) {
+        q->m3C->x = wx;
+        q->m3C->y = wy;
+    }
 }
 
 extern const char lbl_805E0FBC[];

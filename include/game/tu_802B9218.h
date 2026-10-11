@@ -113,6 +113,34 @@ int fn_802BA45C(Unk802B9F40*, Unk802B9F40_A0* s);
 void fn_802BA67C(Unk802B9F40* t, Unk802B9F40_A1EF0* s);
 void fn_802BAFD0(Unk802BACDC_Bat* b);
 void fn_802BB038(Unk802BACDC_Bat* b);
+/* Scroll/animation state: three 12-byte channels at +0xC (id 0x64), +0x18 (0x62), +0x24 (0x63);
+ * +0x30 points at the selected channel. Evidence: fn_802BA96C. */
+struct Unk802BA96C_Chan {
+    int m0;
+    float m4;
+    float m8;
+};
+struct Unk802BA96C_V2 {
+    float x;
+    float y;
+};
+struct Unk802BA96C {
+    int m0;
+    float m4;
+    int m8;
+    Unk802BA96C_Chan mC;
+    Unk802BA96C_Chan m18;
+    Unk802BA96C_Chan m24;
+    Unk802BA96C_Chan* m30;
+};
+struct Unk802BA96C_Q {
+    char pad0[0x30];
+    float m30;
+    float m34;
+    int m38;
+    Unk802BA96C_V2* m3C;
+};
+
 void fn_802B9D7C(int kind, int* a, int* b);
 extern "C" void fn_802B961C(const char* p, int a);
 extern "C" const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
