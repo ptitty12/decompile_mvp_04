@@ -132,6 +132,31 @@ extern "C" FE_OVERLAY FeScrRawL* fn_8044974C(FeScrRawL* self, int a, int b, int 
     return self;
 }
 
+extern "C" FE_OVERLAY int fn_8044A308(FeScr_8044974C* self)
+{
+    if (fn_8044C48C(self) == 1)
+        return 0;
+    int t = ((FeObjI*)self->m168)->v60();
+    if (self->m168 == self->m13C) {
+        fn_8044BF38(self, t);
+    } else if (self->m168 == self->m140) {
+        if (((FeObjI*)self->m168)->v59() > 0)
+            fn_8044C128(self, t);
+    }
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_8044A544(FeScr_8044974C* self)
+{
+    if (self->m240 == 0 || fn_8044C48C(self) == 1)
+        return 0;
+    fn_8001BC4C()->fn_8001BDAC(0xA3);
+    ((FeSub*)&self->m14C->mDC)->s1();
+    fn_8044B5F0(self, ((FeSub*)&self->m14C->mDC)->s5());
+    fn_8044B050(self);
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_8044A8D8(FeScr_8044974C* self)
 {
     self->m168->v50();
@@ -232,8 +257,104 @@ extern "C" FE_OVERLAY int fn_8044ACB4(FeScr_8044974C* self)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_8044AD04(FeScr_8044974C* self)
+{
+    int v = ((FeSub*)&self->m150->mDC)->s5();
+    fn_800D0074(&self->m154->m98, v, 1);
+    fn_800D0074(&self->m158->mDC, v, 1);
+    fn_8044B454(self, ((FeSub*)&self->m154->m98)->s21());
+}
+
+extern "C" FE_OVERLAY void fn_8044B188(FeScr_8044974C* self, FeObj* a)
+{
+    if (a == self->m144) {
+        fn_8044B454(self, ((FeSub*)&self->m158->mDC)->s21());
+    } else if (a == self->m148) {
+        int v = ((FeSub*)&self->m150->mDC)->s5();
+        fn_800D0074(&self->m154->m98, v, 1);
+        fn_800D0074(&self->m158->mDC, v, 1);
+        fn_8044B454(self, ((FeSub*)&self->m154->m98)->s21());
+    }
+    fn_8044B050(self);
+}
+
 extern "C" FE_OVERLAY void fn_8044B278(FeScr_8044974C* self, int a, int b)
 {
     fn_8044B454(self, b);
     fn_8044B050(self);
+}
+
+extern "C" FE_OVERLAY int fn_8044B2B0(FeScr_8044974C* self, FeObj* a, int unused, int b)
+{
+    if (a == self->m13C) {
+        int t = self->m16C;
+        if ((t == -1 && self->m170 == -1) || t == b)
+            fn_8044BF38(self, b);
+        fn_8044B6A4(self, self->m13C);
+    } else if (a == self->m140) {
+        if (self->m16C == -1)
+            fn_8044C128(self, b);
+        fn_8044B6A4(self, self->m140);
+    }
+    fn_8044B050(self);
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_8044B35C(FeScr_8044974C* self, FeObj* a, int unused, int b)
+{
+    if (a == self->m13C) {
+        fn_8044B6A4(self, a);
+        ((FeObj1*)a)->v68(b);
+        ((FeObj1*)self)->v44(fn_800C8070(self));
+    } else if (a == self->m140) {
+        fn_8044B6A4(self, a);
+        ((FeObj1*)a)->v68(b);
+        ((FeObj1*)self)->v44(fn_800C8070(self));
+    }
+    fn_8044B050(self);
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8044B5F0(FeScr_8044974C* self, int a)
+{
+    self->m138 = (FeObj*)a;
+    ((FeSub*)&self->m14C->mDC)->s6();
+    fn_8044B79C(self);
+    ((FeObj1*)self->m168)->v68(0);
+    ((FeObj1*)self->m13C)->v14(0);
+    ((FeObj1*)self->m140)->v14(0);
+}
+
+extern "C" FE_OVERLAY void fn_8044B6A4(FeScr_8044974C* self, FeObj* a)
+{
+    ((FeObj1*)self->m13C)->v14(0);
+    ((FeObj1*)self->m140)->v14(0);
+    self->m168 = a;
+    ((FeObj1*)a)->v14(1);
+    if (a == self->m13C)
+        ((FeObj2*)self->m160)->v84(0, 0);
+    else if (a == self->m140)
+        ((FeObj2*)self->m160)->v84(1, 0);
+    fn_8044ADA4(self);
+}
+
+extern "C" FE_OVERLAY int fn_8044C3EC(FeScr_8044974C* self)
+{
+    if (self->m168 == self->m13C) {
+        if (((FeObjI*)self->m160)->v86() != 0)
+            return 1;
+    }
+    if (self->m168 == self->m140) {
+        if (((FeObjI*)self->m160)->v87() != 0)
+            return 1;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_8044C48C(FeScr_8044974C* self)
+{
+    int r = 0;
+    if (((FeObjI*)self->m160)->v86() != 0 || ((FeObjI*)self->m160)->v87() != 0)
+        r = 1;
+    return r;
 }
