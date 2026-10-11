@@ -11,9 +11,13 @@ struct Unk8017C954_Rec {
     char pad0[0x108];
     int m108;
     int m10C;
-    char pad110[0x1CCA - 0x110];
+    char pad110[0x1CC8 - 0x110];
+    unsigned char m1CC8;
+    char pad1CC9[1];
     unsigned char m1CCA;
     unsigned char m1CCB;
+    char pad1CCC[4];
+    int m1CD0;
 };
 struct Unk8017C954_Mid {
     char pad0[0x14];
@@ -69,9 +73,9 @@ struct Unk8017A930_T {
     void* m3C4;
     void* m3C8;
     void* m3CC;
-    char pad3D0[4];
+    int m3D0;
     int m3D4;
-    char pad3D8[0x3DC - 0x3D8];
+    int m3D8;
     int m3DC;
     int m3E0;
     float m3E4;
@@ -222,6 +226,8 @@ int fn_803272D0(void* p, int a);
 extern const float lbl_805CC8AC;
 extern const float lbl_805CC8B0;
 extern const float lbl_805CC8B4;
+int fn_8017E030(Unk8017A930_T* p, int a, int b);
+int fn_801C1638i(void* p, int a);
 void fn_80176B90(char* p);
 void fn_80176F04(char* p);
 void fn_8017671C(char* p);

@@ -366,6 +366,19 @@ int fn_8017C954(Unk8017A930_T* p)
     return r->m1CCB + r->m1CCA * 4;
 }
 
+int fn_8017C974(Unk8017A930_T* p)
+{
+    int a = (int)fn_801C1638(p->m4, 0);
+    int b = (int)fn_801A4B34(p->m4);
+    Unk8017C954_Rec* r = p->m4->m6F8->m14;
+    int k = r->m1CD0;
+    int c = r->m1CC8;
+    if (fn_8017E030(p, k == 0, 0) == 0 && !(a == p->m3D0 && p->m3D8 == c) && p->m3D4 != b) {
+        return 1;
+    }
+    return 0;
+}
+
 /* near-miss: retail ends with `cmpwi r3,0; li r3,0; beq; li r3,1; b end; li r3,0` (30 instrs); the
  * return/flag spellings tried give 28 (4 slots differ). */
 int fn_8017CA14(Unk8017A930_T* p, int idx)
