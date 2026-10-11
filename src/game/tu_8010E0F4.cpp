@@ -33,6 +33,17 @@ extern const char* lbl_8061B3E0[];
 extern const char lbl_805BFA5C[];
 extern const char lbl_805BFA70[];
 extern const char lbl_806508D0[];
+extern const char lbl_805BAF70[];
+extern const char lbl_805BDDEC[];
+extern const char lbl_805BC1A8[];
+extern char lbl_805B9A30;
+extern int lbl_8061977C;
+struct UnkPly {
+    char pad0[0x704];
+    int m704;
+    int m708;
+};
+struct UnkCMgr;
 struct UnkQ4 {
     int m[4];
 };
@@ -59,8 +70,26 @@ void fn_800EC648(Scr* self, int a, int b, int c, int d, int e, int f, int g, int
 void fn_801142C4(Scr* self);
 void fn_8011415C(Scr* self);
 void fn_800ED254(Scr* self);
+int fn_804089B4(char* buf, const char* fmt, ...);
+int fn_8040B320(void* p, int c, int n, ...);
+int fn_80090880(int mgr, int id);
+int fn_8011B8C8(int a, UnkPly* p);
+int fn_8011B9F4(int a, UnkPly* p);
+int fn_8011B784(int a, UnkPly* p, int c);
+float fn_8011B954(int a, UnkPly* p);
+float fn_8011B81C(int a, UnkPly* p, int c);
+void fn_80119FF0(char* buf, float v);
+void fn_80119F48(char* buf, float v);
+UnkPly* fn_801A4A94(UnkGame* g, int a);
+void fn_800DE274(UnkTextArg* p, UnkPly* t, int f);
+UnkCMgr* fn_800C33D0();
+void fn_800C3DCC(UnkCMgr* m, Unk800C7B40_Widget* w, UnkPly* t);
+int fn_800DC0F4(UnkTeamArr* t, int a, int b);
+void fn_800E0AD4(Unk800C7B40_Widget* w, int a, int b, int c, int d);
+void fn_8010F5E8(Scr* self, UnkTextBox* w, UnkPly* t);
+void fn_8010F7E0(Scr* self, UnkTextBox* w, UnkPly* t);
 void fn_80125180(Unk800C7B40_Widget* self, int a, int id);
-Unk800C7B40_Widget* fn_80110D90(Scr* self, int a);
+UnkTextBox* fn_80110D90(Scr* self, int a);
 void fn_8011243C(Scr* self);
 void fn_80112D90(Scr* self);
 void fn_801138FC(Scr* self);
@@ -98,6 +127,9 @@ void fn_8010F2CC(Scr* self);
 void fn_8010F494(Scr* self, int a);
 int fn_8010F4D4(int a, int b);
 void fn_8010F550(Scr* self);
+void fn_8010F5E8(Scr* self, UnkTextBox* w, UnkPly* a);
+void fn_8010F7E0(Scr* self, UnkTextBox* w, UnkPly* a);
+void fn_8010F9CC(Scr* self, int a);
 void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_8010FE70(Scr* self, int a);
 void fn_8010FFD8(int a, Scr* b);
@@ -111,8 +143,7 @@ int fn_80110C20(Scr* self, int a);
 int fn_80110C7C(Scr* self, int a);
 int fn_80110CD8(Scr* self, int a);
 int fn_80110D34(Scr* self, int a);
-Unk800C7B40_Widget* fn_80110D90(Scr* self, int a);
-/* near-miss: retail stores m134 before loading m154 (2 slots swapped); the scheduler hoists the load here. */
+UnkTextBox* fn_80110D90(Scr* self, int a);
 void fn_80110DDC(Scr* self, int a);
 }
 // PROTOS-END
@@ -392,6 +423,70 @@ void fn_8010F550(Scr* self)
 
 /* near-miss: retail stores m158 first and m168 last; the scheduler hoists m168 here (tried all positions of those two). */
 
+void fn_8010F5E8(Scr* self, UnkTextBox* w, UnkPly* a)
+{
+    char buf[0x64];
+    buf[0] = lbl_805B9A30;
+    int r26 = lbl_8061977C;
+    fn_8040B320(buf + 1, 0, 0x63);
+    int t = fn_8011B8C8(3, a);
+    fn_804089B4(buf, lbl_805BDDEC, t, fn_8011B8C8(4, a));
+    w->fn_vslot43(0, 0, fn_80090880(r26, 0x38A9), 4);
+    w->fn_vslot44(0, 1, buf, 4);
+    float f = fn_8011B954(1, a);
+    fn_80119FF0(buf, f);
+    w->fn_vslot43(1, 0, fn_80090880(r26, 0x196D), 4);
+    w->fn_vslot44(1, 1, buf, 4);
+    fn_804089B4(buf, lbl_805BC1A8, fn_8011B9F4(2, a));
+    w->fn_vslot43(2, 0, fn_80090880(r26, 0x1979), 4);
+    w->fn_vslot44(2, 1, buf, 4);
+}
+
+void fn_8010F7E0(Scr* self, UnkTextBox* w, UnkPly* a)
+{
+    char buf[0x64];
+    buf[0] = lbl_805B9A30;
+    int r26 = lbl_8061977C;
+    fn_8040B320(buf + 1, 0, 0x63);
+    float f = fn_8011B81C(2, a, 2);
+    fn_80119F48(buf, f);
+    w->fn_vslot43(0, 0, fn_80090880(r26, 0x196A), 4);
+    w->fn_vslot44(0, 1, buf, 4);
+    fn_804089B4(buf, lbl_805BC1A8, fn_8011B784(1, a, 2));
+    w->fn_vslot43(1, 0, fn_80090880(r26, 0x199E), 4);
+    w->fn_vslot44(1, 1, buf, 4);
+    fn_804089B4(buf, lbl_805BC1A8, fn_8011B784(0, a, 2));
+    w->fn_vslot43(2, 0, fn_80090880(r26, 0x196B), 4);
+    w->fn_vslot44(2, 1, buf, 4);
+}
+
+void fn_8010F9CC(Scr* self, int a)
+{
+    UnkPly* t = fn_801A4A94(fn_8011AA24(0), a);
+    if (t != 0) {
+        self->m238->fn_vslot8(1);
+        self->m23C->fn_vslot8(1);
+        self->m240->fn_vslot8(1);
+        int r26 = t->m704;
+        UnkTextArg buf;
+        fn_800DE274(&buf, t, 1);
+        ((UnkLabel*)self->m238)->fn_vslot28(&buf);
+        fn_800C3DCC(fn_800C33D0(), self->m23C, t);
+        UnkTeamArr* team = fn_8011AA24(0)->m6F8->m14;
+        int t708 = t->m708;
+        UnkTextBox* w = fn_800C8060(self->m240->fn_vslot32(lbl_805BAF70, 1));
+        if (fn_800DC0F4(team, t708, r26) != 0)
+            fn_8010F5E8(self, w, t);
+        else
+            fn_8010F7E0(self, w, t);
+        fn_800E0AD4(self->m240, r26, 2, 0, 0);
+    } else {
+        self->m238->fn_vslot8(0);
+        self->m23C->fn_vslot8(0);
+        self->m240->fn_vslot8(0);
+    }
+}
+
 void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -523,7 +618,7 @@ int fn_80110D34(Scr* self, int a)
     return 1;
 }
 
-Unk800C7B40_Widget* fn_80110D90(Scr* self, int a)
+UnkTextBox* fn_80110D90(Scr* self, int a)
 {
     return fn_800C8060(self->fn_vslot32(lbl_8061B3E0[a], 1));
 }
@@ -536,7 +631,7 @@ void fn_80110DDC(Scr* self, int a)
     fn_800C8040(fn_800C8044(self->fn_vslot32(lbl_805BE1D8, 1))->fn_vslot32(lbl_805BE5E4, 1))->fn_vslot29((const char*)q.m[self->m134]);
     if (self->m150 != 0)
         self->m150->fn_vslot8(0);
-    self->m150 = fn_80110D90(self, a);
+    self->m150 = (Unk800C7B40_Widget*)fn_80110D90(self, a);
     fn_80125180(self->m154, 1, 0x26DF);
     switch (a) {
     case 0:
