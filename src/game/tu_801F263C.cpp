@@ -17,14 +17,30 @@ struct Unk801F263C_Node {
     char m18[1];
 };
 
+struct Unk801F263C_Cmd {
+    char pad0[0x14];
+    int m14;
+    char pad18[4];
+    int m1C;
+    int m20;
+};
+
 struct Unk801F263C_List {
     char pad0[0x934];
     Unk801F263C_Node* m934;
 };
 
 extern const float lbl_805D4EA8;
+extern float lbl_805D4D68;
 
 extern "C" {
+int fn_801F5DD8(Scr* p, int a);
+int fn_8024D408(int a);
+int fn_8026D8E8(int a, int b);
+int fn_80210FC4(Unk801EE438_G** g, int a, int b, int c);
+int fn_80210DA8(Unk801EE438_G** g, int a, int b);
+int fn_80211D34(void* p);
+int fn_80247858(int a, int b);
 int fn_80210D20(Unk801EE438_G** g, int a);
 int fn_80210C98(Unk801EE438_G** g, int a);
 
@@ -40,6 +56,21 @@ Unk801EE438_Player* fn_801F29AC(Scr* p, Unk801EE438_Game* g, Unk801EE438_Player*
     return r != 0 ? (r == x ? p->m9C->m8[0] : r)
                   : (g->m38C == 3 ? (g->m374 == x ? g->m378 : g->m374)
                                   : (p->m9C->mA4 != -1 ? p->m9C->m8[p->m9C->mA4] : p->m9C->m8[0]));
+}
+
+/* near-miss (6 slots): only the f11/f12 assignment of the double (0x4330...) and float constants is swapped. */
+int fn_801F30B8(Scr* p, Unk801EE438_Vec* out, float* outf)
+{
+    Unk801EE438_G* g = p->m9C;
+    if (!(g->mC80 <= (float)g->m0->m4C * lbl_805D4D68)) {
+        *out = g->mC4C;
+        if (outf != 0) {
+            Unk801EE438_G* h = p->m9C;
+            *outf = h->mC80 - (float)h->m0->m4C * lbl_805D4D68;
+        }
+        return 1;
+    }
+    return 0;
 }
 
 int fn_801F3B54(Scr* p)
@@ -101,7 +132,7 @@ int fn_801F5394()
     return 0;
 }
 
-int fn_801F5DD8(int unused, int a)
+int fn_801F5DD8(Scr* unused, int a)
 {
     if (a == 0x11 || a == 0x13 || a == 0x12 || a == 0x14 || a == 0x16 || a == 0x15)
         return 1;
@@ -112,6 +143,45 @@ inline Unk801EE438_Player* PlayerAt5FD4(Unk801EE438_Player** a, int i)
 {
     Unk801EE438_Player** q = a + i;
     return *q;
+}
+
+inline Unk801EE438_Player* PlayerAtIdx5EF0(Unk801EE438_Owner* o, unsigned k)
+{
+    if (k <= 12)
+        return o->m65C[k];
+    return 0;
+}
+
+inline Unk801EE438_Player* PlayerAt5EF0(Unk801EE438_Player** a, int i)
+{
+    Unk801EE438_Player** q = a + i;
+    return *q;
+}
+
+void fn_801F5EF0(Scr* p)
+{
+    int found = 0;
+    unsigned i = 9;
+    do {
+        Unk801EE438_Player* pl = PlayerAtIdx5EF0(p->m9C->m0, i);
+        if (pl != 0 && fn_80254EA4(&pl->m58C, 0) != -1) {
+            found = 1;
+            break;
+        }
+        i++;
+    } while ((int)i <= 12);
+    if (found == 0) {
+        Unk801EE438_It it;
+        fn_8014E09C(&it, p->m9C->m0, 1);
+        Unk801EE438_It* ip = &it;
+        while (ip->m8 != 10) {
+            int i = ip->m8;
+            Unk801EE438_Player* q = PlayerAt5EF0(p->m9C->m8, i);
+            if (q != 0)
+                fn_8024FC94(&q->m4D8);
+            fn_8014E108(ip);
+        }
+    }
 }
 
 void fn_801F5FD4(Scr* p, int a)
@@ -143,6 +213,24 @@ int fn_801F64E4(Unk801F263C_List* p)
             if (f < lbl_805D4EA8)
                 return 1;
         }
+    }
+    return 0;
+}
+
+int fn_801F6568(Scr* p, int a, Unk801F263C_Cmd* c)
+{
+    if (fn_801F5DD8(p, c->m14) == 1)
+        return 0;
+    if (fn_8024D408(a) != 0) {
+        if (c->m20 == 5) {
+            if (fn_80210FC4(&p->m9C, 2, 3, 0) == 1)
+                return 1;
+            if (c->m20 == 5 && fn_80210FC4(&p->m9C, 2, c->m1C, 0) == 0)
+                return 1;
+        }
+        if (fn_8026D8E8(a, 0) == 1 && fn_80210DA8(&p->m9C, 4, fn_80211D34(&p->m9C->mE8)) == 0 &&
+            fn_80247858(fn_80211D34(&p->m9C->mE8), 0) != c->m1C)
+            return 1;
     }
     return 0;
 }

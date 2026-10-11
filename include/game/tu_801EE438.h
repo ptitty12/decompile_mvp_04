@@ -109,6 +109,8 @@ struct Unk801EE438_Player {         /* G->m8[i] */
     int m460;                       /* index */
     char pad464[0x4D8 - 0x464];
     int m4D8;                       /* sub-object starts here (address passed to fn_8024FC74) */
+    char pad4DC[0x58C - 0x4DC];
+    int m58C;
 };
 
 struct Unk801EE438_O700 {
@@ -150,7 +152,8 @@ struct Unk801EE438_G {
     char padA8[0xC0 - 0xA8];
     Unk801EE438_Sub mC0;
     Unk801EE438_Sub mD4;
-    char padE8[0x1B8 - 0xE8];
+    int mE8;                       /* sub-object (address passed to fn_80211D34) */
+    char padEC[0x1B8 - 0xEC];
     int m1B8;
     int m1BC;
     int m1C0;
@@ -168,7 +171,11 @@ struct Unk801EE438_G {
     Unk801EE438_Sub6A8 m6A8;
     char pad6AC[0x6B8 - 0x6AC];
     Unk801EE438_Rec5C m6B8[10];
-    char pad_A50[0xC88 - 0xA50];
+    char pad_A50[0xC4C - 0xA50];
+    Unk801EE438_Vec mC4C;
+    char padC58[0xC80 - 0xC58];
+    float mC80;
+    char padC84[0xC88 - 0xC84];
     int mC88;
     int mC8C;
     char padC90[0xCA4 - 0xC90];
@@ -204,6 +211,8 @@ int fn_801E82CC(Unk801EE438_Sel* o, int a);
 void fn_80213988(Unk801EE438_Scr* p, int a, int b);
 int fn_801EE6F4(Unk801EE438_Scr* p, int a);
 int fn_80259C50(int h, int e);
+int fn_80254EA4(int* p, int a);
+void fn_8024FC94(int* p);
 unsigned fn_8014E2B4(int e);
 int fn_80216590(Unk801EE438_Scr* p, int a, Unk801EE438_Vec v, int b, int c, int d);
 void fn_8020E074(Unk801EE438_Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7, int a8);
