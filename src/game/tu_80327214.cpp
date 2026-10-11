@@ -58,6 +58,7 @@ void fn_80327274(FxAI* self);
 int fn_803272D0(FxAI* self, unsigned i);
 void fn_803272F0(FxAI* self);
 void fn_80328208();
+FxBase* fn_80328234(FxBase* self, int a, int b);
 FxBase* fn_803282A8(FxBase* self, int a);
 void fn_80328318(FxBase* self, int a, int b);
 void fn_80328374(FxBase* self, int a);
@@ -80,6 +81,8 @@ void fn_80329AAC(FxSing* p, int a);
 void fn_80329AE0(void* p);
 int fn_80329AE4(void* p);
 void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim);
+int fn_80329B98(char** cur, unsigned* n, float* out, int delim);
+int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim);
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim);
 int fn_80329DF0(void* a, int* out, int c);
 int fn_80329E50();
@@ -140,7 +143,17 @@ void fn_803272F0(FxAI* self) {
 
 void fn_80328208() { fn_80327354(1, 0xFFFF); }
 
-/* near-miss: same as fn_80328234 */
+FxBase* fn_80328234(FxBase* self, int a, int b) {
+    self->m14 = 0;
+    self->m18 = lbl_80664020;
+    fn_8040B61C(self, lbl_805EBBF8);
+    self->m20 = 0;
+    self->m18 = lbl_80666F98;
+    fn_80328318(self, a, b);
+    return self;
+}
+
+/* near-miss: same as the neighbouring function */
 FxBase* fn_803282A8(FxBase* self, int a) {
     self->m14 = 0;
     self->m18 = lbl_80664020;
@@ -327,7 +340,39 @@ void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim) {
     }
 }
 
-/* near-miss: same as fn_80329B98 */
+int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
+    int len = 0;
+    fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
+    if ((unsigned)len < *n) {
+        fn_80379094(lbl_80691D18, len, 0);
+        *out = fn_80409D88(lbl_80691D18);
+        *cur = *cur + len + 1;
+        *n -= 1;
+        *n -= len;
+    } else {
+        *n = 0;
+    }
+    return 1;
+}
+
+int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
+    int len = 0;
+    int ok = 1;
+    fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
+    if ((unsigned)len < *n) {
+        fn_80379094(lbl_80691D18, len, 0);
+        *out = fn_80409DAC(lbl_80691D18);
+        if (*out < lo || *out > hi) ok = 0;
+        *cur = *cur + len + 1;
+        *n -= 1;
+        *n -= len;
+    } else {
+        *n = 0;
+    }
+    return ok;
+}
+
+/* near-miss: same as the neighbouring function */
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim) {
     int len = 0;
     int ok = 1;
