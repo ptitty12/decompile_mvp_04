@@ -70,4 +70,23 @@ struct Unk8007DB74_A {
     Unk8007DB74_Tbl* m58;
 };
 
+/* Counter of fn_8007DC08: i lives in a local object with an (empty)
+ * destructor, which keeps it in memory; Next() steps i up to N + 1. */
+template <int N>
+struct Unk8007DB74_Iter {
+    int i;
+    Unk8007DB74_Iter() { i = 0; }
+    ~Unk8007DB74_Iter() {}
+    int Next()
+    {
+        int n;
+        if (i > N)
+            n = i;
+        else
+            n = i + 1;
+        i = n;
+        return n;
+    }
+};
+
 #endif

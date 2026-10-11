@@ -65,19 +65,17 @@ int fn_8007DBBC(A* self, int idx)
     return 0;
 }
 
-/* near-miss: retail keeps i in a stack slot (stw/lwz at 8(r1)) with the
- * branchy clamp, calls fn_8007DDC8 with only three arguments (r6 left stale),
- * and no 4th argument is passed here. volatile i, int& helpers and two-field
- * structs were tried; none gives the same frame. */
+/* near-miss: two slots (the loaded i is compared from r0 here, r6 in retail).
+ * Retail calls fn_8007DDC8 with only three arguments (r6 is left stale). */
 int fn_8007DC08(A* self, int a, int target, int c, int* out)
 {
-    int i = 0;
-    while (i < fn_8007DEAC(self, a, c)) {
-        if (fn_8007DDC8(self, a, c, 0) == target) {
-            *out = i;
+    Unk8007DB74_Iter<9> it;
+    while (it.i < fn_8007DEAC(self, a, c)) {
+        if (fn_8007DDC8(self, a, c) == target) {
+            *out = it.i;
             return 1;
         }
-        i = (i > 9) ? i : i + 1;
+        it.Next();
     }
     return 0;
 }
