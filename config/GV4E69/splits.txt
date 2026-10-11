@@ -22,6 +22,11 @@ ealib/tu_803663B0.cpp:
 	.ctors      start:0x805A2C48 end:0x805A2C4C
 	.bss        start:0x80693C98 end:0x80693CAC
 
+ealib/tu_803666EC.cpp:
+	.text       start:0x803666EC end:0x80367140
+	.ctors      start:0x805A2C4C end:0x805A2C50
+	.bss        start:0x80693CAC end:0x80693CC0
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
