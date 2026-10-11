@@ -180,6 +180,59 @@ int fn_8005B864(Unk8005ADD0_Obj* o)
     return lbl_805B1DC0[o->mA8];
 }
 
+/* near-miss: control flow is right (shared tails via goto) but the switch tree lacks the
+ * 'state <= 5' guard retail emits before the case 6 compare (73 vs 77 instructions). */
+void fn_8005B87C(Unk8005ADD0_Obj* o, int ch, int a2)
+{
+    int st = o->mC[ch].mState;
+    int i;
+    int x;
+    int v;
+    switch (st) {
+    case 3:
+        if (a2 == 0) {
+            fn_8005B58C(o, 0);
+            o->mC[ch].mState = 6;
+        again:
+            fn_8005AF00(o, 0);
+            fn_8005B06C(o);
+            return;
+        }
+        return;
+    case 1:
+        if (a2 == 0) {
+            i = fn_8005B6E4(o);
+            o->mA4 = i;
+            x = o->m80[i];
+            o->mA8 = x;
+            o->mC[x].mState = st;
+            o->mC[ch].mState = 6;
+            return;
+        }
+        break;
+    case 6:
+        if (a2 != 0) {
+            if (o->mC[o->mA8].mState != 3) {
+                o->mC[ch].mState = 1;
+                i = fn_8005B6E4(o);
+                o->mA4 = i;
+                o->mA8 = o->m80[i];
+                goto again;
+            }
+            v = 0;
+        store:
+            o->mC[ch].mState = v;
+        }
+        break;
+    default:
+        if (a2 == 0) {
+            v = 6;
+            goto store;
+        }
+        break;
+    }
+}
+
 int fn_8005B9B0(Unk8005ADD0_Obj* o, int i)
 {
     int r = 1;
