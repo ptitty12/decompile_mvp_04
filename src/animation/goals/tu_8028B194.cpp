@@ -326,11 +326,14 @@ int Unk8028B194::fn_8028C0CC(Unk80270BA0_X* x, int b)
     return 0;
 }
 
-/* near-miss: 184 of 191 instructions. The hash switch is balanced differently in
- * retail (root 0x858075AA with a three-node chain below it, so the real case
- * list is not just these 11 values), and retail stores the angle difference
- * once more (an extra stfs/lfs pair through a second float slot). Everything
- * before the switch matches except those. */
+/* near-miss: 175 of 191 instructions. Retail's hash switch sends 6 of the 11
+ * hashes on to the fn_8026D940 checks (beq to the success path) and only 5 to
+ * `fail`; the angle difference is a named local (its extra float slot, 0x38,
+ * now matches). Left: g++ drops some of the "continue" cases (same target as
+ * default) and roots the compare tree at the median 0xA713FF5B; retail keeps
+ * all 11 compares under root 0x858075AA with a right-only chain
+ * 0x3453C76B -> 0x67A49CBA -> 0x7133B4CB on its left, so its case list must
+ * differ (more labels or ranges). */
 int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
 {
     Unk80273498_Vec3 v = m8->fn_8027A358(0);
@@ -351,7 +354,8 @@ int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
         Unk80273498_Vec3 vb = lbl_806055AC;
         fn_8027AD3C(this, x, 0, &vb, &flt, 0, 0, &hash, 0);
         if (m48 != 19 && m28) {
-            if (Abs(AngleDiff(flt, Heading(GetTarget(this), vb))) >= 0.7853982f) {
+            float ad = AngleDiff(flt, Heading(GetTarget(this), vb));
+            if (Abs(ad) >= 0.7853982f) {
                 goto fail;
             }
         }
@@ -359,12 +363,13 @@ int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
         case 0x858075AAu:
         case 0x3453C76Bu:
         case 0x67A49CBAu:
-        case 0x7133B4CBu:
         case 0xCA0C5FC1u:
         case 0xA713FF5Bu:
+        case 0xECC40882u:
+            break;
+        case 0x7133B4CBu:
         case 0x97F6F9F4u:
         case 0xC96D745Bu:
-        case 0xECC40882u:
         case 0xDB410FF7u:
         case 0xF469A7C1u:
             goto fail;
