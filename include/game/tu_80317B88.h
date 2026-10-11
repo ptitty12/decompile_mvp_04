@@ -620,6 +620,7 @@ struct FxDate {
 };
 struct FxView7;
 struct FxView74;
+struct FxViewD;
 /* Packed date record returned by value from fn_80329FA0 (a: month/day byte, b: byte, c: year).
  * Camera / view objects reached through lbl_8061B8C0->m8 (fn_8032B6C0, fn_8032B748, fn_8032B7B4). */
 struct FxView74 {
@@ -630,8 +631,17 @@ struct FxView7 {
     char pad0[0x3a4];
     void* m3A4;
 };
+struct FxViewD {
+    char pad0[0x1d54];
+    float a54;
+    float a58;
+    float a5C;
+    float a60;
+};
 struct FxView {
-    char pad0[0x700];
+    char pad0[0x6b8];
+    FxViewD* m6B8;
+    char pad6BC[0x44];
     FxView7* m700;
     char pad704[0x40];
     FxView74* m744;
@@ -695,6 +705,7 @@ public:
     int mC;
 };
 struct FxF3 { float x; float y; float z; };
+struct FxRect4 { FxV2f p; FxV2f q; };
 class FxListV {
 public:
     float m0;

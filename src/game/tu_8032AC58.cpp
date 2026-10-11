@@ -11,6 +11,8 @@ extern const float lbl_805ED8BC;
 extern const char lbl_805ED8C0[];
 extern FxApp* lbl_8061B8C0;
 extern int lbl_8061B998;
+extern FxV2f lbl_80691B00;
+extern FxV2f lbl_80691B08;
 extern FxCtx* lbl_8061FEDC;
 extern int lbl_806203F0;
 extern int lbl_806203F4;
@@ -25,6 +27,10 @@ void fn_801A0790(FxView* v, float f);
 void fn_80331294(void* p);
 void fn_802D7ACC();
 void fn_80330BC8();
+void fn_8032C1D0(char* p);
+void fn_801828AC(FxViewD* d);
+int fn_8040B6A0(const char* s);
+void fn_8033E958(const char* fmt, ...);
 void* fn_8040B830(void* dst, const void* src, int n);
 void fn_8032D8F8(float f);
 void fn_80313E94(FxCtx* c, int v);
@@ -39,8 +45,11 @@ void fn_8032B7B4();
 void fn_8032BA5C();
 void fn_8032BA7C(FxPages* self);
 void fn_8032C1CC();
+void fn_8032D29C();
 void fn_8032D36C();
 void fn_8032D378();
+void fn_8032D6E4(FxPages* self);
+void fn_8032D7C4();
 void fn_8032D868(FxCmd* self, int a);
 void fn_8032D880(FxCmd* self, const void* src);
 int fn_8032D8C8();
@@ -100,6 +109,23 @@ void fn_8032BA7C(FxPages* self) {
 
 void fn_8032C1CC() {}
 
+void fn_8032D29C() {
+    char a[0x2800] = "";
+    char b[0x201] = "";
+    int pos = 0;
+    fn_8032C1D0(a);
+    int total = fn_8040B6A0(a);
+    while (pos < total) {
+        char* p = a + pos;
+        int n = fn_8040B6A0(p);
+        if (n > 0x200) n = 0x200;
+        fn_8040B830(b, p, n);
+        pos += n;
+        b[n] = 0;
+        fn_8033E958(b);
+    }
+}
+
 void fn_8032D36C() { char buf[0x60]; }
 
 void fn_8032D378() {
@@ -108,6 +134,43 @@ void fn_8032D378() {
     int c = lbl_806203F8;
     fn_80330BC8();
     if (a != lbl_806203F0 || b != lbl_806203F4 || c != lbl_806203F8) lbl_806203FC = 0;
+}
+
+void fn_8032D6E4(FxPages* self) {
+    FxView* v = lbl_8061B8C0->m8;
+    int zero = 0;
+    FxV2f t;
+    {
+        FxViewD* d = v->m6B8;
+        t.x = d->a54;
+        t.y = d->a58;
+        lbl_80691B00 = t;
+    }
+    {
+        FxViewD* d = v->m6B8;
+        t.x = d->a5C;
+        t.y = d->a60;
+        lbl_80691B08 = t;
+    }
+    self->m204 = zero;
+    self->m208 = zero;
+    self->a0[self->m174]->s3();
+    self->m174 = zero;
+    self->a0[zero]->s2();
+}
+
+/* near-miss: rect copy; retail copies the globals through GPRs and the local copy through FPRs */
+void fn_8032D7C4() {
+    FxViewD* d = lbl_8061B8C0->m8->m6B8;
+    FxRect4 r1;
+    r1.p = lbl_80691B00;
+    r1.q = lbl_80691B08;
+    FxRect4 r2 = r1;
+    d->a54 = r2.p.x;
+    d->a58 = r2.p.y;
+    d->a5C = r2.q.x;
+    d->a60 = r2.q.y;
+    fn_801828AC(d);
 }
 
 void fn_8032D868(FxCmd* self, int a) {
