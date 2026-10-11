@@ -306,6 +306,38 @@ void Unk8001CE80::fn_8001D454()
     fn_80042EA8(m3CC, m3D0);
 }
 
+int fn_8004705C(int a);
+int fn_80047118(int a);
+int fn_80046FD4(int a);
+
+/* near-miss (fn_8001D47C, fn_8001D538): retail forms `entry + 0x1b4` inside the loop and loads with lbzx (addi r11,r8,436; lbzx r0,r11,r9);
+ * these two come out with the right length but an `add` + `lbz 436(r9)` per element. Tried: pointer in the loop body, struct field array, unsigned char counter. */
+static inline int SumBytes(unsigned char* p)
+{
+    int s = 0;
+    for (int i = 0; i < 0x80; i++) {
+        s += p[0x1b4 + (unsigned char)i];
+    }
+    return s;
+}
+
+int Unk8001CE80::fn_8001D47C()
+{
+    int a = SumBytes(m130->m44C->m6F8->m14);
+    int b = SumBytes(m130->m44C->m6F8->m14 + 0xe64);
+    int d = a - b;
+    int r = fn_8004705C(d < 0 ? -d : d);
+    return r | fn_80047118(a + b);
+}
+
+int Unk8001CE80::fn_8001D538()
+{
+    int a = SumBytes(m130->m44C->m6F8->m14);
+    int b = SumBytes(m130->m44C->m6F8->m14 + 0xe64);
+    int d = a - b;
+    return fn_80046FD4(d < 0 ? -d : d);
+}
+
 int Unk8001CE80::fn_8001D5D8()
 {
     return fn_8040ABA0() % 100 > 50 ? 2 : 1;
