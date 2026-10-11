@@ -222,7 +222,7 @@ void* fn_80124A28(Unk80124A28_Scr* self, int a, int b, int c, int d, int e, int 
 void fn_80124A90(Unk80124A28_Scr* self)
 {
     fn_800ECE34(self);
-    self->m134 = fn_800C8060(self->fn_vslot32(lbl_805BE1C4, 1));
+    self->m134 = (Wid*)fn_800C8060(self->fn_vslot32(lbl_805BE1C4, 1));
     self->m138 = fn_800C8044(self->fn_vslot32(lbl_805BEA8C, 1));
     self->m13C = fn_800C8044(self->fn_vslot32(lbl_805BEA94, 1));
 }
