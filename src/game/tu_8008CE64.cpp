@@ -162,6 +162,86 @@ Unk8008CE64_Own* fn_80090744(Unk8008CE64_Own* self);
 void fn_8009075C(Unk8008CE64_Own* self, int flags);
 void fn_80090814(Unk8008CE64_Own* self, int a, int b);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int fn_8040B6A0(const char* s);
+void fn_8040B830(char* dst, const char* src, int n);
+
+char* fn_8008D738(Unk8008CE64_K<Unk8008CE64_T3C>* self, int t, unsigned i, char* buf);
+float fn_8008D7B8(Unk8008CE64_Obj* o, int i, int a);
+float fn_8008E77C(G* self, int a);
+float fn_8008E7F0(G* self, int a);
+float fn_8008E864(G* self, int a);
+float fn_8008E8D4(G* self, int a);
+float fn_8008E950(G* self, int a);
+float fn_8008E9CC(G* self, int a);
+void fn_8008EA20(Unk8008CE64_K<Unk8008CE64_T3C>* self, int a, VObj* obj);
+Unk8008CE64_K<Unk8008CE64_T10>* fn_8008EA7C(Unk8008CE64_K<Unk8008CE64_T10>* self);
+void fn_8008EAF8(Unk8008CE64_K<Unk8008CE64_T10>* self, int flags);
+void fn_8008EB54(Unk8008CE64_K<Unk8008CE64_T10>* self, unsigned i);
+void* fn_8008F08C(void* self, int a, int b, char* buf);
+float fn_8008F0B8();
+void fn_8008F7E0();
+void fn_8008F7E4(Unk8008CE64_K<Unk8008CE64_T10>* self, int a, VObj* obj);
+Unk8008CE64_K<Unk8008CE64_T1C>* fn_8008F840(Unk8008CE64_K<Unk8008CE64_T1C>* self);
+void fn_8008F8A8(Unk8008CE64_K<Unk8008CE64_T1C>* self, int flags);
+void fn_8008F904(Unk8008CE64_K<Unk8008CE64_T1C>* self, unsigned i);
+int fn_8008F940(void* self);
+int fn_8008F948(void* self);
+unsigned fn_8008F950(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i);
+char* fn_8008F99C(Unk8008CE64_K<Unk8008CE64_T1C>* self, int t, unsigned i, char* buf);
+/* near-miss: clamp arms and the store registers/address order differ (35 vs 37 slots). */
+void fn_8008FA1C(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i, int v);
+/* near-miss: register assignment of the parameters differs. */
+void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i, const char* str, int n);
+void fn_8008FB90(Unk8008CE64_K<Unk8008CE64_T1C>* self, int a, VObj* obj);
+int fn_8008FBE8(int v);
+int fn_8008FCC8(int t);
+int fn_8008FD14(int t);
+void fn_8009010C();
+void fn_80090164();
+int fn_800901A4();
+float fn_80090380(void* a);
+void fn_800906B8();
+void fn_80090700();
+Unk8008CE64_Own* fn_80090744(Unk8008CE64_Own* self);
+void fn_8009075C(Unk8008CE64_Own* self, int flags);
+void fn_80090814(Unk8008CE64_Own* self, int a, int b);
+
 char* fn_8008D738(Unk8008CE64_K<Unk8008CE64_T3C>* self, int t, unsigned i, char* buf)
 {
     if (i < self->m1C) {
@@ -348,6 +428,64 @@ char* fn_8008F99C(Unk8008CE64_K<Unk8008CE64_T1C>* self, int t, unsigned i, char*
         }
     }
     return buf;
+}
+
+/* near-miss: clamp arms and the store registers/address order differ (35 vs 37 slots). */
+void fn_8008FA1C(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i, int v)
+{
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: {
+            Unk8008CE64_E1C* e = (Unk8008CE64_E1C*)(i * 0x1C + (int)self->m24);
+            if (!(v > 0xFFFF)) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xFFFF;
+            e->h0 = v;
+            break;
+        }
+        case 1: {
+            Unk8008CE64_E1C* e = (Unk8008CE64_E1C*)(i * 0x1C + (int)self->m24);
+            if (!(v > 1)) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 1;
+            e->f = v;
+            break;
+        }
+        }
+    }
+}
+
+/* near-miss: register assignment of the parameters differs. */
+void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i, const char* str, int n)
+{
+    if (i < self->m1C) {
+        if (n == 0)
+            n = fn_8040B6A0(str);
+        switch (t) {
+        case 0: {
+            int m = n;
+            if (m > 10)
+                m = 10;
+            char* dst = (char*)self->m24 + i * 0x1C + 3;
+            fn_8040B830(dst, str, m);
+            dst[m] = 0;
+            break;
+        }
+        case 1: {
+            int m = n;
+            if (m > 13)
+                m = 13;
+            char* dst = (char*)self->m24 + i * 0x1C + 0xE;
+            fn_8040B830(dst, str, m);
+            dst[m] = 0;
+            break;
+        }
+        }
+    }
 }
 
 /* near-miss: same register-assignment difference as fn_8008EA20. */
