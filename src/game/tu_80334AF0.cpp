@@ -67,6 +67,13 @@ inline int EnumVal(MIE* i) { return i->m60[i->m4C]; }
 inline MIE* EAt(Menu* p, int off) { return (MIE*)((char*)p + off); }
 
 extern const char lbl_80666778[];
+extern const char lbl_80666368[], lbl_805EF59C[], lbl_805EF5A4[], lbl_805EF5BC[], lbl_805F3504[];
+extern int lbl_8062080C, lbl_80620810;
+extern "C" {
+void fn_8032E70C(void* item, const char* name, float a, float b, float c, float d);
+void fn_8032E894(void* item, const char* name, int* val, float a, float b, float c, float d);
+void fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
+}
 extern float lbl_805EEF30, lbl_805EEF40;
 extern int lbl_8062076C, lbl_80620784, lbl_80620780, lbl_80620760, lbl_80620764, lbl_80620768;
 extern float lbl_80620770, lbl_8062077C;
@@ -336,6 +343,19 @@ void fn_80336E88(Menu* p)
 }
 
 void fn_80336F38(Menu* p, int k) { fn_80330BC8(p, k); }
+
+Menu* fn_80336F58(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666368;
+    fn_8032E70C((char*)p + 0x2E0, lbl_805EF59C, 0.0f, 0.1f, 0.0f, 1.0f);
+    fn_8032E894((char*)p + 0x344, lbl_805EF5A4, &lbl_8062080C, 1.0f, 0.01f, 0.33f, 1.5f);
+    fn_8032FAB0((char*)p + 0x3A8, lbl_805EF5BC, &lbl_80620810, lbl_805F3504, 3, -1);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x344));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x3A8));
+    return p;
+}
 
 void fn_80337074(Menu* p)
 {
