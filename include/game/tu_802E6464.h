@@ -53,6 +53,7 @@ public:
     void fn_802E8804(Unk802E869C* o, Unk802E4B98_V4* v);
     void fn_802E8AC4();
     void fn_802E8B6C(Unk802E22EC_Counted* c, int a, Unk802E4B98_V4* v);
+    void fn_802E8D1C(Unk802E22EC_B* o);
 };
 Unk802E869C* fn_802E884C(Unk802E869C* o, Unk802E4B98_V4* v);
 

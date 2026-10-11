@@ -218,6 +218,12 @@ Unk802E8FB0::~Unk802E8FB0()
     fn_802E90C8();
 }
 
+void Unk802E869C::fn_802E8D1C(Unk802E22EC_B* o)
+{
+    lbl_8061F68C->s2(o->m0 == 7, "/mvp2004/source/common/geomlib/geomspheregroup.cpp", 170);
+    lbl_8061F68C->s2(0, "/mvp2004/source/common/geomlib/geomspheregroup.cpp", 171);
+}
+
 void Unk802E8FB0::fn_802E90C8()
 {
     if (m60) {
