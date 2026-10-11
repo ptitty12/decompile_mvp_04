@@ -176,7 +176,8 @@ extern "C" void fn_800C5574(Unk800C341C_Mgr* m, int kind, const char* name, int 
     }
 }
 
-/* near-miss: retail forms the record pointer with stwu r0,0x2cd4(r9) (update-form store); ours uses addi + stwx */
+extern float lbl_805BBFAC;
+
 extern "C" void fn_800C56C0(Unk800C341C_Mgr* m, int idx)
 {
     int n = m->m5D94 - 1;
@@ -188,11 +189,12 @@ extern "C" void fn_800C56C0(Unk800C341C_Mgr* m, int idx)
             i++;
         } while (i < m->m5D94);
     }
-    Unk800C3A10_Rec* r = &m->recs[i];
+    Unk800C3A10_Rec* r = (Unk800C3A10_Rec*)(i * 1040 + (int)m);
+    r = (Unk800C3A10_Rec*)((char*)r + 11476);
     r->m0 = 0;
     r->m4 = 0;
     r->m404 = 0;
-    r->m408 = 0.0f;
+    r->m408 = lbl_805BBFAC;
     r->m40C = 0;
 }
 
