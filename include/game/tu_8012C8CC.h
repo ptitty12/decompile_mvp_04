@@ -97,8 +97,8 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot40(int a);
     virtual void fn_vslot41(int a);
     virtual void fn_vslot42();
-    virtual void fn_vslot43();
-    virtual void fn_vslot44();
+    virtual void fn_vslot43(int a, int b, char* c, int d);
+    virtual void fn_vslot44(int a, int b, char* c, int d);
     virtual void fn_vslot45();
     virtual void fn_vslot46();
     virtual void fn_vslot47(int a);
@@ -133,7 +133,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot76();
     virtual void fn_vslot77();
     virtual void fn_vslot78();
-    virtual void fn_vslot79();
+    virtual void fn_vslot79(int a, int b);
     virtual void fn_vslot80(int a);
     virtual void fn_vslot81();
     virtual void fn_vslot82();
@@ -142,7 +142,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual int fn_vslot85();
     virtual int fn_vslot86();
     virtual int fn_vslot87();
-    virtual void fn_vslot88();
+    virtual void fn_vslot88(int a);
     virtual void fn_vslot89(int a);
     virtual int fn_vslot90();
     virtual int fn_vslot91();
@@ -159,7 +159,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot102();
     virtual void fn_vslot103();
     virtual void fn_vslot104();
-    virtual void fn_vslot105();
+    virtual void fn_vslot105(int a);
     virtual void fn_vslot106();
     virtual void fn_vslot107();
     virtual void fn_vslot108();
