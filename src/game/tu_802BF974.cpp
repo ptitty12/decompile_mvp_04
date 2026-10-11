@@ -185,6 +185,127 @@ void fn_802C2C84(Unk802C2188* o)
     fn_802C2CCC(o, &p);
 }
 
+/* near-miss (94 vs 95 insns): retail repeats the second (a == 0x4A) test with its own cmpwi cr0; ours CSEs the duplicated compare into cr7 (shared cmpwi cr7,r9,74).
+   Separate ifs matched everything else; one big ||/&& expression is worse (81 slots). */
+int fn_802C2CCC(Unk802C2188* o, Unk802C2188_Pair* p)
+{
+    int a = p->x;
+    if (a == 0x10) {
+        if (p->y == 2) {
+            return 1;
+        }
+    }
+    if (a == 0xC) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+        if (b == 2) {
+            return 1;
+        }
+        if (b == 3) {
+            return 1;
+        }
+    }
+    if (a == 0xE) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+        if (b == 14) {
+            return 1;
+        }
+        if (b == 2) {
+            return 1;
+        }
+    }
+    if (a == 0x0) {
+        int b = p->y;
+        if (b == 8) {
+            return 1;
+        }
+        if (b == 9) {
+            return 1;
+        }
+    }
+    if (a == 0x8) {
+        int b = p->y;
+        if (b == 8) {
+            return 1;
+        }
+        if (b == 9) {
+            return 1;
+        }
+    }
+    if (a == 0x28) {
+        int b = p->y;
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x29) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x4A) {
+        int b = p->y;
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x3F) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x4A) {
+        int b = p->y;
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x5A) {
+        int b = p->y;
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x78) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+    }
+    if (a == 0x76) {
+        int b = p->y;
+        if (b == 0) {
+            return 1;
+        }
+        if (b == 1) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fn_802C2E48(unsigned char* p)
 {
     int r = 2;
