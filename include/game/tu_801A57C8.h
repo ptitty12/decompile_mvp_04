@@ -33,8 +33,7 @@ struct Unk801A57C8_G {
 class Unk8035AB00 {
 public:
     Unk8035AB00();
-    virtual void fn_vslot1();
-    virtual ~Unk8035AB00();
+    virtual void fn_vslot1() = 0;
 };
 
 class Unk801B5A44 : public Unk8035AB00 {

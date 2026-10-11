@@ -83,7 +83,7 @@ struct Unk8019F8C0_Ring {
 /* Element of the array at m14 of the manager (stride 0xE64); element 2 also
  * holds the flags read at 0x1CC9 / 0x1CD0 (evidence: fn_801A2034, fn_801A48F8). */
 struct Unk8019F8C0_Inner {
-    char pad0[1];
+    unsigned char m0;
     unsigned char m1;
     char pad2[6];
     int m8;
@@ -91,7 +91,8 @@ struct Unk8019F8C0_Inner {
     int m108;
     char pad10C[0x168 - 0x10C];
     Unk8019F8C0_Ring m168;
-    char pad178[0x3E4 - 0x178];
+    char pad178[0x1B4 - 0x178];
+    unsigned char m1B4[0x3E4 - 0x1B4];
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
 };
@@ -112,7 +113,9 @@ struct Unk8019F8C0_Dev {
 };
 
 struct Unk8019F8C0_Mgr10 {
-    char pad0[0x6C];
+    char pad0[0x1C];
+    int m1C;
+    char pad20[0x6C - 0x20];
     int m6C;
     int m70;
     char pad74[0x22C - 0x74];
