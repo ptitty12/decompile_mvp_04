@@ -93,6 +93,7 @@ void fn_800EC644()
 {
 }
 
+/* near-miss: 47/47 insns, only the temporaries of the argument shuffle (c/d/e in r0/r11/r3) are allocated differently */
 extern "C" UiScrRaw* fn_800EC648(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800CEEF0(self, a, 0, b, c, d, e, f, g, 0, 0, 0, lbl_805BE168);
@@ -176,6 +177,7 @@ extern "C" void fn_800ECAA4(UiS* self)
     }
 }
 
+/* near-miss: ~20 slots, register numbering of self/arr and lwzx base/index order of the table reads */
 void fn_800ECC9C(UiS* self, UiS* node, UiRec12* arr, int n)
 {
     for (; node != 0; node = (UiS*)node->m8) {
