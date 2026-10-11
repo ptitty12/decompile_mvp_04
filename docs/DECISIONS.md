@@ -48,8 +48,11 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
-- 2026-10-10 | **Verifier reports renamed functions as regressions; please install `proposed/verify-rename-fix.patch`.**
-  - Context: `verify.py` keys functions by name. When a matched function's mangled name changes because a parameter type was corrected, the old name shows "100% → 0%". Real case: `fn_802713D4__11Unk8027130CiPi` → `...CScPi`, still 100% (same unit, address and size).
-  - What went wrong: on this case the agent's push command gated on a `grep` instead of the verifier's exit code, so commits `778e804` and `5c6901b` reached `main` although the verifier failed against `b545d69`. No function actually regressed. Pushes are now gated on the verifier's exit code.
-  - The fix falls back to (unit, address, size) when a name disappears. It can't be applied by the agent (CLAUDE.md, `tools/verify/` is protected).
-  - Options: install the patch (3 steps in `proposed/README.md`) / keep as is (agents then avoid renaming matched functions)
+- 2026-10-10 | **BLOCKING: install `proposed/verify-rename-fix.patch` (verifier false positives).**
+  - Context: `verify.py` (protected) reports two non-regressions as regressions:
+    1. renamed functions (keyed by name; a corrected parameter type renames a still-100% function);
+    2. dtk's code-less auto data units, which count as "100% matched code" and vanish when a new unit claims their range.
+  - (2) blocks pushing nearly every new unit. `animation/choosers/tu_80271748.cpp` (cEventChooser, 5/5, the first unit **linked** from C++, main.dol identical) is committed locally on `match/batch-01` but unpushed for this reason.
+  - Earlier, commits `778e804`/`5c6901b` reached main on a failed gate (issue 1, no real regression). Pushes are gated on the verifier's exit code since then.
+  - Fix: fall back to (unit, address, size) for functions, and skip code-less units at the unit level. Tested on real reports: PASS for both false-positive cases, FAIL for a real drop.
+  - Options: install (3 steps in `proposed/README.md`) / keep as is (new units can't be pushed)
