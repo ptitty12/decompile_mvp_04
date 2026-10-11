@@ -9,6 +9,14 @@ typedef Unk80114A20_Scr Scr;
 typedef Unk800C7B40_Widget Wid;
 
 
+inline void SetSub98(Wid* w, int v)
+{
+    ((UnkSub*)((char*)w + 0x98))->fn_vslot20(v, 0);
+}
+extern const char lbl_805BFB7C[];
+extern const char lbl_805BFCDC[];
+extern const float lbl_805BFCE4;
+extern const float lbl_805BFCE8;
 extern const char lbl_805BA6D8[];
 extern const char lbl_805B955C[];
 extern const char lbl_805BFB3C[];
@@ -48,7 +56,9 @@ void fn_80117F48(Unk80117D20_Scr* self);
 void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_80118144(Unk80117D20_Scr* self, Wid* w, int v);
 void fn_801181EC(Scr* self);
+void fn_80118A70(Unk80117D20_Scr* self);
 void fn_80119F48(char* buf, float v);
+void fn_80119FF0(char* buf, float v);
 void fn_8011A0A4(int v, Unk800C7B40_Widget* w, const char* name);
 void fn_8011A14C(int a, Unk800C7B40_Widget* w, const char* name, int flag);
 void fn_8011A1D4(UnkGame* g, int a, Unk800C7B40_Widget* w, const char* name);
@@ -65,6 +75,8 @@ void fn_800ECAA4(void* self);
 void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_8011AD00(int a);
 void fn_800ECF18(void* self);
+int fn_801059E4();
+void fn_80118D14(Wid* w);
 void fn_8035682C(void* name);
 void fn_8040B830(void* dst, const char* src, int n);
 void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
@@ -243,8 +255,7 @@ void fn_80117D70(Unk80117D20_Scr* self)
         name = lbl_805BFB3C;
     else
         name = lbl_805BFB4C;
-    UnkSub* s = (UnkSub*)((char*)fn_800C8054(self->fn_vslot29(name)) + 0x98);
-    s->fn_vslot20(rec->m198, 0);
+    SetSub98(fn_800C8054(self->fn_vslot29(name)), rec->m198);
     for (Wid* c = ((UnkGroupW*)self)->m40; c != 0; c = (Wid*)c->m8)
         fn_80117EA0(self, c, rec->m198);
     self->m134 = (int)fn_800ED2B0(self, lbl_805BE1B0);
@@ -307,6 +318,16 @@ void fn_801181EC(Scr* self)
     fn_800ECAA4(self);
 }
 
+void fn_80118A70(Unk80117D20_Scr* self)
+{
+    UnkGameP6F8* p = fn_8011AA24(0)->m6F8;
+    int i = fn_801059E4();
+    UnkPlayerRec* r = p->m14->rec + i;
+    int v = r->m198;
+    SetSub98(fn_800C8054(self->fn_vslot33(9, 1)), v);
+    fn_80118D14(fn_800C8044(self->fn_vslot32(lbl_805BFB7C, 1)));
+}
+
 void fn_80119F48(char* buf, float v)
 {
     int m = (int)((v + lbl_805BFCD4) * lbl_805BFCD8);
@@ -315,6 +336,15 @@ void fn_80119F48(char* buf, float v)
         fn_804089B4(buf, lbl_805BFCC4);
     else
         fn_804089B4(buf, lbl_805BFCCC, m);
+}
+
+void fn_80119FF0(char* buf, float v)
+{
+    int x = (int)((v + lbl_805BFCE4) * lbl_805BFCE8);
+    if (x % 10 > 4)
+        x += 10;
+    x = x / 10;
+    fn_804089B4(buf, lbl_805BFCDC, x / 100, x % 100);
 }
 
 void fn_8011A0A4(int v, Unk800C7B40_Widget* w, const char* name)
