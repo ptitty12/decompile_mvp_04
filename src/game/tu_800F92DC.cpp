@@ -89,9 +89,107 @@ void fn_800F9E4C(UiScrRaw* self, int a)
     fn_8035686C(self, a);
 }
 
+extern char lbl_805BEAE0[];
+void fn_800FB02C(UiObj* self)
+{
+    fn_802D7ACC();
+    fn_800C8044(self->v32((int)lbl_805BEAE0, 1))->v8((lbl_806192E0->m4->m10->m120 ^ 1) == 0);
+    fn_800B555C()->m570 = -1;
+    fn_802D8294(1);
+    fn_802D7A74();
+    lbl_8061B8C0->m24 = 0;
+    fn_802D7ACC();
+}
+
 int fn_800FC084()
 {
     return 1;
+}
+
+void fn_800FC160(UiV_1E8i_1ECi_1F0i_1F4i_1F8i_1FCi_200i_204i_208i_20Ci_210i_214i_218i_21Ci_220i_224i_228i_22Ci* self)
+{
+    if (fn_8011B4E4() != 0) {
+        fn_801184F4(self->m1E8, self->m1F0, self->m1F8, self->m200, self->m208, self->m210, self->m218, 0, 0);
+        return;
+    }
+    fn_801184F4(self->m1EC, self->m1F4, self->m1FC, self->m204, self->m20C, self->m214, self->m21C, self->m224, self->m22C);
+}
+
+extern char lbl_805B9A9C[];
+extern char lbl_805B9AA4[];
+extern char lbl_805B9ACC[];
+void fn_800FC6B4(UiV_25Ci_260i* self)
+{
+    fn_800C8044(self->v32((int)lbl_805B9A9C, 1))->v8(0);
+    self->m25C = 0;
+    fn_800C8044(self->v32((int)lbl_805B9AA4, 1))->v8(0);
+    fn_800C8044(self->v32((int)lbl_805B9ACC, 1))->v8(0);
+    self->m260 = 0;
+}
+
+UiObj* fn_800FC7B4(UiV_158i_15Ci_160i_164i_168i* self, int idx)
+{
+    switch (idx) {
+    case 0:
+        return fn_800C8044(self->m158);
+    case 1:
+        return fn_800C8044(self->m15C);
+    case 2:
+        return fn_800C8044(self->m160);
+    case 3:
+        return fn_800C8044(self->m164);
+    case 4:
+        return fn_800C8044(self->m168);
+    default:
+        return 0;
+    }
+}
+
+UiObj* fn_800FC844(UiV_170i_174i_178i_17Ci_180i* self, int idx)
+{
+    switch (idx) {
+    case 0:
+        return fn_800C8054(self->m170);
+    case 1:
+        return fn_800C8054(self->m174);
+    case 2:
+        return fn_800C8054(self->m178);
+    case 3:
+        return fn_800C8054(self->m17C);
+    case 4:
+        return fn_800C8054(self->m180);
+    default:
+        return 0;
+    }
+}
+
+UiObj* fn_800FC8D4(UiV_184i_188i_18Ci_190i_194i* self, int idx)
+{
+    switch (idx) {
+    case 0:
+        return fn_800C8038(self->m184);
+    case 1:
+        return fn_800C8038(self->m188);
+    case 2:
+        return fn_800C8038(self->m18C);
+    case 3:
+        return fn_800C8038(self->m190);
+    case 4:
+        return fn_800C8038(self->m194);
+    default:
+        return 0;
+    }
+}
+
+void fn_800FC964(UiV_1A0i_1A4i* self, int a)
+{
+    if (fn_8011B4E4() != 0) {
+        fn_800C8044(self->m1A4)->v8(0);
+        fn_800C8044(self->m1A0)->v8(a);
+        return;
+    }
+    fn_800C8044(self->m1A4)->v8(a);
+    fn_800C8044(self->m1A0)->v8(0);
 }
 
 void fn_800FCA30(UiV_1E0b* self)
