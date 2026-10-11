@@ -18,6 +18,7 @@ struct Unk8005DF2C_Stat;
 struct Unk8005DF2C_Y;
 struct Unk8005DF2C_Q;
 struct Unk8005DF2C_Rec;
+struct Unk8005DF2C_Tri;
 struct Unk8005DF2C_Slot28;
 struct Unk8005DF2C_Ctx;
 struct Unk8005DF2C_O130;
@@ -47,7 +48,9 @@ struct Unk8005DF2C_Stat {
 };
 
 struct Unk8005DF2C_Y {
-    char pad0[0x1B4];
+    char pad0[0x177];
+    unsigned char m177;
+    char pad178[0x3C];
     unsigned char m1B4[128];
     char pad234[0x1];
     unsigned char m235;
@@ -66,6 +69,10 @@ struct Unk8005DF2C_Rec {
     char pad10[0x38];
 };
 
+struct Unk8005DF2C_Tri {
+    int v[3];
+};
+
 struct Unk8005DF2C_Slot28 {
     int m0;
     int m4;
@@ -77,7 +84,8 @@ struct Unk8005DF2C_Ctx {
     unsigned char m1;
     char pad2[0x36];
     int m38;
-    char pad3C[0xC];
+    int m3C;
+    char pad40[0x8];
     int m48;
     char pad4C[0x24];
     Unk8005DF2C_Ent24 m70[3];
@@ -100,7 +108,15 @@ struct Unk8005DF2C_Ctx {
     int m278;
     char pad27C[0x14];
     int m290[1];
-    char pad294[0x11C];
+    char pad294[0x54];
+    int m2E8[1];
+    char pad2EC[0x4];
+    int m2F0[1];
+    char pad2F4[0x24];
+    Unk8005DF2C_Tri m318[1];
+    char pad324[0xC];
+    Unk8005DF2C_Tri m330[1];
+    char pad33C[0x74];
     Unk8005DF2C_O3B0* m3B0;
     int m3B4;
     int m3B8;
@@ -113,7 +129,9 @@ struct Unk8005DF2C_Ctx {
     int m40C;
     int m410;
     int m414;
-    char pad418[0xBC];
+    int m418;
+    int m41C;
+    char pad420[0xB4];
     int m4D4;
     int m4D8;
 };
@@ -160,6 +178,8 @@ struct Unk8005DF2C_O6F8C {
     int m1C;
     char pad20[0x8];
     int m28;
+    char pad2C[0x58];
+    int m84;
 };
 
 struct Unk8005DF2C_O6F810 {
@@ -175,7 +195,9 @@ struct Unk8005DF2C_O700 {
 struct Unk8005DF2C_O3B0 {
     char pad0[0x44C];
     int m44C;
-    char pad450[0x138];
+    char pad450[0x10];
+    int m460;
+    char pad464[0x124];
     Unk8005DF2C_Stat m588;
     char pad5C8[0x140];
     int m708;
