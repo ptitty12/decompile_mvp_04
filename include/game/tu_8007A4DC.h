@@ -54,7 +54,7 @@ struct W : WBase {
     virtual int v50();
     virtual int v58();
     virtual int v60();
-    virtual int v68();
+    virtual int v68(int a, int b);
     virtual int v70(int a, int b);
     virtual int v78(int a, int b, int c);
 };
@@ -311,10 +311,28 @@ void fn_80093E78(Handle* h, int r, int c);
 void fn_8009479C(Handle* h, int r, int c);
 int fn_800918AC(Handle* h, int a);
 
+/*
+ * Per-kind table behind Screen::mC[] (fn_80076A24 and fn_80076AE4): a count at +4,
+ * then 0x1C-byte records at +8 made of a word and two 12-byte (key, byte) pairs.
+ */
+struct Unk80076A24_Sub {
+    int m0;
+    unsigned char m4;
+    char pad5[7];
+};
+struct Unk80076A24_Rec {
+    int m0;
+    Unk80076A24_Sub m4[2];
+};
+struct Unk80076A24_Grp {
+    int m0;
+    unsigned m4;
+    Unk80076A24_Rec* m8;
+};
 struct Unk8007B2B0_Screen {
     char pad0[0x8];
     EntryTable* m8;
-    char padC[0x24];
+    Unk80076A24_Grp* mC[9];
     void* m30;
     char pad34[0x4];
     Handle m38;
@@ -380,10 +398,10 @@ struct Unk8007B2B0_Screen {
     void fn_80072CE8();
     void fn_80072D68();
     void fn_80072DC0();
-    int fn_800757B8();
-    int fn_80075948();
+    int fn_800757B8(int a);
+    int fn_80075948(int a);
     int fn_80075C64(int id);
-    void fn_80078A38(int a);
+    int fn_80078A38(int a);
     float fn_800799D0(int n);
     float fn_80079A1C();
     int fn_80079A58(float f);
@@ -406,7 +424,7 @@ struct Unk8007B2B0_Screen {
     int fn_8007B4A8(int a, int b, int c);
     int fn_8007B510(int a, int b);
     int fn_8007B570(int a, int b, int c);
-    int fn_8007B5D8();
+    int fn_8007B5D8(int a, int b);
     int fn_8007B610(int a, int b);
     int fn_8007B648(int a, int b);
     int fn_8007B680(int a, int b, int c);

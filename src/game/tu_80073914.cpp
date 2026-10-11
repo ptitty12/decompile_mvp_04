@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8007A4DC.h"
+#include "game/clampiter.h"
 
 /* View of a widget whose slot 0x38 returns a float (fn_800745C4). */
 struct Unk800745C4_WBase {
@@ -30,6 +31,7 @@ extern const int lbl_805B6B28[];
 extern const char lbl_805B3F4C[];
 extern const char lbl_805B3F58[];
 unsigned fn_800736EC(const char* s);
+int fn_80083FC0(int x);
 unsigned fn_8007366C(const char* a, const char* b);
 int fn_80075868(int id);
 int fn_80076058(int a, int b);
@@ -164,9 +166,9 @@ void Unk8007A4DC_Screen::fn_8007575C(int a, int b, int i, int j, int c)
         m1CC[i].m4[j]->v40(a, b, c);
 }
 
-int Unk8007B2B0_Screen::fn_800757B8()
+int Unk8007B2B0_Screen::fn_800757B8(int a)
 {
-    int r = fn_80075948();
+    int r = fn_80075948(a);
     if (r != 0 && fn_8007B3E0(0xE, r) != 0)
         return 1;
     return 0;
@@ -200,6 +202,25 @@ int fn_800758F8(int id)
     if (fn_80075808(id) || fn_80075868(id))
         r = 1;
     return r;
+}
+
+int Unk8007B2B0_Screen::fn_80075948(int a)
+{
+    if (a != 0) {
+        unsigned i = 0;
+        unsigned n = fn_8007B2B0();
+        for (; i < n; i++) {
+            Unk8006A138_It<3> it(0);
+            int j = 0;
+            while (j <= 3) {
+                int id = fn_80083FC0(j);
+                if (fn_8007B5D8(id, i) == a)
+                    return fn_8007B2FC(i);
+                j = it.Next();
+            }
+        }
+    }
+    return 0;
 }
 
 void fn_800759F8(Unk8007B2B0_Screen* s, int a)

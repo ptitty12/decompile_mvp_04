@@ -311,9 +311,9 @@ int Unk8007B2B0_Screen::fn_8007B570(int a, int b, int c)
     return m44->v40(a, fn_80071814(m44, b), c);
 }
 
-int Unk8007B2B0_Screen::fn_8007B5D8()
+int Unk8007B2B0_Screen::fn_8007B5D8(int a, int b)
 {
-    return m40->v68();
+    return m40->v68(a, b);
 }
 
 int Unk8007B2B0_Screen::fn_8007B610(int a, int b)

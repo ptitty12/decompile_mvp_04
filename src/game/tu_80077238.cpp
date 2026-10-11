@@ -13,7 +13,7 @@ void fn_800915F0(Handle* h);
 void fn_80083448(Unk8007A4DC_Obj1E8* o, int a, unsigned short b);
 void fn_800835E8(Unk8007A4DC_Obj1E8* o, int a, unsigned short b);
 void fn_80083CEC(Unk8007A4DC_Obj1E8* o);
-void fn_80084114(void);
+int fn_80084114(void);
 int fn_80377E04(Obj* o, int* out, int id);
 void fn_80400CE4(int a);
 int fn_80377E04(Obj* o, int* out, int id);
@@ -182,10 +182,10 @@ void Unk8007A4DC_Screen::fn_80077DAC()
     fn_800915F0(&m4C);
 }
 
-void Unk8007B2B0_Screen::fn_80078A38(int a)
+int Unk8007B2B0_Screen::fn_80078A38(int a)
 {
     fn_8007B8C4(0, a);
-    fn_80084114();
+    return fn_80084114();
 }
 
 int Unk8007A4DC_Screen::fn_80078A64(int a, int b, int c)
