@@ -78,9 +78,9 @@ public:
     virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24();
     virtual void v25(); virtual void v26(); virtual void v27(); virtual void v28(char* s); virtual void v29(int a);
     virtual UiS* v30(const char* s, int a);
-    virtual void v31();
+    virtual int v31();
     virtual UiS* v32(const char* s, int a);
-    virtual UiLabel* v33(int a, int b); virtual void v34(); virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38();
+    virtual UiLabel* v33(int a, int b); virtual int v34(); virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38();
     virtual void v39();
     virtual void v40();
     virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44(); virtual void v45(); virtual void v46();
