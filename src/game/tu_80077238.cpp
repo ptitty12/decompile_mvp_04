@@ -32,6 +32,127 @@ struct Unk80079240_Obj {
     void* m1C;
 };
 
+/* The seven roster-walk functions fn_80077238..fn_80077934 differ only in the handle (+0x17C /
+ * +0x1C0) and the call; each is 1 slot off (lwzx operand order of the id load). */
+int Unk8007A4DC_Screen::fn_80077238(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1)
+            total += fn_800739E0(0, id, b, 2);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_80077320(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1)
+            total += fn_80073710(1, id, b);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_80077404(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1)
+            total += fn_8007455C(1, id, b);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_80077684(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1)
+            total += fn_80075094(2, id, b, 2);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_8007776C(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1)
+            total += fn_80074754(7, id, b);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_80077850(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1)
+            total += fn_80074754(10, id, b);
+    }
+    return total;
+}
+
+int Unk8007A4DC_Screen::fn_80077934(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    int total = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1)
+            total += fn_80074754(11, id, b);
+    }
+    return total;
+}
+
 void Unk8007A4DC_Screen::fn_80077CF8()
 {
     fn_8009532C(&m17C);
