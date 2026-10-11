@@ -475,6 +475,50 @@ struct Unk80537D24_Screen : Unk8007B2B0_Screen {
     float fn_8007BB28(int a, int b, int c);
 };
 
+/* The 0x18-byte stack list that fn_80535650 builds by hand (three inlined constructors in a row:
+ * vtables lbl_8064B298, lbl_8064A550, lbl_8064A4C8 are stored into the vptr slot in turn) around a
+ * 0x28-int buffer next to it. Same layout as Unk805352B0_List with a vptr at +0x10. */
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A4C8[];
+extern char lbl_8064A440[];
+struct Unk80535650_Tmp {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    unsigned Count() { return m4; }
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void D() { vp = lbl_8064A550; }
+};
+
 /* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */
 struct Unk8052CF34_Obj {
     virtual float M(int a);
