@@ -38,6 +38,8 @@ void fn_80328858(void* a, int b, int c);
 void fn_80321628(void* a, int b);
 void fn_80320DD0(void* a, int b);
 void fn_80329AAC(FxSing* p, int a);
+FxDate fn_80329FA0(char* p);
+int fn_8032A130(int a, int b, int c);
 void fn_80378D70(char* src, unsigned n, char* dst, int cap, int delim, int* outLen);
 void fn_80379094(char* s, int len, int a);
 double fn_80409D88(const char* s);
@@ -56,7 +58,6 @@ void fn_80327274(FxAI* self);
 int fn_803272D0(FxAI* self, unsigned i);
 void fn_803272F0(FxAI* self);
 void fn_80328208();
-FxBase* fn_80328234(FxBase* self, int a, int b);
 FxBase* fn_803282A8(FxBase* self, int a);
 void fn_80328318(FxBase* self, int a, int b);
 void fn_80328374(FxBase* self, int a);
@@ -79,15 +80,17 @@ void fn_80329AAC(FxSing* p, int a);
 void fn_80329AE0(void* p);
 int fn_80329AE4(void* p);
 void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim);
-int fn_80329B98(char** cur, unsigned* n, float* out, int delim);
-int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim);
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim);
 int fn_80329DF0(void* a, int* out, int c);
 int fn_80329E50();
-void fn_8032A0C0(FxMS* out, int t);
-int fn_8032A118(FxMS* p);
+FxMS fn_8032A0C0(int t);
+int fn_8032A118(FxMS v);
+int fn_8032A130(int month0, int day, int year);
+int fn_8032A1EC(int kind);
+int fn_8032A278(int t);
 unsigned char fn_8032A2CC(int a, int b);
 int fn_8032A338(unsigned y);
+char* fn_8032A394(char* base, int target);
 void fn_8032ABC8();
 // PROTOS-END
 }
@@ -356,19 +359,61 @@ int fn_80329E50() {
     return 1;
 }
 
-/* near-miss: retail keeps the 2-byte result in a stack temp then copies it */
-void fn_8032A0C0(FxMS* out, int t) {
+FxMS fn_8032A0C0(int t) {
     FxMS r;
+    FxMS* p = &r;
     r.m = 0;
-    r.s = 0;
+    p->s = 0;
     r.m = t / 60;
-    r.s = t - r.m * 60;
-    *out = r;
+    p->s = t - r.m * 60;
+    return r;
 }
 
-int fn_8032A118(FxMS* p) {
-    unsigned short v = *(unsigned short*)p;
-    return (v >> 8) * 60 + (v & 0xFF);
+int fn_8032A118(FxMS v) {
+    unsigned short h = *(unsigned short*)&v;
+    return (h >> 8) * 60 + (h & 0xFF);
+}
+
+int fn_8032A130(int month0, int day, int year) {
+    int m = month0 + 1;
+    int a = (14 - m) / 12;
+    int y = year - a;
+    int mm = m + 12 * a - 2;
+    int d = day + y;
+    return (d + y / 4 - y / 100 + y / 400 + (31 * mm) / 12) % 7;
+}
+
+int fn_8032A1EC(int kind) {
+    FxMS r;
+    FxMS* p = &r;
+    r.m = 0;
+    p->s = 0;
+    r.m = 0xD;
+    p->s = 5;
+    switch (kind) {
+    case 0:
+        r.m = 0xD;
+        p->s = 5;
+        break;
+    case 1:
+        r.m = 0x12;
+        p->s = 5;
+        break;
+    case 2:
+        r.m = 0x13;
+        p->s = 5;
+        break;
+    }
+    return fn_8032A118(r);
+}
+
+int fn_8032A278(int t) {
+    FxMS r = fn_8032A0C0(t);
+    if (r.m > 0x10) {
+        if ((unsigned)(r.m - 0x11) <= 1) return 1;
+        return 2;
+    }
+    return 0;
 }
 
 /* near-miss: return value conversions (clrlwi) differ */
@@ -391,6 +436,16 @@ int fn_8032A338(unsigned y) {
         return 1;
     }
     return 0;
+}
+
+char* fn_8032A394(char* base, int target) {
+    for (int i = 0; i <= 6; i++) {
+        char* p = base + i;
+        FxDate d = fn_80329FA0(p);
+        unsigned w = *(unsigned*)&d;
+        if (fn_8032A130((w >> 24) - 1, (w >> 16) & 0xFF, w & 0xFFFF) == target) return p;
+    }
+    return base;
 }
 
 void fn_8032ABC8() {

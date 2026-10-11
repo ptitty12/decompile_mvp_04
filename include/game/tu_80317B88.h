@@ -599,8 +599,15 @@ struct FxSlot8 {
     int m0;
     int m4;
 };
+struct FxDate {
+    unsigned a : 8;
+    unsigned b : 8;
+    unsigned c : 16;
+};
 struct FxView7;
 struct FxView74;
+/* Packed date record returned by value from fn_80329FA0 (a: month/day byte, b: byte, c: year).
+ * Camera / view objects reached through lbl_8061B8C0->m8 (fn_8032B6C0, fn_8032B748, fn_8032B7B4). */
 struct FxView74 {
     char pad0[0x20];
     int m20;
