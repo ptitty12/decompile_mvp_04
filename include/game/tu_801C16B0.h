@@ -27,6 +27,8 @@ struct Unk801C16B0_M4 {
     Unk801C16B0_Sub8 s8;
     char pad18[0x3B0 - 0x18];
     void* m3B0;
+    char pad3B4[0x418 - 0x3B4];
+    int m418;
 };
 
 /* Pair of vectors at Z::m29C (stride 0x18); Z::m29C[1].a is at +0x2B4. */
