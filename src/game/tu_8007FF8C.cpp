@@ -82,7 +82,9 @@ extern char lbl_805B40B8[];
 
 
 
-void fn_80071E2C(I* self);
+/* fn_80071E2C is the base-class version of these functions: it takes the same
+ * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
+void fn_80071E2C(I* self, int a, Unk8007FF8C_VObj* obj);
 extern float lbl_805B40D0;
 
 /* Entry of the vtable behind Unk8007FF8C_I::m20 at +0x28: a this-adjustment
@@ -471,10 +473,9 @@ float fn_80080A08(I* self, int arg)
     return r;
 }
 
-/* near-miss: same code, but retail keeps self, obj and a in r29, r30, r28. */
 void fn_80080B3C(I* self, int a, Unk8007FF8C_VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk8007FF8C_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 4);
 }
