@@ -160,6 +160,8 @@ Unk8028989C_Goal* fn_80289944(Unk8028989C_Goal* g, float f, Unk8014E388_H** p, i
 
 Unk8028989C_Goal* fn_802899E8(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p)
 {
+    /* near-miss (6 insns): retail loads the 0.0f after the x store, reusing f0; here it is
+     * hoisted into its own register ahead of the x/z loads. */
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
     g->m10.z = v.z;
@@ -172,6 +174,8 @@ Unk8028989C_Goal* fn_802899E8(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 
 Unk8028989C_Goal* fn_80289A4C(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p)
 {
+    /* near-miss (6 insns): retail loads the 0.0f after the x store, reusing f0; here it is
+     * hoisted into its own register ahead of the x/z loads. */
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
     g->m10.z = v.z;
@@ -184,6 +188,8 @@ Unk8028989C_Goal* fn_80289A4C(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 
 Unk8028989C_Goal* fn_80289AB0(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p)
 {
+    /* near-miss (6 insns): retail loads the 0.0f after the x store, reusing f0; here it is
+     * hoisted into its own register ahead of the x/z loads. */
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
     g->m10.z = v.z;
@@ -196,6 +202,8 @@ Unk8028989C_Goal* fn_80289AB0(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 
 Unk8028989C_Goal* fn_80289B14(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p)
 {
+    /* near-miss (6 insns): retail loads the 0.0f after the x store, reusing f0; here it is
+     * hoisted into its own register ahead of the x/z loads. */
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
     g->m10.z = v.z;
