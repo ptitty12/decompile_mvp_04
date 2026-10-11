@@ -78,7 +78,15 @@ struct Unk80268190_Msg5F : MsgB {
     int m8;
     int mC;
     int m10;
-    Unk80268190_Msg5F(int a, Pl* o, Pl* p) : MsgB(0x5F), m8(a), mC(o->m70C), m10(p->m70C) {}
+    Unk80268190_Msg5F() : MsgB(0x5F) {}
+    void Set(int a, Pl* o, Pl* p)
+    {
+        int t = o->m70C;
+        int u = p->m70C;
+        m8 = a;
+        mC = t;
+        m10 = u;
+    }
     ~Unk80268190_Msg5F();
 };
 
@@ -94,7 +102,6 @@ void fn_80268190(M* self, Pl* p)
     }
 }
 
-/* near-miss: store/load schedule inside the 0x5F message ctor differs from retail */
 void fn_80268228(M* self, Pl* p, int a, int b)
 {
     if (p->m458 != 9) {
@@ -105,7 +112,8 @@ void fn_80268228(M* self, Pl* p, int a, int b)
             A* c = &p->m58C;
             int v = c->m38;
             if (v > fn_8035E318(c)) {
-                Unk80268190_Msg5F m(a, o, p);
+                Unk80268190_Msg5F m;
+                m.Set(a, o, p);
                 self->e[p->m458 - 9].f8 = 1;
                 Pl* r = self->m0->m65C[1];
                 if ((r != 0 && fn_8026D8E8(r, 0) == 1) || fn_8026D914(r, 0) == 1) {
@@ -457,6 +465,11 @@ struct Unk80268190_Msg8A : MsgB {
     int m8;
     int mC;
     Unk80268190_Msg8A() : MsgB(0x8A), m8(-1), mC(0) {}
+    void Set(int a, Pl* p)
+    {
+        m8 = a;
+        mC = (int)p;
+    }
     virtual ~Unk80268190_Msg8A() {}
 };
 
@@ -482,7 +495,6 @@ void fn_80269E84(G* self, Pl* p, int ev)
     }
 }
 
-/* near-miss: retail reaches the stack message through its pointer register everywhere (r31); here later stores fold to r1-relative */
 int fn_80269F88(G* self, Pl* p, int ev)
 {
     int sent = 0;
@@ -492,19 +504,17 @@ int fn_80269F88(G* self, Pl* p, int ev)
     if ((unsigned)(r - 2) <= 1 || r == 0) {
         if (ev == 7 && self->rec[idx].b <= 1) {
             fn_80269E80(self, idx, "SetState RUNASSIGNMENT_LEADOFFADV");
-            m.m8 = 0;
-            m.mC = (int)p;
+            m.Set(0, p);
             sent = 1;
         } else if (ev == 8 && self->rec[idx].b > 0) {
             fn_80269E80(self, idx, "SetState RUNASSIGNMENT_LEADOFFRET");
+            m.Set(1, p);
             sent = 1;
-            m.mC = (int)p;
-            m.m8 = 1;
         }
     } else {
         self->rec[idx].a = ev;
     }
-    if (sent) {
+    if (sent != 0) {
         self->rec[idx].a = ev;
         fn_8037893C(p->m44C->m704, m.m0, &m, 0, 0);
     }
