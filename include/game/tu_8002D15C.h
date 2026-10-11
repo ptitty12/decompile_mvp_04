@@ -158,7 +158,8 @@ struct Unk8002D15C_Cc {
     int m38C;
     char pad390[0x3F4 - 0x390];
     float m3F4;
-    char pad3F8[0x448 - 0x3F8];
+    float m3F8;
+    char pad3FC[0x448 - 0x3FC];
     int m448;
 };
 
