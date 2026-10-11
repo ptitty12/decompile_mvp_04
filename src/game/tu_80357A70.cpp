@@ -39,7 +39,7 @@ void fn_80357B28(void* self, int c)
     fn_80330778(self, c);
 }
 
-/* TODO fn_80357B58 */
+/* fn_80357B58: not attempted (0x92C bytes, over the size limit); the original code stays linked */
 
 extern "C" void fn_80358484(void* a, int b) { fn_8037B424(a, b); }
 
@@ -108,7 +108,8 @@ void fn_8035864C(void* self, int c)
     fn_80330778(self, c);
 }
 
-/* TODO fn_8035867C */
+/* fn_8035867C: not matched. UI node builder like fn_80358F84, but fn_8032DC2C takes three by-value 8-byte temporaries
+   (built from lbl_805C5FAC / lbl_805C5FB0 and lbl_8060558C); the original code stays linked */
 
 void fn_80358868(void* self, int c)
 {
@@ -116,7 +117,7 @@ void fn_80358868(void* self, int c)
     fn_80330778(self, c);
 }
 
-/* TODO fn_80358898 */
+/* fn_80358898: not attempted (0x6BC bytes, over the size limit); the original code stays linked */
 
 void fn_80358F54(void* self, int c)
 {
@@ -124,7 +125,144 @@ void fn_80358F54(void* self, int c)
     fn_80330778(self, c);
 }
 
-/* TODO fn_80358F84 */
+struct Node200 {
+    char pad0[0x200];
+    void* m200;
+};
+struct Obj50C : Node200 { char pad204[0x50C - 0x204]; };
+struct Obj454 : Node200 { char pad204[0x454 - 0x204]; };
+struct Obj4EC : Node200 { char pad204[0x4EC - 0x204]; };
+struct Obj40C : Node200 { char pad204[0x40C - 0x204]; };
+struct Obj2E0 {
+    char pad0[0x174];
+    int m174;
+    int m178;
+    char pad17C[0x1FC - 0x17C];
+    int m1FC;
+    void* m200;
+    char pad204[0x210 - 0x204];
+    char m210[0x2D8 - 0x210];
+    int m2D8;
+    const void* m2DC;
+};
+struct Lbl4C {
+    float m0;
+    float m4;
+    const void* m8;
+    int mC;
+    char pad10[0x48 - 0x10];
+    void* m48;
+};
+extern "C" Obj50C* fn_80333FD8(Obj50C*, void*);
+extern "C" Obj454* fn_80333A70(Obj454*, void*);
+extern "C" Obj4EC* fn_80334714(Obj4EC*, void*);
+extern "C" Obj40C* fn_80336F58(Obj40C*, void*);
+extern "C" void fn_80340C14(Obj2E0*);
+extern "C" void fn_803E4A50(void*);
+extern "C" void fn_8032D868(void*, const char*);
+extern "C" void fn_80330B08(void*, void*);
+
+
+
+
+
+
+
+void fn_80358F84(void* self)
+{
+    void* P = self;
+    int z = 0;
+    Lbl4C* l;
+    Obj50C* c1 = fn_80333FD8(new (0) Obj50C, P);
+    l = new (0) Lbl4C;
+    l->m0 = lbl_805C5FB8;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    fn_8032D868(l, lbl_805C495C);
+    l->m48 = c1;
+    l->m8 = lbl_80666E20;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c1);
+    P = c1->m200;
+    Obj454* c2 = fn_80333A70(new (0) Obj454, P);
+    l = new (0) Lbl4C;
+    l->m0 = lbl_805C5FB8;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    fn_8032D868(l, lbl_805C4970);
+    l->m48 = c2;
+    l->m8 = lbl_80666E20;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c2);
+    P = c2->m200;
+    Obj4EC* c3 = fn_80334714(new (0) Obj4EC, P);
+    l = new (0) Lbl4C;
+    l->m0 = lbl_805C5FB8;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    fn_8032D868(l, lbl_805C4980);
+    l->m48 = c3;
+    l->m8 = lbl_80666E20;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c3);
+    P = c3->m200;
+    Obj2E0* c4 = new (0) Obj2E0;
+    c4->m200 = P;
+    c4->m174 = z;
+    c4->m2DC = lbl_80666A18;
+    c4->m178 = z;
+    c4->m1FC = z;
+    fn_803E4A50(c4->m210);
+    c4->m2D8 = z;
+    c4->m2DC = lbl_806662C8;
+    fn_80340C14(c4);
+    l = new (0) Lbl4C;
+    l->m0 = lbl_805C5FB8;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    fn_8032D868(l, lbl_805C4990);
+    l->m48 = c4;
+    l->m8 = lbl_80666E20;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c4);
+    P = c4->m200;
+    Obj40C* c5 = fn_80336F58(new (0) Obj40C, P);
+    l = new (0) Lbl4C;
+    l->m0 = lbl_805C5FB8;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    fn_8032D868(l, lbl_805C49A0);
+    l->m48 = c5;
+    l->m8 = lbl_80666E20;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c5);
+    P = c5->m200;
+    Obj2E0* c6 = new (0) Obj2E0;
+    c6->m2DC = lbl_80666A18;
+    c6->m174 = z;
+    c6->m178 = z;
+    c6->m1FC = z;
+    c6->m200 = P;
+    fn_803E4A50(c6->m210);
+    c6->m2D8 = z;
+    c6->m2DC = lbl_8065D800;
+    fn_803592CC(c6);
+    l = new (0) Lbl4C;
+    l->m4 = lbl_805C5FB8;
+    l->m8 = lbl_80666E70;
+    l->mC = z;
+    l->m0 = lbl_805C5FB8;
+    fn_8032D868(l, lbl_805C49B4);
+    l->m8 = lbl_80666E20;
+    l->m48 = c6;
+    fn_80330ACC(P, l);
+    fn_80330B08(P, c6);
+}
 
 void fn_8035929C(void* self, int c)
 {

@@ -250,15 +250,11 @@ extern char lbl_805C5FA8[];
 extern char lbl_805C5FAC[];
 extern char lbl_805C5FB0[];
 extern char lbl_805C5FB4[];
-extern char lbl_805C5FB8[];
 extern char lbl_805CB03C[];
-extern char lbl_805D30A8[];
-extern char lbl_805D30AC[];
 extern char lbl_805F31CC[];
 extern char lbl_805F31EC[];
 extern char lbl_805F320C[];
 extern char lbl_805F321C[];
-extern char lbl_8060558C[];
 extern char lbl_8061BC34[];
 extern char lbl_8061BC8C[];
 extern char lbl_806204F0[];
@@ -589,6 +585,14 @@ struct Unk8035B1C8 {
     int m20;
     float m24;
 };
+extern const float lbl_805C5FB8;
+struct Unk8060558C {
+    int m0;
+    int m4;
+};
+extern Unk8060558C lbl_8060558C;
+extern float lbl_805D30A8;
+extern float lbl_805D30AC;
 
 /* functions of this range */
 void* fn_80355D08(void*);
@@ -760,6 +764,7 @@ void* fn_8035859C(void*);
 void fn_8035864C(void*, int);
 void fn_80358868(void*, int);
 void fn_80358F54(void*, int);
+void fn_80358F84(void* self);
 void fn_8035929C(void*, int);
 void fn_803592CC(void* self);
 void fn_803595C4(void*, int);
