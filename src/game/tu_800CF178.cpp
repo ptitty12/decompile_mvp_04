@@ -125,7 +125,7 @@ extern "C" void fn_800CF7B0(Unk800C7B40_Widget* w)
 extern "C" void fn_800CF804(Unk800C7B40_Widget* w, int v)
 {
     if (w->b7) {
-        int cur = fn_800C80D4();
+        int cur = fn_800C80D4(w);
         for (Unk800C7B40_Widget* c = w->m4; c != 0 && (unsigned)c->m20 > (unsigned)w->m20; c = c->m4) {
             if (c->b3 != cur)
                 c->fn_vslot14(cur);
