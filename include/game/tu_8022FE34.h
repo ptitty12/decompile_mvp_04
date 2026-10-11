@@ -139,6 +139,21 @@ struct Unk8022FE34_Pai {
     void fn_80230268(int a, int b, Unk8022FE34_Ent* out);
 };
 
+struct Unk8022FE34_VBase {
+    char pad0[0x98];
+};
+struct Unk8022FE34_VObj : Unk8022FE34_VBase {
+    virtual void v08();
+    virtual void v10();
+    virtual void v18();
+    virtual void v20();
+    virtual void v28();
+    virtual void v30();
+    virtual void v38();
+    virtual void v40(int a);
+};
+Unk8022FE34_VObj* fn_801C1638(Unk8022FE34_Ctx* c, int i);
+
 struct Unk8022FE34_U;
 
 struct Unk8022FE34_Z {
@@ -197,6 +212,10 @@ struct Unk8022FE34_U8 {
 struct Unk8022FE34_X6D {
     char pad0[0x14];
     int m14;
+    char pad18[0x3C - 0x18];
+    int m3C;
+    int m40;
+    int m44;
 };
 
 struct Unk8022FE34_U {
@@ -214,7 +233,7 @@ struct Unk8022FE34_U {
     float m6C;
     char pad70[0x78 - 0x70];
     int m78;
-    char pad7C[4];
+    int m7C;
     int m80;
     void fn_8023276C(int i);
     Unk8022FE34_Ctx* fn_80235FA8();

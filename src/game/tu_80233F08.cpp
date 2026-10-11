@@ -26,20 +26,6 @@ void fn_80234B18(Unk8022FE34_U* u);
 void fn_80234E4C(Unk8022FE34_U* u);
 void fn_80235FB4(Unk8022FE34_U* u);
 
-struct Unk8022FE34_VBase {
-    char pad0[0x98];
-};
-struct Unk8022FE34_VObj : Unk8022FE34_VBase {
-    virtual void v08();
-    virtual void v10();
-    virtual void v18();
-    virtual void v20();
-    virtual void v28();
-    virtual void v30();
-    virtual void v38();
-    virtual void v40(int a);
-};
-Unk8022FE34_VObj* fn_801C1638(Unk8022FE34_Ctx* c, int i);
 void fn_802349E8(Unk8022FE34_Owner* t);
 void fn_80233444(Unk8022FE34_Owner* t);
 float fn_802398C8(Unk8022FE34_W* w);
