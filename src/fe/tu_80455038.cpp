@@ -102,6 +102,46 @@ extern "C" FE_OVERLAY int fn_8045618C(FeScr8* self)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_804564A0(FeScr8* self)
+{
+    if (self->m1CC != -1) {
+        FeObj* o = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
+        if (o->m24 >= 0) {
+            FeObj* bat = fn_800C8060(self->m1C0->v32("BATTING", 1));
+            o = fn_800C8060(self->m1C0->v32("PITCHING", 1));
+            if (bat->m24 < 0) {
+                bat->v51();
+                return 1;
+            }
+            if (o->m24 >= 0)
+                return 0;
+        }
+        o->v51();
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_80456858(FeScr8* self)
+{
+    if (self->m1CC != -1) {
+        FeObj* o = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
+        if (o->m24 >= 0) {
+            FeObj* bat = fn_800C8060(self->m1C0->v32("BATTING", 1));
+            o = fn_800C8060(self->m1C0->v32("PITCHING", 1));
+            if (bat->m24 < 0) {
+                bat->v53();
+                return 1;
+            }
+            if (o->m24 >= 0)
+                return 0;
+        }
+        o->v53();
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY void fn_80456978(FeScr8* self, int a, int b)
 {
     fn_80456D6C(self, b);
@@ -119,6 +159,34 @@ extern "C" FE_OVERLAY void fn_80456F94(FeScr8* self)
     }
 }
 
+extern "C" FE_OVERLAY int fn_80458200(int a, int b)
+{
+    switch (b) {
+    case 0:
+        return 6;
+    case 1:
+        return 7;
+    case 2:
+        return 8;
+    case 3:
+        return 5;
+    case 4:
+        return 3;
+    case 5:
+        return 4;
+    case 6:
+        return 0;
+    case 7:
+        return 2;
+    case 8:
+        return 1;
+    case 9:
+        return 10;
+    default:
+        return 14;
+    }
+}
+
 /*
  * Front-end overlay code, .frontend_codeoverlay 0x80455038-0x80459228 (code-only unit;
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
@@ -128,6 +196,18 @@ extern "C" void fn_800ECAA4(void* self);
 extern "C" FE_OVERLAY void fn_8045899C(void* self)
 {
     fn_800ECAA4(self);
+}
+
+extern "C" FE_OVERLAY void fn_804589BC(void* s)
+{
+    FeScr8b* self = (FeScr8b*)s;
+    FeObj** bot = &self->m13C[2];
+    ((FeObj1*)self->m13C[0])->v14(0);
+    ((FeObj1*)self->m13C[1])->v14(0);
+    ((FeObj1*)self->m13C[self->m14C])->v14(1);
+    ((FeObj1*)bot[self->m14C])->v44(1);
+    int k = fn_8045A9AC(self, self->m14C);
+    ((FeObj1*)FeGetP((char*)bot, k * 4))->v44(0);
 }
 
 extern "C" FE_OVERLAY void fn_80458AAC(FeScr8b* self, int a)
