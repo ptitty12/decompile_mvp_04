@@ -61,6 +61,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-11 | **Flags: EA shared libraries = ProDG 3.9.3 `-O2 -G0 -fno-rtti -fno-exceptions`** *[lead, owner authority]* (`cflags_ealib`). Evidence (W4, direct compiles): the 0x320 clone function in 5 units matches only at `-O2` (200/200 insns; `-Os` 90%); the 0x704 clone reaches identical structure only at `-O2` (79% vs 55%, registers only); `-O2` hoists loop invariants and initializes a GXColor the way retail does; `-fno-strength-reduce` makes it worse (retail has strength-reduced induction variables); `-ffloat-store` changes nothing here. Every matched static-init pair in all EA-lib units and W5's ealibs units compile identically either way. | -Os was provisional | W4 report, 2026-10-11
 
+- 2026-10-11 | **Original source paths via `#line`** *[lead, owner authority]*: a unit whose retail strings contain its own `__FILE__` (assert/RNG paths like `C:/mvp2004/source/common/animation/choosers/randomchooser.cpp`) starts with `#line 1 "<that path>"`, so `__FILE__` expands to the original bytes. Standard C preprocessor, not a pragma; changes no code. | Our build path differs from the original build machine's. | playeridchooser/randomchooser/randomloadedchooser: strings now equal retail, matches unchanged
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
