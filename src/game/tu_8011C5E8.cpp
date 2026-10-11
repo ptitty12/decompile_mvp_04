@@ -56,6 +56,7 @@ struct Unk8011C5E8_Hud : Unk80117D20_Scr {
 typedef Unk8011C5E8_Hud Scr;
 
 extern const char lbl_80658730[];
+extern const char lbl_8064FE18[];
 extern const char lbl_805C0034[];
 extern const char lbl_805C0040[];
 extern const char lbl_805C004C[];
@@ -87,6 +88,7 @@ Wid* fn_8011F548(Scr* self, int i);
 Wid* fn_8011F5D8(Scr* self, int i);
 void fn_801203D0();
 void fn_80120410(Scr* self);
+void* fn_80120450(Unk80120450_Diff* self, int a, int b, int c, int d, int e, int f, int g, int h);
 }
 // PROTOS-END
 extern "C" {
@@ -102,6 +104,7 @@ void fn_800CFE84(int* p);
 void* fn_8004072C();
 int fn_800412AC(void* o, int a, int b, int c, int d, int e);
 void fn_8011DBCC(Scr* self);
+void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 }
 
 extern "C" {
@@ -300,6 +303,17 @@ void fn_801203D0()
 void fn_80120410(Scr* self)
 {
     fn_8011C6D0(self);
+}
+
+void* fn_80120450(Unk80120450_Diff* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_8064FE18);
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    return self;
 }
 
 }
