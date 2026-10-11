@@ -211,6 +211,23 @@ void Unk800CD5A4_Obj::fn_800CDA54(int a, int b, int c)
     fn_vslot125(a, b, c, 0, 0);
 }
 
+extern "C" void fn_800CDA90(char* s)
+{
+    int i = 0;
+    char* p = s;
+    while (i < fn_8040B6A0(s)) {
+        if (*p == ',') {
+            int n = fn_8040B6A0(s);
+            for (int j = i + 1; j < n - 1; j++)
+                *p = p[1];
+            s[n - 1] = 0;
+        } else {
+            p++;
+            i++;
+        }
+    }
+}
+
 extern "C" int fn_800CE23C(void* unused, const char* s)
 {
     if (fn_8040B6A0(s) > 3 && s[1] == '.' && s[2] == ' ')
