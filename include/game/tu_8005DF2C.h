@@ -14,6 +14,10 @@
  * are named, and the types behind the pointers are unknown (Unk8005DF2C_O*).
  */
 struct Unk8005DF2C_Ent24;
+struct Unk8005DF2C_Stat;
+struct Unk8005DF2C_Y;
+struct Unk8005DF2C_Q;
+struct Unk8005DF2C_Rec;
 struct Unk8005DF2C_Slot28;
 struct Unk8005DF2C_Ctx;
 struct Unk8005DF2C_O130;
@@ -29,7 +33,37 @@ struct Unk8005DF2C_A;
 
 struct Unk8005DF2C_Ent24 {
     Unk8005DF2C_O3B0* m0;
-    char pad4[0x20];
+    char pad4[0x8];
+    char mC;
+    char padD[0x17];
+};
+
+struct Unk8005DF2C_Stat {
+    char pad0[0x4];
+    int m4;
+    int m8;
+    char padC[0x30];
+    int m3C;
+};
+
+struct Unk8005DF2C_Y {
+    char pad0[0x1B4];
+    unsigned char m1B4[128];
+    char pad234[0x1];
+    unsigned char m235;
+    char pad236[0xC2E];
+};
+
+struct Unk8005DF2C_Q {
+    char pad0[0x458];
+    int m458;
+};
+
+struct Unk8005DF2C_Rec {
+    Unk8005DF2C_Q* m0;
+    char pad4[0x8];
+    int mC;
+    char pad10[0x38];
 };
 
 struct Unk8005DF2C_Slot28 {
@@ -40,16 +74,22 @@ struct Unk8005DF2C_Slot28 {
 
 struct Unk8005DF2C_Ctx {
     unsigned char m0;
-    char pad1[0x6F];
-    Unk8005DF2C_Ent24 m70[1];
-    char pad94[0x70];
+    unsigned char m1;
+    char pad2[0x36];
+    int m38;
+    char pad3C[0xC];
+    int m48;
+    char pad4C[0x24];
+    Unk8005DF2C_Ent24 m70[3];
+    char padDC[0x28];
     int m104;
-    char pad108[0x8];
+    int m108;
+    int m10C;
     int m110;
     char pad114[0x4];
     int m118;
     char pad11C[0x4];
-    int m120;
+    Unk8005DF2C_O3B0* m120;
     char pad124[0xC];
     Unk8005DF2C_O130* m130;
     char pad134[0x4];
@@ -58,7 +98,9 @@ struct Unk8005DF2C_Ctx {
     char pad164[0x110];
     int m274;
     int m278;
-    char pad27C[0x134];
+    char pad27C[0x14];
+    int m290[1];
+    char pad294[0x11C];
     Unk8005DF2C_O3B0* m3B0;
     int m3B4;
     int m3B8;
@@ -80,14 +122,16 @@ struct Unk8005DF2C_O130 {
     char pad0[0x44C];
     Unk8005DF2C_O44C* m44C;
     char pad450[0x138];
-    char m588;
-    char pad589[0x17B];
+    Unk8005DF2C_Stat m588;
+    char pad5C8[0x13C];
     int m704;
     int m708;
 };
 
 struct Unk8005DF2C_O44C {
-    char pad0[0x684];
+    char pad0[0x50];
+    char m50;
+    char pad51[0x633];
     Unk8005DF2C_O684* m684;
     char pad688[0x70];
     Unk8005DF2C_O6F8* m6F8;
@@ -99,19 +143,22 @@ struct Unk8005DF2C_O44C {
 
 struct Unk8005DF2C_O684 {
     char pad0[0x588];
-    char m588;
+    Unk8005DF2C_Stat m588;
 };
 
 struct Unk8005DF2C_O6F8 {
     char pad0[0xC];
     Unk8005DF2C_O6F8C* mC;
     Unk8005DF2C_O6F810* m10;
+    Unk8005DF2C_Y* m14;
 };
 
 struct Unk8005DF2C_O6F8C {
     char pad0[0xC];
     int mC;
-    char pad10[0x18];
+    char pad10[0xC];
+    int m1C;
+    char pad20[0x8];
     int m28;
 };
 
@@ -128,9 +175,9 @@ struct Unk8005DF2C_O700 {
 struct Unk8005DF2C_O3B0 {
     char pad0[0x44C];
     int m44C;
-    char pad450[0x140];
-    int m590;
-    char pad594[0x174];
+    char pad450[0x138];
+    Unk8005DF2C_Stat m588;
+    char pad5C8[0x140];
     int m708;
     char pad70C[0x2F8];
     int mA04;
@@ -139,7 +186,9 @@ struct Unk8005DF2C_O3B0 {
 };
 
 struct Unk8005DF2C_P {
-    char pad0[0x9D8];
+    char pad0[0x4];
+    Unk8005DF2C_Rec m4[1];
+    char pad4C[0x98C];
     int m9D8;
 };
 

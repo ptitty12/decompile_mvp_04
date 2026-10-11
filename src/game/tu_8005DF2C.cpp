@@ -21,7 +21,7 @@ void fn_8005DA1C(Ctx* c, int* a, int* b, int* d, int* e);
 int fn_80088FFC(int a, int b);
 int fn_8001CEA8(Ctx* c, float* a, float* b);
 int fn_8005CDC4(void* a, Ctx* c);
-float fn_8025454C(char* p, int idx);
+float fn_8025454C(Unk8005DF2C_Stat* p, int idx);
 int fn_8004FF78(Unk8005DF2C_P* p, int a, int b);
 void fn_80235BE0(float* out, int a, ...);
 int fn_802F92CC(int a);
@@ -143,7 +143,7 @@ float fn_8005E5B0(void* a, int b, int c, Ctx* ctx)
             || (ctx->m3CC == 0 && ctx->m3D0 == 1) || (ctx->m3CC == 1 && ctx->m3D0 == 2))) {
         Unk8005DF2C_O684* o = ctx->m130->m44C->m684;
         if (o) {
-            char* q = &o->m588;
+            Unk8005DF2C_Stat* q = &o->m588;
             float f0 = fn_8025454C(q, 0xd);
             float f1 = fn_8025454C(q, 0x14);
             if (f0 >= 0.8f || !(f1 < 0.75f))
@@ -161,7 +161,7 @@ float fn_8005E6D8(void* a, int b, int c, Ctx* ctx)
             || (ctx->m3CC == 0 && ctx->m3D0 == 1) || (ctx->m3CC == 1 && ctx->m3D0 == 2))) {
         Unk8005DF2C_O684* o = ctx->m130->m44C->m684;
         if (o) {
-            char* q = &o->m588;
+            Unk8005DF2C_Stat* q = &o->m588;
             float f0 = fn_8025454C(q, 0xd);
             float f1 = fn_8025454C(q, 0x14);
             if (!(f0 >= 0.8f) && !(f1 >= 0.75f) && !(f0 < 0.7f) && !(f1 < 0.7f))

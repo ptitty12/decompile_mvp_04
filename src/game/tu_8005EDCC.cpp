@@ -12,7 +12,7 @@ typedef Unk8005EDCC_Ent Ent;
 
 extern Unk8005EDCC_G* lbl_8061EA68;
 
-unsigned int fn_80253E7C(char* p, int a, int b, int c);
+unsigned int fn_80253E7C(Unk8005DF2C_Stat* p, int a, int b, int c);
 int fn_8040ABA0();
 void fn_80235BE0(float* out, int a, ...);
 int fn_8022EA7C(int a, float* v, float s);
@@ -235,7 +235,7 @@ float fn_8005F418(void* a, int b, int c, Ctx* ctx)
 {
     float result = 0.0f;
     Unk8005DF2C_O3B0* q = ctx->m104 > 0 ? ctx->m70[0].m0 : ctx->m3B0;
-    if (q->m590 & 0x20000000)
+    if (q->m588.m8 & 0x20000000)
         result = 100.0f;
     return result;
 }
@@ -245,12 +245,12 @@ float fn_8005F464(void* a, int b, int c, Ctx* ctx)
     float result = 0.0f;
     int n = ctx->m104;
     for (int i = 0; i < n; i++) {
-        if (ctx->m70[i].m0->m590 & 0x20000000) {
+        if (ctx->m70[i].m0->m588.m8 & 0x20000000) {
             result = 100.0f;
             break;
         }
     }
-    if (ctx->m3B0->m590 & 0x20000000)
+    if (ctx->m3B0->m588.m8 & 0x20000000)
         result = 100.0f;
     return result;
 }
