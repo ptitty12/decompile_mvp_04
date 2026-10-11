@@ -54,17 +54,17 @@ Roughly ordered by expected payoff for the effort.
    - names proven from strings;
    - the call graph;
    - struct-offset usage.
-3. **Pattern cookbook and clustering.** `idea`
+3. **Pattern cookbook and clustering.** `adopted` (docs/PATTERNS.md; shape clusters measured below)
    87 static-init units share the same chooser/class boilerplate (ctor, dtor,
    factory, attribute registration). Cluster functions by the shape of their
    normalized asm. When one function in a cluster matches, write its recipe into
    a cookbook (`docs/PATTERNS.md`) and apply it to the rest of the cluster, even
    semi-automatically.
-4. **Parallel matchers, one unit each, assigned by a supervisor.** `idea`, `needs owner` (cost)
+4. **Parallel matchers, one unit each, assigned by a supervisor.** `adopted` (owner approved 2026-10-10: Opus lead + Sonnet workers, pilot of 3)
    Start with the 17 sdk and runtime units: they have public reference code and
    don't depend on game headers. Then the ea-lib units, then game code, which
    stays with one agent until the shared headers settle. The README advises 2–4 agents after a clean single-agent week.
-5. **Make shared-file edits one at a time.** `idea`, needed before scaling past about 2 agents
+5. **Make shared-file edits one at a time.** `adopted` (lead preps units on main; workers edit src/include only; tools/team/integrate.py)
    Every match edits `configure.py`, `config/GV4E69/splits.txt` and
    `symbols.txt`, and usually PROGRESS/UNITS too. Parallel agents would conflict
    on these constantly. A supervisor, or a merge bot, owns these files: matchers
@@ -87,7 +87,7 @@ Roughly ordered by expected payoff for the effort.
    symbols would give function names and unit boundaries, maybe types too. This
    could be the biggest single speed-up, but it's unknown until checked. The
    owner's own discs only, never downloaded.
-8. **A first-draft decompiler (m2c, PowerPC).** `idea`, `needs owner` (download)
+8. **A first-draft decompiler (m2c, PowerPC).** `adopted` (tools/match/m2c_draft.py; m2c in an external venv)
    It produces starting C from the asm, which is faster than writing it by hand
    or cleaning up Ghidra output. Most useful on mid-size functions.
 9. **Route work to different models and effort levels.** `idea`, `needs owner` (cost)
@@ -142,6 +142,9 @@ Roughly ordered by expected payoff for the effort.
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
+- 2026-10-10 | 3 | Shape clusters (relocatable immediates masked) over .text: game code (<0x80340000) 13,625 functions, 32.0% repeat another function's shape but only 8.6% of bytes; libraries (>=0x80340000) 5,339 functions, 37.1% / 14.5%. Two EA-lib families are exact clones across 5 units each (0x704+0x320 and 0x6A8+0x320 bytes): 20 functions from matching 4 | measured, not yet applied
+- 2026-10-10 | 8 | m2c (`--target ppc-gcc-c++`) on dtk asm: reproduced cCircleChooser's helper dtor and id-resolve loop logic exactly on first try | first-draft quality good on small/mid functions; to be measured on workers
+- 2026-10-10 | 5 | Lead integrated swarm branches W1/W3/W4/W5 with the merge drivers + a union resolver for configure.py: 46 -> 120 functions at 100%, every first-parent commit verified; scripted as tools/team/integrate.py | one integration ~10 min
 - 2026-10-10 | 10 | `tools/match/` helpers: `diff_unit.py` (rebuild one unit and diff each function), `variants.py` (score N rewrites per compile), and asm show/summary scripts | rebuild+diff loop **1.9 s**; a variants run takes about 5 s for 7–10 variants
 - 2026-10-10 | 3 | Reused the chooser "quartet" recipe (ctor / attribute registration / dtor / factory) from ICommonPlayerID on cSignatureChooser | 4/4 matched on the first compile, about 1 min per function
 - 2026-10-10 | 2 | `tools/scout/packet.py` on 0x80270730..0x80271748 reproduced the hand-made split, the class names and the object sizes in **about 4 s, vs about 35 min by hand** (built by the progress session). Minutes actually saved on the next unit: to be filled in after the next unit | per-unit setup cut by roughly 30 min
