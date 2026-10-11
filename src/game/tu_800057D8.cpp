@@ -6,18 +6,30 @@
  * .text 0x800057D8-0x80008540, .rodata 0x805A344C-0x805A3A54, .data 0x8060F720-0x80615848, .bss 0x806869B0-0x80686A4C.
  * Not split (declare extern if used): small-data (.sdata/.sbss) objects and
  * any second, non-contiguous range of a section.
+ *
+ * Contents: one class (ctor 0x800058BC, vtable 0x806492A8, 0x254 bytes) derived
+ * from the base built at 0x80170518. It is a message-driven state machine
+ * ("TRC" messages, save files and blocks per the format strings): the current
+ * state is a pointer to member function at +0x144, run by fn_80005C8C. The
+ * rest of the unit is thirteen static Vec3 direction vectors with their
+ * static-init pair. Names are placeholders (no string names the class); its
+ * virtual functions are named after the retail vtable entries.
+ *
+ * Note: rodata 0x805A3450..0x805A368C (0x23C bytes: "soa allocator NEW",
+ * geomlib assert paths, "EAGL::..." names, "% .3f" formats) has no reference
+ * in this unit; it looks like another TU's strings inside this unit's split.
  */
 #include "game/tu_800057D8.h"
 
 extern "C" {
-void* fn_8040B320(void* dst, int c, unsigned n);       /* memset */
-char* fn_8040B61C(char* dst, const char* src);         /* strcpy */
-int fn_8040B6A0(const char* s);                        /* strlen */
-char* fn_8040B830(char* dst, const char* src, unsigned n); /* strncpy */
-char* fn_8040B948(const char* hay, const char* needle); /* strstr */
-char* fn_8040B4D8(const char* s, int c);               /* strchr */
-int fn_8040B574(const char* a, const char* b);         /* strcmp */
-int fn_804089B4(char* dst, const char* fmt, ...);      /* sprintf */
+void* fn_8040B320(void* dst, int c, unsigned n);       /* behaves like memset */
+char* fn_8040B61C(char* dst, const char* src);         /* behaves like strcpy */
+int fn_8040B6A0(const char* s);                        /* behaves like strlen */
+char* fn_8040B830(char* dst, const char* src, unsigned n); /* behaves like strncpy */
+char* fn_8040B948(const char* hay, const char* needle); /* behaves like strstr */
+char* fn_8040B4D8(const char* s, int c);               /* behaves like strchr */
+int fn_8040B574(const char* a, const char* b);         /* behaves like strcmp */
+int fn_804089B4(char* dst, const char* fmt, ...);      /* behaves like sprintf */
 void fn_80402FCC(char* dst, const void* src);
 Unk80170034_Entry* fn_80170034(Unk80170034_Info* info, int idx);
 void fn_8017008C(Unk80170034_Info* info, const char* name);
@@ -237,19 +249,17 @@ void Unk800058BC::fn_80005F4C(int a, int b, int clear)
 void Unk800058BC::fn_800060B4()
 {
     Unk800060B4_Req req;
-    // PERM_BEGIN
-    m244 = 1;
-    req.m48 = 0;
-    req.m4 = 0;
     req.m38 = 0;
     req.m34 = m140;
     req.m8 = m68;
-    m24C = 0;
-    req.m2C = 1;
-    req.m30 = m240;
-    req.m40 = m154;
     req.m0 = lbl_806EEA1C;
-    // PERM_END
+    req.m48 = 0;
+    req.m30 = m240;
+    req.m4 = 0;
+    m24C = 0;
+    req.m40 = m154;
+    req.m2C = 1;
+    m244 = 1;
     fn_80400DAC();
     m64->vslot3(&req);
     m144 = &Unk800058BC::fn_800061C8;
