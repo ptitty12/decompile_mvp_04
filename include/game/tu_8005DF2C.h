@@ -54,7 +54,9 @@ struct Unk8005DF2C_Y {
     unsigned char m1B4[128];
     char pad234[0x1];
     unsigned char m235;
-    char pad236[0xC2E];
+    char pad236[0xA66];
+    char mC9C;
+    char padC9D[0x1C7];
 };
 
 struct Unk8005DF2C_Q {
@@ -199,7 +201,8 @@ struct Unk8005DF2C_O3B0 {
     int m460;
     char pad464[0x124];
     Unk8005DF2C_Stat m588;
-    char pad5C8[0x140];
+    char pad5C8[0x13C];
+    int m704;
     int m708;
     char pad70C[0x2F8];
     int mA04;
@@ -212,6 +215,8 @@ struct Unk8005DF2C_P {
     Unk8005DF2C_Rec m4[1];
     char pad4C[0x98C];
     int m9D8;
+    char pad9DC[0x38];
+    int mA14;
 };
 
 struct Unk8005DF2C_A {
