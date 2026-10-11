@@ -272,6 +272,7 @@ game/tu_80068380.cpp:
 
 game/tu_80068CE0.cpp:
 	.text       start:0x80068CE0 end:0x8006902C
+	.ctors      start:0x805A2BE0 end:0x805A2BE4
 
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
