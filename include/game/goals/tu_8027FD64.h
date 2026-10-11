@@ -143,6 +143,9 @@ struct Unk8027FD64_Goal {
      * mask test, the original keeps two separate tests (fn_80282E5C). */
     int fn_IsF12() { return mE8.f12; }
     int fn_IsF11() { return mE8.f11; }
+    /* fn_80282B78 tests f14 through this: a direct read lets combine test the
+     * word before the f4/f5 clears; retail tests the cleared word. */
+    int fn_IsF14() { return mE8.f14; }
 
     /* Vector at +0x1C returned by value (fn_80282CC0 copies it twice). */
     Unk80273498_Vec3 fn_GetVec() { return m1C; }
