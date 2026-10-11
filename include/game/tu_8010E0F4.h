@@ -209,7 +209,7 @@ struct UnkLabel : Unk800C7B40_Data {
     virtual void fn_vslot14();
     virtual void fn_vslot15();
     virtual void fn_vslot16();
-    virtual void fn_vslot17();
+    virtual void fn_vslot17(int a);
     virtual void fn_vslot18();
     virtual void fn_vslot19();
     virtual void fn_vslot20();
@@ -221,7 +221,7 @@ struct UnkLabel : Unk800C7B40_Data {
     virtual void fn_vslot26();
     virtual void fn_vslot27();
     virtual void fn_vslot28(const void* v);
-    virtual void fn_vslot29();
+    virtual void fn_vslot29(const char* s);
     virtual void fn_vslot30(const char* s);
     virtual int fn_vslot31();
     virtual void fn_vslot32();
@@ -699,7 +699,7 @@ Unk800C7B40_Widget* fn_800C8034(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8038(Unk800C7B40_Widget* p);
 UnkLabel* fn_800C8040(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8044(Unk800C7B40_Widget* p);
-Unk800C7B40_Widget* fn_800C8048(Unk800C7B40_Widget* p);
+UnkLabel* fn_800C8048(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8054(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C8058(Unk800C7B40_Widget* p);
 Unk800C7B40_Widget* fn_800C805C(Unk800C7B40_Widget* p);

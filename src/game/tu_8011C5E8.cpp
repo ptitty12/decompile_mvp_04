@@ -68,6 +68,7 @@ Unk8001C314* fn_8001C394();
 extern const char lbl_80658730[];
 extern int lbl_8061977C;
 extern const char lbl_805C0028[];
+extern const char lbl_805BC1A8[];
 extern const char lbl_805C01F4[];
 extern const char lbl_805C0200[];
 extern const char lbl_805C0210[];
@@ -103,6 +104,7 @@ void fn_8011D67C(Scr* self, int unused, int a);
 void fn_8011D6E4(Scr* self, int a);
 void fn_8011D798(Scr* self, int a);
 void fn_8011D850(Scr* self, int a, int b);
+void fn_8011D8C8(Scr* self, int a, int b);
 void fn_8011DBCC(Scr* self);
 void fn_8011DC70(Scr* self, int a);
 void fn_8011E220(Scr* self, int a);
@@ -141,6 +143,7 @@ void fn_8011C15C(Scr* self);
 void fn_8011F0F4(Scr* self);
 void fn_803FFC58(void* p, int c, int n);
 void fn_8011C04C(Scr* self);
+int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_8011B148(int a, Wid* w1, int* p1, Wid* w2, int* p2);
 int fn_80090880(int mgr, int id);
 int fn_80403DE4(void* buf, int fmt, ...);
@@ -231,6 +234,23 @@ void fn_8011D850(Scr* self, int a, int b)
     int c = (int)self->m1B8;
     int d = (int)self->m1C0;
     fn_8011AFD4(a, l1, b, l2, c, d, fn_800C8038(self->m154));
+}
+
+void fn_8011D8C8(Scr* self, int a, int b)
+{
+    char buf[0x20];
+    fn_804089B4(buf, lbl_805BC1A8, a);
+    fn_800C8048(self->m158)->fn_vslot30(buf);
+    if (a < 0)
+        fn_800C8048(self->m158)->fn_vslot17(1);
+    else
+        fn_800C8048(self->m158)->fn_vslot17(0);
+    fn_804089B4(buf, lbl_805BC1A8, b);
+    fn_800C8048(self->m160)->fn_vslot30(buf);
+    if (b < 0)
+        fn_800C8048(self->m160)->fn_vslot17(1);
+    else
+        fn_800C8048(self->m160)->fn_vslot17(0);
 }
 
 void fn_8011DBCC(Scr* self)
