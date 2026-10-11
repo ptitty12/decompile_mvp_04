@@ -70,7 +70,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot13();
     virtual void fn_vslot14(int a);
     virtual void fn_vslot15();
-    virtual void fn_vslot16();
+    virtual void fn_vslot16(int a);
     virtual void fn_vslot17();
     virtual void fn_vslot18();
     virtual float fn_vslot19();
@@ -82,8 +82,8 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot25();
     virtual void fn_vslot26();
     virtual void fn_vslot27();
-    virtual void fn_vslot28();
-    virtual int fn_vslot29(const char* name);
+    virtual Unk800C7B40_Widget* fn_vslot28(const char* name);
+    virtual Unk800C7B40_Widget* fn_vslot29(const char* name);
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
     virtual int fn_vslot31();
     virtual Unk800C7B40_Widget* fn_vslot32(const char* name, int a);
@@ -95,7 +95,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot38(int a);
     virtual void fn_vslot39();
     virtual void fn_vslot40(int a);
-    virtual void fn_vslot41();
+    virtual void fn_vslot41(int a);
     virtual void fn_vslot42();
     virtual void fn_vslot43();
     virtual void fn_vslot44();
@@ -103,7 +103,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot46();
     virtual void fn_vslot47(int a);
     virtual void fn_vslot48();
-    virtual void fn_vslot49();
+    virtual void fn_vslot49(int a);
     virtual void fn_vslot50();
     virtual void fn_vslot51();
     virtual void fn_vslot52();
@@ -114,7 +114,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot57();
     virtual void fn_vslot58();
     virtual void fn_vslot59();
-    virtual void fn_vslot60();
+    virtual int fn_vslot60();
     virtual void fn_vslot61();
     virtual void fn_vslot62();
     virtual void fn_vslot63();
@@ -138,14 +138,14 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot81();
     virtual void fn_vslot82();
     virtual void fn_vslot83();
-    virtual void fn_vslot84();
-    virtual void fn_vslot85();
-    virtual void fn_vslot86();
-    virtual void fn_vslot87();
+    virtual void fn_vslot84(int a, int b);
+    virtual int fn_vslot85();
+    virtual int fn_vslot86();
+    virtual int fn_vslot87();
     virtual void fn_vslot88();
-    virtual void fn_vslot89();
+    virtual void fn_vslot89(int a);
     virtual void fn_vslot90();
-    virtual void fn_vslot91();
+    virtual int fn_vslot91();
     virtual void fn_vslot92();
     virtual void fn_vslot93();
     virtual void fn_vslot94();
