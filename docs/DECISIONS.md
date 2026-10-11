@@ -48,4 +48,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
-(none)
+- 2026-10-10 | **Verifier reports renamed functions as regressions; please install `proposed/verify-rename-fix.patch`.**
+  - Context: `verify.py` keys functions by name. When a matched function's mangled name changes because a parameter type was corrected, the old name shows "100% → 0%". Real case: `fn_802713D4__11Unk8027130CiPi` → `...CScPi`, still 100% (same unit, address and size).
+  - What went wrong: on this case the agent's push command gated on a `grep` instead of the verifier's exit code, so commits `778e804` and `5c6901b` reached `main` although the verifier failed against `b545d69`. No function actually regressed. Pushes are now gated on the verifier's exit code.
+  - The fix falls back to (unit, address, size) when a name disappears. It can't be applied by the agent (CLAUDE.md, `tools/verify/` is protected).
+  - Options: install the patch (3 steps in `proposed/README.md`) / keep as is (agents then avoid renaming matched functions)
