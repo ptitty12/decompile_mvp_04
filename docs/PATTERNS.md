@@ -164,3 +164,54 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
 - Read `cc1plus -da` dumps (jump/cse/sched/greg) before a blind variant search
   when a register or ordering difference persists.
 
+## In-place float clamp (hard-case pass, 2026-10-11)
+
+- Retail's [lo, hi] clamp (the result stays in the register that held the
+  value, one shared `fmr` per bound, a single `stfs`) uses g++'s maximum
+  operator for the low bound:
+  `t = !(t > hi) ? (t >? lo) : hi;` gives `bgt` to the hi arm placed last;
+  `t = !(t <= hi) ? hi : (t >? lo);` gives `cror lt` + `bso` with the hi arm
+  first. A low bound alone is `t = t >? lo;`.
+- Why it works: `a >? b` is MAX_EXPR, expanded as `r = a; if (r >= b) skip;
+  r = b`. The test reads r itself, so jump.c's "if (...) x = a; else x = b"
+  to "x = b; if (...) x = a" rewrite (post-CSE jump pass) can't hoist a copy
+  of t above the test. Every if/else or ternary spelling has a plain `R = t`
+  arm, which CSE turns into a register copy that gets hoisted. t and R then
+  conflict and need two registers.
+- fold swaps `!(c) ? const : t` into `c ? t : const` (the constant arm goes
+  last whenever the condition can be inverted), so a negated compare can't
+  keep the 0.0 arm first in a ternary.
+- Matched: fn_8026FDB0 (tu_8026DDE8), fn_8027EFB8 (six clamps, tu_8027DE3C).
+  fn_8027A0B8 (tu_80279AE4) also matches as
+  `r = !(t > 255.0f) ? (int)(t >? 0.0f) : 255;`; it is currently written with a
+  one-float struct. The warps-B worker matched the same form in tu_802A4584.
+- `<?` is MIN_EXPR with an `le` test (`cror lt` + `bso` over the `fmr`). It
+  is not retail's `bgt` hi test; no retail use of it has turned up yet.
+
+## Vec3 copy destination addressing (hard-case pass, 2026-10-11)
+
+- Tell: `addi rP,r1,k` before a 12-byte copy, word 0 stored to `k(r1)`, and
+  words 1 and 2 to `4(rP)` and `8(rP)`. rP may be callee-saved if a call
+  follows. Retail stores all three words to `k(r1)`, `k+4(r1)` and `k+8(r1)`.
+- Cause: a struct copy written in the function itself (local init, or the
+  by-value argument of an inline) goes through emit_block_move with its
+  destination address forced into a pseudo (a BLKmode `(plus sp k)` is not
+  accepted as an address). CSE folds that pseudo back into `k(r1)` only for
+  offset 0. The same copy inside an inlined body comes out direct, because
+  integrate.c substitutes the inline frame pointer's constant value
+  (subst_constants) into every address.
+- Recipe: move the copy into an inline.
+  `inline Vec3 Pos(const Goal* g) { return g->m10 + g->mD8; }` then
+  `Vec3 v = Pos(g); return v;` matched fn_80286E70 and fn_80286F00.
+  `Vec3 pa = Pos0(g);` with `inline Vec3 Pos0(g) { return g->m10; }`, instead
+  of `Vec3 pa = g->m10;`, fixed the pa copy in fn_802857C4. The pointer to pa
+  is then formed only after the call, as in retail.
+- Vec3 here is a POD struct (Unk80273498_Vec3) with free inline operators
+  (`operator+(Vec3, const Vec3&)`, `operator-(const Vec3&, const Vec3&)`), and
+  no constructors.
+- Related: fold distributes `(c ? a : b) - u` into both arms when u is a local.
+  Wrapping the ternary in an inline (`Speed(e) - u`) keeps one subtraction
+  after the join (fn_802857C4).
+- Each inline's frame is its own 8-byte-aligned block. A float passed through
+  two inline layers (`SetAngle(p, v) { SetAngle2(p, v); }`) takes two slots
+  0x8 apart, retail's 0x30/0x38 in fn_8027F504.
