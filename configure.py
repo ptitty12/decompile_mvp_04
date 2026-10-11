@@ -853,6 +853,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "db/tu_8052A220.cpp"),
+            Object(NonMatching, "db/tu_8052CA60.cpp"),
         ],
     },
     {

@@ -15,6 +15,9 @@ Sections:
 db/tu_8052A220.cpp:
 	.dboverlay  start:0x8052A220 end:0x8052CA60
 
+db/tu_8052CA60.cpp:
+	.dboverlay  start:0x8052CA60 end:0x8052E4C0
+
 fe/tu_8043FDC0.cpp:
 	.feoverlay  start:0x8043FDC0 end:0x804439E4
 
