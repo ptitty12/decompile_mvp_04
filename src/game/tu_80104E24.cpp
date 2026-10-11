@@ -5,6 +5,24 @@
 #include "game/tu_800F1AEC.h"
 
 
+extern char lbl_805B955C[];
+void fn_80104E24(UiV_138q* self)
+{
+    fn_800ECAA4(self);
+    int* p = self->m138;
+    if (p != 0) {
+        int v = *p;
+        if (v == 0) {
+            UiMsg m;
+            UiMsg* q = &m;
+            fn_8035682C(q);
+            fn_8040B830(q->name, lbl_805B955C, 15);
+            q->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), q, self);
+        }
+    }
+}
+
 extern char lbl_806520D8[];
 UiScrRaw* fn_80104EC0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
