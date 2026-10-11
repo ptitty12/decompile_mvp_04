@@ -872,6 +872,9 @@ animation/goals/tu_80299920.cpp:
 	.text       start:0x80299920 end:0x8029B6C8
 	.rodata     start:0x805DDBF0 end:0x805DDD0C
 
+game/tu_8029B6C8.cpp:
+	.text       start:0x8029B6C8 end:0x8029B70C
+
 animation/goals/tu_8029B70C.cpp:
 	.text       start:0x8029B70C end:0x8029EE50
 	.rodata     start:0x805DDD0C end:0x805DDEEC
