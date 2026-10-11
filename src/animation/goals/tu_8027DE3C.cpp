@@ -164,26 +164,30 @@ void Unk8027DE3C::fn_8027EB34(int st, Unk80270BA0_X* x)
 }
 
 /* GetI/SetI take &x->m734 at each use: the default case's pointer is then a
- * new pseudo, so gcse can't reuse the top's m190 load and retail's reload
- * appears; registers and the zero shared in r11 now match.
- * near-miss: 144 of 145 instructions. Left: retail stores m120[0] as
- * "li r9,0x120; stwx r11,r29,r9" (an offset register that became the constant
- * 288 after cse1); this gives "stw r11,0x120(r29)". Tried: p->m120[p->m190 - 1],
- * &p->m120[i - 1], (&p->m120[i])[-1], q[-1], compare through the top pointer
- * with the store through &x->m734 (all fold to x+0x854 or keep the stw). */
+ * new (not pointer-flagged) pseudo, so gcse can't reuse the top's m190 load
+ * (retail reloads it) and the offsets get BASE_REGS. SlotI computes the byte
+ * offset as a value (like Unk8027FD64_SetSlot168): with i = m190 - 1 known to
+ * be 0, CSE puts the zero in t's register, so the offset of the first store
+ * becomes a register constant ("li r9,0x120; stwx") for t == 0 and a
+ * displacement for t == r, as in retail. */
 inline int GetI(Unk802726BC_Angles* p)
 {
     int* q = &p->m120[p->m190];
     return *q;
 }
 
+inline void SlotI(Unk802726BC_Angles* a, int i, int v)
+{
+    int off = i * 4 + 0x120;
+    *(int*)((char*)a + off) = v;
+}
+
 inline void SetI(Unk802726BC_Angles* p, int t)
 {
     if (p->m190 == 1) {
-        p->m120[0] = t;
+        SlotI(p, p->m190 - 1, t);
     }
-    int* q = &p->m120[p->m190];
-    *q = t;
+    SlotI(p, p->m190, t);
 }
 
 void Unk8027DE3C::fn_8027EC58(Unk80270BA0_X* x, int h)
