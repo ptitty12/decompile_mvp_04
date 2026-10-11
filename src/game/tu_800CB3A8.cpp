@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800BCD38.h"
+#include "game/tu_800BCD38_decls.h"
 
 extern "C" void fn_80317120(int a, int b);
 extern "C" void fn_800D0D90(void* p);

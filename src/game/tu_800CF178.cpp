@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800BCD38.h"
+#include "game/tu_800BCD38_decls.h"
 
 void Unk800C7A4C_Group::fn_800CF178(int v)
 {

@@ -1,6 +1,10 @@
 #ifndef GAME_TU_800BCD38_H
 #define GAME_TU_800BCD38_H
 
+/* Types this range shares with other units live in their original headers. */
+#include "game/tu_8001B190.h"  /* Unk8001BC8C */
+#include "game/tu_8007A4DC.h"  /* Unk8007B2B0_Screen */
+
 /*
 Types for the front-end code in game/tu_800BCD38.cpp .. game/tu_800D1758.cpp
 (0x800BCD38..0x800D4D0C; one shared header for the range). Everything is named
@@ -495,7 +499,6 @@ void fn_800C97A4(void* o, int c);
 void fn_800C7C04(Unk800C7B40_Widget* w);
 int fn_800C80D4(void* w);
 int fn_800C80DC(Unk800C7B40_Widget* w, int v);
-char* fn_8040B830(char* dst, const char* src, unsigned n); /* behaves like strncpy */
 int fn_8040B574(const char* a, const char* b);             /* behaves like strcmp */
 void fn_80378D40(const char* s, int ch, int* out);
 void fn_80377408(void* p); /* __builtin_delete */
@@ -542,7 +545,6 @@ int fn_800B5520(void* p);
 void fn_800D0074(Unk800CFEEC_Sel* s, int id, int q);
 void* fn_802B0850(void* obj, const char* name, void* out);
 Unk800D244C_Vec4 fn_802B0ACC(void* obj, const char* name);
-Unk800D244C_Vec4 fn_8014DBA0(int r, int g, int b, int a);
 }
 int fn_800E1990(int id);
 extern "C" double fn_80410634(double x);
@@ -666,15 +668,12 @@ void fn_800D2338(Unk800D2338_Obj* o, const char* name, int flag);
 int fn_800C8070(Unk800C7B40_Data* w);
 void fn_802D7EE4(int v);
 int fn_800B548C(int id);
-void fn_804031BC(char* dst, const char* src);
-int fn_804089B4(char* dst, const char* fmt, ...);
 int fn_8040B6A0(const char* s); /* behaves like strlen */
 char* fn_8040B61C(char* dst, const char* src); /* behaves like strcpy */
 int fn_80408A94(const char* s, const char* fmt, ...); /* behaves like sscanf */
 }
 int fn_800E1AC8(int id);
 extern "C" char* fn_80090880(void* t, int id);
-extern void* lbl_8061977C;
 extern char lbl_8061AC58;
 extern const char lbl_8065BC68[];
 struct Unk800D3A38_Raw : Unk800C7B40_Data {
@@ -682,10 +681,6 @@ struct Unk800D3A38_Raw : Unk800C7B40_Data {
     int* m40;
 };
 
-class Unk8001BC8C {
-public:
-    void fn_8001BDAC(int cmd);
-};
 Unk8001BC8C* fn_8001BC4C();
 extern "C" {
 void* fn_800C8034(void* p);
@@ -2343,8 +2338,6 @@ struct Unk800B64BC_Mgr {
     int mB8;
     char padBC[0xD8 - 0xBC];
 };
-extern Unk800B64BC_Mgr* lbl_8061A32C;
-extern "C" Unk800B64BC_Mgr* fn_800B64BC(Unk800B64BC_Mgr* m);
 struct Unk800C3FEC_Tmp {
     char pad0[0x2C];
     int m2C;
@@ -2375,11 +2368,6 @@ struct Unk800C3FEC_V : Unk800C3FEC_Data {
 struct Unk800C3FEC_Obj : Unk800C3FEC_V {
     char pad9C[0x668];
     int m704;
-};
-
-class Unk8007B2B0_Screen {
-public:
-    int fn_8007C514(int a, int b);
 };
 
 struct Unk800C77A0_Obj : Unk800C7B40_Widget {
