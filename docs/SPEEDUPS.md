@@ -142,6 +142,7 @@ Roughly ordered by expected payoff for the effort.
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
+- 2026-10-10 | 4 | Pilot worker (Sonnet) on cLinearChooser: 12/13 functions (the 10.5 KB slot 17 skipped by design) in 28.5 min, 425k tokens, 125 tool calls: about 35k tokens and 2.4 min per function, including a 0x44C float function | first measured worker rate
 - 2026-10-10 | 3 | Shape clusters (relocatable immediates masked) over .text: game code (<0x80340000) 13,625 functions, 32.0% repeat another function's shape but only 8.6% of bytes; libraries (>=0x80340000) 5,339 functions, 37.1% / 14.5%. Two EA-lib families are exact clones across 5 units each (0x704+0x320 and 0x6A8+0x320 bytes): 20 functions from matching 4 | measured, not yet applied
 - 2026-10-10 | 8 | m2c (`--target ppc-gcc-c++`) on dtk asm: reproduced cCircleChooser's helper dtor and id-resolve loop logic exactly on first try | first-draft quality good on small/mid functions; to be measured on workers
 - 2026-10-10 | 5 | Lead integrated swarm branches W1/W3/W4/W5 with the merge drivers + a union resolver for configure.py: 46 -> 120 functions at 100%, every first-parent commit verified; scripted as tools/team/integrate.py | one integration ~10 min

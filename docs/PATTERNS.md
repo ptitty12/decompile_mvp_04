@@ -53,3 +53,37 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
 - int to float uses the `0x4330000080000000` double constant and `xoris`.
 - Float constants: one pool per function, in order of first use, no sharing
   between functions (duplicates in .rodata are normal).
+
+## Learned on cLinearChooser (W3, 2026-10-10)
+
+- Float branches: when the target has `cror`+`bso`, write the negated
+  comparison: `if (!(a <= b || a >= c))`, `if (!(d <= eps))`,
+  `if (!(e.m8 <= a)) { idx = i; break; }`. A plain `a > b && a < c` gives bare
+  `ble`/`bge`. A ternary `c ? x : y` emits `t = y; if (c) t = x`.
+- A `const float` local is stored once, and its register (e.g. f31) is reused
+  after later calls instead of being reloaded from its slot.
+- `const Vec3& pos = x->m60;` declared before the calls makes `x+0x60` a
+  callee-saved pointer computed up front. Inline `x->m60` computes it after.
+- Stack slots: float locals and by-value struct temps are scoped temp slots,
+  split from the end of a freed chunk, so declaration order maps to address
+  order in reverse. Struct temps are 8-aligned. An inline function returning a
+  struct copies its local into the caller's slot.
+- `(&m8[idx])[-1].m8` gives `add r7,r8` order and a `-8(r9)` displacement.
+  `m8[idx-1]` folds differently; reads through `int lo = idx - 1` don't fold.
+- Statement order of independent stores (`out->type`, `out->id`, `out->m14`;
+  constructor field inits) changes the whole function's register allocation.
+  Try permutations; a 24-permutation loop takes about a minute.
+- Chooser slots 13/14: `return m4 ? 0 : fn_vslot17(out, obj, 3, 0, 0, 0);` and
+  `if (m4 == 2) return fn_vslot17(...1...); if (m4 == 0) return fn_vslot17(...3...); return 0;`.
+
+## Tooling tricks
+
+- Register-allocation dumps: `ngccc -E ... -o x.i`, then
+  `cc1plus.exe -Os -G0 -ffloat-store -fno-rtti -fno-exceptions -quiet -dg -dl x.i -o x.s`
+  writes `x.i.greg`/`x.i.lreg` ("regs to allocate", "Register dispositions").
+- Before symbols.txt is renamed, diff_unit shows functions as MISSING:
+  `objcopy --redefine-sym old=new` on the compiled object, then
+  `tools/match/cmp_objects.py`, gives the real comparison. Or run
+  `tools/scout/rename.py <unit> --write` first.
+- For scoring source variants, a difflib ratio over instruction lists works
+  (a full-text ratio doesn't, because of relocations).

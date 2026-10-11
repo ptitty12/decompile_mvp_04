@@ -14,7 +14,9 @@ what is matched.
   `include/game/*.h`, but only additions that keep every existing layout
   (fill padding, add new structs or prototypes). Never reorder or resize.
 - Never touch configure.py, config/, tools/, .github/, .claude/, orig/ or
-  build/ by hand. Never push, rebase or force anything. Never `git reset --hard`.
+  build/ by hand. One exception: once your source compiles, run
+  `python tools/scout/rename.py <UNIT> --write` so symbols.txt pairs your
+  functions (rename lines it skips by hand to the compiled mangled name). Never push, rebase or force anything. Never `git reset --hard`.
 - No inline asm, `asm` blocks, `#pragma`s, byte arrays standing in for code, or
   other tricks. Plain C/C++ that compiles to the same bytes.
 - Use placeholder names (`fn_<addr>`, `lbl_<addr>`, `Unk<addr>`, `m<offset>`)
