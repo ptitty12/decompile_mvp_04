@@ -541,13 +541,13 @@ int fn_80087E0C(H* h, int a, int b)
     return cnt;
 }
 
-/* near-miss: same loop, but retail keeps h in r11 and the offset in r10. */
 E* fn_80087E5C(H* h, int a, int b, int k)
 {
-    E* p = h->e;
+    unsigned i = 0;
     int cnt = 0;
     unsigned n = h->m7D0;
-    for (unsigned i = 0; i < n; i++, p++) {
+    E* p = h->e;
+    for (; i < n; p++, i++) {
         if (a == h->e[i].m0 && h->e[i].m4 == b) {
             if (cnt == k)
                 return p;
@@ -696,7 +696,6 @@ int fn_80088EDC(O* o, int i)
     return i;
 }
 
-/* near-miss: retail compares with cmpwi/cror/mfcr; the compiler here emits the sign-bit trick. */
 int fn_80088EFC(O* o, int i)
 {
     int k = fn_80088EDC(o, i);
