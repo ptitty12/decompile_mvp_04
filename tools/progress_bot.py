@@ -177,9 +177,22 @@ def bot(force: bool, push: bool, ref: str) -> None:
     if not push:
         log(f"--no-push: verified commit {head[:10]} left in {WT}")
         return
-    r = run(["git", *GIT_AUTH, "push", "origin", "HEAD:refs/heads/main"], WT, check=False)
-    if r.returncode:
-        log("push rejected (main probably moved); the next run starts from the new main")
+    # main moves every few minutes while agents merge, and a build takes longer than that.
+    # The verified commit only touches docs/progress/, so when the push is rejected, replay it
+    # onto the new main and push again instead of waiting a whole build for the next try.
+    for attempt in range(4):
+        r = run(["git", *GIT_AUTH, "push", "origin", "HEAD:refs/heads/main"], WT, check=False)
+        if not r.returncode:
+            break
+        log("push rejected (main moved); rebasing the card commit onto it")
+        git(WT, *GIT_AUTH, "fetch", "--quiet", "origin", "main")
+        if run(["git", "rebase", "origin/main"], WT, check=False).returncode:
+            run(["git", "rebase", "--abort"], WT, check=False)
+            log("rebase failed; the next run starts from the new main")
+            return
+        head = git(WT, "rev-parse", "HEAD")
+    else:
+        log("push still rejected; the next run starts from the new main")
         return
     log(f"pushed {head[:10]}: {summary}")
     save_state(handled=head, result="pushed")
