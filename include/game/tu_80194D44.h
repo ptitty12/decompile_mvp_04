@@ -44,6 +44,39 @@ struct Unk80195E60_Q {
     char pad0[0x38];
     int m38;
 };
+/* Object built by fn_80198CC0: flags at +0x36C.., a matrix at +0x3A0 and a ring buffer of
+ * 128-byte entries (count, array, cursor) at +0x3FC. */
+struct Unk80198CC0_Vec4 {
+    float m[4];
+};
+struct Unk80198CC0_Ring {
+    int m0;
+    char* m4;
+    char pad8[4];
+    int mC;
+};
+struct Unk80198CC0_Obj {
+    int m0;
+    char pad4[0x6C - 4];
+    int m6C;
+    char pad70[0x7C - 0x70];
+    Unk80198CC0_Vec4 m7C;
+    char pad8C[0x36C - 0x8C];
+    int m36C;
+    int m370;
+    int m374;
+    int m378;
+    int m37C;
+    int m380;
+    int m384;
+    int m388;
+    char pad38C[0x3A0 - 0x38C];
+    Unk8018A254_Ret m3A0;
+    char pad3E0[0x3FC - 0x3E0];
+    Unk80198CC0_Ring m3FC;
+};
+extern Unk80198CC0_Vec4 lbl_8069428C;
+
 struct Unk80198188_Ring {
     int m0;
     char* m4;
@@ -97,6 +130,10 @@ extern char lbl_806604C8[];
 extern Unk80181140_F lbl_805CE394;
 
 extern "C" {
+void fn_8026C8FC(void* o);
+void fn_803DF74C(Unk8018A254_Ret* m);
+void fn_80198DD8(struct Unk80198E5C_Obj* o, int a);
+void fn_8035A900(void* p);
 void fn_8019D03C(int a, void* ctx, void* o, int b, int c, int d, int e, int f, int g,
     float f0, float f1, float f2, float f3, float f4);
 void fn_80377488(void* p);

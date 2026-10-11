@@ -181,3 +181,35 @@ extern "C" void fn_80198C18(Unk80198C18_Obj* self, int chrg)
     fn_8026C864(self, chrg);
 }
 
+//@80198CC0
+/* near-miss: 62/62 insns, ~20 slots differ: all instructions match; only register numbers
+ * (retail: ring pointer r31, shared zero/offset r29, one r28; here r28/r31/r29) and the order of
+ * the field stores differ. Declaring `off` before the stores gave retail's shared zero. */
+extern "C" void fn_80198CC0(Unk80198CC0_Obj* o)
+{
+    int off = 0;
+    fn_8026C8FC(o);
+    Unk80198CC0_Ring* r = &o->m3FC;
+    o->m0 = 0;
+    o->m6C = 1;
+    o->m7C = lbl_8069428C;
+    fn_803DF74C(&o->m3A0);
+    o->m37C = 1;
+    o->m384 = 0;
+    o->m388 = 0;
+    o->m36C = 0;
+    o->m370 = 1;
+    o->m374 = 0;
+    o->m378 = 0;
+    o->m380 = 0;
+    fn_80198DD8((Unk80198E5C_Obj*)o, 0);
+    fn_8035A900(r);
+    for (int i = 0; i < r->m0; i++, off += 128) {
+        char* e = r->m4 + off;
+        *(float*)e = 0.0f;
+        fn_803DF74C((Unk8018A254_Ret*)(e + 0x20));
+        *(int*)(e + 0x60) = 0;
+    }
+    r->mC = -1;
+}
+
