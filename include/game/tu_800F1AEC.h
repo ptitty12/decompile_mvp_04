@@ -41,7 +41,7 @@ public:
     virtual void v12();
     virtual void v13();
     virtual void v14(int a);
-    virtual void v15();
+    virtual void v15(int a);
     virtual void v16(int a);
     virtual void v17();
     virtual void v18();
@@ -56,9 +56,9 @@ public:
     virtual void v27();
     virtual void v28(char* s);
     virtual void v29();
-    virtual void v30();
+    virtual void v30(int a);
     virtual void v31();
-    virtual void v32();
+    virtual int v32(int a, int b);
     virtual UiItem* v33(int a, int b);
     virtual void v34();
     virtual void v35();
@@ -338,7 +338,7 @@ public:
     virtual void w7();
     virtual void w8();
     virtual void w9();
-    virtual void w10();
+    virtual void w10(int a);
     virtual void w11();
     virtual void w12();
     virtual void w13();
@@ -365,6 +365,7 @@ struct UiScr2A8 : UiObj {
     int m26C;
     char pad270[0x2A8 - 0x270];
     UiObjB* m2A8;
+    int m2AC;
 };
 
 struct UiV_134 : UiObj {
@@ -581,6 +582,72 @@ struct UiV_20i_24i_28i_2Ci {
     int m2C;
 };
 
+struct UiV_134_138 : UiObj {
+    char pad40[0x134 - 0x40];
+    UiObj* m134;
+    UiObj* m138;
+};
+
+struct UiV_2ACi : UiObj {
+    char pad40[0x2AC - 0x40];
+    int m2AC;
+};
+
+struct UiV_148i : UiObj {
+    char pad40[0x148 - 0x40];
+    int m148;
+};
+
+struct UiV_144i : UiObj {
+    char pad40[0x144 - 0x40];
+    int m144;
+};
+
+struct UiV_140 : UiObj {
+    char pad40[0x140 - 0x40];
+    UiObj* m140;
+};
+
+struct UiV_158_15C : UiObj {
+    char pad40[0x158 - 0x40];
+    UiObj* m158;
+    UiObj* m15C;
+};
+
+struct UiV_1E8i_1ECi_1F0i_1F4i_1F8i_1FCi_200i_204i_208i_20Ci_210i_214i_218i_21Ci_220i_224i_228i_22Ci : UiObj {
+    char pad40[0x1E8 - 0x40];
+    int m1E8;
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+    int m200;
+    int m204;
+    int m208;
+    int m20C;
+    int m210;
+    int m214;
+    int m218;
+    int m21C;
+    int m220;
+    int m224;
+    int m228;
+    int m22C;
+};
+
+struct UiV_1A0i_1A4i : UiObj {
+    char pad40[0x1A0 - 0x40];
+    int m1A0;
+    int m1A4;
+};
+
+struct UiV_25Ci_260i : UiObj {
+    char pad40[0x25C - 0x40];
+    int m25C;
+    int m260;
+};
+
 
 /* fn_800B555C(): global input/menu state; +0x570 is the current player/slot index
  * compared by the button handlers. */
@@ -643,6 +710,8 @@ void fn_800EC648(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g
 struct Ui806192E0_C {
     char pad0[0x1C];
     int m1C;
+    char pad20[0x120 - 0x20];
+    int m120;
 };
 struct Ui806192E0_B {
     char pad0[0x10];
@@ -693,8 +762,27 @@ struct Ui700 {
     char pad0[0x3C4];
     Ui3C4* m3C4;
 };
+struct Ui1CD0 {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0xFFC - 0x19C];
+    int mFFC;
+    char pad1000[0x1CD0 - 0x1000];
+    int m1CD0;
+};
+struct Ui6F8_10 {
+    char pad0[0x70];
+    int m70;
+};
+struct Ui6F8 {
+    char pad0[0x10];
+    Ui6F8_10* m10;
+    Ui1CD0* m14;
+};
 struct Ui8011AA24 {
-    char pad0[0x700];
+    char pad0[0x6F8];
+    Ui6F8* m6F8;
+    char pad6FC[4];
     Ui700* m700;
     char m704[0x788 - 0x704];
     int m788;
@@ -839,9 +927,9 @@ struct Ui8010B1E0 {
 };
 int fn_8025416C(char* p, int a);
 void fn_800DE274(short* p, int a, int b);
-int fn_800E5F38();
-int fn_800E5E4C();
-void fn_80097288(int a, int b);
+int fn_800E5F38(int a);
+int fn_800E5E4C(int a);
+int fn_80097288(int a, int b);
 extern int lbl_8061977C;
 int fn_8010A7A0(int a);
 
@@ -879,6 +967,47 @@ struct UiScrA70C {
 void fn_800EC648(UiScrA70C* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_803FFC58(char* p, int v, int n);
 
+extern int lbl_8061B3BC;
+void fn_8010098C(char* p, int a);
+int fn_802D7DB4(int a, int b);
+void fn_800C3DCC(Ui800C33D0* g, UiObj* o, int a);
+void fn_80101A64(UiScr2A8* self);
+
+void fn_800FEB30(const char* s, int a);
+void fn_8011A1D4(Ui8010B1E0* a, int b, UiObj* c, int d);
+
+/* Screen with flag at +0x14C and a record at +0x1AC (fn_8010750C). */
+struct UiScr8010750C : UiObj {
+    char pad40[0x14C - 0x40];
+    int m14C;
+    char pad150[0x1AC - 0x150];
+    UiBase* m1AC;
+};
+void fn_80108070(UiObj* self, int a);
+void fn_80105AE8(UiObj* self, int a, int b);
+void fn_80105048(UiObj* self, int idx, char* e);
+void fn_801051D0(UiObj* self, int a, int b);
+int fn_800B5520(int a);
+int fn_80105AB8();
+int fn_800ED00C(UiObj* self);
+int fn_800C8070(UiObj* self);
+int fn_8040B3B4(const char* a, const char* b);
+
+struct UiArr158 {
+    char pad0[0x158];
+    int m158[1];
+};
+UiObj* fn_800C8034(int a);
+void fn_800B7ADC(UiMsgMgr* mgr, UiObj* o);
+void fn_801089E4(UiObj* self, int a);
+extern int lbl_80620298;
+
+int fn_801184F4(int a, int b, int c, int d, int e, int f, int g, int h, int i);
+int fn_8011B4E4();
+void fn_802D7A74();
+void fn_802D8294(int a);
+UiObj* fn_800C8044(int a);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -890,8 +1019,8 @@ int fn_800F9290(UiObj* self, int a);
 char* fn_8040B830(char* dst, const char* src, unsigned n);
 void fn_80100744(void* self);
 void fn_800ED310(UiObj* self);
-void fn_80108958(void* self, int a);
-void fn_801094AC(void* self, int a);
+void fn_80108958(UiObj* self, int a);
+void fn_801094AC(UiObj* self, int a);
 void fn_80109E0C(void* self, int a);
 void fn_801A39B8(void* a, int b);
 void fn_801A3A54(void* a, int b);
