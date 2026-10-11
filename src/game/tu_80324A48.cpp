@@ -12,6 +12,7 @@ extern const void* const lbl_80665E30[];
 extern const void* const lbl_80665E48[];
 extern int lbl_80620860;
 extern int lbl_80620298;
+extern const float lbl_805EBA58;
 extern FxZ lbl_805EBA10;
 struct FxShorts;
 struct FxGlobal { char pad0[0x30]; FxShorts* m30; };
@@ -26,6 +27,7 @@ FxZ fn_80325410(FxZT* tab, int kind, float t);
 FxZ fn_80325848(FxZT* tab, int kind, float t);
 void fn_80326300(FxZT* t, int a, int b, int c, float f1, float f2);
 int fn_80324A24(FxZ* a);
+int fn_803249D4(FxY* a, FxY* b);
 int fn_80324C6C(FxZ* a, int b);
 void fn_80377488(void* p);
 void fn_80377408(void* p);
@@ -58,6 +60,7 @@ void fn_803250EC(FxZT* self);
 float fn_803250F8(FxZT* self, int flag, float a);
 float fn_80325128(FxZT* self, int flag, float a);
 FxPred fn_80325D18(void* self, int kind);
+void fn_80326300(FxZT* self, int a, int b, int c, float f1, float f2);
 FxAI* fn_803263C4(FxAI* self, FxAIB* a);
 void fn_80326410(FxAI* self, int a);
 void fn_803264B4(FxAI* self, int a);
@@ -75,7 +78,7 @@ FxZ fn_80326F44(FxPtr* p, int kind, float t);
 FxZ fn_80326FC4(FxPtr* p, int kind, float t);
 FxZ fn_80327044(FxPtr* p, int kind, float t);
 int fn_803270C4(FxPtr* p, int kind, int flag, float t);
-void fn_80327100(FxPtr* p, int a, int b, int c, float f1, float f2);
+void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c);
 // PROTOS-END
 }
 
@@ -282,6 +285,26 @@ FxPred fn_80325D18(void* self, int kind) {
     return 0;
 }
 
+/* near-miss: loop shape (retail jumps into a bottom-tested loop, keeps scanning after a hit) and key layout */
+void fn_80326300(FxZT* self, int a, int b, int c, float f1, float f2) {
+    float t1 = f1;
+    float t2 = lbl_805EBA58;
+    FxZ key;
+    key.m0 = a;
+    key.m4 = t1;
+    key.m8 = b;
+    key.mC = c;
+    key.m10 = t2;
+    key.m14 = 0;
+    for (int i = 0; i < self->m8; i++) {
+        FxZ* e = (FxZ*)(self->m4 + i * 0x18);
+        if (fn_803249D4((FxY*)e, (FxY*)&key)) {
+            if (!(e->m10 <= f2)) e->m10 = f2;
+            return;
+        }
+    }
+}
+
 FxAI* fn_803263C4(FxAI* self, FxAIB* a) {
     self->m4F4 = lbl_80665E30;
     self->m4BC = a;
@@ -410,7 +433,6 @@ int fn_803270C4(FxPtr* p, int kind, int flag, float t) {
     return fn_803256C8(p->m0, kind, flag, t);
 }
 
-/* near-miss: store/compare order of the float spills */
-void fn_80327100(FxPtr* p, int a, int b, int c, float f1, float f2) {
+void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c) {
     if (p->m0) fn_80326300(p->m0, a, b, c, f1, f2);
 }
