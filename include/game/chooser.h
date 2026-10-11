@@ -204,24 +204,36 @@ extern const char lbl_805DC0E4[];   /* 0x14-byte string in another unit's .rodat
 extern const char lbl_805DC0F8[];   /* "cSubContainer" (same unit) */
 extern const char lbl_805DC394[];   /* "type": one copy, used by several units' slot 2 */
 
-/* Weights-list helper embedded in cRandomLoaded at +4 (ctor 0x8026FEB8, dtor
- * 0x8026FF08, vtable 0x806625D0: slot 1 parse 0x8027021C, slot 2 dtor). It
- * lives in randomchooser.cpp, which is not decompiled yet. Size 0x14.
- * Offsets seen: +4 entry count (fn_8026FF6C and fn_80270074 bound-check it),
- * +8 array of 16-byte entries (object pointer at +4, float at +8),
- * +0xC index used by fn_80270074 when the player flag 0x800 is set, +0x10
- * (zeroed by the ctor, untouched here). */
+/* One entry of the weights list. Evidence: stride 0x10 in fn_8026FFF8
+ * (resolve), fn_8027021C (parse), fn_80270074 (reads +0x4 and +0x8) and
+ * fn_8027011C (binary search on +0xC); the assert in fn_8027011C names the
+ * array mAssetWeights and the field mSumWeight. */
+struct Unk8026FF6C_Obj;
+struct Unk8026FEB8_Entry {
+    unsigned int m0;           /* hash, parsed from the list string */
+    Unk8026FF6C_Obj* m4;       /* resolved from m0 by fn_8026FFF8 */
+    float m8;                  /* weight */
+    float mSumWeight;          /* running sum of the weights up to this entry */
+};
+
+/* Weights-list helper embedded in cRandom at +8 and cRandomLoaded at +4 (ctor
+ * 0x8026FEB8, dtor 0x8026FF08, vtable 0x806625D0: slot 1 parse 0x8027021C,
+ * slot 2 dtor). Defined in randomchooser.cpp. Size 0x14. Parse format (slot 1):
+ * "hash,weight,hash,weight,...#N" with N stored in mC. */
 class Unk8026FEB8 : public Unk80356798 {
 public:
     Unk8026FEB8();
+    virtual void fn_vslot1(char* buf, int len);
     virtual ~Unk8026FEB8();
     void* fn_8026FF6C(int index);
+    void fn_8026FFF8();
     int fn_80270074(Unk80270BA0_X* x, int index, int* outId, float* outWeight);
+    int fn_8027011C(Unk80270BA0_X* x, int* outId, float* outWeight, float value);
 
-    int m4;
-    int m8;
-    int mC;
-    int m10;
+    int m4;                    /* entry count */
+    Unk8026FEB8_Entry* mAssetWeights;
+    int mC;                    /* index used when the player flag 0x800 is set */
+    int m10;                   /* hashes resolved */
 };
 
 /* Object behind lbl_8061E978; fn_802AE984(mgr, p) forwards to fn_80378024(mgr + 0x3B78, p). */
