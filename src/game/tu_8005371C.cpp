@@ -82,6 +82,109 @@ void fn_800539EC(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
     }
 }
 
+static inline Unk80052794_Vec3 Diff3D0(Unk80052794_S6CC* p)
+{
+    return p->m3D0 - p->m3DC;
+}
+void fn_80053A68(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
+{
+    if ((unsigned)(ctx->m4[idx].mC - 3) <= 1) {
+        Unk80052794_S700* s = ctx->m4[idx].m38->m700;
+        if (fn_80258C90(s->m3B4) != 0) {
+            int a = ctx->m4[idx].m4;
+            int b = ctx->m4[idx].m0;
+            int c = -1;
+            int d = 0;
+            int r = fn_8005000C(ctx, idx, 0x88);
+            Unk80052794_S6CC* p = obj->m130->m44C->m6CC;
+            float len1;
+            Unk80052794_Vec3 v;
+            fn_80189618(&v, p, lbl_805A92DC);
+            len1 = fn_804028E4(v.x * v.x + v.z * v.z) * lbl_805A92E0;
+            float len2;
+            Unk80052794_Vec3 dd = Diff3D0(p);
+            len2 = fn_804028E4(dd.x * dd.x + dd.z * dd.z) * lbl_805A92E4;
+            if (len1 >= lbl_805A92E8 || !(len2 > lbl_805A92EC)) {
+                if (r > -1) {
+                    c = ctx->m4[r].m0;
+                    d = ctx->m4[r].m4;
+                }
+                int x = fn_80044EC0(ctx->m4[idx].m8, c, d, a, b);
+                if (x != 0) {
+                    fn_8000FE60(x);
+                }
+            }
+        }
+    } else {
+        if (obj->m13C[obj->m274].m0 != 0) {
+            if (fn_8004FF78(ctx, ctx->m9D8, 0x56) == -1) {
+                if (fn_8040ABA0() % 100 <= 0x31) {
+                    fn_80016F30();
+                } else {
+                    fn_8000F598(1);
+                }
+            }
+        }
+    }
+}
+
+void fn_80053C88(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
+{
+    Unk80052794_S700* s = ctx->m4[idx].m38->m700;
+    int h = s->m3B8;
+    if (fn_801DC67C(h) != 0 && obj->m3C4 == 0) {
+        if (obj->m3E8 != 0) {
+            int t = fn_801DC570(h);
+            if (t != 0 && obj->m3F8 == 0 && t == obj->m460) {
+                if (obj->m54C != 0) {
+                    if (obj->m448 == 2) {
+                        if ((fn_8026DC18(t, 0) != 0 || fn_8026D628(t, 0) != 0) && ctx->mA68 == 0) {
+                            int a = fn_8001F3FC(obj, t);
+                            int b = fn_8001DA28(obj);
+                            fn_8001922C(a, b, fn_8001F45C(obj, t));
+                            return;
+                        }
+                        if (fn_8026DAE8(t, 0) != 0) {
+                            int c = fn_8001F3FC(obj, t);
+                            fn_80013450(c, fn_8001F45C(obj, t));
+                        }
+                    }
+                } else if (ctx->mA74 == 0) {
+                    if (fn_8040ABA0() % 10 <= 1 && ctx->mA68 == 0) {
+                        int c = fn_8001F3FC(obj, t);
+                        fn_800132A0(c, fn_8001DA28(obj));
+                        return;
+                    }
+                    int u = fn_8001D8DC(obj);
+                    if (u != 0) {
+                        if (fn_800507D8(ctx, idx, obj) != 0) {
+                            int d = fn_8001DA28(obj);
+                            fn_80015590(u, d, fn_8001D6CC(obj));
+                        } else {
+                            int e = fn_8001DA28(obj);
+                            int f = fn_8001D6CC(obj);
+                            int g = fn_8001D70C(obj);
+                            int hh = fn_8001E054(obj);
+                            fn_80014488(u, e, f, g, hh, fn_8001F45C(obj, t), 0x40);
+                        }
+                    }
+                    ctx->mA74 = 1;
+                }
+            }
+        } else if (ctx->mA84 == 0 && (obj->m54C != 0 || fn_801DC570(ctx->m4[idx].m38->m700->m3B8) != 0) && obj->m3DC != 0 && obj->m3F8 == 0) {
+            ctx->mA84 = 1;
+            switch (obj->m444) {
+            case 0xB:
+            case 0xC:
+            case 0xD:
+            case 0xE:
+                fn_80017CD4(fn_8001DA4C(obj), 8);
+                break;
+            }
+        }
+    }
+}
+
 void fn_80053F7C(Unk80052794_Ctx* ctx)
 {
     if (ctx->mA7C == 0) {

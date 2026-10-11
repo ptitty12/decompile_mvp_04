@@ -21,6 +21,7 @@ struct Unk80052794_Entry;
 struct Unk80052794_Row;
 struct Unk80052794_Rec;
 struct Unk80052794_Quad;
+struct Unk80052794_Vec3;
 struct Unk8005ADD0_Obj;
 struct Unk8005BA1C_Obj;
 struct Unk80056970_Obj;
@@ -172,15 +173,26 @@ struct Unk800B555C_Obj {
     Unk80052794_Quad m688;
 };
 
+struct Unk80052794_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+
 struct Unk80052794_S6CC {
     char pad0[0x36C];
     int m36C;
+    char pad370[0x60];
+    Unk80052794_Vec3 m3D0;
+    Unk80052794_Vec3 m3DC;
 };
 
 struct Unk80052794_S700 {
     char pad0[0x3A4];
     int m3A4;
-    char pad3A8[0x14];
+    char pad3A8[0xC];
+    int m3B4;
+    int m3B8;
     int m3BC;
 };
 
@@ -1046,4 +1058,43 @@ void fn_803AB480(int h);
 void fn_803ADA2C(int h, int v);
 
 void fn_8005AEB0(Unk8005ADD0_Obj* o, int ch);
+/* fn_80053C88 */
+int fn_801DC67C(int a);
+int fn_801DC570(int a);
+int fn_8026DC18(int a, int b);
+int fn_8026D628(int a, int b);
+int fn_8026DAE8(int a, int b);
+void fn_8001922C(int a, int b, int c);
+void fn_80013450(int a, int b);
+void fn_800132A0(int a, int b);
+int fn_800507D8(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj);
+void fn_80015590(int a, int b, int c);
+void fn_80014488(int a, int b, int c, int d, int e, int f, int g);
+
+int fn_8001D70C(Unk80052794_Obj* obj);
+int fn_8001E054(Unk80052794_Obj* obj);
+
+void fn_80017CD4(int a, int b);
+/* fn_80053A68 */
+extern const float lbl_805A92DC;
+extern const float lbl_805A92E0;
+extern const float lbl_805A92E4;
+extern const float lbl_805A92E8;
+extern const float lbl_805A92EC;
+inline Unk80052794_Vec3 operator-(const Unk80052794_Vec3& a, const Unk80052794_Vec3& b)
+{
+    Unk80052794_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+int fn_80258C90(int a);
+void fn_80189618(Unk80052794_Vec3* out, Unk80052794_S6CC* p, float f);
+float fn_804028E4(float x);
+int fn_80044EC0(int a, int b, int c, int d, int e);
+void fn_8000FE60(int a);
+void fn_80016F30(void);
+void fn_8000F598(int a);
+
 #endif
