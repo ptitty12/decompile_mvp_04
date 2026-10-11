@@ -118,6 +118,21 @@ extern float lbl_80620540, lbl_80620544;
 struct MIE2 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 inline int EnumVal2(MIE2* i) { return i->m60[i->m4C]; }
 inline MIE2* EAt2(Menu* p, int off) { return (MIE2*)((char*)p + off); }
+/* Button item (0x4C bytes): +0/+4 floats, vptr at +8, +0xC flag, callback at +0x48. Evidence: the
+ * inline base-item ctor in fn_80332978 stores m0, m4, vptr and mC, then fn_8032D868 sets the
+ * name and fn_8033FBD8 the callback. */
+struct ItemB { float m0; float m4; const void* m8; int mC; char pad10[0x38]; void* m48; };
+extern const char lbl_80666E70[], lbl_80666DD0[], lbl_80666E20[], lbl_80666138[];
+extern const char lbl_805EDE40[], lbl_805EDE5C[], lbl_805EDE78[], lbl_805EDE94[], lbl_805EDEAC[], lbl_805EDEC4[], lbl_805EDEDC[], lbl_805EDEF0[], lbl_805EDF08[];
+extern int lbl_80620530[];
+extern "C" {
+void fn_8032F120(void* item, const char* name, int v);
+void fn_8032F428(void* item, const char* name, const void* tbl, int n, int cur);
+void fn_8033FBD8(void* item, void* cb);
+void fn_80332930();
+void fn_80332954();
+void fn_80333848(void* menu, Menu* owner);
+}
 extern const char lbl_805EDDD4[];
 extern int lbl_80691DD8;
 extern "C" {
@@ -434,6 +449,61 @@ void fn_80332898()
 void fn_80332930() { fn_8033280C(1); }
 
 void fn_80332954() { fn_8033280C(0); }
+
+/* near-miss (parked, 150 vs 152 instructions): the three inline button-item ctors are right in
+ * shape (vptr EC0, floats m0/m4, vptr E70, mC, name, vptr DD0, callback), but retail keeps one
+ * more callee-saved register live (r15..r30: the callback address of the first button is
+ * hoisted into r29) and so allocates every item pointer one register lower. */
+Menu* fn_80332978(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666138;
+    fn_8032F120((char*)p + 0x2E0, lbl_805EDE40, 0);
+    ItemB* bA = (ItemB*)((char*)p + 0x334);
+    bA->m8 = lbl_80666EC0;
+    bA->m0 = 0.0f;
+    bA->m4 = 0.0f;
+    bA->m8 = lbl_80666E70;
+    bA->mC = 0;
+    fn_8032D868(bA, lbl_805EDE5C);
+    bA->m8 = lbl_80666DD0;
+    fn_8033FBD8(bA, (void*)fn_80332930);
+    ItemB* bB = (ItemB*)((char*)p + 0x380);
+    bB->m8 = lbl_80666EC0;
+    bB->m0 = 0.0f;
+    bB->m4 = 0.0f;
+    bB->m8 = lbl_80666E70;
+    bB->mC = 0;
+    fn_8032D868(bB, lbl_805EDE78);
+    bB->m8 = lbl_80666DD0;
+    fn_8033FBD8(bB, (void*)fn_80332954);
+    fn_8032F120((char*)p + 0x3CC, lbl_805EDE94, 0);
+    fn_8032F428((char*)p + 0x420, lbl_805EDEAC, lbl_80620530, 4, 0);
+    fn_8032F120((char*)p + 0x480, lbl_805EDEC4, 0);
+    ItemB* bC = (ItemB*)((char*)p + 0x4D4);
+    bC->m8 = lbl_80666EC0;
+    bC->m0 = 0.0f;
+    bC->m4 = 0.0f;
+    bC->m8 = lbl_80666E70;
+    bC->mC = 0;
+    fn_8032D868(bC, lbl_805EDEDC);
+    bC->m48 = (char*)p + 0x520;
+    bC->m8 = lbl_80666E20;
+    fn_80333848((char*)p + 0x520, p);
+    fn_8032F120((char*)p + 0x9F4, lbl_805EDEF0, 0);
+    fn_8032F120((char*)p + 0xA48, lbl_805EDF08, 0);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)bA);
+    fn_80330ACC(p, (MItem*)bB);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x3CC));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x420));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x480));
+    fn_80330ACC(p, (MItem*)bC);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x9F4));
+    fn_80330ACC(p, (MItem*)((char*)p + 0xA48));
+    p->m174 = 0;
+    return p;
+}
 
 void fn_80332BD8(Menu* p, int k)
 {
