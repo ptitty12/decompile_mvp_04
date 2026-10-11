@@ -16,8 +16,11 @@ typedef Unk80268190_HE HE;
 typedef Unk80268190_R R;
 typedef Unk80268190_G G;
 typedef Unk80268190_C C;
+typedef Unk80268190_Cmd Cmd;
 
 extern char lbl_806617D0[];
+extern Unk80268190_V3 lbl_806055AC;
+extern const char lbl_805DB170[];
 extern char lbl_80660608[];
 extern int lbl_8061CB7C;
 
@@ -34,6 +37,12 @@ int fn_80254EA4(A* a, int b);
 void fn_802680B0(M* m, int a);
 void fn_80242E28(Pl* p, float f);
 int fn_8014E2B4(int a);
+void fn_8014E388(char* buf);
+float fn_80189D88(Pl* pl, Pl* o, void* v, char* buf, float f);
+float fn_80259A74(void* list, int type, int idx);
+int fn_80261050(Q* q, Pl** out);
+Pl* fn_80257B40(void* p);
+float fn_80266EF4(void* p, Pl* x);
 void fn_8025713C(void* list, int a);
 void fn_80268A4C(S* s, int t, Pl* p);
 int fn_80268684(M* m, Pl* p);
@@ -49,6 +58,8 @@ void fn_8025E654(C* c);
 int fn_801BBEFC(int a);
 void fn_802665B4(void* x);
 void fn_8025E55C(C* c);
+void fn_8026AA04(R* self, int v, const char* file, int line);
+void fn_8025E26C(C* c, Cmd* cmd, int a, int type);
 }
 
 struct Unk80268190_Msg5E : MsgB {
@@ -346,6 +357,52 @@ void fn_80269128(R* self)
     }
 }
 
+/* near-miss: retail loads rec->aC into r4 for the first compare (we use r0); everything else equal */
+int fn_802691AC(R* self, Unk80268190_Rec* rec, int unused, Pl* o)
+{
+    float f;
+    char buf[16];
+    if (rec->aC == -1)
+        return 0;
+    Pl* pl = self->m58->m44C->m6CC;
+    char* bp = buf;
+    void* pos = (char*)o + 0x60;
+    fn_8014E388(bp);
+    f = fn_80189D88(pl, o, pos, bp, 1320.0f);
+    rec->a14 = rec->a14 + f;
+    rec->a10 = fn_80259A74(self->m58->m44C->m700->m3B4, self->m58->m458, rec->aC);
+    const float k = 0.25f;
+    rec->a18 = rec->a10 - rec->a14;
+    return rec->a18 > k;
+}
+
+/* near-miss (parked, 75 vs 76 insns): retail walks three induction values (tmp pointer with a precomputed end, record pointer, byte offset) and re-forms self+off each pass;
+   the zero-fill of tmp is a libcall memset (crclr cr1eq) in retail */
+void fn_80269288(R* self)
+{
+    Pl* x = 0;
+    if (fn_80261050(self->m0, &x) != 0) {
+        if (fn_80254EA4(&self->m58->m58C, 0) == -1) {
+            if (self->m58 != fn_80257B40(self->m0->m1F0)) {
+                if (self->m58->m58C.m30 <= 2) {
+                    if (x != 0) {
+                        int tmp[3] = { 0, 0, 0 };
+                        float f = fn_80266EF4(self->m0->m48, x);
+                        for (int i = 0; i < 3; i++) {
+                            self->rec[i].a14 = f;
+                            if (self->rec[i].a0 == 1 && fn_802691AC(self, &self->rec[i], 0, x) != 0) {
+                                tmp[i] = 1;
+                                self->rec[i].a0 = 0;
+                                self->rec[i].a4 = 4;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 int fn_8026986C(R* self, int v)
 {
     int r = -1;
@@ -468,7 +525,7 @@ void fn_8026A10C() {}
 
 void fn_8026A1D4() {}
 
-void fn_8026AA04(R* self, int v)
+void fn_8026AA04(R* self, int v, const char* file, int line)
 {
     self->rec[0].a0 = v;
 }
@@ -534,6 +591,27 @@ void fn_8026BA30(C* self)
 void fn_8026BAB8(C* self)
 {
     fn_8025E55C(self);
+}
+
+/* near-miss (parked): same instructions, the independent field stores of the command record are scheduled in a different order (tried 5 source orders) */
+void fn_8026BD5C(C* self, Cmd* cmd, Pl* p)
+{
+    cmd->m8 = 4;
+    cmd->mC = -1;
+    cmd->m4 = 0;
+    cmd->m14 = 0;
+    cmd->m18 = -1.0f;
+    cmd->m1C = -1.0f;
+    cmd->m20 = 6;
+    cmd->m24 = 0;
+    cmd->m28 = lbl_806055AC;
+    cmd->m10 = p;
+    cmd->m34 = 0;
+    cmd->m0 = 1;
+    fn_8026AA04((R*)cmd, 3, lbl_805DB170, 0x65D);
+    cmd->mC = p->m58C.m38;
+    fn_80269F88((G*)((char*)self + 0x190), p, 3);
+    fn_8025E26C(self, cmd, 2, p->m458);
 }
 
 int fn_8026BE3C(C* self, Pl* p)

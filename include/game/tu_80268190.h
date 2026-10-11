@@ -71,9 +71,12 @@ struct Unk80268190_Sub6F8 {
 };
 
 struct Unk80268190_Q {
-    char pad0[0x4C];
+    char pad0[0x48];
+    char m48[4];
     unsigned int m4C;
-    char pad50[0x438 - 0x50];
+    char pad50[0x1F0 - 0x50];
+    void* m1F0;
+    char pad1F4[0x438 - 0x1F4];
     Unk80268190_Pl* m438[4];
     int m448;
     char pad44C[0x65C - 0x44C];
@@ -167,7 +170,7 @@ struct Unk80268190_Rec {
     int aC;
     float a10;
     float a14;
-    int a18;
+    float a18;
 };
 
 struct Unk80268190_R {
@@ -211,6 +214,28 @@ struct Unk80268190_C {
     unsigned int m44C;
     char pad450[0x4C4 - 0x450];
     int m4C4[4];
+};
+
+struct Unk80268190_V3 {
+    int a;
+    int b;
+    int c;
+};
+
+/* Runner command record filled by fn_8026BD5C (size 0x38). */
+struct Unk80268190_Cmd {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    Unk80268190_Pl* m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    int m24;
+    Unk80268190_V3 m28;
+    int m34;
 };
 
 #endif /* GAME_TU_80268190_H */
