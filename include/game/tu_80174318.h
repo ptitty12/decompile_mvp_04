@@ -179,4 +179,31 @@ extern const float lbl_805CBD24;
 void fn_80177C74(void* self, int a);
 void fn_80177BF4(Unk80177B74_T* p, void* a);
 
+struct Unk80177A90_V3 {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Unk80177A90_T {
+    char pad0[0x10];
+    Unk80177A90_V3 m10;
+    Unk80177A90_V3 m1C;
+    Unk80177A90_V3 m28;
+    Unk80177A90_V3 m34;
+};
+extern const Unk80177A90_V3 lbl_806055AC;
+extern const char lbl_805CB1DC[];
+extern const char lbl_805CB208[];
+int fn_802B9300(int n, int a, int b, int c);
+void fn_80402DE4(int a, int b);
+void fn_80402BEC(int a, int b, int c);
+int fn_804089B4(char* dst, const char* fmt, ...);
+void fn_8040074C(void* p, unsigned int n);
+int fn_80359BAC();
+int fn_80359C58();
+int fn_80359E94();
+void fn_803EE8F8(void* cfg);
+void fn_80174824(int a);
+int fn_801747AC(const char* name);
+
 #endif

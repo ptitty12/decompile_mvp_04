@@ -68,9 +68,49 @@ int fn_801747A0()
     return lbl_8061C668;
 }
 
+/* near-miss: only the order of `li r4,1` / `mr r3,r31` before fn_80402DE4 differs (2 slots); treating the
+ * callee as a method call did not change it. */
+int fn_801747AC(const char* name)
+{
+    char buf[128];
+    int r = fn_802B9300((int)name, 0x100, 0xE, 0);
+    if (r == 0) {
+        fn_804089B4(buf, lbl_805CB1DC, name);
+    }
+    fn_80402DE4(r, 1);
+    fn_80402BEC(r, 0, 0);
+    return r;
+}
+
 void fn_80174824(int a)
 {
     fn_80402CAC(lbl_8061C674, a);
+}
+
+struct Unk80174850_Cfg {
+    Unk80174850_Cfg()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0;
+        mC = 0;
+    }
+    int m0;
+    int m4;
+    int m8;
+    void (*mC)(int);
+};
+
+void fn_80174850()
+{
+    Unk80174850_Cfg c;
+    fn_8040074C(&c, 0x10);
+    c.m0 = fn_80359BAC();
+    c.m8 = fn_80359C58();
+    c.m4 = fn_80359E94();
+    c.mC = fn_80174824;
+    lbl_8061C674 = fn_801747AC(lbl_805CB208);
+    fn_803EE8F8(&c);
 }
 
 void fn_801748D8(Unk801748D8_Obj* o)
@@ -331,6 +371,16 @@ void fn_80177A48(Unk80177B74_T* p, void* a, void* b, int c)
 {
     fn_80177BCC(p, b);
     fn_80177B74(p, a, c);
+}
+
+void fn_80177A90(Unk80177A90_T* p)
+{
+    fn_80177B40(p);
+    fn_80177C74(p, 0);
+    p->m10 = lbl_806055AC;
+    p->m1C = lbl_806055AC;
+    p->m28 = lbl_806055AC;
+    p->m34 = lbl_806055AC;
 }
 
 void fn_80177B40(void* self)
