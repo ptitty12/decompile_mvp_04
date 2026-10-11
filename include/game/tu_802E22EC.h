@@ -54,9 +54,10 @@ public:
     virtual void s3();
     virtual Unk802E22EC_B* s4(int x);
     virtual void s5(Unk802E22EC_B* o, int x);
-    virtual void s6(int a, int b);
+    virtual void s6(char* a, int b);
     void fn_802E3770();
     static void operator delete(void* p) { lbl_8061F68C->s5(p); }
+    static void operator delete[](void* p) { lbl_8061F68C->s5(p); }
     static void* operator new(unsigned size, const char* tag) { return lbl_8061F68C->s4(size, tag); }
 };
 
@@ -76,7 +77,7 @@ public:
     void fn_802E32F8(int n);
     void fn_802E33D0(Unk802E313C* o, int x);
     void fn_802E3470(Unk802E313C* o, int x);
-    void fn_802E35DC(int a, int b);
+    void fn_802E35DC(char* a, int b);
     void fn_802E366C();
 };
 Unk802E313C* fn_802E3530(Unk802E313C* o, int x);
@@ -91,6 +92,7 @@ struct Unk802E4B98_V4 {
     float m4;
     float m8;
     float mC;
+    Unk802E4B98_V4() {}
     Unk802E4B98_V4(float x, float y, float z, float w)
     {
         m0 = x;
@@ -168,7 +170,14 @@ public:
     char padA0[0x160 - 0xA0];
     Unk802E4B98_V4 m160;
     Unk802E22EC_B* m170;
+    Unk802E6124()
+    {
+        m0 = 3;
+        m170 = 0;
+    }
     virtual ~Unk802E6124();
+    void fn_802E715C();
+    void fn_802E624C(Unk802E6124* o, Unk802E4B98_V4* v);
     void fn_802E61BC(const Unk802E4B98_M* m, const Unk802E4B98_V4* v);
 };
 
