@@ -198,5 +198,8 @@ libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
 
+dolphin/ai/AI.c:
+	.text       start:0x80414F30 end:0x80415814
+
 dolphin/os/OS.c:
 	.text       start:0x804321A0 end:0x804321CC
