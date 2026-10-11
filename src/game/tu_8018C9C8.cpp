@@ -95,7 +95,7 @@ extern "C" float fn_8018CD0C(Unk80188698* o)
 }
 
 //@8018CD80
-extern "C" float fn_8018CD80(Unk80188698* o, float t)
+extern "C" void* fn_8018CD80(Unk80188698* o, float t)
 {
     return Unk8018CA78_Eval2((char*)o->m448 + 0x58, t);
 }
@@ -107,7 +107,7 @@ extern "C" float fn_8018CDB8(Unk80188698* o, int k, float t)
 }
 
 //@8018CDF0
-extern "C" float fn_8018CDF0(Unk80188698* o, float t)
+extern "C" void* fn_8018CDF0(Unk80188698* o, float t)
 {
     return Unk8018CA78_Eval3((char*)o->m448 + 0x58, t);
 }

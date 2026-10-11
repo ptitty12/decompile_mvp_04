@@ -35,8 +35,8 @@ extern Unk80181140_F lbl_805CDDCC;
 
 extern "C" {
 float fn_801937B4(void* p, int k, float t);
-float fn_80193750(void* p, float t);
-float fn_80193828(void* p, float t);
+void* fn_80193750(void* p, float t);
+void* fn_80193828(void* p, float t);
 int fn_8018AABC(Unk80188698* o);
 int fn_8018B4D0(Unk80188698* o);
 Unk8018A254_Ret fn_8018A254(Unk80188698* o, int a, const Unk80183918_Vec3* v, int b, int c, int d, int e);
@@ -54,11 +54,11 @@ inline float Unk8018CA78_Eval(void* p, int k, float t)
 {
     return fn_801937B4(p, k, t);
 }
-inline float Unk8018CA78_Eval2(void* p, float t)
+inline void* Unk8018CA78_Eval2(void* p, float t)
 {
     return fn_80193750(p, t);
 }
-inline float Unk8018CA78_Eval3(void* p, float t)
+inline void* Unk8018CA78_Eval3(void* p, float t)
 {
     return fn_80193828(p, t);
 }
