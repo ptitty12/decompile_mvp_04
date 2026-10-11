@@ -25,6 +25,15 @@ struct KnotBuf { const void* m0; void* m4; int m8; };
 extern Rec24 lbl_80691BF4[];
 extern int lbl_80691DF4;
 extern Rec24 lbl_805EBA10;
+struct V3x { float x; float y; float z; };
+extern V3x lbl_805F2D64, lbl_805F2D70;
+extern float lbl_805F2D7C;
+extern int lbl_80620DF0, lbl_80691DEC;
+struct Unk738Mgr { char pad0[0x738]; void* m738; };
+extern "C" {
+Rec24 fn_80326F44(int a, int b, float f, int k);
+void fn_8030D1E4(void* o, int k, V3x* a, V3x* b, int z, float f);
+}
 struct KnotV { char pad0[4]; float m4; float m8; float mC; };
 extern "C" void fn_80378D70(const char* src, unsigned int len, char* dst, int cap, int delim, unsigned int* outn);
 extern "C" double fn_80409D88(const char* s);
@@ -141,6 +150,7 @@ extern "C" void fn_80339A08()
 
 Rec24* fn_8033ACE8() { return &lbl_80691BF4[lbl_80691DF4]; }
 
+
 extern "C" void fn_8033AE60()
 {
     int z = 0;
@@ -150,6 +160,14 @@ extern "C" void fn_8033AE60()
     fn_80331294(lbl_8061B998 + 0x24);
     g->m24 = z;
     fn_802D7ACC();
+}
+
+extern "C" void fn_8033B220()
+{
+    int a = lbl_80620DF0;
+    float f = fn_8033ACE8()->m4;
+    Rec24* dst = fn_8033ACE8();
+    *dst = fn_80326F44(lbl_80691DEC, a, f, 1);
 }
 
 extern "C" void fn_8033B2B0()
@@ -169,6 +187,20 @@ extern "C" void fn_8033BB14(Menu* p)
     p->m174 = 0;
     p->items[p->m174]->s2();
     SetV(IAt(p, 0x9F8), lbl_8062151C);
+}
+
+/* near-miss: 13 slots (schedule of the two 12-byte copies against the lis/addi of the globals;
+ * 24 statement orders tried). */
+extern "C" void fn_8033BBB0()
+{
+    int z = 0;
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    V3x a = lbl_805F2D64;
+    V3x b = lbl_805F2D70;
+    fn_8030D1E4(m->m738, 11, &a, &b, 0, lbl_805F2D7C);
+    fn_80331294(lbl_8061B998 + 0x24);
+    lbl_8061B8C0->m24 = z;
+    fn_802D7ACC();
 }
 
 extern "C" void fn_8033BC68()
