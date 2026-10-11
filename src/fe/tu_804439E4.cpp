@@ -4,10 +4,9 @@
  */
 #include "game/tu_8043FDC0.h"
 
-extern "C" void fn_80330BC8(void* self);
-extern "C" FE_OVERLAY void fn_80444090(void* self)
+extern "C" FE_OVERLAY void fn_80444090(void* self, int a)
 {
-    fn_80330BC8(self);
+    fn_80330BC8(self, a);
 }
 
 extern int lbl_80621630;
@@ -46,7 +45,9 @@ extern "C" FE_OVERLAY int fn_8044477C(void)
 }
 
 extern char lbl_8067CEB0[];
+/* near-miss: store order: 66 random/structured orderings tried, best 10 slots off */
 extern "C" FE_OVERLAY void fn_80444850(FeTimerRaw* self);
+/* near-miss: Clear() form gives the right shape but the two zero registers (r11 for the byte stores, r0 for the rest) are scheduled differently; 24 store orders tried */
 extern "C" FE_OVERLAY FeTimerRaw* fn_804447F0(FeTimerRaw* self)
 {
     self->m20 = lbl_8067CEB0;
@@ -119,6 +120,7 @@ extern "C" FE_OVERLAY int fn_80446430(FeScr2* self, int i)
     return self->m148 + i;
 }
 
+/* near-miss: retail forms a - (m148 - 1) after the call; ours folds it to (a + 1) - m148 and reuses a + 1 (5 slots) */
 extern "C" FE_OVERLAY int fn_8044643C(FeScr2* self, int a, int b)
 {
     int r = 0;
