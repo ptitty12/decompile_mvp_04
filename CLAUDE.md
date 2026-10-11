@@ -1,7 +1,7 @@
-# CLAUDE.md — MVP Baseball 2004 (GameCube) matching decompilation
+# CLAUDE.md — MVP Baseball 2005 (GameCube, GV4E69) matching decompilation
 
-You are working on a private, personal matching decompilation of MVP Baseball 2004
-for GameCube, using a disc image the owner dumped from their own copy.
+You are working on a private, personal matching decompilation of MVP Baseball 2005
+for GameCube (`GV4E69`, USA rev 0), using a disc image the owner dumped from their own copy.
 Re-read this file whenever a prompt tells you to, and whenever you are unsure.
 
 ## The goal, precisely

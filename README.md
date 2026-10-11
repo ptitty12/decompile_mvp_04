@@ -1,4 +1,4 @@
-# MVP Baseball 2004 (GameCube) — Matching Decompilation Kit
+# MVP Baseball 2005 (GameCube, GV4E69) — Matching Decompilation Kit
 
 Personal, private project. Goal: a C/C++ source tree that compiles back into a
 byte-identical copy of the original `main.dol`, then later a native/WASM port
@@ -20,7 +20,7 @@ for personal play behind authenticated access.
 
 ## Things only you can do (the agent should never touch these)
 
-1. **Own a GameCube copy** of MVP Baseball 2004 and dump it yourself
+1. **Own a GameCube copy** of MVP Baseball 2005 and dump it yourself
    (Wii + CleanRip is the usual path). Keep the dump outside git.
 2. **Record the dump's SHA-1** and compare it with the redump.org entry for your
    region, so you know your dump is clean.
