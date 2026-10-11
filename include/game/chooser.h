@@ -143,7 +143,9 @@ class Unk80270BA0_XMid : public Unk80270BA0_XVirt {
 public:
     char pad9C[0x44C - 0x9C];
     Unk8014D8AC_Ctx* m44C;
-    char pad450[0x488 - 0x450];
+    char pad450[0x458 - 0x450];
+    int m458;                  /* tested against 0xB by goal code (tu_8028989C.cpp) */
+    char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
     char m588[0x5F0 - 0x588];
@@ -168,10 +170,15 @@ struct Unk802726BC_Angles {
     float m30[2];
     float m38[2];
     float m40[2];
-    char pad48[0xE0 - 0x48];
+    char pad48[0x58 - 0x48];
+    int m58[2];                /* written by goal code (tu_8028989C.cpp), indexed by m190 */
+    char pad60[0xC0 - 0x60];
+    float mC0[2];              /* same, indexed by m190 */
+    char padC8[0xE0 - 0xC8];
     float mE0[2];
     float mE8[2];
-    char padF0[0x100 - 0xF0];
+    char padF0[0xF8 - 0xF0];
+    float mF8[2];              /* goal code (tu_8028989C.cpp) */
     float m100[2];
     float m108[2];
     char pad110[0x130 - 0x110];
@@ -191,7 +198,9 @@ struct Unk802726BC_Angles {
 struct Unk80271DBC_Link {
     char pad0[0x830];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
-    char pad834[0x880 - 0x834];
+    char pad834[0x838 - 0x834];
+    int m838;                  /* compared with state hashes by goal code (tu_8028989C.cpp) */
+    char pad83C[0x880 - 0x83C];
     Unk8014D8AC_Ctx* m880;
 };
 
