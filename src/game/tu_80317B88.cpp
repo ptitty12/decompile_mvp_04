@@ -88,7 +88,6 @@ extern "C" {
 // PROTOS-BEGIN
 void fn_80317B88(Fx* self, int a);
 void fn_80317F30(Fx* self, int a);
-/* near-miss: rotate-about-point; retail builds the vectors through inline struct helpers (different stack layout and float slots) */
 void fn_80317F38(void* self, FxV2f* origin, FxV2f* p, float a);
 void fn_80318090(void* self, FxQuad* obj, float a);
 void fn_80318140(int a, int b, int c, float x1, float x2, float x3, float x4, int d, void* e, int f, float x5, int g, int h, int s0, int s1);
@@ -156,6 +155,7 @@ void fn_80317B88(Fx* self, int a) {
 
 void fn_80317F30(Fx* self, int a) { self->m24 = a; }
 
+/* near-miss: rotate-about-point; retail builds the vectors through inline struct helpers (different stack layout and float slots) */
 void fn_80317F38(void* self, FxV2f* origin, FxV2f* p, float a) {
     FxV2f q = {0, 0};
     q.x = p->x;
