@@ -1,3 +1,4 @@
+#line 1 "C:/mvp2004/source/common/animation/choosers/randomchooser.cpp"
 /*
  * C:/mvp2004/source/common/animation/choosers/randomchooser.cpp
  * (path string at 0x805DC4AC, used by fn_8027011C's assert and the RNG call
