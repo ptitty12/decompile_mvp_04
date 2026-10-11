@@ -36,13 +36,19 @@ float fn_801C7D90(Z* z, float f);
 Vec3 fn_801CE6E4(Z* z, float a, float b, float c);
 }
 struct Unk801C6D2C_G {
-    char pad0[0x380];
+    char pad0[0x60];
+    float m60;
+    float m64;
+    char pad68[0x380 - 0x68];
     float m380;
     float m384;
     float m388;
     float m38C;
 };
 extern Unk801C6D2C_G lbl_8068C420;
+extern int lbl_80620358;
+extern float lbl_8062035C;
+float fn_801CD068(Z* z);
 extern int lbl_80620378;
 
 /* The callees' float result is left in f1 (a `return` per arm changes the branch layout). */
@@ -95,6 +101,20 @@ extern "C" void fn_801C8014(Z* z, float f)
 }
 
 extern "C" int fn_801C8154(Z* z) { return z->m1DC[0] > 0.0f; }
+
+extern "C" float fn_801C8170(Z* z)
+{
+    float a = fn_801CD068(z);
+    float b = z->m1DC[0];
+    float c = z->m1DC[3];
+    float t = a * 0.4f + b * 0.4f + c * 0.2f;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    lbl_8068C420.m64 = t;
+    if (lbl_80620358 != 0)
+        t = lbl_8062035C;
+    lbl_8068C420.m60 = t;
+    return t;
+}
 
 extern "C" void fn_801C891C(void* self, void* q, const Vec3* axis, float angle)
 {
