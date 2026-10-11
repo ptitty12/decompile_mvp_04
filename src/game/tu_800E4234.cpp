@@ -173,6 +173,7 @@ int fn_800E4FDC()
     return 1;
 }
 
+/* near-miss: 5 slots, retail sets the local buffer address (`addi r3,r1,8`) after the integer arguments */
 void fn_800E4FE4(UiS* self, int x)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
@@ -193,6 +194,7 @@ void fn_800E4FE4(UiS* self, int x)
     }
 }
 
+/* near-miss: 35 vs 34 insns; retail keeps the `li r3,0` result in r3 while ours merges the zero with the sum register */
 int fn_800E52F8(int n)
 {
     int r = 0;
@@ -493,6 +495,37 @@ void fn_800E64AC(void* t, int f)
     if (f & 1) {
         fn_80377408(t);
     }
+}
+
+/* near-miss: 17 slots, only the callee-saved registers of b and the inner counter j are swapped (r30/r29); tried all 24 declaration orders */
+void fn_800E6708(Ue6888* t)
+{
+    UiVK* a = (UiVK*)t->p0;
+    UiVK* b = (UiVK*)t->p4;
+    int i = 0;
+    int j;
+    a->v79(0xFA, 0);
+    b->v79(0xFA, 0);
+    while (i < a->v59()) {
+        j = 0;
+        while (j < a->v58()) {
+            int jj = j;
+            j++;
+            a->v44(i, jj, (const char*)lbl_805B6F58, 4);
+        }
+        i++;
+    }
+    i = 0;
+    while (i < b->v59()) {
+        j = 0;
+        while (j < b->v58()) {
+            int jj = j;
+            j++;
+            b->v44(i, jj, (const char*)lbl_805B6F58, 4);
+        }
+        i++;
+    }
+    t->m10 = 0;
 }
 
 void fn_800E6888(Ue6888* t)

@@ -87,6 +87,7 @@ struct Ue6888 {
     int m10;
 };
 extern char lbl_805BDEC8[];
+extern char lbl_805B6F58[];
 extern char lbl_805BDECC[];
 extern char lbl_805BDED0[];
 extern char lbl_805BDED4[];
