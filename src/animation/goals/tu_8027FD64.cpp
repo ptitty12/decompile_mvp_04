@@ -59,42 +59,57 @@ void fn_802803A4(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c, int d)
     }
 }
 
-/* near-miss: 92 of 92 instructions, but the position copy, distance test and
- * their stack temporaries differ from retail (retail keeps two Vec3 copies at
- * sp+0x10 and sp+0x20 and has no dx/dz locals). Tried: an inline by-value
- * Dist2D and getter (extra temp copies), locals for dx/dz, and the order of
- * the zeroing store. The first SetSlot168 store folds its constant index into
- * a displacement here, retail keeps `li r9,0x168; stwx`. */
+/* Both history slots of the int table at +0x168. The m190 == 1 slot is written
+ * at index m190 - 1: CSE knows that is 0 and puts the zero in t's register, so
+ * for t == 0 the offset becomes a register constant ("li r9,0x168; stwx"), for
+ * t == 1 a displacement, as in retail. Taking &x->m734 at each call (no
+ * pointer local) keeps the pointer unflagged, so the offset gets BASE_REGS. */
+inline void Unk8027FD64_SetBoth168(Unk802726BC_Angles* p, int t)
+{
+    if (p->m190 == 1) {
+        Unk8027FD64_SetSlot168(p, p->m190 - 1, t);
+    }
+    Unk8027FD64_SetSlot168(p, p->m190, t);
+}
+
+/* Squared xz distance; both vectors by reference. */
+inline float Unk8027FD64_DistSqXZ(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
+}
+
+/* Copy of a vector with y cleared: by-value parameter and return give
+ * retail's two frame copies (0x10, 0x20). */
+inline Unk80273498_Vec3 Unk8027FD64_FlatY(Unk80273498_Vec3 v)
+{
+    v.y = 0.0f;
+    return v;
+}
+
+/* Returning the byte as int keeps the later `> 1` a signed compare (cmpwi);
+ * a direct unsigned char read is shortened to cmplwi. */
+inline int Unk8027FD64_Get1CC9(Unk80270BA0_X* x)
+{
+    return ((Unk8027FD64_Ctx*)x->m44C)->m6F8->m14->m1CC9;
+}
+
 void fn_80280F08(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
 {
-    int zero = 0;
-    Unk802726BC_Angles* p = &x->m734;
-
-    if (p->m190 == 1) {
-        Unk8027FD64_SetSlot168(p, 0, zero);
-    }
-    Unk8027FD64_SetSlot168(p, p->m190, zero);
+    Unk8027FD64_SetBoth168(&x->m734, 0);
     if (g->mE8.f1 && g->m74 == 2 && g->mA0 == 0) {
         Unk8027FD64_Ctx* ctx = (Unk8027FD64_Ctx*)x->m44C;
         int active = 0;
 
-        if (fn_80257B40(ctx->m700->m3B4)->m458 == 9 || ((Unk8027FD64_Ctx*)x->m44C)->m6F8->m14->m1CC9 > 1) {
+        if (fn_80257B40(ctx->m700->m3B4)->m458 == 9) {
+            active = 1;
+        } else if (Unk8027FD64_Get1CC9(x) > 1) {
             active = 1;
         }
         if (active) {
-            Unk80273498_Vec3 pos = ctx->m680->m60;
-            float dx = pos.x - lbl_805DED28.x;
-            float dz = pos.z - lbl_805DED28.z;
-            float d2 = dx * dx + dz * dz;
+            float d2 = Unk8027FD64_DistSqXZ(Unk8027FD64_FlatY(ctx->m680->fn_GetPos()), lbl_805DED28);
 
-            pos.y = 0.0f;
             if (!(d2 <= lbl_8061E6D0 * (lbl_8061E6D0 * 144.0f))) {
-                int one = 1;
-
-                if (p->m190 == 1) {
-                    *(int*)((char*)p + 0x168) = one;
-                }
-                Unk8027FD64_SetSlot168(p, p->m190, one);
+                Unk8027FD64_SetBoth168(&x->m734, 1);
             }
         }
     }
@@ -117,12 +132,6 @@ float fn_802816D0(Unk8027FD64_Goal* g, Unk8014D8AC_Ctx* ctx)
     return result;
 }
 
-/* near-miss: 56 of 56 instructions, 6 differ in registers and order only.
- * Retail clears bits 4/5 in r0 and tests bit 14 on that cleared word (andis.
- * r9,r0,2); here the test reads the original word in r11 (combine folds the
- * cleared copy away), and the spill of f1 is placed earlier. Tried: statement
- * orders of the clears, m94 store and test, a local for the call result, a
- * reference for the flag word. */
 void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)
 {
     float lim = 76176.0f;
@@ -130,7 +139,7 @@ void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)
     g->mE8.f4 = 0;
     g->mE8.f5 = 0;
     g->m94 = 5;
-    if (!g->mE8.f14) {
+    if (!g->fn_IsF14()) {
         int hit = fn_8024D41C(x);
 
         if (hit) {
@@ -138,10 +147,9 @@ void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)
             g->mE8.f4 = f < lim;
             g->mE8.f5 = 0;
         } else {
-            Unk8027FD64_Ctx* ctx = (Unk8027FD64_Ctx*)x->m44C;
-
             g->m94 = 0;
             g->mE8.f4 = 1;
+            Unk8027FD64_Ctx* ctx = (Unk8027FD64_Ctx*)x->m44C;
             int t = 0;
             if (ctx->m6CC && ctx->m6CC->m38C == 1) {
                 t = f < lim;

@@ -9,8 +9,7 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 15/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * A9AC, AAB0, AD3C, B1A0, B924, BA64). Not attempted: fn_8027B55C (242 insns),
+ * Status: 21/25 match. fn_8027A84C is a near-miss (noted above it). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -141,10 +140,6 @@ float Unk8027A84C::fn_8027A928()
     return r;
 }
 
-/* near-miss: only the first 15 instructions differ (order of the inlined request constructor's
- * stores: retail loads the bitfield word first and stores m68.m8/m4 after it, through the
- * pointer register). 5 variants of the constructor tried (member ctors, flat body, pointer
- * locals, 720 permutations of the six stores). */
 int Unk8027A84C::fn_8027A9AC(Unk80270BA0_X* x, int a, int b, float* c, int d, int e, int f)
 {
     Unk8027A9AC_Req req;
@@ -159,7 +154,6 @@ int Unk8027A84C::fn_8027A9AC(Unk80270BA0_X* x, int a, int b, float* c, int d, in
     return fn_8038614C(x->m618, &req, a, b, c, d, e, 0, fl | 1);
 }
 
-/* near-miss: same constructor-prefix difference as fn_8027A9AC; the rest matches. */
 int Unk8027A84C::fn_8027AAB0(Unk80270BA0_X* x, int a, int b, float* c, Unk80273498_Vec3* d, float* e, int f)
 {
     Unk8027A9AC_Req req;
@@ -214,8 +208,26 @@ void Unk8027A84C::fn_8027AC90(Unk8037B128_Mtx* m, int n, int unused, Unk80273498
     }
 }
 
-/* near-miss: heading temp slot and the else-branch position copy (retail copies m60 through a
- * 0x28 temp into a slot at sp+8; mine adds one more copy). 24 variants tried. */
+/* The heading goes through SetF (its float parameter sits in a BLKmode inline
+ * frame, which reuses pos's freed slot at 0x8), and the else-branch position is
+ * FlatX60(x): the m60 copy into FlatY's by-value parameter happens inside an
+ * inline, so it gets direct stores to 0x28, as in retail. */
+inline void SetF(float* p, float v)
+{
+    *p = v;
+}
+
+inline Unk80273498_Vec3 FlatY(Unk80273498_Vec3 v)
+{
+    v.y = 0.0f;
+    return v;
+}
+
+inline Unk80273498_Vec3 FlatX60(Unk80270BA0_X* x)
+{
+    return FlatY(x->m60);
+}
+
 void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_Vec3* outPos, float* outHeading,
                               float* outSpeed, int* outA, int* outB, int* outC)
 {
@@ -226,8 +238,7 @@ void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_
             *outPos = pos;
         }
         if (outHeading) {
-            float h = fn_8037B1F0(&o->mtx);
-            *outHeading = h;
+            SetF(outHeading, fn_8037B1F0(&o->mtx));
         }
         if (outSpeed) {
             *outSpeed = o->mD0;
@@ -237,10 +248,7 @@ void Unk8027A84C::fn_8027AD3C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, Unk80273498_
         }
     } else {
         if (outPos) {
-            Unk80273498_Vec3 t = x->m60;
-            t.y = 0.0f;
-            Unk80273498_Vec3 pos = t;
-            *outPos = pos;
+            *outPos = FlatX60(x);
         }
         if (outHeading) {
             *outHeading = fn_80382BB8(x->m618);
@@ -315,12 +323,12 @@ void Unk8027A84C::fn_8027AFA8(Unk8014D8AC_Ctx* ctx, Unk80270BA0_X* x, int a)
     }
 }
 
-/* near-miss: loop body identical; retail keeps the result in a callee-saved register
- * (mr r3,r29) while mine threads the constant (li r3,1). */
+/* `hit` is initialized before the call: it then lives across fn_8027A918 in a
+ * callee-saved register (mr r3,r29 at the end), as in retail. */
 int Unk8027A84C::fn_8027B1A0(Unk80270BA0_X* x, const Unk80273498_Vec3* pos)
 {
-    Unk8014D8AC_Ctx* ctx = fn_8027A918();
     int hit = 0;
+    Unk8014D8AC_Ctx* ctx = fn_8027A918();
 
     if (ctx->m6F4 == 9) {
         return 0;
@@ -385,32 +393,32 @@ void Unk8027A84C::fn_8027B31C(int state, const Unk80273498_Vec3* pos, float angl
     }
 }
 
-/* near-miss: same instructions; stack slots differ (retail: Vec3 at sp+0x10, thresholds at
- * sp+0x20, d2 at sp+0x2c). 36 declaration-placement variants tried. */
+/* The thresholds are three float scalars: a freed temp slot is only reused for
+ * the same mode, so they get fresh slots (0x20..0x28) and v (BLKmode) reuses the
+ * first call's Vec3 temp at 0x10, as in retail (a float[3] took that slot). */
 int Unk8027A84C::fn_8027B924(Unk80270BA0_X* x, Unk8018959C_Obj* o, float f)
 {
     if (o->m36C == 0) {
         float vy = fn_8018959C(f, o).y;
         if (!(vy >= 12.0f)) {
-            float th[3];
-            th[0] = lbl_8061E6A0 * (lbl_8061E6A0 * 309.76f);
-            th[1] = lbl_8061E6A4 * (lbl_8061E6A4 * 309.76f);
-            th[2] = lbl_8061E6A8 * (lbl_8061E6A8 * 309.76f);
+            float t0 = lbl_8061E6A0 * (lbl_8061E6A0 * 309.76f);
+            float t1 = lbl_8061E6A4 * (lbl_8061E6A4 * 309.76f);
+            float t2 = lbl_8061E6A8 * (lbl_8061E6A8 * 309.76f);
             Unk80273498_Vec3 v = fn_80189618(f, o);
             float d2 = v.x * v.x + v.y * v.y + v.z * v.z;
-            if (!(d2 >= th[0])) {
+            if (!(d2 >= t0)) {
                 return 1;
             }
-            if (d2 < th[1]) {
+            if (d2 < t1) {
                 return 2;
             }
             if (fn_8024D41C(x)) {
                 return 0;
             }
-            if (d2 < th[1]) {
+            if (d2 < t1) {
                 return 0;
             }
-            if (d2 < th[2]) {
+            if (d2 < t2) {
                 return 3;
             }
         }
@@ -418,14 +426,18 @@ int Unk8027A84C::fn_8027B924(Unk80270BA0_X* x, Unk8018959C_Obj* o, float f)
     return 0;
 }
 
-/* near-miss: same instructions; stack slots differ (retail's inlined AngleDiff slots are not
- * shared between the two uses, frame 96 vs 72). */
+/* Each angle difference goes through an inline AbsF(float): its parameter slot
+ * (0x18, 0x30) is allocated with each AngleDiff frame, so the two inline
+ * frames are not shared (frame 0x60), and the compares are single precision. */
+inline float AbsF(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+
 int Unk8027A84C::fn_8027BA64(float a, float b, float c)
 {
-    float da = AngleDiff(b, a);
-    if (__builtin_fabs(da) > 0.7853982f) {
-        float db = AngleDiff(c, a);
-        if (__builtin_fabs(db) < 0.3926991f) {
+    if (!(AbsF(AngleDiff(b, a)) <= 0.7853982f)) {
+        if (AbsF(AngleDiff(c, a)) < 0.3926991f) {
             return 1;
         }
     }

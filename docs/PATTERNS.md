@@ -266,3 +266,54 @@ the families with example addresses; ask the lead if you need it.
 - Functions whose code needs instructions only inline asm emits (`mftb`, `mfspr`, ...) stay as
   original asm: CLAUDE.md forbids asm. Note them in the unit.
 
+## Near-miss sweep (W4, 2026-10-11)
+Recipes that matched 18 parked functions (details in each unit's comments):
+- Stack slots: a freed temp slot is reused only by an object of the same machine
+  mode. BLKmode objects (structs, arrays, inline frames) reuse BLKmode slots;
+  SFmode float locals take fresh ones. `float t0, t1, t2` instead of
+  `float th[3]` kept a Vec3 temp's slot free for a later Vec3 (fn_8027B924).
+- An inline's float parameters live in its (BLKmode) frame, so routing a value
+  through `AbsF(float v)` or `SetF(float* p, float v)` puts it in a reusable
+  frame slot where a float local would get a fresh one (fn_8027BA64: one AbsF
+  per AngleDiff keeps the two frames apart; fn_8027AD3C, fn_802857C4).
+- An inline's locals are allocated at its entry, before the frames of the
+  inlines it calls: one `GoalDist2D(g)` holding `Vec3 d = EntPos(..) - FlatPos(..)`
+  put d below the getter frames as retail (fn_802855C4).
+- Inline parameter pseudos are not pointer-flagged. Passing `&x->m734` to an
+  inline (instead of a `T* p = &x->m734` local) makes regclass give the index
+  offset BASE_REGS (r9, not r0) and keeps `x+0x734` in a register with grouped
+  `(idx*4)+off` offsets (fn_8027FC80, fn_802A3D8C, fn_8027EC58). Side effect:
+  alias analysis no longer knows the base, so stores through it keep their
+  order against frame accesses (fn_802931D0, fn_80296030 stay open on this).
+- A fresh `&x->m734` per use (GetI/SetI inlines) also stops gcse from reusing
+  an earlier load through another pointer pseudo (retail reloads m190).
+- History-slot writes: `int off = i * 4 + K; *(int*)((char*)p + off) = v;`
+  called with `i = m190 - 1` inside `if (m190 == 1)`: CSE substitutes v's zero
+  register, giving `li r9,K; stwx` for v == 0 and a displacement for v != 0
+  (fn_8027EC58, fn_80280F08).
+- Clamp result stored in each arm (`if (!(v <= 0)) v = ...>?...; else v = 5;`):
+  jump2 runs after sched2 and cross-jumps the per-arm stfs into the join, so
+  sched2 sees a join block starting with the reload (fn_8027F504).
+- `int k = 5;` before `m95C = 0; m958 = k;` emits the 5 first, which changes
+  the local-alloc ranges (the 0 gets r0). Same idea: `int hit = 0;` before a
+  call keeps hit in a callee-saved register (fn_8027B1A0).
+- `extern const int` for globals set once by a static initializer: unchanging
+  loads may be scheduled past stores (cTimeWarp ctor's two type-id loads).
+- `if (lo > v) v = lo;` inside an inline with `lo` a parameter keeps the
+  constant in a register for compare and store (`li r9,3; cmpw r9,r0`).
+- Bit tests through an inline accessor (`fn_IsF14()`) stop combine from
+  folding the test onto the word before a preceding bitfield clear.
+- A byte field read through an int-returning inline compares signed (`cmpwi`);
+  the direct `unsigned char` compare is shortened to `cmplwi`.
+- Calling another class's method as `((Base*)this)->fn(...)` (not a free
+  function taking `this`) moves the `mr r3,rX` after the other argument moves.
+- Sub-object clears as inline `Clear()` methods called from the constructor
+  body: the word at offset 0 folds to a frame address, the others stay on the
+  pointer (fn_8027A9AC: bitfield in a 4-byte struct, triple m0/m4/m8).
+- Lerp as `a + t * (b - a)` gives `fmadds t, (b-a), a`; const float locals keep
+  their registers after the store (fn_80296624, fn_802958F4).
+- Reusing a function-scope loop counter in a second loop gave retail's
+  count-down copy loop instead of bdnz (fn_8026FB80); a loop bound read through
+  an inline taking `&mC` lets the bottom test reuse the body's pointer.
+- Check case routing against the asm: fn_8028C264's switch had 6 of 11 hashes
+  going to the success path, not to `fail`.

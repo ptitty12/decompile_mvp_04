@@ -8,6 +8,7 @@
  */
 #include "game/chooser.h"
 #include "game/goals/tu_8028B194.h"
+#include "game/goals/tu_8027A84C.h"
 
 Unk80273498_Vec3 fn_8027AF54(Unk8028B194* g, int a);
 Unk80270BA0_X* fn_8027A90C(Unk8028B194* g);
@@ -20,7 +21,6 @@ int fn_8026D940(Unk80270BA0_X* x, int a);
 int fn_8026D9D0(Unk80270BA0_X* x, int a);
 double __builtin_fabs(double x);
 int fn_8026D704(Unk80270BA0_X* x, int a);
-void fn_8027A9AC(Unk8028B194* g, Unk80270BA0_X* x, unsigned int h1, unsigned int h2, float* out, int a, int b, int c);
 int fn_803164C4(const Unk80273498_Vec3& v);
 void fn_8024937C(Unk80270BA0_X* x, float a, float b, Unk80273498_Vec3 v);
 
@@ -50,11 +50,17 @@ inline Unk80273498_Vec3 GetTarget(Unk8028B194* g)
     return g->m10;
 }
 
-inline Unk80273498_Vec3 FlatPos(const Unk80273498_Vec3& p)
+inline Unk80273498_Vec3 FlatPos(Unk80273498_Vec3 v)
 {
-    Unk80273498_Vec3 r = p;
-    r.y = 0.0f;
-    return r;
+    v.y = 0.0f;
+    return v;
+}
+
+/* The by-value copy of x->m60 happens inside this inline, which gives
+ * retail's direct frame stores (PATTERNS, "Vec3 copy destination addressing"). */
+inline Unk80273498_Vec3 FlatPosX(Unk80270BA0_X* x)
+{
+    return FlatPos(x->m60);
 }
 
 inline Unk80273498_Vec3 operator-(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
@@ -233,12 +239,9 @@ Unk8028B194* Unk8028B194::fn_8028B51C(float a)
  * Pool order (retail .rodata): 805DD6E8 (2^52+2^31 double), 805DD6F0 (1/60),
  * 9999999, 0.9, 3600, 1/(2*pi), 0.5, 2*pi, -1000, -1, 1.5, 0, 1. */
 
-/* near-miss: 125 of 124 instructions (35 register-normalized diffs). Retail
- * keeps three distinct frame slots (0x18, 0x28, 0x38) for the vector
- * arguments of fn_803164C4 (twice) and fn_8024937C, with direct word stores;
- * the temporaries here share one slot and keep its address in a callee-saved
- * register. Tried: by-value and const& parameters, named locals, one
- * condition expression vs if/else-if, a hit flag vs direct call. */
+/* fn_8027A9AC is the goal base's method (tu_8027A84C.cpp); calling it as a
+ * method puts the `this` move last among the argument moves, as in retail.
+ * The two probes form one `||` condition (retail's flag in r30). */
 void Unk8028B194::fn_8028BDB8(Unk80270BA0_X* x, float t)
 {
     if (!(mA8 & 0x40000) && fn_8026D704(x, 0)) {
@@ -254,18 +257,12 @@ void Unk8028B194::fn_8028BDB8(Unk80270BA0_X* x, float t)
                     unsigned int h = ((Unk8028B194_Link*)x->m618)->m838;
                     float fl0 = 0.0f;
                     float fl1 = 0.0f;
-                    fn_8027A9AC(this, x, h, 0xF4E8B1B9u, &fl0, 0, 0, 0);
-                    fn_8027A9AC(this, x, h, 0xF4E8B1B9u, &fl1, 0, 0, 1);
+                    ((Unk8027A84C*)this)->fn_8027A9AC(x, h, 0xF4E8B1B9u, &fl0, 0, 0, 0);
+                    ((Unk8027A84C*)this)->fn_8027A9AC(x, h, 0xF4E8B1B9u, &fl1, 0, 0, 1);
                     fl0 = fl0 + (fl1 - fl0) * 0.33f;
                     fl1 = fl1 - (fl1 - fl0) * 0.33f;
                     if (!(fl0 <= 0.0f)) {
-                        int hit = 0;
-                        if (fn_803164C4(FlatPos(x->m60))) {
-                            hit = 1;
-                        } else if (fn_803164C4(GetTarget(this))) {
-                            hit = 1;
-                        }
-                        if (hit) {
+                        if (fn_803164C4(FlatPosX(x)) || fn_803164C4(GetTarget(this))) {
                             fn_8024937C(x, fl0, fl1, GetTarget(this));
                         }
                     }
@@ -329,11 +326,14 @@ int Unk8028B194::fn_8028C0CC(Unk80270BA0_X* x, int b)
     return 0;
 }
 
-/* near-miss: 184 of 191 instructions. The hash switch is balanced differently in
- * retail (root 0x858075AA with a three-node chain below it, so the real case
- * list is not just these 11 values), and retail stores the angle difference
- * once more (an extra stfs/lfs pair through a second float slot). Everything
- * before the switch matches except those. */
+/* near-miss: 175 of 191 instructions. Retail's hash switch sends 6 of the 11
+ * hashes on to the fn_8026D940 checks (beq to the success path) and only 5 to
+ * `fail`; the angle difference is a named local (its extra float slot, 0x38,
+ * now matches). Left: g++ drops some of the "continue" cases (same target as
+ * default) and roots the compare tree at the median 0xA713FF5B; retail keeps
+ * all 11 compares under root 0x858075AA with a right-only chain
+ * 0x3453C76B -> 0x67A49CBA -> 0x7133B4CB on its left, so its case list must
+ * differ (more labels or ranges). */
 int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
 {
     Unk80273498_Vec3 v = m8->fn_8027A358(0);
@@ -354,7 +354,8 @@ int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
         Unk80273498_Vec3 vb = lbl_806055AC;
         fn_8027AD3C(this, x, 0, &vb, &flt, 0, 0, &hash, 0);
         if (m48 != 19 && m28) {
-            if (Abs(AngleDiff(flt, Heading(GetTarget(this), vb))) >= 0.7853982f) {
+            float ad = AngleDiff(flt, Heading(GetTarget(this), vb));
+            if (Abs(ad) >= 0.7853982f) {
                 goto fail;
             }
         }
@@ -362,12 +363,13 @@ int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
         case 0x858075AAu:
         case 0x3453C76Bu:
         case 0x67A49CBAu:
-        case 0x7133B4CBu:
         case 0xCA0C5FC1u:
         case 0xA713FF5Bu:
+        case 0xECC40882u:
+            break;
+        case 0x7133B4CBu:
         case 0x97F6F9F4u:
         case 0xC96D745Bu:
-        case 0xECC40882u:
         case 0xDB410FF7u:
         case 0xF469A7C1u:
             goto fail;

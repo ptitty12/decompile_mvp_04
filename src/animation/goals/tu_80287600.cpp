@@ -53,12 +53,13 @@ inline void Scale(Unk80273498_Vec3* v, float s)
     v->z = v->z * s;
 }
 
-/* near-miss (307 vs 295 instructions): the control flow and arithmetic are
- * right but the frame is 8 bytes bigger and the d == 3 branch's temporaries
- * (n, the normalised vector, the two operator* results) land in other slots;
- * the entry loop uses indexed loads where retail steps a pointer by 6, and the
- * [0,1] clamp branches differently. Tried: rec/no rec variable, operator* by
- * value/reference, named temporaries for the two products. */
+/* near-miss (302 vs 295 instructions): the [0,1] clamp is the >? form and the
+ * operator* factors are literals (their float parameters live in the inline
+ * frames, retail's 0x68/0x90 slots). Left: the frame is 8 bytes bigger, the
+ * d == 3 temporaries land in other slots, and the Vec4 build after the loop
+ * (four (float)(signed char) conversions) is scheduled differently. Tried:
+ * rec/no rec variable, operator* by value/reference, named temporaries, a
+ * nested block for len, plain instead of const frame/two. */
 Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float* e)
 {
     int idx = fn_802871D8(a);
@@ -69,7 +70,7 @@ Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float
     fn_802872AC(pos, idx, b, c, d);
     if (a == 7) {
         pos[0] = *e * 0.15915494f + 0.5f;
-        pos[0] = pos[0] > 1.0f ? 1.0f : (!(pos[0] >= 0.0f) ? 0.0f : pos[0]);
+        pos[0] = !(pos[0] > 1.0f) ? (pos[0] >? 0.0f) : 1.0f;
     }
     if (x->fn_vslot4()) {
         pos[0] = 1.0f - pos[0];
@@ -115,9 +116,7 @@ Unk80287600_Vec4 fn_80287600(Unk80270BA0_X* x, int a, int b, int c, int d, float
         } else {
             n = lbl_806055AC;
         }
-        float one = 1.0f;
-        float twelve = 12.0f;
-        Unk80273498_Vec3 off = (n * one) * twelve;
+        Unk80273498_Vec3 off = (n * 1.0f) * 12.0f;
 
         v.x = v.x + off.x;
         v.y = v.y + off.y;

@@ -26,12 +26,23 @@ int Unk802914C8_Goal::fn_802931B0(Unk80270BA0_X* x)
     return fn_802931D0(x);
 }
 
-/* near-miss, about 97% (339 vs 339 instructions, 9 differ): everything but two
- * spots matches. Retail tests `3 > mC` as `li r9,3; cmpw r9,r0; ble` (constant
- * kept in a register) where mine gives `cmpwi r0,2; bgt` (about 10 spellings
- * tried), and the final `mC = 4` picks r0/r9 the other way round. Needed here:
- * LengthR (reference param), `hashB = link->m838; int h = hashB;`, and a
- * second inline level in SetPairF (parameter slots 8 bytes apart). 8 attempts. */
+/* `if (lo > v) v = lo;` with lo an inline parameter: the constant 3 stays in a
+ * register for both the compare and the store (retail li r9,3; cmpw r9,r0). */
+inline void AtLeast(int& v, int lo)
+{
+    if (lo > v) {
+        v = lo;
+    }
+}
+
+/* near-miss (339 vs 339 instructions, 5 differ): only the final `mC = 4` picks
+ * r9/r0 the other way round (retail: m190 index r9, the 4 in r0). sched1 hoists
+ * the li 4 to the top of the last block, which gives it the longer local-alloc
+ * range. Passing the pointer unflagged to the last SetPairF fixes it but breaks
+ * the alias-based scheduling of the earlier stores. Needed here: LengthR
+ * (reference param), `hashB = link->m838; int h = hashB;`, a second inline
+ * level in SetPairF (parameter slots 8 bytes apart), AtLeast. Tried: mC = 4
+ * via a variable, an inline setter, a Finish inline, store first. */
 int Unk802914C8_Goal::fn_802931D0(Unk80270BA0_X* x)
 {
     Unk80271DBC_Link* link = x->m618;
@@ -83,9 +94,7 @@ int Unk802914C8_Goal::fn_802931D0(Unk80270BA0_X* x)
             if (mC <= 2) {
                 SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, res);
             }
-            if (mC < 3) {
-                mC = 3;
-            }
+            AtLeast(mC, 3);
         } else if (h == 0x193EE819) {
             SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, -1.0f);
         }
@@ -129,9 +138,8 @@ float Unk802914C8_Goal::fn_8029589C(Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
     return r;
 }
 
-/* near-miss (97 vs 95 instructions): flags, locals and the Lerp parameter slots
- * match; the nested-ternary clamp (r) takes other registers than retail (b in
- * f12, result in f0) and the 0.5/1.5 locals are stored before t instead of after. */
+/* The clamp is the >? form; the Lerp bounds are const float locals (stored
+ * after the computation, which keeps their registers). */
 float Unk802914C8_Goal::fn_802958F4(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, float b)
 {
     if (!(b >= 0.0f)) {
@@ -150,11 +158,11 @@ float Unk802914C8_Goal::fn_802958F4(Unk80270BA0_X* x, Unk8027AD3C_Obj* o, float 
     if (fn_IsF16() && !fn_IsF17() && o == 0) {
         hi *= 1.15f;
     }
-    float r = !(b > hi) ? (!(b >= lo) ? lo : b) : hi;
+    float r = !(b > hi) ? (b >? lo) : hi;
     if (m4C == 0x40) {
         float t = fn_8024D0F8(x, 0x4A);
-        float a = 0.5f;
-        float c = 1.5f;
+        const float a = 0.5f;
+        const float c = 1.5f;
         float m = Lerp(a, t, c);
         r *= m;
     }
@@ -181,11 +189,12 @@ int Unk802914C8_Goal::fn_80295F90(Unk80270BA0_X* x, float t)
     return r;
 }
 
-/* near-miss, about 87% (169 vs 168 instructions): slots match (SetPairF with two
- * inline levels, AngleDiff computed into `ad` before the call) but the scheduler
- * puts the `stfs` of each pair's parameter copy before the preceding `stwx`
- * (retail after it), and the final clamp keeps its result in a separate float
- * register (retail clamps res in place in f0). 8 attempts. */
+/* near-miss (168 vs 168 instructions, 22 differ): slots match (SetPairF with two
+ * inline levels, AngleDiff computed into `ad` before the call) and the final
+ * clamp is the >? form. Left: sched1 puts each inline parameter `stfs` (and the
+ * AngleDiff parameter stores) before the preceding stwx/stfsx through `a`;
+ * retail lets the frame loads pass that store but not the frame stores. Without
+ * the `a` local (unflagged pointer) nothing passes. 8 attempts + pointer forms. */
 float Unk802914C8_Goal::fn_80296030(Unk80270BA0_X* x, float f1, float f2, float f3, float f4, float f5, float f6)
 {
     Unk802914C8_Angles* a = (Unk802914C8_Angles*)((char*)x + 0x734);
@@ -213,7 +222,7 @@ float Unk802914C8_Goal::fn_80296030(Unk80270BA0_X* x, float f1, float f2, float 
                 res = q2;
             }
         }
-        res = !(res > 2.0f) ? (!(res >= 0.5f) ? 0.5f : res) : 2.0f;
+        res = !(res > 2.0f) ? (res >? 0.5f) : 2.0f;
     }
     return res;
 }
@@ -264,27 +273,33 @@ float Unk802914C8_Goal::fn_802964C4(Vec3 pos, Vec3 target, float angle, float sp
     return r;
 }
 
-/* near-miss (43 vs 46 instructions): retail also stores 150.0 and 0.2 at 0x18/0x1c
- * and clamps t in place in f0 with one store (a ternary or if chain stores per arm
- * or takes another register); Sign() param slot at 0x10 matches. */
+/* The scale and offset are const float locals: stored once (0x18, 0x1c) while
+ * the fmsubs keeps using their registers. The clamp is the >? form. */
 float Unk802914C8_Goal::fn_80296624(float v)
 {
     float sign = Sign(v);
-    float t = v * 150.0f - 0.2f;
-    if (t > 0.5f) {
-        t = 0.5f;
-    } else if (!(t >= 0.0f)) {
-        t = 0.0f;
-    }
+    const float k = 150.0f;
+    const float c = 0.2f;
+    float t;
+    t = v * k - c;
+    t = !(t > 0.5f) ? (t >? 0.0f) : 0.5f;
     t = t * sign;
     return t;
 }
 
-/* near-miss, about 84% (150 vs 146 instructions): control flow, constants and
- * stack slots of the scalars match. Retail copies the by-value operands
- * (x->m60 via Flatten, this+0x10) into sp-relative temps with direct stores;
- * mine goes through a pointer for the destination, as in fn_80286E70 of
- * tu_80283934.cpp. 8 attempts. */
+/* The by-value Vec3 operands are copied inside inlines (FlatPos60, Diff10), so
+ * the copies into the parameter slots use direct sp-relative stores, as in
+ * retail (PATTERNS, "Vec3 copy destination addressing"). */
+inline Vec3 FlatPos60(Unk80270BA0_X* x)
+{
+    return Flatten(x->m60);
+}
+
+inline Vec3 Diff10(Unk802914C8_Goal* g, const Vec3& p)
+{
+    return VSubV(g->fn_Pos10(), p);
+}
+
 float Unk802914C8_Goal::fn_802966DC(Unk80270BA0_X* x)
 {
     Unk802914C8_X* v = (Unk802914C8_X*)x;
@@ -312,11 +327,11 @@ float Unk802914C8_Goal::fn_802966DC(Unk80270BA0_X* x)
         g6 = (Unk802914C8_Goal*)o->m18;
     }
     if (g6 != 0 && f18C.f12 && m28 != 0) {
-        Vec3 pp = Flatten(x->m60);
+        Vec3 pp = FlatPos60(x);
         float t = (float)x->m44C->m4C * 0.016666668f;
         float rem = m74 - t;
         if (!(rem <= 0.5f)) {
-            float dist = Length(VSubV(fn_Pos10(), pp));
+            float dist = Length(Diff10(this, pp));
             float sp = dist / rem;
             float lim = (v->m728 + v->m72C) * 0.5f;
             if (!(sp <= lim)) {

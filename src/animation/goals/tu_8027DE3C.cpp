@@ -163,17 +163,38 @@ void Unk8027DE3C::fn_8027EB34(int st, Unk80270BA0_X* x)
     }
 }
 
-/* near-miss (about 98%): identical but for two instructions of the idx==1 store
- * (retail: "li r9,288; stwx rZ,rP,r9" with the zero hoisted to r11 and the index
- * reloaded) and r9/r11 for the index. Tried: shared zero local, [-1] indexing,
- * q[-1], cast pointer arithmetic, q = &p->m120[idx] reuse. */
+/* GetI/SetI take &x->m734 at each use: the default case's pointer is then a
+ * new (not pointer-flagged) pseudo, so gcse can't reuse the top's m190 load
+ * (retail reloads it) and the offsets get BASE_REGS. SlotI computes the byte
+ * offset as a value (like Unk8027FD64_SetSlot168): with i = m190 - 1 known to
+ * be 0, CSE puts the zero in t's register, so the offset of the first store
+ * becomes a register constant ("li r9,0x120; stwx") for t == 0 and a
+ * displacement for t == r, as in retail. */
+inline int GetI(Unk802726BC_Angles* p)
+{
+    int* q = &p->m120[p->m190];
+    return *q;
+}
+
+inline void SlotI(Unk802726BC_Angles* a, int i, int v)
+{
+    int off = i * 4 + 0x120;
+    *(int*)((char*)a + off) = v;
+}
+
+inline void SetI(Unk802726BC_Angles* p, int t)
+{
+    if (p->m190 == 1) {
+        SlotI(p, p->m190 - 1, t);
+    }
+    SlotI(p, p->m190, t);
+}
+
 void Unk8027DE3C::fn_8027EC58(Unk80270BA0_X* x, int h)
 {
-    Unk802726BC_Angles* p = &x->m734;
     Unk80271DBC_Link* link = x->m618;
     int r = 0;
-    int* q = &p->m120[p->m190];
-    int old = *q;
+    int old = GetI(&x->m734);
     int v;
     switch (m78) {
     case 2:
@@ -199,22 +220,14 @@ void Unk8027DE3C::fn_8027EC58(Unk80270BA0_X* x, int h)
         }
         break;
     default:
-        if (p->m190 == 1) {
-            p->m120[0] = 0;
-        }
+        SetI(&x->m734, 0);
         v = (int)0xA32A6AB4;
-        q = &p->m120[p->m190];
-        *q = 0;
         if (mE8 & 0x400000) {
             float t = (float)x->m44C->m4C * 0.016666668f;
             if (!(m98 - t <= 0.5f)) {
                 Unk80273498_Vec3 pos = fn_80286E70();
                 r = fn_8027B1A0(x, &pos);
-                if (p->m190 == 1) {
-                    p->m120[0] = r;
-                }
-                q = &p->m120[p->m190];
-                *q = r;
+                SetI(&x->m734, r);
             }
             if (fn_80285498() != 0 || link->m83C == 0x27C57C8B) {
                 v = 0x27C57C8B;
@@ -401,12 +414,11 @@ float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
     return result;
 }
 
-/* near-miss: 175 of 181 instructions. The clamp (>? operator) and the frame (SetAngle
- * as two nested inlines, each with its own 8-byte-aligned inline frame: 0x30, 0x38)
- * match. Left: the 0 / 5 constants for m95C / m958 get r11 / r0 (retail r0 / r11;
- * local-alloc priority from the sched1 order), and "addi r3,r30,0x734" is scheduled
- * one slot before "lfs f0,0x10(r1)". Tried: the four store orders, a SetAngle(x, v)
- * wrapper, a pointer local in the wrapper, reference and pointer inner forms. */
+/* SetAngle is two nested inlines, each with its own 8-byte-aligned inline frame
+ * (0x30, 0x38). The clamp stores v in each arm (if/else around the `>?` ternary):
+ * jump2 cross-jumps the stores after sched2, so the join block starts with the
+ * reload of v, as in retail. `int k = 5;` before the stores emits the 5 first,
+ * which gives the 0 the shorter local-alloc range (r0) and the 5 r11. */
 void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
 {
     int a = 0;
@@ -439,8 +451,9 @@ void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
         float ang = fn_80410CE8(m1C, m24) - side;
         float cur = fn_80382BB8(x->m618);
         float diff = AngleDiff(ang, cur);
+        int k = 5;
         x->m95C = 0;
-        x->m958 = 5;
+        x->m958 = k;
         SetFloat(x->m954, diff * 0.2f);
     }
     if (h == (int)0xA84A0C58 || h == (int)0xFA52B1B5 || h == (int)0xF90D27A1) {
@@ -448,7 +461,11 @@ void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
             float k = fn_80382BD8(x->m618, 0);
             float w = lbl_8061E6CC * (1.0f - k);
             float v = (mC8 + w) / f;
-            v = !(v <= 0.0f) ? (!(v > 5.0f) ? (v >? 1.0f) : 5.0f) : 5.0f;
+            if (!(v <= 0.0f)) {
+                v = !(v > 5.0f) ? (v >? 1.0f) : 5.0f;
+            } else {
+                v = 5.0f;
+            }
             SetAngle(&x->m734, v);
         }
     }
@@ -475,11 +492,12 @@ int Unk8027DE3C::fn_8027FC20(int a)
     return r;
 }
 
-/* near-miss: instruction-identical except register numbers (p in r11 vs r10,
- * idx*4 in r9 vs r11) and the scheduling of the 54.0f multiply; 5 variants tried */
-int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
+/* The body is an inline taking the Angles pointer as a parameter: an inline's
+ * parameter pseudo is not pointer-flagged, so regclass gives the index
+ * offsets (idx*4 + 0x30 / 0x40) BASE_REGS, keeping them out of r0 as in
+ * retail (a local pointer variable makes them index registers -> r0). */
+inline int Check8027FC80(Unk80270BA0_X* x, Unk802726BC_Angles* p)
 {
-    Unk802726BC_Angles* p = &x->m734;
     float* q = &p->m30[p->m190];
     float lo = *q;
     if (!(lo <= x->mAB4 * 54.0f)) {
@@ -491,4 +509,9 @@ int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
         }
     }
     return 0;
+}
+
+int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
+{
+    return Check8027FC80(x, &x->m734);
 }
