@@ -4,6 +4,23 @@ Personal, private project. Goal: a C/C++ source tree that compiles back into a
 byte-identical copy of the original `main.dol`, then later a native/WASM port
 for personal play behind authenticated access.
 
+## Progress
+
+![Decompilation progress: percent of code matched, a treemap of units shaded by match percent, and progress over time](docs/progress/progress.svg)
+
+Each block in the treemap is one unit, sized by its code and shaded by objdiff's
+fuzzy match percent (gray = not started, darkest blue = fully matched). Blocks
+split as units are carved out of the auto-generated ones. The daily numbers
+behind the line chart are in [`docs/progress/history.csv`](docs/progress/history.csv).
+
+To refresh after matching, build the report and redraw the card, then commit
+both files in `docs/progress/`:
+
+```sh
+ninja progress
+python tools/progress_chart.py
+```
+
 ## What's in this kit
 
 | File | Purpose | When you use it |
