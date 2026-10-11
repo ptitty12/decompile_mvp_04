@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "deny": [
+      "Edit(./tools/verify/**)",
+      "Edit(./.github/workflows/**)",
+      "Edit(./.claude/**)",
+      "Edit(./orig/**)",
+      "Edit(./build/**)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git add -f:*)",
+      "Bash(git add --force:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(rm -rf:*)"
+    ]
+  }
+}

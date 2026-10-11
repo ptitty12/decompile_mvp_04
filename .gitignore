@@ -1,0 +1,31 @@
+# Game data: NEVER commit (see CLAUDE.md hard rules)
+orig/
+build/
+*.iso
+*.ciso
+*.gcm
+*.rvz
+*.wia
+*.wbfs
+*.gcz
+*.nfs
+*.tgc
+*.dol
+*.rel
+*.elf
+*.map
+*.big
+
+# Kit archive (contents are unpacked into the repo)
+*.zip
+
+# Tooling / local
+__pycache__/
+*.pyc
+.ninja_*
+build.ninja
+objdiff.json
+compile_commands.json
+.vscode/
+.DS_Store
+Thumbs.db
