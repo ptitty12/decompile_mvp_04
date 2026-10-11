@@ -26,12 +26,23 @@ int Unk802914C8_Goal::fn_802931B0(Unk80270BA0_X* x)
     return fn_802931D0(x);
 }
 
-/* near-miss, about 97% (339 vs 339 instructions, 9 differ): everything but two
- * spots matches. Retail tests `3 > mC` as `li r9,3; cmpw r9,r0; ble` (constant
- * kept in a register) where mine gives `cmpwi r0,2; bgt` (about 10 spellings
- * tried), and the final `mC = 4` picks r0/r9 the other way round. Needed here:
- * LengthR (reference param), `hashB = link->m838; int h = hashB;`, and a
- * second inline level in SetPairF (parameter slots 8 bytes apart). 8 attempts. */
+/* `if (lo > v) v = lo;` with lo an inline parameter: the constant 3 stays in a
+ * register for both the compare and the store (retail li r9,3; cmpw r9,r0). */
+inline void AtLeast(int& v, int lo)
+{
+    if (lo > v) {
+        v = lo;
+    }
+}
+
+/* near-miss (339 vs 339 instructions, 5 differ): only the final `mC = 4` picks
+ * r9/r0 the other way round (retail: m190 index r9, the 4 in r0). sched1 hoists
+ * the li 4 to the top of the last block, which gives it the longer local-alloc
+ * range. Passing the pointer unflagged to the last SetPairF fixes it but breaks
+ * the alias-based scheduling of the earlier stores. Needed here: LengthR
+ * (reference param), `hashB = link->m838; int h = hashB;`, a second inline
+ * level in SetPairF (parameter slots 8 bytes apart), AtLeast. Tried: mC = 4
+ * via a variable, an inline setter, a Finish inline, store first. */
 int Unk802914C8_Goal::fn_802931D0(Unk80270BA0_X* x)
 {
     Unk80271DBC_Link* link = x->m618;
@@ -83,9 +94,7 @@ int Unk802914C8_Goal::fn_802931D0(Unk80270BA0_X* x)
             if (mC <= 2) {
                 SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, res);
             }
-            if (mC < 3) {
-                mC = 3;
-            }
+            AtLeast(mC, 3);
         } else if (h == 0x193EE819) {
             SetPairF((Unk802914C8_Angles*)((char*)x + 0x734), 0x48, -1.0f);
         }
@@ -264,18 +273,16 @@ float Unk802914C8_Goal::fn_802964C4(Vec3 pos, Vec3 target, float angle, float sp
     return r;
 }
 
-/* near-miss (43 vs 46 instructions): retail also stores 150.0 and 0.2 at 0x18/0x1c
- * and clamps t in place in f0 with one store (a ternary or if chain stores per arm
- * or takes another register); Sign() param slot at 0x10 matches. */
+/* The scale and offset are const float locals: stored once (0x18, 0x1c) while
+ * the fmsubs keeps using their registers. The clamp is the >? form. */
 float Unk802914C8_Goal::fn_80296624(float v)
 {
     float sign = Sign(v);
-    float t = v * 150.0f - 0.2f;
-    if (t > 0.5f) {
-        t = 0.5f;
-    } else if (!(t >= 0.0f)) {
-        t = 0.0f;
-    }
+    const float k = 150.0f;
+    const float c = 0.2f;
+    float t;
+    t = v * k - c;
+    t = !(t > 0.5f) ? (t >? 0.0f) : 0.5f;
     t = t * sign;
     return t;
 }
