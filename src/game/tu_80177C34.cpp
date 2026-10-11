@@ -309,3 +309,24 @@ void fn_80179BBC(void* self)
 }
 
 void fn_80179BDC() {}
+
+void fn_8017A880(Unk8017A880_T* p)
+{
+    p->m3D0 = 0;
+    p->m3D4 = 0;
+    p->m3D8 = -1;
+    p->m3DC = 2;
+    p->m3E0 = 2;
+    p->m3E4 = lbl_805CC758;
+    p->m400 = lbl_805CC758;
+    p->m3E8 = lbl_805EBA10;
+    p->m408 = 0;
+    p->m40C = 0;
+    p->m410 = 0;
+    p->m414 = 0;
+    p->m418 = 1;
+    p->m41C = 10;
+    p->m420 = 4;
+    p->m424 = 4;
+    p->m428 = 0;
+}

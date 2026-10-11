@@ -72,6 +72,38 @@ struct Unk80178BBC_T {
     Unk80178BBC_Entry m134[2];
     int m14C;
 };
+struct Unk8017A880_V6 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+/* Screen state block at +0x3D0 of the screen object (see tu_8017A930.h). */
+struct Unk8017A880_T {
+    char pad0[0x3D0];
+    int m3D0;
+    int m3D4;
+    int m3D8;
+    int m3DC;
+    int m3E0;
+    float m3E4;
+    Unk8017A880_V6 m3E8;
+    float m400;
+    char pad404[4];
+    int m408;
+    int m40C;
+    int m410;
+    int m414;
+    int m418;
+    int m41C;
+    int m420;
+    int m424;
+    int m428;
+};
+extern const float lbl_805CC758;
+extern const Unk8017A880_V6 lbl_805EBA10;
 struct Unk80177C34_X {
     char pad0[0x40];
     void* m40;
