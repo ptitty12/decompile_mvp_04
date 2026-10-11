@@ -21,6 +21,9 @@ void fn_80071E2C(Unk80071604* self, int a, Unk80070DDC_Stream* io);
 Unk8006902C_Ctx* fn_8006F594(void* p);
 extern char lbl_80649EF0[];
 extern char lbl_8064AE28[];
+extern const float lbl_805B3C68;
+void fn_8008395C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
 extern const char lbl_805B3B4C[];
 unsigned fn_8007366C(const char* a, const char* b);
 extern const char lbl_805B3C54[];
@@ -217,6 +220,19 @@ unsigned fn_80071170(void* l, int k, unsigned c)
             break;
         }
     }
+    return r;
+}
+
+/* near-miss: 7 slots; the two float registers (x / zero) come out swapped in the fcmpu/fdivs. */
+float fn_800714C4(W* w, int a)
+{
+    float x = (float)w->v28(1, a);
+    float y = (float)w->v28(2, a);
+    float r;
+    if (x != lbl_805B3C68)
+        r = y / x;
+    else
+        r = lbl_805B3C68;
     return r;
 }
 
@@ -507,6 +523,32 @@ unsigned fn_8007366C(const char* a, const char* b)
 unsigned fn_800736EC(const char* s)
 {
     return fn_80071ED4(s, 0);
+}
+
+/* near-miss: 12 slots; retail keeps buf[1] in the frame (lwz 12(r1)) where we keep it in a
+ * register, and uses one more callee-saved register for the out pointer. */
+int Unk8007A4DC_Screen::fn_80073710(int a, int x, int i)
+{
+    if (i <= 1) {
+        W* w = m190[i].m0;
+        return w->v28(a, fn_80071814(w, x));
+    }
+    Unk8007A4DC_Obj1E8* o = m1E8;
+    int p = fn_80080198();
+    unsigned sp8, spC;
+    fn_8008395C(o, x, p, fn_800849C0(i), &sp8);
+    switch (a) {
+    case 0:
+        return (unsigned char)(sp8 >> 14);
+    case 1:
+        return (sp8 >> 7) & 0x7F;
+    case 2:
+        return sp8 & 0x7F;
+    case 3:
+        return (unsigned char)(spC >> 7);
+    default:
+        return 0;
+    }
 }
 
 float Unk8007A4DC_Screen::fn_80073820(int a, int b, int i)
