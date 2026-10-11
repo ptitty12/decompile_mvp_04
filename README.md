@@ -13,12 +13,17 @@ fuzzy match percent (gray = not started, darkest blue = fully matched). Blocks
 split as units are carved out of the auto-generated ones. The daily numbers
 behind the line chart are in [`docs/progress/history.csv`](docs/progress/history.csv).
 
-To refresh after matching, build the report and redraw the card, then commit
-both files in `docs/progress/`:
+The card updates itself. A scheduled task on the owner's PC runs
+`tools/progress_bot.py` every 30 minutes. When `main` has changed, it builds
+`main` in a private worktree (`build/_progress/wt`), redraws the card if the
+numbers moved, runs `tools/verify/verify.py`, and pushes a
+`docs: update progress card` commit. Nothing needs doing by hand. Its log is
+`build/_progress/bot.log`.
 
 ```sh
-ninja progress
-python tools/progress_chart.py
+python tools/progress_bot.py --install     # register the task (done once)
+python tools/progress_bot.py --uninstall   # remove it
+python tools/progress_bot.py --force       # run once now
 ```
 
 ## What's in this kit
