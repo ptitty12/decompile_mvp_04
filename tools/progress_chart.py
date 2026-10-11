@@ -12,6 +12,10 @@ writes docs/progress/progress.svg:
   - history: percent of code matched over time, one point per day the card
     is regenerated (re-running on the same day replaces that day's point).
 
+With --if-changed nothing is written unless the totals or the treemap differ
+from the current card, so a new date alone never produces a commit.
+tools/progress_bot.py uses this to redraw the card automatically.
+
 Units without code (data-only auto splits) are left out of the treemap:
 objdiff scores them 100% because there is nothing to match.
 
@@ -20,12 +24,13 @@ with its palette validator in --ordinal mode against the card surfaces.
 
 Standard library only.
 
-Usage: python tools/progress_chart.py [--report PATH] [--out-dir DIR] [--date YYYY-MM-DD]
+Usage: python tools/progress_chart.py [--report PATH] [--out-dir DIR] [--date YYYY-MM-DD] [--if-changed]
 """
 import argparse
 import csv
 import datetime
 import json
+import re
 from html import escape
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -131,18 +136,23 @@ def squarify(
     return rects
 
 
-def update_history(path: Path, row: Dict[str, Any]) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
-    if path.is_file():
-        with open(path, newline="", encoding="utf-8") as f:
-            rows = [r for r in csv.DictReader(f) if r["date"] != row["date"]]
-    rows.append(row)
-    rows.sort(key=lambda r: r["date"])
+def read_history(path: Path) -> List[Dict[str, Any]]:
+    if not path.is_file():
+        return []
+    with open(path, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def write_history(path: Path, rows: List[Dict[str, Any]]) -> None:
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=HISTORY_FIELDS, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    return rows
+
+
+def treemap_part(svg: str) -> str:
+    m = re.search(r'<g id="treemap">.*?</g>', svg, re.S)
+    return m.group(0) if m else ""
 
 
 def text(x: float, y: float, s: str, cls: str, size: int, anchor: str = "start", weight: int = 400) -> str:
@@ -198,6 +208,7 @@ def draw_treemap(out: List[str], units: List[Dict[str, Any]], top: float) -> flo
 
     y0, h = top + 48, 340.0
     rects = squarify([float(u["code"]) for u in units], PAD, y0, W - 2 * PAD, h)
+    out.append('<g id="treemap">')
     for u, (rx, ry, rw, rh) in zip(units, rects):
         # 2px surface gap between neighbours; blocks too small to see are left out.
         rx, ry, rw, rh = rx + 1, ry + 1, rw - 2, rh - 2
@@ -218,6 +229,7 @@ def draw_treemap(out: List[str], units: List[Dict[str, Any]], top: float) -> flo
         # Percent only on partly matched units; the shade already says 0% / 100%.
         if rh >= 34 and 0 < b < 5:
             out.append(text(rx + 5, ry + 28, f"{u['fuzzy']:.1f}%", f"l{b}", 11))
+    out.append("</g>")
     return y0 + h
 
 
@@ -269,7 +281,7 @@ def draw_history(out: List[str], rows: List[Dict[str, Any]], top: float) -> floa
     # Direct label on the latest point only.
     lx, ly = pts[-1]
     if len(pts) == 1:
-        out.append(text(lx + 10, ly - 8, f"{vals[-1]:.2f}% on {rows[-1]['date']}; one point is added per day the card is regenerated", "t2", 12))
+        out.append(text(lx + 10, ly - 8, f"{vals[-1]:.2f}% on {rows[-1]['date']}; a point is added each day the numbers change", "t2", 12))
     else:
         out.append(text(lx, ly - 10, f"{vals[-1]:.2f}%", "t1", 12, anchor="end", weight=600))
         out.append(text(x0, y1 + 18, rows[0]["date"], "t3", 11))
@@ -282,6 +294,7 @@ def main() -> None:
     parser.add_argument("--report", type=Path, default=ROOT / "build" / "GV4E69" / "report.json")
     parser.add_argument("--out-dir", type=Path, default=ROOT / "docs" / "progress")
     parser.add_argument("--date", default=datetime.date.today().isoformat())
+    parser.add_argument("--if-changed", action="store_true", help="write nothing unless the totals or the treemap changed")
     args = parser.parse_args()
 
     with open(args.report, encoding="utf-8") as f:
@@ -299,18 +312,19 @@ def main() -> None:
     units = sorted((u for u in units if u["code"] > 0), key=lambda u: (-u["code"], u["name"]))
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    rows = update_history(
-        args.out_dir / "history.csv",
-        {
-            "date": args.date,
-            "matched_code": num(m, "matched_code"),
-            "total_code": num(m, "total_code"),
-            "matched_functions": num(m, "matched_functions"),
-            "total_functions": num(m, "total_functions"),
-            "matched_data": num(m, "matched_data"),
-            "total_data": num(m, "total_data"),
-        },
-    )
+    hist_path = args.out_dir / "history.csv"
+    out_svg = args.out_dir / "progress.svg"
+    row = {
+        "date": args.date,
+        "matched_code": num(m, "matched_code"),
+        "total_code": num(m, "total_code"),
+        "matched_functions": num(m, "matched_functions"),
+        "total_functions": num(m, "total_functions"),
+        "matched_data": num(m, "matched_data"),
+        "total_data": num(m, "total_data"),
+    }
+    old_rows = read_history(hist_path)
+    rows = sorted([r for r in old_rows if r["date"] != args.date] + [row], key=lambda r: r["date"])
 
     body: List[str] = []
     bottom = draw_header(body, m, args.date)
@@ -334,9 +348,18 @@ def main() -> None:
         *body,
         "</svg>",
     ]
-    out_svg = args.out_dir / "progress.svg"
+    content = "\n".join(svg) + "\n"
+
+    if args.if_changed and old_rows and out_svg.is_file():
+        same_totals = all(str(old_rows[-1][k]) == str(row[k]) for k in HISTORY_FIELDS if k != "date")
+        old_svg = out_svg.read_text(encoding="utf-8")
+        if same_totals and treemap_part(old_svg) == treemap_part(content):
+            print(f"No change since {old_rows[-1]['date']}; card left as is.")
+            return
+
+    write_history(hist_path, rows)
     with open(out_svg, "w", newline="\n", encoding="utf-8") as f:
-        f.write("\n".join(svg) + "\n")
+        f.write(content)
     print(summary)
     print(f"Wrote {out_svg}")
 

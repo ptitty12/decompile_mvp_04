@@ -50,6 +50,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="818.2" y="184.0" class="t2" font-size="12" font-weight="400" text-anchor="start">75–99%</text>
 <rect x="871.8" y="174" width="12" height="12" rx="2" class="b5"/>
 <text x="889.8" y="184.0" class="t2" font-size="12" font-weight="400" text-anchor="start">Matched</text>
+<g id="treemap">
 <rect x="25.0" y="201.0" width="247.4" height="200.4" rx="2" class="b0"><title>auto_02_8043FDC0_feoverlay: 959,516 bytes of code, 0.0% fuzzy match</title></rect>
 <text x="30.0" y="215.0" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_02_8043FDC0_feoverlay</text>
 <rect x="25.0" y="403.4" width="247.4" height="135.6" rx="2" class="b0"><title>auto_01_800A8910_text: 652,672 bytes of code, 0.0% fuzzy match</title></rect>
@@ -162,6 +163,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="915.7" y="524.6" width="3.9" height="5.3" rx="2" class="b0"><title>auto_01_803D7ED4_text: 820 bytes of code, 0.0% fuzzy match</title></rect>
 <rect x="915.7" y="531.9" width="3.9" height="3.7" rx="2" class="b0"><title>auto_01_803E1F98_text: 644 bytes of code, 0.0% fuzzy match</title></rect>
 <rect x="915.7" y="537.7" width="3.9" height="1.3" rx="2" class="b0"><title>auto_01_803D9FE8_text: 372 bytes of code, 0.0% fuzzy match</title></rect>
+</g>
 <text x="24.0" y="580.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code matched over time</text>
 <line x1="68" y1="740.0" x2="936" y2="740.0" class="axis" stroke-width="1"/>
 <text x="60.0" y="744.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0%</text>
@@ -174,5 +176,5 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <line x1="68" y1="600.0" x2="936" y2="600.0" class="grid" stroke-width="1"/>
 <text x="60.0" y="604.0" class="t3" font-size="11" font-weight="400" text-anchor="end">1%</text>
 <circle cx="68.0" cy="740.0" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.00% of code, 0 / 24,158 functions</title></circle>
-<text x="78.0" y="732.0" class="t2" font-size="12" font-weight="400" text-anchor="start">0.00% on 2026-10-10; one point is added per day the card is regenerated</text>
+<text x="78.0" y="732.0" class="t2" font-size="12" font-weight="400" text-anchor="start">0.00% on 2026-10-10; a point is added each day the numbers change</text>
 </svg>
