@@ -32,6 +32,10 @@ struct Unk80368E64Param {
     void* m4;
 };
 
+struct Unk80373AD8Mtx {
+    float f[16];
+};
+
 /*
  * Object built by fn_803E3C08 (x, -1). Offsets seen in fn_80369554 (stack
  * object, 0xC0 bytes) and fn_80368E64.
@@ -95,6 +99,59 @@ void fn_803DA468(int attr, void* base, int stride);
 void fn_803E3C08(Unk803E3C08* self, void* x, int n);
 }
 
+struct Unk803DE1BC {
+    int m[26];
+};
+
+struct Unk803DBE08Out {
+    int m0;
+    int m4;
+    inline Unk803DBE08Out(void* state);
+    inline void Begin(int n);
+    inline void StoreHdr(int per);
+};
+
+extern unsigned char* lbl_8062C660;
+extern int lbl_8062C664;
+
+extern "C" {
+void fn_803DFBAC(Unk80373AD8Mtx* in, Unk80373AD8Mtx* out);
+void fn_804302C4(Unk80373AD8Mtx* m, int id);
+void fn_80430364(int id);
+void fn_803DBE08(void* state, Unk803DBE08Out* out);
+void fn_80433004(void* p, int n);
+void fn_8042C8B0(int a, int b, int c);
+void fn_803DA188(int n);
+}
+
+inline Unk803DBE08Out::Unk803DBE08Out(void* state)
+{
+    fn_803DBE08(state, this);
+}
+
+inline void Unk803DBE08Out::StoreHdr(int per)
+{
+    *lbl_8062C660 = (unsigned char)m0;
+    *(unsigned short*)(lbl_8062C660 + 1) = per;
+}
+
+inline void Unk803DBE08Out::Begin(int n)
+{
+    fn_8042C8B0(0x90, 0, 0);
+    GXWGFifo.u8 = (unsigned char)m0;
+    GXWGFifo.u16 = n;
+}
+
+extern "C" {
+void fn_803DE1BC(Unk803DE1BC* o);
+void fn_803DE2E8(Unk803DE1BC* o, int a, int b);
+void fn_803DE27C(Unk803DE1BC* o, int a, int b, int c, int d);
+void fn_803DE25C(Unk803DE1BC* o, int a, int b, int c, int d);
+void fn_803DE300(Unk803DE1BC* o, int a);
+void fn_803DD794(void* tex);
+void fn_80430124(void* list, int nbytes);
+}
+
 extern const char lbl_80623230[];
 extern const char lbl_80623248[];
 extern const char lbl_80603718[];
@@ -111,7 +168,165 @@ extern void* lbl_806EFA80[2];
 extern int lbl_806EFA88;
 extern int lbl_806EFA8C;
 
-extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b);
+/*
+ * Display-list builder (same family as the 0x704 function in tu_80373AD8).
+ * Register allocation tells: the index loops of one branch share ONE counter
+ * (i1 / i2, declared at function scope). With a counter per loop the default
+ * loops get i and j in swapped registers (gcc 2.95 allocates by
+ * refs*log2(refs)/live-length, and a per-loop i loses to the inner counter j);
+ * a shared i has enough weighted references to be allocated first (r9, j r11).
+ * "first = 1" goes after the fn_80430124 call (li r25,1 after mr r4,r28).
+ */
+extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
+{
+    Unk80373AD8Mtx mtx;
+    Unk803DE1BC o;
+    unsigned i1;
+    unsigned i2;
+    if (a->mB0) {
+        b->m4 = a->m0[4].m4;
+        mtx = *(Unk80373AD8Mtx*)a->m0[1].m4;
+        fn_803DFBAC(&mtx, &mtx);
+        fn_804302C4(&mtx, 0);
+        fn_80430364(0);
+        fn_803DDB5C(0);
+        fn_803DE1BC(&o);
+        fn_803DE2E8(&o, 0xff, 0xff);
+        fn_803DE27C(&o, 0xf, 0xf, 0xf, 0xa);
+        fn_803DE25C(&o, 7, 7, 7, 5);
+        fn_803DE300(&o, 0);
+        if (b->m70) {
+            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
+            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+        } else {
+            fn_8042DC44(1);
+            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
+            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+        }
+        fn_803DB5A0(b->m4);
+        if (b->m6C == 0) {
+            fn_803DB9C0(b->m8, 3);
+        }
+    }
+    fn_803DDCD4();
+    if (a->mBC == 0) {
+        void* dl = a->m28;
+        int dlsz = a->m2C;
+        if (a->mB8) {
+            GXWGFifo.u8 = 0x40;
+            GXWGFifo.u32 = (unsigned int)dl;
+            GXWGFifo.u32 = dlsz;
+        } else {
+            fn_80430124(dl, dlsz);
+        }
+    } else {
+        Unk803DBE08Out v(b->m4);
+        int n = *(int*)a->m0[0].m4;
+        if (lbl_8062C660) {
+            int per = (lbl_8062C664 - 3) / b->m0;
+            per = per / 12 * 12;
+            fn_803DB9C0(b->m8, 2);
+            if (*(int*)lbl_8062C660 == -1) {
+                v.StoreHdr(per);
+                unsigned char* p = lbl_8062C660 + 3;
+                unsigned char i = 0;
+                while (i < per) {
+                    int next = i + 1;
+                    for (int j = 0; j < b->m0; j++) {
+                        *p++ = i;
+                    }
+                    i = next;
+                }
+                for (; p < lbl_8062C660 + lbl_8062C664; p++) {
+                    *p = 0;
+                }
+                fn_80433004(lbl_8062C660, lbl_8062C664);
+            }
+            int sz = (per * b->m0 + 0x22) / 32 * 32;
+            int first = 0;
+            while (n >= per) {
+                if (first) {
+                    GXWGFifo.u8 = 0x40;
+                    GXWGFifo.u32 = (unsigned int)lbl_8062C660;
+                    GXWGFifo.u32 = sz;
+                } else {
+                    fn_80430124(lbl_8062C660, sz);
+                    first = 1;
+                }
+                int chunk = per;
+                if (v.m0 == 0x98) {
+                    chunk = per - 2;
+                }
+                fn_803DA188(chunk);
+                n -= chunk;
+            }
+            v.Begin(n);
+            if (b->m0 == 4) {
+                for (i1 = 0; i1 < n; i1++) {
+                    GXWGFifo.u32 = i1 | (i1 << 8) | (i1 << 16) | (i1 << 24);
+                }
+            } else if (b->m0 == 3) {
+                for (i1 = 0; i1 < n; i1++) {
+                    GXWGFifo.u16 = i1 | (i1 << 8);
+                    GXWGFifo.u8 = i1;
+                }
+            } else if (b->m0 == 2) {
+                for (i1 = 0; i1 < n; i1++) {
+                    GXWGFifo.u16 = i1 | (i1 << 8);
+                }
+            } else if (b->m0 == 1) {
+                for (i1 = 0; i1 < n; i1++) {
+                    GXWGFifo.u8 = i1;
+                }
+            } else {
+                for (i1 = 0; i1 < n; i1++) {
+                    for (int j = 0; j < b->m0; j++) {
+                        GXWGFifo.u8 = i1;
+                    }
+                }
+            }
+            n *= b->m0;
+            n += 3;
+            while (n & 0x1f) {
+                n++;
+                GXWGFifo.u8 = 0;
+            }
+        } else {
+            v.Begin(n);
+            if (b->m0 == 4) {
+                for (i2 = 0; i2 < n; i2++) {
+                    GXWGFifo.u32 = i2 | (i2 << 16);
+                    GXWGFifo.u32 = i2 | (i2 << 16);
+                }
+            } else if (b->m0 == 3) {
+                for (i2 = 0; i2 < n; i2++) {
+                    GXWGFifo.u32 = i2 | (i2 << 16);
+                    GXWGFifo.u16 = i2;
+                }
+            } else if (b->m0 == 2) {
+                for (i2 = 0; i2 < n; i2++) {
+                    GXWGFifo.u32 = i2 | (i2 << 16);
+                }
+            } else if (b->m0 == 1) {
+                for (i2 = 0; i2 < n; i2++) {
+                    GXWGFifo.u16 = i2;
+                }
+            } else {
+                for (i2 = 0; i2 < n; i2++) {
+                    for (int j = 0; j < b->m0; j++) {
+                        GXWGFifo.u16 = i2;
+                    }
+                }
+            }
+            n = (n + n) * b->m0;
+            n += 3;
+            while (n & 0x1f) {
+                n++;
+                GXWGFifo.u8 = 0;
+            }
+        }
+    }
+}
 
 extern "C" void fn_80369554(void* x)
 {
