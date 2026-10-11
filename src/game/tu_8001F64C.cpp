@@ -53,6 +53,11 @@ extern "C" int fn_8001F764(Unk8001F764_Obj* x)
     return 0;
 }
 
+/* near-miss: 70/76 insns. Retail sums the two 128-byte rows with counted (bdnz) loops whose
+ * index is `clrlwi r,r,24` of an int counter and whose row base (add r8,r6,r0) is hoisted.
+ * `for (int i...) row->m1B4[(unsigned char)i]` gives the bdnz and clrlwi but then the
+ * m708 == 0 row selection becomes a branch (cmpwi/bne) instead of subfic/adde, and the
+ * register use / frame (r31 saved) differs. Tried ~10 loop and row-pointer forms. */
 extern "C" int fn_8001F788(Unk8001E444_Obj* x)
 {
     Unk8001E444_Owner* o = x->m130;
