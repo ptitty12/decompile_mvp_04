@@ -32,6 +32,7 @@ struct Unk803B9D60_Rec {
 
 struct Unk803B9D60_Alloc {
     virtual Unk803B9D60_Rec* v1(int size, const Unk803B9D60_Z& z);
+    virtual void v2(void* p, int x);
 };
 
 struct Unk803B9D60_In1 {
