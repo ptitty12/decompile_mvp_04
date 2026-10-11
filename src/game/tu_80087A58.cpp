@@ -608,7 +608,8 @@ int fn_80088EDC(O* o, int i)
 int fn_80088EFC(O* o, int i)
 {
     int k = fn_80088EDC(o, i);
-    return o->mF5C[k].m10 >= 0;
+    int z = 0; /* a variable zero: a literal 0 takes the not/srwi sign-bit path */
+    return o->mF5C[k].m10 >= z;
 }
 
 int fn_80088F48(O* o, int i)

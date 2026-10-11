@@ -103,8 +103,7 @@ void fn_80048818(Unk8004763C* t, int idx)
     }
 }
 
-/* near-miss: flag shares r0 with the loaded value in retail (r9 here) */
-void fn_800488C4(Unk8004763C* t, float f)
+void fn_800488C4(Unk8004763C* t, int id, float f, int* a, void* b, void* w)
 {
     unsigned flag = 0;
     if (t->mF4 == 1) {
@@ -112,7 +111,7 @@ void fn_800488C4(Unk8004763C* t, float f)
         flag = (unsigned)~v >> 31;
     }
     if (flag == 1)
-        fn_80048E50(&t->mFC, f);
+        fn_80048E50(&t->mFC, id, f, a, b, w);
 }
 
 void fn_80048914(Unk8004763C* t, int a)

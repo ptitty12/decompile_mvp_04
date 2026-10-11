@@ -608,3 +608,108 @@ Open (not reproduced):
   - a local struct whose address goes to two calls: retail rematerialises
     `addi rX,r1,8` after the call (fn_80134F48, fn_80134F98);
   - r4 moved before r3, suspected method calls into unmatched units (fn_80132630).
+
+## Hard-case families 2 (Opus, 2026-10-11)
+
+Matched 17 functions in 7 units with these recipes. Each recipe is one source change.
+
+### Pass-through, the wider version (fn_8004961C, fn_800488C4, fn_8006473C, fn_80051014)
+- Run `python tools/match/passthru.py .` first. The callee can read *every*
+  argument register the caller leaves alone. fn_800488C4's caller in another
+  unit passes six arguments, and all of them reach fn_80048E50. Read the
+  caller's prototype in other headers before trusting this unit's.
+- Strcpy chains: `fn_8040B61C(&s1)` was really `fn_8040B61C(&s1, name)`.
+  r4 still held `name`.
+- Empty callees (a bare `blr`) can still take arguments. fn_80051014 keeps s
+  and idx live in r3/r4 up to `fn_80052FBC()`. That makes the entry base and
+  offset take fresh registers (`addi r9` / `mulli r0`) instead of the dead
+  r3/r4. The recipe is `fn_80052FBC(s, idx)` plus an overload in the header.
+- Tell: your build reuses dead argument registers or parameter copies for
+  temporaries, and retail does not.
+
+### The callee's return type changes sched2 (fn_8004A8F8, fn_8006473C)
+- A call to a value-returning function sets r3. A void call only clobbers it.
+  With a void callee, an earlier `r3 = ...` argument setup keeps dependence
+  edges to every later call and every later r3 write. That gives it more
+  dependents, so it wins sched2 ties against parameter copies.
+- Tell: 2 slots swapped near a call, between an argument setup and an
+  `mr rN,rM` parameter copy.
+- Fix: check the callee's epilogue. If it has `li r3,1` or `mr r3,..` before
+  `blr`, declare it `int`. fn_80058FE4 returns 1, and strcpy/strcat return dst.
+- Debug with `-fsched-verbose-5` (dash, not `=`). It prints each block's
+  dependence table: priority, cost and the forward dependents of every insn.
+- In this compiler anti and output deps cost 1.
+- Ranking order:
+  1. priority
+  2. register weight (sched1 only)
+  3. class relative to the last insn scheduled
+  4. number of dependents
+  5. lower LUID
+
+### Indexed load operand order (roster walk family, 7 functions)
+- `m0[j]` and `*(int*)((char*)m0 + j*4)` are canonicalised to
+  (plus (ashift j 2) m0), which prints `lwzx rD,off,base`.
+- Recipe: put the byte offset in its own variable first:
+  `int k = f(r, a); int o = j * 4; int id = *(int*)((char*)r->m10[k].m0 + o);`.
+- Keep m0 a temporary. A pointer-typed local is flagged as a pointer, and then
+  the offset gets index class (r0) instead of retail's r11.
+
+### scc through cr7 (fn_80088EFC, fn_80078D00)
+- A cmpwi cr7 / (cror) / mfcr / rlwinm sequence is the CC-register scc
+  pattern. `x >= 0` against a literal takes emit_store_flag's sign-bit path
+  (`not; srwi 31`). `int z = 0; return x >= z;` keeps the scc form.
+- Read the extracted bit before you guess the operator. In cr7, bit 28 is lt,
+  29 gt, 30 eq, 31 so/un. `rlwinm r,r,30,31,31` (also printed
+  `extrwi r,r,1,29`) is **gt**.
+- fn_80078D00's "spC == 6" was `spC > 6`. EQ never stays in the CC form; it
+  becomes xori/subfic/adde.
+
+### &buf recomputed per use (fn_800A3DF8)
+- An 8-byte local (char[8], or a struct of two ints) has DImode. It goes
+  through ADDRESSOF, CSE merges the address pseudos, and the address lives in a
+  callee-saved register.
+- A BLKmode local (char[5..7], or a class with virtual functions) stays in
+  memory. A local at frame offset 0 has the address `virtual-stack-vars`
+  itself. Both go straight into the argument register, so `addi rX,r1,8` is
+  recomputed at each call.
+- fn_800A3DF8's local is a polymorphic 8-byte object. Its out-of-line ctor
+  fn_80353218 stores m0 = 0 and the vptr at +4.
+- Still open: locals at a nonzero frame offset. expand_expr(ADDR_EXPR) runs
+  force_operand, which makes a pseudo, and CSE keeps it. That covers the v8
+  name-swap methods in tu_80094578 (char[0x14] at sp+0x18).
+
+### Smaller recipes
+- Form the entry base after the call, inside the branch, as
+  `char* b = (char*)s + 8;`. Otherwise it is held across the call in a saved
+  register (fn_80051E68).
+- The 0x3C entries of Unk800493D4_Sm are Unk80044C10_B, and m6F8 is read
+  straight from the entry (`lwzx; lwz 0x6f8`). That fixed fn_8004B538 (34 vs
+  35 insns) and fn_80051014.
+- Declaring the out-slot locals in address order fixed the zero-store order
+  (fn_80078D00).
+- objdiff's fuzzy score can rate a 2-slot reorder *lower* than a
+  register-only permutation (fn_8004A8F8: 90.9% vs 92.95%). verify fails on
+  fuzzy regressions, so when you park a function, keep the higher-scoring form.
+
+### Still open (mechanism known)
+- Dead `cmpwi`/`cmplwi` before `li r3,0; blr` (fn_8006FB10, FB1C, FF9C,
+  FFD0, fn_80071138, fn_80071154):
+  - After reload with sched2 on, delete_computation deletes only the jump.
+    The compare stays ("REG_DEAD notes not accurate").
+  - So retail's jumps became redundant only after reload, when jump2
+    cross-jumped the identical `li r3,0` case tails into the default.
+  - Ours merges the `return 0` bodies before reload (jump1's store-before-jump
+    rewrite, then CSE), and flow deletes the compare.
+  - The range checks are `cmplwi`, so the switch index is **unsigned**.
+    `switch (unsigned k) { case 2: return 0; case 5: ...; case 8: ... } return 0;`
+    reaches 5 of 13 differing slots on fn_8006FF9C. The tree is right, but the
+    case block and the default `li r3,0; blr` are not cross-jumped.
+- fn_8028F178 (2 slots): the -ffloat-store parameter spill `stfs f1,8(r1)`
+  has to land between `lwz r11,0x44(r3)` and `lwz r0,0x14(r11)`:
+  - The original int-field load does not conflict with the spill because of
+    the scalar-vs-in-struct alias heuristic. After reload the stack store
+    loses MEM_SCALAR_P.
+  - With `*(char**)&g->m44->m14`, the load may alias the float slot, and the
+    spill moves to the first slot.
+  - Retail has the spill one slot later. In sched1 it was issued after
+    `lwz r11` and before `lwz r0`.

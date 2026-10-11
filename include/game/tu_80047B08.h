@@ -17,7 +17,7 @@ void fn_80057778(void* p);
 void fn_80057950(void* p);
 void* fn_8005BA9C(void* p);
 void fn_8005C654(void* a, void* b, int c, int d);
-void fn_80048E50(Unk80048A10_Sub* p, float f);
+void fn_80048E50(Unk80048A10_Sub* p, int id, float f, int* a, void* b, void* w);
 void fn_80049090(Unk80048A10_Sub* p, int a);
 void fn_800490D0(Unk80048A10_Sub* p);
 void fn_800490F8(Unk80048A10_Sub* p);
