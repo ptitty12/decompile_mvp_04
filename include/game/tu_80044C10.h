@@ -22,6 +22,8 @@ struct Unk80044C10_D;
 struct Unk80044C10_C;
 struct Unk80044C10_B;
 class Unk80044C10_A;
+struct Unk80048A10_Ent;
+struct Unk80048A10_Sub;
 struct Unk8004763C_Slot;
 struct Unk8004763C;
 struct Unk80044C98_Arg;
@@ -122,6 +124,20 @@ public:
     int m708;
 };
 
+struct Unk80048A10_Ent {
+    char pad0[0x3C];
+    int m3C;
+    char pad40[0x4];
+    int m44;
+};
+
+struct Unk80048A10_Sub {
+    Unk80048A10_Ent mEnt[35];
+    char pad9D8[0xC4];
+    void* mA9C;
+    char padAA0[0x44];
+};
+
 struct Unk8004763C_Slot {
     int m0;
     int m4;
@@ -129,7 +145,7 @@ struct Unk8004763C_Slot {
     int mC;
     int m10;
     int m14;
-    char pad18[0x4];
+    int m18;
 };
 
 struct Unk8004763C {
@@ -141,9 +157,7 @@ struct Unk8004763C {
     int mF0;
     int mF4;
     int mF8;
-    char mFC[0xA9C];
-    void* mB98;
-    char padB9C[0x44];
+    Unk80048A10_Sub mFC;
     int mBE0[8];
     int mC00;
     unsigned mC04;
@@ -182,11 +196,11 @@ int fn_80048294(Unk8004763C* t, int i);
 void fn_8004838C(Unk8004763C* t, int i);
 int fn_800484A8(Unk8004763C* t, int i);
 void fn_80048818(Unk8004763C* t, int i);
-void fn_80048A10(void* p);
-void fn_80048B2C(void* p, int flags);
-void fn_80048BC0(void* p);
-void fn_80048BE4(void* p);
-void fn_800490F4(void* p);
+void fn_80048A10(Unk80048A10_Sub* p);
+void fn_80048B2C(Unk80048A10_Sub* p, int flags);
+void fn_80048BC0(Unk80048A10_Sub* p);
+void fn_80048BE4(Unk80048A10_Sub* p);
+void fn_800490F4(Unk80048A10_Sub* p);
 void fn_80377408(void* p); /* __builtin_delete */
 void fn_80391348(unsigned a);
 void fn_803EE7BC();
