@@ -170,7 +170,8 @@ struct Unk802726BC_Angles {
     float m30[2];
     float m38[2];
     float m40[2];
-    char pad48[0x58 - 0x48];
+    float m48[2];              /* goal code (tu_8028989C.cpp), indexed by m190 */
+    char pad50[0x58 - 0x50];
     int m58[2];                /* written by goal code (tu_8028989C.cpp), indexed by m190 */
     char pad60[0xC0 - 0x60];
     float mC0[2];              /* same, indexed by m190 */

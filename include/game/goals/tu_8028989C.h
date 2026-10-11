@@ -108,9 +108,13 @@ public:
     Unk80273498_Vec3 mA4;
     char padB0[0xBC - 0xB0];
     unsigned int mBC;
-    char padC0[0xD4 - 0xC0];
+    char padC0[0xCC - 0xC0];
+    int mCC;
+    char padD0[0xD4 - 0xD0];
     float mD4;
     int mD8;
+    void SetYaw(float yaw);
+    void SetPos(Unk80273498_Vec3 v);
     void SetD4(float v) { mD4 = v; }
     void AddD4(float v) { mD4 = mD4 + v; }
 };
@@ -140,6 +144,34 @@ Unk80273498_Vec3 fn_8037B128(Unk80279BB8* q);
 void fn_80386188(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* f1, int c, int d,
                  Unk80273498_Vec3* e, Unk80273498_Vec3* g, int h, int i);
 int fn_80386110(Unk80271DBC_Link* link, Unk8035EB7C* q, int a, int b, float* out, int c);
+
+/* Not a member in retail (r3 = query, f1 = yaw / r4 = vector): called by the
+ * inline SetYaw / SetPos below. */
+void fn_8037B16C(Unk80279BB8* q, float yaw);
+void fn_8037B10C(Unk80279BB8* q, Unk80273498_Vec3* v);
+inline void Unk80279BB8::SetYaw(float yaw)
+{
+    fn_8037B16C(this, yaw);
+}
+inline void Unk80279BB8::SetPos(Unk80273498_Vec3 v)
+{
+    fn_8037B10C(this, &v);
+}
+
+/* Side/team index of the player object (+0x5C4 lies inside XMid::m588). */
+inline int& UnkX5C4(Unk80270BA0_X* x)
+{
+    return *(int*)((char*)x + 0x5C4);
+}
+extern const Unk80273498_Vec3 lbl_805DED28[];
+
+/* Word at +0x4C of the context behind the player object (frame counter?). */
+inline unsigned int UnkCtx4C(Unk8014D8AC_Ctx* c)
+{
+    return *(unsigned int*)((char*)c + 0x4C);
+}
+float fn_80382BB8(Unk80271DBC_Link* link);
+void fn_80242E6C(Unk80270BA0_X* x);
 
 #define UNK8028989C_STATE_A 0x75027FEF
 

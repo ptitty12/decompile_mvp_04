@@ -11,8 +11,49 @@
 
 Unk80273498_Vec3 fn_8014E388(Unk8014E388_H* h);
 int fn_8028AA4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q);
+float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, float dist, Unk80273498_Vec3* out, int c,
+                  int n);
+void fn_8028A2E0(Unk8028989C_Goal* g, Unk80270BA0_X* x);
+void fn_80289FB8(Unk8028989C_Goal* g, Unk80270BA0_X* x);
+void fn_8028A05C(Unk8028989C_Goal* g, Unk80270BA0_X* x);
+void fn_8028A13C(Unk8028989C_Goal* g, Unk80270BA0_X* x);
+void fn_8028A21C(Unk8028989C_Goal* g, Unk80270BA0_X* x);
+void fn_8028A450(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int sel, float dist, Unk80273498_Vec3* out, int c,
+                 int n);
 extern int lbl_806242B0;
 extern int lbl_806242B4;
+
+static inline Unk80273498_Vec3 GetQueryPos(Unk80279BB8* q)
+{
+    Unk80273498_Vec3 v = fn_8037B128(q);
+    return v;
+}
+
+static inline float HeadingOf(Unk80273498_Vec3 d)
+{
+    return fn_80410CE8(d.x, d.z);
+}
+
+static inline Unk80273498_Vec3 FlatPos(Unk80270BA0_X* x)
+{
+    Unk80273498_Vec3 v = x->m60;
+    v.y = 0.0f;
+    return v;
+}
+
+static inline float LenSq(Unk80273498_Vec3 v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+
+static inline Unk80273498_Vec3 VSub(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
 
 static inline void SetAngleI(Unk802726BC_Angles* p, int v)
 {
@@ -28,6 +69,19 @@ static inline void SetAngleF(Unk802726BC_Angles* p, float v)
         p->mC0[0] = v;
     }
     p->mC0[p->m190] = v;
+}
+
+static inline void SetAngleF48(Unk802726BC_Angles* p, float v)
+{
+    if (p->m190 == 1) {
+        p->m48[0] = v;
+    }
+    p->m48[p->m190] = v;
+}
+
+static inline void SetAngleF48b(Unk802726BC_Angles* p, float v)
+{
+    SetAngleF48(p, v);
 }
 
 static inline void SetPair(float* dst, float v)
@@ -128,6 +182,66 @@ int fn_80289B78(Unk8028989C_Goal* g)
         return 1;
     }
     return 0;
+}
+
+int fn_80289B98(Unk8028989C_Goal* g, Unk80270BA0_X* x)
+{
+    /* near-miss: retail clamps m64 with a single store through f0 (see
+     * fn_802898FC) and stores the float argument of the second SetAngleF48b
+     * call in each arm of the ternary. */
+    Unk80271DBC_Link* link = x->m618;
+    Unk80273498_Vec3 pos = FlatPos(x);
+    float t = (float)UnkCtx4C(x->m44C) * 0.016666668f;
+
+    if (g->mC <= 2) {
+        g->m54 = FlatPos(x);
+        g->m60 = fn_80382BB8(x->m618);
+        g->m50 = t;
+        g->m68 = LenSq(VSub(g->GetM10(), g->m54));
+    }
+    if (g->mC <= 1 && !(g->m6C <= 0.0f)) {
+        SetAngleF48b(&x->m734, -1.0f);
+        Unk80279BB8 q(x);
+        fn_8028A450(g, x, &q, 1, -1.0f, 0, 0, 0);
+        float d = q.mD4;
+        g->m64 = d / g->m6C;
+        if (g->m64 > 10.0f) {
+            g->m64 = 10.0f;
+        } else if (g->m64 < 0.1f) {
+            g->m64 = 0.1f;
+        }
+    }
+    {
+        SetAngleF48b(&x->m734, g->m64 > 0.0f ? g->m64 : -1.0f);
+    }
+    if (link->m838 == 0x7873C72B) {
+        g->m70 = 1;
+    }
+    float len = LenSq(VSub(pos, g->m54));
+    if (len > (((unsigned int)(g->m48 - 3) <= 3) ? g->m68 : g->m68 * 0.5f)) {
+        fn_80242E6C(x);
+        return 2;
+    }
+    if (g->mC <= 1) {
+        fn_8028A2E0(g, x);
+    }
+    switch (g->m48) {
+    case 1:
+        fn_80289FB8(g, x);
+        break;
+    case 3:
+    case 4:
+        fn_8028A05C(g, x);
+        break;
+    case 5:
+    case 6:
+        fn_8028A13C(g, x);
+        break;
+    case 2:
+        fn_8028A21C(g, x);
+        break;
+    }
+    return 1;
 }
 
 void fn_80289FB8(Unk8028989C_Goal* g, Unk80270BA0_X* x)
@@ -263,6 +377,79 @@ void fn_8028A2E0(Unk8028989C_Goal* g, Unk80270BA0_X* x)
     }
 }
 
+void fn_8028A450(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int sel, float dist, Unk80273498_Vec3* out, int c,
+                 int n)
+{
+    if (sel == 1) {
+        sel = g->m0;
+    }
+    float res = 0.0f;
+    float ang;
+    Unk80273498_Vec3 base = lbl_805DED28[UnkX5C4(x)];
+    fn_8028A2E0(g, x);
+    switch (g->m48) {
+    case 1: {
+        ang = HeadingOf(VSub(g->GetM10(), base));
+        q->SetYaw(ang);
+        q->mBC |= 1;
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        q->mCC = 0x11;
+        break;
+    }
+    case 3: {
+        ang = HeadingOf(VSub(g->GetM10(), base)) + 1.5707964f;
+        q->SetYaw(ang);
+        q->mBC |= 1;
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        if (!(dist >= 0.0f)) {
+            q->SetPos(g->GetM10());
+            q->mBC |= 1;
+        }
+        q->mCC = 0x11;
+        break;
+    }
+    case 4: {
+        ang = HeadingOf(VSub(g->GetM10(), base)) + 1.5707964f;
+        q->SetYaw(ang);
+        q->mBC |= 1;
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        q->mCC = 0x11;
+        break;
+    }
+    case 5: {
+        ang = HeadingOf(VSub(g->GetM10(), base)) - 1.5707964f;
+        q->SetYaw(ang);
+        q->mBC |= 1;
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        if (!(dist >= 0.0f)) {
+            q->SetPos(g->GetM10());
+            q->mBC |= 1;
+        }
+        q->mCC = 0x12;
+        break;
+    }
+    case 6: {
+        ang = HeadingOf(VSub(g->GetM10(), base)) - 1.5707964f;
+        q->SetYaw(ang);
+        q->mBC |= 1;
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        q->mCC = 0x12;
+        break;
+    }
+    case 2:
+        res = fn_8028AB4C(g, x, q, sel, dist, out, c, n);
+        if (!(dist >= 0.0f)) {
+            q->SetPos(g->GetM10());
+            q->mBC |= 1;
+        }
+        q->mCC = 0x12;
+        break;
+    }
+    q->SetPos(g->GetM10());
+    q->mD8 = 1;
+    q->mBC |= 1;
+}
+
 int fn_8028AA4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q)
 {
     int hash = 0;
@@ -309,48 +496,43 @@ int fn_8028AB04(Unk8028989C_Goal* g, int k)
     return r;
 }
 
-float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, Unk80273498_Vec3* out, int c,
-                  int n, float dist)
+float fn_8028AB4C(Unk8028989C_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q, int k, float dist, Unk80273498_Vec3* out, int c,
+                  int n)
 {
+    /* near-miss (5 insns): the dist spill sits after the parameter moves; retail
+     * tests dist < 0.0f with `blt` twice (a dead second branch). */
     float rem = 0.0f;
     int flags = 0;
     int s22 = fn_8028AB04(g, k);
     int hash = fn_8028AA4C(g, x, q);
 
-    if (dist >= 0.0f) {
+    if (!(dist < 0.0f)) {
         rem = dist - q->mD4;
         if (!(rem > 0.0f)) {
             q->mD8 = 1;
-            q->mD4 = dist;
-            if (out && n > 0) {
-                Unk80273498_Vec3* p = out;
-                do {
-                    Unk80273498_Vec3 t = fn_8037B128(q);
-                    n--;
-                    *p = t;
-                    p++;
-                } while (n != 0);
+            q->SetD4(dist);
+            if (out) {
+                for (int i = 0; i < n; i++) {
+                    out[i] = GetQueryPos(q);
+                }
             }
             return 0.0f;
         }
         flags = 0x20;
     }
-    float used = rem;
-    fn_80386188(x->m618, q, hash, lbl_806242B0, &used, n, c, out, 0, 0, flags | 2);
-    float u2 = used;
-    rem -= used;
-    q->mD4 = q->mD4 + u2;
-    if (dist < 0.0f || rem > 0.0001f) {
+    float tmp = rem;
+    fn_80386188(x->m618, q, hash, lbl_806242B0, &tmp, n, c, out, 0, 0, flags | 2);
+    rem -= tmp;
+    q->AddD4(tmp);
+    if (!(dist >= 0.0f && rem <= 0.0001f)) {
         if (g->m28) {
-            Unk80273498_Vec3 t = g->m10;
-            q->mA4 = t;
+            q->mA4 = g->GetM10();
             flags |= 0x10;
             q->mBC |= 0x10;
         }
         fn_80386188(x->m618, q, hash, s22, &rem, n, c, out, 0, 0, flags | 0xA);
-        float u3 = rem;
         q->mBC &= ~0x10;
-        q->mD4 = q->mD4 + u3;
+        q->AddD4(rem);
     }
     q->mD8 = 1;
     return rem;
