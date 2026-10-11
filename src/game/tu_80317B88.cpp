@@ -42,7 +42,8 @@ extern const float lbl_805EA564;
 extern const char lbl_805E7988[];
 extern const char* lbl_8061FF8C[];
 extern int lbl_8061FF88;
-extern int lbl_80691480[];
+extern FxCfg7 lbl_80691480;
+extern const float lbl_805EA568;
 
 extern "C" {
 void fn_80328374(void* p, int a);
@@ -70,6 +71,8 @@ int fn_803E9B98(const void* a, void* b);
 void* fn_8037C7FC();
 void* fn_8037CF5C(void* c, unsigned hash, void* obj);
 void fn_80377488(void* p);
+int fn_8014DDAC(void* p);
+void fn_803181E4(int a, int b, int c, int d, int e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1);
 void fn_80377408(void* p);
 void fn_803E6708(void* p, int a);
 void fn_803DBD84(void* p, int a);
@@ -79,6 +82,7 @@ extern "C" {
 // PROTOS-BEGIN
 void fn_80317B88(Fx* self, int a);
 void fn_80317F30(Fx* self, int a);
+void fn_80318140(int a, int b, int c, int d, void* e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1);
 void fn_8031883C(Fx* self);
 void fn_80318890(Fx* self);
 void fn_803188C4(Fx* self);
@@ -97,6 +101,7 @@ int fn_803194F4(FxReg* self, int a, int b, int c, int d);
 FxCfg* fn_80319534(FxCfg* self);
 FxCfg* fn_8031984C();
 void* fn_8031987C(const char* s);
+void fn_803198B8(FxCfg7* c, int on);
 FxB* fn_80319A58(FxB* self, int n);
 void fn_80319B7C(FxB* self, int a);
 void fn_80319C2C(FxB* self, int id);
@@ -106,14 +111,18 @@ void fn_8031A760(FxB* self, int tex);
 FxC* fn_8031A7CC(FxC* self, int a);
 void fn_8031A8B0(FxC* self, int a);
 int fn_8031A8E0(const char* name);
+void fn_8031AB8C(FxRec* r, int x, int y);
 void fn_8031AC74();
 void fn_8031B0E8(FxRec* self, int a);
 void fn_8031B0F0(FxC* self, const char* name, int val);
+int fn_8031B170(FxC* self, int** pp);
 void fn_8031B228(FxC* self, int i);
 void fn_8031B250(FxC* self, int i, int a, float f, FxSrc* b);
 void fn_8031B27C(FxC* self, int i);
+void fn_8031B2A8(FxC* self, int i);
 // PROTOS-END
 void fn_80319D78(FxB* self);
+void fn_80319938(void* cfg, int on);
 }
 
 // FUNCS-BEGIN
@@ -136,6 +145,10 @@ void fn_80317B88(Fx* self, int a) {
 }
 
 void fn_80317F30(Fx* self, int a) { self->m24 = a; }
+
+void fn_80318140(int a, int b, int c, int d, void* e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1) {
+    fn_803181E4(a, b, c, d, fn_8014DDAC(e), f, g, h, x1, x2, x3, x4, x5, s0, s1);
+}
 
 void fn_8031883C(Fx* self) {
     if (self->m24 != 0) fn_803188F0(self);
@@ -260,6 +273,12 @@ FxCfg* fn_8031984C() { return fn_80319534((FxCfg*)operator new(0x5C, lbl_806EF9B
 
 void* fn_8031987C(const char* s) { return fn_8037CF5C(fn_8037C7FC(), 0xCED26CE8, (void*)s); }
 
+void fn_803198B8(FxCfg7* c, int on) {
+    fn_80319938(c, on);
+    if (on) lbl_80691480 = *c;
+    lbl_8061FF6C = on;
+}
+
 FxB* fn_80319A58(FxB* self, int n) {
     char* sub = (char*)self + 0x38;
     int k = n - 1;
@@ -379,8 +398,17 @@ int fn_8031A8E0(const char* name) {
     return -1;
 }
 
+void fn_8031AB8C(FxRec* r, int x, int y) {
+    float fx = (float)x / (float)r->m28;
+    float fy = (float)y / (float)r->m2C;
+    if (r->m3C) {
+        r->m3C[0] = fx;
+        r->m3C[1] = fy;
+    }
+}
+
 // fn_8031AC48
-FxRec::FxRec() {
+FxRec::FxRec() { // fn_8031AC48
     m3C = 0;
     m38 = -1;
     m28 = 0;
@@ -396,6 +424,24 @@ void fn_8031B0F0(FxC* self, const char* name, int val) {
     for (int i = 0; i < self->m70; i++) {
         if (fn_8040B574((char*)self->m24 + i * 0x40, name) == 0) fn_8031B0E8((FxRec*)((char*)self->m24 + i * 0x40), val);
     }
+}
+
+int fn_8031B170(FxC* self, int** pp) {
+    int cnt = 0;
+    for (int k = 0; k < 5; k++) {
+        if (self->a74[k].m10 == 0) cnt++;
+    }
+    int* p = *pp;
+    *p = cnt;
+    char* cur = (char*)(p + 1);
+    for (int k = 0; k < 5; k++) {
+        if (self->a74[k].m10 == 0) {
+            *(FxItem*)cur = self->a74[k];
+            cur += 0x14;
+        }
+    }
+    *pp = (int*)cur;
+    return 1;
 }
 
 void fn_8031B228(FxC* self, int i) {
@@ -417,4 +463,18 @@ void fn_8031B250(FxC* self, int i, int a, float f, FxSrc* b) {
 void fn_8031B27C(FxC* self, int i) {
     int off = i * 12 + 0x28;
     *(FxSlot*)((char*)self + off) = self->a28[1];
+}
+
+void fn_8031B2A8(FxC* self, int i) {
+    FxSrc* src = self->a28[i].m4;
+    for (int k = 0; k < 5; k++) {
+        self->aD8[k].m0 = 0;
+        self->aD8[k].m4 = lbl_805EA568;
+        self->aD8[k].m10 = 1;
+    }
+    if (src) {
+        int n = src->m0;
+        if (n > 5) n = 5;
+        for (int j = 0; j < n; j++) self->aD8[j] = (&src->m4)[j];
+    }
 }

@@ -184,6 +184,16 @@ struct FxC {
     FxItem a74[5];
     FxItem aD8[5];
 };
+/* Seven-word config record copied to lbl_80691480 by fn_803198B8. */
+struct FxCfg7 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+};
 struct FxV3 { float x; float y; float z; };
 class FxEObj;
 /* Per-effect record of the FxD class (0x128 bytes; array at FxD::m24, kind at +0x38,
@@ -697,6 +707,12 @@ struct FxStack {
     int m178;
     int a17C[32];
     int m1FC;
+};
+struct FxWid {
+    float m0;
+    float m4;
+    const void* m8;
+    int mC;
 };
 // STRUCTS-END
 
