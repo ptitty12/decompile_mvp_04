@@ -426,6 +426,22 @@ void fn_802D8294(int a)
     lbl_8061EE00 = a;
 }
 
+/* near-miss: second memset argument moves are scheduled li/li/mr here, mr/li/li in retail (3 slots) */
+void Unk802D73B4_Mgr::s2()
+{
+    fn_803FFC58(m8, 0, 16);
+    fn_803FFC58(m18, 0, 16);
+    int n = fn_80008540((Unk800085B0**)m8, 4);
+    for (int i = 0; i < n; i++) {
+        if (m8[i]) {
+            fn_802D8B64(m8[i]);
+            m18[i] = new (0) char[m8[i]->s41() * lbl_8061F674];
+        }
+    }
+    m0 = 0;
+    m4 = 0;
+}
+
 void Unk802D73B4_Mgr::s3()
 {
     for (int i = 0; i <= 3; i++) {
@@ -462,21 +478,6 @@ int Unk802D73B4_Mgr::fn_802D845C()
 Unk802D73B4_Pad* Unk802D73B4_Mgr::fn_802D8490(int a)
 {
     return m8[a];
-}
-
-void Unk802D73B4_Mgr::s2()
-{
-    fn_803FFC58(m8, 0, 16);
-    fn_803FFC58(m18, 0, 16);
-    int n = fn_80008540((Unk800085B0**)m8, 4);
-    for (int i = 0; i < n; i++) {
-        if (m8[i]) {
-            fn_802D8B64(m8[i]);
-            m18[i] = new (0) char[m8[i]->s41() * lbl_8061F674];
-        }
-    }
-    m4 = 0;
-    m0 = 0;
 }
 
 void Unk802D73B4_Mgr::s6()
