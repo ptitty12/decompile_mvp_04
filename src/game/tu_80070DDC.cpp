@@ -47,6 +47,19 @@ struct Unk80071170_Rec {
     unsigned f6 : 11;
     unsigned p3 : 21;
 };
+struct Unk718F0_WBase {
+    char pad0[0x20];
+};
+struct Unk718F0_W : Unk718F0_WBase {
+    virtual int v08();
+    virtual int v10(int i);
+    virtual int v18(int a);
+    virtual int v20(int a);
+    virtual int v28(int a, int b);
+};
+extern const float lbl_805B3C80;
+extern const float lbl_805B3C84;
+
 struct Unk80073820_WBase {
     char pad0[0x20];
 };
@@ -131,7 +144,6 @@ void fn_80070E80(void)
     }
 }
 
-/* near-miss: 1 slot (stwx operand order, r30/r28 swapped). */
 Unk80070ED8_Mgr* fn_80070ED8(Unk80070ED8_Mgr* self)
 {
     self->mC = lbl_80649EF0;
@@ -140,7 +152,8 @@ Unk80070ED8_Mgr* fn_80070ED8(Unk80070ED8_Mgr* self)
     for (i = 0; i < 2; i++) {
         Unk80069F0C** a = self->m4;
         Unk80069F0C* s = (Unk80069F0C*)operator new(0x5C, 0);
-        a[i] = s->fn_80069F0C(self->m0);
+        int off = i * 4;
+        *(Unk80069F0C**)((char*)a + off) = s->fn_80069F0C(self->m0);
     }
     self->m0->mC->m0 = self->m4[0];
     return self;
@@ -312,6 +325,20 @@ int fn_80071814(W* w, int id)
             b = 0;
     }
     return b;
+}
+
+float fn_8007189C(W* w, int a, int id)
+{
+    return fn_800718F0(w, a, w->v28(a, id));
+}
+
+float fn_800718F0(W* w, int a, int val)
+{
+    float hi = (float)((Unk718F0_W*)w)->v18(a);
+    float lo = (float)((Unk718F0_W*)w)->v20(a);
+    float r = ((float)val - lo) / (hi - lo);
+    r = !(r > lbl_805B3C80) ? (r >? lbl_805B3C84) : lbl_805B3C80;
+    return r;
 }
 
 void fn_80071E2C(Unk80071604* self, int a, Unk80070DDC_Stream* io)

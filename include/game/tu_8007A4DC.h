@@ -67,6 +67,8 @@ struct Unk8052_Obj;
 
 int fn_80071814(W* w, int b);
 int fn_8007189C(W* w, int b);
+float fn_8007189C(W* w, int a, int id);
+float fn_800718F0(W* w, int a, int val);
 int fn_80071784(W* w, int b);
 
 struct Entry {
@@ -155,6 +157,9 @@ struct Unk8007A4DC_Screen {
     int fn_8007A270(int a);
     void fn_8007A2B4(int flags);
     void fn_8007A380();
+    float fn_8007A3FC(int a, int b);
+    float fn_8007A444(int a, int b);
+    float fn_8007A48C(int a, int b, int i);
     int fn_8007A4DC(int a);
     int fn_8007A500(int a);
     int fn_8007A524(int a, int b, int i);
