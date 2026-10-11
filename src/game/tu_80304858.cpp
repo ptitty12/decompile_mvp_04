@@ -139,6 +139,7 @@ void fn_80306394(Unk80304858_At8* p, int c)
     fn_80304388(p, c);
 }
 
+/* near-miss: retail keeps the loaded zero in r0 and stores it before li r0,1; ours loads into r11 (4 spellings tried) */
 void fn_803063C4()
 {
     if (lbl_8061F96C == 0) {
