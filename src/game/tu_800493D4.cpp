@@ -48,17 +48,14 @@ void fn_8004A8A4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     }
 }
 
-/* near-miss: with `char* b = (char*)s + 0x3C; int o = idx * 0x48;` after the
- * call only 2 slots differ (objdiff scores that lower, 90.9%, so this form stays):
- * retail emits `mr r29,r4` before `lwz r3,0xa9c(r30)`. sched2 ties them
- * (priority 10, class 3) and the load wins on dependents (4 vs 3). Tried
- * statement orders, unsigned idx/off, struct-array forms, `h = s->mA9C`. */
 void fn_8004A8F8(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     s->mA34 = 0;
     fn_80058FE4(s->mA9C, 0x39, a);
     s->mA90 = 1;
-    fn_80046078((Unk80044C10_B*)*(void**)((char*)s + 0x3C + idx * 0x48));
+    char* b = (char*)s + 0x3C;
+    int o = idx * 0x48;
+    fn_80046078(*(Unk80044C10_B**)(b + o));
 }
 
 void fn_8004AA40()
@@ -77,7 +74,6 @@ void fn_8004B534()
 {
 }
 
-/* near-miss: same callee-saved swap as fn_8004961C; 34 vs 35 insns */
 void fn_8004B538(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     s->m9DC = idx;
@@ -85,7 +81,7 @@ void fn_8004B538(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     int off = idx * 0x48;
     fn_801A6D84(*(Unk80044C10_A**)(base + off), 1);
     if (fn_8016B9F4() == 0) {
-        if (fn_8006BE18((*(Unk80044C10_A**)(base + off))->m44C->m6F8) == 0)
+        if (fn_8006BE18((*(Unk80044C10_B**)(base + off))->m6F8) == 0)
             fn_8004B5C0(s, idx, a);
         fn_80057B54(fn_800475EC()->mFC.mA9C, 0);
     }

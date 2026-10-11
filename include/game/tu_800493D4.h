@@ -39,8 +39,8 @@ struct Unk800493D4_Sm {
     char padABC[0x28];
 };
 
-void fn_80058FE4(void* sink, int msg);
-void fn_80058FE4(void* sink, int msg, Unk80044C10_A* a);
+int fn_80058FE4(void* sink, int msg); /* returns 1 (li r3,1 at 0x800596BC) */
+int fn_80058FE4(void* sink, int msg, Unk80044C10_A* a);
 void fn_8004FCDC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
 void fn_8004B910(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
 void fn_80011890();
