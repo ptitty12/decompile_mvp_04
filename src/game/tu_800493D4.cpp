@@ -7,11 +7,10 @@
  */
 #include "game/tu_800493D4.h"
 
-/* near-miss: callee-saved registers swapped (s/a in r31/r30 vs r30/r31) */
 void fn_8004961C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (a->m50 == 0) {
-        fn_80058FE4(s->mA9C, 8);
+        fn_80058FE4(s->mA9C, 8, a);
         fn_80058FE4(s->mA9C, 0x3F, a);
     }
 }
@@ -49,11 +48,15 @@ void fn_8004A8A4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     }
 }
 
-/* near-miss: retail forms the entry base in place (addi r30,r30,0x3c / lwzx); registers swapped */
-void fn_8004A8F8(Unk800493D4_Sm* s, int idx)
+/* near-miss: with `char* b = (char*)s + 0x3C; int o = idx * 0x48;` after the
+ * call only 2 slots differ (objdiff scores that lower, 90.9%, so this form stays):
+ * retail emits `mr r29,r4` before `lwz r3,0xa9c(r30)`. sched2 ties them
+ * (priority 10, class 3) and the load wins on dependents (4 vs 3). Tried
+ * statement orders, unsigned idx/off, struct-array forms, `h = s->mA9C`. */
+void fn_8004A8F8(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     s->mA34 = 0;
-    fn_80058FE4(s->mA9C, 0x39);
+    fn_80058FE4(s->mA9C, 0x39, a);
     s->mA90 = 1;
     fn_80046078((Unk80044C10_B*)*(void**)((char*)s + 0x3C + idx * 0x48));
 }
