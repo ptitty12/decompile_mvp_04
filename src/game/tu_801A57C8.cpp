@@ -39,6 +39,35 @@ int fn_80400E84();
 int fn_80400DA4();
 void fn_80107F74(int a, int b, int c);
 
+struct Unk801A57C8_Ob {
+    char pad0[0x1C];
+    int m1C;
+    char pad20[0x38 - 0x20];
+    int m38;
+};
+float fn_802D7E2C(int a, int b);
+void fn_801A81A4(Unk801A57C8_Ob* o);
+void fn_801A82A8(Unk801A57C8_Ob* o, int x);
+void fn_801A8198(char* p);
+
+/* Short string buffer (ctor 0x8035682C), copied into with fn_8040B830 and terminated at +0xF. */
+class Unk8035682C {
+public:
+    Unk8035682C();
+    char m0[0x10];
+};
+/* Singleton queue behind lbl_8061A32C (size 0xD8, ctor 0x800B64BC). */
+class Unk800B64BC {
+public:
+    Unk800B64BC();
+    char m0[0xD8];
+};
+void* operator new(unsigned int size, int heap);
+void fn_8040B830(void* dst, const char* src, int n);
+void fn_800B7B4C(Unk800B64BC* q, Unk8035682C* s, int n);
+extern Unk800B64BC* lbl_8061A32C;
+extern char lbl_805CEB0C[];
+
 struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
@@ -215,9 +244,35 @@ int fn_801A7B20(Unk8019F8C0_Owner** a, int* b)
     return 0;
 }
 
+/* near-miss: 32/32 insns; retail keeps the buffer pointer in r31 and the queue global's address in r30
+ * (mine swaps them), 9 slots differ. */
+void fn_801A7CBC()
+{
+    Unk8035682C buf;
+    Unk8035682C* s = &buf;
+    fn_8040B830(s, lbl_805CEB0C, 0xF);
+    s->m0[0xF] = 0;
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = new (0) Unk800B64BC;
+    }
+    fn_800B7B4C(lbl_8061A32C, s, 0);
+}
+
 void fn_801A8198(char* p)
 {
     *(int*)(p + 0x1C) = 0;
+}
+
+void fn_801A8224(Unk801A57C8_Ob* o, int x)
+{
+    int f = (int)fn_802D7E2C(x, 0x39) != 0 ? 1 : 0;
+    if (f != 0) {
+        fn_801A81A4(o);
+        fn_801A8198((char*)o);
+    }
+    if (o->m38 == 0) {
+        fn_801A82A8(o, x);
+    }
 }
 
 void fn_801A9584(Unk801A57C8_Timer* p)
