@@ -2301,7 +2301,9 @@ struct Unk800D3F0C_V : Unk800C7B40_Data {
 struct Unk800D3F0C_Obj : Unk800D3F0C_V {
     char* m40;
     int m44;
-    char pad48[0x20];
+    int m48;
+    char pad4C[0x18];
+    int m64;
     int m68;
     char pad6C[0x10];
     int m7C;
