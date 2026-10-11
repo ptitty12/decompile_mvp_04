@@ -91,13 +91,13 @@ extern const char lbl_8064C848[];
 struct Unk801418B4_Sub {      /* second base at +0x134: ctor fn_803785E4, vptr at +8 */
     int m0;
     int m4;
-    const void* m8;
 };
 struct Unk801418B4 : Unk800C7B40_Widget {
     char pad40[0xF0];
     int m130;
     Unk801418B4_Sub m134;
-    const void* m140;
+    const void* m13C;
+    int m140;
     char pad144[0x10];
     int m154;
     int m158;
@@ -206,38 +206,39 @@ extern "C" void fn_80142234(void* x)
 extern int lbl_8061B870;
 extern "C" int fn_80142410() { return lbl_8061B870; }
 
-/* near-miss: 73/74 insns; retail keeps the zero in r29 and &m134 in r30 (swapped here), and takes
- * &lbl_80687CC8 into a callee-saved register before the fn_8005B9B0 call. Tried local pointers. */
 extern "C" Unk801418B4* fn_8014241C(Unk801418B4* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
+    Unk801418B4_Sub* s = &self->m134;
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->m130 = 0;
     self->SetVptr(lbl_8065C4E0);
-    fn_803785E4(&self->m134);
-    self->m134.m8 = lbl_80649DB8;
-    self->m140 = lbl_8064C820;
+    fn_803785E4(s);
+    *(const void**)((char*)s + 8) = lbl_80649DB8;
+    self->m13C = lbl_8064C820;
     self->SetVptr(lbl_8064C848);
     lbl_8061B870 = (int)self;
     self->m158 = 0;
-    fn_80378A34(&self->m134, fn_8005ACE4());
+    fn_80378A34(s, fn_8005ACE4());
     if (lbl_8061B86C != 0) {
         int r = fn_8005B864(fn_8005ACE4());
         if (r != 0) {
+            Unk80687CC8* g = &lbl_80687CC8;
+            int ok = fn_8005B9B0(fn_8005ACE4(), r - 1);
             int t = 0;
-            if (fn_8005B9B0(fn_8005ACE4(), r - 1) != 0) {
+            if (ok != 0) {
                 t = 1;
             }
-            lbl_80687CC8.m4 = t;
+            g->m4 = t;
         } else {
             lbl_80687CCC = r;
         }
         fn_80143190(self, r);
         self->m154 = 0;
-        lbl_80687CC8.m18 = 1;
-        lbl_8061B86C = 0;
-        lbl_80687CC8.m14 = -1;
         lbl_80687CC8.m8 = 1;
         lbl_80687CC8.m10 = -1;
+        lbl_8061B86C = 0;
+        lbl_80687CC8.m14 = -1;
+        lbl_80687CC8.m18 = 1;
     }
     return self;
 }
