@@ -355,7 +355,7 @@ cflags_libgcc = ["-O2", "-G0"]
 # Game code (MVP Baseball 2005, EA Canada): ProDG 3.9.3. -G0: game .text never
 # uses r13 small-data addressing. C++: no RTTI (empty vtable RTTI slots) and no
 # exception tables in the binary. See docs/DECISIONS.md.
-cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
+cflags_game = ["-Os", "-G0", "-ffloat-store", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
 # EA shared libraries (ProDG 3.9.3). Provisional: -G0 is what the matched units
 # were verified with; W5 reported r13 small-data use in places, so confirm per unit.

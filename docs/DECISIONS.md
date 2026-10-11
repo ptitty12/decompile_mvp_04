@@ -31,6 +31,7 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
   - no EH: no exception tables in the binary.
 
   EA shared libraries do use r13 small data, so their flags differ (TBD). | 19 functions at 100% in `animation/choosers/playeridchooser.cpp` | commit `6ea98bd`
+- 2026-10-10 | **Flags: game code += `-ffloat-store`.** Float locals live in stack slots with a store/reload after every assignment (e.g. fn_8026D504, fn_802721E0, fn_802726BC), which is what `-ffloat-store` produces; mitsevox/mvp2005 also measured it for game code. Adding it changes none of the 44 chooser functions (43/44 match with and without it). Applies to the whole `game` lib. | 43/44 chooser functions unchanged | this commit
 - 2026-10-10 | **Flags: Dolphin SDK OS (first datapoint)** = MWCC GC/1.2.5n, template base flags + `-char unsigned -opt nopeephole`. Other SDK libraries (built Apr 5 rather than May 21) may differ; confirm per library. | `OSRegisterVersion` at 100% | `dolphin/os/OS.c`
 - 2026-10-10 | **The three Phase 1 probe functions are committed as the first matches.** | They're public-source functions (GCC `libgcc2.c`; Dolphin SDK). | owner approval
 - 2026-10-10 | **Verifier + CI installed** from `proposed/`. CLAUDE.md's "verification tooling" means `tools/verify/**`, `.github/workflows/**` and the files listed in `tools/verify/protected.sha256`. | owner approval of the staged files | `tools/verify/`
