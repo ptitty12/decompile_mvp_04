@@ -63,6 +63,9 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-11 | **Original source paths via `#line`** *[lead, owner authority]*: a unit whose retail strings contain its own `__FILE__` (assert/RNG paths like `C:/mvp2004/source/common/animation/choosers/randomchooser.cpp`) starts with `#line 1 "<that path>"`, so `__FILE__` expands to the original bytes. Standard C preprocessor, not a pragma; changes no code. | Our build path differs from the original build machine's. | playeridchooser/randomchooser/randomloadedchooser: strings now equal retail, matches unchanged
 
+- 2026-10-11 | **Early game TUs (0x800034A0..0x8000F598) use the game flags** *[lead, owner authority]*: -Os (a factory loop only matches at -Os; -O1/-O2 fail), -G0 (without it a global loads via r13), -ffloat-store (float-parameter spills). Evidence table in the tu_80008540 merge (031d2d6). | Confirms cflags_game for real standalone TUs, not only the unity TU. | W12 report
+- 2026-10-11 | **Known linking issue for real TUs (not blocking matching):** ProDG g++ emits implicit dtors and vtables into .gnu.linkonce.* sections; retail keeps those dtors in the TU's .text (in reverse order) and vtables in its data. `-fno-weak` moves them into .text/.rodata but in a different order. To be solved before the early TUs can link (candidate: link-order/ldscript handling of linkonce sections, which is a protected file). | Recorded so linking work starts from it. | W12 report on tu_80008540
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
