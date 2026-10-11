@@ -454,9 +454,9 @@ void fn_8014887C(void* self, VT18D* e, int unused, int* flag)
 
 int fn_80148930(Unk20Pair* p)
 {
-    lbl_8061B8F4 = 0;
     lbl_8061B8F0 = 0;
     lbl_8061B8C4 = 0;
+    lbl_8061B8F4 = 0;
     fn_8033E958(lbl_805C4D84);
     if (!lbl_8061A32C) {
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
@@ -483,13 +483,13 @@ int fn_80148930(Unk20Pair* p)
 
 void fn_80148A40(void* p)
 {
-    lbl_8061B918 = lbl_805C4DA8;
     lbl_8061B904 = lbl_805C4DA8;
-    lbl_8061B914 = 0;
-    lbl_8061B910 = 0;
     lbl_8061B908 = lbl_805C4DA8;
-    lbl_8061B91C = 1;
     lbl_8061B90C = 0;
+    lbl_8061B910 = 0;
+    lbl_8061B918 = lbl_805C4DA8;
+    lbl_8061B91C = 1;
+    lbl_8061B914 = 0;
     fn_80148580();
     lbl_80616504 = 7;
 }

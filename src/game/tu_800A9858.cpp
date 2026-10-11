@@ -310,8 +310,8 @@ extern "C" void fn_800AA2FC(UnkFEA* s, int a, int b, int c)
 void fn_800AA42C()
 {
     for (int i = 0; i < 12; i++) {
-        lbl_80619CD0[i] = 0;
         lbl_80619CA0[i] = 0;
+        lbl_80619CD0[i] = 0;
     }
     lbl_80619D00 = -1;
 }

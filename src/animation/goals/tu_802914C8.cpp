@@ -303,7 +303,7 @@ inline Vec3 Diff10(Unk802914C8_Goal* g, const Vec3& p)
 float Unk802914C8_Goal::fn_802966DC(Unk80270BA0_X* x)
 {
     Unk802914C8_X* v = (Unk802914C8_X*)x;
-    float r = 0.7853982f;
+    float r = 0.78539824f;
     if (fn_8027B2CC(x)) {
         r = 2.3561947f;
         return r;

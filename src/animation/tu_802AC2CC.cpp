@@ -16,38 +16,25 @@
  * defined out of line, in retail .text order. Retail emits them as deferred
  * inline functions; the code is the same.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 /* ---- Event classes (vtable 0x806850A0 and its derived classes) ----
- * Root of the events: dtor 0x8037B424 (vptr 0x806849D0, deleting part). The
- * mid class has an inline dtor (vptr store 0x806850A0, then the root dtor with
- * the in-charge argument passed on); every derived class's dtor expands it, so
- * each of them is a separate copy of the same code (0x802AC2D8 and its
- * siblings). Evidence: fn_8038B7E4 (the mid class's own dtor, vtable slot 1 of
- * 0x806850A0) has the same body.
+ * Root of the events: Unk8037B3E8 in game/chooser.h (dtor 0x8037B424, vptr
+ * 0x806849D0, deleting part). The mid class has an inline dtor (vptr store
+ * 0x806850A0, then the root dtor with the in-charge argument passed on); every
+ * derived class's dtor expands it, so each of them is a separate copy of the
+ * same code (0x802AC2D8 and its siblings). Evidence: fn_8038B7E4 (the mid
+ * class's own dtor, vtable slot 1 of 0x806850A0) has the same body.
  * Each derived class adds a virtual at vtable slot 14 (an event type id). */
-class Unk8037B424 {
+class Unk8038B7E4 : public Unk8037B3E8 {
 public:
-    virtual ~Unk8037B424();
-    virtual void fn_vslot2();
-    virtual const char* fn_vslot3();
-    virtual int fn_vslot4();
-    virtual Unk8037B424* fn_vslot5();
-    virtual void fn_vslot6();
-    virtual void fn_vslot7();
-    virtual void fn_vslot8();
-    virtual void fn_vslot9();
-    virtual int fn_vslot10();
-};
-
-class Unk8038B7E4 : public Unk8037B424 {
-public:
+    Unk8038B7E4();                      /* not used here; lets the event classes omit ctors */
     virtual ~Unk8038B7E4() {}
     virtual void fn_vslot2();
     virtual const char* fn_vslot3() = 0;
     virtual int fn_vslot4() = 0;
-    virtual Unk8037B424* fn_vslot5() = 0;
-    virtual int fn_vslot10();
+    virtual Unk8037B3E8* fn_vslot5() = 0;
+    virtual void fn_vslot10();          /* 0x8038B820 returns 1; void as in chooser.h's root */
     virtual void fn_vslot11() = 0;
     virtual void fn_vslot12();
     virtual int fn_vslot13();
@@ -521,7 +508,7 @@ const char* cCollisionSyncPoint::fn_802AC7DC()
     return lbl_805DC07C;
 }
 
-/* ---- Chooser classes (root: Unk8037B3E8 in game/chooser.h) ---- */
+/* ---- Chooser classes (base: Unk80362C2C in game/chooser.h) ---- */
 extern const char* lbl_8061E640;   /* "cMatrixChooser" */
 extern const char* lbl_8061E644;   /* "cRandom" */
 extern const char* lbl_8061E648;   /* "ICommonPlayerID" */
@@ -559,7 +546,7 @@ public:
 };
 
 
-class cMatrixChooser : public Unk8037B3E8 {
+class cMatrixChooser : public Unk80362C2C {
 public:
     cMatrixChooser();
     virtual void fn_vslot2();
@@ -572,7 +559,7 @@ public:
     Unk8026DDE8 mC;
 };
 
-class cRandom : public Unk8037B3E8 {
+class cRandom : public Unk80362C2C {
 public:
     cRandom();
     virtual void fn_vslot2();
@@ -582,7 +569,7 @@ public:
     virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class ICommonPlayerID : public Unk8037B3E8 {
+class ICommonPlayerID : public Unk80362C2C {
 public:
     ICommonPlayerID();
     virtual void fn_vslot2();
@@ -592,7 +579,7 @@ public:
     virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class cSignatureChooser : public Unk8037B3E8 {
+class cSignatureChooser : public Unk80362C2C {
 public:
     cSignatureChooser();
     virtual void fn_vslot2();
@@ -605,7 +592,7 @@ public:
     Unk8027130C m8;
 };
 
-class cEventChooser : public Unk8037B3E8 {
+class cEventChooser : public Unk80362C2C {
 public:
     cEventChooser();
     virtual void fn_vslot2();
@@ -615,7 +602,7 @@ public:
     virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class cHandChooser : public Unk8037B3E8 {
+class cHandChooser : public Unk80362C2C {
 public:
     cHandChooser();
     virtual void fn_vslot2();
@@ -628,7 +615,7 @@ public:
     Unk80384F28 m8;
 };
 
-class cPitchChooser : public Unk8037B3E8 {
+class cPitchChooser : public Unk80362C2C {
 public:
     cPitchChooser();
     virtual void fn_vslot2();
@@ -638,7 +625,7 @@ public:
     virtual int fn_vslot14(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class cCircleChooser : public Unk8037B3E8 {
+class cCircleChooser : public Unk80362C2C {
 public:
     cCircleChooser();
     virtual void fn_vslot2();
@@ -651,7 +638,7 @@ public:
     Unk80271F14 mC;
 };
 
-class cLinearChooser : public Unk8037B3E8 {
+class cLinearChooser : public Unk80362C2C {
 public:
     cLinearChooser();
     virtual void fn_vslot2();
@@ -664,7 +651,7 @@ public:
     Unk80272B20 mC;
 };
 
-class cFitnessChooser : public Unk8037B3E8 {
+class cFitnessChooser : public Unk80362C2C {
 public:
     cFitnessChooser();
     virtual void fn_vslot2();
@@ -674,7 +661,7 @@ public:
     virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class cRandomLoaded : public Unk8037B3E8 {
+class cRandomLoaded : public Unk80362C2C {
 public:
     cRandomLoaded();
     virtual void fn_vslot2();
@@ -684,7 +671,7 @@ public:
     virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
 };
 
-class cShortestPathChooser : public Unk8037B3E8 {
+class cShortestPathChooser : public Unk80362C2C {
 public:
     cShortestPathChooser();
     virtual void fn_vslot2();

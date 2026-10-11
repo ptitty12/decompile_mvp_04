@@ -215,15 +215,23 @@ public:
     char pad14[0x10];
 };
 
+/* Base of the choosers (dtor 0x80362C2C, out of line; see game/chooser.h). The
+ * inline chooser dtors below end in a call to it. */
+class Unk80362C2C : public Unk8037B3E8 {
+public:
+    Unk80362C2C(unsigned int hash) : Unk8037B3E8(hash) {}
+    virtual ~Unk80362C2C();
+};
+
 /* Choosers (the real declarations are in animation/choosers/*.cpp). */
-class cEventChooser : public Unk8037B3E8 {
+class cEventChooser : public Unk80362C2C {
 public:
     cEventChooser();
     virtual ~cEventChooser();
     int m4;
     Unk80384F28 m8;
 };
-class cHandChooser : public Unk8037B3E8 {
+class cHandChooser : public Unk80362C2C {
 public:
     cHandChooser();
     virtual ~cHandChooser();
@@ -233,7 +241,7 @@ public:
 
 /* Matrix chooser helper (dtor 0x8026DE5C, size 0x48). */
 class Unk8026DDE8 { public: Unk8026DDE8(); ~Unk8026DDE8(); char pad0[0x48]; };
-class cMatrixChooser : public Unk8037B3E8 {
+class cMatrixChooser : public Unk80362C2C {
 public:
     cMatrixChooser();
     virtual ~cMatrixChooser() {}
@@ -246,32 +254,32 @@ public:
     int m5C;
 };
 
-class cPitchChooser : public Unk8037B3E8 {
+class cPitchChooser : public Unk80362C2C {
 public:
     cPitchChooser();
     virtual ~cPitchChooser();
     int m4;
     Unk80384F28 m8;
 };
-class ICommonPlayerID : public Unk8037B3E8 {
+class ICommonPlayerID : public Unk80362C2C {
 public:
     ICommonPlayerID();
     virtual ~ICommonPlayerID();
     char pad4[0x1C];
 };
-class cSignatureChooser : public Unk8037B3E8 {
+class cSignatureChooser : public Unk80362C2C {
 public:
     cSignatureChooser();
     virtual ~cSignatureChooser();
     char pad4[0x20];
 };
-class cRandom : public Unk8037B3E8 {
+class cRandom : public Unk80362C2C {
 public:
     cRandom();
     virtual ~cRandom();
     char pad4[0x18];
 };
-class cRandomLoaded : public Unk8037B3E8 {
+class cRandomLoaded : public Unk80362C2C {
 public:
     cRandomLoaded();
     virtual ~cRandomLoaded();
@@ -281,7 +289,7 @@ public:
 /* Linear chooser helper (size 0x1C) and circle chooser helper (size 0x30). */
 class Unk80272B20 { public: Unk80272B20(); ~Unk80272B20(); char pad0[0x1C]; };
 class Unk80271F14 { public: Unk80271F14(); ~Unk80271F14(); char pad0[0x30]; };
-class cLinearChooser : public Unk8037B3E8 {
+class cLinearChooser : public Unk80362C2C {
 public:
     cLinearChooser();
     virtual ~cLinearChooser() {}
@@ -290,7 +298,7 @@ public:
     int m8;
     Unk80272B20 mC;
 };
-class cCircleChooser : public Unk8037B3E8 {
+class cCircleChooser : public Unk80362C2C {
 public:
     cCircleChooser();
     virtual ~cCircleChooser() {}
@@ -299,7 +307,7 @@ public:
     int m8;
     Unk80271F14 mC;
 };
-class cShortestPathChooser : public Unk8037B3E8 {
+class cShortestPathChooser : public Unk80362C2C {
 public:
     cShortestPathChooser();
     virtual ~cShortestPathChooser() {}
