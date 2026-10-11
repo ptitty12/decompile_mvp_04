@@ -9,6 +9,9 @@ typedef Unk8010E0F4_Scr UnkScrA;
 typedef Unk80114A20_Scr Scr;
 
 extern const char lbl_805BE138[];
+extern const char lbl_8065C4E0[];
+extern const char lbl_80650610[];
+extern const char lbl_80650628[];
 extern const float lbl_805BFAE8;
 Unk8001BC8C* fn_8001BC4C();
 extern const char lbl_805BA6D8[];
@@ -26,6 +29,7 @@ void fn_80114664(UnkScrA* self, int b);
 void fn_801147E4(int a, UnkScrA* b);
 void fn_80114840(int a, UnkScrA* b);
 void fn_80114A00(UnkScrA* self);
+void* fn_80114A20(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_80114D14(Scr* self, int a);
 void fn_80114E7C(int a, Scr* b);
 void fn_80114F2C(Scr* self);
@@ -42,6 +46,8 @@ int fn_80115924(Scr* self, int a);
 // PROTOS-END
 extern "C" {
 void fn_800ED310(UnkScrA* self);
+void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_80134E38(void* p, int a);
 void fn_800ECAA4(UnkScrA* self);
 void fn_800ED254(Scr* self);
 void fn_8011489C(UnkScrA* self);
@@ -165,6 +171,27 @@ void fn_80114A00(UnkScrA* self)
 }
 
 /* near-miss: clone of fn_8010FE70, same argument-order difference. */
+
+void* fn_80114A20(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m130 = 0;
+    self->SetVptr(lbl_8065C4E0);
+    fn_80134E38(self->m134, 0);
+    self->m17C = lbl_80650610;
+    self->SetVptr(lbl_80650628);
+    self->m198 = 0;
+    self->m19C = 0;
+    self->m1A8 = 0;
+    self->m1AC = 0;
+    self->m1B0 = 0;
+    self->m1B4 = 0;
+    self->m1B8 = 0;
+    self->m1BC[0] = 0;
+    self->m1A4 = 0;
+    self->m1A0 = 0;
+    return self;
+}
 
 int fn_80114D14(Scr* self, int a)
 {
