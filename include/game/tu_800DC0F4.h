@@ -57,4 +57,27 @@ int fn_800DE930(int i);
 int fn_800DE980(int i, int id);
 int fn_80403DE4(char* dst, const char* fmt, ...);
 extern char lbl_805BA46C[];
+struct Udd344_T {
+    unsigned char m0;
+    unsigned char m1;
+};
+int fn_80403144(void* dst, const char* src);
+void fn_800DBC50(Unk800DB840_Slot* o, int a, int idx, int b, int c);
+int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b);
+const char* fn_800E5F38(int x);
+void fn_800DE6A8(int a0, char* a, char* b, int fl, int v, char* c);
+void fn_802542E8(char* sub, int a, char* out);
+int fn_8040B320(char* dst, int a, int n, ...);
+char* fn_8040B61C(char* dst, const char* src);
+void fn_8008D738(char* p, int a, unsigned r, char* out);
+struct UdE274_T {
+    char pad0[0x384];
+    unsigned m384;
+    char pad388[0x704 - 0x388];
+    int m704;
+};
+struct UdE354_T {
+    char pad0[0x14];
+    char* m14;
+};
 #endif

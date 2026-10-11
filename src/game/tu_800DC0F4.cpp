@@ -78,6 +78,26 @@ void fn_800DD140(UiS* self)
     self->v10((480 - h) / 2);
 }
 
+void fn_800DD344(Udd344_T* t, void* dst)
+{
+    unsigned char h = t->m0;
+    int am = 1;
+    unsigned char hh;
+    if (h > 11) {
+        am = 0;
+        hh = h % 12;
+    } else
+        hh = h;
+    if (hh == 0)
+        hh = 12;
+    char buf[0x18];
+    if (am != 0)
+        fn_80403DE4(buf, (const char*)fn_80090880(lbl_8061977C, 0x2332), hh, t->m1, fn_80090880(lbl_8061977C, 0x1A7C));
+    else
+        fn_80403DE4(buf, (const char*)fn_80090880(lbl_8061977C, 0x2332), hh, t->m1, fn_80090880(lbl_8061977C, 0x1A7B));
+    fn_80403144(dst, buf);
+}
+
 int fn_800DD5E8(int i)
 {
     return lbl_805C2EB4[i];
@@ -144,6 +164,63 @@ char* fn_800DE1C4(char* dst, int x)
     return dst;
 }
 
+/* near-miss: argument setup order only (2-4 slots) */
+extern "C" void fn_800DE274(int a0, UdE274_T* x, int a2)
+{
+    char* sub = (char*)x + 0x588;
+    char b8[0x18];
+    char b20[0x18];
+    char b38[0x20];
+    fn_802542E8(sub, 0, b20);
+    fn_802542E8(sub, 1, b8);
+    fn_8040B320(b38, 0, 0x20);
+    if (a2 & 0x10) {
+        Unk800DB840_Slot* o = 0;
+        int s = 5;
+        int p = x->m704;
+        fn_800DC3D8((int*)&o, &s, p);
+        fn_8040B61C(b38, fn_800E5F38(fn_800DBAE0(o, 5, s, p)));
+    }
+    fn_800DE6A8(a0, b20, b8, a2, x->m384 >> 25, b38);
+}
+
+/* near-miss: retail caches the other output buffer address in a callee-saved register */
+void fn_800DE354(int a0, UdE354_T* o, int idx, int b, int fl)
+{
+    char* e = o->m14 + idx * 0xE64;
+    char* sub = e + 0xC9C;
+    unsigned char r = fn_800968C0(e, b, 1);
+    char b8[0x18];
+    char b20[0x18];
+    char b38[0x20];
+    fn_8008D738(sub, 0, r, b20);
+    fn_8008D738(sub, 1, r, b8);
+    int v = fn_8008CFD8(sub, 4, r);
+    fn_8040B320(b38, 0, 0x20);
+    if (fl & 0x10) {
+        fn_8040B61C(b38, fn_800E5F38(fn_8008CFD8(sub, 5, r)));
+    }
+    fn_800DE6A8(a0, b20, b8, fl, v, b38);
+}
+
+/* near-miss: the two reloads of sp58/sp5C swap order (4 slots) */
+extern "C" void fn_800DE440(int a0, int a1, int a2)
+{
+    Unk800DB840_Slot* o = 0;
+    int s = 5;
+    char b8[0x18];
+    char b20[0x18];
+    char b38[0x20];
+    fn_800DC3D8((int*)&o, &s, a1);
+    fn_800DBC50(o, 0, s, a1, (int)b8);
+    fn_800DBC50(o, 1, s, a1, (int)b20);
+    fn_8040B320(b38, 0, 0x20);
+    if (a2 & 0x10) {
+        fn_8040B61C(b38, fn_800E5F38(fn_800DBAE0(o, 5, s, a1)));
+    }
+    fn_800DE6A8(a0, b8, b20, a2, fn_800DBAE0(o, 4, s, a1), b38);
+}
+
 int fn_800DE930(int i)
 {
     Unk800DE930_T loc = lbl_805BD9BC;
@@ -198,8 +275,6 @@ float fn_800DEE38(int i, int b)
     return r;
 }
 
-/* near-miss: retail keeps a redundant second test of the first byte (cmpwi r0,0; beqlr) that
- * the compiler removes here */
 char* fn_800DF034(char* s)
 {
     if (s[0] == '0') {
