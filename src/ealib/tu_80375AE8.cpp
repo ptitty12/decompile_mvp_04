@@ -2,6 +2,12 @@
  * EA library TU, .text 0x80375AE8-0x80376598 (static-init anchored; issue #75).
  * Registers one static node (5 words, intrusive list, ctor 0x803DA440) whose
  * arguments are a creator function and three data tables.
+ *
+ * Compiler flags: the two functions below only reproduce retail's loop
+ * hoisting, scheduling and register choices at -O2; at the configured -Os they
+ * do not (see the notes above each function). GXWGFifo (0xCC008000) is an
+ * extern symbol: retail has lis 0xcc01 / -0x8000(rX) for it, which gcc 2.95
+ * only produces for a symbol reference (a literal address gives lis/ori).
  */
 
 class Unk803DA440 {
@@ -10,9 +16,364 @@ public:
     int m[5];
 };
 
-extern "C" void fn_803761EC(void);
+union PPCWGPipe {
+    unsigned char u8;
+    unsigned short u16;
+    unsigned int u32;
+    float f32;
+};
+extern volatile PPCWGPipe GXWGFifo;
+
+struct GXColor {
+    unsigned char r, g, b, a;
+};
+
+struct Unk80373AD8Param {
+    void* m0;
+    void* m4;
+};
+
+struct Unk80373AD8Mtx {
+    float f[16];
+};
+
+/*
+ * Object built by fn_803E3C08 (x, -1). Offsets seen in fn_803761EC (stack
+ * object, 0xC0 bytes) and fn_80375AE8.
+ */
+struct Unk803E3C08 {
+    Unk80373AD8Param* m0;
+    unsigned char* m4;
+    int* m8;
+    int pad0C;
+    int* m10;
+    int* m14;
+    int m18;
+    int* m1C;
+    int* m20;
+    unsigned char* m24;
+    void* m28;
+    int m2C;
+    int m30[8];
+    int m50[24];
+    int mB0;
+    int mB4;
+    int mB8;
+    int mBC;
+};
+
+struct Unk80623E94 {
+    int m0;
+    void* m4;
+    int m8;
+    int pad0C[10];
+    int m34;
+    int pad38[3];
+    int m44;
+    int pad48;
+    int m4C;
+    int pad50[7];
+    int m6C;
+    int m70;
+};
+
+extern unsigned char* lbl_8062C660;
+extern int lbl_8062C664;
+
+struct Unk803DBE08Out {
+    int m0;
+    int pad[7];
+    inline Unk803DBE08Out(void* state);
+    inline void Begin(int n);
+    inline void StoreHdr(int per);
+};
+
+extern "C" {
+void fn_803DFBAC(Unk80373AD8Mtx* in, Unk80373AD8Mtx* out);
+void fn_804302C4(Unk80373AD8Mtx* m, int id);
+void fn_80430364(int id);
+void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void fn_8042DC44(int n);
+void fn_803DD794(void* tex);
+void fn_80431318(Unk80373AD8Mtx* m, float x, float y, float z);
+void fn_80430398(Unk80373AD8Mtx* m, int id, int type);
+void fn_803DDB88(int a, int b, int c, int d, int e, int f);
+void fn_803DB5A0(void* state);
+void fn_803DB9C0(int a, int b);
+void fn_803DDCD4(void);
+void fn_80430124(void* list, int nbytes);
+void fn_803DBE08(void* state, Unk803DBE08Out* out);
+void fn_80433004(void* p, int n);
+void fn_8042C8B0(int a, int b, int c);
+void fn_803DA188(int n);
+void fn_803DDBF0(void);
+void fn_803DDE7C(void);
+void fn_8042DA74(int chan, GXColor c);
+void fn_8042DB5C(int chan, GXColor c);
+void fn_8042B460(void);
+void fn_8042AB48(int attr, int type);
+void fn_803DBF78(int a, int b, int c, int d, int e);
+void fn_803DDB5C(int n);
+void fn_803DA468(int attr, void* base, int stride);
+void fn_803E3C08(Unk803E3C08* self, void* x, int n);
+}
+
+extern void (*lbl_806279C8)(void);
+extern int lbl_80627290;
 extern char lbl_80624088[];
 extern char lbl_806240AC[];
 extern char lbl_806052F4[];
+extern int lbl_806240CC;
+extern char lbl_806240D0[];
+extern Unk80623E94 lbl_806240D4;
+extern int lbl_80624108;
+extern int lbl_80624118;
+extern int lbl_80624120;
+extern int lbl_806EFBE8;
+extern int lbl_806EFBEC;
+extern int lbl_806EFBF0;
+extern int lbl_806EFBF4;
+extern int lbl_806EFBF8;
 
-Unk803DA440 lbl_80693E64(fn_803761EC, lbl_80624088, lbl_806240AC, lbl_806052F4);
+inline Unk803DBE08Out::Unk803DBE08Out(void* state)
+{
+    fn_803DBE08(state, this);
+}
+
+inline void Unk803DBE08Out::StoreHdr(int per)
+{
+    *lbl_8062C660 = (unsigned char)m0;
+    *(unsigned short*)(lbl_8062C660 + 1) = per;
+}
+
+inline void Unk803DBE08Out::Begin(int n)
+{
+    fn_8042C8B0(0x90, 0, 0);
+    GXWGFifo.u8 = (unsigned char)m0;
+    GXWGFifo.u16 = n;
+}
+
+/*
+ * near-miss: at -O2 the instruction sequence is identical to retail except
+ * that retail keeps &v (the Unk803DBE08Out on the stack) in two registers
+ * (addi r31,r1,72; mr r4,r31; mr r22,r31, then lbz 3(r31) / lbz 3(r22)) while
+ * this version folds it to sp-relative addressing (addi r4,r1,72; lbz 75(r1)).
+ * That one difference shifts every callee-saved register after the call.
+ * Tried: ctor + inline members (this), inline Init() returning the pointer,
+ * explicit pointer locals, Setup() method, object at function scope.
+ */
+extern "C" void fn_80375AE8(Unk803E3C08* a, Unk80623E94* b)
+{
+    Unk80373AD8Mtx mtx;
+    if (a->mB0) {
+        b->m4 = a->m0[7].m4;
+        mtx = *(Unk80373AD8Mtx*)a->m0[1].m4;
+        fn_803DFBAC(&mtx, &mtx);
+        fn_804302C4(&mtx, 0);
+        fn_80430364(0);
+        if (b->m70) {
+            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
+            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+        } else {
+            fn_8042DC44(1);
+            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
+            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+        }
+        lbl_806279C8 = fn_803DDBF0;
+    }
+    if (a->m30[0]) {
+        fn_803DD794(a->m0[5].m4);
+    }
+    float* uv = (float*)a->m0[6].m4;
+    fn_80431318(&mtx, uv[0], uv[1], 0.0f);
+    fn_80430398(&mtx, 0x1e, 1);
+    fn_803DDB88(0, 1, 4, 0x1e, 0, 0x7d);
+    fn_803DB5A0(b->m4);
+    if (b->m6C == 0) {
+        fn_803DB9C0(b->m8, 3);
+    }
+    fn_803DDCD4();
+    if (a->mBC == 0) {
+        void* dl = a->m28;
+        int dlsz = a->m2C;
+        if (a->mB8) {
+            GXWGFifo.u8 = 0x40;
+            GXWGFifo.u32 = (unsigned int)dl;
+            GXWGFifo.u32 = dlsz;
+        } else {
+            fn_80430124(dl, dlsz);
+        }
+    } else {
+        Unk803DBE08Out v(b->m4);
+        int n = *(int*)a->m0[0].m4;
+        if (lbl_8062C660) {
+            int per = (lbl_8062C664 - 3) / b->m0 / 12 * 12;
+            fn_803DB9C0(b->m8, 2);
+            if (*(int*)lbl_8062C660 == -1) {
+                v.StoreHdr(per);
+                unsigned char* p = lbl_8062C660 + 3;
+                unsigned char i = 0;
+                while (i < per) {
+                    int next = i + 1;
+                    for (int j = 0; j < b->m0; j++) {
+                        *p++ = i;
+                    }
+                    i = next;
+                }
+                for (; p < lbl_8062C660 + lbl_8062C664; p++) {
+                    *p = 0;
+                }
+                fn_80433004(lbl_8062C660, lbl_8062C664);
+            }
+            int sz = (per * b->m0 + 0x22) / 32 * 32;
+            int first = 0;
+            while (n >= per) {
+                if (first) {
+                    GXWGFifo.u8 = 0x40;
+                    GXWGFifo.u32 = (unsigned int)lbl_8062C660;
+                    GXWGFifo.u32 = sz;
+                } else {
+                    first = 1;
+                    fn_80430124(lbl_8062C660, sz);
+                }
+                int chunk = per;
+                if (v.m0 == 0x98) {
+                    chunk = per - 2;
+                }
+                fn_803DA188(chunk);
+                n -= chunk;
+            }
+            v.Begin(n);
+            if (b->m0 == 4) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u32 = i | (i << 8) | (i << 16) | (i << 24);
+                }
+            } else if (b->m0 == 3) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u16 = i | (i << 8);
+                    GXWGFifo.u8 = i;
+                }
+            } else if (b->m0 == 2) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u16 = i | (i << 8);
+                }
+            } else if (b->m0 == 1) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u8 = i;
+                }
+            } else {
+                for (unsigned i = 0; i < n; i++) {
+                    for (int j = 0; j < b->m0; j++) {
+                        GXWGFifo.u8 = i;
+                    }
+                }
+            }
+            n = n * b->m0 + 3;
+            while (n & 0x1f) {
+                n++;
+                GXWGFifo.u8 = 0;
+            }
+        } else {
+            v.Begin(n);
+            if (b->m0 == 4) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u32 = i | (i << 16);
+                    GXWGFifo.u32 = i | (i << 16);
+                }
+            } else if (b->m0 == 3) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u32 = i | (i << 16);
+                    GXWGFifo.u16 = i;
+                }
+            } else if (b->m0 == 2) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u32 = i | (i << 16);
+                }
+            } else if (b->m0 == 1) {
+                for (unsigned i = 0; i < n; i++) {
+                    GXWGFifo.u16 = i;
+                }
+            } else {
+                for (unsigned i = 0; i < n; i++) {
+                    for (int j = 0; j < b->m0; j++) {
+                        GXWGFifo.u16 = i;
+                    }
+                }
+            }
+            n = (n + n) * b->m0 + 3;
+            while (n & 0x1f) {
+                n++;
+                GXWGFifo.u8 = 0;
+            }
+        }
+    }
+}
+
+/* Matches retail at -O2 (diff_unit equivalent); at -Os it does not. */
+extern "C" void fn_803761EC(void* x)
+{
+    Unk803E3C08 a;
+    a.m8 = &lbl_806EFBE8;
+    a.m24 = (unsigned char*)lbl_806240D0;
+    a.m18 = lbl_806240CC;
+    a.m14 = &lbl_806EFBEC;
+    a.m10 = &lbl_806EFBF0;
+    a.m1C = &lbl_806EFBF4;
+    a.m20 = &lbl_806EFBF8;
+    fn_803E3C08(&a, x, -1);
+    if (a.mB0) {
+        GXColor c = { 0xff, 0xff, 0xff, 0xff };
+        fn_8042DA74(4, c);
+        fn_8042DB5C(4, c);
+        fn_803DDE7C();
+        fn_803DDBF0();
+    }
+    if (a.mB4 != 0 || a.m50[10] != lbl_806240D4.m34 || a.m50[14] != lbl_806240D4.m44
+        || a.m50[16] != lbl_806240D4.m4C) {
+        a.mB8 = 0;
+        fn_8042B460();
+        lbl_80624108 = a.m50[10];
+        if (lbl_80624108) {
+            fn_8042AB48(9, 2);
+        } else {
+            fn_8042AB48(9, 3);
+        }
+        lbl_80624118 = a.m50[14];
+        if (lbl_80624118) {
+            fn_8042AB48(0xb, 2);
+        } else {
+            fn_8042AB48(0xb, 3);
+        }
+        lbl_80624120 = a.m50[16];
+        if (lbl_80624120) {
+            fn_8042AB48(0xd, 2);
+        } else {
+            fn_8042AB48(0xd, 3);
+        }
+    }
+    if (a.mB4) {
+        fn_803DBF78(0, 9, 1, 4, 0);
+        fn_803DBF78(0, 0xb, 1, 5, 0);
+        fn_803DBF78(0, 0xd, 1, 4, 0);
+        fn_803DDB88(0, 1, 4, 0x3c, 0, 0x7d);
+        fn_803DDB5C(1);
+        fn_8042DC44(1);
+        lbl_806240D4.m0 = 3;
+        lbl_806240D4.m8 = 0x5200;
+        lbl_806240D4.m6C = 1;
+        fn_803DB9C0(0x5200, -1);
+        lbl_806240D4.m70 = 1;
+    }
+    fn_803DA468(9, a.m0[2].m4, 0xc);
+    fn_803DA468(0xb, a.m0[3].m4, 4);
+    fn_803DA468(0xd, a.m0[4].m4, 8);
+    fn_80375AE8(&a, &lbl_806240D4);
+    if (a.m4) {
+        while (a.m4[0] == 2) {
+            a.m0[a.m4[1]].m4 = (void*)((int)a.m0[a.m4[1]].m4 - *(int*)(a.m4 + 2) * lbl_80627290);
+            a.m4 += 6;
+        }
+    }
+}
+
+Unk803DA440 lbl_80693E64((void (*)())fn_803761EC, lbl_80624088, lbl_806240AC, lbl_806052F4);
