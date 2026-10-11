@@ -197,6 +197,9 @@ animation/events/tu_802A79BC.cpp:
 animation/events/tu_802A89C8.cpp:
 	.text       start:0x802A89C8 end:0x802A9A04
 
+animation/tu_802A9A04.cpp:
+	.text       start:0x802A9A04 end:0x802AA7A4
+
 ealib/tu_803663B0.cpp:
 	.text       start:0x803663B0 end:0x803666EC
 	.ctors      start:0x805A2C48 end:0x805A2C4C
