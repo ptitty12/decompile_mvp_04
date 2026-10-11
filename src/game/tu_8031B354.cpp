@@ -73,6 +73,7 @@ void fn_8031B880(FxE* self);
 void fn_8031B8E4(FxE* self);
 void fn_8031B93C(FxE* self, int a);
 void fn_8031BE94();
+int fn_8031BE98(FxD* self, char** out);
 void fn_8031BF58(FxD* self, int i);
 void fn_8031BF80(FxD* self, int i, int a, float f, FxSrcD* b);
 void fn_8031BFAC(FxD* self, int i);
@@ -216,6 +217,23 @@ void fn_8031B93C(FxE* self, int a) {
 }
 
 void fn_8031BE94() {}
+
+/* near-miss: the output cursor lives in memory like retail (class with a dtor), but retail reaches it through a pointer register and keeps the 3-word copy in order */
+int fn_8031BE98(FxD* self, char** out) {
+    int n = 0;
+    for (int i = 0; i < 5; i++) {
+        FxRec2* r = self->a2C[i].m0;
+        if (r && r->m28 != -1) n++;
+    }
+    FxWr w(*out);
+    w.putInt(n);
+    for (int i = 0; i < 5; i++) {
+        FxRec2* r = self->a2C[i].m0;
+        if (r && r->m28 != -1) w.putItem(&self->a2C[i]);
+    }
+    *out = w.p;
+    return 1;
+}
 
 void fn_8031BF58(FxD* self, int i) {
     int off = i * 12 + 0xA4;

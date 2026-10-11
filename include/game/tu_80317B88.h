@@ -807,6 +807,61 @@ struct FxItem3 {
     FxWid3* m74;
 };
 struct FxOne { int v; };
+/* Actor reached through the name-slot lookup fn_803285A0 (two fields written by fn_803294E8). */
+struct FxActS {
+    char pad0[0x54c];
+    void* m54C;
+    int m550;
+};
+/* Effect object stored in the name-slot table lbl_806E2274 (vptr at +0x18; slot 12 is the per-frame
+ * hook called by fn_803295F0, slot 13 by fn_803294E8). */
+class FxEffV {
+public:
+    char pad0[0x18];
+    virtual void s0();
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13(int a);
+    virtual void s14();
+    virtual void s15();
+    virtual void s16(int a);
+};
+struct FxActT {
+    char pad0[0x4c];
+    unsigned m4C;
+};
+/* Model object reached through FxL::mC (vector at +0x60, vptr at +0x98; slot 4 fills a matrix, fn_8031ED80). */
+class FxMV {
+public:
+    char pad0[0x60];
+    FxF3 m60;
+    char pad6C[0x2c];
+    virtual void s0();
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(void* out);
+    virtual void s4();
+};
+/* Output cursor of the save helpers (fn_8031BE98). */
+struct FxCur { char* p; };
+/* Save-stream writer (fn_8031BE98); the user dtor keeps the cursor addressable. */
+struct FxWr {
+    char* p;
+    FxWr(char* q) { p = q; }
+    ~FxWr() {}
+    void putInt(int v) { *(int*)p = v; p += 4; }
+    void putItem(FxItemD* it) { *(FxItemD*)p = *it; p += 12; }
+};
 /* 16-byte ring entry of FxZT::m0 (fn_8032713C). */
 struct FxEnt16 {
     int m0;
