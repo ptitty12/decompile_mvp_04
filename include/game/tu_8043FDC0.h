@@ -352,8 +352,8 @@ struct FeScrRawL {
 struct FeScr_8044974C : FeObj {
     char pad40[0x130 - 0x40];
     int m130;
-    FeObj* m134;
-    FeObj* m138;
+    int m134;
+    int m138;
     FeObj* m13C;
     FeObj* m140;
     FeObj* m144;
@@ -364,13 +364,16 @@ struct FeScr_8044974C : FeObj {
     FeHolder* m158;
     int m15C;
     FeObj* m160;
-    int m164;
+    FeObj* m164;
     FeObj* m168;
     int m16C;
     int m170;
     int m174;
-    char pad178[0x240 - 0x178];
+    int m178[25];
+    int m1DC[25];
     int m240;
+    int m244;
+    int m248;
 };
 extern "C" {
 void fn_8044BF38(FeScr_8044974C* self, int a);
@@ -379,6 +382,9 @@ int fn_8044C48C(FeScr_8044974C* self);
 void fn_8044B5F0(FeScr_8044974C* self, int a);
 void fn_8044ADA4(FeScr_8044974C* self);
 void fn_8044B79C(FeScr_8044974C* self);
+void fn_8044C314(FeScr_8044974C* self, int a, int b);
+void fn_80122D40(FeObj* o, int v, int a, int b, int c, int d);
+int fn_80075808(int a);
 void fn_8044B050(FeScr_8044974C* self);
 void fn_8044AD04(FeScr_8044974C* self);
 void fn_8044B454(FeScr_8044974C* self, int a);
@@ -658,6 +664,30 @@ public:
     virtual int s19(int a);
     virtual int s20(int a);
 };
+class FeSub2 {
+public:
+    char pad0[0x24];
+    virtual int s1(int a, int b);
+    virtual int s2(int a, int b);
+    virtual int s3(int a, int b);
+    virtual int s4(int a, int b);
+    virtual int s5(int a, int b);
+    virtual int s6(int a, int b);
+    virtual int s7(int a, int b);
+    virtual int s8(int a, int b);
+    virtual int s9(int a, int b);
+    virtual int s10(int a, int b);
+    virtual int s11(int a, int b);
+    virtual int s12(int a, int b);
+    virtual int s13(int a, int b);
+    virtual int s14(int a, int b);
+    virtual int s15(int a, int b);
+    virtual int s16(int a, int b);
+    virtual int s17(int a, int b);
+    virtual int s18(int a, int b);
+    virtual int s19(int a, int b);
+    virtual int s20(int a, int b);
+};
 struct FeWidgetS : FeObj {
     char pad40[0x98 - 0x40];
     FeSub m98;
@@ -689,4 +719,167 @@ void fn_80449168(FeMeter* m, int a, int b, void (*cb)(int));
 }
 int fn_800DD5E8(int a);
 Unk8007F198_B* fn_8007F7D0(Unk8007F198_B* s, unsigned a);
+
+/* Debug-menu item (0x54 bytes, vptr at +8, ctor fn_8032F120): +0x48 points at a live value when non-null,
+ * else +0x4C holds it. A menu keeps an array of item pointers at +0 indexed by m174. */
+struct FeItemData {
+    int m0;
+    int m4;
+};
+class FeItemV : public FeItemData {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+};
+struct FeItem : FeItemV {
+    char padC[0x48 - 0xC];
+    int* m48;
+    int m4C;
+    int m50;
+};
+inline int FeItemGet(FeItem* it)
+{
+    return it->m48 ? *it->m48 : it->m4C;
+}
+inline void FeItemSet(FeItem* it, int v)
+{
+    if (it->m48 != 0)
+        *it->m48 = v;
+    else
+        it->m4C = v;
+}
+extern "C" {
+void fn_80330BC8(void* menu, int a);
+void fn_803E4A50(void* p);
+FeItem* fn_8032F120(FeItem* it, const char* name, int a);
+void fn_80330ACC(void* menu, FeItem* it);
+}
+/* Email sub-menu (ctor fn_80442594). */
+struct FeMenuEmail {
+    FeItem* items[93];
+    int m174;
+    int m178;
+    char pad17C[0x1FC - 0x17C];
+    int m1FC;
+    int m200;
+    int m204;
+    int m208;
+    char pad20C[0x2D8 - 0x20C];
+    int m2D8;
+    const void* m2DC;
+    FeItem m2E0;
+    FeItem m334;
+};
+inline int FeItemGetB(FeItem* it)
+{
+    if (it->m48 == 0)
+        return it->m4C;
+    return *it->m48;
+}
+/* Sim-year sub-menu (ctors fn_804436B4 / fn_804438DC): items at +0x32C and +0x394. */
+struct FeMenuSim {
+    FeItem* items[93];
+    int m174;
+    int m178;
+    char pad17C[0x1FC - 0x17C];
+    int m1FC;
+    int m200;
+    int m204;
+    int m208;
+    char pad20C[0x32C - 0x20C];
+    FeItem m32C;
+    char pad380[0x394 - 0x380];
+    FeItem m394;
+};
+extern int lbl_80621604;
+extern int lbl_80621608;
+struct FeMenuEmailRaw {
+    int items[93];
+    int m174, m178;
+    char pad17C[0x1FC - 0x17C];
+    int m1FC, m200, m204, m208;
+    char m210[0xC8];
+    int m2D8;
+    const void* m2DC;
+};
+extern int lbl_80622DC4;
+extern int lbl_80622DC8;
+
+/* Strings table (lbl_8061977C): fn_80090880(table, id) returns the string. */
+struct Unk80090880;
+const char* fn_80090880(Unk80090880* t, int id);
+extern Unk80090880* lbl_8061977C;
+extern int lbl_8061A328;
+extern "C" {
+char* fn_80403144(char* dst, const char* src);
+char* fn_80403DE4(char* dst, const char* fmt, ...);
+void fn_800DFF0C(char* a, char* b);
+void fn_804031F8(char* out, const char* a, const char* b);
+}
+/* Meter/caption class (FeMeter) extra members used by the caption functions. */
+struct FeMeter2 : FeMeter {
+};
+extern "C" {
+int fn_80449358(FeMeter* s);
+void fn_804493EC(FeMeter* s, char* out);
+void fn_80449530(FeMeter* s);
+void fn_804495C4(FeMeter* s);
+void fn_80449300(FeMeter* s);
+void fn_800DC50C(FeObj* o, float a, float b);
+}
+
+struct Unk8007DB74_A;
+int fn_8007E060(Unk8007DB74_A* s, int a, int b, int c);
+void fn_8007DD38(Unk8007DB74_A* s, int a, int b, int c, int d);
+void fn_8007DEF8(Unk8007DB74_A* s, int a, int b, int c, int d);
+int fn_8007E0E4(Unk8007DB74_A* s, int a, int b);
+
+extern "C" {
+int fn_800A2EFC(FeGame* g);
+int fn_8044C508(FeScr_8044974C* self, int a);
+}
+
+/* Roster-popup screen of unit 80452120 (ctor fn_80452120; the other copy of the FTOPBAR screen). */
+typedef FeScr_8044974C FeScr7;  /* same layout; m23C is m1DC[24] */
+struct FeScr7Raw {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138, m13C, m140, m144, m148;
+    char pad14C[0x154 - 0x14C];
+    int m154, m158, m15C, m160, m164, m168, m16C, m170;
+    char pad174[0x23C - 0x174];
+    int m23C, m240;
+};
+extern "C" {
+int fn_80454D9C(FeScr7* s);
+void fn_80454890(FeScr7* s, int a);
+void fn_8045499C(FeScr7* s, int a);
+void fn_80453F20(FeScr7* s, int a);
+void fn_80453980(FeScr7* s);
+void fn_80453FD4(FeScr7* s, FeObj* a);
+void fn_804540CC(FeScr7* s);
+}
+
+struct Unk8007F198_A;
+/* fn_8007F3A0 passes its r4 on to fn_805A19C8, so it really takes (s, a): callers leave a in r4. */
+int fn_8007F3A0(Unk8007F198_A* s, int a);
+extern "C" {
+void fn_800E4234(int a, int b, char* out);
+void fn_801321D4(FeObj* o, void* self, FeCb cb, int a, void* b, int c, int d, int e, const char* s1, const char* s2,
+                 const char* s3, int f, int g, int h);
+void fn_8055F5A0(int a);
+void fn_8055EAFC(int a);
+void fn_8044C644(int a, FeScr_8044974C* self);
+}
 #endif
