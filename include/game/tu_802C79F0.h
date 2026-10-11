@@ -22,12 +22,13 @@ public:
 
 /* Model loader object: +0xA8 table of lbl_805E1B34 12-byte entries, +0x3C0 array of 0x10-byte pairs, +0x3D4 count.
  * Evidence: fn_802C7B54. */
+struct Unk802C95F8;
 struct Unk802C7B54 {
     char pad0[0xA8];
     int mA8[1];
     char padAC[0x3C0 - 0xAC];
     char* m3C0;
-    char pad3C4[0x10];
+    Unk802C95F8* m3C4[4];
     unsigned char m3D4;
 };
 
@@ -50,10 +51,13 @@ struct Unk802C95F8_Sub {
     int m0;
 };
 struct Unk802C95F8 {
-    char pad0[0x438];
+    int m0;
+    char pad4[0x438 - 4];
     Unk802C95F8_Sub* m438;
-    char pad43C[0x4B0 - 0x43C];
+    char* m43C;
+    char pad440[0x4B0 - 0x440];
     int m4B0;
+    char pad4B4[0];
 };
 
 /* Per-slot record of 0x1EC bytes (0x52 floats, then 0x29 ints); ctor fn_802C9618 fills the floats with 1.0f. 0x26 slots,

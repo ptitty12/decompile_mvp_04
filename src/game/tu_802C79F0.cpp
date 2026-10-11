@@ -31,10 +31,14 @@ void fn_80433004(int p, int n);
 void* fn_8040B190(void* dst, const void* src, ...);
 int fn_802B9300(const char* name, int a, int b, unsigned int* outn);
 void fn_802CA5AC(int a, int b);
+void fn_80314D60(int h);
+extern const char lbl_8061D2BC[];
+void fn_802AD2B8(void* a, void* b, int c, const char* d, int e);
 Unk8000E618* fn_8000E65C();
 extern int lbl_8061EC60[];
 extern int lbl_8061EC70[];
 extern int lbl_8061EC80[];
+extern int lbl_8061EC90[];
 extern const char lbl_805E1918[];
 extern const char lbl_805E15E0[];
 extern const void* lbl_80664250[];
@@ -104,12 +108,44 @@ void fn_802C7E80(Unk802C7B54* o)
     }
 }
 
+/* near-miss (68 vs 68 insns, register names only): retail uses k in r29 and three separate byte-offset registers (r3/r4/r5) for the table loads and
+   even indexes the k == 0 arm by r29 itself (k known to be 0 there); ours picks different registers. */
+void fn_802C7EF8(Unk802C7B54* o)
+{
+    for (int i = 0; i < 2; i++) {
+        fn_802AD2B8((char*)o + 0xF0 + i * 0x168, (char*)o + 0x30 + i * 0xC, lbl_8061EC90[i], lbl_8061D2BC, 0x2E);
+    }
+    for (int k = 0; k < 4; k++) {
+        for (int j = 0; j < lbl_805E1B34[k]; j++) {
+            if (k == 0) {
+                o->m3C4[k][j].m43C = (char*)o + 0xF0;
+            } else {
+                o->m3C4[k][j].m43C = (char*)o + 0x258;
+            }
+        }
+    }
+}
+
 void fn_802C8008(Unk802C7B54* o)
 {
     fn_802C7E80(o);
     fn_802C7EF8(o);
     fn_802C86B8(o);
     fn_802C9EF4((char*)lbl_8061E978 + 0x125E0);
+}
+
+void fn_802C8058(Unk802C7B54* o)
+{
+    for (int k = 0; k < 4; k++) {
+        if (o->m3C4[k] != 0) {
+            for (int j = 0; j < lbl_805E1B34[k]; j++) {
+                fn_80314D60(o->m3C4[k][j].m0);
+                if (o->m3C4[k][j].m438->m0 != 0) {
+                    fn_80314D60(o->m3C4[k][j].m438->m0);
+                }
+            }
+        }
+    }
 }
 
 void* fn_802C83C0(Unk802C83C0* o, int a, int* out)
