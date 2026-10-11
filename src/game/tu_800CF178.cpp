@@ -97,11 +97,12 @@ extern "C" Unk800C7B40_Widget* fn_800CF4AC(Unk800C7A4C_Group* g, const char* nam
     return 0;
 }
 
-/* near-miss: retail keeps the null check (mr. / li 0 / beq / mr) on the slot-28 result; every ternary form folds it away */
 extern "C" Unk800C7B40_Widget* fn_800CF5AC(Unk800C7B40_Widget* w, const char* a, int b)
 {
     Unk800C7B40_Widget* r = w->fn_vslot28(a);
-    return r ? r : 0;
+    if (r == 0)
+        return 0;
+    return r;
 }
 
 extern "C" Unk800C7B40_Widget* fn_800CF5F0(Unk800C7B40_Widget* w, const char* name, int deep)
@@ -142,11 +143,12 @@ extern "C" Unk800C7B40_Widget* fn_800CF6B0(Unk800C7B40_Widget* w, int id, int de
     return 0;
 }
 
-/* near-miss: same null check as fn_800CF5AC (slot 30) */
 extern "C" Unk800C7B40_Widget* fn_800CF738(Unk800C7B40_Widget* w, const char* a, int b)
 {
     Unk800C7B40_Widget* r = w->fn_vslot30(a, b);
-    return r ? r : 0;
+    if (r == 0)
+        return 0;
+    return r;
 }
 
 extern "C" Unk800C7B40_Widget* fn_800CF77C(Unk800C7B40_Widget* w, const char* a, int b, int c)
