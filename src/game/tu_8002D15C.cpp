@@ -39,6 +39,22 @@ extern "C" void fn_8002D290(Unk8002D15C* self)
     }
 }
 
+extern "C" void fn_8002D314(Unk8002D15C* self, int id, Unk8002D15C_Msg* msg)
+{
+    fn_8040B320(&self->m12C, 0, 0x34);
+    if (lbl_80620860 == 0 && self->mD4 == 1) {
+        if (id == 0x22)
+            self->v11((int)msg);
+        self->m6BC = msg;
+        for (int i = 0; i <= 0x52; i++) {
+            if (lbl_80616528[i].id == id) {
+                (self->*lbl_80616528[i].h)();
+                return;
+            }
+        }
+    }
+}
+
 extern "C" void fn_8002DCF4(Unk8002D15C* self)
 {
     fn_8003F6D4(self->m6C8, self->m80->m6F8->m14->m1CD0 == 0);
