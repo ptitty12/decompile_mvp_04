@@ -113,20 +113,12 @@ float fn_8005F6F4(void* a, int b, int c, Ctx* ctx)
     return result;
 }
 
-/* near-miss: instruction-for-instruction the same (two bdnz loops, y+0xe64 in
- * its own register) but the register numbers differ (sums r7/r8 here, r6/r8 in
- * retail); about 10 variants of loop and pointer shape did not move them. */
 float fn_8005F7D8(void* a, int b, int c, Ctx* ctx)
 {
     float result = 0.0f;
-    Unk8005DF2C_Y* y = ctx->m130->m44C->m6F8->m14;
-    int s0 = 0;
-    for (int i = 0; i < 128; i++)
-        s0 += y->m1B4[(unsigned char)i];
-    int s1 = 0;
-    y++;
-    for (int i = 0; i < 128; i++)
-        s1 += y->m1B4[(unsigned char)i];
+    int y = *(int*)((char*)ctx->m130->m44C->m6F8 + 0x14);
+    int s0 = SumYBytes(y);
+    int s1 = SumYBytes(y + 0xe64);
     if (s0 == s1)
         result = 100.0f;
     return result;

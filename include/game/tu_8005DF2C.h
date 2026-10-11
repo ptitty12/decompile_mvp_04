@@ -233,5 +233,16 @@ struct Unk8005DF2C_A {
 };
 
 
-
+/*
+ * Sum of the 0x80 bytes at +0x1B4 of a Y record, given its address as an int
+ * (fn_8005F7D8 and fn_80060AB8). Carrying the address as an int rather than a
+ * Y* is what reproduces retail's register classes for the loop temporaries.
+ */
+inline int SumYBytes(int y)
+{
+    int s = 0;
+    for (int i = 0; i < 128; i++)
+        s += ((Unk8005DF2C_Y*)y)->m1B4[(unsigned char)i];
+    return s;
+}
 #endif
