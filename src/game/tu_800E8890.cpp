@@ -4,6 +4,56 @@
  */
 #include "game/tu_800E8890.h"
 
+inline int KeyAt8890(char* base, int off)
+{
+    return *(int*)(base + off);
+}
+
+void fn_800E8890(Ue8890* t, int idx, int a2, int a3)
+{
+    UiS* scr = t->p0;
+    char* row = t->m8->m14 + idx * 0xE64;
+    int cnt = 0;
+    unsigned char n = *(unsigned char*)(row + 0x3E4);
+    int* pc = &t->m10;
+    char b8[0x190];
+    char b198[0x190];
+    unsigned char b328[0x18];
+    fn_80403144(b8, fn_80090880(lbl_8061977C, a2));
+    int k = 0;
+    fn_800DFEAC(b8, lbl_805BE020);
+    if (cnt < n) {
+        do {
+            unsigned char kk = k;
+            int r = fn_80097EA4(row, a3, kk, 2, 0);
+            if (r > 0) {
+                cnt++;
+                if (cnt > 1)
+                    fn_800DFEAC(b8, lbl_805BE024);
+                char* tb = row + 0x3E8;
+                int off = kk * 0x34;
+                fn_800DE354((int)b198, t->m8, idx, KeyAt8890(tb, off), 1);
+                b328[0] = *(unsigned char*)lbl_805B6F58;
+                if (r > 1)
+                    fn_804089B4((char*)b328, lbl_805BE02C, r);
+                fn_800DFEAC(b198, (char*)b328);
+                int l1 = fn_80403060(b8);
+                if (l1 + fn_80403060(b198) > 0x3E) {
+                    ((UiVM*)scr)->v43(*pc, 0, b8, 4);
+                    fn_80403144(b8, b198);
+                    *pc = *pc + 1;
+                } else
+                    fn_800DFF0C(b8, b198);
+            }
+            k++;
+        } while (k < n);
+    }
+    if (cnt > 0) {
+        ((UiVM*)scr)->v43(*pc, 0, b8, 4);
+        *pc = *pc + 1;
+    }
+}
+
 /* near-miss: 3 slots, lwzx base/index order of the quad table reads (retail: lwzx r25,r27,r30 and a precomputed &loc+4) */
 void fn_800E8A6C(Ue8A6C* m)
 {
@@ -48,6 +98,114 @@ void fn_800E8BCC(UiS* self)
     self->p2E0 = fn_800B7AB8(UiGetMsgMgr(), lbl_805BA6D8);
     self->m308 = 0;
     self->m304 = 0;
+}
+
+int fn_800E8C3C(UiS* self, int a)
+{
+    Ui80619948* g = lbl_80619948;
+    self->m2DC = a;
+    int v = g->m80;
+    self->m2E4 = v;
+    if (g->m74 == 2) {
+        switch (v) {
+        case 21:
+            self->v109();
+            break;
+        case 5:
+            self->v96();
+            break;
+        case 6:
+            self->v97();
+            break;
+        case 3:
+            self->v93();
+            break;
+        case 4:
+            ((UiVN*)self)->v94();
+            break;
+        case 1:
+            self->v98();
+            break;
+        case 10:
+            self->v107();
+            break;
+        case 8: {
+            int z = fn_800B555C()->m518;
+            if (z != 0) {
+                self->m2E8 = 0;
+                return 0;
+            }
+            self->v105();
+            g->m74 = z;
+            g->m80 = z;
+            g->mA4 = z;
+            break;
+        }
+        case 11: {
+            int z = fn_800B555C()->m524;
+            if (z != 0) {
+                self->m2E8 = 0;
+                return 0;
+            }
+            self->v108();
+            g->m74 = z;
+            g->m80 = z;
+            g->mA4 = z;
+            break;
+        }
+        default:
+            self->m2E8 = 0;
+            return 0;
+        }
+        self->m2E8 = 1;
+        return 1;
+    } else {
+        int t = self->m2E8;
+        if (t != 0) {
+            self->m2E8 = 0;
+            self->m2EC = 1;
+            return 1;
+        }
+        if (self->m2EC != 0) {
+            self->m2EC = t;
+            return 1;
+        }
+        return 0;
+    }
+}
+
+/* near-miss: 118 vs 117 insns. Retail keeps the id (0x4556 / 0x4D50 / 0x4D52) in r4 and sets it right before the cmpw / after the fn_800A2E6C call; sched1 hoists the `li` of id above the fn_800A2AE8 call here, so id lands in callee-saved r29 (extra `mr r4,r29`). if/else, ternary, early-call-result and hoisted-q forms all tried. */
+void fn_800E9074(UiS* x)
+{
+    Ui80619948* g = lbl_80619948;
+    Unk8007B2B0_Screen* s = lbl_8061930C;
+    int flag = 1;
+    int a = fn_800A3244(g);
+    int b = ((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x1E, a);
+    int c = ((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x1F, a);
+    char buf20[0xC8];
+    char bufE8[0x190];
+    fn_800DE440((int)buf20, a, 1);
+    if (x->m2DC == 0)
+        flag = 0;
+    if (b == 0x31) {
+        fn_80403DE4(bufE8, (const char*)fn_80090880(lbl_8061977C, 0x4647), buf20, c);
+    } else {
+        int p = fn_800A2AE8(g);
+        int id = 0x4556;
+        if (c >= fn_8056B7D0(lbl_80619948->m28) - p) {
+            id = 0x4D50;
+            if (fn_800A2E6C(g) != 0)
+                id = 0x4D52;
+        }
+        const char* f = (const char*)fn_80090880(lbl_8061977C, id);
+        fn_80403DE4(bufE8, f, buf20, fn_80090880(lbl_8061977C, fn_800E6058(b)), c);
+    }
+    UiS* d = x->p2E0;
+    int s1 = (int)fn_80090880(lbl_8061977C, 0x4557);
+    int s2 = (int)fn_80090880(lbl_8061977C, 0x4558);
+    fn_801321D4(d, x, (void (*)(void*, UiS*))fn_800E9248, 0, (int)bufE8, 2, -1, 1, s1, s2, 0, 0, flag, 0);
+    x->p2E0->v86();
 }
 
 void fn_800E9248(int a, UiS* x)
@@ -120,6 +278,28 @@ void fn_800E95FC(int a, UiS* x)
     }
 }
 
+void fn_800E97B4(UiS* x)
+{
+    Ui80619948* g = lbl_80619948;
+    int mins = 0x3C;
+    int a = fn_800A324C(g);
+    int b = fn_800A3264(g);
+    char buf20[0xC8];
+    char bufE8[0x7D0];
+    fn_800DE440((int)buf20, a, 1);
+    UiS* c = x->p2E0;
+    if (b == 0)
+        mins = 0xF;
+    int flag = 1;
+    if (x->m2DC == 0)
+        flag = 0;
+    fn_80403DE4(bufE8, (const char*)fn_80090880(lbl_8061977C, 0x45C5), buf20, mins);
+    int s1 = (int)fn_80090880(lbl_8061977C, 0x4557);
+    int s2 = (int)fn_80090880(lbl_8061977C, 0x4558);
+    fn_801321D4(c, x, (void (*)(void*, UiS*))fn_800E98D8, 0, (int)bufE8, 2, -1, 1, s1, s2, 0, 0, flag, 0);
+    c->v86();
+}
+
 void fn_800E98D8(int a, UiS* x)
 {
     UiMsg m;
@@ -174,6 +354,35 @@ void fn_800E9BB8(UiS* self)
         fn_80131F34(self->p2E0, self, (void (*)(int, void*))fn_800EAE04, 0, 0xFFA, 2, -1, 1, 0x1A81, 0x1A80, 0, 0, 1, 0);
         self->p2E0->v86();
     }
+}
+
+/* near-miss: 100 vs 99 insns; the u8 counter is clamped once and shared by both calls (extra callee-saved register), retail clamps per call */
+void fn_800E9CB8(int arg0)
+{
+    UiS* t = fn_800B7AB8(UiGetMsgMgr(), lbl_805BA7A8);
+    char* g = lbl_80619948->mA8;
+    int w0 = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80075948(fn_80599C80(g, 0));
+    int w1 = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80075948(fn_80599C80(g, 1));
+    unsigned c0 = fn_80599C40(g, 0);
+    unsigned c1 = fn_80599C40(g, 1);
+    unsigned m = c1;
+    if (m < c0)
+        m = c0;
+    fn_80523824(t, arg0, 1, fn_800EA91C, w0, w1, m);
+    int j = 0;
+    do {
+        int flag = 1;
+        if (j == 0)
+            flag = 0;
+        unsigned k = 0;
+        while (k < fn_80599C40(g, j)) {
+            int e = fn_80599C50(g, j, k);
+            fn_80523C94(t, e, flag, k, fn_80599C80(g, j));
+            k++;
+        }
+        j++;
+    } while (j <= 1);
+    t->v86();
 }
 
 void fn_800E9E44(UiS* self)
@@ -281,6 +490,16 @@ void fn_800EA91C(int a, UiS* x)
         fn_80134CD0(x->p2E0);
         break;
     }
+}
+
+void fn_800EA9F4(UiS* self)
+{
+    char buf[0x7D0];
+    fn_800E5100((unsigned short*)buf, (int)lbl_80619948->mA8);
+    UiS* p = self->p2E0;
+    int id = (int)fn_80090880(lbl_8061977C, 0x26DE);
+    fn_801321D4(p, self, (void (*)(void*, UiS*))fn_800EAAA4, 0, (int)buf, 1, -1, 1, id, 0, 0, 0, 0, 0);
+    self->p2E0->v86();
 }
 
 void fn_800EAAA4(void* unused, UiS* x)

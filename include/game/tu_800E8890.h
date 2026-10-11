@@ -19,7 +19,9 @@ void fn_800EAD5C(Unk800EAD5C_C* t);
 UiS* fn_804D2310(char* p);
 
 struct Ui80619948 {
-    char pad0[0x74];
+    char pad0[0x28];
+    int m28;
+    char pad2C[0x74 - 0x2C];
     int m74;
     char pad78[0x80 - 0x78];
     int m80;
@@ -111,4 +113,43 @@ void fn_800E7888(Ue8A6C* m, int k);
 void fn_800E7AD8(Ue8A6C* m, int k);
 void fn_800E7E48(Ue8A6C* m, int k);
 void fn_800E8890(Ue8A6C* m, int k, int a, int b);
+void fn_800E5100(unsigned short* out, int arg1);
+int fn_800A324C(Ui80619948* g);
+int fn_800A3264(Ui80619948* g);
+extern "C" void fn_800DE440(int a0, int a1, int a2);
+int fn_80403DE4(char* dst, const char* fmt, ...);
+void fn_800E98D8(int a, UiS* x);
+extern char lbl_805BA7A8[];
+unsigned fn_80599C40(char* g, int j);
+int fn_80599C50(char* g, int j, unsigned char k);
+int fn_80599C80(char* g, int j);
+void fn_80523824(UiS* t, int a0, int b, void (*cb)(int, UiS*), int w0, int w1, unsigned m);
+void fn_80523C94(UiS* t, int e, int flag, unsigned char k, int w);
+void fn_800EA91C(int a, UiS* x);
+struct UdE354_T {
+    char pad0[0x14];
+    char* m14;
+};
+struct Ue8890 {
+    UiS* p0;
+    char pad4[4];
+    UdE354_T* m8;
+    char padC[4];
+    int m10;
+};
+void fn_800DE354(int a0, UdE354_T* o, int idx, int b, int fl);
+int fn_80097EA4(char* p, int a, unsigned char b, int c, int d);
+int fn_80403060(const char* s);
+void fn_80403144(char* dst, const char* src);
+void fn_800DFEAC(char* dst, const char* name);
+void fn_800DFF0C(char* dst, const char* s);
+extern char lbl_805BE020[];
+extern char lbl_805BE024[];
+extern char lbl_805BE02C[];
+int fn_804089B4(char* dst, const char* fmt, ...);
+int fn_800A2AE8(Ui80619948* g);
+int fn_800A2E6C(Ui80619948* g);
+int fn_8056B7D0(int a);
+int fn_800E6058(int x);
+void fn_800E9248(int a, UiS* x);
 #endif
