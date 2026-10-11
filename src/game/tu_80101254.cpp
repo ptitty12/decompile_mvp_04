@@ -5,69 +5,62 @@
 #include "game/tu_800F1AEC.h"
 
 
-int fn_80101254()
+int fn_80101254(void* self)
 {
     return fn_800B555C()->m570;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101BC8(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m244[self->m26C]->w4();
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101C34(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m244[self->m26C]->w5();
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101CA0(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m2A8->v40(1);
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101D04(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m2A8->v41();
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101D64(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m2A8->v38(1);
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101DC8(UiScr2A8* self, int a)
 {
-    if (fn_80101254() != a)
+    if (fn_80101254(self) != a)
         return 0;
     self->m2A8->v39();
     return 1;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101E28(UiV_2B4b* self, int a)
 {
-    int r = fn_80101254();
+    int r = fn_80101254(self);
     if (r != a)
         return 0;
     if (self->m2B4 != 0 && self->m2B4->m24 < 0) {
@@ -77,10 +70,9 @@ int fn_80101E28(UiV_2B4b* self, int a)
     return 0;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101EA0(UiV_2B4b* self, int a)
 {
-    int r = fn_80101254();
+    int r = fn_80101254(self);
     if (r != a)
         return 0;
     if (self->m2B4 != 0 && self->m2B4->m24 < 0) {
@@ -90,10 +82,9 @@ int fn_80101EA0(UiV_2B4b* self, int a)
     return 0;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101F18(UiV_2B4b* self, int a)
 {
-    int r = fn_80101254();
+    int r = fn_80101254(self);
     if (r != a)
         return 0;
     if (self->m2B4 != 0 && self->m2B4->m24 < 0) {
@@ -103,10 +94,9 @@ int fn_80101F18(UiV_2B4b* self, int a)
     return 0;
 }
 
-/* near-miss: same code but the prologue moves a (r4) before self (r3); retail moves self first (two insns swapped) */
 int fn_80101F90(UiV_2B4b* self, int a)
 {
-    int r = fn_80101254();
+    int r = fn_80101254(self);
     if (r != a)
         return 0;
     if (self->m2B4 != 0 && self->m2B4->m24 < 0) {
@@ -114,6 +104,17 @@ int fn_80101F90(UiV_2B4b* self, int a)
         return 1;
     }
     return 0;
+}
+
+void fn_801020A4(UiScr2A8* self)
+{
+    self->m244[self->m26C]->w9();
+}
+
+void fn_801020E8(UiScr2A8* self, UiObjB* a)
+{
+    if (a == self->m2A8)
+        fn_801018F4(self);
 }
 
 extern char lbl_806530C8[];
@@ -192,6 +193,14 @@ void fn_801038B8(UiObj* self)
     fn_80103920(self);
 }
 
+void fn_801038EC(UiObj* self)
+{
+    fn_800ED254(self);
+    fn_800C33D0();
+    fn_800C3BE0();
+    fn_800C33D0()->m5DA4 = 2;
+}
+
 extern char lbl_80653618[];
 UiScrRaw* fn_80103AEC(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -213,4 +222,10 @@ UiScrRaw* fn_80103B58(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m3C = lbl_80653370;
     self->m130 = 0;
     return self;
+}
+
+void fn_801044C4()
+{
+    fn_800C33D0();
+    fn_800C3BE0();
 }
