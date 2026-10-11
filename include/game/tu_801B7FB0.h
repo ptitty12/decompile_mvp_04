@@ -56,7 +56,7 @@ struct Unk801B7FB0_Ump {
 struct Unk801B7FB0_B {
     int m0;
     Unk801B7FB0_P* m4;
-    void* m8;
+    Unk801B7FB0_Ai* m8;
     int mC;
     int m10;
     int m14;
@@ -91,7 +91,7 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
     virtual void v5();
     virtual void v6();
     virtual void v7();
-    virtual void v8();
+    virtual void v8(int x);
     virtual void v9();
     virtual void v10();
     virtual void v11();
@@ -127,7 +127,14 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
 };
 
 struct Unk801B7FB0_P : public Unk801B7FB0_PV {
-    char pad9C[0x3B0];
+    char pad9C[0x2D0];
+    Unk801B7FB0_P* m36C;
+    char pad370[0x1C];
+    int m38C;
+    char pad390[0x60];
+    float m3F0;
+    float m3F4;
+    char pad3F8[0x54];
     Unk801B7FB0_P* m44C;
     char pad450[0x8];
     int m458;
@@ -140,31 +147,35 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char pad5A4[0x24];
     int m5C8;
     char pad5CC[0x90];
-    Unk801B7FB0_P* m65C;
-    Unk801B7FB0_P* m660;
-    Unk801B7FB0_P* m664;
-    Unk801B7FB0_P* m668;
-    Unk801B7FB0_P* m66C;
-    Unk801B7FB0_P* m670;
-    char pad674[0xC];
-    void* m680;
-    char pad684[0x48];
-    void* m6CC;
+    Unk801B7FB0_P* m65C[13];
+    char pad690[0x3C];
+    Unk801B7FB0_P* m6CC;
     char pad6D0[0x24];
     int m6F4;
     Unk801B7FB0_Game* m6F8;
-    char pad6FC[0x8];
+    char pad6FC[0x4];
+    void* m700;
     int m704;
     int m708;
-    char pad70C[0x220];
+    char pad70C[0x24];
+    int m730;
+    char pad734[0x1F8];
     int m92C;
-    char pad930[0x23C];
+    char pad930[0x184];
+    float mAB4;
+    char padAB8[0xB4];
     int mB6C;
     char padB70[0x10];
     float mB80;
     float mB84;
     Unk801B7FB0_Ump* mB88;
 };
+struct Unk801B7FB0_Slot {
+    void* m0;
+    int m4;
+    float m8;
+};
+
 struct Unk801B7FB0_Ai {
     void* m0;
     char pad4[0x4];
@@ -180,7 +191,7 @@ struct Unk801B7FB0_Ai {
     float m2C;
     float m30;
     float m34;
-    char pad38[0x30];
+    Unk801B7FB0_Slot m38[4];
     int m68;
     char pad6C[0x4];
 };

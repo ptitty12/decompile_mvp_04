@@ -214,7 +214,7 @@ extern "C" void fn_801B97E8(U* u)
     u->mC = 0.0f;
 }
 
-extern "C" B* fn_801B9800(B* u, P* p, void* q)
+extern "C" B* fn_801B9800(B* u, P* p, A* q)
 {
     u->m4 = p;
     u->m8 = q;
@@ -289,7 +289,7 @@ extern "C" int fn_801B9C5C(B* u)
 extern "C" int fn_801B9CC0(B* u) { return u->m4->m6F8->m14->m1CCA == 1; }
 extern "C" void fn_801B9E04(B* u, P* q)
 {
-    P* t = u->m4->m65C;
+    P* t = u->m4->m65C[0];
     if (t && fn_801B9940(u, t)) {
         if (u->m30 == 0)
             fn_801B9A18(u, t, q);
