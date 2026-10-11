@@ -32,6 +32,18 @@ struct Unk8028B194_Pos {
     char pad0[0x36C];
     Unk80270BA0_X* m36C;
 };
+struct Unk8028B194_Sub2 {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk8028B194_Sub1 {
+    char pad0[0x14];
+    Unk8028B194_Sub2* m14;
+};
+struct Unk8028B194_Sub3 {
+    char pad0[0x3B4];
+    int m3B4;
+};
 struct Unk8028B194_Ctx {
     char pad0[0x4C];
     int m4C;                   /* frame counter (converted to seconds) */
@@ -39,6 +51,11 @@ struct Unk8028B194_Ctx {
     int m6B8;
     char pad6BC[0x6CC - 0x6BC];
     Unk8028B194_Pos* m6CC;
+    char pad6D0[0x6F4 - 0x6D0];
+    int m6F4;
+    Unk8028B194_Sub1* m6F8;
+    char pad6FC[0x700 - 0x6FC];
+    Unk8028B194_Sub3* m700;
 };
 
 /* Fields of the link object at player+0x618 (Unk80271DBC_Link). */
@@ -108,6 +125,9 @@ public:
     void fn_8028B4D0(float a);
     void fn_8028B514(int a);
     Unk8028B194* fn_8028B51C(float a);
+    unsigned int fn_8028C560(int id, unsigned int cur);
+    int fn_8028C0CC(Unk80270BA0_X* x, int b);
+    void fn_8028BFA8(Unk80270BA0_X* x, Unk8028B194_Ctx* ctx, float t);
 };
 
 #endif /* GAME_GOALS_TU_8028B194_H */

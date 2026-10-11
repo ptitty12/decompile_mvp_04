@@ -13,6 +13,26 @@ Unk80273498_Vec3 fn_8027AF54(Unk8028B194* g, int a);
 Unk80270BA0_X* fn_8027A90C(Unk8028B194* g);
 Unk80273498_Vec3 fn_801837F4(int obj, int a);
 void fn_8028F5CC(void* p, float f);
+void fn_8027AD3C(Unk8028B194* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* out6, Unk80273498_Vec3* out7,
+                 int b, int c, unsigned int* out10, int s8);
+extern const Unk80273498_Vec3 lbl_806055AC;    /* zero vector */
+int fn_801A2034(Unk8028B194_Ctx* ctx, int a);
+Unk80270BA0_X* fn_80257DD8(int a);
+void fn_802D7B88(int a, int b, int c, float f);
+
+inline Unk80273498_Vec3 GetTarget(Unk8028B194* g)
+{
+    return g->m10;
+}
+
+inline Unk80273498_Vec3 operator-(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
 
 Unk8028B194* Unk8028B194::fn_8028B194(Unk80273498_Vec3 v)
 {
@@ -147,4 +167,119 @@ Unk8028B194* Unk8028B194::fn_8028B51C(float a)
     m74 = a;
     fn_8028F5CC(m4, a);
     return this;
+}
+
+void Unk8028B194::fn_8028BFA8(Unk80270BA0_X* x, Unk8028B194_Ctx* ctx, float t)
+{
+    if (ctx->m6F4 != 1 && m28 && !(mA8 & 0x800000) && !(t <= 0.0f)) {
+        switch (m48) {
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16: {
+            int flag = 0;
+            if (ctx->m6F8->m14->m1CD0) {
+                flag = 1;
+            }
+            int h = fn_801A2034(ctx, flag);
+            if (h != -1) {
+                if (x == fn_80257DD8(ctx->m700->m3B4)) {
+                    int n = (int)((m8->fn_8027A280(0) - t) * 60.0f);
+                    fn_802D7B88(h, 1, n / 4, 1.0f);
+                }
+            }
+            break;
+        }
+        }
+        mA8 |= 0x800000;
+    }
+}
+
+int Unk8028B194::fn_8028C0CC(Unk80270BA0_X* x, int b)
+{
+    if (m28 && m4C == 3) {
+        unsigned int hash = 0;
+        Unk80273498_Vec3 pos = lbl_806055AC;
+        float d2;
+        fn_8027AD3C(this, x, b, &pos, 0, 0, 0, &hash, 0);
+        Unk80273498_Vec3 diff = GetTarget(this) - pos;
+        d2 = diff.x * diff.x + diff.z * diff.z;
+        if (!(d2 >= 2304.0f)) {
+            switch (hash) {
+            case 0xA84A0C58u:
+            case 0x7942CA79u:
+            case 0x9FE2E6D1u:
+            case 0xCA50EF74u:
+            case 0xF90D27A1u:
+            case 0xFA52B1B5u:
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+unsigned int Unk8028B194::fn_8028C560(int id, unsigned int cur)
+{
+    unsigned int h = 0;
+
+    switch (id) {
+    case 0:
+        h = 0xDB410FF7u;
+        break;
+    case 1:
+    case 20:
+        h = 0xF469A7C1u;
+        if (mA8 & 0x8000000) {
+            h = 0x97F6F9F4u;
+        }
+        break;
+    case 2:
+        h = 0x7C084C6Cu;
+        break;
+    case 22:
+    case 23:
+    case 24:
+        h = 0xA58E08ADu;
+        break;
+    case 25:
+        h = 0x2E726971u;
+        break;
+    case 3:
+        h = 0xA84A0C58u;
+        break;
+    case 14:
+    case 15:
+    case 16:
+        h = 0xB227F91Du;
+        if (mA8 & 0x40000) {
+            h = 0xFAA6104Cu;
+        }
+        break;
+    case 4:
+    case 9:
+    case 19:
+        h = 0xFAA6104Cu;
+        break;
+    case 11:
+    case 12:
+    case 13:
+        h = 0xB227F91Du;
+        break;
+    case 10:
+        h = 0x519E35F8u;
+        break;
+    case 7:
+    case 8:
+        h = 0x453DA560u;
+        break;
+    case 17:
+        h = 0x1463E9BAu;
+        break;
+    case 18:
+        break;
+    }
+    return h;
 }
