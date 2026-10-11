@@ -13,7 +13,7 @@
 
 
 struct Z8 { int a; int b; };   /* 8-byte constants passed by value (lbl_805B99xx) */
-
+struct Unk744Obj { char pad0[0x20]; int m20; };
 /* vptr at +0x8 */
 class VT8 {
 public:
@@ -37,6 +37,43 @@ public:
     virtual int s17();
     virtual int s18();
 };
+/* vptr at +0x18 (objects held in the 3-slot arrays at +8 of the loop owner) */
+class VT18 {
+public:
+    char pad0[0x18];
+    virtual ~VT18();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual int s18();
+    virtual int s19();
+    virtual int s20();
+    virtual int s21();
+};
+/* data of the derived screen classes after the vptr */
+class VT18D : public VT18 {
+public:
+    char pad1C[0x30];
+    int m4C;
+    char pad50[0x6F4];
+    Unk744Obj* m744;
+    char pad748[0x38];
+    int m780;
+    int m784;
+};
 /* vptr at +0x24 (sub-object at +0xDC / +0x98 of the screen classes) */
 class VT24 {
 public:
@@ -52,6 +89,15 @@ public:
     virtual int s9(int a, int b);
     virtual int s10(int a);
     virtual int s11();
+};
+/* vptr at +0x28 (object at lbl_8061EDF8) */
+class VT28 {
+public:
+    char pad0[0x28];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
 };
 /* vptr at +0x3C: TITLESLIDE family (vtable lbl_8065A640, 91+ slots) */
 class VT3C {
