@@ -83,6 +83,7 @@ void fn_80218A30(Task* t, int, int b, int idx)
     e->m9C = 1;
 }
 
+/* near-miss: 14 stores plus two Vec3 copies; best hill-climb order is 111 slots off */
 void fn_802198AC(Task* t, Player* x)
 {
     RecQueue* q = t->m9C->m3A60;
