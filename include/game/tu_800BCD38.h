@@ -182,10 +182,11 @@ void fn_800C3B14(Unk800C341C_Mgr* m);
 
 /* Data part of the front-end widget base (ctor fn_800C7B40, size 0x40 with the vptr at +0x3C).
  * +0x24 is a word of flag bits (b0 = MSB) whose low half overlaps m26. */
+struct Unk800C7B40_Widget;
 struct Unk800C7B40_Data {
     int m0;
     int m4;
-    int m8;
+    Unk800C7B40_Widget* m8;
     char mC[16];
     int m1C;
     int m20;
@@ -236,10 +237,10 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot11();
     virtual void fn_vslot12(int a);
     virtual void fn_vslot13();
-    virtual void fn_vslot14();
-    virtual void fn_vslot15();
-    virtual void fn_vslot16();
-    virtual void fn_vslot17();
+    virtual void fn_vslot14(int a);
+    virtual void fn_vslot15(int a);
+    virtual void fn_vslot16(int a);
+    virtual void fn_vslot17(int a);
     virtual void fn_vslot18(int a);
     virtual void fn_vslot19();
     virtual void fn_vslot20();
@@ -295,7 +296,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot70();
     virtual void fn_vslot71();
     virtual void fn_vslot72();
-    virtual void fn_vslot73();
+    virtual void fn_vslot73(int a, int b);
     virtual void fn_vslot74();
     virtual void fn_vslot75();
     virtual void fn_vslot76();
@@ -347,7 +348,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot122();
     virtual void fn_vslot123();
     virtual void fn_vslot124();
-    virtual void fn_vslot125();
+    virtual void fn_vslot125(int a, int b, int c, int d, int e);
     virtual void fn_vslot126();
     virtual void fn_vslot127();
 };
@@ -365,6 +366,10 @@ struct Unk800C7A4C_Group : Unk800C7B40_Widget {
     void fn_800C765C(Unk800C7B40_Widget* c);
     void fn_800C76C8(Unk800C7B40_Widget* c);
     void fn_800C7734(Unk800C7B40_Widget* c);
+    void fn_800CF114(int v);
+    void fn_800CF178(int v);
+    void fn_800CF1DC(int v);
+    void fn_800CF240(int v);
 };
 
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
@@ -403,6 +408,74 @@ struct Unk800C68B4_List {
     Unk800C7B40_Widget* fn_800C68D0(const char* name);
     void fn_800C694C(const char* name);
     void fn_800C696C();
+};
+
+extern "C" {
+void fn_800C7E0C(Unk800C7B40_Data* w, int v);
+void fn_800C7E38(Unk800C7B40_Data* w, int v);
+void fn_800C7E64(Unk800C7B40_Data* w, int v);
+void fn_800C7E90(Unk800C7B40_Data* w, int v);
+void fn_800C7EBC(Unk800C7B40_Data* w, int v);
+}
+
+/* Widget with a slot-73 callback pair at +0x68/+0x6C (fn_800CD5A4). */
+struct Unk800CD5A4_Obj : Unk800C7B40_Widget {
+    char pad40[0x28];
+    int m68;
+    int m6C;
+    void fn_800CD5A4();
+    void fn_800CD5E4();
+    void fn_800CDA14(int a, int b, int c);
+    void fn_800CDA54(int a, int b, int c);
+};
+
+/* Widget with six child pointers at +0x40..+0x54 (fn_800D1614 family). */
+struct Unk800D1614_Obj : Unk800C7B40_Widget {
+    int m40;
+    Unk800C7B40_Widget* m44;
+    Unk800C7B40_Widget* m48;
+    Unk800C7B40_Widget* m4C;
+    Unk800C7B40_Widget* m50;
+    Unk800C7B40_Widget* m54;
+    void fn_800D1614(Unk800C7B40_Widget* c);
+    void fn_800D1654(Unk800C7B40_Widget* c);
+    void fn_800D1694(Unk800C7B40_Widget* c);
+    void fn_800D16D4(Unk800C7B40_Widget* c);
+    void fn_800D1714(int v);
+};
+
+struct Unk800D244C_Vec4 {
+    int m0, m4, m8, mC;
+};
+
+/* Widget with a value at +0x5C that its flag setters refresh (fn_800D238C family) and a
+ * 16-byte value at +0x6C (fn_800D244C). */
+struct Unk800D238C_Obj : Unk800C7B40_Widget {
+    char pad40[0x1C];
+    int m5C;
+    char pad60[0xC];
+    Unk800D244C_Vec4 m6C;
+    void fn_800D238C(int v);
+    void fn_800D23BC(int v);
+    void fn_800D23EC(int v);
+    void fn_800D241C(int v);
+    void fn_800D244C(const Unk800D244C_Vec4& v);
+    void fn_800D2474(int v);
+};
+
+/* Object with an indexed table of ints at +0x17C. */
+struct Unk800D2CD8_Obj {
+    char pad0[0x17C];
+    int m17C[1];
+};
+
+/* Object with its own flag word at +0x70 and a value at +0x84. */
+struct Unk800D4B88_Obj {
+    char pad0[0x70];
+    unsigned b0 : 1;
+    unsigned rest : 31;
+    char pad74[0x10];
+    int m84;
 };
 
 extern int lbl_8061A330;
