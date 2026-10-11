@@ -379,6 +379,14 @@ public:
     void fn_8037B458(const char* name, int* field, int a, const char* b);               /* flag */
     void fn_8037B50C(const char* name, float* field, const char* range, int a);         /* float */
     void fn_8037B638(const char* name, int* field, const char* values);                 /* enum list */
+    /* Attribute registration used by the events (animation/events/tu_802A79BC.cpp).
+     * The last argument is the default value as a string (or null). The type
+     * code each one passes to fn_8037B76C is in the comment. */
+    void fn_8037B674(const char* name, int* field, const char* values, const char* def);   /* enum with default, 0xD */
+    void fn_8037B50C(const char* name, float* field, const char* range, const char* def);  /* float, 5 */
+    void fn_8037B494(const char* name, int* field, const char* range, const char* def);    /* int with range, 1 */
+    void fn_8037B7E8(const char* group);                                                    /* begin attribute group */
+    void fn_8037B830(const char* group);                                                    /* end attribute group */
 };
 
 #endif /* GAME_CHOOSER_H */
