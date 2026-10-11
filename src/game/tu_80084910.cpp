@@ -278,9 +278,6 @@ void fn_80086D24(Unk80084910_W* self, int i, int v);
 int fn_80086D34(Unk80084910_W* self, int i);
 int fn_80086DD8(void* self, unsigned i);
 void fn_80086E58(Unk80084910_Str* self, const short* str);
-/* near-miss: retail forms the destination as (i*34 + 0x88) from self and the
- * terminator offset as (n-1)*2 + i*34 from self+0x88; one slot of address
- * arithmetic differs. */
 void fn_80086F6C(Unk80084910_Q* self, int i, const short* str);
 void fn_800879B8(void* out, int a, VObj* obj);
 void fn_80087A50(Unk80084910_S* self, int v);
