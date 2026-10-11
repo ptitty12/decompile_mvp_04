@@ -90,6 +90,10 @@ animation/goals/tu_80287600.cpp:
 	.text       start:0x80287600 end:0x8028989C
 	.rodata     start:0x805DD54C end:0x805DD640
 
+animation/goals/tu_8028989C.cpp:
+	.text       start:0x8028989C end:0x8028B194
+	.rodata     start:0x805DD640 end:0x805DD6DC
+
 animation/warps/tu_802A3704.cpp:
 	.text       start:0x802A3704 end:0x802A4584
 	.rodata     start:0x805DE11C end:0x805DE2F8
