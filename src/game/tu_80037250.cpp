@@ -427,7 +427,7 @@ extern "C" void fn_800393B0(Unk80038570* s, int i)
             lbl_80616EF0[j] = 0;
     }
     lbl_80616F04 = -1;
-    fn_80039DBC(s, &lbl_80616F04);
+    fn_80039DBC(s, i);
     fn_80039988(s);
 }
 
