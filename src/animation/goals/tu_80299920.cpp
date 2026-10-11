@@ -7,7 +7,7 @@
  * emits .data in source-definition order, not .text order).
  *
  * Status: 18 of 25 match. Parked near-misses: fn_80299FD4, fn_8029A788, fn_8029A9A4, fn_8029AC74,
- * fn_8029B3F8, fn_8029B520 (notes above each). Not attempted: fn_8029B030 (242 instructions).
+ * fn_8029B030, fn_8029B3F8, fn_8029B520 (notes above each).
  * The 0x805DDC74 float pool (0, 1/(2*pi), 0.5, 2*pi, 100) belongs to fn_8029AC74 in retail but only
  * its first entry is used by the live code; the rest are leftovers of removed code.
  */
@@ -602,6 +602,79 @@ unsigned int Unk80299920_Goal::fn_8029B000(int k)
         break;
     }
     return h;
+}
+
+/* near-miss (245 vs 242 instructions, ~70% by alignment): the setup through the fn_8029A5C4 call is close;
+ * the m50 mode switch differs: retail jumps into shared SetPairI tails per value (1, 2, 0) while each case here
+ * gets its own copy, and retail keeps flag in r26 (one more callee-saved register than here) with the
+ * address of pos made only at the subtraction. About 6 shapes tried. */
+void Unk80299920_Goal::fn_8029B030(Unk80299920_XV* x, Unk8027AD3C_Obj* obj, int flag)
+{
+    if (m28) {
+        Vec3 pos;
+        float speed = 0.0f;
+
+        ((Unk8027A84C*)this)->fn_8027AD3C((Unk80270BA0_X*)x, obj, &pos, 0, &speed, 0, 0, 0);
+        Vec3 tgt;
+
+        if (m4C) {
+            tgt = m4Cp->m60;
+        } else {
+            tgt = GetM10();
+        }
+        float len = Length(Sub(tgt, pos));
+        Vec3 p = GetM10();
+        float ang1 = fn_8029A5C4(x, &p, obj, flag);
+        float ang2 = fn_80410CE8(GetM10().x - pos.x, GetM10().z - pos.z);
+
+        if (m48 == 0x17) {
+            if (m50 == 0) {
+                Unk80299920_SetPairI(&x->m734, 0x188, 0);
+            } else {
+                int mode = m50->m5B4;
+                int s = fn_80250724(x->m4D8);
+
+                switch (mode) {
+                case 0xc:
+                case 0xe:
+                    if (s == 3) {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 1);
+                    } else {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 0);
+                    }
+                    break;
+                case 0xd:
+                case 0xf:
+                    if (s != 2) {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 1);
+                    } else {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 0);
+                    }
+                    break;
+                case 0xb:
+                case 0x10:
+                    if (s == 3) {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 1);
+                    } else if (s == 2) {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 0);
+                    } else {
+                        Unk80299920_SetPairI(&x->m734, 0x188, 2);
+                    }
+                    break;
+                default:
+                    Unk80299920_SetPairI(&x->m734, 0x188, 0);
+                    break;
+                }
+            }
+        }
+        Unk80299920_Angles* a = &x->m734;
+
+        Unk80299920_SetM20(a, ang1);
+        Unk80299920_SetM140(a, ang2);
+        Unk80299920_SetM28(a, len);
+        Unk80299920_SetMB8(a, speed);
+        Unk80299920_SetMB8(a, speed);
+    }
 }
 
 /* near-miss (73 vs 74 instructions): retail sets r3 = 0 before the null test and keeps both m48 == 0x1d

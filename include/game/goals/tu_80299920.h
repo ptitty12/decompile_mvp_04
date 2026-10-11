@@ -69,7 +69,10 @@ struct Unk80299920_Goal {
     int m2C;
     char pad30[0x48 - 0x30];
     int m48;
-    int m4C;
+    union {
+        int m4C;
+        Unk80273498_Pos* m4Cp;
+    };
     Unk80299920_Tgt* m50;
     union {
         float m54;
@@ -288,6 +291,28 @@ inline Vec3 GetPos(const Unk8037B128_Mtx* m)
     Vec3 v = fn_8037B128(m);
     return v;
 }
+inline void Unk80299920_SetM20(Unk802726BC_Angles* a, float f)
+{
+    Unk80299920_SetPair(a, 0x20, f);
+}
+inline void Unk80299920_SetM28(Unk802726BC_Angles* a, float f)
+{
+    Unk80299920_SetPair(a, 0x28, f);
+}
+inline void Unk80299920_SetM140(Unk802726BC_Angles* a, float f)
+{
+    Unk80299920_SetPair(a, 0x140, f);
+}
+inline void Unk80299920_SetMB8(Unk802726BC_Angles* a, float f)
+{
+    Unk80299920_SetPair(a, 0xB8, f);
+}
+float fn_804028E4(float x);               /* square root */
+inline float Length(Vec3 v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+int fn_80250724(char* p);
 inline Vec3 CopyVec(const Vec3& v)
 {
     return v;
