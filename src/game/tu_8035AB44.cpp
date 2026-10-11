@@ -233,7 +233,79 @@ extern "C" void fn_8035B1C8(Unk8035B1C8* s)
     s->m20 = 0;
 }
 
-/* TODO fn_8035B200 */
+/* near-miss: 79 slots (register choices: retail keeps the object in r31 and precomputed member addresses in r26-r30;
+   ours uses r12). Statements are in retail's store order; no reordering search done (about 40 stores). */
+struct Unk8035B200 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    Unk8060558C m30;
+    Unk806055AC m38;
+    float m44;
+    Unk806055AC m48;
+    Unk806055AC m54;
+    float m60;
+    Unk806055AC m64;
+    Unk806055AC m70;
+    Unk806055AC m7C;
+    int m88;
+    int m8C;
+    Unk806055AC m90;
+    Unk806055AC m9C;
+    int mA8;
+    int mAC;
+    float mB0;
+    float mB4;
+    float mB8;
+    float mBC[6];
+    int mD4;
+    float mD8;
+};
+void fn_8035B200(Unk8035B200* s)
+{
+    s->m0 = 0;
+    s->m10 = 5;
+    s->m2C = lbl_805D30AC;
+    s->m4 = 0;
+    s->m30 = lbl_8060558C;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m1C = lbl_805D30A8;
+    s->m20 = lbl_805D30A8;
+    s->m24 = lbl_805D30A8;
+    s->m28 = lbl_805D30A8;
+    s->m18 = lbl_805D30A8;
+    s->m60 = lbl_805D30A8;
+    s->m64 = lbl_806055AC;
+    s->m70 = lbl_806055AC;
+    s->m44 = lbl_805D30A8;
+    s->m38 = lbl_806055AC;
+    s->m48 = lbl_806055AC;
+    s->m54 = lbl_806055AC;
+    s->m7C = lbl_806055AC;
+    s->m88 = 6;
+    s->m8C = 0;
+    s->m90 = lbl_806055AC;
+    s->m9C = lbl_806055AC;
+    s->mA8 = 0;
+    s->mD4 = 0;
+    s->mD8 = lbl_805D30A8;
+    s->mAC = 0;
+    s->mB0 = lbl_805D30A8;
+    s->mB4 = lbl_805D30A8;
+    s->mB8 = lbl_805D30A8;
+    for (int i = 0; i < 6; i++)
+        s->mBC[i] = lbl_805D30A8;
+}
 
 void fn_8035B3AC(int* p)
 {
