@@ -323,6 +323,11 @@ static inline Unk80052794_Entry* EntryOf(Unk80052794_Ctx* c, int i)
     return (Unk80052794_Entry*)((char*)c + i * 0x48 + 4);
 }
 
+/* Switch index type of fn_80059BDC (kind values 0x2A..0x5A). An enumeral switch index makes
+ * g++ 2.95 balance the case tree by node count instead of its ASCII cost table, as retail does.
+ * The negative enumerator keeps the type signed (cmpwi, not cmplwi). */
+enum Unk80059BDC_Kind { Unk80059BDC_Kind_Neg = -1, Unk80059BDC_Kind_Lo = 0x2A, Unk80059BDC_Kind_Hi = 0x5A };
+
 /* Callee prototypes (guessed from call sites; most callees are not matched yet). */
 extern const float lbl_805A92D4;
 extern int* lbl_8061B9C4;

@@ -7,6 +7,163 @@
  */
 #include "game/tu_80052794.h"
 
+void fn_80059BDC(int h, int kind, Unk80052794_Obj* obj)
+{
+    int v = 0x40;
+    switch ((Unk80059BDC_Kind)kind) {
+    case 0x2E:
+        v = 0xA;
+        break;
+    case 0x2F:
+        v = 0xB;
+        break;
+    case 0x30:
+        v = 0x26;
+        break;
+    case 0x2C:
+        v = 9;
+        break;
+    case 0x2D:
+        v = 9;
+        break;
+    case 0x31:
+        v = 0xC;
+        break;
+    case 0x32:
+        v = 0xD;
+        break;
+    case 0x35:
+        v = 0xE;
+        break;
+    case 0x37:
+        v = 0xF;
+        break;
+    case 0x3B:
+        v = 0x10;
+        break;
+    case 0x3F:
+        v = 0x11;
+        break;
+    case 0x34:
+        v = 0x2F;
+        break;
+    case 0x36:
+        v = 0x30;
+        break;
+    case 0x3A:
+        v = 0x31;
+        break;
+    case 0x3E:
+        v = 0x32;
+        break;
+    case 0x42:
+        v = 0x12;
+        break;
+    case 0x43:
+        v = 0x2E;
+        break;
+    case 0x44:
+        v = 0x13;
+        break;
+    case 0x45:
+        v = 0x14;
+        break;
+    case 0x46:
+        v = 0x3A;
+        break;
+    case 0x47:
+        v = 0x15;
+        break;
+    case 0x48:
+        v = 0x3B;
+        break;
+    case 0x49:
+        v = 0x16;
+        break;
+    case 0x4A:
+        v = 0x17;
+        break;
+    case 0x4B:
+        v = 0x18;
+        break;
+    case 0x4C:
+        v = 0x2B;
+        break;
+    case 0x4D:
+        v = 0x19;
+        break;
+    case 0x4E:
+        v = 0x1A;
+        break;
+    case 0x4F:
+        v = 0x1B;
+        break;
+    case 0x50:
+        v = 0x37;
+        break;
+    case 0x51:
+        v = 0x38;
+        break;
+    case 0x52:
+        v = 0x1C;
+        break;
+    case 0x53:
+        v = 0x36;
+        break;
+    case 0x56:
+        v = 0x1D;
+        break;
+    case 0x38:
+        v = 0x1E;
+        break;
+    case 0x3C:
+        v = 0x1F;
+        break;
+    case 0x40:
+        v = 0x20;
+        break;
+    case 0x57:
+        v = 0x21;
+        break;
+    case 0x58:
+        v = 0x22;
+        break;
+    case 0x59:
+        v = 0x23;
+        break;
+    case 0x5A:
+        v = 0x24;
+        break;
+    case 0x33:
+        v = 0x27;
+        break;
+    case 0x2A:
+        v = 0x27;
+        break;
+    case 0x2B:
+        v = 0x27;
+        break;
+    case 0x54:
+        v = 0x28;
+        break;
+    case 0x55:
+        v = 0x29;
+        break;
+    case 0x39:
+        v = 0x33;
+        break;
+    case 0x3D:
+        v = 0x34;
+        break;
+    case 0x41:
+        v = 0x35;
+        break;
+    }
+    if (v != 0x40) {
+        fn_80058FE4(h, v, obj);
+    }
+}
+
 /* near-miss: retail keeps the constant 3 in r4 for both the m18 store and the
  * fn_803A9204 argument (one fewer callee-saved register); this loads it twice. */
 Unk8005BA1C_Voice::Unk8005BA1C_Voice(int unused, int vol, int a3, int a4, int a5, int a6, int a7)
