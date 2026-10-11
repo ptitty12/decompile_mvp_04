@@ -35,6 +35,8 @@ void fn_801519A4();
 void* fn_801519A8();
 void fn_801519D8(void* p);
 char* fn_80151A18(char* p, int i);
+int fn_80151A28(char* p, int i);
+int fn_80151A38(char* p, int i);
 void* fn_80151C10();
 void fn_80151FA0(Unk80151FA0_Obj* p);
 float fn_80152064(UnkAt20F2* p, float f);
@@ -110,6 +112,20 @@ void fn_801519D8(void* p) { fn_8037CE98(fn_8037C7FC(), 0x916112DD, p, 0x0); }
 char* fn_80151A18(char* p, int i)
 {
     return (char*)(i * 0x18 + (int)p + 0x30);
+}
+
+int fn_80151A28(char* p, int i)
+{
+    char* b = p + 0x28;
+    int o = i * 0x18;
+    return *(int*)(b + o);
+}
+
+int fn_80151A38(char* p, int i)
+{
+    char* b = p + 0x2C;
+    int o = i * 0x18;
+    return *(int*)(b + o);
 }
 
 void* fn_80151C10() { return fn_80151A48(operator new(0x1C, lbl_806EF9B4)); }
