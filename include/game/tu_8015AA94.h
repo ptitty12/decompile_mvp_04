@@ -37,6 +37,13 @@ public:
     Unk801527C8_Actor* m324;
 };
 
+struct Unk8015F164_Evt {
+    char pad0[4];
+    float m4;
+    char pad8[4];
+    int mC;
+};
+
 /* Event record read by the event-to-code mappers fn_8015F744/fn_8015F7D0. */
 struct Unk8015F744_Evt {
     int m0;
@@ -76,6 +83,8 @@ public:
     void fn_8015AA94();
     void fn_80159F28(int a, int b);
     void fn_80157514(int a, int b, int c, int d, int e, Unk8015AB2C_Blk blk);
+    int fn_8015F164(Unk8015F164_Evt* e);
+    Unk80326F44_Out fn_8015F1F4(Unk8015F164_Evt* e);
     int fn_8015F744(Unk8015F744_Evt* e);
     int fn_8015F7D0(Unk8015F744_Evt* e);
     int fn_8015F840();
@@ -105,6 +114,8 @@ public:
     void fn_80165B68(struct Unk80165B68_Evt* e, float t);
     void fn_80165BE0(struct Unk80165BE0_Evt* e, float t);
     void fn_80163A98();
+    void fn_80163AF4(int id);
+    void fn_80161A74();
     void fn_80157410();
     void fn_801593D8();
     void fn_8015A1D4();

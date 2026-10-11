@@ -5,7 +5,59 @@
 #include "game/tu_8015AA94.h"
 
 extern float lbl_805C8EE8;
+extern const float lbl_805C8EC8;
+extern const float lbl_805C8ECC;
+extern Unk80326F44_Out lbl_805EBA10;
 extern float lbl_805C8EEC;
+
+inline int IsValid(const Unk80326F44_Out& o)
+{
+    return o.m0 != 0xC7;
+}
+
+/* near-miss: same logic; retail keeps the constant in f31 across the call and tests the result through a bool temp (li 1; cmpwi 0xC7; bne; li 0); const globals and inline IsValid tried */
+int Unk80159F28::fn_8015F164(Unk8015F164_Evt* e) /* 8015F164 */
+{
+    const float c = lbl_805C8EC8;
+    Unk80326F44_Out a = mC->m50.fn_80326F44(0x39, 0, e->m4);
+    if (IsValid(a)) {
+        if (a.m4 - e->m4 < c) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+/* near-miss: same shape as fn_8015F164 (constant kept in f31, bool temp); 6 instructions more in retail */
+Unk80326F44_Out Unk80159F28::fn_8015F1F4(Unk8015F164_Evt* e) /* 8015F1F4 */
+{
+    const float c = lbl_805C8ECC;
+    Unk801527C8_Sub* s = &mC->m50;
+    int id;
+    switch (e->mC) {
+    case 0:
+        id = 0xC0;
+        break;
+    case 1:
+        id = 0xC1;
+        break;
+    case 2:
+        id = 0xC2;
+        break;
+    case 3:
+        id = 0xC3;
+        break;
+    default:
+        return lbl_805EBA10;
+    }
+    Unk80326F44_Out a = s->fn_80326F44(id, 1, e->m4 - c);
+    if (a.m0 != 0xC7) {
+        if (!(a.m4 - e->m4 >= c)) {
+            return a;
+        }
+    }
+    return lbl_805EBA10;
+}
 
 int Unk80159F28::fn_8015F744(Unk8015F744_Evt* e) /* 8015F744 */
 {
