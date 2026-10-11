@@ -174,6 +174,9 @@ animation/goals/tu_8029B70C.cpp:
 	.rodata     start:0x805DDD0C end:0x805DDEEC
 	.data       start:0x8061E7FC end:0x8061E83C
 
+animation/goals/tu_8029EE50.cpp:
+	.text       start:0x8029EE50 end:0x802A3704
+
 animation/warps/tu_802A3704.cpp:
 	.text       start:0x802A3704 end:0x802A4584
 	.rodata     start:0x805DE11C end:0x805DE2F8
