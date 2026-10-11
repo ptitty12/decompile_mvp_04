@@ -525,14 +525,18 @@ struct Unk8026FB80_Item {
     int idx;
 };
 
-/* near-miss: 139 of 140 instructions; the stack frame, the call sequence and
- * all float code match. Remaining: callee-saved register numbers differ (this
- * r27 vs r25, loop index r26 vs r29, ...), the loop bottom reads the entry
- * count as 16(this) instead of 4(&mC), and the final copy loop is a bdnz loop
- * where retail has "mr rN,count; addic. rN,rN,-1; bne".
+/* The entry count is read through an inline taking &mC, so the loop-bottom test
+ * reuses the &mC pointer of the loop body (lwz 4(r27)), as in retail.
  * Needed to get the frame right: v, dist, r, a, b, n, q, list declared in this
  * order at function scope; an unused float between maxDist and ent (it only
- * occupies a slot); &v held in a pointer before the call. */
+ * occupies a slot); &v held in a pointer before the call. The copy loop reuses
+ * `i` (retail's count-down loop instead of bdnz), and the list entry is filled
+ * obj, key, idx. */
+inline int Unk8026DDE8_Count(Unk8026DDE8* m)
+{
+    return m->m4;
+}
+
 int cMatrixChooser::fn_8026FB80(Unk80270BA0_Obj* obj, float* out)
 {
     Unk80273498_Vec3 v;
@@ -546,7 +550,7 @@ int cMatrixChooser::fn_8026FB80(Unk80270BA0_Obj* obj, float* out)
     int count = 0;
     int i;
 
-    for (i = 0; i < mC.m4; i++) {
+    for (i = 0; i < Unk8026DDE8_Count(&mC); i++) {
         float maxDist;
         float unusedF;
         Unk8026FB80_A* ent;
@@ -565,16 +569,16 @@ int cMatrixChooser::fn_8026FB80(Unk80270BA0_Obj* obj, float* out)
             b = r * 0.0025399998f;
             mC.fn_8026DFC0(i, b);
             if (!(a <= 0.48) && !(a >= 0.52)) {
-                list[count].key = r;
                 list[count].obj = pl;
+                list[count].key = r;
                 list[count].idx = i;
                 count++;
             }
         }
     }
     fn_8040A208(list, count, 12, fn_8026FB60);
-    for (int k = 0; k < count; k++) {
-        out[k] = list[k].key;
+    for (i = 0; i < count; i++) {
+        out[i] = list[i].key;
     }
     return count;
 }
