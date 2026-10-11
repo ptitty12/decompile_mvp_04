@@ -55,7 +55,11 @@ struct Unk802D5D24_B {
     Unk802D5D24_C* m14;
 };
 struct Unk802D58E8_Owner {
-    char pad0[0x6F4];
+    char pad0[0x6D0];
+    int m6D0;
+    char pad6D4[8];
+    int m6DC;
+    char pad6E0[0x6F4 - 0x6E0];
     int m6F4;
     Unk802D5D24_B* m6F8;
     char pad6FC[4];
@@ -144,6 +148,19 @@ class Unk802D4BD0_Obj : public Unk802D4BD0_Virt {
 public:
     char pad9C[0x390 - 0x9C];
     int m390;
+};
+
+/* cCameraPole object as seen by its destructor fn_802D729C (vtable 0x80664528, member at +0x2C) and the camera-manager dtor
+ * fn_802D62A8 (vptr at +8, vtable 0x806643D0). */
+struct Unk802D729C {
+    const void* vptr;
+    char pad4[0x28];
+    char m2C[4];
+};
+struct Unk802D62A8 {
+    int m0;
+    int m4;
+    const void* m8;
 };
 
 #endif

@@ -17,6 +17,13 @@ extern const char lbl_805E2700[];
 extern const char lbl_805E270C[];
 extern const void* lbl_806646F0[];
 extern int lbl_8061EDB8;
+extern float lbl_8061EDE4;
+extern float lbl_8061EDE8;
+extern float lbl_8061EDEC;
+extern const void* lbl_80664528[];
+extern const void* lbl_806643D0[];
+void fn_8033CD28(void* p, int c);
+void fn_802D3B40(void* p, int c);
 extern Unk802D58E8_Flags* lbl_8061B8C0;
 
 Unk802D58E8* fn_801A4CE8(void* owner, int k);
@@ -42,9 +49,91 @@ const char* fn_802D4CBC();
 void fn_802D4DE8(Unk802D58E8* o, int k);
 void fn_802D4CC8(Unk802D58E8* o, int k);
 void fn_802D4434(Unk802D58E8* o, int k);
+enum KeyE { KeyE_Neg = -1, KeyE_Lo = 0x2B, KeyE_Hi = 0x6A };
+
+void fn_802D41C0(Unk802D58E8* o, int key)
+{
+    Unk802D58E8_Owner* ow = o->m60;
+    switch ((KeyE)key) {
+    case 0x2F:
+    case 0x5B:
+    case 0x67:
+        fn_802D58E8(o, 2);
+        break;
+    case 0x2B:
+    case 0x34:
+    case 0x35:
+    case 0x36:
+    case 0x57:
+    case 0x68:
+    case 0x6A:
+        fn_802D58E8(o, 1);
+        break;
+    case 0x42:
+        ow->m6DC = ow->m6D0;
+        o->m88 = 1;
+        o->m8C = lbl_8061EDE4;
+        break;
+    }
+}
+
 void fn_802D4280(Unk802D58E8* o)
 {
     fn_802D58E8(o, 1);
+}
+
+void fn_802D42A4(Unk802D58E8* o, int key)
+{
+    Unk802D58E8_Owner* ow = o->m60;
+    switch ((KeyE)key) {
+    case 0x5B:
+    case 0x67:
+        fn_802D58E8(o, 2);
+        break;
+    case 0x2B:
+    case 0x34:
+    case 0x35:
+    case 0x36:
+    case 0x39:
+    case 0x57:
+    case 0x68:
+    case 0x6A:
+        fn_802D58E8(o, 1);
+        break;
+    case 0x42:
+        ow->m6DC = ow->m6D0;
+        o->m88 = 1;
+        o->m8C = lbl_8061EDE8;
+        break;
+    }
+}
+
+void fn_802D4360(Unk802D58E8* o, int key)
+{
+    Unk802D58E8_Owner* ow = o->m60;
+    switch ((KeyE)key) {
+    case 0x39:
+    case 0x3A:
+    case 0x40:
+    case 0x5B:
+    case 0x67:
+        fn_802D58E8(o, 2);
+        break;
+    case 0x2B:
+    case 0x34:
+    case 0x35:
+    case 0x36:
+    case 0x57:
+    case 0x68:
+    case 0x6A:
+        fn_802D58E8(o, 1);
+        break;
+    case 0x42:
+        ow->m6DC = ow->m6D0;
+        o->m88 = 1;
+        o->m8C = lbl_8061EDEC;
+        break;
+    }
 }
 
 const char* fn_802D4BD0(Unk802D58E8* o, int k)
@@ -220,6 +309,12 @@ void fn_802D61AC(Unk802D58E8* o, int k, int a)
     fn_802D6008(o, k, fn_801A4B34(o->m60)->m390, a);
 }
 
+void fn_802D62A8(Unk802D62A8* p, int c)
+{
+    p->m8 = lbl_806643D0;
+    fn_802D3B40(p, c);
+}
+
 void fn_802D62D8(Unk802D62D8* o)
 {
     fn_802CBD04(o->m78);
@@ -287,6 +382,14 @@ const char* fn_802D7288()
 int fn_802D7294()
 {
     return 0;
+}
+
+void fn_802D729C(Unk802D729C* p, int c)
+{
+    p->vptr = lbl_80664528;
+    fn_8033CD28(p->m2C, 2);
+    p->vptr = lbl_806646F0;
+    fn_8037B424(p, c);
 }
 
 const char* fn_802D72F8()
