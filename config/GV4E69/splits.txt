@@ -391,6 +391,9 @@ game/tu_800CB3A8.cpp:
 game/tu_800CF178.cpp:
 	.text       start:0x800CF178 end:0x800D1758
 
+game/tu_800D1758.cpp:
+	.text       start:0x800D1758 end:0x800D4D0C
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
