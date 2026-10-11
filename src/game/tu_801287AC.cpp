@@ -42,6 +42,8 @@ extern const char lbl_805C0424[];
 extern const char lbl_805C0438[];
 extern const char lbl_805C088C[];
 extern const char lbl_805C0890[];
+extern const char lbl_805BC19C[];
+extern const char lbl_805BC1A0[];
 
 // PROTOS-BEGIN
 extern "C" {
@@ -68,6 +70,7 @@ void fn_8012AF28(int a, int b, int c);
 void fn_8012B678(int a, int b, int c);
 int fn_8007AB9C(int a, int b, int c);
 int fn_8012E3F4(Scr* self);
+void fn_8012D0D0(Scr* self);
 int fn_80126CF4(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 Wid* fn_8012B960(Scr* self, int id, int* out);
 int fn_8007AA84(int a, int b, int c, int d);
@@ -319,5 +322,82 @@ int fn_8012BF50(Scr* self, int id)
     }
     return 0;
 }
+
+/* near-miss: same layout difference as fn_8012C2BC. */
+int fn_8012C0A4(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->b0) {
+        if (self->m188 != 0 || self->m18C != 0)
+            c = 1;
+        else
+            c = 0;
+        if (c != 0) {
+            Wid* w = fn_8012B960(self, id, &out);
+            if (w != 0) {
+                fn_800C805C(fn_800C8044(w->fn_vslot32(lbl_805BC1A0, 1))->fn_vslot32(lbl_805BC19C, 1))->fn_vslot38(1);
+                fn_8012D0D0(self);
+            }
+            return 1;
+        }
+        if (fn_8012E3F4(self) != 0) {
+            int k = self->fn_vslot85();
+            Wid* w;
+            if (k != 2) {
+                if (k == 0) {
+                    if (self->fn_vslot86() == 0)
+                        return 0;
+                    w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+                } else {
+                    if (self->fn_vslot87() == 0)
+                        return 0;
+                    w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+                }
+                fn_800C805C(fn_800C8044(w->fn_vslot32(lbl_805BC1A0, 1))->fn_vslot32(lbl_805BC19C, 1))->fn_vslot38(1);
+            } else
+                return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
+
+/* near-miss: 1 extra insn; retail places the shared `li r3,0` block between the slot-87 test and the second name arm, and
+ * does not merge the first chain with the shared one (GCC merges them when the early returns are hoisted). */
+int fn_8012C2BC(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0)
+            fn_800C805C(fn_800C8044(w->fn_vslot32(lbl_805BC1A0, 1))->fn_vslot32(lbl_805BC19C, 1))->fn_vslot39();
+        return 1;
+    }
+    if (fn_8012E3F4(self) != 0) {
+        int k = self->fn_vslot85();
+        Wid* w;
+        if (k != 2) {
+            if (k == 0) {
+                if (self->fn_vslot86() == 0)
+                    return 0;
+                w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+            } else {
+                if (self->fn_vslot87() == 0)
+                    return 0;
+                w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+            }
+            fn_800C805C(fn_800C8044(w->fn_vslot32(lbl_805BC1A0, 1))->fn_vslot32(lbl_805BC19C, 1))->fn_vslot39();
+        } else
+            return 0;
+    }
+    return 1;
+}
+
 
 }
