@@ -2,6 +2,7 @@
  * Game code, .text 0x800A8684-0x800A9858 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/chooser.h"
 #include "game/tu_800A8684.h"
 #include "game/tu_8001B190.h"
 
@@ -31,12 +32,6 @@ struct Unk800A89DC_Mgr {
     Unk800A89DC_Slot* m4;
     Unk800A89DC_Slot* m8;
 };
-struct Unk800B555C {
-    int m0;
-    int m4;
-    int m8[1];
-};
-extern "C" Unk800B555C* fn_800B555C();
 extern void* lbl_8061930C;
 extern Unk800A89DC_Mgr* lbl_806192E0;
 extern const char* lbl_80619974[];

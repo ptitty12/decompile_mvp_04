@@ -11,7 +11,8 @@
 #ifndef GAME_TU_800A8684_H
 #define GAME_TU_800A8684_H
 
-#include "game/chooser.h"
+void* operator new(unsigned int size, int heap);
+extern int lbl_806EF9B4;
 
 extern "C" {
 void fn_80400560(void* p, int n);
@@ -46,5 +47,16 @@ struct UnkFEByte : UnkFEVirt {  /* flag byte (+4) */
 struct UnkFEStr : UnkFEVirt {   /* string (+4) */
     char m4[0x40];
 };
+
+/* Object returned by fn_800B555C (front-end state): +0 and +4 written by the
+ * flag actions (fn_800A94B4, fn_800A9328), +8 address passed to fn_800C1D6C
+ * (fn_800A89DC), +0x608 compared by fn_800A9B0C / fn_800A9C90. */
+struct Unk800B555C {
+    int m0;
+    int m4;
+    int m8[0x180];
+    int m608;
+};
+extern "C" Unk800B555C* fn_800B555C();
 
 #endif
