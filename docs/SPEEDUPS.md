@@ -45,7 +45,7 @@ Roughly ordered by expected payoff for the effort.
    agent time. Matchers park anything at 95% or above in a queue instead of
    spending their 8 attempts on it. Needs a compile script that wraps
    `ngccc` with the unit's flags.
-2. **A scout agent that prepares units before matchers start.** `idea`
+2. **A scout agent that prepares units before matchers start.** `adopted` (tools/scout: `packet.py`, `rename.py`)
    Most of the first game unit's hour went into finding its boundaries, proving
    class names from strings, and checking the C++ ABI. A scout can do this ahead
    of time for every unit and attach a "unit packet" to the unit's issue:
@@ -132,9 +132,18 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-10 | matcher | Timing for playeridchooser.cpp: 19/26 functions in about 80 min, including about 35 min of unit setup (boundaries, names, ABI). Boilerplate took about 1–2 min per function once the first of its kind matched. Loops of 0x100–0x1AC bytes took about 5–10 min each | measure (13), scout (2) | baseline for per-tier rates
 - 2026-10-10 | matcher | g++ 2.95 emits vtables in `.gnu.linkonce.d._vt.*` sections. The ldscript has no rule for them yet, so the first C++ unit to link (Matching) will need one | — | one-off, blocks linking C++ units
 - 2026-10-10 | matcher | A partial MWCC SDK unit can't link: its .sdata is 8-aligned, and OS.c's data must be complete first. SDK progress therefore counts code only until whole units are done | — | affects SDK planning
+- 2026-10-10 | matcher | Near-miss queue entry: `ICommonPlayerID::fn_vslot17` (0x80270BA0, 0x13C) has exact logic/blocks/length, but `this`/`out` are swapped between r29 and r28. 14 variants failed. Parked | permuter (1) | first queue entry
+- 2026-10-10 | matcher | Two identical source clamps (`key = v; if (v < 0) key = 0;`) get cross-jumped by GCC into one shared block. When retail keeps them apart, one of them was written differently (here a ternary select) | cookbook (3) | saved about 15 min once known
+- 2026-10-10 | matcher | g++ 2.95 places the vptr after the data of the class that introduces virtuals. A vptr at +0x98 in a big object means a data-less intermediate class; getting this wrong shifts every field by 4 | cookbook (3) | medium, recurs for every class hierarchy
+- 2026-10-10 | matcher | ProDG's plain `char` is **signed** (callers `extsb`). A `clrlwi rX,rY,24` at a call site means the parameter is `unsigned char` | cookbook (3) | small, recurs
+- 2026-10-10 | matcher | Positional diff counts mislead on big functions: one inserted instruction looks like 100 differences. An alignment-aware score (LCS) made variant ranking usable on a 0x290 function (71 → 8 → MATCH) | tight loop (10) | high on functions > 256 B
+- 2026-10-10 | matcher | Timing for playeridchooser.cpp overall: 25/26 in about 2 h 15 min of matching, including about 35 min of setup. Rough per-size rate: ≤64 B about 1–2 min; 65–256 B about 5–10 min; 0x290 about 25 min; one 0x13C near-miss parked after about 15 min | measure (13) | baseline
 
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
 - 2026-10-10 | 10 | `tools/match/` helpers: `diff_unit.py` (rebuild one unit and diff each function), `variants.py` (score N rewrites per compile), and asm show/summary scripts | rebuild+diff loop **1.9 s**; a variants run takes about 5 s for 7–10 variants
 - 2026-10-10 | 3 | Reused the chooser "quartet" recipe (ctor / attribute registration / dtor / factory) from ICommonPlayerID on cSignatureChooser | 4/4 matched on the first compile, about 1 min per function
+- 2026-10-10 | 2 | `tools/scout/packet.py` on 0x80270730..0x80271748 reproduced the hand-made split, the class names and the object sizes in **about 4 s, vs about 35 min by hand** (built by the progress session). Minutes actually saved on the next unit: to be filled in after the next unit | per-unit setup cut by roughly 30 min
+- 2026-10-10 | 2 | `tools/scout/rename.py` (dry run) caught a function-order mismatch between source and retail (0x8027101C must precede 0x8027107C) that would have broken linking later | prevents a link-order bug
+- 2026-10-10 | 10 | `tools/match/variants.py` alignment-aware scoring | made variant search work on the 0x290 function: 3 runs to MATCH
