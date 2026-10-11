@@ -91,7 +91,7 @@ inline float LenSq3(const Unk80273498_Vec3& v)
 struct Unk802A2604_Player {
     char pad0[0x720];
     float m720;
-    char pad724[0x728 - 0x724];
+    float m724;
     float m728;
     float m72C;
 };
@@ -148,6 +148,103 @@ int fn_8027D708(void* g, Unk8027C728_Player* x, Unk8027C728_Player* p);
 extern int lbl_806242B4;
 int fn_8026DC5C(Unk80270BA0_X* x, int a);
 int fn_8026DB3C(Unk80270BA0_X* x, int a);
+
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror108, float, 0x108)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror50, float, 0x50)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror110, float, 0x110)
+
+int fn_8029CFDC(Unk8029B70C_Goal* g, const Unk80273498_Vec3* a, const Unk80273498_Vec3* b);
+extern const Unk80273498_Vec3 lbl_805DED34;     /* (1080, 0, 1080) */
+extern const Unk80273498_Vec3 lbl_805DED4C;     /* (7.5, 0, 7.5) */
+extern float lbl_8061E7D4;
+extern float lbl_8061E7D8;
+
+/* Position of the player with y cleared. Reading x->m60 inside the inline
+ * (rather than passing it by reference) gives retail's instruction order
+ * (fn_802A253C, fn_802A0754). */
+inline Unk80273498_Vec3 FlatPosOf(Unk80270BA0_X* x)
+{
+    Unk80273498_Vec3 r = x->m60;
+    r.y = 0.0f;
+    return r;
+}
+
+/* Object at context+0x6CC as seen by fn_802A1790: position at +0x60, owner
+ * at +0x36C, two ints at +0x38C/+0x390 (tested against 1). */
+struct Unk802A1790_Pos {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+    char pad6C[0x36C - 0x6C];
+    Unk80270BA0_X* m36C;
+    char pad370[0x38C - 0x370];
+    int m38C;
+    int m390;
+};
+
+float fn_8041171C(float a);        /* sin */
+float fn_80411554(float a);        /* cos */
+
+/* Unary minus on a vector: three negations (fn_802A1790). */
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a)
+{
+    Unk80273498_Vec3 r;
+    r.x = -a.x;
+    r.y = -a.y;
+    r.z = -a.z;
+    return r;
+}
+
+inline float Unk802A1790_Yaw(Unk80273498_Vec3 v)
+{
+    return fn_80410CE8(v.x, v.z);
+}
+
+inline Unk80273498_Vec3 Unk802A1790_Dir(float a)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(a);
+    r.y = 0.0f;
+    r.z = fn_80411554(a);
+    return r;
+}
+
+inline Unk80273498_Vec3 Unk802A1790_Scale(Unk80273498_Vec3 v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+int fn_8024D408(Unk80270BA0_X* x);
+int fn_8026D654(Unk80270BA0_X* x, int a);
+void fn_80191068(Unk802A1790_Pos* p, Unk80273498_Vec3* v, int a, float* out, float f1, float f2);
+extern float lbl_8061E858;
+extern float lbl_8061E85C;
+/* The second probe of fn_802A1790 takes its position by value (a copy in the
+ * inline's own frame). */
+inline void Unk802A1790_Probe(Unk802A1790_Pos* p, Unk80273498_Vec3 v, float* out)
+{
+    fn_80191068(p, &v, 0, out, lbl_8061E858, lbl_8061E85C);
+}
+extern float lbl_8061E850;
+extern float lbl_8061E854;
+
+/* Writes the vector through the first argument (fn_802A1790). The same
+ * address is declared in tu_8027A84C.h as returning the vector by value; the
+ * register usage is identical. */
+void fn_80189618(Unk80273498_Vec3* out, Unk8018959C_Obj* o, float f);
+
+/* fn_802A168C: retail's parameter order is (goal, player, float, hash): the
+ * float parameter is spilled before the hash is moved, which only happens when
+ * it is declared first. tu_8029B70C.h declares the other order, which compiles
+ * to the same argument registers (the callers there are unaffected). */
+int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, unsigned int hash);
+
+void fn_802A28EC(Unk8029B70C_Goal* g, Unk80270BA0_X* a, Unk80273498_Pos* b);
+int fn_8029D7D4(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int a, int b, int c, int d);
 
 void fn_802771A0(int a);
 void fn_802D7B88(int a, int b, float f, int c);

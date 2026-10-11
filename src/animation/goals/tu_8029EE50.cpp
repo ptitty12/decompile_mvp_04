@@ -35,6 +35,69 @@ void fn_8029EF28(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link)
     }
 }
 
+int fn_802A0754(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
+{
+    Unk80271DBC_Link* link = x->m618;
+    Unk80273498_Vec3 pos = FlatPosOf(x);
+    float cur = fn_80382BB8(link);
+    int state = fn_802A2604(g, x, f, g->m48);
+    int s = fn_802A1790(g, x, f);
+    if (s != 0x11) {
+        return s;
+    }
+    if (state == 7 || state == 5 || state == 6 || state == 9) {
+        int kind = g->m48;
+        unsigned int hash = 0x12A7B064;
+        if (kind == 5) {
+            hash = 0xEF34393E;
+        }
+        if (kind == 6) {
+            Unk80273498_Vec3 a = pos;
+            Unk80273498_Vec3 b = lbl_805DED34;
+            fn_8029CFDC(g, &a, &b);
+        } else if (kind == 7) {
+            if (g->m60) {
+                Unk80273498_Vec3 b = pos;
+                Unk80273498_Vec3 a = g->m60->m60;
+                fn_8029CFDC(g, &b, &a);
+            }
+        } else {
+            Unk80273498_Vec3 b = pos;
+            Unk80273498_Vec3 a = lbl_805DED4C;
+            fn_8029CFDC(g, &b, &a);
+        }
+        if (!fn_8029D7C4(g) || !fn_802A168C(g, x, g->m70, hash)) {
+            Unk802726BC_Angles* p = &x->m734;
+            Unk8029B70C_Mirror98(p, AngleDiff(cur, g->m70));
+            Unk8029B70C_Mirror108(p, AngleDiff(g->m70, g->m6C));
+            Unk80273498_Vec3 zero = lbl_806055AC;
+            float speed = 0.0f;
+            ((Unk8027A84C*)g)->fn_8027AAB0(x, hash, lbl_806242B4, &speed, &zero, 0, 0);
+            float dist = fn_804028E4(LenSq3(FlatPos(zero - pos)));
+            float q = dist / speed;
+            dist = !(dist > 120.0f) ? (dist >? 12.0f) : 120.0f;
+            Unk8029B70C_Mirror8(p, f);
+            Unk8029B70C_Mirror48(p, -1.0f);
+            float k = f / ((Unk802A2604_Player*)x)->m72C;
+            k = !(k > 1.0f) ? (k >? 0.1f) : 1.0f;
+            float v = g->m48 == 5 ? lbl_8061E7D4 : lbl_8061E7D8;
+            float w = v / q * k;
+            Unk8029B70C_Mirror50(p, w);
+            Unk8029B70C_Mirror110(p, g->m6C);
+            fn_80381E9C(link, hash, 0, 0);
+            if (link->m838 != hash) {
+                return state;
+            }
+            if (!(x->m71C & 0x2000)) {
+                g->mD0.f4 = 1;
+            }
+            fn_80244858(x, g->m70);
+        }
+        g->mD0.f7 = 1;
+    }
+    return state;
+}
+
 int fn_802A0D80(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk8014D8AC_Ctx* ctx = x->m44C;
@@ -199,7 +262,7 @@ int fn_802A15BC(Unk8029B70C_Goal* g, Unk80270BA0_X* x)
     return r;
 }
 
-int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, unsigned int hash, float f)
+int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, unsigned int hash)
 {
     if (fn_8026DC18(x, 0) || fn_8026D628(x, 0) || fn_8026D988(x, 0)) {
         float now = (float)x->m44C->m4C * 0.016666668f;
@@ -216,10 +279,111 @@ int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, unsigned int hash, float 
     return 0;
 }
 
+int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
+{
+    Unk80273498_Vec3 pos = FlatPosOf(x);
+    Unk802A1790_Pos* p = (Unk802A1790_Pos*)x->m44C->m6CC;
+    Unk80273498_Vec3 ppos = p->m60;
+    if (p->m36C == 0) {
+        {
+            Unk80273498_Vec3 a = pos;
+            Unk80273498_Vec3 b = ppos;
+            if (!fn_8029CFDC(g, &a, &b)) {
+                if (!(ppos.y <= 120.0f)) {
+                    fn_80189618(&a, (Unk8018959C_Obj*)p, 0.0f);
+                    float yaw = Unk802A1790_Yaw(-a);
+                    g->m70 = yaw;
+                    g->mD0.f2 = 1;
+                }
+            }
+        }
+        int flagB = 0;
+        fn_802A28EC(g, x, (Unk80273498_Pos*)p);
+        int flagC = 0;
+        int is34 = (unsigned int)(g->m48 - 3) <= 1;
+        if (is34) {
+            float t = ((Unk802A2604_Player*)x)->m724;
+            if (g->m48 == 4) {
+                t *= fn_8024D0C4(x, 0x48, 0.0f, 1.0f);
+            }
+            if (!(f >= t)) {
+                flagB = 1;
+            }
+        } else {
+            flagB = 1;
+        }
+        if (!flagB || (fn_8026D628(x, 0) && !(f <= 0.0f))) {
+            if (fn_8024D408(x)) {
+                int c = 0;
+                if (p->m38C == 1 || p->m390 == 1) {
+                    c = 1;
+                }
+                if (c) {
+                    Unk80273498_Vec3 w = x->m60;
+                    float h = 0.0f;
+                    fn_80191068(p, &w, 0, &h, lbl_8061E858, lbl_8061E85C);
+                    if (!(h >= lbl_8061E850)) {
+                        if (fn_8026D654(x, 0)) {
+                            flagB = 1;
+                        } else {
+                            float ang = fn_80382BB8(x->m618);
+                            Unk80273498_Vec3 off = Unk802A1790_Scale(Unk802A1790_Scale(Unk802A1790_Dir(ang), f), 0.35f);
+                            float h2 = 0.0f;
+                            Unk802A1790_Probe(p, w + off, &h2);
+                            if (!(h2 <= lbl_8061E854)) {
+                                float eps = 65.0f;
+                                flagB = 1;
+                                Unk80273498_Vec3 v;
+                                fn_80189618(&v, (Unk8018959C_Obj*)p, 0.3f);
+                                float len = LenSq3(v);
+                                if (!(len <= eps * (eps * 309.76f))) {
+                                    if (!fn_8026DC18(x, 0)) {
+                                        flagC = 1;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int r = fn_8029D7D4(g, x, (int)p, is34, flagB, flagC);
+        if (r == 1) {
+            return 0xA;
+        }
+        if (r == 2) {
+            return 0xC;
+        }
+        return 0x11;
+    }
+    g->mD0.f2 = 0;
+    if (g->m60) {
+        fn_802A2A64(g, x, g->m60);
+        int flag = 0;
+        g->m70 = fn_80410CE8(g->m60->m60.x - pos.x, g->m60->m60.z - pos.z);
+        g->mD0.f2 = 1;
+        int a = fn_8026DC5C(x, 0);
+        if (!a || fn_8026DB3C(x, 0)) {
+            flag = 1;
+        }
+        g->m50 = ((Unk8027A84C*)g)->fn_8027BB88(x, (Unk8027BBA8_Obj*)g->m60, a, flag, 1);
+        if (g->m50) {
+            g->mD0.f6 = 0;
+            return 0xB;
+        }
+        if (!(f <= ((Unk802A2604_Player*)x)->m720)) {
+            if (fn_8027D708(g, (Unk8027C728_Player*)x, (Unk8027C728_Player*)g->m60) == 1) {
+                return 0xD;
+            }
+        }
+    }
+    return 0x11;
+}
+
 int fn_802A253C(Unk8029B70C_Goal* g, Unk80270BA0_X* x)
 {
     if (g->m60) {
-        Unk80273498_Vec3 pos = FlatPos(x->m60);
+        Unk80273498_Vec3 pos = FlatPosOf(x);
         int idx;
         float d;
         if (fn_8026CF70(x, g->m60, &g->mC4, &idx, &d)) {
