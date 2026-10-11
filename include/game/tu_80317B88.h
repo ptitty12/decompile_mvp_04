@@ -597,7 +597,8 @@ struct FxView {
 struct FxApp {
     char pad0[0x8];
     FxView* m8;
-    char padC[0x18];
+    char padC[0x14];
+    int m20;
     int m24;
 };
 class FxPageV {
@@ -652,6 +653,51 @@ public:
     int mC;
 };
 struct FxF3 { float x; float y; float z; };
+class FxListV {
+public:
+    float m0;
+    float m4;
+    virtual ~FxListV();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+};
+class FxListD : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    int* m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int* m60;
+};
+class FxModal {
+public:
+    char pad0[0x2DC];
+    virtual ~FxModal();
+    virtual void s2();
+    virtual void s3();
+};
+/* Input-list widget (count at +0x54, id array pointer at +0x60; fn_8032F5C4, fn_8032F620,
+ * fn_8032FB78 step through it; vptr at +8).
+ * Object with its vptr at +0x2DC (vtable lbl_80666A18; dtor fn_80330870, start/stop fn_80330B48).
+ * Stack of items (count at +0x178, items from +0) and a second list from +0x17C (count +0x1FC). */
+struct FxStack {
+    int a0[94];
+    int m178;
+    int a17C[32];
+    int m1FC;
+};
 // STRUCTS-END
 
 extern int lbl_8061FF50;
