@@ -152,15 +152,13 @@ inline void Unk803DBE08Out::Begin(int n)
 }
 
 /*
- * near-miss (-O2): 449/449 instructions, ~98% in objdiff. Remaining
- * differences: in the two default-case index loops (b->m0 not 1..4) retail
- * has i in r9 and j in r11, this has them swapped; and "li r25,1" / "mr r4,r28"
- * are in the other order in the first-chunk call. GXWGFifo relocs also differ
- * from retail's raw lis 0xcc01 immediates.
  * What mattered: Unk803DBE08Out must be 8 bytes (frame layout), inline ctor and
  * members for the &v register pair, "per = a / b; per = per / 12 * 12;" as two
  * statements, "n *= m; n += 3;" in the tails, the if/else chain (not a switch),
- * unsigned char i with an int "next" temp in the fill loop.
+ * unsigned char i with an int "next" temp in the fill loop, "first = 1" after
+ * the first-chunk call, and one "unsigned i" per branch shared by its five
+ * index loops (global-alloc priority: a per-loop i is 3*11/34 against the
+ * inner j's 3*13/20, so j takes r9; the shared i is 5*53/130 and goes first).
  */
 extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
 {
@@ -234,8 +232,8 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
                     GXWGFifo.u32 = (unsigned int)lbl_8062C660;
                     GXWGFifo.u32 = sz;
                 } else {
-                    first = 1;
                     fn_80430124(lbl_8062C660, sz);
+                    first = 1;
                 }
                 int chunk = per;
                 if (v.m0 == 0x98) {
@@ -244,26 +242,27 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
                 fn_803DA188(chunk);
                 n -= chunk;
             }
+            unsigned i;
             v.Begin(n);
             if (b->m0 == 4) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 8) | (i << 16) | (i << 24);
                 }
             } else if (b->m0 == 3) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i | (i << 8);
                     GXWGFifo.u8 = i;
                 }
             } else if (b->m0 == 2) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i | (i << 8);
                 }
             } else if (b->m0 == 1) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u8 = i;
                 }
             } else {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     for (int j = 0; j < b->m0; j++) {
                         GXWGFifo.u8 = i;
                     }
@@ -276,27 +275,28 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
                 GXWGFifo.u8 = 0;
             }
         } else {
+            unsigned i;
             v.Begin(n);
             if (b->m0 == 4) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                     GXWGFifo.u32 = i | (i << 16);
                 }
             } else if (b->m0 == 3) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                     GXWGFifo.u16 = i;
                 }
             } else if (b->m0 == 2) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                 }
             } else if (b->m0 == 1) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i;
                 }
             } else {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     for (int j = 0; j < b->m0; j++) {
                         GXWGFifo.u16 = i;
                     }

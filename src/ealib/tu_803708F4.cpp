@@ -152,13 +152,11 @@ inline void Unk803DBE08Out::Begin(int n)
 }
 
 /*
- * near-miss (-O2): same instruction count as retail; this is the variant of
- * the 0x704 function in tu_80373AD8 without the UV matrix part (b->m4 comes
- * from entry 6, the lbl_806279C8 store is absent, fn_803DD794 is called before
- * fn_803DDCD4). Differences left are register numbers only: b is r27 here and
- * r26 in retail (the GXWGFifo high-half register is the other way round), and
- * in the two default-case index loops i and j are swapped (retail i=r9, j=r11);
- * "li r25,1" / "mr r4,r28" are in the other order in the first-chunk call.
+ * The variant of the 0x704 function in tu_80373AD8 without the UV matrix part
+ * (b->m4 comes from entry 6, the lbl_806279C8 store is absent, fn_803DD794 is
+ * called before fn_803DDCD4). Same source shape otherwise, including the one
+ * "unsigned i" per branch shared by the index loops and "first = 1" after the
+ * first-chunk call (both needed here too; they also put b in r26).
  */
 extern "C" void fn_803708F4(Unk803E3C08* a, Unk80623E94* b)
 {
@@ -227,8 +225,8 @@ extern "C" void fn_803708F4(Unk803E3C08* a, Unk80623E94* b)
                     GXWGFifo.u32 = (unsigned int)lbl_8062C660;
                     GXWGFifo.u32 = sz;
                 } else {
-                    first = 1;
                     fn_80430124(lbl_8062C660, sz);
+                    first = 1;
                 }
                 int chunk = per;
                 if (v.m0 == 0x98) {
@@ -237,26 +235,27 @@ extern "C" void fn_803708F4(Unk803E3C08* a, Unk80623E94* b)
                 fn_803DA188(chunk);
                 n -= chunk;
             }
+            unsigned i;
             v.Begin(n);
             if (b->m0 == 4) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 8) | (i << 16) | (i << 24);
                 }
             } else if (b->m0 == 3) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i | (i << 8);
                     GXWGFifo.u8 = i;
                 }
             } else if (b->m0 == 2) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i | (i << 8);
                 }
             } else if (b->m0 == 1) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u8 = i;
                 }
             } else {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     for (int j = 0; j < b->m0; j++) {
                         GXWGFifo.u8 = i;
                     }
@@ -269,27 +268,28 @@ extern "C" void fn_803708F4(Unk803E3C08* a, Unk80623E94* b)
                 GXWGFifo.u8 = 0;
             }
         } else {
+            unsigned i;
             v.Begin(n);
             if (b->m0 == 4) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                     GXWGFifo.u32 = i | (i << 16);
                 }
             } else if (b->m0 == 3) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                     GXWGFifo.u16 = i;
                 }
             } else if (b->m0 == 2) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u32 = i | (i << 16);
                 }
             } else if (b->m0 == 1) {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     GXWGFifo.u16 = i;
                 }
             } else {
-                for (unsigned i = 0; i < n; i++) {
+                for (i = 0; i < n; i++) {
                     for (int j = 0; j < b->m0; j++) {
                         GXWGFifo.u16 = i;
                     }
