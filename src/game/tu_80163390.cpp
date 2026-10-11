@@ -4,6 +4,9 @@
  */
 #include "game/tu_80163390.h"
 
+extern float lbl_805C9204;
+extern float lbl_805C9208;
+
 extern float lbl_805C9248;
 extern float lbl_805C924C;
 extern float lbl_805C9250;
@@ -38,6 +41,7 @@ Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
 Unk801527C8_Actor* fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
 Unk801527C8_Actor* fn_801A4910(Unk801527C8_Actor* a, int k, int v);
 int fn_8014E310(int id);
+void fn_8022EA60(Unk80273498_Vec3* out, void* a, ...);
 void fn_8018CA5C(Unk80189300* o, float* a, float* b, float* c);
 
 void Unk80159F28::fn_80163A98() /* 80163A98 */
@@ -124,6 +128,40 @@ void Unk80159F28::fn_80165328(Unk80165328_Evt* e, float t) /* 80165328 */
     s->fn_80326EF4(u, lbl_805C9200, 0xAC, -1, -1, 0);
 }
 
+/* near-miss: structure differs (retail computes the (x+y > c) flag once into an int before the branches); 3 forms tried */
+void Unk80159F28::fn_801653B0(int id, float t) /* 801653B0 */
+{
+    Unk80273498_Vec3 v;
+    fn_8022EA60(&v, mC->m700->m3B0);
+    if (fn_8015F840() != 0) {
+        v.x = -v.x;
+    }
+    int g = v.x + v.y > lbl_805C9204;
+    float x = lbl_805EBA00;
+    int flags;
+    if (!(v.x - v.y <= lbl_805C9204)) {
+        if (g) {
+            flags = 0x8000;
+            x = v.x - lbl_805C9208;
+        } else {
+            flags = 0x2000;
+            x = -v.y - lbl_805C9208;
+        }
+    } else {
+        if (g) {
+            flags = 0x1000;
+            x = v.y - lbl_805C9208;
+        } else {
+            flags = 0x4000;
+            x = -v.x - lbl_805C9208;
+        }
+    }
+    if (id == 0x41) {
+        x = -x;
+    }
+    mC->m50.fn_80326EF4(t, x, id, -1, -1, flags);
+}
+
 void Unk80159F28::fn_801654F0(Unk801654F0_Evt* e, float t) /* 801654F0 */
 {
     if (e->m8 == 2) {
@@ -181,8 +219,9 @@ void Unk80159F28::fn_80165884(Unk80165884_Evt* e, float t) /* 80165884 */
     }
     Unk80165578_Obj* o = (Unk80165578_Obj*)fn_801A4910(a, k, m10);
     if (o != 0) {
+        int id = o->m458;
         int b = e->m8;
-        s->fn_80326EF4(t, lbl_805C921C, 0x5F, o->m458, b, 0);
+        s->fn_80326EF4(t, lbl_805C921C, 0x5F, id, b, 0);
     }
 }
 
