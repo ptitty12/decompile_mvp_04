@@ -357,9 +357,8 @@ cflags_libgcc = ["-O2", "-G0"]
 # exception tables in the binary. See docs/DECISIONS.md.
 cflags_game = ["-Os", "-G0", "-ffloat-store", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
-# EA shared libraries (ProDG 3.9.3). Provisional: -G0 is what the matched units
-# were verified with; W5 reported r13 small-data use in places, so confirm per unit.
-cflags_ealib = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions"]
+# EA shared libraries (ProDG 3.9.3): -O2, unlike game code (-Os). See docs/DECISIONS.md.
+cflags_ealib = ["-O2", "-G0", "-fno-rtti", "-fno-exceptions"]
 
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
