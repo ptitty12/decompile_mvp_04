@@ -206,6 +206,7 @@ void fn_800EF2B8(UiScrRaw* self)
 }
 
 enum E48Sel { E48Sel_Neg = -1, E48Sel_Lo = 0, E48Sel_Hi = 1 };
+/* near-miss: 136 vs 139 insns; local UiStr4 copies and field reads through byte offsets differ */
 int fn_800EF7D8(UiS* self, int idx)
 {
     fn_8001BC4C()->fn_8001BDAC(0x9C);
@@ -239,6 +240,7 @@ int fn_800EF7D8(UiS* self, int idx)
     return 1;
 }
 
+/* near-miss: 132 vs 137 insns; local UiStr4 copies and field reads through byte offsets differ */
 int fn_800EFA04(UiS* self, int idx)
 {
     fn_8001BC4C()->fn_8001BDAC(0x9B);
