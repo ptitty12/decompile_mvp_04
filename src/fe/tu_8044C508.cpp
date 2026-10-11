@@ -55,6 +55,18 @@ extern "C" FE_OVERLAY void fn_8044C77C(FeX24* self)
     fn_80444890(self);
 }
 
+extern "C" FE_OVERLAY void fn_8044D270(FeS0_8* self)
+{
+    FeObj* c = fn_800C8044(self->m0->v32("CONTENTS", 1));
+    if (self->m8 == 0) {
+        ((FeObj1*)c->v32("OPPONENT", 1))->v8(1);
+        ((FeObj1*)c->v32("BACKING", 1))->v8(1);
+    } else {
+        ((FeObj1*)c->v32("OPPONENT", 1))->v8(0);
+        ((FeObj1*)c->v32("BACKING", 1))->v8(0);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_8044D3D8(FeX14* self)
 {
     int v = lbl_8061930C->fn_80078A38(lbl_8062163C);
@@ -159,6 +171,34 @@ extern "C" FE_OVERLAY void fn_8044E398(int a, FeObj* o)
         ((FeObj2*)o)->v67(0, 0);
 }
 
+extern "C" FE_OVERLAY void fn_8044E5EC(void)
+{
+    UiMsg m;
+    FeObj* cal = fn_800B7AB8(UiGetMsgMgr(), "GAMECALENDAR");
+    UiMsg* p = &m;
+    ((FeObj1*)cal)->v80(1);
+    fn_8035682C(p);
+    if (fn_800A2EB4(lbl_80619948) != 0) {
+        if (fn_805562B8(fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0)) != 0) {
+            fn_8040B830(p->name, "WINNER", 15);
+            p->name[15] = 0;
+        } else {
+            fn_8040B830(p->name, "PLAYOFFEND", 15);
+            p->name[15] = 0;
+        }
+    } else if (fn_800A2E6C(lbl_80619948) != 0) {
+        fn_8040B830(p->name, "SPRINGEND", 15);
+        p->name[15] = 0;
+    } else if (fn_800B56C4(fn_800B555C()) != 0) {
+        fn_8040B830(p->name, "SEASONEND", 15);
+        p->name[15] = 0;
+    } else {
+        fn_8040B830(p->name, "BACK", 15);
+        p->name[15] = 0;
+    }
+    fn_800B7B4C(UiGetMsgMgr(), &m, cal);
+}
+
 extern "C" FE_OVERLAY void fn_8044E768(void)
 {
     fn_80445DA8((FeScr2*)fn_800B7A94(UiGetMsgMgr(), "GAMECALENDAR"));
@@ -168,6 +208,26 @@ extern "C" FE_OVERLAY int fn_8044E7C4(void)
 {
     ((FeObj1*)fn_800B7A94(UiGetMsgMgr(), "GAMECALENDAR"))->v14(1);
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_8044E83C(FeScr2* self, int a, int b)
+{
+    if (fn_800B5758(fn_800B555C()) != 0) {
+        if (a == 0) {
+            fn_801251CC(self->m170, 2, 0x170E, 3);
+            ((FeObj1*)self->m6EC)->v8(1);
+            ((FeObj1*)self->m6F0)->v8(1);
+            ((FeObj1*)self->m6F4)->v8(1);
+            ((FeObj1*)self->m6F8)->v8(1);
+        } else {
+            fn_80125084(self->m170, 2);
+            ((FeObj1*)self->m6EC)->v8(0);
+            ((FeObj1*)self->m6F0)->v8(0);
+            ((FeObj1*)self->m6F4)->v8(0);
+            ((FeObj1*)self->m6F8)->v8(0);
+        }
+    }
+    fn_80445564(self, a, b);
 }
 
 /*
