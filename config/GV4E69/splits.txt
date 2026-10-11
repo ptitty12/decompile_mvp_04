@@ -276,6 +276,7 @@ game/tu_80068CE0.cpp:
 
 game/tu_8006902C.cpp:
 	.text       start:0x8006902C end:0x8006D05C
+	.ctors      start:0x805A2BE4 end:0x805A2BE8
 
 game/tu_8006D05C.cpp:
 	.text       start:0x8006D05C end:0x80070DDC
@@ -348,6 +349,8 @@ game/tu_800A4668.cpp:
 
 game/tu_800A8684.cpp:
 	.text       start:0x800A8684 end:0x800A9858
+	.ctors      start:0x805A2BE8 end:0x805A2BEC
+	.dtors      start:0x805A2D44 end:0x805A2D48
 
 game/tu_800A9858.cpp:
 	.text       start:0x800A9858 end:0x800AB0E8
@@ -504,6 +507,7 @@ game/tu_801465AC.cpp:
 
 game/tu_80147748.cpp:
 	.text       start:0x80147748 end:0x801498C0
+	.ctors      start:0x805A2BEC end:0x805A2BF0
 
 game/tu_801498C0.cpp:
 	.text       start:0x801498C0 end:0x8014BEA4
@@ -513,6 +517,8 @@ game/tu_8014BEA4.cpp:
 
 game/tu_8014F47C.cpp:
 	.text       start:0x8014F47C end:0x801527C8
+	.ctors      start:0x805A2BF0 end:0x805A2BF4
+	.dtors      start:0x805A2D48 end:0x805A2D4C
 
 game/tu_801527C8.cpp:
 	.text       start:0x801527C8 end:0x801547AC
@@ -543,6 +549,7 @@ game/tu_8016F45C.cpp:
 
 game/tu_8016F9A8.cpp:
 	.text       start:0x8016F9A8 end:0x80170044
+	.ctors      start:0x805A2BF4 end:0x805A2BF8
 
 game/tu_80170044.cpp:
 	.text       start:0x80170044 end:0x80171A10
@@ -552,6 +559,7 @@ game/tu_80171A10.cpp:
 
 game/tu_80174318.cpp:
 	.text       start:0x80174318 end:0x80177C34
+	.ctors      start:0x805A2BF8 end:0x805A2C00
 
 game/tu_80177C34.cpp:
 	.text       start:0x80177C34 end:0x8017A930
@@ -621,6 +629,8 @@ game/tu_801BDD60.cpp:
 
 game/tu_801C16B0.cpp:
 	.text       start:0x801C16B0 end:0x801C2C64
+	.ctors      start:0x805A2C00 end:0x805A2C04
+	.dtors      start:0x805A2D4C end:0x805A2D50
 
 game/tu_801C2C64.cpp:
 	.text       start:0x801C2C64 end:0x801C6D2C
@@ -639,6 +649,7 @@ game/tu_801D31D8.cpp:
 
 game/tu_801D771C.cpp:
 	.text       start:0x801D771C end:0x801DB948
+	.ctors      start:0x805A2C04 end:0x805A2C08
 
 game/tu_801DB948.cpp:
 	.text       start:0x801DB948 end:0x801DC918
@@ -705,6 +716,7 @@ game/tu_80227564.cpp:
 
 game/tu_8022BB90.cpp:
 	.text       start:0x8022BB90 end:0x8022FE34
+	.ctors      start:0x805A2C08 end:0x805A2C0C
 
 game/tu_8022FE34.cpp:
 	.text       start:0x8022FE34 end:0x80233F08
@@ -717,6 +729,7 @@ game/tu_802362A8.cpp:
 
 game/tu_8023A6C8.cpp:
 	.text       start:0x8023A6C8 end:0x8023DB8C
+	.ctors      start:0x805A2C0C end:0x805A2C10
 
 game/tu_8023DB8C.cpp:
 	.text       start:0x8023DB8C end:0x80241C24
@@ -741,6 +754,8 @@ game/tu_802547C0.cpp:
 
 game/tu_80256C80.cpp:
 	.text       start:0x80256C80 end:0x8025877C
+	.ctors      start:0x805A2C10 end:0x805A2C14
+	.dtors      start:0x805A2D50 end:0x805A2D54
 
 game/tu_8025877C.cpp:
 	.text       start:0x8025877C end:0x8025B59C
@@ -759,6 +774,7 @@ game/tu_80268190.cpp:
 
 game/tu_8026C414.cpp:
 	.text       start:0x8026C414 end:0x8026DDE8
+	.ctors      start:0x805A2C14 end:0x805A2C18
 
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
@@ -917,6 +933,7 @@ animation/tu_802AC2CC.cpp:
 
 game/tu_802ACD88.cpp:
 	.text       start:0x802ACD88 end:0x802B0ACC
+	.ctors      start:0x805A2C18 end:0x805A2C1C
 
 game/tu_802B0ACC.cpp:
 	.text       start:0x802B0ACC end:0x802B5234
@@ -938,6 +955,8 @@ game/tu_802C3974.cpp:
 
 game/tu_802C79F0.cpp:
 	.text       start:0x802C79F0 end:0x802CBD04
+	.ctors      start:0x805A2C1C end:0x805A2C20
+	.dtors      start:0x805A2D54 end:0x805A2D58
 
 game/tu_802CBD04.cpp:
 	.text       start:0x802CBD04 end:0x802CFED4
@@ -950,12 +969,14 @@ game/tu_802D3E44.cpp:
 
 game/tu_802D73B4.cpp:
 	.text       start:0x802D73B4 end:0x802DBCB8
+	.ctors      start:0x805A2C20 end:0x805A2C24
 
 game/tu_802DBCB8.cpp:
 	.text       start:0x802DBCB8 end:0x802DE2C8
 
 game/tu_802DE2C8.cpp:
 	.text       start:0x802DE2C8 end:0x802E22EC
+	.ctors      start:0x805A2C24 end:0x805A2C28
 
 game/tu_802E22EC.cpp:
 	.text       start:0x802E22EC end:0x802E6464
@@ -968,6 +989,7 @@ game/tu_802EBA64.cpp:
 
 game/tu_802EFF28.cpp:
 	.text       start:0x802EFF28 end:0x802F42A4
+	.ctors      start:0x805A2C28 end:0x805A2C2C
 
 game/tu_802F42A4.cpp:
 	.text       start:0x802F42A4 end:0x802F8324
@@ -980,6 +1002,8 @@ game/tu_802FCAC0.cpp:
 
 game/tu_80300848.cpp:
 	.text       start:0x80300848 end:0x80304858
+	.ctors      start:0x805A2C2C end:0x805A2C30
+	.dtors      start:0x805A2D58 end:0x805A2D5C
 
 game/tu_80304858.cpp:
 	.text       start:0x80304858 end:0x80308874
@@ -1007,12 +1031,15 @@ game/tu_8031D988.cpp:
 
 game/tu_80321A78.cpp:
 	.text       start:0x80321A78 end:0x80324A48
+	.ctors      start:0x805A2C30 end:0x805A2C38
+	.dtors      start:0x805A2D5C end:0x805A2D60
 
 game/tu_80324A48.cpp:
 	.text       start:0x80324A48 end:0x80327214
 
 game/tu_80327214.cpp:
 	.text       start:0x80327214 end:0x8032AC58
+	.ctors      start:0x805A2C38 end:0x805A2C3C
 
 game/tu_8032AC58.cpp:
 	.text       start:0x8032AC58 end:0x8032ECD8
