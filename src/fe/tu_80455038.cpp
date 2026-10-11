@@ -247,6 +247,28 @@ extern "C" FE_OVERLAY int fn_80458FE0(void)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_80458FE8(void* s, FeObj* a, int unused, int c)
+{
+    FeScr8b* self = (FeScr8b*)s;
+    fn_8045AF68(self, 2);
+    if (a == self->m13C[1]) {
+        fn_80458AAC(self, 1);
+        if (self->m158 == -1 && self->m154 == -1)
+            goto L0A4;
+        if (self->m154 == c)
+            ((FeObj2*)self)->v67(1, fn_800C8070(self));
+    } else if (a == self->m13C[0]) {
+        fn_80458AAC(self, 0);
+    L0A4:
+        if (self->m158 == -1 && self->m154 == -1)
+            ((FeObj2*)self)->v67(0, fn_800C8070(self));
+        else if (self->m158 == c)
+            ((FeObj2*)self)->v67(1, fn_800C8070(self));
+    }
+    fn_804589BC(self);
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_80459130(void* s, FeObj* a, int unused, int c)
 {
     FeScr8b* self = (FeScr8b*)s;
