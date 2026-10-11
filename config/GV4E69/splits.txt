@@ -14,41 +14,48 @@ Sections:
 
 game/tu_800034A0.cpp:
 	.text       start:0x800034A0 end:0x800042B0
+	.ctors      start:0x805A2BC4 end:0x805A2BC8
 	.rodata     start:0x805A301C end:0x805A3400
 	.bss        start:0x80686860 end:0x806868FC
 
 game/tu_800042B0.cpp:
 	.text       start:0x800042B0 end:0x800057D8
+	.ctors      start:0x805A2BC8 end:0x805A2BCC
 	.rodata     start:0x805A3400 end:0x805A344C
 	.data       start:0x8060F128 end:0x8060F720
 	.bss        start:0x806868FC end:0x806869B0
 
 game/tu_800057D8.cpp:
 	.text       start:0x800057D8 end:0x80008540
+	.ctors      start:0x805A2BCC end:0x805A2BD0
 	.rodata     start:0x805A344C end:0x805A3A54
 	.data       start:0x8060F720 end:0x80615848
 	.bss        start:0x806869B0 end:0x80686A4C
 
 game/tu_80008540.cpp:
 	.text       start:0x80008540 end:0x8000C2C4
+	.ctors      start:0x805A2BD0 end:0x805A2BD4
 	.rodata     start:0x805A3A54 end:0x805A3B38
 	.data       start:0x80615848 end:0x80615850
 	.bss        start:0x80686A4C end:0x80686AF8
 
 game/tu_8000C2C4.cpp:
 	.text       start:0x8000C2C4 end:0x8000D650
+	.ctors      start:0x805A2BD4 end:0x805A2BD8
 	.rodata     start:0x805A3B38 end:0x805A4014
 	.data       start:0x80615850 end:0x806164B8
 	.bss        start:0x80686AF8 end:0x80686B94
 
 game/tu_8000D650.cpp:
 	.text       start:0x8000D650 end:0x8000E618
+	.ctors      start:0x805A2BD8 end:0x805A2BDC
 	.rodata     start:0x805A4014 end:0x805A430C
 	.data       start:0x806164B8 end:0x806164C0
 	.bss        start:0x80686B94 end:0x80686C30
 
 game/tu_8000E618.cpp:
 	.text       start:0x8000E618 end:0x8000F598
+	.ctors      start:0x805A2BDC end:0x805A2BE0
 	.rodata     start:0x805A430C end:0x805A4984
 	.data       start:0x806164C0 end:0x806164E8
 	.bss        start:0x80686C30 end:0x80686CCC
