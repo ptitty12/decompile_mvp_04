@@ -17,8 +17,13 @@ struct UnkFETable {        /* vptr +0x18, +0x24 entry count, +0x440 table of 0xC
     int m28;
     int m2C;
     int m30;
-    char pad34[0x440 - 0x34];
+    int m34;
+    int m38;
+    int m3C;
+    char m40[1];
+    char pad41[0x440 - 0x41];
     UnkFEArr* m440;
+    int m444;
 };
 struct UnkAt1C {
     char pad0[0x1C];
@@ -70,7 +75,7 @@ public:
     virtual void s10();
     virtual void s11();
     virtual void s12();
-    virtual void s13();
+    virtual int s13(int a, int b, int c);
     virtual void s14();
     virtual int s15(int a, int b, int c);
 };
@@ -110,6 +115,7 @@ struct UnkFEObj8 {         /* vptr at +8 (lbl_8065B228 / lbl_8065B1E8), 0x28 byt
     float m24;
 };
 void fn_800AB0C4(UnkFEArr* a, int v);
+void fn_800AB098(UnkFEArr* a);
 void fn_800ADAD8(void* p);
 Unk80040640* fn_8004072C();
 void fn_800412AC(Unk80040640* o, int a, int b, int c, int d, int e);
@@ -123,6 +129,7 @@ extern const float lbl_805B95A0;
 extern FEV18* lbl_80619D10;
 extern UnkFE806192E0* lbl_806192E0;
 extern const char lbl_8065B8B8[];
+extern int lbl_80620860;
 extern const char lbl_8065B228[];
 extern const char lbl_8065B1E8[];
 extern const char lbl_8065B1A8[];
@@ -148,6 +155,8 @@ void fn_800B0570(void* o, int a);
 void fn_800B06F8(void* o, int a);
 void fn_800B0738(void* o, int a, int b, int c, int d);
 void fn_800AB788(UnkFETable* t);
+void fn_803282A8(void* p, int a);
+void* fn_803774A8(unsigned n, int heap);
 FEO8* fn_800AB80C(UnkFETable* t, int i, int j);
 void* fn_800AC1FC(void* self);
 int fn_800B08B0(void* o);
@@ -161,8 +170,14 @@ void fn_80377488(void* p);
 
 
 
+
+
+
 /* ---- unit prototypes ---- */
 extern "C" {
+UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n);
+int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d);
+void fn_800ABC9C(UnkFETable* t);
 void fn_800AB0E8(UnkFEArr* a, int i);
 int fn_800AB1AC(UnkFEArr* a, int i);
 void fn_800AB2B0();
@@ -216,6 +231,74 @@ void fn_800ACD48(UnkFE20* self);
 /* ---- end prototypes ---- */
 
 /* ---- functions ---- */
+
+extern "C" UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n)
+{
+    fn_803282A8(self, 0);
+    self->m18 = lbl_8065B8B8;
+    self->m24 = 0;
+    self->m28 = 0;
+    self->m2C = 0;
+    self->m30 = 0;
+    self->m440 = 0;
+    self->m444 = 0;
+    lbl_80619D10 = (FEV18*)self;
+    self->m24 = n;
+    UnkFEArr* arr = (UnkFEArr*)fn_803774A8(n * 0xC, 0x400);
+    UnkFEArr* p = arr;
+    int c = n - 1;
+    if (n != 0) {
+        do {
+            fn_800AB098(p);
+            p++;
+        } while (c-- != 0);
+    }
+    self->m440 = arr;
+    for (int i = 0; i < n; i++) {
+        self->m440[i].m8 = src[i];
+    }
+    fn_800ABD80((UnkFE40*)self);
+    return self;
+}
+
+extern "C" int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d)
+{
+    if (lbl_80620860 == 0) {
+        int idx = fn_800ABC58(t, a);
+        int n = fn_800AB850(t, idx);
+        for (int i = 0; i < n; i++) {
+            int r = fn_800AB80C(t, idx, i)->s13(b, (int)c, d);
+            if (r == 0) {
+                return 1;
+            }
+            if (r == 2) {
+                fn_800ABB20((UnkFE40*)t, a, b, c, d);
+            }
+        }
+    }
+    return 0;
+}
+
+extern "C" void fn_800ABC9C(UnkFETable* t)
+{
+    if (t->m2C != 0) {
+        int ok = 1;
+        if (t->m34 == 0xC7) {
+            ok = 0;
+        }
+        if (ok) {
+            if (fn_800AB8C8(t, t->m3C, t->m34, t->m40, t->m38)) {
+                fn_800ABD80((UnkFE40*)t);
+            }
+        }
+        for (int i = 0; i < t->m24; i++) {
+            int n = fn_800AB850(t, i);
+            for (int j = 0; j < n; j++) {
+                fn_800AB80C(t, i, j)->s9();
+            }
+        }
+    }
+}
 
 extern "C" void fn_800AB0E8(UnkFEArr* a, int i)
 {
