@@ -3,7 +3,7 @@
 Usage: python variants.py <prodg_dir> <objdump> <variants.cpp> <target.o> <target_symbol> [flags...]
 Every function in variants.cpp whose (mangled) name contains "__v" followed by digits is scored.
 """
-import os, re, subprocess, sys, tempfile
+import difflib, os, re, subprocess, sys, tempfile
 
 prodg, objdump, src, tobj, tsym = sys.argv[1:6]
 flags = sys.argv[6:] or ["-O2", "-G0", "-fno-rtti", "-fno-exceptions"]
@@ -43,7 +43,13 @@ for name, ins in funcs(obj).items():
         continue
     n = max(len(ins), len(target))
     diffs = [i for i in range(n) if i >= len(ins) or i >= len(target) or mask(ins[i][0], ins[i][2]) != mask(target[i][0], target[i][2])]
-    print(f"{'MATCH' if not diffs else f'{len(diffs):3} diffs'}  len {len(ins)}/{len(target)}  {name}")
+    # Alignment-aware score: instructions outside the longest common subsequence
+    # (one inserted instruction no longer counts as "everything after it differs").
+    a = [mask(x[0], x[2]) for x in ins]
+    b = [mask(x[0], x[2]) for x in target]
+    same = sum(blk.size for blk in difflib.SequenceMatcher(None, a, b, autojunk=False).get_matching_blocks())
+    aligned = len(a) + len(b) - 2 * same
+    print(f"{'MATCH' if not diffs else f'{len(diffs):3} diffs ({aligned:3} aligned)'}  len {len(ins)}/{len(target)}  {name}")
     if diffs and os.environ.get("SHOW") and os.environ["SHOW"] in name:
         for i in diffs[:20]:
             a = ins[i][1] if i < len(ins) else "-"
