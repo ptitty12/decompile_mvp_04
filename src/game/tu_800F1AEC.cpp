@@ -301,6 +301,30 @@ void fn_800F5224()
     fn_8006C698(lbl_806192E0->m4);
 }
 
+/* near-miss: right shape but the strncpy tail is not cross-jumped and self lands in r29 (retail r30); v40 takes no argument here (UiObjC) */
+extern char lbl_805BE4A0[];
+extern char lbl_805B955C[];
+int fn_800F5250(UiObjC* self)
+{
+    if (fn_804D3B18(self) == 1) {
+        fn_804D2F9C(self);
+        if (fn_800B555C()->m4 & 0x200)
+            fn_804D304C(self);
+        self->v40();
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        if (fn_800B57EC(fn_800B555C()) == 1)
+            fn_8040B830(p->name, lbl_805BE4A0, 15);
+        else
+            fn_8040B830(p->name, lbl_805B955C, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, (UiObj*)self);
+        return 1;
+    }
+    return 0;
+}
+
 void fn_800F5344(UiObj* self)
 {
     fn_800ECAA4(self);
@@ -328,6 +352,30 @@ void fn_800F53F0(UiV_13Ci* self)
 void fn_800F5454()
 {
     fn_8006C698(lbl_806192E0->m4);
+}
+
+/* near-miss: copy of fn_800F5250 (see there) */
+extern char lbl_805BE4A0[];
+extern char lbl_805B955C[];
+int fn_800F5480(UiObjC* self)
+{
+    if (fn_804D3B18(self) == 1) {
+        fn_804D2F9C(self);
+        if (fn_800B555C()->m4 & 0x200)
+            fn_804D304C(self);
+        self->v40();
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        if (fn_800B57EC(fn_800B555C()) == 1)
+            fn_8040B830(p->name, lbl_805BE4A0, 15);
+        else
+            fn_8040B830(p->name, lbl_805B955C, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, (UiObj*)self);
+        return 1;
+    }
+    return 0;
 }
 
 void fn_800F5574(UiObj* self)
