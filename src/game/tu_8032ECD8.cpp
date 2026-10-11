@@ -241,14 +241,13 @@ void fn_80331568() {
     fn_80331508();
 }
 
-/* near-miss: lis order of the eight global stores */
 void fn_803318CC() {
-    lbl_8061FE90 = 1;
-    lbl_8061FDCC = 0;
-    lbl_8068B4BC = 0;
-    lbl_8061FE94 = 1;
     lbl_8061FE9C = 0;
-    lbl_8061C8F8 = 0;
+    lbl_8061FE90 = 1;
     lbl_80620134 = 0;
+    lbl_8061FDCC = 0;
+    lbl_8061FE94 = 1;
     lbl_8061B898 = 0;
+    lbl_8068B4BC = 0;
+    lbl_8061C8F8 = 0;
 }
