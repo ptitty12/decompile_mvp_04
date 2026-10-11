@@ -794,6 +794,7 @@ config.libs = [
             Object(NonMatching, "fe/tu_80492680.cpp"),
             Object(NonMatching, "fe/tu_804987EC.cpp"),
             Object(NonMatching, "fe/tu_8049B0CC.cpp"),
+            Object(NonMatching, "fe/tu_8049E0BC.cpp"),
         ],
     },
     {
