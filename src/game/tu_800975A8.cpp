@@ -44,6 +44,61 @@ extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i);
 
 extern "C" int fn_80098C68(char* o, int a, int b, int c) { return fn_80097EA4(o, a, b, c, 0) + fn_80097EA4(o, a, b, c, 1); }
 
+/* near-miss: case order / jump layout of the switch differs */
+extern "C" int fn_8008AC94(void* p);
+
+extern "C" int fn_80099278(Obj3* o, int k, int p)
+{
+    int base = fn_8008AC94((char*)o + 0xD44);
+    int r = 0;
+    switch (k) {
+    case 0:
+        r = fn_8009764C((char*)o, 0, p, 0);
+        break;
+    case 1:
+        r = fn_8009764C((char*)o, 6, p, 0);
+        break;
+    case 2:
+        r = fn_8009764C((char*)o, 4, p, 0);
+        break;
+    case 3:
+        r = fn_8009764C((char*)o, 3, p, 0);
+        break;
+    case 4:
+        r = fn_8009764C((char*)o, 7, p, 0);
+        break;
+    case 5:
+        r = fn_80097A9C((char*)o, 0, p, 2, 0);
+        break;
+    case 6:
+        r = fn_80097A9C((char*)o, 2, p, 2, 0);
+        break;
+    case 7:
+        r = fn_8009764C((char*)o, 1, p, 0);
+        break;
+    case 8:
+        r = fn_8009764C((char*)o, 2, p, 0);
+        break;
+    }
+    return base + r;
+}
+
+/* near-miss: retail lays out the c <= 1 branch first */
+struct Unk80099570 {
+    char pad0[0xCC4];
+    Rec* mCC4;
+    Rec* mCC8;
+};
+
+extern "C" int fn_80099570(Unk80099570* o, int a, int b, int c)
+{
+    if (c <= 1)
+        return (&o->mCC4)[c]->v5(a, b);
+    Rec* x = o->mCC8;
+    int r = x->v5(a, b);
+    return r + o->mCC4->v5(a, b);
+}
+
 extern "C" int fn_800997DC(Obj3* o, ByteVec* v);
 extern "C" int fn_80099670(Obj3* o);
 extern "C" int fn_80099704(Obj3* o);
@@ -112,6 +167,7 @@ extern "C" int fn_800997DC(Obj3* o, ByteVec* v)
     return 0;
 }
 
+/* near-miss: retail hoists the count before an entry jump to the loop test */
 extern "C" void fn_80099A44(Obj3* o, int k, int slot)
 {
     ByteVec* v = &o->m168;
