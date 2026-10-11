@@ -6,12 +6,14 @@
 #define GAME_TU_80087A58_H
 
 /* Flag word of an entry (the word at +0x10): a top bit, a 4-bit field at bits
- * 1-4 and a 3-bit field at bits 5-7 (fn_80088234, fn_80088FBC, fn_80088FFC). */
+ * 1-4, a 3-bit field at bits 5-7 and a bit at 8 (fn_80088234, fn_80088FBC,
+ * fn_80088FFC; fn_80087C40 clears the first four). */
 struct Unk80087A58_Bits {
     unsigned hi : 1;
     unsigned a : 4;
     unsigned b : 3;
-    unsigned rest : 24;
+    unsigned c : 1;
+    unsigned rest : 23;
 };
 
 /* 0x14-byte entry of the history ring (Unk80087A58_H::e) and of the table at

@@ -197,6 +197,86 @@ Unk80087A58_X* fn_80089798();
 Unk80087A58_K* fn_800897B8(Unk80087A58_K* self);
 void fn_80089838(Unk80087A58_K* self, int flags);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern Unk80087A58_Pair lbl_8060558C;
+
+void fn_80087A58(O* s, int a, char v, int w, int flag);
+char fn_80087A88(O* s, int a, int w, int flag);
+float fn_80087ABC(O* s, int a, int w);
+void fn_80087B10();
+Unk80087A58_X* fn_80087B14();
+int fn_80087B60(int t);
+int fn_80087BE8(int a, int b);
+void fn_80087C40(E* e);
+H* fn_80087C88(H* h);
+void fn_80087CC4(H* h);
+void fn_80087D08();
+void fn_80087D0C(H* h);
+int fn_80087E0C(H* h, int a, int b);
+E* fn_80087E5C(H* h, int a, int b, int k);
+void fn_80087F7C(H* h, int v);
+int fn_80087F94(H* h);
+void fn_8008801C();
+void fn_80088020();
+void fn_800881FC(void* s, int a, int b, int c, Unk80087A58_Rec* z);
+int fn_80088234(O* o, int v);
+int fn_80088280(O* o);
+int fn_800882D0(O* o);
+int fn_8008838C(O* o, int a, int b);
+int fn_80088640(O* o, int a, int b);
+float fn_80088E74(O* o);
+float fn_80088EA4(O* o);
+E* fn_80088EAC(O* o, int a, int b, int c);
+int fn_80088EDC(O* o, int i);
+int fn_80088EFC(O* o, int i);
+int fn_80088F48(O* o, int i);
+int fn_80088F84(O* o, int i);
+int fn_80088FBC(O* o, int i);
+int fn_80088FFC(O* o, int i);
+void fn_80089108(O* o);
+int fn_80089304(void* x, int t);
+int fn_80089348(void* x, int t, int* out);
+Unk80087A58_X* fn_80089798();
+Unk80087A58_K* fn_800897B8(Unk80087A58_K* self);
+void fn_80089838(Unk80087A58_K* self, int flags);
+
 void fn_80087A58(O* s, int a, char v, int w, int flag)
 {
     int i = flag == 0 ? s->m14[w] : s->m234;
@@ -246,6 +326,20 @@ int fn_80087BE8(int a, int b)
     if ((b == 0 && (unsigned)(a - 2) <= 1) || c == 0)
         r = 1;
     return r;
+}
+
+/* near-miss: retail clears the hi and b fields with one store and the a and c
+ * fields with a second store (two read-modify-write stores of the flag word,
+ * before the 8-byte copy); here the four bitfield stores merge into one. */
+void fn_80087C40(E* e)
+{
+    e->m4 = 0;
+    e->m0 = 0;
+    e->b10.hi = 0;
+    e->b10.b = 0;
+    e->b10.a = 0;
+    e->b10.c = 0;
+    *(Unk80087A58_Pair*)&e->m8 = lbl_8060558C;
 }
 
 H* fn_80087C88(H* h)
