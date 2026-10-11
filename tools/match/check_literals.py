@@ -28,6 +28,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BUILD = ROOT / "build" / "GV4E69"
+# Overlay units' code is split into .feoverlay/.dboverlay (FE_OVERLAY/DB_OVERLAY).
+CODE_SECTIONS = (".text", ".feoverlay", ".dboverlay")
 
 
 class Elf:
@@ -53,8 +55,12 @@ class Elf:
         s = self.secs[idx]
         return self.data[s[4]:s[4] + s[5]] if s[1] != 8 else bytes(s[5])  # SHT_NOBITS
 
-    def text_index(self):
-        return self.names.index(".text") if ".text" in self.names else None
+    def text_index(self, name=None):
+        """Index of the code section: `name` if given, else .text or an overlay section."""
+        for n in ([name] if name else CODE_SECTIONS):
+            if n in self.names:
+                return self.names.index(n)
+        return None
 
     def relocs(self, target_idx):
         """{offset: (sym_index, type, addend)} for the RELA section applying to target_idx."""
@@ -103,7 +109,8 @@ def main():
         if not full or not ours_p.exists() or not orig_p.exists():
             continue
         ours, orig = Elf(ours_p), Elf(orig_p)
-        ot, gt = ours.text_index(), orig.text_index()
+        gt = orig.text_index()
+        ot = ours.text_index(orig.names[gt]) if gt is not None else None
         if ot is None or gt is None:
             continue
         otext, orel, grel = ours.sec_bytes(ot), ours.relocs(ot), orig.relocs(gt)
