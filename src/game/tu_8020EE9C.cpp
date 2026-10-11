@@ -460,7 +460,7 @@ void fn_8021239C(Obj74* o, int a, float f, Vec3f* v)
     o->m7C = *v;
 }
 
-void fn_802123D4(Task* t, int kind)
+void fn_802123D4(Task* t, int kind, int)
 {
     RecQueue* q = t->m9C->m3A60;
     int n = q->count;

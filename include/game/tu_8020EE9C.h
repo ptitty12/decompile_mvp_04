@@ -44,28 +44,56 @@ inline int GetSlot(Slots4* s, int x)
 }
 
 /* Record of 0xD8 bytes in the queue at TaskInner::m3A60 (fn_802124B8, fn_80212550). */
+struct Player;
 struct Rec {
     int m0;
     int m4;
     int m8;
     int mC;
-    char pad10[0x38 - 0x10];
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    Player* m28;
+    int m2C;
+    int m30;
+    int m34;
     Vec3f m38;
-    char pad44[0x50 - 0x44];
+    Vec3f m44;
     Vec3f m50;
-    char pad5C[0x80 - 0x5C];
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
     float m80;
-    char pad84[0x88 - 0x84];
+    float m84;
     float m88;
-    char pad8C[0x94 - 0x8C];
+    float m8C;
+    float m90;
     int m94;
-    char pad98[0x9C - 0x98];
+    int m98;
     int m9C;
-    char padA0[0xA4 - 0xA0];
+    int mA0;
     int mA4;
-    char padA8[0xAC - 0xA8];
+    int mA8;
     int mAC;
-    char padB0[0xD8 - 0xB0];
+    int mB0;
+    int mB4;
+    int mB8;
+    int mBC;
+    int mC0;
+    int mC4;
+    int mC8;
+    int mCC;
+    int mD0;
+    int mD4;
 };
 
 struct RecQueue {
@@ -77,17 +105,26 @@ struct RecQueue {
 struct PlayerSub {
     char pad0[8];
     float m8;
-    char padC[0x38 - 0xC];
+    char padC[0x30 - 0xC];
+    int m30;
+    char pad34[4];
     int m38;
 };
 
 /* Player objects walked with fn_80257B40 / fn_80257BD0. */
+struct CtxOwner;
 struct Player {
-    char pad0[0x458];
+    char pad0[0x44C];
+    CtxOwner* m44C;
+    char pad450[8];
     int m458;
-    char pad45C[0x4C8 - 0x45C];
+    char pad45C[4];
+    int m460;
+    char pad464[0x4C8 - 0x464];
     int m4C8;
-    char pad4CC[0x588 - 0x4CC];
+    char pad4CC[0x570 - 0x4CC];
+    int m570;
+    char pad574[0x588 - 0x574];
     int m588;
     PlayerSub m58C;
 };
@@ -98,10 +135,34 @@ struct CtxOuter700 {
     char pad3B8[0x3C4 - 0x3B8];
     void* m3C4;
 };
+struct Obj36C {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x460 - 0x6C];
+    int m460;
+};
+struct Obj4_36C {
+    char pad0[0x36C];
+    Obj36C* m36C;
+};
+/* Block reached through CtxOwner::m6F8 -> +0x14 (byte at +0x1CC9). */
+struct Ctx6F8Inner {
+    char pad0[0x1CC9];
+    unsigned char m1CC9;
+};
+struct Ctx6F8 {
+    char pad0[0x14];
+    Ctx6F8Inner* m14;
+};
 struct CtxOwner {
-    char pad0[0x684];
+    char pad0[0x680];
+    int m680;
     Player* m684;
-    char pad688[0x700 - 0x688];
+    char pad688[0x6CC - 0x688];
+    Obj4_36C* m6CC;
+    char pad6D0[0x6F8 - 0x6D0];
+    Ctx6F8* m6F8;
+    char pad6FC[4];
     CtxOuter700* m700;
 };
 
@@ -113,22 +174,44 @@ struct Rec16 {
     int mC;
 };
 
+struct Obj3A64 {
+    char pad0[0x794];
+    int m794;
+    int m798;
+};
+
+/* Iterator object used with fn_8014E09C / fn_8014E108 (loop over 10 slots). */
+struct IterObj {
+    char pad0[8];
+    int m8;
+    char padC[0x18 - 0xC];
+};
+
 /* Block at Task+0x9C: object table at +8 (indexed by m3A5C), two Slots4 at
  * +0xC0 and +0xD4, the record queue at +0x3A60. */
 struct TaskInner {
     CtxOwner* m0;
-    char pad4[4];
+    Obj4_36C* m4;
     void* m8[10];
     int m30;
-    char pad34[0xC0 - 0x34];
+    char pad34[0x40 - 0x34];
+    int m40;
+    char pad44[0x80 - 0x44];
+    int m80;
+    char pad84[0xC0 - 0x84];
     Slots4 mC0;
     char padD0[0xD4 - 0xD0];
     Slots4 mD4;
-    char padE4[0x9FC - 0xE4];
+    char padE4[0x19C - 0xE4];
+    int m19C;
+    char pad1A0[0x9FC - 0x1A0];
     Rec16 m9FC[8];
-    char padA7C[0x3A5C - 0xA7C];
+    char padA7C[0xCA8 - 0xA7C];
+    RecQueue mCA8[4];
+    char pad20F8[0x3A5C - 0x20F8];
     int m3A5C;
     RecQueue* m3A60;
+    Obj3A64* m3A64;
 };
 
 /* First field of the task objects, also present at Task+0x9C (the sub-object
@@ -140,6 +223,10 @@ struct Sub {
 struct Task : Sub {
     char pad4[0x9C - 4];
     TaskInner* m9C;
+    char padA0[0xB8 - 0xA0];
+    int mB8;
+    char padBC[0xE8 - 0xBC];
+    float mE8;
 };
 
 /* Objects compared in fn_8021157C .. fn_80211648 (floats at +4, +8). */
@@ -267,6 +354,8 @@ struct Obj74 {
     float m78;
     Vec3f m7C;
 };
+
+extern "C" void fn_80204CCC(Rec* r);
 
 /* Functions of tu_8020EE9C.cpp used by the neighbouring units. */
 extern "C" {
