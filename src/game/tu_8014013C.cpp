@@ -35,7 +35,7 @@ int fn_8007D41C(Unk8061930C* g, int v, int w);
 int fn_8013BBF0(int v);
 void fn_8037B424(void* p, int in_chrg);
 void* fn_801418B4(void* p);
-void fn_80142254(void* p);
+void fn_80142254(char* p);
 void fn_800ED254(void* p);
 int fn_80143114(void* x);
 void fn_800ECF18(void* p);
@@ -111,6 +111,23 @@ int fn_8005B864(void* p);
 int fn_8005B9B0(void* p, int v);
 }
 extern int lbl_80687CCC;
+extern float lbl_806E02D8[];
+extern float lbl_806E02FC[];
+extern float lbl_806E0314[];
+extern float lbl_806E0328[];
+extern float lbl_806E035C[];
+extern float lbl_806E0394[];
+extern float lbl_806E03A0[];
+extern float lbl_806E03B0[];
+extern float lbl_806EF9B8[];
+static inline float LdF(char* b, int off)
+{
+    return *(float*)(b + off);
+}
+static inline void StF(char* b, int off, const float& v)
+{
+    *(float*)(b + off) = v;
+}
 
 struct UnkP0 {
     const void* m0;
@@ -198,9 +215,69 @@ extern "C" void* fn_80142204()
     return fn_801418B4(operator new(0xFC, lbl_806EF9B4));
 }
 
-extern "C" void fn_80142234(void* x)
+extern "C" void fn_80142234(char* x)
 {
     fn_80142254(x);
+}
+
+extern "C" void fn_80142254(char* x)
+{
+    float t;
+    int off;
+    off = 0;
+    for (int i = 0; i < 9; i++) {
+        t = LdF(x + 4, off);
+        StF((char*)lbl_806E02D8, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 6; i++) {
+        t = LdF(x + 0x28, off);
+        StF((char*)lbl_806E02FC, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 5; i++) {
+        t = LdF(x + 0x40, off);
+        StF((char*)lbl_806E0314, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 13; i++) {
+        t = LdF(x + 0x54, off);
+        StF((char*)lbl_806E0328, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 14; i++) {
+        t = LdF(x + 0x88, off);
+        StF((char*)lbl_806E035C, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 3; i++) {
+        t = LdF(x + 0xC0, off);
+        StF((char*)lbl_806E0394, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 4; i++) {
+        t = LdF(x + 0xCC, off);
+        StF((char*)lbl_806E03A0, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 6; i++) {
+        t = LdF(x + 0xDC, off);
+        StF((char*)lbl_806E03B0, off, t);
+        off += 4;
+    }
+    off = 0;
+    for (int i = 0; i < 2; i++) {
+        t = LdF(x + 0xF4, off);
+        *(float*)(off + (char*)lbl_806EF9B8) = t;
+        off += 4;
+    }
 }
 
 extern int lbl_8061B870;
