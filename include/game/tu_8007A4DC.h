@@ -59,6 +59,17 @@ struct W : WBase {
     virtual int v78(int a, int b, int c);
 };
 struct Unk8007A4DC_Obj1E8;
+struct Unk805A19C8_Entry {
+    int* m0;
+    char pad4[3];
+    unsigned char m7;
+    char pad8[0x1E0 - 8];
+};
+struct Unk805A19C8_Roster {
+    char pad0[0x10];
+    Unk805A19C8_Entry* m10;
+};
+int fn_805A19C8(Unk805A19C8_Roster* r, int a);
 struct Slot {
     W* m0;
     W* m4[2];
@@ -99,7 +110,9 @@ struct Unk8007A4DC_Screen {
     Owner* m0;
     char pad4[0x48];
     Handle m4C;
-    char pad50[0x12C];
+    char pad50[0x8];
+    Unk805A19C8_Roster* m58;
+    char pad5C[0x120];
     Handle m17C;
     char pad180[0x4];
     W* m184;
@@ -124,6 +137,7 @@ struct Unk8007A4DC_Screen {
     void fn_8007389C(int a, int b, int i, int c);
     int fn_80073914(int a, int b, int i);
     void fn_80073994(int a, int b, int i, int c);
+    int fn_800739E0(int a, int id, int c, int d);
     void fn_800743A0(int a, int b, int i, int j, int c);
     void fn_80074500(int a, int b, int i, int j, int c);
     int fn_8007455C(int a, int b, int i);
@@ -135,10 +149,18 @@ struct Unk8007A4DC_Screen {
     void fn_80074F50(int a, int b, int i, int c);
     int fn_80074FC8(int a, int b, int i);
     void fn_80075048(int a, int b, int i, int c);
+    int fn_80075094(int a, int id, int c, int d);
     void fn_800755FC(int a, int b, int i, int j, int c);
     void fn_8007575C(int a, int b, int i, int j, int c);
     int fn_800764F4(const char* a, const char* b, int c);
     int fn_8007661C(int b);
+    int fn_80077238(int a, int b);
+    int fn_80077320(int a, int b);
+    int fn_80077404(int a, int b);
+    int fn_80077684(int a, int b);
+    int fn_8007776C(int a, int b);
+    int fn_80077850(int a, int b);
+    int fn_80077934(int a, int b);
     void fn_80077CF8();
     void fn_80077D38(int a, int b);
     void fn_80077D60(int a, int b);

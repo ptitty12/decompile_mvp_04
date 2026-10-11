@@ -22,6 +22,23 @@ struct Unk8006FB28_Rec {
     unsigned f3 : 8;
     unsigned f4 : 1;
 };
+struct Unk80070004_Rec {
+    unsigned f0 : 7;
+    unsigned f1 : 8;
+    unsigned f2 : 8;
+    unsigned f3 : 7;
+    unsigned p0 : 2;
+    unsigned f4 : 7;
+    unsigned f5 : 8;
+    unsigned f6 : 8;
+    unsigned f7 : 7;
+    unsigned p1 : 2;
+    unsigned f8 : 7;
+    unsigned f9 : 7;
+    unsigned f10 : 7;
+    unsigned f11 : 10;
+    unsigned p2 : 1;
+};
 struct Unk8006F690_Obj {
     char pad0[8];
     void* m8;
@@ -49,6 +66,17 @@ void fn_80089164(void* ctx);
 extern int* lbl_8061B9C4;
 extern const float lbl_805B3B7C;
 extern const float lbl_805B3B60;
+extern const float lbl_805B3B78;
+extern const float lbl_805B3BA0;
+extern const float lbl_805B3BA4;
+extern const float lbl_805B3BA8;
+extern const float lbl_805B3BAC;
+extern const float lbl_805B3BB8;
+extern const float lbl_805B3B88;
+extern const float lbl_805B3B8C;
+extern const float lbl_805B3B90;
+float fn_80070A60(W* w, int a);
+
 void fn_80071E2C(Unk80071604* self, int a, Unk80070DDC_Stream* io);
 float fn_8007057C(void* self, int a);
 float fn_800706C0(void* self, int a);
@@ -364,6 +392,219 @@ void fn_8006FF60(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 12, 12);
 }
 
+unsigned fn_80070004(void* l, int k, unsigned c)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    unsigned r = 0;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0:
+            r = ((Unk80070004_Rec*)a->m24)[c].f0;
+            break;
+        case 1:
+            r = ((Unk80070004_Rec*)a->m24)[c].f1;
+            break;
+        case 2:
+            r = ((Unk80070004_Rec*)a->m24)[c].f2;
+            break;
+        case 3:
+            r = ((Unk80070004_Rec*)a->m24)[c].f3;
+            break;
+        case 4:
+            r = ((Unk80070004_Rec*)a->m24)[c].f4;
+            break;
+        case 5:
+            r = ((Unk80070004_Rec*)a->m24)[c].f5;
+            break;
+        case 6:
+            r = ((Unk80070004_Rec*)a->m24)[c].f6;
+            break;
+        case 7:
+            r = ((Unk80070004_Rec*)a->m24)[c].f7;
+            break;
+        case 8:
+            r = ((Unk80070004_Rec*)a->m24)[c].f8;
+            break;
+        case 9:
+            r = ((Unk80070004_Rec*)a->m24)[c].f9;
+            break;
+        case 10:
+            r = ((Unk80070004_Rec*)a->m24)[c].f10;
+            break;
+        case 11:
+            r = ((Unk80070004_Rec*)a->m24)[c].f11;
+            break;
+        }
+    }
+    return r;
+}
+
+void fn_80070248(void* l, int k, unsigned c, int v)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f0 = v;
+            return;
+        }
+        case 1: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFF;
+            }
+            r->f1 = v;
+            return;
+        }
+        case 2: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFF;
+            }
+            r->f2 = v;
+            return;
+        }
+        case 3: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f3 = v;
+            return;
+        }
+        case 4: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f4 = v;
+            return;
+        }
+        case 5: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFF;
+            }
+            r->f5 = v;
+            return;
+        }
+        case 6: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFF;
+            }
+            r->f6 = v;
+            return;
+        }
+        case 7: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f7 = v;
+            return;
+        }
+        case 8: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f8 = v;
+            return;
+        }
+        case 9: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f9 = v;
+            return;
+        }
+        case 10: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x7F;
+            }
+            r->f10 = v;
+            return;
+        }
+        case 11: {
+            Unk80070004_Rec* r = (Unk80070004_Rec*)(c * 12 + (unsigned)a->m24);
+            int t;
+            if (v <= 0x3FF) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0x3FF;
+            }
+            r->f11 = t;
+            return;
+        }
+        }
+    }
+}
+
+float fn_8007057C(void* self, int a)
+{
+    W* w = (W*)self;
+    int s2 = w->v28(2, a);
+    int s3 = w->v28(3, a);
+    int s4 = w->v28(4, a);
+    float r = (float)s2 + (float)s3 + (float)s4 + (float)w->v28(0, a);
+    return r;
+}
+
+float fn_800706C0(void* self, int a)
+{
+    W* w = (W*)self;
+    int p = w->v28(0xB, a);
+    int s6 = w->v28(6, a);
+    int sa = w->v28(0xA, a);
+    int s8 = w->v28(8, a);
+    float r = (float)p - (float)(s6 + sa + s8 + w->v28(9, a));
+    if (!(r >= lbl_805B3B78))
+        r = lbl_805B3B78;
+    return r;
+}
+
 float fn_80070810(void* self, int a)
 {
     float x = fn_8007057C(self, a);
@@ -371,6 +612,54 @@ float fn_80070810(void* self, int a)
     float r = lbl_805B3B7C;
     if (!(y <= lbl_805B3B7C))
         r = x / y;
+    return r;
+}
+
+/* near-miss: 2 slots, same division/register difference as fn_80070BC8. */
+float fn_80070880(void* self, int a)
+{
+    W* w = (W*)self;
+    float x = fn_8007057C(self, a);
+    float y = (float)w->v28(6, a);
+    float z = (float)w->v28(0xA, a);
+    float u = fn_800706C0(self, a);
+    float v = (float)w->v28(8, a);
+    float r = lbl_805B3B88;
+    float den = u + y + z + v;
+    if (!(den <= lbl_805B3B88)) {
+        r = (x + y + z) / den;
+        int n = (int)(r * lbl_805B3B8C);
+        if (n % 10 > 4)
+            n += 10;
+        r = (float)(n / 10) * lbl_805B3B90;
+    }
+    return r;
+}
+
+float fn_80070A60(W* w, int a)
+{
+    float x = (float)w->v28(2, a);
+    float y = (float)w->v28(3, a);
+    float z = (float)w->v28(4, a);
+    float v = (float)w->v28(0, a);
+    float r = v * lbl_805B3BA4 + (z * lbl_805B3BA0 + (x + 2.0f * y));
+    return r;
+}
+
+/* near-miss: 2 slots; the (n / 10) division result lands in r0 instead of r10 (subf / xoris). */
+float fn_80070BC8(void* self, int a)
+{
+    W* w = (W*)self;
+    float hi = fn_80070A60(w, a);
+    float lo = fn_800706C0(self, a);
+    float r = lbl_805B3BA8;
+    if (!(lo <= lbl_805B3BA8)) {
+        r = hi / lo;
+        int n = (int)(r * lbl_805B3BAC);
+        if (n % 10 > 4)
+            n += 10;
+        r = (float)(n / 10) * lbl_805B3BB8;
+    }
     return r;
 }
 
