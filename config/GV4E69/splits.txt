@@ -156,6 +156,9 @@ fe/tu_804CB430.cpp:
 fe/tu_804CE408.cpp:
 	.feoverlay  start:0x804CE408 end:0x804D08D0
 
+fe/tu_804D08D0.cpp:
+	.feoverlay  start:0x804D08D0 end:0x804D2AC0
+
 game/tu_800034A0.cpp:
 	.text       start:0x800034A0 end:0x800042B0
 	.ctors      start:0x805A2BC4 end:0x805A2BC8
