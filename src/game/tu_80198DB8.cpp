@@ -109,6 +109,21 @@ extern "C" void fn_80199414()
 {
 }
 
+//@8019A314
+extern "C" void fn_8019A314(Unk8019A314_O* o, float* a, void* out1, void* out2)
+{
+    float len = Unk8019A314_Len(o->m3F0);
+    if (!(len < 0.0001f)) {
+        Unk8018A254_Ret m;
+        fn_803DF74C(&m);
+        fn_803DFD90(&m, -a[0], -a[1], -a[2]);
+        fn_803DFD40(&m, len * 0.9549296f, o->m3F0.m0, o->m3F0.m4, o->m3F0.m8);
+        fn_803DFD90(&m, a[0], a[1], a[2]);
+        fn_804023C4(out1, &m, out1);
+        fn_804023C4(out2, &m, out2);
+    }
+}
+
 //@8019A404
 extern "C" void fn_8019A404(void* o, void* x, float* out)
 {
@@ -150,6 +165,22 @@ extern "C" void fn_8019ACE0(Unk8019AC78_Obj* o)
             fn_803DE374(1, 0);
             fn_8026CA5C(o);
             fn_803DE374(0, 0);
+        }
+    }
+}
+
+//@8019AD84
+extern "C" void fn_8019AD84(Unk8019AD84_Obj* o)
+{
+    if (lbl_8061B894 != 0) {
+        Unk8019AD84_X* x = o->m36C;
+        if (x != 0) {
+            Unk8018A254_Ret m;
+            fn_80389BD8(x->mAB8, lbl_806EF9C4, &m, 1);
+            o->m3A0 = m;
+            fn_8019AB74(o);
+            fn_8019AC78((Unk8019AC78_Obj*)o);
+            fn_8026CA5C(o);
         }
     }
 }
@@ -248,6 +279,37 @@ extern "C" Unk8019B24C_Obj* fn_8019B24C(Unk8019B24C_Obj* self, void* owner)
 extern "C" void fn_8019B2A0(Unk80198E5C_Obj* o)
 {
     o->m3E8 = 0;
+}
+
+//@8019B2E0
+extern "C" void fn_8019B2E0(char* o, Unk8019B2E0_P* p, int flag)
+{
+    if (p == 0)
+        return;
+    int busy = p->m264;
+    int st = p->m458;
+    if (busy != 0)
+        return;
+    if (st == 13)
+        return;
+    int idx = *(int*)(o + 0x3E8);
+    Unk8019B2E0_Rec* r = (Unk8019B2E0_Rec*)(o + 0x28 + idx * 16);
+    int kind = 2;
+    if (flag) {
+        kind = 0;
+        if (!(p->m590 & 0x40000000)) {
+            kind = 3;
+            if ((unsigned)(st - 9) <= 3)
+                kind = st - 6;
+        }
+    } else if (p->m450 != 0) {
+        kind = 1;
+    }
+    r->m4 = kind;
+    r->m0 = p;
+    r->m8 = 0.0f;
+    r->mC = p->mB68 != 0;
+    *(int*)(o + 0x3E8) = *(int*)(o + 0x3E8) + 1;
 }
 
 //@8019B5AC

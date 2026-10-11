@@ -118,7 +118,54 @@ extern char lbl_805D058C[];
 extern char lbl_805D059C[];
 
 struct Unk8019755C_Data;
+/* Entry list (16-byte records at +0x28, count at +0x3E8) filled by fn_8019B2E0. */
+struct Unk8019B2E0_Rec {
+    void* m0;
+    int m4;
+    float m8;
+    int mC;
+};
+struct Unk8019B2E0_Obj {
+    char pad0[0x28];
+    Unk8019B2E0_Rec m28[1];
+};
+struct Unk8019B2E0_P {
+    char pad0[0x264];
+    int m264;
+    char pad268[0x450 - 0x268];
+    int m450;
+    char pad454[4];
+    int m458;
+    char pad45C[0x590 - 0x45C];
+    unsigned int m590;
+    char pad594[0xB68 - 0x594];
+    int mB68;
+};
+struct Unk8019AD84_X {
+    char pad0[0xAB8];
+    void* mAB8;
+};
+struct Unk8019AD84_Obj {
+    char pad0[0x36C];
+    Unk8019AD84_X* m36C;
+    char pad370[0x3A0 - 0x370];
+    Unk8018A254_Ret m3A0;
+};
+extern char lbl_806EF9C4;
+struct Unk8019A314_O {
+    char pad0[0x3F0];
+    Unk80183918_Vec3 m3F0;
+};
+inline float Unk8019A314_Len(const Unk80183918_Vec3& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
 extern "C" {
+void fn_80389BD8(void* p, int a, Unk8018A254_Ret* m, int b);
+void fn_803DF74C(Unk8018A254_Ret* m);
+void fn_803DFD90(Unk8018A254_Ret* m, float a, float b, float c);
+void fn_803DFD40(Unk8018A254_Ret* m, float a, float b, float c, float d);
+void fn_804023C4(void* out, Unk8018A254_Ret* m, void* in);
 void fn_8019755C(Unk8019755C_Data* self, int chrg);
 void fn_80198F68(void* o);
 void fn_80199554(void* o);
