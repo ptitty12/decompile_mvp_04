@@ -148,6 +148,8 @@ def pair(src: List[Tuple[int, int, str]], dst: List[Tuple[int, int, str]]) -> Li
     return pairs
 
 
+PER_TU_LOCAL = re.compile(r"^(__static_initialization_and_destruction_0|__tcf_\d+)$")
+
 _OBJ_SYMS: Optional[Dict[str, Path]] = None
 
 
@@ -228,7 +230,7 @@ def main() -> None:
         if pm and int(pm.group(1), 16) != addr:
             print(f"  SKIP {addr:08X} {old} -> {new}: name says {pm.group(1)}, pairing is off")
             continue
-        if new in addr_of_name and addr_of_name[new] != addr:
+        if new in addr_of_name and addr_of_name[new] != addr and not PER_TU_LOCAL.match(new):
             print(f"  SKIP {addr:08X} {old} -> {new}: name already used at {addr_of_name[new]:08X}")
             continue
         ref = referenced(old)
@@ -251,6 +253,10 @@ def main() -> None:
     for old, new in renames:
         k = line_of[old]
         lines[k] = new + lines[k][len(old):]
+        # g++ names these per TU (static init, __tcf_N stubs): several TUs share
+        # a name, so they must be local or links resolve to the wrong copy.
+        if PER_TU_LOCAL.match(new) and "scope:local" not in lines[k]:
+            lines[k] = lines[k].rstrip() + " scope:local"
     args.symbols.write_bytes("\n".join(lines).encode("utf-8"))
     print(f"wrote {len(renames)} rename(s) to {args.symbols}")
 
