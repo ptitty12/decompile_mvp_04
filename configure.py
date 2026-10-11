@@ -389,6 +389,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
+            Object(NonMatching, "ealib/tu_803663B0.cpp"),
         ],
     },
 ]
