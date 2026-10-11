@@ -51,6 +51,91 @@ void fn_8005AEB0(Unk8005ADD0_Obj* o, int ch)
     }
 }
 
+void fn_8005B06C(Unk8005ADD0_Obj* o)
+{
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1 && o->mC[o->mA8].mState == 1) {
+        switch (o->mC[o->mA8].mMode) {
+        case 0:
+            fn_8005B0EC(o, o->mA8);
+            return;
+        case 1:
+            fn_8005B1F0(o, o->mA8);
+            break;
+        }
+    }
+}
+
+void fn_8005B414(Unk8005ADD0_Obj* o)
+{
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1) {
+        switch (o->mC[o->mA8].mState) {
+        case 3:
+            o->m10C = o->m10C + 1;
+            if (o->m10C > 9) {
+                fn_8005B2D8(o);
+                o->m10C = 0;
+            }
+            break;
+        case 1:
+            fn_8005B06C(o);
+            o->m10C = 0;
+            break;
+        case 4:
+            fn_8005B4D0(o);
+            break;
+        }
+    }
+}
+
+void fn_8005B4D0(Unk8005ADD0_Obj* o)
+{
+    switch (o->mC[o->mA8].mMode) {
+    case 0:
+        if (fn_8005C7E8(fn_8005BA9C(), 1) == 0) {
+            o->mC[o->mA8].mState = 5;
+        }
+        break;
+    case 1:
+        fn_803A975C();
+        int h = fn_803A914C(o->mC[o->mA8].mHandle);
+        fn_803A979C();
+        if (h > 0) {
+            o->mC[o->mA8].mState = 5;
+            fn_800403EC(&o->mAC);
+        }
+        break;
+    }
+}
+
+void fn_8005B58C(Unk8005ADD0_Obj* o, int a)
+{
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1 && o->mC[o->mA8].mState == 3 && a == o->mC[o->mA8].mMode) {
+        o->mC[o->mA8].mState = 4;
+        switch (o->mC[o->mA8].mMode) {
+        case 0:
+            fn_8005C75C(fn_8005BA9C(), 1, 0);
+            return;
+        case 1:
+            fn_803A975C();
+            fn_803AB480(o->mC[o->mA8].mHandle);
+            fn_803A979C();
+            break;
+        }
+    }
+}
+
 /* near-miss (1 slot): retail reloads o->mA4 for the final return; this reuses cur. */
 int fn_8005B6E4(Unk8005ADD0_Obj* o)
 {
@@ -66,6 +151,28 @@ int fn_8005B6E4(Unk8005ADD0_Obj* o)
         }
     }
     return o->mA4;
+}
+
+void fn_8005B76C(Unk8005ADD0_Obj* o, int vol)
+{
+    int t = ((vol << 7) - vol) / 100;
+    o->m78 = t <= 0x7F ? (t < 0 ? 0 : t) : 0x7F;
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1 && o->mC[o->mA8].mState == 3) {
+        switch (o->mC[o->mA8].mMode) {
+        case 0:
+            fn_8005C654(fn_8005BA9C(), 1, o->m78, 0);
+            return;
+        case 1:
+            fn_803A975C();
+            fn_803ADA2C(o->mC[o->mA8].mHandle, o->m78);
+            fn_803A979C();
+            break;
+        }
+    }
 }
 
 int fn_8005B864(Unk8005ADD0_Obj* o)

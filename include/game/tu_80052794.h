@@ -946,7 +946,7 @@ struct Unk8005ADD0_Obj {
     int m80[9];
     int mA4;
     int mA8;
-    char padAC[0xE8 - 0xAC];
+    char mAC[0xE8 - 0xAC];
     int mE8[8];
     int m108;
     int m10C;
@@ -1012,5 +1012,18 @@ Unk800475EC_T* fn_800475EC(void);
 int fn_803AAA18(int h, int a, int name, int x);
 int fn_800412AC(void* self, int a, int b, int c, int d, int e);
 extern char lbl_805B0780[][0x42];
+
+void fn_8005B0EC(Unk8005ADD0_Obj* o, int ch);
+void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch);
+void fn_8005B2D8(Unk8005ADD0_Obj* o);
+void fn_8005B4D0(Unk8005ADD0_Obj* o);
+int fn_8005C7E8(Unk8005BA1C_Obj* b, int ch);
+int fn_803A914C(int h);
+void fn_800403EC(void* p);
+
+int fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
+int fn_8005C654(Unk8005BA1C_Obj* o, int a, int b, int c);
+void fn_803AB480(int h);
+void fn_803ADA2C(int h, int v);
 
 #endif
