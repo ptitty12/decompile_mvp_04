@@ -91,7 +91,8 @@ inline float LenSq3(const Unk80273498_Vec3& v)
 struct Unk802A2604_Player {
     char pad0[0x720];
     float m720;
-    char pad724[0x72C - 0x724];
+    char pad724[0x728 - 0x724];
+    float m728;
     float m72C;
 };
 
@@ -114,6 +115,39 @@ extern int lbl_8061E7DC;
 extern int lbl_80691DE0;
 extern float lbl_8061E864;
 extern float lbl_8061E868;
+
+int fn_8026D8E8(Unk80270BA0_X* x, int a);
+int fn_8026D914(Unk80270BA0_X* x, int a);
+
+/* Player field written by fn_802A3408 (callers cast): a vector at +0x320. */
+struct Unk802A3408_Player {
+    char pad0[0x320];
+    Unk80273498_Vec3 m320;
+};
+
+int fn_801CEADC(Unk8027107C_Inner* p);
+void fn_801CEA44(Unk80273498_Vec3* out, Unk8027107C_Inner* p, int k);
+int fn_802A30B0(Unk802A309C_Goal* g, Unk80270BA0_X* x);
+void fn_802A36B0(Unk802A309C_Goal* g);
+extern const float lbl_805DE118;
+
+/* Two float parameters, each with a frame slot of its own (fn_802A3408). */
+inline void Unk802A3408_SetXY(Unk80270BA0_X* x, float a, float b)
+{
+    x->m96C = a;
+    x->m970 = b;
+}
+
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror10, float, 0x10)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror140, float, 0x140)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror18, int, 0x18)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror158, int, 0x158)
+
+struct Unk8027C728_Player;
+int fn_8027D708(void* g, Unk8027C728_Player* x, Unk8027C728_Player* p);
+extern int lbl_806242B4;
+int fn_8026DC5C(Unk80270BA0_X* x, int a);
+int fn_8026DB3C(Unk80270BA0_X* x, int a);
 
 void fn_802771A0(int a);
 void fn_802D7B88(int a, int b, float f, int c);

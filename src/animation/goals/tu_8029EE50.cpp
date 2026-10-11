@@ -35,6 +35,150 @@ void fn_8029EF28(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link)
     }
 }
 
+int fn_802A0D80(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
+{
+    Unk8014D8AC_Ctx* ctx = x->m44C;
+    float now = (float)ctx->m4C * 0.016666668f;
+    unsigned int flags = *(unsigned int*)&g->mD0;
+    Unk80271DBC_Link* link = x->m618;
+    if (g->mD0.f6) {
+        if (!(now <= g->m5C)) {
+            Unk8029B70C_Mirror8(&x->m734, 0.0f);
+            g->mD0.f6 = 0;
+            return 1;
+        }
+        if (!(now <= g->m58)) {
+            Unk8029B70C_Mirror8(&x->m734, ((Unk802A2604_Player*)x)->m728);
+            g->mD0.f6 = 0;
+            return 3;
+        }
+        if (!(now <= g->m54)) {
+            Unk80270BA0_X* other = ((Unk8029B70C_Pos*)ctx->m6CC)->m36C;
+            if (other && other != x) {
+                g->mD0.f6 = 0;
+                return 1;
+            }
+        }
+    }
+    unsigned int cur = link->m838;
+    if (cur != g->m50) {
+        return 0xA;
+    }
+    int hit = flags & 0x02000000;
+    if (!hit) {
+        float t = 0.0f;
+        Unk8029B70C_Query q;
+        q.mBC = 0;
+        fn_80386110(x->m618, &q, cur, 0x971949A6, &t, 0);
+        q.mBC = 0;
+        g->m54 = now + t;
+        float b = 0.0f;
+        if (fn_80386110(x->m618, &q, g->m50, 0xFF0D1452, &b, 0) & 0x10000) {
+            g->m5C = now + b;
+            g->m58 = now + 9999.0f;
+            if (!(g->m5C >= g->m54)) {
+                g->m5C = g->m54;
+            }
+        }
+        q.mBC = 0;
+        float c = 0.0f;
+        if (fn_80386110(x->m618, &q, g->m50, 0x989091AD, &c, 0) & 0x10000) {
+            g->m58 = c + now;
+            g->m5C = now + 9999.0f;
+            if (!(g->m58 >= g->m54)) {
+                g->m58 = g->m54;
+            }
+        }
+        g->mD0.f6 = 1;
+    }
+    g->mD0.f7 = 0;
+    return 0xA;
+}
+
+int fn_802A1070(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
+{
+    Unk80271DBC_Link* link = x->m618;
+    float now = (float)x->m44C->m4C * 0.016666668f;
+    if (g->mD0.f6) {
+        if (!(now <= g->m54)) {
+            fn_80249B40(x, 0, 0, 0, 0.2f);
+            return 1;
+        }
+    }
+    if (fn_8026D8E8(x, 0) || fn_8026D914(x, 0)) {
+        return 1;
+    }
+    if (link->m838 != g->m50) {
+        return 0xB;
+    }
+    if (fn_80380964(link)) {
+        return 0xB;
+    }
+    if (!g->mD0.f6) {
+        float t = 0.0f;
+        Unk8029B70C_Query q;
+        q.mBC = 0;
+        fn_80386110(x->m618, &q, g->m50, 0x440397DE, &t, 4);
+        g->m54 = now + t;
+    }
+    g->mD0.f6 = 1;
+    g->mD0.f7 = 0;
+    return 0xB;
+}
+
+int fn_802A11FC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
+{
+    Unk80271DBC_Link* link = x->m618;
+    unsigned int cur = link->m838;
+    int a = fn_8026DC5C(x, 0);
+    int b = fn_8026DB3C(x, 0);
+    g->m50 = ((Unk8027A84C*)g)->fn_8027BB88(x, (Unk8027BBA8_Obj*)g->m60, a, b, 1);
+    if (g->m50) {
+        g->mD0.f6 = 0;
+        return 0xB;
+    }
+    if (!g->m60 || !fn_8027D708(g, (Unk8027C728_Player*)x, (Unk8027C728_Player*)g->m60)) {
+        return 3;
+    }
+    float ang;
+    if (g->mD0.f1) {
+        ang = g->m6C;
+    } else {
+        ang = g->m70;
+    }
+    Unk802726BC_Angles* p = &x->m734;
+    Unk8029B70C_Mirror48(p, -1.0f);
+    Unk8029B70C_Mirror158(p, 0);
+    Unk8029B70C_Mirror10(p, ang);
+    Unk8029B70C_Mirror140(p, ang);
+    Unk8029B70C_Mirror18(p, 3);
+    Unk8029B70C_Mirror8(p, f);
+    fn_80381E9C(link, 0x6A939117, 0, 0);
+    if (cur == 0x6A939117) {
+        if (g->mC <= 3) {
+            const float zero = 0.0f;
+            float speed = zero;
+            Unk80273498_Vec3 vec;
+            ((Unk8027A84C*)g)->fn_8027A9AC(x, 0x6A939117, lbl_806242B4, &speed, (int)&vec, 0, 0);
+            vec.y = zero;
+            g->m98 = fn_804028E4(LenSq3(vec)) / speed;
+        }
+        float k = f / g->m98;
+        Unk8029B70C_Mirror48(p, k);
+        float diff = AngleDiff(ang, fn_80382BB8(x->m618));
+        if (!(diff >= -2.3561945f)) {
+            diff = diff + 6.2831855f;
+        }
+        ang = diff * 0.1f + fn_80382BB8(x->m618);
+        fn_80244858(x, ang);
+        g->mD0.f7 = 0;
+        if (f < ((Unk802A2604_Player*)x)->m720) {
+            return 1;
+        }
+    }
+    return 0xD;
+}
+
 int fn_802A15BC(Unk8029B70C_Goal* g, Unk80270BA0_X* x)
 {
     int r = fn_802A1790(g, x, fn_804028E4(x->m8E8) / ((float)lbl_8061B9C8 * 0.016666668f));
@@ -433,6 +577,88 @@ void fn_802A309C(Unk802A309C_Goal* g)
     g->m48 = 0;
     g->m4C = 0;
     g->m50 = 0;
+}
+
+inline void Unk802A3408_SetM320(Unk80270BA0_X* x, const Unk80273498_Vec3& v)
+{
+    ((Unk802A3408_Player*)x)->m320 = v;
+}
+
+int fn_802A3408(Unk802A309C_Goal* g, Unk80270BA0_X* x)
+{
+    int play = 0;
+    unsigned int hash;
+    Unk80273498_Vec3 v = lbl_806055AC;
+    Unk802A3408_SetXY(x, 1.0f, 1.0f);
+    x->m960 = v;
+    x->m974 = 0;
+    x->m978 = 0;
+    Unk80271DBC_Link* link = x->m618;
+    switch (g->m48) {
+    case 2:
+        play = 1;
+        hash = 0xBF270656;
+        break;
+    case 1:
+        play = 1;
+        hash = 0x3C188866;
+        break;
+    case 3:
+        hash = 0x62F631D0;
+        break;
+    default:
+        hash = 0;
+        break;
+    }
+    if (play) {
+        if (g->m4C == 0) {
+            if (link->m838 == 0x94C34DBD) {
+                fn_80381E9C(link, hash, 0, 0);
+                g->m50 = 1;
+            } else {
+                fn_80381E9C(link, 0x94C34DBD, 0, 0);
+            }
+            if (g->m50 && link->m838 == hash && !fn_80380964(link)) {
+                int n = fn_801CEADC(x->m44C->m700->m3A4);
+                int k = 1;
+                if (g->m48 == 1) {
+                    switch (n) {
+                    case 0:
+                        break;
+                    case 1:
+                        k = 2;
+                        break;
+                    }
+                } else if (g->m48 == 2) {
+                    if (n == 2) {
+                    } else if (n == 1) {
+                        k = 0;
+                    }
+                }
+                fn_801CEA44(&v, x->m44C->m700->m3A4, k);
+                Unk80273498_Vec3 t = v;
+                Unk802A3408_SetM320(x, t);
+                fn_80381E9C(link, 0x94C34DBD, 0, 0);
+                g->m4C = 1;
+            }
+            return 1;
+        }
+        if (link->m838 != hash) {
+            fn_802A36B0(g);
+            return 0;
+        }
+        if (fn_802A30B0(g, x)) {
+            fn_802A36B0(g);
+            return 0;
+        }
+        return 1;
+    }
+    if (link->m838 == hash) {
+        g->m48 = 0;
+        return 0;
+    }
+    fn_80381E9C(link, hash, 0, 0);
+    return 1;
 }
 
 void fn_802A36B0(Unk802A309C_Goal* g)
