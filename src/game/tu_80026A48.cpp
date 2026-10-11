@@ -7,6 +7,7 @@
  */
 #include "game/tu_800239F4.h"
 
+extern const float lbl_805A61FC;
 extern const float lbl_805A6240;
 extern const float lbl_805A6250;
 extern const float lbl_805A62A0;
@@ -24,9 +25,31 @@ extern const float lbl_805A62D0;
 
 
 
-extern "C" void fn_800289F8(Unk80023AC4_Obj* x);
+
 extern "C" void fn_80028CEC(Unk80023AC4_Obj* x);
 extern "C" void fn_80028E18(Unk80023AC4_Obj* x);
+
+extern "C" void fn_80026D7C(Unk80023AC4_Obj* x)
+{
+    fn_803EE7BC();
+    if (x->m704 == 0) {
+        fn_80048968(fn_800475EC());
+        int v = 3;
+        fn_800396D0(fn_80038EB4(), 1);
+        if (x->mC8->mC->m28 == 0x37)
+            v = 6;
+        fn_8005C250(fn_8005BA9C(), v);
+        fn_8003968C(fn_80038EB4(), v);
+        fn_80039854(fn_80038EB4(), 0, fn_8017FA08(x->mCC));
+        fn_80039790(fn_80038EB4(), fn_8017FA08(x->mCC));
+        fn_800398E4(fn_80038EB4(), lbl_805A61FC);
+        fn_800395B0(fn_80038EB4(), v);
+        fn_80039790(fn_80038EB4(), fn_8017FA08(x->mCC));
+        fn_80048C08((char*)fn_800475EC() + 0xFC);
+        x->m704 = 1;
+    }
+    fn_803EE7BC();
+}
 
 extern "C" void fn_80026E7C()
 {
