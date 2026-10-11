@@ -88,6 +88,18 @@ At the end of every session, append to `PROGRESS.md`:
 date, unit, functions matched/attempted, blockers, and anything the owner must
 decide. Be honest: report failures and unmatched functions plainly.
 
+## The owner never runs commands (owner, 2026-10-11)
+
+- Never hand the owner a shell command, script or manual procedure to run.
+  Agents run every command themselves.
+- If an action is physically blocked (the permission rules in
+  `.claude/settings.json` deny agents edits to `tools/verify/**`,
+  `.github/workflows/**` and `.claude/**`), do not work around the block.
+  Record it once under "Open questions for owner" in `docs/DECISIONS.md`
+  and keep working on everything else.
+- "Stop and ask" below means: record the question in `docs/DECISIONS.md`,
+  mention it once in your report, and continue with other work.
+
 ## When to stop and ask
 
 - The verifier disagrees with something you're confident about.
