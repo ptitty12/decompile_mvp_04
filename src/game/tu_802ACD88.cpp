@@ -6,12 +6,70 @@
 
 typedef Unk802ACD88_Mgr Mgr;
 
+class Unk802ACD88_G {
+public:
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11(void* a);
+    virtual int s12(void* a);
+};
+
+struct Unk802AE9C8_R {
+    void* m0;
+    void* m4;
+    struct Unk802AE9C8_Q* m8;
+    float mC;
+};
+
+struct Unk802AE9C8_Q {
+    char pad0[0x10];
+    int m10;
+};
+
+class Unk802AE200_VT18 {
+public:
+    char pad0[0x18];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4(const char* name);
+};
+
+struct Unk802AE13C_Z {
+    int m0;
+    int m4;
+    int m8;
+};
+
+extern void* (*lbl_8062C668)(int size, int heap);
+extern const char lbl_805DFFB0[];
+extern const char lbl_805DFFC0[];
+extern char lbl_8060D190[];
+extern Unk802ACD88_G* lbl_80626DD0;
 extern const char* lbl_8061C728[];
 extern const char lbl_805DFC08[];
 extern const char lbl_805DFFD0[];
 extern const char lbl_805E0004[];
 
+void* operator new(unsigned int size, int heap);
+
 extern "C++" {
+void* fn_803E9640(void* a, void* b, int c, void* fn);
+void fn_803E9994(void* a, char* tbl, int* n, void* z);
+void fn_803D6144(int a, int b);
+void fn_80314D60(int a);
+void fn_80312700();
+void* fn_80187190(void* mem, void* a, void* b);
+void* fn_80306350(void* mem, int a, void* b, void* c);
+void fn_8030427C(void* a, int b);
 void fn_802AA7A4(int a, int b);
 int fn_8040B574(const char* a, const char* b);
 void* fn_802B9300(const char* name, int a, int b, int* n);
@@ -19,6 +77,8 @@ void fn_802ACE20(Mgr* m, void* p, int n);
 int fn_802B6368(void* p, float x);
 void* fn_802AFA54(Mgr* m, const char* s);
 void fn_803DDA8C(void* a, void* b);
+void fn_802AF1C4(Mgr* m, void* a, int b);
+void fn_802BBA88(void* p);
 void fn_802B7C50(void* p);
 void fn_802C40BC(void* p);
 void fn_802C40DC(void* p);
@@ -46,6 +106,10 @@ void fn_803DD73C(void* a, int b);
 void* fn_803EDA0C(void* a);
 unsigned int fn_80378568(const char* s, int n);
 int fn_80377E90(void* t, int* a, int* b, unsigned int h);
+int fn_802AFB88(Mgr* m);
+void fn_80377CD8(void* t, int idx, int a, unsigned int h);
+void fn_802AFC7C(Mgr* m, void* e, int idx, int a, int b);
+void* fn_802B98AC(const char* name, int a);
 void fn_802BA310(void* t, const char* s);
 void fn_802BA218(void* t);
 void fn_802BA750(void* t);
@@ -88,6 +152,33 @@ Mgr* fn_802AD500(Mgr* m, int a)
 {
     fn_802BAD84(m, a + 0x16EF0);
     return m;
+}
+
+/* near-miss: retail reaches the stack Z object through a callee-saved pointer (r29) and has a larger frame */
+void fn_802AE13C(Mgr* m)
+{
+    int n = 0;
+    Unk802AE13C_Z z;
+    int out = 0;
+    z.m0 = 0;
+    z.m8 = 0;
+    m->m3B14 = fn_802B9300(lbl_805DFFB0, 0x400, 1, &out);
+    void* o = lbl_8062C668(0x30, 0);
+    m->m3B1C = 1;
+    void* r = fn_803E9640(o, m->m3B14, out, (void*)fn_80312700);
+    m->m3B18 = r;
+    fn_803E9994(r, lbl_8060D190, &n, &z);
+    m->m3B10 = z.m8;
+    fn_803D6144(z.m8, m->m3B0C);
+    fn_80314D60(m->m3B10);
+}
+
+void* fn_802AE200(Mgr* m, void* a, void* b)
+{
+    void* r = fn_80187190(operator new(0xC20, 0), a, b);
+    ((Unk802AE200_VT18*)((char*)r + 0xA0))->s4(lbl_805DFFC0);
+    fn_8030427C(fn_80306350(operator new(0x198, 0), 0x1C, r, a), m->m3B10);
+    return r;
 }
 
 int fn_802AE374(Mgr* m)
@@ -175,6 +266,35 @@ int fn_802AE984(Mgr* m, void* p)
     return ok;
 }
 
+int fn_802AE9C8(Mgr* m, void* key, float* a, int* b, int* c)
+{
+    Unk802AE9C8_R* r = (Unk802AE9C8_R*)fn_80378024((char*)m + 0x3B78, key);
+    if (r != (Unk802AE9C8_R*)-1) {
+        if (*(int*)r == 0)
+            fn_802AF1C4(m, (char*)r->m8 + 0x18, 0);
+        r->m8->m10++;
+        *b = lbl_80626DD0->s11(r->m0);
+        *a = r->mC;
+        *c = lbl_80626DD0->s11(r->m4);
+        return 1;
+    }
+    return 0;
+}
+
+void fn_802AEAA0(Mgr* m, void* key, void* a, void* b)
+{
+    void* p = 0;
+    int* r = fn_80378024((char*)m + 0x3B78, key);
+    if (r != (int*)-1)
+        p = (void*)r[2];
+    if (a != 0)
+        lbl_80626DD0->s12(a);
+    if (b != 0)
+        lbl_80626DD0->s12(b);
+    if (p != 0)
+        fn_802BBA88(p);
+}
+
 float fn_802AEB4C(Mgr* m, void* p)
 {
     float r = ((float*)fn_80378024((char*)m + 0x3B78, p))[3];
@@ -246,6 +366,29 @@ void* fn_802AFC3C(void* p)
     return fn_803EDA0C(p);
 }
 
+/* near-miss: retail keeps only m+0x10000 in a register and re-forms every table address per use (no cached table pointers) */
+void fn_802B0140(Mgr* m, const char* name, int flag, int n)
+{
+    unsigned int h = fn_80378568(name, 0);
+    char* t = (char*)m + 0x10000 - 0x568;
+    int a;
+    int b;
+    if (fn_80377E90(t, &a, &b, h) == 0) {
+        int idx = fn_802AFB88(m);
+        void* asset;
+        if (flag != 0)
+            asset = fn_802B98AC(name, n);
+        else
+            asset = fn_802B9300(name, n, 14, 0);
+        char* tb = (char*)m + 0x10000 - 0x1E80;
+        int o = idx * 4;
+        *(void**)(tb + o) = asset;
+        fn_80377CD8(t, idx, 0, h);
+        char* e = *(char**)(tb + o);
+        fn_802AFC7C(m, e + *(int*)(e + 0x14), idx, a, 0);
+    }
+}
+
 void fn_802B0388(Mgr* m, const char* s, int flag)
 {
     char* b = (char*)m + 0x10000;
@@ -272,4 +415,21 @@ void fn_802B0444(Mgr* m, int a, int b)
     fn_802BA820(t, b);
     int* r = fn_802BA4D8(t, a);
     r[1] = b;
+}
+
+void fn_802B058C(Mgr* m, const char* name, void* asset)
+{
+    unsigned int h = fn_80378568(name, 0);
+    char* t = (char*)m + 0x10000 - 0x568;
+    int a;
+    int b;
+    if (fn_80377E90(t, &a, &b, h) == 0) {
+        int idx = fn_802AFB88(m);
+        char* tb = (char*)m + 0x10000 - 0x1E80;
+        int o = idx * 4;
+        *(void**)(tb + o) = asset;
+        fn_80377CD8(t, idx, 0, h);
+        char* e = *(char**)(tb + o);
+        fn_802AFC7C(m, e + *(int*)(e + 0x14), idx, a, 0);
+    }
 }

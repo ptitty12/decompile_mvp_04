@@ -20,7 +20,12 @@ struct Unk802ACD88_Ent {
 struct Unk802ACD88_Mgr {
     char pad0[0x3B08];
     void* m3B08;
-    char pad3B0C[0x3B50 - 0x3B0C];
+    int m3B0C;
+    int m3B10;
+    void* m3B14;
+    void* m3B18;
+    int m3B1C;
+    char pad3B20[0x3B50 - 0x3B20];
     char* m3B50;
     char pad3B54[0x3BAC - 0x3B54];
     Unk802ACD88_Ent ent[32];
