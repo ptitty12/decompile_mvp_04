@@ -13,8 +13,33 @@ Unk80273498_Vec3 fn_8027AF54(Unk8028B194* g, int a);
 Unk80270BA0_X* fn_8027A90C(Unk8028B194* g);
 Unk80273498_Vec3 fn_801837F4(int obj, int a);
 void fn_8028F5CC(void* p, float f);
-void fn_8027AD3C(Unk8028B194* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* out6, Unk80273498_Vec3* out7,
+void fn_8027AD3C(Unk8028B194* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* out6, float* out7,
                  int b, int c, unsigned int* out10, int s8);
+float fn_80410CE8(float a, float b);           /* atan2 */
+int fn_8026D940(Unk80270BA0_X* x, int a);
+int fn_8026D9D0(Unk80270BA0_X* x, int a);
+double __builtin_fabs(double x);
+int fn_8026D704(Unk80270BA0_X* x, int a);
+void fn_8027A9AC(Unk8028B194* g, Unk80270BA0_X* x, unsigned int h1, unsigned int h2, float* out, int a, int b, int c);
+int fn_803164C4(const Unk80273498_Vec3& v);
+void fn_8024937C(Unk80270BA0_X* x, float a, float b, Unk80273498_Vec3 v);
+
+inline float AngleDiff(float a, float b)
+{
+    float d = a - b;
+    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    return d;
+}
+
+inline float Heading(Unk80273498_Vec3 t, const Unk80273498_Vec3& vb)
+{
+    return fn_80410CE8(t.x - vb.x, t.z - vb.z);
+}
+
+inline float Abs(float v)
+{
+    return __builtin_fabs(v);
+}
 extern const Unk80273498_Vec3 lbl_806055AC;    /* zero vector */
 int fn_801A2034(Unk8028B194_Ctx* ctx, int a);
 Unk80270BA0_X* fn_80257DD8(int a);
@@ -23,6 +48,13 @@ void fn_802D7B88(int a, int b, int c, float f);
 inline Unk80273498_Vec3 GetTarget(Unk8028B194* g)
 {
     return g->m10;
+}
+
+inline Unk80273498_Vec3 FlatPos(const Unk80273498_Vec3& p)
+{
+    Unk80273498_Vec3 r = p;
+    r.y = 0.0f;
+    return r;
 }
 
 inline Unk80273498_Vec3 operator-(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
@@ -169,6 +201,50 @@ Unk8028B194* Unk8028B194::fn_8028B51C(float a)
     return this;
 }
 
+/* near-miss: 125 of 124 instructions (35 register-normalized diffs). Retail
+ * keeps three distinct frame slots (0x18, 0x28, 0x38) for the vector
+ * arguments of fn_803164C4 (twice) and fn_8024937C, with direct word stores;
+ * the temporaries here share one slot and keep its address in a callee-saved
+ * register. Tried: by-value and const& parameters, named locals, one
+ * condition expression vs if/else-if, a hit flag vs direct call. */
+void Unk8028B194::fn_8028BDB8(Unk80270BA0_X* x, float t)
+{
+    if (!(mA8 & 0x40000) && fn_8026D704(x, 0)) {
+        switch (m48) {
+        case 11:
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+            if (m28 && !(mA8 & 0x1000000)) {
+                if (!(t <= 0.0f)) {
+                    unsigned int h = ((Unk8028B194_Link*)x->m618)->m838;
+                    float fl0 = 0.0f;
+                    float fl1 = 0.0f;
+                    fn_8027A9AC(this, x, h, 0xF4E8B1B9u, &fl0, 0, 0, 0);
+                    fn_8027A9AC(this, x, h, 0xF4E8B1B9u, &fl1, 0, 0, 1);
+                    fl0 = fl0 + (fl1 - fl0) * 0.33f;
+                    fl1 = fl1 - (fl1 - fl0) * 0.33f;
+                    if (!(fl0 <= 0.0f)) {
+                        int hit = 0;
+                        if (fn_803164C4(FlatPos(x->m60))) {
+                            hit = 1;
+                        } else if (fn_803164C4(GetTarget(this))) {
+                            hit = 1;
+                        }
+                        if (hit) {
+                            fn_8024937C(x, fl0, fl1, GetTarget(this));
+                        }
+                    }
+                    mA8 |= 0x1000000;
+                }
+            }
+            break;
+        }
+    }
+}
+
 void Unk8028B194::fn_8028BFA8(Unk80270BA0_X* x, Unk8028B194_Ctx* ctx, float t)
 {
     if (ctx->m6F4 != 1 && m28 && !(mA8 & 0x800000) && !(t <= 0.0f)) {
@@ -218,6 +294,58 @@ int Unk8028B194::fn_8028C0CC(Unk80270BA0_X* x, int b)
             }
         }
     }
+    return 0;
+}
+
+/* near-miss: 184 of 191 instructions. The hash switch is balanced differently in
+ * retail (root 0x858075AA with a three-node chain below it, so the real case
+ * list is not just these 11 values), and retail stores the angle difference
+ * once more (an extra stfs/lfs pair through a second float slot). Everything
+ * before the switch matches except those. */
+int Unk8028B194::fn_8028C264(Unk80270BA0_X* x)
+{
+    Unk80273498_Vec3 v = m8->fn_8027A358(0);
+    const float k = 12.0f;
+    int c;
+
+    if (!(v.z >= 0.0f)) {
+        c = m64 + k > v.z;
+    } else {
+        c = m6C < (v.z + k) * (v.z + k);
+    }
+    if (!c) {
+        return 0;
+    }
+    if (!(m68 >= 576.0f)) {
+        float flt = 0.0f;
+        unsigned int hash = 0;
+        Unk80273498_Vec3 vb = lbl_806055AC;
+        fn_8027AD3C(this, x, 0, &vb, &flt, 0, 0, &hash, 0);
+        if (m48 != 19 && m28) {
+            if (Abs(AngleDiff(flt, Heading(GetTarget(this), vb))) >= 0.7853982f) {
+                goto fail;
+            }
+        }
+        switch (hash) {
+        case 0x858075AAu:
+        case 0x3453C76Bu:
+        case 0x67A49CBAu:
+        case 0x7133B4CBu:
+        case 0xCA0C5FC1u:
+        case 0xA713FF5Bu:
+        case 0x97F6F9F4u:
+        case 0xC96D745Bu:
+        case 0xECC40882u:
+        case 0xDB410FF7u:
+        case 0xF469A7C1u:
+            goto fail;
+        }
+        if (!fn_8026D940(x, 0) && !fn_8026D9D0(x, 0)) {
+            return 1;
+        }
+    }
+fail:
+    mA8 &= ~0x200000;
     return 0;
 }
 

@@ -128,6 +128,8 @@ public:
     unsigned int fn_8028C560(int id, unsigned int cur);
     int fn_8028C0CC(Unk80270BA0_X* x, int b);
     void fn_8028BFA8(Unk80270BA0_X* x, Unk8028B194_Ctx* ctx, float t);
+    int fn_8028C264(Unk80270BA0_X* x);
+    void fn_8028BDB8(Unk80270BA0_X* x, float t);
 };
 
 #endif /* GAME_GOALS_TU_8028B194_H */
