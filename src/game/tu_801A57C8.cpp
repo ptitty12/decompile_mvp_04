@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801A57C8.h"
+#include "game/clampiter.h"
 
 void fn_801A57C8(Unk8019F8C0_Owner* o, int a);
 int fn_801A57B8();
@@ -25,6 +26,8 @@ void fn_801A5014(Unk8019F8C0_Owner* o);
 void fn_8006F918(int a, int b);
 int fn_800A8874(void* m, int a, int b, int c);
 void fn_801A594C(Unk8019F8C0_Owner* o, int i);
+/* near-miss: same code; retail forms o+0x6B0 inside the branch (r30/r31 roles swap), keeps buf at sp+8 with a
+ * recomputed address, and holds idx in r7 (about 3 extra insns here). */
 void fn_801A5D3C(Unk8019F8C0_Owner* o);
 void fn_801A5C1C(Unk8019F8C0_Owner* o);
 void fn_801A5B44(Unk8019F8C0_Owner* o);
@@ -40,7 +43,8 @@ int fn_80400DA4();
 void fn_80107F74(int a, int b, int c);
 
 struct Unk801A57C8_Ob {
-    char pad0[0x1C];
+    char pad0[0x18];
+    int m18;
     int m1C;
     char pad20[0x38 - 0x20];
     int m38;
@@ -68,6 +72,188 @@ void fn_800B7B4C(Unk800B64BC* q, Unk8035682C* s, int n);
 extern Unk800B64BC* lbl_8061A32C;
 extern char lbl_805CEB0C[];
 
+/* Result record of fn_80326F44 (returned through memory; id at +0, value at +4). */
+struct Unk801A78E4_Rec {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+void fn_80326F44(Unk801A78E4_Rec* out, char* obj, int a, int b, float f);
+extern float lbl_805CEAF0;
+
+/* Owner's mode objects, as fn_801A72E0 sees them (+0x58C sub-record with state words at +0x40/+0x44). */
+struct Unk801A72E0_Sub {
+    char pad0[0x40];
+    int m40;
+    int m44;
+};
+struct Unk801A72E0_Obj {
+    char pad0[0x58C];
+    Unk801A72E0_Sub m58C;
+};
+
+inline int Unk801A57C8_At(int* a, int off)
+{
+    return *(int*)((char*)a + off);
+}
+
+/* Timer-like object: owner at +0, a flag at +0x18; fn_801A745C reads the owner's value at +0x6CC. */
+struct Unk801A745C_T {
+    Unk8019F8C0_Owner* m0;
+    char pad4[0x18 - 0x4];
+    int m18;
+};
+int fn_80326E64(void* p, int a);
+extern "C" float fn_80189D60(int a);
+extern float lbl_805CEAA8;
+extern float lbl_805CEAAC;
+
+/* Object built by fn_802AE610: vptr at +0x98 (slot 8 takes a flag); a sub-object at +0xA0 has its vptr at +0xB8. */
+class Unk801A5A9C_VB {
+public:
+    char pad0[0x98];
+};
+class Unk801A5A9C_V : public Unk801A5A9C_VB {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+struct Unk801A5A9C_Obj {
+    char pad0[0x708];
+    int m708;
+};
+class Unk802AE610_SubB {
+public:
+    char pad0[0x18];
+};
+class Unk802AE610_Sub : public Unk802AE610_SubB {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4(const char* s);
+};
+Unk801A5A9C_Obj* fn_802AE610(void* mgr, Unk8019F8C0_Owner* a, int b, Unk8019F8C0_Owner* c, int d, int e);
+void fn_8024BE80(Unk801A5A9C_Obj* o, int a);
+extern char lbl_805CE8E8[];
+extern int lbl_805CEA60[];
+void fn_802B8888(void* mgr, Unk8019F8C0_Inner* t, int v);
+int fn_80097300(Unk8019F8C0_Inner* t, int v);
+extern void* lbl_8061E978;
+
+/* Timer-like object of fn_801A9428: owner at +0, flags at +0x18 and +0x20. */
+struct Unk801A9428_T {
+    Unk8019F8C0_Owner* m0;
+    char pad4[0x18 - 0x4];
+    int m18;
+    char pad1C[4];
+    int m20;
+};
+struct Unk801A9428_Pair {
+    char pad0[0x24];
+    int m24;
+};
+class Unk8016ACAC {
+public:
+    char pad0[4];
+    int fn_8016AD44();
+};
+extern "C" void fn_80188044(int h, int v);
+extern "C" void fn_80188698(int h, float f);
+extern "C" void fn_801889C0(int h);
+void fn_801A94EC(void* p);
+extern float lbl_805CEB90;
+
+struct Unk801A94EC_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk801A94EC_T {
+    void* m0;
+    Unk801A94EC_V m4;
+    int m10;
+    int m14;
+    char pad18[0x38 - 0x18];
+    int m38;
+};
+float fn_80301E44(void* o, Unk801A94EC_V* v);
+void fn_802FFAD4(Unk801A94EC_V* v, int a, int b, float f);
+extern float lbl_805CEB94;
+extern Unk801A734C_V3 lbl_806055AC;
+extern float lbl_805CEA98;
+
+/* Iterator object of fn_801A62D0 (ctor 0x8014E09C, advance 0x8014E108); current index at +8. */
+struct Unk801A62D0_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk801A62D0_X {
+    char pad0[0x460];
+    int m460;
+};
+void fn_8014E09C(Unk801A62D0_It* it, Unk8019F8C0_Owner* o, int a);
+void fn_8014E108(Unk801A62D0_It* it);
+int fn_802D7DB4(int a, int b);
+
+struct Unk801A7048_T744 {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk801A7048_P {
+    char pad0[0x38C];
+    int m38C;
+};
+extern "C" Unk8019F8C0_M2* fn_801A4CE8(Unk8019F8C0_Owner* o, int i);
+int fn_8018AD2C(Unk801A7048_P* p);
+
+struct Unk801A6750_X {
+    char pad0[0x380];
+    int m380;
+};
+struct Unk801A6750_V {
+    float x;
+    float y;
+    float z;
+};
+void fn_80198E70(void* o, int a);
+void fn_8019A5E0(void* o, int a, Unk801A6750_V* v, int c);
+
+void* fn_802AE7D4(void* mgr, Unk8019F8C0_Owner* a, int i, Unk8019F8C0_Owner* c);
+int fn_804089B4(char* dst, const char* fmt, ...);
+extern char lbl_805CE8F8[];
+extern char lbl_805CE97C[];
+extern char lbl_805CE9A0[];
+extern char lbl_805CE918[];
+extern char lbl_805CE924[];
+
+int fn_803270C4(char* p, int a, int b, float f);
+int fn_8014E2B4(int a);
+extern float lbl_805CEA5C;
+struct Unk801A71D0_Sub {
+    char pad0[4];
+    unsigned m4;
+    char pad8[0x38 - 0x8];
+    int m38;
+};
+struct Unk801A71D0_Obj {
+    char pad0[0x58C];
+    Unk801A71D0_Sub m58C;
+};
+
 struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
@@ -86,6 +272,51 @@ void fn_801A58FC(Unk8019F8C0_Owner* o, int a)
     }
 }
 
+void fn_801A5A9C(Unk8019F8C0_Owner* o)
+{
+    fn_801A5394(o);
+    Unk801A5A9C_Obj* x = fn_802AE610(lbl_8061E978, o, 0, o, 0, 0);
+    ((Unk802AE610_Sub*)((char*)x + 0xA0))->fn_vslot4(lbl_805CE8E8);
+    x->m708 = 0;
+    fn_8024BE80(x, 0);
+    ((Unk801A5A9C_V*)x)->fn_vslot8(0);
+    o->m594[0] = (int)x;
+}
+
+void fn_801A5B44(Unk8019F8C0_Owner* o)
+{
+    fn_8033E958(lbl_805CE8F8);
+    int i = 0;
+    do {
+        o->m690[i] = (int)fn_802AE7D4(lbl_8061E978, o, i, o);
+        char buf[16];
+        fn_804089B4(buf, lbl_805CE918, i);
+        ((Unk802AE610_Sub*)((char*)o->m690[i] + 0xA0))->fn_vslot4(buf);
+        char* x = (char*)o->m690[i];
+        fn_80378A34(o->m704, x ? x + 0x5e4 : 0);
+        i++;
+    } while (i <= 3);
+    fn_8033E958(lbl_805CE924);
+}
+
+void fn_801A5D3C(Unk8019F8C0_Owner* o)
+{
+    fn_8033E958(lbl_805CE97C);
+    Unk8006A138_It<1> it(0);
+    int idx = 0;
+    do {
+        int v = o->m6F8->m14[idx].m1A0;
+        if (v != 0) {
+            o->m6B0[it.v] = (int)fn_802AE610(lbl_8061E978, o, v, o, idx, 0xff);
+            char buf[16];
+            fn_804089B4(buf, lbl_805CE9A0, it.v);
+            ((Unk802AE610_Sub*)((char*)o->m6B0[it.v] + 0xA0))->fn_vslot4(buf);
+            ((Unk801A5A9C_V*)o->m6B0[it.v])->fn_vslot8(1);
+        }
+        idx = it.Next();
+    } while (idx <= 1);
+}
+
 void fn_801A6240(Unk8019F8C0_Owner* o)
 {
     void* t = (void*)o->m594[0];
@@ -97,6 +328,56 @@ void fn_801A6240(Unk8019F8C0_Owner* o)
         fn_8028709C(t, 0xBEE24601u);
         fn_8028709C(t, 0x52D3659Du);
     }
+}
+
+/* near-miss: same code; callee-saved registers match, the table index temporaries differ (10 slots). */
+void fn_801A62D0(Unk8019F8C0_Owner* o, int team)
+{
+    Unk801A62D0_It it;
+    fn_8014E09C(&it, o, 1);
+    Unk801A62D0_It* p = &it;
+    while (p->m8 != 10) {
+        Unk8019F8C0_Inner* q = o->m6F8->m14 + team;
+        int slot = q->m17C[p->m8];
+        if (slot != 0xff) {
+            Unk801A62D0_X* x = (Unk801A62D0_X*)Unk801A57C8_At(o->m594, slot * 4 + team * 100);
+            x->m460 = p->m8;
+        }
+        fn_8014E108(p);
+    }
+    Unk8019F8C0_Inner* t = o->m6F8->m14 + team;
+    int s = t->m164;
+    if (s == 0 || s == 2) {
+        int slot = t->m17C[9];
+        if (slot != 0xff) {
+            Unk801A62D0_X* x = (Unk801A62D0_X*)Unk801A57C8_At(o->m594, team * 100 + slot * 4);
+            x->m460 = 9;
+        }
+    }
+}
+
+/* near-miss: same code; retail keeps the loop counter and byte offset in r10/r11 and the row offset in r0 (8 slots). */
+void fn_801A63B0(Unk8019F8C0_Owner* o, int key, int team, int* out)
+{
+    if (team > 2) {
+        int f = 0;
+        if (o->m6F8->m14[2].m8 != 0) {
+            f = 1;
+        }
+        int a = team;
+        if (a != 3) {
+            team = f ^ 1;
+        } else {
+            team = f;
+        }
+    }
+    for (int i = 0; i < 25; i++) {
+        if (key == Unk801A57C8_At(o->m594, team * 100 + i * 4)) {
+            *out = i;
+            return;
+        }
+    }
+    *out = 0xff;
 }
 
 void fn_801A642C(Unk8019F8C0_Owner* o)
@@ -140,12 +421,42 @@ void fn_801A6528(Unk8019F8C0_Owner* o)
 
 void fn_801A674C() {}
 
+void fn_801A6750(Unk8019F8C0_Owner* o, int a, Unk801A6750_V* v, int c)
+{
+    fn_80198E70(o->m6E4, 2);
+    ((Unk801A5A9C_V*)o->m6E8)->fn_vslot8(0);
+    fn_80198E70(o->m6E8, 3);
+    Unk801A6750_X* p = (Unk801A6750_X*)o->m6E4;
+    Unk801A6750_X* q = (Unk801A6750_X*)o->m6E8;
+    int t = p->m380;
+    if (t > 7) {
+        t = 7;
+    }
+    q->m380 = t;
+    Unk801A6750_V w = *v;
+    fn_8019A5E0(o->m6E8, a, &w, c);
+    fn_8037893C(o->m704, 0x52, 0, 0, 0);
+}
+
 void fn_801A6820(Unk8019F8C0_Owner* o)
 {
     Unk801A57C8_Mode* p = (Unk801A57C8_Mode*)o->m560;
     if (p->m4->m14 - 3 <= 1) {
         fn_80235AD4(o->m700->m3B0);
         fn_8033E5C4(p, 3);
+    }
+}
+
+void fn_801A69EC(Unk8019F8C0_Owner* o)
+{
+    Unk8019F8C0_Inner* t = &o->m6F8->m14[1];
+    unsigned i = 0;
+    if (i < o->m6F8->m14[1].m168.m4) {
+        do {
+            int v = fn_80097300(t, (unsigned char)i);
+            i++;
+            fn_802B8888(lbl_8061E978, t, v);
+        } while (i < t->m168.m4);
     }
 }
 
@@ -156,6 +467,29 @@ Unk8019F8C0_Ref* fn_801A6D84(Unk8019F8C0_Owner* o, int i)
         return s->m40;
     }
     return 0;
+}
+
+void fn_801A6ED8(Unk8019F8C0_Owner* o)
+{
+    int a = fn_801A2034(o, o->m6F8->m14[2].m8 == 0);
+    int f = 0;
+    if (o->m6F8->m14[2].m8 != 0) {
+        f = 1;
+    }
+    int b = fn_801A2034(o, f);
+    Unk801A57C8_G* g = &lbl_8068BF34;
+    if (g->m310 == 0) {
+        g->m310 = fn_802D7DB4(a, 0xc4);
+    }
+    if (g->m31C == 0) {
+        g->m31C = fn_802D7DB4(a, 0xc7);
+    }
+    if (g->m314 == 0) {
+        g->m314 = fn_802D7DB4(a, 0xc5);
+    }
+    if (g->m0[0x76] == 0) {
+        g->m0[0x76] = fn_802D7DB4(b, 0x76);
+    }
 }
 
 void fn_801A6FBC()
@@ -182,6 +516,25 @@ int fn_801A7020(Unk8019F8C0_Owner* o)
     return r;
 }
 
+int fn_801A7048(Unk8019F8C0_Owner* o)
+{
+    Unk801A57C8_ModeObj* m = ((Unk801A57C8_Mode*)o->m560)->m4;
+    if (m != 0 && m->m14 == 6) {
+        Unk8019F8C0_M2* a = fn_801A4CE8(o, 1);
+        Unk8019F8C0_Sub* b = fn_801A04A8(o, 1);
+        Unk801A7048_P* p = (Unk801A7048_P*)o->m6CC;
+        if (a->fn_vslot9() == 0 && ((Unk801A7048_T744*)o->m744)->m20 == 0 && b->m44 == 0) {
+            return 1;
+        }
+        if (a->fn_vslot9() != 0 && p->m38C == 1) {
+            if (fn_8018AD2C(p)) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 /* near-miss: retail returns the -1 case from a shared tail at the end (3 slots differ). */
 int fn_801A7130(Unk8019F8C0_Owner* o, int i)
 {
@@ -206,11 +559,71 @@ int fn_801A7198(Unk8019F8C0_Owner* o)
     return r;
 }
 
+int fn_801A71D0(Unk8019F8C0_Owner* o)
+{
+    char* sub = (char*)o + 0x50;
+    int a = fn_803270C4(sub, 0x39, 1, lbl_805CEA5C);
+    if (fn_803270C4(sub, 0x61, 1, lbl_805CEA5C) > 0) {
+        return 1;
+    }
+    if (a > 1 || o->m6F8->m14[2].m1 == 3) {
+        return 0;
+    }
+    int r = 0;
+    Unk8006A138_It<0x15> it(9);
+    int idx = 9;
+    do {
+        unsigned k = idx;
+        Unk801A71D0_Obj* p = k <= 12 ? (Unk801A71D0_Obj*)o->m65C[k] : 0;
+        if (p != 0) {
+            Unk801A71D0_Sub* s = &p->m58C;
+            if (s->m4 & 0x20000000) {
+                r = 0;
+            } else {
+                r = it.v < fn_8014E2B4(s->m38);
+            }
+        }
+        idx = it.Next();
+    } while (idx <= 12);
+    return r;
+}
+
+int fn_801A72E0(Unk8019F8C0_Owner* o)
+{
+    int n = 0;
+    for (int i = 0; i < 4; i++) {
+        unsigned k = i + 9;
+        Unk801A72E0_Obj* p = k <= 12 ? (Unk801A72E0_Obj*)o->m65C[k] : 0;
+        if (p != 0) {
+            Unk801A72E0_Sub* sub = &p->m58C;
+            if (sub->m40 == 3 && sub->m44 == 0) {
+                n++;
+            }
+        }
+    }
+    return n;
+}
+
 Unk801A734C::Unk801A734C(int a)
 {
     m0 = a;
     m28 = 0;
     Reset();
+}
+
+void Unk801A734C::Reset()
+{
+    m1C = 0;
+    m18 = 0;
+    m38 = 0;
+    m4 = lbl_806055AC;
+    m24 = lbl_805CEA98;
+    m10 = 0;
+    m14 = 0;
+    m20 = 0;
+    m2C = 0;
+    m30 = 0;
+    m34 = 0;
 }
 
 Unk801A734C::~Unk801A734C() {}
@@ -219,6 +632,29 @@ void Unk801A734C::Clear()
 {
     Init(0);
     Reset();
+}
+
+float fn_801A745C(Unk801A745C_T* t)
+{
+    float f = (float)fn_80326E64((char*)t->m0 + 0x50, 0) * lbl_805CEAA8;
+    if (t->m18 != 0) {
+        float g = fn_80189D60(t->m0->m6CC) + lbl_805CEAAC;
+        if (!(g >= f)) {
+            f = g;
+        }
+    }
+    return f;
+}
+
+float fn_801A78E4(Unk801A57C8_Wrap* w)
+{
+    Unk801A78E4_Rec r;
+    fn_80326F44(&r, (char*)w->m0 + 0x50, 0x3d, 1, lbl_805CEAF0);
+    int ok = 1;
+    if (r.m0 == 0xc7) {
+        ok = 0;
+    }
+    return ok != 0 ? r.m4 : lbl_805CEAF0;
 }
 
 void fn_801A7AB0(Unk801A57C8_Wrap* w)
@@ -263,6 +699,28 @@ void fn_801A8198(char* p)
     *(int*)(p + 0x1C) = 0;
 }
 
+void fn_801A81A4(Unk801A57C8_Ob* o)
+{
+    int done = 0;
+    do {
+        int n = o->m38 + 1;
+        o->m38 = n;
+        if (n > 13) {
+            o->m38 = 0;
+        }
+        if (o->m18 != 0) {
+            if ((unsigned)lbl_805CEA60[o->m38] <= 1) {
+                done = 1;
+            }
+        } else {
+            int v = lbl_805CEA60[o->m38];
+            if (v == 0 || v == 2) {
+                done = 1;
+            }
+        }
+    } while (done == 0);
+}
+
 void fn_801A8224(Unk801A57C8_Ob* o, int x)
 {
     int f = (int)fn_802D7E2C(x, 0x39) != 0 ? 1 : 0;
@@ -272,6 +730,40 @@ void fn_801A8224(Unk801A57C8_Ob* o, int x)
     }
     if (o->m38 == 0) {
         fn_801A82A8(o, x);
+    }
+}
+
+void fn_801A9428(Unk801A9428_T* t)
+{
+    if (t->m20 != 0) {
+        fn_801A94EC(t);
+        if (t->m18 != 0) {
+            fn_80188044(t->m0->m6CC, 0);
+        } else {
+            int h = t->m0->m6CC;
+            fn_80188698(h, lbl_805CEB90);
+            fn_801889C0(h);
+        }
+    }
+    Unk8019F8C0_Owner* o = t->m0;
+    Unk8019F8C0_Sub* s = (Unk8019F8C0_Sub*)o->m54C;
+    if (((Unk801A9428_Pair*)o->m700->m3BC)->m24 == 0) {
+        if ((int)s == (int)fn_801A04A8(o, 5)) {
+            if (((Unk8016ACAC*)s->m40)->fn_8016AD44()) {
+                fn_80188044(t->m0->m6CC, 0);
+            }
+        }
+    }
+}
+
+void fn_801A94EC(void* p)
+{
+    Unk801A94EC_T* t = (Unk801A94EC_T*)p;
+    if (t->m14 == 0 && t->m38 == 0) {
+        Unk801A94EC_V a = t->m4;
+        Unk801A94EC_V b = a;
+        a.y = fn_80301E44(t->m0, &b);
+        fn_802FFAD4(&a, 0, 0, lbl_805CEB94);
     }
 }
 

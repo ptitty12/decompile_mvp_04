@@ -95,10 +95,13 @@ struct Unk8019F8C0_Inner {
     int m8;
     char padC[0x108 - 0xC];
     int m108;
-    char pad10C[0x168 - 0x10C];
+    char pad10C[0x164 - 0x10C];
+    int m164;
     Unk8019F8C0_Ring m168;
     char pad178[0x17C - 0x178];
-    unsigned char m17C[0x1B4 - 0x17C];
+    unsigned char m17C[0x1A0 - 0x17C];
+    int m1A0;
+    char pad1A4[0x1B4 - 0x1A4];
     unsigned char m1B4[0x3E4 - 0x1B4];
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
