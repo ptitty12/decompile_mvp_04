@@ -251,6 +251,36 @@ void Unk802E8FB0::fn_802E9150(Unk802E22EC_B* o)
     lbl_8061F68C->s2(0, "/mvp2004/source/common/geomlib/geomspheremesh.cpp", 75);
 }
 
+void Unk802E8FB0::fn_802E91D8(char* mats)
+{
+    lbl_8061F68C->s2(m60 != 0, "/mvp2004/source/common/geomlib/geomspheremesh.cpp", 84);
+    lbl_8061F68C->s2(m64 != 0, "/mvp2004/source/common/geomlib/geomspheremesh.cpp", 85);
+    m60->s6(mats, 1);
+    m64->s6(mats, 1);
+    Unk802E0914_Box* b = &m30;
+    fn_8035F4EC(b, &m64->m30);
+    Unk802E0914_Box* c = &m60->m30;
+    if (!(m30.mx <= c->mx)) {
+        m30.mx = c->mx;
+    }
+    if (!(b->my <= c->my)) {
+        b->my = c->my;
+    }
+    if (!(b->mz <= c->mz)) {
+        b->mz = c->mz;
+    }
+    if (!(b->Mx >= c->Mx)) {
+        b->Mx = c->Mx;
+    }
+    if (!(b->My >= c->My)) {
+        b->My = c->My;
+    }
+    if (!(b->Mz >= c->Mz)) {
+        b->Mz = c->Mz;
+    }
+    m3 = 0;
+}
+
 void Unk802E8FB0::fn_802E9380()
 {
     m60->s1();

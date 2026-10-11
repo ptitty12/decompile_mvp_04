@@ -67,6 +67,7 @@ public:
     virtual ~Unk802E8FB0();
     void fn_802E90C8();
     void fn_802E9150(Unk802E22EC_B* o);
+    void fn_802E91D8(char* mats);
     void fn_802E9380();
 };
 
