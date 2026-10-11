@@ -377,16 +377,15 @@ int fn_801A1FFC(Unk8019F8C0_Owner* o, int a, int b)
 
 int fn_801A2034(Unk8019F8C0_Owner* o, int i)
 {
-    /* near-miss: retail compares i == 3 before `mr r4,r11` and branches after it (3 slots differ). */
     if (i > 2) {
         int f = 0;
         if (o->m6F8->m14[2].m8 != 0) {
             f = 1;
         }
-        if (i == 3) {
-            i = f;
-        } else {
+        if (i != 3) {
             i = f ^ 1;
+        } else {
+            i = f;
         }
     }
     return o->m58C[i];
