@@ -5,7 +5,7 @@
  *
  * .text 0x80021BE8-0x800239F4 only: every data object is extern by its lbl_ name.
  */
-#include "game/tu_80021BE8.h"
+#include "game/tu_800239F4.h"
 
 extern const float lbl_805A5FFC;
 extern int lbl_805B19F0[];
@@ -162,11 +162,11 @@ extern "C" int fn_80022730(int unused, int b, int c)
     return r;
 }
 
-extern "C" void fn_80022D64(Unk80021A60_Data* x, Unk801A4B34_Vec3* a, Unk801A4B34_Vec3* b, Unk801A4B34_Vec3* c)
+extern "C" void fn_80022D64(Unk80021A60_Data* x, Unk801A4B34_Vec3 a, Unk801A4B34_Vec3 b, Unk801A4B34_Vec3 c)
 {
-    x->m90 = fn_804028E4(a->x * a->x + a->z * a->z) * lbl_805A5FFC;
-    x->m94 = fn_804028E4(b->x * b->x + b->z * b->z) * lbl_805A5FFC;
-    x->m98 = fn_804028E4(c->x * c->x + c->z * c->z) * lbl_805A5FFC;
+    x->m90 = fn_804028E4(a.x * a.x + a.z * a.z) * lbl_805A5FFC;
+    x->m94 = fn_804028E4(b.x * b.x + b.z * b.z) * lbl_805A5FFC;
+    x->m98 = fn_804028E4(c.x * c.x + c.z * c.z) * lbl_805A5FFC;
 }
 
 int Unk80021A60::fn_800232A0(int kind, int v)
@@ -239,5 +239,26 @@ void Unk80021A60::fn_80023490(int key, int unused)
     for (int i = 0; i < 10; i++) {
         if (key == e[i].m0 && e[i].m4 != 0)
             e[i].m4 = 0;
+    }
+}
+
+/* near-miss: 37/38 insns. Retail keeps the index in r31 inside the `idx == 0` branch
+ * (stwx/lwzx with the register); here GCC folds it to 0. Tried <=, unsigned and else forms. */
+extern "C" void fn_8002395C(Unk80023AC4_Obj* x, int idx)
+{
+    if (idx == 0) {
+        Unk8001F2C4_World** arr = x->m80;
+        char* sub = (char*)x + 0xBC;
+        fn_80378ACC(sub, fn_801A4CE8(arr[idx], 1));
+        char* q = 0;
+        if (arr[idx]->m6E4 != 0)
+            q = arr[idx]->m6E4 + 0x360;
+        fn_80378ACC(sub, q);
+        fn_8003A058(fn_80038EB4(), 0);
+        arr[idx] = (Unk8001F2C4_World*)idx;
+        x->mCC = idx;
+        x->mC8 = (Unk8001F5CC_Tbl*)idx;
+        x->m7C = -1;
+        fn_8003B378(x->m6C8);
     }
 }

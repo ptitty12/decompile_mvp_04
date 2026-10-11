@@ -38,37 +38,6 @@ union Unk80023AC4_Word {
     float f;
 };
 
-/* Player object (same as Unk80270BA0_X) with its vptr at +0x98; only slot 24 is called here. */
-struct Unk80023F98_PlBase {
-    char pad0[0x98];
-};
-class Unk80023F98_Pl : public Unk80023F98_PlBase {
-public:
-    virtual void fn_vslot1();
-    virtual void fn_vslot2();
-    virtual void fn_vslot3();
-    virtual void fn_vslot4();
-    virtual void fn_vslot5();
-    virtual void fn_vslot6();
-    virtual void fn_vslot7();
-    virtual void fn_vslot8();
-    virtual void fn_vslot9();
-    virtual void fn_vslot10();
-    virtual void fn_vslot11();
-    virtual void fn_vslot12();
-    virtual void fn_vslot13();
-    virtual void fn_vslot14();
-    virtual void fn_vslot15();
-    virtual void fn_vslot16();
-    virtual void fn_vslot17();
-    virtual void fn_vslot18();
-    virtual void fn_vslot19();
-    virtual void fn_vslot20();
-    virtual void fn_vslot21();
-    virtual void fn_vslot22();
-    virtual void fn_vslot23();
-    virtual int fn_vslot24();
-};
 
 /* Record behind Obj::m6B8 (its first word is compared against 3 in fn_800256F8). */
 struct Unk800256F8_Rec {
@@ -174,6 +143,10 @@ int fn_8006BE18(Unk8001F5CC_Tbl* t);
 void fn_80344494(int* p, int a);
 void fn_8003F974(int a);
 void fn_80030274();
+void* fn_801A4CE8(Unk8001F2C4_World* w, int a);
+void fn_80378ACC(char* sub, void* p);
+void fn_8003A058(Unk80038EB4_Obj* o, int a);
+void fn_8003B378(int a);
 float fn_8018CDB8(Unk801A4B34_Pos* p, int a, float f);
 void fn_803EE7BC();
 void fn_80048968(Unk800475EC_Obj* o);

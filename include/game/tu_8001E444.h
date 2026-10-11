@@ -154,7 +154,9 @@ struct Unk8001F2C4_World {
     int m68C;
     char pad690[0x6CC - 0x690];
     Unk801A4B34_Pos* m6CC;
-    char pad6D0[0x6F8 - 0x6D0];
+    char pad6D0[0x6E4 - 0x6D0];
+    char* m6E4;
+    char pad6E8[0x6F8 - 0x6E8];
     Unk8001F5CC_Tbl* m6F8;
     char pad6FC[4];
     Unk8001F2C4_Outer* m700;
@@ -183,6 +185,38 @@ struct Unk8001E444_Owner {
 struct Unk80344538_Rec {
     Unk80344538_Rec();
     char data[0x2C];
+};
+
+/* Player object (same as Unk80270BA0_X) with its vptr at +0x98; only slot 24 is called here. */
+struct Unk80023F98_PlBase {
+    char pad0[0x98];
+};
+class Unk80023F98_Pl : public Unk80023F98_PlBase {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual int fn_vslot24();
 };
 
 struct Unk8001E444_Obj {
@@ -237,6 +271,10 @@ int fn_800458C0(float a);
 void fn_800474A4();
 void fn_800433CC();
 void fn_80046160(int a, int b);
+void fn_80235C18(int* out, int pl, ...);
+int fn_8022EC70(int pl);
+int fn_8022EAF4(int pl, int* buf);
+int fn_8018CE28(Unk801A4B34_Pos* p, int v, int* buf);
 void fn_80043650(bool a);
 void fn_8004390C(int a);
 void fn_80045FEC(int a);
