@@ -11,6 +11,10 @@ extern const float lbl_805A60B8;
 extern const float lbl_805A60C8;
 extern const float lbl_805A61C0;
 extern const float lbl_805A61E0;
+extern float lbl_805A60DC;
+extern const float lbl_805A60E0;
+extern const float lbl_805A60CC;
+extern const float lbl_805A60D8;
 extern const float lbl_805A6068;
 extern const float lbl_805A6074;
 extern const float lbl_805A6078;
@@ -43,6 +47,28 @@ extern const float lbl_805A6154;
 
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x);
 extern "C" void fn_80023F98(Unk80023AC4_Obj* x);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern "C" void fn_8002F160(Unk80023AC4_Obj* x);
 
 /* near-miss: 52/52 insns, ~20 slots differ (register allocation of the message pointer and the
  * Vec3 copy temporaries: retail keeps it in r12 and reloads words 1 and 2 of the local copy
@@ -129,8 +155,55 @@ extern "C" void fn_8002437C(Unk80023AC4_Obj* x)
     fn_8002A244(x, 4, (float)x->m80[0]->m48 * lbl_805A60C8);
 }
 
+/* near-miss: 53/53 insns, ~15 slots differ (same instructions; register numbers and the
+ * placement of the unsigned-int conversion constant loads differ). */
+extern "C" void fn_800243D4(Unk80023AC4_Obj* x)
+{
+    float a, b, c;
+    fn_8018CA5C(x->m80[0]->m6CC, &a, &b, &c);
+    x->m51C = 1;
+    c = c * lbl_805A60CC;
+    x->m528 = x->m80[0]->m700->m3A4->m1F8;
+    x->m520 = (float)x->m80[0]->m48 * lbl_805A60D8;
+    int t = (int)c;
+    x->m1BC = t;
+    fn_80021D6C(x, x->m80[0], t);
+    fn_8002F160(x);
+}
+
 extern "C" void fn_800244A8()
 {
+}
+
+extern "C" void fn_800244AC(Unk8001E444_Obj* x, Unk801A4B34_Pos* p, float f)
+{
+    if (p != 0 && fn_8024D408(p) != 0) {
+        if (x->m444 == 8 || x->m444 == 0) {
+            Unk801A4B34_Pos* pp = x->m130->m44C->m6CC;
+            int n = 0;
+            float g = fn_8018CDB8(pp, 2, lbl_805A60DC);
+            if (!(g >= f)) {
+                x->m444 = 6;
+            } else {
+                float t = lbl_805A60DC;
+                for (int i = 0; i <= 4; i++) {
+                    float g2 = fn_8018CDB8(pp, 0xB, t);
+                    if (!(g2 >= f)) {
+                        n++;
+                        t = g2 + lbl_805A60E0;
+                        continue;
+                    }
+                    break;
+                }
+                if (n == 0)
+                    x->m444 = n;
+                else if (n == 1)
+                    x->m444 = 4;
+                else if (n == 2)
+                    x->m444 = 5;
+            }
+        }
+    }
 }
 
 extern "C" void fn_800245D0(Unk80023AC4_Obj* x)
@@ -187,6 +260,37 @@ extern "C" void fn_8002569C(Unk80023AC4_Obj* x, Unk8002569C_Msg* m)
     int v = m->m8;
     x->m134 = v;
     x->m138 = (v ^ 6) == 0;
+}
+
+extern "C" void fn_800256F8(Unk80023AC4_Obj* x, Unk8002569C_Msg* m)
+{
+    int z = 0;
+    x->m12C = m->mC;
+    x->m140 = m->m24;
+    x->m13C = m->m18;
+    x->m144 = m->m28;
+    x->m148 = m->m30;
+    x->m14C = m->m2C;
+    x->m150 = m->m34;
+    int t = m->m8;
+    x->m138 = z;
+    x->m130.i = t;
+    x->m134 = z;
+    x->m15C = x->m6B8->m0;
+    x->m158 = m->m3C;
+    if (t == 6 || t == 8) {
+        x->m150 = z;
+        x->m108 = 1;
+    } else if (t == 3 || t == 5) {
+        x->m108 = 1;
+    }
+    Unk801A4B34_Pos* p = (Unk801A4B34_Pos*)m->mC;
+    if (p != 0 && fn_8024D408(p) != 0 && x->m6B8->m0 == 3 && m->m44 != -1
+        && fn_80257EA8(p->m44C->m700->m3B4, m->m44) != 0) {
+        x->m134 = 1;
+        if (m->m40 == -1)
+            x->m138 = 1;
+    }
 }
 
 extern "C" int fn_80026330(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* a, Unk801A4B34_Pos* p)
