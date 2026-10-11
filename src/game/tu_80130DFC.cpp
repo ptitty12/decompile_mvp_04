@@ -114,6 +114,12 @@ extern const char lbl_805C0B7C[];
 extern const char lbl_805C0B80[];
 extern "C" void fn_801321D4(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l, int m);
 extern const float lbl_805C0BC4;
+extern const char lbl_805C0B7C[];
+extern const char lbl_805C0C1C[];
+extern "C" {
+void fn_802DC9C0();
+Unk800C7B40_Widget* fn_800C8068(Unk800C7B40_Widget* p);
+}
 
 struct UnkI188 {
     char pad0[0x188];
@@ -451,6 +457,24 @@ extern "C" void fn_801323C8(Scr* self, int a, int b, int c, int d, int e, int f,
 {
     fn_801321D4(self, a, b, c, d, e, f, g, h, i, j, k, l, 0);
     fn_80131C48(self, 1, lbl_805C0BC4);
+}
+
+extern "C" void fn_8013440C(Scr* x)
+{
+    fn_802DC9C0();
+    if (x->m31C == 0) {
+        if (x->fn_vslot90() != 0) {
+            fn_8001BC4C()->fn_8001BDAC(0x9D);
+        }
+    }
+    x->m31C = 0;
+    x->fn_vslot89(0);
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        fn_800C8068(x->fn_vslot32(lbl_805C0C1C, 1))->fn_vslot14(1);
+    }
+    Unk800C7B40_Widget* w = fn_800C8060(x->fn_vslot32(lbl_805C0B8C, 1));
+    w->fn_vslot68(0);
+    w->fn_vslot14(1);
 }
 
 extern "C" void fn_80134568(Scr* x)
