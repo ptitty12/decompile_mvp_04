@@ -269,6 +269,35 @@ extern "C" void fn_801D7918(Unk801D771C_D* s)
     s->m24[5] = 4;
 }
 
+struct Unk801D771C_F2 {
+    float x;
+    float y;
+};
+struct Unk801D771C_Ent {
+    char pad0[0x38];
+    Unk801D771C_F2 lo;
+    char pad40[0x80 - 0x40];
+    Unk801D771C_F2 hi;
+};
+
+extern "C" int fn_801D7998(void* s, Unk801D771C_F2* pt)
+{
+    Unk801D771C_Ent* p = (Unk801D771C_Ent*)((char*)s + 0x10);
+    int k = 2;
+    Unk801D771C_F2 hi, lo;
+    Unk801D771C_F2 q = *pt;
+    int n = 9;
+    do {
+        hi = p->hi;
+        lo = p->lo;
+        if (!(q.x > hi.x) && !(q.x < lo.x) && !(q.y < hi.y) && !(q.y > lo.y))
+            return k;
+        p = (Unk801D771C_Ent*)((char*)p + 8);
+        k++;
+    } while (--n != 0);
+    return -1;
+}
+
 extern "C" int fn_801D7A3C(Unk801D771C_E* s, int k)
 {
     if (k == -1)
