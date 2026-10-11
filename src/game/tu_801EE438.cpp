@@ -26,13 +26,17 @@ int fn_801EE6F4(Scr* p, int a)
     return r;
 }
 
-/* near-miss (13 slots): the strength-reduced loop matches with "e = &s->m4[i]" inside the body; retail
- * keeps slot in r31 and p in r30 (ours the reverse), orders lwzx before add, and lays out the final
- * returns the other way round. */
+/* near-miss (9 slots): accessor + strength-reduced loop match; retail keeps slot in r31 and p in r30 (ours
+ * the reverse) and lays out the final "return 1" block before "return 0". */
+inline Unk801EE438_Slot* SlotAtE77C(Unk801EE438_Slot* a, int i)
+{
+    Unk801EE438_Slot* q = a + i;
+    return q;
+}
+
 int fn_801EE77C(Scr* p, int slot, int k)
 {
-    Unk801EE438_Slot* a = p->m9C->mCA8;
-    Unk801EE438_Slot* s = &a[slot];
+    Unk801EE438_Slot* s = SlotAtE77C(p->m9C->mCA8, slot);
     if (s->m0 > 0) {
         if (fn_801E817C(p->m9C->m3A64) != 1 && fn_801E82DC(p->m9C->m3A64, slot) != 1) {
             int i;
@@ -181,12 +185,12 @@ void fn_801F17F0(Scr* p, int a)
 
 extern "C" {
 
-/* near-miss (best 10 slots differ): retail ends with cmpwi cr7,n,2; mfcr; rlwinm 29,31,31 (a signed
- * LT test kept as LT 2), ours canonicalizes to cmpwi n,1 + cror. The inline accessor gives retail's
- * r9/r11 index registers; lwzx operand order still differs. */
+/* near-miss (9 slots): retail ends with cmpwi cr7,n,2; mfcr; rlwinm 29,31,31 (a signed LT test kept as
+ * LT 2); ours canonicalizes to cmpwi n,1 + cror. The accessor gives retail's r9/r11 loop registers. */
 inline int SlotCnt(Unk801EE438_Slot* a, int i)
 {
-    return a[i].m0;
+    Unk801EE438_Slot* q = a + i;
+    return q->m0;
 }
 
 int fn_801F18A0(Scr* p)

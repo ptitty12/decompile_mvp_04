@@ -122,7 +122,7 @@ struct Unk801EE438_Owner {
     char pad50[0x65C - 0x50];
     Unk801EE438_Player* m65C[13];
     char pad690[0x6CC - 0x690];
-    int m6CC;
+    Unk801EE438_Game* m6CC;
     char pad6D0[0x700 - 0x6D0];
     Unk801EE438_O700* m700;
 };
@@ -191,8 +191,18 @@ struct Unk801EE438_Scr {
     float mF4;
 };
 
+struct Unk801EE438_Sel {           /* G->m3A64 viewed as an object (fn_801E816C / fn_801E82CC take it) */
+    char pad0[0x794];
+    int m794;
+    int m798;
+};
+
 struct Unk801EE438_Scr;
 extern "C" {
+int fn_801E816C(Unk801EE438_Sel* o, int a);
+int fn_801E82CC(Unk801EE438_Sel* o, int a);
+void fn_80213988(Unk801EE438_Scr* p, int a, int b);
+int fn_801EE6F4(Unk801EE438_Scr* p, int a);
 int fn_80259C50(int h, int e);
 unsigned fn_8014E2B4(int e);
 int fn_80216590(Unk801EE438_Scr* p, int a, Unk801EE438_Vec v, int b, int c, int d);
