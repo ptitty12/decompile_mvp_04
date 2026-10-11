@@ -461,6 +461,54 @@ done:
     return acc;
 }
 
+/* Nearest-point search along the spline: starting at t, step forward by lbl_805F30C4 while
+ * the distance to *ref keeps shrinking (within lbl_805F30C0 and the last segment), else
+ * step backward (down to lbl_805F30D0). Returns the best parameter (best.x). */
+/* near-miss: 215 vs 209 insns, stack slots, constants and exit tests match. Retail enters each
+ * loop with only the fcmpu of the first test before `b` into the shared test (one copy of the
+ * int->float conversion); mine duplicates the whole test chain, which makes the magic-constant
+ * address a hoisted callee-saved lis (r27) and shifts r24..r27. Tried: while / for / goto /
+ * break forms and `!(a >= b)` vs `a < b` spellings; three plain floats (not a Vec3) for the
+ * 0x1c..0x24 slots to get 4-byte alignment. */
+extern const float lbl_805F30C0, lbl_805F30C4, lbl_805F30D0;
+extern "C" float fn_8033DF60(Spline* s, SplVec3* ref, float t, float tol)
+{
+    float d;
+    float bestD;
+    float u;
+    float bx, by, bz;
+    int found = 0;
+    bx = t;
+    by = lbl_805F30C0;
+    bz = lbl_805F30C4;
+    SplVec3 P = fn_8033D3EC(s, t);
+    bestD = fn_804028E4(LenSq(SubV(P, *ref)));
+    u = t + lbl_805F30C4;
+    while (!(u >= t + lbl_805F30C0) && u <= (float)(s->m0 - 1)) {
+        P = fn_8033D3EC(s, u);
+        d = fn_804028E4(LenSq(SubV(P, *ref)));
+        if (d >= bestD)
+            break;
+        found = 1;
+        bx = u;
+        bestD = d;
+        u = u + lbl_805F30C4;
+    }
+    if (!found) {
+        u = t - lbl_805F30C4;
+        while (!(u <= t - lbl_805F30C0) && u >= lbl_805F30D0) {
+            P = fn_8033D3EC(s, u);
+            d = fn_804028E4(LenSq(SubV(P, *ref)));
+            if (d >= bestD)
+                break;
+            bx = u;
+            bestD = d;
+            u = u - lbl_805F30C4;
+        }
+    }
+    return bx;
+}
+
 /* Curvature of the spline at t: |p''| / |p'|^2, signed by the y component of
  * p' x p'' when sgn is set. Evidence: fn_8033D490 / fn_8033D534 are the first
  * and second derivatives (fn_8033D2C4 / fn_8033D334 per channel), fn_804028E4
