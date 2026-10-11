@@ -143,6 +143,21 @@ int fn_80409CF0(void (*f)());
 
 extern const char* lbl_80619D04;
 extern const char lbl_805B8C84[];
+void* fn_800AA874(char* p, int i);
+void* fn_800AAF1C(UnkFEObj* self);
+struct FEPair8 {
+    UnkFEL* m0;
+    int m4;
+};
+struct FEMsg16 {
+    char name[16];
+};
+extern "C" {
+void fn_8035682C(FEMsg16* m);
+void fn_8040B830(char* dst, const char* src, int n);
+FEPair8 fn_800AA8C4(void* o, FEMsg16* m, int* z, ...);
+}
+
 struct Unk8007F198_C;
 int fn_8007FB2C(Unk8007F198_C* c, int i);
 int fn_8007FDA8(Unk8007F198_C* c, int a, int b);
@@ -475,6 +490,37 @@ void fn_800AA144()
 extern "C" UnkFEA* fn_800AA19C()
 {
     return lbl_80619C64;
+}
+
+/* near-miss (60/60 insns, register assignment and arm order differ): retail keeps idx*4 in r0 per arm and the name arm after the nameless arm; ternary/nested forms tried */
+UnkFEL* fn_800AA1A8(void* unused, int idx, const char* name)
+{
+    int* tbl;
+    if (((Unk8037C7FC_Data*)fn_8037C7FC())->m4 != 0) {
+        tbl = lbl_80619C68;
+    } else {
+        tbl = lbl_80619C84;
+    }
+    int v = tbl[idx];
+    void* o = (void*)fn_8037C7FC()->fn_8037CE98(0x8CA866F4, v, 0);
+    if (o == 0) {
+        return 0;
+    }
+    if (name == 0) {
+        void* r = fn_800AA874((char*)o, 0);
+        if (r == 0) {
+            return 0;
+        }
+        return (UnkFEL*)fn_800AAF1C((UnkFEObj*)r);
+    }
+    FEMsg16 m;
+    FEMsg16* p = &m;
+    int z = 0;
+    fn_8035682C(p);
+    fn_8040B830(p->name, name, 0xF);
+    p->name[15] = 0;
+    FEPair8 ret = fn_800AA8C4(o, p, &z);
+    return ret.m0;
 }
 
 void fn_800AA298(int i, int v)
