@@ -14,6 +14,16 @@
 
 struct Unk80023AC4_Obj;
 
+/* Sub-object at Obj+0x160 (initialised by fn_8001CE80; m8 is a counter at +0x168, m44 at +0x1A4). */
+struct Unk8001CE80_Sub {
+    char pad0[8];
+    int m8;
+    char padC[0x44 - 0xC];
+    int m44;
+    char pad48[0x5C - 0x48];
+};
+struct Unk8001F5CC_Tbl;
+
 /* A 4-byte slot read as an int by some functions and as a float by others. */
 union Unk80023AC4_Word {
     int i;
@@ -120,10 +130,23 @@ inline Unk8002569C_Msg* Unk8002569C_Cast(Unk8002569C_Msg* m, int id)
 extern "C" {
 void fn_8002A244(Unk80023AC4_Obj* x, int id, float duration);
 int fn_803445A0(char* p);
+void fn_8002F850(Unk80023AC4_Obj* x);
+void fn_8003C804(int a, int b);
+int fn_8006BE18(Unk8001F5CC_Tbl* t);
+void fn_80344494(int* p, int a);
+void fn_8003F974(int a);
+void fn_80030274();
+void fn_8003EAB0(int a);
+int fn_801C3E28(Unk8001F2C4_Inner* v);
+void fn_80038EB4();
+void fn_80039F04();
+void fn_8003C9A0(int a);
+void fn_80035E94(int a);
+void fn_8002B5B0();
 void fn_80035AE8(int a, int b, int c);
 void fn_8003CC0C(int a, int b);
 void fn_8003F8A4(int a);
-void fn_8001CE80(char* p);
+void fn_8001CE80(Unk8001CE80_Sub* p);
 float fn_80190F0C(Unk801A4B34_Pos* p);
 void fn_80189618(Unk801A4B34_Vec3* out, Unk801A4B34_Pos* p, float t);
 Unk80023F98_Vec2 fn_80235BE0(int a, ...);
@@ -138,9 +161,18 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int mD0;
     char padD4[0x8];
     int mDC;
-    char padE0[0x34];
+    char padE0[0x20];
+    int m100;
+    int m104;
+    char pad108[0x4];
+    int m10C;
+    char pad110[0x4];
     int m114;
-    char pad118[0x14];
+    unsigned m118;
+    int m11C;
+    char pad120[0x4];
+    int m124;
+    int m128;
     int m12C;
     Unk80023AC4_Word m130;
     int m134;
@@ -151,7 +183,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m148;
     int m14C;
     char pad150[0x10];
-    char m160[0x5C];
+    Unk8001CE80_Sub m160;
     int m1BC;
     int m1C0[3];
     char pad1CC[0x18];
@@ -171,11 +203,16 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     char pad3E8[0x128];
     Unk80023F98_Pl* m510;
     int m514;
-    char pad518[0x50];
+    char pad518[0x4C];
+    int m564;
     int m568;
-    char pad56C[0xC];
+    int m56C;
+    char pad570[0x4];
+    int m574;
     int m578;
-    char pad57C[0xC4];
+    char pad57C[0xBC];
+    int m638;
+    char pad63C[0x4];
     Unk801A4B34_Vec3 m640[9];
     char pad6AC[0x10];
     Unk8002569C_Msg* m6BC;
@@ -183,15 +220,22 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m6C8;
     float m6CC;
     int m6D0;
-    char pad6D4[0x2C];
+    char pad6D4[0x28];
+    int m6FC;
     int m700;
     char pad704[0x8];
     int m70C;
     int m710;
     char pad714[0x4];
     Unk801A4B34_Pos* m718;
-    char pad71C[0xA0];
+    char pad71C[0x8];
+    Unk801A4B34_Pos* m724;
+    char pad728[0x6C];
+    int m794;
+    char pad798[0x24];
     int m7BC;
+    char pad7C0[0x34];
+    int m7F4;
 };
 
 #endif

@@ -212,7 +212,7 @@ public:
     int fn_800232A0(int kind, int v);
     int fn_800233B4(int a, int b, int c);
     int fn_80023430(int key, int unused, int* out);
-    void fn_80023490(int key);
+    void fn_80023490(int key, int unused);
 };
 
 #endif

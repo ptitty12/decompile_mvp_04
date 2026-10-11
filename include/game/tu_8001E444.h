@@ -109,6 +109,12 @@ struct Unk8001F2C4_Outer {
     Unk8001F2C4_Inner* m3A4;
     char pad3A8[8];
     int m3B0;
+    struct Unk8001F2C4_Rec* m3B4;
+};
+
+struct Unk8001F2C4_Rec {
+    char pad0[0xC];
+    int mC;
 };
 
 /* Game context (same object as Unk8014D8AC_Ctx in chooser.h). */
@@ -128,7 +134,7 @@ struct Unk8001F2C4_World {
     int m780;
     int m784;
     int m788;
-    void fn_801A6D84(int a);
+    int* fn_801A6D84(int a);
 };
 
 /* Object at Obj+0x130. */
@@ -202,7 +208,17 @@ void fn_80043650(bool a);
 void fn_8004390C(int a);
 void fn_80045FEC(int a);
 int fn_8001D1A4(Unk8001E444_Obj* x, int a, int b, int c);
-int fn_800B555C();
+struct Unk800B555C_Quad {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk800B555C_Obj {
+    char pad0[0x688];
+    Unk800B555C_Quad m688;
+};
+Unk800B555C_Obj* fn_800B555C();
 int fn_8001CF18(Unk8001E444_Obj* x, Unk80344538_Rec* arr);
 void fn_800437AC(int a);
 int fn_802F922C(int p);

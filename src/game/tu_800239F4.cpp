@@ -68,7 +68,7 @@ extern "C" void fn_800239F4(Unk80023AC4_Obj* x, int idx, int kind, Unk8002569C_M
 
 extern "C" void fn_80023AC4(Unk80023AC4_Obj* x)
 {
-    fn_8001CE80(x->m160);
+    fn_8001CE80(&x->m160);
     x->m700 = 0;
     float f = (float)x->m80[0]->m48 * lbl_805A6068;
     fn_8002A244(x, 0x13, f);

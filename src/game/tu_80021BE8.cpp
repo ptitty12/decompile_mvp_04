@@ -19,7 +19,7 @@ void Unk80021A60::fn_vslot10()
     }
 }
 
-extern "C" void fn_80021C1C(Unk8001E444_Obj* x, Unk8001F2C4_World* ctx)
+extern "C" void fn_80021C1C(void* x, Unk8001F2C4_World* ctx)
 {
     int sx, sy;
     fn_800222B4(ctx, &sx, &sy, fn_801A4B34(ctx)->m60);
@@ -99,7 +99,7 @@ extern "C" void fn_80021F68(Unk8001E444_Obj* x, Unk8001F2C4_World* ctx, Unk801A4
     }
 }
 
-extern "C" void fn_80022080(Unk8001E444_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p)
+extern "C" void fn_80022080(void* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p)
 {
     int sx, sy;
     fn_800222B4(ctx, &sx, &sy, p->m60);
@@ -232,7 +232,7 @@ int Unk80021A60::fn_80023430(int key, int unused, int* out)
     return found;
 }
 
-void Unk80021A60::fn_80023490(int key)
+void Unk80021A60::fn_80023490(int key, int unused)
 {
     if (mB4 == 0)
         return;
