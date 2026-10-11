@@ -22,6 +22,27 @@ int fn_8017D640(Unk8017A930_T* p, int a, char* b, int c, int d)
     return r;
 }
 
+int fn_8017DCCC(Unk8017DD64_T* p, Unk8017DCCC_Obj* b)
+{
+    int r = 0;
+    if (b) {
+        int off = b->m708 * 0xE64;
+        Unk8017DD64_Item* it = (Unk8017DD64_Item*)((char*)p->m4->m6F8->m14 + off);
+        int n = it->m78;
+        if (n > 0) {
+            int v = b->m704;
+            r = v == fn_80099B50(it, 0);
+        }
+        if (n > 1) {
+            int v = b->m704;
+            if (v == fn_80099B50(it, 1)) {
+                r = 1;
+            }
+        }
+    }
+    return r;
+}
+
 int fn_8017DD64(Unk8017DD64_T* p, int idx)
 {
     int off = idx * 0xE64;
@@ -34,25 +55,6 @@ int fn_8017ED94(Unk8017DD64_Ctx* p)
         return p->m704;
     }
     return 0;
-}
-
-int fn_8017DCCC(Unk8017DD64_T* p, Unk8017DCCC_Obj* b)
-{
-    int r = 0;
-    if (b) {
-        int off = b->m708 * 0xE64;
-        Unk8017DD64_Item* it = (Unk8017DD64_Item*)((char*)p->m4->m6F8->m14 + off);
-        int n = it->m78;
-        if (n > 0) {
-            r = b->m704 == fn_80099B50(it, 0);
-        }
-        if (n > 1) {
-            if (b->m704 == fn_80099B50(it, 1)) {
-                r = 1;
-            }
-        }
-    }
-    return r;
 }
 
 void fn_8017DD80(Unk8017DD64_T* p, int idx, int* out0, int* out1)
