@@ -14,6 +14,8 @@
 typedef Unk80273498_Vec3 Vec3;
 
 struct Unk80299920_Req;
+struct Unk80299920_Out;
+struct Unk80299920_Ref;
 class Unk80299920_XV;
 
 /* Object at ctx+0x6B8; fn_8018514C returns a height for a position. */
@@ -114,7 +116,7 @@ struct Unk80299920_Goal {
     int fn_8029A768(Unk80299920_XV* x);
     int fn_8029A788(Unk80299920_XV* x);
     float fn_8029A948();
-    void fn_8029A9A4(float t, Unk80299920_XV* x, Unk80299920_Req* req, int k, Vec3* a, Vec3* b, int c);
+    void fn_8029A9A4(float t, Unk80299920_XV* x, Unk80299920_Req* req, int k, Unk80299920_Out* out, Unk80299920_Ref* ref, int c);
     void fn_8029AC74(float* outA, int* outB);
     unsigned int fn_8029ADC8(int kind);
     unsigned int fn_8029B000(int k);
@@ -136,6 +138,31 @@ struct Unk80299920_Ctx {
     Unk80299920_Pos* m6CC;
     char pad6D0[0x6F4 - 0x6D0];
     int m6F4;
+};
+
+/* chooser.h's angle block with the saved index right after it (+0x194):
+ * fn_8029AC74 parks m190 there while it queries. */
+struct Unk80299920_Angles : public Unk802726BC_Angles {
+    int m194;
+};
+
+/* Output pair filled by fn_8029A9A4: a position and a second vector. */
+struct Unk80299920_Out {
+    Vec3 a;
+    Vec3 b;
+};
+
+/* Object whose +4 is compared with lbl_8061EC9C by fn_8029A9A4. */
+struct Unk80299920_Ref {
+    int m0;
+    int m4;
+};
+
+/* Result of fn_80386188's motion query (10th argument): +0x20 a float, +0x24 an int. */
+struct Unk80386188_Result {
+    char pad0[0x20];
+    float m20;
+    int m24;
 };
 
 /* Component embedded in the player object at +0xA0 (vptr at +0x18, called through
@@ -190,7 +217,7 @@ public:
     char pad574[0x618 - 0x574];
     Unk80271DBC_Link* m618[3];
     char pad624[0x734 - 0x624];
-    Unk802726BC_Angles m734;
+    Unk80299920_Angles m734;
 };
 
 /* Motion request / state record passed to fn_8037B10C (position), fn_8037B16C
@@ -217,6 +244,7 @@ struct Unk80299920_Req {
     void SetScale(float f) { fn_8037B16C(f); }
     void SetD0(float f) { mD0 = f; }
     void AddD4(float f) { mD4 = mD4 + f; }
+    void SetD4(float f) { mD4 = f; }
 };
 
 float fn_80410CE8(float y, float x);
@@ -254,6 +282,11 @@ inline void Unk80299920_SetM8(Unk802726BC_Angles* a, float f)
 inline void Unk80299920_SetM48(Unk802726BC_Angles* a, float f)
 {
     Unk80299920_SetPair(a, 0x48, f);
+}
+inline Vec3 GetPos(const Unk8037B128_Mtx* m)
+{
+    Vec3 v = fn_8037B128(m);
+    return v;
 }
 inline Vec3 CopyVec(const Vec3& v)
 {
@@ -308,6 +341,77 @@ inline Vec3 Sub(const Vec3& a, const Vec3& b)
     return r;
 }
 extern int lbl_806242B4;
+int fn_80386188(Unk80271DBC_Link* link, Unk8027A9AC_Req* req, unsigned int a, unsigned int b, float* t,
+                int c, int d, int e, int f, Unk80386188_Result** res, int flags);
+int fn_80386188(Unk80271DBC_Link* link, Unk80299920_Req* req, unsigned int a, unsigned int b, float* t,
+                int c, Unk80299920_Ref* d, Unk80299920_Out* e, int f, Unk80386188_Result** res, int flags);
+int fn_80386110(Unk80271DBC_Link* link, Unk80299920_Req* req, unsigned int a, unsigned int b, float* t, int flags);
+int fn_8026D9D0(Unk80299920_XV* x, Unk80299920_Req* req);
+extern signed char lbl_8061EC9C;      /* first byte of a shared 0xC-byte object */
+extern int lbl_806242B0;
+/* Stack record of float parameters in fn_80299FD4 (+0 ratio, +0x18 upper and +0x1C lower clamp). */
+struct Unk80299920_Params {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+};
+
+/* Query record helper classes (same layouts and names as animation/choosers/tu_80279AE4.cpp,
+ * where they are defined; copied here for the goal logic that builds one on the stack). */
+class Unk8035EB7C {
+public:
+    Unk80270BA0_Mtx m0;
+    float m40;
+    unsigned int m44 : 4;
+    unsigned int m44r : 28;
+    char pad48[0x68 - 0x48];
+    int m68[3];
+    char pad74[0xA0 - 0x74];
+    int mA0;
+    char padA4[0xBC - 0xA4];
+    unsigned int mBC;
+};
+class Unk80279BB8 : public Unk8035EB7C {
+public:
+    Unk80279BB8();
+    void fn_80279DD0(Unk80270BA0_X* x);
+    char padC0[0xCC - 0xC0];
+    int mCC;
+    float mD0;
+    float mD4;
+    int mD8;
+};
+void fn_80386110(Unk80271DBC_Link* link, Unk8035EB7C* q, int a, int b, float* out, int c);
+
+/* Event object queued by fn_80299FD4: a base with an id and a vptr (base vtable
+ * 0x80649DA0), and a derived class (vtable 0x80660EF0, dtor 0x8035E1AC) that adds the
+ * player and a flag. The same event is built in the unit at 0x80247684. */
+class Unk80649DA0 {
+public:
+    Unk80649DA0() {}
+    int m0;
+    virtual ~Unk80649DA0();
+};
+class Unk8035E1AC : public Unk80649DA0 {
+public:
+    Unk8035E1AC(int id, Unk80270BA0_X* x)
+    {
+        m0 = id;
+        m8 = x;
+    }
+    virtual ~Unk8035E1AC();
+    Unk80270BA0_X* m8;
+    int mC;
+};
+void fn_8037893C(void* queue, int id, Unk80649DA0* ev, int a, int b);
+int fn_8027D3E8(int a, int b, float* c, int d, int e, int f);
+int fn_8026D7B4(Unk80299920_XV* x, int a);
+extern const Vec3 lbl_805DED34;
 unsigned int fn_80299E54(Unk80270BA0_X* x);
 void fn_80299B98(Unk80270BA0_X* x, const Vec3& pos, float* ang);
 

@@ -5,6 +5,11 @@
  * .text 0x80299920-0x8029B6C8, .rodata 0x805DDBF0-0x805DDD0C.
  * Data this code uses outside these ranges is declared extern (the unity TU
  * emits .data in source-definition order, not .text order).
+ *
+ * Status: 18 of 25 match. Parked near-misses: fn_80299FD4, fn_8029A788, fn_8029A9A4, fn_8029AC74,
+ * fn_8029B3F8, fn_8029B520 (notes above each). Not attempted: fn_8029B030 (242 instructions).
+ * The 0x805DDC74 float pool (0, 1/(2*pi), 0.5, 2*pi, 100) belongs to fn_8029AC74 in retail but only
+ * its first entry is used by the live code; the rest are leftovers of removed code.
  */
 #include "game/chooser.h"
 #include "game/goals/tu_80299920.h"
@@ -153,6 +158,93 @@ int Unk80299920_Goal::fn_80299F6C(Unk80299920_XV* x)
     return fn_8029A308(x, fn_8029ADC8(m48));
 }
 
+/* near-miss (211 vs 205 instructions, registers and control flow right): retail has ONE copy of the
+ * SetM48 tail shared by the clamp path and the "m48 != 0x1d" path (cross-jumped), with the wrapper
+ * slots at 0x110/0x118 in both; here the else path gets its own copy in slots 0xF0/0xF8 because the
+ * params record t is out of scope there. Declaring t/a/b at function scope moves them below q and
+ * breaks the layout (q must come first, then a, b, t). Also differs: order of the event stores and
+ * which side of the 3.0f compare is loaded first. ~12 variants tried. */
+void Unk80299920_Goal::fn_80299FD4(Unk80299920_XV* x)
+{
+    if ((unsigned int)(m48 - 0x17) <= 1) {
+        Unk80279BB8 q;
+        float a = 0.0f;
+        float b;
+
+        fn_8027D3E8(m50->m934, 7, &a, 0, 0, 0);
+        if (fn_8026D7B4(x, 0) == 1) {
+            if (!(x->m60.x >= lbl_805DED34.x)) {
+                a = a - 0.17f;
+                b = 0.17f;
+            }
+        }
+        unsigned int h = 0;
+        switch (m48) {
+        case 0x17:
+            h = 0xF951234A;
+            break;
+        case 0x18:
+            h = 0xB88DC566;
+            break;
+        }
+        Unk80279BB8* qp = &q;
+
+        b = 0.0f;
+        qp->fn_80279DD0((Unk80270BA0_X*)x);
+        fn_80386110(x->m618[0], qp, h, 0xA5422C1B, &b, 0);
+        Unk80299920_Params t;
+
+        t.m0 = 1.0f;
+        t.m4 = 1.7f;
+        t.m8 = 1.9f;
+        t.mC = 1.6f;
+        t.m10 = 0.5f;
+        t.m14 = 3.0f;
+        t.m18 = 1.0f;
+        t.m1C = 0.0f;
+
+        switch (m48) {
+        case 0x17:
+            t.m18 = 1.7f;
+            break;
+        case 0x18:
+            t.m18 = 1.9f;
+            break;
+        }
+        if (a > 0.0f) {
+            t.m0 = b / a;
+        } else {
+            t.m0 = 99.0f;
+        }
+        if (!(t.m0 <= 3.0f)) {
+            Unk8035E1AC ev(0x8d, (Unk80270BA0_X*)x);
+
+            m48 = 0x19;
+            ev.mC = 0;
+            fn_8037893C((char*)((Unk8027A84C*)this)->fn_8027A918() + 0x704, ev.m0, &ev, 0, 0);
+            float c = 0.0f;
+
+            qp->fn_80279DD0((Unk80270BA0_X*)x);
+            fn_80386110(x->m618[0], qp, 0xF1977099, 0x6A552F40, &c, 0);
+            t.m18 = 1.6f;
+            t.m1C = 0.5f;
+            if (a > 0.0f) {
+                t.m0 = c / a;
+            } else {
+                t.m0 = t.m18;
+            }
+        }
+        if (t.m0 > t.m18) {
+            t.m0 = t.m18;
+        } else if (!(t.m0 >= t.m1C)) {
+            t.m0 = t.m1C;
+        }
+        Unk80299920_SetM48(&x->m734, t.m0);
+    } else if (m48 != 0x1d) {
+        Unk80299920_SetM48(&x->m734, -1.0f);
+    }
+}
+
 int Unk80299920_Goal::fn_8029A308(Unk80299920_XV* x, unsigned int hash)
 {
     Unk80299920_Ctx* ctx = x->m44C;
@@ -260,6 +352,9 @@ int Unk80299920_Goal::fn_8029A768(Unk80299920_XV* x)
     return fn_8029A788(x);
 }
 
+/* near-miss (116 vs 112 instructions, frame 96 vs 112): retail keeps the float locals (a, b, the angle
+ * difference) below the three Vec3 temps (copy of m10, result of the subtraction, d); every declaration
+ * order tried puts the Vec3 temps lowest. Heading(Vec3) wrapper and split declarations were worse. */
 int Unk80299920_Goal::fn_8029A788(Unk80299920_XV* x)
 {
     int v = -1;
@@ -298,6 +393,108 @@ float Unk80299920_Goal::fn_8029A948()
         a = b;
     }
     return a;
+}
+
+/* near-miss (177 vs 180 instructions): the only difference is the copy chain of the position into
+ * out->a. Retail has the call result at 0x38, a by-value copy at 0x28 that y and z are read from; GetPos()
+ * keeps the frame size but forwards the copy through registers, a plain call or a named local
+ * changes the frame. The final stores (mCC before mD8) match. */
+void Unk80299920_Goal::fn_8029A9A4(float t, Unk80299920_XV* x, Unk80299920_Req* req, int k, Unk80299920_Out* out, Unk80299920_Ref* ref, int c)
+{
+    if (k == 1) {
+        k = m0;
+    }
+    int flags = 0;
+    unsigned int h1 = fn_8029ADC8(m48);
+    unsigned int h2 = fn_8029B000(k);
+
+    fn_8029B030(x, (Unk8027AD3C_Obj*)req, 1);
+    float tmp = 0.0f;
+    Unk80271DBC_Link* link = x->m618[0];
+
+    if (mC <= 2) {
+        if (fn_8026D9D0(x, req)) {
+            fn_80386188(link, req, 0xC331A6BF, lbl_806242B0, &tmp, c, ref, out, 0, 0, 2);
+            req->AddD4(tmp);
+        }
+    }
+    if (!(t < 0.0f)) {
+        tmp = t - req->mD4;
+        if (tmp > 0.0f) {
+            flags = 0x20;
+        } else {
+            req->mD8 = 1;
+            req->SetD4(t);
+            return;
+        }
+    }
+    if (out) {
+        int same = ref->m4 == lbl_8061EC9C;
+
+        fn_80386188(link, req, h1, h2, &tmp, c, ref, out, 0, 0, flags | 2);
+        if (same) {
+            if (ref->m4 == lbl_8061EC9C) {
+                SetVec(&out->a, GetPos(&req->mtx));
+                out->b = lbl_806055AC;
+                out->b.y = -1000.0f;
+            }
+        }
+    } else {
+        fn_80386110(link, req, h1, h2, &tmp, flags | 2);
+    }
+    req->AddD4(tmp);
+    switch (m48) {
+    case 2:
+    case 3:
+    case 6:
+    case 7:
+    case 11:
+    case 13:
+    case 0x1c:
+        req->mCC = 0x1d;
+        break;
+    }
+    req->mCC = 0x1c;
+    req->mD8 = 1;
+}
+
+/* near-miss (same length, 31 of 85 slots differ): the query record's inline constructor stores. Retail
+ * reaches the type nibble (+0x44) and +0xBC with direct frame offsets and +0xA0 through the pointer;
+ * here all three use the pointer. Ctor statement orders (all 6) and a private copy of the record made no
+ * difference. */
+void Unk80299920_Goal::fn_8029AC74(float* outA, int* outB)
+{
+    if (m48 == 0x19) {
+        if (outA) {
+            *outA = 0.0f;
+        }
+        if (outB) {
+            *outB = 0;
+        }
+    }
+    Unk80299920_XV* p = (Unk80299920_XV*)((Unk8027A84C*)this)->fn_8027A90C();
+    Unk80299920_Angles* a = &p->m734;
+    unsigned int h1 = fn_8029ADC8(m48);
+    unsigned int h2 = fn_8029B000(m0);
+    int saved = a->m190;
+
+    a->m190 = 0;
+    a->m194 = saved;
+    fn_8029B030(p, 0, 1);
+    Unk8027A9AC_Req req;
+    float t = 0.0f;
+    Unk80386188_Result* res;
+    int r = fn_80386188(p->m618[0], &req, h1, h2, &t, 0, 0, 0, 0, &res, 0);
+
+    if (!(r & 2)) {
+        if (outA) {
+            *outA = res->m20;
+        }
+        if (outB) {
+            *outB = res->m24;
+        }
+    }
+    a->m190 = a->m194;
 }
 
 unsigned int Unk80299920_Goal::fn_8029ADC8(int kind)
@@ -407,6 +604,8 @@ unsigned int Unk80299920_Goal::fn_8029B000(int k)
     return h;
 }
 
+/* near-miss (73 vs 74 instructions): retail sets r3 = 0 before the null test and keeps both m48 == 0x1d
+ * tests (the second one is not folded into the first); the distance goes through a float local. */
 int Unk80299920_Goal::fn_8029B3F8(const Unk80299920_Goal* o) const
 {
     if (o == 0) {
@@ -449,6 +648,9 @@ int Unk80299920_Goal::fn_8029B3F8(const Unk80299920_Goal* o) const
     return d2 < 32400.0f;
 }
 
+/* near-miss (72 vs 74 instructions): retail clears flag bits 0, 3, {6,7}, {1,2}, {8,9,10} as five separate
+ * rlwinm; consecutive bit-field assignments here are merged into lis/ori/and (interleaving stores, a
+ * local flags copy and a pointer to the flags did not stop the merge). */
 void Unk80299920_Goal::fn_8029B520()
 {
     mD0.f0 = 0;
