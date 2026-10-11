@@ -17,7 +17,7 @@ struct Unk80124F24_Scr : Unk800C7B40_Widget {
     int m14C[4];
     int m15C[8];
     int m17C[4];
-    char pad18C[0x10];
+    int m18C[4];
     Wid* m19C;
 };
 /* CELL screen (vtable lbl_8064CAF0, ctor fn_80124A28): three child widgets, a callback and its argument widget (fn_80124DF8). */
@@ -65,6 +65,12 @@ struct UnkNavBar : Unk800C7B40_Widget {
     char pad40[0xF8];
     int m138;
 };
+/* Screen with two button widgets at +0x188 / +0x18C (continues in tu_801287AC.cpp). */
+struct Unk8012684C_Scr : Unk800C7B40_Widget {
+    char pad40[0x148];
+    Wid* m188;
+    Wid* m18C;
+};
 typedef Unk80124F24_Scr Scr;
 
 extern const char lbl_80656CD8[];
@@ -73,6 +79,13 @@ extern int lbl_8061977C;
 extern const char lbl_8064DB50[];
 extern const char lbl_805BAF98[];
 extern const char lbl_805BF5CC[];
+extern const char lbl_805C03DC[];
+extern const char lbl_805C03E4[];
+extern const char lbl_805C03EC[];
+extern const char lbl_805C03F4[];
+extern const char lbl_805C03FC[];
+extern const char lbl_805C0404[];
+extern const char lbl_805C040C[];
 extern const char lbl_805BE1C4[];
 extern const char lbl_805BEA8C[];
 extern const char lbl_805BEA94[];
@@ -81,6 +94,7 @@ extern const char lbl_805C0418[];
 
 // PROTOS-BEGIN
 extern "C" {
+int fn_80124738(void* a);
 int fn_801247A4(void* a);
 int fn_80124800(Scr* self);
 int fn_8012483C(Scr* self);
@@ -107,10 +121,13 @@ void fn_80125220(Scr* self, int a, int str);
 void fn_80125268(Scr* self, int a, int str, int c);
 int fn_801252B8(Scr* self, int a);
 void fn_80125300(Scr* self, int a, int b, int id);
+int fn_80125354(Scr* self, int i, int a, int str);
 void fn_80125490(Scr* self, int a, int b, int id, int e);
 void fn_801254EC(Scr* self, int a, int b, int c, int d);
+int fn_80125538(Scr* self);
 void fn_80125700(Scr* self);
 int fn_80125720(Scr* self, int a);
+void fn_801257C0(Scr* self);
 void fn_80125844(Scr* self, int i, int c);
 int fn_80125890(Scr* self, int i);
 void fn_80125940(Scr* self, int a, int i);
@@ -121,6 +138,7 @@ void fn_80125C84(Unk80126064_Scr* self, int a);
 int fn_80126034();
 void* fn_80126064(Unk80126064_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_8012611C(Scr* self);
+void fn_8012684C(Unk8012684C_Scr* self);
 int fn_80127550(Scr* self, Wid* a);
 }
 // PROTOS-END
@@ -134,12 +152,16 @@ void fn_801251CC(Scr* self, int a, int id, int c);
 void fn_80125220(Scr* self, int a, int str);
 void fn_80125268(Scr* self, int a, int id, int c);
 int fn_801252B8(Scr* self, int a);
-void fn_80125354(Scr* self, int a, int b, int c);
+int fn_80125354(Scr* self, int a, int b, int c);
 void fn_801254EC(Scr* self, int a, int b, int c, int d);
 int fn_80125890(Scr* self, int i);
 void fn_800ECF18(Scr* self);
 void fn_800ED310(Scr* self);
+void fn_800ECAA4(void* self);
 int fn_8057CE00(int a);
+void fn_8035682C(void* name);
+void fn_800B7B4C(UnkFEMgr* m, const void* name, void* obj);
+void fn_80125940(Scr* self, int a, int i);
 int fn_800B5898(UnkFEState* s);
 void fn_800ECE34(void* self);
 UnkNavBar* fn_800B7A94(UnkFEMgr* m, const char* name);
@@ -153,6 +175,17 @@ extern const char lbl_805C0438[];
 }
 
 extern "C" {
+
+int fn_80124738(void* a)
+{
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, a);
+    return 1;
+}
 
 int fn_801247A4(void* a)
 {
@@ -369,6 +402,24 @@ void fn_80125300(Scr* self, int a, int b, int id)
     fn_80125354(self, a, b, fn_80090880(lbl_8061977C, id));
 }
 
+int fn_80125354(Scr* self, int i, int a, int str)
+{
+    int o4 = i * 4;
+    char* b = (char*)self + 0x13C;
+    fn_800C8040(fn_800C8044(*(Wid**)(b + o4))->fn_vslot32(lbl_805BF5CC, 1))->fn_vslot28((const void*)str);
+    ((UnkSub*)((char*)fn_800C8054(fn_800C8044(*(Wid**)(b + o4))->fn_vslot32(lbl_805C03DC, 1)) + 0x98))->fn_vslot6(a);
+    (*(Wid**)(b + o4))->fn_vslot8(1);
+    (*(Wid**)(b + o4))->fn_vslot16(1);
+    int o8 = i * 8;
+    char* p14C = (char*)self + 0x14C;
+    *(int*)(p14C + o4) = a;
+    char* p15C = (char*)self + 0x15C;
+    *(int*)(p15C + o8) = 0;
+    char* p160 = (char*)self + 0x160;
+    *(int*)(p160 + o8) = 0;
+    return 1;
+}
+
 void fn_80125490(Scr* self, int a, int b, int id, int e)
 {
     fn_801254EC(self, a, b, fn_80090880(lbl_8061977C, id), e);
@@ -382,6 +433,40 @@ void fn_801254EC(Scr* self, int a, int b, int c, int d)
     char* y = (char*)self + 0x160;
     *(int*)(x + off) = 1;
     *(int*)(y + off) = d;
+}
+
+int fn_80125538(Scr* self)
+{
+    fn_800ECE34(self);
+    Wid* g = self->fn_vslot32(lbl_805C03E4, 1);
+    self->m13C[0] = g->fn_vslot32(lbl_805C03EC, 1);
+    self->m13C[1] = g->fn_vslot32(lbl_805C03F4, 1);
+    self->m13C[2] = g->fn_vslot32(lbl_805C03FC, 1);
+    Wid* b3 = g->fn_vslot32(lbl_805C0404, 1);
+    self->m13C[3] = b3;
+    Wid* a = self->m13C[0];
+    Wid* c = self->m13C[1];
+    Wid* d = self->m13C[2];
+    self->m17C[0] = a->m26;
+    self->m18C[0] = a->m28;
+    self->m17C[1] = c->m26;
+    self->m18C[1] = c->m28;
+    self->m17C[2] = d->m26;
+    self->m18C[2] = d->m28;
+    self->m17C[3] = b3->m26;
+    self->m18C[3] = b3->m28;
+    self->m14C[0] = -1;
+    self->m14C[1] = -1;
+    self->m14C[2] = -1;
+    self->m14C[3] = -1;
+    Wid* r = self->fn_vslot30(lbl_805C040C, 1);
+    int res = (int)r;
+    if (r != 0) {
+        self->m138 = fn_800C8038(r);
+        self->m138->fn_vslot8(0);
+        res = self->m138->fn_vslot18(self->m138->m2E + 1);
+    }
+    return res;
 }
 
 void fn_80125700(Scr* self)
@@ -412,6 +497,14 @@ int fn_80125720(Scr* self, int a)
         } while (i <= 3);
     }
     return 0;
+}
+
+void fn_801257C0(Scr* self)
+{
+    if (!self->m13C[0]->b0 && self->m13C[1]->b0)
+        fn_80125940(self, 0, 1);
+    if (!self->m13C[3]->b0 && self->m13C[2]->b0)
+        fn_80125940(self, 3, 2);
 }
 
 void fn_80125844(Scr* self, int i, int c)
@@ -464,6 +557,7 @@ void fn_80125A20(Scr* self, int a)
 }
 
 /* near-miss: retail recomputes the field base addresses per arm; GCC shares them here. */
+
 void fn_80125AAC(Scr* self)
 {
     int o8 = 0;
@@ -496,6 +590,7 @@ void fn_80125AAC(Scr* self)
 }
 
 /* near-miss: same base-address sharing difference as fn_80125AAC. */
+
 void fn_80125BC0(Scr* self)
 {
     int i = 0;
@@ -572,6 +667,18 @@ void fn_8012611C(Scr* self)
 {
     fn_800ED254(self);
     fn_800C3BE0(fn_800C33D0());
+}
+
+void fn_8012684C(Unk8012684C_Scr* self)
+{
+    fn_800ECAA4(self);
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0)
+        ((UnkWidgetB*)self)->fn_vslot84(2, 0);
 }
 
 int fn_80127550(Scr* self, Wid* a)
