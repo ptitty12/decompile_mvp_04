@@ -71,14 +71,34 @@ inline void Unk8018D410_SetPos(Unk80188698* o, float x, float y, float z)
 }
 extern Unk80181140_F lbl_805CDDCC;
 
+struct Unk8018E8F4_Rec16 {
+    float m[4];
+};
+struct Unk8018E8F4_Ctx {
+    char pad0[0x6BC];
+    void** m6BC;
+    char pad6C0[0x700 - 0x6C0];
+    void* m700;
+};
+extern Unk80183918_Vec3 lbl_806055B8;
 extern "C" {
+int fn_8019BBC0(void** o, void* a, void* b, float* t, void* p1, void* p2, float k);
+void fn_801923CC(void* ret, void* a, void* b, void* c, void* d, int e, int f);
+void fn_8017BB18(void* p, int a, void* o, int b, int c);
+void fn_8017BB3C(void* p, int a, void* o, int b);
+void fn_8018A930(Unk80188698* o, int a, float t, void* b, void* c, void* d);
+Unk80188698* fn_801A4C74(void* c, int i);
+float fn_804028E4(float x);
+float fn_80190F0C(struct Unk80190EB4_Obj* o);
+void fn_8018EFC0(Unk80188698* o, Unk80188698* t);
 Unk8018ED00_B* fn_801A6DB8(void* c);
 int fn_801C3F60(void* p);
-int fn_8018F684(Unk80188698* o, Unk80188698* t, int* slot, int b, float k);
+int fn_8018F684(Unk80188698* o, Unk80188698* t, int* slot, float k, int flag);
 void fn_801BD80C(void* p, void* t);
 void fn_8018EE84(Unk80188698* o, Unk80188698* t);
 int fn_8018E8F4(Unk80188698* o, Unk80183918_Vec3* a, Unk80183918_Vec3* b);
 Unk80183918_Vec3 fn_8018959C(Unk80188698* o, float t);
+Unk80183918_Vec3 fn_80189618(Unk80188698* o, float t);
 float fn_801937B4(void* p, int k, float t);
 void* fn_80193750(void* p, float t);
 void* fn_80193828(void* p, float t);

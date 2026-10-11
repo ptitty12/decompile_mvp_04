@@ -220,6 +220,26 @@ extern "C" void fn_8018E8C4(Unk80188698* o)
         fn_8018E4CC(o);
 }
 
+//@8018E8F4
+/* near-miss: 73/73 insns, 3 slots differ: the order of the argument moves for the
+ * fn_801923CC call (retail sets r4/r6 before r3 = &v40). ~6 forms tried. */
+extern "C" int fn_8018E8F4(Unk80188698* o, Unk80183918_Vec3* a, Unk80183918_Vec3* b)
+{
+    float t = 0.0f;
+    Unk8018E8F4_Rec16 vA;
+    Unk8018E8F4_Rec16 vB;
+    if (fn_8019BBC0(((Unk8018E8F4_Ctx*)o->m44C)->m6BC, a, b, &t, &vA, &vB, 1.5f) != 0) {
+        Unk80183918_Vec3 v30 = lbl_806055B8;
+        Unk80183918_Vec3 v40 = fn_80189618(o, 0.0f);
+        fn_801923CC(&v40, &vA, &vB, &v30, (char*)o->m448 + 4, 5, 0);
+        fn_8017BB18(((Unk8018E8F4_Ctx*)o->m44C)->m700, 1, o, 0, 15);
+        fn_8018A930(o, 0, t, &v40, &v30, &vA);
+        fn_8017BB3C(((Unk8018E8F4_Ctx*)o->m44C)->m700, 1, o, 0);
+        return 1;
+    }
+    return 0;
+}
+
 //@8018EA18
 extern "C" void fn_8018EA18(Unk80188698* o)
 {
@@ -237,6 +257,37 @@ extern "C" void fn_8018EA18(Unk80188698* o)
     }
 }
 
+//@8018EB14
+extern "C" void fn_8018EB14(Unk80188698* o)
+{
+    if (o->m38C == 1 || o->m38C == 4) {
+        int i = 0;
+        int slot = 0;
+        const float K = 1000.0f;
+        Unk8014D8AC_Ctx* c = (Unk8014D8AC_Ctx*)o->m44C;
+        Unk80273498_Pos** p = c->m65C;
+        Unk80183918_Vec3 v = fn_80189618(o, 0.0f);
+        int flag = fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8) < 211.2f;
+        fn_8018F684(o, (Unk80188698*)p[9], &slot, K, flag);
+        fn_8018F684(o, (Unk80188698*)p[12], &slot, K, flag);
+        if (c->m6F4 == 0) {
+            fn_8018F684(o, (Unk80188698*)p[1], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)c->m65C[0], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[2], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[3], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[4], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[5], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[6], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[7], &slot, K, flag);
+            fn_8018F684(o, (Unk80188698*)p[8], &slot, K, flag);
+        }
+        do {
+            fn_8018F684(o, fn_801A4C74(c, i), &slot, 1000.0f, flag);
+            i++;
+        } while (i <= 3);
+    }
+}
+
 //@8018ED00
 extern "C" void fn_8018ED00(Unk80188698* o)
 {
@@ -247,7 +298,7 @@ extern "C" void fn_8018ED00(Unk80188698* o)
         Unk8018ED00_S* s = c->m700->m3A4;
         if (t != 0 && s->m288 != 2) {
             if (s->m288 == 1) {
-                if (fn_8018F684(o, t, &slot, 0, 0.0f) != 0 && *(int*)((char*)t + 0x92C) == 15) {
+                if (fn_8018F684(o, t, &slot, 0.0f, 0) != 0 && *(int*)((char*)t + 0x92C) == 15) {
                     *(int*)((char*)t + 0x92C) = slot;
                     fn_801BD80C(((Unk8018ED00_Ctx*)o->m44C)->m700->m3BC, t);
                     fn_8037893C((char*)o->m44C + 0x704, 0x87, 0, 0, 0);
@@ -288,6 +339,42 @@ extern "C" int fn_8018EE0C(void* unused, int v)
         break;
     }
     return r;
+}
+
+//@8018EE84
+/* near-miss: 79/79 insns, ~14 slots differ: only the scheduling of the table copy against
+ * the m700->m3A4 loads and the idx register (retail copies the index with mr. into r9);
+ * the clamp shape (<= 4 arm first) and the state tests match. ~7 forms tried. */
+extern "C" void fn_8018EE84(Unk80188698* o, Unk80188698* t)
+{
+    int st = o->m38C;
+    if (st == 2) {
+        int m = *(int*)((char*)o + 0x4A8);
+        if (m == 1) {
+            if (!(fn_80190F0C((Unk80190EB4_Obj*)o) - o->m3F4 >= 0.33333334f)) {
+                if (*(int*)((char*)o + 0x4AC) == 5) {
+                    ((Unk8018ED00_Ctx*)o->m44C)->m700->m3A4->m288 = m;
+                    fn_8037893C((char*)o->m44C + 0x704, 0x89, 0, 0, 0);
+                } else {
+                    Unk8018ED00_S* s = ((Unk8018ED00_Ctx*)o->m44C)->m700->m3A4;
+                    int tbl[5] = { 0, 1, 2, 3, 4 };
+                    int idx0 = *(int*)((char*)o + 0x4AC);
+                    s->m288 = st;
+                    int idx = idx0;
+                    if (idx <= 4) {
+                        if (idx < 0)
+                            idx = 0;
+                    } else
+                        idx = 4;
+                    *(int*)((char*)o + 0x4AC) = idx;
+                    *(int*)((char*)t + 0x930) = tbl[idx];
+                    fn_8037893C((char*)o->m44C + 0x704, 0x89, 0, 0, 0);
+                }
+            }
+        } else if (m == 0) {
+            fn_8018EFC0(o, t);
+        }
+    }
 }
 
 //@8019019C
