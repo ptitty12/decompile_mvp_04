@@ -221,6 +221,7 @@ Unk80303ADC_Mgr* fn_80303AD0()
     return lbl_8068F1FC;
 }
 
+/* near-miss: same instructions, but retail stores f1 before the register copies and the order of the float stores differs (f >? 1 gives the right clamp branch) */
 void fn_80303ADC(Unk80303ADC_Mgr* m, const char* text, int color, float dur, float x, float y)
 {
     if (m->m1124 <= 0x3F) {
@@ -236,6 +237,7 @@ void fn_80303ADC(Unk80303ADC_Mgr* m, const char* text, int color, float dur, flo
     }
 }
 
+/* near-miss: va_list word lives in r12 in retail (va copy is emitted inside the if); ours hoists the copy above the test and keeps the word in r30 (frame 0x1B0 vs 0x1A0) */
 void fn_80303BC4(const char* fmt, float a, float b, ...)
 {
     char buf[0x100];
@@ -247,6 +249,7 @@ void fn_80303BC4(const char* fmt, float a, float b, ...)
     }
 }
 
+/* near-miss: same va_list issue as fn_80303BC4 */
 void fn_80303CA0(const char* fmt, float a, float b, float c, ...)
 {
     char buf[0x100];
@@ -272,6 +275,7 @@ void fn_80303D78(Unk80303ADC_Mgr* m)
     }
 }
 
+/* near-miss: same va_list issue as fn_80303BC4 */
 void fn_80303E38(const char* fmt, float a, float b, ...)
 {
     char buf[0x100];
@@ -298,6 +302,7 @@ void fn_80304218(Unk80300848_P188* p, const Unk80300848_Blk* src)
     *(int*)((char*)p + 0x188) = t;
 }
 
+/* near-miss: retail puts the two vtable addresses in r11/r10, ours r9/r11 (statement permutations and typed vptr fields tried) */
 void fn_80304388(Unk80300848_At8* p, int c)
 {
     p->m1C = 0;
