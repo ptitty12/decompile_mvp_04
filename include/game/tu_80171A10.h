@@ -40,7 +40,7 @@ struct Unk80171A10_Menu {
     int m18;
     char pad1C[0x3C - 0x1C];
     void* m3C;
-    char pad40[4];
+    int m40;
     int m44;
     int m48;
     char pad4C[0x54 - 0x4C];
@@ -69,6 +69,7 @@ struct Unk80171A10_Svc {
 };
 int fn_80173274(Unk80173274_T* p);
 void fn_80172D00(Unk80171A10_Menu* p);
+int fn_80172D44(Unk80171A10_Menu* p, int a);
 void fn_801728A0(Unk80171A10_Menu* p, int a, int b);
 void fn_80174438(Unk80171A10_Menu* p);
 extern int lbl_8061977C;

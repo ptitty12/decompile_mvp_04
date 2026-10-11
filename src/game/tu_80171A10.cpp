@@ -24,6 +24,8 @@ extern const Unk80171A10_Fn lbl_805CB144;
 
 extern const Unk80171A10_Fn lbl_805CB134;
 
+extern const Unk80171A10_Fn lbl_805CB14C;
+
 extern const Unk80171A10_Fn lbl_805CB154;
 
 extern const Unk80171A10_Fn lbl_805CB174;
@@ -96,16 +98,6 @@ int fn_801725C4(Unk80171A10_Menu* p, const unsigned short* s)
     return 0;
 }
 
-void fn_80172D00(Unk80171A10_Menu* p)
-{
-    int t = p->m4 + 1;
-    p->m4 = t;
-    if (t > 0) {
-        p->m4 = 0;
-    }
-    fn_801728A0(p, 0, 4);
-}
-
 void fn_80172678(Unk80171A10_Menu* p)
 {
     fn_801743E0(p);
@@ -117,6 +109,50 @@ void fn_80172678(Unk80171A10_Menu* p)
     p->m80 = 0;
     p->m4 = 1;
     p->m18 = 4;
+}
+
+void fn_80172D00(Unk80171A10_Menu* p)
+{
+    int t = p->m4 + 1;
+    p->m4 = t;
+    if (t > 0) {
+        p->m4 = 0;
+    }
+    fn_801728A0(p, 0, 4);
+}
+
+/* near-miss: native PTMF members give retail's separate zero registers; 3 slots of store order differ. */
+void fn_801742C4(Unk80171A10_Menu* p)
+{
+    int t = p->m54;
+    p->m60 = 0;
+    p->m114 = -1;
+    if (t == 0) {
+        p->mA4[0] = (unsigned short)t;
+    }
+    p->m70 = p->m7C;
+    p->m7C = 0x19;
+    p->m74 = p->m80;
+    p->m80 = 0;
+
+}
+
+int fn_801731D8(Unk80171A10_Menu* p, int idx)
+{
+    int id;
+    switch (idx) {
+    case 5: id = 5; break;
+    case 6: id = 0xB; break;
+    case 7: id = 0x11; break;
+    case 8: id = 0xA; break;
+    case 9: id = 0xD; break;
+    default: id = 0x15; break;
+    }
+    if (id != 0x15) {
+        fn_80172B60(p, id, 8);
+        return 1;
+    }
+    return 0;
 }
 
 int fn_80173274(Unk80173274_T* p)
@@ -143,6 +179,24 @@ void fn_801732EC(Unk80171A10_Menu* p)
     } else {
         fn_80174318(p, 4, lbl_805CB144);
     }
+}
+
+/* near-miss: retail shares one tail call between the m40 path and the 805CB14C path (50 instrs); the
+ * goto and pointer-variable spellings tried are 11+ slots off. */
+void fn_80173378(Unk80171A10_Menu* p)
+{
+    p->m60 = 1;
+    if (fn_80172D44(p, 0) == 0) {
+        if (p->m40 != 0) {
+            fn_80174318(p, 1, lbl_805CB11C);
+            return;
+        }
+        if (((Unk80171A10_Svc*)fn_80173274((Unk80173274_T*)p))->mC4 == 0) {
+            fn_80174318(p, 1, lbl_805CB11C);
+            return;
+        }
+    }
+    fn_80174318(p, 7, lbl_805CB14C);
 }
 
 void fn_80173A24(Unk80171A10_Menu* p)
@@ -215,20 +269,4 @@ void fn_80174274(Unk80174274_T* p)
 void fn_8017429C(Unk80174274_T* p)
 {
     fn_80171A10(p->m3C, 6);
-}
-
-/* near-miss: native PTMF members give retail's separate zero registers; 3 slots of store order differ. */
-void fn_801742C4(Unk80171A10_Menu* p)
-{
-    int t = p->m54;
-    p->m60 = 0;
-    p->m114 = -1;
-    if (t == 0) {
-        p->mA4[0] = (unsigned short)t;
-    }
-    p->m70 = p->m7C;
-    p->m7C = 0x19;
-    p->m74 = p->m80;
-    p->m80 = 0;
-
 }
