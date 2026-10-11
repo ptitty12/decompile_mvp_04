@@ -14,6 +14,17 @@ extern const void* const lbl_80666E70[];
 extern const void* const lbl_80666C40[];
 extern const void* const lbl_80666B70[];
 extern const void* const lbl_80666A18[];
+extern const void* const lbl_806669C8[];
+extern int lbl_806204F4;
+extern int lbl_806204F8;
+extern int lbl_806204FC;
+extern int lbl_80620500;
+extern FxBlk44 lbl_80691B14;
+extern FxBlk44 lbl_80691B5C;
+extern FxBlk44 lbl_80691BA4;
+extern float lbl_80691B58;
+extern float lbl_80691BA0;
+extern float lbl_80691BE8;
 extern FxApp* lbl_8061B8C0;
 extern int lbl_8061B998;
 extern FxCtx* lbl_8061FEDC;
@@ -33,7 +44,7 @@ extern int lbl_8061C8F8;
 extern int lbl_80620134;
 extern int lbl_8061B898;
 
-struct FxViewB { int pad[3]; int mC; int m10; };
+struct FxViewB { int pad[3]; int mC; int m10; char pad14[0x60]; FxWid3* m74; };
 
 extern "C" {
 void fn_80313F28(FxCtx* c, const void* s);
@@ -50,10 +61,11 @@ void fn_8035F8CC(void* idx, int a, int n);
 void fn_8035F95C(void* idx, char** names, int n);
 void fn_802D8294(int a);
 void fn_801A750C(void* v, int a);
-FxViewB* fn_801A4CE8(FxView* v, int a);
 void fn_802D7ACC();
 void fn_8033E6DC();
 void fn_80331508();
+FxViewB* fn_801A4CE8(FxView* v, int a);
+void fn_802CBDBC(void* w, void* b, int a, int c);
 int fn_8040B574(const char* a, const char* b);
 // PROTOS-BEGIN
 void fn_8032ED80(FxListD* self);
@@ -67,6 +79,7 @@ void fn_8032FB78(FxListD* self, int a);
 int fn_8032FBCC(int* a, int* b);
 void fn_8032FC0C(int a, char** names, int n);
 int fn_80330018(FxCmd* self, int k);
+void fn_80330778(FxStackG* self, int a);
 void fn_80330870(FxModal* self, int a);
 void fn_80330ACC(FxStack* self, int v);
 void fn_80330B08(FxStack* self, int v);
@@ -83,6 +96,9 @@ void fn_80331508();
 void fn_80331548();
 void fn_80331568();
 void fn_803318CC();
+void fn_80331918();
+void fn_80331A30();
+void fn_80331B48();
 // PROTOS-END
 }
 
@@ -182,6 +198,20 @@ int fn_80330018(FxCmd* self, int k) {
         }
     }
     return r;
+}
+
+void fn_80330778(FxStackG* self, int a) {
+    int i;
+    *(const void**)((char*)self + 0x2DC) = lbl_806669C8;
+    for (i = 0; i < self->m178; i++) {
+        if (self->a0[i]) delete self->a0[i];
+        self->a0[i] = 0;
+    }
+    for (i = 0; i < self->m1FC; i++) {
+        if (self->a17C[i]) delete self->a17C[i];
+        self->a17C[i] = 0;
+    }
+    fn_80330870((FxModal*)self, a);
 }
 
 /* near-miss: store order of lbl_80620410 / lbl_80620414 clears */
@@ -300,4 +330,52 @@ void fn_803318CC() {
     lbl_8061B898 = 0;
     lbl_8068B4BC = 0;
     lbl_8061C8F8 = 0;
+}
+
+/* near-miss: retail spills the saved first word to the stack (sp+8) around the 0x44-byte template copy; ours keeps it in a register */
+void fn_80331918() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w && lbl_806204F4) {
+        FxBlk44* b = w->mA0;
+        int saved = b->m0;
+        *b = lbl_80691B14;
+        b->m0 = saved;
+        fn_802CBDBC(w, b, 1, 0);
+        float f = lbl_80691B58;
+        w->mA4 = f;
+        fn_803318CC();
+        lbl_80620500 = 1;
+    }
+}
+
+/* near-miss: retail spills the saved first word to the stack (sp+8) around the 0x44-byte template copy; ours keeps it in a register */
+void fn_80331A30() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w && lbl_806204F8) {
+        FxBlk44* b = w->mA0;
+        int saved = b->m0;
+        *b = lbl_80691B5C;
+        b->m0 = saved;
+        fn_802CBDBC(w, b, 1, 0);
+        float f = lbl_80691BA0;
+        w->mA4 = f;
+        fn_803318CC();
+        lbl_80620500 = 2;
+    }
+}
+
+/* near-miss: retail spills the saved first word to the stack (sp+8) around the 0x44-byte template copy; ours keeps it in a register */
+void fn_80331B48() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w && lbl_806204FC) {
+        FxBlk44* b = w->mA0;
+        int saved = b->m0;
+        *b = lbl_80691BA4;
+        b->m0 = saved;
+        fn_802CBDBC(w, b, 1, 0);
+        float f = lbl_80691BE8;
+        w->mA4 = f;
+        fn_803318CC();
+        lbl_80620500 = 3;
+    }
 }

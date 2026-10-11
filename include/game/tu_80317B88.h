@@ -785,6 +785,28 @@ struct FxStackF {
     char pad17C[0x90];
     float m20C;
 };
+struct FxStackG {
+    FxVT8* a0[94];
+    int m178;
+    FxModal* a17C[32];
+    int m1FC;
+};
+/* Embedded helper object at FxCmd+0x48 whose vptr is at its +0x10 (so +0x58 in the owner).
+ * Template block (0x44 bytes) copied over a widget's buffer by fn_80331918 and its two siblings. */
+struct FxBlk44 {
+    int m0;
+    char pad4[0x40];
+};
+struct FxWid3 {
+    char pad0[0xa0];
+    FxBlk44* mA0;
+    float mA4;
+};
+struct FxItem3 {
+    char pad0[0x74];
+    FxWid3* m74;
+};
+struct FxOne { int v; };
 // STRUCTS-END
 
 extern int lbl_8061FF50;
