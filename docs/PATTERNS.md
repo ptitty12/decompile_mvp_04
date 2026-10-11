@@ -227,3 +227,21 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
 - Each inline's frame is its own 8-byte-aligned block. A float passed through
   two inline layers (`SetAngle(p, v) { SetAngle2(p, v); }`) takes two slots
   0x8 apart, retail's 0x30/0x38 in fn_8027F504.
+
+## Big boilerplate families across game code (lead survey, 2026-10-11)
+
+Shape clusters over unmatched game .text (relocations masked). Each has a
+known recipe; generate the members with a script once one matches.
+
+| Family | Count | Shape | Recipe |
+|---|---|---|---|
+| factory, 0x30 | ~144 | `lis/lwz lbl_806EF9B4; li r3,SIZE; bl __nw__FUii; bl ctor` | `return new (lbl_806EF9B4) X;` (X's ctor out of line) |
+| dtor, 0x30 | ~159 | `stw <vtable>,8(this); bl fn_80378620` | `X::~X() {}` where the vptr is at +8 and the base dtor is fn_80378620 (non-deleting variant, or a member with inline dtor) |
+| dtor+delete, 0x34 | ~56 | `stw <vtable>,0x20(r3); andi. r0,r4,1; beq; bl __builtin_delete` | out-of-line `X::~X() {}` with vptr at +0x20 |
+| hash wrapper, 0x20 | ~159 | `bl fn_80378568` passing r3/r4 through | out-of-line copies of an inline `unsigned Hash(const char* s, int n) { return fn_80378568(s, n); }` |
+| forwarder, 0x24 | ~131 | `lwz r3,OFF(r3); bl f` | `void X::f() { mOFF->g(); }` / `g(mOFF)` |
+| static-call, 0x2C | ~58 | `lis/addi r3,&lbl; li r4,K; bl f` | `f(&lbl_X, K);` |
+
+`python <scratchpad>/tools/families.py . LO HI` (lead's scratch tool) lists
+the families with example addresses; ask the lead if you need it.
+
