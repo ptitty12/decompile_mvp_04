@@ -14,8 +14,11 @@ extern const char lbl_805C947C[];
 
 extern Unk80619D10* lbl_80619D10;
 int fn_8040B6A0(const char* s);
+extern void* lbl_8061E978;
+void fn_802AEBF0(void* mgr, const char* s);
 int fn_8016DB74(const char* s);
-void fn_8016D2F4(Unk801527C8_Ctx* ctx, const char* s);
+void fn_8017C72C(Unk801527C8_Slots* s);
+int fn_80169DC4(char* b);
 void fn_8016C4A0(void* p);
 void fn_8037CD38();
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
@@ -140,13 +143,13 @@ void cScriptLoadAnimations::fn_vslot2() /* 8016972C */
 int cScriptLoadAnimations::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801697C4 */
 {
     if (fn_8040B6A0(m4) != 0) {
-        fn_8016D2F4(ctx, m4);
+        ctx->fn_8016D2F4(m4);
     }
     if (fn_8040B6A0(mE) != 0) {
-        fn_8016D2F4(ctx, mE);
+        ctx->fn_8016D2F4(mE);
     }
     if (fn_8040B6A0(m18) != 0) {
-        fn_8016D2F4(ctx, m18);
+        ctx->fn_8016D2F4(m18);
     }
 }
 
@@ -158,6 +161,70 @@ int cScriptLoadAnimations::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, flo
 Unk8037B3E8* cScriptLoadAnimations::fn_vslot5() /* 80169878 */
 {
     return new (lbl_806EF9B4) cScriptLoadAnimations;
+}
+
+/* near-miss: retail adds the +0x44 offset to the base before the indexed load (addi; lwzx) where this uses add; lwz 0x44(rX); 4 variants tried */
+int fn_80169DC4(char* base) /* 80169DC4 */
+{
+    int p = (int)base;
+    int off = 0;
+    int end = (int)base + 0x460;
+    do {
+        if (fn_8040B6A0((char*)p) != 0) {
+            int v = *(int*)(&base[0x44] + off);
+            if ((unsigned int)(v - 0x2A) <= 0x30) {
+                return 1;
+            }
+        }
+        p += 0xA0;
+        off += 0xA0;
+    } while (p <= end);
+    return 0;
+}
+
+void Unk8016ACAC_Slot::fn_8016A6AC() /* 8016A6AC */
+{
+    for (int i = 0; i <= 12; i++) {
+        fn_8016CE5C(i + 2);
+    }
+    mA20 = 0;
+    ((Unk801527C8_Ctx*)this)->fn_8016AC3C();
+    mLists[0].fn_8016D258();
+}
+
+void Unk8016ACAC::fn_8016A7A8(Unk8016D9A0_Rec* rec) /* 8016A7A8 */
+{
+    if (m3D40 == 0) {
+        m4.fn_8016D9A0(rec);
+        m3D90 = fn_8016C39C();
+    }
+    if (fn_801A04A8(m3D3C, 1) == m4294) {
+        fn_8017C72C(m3D3C->m700);
+    }
+}
+
+void Unk8016ACAC::fn_8016A814(Unk8016D9A0_Rec* rec) /* 8016A814 */
+{
+    if (m3D40 == 0) {
+        m4.fn_8016DA48(rec);
+        m3D90 = fn_8016C39C();
+    }
+    if (fn_801A04A8(m3D3C, 1) == m4294) {
+        fn_8017C72C(m3D3C->m700);
+    }
+}
+
+/* near-miss: retail keeps this in r28 and re-forms this+0xA24 for the byte store; one instruction more in retail; 2 variants tried */
+void Unk801527C8_Ctx::fn_8016AC3C() /* 8016AC3C */
+{
+    int off = 0;
+    char* p = mA24[0];
+    for (int i = 4; i != 0; i--, p += 10, off += 10) {
+        if (fn_8040B6A0(p) != 0) {
+            fn_802AEBF0(lbl_8061E978, p);
+            mA24[0][off] = 0;
+        }
+    }
 }
 
 /* near-miss: 6 diff lines in the hash compares: retail merges only the first nine consecutive hashes into a range test; one instruction more here */
@@ -289,4 +356,13 @@ void Unk8016ACAC::fn_8016B2B8() /* 8016B2B8 */
 {
     fn_8016B2F0();
     m3D90 = fn_8016C39C();
+}
+
+int Unk8016ACAC::fn_8016B9F4() /* 8016B9F4 */
+{
+    int r = 0;
+    if (fn_80169DC4(m3D94[0]) != 0 || m4.fn_8016DBF0() != 0) {
+        r = 1;
+    }
+    return r;
 }

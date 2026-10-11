@@ -28,6 +28,10 @@ public:
 /* One of the three script slots of the manager (stride 0xA5C); +0xA20 is the
  * hash of the slot's current script. */
 struct Unk8016ACAC_Slot {
+    void fn_8016C448();
+    void fn_8016D368(float* t);
+    void fn_8016A6AC();
+    void fn_8016CE5C(int id);
     Unk8016C1C4_List mLists[15];
     char padA14[0xA20 - 0xA14];
     int mA20;
@@ -45,8 +49,8 @@ struct Unk8016D9A0_Rec {
  * Evidence: fn_8016D9A0/fn_8016DBF0/fn_8016E18C/fn_8016E0E8. */
 class Unk8016D9A0 {
 public:
-    void fn_8016D9A0(Unk8016D9A0_Rec rec);
-    void fn_8016DA48(Unk8016D9A0_Rec rec);
+    void fn_8016D9A0(Unk8016D9A0_Rec* rec);
+    void fn_8016DA48(Unk8016D9A0_Rec* rec);
     int fn_8016DBF0();
     void fn_8016DFD0();
     void fn_8016E0E8(const char* rec);
@@ -78,19 +82,23 @@ public:
     int fn_8016C344();
     int fn_8016C764(int idx);
     void fn_8016D2A4();
-    void fn_8016A6AC();
-    void fn_8016A7A8();
-    void fn_8016A814();
+    void fn_8016A7A8(Unk8016D9A0_Rec* rec);
+    void fn_8016A814(Unk8016D9A0_Rec* rec);
+    int fn_8016B9F4();
+    void fn_8016C4A0();
+    void fn_8016A880();
+    void fn_8016D128();
 
     int m0;
     Unk8016D9A0 m4;
     Unk8016ACAC_Slot m1E28[3];
     Unk801527C8_Actor* m3D3C;
-    char pad3D40[0x3D90 - 0x3D40];
+    int m3D40;
+    char pad3D44[0x3D90 - 0x3D44];
     int m3D90;
     char m3D94[8][0xA0];
-    int m4294;
-    char pad4298[4];
+    Unk801527C8_Actor* m4294;
+    int m4298;
     int m429C[5];
 };
 
