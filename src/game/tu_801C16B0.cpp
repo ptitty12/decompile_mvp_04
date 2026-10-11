@@ -49,19 +49,43 @@ extern const char lbl_805CCCE4[];
 extern const char lbl_805CD948[];
 extern const char lbl_805CD958[];
 
+
+
+
+
+
+
+class Unk801C1AF0 {
+public:
+    virtual ~Unk801C1AF0();
+};
+
 extern "C" void fn_801C16B0(void) {}
+
 extern "C" int fn_801C16B4(void) { return lbl_8061CB38; }
+
 extern "C" unsigned fn_801C16C0(void) { return 0xEA9F4BCE; }
+
 extern "C" int fn_801C16CC(void) { return lbl_8061CB34; }
+
 extern "C" unsigned fn_801C16D8(void) { return 0xE608C67F; }
+
 extern "C" const char* fn_801C16E4(void) { return fn_801C1710(); }
+
 extern "C" unsigned fn_801C1704(void) { return 0x6F618F85; }
+
 extern "C" const char* fn_801C1710(void) { return lbl_805CCCE4; }
+
 extern "C" const char* fn_801C174C(void) { return fn_801C1778(); }
+
 extern "C" unsigned fn_801C176C(void) { return 0xDA319B21; }
+
 extern "C" const char* fn_801C1778(void) { return lbl_805CD948; }
+
 extern "C" const char* fn_801C17B4(void) { return fn_801C17E0(); }
+
 extern "C" unsigned fn_801C17D4(void) { return 0x0F245603; }
+
 extern "C" const char* fn_801C17E0(void) { return lbl_805CD958; }
 
 extern "C" float fn_801C17EC(P* p)
@@ -73,13 +97,21 @@ extern "C" float fn_801C17EC(P* p)
 }
 
 extern "C" void fn_801C1840(void) {}
+
 extern "C" void fn_801C1844(void) {}
+
 extern "C" void fn_801C1848(void) {}
+
 extern "C" int fn_801C184C(C* c, int a, int b) { return a > b; }
+
 extern "C" int fn_801C185C(C* c, int a, int b) { return a >= b; }
+
 extern "C" int fn_801C1870(C* c, int a, int b) { return a < b; }
+
 extern "C" int fn_801C1880(C* c, int a, int b) { return a <= b; }
+
 extern "C" int fn_801C1894(C* c, int a, int b) { return a == b; }
+
 extern "C" int fn_801C18A4(C* c, int lo, int hi, int x)
 {
     int r = 0;
@@ -89,8 +121,11 @@ extern "C" int fn_801C18A4(C* c, int lo, int hi, int x)
 }
 
 extern "C" int fn_801C18C4(C* c, int a, int b) { return b <= a; }
+
 extern "C" int fn_801C18D8(C* c, int a, int b) { return b >= a; }
+
 extern "C" int fn_801C18EC(C* c, int a) { return a >= 0; }
+
 extern "C" int fn_801C18F8(C* c, int a)
 {
     if (a <= 0)
@@ -99,6 +134,7 @@ extern "C" int fn_801C18F8(C* c, int a)
 }
 
 extern "C" int fn_801C190C(C* c, int a) { return a == 0; }
+
 extern "C" int fn_801C1918(C* c, int a)
 {
     if (a > 0)
@@ -107,20 +143,25 @@ extern "C" int fn_801C1918(C* c, int a)
 }
 
 extern "C" int fn_801C192C(C* c, int a) { return a < 0; }
+
 extern "C" int fn_801C1934(void) { return lbl_8061CBBC; }
+
 extern "C" unsigned fn_801C1940(void) { return 0xD1E132A4; }
+
 extern "C" void fn_801C194C(void) {}
+
 extern "C" int fn_801C1950(A* a) { return a->m8->mC; }
+
 extern "C" void fn_801C195C(void) { fn_801C0538(1, 0xFFFF); }
+
 extern "C" void fn_801C1988(void) { fn_801C0538(0, 0xFFFF); }
 
-class Unk801C1AF0 {
-public:
-    virtual ~Unk801C1AF0();
-};
 Unk801C1AF0::~Unk801C1AF0() {}
 
 extern "C" void fn_801C1E24(void* self) { fn_801C1E44(self); }
+
+extern "C" void fn_801C20A8(char* self) { fn_801D6044(self + 0x20C); }
+
 extern "C" void fn_801C20CC(Z* z)
 {
     P* c = z->m204;
@@ -131,10 +172,7 @@ extern "C" void fn_801C20CC(Z* z)
     }
 }
 
-extern "C" void fn_801C20A8(char* self) { fn_801D6044(self + 0x20C); }
 extern "C" void fn_801C2120(char* self) { fn_801D7FCC(self + 0xE0); }
-extern "C" void fn_801C26FC(void* self) { fn_801C38F0(self, 2.0f); }
-extern "C" void fn_801C2A18(void* self) { fn_801C38F0(self, 0.0f); }
 
 extern "C" void fn_801C2144(Z* z)
 {
@@ -166,6 +204,8 @@ extern "C" void fn_801C21EC(Z* z)
         fn_801C3B04(z, p);
 }
 
+extern "C" void fn_801C26FC(void* self) { fn_801C38F0(self, 2.0f); }
+
 extern "C" void fn_801C2724(Z* z)
 {
     Unk801C16B0_Mode* m = &z->m28C;
@@ -175,6 +215,8 @@ extern "C" void fn_801C2724(Z* z)
         m->m4 = 4;
     fn_801D5CBC(z->m20C);
 }
+
+extern "C" void fn_801C2A18(void* self) { fn_801C38F0(self, 0.0f); }
 
 extern "C" void fn_801C2A40(Z* z)
 {
