@@ -39,7 +39,7 @@ struct Unk80071604 {
     int m18;
     unsigned m1C;
     void* m20;
-    void* m24;
+    char* m24;
 };
 
 struct Unk80070ED8_Data {

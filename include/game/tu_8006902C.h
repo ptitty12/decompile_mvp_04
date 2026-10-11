@@ -16,6 +16,8 @@ struct Unk80069F0C;
 
 struct Unk8006902C_CtxC {
     Unk80069F0C* m0;
+    char pad4[0x1750 - 4];
+    int m1750;
 };
 
 struct Unk8006902C_Ctx {
@@ -24,7 +26,11 @@ struct Unk8006902C_Ctx {
     char pad10[0x10];
     Unk80069F0C* m20;
     int m24;
-    char pad28[0x7C - 0x28];
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    char pad38[0x7C - 0x38];
     int m7C;
     int m80;
     int m84;
@@ -35,6 +41,42 @@ struct Unk8006902C_Ctx {
 
 struct Unk8014D81C_Obj {
     char pad0[0x1C];
+};
+
+struct Unk8006902C_EvE2FC {
+    char pad0[0x14];
+    unsigned char m14;
+};
+
+struct Unk8006902C_EvE36C {
+    char pad0[0xF];
+    unsigned char mF;
+};
+
+struct Unk8006902C_EvDE84 {
+    char pad0[0xC];
+    int mC;
+};
+
+struct Unk8006902C_EvE280 {
+    char pad0[0xC];
+    int mC;
+    int m10;
+};
+
+struct Unk8006902C_ModeIdx {
+    char pad0[0x708];
+    int m708;
+};
+
+struct Unk8006902C_EvE5FC {
+    char pad0[0x10];
+    Unk8006902C_ModeIdx* m10;
+};
+
+struct Unk8006902C_EvE650 {
+    char pad0[0x14];
+    Unk8006902C_ModeIdx* m14;
 };
 
 struct Unk8006902C_EvC088 {
@@ -83,7 +125,8 @@ struct Unk8006902C_Rec {
 };
 
 struct Unk8006902C_Side {
-    char pad0[0x198];
+    char pad0[0x17C];
+    unsigned char m17C[0x1C];
     int m198;
     char pad19C[0x1B4 - 0x19C];
     unsigned char m1B4[0x80];
@@ -93,9 +136,11 @@ struct Unk8006902C_Side {
     Unk8006902C_Entry m238[16];
     char pad2B8[0x3E8 - 0x2B8];
     Unk8006902C_Rec m3E8[16];
-    char pad728[0x92C - 0x728];
+    char pad728[0x8FC - 0x728];
+    char m8FC[0x30];
     char m92C[0x30];
-    char pad95C[0xC9C - 0x95C];
+    char m95C[0x30];
+    char padA8C[0xC9C - 0x98C];
     char mC9C[0x30];
     char padCCC[0xE64 - 0xCCC];
 };
@@ -154,6 +199,21 @@ struct Unk80069F0C {
     Unk8006902C_Side* SideAt(int off) { return (Unk8006902C_Side*)((char*)m14.m0 + off); }
     void fn_8006CFA4(Unk8006902C_EvCFA4* ev);
     void fn_8006EC94(unsigned char c, int k);
+    void fn_8006D508();
+    void fn_8006DD64(int a);
+    void fn_8006DDF4();
+    void fn_8006DE84(Unk8006902C_EvDE84* ev);
+    void fn_8006DF00();
+    void fn_8006E0F8(Unk8006902C_EvC17C* ev);
+    void fn_8006E168(Unk8006902C_EvC17C* ev);
+    void fn_8006E1FC(Unk8006902C_EvC17C* ev);
+    void fn_8006E280(Unk8006902C_EvE280* ev);
+    void fn_8006E2FC(Unk8006902C_EvE2FC* ev);
+    void fn_8006E36C(Unk8006902C_EvE36C* ev);
+    void fn_8006E5FC(Unk8006902C_EvE5FC* ev);
+    void fn_8006E650(Unk8006902C_EvE650* ev);
+    void fn_8006E6A4();
+    void fn_8006F258(Unk8006902C_EvC17C* ev);
     int fn_8006A238(int idx);
     void fn_8006C17C(Unk8006902C_EvC17C* ev);
     void fn_8006A22C();
