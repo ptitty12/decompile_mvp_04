@@ -423,7 +423,9 @@ Unk800C7B40_Widget* fn_800C8060(Unk800C7B40_Widget* p);
  * fn_800B64BC(new(0) 0xD8)); fn_800B7B4C(mgr, name, obj) / fn_800B7AB8(mgr, name) look
  * screens and widgets up by their 16-byte name. */
 struct UnkFEMgr {
-    char pad0[0xD8];
+    char pad0[0xB8];
+    int mB8;
+    char padBC[0x1C];
 };
 extern UnkFEMgr* lbl_8061A32C;
 extern "C" {
