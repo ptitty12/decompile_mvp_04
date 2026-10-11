@@ -167,10 +167,18 @@ struct Unk801DB948_J {
 };
 
 /* Controller context returned by fn_801DCC0C (Ctx::m0). */
+/* Random number generator (same class as in chooser.h). */
+class Unk8014D8AC {
+public:
+    int fn_8014D8AC(int max, const char* file, int line);
+};
+
 struct Unk801DB948_Game {
     char pad0[0x4C];
     unsigned int m4C;
-    char pad50[0x560 - 0x50];
+    char pad50[0x554 - 0x50];
+    Unk8014D8AC* m554;
+    char pad558[0x560 - 0x558];
     char m560[1];
     char pad561[0x660 - 0x561];
     Unk80270BA0_X* m660;

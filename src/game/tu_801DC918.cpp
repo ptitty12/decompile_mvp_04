@@ -22,6 +22,10 @@ extern float lbl_805D3B1C;
 extern const float lbl_805D3B20;
 extern const float lbl_805D3B28;
 extern const float lbl_805D3B30;
+extern const Vec3 lbl_805D3A34;
+extern const char lbl_805D3A40[];
+extern const float lbl_805D3A78;
+extern const float lbl_805D3A88;
 extern const Vec3 lbl_805D6760[];
 
 extern "C" {
@@ -57,6 +61,7 @@ void fn_801E9E94(I* i);
 void fn_801EA458(I* i);
 Unk8027C728_Goal* fn_801E5DF8(Unk801DB948_Game* g, int a, int b);
 void fn_8014E09C(Unk801DB948_It* it, Unk801DB948_Game* g, int k);
+int fn_80259C00(int x);
 void fn_801DD420(Unk801DD660_Sub2* s);
 void fn_801E9BE4(I* i);
 void fn_80249B08(void* o, int a, float f);
@@ -210,6 +215,47 @@ extern "C" int fn_801DCE4C(Unk801DD660_Sub* s)
     int r = 0;
     if (s->mC != -1 && !(s->m14 < lbl_805D3A24))
         r = (float)s->m0->m9C->m0->m4C * lbl_805D3A30 > s->m14;
+    return r;
+}
+
+struct Unk801DCEC8_Gm {
+    char pad0[0x65C];
+    Unk80270BA0_X* m65C[13];
+};
+static inline Unk80270BA0_X* PlAt2(I* i, unsigned j)
+{
+    return j <= 12 ? ((Unk801DCEC8_Gm*)i->m9C->m0)->m65C[j] : 0;
+}
+
+/* near-miss: k lands in r0 (retail r11) and p in r9 (retail r4); lfsx operand order differs (17 slots) */
+extern "C" int fn_801DCEC8(Unk801DD660_Sub* s, int sel)
+{
+    int r = 0;
+    unsigned k = -1;
+    switch (sel) {
+    case 0:
+        k = 10;
+        break;
+    case 1:
+        k = 11;
+        break;
+    case 2:
+        k = 12;
+        break;
+    }
+    I* i = s->m0;
+    Unk80270BA0_X* p = PlAt2(i, k);
+    if (p != 0) {
+        int idx = fn_80259C00(i->m9C->m0->m700->m3B4);
+        Vec3 v = lbl_805D3A34;
+        float t;
+        volatile int pad;
+        float lim = lbl_805D3A78;
+        const char* file = lbl_805D3A40;
+        unsigned rn = s->m0->m9C->m0->m554->fn_8014D8AC(1000000, file, 0x9D);
+        t = (float)rn * lim * lbl_805D3A88;
+        r = t < ((float*)&v)[idx];
+    }
     return r;
 }
 
