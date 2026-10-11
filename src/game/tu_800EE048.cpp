@@ -205,6 +205,84 @@ void fn_800EF2B8(UiScrRaw* self)
     self->m1AC = fn_8011AB48(1);
 }
 
+enum E48Sel { E48Sel_Neg = -1, E48Sel_Lo = 0, E48Sel_Hi = 1 };
+int fn_800EF7D8(UiS* self, int idx)
+{
+    fn_8001BC4C()->fn_8001BDAC(0x9C);
+    int sel = -1;
+    UiStr4 a = lbl_805BE2DC;
+    UiStr4 b = lbl_805BE2FC;
+    UiS* o1 = self->v32(a.m[idx], 1);
+    UiS* o2 = self->v32(b.m[idx], 1);
+    if (idx == fn_8011AB48(0))
+        sel = 0;
+    else if (idx == fn_8011AB48(1))
+        sel = 1;
+    switch ((E48Sel)sel) {
+    case 0:
+        break;
+    case 1: {
+        int o = idx * 16;
+        ((UiVJ*)o1)->v5(*(int*)((char*)self + 0x148 + o), *(int*)((char*)self + 0x14C + o), lbl_8061A328, lbl_8061A328 + 0xC);
+        ((UiVJ*)o2)->v5(*(int*)((char*)self + 0x150 + o), *(int*)((char*)self + 0x154 + o), lbl_8061A328, lbl_8061A328 + 0xC);
+        fn_8011ABDC(1, -1);
+        break;
+    }
+    case -1:
+        if (fn_8011AB48(0) == -1 && fn_800EEB38((Unk800EEB2C_T*)self, 0) != 0) {
+            ((UiVJ*)o1)->v5(self->m188, self->m18C, lbl_8061A328, lbl_8061A328 + 0xC);
+            ((UiVJ*)o2)->v5(self->m198, self->m19C, lbl_8061A328, lbl_8061A328 + 0xC);
+            fn_8011ABDC(0, idx);
+        }
+        break;
+    }
+    return 1;
+}
+
+int fn_800EFA04(UiS* self, int idx)
+{
+    fn_8001BC4C()->fn_8001BDAC(0x9B);
+    int sel = -1;
+    UiStr4 a = lbl_805BE2DC;
+    UiStr4 b = lbl_805BE2FC;
+    UiS* o1 = self->v32(a.m[idx], 1);
+    UiS* o2 = self->v32(b.m[idx], 1);
+    if (idx == fn_8011AB48(0))
+        sel = 0;
+    else if (idx == fn_8011AB48(1))
+        sel = 1;
+    switch ((E48Sel)sel) {
+    case 0: {
+        int o = idx * 16;
+        ((UiVJ*)o1)->v5(*(int*)((char*)self + 0x148 + o), *(int*)((char*)self + 0x14C + o), lbl_8061A328, lbl_8061A328 + 0xC);
+        ((UiVJ*)o2)->v5(*(int*)((char*)self + 0x150 + o), *(int*)((char*)self + 0x154 + o), lbl_8061A328, lbl_8061A328 + 0xC);
+        fn_8011ABDC(0, -1);
+        break;
+    }
+    case -1:
+        if (fn_8011AB48(1) == -1 && fn_800EEB38((Unk800EEB2C_T*)self, 1) != 0) {
+            ((UiVJ*)o1)->v5(self->m190, self->m194, lbl_8061A328, lbl_8061A328 + 0xC);
+            ((UiVJ*)o2)->v5(self->m1A0, self->m1A4, lbl_8061A328, lbl_8061A328 + 0xC);
+            fn_8011ABDC(1, idx);
+        }
+        break;
+    }
+    return 1;
+}
+
+void fn_800F04E0(UiS* self, int a)
+{
+    UiS* w = fn_800C8044(self->v32(lbl_805BE32C, 1));
+    if (a == 1) {
+        self->v32(lbl_805BE200, 1)->v8(0);
+        w->v32(lbl_805BE33C, 1)->v8(0);
+    } else {
+        self->v32(lbl_805BE20C, 1)->v8(0);
+        w->v32(lbl_805BE348, 1)->v8(0);
+    }
+    fn_800EEB50((Unk800EEB2C_T*)self, a);
+}
+
 void fn_800F0650(void* t)
 {
     UiX600* c = lbl_806192E0->m4->mC;
@@ -285,7 +363,7 @@ void fn_800F08B8(UiS* self, char* out)
 
 void fn_800F0968(void* t)
 {
-    fn_800ECE34(t);
+    fn_800ECE34((UiS*)t);
 }
 
 void fn_800F1210(void* t)

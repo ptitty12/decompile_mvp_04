@@ -53,4 +53,16 @@ int fn_8011AB48(int a);
 void fn_800EE63C(UiS* p);
 
 
+extern char lbl_805BE32C[];
+extern char lbl_805BE200[];
+extern char lbl_805BE20C[];
+extern char lbl_805BE33C[];
+extern char lbl_805BE348[];
+struct UiStr4 {
+    const char* m[4];
+};
+extern UiStr4 lbl_805BE2DC;
+extern UiStr4 lbl_805BE2FC;
+extern int lbl_8061A328;
+void fn_8011ABDC(int a, int b);
 #endif
