@@ -65,6 +65,22 @@ struct Unk803BA4D0_Obj {
 };
 void fn_803BA4D0(void* list, int* p);
 
+/* Index tables of tu_803414A4 (fn_8034151C / fn_803415F0 and their users). */
+struct Unk8034151C {
+    int pad0;
+    int m4[30];
+    unsigned char m7C[30];
+    unsigned char m9A;
+};
+struct Unk803415F0 {
+    int pad0;
+    int m4[50];
+    unsigned char mCC[50];
+    unsigned char mFE;
+};
+unsigned char fn_8034151C(Unk8034151C* t, int v);
+unsigned char fn_803415F0(Unk803415F0* t, int v);
+
 int fn_803B9D60(Unk803B9D60_Alloc** out);
 int fn_803B9DDC();
 int fn_803B9E08();

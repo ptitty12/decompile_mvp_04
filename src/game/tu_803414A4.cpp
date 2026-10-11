@@ -2,6 +2,8 @@
  * Game code, .text 0x803414A4-0x80341B78 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/tu_803401A8.h"
+
 extern char lbl_806648E8[];
 struct Unk805A3AD8 { float v; };
 extern Unk805A3AD8 lbl_805A3AD8;
@@ -50,13 +52,6 @@ Unk803414A4* fn_803414A4(Unk803414A4* self)
     return self;
 }
 
-struct Unk8034151C {
-    int pad0;
-    int m4[30];
-    unsigned char m7C[30];
-    unsigned char m9A;
-};
-
 unsigned char fn_8034151C(Unk8034151C* t, int v)
 {
     unsigned char i;
@@ -82,13 +77,6 @@ void fn_80341598(Unk8034151C* t, int v)
         i = fn_80341560(t, v);
     t->m7C[i]++;
 }
-
-struct Unk803415F0 {
-    int pad0;
-    int m4[50];
-    unsigned char mCC[50];
-    unsigned char mFE;
-};
 
 unsigned char fn_803415F0(Unk803415F0* t, int v)
 {
