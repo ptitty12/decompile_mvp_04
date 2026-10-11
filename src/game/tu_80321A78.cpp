@@ -164,6 +164,7 @@ int fn_80322290(FxU* self) {
     return self->m0;
 }
 
+/* near-miss: retail keeps (base + 1) separate; g++ reassociates it */
 int fn_8032234C(FxU* self) {
     int v = self->m4;
     if (v == -1) {
@@ -219,11 +220,7 @@ int fn_80323830() { return lbl_8062014C; }
 
 int fn_8032383C() { return 0xE33E6A08; }
 
-float fn_80323848(FxV* self) {
-    if (self->m44 == 0 && self->m48 != 0) return fn_80323848(self->m48);
-    return self->m4C;
-}
-
+/* near-miss: same as fn_80323848 */
 float fn_8032388C(FxV* self) {
     if (self->m44 == 0 && self->m48 != 0) return fn_8032388C(self->m48);
     return self->m50;
@@ -282,6 +279,7 @@ const char* fn_80323AA8() { return lbl_805E8A38; }
 
 int fn_80323AB4() { return 0x77F3B9AB; }
 
+/* near-miss: retail loads before the index increment */
 float fn_80323AC0(void* unused, int* idx) {
     return lbl_806E10E4[(*idx)++ & 0x3FF];
 }
