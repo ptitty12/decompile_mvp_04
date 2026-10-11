@@ -28,3 +28,4 @@
   - original-asm SDK functions policy;
   - push + create unit issues;
   - review the Phase 1 pipeline choices.
+- 2026-10-10 | Claude Sonnet 5.5 (W1) | dolphin/ai/AI.c (#108) | matched 6 (152 B), attempted 12, parked 6 (AIInitDMA, AIStartDMA, AIStopDMA, AISetStreamPlayState, AISetStreamVolLeft/Right: RMW on constant register base does not reproduce lis+addi base) | unmatched also: AIInit, AISetDSPSampleRate, AISetStreamSampleRate, __AI_SRC_INIT (large), 3 handlers (not attempted) | none

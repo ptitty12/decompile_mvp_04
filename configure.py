@@ -360,6 +360,9 @@ cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
+# Dolphin SDK AI library (built Apr 5 2004). Flags TBD; start from the OS ones.
+cflags_dolphin_ai = [*cflags_base, "-char unsigned", "-opt nopeephole"]
+
 # Units not listed here are linked from the dtk split (assembly).
 config.libs = [
     {
@@ -380,6 +383,15 @@ config.libs = [
             # Code-matched, not linkable: OS.c's .sdata/.data (__OSVersion, OSInit strings)
             # and original-assembly functions must be reproduced before it can link.
             Object(NonMatching, "dolphin/os/OS.c"),
+        ],
+    },
+    {
+        "lib": "dolphin_ai",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_ai,
+        "progress_category": "sdk",
+        "objects": [
+            Object(NonMatching, "dolphin/ai/AI.c"),
         ],
     },
     {
