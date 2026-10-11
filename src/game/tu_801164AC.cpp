@@ -6,12 +6,20 @@
 #include "game/tu_8001B190.h"
 
 typedef Unk80114A20_Scr Scr;
+typedef Unk800C7B40_Widget Wid;
 
 
 struct UnkTextArg {
     char b[0xC8];
 };
 extern const char lbl_805BA6D8[];
+extern const char lbl_805BFB3C[];
+extern const char lbl_805BFB4C[];
+extern const char lbl_805BE1B0[];
+int fn_801A71D0();
+int* fn_800ED2B0(void* container, const char* name);
+extern const float lbl_805BFB38;
+Unk8001BC8C* fn_8001BC4C();
 extern const char lbl_805BC1A8[];
 extern const char lbl_805BFCC4[];
 extern const char lbl_805BFCCC[];
@@ -25,6 +33,7 @@ extern const char lbl_8064E630[];
 // PROTOS-BEGIN
 extern "C" {
 int fn_80116A64(Scr* self, int b);
+void fn_80117634(Scr* self);
 void fn_80117764(Scr* self);
 void fn_801177E8(Scr* self, int a);
 int fn_80117838();
@@ -35,6 +44,8 @@ void fn_80117984(Scr* self, int b);
 void fn_80117B04(int a, Scr* b);
 void fn_80117B60(int a, Scr* b);
 void* fn_80117D20(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_80117D70(Unk80117D20_Scr* self);
+void fn_80117EA0(Unk80117D20_Scr* self, Wid* w, int v);
 void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_801181EC(Scr* self);
 void fn_80119F48(char* buf, float v);
@@ -53,6 +64,7 @@ void fn_800ED310(Scr* self);
 void fn_800ECAA4(Scr* self);
 void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
 int fn_8011AD00(int a);
+void fn_800ECF18(void* self);
 void fn_80116100(Scr* self);
 void fn_80116268(Scr* self);
 void fn_801164AC(Scr* self);
@@ -84,6 +96,19 @@ int fn_80116A64(Scr* self, int b)
         }
     }
     return 0;
+}
+
+void fn_80117634(Scr* self)
+{
+    Unk8001BC8C* g = fn_8001BC4C();
+    float t0 = (float)self->m188;
+    g->fn_8001C05C(3, t0 * lbl_805BFB38, 1);
+    float t1 = (float)self->m18C;
+    g->fn_8001C05C(1, t1 * lbl_805BFB38, 1);
+    float t2 = (float)self->m190;
+    g->fn_8001C05C(4, t2 * lbl_805BFB38, 1);
+    float t3 = (float)self->m194;
+    g->fn_8001C05C(2, t3 * lbl_805BFB38, 1);
 }
 
 void fn_80117764(Scr* self)
@@ -192,6 +217,48 @@ void* fn_80117D20(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int 
     self->SetVptr(lbl_8064E8D8);
     self->m134 = 0;
     return self;
+}
+
+void fn_80117D70(Unk80117D20_Scr* self)
+{
+    fn_800ECF18(self);
+    UnkGame* g = fn_8011AA24(0);
+    UnkGameP6F8* p = g->m6F8;
+    int n = fn_801A71D0() != 0 ? 3 : 4;
+    int idx = n;
+    if (n > 2) {
+        int t = 0;
+        if (g->m6F8->m14->m1CD0 != 0)
+            t = 1;
+        idx = t;
+        if (n != 3)
+            idx ^= 1;
+    }
+    UnkPlayerRec* rec = &p->m14->rec[idx];
+    const char* name;
+    if (idx == 0)
+        name = lbl_805BFB3C;
+    else
+        name = lbl_805BFB4C;
+    UnkSub* s = (UnkSub*)((char*)fn_800C8054(self->fn_vslot29(name)) + 0x98);
+    s->fn_vslot20(rec->m198, 0);
+    for (Wid* c = ((UnkGroupW*)self)->m40; c != 0; c = (Wid*)c->m8)
+        fn_80117EA0(self, c, rec->m198);
+    self->m134 = (int)fn_800ED2B0(self, lbl_805BE1B0);
+}
+
+void fn_80117EA0(Unk80117D20_Scr* self, Wid* w, int v)
+{
+    int t = w->m1C;
+    if (t == 9) {
+        if (v != 0) {
+            UnkSub* s = (UnkSub*)((char*)fn_800C8054(w) + 0x98);
+            s->fn_vslot20(v, 0);
+        }
+    } else if (t == 3 || t == 8) {
+        for (Wid* c = ((UnkGroupW*)w)->m40; c != 0; c = (Wid*)c->m8)
+            fn_80117EA0(self, c, v);
+    }
 }
 
 void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
