@@ -210,4 +210,12 @@ int fn_800902B0(int a, int b);
 int fn_80083FC0(int a);
 int fn_8008FCC8(int a);
 
+/* 0x30-byte result record built by fn_8053E240 (m0 returned, m8 optional float out). */
+struct Db8053E240_Ctx {
+    int m0;
+    int m4;
+    float m8;
+    char padC[0x24];
+};
+
 #endif

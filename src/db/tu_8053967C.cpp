@@ -193,6 +193,11 @@ DB_OVERLAY unsigned char fn_8053B210(R* r, int id)
     return 0xFF;
 }
 
+DB_OVERLAY void fn_8053B6A4(R* r)
+{
+    fn_8040074C(r->m1D0, 0xC);
+}
+
 /* near-miss: lwzx base/index order (retail: base m0, index i*4) */
 DB_OVERLAY unsigned fn_8053B6CC(R* r, int id)
 {
@@ -206,11 +211,6 @@ DB_OVERLAY unsigned fn_8053B6CC(R* r, int id)
         }
     }
     return res;
-}
-
-DB_OVERLAY void fn_8053B6A4(R* r)
-{
-    fn_8040074C(r->m1D0, 0xC);
 }
 
 DB_OVERLAY int fn_8053B824(R* r, int v)
@@ -379,11 +379,6 @@ DB_OVERLAY int fn_8053CA58(X* x)
     return n;
 }
 
-DB_OVERLAY unsigned char fn_8053CAD4(X* x, int i)
-{
-    return x->m14.m0[i];
-}
-
 DB_OVERLAY int fn_8053CA8C(X* x, int i)
 {
     int idx = fn_8053CAD4(x, i);
@@ -395,6 +390,11 @@ DB_OVERLAY int fn_8053CA8C(X* x, int i)
         r = 0;
     }
     return r;
+}
+
+DB_OVERLAY unsigned char fn_8053CAD4(X* x, int i)
+{
+    return x->m14.m0[i];
 }
 
 DB_OVERLAY int fn_8053CAE0(X* x)
