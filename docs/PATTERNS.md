@@ -133,3 +133,34 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
   0x4330000080000000).
 - `__FILE__`: units start with `#line 1 "C:/mvp2004/source/..."` (DECISIONS).
 
+## More from the warp, path and EA-setup workers (2026-10-11)
+
+- `-ffloat-store` doesn't force a float inside a one-float struct local to
+  memory: a conditional `u.f = 0.0f` becomes a register `fmr` select.
+- Out-of-line clamp branch: `if (!(t > 255.0f)) {clamp} else r = 255;` gives
+  retail's `bgt` to an out-of-line `li r4,255`.
+- Indexed member arrays: an inline `Entry* At(Entry* a, int i) { return &a[i]; }`
+  gives `mulli; add rX,this,rX; lwz 0x44(rX)`, where `m20[i].m24` gives
+  `addi; lwzx`.
+- Struct copies through an inline by-value getter (`mA4 = GetPos(x)`) give
+  retail's temp-slot copy; a local copy doesn't. Passing a by-value getter's
+  result to a `const Vec3&` parameter gives direct frame stores.
+- Inline `Clear()` methods on sub-structs give the `stw 0(...)` plus
+  `addi rP,this,off` shape.
+- A constructor that returns `this` copies r3 (`mr r9,r3`); no copy in the
+  prologue means a plain method.
+- Inline mid-class ctor `Mid(unsigned h) : Root(h) {}` leaves only the
+  final vptr store in the derived ctor; `~X() {}` gives vptr store plus
+  `bl <mid dtor>` passing r4 through.
+- A frame bigger than the visible locals: an unused `char buf[N]` local
+  reproduces it (fn_802A3974).
+- EA lib float literals: write `0.5f` etc.; an `extern const float` gets
+  CSE'd into a callee-saved register.
+- Under -ffloat-store, re-read `a->m0[k].m4[i]` in every float assignment
+  (no local pointer): retail reloads after each float store.
+- Ctor float inits: chained assignments (`m3C = m40 = 0.0f;`) store the left
+  one first; a generator plus variants.py found ctor orders that plain
+  permutations missed.
+- Read `cc1plus -da` dumps (jump/cse/sched/greg) before a blind variant search
+  when a register or ordering difference persists.
+

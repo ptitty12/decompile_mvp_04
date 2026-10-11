@@ -24,6 +24,10 @@ what is matched.
 - At most 8 real attempts per function. Then park it: leave your best version
   in the file (with a short `/* near-miss: ... */` comment) and move on.
 
+Scratch files (variant scripts, test .cpp, dumps) go in your own subfolder of
+the session scratchpad named after your worktree (e.g. `scratchpad/W3/`):
+workers share the scratchpad and have overwritten each other's files.
+
 ## Commands (each Bash call starts outside the worktree: always `cd` first)
 
 ```bash
