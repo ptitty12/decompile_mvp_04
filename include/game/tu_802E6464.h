@@ -54,6 +54,7 @@ public:
     void fn_802E8AC4();
     void fn_802E8B6C(Unk802E22EC_Counted* c, int a, Unk802E4B98_V4* v);
     void fn_802E8D1C(Unk802E22EC_B* o);
+    void fn_802E8FA4();
 };
 Unk802E869C* fn_802E884C(Unk802E869C* o, Unk802E4B98_V4* v);
 
@@ -102,7 +103,7 @@ public:
         mB8 = 10000000.0f;
         mBC = 1.0f / mB8;
     }
-    virtual ~Unk802E7314() {}
+    virtual ~Unk802E7314();
     void fn_802E7200(Unk802E7314* o, int x);
     void fn_802E7298(Unk802E7314* o, float* s);
     void fn_802E78D4();

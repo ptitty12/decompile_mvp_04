@@ -33,6 +33,10 @@ void Unk802E6124::fn_802E715C()
     }
 }
 
+Unk802E7314::~Unk802E7314()
+{
+}
+
 void Unk802E7314::fn_802E7200(Unk802E7314* o, int x)
 {
     fn_802E21FC((Unk802E21FC_R*)this, (Unk802E21FC_R*)o);
@@ -222,6 +226,11 @@ void Unk802E869C::fn_802E8D1C(Unk802E22EC_B* o)
 {
     lbl_8061F68C->s2(o->m0 == 7, "/mvp2004/source/common/geomlib/geomspheregroup.cpp", 170);
     lbl_8061F68C->s2(0, "/mvp2004/source/common/geomlib/geomspheregroup.cpp", 171);
+}
+
+void Unk802E869C::fn_802E8FA4()
+{
+    m3 = 1;
 }
 
 void Unk802E8FB0::fn_802E90C8()
