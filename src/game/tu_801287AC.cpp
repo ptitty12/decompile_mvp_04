@@ -24,18 +24,23 @@ typedef Unk8012B960_Scr Scr;
 extern const float lbl_805C068C;
 extern const float lbl_805C0690;
 extern const float lbl_805C0694;
+extern const float lbl_805C06A0;
 extern const int lbl_805C06A4[];
 extern const char lbl_805C0424[];
 extern const char lbl_805C0438[];
+extern const char lbl_805C088C[];
+extern const char lbl_805C0890[];
 
 // PROTOS-BEGIN
 extern "C" {
 void fn_801287AC(int a, int b, int c);
 int fn_801295DC(int a, int b, int c);
 int fn_8012964C(int a, int c, float v);
+int fn_801296DC(int a, int b, int c);
 void fn_8012981C(int a, int b, int* out);
 void fn_8012A490(int a, int b, int c);
 Wid* fn_8012B960(Scr* self, int id, int* out);
+int fn_8012BBF4(Scr* self, int id);
 }
 // PROTOS-END
 extern "C" {
@@ -50,6 +55,10 @@ void fn_8012AB7C(int a, int b, int c);
 void fn_8012AF28(int a, int b, int c);
 void fn_8012B678(int a, int b, int c);
 int fn_8007AB9C(int a, int b, int c);
+int fn_8012E3F4(Scr* self);
+Wid* fn_8012B960(Scr* self, int id, int* out);
+int fn_8007AA84(int a, int b, int c, int d);
+int fn_8007A6A0(int a, int b, int c);
 }
 
 extern "C" {
@@ -67,6 +76,7 @@ void fn_801287AC(int a, int b, int c)
     }
 }
 
+/* near-miss: retail tests b <= 0x3C with bgt-first layout (li r3,6 after the branch); GCC hoists the li here. */
 int fn_801295DC(int a, int b, int c)
 {
     int r = 0;
@@ -91,6 +101,7 @@ int fn_801295DC(int a, int b, int c)
     return r;
 }
 
+/* near-miss: retail keeps the result in r3 with a shared epilogue (single exit); this form uses r11. */
 int fn_8012964C(int a, int c, float v)
 {
     int r = 0;
@@ -113,6 +124,26 @@ int fn_8012964C(int a, int c, float v)
     return r;
 }
 
+/* near-miss: retail splits the switch into nested compares on b (80 insns vs 69). */
+int fn_801296DC(int a, int b, int c)
+{
+    switch (b) {
+    case 0:
+    case 1: {
+        int t = fn_8007AA84(a, b, c, 0) + fn_8007AA84(a, b, c, 1);
+        return t / 2;
+    }
+    case 2:
+        return fn_8007A6A0(a, 0xD, c);
+    case 3:
+        return (int)((float)fn_8007A6A0(a, 0x10, c) * lbl_805C06A0);
+    case 4:
+        return (int)((float)fn_8007A6A0(a, 0xE, c) * lbl_805C06A0);
+    }
+    return 0;
+}
+
+/* near-miss: one instruction (lwzx operand order r30,r3 in retail). */
 void fn_8012981C(int a, int b, int* out)
 {
     for (int i = 0; i < 4; i++) {
@@ -136,6 +167,7 @@ void fn_8012A490(int a, int b, int c)
     }
 }
 
+/* near-miss: retail loads the vptr after selecting the name (14 slots differ). */
 Wid* fn_8012B960(Scr* self, int id, int* out)
 {
     const char* name;
@@ -149,6 +181,27 @@ Wid* fn_8012B960(Scr* self, int id, int* out)
         name = lbl_805C0438;
     }
     return fn_800C8044(self->fn_vslot32(name, 1));
+}
+
+/* near-miss: retail loads the vptr inside each name arm (85 insns vs 84). */
+int fn_8012BBF4(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0)
+            fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
+        return 1;
+    }
+    if (fn_8012E3F4(self) != 0) {
+        fn_800C8034(fn_800C8044(self->fn_vslot32(self->m184 == 0 ? lbl_805C0424 : lbl_805C0438, 1))->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
+    }
+    return 0;
 }
 
 }

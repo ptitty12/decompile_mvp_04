@@ -74,7 +74,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot12();
     virtual void fn_vslot13();
     virtual void fn_vslot14(int a);
-    virtual void fn_vslot15();
+    virtual void fn_vslot15(int a);
     virtual void fn_vslot16(int a);
     virtual void fn_vslot17();
     virtual void fn_vslot18();
@@ -472,7 +472,7 @@ struct UnkWidgetB : Unk800C7B40_Data {
     virtual void fn_vslot12();
     virtual void fn_vslot13();
     virtual void fn_vslot14(int a);
-    virtual void fn_vslot15();
+    virtual void fn_vslot15(int a);
     virtual void fn_vslot16(int a);
     virtual void fn_vslot17();
     virtual void fn_vslot18();
