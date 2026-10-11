@@ -270,10 +270,11 @@ int Unk8016ACAC::fn_8016AD7C(int idx) /* 8016AD7C */
     return m429C[idx];
 }
 
-int Unk8016ACAC::fn_8016ADC4() /* 8016ADC4 */
+/* extern "C" like its callers' declaration (tu_80021BE8.h); retail takes the manager in r3 */
+extern "C" int fn_8016ADC4(Unk8016ACAC* m) /* 8016ADC4 */
 {
     int r = 0;
-    Unk8016ACAC_Slot* s = m1E28;
+    Unk8016ACAC_Slot* s = m->m1E28;
     for (int i = 0; i <= 2; s++, i++) {
         int h = s->mA20;
         if (h == 0x710572A7 || h == 0x40121546 || h == 0x19A6161E || h == (int)0xE8B2B8BD) {

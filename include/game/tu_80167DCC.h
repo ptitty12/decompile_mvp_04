@@ -69,7 +69,6 @@ public:
     int fn_8016ACAC();
     int fn_8016AD44();
     int fn_8016AD7C(int idx);
-    int fn_8016ADC4();
     int fn_8016AE34();
     int fn_8016AE94();
     int fn_8016AEEC();
