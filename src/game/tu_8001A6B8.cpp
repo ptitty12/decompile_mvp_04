@@ -120,6 +120,11 @@ void fn_8001ADA0(int a)
     lbl_80624408(fn_80391C04(0x3, 0x0, 0x6087), 1, a);
 }
 
+/* near-miss (all 0-argument wrappers of this shape, K != 0): retail loads the
+ * tag arguments as `li r4,0; li r5,LINE; li r3,K` (r5 before r3); the compiler
+ * emits r3 before r5. The versions with arguments (mr moves first) match.
+ * Tried: argument/return types of fn_80391C04 and lbl_80624408, inline Tag(),
+ * unused parameters, a local for the tag. */
 void fn_8001ADF4(void)
 {
     lbl_80624408(fn_80391C04(0x4, 0x0, 0x8089), 0);
