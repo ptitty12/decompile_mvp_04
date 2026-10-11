@@ -125,12 +125,35 @@ float fn_80285534(Unk80283934_Goal* g)
     return r;
 }
 
-/* near-miss, about 65% (128 vs 126 instructions): the float arithmetic and the
- * branches are right, but the Vec3 temporaries differ. Retail copies the
- * player position (+0x60) with the y word going through a temp at 0x4c, zeroes
- * it, and subtracts into a second temp at 0x48; every helper shape tried
- * (inline flatten by value / reference / member-wise, subtraction operator
- * variants) gives another layout. 5 attempts. */
+inline Vec3 EntPos(const Unk80283934_Ent* e)
+{
+    return e->m10;
+}
+
+inline Vec3 Flat(Vec3 v)
+{
+    v.y = 0.0f;
+    return v;
+}
+
+inline Vec3 FlatPos(const Unk80270BA0_XBase* x)
+{
+    return Flat(x->m60);
+}
+
+inline float Dist2D(const Vec3& a, const Vec3& b)
+{
+    Vec3 d = a - b;
+    return fn_804028E4(d.x * d.x + d.z * d.z);
+}
+
+/* near-miss: 128 of 128 instructions, 48 differ, nearly all in stack offsets.
+ * The copy shapes now follow retail: EntPos/FlatPos getters (copies inside
+ * inlined bodies get direct sp stores) and Flat zeroing y on its by-value
+ * parameter, whose slot operator- reuses. Left: the frame is 0x88 (retail 0x78)
+ * and the temporaries sit in another order (retail: d 0x18, ep 0x28, pp 0x38,
+ * Flat/operator- 0x48, dist 0x10; here ep 0x18, pp 0x28, ...). Tried: Dist2D by
+ * value / reference, named ep/pp/d locals, an inner block, d declared first. */
 float fn_802855C4(Unk80283934_Goal* g)
 {
     if (g->m98 == 0.0f) {
@@ -140,11 +163,7 @@ float fn_802855C4(Unk80283934_Goal* g)
     float r = 0.0f;
     Unk80283934_Ent* e = g->m4;
     if (e->m28 && g->m7C == 1) {
-        Vec3 ep = e->m10;
-        Vec3 pp = ((Unk80270BA0_XBase*)fn_8027A90C(g))->m60;
-        pp.y = 0.0f;
-        Vec3 d = ep - pp;
-        float dist = fn_804028E4(d.x * d.x + d.z * d.z);
+        float dist = Dist2D(EntPos(e), FlatPos((Unk80270BA0_XBase*)fn_8027A90C(g)));
         dist -= 12.0f;
         if (!(dist <= 0.0f)) {
             float s = fn_802958F4(g->m4, (Unk80270BA0_X*)fn_8027A90C(g), 0, -1.0f);
@@ -160,21 +179,32 @@ float fn_802855C4(Unk80283934_Goal* g)
     return r;
 }
 
-/* near-miss, about 70% (122 vs 120 instructions). The same Vec3 copy problem as
- * fn_80286E70: retail copies g->m10 into its stack local with direct sp offsets
- * and takes the pointer to it only after the fn_80286E70 call; mine keeps a
- * callee-saved pointer (r30) to the local across the call. fn_8028F588 is
- * called with (ternary - u): mine distributes the subtraction into the arms.
- * Needed: `(float)fabs(t)` (see header) for the single-float compare. */
+inline Vec3 Pos0(const Unk80283934_Goal* g)
+{
+    return g->m10;
+}
+
+inline float Speed(const Unk80283934_Ent* e)
+{
+    return (e->m18C & 0x80000) ? e->m74 : -1.0f;
+}
+
+/* near-miss: 120 of 120 instructions, 11 differ. Pos0 (an inline getter) makes
+ * the g->m10 copy direct sp stores, as in retail (see fn_80286E70), and Speed
+ * keeps fold from distributing "- u" into the ternary arms. Left: t and u sit at
+ * 0x48/0x4C (retail 0x38, reusing operator-'s inline frame, and 0x48), the
+ * m9C compare operand order (retail loads o first but compares g, o), and two
+ * scratch registers. Needed: `(float)fabs(t)` (see header) for the compare. */
 int fn_802857C4(Unk80283934_Goal* g, const Unk80283934_Goal* o)
 {
     if (o) {
         if ((g->mE8 & 0x2000000) && (o->mE8 & 0x2000000)) {
-            return g->m78 == o->m78;
+            int om = o->m78;
+            return g->m78 == om;
         }
         if (g->m28 && o->m28 && ((g->mE8 >> 12) & 1) == ((o->mE8 >> 12) & 1)
-            && ((g->mE8 >> 13) & 1) == ((o->mE8 >> 13) & 1) && g->m9C == o->m9C) {
-            Vec3 pa = g->m10;
+            && ((g->mE8 >> 13) & 1) == ((o->mE8 >> 13) & 1) && o->m9C == g->m9C) {
+            Vec3 pa = Pos0(g);
             Vec3 pb = fn_80286E70(o);
             Vec3 d = pa - pb;
             if (!(d.x * d.x + d.y * d.y + d.z * d.z >= 144.0f)) {
@@ -182,7 +212,7 @@ int fn_802857C4(Unk80283934_Goal* g, const Unk80283934_Goal* o)
                 if (!((float)fabs(t) > 0.35f)) {
                     if (g->m4->m18C & 0x80000) {
                         float u = g->m84 - fn_80286F9C(o);
-                        fn_8028F588(((g->m4->m18C & 0x80000) ? g->m4->m74 : -1.0f) - u);
+                        fn_8028F588(Speed(g->m4) - u);
                     }
                     g->m84 = fn_80286F9C(o);
                     return 1;
@@ -239,19 +269,23 @@ void fn_802859A4(Unk80283934_Goal* g, const Unk80283934_Info* info)
     fn_8027DB38(g, &d, &lbl_806055AC);
 }
 
-/* near-miss (37 vs 36 instructions): operand copies. Retail copies g->m10 into
- * the by-value parameter temp with sp-relative stores (only the source goes
- * through a pointer), mine goes through a pointer for the destination as well.
- * About 40 operator/body shapes tried; none removes the extra pointer. */
+/* The sum goes through an inline (Pos): the by-value operator+ argument copy is
+ * then part of an inlined body, whose frame addresses fold to sp offsets (see
+ * PATTERNS, "Vec3 copy destination addressing"). */
+inline Vec3 Pos(const Unk80283934_Goal* g)
+{
+    return g->m10 + g->mD8;
+}
+
 Vec3 fn_80286E70(const Unk80283934_Goal* g)
 {
-    Vec3 v = g->m10 + g->mD8;
+    Vec3 v = Pos(g);
     return v;
 }
 
 Vec3 fn_80286F00(const Unk80283934_Goal* g)
 {
-    Vec3 v = g->m10 + g->mD8;
+    Vec3 v = Pos(g);
     v.y = 0.0f;
     return v;
 }
