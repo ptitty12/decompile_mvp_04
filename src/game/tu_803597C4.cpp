@@ -213,9 +213,10 @@ void fn_80359E30(char* self, int c)
         fn_80377408(self);
 }
 
-/* TODO fn_80359E94 */
+/* fn_80359E94: not matched. Lazy singleton of the 0x334-byte thread object (same crclr memset issue as fn_80359C58,
+   plus a dead lis/ori 0x19000); the original code stays linked */
 
-/* TODO fn_80359F30 */
+/* fn_80359F30: not matched. Factory for the same object (see fn_80359E94); the original code stays linked */
 
 int fn_80359FB0(int* o)
 {
