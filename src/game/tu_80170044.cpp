@@ -18,7 +18,9 @@ struct Unk80170488_T {
     void* m0;
     int m4;
 };
+
 extern Unk80170488_T lbl_8068B884;
+
 struct Unk801704C0_T {
     void* m0;
     char pad4[0x10];
@@ -26,6 +28,7 @@ struct Unk801704C0_T {
     char pad18[0x330 - 0x18];
     int m330;
 };
+
 extern Unk801704C0_T lbl_8068B8AC;
 
 int Unk8016FF40::fn_80170044(int x)
@@ -331,4 +334,320 @@ void Unk80170518::fn_80170A54(int a)
 int Unk80170518::fn_80170B3C()
 {
     return 0;
+}
+
+/* near-miss: retail keeps the stack buffer's address in r29 across both calls (46 instrs, an extra
+ * mr); a local char* alias and a struct-wrapped buffer were also tried (6 slots). */
+Unk80170B44::Unk80170B44()
+{
+    char buf[12];
+    fn_804089B4(buf, lbl_805CB084, 4);
+    fn_80402EF8(m584, buf);
+    fn_80170F2C(6, 1, 0);
+    fn_80170F2C(0, 0, 0);
+    fn_80170EC4((const unsigned short*)fn_80171280(0x11));
+    fn_80170EF8((const unsigned short*)fn_80171280(0x11));
+}
+
+Unk80170B44::~Unk80170B44() {}
+
+Unk80170B44* Unk80170B44::fn_80170C30(int idx)
+{
+    fn_80170FEC((const unsigned short*)fn_80171458(idx));
+    return this;
+}
+
+Unk80170B44* Unk80170B44::fn_80170C6C(int idx)
+{
+    fn_80170FEC((const unsigned short*)fn_801713D4(idx));
+    return this;
+}
+
+Unk80170B44* Unk80170B44::fn_80170CA8(int idx)
+{
+    fn_80170FEC((const unsigned short*)fn_801710D4(idx));
+    return this;
+}
+
+Unk80170B44* Unk80170B44::fn_80170CE4(int idx)
+{
+    fn_80170FEC((const unsigned short*)fn_801711E8(idx));
+    return this;
+}
+
+void Unk80170B44::fn_80170EC4(const unsigned short* s)
+{
+    if (s) {
+        fn_80403144(m3C2, s);
+    } else {
+        m3C2[0] = (unsigned short)(int)s;
+    }
+}
+
+void Unk80170B44::fn_80170EF8(const unsigned short* s)
+{
+    if (s) {
+        fn_80403144(m52A, s);
+    } else {
+        m52A[0] = (unsigned short)(int)s;
+    }
+}
+
+void Unk80170B44::fn_80170F2C(int a, int b, int c)
+{
+    if (a > 49999 && c != 0) {
+        fn_80403DE4(m41C, fn_80171280(0xF), 50000);
+    } else {
+        fn_80403DE4(m41C, fn_80171280(0xE), a);
+    }
+    if (b > 0) {
+        fn_80403DE4(m476, fn_80171280(0xD), b);
+    }
+}
+
+int Unk80170B44::fn_801710D4(int idx)
+{
+    int id;
+    switch (idx) {
+    case 2: id = 0x6A3; break;
+    case 10: id = 0x68F; break;
+    case 8: id = 0x691; break;
+    case 9: id = 0x692; break;
+    case 19: id = 0x693; break;
+    case 7: id = 0x698; break;
+    case 16: id = 0x6A1; break;
+    case 15: id = 0x69A; break;
+    case 12: id = 0x69D; break;
+    case 11: id = 0x686; break;
+    case 13: id = 0x695; break;
+    case 17: id = 0x688; break;
+    case 18: id = 0x6A7; break;
+    case 20: id = 0x6A8; break;
+    default: id = 0x63F; break;
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+int Unk80170B44::fn_801711E8(int idx)
+{
+    int id;
+    switch (idx) {
+    case 5: id = 0x655; break;
+    case 6:
+    case 7: id = 0x657; break;
+    case 10: id = 0x658; break;
+    case 11: id = 0x695; break;
+    case 12: id = 0x65B; break;
+    case 13: id = 0x64F; break;
+    default: id = 0x63F; break;
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+int Unk80170B44::fn_80171280(int idx)
+{
+    int id;
+    switch (idx) {
+    case 13: id = 0x62F; break;
+    case 0: id = 0x5FA; break;
+    case 2: id = 0x5FB; break;
+    case 16: id = 0x641; break;
+    case 12: id = 0x604; break;
+    default: id = 0x63F; break;
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+int Unk80170B44::fn_80171308(int a, int b)
+{
+    int id;
+    if (b != 0) {
+        switch (a) {
+        case 0: id = 0x605; break;
+        case 1: id = 0x606; break;
+        case 2: id = 0x607; break;
+        case 4: id = 0x608; break;
+        default: id = 0x63F; break;
+        }
+    } else {
+        switch (a) {
+        case 0: id = 0x619; break;
+        case 1: id = 0x618; break;
+        case 2: id = 0x61A; break;
+        case 4: id = 0x61B; break;
+        default: id = 0x63F; break;
+        }
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+int Unk80170B44::fn_801713D4(int idx)
+{
+    int id;
+    switch (idx) {
+    case 0: id = 0x636; break;
+    case 1: id = 0x636; break;
+    case 4: id = 0x636; break;
+    case 3: id = 0x63A; break;
+    case 2: id = 0x639; break;
+    case 5: id = 0x63B; break;
+    default: id = 0x63F; break;
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+int Unk80170B44::fn_80171458(int idx)
+{
+    int id;
+    switch (idx) {
+    case 3: id = 0x65C; break;
+    case 4: id = 0x65A; break;
+    case 2: id = 0x64C; break;
+    case 7: id = 0x64D; break;
+    case 8: id = 0x64E; break;
+    default: id = 0x63F; break;
+    }
+    return fn_80090880(lbl_8061977C, id);
+}
+
+Unk801714E0::Unk801714E0()
+{
+    m0 = 0;
+    m4 = 0;
+    fn_801716E4(this);
+}
+
+Unk801714E0::~Unk801714E0()
+{
+    fn_8017171C(this);
+    if (m4) {
+        delete m4;
+        m4 = 0;
+    }
+}
+
+void Unk801714E0::fn_8017158C(const unsigned short* s)
+{
+    int n = fn_80403060(s);
+    if (m4) {
+        delete m4;
+        m4 = 0;
+    }
+    m4 = new (0x100) unsigned short[n + 1];
+    fn_80403144(m4, s);
+}
+
+void fn_801715F8()
+{
+    while (lbl_8061C66C) {
+        delete lbl_8061C66C;
+    }
+}
+
+Unk801714E0* fn_8017165C(unsigned int i)
+{
+    if (i < fn_801716BC()) {
+        Unk801714E0* n = lbl_8061C66C;
+        for (unsigned int j = 0; j < i; j++) {
+            n = n->m0;
+        }
+        return n;
+    }
+    return 0;
+}
+
+unsigned int fn_801716BC()
+{
+    unsigned int n = 0;
+    for (Unk801714E0* p = lbl_8061C66C; p != 0; p = p->m0) {
+        n++;
+    }
+    return n;
+}
+
+void fn_801716E4(Unk801714E0* p)
+{
+    if (lbl_8061C66C == 0) {
+        lbl_8061C66C = p;
+        return;
+    }
+    Unk801714E0* q = lbl_8061C66C;
+    while (q->m0 != 0) {
+        q = q->m0;
+    }
+    q->m0 = p;
+}
+
+/* near-miss: the original loop never advances (an unlinked node hangs it); retail re-tests h with a
+ * second cmpwi instead of reusing the loop-entry compare (16 vs 17 instrs). */
+void fn_8017171C(Unk801714E0* p)
+{
+    Unk801714E0* h = lbl_8061C66C;
+    if (p == h) {
+        lbl_8061C66C = h->m0;
+        return;
+    }
+    while (h != 0) {
+        if (h->m0 == p) {
+            h->m0 = p->m0;
+        }
+    }
+}
+
+Unk80171760::Unk80171760()
+{
+    m0 = 9;
+    m4 = 0;
+    m8 = 0;
+    mC = 0;
+    m10 = 0;
+}
+
+Unk80171760::~Unk80171760()
+{
+    fn_801717DC();
+}
+
+void Unk80171760::fn_801717DC()
+{
+    if (mC) {
+        delete mC;
+        mC = 0;
+    }
+}
+
+void Unk80171760::fn_801718A8(int a)
+{
+    if (m10 != 0) {
+        fn_801715F8();
+    }
+    m10 = a;
+}
+
+int Unk80171760::fn_801718E8()
+{
+    if (m10 != 0) {
+        return fn_801716BC();
+    }
+    return 0;
+}
+
+void Unk80171760::fn_8017191C(unsigned int i)
+{
+    fn_8017165C(i);
+}
+
+Unk80171940::Unk80171940()
+{
+    m0 = new (0x100) Unk80170B44;
+    m4 = 0;
+}
+
+Unk80171940::~Unk80171940()
+{
+    fn_80171FE8(this);
+    if (m0) {
+        delete m0;
+        m0 = 0;
+    }
 }

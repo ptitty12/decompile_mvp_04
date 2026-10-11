@@ -130,4 +130,94 @@ void fn_80403144(unsigned short* dst, const unsigned short* src);
 int fn_80403060(const unsigned short* s);
 }
 
+/*
+ * Dialog text object (ctor 0x80170B44, vptr at +0x5E0): six 0x5A-byte wide-string slots at
+ * +0x3C2, +0x41C, +0x476, +0x4D0, +0x52A and +0x584; the string-table lookups (ids of the
+ * localized text table behind lbl_8061977C) ignore `this`.
+ */
+class Unk80170B44 {
+public:
+    Unk80170B44();
+    virtual ~Unk80170B44();
+    Unk80170B44* fn_80170C30(int idx);
+    Unk80170B44* fn_80170C6C(int idx);
+    Unk80170B44* fn_80170CA8(int idx);
+    Unk80170B44* fn_80170CE4(int idx);
+    void fn_80170EC4(const unsigned short* s);
+    void fn_80170EF8(const unsigned short* s);
+    void fn_80170F2C(int a, int b, int c);
+    void fn_80170FEC(const unsigned short* s);
+    int fn_801710D4(int idx);
+    int fn_801711E8(int idx);
+    int fn_80171280(int idx);
+    int fn_80171308(int a, int b);
+    int fn_801713D4(int idx);
+    int fn_80171458(int idx);
+    char pad0[0x3C2];
+    unsigned short m3C2[45];
+    unsigned short m41C[45];
+    unsigned short m476[45];
+    unsigned short m4D0[45];
+    unsigned short m52A[45];
+    unsigned short m584[45];
+};
+
+extern "C" {
+int fn_804089B4(char* dst, const char* fmt, ...);               /* behaves like sprintf */
+void fn_80402EF8(void* dst, const char* src);
+int fn_80403DE4(unsigned short* dst, int fmt, ...);
+}
+extern const char lbl_805CB084[];
+
+void* operator new[](unsigned int size, int heap);            /* 0x803774A8 */
+
+/*
+ * Text node of a global singly linked list (head lbl_8061C66C): next at +0, wide text
+ * (allocated with new[]) at +4, vptr at +0xC. The constructor appends the node; the
+ * destructor unlinks it.
+ */
+class Unk801714E0 {
+public:
+    Unk801714E0();
+    virtual ~Unk801714E0();
+    void fn_8017158C(const unsigned short* s);
+    Unk801714E0* m0;
+    unsigned short* m4;
+    int m8;
+};
+extern Unk801714E0* lbl_8061C66C;
+void fn_801715F8();
+Unk801714E0* fn_8017165C(unsigned int i);
+unsigned int fn_801716BC();
+void fn_801716E4(Unk801714E0* p);
+void fn_8017171C(Unk801714E0* p);
+
+void* operator new(unsigned int size, int heap);              /* 0x80377428 */
+
+/* Popup handle (ctor 0x80171760, vptr at +0x14): text at +0xC (new[]), list-owner flag at +0x10. */
+class Unk80171760 {
+public:
+    Unk80171760();
+    virtual ~Unk80171760();
+    void fn_801717DC();
+    void fn_801718A8(int a);
+    int fn_801718E8();
+    void fn_8017191C(unsigned int i);
+    int m0;
+    int m4;
+    int m8;
+    unsigned short* mC;
+    int m10;
+};
+
+/* Holder of a dialog (Unk80170B44) created with new (heap 0x100); vptr at +8. */
+class Unk80171940 {
+public:
+    Unk80171940();
+    virtual ~Unk80171940();
+    Unk80170B44* m0;
+    int m4;
+};
+void fn_80171FE8(void* p);
+
 #endif
