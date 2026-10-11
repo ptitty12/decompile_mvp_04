@@ -155,7 +155,26 @@ struct Unk8052DD58_Set {
 /* 0x2C-byte element of the first record table (fn_8052CA60): two 12-byte strings at
  * +0xE and +0x1A (fn_8052CEB4 reads them, fn_8052D430 writes them). */
 struct Unk8052CA60_Rec {
-    char pad0[0xE];
+    unsigned p0 : 8;
+    unsigned f0 : 16;
+    unsigned f1 : 6;
+    unsigned p1 : 2;
+    unsigned f2 : 8;
+    unsigned f3 : 7;
+    unsigned f4 : 10;
+    unsigned f5 : 4;
+    unsigned f6 : 3;
+    unsigned f7 : 4;
+    unsigned f8 : 1;
+    unsigned f9 : 1;
+    unsigned f10 : 1;
+    unsigned f11 : 8;
+    unsigned f12 : 3;
+    unsigned f13 : 7;
+    unsigned f14 : 7;
+    unsigned f15 : 7;
+    unsigned f16 : 7;
+    unsigned p2 : 2;
     char m0E[0xC];
     char m1A[0xC];
     char pad26[6];
@@ -163,7 +182,28 @@ struct Unk8052CA60_Rec {
 
 /* Same for the second table (unit 0x8052FF10): strings at +0xF and +0x1B. */
 struct Unk8052FF10_Rec {
-    char pad0[0xF];
+    unsigned p0 : 8;
+    unsigned f0 : 16;
+    unsigned f1 : 1;
+    unsigned f2 : 6;
+    unsigned p1 : 1;
+    unsigned f3 : 8;
+    unsigned f4 : 7;
+    unsigned f5 : 10;
+    unsigned f6 : 4;
+    unsigned f7 : 3;
+    unsigned f8 : 4;
+    unsigned f9 : 1;
+    unsigned f10 : 1;
+    unsigned f11 : 8;
+    unsigned f12 : 3;
+    unsigned f13 : 7;
+    unsigned f14 : 7;
+    unsigned p2 : 1;
+    unsigned f15 : 7;
+    unsigned f16 : 7;
+    unsigned f17 : 7;
+    unsigned p3 : 3;
     char m0F[0xC];
     char m1B[0xC];
     char pad27[5];
