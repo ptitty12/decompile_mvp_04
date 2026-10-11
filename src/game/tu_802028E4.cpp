@@ -6,9 +6,39 @@
 #include "game/tu_802028E4.h"
 
 typedef Unk802028E4_Obj Obj;
+typedef Unk801EE438_Scr Scr;
 
 extern "C" {
 void fn_80205A5C(Obj* o);
+}
+
+inline void SetAt(int* b, int i, int v)
+{
+    int* q = b + i;
+    *q = v;
+}
+
+extern "C" void fn_80204610(Scr* p, int a1, int a2, int a3)
+{
+    int x;
+    if (((Unk801EE438_Sel*)p->m9C->m3A64)->m794 > 0)
+        x = fn_801E82CC((Unk801EE438_Sel*)p->m9C->m3A64, 0);
+    else
+        x = -1;
+    int y;
+    if (((Unk801EE438_Sel*)p->m9C->m3A64)->m798 > 0)
+        y = fn_801E816C((Unk801EE438_Sel*)p->m9C->m3A64, 0);
+    else
+        y = -1;
+    if (p->m9C->mA4 != a1 && x != a1 && y != a1) {
+        fn_80205450(p->m9C, a1);
+        fn_801EE6F4(p, a1);
+        fn_801F0EA8(p, a1);
+        fn_802123D4(p, 1, 1);
+        fn_80211BA0(&p->m9C->mC0, a2);
+        SetAt(&p->m9C->mD4.m0, a2, a3);
+        fn_80213988(p, a2, 1);
+    }
 }
 
 extern "C" void fn_80204AAC(Unk802028E4_Pair* o)
