@@ -228,6 +228,27 @@ void fn_80102B7C(UiV_134_138* self, int a)
     p->v8(1);
 }
 
+extern char lbl_805BE138[];
+extern char lbl_805B955C[];
+void fn_80102E70(UiObj* self, int a)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    switch (a) {
+    case 0:
+        fn_8040B830(p->name, lbl_805BE138, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+        return;
+    case 1:
+        fn_8040B830(p->name, lbl_805B955C, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+        return;
+    }
+}
+
 extern char lbl_8065C238[];
 UiScrRaw* fn_80102F5C(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -319,8 +340,7 @@ void fn_80103DAC(Ui8010B1E0* a, int b, UiObj* c, int d)
 {
     int t = fn_8025416C((char*)a + 0x588, 5);
     if (fn_80097288(b, a->m704) == 0 && t != 0 && t != 10) {
-        c->v32(d, 1);
-        fn_800C8040()->v30(fn_800E5F38(t));
+        fn_800C8040(c->v32(d, 1))->v30(fn_800E5F38(t));
         return;
     }
     fn_8011A1D4(a, b, c, d);
