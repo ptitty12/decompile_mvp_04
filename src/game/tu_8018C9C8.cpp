@@ -267,7 +267,7 @@ extern "C" void fn_8018EB14(Unk80188698* o)
         Unk8014D8AC_Ctx* c = (Unk8014D8AC_Ctx*)o->m44C;
         Unk80273498_Pos** p = c->m65C;
         Unk80183918_Vec3 v = fn_80189618(o, 0.0f);
-        int flag = fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8) < 211.2f;
+        int flag = fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8) < 211.20001f;
         fn_8018F684(o, (Unk80188698*)p[9], &slot, K, flag);
         fn_8018F684(o, (Unk80188698*)p[12], &slot, K, flag);
         if (c->m6F4 == 0) {
