@@ -152,6 +152,7 @@ void* fn_800DE160(int x)
     return fn_80090880(lbl_8061977C, id);
 }
 
+/* near-miss: 2 slots, `mr r3,r27` / `mr r7,r30` argument move order */
 char* fn_800DE1C4(char* dst, int x)
 {
     int a = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(8, x);
