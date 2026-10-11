@@ -140,18 +140,31 @@ struct Unk8052DD20_Tri {
  * 4-byte members cleared with bzero; the vptr is at +0x14, vtable lbl_80682810).
  * Unk8052DD58_Set: count at +0, 32 entries from +4 (fn_8052DE9C builds them).
  */
-struct Unk8052DD58_Ent {
+struct Unk8052DD58_Bits {
+    unsigned p : 2;
+    unsigned a : 6;
+    unsigned e : 6;
+    unsigned f : 6;
+    unsigned g : 6;
+    unsigned h : 6;
+};
+struct Unk8052DD58_EntData {
     int m0;
     int m4;
     int m8;
-    int mC;
-    int m10;
-    const void* m14;
+    Unk8052DD58_Bits mC;
+    unsigned short m10;
+    unsigned short m12;
+};
+struct Unk8052DD58_Ent : Unk8052DD58_EntData {
+    virtual void v08();
+    virtual void v10(int a, Unk80070DDC_Stream* io);
 };
 struct Unk8052DD58_Set {
     int m0;
     Unk8052DD58_Ent m4[32];
 };
+/* Entry as seen by fn_8052E10C and friends (m12 is the halfword at +0x12). */
 /* 0x2C-byte element of the first record table (fn_8052CA60): two 12-byte strings at
  * +0xE and +0x1A (fn_8052CEB4 reads them, fn_8052D430 writes them). */
 struct Unk8052CA60_Rec {
@@ -321,7 +334,7 @@ struct Unk805325F8_T20 {
 };
 struct Unk80532A18_T4 {
     char pad0[8];
-    float m8[7][3][2][2];
+    float m8[8][3][2][2];
 };
 /* 16-byte records at +8 (fn_80532D68 sets one, fn_80532DA0 reads the float, fn_80532E34 clears 15). */
 struct Unk80532D68_Rec {
@@ -360,6 +373,107 @@ struct Unk80533B74_T {
 struct Unk80533E14_T {
     char pad0[8];
     float m8[14][14];
+};
+
+/* Unit 0x80534078: tables with a pick loop returning (base - index). */
+struct Unk80534078_T {
+    char pad0[8];
+    float m8[5][16];
+};
+struct Unk80534304_T {
+    char pad0[8];
+    float m8[13];
+};
+struct Unk80534530_Base {
+    int m0;
+};
+struct Unk80534530_Obj : Unk80534530_Base {
+    virtual int v08();
+    virtual void v10(int a);
+};
+/* [k][b][f]: fn_80534598.. set field f, 0x78 bytes per k, 0x18 per b. */
+struct Unk80534598_T {
+    char pad0[8];
+    int m8[45][5][6];
+};
+struct Unk80534BAC_T {
+    char pad0[8];
+    float m8[28][5];
+};
+
+#include "game/tu_8007A4DC.h"
+/* Growable int list (data pointer, used count, capacity, ... , done flag at +0x14). */
+struct Unk805352B0_List {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    int m10;
+    int m14;
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void Set(unsigned i, int v)
+    {
+        if (i >= m4)
+            m4 = i + 1;
+        m0[i] = v;
+    }
+    void RemoveAt(unsigned i)
+    {
+        if (i < m4) {
+            unsigned j;
+            for (j = i; j < m4; j++)
+                m0[j] = m0[j + 1];
+            m4--;
+        }
+    }
+    void Push(int v)
+    {
+        if (m4 < m8) {
+            m0[m4] = v;
+            m4++;
+        }
+    }
+};
+
+/* Name pools: strings of 11 bytes from +0 (fn_80534F64 picks one by index) and of 14 bytes from
+ * +0x55F0; the pick count is at +0xE290 and a per-entry flag table at +0xC350 (fn_80534EA0). */
+struct Unk80534EA0_T {
+    char m0[0x55F0];
+    char m55F0[0x6D60];
+    int mC350[0x340 / 4];
+    char padC690[0xE290 - 0xC350 - 0x340];
+    unsigned mE290;
+};
+
+struct Unk80538DD8_G {
+    char pad0[0x5C];
+    void* m5C;
+};
+
+/* View of the screen singleton for fn_80536990, whose caller converts the result of
+ * Unk8007A4DC_Screen::fn_8007A768 with fctiwz (the real return type is float; the game
+ * header declares int). */
+struct Unk80536990_Screen : Unk8007A4DC_Screen {
+    float fn_8007A768(int a, int b);
+};
+
+/* Four string pointers copied to the stack by fn_80532E78 (from lbl_805FEA90). */
+struct Unk80532E78_Names {
+    const char* w[4];
+};
+
+/* Fourteen name pointers copied to the stack by fn_80533E58 (from lbl_805FE998). */
+struct Unk80533E58_Names {
+    const char* w[14];
+};
+
+/* Same for Unk8007B2B0_Screen::fn_8007BB28, whose result fn_80537D24 stores as a float. */
+struct Unk80537D24_Screen : Unk8007B2B0_Screen {
+    float fn_8007BB28(int a, int b, int c);
 };
 
 /* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */

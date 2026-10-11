@@ -14,6 +14,8 @@ extern char lbl_805FE1D4[];
 extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
 extern "C" void fn_8052DD58(Unk8052DD58_Ent* e);
+extern "C" void fn_8052DFDC(Unk8052DD58_Set* self, unsigned i);
+extern "C" void fn_8052E10C(Unk8052DD58_Ent* self, char a, int b, int c, int d, int e, int f, int g, char h, int i);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern "C" int fn_8040B6A0(const char* s);
 extern "C" char* fn_8040B830(char* dst, const char* src, int n);
@@ -437,6 +439,75 @@ extern "C" DB_OVERLAY void fn_8052DE9C(Unk8052DD58_Set* self)
         i++;
         p++;
     } while (i <= 31);
+}
+
+/* near-miss: 2-slot swap (li/addi order at the loop entry). */
+extern "C" DB_OVERLAY int fn_8052DEE8(Unk8052DD58_Set* self, Unk8052DD58_Ent* src)
+{
+    int ret = -1;
+    if (self->m0 == 32) {
+        unsigned best = 0;
+        unsigned bv = (unsigned)-1;
+        unsigned i;
+        Unk8052DD58_Ent* q = self->m4;
+        for (i = 0; i < self->m0; i++, q++) {
+            unsigned v = q->m12;
+            if (v != 0 && v < bv) {
+                bv = v;
+                best = i;
+            }
+        }
+        fn_8052DFDC(self, best);
+    }
+    if ((unsigned)self->m0 <= 31) {
+        ret = self->m0;
+        self->m4[self->m0] = *src;
+        self->m0++;
+    }
+    return ret;
+}
+
+/* near-miss: loop and copy match; retail addresses the source entry as base+28 with negative
+ * displacements, ours folds the base to the destination. */
+extern "C" DB_OVERLAY void fn_8052DFDC(Unk8052DD58_Set* self, unsigned i)
+{
+    unsigned last = self->m0 - 1;
+    if (i < last) {
+        Unk8052DD58_Ent* s = &self->m4[i + 1];
+        for (; i < last; i++) {
+            s[-1] = s[0];
+            s++;
+        }
+    }
+    fn_8052DD58(&self->m4[i]);
+    self->m0--;
+}
+
+extern "C" DB_OVERLAY void fn_8052E07C(Unk8052DD58_Set* self, int a, Unk80070DDC_Stream* io)
+{
+    io->v08(a, self, 4);
+    unsigned i = 0;
+    do {
+        self->m4[i].v10(a, io);
+        i++;
+    } while (i <= 31);
+}
+
+/* near-miss: ours builds a frame (r30) for the ninth argument; retail stays in caller-saved registers
+ * (statement order searched with a hill climb, best 22 slots). */
+extern "C" DB_OVERLAY void fn_8052E10C(Unk8052DD58_Ent* self, char a, int b, int c, int d, int e, int f, int g, char h, int i)
+{
+    self->mC.a = a;
+    self->m0 = b;
+    self->mC.h = h;
+    self->mC.e = e;
+    self->mC.f = f;
+    self->mC.g = g;
+    self->m4 = c;
+    self->m8 = d;
+    self->mC.p = 0;
+    self->m10 = i;
+    self->m12 = 0;
 }
 
 extern "C" DB_OVERLAY Unk8052E408_Obj* fn_8052E408(Unk8052E408_Obj* self)
