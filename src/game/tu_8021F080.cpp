@@ -17,6 +17,7 @@ void fn_801F0174(Task* t, int a, int b);
 
 extern "C" {
 
+extern Vec3f lbl_805D6244;
 void fn_8021FFD4(Task* t, int, RecQueue* q)
 {
     Rec* e = &q->e[0];
@@ -35,9 +36,9 @@ void fn_8021FFD4(Task* t, int, RecQueue* q)
         return;
     }
     e->mA4 = 1;
-    e->mAC = 0;
-    e->m80 = 0.0f;
+    e->m80 = lbl_805D6244.x;
     e->m9C = 0;
+    e->mAC = 0;
 }
 
 int fn_80221974(Task* t)
