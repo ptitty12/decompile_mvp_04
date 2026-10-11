@@ -15,7 +15,9 @@ void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 
 void fn_80071604(void* self);
 void fn_80071688(void* self, int flags);
-void fn_80071E2C(void* self);
+/* fn_80071E2C is the base-class version of these functions: it takes the same
+ * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
+void fn_80071E2C(void* self, int a, void* obj);
 void* fn_8007366C(const char* a, const char* b);
 void fn_8040074C(void* p, int n);
 extern char lbl_805B3B4C[];
@@ -393,10 +395,9 @@ float fn_8008598C(G* self, int a)
     return r;
 }
 
-/* near-miss: same code; retail keeps self, obj and a in r29, r30, r28. */
 void fn_800859E0(K30* self, int a, VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80084910_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0x30);
 }
@@ -463,10 +464,9 @@ void fn_80085B90()
 {
 }
 
-/* near-miss: same register-assignment difference as fn_800859E0. */
 void fn_80085B94(K8* self, int a, VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk80084910_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 8);
 }
