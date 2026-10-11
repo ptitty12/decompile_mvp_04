@@ -7,6 +7,25 @@
 typedef Unk801D31D8 B;
 
 extern float lbl_805D2C40;
+extern const float lbl_805D2CD8;
+extern const float lbl_805D2CDC;
+extern const float lbl_805D2CE8;
+extern float lbl_805D2CEC;
+extern float lbl_805D2CF0;
+extern float lbl_8061CBDC;
+extern const float lbl_805D2CF4;
+extern float lbl_805D2CF8;
+extern float lbl_805D2D08;
+extern float lbl_805D2D0C;
+extern const char lbl_805D25E0[];
+extern float lbl_805D29D8;
+extern const float lbl_805D29DC;
+extern float lbl_805D29E8;
+extern float lbl_805D29EC;
+extern float lbl_805D2BFC;
+extern float lbl_805D2C00;
+extern float lbl_805D2C10;
+extern float lbl_805D2C14;
 extern float lbl_805D2CC0;
 extern const float lbl_805D2CC4;
 extern float lbl_805D2CC8;
@@ -35,6 +54,42 @@ int fn_8018AD20(Unk801D31D8_Obj* o);
 float fn_8022E7F0(int a, int b);
 float fn_801CF8CC(void* p, float f);
 float fn_801CF740(void* p);
+}
+
+extern "C" void fn_801D34E4(B* s)
+{
+    float lo = lbl_805D29D8;
+    float t;
+    float hi;
+    volatile int pad;
+    float x = lbl_805D29DC;
+    const char* file = lbl_805D25E0;
+    unsigned r = s->m30->m554->fn_8014D8AC(1000000, file, 0x552);
+    hi = lbl_805D29DC;
+    t = (float)r * x * lbl_805D29E8;
+    s->m44.m10 = lbl_805D29EC;
+    s->m44.mC = t * (hi - lo) + lo;
+}
+
+extern "C" void fn_801D5650(B* s)
+{
+    float a;
+    float b;
+    float lo;
+    float t;
+    float hi;
+    volatile int pad;
+    float x;
+    s->m44.m8 = 1;
+    a = fn_801CF8CC(s->m2C, s->m44.mC);
+    b = fn_801CF740(s->m2C);
+    lo = lbl_805D2BFC;
+    x = lbl_805D2C00;
+    const char* file = lbl_805D25E0;
+    unsigned r = s->m30->m554->fn_8014D8AC(1000000, file, 0x824);
+    t = (float)r * x * lbl_805D2C10;
+    hi = lbl_805D2C14;
+    s->m44.m4 = b * (t * (hi - lo) + lo) + a;
 }
 
 struct Unk801D31D8_Q {
@@ -185,6 +240,62 @@ extern "C" void fn_801D64A0(B* s, int flag)
     else
         c = lbl_805D2CD4;
     s->m44.m4 = a * c + b;
+}
+
+/* near-miss: second lerp's load order after the 2nd RNG call differs (hi2/x2 reload order, ~8 slots) */
+extern "C" void fn_801D6538(B* s)
+{
+    float lo;
+    float t;
+    float hi;
+    volatile int pad1;
+    float x;
+    volatile int pad2;
+    float a;
+    float b;
+    float x2;
+    s->m44.m0 = 1;
+    s->m44.m8 = 1;
+    lo = lbl_8061CBDC - lbl_805D2CD8;
+    x = lbl_805D2CDC;
+    const char* file = lbl_805D25E0;
+    unsigned r = s->m30->m554->fn_8014D8AC(1000000, file, 0xA1F);
+    hi = lbl_8061CBDC + lbl_805D2CD8;
+    t = (float)r * x * lbl_805D2CE8;
+    s->m44.mC = lbl_805D2CDC;
+    s->m44.m10 = t * (hi - lo) + lo;
+    a = fn_801CF740(s->m2C);
+    b = fn_801CF8CC(s->m2C, s->m44.mC);
+    lo = lbl_805D2CEC;
+    x2 = lbl_805D2CDC;
+    unsigned r2 = s->m30->m554->fn_8014D8AC(1000000, file, 0xA24);
+    hi = lbl_805D2CF0;
+    t = (float)r2 * x2 * lbl_805D2CE8;
+    s->m44.m4 = a * (t * (hi - lo) + lo) + b;
+}
+
+extern "C" void fn_801D66C8(B* s)
+{
+    float a;
+    float b;
+    float lo;
+    float t;
+    float hi;
+    volatile int pad;
+    float x;
+    s->m44.m10 = lbl_805D2CF4;
+    s->m44.mC = lbl_805D2CF4;
+    s->m44.m0 = 1;
+    s->m44.m8 = 0;
+    a = fn_801CF740(s->m2C);
+    b = fn_801CF8CC(s->m2C, s->m44.mC);
+    lo = lbl_805D2CF8;
+    x = lbl_805D2CF4;
+    const char* file = lbl_805D25E0;
+    unsigned r = s->m30->m554->fn_8014D8AC(1000000, file, 0xA31);
+    t = (float)r * x * lbl_805D2D08;
+    hi = lbl_805D2D0C;
+    s->m44.m4 = a * (t * (hi - lo) + lo) + b;
 }
 
 extern "C" void fn_801D67CC(B* s)

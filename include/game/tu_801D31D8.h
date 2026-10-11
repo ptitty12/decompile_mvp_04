@@ -6,6 +6,8 @@
 #ifndef GAME_TU_801D31D8_H
 #define GAME_TU_801D31D8_H
 
+#include "game/chooser.h"
+
 /* Block at Unk801D31D8::m44 reset by fn_801D5C1C and its clones (float value varies). */
 struct Unk801D31D8_Blk {
     int m0;
@@ -51,7 +53,7 @@ struct Unk801D31D8_Game {
     char pad0[0x4C];
     unsigned m4C;
     char pad50[0x554 - 0x50];
-    void* m554;
+    Unk8014D8AC* m554;
     char pad558[0x6CC - 0x558];
     Unk801D31D8_Obj* m6CC;
     char pad6D0[0x6F4 - 0x6D0];
