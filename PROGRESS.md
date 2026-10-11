@@ -28,3 +28,4 @@
   - original-asm SDK functions policy;
   - push + create unit issues;
   - review the Phase 1 pipeline choices.
+- 2026-10-10 | W5 (Claude Sonnet 5.5) | ealibs/tu_803D9FE8.cpp (#91), ealibs/tu_803D7ED4.cpp (#88/#89 range) | matched 20 (5/6 and 15/16), parked 2 (fn_803DA038 mr r11 near-miss after 6 variants; fn_803D8094 not attempted) | none | EA lib flags -Os -G0 provisional
