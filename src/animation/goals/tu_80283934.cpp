@@ -141,19 +141,16 @@ inline Vec3 FlatPos(const Unk80270BA0_XBase* x)
     return Flat(x->m60);
 }
 
-inline float Dist2D(const Vec3& a, const Vec3& b)
+/* The xz distance is one inline taking the goal: its local d is allocated
+ * before the inlined getters' frames (d 0x18, EntPos 0x28, FlatPos 0x38,
+ * Flat/operator- 0x48), as in retail; copies inside inlined bodies give
+ * direct sp stores. */
+inline float GoalDist2D(Unk80283934_Goal* g)
 {
-    Vec3 d = a - b;
+    Vec3 d = EntPos(g->m4) - FlatPos((Unk80270BA0_XBase*)fn_8027A90C(g));
     return fn_804028E4(d.x * d.x + d.z * d.z);
 }
 
-/* near-miss: 128 of 128 instructions, 48 differ, nearly all in stack offsets.
- * The copy shapes now follow retail: EntPos/FlatPos getters (copies inside
- * inlined bodies get direct sp stores) and Flat zeroing y on its by-value
- * parameter, whose slot operator- reuses. Left: the frame is 0x88 (retail 0x78)
- * and the temporaries sit in another order (retail: d 0x18, ep 0x28, pp 0x38,
- * Flat/operator- 0x48, dist 0x10; here ep 0x18, pp 0x28, ...). Tried: Dist2D by
- * value / reference, named ep/pp/d locals, an inner block, d declared first. */
 float fn_802855C4(Unk80283934_Goal* g)
 {
     if (g->m98 == 0.0f) {
@@ -163,7 +160,7 @@ float fn_802855C4(Unk80283934_Goal* g)
     float r = 0.0f;
     Unk80283934_Ent* e = g->m4;
     if (e->m28 && g->m7C == 1) {
-        float dist = Dist2D(EntPos(e), FlatPos((Unk80270BA0_XBase*)fn_8027A90C(g)));
+        float dist = GoalDist2D(g);
         dist -= 12.0f;
         if (!(dist <= 0.0f)) {
             float s = fn_802958F4(g->m4, (Unk80270BA0_X*)fn_8027A90C(g), 0, -1.0f);
