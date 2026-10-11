@@ -15,8 +15,8 @@
 struct Unk803BA44C_Obj {
     void* m0;
 };
-int fn_803BA44C(void* list, int* count);
-int fn_803BA378(void* list);
+extern "C" int fn_803BA44C(void* list, int* count);
+extern "C" int fn_803BA378(void* list);
 
 /* Ring / array containers (fn_80353244 .. fn_80353F58 and the clones at
  * 0x80354xxx, 0x80355xxx, five instantiations of the same template): m0 is the
@@ -43,7 +43,7 @@ struct Unk80353ECC : Unk80353E68 {
     virtual void v10();
 };
 
-void fn_80377408(void* p);
-void fn_80377488(void* p);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80377488(void* p);
 
 #endif
