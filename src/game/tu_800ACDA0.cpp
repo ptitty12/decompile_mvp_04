@@ -89,7 +89,22 @@ void fn_8033E600(void* p, int c);
 void fn_80377408(void* p);
 }
 
+extern const float lbl_805B966C;
+extern const char lbl_805B962C[];
+struct FEG554 {
+    char pad0[0x554];
+    int m554;
+};
+struct FEGrid {
+    char pad0[0xA84];
+    FEG554* mA84;
+};
+extern "C" void* fn_8014D8AC(int a, int b, const char* s, int c);
+
 /* ---- generated externs ---- */
+
+
+
 
 
 
@@ -106,6 +121,7 @@ void fn_800ACFE8();
 void fn_800AD17C(char* self, int c);
 void fn_800AD6FC(char* self);
 void fn_800AD774(UnkAtAA4* p);
+void fn_800AD78C(void* p);
 void fn_800AD948(char* self, int key, float v);
 void fn_800ADAD8(char* self);
 UnkFEPair fn_800ADB34(char* base, int a, int b);
@@ -178,10 +194,20 @@ extern "C" void fn_800AD17C(char* self, int c)
 /* near-miss (retail reloads the count before the inner loop pre-test and keeps self in r31; ours reuses r0 and swaps r30/r31): 4 loop forms tried */
 extern "C" void fn_800AD6FC(char* self)
 {
-    for (int i = 0; i < *(int*)(self + 0xAA4); i++) {
-        for (int j = 0; j < *(int*)(self + 0xAA4); j++) {
-            fn_800AD58C(self, i, j);
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
         }
+        int j = 0;
+        while (1) {
+            if (!(j < *(int*)(self + 0xAA4))) {
+                break;
+            }
+            fn_800AD58C(self, i, j);
+            j++;
+        }
+        i++;
     }
 }
 
@@ -192,29 +218,72 @@ extern "C" void fn_800AD774(UnkAtAA4* p)
     }
 }
 
-/* near-miss: same nested-loop allocation difference as fn_800AD6FC */
+extern "C" void fn_800AD78C(void* p)
+{
+    char* self = (char*)p;
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        char* row = self + 0x14 + i * 0x60;
+        int j = 0;
+        while (1) {
+            if (!(j < *(int*)(self + 0xAA4))) {
+                break;
+            }
+            int* c = (int*)(row + j * 0xC);
+            c[1] = (int)fn_8014D8AC(((FEGrid*)self)->mA84->m554, 5, lbl_805B962C, 0x17E);
+            *(float*)(c + 2) = lbl_805B966C;
+            c[0] = 0;
+            j++;
+        }
+        i++;
+    }
+}
+
+/* near-miss (2 slots): add/addi order of the cell address; nested loops need the explicit `while (1) { if (!c) break; ... }` pre-test or CSE merges the count load */
 extern "C" void fn_800AD948(char* self, int key, float v)
 {
-    for (int i = 0; i < *(int*)(self + 0xAA4); i++) {
-        for (int j = *(int*)(self + 0xAA4) - 1; j >= 0; j--) {
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
             char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
             if (*(int*)(b1 + off) == key) {
                 char* b2 = self + 0x1C;
                 *(float*)(b2 + off) = v;
             }
+            j--;
         }
+        i++;
     }
 }
 
-/* near-miss: same nested-loop allocation difference as fn_800AD6FC (retail has one extra count reload) */
 extern "C" void fn_800ADAD8(char* self)
 {
-    for (int i = 0; i < *(int*)(self + 0xAA4); i++) {
-        for (int j = *(int*)(self + 0xAA4) - 1; j >= 0; j--) {
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
             char* e = self + i * 0xE0 + j * 0x1C;
             *(UnkFEPair*)(e + 0x328) = *(UnkFEPair*)(e + 0x318);
+            j--;
         }
+        i++;
     }
 }
 
@@ -287,11 +356,19 @@ extern "C" float fn_800ADF6C(char* self, int a, int b)
     return r;
 }
 
-/* near-miss: same nested-loop allocation difference as fn_800AD6FC (i and i*0x60 swap registers) */
+/* near-miss (2 slots): add/addi order of the cell address */
 extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
 {
-    for (int i = 0; i < *(int*)(self + 0xAA4); i++) {
-        for (int j = *(int*)(self + 0xAA4) - 1; j >= 0; j--) {
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
             char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
             if (*(int*)(b1 + off) == key) {
@@ -299,7 +376,9 @@ extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
                 *oj = j;
                 return 1;
             }
+            j--;
         }
+        i++;
     }
     return 0;
 }
@@ -312,12 +391,22 @@ extern "C" void fn_800AE2E4(void* p)
 extern "C" void fn_800AE4F4(char* self)
 {
     fn_800AE3FC(self);
-    for (int i = 0; i < *(int*)(self + 0xAA4); i++) {
-        for (int j = *(int*)(self + 0xAA4) - 1; j >= 0; j--) {
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
             char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
             *(int*)(b1 + off) = 0;
+            j--;
         }
+        i++;
     }
 }
 
