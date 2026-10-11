@@ -114,6 +114,12 @@ extern "C" int fn_801C1950(A* a) { return a->m8->mC; }
 extern "C" void fn_801C195C(void) { fn_801C0538(1, 0xFFFF); }
 extern "C" void fn_801C1988(void) { fn_801C0538(0, 0xFFFF); }
 
+class Unk801C1AF0 {
+public:
+    virtual ~Unk801C1AF0();
+};
+Unk801C1AF0::~Unk801C1AF0() {}
+
 extern "C" void fn_801C1E24(void* self) { fn_801C1E44(self); }
 extern "C" void fn_801C20CC(Z* z)
 {
