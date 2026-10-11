@@ -47,6 +47,35 @@ extern "C" void fn_8009FD8C(Unk8009FC5C* p, unsigned i)
         fn_8040074C(&p->m24[i], 4);
 }
 
+struct Unk8009FDE0 {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    unsigned char* m24;
+};
+
+extern "C" unsigned char fn_8009FDE0(Unk8009FDE0* p, int ch, unsigned idx)
+{
+    unsigned char r = 0;
+    if (idx < p->m1C) {
+        switch (ch) {
+        case 0:
+            r = p->m24[idx * 4];
+            break;
+        case 1:
+            r = p->m24[idx * 4 + 1];
+            break;
+        case 2:
+            r = p->m24[idx * 4 + 2];
+            break;
+        case 3:
+            r = p->m24[idx * 4 + 3];
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
 
@@ -175,6 +204,22 @@ extern "C" void fn_800A0778(Unk8009FC5C* p, unsigned i)
 extern "C" int fn_800A07B4() { return 0; }
 
 extern "C" int fn_800A07BC() { return 0; }
+
+extern "C" unsigned short fn_800A07C4(Unk8009FDE0* p, int ch, unsigned idx)
+{
+    unsigned short r = 0;
+    if (idx < p->m1C) {
+        switch (ch) {
+        case 0:
+            r = *(unsigned short*)(p->m24 + idx * 4);
+            break;
+        case 1:
+            r = *(unsigned short*)(p->m24 + idx * 4 + 2);
+            break;
+        }
+    }
+    return r;
+}
 
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
