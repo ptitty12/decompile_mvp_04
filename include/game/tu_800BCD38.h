@@ -185,7 +185,7 @@ void fn_800C3B14(Unk800C341C_Mgr* m);
 struct Unk800C7B40_Widget;
 struct Unk800C7B40_Data {
     int m0;
-    int m4;
+    Unk800C7B40_Widget* m4;
     Unk800C7B40_Widget* m8;
     char mC[16];
     int m1C;
@@ -232,8 +232,8 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot6();
     virtual void fn_vslot7();
     virtual void fn_vslot8(int a);
-    virtual void fn_vslot9();
-    virtual void fn_vslot10();
+    virtual void fn_vslot9(int a);
+    virtual void fn_vslot10(int a);
     virtual void fn_vslot11();
     virtual void fn_vslot12(int a);
     virtual void fn_vslot13();
@@ -243,17 +243,17 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot17(int a);
     virtual void fn_vslot18(int a);
     virtual void fn_vslot19();
-    virtual void fn_vslot20();
-    virtual void fn_vslot21();
+    virtual void fn_vslot20(float a);
+    virtual void fn_vslot21(float a);
     virtual void fn_vslot22();
     virtual void fn_vslot23();
-    virtual void fn_vslot24();
+    virtual void fn_vslot24(int a);
     virtual void fn_vslot25();
     virtual void fn_vslot26();
     virtual void fn_vslot27();
-    virtual Unk800C7B40_Widget* fn_vslot28(const char* name, int a);
+    virtual Unk800C7B40_Widget* fn_vslot28(const char* name);
     virtual void fn_vslot29();
-    virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
+    virtual Unk800C7B40_Widget* fn_vslot30(const char* name);
     virtual Unk800C7B40_Widget* fn_vslot31(int type, int a);
     virtual void fn_vslot32();
     virtual void fn_vslot33();
@@ -479,5 +479,123 @@ struct Unk800D4B88_Obj {
 };
 
 extern int lbl_8061A330;
+
+/* ---- pass-2 additions (range 04) ---- */
+extern "C" {
+void fn_800C7C04(Unk800C7B40_Widget* w);
+int fn_800C80D4();
+int fn_800C80DC(Unk800C7B40_Widget* w, int v);
+char* fn_8040B830(char* dst, const char* src, unsigned n); /* behaves like strncpy */
+int fn_8040B574(const char* a, const char* b);             /* behaves like strcmp */
+void fn_80378D40(const char* s, int ch, int* out);
+void fn_80377408(void* p); /* __builtin_delete */
+}
+
+/* Index cursor with a wrap flag (b0 of the word at +8); vptr at +0x24 (vtable lbl_8065A370:
+ * slot 3 = fn_800CFF7C next, slot 5 = fn_800CFFB4 previous). Ctor fn_800CFEEC. */
+struct Unk800CFEEC_Data {
+    int m0;
+    int m4;
+    int b0 : 1;
+    int b1 : 1;
+    int b2 : 1;
+    int b3 : 1;
+    int rest : 28;
+    int mC;
+    int m10[4];
+    int m20;
+};
+struct Unk800CFEEC_Raw : Unk800CFEEC_Data {
+    const void* m24;
+};
+struct Unk800CFEEC_Sel : Unk800CFEEC_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(Unk800C7B40_Widget* p);
+};
+
+extern "C" {
+int fn_800B5520(void* p);
+void fn_800D0074(Unk800CFEEC_Sel* s, int id, int q);
+void* fn_802B0850(void* obj, const char* name, int zero);
+Unk800D244C_Vec4 fn_802B0ACC(void* obj, const char* name);
+Unk800D244C_Vec4 fn_8014DBA0(int r, int g, int b, int a);
+}
+int fn_800E1990(int id);
+
+/* Two-button list selector: count m40, selected index m44, step widgets m48/m4C (fn_800D0F18 family). */
+struct Unk800D0F18_Obj : Unk800C7B40_Widget {
+    int m40;
+    int m44;
+    Unk800C7B40_Widget* m48;
+    Unk800C7B40_Widget* m4C;
+};
+
+/* Widget holding a looked-up id at +0x70 and a rect at +0x74 (fn_800D03B4). */
+struct Unk800D03B4_Obj : Unk800C7B40_Widget {
+    char pad40[0x30];
+    int m70;
+    Unk800D244C_Vec4 m74;
+};
+
+/* Widget with two colours at +0x44/+0x54 (fn_800D0C84). */
+struct Unk800D0C84_Obj : Unk800C7B40_Widget {
+    char pad40[0x4];
+    Unk800D244C_Vec4 m44;
+    Unk800D244C_Vec4 m54;
+};
+
+/* Object with a vptr at +0x24: slot 3 takes an index, slot 13 returns a count (fn_800CFFF0). */
+struct Unk800CFFF0_Data {
+    char pad0[0x24];
+};
+struct Unk800CFFF0_Obj : Unk800CFFF0_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3(int i);
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual int fn_vslot13();
+};
+
+struct Unk800D0D3C_Obj {
+    float m0;
+    float m4;
+    int m8;
+    Unk800D0D3C_Obj();
+};
+
+/* Raw view of Unk800D1614_Obj for constructors/destructors that store the vptr by hand. */
+struct Unk800D1614_Raw : Unk800C7B40_Data {
+    const void* m3C;
+    int m40;
+    Unk800C7B40_Widget* m44;
+    Unk800C7B40_Widget* m48;
+    Unk800C7B40_Widget* m4C;
+    Unk800C7B40_Widget* m50;
+    Unk800C7B40_Widget* m54;
+};
+extern const char lbl_80657A78[];
+extern const char lbl_80657C18[];
+extern const char lbl_8065CCE8[];
+extern "C" {
+void fn_800C8010(Unk800C7B40_Data* w, int a, int b, int c, int d);
+Unk800D1614_Raw* fn_800D0D9C(Unk800D1614_Raw* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j,
+                             int k, int l);
+void fn_800C7B40(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l, float x);
+void fn_800C7EE8(Unk800C7B40_Widget* w);
+}
 
 #endif
