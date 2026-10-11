@@ -105,7 +105,11 @@ struct Unk801EE438_Rec5C {         /* stride 0x5C, G+0x6B8 (10 entries) */
 };
 
 struct Unk801EE438_Player {         /* G->m8[i] */
-    char pad0[0x460];
+    char pad0[0x60];
+    float m60;
+    float m64;
+    float m68;
+    char pad6C[0x460 - 0x6C];
     int m460;                       /* index */
     char pad464[0x4D8 - 0x464];
     int m4D8;                       /* sub-object starts here (address passed to fn_8024FC74) */
@@ -125,7 +129,9 @@ struct Unk801EE438_Owner {
     Unk801EE438_Player* m65C[13];
     char pad690[0x6CC - 0x690];
     Unk801EE438_Game* m6CC;
-    char pad6D0[0x700 - 0x6D0];
+    char pad6D0[0x6F8 - 0x6D0];
+    struct Unk802028E4_Y* m6F8;
+    char pad6FC[4];
     Unk801EE438_O700* m700;
 };
 
@@ -210,6 +216,7 @@ int fn_801E816C(Unk801EE438_Sel* o, int a);
 int fn_801E82CC(Unk801EE438_Sel* o, int a);
 void fn_80213988(Unk801EE438_Scr* p, int a, int b);
 int fn_801EE6F4(Unk801EE438_Scr* p, int a);
+void fn_8024FBEC(int* p, int a);
 int fn_80259C50(int h, int e);
 int fn_80254EA4(int* p, int a);
 void fn_8024FC94(int* p);

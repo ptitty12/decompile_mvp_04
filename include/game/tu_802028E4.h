@@ -6,8 +6,15 @@
 #ifndef GAME_TU_802028E4_H
 #define GAME_TU_802028E4_H
 
+struct Unk802028E4_Team {          /* 0xE64 bytes; W holds two of them back to back */
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+    char pad234[0xE64 - 0x234];
+};
+
 struct Unk802028E4_W {
-    char pad0[0x1CC9];
+    Unk802028E4_Team m0[2];
+    unsigned char m1CC8;
     unsigned char m1CC9;
     char pad1CCA[0x1CD0 - 0x1CCA];
     int m1CD0;
@@ -16,7 +23,9 @@ struct Unk802028E4_W {
 struct Unk802028E4_Z {
     char pad0[0xC];
     int mC;
-    char pad10[0x6C - 0x10];
+    char pad10[0x1C - 0x10];
+    int m1C;
+    char pad20[0x6C - 0x20];
     int m6C[2];
 };
 

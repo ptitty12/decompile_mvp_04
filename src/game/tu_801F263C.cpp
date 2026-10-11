@@ -31,6 +31,8 @@ struct Unk801F263C_List {
 };
 
 extern const float lbl_805D4EA8;
+extern const float lbl_805D4E80;
+extern Unk801EE438_Vec lbl_805D6790;
 extern float lbl_805D4D68;
 
 extern "C" {
@@ -48,6 +50,12 @@ void fn_801F263C(Scr* p, void* v)
 {
     int tmp;
     fn_801F2668(p, &tmp, v, -1);
+}
+
+inline Unk801EE438_Player* PlayerAt5E18(Unk801EE438_Player** a, int i)
+{
+    Unk801EE438_Player** q = a + i;
+    return *q;
 }
 
 Unk801EE438_Player* fn_801F29AC(Scr* p, Unk801EE438_Game* g, Unk801EE438_Player* x)
@@ -156,6 +164,27 @@ inline Unk801EE438_Player* PlayerAt5EF0(Unk801EE438_Player** a, int i)
 {
     Unk801EE438_Player** q = a + i;
     return *q;
+}
+
+void fn_801F5E18(Scr* p)
+{
+    int found = 0;
+    Unk801EE438_G* g = p->m9C;
+    Unk801EE438_Player* t = g->m4->m36C;
+    if (t != 0) {
+        float d2 = (t->m60 - lbl_805D6790.m0) * (t->m60 - lbl_805D6790.m0) + (t->m68 - lbl_805D6790.m8) * (t->m68 - lbl_805D6790.m8);
+        found = d2 < lbl_805D4E80;
+    }
+    Unk801EE438_It it;
+    fn_8014E09C(&it, g->m0, 1);
+    Unk801EE438_It* ip = &it;
+    while (it.m8 != 10) {
+        int i = it.m8;
+        Unk801EE438_Player* q = PlayerAt5E18(p->m9C->m8, i);
+        if (q != 0)
+            fn_8024FBEC(&q->m4D8, found);
+        fn_8014E108(ip);
+    }
 }
 
 void fn_801F5EF0(Scr* p)
