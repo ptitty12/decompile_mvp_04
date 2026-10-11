@@ -106,7 +106,7 @@ void fn_80053FBC(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 
 void fn_8005405C(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
-    if (obj->m44 > 0 && fn_80054D98() != 0) {
+    if (obj->m44 > 0 && fn_80054D98(ctx) != 0) {
         fn_80012418();
         return;
     }
@@ -252,7 +252,7 @@ int fn_80054544(Unk80052794_Ctx* ctx, int idx)
     return fn_8005481C(ctx, idx) <= 3;
 }
 
-int fn_80054574(void)
+int fn_80054574(Unk80052794_Ctx* ctx)
 {
     int r = 0;
     fn_800B555C();
