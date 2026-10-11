@@ -40,6 +40,9 @@ extern "C" double fn_80409D88(const char* s);
 struct Unk308 { char pad0[0x300]; int m300; char pad304[4]; int m308; int m30C; int m310; int m314; int m318; char pad31C[8]; int m324; char pad328[0xC0]; int m3E8; int m3EC; int m3F0; int m3F4; };
 extern Unk308* lbl_8061EA68;
 extern int lbl_80621574, lbl_80621578;
+extern int lbl_8061E690, lbl_8068CD14, lbl_8068CD18;
+extern const char lbl_80666548[], lbl_805EFF54[], lbl_805EFF68[], lbl_805EFF84[];
+extern "C" void fn_8032F19C(void* item, const char* name, int* val, int init);
 extern int lbl_80621510, lbl_80621514, lbl_8062087C, lbl_805C94A0[], lbl_805C9758[], lbl_8062150C, lbl_80621520, lbl_80621524, lbl_80621528, lbl_8062152C;
 struct MIE3 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 extern "C" void fn_8032FB78(void* item, int v);
@@ -105,6 +108,20 @@ extern "C" void fn_80339530(Menu* p)
     SetV(IAt(p, 0x1238), lbl_8061FF70);
     SetV(IAt(p, 0x128C), lbl_8061D2B8);
     SetV(IAt(p, 0x1430), 0);
+}
+
+extern "C" Menu* fn_803396A4(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666548;
+    fn_8032F19C((char*)p + 0x2E0, lbl_805EFF54, &lbl_8061E690, lbl_8061E690);
+    fn_8032F19C((char*)p + 0x334, lbl_805EFF68, &lbl_8068CD14, lbl_8068CD14);
+    fn_8032F19C((char*)p + 0x388, lbl_805EFF84, &lbl_8068CD18, lbl_8061E690);
+    fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x334));
+    fn_80330ACC(p, (MItem*)((char*)p + 0x388));
+    p->m174 = 0;
+    return p;
 }
 
 extern "C" void fn_80339790(Menu* p, int k) { fn_80330BC8(p, k); }
