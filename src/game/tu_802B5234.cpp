@@ -51,15 +51,19 @@ void fn_803FEDB8(void* p, int a);
 void fn_803EDA0C(void* p);
 int fn_8040B574(const char* a, const char* b);
 void fn_802AEBF0(void* a, const char* s);
+void fn_802AEBCC(void* a, const char* s);
+char* fn_8040B61C(char* d, const char* s);
 void fn_803188FC(void* a, int b);
 void fn_803DD73C(void* a, int b);
 int fn_802B86D4(Mgr* m, const char* s, int* idx);
+/* near-miss (parked, 44 vs 47 insns): retail keeps a register copy of the loop index and stores it to idx (stack) after each increment, re-reading idx for the strcpy */
 void fn_802B8760(Mgr* m, const char* s);
 void fn_802B881C(Mgr* m, const char* s);
 int fn_800968C0(void* o, int x, int y);
 int fn_80089AA0(void* o, int a, int b);
 int fn_8008CFD8(void* o, int a, int b);
 int fn_804089B4(char* buf, const char* fmt, ...);
+void fn_802C9284(void* p, int a, void* o, int b, int c);
 }
 
 Unk802B5234_T* fn_802B53C4(Unk802B5234_T* self)
@@ -194,6 +198,24 @@ int fn_802B86D4(Mgr* m, const char* s, int* idx)
     return 0;
 }
 
+/* near-miss (parked, 44 vs 47 insns): retail keeps a register copy of the loop index and stores it to idx (stack) after each increment, re-reading idx for the strcpy */
+void fn_802B8760(Mgr* m, const char* s)
+{
+    int idx;
+    if (fn_802B86D4(m, s, &idx) != 0) {
+        m->ent[idx].cnt++;
+    } else {
+        for (idx = 0; idx <= 31; idx++) {
+            if (m->ent[idx].cnt == 0) {
+                m->ent[idx].cnt = 1;
+                fn_8040B61C(m->ent[idx].name, s);
+                fn_802AEBCC(lbl_8061E978, s);
+                break;
+            }
+        }
+    }
+}
+
 void fn_802B881C(Mgr* m, const char* s)
 {
     int idx;
@@ -201,6 +223,46 @@ void fn_802B881C(Mgr* m, const char* s)
         if (--m->ent[idx].cnt == 0)
             fn_802AEBF0(lbl_8061E978, s);
     }
+}
+
+void fn_802B8888(Mgr* m, void* o, int x)
+{
+    char buf[32];
+    int t = fn_800968C0(o, x, 1);
+    int a = fn_8008CFD8((char*)o + 0xC9C, 0x21, t);
+    fn_804089B4(buf, lbl_805E0E88, a);
+    fn_802B8760(m, buf);
+    fn_804089B4(buf, lbl_805E0E94, 0);
+    fn_802B8760(m, buf);
+}
+
+void fn_802B891C(Mgr* m, void* o, int x)
+{
+    char buf[32];
+    int t = fn_800968C0(o, x, 1);
+    int a = fn_80089AA0((char*)o + 0xC74, 0x1A, t);
+    fn_804089B4(buf, lbl_805E0EA0, a);
+    fn_802B8760(m, buf);
+}
+
+void fn_802B898C(Mgr* m, void* o, int x)
+{
+    char buf[32];
+    int t = fn_800968C0(o, x, 1);
+    int a = fn_8008CFD8((char*)o + 0xC9C, 0x21, t);
+    fn_804089B4(buf, lbl_805E0E88, a);
+    fn_802B881C(m, buf);
+    fn_804089B4(buf, lbl_805E0E94, 0);
+    fn_802B881C(m, buf);
+}
+
+void fn_802B8A20(Mgr* m, void* o, int x)
+{
+    char buf[32];
+    int t = fn_800968C0(o, x, 1);
+    int a = fn_80089AA0((char*)o + 0xC74, 0x1A, t);
+    fn_804089B4(buf, lbl_805E0EA0, a);
+    fn_802B881C(m, buf);
 }
 
 void fn_802B8A90(Mgr* m)
@@ -211,6 +273,11 @@ void fn_802B8A90(Mgr* m)
             fn_802AEBF0(lbl_8061E978, m->ent[i].name);
         }
     }
+}
+
+void fn_802B8AFC(Mgr* m, void* o)
+{
+    fn_802C9284((char*)m + 0x12204, *(int*)((char*)o + 0x2C), o, 0, 1);
 }
 
 /* near-miss: retail orders the argument setup li r4/li r5/addi r6 before addi r3 (name) */
