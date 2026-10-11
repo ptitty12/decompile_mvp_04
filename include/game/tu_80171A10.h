@@ -29,17 +29,25 @@ struct Unk80171A10_Fn {
     int m4;
 };
 
+class Unk80171940;
+class Unk801748D8_Obj {
+public:
+    virtual void vslot1();
+    virtual void vslot2();
+};
+void fn_801748D8(Unk801748D8_Obj* o);
 struct Unk80171A10_Menu;
 typedef void (Unk80171A10_Menu::*Unk80171A10_PFn)();
 
 /* Menu/popup object (vptr at +0x120): state, text buffers and the handler set by fn_80174318. */
 struct Unk80171A10_Menu {
+    virtual ~Unk80171A10_Menu();
     int m0;
     int m4;
     int m8[4];
     int m18;
     char pad1C[0x3C - 0x1C];
-    void* m3C;
+    Unk80171940* m3C;
     int m40;
     int m44;
     int m48;
@@ -77,6 +85,7 @@ extern int lbl_8061977C;
 void fn_80172B60(Unk80171A10_Menu* p, int a, int b);
 void fn_80174318(Unk80171A10_Menu* p, int state, Unk80171A10_Fn f);
 void fn_801743E0(Unk80171A10_Menu* p);
+void fn_80172678(Unk80171A10_Menu* p);
 void fn_80174438(Unk80171A10_Menu* p);
 void fn_801744AC(Unk80171A10_Menu* p);
 extern "C" {

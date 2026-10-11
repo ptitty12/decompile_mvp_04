@@ -17,6 +17,8 @@ void fn_801728E8(Unk80171A10_Menu* p, Unk8016FF40* info);
 
 void fn_801726E8(Unk80171A10_Menu* p);
 
+void fn_801748D8(Unk801748D8_Obj* o);
+
 Unk801714E0* fn_80172058(Unk80171A10_Holder* h, const unsigned short* s, int a);
 
 void fn_801720A8(Unk80171A10_Holder* h, Unk801714E0* n, const unsigned short* s, int id);
@@ -30,6 +32,19 @@ Unk80171760* fn_80171A10(Unk80171A10_Holder* h, int a)
     h->m4->m8 = 0;
     h->m4->m4 = 0;
     h->m4->m0 = a;
+    return h->m4;
+}
+
+/* near-miss: retail stores the zero text terminator through r3 (li r3,0; sth) and then reloads r3 with the
+ * holder; here it goes through r0 (26 vs 27 instrs). */
+Unk80171760* fn_80171A8C(Unk80171A10_Holder* h, const unsigned short* s)
+{
+    unsigned short z = 0;
+    fn_80171FE8(h);
+    Unk801714E0* n = fn_80172058(h, &z, 4);
+    if (n) {
+        fn_801720A8(h, n, s, 1);
+    }
     return h->m4;
 }
 
@@ -48,19 +63,6 @@ Unk80171760* fn_80171C20(Unk80171A10_Holder* h, int a)
         return h->m4;
     }
     return 0;
-}
-
-/* near-miss: retail stores the zero text terminator through r3 (li r3,0; sth) and then reloads r3 with the
- * holder; here it goes through r0 (26 vs 27 instrs). */
-Unk80171760* fn_80171A8C(Unk80171A10_Holder* h, const unsigned short* s)
-{
-    unsigned short z = 0;
-    fn_80171FE8(h);
-    Unk801714E0* n = fn_80172058(h, &z, 4);
-    if (n) {
-        fn_801720A8(h, n, s, 1);
-    }
-    return h->m4;
 }
 
 Unk80171760* fn_80171F80(Unk80171A10_Holder* h, const unsigned short* s)
@@ -103,6 +105,17 @@ void fn_801720A8(Unk80171A10_Holder* h, Unk801714E0* n, const unsigned short* s,
 void fn_80172118() {}
 
 void fn_8017211C() {}
+
+Unk80171A10_Menu::~Unk80171A10_Menu()
+{
+    fn_801748D8((Unk801748D8_Obj*)m6C);
+    m6C = 0;
+    fn_80172678(this);
+    if (m3C) {
+        delete m3C;
+        m3C = 0;
+    }
+}
 
 void fn_8017227C(Unk8017227C_T* p, int a, int b, int i)
 {
@@ -163,9 +176,9 @@ void fn_80172334(Unk80171A10_Menu* p, int a, int b, const unsigned short* c, con
 
 Unk80171760* fn_801723B8(Unk80171A10_Menu* p)
 {
-    fn_80171FE8((Unk80171A10_Holder*)p->m3C);
+    fn_80171FE8((Unk80171A10_Holder*)(void*)p->m3C);
     fn_801726E8(p);
-    return ((Unk80171A10_Holder*)p->m3C)->m4;
+    return ((Unk80171A10_Holder*)(void*)p->m3C)->m4;
 }
 
 int fn_80172514(Unk80171A10_Menu* p)
@@ -229,22 +242,6 @@ void fn_80172D00(Unk80171A10_Menu* p)
         p->m4 = 0;
     }
     fn_801728A0(p, 0, 4);
-}
-
-/* near-miss: native PTMF members give retail's separate zero registers; 3 slots of store order differ. */
-void fn_801742C4(Unk80171A10_Menu* p)
-{
-    int t = p->m54;
-    p->m60 = 0;
-    p->m114 = -1;
-    if (t == 0) {
-        p->mA4[0] = (unsigned short)t;
-    }
-    p->m70 = p->m7C;
-    p->m7C = 0x19;
-    p->m74 = p->m80;
-    p->m80 = 0;
-
 }
 
 int fn_801731D8(Unk80171A10_Menu* p, int idx)
@@ -379,4 +376,20 @@ void fn_80174274(Unk80174274_T* p)
 void fn_8017429C(Unk80174274_T* p)
 {
     fn_80171A10(p->m3C, 6);
+}
+
+/* near-miss: native PTMF members give retail's separate zero registers; 3 slots of store order differ. */
+void fn_801742C4(Unk80171A10_Menu* p)
+{
+    int t = p->m54;
+    p->m60 = 0;
+    p->m114 = -1;
+    if (t == 0) {
+        p->mA4[0] = (unsigned short)t;
+    }
+    p->m70 = p->m7C;
+    p->m7C = 0x19;
+    p->m74 = p->m80;
+    p->m80 = 0;
+
 }
