@@ -121,7 +121,33 @@ void fn_8035A6F4(char* s, Unk8035A6F4_V* v)
     *(Unk8035A6F4_V*)(s + 0x60) = *v;
 }
 
-/* TODO fn_8035A71C */
+struct Unk8035A71C_Blob {
+    int w[0x52];
+};
+struct Unk8035A71C {
+    int m0;
+    Unk8035A71C_Blob m4;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+    const void* m164;
+    Unk8035A71C(const Unk8035A71C& o);
+};
+Unk8035A71C::Unk8035A71C(const Unk8035A71C& o)
+{
+    m164 = lbl_806604E0;
+    m0 = o.m0;
+    m4 = o.m4;
+    m14C = o.m14C;
+    m150 = o.m150;
+    m154 = o.m154;
+    m158 = o.m158;
+    m15C = o.m15C;
+    m160 = o.m160;
+}
 
 void fn_8035A7D8(void* self, int c)
 {
