@@ -41,11 +41,11 @@ int fn_802BB4D0(char* o, int i)
     return fn_803EE3D4(*(int*)(b + off));
 }
 
-void* fn_802BB4FC(void* p)
+extern "C" void* fn_802BB4FC(void* p)
 {
     Unk802BB4FC* o = (Unk802BB4FC*)p;
-    o->m4 = 0;
     o->m0 = 0;
+    o->m4 = 0;
     lbl_8061EAF0 = o;
     return p;
 }
