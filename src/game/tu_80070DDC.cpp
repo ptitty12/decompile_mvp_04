@@ -9,6 +9,20 @@ void* operator new(unsigned int size, int heap);
 void* fn_803774A8(unsigned n, int heap);
 unsigned fn_800734D4(void* self, unsigned flags);
 Unk8000E618* fn_8000E65C();
+struct Unk800B555C_Obj {
+    char pad0[0x530];
+    int m530;
+};
+Unk800B555C_Obj* fn_800B555C();
+void fn_802B8CCC();
+void fn_802B8D34();
+void fn_80095178(Handle* h);
+void fn_80095DAC(Handle* h);
+void fn_800914BC(Handle* h);
+void fn_80091A30(Handle* h);
+void fn_80090E84(Handle* h);
+void fn_80090A24(Handle* h, int r);
+unsigned fn_800765A8(int x);
 void fn_80377E90(Obj* list, int* a, int* b, int idx);
 void fn_80377DBC(Obj* list, int* a, int* b, int idx);
 char* fn_8040B61C(char* dst, const char* src);
@@ -417,6 +431,35 @@ int Unk8007B2B0_Screen::fn_8007290C(int a)
 int Unk8007B2B0_Screen::fn_80072934(int a)
 {
     return fn_80090A90(&m4C, a, 1);
+}
+
+void Unk8007A4DC_Screen::fn_8007295C()
+{
+    unsigned i = 0;
+    fn_802B8CCC();
+    fn_80095178(&m17C);
+    fn_80095DAC(&m1C0);
+    fn_800914BC(&m4C);
+    fn_80091A30(&m8C);
+    fn_80090E84(&m38);
+    fn_802B8D34();
+    fn_8007285C();
+    C2()->fn_80072DC0();
+    C2()->fn_80072C28();
+    do {
+        int id = fn_800765A8(i++);
+        fn_80090A24(&m17C, id);
+        fn_80090A24(&m1C0, id);
+        fn_8007A808(0xB, id, 1);
+    } while (i <= 0x18);
+    char buf1[0x80];
+    char buf2[0x80];
+    fn_8007A914(0, 0, buf1);
+    fn_8007A914(1, 0, buf2);
+    m208 = fn_8007366C(buf1, buf2);
+    fn_80072ABC();
+    if (fn_800B555C()->m530 == 1)
+        fn_800759F8(C2(), C2()->fn_8007DA28());
 }
 
 void fn_80072A84(Unk80072A84* o)

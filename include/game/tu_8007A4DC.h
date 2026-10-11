@@ -108,11 +108,15 @@ int fn_80080464(Unk8007A4DC_Screen* s, int a, int b);
 
 struct Unk8007A4DC_Screen {
     Owner* m0;
-    char pad4[0x48];
+    char pad4[0x34];
+    Handle m38;
+    char pad3C[0x10];
     Handle m4C;
     char pad50[0x8];
     Unk805A19C8_Roster* m58;
-    char pad5C[0x120];
+    char pad5C[0x30];
+    Handle m8C;
+    char pad90[0xEC];
     Handle m17C;
     char pad180[0x4];
     W* m184;
@@ -126,8 +130,11 @@ struct Unk8007A4DC_Screen {
     Slot m1CC[2];
     W* m1E4;
     Unk8007A4DC_Obj1E8* m1E8;
+    char pad1EC[0x1C];
+    int m208;
 
     void fn_8007285C();
+    void fn_8007295C();
     int fn_80072894(int a);
     int fn_800728BC(int a);
     int fn_800728E4(int a);
