@@ -104,6 +104,9 @@ public:
     void fn_80165B68(struct Unk80165B68_Evt* e, float t);
     void fn_80165BE0(struct Unk80165BE0_Evt* e, float t);
     void fn_80163A98();
+    void fn_801593D8();
+    void fn_8015A1D4();
+    void fn_8016CFC4(struct Unk8016C788_Obj* o);
     void fn_80169674();
     void fn_80163AF0();
     void fn_80163AF4();

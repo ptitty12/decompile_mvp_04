@@ -2,7 +2,7 @@
  * Game code, .text 0x80156714-0x8015AA94 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
-#include "game/tu_801527C8.h"
+#include "game/tu_8015AA94.h"
 
 extern float lbl_805C8C04;
 
@@ -41,20 +41,7 @@ extern const char lbl_805C60F8[];
 extern const char lbl_805C6240[];
 extern const char* lbl_8061BD80;
 
-void fn_801A4F40(Unk801527C8_Actor* a);
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
-int fn_80097190(Unk801527C8_Team* t, int a);
-int fn_80097300(Unk801527C8_Team* t, int a);
-int fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
-void fn_80178F64(void* p, int v);
-void fn_80327274(Unk801527C8_Sub* s);
-int fn_804089B4(char* buf, const char* fmt, ...);
-int fn_80326E64(Unk801527C8_Sub* s, int a);
-void fn_8016D3DC(Unk801527C8_Ctx* ctx, int a);
-void fn_8016C660(Unk801527C8_Ctx* ctx, int a);
-void fn_801515AC(int* a, int* b, int* c);
-int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
-void fn_802B2518(void* o, int a, float t);
 
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
@@ -309,4 +296,9 @@ int fn_80157708(void* self, int v) /* 80157708 */
         return 0;
     }
     return 1;
+}
+
+void Unk80159F28::fn_801593D8() /* 801593D8 */
+{
+    fn_8015A1D4();
 }
