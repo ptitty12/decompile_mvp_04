@@ -21,6 +21,7 @@ int fn_8022E610();
 int fn_8022E648();
 void fn_8022D708(int a, int b);
 void fn_8035AB00(void* p);
+/* near-miss: 2 slots: retail emits mr r4,r30 before addi r3,r30,0x440 for the fn_802376A0 call */
 Fe73C* fn_8022F17C(Fe73C* d, Fe8022* owner, int b);
 void fn_8022E748(Fe8022* c);
 void fn_8035DC4C(void* p, int x);
@@ -135,6 +136,7 @@ void fn_8022E7D0(Fe8022* c)
     fn_8022E748(c);
 }
 
+/* near-miss: retail reads th into f31 before the fn_80235FA8 call (arguments evaluated last-to-first here); 42 slots off */
 float fn_8022E7F0(Fe8022* c, int k)
 {
     float th = 80.0f;
@@ -208,6 +210,7 @@ Pair8 fn_8022EA60(Fe8022* c)
     return c->m4->m28;
 }
 
+/* near-miss: frame is 8 bytes larger in retail (extra Pair8 temp); 25 slots off */
 int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
 {
     Pair8 v;
@@ -245,6 +248,7 @@ int fn_8022EB74(Fe8022* c, Pair8* a, Pair8* b)
     return d <= th;
 }
 
+/* near-miss: 2 slots: retail loads the 0.75 constant before reloading v from its stack slot */
 int fn_8022EC1C(Fe8022* c)
 {
     Fe73C* d = c->m4;
