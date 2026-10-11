@@ -58,7 +58,9 @@ struct Unk80273498_Ref {
  * +0x6F4 and +0x700 are used here. */
 struct Unk8027107C_Outer;
 struct Unk8014D8AC_Ctx {
-    char pad0[0x54C];
+    char pad0[0x4C];
+    unsigned int m4C;          /* tick counter read by goal logic (fn_8027EC58) */
+    char pad50[0x54C - 0x50];
     Unk80273498_Ref* m54C;
     char pad550[4];
     Unk8014D8AC* m554;
@@ -113,7 +115,8 @@ struct Unk8027107C_Outer {
     Unk8027107C_Inner* m3A4;
     char pad3A8[0x3B0 - 0x3A8];
     int m3B0;
-    char pad3B4[8];
+    int m3B4;
+    int m3B8;                  /* id passed to fn_801DC570/fn_801DC5C4 (goal logic) */
     int m3BC;
 };
 
@@ -153,6 +156,25 @@ public:
     virtual void fn_vslot2();
     virtual void fn_vslot3();
     virtual int fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual int fn_vslot23();          /* called by goal logic (fn_8027F504) */
 };
 
 /* Data of the player object between its vptr and its second base. */
@@ -185,16 +207,19 @@ struct Unk802726BC_Angles {
     float m0[2];
     float m8[2];
     char pad10[0x30 - 0x10];
-    float m30[2];
+    float m30[2];              /* goal logic (fn_8027FC80) */
     float m38[2];
     float m40[2];
-    char pad48[0xE0 - 0x48];
+    float m48[2];              /* goal logic (fn_8027F504) */
+    char pad50[0xE0 - 0x50];
     float mE0[2];
     float mE8[2];
     char padF0[0x100 - 0xF0];
     float m100[2];
     float m108[2];
-    char pad110[0x130 - 0x110];
+    char pad110[0x120 - 0x110];
+    int m120[2];               /* goal logic (fn_8027EC58) */
+    char pad128[0x130 - 0x128];
     float m130[2];
     char pad138[0x140 - 0x138];
     float m140[2];
@@ -212,8 +237,8 @@ struct Unk80271DBC_Link {
     char pad0[0x830];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
     char pad834[4];
-    int m838;
-    int m83C;
+    int m838;                  /* hash read by goal logic (fn_8027EA14) */
+    int m83C;                  /* hash read by goal logic (fn_8027E084) */
     char pad840[0x880 - 0x840];
     Unk8014D8AC_Ctx* m880;
 };
@@ -232,10 +257,15 @@ public:
     float m8E8;                /* sqrt'ed by the path query constructors (tu_80279AE4.cpp) */
     char pad8EC[0x908 - 0x8EC];
     Unk80273498_Pos* m908;
-    char pad90C[0x93C - 0x90C];
-    Unk80273498_Vec3 m93C;     /* copied into the path query's +0xA4 */
-    char pad948[0xAB4 - 0x948];
-    float mAB4;
+    char pad90C[0x938 - 0x90C];
+    int m938;                  /* goal logic (fn_8027F504) */
+    Unk80273498_Vec3 m93C;     /* goal logic (fn_8027EB34): two target positions */
+    Unk80273498_Vec3 m948;
+    float m954;                /* goal logic (fn_8027F504) */
+    int m958;
+    int m95C;
+    char pad960[0xAB4 - 0x960];
+    float mAB4;                /* goal logic (fn_8027FC80) */
     char padAB8[0xB3C - 0xAB8];
     int mB3C;
     char padB40[0xB4C - 0xB40];
