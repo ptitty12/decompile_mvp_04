@@ -138,6 +138,7 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-10 | matcher | ProDG's plain `char` is **signed** (callers `extsb`). A `clrlwi rX,rY,24` at a call site means the parameter is `unsigned char` | cookbook (3) | small, recurs
 - 2026-10-10 | matcher | Positional diff counts mislead on big functions: one inserted instruction looks like 100 differences. An alignment-aware score (LCS) made variant ranking usable on a 0x290 function (71 → 8 → MATCH) | tight loop (10) | high on functions > 256 B
 - 2026-10-10 | matcher | Timing for playeridchooser.cpp overall: 25/26 in about 2 h 15 min of matching, including about 35 min of setup. Rough per-size rate: ≤64 B about 1–2 min; 65–256 B about 5–10 min; 0x290 about 25 min; one 0x13C near-miss parked after about 15 min | measure (13) | baseline
+- 2026-10-11 | W4 (near-miss sweep) | A recipe-first pass over parked near-misses matched 18 of ~30 in about 75 min (after the >?/Vec3-copy recipes; most fixes were new mechanisms: temp-slot reuse needs the same machine mode, inline parameters are not pointer-flagged, jump2 cross-jumps after sched2). Reading the RTL dumps (-da: sched, sched2, lreg, greg) before searching found each mechanism in 1-3 variant runs; a 20-line Python helper that writes variant files from (old, new) substitutions and scores the directory with score_variants.py kept each run under a minute | tight loop (10), cookbook (3) | high on parked near-misses
 
 ## Tried
 
