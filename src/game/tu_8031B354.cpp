@@ -336,27 +336,23 @@ void fn_8031CB4C(void* unused, float* out) {
     FxCtx* c = lbl_8061FEDC;
     if (c->m204 != 0 && c->m208 == 0) {
         float a = lbl_805EA624;
-        float b = lbl_805EA62C;
-        float z = lbl_805EA628;
-        out[7] = b;
-        out[3] = z;
-        out[6] = a + b;
+        out[7] = lbl_805EA62C;
+        out[3] = lbl_805EA628;
+        out[6] = a + lbl_805EA62C;
         out[4] = -a;
         out[0] = -a;
-        out[1] = z;
-        out[2] = a + b;
-        out[5] = b;
+        out[1] = lbl_805EA628;
+        out[2] = a + lbl_805EA62C;
+        out[5] = lbl_805EA62C;
     } else {
-        float z = lbl_805EA628;
-        float b = lbl_805EA62C;
-        out[4] = z;
-        out[7] = b;
-        out[0] = z;
-        out[1] = z;
-        out[2] = b;
-        out[3] = z;
-        out[5] = b;
-        out[6] = b;
+        out[4] = lbl_805EA628;
+        out[7] = lbl_805EA62C;
+        out[0] = lbl_805EA628;
+        out[1] = lbl_805EA628;
+        out[2] = lbl_805EA62C;
+        out[3] = lbl_805EA628;
+        out[5] = lbl_805EA62C;
+        out[6] = lbl_805EA62C;
     }
 }
 
@@ -374,7 +370,12 @@ void fn_8031CBF8(void* unused, float* out) {
     out[6] = lbl_805EA634;
 }
 
-/* near-miss: same fmr chain as fn_8031CC2C */
+void* fn_8031CC2C(void* self, float t) {
+    fn_8014D9EC(self, lbl_805EA650, lbl_805EA650, lbl_805EA650, t, lbl_805EA650);
+    return self;
+}
+
+/* near-miss: same fmr chain as the neighbouring function */
 void* fn_8031CC78(void* self, float t) {
     fn_8014D9EC(self, lbl_805EA654, lbl_805EA654, lbl_805EA654, t, lbl_805EA658);
     return self;
