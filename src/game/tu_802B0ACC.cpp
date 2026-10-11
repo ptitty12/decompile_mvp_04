@@ -8,10 +8,13 @@ typedef Unk802ACD88_Mgr Mgr;
 typedef Unk802B0ACC_T T;
 typedef Unk802B0ACC_Rec Rec;
 typedef Unk802B0ACC_V4 V4;
+typedef Unk802B0ACC_F4 F4;
 
 void* operator new(unsigned int size, int heap);
 void* operator new[](unsigned int size, int heap);
 
+extern int lbl_8061E970;
+extern char lbl_80664140[];
 extern const char lbl_805E0280[];
 extern const char lbl_805E028C[];
 extern const char lbl_805E029C[];
@@ -30,10 +33,37 @@ void fn_802B1D44(T* t);
 void* fn_802B23F0(void* p, void* a);
 int fn_80075E7C(int a);
 int fn_8040ABA0();
+void fn_80328234(void* p, int a, int b);
 int fn_8040B6A0(const char* s);
 void fn_802B1E38(T* t, const char* s, int v);
 void fn_802B1FC0(T* t);
 void* fn_8040B320(void* p, int v, int n);
+}
+
+/* near-miss (parked, 58 vs 59 insns): retail joins the default and found paths before one 16-byte copy whose first word is loaded in each path */
+V4 fn_802B0ACC(Mgr* m, int key)
+{
+    int a = -1;
+    int b = -1;
+    F4 d;
+    V4* src;
+    char* t = (char*)m + 0x10000 - 0x580;
+    if (fn_80377F00(t, &a, &b, key, 0) == 0) {
+        b = -1;
+        a = -1;
+        if (fn_80377F00(t, &a, &b, lbl_8061E970, 0) == 0) {
+            d.a = 0.0f;
+            d.d = 0.0f;
+            d.c = 0.0f;
+            d.b = 0.0f;
+            src = (V4*)&d;
+        } else {
+            src = (V4*)((char*)m + 0x4038 + a * 0x1C);
+        }
+    } else {
+        src = (V4*)((char*)m + 0x4038 + a * 0x1C);
+    }
+    return *src;
 }
 
 void fn_802B0BB8(Mgr* m, int key, V4* val)
@@ -60,7 +90,10 @@ struct Unk802B2518_W {
 };
 
 struct Unk802B2518_S {
-    char pad0[0x28];
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[0x24 - 0x1C];
+    int m24;
     int m28;
     int m2C;
     int e30[1];
@@ -76,9 +109,22 @@ struct Unk802B2518_S {
     int m1C3C;
     float m1C40;
     float m1C44;
+    int m1C48;
 };
 
 extern Unk802B2518_W* lbl_8061E978;
+
+struct Unk802B1F00_B {
+    char pad0[0x1F00];
+    unsigned int a1F00[30];
+};
+
+struct Unk802B0DB0_M {
+    char pad0[0x11E10];
+    void* a11E10[30];
+    void* a11E88[30];
+    unsigned int a11F00[30];
+};
 
 extern T* lbl_8061EA68;
 extern void* lbl_8061EA74;
@@ -90,21 +136,18 @@ void fn_802B0D9C(Mgr* m)
     *(int*)((char*)m + 0x11EE0) = 0;
 }
 
-/* near-miss: lwzx/stwx operand order (retail base, index; here index, base) */
 void fn_802B0DB0(Mgr* m)
 {
+    Unk802B0DB0_M* mm = (Unk802B0DB0_M*)m;
     for (int i = 0; i <= 29; i++) {
         if (i != 22) {
-            char* b = (char*)m + 0x10000;
-            void** a = (void**)(b + 0x1E88);
-            if (*(void**)((char*)a + i * 4) != 0)
-                fn_803EB330(*(void**)((char*)a + i * 4));
-            void** c = (void**)(b + 0x1E10);
-            if (*(void**)((char*)c + i * 4) != 0) {
-                delete *(void**)((char*)c + i * 4);
-                *(void**)((char*)c + i * 4) = 0;
+            if (mm->a11E88[i] != 0)
+                fn_803EB330(mm->a11E88[i]);
+            if (mm->a11E10[i] != 0) {
+                delete mm->a11E10[i];
+                mm->a11E10[i] = 0;
             }
-            *(void**)((char*)a + i * 4) = 0;
+            mm->a11E88[i] = 0;
         }
     }
 }
@@ -236,6 +279,29 @@ void fn_802B1FC0(T* self)
     }
 }
 
+Unk802B2518_S* fn_802B23F0(Unk802B2518_S* self, int a)
+{
+    fn_80328234(self, 6, a);
+    self->m1C48 = a;
+    self->m2C = 0x100;
+    self->m18 = lbl_80664140;
+    self->mC30 = 2;
+    self->m1C34 = -1.0f;
+    self->m1C3C = 1;
+    self->m28 = 0;
+    self->m1C40 = 0.0f;
+    self->m1C44 = 0.0f;
+    self->m24 = 0;
+    fn_8040B320(self->e30, 1, 0x400);
+    for (int i = 0; i < self->m2C; i++) {
+        self->e30[i] = 1;
+        int r = fn_8040ABA0();
+        self->f430[i] = (float)(r % 2) + 2.0f;
+        self->f1834[i] = 0.0f;
+    }
+    return self;
+}
+
 void fn_802B2518(Unk802B2518_S* self, int a, float x)
 {
     if (fn_80075E7C(lbl_8061E978->m8) <= 29) {
@@ -246,20 +312,19 @@ void fn_802B2518(Unk802B2518_S* self, int a, float x)
     }
 }
 
-/* near-miss: retail uses indexed stwx/stfsx with separate base registers and a different literal-pool order (-1.0f before 0.0f) */
 void fn_802B258C(Unk802B2518_S* self)
 {
     self->m1C3C = 1;
+    self->m1C40 = 0.0f;
     self->m1C44 = 0.0f;
+    self->mC30 = 0;
     self->m28 = 0;
     self->m1C34 = -1.0f;
-    self->m1C40 = 0.0f;
-    self->mC30 = 0;
     for (int i = 0; i < self->m2C; i++) {
-        ((int*)((char*)self + 0x30))[i] = 1;
+        self->e30[i] = 1;
         int r = fn_8040ABA0();
-        ((float*)((char*)self + 0x430))[i] = (float)(r % 2) + 2.0f;
-        ((float*)((char*)self + 0x1834))[i] = 0.0f;
+        self->f430[i] = (float)(r % 2) + 2.0f;
+        self->f1834[i] = 0.0f;
     }
 }
 

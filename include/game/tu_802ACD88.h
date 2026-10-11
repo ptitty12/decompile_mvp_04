@@ -82,4 +82,11 @@ struct Unk802B0ACC_V4 {
     int d;
 };
 
+struct Unk802B0ACC_F4 {
+    float a;
+    float b;
+    float c;
+    float d;
+};
+
 #endif /* GAME_TU_802ACD88_H */
