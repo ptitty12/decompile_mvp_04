@@ -406,6 +406,7 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80371D9C.cpp"),
             Object(NonMatching, "ealib/tu_803728E8.cpp"),
             Object(NonMatching, "ealib/tu_80372F60.cpp"),
+            Object(NonMatching, "ealib/tu_80373AD8.cpp"),
         ],
     },
 ]
