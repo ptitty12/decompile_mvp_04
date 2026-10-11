@@ -234,9 +234,9 @@ extern "C" int fn_80144588() { return 0; }
 
 extern "C" int fn_80144590() { return 0; }
 
-extern "C" void fn_80144598(Unk800C7B40_Widget* x)
+extern "C" void fn_80144598(Unk800C7B40_Widget* x, int a)
 {
-    x->fn_vslot41();
+    x->fn_vslot41(a);
 }
 
 extern "C" void fn_801445CC() {}

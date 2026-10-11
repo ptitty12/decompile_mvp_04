@@ -87,7 +87,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name, int a);
     virtual int fn_vslot31();
     virtual Unk800C7B40_Widget* fn_vslot32(const char* name, int a);
-    virtual void fn_vslot33();
+    virtual Unk800C7B40_Widget* fn_vslot33(int a, int b);
     virtual void fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
@@ -122,9 +122,9 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot65();
     virtual void fn_vslot66();
     virtual void fn_vslot67();
-    virtual void fn_vslot68();
+    virtual void fn_vslot68(int a);
     virtual void fn_vslot69();
-    virtual void fn_vslot70();
+    virtual Unk800C7B40_Widget* fn_vslot70();
     virtual void fn_vslot71();
     virtual void fn_vslot72();
     virtual Unk800C7B40_Widget* fn_vslot73(int idx, int a);
