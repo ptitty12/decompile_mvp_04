@@ -386,7 +386,13 @@ void fn_80326EF4(FxZ6C* a, int p4, int p5, int p6, int p7, float f1, float f2) {
 
 int fn_80326F30(int a) { return (unsigned)(a - 0xB3) <= 0x12; }
 
-/* near-miss: same as fn_80326F44 */
+FxZ fn_80326F44(FxPtr* p, int kind, float t) {
+    FxZT* tab = p->m0;
+    if (tab) return fn_80325158(tab, kind, t);
+    return lbl_805EBA10;
+}
+
+/* near-miss: same as the neighbouring function */
 FxZ fn_80326FC4(FxPtr* p, int kind, float t) {
     FxZT* tab = p->m0;
     if (tab) return fn_80325410(tab, kind, t);
