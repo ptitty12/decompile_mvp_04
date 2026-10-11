@@ -497,6 +497,83 @@ extern "C" Sub198* fn_80096244(Sub198* d, Sub198* s)
     return d;
 }
 
+extern "C" void fn_80096AB4(Obj3* o);
+extern "C" void fn_80099C48(Obj3* o, int a);
+extern "C" unsigned fn_8007E0E4(int g, int a, int b);
+extern "C" int fn_8007DF5C(int g, int a, int b, int i);
+
+extern "C" void fn_800965E8(Obj3* o, int a, int b)
+{
+    fn_80096AB4(o);
+    unsigned j = 0;
+    fn_80096204(&o->m198, a);
+    int g = lbl_8061930C;
+    o->m164 = b;
+    o->m188 = 1;
+    unsigned n = fn_8007E0E4(g, a, b);
+    if (j < n) {
+        do {
+            int r = fn_8007DF5C(g, a, b, j);
+            unsigned char cnt = o->m3E4;
+            ByteVec* v = &o->m168;
+            o->m3E8[cnt].m0 = r;
+            unsigned c = v->m4;
+            if (c < v->m8) {
+                v->m0[c] = cnt;
+                v->m4 = v->m4 + 1;
+            }
+            j++;
+            o->m3E4 = o->m3E4 + 1;
+        } while (j < n);
+    }
+    fn_80099C48(o, 0);
+}
+
+extern "C" void fn_80096AB4(Obj3* o);
+extern "C" void fn_80099C48(Obj3* o, int a);
+
+extern "C" void fn_800966CC(Obj3* o, int a, int b)
+{
+    fn_80096AB4(o);
+    fn_80096204(&o->m198, a);
+    unsigned char n = o->m3E4;
+    o->m164 = 4;
+    o->m188 = 1;
+    o->mD6C = b;
+    o->m3E8[n].m0 = b;
+    ByteVec* v = &o->m168;
+    unsigned c = v->m4;
+    if (c < v->m8) {
+        v->m0[c] = n;
+        v->m4 = v->m4 + 1;
+    }
+    o->m3E4 = o->m3E4 + 1;
+    fn_80099C48(o, 0);
+}
+
+/* near-miss (25 of 48 slots): retail keeps the incremented count unextended in r9 and copies it */
+extern "C" int fn_8007DDC8(int g, int a, int b, int c);
+
+extern "C" void fn_80096770(Obj3* o, int a, int b, int flag)
+{
+    Slot34* rows = o->m3E8;
+    fn_80096AB4(o);
+    fn_80096204(&o->m198, a);
+    unsigned char n = o->m3E4;
+    o->m164 = 4;
+    o->m188 = 2;
+    rows[n].m0 = b;
+    o->m17C[0] = n;
+    int n2 = o->m3E4 + 1;
+    o->m3E4 = n2;
+    if (flag == 1) {
+        rows[(unsigned char)n2].m0 = fn_8007DDC8(lbl_8061930C, a, 1, 1);
+        o->m17C[1] = n2;
+        o->m3E4 = o->m3E4 + 1;
+    }
+    fn_80099C48(o, 0);
+}
+
 extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
 extern "C" void fn_80099A44(Obj3* o, int a, int b);
 

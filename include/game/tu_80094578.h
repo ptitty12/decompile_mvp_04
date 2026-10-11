@@ -57,6 +57,8 @@ struct Obj3 {
     unsigned char m3E4;
     char pad3E5[3];
     Slot34 m3E8[25];
+    char pad8FC[0xD6C - 0x8FC];
+    int mD6C;
 };
 
 
