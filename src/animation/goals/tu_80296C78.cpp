@@ -125,6 +125,31 @@ int fn_80298B8C(Unk80296C78_Goal* g, Unk80270BA0_X* x)
     return 1;
 }
 
+void fn_80298CB8(Unk80296C78_Goal* g, Unk80270BA0_X* x, Unk80298CB8_Req* o, float f, int c, Vec3* out, int unused,
+                 int n)
+{
+    if (c == 1) {
+        c = g->m0;
+    }
+    int flag = 0;
+    int h = fn_80298DB8(g, c, &flag);
+    int flags = 0;
+    if (flag != 0) {
+        flags = 4;
+    }
+    if (g->m48 == 0) {
+        o->mA0 = 0x53CFCF84;
+        o->mBC |= 8;
+    }
+    float t = 0.0f;
+    fn_80386110(x->m618, o, 0x53CFCF84, h, &t, flags | 2);
+    float u = t;
+    float spare;                   /* never read: reserves stack slot 0x14 */
+    o->mD8 = 1;
+    o->mD4 = o->mD4 + u;
+    ((Unk8027A84C*)g)->fn_8027AC90(&o->mtx, n, unused, out);
+}
+
 int fn_80298DB8(Unk80296C78_Goal* g, int code, int* out)
 {
     int r = 0;
@@ -192,4 +217,60 @@ Unk8027A84C* fn_80298F8C(Unk8027A84C* g, const Vec3* v)
     Vec3 t = *v;
     g->fn_8027A898(&t);
     return g;
+}
+
+int fn_80298FE0(Unk80296C78_Goal* g, Unk80270BA0_X* x)
+{
+    Unk80296C78_Player* t = (Unk80296C78_Player*)g->m4C;
+    int r = 1;
+    if (t->m264 != 0) {
+        if (x->mB3C & 0x10000000) {
+            fn_80249B40(x, 0.2f, 0, 0, 0);
+            fn_80249DF8(x, 0);
+        }
+        return 0;
+    }
+    if (t != 0) {
+        fn_80249DF8(x, 1);
+        fn_80249B40(x, 0.2f, g->m4C, 0, 0);
+    }
+    Unk80695950* mgr = &lbl_80695950;
+    if (!mgr->fn_803834D8(x)) {
+        if (g->m48 != 0 && g->m60 == 0) {
+            r = fn_802993B4(g, x, g->m4C);
+        } else {
+            r = fn_80299100(g, x, g->m4C);
+            g->m60 = 0;
+        }
+    }
+    return r;
+}
+
+int fn_802993B4(Unk80296C78_Goal* g, Unk80270BA0_X* x, int target)
+{
+    return fn_802993D4(g, x, target);
+}
+
+void fn_802997F0(Unk80296C78_Goal* g, Unk80270BA0_X* x, Unk80298CB8_Req* o, int c, Vec3* out, int unused, int n,
+                 float f)
+{
+    ((Unk8027A84C*)g)->fn_8027AC90(&o->mtx, n, unused, out);
+    o->mD8 = 0;
+}
+
+int fn_80299834(const Unk80296C78_Goal* a, const Unk80296C78_Goal* b)
+{
+    if (b) {
+        if (b->m48 == a->m48 || a->m64 != 0) {
+            if (b->m4C != 0 && b->m4C == a->m4C) {
+                return DistSq2D(a->m50 - GetPos50(b)) <= 14400.0f;
+            }
+        }
+    }
+    return 0;
+}
+
+void fn_80299914(Unk80296C78_Goal* g)
+{
+    g->m0 = 0;
 }

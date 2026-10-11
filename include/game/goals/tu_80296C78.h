@@ -69,6 +69,12 @@ inline Vec3 GetPos(const Unk80296C78_Goal* p)
     return p->m10;
 }
 
+/* Same for the vector at +0x50 (fn_80299834: the by-value result gives retail's temp). */
+inline Vec3 GetPos50(const Unk80296C78_Goal* p)
+{
+    return p->m50;
+}
+
 /* Writes through a by-value parameter: gives retail's temp-to-member copy. */
 inline void SetVec(Vec3& dst, Vec3 v)
 {
@@ -78,11 +84,54 @@ inline void SetVec(Vec3& dst, Vec3 v)
 extern const Vec3 lbl_806055AC;
 extern int lbl_806242B4;
 
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+/* Squared length in the x/z plane; by value, as retail copies the argument. */
+inline float DistSq2D(Vec3 v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+
+/* Request record built by the +0x18C-family goals (fn_80298CB8, fn_802997F0):
+ * the Unk8027A9AC_Req prefix (0xC0 bytes) plus the fields at +0xCC..+0xD8
+ * (Unk8027AD3C_Obj has +0xCC and +0xD0 too). */
+struct Unk80298CB8_Req : public Unk8027A9AC_Req {
+    char padC0[0xCC - 0xC0];
+    int mCC;
+    float mD0;
+    float mD4;
+    int mD8;
+};
+
 /* Fields of the player object (Unk80270BA0_X) hidden in chooser.h padding. */
 struct Unk80296C78_Player {
-    char pad0[0x934];
+    char pad0[0x264];
+    int m264;
+    char pad268[0x590 - 0x268];
+    unsigned int m590;
+    char pad594[0x934 - 0x594];
     Unk8027A84C_Owner* m934;
 };
+
+/* 0xC-byte object at 0x80695950 (shared with other units); fn_803834D8 is its method. */
+struct Unk80695950 {
+    char pad0[0xC];
+    int fn_803834D8(Unk80270BA0_Obj* o);
+};
+extern Unk80695950 lbl_80695950;
+
+/* Functions of the unit referenced before their definition. */
+int fn_80298DB8(Unk80296C78_Goal* g, int code, int* out);
+int fn_80299100(Unk80296C78_Goal* g, Unk80270BA0_X* x, int target);
+int fn_802993B4(Unk80296C78_Goal* g, Unk80270BA0_X* x, int target);
+int fn_802993D4(Unk80296C78_Goal* g, Unk80270BA0_X* x, int target);
 
 /* Link object reached through Unk80270BA0_X::m618 (see Unk80271DBC_Link). */
 void fn_80381E9C(Unk80271DBC_Link* l, int v, int a, int b);
