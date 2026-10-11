@@ -6,6 +6,18 @@
 #include "game/goals/tu_8027C728.h"
 
 extern int lbl_806EF9B4;
+extern const Unk80273498_Vec3 lbl_806055DC;
+extern "C" int fn_801DCC1C(Unk80270BA0_X* p, const Unk80273498_Vec3* v);
+/* Minimal view of Unk80299920_Goal (the full header clashes with tu_80287600.h). */
+struct Unk80299920_Goal {
+    char pad0[0x60];
+    int m60;
+    void fn_80299F64(int v);
+};
+struct Unk801E4048_Src {
+    char pad0[0x1C];
+    int m1C;
+};
 extern "C" Unk8027C728_Goal* fn_802448F4(Unk80270BA0_X* p, int k);
 void fn_8027C728(Unk8027C728_Goal* g);
 
@@ -20,6 +32,21 @@ extern "C" Unk8027C728_Goal* fn_801E3FF8(void* self, Unk80270BA0_X* p)
     g->m10 = 2;
     fn_8027C728(g);
     ((Unk80287D70*)g->m18)->fn_80287DB8(0xC);
+    return g;
+}
+
+extern "C" Unk8027C728_Goal* fn_801E4048(void* self, Unk80270BA0_X* p, Unk801E4048_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 5;
+    fn_8027C728(g);
+    Unk80299920_Goal* sub = (Unk80299920_Goal*)g->m18;
+    sub->fn_80299F64(x->m1C);
+    sub->m60 = 1;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    ((Unk80287D70*)h->m18)->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
     return g;
 }
 
