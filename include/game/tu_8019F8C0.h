@@ -53,7 +53,9 @@ struct Unk8019F8C0_Ctrl {
 
 /* m700 of the owner: a player object with control pointers at 0x3B0.. */
 struct Unk8019F8C0_Pl {
-    char pad0[0x3B0];
+    char pad0[0x3A4];
+    void* m3A4;
+    char pad3A8[0x3B0 - 0x3A8];
     Unk8019F8C0_Ctrl* m3B0;
     void* m3B4;
     int m3B8;
@@ -95,6 +97,7 @@ struct Unk8019F8C0_Inner {
     unsigned char m1B4[0x3E4 - 0x1B4];
     unsigned char m3E4;
     char pad3E5[0xE64 - 0x3E5];
+    int GetM1() { return m1; }
 };
 
 struct Unk8019F8C0_Obj4A4 {
@@ -141,6 +144,54 @@ public:
     virtual void fn_vslot4(void* out);
 };
 
+/* The owner object seen as a class with a vptr at +0x18 (data-only base, then the virtuals). */
+class Unk8019F8C0_OVBase {
+public:
+    char pad0[0x18];
+};
+class Unk8019F8C0_OV : public Unk8019F8C0_OVBase {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+};
+
+/* State-machine style object with a vptr at +8 (fn_801A4CE8 result, Sub::m3C). */
+class Unk8019F8C0_MBase {
+public:
+    char pad0[8];
+};
+class Unk8019F8C0_M : public Unk8019F8C0_MBase {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual int fn_vslot9();
+};
+
+class Unk8019F8C0_M2 : public Unk8019F8C0_M {
+public:
+    int mC;
+};
+
+/* Same layout, fourth virtual takes no argument (fn_801A3860). */
+class Unk8019F8C0_W : public Unk8019F8C0_VBase {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual int fn_vslot4();
+};
+
 /* Sub-object of the owner at index 0..5 of its table at +0x30 (fn_801A04A8). */
 struct Unk8019F8C0_Sub {
     char pad0[4];
@@ -149,7 +200,7 @@ struct Unk8019F8C0_Sub {
     Unk8019F8C0_V* mC;
     char pad10[0x38 - 0x10];
     int m38;
-    void* m3C;
+    Unk8019F8C0_M2* m3C;
     Unk8019F8C0_Ref* m40;
     int m44;
     int m48;
@@ -172,7 +223,8 @@ struct Unk8019F8C0_Owner {
     int m548;
     int m54C;
     int m550;
-    char pad554[0x8];
+    void* m554;
+    char pad558[0x4];
     int m55C;
     char m560[0x28];
     void* m588;
