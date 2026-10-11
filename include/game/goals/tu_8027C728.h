@@ -54,13 +54,83 @@ struct Unk8027C728_Player {
  * goal); the per-type goal data extends it. */
 struct Unk8027C728_Base {
     int m0;
-    char pad4[8];
+    void* m4;
+    void* m8;
     int mC;
-    char pad10[0x48 - 0x10];
+    Unk80273498_Vec3 m10;      /* fn_8027DAE8 */
+    Unk80273498_Vec3 m1C;      /* fn_8027A898, fn_8027DB38 */
+    int m28;                   /* fn_8027DAE8 */
+    int m2C;
+    char pad30[0x48 - 0x30];
     void* m48;
     int m4C;
+};
+
+/* Goal data of type 10 (fn_8027D598): flags at +0xA8, base +0x4C is a mode. */
+struct Unk8027D598_Type10 : public Unk8027C728_Base {
     char pad50[0xA8 - 0x50];
     unsigned int mA8;
+};
+
+/* Frame counter object reached through fn_8027A918(base) = base->m44->mC->m44C
+ * (Unk8014D8AC_Ctx in chooser.h); only +0x4C is used here. */
+struct Unk8027DC98_Ctx {
+    char pad0[0x4C];
+    unsigned int m4C;
+};
+
+/* Goal data of type 6 (set up by fn_8027D9A4). Evidence: fn_8027D9A4 (init),
+ * fn_8027DC98/DD54 (m80/m84 from a time), fn_8027DDE8/DE00/DE14/DE28 (flag
+ * setters). The flag word at +0xE8 holds bit-fields covering bits 0..23. */
+struct Unk8027D9A4 : public Unk8027C728_Base {
+    char pad50[0x78 - 0x50];
+    int m78;
+    int m7C;
+    float m80;
+    float m84;
+    float m88;
+    float m8C;
+    float m90;
+    int m94;
+    float m98;
+    int m9C;
+    int mA0;
+    Unk80273498_Vec3 mA4;
+    Unk80273498_Vec3 mB0;
+    Unk80273498_Vec3 mBC;
+    float mC8;
+    float mCC;
+    float mD0;                 /* fn_8027DB38 */
+    float mD4;
+    Unk80273498_Vec3 mD8;
+    int mE4;
+    /* +0xE8: flag word; f<N> is bit N counted from the MSB (fn_8027DC98: f2, fn_8027DDE8: f6,
+     * fn_8027DE00: f15, fn_8027DE14: f16, fn_8027DE28: f19) */
+    unsigned int f0 : 1;
+    unsigned int f1 : 1;
+    unsigned int f2 : 1;
+    unsigned int f3 : 1;
+    unsigned int f4 : 1;
+    unsigned int f5 : 1;
+    unsigned int f6 : 1;
+    unsigned int f7 : 1;
+    unsigned int f8 : 1;
+    unsigned int f9 : 1;
+    unsigned int f10 : 1;
+    unsigned int f11 : 1;
+    unsigned int f12 : 1;
+    unsigned int f13 : 1;
+    unsigned int f14 : 1;
+    unsigned int f15 : 1;
+    unsigned int f16 : 1;
+    unsigned int f17 : 1;
+    unsigned int f18 : 1;
+    unsigned int f19 : 1;
+    unsigned int f20 : 1;
+    unsigned int f21 : 1;
+    unsigned int f22 : 1;
+    unsigned int f23 : 1;
+    unsigned int f24 : 8;
 };
 
 /* Result record built by fn_80279BB8(out, player) (tu_80279AE4.cpp); the goal

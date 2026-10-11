@@ -14,6 +14,7 @@ typedef Unk8027C728_Player Player;
 typedef Unk8027C728_Base Base;
 typedef Unk80273498_Vec3 Vec3;
 
+extern const Vec3 lbl_806055AC;
 extern char lbl_806EF9C7;
 extern char lbl_8061EC9C[];
 
@@ -22,6 +23,16 @@ void fn_8027A84C(void* base, void* owner);
 void fn_8028F34C(void* p);
 void fn_8027A05C(void* p, Player* player);
 Base* fn_8027C67C(Goal* g);
+Unk8027DC98_Ctx* fn_8027A918(Base* base);
+void fn_8027A898(Base* base, Vec3 v);
+float fn_804028E4(float x);
+int fn_80255028(Unk8027C728_Track* t);
+int fn_80254EA4(Unk8027C728_Track* t, int a);
+Vec3 fn_8014E388(int idx);
+Vec3 fn_80379530(const Vec3& a, const Vec3& b, const Vec3& c, int d, float e, float f);
+float fn_80410CE8(float y, float x);
+float fn_80410634(float x);
+float fn_80382BB8(Unk8027C728_Link* link);
 void fn_8027AC90(void* base, Unk80279BB8* out, int n, void* b, Vec3* arr);
 Vec3 fn_8037B128();
 float fn_8037B1F0(Unk80279BB8* out);
@@ -530,18 +541,6 @@ int fn_8027D390(Goal* g, float* a, Vec3* b, Vec3* c, float* d)
     return fn_8027D3E8(g, fn_8027C67C(g)->m0, a, b, c, d);
 }
 
-int fn_8027D574(Goal* g)
-{
-    int n = 0;
-    if (g) {
-        do {
-            g = g->m0;
-            n++;
-        } while (g);
-    }
-    return n;
-}
-
 inline Vec3 GetVec()
 {
     Vec3 v = fn_8037B128();
@@ -560,6 +559,8 @@ inline int GetResult(Unk80279BB8* o, float* dist)
     return r;
 }
 
+/* near-miss (97%): everything matches except that retail addresses the result
+ * record through r4 (addi r4,r1,8) in the GetResult part where this uses r9. */
 int fn_8027D3E8(Goal* g, int a, float* outF, Vec3* pos6, Vec3* pos7, float* out8)
 {
     Player* player = g->mC;
@@ -589,6 +590,18 @@ int fn_8027D3E8(Goal* g, int a, float* outF, Vec3* pos6, Vec3* pos7, float* out8
     return r;
 }
 
+int fn_8027D574(Goal* g)
+{
+    int n = 0;
+    if (g) {
+        do {
+            g = g->m0;
+            n++;
+        } while (g);
+    }
+    return n;
+}
+
 int fn_8027D598(Goal* g, int* out)
 {
     Goal* p = fn_8027D2DC(g, -1);
@@ -596,7 +609,7 @@ int fn_8027D598(Goal* g, int* out)
         p = p->m0;
     }
     if (p) {
-        Base* b = p->m10 == 10 ? (Base*)p->m18 : 0;
+        Unk8027D598_Type10* b = p->m10 == 10 ? (Unk8027D598_Type10*)p->m18 : 0;
         if (b) {
             int v = b->m4C;
             if (!(b->mA8 & 0x40000) && v > 10 && v <= 16) {
@@ -648,4 +661,152 @@ int fn_8027D670(Goal* g, Player*, int)
         return 0;
     }
     return 0;
+}
+
+inline bool operator==(const Vec3& a, const Vec3& b)
+{
+    return a.x == b.x && a.y == b.y && a.z == b.z;
+}
+
+inline float Dist2(const Vec3& a, const Vec3& b)
+{
+    return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
+}
+
+inline float AngleDiff(float a, float b)
+{
+    float d = a - b;
+    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    return d;
+}
+
+/* near-miss (76%): float register allocation and the first early exit differ
+ * (retail keeps the track index in r3 with li r3,0 hoisted above the first
+ * beq, and keeps q.x in f11 across the expression chain). */
+int fn_8027D708(void*, Player* pa, Player* pb)
+{
+    Unk8027C728_Track* trk = &pb->m58C;
+    int a = fn_80255028(trk);
+    if (a == fn_80254EA4(trk, 0)) {
+        return 0;
+    }
+    if (trk->m38 == 3) {
+        return 0;
+    }
+    int next = trk->m38;
+    if (next == a) {
+        next = a + 1;
+    }
+    Vec3 posA = pa->m60;
+    Vec3 posB = pb->m60;
+    Vec3 p0 = fn_8014E388(next);
+    Vec3 p1 = fn_8014E388(a);
+    Vec3 q = fn_80379530(p0, p1, posA, 0, 0.0f, 0.0f);
+    if (!(q == p0)) {
+        if (!(q == p1)) {
+            const float lim = 9216.0f;
+            float d2 = Dist2(q, posA);
+            if (!(d2 > lim)) {
+                float ang = fn_80410CE8(p1.x - posA.x, p1.z - posA.z);
+                float diff = AngleDiff(ang, fn_80382BB8(pa->m618));
+                float adiff = __builtin_fabsf(diff);
+                if (!(adiff > 0.7853982f)) {
+                    float da = Dist2(posA, p1);
+                    float db = Dist2(posB, p1);
+                    return db < da;
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+inline void SetVec(Vec3* dst, Vec3 v)
+{
+    *dst = v;
+}
+
+Base* fn_8027DAE8(Base* b, Vec3 v)
+{
+    SetVec(&b->m10, v);
+    b->m28 = 1;
+    return b;
+}
+
+inline Vec3 operator-(const Vec3& v)
+{
+    Vec3 r;
+    r.x = -v.x;
+    r.y = -v.y;
+    r.z = -v.z;
+    return r;
+}
+
+Unk8027D9A4* fn_8027DB38(Unk8027D9A4* d, Vec3* p, Vec3* q)
+{
+    if (p->x != 0.0f || p->y != 0.0f || p->z != 0.0f) {
+        fn_8027A898(d, *p);
+    }
+    if (q->x != 0.0f || q->y != 0.0f || q->z != 0.0f) {
+        d->mD0 = fn_804028E4(q->x * q->x + q->z * q->z);
+        if (d->m2C == 0) {
+            fn_8027A898(d, -*q);
+        }
+        if (d->m2C != 0) {
+            if (!(fn_804028E4(q->x * q->x + q->y * q->y + q->z * q->z) >= 88.0f)) {
+                d->m2C = 0;
+            }
+        }
+    }
+    return d;
+}
+
+Unk8027D9A4* fn_8027DC98(Unk8027D9A4* d, float f)
+{
+    d->m80 = f;
+    if (!(f > 0.0f)) {
+        d->m84 = 0.0f;
+        d->f2 = 0;
+    } else {
+        d->f2 = 1;
+        float t = (float)fn_8027A918(d)->m4C * 0.016666668f;
+        d->m84 = f + t;
+    }
+    d->m78 = 0;
+    return d;
+}
+
+Unk8027D9A4* fn_8027DD54(Unk8027D9A4* d, float f)
+{
+    d->m84 = f;
+    d->f2 = 1;
+    float t = (float)fn_8027A918(d)->m4C * 0.016666668f;
+    d->m78 = 0;
+    d->m80 = f - t;
+    return d;
+}
+
+Unk8027D9A4* fn_8027DDE8(Unk8027D9A4* d, int v)
+{
+    d->m78 = v;
+    d->f6 = 1;
+    return d;
+}
+
+Unk8027D9A4* fn_8027DE00(Unk8027D9A4* d, int v)
+{
+    d->f15 = v;
+    return d;
+}
+
+Unk8027D9A4* fn_8027DE14(Unk8027D9A4* d, int v)
+{
+    d->f16 = v;
+    return d;
+}
+
+Unk8027D9A4* fn_8027DE28(Unk8027D9A4* d)
+{
+    d->f19 = 1;
+    return d;
 }
