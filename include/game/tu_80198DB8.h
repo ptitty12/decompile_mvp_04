@@ -137,7 +137,7 @@ void fn_803DE374(int a, int b);
 void fn_8026CA5C(void* o);
 void fn_8019B490(void* o);
 void fn_802C0888(void* p, float t);
-void fn_802C0050(void* p, float t);
+int fn_802C0050(void* p, void* a, void* b, float* t, void* p1, void* p2, float k);
 void fn_802C0EC4(void* p);
 void* fn_80198CC0(void* o);
 void fn_80199414();

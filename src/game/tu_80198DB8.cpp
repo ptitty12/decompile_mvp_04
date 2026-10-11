@@ -285,9 +285,9 @@ extern "C" void fn_8019BA30(void** o, float t)
 }
 
 //@8019BBC0
-extern "C" void fn_8019BBC0(void** o, float t)
+extern "C" int fn_8019BBC0(void** o, void* a, void* b, float* t, void* p1, void* p2, float k)
 {
-    fn_802C0050(*o, t);
+    return fn_802C0050(*o, a, b, t, p1, p2, k);
 }
 
 //@8019BBEC
