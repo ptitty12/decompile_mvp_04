@@ -1114,4 +1114,6 @@ struct Unk80052794_Payload {
 };
 extern const char lbl_805A931C[];
 void fn_8033E958(const char* fmt, ...);
+void fn_8005B414(Unk8005ADD0_Obj* o);
+int fn_8005B6E4(Unk8005ADD0_Obj* o);
 #endif

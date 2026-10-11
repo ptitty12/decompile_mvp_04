@@ -51,6 +51,46 @@ void fn_8005AEB0(Unk8005ADD0_Obj* o, int ch)
     }
 }
 
+void fn_8005AF00(Unk8005ADD0_Obj* o, int a)
+{
+    int ok = 0;
+    if (o->m7C == 1) {
+        ok = o->m108 >= 0;
+    }
+    if (ok == 1) {
+        int st = o->mC[o->mA8].mState;
+        if (st != 3) {
+            if (st != 0 && a == 0) {
+                o->mA4 = fn_8005B6E4(o);
+            }
+            int old = o->mA8;
+            if (o->mC[old].mState != 6) {
+                int ch = o->m80[o->mA4];
+                o->mA8 = ch;
+                o->mC[ch].mState = 1;
+                o->mC[o->mA8].mMode = a;
+                if (a == 1) {
+                    fn_8005B414(o);
+                }
+            } else {
+                int ch = o->m80[o->mA4];
+                o->mA8 = ch;
+                if (ch != old) {
+                    o->mC[ch].mState = 1;
+                    o->mC[o->mA8].mMode = a;
+                    fn_8005B06C(o);
+                } else {
+                    fn_8005B58C(o, 0);
+                }
+            }
+        } else if (o->mC[o->mA8].mMode == 0 && a == 1) {
+            fn_8005B58C(o, 0);
+            o->mC[o->mA8].mState = a;
+            o->mC[o->mA8].mMode = a;
+        }
+    }
+}
+
 void fn_8005B06C(Unk8005ADD0_Obj* o)
 {
     int ok = 0;
