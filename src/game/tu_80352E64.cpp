@@ -159,6 +159,17 @@ void fn_8035324C(DtorAt1C* self, int chrg)
         fn_80377408(self);
 }
 
+struct Unk80353280_ED { char pad[0x1c]; };
+struct Unk80353280_E : Unk80353280_ED { virtual ~Unk80353280_E(); };
+struct Unk80353280 {
+    int m0;
+    Unk80353280_E m4[16];
+    ~Unk80353280();
+};
+Unk80353280::~Unk80353280()
+{
+}
+
 void fn_803532F8(DtorAt8* self, int chrg)
 {
     self->m = lbl_8064A620;
@@ -188,6 +199,47 @@ void fn_80353374(DtorAt18* self, int chrg)
     self->m = lbl_8064A5F0;
     if (chrg & 1)
         fn_80377408(self);
+}
+
+struct Unk803533A8_AD { char pad[0x24]; };
+struct Unk803533A8_A : Unk803533A8_AD { virtual ~Unk803533A8_A(); };
+struct Unk803533A8_BD { char pad[8]; };
+struct Unk803533A8_B : Unk803533A8_BD { virtual ~Unk803533A8_B(); };
+struct Unk803533A8_Mid {
+    char pad0[0x80];
+    Unk803533A8_A m80[6];
+    Unk803533A8_B m170[4];
+    char pad1[0x6ec - 0x1a0];
+    ~Unk803533A8_Mid() {}
+};
+struct Unk803533A8 {
+    char pad0[0x18];
+    Unk803533A8_Mid m18[4];
+    ~Unk803533A8();
+};
+Unk803533A8::~Unk803533A8()
+{
+}
+
+struct Unk80353478_ED { char pad[0x14]; };
+struct Unk80353478_E : Unk80353478_ED { virtual ~Unk80353478_E(); };
+struct Unk80353478 {
+    int m0;
+    Unk80353478_E m4[32];
+    ~Unk80353478();
+};
+Unk80353478::~Unk80353478()
+{
+}
+
+struct Unk803534F0_ED { char pad[0x1c]; };
+struct Unk803534F0_E : Unk803534F0_ED { virtual ~Unk803534F0_E(); };
+struct Unk803534F0 {
+    Unk803534F0_E m0[25];
+    ~Unk803534F0();
+};
+Unk803534F0::~Unk803534F0()
+{
 }
 
 void fn_80353564(DtorAt10* self, int chrg)
