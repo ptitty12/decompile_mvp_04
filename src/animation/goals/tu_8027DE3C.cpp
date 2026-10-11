@@ -401,12 +401,11 @@ float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
     return result;
 }
 
-/* near-miss: 175 of 181 instructions. The clamp (>? operator) and the frame (SetAngle
- * as two nested inlines, each with its own 8-byte-aligned inline frame: 0x30, 0x38)
- * match. Left: the 0 / 5 constants for m95C / m958 get r11 / r0 (retail r0 / r11;
- * local-alloc priority from the sched1 order), and "addi r3,r30,0x734" is scheduled
- * one slot before "lfs f0,0x10(r1)". Tried: the four store orders, a SetAngle(x, v)
- * wrapper, a pointer local in the wrapper, reference and pointer inner forms. */
+/* SetAngle is two nested inlines, each with its own 8-byte-aligned inline frame
+ * (0x30, 0x38). The clamp stores v in each arm (if/else around the `>?` ternary):
+ * jump2 cross-jumps the stores after sched2, so the join block starts with the
+ * reload of v, as in retail. `int k = 5;` before the stores emits the 5 first,
+ * which gives the 0 the shorter local-alloc range (r0) and the 5 r11. */
 void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
 {
     int a = 0;
@@ -439,8 +438,9 @@ void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
         float ang = fn_80410CE8(m1C, m24) - side;
         float cur = fn_80382BB8(x->m618);
         float diff = AngleDiff(ang, cur);
+        int k = 5;
         x->m95C = 0;
-        x->m958 = 5;
+        x->m958 = k;
         SetFloat(x->m954, diff * 0.2f);
     }
     if (h == (int)0xA84A0C58 || h == (int)0xFA52B1B5 || h == (int)0xF90D27A1) {
@@ -448,7 +448,11 @@ void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
             float k = fn_80382BD8(x->m618, 0);
             float w = lbl_8061E6CC * (1.0f - k);
             float v = (mC8 + w) / f;
-            v = !(v <= 0.0f) ? (!(v > 5.0f) ? (v >? 1.0f) : 5.0f) : 5.0f;
+            if (!(v <= 0.0f)) {
+                v = !(v > 5.0f) ? (v >? 1.0f) : 5.0f;
+            } else {
+                v = 5.0f;
+            }
             SetAngle(&x->m734, v);
         }
     }
