@@ -152,6 +152,62 @@ struct Unk8052DD58_Set {
     int m0;
     Unk8052DD58_Ent m4[32];
 };
+/* 0x2C-byte element of the first record table (fn_8052CA60): two 12-byte strings at
+ * +0xE and +0x1A (fn_8052CEB4 reads them, fn_8052D430 writes them). */
+struct Unk8052CA60_Rec {
+    char pad0[0xE];
+    char m0E[0xC];
+    char m1A[0xC];
+    char pad26[6];
+};
+
+/* Same for the second table (unit 0x8052FF10): strings at +0xF and +0x1B. */
+struct Unk8052FF10_Rec {
+    char pad0[0xF];
+    char m0F[0xC];
+    char m1B[0xC];
+    char pad27[5];
+};
+
+struct Unk80531264_Five {
+    int w[5];
+};
+/* Byte tables indexed by (row, column, range class): fn_80531718 reads from +8 with an extra
+ * offset d; fn_80531774..fn_80531984 read from +0x11..+0x17. */
+struct Unk80531718_Tbl {
+    char pad0[8];
+    unsigned char m8[1];
+};
+struct Unk80531774_Tbl {
+    char pad0[0x11];
+    unsigned char m11[1];
+    unsigned char m12[1];
+    unsigned char m13[1];
+    unsigned char m14[1];
+    unsigned char m15[1];
+    unsigned char m16[1];
+    unsigned char m17[1];
+};
+
+/* The table both lookup families read (fn_805312AC fills it): bytes at +8 (indexed with d),
+ * then seven tables at +0x11..+0x17. */
+struct Unk805312AC_Tbl {
+    char pad0[8];
+    unsigned char m8[9];
+    unsigned char m11[1];
+    unsigned char m12[1];
+    unsigned char m13[1];
+    unsigned char m14[1];
+    unsigned char m15[1];
+    unsigned char m16[1];
+    unsigned char m17[1];
+};
+
+/* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */
+struct Unk8052CF34_Obj {
+    virtual float M(int a);
+};
+typedef float (Unk8052CF34_Obj::*Unk8052CF34_Pmf)(int);
 struct Unk8052E408_Obj {
     char pad0[0x14];
     const void* m14;

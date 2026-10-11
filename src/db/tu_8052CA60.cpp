@@ -15,6 +15,11 @@ extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
 extern "C" void fn_8052DD58(Unk8052DD58_Ent* e);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
+extern "C" int fn_8040B6A0(const char* s);
+extern "C" char* fn_8040B830(char* dst, const char* src, int n);
+extern int lbl_8060133C[];
+extern Unk8007B2B0_Screen* lbl_8061930C;
+extern Unk8052CF34_Pmf lbl_8060130C[];
 extern char lbl_80682810[];
 struct Unk8052E408_Obj;
 extern "C" void fn_80360AB4(Unk8052E408_Obj* self);
@@ -61,6 +66,33 @@ extern "C" DB_OVERLAY char* fn_8052CEB4(Unk80071604* self, int kind, unsigned i,
     return out;
 }
 
+extern "C" DB_OVERLAY float fn_8052CF34(Unk8052CF34_Obj* o, int i, int a)
+{
+    float r = (o->*lbl_8060130C[i])(a);
+    return r;
+}
+
+extern "C" DB_OVERLAY void fn_8052D430(Unk80071604* self, int kind, unsigned i, const char* src, int n)
+{
+    if (i < self->m1C) {
+        if (n <= 0)
+            n = fn_8040B6A0(src);
+        int lim = lbl_8060133C[kind] - 1;
+        if (n > lim)
+            n = lim;
+        switch (kind) {
+        case 0:
+            fn_8040B830(((Unk8052CA60_Rec*)self->m24)[i].m0E, src, n);
+            ((Unk8052CA60_Rec*)self->m24)[i].m0E[n] = 0;
+            break;
+        case 1:
+            fn_8040B830(((Unk8052CA60_Rec*)self->m24)[i].m1A, src, n);
+            ((Unk8052CA60_Rec*)self->m24)[i].m1A[n] = 0;
+            break;
+        }
+    }
+}
+
 extern "C" DB_OVERLAY float fn_8052D51C(W* self, int a)
 {
     float r = (float)(self->v28(1, a) + 0x30);
@@ -89,6 +121,13 @@ extern "C" DB_OVERLAY float fn_8052D6E0(W* self, int a)
 {
     Unk80329FA0_Out o = fn_80329FA0(self->v28(0, a));
     return (float)o.m1;
+}
+
+extern "C" DB_OVERLAY float fn_8052D75C(W* self, int a)
+{
+    int v = self->v28(0xB, a);
+    float r = lbl_8061930C->fn_80079A90(v);
+    return r;
 }
 
 extern "C" DB_OVERLAY void fn_8052D7B0(Unk80071604* self, int a, Unk80070DDC_Stream* io)
