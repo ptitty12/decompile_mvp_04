@@ -43,13 +43,6 @@ extern "C" void fn_801CB324(Z* z) { fn_801CB360(z); }
 
 extern "C" void fn_801CB344(Z* z) { *(V2*)z->m150 = lbl_8060558C; }
 
-extern "C" float fn_801CBE74(Z* z)
-{
-    P* p = fn_801A4B34(z->m204);
-    float r = fn_8024F20C(p->mA0C, p->mA04, p->m44C, p->m708, 0);
-    return r;
-}
-
 extern "C" void fn_801CBE08(Z* z)
 {
     z->m150[0] = z->m13C;
@@ -57,6 +50,13 @@ extern "C" void fn_801CBE08(Z* z)
     if (p->v4() == 0)
         z->m150[0] = -z->m150[0];
     z->m150[1] = z->m140;
+}
+
+extern "C" float fn_801CBE74(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    float r = fn_8024F20C(p->mA0C, p->mA04, p->m44C, p->m708, 0);
+    return r;
 }
 
 extern "C" float fn_801CBEBC(Z* z)
@@ -145,6 +145,7 @@ extern "C" float fn_801CDA14(Z* z)
 }
 
 extern "C" float fn_801CDA6C(void) { return -1.3f; }
+
 extern "C" float fn_801CDA78(void) { return 1.3f; }
 
 extern "C" int fn_801CDB4C(Z* z)
@@ -173,6 +174,7 @@ extern "C" void fn_801CE974(Z* z)
 }
 
 extern "C" void fn_801CE9CC(Z* z) { z->m1CC = 1; }
+
 extern "C" void fn_801CE9D8(Z* z) { fn_801D7AC4(z->m8, z->m204); }
 
 extern "C" int fn_801CEA00(Z* z)
