@@ -280,6 +280,19 @@ inline void Unk8035B718_Assign(const Unk8035B718* s, Unk8035B718* d)
         fn_803FFA60(d, s, sizeof(*d));
 }
 
+/* 0x24-byte block at Unk801DD660::mF8 (set up by fn_801E98C0). */
+struct Unk801DD660_Blk {
+    float m0;
+    int m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    int m1C;
+    int m20;
+};
+
 /* Base part before the vptr (+0x98). */
 struct Unk801DD660_Base {
     char pad0[0x98];
@@ -298,10 +311,16 @@ struct Unk801DD660 : public Unk801DD660_Virt {
     Unk801DD660_Ctx* m9C;
     char padA0[0xAC - 0xA0];
     Unk801DD660_Hist mAC;
-    char padB4[0xBC - 0xB4];
+    char padB4[4];
+    int mB8;
     int mBC;
     int mC0;
-    char padC4[0x11C - 0xC4];
+    char mC4[0x24];
+    float mE8;
+    float mEC;
+    float mF0;
+    float mF4;
+    Unk801DD660_Blk mF8;
     Unk801DD660_Sub m11C;
     Unk801DD660_Sub2 m134;
     int m168;

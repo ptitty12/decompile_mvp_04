@@ -16,6 +16,23 @@ extern const Vec3 lbl_805D40D0[];
 extern const Vec3 lbl_805D3F98[];
 extern const float lbl_805D4254;
 extern const float lbl_805D4A0C;
+extern float lbl_805D4A00;
+extern float lbl_805D4A04;
+extern float lbl_805D4A08;
+
+struct Unk801E6D88_W {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    int m1C;
+    int m20;
+};
+
+extern "C" void fn_801E99A0(Unk801E6D88_W* s, int a);
 
 struct Unk801E6D88_F160 {
     char pad0[0x160];
@@ -44,6 +61,7 @@ void fn_8014E09C(Unk801DB948_It* it, Unk801DB948_Game* g, int k);
 P* fn_801A497C(Unk801DB948_Game* g, int a, int b);
 int fn_802D7DB4(int a, int b);
 int fn_8020543C(Unk801DD660_Ctx* c);
+void fn_802053AC(Unk801DD660_Ctx* c);
 }
 
 extern "C" void fn_801E6E48(I* s, int chrg)
@@ -266,20 +284,32 @@ extern "C" int fn_801E9280(I* s, int v)
     return 0;
 }
 
-struct Unk801E6D88_W {
-    int m0;
-    int m4;
-    float m8;
-    float mC;
-    float m10;
-    float m14;
-    float m18;
-    int m1C;
-    int m20;
-};
-/* near-miss: float store order (3 slots) */
-extern "C" void fn_801E99A0(Unk801E6D88_W* s, int a);
+extern "C" void fn_801E98C0(I* s)
+{
+    fn_802053AC(s->m9C);
+    s->mC0 = 0;
+    Unk801DD660_Blk* b = &s->mF8;
+    s->mF8.m0 = lbl_805D4A00;
+    b->m4 = 0;
+    b->m8 = lbl_805D4A00;
+    b->mC = lbl_805D4A00;
+    b->m10 = lbl_805D4A00;
+    b->m14 = lbl_805D4A04;
+    b->m20 = 1;
+    b->m18 = lbl_805D4A08;
+    b->m1C = 0;
+    s->mF0 = lbl_805D4A00;
+    s->mAC.m4 = -1;
+    s->mE8 = lbl_805D4A00;
+    s->mEC = lbl_805D4A00;
+    s->mF4 = lbl_805D4A00;
+    s->mAC.m0 = -1;
+    fn_801E99A0((Unk801E6D88_W*)s->mC4, (int)s->m9C->m0);
+    s->mBC = 1;
+    s->mB8 = 0;
+}
 
+/* near-miss: float store order (3 slots) */
 extern "C" Unk801E6D88_W* fn_801E9970(Unk801E6D88_W* s, int a)
 {
     fn_801E99A0(s, a);
