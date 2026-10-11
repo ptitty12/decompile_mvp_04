@@ -4,6 +4,11 @@
  */
 #include "game/tu_80167DCC.h"
 
+extern float lbl_805CAD78;
+extern const char lbl_805CAD7C[];
+extern float lbl_805CAD8C;
+extern float lbl_805CAD90;
+
 extern const char lbl_805C6244[];
 
 extern float lbl_805CAD38;
@@ -16,6 +21,13 @@ extern float lbl_805CAD94;
 int fn_8040B6A0(const char* s);
 int fn_80169DC4(const char* b);
 int fn_8040B574(const char* a, const char* b);
+void fn_80359948(Unk8016C1C4_List* l, int a);
+int fn_804089B4(char* buf, const char* fmt, ...);
+void fn_80303BC4(const char* fmt, ...);
+char* fn_8040B61C(char* d, const char* s);
+void fn_802AEBCC(void* mgr, const char* s);
+void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
+extern void* lbl_8061E978;
 void fn_80359910(Unk8016C1C4_List* l);
 void fn_803596DC(void* p);
 
@@ -28,7 +40,6 @@ float Unk8016C1C4_List::fn_8016BF94() /* 8016BF94 */
     return x;
 }
 
-/* near-miss: retail uses lwzux on this + idx*0xAC; here lwzx + add */
 inline int CurId(Unk8016C1C4_List* l)
 {
     if (l->mCur >= 0) {
@@ -42,7 +53,6 @@ int Unk8016C1C4_List::fn_8016C1C4(int idx) /* 8016C1C4 */
     return CurId(this + idx);
 }
 
-/* near-miss: 2 extra instructions in the second-list lookup */
 int Unk8016C1C4_List::fn_8016C1EC() /* 8016C1EC */
 {
     if (CurId(this) == 0) {
@@ -112,7 +122,6 @@ int Unk8016ACAC::fn_8016C39C() /* 8016C39C */
     return !AllEmpty(m3D94);
 }
 
-/* near-miss: retail uses lwzux; one instruction less here */
 inline void ClearCur(Unk8016C1C4_List* l)
 {
     if (l->mCur >= 0) {
@@ -123,6 +132,29 @@ inline void ClearCur(Unk8016C1C4_List* l)
 void Unk8016C1C4_List::fn_8016C424(int idx) /* 8016C424 */
 {
     ClearCur(this + idx);
+}
+
+void Unk8016ACAC_Slot::fn_8016C448() /* 8016C448 */
+{
+    int p = (int)this;
+    int end = p + 0x968;
+    do {
+        fn_80359948((Unk8016C1C4_List*)p, 0);
+        ((Unk8016C1C4_List*)p)->mCur = 0;
+        p += 0xAC;
+    } while (p <= end);
+    fn_8016A6AC();
+}
+
+void Unk8016ACAC::fn_8016C4A0() /* 8016C4A0 */
+{
+    Unk8016ACAC_Slot* s = m1E28;
+    for (int i = 3; i != 0; i--, s++) {
+        s->fn_8016C448();
+    }
+    m4.fn_8016DFD0();
+    fn_8016A880();
+    fn_8016D128();
 }
 
 /* near-miss: retail forms the offset cur*0x14+idx*0xAC once and uses four (this+k)[off] stores; raw-offset and pointer forms tried */
@@ -171,6 +203,16 @@ int Unk8016C1C4_List::fn_8016C798(int idx) /* 8016C798 */
     return *(int*)((char*)this + 0xA8 + idx * 0xAC);
 }
 
+void Unk80159F28::fn_8016CFC4(Unk8016C788_Obj* o) /* 8016CFC4 */
+{
+    if (o != 0) {
+        *(unsigned int*)((char*)o + 0x71C) |= 0x1000;
+        fn_80244A64(o, 0, 1);
+        ((Unk80189300*)((char*)o + 0))->fn_v8(0);
+        fn_80244A64(o, 0, 1);
+    }
+}
+
 void Unk8016C1C4_List::fn_8016D258() /* 8016D258 */
 {
     int p = (int)this;
@@ -182,6 +224,38 @@ void Unk8016C1C4_List::fn_8016D258() /* 8016D258 */
         ((Unk8016C1C4_List*)p)->mA4 = z;
         p += 0xAC;
     } while (p <= end);
+}
+
+void Unk8016ACAC::fn_8016D2A4() /* 8016D2A4 */
+{
+    float t = lbl_805CAD78;
+    Unk8016ACAC_Slot* s = m1E28;
+    for (int i = 3; i != 0; i--, s++) {
+        s->fn_8016D368(&t);
+    }
+}
+
+/* near-miss: retail enters the loop through its condition (pre-header jump) and keeps the previous pointer in r30; for/while forms tried */
+void Unk801527C8_Ctx::fn_8016D2F4(const char* s) /* 8016D2F4 */
+{
+    char* p = mA24[0];
+    for (int i = 0; i <= 3; i++, p += 10) {
+        if (fn_8040B6A0(p) == 0) {
+            fn_8040B61C(p, s);
+            break;
+        }
+    }
+    fn_802AEBCC(lbl_8061E978, s);
+}
+
+void Unk8016ACAC_Slot::fn_8016D368(float* t) /* 8016D368 */
+{
+    if (mA20 != 0) {
+        char buf[32];
+        fn_804089B4(buf, lbl_805CAD7C, mA20);
+        fn_80303BC4(buf, lbl_805CAD8C, *t);
+    }
+    *t = *t + lbl_805CAD90;
 }
 
 /* near-miss: same as fn_8016C620 */
