@@ -7,14 +7,13 @@
 
 int fn_80355A6C(Cont* self) { return self->m14.m4; }
 
-/* near-miss: retail re-reads the int-list count (v->m4) at the loop bottom; ours hoists it into a register
-   (inline Count(), while form and v->m0[i] data reads tried; the last gives 14 slots, this form 19) */
 int fn_80355A74(Cont* self, int idx)
 {
     IntVec* v = &self->m14;
     Rec1C* r = &self->m0[idx];
     for (unsigned i = 0; i < v->m4; i++) {
-        if (r->m0 == self->m14.m0[i])
+        int o = i * 4;
+        if (r->m0 == *(int*)((char*)self->m14.m0 + o))
             return 0;
     }
     return 1;

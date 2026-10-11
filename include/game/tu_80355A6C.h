@@ -52,8 +52,8 @@ public:
     virtual int s19(int a);
 };
 struct IntVec {
-    int* m0;
-    unsigned m4;
+    int* volatile m0;
+    volatile unsigned m4;
 };
 class Cont : public Cont0 {
 public:
