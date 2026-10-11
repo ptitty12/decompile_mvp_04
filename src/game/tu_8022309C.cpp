@@ -51,6 +51,7 @@ void fn_8022359C(Task* t, int a, RecQueue* q)
     }
 }
 
+/* near-miss: 8 slots: retail forms in+3240 as its own base register (add. r10,r9,r11 / lwzx r0,r9,r11); ours folds it into the index */
 void fn_80223910(Task* t, int a)
 {
     TaskInner* in = t->m9C;
