@@ -187,6 +187,21 @@ void fn_8017696C(void* self)
     fn_801769A8(self, 1);
 }
 
+/* near-miss: retail recomputes `off + this` for each use (37 instrs); the byte-offset and entry-pointer
+ * spellings tried CSE it (34-35). */
+void fn_80176ADC(Unk80176C0C_T* p, Unk80176ADC_Obj* a, int idx)
+{
+    fn_801A656C(p->m8, a, 0xF);
+    int off = idx * 0x48;
+    if (*(void**)((char*)p + off + 0x18) != a) {
+        fn_80177B74((Unk80177B74_T*)((char*)p + off + 0xC), a, 1);
+        return;
+    }
+    if (a->m618->m838 == 0 || a->m264 != 0) {
+        fn_80177B74((Unk80177B74_T*)((char*)p + off + 0xC), a, 1);
+    }
+}
+
 void fn_80176B70(void* self)
 {
     fn_8017696C(self);

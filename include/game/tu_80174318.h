@@ -37,7 +37,9 @@ void fn_80402CAC(int a, int b);
 struct Unk80176C0C_Entry {
     int m0;
     int m4;
-    char pad8[0x44 - 8];
+    int m8;
+    void* mC;
+    char pad10[0x44 - 0x10];
     int m44;
 };
 struct Unk80176C0C_Rec {
@@ -71,6 +73,17 @@ int fn_801A7020(void* p);
 int fn_8006BE18(void* a);
 int fn_801A2400(void* p);
 void fn_80177A48(void* p, int a, int b, int c);
+struct Unk80176ADC_Sub {
+    char pad0[0x838];
+    int m838;
+};
+struct Unk80176ADC_Obj {
+    char pad0[0x264];
+    int m264;
+    char pad268[0x618 - 0x268];
+    Unk80176ADC_Sub* m618;
+};
+void fn_801A656C(void* ctx, void* a, int b);
 void fn_80177A90(void* p);
 void fn_8017739C(Unk80176C0C_Entry* p, int a);
 void fn_8017772C(void* p);
