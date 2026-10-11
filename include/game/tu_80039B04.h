@@ -96,15 +96,21 @@ struct Unk8003B3F4_Sub14 {
     char pad1CC9[7];
     int m1CD0;
 };
+struct Unk8003EAB0_Sub10 {
+    char pad0[0x1C];
+    int m1C;
+};
 struct Unk8003B2DC_Sub6F8 {
     char pad0[0xC];
     Unk8003B2DC_Sub0C* mC;
-    char pad10[4];
+    Unk8003EAB0_Sub10* m10;
     Unk8003B3F4_Sub14* m14;
 };
 struct Unk8027107C_Outer;
 struct Unk8003A5DC_Ctx {
-    char pad0[0x65C];
+    char pad0[0x48];
+    unsigned int m48;
+    char pad4C[0x65C - 0x4C];
     void* m65C[13];
     char pad690[0x6F8 - 0x690];
     Unk8003B2DC_Sub6F8* m6F8;
