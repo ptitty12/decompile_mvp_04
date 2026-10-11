@@ -387,14 +387,14 @@ void fn_80331568() {
 }
 
 void fn_803318CC() {
+    lbl_8068B4BC = 0;
+    lbl_8061FE94 = 1;
     lbl_8061FE9C = 0;
+    lbl_8061C8F8 = 0;
     lbl_8061FE90 = 1;
     lbl_80620134 = 0;
-    lbl_8061FDCC = 0;
-    lbl_8061FE94 = 1;
     lbl_8061B898 = 0;
-    lbl_8068B4BC = 0;
-    lbl_8061C8F8 = 0;
+    lbl_8061FDCC = 0;
 }
 
 /* near-miss: retail spills the saved first word to the stack (sp+8) around the 0x44-byte template copy; ours keeps it in a register */
