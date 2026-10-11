@@ -21,6 +21,11 @@ void fn_800949B4(Handle* h, int a);
 void fn_80095844(Handle* h, int a);
 void fn_80377E90(Obj* list, int* a, int* b, int idx);
 void* fn_8040B190(void* dst, const void* src, int n);
+void fn_80400CE4(int a);
+extern Unk8007A4DC_Screen* lbl_8061930C;
+extern int lbl_80619310;
+extern float lbl_80619314;
+extern const float lbl_805B4078;
 void fn_8059A3CC(void* p);
 struct Unk80079240_Obj {
     char pad0[0x1C];
@@ -60,6 +65,99 @@ void Unk8007B2B0_Screen::fn_80078A38(int a)
 {
     fn_8007B8C4(0, a);
     fn_80084114();
+}
+
+int Unk8007A4DC_Screen::fn_80078A64(int a, int b, int c)
+{
+    unsigned n = fn_8007F674(a, b);
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        if (fn_8007F6C4(a, b, i) == c)
+            return 1;
+    }
+    return 0;
+}
+
+void Unk8007A4DC_Screen::fn_80078AE0(int a, int* o1, int* o2, int* o3, int* o4)
+{
+    *o1 = 0;
+    *o2 = 0;
+    *o3 = 0;
+    *o4 = 0;
+    unsigned i = 0;
+    unsigned n = fn_8007F198(a);
+    for (; i < n; i++) {
+        int e = fn_8007F24C(a, (unsigned char)i);
+        int p = fn_8007A6A0(0x1E, e);
+        int q = fn_8007A6A0(0x1F, e);
+        int r = fn_8007A270(e);
+        int f = 0;
+        if (p != 0 && q > 0)
+            f = 1;
+        if (r != 0) {
+            if (f)
+                (*o1)++;
+            else
+                (*o2)++;
+        } else {
+            if (f)
+                (*o3)++;
+            else
+                (*o4)++;
+        }
+    }
+}
+
+/* near-miss: 3 slots; retail evaluates `spC == 6` through cr7 (cmpwi cr7 / mfcr / extrwi),
+ * we get xori/subfic/adde. */
+int Unk8007A4DC_Screen::fn_80078D00(int a)
+{
+    int sp14 = 0;
+    int sp8 = 0;
+    int spC = 0;
+    int sp10 = 0;
+    fn_80078AE0(a, &sp8, &spC, &sp10, &sp14);
+    int r = spC == 6;
+    if (sp14 <= 9)
+        r = 0;
+    int i = 0;
+    do {
+        if (fn_8007F674(a, i) > 1)
+            r = 0;
+        i++;
+    } while (i <= 1);
+    return r;
+}
+
+int fn_80078DA4(void* self, int a, int b, int c)
+{
+    if (a == 10)
+        a = 0;
+    int f = 0;
+    if ((c == 0 && a == 0) || (c == 1 && a == 1) || c == 2)
+        f = 1;
+    if (f == 0) {
+        if (b != 0)
+            return 3;
+        return 1;
+    }
+    if (b == 0)
+        return 0;
+    return 2;
+}
+
+int fn_8007900C(void* self, int x)
+{
+    Unk8007A4DC_Screen* o = lbl_8061930C;
+    int cnt = 0;
+    unsigned i = 0;
+    while (i < o->fn_8007F198(x)) {
+        int e = o->fn_8007F24C(x, (unsigned char)i);
+        if (e != 0 && o->fn_8007A270(e) != 0)
+            cnt++;
+        i++;
+    }
+    return cnt;
 }
 
 void fn_80079240(Unk80079240_Obj* o)
@@ -102,6 +200,35 @@ float Unk8007B2B0_Screen::fn_80079B14(int a)
 {
     float r = fn_80079F54(fn_8007B3E0(0x15, a));
     return r;
+}
+
+float Unk8007B2B0_Screen::fn_80079B5C(int a, int kind)
+{
+    int sel;
+    if (kind != 0) {
+        if (kind != 1) {
+            sel = 0x19;
+            if (kind == 2)
+                sel = 0x18;
+        } else {
+            sel = 0x17;
+        }
+    } else {
+        sel = 0x16;
+    }
+    float r = (float)fn_8007B3E0(sel, a) * m204;
+    return r;
+}
+
+float Unk8007B2B0_Screen::fn_80079E74(int a)
+{
+    if (lbl_80619310 == 0) {
+        float f = lbl_805B4078;
+        f += fn_80079CF8(a);
+        f += fn_80079BF8(a);
+        return f;
+    }
+    return lbl_80619314;
 }
 
 float Unk8007B2B0_Screen::fn_80079EFC(int a)
@@ -199,6 +326,26 @@ int Unk8007A4DC_Screen::fn_8007A270(int a)
     if (r == 0 || r == 10)
         x = 1;
     return x;
+}
+
+/* near-miss: 8 slots; the order of the argument moves (mr r3,r30 first) differs. */
+void Unk8007A4DC_Screen::fn_8007A2B4(int flags)
+{
+    unsigned i = 0;
+    unsigned n = fn_8007B1EC();
+    int v = fn_8007A550(0x1D);
+    for (; i < n; i++) {
+        if ((i & 0x1F) == 0)
+            fn_80400CE4(0);
+        if (flags & 1) {
+            fn_8007A94C(0x1D, i, v);
+            fn_8007A94C(0x1C, i, 0);
+        }
+        if (flags & 2) {
+            fn_8007A94C(0x1E, i, 0);
+            fn_8007A94C(0x1F, i, 0);
+        }
+    }
 }
 
 void Unk8007A4DC_Screen::fn_8007A380()
