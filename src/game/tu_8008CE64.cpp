@@ -259,6 +259,75 @@ extern int lbl_805B6D70[];
 extern float lbl_805B6C80[][5];
 
 
+
+
+
+
+extern "C" unsigned fn_8008CFD8(Unk8008CE64_PackTabE* self, unsigned t, unsigned i)
+{
+    unsigned r = 0;
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: r = self->m24[i].h0; break;
+        case 1: r = self->m24[i].h2; break;
+        case 2: r = self->m24[i].f02; break;
+        case 3: r = self->m24[i].f03; break;
+        case 4: r = self->m24[i].f04; break;
+        case 5: r = self->m24[i].f05; break;
+        case 6: r = self->m24[i].f06; break;
+        case 7: r = self->m24[i].f07; break;
+        case 8: r = self->m24[i].f08; break;
+        case 9: r = self->m24[i].f09; break;
+        case 10: r = self->m24[i].f0A; break;
+        case 11: r = self->m24[i].f0B; break;
+        case 12: r = self->m24[i].f0C; break;
+        case 13: r = self->m24[i].f0D; break;
+        case 14: r = self->m24[i].f0E; break;
+        case 15: r = self->m24[i].f0F; break;
+        case 16: r = self->m24[i].f10; break;
+        case 17: r = self->m24[i].f11; break;
+        case 18: r = self->m24[i].f12; break;
+        case 19: r = self->m24[i].f13; break;
+        case 20: r = self->m24[i].f14; break;
+        case 21: r = self->m24[i].f15; break;
+        case 22: r = self->m24[i].f16; break;
+        case 23: r = self->m24[i].f17; break;
+        case 24: r = self->m24[i].f18; break;
+        case 25: r = self->m24[i].f19; break;
+        case 26: r = self->m24[i].f1A; break;
+        case 27: r = self->m24[i].f1B; break;
+        case 28: r = self->m24[i].f1C; break;
+        case 29: r = self->m24[i].f1D; break;
+        case 30: r = self->m24[i].f1E; break;
+        case 31: r = self->m24[i].f1F; break;
+        case 32: r = self->m24[i].f20; break;
+        case 33: r = self->m24[i].f21; break;
+        case 34: r = self->m24[i].f22; break;
+        case 35: r = self->m24[i].f23; break;
+        case 36: r = self->m24[i].f24; break;
+        case 37: r = self->m24[i].f25; break;
+        case 38: r = self->m24[i].f26; break;
+        case 39: r = self->m24[i].f27; break;
+        case 40: r = self->m24[i].f28; break;
+        case 41: r = self->m24[i].f29; break;
+        case 42: r = self->m24[i].f2A; break;
+        case 43: r = self->m24[i].f2B; break;
+        case 44: r = self->m24[i].f2C; break;
+        case 45: r = self->m24[i].f2D; break;
+        case 46: r = self->m24[i].f2E; break;
+        case 47: r = self->m24[i].f2F; break;
+        case 48: r = self->m24[i].f30; break;
+        case 49: r = self->m24[i].f31; break;
+        case 50: r = self->m24[i].f32; break;
+        case 51: r = self->m24[i].f33; break;
+        case 52: r = self->m24[i].f34; break;
+        case 53: r = self->m24[i].f35; break;
+        case 54: r = self->m24[i].f36; break;
+        }
+    }
+    return r;
+}
+
 char* fn_8008D738(Unk8008CE64_K<Unk8008CE64_T3C>* self, int t, unsigned i, char* buf)
 {
     if (i < self->m1C) {
@@ -278,6 +347,571 @@ float fn_8008D7B8(Unk8008CE64_Obj* o, int i, int a)
 {
     float r = (o->*lbl_805B6C50[i])(a);
     return r;
+}
+
+extern "C" void fn_8008D850(Unk8008CE64_PackTabE* self, unsigned t, unsigned i, int v)
+{
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: {
+            Unk8008CE64_PackE* b = self->m24;
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)b);
+            if (v <= 0xFFFF) {
+                if (v < 0)
+                    v = 0;
+                p->h0 = v;
+            } else
+                p->h0 = 0xFFFF;
+            break;
+        }
+        case 1: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xFFFF) {
+                if (v < 0)
+                    v = 0;
+                p->h2 = v;
+            } else
+                p->h2 = 0xFFFF;
+            break;
+        }
+        case 2: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3F;
+            p->f02 = v;
+            break;
+        }
+        case 3: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xFF;
+            p->f03 = v;
+            break;
+        }
+        case 4: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f04 = v;
+            break;
+        }
+        case 5: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f05 = v;
+            break;
+        }
+        case 6: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1F;
+            p->f06 = v;
+            break;
+        }
+        case 7: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f07 = v;
+            break;
+        }
+        case 8: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f08 = v;
+            break;
+        }
+        case 9: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f09 = v;
+            break;
+        }
+        case 10: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f0A = v;
+            break;
+        }
+        case 11: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f0B = v;
+            break;
+        }
+        case 12: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0C = v;
+            break;
+        }
+        case 13: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x64;
+            p->f0D = v;
+            break;
+        }
+        case 14: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0E = v;
+            break;
+        }
+        case 15: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0F = v;
+            break;
+        }
+        case 16: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f10 = v;
+            break;
+        }
+        case 17: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f11 = v;
+            break;
+        }
+        case 18: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f12 = v;
+            break;
+        }
+        case 19: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f13 = v;
+            break;
+        }
+        case 20: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f14 = v;
+            break;
+        }
+        case 21: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f15 = v;
+            break;
+        }
+        case 22: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f16 = v;
+            break;
+        }
+        case 23: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f17 = v;
+            break;
+        }
+        case 24: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            int w;
+            if (v <= 0xFF) {
+                w = v;
+                if (w < 0)
+                    w = 0;
+            } else
+                w = 0xFF;
+            p->f18 = w;
+            break;
+        }
+        case 25: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f19 = v;
+            break;
+        }
+        case 26: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f1A = v;
+            break;
+        }
+        case 27: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f1B = v;
+            break;
+        }
+        case 28: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xFF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xFF;
+            p->f1C = v;
+            break;
+        }
+        case 29: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x64;
+            p->f1D = v;
+            break;
+        }
+        case 30: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f1E = v;
+            break;
+        }
+        case 31: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            int w;
+            if (v <= 0xFF) {
+                w = v;
+                if (w < 0)
+                    w = 0;
+            } else
+                w = 0xFF;
+            p->f1F = w;
+            break;
+        }
+        case 32: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f20 = v;
+            break;
+        }
+        case 33: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f21 = v;
+            break;
+        }
+        case 34: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f22 = v;
+            break;
+        }
+        case 35: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f23 = v;
+            break;
+        }
+        case 36: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f24 = v;
+            break;
+        }
+        case 37: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f25 = v;
+            break;
+        }
+        case 38: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f26 = v;
+            break;
+        }
+        case 39: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f27 = v;
+            break;
+        }
+        case 40: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f28 = v;
+            break;
+        }
+        case 41: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f29 = v;
+            break;
+        }
+        case 42: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f2A = v;
+            break;
+        }
+        case 43: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->f2B = v;
+            break;
+        }
+        case 44: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3FF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3FF;
+            p->f2C = v;
+            break;
+        }
+        case 45: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f2D = v;
+            break;
+        }
+        case 46: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f2E = v;
+            break;
+        }
+        case 47: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f2F = v;
+            break;
+        }
+        case 48: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f30 = v;
+            break;
+        }
+        case 49: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f31 = v;
+            break;
+        }
+        case 50: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1F;
+            p->f32 = v;
+            break;
+        }
+        case 51: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->f33 = v;
+            break;
+        }
+        case 52: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f34 = v;
+            break;
+        }
+        case 53: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f35 = v;
+            break;
+        }
+        case 54: {
+            Unk8008CE64_PackE* p = (Unk8008CE64_PackE*)(i * 60 + (int)self->m24);
+            int w;
+            if (v <= 0x7) {
+                w = v;
+                if (w < 0)
+                    w = 0;
+            } else
+                w = 0x7;
+            p->f36 = w;
+            break;
+        }
+        }
+    }
 }
 
 void fn_8008E690(Unk8008CE64_K<Unk8008CE64_T3C>* self, signed char t, unsigned i, const char* str, int n)
@@ -382,6 +1016,43 @@ void fn_8008EB54(Unk8008CE64_K<Unk8008CE64_T10>* self, unsigned i)
         fn_8040074C(&self->m24[i], 0x10);
 }
 
+unsigned fn_8008ED04(Unk8008CE64_PackTabF* self, unsigned t, unsigned i)
+{
+    unsigned r = 0;
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: r = self->m24[i].f00; break;
+        case 1: r = self->m24[i].f01; break;
+        case 2: r = self->m24[i].f02; break;
+        case 3: r = self->m24[i].f03; break;
+        case 4: r = self->m24[i].f04; break;
+        case 5: r = self->m24[i].f05; break;
+        case 6: r = self->m24[i].f06; break;
+        case 7: r = self->m24[i].f07; break;
+        case 8: r = self->m24[i].f08; break;
+        case 9: r = self->m24[i].f09; break;
+        case 10: r = self->m24[i].f0A; break;
+        case 11: r = self->m24[i].f0B; break;
+        case 12: r = self->m24[i].f0C; break;
+        case 13: r = self->m24[i].f0D; break;
+        case 14: r = self->m24[i].f0E; break;
+        case 15: r = self->m24[i].f0F; break;
+        case 16: r = self->m24[i].f10; break;
+        case 17: r = self->m24[i].f11; break;
+        case 18: r = self->m24[i].f12; break;
+        case 19: r = self->m24[i].f13; break;
+        case 20: r = self->m24[i].f14; break;
+        case 21: r = self->m24[i].f15; break;
+        case 22: r = self->m24[i].f16; break;
+        case 23: r = self->m24[i].f17; break;
+        case 24: r = self->m24[i].f18; break;
+        case 25: r = self->m24[i].f19; break;
+        case 26: r = self->m24[i].f1A; break;
+        }
+    }
+    return r;
+}
+
 void* fn_8008F08C(void* self, int a, int b, char* buf)
 {
     return fn_8040B61C(buf, lbl_80619308);
@@ -391,6 +1062,286 @@ float fn_8008F0B8()
 {
     float f;
     return f = lbl_805B5628;
+}
+
+void fn_8008F0D4(Unk8008CE64_PackTabF* self, unsigned t, unsigned i, int v)
+{
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x64;
+            p->f00 = v;
+            break;
+        }
+        case 1: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x64) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x64;
+            p->f01 = v;
+            break;
+        }
+        case 2: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f02 = v;
+            break;
+        }
+        case 3: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f03 = v;
+            break;
+        }
+        case 4: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f04 = v;
+            break;
+        }
+        case 5: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f05 = v;
+            break;
+        }
+        case 6: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f06 = v;
+            break;
+        }
+        case 7: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f07 = v;
+            break;
+        }
+        case 8: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f08 = v;
+            break;
+        }
+        case 9: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f09 = v;
+            break;
+        }
+        case 10: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x3) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x3;
+            p->f0A = v;
+            break;
+        }
+        case 11: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0B = v;
+            break;
+        }
+        case 12: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0C = v;
+            break;
+        }
+        case 13: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0D = v;
+            break;
+        }
+        case 14: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0E = v;
+            break;
+        }
+        case 15: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f0F = v;
+            break;
+        }
+        case 16: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f10 = v;
+            break;
+        }
+        case 17: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f11 = v;
+            break;
+        }
+        case 18: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f12 = v;
+            break;
+        }
+        case 19: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->f13 = v;
+            break;
+        }
+        case 20: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f14 = v;
+            break;
+        }
+        case 21: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f15 = v;
+            break;
+        }
+        case 22: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f16 = v;
+            break;
+        }
+        case 23: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f17 = v;
+            break;
+        }
+        case 24: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f18 = v;
+            break;
+        }
+        case 25: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->f19 = v;
+            break;
+        }
+        case 26: {
+            Unk8008CE64_PackF* p = (Unk8008CE64_PackF*)(i * 16 + (int)self->m24);
+            int w;
+            if (v <= 0x7F) {
+                w = v;
+                if (w < 0)
+                    w = 0;
+            } else
+                w = 0x7F;
+            p->f1A = w;
+            break;
+        }
+        }
+    }
 }
 
 void fn_8008F7E0()
