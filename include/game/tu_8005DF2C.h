@@ -13,6 +13,8 @@
  * 0x3CC, 0x3D0, 0x408..0x414 and 0x4D4. Only the offsets these functions touch
  * are named, and the types behind the pointers are unknown (Unk8005DF2C_O*).
  */
+struct Unk8005DF2C_Ent24;
+struct Unk8005DF2C_Slot28;
 struct Unk8005DF2C_Ctx;
 struct Unk8005DF2C_O130;
 struct Unk8005DF2C_O44C;
@@ -25,9 +27,22 @@ struct Unk8005DF2C_O3B0;
 struct Unk8005DF2C_P;
 struct Unk8005DF2C_A;
 
+struct Unk8005DF2C_Ent24 {
+    Unk8005DF2C_O3B0* m0;
+    char pad4[0x20];
+};
+
+struct Unk8005DF2C_Slot28 {
+    int m0;
+    int m4;
+    char pad8[0x20];
+};
+
 struct Unk8005DF2C_Ctx {
     unsigned char m0;
-    char pad1[0x103];
+    char pad1[0x6F];
+    Unk8005DF2C_Ent24 m70[1];
+    char pad94[0x70];
     int m104;
     char pad108[0x8];
     int m110;
@@ -37,7 +52,11 @@ struct Unk8005DF2C_Ctx {
     int m120;
     char pad124[0xC];
     Unk8005DF2C_O130* m130;
-    char pad134[0x144];
+    char pad134[0x4];
+    int m138;
+    Unk8005DF2C_Slot28 m13C[1];
+    char pad164[0x110];
+    int m274;
     int m278;
     char pad27C[0x134];
     Unk8005DF2C_O3B0* m3B0;
@@ -54,12 +73,15 @@ struct Unk8005DF2C_Ctx {
     int m414;
     char pad418[0xBC];
     int m4D4;
+    int m4D8;
 };
 
 struct Unk8005DF2C_O130 {
     char pad0[0x44C];
     Unk8005DF2C_O44C* m44C;
-    char pad450[0x2B4];
+    char pad450[0x138];
+    char m588;
+    char pad589[0x17B];
     int m704;
     int m708;
 };
@@ -89,6 +111,8 @@ struct Unk8005DF2C_O6F8 {
 struct Unk8005DF2C_O6F8C {
     char pad0[0xC];
     int mC;
+    char pad10[0x18];
+    int m28;
 };
 
 struct Unk8005DF2C_O6F810 {
@@ -104,7 +128,9 @@ struct Unk8005DF2C_O700 {
 struct Unk8005DF2C_O3B0 {
     char pad0[0x44C];
     int m44C;
-    char pad450[0x2B8];
+    char pad450[0x140];
+    int m590;
+    char pad594[0x174];
     int m708;
     char pad70C[0x2F8];
     int mA04;
