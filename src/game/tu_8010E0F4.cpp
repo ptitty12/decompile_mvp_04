@@ -33,6 +33,12 @@ extern const char* lbl_8061B3E0[];
 extern const char lbl_805BFA5C[];
 extern const char lbl_805BFA70[];
 extern const char lbl_806508D0[];
+struct UnkQ4 {
+    int m[4];
+};
+extern UnkQ4 lbl_805BFA98;
+extern const char lbl_805BE1D8[];
+extern const char lbl_805BE5E4[];
 extern const char lbl_805BE234[];
 extern const char lbl_805BA760[];
 extern const char lbl_805BC19C[];
@@ -53,6 +59,12 @@ void fn_800EC648(Scr* self, int a, int b, int c, int d, int e, int f, int g, int
 void fn_801142C4(Scr* self);
 void fn_8011415C(Scr* self);
 void fn_800ED254(Scr* self);
+void fn_80125180(Unk800C7B40_Widget* self, int a, int id);
+Unk800C7B40_Widget* fn_80110D90(Scr* self, int a);
+void fn_8011243C(Scr* self);
+void fn_80112D90(Scr* self);
+void fn_801138FC(Scr* self);
+void fn_80113CA8(Scr* self);
 int fn_8006BC74(void* p);
 int fn_801059E4();
 int fn_8017E030(UnkGameP700* a, int b, int c);
@@ -67,7 +79,6 @@ void fn_80131F34(Unk800C7B40_Widget* w, Scr* self, void (*cb)(int, Scr*), int a,
 // PROTOS-BEGIN
 extern "C" {
 int fn_8010E0F4(Scr* self, Unk800C7B40_Widget* a);
-/* near-miss: retail duplicates the shared fn_8010F9CC tail (159 insns vs 145 here); the goto form gives 142. */
 int fn_8010E190(Scr* self, Scr* a, int unused, int c);
 int fn_8010E40C(Scr* self, Scr* a, int b, int c);
 void fn_8010E4BC(Scr* self);
@@ -101,6 +112,8 @@ int fn_80110C7C(Scr* self, int a);
 int fn_80110CD8(Scr* self, int a);
 int fn_80110D34(Scr* self, int a);
 Unk800C7B40_Widget* fn_80110D90(Scr* self, int a);
+/* near-miss: retail stores m134 before loading m154 (2 slots swapped); the scheduler hoists the load here. */
+void fn_80110DDC(Scr* self, int a);
 }
 // PROTOS-END
 
@@ -513,6 +526,33 @@ int fn_80110D34(Scr* self, int a)
 Unk800C7B40_Widget* fn_80110D90(Scr* self, int a)
 {
     return fn_800C8060(self->fn_vslot32(lbl_8061B3E0[a], 1));
+}
+
+void fn_80110DDC(Scr* self, int a)
+{
+    self->m134 = a;
+    fn_80125180(self->m154, 0, 0x1A0A);
+    UnkQ4 q = lbl_805BFA98;
+    fn_800C8040(fn_800C8044(self->fn_vslot32(lbl_805BE1D8, 1))->fn_vslot32(lbl_805BE5E4, 1))->fn_vslot29((const char*)q.m[self->m134]);
+    if (self->m150 != 0)
+        self->m150->fn_vslot8(0);
+    self->m150 = fn_80110D90(self, a);
+    fn_80125180(self->m154, 1, 0x26DF);
+    switch (a) {
+    case 0:
+        fn_8011243C(self);
+        break;
+    case 1:
+        fn_80112D90(self);
+        break;
+    case 2:
+        fn_801138FC(self);
+        break;
+    case 3:
+        fn_80113CA8(self);
+        break;
+    }
+    self->m150->fn_vslot8(1);
 }
 
 }
