@@ -388,7 +388,6 @@ void fn_8044ADA4(FeScr_8044974C* self);
 void fn_8044B79C(FeScr_8044974C* self);
 void fn_8044C314(FeScr_8044974C* self, int a, int b);
 void fn_80122D40(FeObj* o, int v, int a, int b, int c, int d);
-int fn_80075808(int a);
 void fn_8044B050(FeScr_8044974C* self);
 void fn_8044AD04(FeScr_8044974C* self);
 void fn_8044B454(FeScr_8044974C* self, int a);
@@ -1156,4 +1155,6 @@ struct FeS0_8 {
 };
 
 extern int lbl_80621650[];
+
+int fn_80075808(int a);
 #endif
