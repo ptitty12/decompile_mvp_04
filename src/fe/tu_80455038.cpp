@@ -86,6 +86,7 @@ extern "C" FE_OVERLAY int fn_80456110(FeScr8* self)
     return 0;
 }
 
+/* near-miss: retail copies self to r11 at entry (mr r11,r3); ours keeps it in r3 (1 slot, 5 spellings tried) */
 extern "C" FE_OVERLAY int fn_8045618C(FeScr8* self)
 {
     if (self->m1CC == -1) {
