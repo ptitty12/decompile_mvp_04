@@ -111,7 +111,8 @@ extern char lbl_805BDC74[];
 int fn_800B56C4(Ui800B555C* p);
 void fn_800DF254(char* dst, int a, int b, float f);
 struct Ue1E0 {
-    char pad0[0x1E0];
+    char pad0[0x1DC];
+    int m1DC;
     int m1E0;
 };
 Ue1E0* fn_8007FE04(Unk8007B2B0_Screen* s);
@@ -123,4 +124,18 @@ struct Ue6058_T {
 };
 extern Ue6058_T lbl_805BDF00;
 float fn_80551A80(int a, int b);
+extern int lbl_8061977C;
+unsigned short* fn_80090880(int obj, int id);
+int fn_80403DE4(char* dst, const char* fmt, ...);
+char* fn_804031BC(char* dst, const char* src);
+int fn_8040321C(unsigned short* dst, unsigned short* fmt, char* a, char* b);
+int fn_804031F8(unsigned short* dst, unsigned short* fmt, char* a);
+int fn_80083F6C(int a);
+extern char lbl_805BC1A8[];
+int fn_80403144(unsigned short* dst, const unsigned short* src);
+void fn_800DFF0C(unsigned short* dst, unsigned short* s);
+void fn_800DE440(char* buf, int a, int b);
+unsigned fn_80599C40(int a, int b);
+int fn_80599C50(int a, int b, unsigned char c);
+int fn_80077BC4(Unk8007B2B0_Screen* s, int a);
 #endif

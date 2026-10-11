@@ -4,6 +4,76 @@
  */
 #include "game/tu_800E4234.h"
 
+void fn_800E4234(int a0, int mode, unsigned short* out)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    char b8[0x68];
+    char b70[0xC8];
+    char b138[0x190];
+    char b2C8[8];
+    char b2D0[4];
+    s->fn_8007B924(1, a0, b8);
+    fn_80402EF8(b70, b8);
+    int v = s->fn_80078A38(a0);
+    if (v == 4)
+        v = 0;
+    unsigned short* t = fn_80090880(lbl_8061977C, fn_80083F6C(v));
+    fn_80403DE4(b138, (const char*)fn_80090880(lbl_8061977C, 0x4F35), b70, t);
+    int id;
+    switch (mode) {
+    case 0:
+        id = 0x44CB;
+        break;
+    case 1:
+        id = 0x44CC;
+        break;
+    case 2:
+        id = 0x44CD;
+        break;
+    case 3:
+        id = 0x44CE;
+        break;
+    case 4:
+        id = 0x44CF;
+        break;
+    case 5:
+        id = 0x44D0;
+        break;
+    case 6:
+        id = 0x4629;
+        break;
+    case 7:
+        id = 0x484C;
+        break;
+    default:
+        *out = 0;
+        return;
+    }
+    unsigned short* tx = fn_80090880(lbl_8061977C, id);
+    if (mode == 5) {
+        int w = -1;
+        switch (v) {
+        case 0:
+            w = 0x19;
+            break;
+        case 1:
+            w = 0x14;
+            break;
+        case 2:
+            w = 0x14;
+            break;
+        case 3:
+            w = 0x14;
+            break;
+        }
+        fn_804031BC(b2C8, lbl_805BC1A8);
+        fn_80403DE4(b2D0, b2C8, w);
+        fn_8040321C(out, tx, b138, b2D0);
+        return;
+    }
+    fn_804031F8(out, tx, b138);
+}
+
 void fn_800E442C(UiS* self, int x)
 {
     int k = fn_800E4504(x);
@@ -192,6 +262,39 @@ void fn_800E4FE4(UiS* self, int x)
         fn_800DF254(buf, 0, 0, f);
         w->v28(buf);
     }
+}
+
+/* near-miss: 14 slots; k and the inner counter i have their callee-saved registers swapped (r25/r24) and two argument-setup pairs are ordered differently */
+void fn_800E5100(unsigned short* out, int arg1)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    char b8[0xC8];
+    char bD0[0xC8];
+    char b198[0x68];
+    char b200[0xC8];
+    int e = fn_800B57EC(fn_800B555C());
+    int k = 0;
+    fn_80403144(out, fn_80090880(lbl_8061977C, 0x238C));
+    fn_800DFF0C(out, fn_80090880(lbl_8061977C, 0x4ED2));
+    do {
+        unsigned i = 0;
+        while (i < fn_80599C40(arg1, k)) {
+            int id = fn_80599C50(arg1, k, i);
+            int w = fn_80077BC4(s, id);
+            int o;
+            if ((e == 0 || fn_8007FE04(s)->m1DC != 1 || (o = (int)fn_8007F7D0((int)s, 0), w == s->fn_8007B320(0, o)) || w == s->fn_8007B320(1, o) || w == s->fn_8007B320(2, o) || w == s->fn_8007B320(3, o)) && w != 0) {
+                fn_800DE440(bD0, id, 1);
+                s->fn_8007B924(2, w, b198);
+                fn_804031BC(b200, b198);
+                fn_80403DE4(b8, (const char*)fn_80090880(lbl_8061977C, 0x4ED3), bD0, b200);
+                fn_800DFF0C(out, (unsigned short*)b8);
+            }
+            i++;
+        }
+        if (k == 0 && e == 0)
+            fn_800DFF0C(out, fn_80090880(lbl_8061977C, 0x4ED4));
+        k++;
+    } while (k <= 1);
 }
 
 /* near-miss: 35 vs 34 insns; retail keeps the `li r3,0` result in r3 while ours merges the zero with the sum register */
