@@ -481,11 +481,14 @@ void fn_8031D494(FxI* self, float a, float b, float c, float d) {
     self->m10->s3(self->m2C, self->m30);
 }
 
-/* near-miss: int-to-float constant/lis scheduling */
 void fn_8031D54C(FxI* self) {
     self->m28 = self->m24 = lbl_805EA6A4;
-    self->m2C = (float)(lbl_8061FEDC->m28 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14) * lbl_805EA6B0;
-    self->m30 = (float)(lbl_8061FEDC->m28 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18) * lbl_805EA6B4;
+    FxCtx* c = lbl_8061FEDC;
+    int w = c->m28 ? c->m2C : c->m14;
+    self->m2C = (float)w * lbl_805EA6B0;
+    c = lbl_8061FEDC;
+    int h = c->m28 ? c->m30 : c->m18;
+    self->m30 = (float)h * lbl_805EA6B4;
 }
 
 void fn_8031D610(FxI* self) { self->m1A8 = 1; }
