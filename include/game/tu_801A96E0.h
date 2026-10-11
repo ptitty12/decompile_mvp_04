@@ -28,7 +28,7 @@ struct Unk801A96E0_Init {  /* fn_801AA248, fn_801AB188, fn_801AA570, fn_801A99B4
     char pad24[0x24 - 0x24];
     int m24;
     int m28;
-    char pad2C[0x38 - 0x2C];
+    int m2C[3];
     int m38[2];
     int m40[2];
     int m48[2];

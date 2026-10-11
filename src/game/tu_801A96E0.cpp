@@ -55,6 +55,11 @@ struct Unk801AB460_T {
     int m2C[1];
 };
 
+void fn_801A96E0(void* p)
+{
+    fn_801A9684(p);
+}
+
 void fn_801A9700(void* p)
 {
     fn_801AA038(p, 0);
@@ -200,11 +205,6 @@ void fn_801AA038(void* p)
     fn_801AB470(p);
 }
 
-void fn_801A96E0(void* p)
-{
-    fn_801A9684(p);
-}
-
 void fn_801AA248(Unk801A96E0_Init* p)
 {
     for (int i = 0; i < 2; i++) {
@@ -238,6 +238,23 @@ void fn_801AB188(Unk801A96E0_Init* p, int v)
     for (int i = 0; i < 4; i++) {
         p->m14[i] = v;
     }
+}
+
+/* The loop counter lives in memory (stack slot reloaded every iteration): a volatile local reproduces it. */
+void fn_801AB2EC(Unk801A96E0_Init* o)
+{
+    volatile int c = 0;
+    int i = 0;
+    do {
+        o->m2C[i] = 0;
+        int v = c;
+        int r = v + 1;
+        if (v > 3) {
+            r = v;
+        }
+        c = r;
+        i = r;
+    } while (i <= 2);
 }
 
 int fn_801AB460(Unk801AB460_T* p, int i)
