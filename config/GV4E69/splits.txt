@@ -800,6 +800,9 @@ animation/choosers/tu_80272B20.cpp:
 	.rodata     start:0x805DC7E4 end:0x805DCCB0
 	.data       start:0x8061E670 end:0x8061E674
 
+game/tu_80275F24.cpp:
+	.text       start:0x80275F24 end:0x80279758
+
 animation/choosers/randomloadedchooser.cpp:
 	.text       start:0x80279758 end:0x80279AE4
 	.rodata     start:0x805DCE7C end:0x805DCEE8
