@@ -209,6 +209,10 @@ public:
     virtual void fn_vslot8() = 0;
     virtual void fn_vslot9();
     virtual void fn_vslot10();
+    int fn_800232A0(int kind, int v);
+    int fn_800233B4(int a, int b, int c);
+    int fn_80023430(int key, int unused, int* out);
+    void fn_80023490(int key);
 };
 
 #endif

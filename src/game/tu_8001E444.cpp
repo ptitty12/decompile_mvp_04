@@ -183,7 +183,7 @@ extern "C" void fn_8001F4F0()
 extern "C" int fn_8001F510(Unk8001E444_Obj* x)
 {
     Unk8001F2C4_World* w = x->m130->m44C;
-    int c = fn_801A4B34(w);
+    Unk801A4B34_Pos* c = fn_801A4B34(w);
     int a = fn_80045BD8(fn_801A497C(w, w->m6F8->m14->m1CD0 == 0, 0));
     int b = fn_80045BD8(c);
     int r = 0;

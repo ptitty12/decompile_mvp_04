@@ -64,11 +64,40 @@ struct Unk8001F5CC_Tbl {
     Unk8001F218_Pair* m14;
 };
 
+/* Three floats at Pos+0x60 (position); same layout as Unk80273498_Vec3 in chooser.h. */
+struct Unk801A4B34_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+
+/* Character-like object returned by fn_801A4B34/fn_801A497C (position at +0x60). */
+struct Unk801A4B34_Pos {
+    char pad0[0x60];
+    Unk801A4B34_Vec3 m60;
+    char pad6C[0x458 - 0x6C];
+    int m458;
+};
+
+struct Unk8001F2C4_Outer {
+    char pad0[0x3A4];
+    int m3A4;
+};
+
+/* Game context (same object as Unk8014D8AC_Ctx in chooser.h). */
 struct Unk8001F2C4_World {
-    char pad0[0x6F8];
+    char pad0[0x6CC];
+    Unk801A4B34_Pos* m6CC;
+    char pad6D0[0x6F8 - 0x6D0];
     Unk8001F5CC_Tbl* m6F8;
-    char pad6FC[0x720 - 0x6FC];
+    char pad6FC[4];
+    Unk8001F2C4_Outer* m700;
+    char pad704[0x720 - 0x704];
     int m720;
+    char pad724[0x780 - 0x724];
+    int m780;
+    int m784;
+    void fn_801A6D84(int a);
 };
 
 /* Object at Obj+0x130. */
@@ -155,9 +184,9 @@ void fn_80046D30(float f);
 int fn_80097210(Unk8001F5CC_Ent* e, int a);
 int fn_800638F0(Unk8001F5CC_Tbl* t, Unk8001F218_Pair* base, int idx, int a, int* outSize, int** outArr);
 void fn_8004378C(int a);
-int fn_801A4B34(Unk8001F2C4_World* w);
-int fn_801A497C(Unk8001F2C4_World* w, int a, int b);
-int fn_80045BD8(int a);
+Unk801A4B34_Pos* fn_801A4B34(Unk8001F2C4_World* w);
+Unk801A4B34_Pos* fn_801A497C(Unk8001F2C4_World* w, int a, int b);
+int fn_80045BD8(Unk801A4B34_Pos* p);
 int fn_802540E4(void* p, int a, int b);
 void fn_80045F88(float f);
 void fn_80046C64(float f);
