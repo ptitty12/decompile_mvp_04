@@ -45,9 +45,9 @@ int Unk80159F28::fn_8015F7D0(Unk8015F744_Evt* e) /* 8015F7D0 */
     }
 }
 
-void Unk80159F28::fn_8015F840() /* 8015F840 */
+int Unk80159F28::fn_8015F840() /* 8015F840 */
 {
-    fn_801A4B34(mC)->fn_v4();
+    return fn_801A4B34(mC)->fn_v4();
 }
 
 void Unk80159F28::fn_8015F87C() /* 8015F87C */

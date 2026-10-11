@@ -48,7 +48,7 @@ public:
      * implementations; chooser.h has the others). Declared here, not in
      * Unk8037B3E8, so that chooser.h stays untouched. */
     void fn_8037B5C0(const char* name, int* field, const char* typeList);          /* object reference */
-    void fn_8037B584(const char* name, int a, int b, const char* names);            /* script info */
+    void fn_8037B584(const char* name, void* data, int len, const char* names);     /* script info / string field */
     void fn_8037B548(const char* name, const char* names);
     void fn_8037B728(const char* name, const char* name2, void* list, const char* classes);
 };
@@ -58,7 +58,9 @@ public:
 struct Unk801527C8_Team {
     char pad0[0x1B4];
     unsigned char m1B4[0x80];
-    char pad234[0xE64 - 0x234];
+    char pad234[0xD70 - 0x234];
+    int mD70;
+    char padD74[0xE64 - 0xD74];
 };
 
 struct Unk801527C8_Teams {
@@ -73,9 +75,15 @@ struct Unk801527C8_Ent10 {
     int m13C;
 };
 
+struct Unk801527C8_Ent0C {
+    char pad0[0x84];
+    int m84;
+};
+
 struct Unk801527C8_Mgr {
     int fn_8006BE18();
-    char pad0[0x10];
+    char pad0[0xC];
+    Unk801527C8_Ent0C* mC;
     Unk801527C8_Ent10* m10;
     Unk801527C8_Teams* m14;
 };
@@ -90,13 +98,16 @@ struct Unk801527C8_Slots {
     void* m3A4;
     char pad3A8[4];
     void* m3AC;
-    char pad3B0[0x3BC - 0x3B0];
+    void* m3B0;
+    void* m3B4;
+    void* m3B8;
     Unk801527C8_Ent3BC* m3BC;
 };
 
 /* Sub-object at actor+0x50 (animation/state controller; passed to fn_80327274,
  * fn_803270C4, fn_80326E64). */
 struct Unk801527C8_Sub {
+    void fn_80326EF4(float t, float k, int id, int a, int b, int flags);
     char pad0[0x40];
 };
 
@@ -110,7 +121,7 @@ public:
     virtual void fn_v1();
     virtual void fn_v2();
     virtual void fn_v3();
-    virtual void fn_v4();
+    virtual int fn_v4();
     virtual void fn_v5();
     virtual void fn_v6();
     virtual void fn_v7();
@@ -122,7 +133,7 @@ struct Unk801527C8_Actor {
     int m4;
     char pad8[0x3C - 8];
     void* m3C;
-    char pad40[4];
+    void* m40;
     int m44;
     char pad48[4];
     float m4C;
@@ -133,7 +144,8 @@ struct Unk801527C8_Actor {
     void* m6C0;
     char pad6C4[0x6CC - 0x6C4];
     Unk80189300* m6CC;
-    char pad6D0[0x6F8 - 0x6D0];
+    char pad6D0[0x6F4 - 0x6D0];
+    int m6F4;
     Unk801527C8_Mgr* m6F8;
     int m6FC;
     Unk801527C8_Slots* m700;
@@ -188,6 +200,7 @@ struct Unk80619D10_Data {
 
 class Unk80619D10 : public Unk80619D10_Data {
 public:
+    void fn_800AB9A8(int v);
     virtual void fn_v1();
     virtual void fn_v2();
     virtual void fn_v3();
