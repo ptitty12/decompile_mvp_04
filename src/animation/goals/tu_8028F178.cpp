@@ -78,6 +78,33 @@ inline Unk80273498_Vec3 GetPos(const Unk8037B128_Mtx* m)
     return v;
 }
 
+inline Unk8028F178_Goal* Kind6(Unk8028F178_Goal* g)
+{
+    Unk8028F178_Owner* owner = g->m48->m44;
+    Unk8028F178_Goal* ng = 0;
+    if (owner->m10 == 6) {
+        ng = (Unk8028F178_Goal*)owner->m18;
+    }
+    return ng;
+}
+
+inline Unk8028F178_Goal* Kind10(Unk8028F178_Goal* g)
+{
+    Unk8028F178_Owner* owner = g->m48->m44;
+    Unk8028F178_Goal* ng = 0;
+    if (owner->m10 == 10) {
+        ng = (Unk8028F178_Goal*)owner->m18;
+    }
+    return ng;
+}
+
+inline void RaiseStage(Unk8028F178_Goal* g, int n)
+{
+    if (g->mC < n) {
+        g->mC = n;
+    }
+}
+
 inline float YawOf(Unk80273498_Vec3 d)
 {
     return fn_80410CE8(d.x, d.z);
@@ -584,6 +611,152 @@ int fn_80290D3C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
 int fn_80290D1C(Unk8028F178_Goal* g, Unk80270BA0_X* x)
 {
     return fn_80290D3C(g, x);
+}
+
+void fn_80291378(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+
+/* near-miss: 399 of 399 instructions, about 375 identical. Differences: the table lookup is `lfsx` + `add` where
+ * retail has one `lfsux`; retail keeps three separate `mr r3,r31; bl fn_802977B0` tails where mine
+ * cross-jumps them; the final switch result lives in r9 here and r3 in retail. The `int one = 1` form gives
+ * retail's `li r11,1; cmpw r11,r0` for the stage clamp. */
+int fn_80290D3C(Unk8028F178_Goal* g, Unk80270BA0_X* x)
+{
+    Unk8028F178_Ctx* ctx = (Unk8028F178_Ctx*)x->m44C;
+    float t = (float)ctx->m4C * 0.016666668f;
+    int one = 1;
+    if (one > g->mC) {
+        g->mC = one;
+    }
+    if (g->mC <= 1) {
+        g->m6C = t;
+        if (Kind6(g)) {
+            g->m18C.f16 = 1;
+        }
+    }
+    if (((Unk8027A84C*)g)->fn_8027B2CC(x)) {
+        if (Kind10(g)) {
+            g->m40 = 11;
+        }
+    }
+    if (fn_8026D5A4(x, 0) && g->m38 == 0) {
+        g->m50 = 4;
+    }
+    if (g->mC <= 1) {
+        Unk8028F178_Pos6CC* p = ctx->m6CC;
+        if (p) {
+            if (fn_8026D7E0(x, 0) && x != p->m36C) {
+                g->m50 = 5;
+            }
+            if (Kind10(g) && x->m618->m838 == 0x193EE819) {
+                int idx = fn_80247858(x, 0);
+                Unk80273498_Vec3 gp = fn_80297614(g);
+                Unk80273498_Vec3* tp = &lbl_805DED28[idx];
+                if (!((gp.x - tp->x) * (gp.x - tp->x) + (gp.z - tp->z) * (gp.z - tp->z) >= 1296.0f)) {
+                    g->m50 = 6;
+                }
+            }
+        }
+    }
+    int r = fn_80294EE4(g, x);
+    if (r != -1) {
+        return r;
+    }
+    fn_80296C78(g, x, ctx);
+    if (x->m71C & 0x8000) {
+        Unk80273498_Vec3 gv = g->fn_GetM10();
+        if (!((x->m60.x - gv.x) * (x->m60.x - gv.x) + (x->m60.z - gv.z) * (x->m60.z - gv.z) >= 3600.0f)) {
+            return fn_80297764(g);
+        }
+    }
+    if (g->m4C == 0) {
+        g->m4C = fn_8029055C(g, x);
+        if (g->m4C == 0x10 || g->m4C == 8) {
+            if (Kind6(g)) {
+                g->m40 = 4;
+            }
+        }
+    }
+    if (g->m4C == 0x20) {
+        g->m78 = ((Unk8028F178_Player*)x)->m724;
+    }
+    int cur = g->m4C;
+    if (cur == 0x80) {
+        return fn_802977B0(g);
+    }
+    if (g->mC <= 1) {
+        if (cur == 2 && fn_80297668(g) == 0) {
+            Unk80273498_Vec3 d = fn_80297614(g) - FlatPos(x);
+            fn_8028F528(g, &d);
+        }
+        if (g->m4C == 1 || g->m4C == 2 || g->m4C == 4) {
+            if (g->m18C.f11) {
+                Unk80273498_Vec3 v = g->m8C;
+                fn_8028F528(g, &v);
+            }
+        }
+        if (g->mC <= 1) {
+            fn_80291378(g, x);
+            if (!(t >= g->m70)) {
+                if (!fn_8026DAE8(x, 0)) {
+                    fn_80296924(g, x);
+                }
+                return 1;
+            }
+        }
+    }
+    if (g->mC > 1) {
+        if (!(g->m84 <= 0.0f) && !((t - g->m6C) <= g->m84)) {
+            return fn_80297764(g);
+        }
+    }
+    if (fn_8027C2D0(g, x, g->m98)) {
+        return 3;
+    }
+    int res;
+    if (g->mC > 4) {
+        if (g->m18C.f15) {
+            if (fn_8029543C(g, x)) {
+                return fn_802977B0(g);
+            }
+            return 1;
+        }
+        return fn_80297764(g);
+    }
+    res = 1;
+    switch (g->m4C) {
+    case 1:
+        res = fn_802914C8(g, x);
+        break;
+    case 2:
+        res = fn_8029155C(g, x);
+        break;
+    case 4:
+        res = fn_80291F74(g, x);
+        break;
+    case 8:
+        res = fn_802924D4(g, x);
+        break;
+    case 16:
+        res = fn_80292ABC(g, x);
+        break;
+    case 32:
+        res = fn_80293EE0(g, x);
+        break;
+    case 64:
+        res = fn_802931B0(g, x);
+        break;
+    case 128:
+        res = 2;
+        break;
+    }
+    RaiseStage(g, 2);
+    if (res == 0) {
+        return fn_80297764(g);
+    }
+    if (res == 2) {
+        return fn_802977B0(g);
+    }
+    return res;
 }
 
 /* near-miss: 84 of 84 instructions, 5 differ in the order of the early loads of x->m724/m728 and the

@@ -114,11 +114,15 @@ struct Unk8028F178_Goal {
 /* Same object as Unk8014D8AC_Ctx (reached through Unk80270BA0_X::m44C) with the
  * fields this unit reads; callers cast. Evidence: fn_8028F610 (+0x4C, a frame
  * counter converted to seconds), fn_80290D3C (+0x4C, +0x6CC), fn_80291378. */
+struct Unk8028F178_Pos6CC {
+    char pad0[0x36C];
+    Unk80270BA0_X* m36C;
+};
 struct Unk8028F178_Ctx {
     char pad0[0x4C];
     unsigned int m4C;
     char pad50[0x6CC - 0x50];
-    Unk80273498_Pos* m6CC;
+    Unk8028F178_Pos6CC* m6CC;
 };
 
 int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk80279BB8* r, int a, int b, int c, int d, float f);
@@ -142,6 +146,24 @@ int fn_8026D7E0(Unk80270BA0_X* x, void* a);
 int fn_8026D6AC(Unk80270BA0_X* x, void* a);
 float fn_80248FC8(Unk80270BA0_X* x, int a);
 float fn_802966DC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_8026D5A4(Unk80270BA0_X* x, int a);
+int fn_80247858(Unk80270BA0_X* x, int a);
+int fn_80294EE4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+void fn_80296C78(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8028F178_Ctx* ctx);
+int fn_80297764(Unk8028F178_Goal* g);
+int fn_802977B0(Unk8028F178_Goal* g);
+void fn_80296924(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_8027C2D0(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a);
+int fn_8029543C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_802914C8(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_8029155C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_80291F74(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_802924D4(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_80292ABC(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_80293EE0(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_802931B0(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+int fn_8029055C(Unk8028F178_Goal* g, Unk80270BA0_X* x);
+extern Unk80273498_Vec3 lbl_805DED28[];
 int fn_8027B55C(Unk8028F178_Goal* g, Unk80270BA0_X* x, int a, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int b, int c,
                 int* d, int* e, float f);
 
