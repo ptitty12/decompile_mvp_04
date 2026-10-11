@@ -46,6 +46,24 @@ struct Unk803B9D60_In3 {
     int m8;
 };
 
+struct Unk803B9D60_In4 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+/* The same record as seen by the clamping setters (fn_8034A9A4 ..): m0 is the
+ * observer list handed to fn_803BA4D0 together with &m4. */
+struct Unk803BA4D0_Obj {
+    void* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+void fn_803BA4D0(void* list, int* p);
+
 int fn_803B9D60(Unk803B9D60_Alloc** out);
 int fn_803B9DDC();
 int fn_803B9E08();
