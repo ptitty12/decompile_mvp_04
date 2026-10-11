@@ -43,6 +43,39 @@ extern int lbl_80620298;
 extern float lbl_805CE628;
 extern void* lbl_80619D10;
 extern Unk8019F8C0_Glob* lbl_8061B8C0;
+struct Unk80087A58_O;
+float fn_80087ABC(Unk80087A58_O* s, int a, int w);
+extern float lbl_805CE6C0;
+void fn_8017BB60(void* p);
+void fn_8015A5A4(void* p);
+void fn_8035AF30(void* p, int inchrg);
+extern "C" Unk8019F8C0_M2* fn_801A4CE8(Unk8019F8C0_Owner* o, int i);
+extern char lbl_80649DA0[];
+extern char lbl_8065FAA8[];
+
+/* Message object built on the stack (vptr at +4; base vtable lbl_80649DA0, derived lbl_8065FAA8).
+ * Destroyed by calling the base destructor 0x8035AF30 with in-charge 2. */
+struct Unk8035AF30_Base {
+    int m0;
+    const void* m4;
+    Unk8035AF30_Base(int id) : m0(id) { m4 = lbl_80649DA0; }
+};
+struct Unk8019FBB4_Msg : public Unk8035AF30_Base {
+    int m8;
+    Unk8019FBB4_Msg(int id, Unk8019F8C0_Owner* o) : Unk8035AF30_Base(id) { m8 = o->m65C[8]; m4 = lbl_8065FAA8; }
+};
+void fn_8017BE28(void* p);
+void fn_801A0790(Unk8019F8C0_Owner* o, float v);
+void fn_8037893C(void* a, int b, void* c, void* d, int e);
+void fn_80169674(void* p);
+void fn_80166E40(void* p);
+extern float lbl_805CE610;
+extern float lbl_805CE6C4;
+extern float lbl_805CE6C8;
+extern float lbl_805CE6CC;
+extern float lbl_805CE6D0;
+void* fn_80326534(void* p);
+void fn_803296AC(void* p);
 
 void Unk8019F8C0_S3::fn_vslot5()
 {
@@ -108,6 +141,21 @@ void Unk8019FAF8::fn_vslot6() {}
 
 Unk8019FBB4::Unk8019FBB4(Unk8019F8C0_Owner* o) : Unk8019F8C0_State(o, 7) {}
 
+/* near-miss: same code; retail schedules the owner load and the msg stores differently (12 slots). */
+void Unk8019FBB4::fn_vslot4()
+{
+    Unk8019FBB4_Msg msg(0x7c, m18);
+    fn_8037893C(m18->m704, msg.m0, &msg, 0, 0);
+    fn_8017BB60(m18->m700);
+    if (lbl_80620860 == 0) {
+        fn_8015A5A4(m18->m710);
+    }
+    if (fn_801A4CE8(m18, 1)->fn_vslot9() == 0 && fn_801A6D84(m18, 1)->m3D90 == 0) {
+        lbl_8061B8C0->m2C = 4;
+    }
+    fn_8035AF30(&msg, 2);
+}
+
 void Unk8019FBB4::fn_vslot5()
 {
     if (fn_80162598(m18->m710)) {
@@ -166,6 +214,19 @@ void Unk8019FE5C::fn_vslot6()
 
 Unk8019FFB0::Unk8019FFB0(Unk8019F8C0_Owner* o) : Unk8019F8C0_State(o, 0xb), m1C(o) {}
 
+void Unk8019FFB0::fn_vslot4()
+{
+    if (lbl_80620860 != 0) {
+        lbl_80620860 = 0;
+        fn_801A0790(m1C, (float)(unsigned)m1C->m4C * lbl_805CE610);
+    }
+    fn_8017BE28(m1C->m700);
+    fn_80169674(m18->m710);
+    fn_8037893C((char*)m1C + 0x704, 0x36, 0, 0, 0);
+    ((Unk8019F8C0_OV*)lbl_80619D10)->fn_vslot24(0);
+    fn_80166E40(m1C->m710);
+}
+
 void Unk8019FFB0::fn_vslot5()
 {
     if (fn_801A6D84(m18, 1)->m3D90 == 0 && lbl_8061B8C0->m20 != 2) {
@@ -178,6 +239,12 @@ void Unk8019FFB0::fn_vslot6() {}
 void fn_801A02F0(char* self)
 {
     fn_8033E5C4(self + 0x560, 1);
+}
+
+void fn_801A043C(Unk8019F8C0_Owner* o)
+{
+    ((Unk8019F8C0_OV*)o)->fn_vslot17();
+    fn_803296AC(fn_80326534((char*)o + 0x50));
 }
 
 void fn_801A0488(Unk8019F8C0_Owner* o)
@@ -310,16 +377,15 @@ int fn_801A1FFC(Unk8019F8C0_Owner* o, int a, int b)
 
 int fn_801A2034(Unk8019F8C0_Owner* o, int i)
 {
-    /* near-miss: retail compares i == 3 before `mr r4,r11` and branches after it (3 slots differ). */
     if (i > 2) {
         int f = 0;
         if (o->m6F8->m14[2].m8 != 0) {
             f = 1;
         }
-        if (i == 3) {
-            i = f;
-        } else {
+        if (i != 3) {
             i = f ^ 1;
+        } else {
+            i = f;
         }
     }
     return o->m58C[i];
@@ -346,6 +412,32 @@ float fn_801A20F8(Unk8019F8C0_Owner* o, int idx, float a, float b)
     float t = fn_801A2158(o, idx);
     float r = Unk8019F8C0_Lerp(a, t, b);
     return r;
+}
+
+/* near-miss: same code; retail stores the clamp result straight into v's slot (sp+8), ours via the
+   inline's return temp (sp+0x20), 2 slots. */
+inline float Unk8019F8C0_Clamp(float lo, float t, float hi)
+{
+    t = !(t > hi) ? (t >? lo) : hi;
+    return t;
+}
+
+float fn_801A2158(Unk8019F8C0_Owner* o, int idx)
+{
+    Unk8019F8C0_Mgr10* m = o->m6F8->m10;
+    if (m == 0) {
+        return lbl_805CE6C0;
+    }
+    float v = fn_80087ABC((Unk80087A58_O*)m, idx, 0);
+    switch (idx) {
+    case 0x18:
+        v = v + lbl_805CE6C4;
+        break;
+    case 0x25:
+        v = v - lbl_805CE6C8;
+        break;
+    }
+    return Unk8019F8C0_Clamp(lbl_805CE6CC, v, lbl_805CE6D0);
 }
 
 int fn_801A2238(Unk8019F8C0_Owner* o, int a)

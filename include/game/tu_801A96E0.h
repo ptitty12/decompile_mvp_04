@@ -41,8 +41,10 @@ struct Unk801A96E0_Init {  /* fn_801AA248, fn_801AB188, fn_801AA570, fn_801A99B4
     int m6C;
 };
 
-struct Unk801A96E0_Late {  /* fn_801AB470 */
-    char pad0[0x68];
+struct Unk801A96E0_Late {  /* fn_801AB470, fn_801A9D48 */
+    char pad0[8];
+    Unk8019F8C0_Owner* m8;
+    char padC[0x68 - 0xC];
     int m68;
     int m6C;
     int m70;
