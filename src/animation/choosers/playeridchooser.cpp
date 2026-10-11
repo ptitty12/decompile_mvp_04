@@ -11,7 +11,7 @@
  * there is no evidence for a real name (see CLAUDE.md).
  */
 
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 extern unsigned int lbl_8068D578; /* ICommonPlayerID type hash */
 
@@ -38,7 +38,7 @@ public:
     int* m18;
 };
 
-class ICommonPlayerID : public Unk8037B3E8 {
+class ICommonPlayerID : public Unk80362C2C {
 public:
     ICommonPlayerID();
     virtual ~ICommonPlayerID();
@@ -72,7 +72,7 @@ public:
     int m14;
 };
 
-class cSignatureChooser : public Unk8037B3E8 {
+class cSignatureChooser : public Unk80362C2C {
 public:
     cSignatureChooser();
     virtual ~cSignatureChooser();
@@ -193,7 +193,7 @@ int Unk80270730::fn_802709D0(int index, int* outId, int* outFlag)
 
 /* ---- ICommonPlayerID ---- */
 
-ICommonPlayerID::ICommonPlayerID() : Unk8037B3E8(lbl_8068D578)
+ICommonPlayerID::ICommonPlayerID() : Unk80362C2C(lbl_8068D578)
 {
 }
 
@@ -305,7 +305,7 @@ int ICommonPlayerID::fn_80270E3C(Unk8014D8AC_Ctx* ctx, int count)
 
 /* ---- cSignatureChooser ---- */
 
-cSignatureChooser::cSignatureChooser() : Unk8037B3E8(0x29505A6D), m8(1)
+cSignatureChooser::cSignatureChooser() : Unk80362C2C(0x29505A6D), m8(1)
 {
     m20 = 0;
 }

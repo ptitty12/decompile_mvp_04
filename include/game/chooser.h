@@ -353,7 +353,11 @@ public:
 struct Unk802AE984_Mgr;
 int fn_802AE984(Unk802AE984_Mgr* mgr, void* p);
 
-/* Base of the choosers (ctor 0x8037B3E8, dtor 0x80362C2C). */
+/* Root of the choosers, warps, events and game script commands (ctor
+ * 0x8037B3E8 / 0x8037B3AC, dtor 0x8037B424, vtable 0x806849D0). Retail's root
+ * vtable has slots 1..10 only (slots 2..5 pure); slots 11..17 below belong to
+ * the chooser base Unk80362C2C (game/chooser_base.h), but stay declared here so
+ * the slot indices of the units that include this header do not move. */
 class Unk8037B3E8 {
 public:
     Unk8037B3E8(unsigned int hash);       /* 0x8037B3E8 */

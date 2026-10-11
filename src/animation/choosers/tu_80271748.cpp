@@ -9,14 +9,14 @@
  * cEventChooser: vtable 0x80662328 slot 3 (0x802AC96C) returns the pointer at
  * 0x8061E650 -> "cEventChooser".
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 extern unsigned int lbl_8068D57C; /* cEventChooser type hash */
 
 /* Class name; read by cEventChooser's vtable slot 3 (0x802AC96C). */
 const char* lbl_8061E650 = "cEventChooser";
 
-class cEventChooser : public Unk8037B3E8 {
+class cEventChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -33,7 +33,7 @@ public:
     Unk80384F28 m8;            /* "eventanimpairlist"/"eventanimpairs" */
 };
 
-cEventChooser::cEventChooser() : Unk8037B3E8(lbl_8068D57C)
+cEventChooser::cEventChooser() : Unk80362C2C(lbl_8068D57C)
 {
     m4 = 0;
 }
