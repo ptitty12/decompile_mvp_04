@@ -323,14 +323,18 @@ float Unk8027DE3C::fn_8027F28C(Unk80270BA0_X* x, float a)
     return (float)changed;
 }
 
-inline void SetAngle(Unk802726BC_Angles* p, float v)
+inline void SetAngle2(Unk802726BC_Angles* p, float t)
 {
-    float t = v;
     if (p->m190 == 1) {
         p->m48[0] = t;
     }
     float* q = &p->m48[p->m190];
     *q = t;
+}
+
+inline void SetAngle(Unk802726BC_Angles* p, float v)
+{
+    SetAngle2(p, v);
 }
 
 inline void SetFloat(float& dst, float v)
@@ -343,11 +347,8 @@ inline float LenSq(Unk80273498_Vec3 v)
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
-/* near-miss (about 87%): the first half is instruction-identical (f31 holds 1.3, the sret
- * Vec3 is addressed from r1, LenSq/ball local give retail's frame). The clamps differ:
- * retail edits the loaded value in place (one shared "fmr f0,f13" per clamp, stored once),
- * ternaries here copy it into a second register. Tried: if-chain, nested ternaries with
- * negated compares, register variable, hi/lim as separate statements. */
+/* The clamps use g++'s >? (maximum) operator for the lower bound; see PATTERNS,
+ * "In-place float clamp". */
 float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
 {
     float hi = 1.3f;
@@ -382,11 +383,11 @@ float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
     }
     if (mE8 & 0x1000000) {
         if (m7C == 1) {
-            lim = !(lim > 1.2f) ? (!(lim >= 0.8f) ? 0.8f : lim) : 1.2f;
-            hi = !(hi <= 1.2f) ? 1.2f : (!(hi >= 0.8f) ? 0.8f : hi);
+            lim = !(lim > 1.2f) ? (lim >? 0.8f) : 1.2f;
+            hi = !(hi <= 1.2f) ? 1.2f : (hi >? 0.8f);
         } else {
-            lim = !(lim > 1.6f) ? (!(lim >= 0.8f) ? 0.8f : lim) : 1.6f;
-            hi = !(hi > 1.6f) ? (!(hi >= 0.8f) ? 0.8f : hi) : 1.6f;
+            lim = !(lim > 1.6f) ? (lim >? 0.8f) : 1.6f;
+            hi = !(hi > 1.6f) ? (hi >? 0.8f) : 1.6f;
         }
     }
     if ((unsigned)(m78 - 0x1A) <= 1) {
@@ -394,17 +395,18 @@ float Unk8027DE3C::fn_8027EFB8(Unk80270BA0_X* x, float a)
         hi = 1.5f;
     }
     if (mC <= 3) {
-        lim = !(lim >= 0.75f) ? 0.75f : lim;
+        lim = lim >? 0.75f;
     }
-    float result = !(a > hi) ? (!(a >= lim) ? lim : a) : hi;
+    float result = !(a > hi) ? (a >? lim) : hi;
     return result;
 }
 
-/* near-miss (about 87%, 180 vs 181 insns): same control flow and constants; differs
- * in the stack slots of the SetAngle inline (retail 0x30/0x38, here 0x20/0x24), the
- * register of the clamped value (retail keeps it in f0, here f13 plus a copy) and the
- * li order of the two stores. Tried: named local vs inline for the 0.2 product,
- * store order permutations, if-chain vs nested ternary clamp, open-coded SetAngle. */
+/* near-miss: 175 of 181 instructions. The clamp (>? operator) and the frame (SetAngle
+ * as two nested inlines, each with its own 8-byte-aligned inline frame: 0x30, 0x38)
+ * match. Left: the 0 / 5 constants for m95C / m958 get r11 / r0 (retail r0 / r11;
+ * local-alloc priority from the sched1 order), and "addi r3,r30,0x734" is scheduled
+ * one slot before "lfs f0,0x10(r1)". Tried: the four store orders, a SetAngle(x, v)
+ * wrapper, a pointer local in the wrapper, reference and pointer inner forms. */
 void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
 {
     int a = 0;
@@ -446,7 +448,7 @@ void Unk8027DE3C::fn_8027F504(Unk80270BA0_X* x, int h, float f)
             float k = fn_80382BD8(x->m618, 0);
             float w = lbl_8061E6CC * (1.0f - k);
             float v = (mC8 + w) / f;
-            v = !(v <= 0.0f) ? (!(v > 5.0f) ? (!(v >= 1.0f) ? 1.0f : v) : 5.0f) : 5.0f;
+            v = !(v <= 0.0f) ? (!(v > 5.0f) ? (v >? 1.0f) : 5.0f) : 5.0f;
             SetAngle(&x->m734, v);
         }
     }
