@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8007A4DC.h"
+#include "game/clampiter.h"
 
 int Unk8007B2B0_Screen::fn_8007B714()
 {
@@ -280,25 +281,23 @@ int Unk8007B2B0_Screen::fn_8007C288(int a, int b, Unk8007B2B0_Pair* c, int d, in
     return 0;
 }
 
-/* near-miss: retail keeps the loop counter in a stack slot (lwz/stw 8(r1)); every
- * spelling tried (struct with inline Next(), address-taking inline, volatile, class
- * with ctor) promotes it to a register. */
+/* near-miss (2 slots): `mr r3,r31` (this) comes before `li r6,0` for the fn_8007B440 call in retail. */
 void Unk8007B2B0_Screen::fn_8007C328(int a, int b)
 {
     int found = 0;
     int id = 0x23;
-    Unk8007B2B0_Clamp k = {0};
-    while (k.v <= 9) {
-        id = fn_8008FE14(k.v);
+    Unk8006A138_It<9> it(0);
+    while (it.v <= 9) {
+        id = fn_8008FE14(it.v);
         if (fn_8007B380(id, b) == a) {
             found = 1;
             break;
         }
-        k.Next();
+        it.Next();
     }
     if (found) {
         fn_8007B440(id, b, 0);
-        fn_800905FC(fn_8008FD78(k.v), a, 0);
+        fn_800905FC(fn_8008FD78(it.v), a, 0);
     }
     fn_80590C24(m30);
 }
