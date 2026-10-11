@@ -131,6 +131,30 @@ struct FEEv {
     int m18;
 };
 extern FEV18* lbl_80619D10;
+struct FEOb65C {
+    char pad0[0x65C];
+    char* m65C;
+};
+struct FEOb1F04 {
+    char pad0[4];
+    FEOb65C* m4;
+    char pad8[0x114 - 8];
+    int m114;
+};
+extern const float lbl_805B9B70;
+extern "C" void fn_80252DF4(char* p, float f);
+struct FEOb26 {
+    char pad0[0x68];
+    float m68;
+    float m6C;
+};
+struct Unk80040640;
+Unk80040640* fn_8004072C();
+void fn_800412AC(Unk80040640* o, int a, int b, int c, int d, int e);
+extern const float lbl_805B9B98;
+extern const float lbl_805B9B9C;
+extern const float lbl_805B9BA0;
+extern const float lbl_805B9BA4;
 struct FEOb2390 {
     char pad0[0x68];
     float m68;
@@ -202,7 +226,6 @@ void fn_800AF110(void* p);
 void fn_800FC6B4(void* p);
 void fn_800B245C(void* p);
 void* fn_800AF010(void* p, int k);
-void fn_800B1F04(void* p);
 void fn_800B1DBC(void* p, int a);
 void fn_800AE96C(char* p);
 void fn_800AEBAC(char* p);
@@ -218,10 +241,12 @@ void fn_800AF148(void* p);
 void fn_800AF544(UnkAt2C* p);
 void fn_8011A0A4(void* o, void* a, const char* s);
 void fn_800B2588(void* p);
-void fn_800B26CC(void* p);
 }
 
 /* ---- generated externs ---- */
+
+
+
 
 
 
@@ -252,6 +277,7 @@ void fn_800B07A0(FEObj10v* self);
 void fn_800B0884(UnkAt10P* p);
 void fn_800B1D90(FEOb110* self);
 void fn_800B1E84(FEOb7C* self);
+void fn_800B1F04(FEOb1F04* self);
 int fn_800B1FCC(FEOb210* self);
 int fn_800B2034(char* p);
 int fn_800B2048(char* p);
@@ -260,12 +286,14 @@ int fn_800B210C(FEOb210* self);
 int fn_800B214C(FEOb214* self);
 int fn_800B21C0(FEOb210* self);
 int fn_800B2204(FEOb210* self);
+int fn_800B2238(FEOb2390* self);
 void fn_800B228C(FEOb118* self);
 void fn_800B22B0(FEStats* self, FEEv* e);
 void fn_800B2390(FEOb2390* self);
 void fn_800B243C(void* p);
 void fn_800B2544(void* self);
 void fn_800B2668(FEOb74* self);
+void fn_800B26CC(FEOb26* self);
 }
 /* ---- end prototypes ---- */
 
@@ -448,6 +476,15 @@ extern "C" void fn_800B1E84(FEOb7C* self)
     }
 }
 
+extern "C" void fn_800B1F04(FEOb1F04* self)
+{
+    int t[12] = {100, 100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50};
+    char* p = self->m4->m65C;
+    if (p) {
+        fn_80252DF4(p + 0x480, (float)t[self->m114] * lbl_805B9B70);
+    }
+}
+
 extern "C" int fn_800B1FCC(FEOb210* self)
 {
     int sum = 0;
@@ -532,6 +569,29 @@ extern "C" int fn_800B2204(FEOb210* self)
     return self->m7C[v];
 }
 
+/* near-miss (4 slots): retail roots the compare tree at 2 and tests case 1 after case 0 (beqlr on the pre-set r3); enum-typed index did not move the root */
+extern "C" int fn_800B2238(FEOb2390* self)
+{
+    int r = 0;
+    switch (self->m114) {
+    case 0:
+        break;
+    case 1:
+        r = 1;
+        break;
+    case 2:
+        r = 2;
+        break;
+    case 3:
+        r = 3;
+        break;
+    default:
+        r = 4;
+        break;
+    }
+    return r;
+}
+
 extern "C" void fn_800B228C(FEOb118* self)
 {
     for (int i = 0; i < 5; i++) {
@@ -561,7 +621,7 @@ extern "C" void fn_800B22B0(FEStats* self, FEEv* e)
 extern "C" void fn_800B2390(FEOb2390* self)
 {
     fn_800B228C((FEOb118*)self);
-    fn_800B1F04(self);
+    fn_800B1F04((FEOb1F04*)self);
     fn_800B1DBC(self, self->m114);
     fn_800B1E84((FEOb7C*)self);
     self->m74 = 0;
@@ -583,7 +643,7 @@ extern "C" void fn_800B2544(void* self)
     fn_800B2588(self);
     fn_800B2668((FEOb74*)self);
     fn_800B245C(self);
-    fn_800B26CC(self);
+    fn_800B26CC((FEOb26*)self);
 }
 
 extern "C" void fn_800B2668(FEOb74* self)
@@ -591,6 +651,22 @@ extern "C" void fn_800B2668(FEOb74* self)
     if (lbl_80620414 == 0) {
         if (self->m74 != 0) {
             self->m68 = FMax2(self->m68 - lbl_805B9B90, lbl_805B9B94);
+        }
+    }
+}
+
+extern "C" void fn_800B26CC(FEOb26* self)
+{
+    if (!(self->m68 < lbl_805B9B98)) {
+        self->m6C = lbl_805B9B98;
+    }
+    if (!(self->m68 >= self->m6C)) {
+        if (!(self->m6C <= lbl_805B9B9C)) {
+            self->m6C = self->m6C - lbl_805B9BA0;
+            fn_800412AC(fn_8004072C(), 0x32, 0, 0, 0, 0);
+        } else {
+            self->m6C = self->m6C - lbl_805B9BA4;
+            fn_800412AC(fn_8004072C(), 0x31, 0, 0, 0, 0);
         }
     }
 }
