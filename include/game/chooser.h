@@ -48,6 +48,8 @@ struct Unk80273498_Pos {
     int m38C;
     char pad390[0x3D0 - 0x390];
     Unk80273498_Vec3 m3D0;
+    char pad3DC[0x3F4 - 0x3DC];
+    float m3F4;
 };
 struct Unk80273498_Ref {
     char pad0[0xC];
@@ -159,7 +161,7 @@ public:
     virtual void fn_vslot5();
     virtual void fn_vslot6();
     virtual void fn_vslot7();
-    virtual void fn_vslot8();
+    virtual void fn_vslot8(int a);
     virtual void fn_vslot9();
     virtual void fn_vslot10();
     virtual void fn_vslot11();
@@ -183,12 +185,14 @@ public:
     char pad9C[0x44C - 0x9C];
     Unk8014D8AC_Ctx* m44C;
     int m450;
-    char pad454[4];
+    char pad454[0x458 - 0x454];
     int m458;
     char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
-    char m588[0x5F0 - 0x588];
+    char m588[0x594 - 0x588];
+    float m594;
+    char pad598[0x5F0 - 0x598];
 };
 
 /* Second argument of vtable slot 17; only its first virtual is used here. */
