@@ -87,6 +87,34 @@ inline float LenSq3(const Unk80273498_Vec3& v)
     return v.x * v.x + v.y * v.y + v.z * v.z;
 }
 
+/* Player fields read by fn_802A2604 (callers cast): two floats before the angle block. */
+struct Unk802A2604_Player {
+    char pad0[0x720];
+    float m720;
+    char pad724[0x72C - 0x724];
+    float m72C;
+};
+
+/* Object chain reached from the context by fn_802A2604: ctx+0x6F8 -> +0x10 -> +0x188. */
+struct Unk802A2604_Obj2 {
+    char pad0[0x188];
+    int m188;
+};
+struct Unk802A2604_Obj {
+    char pad0[0x10];
+    Unk802A2604_Obj2* m10;
+};
+struct Unk802A2604_Ctx {
+    char pad0[0x6F8];
+    Unk802A2604_Obj* m6F8;
+};
+
+extern int lbl_8061E7A4;
+extern int lbl_8061E7DC;
+extern int lbl_80691DE0;
+extern float lbl_8061E864;
+extern float lbl_8061E868;
+
 void fn_802771A0(int a);
 void fn_802D7B88(int a, int b, float f, int c);
 float fn_804028E4(float f);
