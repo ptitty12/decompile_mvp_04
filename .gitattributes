@@ -20,6 +20,7 @@ config/GV4E69/splits.txt  merge=dtk-splits
 # Append-only logs: keep both sides of parallel appends
 PROGRESS.md       merge=union
 docs/SPEEDUPS.md  merge=union
+docs/PATTERNS.md  merge=union
 
 # Patches must keep their exact bytes (a CRLF checkout breaks git apply)
 *.patch -text
