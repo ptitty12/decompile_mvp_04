@@ -9,8 +9,7 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 20/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * B1A0). Not attempted: fn_8027B55C (242 insns),
+ * Status: 21/25 match. fn_8027A84C is a near-miss (noted above it). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -324,12 +323,12 @@ void Unk8027A84C::fn_8027AFA8(Unk8014D8AC_Ctx* ctx, Unk80270BA0_X* x, int a)
     }
 }
 
-/* near-miss: loop body identical; retail keeps the result in a callee-saved register
- * (mr r3,r29) while mine threads the constant (li r3,1). */
+/* `hit` is initialized before the call: it then lives across fn_8027A918 in a
+ * callee-saved register (mr r3,r29 at the end), as in retail. */
 int Unk8027A84C::fn_8027B1A0(Unk80270BA0_X* x, const Unk80273498_Vec3* pos)
 {
-    Unk8014D8AC_Ctx* ctx = fn_8027A918();
     int hit = 0;
+    Unk8014D8AC_Ctx* ctx = fn_8027A918();
 
     if (ctx->m6F4 == 9) {
         return 0;
