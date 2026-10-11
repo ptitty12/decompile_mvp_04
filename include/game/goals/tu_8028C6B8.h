@@ -40,6 +40,14 @@ struct Unk8028C6B8_Ctx {
     Unk8028C6B8_Pos6CC* m6CC;
 };
 
+/* Link object at Unk80270BA0_X::m618 (same object as Unk80271DBC_Link):
+ * fn_8028D4E4 and fn_8028C6B8 read an id at +0x838 and +0x83C. */
+struct Unk8028C6B8_Link {
+    char pad0[0x838];
+    int m838;
+    int m83C;
+};
+
 /* The player object (Unk80270BA0_X) with the fields this unit reads. The
  * functions here take it by pointer only. Evidence: fn_8028F0F4 (+0x44C, +0x458
  * unsigned compare), fn_8028EF98 (float at +0x724), fn_8028D8D8 (+0x708),
@@ -54,7 +62,7 @@ struct Unk8028C6B8_X {
     char pad45C[0x58C - 0x45C];
     char m58C[4];
     char pad590[0x618 - 0x590];
-    Unk80271DBC_Link* m618;
+    Unk8028C6B8_Link* m618;
     char pad61C[0x708 - 0x61C];
     int m708;
     char pad70C[0x724 - 0x70C];
@@ -62,7 +70,8 @@ struct Unk8028C6B8_X {
 };
 void fn_8025596C(void* p, int n);
 float fn_80248FC8(Unk8028C6B8_X* x, int a);
-float fn_80382BB8(Unk80271DBC_Link* p);
+float fn_80410CE8(float a, float b);
+float fn_80382BB8(Unk8028C6B8_Link* p);
 Unk80273498_Vec3 fn_8014E388(int a);
 
 /* Heading of the player relative to pi/2. fn_8028DA0C calls it and drops the
@@ -196,6 +205,7 @@ struct Unk8028C6B8_Goal {
     int fn_8028E944(Unk8028C6B8_X* x, int c);
     int fn_8028E9E8(Unk8028C6B8_Goal* other, Unk8028C6B8_X* x);
     int fn_8028C560(int a, int b);
+    void fn_8027AD3C(Unk8028C6B8_X* x, int c, Unk80273498_Vec3* outPos, float* outHeading, float* outSpeed, int* outA, int* outB, int* outC);
 
     /* Methods of the goal base (animation/goals/tu_8027A84C.cpp). */
     Unk8028C6B8_X* fn_8027A90C();
@@ -214,6 +224,8 @@ struct Unk8028C6B8_Goal {
     void fn_8028F0AC();
     void fn_8028F0D0();
 };
+
+unsigned int fn_8028E73C(void* g, int k);
 
 /* Returns a position for an object (sret): Unk80273498_Vec3 by value. */
 Unk80273498_Vec3 fn_801837F4(void* obj, int idx);
