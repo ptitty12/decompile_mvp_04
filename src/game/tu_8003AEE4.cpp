@@ -29,7 +29,7 @@ int fn_80047250(Unk8003A5DC_Ctx* ctx);
 int fn_8003B478(Unk8003A5DC* self, int a);
 int fn_8003B4B8(Unk8003A5DC* self, int a);
 void fn_8001B6D0(int a, int b, int c, int d);
-void fn_8001B73C(int a);
+void fn_8001B73C(int a, int b);
 Unk800475EC_Obj* fn_800475EC();
 int fn_8003E844(Unk8003A5DC* self);
 void* fn_8004072C();
@@ -88,62 +88,58 @@ void fn_8003B008(Unk8003A5DC* self)
     }
 }
 
-/* near-miss: written with switches (72 slots vs retail 82). Retail has three
- * explicit if-chains with range tests plus the shared "0x20" call; its loads
- * are r31,r30,r27,r26,r29,r25,r28,r24 and the register order differs. An
- * if-chain with goto (71 slots) and a hoisted-locals variant did not match. */
 void fn_8003B0F4(Unk8003A5DC* self, Unk8003B0F4_Arg* s)
 {
     int a = s->m10;
     int b = s->mC;
-    int c = s->m28;
     int d = s->m1C;
     int e = s->m20;
     int f = s->m14;
     int g = s->m18;
     int h = s->m24;
-    fn_8040ABA0();
+    int c = s->m28;
+    int bit = 1 << (fn_8040ABA0() % 10);
     if (b != a) {
         switch (a) {
         case 9:
-            fn_8001B73C(8);
+            fn_8001B73C(8, bit);
             break;
         case 10:
         case 11:
-            fn_8001B73C(0x10);
+            fn_8001B73C(0x10, bit);
             break;
         case 12:
         case 13:
         case 14:
-            fn_8001B73C(0x20);
+            fn_8001B73C(0x20, bit);
             break;
         case 15:
         case 16:
-            fn_8001B73C(0x40);
+            fn_8001B73C(0x40, bit);
             break;
         }
     } else if (d != e) {
         switch (e) {
         case 11:
-            fn_8001B73C(1);
+            fn_8001B73C(1, bit);
             break;
         case 12:
         case 13:
-            fn_8001B73C(4);
+            fn_8001B73C(4, bit);
             break;
         }
     } else if (f != g) {
         switch (g) {
         case 3:
-            fn_8001B73C(0x20);
+            fn_8001B73C(0x20, bit);
             break;
         case 4:
         case 5:
-            fn_8001B73C(0x80);
+            fn_8001B73C(0x80, bit);
             break;
         }
     } else if (h != c && c == 3) {
-        fn_8001B73C(2);
+        fn_8001B73C(2, bit);
     }
 }
 
@@ -541,8 +537,9 @@ void fn_8003C710(Unk8003A5DC* self, int a)
 }
 
 /* near-miss: 97/97 slots, only the argument setup of the seven fn_8003D944
- * calls differs (retail: li r4, li r5, then mr r3,r31; here mr r3 first).
- * An inline helper taking (id, time) did not change it. */
+ * calls differs: retail puts "mr r3,r31" last for the calls with 0x78, 0x12C,
+ * 0x1E0 and 0x3FC but early for 0x294 and 0x348, and after "li r4" for the
+ * last one; here it is early everywhere. An inline helper did not change it. */
 void fn_8003C804(Unk8003A5DC* self, int a)
 {
     Unk800475EC_Obj* o = fn_800475EC();
