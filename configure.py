@@ -760,6 +760,24 @@ config.libs = [
         ],
     },
     {
+        # .frontend_codeoverlay (split as .feoverlay). Game code; see docs/DECISIONS.md.
+        "lib": "fe_overlay",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_game,
+        "progress_category": "game",
+        "objects": [
+        ],
+    },
+    {
+        # .database_codeoverlay (split as .dboverlay). Game code; see docs/DECISIONS.md.
+        "lib": "db_overlay",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_game,
+        "progress_category": "game",
+        "objects": [
+        ],
+    },
+    {
         "lib": "ealib",
         "mw_version": "ProDG/3.9.3",
         "cflags": cflags_ealib,
