@@ -40,6 +40,13 @@ extern "C" double fn_80409D88(const char* s);
 struct Unk308 { char pad0[0x300]; int m300; char pad304[4]; int m308; int m30C; int m310; int m314; int m318; char pad31C[8]; int m324; char pad328[0xC0]; int m3E8; int m3EC; int m3F0; int m3F4; };
 extern Unk308* lbl_8061EA68;
 extern int lbl_80621574, lbl_80621578;
+extern const char lbl_80666598[], lbl_805F2F00[], lbl_805F2F10[], lbl_805F2F20[], lbl_805F2F30[], lbl_805F2F44[], lbl_805F2F5C[], lbl_805F2F6C[], lbl_805F2F84[], lbl_805F2F98[];
+extern "C" {
+void fn_8032ECD8(void* item, int a, int b, int c, int d);
+void* fn_8032EC38(void* mem, const char* name, int a, int b, int c, int d);
+void fn_8032F120(void* item, const char* name, int v);
+void fn_8032D868(void* item, const char* name);
+}
 extern int lbl_8061E690, lbl_8068CD14, lbl_8068CD18;
 extern const char lbl_80666548[], lbl_805EFF54[], lbl_805EFF68[], lbl_805EFF84[];
 extern "C" void fn_8032F19C(void* item, const char* name, int* val, int init);
@@ -281,6 +288,64 @@ extern "C" void fn_8033BC68()
         lbl_8062157C = (int)fn_8030EBC8(lbl_8061FE10, (void*)lbl_8062157C, 1);
 }
 
+static inline int LdX(char* b, int off) { return *(int*)(b + off); }
+/* near-miss: 179/179 insns, 10 diffs. The two 3-arg fn_8032F120 calls set r5 before r3
+ * in the original (mine r3 first, same unsolved item-ctor arg order as fn_80331DB8), and
+ * the loop givs are initialised/incremented in a different order. The index form
+ * (p + 0x2E0 + i * 0x68) stops gcse sharing p + 0x2E0 with the 32-item ctor loop. */
+extern "C" Menu* fn_8033C490(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666598;
+    char* e = (char*)p + 0x2E0;
+    int n = 31;
+    do {
+        fn_8032ECD8(e, 0, 1, 0, 100);
+        e += 0x68;
+    } while (n-- != 0);
+    void* i1 = (char*)p + 0xFE0;
+    fn_8032F120(i1, lbl_805F2F00, 0);
+    void* i2 = (char*)p + 0x1034;
+    fn_8032F120(i2, lbl_805F2F10, 0);
+    void* i3 = (char*)p + 0x1088;
+    fn_8032EC38(i3, lbl_805F2F20, 0, 1, 0, 3);
+    void* i4 = (char*)p + 0x10F0;
+    fn_8032EC38(i4, lbl_805F2F30, 0, 1, 4, 6);
+    void* i5 = (char*)p + 0x1158;
+    fn_8032EC38(i5, lbl_805F2F44, 0, 1, 0, 2);
+    void* i6 = (char*)p + 0x11C0;
+    fn_8032EC38(i6, lbl_805F2F5C, 0, 1, 0, 3);
+    void* i7 = (char*)p + 0x1228;
+    fn_8032EC38(i7, lbl_805F2F6C, 0, 1, 0, 3);
+    void* i8 = (char*)p + 0x1290;
+    fn_8032EC38(i8, lbl_805F2F84, 0, 1, 0, 2);
+    void* i9 = (char*)p + 0x12F8;
+    fn_8032EC38(i9, lbl_805F2F98, 0, 1, 1, 6);
+    Unk308* o = lbl_8061EA68;
+    fn_80330ACC(p, (MItem*)i1);
+    fn_80330ACC(p, (MItem*)i2);
+    fn_80330ACC(p, (MItem*)i3);
+    fn_80330ACC(p, (MItem*)i4);
+    fn_80330ACC(p, (MItem*)i6);
+    fn_80330ACC(p, (MItem*)i7);
+    fn_80330ACC(p, (MItem*)i8);
+    fn_80330ACC(p, (MItem*)i9);
+    fn_80330ACC(p, (MItem*)i5);
+    int i = 0;
+    if (i < o->m300) {
+        do {
+            MIV* it = (MIV*)((char*)p + 0x2E0 + i * 0x68);
+            *(int*)((char*)it + 0x5C) = 5;
+            fn_8032D868(it, (char*)o + i * 0x18);
+            SetV(it, LdX((char*)o + 0x14, i * 0x18));
+            if (fn_8040B574((char*)o + i * 0x18, lbl_805F2FB0) != 0)
+                fn_80330ACC(p, (MItem*)it);
+            i++;
+        } while (i < o->m300);
+    }
+    return p;
+}
+
 extern "C" void fn_8033C75C(Menu* p)
 {
     Unk308* o = lbl_8061EA68;
@@ -425,4 +490,42 @@ extern "C" void fn_8033CD74(KnotBuf* p)
         p->m8 = 0;
         p->m4 = 0;
     }
+}
+
+/* Knot table lookup + Hermite sample. Evidence: callers (tu_801527C8.h) call it as a
+ * method taking a float; r3/r4 pass straight into fn_8033D084 (knots at +4, count at +8,
+ * 12-byte knots whose first float is the key). */
+struct CKnot { float m0; float m4; float m8; };
+struct CCurve { char pad0[4]; CKnot* m4; int m8; };
+extern const float lbl_805F3010;
+extern "C" float fn_8033D084(void* o, int idx, float t);
+
+extern "C" float fn_8033CDC4(CCurve* o, float x)
+{
+    float r = lbl_805F3010;
+    if (o->m8 > 1) {
+                int found = 0;
+        int i = -1;
+        if (!(o->m4[0].m0 <= x))
+            return o->m4[0].m4;
+        if (!(o->m4[o->m8 - 1].m0 > x))
+            return o->m4[o->m8 - 1].m4;
+        do {
+            i++;
+            if (i >= o->m8)
+                break;
+            if (!(o->m4[i].m0 <= x)) {
+                found = 1;
+                i--;
+            } else if (o->m4[i].m0 == x) {
+                found = 1;
+            }
+        } while (!found);
+        if (i != -1 && i != o->m8) {
+            float t = (x - o->m4[i].m0) / (o->m4[i + 1].m0 - o->m4[i].m0);
+            float v = fn_8033D084(o, i, t);
+            r = v;
+        }
+    }
+    return r;
 }
