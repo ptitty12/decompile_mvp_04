@@ -9,6 +9,8 @@
  */
 #include "game/tu_8002D15C.h"
 
+extern "C" void fn_80039790(int a);
+
 extern "C" void fn_8002EB80(Unk8002D15C* self)
 {
     Unk8002D15C_Msg* m = Unk8002D15C_AsMsg(self->m6BC, 0x98);
@@ -276,7 +278,6 @@ extern "C" void fn_8002F850(Unk8002D15C* self)
     self->m478[i][0]++;
 }
 
-/* near-miss: same length as retail; register choice (r10/r11) and the pointer-relative stores after the chain differ. */
 extern "C" void fn_8002F894(Unk8002D15C* self, Unk8002F894_Ev* ev)
 {
     int t = ev->m4;
@@ -311,8 +312,7 @@ extern "C" void fn_8002F894(Unk8002D15C* self, Unk8002F894_Ev* ev)
         else if (t == 8)
             x = 0x10;
         if (x != 0) {
-            o.mC = x;
-            o.m8 = p;
+            o.Set(x, p);
             fn_8037893C((char*)p->m44C + 0x704, o.m0, &o, 0, 0);
         }
         fn_803444D0(&o, 2);

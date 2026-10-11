@@ -81,7 +81,7 @@ struct Unk8002D15C_PI {
 /* Table behind +0x6F8 of the owner: m10 points to ints at +0x6C. */
 struct Unk8002D15C_Tbl10 {
     char pad0[0x6C];
-    int m6C[1];
+    int m6C[2];
 };
 
 struct Unk8002D15C_Data14 {
@@ -143,7 +143,8 @@ struct Unk8002D15C_Owner {
     struct Unk8002D15C_Cc* m6CC;
     char pad6D0[0x6E4 - 0x6D0];
     char* m6E4;
-    char pad6E8[0x6F8 - 0x6E8];
+    char pad6E8[0x6F4 - 0x6E8];
+    int m6F4;
     Unk8002D15C_Sub6F8* m6F8;
     char pad6FC[0x700 - 0x6FC];
     Unk8002D15C_Q700* m700;
@@ -157,6 +158,8 @@ struct Unk8002D15C_Cc {
     int m38C;
     char pad390[0x3F4 - 0x390];
     float m3F4;
+    char pad3F8[0x448 - 0x3F8];
+    int m448;
 };
 
 struct Unk8002D15C_Q3B8 {
@@ -194,19 +197,45 @@ struct Unk8002D15C_Pair {
     int m4;
 };
 
-struct Unk8002D15C {
+/*
+ * Common base of the objects the manager in game/tu_80030778.cpp keeps in its
+ * slots (the 0x7F8-byte Unk8002D15C, and the 0x144, 0xD8, 0xE4, 0x150 byte
+ * ones). Data to +0xB8, then the vptr, so the first virtual is at vtable
+ * entry 1 (a virtual destructor: called with in-charge 3 by the manager).
+ * Evidence: fn_80030C90 .. fn_80031088 (calls through [obj+0xB8] with the
+ * delta adjust), fn_8002D314 (entry 11).
+ */
+struct Unk80030C90_Base {
     char pad0[0x80];
     Unk8002D15C_Owner* m80;
-    char pad84[0xC8 - 0x84];
+    char pad84[0xB8 - 0x84];
+    virtual ~Unk80030C90_Base();
+    virtual void v2(int);
+    virtual void v3(int, float);
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7(int);
+    virtual void v8(int);
+    virtual void v9();
+    virtual void v10();
+    virtual void v11(int);
+};
+
+struct Unk8002D15C : public Unk80030C90_Base {
+    char padBC[0xC8 - 0xBC];
     Unk8002D15C_C8* mC8;
     int mCC;
     int mD0;
-    char padD4[0xE4 - 0xD4];
+    int mD4;
+    char padD8[0xE4 - 0xD8];
     int mE4;
     int mE8;
     char padEC[0xF0 - 0xEC];
     int mF0;
-    char padF4[0x11C - 0xF4];
+    char padF4[0xFC - 0xF4];
+    int mFC;
+    char pad100[0x11C - 0x100];
     int m11C;
     int m120;
     int m124;
@@ -270,7 +299,9 @@ struct Unk8002D15C {
     char pad528[0x52C - 0x528];
     int m52C;
     int m530;
-    char pad534[0x634 - 0x534];
+    char pad534[0x5A8 - 0x534];
+    int m5A8;
+    char pad5AC[0x634 - 0x5AC];
     int m634;
     char pad638[0x6BC - 0x638];
     Unk8002D15C_Msg* m6BC;
@@ -299,10 +330,35 @@ struct Unk8002D15C {
     int m7D0;
     int m7D4;
     int m7D8;
-    char pad7DC[0x7F0 - 0x7DC];
+    char pad7DC[0x7E0 - 0x7DC];
+    int m7E0;
+    char pad7E4[0x7F0 - 0x7E4];
     float m7F0;
     int m7F4;
 };
+
+typedef void (Unk8002D15C::*Unk8002D15C_Handler)();
+
+/* Message dispatch table at 0x80616528: 0x53 entries of {message id, pointer to member function}. */
+struct Unk8002D15C_HEnt {
+    int id;
+    Unk8002D15C_Handler h;
+};
+extern Unk8002D15C_HEnt lbl_80616528[];
+extern int lbl_80620860;
+extern "C" void* fn_8040B320(void* dst, int c, unsigned int n);
+
+/* Iterator (24 bytes on the stack) filled by fn_8014E09C; m8 is the current element (10 = end). */
+struct Unk8014E09C_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+extern float lbl_805A6684;
 
 /* Checked cast of the current message: null unless it has the given id. */
 inline Unk8002D15C_Msg* Unk8002D15C_AsMsg(Unk8002D15C_Msg* m, int id)
@@ -320,9 +376,9 @@ void fn_800221E4(Unk8002D15C* self, Unk8002D15C_Owner* owner, int a, int b);
 void fn_80022270(Unk8002D15C* self, Unk8002D15C_Owner* owner, int a);
 void fn_80021C9C(Unk8002D15C* self, Unk8002D15C_Owner* owner, Unk8002D15C_Vec3 v);
 void fn_80021D04(Unk8002D15C* self, Unk8002D15C_Owner* owner, Unk8002D15C_Vec3 v, int flag, const Unk8002D15C_Vec3& w);
-void fn_800233B4(Unk8002D15C* self, int a, int b, int c);
-int fn_80023430(Unk8002D15C* self, int a, int b, int c);
-void fn_80023490(Unk8002D15C* self, int a, int b);
+void fn_800233B4(void* self, int a, int b, int c);
+int fn_80023430(void* self, int a, int b, int c);
+void fn_80023490(void* self, int a, int b);
 void fn_8002A244(Unk8002D15C* self, int id, float t);
 int fn_8002A2D4(Unk8002D15C* self);
 void fn_8003B394(int a, int b);
@@ -333,12 +389,17 @@ float fn_804028E4(float x);
 int fn_80211DB8(int x);
 int fn_80211D78(int x);
 void fn_8003F14C(int a, int b);
+void fn_8003EF1C(int a);
+void fn_8014E09C(struct Unk8014E09C_It* it, Unk8002D15C_Owner* o, int k);
+void fn_8014E108(struct Unk8014E09C_It* it);
+int fn_801DC964(struct Unk8002D15C_Q3B8* q, int x);
 void fn_8002F1E4(Unk8002D15C* self);
 void fn_800303A4(Unk8002D15C* self, int a);
 void fn_80030380(Unk8002D15C* self, int a);
 void fn_8003049C(Unk8002D15C* self, int id, int a, int b);
 void fn_80035EEC(int a, int b, int c);
 void fn_80039A3C(int a, int b, int c);
+void fn_80021E30(void* self, void* o, int a);
 void fn_8003F460(int a, int b);
 void fn_8003F698(int a);
 void fn_8003FA44(int a);
@@ -360,8 +421,7 @@ void fn_8002F160(Unk8002D15C* self);
 void fn_80021BE8(Unk8002D15C* self);
 void fn_80048C08(void* p);
 void fn_8003968C(int a, int b);
-void fn_8017FA08(int a);
-void fn_80039790(int a);
+float fn_8017FA08(int a);
 void fn_80035E94(int a);
 int fn_80030130(Unk8002D15C* self);
 Unk8002D15C_Vec3* fn_8019CF24(int a);
@@ -407,12 +467,17 @@ struct Unk8002F894_Obj {
     {
         vptr = lbl_80649DA0;
         m0 = id;
-        mC = 0;
         m8 = 0;
+        mC = 0;
     }
     void Derived()
     {
         vptr = lbl_80649D88;
+    }
+    void Set(int x, Unk8002D15C_Player* p)
+    {
+        mC = x;
+        m8 = p;
     }
 };
 
