@@ -289,6 +289,138 @@ public:
     virtual void v127();
 };
 
+/* Third virtual-call class: placeholders only (slot 40 takes no argument here). */
+class UiObjC : public UiBase {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual void v30();
+    virtual void v31();
+    virtual void v32();
+    virtual void v33();
+    virtual void v34();
+    virtual void v35();
+    virtual void v36();
+    virtual void v37();
+    virtual void v38();
+    virtual void v39();
+    virtual void v40();
+    virtual void v41();
+    virtual void v42();
+    virtual void v43();
+    virtual void v44();
+    virtual void v45();
+    virtual void v46();
+    virtual void v47();
+    virtual void v48();
+    virtual void v49();
+    virtual void v50();
+    virtual void v51();
+    virtual void v52();
+    virtual void v53();
+    virtual void v54();
+    virtual void v55();
+    virtual void v56();
+    virtual void v57();
+    virtual void v58();
+    virtual void v59();
+    virtual void v60();
+    virtual void v61();
+    virtual void v62();
+    virtual void v63();
+    virtual void v64();
+    virtual void v65();
+    virtual void v66();
+    virtual void v67();
+    virtual void v68();
+    virtual void v69();
+    virtual void v70();
+    virtual void v71();
+    virtual void v72();
+    virtual void v73();
+    virtual void v74();
+    virtual void v75();
+    virtual void v76();
+    virtual void v77();
+    virtual void v78();
+    virtual void v79();
+    virtual void v80();
+    virtual void v81();
+    virtual void v82();
+    virtual void v83();
+    virtual void v84();
+    virtual void v85();
+    virtual void v86();
+    virtual void v87();
+    virtual void v88();
+    virtual void v89();
+    virtual void v90();
+    virtual void v91();
+    virtual void v92();
+    virtual void v93();
+    virtual void v94();
+    virtual void v95();
+    virtual void v96();
+    virtual void v97();
+    virtual void v98();
+    virtual void v99();
+    virtual void v100();
+    virtual void v101();
+    virtual void v102();
+    virtual void v103();
+    virtual void v104();
+    virtual void v105();
+    virtual void v106();
+    virtual void v107();
+    virtual void v108();
+    virtual void v109();
+    virtual void v110();
+    virtual void v111();
+    virtual void v112();
+    virtual void v113();
+    virtual void v114();
+    virtual void v115();
+    virtual void v116();
+    virtual void v117();
+    virtual void v118();
+    virtual void v119();
+    virtual void v120();
+    virtual void v121();
+    virtual void v122();
+    virtual void v123();
+    virtual void v124();
+    virtual void v125();
+    virtual void v126();
+    virtual void v127();
+};
+
 /* Views of a screen object (derived from UiObj, vptr at +0x3C): each names
  * only the field a function reads. Evidence: the functions using it. */
 struct UiScr134 : UiObj {
@@ -711,6 +843,17 @@ struct UiV_14Ci_158i_15Ci_160i_164i_168i_16Ci_170i_174i_178i_17Ci_180i_184i_188i
     int m19C;
 };
 
+struct UiV_138q : UiObj {
+    char pad40[0x138 - 0x40];
+    int* m138;
+};
+
+struct UiV_138i_13Ci : UiObj {
+    char pad40[0x138 - 0x40];
+    int m138;
+    int m13C;
+};
+
 
 /* fn_800B555C(): global input/menu state; +0x570 is the current player/slot index
  * compared by the button handlers. */
@@ -721,6 +864,7 @@ struct Ui800B555C {
     int m570;
     char pad574[0x664 - 0x574];
     int m664;
+    int m668;
 };
 Ui800B555C* fn_800B555C();
 int fn_800B57EC(Ui800B555C* p);
@@ -843,6 +987,11 @@ struct Ui1CD0 {
 struct Ui6F8_10 {
     char pad0[0x70];
     int m70;
+    int m74;
+};
+struct UiP2 {
+    int a;
+    int b;
 };
 struct Ui6F8 {
     char pad0[0x10];
@@ -908,7 +1057,9 @@ struct UiMsg {
     char name[16];
 };
 struct UiMsgMgr {
-    char pad0[0xD8];
+    char pad0[0xBC];
+    int mBC;
+    char padC0[0xD8 - 0xC0];
     UiMsgMgr();
 };
 extern UiMsgMgr* lbl_8061A32C;
@@ -992,7 +1143,7 @@ void fn_800C80C0(UiObj* o, int a);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
 int fn_80403DE4(char* buf, const char* fmt, ...);
 int fn_80090880(int a, int b);
-UiObj* fn_800C8040();
+UiObj* fn_800C8040(int a);
 
 struct Ui8010B1E0 {
     char pad0[0x704];
@@ -1155,6 +1306,24 @@ void fn_801A750C(int a, int b);
 void fn_802D7ADC();
 void fn_802D7A64();
 
+int fn_804D3B18(UiObjC* self);
+void fn_804D2F9C(UiObjC* self);
+void fn_804D304C(UiObjC* self);
+
+char* fn_801A4B34(int a);
+void fn_8011A14C(char* t, UiObj* o, const char* s, int a);
+void fn_8011A268(char* t, UiObj* o, const char* s);
+
+void fn_800F595C(UiObj* self, int* p, int n);
+
+void fn_800B2390();
+void fn_800AB578(int a);
+void fn_800AEDDC();
+void fn_800B5364();
+
+void fn_800FCB38(UiObj* self, int* m);
+void fn_800FCD0C(UiObj* self, int* m);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -1219,5 +1388,6 @@ void fn_80100668(UiV_2Ci* self, int a);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(UiObj*, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
 int fn_800C8060(int a);
 void fn_80100A98(UiWM* self, int a, int b);
+void fn_800F84F4(UiObj* self);
 
 #endif
