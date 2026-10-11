@@ -122,13 +122,19 @@ struct Unk800C3A10_Rec {
     int m0;
     char m4;
     char pad5[0x3FF];
+    const char* m4_name() { return &m4; }
     int m404;
     float m408;
     int m40C;
 };
 
 struct Unk800C341C_Mgr {
-    int m0[0x26];
+    int m0;
+    int m4;
+    void* m8;
+    char padC[0x10];
+    void* m1C;
+    char pad20[0x78];
     char m98;
     char pad99[3];
     Unk800C2250_File files[10];
@@ -144,6 +150,22 @@ extern "C" {
 void fn_800C537C(Unk800C341C_Mgr* m, int kind, const char* name, int idx, float scale, int flag);
 Unk800C341C_Mgr* fn_800C33D0();
 int fn_800C5CF8(Unk800C341C_Mgr* m, const char* name);
+void fn_800C3D50(Unk800C341C_Mgr* m);
+int fn_800C2998(Unk800C2250_File* f, Unk800C1BE4_Widget* w);
+void fn_800C2458(Unk800C2250_File* f);
+void fn_800C5010(Unk800C341C_Mgr* m);
+void fn_800C5080(Unk800C341C_Mgr* m);
+void fn_800C3A4C(Unk800C341C_Mgr* m);
+void fn_800C3A10(Unk800C341C_Mgr* m);
+void fn_800C5AF8(Unk800C341C_Mgr* m);
+void fn_800C5B58(Unk800C341C_Mgr* m);
+void fn_800C3828(Unk800C341C_Mgr* m);
+int fn_800C58E8(Unk800C341C_Mgr* m, int kind);
+void fn_800C435C(Unk800C341C_Mgr* m, int idx, float scale, const char* name, int flag);
+void fn_800C4D90(Unk800C341C_Mgr* m, int idx, float scale, const char* name, int flag);
+void fn_800C56C0(Unk800C341C_Mgr* m, int a);
+void fn_803FEDB8(void* p, int a);
+void fn_803FB4B0();
 int fn_800C5C68(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w);
 void fn_800C2C78(Unk800C2250_File* f);
 void fn_800C334C(Unk800C2250_File* f);
