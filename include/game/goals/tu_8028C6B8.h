@@ -67,6 +67,9 @@ struct Unk8028C6B8_X {
     int m708;
     char pad70C[0x724 - 0x70C];
     float m724;
+
+    /* Inline by-value getter: passing its result gives retail's direct temp. */
+    Unk80273498_Vec3 fn_GetPos() { return m60; }
 };
 void fn_8025596C(void* p, int n);
 float fn_80248FC8(Unk8028C6B8_X* x, int a);
@@ -108,7 +111,6 @@ public:
 struct Unk8028F45C_Inner {
     int fn_8028F45C(Unk80273498_Vec3 v);
     void fn_8028F528(Unk80273498_Vec3 v);
-    void fn_8028F588(float f);
     void fn_8028F5CC(float f);
     void fn_8028F5F4(float f);
     void fn_8028F610();
@@ -226,6 +228,24 @@ struct Unk8028C6B8_Goal {
 };
 
 unsigned int fn_8028E73C(void* g, int k);
+/* Same function as Unk8028F45C_Inner::fn_8028F588 declared with the object last:
+ * a free function evaluates the float argument before the object pointer
+ * (fn_8028EF98 loads f1 first, then r3). */
+void fn_8028F588(float f, Unk8028F45C_Inner* i);
+int fn_8026DC18(Unk8028C6B8_X* x, int a);
+float fn_80249298(Unk8028C6B8_X* x, int a, int b);
+extern float lbl_8061E700[27];            /* squared distances, indexed by Goal::m4C */
+
+/* Vector difference with by-value parameters (each lvalue argument is copied to a
+ * stack temp first, as in fn_8028E9E8). */
+inline Unk80273498_Vec3 Unk8028E9E8_Sub(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
 
 /* Returns a position for an object (sret): Unk80273498_Vec3 by value. */
 Unk80273498_Vec3 fn_801837F4(void* obj, int idx);

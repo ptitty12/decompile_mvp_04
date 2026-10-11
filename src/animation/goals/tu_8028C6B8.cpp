@@ -11,6 +11,36 @@
 
 #define REACHGOAL_FILE "C:/mvp2004/source/common/animation/goals/reachgoal.cpp"
 
+/* .data 0x8061E700 (this unit's split): squared distances indexed by Goal::m4C
+ * (read by fn_8028E9E8) and the word at 0x8061E76C (read by fn_8028DB44). */
+float lbl_8061E700[27] = {
+    23963.037f, 23963.037f, 16796.162f, 10404.0f, 17108.637f, 0.0f, 0.0f, 3600.0f, 3600.0f,
+    5715.361f, 7056.0f, 57600.0f, 49818.246f, 30695.045f, 29036.158f, 48224.156f, 57600.0f, 8100.0f,
+    30276.0f, 1383.8397f, 3600.0f, 36864.0f, 3600.0f, 3600.0f, 3600.0f, 3600.0f, 0.0f
+};
+int lbl_8061E76C = 1;
+
+extern Unk80273498_Vec3 lbl_805DED4C;       /* 7.5, 0, 7.5 (preceded by 1072.5, 0, 7.5) */
+
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+/* Cross product with by-value parameters, as fn_8028D8D8 uses it. */
+inline Unk80273498_Vec3 Unk8028D8D8_Cross(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
+{
+    Unk80273498_Vec3 r;
+    r.x = b.y * a.z - a.y * b.z;
+    r.y = a.x * b.z - b.x * a.z;
+    r.z = b.x * a.y - a.x * b.y;
+    return r;
+}
+
 void Unk8028C6B8_Goal::fn_8028D0EC(Unk8028C6B8_X* x, Unk8028C6B8_Ctx* ctx)
 {
     if (!mA8.f15) {
@@ -120,6 +150,24 @@ void Unk8028C6B8_Goal::fn_8028D808(Unk8028C6B8_X* x, int c)
     fn_8025596C(x->m58C, m48);
 }
 
+/* near-miss: 77 of 77 instructions in the same order as retail; the 28 that
+ * differ are stack offsets only. Retail keeps the two Vec3 differences at
+ * sp+0x28 and sp+0x38 and the by-value copies below them (sp+0x18, sp+0x28);
+ * here every temp sits 0x10 higher except the final copy of the cross product.
+ * Tried: named locals for the differences and the product (double copies, 95
+ * instructions), const-reference parameters, Cross with swapped parameters,
+ * a ternary return, declaration order of the locals. */
+int Unk8028C6B8_Goal::fn_8028D8D8(Unk8028C6B8_X* x)
+{
+    Unk80273498_Vec3 p = fn_801837F4(x->m44C->m6B8, x->m708);
+    int r = 7;
+
+    if (!(Unk8028D8D8_Cross(p - lbl_805DED4C, lbl_805DED4C - (&lbl_805DED4C)[-1]).y > 0.0f)) {
+        r = 8;
+    }
+    return r;
+}
+
 int fn_8028DA0C(void* g, Unk8028C6B8_X* x)
 {
     if (x && x->m458 == 1) {
@@ -177,7 +225,7 @@ void Unk8028C6B8_Goal::fn_8028E7B0(Unk8028C6B8_X* x)
     m4->m18C.f18 = mA8.f5;
     if (mA8.f11) {
         float d = m70 - m8->fn_8027A280(0);
-        m4->fn_8028F588(d);
+        fn_8028F588(d, m4);
         float v = x->m724;
         if (mA8.f12) {
             v = fn_80248FC8(x, m38);
@@ -210,6 +258,72 @@ int Unk8028C6B8_Goal::fn_8028E944(Unk8028C6B8_X* x, int c)
         break;
     }
     return result;
+}
+
+/* near-miss: 198 of 198 instructions in the same order as retail; 32 differ,
+ * all in stack offsets (frame is 136 bytes, retail 152: retail keeps d2/dist2
+ * above block 1's freed temps, here d2 reuses them) plus the operand order of
+ * the xor and the cmpw on m4C (retail loads o->m4C first, then compares
+ * this->m4C against it). Tried: dist2/d2 declaration order and scope, the
+ * m4C comparison written both ways, by-value getters vs lvalue arguments, a
+ * flag instead of gotos (adds instructions). */
+int Unk8028C6B8_Goal::fn_8028E9E8(Unk8028C6B8_Goal* o, Unk8028C6B8_X* x)
+{
+    if (!o) {
+        goto fail;
+    }
+    if (m28 == 0) {
+        if (o->m28 != 0) {
+            goto fail;
+        }
+        return o->m4C == m4C;
+    }
+    {
+        int ot = o->m38 == 4 ? 3 : o->m38;
+        int gt = m38 == 4 ? 3 : m38;
+
+        if (ot != gt) {
+            goto fail;
+        }
+        float lim = fn_80249298(x, m40, 1);
+        if (o->m28 == 0) {
+            goto fail;
+        }
+        Unk80273498_Vec3 d = Unk8028E9E8_Sub(fn_GetTarget(), o->fn_GetTarget());
+        if (d.x * d.x + d.z * d.z >= lim) {
+            goto fail;
+        }
+        if (mC > 2 && m44->m14 == 0) {
+            goto ok;
+        }
+        if (fn_8026DC18(x, 0)) {
+            float dist2;
+            Unk80273498_Vec3 d2 = Unk8028E9E8_Sub(x->m60, fn_GetTarget());
+
+            dist2 = d2.x * d2.x + d2.z * d2.z;
+            if (dist2 < lbl_8061E700[m4C]) {
+                goto ok;
+            }
+        }
+        if (o->m4C != m4C) {
+            goto fail;
+        }
+        if (o->m2C && m2C) {
+            float diff = AngleDiff(fn_80410CE8(o->m1C.x, o->m1C.z), fn_80410CE8(m1C.x, m1C.z));
+
+            if (fabsf(diff) >= 0.26179942f) {
+                goto fail;
+            }
+        }
+    }
+ok:
+    if (o->mA8.f11) {
+        m70 = o->m70;
+        mA8.f11 = 1;
+    }
+    return 1;
+fail:
+    return 0;
 }
 
 void Unk8028C6B8_Goal::fn_8028ED00()
@@ -269,15 +383,13 @@ Unk8028C6B8_Goal* Unk8028C6B8_Goal::fn_8028EF14(Unk80273498_Vec3 v)
 
 Unk8028C6B8_Goal* Unk8028C6B8_Goal::fn_8028EF98(float f)
 {
-    int flag;
     if (!(f <= 0.0f)) {
         m4CF = f;
-        flag = 1;
+        m50 = 1;
     } else {
-        flag = 0;
+        m50 = 0;
     }
-    m50 = flag;
-    m4->fn_8028F588(f);
+    fn_8028F588(f, m4);
     Unk8028F45C_Inner* i = m4;
     float unused;
     float t = fn_8027A90C()->m724;
