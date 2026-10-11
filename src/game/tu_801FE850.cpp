@@ -4,6 +4,34 @@
  */
 #include "game/tu_801FA73C.h"
 
+struct Unk80201738_Owner {
+    char pad0[0x6CC];
+    void* m6CC;
+};
+
+/* Roster of the nine player slots (G+0 in tu_801EE438.h terms): owner, a pointer copied from owner+0x6CC,
+ * and nine slot words. Cleared by fn_80201738, refilled by fn_80201764. */
+struct Unk80201738_Roster {
+    Unk80201738_Owner* m0;
+    void* m4;
+    int m8[9];
+};
+
+struct Unk80201738_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+extern "C" {
+void fn_8014E09C(Unk80201738_It* it, Unk80201738_Owner* o, int k);
+void fn_8014E108(Unk80201738_It* it);
+int fn_801A497C(Unk80201738_Owner* o, int a, int b);
+}
+
 extern float lbl_805D50F0;
 extern float lbl_805D50F4;
 extern float lbl_805D50F8;
@@ -983,6 +1011,26 @@ void fn_802016F4(Unk801FA73C_Scr* p)
     fn_801F7F64(&p->mA0);
     fn_801F803C(&p->mA0, 5);
     fn_801F8D34(&p->mA0);
+}
+
+void fn_80201738(Unk80201738_Roster* r)
+{
+    r->m4 = 0;
+    for (int i = 0; i < 9; i++)
+        r->m8[i] = 0;
+}
+
+void fn_80201764(Unk80201738_Roster* r)
+{
+    Unk80201738_It it;
+    r->m4 = r->m0->m6CC;
+    fn_8014E09C(&it, r->m0, 1);
+    Unk80201738_It* ip = &it;
+    while (ip->m8 != 10) {
+        int i = ip->m8;
+        *(int*)((char*)r + i * 4 + 8) = fn_801A497C(r->m0, 4, i);
+        fn_8014E108(ip);
+    }
 }
 
 }
