@@ -74,13 +74,6 @@ extern "C" int fn_8020C5FC(Scr* p)
 
 /* near-miss (6 slots): saturating-decrement loop and volatile counter match; retail puts the final
  * player-slot index/result in r11/r3 where ours uses r0, and schedules cmpwi before the addi. */
-inline Unk801EE438_Player* PlayerAtIdx(Unk801EE438_Owner* o, unsigned k)
-{
-    if (k <= 12)
-        return o->m65C[k];
-    return 0;
-}
-
 extern "C" int fn_8020C90C(Scr* p)
 {
     volatile int sp8;
@@ -101,7 +94,13 @@ extern "C" int fn_8020C90C(Scr* p)
     int s = sp8;
     if (s <= 2) {
         Unk801EE438_Owner* o = p->m0->m0;
-        if (PlayerAtIdx(o, fn_8014E2B4(s)) != 0)
+        unsigned k = fn_8014E2B4(s);
+        Unk801EE438_Player* pl;
+        if (k <= 12)
+            pl = o->m65C[k];
+        else
+            pl = 0;
+        if (pl != 0)
             r = 3;
     }
     return r;
