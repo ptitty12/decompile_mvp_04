@@ -94,6 +94,7 @@ public:
     virtual ~Unk802F42A4();
     void fn_802F4368();
     void fn_802F4F40();
+    void fn_802F4628();
 };
 
 /* Object with the two extents at +0x3C/+0x40 read by fn_802F7EE8 / fn_802F7F04. */
@@ -102,6 +103,19 @@ struct Unk802F7EE8_S {
     float m3C;
     float m40;
 };
+/* 16-byte result of fn_802B0ACC, kept in the table at lbl_806E0E00. */
+struct Unk802F4628_Q {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+Unk802F4628_Q fn_802B0ACC(int a, int b);
+int fn_802B0850(int a, int b, int c);
+extern int lbl_8061E978;
+extern int lbl_8061F804[];
+extern int lbl_806E0DD8[];
+extern Unk802F4628_Q lbl_806E0E00[];
 extern float lbl_8061CBC4;
 extern float lbl_8061F6EC;
 

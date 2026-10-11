@@ -70,6 +70,20 @@ void Unk802F42A4::fn_802F4368()
     mEC = -1.0f;
 }
 
+void Unk802F42A4::fn_802F4628()
+{
+    int a = lbl_8061E978;
+    for (int k = 0; k < 10; k++) {
+        lbl_806E0DD8[k] = fn_802B0850(a, lbl_8061F804[k], 0);
+        lbl_806E0E00[k] = fn_802B0ACC(a, lbl_8061F804[k]);
+    }
+    float t = lbl_806E0E00[0].mC;
+    t = t * 0.1f;
+    lbl_806E0E00[0].mC = lbl_806E0E00[0].mC - 2.0f * t;
+    lbl_806E0E00[0].m4 = lbl_806E0E00[0].m4 + t;
+    mC0 = 1;
+}
+
 void Unk802F42A4::fn_802F4F40()
 {
     Unk802F4F40_P* p = m64->m6CC;
