@@ -17,6 +17,14 @@ animation/choosers/playeridchooser.cpp:
 	.rodata     start:0x805DC568 end:0x805DC644
 	.data       start:0x8061E648 end:0x8061E650
 
+ealib/tu_8036FEA0.cpp:
+	.text       start:0x8036FEA0 end:0x803708F4
+	.ctors      start:0x805A2C7C end:0x805A2C84
+	.rodata     start:0x80604538 end:0x8060468C
+	.data       start:0x806239C0 end:0x80623A78
+	.bss        start:0x80693DB0 end:0x80693DC4
+	.sbss       start:0x806EFB34 end:0x806EFB48
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
