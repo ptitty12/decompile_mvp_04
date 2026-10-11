@@ -55,11 +55,14 @@ void fn_8011A974(UnkPlr* a, Wid* w, const char* name);
 void fn_8011A9B8(const char* s, Wid* w, const char* name);
 UnkGame* fn_8011AA24(int i);
 int fn_8011AA4C();
+int fn_8011AB48(int a);
+void fn_8011ABDC(int a, int b);
 UnkGameP10* fn_8011AC90(int idx);
 int fn_8011AD00(int mode, int idx);
 void fn_8011AD88(int mode, int idx, int c);
 int fn_8011AE28(int mode, int idx);
 void fn_8011AEB0(int mode, int idx, int c);
+void fn_8011AF34(Wid* self);
 void fn_8011B3E8(int a, int* x, int* y);
 int fn_8011B494(int* p, int a, int c);
 int fn_8011B4E4();
@@ -109,6 +112,14 @@ int fn_8011BB54(void* a, int b);
 int fn_8006BC74(void* a, int b);
 int fn_8006A1B4(void* p);
 void* fn_8004072C();
+void fn_801A23B8(UnkGame* g, int a);
+void fn_80086EC0(UnkGameP10* p, int a, int b);
+struct Unk800AEC80 {
+    char pad0[0xD8];
+    int mD8;
+};
+Unk800AEC80* fn_800AEC80(int a);
+int fn_800AB5C8(int a);
 int* fn_800ED2B0(void* container, const char* name);
 void fn_800CFB38(int* p);
 int fn_800412AC(void* o, int a, int b, int c, int d, int e);
@@ -143,7 +154,7 @@ int fn_801A49F0(void* g, int a, int b);
 int fn_801B454C(int a, int b);
 int fn_8025416C(char* p, int a);
 int fn_8004181C(void* o, int a, int b, int c, int d, int e, int f);
-void fn_80086EC0(int a, int b);
+
 int fn_8011AA4C();
 int fn_800B55A8(UnkFEState* s);
 int fn_800B59DC(UnkFEState* s);
@@ -233,6 +244,56 @@ int fn_8011AA4C()
     return lbl_806192E0->m4->m10->m74;
 }
 
+/* near-miss: one slot (lwzx operand order). An inline `int AtI(int* p, int i) { return p[i]; }` gives retail's r11 index register but flips the operands. */
+int fn_8011AB48(int a)
+{
+    int r = -1;
+    int mode = fn_8011AA4C();
+    switch (mode) {
+    case 1:
+    case 2:
+        r = fn_8011AD00(mode, a == 0);
+        break;
+    case 0:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 10:
+    {
+        char* b = (char*)fn_8011AA24(0)->m6F8->m10 + 0x6C;
+        r = *(int*)(b + a * 4);
+        break;
+    }
+    }
+    return r;
+}
+
+void fn_8011ABDC(int a, int b)
+{
+    int mode = fn_8011AA4C();
+    switch (mode) {
+    case 1:
+    case 2: {
+        int c = a == 0;
+        fn_8011AD88(mode, c, b);
+        fn_801A23B8(fn_8011AA24(c), 0);
+        break;
+    }
+    case 0:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 10: {
+        UnkGame* g = fn_8011AA24(0);
+        fn_80086EC0(g->m6F8->m10, a, b);
+        fn_801A23B8(g, 1);
+        break;
+    }
+    }
+}
+
 UnkGameP10* fn_8011AC90(int idx)
 {
     UnkGame* g = 0;
@@ -250,6 +311,7 @@ UnkGameP10* fn_8011AC90(int idx)
     return g->m6F8->m10;
 }
 
+/* near-miss: retail compares mode 2 as the bne fallthrough of the mode 1 test (no explicit cmpwi 2); case order permutations tried. */
 int fn_8011AD00(int mode, int idx)
 {
     UnkGameP10* o = fn_8011AC90(idx);
@@ -272,12 +334,13 @@ int fn_8011AD00(int mode, int idx)
     return -1;
 }
 
+/* near-miss: same switch layout difference as fn_8011AD00 (one slot). */
 void fn_8011AD88(int mode, int idx, int c)
 {
-    fn_8011AC90(idx);
+    UnkGameP10* o = fn_8011AC90(idx);
     switch (mode) {
     case 1:
-        fn_80086EC0(1, c);
+        fn_80086EC0(o, 1, c);
         break;
     case 2:
         break;
@@ -286,16 +349,17 @@ void fn_8011AD88(int mode, int idx, int c)
     case 6:
         switch (idx) {
         case 0:
-            fn_80086EC0(0, c);
+            fn_80086EC0(o, 0, c);
             break;
         case 1:
-            fn_80086EC0(1, c);
+            fn_80086EC0(o, 1, c);
             break;
         }
         break;
     }
 }
 
+/* near-miss: same switch layout difference as fn_8011AD00. */
 int fn_8011AE28(int mode, int idx)
 {
     UnkGameP10* o = fn_8011AC90(idx);
@@ -318,6 +382,7 @@ int fn_8011AE28(int mode, int idx)
     return 1;
 }
 
+/* near-miss: same switch layout difference as fn_8011AD00. */
 void fn_8011AEB0(int mode, int idx, int c)
 {
     UnkGameP10* o = fn_8011AC90(idx);
@@ -341,6 +406,28 @@ void fn_8011AEB0(int mode, int idx, int c)
         }
         break;
     }
+}
+
+void fn_8011AF34(Wid* self)
+{
+    int m = fn_8011AA4C();
+    int v = 0xBBC;
+    switch (m) {
+    case 1:
+        v = 0x4179;
+        break;
+    case 6: {
+        int c = fn_800AEC80(fn_800AB5C8(lbl_80619D10))->mD8;
+        v = 0x119;
+        if (c == 1)
+            v = 0x5C4A;
+        break;
+    }
+    case 5:
+        v = 0x5C4B;
+        break;
+    }
+    self->fn_vslot29((const char*)v);
 }
 
 void fn_8011B3E8(int a, int* x, int* y)
