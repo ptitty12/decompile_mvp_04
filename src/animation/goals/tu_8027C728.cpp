@@ -559,8 +559,13 @@ inline int GetResult(Unk80279BB8* o, float* dist)
     return r;
 }
 
-/* near-miss (97%): everything matches except that retail addresses the result
- * record through r4 (addi r4,r1,8) in the GetResult part where this uses r9. */
+/* near-miss (97%, 3 insns): everything matches except that retail addresses the
+ * result record through r4 (addi r4,r1,8; lwz r31,0xd8(r4); lfs f0,0xd4(r4)) in
+ * the GetResult part where this gets r9. Tried (all give r9): inline taking a
+ * pointer or reference, a member function, if/else and ternary forms, a
+ * separate inline for the int and the float, a pointer variable assigned in
+ * both branches, ~1500 combinations of declaration order, store order and the
+ * pos6 copy. */
 int fn_8027D3E8(Goal* g, int a, float* outF, Vec3* pos6, Vec3* pos7, float* out8)
 {
     Player* player = g->mC;

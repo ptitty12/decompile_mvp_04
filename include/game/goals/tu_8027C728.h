@@ -104,36 +104,38 @@ struct Unk8027D9A4 : public Unk8027C728_Base {
     float mD4;
     Unk80273498_Vec3 mD8;
     int mE4;
-    /* +0xE8: flag word; f<N> is bit N counted from the MSB (fn_8027DC98: f2, fn_8027DDE8: f6,
-     * fn_8027DE00: f15, fn_8027DE14: f16, fn_8027DE28: f19) */
+    /* +0xE8: flag word. f<N> is bit N counted from the MSB (fn_8027DC98: f2,
+     * fn_8027DDE8: f6, fn_8027DE00: f15, fn_8027DE14: f16, fn_8027DE28: f19).
+     * fn_8027D9A4 clears it with word masks, so it is a union with an
+     * unsigned word. */
     union {
         unsigned int mE8;
         struct {
-        unsigned int f0 : 1;
-        unsigned int f1 : 1;
-        unsigned int f2 : 1;
-        unsigned int f3 : 1;
-        unsigned int f4 : 1;
-        unsigned int f5 : 1;
-        unsigned int f6 : 1;
-        unsigned int f7 : 1;
-        unsigned int f8 : 1;
-        unsigned int f9 : 1;
-        unsigned int f10 : 1;
-        unsigned int f11 : 1;
-        unsigned int f12 : 1;
-        unsigned int f13 : 1;
-        unsigned int f14 : 1;
-        unsigned int f15 : 1;
-        unsigned int f16 : 1;
-        unsigned int f17 : 1;
-        unsigned int f18 : 1;
-        unsigned int f19 : 1;
-        unsigned int f20 : 1;
-        unsigned int f21 : 1;
-        unsigned int f22 : 1;
-        unsigned int f23 : 1;
-        unsigned int f24 : 8;
+            unsigned int f0 : 1;
+            unsigned int f1 : 1;
+            unsigned int f2 : 1;
+            unsigned int f3 : 1;
+            unsigned int f4 : 1;
+            unsigned int f5 : 1;
+            unsigned int f6 : 1;
+            unsigned int f7 : 1;
+            unsigned int f8 : 1;
+            unsigned int f9 : 1;
+            unsigned int f10 : 1;
+            unsigned int f11 : 1;
+            unsigned int f12 : 1;
+            unsigned int f13 : 1;
+            unsigned int f14 : 1;
+            unsigned int f15 : 1;
+            unsigned int f16 : 1;
+            unsigned int f17 : 1;
+            unsigned int f18 : 1;
+            unsigned int f19 : 1;
+            unsigned int f20 : 1;
+            unsigned int f21 : 1;
+            unsigned int f22 : 1;
+            unsigned int f23 : 1;
+            unsigned int f24 : 8;
         };
     };
 };
