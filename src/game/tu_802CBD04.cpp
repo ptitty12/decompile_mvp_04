@@ -6,6 +6,8 @@
 #include "game/tu_802CBD04.h"
 
 extern int lbl_8061ECAC[];
+Unk802CC580_T* fn_801A04A8(Unk802CC580_Data* d, int k);
+int fn_803272D0(char* tbl, int idx);
 extern const char lbl_805E2568[];
 extern const char lbl_805E331C[];
 extern const char lbl_805E32DC[];
@@ -106,6 +108,27 @@ void fn_802CC53C(Unk802CBD04* o)
     if (t != 0) {
         t->s11(o);
     }
+}
+
+/* near-miss (2 slots): retail loads o->mD8 (lwz r3,0xd8(r31)) before the cmplwi idx,12 test; ours loads it after (in the taken arm). Local d before/after the
+   branch, ternary and early-return forms tried. */
+int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
+{
+    Unk802CC580_T* t = fn_801A04A8(o->mD8, k);
+    if (t == 0) {
+        t = fn_801A04A8(o->mD8, 1);
+    }
+    int r;
+    if (t->m44 == 0) {
+        if (idx <= 0xC) {
+            r = o->mD8->m65C[idx];
+        } else {
+            r = 0;
+        }
+    } else {
+        r = fn_803272D0(o->mD8->m50, idx);
+    }
+    return r;
 }
 
 void fn_802CC888(Unk802CBD04* o, int idx, int a, int b, Unk802CBD04_Vec3* v)

@@ -5,6 +5,7 @@
 #ifndef GAME_TU_802CBD04_H
 #define GAME_TU_802CBD04_H
 
+struct Unk802CC580_Data;
 struct Unk802CBD04_Vec3 {
     float x;
     float y;
@@ -45,7 +46,7 @@ struct Unk802CBD04 {
     float mAC;
     char padB0[0xD4 - 0xB0];
     int mD4;
-    char* mD8;
+    Unk802CC580_Data* mD8;
     int mDC;
     int mE0;
     char padE4[0x160 - 0xE4];
@@ -108,6 +109,17 @@ public:
     float m10;
     float m14;
     float m18;
+};
+
+/* Data block at Unk802CBD04::mD8 (fn_802CC580): +0x50 the lookup table passed to fn_803272D0, +0x65C 13 word slots. */
+struct Unk802CC580_Data {
+    char pad0[0x50];
+    char m50[0x65C - 0x50];
+    int m65C[13];
+};
+struct Unk802CC580_T {
+    char pad0[0x44];
+    int m44;
 };
 
 #include "game/chooser.h"
