@@ -38,6 +38,12 @@ int fn_80354900(Unk80353E68* s, int v)
     return -1;
 }
 
+void fn_80354940(Unk80354940* s, int v)
+{
+    if (s->m14.Find(v) == -1)
+        s->m14.Add(v);
+}
+
 struct Unk803549B8 {
     char pad0[0x18];
     int m18;
@@ -45,6 +51,28 @@ struct Unk803549B8 {
 int fn_803549B8(Unk803549B8* s)
 {
     return s->m18;
+}
+
+int fn_80354A1C(Unk80354940* s)
+{
+    int n = 0;
+    for (unsigned i = 0; i < s->m4;) {
+        if (s->v19(i++) == 1)
+            n++;
+    }
+    return n;
+}
+
+Unk803541D4_E* fn_80354A94(Unk80354940* s, unsigned n)
+{
+    unsigned cnt = 0;
+    for (unsigned i = 0; i < s->m4; i++) {
+        if (s->v19(i) == 1) {
+            if (cnt++ >= n)
+                return &s->m0[i];
+        }
+    }
+    return s->m0;
 }
 
 int fn_80354CA8(Unk80353E68* s)
@@ -154,11 +182,48 @@ int fn_8035534C(void)
     return 0;
 }
 
+void fn_80355354(Unk80353930* z)
+{
+    z->m8 = 1;
+    z->b0 = 0;
+    z->b1 = 0;
+    z->b3 = 0;
+    z->b2 = 0;
+    z->b4 = 0;
+    z->b5 = 0;
+    Unk8006A138_It<3> it(0);
+    int k = 0;
+    do {
+        fn_80080B98((Unk8007FF8C_Q*)&z->q[k]);
+        k = it.Next();
+    } while (k <= 3);
+}
+
 void fn_803553E0(DtorAt10* self, int chrg)
 {
     self->m = lbl_8064B5D8;
     if (chrg & 1)
         fn_80377408(self);
+}
+
+Unk80355414_E fn_80355414(Unk80355414* s)
+{
+    s->mC = 0;
+    return s->m0[0];
+}
+
+Unk80355414_E fn_80355460(Unk80355414* s)
+{
+    int i = 0;
+    if (s->m4 != 0)
+        i = s->m4 - 1;
+    s->mC = i;
+    return s->m0[i];
+}
+
+Unk80355414_E fn_803554C8(Unk80355414* s)
+{
+    return s->m0[s->mC];
 }
 
 int fn_80355518(Unk80353E68* s)
@@ -210,4 +275,11 @@ void fn_803556A4(Unk80353E68* s, int v)
 void fn_803559C0(Unk803548BC* s)
 {
     s->m14.Clear();
+}
+
+int fn_80354900(Unk80353E68* s, int v);
+void fn_80355A04(Unk80354940* s, int v)
+{
+    if (fn_80354900(&s->m14, v) == -1)
+        s->m14.Add(v);
 }
