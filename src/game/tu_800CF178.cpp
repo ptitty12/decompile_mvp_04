@@ -104,6 +104,44 @@ extern "C" Unk800C7B40_Widget* fn_800CF5AC(Unk800C7B40_Widget* w, const char* a,
     return r ? r : 0;
 }
 
+extern "C" Unk800C7B40_Widget* fn_800CF5F0(Unk800C7B40_Widget* w, const char* name, int deep)
+{
+    for (Unk800C7B40_Widget* c = w->m4; c != 0; c = c->m4) {
+        if ((unsigned)c->m20 <= (unsigned)w->m20)
+            break;
+        if (deep == 0) {
+            for (; c != 0; c = c->m4) {
+                if ((unsigned)c->m20 <= (unsigned)w->m20 + 1)
+                    break;
+            }
+            if (c == 0 || (unsigned)c->m20 <= (unsigned)w->m20)
+                return 0;
+        }
+        if (fn_8040B574(c->mC, name) == 0)
+            return c;
+    }
+    return 0;
+}
+
+extern "C" Unk800C7B40_Widget* fn_800CF6B0(Unk800C7B40_Widget* w, int id, int deep)
+{
+    for (Unk800C7B40_Widget* c = w->m4; c != 0; c = c->m4) {
+        if ((unsigned)c->m20 <= (unsigned)w->m20)
+            break;
+        if (deep == 0) {
+            for (; c != 0; c = c->m4) {
+                if ((unsigned)c->m20 <= (unsigned)w->m20 + 1)
+                    break;
+            }
+            if (c == 0 || (unsigned)c->m20 <= (unsigned)w->m20)
+                break;
+        }
+        if (c->m1C == id)
+            return c;
+    }
+    return 0;
+}
+
 /* near-miss: same null check as fn_800CF5AC (slot 30) */
 extern "C" Unk800C7B40_Widget* fn_800CF738(Unk800C7B40_Widget* w, const char* a, int b)
 {
@@ -162,7 +200,10 @@ extern "C" int fn_800CFAE4(Unk800CFAE4_Range* r, float f)
 }
 
 struct Unk800CFB88_Node {
-    char pad0[0x10];
+    int m0;
+    int m4;
+    int m8;
+    float mC;
     float m10;
     int m14;
     Unk800CFB88_Node* m18;
@@ -177,6 +218,7 @@ struct Unk800CFB38_Timer {
     Unk800CFB88_Node* m20;
     char pad24[4];
     Unk800CFB88_Node* m28;
+    inline float Clamp(float* p);
 };
 
 extern int lbl_8061A328;
@@ -232,6 +274,44 @@ extern "C" int fn_800CFC28(Unk800CFB38_Timer* o, float t)
         o->m0 = 0;
     return 0;
 }
+
+extern "C" float fn_8033D14C(float a, float b, float c, float d, float e);
+
+/* near-miss: CFG and registers match retail except the tail: retail keeps *p in f0 and shares 'fmr f0,f13; stfs' for the 1.0/0.0 arms,
+ * here the inline result gets its own copy (fmr f13,f0) and 'bge' instead of 'cror/bso'. By-value inline params get float-store stack slots, so not used. */
+inline float Unk800CFB38_Timer::Clamp(float* p)
+{
+    if (!(*p < 1.0f)) {
+        m28->m14 = 1;
+        if (*p > 1.0f)
+            return 1.0f;
+    }
+    if (*p < 0.0f)
+        return 0.0f;
+    return *p;
+}
+
+extern "C" void fn_800CFD1C(Unk800CFB38_Timer* o, float t, int* a, int* b, float* out)
+{
+    t = t - o->m18;
+    if (o->m14 != 0)
+        t = t - (float)fn_80410634(t / o->m1C) * o->m1C;
+    *a = o->m28->m4;
+    *b = o->m28->m8;
+    if (t == 0.0f) {
+        *out = 0.0f;
+    } else {
+        float d = o->m28->m10 - o->m28->mC;
+        if (d != 0.0f)
+            *out = (t - o->m28->mC) / d;
+        else
+            *out = 1.0f;
+    }
+    *out = o->Clamp(out);
+    if (o->m28->m0 != 0)
+        *out = fn_8033D14C(0.0f, 1.0f, 0.0f, 0.0f, *out);
+}
+
 
 extern "C" void fn_800CFE84(Unk800CFB88_List* l)
 {
