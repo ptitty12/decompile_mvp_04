@@ -111,9 +111,9 @@ extern "C" Unk800C7B40_Widget* fn_800CF738(Unk800C7B40_Widget* w, const char* a,
     return r ? r : 0;
 }
 
-extern "C" Unk800C7B40_Widget* fn_800CF77C(Unk800C7B40_Widget* w, int a, int b)
+extern "C" Unk800C7B40_Widget* fn_800CF77C(Unk800C7B40_Widget* w, const char* a, int b, int c)
 {
-    return w->fn_vslot31(a, b);
+    return w->fn_vslot31(a, b, c);
 }
 
 extern "C" void fn_800CF7B0(Unk800C7B40_Widget* w)

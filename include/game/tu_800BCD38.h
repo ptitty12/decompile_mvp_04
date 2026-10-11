@@ -254,16 +254,16 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual Unk800C7B40_Widget* fn_vslot28(const char* name);
     virtual void fn_vslot29();
     virtual Unk800C7B40_Widget* fn_vslot30(const char* name);
-    virtual Unk800C7B40_Widget* fn_vslot31(int type, int a);
-    virtual void fn_vslot32();
-    virtual void fn_vslot33();
+    virtual Unk800C7B40_Widget* fn_vslot31(const char* name, int a, int b);
+    virtual Unk800C7B40_Widget* fn_vslot32(const char* name, int a);
+    virtual char* fn_vslot33(int a);
     virtual void fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
     virtual void fn_vslot37();
-    virtual void fn_vslot38();
+    virtual void fn_vslot38(int a);
     virtual void fn_vslot39();
-    virtual void fn_vslot40();
+    virtual void fn_vslot40(int a);
     virtual void fn_vslot41();
     virtual void fn_vslot42();
     virtual void fn_vslot43();
@@ -509,20 +509,25 @@ struct Unk800CFEEC_Raw : Unk800CFEEC_Data {
     const void* m24;
 };
 struct Unk800CFEEC_Sel : Unk800CFEEC_Data {
-    virtual void fn_vslot1();
-    virtual void fn_vslot2();
-    virtual void fn_vslot3();
+    virtual int fn_vslot1();
+    virtual int fn_vslot2();
+    virtual void fn_vslot3(int i);
     virtual void fn_vslot4();
-    virtual void fn_vslot5();
-    virtual void fn_vslot6();
-    virtual void fn_vslot7();
+    virtual int fn_vslot5();
+    virtual void fn_vslot6(int i);
+    virtual int fn_vslot7();
     virtual void fn_vslot8(Unk800C7B40_Widget* p);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual int fn_vslot13();
 };
 
 extern "C" {
 int fn_800B5520(void* p);
 void fn_800D0074(Unk800CFEEC_Sel* s, int id, int q);
-void* fn_802B0850(void* obj, const char* name, int zero);
+void* fn_802B0850(void* obj, const char* name, void* out);
 Unk800D244C_Vec4 fn_802B0ACC(void* obj, const char* name);
 Unk800D244C_Vec4 fn_8014DBA0(int r, int g, int b, int a);
 }
@@ -577,6 +582,12 @@ struct Unk800D0D3C_Obj {
     Unk800D0D3C_Obj();
 };
 
+extern "C" {
+void fn_800CFF48(Unk800CFEEC_Data* c, int i);
+int fn_800CFF7C(Unk800CFEEC_Data* c);
+int fn_800CFFB4(Unk800CFEEC_Data* c);
+}
+
 /* Raw view of Unk800D1614_Obj for constructors/destructors that store the vptr by hand. */
 struct Unk800D1614_Raw : Unk800C7B40_Data {
     const void* m3C;
@@ -596,6 +607,60 @@ Unk800D1614_Raw* fn_800D0D9C(Unk800D1614_Raw* self, int a, int b, int c, int d, 
                              int k, int l);
 void fn_800C7B40(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l, float x);
 void fn_800C7EE8(Unk800C7B40_Widget* w);
+}
+
+/* Selector-list widget: name buffer at +0x4A, flag word at +0x68, a Sel sub-object at +0x98 (its
+ * vptr at +0xBC), five-byte names from +0xC0, id table at +0x17C, current value at +0x210. */
+struct Unk800D2338_Obj : Unk800C7B40_Widget {
+    char* m40;
+    int m44;
+    char pad48[2];
+    char m4A[5];
+    char pad4F[0x15];
+    int m64;
+    int b68_0 : 1;
+    int b68_1 : 1;
+    int b68_2 : 1;
+    int rest68 : 29;
+    char pad6C[0x10];
+    int m7C;
+    Unk800D244C_Vec4 m80;
+    char pad90[0x8];
+    char pad98[0x28];
+    char mC0[0xBC];
+    int m17C[0x20];
+    char pad1FC[0x14];
+    int m210;
+};
+extern "C" {
+void fn_800D24A4(Unk800D2338_Obj* o);
+void fn_800D1D5C(Unk800D2338_Obj* o);
+void fn_800D2338(Unk800D2338_Obj* o, const char* name, int flag);
+int fn_800C8070(Unk800C7B40_Data* w);
+void fn_802D7EE4(int v);
+int fn_800B548C(int id);
+void fn_804031BC(char* dst);
+int fn_804089B4(char* dst, const char* fmt, ...);
+}
+int fn_800E1AC8(int id);
+struct Unk80090880;
+char* fn_80090880(Unk80090880* p);
+extern Unk80090880* lbl_8061977C;
+extern char lbl_8061AC58;
+extern const char lbl_8065BC68[];
+struct Unk800D3A38_Raw : Unk800C7B40_Data {
+    const void* m3C;
+    int* m40;
+};
+
+class Unk8001BC8C {
+public:
+    void fn_8001BDAC(int cmd);
+};
+Unk8001BC8C* fn_8001BC4C();
+extern "C" {
+void* fn_800C8054(void* p);
+void* fn_800C8058(void* p);
 }
 
 #endif
