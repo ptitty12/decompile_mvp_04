@@ -519,6 +519,55 @@ struct Unk80535650_Tmp {
     void D() { vp = lbl_8064A550; }
 };
 
+/* 0x54-byte element of the record table built by fn_8052E654 (fn_8052E9C4 reads, fn_8052EE14
+ * writes): fourteen ints, a halfword-pair word (seven bit fields then eleven halfwords), and a last
+ * word of 15+15+2 bit fields. */
+struct Unk8052E9C4_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    unsigned f14 : 1;
+    unsigned f15 : 5;
+    unsigned f16 : 3;
+    unsigned f17 : 1;
+    unsigned f18 : 2;
+    unsigned f19 : 3;
+    unsigned f20 : 1;
+    unsigned short s21;
+    unsigned short s22;
+    unsigned short s23;
+    unsigned short s24;
+    unsigned short s25;
+    unsigned short s26;
+    unsigned short s27;
+    unsigned short s28;
+    unsigned short s29;
+    unsigned short s30;
+    unsigned short s31;
+    unsigned f32 : 15;
+    unsigned f33 : 15;
+    unsigned f34 : 2;
+};
+
+/* Compact result of fn_8052DC94 / fn_805311D8: a byte, a 6-bit and a 3-bit field. */
+struct Unk8052DC94_Out {
+    unsigned b0 : 8;
+    unsigned fa : 6;
+    unsigned fb : 3;
+    unsigned rest : 15;
+};
+
 /* Receiver of the member-pointer table calls in fn_8052CF34 / fn_80530418. */
 struct Unk8052CF34_Obj {
     virtual float M(int a);

@@ -15,6 +15,7 @@ extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
 extern "C" void fn_8052DD58(Unk8052DD58_Ent* e);
 extern "C" void fn_8052DFDC(Unk8052DD58_Set* self, unsigned i);
+extern "C" void fn_8052E158(Unk8052DD58_Ent* self, char a, int b, int c, int d, unsigned e, unsigned f, unsigned g, int h);
 extern "C" void fn_8052E10C(Unk8052DD58_Ent* self, char a, int b, int c, int d, int e, int f, int g, char h, int i);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern "C" int fn_8040B6A0(const char* s);
@@ -23,6 +24,7 @@ extern int lbl_8060133C[];
 extern Unk8007B2B0_Screen* lbl_8061930C;
 extern Unk8052CF34_Pmf lbl_8060130C[];
 extern char lbl_80682810[];
+extern char lbl_806841F8[];
 struct Unk8052E408_Obj;
 extern "C" void fn_80360AB4(Unk8052E408_Obj* self);
 
@@ -394,6 +396,16 @@ extern "C" DB_OVERLAY void* fn_8052DC60(void* self, const void* src)
     return self;
 }
 
+extern "C" DB_OVERLAY Unk8052DC94_Out* fn_8052DC94(Unk8052DC94_Out* self, Unk8052CA60_Rec* src)
+{
+    unsigned short ha = fn_80329FA0(1).m2;
+    unsigned short hb = fn_80329FA0(src->f0).m2;
+    self->b0 = hb - ha;
+    self->fa = src->f11;
+    self->fb = src->f12;
+    return self;
+}
+
 extern "C" DB_OVERLAY int fn_8052DD18()
 {
     return 3;
@@ -510,9 +522,59 @@ extern "C" DB_OVERLAY void fn_8052E10C(Unk8052DD58_Ent* self, char a, int b, int
     self->m12 = 0;
 }
 
+extern "C" DB_OVERLAY void fn_8052E158(Unk8052DD58_Ent* self, char a, int b, int c, int d, unsigned e, unsigned f, unsigned g, int h)
+{
+    fn_8052E10C(self, a, b, c, d, e & 0x3F, (e >> 6) & 0x3F, f & 0x3F, g & 0x3F, h);
+}
+
+extern "C" DB_OVERLAY Unk8052DD58_Ent* fn_8052E198(Unk8052DD58_Ent* self, char a, int b, int c, int d, int e, int f, int g, char h, int i)
+{
+    *(const void**)((char*)self + 0x14) = lbl_806841F8;
+    fn_8052DD58(self);
+    *(const void**)((char*)self + 0x14) = lbl_80682810;
+    fn_8052E10C(self, a, b, c, d, e, f, g, h, i);
+    return self;
+}
+
+extern "C" DB_OVERLAY Unk8052DD58_Ent* fn_8052E234(Unk8052DD58_Ent* self, char a, int b, int c, int d, unsigned e, unsigned f, unsigned g, int h)
+{
+    *(const void**)((char*)self + 0x14) = lbl_806841F8;
+    fn_8052DD58(self);
+    *(const void**)((char*)self + 0x14) = lbl_80682810;
+    fn_8052E158(self, a, b, c, d, e, f, g, h);
+    return self;
+}
+
+extern "C" DB_OVERLAY Unk8052DD58_Ent* fn_8052E2C4(Unk8052DD58_Ent* self, char a, int b, int c, int d, unsigned e, unsigned f, unsigned g, char h, int i)
+{
+    *(const void**)((char*)self + 0x14) = lbl_806841F8;
+    fn_8052DD58(self);
+    *(const void**)((char*)self + 0x14) = lbl_80682810;
+    fn_8052E158(self, a, b, (d << 16) | c, e, f, g, h, i);
+    return self;
+}
+
+extern "C" DB_OVERLAY Unk8052DD58_Ent* fn_8052E360(Unk8052DD58_Ent* self, char a, int b, int c, int d, int e, int f, int g, char h, char h2, int i)
+{
+    *(const void**)((char*)self + 0x14) = lbl_806841F8;
+    fn_8052DD58(self);
+    *(const void**)((char*)self + 0x14) = lbl_80682810;
+    fn_8052E10C(self, a, b, (d << 16) | c, e, f, g, h, h2, i);
+    return self;
+}
+
 extern "C" DB_OVERLAY Unk8052E408_Obj* fn_8052E408(Unk8052E408_Obj* self)
 {
     fn_80360AB4(self);
     self->m14 = lbl_80682810;
+    return self;
+}
+
+extern "C" DB_OVERLAY Unk8052DD58_Ent* fn_8052E444(Unk8052DD58_Ent* self, char a)
+{
+    *(const void**)((char*)self + 0x14) = lbl_806841F8;
+    fn_8052DD58(self);
+    *(const void**)((char*)self + 0x14) = lbl_80682810;
+    fn_8052E10C(self, a, 0, 0, 0, 0, 0, 0, 0, 0);
     return self;
 }
