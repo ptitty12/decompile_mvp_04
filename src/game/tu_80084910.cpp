@@ -306,6 +306,19 @@ const short* fn_80090880(void* names, int id);
 
 
 
+struct Unk80084910_S4 {
+    unsigned short a;
+    unsigned short b;
+};
+struct Unk80084910_Rec {
+    unsigned c0 : 8;
+    unsigned f1 : 6;
+    unsigned f2 : 3;
+    unsigned rest : 15;
+};
+int fn_80329FA0(int* out, int c, ...);
+
+
 int fn_80084910(void* self, int a, int b, int c)
 {
     return fn_8008453C(fn_80084660(self), a, b, c);
@@ -810,6 +823,26 @@ void* fn_80085EF8(void* self, int a)
 {
     fn_803FFA60(self, a, 8);
     return self;
+}
+
+/* near-miss (2 slots): retail emits addi r3,r1,8 before li r4,1 for the first fn_80329FA0 call. */
+struct S4D {
+    unsigned short a;
+    unsigned short b;
+    ~S4D() {}
+};
+extern "C" Unk80084910_Rec* fn_80085F2C(Unk80084910_Rec* out, char* in)
+{
+    S4D s1;
+    S4D s2;
+    fn_80329FA0((int*)&s1, 1);
+    int base = s1.b;
+    fn_80329FA0((int*)&s2, *(unsigned short*)(in + 1));
+    int d = s2.b - base;
+    out->c0 = d;
+    out->f1 = (*(unsigned*)(in + 0xC) >> 13) & 0x7F;
+    out->f2 = (*(unsigned*)(in + 0xC) >> 10) & 7;
+    return out;
 }
 
 int fn_80085FB0()
