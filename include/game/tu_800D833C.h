@@ -1,6 +1,9 @@
 #ifndef GAME_TU_800D833C_H
 #define GAME_TU_800D833C_H
 
+#include "game/tu_8007A4DC.h"
+#include "game/tu_8023A6C8.h"
+
 /*
  * Types and declarations for game/tu_800D833C.cpp (reconstructed; placeholders:
  * Unk<addr>, m<offset>).
@@ -124,4 +127,11 @@ int fn_800DA1AC(int a);
 int fn_80075D80(int a);
 int fn_80076058(int a, int b);
 
+extern Unk8023BE30 lbl_8068CC18;
+extern Unk8023BE30 lbl_8068CCA8;
+int fn_80089AA0(char* p, int a, int b);
+int fn_8008CFD8(char* p, int a, int b);
+int fn_80099570(void* p, int a, int b, int c);
+void fn_800D8EE0(void* t, int a);
+void fn_800D9360(void* t, int a);
 #endif

@@ -83,6 +83,33 @@ int fn_800D87C4(Unk800D876C_A* t)
     return 0;
 }
 
+void fn_800D92D8(void* t)
+{
+    int r = fn_8040ABA0() % 3;
+    switch (r) {
+    case 0:
+        fn_800D8EE0(t, 4);
+        break;
+    case 1:
+        fn_800D8EE0(t, 5);
+        break;
+    default:
+        fn_800D9360(t, 7);
+        break;
+    }
+}
+
+static inline int Adv9C18()
+{
+    int v = lbl_8061ADFC + 1;
+    lbl_8061ADFC = v;
+    int t = 0;
+    if (v <= 0x56)
+        t = v;
+    lbl_8061ADFC = t;
+    return t;
+}
+
 /* near-miss: 48/48 insns, switch tree differs only in the order of the cmpwi 10/34 pair
  * (adding dummy cases 0..9 gets within 3 slots; the real case set is unknown) */
 int fn_800D9A64(int unused)
@@ -146,6 +173,17 @@ int fn_800D9B9C(int unused)
         }
     } while (!ok);
     return r;
+}
+
+int fn_800D9C18(int unused)
+{
+    int r = Adv9C18();
+    if (r == 0x22 || r == 0x55) {
+        r = Adv9C18();
+        if (r == 0x22 || r == 0x55)
+            Adv9C18();
+    }
+    return lbl_8061ADFC;
 }
 
 int fn_800D9CA8(Unk800D876C_A* t)
@@ -300,6 +338,23 @@ void fn_800DB930(Unk800DB840_Slot* o, int a, int idx, int b, int c, int d)
     }
 }
 
+int fn_800DB9A8(Unk800DB840_Slot* o, int a, int idx, int b)
+{
+    int r;
+    if (o == 0) {
+        r = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007AB9C(a, b);
+    } else {
+        Unk800DB840_Slot* p = o + idx;
+        int t = fn_800968C0(p, b, 1);
+        int v = fn_80089AA0((char*)p + 0xC74, a, t);
+        lbl_8068CC18.fn_8023C1E8(a, &v, idx, 1);
+        lbl_8068CCA8.fn_8023C1E8(a, &v, idx, 1);
+        ((Unk8023BE30*)((char*)p + 0x118))->fn_8023C1E8(a, &v, idx, 1);
+        r = v;
+    }
+    return r;
+}
+
 void fn_800DBA74(Unk800DB840_Slot* o, int a, int idx, int b)
 {
     if (o == 0) {
@@ -309,6 +364,23 @@ void fn_800DBA74(Unk800DB840_Slot* o, int a, int idx, int b)
         int r = fn_800968C0(p, b, 1);
         fn_80089E48((char*)p + 0xC74, a, r);
     }
+}
+
+extern "C" int fn_800DBAE0(Unk800DB840_Slot* o, int a, int idx, int b)
+{
+    int* g = &lbl_8061930C;
+    if (o != 0) {
+        Unk800DB840_Slot* p = o + idx;
+        int t = fn_800968C0(p, b, 1);
+        int v = fn_8008CFD8((char*)p + 0xC9C, a, t);
+        lbl_8068CC18.fn_8023C254(a, &v, idx, 1);
+        lbl_8068CCA8.fn_8023C254(a, &v, idx, 1);
+        ((Unk8023BE30*)((char*)p + 0x118))->fn_8023C254(a, &v, idx, 1);
+        return v;
+    }
+    if (a == 0x1D)
+        return ((Unk8007A4DC_Screen*)*g)->fn_8007A984(b);
+    return ((Unk8007A4DC_Screen*)*g)->fn_8007AD34(a, b, ((Unk8007A4DC_Screen*)*g)->fn_8007A6A0(a, b));
 }
 
 void fn_800DBBE4(Unk800DB840_Slot* o, int a, int idx, int b)
@@ -361,6 +433,24 @@ void fn_800DBDD0(Unk800DB840_Slot* o, int a, int idx, int b, int c, int d, int e
         Unk800DB840_Slot* p = o + idx;
         fn_80097F68(p, a, fn_800968C0(p, b, 1), c, d);
     }
+}
+
+int fn_800DBE54(Unk800DB840_Slot* o, int a, int idx, int b, int c)
+{
+    int* g = &lbl_8061930C;
+    int r;
+    if (o == 0) {
+        r = ((Unk8007A4DC_Screen*)*g)->fn_8007ADD0(a, b, ((Unk8007A4DC_Screen*)*g)->fn_8007AA84(a, b, c));
+    } else {
+        Unk800DB840_Slot* p = o + idx;
+        int t = fn_800968C0(p, b, 1);
+        int v = fn_80099570(p, a, t, c);
+        lbl_8068CC18.fn_8023C2C0(a, &v, idx, 1);
+        lbl_8068CCA8.fn_8023C2C0(a, &v, idx, 1);
+        ((Unk8023BE30*)((char*)p + 0x118))->fn_8023C2C0(a, &v, idx, 1);
+        r = v;
+    }
+    return r;
 }
 
 void fn_800DBF44(Unk800DB840_Slot* o, int a, int idx, int b)
