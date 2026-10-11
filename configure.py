@@ -425,6 +425,7 @@ config.libs = [
             Object(NonMatching, "animation/goals/tu_8028F178.cpp"),
             Object(NonMatching, "animation/goals/tu_802914C8.cpp"),
             Object(NonMatching, "animation/goals/tu_80296C78.cpp"),
+            Object(NonMatching, "animation/goals/tu_80299920.cpp"),
             Object(NonMatching, "animation/warps/tu_802A3704.cpp"),
             Object(NonMatching, "animation/warps/tu_802A4584.cpp"),
         ],
