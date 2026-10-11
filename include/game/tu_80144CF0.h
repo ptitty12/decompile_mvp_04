@@ -76,7 +76,7 @@ public:
     virtual int s17();
     virtual int s18();
     virtual int s19();
-    virtual int s20();
+    virtual int s20(float a);
     virtual int s21();
     virtual int s22();
     virtual int s23();
@@ -123,7 +123,7 @@ public:
     virtual int s64();
     virtual int s65();
     virtual int s66(int a);
-    virtual int s67();
+    virtual int s67(int a, int b);
     virtual int s68();
     virtual int s69();
     virtual int s70();
@@ -167,7 +167,25 @@ public:
     virtual int s108();
     virtual int s109();
     virtual int s110();
-    virtual int s111();
+    virtual int s111(int a, int b);
+};
+/* data of the derived screen classes after the vptr */
+class VT3CD : public VT3C {
+public:
+    char pad40[0x28];
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    VT3C* m78;
+    VT3C* m7C;
+    int m80;
+    char pad84[0x4];
+    void* m88;
+    void* m8C;
+    void* m90;
+    void* m94;
+    void* m98;
 };
 /* vptr at +0x1C8 */
 class VT1C8 {
