@@ -709,7 +709,7 @@ void fn_800C5AA4(Unk800C341C_Mgr* m);
 void fn_800C5A50(Unk800C341C_Mgr* m);
 int fn_800C5980(Unk800C341C_Mgr* m);
 void fn_800C2580(Unk800C2250_File* f, const char* name, Unk800C1BE4_Widget* w, int c, float t);
-void fn_800C5574(Unk800C341C_Mgr* m, int kind, const char* name, Unk800C1BE4_Widget* w, int flag, float t);
+void fn_800C5574(Unk800C341C_Mgr* m, int kind, const char* name, Unk800C1BE4_Widget* w, float t, int flag);
 void fn_800C5798(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w);
 int fn_800C59E8(Unk800C341C_Mgr* m);
 void fn_800C26D0(Unk800C2250_File* f, const char* name, Unk800C1BE4_Widget* w, float t, int c);
@@ -741,7 +741,7 @@ extern "C" void fn_800C435C(Unk800C341C_Mgr* m, int wi, float t, const char* nam
             fn_800C5798(m, w);
         idx = fn_800C59E8(m);
         if (idx == -1)
-            fn_800C5574(m, 2, name, w, flag, t);
+            fn_800C5574(m, 2, name, w, t, flag);
         else
             fn_800C26D0(&m->files[idx], name, w, t, flag);
     }
