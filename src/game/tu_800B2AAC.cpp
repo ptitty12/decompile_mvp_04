@@ -236,6 +236,8 @@ void fn_800B302C(GObj* self);
 void fn_800B33D4(GObj6* self);
 void fn_800B5170(GObj5* self);
 FEMgrB8* fn_800B64BC(FEMgrB8* p);
+void fn_800B7FC4(FEMgrB8* mgr);
+void fn_8011C4A8(void* o, int a, int b);
 void* fn_800B7AB8(FEMgrB8* mgr, const char* name);
 void fn_8011D850(void* w, int a, int b);
 void fn_8004181C(Unk8004072C* o, int a, int b, int c, int d, int e, int f);
@@ -272,8 +274,10 @@ inline int FEIsBC(int v)
 }
 
 
+
 /* ---- unit prototypes ---- */
 extern "C" {
+int fn_800B2AAC(GObj* self, int k);
 int fn_800B2B78();
 void* fn_800B2B80(void* self, int k);
 void fn_800B2BB0(GObj* self);
@@ -328,6 +332,30 @@ int fn_800B5BD4();
 /* ---- end prototypes ---- */
 
 /* ---- functions ---- */
+
+extern "C" int fn_800B2AAC(GObj* self, int k)
+{
+    int r = 0;
+    switch (k) {
+    case 1:
+        if (GetMgr()->mBC != 0) {
+            fn_800B7FC4(GetMgr());
+        } else if (self->mDC) {
+            fn_8011C4A8(self->mDC, 0x36, 0);
+        } else {
+            return 2;
+        }
+        break;
+    case 2:
+    case 3:
+    case 4:
+        break;
+    default:
+        r = 1;
+        break;
+    }
+    return r;
+}
 
 extern "C" int fn_800B2B78()
 {
