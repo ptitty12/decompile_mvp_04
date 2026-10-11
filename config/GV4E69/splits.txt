@@ -234,6 +234,9 @@ game/tu_80058060.cpp:
 game/tu_8005ADD0.cpp:
 	.text       start:0x8005ADD0 end:0x8005C514
 
+game/tu_8005C514.cpp:
+	.text       start:0x8005C514 end:0x8005D268
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
