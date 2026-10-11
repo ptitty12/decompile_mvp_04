@@ -317,12 +317,11 @@ int fn_801B17F0(Unk801AB63C_P* p, Unk801AB63C_Q* q)
     return 0;
 }
 
-/* near-miss: retail passes `v == 3` via cmpwi cr7 / mfcr / rlwinm; mine uses xori/subfic/adde (same as fn_801ADC34). */
 void fn_801B1B88(Unk801AB63C_P* p, Unk801AB63C_Q* q)
 {
     if (fn_801B19E8(p, q) != 0) {
         int v = fn_801B5EDC(p, q->m708, 0);
-        fn_801B1D60(p, q, 2, v == 3);
+        fn_801B1D60(p, q, 2, v > 3);
     }
 }
 
