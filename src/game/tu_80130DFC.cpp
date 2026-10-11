@@ -112,7 +112,7 @@ extern const float lbl_805C0B78;
 extern const float lbl_805C0C84;
 extern const char lbl_805C0B7C[];
 extern const char lbl_805C0B80[];
-extern "C" void fn_801321D4(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l, int m);
+extern "C" void fn_801321D4(Scr* x, int a1, int (*a2)(int, int), int (*a3)(), int a4, int a5, int a6, int a7, char* s8, char* sC, char* s10, char* s14, int s18, int s1C);
 extern const float lbl_805C0BC4;
 extern const char lbl_805C0B7C[];
 extern const char lbl_805C0C1C[];
@@ -120,6 +120,91 @@ extern "C" {
 void fn_802DC9C0();
 Unk800C7B40_Widget* fn_800C8068(Unk800C7B40_Widget* p);
 }
+extern "C" {
+void fn_80134680(Scr* x);
+void fn_801345F8(Scr* x, int (*f)());
+void fn_80134D74(Scr* x);
+void fn_80132830(Scr* x, int a, int b, char* c, char* d, char* e, char* f, int g);
+void fn_80132A38(Scr* x);
+void fn_80132C00(Scr* x, int a, int b, int c, int d, int e, int f, int g);
+}
+extern const float lbl_805C0BBC;
+/* Widget-like object with its vptr at +0x3C whose slots 28 and 30 take just a name, 40 an int. */
+struct Unk80132A38_Data {
+    char pad0[0x3C];
+};
+struct Unk80132A38_W : Unk80132A38_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28(const char* name);
+    virtual void fn_vslot29();
+    virtual void fn_vslot30(const char* name);
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40(int a);
+};
+extern const char lbl_805C0BC8[];
+extern const char lbl_805C0BD4[];
+extern const char lbl_805C0BDC[];
+extern const char lbl_805C0BE4[];
+extern const char lbl_805C0BEC[];
+extern const char lbl_805BC9DC[];
+extern "C" {
+Unk80132A38_W* fn_800C8040(Unk800C7B40_Widget* p);
+Unk80132A38_W* fn_800C8048(Unk800C7B40_Widget* p);
+}
+extern int lbl_8061977C;
+extern "C" int fn_80090880(int a, int b);
+struct Unk80132630_Cfg {
+    int m0;
+    int m4;
+    int m8;
+    char mC[0x82];
+    char m8E[0x82];
+    char m110[0x82];
+    char m192[0x82];
+    int m214;
+    int (*m218)();
+    int m21C;
+    int m220;
+    int m224;
+    int m228;
+    int m22C;
+    float m230;
+};
+extern "C" void fn_80134A60(Scr* x, Unk80132630_Cfg* c, int a);
 
 struct UnkI188 {
     char pad0[0x188];
@@ -453,10 +538,112 @@ extern "C" int fn_80131BD0(Scr* x, Unk800C7B40_Widget* a, int b, int c)
     return 0;
 }
 
-extern "C" void fn_801323C8(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l)
+extern "C" void fn_801321D4(Scr* x, int a1, int (*a2)(int, int), int (*a3)(), int a4, int a5, int a6, int a7, char* s8, char* sC, char* s10, char* s14, int s18, int s1C)
+{
+    fn_80134680(x);
+    x->m30C = s1C;
+    fn_80131C48(x, 0, lbl_805C0BBC);
+    x->fn_vslot16(0);
+    x->fn_vslot8(0);
+    x->m2DC = a2;
+    fn_801345F8(x, a3);
+    x->fn_vslot88(a1);
+    Unk800C7B40_Widget* w = fn_800C8060(x->fn_vslot32(lbl_805C0B8C, 1));
+    w->fn_vslot79(a5, 0);
+    w->fn_vslot3();
+    x->m324 = a7;
+    x->m2FC = a5;
+    fn_80132830(x, a4, a5, s8, sC, s10, s14, s18);
+    fn_80132A38(x);
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        fn_80132C00(x, 1, 0x19, 4, 0xC, 0xC, 0xC, a6);
+    } else {
+        fn_80132C00(x, 0, 0x19, 0xC, 0xC, 0xC, 0, a6);
+    }
+    fn_80134D74(x);
+}
+
+extern "C" void fn_801323C8(Scr* self, int a, int (*b)(int, int), int (*c)(), int d, int e, int f, int g, char* h, char* i, char* j, char* k, int l)
 {
     fn_801321D4(self, a, b, c, d, e, f, g, h, i, j, k, l, 0);
     fn_80131C48(self, 1, lbl_805C0BC4);
+}
+
+extern "C" void fn_80132438(Scr* x, int a1, int a2, int a3, int a4, int a5, int a6, int a7, float f)
+{
+    fn_80134680(x);
+    x->fn_vslot16(0);
+    x->fn_vslot8(0);
+    fn_80131C48(x, 2, f);
+    x->m2E4 = a3;
+    x->m2E8 = a2;
+    x->m2EC = a4;
+    x->fn_vslot88(a1);
+    Unk800C7B40_Widget* w = fn_800C8060(x->fn_vslot32(lbl_805C0B8C, 1));
+    w->fn_vslot79(0, 0);
+    w->fn_vslot3();
+    x->m324 = a7;
+    x->m2FC = 0;
+    int v;
+    if (a5 != 0) {
+        v = fn_80090880(lbl_8061977C, a5);
+    } else {
+        v = 0;
+    }
+    fn_80132830(x, v, 0, 0, 0, 0, 0, 0);
+    fn_80132A38(x);
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        fn_80132C00(x, 1, 0x19, 4, 0xC, 0xC, 0xC, a6);
+    } else {
+        fn_80132C00(x, 0, 0x19, 0xC, 0xC, 0xC, 0, a6);
+    }
+    fn_80134D74(x);
+}
+
+/* near-miss: 128/128 insns, one swap: retail moves r4 (the config object) before r3 (this) for the call to fn_80134A60, i.e. it is a method call (the callee is the unit-3 screen class method at 0x80134A60); as a free function the order is r3, r4 */
+extern "C" void fn_80132630(Scr* x, int a)
+{
+    fn_80134680(x);
+    x->fn_vslot16(0);
+    x->fn_vslot8(0);
+    Unk80132630_Cfg* c = (Unk80132630_Cfg*)operator new(0x234, 0x100);
+    fn_80134A60(x, c, a);
+    x->m2DC = (int (*)(int, int))c->m214;
+    fn_801345F8(x, c->m218);
+    x->m2E4 = c->m220;
+    x->m2E8 = c->m21C;
+    x->fn_vslot88(c->m0);
+    fn_80131C48(x, c->m22C, c->m230);
+    Unk800C7B40_Widget* w = fn_800C8060(x->fn_vslot32(lbl_805C0B8C, 1));
+    w->fn_vslot79(c->m8, 0);
+    w->fn_vslot3();
+    int t = c->m8;
+    x->m324 = c->m228;
+    x->m2FC = t;
+    fn_80132830(x, c->m4, t, c->mC, c->m8E, c->m110, c->m192, 0);
+    fn_80132A38(x);
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        fn_80132C00(x, 1, 0x19, 4, 0xC, 0xC, 0xC, c->m224);
+    } else {
+        fn_80132C00(x, 0, 0x19, 0xC, 0xC, 0xC, 0, c->m224);
+    }
+    fn_80134D74(x);
+    delete c;
+}
+
+extern "C" void fn_80132A38(Scr* x)
+{
+    Unk80132A38_W* w = fn_800C8040(x->fn_vslot32(lbl_805C0BC8, 1));
+    w->fn_vslot40(x->m324);
+    if (x->m328 != 0) {
+        w->fn_vslot28(x->m328);
+    } else {
+        w->fn_vslot30(lbl_805BC9DC);
+    }
+    fn_800C8048(x->fn_vslot32(lbl_805C0BD4, 1))->fn_vslot28((char*)x + 0x32C);
+    fn_800C8048(x->fn_vslot32(lbl_805C0BDC, 1))->fn_vslot28((char*)x + 0x3AE);
+    fn_800C8048(x->fn_vslot32(lbl_805C0BE4, 1))->fn_vslot28((char*)x + 0x430);
+    fn_800C8048(x->fn_vslot32(lbl_805C0BEC, 1))->fn_vslot28((char*)x + 0x4B2);
 }
 
 extern "C" void fn_8013440C(Scr* x)
