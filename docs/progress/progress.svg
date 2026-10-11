@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">0.45% of code matched as of 2026-10-11: 169 of 24,158 functions, 26,316 of 5,896,176 code bytes, 199 units with code.</desc>
+<desc id="desc">1.28% of code matched as of 2026-10-11: 341 of 24,158 functions, 75,328 of 5,896,176 code bytes, 194 units with code.</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -26,17 +26,17 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="0.5" y="0.5" width="959" height="781" rx="8" class="border"/>
 <text x="24.0" y="40.0" class="t2" font-size="14" font-weight="600" text-anchor="start">MVP Baseball 2005 (GV4E69) decompilation</text>
 <text x="936.0" y="40.0" class="t3" font-size="12" font-weight="400" text-anchor="end">as of 2026-10-11</text>
-<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">0.45%</text>
+<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">1.28%</text>
 <text x="26.0" y="118.0" class="t2" font-size="13" font-weight="400" text-anchor="start">of code matched</text>
 <text x="300.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Functions matched</text>
-<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">169 / 24,158</text>
+<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">341 / 24,158</text>
 <text x="512.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
-<text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">26.3 KB / 5.90 MB</text>
+<text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">75.3 KB / 5.90 MB</text>
 <text x="724.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Data matched</text>
-<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">620 B / 1.37 MB</text>
+<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">628 B / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
-<rect x="24" y="140" width="4.1" height="12" class="b5" clip-path="url(#bar)"/>
+<rect x="24" y="140" width="11.7" height="12" class="b5" clip-path="url(#bar)"/>
 <text x="24.0" y="184.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code by unit</text>
 <text x="122.0" y="184.0" class="t3" font-size="12" font-weight="400" text-anchor="start">area = code size, shade = fuzzy match</text>
 <rect x="487.4" y="174" width="12" height="12" rx="2" class="b0"/>
@@ -106,119 +106,118 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="709.7" y="462.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
 <rect x="704.7" y="496.8" width="50.8" height="42.2" rx="2" class="b0"><title>auto_01_803F00FC_text: 44,396 bytes of code, 0.0% fuzzy match</title></rect>
 <text x="709.7" y="510.8" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="757.5" y="337.9" width="49.0" height="35.8" rx="2" class="b0"><title>auto_01_80147EBC_text: 36,616 bytes of code, 0.0% fuzzy match</title></rect>
-<text x="762.5" y="351.9" class="l0" font-size="11" font-weight="400" text-anchor="start">auto_…</text>
-<rect x="808.5" y="337.9" width="43.7" height="35.8" rx="2" class="b0"><title>auto_01_8029B6C8_text: 32,828 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="854.2" y="337.9" width="41.2" height="35.8" rx="2" class="b0"><title>auto_01_803FAE94_text: 31,004 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="897.3" y="337.9" width="37.7" height="35.8" rx="2" class="b0"><title>auto_01_802D73E8_text: 28,508 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="757.5" y="375.7" width="34.3" height="37.4" rx="2" class="b0"><title>auto_01_802A6334_text: 27,220 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="757.5" y="415.1" width="34.3" height="33.5" rx="2" class="b0"><title>auto_01_803E3C08_text: 24,512 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="757.5" y="450.7" width="34.3" height="30.9" rx="2" class="b0"><title>auto_01_8016FF40_text: 22,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="757.5" y="483.5" width="34.3" height="30.5" rx="2" class="b0"><title>animation/goals/tu_802914C8: 22,448 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="757.5" y="516.1" width="34.3" height="22.9" rx="2" class="b0"><title>auto_01_80377048_text: 17,208 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="375.7" width="27.8" height="25.7" rx="2" class="b0"><title>auto_01_80008540_text: 15,704 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="823.6" y="375.7" width="27.6" height="25.7" rx="2" class="b0"><title>animation/goals/tu_80283934: 15,564 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="853.2" y="375.7" width="27.1" height="25.7" rx="2" class="b0"><title>animation/goals/tu_8027FD64: 15,312 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="882.3" y="375.7" width="25.3" height="25.7" rx="2" class="b0"><title>auto_01_80275F24_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="909.7" y="375.7" width="25.3" height="25.7" rx="2" class="b0"><title>auto_01_803249D4_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="403.4" width="25.3" height="23.6" rx="2" class="b1"><title>animation/choosers/tu_80272B20: 13,316 bytes of code, 20.8% fuzzy match</title></rect>
-<rect x="793.8" y="429.0" width="25.3" height="21.5" rx="2" class="b0"><title>auto_01_8038BC58_text: 12,200 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="452.4" width="25.3" height="21.3" rx="2" class="b0"><title>auto_01_803BA9DC_text: 12,092 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="475.7" width="25.3" height="20.3" rx="2" class="b0"><title>auto_01_800057D8_text: 11,580 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="498.0" width="25.3" height="20.0" rx="2" class="b0"><title>animation/goals/tu_80296C78: 11,432 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="793.8" y="520.0" width="25.3" height="19.0" rx="2" class="b0"><title>animation/goals/tu_8028C6B8: 10,944 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="403.4" width="23.1" height="20.8" rx="2" class="b0"><title>auto_01_803A6D80_text: 10,884 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="846.2" y="403.4" width="22.6" height="20.8" rx="2" class="b0"><title>auto_01_803ED700_text: 10,660 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="870.8" y="403.4" width="21.3" height="20.8" rx="2" class="b0"><title>auto_01_803EAF50_text: 10,116 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="894.2" y="403.4" width="20.0" height="20.8" rx="2" class="b0"><title>auto_01_803DE414_text: 9,532 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="916.2" y="403.4" width="18.8" height="20.8" rx="2" class="b0"><title>animation/goals/tu_8028F178: 9,040 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="426.2" width="20.1" height="19.1" rx="2" class="b0"><title>animation/goals/tu_80287600: 8,860 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="447.2" width="20.1" height="18.0" rx="2" class="b0"><title>animation/choosers/tu_8026DDE8: 8,400 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="467.2" width="20.1" height="17.0" rx="2" class="b0"><title>animation/goals/tu_8027DE3C: 7,976 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="486.1" width="20.1" height="16.8" rx="2" class="b0"><title>animation/goals/tu_8027A84C: 7,900 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="504.9" width="20.1" height="16.1" rx="2" class="b0"><title>animation/warps/tu_802A4584: 7,600 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="821.1" y="523.0" width="20.1" height="16.0" rx="2" class="b0"><title>animation/goals/tu_80299920: 7,592 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="843.3" y="426.2" width="18.7" height="17.2" rx="2" class="b0"><title>auto_01_803D8234_text: 7,560 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="864.0" y="426.2" width="18.1" height="17.2" rx="2" class="b0"><title>auto_01_803DBFF4_text: 7,348 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="884.1" y="426.2" width="16.8" height="17.2" rx="2" class="b0"><title>auto_01_803DA4EC_text: 6,876 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="903.0" y="426.2" width="15.5" height="17.2" rx="2" class="b0"><title>animation/goals/tu_8028989C: 6,392 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="920.5" y="426.2" width="14.5" height="17.2" rx="2" class="b0"><title>auto_01_8026C65C_text: 6,028 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="843.3" y="445.4" width="15.0" height="16.3" rx="2" class="b0"><title>animation/goals/tu_8027C728: 5,908 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="860.3" y="445.4" width="14.2" height="16.3" rx="2" class="b0"><title>auto_01_80413940_text: 5,608 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="876.4" y="445.4" width="13.6" height="16.3" rx="2" class="b0"><title>animation/goals/tu_8028B194: 5,412 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="892.0" y="445.4" width="13.5" height="16.3" rx="2" class="b0"><title>auto_01_800042B0_text: 5,372 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="907.5" y="445.4" width="13.2" height="16.3" rx="2" class="b0"><title>auto_01_803E0ACC_text: 5,280 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="922.7" y="445.4" width="12.3" height="16.3" rx="2" class="b0"><title>auto_01_8000C2C4_text: 4,960 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="843.3" y="463.6" width="12.4" height="15.8" rx="2" class="b0"><title>auto_01_803E9C20_text: 4,868 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="843.3" y="481.5" width="12.4" height="13.1" rx="2" class="b4"><title>animation/choosers/playeridchooser: 4,120 bytes of code, 99.9% fuzzy match</title></rect>
-<rect x="843.3" y="496.6" width="12.4" height="12.9" rx="2" class="b1"><title>ealib/tu_8036AEE4: 4,072 bytes of code, 3.4% fuzzy match</title></rect>
-<rect x="843.3" y="511.5" width="12.4" height="12.9" rx="2" class="b0"><title>auto_01_803E2248_text: 4,064 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="843.3" y="526.4" width="12.4" height="12.6" rx="2" class="b0"><title>auto_01_8000D650_text: 3,996 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="857.6" y="463.6" width="13.1" height="11.7" rx="2" class="b0"><title>auto_01_8000E618_text: 3,924 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="857.6" y="477.3" width="13.1" height="11.1" rx="2" class="b0"><title>auto_01_8006902C_text: 3,764 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="857.6" y="490.4" width="13.1" height="10.9" rx="2" class="b0"><title>animation/warps/tu_802A3704: 3,712 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="857.6" y="503.3" width="13.1" height="10.9" rx="2" class="b0"><title>auto_01_80323B3C_text: 3,692 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="857.6" y="516.2" width="13.1" height="10.4" rx="2" class="b1"><title>ealib/tu_8036E65C: 3,568 bytes of code, 3.9% fuzzy match</title></rect>
-<rect x="857.6" y="528.6" width="13.1" height="10.4" rx="2" class="b0"><title>auto_01_800034A0_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="872.7" y="463.6" width="11.4" height="12.0" rx="2" class="b0"><title>auto_01_80175810_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="886.1" y="463.6" width="11.2" height="12.0" rx="2" class="b1"><title>ealib/tu_8036D8AC: 3,504 bytes of code, 4.0% fuzzy match</title></rect>
-<rect x="899.2" y="463.6" width="10.9" height="12.0" rx="2" class="b0"><title>animation/choosers/tu_80279AE4: 3,432 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="912.1" y="463.6" width="10.7" height="12.0" rx="2" class="b1"><title>ealib/tu_8036BECC: 3,388 bytes of code, 4.1% fuzzy match</title></rect>
-<rect x="924.9" y="463.6" width="10.1" height="12.0" rx="2" class="b1"><title>ealib/tu_8036CC08: 3,236 bytes of code, 4.3% fuzzy match</title></rect>
-<rect x="872.7" y="477.6" width="10.7" height="11.1" rx="2" class="b1"><title>ealib/tu_80367658: 3,152 bytes of code, 4.4% fuzzy match</title></rect>
-<rect x="872.7" y="490.7" width="10.7" height="10.8" rx="2" class="b1"><title>ealib/tu_80369878: 3,096 bytes of code, 4.5% fuzzy match</title></rect>
-<rect x="872.7" y="503.6" width="10.7" height="10.8" rx="2" class="b4"><title>animation/choosers/tu_80271F14: 3,084 bytes of code, 99.8% fuzzy match</title></rect>
-<rect x="872.7" y="516.4" width="10.7" height="10.5" rx="2" class="b1"><title>ealib/tu_803682A8: 3,004 bytes of code, 4.7% fuzzy match</title></rect>
-<rect x="872.7" y="528.8" width="10.7" height="10.2" rx="2" class="b1"><title>ealib/tu_80372F60: 2,936 bytes of code, 4.8% fuzzy match</title></rect>
-<rect x="885.4" y="477.6" width="11.4" height="9.3" rx="2" class="b1"><title>ealib/tu_80371D9C: 2,892 bytes of code, 4.8% fuzzy match</title></rect>
-<rect x="898.9" y="477.6" width="10.7" height="9.3" rx="2" class="b4"><title>ealib/tu_80373AD8: 2,736 bytes of code, 99.5% fuzzy match</title></rect>
-<rect x="911.6" y="477.6" width="10.7" height="9.3" rx="2" class="b4"><title>ealib/tu_80374588: 2,736 bytes of code, 99.5% fuzzy match</title></rect>
-<rect x="924.3" y="477.6" width="10.7" height="9.3" rx="2" class="b4"><title>ealib/tu_80375038: 2,736 bytes of code, 99.5% fuzzy match</title></rect>
-<rect x="885.4" y="489.0" width="11.0" height="9.0" rx="2" class="b4"><title>ealib/tu_80375AE8: 2,736 bytes of code, 99.5% fuzzy match</title></rect>
-<rect x="898.5" y="489.0" width="11.0" height="9.0" rx="2" class="b4"><title>ealib/tu_80376598: 2,736 bytes of code, 99.5% fuzzy match</title></rect>
-<rect x="911.5" y="489.0" width="10.9" height="9.0" rx="2" class="b0"><title>auto_01_8038EC58_text: 2,700 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="924.4" y="489.0" width="10.6" height="9.0" rx="2" class="b0"><title>auto_01_8036F44C_text: 2,644 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="885.4" y="500.0" width="11.6" height="8.3" rx="2" class="b4"><title>ealib/tu_803666EC: 2,644 bytes of code, 99.3% fuzzy match</title></rect>
-<rect x="885.4" y="510.2" width="11.6" height="8.3" rx="2" class="b4"><title>ealib/tu_8036A490: 2,644 bytes of code, 99.3% fuzzy match</title></rect>
-<rect x="885.4" y="520.5" width="11.6" height="8.3" rx="2" class="b4"><title>ealib/tu_8036FEA0: 2,644 bytes of code, 99.3% fuzzy match</title></rect>
-<rect x="885.4" y="530.7" width="11.6" height="8.3" rx="2" class="b4"><title>ealib/tu_803708F4: 2,644 bytes of code, 99.3% fuzzy match</title></rect>
-<rect x="899.0" y="500.0" width="11.3" height="8.5" rx="2" class="b4"><title>ealib/tu_80371348: 2,644 bytes of code, 99.3% fuzzy match</title></rect>
-<rect x="912.2" y="500.0" width="10.9" height="8.5" rx="2" class="b1"><title>ealib/tu_80368E64: 2,580 bytes of code, 5.4% fuzzy match</title></rect>
-<rect x="925.2" y="500.0" width="9.8" height="8.5" rx="2" class="b0"><title>auto_01_803E3280_text: 2,352 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="899.0" y="510.5" width="8.8" height="9.1" rx="2" class="b1"><title>dolphin/ai/AI: 2,276 bytes of code, 6.7% fuzzy match</title></rect>
-<rect x="899.0" y="521.6" width="8.8" height="8.6" rx="2" class="b5"><title>animation/choosers/randomchooser: 2,168 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="899.0" y="532.2" width="8.8" height="6.8" rx="2" class="b0"><title>auto_01_803DDCD4_text: 1,812 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="909.7" y="510.5" width="7.8" height="6.9" rx="2" class="b0"><title>auto_01_803D7830_text: 1,656 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="919.5" y="510.5" width="7.8" height="6.9" rx="2" class="b1"><title>ealib/tu_803728E8: 1,656 bytes of code, 8.5% fuzzy match</title></rect>
-<rect x="929.3" y="510.5" width="5.7" height="6.9" rx="2" class="b1"><title>ealib/tu_80367140: 1,304 bytes of code, 10.7% fuzzy match</title></rect>
-<rect x="909.7" y="519.4" width="4.5" height="5.4" rx="2" class="b5"><title>animation/choosers/randomloadedchooser: 908 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="909.7" y="526.7" width="4.5" height="5.3" rx="2" class="b0"><title>auto_00_80003100_init: 896 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="909.7" y="534.0" width="4.5" height="5.0" rx="2" class="b3"><title>ealibs/tu_803D7ED4: 864 bytes of code, 73.1% fuzzy match</title></rect>
-<rect x="916.2" y="519.4" width="5.0" height="4.2" rx="2" class="b1"><title>ealib/tu_803663B0: 828 bytes of code, 16.9% fuzzy match</title></rect>
-<rect x="923.2" y="519.4" width="5.0" height="4.2" rx="2" class="b0"><title>auto_01_803DA188_text: 824 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="930.2" y="519.4" width="4.8" height="4.2" rx="2" class="b5"><title>animation/choosers/tu_80271940: 804 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="916.2" y="525.6" width="4.3" height="3.8" rx="2" class="b5"><title>animation/choosers/tu_80271C64: 688 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="916.2" y="531.4" width="4.3" height="3.4" rx="2" class="b0"><title>auto_01_803E1F98_text: 644 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="916.2" y="536.8" width="4.3" height="2.2" rx="2" class="b5"><title>animation/choosers/tu_80271748: 504 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="922.5" y="525.6" width="4.6" height="1.3" rx="2" class="b4"><title>ealibs/tu_803D9FE8: 416 bytes of code, 98.9% fuzzy match</title></rect>
-<rect x="929.1" y="525.6" width="2.7" height="1.3" rx="2" class="b0"><title>auto_01_803E097C_text: 292 bytes of code, 0.0% fuzzy match</title></rect>
-<rect x="933.8" y="525.6" width="1.2" height="1.3" rx="2" class="b5"><title>libgcc/_main: 200 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="757.5" y="337.9" width="42.5" height="41.3" rx="2" class="b0"><title>auto_01_80147EBC_text: 36,616 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="802.0" y="337.9" width="35.6" height="41.3" rx="2" class="b0"><title>auto_01_803FAE94_text: 31,004 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="839.6" y="337.9" width="32.6" height="41.3" rx="2" class="b0"><title>auto_01_802D73E8_text: 28,508 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="874.2" y="337.9" width="31.0" height="41.3" rx="2" class="b0"><title>auto_01_802A6334_text: 27,220 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="907.2" y="337.9" width="27.8" height="41.3" rx="2" class="b0"><title>auto_01_803E3C08_text: 24,512 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="757.5" y="381.2" width="29.8" height="35.5" rx="2" class="b0"><title>auto_01_8016FF40_text: 22,692 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="757.5" y="418.7" width="29.8" height="35.1" rx="2" class="b0"><title>animation/goals/tu_802914C8: 22,448 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="757.5" y="455.8" width="29.8" height="28.7" rx="2" class="b0"><title>auto_01_8029EE50_text: 18,612 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="757.5" y="486.6" width="29.8" height="26.4" rx="2" class="b0"><title>auto_01_80377048_text: 17,208 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="757.5" y="515.0" width="29.8" height="24.0" rx="2" class="b0"><title>game/tu_80008540: 15,748 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="789.3" y="381.2" width="29.1" height="24.3" rx="2" class="b1"><title>animation/goals/tu_80283934: 15,564 bytes of code, 23.2% fuzzy match</title></rect>
+<rect x="820.5" y="381.2" width="28.6" height="24.3" rx="2" class="b1"><title>animation/goals/tu_8027FD64: 15,312 bytes of code, 14.8% fuzzy match</title></rect>
+<rect x="851.1" y="381.2" width="26.8" height="24.3" rx="2" class="b0"><title>auto_01_80275F24_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="879.9" y="381.2" width="26.8" height="24.3" rx="2" class="b0"><title>auto_01_803249D4_text: 14,388 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="908.7" y="381.2" width="26.3" height="24.3" rx="2" class="b0"><title>animation/goals/tu_8029B70C: 14,148 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="789.3" y="407.5" width="21.9" height="27.3" rx="2" class="b1"><title>animation/choosers/tu_80272B20: 13,316 bytes of code, 20.8% fuzzy match</title></rect>
+<rect x="789.3" y="436.8" width="21.9" height="24.8" rx="2" class="b0"><title>auto_01_8038BC58_text: 12,200 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="789.3" y="463.7" width="21.9" height="24.6" rx="2" class="b0"><title>auto_01_803BA9DC_text: 12,092 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="789.3" y="490.3" width="21.9" height="23.6" rx="2" class="b0"><title>game/tu_800057D8: 11,624 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="789.3" y="515.8" width="21.9" height="23.2" rx="2" class="b0"><title>animation/goals/tu_80296C78: 11,432 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="813.2" y="407.5" width="24.0" height="20.2" rx="2" class="b0"><title>animation/goals/tu_8028C6B8: 10,944 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="839.2" y="407.5" width="23.8" height="20.2" rx="2" class="b0"><title>auto_01_803A6D80_text: 10,884 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="865.1" y="407.5" width="23.3" height="20.2" rx="2" class="b0"><title>auto_01_803ED700_text: 10,660 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="890.4" y="407.5" width="22.0" height="20.2" rx="2" class="b0"><title>auto_01_803EAF50_text: 10,116 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="914.4" y="407.5" width="20.6" height="20.2" rx="2" class="b0"><title>auto_01_803DE414_text: 9,532 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="813.2" y="429.7" width="17.9" height="21.9" rx="2" class="b0"><title>animation/goals/tu_8028F178: 9,040 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="813.2" y="453.5" width="17.9" height="21.4" rx="2" class="b2"><title>animation/goals/tu_80287600: 8,860 bytes of code, 38.2% fuzzy match</title></rect>
+<rect x="813.2" y="476.9" width="17.9" height="20.2" rx="2" class="b2"><title>animation/choosers/tu_8026DDE8: 8,400 bytes of code, 49.6% fuzzy match</title></rect>
+<rect x="813.2" y="499.1" width="17.9" height="19.1" rx="2" class="b3"><title>animation/goals/tu_8027DE3C: 7,976 bytes of code, 54.5% fuzzy match</title></rect>
+<rect x="813.2" y="520.1" width="17.9" height="18.9" rx="2" class="b3"><title>animation/goals/tu_8027A84C: 7,900 bytes of code, 50.1% fuzzy match</title></rect>
+<rect x="833.2" y="429.7" width="19.3" height="16.7" rx="2" class="b0"><title>animation/warps/tu_802A4584: 7,600 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="854.5" y="429.7" width="19.3" height="16.7" rx="2" class="b0"><title>animation/goals/tu_80299920: 7,592 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="875.8" y="429.7" width="19.2" height="16.7" rx="2" class="b0"><title>auto_01_803D8234_text: 7,560 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="897.1" y="429.7" width="18.6" height="16.7" rx="2" class="b0"><title>auto_01_803DBFF4_text: 7,348 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="917.7" y="429.7" width="17.3" height="16.7" rx="2" class="b0"><title>auto_01_803DA4EC_text: 6,876 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="833.2" y="448.4" width="14.7" height="18.2" rx="2" class="b0"><title>animation/goals/tu_8028989C: 6,392 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="833.2" y="468.6" width="14.7" height="17.0" rx="2" class="b0"><title>auto_01_8026C65C_text: 6,028 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="833.2" y="487.6" width="14.7" height="16.6" rx="2" class="b0"><title>animation/goals/tu_8027C728: 5,908 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="833.2" y="506.2" width="14.7" height="15.7" rx="2" class="b0"><title>auto_01_80413940_text: 5,608 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="833.2" y="523.9" width="14.7" height="15.1" rx="2" class="b0"><title>game/tu_800042B0: 5,416 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="849.8" y="448.4" width="17.1" height="12.9" rx="2" class="b3"><title>animation/goals/tu_8028B194: 5,412 bytes of code, 59.1% fuzzy match</title></rect>
+<rect x="868.9" y="448.4" width="16.6" height="12.9" rx="2" class="b0"><title>auto_01_803E0ACC_text: 5,280 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="887.6" y="448.4" width="15.7" height="12.9" rx="2" class="b0"><title>game/tu_8000C2C4: 5,004 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="905.3" y="448.4" width="15.2" height="12.9" rx="2" class="b0"><title>auto_01_803E9C20_text: 4,868 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="922.5" y="448.4" width="12.5" height="12.9" rx="2" class="b5"><title>animation/choosers/playeridchooser: 4,120 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="849.8" y="463.3" width="11.5" height="13.9" rx="2" class="b1"><title>ealib/tu_8036AEE4: 4,072 bytes of code, 3.4% fuzzy match</title></rect>
+<rect x="849.8" y="479.2" width="11.5" height="13.9" rx="2" class="b0"><title>auto_01_803E2248_text: 4,064 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="849.8" y="495.1" width="11.5" height="13.8" rx="2" class="b0"><title>game/tu_8000D650: 4,040 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="849.8" y="510.8" width="11.5" height="13.5" rx="2" class="b0"><title>game/tu_8000E618: 3,968 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="849.8" y="526.3" width="11.5" height="12.7" rx="2" class="b0"><title>auto_01_8006902C_text: 3,764 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="863.3" y="463.3" width="13.1" height="10.9" rx="2" class="b4"><title>animation/warps/tu_802A3704: 3,712 bytes of code, 99.3% fuzzy match</title></rect>
+<rect x="878.4" y="463.3" width="13.0" height="10.9" rx="2" class="b0"><title>auto_01_80323B3C_text: 3,692 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="893.4" y="463.3" width="12.6" height="10.9" rx="2" class="b0"><title>game/tu_800034A0: 3,600 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="908.0" y="463.3" width="12.5" height="10.9" rx="2" class="b1"><title>ealib/tu_8036E65C: 3,568 bytes of code, 3.9% fuzzy match</title></rect>
+<rect x="922.5" y="463.3" width="12.5" height="10.9" rx="2" class="b0"><title>auto_01_80175810_text: 3,556 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="863.3" y="476.2" width="11.6" height="11.6" rx="2" class="b1"><title>ealib/tu_8036D8AC: 3,504 bytes of code, 4.0% fuzzy match</title></rect>
+<rect x="863.3" y="489.8" width="11.6" height="11.3" rx="2" class="b4"><title>animation/choosers/tu_80279AE4: 3,432 bytes of code, 96.9% fuzzy match</title></rect>
+<rect x="863.3" y="503.1" width="11.6" height="11.1" rx="2" class="b1"><title>ealib/tu_8036BECC: 3,388 bytes of code, 4.1% fuzzy match</title></rect>
+<rect x="863.3" y="516.2" width="11.6" height="10.5" rx="2" class="b1"><title>ealib/tu_8036CC08: 3,236 bytes of code, 4.3% fuzzy match</title></rect>
+<rect x="863.3" y="528.8" width="11.6" height="10.2" rx="2" class="b5"><title>ealib/tu_80367658: 3,152 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="876.9" y="476.2" width="10.4" height="11.1" rx="2" class="b5"><title>ealib/tu_80369878: 3,096 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="889.3" y="476.2" width="10.4" height="11.1" rx="2" class="b4"><title>animation/choosers/tu_80271F14: 3,084 bytes of code, 99.8% fuzzy match</title></rect>
+<rect x="901.6" y="476.2" width="10.0" height="11.1" rx="2" class="b5"><title>ealib/tu_803682A8: 3,004 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="913.7" y="476.2" width="9.8" height="11.1" rx="2" class="b1"><title>ealib/tu_80372F60: 2,936 bytes of code, 4.8% fuzzy match</title></rect>
+<rect x="925.4" y="476.2" width="9.6" height="11.1" rx="2" class="b1"><title>ealib/tu_80371D9C: 2,892 bytes of code, 4.8% fuzzy match</title></rect>
+<rect x="876.9" y="489.4" width="9.1" height="10.9" rx="2" class="b5"><title>ealib/tu_80373AD8: 2,736 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="876.9" y="502.3" width="9.1" height="10.9" rx="2" class="b5"><title>ealib/tu_80374588: 2,736 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="876.9" y="515.2" width="9.1" height="10.9" rx="2" class="b5"><title>ealib/tu_80375038: 2,736 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="876.9" y="528.1" width="9.1" height="10.9" rx="2" class="b5"><title>ealib/tu_80375AE8: 2,736 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="888.0" y="489.4" width="10.5" height="9.5" rx="2" class="b5"><title>ealib/tu_80376598: 2,736 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="900.5" y="489.4" width="10.3" height="9.5" rx="2" class="b0"><title>auto_01_8038EC58_text: 2,700 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="912.9" y="489.4" width="10.1" height="9.5" rx="2" class="b0"><title>auto_01_8036F44C_text: 2,644 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="924.9" y="489.4" width="10.1" height="9.5" rx="2" class="b5"><title>ealib/tu_803666EC: 2,644 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="888.0" y="500.9" width="8.4" height="11.4" rx="2" class="b5"><title>ealib/tu_8036A490: 2,644 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="888.0" y="514.3" width="8.4" height="11.4" rx="2" class="b5"><title>ealib/tu_8036FEA0: 2,644 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="888.0" y="527.6" width="8.4" height="11.4" rx="2" class="b5"><title>ealib/tu_803708F4: 2,644 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="898.4" y="500.9" width="11.5" height="8.3" rx="2" class="b5"><title>ealib/tu_80371348: 2,644 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="911.9" y="500.9" width="11.1" height="8.3" rx="2" class="b5"><title>ealib/tu_80368E64: 2,580 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="925.0" y="500.9" width="10.0" height="8.3" rx="2" class="b0"><title>auto_01_803E3280_text: 2,352 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="898.4" y="511.2" width="9.0" height="8.8" rx="2" class="b1"><title>dolphin/ai/AI: 2,276 bytes of code, 6.7% fuzzy match</title></rect>
+<rect x="898.4" y="522.1" width="9.0" height="8.3" rx="2" class="b5"><title>animation/choosers/randomchooser: 2,168 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="898.4" y="532.4" width="9.0" height="6.6" rx="2" class="b0"><title>auto_01_803DDCD4_text: 1,812 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.5" y="511.2" width="7.9" height="6.8" rx="2" class="b0"><title>auto_01_803D7830_text: 1,656 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="919.4" y="511.2" width="7.9" height="6.8" rx="2" class="b1"><title>ealib/tu_803728E8: 1,656 bytes of code, 8.5% fuzzy match</title></rect>
+<rect x="929.2" y="511.2" width="5.8" height="6.8" rx="2" class="b5"><title>ealib/tu_80367140: 1,304 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="909.5" y="520.0" width="4.7" height="5.1" rx="2" class="b5"><title>animation/choosers/randomloadedchooser: 908 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="909.5" y="527.2" width="4.7" height="5.0" rx="2" class="b0"><title>auto_00_80003100_init: 896 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="909.5" y="534.2" width="4.7" height="4.8" rx="2" class="b3"><title>ealibs/tu_803D7ED4: 864 bytes of code, 73.1% fuzzy match</title></rect>
+<rect x="916.2" y="520.0" width="5.0" height="4.2" rx="2" class="b1"><title>ealib/tu_803663B0: 828 bytes of code, 16.9% fuzzy match</title></rect>
+<rect x="923.2" y="520.0" width="5.0" height="4.2" rx="2" class="b0"><title>auto_01_803DA188_text: 824 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="930.2" y="520.0" width="4.8" height="4.2" rx="2" class="b5"><title>animation/choosers/tu_80271940: 804 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="916.2" y="526.2" width="2.7" height="5.6" rx="2" class="b5"><title>animation/choosers/tu_80271C64: 688 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="916.2" y="533.9" width="2.7" height="5.1" rx="2" class="b0"><title>auto_01_803E1F98_text: 644 bytes of code, 0.0% fuzzy match</title></rect>
+<rect x="920.9" y="526.2" width="2.3" height="4.1" rx="2" class="b5"><title>animation/choosers/tu_80271748: 504 bytes of code, 100.0% fuzzy match</title></rect>
+<rect x="920.9" y="532.4" width="2.3" height="3.1" rx="2" class="b4"><title>ealibs/tu_803D9FE8: 416 bytes of code, 98.9% fuzzy match</title></rect>
+<rect x="920.9" y="537.4" width="2.3" height="1.6" rx="2" class="b0"><title>auto_01_803E097C_text: 292 bytes of code, 0.0% fuzzy match</title></rect>
 </g>
 <text x="24.0" y="580.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code matched over time</text>
 <line x1="68" y1="740.0" x2="936" y2="740.0" class="axis" stroke-width="1"/>
 <text x="60.0" y="744.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0%</text>
 <line x1="68" y1="705.0" x2="936" y2="705.0" class="grid" stroke-width="1"/>
-<text x="60.0" y="709.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0.25%</text>
+<text x="60.0" y="709.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0.5%</text>
 <line x1="68" y1="670.0" x2="936" y2="670.0" class="grid" stroke-width="1"/>
-<text x="60.0" y="674.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0.5%</text>
+<text x="60.0" y="674.0" class="t3" font-size="11" font-weight="400" text-anchor="end">1%</text>
 <line x1="68" y1="635.0" x2="936" y2="635.0" class="grid" stroke-width="1"/>
-<text x="60.0" y="639.0" class="t3" font-size="11" font-weight="400" text-anchor="end">0.75%</text>
+<text x="60.0" y="639.0" class="t3" font-size="11" font-weight="400" text-anchor="end">1.5%</text>
 <line x1="68" y1="600.0" x2="936" y2="600.0" class="grid" stroke-width="1"/>
-<text x="60.0" y="604.0" class="t3" font-size="11" font-weight="400" text-anchor="end">1%</text>
-<polyline points="68.0,715.0 936.0,677.5" class="line" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="68.0" cy="715.0" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
-<circle cx="936.0" cy="677.5" r="4" class="dot" stroke-width="2"><title>2026-10-11: 0.45% of code, 169 / 24,158 functions</title></circle>
-<text x="936.0" y="667.5" class="t1" font-size="12" font-weight="600" text-anchor="end">0.45%</text>
+<text x="60.0" y="604.0" class="t3" font-size="11" font-weight="400" text-anchor="end">2%</text>
+<polyline points="68.0,727.5 936.0,650.6" class="line" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="68.0" cy="727.5" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
+<circle cx="936.0" cy="650.6" r="4" class="dot" stroke-width="2"><title>2026-10-11: 1.28% of code, 341 / 24,158 functions</title></circle>
+<text x="936.0" y="640.6" class="t1" font-size="12" font-weight="600" text-anchor="end">1.28%</text>
 <text x="68.0" y="758.0" class="t3" font-size="11" font-weight="400" text-anchor="start">2026-10-10</text>
 <text x="936.0" y="758.0" class="t3" font-size="11" font-weight="400" text-anchor="end">2026-10-11</text>
 </svg>
