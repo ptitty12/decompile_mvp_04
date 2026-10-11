@@ -188,7 +188,7 @@ public:
     Unk8014D8AC_Ctx* m44C;
     int m450;
     char pad454[0x458 - 0x454];
-    int m458;
+    int m458;                  /* tested against 0xB by goal code (tu_8028989C.cpp) */
     char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
@@ -216,13 +216,17 @@ struct Unk802726BC_Angles {
     float m30[2];              /* goal logic (fn_8027FC80) */
     float m38[2];
     float m40[2];
-    float m48[2];              /* goal logic (fn_8027F504) */
+    float m48[2];              /* goal code (tu_8028989C.cpp), indexed by m190 */
     float m50[2];              /* read by the warps */
-    char pad58[0xD8 - 0x58];
+    int m58[2];                /* written by goal code (tu_8028989C.cpp), indexed by m190 */
+    char pad60[0xC0 - 0x60];
+    float mC0[2];              /* same, indexed by m190 */
+    char padC8[0xD8 - 0xC8];
     float mD8[2];              /* read by the warps */
     float mE0[2];
     float mE8[2];
-    char padF0[0x100 - 0xF0];
+    char padF0[0xF8 - 0xF0];
+    float mF8[2];              /* goal code (tu_8028989C.cpp) */
     float m100[2];
     float m108[2];
     float m110[2];             /* read by the warps */
@@ -246,7 +250,7 @@ struct Unk80271DBC_Link {
     char pad0[0x830 - 0x0];
     int m830;                  /* read by the path query constructors (tu_80279AE4.cpp) */
     char pad834[0x838 - 0x834];
-    int m838;                  /* hash read by goal logic (fn_8027EA14) */
+    int m838;                  /* compared with state hashes by goal code (tu_8028989C.cpp) */
     int m83C;                  /* hash read by goal logic (fn_8027E084) */
     char pad840[0x85C - 0x840];
     int m85C;                  /* tested by the warps (tu_802A4584.cpp) */
