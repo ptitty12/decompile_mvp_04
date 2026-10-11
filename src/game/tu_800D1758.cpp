@@ -401,13 +401,13 @@ extern "C" char* fn_800D3EAC(Unk800D3EAC_Obj* o)
             p = &lbl_8061AC58;
         return p;
     }
-    return fn_80090880(lbl_8061977C);
+    return fn_80090880(lbl_8061977C, o->m44);
 }
 
-extern "C" void fn_800D4208(Unk800C7B40_Widget* w)
+extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s)
 {
     char buf[800];
-    fn_804031BC(buf);
+    fn_804031BC(buf, s);
     w->fn_vslot28(buf);
 }
 
