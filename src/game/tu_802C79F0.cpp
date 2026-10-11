@@ -32,6 +32,13 @@ void* fn_8040B190(void* dst, const void* src, ...);
 int fn_802B9300(const char* name, int a, int b, unsigned int* outn);
 void fn_802CA5AC(int a, int b);
 void fn_80314D60(int h);
+extern const char lbl_805E186C[];
+extern int lbl_806EE9F0;
+void* operator new[](unsigned int n, int heap);
+void* fn_802BB19C();
+int fn_802BB27C(void* o, int idx);
+void fn_802C851C(Unk802C851C* o);
+void fn_802C8564(Unk802C851C* o);
 extern const char lbl_8061D2BC[];
 void fn_802AD2B8(void* a, void* b, int c, const char* d, int e);
 Unk8000E618* fn_8000E65C();
@@ -60,6 +67,36 @@ int fn_802C8484(const char* name, int size);
 void fn_802C85AC(char* p);
 float fn_802AEAA0(Unk802AEB4C* o, int id);
 float fn_802AE9C8(Unk802AEB4C* o, int id);
+
+/* near-miss (88 vs 89 insns): everything else matches, including the g++ array-new ctor loop (new (0) T[cnt]); retail copies the trip count into a new register
+   (mr r30,r31; li r31,0) in the first loop where ours coalesces count and offset registers. */
+void fn_802C79F0(Unk802C7B54* o, int flag)
+{
+    int n = lbl_805E1B34[0];
+    int h = fn_802BB27C(fn_802BB19C(), 1);
+    if (n > 0) {
+        int c = n;
+        int off = 0;
+        do {
+            char* b = (char*)o + 0xA8;
+            *(int*)(b + off) = fn_803ED634(lbl_805E186C, 0xD6D8, h | 0x400);
+            if (*(int*)(b + off) == 0) {
+                *(int*)(b + off) = fn_803ED604(lbl_805E186C, 0xD6D8, lbl_806EE9F0 | 0x400);
+            }
+            off += 0xC;
+        } while (--c != 0);
+    }
+    o->m3D4 = flag ? 0xA : 0x23;
+    int cnt = o->m3D4;
+    Unk802C83A4* arr = new (0) Unk802C83A4[cnt];
+    o->m3C0 = (char*)arr;
+    for (int i = 0; i < o->m3D4; i++) {
+        fn_802C851C((Unk802C851C*)(o->m3C0 + i * 0x10));
+    }
+    for (int i = 0; i < o->m3D4; i++) {
+        fn_802C8564((Unk802C851C*)(o->m3C0 + i * 0x10));
+    }
+}
 
 void fn_802C7B54(Unk802C7B54* o)
 {
