@@ -67,6 +67,8 @@ void fn_80131F34(Unk800C7B40_Widget* w, Scr* self, void (*cb)(int, Scr*), int a,
 // PROTOS-BEGIN
 extern "C" {
 int fn_8010E0F4(Scr* self, Unk800C7B40_Widget* a);
+/* near-miss: retail duplicates the shared fn_8010F9CC tail (159 insns vs 145 here); the goto form gives 142. */
+int fn_8010E190(Scr* self, Scr* a, int unused, int c);
 int fn_8010E40C(Scr* self, Scr* a, int b, int c);
 void fn_8010E4BC(Scr* self);
 int fn_8010E4FC(Scr* self, int a);
@@ -81,6 +83,7 @@ int fn_8010EAF4(Scr* self);
 void fn_8010EF84(Scr* self);
 void fn_8010F1E4(Scr* self);
 void fn_8010F290(Scr* self);
+void fn_8010F2CC(Scr* self);
 void fn_8010F494(Scr* self, int a);
 int fn_8010F4D4(int a, int b);
 void fn_8010F550(Scr* self);
@@ -111,6 +114,42 @@ int fn_8010E0F4(Scr* self, Unk800C7B40_Widget* a)
         return 1;
     }
     return 0;
+}
+
+int fn_8010E190(Scr* self, Scr* a, int unused, int c)
+{
+    int r = 0;
+    if (a == (Scr*)self->m148) {
+        unsigned m = self->m140;
+        if (m <= 1) {
+            int* arr = self->m16C;
+            if (arr[a->fn_vslot60()] == self->m158) {
+                self->fn_vslot42(fn_800B555C()->m570);
+            } else if (fn_8010EAF4(self) != 0) {
+                int idx = self->m14C->fn_vslot60();
+                fn_8010F2CC(self);
+                if (self->m14C->fn_vslot93(idx, 0) != 0)
+                    self->m14C->fn_vslot68(idx);
+            }
+            a->fn_vslot68(c);
+            fn_8010F9CC(self, arr[self->m148->fn_vslot60()]);
+            return 1;
+        }
+        if (m == 2) {
+            int* arr = self->m16C;
+            if (arr[a->fn_vslot60()] == self->m158)
+                self->fn_vslot42(fn_800B555C()->m570);
+            a->fn_vslot68(c);
+            fn_8010F9CC(self, arr[self->m148->fn_vslot60()]);
+            return 1;
+        }
+    }
+    if (a == (Scr*)self->m14C && self->m140 == 1) {
+        a->fn_vslot68(c);
+        fn_8010F9CC(self, self->m1D0[self->m14C->fn_vslot60()]);
+        r = 1;
+    }
+    return r;
 }
 
 int fn_8010E40C(Scr* self, Scr* a, int b, int c)
@@ -274,6 +313,33 @@ void fn_8010F290(Scr* self)
     fn_8010BF88(self);
 }
 
+void fn_8010F2CC(Scr* self)
+{
+    self->m140 = 0;
+    self->m158 = 0;
+    self->m15C = 0;
+    if (self->m144 != 7) {
+        self->m160 = 0;
+        self->m164 = 0;
+    }
+    fn_8010F290(self);
+    self->m13C->fn_vslot8(0);
+    ((UnkWidgetB*)self->m13C)->fn_vslot84(2, 0);
+    self->m13C->fn_vslot16(0);
+    if (self->m150 == 0) {
+        self->m140 = (int)self->m150;
+        self->m148->fn_vslot14(self->b1);
+        self->m14C->fn_vslot14(0);
+        fn_8010F9CC(self, self->m16C[self->m148->fn_vslot60()]);
+    } else {
+        self->m140 = 1;
+        self->m148->fn_vslot14(0);
+        self->m14C->fn_vslot14(self->b1);
+        fn_8010F9CC(self, self->m1D0[self->m14C->fn_vslot60()]);
+    }
+    fn_8010D33C(self, 0);
+}
+
 void fn_8010F494(Scr* self, int a)
 {
     if (self->m234 != 0)
@@ -317,7 +383,7 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->SetVptr(lbl_806508D0);
-    self->m16C[0] = 0;
+    self->m158 = 1;
     self->m130 = 0;
     self->m150 = 0;
     self->m154 = 0;
@@ -325,7 +391,7 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     self->m160 = 0;
     self->m164 = 0;
     self->m168 = 0;
-    self->m158 = 1;
+    self->m16C[0] = 0;
     return self;
 }
 
