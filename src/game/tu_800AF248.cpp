@@ -131,6 +131,33 @@ struct FEEv {
     int m18;
 };
 extern FEV18* lbl_80619D10;
+struct Unk8019F8C0_Owner;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+struct FEOb245 {
+    char pad0[4];
+    Unk8019F8C0_Owner* m4;
+    char pad8[0x68 - 8];
+    float m68;
+    char pad6C[0xAC - 0x6C];
+    int mAC[10];
+    int mD4;
+    int mD8;
+};
+extern const float lbl_805B9B7C;
+extern const float lbl_805B9B80;
+struct FEOb2588 {
+    char pad0[0x68];
+    float m68;
+    char pad6C[4];
+    int m70;
+    char pad74[0xDC - 0x74];
+    void* mDC;
+    char padE0[0x110 - 0xE0];
+    int m110;
+};
+extern "C" void fn_80120144(void* o, float f);
+extern "C" void fn_800B2DD4(void* self, int k);
+extern "C" int fn_802D7DB4(int a, int b);
 struct FEOb65C {
     char pad0[0x65C];
     char* m65C;
@@ -224,7 +251,6 @@ void* fn_800B7AB8(FEMgrB8* mgr, const char* name);
 void fn_802B09CC(void* o, const char* s, int a, int b, int c);
 void fn_800AF110(void* p);
 void fn_800FC6B4(void* p);
-void fn_800B245C(void* p);
 void* fn_800AF010(void* p, int k);
 void fn_800B1DBC(void* p, int a);
 void fn_800AE96C(char* p);
@@ -240,10 +266,12 @@ int fn_800B210C(FEOb210* p);
 void fn_800AF148(void* p);
 void fn_800AF544(UnkAt2C* p);
 void fn_8011A0A4(void* o, void* a, const char* s);
-void fn_800B2588(void* p);
 }
 
 /* ---- generated externs ---- */
+
+
+
 
 
 
@@ -291,7 +319,9 @@ void fn_800B228C(FEOb118* self);
 void fn_800B22B0(FEStats* self, FEEv* e);
 void fn_800B2390(FEOb2390* self);
 void fn_800B243C(void* p);
+void fn_800B245C(FEOb245* self);
 void fn_800B2544(void* self);
+void fn_800B2588(FEOb2588* self);
 void fn_800B2668(FEOb74* self);
 void fn_800B26CC(FEOb26* self);
 }
@@ -635,15 +665,66 @@ extern "C" void fn_800B2390(FEOb2390* self)
 
 extern "C" void fn_800B243C(void* p)
 {
-    fn_800B245C(p);
+    fn_800B245C((FEOb245*)p);
+}
+
+/* near-miss (4 slots): retail loads m68 into f0 and the constant into f13 (compare operands swapped in ours); 5 operand forms tried */
+extern "C" void fn_800B245C(FEOb245* self)
+{
+    if (fn_802D7DB4(fn_801A2034(self->m4, 4), 0x106)) {
+        int did = 0;
+        if (self->mD8 == 1) {
+            if (!(self->m68 < lbl_805B9B7C)) {
+                self->m68 = FMax2(self->m68 - lbl_805B9B7C, lbl_805B9B80);
+                did = 1;
+            }
+        } else {
+            int n = self->mD4;
+            if (!(n > 9)) {
+                self->mAC[n] = did;
+                self->mD4 = n + 1;
+                did = 1;
+            }
+        }
+        if (did) {
+            fn_800AEBAC((char*)fn_800AB5C8(lbl_80619D10));
+            fn_800B2DD4(self, 5);
+        }
+    }
 }
 
 extern "C" void fn_800B2544(void* self)
 {
-    fn_800B2588(self);
+    fn_800B2588((FEOb2588*)self);
     fn_800B2668((FEOb74*)self);
-    fn_800B245C(self);
+    fn_800B245C((FEOb245*)self);
     fn_800B26CC((FEOb26*)self);
+}
+
+extern "C" void fn_800B2588(FEOb2588* self)
+{
+    if (self->m70 <= 6) {
+        int off = self->m70 * 0xC;
+        char* b28 = (char*)self + 0x28;
+        if (*(int*)(b28 + off) == 0) {
+            int lvl = self->m110;
+            char* b20 = (char*)self + 0x20;
+            if (lvl >= *(int*)(b20 + off)) {
+                char* b24 = (char*)self + 0x24;
+                self->m68 = self->m68 + (float)*(int*)(b24 + off);
+                *(int*)(b28 + off) = 1;
+                if (self->m70 <= 4) {
+                    self->m70 = self->m70 + 1;
+                }
+                if (fn_800B214C((FEOb214*)self) == 0) {
+                    fn_800B2DD4(self, 1);
+                }
+            }
+        }
+        if (self->mDC) {
+            fn_80120144(self->mDC, self->m68);
+        }
+    }
 }
 
 extern "C" void fn_800B2668(FEOb74* self)
