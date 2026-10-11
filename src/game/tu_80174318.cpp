@@ -202,6 +202,80 @@ void fn_80176F4C(Unk80176C0C_T* p)
 
 void fn_80176FD0() {}
 
+int fn_80176FD4(Unk8017706C_T* p, int a)
+{
+    int r;
+    if (a == 0) {
+        r = 0;
+        bool b = p->m18;
+        if (!b) {
+            bool c = p->m60;
+            if (c) {
+                goto yes;
+            }
+        } else {
+yes:
+            r = 1;
+        }
+        return r;
+    }
+    r = 0;
+    bool b = p->mA8;
+    if (!b) {
+        bool c = p->mF0;
+        if (c) {
+            goto yes2;
+        }
+    } else {
+yes2:
+        r = 1;
+    }
+    return r;
+}
+
+int fn_8017706C(Unk8017706C_T* p, int a)
+{
+    int r = 0;
+    if (a == 0) {
+        bool b = p->m18;
+        if (b) {
+            r = 1;
+        }
+        bool c = p->m60;
+        if (c) {
+            r += 1;
+        }
+    } else {
+        bool b = p->mA8;
+        if (b) {
+            r = 1;
+        }
+        bool c = p->mF0;
+        if (c) {
+            r += 1;
+        }
+    }
+    return r;
+}
+
+int fn_801770E8(Unk8017706C_T* p, int a)
+{
+    if (a == 0) {
+        int t = p->m18;
+        bool b = t;
+        if (b) {
+            return t;
+        }
+        return p->m60;
+    }
+    int u = p->mA8;
+    bool c = u;
+    if (c) {
+        return u;
+    }
+    return p->mF0;
+}
+
 int fn_80177148(int* p, int a)
 {
     if (p[0x60 / 4] == a || p[0xF0 / 4] == a) {
@@ -218,6 +292,32 @@ void fn_8017739C(Unk80176C0C_Entry* p, int a)
         } else if (p->m0 == 5) {
             fn_80178944(p);
         }
+    }
+}
+
+void fn_80177900(void* self, Unk80177900_Obj* o)
+{
+    if (o) {
+        fn_80244A64(o, 0, 0);
+        fn_8037EBE8(o->m618);
+        fn_803814A4(o->m618, 0, 0, lbl_805CBD24);
+        o->m908 = 0;
+        fn_8024D178(o, 0);
+        o->m8F0 = 0;
+    }
+}
+
+void fn_80177974(Unk80177974_T* p)
+{
+    fn_80177BF4((Unk80177B74_T*)p, 0);
+    fn_80177C74(p, 0);
+    if (p->m44 != 0) {
+        fn_80189300(p->m44, 0);
+        p->m44->fn_vslot8(1);
+    }
+    Unk80177974_Obj* o = p->m40;
+    if (o != 0) {
+        o->fn_vslot8(1);
     }
 }
 

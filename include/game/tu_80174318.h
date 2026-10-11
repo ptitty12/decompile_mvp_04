@@ -134,4 +134,49 @@ int fn_80173274(Unk80173274_T* p);
 int fn_8000587C(int p);
 void fn_803EDA0C(int a);
 
+/* Player object (vptr at +0x98): only slot 8 is used here. */
+class Unk80177974_Obj {
+public:
+    char pad0[0x98];
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+struct Unk80177974_T {
+    char pad0[0x40];
+    Unk80177974_Obj* m40;
+    Unk80177974_Obj* m44;
+};
+struct Unk80177900_Obj {
+    char pad0[0x618];
+    void* m618;
+    char pad61C[0x8F0 - 0x61C];
+    int m8F0;
+    char pad8F4[0x908 - 0x8F4];
+    int m908;
+};
+struct Unk8017706C_T {
+    char pad0[0x18];
+    int m18;
+    char pad1C[0x60 - 0x1C];
+    int m60;
+    char pad64[0xA8 - 0x64];
+    int mA8;
+    char padAC[0xF0 - 0xAC];
+    int mF0;
+};
+void fn_80244A64(void* p, int a, int b);
+void fn_8037EBE8(void* p);
+void fn_803814A4(void* p, int a, int b, float f);
+void fn_8024D178(void* p, int a);
+void fn_80189300(void* p, int a);
+extern const float lbl_805CBD24;
+void fn_80177C74(void* self, int a);
+void fn_80177BF4(Unk80177B74_T* p, void* a);
+
 #endif
