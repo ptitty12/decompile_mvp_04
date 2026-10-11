@@ -89,4 +89,16 @@ struct Unk802B0ACC_F4 {
     float d;
 };
 
+/* Small float/handle record (fn_802B5EF4 init, fn_802B5F58 release): floats at +0..+0xC,
+   an owned handle at +0x34 and a second field at +0x38. */
+struct Unk802B5EF4_R {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    char pad10[0x34 - 0x10];
+    void* m34;
+    int m38;
+};
+
 #endif /* GAME_TU_802ACD88_H */

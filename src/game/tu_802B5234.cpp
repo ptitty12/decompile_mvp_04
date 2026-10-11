@@ -6,6 +6,31 @@
 
 typedef Unk802ACD88_Mgr Mgr;
 typedef Unk802ACD88_Ent Ent;
+typedef Unk802B5EF4_R Rr;
+
+struct Unk802B7B18_L {
+    char* m0;
+    int m4;
+};
+
+struct Unk802B7B18_Ent {
+    const char* m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+struct Unk802B7B18_Out {
+    Unk802B7B18_L* m0;
+    void* m4[15];
+};
+
+struct Unk802B8388_O {
+    char pad0[0xC];
+    unsigned int mC;
+};
+
+extern void* (*lbl_8062C668)(int size, int heap);
 typedef Unk802B5234_T T;
 
 extern void* lbl_8061EAB4;
@@ -34,13 +59,36 @@ extern void* lbl_8061E978;
 extern void* lbl_8061EA64;
 extern int lbl_8061EA00[];
 extern void* lbl_8061FF44;
+extern const char lbl_805E0BC8[];
+extern const char lbl_805E0BEC[];
+extern const char lbl_805E0C10[];
+extern const char lbl_805E0C34[];
+extern const char lbl_805E0C58[];
+extern const char lbl_805E0C7C[];
+extern const char lbl_805E0CA0[];
+extern const char lbl_805E0CC4[];
+extern const char lbl_805E0CE8[];
+extern const char lbl_805E0D0C[];
+extern const char lbl_805E0D30[];
+extern const char lbl_805E0D54[];
+extern const char lbl_805E0D78[];
+extern const char lbl_805E0D9C[];
+extern const char lbl_805E0DC0[];
+extern const char lbl_805E0DE4[];
 extern const char lbl_805E0E5C[];
+extern const char lbl_805E0BC0[];
+extern const char lbl_805E03D0[];
 extern const char lbl_805E0E44[];
 extern const char lbl_805E0E50[];
 extern const char lbl_805E0E78[];
 extern const char lbl_805E0E88[];
 extern const char lbl_805E0E94[];
 extern const char lbl_805E0EA0[];
+
+extern "C" {
+char* strcpy(char* d, const char* s);
+char* strcat(char* d, const char* s);
+}
 
 extern "C++" {
 int fn_802B96C4(const char* name, int a);
@@ -60,6 +108,19 @@ int fn_802B86D4(Mgr* m, const char* s, int* idx);
 void fn_802B8760(Mgr* m, const char* s);
 void fn_802B881C(Mgr* m, const char* s);
 int fn_800968C0(void* o, int x, int y);
+int fn_8033D1E4(char* buf, const char* name, int n);
+void* fn_8018466C(char* buf, void* a);
+void* fn_8014EB44(void* x);
+void fn_8014EBEC(void* x, char* buf);
+struct Unk802B8388_O;
+Unk802B8388_O* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+void* fn_803DD628(void* a, void* b);
+void fn_802B832C(Mgr* m);
+void* fn_8037C7FC();
+int fn_8040B3B4(const char* a, const char* b);
+void* fn_803D77EC(void* e);
+void fn_8037C9F4(void* o, char* s);
+void fn_802AD538(void* o, int a);
 int fn_80089AA0(void* o, int a, int b);
 int fn_8008CFD8(void* o, int a, int b);
 int fn_804089B4(char* buf, const char* fmt, ...);
@@ -136,6 +197,28 @@ void fn_802B56C8()
         lbl_8061EA00[i] = 0;
 }
 
+int fn_802B56FC(const char* name)
+{
+    if (fn_802B96C4(name, 0) == 0) {
+        char buf[0x104] = "";
+        fn_8040B61C(buf, name);
+        if (fn_8033D1E4(buf, name, 0x104) == 0)
+            return 0;
+        while (fn_802B96C4(name, 0) == 0) {
+        }
+    }
+    return 1;
+}
+
+void fn_802B5794(void* a, char* out)
+{
+    char buf[0x104] = "";
+    fn_8014EBEC(fn_8014EB44(fn_8018466C(buf, a)), buf);
+    strcpy(out, "stadium\\");
+    strcat(out, buf);
+    strcat(out, lbl_805E03D0);
+}
+
 /* near-miss: `li r0,0` is scheduled before the second lfs/fcmpu here, after the fcmpu in retail */
 void fn_802B5D28(int* out, float x)
 {
@@ -151,9 +234,83 @@ void fn_802B5D28(int* out, float x)
     *out = r;
 }
 
+void fn_802B5EF4(Rr* self)
+{
+    self->m0 = 0.0f;
+    self->m4 = 0.4f;
+    self->m34 = 0;
+    self->m38 = 0;
+    self->mC = 0.0f;
+    self->m8 = -1.0f;
+}
+
 void fn_802B5F2C()
 {
     fn_803188FC(lbl_8061FF44, 5);
+}
+
+void fn_802B5F58(Rr* self)
+{
+    if (self->m34 != 0) {
+        fn_803DD73C(self->m34, 3);
+        self->m34 = 0;
+    }
+}
+
+void fn_802B7A28(void* unused, int idx)
+{
+    char a[0x100] = "";
+    char b[0x20] = "";
+    fn_8018466C(b, (void*)idx);
+    strcpy(a, (char*)lbl_8061E978 + 0x37F8 + idx * 9);
+    strcat(a, lbl_805E0BC0);
+    fn_8037C9F4(fn_8037C7FC(), a);
+    a[0] = 0;
+    fn_8018466C(b, (void*)idx);
+    strcat(a, b);
+    strcat(a, lbl_805E0BC0);
+    fn_8037C9F4(fn_8037C7FC(), a);
+    fn_802AD538(lbl_8061E978, 0);
+}
+
+/* near-miss (parked, 77 vs 78 insns): retail loads the list head/end before copying the 16-pointer name table and walks the output with a pointer register */
+void fn_802B7B18(void* unused, Unk802B7B18_Out* out)
+{
+    for (int i = 0; i < 15; i++)
+        out->m4[i] = 0;
+    const char* names[16] = {
+        lbl_805E0BC8,
+        lbl_805E0BEC,
+        lbl_805E0C10,
+        lbl_805E0C34,
+        lbl_805E0C58,
+        lbl_805E0C7C,
+        lbl_805E0CA0,
+        lbl_805E0CC4,
+        lbl_805E0CE8,
+        lbl_805E0D0C,
+        lbl_805E0D30,
+        lbl_805E0D54,
+        lbl_805E0D78,
+        lbl_805E0D9C,
+        lbl_805E0DC0,
+        lbl_805E0DE4
+    };
+    Unk802B7B18_L* l = out->m0;
+    Unk802B7B18_Ent* it = (Unk802B7B18_Ent*)l->m0;
+    Unk802B7B18_Ent* end = it + l->m4;
+    while (it != end) {
+        for (int j = 0; j < 15; j++) {
+            if (fn_8040B3B4(it->m0, names[j]) == 0) {
+                void* p = fn_803D77EC(it);
+                if (p != 0)
+                    out->m4[j] = (void*)it->mC;
+                else
+                    out->m4[j] = p;
+            }
+        }
+        it++;
+    }
 }
 
 void fn_802B832C(Mgr* m)
@@ -165,6 +322,19 @@ void fn_802B832C(Mgr* m)
     if (*(void**)((char*)m + 0x1871C) != 0) {
         fn_803EDA0C(*(void**)((char*)m + 0x1871C));
         *(void**)((char*)m + 0x1871C) = 0;
+    }
+}
+
+void fn_802B8388(Mgr* m)
+{
+    char* b = (char*)m + 0x20000;
+    fn_802B832C(m);
+    Unk802B8388_O* o = fn_803EBBA4(0x100, 0x100, 0x20, 0, 0, 0x100, 0, 0);
+    *(Unk802B8388_O**)(b - 0x78E4) = o;
+    if (o != 0) {
+        o->mC |= 0x20000000;
+        void* h = lbl_8062C668(0x58, 0);
+        *(void**)(b - 0x78E8) = fn_803DD628(h, *(void**)(b - 0x78E4));
     }
 }
 
@@ -183,6 +353,26 @@ void fn_802B85A0(Mgr* m)
 void fn_802B85D8(Mgr* m)
 {
     fn_803FED48(lbl_805E0E78, 0, 0, (char*)m + 0x1870C);
+}
+
+void fn_802B8610(Mgr* m)
+{
+    fn_803FEDB8(*(void**)((char*)m + 0x18704), 0);
+    *(void**)((char*)m + 0x18704) = 0;
+    fn_803FEDB8(*(void**)((char*)m + 0x18708), 0);
+    *(void**)((char*)m + 0x18708) = 0;
+}
+
+void fn_802B865C(Mgr* m)
+{
+    fn_803FEDB8(*(void**)((char*)m + 0x18710), 0);
+    *(void**)((char*)m + 0x18710) = 0;
+}
+
+void fn_802B8698(Mgr* m)
+{
+    fn_803FEDB8(*(void**)((char*)m + 0x1870C), 0);
+    *(void**)((char*)m + 0x1870C) = 0;
 }
 
 int fn_802B86D4(Mgr* m, const char* s, int* idx)
