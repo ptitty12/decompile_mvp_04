@@ -39,3 +39,10 @@
   - MISTAKE: cc5d94b (cMatrixChooser setup) reached main with a failing build: the push was gated on a pipe's exit code, not verify.py's. Fixed forward in 9f743e2 (verified against f065b4a). Since then every lead push goes through `tools/team/integrate.py --push` (lead mode), which gates on verify.py per commit.
   - Parked: see docs/NEARMISS.md (cCircleChooser slot 17 at 97.9%, others).
   | Owner: verify.py reads every `#pragma` allowlist entry as a comment (DECISIONS open question). That one-line fix is in tools/verify, which only the owner can edit; W2's 80 SDK functions wait on it.
+- 2026-10-11 | Claude Opus 5.5 (lead) + up to 12 Sonnet/Opus workers | checkpoint | main: 341 -> 2052 functions at 100% since the last entry; every merge verified per commit (skeleton-only setup batches verified at HEAD) | Notes:
+  - All main game .text (0x80003100..0x80340000) is now in units: real TUs where boundaries are known (7 early TUs), code-only units elsewhere (data extern). Unity-TU regions (animation choosers/goals, 0x8000F598..0x8006902C) are split per placeholder file.
+  - Families found: trace wrappers (2 families, ~800 functions, generated), event/chooser/warp class boilerplate, static-dtor (__tcf_N) stubs, setter families. Recipes in docs/PATTERNS.md.
+  - Hard idioms cracked: `>?` clamps, Vec3 copies inside inlines, global/local-alloc priority (docs/PATTERNS.md).
+  - Incidents: a merge tool bug (stale pad name) and duplicate global __tcf_N names each broke the link checksum before push; both caught by the gate, fixed (tools updated), nothing bad reached main.
+  - Not linkable yet: unity-TU parts; real TUs pending linkonce/rodata-pool questions (DECISIONS).
+  | Owner: verify.py allowlist bug still open (DECISIONS); W2 (80 SDK functions) waits on it.
