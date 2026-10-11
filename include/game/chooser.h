@@ -379,6 +379,10 @@ public:
     void fn_8037B458(const char* name, int* field, int a, const char* b);               /* flag */
     void fn_8037B50C(const char* name, float* field, const char* range, int a);         /* float */
     void fn_8037B638(const char* name, int* field, const char* values);                 /* enum list */
+    /* Used by the animation events (animation/events/tu_802A89C8.cpp). */
+    void fn_8037B50C(const char* name, float* field, const char* range, const char* dflt);   /* float, string last argument */
+    void fn_8037B5FC(const char* name, int* field);                                     /* anim state */
+    void fn_8037B674(const char* name, int* field, const char* values, int a);          /* enum list */
 };
 
 #endif /* GAME_CHOOSER_H */
