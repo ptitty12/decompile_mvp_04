@@ -32,6 +32,10 @@ extern Unk80687CB8 lbl_80687CB8;
 extern const char* lbl_8061B3E0[];
 extern const char lbl_805BFA5C[];
 extern const char lbl_805BFA70[];
+inline int AtI(int* p, int i)
+{
+    return p[i];
+}
 extern const char lbl_806508D0[];
 extern const char lbl_805BAF70[];
 extern const char lbl_805BDDEC[];
@@ -315,14 +319,16 @@ int fn_8010EA4C(Scr* self, int a)
     return 1;
 }
 
+/* near-miss: 7 slots, all register naming (retail reloads m168 into r4 and keeps t in r31); AtI() gives retail's r11 index register. */
 int fn_8010EAF4(Scr* self)
 {
     int r27 = 0;
     UnkGame* g = fn_8011AA24(0);
     UnkGameP700* p700 = g->m700;
     int t = fn_8017E030(p700, fn_801059E4(), 0);
+    int e = fn_800B555C()->m570;
     UnkGameP6F8* p = g->m6F8;
-    int x = fn_800B555C()->m570 ^ ((int*)&p->m10->m6C)[self->m168];
+    int x = e ^ AtI(&p->m10->m6C, self->m168);
     int c = x == 0;
     if (self->m144 != 3 && self->m144 != 6 && self->m144 != 7)
         r27 = 1;
@@ -344,7 +350,8 @@ void fn_8010EF84(Scr* self)
 void fn_8010F1E4(Scr* self)
 {
     self->m168 = self->m168 == 0;
-    int v = fn_8011AA24(0)->m6F8->m14->rec[self->m168].m198;
+    UnkPlayerRec* r = fn_8011AA24(0)->m6F8->m14->rec + self->m168;
+    int v = r->m198;
     UnkSub* s = (UnkSub*)((char*)fn_800C8054(self->fn_vslot32(lbl_805BE234, 1)) + 0x98);
     s->fn_vslot20(v, 0);
     fn_8010F2CC(self);
