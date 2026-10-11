@@ -63,9 +63,37 @@ void fn_8035A5C4(void* self, int c)
         fn_80377408(self);
 }
 
-/* TODO fn_8035A5F8 */
+struct Unk8035A5F8 {
+    int m0;
+    int m4;
+    int m8;
+    const void* mC;
+    Unk8035A5F8();
+};
+Unk8035A5F8::Unk8035A5F8()
+{
+    m0 = 0;
+    m4 = 0;
+    mC = lbl_80660638;
+}
 
-/* TODO fn_8035A618 */
+extern "C" /* near-miss: 4 slots. Retail loads lbl_805CFFE8 (f13) before lbl_805CFFE4 (f0) and stores 0x8C/0x94/0x90 in
+   another order; store-order hill climbing and chained assignments stay at 4 */
+void fn_8035A618(Unk8035A618_S* s)
+{
+    s->m0 = 0;
+    s->m78 = lbl_805CFFE8;
+    s->m6C = 0;
+    s->m90 = lbl_805CFFE4;
+    s->m94 = lbl_805CFFE4;
+    s->m8C = lbl_805CFFE4;
+    s->m74 = lbl_805CFFE8;
+    s->m70 = lbl_805CFFE8;
+    s->m7C = lbl_8069429C;
+    s->m68 = lbl_805CFFE8;
+    s->m64 = lbl_805CFFE8;
+    s->m60 = lbl_805CFFE8;
+}
 
 void fn_8035A688(void* self, int c)
 {
@@ -74,9 +102,24 @@ void fn_8035A688(void* self, int c)
         fn_80377408(self);
 }
 
-/* TODO fn_8035A6BC */
+void fn_8035A6BC(Unk8035A618_S* s, float x, float y, float z)
+{
+    s->m0 = 0;
+    s->m60 = x;
+    s->m64 = y;
+    s->m68 = z;
+}
 
-/* TODO fn_8035A6F4 */
+struct Unk8035A6F4_V {
+    int m0;
+    int m4;
+    int m8;
+};
+void fn_8035A6F4(char* s, Unk8035A6F4_V* v)
+{
+    F(int, s, 0) = 0;
+    *(Unk8035A6F4_V*)(s + 0x60) = *v;
+}
 
 /* TODO fn_8035A71C */
 
@@ -87,15 +130,49 @@ void fn_8035A7D8(void* self, int c)
         fn_80377408(self);
 }
 
-/* TODO fn_8035A80C */
+void fn_8035A80C(char* s)
+{
+    F(float, s, 0) = lbl_805CFFEC;
+    fn_803DF74C(s + 0x20);
+    F(int, s, 0x60) = 0;
+}
 
-/* TODO fn_8035A850 */
+struct Unk8035A850 {
+    Unk806055AC m0;
+    Unk806055AC mC;
+    int m18;
+};
+void fn_8035A850(Unk8035A850* s)
+{
+    s->m0 = lbl_806055AC;
+    s->mC = lbl_806055AC;
+    s->m18 = 0;
+}
 
-/* TODO fn_8035A898 */
+void fn_8035A898(char* self, int c)
+{
+    PUT(0x10, lbl_806604C8);
+    void* p = F(void*, self, 4);
+    if (p != 0)
+        fn_80377488(p);
+    void* q = F(void*, self, 8);
+    if (q != 0)
+        fn_80377488(q);
+    if (c & 1)
+        fn_80377408(self);
+}
 
-/* TODO fn_8035A900 */
+extern "C" void fn_8035A900(Unk8035A900* s)
+{
+    for (int i = 0; i < s->cnt - 1; i++) {
+        Unk8035A900_E* e = (Unk8035A900_E*)(i * 0x1c + (int)s->m8);
+        e->m0 = lbl_806055AC;
+        e->mC = lbl_806055AC;
+        e->m18 = 0;
+    }
+}
 
-/* TODO fn_8035A97C */
+int fn_8035A97C(int* s, int v) { return (v + 1) % s[0]; }
 
 void fn_8035A994(void* self, int c)
 {
