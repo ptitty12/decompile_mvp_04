@@ -39,6 +39,7 @@ python tools/match/m2c_draft.py <UNIT_NO_EXT> fn_XXXXXXXX   # first-draft C (m2c
 python tools/match/diff_unit.py <UNIT_NO_EXT>              # rebuild + per-function result
 python tools/match/diff_unit.py <UNIT_NO_EXT> fn_XXXXXXXX  # side-by-side diff of one function
 python tools/verify/verify.py --baseline-ref origin/main   # before every commit; must print VERIFY PASS
+python tools/match/check_literals.py <UNIT_NO_EXT>         # before every commit; must print 0 mismatch(es)
 # If origin/main moved since your branch was cut, use the merge-base instead (other
 # workers' merged units otherwise show as false regressions):
 #   python tools/verify/verify.py --baseline-ref $(git merge-base HEAD origin/main)
@@ -66,9 +67,18 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
 - Skip functions over ~0x400 bytes, and those that need inline-asm-only
   instructions (mftb, mfcr/mtcrf).
 - New types go in `include/game/tu_<first unit addr>.h`.
+- Overlay units (`src/fe/`, `src/db/`): every function definition carries
+  `FE_OVERLAY` / `DB_OVERLAY` from `include/game/overlay.h` (placement only;
+  without it objdiff can't pair the function). Same flags as game code.
 - Commit each unit with its own renames, after VERIFY PASS.
 
 ## Quick tips (details in docs/PATTERNS.md)
+
+- objdiff's 100% ignores relocation targets: a wrong float/string literal, a
+  swapped global or a call to the wrong function still scores 100%.
+  `tools/match/check_literals.py` compares them; a function is only matched
+  when it reports 0 mismatches for your unit. Take literal values from the
+  original data. Strings in the original may contain a literal backslash.
 
 - Call arguments are evaluated left to right. A nested call hoisted into a
   local (`int k = f(); g(base, 5, k);`) moves before the address setup.

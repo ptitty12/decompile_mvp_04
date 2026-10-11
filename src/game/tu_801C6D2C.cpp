@@ -2,3 +2,193 @@
  * Game code, .text 0x801C6D2C-0x801CAFA0 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/tu_801C6D2C.h"
+
+typedef Unk801B7FB0_P P;
+typedef Unk801C16B0_Z Z;
+
+extern "C" {
+float fn_801C6D2C(Z* z, float f);
+float fn_801C66E8(Z* z, float f);
+float fn_801C6A34(Z* z, float f);
+float fn_801C6BB0(Z* z, float f);
+float fn_801C8170(Z* z);
+void fn_801C7F38(Z* z, float f);
+void fn_801CB8B0(Z* z, float f);
+float fn_801C8240(Z* z);
+void fn_801C8014(Z* z, float f);
+void fn_803DF4E4(void* out, float angle, float x, float y, float z);
+void fn_803DED40(void* m, void* in, void* out);
+float fn_801C8C38(Z* z);
+float fn_801C8B7C(Z* z);
+float fn_801C8EFC(Z* z);
+float fn_801C8CF4(Z* z);
+float fn_801C8AC0(Z* z);
+float fn_801C8A04(Z* z);
+float fn_801C8DB0(Z* z);
+void fn_801C93BC(Z* z, float a, float b, float c, float d);
+float fn_801C7964(Z* z);
+float fn_801C5D74(Z* z);
+float fn_801C72FC(Z* z, float f, float a, float b);
+P* fn_801A4B34(P* ctx);
+float fn_801C7BF0(Z* z, float f);
+float fn_801C7D90(Z* z, float f);
+Vec3 fn_801CE6E4(Z* z, float a, float b, float c);
+}
+struct Unk801C6D2C_G {
+    char pad0[0x60];
+    float m60;
+    float m64;
+    char pad68[0x380 - 0x68];
+    float m380;
+    float m384;
+    float m388;
+    float m38C;
+};
+extern Unk801C6D2C_G lbl_8068C420;
+extern int lbl_80620358;
+extern float lbl_8062035C;
+float fn_801CD068(Z* z);
+extern int lbl_80620378;
+
+/* The callees' float result is left in f1 (a `return` per arm changes the branch layout). */
+extern "C" float fn_801C6D2C(Z* z, float f)
+{
+    if (!(f <= 0.67f))
+        fn_801C66E8(z, f);
+    else if (!(f > 0.33f))
+        fn_801C6BB0(z, f);
+    else
+        fn_801C6A34(z, f);
+}
+
+extern "C" void fn_801C7F38(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    float a = fn_801C7964(z);
+    float b = fn_801C7BF0(z, f);
+    float c = fn_801C7D90(z, f);
+    lbl_8068C420.m380 = a;
+    lbl_8068C420.m384 = b;
+    lbl_8068C420.m38C = c;
+    z->m1B0 = fn_801CE6E4(z, b, a, c);
+}
+
+/* near-miss (81 vs 80 instructions): retail keeps p in r3 and the flag in r0. */
+extern "C" void fn_801C8014(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    float a = fn_801C5D74(z);
+    float b = fn_801C6D2C(z, f);
+    float c = fn_801C72FC(z, f, b, a);
+    P* p = fn_801A4B34(z->m204);
+    if (z->m204->m6F4 == 0) {
+        int ok;
+        if (lbl_80620378 != 0)
+            ok = 1;
+        else
+            ok = p->mB3C.f;
+        if (ok) {
+            a = 45.0f;
+            b = -5.0f;
+            c = 15.0f;
+        }
+    }
+    lbl_8068C420.m380 = a;
+    lbl_8068C420.m38C = c;
+    lbl_8068C420.m384 = b;
+    z->m1B0 = fn_801CE6E4(z, b, a, c);
+}
+
+extern "C" int fn_801C8154(Z* z) { return z->m1DC[0] > 0.0f; }
+
+extern "C" float fn_801C8170(Z* z)
+{
+    float a = fn_801CD068(z);
+    float b = z->m1DC[0];
+    float c = z->m1DC[3];
+    float t = a * 0.4f + b * 0.4f + c * 0.2f;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    lbl_8068C420.m64 = t;
+    if (lbl_80620358 != 0)
+        t = lbl_8062035C;
+    lbl_8068C420.m60 = t;
+    return t;
+}
+
+extern "C" void fn_801C891C(void* self, void* q, const Vec3* axis, float angle)
+{
+    char m[0x40];
+    fn_803DF4E4(m, angle, axis->x, axis->y, axis->z);
+    fn_803DED40(m, q, q);
+}
+
+extern "C" int fn_801C8974(Z* z)
+{
+    return RandF(z->m204->m554, 1.0f, 0x1034) > 0.5f;
+}
+
+extern "C" float fn_801C8A04(Z* z)
+{
+    float lo = 44.0f;
+    float hi = 52.0f;
+    return Lerp(lo, hi, RandF(z->m204->m554, 1.0f, 0x1060));
+}
+
+extern "C" float fn_801C8FB8(Z* z)
+{
+    float r = 0.0f;
+    switch (z->m130) {
+    case 0:
+        if (z->m124 == 2 || z->m128 == 5)
+            r = fn_801C8C38(z);
+        else
+            r = fn_801C8B7C(z);
+        break;
+    case 1:
+        r = fn_801C8EFC(z);
+        break;
+    case 2:
+        r = fn_801C8CF4(z);
+        break;
+    case 3:
+        if (z->m124 == 2 || z->m128 == 5)
+            r = fn_801C8AC0(z);
+        else
+            r = fn_801C8A04(z);
+        break;
+    case 4:
+        r = fn_801C8DB0(z);
+        break;
+    case 5:
+        r = 100.0f;
+        break;
+    default:
+        r = 100.0f;
+        break;
+    }
+    return r;
+}
+
+/* near-miss: two instructions swapped (retail stores the RandF scale slot before reloading x). */
+extern "C" void fn_801C90AC(Z* z)
+{
+    float x = fn_801C8FB8(z);
+    const float a = 43.0f;
+    const float b = 25.0f;
+    fn_801C93BC(z, x, RandF(z->m204->m554, 1.0f, 0x10CC), a, b);
+}
+
+extern "C" void fn_801C97AC(Z* z)
+{
+    float t = fn_801C8170(z);
+    fn_801C7F38(z, t);
+    fn_801CB8B0(z, t);
+}
+
+extern "C" void fn_801C97F4(Z* z)
+{
+    float t = fn_801C8240(z);
+    fn_801C8014(z, t);
+    fn_801CB8B0(z, t);
+}

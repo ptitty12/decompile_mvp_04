@@ -575,8 +575,8 @@ void fn_800449D8()
     int i;
     for (i = 0; i < 0x12; i++)
         lbl_806E0270[i] = -1;
-    lbl_806EF9AC = 0;
     lbl_806EF9A8 = 0;
+    lbl_806EF9AC = 0;
     lbl_806EF9B0 = 0x738;
 }
 

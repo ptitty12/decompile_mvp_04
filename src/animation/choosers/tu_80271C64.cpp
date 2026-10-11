@@ -8,7 +8,7 @@
  * cPitchChooser: vtable 0x806621F8 slot 3 (0x802ACA14) returns the pointer at
  * 0x8061E660 -> "cPitchChooser".
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 /* Class name; read by cPitchChooser's vtable slot 3 (0x802ACA14). */
 const char* lbl_8061E660 = "cPitchChooser";
@@ -18,7 +18,7 @@ unsigned int lbl_8061E668 = 0;    /* hash of "Stand" */
 /* Global (not a literal): 0x802A7D6C in another unit loads this address. */
 extern const char lbl_805DC6DC[];
 
-class cPitchChooser : public Unk8037B3E8 {
+class cPitchChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -35,7 +35,7 @@ public:
     Unk80384F28 m8;            /* "pitchanimpairlist"/"pitchanimpairs" */
 };
 
-cPitchChooser::cPitchChooser() : Unk8037B3E8(lbl_8061E660)
+cPitchChooser::cPitchChooser() : Unk80362C2C(lbl_8061E660)
 {
     if (!lbl_8061E664 || !lbl_8061E668) {
         lbl_8061E664 = fn_80378568("Stretch", 7);

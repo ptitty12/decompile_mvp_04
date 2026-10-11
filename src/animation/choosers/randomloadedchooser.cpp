@@ -12,7 +12,7 @@
  * randomchooser.cpp (ctor 0x8026FEB8, dtor 0x8026FF08); "a" and "weights"
  * (0x805DC538, 0x805DC53C) belong to that unit too.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 extern unsigned int lbl_8068D580;         /* cRandomLoaded type hash (also read by 0x802AA7A4, 0x802ACB40) */
 extern Unk802AE984_Mgr* lbl_8061E978;
@@ -30,7 +30,7 @@ struct Unk8027985C_Pick {
 /* Class name; read by cRandomLoaded's vtable slot 3 (0x802ACB34). */
 const char* lbl_8061E698 = "cRandomLoaded";
 
-class cRandomLoaded : public Unk8037B3E8 {
+class cRandomLoaded : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -46,7 +46,7 @@ public:
     Unk8026FEB8 m4;            /* "a"/"weights" */
 };
 
-cRandomLoaded::cRandomLoaded() : Unk8037B3E8(lbl_8068D580)
+cRandomLoaded::cRandomLoaded() : Unk80362C2C(lbl_8068D580)
 {
 }
 

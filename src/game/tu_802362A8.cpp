@@ -2,3 +2,146 @@
  * Game code, .text 0x802362A8-0x8023A6C8 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+
+#include "game/tu_802362A8.h"
+
+extern const char lbl_805D7380[];
+extern const char lbl_805D7384[];
+extern const char lbl_805D7394[];
+extern const char lbl_805D73A0[];
+extern const char lbl_805D73AC[];
+extern const char lbl_805D73B8[];
+extern const char lbl_805D73BC[];
+extern const char lbl_805D73CC[];
+extern const char lbl_805D73D0[];
+extern const char lbl_805D73E8[];
+extern const char lbl_805D7400[];
+extern const char lbl_805D740C[];
+extern const char lbl_805D7428[];
+extern const char lbl_805D7440[];
+extern const char lbl_805D7458[];
+extern const char lbl_805D7470[];
+extern const char lbl_805D748C[];
+extern const char lbl_805D74A4[];
+extern const char lbl_805D74C0[];
+extern const char lbl_805D74D8[];
+extern const char lbl_805D74F0[];
+extern const char lbl_805D7508[];
+extern const char lbl_805D7524[];
+extern const char lbl_805D753C[];
+extern const char lbl_805D7558[];
+extern const char lbl_805D7570[];
+extern const char lbl_805D7588[];
+extern const char lbl_805D75A0[];
+extern const char lbl_805D75BC[];
+extern const char lbl_805D75D4[];
+extern const char lbl_805D75F0[];
+extern const char lbl_805D7608[];
+extern const char lbl_805D7620[];
+extern const char lbl_805D7638[];
+extern const char lbl_805D7644[];
+extern const char lbl_805D7660[];
+extern const char lbl_805D7684[];
+extern const char lbl_805D7698[];
+extern int lbl_8068CA8C;
+extern const float lbl_805D7C18;
+
+cPitcherTunables::cPitcherTunables() : Unk8037B3E8(0x1011A855)
+{
+}
+
+void cPitcherTunables::fn_vslot2()
+{
+    fn_8037B7E4(lbl_805D7380);
+    fn_8037B50C(lbl_805D7384, &m24, lbl_805D7394, 0);
+    fn_8037B50C(lbl_805D73A0, &m1C, lbl_805D73AC, lbl_805D73B8);
+    fn_8037B50C(lbl_805D73BC, &m20, lbl_805D73AC, lbl_805D73CC);
+    fn_8037B7E8(lbl_805D73D0);
+    fn_8037B50C(lbl_805D73E8, &m28, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D740C, &m2C, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7428, &m30, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7440, &m34, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7458, &m68, lbl_805D7400, 0);
+    fn_8037B830(lbl_805D73D0);
+    fn_8037B7E8(lbl_805D7470);
+    fn_8037B50C(lbl_805D748C, &m38, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D74A4, &m3C, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D74C0, &m40, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D74D8, &m44, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D74F0, &m6C, lbl_805D7400, 0);
+    fn_8037B830(lbl_805D7470);
+    fn_8037B7E8(lbl_805D7508);
+    fn_8037B50C(lbl_805D7524, &m48, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D753C, &m4C, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7558, &m50, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7570, &m54, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7588, &m70, lbl_805D7400, 0);
+    fn_8037B830(lbl_805D7508);
+    fn_8037B7E8(lbl_805D75A0);
+    fn_8037B50C(lbl_805D75BC, &m58, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D75D4, &m5C, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D75F0, &m60, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7608, &m64, lbl_805D7400, 0);
+    fn_8037B50C(lbl_805D7620, &m74, lbl_805D7400, 0);
+    fn_8037B830(lbl_805D75A0);
+    fn_8037B728(lbl_805D7638, lbl_805D7644, &m4, (int)lbl_805D7660);
+    fn_8037B728(lbl_805D7638, lbl_805D7684, &m10, (int)lbl_805D7698);
+}
+
+Unk8037B3E8* cPitcherTunables::fn_vslot5()
+{
+    return new (lbl_806EF9B4) cPitcherTunables;
+}
+
+void cPitcherTunables::fn_vslot8() {}
+
+void fn_802366B0()
+{
+    fn_8037C7FC()->fn_8037CE98(0x1011A855, lbl_8068CA8C, 0);
+}
+
+void fn_80236B8C() {}
+
+float fn_802398C8()
+{
+    return lbl_805D7C18;
+}
+
+/* near-miss: retail presets li r3,0 and ends in a shared 'li r3,0; blr'; case 6 then returns through beqlr.
+   Tried return-chain, int r preset (39 vs 41 insns) and empty-case-6 forms */
+int fn_80236F34(void* p, int k)
+{
+    switch (k) {
+    case 2:
+        return 5;
+    case 3:
+        return 1;
+    case 4:
+        return 7;
+    case 5:
+        return 3;
+    case 6:
+        return 0;
+    case 7:
+        return 4;
+    case 8:
+        return 6;
+    case 9:
+        return 2;
+    case 10:
+        return 8;
+    }
+    return 0;
+}
+
+void Unk802362A8_Slots::fn_80237114()
+{
+    for (int i = 0; i < 11; i++) {
+        m0[i] = -1;
+        m2C[i] = -1;
+        m58[i] = -1;
+    }
+    m84 = 0;
+    m88 = 0;
+    m8C = 0;
+}

@@ -11,7 +11,7 @@
  *
  * Not attempted (tier C, 10.5 KB): fn_802735F4, the chooser's vtable slot 17.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 float fn_804028E4(float x);               /* square root */
 float fn_8041171C(float x);
@@ -268,7 +268,7 @@ int Unk80272B20::fn_80272E28(Unk80270BA0_X* x, float a, Unk80270BA0_Result* out,
 /* Class name; read by cLinearChooser's vtable slot 3 (0x802ACAE4). */
 const char* lbl_8061E670 = "cLinearChooser";
 
-class cLinearChooser : public Unk8037B3E8 {
+class cLinearChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -288,7 +288,7 @@ public:
     Unk80272B20 mC;            /* "matrix1dx"/"scale" */
 };
 
-cLinearChooser::cLinearChooser() : Unk8037B3E8(0xF8EB0036u)
+cLinearChooser::cLinearChooser() : Unk80362C2C(0xF8EB0036u)
 {
     m4 = 0;
     m8 = 1;

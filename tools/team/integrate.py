@@ -12,7 +12,9 @@ Steps:
    configure.py are append-style Object lists and are resolved by keeping both
    sides; any other conflict aborts that branch's merge and it is reported.
 3. Build, check main.dol against config/GV4E69/build.sha1, then run
-   tools/verify/verify.py on every first-parent commit against its parent.
+   tools/verify/verify.py on every first-parent commit against its parent,
+   and tools/match/check_literals.py: a commit may not add literal or target
+   mismatches (functions objdiff scores 100% that load the wrong data).
 4. With --push, and only if everything passed and origin/main has not moved,
    push HEAD to main.
 
@@ -80,6 +82,13 @@ def verify(baseline: str) -> bool:
     tail = [l for l in r.stdout.splitlines() if l.startswith(("VERIFY", "regressions", "  "))][-6:]
     print("    " + "\n    ".join(tail))
     return r.returncode == 0
+
+
+def literal_mismatches() -> set:
+    """(unit, function) pairs check_literals.py reports at the current build."""
+    r = run(sys.executable, "tools/match/check_literals.py", check=False)
+    return {tuple(l.split()[:2]) for l in r.stdout.splitlines()
+            if l and not l.startswith(("checked", "unresolved"))}
 
 
 def main() -> None:
@@ -161,10 +170,19 @@ def finish(base: str, branch: str, push: bool, head_only: bool = False) -> None:
         print(f"  head-only: {len(commits)} commits, verifying HEAD against {base[:7]}")
         ok = verify(base)
         commits = []
+    if commits:
+        git("checkout", "-q", "-f", "--detach", base)
+        run("ninja", check=False)
+        prev = literal_mismatches()
     for c in commits:
         git("checkout", "-q", "-f", "--detach", c)  # -f: content was checked clean at start
         print(f"  {git('log', '--oneline', '-1', c)[:70]}")
         ok = verify(f"{c}~1") and ok
+        cur = literal_mismatches()
+        for u, f in sorted(cur - prev):
+            print(f"    NEW literal/target mismatch: {u} {f}")
+            ok = False
+        prev = cur
     git("checkout", "-q", "-f", branch)
     if git("rev-parse", "HEAD") != head:
         raise SystemExit("HEAD moved during verification")
@@ -176,7 +194,14 @@ def finish(base: str, branch: str, push: bool, head_only: bool = False) -> None:
     if push:
         git("fetch", "-q", "origin")
         if git("rev-parse", "origin/main") != base:
-            raise SystemExit("origin/main moved; rerun to rebase")
+            # The progress bot pushes docs/progress/ cards after every merge.
+            # Those files don't affect the build, so rebase over them without
+            # re-verifying; anything else means rerun.
+            moved = git("diff", "--name-only", base, "origin/main").splitlines()
+            if not moved or not all(f.startswith("docs/progress/") for f in moved):
+                raise SystemExit("origin/main moved; rerun to rebase")
+            git("rebase", "-q", "--rebase-merges", "origin/main")
+            print(f"rebased over {len(moved)} progress-card file(s)")
         r = run("git", "push", "origin", "HEAD:main", check=False)
         print((r.stdout + r.stderr).strip())
         if r.returncode != 0:

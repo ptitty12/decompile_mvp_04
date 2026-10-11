@@ -9,7 +9,7 @@
  * 0x806621D8, ctor 0x80271F14) is defined first in the file: the helper's
  * float constants come before the class-name string in .rodata.
  */
-#include "game/chooser.h"
+#include "game/chooser_base.h"
 
 /* One parsed (hash, id, value) triple. */
 struct Unk80271F14_Entry {
@@ -186,7 +186,7 @@ int Unk80271F14::fn_802721E0(Unk80270BA0_X* x, float value, Unk80270BA0_Result* 
 
 const char* lbl_8061E66C = "cCircleChooser";
 
-class cCircleChooser : public Unk8037B3E8 {
+class cCircleChooser : public Unk80362C2C {
 public:
     /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
      * which makes g++ 2.95 emit this class's vtable there, as in retail. */
@@ -205,7 +205,7 @@ public:
     Unk80271F14 mC;            /* "matrix2pi"/"angles" */
 };
 
-cCircleChooser::cCircleChooser() : Unk8037B3E8(lbl_8061E66C)
+cCircleChooser::cCircleChooser() : Unk80362C2C(lbl_8061E66C)
 {
     m4 = 0;
 }

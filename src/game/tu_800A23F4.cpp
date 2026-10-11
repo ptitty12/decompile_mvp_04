@@ -690,7 +690,6 @@ extern "C" Unk800A3AB0_Q* fn_800A3B7C(Unk800A3AB0* p)
 
 extern "C" void fn_800A3DF4() {}
 
-/* near-miss (27 of 29 slots): retail recomputes &sp8 per use, ours keeps it in a saved register */
 struct Unk800A3E6C {
     char pad0[0x48];
     void* m48;
@@ -710,11 +709,19 @@ struct Unk800A42A4 {
 extern "C" void fn_800A3E6C(Unk800A3E6C* p);
 extern "C" void fn_800A42A4(Unk800A42A4* p, int v);
 
+/* Polymorphic 8-byte object built by fn_80353218 (stores m0 = 0 and the vptr
+ * lbl_8064B718 at +4, g++ 2.95 layout). A class with virtuals lives in memory
+ * (no ADDRESSOF pseudo), so retail recomputes `addi rX,r1,8` for each use. */
+struct Unk80353218 {
+    int m0;
+    Unk80353218(); /* fn_80353218 */
+    virtual void vf0();
+};
+
 extern "C" void fn_800A3DF8(Unk800A3E6C* o, int a, int b, int c, int d)
 {
-    char sp8[8];
-    fn_80353218(sp8);
-    fn_80072E90(lbl_8061930C, a, b, c, d, sp8);
+    Unk80353218 sp8;
+    fn_80072E90(lbl_8061930C, a, b, c, d, &sp8);
     fn_800A42A4((Unk800A42A4*)o, c);
     fn_800A3E6C(o);
 }

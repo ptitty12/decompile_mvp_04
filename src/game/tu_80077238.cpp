@@ -40,7 +40,8 @@ struct Unk80079240_Obj {
 };
 
 /* The seven roster-walk functions fn_80077238..fn_80077934 differ only in the handle (+0x17C /
- * +0x1C0) and the call; each is 1 slot off (lwzx operand order of the id load). */
+ * +0x1C0) and the call. The id load needs the byte offset in its own variable: `m0[j]` (or
+ * `m0 + j * 4`) is canonicalised to (plus (ashift j 2) m0) and gives `lwzx rD,off,base`. */
 int Unk8007A4DC_Screen::fn_80077238(int a, int b)
 {
     Unk805A19C8_Roster* r = m58;
@@ -49,7 +50,9 @@ int Unk8007A4DC_Screen::fn_80077238(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
         if (f == 1)
@@ -66,7 +69,9 @@ int Unk8007A4DC_Screen::fn_80077320(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
         if (f == 1)
@@ -83,7 +88,9 @@ int Unk8007A4DC_Screen::fn_80077404(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
         if (f == 1)
@@ -100,7 +107,9 @@ int Unk8007A4DC_Screen::fn_80077684(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
         if (f == 1)
@@ -117,7 +126,9 @@ int Unk8007A4DC_Screen::fn_8007776C(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
         if (f == 1)
@@ -134,7 +145,9 @@ int Unk8007A4DC_Screen::fn_80077850(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
         if (f == 1)
@@ -151,7 +164,9 @@ int Unk8007A4DC_Screen::fn_80077934(int a, int b)
     unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
     for (; i < cnt; i++) {
         unsigned char j = i;
-        int id = r->m10[fn_805A19C8(r, a)].m0[j];
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
         int x;
         int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
         if (f == 1)
@@ -263,16 +278,14 @@ void Unk8007A4DC_Screen::fn_80078C04(int a, int* o1, int* o2, int* o3, int* o4)
     }
 }
 
-/* near-miss: 3 slots; retail evaluates `spC == 6` through cr7 (cmpwi cr7 / mfcr / extrwi),
- * we get xori/subfic/adde. */
 int Unk8007A4DC_Screen::fn_80078D00(int a)
 {
-    int sp14 = 0;
     int sp8 = 0;
     int spC = 0;
     int sp10 = 0;
+    int sp14 = 0;
     fn_80078AE0(a, &sp8, &spC, &sp10, &sp14);
-    int r = spC == 6;
+    int r = spC > 6;
     if (sp14 <= 9)
         r = 0;
     int i = 0;

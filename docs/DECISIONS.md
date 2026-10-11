@@ -65,9 +65,28 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-11 | **Early game TUs (0x800034A0..0x8000F598) use the game flags** *[lead, owner authority]*: -Os (a factory loop only matches at -Os; -O1/-O2 fail), -G0 (without it a global loads via r13), -ffloat-store (float-parameter spills). Evidence table in the tu_80008540 merge (031d2d6). | Confirms cflags_game for real standalone TUs, not only the unity TU. | W12 report
 - 2026-10-11 | **Known linking issue for real TUs (not blocking matching):** ProDG g++ emits implicit dtors and vtables into .gnu.linkonce.* sections; retail keeps those dtors in the TU's .text (in reverse order) and vtables in its data. `-fno-weak` moves them into .text/.rodata but in a different order. To be solved before the early TUs can link (candidate: link-order/ldscript handling of linkonce sections, which is a protected file). | Recorded so linking work starts from it. | W12 report on tu_80008540
+- 2026-10-11 | **0x803401A8..0x803663B0 is game code (`cflags_game`)** *[lead, owner authority]*. objdiff probes:
+  - fn_8034151C, fn_80360EF8 and fn_803622B0 score 100% with the game flags.
+  - With `cflags_ealib` they score 60.3%, 54.6% and 48.4%: -O2 hoists the loop invariants that retail recomputes inside the loop.
+  - Exception: fn_80365C10 (0x7A0 bytes) sits alone after a 0xC-byte alignment gap at 0x80365C04, just before ealib/tu_803663B0. That gap marks an object boundary, so it got its own unit, `game/tu_80365C10`. Its flags are not confirmed.
+
+  | Region split into 38 code-only units for range workers. | setup commits on work/setup-tail
+- 2026-10-11 | **Code overlay units** *[lead, owner authority]*:
+  - **Declaration.** Units are declared with the split input section: `fe/tu_X.cpp: .feoverlay start:.. end:..` and `db/tu_X.cpp: .dboverlay ...`. They live in the configure.py libs `fe_overlay` and `db_overlay`, which use `cflags_game`.
+  - **Section attribute.** objdiff pairs functions only within sections of the same name. A function compiled into `.text` stays unpaired (no score) against the `.feoverlay` target, and `-c combineTextSections=true` doesn't change that. GCC 2.95/ProDG has no flag that renames the text section; the cc1plus and ngccc option strings were searched. So every function defined in `src/fe/` or `src/db/` carries `FE_OVERLAY` or `DB_OVERLAY` from `include/game/overlay.h`, which expands to `__attribute__((section(".feoverlay")))` or `.dboverlay`. It only sets placement and changes no instruction. It is also what the protected ldscript (`*(.feoverlay)`, `*(.dboverlay)`) needs to link a matched overlay object.
+  - **Flags.** The overlays use the game flags: retail spills and reloads float parameters, which is the `-ffloat-store` tell.
+    - fn_804BC414 (fe): 100% with the game flags, 32.5% with `cflags_ealib`.
+    - fn_8052A3C0 (db): 100% vs 71.8%.
+    - fn_8047D1AC, fn_8043FDC0 and fn_8043FE44 (fe): 100%.
+  - **Limit.** Compiler-generated functions (implicit dtors, out-of-line inlines, thunks) can't take the attribute. They land in `.text` or `.gnu.linkonce.*` and won't pair; same family as the linkonce issue above.
+  - **Link-order evidence.** The dtk write-back puts the overlay units at the top of splits.txt. The last fe unit (.ctors 0x805A2C40) and the last db unit (.ctors 0x805A2C44) sort between game/tu_803401A8 (0x805A2C3C) and ealib/tu_803663B0 (0x805A2C48). So in the retail link, the overlays' final TUs came between those two objects.
+
+  | 77 fe and 41 db code-only units for range workers. Build OK; main.dol == retail. | probe on work/setup-tail
 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
 - 2026-10-11 | **verify.py ignores every `#pragma` line in its allowlist** (it treats lines starting with `#` as comments). Owner's approved pragmas therefore have no effect. One-line fix: treat lines starting with `#pragma` as entries. The exact PowerShell command was given to the owner in chat. Options: apply / leave (W2 can't merge).
 
+
+- 2026-10-11 | **verify.py's function scores ignore relocation targets** (objdiff report `functionRelocDiffs=none`, the dtk-template default in configure.py `progress_report_args`). A function whose float literal, string, global or call target differs from retail still scores 100%. Example: changing `211.2f` to `211.3f` in fn_8018EB14 left it at 100%. On main, `tools/match/check_literals.py` (lead-side, outside tools/verify) found 127 such references in 104 "matched" functions, 90 of them from one misnamed dtor symbol. | The lead can't change verification config. Meanwhile check_literals.py gates every integration (integrate.py refuses commits that add mismatches), and a worker is fixing the existing ones. | Options: (a) keep the lead-side gate (current); (b) make verify stricter: `--config functionRelocDiffs=data_value` in configure.py fails ~3,000 functions today, because extern symbol names still differ from retail (`fn_80377408` vs `__builtin_delete`), so it would need name alignment first; (c) teach verify.py the address-based check that check_literals.py does.
