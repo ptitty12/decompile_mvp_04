@@ -97,6 +97,8 @@ extern char lbl_806604C8[];
 extern Unk80181140_F lbl_805CE394;
 
 extern "C" {
+void fn_8019D03C(int a, void* ctx, void* o, int b, int c, int d, int e, int f, int g,
+    float f0, float f1, float f2, float f3, float f4);
 void fn_80377488(void* p);
 void fn_80377408(void* p);
 void fn_8019755C(Unk8019755C_Data* self, int chrg);

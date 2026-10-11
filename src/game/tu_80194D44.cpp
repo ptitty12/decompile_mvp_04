@@ -98,6 +98,18 @@ extern "C" int fn_80195FD8(Unk80194D44_O* o, float t)
     return 0;
 }
 
+//@801974C4
+/* near-miss: 38 vs 37 insns: same call and argument shuffle, but retail copies four of the
+ * incoming argument registers into r27..r30 up front (an extra saved register and moves via
+ * r3) where this keeps them in volatile registers. The float spills match. */
+extern "C" int fn_801974C4(int a0, Unk80188698** pp, int a2, int a3, int a4, int a5, int a6, int a7,
+    float f0, float f1, float f2, float f3, float f4)
+{
+    Unk80188698* o = *pp;
+    fn_8019D03C(a0, *(void**)((char*)o->m44C + 0x6C8), o, a2, a3, a4, a5, a6, a7, f0, f1, f2, f3, f4);
+    return a0;
+}
+
 //@8019755C
 extern "C" void fn_8019755C(Unk8019755C_Data* self, int chrg)
 {
