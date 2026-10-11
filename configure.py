@@ -352,6 +352,11 @@ config.warn_missing_source = False
 # SN's libgcc (GCC 2.95.3 runtime as shipped with ProDG). See docs/DECISIONS.md.
 cflags_libgcc = ["-O2", "-G0"]
 
+# Game code (MVP Baseball 2005, EA Canada): ProDG 3.9.3. -G0: game .text never
+# uses r13 small-data addressing. C++: no RTTI (empty vtable RTTI slots) and no
+# exception tables in the binary. See docs/DECISIONS.md.
+cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
+
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
@@ -375,6 +380,15 @@ config.libs = [
             # Code-matched, not linkable: OS.c's .sdata/.data (__OSVersion, OSInit strings)
             # and original-assembly functions must be reproduced before it can link.
             Object(NonMatching, "dolphin/os/OS.c"),
+        ],
+    },
+    {
+        "lib": "game",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_game,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
         ],
     },
 ]
