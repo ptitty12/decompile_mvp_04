@@ -18,6 +18,15 @@ extern const char lbl_805E270C[];
 extern const void* lbl_806646F0[];
 extern int lbl_8061EDB8;
 extern float lbl_8061EDE4;
+extern char lbl_805E4284[];
+extern char lbl_805E4298[];
+void* fn_802CF168(void* name);
+
+inline void CopyF(float* dst, float v)
+{
+    *dst = v;
+}
+
 extern float lbl_8061EDE8;
 extern float lbl_8061EDEC;
 extern const void* lbl_80664528[];
@@ -35,6 +44,12 @@ void fn_8040B830(char* dst, const char* src, int n);
 unsigned int fn_80378568(const char* token, int len);
 void fn_802D6008(Unk802D58E8* o, int k, int a, int b);
 void fn_802D5D24(Unk802D58E8* o, int* p);
+void fn_802D3F38(Unk802D58E8* o, int a, int b, int c);
+void fn_802D41C0(Unk802D58E8* o, int key, int, int);
+void fn_802D42A4(Unk802D58E8* o, int key, int, int);
+void fn_802D4360(Unk802D58E8* o, int key, int, int);
+void fn_802D4280(Unk802D58E8* o, int, int, int);
+Unk802D5B64_View* fn_801A04A8(void* owner, int k);
 int fn_801A2034(Unk802D58E8_Owner* ow, int f);
 
 void fn_8037B424(void* p, int c);
@@ -49,9 +64,32 @@ const char* fn_802D4CBC();
 void fn_802D4DE8(Unk802D58E8* o, int k);
 void fn_802D4CC8(Unk802D58E8* o, int k);
 void fn_802D4434(Unk802D58E8* o, int k);
+void fn_802D3E44(Unk802D58E8* o, int a, int b, int c)
+{
+    if (fn_801A04A8(o->m60, 5) != o->m64) {
+        switch (o->m60->m6F4) {
+        case 0:
+            fn_802D3F38(o, a, b, c);
+            break;
+        case 3:
+            fn_802D4360(o, a, b, c);
+            break;
+        case 4:
+            fn_802D42A4(o, a, b, c);
+            break;
+        case 9:
+            fn_802D4280(o, a, b, c);
+            break;
+        default:
+            fn_802D41C0(o, a, b, c);
+            break;
+        }
+    }
+}
+
 enum KeyE { KeyE_Neg = -1, KeyE_Lo = 0x2B, KeyE_Hi = 0x6A };
 
-void fn_802D41C0(Unk802D58E8* o, int key)
+void fn_802D41C0(Unk802D58E8* o, int key, int, int)
 {
     Unk802D58E8_Owner* ow = o->m60;
     switch ((KeyE)key) {
@@ -77,12 +115,12 @@ void fn_802D41C0(Unk802D58E8* o, int key)
     }
 }
 
-void fn_802D4280(Unk802D58E8* o)
+void fn_802D4280(Unk802D58E8* o, int, int, int)
 {
     fn_802D58E8(o, 1);
 }
 
-void fn_802D42A4(Unk802D58E8* o, int key)
+void fn_802D42A4(Unk802D58E8* o, int key, int, int)
 {
     Unk802D58E8_Owner* ow = o->m60;
     switch ((KeyE)key) {
@@ -108,7 +146,7 @@ void fn_802D42A4(Unk802D58E8* o, int key)
     }
 }
 
-void fn_802D4360(Unk802D58E8* o, int key)
+void fn_802D4360(Unk802D58E8* o, int key, int, int)
 {
     Unk802D58E8_Owner* ow = o->m60;
     switch ((KeyE)key) {
@@ -302,6 +340,16 @@ void fn_802D5D24(Unk802D58E8* o, int* p)
         return;
     }
     *p = 5;
+}
+
+void fn_802D5F74(Unk802D5F74* o)
+{
+    o->m164 = (Unk802D5F74_Rec*)fn_802CF168(lbl_805E4284);
+    Unk802D5F74_Rec* b = (Unk802D5F74_Rec*)fn_802CF168(lbl_805E4298);
+    CopyF(&o->m164->m70, b->m70);
+    CopyF(&o->m164->m74, b->m74);
+    CopyF(&o->m164->m5C, b->m5C);
+    fn_802CBDBC(o->m6C, (int)o->m164, 1, 0);
 }
 
 void fn_802D61AC(Unk802D58E8* o, int k, int a)
