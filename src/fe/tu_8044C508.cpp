@@ -70,9 +70,9 @@ extern "C" FE_OVERLAY void fn_8044D9E0(FeScr5* self)
         fn_801251CC(self->m170, 0, 0x10, -1);
 }
 
-extern "C" FE_OVERLAY void fn_8044DA44(FeScr5* self)
+extern "C" FE_OVERLAY void fn_8044DA44(FeScr5* self, int a)
 {
-    fn_804454CC(self);
+    fn_804454CC(self, a);
     ((FeObj1*)self->m16C)->v14(0);
 }
 
@@ -95,6 +95,16 @@ extern "C" FE_OVERLAY void fn_8044DC18(FeScr5* self)
     fn_8044DCAC(self, self->m14C);
 }
 
+extern "C" FE_OVERLAY void fn_8044DDFC(FeScr5* self)
+{
+    char buf[0x18];
+    int a = 0;
+    int b = 0;
+    fn_8056AF84(lbl_80619948->m28, self->m14C, self->m144, &a, &b);
+    fn_80403DE4(buf, fn_80090880(lbl_8061977C, 0x2335), a, b);
+    ((FeObj1*)fn_800C8040(fn_800C8044(((FeObj*)self)->v32("RIGHTSIDE", 1))->v32("WLNUMBER", 1)))->v28((int)buf);
+}
+
 extern "C" FE_OVERLAY void fn_8044DEE4(FeScr5* self, int a)
 {
     FeSub1* s = (FeSub1*)&self->m168->m98;
@@ -115,6 +125,17 @@ extern "C" FE_OVERLAY int fn_8044E08C(int a, unsigned* p)
     if (hi == d[0] && ((v >> 16) & 0xFF) >= d[1])
         return 0;
     return 1;
+}
+
+/* near-miss: same calls; retail loads self->m140 into r3 for the final v86 vcall and orders the stack-arg stores differently (18 slots) */
+extern "C" FE_OVERLAY void fn_8044E210(FeScr5* self, int a)
+{
+    if (a != 0) {
+        fn_80131F34(self->m140, self, (FeCb)fn_8044E304, fn_8044E7C4, 0, 4, -1, 1, 0x1903, 0x1906, 0x1902, 0x26DF, 0, 0);
+    } else {
+        fn_80131F34(self->m140, self, (FeCb)fn_8044E398, fn_8044E7C4, 0, 2, -1, 1, 0x1903, 0x26DF, 0, 0, 0, 0);
+        self->m140->v86();
+    }
 }
 
 extern "C" FE_OVERLAY void fn_8044E304(int a, FeObj* o)
@@ -188,6 +209,13 @@ extern "C" FE_OVERLAY int fn_8044F188(FeW138* self)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_8044F1C4(void* self)
+{
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+    fn_80131F34(p, self, (FeCb)fn_8044F284, 0, 0x46B1, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    p->v86();
+}
+
 extern "C" FE_OVERLAY void fn_8044F284(int a, void* b)
 {
     if (a != 0) {
@@ -204,6 +232,13 @@ extern "C" FE_OVERLAY void fn_8044F284(int a, void* b)
             }
         }
     }
+}
+
+extern "C" FE_OVERLAY void fn_8044F338(void* self)
+{
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+    fn_80131F34(p, self, (FeCb)fn_8044F3F8, 0, 0x4844, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    p->v86();
 }
 
 extern "C" FE_OVERLAY void fn_8044F3F8(int a, int b)
