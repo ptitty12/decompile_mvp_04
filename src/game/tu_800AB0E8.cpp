@@ -195,12 +195,9 @@ void fn_80377488(void* p);
 
 /* ---- unit prototypes ---- */
 extern "C" {
-UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n);
-UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n);
-int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d);
-void fn_800ABC9C(UnkFETable* t);
 void fn_800AB0E8(UnkFEArr* a, int i);
 int fn_800AB1AC(UnkFEArr* a, int i);
+UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n);
 void fn_800AB2B0();
 void fn_800AB308(UnkFETable* t, int c);
 void fn_800AB368(UnkFETable* t);
@@ -216,10 +213,12 @@ void fn_800AB788(UnkFETable* t);
 FEO8* fn_800AB80C(UnkFETable* t, int i, int j);
 int fn_800AB850(UnkFETable* t, int i);
 void fn_800AB878(UnkFE28* self, int a);
+int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d);
 void fn_800ABB20(UnkFE40* self, int a, int b, char* s, int d);
 int fn_800ABB94(void* self, int k);
 int fn_800ABC30(UnkFETable* t, int i);
 int fn_800ABC58(UnkFETable* t, int key);
+void fn_800ABC9C(UnkFETable* t);
 void fn_800ABD80(UnkFE40* self);
 int fn_800ABDC4(UnkFETable* t, int k);
 int fn_800ABDFC(UnkFETable* t, int key);
@@ -227,6 +226,7 @@ int fn_800ABE80(UnkFETable* t, int k);
 int fn_800ABEB8(UnkFETable* t, int key);
 int fn_800ABF3C(UnkFETable* t, int k);
 int fn_800ABF74(UnkFETable* t, int key);
+UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n);
 void* fn_800AC1FC(void* self);
 void fn_800AC264(void* self, int a, int b);
 void fn_800AC2A0(void* self, int a);
@@ -253,82 +253,6 @@ void fn_800ACD48(UnkFE20* self);
 
 /* ---- functions ---- */
 
-/* near-miss (6 slots): retail copies the source pointer (mr r31,r30) after the loop pre-test and assigns n/i to r28/r27; only the register order differs */
-extern "C" UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n)
-{
-    fn_800AB1CC(self, src, n);
-    self->m18 = lbl_8065B780;
-    for (int i = 0; i < n; i++) {
-        FEOb28* o = (FEOb28*)operator new(0x28, 0x400);
-        fn_800AEFF4((FEOb12*)o, i, src[i]);
-        o->mC = lbl_8065ACD0;
-        o->m8 = lbl_8065AD10;
-        fn_800B0484(o);
-        fn_800B0564(o);
-        fn_800AB758(self, i, ((FEO8*)o)->s2(0));
-    }
-    return self;
-}
-
-extern "C" UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n)
-{
-    fn_803282A8(self, 0);
-    self->m18 = lbl_8065B8B8;
-    self->m24 = 0;
-    self->m28 = 0;
-    self->m2C = 0;
-    self->m30 = 0;
-    self->m440 = 0;
-    self->m444 = 0;
-    lbl_80619D10 = (FEV18*)self;
-    self->m24 = n;
-    self->m440 = new (0x400) UnkFEArr[n];
-    for (int i = 0; i < n; i++) {
-        self->m440[i].m8 = src[i];
-    }
-    fn_800ABD80((UnkFE40*)self);
-    return self;
-}
-
-extern "C" int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d)
-{
-    if (lbl_80620860 == 0) {
-        int idx = fn_800ABC58(t, a);
-        int n = fn_800AB850(t, idx);
-        for (int i = 0; i < n; i++) {
-            int r = fn_800AB80C(t, idx, i)->s13(b, (int)c, d);
-            if (r == 0) {
-                return 1;
-            }
-            if (r == 2) {
-                fn_800ABB20((UnkFE40*)t, a, b, c, d);
-            }
-        }
-    }
-    return 0;
-}
-
-extern "C" void fn_800ABC9C(UnkFETable* t)
-{
-    if (t->m2C != 0) {
-        int ok = 1;
-        if (t->m34 == 0xC7) {
-            ok = 0;
-        }
-        if (ok) {
-            if (fn_800AB8C8(t, t->m3C, t->m34, t->m40, t->m38)) {
-                fn_800ABD80((UnkFE40*)t);
-            }
-        }
-        for (int i = 0; i < t->m24; i++) {
-            int n = fn_800AB850(t, i);
-            for (int j = 0; j < n; j++) {
-                fn_800AB80C(t, i, j)->s9();
-            }
-        }
-    }
-}
-
 extern "C" void fn_800AB0E8(UnkFEArr* a, int i)
 {
     if (i < a->m4 && i >= 0) {
@@ -349,6 +273,26 @@ extern "C" int fn_800AB1AC(UnkFEArr* a, int i)
         return a->m0[i];
     }
     return 0;
+}
+
+extern "C" UnkFETable* fn_800AB1CC(UnkFETable* self, int* src, int n)
+{
+    fn_803282A8(self, 0);
+    self->m18 = lbl_8065B8B8;
+    self->m24 = 0;
+    self->m28 = 0;
+    self->m2C = 0;
+    self->m30 = 0;
+    self->m440 = 0;
+    self->m444 = 0;
+    lbl_80619D10 = (FEV18*)self;
+    self->m24 = n;
+    self->m440 = new (0x400) UnkFEArr[n];
+    for (int i = 0; i < n; i++) {
+        self->m440[i].m8 = src[i];
+    }
+    fn_800ABD80((UnkFE40*)self);
+    return self;
 }
 
 extern "C" void fn_800AB2B0()
@@ -490,6 +434,24 @@ extern "C" void fn_800AB878(UnkFE28* self, int a)
     }
 }
 
+extern "C" int fn_800AB8C8(UnkFETable* t, int a, int b, char* c, int d)
+{
+    if (lbl_80620860 == 0) {
+        int idx = fn_800ABC58(t, a);
+        int n = fn_800AB850(t, idx);
+        for (int i = 0; i < n; i++) {
+            int r = fn_800AB80C(t, idx, i)->s13(b, (int)c, d);
+            if (r == 0) {
+                return 1;
+            }
+            if (r == 2) {
+                fn_800ABB20((UnkFE40*)t, a, b, c, d);
+            }
+        }
+    }
+    return 0;
+}
+
 extern "C" void fn_800ABB20(UnkFE40* self, int a, int b, char* s, int d)
 {
     if (s) {
@@ -541,6 +503,27 @@ extern "C" int fn_800ABC58(UnkFETable* t, int key)
         }
     }
     return 0;
+}
+
+extern "C" void fn_800ABC9C(UnkFETable* t)
+{
+    if (t->m2C != 0) {
+        int ok = 1;
+        if (t->m34 == 0xC7) {
+            ok = 0;
+        }
+        if (ok) {
+            if (fn_800AB8C8(t, t->m3C, t->m34, t->m40, t->m38)) {
+                fn_800ABD80((UnkFE40*)t);
+            }
+        }
+        for (int i = 0; i < t->m24; i++) {
+            int n = fn_800AB850(t, i);
+            for (int j = 0; j < n; j++) {
+                fn_800AB80C(t, i, j)->s9();
+            }
+        }
+    }
 }
 
 extern "C" void fn_800ABD80(UnkFE40* self)
@@ -600,6 +583,23 @@ extern "C" int fn_800ABF74(UnkFETable* t, int key)
         }
     }
     return 0;
+}
+
+/* near-miss (6 slots): retail copies the source pointer (mr r31,r30) after the loop pre-test and assigns n/i to r28/r27; only the register order differs */
+extern "C" UnkFETable* fn_800AC128(UnkFETable* self, int* src, int n)
+{
+    fn_800AB1CC(self, src, n);
+    self->m18 = lbl_8065B780;
+    for (int i = 0; i < n; i++) {
+        FEOb28* o = (FEOb28*)operator new(0x28, 0x400);
+        fn_800AEFF4((FEOb12*)o, i, src[i]);
+        o->mC = lbl_8065ACD0;
+        o->m8 = lbl_8065AD10;
+        fn_800B0484(o);
+        fn_800B0564(o);
+        fn_800AB758(self, i, ((FEO8*)o)->s2(0));
+    }
+    return self;
 }
 
 extern "C" void* fn_800AC1FC(void* self)
