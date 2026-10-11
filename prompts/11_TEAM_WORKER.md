@@ -39,6 +39,9 @@ python tools/match/m2c_draft.py <UNIT_NO_EXT> fn_XXXXXXXX   # first-draft C (m2c
 python tools/match/diff_unit.py <UNIT_NO_EXT>              # rebuild + per-function result
 python tools/match/diff_unit.py <UNIT_NO_EXT> fn_XXXXXXXX  # side-by-side diff of one function
 python tools/verify/verify.py --baseline-ref origin/main   # before every commit; must print VERIFY PASS
+# If origin/main moved since your branch was cut, use the merge-base instead (other
+# workers' merged units otherwise show as false regressions):
+#   python tools/verify/verify.py --baseline-ref $(git merge-base HEAD origin/main)
 ```
 
 `asm_show` prints duplicates from stale split files; read only the copy from
@@ -49,6 +52,7 @@ Read `docs/PATTERNS.md` before writing code.
 
 One function at a time, in .text order: read its asm, write the C++, diff,
 adjust (types, signedness, statement order, temporaries, loop shape), repeat.
+Define functions in .text address order (rename.py pairs by object order).
 Commit each time the unit gains matched functions:
 `match(<UNIT>): <function names> [N/M funcs]`, with evidence for any names in
 the body and the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
