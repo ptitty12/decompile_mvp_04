@@ -85,8 +85,9 @@ extern "C" int fn_80099278(Obj3* o, int k, int p)
 
 extern "C" void fn_800994D4(char* o, int x)
 {
-    unsigned a = fn_8009764C(o, 2, x, 0) + 1;
+    unsigned a = fn_8009764C(o, 2, x, 0);
     unsigned b = fn_8009764C(o, 1, x, 0);
+    a += 1;
     if (a > 2) {
         a = 0;
         b += 1;
