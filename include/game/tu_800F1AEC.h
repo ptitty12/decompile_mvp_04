@@ -1017,12 +1017,18 @@ struct Ui6F8 {
     Ui6F8_10* m10;
     Ui1CD0* m14;
 };
+struct Ui710 {
+    char pad0[0x14];
+    int m14;
+};
 struct Ui8011AA24 {
     char pad0[0x6F8];
     Ui6F8* m6F8;
     char pad6FC[4];
     Ui700* m700;
-    char m704[0x788 - 0x704];
+    char m704[0x710 - 0x704];
+    Ui710* m710;
+    char pad714[0x788 - 0x714];
     int m788;
     char pad78C[4];
     int m790;
@@ -1308,7 +1314,6 @@ struct UiEvtRaw {
 };
 void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
 void fn_8017D378(Ui700* p, int a);
-void fn_8010A0A4(UiObj* self);
 
 int fn_80097318(char* e, int p);
 int fn_80097380(char* e, int p);
@@ -1425,6 +1430,21 @@ struct Ui72F0 {
 };
 void fn_800EC648(Ui72F0* self, int a, int b, int c, int d, int e, int f, int g, int h);
 
+int fn_8011BD3C(Ui8011AA24* g, int p);
+int fn_8011BD0C(Ui8011AA24* g, int p);
+int fn_8017C974(Ui700* p);
+
+struct Ui9F58 : UiObj {
+    char pad40[0x138 - 0x40];
+    UiObj* m138;
+    UiV_2F0i* m13C;
+    char pad140[4];
+    int m144;
+};
+int fn_80109F50();
+void fn_801321D4(UiObj* o, UiObj* self, void (*cb)(int, UiV_144s*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+void fn_8010A0A4(Ui9F58* self);
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -1491,5 +1511,7 @@ int fn_800C8060(int a);
 void fn_80100A98(UiWM* self, int a, int b);
 void fn_800F84F4(UiObj* self);
 void fn_8010D258();
+void fn_801083AC(UiObj* self);
+void fn_8010A0A4(UiObj* self);
 
 #endif

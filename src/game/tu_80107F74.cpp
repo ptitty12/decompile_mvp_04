@@ -64,6 +64,26 @@ UiScrRaw* fn_80108214(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+/* near-miss: same calls; retail interleaves the xor/subfic chain with the vcalls and keeps m134 in r29 (we reload it) */
+extern char lbl_805BE370[];
+extern char lbl_805BE4B0[];
+void fn_80108268(UiV_134* self)
+{
+    fn_800ECF18(self);
+    fn_802DC9C0();
+    Ui8011AA24* g = fn_8011AA24(0);
+    fn_801083AC(self);
+    self->m134 = (UiObj*)fn_800C8060(self->v32((int)lbl_805BE370, 1));
+    UiObj* o = self->m134;
+    int t = g->m6F8->m14->m1CD0;
+    int x = fn_801059E4() ^ (t == 0);
+    int y = x == 0;
+    o->v91(1, 0, y);
+    self->m134->v91(0, 0, y ^ 1);
+    fn_80118A70(fn_800C8044(self->v32((int)lbl_805BE4B0, 1)));
+    fn_800C80C0(self, fn_800B555C()->m570);
+}
+
 void fn_8010838C(UiObj* self)
 {
     fn_800ED254(self);
@@ -474,6 +494,21 @@ int fn_80109A3C(UiScr134* self, int a)
     return 1;
 }
 
+void fn_80109A98(UiV_134* self)
+{
+    Ui8011AA24* g = fn_8011AA24(0);
+    UiObj* o = self->m134;
+    int pid = fn_801059E4();
+    if (g->m710->m14 != 0 || (g->m6F8->m14->m1CD0 == 0) != pid || fn_8017C974(g->m700) == 0)
+        ((UiObj*)fn_800C8060((int)o))->v91(0, 0, 0);
+    int a = fn_8011BD3C(g, pid);
+    int b = fn_8011BD0C(g, pid);
+    int c = fn_8011BF1C(g, pid);
+    o->v91(1, 0, a);
+    o->v91(3, 0, b);
+    o->v91(5, 0, c);
+}
+
 int fn_80109BDC(UiV_134i* self, int a, int b, int c)
 {
     if (a == self->m134) {
@@ -519,4 +554,19 @@ void fn_80109EC8(int unused, UiV_144s* self)
 int fn_80109F50()
 {
     return 0;
+}
+
+extern char lbl_805BA6D8[];
+void fn_80109F58(Ui9F58* self, int a, int b)
+{
+    self->m144 = b;
+    if (self->m13C != 0)
+        fn_8010A0A4(self);
+    self->m13C = (UiV_2F0i*)fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D8);
+    self->v16(0);
+    self->m138->v16(0);
+    fn_801321D4(self->m13C, self, fn_80109EC8, fn_80109F50, a, 1, -1, 1, fn_80090880(lbl_8061977C, 0x1FE1), 0, 0, 0, 0, 0);
+    self->m13C->m2F0 = -0x63;
+    fn_800C80C0(self->m13C, fn_800B555C()->m570);
+    self->m13C->v86();
 }
