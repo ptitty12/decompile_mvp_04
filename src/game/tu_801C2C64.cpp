@@ -9,6 +9,7 @@ typedef Unk801C16B0_Z Z;
 
 extern "C" {
 float fn_801C34F4(Z* z);
+Vec3 fn_801C5C70(void* u, const Vec3* i, const Vec3* n);
 int fn_801C3F00(Z* z);
 void fn_801CF1BC(Z* z);
 void fn_801C34AC(Z* z, int s);
@@ -42,6 +43,27 @@ extern float lbl_805D1398;
 extern float lbl_805D139C;
 extern float lbl_805D13A0;
 extern float lbl_805D13A4;
+inline Vec3 Scale(const Vec3* v, float s)
+{
+    Vec3 r;
+    r.x = v->x * s;
+    r.y = v->y * s;
+    r.z = v->z * s;
+    return r;
+}
+
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+float fn_80410CE8(float y, float x);
+float fn_804028E4(float x);
+Vec3 fn_80189618(P* p, float f);
 extern float lbl_8068C4C4;
 extern Vec3 lbl_8068C3DC;
 extern Vec3 lbl_8068C3E8;
@@ -125,6 +147,15 @@ extern "C" int fn_801C38F0(Z* z, float f)
     return 0;
 }
 
+extern "C" int fn_801C3E28(Z* z)
+{
+    if (z->m144 >= 1.0f)
+        return 0;
+    if (z->m144 <= -1.0f)
+        return 2;
+    return 1;
+}
+
 extern "C" int fn_801C3E68(Z* z)
 {
     P* p = fn_801A4B34(z->m204);
@@ -191,6 +222,22 @@ extern "C" int fn_801C4474(Z* z)
     return 0;
 }
 
+/* near-miss: same code, but retail puts the fn_801C34D0 result at 0x20 and the difference at 0x10. */
+extern "C" int fn_801C4C3C(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        const float k = 180.0f;
+        const Vec3& pos = p->m60;
+        Vec3 q;
+        fn_801C34D0(&q, z);
+        Vec3 d = pos - q;
+        if (fn_804028E4(d.x * d.x + d.z * d.z) < k)
+            return 1;
+    }
+    return 0;
+}
+
 extern "C" void fn_801C4D04(void)
 {
     if (lbl_8061CBC8) {
@@ -210,3 +257,24 @@ extern "C" float fn_801C36AC(Z* z)
 }
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
+
+extern "C" Vec3 fn_801C5C70(void* u, const Vec3* i, const Vec3* n)
+{
+    return *i - Scale(n, (n->z * i->z + (n->x * i->x + n->y * i->y)) * 2.0f);
+}
+
+extern "C" Vec3 fn_801C5BD4(Z* z)
+{
+    P* c = z->m204->m6CC;
+    float t = z->m180 - (float)z->m204->m4C * 0.016666668f;
+    if (!(t >= 0.0f))
+        t = 0.0f;
+    return fn_80189618(c, t);
+}
+
+extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c)
+{
+    Vec3 t = fn_801C5C70(a, b, c);
+    float r = fn_80410CE8(t.x, t.z);
+    return r * 57.295773f;
+}
