@@ -39,6 +39,10 @@ extern int lbl_8062C290;
 extern const float lbl_805EA540;
 extern const float lbl_805EA544;
 extern const float lbl_805EA564;
+extern const float lbl_805E9C90;
+extern const float lbl_805E9C94;
+extern const float lbl_805E9C98;
+extern const float lbl_805E9C9C;
 extern const char lbl_805E7988[];
 extern const char* lbl_8061FF8C[];
 extern int lbl_8061FF88;
@@ -71,8 +75,10 @@ int fn_803E9B98(const void* a, void* b);
 void* fn_8037C7FC();
 void* fn_8037CF5C(void* c, unsigned hash, void* obj);
 void fn_80377488(void* p);
+float fn_8041171C(float x);
+float fn_80411554(float x);
 int fn_8014DDAC(void* p);
-void fn_803181E4(int a, int b, int c, int d, int e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1);
+void fn_803181E4(int a, int b, int c, float x1, float x2, float x3, float x4, int d, int e, int f, float x5, int g, int h, int s0, int s1);
 void fn_80377408(void* p);
 void fn_803E6708(void* p, int a);
 void fn_803DBD84(void* p, int a);
@@ -82,7 +88,10 @@ extern "C" {
 // PROTOS-BEGIN
 void fn_80317B88(Fx* self, int a);
 void fn_80317F30(Fx* self, int a);
-void fn_80318140(int a, int b, int c, int d, void* e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1);
+/* near-miss: rotate-about-point; retail builds the vectors through inline struct helpers (different stack layout and float slots) */
+void fn_80317F38(void* self, FxV2f* origin, FxV2f* p, float a);
+void fn_80318090(void* self, FxQuad* obj, float a);
+void fn_80318140(int a, int b, int c, float x1, float x2, float x3, float x4, int d, void* e, int f, float x5, int g, int h, int s0, int s1);
 void fn_8031883C(Fx* self);
 void fn_80318890(Fx* self);
 void fn_803188C4(Fx* self);
@@ -147,9 +156,41 @@ void fn_80317B88(Fx* self, int a) {
 
 void fn_80317F30(Fx* self, int a) { self->m24 = a; }
 
-/* near-miss: callee-saved registers of d/f/g/h permuted (priority); logic is the pass-through of fn_803181E4 */
-void fn_80318140(int a, int b, int c, int d, void* e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1) {
-    fn_803181E4(a, b, c, d, fn_8014DDAC(e), f, g, h, x1, x2, x3, x4, x5, s0, s1);
+void fn_80317F38(void* self, FxV2f* origin, FxV2f* p, float a) {
+    FxV2f q = {0, 0};
+    q.x = p->x;
+    q.y = p->y;
+    float ang = a;
+    FxV2f d;
+    d.x = q.x - origin->x;
+    d.y = q.y - origin->y;
+    FxV2f d2 = d;
+    if (!(ang >= lbl_805E9C90)) ang = lbl_805E9C90;
+    if (!(ang <= lbl_805E9C94)) ang = lbl_805E9C94;
+    if (!(ang <= lbl_805E9C98)) ang = ang - lbl_805E9C94;
+    float s = fn_8041171C(ang);
+    float c = fn_80411554(ang);
+    FxV2f r;
+    r.x = d2.x * c - d2.y * s;
+    r.y = d2.x * s + d2.y * c;
+    r.x = r.x + origin->x;
+    r.y = r.y + origin->y;
+    p->y = r.y;
+    p->x = r.x;
+}
+
+void fn_80318090(void* self, FxQuad* obj, float a) {
+    FxV2f mid;
+    mid.x = (obj->p[0].x + obj->p[1].x) * lbl_805E9C9C;
+    mid.y = (obj->p[0].y + obj->p[3].y) * lbl_805E9C9C;
+    fn_80317F38(self, &mid, (FxV2f*)&obj->p[0], a);
+    fn_80317F38(self, &mid, (FxV2f*)&obj->p[1], a);
+    fn_80317F38(self, &mid, (FxV2f*)&obj->p[2], a);
+    fn_80317F38(self, &mid, (FxV2f*)&obj->p[3], a);
+}
+
+void fn_80318140(int a, int b, int c, float x1, float x2, float x3, float x4, int d, void* e, int f, float x5, int g, int h, int s0, int s1) {
+    fn_803181E4(a, b, c, x1, x2, x3, x4, d, fn_8014DDAC(e), f, x5, g, h, s0, s1);
 }
 
 void fn_8031883C(Fx* self) {

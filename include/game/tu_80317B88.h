@@ -201,6 +201,12 @@ struct FxPart24 {
     char pad0[0x20];
     int m20;
 };
+struct FxV2f { float x; float y; };
+/* Quad of four 16-byte corner records at +8, +0x18, +0x28, +0x38 (x at +0, y at +4 of each). */
+struct FxQuad {
+    char pad0[0x8];
+    Vtx16 p[4];
+};
 struct FxV3 { float x; float y; float z; };
 class FxEObj;
 /* Per-effect record of the FxD class (0x128 bytes; array at FxD::m24, kind at +0x38,
