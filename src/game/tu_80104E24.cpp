@@ -34,6 +34,19 @@ UiScrRaw* fn_80104F74(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+void fn_80104FC0(UiObj* self)
+{
+    fn_800ECF18(self);
+    Ui1CD0* g = fn_8011AA24(0)->m6F8->m14;
+    int b = 0;
+    if (g->m1CD0 != 0)
+        b = 1;
+    int idx = b ^ 1;
+    fn_80105048(self, idx, (char*)g + idx * 0xE64);
+    int t = fn_800B5520(g->mFFC);
+    fn_801051D0(self, t, fn_800B5520(g->m198));
+}
+
 extern char lbl_8064F620[];
 UiScrRaw* fn_80105344(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -46,6 +59,44 @@ UiScrRaw* fn_80105344(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m144 = 0;
     self->m148 = 0;
     return self;
+}
+
+void fn_80105974()
+{
+    int i = fn_800B555C()->m570;
+    if (i == -1) {
+        fn_800B555C()->m570 = 0;
+        for (i = 0; i <= 3; i++) {
+            if (fn_802D7DB4(i, 5) != 0) {
+                fn_800B555C()->m570 = i;
+                break;
+            }
+        }
+    }
+}
+
+int fn_801059E4()
+{
+    int r = 0;
+    Ui6F8* g = fn_8011AA24(0)->m6F8;
+    if (fn_800B555C()->m570 == g->m10->m70)
+        r = 1;
+    else
+        fn_800B555C();
+    return r;
+}
+
+void fn_80105A40(UiV_144i* self)
+{
+    if (self->m144 == 1) {
+        if (fn_80105AB8() == 1) {
+            fn_80105AE8(self, 0x39E1, 0);
+            return;
+        }
+        fn_80105AE8(self, 0x39E2, 2);
+        return;
+    }
+    fn_80105AE8(self, 0x39D6, 0);
 }
 
 int fn_80105AB8()
@@ -80,6 +131,25 @@ void fn_80105CA0()
 
 void fn_80105CA4(int a)
 {
+}
+
+extern char lbl_805BF5E0[];
+extern char lbl_805BF5F0[];
+char* fn_80105E94(UiV_140* self)
+{
+    char* s = self->m140->v70()->v33(5, 1)->name;
+    if (fn_8040B3B4(s, lbl_805BF5E0) == 0)
+        s = lbl_805BF5F0;
+    return s;
+}
+
+int fn_8010607C(UiV_140i* self, int a)
+{
+    if (a == self->m140) {
+        self->v67(1, fn_800C8070(self));
+        return 1;
+    }
+    return 0;
 }
 
 int fn_801060EC(UiObj* self, int a)
@@ -204,6 +274,13 @@ int fn_80107294(UiScr134* self, int a)
     return 1;
 }
 
+int fn_8010750C(UiScr8010750C* self, int a)
+{
+    if (fn_800B555C()->m570 == a || self->m14C != 0)
+        fn_80108070(self, ((unsigned)self->m1AC->m24 >> 31) ^ 1);
+    return 1;
+}
+
 void fn_80107570(void* self, char* out)
 {
     *out = 0;
@@ -217,4 +294,11 @@ void fn_80107C84(UiV_150i* self)
 void fn_80107DB0(UiObj* self)
 {
     fn_80107C94(self);
+}
+
+int fn_80107F3C(UiV_148i* self)
+{
+    if (self->m148 == 0)
+        return fn_800ED00C(self);
+    return 0;
 }
