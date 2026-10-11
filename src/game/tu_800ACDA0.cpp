@@ -31,7 +31,7 @@ class FEO8B {
 public:
     char pad0[8];
     virtual void s1();
-    virtual void s2();
+    virtual int s2(int a);
     virtual int s3();
     virtual void s4();
     virtual int s5();
@@ -129,7 +129,57 @@ extern FEV4 lbl_8068B588;
 extern const float lbl_805B96AC;
 extern const float lbl_805B96B0;
 
+struct FEOb108 {
+    int m0;
+    int m4;
+    const void* m8;
+    char padC[0x58 - 0xC];
+    const void* m58;
+};
+extern const char lbl_8065AF38[];
+extern const char lbl_8065BA00[];
+extern const char lbl_8065AC28[];
+extern const char lbl_8065AC08[];
+struct FEIT {
+    char pad0[0x18];
+    const void* m18;
+};
+extern "C" {
+FEIT* fn_800AB1CC(FEIT* self, int* src, int n);
+void fn_803569D8(void* p);
+void fn_80356C68(void* p);
+void fn_800B32A4(void* p);
+void fn_800B385C(void* p);
+void fn_800AB758(FEIT* t, int idx, int v);
+}
+
+struct FEOb150 {
+    int m0;
+    int m4;
+    const void* m8;
+    const void* mC;
+    int m10;
+    int m14;
+    char pad18[4];
+    const void* m1C;
+    char pad20[0xDC - 0x20];
+    int mDC;
+};
+extern const char lbl_8065B010[];
+extern const char lbl_8065B9C0[];
+extern const char lbl_8065B690[];
+extern const char lbl_8065B280[];
+extern const char lbl_8065B2D8[];
+extern const char lbl_8065B298[];
+extern "C" {
+void fn_800ACFEC(void* p, int a);
+void fn_800B1C7C(void* p);
+void fn_800B2C6C(void* p);
+}
+
 /* ---- generated externs ---- */
+
+
 
 
 
@@ -174,6 +224,7 @@ void fn_800AE964(UnkAtEF0* p, int v);
 void fn_800AE96C(char* self);
 int fn_800AEA04(char* self, int k);
 void fn_800AEA64();
+FEIT* fn_800AEA68(FEIT* self, int* src, int n);
 void fn_800AEB88(char* p);
 void fn_800AEBAC(char* p);
 void fn_800AEBD0(char* self);
@@ -181,6 +232,7 @@ void fn_800AEC04(char* self);
 void fn_800AEC74();
 char* fn_800AEC78(char* p);
 void* fn_800AEC80(void* self);
+FEIT* fn_800AECE8(FEIT* self, int* src, int n);
 void* fn_800AEDDC(void* self);
 int fn_800AEE44(void* self);
 FEOb12* fn_800AEFF4(FEOb12* self, int a, int b);
@@ -550,6 +602,35 @@ extern "C" void fn_800AEA64()
 {
 }
 
+/* near-miss (64 vs 72 insns): retail keeps both the first-level ctor stores (mC = lbl_8065B9C0, sub-object vptr, zeros) and the derived overwrites; ours lets CSE drop the dead earlier mC store */
+extern "C" FEIT* fn_800AEA68(FEIT* self, int* src, int n)
+{
+    fn_800AB1CC(self, src, n);
+    int i = 0;
+    self->m18 = lbl_8065B010;
+    fn_800ACFEC((char*)self + 0x448, src[0]);
+    *(int*)((char*)self + 0xEF4) = 0;
+    int* q = src;
+    for (; i < n; i++) {
+        FEOb150* o = (FEOb150*)operator new(0x150, 0x400);
+        fn_800AEFF4((FEOb12*)o, i, *q);
+        q++;
+        o->mC = lbl_8065B9C0;
+        char* sub = (char*)o + 0x10;
+        *(const void**)(sub + 0xC) = lbl_8065B690;
+        o->m10 = 0;
+        o->m14 = 0;
+        o->m1C = lbl_8065B280;
+        o->m8 = lbl_8065B2D8;
+        o->mC = lbl_8065B298;
+        o->mDC = 0;
+        fn_800B1C7C(o);
+        fn_800B2C6C(o);
+        fn_800AB758(self, i, ((FEO8B*)o)->s2(0));
+    }
+    return self;
+}
+
 extern "C" void fn_800AEB88(char* p)
 {
     fn_800AE574(p + 0x448);
@@ -595,6 +676,27 @@ extern "C" void* fn_800AEC80(void* self)
         }
     }
     return 0;
+}
+
+extern "C" FEIT* fn_800AECE8(FEIT* self, int* src, int n)
+{
+    fn_800AB1CC(self, src, n);
+    int i = 0;
+    self->m18 = lbl_8065AF38;
+    for (; i < n; i++) {
+        FEOb108* o = (FEOb108*)operator new(0x108, 0x400);
+        fn_800AEFF4((FEOb12*)o, i, src[i]);
+        char* sub = (char*)o + 0xC;
+        *(const void**)(sub + 0x4C) = lbl_8065BA00;
+        fn_803569D8(sub);
+        o->m58 = lbl_8065AC08;
+        o->m8 = lbl_8065AC28;
+        fn_80356C68((char*)o + 0x60);
+        fn_800B32A4(o);
+        fn_800B385C(o);
+        fn_800AB758(self, i, ((FEO8B*)o)->s2(0));
+    }
+    return self;
 }
 
 extern "C" void* fn_800AEDDC(void* self)
