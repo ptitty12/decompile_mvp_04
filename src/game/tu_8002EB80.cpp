@@ -352,6 +352,40 @@ extern "C" void fn_8002F9E8(Unk8002D15C* self)
     fn_803EE7BC();
 }
 
+extern "C" void fn_80030130(Unk8002D15C* self)
+{
+    self->m260 = 0;
+    self->m264 = 0;
+    self->m268 = 0;
+    for (int i = 0; i < 4; i++)
+        self->m1D0[i].m0 = 0;
+    self->m164 = 0;
+    self->m168 = 0;
+    self->m19C = 0;
+    self->m1A0 = 0;
+    self->m290 = (Unk8002D15C_Player*)fn_801A497C(self->m80, 0, 0);
+    self->m510 = (Unk8002D15C_Player*)fn_801A4B34(self->m80);
+    int flag = 0;
+    if (self->m80->m6F8->m14->m1CD0 != 0)
+        flag = 1;
+    self->m714 = 0;
+    self->m7AC = 0;
+    self->m514 = flag;
+    self->mE8 = 1;
+    fn_8002FE88(self);
+    for (int j = 0; j < 4; j++)
+        self->m1C0[j] = 0;
+    unsigned int k = self->m160;
+    if (k <= 2) {
+        self->m57C = 0;
+    } else {
+        if (k == 3)
+            self->m57C = (fn_8040ABA0() % 100 <= 0x31);
+        else
+            self->m57C = 1;
+    }
+}
+
 extern "C" void fn_80030274(Unk8002D15C* self)
 {
     self->m7F4 = 0;
