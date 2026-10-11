@@ -101,7 +101,28 @@ struct FEGrid {
 };
 extern "C" void* fn_8014D8AC(int a, int b, const char* s, int c);
 
+struct Unk8019F8C0_Owner;
+struct Unk80084910_W;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+int fn_80086D34(Unk80084910_W* w, int h);
+void fn_80086D24(Unk80084910_W* w, int h, int k);
+
+struct FEObjAF {
+    int m0;
+    char pad4[0x34 - 4];
+    int m34;
+    FEV3Cz* m38;
+    int m3C;
+};
+extern const char lbl_805B96C4[];
+extern const char lbl_805B96D0[];
+extern const char lbl_805B96DC[];
+extern const char lbl_805B6F58[];
+extern "C" void fn_8011A9B8(const char* a, int b, const char* c);
+
 /* ---- generated externs ---- */
+
+
 
 
 
@@ -135,6 +156,7 @@ void fn_800AE2E4(void* p);
 void fn_800AE4F4(char* self);
 void fn_800AE944(void* p);
 void fn_800AE964(UnkAtEF0* p, int v);
+void fn_800AE96C(char* self);
 int fn_800AEA04(char* self, int k);
 void fn_800AEA64();
 void fn_800AEB88(char* p);
@@ -153,6 +175,7 @@ FEO8B* fn_800AF070(FEO8B* self);
 FEO8B* fn_800AF0C0(FEO8B* self);
 int fn_800AF110();
 void* fn_800AF118(void* p, int k);
+void fn_800AF148(FEObjAF* self);
 }
 /* ---- end prototypes ---- */
 
@@ -420,6 +443,19 @@ extern "C" void fn_800AE964(UnkAtEF0* p, int v)
     p->mEF0 = v;
 }
 
+extern "C" void fn_800AE96C(char* self)
+{
+    char* p = self + 0x448;
+    Unk80084910_W* w = (Unk80084910_W*)((FE6F8H*)fn_800ABC30(self, 0))->m6F8->m10;
+    int h = fn_801A2034((Unk8019F8C0_Owner*)fn_800ABC30(self, 0), 4);
+    if (*(int*)(p + 0xAA4) <= 7) {
+        fn_800AD774((UnkAtAA4*)p);
+    } else if (fn_80086D34(w, h) == 1) {
+        fn_80086D24(w, h, 0);
+    }
+    fn_800AD1D4(p);
+}
+
 /* near-miss (7 slots): second branch keeps temporaries in r0 / result in r3 in retail */
 extern "C" int fn_800AEA04(char* self, int k)
 {
@@ -565,4 +601,19 @@ extern "C" void* fn_800AF118(void* p, int k)
         return (char*)p + 0xC;
     }
     return fn_800AF010(p, k);
+}
+
+extern "C" void fn_800AF148(FEObjAF* self)
+{
+    FEV3Cz* o = self->m38;
+    self->m34 = 0;
+    if (o) {
+        if (self->m0 == 0) {
+            o->s32(lbl_805B96C4, 1)->s8(0);
+        } else {
+            o->s32(lbl_805B96D0, 1)->s8(0);
+        }
+        fn_8011A9B8(lbl_805B6F58, self->m3C, lbl_805B96DC);
+    }
+    ((FEV1C*)((char*)self + 0xC))->s2();
 }
