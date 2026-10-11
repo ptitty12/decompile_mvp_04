@@ -8,28 +8,32 @@
 #include "game/tu_80037250.h"
 
 /*
- * near-miss (all twelve CSV row loaders, fn_80037250 .. fn_80038424): same
- * instruction count (+-1) as retail; retail keeps the address of the cursor
- * local in its own callee-saved register (r31) and the length (&n) in r30, the
- * build here recomputes &cur and swaps the two. Tried: declaration order,
- * pointer locals, a struct holding both.
+ * The twelve CSV row loaders (fn_80037250 .. fn_80038424) hold &n and &cur in
+ * pointer locals: pn at the top (it is fn_802B9300's argument), pc inside the
+ * if. Written as &cur/&n at each call, the addresses are recomputed in the loop
+ * (loop.c can't hoist them: the scan starts at the bottom test, so the body is
+ * "maybe never" executed). Locals that retail zeroes after the fn_802B9300
+ * call (one shared zero register with n = 0) are initialised in the
+ * declaration after `end`.
  */
 extern "C" void fn_80037250(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v1, 0, 3, 0x2C)
-                || !fn_80036628(buf, &v2, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x40 + v1 * 0x10 + v2 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, 0, 3, 0x2C)
+                || !fn_80036628(buf, &v2, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x40 + v1 * 0x10 + v2 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -38,20 +42,22 @@ extern "C" void fn_80037250(char* buf, int out, const char* text)
 extern "C" void fn_800373A4(char* buf, int out, const char* text, int lo, int hi)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2, v3;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v1, lo, hi, 0x2C)
-                || !fn_800368A8(buf, &v2, &cur, &n)
-                || !fn_80036628(buf, &v3, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x280 + v1 * 0xA0 + v2 * 0x10 + v3 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, lo, hi, 0x2C)
+                || !fn_800368A8(buf, &v2, pc, pn)
+                || !fn_80036628(buf, &v3, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x280 + v1 * 0xA0 + v2 * 0x10 + v3 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -60,21 +66,23 @@ extern "C" void fn_800373A4(char* buf, int out, const char* text, int lo, int hi
 extern "C" void fn_80037530(char* buf, int out, const char* text, int lo, int hi)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2, v3, v4;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v1, lo, hi, 0x2C)
-                || !fn_800362B4(buf, &v2, &cur, &n)
-                || !fn_800368A8(buf, &v3, &cur, &n)
-                || !fn_80036628(buf, &v4, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x500 + v1 * 0x140 + v2 * 0xA0 + v3 * 0x10 + v4 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, lo, hi, 0x2C)
+                || !fn_800362B4(buf, &v2, pc, pn)
+                || !fn_800368A8(buf, &v3, pc, pn)
+                || !fn_80036628(buf, &v4, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x500 + v1 * 0x140 + v2 * 0xA0 + v3 * 0x10 + v4 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -83,19 +91,21 @@ extern "C" void fn_80037530(char* buf, int out, const char* text, int lo, int hi
 extern "C" void fn_800376EC(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800366A8(buf, &v1, &cur, &n)
-                || !fn_80036628(buf, &v2, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x30 + v1 * 0x10 + v2 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800366A8(buf, &v1, pc, pn)
+                || !fn_80036628(buf, &v2, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x30 + v1 * 0x10 + v2 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -104,20 +114,22 @@ extern "C" void fn_800376EC(char* buf, int out, const char* text)
 extern "C" void fn_80037834(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2, v3;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800367A8(buf, &v1, &cur, &n)
-                || !fn_80036728(buf, &v2, &cur, &n)
-                || !fn_800362B4(buf, &v3, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0xC8 + v1 * 0x28 + v2 * 8 + v3 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800367A8(buf, &v1, pc, pn)
+                || !fn_80036728(buf, &v2, pc, pn)
+                || !fn_800362B4(buf, &v3, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0xC8 + v1 * 0x28 + v2 * 8 + v3 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -126,21 +138,23 @@ extern "C" void fn_80037834(char* buf, int out, const char* text)
 extern "C" void fn_800379A4(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2, v3, v4;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800367A8(buf, &v1, &cur, &n)
-                || !fn_800366A8(buf, &v2, &cur, &n)
-                || !fn_800362B4(buf, &v3, &cur, &n)
-                || !fn_80036628(buf, &v4, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x1E0 + v1 * 0x60 + (v2 << 5) + v3 * 0x10 + v4 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800367A8(buf, &v1, pc, pn)
+                || !fn_800366A8(buf, &v2, pc, pn)
+                || !fn_800362B4(buf, &v3, pc, pn)
+                || !fn_80036628(buf, &v4, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x1E0 + v1 * 0x60 + (v2 << 5) + v3 * 0x10 + v4 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -149,22 +163,24 @@ extern "C" void fn_800379A4(char* buf, int out, const char* text)
 extern "C" void fn_80037B44(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2, v3, v4, v5;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800367A8(buf, &v1, &cur, &n)
-                || !fn_80036728(buf, &v2, &cur, &n)
-                || !fn_800362B4(buf, &v3, &cur, &n)
-                || !fn_800362B4(buf, &v4, &cur, &n)
-                || !fn_80036628(buf, &v5, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x640 + v1 * 0x140 + (v2 << 6) + (v3 << 5) + v4 * 0x10 + v5 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800367A8(buf, &v1, pc, pn)
+                || !fn_80036728(buf, &v2, pc, pn)
+                || !fn_800362B4(buf, &v3, pc, pn)
+                || !fn_800362B4(buf, &v4, pc, pn)
+                || !fn_80036628(buf, &v5, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x640 + v1 * 0x140 + (v2 << 6) + (v3 << 5) + v4 * 0x10 + v5 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -173,22 +189,24 @@ extern "C" void fn_80037B44(char* buf, int out, const char* text)
 extern "C" void fn_80037D0C(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
+    int v0, v1, v2 = 0, v3 = 0, v4 = 0, v5;
     if (n != 0) {
-        int v0, v1, v2, v3, v4, v5;
-        fn_803792AC(&cur, &n);
+        const char** pc = &cur;
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_80036828(buf, &v1, &cur, &n)
-                || !fn_800362B4(buf, &v2, &cur, &n)
-                || !fn_800362B4(buf, &v3, &cur, &n)
-                || !fn_800362B4(buf, &v4, &cur, &n)
-                || !fn_80036628(buf, &v5, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x280 + (v1 << 7) + (v2 << 6) + (v3 << 5) + v4 * 0x10 + v5 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_80036828(buf, &v1, pc, pn)
+                || !fn_800362B4(buf, &v2, pc, pn)
+                || !fn_800362B4(buf, &v3, pc, pn)
+                || !fn_800362B4(buf, &v4, pc, pn)
+                || !fn_80036628(buf, &v5, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x280 + (v1 << 7) + (v2 << 6) + (v3 << 5) + v4 * 0x10 + v5 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -197,22 +215,24 @@ extern "C" void fn_80037D0C(char* buf, int out, const char* text)
 extern "C" void fn_80037EE0(char* buf, int out, const char* text, int lo, int hi)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
+    int v0, v1, v2 = 0, v3, v4 = 0, v5;
     if (n != 0) {
-        int v0, v1, v2, v3, v4, v5;
-        fn_803792AC(&cur, &n);
+        const char** pc = &cur;
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v1, lo, hi, 0x2C)
-                || !fn_800362B4(buf, &v2, &cur, &n)
-                || !fn_800368A8(buf, &v3, &cur, &n)
-                || !fn_800362B4(buf, &v4, &cur, &n)
-                || !fn_80036628(buf, &v5, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0xA00 + v1 * 0x280 + v2 * 0x140 + (v3 << 5) + v4 * 0x10 + v5 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, lo, hi, 0x2C)
+                || !fn_800362B4(buf, &v2, pc, pn)
+                || !fn_800368A8(buf, &v3, pc, pn)
+                || !fn_800362B4(buf, &v4, pc, pn)
+                || !fn_80036628(buf, &v5, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0xA00 + v1 * 0x280 + v2 * 0x140 + (v3 << 5) + v4 * 0x10 + v5 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -221,22 +241,24 @@ extern "C" void fn_80037EE0(char* buf, int out, const char* text, int lo, int hi
 extern "C" void fn_800380D4(char* buf, int out, const char* text, int lo, int hi)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
+    int v0, v1, v2, v3 = 0, v4, v5;
     if (n != 0) {
-        int v0, v1, v2, v3, v4, v5;
-        fn_803792AC(&cur, &n);
+        const char** pc = &cur;
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800369A8(buf, &v1, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v2, lo, hi, 0x2C)
-                || !fn_800362B4(buf, &v3, &cur, &n)
-                || !fn_80036928(buf, &v4, &cur, &n)
-                || !fn_80036628(buf, &v5, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x480 + v1 * 0x180 + v2 * 0x60 + v3 * 0x30 + v4 * 0x10 + v5 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800369A8(buf, &v1, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v2, lo, hi, 0x2C)
+                || !fn_800362B4(buf, &v3, pc, pn)
+                || !fn_80036928(buf, &v4, pc, pn)
+                || !fn_80036628(buf, &v5, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + v0 * 0x480 + v1 * 0x180 + v2 * 0x60 + v3 * 0x30 + v4 * 0x10 + v5 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -245,19 +267,21 @@ extern "C" void fn_800380D4(char* buf, int out, const char* text, int lo, int hi
 extern "C" void fn_800382BC(char* buf, int out, const char* text, int lo, int hi)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
     if (n != 0) {
+        const char** pc = &cur;
         int v0, v1, v2;
-        fn_803792AC(&cur, &n);
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800361D8(buf, &cur, &n, &v1, lo, hi, 0x2C)
-                || (v1 -= 1, !fn_80036628(buf, &v2, &cur, &n)))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + (v0 << 6) + v1 * 0x10 + v2 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, lo, hi, 0x2C)
+                || (v1 -= 1, !fn_80036628(buf, &v2, pc, pn)))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + (v0 << 6) + v1 * 0x10 + v2 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
@@ -266,19 +290,21 @@ extern "C" void fn_800382BC(char* buf, int out, const char* text, int lo, int hi
 extern "C" void fn_80038424(char* buf, int out, const char* text)
 {
     unsigned int n = 0;
-    const char* start = fn_802B9300(text, 0x500, 0xB, &n);
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
     const char* cur = start;
     const char* end = start + n;
+    int v0, v1 = 0, v2;
     if (n != 0) {
-        int v0, v1, v2;
-        fn_803792AC(&cur, &n);
+        const char** pc = &cur;
+        fn_803792AC(pc, pn);
         while (cur != end && n > 1) {
-            if (!fn_800365A4(buf, &v0, &cur, &n)
-                || !fn_800362B4(buf, &v1, &cur, &n)
-                || !fn_80036628(buf, &v2, &cur, &n))
-                fn_803792AC(&cur, &n);
-            else if (!fn_8003641C(buf, (unsigned char*)(out + (v0 << 5) + v1 * 0x10 + v2 * 4), &cur, &n))
-                fn_803792AC(&cur, &n);
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800362B4(buf, &v1, pc, pn)
+                || !fn_80036628(buf, &v2, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, (unsigned char*)(out + (v0 << 5) + v1 * 0x10 + v2 * 4), pc, pn))
+                fn_803792AC(pc, pn);
         }
     }
     fn_802B961C(start, 0xB);
