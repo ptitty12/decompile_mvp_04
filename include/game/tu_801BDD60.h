@@ -36,6 +36,7 @@ public:
     virtual ~Unk801C0334();
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
+    float fn_801C04E0(int base);
 
     float m4;
     float m8;

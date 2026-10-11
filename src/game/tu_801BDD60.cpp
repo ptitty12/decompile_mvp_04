@@ -287,6 +287,22 @@ Unk8037B3E8* Unk801C0334::fn_vslot5()
     return new (lbl_806EF9B4) Unk801C0334;
 }
 
+float Unk801C0334::fn_801C04E0(int base)
+{
+    switch (base) {
+    case 0:
+        return mC;
+    case 1:
+        return m10;
+    case 2:
+        return m14;
+    case 3:
+        return m18;
+    default:
+        return 0.0f;
+    }
+}
+
 extern "C" void fn_801C156C(void) {}
 
 extern "C" void fn_801C1570(void) {}
