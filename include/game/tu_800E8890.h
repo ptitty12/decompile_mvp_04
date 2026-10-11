@@ -62,7 +62,6 @@ void fn_801321D4(UiS* o, UiS* self, void (*cb)(void*, UiS*), int a, int b, int c
 extern char lbl_805BAF60[];
 extern char lbl_805BAF10[];
 extern char lbl_805BAF40[];
-void fn_800ECE34(void* t);
 struct Ui1E8 {
     char pad0[0x1E8];
     int m1E8;
@@ -74,4 +73,17 @@ extern int lbl_8061A48C;
 void fn_800EAAEC();
 void fn_800EAE04(int a, UiS* x);
 int fn_800A3270(Ui80619948* g, int* a, int* b);
+struct UiSub144 {
+    char pad0[0x38];
+    int m38;
+};
+int fn_800A3258(Ui80619948* g);
+void fn_800C2034(char* a, int b);
+void fn_8055EAFC(void* o);
+extern char lbl_805BE110[];
+const char* fn_800EAE8C(int a);
+void* fn_8007F7D0(Unk8007B2B0_Screen* s, unsigned i);
+extern char lbl_805BE138[];
+int fn_800A3244(Ui80619948* g);
+int fn_80077BC4(Unk8007B2B0_Screen* s, int a);
 #endif
