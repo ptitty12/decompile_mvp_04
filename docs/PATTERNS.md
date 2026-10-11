@@ -713,3 +713,72 @@ Matched 17 functions in 7 units with these recipes. Each recipe is one source ch
     spill moves to the first slot.
   - Retail has the spill one slot later. In sched1 it was issued after
     `lwz r11` and before `lwz r0`.
+
+## Ranges 10-19 recipes (2026-10-11, condensed from worker reports)
+
+Literals and constants
+- objdiff's 100% does not check literal values or call/global targets. Run
+  `tools/match/check_literals.py <unit>`. Write real literals with the values
+  read from the original data. Original strings may contain a literal
+  backslash (`"\n"`).
+- A `const float k = ...;` local (or a literal used several times) stays in
+  f31 across calls. An `extern const float` global may be hoisted above
+  earlier int stores. A float read from an aggregate global (`lbl.x`) may
+  alias, so it stays below earlier stores (reset-record family, range-17).
+  Try each spelling when a `lfs` sits in the wrong place.
+- Float locals take stack slots in reverse declaration order. An unused
+  `double d;` keeps a 0x10 frame. An unused `volatile int pad;` reproduces a
+  slot gap.
+
+Calls
+- The callee's return type matters: if its epilogue sets r3 (strcpy, `li r3,1`),
+  declare it int even when the result is ignored. A void call changes the
+  sched2 dependences, so two slots swap near the call (Hard-case families 2,
+  range-16).
+- Prototype parameter order drives argument evaluation order (`float k`
+  before `int flag` fixed fmr/mr order).
+- Struct-returning helpers reused for two calls: `Vec3* f(Vec3* out, ...)`
+  with `*out = ...; return out;`. A by-value return makes a second temp slot.
+- Declare C++ callees (mangled symbols) outside `extern "C"` blocks. Otherwise
+  the plain name is emitted, objdiff still says MATCH, and the link breaks.
+- RNG-percent families: `inline float RandPct(P* x, const char* file, int line)`.
+  Pass the file string and line as inline parameters, or the lis/li order
+  is wrong (range-19 injury family, range-15 RNG lerp).
+
+Indexing
+- Retail's base-first `lwzx base,idx` with an r9/r11 index temp comes from an
+  inline that takes the base pointer and does explicit byte arithmetic:
+  `inline int ObjAt(void** a, int i) { int o = i*4; return *(int*)((char*)a + o); }`.
+  The same applies to `KeyAt`, `AtD`, `Pick` and `T* q = base + i; return *q;`.
+  Plain `a[i]` gives the swapped order or r0.
+- Stride records: `Rec* b = i->arr; Rec* r = b + k;` gives `addi` first, then
+  `mulli/add`.
+
+Control flow
+- `if (d < 0) return -1; if (d > 0) return 1; return 0;` gives
+  `subf.; blt; li 1; bgtlr`.
+- A nested-ternary return gives `mr r3,r0` from r0 (fn_801F29AC).
+- A clamp with the high arm out of line:
+  `if (v <= 99) { if (v < 0) v = 0; } else v = 99;`.
+- `int g; if (i != 3) g = f ^ 1; else g = f;` gives `mr; beq; xori`.
+- Empty `for (j = 0; j < n; j++) {}` loops survive as `mtctr/bdnz`.
+- A volatile saturating counter also works counting down:
+  `while (sp8 = t, e = sp8, e > 0) { ...; c = sp8; t = c - 1; if (c <= -1) t = c; }`.
+- A member-pointer table entry is copied to a local before an earlier call:
+  `Pmf f = tbl[k]; call(); (s->*f)();`.
+
+Objects
+- Member arrays of classes with ctors (`Sub m4[2]` of `Ent m4[5]`) give a
+  do-while with post-decrement. Give Ent an inline ctor calling the extern.
+- Struct assignment via `Assign(const T* src, T* dst) { if (dst != src) memcpy(dst, src, sizeof *dst); }`
+  with (src, dst) parameter order.
+- Local struct slots follow declaration order, low to high.
+- Store-order search: hill-climbing over adjacent swaps (about 0.2 s per
+  compile, calling ngccc directly) solves 11-20 stores in minutes.
+  Plain permutations are enough up to about 6.
+
+Still open (Opus queue)
+- `t == 1 || t == 2` kept as two compares in retail (fold_range_test):
+  fn_80254964, fn_8025E5E0, fn_8025CDD8.
+- Loop test at the top with a back edge to it: fn_80255284, fn_80257DFC.
+- Dead `cmpwi` before a constant return (mechanism in Hard-case families 2).
