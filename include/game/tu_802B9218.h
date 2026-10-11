@@ -100,9 +100,17 @@ struct Unk802BACDC_Bat {
 };
 /* 0x1C-byte overlay descriptors (fn_802BB1E4 selects them with +0x1C). */
 struct Unk802BB1E4_Obj {
-    char pad0[0x1C];
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
 };
 
+int fn_802BA45C(Unk802B9F40*, Unk802B9F40_A0* s);
+void fn_802BA67C(Unk802B9F40* t, Unk802B9F40_A1EF0* s);
 void fn_802BAFD0(Unk802BACDC_Bat* b);
 void fn_802BB038(Unk802BACDC_Bat* b);
 void fn_802B9D7C(int kind, int* a, int* b);

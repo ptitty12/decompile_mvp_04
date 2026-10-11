@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_802B9218.h"
+#include "game/tu_8000E618.h"
 
 extern int lbl_8061EAE0;
 extern int lbl_8061E978;
@@ -23,6 +24,13 @@ extern int lbl_8061EADC;
 extern Unk8068B4F8 lbl_8068B4F8;
 
 void fn_803EDA0C(int p);
+Unk8000E618* fn_8000E65C();
+void* fn_8040B190(void* dst, const void* src, ...);
+void fn_803ED95C(int a);
+void fn_803ED8EC(int a);
+int fn_803ED9D4();
+int fn_803ED720(int a, const char* b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern const char lbl_805E10B8[];
 extern const char lbl_805E0F5C[];
 extern const char lbl_805E0F68[];
 void fn_8033E958(const char* fmt, ...);
@@ -514,6 +522,16 @@ void fn_802BA218(Unk802B9F40* p)
     p->m2354 = 1;
 }
 
+void fn_802BA274(Unk802B9F40* t, Unk802B9F40_A0* s, const void* a1, int n1, const void* a2, int n2)
+{
+    if (fn_802BA45C(t, s)) {
+        s->m0 = fn_803774A8(n1, fn_8000E65C()->fn_8000E6F0());
+        s->m4 = fn_803774A8(n2, fn_8000E65C()->fn_8000E6F0());
+    }
+    fn_8040B190(s->m0, a1, n1);
+    fn_8040B190(s->m4, a2, n2);
+}
+
 int fn_802BA45C(Unk802B9F40*, Unk802B9F40_A0* s)
 {
     return s->m0 == 0 && s->m4 == 0;
@@ -573,6 +591,24 @@ Unk802B9F40_A0* fn_802BA55C(Unk802B9F40* t, const char* name)
     return 0;
 }
 
+Unk802B9F40_A1EF0* fn_802BA5F4(Unk802B9F40* t)
+{
+    Unk802B9F40_A1EF0* best = 0;
+    for (int i = 0; i < 0x14; i++) {
+        Unk802B9F40_A1EF0* s = &t->a1EF0[i];
+        if (s->m0 != -1) {
+            if (best == 0 || s->m4 < best->m4) {
+                best = s;
+            }
+        } else {
+            fn_802BA67C(t, s);
+            return s;
+        }
+    }
+    fn_802BA67C(t, best);
+    return best;
+}
+
 void fn_802BA67C(Unk802B9F40* t, Unk802B9F40_A1EF0* s)
 {
     if (s->m0 != -1) {
@@ -585,23 +621,6 @@ void fn_802BA67C(Unk802B9F40* t, Unk802B9F40_A1EF0* s)
         s->mC[i] = 0;
     }
     s->m4 = t->m2350 + 1;
-}
-
-Unk802B9F40_A1EF0* fn_802BA5F4(Unk802B9F40* t)
-{
-    Unk802B9F40_A1EF0* best = 0;
-    for (int i = 0; i < 0x14; i++) {
-        Unk802B9F40_A1EF0* s = &t->a1EF0[i];
-        if (s->m0 == -1) {
-            fn_802BA67C(t, s);
-            return s;
-        }
-        if (best == 0 || s->m4 < best->m4) {
-            best = s;
-        }
-    }
-    fn_802BA67C(t, best);
-    return best;
 }
 
 void fn_802BA708(Unk802B9F40* t)
@@ -795,6 +814,22 @@ int fn_802BB27C(char* o, int idx)
     char* b = o + 8;
     int t = *(int*)((char*)lbl_805E101C + idx * 4);
     return *(int*)(b + t * 0x1C);
+}
+
+void fn_802BB400(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
+{
+    int h = fn_803ED9D4();
+    o->m8 = h;
+    int hi = o->m4;
+    o->mC = fn_803ED720(h, lbl_805E10B8, o->m0 + 0x10, hi - 0x20, 0x20, 0x20, 0, 0, 0, 1);
+}
+
+void fn_802BB474(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
+{
+    fn_803ED95C(o->m8);
+    fn_803ED8EC(o->m8);
+    o->m8 = 0;
+    o->mC = 0;
 }
 
 void fn_802BB4B8()
