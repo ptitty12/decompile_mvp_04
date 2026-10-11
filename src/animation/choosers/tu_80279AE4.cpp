@@ -94,6 +94,14 @@ public:
 
     void fn_8035EB7C(Unk80270BA0_X* x);
     void fn_8035EC3C(float yaw);
+    void Init()
+    {
+        m44 = 0;
+        m68.Clear();
+        mA0 = 0;
+        mBC = 0;
+        m0 = lbl_8060E938;
+    }
 };
 
 void fn_80386110(Unk80271DBC_Link* link, Unk8035EB7C* q, int a, int b, float* out, int c);
@@ -197,6 +205,14 @@ struct Unk8027A05C_Entry {
     unsigned int m24;
 };
 
+/* Matching note: reading the flags word through this helper gives retail's
+ * "add rX,this,idx*40; lwz 0x44(rX)"; m20[idx].m24 directly gives an indexed
+ * "addi rX,this,0x44; lwzx" instead. */
+inline Unk8027A05C_Entry* Unk8027A05C_At(Unk8027A05C_Entry* arr, int i)
+{
+    return &arr[i];
+}
+
 /* Cache of up to three path query results for one player (size 0xA8). */
 class Unk8027A05C {
 public:
@@ -294,7 +310,7 @@ float Unk8027A05C::fn_8027A280(int a)
     }
     int changed = 0;
     int idx = fn_8027A198(&changed);
-    if (idx == -1 || changed || (int)m20[idx].m24 >= 0) {
+    if (idx == -1 || changed || (int)Unk8027A05C_At(m20, idx)->m24 >= 0) {
         fn_8027A4A4(&idx, 0, 0);
     }
     float r = (float)m20[idx].m1C * 0.000076293945f;
@@ -309,7 +325,7 @@ Unk80273498_Vec3 Unk8027A05C::fn_8027A358(int a)
     }
     int changed = 0;
     int idx = fn_8027A198(&changed);
-    if (idx == -1 || changed || !(m20[idx].m24 & 0x40000000)) {
+    if (idx == -1 || changed || !(Unk8027A05C_At(m20, idx)->m24 & 0x40000000)) {
         fn_8027A4A4(&idx, 1, 0);
     }
     Unk80273498_Vec3 v;
@@ -330,46 +346,44 @@ void Unk8027A05C::fn_8027A4A4(int* idx, int flag, int unused)
         *idx = m9C;
         m9C = m9C + 1;
     }
-    m20[*idx].m0 = m4;
-    m20[*idx].m8 = mC;
-    m20[*idx].mC = m10;
-    m20[*idx].m4 = m8;
+    int a = m4;
+    int c = mC;
+    int d = m10;
+    int b = m8;
+    m20[*idx].m0 = a;
+    m20[*idx].m8 = c;
+    m20[*idx].mC = d;
+    m20[*idx].m4 = b;
     m20[*idx].m10 = m14;
     float f18 = 0.0f;
     Unk80273498_Vec3 v20 = lbl_806055AC;
     Unk80273498_Vec3 v30 = lbl_806055AC;
     Unk8035EB7C q;
-    q.m68.a = 0;
-    q.m44 = 0;
-    q.m68.b = 0;
-    q.m68.c = 0;
-    q.mBC = 0;
-    q.mA0 = 0;
-    q.m0 = lbl_8060E938;
-    if (m4 == 0) {
+    q.Init();
+    if (a == 0) {
         q.mBC = 1;
     } else {
         q.mBC = 0xB;
-        q.mA0 = m4;
+        q.mA0 = a;
         q.m40 = 0.0f;
     }
     float f100 = 0.0f;
-    if (m8) {
-        fn_80386110(m0->m618, &q, m8, lbl_806242B4, &f100, 2);
+    if (b) {
+        fn_80386110(m0->m618, &q, b, lbl_806242B4, &f100, 2);
     }
     int sc = lbl_8061EC9C;
-    fn_80386188(m0->m618, &q, mC, m10, &f18, 1, &sc, &v30, &v20, 0, 0);
+    fn_80386188(m0->m618, &q, c, d, &f18, 1, &sc, &v30, &v20, 0, 0);
     m20[*idx].m1C = (short)((f100 + f18) * 13107.2f);
-    m20[*idx].m24 |= 0x80000000u;
+    Unk8027A05C_At(m20, *idx)->m24 |= 0x80000000u;
     if (flag) {
         m20[*idx].m1E = (short)(v30.x * 91.022224f);
         m20[*idx].m20 = (short)(v30.y * 91.022224f);
         m20[*idx].m22 = (short)(v30.z * 91.022224f);
-        m20[*idx].m24 |= 0x40000000u;
+        Unk8027A05C_At(m20, *idx)->m24 |= 0x40000000u;
     } else {
         m20[*idx].m1E = 0;
         m20[*idx].m20 = 0;
         m20[*idx].m22 = 0;
-        m20[*idx].m24 &= ~0x40000000u;
+        Unk8027A05C_At(m20, *idx)->m24 &= ~0x40000000u;
     }
 }
