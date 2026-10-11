@@ -134,6 +134,7 @@ extern FeTunHolder* lbl_8061B9A0;
 #define FE_VI0(n) virtual int v##n();
 #define FE_VI1(n) virtual int v##n(int a);
 #define FE_VF0(n) virtual float v##n();
+#define FE_VP2(n) virtual void* v##n(int a, int b);
 class FeObj : public UiBase {
 public:
     FE_LO(FE_V0) virtual FeObj* v32(const char* a, int b); FE_HI(FE_V0)
@@ -219,7 +220,9 @@ void fn_800ECAA4(void* self);
 /* Game state record returned by fn_800B555C(); only the fields the front-end reads. */
 struct FeState {
     int m0;
-    char pad4[0x570 - 4];
+    char pad4[0x14 - 4];
+    int m14;
+    char pad18[0x570 - 0x18];
     int m570;
     char pad574[0x588 - 0x574];
     int m588;
@@ -230,6 +233,7 @@ struct FeState {
 };
 
 typedef void (*FeCb)(int, void*);
+typedef int (*FeCb2)();
 extern "C" {
 FeState* fn_800B555C();
 FeObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
@@ -246,7 +250,7 @@ FeObj* fn_800C8054(void* p);
 FeObj* fn_800C8058(void* p);
 FeObj* fn_800C805C(void* p);
 FeObj* fn_800C8060(void* p);
-void fn_80131F34(FeObj* o, void* self, FeCb cb, int a, int b, int c, int d, int e, int f,
+void fn_80131F34(FeObj* o, void* self, FeCb cb, FeCb2 cb2, int b, int c, int d, int e, int f,
                  int g, int h, int i, int j, int k);
 }
 
@@ -506,7 +510,10 @@ struct FeScr2 : FeObj {
     char pad40[0x130 - 0x40];
     int m130, m134, m138;
     FeObj* m13C;
-    int m140, m144, m148, m14C, m150, m154, m158, m15C;
+    int m140, m144, m148, m14C;
+    short m150;
+    unsigned short m152;
+    int m154, m158, m15C;
 };
 struct FeRec1C {
     char pad0[0xC];
@@ -541,7 +548,8 @@ struct FeScr6 : FeObj {
     FeObj* m13C;
     char pad140[0x17C - 0x140];
     int m17C;
-    char pad180[0x188 - 0x180];
+    int m180;
+    int m184;
     FeObj* m188;
     FeSlotObj* m18C;
     int m190;
@@ -576,6 +584,8 @@ void fn_80450C4C(FeScr6* s);
 void fn_804509E0(FeScr6* s, int a, int b);
 void fn_8045081C(FeObj* o, int a);
 void fn_80451028(FeScr6* s, int a);
+void fn_8044F284(int a, void* b);
+void fn_8044F3F8(int a, int b);
 void fn_80450FCC(FeScr6* s);
 void fn_80450E44(FeScr6* s, int a);
 }
@@ -695,7 +705,8 @@ struct FeWidgetS : FeObj {
     FeSub mDC;
 };
 struct FeScr5 : FeObj {
-    char pad40[0x144 - 0x40];
+    char pad40[0x140 - 0x40];
+    FeObj* m140;
     int m144;
     char pad148[4];
     int m14C;
@@ -707,7 +718,7 @@ struct FeScr5 : FeObj {
 struct Unk8007F198_B;
 extern "C" {
 FeTimer* fn_80446AD4(void* self);
-void fn_804454CC(void* self);
+void fn_804454CC(void* self, int a);
 void fn_8044DDFC(FeScr5* s);
 void fn_8044DCAC(FeScr5* s, int a);
 void fn_8044F45C(int a);
@@ -881,5 +892,190 @@ void fn_801321D4(FeObj* o, void* self, FeCb cb, int a, void* b, int c, int d, in
 void fn_8055F5A0(int a);
 void fn_8055EAFC(int a);
 void fn_8044C644(int a, FeScr_8044974C* self);
+}
+
+class FeObjP2 : public UiBase {
+public:
+    FE_LO(FE_VP2) virtual FeObj* v32(const char* a, int b); FE_HI(FE_VP2)
+};
+struct FeScr2Raw {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138, m13C, m140, m144;
+    char pad148[0x14C - 0x148];
+    int m14C, m150, m154, m158, m15C, m160;
+};
+extern int lbl_8061AC54;
+extern "C" {
+int fn_8032A130(int a, int b, unsigned short c);
+int fn_8032A2CC(int a, unsigned short c);
+void fn_80453D84(FeScr_8044974C* s, int a);
+}
+
+extern "C" {
+void fn_80528920(FeObj* o, int a);
+int fn_8056AF84(int a, int b, int c, int* d, int* e);
+void fn_800DD44C(int* a, char* b, int c);
+}
+
+struct UiItemN {
+    char pad0[0xC];
+    char name[16];
+};
+/* Widget view for the cell-name lookups: v33 returns a named item, v70 returns the cell content. */
+class FeObjQ : public UiBase {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual void v30();
+    virtual void v31();
+    virtual FeObj* v32(const char* a, int b);
+    virtual UiItemN* v33(int a, int b);
+    virtual void v34();
+    virtual void v35();
+    virtual void v36();
+    virtual void v37();
+    virtual void v38();
+    virtual void v39();
+    virtual void v40();
+    virtual void v41();
+    virtual void v42();
+    virtual void v43();
+    virtual void v44();
+    virtual void v45();
+    virtual void v46();
+    virtual void v47();
+    virtual void v48();
+    virtual void v49();
+    virtual void v50();
+    virtual void v51();
+    virtual void v52();
+    virtual void v53();
+    virtual void v54();
+    virtual void v55();
+    virtual void v56();
+    virtual void v57();
+    virtual void v58();
+    virtual void v59();
+    virtual void v60();
+    virtual void v61();
+    virtual void v62();
+    virtual void v63();
+    virtual void v64();
+    virtual void v65();
+    virtual void v66();
+    virtual void v67();
+    virtual void v68();
+    virtual void v69();
+    virtual FeObjQ* v70();
+    virtual void v71();
+    virtual void v72();
+    virtual void v73();
+    virtual void v74();
+    virtual void v75();
+    virtual void v76();
+    virtual void v77();
+    virtual void v78();
+    virtual void v79();
+    virtual void v80();
+    virtual void v81();
+    virtual void v82();
+    virtual void v83();
+    virtual void v84();
+    virtual void v85();
+    virtual void v86();
+    virtual void v87();
+    virtual void v88();
+    virtual void v89();
+    virtual void v90();
+    virtual void v91();
+    virtual void v92();
+    virtual void v93();
+    virtual void v94();
+    virtual void v95();
+    virtual void v96();
+    virtual void v97();
+    virtual void v98();
+    virtual void v99();
+    virtual void v100();
+    virtual void v101();
+    virtual void v102();
+    virtual void v103();
+    virtual void v104();
+    virtual void v105();
+    virtual void v106();
+    virtual void v107();
+    virtual void v108();
+    virtual void v109();
+    virtual void v110();
+    virtual void v111();
+    virtual void v112();
+    virtual void v113();
+    virtual void v114();
+    virtual void v115();
+    virtual void v116();
+    virtual void v117();
+    virtual void v118();
+    virtual void v119();
+    virtual void v120();
+    virtual void v121();
+    virtual void v122();
+    virtual void v123();
+    virtual void v124();
+    virtual void v125();
+    virtual void v126();
+    virtual void v127();
+};
+
+struct FeSt8 {
+    char pad0[0x4F4];
+    int m4F4;
+};
+extern int lbl_80621648;
+extern "C" {
+void fn_804D1CB8(void* self);
+int fn_80528918(void);
+}
+
+extern "C" int fn_8045A9AC(void* s, int a);
+
+inline FeObj* FeGetP(char* b, int o)
+{
+    return *(FeObj**)(b + o);
+}
+
+extern "C" {
+int fn_8044E7C4(void);
+void fn_8044E304(int a, FeObj* o);
+void fn_8044E398(int a, FeObj* o);
+void fn_804502F4(int a, FeScr6* b);
 }
 #endif

@@ -45,6 +45,7 @@ extern "C" FE_OVERLAY int fn_8044477C(void)
 }
 
 extern char lbl_8067CEB0[];
+extern char lbl_8067CBD0[];
 /* near-miss: store order: 66 random/structured orderings tried, best 10 slots off */
 extern "C" FE_OVERLAY void fn_80444850(FeTimerRaw* self);
 /* near-miss: Clear() form gives the right shape but the two zero registers (r11 for the byte stores, r0 for the rest) are scheduled differently; 24 store orders tried */
@@ -72,6 +73,20 @@ extern "C" FE_OVERLAY void fn_80444850(FeTimerRaw* self)
     self->m1C = 0;
 }
 
+struct FeDate {
+    unsigned short y;
+    unsigned short m;
+};
+extern "C" FE_OVERLAY void fn_80444FE4(FeTimer* self)
+{
+    FeDate d;
+    fn_80329FA0(&d, fn_800A2AE8(lbl_80619948));
+    if (*(unsigned short*)&self->mC == d.y && *((unsigned short*)&self->mC + 1) == d.m)
+        ((FeObj1*)self->m4)->v17(1);
+    else
+        ((FeObj1*)self->m4)->v17(0);
+}
+
 extern "C" FE_OVERLAY void fn_80445090(FeTimer* self)
 {
     int t = self->m8;
@@ -80,11 +95,44 @@ extern "C" FE_OVERLAY void fn_80445090(FeTimer* self)
     fn_80444FE4(self);
 }
 
+extern "C" FE_OVERLAY FeScr2Raw* fn_80445104(FeScr2Raw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648((FeScrRaw*)self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_8067CBD0;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 0;
+    self->m144 = 3;
+    self->m14C = 0;
+    self->m150 = -1;
+    self->m154 = 0;
+    self->m158 = 0;
+    self->m15C = 0;
+    self->m160 = -1;
+    int one = 1;
+    lbl_8061AC54 = one;
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_80445454(void* self)
 {
     fn_800ECF18(self);
     if (fn_800A2E6C(lbl_80619948) != 0)
         fn_804A763C(fn_800B7AB8(UiGetMsgMgr(), "FTOPBAR"), 1);
+}
+
+extern "C" FE_OVERLAY void fn_804454CC(void* s, int a)
+{
+    FeScr2* self = (FeScr2*)s;
+    fn_800ED310(self, a);
+    if (a != 0) {
+        ((FeObj1*)self->m13C)->v14(1);
+        ((FeObj1*)self->m134)->v14(0);
+    } else {
+        ((FeObj1*)self)->v14(0);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80445564(FeScr2* self, int a, int b)
@@ -133,6 +181,17 @@ extern "C" FE_OVERLAY int fn_8044643C(FeScr2* self, int a, int b)
     return r;
 }
 
+extern "C" FE_OVERLAY int fn_804464B0(FeScr2* self, int a)
+{
+    int n = a - 1;
+    int x = fn_8032A130(n, 1, self->m152);
+    if (fn_8032A2CC(n, self->m152) == 0x1E && x > 5)
+        return 0x24 - x;
+    if (fn_8032A2CC(n, self->m152) == 0x1F && x > 4)
+        return 0x24 - x;
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_80446534(void)
 {
     if ((fn_8044477C() != 0 && lbl_80621638 == 0) || lbl_80621638 == 1)
@@ -153,4 +212,10 @@ extern "C" FE_OVERLAY void fn_80446974(FeScr2* self)
 {
     self->m158 = ((FeObjI*)self->m13C)->v60();
     self->m15C = ((FeObjI*)self->m13C)->v61();
+}
+
+extern "C" FE_OVERLAY FeTimer* fn_80446AD4(void* s)
+{
+    FeScr2* self = (FeScr2*)s;
+    return (FeTimer*)((FeObjP2*)self)->v90(((FeObjI*)self->m138)->v60(), ((FeObjI*)self->m138)->v61());
 }
