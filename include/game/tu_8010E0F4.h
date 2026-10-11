@@ -350,7 +350,7 @@ struct Unk8010E0F4_Scr : Unk800C7B40_Widget {
 
 /* Second front-end screen (TITLESLIDE-derived, vtable lbl_80650628, ctor fn_80114A20 in
  * tu_8011243C.cpp): the same code as screen A at shifted offsets (A 0x134->0x184,
- * 0x150->0x198, 0x154->0x19C, 0x168->0x1B8, 0x16C->0x1BC), found by aligning the asm of
+ * 0x150->0x198, 0x154->0x19C, 0x168->0x1B8, 0x16C->0x1BC), found by aligning the disassembly of
  * the cloned functions. Evidence for the rest: ctor fn_80114A20 stores m130, m17C (a second
  * vptr), m1A0..m1BC and calls fn_80134E38 on the member at +0x134. */
 struct Unk80114A20_Scr : Unk800C7B40_Widget {
