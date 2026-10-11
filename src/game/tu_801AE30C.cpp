@@ -68,7 +68,15 @@ void fn_801B185C(Unk801AB63C_P* p);
 int fn_801AEBB0(void* a, void* q);
 int fn_801B19E8(Unk801AB63C_P* p, Unk801AB63C_Q* q);
 int fn_801B5EDC(void* a, int b, int c);
-void fn_801B1D60(Unk801AB63C_P* p, Unk801AB63C_Q* q, int a, int b);
+Unk801AB63C_Q* fn_801B1DD8(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d, int e);
+int fn_801B350C(Unk801AB63C_P* p, Unk801AB63C_Q* t, Unk801AB63C_Q* q, int d);
+int fn_801B13D0(Unk801AB63C_P* p, Unk801AB63C_Q* q, Unk801AB63C_Q* t, int c);
+int fn_801B1D60(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
+int fn_802530E8(void* a);
+int fn_801B371C(void* a, Unk801AB63C_Q* q, int c);
+Unk801AB63C_Q* fn_801B21A4(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
+int fn_801B3588(Unk801AB63C_P* p, Unk801AB63C_Q* t, Unk801AB63C_Q* q);
+int fn_801B15EC(Unk801AB63C_P* p, Unk801AB63C_Q* q, Unk801AB63C_Q* t, int c);
 
 struct Unk801AE30C_Pair {
     int m0;
@@ -316,4 +324,25 @@ void fn_801B1B88(Unk801AB63C_P* p, Unk801AB63C_Q* q)
         int v = fn_801B5EDC(p, q->m708, 0);
         fn_801B1D60(p, q, 2, v == 3);
     }
+}
+
+int fn_801B1D60(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d)
+{
+    Unk801AB63C_Q* t = fn_801B1DD8(p, q, c, d, 0);
+    if (t != 0 && fn_801B350C(p, t, q, 0) == 1) {
+        return fn_801B13D0(p, q, t, c);
+    }
+    return 0;
+}
+
+int fn_801B20F0(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d)
+{
+    if (q != 0 && fn_802530E8((char*)q + 0x480) != 0 && fn_801B371C(p, q, 1) != 0) {
+        return 0;
+    }
+    Unk801AB63C_Q* t = fn_801B21A4(p, q, c, d);
+    if (t != 0 && fn_801B3588(p, t, q) == 1) {
+        return fn_801B15EC(p, q, t, c);
+    }
+    return 0;
 }
