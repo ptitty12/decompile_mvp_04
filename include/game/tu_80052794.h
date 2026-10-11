@@ -1116,4 +1116,12 @@ extern const char lbl_805A931C[];
 void fn_8033E958(const char* fmt, ...);
 void fn_8005B414(Unk8005ADD0_Obj* o);
 int fn_8005B6E4(Unk8005ADD0_Obj* o);
+int fn_803AA934(void* sub, int a, int b, int c, int d);
+int fn_803A7924(int a, int b, int c);
+extern int lbl_80620548;
+int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch);
+void fn_8005A240(Unk8005BA1C_Voice* v);
+
+void fn_80392AA4(int h);
+void fn_80392A28(int h);
 #endif

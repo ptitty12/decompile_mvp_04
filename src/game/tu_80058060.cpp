@@ -47,6 +47,86 @@ Unk8005BA1C_Voice::~Unk8005BA1C_Voice()
     fn_8005A19C(this);
 }
 
+int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
+{
+    int ok = 0;
+    if (v->m4 != 0) {
+        fn_8005A814(v, 0);
+        fn_8005A19C(v);
+        if (a == 0) {
+            v->m0 = fn_803AA934(&v->m50, v->m10, v->mC, v->m4, v->m8);
+        } else {
+            int cnt = 0;
+            int sum = 0;
+            for (int i = 0; i < 4; i++) {
+                if (lbl_805AE420[ch].e[i].m24 == 1) {
+                    cnt++;
+                    sum += lbl_805AE420[ch].e[i].m20;
+                }
+            }
+            if (fn_803A7924(v->m4, sum - (lbl_80620548 << 10), cnt) >= 0) {
+                v->m0 = 0;
+            }
+        }
+        if (v->m0 >= 0) {
+            ok = 1;
+            v->m18 = 0;
+        }
+    }
+    return ok;
+}
+
+void fn_8005A240(Unk8005BA1C_Voice* v)
+{
+    if (v->m1C == 0 && v->m0 > -1) {
+        fn_803A975C();
+        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
+            fn_803A979C();
+            if (v->m34 > 0) {
+                fn_803A975C();
+                fn_803AB644(v->m38, &v->m40);
+                fn_803A979C();
+                if (v->m40 == 2 && v->m48 <= 0xC8) {
+                    fn_8005AA00(v);
+                }
+            }
+        } else {
+            fn_803A979C();
+        }
+    }
+}
+
+void fn_8005A2E4(Unk8005BA1C_Voice* v, int k)
+{
+    if (v->m1C == 0 && fn_8005A5FC(v, k) != 0 && v->m0 >= 0) {
+        fn_803A975C();
+        int f = 0;
+        if (fn_803AB8A4(v->m0, &v->m34) >= 0) {
+            fn_803A979C();
+            int t = v->m34;
+            if (t == 0) {
+                f = 1;
+            } else if (t == 1) {
+                fn_803A975C();
+                fn_803AB644(v->m38, &v->m40);
+                fn_803A979C();
+                if (v->m40 == 2) {
+                    f = v->m48 <= 0xC8;
+                }
+            }
+            if (f == 1) {
+                int h = lbl_805B09F4[k].mC4;
+                if (fn_803927D0(h) != 0) {
+                    fn_80392AA4(h);
+                    fn_80392A28(h);
+                }
+            }
+        } else {
+            fn_803A979C();
+        }
+    }
+}
+
 /* near-miss (2 slots): the ch * 0x1C product lands in r11 instead of r0. Same in fn_8005A4F8. */
 int fn_8005A3E8(Unk8005BA1C_Voice* v, int ch, int x)
 {
