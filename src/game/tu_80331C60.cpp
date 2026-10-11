@@ -468,11 +468,11 @@ void fn_80332898()
     }
     int on = lbl_8061EDCC;
     int off = on ^ 1;
-    lbl_8061F830 = off;
-    lbl_8061FE94 = on;
     lbl_8068B4BC = off;
+    lbl_8061FE94 = on;
     lbl_8061C900 = off;
     lbl_8061B894 = off;
+    lbl_8061F830 = off;
     fn_80331568();
 }
 
