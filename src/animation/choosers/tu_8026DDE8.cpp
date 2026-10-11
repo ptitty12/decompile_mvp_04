@@ -356,13 +356,13 @@ Unk8037B3E8* cMatrixChooser::fn_vslot5()
     return new (lbl_806EF9B4) cMatrixChooser;
 }
 
-/* near-miss, well under 95%: 419 of 433 instructions, per-case structure and
- * constants match. Open: (1) the float clamps (see fn_8026FDB0), which retail
- * writes with the limit tests in the opposite sense (a "bgt" jump to the
- * 1.0 block, i.e. !(x > hi) { !(x >= lo) ... } else x = hi), (2) the incoming
- * arguments c,d,e,f land in different callee-saved registers, (3) the switch
- * dispatch tree differs a little (cases 0-2 share the default body here).
- * Attempts so far: 5. */
+/* near-miss, well under 95%: 431 of 433 instructions, per-case structure,
+ * constants and the nine clamps (">?" form, see fn_8026FDB0) match. Open:
+ * (1) the incoming arguments c,d,e,f land in different callee-saved registers,
+ * (2) the switch dispatch tree differs a little (cases 0-2 share the default
+ * body here), (3) the m170/m178/m38 array reads index from x+0x734 in retail
+ * (addi r8; slwi; addi 368; lfsx) where ours folds the offsets into the base.
+ * Attempts so far: 6. */
 int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f)
 {
     m4 = -1;
@@ -415,11 +415,7 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
         } else {
             float t3 = p->m38[p->m190];
             a = t3 * 0.5f / (x->mAB4 * 120.0f) + 0.5f;
-            if (a > 1.0f) {
-                a = 1.0f;
-            } else if (!(a >= 0.0f)) {
-                a = 0.0f;
-            }
+            a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
         }
         if (t2 != -1000.0f) {
             b = t2;
@@ -427,11 +423,7 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
         } else {
             float t4 = p->m30[p->m190];
             b = t4 / (x->mAB4 * 120.0f);
-            if (b > 1.0f) {
-                b = 1.0f;
-            } else if (!(b >= 0.0f)) {
-                b = 0.0f;
-            }
+            b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
         }
         m4 = 2;
         mode = 1;
@@ -446,17 +438,9 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
             fx = 1;
         } else {
             float t3 = p->m40[p->m190];
-            if (t3 > 3.1415927f) {
-                t3 = 3.1415927f;
-            } else if (!(t3 >= -3.1415927f)) {
-                t3 = -3.1415927f;
-            }
+            t3 = !(t3 > 3.1415927f) ? (t3 >? -3.1415927f) : 3.1415927f;
             a = t3 * 0.15915494f + 0.5f;
-            if (a > 1.0f) {
-                a = 1.0f;
-            } else if (!(a >= 0.0f)) {
-                a = 0.0f;
-            }
+            a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
         }
         if (!(t2 < 0.0f)) {
             b = t2;
@@ -464,11 +448,7 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
         } else {
             float t4 = p->m30[p->m190];
             b = t4 / (x->mAB4 * 120.0f);
-            if (b > 1.0f) {
-                b = 1.0f;
-            } else if (!(b >= 0.0f)) {
-                b = 0.0f;
-            }
+            b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
         }
         m4 = 1;
         mode = 1;
@@ -479,17 +459,9 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
         float t1 = p->m38[p->m190];
         float t2 = p->m30[p->m190];
         a = t1 * 0.5f / (x->mAB4 * 120.0f) + 0.5f;
-        if (a > 1.0f) {
-            a = 1.0f;
-        } else if (!(a >= 0.0f)) {
-            a = 0.0f;
-        }
+        a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
         b = t2 / (x->mAB4 * 120.0f);
-        if (b > 1.0f) {
-            b = 1.0f;
-        } else if (!(b >= 0.0f)) {
-            b = 0.0f;
-        }
+        b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
         m4 = 1;
         mode = 0;
         break;
@@ -499,17 +471,9 @@ int cMatrixChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, in
         float t1 = p->m38[p->m190];
         float t2 = p->m130[p->m190];
         a = t1 * 0.5f / (x->mAB4 * 120.0f) + 0.5f;
-        if (a > 1.0f) {
-            a = 1.0f;
-        } else if (!(a >= 0.0f)) {
-            a = 0.0f;
-        }
+        a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
         b = t2 * 0.5f / (x->mAB4 * 120.0f) + 0.5f;
-        if (b > 1.0f) {
-            b = 1.0f;
-        } else if (!(b >= 0.0f)) {
-            b = 0.0f;
-        }
+        b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
         m4 = 1;
         mode = 1;
         break;
