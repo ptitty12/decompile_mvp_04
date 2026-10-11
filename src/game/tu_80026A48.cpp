@@ -139,6 +139,40 @@ extern "C" void fn_80028560()
 {
 }
 
+/* near-miss: 106/106 insns, ~10 slots differ: the tail (three fn_801A497C vector copies) matches;
+ * the block layout around the fn_800289F8/fn_8002870C/fn_800233B4 selection is one jump off
+ * (retail falls through to the fn_800233B4 block and branches over fn_8002870C). */
+extern "C" void fn_80028564(Unk80023AC4_Obj* x)
+{
+    fn_80057B54(fn_800475EC()->mB98, 1);
+    if (x->m6F0 == 0) {
+        x->fn_800233B4(0xD, 2, 0);
+        fn_80026D7C(x);
+    }
+    x->m6F0 = 1;
+    x->m7E0 = 0;
+    unsigned t = x->m80[0]->m4C;
+    int found = x->fn_80023430(7, 0, 0);
+    if (found != 0 || t < x->m128) {
+        if (found != 0)
+            fn_800289F8(x);
+        unsigned r = x->m128;
+        int v = 1;
+        if (t < r)
+            v = r - t;
+        x->fn_800233B4(0x11, v, 0);
+    } else {
+        fn_8002870C(x);
+    }
+    Unk8001F2C4_World* w = x->m80[0];
+    Unk801A4B34_Pos* p6 = fn_801A497C(w, w->m6F8->m14->m1CD0 == 0, 6);
+    Unk801A4B34_Pos* p7 = fn_801A497C(w, w->m6F8->m14->m1CD0 == 0, 7);
+    Unk801A4B34_Pos* p8 = fn_801A497C(w, w->m6F8->m14->m1CD0 == 0, 8);
+    x->m5C8 = p6->m60;
+    x->m5D4 = p7->m60;
+    x->m5E0 = p8->m60;
+}
+
 extern "C" void fn_80028944(Unk80023AC4_Obj* x)
 {
     if (x->fn_80023430(0xA, 0, 0) == 0) {
@@ -148,6 +182,35 @@ extern "C" void fn_80028944(Unk80023AC4_Obj* x)
         }
         x->m104 = 1;
     }
+}
+
+extern "C" void fn_800289F8(Unk80023AC4_Obj* x)
+{
+    if (x->fn_80023430(0xA, 0, 0) == 1)
+        x->fn_80023490(0xA, 0);
+    if (x->fn_80023430(7, 0, 0) == 1)
+        x->fn_80023490(7, 0);
+    if (x->mB4 != 0) {
+        for (int i = 0; i < 10; i++) {
+            if (x->e[i].m4 != 0) {
+                x->e[i].m4 = 0;
+                for (int j = 0; j <= 0x31; j++) {
+                    if (lbl_8061690C[j].key == x->e[i].m0) {
+                        (x->*lbl_8061690C[j].fn)();
+                        break;
+                    }
+                }
+                x->mB4 = x->mB4 - 1;
+                if (x->mB4 == 0)
+                    break;
+            }
+        }
+    }
+    if (x->m100 == 0)
+        ((void (*)(Unk80023AC4_Obj*))fn_8002B5B0)(x);
+    x->m100 = 1;
+    x->fn_800233B4(8, 4, 0);
+    x->m700 = 0;
 }
 
 extern "C" void fn_80028B94(Unk80023AC4_Obj* x)

@@ -34,6 +34,8 @@ struct Unk800475EC_Obj {
     float mAE4;
     float mAE8;
     float mAEC;
+    char padAF0[0xB98 - 0xAF0];
+    int mB98;
     /* Two-layer setters: a float passed through two inline layers takes two stack slots. */
     void SetAE0b(float w) { mAE0 = w; }
     void SetAE0(float v) { SetAE0b(v); }

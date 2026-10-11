@@ -12,7 +12,30 @@
 
 #include "game/tu_80021BE8.h"
 
+/* Object behind Obj::m6C8 (vptr at +0); only slot 11 is called here. */
+class Unk8002A920_Vt {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+};
+
 struct Unk80023AC4_Obj;
+typedef void (Unk80023AC4_Obj::*Unk8061690C_Fn)();
+/* Dispatch table at 0x8061690C: 50 entries of {key, pointer to member function} (12 bytes). */
+struct Unk8061690C_Ent {
+    int key;
+    Unk8061690C_Fn fn;
+};
+extern Unk8061690C_Ent lbl_8061690C[50];
 
 /* Sub-object at Obj+0x160 (initialised by fn_8001CE80; m8 is a counter at +0x168, m44 at +0x1A4). */
 struct Unk8001CE80_Sub {
@@ -143,6 +166,9 @@ int fn_8006BE18(Unk8001F5CC_Tbl* t);
 void fn_80344494(int* p, int a);
 void fn_8003F974(int a);
 void fn_80030274();
+void fn_80057B54(int a, int b);
+void fn_8002870C(Unk80023AC4_Obj* x);
+void fn_800307B4(Unk80023AC4_Obj* x);
 void* fn_801A4CE8(Unk8001F2C4_World* w, int a);
 void fn_80378ACC(char* sub, void* p);
 void fn_8003A058(Unk80038EB4_Obj* o, int a);
@@ -197,7 +223,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk8001F5CC_Tbl* mC8;
     int mCC;
     int mD0;
-    char padD4[0x8];
+    int mD4;
+    char padD8[0x4];
     int mDC;
     char padE0[0x14];
     int mF4;
@@ -260,7 +287,11 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m570;
     int m574;
     int m578;
-    char pad57C[0xB8];
+    char pad57C[0x4C];
+    Unk801A4B34_Vec3 m5C8;
+    Unk801A4B34_Vec3 m5D4;
+    Unk801A4B34_Vec3 m5E0;
+    char pad5EC[0x48];
     int m634;
     int m638;
     char pad63C[0x4];
@@ -302,7 +333,9 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m794;
     char pad798[0x24];
     int m7BC;
-    char pad7C0[0x34];
+    char pad7C0[0x20];
+    int m7E0;
+    char pad7E4[0x10];
     int m7F4;
 };
 
