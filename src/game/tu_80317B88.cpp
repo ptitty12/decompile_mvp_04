@@ -147,6 +147,7 @@ void fn_80317B88(Fx* self, int a) {
 
 void fn_80317F30(Fx* self, int a) { self->m24 = a; }
 
+/* near-miss: callee-saved registers of d/f/g/h permuted (priority); logic is the pass-through of fn_803181E4 */
 void fn_80318140(int a, int b, int c, int d, void* e, int f, int g, int h, float x1, float x2, float x3, float x4, float x5, int s0, int s1) {
     fn_803181E4(a, b, c, d, fn_8014DDAC(e), f, g, h, x1, x2, x3, x4, x5, s0, s1);
 }
@@ -171,6 +172,7 @@ void fn_803188C4(Fx* self) {
 
 void fn_803188F0(Fx* self) { self->m11C = 0; }
 
+/* near-miss: three erase-by-id loops; only the count/element register assignment differs (r9/r11 swapped) */
 void fn_803188FC(Fx* self, int id) {
     int i = 0;
     while (i < self->m118) {
@@ -293,6 +295,7 @@ int fn_803194F4(FxReg* self, int a, int b, int c, int d) {
     return fn_80319490(self, (int*)self->m0, a, b, c, d);
 }
 
+/* near-miss: store order of the 0x34..0x58 fields (m34 lands one slot early) */
 FxCfg* fn_80319534(FxCfg* self) {
     new ((void*)self) Unk8037B3E8(0xCED26CE8U);
     self->m0 = lbl_80665860;
@@ -401,6 +404,7 @@ void fn_8031A760(FxB* self, int tex) {
     fn_803E6C28(r, self->m24 * 6);
 }
 
+/* near-miss: retail keeps li/lis/lfs inside the item loops; ours hoists them */
 FxC* fn_8031A7CC(FxC* self, int a) {
     fn_80328234(self, 0xD, a);
     self->m70 = 0;
@@ -438,6 +442,7 @@ int fn_8031A8E0(const char* name) {
     return -1;
 }
 
+/* near-miss: retail loads both float temps before the first store */
 void fn_8031AB8C(FxRec* r, int x, int y) {
     float fx = (float)x / (float)r->m28;
     float fy = (float)y / (float)r->m2C;
@@ -448,6 +453,7 @@ void fn_8031AB8C(FxRec* r, int x, int y) {
 }
 
 // fn_8031AC48
+/* near-miss: retail schedules the string-byte load after the stores */
 FxRec::FxRec() { // fn_8031AC48
     m3C = 0;
     m38 = -1;
@@ -466,6 +472,7 @@ void fn_8031B0F0(FxC* self, const char* name, int val) {
     }
 }
 
+/* near-miss: retail keeps the output cursor in a stack slot (address taken) */
 int fn_8031B170(FxC* self, int** pp) {
     int cnt = 0;
     for (int k = 0; k < 5; k++) {
@@ -505,6 +512,7 @@ void fn_8031B27C(FxC* self, int i) {
     *(FxSlot*)((char*)self + off) = self->a28[1];
 }
 
+/* near-miss: slot address computed with add+displacement in retail, addi+lwzx here */
 void fn_8031B2A8(FxC* self, int i) {
     FxSrc* src = self->a28[i].m4;
     for (int k = 0; k < 5; k++) {
