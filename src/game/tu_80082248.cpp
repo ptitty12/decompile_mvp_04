@@ -58,7 +58,7 @@ void fn_80082308(Link* l);
 Tree* fn_80082318(Tree* self);
 void fn_800824D4(void* unused, Node* n);
 void fn_80082510(Tree* self);
-void fn_80082F4C(Tree* t, int key);
+Node* fn_80082F4C(Tree* t, int key);
 int fn_80082FC4(Tree* t, Node* n);
 void fn_80083258(void* self, int a, int h, int b, Key* k, int c);
 void fn_8008395C();
@@ -83,7 +83,7 @@ void fn_80082308(Link* l);
 Tree* fn_80082318(Tree* self);
 void fn_800824D4(void* unused, Node* n);
 void fn_80082510(Tree* self);
-void fn_80082F4C(Tree* t, int key);
+Node* fn_80082F4C(Tree* t, int key);
 int fn_80082FC4(Tree* t, Node* n);
 void fn_80083258(void* self, int a, int h, int b, Key* k, int c);
 void fn_8008395C();
@@ -106,6 +106,54 @@ int fn_8008461C(int t);
 int fn_8008462C(int t);
 int fn_80084660(int t);
 
+typedef Unk80082248_Rec Rec;
+typedef Unk80082248_V3 V3;
+
+extern int lbl_8061930C;
+extern const char* lbl_80622810;
+extern const char* lbl_80622814;
+unsigned fn_800736EC(const char* s);
+int fn_8007A0D0(int h, int b);
+Link* fn_800820C0(Node* n, int a, int b, int c);
+int fn_80083778(Tree* t, int key, int a, int b, Rec* out, int mode);
+
+
+#define RING_ENT ((Rec*)(lbl_80619324 + lbl_80619328 * 0x14))
+#include "game/clampiter.h"
+typedef Unk80082248_Stream Stream;
+int fn_8008399C(Holder* h, int a, int b, int* out);
+void fn_80083038(Tree* t, char** cursor, Node* root, Stream* s);
+void fn_80083160(Tree* t, char** cursor, int v, Stream* s);
+void fn_80083D10(Holder* self, char** cursor, Stream* s);
+void fn_80079FC0(void* self, char** cursor, void* dst, int n);
+int fn_80078A38(int self, int id);
+const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
+void fn_802B961C(const char* p, int a);
+extern char lbl_805B4254[];
+
+
+
+Rec* fn_80082248()
+{
+    int start = lbl_80619328;
+    while (RING_ENT->used) {
+        lbl_80619328++;
+        if (lbl_80619328 == 0x5000)
+            lbl_80619328 = 0;
+        if (lbl_80619328 == start)
+            break;
+    }
+    RING_ENT->used = 1;
+    RING_ENT->m0 = 0;
+    RING_ENT->h4 = 0;
+    RING_ENT->b6 = 0xff;
+    RING_ENT->c = 0;
+    RING_ENT->d = 0;
+    return RING_ENT;
+}
+
+#undef RING_ENT
+
 void fn_80082308(Link* l)
 {
     l->m4 = l->m4 & ~1;
@@ -119,6 +167,30 @@ Tree* fn_80082318(Tree* self)
     self->m15F98 = 0;
     fn_80082510(self);
     return self;
+}
+
+/* Ring entry seen through its flag word (+0x14 from the tree base). */
+struct RingV {
+    char pad[0x14];
+    unsigned f;
+};
+inline RingV* AtR(RingV* a, int i) { return &a[i]; }
+Node* fn_8008241C(Tree* t)
+{
+    int start = t->m15F98;
+    while ((AtR((RingV*)t, t->m15F98))->f & 1) {
+        t->m15F98++;
+        if (t->m15F98 == 0xEA6)
+            t->m15F98 = 0;
+        if (t->m15F98 == start)
+            break;
+    }
+    (AtR((RingV*)t, t->m15F98))->f |= 1;
+    t->m8[t->m15F98].m0 = 0;
+    t->m8[t->m15F98].m4 = 0;
+    t->m8[t->m15F98].m8 = 0;
+    t->m8[t->m15F98].m14 = 0;
+    return &t->m8[t->m15F98];
 }
 
 void fn_800824D4(void* unused, Node* n)
@@ -137,31 +209,27 @@ void fn_80082510(Tree* self)
     self->m4 = &lbl_8061932C;
 }
 
-/* near-miss: 21 instructions here, 30 in retail (the descent loop is laid out
- * with a second copy of the compare and of the cache store). */
-void fn_80082F4C(Tree* t, int key)
+Node* fn_80082F4C(Tree* t, int key)
 {
     if (key == t->m4->m10)
-        return;
+        return t->m4;
     Node* n = t->m0;
     if (n == &lbl_8061932C)
-        return;
+        return n;
     if (key == n->m10) {
         t->m4 = n;
-        return;
+        return n;
     }
-    while (1) {
+    while (key != n->m10) {
         if (key < n->m10)
             n = n->m4;
         else
             n = n->m8;
         if (n == &lbl_8061932C)
-            return;
-        if (key == n->m10) {
-            t->m4 = n;
-            return;
-        }
+            return n;
     }
+    t->m4 = n;
+    return n;
 }
 
 int fn_80082FC4(Tree* t, Node* n)
@@ -183,6 +251,45 @@ void fn_80083258(void* self, int a, int h, int b, Key* k, int c)
     k->m0 = 0;
     k->c = c;
     fn_80082944(self, a, k);
+}
+
+int fn_80083778(Tree* t, int key, int a, int b, Rec* out, int mode)
+{
+    Node* n;
+    Link* l;
+    while ((n = fn_80082F4C(t, key)) != &lbl_8061932C
+           && (l = fn_800820C0(n, a, (unsigned char)fn_8007A0D0(lbl_8061930C, b), mode)) != 0) {
+        *out = *(Rec*)l;
+        return 1;
+    }
+    fn_8040B320(out, 0, 0x14);
+    return 0;
+}
+
+void fn_80083838(Holder* h, int a, int b, int c, V3* out)
+{
+    Rec r;
+    fn_80083778(h->m0, a, b, c, &r, 1);
+    *out = *(V3*)&r.m8;
+}
+
+void fn_8008388C(Holder* h, int a, int b, int c, V3* out)
+{
+    Rec r;
+    fn_80083778(h->m0, a, b, c, &r, 2);
+    *out = *(V3*)&r.m8;
+}
+
+int fn_800838E0(Holder* h, int a, int b, int want, int* out)
+{
+    int n = fn_8008399C(h, a, b, out);
+    for (int i = 0; i < n; i++) {
+        if (out[i] != 0) {
+            if (want != fn_80078A38(lbl_8061930C, out[i]))
+                out[i] = 0;
+        }
+    }
+    return n;
 }
 
 void fn_8008395C()
@@ -232,9 +339,33 @@ void fn_80083CEC(Holder* self)
     fn_80082DA8(self->m0);
 }
 
+void fn_80083D10(Holder* self, char** cursor, Stream* s)
+{
+    if (s->v10() == 1) {
+        int n = fn_80082FC4(self->m0, self->m0->m0);
+        s->v08(cursor, &n, 4);
+        fn_80083038(self->m0, cursor, self->m0->m0, s);
+        return;
+    }
+    if (s->m0 == 0)
+        fn_80083DF4(self);
+    int v = 0;
+    fn_80079FC0((void*)lbl_8061930C, cursor, &v, 4);
+    fn_80083160(self->m0, cursor, v, s);
+}
+
 void fn_80083DF4(Holder* self)
 {
     fn_80082510(self->m0);
+}
+
+void fn_80083E18(Holder* self)
+{
+    char* buf = (char*)fn_802B9300(lbl_805B4254, 0x100, 4, 0);
+    char* cur = buf;
+    Stream s;
+    fn_80083D10(self, &cur, &s);
+    fn_802B961C(buf, 4);
 }
 
 void fn_80083E84(int t, int* a, int* b)
@@ -292,6 +423,21 @@ int fn_80084014(int t, int x)
     return 1;
 }
 
+int fn_80084070(int t)
+{
+    int hi = 0xB;
+    int lo = 0xB;
+    fn_80083E84(t, &lo, &hi);
+    int r = 0;
+    Unk8006A138_It<10> it(lo);
+    int i = lo;
+    while (i < hi) {
+        r = r || fn_8008462C(i);
+        i = it.Next();
+    }
+    return r;
+}
+
 int fn_80084114(int t)
 {
     switch (t) {
@@ -313,6 +459,84 @@ int fn_80084114(int t)
         return 0;
     }
     return 4;
+}
+
+int fn_80084268(int t)
+{
+    switch (t) {
+    case 10:
+        return 0x4065;
+    case 0:
+        return 0x1C3E;
+    case 1:
+        return 0x1C3F;
+    case 2:
+        return 0x2080;
+    case 3:
+        return 0x2081;
+    case 4:
+        return 0x2082;
+    case 5:
+        return 0x2083;
+    case 6:
+        return 0x2084;
+    case 7:
+        return 0x5979;
+    case 8:
+        return 0x597A;
+    case 9:
+        return 0x597B;
+    default:
+        return 0;
+    }
+}
+
+int fn_80084338(int t)
+{
+    switch (t) {
+    case 10:
+        return 0x5CBC;
+    case 0:
+        return 0x404D;
+    case 1:
+        return 0x404E;
+    case 2:
+        return 0x404F;
+    case 3:
+        return 0x4050;
+    case 4:
+        return 0x4051;
+    case 5:
+        return 0x4052;
+    case 6:
+        return 0x4053;
+    case 7:
+        return 0x5976;
+    case 8:
+        return 0x5977;
+    case 9:
+        return 0x5978;
+    default:
+        return 0;
+    }
+}
+
+unsigned fn_80084408(int t)
+{
+    if (t == 0)
+        return fn_800736EC(lbl_80622810);
+    if (t == 1)
+        return fn_800736EC(lbl_80622814);
+    return fn_800736EC(lbl_80622810);
+}
+
+unsigned fn_80084458(int t)
+{
+    if (t == 0)
+        return fn_800736EC(lbl_80622814);
+    if (t == 1)
+        return fn_800736EC(lbl_80622810);
+    return fn_800736EC(lbl_80622814);
 }
 
 int fn_800844A8(int t)
@@ -352,13 +576,11 @@ int fn_800845E4(int t)
     return 0;
 }
 
-/* near-miss: retail compares with cmpwi r3,5 / bgelr; here the range test is
- * canonicalised to cmpwi r3,4 / bgtlr. */
 int fn_80084600(int t)
 {
-    if (t <= 9) {
-        if (t >= 5)
-            return 1;
+    switch (t) {
+    case 5: case 6: case 7: case 8: case 9:
+        return 1;
     }
     return 0;
 }
@@ -373,37 +595,68 @@ int fn_8008462C(int t)
     return t == 7;
 }
 
-/* near-miss: retail compares with a different chain (50 instructions, cror-free
- * ranges); this if-ladder gives 43. */
+int fn_8008463C(int t)
+{
+    return fn_80084114(fn_80084660(t));
+}
+
 int fn_80084660(int t)
 {
     int r = 0;
-    if (t <= 16) {
-        if (t < 15) {
-            if (t <= 8) {
-                if (t < 6) {
-                    if (t >= 0 && t > 2)
-                        r = 1;
-                } else
-                    r = 2;
-            } else if (t > 12)
-                r = 4;
-            else
-                r = 3;
-        } else
-            r = 5;
-    } else if (t <= 22) {
-        if (t < 21) {
-            if (t > 18)
-                r = 7;
-            else
-                r = 6;
-        } else
-            r = 8;
-    } else if (t > 24) {
-        if (t == 25)
-            r = 10;
-    } else
+    switch (t) {
+    case 0:
+    case 1:
+    case 2:
+        r = 0;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        r = 1;
+        break;
+    case 6:
+    case 7:
+    case 8:
+        r = 2;
+        break;
+    case 9:
+    case 10:
+    case 11:
+    case 12:
+        r = 3;
+        break;
+    case 13:
+    case 14:
+        r = 4;
+        break;
+    case 15:
+    case 16:
+        r = 5;
+        break;
+    case 17:
+    case 18:
+        r = 6;
+        break;
+    case 19:
+    case 20:
+        r = 7;
+        break;
+    case 21:
+    case 22:
+        r = 8;
+        break;
+    case 23:
+    case 24:
         r = 9;
+        break;
+    case 25:
+        r = 10;
+        break;
+    }
     return r;
+}
+
+int fn_800848EC(int t)
+{
+    return fn_800844A8(fn_80084660(t));
 }
