@@ -452,3 +452,283 @@ void Tbl800956D8::v10(int a, TblBase* b)
     }
     m24->v11(a, b);
 }
+
+/*
+ * Game-object layout seen by the unit's tail (offsets from the functions below):
+ * Sub198 at +0x198 (0x9C bytes, name buffer at +0x1C), ByteVec at +0x168
+ * (data, count, capacity; vptr at +0x178), byte list at +0x17C, 0x34-byte
+ * records from +0x3E8 with their count at +0x3E4.
+ */
+struct Sub198 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    char m1C[0x80];
+};
+
+struct ByteVec {
+    unsigned char* m0;
+    unsigned m4;
+    unsigned m8;
+    char padC[3];
+    unsigned char mF;
+    void* vptr10;
+};
+
+struct Slot34 {
+    int m0;
+    int m4;
+    char pad8[0x2C];
+};
+
+struct Obj3 {
+    char pad0[0x164];
+    int m164;
+    ByteVec m168;
+    unsigned char m17C[12];
+    int m188;
+    char pad18C[0xC];
+    Sub198 m198;
+    char pad234[0x3E4 - 0x234];
+    unsigned char m3E4;
+    char pad3E5[3];
+    Slot34 m3E8[10];
+};
+
+extern "C" void fn_800961E0(Sub198* p);
+
+extern "C" void fn_8009619C(Sub198* p)
+{
+    p->m0 = 0;
+    p->m4 = 4;
+    p->m8 = 0;
+    p->mC = 0;
+    p->m10 = 0;
+    p->m14 = 0;
+    fn_800961E0(p);
+}
+
+extern "C" void fn_800961E0(Sub198* p)
+{
+    for (int i = 0; i < 0x80; i++)
+        p->m1C[i] = 0;
+}
+
+/* near-miss: retail copies x through r0 before the call */
+extern int lbl_8061930C;
+extern "C" int fn_80078A38(int g);
+
+extern "C" void fn_80096204(Sub198* p, int x)
+{
+    p->m0 = x;
+    p->m4 = fn_80078A38(lbl_8061930C);
+}
+
+extern "C" void* fn_803FFA60(void* dst, const void* src, unsigned n); /* memcpy */
+
+extern "C" Sub198* fn_80096244(Sub198* d, Sub198* s)
+{
+    d->m0 = s->m0;
+    d->m4 = s->m4;
+    d->m8 = s->m8;
+    d->mC = s->mC;
+    d->m10 = s->m10;
+    d->m14 = s->m14;
+    fn_803FFA60(d->m1C, s->m1C, 0x80);
+    return d;
+}
+
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+extern "C" void fn_80099A44(Obj3* o, int a, int b);
+
+extern "C" void fn_80096830(Obj3* o, int a) { fn_80099A44(o, fn_800968C0(o, a, 1), 0); }
+
+extern "C" void fn_80096870(Obj3* o, unsigned a, unsigned b)
+{
+    ByteVec* v = &o->m168;
+    unsigned char* p = v->m0;
+    unsigned char ta = p[a];
+    unsigned char tb = p[b];
+    if (a >= v->m4)
+        v->m4 = a + 1;
+    v->m0[a] = tb;
+    if (b >= v->m4)
+        v->m4 = b + 1;
+    v->m0[b] = ta;
+}
+
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
+{
+    unsigned char n = o->m3E4;
+    unsigned char i = 0;
+    unsigned char r = 0xFF;
+    if (i < n) {
+        Slot34* rows = o->m3E8;
+        if (rows[0].m0 == key) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < n))
+                    break;
+            } while (rows[i].m0 != key);
+            if (i < n)
+                r = i;
+        }
+    }
+    if (r == 0xFF && flag == 1)
+        r = 0;
+    return r;
+}
+
+extern "C" unsigned char fn_8009692C(Obj3* o, int key)
+{
+    ByteVec* v = &o->m168;
+    unsigned char i = 0;
+    unsigned char r = 0xFF;
+    if (i < v->m4) {
+        unsigned char* p = v->m0;
+        if (p[0] == key) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < v->m4))
+                    break;
+            } while (p[i] != key);
+            if (i < v->m4)
+                r = i;
+        }
+    }
+    return r;
+}
+
+extern "C" int fn_80097148(Obj3* o, unsigned i)
+{
+    int r = 2;
+    if (i != 0xFF && i < o->m3E4)
+        r = o->m3E8[i].m4;
+    return r;
+}
+
+extern "C" void fn_80097174(Obj3* o, unsigned i, int v)
+{
+    if (i < o->m3E4)
+        o->m3E8[i].m4 = v;
+}
+
+extern "C" unsigned char fn_80097190(Obj3* o, int k)
+{
+    ByteVec* v = &o->m168;
+    unsigned char r = 0xFF;
+    if (v->m4 != 0)
+        r = (v->mF + k + v->m4) % v->m4;
+    return r;
+}
+
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+extern "C" int fn_800971C8(Obj3* o, int x)
+{
+    int r = fn_8008CFD8((char*)o + 0xC9C, 5, x);
+    int ok = 0;
+    if (r == 0 || r == 10)
+        ok = 1;
+    return ok;
+}
+
+extern "C" int fn_80097210(Obj3* o, int i)
+{
+    unsigned char s = o->m17C[i];
+    if (s == 0xFF)
+        return 0;
+    return o->m3E8[s].m0;
+}
+
+extern "C" int fn_80097238(Obj3* o, int key)
+{
+    volatile int sp = 0;
+    int i = 0;
+    do {
+        if (key == o->m17C[i])
+            return i;
+        int t;
+        if (i > 9)
+            t = i;
+        else
+            t = i + 1;
+        sp = t;
+        i = t;
+    } while (i <= 9);
+    return -1;
+}
+
+/* near-miss (6 of 30 slots): the iterator is reloaded from its stack slot where retail keeps one copy */
+extern "C" int fn_80097288(Obj3* o, int key)
+{
+    volatile int sp = 0;
+    int i = 0;
+    do {
+        if (key == fn_80097210(o, i))
+            return sp;
+        int t = sp + 1;
+        if (sp > 9)
+            t = sp;
+        i = t;
+        sp = t;
+    } while (i <= 9);
+    return -1;
+}
+
+extern "C" int fn_80097300(Obj3* o, int i)
+{
+    return o->m3E8[o->m168.m0[i]].m0;
+}
+
+struct Unk80097318 {
+    unsigned char* m0;
+    unsigned m4;
+    char pad8[0x3E8 - 8];
+    Slot34 m3E8[10];
+};
+
+extern "C" int fn_80097318(Unk80097318* o, int key)
+{
+    int found = 0;
+    unsigned char i = 0;
+    if (i < o->m4) {
+        int v = o->m3E8[o->m0[i]].m0;
+        for (;;) {
+            if (key == v) {
+                found = 1;
+                break;
+            }
+            i++;
+            if (!(i < o->m4))
+                break;
+            v = o->m3E8[o->m0[i]].m0;
+        }
+    }
+    return found;
+}
+
+extern "C" int fn_80097520(Obj3* o, int a)
+{
+    int k = fn_800968C0(o, a, 1);
+    int r = fn_8008CFD8((char*)o + 0xC9C, 5, k);
+    int ok = 0;
+    if (r == 0 || r == 10)
+        ok = 1;
+    return ok;
+}
+
+extern "C" void fn_8006FC40(void* a, void* b);
+
+extern "C" void fn_8009757C(char* o, void* a, int b, int c, int i)
+{
+    fn_8006FC40((char*)(i * 0x128 + (int)o) + 0x92C, a);
+}
