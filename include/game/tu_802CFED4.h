@@ -117,4 +117,23 @@ struct Unk802D116C {
     char m2C[4];
 };
 
+#include "game/chooser.h"
+/* Registration helper methods that chooser.h does not declare yet (calls on the registrar object). */
+class Unk802D0B94_Reg : public Unk8037B3E8 {
+public:
+    Unk802D0B94_Reg(const char* name);   /* never defined */
+    void fn_8037B548(const char* name, const char* def);
+    void fn_8037B5C0(const char* name, int* field, const char* values);
+};
+/* Location record registered by fn_802D0B94 (fields at +0, +4, +8 ints; +0xC, +0x10, +0x14, +0x18 floats). */
+struct Unk802D0B94_Self {
+    int m0;
+    int m4;
+    int m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+};
+
 #endif

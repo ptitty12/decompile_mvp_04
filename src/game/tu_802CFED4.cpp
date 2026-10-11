@@ -5,6 +5,27 @@
 #include "game/tu_802CFED4.h"
 
 extern Unk802D0B4C_Vec3 lbl_806055AC;
+extern const char lbl_805E3BA4[];
+extern const char lbl_805E3BB0[];
+extern const char lbl_805E3BBC[];
+extern const char lbl_805E3488[];
+extern const char lbl_805E3BCC[];
+extern const char lbl_805E3BDC[];
+extern const char lbl_805E382C[];
+extern const char lbl_805E3BEC[];
+extern const char lbl_805E26D8[];
+extern const char lbl_805E2444[];
+extern const char lbl_805E3C00[];
+extern const char lbl_805E3C14[];
+extern const char lbl_805E3C18[];
+extern const char lbl_805E3C28[];
+extern const char lbl_805E3C2C[];
+extern const char lbl_805E3C40[];
+extern const char lbl_805E3C48[];
+extern const char lbl_805E3C58[];
+extern const char lbl_805E3C78[];
+extern const char lbl_805E3C84[];
+extern const char lbl_805E39F8[];
 extern int lbl_806EF9B4;
 extern const void* lbl_806646F0[];
 extern const void* lbl_80664528[];
@@ -46,6 +67,27 @@ Unk802D0B4C::Unk802D0B4C()
     m0 = 0;
     m4 = 0;
     m8 = 0;
+}
+
+void fn_802D0B94(Unk802D0B94_Self* self, Unk8037B3E8* reg)
+{
+    Unk802D0B94_Reg* r = (Unk802D0B94_Reg*)reg;
+    r->fn_8037B7E8(lbl_805E3BA4);
+    r->fn_8037B7E8(lbl_805E3BB0);
+    r->fn_8037B674(lbl_805E3BBC, (int*)self, lbl_805E3488, 0);
+    r->fn_8037B7E8(lbl_805E3BCC);
+    r->fn_8037B5C0(lbl_805E3BDC, &self->m4, lbl_805E382C);
+    r->fn_8037B830(lbl_805E3BCC);
+    r->fn_8037B458(lbl_805E3BEC, &self->m8, 0, lbl_805E26D8);
+    r->fn_8037B830(lbl_805E3BB0);
+    r->fn_8037B50C(lbl_805E2444, &self->mC, lbl_805E3C00, 0);
+    r->fn_8037B50C(lbl_805E3C14, &self->m10, lbl_805E3C18, 0);
+    r->fn_8037B50C(lbl_805E3C28, &self->m14, lbl_805E3C00, 0);
+    r->fn_8037B548(lbl_805E3C2C, lbl_805E3C40);
+    r->fn_8037B548(lbl_805E3C48, lbl_805E3C40);
+    r->fn_8037B548(lbl_805E3C58, lbl_805E3C40);
+    r->fn_8037B50C(lbl_805E3C78, &self->m18, lbl_805E3C84, lbl_805E39F8);
+    r->fn_8037B830(lbl_805E3BA4);
 }
 
 void fn_802D116C(Unk802D116C* p, int c)
