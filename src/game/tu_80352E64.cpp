@@ -334,7 +334,6 @@ void fn_803536B0(Unk803536B0* s)
     s->m24 = 0;
 }
 
-void fn_8009619C(void* p);
 void fn_803536B0(Unk803536B0* s);
 Unk803536B0* fn_803537FC(Unk803536B0* s)
 {

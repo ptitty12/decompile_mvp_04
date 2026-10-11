@@ -295,6 +295,7 @@ extern "C" int fn_800838E0(int a, int b, int c, int d, int* list);
 extern "C" void fn_80083838(int a, int b, int c, int d, Unk8035300C_V3* out);
 extern "C" void fn_8008388C(int a, int b, int c, int d, Unk8035300C_V3* out);
 
+extern "C" void fn_8009619C(void* p);
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
 
