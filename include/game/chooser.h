@@ -122,7 +122,7 @@ class Unk80270BA0_XVirt : public Unk80270BA0_XBase {
 public:
     virtual void fn_vslot1();
     virtual void fn_vslot2();
-    virtual void fn_vslot3(Unk80273498_Vec3* v);   /* v: used by the warps (tu_802A4584.cpp) */
+    virtual void fn_vslot3(const Unk80273498_Vec3& v);   /* v: used by the warps (tu_802A4584.cpp) */
     virtual int fn_vslot4();
 };
 

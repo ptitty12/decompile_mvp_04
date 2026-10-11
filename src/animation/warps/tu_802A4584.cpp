@@ -55,6 +55,32 @@ static int lbl_8068CE64;
 
 int fn_8023F330(Unk80270BA0_X* x, int a, int b, void* c, void* d, int e, int f, int g, int h);
 
+inline Unk80379324_Vec4 MakeVec4(Unk80273498_Vec3 v, float w)
+{
+    Unk80379324_Vec4 r;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    r.w = w;
+    return r;
+}
+
+inline Unk80273498_Vec3 ToVec3(const Unk80379324_Vec4& v)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x;
+    r.y = v.y;
+    r.z = v.z;
+    return r;
+}
+
+inline float AngleDiff(float a, float b)
+{
+    float d = a - b;
+    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    return d;
+}
+
 /* Class name; read by cSwingTimeWarp's vtable slot 3 (0x802ACC04). */
 const char* lbl_8061E87C = "cSwingTimeWarp";
 
@@ -450,7 +476,7 @@ void cCycleTimeSpaceWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, U
                 dh *= t;
                 Unk80273498_Vec3 target = m14 + d;
                 float newHeading = m20 + dh;
-                x->fn_vslot3(&target);
+                x->fn_vslot3(target);
                 fn_80244858(x, newHeading);
             }
         } else if (m10) {
@@ -475,7 +501,7 @@ void cCycleTimeSpaceWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, U
                 v.x = len * sa;
                 v.z = len * ca;
                 Unk80273498_Vec3 target = m14 + v;
-                x->fn_vslot3(&target);
+                x->fn_vslot3(target);
             }
         }
     }
@@ -590,8 +616,7 @@ void cLimbLockWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk8027
                     if (!m10) {
                         d.y = 0.0f;
                     }
-                    Unk80273498_Vec3 target = x->m60 + d * 0.25f;
-                    x->fn_vslot3(&target);
+                    x->fn_vslot3(x->m60 + d * 0.25f);
                 }
             }
         }
@@ -653,6 +678,19 @@ void cHeadingWarp::fn_vslot11(float* a, Unk80270BA0_Obj* obj)
 
 void cHeadingWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk80270BA0_Obj* obj)
 {
+    if (m4) {
+        Unk80270BA0_X* x = obj->fn_vslot1();
+
+        if (x->m95C < x->m958) {
+            Unk80379324_Vec4 in = MakeVec4(x->m60 - m8, 1.0f);
+            float angle = AngleDiff(fn_80382BB8(x->m618), m14);
+            Unk8035A618 xf;
+            xf.SetAngle(angle - x->m954 * (float)x->m95C);
+            Unk80379324_Vec4 out;
+            xf.fn_8037D824(&in, &out);
+            x->fn_vslot3(m8 + ToVec3(out));
+        }
+    }
 }
 
 Unk8037B3E8* cHeadingWarp::fn_vslot5()
@@ -713,8 +751,7 @@ void cTranslationWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk8
             float sz = x->m970;
             d.x *= sx;
             d.z *= sz;
-            Unk80273498_Vec3 r = m8 + d + w;
-            x->fn_vslot3(&r);
+            x->fn_vslot3(m8 + d + w);
             x->m978 = x->m978 + 1;
         }
     }

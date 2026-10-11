@@ -83,6 +83,51 @@ struct Unk802A4674_Hdr {
     float m58;
 };
 
+/* Four floats; the default ctor (0x80379324) sets all of them to the float at
+ * 0x80605638. Evidence: fn_802A5CA4 (tu_802A4584.cpp) builds one as the member at
+ * +0x7C of the local Unk8035A618 and as the in/out operands of its transform. */
+struct Unk80379324_Vec4 {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+
+struct Unk80379324 : public Unk80379324_Vec4 {
+    Unk80379324();
+};
+
+/* Local transform object of cHeadingWarp's slot 13 (fn_802A5CA4). Layout from
+ * the ctor-side function 0x8035A618 (it initializes +0x0 .. +0x94), the virtuals
+ * 0x8035A6BC / 0x8035A6F4 (which write the vector at +0x60) and the vptr at
+ * +0x98 (vtable 0x806604F8: dtor 0x8035A688, slots 2 and 3 as above). The
+ * constructor and destructor are inline (the dtor leaves only a vptr store);
+ * the transform is 0x8037D824. */
+class Unk8035A618 {
+public:
+    Unk8035A618() { fn_8035A618(); }
+    virtual ~Unk8035A618() {}
+    virtual void fn_vslot2(float x, float y, float z);
+    virtual void fn_vslot3(const Unk80273498_Vec3& v);
+    void fn_8035A618();                                          /* initializer */
+    void SetAngle(float a) { m0 = 0; m6C = 0; m74 = a; }         /* guess for the inlined setter */
+    void fn_8037D824(const Unk80379324_Vec4* in, Unk80379324_Vec4* out);   /* transform */
+
+    int m0;
+    char pad4[0x60 - 0x4];
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    float m70;
+    float m74;
+    float m78;
+    Unk80379324 m7C;
+    float m8C;
+    float m90;
+    float m94;
+};
+
 /* Mid class of the warps (dtor 0x8035EAE8, no vptr store: it adds no vtable
  * of its own to the root's; slots 11-14 are empty functions at
  * 0x8035EB08..0x8035EB14). The dtor is implicit. */
