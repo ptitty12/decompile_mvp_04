@@ -14,6 +14,10 @@ void fn_801AB188(void* p, int v);
 void fn_801AB470(void* p);
 extern float lbl_805CEEF8;
 extern int lbl_80620388;
+extern unsigned lbl_80620394[];
+int fn_801A96A8(int x);
+int fn_801A9D9C(Unk801A96E0_Init* o, int i);
+int fn_801AB460(Unk801A96E0_Init* o, int i);
 extern unsigned lbl_8062038C;
 extern unsigned lbl_80620390;
 extern unsigned lbl_806203A4;
@@ -168,6 +172,42 @@ int fn_801A9BC0(Unk801A96E0_Sel* a, int b, int c)
         return a->m28;
     }
     return 2;
+}
+
+unsigned fn_801A9BE8(Unk801A96E0_Init* o, int x)
+{
+    unsigned t = x - 2;
+    int r = 1;
+    if (t <= 3) {
+        unsigned v;
+        if (lbl_80620388 == 1 && (v = lbl_80620394[fn_801A96A8(x)]) > 1) {
+            return v;
+        }
+        r = o->m14[t];
+        if (r <= 2 && o->m68 == 1) {
+            volatile int c = 0;
+            int idx = -1;
+            int i = 0;
+            do {
+                if (fn_801A9D9C(o, i) == x) {
+                    idx = c;
+                }
+                int w = c;
+                int n;
+                if (w > 3) {
+                    n = w;
+                } else {
+                    n = w + 1;
+                }
+                c = n;
+                i = n;
+            } while (i <= 3);
+            if (idx != -1 && idx <= 2 && (o->m6C == -1 || o->m6C == idx) && fn_801AB460(o, idx) != 0) {
+                r = 3;
+            }
+        }
+    }
+    return r;
 }
 
 void fn_801A9CFC(Unk801A9CFC_T* p, int i, int v)

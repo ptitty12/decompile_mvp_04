@@ -37,6 +37,8 @@ struct Unk801A96E0_Init {  /* fn_801AA248, fn_801AB188, fn_801AA570, fn_801A99B4
     int m5C;
     int m60;
     int m64;
+    int m68;
+    int m6C;
 };
 
 struct Unk801A96E0_Late {  /* fn_801AB470 */
