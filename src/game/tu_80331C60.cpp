@@ -6,7 +6,8 @@
 #include "game/tu_80331C60.h"
 
 struct UnkC128 { char pad0[0x128]; int m128; };
-struct UnkB6F8 { char pad0[0x10]; UnkC128* m10; };
+struct UnkB14 { char pad0[0x114]; int m114; char pad118[0xE60]; int mF78; };
+struct UnkB6F8 { char pad0[0x10]; UnkC128* m10; UnkB14* m14; };
 struct Unk8017DD64_T { char pad0[0x3B0]; void* m3B0; };
 struct UnkMgr8 { char pad0[0x6F8]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; };
 struct UnkGm { char pad0[0x8]; UnkMgr8* m8; char padC[0x18]; int m24; };
@@ -20,6 +21,11 @@ struct MenuListEnt { MItem* m0; char m4[0x14]; };
 struct MenuL : Menu {
     MenuListEnt e[20];
     int m4C0;
+};
+
+struct MenuV : Menu {
+    char pad2E0[0x94];
+    int m374;
 };
 
 /* Value item: a pointer to the live value at +0x48, or the value stored in the item at +0x4C. */
@@ -42,6 +48,24 @@ inline void SetV(MIV* i, int v)
         *i->m48 = v;
     else
         i->m4C = v;
+}
+inline MIV* ItemAt2(Menu* p, int i)
+{
+    char* b = (char*)p + 0x388;
+    int off = i * 4;
+    return *(MIV**)(b + off);
+}
+inline MIV* ItemAtA(Menu* p, int i)
+{
+    char* b = (char*)p + 0x334;
+    int off = i * 4;
+    return *(MIV**)(b + off);
+}
+inline MIV* ItemAtB(Menu* p, int i)
+{
+    char* b = (char*)p + 0x370;
+    int off = i * 4;
+    return *(MIV**)(b + off);
 }
 inline MIV* ItemAt(Menu* p, int i)
 {
@@ -78,6 +102,16 @@ void fn_801A4674(UnkMgr8* m);
 void fn_80333E28(Menu* p);
 void fn_80333E98(Menu* p);
 void fn_80334504(Menu* p);
+int fn_8023C3E0(char* o, int i, int k);
+void fn_8023C490(char* o, int i, int k, int v);
+void fn_8009DC48(void* o, int v);
+extern char lbl_8068CC18[];
+int fn_80334AF0(Menu* p);
+int fn_80334B2C(Menu* p);
+UnkC128* fn_803349B8(Menu* p);
+struct MenuV;
+void fn_803349D0(MenuV* p);
+void fn_80334A60(MenuV* p);
 void fn_80334604(Menu* p);
 void fn_8023C6F8(char* o, int i, int v);
 void fn_8022E92C(void* h, int k);
@@ -99,7 +133,14 @@ extern int lbl_8068CCB4;
 extern const char* lbl_80620564[];
 extern const char lbl_80666EC0[];
 extern const char lbl_80666048[];
+extern const char lbl_80665FF8[];
 extern const char lbl_80666098[];
+struct Unk80084910_S;
+struct Unk80087A58_O;
+void fn_80087A50(Unk80084910_S* s, int v);
+void fn_80087A58(Unk80087A58_O* s, int a, char v, int w, int flag);
+int fn_80087A88(Unk80087A58_O* s, int a, int w, int flag);
+void fn_80087B10();
 extern int lbl_806177DC;
 extern float lbl_80620540, lbl_80620544;
 extern const char lbl_805EDDD4[];
@@ -469,6 +510,121 @@ void fn_8033439C(Menu* p)
     UnkMgr8* m = lbl_8061B8C0->m8;
     fn_80334604(p);
     fn_801A4674(m);
+}
+
+void fn_803343FC(Menu* p, int k)
+{
+    if (GetV2(ItemAtB(p, 0)) > 0) {
+        for (int i = 0; i < 15; i++) {
+            char* b = (char*)p + 0x370;
+            int v = GetV2(ItemAtB(p, 0));
+            int off = i * 4;
+            SetV(*(MIV**)(b + off), v);
+        }
+    }
+    if (GetV2(ItemAtA(p, 0)) > 0) {
+        for (int i = 0; i < 15; i++) {
+            char* b = (char*)p + 0x334;
+            int v = GetV2(ItemAtA(p, 0));
+            int off = i * 4;
+            SetV(*(MIV**)(b + off), v);
+        }
+    }
+    fn_80330BC8(p, k);
+}
+
+void fn_80334504(Menu* p)
+{
+    int i = 0;
+    do {
+        int v = fn_8023C3E0(lbl_8068CC18, i, 0);
+        SetV(ItemAtA(p, i), v);
+        v = fn_8023C3E0(lbl_8068CC18, i, 1);
+        SetV(ItemAtB(p, i), v);
+        i++;
+    } while (i <= 14);
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    SetV(IAt(p, 0x3F4), m->m6F8->m14->m114);
+    SetV(IAt(p, 0x4A4), m->m6F8->m14->mF78);
+}
+
+void fn_80334604(Menu* p)
+{
+    int i = 0;
+    do {
+        fn_8023C490(lbl_8068CC18, i, 0, GetV2(ItemAtA(p, i)));
+        fn_8023C490(lbl_8068CC18, i, 1, GetV2(ItemAtB(p, i)));
+        i++;
+    } while (i <= 14);
+    UnkMgr8* m = lbl_8061B8C0->m8;
+    fn_8009DC48(m->m6F8->m14, GetV2(IAt(p, 0x3F4)));
+    fn_8009DC48((char*)m->m6F8->m14 + 0xE64, GetV2(IAt(p, 0x4A4)));
+    fn_8017E264(m->m700);
+}
+
+void fn_80334848(Menu* p, int c)
+{
+    p->m2DC = lbl_80665FF8;
+    for (int i = 0; i < 0x59; i++) {
+        char* b = (char*)p + 0x388;
+        int off = i * 4;
+        MItem* it = *(MItem**)(b + off);
+        if (it)
+            delete it;
+    }
+    SetVp(p, 0x330, lbl_80666EC0);
+    SetVp(p, 0x2E8, lbl_80666EC0);
+    fn_80330870(p, c);
+}
+
+void fn_803348DC(MenuV* p)
+{
+    int v = fn_80334B2C(p);
+    fn_8032F574((MItem*)IAt(p, 0x328), v);
+    fn_803349D0(p);
+    p->m204 = 0;
+    p->m208 = 0;
+    p->items[p->m174]->s3();
+    p->m174 = 0;
+    p->items[p->m174]->s2();
+}
+
+void fn_8033496C(MenuV* p)
+{
+    fn_80334A60(p);
+    fn_803349B8(p);
+    fn_80087B10();
+    fn_8017E264(lbl_8061B8C0->m8->m700);
+}
+
+UnkC128* fn_803349B8(Menu* p) { return lbl_8061B8C0->m8->m6F8->m10; }
+
+void fn_803349D0(MenuV* p)
+{
+    int w = fn_80334AF0(p);
+    UnkC128* o = fn_803349B8(p);
+    fn_80087A50((Unk80084910_S*)o, p->m374);
+    int i = 0;
+    do {
+        int v = fn_80087A88((Unk80087A58_O*)o, i, w, 1);
+        SetV(ItemAt2(p, i), v);
+        i++;
+    } while (i <= 0x58);
+}
+
+/* near-miss: retail passes the value to fn_80087A58 without an extsb, but the repo's
+ * definition of the callee (tu_80087A58.cpp) takes `char v`, so the caller narrows it
+ * (1 extra instruction). Everything else matches. */
+void fn_80334A60(MenuV* p)
+{
+    int w = fn_80334AF0(p);
+    UnkC128* o = fn_803349B8(p);
+    fn_80087A50((Unk80084910_S*)o, p->m374);
+    int i = 0;
+    do {
+        fn_80087A58((Unk80087A58_O*)o, i, GetV2(ItemAt2(p, i)), w, 1);
+        i++;
+    } while (i <= 0x58);
 }
 
 }
