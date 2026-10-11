@@ -6,6 +6,8 @@
 
 extern const char lbl_805ED9C0[];
 extern const float lbl_805ED9E0;
+extern const float lbl_805EDAAC;
+extern const float lbl_805EDAB0;
 extern const float lbl_805EDAB4;
 extern const void* const lbl_80666EC0[];
 extern const void* const lbl_80666E70[];
@@ -35,12 +37,17 @@ struct FxViewB { int pad[3]; int mC; int m10; };
 
 extern "C" {
 void fn_80313F28(FxCtx* c, const void* s);
+int fn_8032D8C8();
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_8032D868(void* self, int a);
 int fn_8032F684(FxListD* self, int a, int b);
-void fn_803312E0(void* p);
 void fn_803E4B40(void* p, int a);
 void fn_80377408(void* p);
+void* fn_803774A8(unsigned size, int heap);
+void fn_80377488(void* p);
+void fn_8040A208(void* base, int n, int size, int (*cmp)(int*, int*));
+void fn_8035F8CC(void* idx, int a, int n);
+void fn_8035F95C(void* idx, char** names, int n);
 void fn_802D8294(int a);
 void fn_801A750C(void* v, int a);
 FxViewB* fn_801A4CE8(FxView* v, int a);
@@ -58,12 +65,15 @@ int fn_8032F620(FxListD* self, int k);
 void fn_8032FB24(FxListD* self);
 void fn_8032FB78(FxListD* self, int a);
 int fn_8032FBCC(int* a, int* b);
+void fn_8032FC0C(int a, char** names, int n);
+int fn_80330018(FxCmd* self, int k);
 void fn_80330870(FxModal* self, int a);
 void fn_80330ACC(FxStack* self, int v);
 void fn_80330B08(FxStack* self, int v);
 void fn_80330B48(FxModal* self);
 void fn_80331234(FxModal* self);
 void fn_80331294(FxModal* self);
+void fn_803312E0(FxStackF* self);
 float fn_80331394();
 void fn_803313A0();
 void fn_8033140C();
@@ -143,6 +153,37 @@ int fn_8032FBCC(int* a, int* b) {
     return fn_8040B574(lbl_80691DC4[*a], lbl_80691DC4[*b]);
 }
 
+void fn_8032FC0C(int a, char** names, int n) {
+    int* idx = (int*)fn_803774A8(n * 4, 0x100);
+    for (int i = 0; i < n; i++) idx[i] = i;
+    lbl_80691DC4 = names;
+    fn_8040A208(idx, n, 4, fn_8032FBCC);
+    fn_8035F8CC(idx, a, n);
+    fn_8035F95C(idx, names, n);
+    if (idx) fn_80377488(idx);
+}
+
+/* near-miss: switch tree (retail splits at <3 / >4 and reuses the compare with 3 in cr7) */
+int fn_80330018(FxCmd* self, int k) {
+    int r = fn_8032D8C8();
+    if (r == 0) {
+        switch (k) {
+        case 3:
+            ((FxEmb*)((char*)self + 0x48))->s7();
+            r = 1;
+            break;
+        case 4:
+            ((FxEmb*)((char*)self + 0x48))->s6();
+            r = 1;
+            break;
+        case 7:
+            r = 1;
+            break;
+        }
+    }
+    return r;
+}
+
 /* near-miss: store order of lbl_80620410 / lbl_80620414 clears */
 void fn_80330870(FxModal* self, int a) {
     *(const void**)((char*)self + 0x2DC) = lbl_80666A18;
@@ -157,13 +198,13 @@ void fn_80330870(FxModal* self, int a) {
 void fn_80330ACC(FxStack* self, int v) {
     self->a0[self->m178] = v;
     self->m178 = self->m178 + 1;
-    fn_803312E0(self);
+    fn_803312E0((FxStackF*)self);
 }
 
 void fn_80330B08(FxStack* self, int v) {
     self->a17C[self->m1FC] = v;
     self->m1FC = self->m1FC + 1;
-    fn_803312E0(self);
+    fn_803312E0((FxStackF*)self);
 }
 
 void fn_80330B48(FxModal* self) {
@@ -184,6 +225,15 @@ void fn_80331294(FxModal* self) {
     lbl_80620414 = 0;
     self->s3();
     fn_802D8294(lbl_8062042C);
+}
+
+void fn_803312E0(FxStackF* self) {
+    self->m20C = lbl_805EDAAC;
+    for (int i = 0; i < self->m178; i++) {
+        float v = self->a0[i]->s7();
+        if (!(v <= self->m20C)) self->m20C = v;
+    }
+    self->m20C = self->m20C >? lbl_805EDAB0;
 }
 
 float fn_80331394() { return lbl_805EDAB4; }

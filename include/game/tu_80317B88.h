@@ -757,6 +757,34 @@ struct FxWid {
     const void* m8;
     int mC;
 };
+class FxEmb {
+public:
+    char pad0[0x10];
+    virtual ~FxEmb();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+};
+class FxStackObj {
+public:
+    char pad0[8];
+    virtual ~FxStackObj();
+    virtual float s2();
+    virtual float s3();
+    virtual float s4();
+    virtual float s5();
+    virtual float s6();
+    virtual float s7();
+};
+struct FxStackF {
+    FxStackObj* a0[94];
+    int m178;
+    char pad17C[0x90];
+    float m20C;
+};
 // STRUCTS-END
 
 extern int lbl_8061FF50;
