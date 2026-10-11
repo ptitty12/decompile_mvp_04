@@ -204,6 +204,30 @@ extern const char lbl_805DC0E4[];   /* 0x14-byte string in another unit's .rodat
 extern const char lbl_805DC0F8[];   /* "cSubContainer" (same unit) */
 extern const char lbl_805DC394[];   /* "type": one copy, used by several units' slot 2 */
 
+/* Weights-list helper embedded in cRandomLoaded at +4 (ctor 0x8026FEB8, dtor
+ * 0x8026FF08, vtable 0x806625D0: slot 1 parse 0x8027021C, slot 2 dtor). It
+ * lives in randomchooser.cpp, which is not decompiled yet. Size 0x14.
+ * Offsets seen: +4 entry count (fn_8026FF6C and fn_80270074 bound-check it),
+ * +8 array of 16-byte entries (object pointer at +4, float at +8),
+ * +0xC index used by fn_80270074 when the player flag 0x800 is set, +0x10
+ * (zeroed by the ctor, untouched here). */
+class Unk8026FEB8 : public Unk80356798 {
+public:
+    Unk8026FEB8();
+    virtual ~Unk8026FEB8();
+    void* fn_8026FF6C(int index);
+    int fn_80270074(Unk80270BA0_X* x, int index, int* outId, float* outWeight);
+
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+
+/* Object behind lbl_8061E978; fn_802AE984(mgr, p) forwards to fn_80378024(mgr + 0x3B78, p). */
+struct Unk802AE984_Mgr;
+int fn_802AE984(Unk802AE984_Mgr* mgr, void* p);
+
 /* Base of the choosers (ctor 0x8037B3E8, dtor 0x80362C2C). */
 class Unk8037B3E8 {
 public:
