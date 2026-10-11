@@ -317,3 +317,66 @@ Recipes that matched 18 parked functions (details in each unit's comments):
   an inline taking `&mC` lets the bottom test reuse the body's pointer.
 - Check case routing against the asm: fn_8028C264's switch had 6 of 11 hashes
   going to the success path, not to `fail`.
+
+## UI/menu range 0x800F1AEC-0x8010E0F4 (range-06 worker, 2026-10-11)
+
+Shared types are in `include/game/tu_800F1AEC.h` (screen base `UiObj`, vptr at +0x3C,
+`{delta, pfn}` vtable entries so virtual N is at +8N; `UiObjB`/`UiObjC` are second and
+third placeholder classes for slots whose signature differs between object kinds;
+`UiW` has its vptr at +0xC, `UiX` at +0x10). Classes never define a virtual, so no
+vtable is emitted; retail's vtables are the `lbl_` data objects.
+
+Boilerplate families (generate with a script, they matched on the first compile):
+- Button handlers: `int f(Scr* self, int a) { if (fn_800B555C()->m570 == a) self->m134->vN(); return 1; }`
+  (N = 50..57, offset 0x190..0x1C8 in steps of 8); the variants test through a helper
+  `int h(self, a)` (`return fn_800B555C()->m570 == a;`) or `if (self->m138 != 0 && h(self, a))`.
+- Screen constructors: free function `UiScrRaw* f(UiScrRaw* self, int a..h) { fn_800EC648(self, a..h);
+  self->m3C = lbl_vtable; self->m130 = 0; ... return self; }`. The 8th argument is a stack word
+  (`lwz r0,0x20(r1); stw r0,8(r1)`), so declare eight int parameters after `self`. The vtable
+  address is stored by hand (`const void* m3C = lbl_xxx`) because the vtable is a retail data
+  object. Zero stores go in ascending field order; with that order every ctor matched
+  (also `fn_804D2AC0(self, a..h, 0, 0x3364, K, &lbl)` ctors).
+- Dtor with in-charge: `self->m3C = lbl_vt; fn_8035686C(self);` (`mr r11,r3` appears by itself).
+- `blr`, `li r3,N; blr`, `*out = 0` wrappers are one-liners.
+- Menu-tab widget ctor (vptr at +0xC): a real class ctor `UiWRaw::UiWRaw() { mC = lbl; m0 = 0; m4 = 0; m8 = 0; }`
+  gives retail's `mr r11,r3`; found with a 24-permutation search (vptr first, then ascending).
+
+Recipes found while matching:
+- **A callee that receives `this`/`a` unchanged takes them as arguments.** If r3 (and r4) stay
+  untouched between the prologue moves and a `bl`, pass them (`fn_80101254(self)`,
+  `fn_800ED310(self, a)`) even when the callee ignores them: with the extra argument the
+  prologue moves come out in retail's order (`mr r31,r3; mr r30,r4`); without it the two
+  `mr` are swapped (14 functions in tu_80101254 went from 2-slot near-misses to matches).
+  The same applies to a result: `fn_800C8044(obj->v32(...))`, `fn_802D7DB4(r, 0x78)` and
+  `fn_800C3DCC(fn_800C33D0(), ...)` pass the previous call's r3 straight through.
+- `if (c) { ...; return 1; } return 0;` (not `if (!c) return 0; ...`) gives `bne -> li r3,0`
+  with the return value built in the else arm; `if (a == b) {..} else if (a == c)` keeps retail's
+  compare order where a `switch` reorders it. `switch (b) { case 1: break; case 2: ...; case 3: ... }`
+  with an extra empty low case gives the `cmpwi 2; beq; ble end; cmpwi 3` shape (fn_80108958).
+- Range test `x == 6 || x == 7` returning 0/1 as `switch (x) { case 6: case 7: return 0; } return 1;`
+  gives `cmpwi 7; bgt; cmpwi 6; li r3,0; bgelr` (retail), if/&& forms give the subtract trick.
+- Per-arm tail calls: `switch (a) { case 0: return f(g, 0x2B34); case 2: return f(g, 0x2B35);
+  default: return f(g, 0x2B33); }` makes jump2 cross-jump the shared `lwz r3; bl f` tail
+  (dtk then shows `lis r9,0x8062` raw in two arms; objdiff still scores 100%).
+- `int one = 1; lbl = one; if (a == one) {...}` keeps the constant in a register
+  (fn_8010817C); `if (c) { int z = 0; lbl = z; }` puts `li r0,0` before the `lis` (fn_80107BDC).
+- Locals: `char buf[100] = "";` reproduces `lbz r0,lbl@l; stb r0,8(r1); memset(buf+1,0,99)`
+  with `crclr cr1eq` (libcall); objdiff accepts the `.rodata` literal vs retail's `lbl_` string.
+- `UiMsg m; UiMsg* p = &m;` for init/strncpy/`p->name[15] = 0` but `&m` passed directly to the
+  final send call gives retail's register split (fn_800F8588).
+- Lazy singleton: `inline UiMsgMgr* UiGetMsgMgr() { if (lbl_8061A32C == 0) lbl_8061A32C = new (0) UiMsgMgr; return lbl_8061A32C; }`
+  (ctor out of line = `bl __nw__FUii; bl fn_800B64BC`). A string-copy message send is
+  `fn_8035682C(p); fn_8040B830(p->name, lbl, 15); p->name[15] = 0; fn_800B7B4C(UiGetMsgMgr(), &m, self);`.
+- Table objects with several two-entry int arrays at fixed offsets (`struct { char pad[0x38]; int a38[2];
+  int a40[2]; int a48[2]; ...}`): `q->a48[idx]` gives `addi rX,q,0x48; lwzx`, `(int*)q + 18` gives a folded displacement.
+- A downward loop's final counter value is reused as the constant 0 afterwards (`mfctr r0` before the
+  following stores, fn_800FB0E4/fn_800F9D0C): not reproduced yet.
+- Float parameter passed on: `void f(S* self, float t) { g(self->m198, self->m134, t); }` is `stfs f1,8(r1)` / `lfs f2,8(r1)`.
+- A by-value 8-byte struct copy from a global to a local (`UiP2 s = lbl;`) is `lwz r10,4; lwz r9,0; stw; stw`;
+  declare the locals at function scope when retail uses distinct frame slots per case.
+
+Open (not reproduced):
+- Stack layout of two locals in sibling blocks (fn_80108800/fn_80109354: retail event object at
+  sp+8 and message at sp+0x10; we get the reverse).
+- Ternary-chain id selection passed to a call (fn_8010B0CC): right length, different branch layout.
+- fn_800F5250/fn_800F5480, fn_800F3FCC, fn_800F3100, fn_80100BA4 (+2): see the near-miss comments.
