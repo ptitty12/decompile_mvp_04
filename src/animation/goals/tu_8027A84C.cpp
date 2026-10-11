@@ -8,6 +8,10 @@
  * .data 0x8061E6A0-0x8061E6C8 is assigned here so the split has no gap;
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
+ *
+ * Status: 15/25 match. Near-misses are noted above their functions (fn_8027A84C,
+ * A9AC, AAB0, AD3C, B1A0, B924, BA64). Not attempted: fn_8027B55C (242 insns),
+ * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
 #include "game/goals/tu_8027A84C.h"
