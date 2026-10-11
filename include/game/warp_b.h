@@ -42,9 +42,12 @@ public:
 };
 extern Unk802AEB4C* lbl_8061E978;
 
-/* Type ids set by the static initializer fn_802AA7A4. */
-extern int lbl_8068D5AC;
-extern int lbl_8068D5B0;
+/* Type ids set by the static initializer fn_802AA7A4 (hashes from fn_80378568).
+ * D5AC/D5B0 are const: retail schedules their loads across the vptr store in
+ * cTimeWarp::cTimeWarp, which needs unchanging memory. D5B4..D5BC as const break
+ * cLimbLockWarp::fn_vslot13, so they stay plain. */
+extern const int lbl_8068D5AC;
+extern const int lbl_8068D5B0;
 extern int lbl_8068D5B4;
 extern int lbl_8068D5B8;
 extern int lbl_8068D5BC;

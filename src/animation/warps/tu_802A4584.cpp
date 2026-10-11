@@ -28,9 +28,8 @@
  *  - The Vec3 operators and AngleDiff below duplicate the ones in
  *    choosers/tu_80272B20.cpp (operator* there takes its vector by value; here a
  *    const reference matched); they belong in one shared header of the unity TU.
- *
- * Not matched: cTimeWarp::cTimeWarp (0x802A477C) differs only in the order of
- * two instructions (lwz of the second global before/after the vtable lis).
+ *  - The type ids read by cTimeWarp::cTimeWarp are `const` (see warp_b.h):
+ *    unchanging loads are what let retail schedule them past the vptr store.
  */
 #include "game/warp_b.h"
 
@@ -193,9 +192,6 @@ public:
     int m8;                    /* "end" */
 };
 
-/* near-miss: retail loads lbl_8068D5B0 after the `lis` of the vtable address; this
- * order puts the lwz first (2 instructions swapped). Tried: member initializers
- * in both orders, locals, getters, unsigned types, defined instead of extern. */
 cTimeWarp::cTimeWarp() : Unk8035EAE8(0x1C105B31u)
 {
     m4 = lbl_8068D5AC;
