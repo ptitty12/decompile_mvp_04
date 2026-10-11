@@ -51,7 +51,9 @@ struct Unk80273498_Ref {
  * +0x6F4 and +0x700 are used here. */
 struct Unk8027107C_Outer;
 struct Unk8014D8AC_Ctx {
-    char pad0[0x54C];
+    char pad0[0x4C];
+    unsigned int m4C;          /* tick counter read by goal logic (fn_8027EC58) */
+    char pad50[0x54C - 0x50];
     Unk80273498_Ref* m54C;
     char pad550[4];
     Unk8014D8AC* m554;
@@ -102,6 +104,8 @@ struct Unk8027107C_Outer {
     Unk8027107C_Inner* m3A4;
     char pad3A8[0x3B0 - 0x3A8];
     int m3B0;
+    int m3B4;
+    int m3B8;                  /* id passed to fn_801DC570/fn_801DC5C4 (goal logic) */
 };
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out);
@@ -145,7 +149,9 @@ public:
  * cCircleChooser's slot 17 (0x802726BC) reads m40, mE0, mE8, m100, m108,
  * m140 and m190. */
 struct Unk802726BC_Angles {
-    char pad0[0x40];
+    char pad0[0x30];
+    float m30[2];              /* goal logic (fn_8027FC80) */
+    char pad38[0x40 - 0x38];
     float m40[2];
     char pad48[0xE0 - 0x48];
     float mE0[2];
@@ -153,7 +159,9 @@ struct Unk802726BC_Angles {
     char padF0[0x100 - 0xF0];
     float m100[2];
     float m108[2];
-    char pad110[0x140 - 0x110];
+    char pad110[0x120 - 0x110];
+    int m120[2];               /* goal logic (fn_8027EC58) */
+    char pad128[0x140 - 0x128];
     float m140[2];
     char pad148[0x190 - 0x148];
     int m190;
@@ -163,7 +171,10 @@ struct Unk802726BC_Angles {
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
 struct Unk80271DBC_Link {
-    char pad0[0x880];
+    char pad0[0x838];
+    int m838;                  /* hash read by goal logic (fn_8027EA14) */
+    int m83C;                  /* hash read by goal logic (fn_8027E084) */
+    char pad840[0x880 - 0x840];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -177,7 +188,12 @@ public:
     int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
     char pad720[0x734 - 0x720];
     Unk802726BC_Angles m734;
-    char pad8C8[0xB4C - 0x8C8];
+    char pad8C8[0x93C - 0x8C8];
+    Unk80273498_Vec3 m93C;     /* goal logic (fn_8027EB34): two target positions */
+    Unk80273498_Vec3 m948;
+    char pad954[0xAB4 - 0x954];
+    float mAB4;                /* goal logic (fn_8027FC80) */
+    char padAB8[0xB4C - 0xAB8];
     int mB4C;
     int mB50;
 };
