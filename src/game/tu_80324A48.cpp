@@ -66,6 +66,8 @@ void fn_80326554(FxAI* self);
 void fn_80326574(FxAI* self);
 FxShorts* fn_803265F0();
 int fn_80326C20(FxAI* a);
+int fn_80326DF0(FxRing* self, int flag);
+int fn_80326E64(FxRing* self, int flag);
 void fn_80326ED4(FxZ6C* a, int* o1, int* o2);
 void fn_80326EF4(FxZ6C* a, int p4, int p5, int p6, int p7, float f1, float f2);
 int fn_80326F30(int a);
@@ -139,6 +141,7 @@ int fn_80324C48(FxZ* a, int unused) {
     return r;
 }
 
+/* near-miss: register choice of the float constant */
 int fn_80324D74(FxZ* a) {
     const float t = lbl_805EBA30;
     int r = 0;
@@ -173,6 +176,7 @@ int fn_80324E54(FxZ* a) {
 
 int fn_80324E6C(FxZ* a) { return (unsigned)(a->m0 - 0xAD) <= 1; }
 
+/* near-miss: register assignment of the walk pointers */
 int fn_80324E84(short* p) {
     short* last = p;
     short* cur = p;
@@ -339,6 +343,35 @@ int fn_80326C20(FxAI* a) {
     return r;
 }
 
+/* near-miss: register assignment (result kept in r10, v in r0) */
+int fn_80326DF0(FxRing* self, int flag) {
+    FxRingH* h = self->m0;
+    int r = -1;
+    if (h->m1C != h->m20) r = h->m0[h->m1C * 4 + 1];
+    else flag = 1;
+    if (flag) {
+        FxRingH* h2 = self->m4;
+        int v = h2->m0[h2->m1C * 4 + 1];
+        if (v < r) r = v;
+        else if (r < 0) r = v;
+    }
+    return r >= 0 ? r : 0;
+}
+
+/* near-miss: result kept in r3 in retail */
+int fn_80326E64(FxRing* self, int flag) {
+    FxRingH* h = self->m0;
+    int r = -1;
+    if (h->m1C != h->m20) r = h->m0[h->m18 * 4 + 1];
+    else flag = 1;
+    if (flag) {
+        FxRingH* h2 = self->m4;
+        int v = h2->m0[h2->m18 * 4 + 1];
+        if (v > r || r < 0) r = v;
+    }
+    return r;
+}
+
 void fn_80326ED4(FxZ6C* a, int* o1, int* o2) {
     FxZ6C* p = (FxZ6C*)a->m0;
     if (p == 0) return;
@@ -353,12 +386,7 @@ void fn_80326EF4(FxZ6C* a, int p4, int p5, int p6, int p7, float f1, float f2) {
 
 int fn_80326F30(int a) { return (unsigned)(a - 0xB3) <= 0x12; }
 
-FxZ fn_80326F44(FxPtr* p, int kind, float t) {
-    FxZT* tab = p->m0;
-    if (tab) return fn_80325158(tab, kind, t);
-    return lbl_805EBA10;
-}
-
+/* near-miss: same as fn_80326F44 */
 FxZ fn_80326FC4(FxPtr* p, int kind, float t) {
     FxZT* tab = p->m0;
     if (tab) return fn_80325410(tab, kind, t);
@@ -376,6 +404,7 @@ int fn_803270C4(FxPtr* p, int kind, int flag, float t) {
     return fn_803256C8(p->m0, kind, flag, t);
 }
 
+/* near-miss: store/compare order of the float spills */
 void fn_80327100(FxPtr* p, int a, int b, int c, float f1, float f2) {
     if (p->m0) fn_80326300(p->m0, a, b, c, f1, f2);
 }
