@@ -108,3 +108,28 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
 - Clone families: write one unit, then generate the others by substituting
   the relocated symbols (derive the map from the asm); don't hand-port.
 
+## Register allocation (GCC 2.95 global-alloc), learned on the EA-lib families
+
+- Priority of a pseudo = floor_log2(refs) * refs / live_length. Read
+  "Register N used R times across L insns" in the `.lreg` dump and compute it.
+  The higher-priority pseudo gets the first free register (e.g. r9).
+- If an inner loop counter steals the outer counter's register, declare the
+  outer counter once per block and reuse it across sibling loops: its refs
+  grow faster than its live length, so its priority rises. Sharing across
+  unrelated branches can make it worse; search the subsets with a script.
+- A flag set next to a call (`first = 1; call(...)`) changes the order of the
+  argument moves; try the assignment after the call.
+
+## More chooser idioms (randomchooser.cpp)
+
+- Two call sites with the same tail (`if (f) return g(x, a, ...); return g(x, b, ...);`)
+  produce the cross-jumped shared tail; a single call with a selected index
+  gives different registers.
+- `blt` straight to an assert call: write `value < 0.0 || !(value <= x)`.
+- Binary search with `cror gt; bso`: `if (!(value >= sum)) top = mid; else lo = mid + 1;`.
+- A function-wide pointer for a count load plus a per-iteration
+  `T* list = &m;` inside the loop body (two matches now).
+- `(float)(unsigned int)x` uses the 0x4330000000000000 constant (signed:
+  0x4330000080000000).
+- `__FILE__`: units start with `#line 1 "C:/mvp2004/source/..."` (DECISIONS).
+
