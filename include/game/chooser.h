@@ -55,7 +55,9 @@ struct Unk8014D8AC_Ctx {
     Unk80273498_Ref* m54C;
     char pad550[4];
     Unk8014D8AC* m554;
-    char pad558[0x6CC - 0x558];
+    char pad558[0x65C - 0x558];
+    Unk80273498_Pos* m65C[13];
+    char pad690[0x6CC - 0x690];
     Unk80273498_Pos* m6CC;
     char pad6D0[0x6F4 - 0x6D0];
     int m6F4;
@@ -106,9 +108,18 @@ struct Unk8027107C_Outer {
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out);
 
+/* 4x4 float matrix with the fourth column unused: rows 0..2 are the axes and
+ * row 3 (+0x30) the position (fn_8037B128 reads +0x30..+0x38). Size 0x40.
+ * fn_8027AAB0 (animation/goals/tu_8027A84C.cpp) copies one from player+0x20. */
+struct Unk8037B128_Mtx {
+    float r[4][4];
+};
+
 /* Base part of Unk80270BA0_X that precedes its vtable pointer (at +0x98). */
 struct Unk80270BA0_XBase {
-    char pad0[0x60];
+    int m0;                    /* set to 1 after fn_8037D768 (fn_8027AAB0) */
+    char pad4[0x20 - 0x4];
+    Unk8037B128_Mtx m20;
     Unk80273498_Vec3 m60;      /* position */
     char pad6C[0x98 - 0x6C];
 };
@@ -129,7 +140,10 @@ class Unk80270BA0_XMid : public Unk80270BA0_XVirt {
 public:
     char pad9C[0x44C - 0x9C];
     Unk8014D8AC_Ctx* m44C;
-    char pad450[0x488 - 0x450];
+    int m450;
+    char pad454[4];
+    int m458;
+    char pad45C[0x488 - 0x45C];
     int m488;
     char pad48C[0x588 - 0x48C];
     char m588[0x5F0 - 0x588];
@@ -163,7 +177,12 @@ struct Unk802726BC_Angles {
  * Multiple inheritance: converting it to Unk80270BA0_Obj* adds 0x5F0 with a
  * null check (cEventChooser's slot 17 passes it to the base that way). */
 struct Unk80271DBC_Link {
-    char pad0[0x880];
+    char pad0[0x830];
+    int m830;
+    char pad834[4];
+    int m838;
+    int m83C;
+    char pad840[0x880 - 0x840];
     Unk8014D8AC_Ctx* m880;
 };
 
@@ -177,7 +196,13 @@ public:
     int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
     char pad720[0x734 - 0x720];
     Unk802726BC_Angles m734;
-    char pad8C8[0xB4C - 0x8C8];
+    char pad8C8[0x8E8 - 0x8C8];
+    float m8E8;
+    char pad8EC[0x908 - 0x8EC];
+    Unk80273498_Pos* m908;
+    char pad90C[0xB3C - 0x90C];
+    int mB3C;
+    char padB40[0xB4C - 0xB40];
     int mB4C;
     int mB50;
 };
