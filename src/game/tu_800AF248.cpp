@@ -131,6 +131,73 @@ struct FEEv {
     int m18;
 };
 extern FEV18* lbl_80619D10;
+class FEV8c {
+public:
+    char pad0[8];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+};
+struct FEOb2954 {
+    char pad0[0x74];
+    int m74;
+    int m78;
+    char pad7C[0xAC - 0x7C];
+    int mAC[10];
+    int mD4;
+    int mD8;
+    void* mDC;
+    char padE0[0x110 - 0xE0];
+    int m110;
+};
+extern "C" void fn_801200C4(void* o, int a);
+extern "C" void fn_800B302C(void* self);
+extern "C" int fn_800AEA04(char* self, int k);
+extern "C" void fn_800AEB88(char* p);
+struct FE74c {
+    char pad0[0x120];
+    int m120;
+    char pad124[0x18C - 0x124];
+    int m18C;
+};
+struct FE6F8c {
+    char pad0[0x6F8];
+    struct FE10c* m6F8;
+};
+struct FE10c {
+    char pad0[0x10];
+    FE74c* m10;
+};
+struct FEObR {
+    char pad0[4];
+    FE6F8c* m4;
+    char pad8[4];
+    FEV0b mC;
+    char pad10[0x68 - 0x10];
+    float m68;
+    char pad6C[0x74 - 0x6C];
+    int m74;
+    int m78;
+    char pad7C[0xD8 - 0x7C];
+    int mD8;
+    char padDC[0xE0 - 0xDC];
+    int mE0[12];
+    char pad110[0x114 - 0x110];
+    int m114;
+    char pad118[0x118 - 0x118];
+    int a118[5];
+    int b12C[5];
+    int m140;
+    int m144;
+};
+extern "C" void fn_800B3218(void* self);
+extern const float lbl_805B9AE8;
+extern const float lbl_805B9AEC;
 struct FE24b;
 class FEV8b {
 public:
@@ -335,7 +402,7 @@ extern "C" {
 FEMgrB8* fn_800B64BC(FEMgrB8* p);
 void* fn_800B7AB8(FEMgrB8* mgr, const char* name);
 void fn_802B09CC(void* o, const char* s, int a, int b, int c);
-void fn_800AF110(void* p);
+int fn_800AF110(void* p);
 void fn_800FC6B4(void* p);
 void* fn_800AF010(void* p, int k);
 void fn_800AE96C(char* p);
@@ -354,6 +421,8 @@ void fn_8011A0A4(void* o, void* a, const char* s);
 }
 
 /* ---- generated externs ---- */
+
+
 
 
 
@@ -396,6 +465,7 @@ void fn_800B0738(FEObj10v* self, float* a, float* b, float* c, float* d);
 void fn_800B07A0(FEObj10v* self);
 void fn_800B07E0(FEOb107* self, int a, int b);
 void fn_800B0884(UnkAt10P* p);
+void fn_800B1C7C(FEObR* self);
 void fn_800B1D90(FEOb110* self);
 void fn_800B1DBC(FEOb1DBC* self, int lvl);
 void fn_800B1E84(FEOb7C* self);
@@ -419,6 +489,7 @@ void fn_800B2544(void* self);
 void fn_800B2588(FEOb2588* self);
 void fn_800B2668(FEOb74* self);
 void fn_800B26CC(FEOb26* self);
+int fn_800B2954(FEOb2954* self, int k);
 }
 /* ---- end prototypes ---- */
 
@@ -635,6 +706,36 @@ extern "C" void fn_800B0884(UnkAt10P* p)
     if (p->m10) {
         fn_800FC6B4(p->m10);
     }
+}
+
+/* near-miss (4 slots): retail emits `stfs` (m68) before `li r0,0` and the 0x144 store first; ours schedules the zero constant first; all 720 orders of the six stores tried */
+extern "C" void fn_800B1C7C(FEObR* self)
+{
+    FE74c* g = self->m4->m6F8->m10;
+    int f = g->m18C;
+    if (f != 0) {
+        f = 1;
+    }
+    self->mD8 = f;
+    ((FEV0b*)((char*)self + 0xC))->s2();
+    self->m68 = g->m120 ? lbl_805B9AEC : lbl_805B9AE8;
+    self->m74 = 0;
+    self->m78 = 0;
+    self->m114 = 0;
+    self->m140 = 0;
+    self->m144 = 0;
+    fn_800B3218(self);
+    for (int i = 0; i < 12; i++) {
+        self->mE0[i] = 0;
+    }
+    fn_800B1DBC((FEOb1DBC*)self, 0);
+    fn_800B1E84((FEOb7C*)self);
+    fn_800B1D90((FEOb110*)self);
+    for (int i = 0; i < 5; i++) {
+        self->b12C[i] = 0;
+        self->a118[i] = 0;
+    }
+    fn_800B1F04((FEOb1F04*)self);
 }
 
 extern "C" void fn_800B1D90(FEOb110* self)
@@ -932,4 +1033,48 @@ extern "C" void fn_800B26CC(FEOb26* self)
             fn_800412AC(fn_8004072C(), 0x31, 0, 0, 0, 0);
         }
     }
+}
+
+/* near-miss (87 vs 86 insns): retail does not reuse the `li r29,0` result register for the zero stores (fresh li r0,0), and copies nothing for v; the switch tree itself matches */
+extern "C" int fn_800B2954(FEOb2954* self, int k)
+{
+    int r = 0;
+    switch (k) {
+    case 0x2B:
+        ((FEV8c*)self)->s8();
+        fn_800B302C(self);
+        break;
+    case 0x31:
+        if (self->mD8 == 0) {
+            if (self->mDC) {
+                fn_801200C4(self->mDC, 10 - self->mD4);
+            }
+        }
+        break;
+    case 0x32:
+        break;
+    case 0x3E:
+    case 0x3F: {
+        FEV18* o = fn_800AB5C8(lbl_80619D10);
+        fn_800AEB88((char*)o);
+        int v = fn_800AEA04((char*)o, self->mD8);
+        if (self->mD8 != 1) {
+            self->mAC[self->mD4] = v;
+            self->mD4 = self->mD4 + 1;
+        }
+        self->m110 = self->m110 + v;
+        fn_800B22B0((FEStats*)self, (FEEv*)((char*)o + 0xED0));
+        self->m78 = 0;
+        fn_800B2DD4(self, 2);
+        break;
+    }
+    case 0x59:
+        self->m78 = 1;
+        self->m74 = self->mD8 == 1;
+        break;
+    default:
+        r = fn_800AF110(self);
+        break;
+    }
+    return r;
 }
