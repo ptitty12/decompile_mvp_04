@@ -5,6 +5,7 @@
 #include "game/tu_801A96E0.h"
 #include "game/tu_801A57C8.h"
 #include "game/tu_801AB63C.h"
+#include "game/clampiter.h"
 
 void fn_801AA088(void* p);
 void fn_801AB49C(void* p);
@@ -53,6 +54,13 @@ void fn_801AA284(void* p, int n);
 void fn_801AB5CC(void* p);
 
 /* Object seen by fn_801AB5CC: a Unk801B2490 with two cleared pair tables at +0x60 and +0x74. */
+struct Unk801AB338_Q {
+    char pad0[0x5D8];
+    float m5D8;
+};
+Unk801AB338_Q* fn_801B6438(Unk801AB63C_P* p, int id);
+extern float lbl_805CEEF0;
+extern float lbl_805CEEF4;
 struct Unk801AE30C_Clr {
     int m0;
     Unk801AB63C_E m4[2];
@@ -642,6 +650,39 @@ void fn_801AB2EC(Unk801A96E0_Init* o)
         c = r;
         i = r;
     } while (i <= 2);
+}
+
+void fn_801AB338(Unk801A96E0_Init* o)
+{
+    Unk801AB63C_P* p = (Unk801AB63C_P*)o;
+    fn_801AB2EC(o);
+    Unk8006A138_It<3> it(0);
+    int idx = 0;
+    do {
+        Unk801AB338_Q* q = fn_801B6438(p, idx);
+        if (q != 0) {
+            int f = 0;
+            if (it.v <= 1) {
+                f = fn_801B6438(p, it.v + 1) != 0 ? 1 : 0;
+            }
+            if (f == 1) {
+                o->m2C[it.v] = f;
+            } else if (fn_801B5F8C(p) <= 1) {
+                if (!(q->m5D8 <= lbl_805CEEF0)) {
+                    o->m2C[it.v] = 3;
+                } else {
+                    o->m2C[it.v] = 2;
+                }
+            } else {
+                if (!(q->m5D8 <= lbl_805CEEF4)) {
+                    o->m2C[it.v] = 3;
+                } else {
+                    o->m2C[it.v] = 2;
+                }
+            }
+        }
+        idx = it.Next();
+    } while (idx <= 2);
 }
 
 int fn_801AB460(Unk801AB460_T* p, int i)
