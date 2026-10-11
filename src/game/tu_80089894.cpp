@@ -2,6 +2,7 @@
  * Game code, .text 0x80089894-0x8008CE64 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/tu_8007A4DC.h"
 #include "game/tu_80089894.h"
 
 typedef float (Unk80089894_Obj::*Unk80089894_Pmf)(int);
@@ -182,6 +183,42 @@ Unk80089894_K<Unk80089894_T3C>* fn_8008CAF8(Unk80089894_K<Unk80089894_T3C>* self
 void fn_8008CB74(Unk80089894_K<Unk80089894_T3C>* self, int flags);
 void fn_8008CBD0(Unk80089894_K<Unk80089894_T3C>* self, unsigned i);
 
+extern float lbl_805B4E60;
+extern float lbl_805B4E64;
+extern float lbl_805B4E68;
+extern float lbl_805B4E78;
+extern float lbl_805B4E7C;
+extern float lbl_805B4E88;
+float fn_8008C45C(W* self, int a);
+float fn_8008C54C(W* self, int a);
+float fn_8008C724(W* self, int a);
+float fn_8008C884(W* self, int a);
+float fn_8008C94C(W* self, int a);
+
+
+extern int lbl_80620758;
+extern float lbl_8062075C;
+extern float lbl_805B4BB4;
+extern float lbl_805B4BB8;
+extern float lbl_805B4BBC;
+extern float lbl_805B4BC0;
+extern float lbl_805B4BC4;
+extern float lbl_805B4BC8;
+extern float lbl_805B4BCC;
+extern float lbl_805B4BD0;
+extern float lbl_805B4BD4;
+extern float lbl_805B4BD8;
+float fn_8008A9DC(int kind, float a, float b, float c, float d);
+
+
+
+extern Unk80089894_Pmf lbl_805B6BD0[];
+
+
+float fn_8008BA24(W* self, int a);
+
+
+
 void fn_80089894(Unk80089894_K<Unk80089894_T14>* self, unsigned i)
 {
     if (i < self->m1C)
@@ -191,6 +228,85 @@ void fn_80089894(Unk80089894_K<Unk80089894_T14>* self, unsigned i)
 float fn_80089E48(Unk80089894_Obj* o, int i, int a)
 {
     float r = (o->*lbl_805B6BA8[i])(a);
+    return r;
+}
+
+float fn_8008A624(W* self, int a)
+{
+    float s2 = fn_8007189C(self, 2, a);
+    const float z = 0.0f;
+    float s4 = fn_8007189C(self, 4, a);
+    float s5 = fn_8007189C(self, 5, a);
+    float r = fn_8008A9DC(0, s2, z, s4, s5);
+    return r;
+}
+
+float fn_8008A6BC(W* self, int a)
+{
+    int h = self->v28(6, a);
+    float r = 0.0f;
+    if (h != 0) {
+        float s7 = fn_8007189C(self, 7, a);
+        const float z = 0.0f;
+        float s9 = fn_8007189C(self, 9, a);
+        float s10 = fn_8007189C(self, 10, a);
+        r = fn_8008A9DC(h, s7, z, s9, s10);
+    }
+    return r;
+}
+
+float fn_8008A784(W* self, int a)
+{
+    int h = self->v28(11, a);
+    float r = 0.0f;
+    if (h != 0) {
+        float s7 = fn_8007189C(self, 12, a);
+        const float z = 0.0f;
+        float s9 = fn_8007189C(self, 14, a);
+        float s10 = fn_8007189C(self, 15, a);
+        r = fn_8008A9DC(h, s7, z, s9, s10);
+    }
+    return r;
+}
+
+float fn_8008A84C(W* self, int a)
+{
+    int h = self->v28(16, a);
+    float r = 0.0f;
+    if (h != 0) {
+        float s7 = fn_8007189C(self, 17, a);
+        const float z = 0.0f;
+        float s9 = fn_8007189C(self, 19, a);
+        float s10 = fn_8007189C(self, 20, a);
+        r = fn_8008A9DC(h, s7, z, s9, s10);
+    }
+    return r;
+}
+
+float fn_8008A914(W* self, int a)
+{
+    int h = self->v28(21, a);
+    float r = 0.0f;
+    if (h != 0) {
+        float s7 = fn_8007189C(self, 22, a);
+        const float z = 0.0f;
+        float s9 = fn_8007189C(self, 24, a);
+        float s10 = fn_8007189C(self, 25, a);
+        r = fn_8008A9DC(h, s7, z, s9, s10);
+    }
+    return r;
+}
+
+float fn_8008A9DC(int kind, float a, float b, float c, float d)
+{
+    if (lbl_80620758 != 0)
+        return lbl_8062075C;
+    float r = 0.0f;
+    if (kind == 0)
+        r = (c + d) * 0.5f + d - 0.93f;
+    else
+        r = (c + a) * 0.5f + 0.04f;
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
     return r;
 }
 
@@ -248,6 +364,12 @@ unsigned fn_8008AC94(Unk80089894_PackTab* self, unsigned t, unsigned i)
     return r;
 }
 
+float fn_8008ADCC(Unk80089894_Obj* o, int i, int a)
+{
+    float r = (o->*(lbl_805B6BD0 + i)[0])(a);
+    return r;
+}
+
 void fn_8008B1F8(Unk80089894_K<Unk80089894_TC>* self, int a, Unk80089894_VObj* obj)
 {
     fn_80071E2C(self, a, obj);
@@ -289,9 +411,45 @@ float fn_8008B5F8(Unk80089894_Obj* o, int i, int a)
     return r;
 }
 
+float fn_8008BA24(W* self, int a)
+{
+    float r = (float)self->v28(1, a);
+    r += (float)self->v28(2, a) * 0.33333334f;
+    return r;
+}
+
+float fn_8008BAF0(W* self, int a)
+{
+    float s = (float)self->v28(6, a);
+    float d = fn_8008BA24(self, a);
+    float r = 0.0f;
+    if (!(d <= 0.0f))
+        r = s * 9.0f / d;
+    return r;
+}
+
+float fn_8008BBAC(W* self, int a)
+{
+    float s = (float)self->v28(3, a);
+    int b = self->v28(4, a);
+    float tot;
+    float r = 0.0f;
+    tot = s + (float)b;
+    if (!(tot <= 0.0f))
+        r = s / tot;
+    return r;
+}
+
 float fn_8008BC94()
 {
     return lbl_805B4E34;
+}
+
+float fn_8008BCA0(W* self, int a)
+{
+    int x = self->v28(7, a);
+    float r = (float)x + (float)self->v28(8, a);
+    return r;
 }
 
 float fn_8008BD5C()
@@ -344,9 +502,97 @@ void fn_8008BEB4(Unk80089894_K<Unk80089894_TC>* self, unsigned i)
         fn_8040074C(&self->m24[i], 0xC);
 }
 
+/* near-miss (5 slots): retail keeps the dead cmplwi compares and merges all
+ * `li r3,0; blr` tails; see PATTERNS (dead cmpwi before li r3,0 family). */
+int fn_8008BEF0(void* self, int k)
+{
+    switch ((unsigned)k) {
+    case 2:
+        return 0;
+    case 5:
+        return 0;
+    case 8:
+        return 0;
+    }
+    return 0;
+}
+
 float fn_8008C0DC(Unk80089894_Obj* o, int i, int a)
 {
     float r = (o->*lbl_805B6C18[i])(a);
+    return r;
+}
+
+float fn_8008C45C(W* self, int a)
+{
+    int x0 = self->v28(4, a);
+    int x1 = self->v28(5, a);
+    int x2 = self->v28(6, a);
+    float r = (float)(x0 + x1 + x2 + self->v28(7, a));
+    return r;
+}
+
+float fn_8008C54C(W* self, int a)
+{
+    float s0 = (float)self->v28(4, a);
+    float s1 = (float)self->v28(5, a);
+    float s2 = (float)self->v28(6, a);
+    float s3 = (float)self->v28(7, a);
+    float r = s3 * lbl_805B4E64 + (s2 * lbl_805B4E60 + (s0 + 2.0f * s1));
+    return r;
+}
+
+float fn_8008C6B4(W* self, int a)
+{
+    float x = fn_8008C45C(self, a);
+    float d = fn_8008C94C(self, a);
+    float r = lbl_805B4E68;
+    if (!(d <= lbl_805B4E68))
+        r = x / d;
+    return r;
+}
+
+float fn_8008C724(W* self, int a)
+{
+    float t = fn_8008C45C(self, a);
+    float b0 = (float)self->v28(0, a);
+    float b3 = (float)self->v28(3, a);
+    float b8 = (float)self->v28(8, a);
+    float d = fn_8008C94C(self, a);
+    float tot = d + b0 + b3 + b8;
+    float r = lbl_805B4E78;
+    if (!(tot <= lbl_805B4E78))
+        r = (t + b0 + b3) / tot;
+    return r;
+}
+
+float fn_8008C884(W* self, int a)
+{
+    float x = fn_8008C54C(self, a);
+    float d = fn_8008C94C(self, a);
+    float r = lbl_805B4E7C;
+    if (!(d <= lbl_805B4E7C))
+        r = x / d;
+    return r;
+}
+
+float fn_8008C8F4(W* self, int a)
+{
+    float x = fn_8008C724(self, a);
+    float y = fn_8008C884(self, a);
+    float r = x + y;
+    return r;
+}
+
+float fn_8008C94C(W* self, int a)
+{
+    int x = self->v28(10, a);
+    int p = self->v28(0, a);
+    int q = self->v28(3, a);
+    int s = self->v28(8, a);
+    float r = (float)x - (float)(p + q + s + self->v28(9, a));
+    if (!(r >= lbl_805B4E88))
+        r = lbl_805B4E88;
     return r;
 }
 
