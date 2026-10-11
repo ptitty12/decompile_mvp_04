@@ -7,12 +7,18 @@
 extern int lbl_8061930C;
 extern "C" void fn_805909D4(int a);
 extern "C" int fn_8007F7D0(int g, int a);
-extern "C" void fn_8007B320(int g, int a, int b);
+extern "C" int fn_8007B320(int g, int a, int b);
 extern "C" void fn_80552054();
 extern "C" void* fn_805535A4(void* mem);
 extern "C" void fn_805536B4(void* p);
 extern "C" int fn_8007F9E8(int g);
 extern "C" int fn_8007F9B4(int a);
+extern "C" int fn_8008FCC8(int a);
+extern "C" unsigned fn_8007C458(int g);
+extern "C" int fn_8007C67C(int g, int a, int b);
+extern "C" int fn_8007C4A4(int g, int a);
+extern "C" int fn_8007C034(int g, int a, int b);
+extern "C" void fn_80072C28(int g);
 extern "C" int fn_80566674(void* p);
 extern "C" int fn_80566520(void* p);
 extern "C" int fn_80566570(void* p);
@@ -20,6 +26,12 @@ extern "C" int fn_80569128(void* p);
 extern "C" void fn_8055395C(void* p);
 extern "C" int fn_8054C940(void* p);
 extern "C" int fn_8054C94C(void* p);
+extern "C" int fn_8007F84C(int g);
+extern "C" int fn_80083FC0(int e);
+extern "C" int fn_800A588C(void* o, int v);
+extern "C" int fn_8007B2B0(int g);
+extern "C" int fn_8007B648(int g, int a, int b);
+extern "C" int fn_8007B5D8(int g, int a, int b);
 extern "C" int fn_800A55A4(void* p, int a, int b, int* c, int* d);
 extern "C" int fn_805701E4(void* p);
 extern "C" void fn_8006BE18(int a);
@@ -30,6 +42,11 @@ extern int lbl_8061994C;
 extern float lbl_80619950;
 extern const float lbl_805FF3E4;
 extern "C" float fn_8055248C(int x);
+extern "C" int fn_80566570(void* a);
+extern "C" int fn_80566520(void* a);
+extern "C" int fn_80566674(void* a);
+extern "C" int fn_8007FB2C(int g, int a);
+extern "C" int fn_8007FDA8(int g, int a, int b);
 
 /* state object of the game flow (fields seen in the unit: +0x70..+0x98) */
 struct Unk800A2688 {
@@ -109,6 +126,18 @@ struct Unk800A2B10 {
 };
 
 extern "C" void fn_800A2B10(Unk800A2B10* p) { p->m74 = 0; }
+
+extern "C" void fn_800A2DCC()
+{
+    int g = lbl_8061930C;
+    unsigned i = fn_8008FCC8(0) == 1;
+    while (i < fn_8007C458(g)) {
+        if (fn_8007C67C(g, 0xE, i) == 0 && fn_8007C034(g, 0, fn_8007C4A4(g, i)) == 1)
+            i--;
+        i++;
+    }
+    fn_80072C28(g);
+}
 
 struct Unk800A2E6C {
     char pad0[0x48];
@@ -228,6 +257,70 @@ extern "C" int fn_800A324C(Unk800A324C* p) { return p->m50->m8; }
 extern "C" int fn_800A3258(Unk800A324C* p) { return p->m50->mC; }
 
 extern "C" int fn_800A3264(Unk800A324C* p) { return p->m50->m10; }
+
+extern "C" int fn_800A3270(void* o, int* a, int* b)
+{
+    int g = lbl_8061930C;
+    int i = 0;
+    int n = fn_8007F84C(g);
+    if (i < n) {
+        do {
+            int h = fn_8007F7D0(g, i);
+            volatile int sp8 = 0;
+            int e = 0;
+            do {
+                int v = fn_8007B320(g, fn_80083FC0(e), h);
+                *a = v;
+                int r = fn_800A588C(o, v);
+                *b = r;
+                if (r != 0)
+                    return 0;
+                int c = sp8;
+                int t;
+                if (c > 3)
+                    t = c;
+                else
+                    t = c + 1;
+                sp8 = t;
+                e = t;
+            } while (e <= 3);
+            i++;
+        } while (i < n);
+    }
+    return 1;
+}
+
+extern "C" int fn_800A3348(void* o, int* a, int* b)
+{
+    int g = lbl_8061930C;
+    int i = 0;
+    int n = fn_8007B2B0(g);
+    if (i < n) {
+        do {
+            int cnt = 0;
+            if (fn_8007B648(g, 0xE, i) != 0)
+                cnt = 4;
+            volatile int sp8;
+            int t = 0;
+            int e;
+            while (sp8 = t, e = t, e < cnt) {
+                int v = fn_8007B5D8(g, fn_80083FC0(e), i);
+                *a = v;
+                int r = fn_800A588C(o, v);
+                *b = r;
+                if (r != 0)
+                    return 0;
+                int c = sp8;
+                if (c > 3)
+                    t = c;
+                else
+                    t = c + 1;
+            }
+            i++;
+        } while (i < n);
+    }
+    return 1;
+}
 
 extern "C" int fn_800A3430(Unk800A2EFC* p)
 {
@@ -421,7 +514,11 @@ extern "C" Unk800A3AB0_Q* fn_800A3B7C(Unk800A3AB0* p)
 extern "C" void fn_800A3DF4() {}
 
 struct Unk800A3E6C {
-    char pad0[0x7C];
+    char pad0[0x48];
+    void* m48;
+    char pad4C[0x70 - 0x4C];
+    int m70;
+    char pad74[8];
     int m7C;
     char pad80[4];
     int m84;
@@ -454,4 +551,52 @@ extern "C" void fn_800A42A4(Unk800A42A4* p, int v)
         p->m6C = 3;
         return;
     }
+}
+
+struct Unk800A42EC_Sub {
+    char pad0[0x1C];
+    void* m1C;
+};
+
+extern "C" void fn_800A42EC(Unk800A3E6C* p)
+{
+    int v;
+    Unk800A42EC_Sub* q = (Unk800A42EC_Sub*)((char*)p + 0x2C);
+    if (fn_80566570(q->m1C) == 1)
+        v = 3;
+    else if (fn_80566520(q->m1C) == 1)
+        v = 2;
+    else if (fn_80566674(q->m1C) == 1)
+        v = 4;
+    else
+        return;
+    p->m70 = v;
+}
+
+/* near-miss: ok/v swap registers, one mr missing */
+
+extern "C" int fn_800A449C()
+{
+    int g = lbl_8061930C;
+    int ok = 1;
+    volatile int sp8 = 0;
+    int e = 0;
+    do {
+        int v = 0;
+        if (fn_8007FB2C(g, e) == 0 || fn_8007FDA8(g, fn_8007FB2C(g, sp8) - 1, sp8) != 0)
+            v = 1;
+        int both = 0;
+        if (ok && v)
+            both = 1;
+        int c = sp8;
+        ok = both;
+        int t;
+        if (c > 3)
+            t = c;
+        else
+            t = c + 1;
+        sp8 = t;
+        e = t;
+    } while (e <= 3);
+    return ok;
 }
