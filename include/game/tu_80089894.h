@@ -127,4 +127,47 @@ struct Unk80089894_PackTabC {
     Unk80089894_PackC* m24;
 };
 
+/* 0x14-byte packed record of the table behind Unk80089894_K<Unk80089894_T14>::m24
+ * as read by fn_80089AA0 (28 fields: 7/4/1/1/7/7/4/1, 4/3/7/7/4/4/3,
+ * 7/7/4/4/3/7, 7/4/4/3/7/7 and 7/7/18 bits). */
+struct Unk80089894_PackD {
+    unsigned a0 : 7;
+    unsigned a1 : 4;
+    unsigned a2 : 1;
+    unsigned a3 : 1;
+    unsigned a4 : 7;
+    unsigned a5 : 7;
+    unsigned a6 : 4;
+    unsigned a7 : 1;
+    unsigned b0 : 4;
+    unsigned b1 : 3;
+    unsigned b2 : 7;
+    unsigned b3 : 7;
+    unsigned b4 : 4;
+    unsigned b5 : 4;
+    unsigned b6 : 3;
+    unsigned c0 : 7;
+    unsigned c1 : 7;
+    unsigned c2 : 4;
+    unsigned c3 : 4;
+    unsigned c4 : 3;
+    unsigned c5 : 7;
+    unsigned d0 : 7;
+    unsigned d1 : 4;
+    unsigned d2 : 4;
+    unsigned d3 : 3;
+    unsigned d4 : 7;
+    unsigned d5 : 7;
+    unsigned e0 : 7;
+    unsigned e1 : 7;
+    unsigned e2 : 18;
+};
+
+struct Unk80089894_PackTabD {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk80089894_PackD* m24;
+};
+
 #endif

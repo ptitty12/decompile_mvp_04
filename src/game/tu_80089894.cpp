@@ -224,16 +224,346 @@ float fn_8008BA24(W* self, int a);
 
 
 
+
+
 void fn_80089894(Unk80089894_K<Unk80089894_T14>* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(&self->m24[i], 0x14);
 }
 
+unsigned fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i)
+{
+    unsigned r = 0;
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: r = self->m24[i].a0; break;
+        case 1: r = self->m24[i].a1; break;
+        case 2: r = self->m24[i].a2; break;
+        case 3: r = self->m24[i].a3; break;
+        case 4: r = self->m24[i].a4; break;
+        case 5: r = self->m24[i].a5; break;
+        case 6: r = self->m24[i].a6; break;
+        case 7: r = self->m24[i].b0; break;
+        case 8: r = self->m24[i].b1; break;
+        case 9: r = self->m24[i].b2; break;
+        case 10: r = self->m24[i].b3; break;
+        case 11: r = self->m24[i].b4; break;
+        case 12: r = self->m24[i].b5; break;
+        case 13: r = self->m24[i].b6; break;
+        case 14: r = self->m24[i].c0; break;
+        case 15: r = self->m24[i].c1; break;
+        case 16: r = self->m24[i].c2; break;
+        case 17: r = self->m24[i].c3; break;
+        case 18: r = self->m24[i].c4; break;
+        case 19: r = self->m24[i].c5; break;
+        case 20: r = self->m24[i].d0; break;
+        case 21: r = self->m24[i].d1; break;
+        case 22: r = self->m24[i].d2; break;
+        case 23: r = self->m24[i].d3; break;
+        case 24: r = self->m24[i].d4; break;
+        case 25: r = self->m24[i].d5; break;
+        case 26: r = self->m24[i].e0; break;
+        case 27: r = self->m24[i].e1; break;
+        }
+    }
+    return r;
+}
+
 float fn_80089E48(Unk80089894_Obj* o, int i, int a)
 {
     float r = (o->*lbl_805B6BA8[i])(a);
     return r;
+}
+
+void fn_80089EE0(Unk80089894_PackTabD* self, unsigned t, unsigned i, int v)
+{
+    if (i < self->m1C) {
+        switch (t) {
+        case 0: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->a0 = v;
+            break;
+        }
+        case 1: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->a1 = v;
+            break;
+        }
+        case 2: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->a2 = v;
+            break;
+        }
+        case 3: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x1) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x1;
+            p->a3 = v;
+            break;
+        }
+        case 4: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->a4 = v;
+            break;
+        }
+        case 5: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->a5 = v;
+            break;
+        }
+        case 6: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->a6 = v;
+            break;
+        }
+        case 7: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->b0 = v;
+            break;
+        }
+        case 8: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->b1 = v;
+            break;
+        }
+        case 9: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->b2 = v;
+            break;
+        }
+        case 10: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->b3 = v;
+            break;
+        }
+        case 11: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->b4 = v;
+            break;
+        }
+        case 12: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->b5 = v;
+            break;
+        }
+        case 13: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->b6 = v;
+            break;
+        }
+        case 14: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->c0 = v;
+            break;
+        }
+        case 15: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->c1 = v;
+            break;
+        }
+        case 16: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->c2 = v;
+            break;
+        }
+        case 17: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->c3 = v;
+            break;
+        }
+        case 18: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->c4 = v;
+            break;
+        }
+        case 19: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->c5 = v;
+            break;
+        }
+        case 20: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->d0 = v;
+            break;
+        }
+        case 21: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->d1 = v;
+            break;
+        }
+        case 22: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0xF) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0xF;
+            p->d2 = v;
+            break;
+        }
+        case 23: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7;
+            p->d3 = v;
+            break;
+        }
+        case 24: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->d4 = v;
+            break;
+        }
+        case 25: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->d5 = v;
+            break;
+        }
+        case 26: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            if (v <= 0x7F) {
+                if (v < 0)
+                    v = 0;
+            } else
+                v = 0x7F;
+            p->e0 = v;
+            break;
+        }
+        case 27: {
+            Unk80089894_PackD* p = (Unk80089894_PackD*)(i * 20 + (int)self->m24);
+            int w;
+            if (v <= 0x7F) {
+                w = v;
+                if (w < 0)
+                    w = 0;
+            } else
+                w = 0x7F;
+            p->e1 = w;
+            break;
+        }
+        }
+    }
 }
 
 float fn_8008A624(W* self, int a)
