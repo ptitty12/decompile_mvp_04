@@ -8,9 +8,10 @@ typedef Unk801B7FB0_P P;
 typedef Unk801C16B0_Z Z;
 
 extern "C" {
-void fn_801C66E8(Z* z, float f);
-void fn_801C6A34(Z* z, float f);
-void fn_801C6BB0(Z* z, float f);
+float fn_801C6D2C(Z* z, float f);
+float fn_801C66E8(Z* z, float f);
+float fn_801C6A34(Z* z, float f);
+float fn_801C6BB0(Z* z, float f);
 float fn_801C8170(Z* z);
 void fn_801C7F38(Z* z, float f);
 void fn_801CB8B0(Z* z, float f);
@@ -26,9 +27,26 @@ float fn_801C8AC0(Z* z);
 float fn_801C8A04(Z* z);
 float fn_801C8DB0(Z* z);
 void fn_801C93BC(Z* z, float a, float b, float c, float d);
+float fn_801C7964(Z* z);
+float fn_801C5D74(Z* z);
+float fn_801C72FC(Z* z, float f, float a, float b);
+P* fn_801A4B34(P* ctx);
+float fn_801C7BF0(Z* z, float f);
+float fn_801C7D90(Z* z, float f);
+Vec3 fn_801CE6E4(Z* z, float a, float b, float c);
 }
+struct Unk801C6D2C_G {
+    char pad0[0x380];
+    float m380;
+    float m384;
+    float m388;
+    float m38C;
+};
+extern Unk801C6D2C_G lbl_8068C420;
+extern int lbl_80620378;
 
-extern "C" void fn_801C6D2C(Z* z, float f)
+/* The callees' float result is left in f1 (a `return` per arm changes the branch layout). */
+extern "C" float fn_801C6D2C(Z* z, float f)
 {
     if (!(f <= 0.67f))
         fn_801C66E8(z, f);
@@ -36,6 +54,44 @@ extern "C" void fn_801C6D2C(Z* z, float f)
         fn_801C6BB0(z, f);
     else
         fn_801C6A34(z, f);
+}
+
+extern "C" void fn_801C7F38(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    float a = fn_801C7964(z);
+    float b = fn_801C7BF0(z, f);
+    float c = fn_801C7D90(z, f);
+    lbl_8068C420.m380 = a;
+    lbl_8068C420.m384 = b;
+    lbl_8068C420.m38C = c;
+    z->m1B0 = fn_801CE6E4(z, b, a, c);
+}
+
+/* near-miss (81 vs 80 instructions): retail keeps p in r3 and the flag in r0. */
+extern "C" void fn_801C8014(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    float a = fn_801C5D74(z);
+    float b = fn_801C6D2C(z, f);
+    float c = fn_801C72FC(z, f, b, a);
+    P* p = fn_801A4B34(z->m204);
+    if (z->m204->m6F4 == 0) {
+        int ok;
+        if (lbl_80620378 != 0)
+            ok = 1;
+        else
+            ok = p->mB3C.f;
+        if (ok) {
+            a = 45.0f;
+            b = -5.0f;
+            c = 15.0f;
+        }
+    }
+    lbl_8068C420.m380 = a;
+    lbl_8068C420.m38C = c;
+    lbl_8068C420.m384 = b;
+    z->m1B0 = fn_801CE6E4(z, b, a, c);
 }
 
 extern "C" int fn_801C8154(Z* z) { return z->m1DC[0] > 0.0f; }
