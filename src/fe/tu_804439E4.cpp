@@ -142,6 +142,29 @@ extern "C" FE_OVERLAY void fn_80445564(FeScr2* self, int a, int b)
     fn_80445DA8(self);
 }
 
+/* near-miss: retail loads the vptr before the m14C store and shares one zero register for the three locals (12 slots; 5 spellings tried) */
+extern "C" FE_OVERLAY void fn_804459D0(FeScr2* self)
+{
+    self->m14C = fn_800C203C((char*)fn_800B555C() + 8);
+    ((FeObj*)self)->v87();
+    if ((fn_800B555C()->m4 & 1) != 0) {
+        fn_80445B18(self);
+    } else {
+        int a = 0;
+        int b = 0;
+        int c = 0;
+        fn_800C1FD8((char*)fn_800B555C() + 8, &a, &b, &c);
+        self->m144 = a;
+        int x = fn_80445D5C((int)self, b);
+        int y = fn_80445D7C((int)self, b);
+        ((FeObj2*)self->m138)->v67(x, y);
+        ((FeObj2*)self->m13C)->v67(x, y);
+        ((FeObj1*)self->m134)->v37(c);
+        ((FeObj1*)self)->v88(self->m14C);
+        fn_80445DA8(self);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80445B18(FeScr2* self)
 {
     ((FeObj1*)self)->v88(self->m14C);
@@ -161,6 +184,39 @@ extern "C" FE_OVERLAY int fn_80445D5C(int a, int idx)
 extern "C" FE_OVERLAY int fn_80445D7C(int a, int idx)
 {
     return idx % 7;
+}
+
+extern "C" FE_OVERLAY void fn_80445DA8(FeScr2* self)
+{
+    int r = 0;
+    int c;
+    fn_80444738(0);
+    do {
+        c = 0;
+        do {
+            fn_80444850((FeTimerRaw*)((FeObjP2*)self)->v90(r, c));
+            c++;
+        } while (c <= 6);
+        r++;
+    } while (r <= 4);
+    ((FeObj2*)self)->v90(0, 0);
+    lbl_8062163C = self->m14C;
+    int t = fn_804464B0(self, self->m144);
+    if (t == 0) {
+        fn_80445EF4(self, 0);
+    } else {
+        fn_80445EF4(self, fn_804461A0(self, self->m144 - 1, t, 0));
+    }
+    r = 0;
+    do {
+        c = 0;
+        do {
+            ((FeTimer*)((FeObjP2*)self)->v90(r, c))->s4();
+            c++;
+        } while (c <= 6);
+        r++;
+    } while (r <= 4);
+    fn_804469DC(self, 1);
 }
 
 extern "C" FE_OVERLAY int fn_80446430(FeScr2* self, int i)

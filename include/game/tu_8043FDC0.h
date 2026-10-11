@@ -221,7 +221,8 @@ void fn_800ECAA4(void* self);
 /* Game state record returned by fn_800B555C(); only the fields the front-end reads. */
 struct FeState {
     int m0;
-    char pad4[0x14 - 4];
+    int m4;
+    char pad8[0x14 - 8];
     int m14;
     char pad18[0x570 - 0x18];
     int m570;
@@ -1217,5 +1218,19 @@ int fn_8056AB84(int a, int b, int c);
 int fn_8044E08C(int a, unsigned* p);
 void fn_8044E10C(FeScr5* s, int x, int y);
 void fn_8044E210(FeScr5* s, int a);
+}
+
+extern "C" {
+int fn_800C203C(void* st);
+void fn_800C1FD8(void* st, int* a, int* b, int* c);
+void fn_80445B18(FeScr2* s);
+void fn_80445EF4(FeScr2* s, int a);
+int fn_804461A0(FeScr2* s, int a, int b, int c);
+void fn_804469DC(FeScr2* s, int a);
+void fn_80444738(int a);
+void fn_80444850(FeTimerRaw* t);
+void fn_80445DA8(FeScr2* s);
+int fn_80445D5C(int a, int idx);
+int fn_80445D7C(int a, int idx);
 }
 #endif
