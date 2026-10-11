@@ -41,10 +41,19 @@ struct Unk802D5B64_View {
     int m0;
     int m4;
 };
+struct Unk802D5D24_C {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk802D5D24_B {
+    char pad0[0x14];
+    Unk802D5D24_C* m14;
+};
 struct Unk802D58E8_Owner {
     char pad0[0x6F4];
     int m6F4;
-    char pad6F8[8];
+    Unk802D5D24_B* m6F8;
+    char pad6FC[4];
     void* m700;
 };
 struct Unk802D58E8_Pad {
@@ -99,13 +108,18 @@ struct Unk802D5618 {
 struct Unk802D4BD0_Base {
     char pad0[0x98];
 };
-class Unk802D4BD0_Obj : public Unk802D4BD0_Base {
+class Unk802D4BD0_Virt : public Unk802D4BD0_Base {
 public:
     virtual void s1();
     virtual void s2();
     virtual void s3();
     virtual void s4();
     virtual int s5(int a);
+};
+class Unk802D4BD0_Obj : public Unk802D4BD0_Virt {
+public:
+    char pad9C[0x390 - 0x9C];
+    int m390;
 };
 
 #endif

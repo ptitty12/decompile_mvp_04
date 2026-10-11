@@ -26,6 +26,8 @@ int fn_802CBDB4(Unk802CBD04* o);
 void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
 void fn_8040B830(char* dst, const char* src, int n);
 unsigned int fn_80378568(const char* token, int len);
+void fn_802D6008(Unk802D58E8* o, int k, int a, int b);
+int fn_801A2034(Unk802D58E8_Owner* ow, int f);
 
 void fn_8037B424(void* p, int c);
 void fn_802CBD04(void* p);
@@ -170,6 +172,36 @@ int fn_802D5C64(Unk802D5C64* o)
         return 1;
     }
     return 0;
+}
+
+void fn_802D5D24(Unk802D58E8* o, int* p)
+{
+    Unk802D58E8_Owner* ow = o->m60;
+    int m = ow->m6F4;
+    if (m != 3) {
+        if (m == 7) {
+            *p = 0;
+            return;
+        }
+        if (*p > 5) {
+            int f = 0;
+            if (ow->m6F8->m14->m1CD0 != 0) {
+                f = 1;
+            }
+            if (fn_801A2034(ow, f) != -1) {
+                *p = *p - 6;
+                return;
+            }
+            *p = 5;
+        }
+        return;
+    }
+    *p = 5;
+}
+
+void fn_802D61AC(Unk802D58E8* o, int k, int a)
+{
+    fn_802D6008(o, k, fn_801A4B34(o->m60)->m390, a);
 }
 
 void fn_802D62D8(Unk802D62D8* o)
