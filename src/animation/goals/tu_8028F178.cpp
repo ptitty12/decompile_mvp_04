@@ -90,6 +90,25 @@ void fn_8028F1F8(Unk8028F178_Goal* g, Unk8028F178_Goal* o)
     fn_802987C8(g->m4, o->m4);
 }
 
+float fn_8028F220(Unk80270BA0_X* x, int idx)
+{
+    int which = 0;
+    if (lbl_8061E770[which] == 0) {
+        Unk8028F220_Entry* e = fn_80384A48(0x2D9F492A);
+        Unk8028F220_Chooser* c = fn_8037D028(fn_8037C7FC(), e->m28);
+        cMatrixChooser* m;
+        if (c->fn_vslot4() == 0x42D34230) {
+            m = (cMatrixChooser*)c;
+        } else {
+            Unk8028F220_Chooser* p = c->fn_vslot18(0);
+            m = (cMatrixChooser*)fn_8037D028(fn_8037C7FC(), p->fn_vslot24());
+        }
+        m->fn_8026FB80(x, lbl_806E0B70[which]);
+        lbl_8061E770[which] = 1;
+    }
+    return lbl_806E0B70[which][idx];
+}
+
 /* The shared local `m1` gives retail's single -1 register for the byte store and the two ints. The
  * statement order was found by a hill-climb on the order of independent stores (see PATTERNS). */
 void fn_8028F34C(Unk8028F178_Goal* g)
@@ -195,7 +214,7 @@ Unk8028F178_Goal* fn_8028F5F4(Unk8028F178_Goal* g, float f)
 
 int fn_8028F610(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
 {
-    if (g->mC == 2) {
+    if (g->mC > 2) {
         return 0;
     }
     if (g->m18C.f12) {

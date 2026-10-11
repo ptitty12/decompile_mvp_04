@@ -115,4 +115,32 @@ int fn_80297668(Unk8028F178_Goal* g);
 Unk80273498_Vec3 fn_802976A8(Unk8028F178_Goal* g);
 int fn_8026DC18(Unk80270BA0_X* x, int a);
 
+/* fn_8028F220 looks up a cMatrixChooser by hash and runs its fn_8026FB80 once (flag in
+ * lbl_8061E770, result floats in lbl_806E0B70). Evidence: the vtable slot 4 call (class-name hash)
+ * compared with 0x42D34230, the fallback through slots 18 and 24, and the call of
+ * fn_8026FB80__14cMatrixChooserP15Unk80270BA0_ObjPf (animation/choosers/tu_8026DDE8.cpp). */
+class Unk8028F220_Chooser : public Unk8037B3E8 {
+public:
+    Unk8028F220_Chooser();
+    virtual Unk8028F220_Chooser* fn_vslot18(int a);
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual int fn_vslot24();
+};
+struct Unk8028F220_Entry {
+    char pad0[0x28];
+    int m28;
+};
+class cMatrixChooser {
+public:
+    int fn_8026FB80(Unk80270BA0_Obj* obj, float* out);
+};
+Unk8028F220_Entry* fn_80384A48(unsigned int hash);
+Unk8028F220_Chooser* fn_8037D028(Unk8037C7FC* mgr, int a);
+extern int lbl_8061E770[2];
+extern float lbl_806E0B70[2][5];
+
 #endif /* GAME_GOALS_TU_8028F178_H */
