@@ -126,7 +126,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot64();
     virtual void fn_vslot65();
     virtual void fn_vslot66();
-    virtual void fn_vslot67();
+    virtual void fn_vslot67(int a);
     virtual void fn_vslot68(int a);
     virtual void fn_vslot69();
     virtual Unk800C7B40_Widget* fn_vslot70();
@@ -223,7 +223,7 @@ struct UnkLabel : Unk800C7B40_Data {
     virtual void fn_vslot28(const void* v);
     virtual void fn_vslot29();
     virtual void fn_vslot30(const char* s);
-    virtual void fn_vslot31();
+    virtual int fn_vslot31();
     virtual void fn_vslot32();
     virtual void fn_vslot33();
     virtual void fn_vslot34();
@@ -524,7 +524,7 @@ struct UnkWidgetB : Unk800C7B40_Data {
     virtual void fn_vslot64();
     virtual void fn_vslot65();
     virtual void fn_vslot66();
-    virtual void fn_vslot67();
+    virtual void fn_vslot67(int a);
     virtual void fn_vslot68(int a);
     virtual void fn_vslot69();
     virtual Unk800C7B40_Widget* fn_vslot70();
@@ -688,6 +688,8 @@ struct UnkFEState {
     UnkFESub m8;
     char pad4E8[0x88];
     int m570;
+    char pad574[0x94];
+    int m608;
 };
 extern "C" UnkFEState* fn_800B555C();
 
