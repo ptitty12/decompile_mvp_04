@@ -479,11 +479,12 @@ int Unk8027DE3C::fn_8027FC20(int a)
     return r;
 }
 
-/* near-miss: instruction-identical except register numbers (p in r11 vs r10,
- * idx*4 in r9 vs r11) and the scheduling of the 54.0f multiply; 5 variants tried */
-int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
+/* The body is an inline taking the Angles pointer as a parameter: an inline's
+ * parameter pseudo is not pointer-flagged, so regclass gives the index
+ * offsets (idx*4 + 0x30 / 0x40) BASE_REGS, keeping them out of r0 as in
+ * retail (a local pointer variable makes them index registers -> r0). */
+inline int Check8027FC80(Unk80270BA0_X* x, Unk802726BC_Angles* p)
 {
-    Unk802726BC_Angles* p = &x->m734;
     float* q = &p->m30[p->m190];
     float lo = *q;
     if (!(lo <= x->mAB4 * 54.0f)) {
@@ -495,4 +496,9 @@ int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
         }
     }
     return 0;
+}
+
+int Unk8027DE3C::fn_8027FC80(Unk80270BA0_X* x)
+{
+    return Check8027FC80(x, &x->m734);
 }
