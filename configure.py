@@ -357,6 +357,9 @@ cflags_libgcc = ["-O2", "-G0"]
 # exception tables in the binary. See docs/DECISIONS.md.
 cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
+# EA shared libraries (ProDG 3.9.3). Unlike game code they use r13 small data, so no -G0.
+cflags_ealib = ["-Os", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
+
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
@@ -405,6 +408,25 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80367140.cpp"),
             Object(NonMatching, "ealib/tu_803666EC.cpp"),
             Object(NonMatching, "ealib/tu_803663B0.cpp"),
+        ],
+    },
+    {
+        "lib": "ealib",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_ealib,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "ealib/tu_8036FEA0.cpp"),
+            Object(NonMatching, "ealib/tu_803708F4.cpp"),
+            Object(NonMatching, "ealib/tu_80371348.cpp"),
+            Object(NonMatching, "ealib/tu_80371D9C.cpp"),
+            Object(NonMatching, "ealib/tu_803728E8.cpp"),
+            Object(NonMatching, "ealib/tu_80372F60.cpp"),
+            Object(NonMatching, "ealib/tu_80373AD8.cpp"),
+            Object(NonMatching, "ealib/tu_80374588.cpp"),
+            Object(NonMatching, "ealib/tu_80375038.cpp"),
+            Object(NonMatching, "ealib/tu_80375AE8.cpp"),
+            Object(NonMatching, "ealib/tu_80376598.cpp"),
         ],
     },
 ]

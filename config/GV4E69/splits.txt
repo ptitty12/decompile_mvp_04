@@ -97,6 +97,94 @@ ealib/tu_8036E65C.cpp:
 	.ctors      start:0x805A2C78 end:0x805A2C7C
 	.bss        start:0x80693D88 end:0x80693D9C
 
+ealib/tu_8036FEA0.cpp:
+	.text       start:0x8036FEA0 end:0x803708F4
+	.ctors      start:0x805A2C7C end:0x805A2C84
+	.rodata     start:0x80604538 end:0x8060468C
+	.data       start:0x806239C0 end:0x80623A78
+	.bss        start:0x80693DB0 end:0x80693DC4
+	.sbss       start:0x806EFB34 end:0x806EFB48
+
+ealib/tu_803708F4.cpp:
+	.text       start:0x803708F4 end:0x80371348
+	.ctors      start:0x805A2C84 end:0x805A2C88
+	.rodata     start:0x8060468C end:0x806047E8
+	.data       start:0x80623A78 end:0x80623B30
+	.bss        start:0x80693DC4 end:0x80693DD8
+	.sbss       start:0x806EFB48 end:0x806EFB5C
+
+ealib/tu_80371348.cpp:
+	.text       start:0x80371348 end:0x80371D9C
+	.ctors      start:0x805A2C88 end:0x805A2C8C
+	.rodata     start:0x806047E8 end:0x8060494C
+	.data       start:0x80623B30 end:0x80623BE8
+	.bss        start:0x80693DD8 end:0x80693DEC
+	.sbss       start:0x806EFB5C end:0x806EFB70
+
+ealib/tu_80371D9C.cpp:
+	.text       start:0x80371D9C end:0x803728E8
+	.ctors      start:0x805A2C8C end:0x805A2C90
+	.rodata     start:0x8060494C end:0x80604A9C
+	.data       start:0x80623BE8 end:0x80623CA0
+	.bss        start:0x80693DEC end:0x80693E00
+	.sbss       start:0x806EFB70 end:0x806EFB84
+
+ealib/tu_803728E8.cpp:
+	.text       start:0x803728E8 end:0x80372F60
+	.ctors      start:0x805A2C90 end:0x805A2C94
+	.rodata     start:0x80604A9C end:0x80604C0C
+	.data       start:0x80623CA0 end:0x80623D78
+	.bss        start:0x80693E00 end:0x80693E14
+	.sbss       start:0x806EFB84 end:0x806EFB98
+
+ealib/tu_80372F60.cpp:
+	.text       start:0x80372F60 end:0x80373AD8
+	.ctors      start:0x805A2C94 end:0x805A2C98
+	.rodata     start:0x80604C0C end:0x80604D9C
+	.data       start:0x80623D78 end:0x80623E48
+	.bss        start:0x80693E14 end:0x80693E28
+	.sbss       start:0x806EFB98 end:0x806EFBAC
+
+ealib/tu_80373AD8.cpp:
+	.text       start:0x80373AD8 end:0x80374588
+	.ctors      start:0x805A2C98 end:0x805A2C9C
+	.rodata     start:0x80604D9C end:0x80604F14
+	.data       start:0x80623E48 end:0x80623F08
+	.bss        start:0x80693E28 end:0x80693E3C
+	.sbss       start:0x806EFBAC end:0x806EFBC0
+
+ealib/tu_80374588.cpp:
+	.text       start:0x80374588 end:0x80375038
+	.ctors      start:0x805A2C9C end:0x805A2CA0
+	.rodata     start:0x80604F14 end:0x8060507C
+	.data       start:0x80623F08 end:0x80623FC8
+	.bss        start:0x80693E3C end:0x80693E50
+	.sbss       start:0x806EFBC0 end:0x806EFBD4
+
+ealib/tu_80375038.cpp:
+	.text       start:0x80375038 end:0x80375AE8
+	.ctors      start:0x805A2CA0 end:0x805A2CA4
+	.rodata     start:0x8060507C end:0x806051E0
+	.data       start:0x80623FC8 end:0x80624088
+	.bss        start:0x80693E50 end:0x80693E64
+	.sbss       start:0x806EFBD4 end:0x806EFBE8
+
+ealib/tu_80375AE8.cpp:
+	.text       start:0x80375AE8 end:0x80376598
+	.ctors      start:0x805A2CA4 end:0x805A2CA8
+	.rodata     start:0x806051E0 end:0x8060534C
+	.data       start:0x80624088 end:0x80624148
+	.bss        start:0x80693E64 end:0x80693E78
+	.sbss       start:0x806EFBE8 end:0x806EFBFC
+
+ealib/tu_80376598.cpp:
+	.text       start:0x80376598 end:0x80377048
+	.ctors      start:0x805A2CA8 end:0x805A2CAC
+	.rodata     start:0x8060534C end:0x80605478
+	.data       start:0x80624148 end:0x8062421C
+	.bss        start:0x80693E78 end:0x80693E8C
+	.sbss       start:0x806EFBFC end:0x806EFC10
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
