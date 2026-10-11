@@ -88,6 +88,30 @@ extern "C" FE_OVERLAY void fn_8044DA44(FeScr5* self, int a)
     ((FeObj1*)self->m16C)->v14(0);
 }
 
+extern "C" FE_OVERLAY void fn_8044DA90(FeScr5* self)
+{
+    char it[4];
+    char* p = it;
+    fn_804455B4(self);
+    Unk8007F198_B* sc = (Unk8007F198_B*)lbl_8061930C;
+    ((FeSub*)&self->m168->m98)->s15();
+    Unk8007F198_B* tm = fn_8007F7D0(sc, 0);
+    fn_804CDFE4(p);
+    fn_804CDFF8(p, 0, tm);
+    int v = fn_804CE004(p);
+    if (v != 0) {
+        do {
+            ((FeSub1*)&self->m168->m98)->s18(v);
+            ((FeSub1*)&self->m16C->mDC)->s18(v);
+            v = fn_804CE038(p);
+        } while (v != 0);
+    }
+    FeSub1* s1 = (FeSub1*)&self->m168->m98;
+    s1->s8(self->m14C);
+    FeSub1* s2 = (FeSub1*)&self->m16C->mDC;
+    s2->s8(self->m14C);
+}
+
 extern "C" FE_OVERLAY void* fn_8044DBC0(char* base, int idx)
 {
     int r = idx / 7;
@@ -105,6 +129,20 @@ extern "C" FE_OVERLAY void fn_8044DC18(FeScr5* self)
     ((FeObj1*)month)->v29(fn_800DD5E8(self->m144));
     fn_8044DDFC(self);
     fn_8044DCAC(self, self->m14C);
+}
+
+extern "C" FE_OVERLAY void fn_8044DCAC(FeScr5* self, int a)
+{
+    char buf[0x38];
+    if (fn_800A2E90(lbl_80619948) != 0) {
+        int x = lbl_8061930C->fn_80078A38(a);
+        int y = lbl_8061930C->fn_8007B8C4(1, a);
+        fn_804089B4(buf, "%.1f", fn_80574A04(fn_800A3A10(lbl_80619948, x), y, a));
+        ((FeObj1*)fn_800C8040((void*)((FeObjP1*)self)->v29((int)"RIGHTSIDE/GB")))->v30((int)buf);
+    } else {
+        ((FeObj1*)((FeObjP1*)self)->v29((int)"RIGHTSIDE/GB"))->v8(0);
+        ((FeObj1*)((FeObjP1*)self)->v29((int)"RIGHTSIDE/GBTXT"))->v8(0);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_8044DDFC(FeScr5* self)
@@ -126,6 +164,35 @@ extern "C" FE_OVERLAY void fn_8044DEE4(FeScr5* self, int a)
     fn_8044DCAC(self, a);
 }
 
+extern "C" FE_OVERLAY void fn_8044DF60(FeScr5* self, FeRec8* r)
+{
+    char db[6];
+    if (r->m8 != -1) {
+        int c = 0;
+        int sid = lbl_8061930C->fn_80078A38(self->m14C);
+        *(int*)db = r->mC;
+        int x = fn_80329E74((int*)db);
+        if (r->m8 != 0) {
+            *(int*)db = r->mC;
+            if (fn_8044E08C((int)self, (unsigned*)db) == 0) {
+                if (x == fn_800A2AE8(lbl_80619948) && fn_8056AB84(lbl_80619948->m28, x, sid) != 0)
+                    c = 1;
+            }
+        }
+        if (c != 0) {
+            fn_8044E210(self, 0);
+            return;
+        }
+        int cnt = fn_8007FB2C((Unk8007F198_C*)lbl_8061930C, sid);
+        int w = fn_8007FBC0((Unk8007F198_C*)lbl_8061930C, cnt - 1, sid);
+        if (r->m8 == 3 && x > w) {
+            fn_8044E10C(self, sid, w);
+            return;
+        }
+        fn_8044E210(self, 1);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_8044E08C(int a, unsigned* p)
 {
     unsigned v = *p;
@@ -137,6 +204,21 @@ extern "C" FE_OVERLAY int fn_8044E08C(int a, unsigned* p)
     if (hi == d[0] && ((v >> 16) & 0xFF) >= d[1])
         return 0;
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_8044E10C(FeScr5* self, int x, int y)
+{
+    char b20[0x40];
+    char b60[0xC8];
+    int d[2];
+    Unk80090880* tbl = lbl_8061977C;
+    fn_80329FA0(d, y);
+    fn_800DD44C(d, b20, 2);
+    const char* s1 = fn_80090880(tbl, 0x4634);
+    fn_8040321C(b60, s1, fn_80090880(tbl, fn_80083F6C(x)), b20);
+    FeObj* o = self->m140;
+    fn_801321D4(o, self, (FeCb)fn_805288E4, 0, b60, 1, -1, 1, fn_80090880(tbl, 0x26DE), 0, 0, 0, 0, 0);
+    self->m140->v86();
 }
 
 /* near-miss: same calls; retail loads self->m140 into r3 for the final v86 vcall and orders the stack-arg stores differently (18 slots) */

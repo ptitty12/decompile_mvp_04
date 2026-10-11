@@ -135,6 +135,7 @@ extern FeTunHolder* lbl_8061B9A0;
 #define FE_VI1(n) virtual int v##n(int a);
 #define FE_VF0(n) virtual float v##n();
 #define FE_VP2(n) virtual void* v##n(int a, int b);
+#define FE_VP1(n) virtual FeObj* v##n(int a);
 class FeObj : public UiBase {
 public:
     FE_LO(FE_V0) virtual FeObj* v32(const char* a, int b); FE_HI(FE_V0)
@@ -1178,5 +1179,43 @@ extern "C" {
 void fn_8045156C(FeScr6* s, FeObj* o, int f, int v, int a);
 int fn_8032A0C0(char* buf, ...);
 void fn_800DD344(char* a, char* b);
+}
+
+extern "C" {
+void fn_804455B4(FeScr5* s);
+void fn_804CDFE4(char* it);
+void fn_804CDFF8(char* it, int a, Unk8007F198_B* b);
+int fn_804CE004(char* it);
+int fn_804CE038(char* it);
+}
+
+class FeObjP1 : public UiBase {
+public:
+    FE_LO(FE_VP1) virtual FeObj* v32(const char* a, int b); FE_HI(FE_VP1)
+};
+extern "C" {
+int fn_800A2E90(FeGame* g);
+int fn_800A3A10(FeGame* g, int a);
+float fn_80574A04(int a, int b, int c);
+}
+
+int fn_80083F6C(int a);
+extern "C" {
+void fn_8040321C(char* out, const char* a, const char* b, char* c);
+void fn_805288E4(int a, void* b);
+}
+
+struct FeRec8 {
+    char pad0[8];
+    int m8;
+    int mC;
+};
+int fn_8007FB2C(Unk8007F198_C* s, int a);
+int fn_8007FBC0(Unk8007F198_C* s, int a, int b);
+extern "C" {
+int fn_8056AB84(int a, int b, int c);
+int fn_8044E08C(int a, unsigned* p);
+void fn_8044E10C(FeScr5* s, int x, int y);
+void fn_8044E210(FeScr5* s, int a);
 }
 #endif
