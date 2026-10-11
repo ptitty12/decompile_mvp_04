@@ -131,6 +131,30 @@ extern "C" int fn_8002A544(Unk80023AC4_Obj* x, Unk8001F2C4_World* y)
     return y->m68C;
 }
 
+extern "C" void fn_8002A920(Unk80023AC4_Obj* x)
+{
+    if (x->mD4 == 1) {
+        if (x->mB4 != 0) {
+            for (int i = 0; i < 10; i++) {
+                if (x->e[i].m4 != 0) {
+                    x->e[i].m4 = x->e[i].m4 - 1;
+                    if (x->e[i].m4 == 0) {
+                        for (int j = 0; j <= 0x31; j++) {
+                            if (lbl_8061690C[j].key == x->e[i].m0) {
+                                (x->*lbl_8061690C[j].fn)();
+                                break;
+                            }
+                        }
+                        x->mB4 = x->mB4 - 1;
+                    }
+                }
+            }
+        }
+        fn_800307B4(x);
+        ((Unk8002A920_Vt*)x->m6C8)->fn_vslot11();
+    }
+}
+
 extern "C" void fn_8002ABC4(Unk80023AC4_Obj* x)
 {
     x->m12C = 0;
