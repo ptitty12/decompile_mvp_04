@@ -8,6 +8,8 @@
 
 #include "game/tu_80070DDC.h"
 #include "game/tu_80084910.h"
+#include "game/tu_8007F198.h"
+#include "game/clampiter.h"
 #include "game/overlay.h"
 
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
@@ -122,5 +124,90 @@ unsigned fn_8032A2CC(unsigned m, unsigned short y);
 int fn_80329E74(Db8053CC9C_Date d);
 void* fn_803FFA60(void* s, int a, int n);
 }
+
+/*
+ * Int list used by the roster screens (fn_8053967C, fn_80539900, ...): data
+ * pointer, count, capacity, cursor, vptr slot at +0x10 and a built flag at +0x14.
+ */
+struct Db8053967C_List {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+/*
+ * 0x1E0-byte roster record (Unk8007F198_Rec): an int list at +0 (data, count,
+ * capacity), two pairs of {id, value} per half at +0x1B0 and three ids at +0x1D0.
+ */
+struct Db8053967C_Pair {
+    int id;
+    int val;
+};
+struct Db8053967C_Rost {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    char padC[0x1B0 - 0xC];
+    Db8053967C_Pair m1B0[2][2];
+    int m1D0[3];
+};
+
+/* Byte index list embedded at +0x14 of Db8053967C_Idx (data, count, capacity, cursor). */
+struct Db8053967C_Bytes {
+    unsigned char* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+};
+
+/* An int list (data, count, ...) followed by a byte index list at +0x14. */
+struct Db8053967C_Idx {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    int m10;
+    Db8053967C_Bytes m14;
+};
+
+/* Object built by fn_8053BB80 (size 0x58): records of 0x1E0 bytes at +0x10. */
+struct Db8053967C_DbObj {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Db8053967C_Obj58 {
+    int m0;
+    Db8053967C_DbObj* m4;
+    unsigned m8;
+    int mC;
+    char* m10;
+};
+
+int fn_800736EC(const char* s);
+
+unsigned fn_8007F488(Unk8007F198_A* a, int b);
+int fn_8007F4D0(Unk8007F198_A* a, int b, int c);
+extern const char* lbl_80622AC4[];
+
+extern "C" {
+void fn_80539C44(Db8053967C_List* l, int e);
+int fn_8053CA58(Db8053967C_Idx* x);
+int fn_8053CA8C(Db8053967C_Idx* x, int i);
+unsigned fn_8053B6CC(Db8053967C_Rost* r, int id);
+unsigned char fn_8053B210(Db8053967C_Rost* r, int id);
+int fn_8053BA1C(Db8053967C_Rost* r, int h);
+void fn_8053B548(char* p, int v);
+int fn_80377E90(Db8053967C_DbObj* d, int* a, int* b, int id);
+void fn_80377CD8(Db8053967C_DbObj* d, int a, int b, int c);
+void fn_803791BC();
+int fn_800902B0(int a, int b);
+}
+int fn_80083FC0(int a);
+int fn_8008FCC8(int a);
 
 #endif
