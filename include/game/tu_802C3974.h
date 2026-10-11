@@ -50,4 +50,40 @@ struct Unk802C3B60 {
 
 void fn_802C40A0(Unk802C3B60*, Unk802C40A0_Elem* e);
 
+/* 3-byte colour entry of the table at 0x805E2256 (fn_802C60A4 copies it with lhz + lbz). */
+struct Unk802C60A4_Rgb {
+    unsigned char r;
+    unsigned char g;
+    unsigned char b;
+};
+/* Pair of the two bytes that key the tables (fn_802C60A4 reads +0 and +4 as ints). */
+struct Unk802C60A4_Key {
+    int m0;
+    int m4;
+};
+/* Request record for the texture-name builders (fn_802C59D0 / fn_802C58E0): +0x2C id, +0x34..+0x3C letters. */
+struct Unk802C59D0_Req {
+    char pad0[0x2C];
+    int m2C;
+    char pad30[4];
+    int m34;
+    int m38;
+    int m3C;
+};
+
+/* Loader slot: +0 loaded handle, +4 buffer. */
+struct Unk802C58E0_Slot {
+    int m0;
+    int m4;
+};
+
+/* Conversion request (fn_802C610C / fn_802C57B0 / fn_802C56F8): format selectors at +0x64/+0x68, +0x80 forced flag. */
+struct Unk802C610C_Cfg {
+    char pad0[0x64];
+    int m64;
+    int m68;
+    char pad6C[0x14];
+    int m80;
+};
+
 #endif

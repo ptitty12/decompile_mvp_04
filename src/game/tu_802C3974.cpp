@@ -14,6 +14,35 @@ void* operator new(unsigned int n, int heap);
 void fn_802B961C(int p, int a);
 int fn_802C72F4(int a, int b, int c);
 void fn_802C3EC0(Unk802C3B60* o);
+extern const char lbl_805E15E8[];
+extern Unk802C60A4_Rgb lbl_805E2256[];
+char* fn_802C5970(char* buf, int a, int b, int c, int d);
+extern const char lbl_805E0134[];
+extern int lbl_8061D464;
+extern int lbl_80620830;
+extern const char lbl_805E1628[];
+extern const char lbl_805E158C[];
+extern const char lbl_805E1594[];
+extern const char lbl_805E159C[];
+extern const char lbl_805E15A4[];
+extern const char lbl_805E15BC[];
+extern const char lbl_805E1644[];
+extern const char lbl_805E166C[];
+extern const char lbl_805E1690[];
+extern const char lbl_805E16B8[];
+extern const char lbl_805E16C0[];
+extern const char lbl_805E16E8[];
+extern const char lbl_805E16F0[];
+void fn_802C63B4(const char* name, const char* b, int* out1, int* out2);
+extern const char lbl_805E15CC[];
+extern const char lbl_805E15E0[];
+int fn_803EBD14(int h, const char* k);
+int fn_802B9954(int a, int b, int c);
+int fn_802B98AC(int a, int b);
+int fn_803EE310(int a);
+void fn_803FFA60(int dst, int src, int n);
+void fn_80433004(int p, int n);
+void fn_803EDA0C(int p);
 extern const char lbl_805DFC34[];
 extern const char lbl_805E144C[];
 extern const char lbl_805E1468[];
@@ -358,4 +387,97 @@ void fn_802C44A8(int, int x, int h, int y, int z)
 void fn_802C44F0(int, int x, Unk802C2188* h, int y, int z)
 {
     fn_803D74A0(x, y, fn_802C2304(h, z));
+}
+
+void fn_802C58E0(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
+{
+    char buf[0x40] = "";
+    fn_804089B4(buf, lbl_805E15CC, req->m2C, lbl_805DFC34);
+    fn_802B9954((int)buf, o->m4, 0x4070);
+    o->m0 = fn_803EBD14(o->m4, lbl_805E15E0);
+}
+
+char* fn_802C5970(char* buf, int a, int b, int c, int d)
+{
+    fn_804089B4(buf, lbl_805E15E8, a + 0x61, b + 0x61, c + 0x61, d + 0x61, lbl_805DFC34);
+    return buf;
+}
+
+char* fn_802C59D0(char* buf, Unk802C59D0_Req* o)
+{
+    return fn_802C5970(buf, o->m2C - 0x385, o->m34, o->m3C, o->m38);
+}
+
+void fn_802C5A08(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
+{
+    char buf[0x40];
+    fn_802C59D0(buf, req);
+    int h = fn_802B98AC((int)buf, 0x500);
+    fn_803FFA60(o->m4, h, fn_803EE310(h));
+    fn_80433004(o->m4, 0x4070);
+    fn_803EDA0C(h);
+    o->m0 = fn_803EBD14(o->m4, lbl_805E15E0);
+}
+
+void fn_802C60A4(int, Unk802C60A4_Key* k, Unk802C60A4_Rgb* out)
+{
+    unsigned char* e = fn_802C3A2C(k->m0, k->m4);
+    if (e) {
+        *out = lbl_805E2256[e[2]];
+    }
+}
+
+/* near-miss (9 slots): retail keeps o in r11 (mr r11,r3) and loads o->m234 straight into the return register in the shared tail. */
+Unk802C2188* fn_802C610C(Unk802C3B60* o, Unk802C610C_Cfg* c, int flag)
+{
+    if (flag == 0 && c->m68 == 0xE) {
+        return &o->s2;
+    }
+    if (c->m80 != 0 || (lbl_8061D464 != 0 && lbl_80620830 != 0 && o->m234 != 0 && c->m64 == 0 && c->m68 == 8)) {
+        Unk802C2188* t = o->m234;
+        if (t != 0) {
+            return t;
+        }
+        return (Unk802C2188*)o;
+    }
+    if (c->m64 == 1) {
+        return &o->s1;
+    }
+    return (Unk802C2188*)o;
+}
+
+void fn_802C63B4(const char* name, const char* b, int* out1, int* out2)
+{
+    int h = fn_802B9300(name, 0x400, 1, 0);
+    *out1 = h;
+    *out2 = fn_803EBD14(h, b);
+}
+
+void fn_802C6404(Unk802C3B60* o)
+{
+    char buf[0x40] = "";
+    fn_804089B4(buf, lbl_805E1628, lbl_805DFC34);
+    int h = fn_802B9300(buf, 0x400, 1, 0);
+    o->m254 = h;
+    o->m26C = fn_803EBD14(h, lbl_805E158C);
+    o->m270 = fn_803EBD14(o->m254, lbl_805E1594);
+    fn_802C63B4(lbl_805E1644, lbl_805E159C, &o->m258, &o->m274);
+    fn_802C63B4(lbl_805E166C, lbl_805E15A4, &o->m25C, &o->m278);
+    fn_802C63B4(lbl_805E1690, lbl_805E16B8, &o->m260, &o->m27C);
+    fn_802C63B4(lbl_805E16C0, lbl_805E16E8, &o->m264, &o->m280);
+    fn_802C63B4(lbl_805E16F0, lbl_805E15BC, &o->m268, &o->m284);
+}
+
+void fn_802C6B70()
+{
+}
+
+unsigned fn_802C6B74(unsigned r, unsigned g, unsigned b)
+{
+    return ((r << 8) & 0xF800) | ((g << 3) & 0x7E0) | ((b >> 3) & 0x1F);
+}
+
+unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b)
+{
+    return (r << 16) | 0xFF000000 | (g << 8) | b;
 }
