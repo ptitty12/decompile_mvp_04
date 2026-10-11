@@ -18,7 +18,9 @@ struct Unk801B23A8_F {
 /* Argument object of the controller helpers: flags at +0x4C4/+0x4C8, floats at +0x4D8 and
  * +0x5D8, pointer-like tag at +0x588, state at +0x704/+0x708. */
 struct Unk801B23A8_Q {
-    char pad0[0x460];
+    char pad0[0x44C];
+    void* m44C;
+    char pad450[0x460 - 0x450];
     int m460;
     char pad464[0x4C4 - 0x464];
     unsigned m4C4;
@@ -32,6 +34,8 @@ struct Unk801B23A8_Q {
     char pad5DC[0x704 - 0x5DC];
     int m704;
     int m708;
+    char pad70C[0xA04 - 0x70C];
+    void* mA04;
 };
 
 /* Controller seen through its slot table: m8 owner, 2 x 9 pointers at +0x14. */

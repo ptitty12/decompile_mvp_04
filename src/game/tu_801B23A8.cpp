@@ -20,6 +20,20 @@ int fn_800974B8(Unk8019F8C0_Inner* t, int v);
 int fn_80097450(Unk8019F8C0_Inner* t, int v);
 void fn_8017D640(void* a, int b, Unk801B23A8_Q* c, int d, int e);
 extern float lbl_805CF740;
+extern float lbl_805CF754;
+extern float lbl_805CF744;
+extern float lbl_805CF748;
+float fn_8024EF40(void* a, void* b, int c);
+float fn_8024F048(void* a, void* b, void* c, int d, int e);
+float fn_8024F20C(void* a, void* b, void* c, int d, int e);
+int fn_80097380(Unk8019F8C0_Inner* t, int v);
+int fn_800973E8(Unk8019F8C0_Inner* t, int v);
+int fn_80097318(Unk8019F8C0_Inner* t, int v);
+int fn_801B3E48(void* a, Unk801B23A8_Q* q, int c);
+int fn_801B3FD0(void* a, Unk801B23A8_Q* q, int c);
+int fn_801B40DC(void* a, Unk801B23A8_Q* q);
+float fn_801B3460(void* a, Unk801B23A8_Q* q, int c);
+float fn_801B3430(void* a, Unk801B23A8_Q* q);
 int fn_801B5FC4(void* a, int b);
 int fn_801B5EDC(void* a, int b, int c);
 Unk801B23A8_Q* fn_801B2F2C(void* a, Unk801B23A8_Q* p, Unk801B23A8_Q* q, int d, int e);
@@ -233,9 +247,67 @@ float fn_801B3430(void* a, Unk801B23A8_Q* q)
     return r;
 }
 
+/* near-miss: retail keeps the first partial result in f31 across the second call (stfd f31 in the prologue);
+ * mine spills it to a stack slot (43 vs 42 insns). */
+float fn_801B3460(void* a, Unk801B23A8_Q* q, int c)
+{
+    float r = lbl_805CF744;
+    if (c != 0) {
+        r = fn_8024EF40((char*)q + 0xA0C, q->m44C, q->m708);
+    } else {
+        char* s = (char*)q + 0xA0C;
+        const float t = fn_8024F048(s, q->mA04, q->m44C, q->m708, 1);
+        r = (t + fn_8024F20C(s, q->mA04, q->m44C, q->m708, 1)) * lbl_805CF748;
+    }
+    return r;
+}
+
 float fn_801B3580(void* a, Unk801B23A8_Q* q)
 {
     return q->m5D8;
+}
+
+float fn_801B35F0(void* a, Unk801B23A8_Q* q)
+{
+    float t = fn_801B3460(a, q, 0);
+    float u = fn_801B3430(a, q);
+    return (t + u) * lbl_805CF754;
+}
+
+int fn_801B3650(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    Unk8019F8C0_Inner* t = &p->m8->m6F8->m14[q->m708];
+    if (fn_80097380(t, q->m704) == 1) {
+        return 1;
+    }
+    if (fn_800973E8(t, q->m704) == 1) {
+        return 2;
+    }
+    if (fn_80097450(t, q->m704) == 1) {
+        return 3;
+    }
+    if (fn_800974B8(t, q->m704) == 1) {
+        return 4;
+    }
+    int x = fn_80097318(t, q->m704);
+    int r = 5;
+    if (x == 1) {
+        r = 0;
+    }
+    return r;
+}
+
+int fn_801B371C(void* a, Unk801B23A8_Q* q, int c)
+{
+    int r = 0;
+    if (fn_801B5DE8(a, q, 0) == 1) {
+        if (fn_801B40DC(a, q) == 1) {
+            r = fn_801B3E48(a, q, c);
+        } else {
+            r = fn_801B3FD0(a, q, c);
+        }
+    }
+    return r;
 }
 
 void fn_801B37A0(void* p)
