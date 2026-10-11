@@ -43,6 +43,11 @@ float fn_802CBD90(Unk802CBD04* o)
     return (o->mA4 / (1.0f - o->mA8)) * o->mAC;
 }
 
+int fn_802CBDB4(Unk802CBD04* o)
+{
+    return o->mD4;
+}
+
 void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind)
 {
     o->mA0 = (Unk802CC53C_Target*)a;
@@ -147,6 +152,17 @@ void fn_802CF368(Unk802CF368_Self* o)
     o->fn_8037B458(lbl_805E3330, &o->m1C, lbl_805E2568, lbl_805E331C);
     o->fn_8037B548(lbl_805E3334, 0);
     o->fn_8037B548(lbl_805E3340, 0);
+}
+
+Unk802CF484::Unk802CF484()
+{
+    m0 = 0;
+    m4 = 0.0f;
+    m8 = 0.0f;
+    mC = 0.0f;
+    m10 = 0.0f;
+    m14 = 0.0f;
+    m18 = 0.0f;
 }
 
 void fn_802CF4B4(Unk802CF4B4_Self* self, Unk8037B3E8* reg)
