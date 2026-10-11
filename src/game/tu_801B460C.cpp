@@ -15,17 +15,54 @@ void fn_801B6A24(void* p)
 /* Script-command style class: hash 0x575DF764, vtable 0x80660230. */
 class Unk801B64B0 : public Unk8037B3E8 {
 public:
-    int m4;
-    int m8;
-    int mC;
+    float m4;
+    float m8;
+    float mC;
     Unk801B64B0();
+    virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
 };
 
 struct Unk801B6A4C_T {
     char pad0[0xB88];
-    void* mB88;
+    int* mB88;
 };
+/* Object with a vptr at +0x98 whose virtual 24 (entry at +0xC0) returns an id/handle. */
+class Unk801B460C_ObBase {
+public:
+    char pad0[0x98];
+};
+class Unk801B460C_Ob : public Unk801B460C_ObBase {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual int fn_vslot24();
+};
+Unk801B460C_Ob* fn_801B63A0(Unk801AB63C_P* p, int t);
+void fn_801B8D1C(void* p, int v);
+void fn_80249B08(void* p, int a, float f);
+extern float lbl_805CF8EC;
 struct Unk801B6A44_T {
     char pad0[0x70C];
     unsigned char m70C;
@@ -52,15 +89,47 @@ int fn_801B58D4(Unk801B460C_Tbl* t);
 int fn_8025416C(void* a, int b);
 int fn_80076644(int a, int b, int c);
 int fn_801B5F4C(Unk801AB63C_P* p);
+void fn_801B484C(int* acc);
+void fn_801B48EC(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4AB4(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4B88(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4C6C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4D2C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B4F14(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+void fn_801B50B4(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc);
+int fn_801B3FD8(void* a, Unk801B23A8_Q* q);
+unsigned fn_801B608C(void* a, Unk801B23A8_Q* q);
+int fn_801B380C(void* a, Unk801B23A8_Q* q);
 int fn_801B5F70(Unk801AB63C_P* p);
 int fn_801C1870(void* a, int b, int c);
 int fn_801B5EDC(void* a, int b, int c);
 extern int lbl_8068BECC;
+extern char lbl_805CF874[];
+extern char lbl_805CF878[];
+extern char lbl_805CF888[];
+extern char lbl_805CF8A4[];
+extern char lbl_805CF8B4[];
+extern char lbl_805CF8CC[];
 extern int lbl_806EF9B4;
 
 int fn_801B5FC4(void* a, int b);
 
-void fn_801B50B4(void* a, Unk801B23A8_Q* q, int* acc)
+void fn_801B4A0C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    if ((int)q->m4C4 < 0 && fn_801B3FD8(p, q) == 0) {
+        unsigned t = fn_801B608C(p, q);
+        if (t > fn_801B380C(p, q)) {
+            int r = fn_801B5EDC(p, q->m708, 0);
+            if (fn_801C1870(p, r, 3) != 0) {
+                *acc += 3;
+                *acc -= r;
+            }
+        }
+    }
+}
+
+void fn_801B50B4(Unk801AB63C_P* a, Unk801B23A8_Q* q, int* acc)
 {
     int r = 0;
     int t = fn_801B5EDC(a, q->m708, 0);
@@ -68,6 +137,37 @@ void fn_801B50B4(void* a, Unk801B23A8_Q* q, int* acc)
         r = (4 - t) * 10;
     }
     *acc += r;
+}
+
+/* near-miss: same code; retail keeps &s in r28 and p in r30 (mine swaps them), 17 slots differ; ~3 forms tried. */
+int fn_801B5120(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c)
+{
+    int s = 0;
+    fn_801B484C(&s);
+    fn_801B48EC(p, q, &s);
+    fn_801B4AB4(p, q, &s);
+    fn_801B4B88(p, q, &s);
+    fn_801B4C6C(p, q, &s);
+    fn_801B4D2C(p, q, &s);
+    fn_801B4E24(p, q, &s);
+    fn_801B4F14(p, q, &s);
+    fn_801B50B4(p, q, &s);
+    return s;
+}
+
+/* near-miss: same register swap as fn_801B5120. */
+int fn_801B51E4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int s = 0;
+    fn_801B484C(&s);
+    fn_801B48EC(p, q, &s);
+    fn_801B4AB4(p, q, &s);
+    fn_801B4B88(p, q, &s);
+    fn_801B4C6C(p, q, &s);
+    fn_801B4D2C(p, q, &s);
+    fn_801B4E24(p, q, &s);
+    fn_801B4F14(p, q, &s);
+    return s;
 }
 
 void fn_801B564C(Unk801B460C_Tbl* t)
@@ -130,6 +230,12 @@ Unk801B5A44::~Unk801B5A44()
 {
     m4 = 0;
     m8 = 0;
+}
+
+int fn_801B5AD0(Unk801AB63C_P* p, int t)
+{
+    Unk801B460C_Ob* o = fn_801B63A0(p, t);
+    return o ? o->fn_vslot24() : 0;
 }
 
 int fn_801B5DE8(void* a, void* q, int c)
@@ -217,6 +323,16 @@ int fn_801B6354(void* a, int b, int c)
 
 Unk801B64B0::Unk801B64B0() : Unk8037B3E8(0x575DF764u) {}
 
+void Unk801B64B0::fn_vslot2()
+{
+    fn_8037B7E4(lbl_805CF874);
+    fn_8037B7E8(lbl_805CF878);
+    fn_8037B50C(lbl_805CF888, &m4, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CF8B4, &m8, lbl_805CF8A4, 0);
+    fn_8037B50C(lbl_805CF8CC, &mC, lbl_805CF8A4, 0);
+    fn_8037B830(lbl_805CF878);
+}
+
 Unk801B64B0* fn_801B659C()
 {
     return (Unk801B64B0*)fn_8037C7FC()->fn_8037CE98(0x575DF764, lbl_8068BECC, 0);
@@ -238,7 +354,28 @@ void fn_801B6A4C(Unk801B6A4C_T* p)
     fn_801B905C(p->mB88);
 }
 
+void fn_801B6A80(void* p)
+{
+    fn_801B8D1C(p, 0);
+    fn_80249B08(p, 0, lbl_805CF8EC);
+}
+
+void fn_801B7ED8(void* p, Unk801B460C_Ob* o)
+{
+    if (o) {
+        fn_801B8D1C(p, o->fn_vslot24());
+    }
+}
+
 void fn_801B7F2C(void* p)
 {
     fn_801B8D1C(p, 0);
+}
+
+void fn_801B7F50(Unk801B6A4C_T* p, Unk801B460C_Ob* o)
+{
+    if (o) {
+        fn_801B8D1C(p, o->fn_vslot24());
+    }
+    *p->mB88 = 1;
 }
