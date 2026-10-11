@@ -45,6 +45,43 @@ inline void Append(Unk805352B0_List* dst, Unk80535650_Tmp* src)
     dst->m14 = 1;
 }
 
+extern "C" DB_OVERLAY void fn_80535360(Unk805352B0_List* self, int x)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0x78];
+    Unk80535650_Tmp* q = &t;
+    int z = 0;
+    fn_8040074C(self->m0, self->m8 << 2);
+    self->m4 = z;
+    self->mC = z;
+    self->m14 = z;
+    q->C1(buf, 0x78);
+    q->C2();
+    q->C3(lbl_8064A440);
+    int g1 = sc->fn_8007B320(0, x);
+    int g2 = sc->fn_8007B320(1, x);
+    int g3 = sc->fn_8007B320(2, x);
+    int g4 = sc->fn_8007B320(3, x);
+    fn_80535650((Unk805352B0_List*)&t, g1);
+    Append(self, &t);
+    if (g2) {
+        fn_80535650((Unk805352B0_List*)&t, g2);
+        Append(self, &t);
+    }
+    if (g3) {
+        fn_80535650((Unk805352B0_List*)&t, g3);
+        Append(self, &t);
+    }
+    if (g4) {
+        fn_80535650((Unk805352B0_List*)&t, g4);
+        Append(self, &t);
+    }
+    self->m14 = 1;
+    t.D();
+}
+
+extern "C" void fn_805366FC(Unk805352B0_List* self, int i, int last, int mode);
 extern "C" void fn_80535764(Unk805352B0_List* self, int x);
 extern "C" void fn_80535820(Unk805352B0_List* self, int x);
 extern "C" void fn_80535F84(Unk805352B0_List* self, int a, int p, int q);
@@ -309,6 +346,23 @@ extern "C" DB_OVERLAY void fn_805364E0(Unk805352B0_List* self, int mode)
                 self->Set(x, a);
                 self->Set(y, b);
             }
+        }
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80536624(Unk805352B0_List* self, int mode)
+{
+    int n = self->m4;
+    if (n > 1) {
+        int i;
+        for (i = n / 2 - 1; i >= 0; i--)
+            fn_805366FC(self, i, n - 1, mode);
+        for (i = n - 1; i > 0; i--) {
+            int x = self->At(0);
+            int y = self->At(i);
+            self->Set(0, y);
+            self->Set(i, x);
+            fn_805366FC(self, 0, i - 1, mode);
         }
     }
 }
