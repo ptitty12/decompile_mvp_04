@@ -185,6 +185,104 @@ int fn_80086DD8(void* self, unsigned i);
 void fn_80086E58(Unk80084910_Str* self, const short* str);
 void fn_80087A50(Unk80084910_S* self, int v);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void fn_80403060_(void);
+struct Unk80084910_Q {
+    char pad0[0x88];
+    short m88[1];
+};
+
+int fn_80084910(void* self, int a, int b, int c);
+int fn_80084954(void* self);
+int fn_80084978(void* self);
+int fn_8008499C(void* self);
+int fn_800849C0(int t);
+K30* fn_80084A10(K30* self);
+void fn_80084A8C(K30* self, int flags);
+void fn_80084AE8(K30* self, unsigned i);
+float fn_80084FEC(Unk80084910_PObj* o, int i, int a);
+float fn_8008574C(G* self, int a);
+float fn_800857B8(G* self, int a);
+float fn_80085824(G* self, int a);
+float fn_80085894(G* self, int a);
+float fn_80085910(G* self, int a);
+float fn_8008598C(G* self, int a);
+void fn_800859E0(K30* self, int a, VObj* obj);
+K8* fn_80085A3C(K8* self);
+void fn_80085AB8(K8* self, int flags);
+void fn_80085B14(K8* self, unsigned i);
+int fn_80085B50(void* self);
+int fn_80085B58(void* self);
+int fn_80085B60(void* self);
+int fn_80085B68(void* self, int a, int b, int c);
+float fn_80085B70();
+void fn_80085B8C();
+void fn_80085B90();
+void fn_80085B94(K8* self, int a, VObj* obj);
+T8* fn_80085BF0(K8* self, int i);
+T8* fn_80085C00(K8* self, int i);
+void* fn_80085EF8(void* self, int a);
+int fn_80085FB0();
+void fn_80085FF8(Unk80084910_N* self, int key);
+void fn_80086030(Unk80084910_N* self, char* buf);
+void fn_80086078(Unk80084910_N* self, char* buf);
+void fn_800860E0(Unk80084910_N* self, char* buf);
+void fn_80086140(Unk80084910_N* self, char* buf);
+void fn_800861A8(Unk80084910_N* self, char* buf);
+Unk80084910_R* fn_80086210(Unk80084910_R* self);
+void fn_80086D24(Unk80084910_W* self, int i, int v);
+int fn_80086D34(Unk80084910_W* self, int i);
+int fn_80086DD8(void* self, unsigned i);
+void fn_80086E58(Unk80084910_Str* self, const short* str);
+/* near-miss: retail forms the destination as (i*34 + 0x88) from self and the
+ * terminator offset as (n-1)*2 + i*34 from self+0x88; one slot of address
+ * arithmetic differs. */
+void fn_80086F6C(Unk80084910_Q* self, int i, const short* str);
+void fn_800879B8(void* out, int a, VObj* obj);
+void fn_80087A50(Unk80084910_S* self, int v);
+
 int fn_80084910(void* self, int a, int b, int c)
 {
     return fn_8008453C(fn_80084660(self), a, b, c);
@@ -467,6 +565,26 @@ void fn_80086E58(Unk80084910_Str* self, const short* str)
         n = 0x12;
     fn_8040316C(self->m204, str, n);
     self->m204[n - 1] = 0;
+}
+
+/* near-miss: retail forms the destination as (i*34 + 0x88) from self and the
+ * terminator offset as (n-1)*2 + i*34 from self+0x88; one slot of address
+ * arithmetic differs. */
+void fn_80086F6C(Unk80084910_Q* self, int i, const short* str)
+{
+    int n = fn_80403060(str) + 1;
+    if (n > 0x10)
+        n = 0x10;
+    short* dst = (short*)((char*)self + i * 0x22 + 0x88);
+    fn_8040316C(dst, str, n);
+    dst[n - 1] = 0;
+}
+
+void fn_800879B8(void* out, int a, VObj* obj)
+{
+    obj->m4->pfn((char*)obj + obj->m4->delta, a, out, 4);
+    obj->m4->pfn((char*)obj + obj->m4->delta, a, (char*)out + 4, 5);
+    obj->m4->pfn((char*)obj + obj->m4->delta, a, (char*)out + 0xA, 2);
 }
 
 void fn_80087A50(Unk80084910_S* self, int v)
