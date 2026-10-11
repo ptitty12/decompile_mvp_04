@@ -90,4 +90,22 @@ public:
     void Init();
 };
 
+/* Object with a vptr at +0x3C (data-only base, then the virtuals); vtable 0x80660128. */
+class Unk801A734C_Base {
+public:
+    int m0;
+    char pad4[0x28 - 0x4];
+    int m28;
+    char pad2C[0x3C - 0x2C];
+};
+
+class Unk801A734C : public Unk801A734C_Base {
+public:
+    Unk801A734C(int a);
+    virtual ~Unk801A734C();
+    void Reset();           /* 0x801A7394 */
+    void Init(int a);       /* 0x801A750C */
+    void Clear();           /* 0x801A7424 */
+};
+
 #endif
