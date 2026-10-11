@@ -401,6 +401,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "ealib/tu_8036FEA0.cpp"),
+            Object(NonMatching, "ealib/tu_803708F4.cpp"),
         ],
     },
 ]

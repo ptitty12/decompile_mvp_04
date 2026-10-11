@@ -25,6 +25,14 @@ ealib/tu_8036FEA0.cpp:
 	.bss        start:0x80693DB0 end:0x80693DC4
 	.sbss       start:0x806EFB34 end:0x806EFB48
 
+ealib/tu_803708F4.cpp:
+	.text       start:0x803708F4 end:0x80371348
+	.ctors      start:0x805A2C84 end:0x805A2C88
+	.rodata     start:0x8060468C end:0x806047E8
+	.data       start:0x80623A78 end:0x80623B30
+	.bss        start:0x80693DC4 end:0x80693DD8
+	.sbss       start:0x806EFB48 end:0x806EFB5C
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
