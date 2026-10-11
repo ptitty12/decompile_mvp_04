@@ -92,7 +92,9 @@ class Unk80195404 {
 public:
     Unk80195404(Unk80187190* owner, int flag);
     ~Unk80195404();
-    char pad0[0xB04];
+    char pad0[0xAB0];
+    int* mAB0;
+    char padAB4[0xB04 - 0xAB4];
 };
 class Unk80187190_M {
 public:
