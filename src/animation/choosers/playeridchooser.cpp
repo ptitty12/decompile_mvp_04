@@ -225,8 +225,13 @@ int ICommonPlayerID::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, i
         } else {
             Unk80270BA0_X* x = obj->fn_vslot1();
             int k = fn_8025416C(x->m588, 32);
-            if (k && (k = fn_80270CDC(n, k))) {
-                id = fn_80270E3C(x->m44C, k);
+            if (k) {
+                k = fn_80270CDC(n, k);
+                if (k) {
+                    id = fn_80270E3C(x->m44C, k);
+                } else {
+                    id = fn_80270D64(x->m44C, n);
+                }
             } else {
                 id = fn_80270D64(x->m44C, n);
             }

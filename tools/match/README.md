@@ -7,6 +7,7 @@ and objdiff decide what counts as matched.
 |---|---|
 | `diff_unit.py <unit> [name-substr...]` | Rebuild one unit object with ninja, then compare every function to dtk's target object. Relocations are masked. Give a name substring for a side-by-side diff. One loop takes about 5–8 s. |
 | `variants.py <prodg_dir> <objdump> <file.cpp> <target.o> <symbol> [flags...]` | Compile a scratch file of whole-function rewrites (any function whose name contains `_v<N>`) and score each against the target. Set `SHOW=<name-substr>` to list one variant's diffs. Good for register-allocation and scheduling near-misses. |
+| `score_variants.py <unit> <function> <file.cpp>... [--relax] [--show]` | Compile scratch copies of a unit with its cflags from `build.ninja` and score one function against dtk's target object (differing slots plus an alignment-aware count). About 0.2 s per file, so scripted searches over hundreds of variants are cheap. `--relax` accepts a relocation against a raw immediate (e.g. `GXWGFifo@ha` vs `lis 0xcc01`). |
 | `cmp_objects.py <objdump> <compiled.o> <target.o> [name-substr...]` | The comparison step `diff_unit.py` uses. |
 | `asm_show.py <asm_dir> show <fn...>` / `list ...` | Print functions from dtk's split asm (`build/GV4E69/asm`), compacted. |
 | `m2c_draft.py <unit> <fn>` | First-draft C for one function via m2c (external venv, see the script). A starting point: m2c guesses types, `unk<off>` fields map to our `m<off>`. |
