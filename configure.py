@@ -767,6 +767,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "fe/tu_8043FDC0.cpp"),
+            Object(NonMatching, "fe/tu_804439E4.cpp"),
         ],
     },
     {
