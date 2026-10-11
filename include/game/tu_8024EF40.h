@@ -45,8 +45,14 @@ struct Unk8024EF40_Ent {
     char pad0[0xE64];
 };
 
-struct Unk8024EF40_Sub6F8 {
+struct Unk8024EF40_T10 {
     char pad0[0x14];
+    int m14[3];
+};
+
+struct Unk8024EF40_Sub6F8 {
+    char pad0[0x10];
+    Unk8024EF40_T10* m10;
     Unk8024EF40_Ent* m14;
 };
 
@@ -124,7 +130,8 @@ struct Unk8024EF40_P {
     Unk8024EF40_A m58C;
     char pad5E0[0x618 - 0x5E0];
     struct Unk8024EF40_Obj618* m618;
-    char pad61C[0x708 - 0x61C];
+    char pad61C[0x704 - 0x61C];
+    int m704;
     int m708;
     unsigned char m70C;
     char pad70D[0x730 - 0x70D];
@@ -229,6 +236,13 @@ struct Unk80256C80_Inner {
 inline void SetF(float* p, float v)
 {
     *p = v;
+}
+
+/* Table read through an inline taking the table pointer: the index load lands in r11 as in retail
+   (the plain `m10->m14[i]` expression puts it in r0): fn_802536D0. */
+inline int Pick(Unk8024EF40_T10* t, int i)
+{
+    return t->m14[i];
 }
 
 #endif /* GAME_TU_8024EF40_H */

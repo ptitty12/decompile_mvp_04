@@ -7,6 +7,7 @@
 typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
 typedef Unk8024EF40_W W;
+typedef Unk8024EF40_Q Q;
 
 extern "C++" {
 int fn_80250AC4(P* x);
@@ -45,6 +46,48 @@ extern int lbl_8061DC54;
 extern float lbl_8061DC44;
 extern int lbl_80691CDC;
 inline float G_8061DC44(void* p) { return lbl_8061DC44; }
+struct Unk802531FC_C {
+    int m0;
+    P* m4;
+    int m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    unsigned f0 : 1;
+    unsigned f1 : 1;
+    unsigned f2 : 1;
+    unsigned f3 : 29;
+    int m48;
+    int m4C;
+    P* m50;
+};
+typedef Unk802531FC_C C;
+void fn_8037893C(void* q, int id, void* o, int a, int b);
+int fn_80097318(Unk8024EF40_Ent* e, int a);
+int fn_800973E8(Unk8024EF40_Ent* e, int a);
+int fn_80097380(Unk8024EF40_Ent* e, int a);
+int fn_80097450(Unk8024EF40_Ent* e, int a);
+int fn_800974B8(Unk8024EF40_Ent* e, int a);
+int fn_801A2034(Q* q, int pos);
+int* fn_801A6DB8(Q* q);
+void fn_8025283C(C* self);
+void fn_80252964(C* self);
+void fn_802529F0(C* self);
+void fn_802526D4();
+int fn_80254374(W* self, int a);
+float fn_80254618(W* self, int a);
+int fn_80253100(C* self, int a);
 }
 
 void fn_80252460(P* x)
@@ -57,6 +100,145 @@ void fn_80252460(P* x)
         if (!(p >= t))
             fn_80250B28(x, 0xC);
     }
+}
+
+void fn_802526D4()
+{
+}
+
+/* near-miss: retail emits `lis r29,0x4330` after the call to the empty fn_802526D4, ours hoists it above (1 slot) */
+void fn_802526D8(C* self)
+{
+    self->m0 = 2;
+    fn_802526D4();
+    fn_802529F0(self);
+    self->m8 = fn_80254374(&self->m4->m588, 0x1A);
+    self->mC = (float)fn_80254374(&self->m4->m588, 4);
+    self->m10 = (float)fn_80254374(&self->m4->m588, 9);
+    self->m14 = (float)fn_80254374(&self->m4->m588, 0xE);
+    self->m18 = (float)fn_80254374(&self->m4->m588, 0x13);
+    self->m1C = (float)fn_80254374(&self->m4->m588, 0x18);
+    self->m20 = fn_80254618(&self->m4->m588, 1);
+    fn_8025283C(self);
+    fn_80252964(self);
+}
+
+void fn_80252964(C* self)
+{
+    float v = (float)fn_80254374(&self->m4->m588, 0);
+    self->m28 = !(v <= 0.0f) ? self->m24 / v : 0.0f;
+}
+
+void fn_80252A90()
+{
+}
+
+/* near-miss: same stores, scheduler moves m10/m38 earlier than retail */
+void fn_80252D38(C* self)
+{
+    self->m3C = -1;
+    self->m2C = 0.0f;
+    self->f0 = 0;
+    self->f1 = 0;
+    self->f2 = 0;
+    self->m50 = 0;
+    self->m8 = 0;
+    self->m28 = 0.0f;
+    self->m24 = 0.0f;
+    self->mC = 0.0f;
+    self->m20 = 0.0f;
+    self->m1C = 0.0f;
+    self->m18 = 0.0f;
+    self->m14 = 0.0f;
+    self->m10 = 0.0f;
+    self->m30 = 0;
+    self->m34 = 0;
+    self->m40 = 0;
+    self->m38 = 0;
+    self->m48 = fn_80253100(self, 0xF);
+    self->m4C = fn_80253100(self, 0xFF);
+}
+
+void fn_80252DD8(C* self, P* p)
+{
+    if (p != 0)
+        self->m50 = (P*)p->m704;
+    else
+        self->m50 = p;
+}
+
+int fn_802530E8(C* self)
+{
+    return self->m4C != 0xFF;
+}
+
+int fn_80253100(C* self, int a)
+{
+    P* p = self->m4;
+    int t = p->m708;
+    int n;
+    if (t == 2 || (n = p->m704) == 0 || p->m44C->m6F4 != 0)
+        return 15;
+    Unk8024EF40_Ent* e = p->m44C->m6F8->m14 + t;
+    int r = a;
+    if (fn_80097318(e, n) != 0)
+        r = 15;
+    else if (fn_800973E8(e, n) != 0)
+        r = 16;
+    else if (fn_80097380(e, n) != 0)
+        r = 17;
+    else if (fn_80097450(e, n) != 0)
+        r = 18;
+    else if (fn_800974B8(e, n) != 0)
+        r = 19;
+    return r;
+}
+
+/* near-miss: one register (li r10 vs r11) differs; store order and byte-load spellings tried */
+void fn_802531FC(C* self)
+{
+    self->m3C = *((unsigned char*)self->m4->m44C->m6F8->m14 + 0x1CC8);
+    self->m38 = 0;
+}
+
+void fn_80253220(C* self)
+{
+    self->m38 = self->m38 + 1;
+    if (self->f1)
+        self->f1 = 0;
+}
+
+int fn_802536D0(P* self)
+{
+    if (self->m44C->m6F4 == 1)
+        return 1;
+    if (fn_801A2034(self->m44C, self->m708) == -1)
+        return *fn_801A6DB8(self->m44C);
+    return Pick(self->m44C->m6F8->m10, self->m708);
+}
+
+int fn_8025374C(P* self)
+{
+    if (self->m44C->m6F4 == 1)
+        return 1;
+    if (fn_801A2034(self->m44C, self->m708) != -1)
+        return fn_802536D0(self);
+    int k = self->m708;
+    if (k == 0)
+        k = 1;
+    else if (k == 1)
+        k = 0;
+    return Pick(self->m44C->m6F8->m10, k);
+}
+
+void fn_80253BFC(W* self)
+{
+    fn_8037893C(self->m0->m44C->m704, 0x53, 0, 0, 0);
+}
+
+void fn_80253C38(W* self)
+{
+    fn_8037893C(self->m0->m44C->m704, 0x54, 0, 0, 0);
 }
 
 int fn_80253DB0(Unk8024EF40_W* self, int a, int b)
