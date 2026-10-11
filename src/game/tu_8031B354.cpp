@@ -151,6 +151,7 @@ void fn_8031B470(FxC* self, int id, int a, int b) {
     }
 }
 
+/* near-miss: retail materialises li/lis/lfs inside both item loops; ours hoists them */
 FxD* fn_8031B4EC(FxD* self, int a) {
     fn_80328234(self, 0xE, a);
     self->m28 = 0;
@@ -232,6 +233,7 @@ void fn_8031BFAC(FxD* self, int i) {
     *(FxSlotD*)((char*)self + off) = self->aA4[1];
 }
 
+/* near-miss: slot address: add + displacement in retail, addi + lwzx here */
 void fn_8031BFD8(FxD* self, int i) {
     FxSrcD* src = self->aA4[i].m4;
     for (int k = 0; k < 5; k++) {
@@ -329,6 +331,7 @@ void fn_8031C714(FxG* self) {
     }
 }
 
+/* near-miss: float temporaries: retail has one stack slot, ours three */
 void fn_8031CB4C(void* unused, float* out) {
     FxCtx* c = lbl_8061FEDC;
     if (c->m204 != 0 && c->m208 == 0) {
@@ -359,6 +362,7 @@ void fn_8031CB4C(void* unused, float* out) {
 
 void fn_8031CBF4() {}
 
+/* near-miss: eight float stores; store order not found */
 void fn_8031CBF8(void* unused, float* out) {
     out[4] = lbl_805EA630;
     out[7] = lbl_805EA634;
@@ -370,16 +374,13 @@ void fn_8031CBF8(void* unused, float* out) {
     out[6] = lbl_805EA634;
 }
 
-void* fn_8031CC2C(void* self, float t) {
-    fn_8014D9EC(self, lbl_805EA650, lbl_805EA650, lbl_805EA650, t, lbl_805EA650);
-    return self;
-}
-
+/* near-miss: same fmr chain as fn_8031CC2C */
 void* fn_8031CC78(void* self, float t) {
     fn_8014D9EC(self, lbl_805EA654, lbl_805EA654, lbl_805EA654, t, lbl_805EA658);
     return self;
 }
 
+/* near-miss: switch tree: retail has a dead compare for case 1 and a [6,7] range test */
 int fn_8031CCC8(FxG* self) {
     int kind = self->m2C;
     int now = lbl_8061E9F4;
@@ -479,6 +480,7 @@ void fn_8031D494(FxI* self, float a, float b, float c, float d) {
     self->m10->s3(self->m2C, self->m30);
 }
 
+/* near-miss: int-to-float constant/lis scheduling */
 void fn_8031D54C(FxI* self) {
     self->m28 = self->m24 = lbl_805EA6A4;
     self->m2C = (float)(lbl_8061FEDC->m28 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14) * lbl_805EA6B0;
