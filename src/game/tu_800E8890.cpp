@@ -4,6 +4,44 @@
  */
 #include "game/tu_800E8890.h"
 
+/* near-miss: 3 slots, lwzx base/index order of the quad table reads (retail: lwzx r25,r27,r30 and a precomputed &loc+4) */
+void fn_800E8A6C(Ue8A6C* m)
+{
+    int i = 0;
+    fn_800E6708(m);
+    while (i < m->mF4) {
+        int k = m->mEC[i];
+        i++;
+        fn_800E694C(m, k);
+        fn_800E71E0(m, k);
+        fn_800E7598(m, k);
+        fn_800E7888(m, k);
+        fn_800E7AD8(m, k);
+    }
+    i = 0;
+    while (i < m->mF4) {
+        int k = m->mEC[i];
+        i++;
+        fn_800E7E48(m, k);
+    }
+    UiQuad loc = lbl_805BE0E0;
+    char* q = (char*)&loc;
+    int off = 0;
+    int j = 2;
+    do {
+        i = 0;
+        int v = *(int*)(q + off);
+        while (i < m->mF4) {
+            int k = m->mEC[i];
+            i++;
+            fn_800E8890(m, k, *(int*)(q + 4 + off), v);
+        }
+        off += 8;
+        j--;
+    } while (j != 0);
+    fn_800E6888(m);
+}
+
 void fn_800E8BCC(UiS* self)
 {
     fn_800EC1E8(self);
@@ -41,6 +79,44 @@ void fn_800E9248(int a, UiS* x)
         fn_800B7B4C(UiGetMsgMgr(), p, x);
         break;
     }
+    }
+}
+
+void fn_800E95FC(int a, UiS* x)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    switch (a) {
+    case 0:
+        fn_800A2F9C(lbl_80619948, 1);
+        x->v114(x->m2E4);
+        break;
+    case 1: {
+        x->v80(1);
+        Unk8007B2B0_Screen* s = lbl_8061930C;
+        const char* nm;
+        if (((Unk8007A4DC_Screen*)s)->fn_8007A270(fn_800A31FC(lbl_80619948)) != 0)
+            nm = lbl_805BE0F0;
+        else
+            nm = lbl_805BE100;
+        fn_8040B830(p->name, nm, 15);
+        p->name[15] = 0;
+        char* t = (char*)fn_800B555C() + 8;
+        Unk8007B2B0_Screen* s2 = lbl_8061930C;
+        fn_800C2034(t, s2->fn_80078A38(fn_80077BC4(s2, fn_800A31FC(lbl_80619948))));
+        lbl_80619948->m74 = 0;
+        lbl_80619948->m80 = 0;
+        lbl_80619948->mA4 = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, x);
+        break;
+    }
+    case 2:
+        lbl_80619948->m74 = 0;
+        lbl_80619948->m80 = 0;
+        lbl_80619948->mA4 = 0;
+        x->v114(x->m2E4);
+        break;
     }
 }
 
@@ -482,6 +558,7 @@ int fn_800EBDB8()
     return 0;
 }
 
+/* near-miss: 8 slots, load order of p134 and the cached sub->m38 */
 void fn_800EBDC0(UiS* self)
 {
     if (self->p134 != 0 && self->v91() == 0) {

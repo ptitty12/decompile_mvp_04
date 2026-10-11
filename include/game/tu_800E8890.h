@@ -86,4 +86,29 @@ void* fn_8007F7D0(Unk8007B2B0_Screen* s, unsigned i);
 extern char lbl_805BE138[];
 int fn_800A3244(Ui80619948* g);
 int fn_80077BC4(Unk8007B2B0_Screen* s, int a);
+int fn_800A31FC(Ui80619948* g);
+struct Ue6888 {
+    UiS* p0;
+    UiS* p4;
+    char pad8[8];
+    int m10;
+};
+void fn_800E6888(Ue6888* t);
+struct Ue8A6C : public Ue6888 {
+    char pad14[0xEC - 0x14];
+    int mEC[2];
+    int mF4;
+};
+struct UiQuad {
+    int m[4];
+};
+extern UiQuad lbl_805BE0E0;
+void fn_800E6708(Ue8A6C* m);
+void fn_800E694C(Ue8A6C* m, int k);
+void fn_800E71E0(Ue8A6C* m, int k);
+void fn_800E7598(Ue8A6C* m, int k);
+void fn_800E7888(Ue8A6C* m, int k);
+void fn_800E7AD8(Ue8A6C* m, int k);
+void fn_800E7E48(Ue8A6C* m, int k);
+void fn_800E8890(Ue8A6C* m, int k, int a, int b);
 #endif
