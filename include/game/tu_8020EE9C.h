@@ -147,6 +147,8 @@ struct Obj4_36C {
     char pad370[4];
     Obj36C* m374;
     int m378;
+    char pad37C[0x38C - 0x37C];
+    int m38C;
 };
 /* Block reached through CtxOwner::m6F8 -> +0x14 (byte at +0x1CC9). */
 struct Ctx6F8Inner {
@@ -201,7 +203,9 @@ struct TaskInner {
     int m40;
     char pad44[0x80 - 0x44];
     int m80;
-    char pad84[0xC0 - 0x84];
+    char pad84[0xA4 - 0x84];
+    int mA4;
+    char padA8[0xC0 - 0xA8];
     Slots4 mC0;
     char padD0[0xD4 - 0xD0];
     Slots4 mD4;

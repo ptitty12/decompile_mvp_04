@@ -113,6 +113,7 @@ int fn_80211064(Sub* t, int kind, Player* p, int* out)
     return r;
 }
 
+/* near-miss: retail lays out li -1; b end between ble and addi r3,r3,1; ours speculates the addi above the ble */
 int fn_802112B4(Sub* t, Player** out)
 {
     void* list = t->m0->m0->m700->m3B4;
@@ -343,6 +344,7 @@ int fn_80211E1C(EntList* l)
     return l->mC[l->m8].m20;
 }
 
+/* near-miss: block layout: retail duplicates the m10 compare in both type arms and shares the -1/1 tails */
 int fn_80211E30(CmpKey* a, CmpKey* b)
 {
     if (a->m4 == 7) {
