@@ -125,8 +125,7 @@ float fn_8005D6A0(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
 
 float fn_8005D6C4(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
 {
-    fn_8005D6A0(self, a, b, obj);
-    return fn_8005CE4C(self);
+    return fn_8005CE4C(self, fn_8005D6A0(self, a, b, obj));
 }
 
 float fn_8005D6F8(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)

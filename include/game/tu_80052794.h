@@ -127,6 +127,8 @@ struct Unk80052794_Row {
 struct Unk80052794_SC {
     char pad0[0xC];
     int mC;
+    char pad10[0x18];
+    int m28;
 };
 
 struct Unk80052794_S6F8 {
@@ -192,16 +194,22 @@ struct Unk80052794_S44C {
 };
 
 struct Unk80052794_S130 {
-    char pad0[0x44C];
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0xBC];
     Unk80052794_S44C* m44C;
-    char pad450[0x2B4];
+    char pad450[0x8];
+    int m458;
+    char pad45C[0x2A8];
     int m704;
     int m708;
 };
 
 /* Class with a vptr at +0x98 (fn_80052A34 and fn_800543B4 call virtual slots 24 and 4 through it). */
 struct Unk80052794_S3B0 : Unk80052794_B3B0 {
-    char pad9C[0x3B0];
+    char pad9C[0x2EC];
+    int m388;
+    char pad38C[0xC0];
     int m44C;
     char pad450[0x10];
     int m460;
@@ -737,7 +745,7 @@ void* fn_80057074(Unk80057204_Mgr* m, int k);
 void* fn_800570D8(Unk80057204_Mgr* m, int k);
 unsigned fn_803440F0(void* p, int x);
 unsigned fn_80344138(void* p, int x);
-float fn_8005CE4C(Unk80057204_Mgr* self);
+float fn_8005CE4C(Unk80057204_Mgr* self, float x);
 float fn_8005D6A0(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj);
 float fn_8025454C(void* p, int idx);
 int fn_80045F28(float x);
@@ -776,5 +784,118 @@ extern const float lbl_805ADE08;
 extern const float lbl_805ADE0C;
 extern const float lbl_805ADE10;
 extern const float lbl_805ADE14;
+
+/* unit 0x8005C514 */
+struct Unk8005C514_Slot {
+    void* m0;
+    char pad4[0x10];
+};
+struct Unk8005C514_Obj {
+    int m0;
+    int m4;
+    int m8;
+    char padC[0x20];
+    int m2C;
+    Unk8005C514_Slot m30[4];
+};
+struct Unk805B09F4_E {
+    char pad0[0xD4];
+    int mD4;
+};
+extern Unk805B09F4_E lbl_805B09F4[];
+struct Unk805AE420_E {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    int m20;
+    char pad24[4];
+};
+struct Unk805AE420_Row {
+    Unk805AE420_E e[4];
+};
+extern Unk805AE420_Row lbl_805AE420[];
+int fn_8005C344(Unk8005C514_Obj* o, int k);
+int fn_8005A3E8(void* p, int a, int b);
+int fn_8005A674(void* p, int a, int b);
+int fn_8005A780(void* p, int a);
+void fn_8005A814(void* p, int a);
+int fn_8005A8B4(void* p);
+int fn_8005A94C(void* p);
+void fn_8005A240(void* p);
+int fn_8005AB44(void* p);
+void fn_8005A9A8(void* p);
+int fn_803AB528(int a, int b);
+int fn_80097520(Unk80052794_Row* r, int k);
+int fn_8001F984(Unk80052794_Obj* obj);
+int fn_803440D0(void* p);
+int fn_803440D8(void* p);
+int fn_803440E0(void* p);
+int fn_803440E8(void* p);
+void* fn_80056FAC(Unk80057204_Mgr* m, int k);
+void* fn_80057010(Unk80057204_Mgr* m, int k);
+void* fn_8005713C(Unk80057204_Mgr* m, int k);
+void* fn_800571A0(Unk80057204_Mgr* m, int k);
+int fn_8005CDC4(Unk80057204_Mgr* self, Unk80052794_Obj* obj);
+extern const float lbl_805ADC6C;
+extern const float lbl_805ADC70;
+extern const float lbl_805ADC74;
+extern const float lbl_805ADC78;
+extern const float lbl_805ADC7C;
+extern const float lbl_805ADC80;
+extern const float lbl_805ADC84;
+extern const float lbl_805ADC88;
+extern const float lbl_805ADC8C;
+extern const float lbl_805ADC90;
+extern const float lbl_805ADC94;
+extern const float lbl_805ADC98;
+extern const float lbl_805ADC9C;
+extern const float lbl_805ADCA0;
+extern const float lbl_805ADCA4;
+extern const float lbl_805ADCA8;
+extern const float lbl_805ADCAC;
+extern const float lbl_805ADCB0;
+extern const float lbl_805ADCB4;
+extern const float lbl_805ADCB8;
+extern const float lbl_805ADCBC;
+extern const float lbl_805ADCC0;
+extern const float lbl_805ADCC4;
+extern const float lbl_805ADCC8;
+extern const float lbl_805ADCCC;
+extern const float lbl_805ADCD0;
+extern const float lbl_805ADCD4;
+extern const float lbl_805ADCD8;
+extern const float lbl_805ADCDC;
+
+int fn_8005A4F8(void* p, int a, int b, int c);
+/* 0x8005C97C: queue of 0x50-byte records (+0 key, +4 a 0x4C-byte block) */
+struct Unk8005C97C_Sub {
+    int w[19];
+};
+extern Unk8005C97C_Sub lbl_806875B4;
+extern const float lbl_805ADC68;
+extern int lbl_80649768;
+struct Unk8005C97C_Elem {
+    float m0;
+    Unk8005C97C_Sub m4;
+    Unk8005C97C_Elem()
+    {
+        m0 = lbl_805ADC68;
+        m4 = lbl_806875B4;
+    }
+};
+struct Unk8005C97C_Q {
+    unsigned m0;
+    unsigned m4;
+    Unk8005C97C_Elem* m8;
+    void* mC;
+};
+/* Same layout as Unk8005C97C_Q with the vptr at +0xC (virtual dtor fn_8005CA60). */
+struct Unk8005CA60_Q {
+    unsigned m0;
+    unsigned m4;
+    Unk8005C97C_Elem* m8;
+    virtual ~Unk8005CA60_Q();
+};
+void fn_803EE7BC(void);
 
 #endif
