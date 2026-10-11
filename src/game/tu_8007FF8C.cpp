@@ -51,7 +51,6 @@ typedef Unk8007FF8C_W W;
 unsigned fn_8007F198(void* self, int a);
 int fn_8007F24C(void* self, int a, int i);
 int fn_8007A6A0(void* self, int x, int v);
-int fn_8007A6A0(void* self, int x);
 void fn_8007A808(void* self, int x, int b, int v);
 int fn_8007AA10(void* self, int b);
 extern int lbl_805B62C8[];
@@ -333,10 +332,10 @@ int fn_800802B8(void* self, int a, int x)
     return x;
 }
 
-/* near-miss: same code; retail keeps a, b and the level in r28, r30, r29. */
+/* fn_8007A6A0 reads r5 (its third argument): b is passed through. */
 void fn_80080374(void* self, int a, int b)
 {
-    int lvl = fn_8007A6A0(self, 4);
+    int lvl = fn_8007A6A0(self, 4, b);
     if (fn_8008021C(self, a, b, lvl)) {
         int n = fn_800802B8(self, a, lvl);
         fn_8007A808(self, 4, b, n);
