@@ -115,9 +115,11 @@ void fn_802898FC(Unk8028989C_Goal* g, float f)
 
 Unk8028989C_Goal* fn_80289944(Unk8028989C_Goal* g, float f, Unk8014E388_H** p, int n)
 {
+    /* near-miss: retail reloads all three words of w; here y and z are forwarded. */
     Unk80273498_Vec3 v = fn_8014E388(*p);
     v.y = 0.0f;
-    g->m10 = v;
+    Unk80273498_Vec3 w = v;
+    g->m10 = w;
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 2;
@@ -267,8 +269,8 @@ void fn_8028A05C(Unk8028989C_Goal* g, Unk80270BA0_X* x)
     int hash = fn_8028AA4C(g, x, 0);
 
     if (g->m28) {
-        Unk80273498_Vec3 v = g->m10;
-        x->m93C = v;
+        Unk80273498_Vec3 v = g->GetM10();
+        x->m93C = g->m10;
     } else {
         x->m93C.y = -1000.0f;
     }
@@ -291,8 +293,8 @@ void fn_8028A13C(Unk8028989C_Goal* g, Unk80270BA0_X* x)
     Unk80271DBC_Link* link = x->m618;
 
     if (g->m28) {
-        Unk80273498_Vec3 v = g->m10;
-        x->m93C = v;
+        Unk80273498_Vec3 v = g->GetM10();
+        x->m93C = g->m10;
     } else {
         x->m93C.y = -1000.0f;
     }
@@ -316,8 +318,8 @@ void fn_8028A21C(Unk8028989C_Goal* g, Unk80270BA0_X* x)
 
     if (g->mC <= 2) {
         if (g->m28) {
-            Unk80273498_Vec3 v = g->m10;
-            x->m93C = v;
+            Unk80273498_Vec3 v = g->GetM10();
+            x->m93C = g->m10;
         } else {
             x->m93C.y = -1000.0f;
         }
@@ -542,11 +544,9 @@ int fn_8028ADB8(Unk8028989C_Goal* g, Unk8028989C_Goal* o, float f, Unk80270BA0_X
 {
     if (o && o->m28 && g->m28) {
         fn_80249298(x, g->m40, 1);
-        Unk80273498_Vec3 a = o->m10;
-        Unk80273498_Vec3 b = g->m10;
-        float dx = a.x - b.x;
-        float dz = a.z - b.z;
-        if (dx * dx + dz * dz < f) {
+        Unk80273498_Vec3 a = o->GetM10();
+        Unk80273498_Vec3 b = g->GetM10();
+        if ((a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z) < f) {
             return 1;
         }
     }
