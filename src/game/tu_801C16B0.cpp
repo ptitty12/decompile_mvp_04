@@ -55,6 +55,31 @@ extern const char lbl_805CD958[];
 
 
 
+class Unk801C171C : public Unk8037B3E8 {
+public:
+    Unk801C171C();
+    virtual ~Unk801C171C();
+};
+
+class Unk801C1784 : public Unk8037B3E8 {
+public:
+    Unk801C1784();
+    virtual ~Unk801C1784();
+};
+
+/* Base with 0x18 bytes of data and the vptr after them (dtor at 0x80328374, defined elsewhere). */
+class Unk80328374 {
+public:
+    char pad0[0x18];
+    Unk80328374();
+    virtual ~Unk80328374();
+};
+class Unk801C1810 : public Unk80328374 {
+public:
+    Unk801C1810();
+    virtual ~Unk801C1810();
+};
+
 class Unk801C1AF0 {
 public:
     virtual ~Unk801C1AF0();
@@ -76,11 +101,15 @@ extern "C" unsigned fn_801C1704(void) { return 0x6F618F85; }
 
 extern "C" const char* fn_801C1710(void) { return lbl_805CCCE4; }
 
+Unk801C171C::~Unk801C171C() {}
+
 extern "C" const char* fn_801C174C(void) { return fn_801C1778(); }
 
 extern "C" unsigned fn_801C176C(void) { return 0xDA319B21; }
 
 extern "C" const char* fn_801C1778(void) { return lbl_805CD948; }
+
+Unk801C1784::~Unk801C1784() {}
 
 extern "C" const char* fn_801C17B4(void) { return fn_801C17E0(); }
 
@@ -95,6 +124,8 @@ extern "C" float fn_801C17EC(P* p)
         return q->mAB4;
     return 1.0f;
 }
+
+Unk801C1810::~Unk801C1810() {}
 
 extern "C" void fn_801C1840(void) {}
 
