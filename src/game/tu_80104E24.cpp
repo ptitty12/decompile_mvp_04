@@ -202,9 +202,34 @@ void fn_80106580()
     fn_8017E264(fn_8011AA24(0)->m700);
 }
 
+extern char lbl_805BE138[];
+void fn_80106690(int a, UiObj* b)
+{
+    if (a == 1) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, lbl_805BE138, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, b);
+    }
+}
+
 int fn_8010671C()
 {
     return 0;
+}
+
+int fn_80106724(UiV_13C_140i* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        if (self->m140 != 0) {
+            fn_80131F34(self->m13C, self, fn_80106690, fn_8010671C, 0x3364, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+            self->m13C->v86();
+        } else
+            fn_80106690(1, self);
+    }
+    return 1;
 }
 
 extern char lbl_805B955C[];
@@ -299,6 +324,33 @@ int fn_8010750C(UiScr8010750C* self, int a)
 void fn_80107570(void* self, char* out)
 {
     *out = 0;
+}
+
+void fn_80107BDC(UiV_14Ci_158i_15Ci_160i_164i_168i_16Ci_170i_174i_178i_17Ci_180i_184i_188i_18Ci_19Ci* self)
+{
+    if (self->m14C != 0) {
+        int z = 0;
+        lbl_8061EE14 = z;
+    }
+    fn_800ED254(self);
+    lbl_8061B8C0->m24 = 1;
+    fn_802D7ADC();
+    fn_801A750C(self->m19C, 0);
+    fn_802D7A64();
+    self->m158 = 0;
+    self->m15C = 0;
+    self->m160 = 0;
+    self->m164 = 0;
+    self->m168 = 0;
+    self->m16C = 0;
+    self->m170 = 0;
+    self->m174 = 0;
+    self->m178 = 0;
+    self->m17C = 0;
+    self->m180 = 0;
+    self->m184 = 0;
+    self->m188 = 0;
+    self->m18C = 0;
 }
 
 void fn_80107C84(UiV_150i* self)
