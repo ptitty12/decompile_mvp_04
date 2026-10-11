@@ -59,6 +59,7 @@ extern const void* const lbl_806650F8[];
 struct FxEngine { char pad0[0x3654]; int m3654; };
 extern FxEngine* lbl_8061E978;
 
+extern FxF3 lbl_806E20E4;
 extern "C" {
 void fn_8037B7E4(void* self, const char* name);
 void fn_8037B50C(void* self, const char* name, void* field, const char* list, int flags);
@@ -120,6 +121,7 @@ void fn_8031E404(FxL* self, float a, float b, float c, float d);
 float fn_8031E6E4(FxL* self);
 float fn_8031E86C();
 void fn_8031E960(FxL* self);
+void fn_8031ED80(FxL* self);
 void fn_8031F04C(FxL* self, int v);
 void fn_8031F080(FxQ* self, int v);
 void fn_8031F0A0(FxQ* self, FxVec* out);
@@ -324,6 +326,19 @@ void fn_8031E960(FxL* self) {
     fn_803E1CDC(self->m8, lbl_805EA7CC, lbl_805EA7C4, lbl_805EA7C8);
     fn_803DF74C(p);
     fn_803E1C44(self->m8, p);
+}
+
+void fn_8031ED80(FxL* self) {
+    FxMV* m = (FxMV*)self->mC;
+    if (m) {
+        FxMat mat;
+        m->s3(&mat);
+        fn_803E1C44(self->m8, &mat);
+        FxVec tmp = *(FxVec*)&((FxMV*)self->mC)->m60;
+        lbl_806E20E4.x = *(float*)&tmp.x;
+        lbl_806E20E4.y = *(float*)&tmp.y;
+        lbl_806E20E4.z = *(float*)&tmp.z;
+    }
 }
 
 void fn_8031F04C(FxL* self, int v) {
