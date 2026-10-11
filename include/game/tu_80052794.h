@@ -1021,7 +1021,7 @@ int fn_8005C7E8(Unk8005BA1C_Obj* b, int ch);
 int fn_803A914C(int h);
 void fn_800403EC(void* p);
 
-int fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
+void fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
 int fn_8005C654(Unk8005BA1C_Obj* o, int a, int b, int c);
 void fn_803AB480(int h);
 void fn_803ADA2C(int h, int v);
