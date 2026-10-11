@@ -22,8 +22,8 @@ Unk8006902C_Ctx* fn_8006F594(void* p);
 extern char lbl_80649EF0[];
 void fn_80083DF4(Unk8007A4DC_Obj1E8* o);
 void fn_80083E18(Unk8007A4DC_Obj1E8* o);
-void fn_800956B8(Handle* h, int a, int b);
-void fn_80090A90(Handle* h, int a, int b);
+int fn_800956B8(Handle* h, int a, int b);
+int fn_80090A90(Handle* h, int a, int b);
 void fn_802B8EC4(void);
 void fn_802B8F2C(void);
 void fn_8059A580(void* p);
@@ -252,29 +252,29 @@ void Unk8007A4DC_Screen::fn_8007285C()
     fn_80083E18(m1E8);
 }
 
-void Unk8007A4DC_Screen::fn_80072894(int a)
+int Unk8007A4DC_Screen::fn_80072894(int a)
 {
-    fn_800956B8(&m17C, a, 1);
+    return fn_800956B8(&m17C, a, 1);
 }
 
-void Unk8007A4DC_Screen::fn_800728BC(int a)
+int Unk8007A4DC_Screen::fn_800728BC(int a)
 {
-    fn_800956B8(&m17C, a, 0);
+    return fn_800956B8(&m17C, a, 0);
 }
 
-void Unk8007A4DC_Screen::fn_800728E4(int a)
+int Unk8007A4DC_Screen::fn_800728E4(int a)
 {
-    fn_80090A90(&m1C0, a, 1);
+    return fn_80090A90(&m1C0, a, 1);
 }
 
-void Unk8007B2B0_Screen::fn_8007290C(int a)
+int Unk8007B2B0_Screen::fn_8007290C(int a)
 {
-    fn_80090A90(&m4C, a, 0);
+    return fn_80090A90(&m4C, a, 0);
 }
 
-void Unk8007B2B0_Screen::fn_80072934(int a)
+int Unk8007B2B0_Screen::fn_80072934(int a)
 {
-    fn_80090A90(&m4C, a, 1);
+    return fn_80090A90(&m4C, a, 1);
 }
 
 void fn_80072A84(Unk80072A84* o)

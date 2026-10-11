@@ -61,8 +61,7 @@ struct W : WBase {
 struct Unk8007A4DC_Obj1E8;
 struct Slot {
     W* m0;
-    int m4;
-    int m8;
+    W* m4[2];
 };
 struct Unk8052_Obj;
 
@@ -101,20 +100,37 @@ struct Unk8007A4DC_Screen {
     char pad180[0x4];
     W* m184;
     W* m188[2];
-    Slot m190[3];
-    char pad1B4[0x8];
+    Slot m190[2];
+    W* m1A8[5];
     W* m1BC;
     Handle m1C0;
     char pad1C4[0x4];
     W* m1C8;
-    char pad1CC[0x18];
+    Slot m1CC[2];
     W* m1E4;
     Unk8007A4DC_Obj1E8* m1E8;
 
     void fn_8007285C();
-    void fn_80072894(int a);
-    void fn_800728BC(int a);
-    void fn_800728E4(int a);
+    int fn_80072894(int a);
+    int fn_800728BC(int a);
+    int fn_800728E4(int a);
+    int fn_80073710(int a, int x, int i);
+    int fn_80073914(int a, int b, int i);
+    void fn_80073994(int a, int b, int i, int c);
+    void fn_800743A0(int a, int b, int i, int j, int c);
+    void fn_80074500(int a, int b, int i, int j, int c);
+    int fn_8007455C(int a, int b, int i);
+    float fn_800745C4(int a, int b, int i);
+    void fn_80074640(int a, int b, int i, int c);
+    int fn_800746B8(int a, int b, int i);
+    void fn_80074708(int a, int b, int i, int c);
+    int fn_80074754(int a, int x, int i);
+    void fn_80074F50(int a, int b, int i, int c);
+    int fn_80074FC8(int a, int b, int i);
+    void fn_80075048(int a, int b, int i, int c);
+    void fn_800755FC(int a, int b, int i, int j, int c);
+    void fn_8007575C(int a, int b, int i, int j, int c);
+    int fn_8007661C(int b);
     int fn_8007A4DC(int a);
     int fn_8007A500(int a);
     int fn_8007A524(int a, int b, int i);
@@ -292,8 +308,8 @@ struct Unk8007B2B0_Screen {
     char pad170[0x7C];
     int m1EC;
 
-    void fn_8007290C(int a);
-    void fn_80072934(int a);
+    int fn_8007290C(int a);
+    int fn_80072934(int a);
     void fn_80072B60();
     void fn_80072B98();
     void fn_80072BD0();
@@ -301,6 +317,9 @@ struct Unk8007B2B0_Screen {
     void fn_80072CE8();
     void fn_80072D68();
     void fn_80072DC0();
+    int fn_800757B8();
+    int fn_80075948();
+    int fn_80075C64(int id);
     int fn_8007B2B0();
     int fn_8007B2FC(int a);
     int fn_8007B320(int a, int b);
