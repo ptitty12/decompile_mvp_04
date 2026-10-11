@@ -125,12 +125,35 @@ float fn_80285534(Unk80283934_Goal* g)
     return r;
 }
 
-/* near-miss, about 65% (128 vs 126 instructions): the float arithmetic and the
- * branches are right, but the Vec3 temporaries differ. Retail copies the
- * player position (+0x60) with the y word going through a temp at 0x4c, zeroes
- * it, and subtracts into a second temp at 0x48; every helper shape tried
- * (inline flatten by value / reference / member-wise, subtraction operator
- * variants) gives another layout. 5 attempts. */
+inline Vec3 EntPos(const Unk80283934_Ent* e)
+{
+    return e->m10;
+}
+
+inline Vec3 Flat(Vec3 v)
+{
+    v.y = 0.0f;
+    return v;
+}
+
+inline Vec3 FlatPos(const Unk80270BA0_XBase* x)
+{
+    return Flat(x->m60);
+}
+
+inline float Dist2D(const Vec3& a, const Vec3& b)
+{
+    Vec3 d = a - b;
+    return fn_804028E4(d.x * d.x + d.z * d.z);
+}
+
+/* near-miss: 128 of 128 instructions, 48 differ, nearly all in stack offsets.
+ * The copy shapes now follow retail: EntPos/FlatPos getters (copies inside
+ * inlined bodies get direct sp stores) and Flat zeroing y on its by-value
+ * parameter, whose slot operator- reuses. Left: the frame is 0x88 (retail 0x78)
+ * and the temporaries sit in another order (retail: d 0x18, ep 0x28, pp 0x38,
+ * Flat/operator- 0x48, dist 0x10; here ep 0x18, pp 0x28, ...). Tried: Dist2D by
+ * value / reference, named ep/pp/d locals, an inner block, d declared first. */
 float fn_802855C4(Unk80283934_Goal* g)
 {
     if (g->m98 == 0.0f) {
@@ -140,11 +163,7 @@ float fn_802855C4(Unk80283934_Goal* g)
     float r = 0.0f;
     Unk80283934_Ent* e = g->m4;
     if (e->m28 && g->m7C == 1) {
-        Vec3 ep = e->m10;
-        Vec3 pp = ((Unk80270BA0_XBase*)fn_8027A90C(g))->m60;
-        pp.y = 0.0f;
-        Vec3 d = ep - pp;
-        float dist = fn_804028E4(d.x * d.x + d.z * d.z);
+        float dist = Dist2D(EntPos(e), FlatPos((Unk80270BA0_XBase*)fn_8027A90C(g)));
         dist -= 12.0f;
         if (!(dist <= 0.0f)) {
             float s = fn_802958F4(g->m4, (Unk80270BA0_X*)fn_8027A90C(g), 0, -1.0f);
