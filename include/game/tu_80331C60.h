@@ -63,4 +63,43 @@ MItem* fn_8032E7C0(void* mem, const char* name, float* val, float* ref, float a,
 MItem* fn_8032EB84(void* mem, const char* name, int* val, int a, int b, int c, int d);
 }
 
+/* Game manager chain used by the debug menus (lbl_8061B8C0 -> +8 -> +0x6F8 -> +0x10/+0x14). */
+struct UnkC128 { char pad0[0xC]; int mC; char pad10[4]; int m14[22]; int m6C; char pad70[0xB8]; int m128; };
+struct UnkB14 { char pad0[0x114]; int m114; char pad118[0xE60]; int mF78; };
+struct UnkB6F8 { char pad0[0x10]; UnkC128* m10; UnkB14* m14; };
+struct Unk8017DD64_T { char pad0[0x3B0]; void* m3B0; };
+struct UnkMgr8 { char pad0[0x6F8]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; char pad704[0xC]; void* m710; };
+struct UnkGm { char pad0[0x8]; UnkMgr8* m8; char padC[0x18]; int m24; };
+/* result of fn_801A4CE8(mgr, 1): option record with fields at +0xC, +0x10, +0xA0 */
+struct UnkOpt { char pad0[0xC]; int mC; int m10; char pad14[0x8C]; int mA0; };
+
+
+/* Value item: a pointer to the live value at +0x48, or the value stored in the item at +0x4C. */
+struct MIV { char pad0[0x48]; int* m48; int m4C; };
+inline int GetV(MIV* i)
+{
+    if (i->m48)
+        return *i->m48;
+    return i->m4C;
+}
+inline int GetV2(MIV* i)
+{
+    if (!i->m48)
+        return i->m4C;
+    return *i->m48;
+}
+inline void SetV(MIV* i, int v)
+{
+    if (i->m48)
+        *i->m48 = v;
+    else
+        i->m4C = v;
+}
+/* embedded item vptr resets in the dtors */
+inline void SetVp(void* p, int off, const void* v) { *(const void**)((char*)p + off) = v; }
+inline MIV* IAt(Menu* p, int off) { return (MIV*)((char*)p + off); }
+
+
+extern UnkGm* lbl_8061B8C0;
+
 #endif

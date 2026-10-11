@@ -28,9 +28,6 @@ extern float lbl_806203E8;
 extern int lbl_806203F0, lbl_806203F4, lbl_806203F8;
 
 struct UnkMenu174 { MItem* items[93]; int m174; int m178; char pad17C[0x80]; int m1FC; int m200; int m204; int m208; };
-/* embedded item vptr resets in the dtors */
-inline void SetVp(void* p, int off, const void* v) { *(const void**)((char*)p + off) = v; }
-
 extern "C" {
 
 void fn_8033FAFC(UnkAt1C* p, int v) { p->m1C = v; }

@@ -5,15 +5,6 @@
  */
 #include "game/tu_80331C60.h"
 
-struct UnkC128 { char pad0[0x128]; int m128; };
-struct UnkB14 { char pad0[0x114]; int m114; char pad118[0xE60]; int mF78; };
-struct UnkB6F8 { char pad0[0x10]; UnkC128* m10; UnkB14* m14; };
-struct Unk8017DD64_T { char pad0[0x3B0]; void* m3B0; };
-struct UnkMgr8 { char pad0[0x6F8]; UnkB6F8* m6F8; char pad6FC[4]; Unk8017DD64_T* m700; };
-struct UnkGm { char pad0[0x8]; UnkMgr8* m8; char padC[0x18]; int m24; };
-/* result of fn_801A4CE8(mgr, 1): option record with fields at +0xC, +0x10, +0xA0 */
-struct UnkOpt { char pad0[0xC]; int mC; int m10; char pad14[0x8C]; int mA0; };
-
 /* Menu whose 20 item slots (0x18 bytes each: item pointer plus a name field) sit
  * at +0x2E0 with the count at +0x4C0. Evidence: fn_80332398 / fn_80332584 delete
  * them in a loop, fn_80332520 passes the name field at +4 to fn_8040B6A0. */
@@ -28,27 +19,6 @@ struct MenuV : Menu {
     int m374;
 };
 
-/* Value item: a pointer to the live value at +0x48, or the value stored in the item at +0x4C. */
-struct MIV { char pad0[0x48]; int* m48; int m4C; };
-inline int GetV(MIV* i)
-{
-    if (i->m48)
-        return *i->m48;
-    return i->m4C;
-}
-inline int GetV2(MIV* i)
-{
-    if (!i->m48)
-        return i->m4C;
-    return *i->m48;
-}
-inline void SetV(MIV* i, int v)
-{
-    if (i->m48)
-        *i->m48 = v;
-    else
-        i->m4C = v;
-}
 inline MIV* ItemAt2(Menu* p, int i)
 {
     char* b = (char*)p + 0x388;
@@ -73,11 +43,6 @@ inline MIV* ItemAt(Menu* p, int i)
     int off = i * 4;
     return *(MIV**)(b + off);
 }
-/* embedded item vptr resets in the dtors */
-inline void SetVp(void* p, int off, const void* v) { *(const void**)((char*)p + off) = v; }
-inline MIV* IAt(Menu* p, int off) { return (MIV*)((char*)p + off); }
-
-extern UnkGm* lbl_8061B8C0;
 extern int lbl_8061EDC0, lbl_8061B88C;
 extern int lbl_8061EDCC, lbl_8061FE94, lbl_8061F830, lbl_8068B4BC, lbl_8061C900, lbl_8061B894;
 extern int lbl_8061CB80, lbl_8061D3AC, lbl_80691CA8;
