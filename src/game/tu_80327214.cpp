@@ -161,6 +161,7 @@ void fn_803272F0(FxAI* self) {
 
 void fn_80328208() { fn_80327354(1, 0xFFFF); }
 
+/* near-miss: retail stores the second field before forming the lbl_805EBBF8 pool address */
 FxBase* fn_80328234(FxBase* self, int a, int b) {
     self->m14 = 0;
     self->m18 = lbl_80664020;
@@ -485,6 +486,7 @@ void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim) {
     }
 }
 
+/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     int len = 0;
     fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
@@ -500,6 +502,7 @@ int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     return 1;
 }
 
+/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
     int len = 0;
     int ok = 1;
