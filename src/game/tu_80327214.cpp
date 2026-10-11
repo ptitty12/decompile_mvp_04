@@ -69,6 +69,7 @@ int fn_803285A0(int n);
 int fn_803285F4(int n);
 int fn_80328648(int n);
 void fn_80328690(FxBase* self, int a);
+void fn_80328760(FxBase* self);
 void fn_803289C0(int a);
 void fn_80329498();
 void fn_803296AC();
@@ -270,6 +271,31 @@ void fn_80328690(FxBase* self, int a) {
     else lbl_806E2184[row][a] = cur;
     lbl_806E2274[cur].m4 = 0;
     lbl_806E2274[cur].m0 = (int)self;
+}
+
+/* near-miss: loop shape matches (goto form keeps it unrotated); retail shares one lis for the slot table across the unlink stores, ours emits it twice */
+void fn_80328760(FxBase* self) {
+    int row = fn_80328648(self->m1C);
+    if (row >= 0) {
+        int a = self->m20;
+        int cur = -1;
+        int prev = -1;
+        int tmp;
+    again:
+        if (fn_803283D8(row, a, &cur, &tmp)) {
+            if (tmp == (int)self) {
+                int nxt = lbl_806E2274[cur].m4;
+                if (prev > 0) lbl_806E2274[prev].m4 = nxt;
+                else lbl_806E2184[row][a] = nxt;
+                lbl_806E2274[cur].m4 = 0;
+                lbl_806E2274[cur].m0 = 0;
+            } else {
+                prev = cur;
+                goto again;
+            }
+        }
+        if (cur > 0 && cur < lbl_806202F0) lbl_806202F0 = cur;
+    }
 }
 
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
