@@ -38,24 +38,37 @@ struct Unk8027BBA8_Obj;
  * +0x44 (4-bit field), +0x68..+0x70, +0xA0 and +0xBC first, then set +0x40 and
  * the matrix; +0xA0 receives the first int argument and +0xBC the value 0xB.
  * fn_8037B128 / fn_8037B1F0 read the matrix (position, heading). */
+/* Cleared through inline methods called in the request's constructor body:
+ * each method's `this` is a pointer pseudo, so the word at offset 0 folds to a
+ * frame address (stw 0x78(r1), the +0x44 word at 0x54(r1)) while the other
+ * words go through the pointer, as in retail. */
 struct Unk8027A9AC_Zero3 {
     int m0;
     int m4;
     int m8;
 
-    Unk8027A9AC_Zero3()
+    void Clear()
     {
         m0 = 0;
-        m8 = 0;
         m4 = 0;
+        m8 = 0;
+    }
+};
+
+struct Unk8027A9AC_Flags {
+    unsigned int type : 4;
+    unsigned int pad : 28;
+
+    void Clear()
+    {
+        type = 0;
     }
 };
 
 struct Unk8027A9AC_Req {
     Unk8037B128_Mtx mtx;
     float m40;
-    unsigned int type : 4;
-    unsigned int pad44 : 28;
+    Unk8027A9AC_Flags m44;
     char pad48[0x68 - 0x48];
     Unk8027A9AC_Zero3 m68;
     char pad74[0xA0 - 0x74];
@@ -65,9 +78,10 @@ struct Unk8027A9AC_Req {
 
     Unk8027A9AC_Req()
     {
-        type = 0;
-        mBC = 0;
+        m44.Clear();
+        m68.Clear();
         mA0 = 0;
+        mBC = 0;
     }
 };
 

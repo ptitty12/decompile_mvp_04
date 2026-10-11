@@ -9,8 +9,8 @@
  * 0x8061E6B8..0x8061E6C4 are used by fn_80285238/fn_802852F0 (a later part
  * of the unity TU), whose units extern them.
  *
- * Status: 15/25 match. Near-misses are noted above their functions (fn_8027A84C,
- * A9AC, AAB0, AD3C, B1A0, B924, BA64). Not attempted: fn_8027B55C (242 insns),
+ * Status: 17/25 match. Near-misses are noted above their functions (fn_8027A84C,
+ * AD3C, B1A0, B924, BA64). Not attempted: fn_8027B55C (242 insns),
  * fn_8027BBA8 (458) and fn_8027C2D0 (225); fn_8027BB88 only wraps fn_8027BBA8.
  */
 #include "game/chooser.h"
@@ -141,10 +141,6 @@ float Unk8027A84C::fn_8027A928()
     return r;
 }
 
-/* near-miss: only the first 15 instructions differ (order of the inlined request constructor's
- * stores: retail loads the bitfield word first and stores m68.m8/m4 after it, through the
- * pointer register). 5 variants of the constructor tried (member ctors, flat body, pointer
- * locals, 720 permutations of the six stores). */
 int Unk8027A84C::fn_8027A9AC(Unk80270BA0_X* x, int a, int b, float* c, int d, int e, int f)
 {
     Unk8027A9AC_Req req;
@@ -159,7 +155,6 @@ int Unk8027A84C::fn_8027A9AC(Unk80270BA0_X* x, int a, int b, float* c, int d, in
     return fn_8038614C(x->m618, &req, a, b, c, d, e, 0, fl | 1);
 }
 
-/* near-miss: same constructor-prefix difference as fn_8027A9AC; the rest matches. */
 int Unk8027A84C::fn_8027AAB0(Unk80270BA0_X* x, int a, int b, float* c, Unk80273498_Vec3* d, float* e, int f)
 {
     Unk8027A9AC_Req req;
