@@ -85,9 +85,11 @@ struct Unk80270BA0_Result {
     unsigned int pad0 : 28;
     int id;
     int m8;                    /* second id when type == 2 (0x802721E0) */
-    char padC[0x14 - 0xC];
+    int mC;                    /* third id (0x8026E364) */
+    char pad10[4];
     float m14;
     float m18;                 /* second weight when type == 2 (0x802721E0) */
+    float m1C;                 /* third weight (0x8026E364) */
 };
 
 struct Unk80270BA0_X;
@@ -139,13 +141,20 @@ public:
 class Unk80270BA0_Obj {
 public:
     virtual Unk80270BA0_X* fn_vslot1();
+    virtual void fn_obj2();    /* named apart from Unk80270BA0_XVirt's slots: */
+    virtual void fn_obj3();    /* Unk80270BA0_X inherits both */
+    virtual int fn_obj4();     /* called by 0x8026F590 */
 };
 
 /* Sub-object at Unk80270BA0_X+0x734: float pairs indexed by m190 (0 or 1).
  * cCircleChooser's slot 17 (0x802726BC) reads m40, mE0, mE8, m100, m108,
  * m140 and m190. */
 struct Unk802726BC_Angles {
-    char pad0[0x40];
+    float m0[2];
+    float m8[2];
+    char pad10[0x30 - 0x10];
+    float m30[2];
+    float m38[2];
     float m40[2];
     char pad48[0xE0 - 0x48];
     float mE0[2];
@@ -153,9 +162,14 @@ struct Unk802726BC_Angles {
     char padF0[0x100 - 0xF0];
     float m100[2];
     float m108[2];
-    char pad110[0x140 - 0x110];
+    char pad110[0x130 - 0x110];
+    float m130[2];
+    char pad138[0x140 - 0x138];
     float m140[2];
-    char pad148[0x190 - 0x148];
+    char pad148[0x170 - 0x148];
+    float m170[2];
+    float m178[2];
+    char pad180[0x190 - 0x180];
     int m190;
 };
 
@@ -177,7 +191,9 @@ public:
     int m71C;                  /* flags; 0x800 tested by 0x802721E0 */
     char pad720[0x734 - 0x720];
     Unk802726BC_Angles m734;
-    char pad8C8[0xB4C - 0x8C8];
+    char pad8C8[0xAB4 - 0x8C8];
+    float mAB4;
+    char padAB8[0xB4C - 0xAB8];
     int mB4C;
     int mB50;
 };
@@ -264,6 +280,7 @@ public:
     virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
     void fn_8037B6B0(const char* name, int* field, const char* values);
     void fn_8037B728(const char* name, const char* name2, void* list, int flags);
+    void fn_8037B458(const char* name, int* field, const void* a, const void* b);
 };
 
 #endif /* GAME_CHOOSER_H */
