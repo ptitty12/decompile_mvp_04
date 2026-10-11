@@ -60,6 +60,14 @@ extern "C" void fn_80026E80()
     fn_80030274();
 }
 
+extern "C" void fn_80026EA0(Unk80023AC4_Obj* x)
+{
+    Unk801A4B34_Vec3 a = fn_801A497C(x->m80[0], x->m80[0]->m6F8->m14->m1CD0 == 0, 6)->m60;
+    Unk801A4B34_Vec3 b = fn_801A497C(x->m80[0], x->m80[0]->m6F8->m14->m1CD0 == 0, 7)->m60;
+    Unk801A4B34_Vec3 c = fn_801A497C(x->m80[0], x->m80[0]->m6F8->m14->m1CD0 == 0, 8)->m60;
+    fn_80022D64(x, a, b, c);
+}
+
 extern "C" void fn_80027CCC(Unk80023AC4_Obj* x)
 {
     fn_8003EAB0(x->m6C8);
