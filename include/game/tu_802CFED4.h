@@ -110,4 +110,11 @@ struct Unk802D2344 {
     float m6C;
 };
 
+/* Camera object seen by the destructors: vptr at +0 (mid vtable 0x806646F0 while the root destructor runs). */
+struct Unk802D116C {
+    const void* vptr;
+    char pad4[0x28];
+    char m2C[4];
+};
+
 #endif

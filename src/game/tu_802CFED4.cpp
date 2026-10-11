@@ -6,6 +6,27 @@
 
 extern Unk802D0B4C_Vec3 lbl_806055AC;
 extern int lbl_806EF9B4;
+extern const void* lbl_806646F0[];
+extern const void* lbl_80664528[];
+extern Unk802D116C lbl_8068DAF4;
+extern Unk802D116C lbl_8068DBE8;
+extern Unk802D116C lbl_8068DD20;
+extern Unk802D116C lbl_8068DD64;
+void fn_8037B424(void* p, int c);
+void fn_8033CD28(void* p, int c);
+extern int lbl_8068DBE4;
+extern int lbl_8068DD1C;
+extern int lbl_8068DD60;
+extern int lbl_8068DDA8;
+void* fn_802D10A0(void* p);
+void* fn_802D1EA4(void* p);
+void* fn_802D3268(void* p);
+void* fn_802D1278(void* p);
+int fn_80409CF0(void (*f)());
+void fn_802D370C();
+void fn_802D3738();
+void fn_802D3794();
+void fn_802D37CC();
 extern Unk802D38E8_Cfg* lbl_8061FEDC;
 void fn_8014D9EC(void* buf, float a, float b, float c, float d, float e);
 void fn_803DFB48(Unk802D3958_Mat* m);
@@ -25,6 +46,12 @@ Unk802D0B4C::Unk802D0B4C()
     m0 = 0;
     m4 = 0;
     m8 = 0;
+}
+
+void fn_802D116C(Unk802D116C* p, int c)
+{
+    p->vptr = lbl_806646F0;
+    fn_8037B424(p, c);
 }
 
 void fn_802D119C()
@@ -157,6 +184,55 @@ void fn_802D36D0(Unk802D36D0* o, int, Unk802D0B4C_Vec3* a, float* b)
 
 void fn_802D36F8(float, float)
 {
+}
+
+void fn_802D370C()
+{
+    fn_802D116C(&lbl_8068DAF4, 2);
+}
+
+void fn_802D3738()
+{
+    lbl_8068DBE8.vptr = lbl_80664528;
+    fn_8033CD28(lbl_8068DBE8.m2C, 2);
+    lbl_8068DBE8.vptr = lbl_806646F0;
+    fn_8037B424(&lbl_8068DBE8, 2);
+}
+
+void fn_802D3794()
+{
+    lbl_8068DD20.vptr = lbl_806646F0;
+    fn_8037B424(&lbl_8068DD20, 2);
+}
+
+void fn_802D37CC()
+{
+    lbl_8068DD64.vptr = lbl_806646F0;
+    fn_8037B424(&lbl_8068DD64, 2);
+}
+
+void fn_802D3804()
+{
+    if (lbl_8068DBE4 == 0) {
+        fn_802D10A0(&lbl_8068DAF4);
+        lbl_8068DBE4 = 1;
+        fn_80409CF0(fn_802D370C);
+    }
+    if (lbl_8068DD1C == 0) {
+        fn_802D1EA4(&lbl_8068DBE8);
+        lbl_8068DD1C = 1;
+        fn_80409CF0(fn_802D3738);
+    }
+    if (lbl_8068DD60 == 0) {
+        fn_802D3268(&lbl_8068DD20);
+        lbl_8068DD60 = 1;
+        fn_80409CF0(fn_802D3794);
+    }
+    if (lbl_8068DDA8 == 0) {
+        fn_802D1278(&lbl_8068DD64);
+        lbl_8068DDA8 = 1;
+        fn_80409CF0(fn_802D37CC);
+    }
 }
 
 float fn_802D38E8()
