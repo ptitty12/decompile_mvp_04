@@ -12,13 +12,6 @@ struct Unk8004072C_Obj {
     int m5F8;
 };
 
-struct Unk800475EC_Obj {
-    char padF4[0xF4];
-    int mF4;
-    char padF8[0xC00 - 0xF8];
-    int mC00;
-};
-
 struct Unk80306AC0_Obj {
     char pad0[0x734];
     int m734;

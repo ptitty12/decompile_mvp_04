@@ -27,6 +27,16 @@ public:
     int m10;
 };
 
+/* Object returned by fn_800475EC(): +0xF4 is an enable flag, +0xC00 a signed
+ * value whose sign gates the callers (fn_8003AA88 and the sound-event
+ * functions of tu_8003AEE4.cpp). */
+struct Unk800475EC_Obj {
+    char padF4[0xF4];
+    int mF4;
+    char padF8[0xC00 - 0xF8];
+    int mC00;
+};
+
 /* Six-byte record scanned by the three lookup functions (fn_8003A194,
  * fn_8003A354, fn_8003A498). */
 struct Unk8003A194_Rec {
@@ -89,6 +99,7 @@ struct Unk8003B3F4_Sub14 {
 struct Unk8003B2DC_Sub6F8 {
     char pad0[0xC];
     Unk8003B2DC_Sub0C* mC;
+    char pad10[4];
     Unk8003B3F4_Sub14* m14;
 };
 struct Unk8027107C_Outer;
@@ -97,6 +108,7 @@ struct Unk8003A5DC_Ctx {
     void* m65C[13];
     char pad690[0x6F8 - 0x690];
     Unk8003B2DC_Sub6F8* m6F8;
+    char pad6FC[4];
     Unk8027107C_Outer* m700;
 };
 
