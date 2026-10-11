@@ -21,6 +21,12 @@ struct Unk8024B99C_V3 {
     int c;
 };
 
+struct Unk8024B99C_Flags {
+    unsigned pad : 3;
+    unsigned m3 : 1;
+    unsigned rest : 28;
+};
+
 struct Unk8024B99C_V {
     char pad0[0x44C];
     Unk8022FE34_Ctx* m44C;
@@ -28,18 +34,36 @@ struct Unk8024B99C_V {
     int m458;
     char pad45C[0x708 - 0x45C];
     int m708;
-    char pad70C[0x8D0 - 0x70C];
+    char pad70C[0x720 - 0x70C];
+    float m720;
+    float m724;
+    float m728;
+    float m72C;
+    char pad730[0x8D0 - 0x730];
     float m8D0;
     int m8D4;
     int m8D8;
     float m8DC;
     int m8E0;
     int m8E4;
-    char pad8E8[0x8F8 - 0x8E8];
+    float m8E8;
+    float m8EC;
+    char pad8F0[0x8F8 - 0x8F0];
     Unk8024B99C_V3 m8F8;
     char pad904[0x918 - 0x904];
     int m918;
     Unk8024B99C_V3 m91C;
+    char pad928[0xAE0 - 0x928];
+    int mAE0;
+    float mAE4;
+    int mAE8;
+    char padAEC[0xB0C - 0xAEC];
+    int mB0C;
+    float mB10;
+    float mB14;
+    float mB18;
+    char padB1C[0xB3C - 0xB1C];
+    Unk8024B99C_Flags mB3C;
 };
 
 #endif
