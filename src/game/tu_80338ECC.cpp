@@ -40,6 +40,9 @@ extern "C" double fn_80409D88(const char* s);
 struct Unk308 { char pad0[0x300]; int m300; char pad304[4]; int m308; int m30C; int m310; int m314; int m318; char pad31C[8]; int m324; char pad328[0xC0]; int m3E8; int m3EC; int m3F0; int m3F4; };
 extern Unk308* lbl_8061EA68;
 extern int lbl_80621574, lbl_80621578;
+extern int lbl_80621510, lbl_80621514, lbl_8062087C, lbl_805C94A0[], lbl_805C9758[], lbl_8062150C, lbl_80621520, lbl_80621524, lbl_80621528, lbl_8062152C;
+struct MIE3 { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
+extern "C" void fn_8032FB78(void* item, int v);
 struct Unk3D40 { char pad0[0x3D40]; int m3D40; };
 extern UnkGm* lbl_8068B618;
 extern int lbl_80620860, lbl_80620864, lbl_80620868;
@@ -204,6 +207,32 @@ extern "C" void fn_8033B2B0()
 }
 
 extern "C" void fn_8033B300() { *fn_8033ACE8() = lbl_805EBA10; }
+
+/* near-miss: 140 vs 143 instructions; the value/pointer registers of the first two GetV reads
+ * and the item-pointer reuse around the clamp differ (3 attempts). */
+extern "C" int fn_8033B8D8(Menu* p, int k)
+{
+    fn_80330BC8(p, k);
+    lbl_80621510 = GetV(IAt(p, 0x460));
+    lbl_80621514 = GetV(IAt(p, 0x4B4));
+    MIE3* e = (MIE3*)((char*)p + 0x32C);
+    int v = e->m60[e->m4C];
+    lbl_8062087C = v;
+    SetV(IAt(p, 0x390), lbl_805C94A0[v]);
+    int lim = lbl_805C9758[v];
+    if (GetV2(IAt(p, 0x3F8)) > lim)
+        SetV(IAt(p, 0x3F8), lim);
+    lbl_8062150C = GetV2(IAt(p, 0x3F8));
+    *(int*)((char*)p + 0x454) = lim;
+    fn_8032FB78((char*)p + 0x60C, fn_8033ACE8()->m8);
+    fn_8032FB78((char*)p + 0x670, fn_8033ACE8()->mC);
+    SetVF(IAt(p, 0x6D4), fn_8033ACE8()->m4);
+    lbl_80621520 = GetV(IAt(p, 0x880));
+    lbl_80621524 = GetV2(IAt(p, 0x8D4));
+    lbl_80621528 = GetV(IAt(p, 0x93C));
+    lbl_8062152C = GetV2(IAt(p, 0x990));
+    return GetV(IAt(p, 0x9F8));
+}
 
 extern "C" void fn_8033BB14(Menu* p)
 {
