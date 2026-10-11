@@ -15,6 +15,9 @@ extern const float lbl_805EA650;
 extern const float lbl_805EA654;
 extern const float lbl_805EA658;
 extern const float lbl_805EA668;
+extern const float lbl_805EA5EC;
+extern const float lbl_805EA5F0;
+extern const float lbl_805EA5F4;
 extern const float lbl_805EA56C;
 extern const float lbl_805EA6A0;
 extern const float lbl_805EA6A4;
@@ -41,6 +44,7 @@ extern FxHooks lbl_80699B94;
 extern int lbl_8061E9F4;
 
 extern "C" {
+double fn_80410634(double x);
 void fn_8031259C(FxCtx* c);
 void fn_803125D0(FxCtx* c);
 void fn_8014D9EC(void* p, float a, float b, float c, float d, float e);
@@ -74,6 +78,7 @@ void fn_8031BF80(FxD* self, int i, int a, float f, FxSrcD* b);
 void fn_8031BFAC(FxD* self, int i);
 void fn_8031BFD8(FxD* self, int i);
 int fn_8031C074(FxItemD* self, float t);
+float fn_8031C100(FxRec2* rec, float t);
 int fn_8031C1E4(FxD* self, int id);
 FxRec2* fn_8031C228(FxD* self, const char* name);
 int fn_8031C2A4(FxD* self, int id, int* found, float t);
@@ -263,6 +268,24 @@ int fn_8031C074(FxItemD* self, float t) {
         }
     }
     return 1;
+}
+
+float fn_8031C100(FxRec2* rec, float t) {
+    float x;
+    float r;
+    switch (rec->m28) {
+    case 0:
+    case 2:
+    case 3:
+        return lbl_805EA5E4;
+    case 1: {
+        x = t * rec->m24;
+        int n = (int)((float)fn_80410634(x) + (!((float)fn_80410634(x) < lbl_805EA5E8) ? lbl_805EA5EC : lbl_805EA5F0));
+        r = (n & 1) ? lbl_805EA5F4 : lbl_805EA5E4;
+        return r;
+    }
+    }
+    return lbl_805EA5E8;
 }
 
 int fn_8031C1E4(FxD* self, int id) {
