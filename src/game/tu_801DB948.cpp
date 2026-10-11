@@ -5,7 +5,7 @@
 #include "game/tu_801DB948.h"
 
 extern const char lbl_80660BF8[];
-extern const float lbl_805D39D0;
+extern float lbl_805D39D0;
 extern const float lbl_805D39A4;
 extern const float lbl_805D39A8;
 extern float lbl_8061D560;
@@ -30,11 +30,6 @@ struct Unk801DB948_E {
     char pad0[8];
     int m8;
     int mC;
-};
-
-struct Unk801DB948_A {
-    char pad0[0x68];
-    int m68;
 };
 
 extern "C" {
