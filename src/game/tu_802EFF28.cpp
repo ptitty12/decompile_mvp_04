@@ -35,3 +35,22 @@ void fn_802F35A4(char* dst, char* src)
     } while (i < src[i]);
     dst[i] = 0;
 }
+
+Unk802F3A04::~Unk802F3A04()
+{
+}
+
+int Unk802F3A04::s8()
+{
+    return 0;
+}
+
+int Unk802F3A04::s9()
+{
+    return 0;
+}
+
+void fn_802F3A90()
+{
+    fn_802F398C(1, 0xFFFF);
+}
