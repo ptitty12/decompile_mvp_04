@@ -163,17 +163,34 @@ void Unk8027DE3C::fn_8027EB34(int st, Unk80270BA0_X* x)
     }
 }
 
-/* near-miss (about 98%): identical but for two instructions of the idx==1 store
- * (retail: "li r9,288; stwx rZ,rP,r9" with the zero hoisted to r11 and the index
- * reloaded) and r9/r11 for the index. Tried: shared zero local, [-1] indexing,
- * q[-1], cast pointer arithmetic, q = &p->m120[idx] reuse. */
+/* GetI/SetI take &x->m734 at each use: the default case's pointer is then a
+ * new pseudo, so gcse can't reuse the top's m190 load and retail's reload
+ * appears; registers and the zero shared in r11 now match.
+ * near-miss: 144 of 145 instructions. Left: retail stores m120[0] as
+ * "li r9,0x120; stwx r11,r29,r9" (an offset register that became the constant
+ * 288 after cse1); this gives "stw r11,0x120(r29)". Tried: p->m120[p->m190 - 1],
+ * &p->m120[i - 1], (&p->m120[i])[-1], q[-1], compare through the top pointer
+ * with the store through &x->m734 (all fold to x+0x854 or keep the stw). */
+inline int GetI(Unk802726BC_Angles* p)
+{
+    int* q = &p->m120[p->m190];
+    return *q;
+}
+
+inline void SetI(Unk802726BC_Angles* p, int t)
+{
+    if (p->m190 == 1) {
+        p->m120[0] = t;
+    }
+    int* q = &p->m120[p->m190];
+    *q = t;
+}
+
 void Unk8027DE3C::fn_8027EC58(Unk80270BA0_X* x, int h)
 {
-    Unk802726BC_Angles* p = &x->m734;
     Unk80271DBC_Link* link = x->m618;
     int r = 0;
-    int* q = &p->m120[p->m190];
-    int old = *q;
+    int old = GetI(&x->m734);
     int v;
     switch (m78) {
     case 2:
@@ -199,22 +216,14 @@ void Unk8027DE3C::fn_8027EC58(Unk80270BA0_X* x, int h)
         }
         break;
     default:
-        if (p->m190 == 1) {
-            p->m120[0] = 0;
-        }
+        SetI(&x->m734, 0);
         v = (int)0xA32A6AB4;
-        q = &p->m120[p->m190];
-        *q = 0;
         if (mE8 & 0x400000) {
             float t = (float)x->m44C->m4C * 0.016666668f;
             if (!(m98 - t <= 0.5f)) {
                 Unk80273498_Vec3 pos = fn_80286E70();
                 r = fn_8027B1A0(x, &pos);
-                if (p->m190 == 1) {
-                    p->m120[0] = r;
-                }
-                q = &p->m120[p->m190];
-                *q = r;
+                SetI(&x->m734, r);
             }
             if (fn_80285498() != 0 || link->m83C == 0x27C57C8B) {
                 v = 0x27C57C8B;
