@@ -111,7 +111,8 @@ public:
     Unk801DB948_Cfg* m618;
     char pad61C[0x710 - 0x61C];
     Unk801DB948_Vec3 m710;
-    char pad71C[0x8F0 - 0x71C];
+    unsigned m71C;
+    char pad720[0x8F0 - 0x720];
     int m8F0;
     char pad8F4[0x908 - 0x8F4];
     int m908;
@@ -210,9 +211,12 @@ struct Unk801DD660_Ctx {
     int m30;
     char pad34[4];
     int m38;
-    char pad3C[0x70 - 0x3C];
+    char pad3C[0x44 - 0x3C];
+    int m44;
+    char pad48[0x70 - 0x48];
     int m70;
-    char pad74[0xA8 - 0x74];
+    char pad74[0xA4 - 0x74];
+    int mA4;
     float mA8;
     char padAC[0x1B8 - 0xAC];
     int m1B8;
@@ -220,6 +224,9 @@ struct Unk801DD660_Ctx {
     Unk801DD660_Tbl m2B4;
     char pad2B4b[0x6D8 - 0x2B4 - sizeof(Unk801DD660_Tbl)];
     Unk801DD660_Ent m6D8[1];
+    char pad734[0x3A68 - 0x6D8 - sizeof(Unk801DD660_Ent)];
+    int m3A68;
+    int m3A6C;
 };
 
 /* 0x14-byte sub-object at Unk801DD660::m11C (reset by fn_801DC8E8). */
@@ -287,7 +294,8 @@ struct Unk801DD660 : public Unk801DD660_Virt {
     Unk801DD660_Ctx* m9C;
     char padA0[0xAC - 0xA0];
     Unk801DD660_Hist mAC;
-    char padB4[0xC0 - 0xB4];
+    char padB4[0xBC - 0xB4];
+    int mBC;
     int mC0;
     char padC4[0x11C - 0xC4];
     Unk801DD660_Sub m11C;
@@ -299,9 +307,10 @@ struct Unk801DD660 : public Unk801DD660_Virt {
     int m788;
     int m78C;
     float m790;
-    char pad794[4];
+    int m794;
     int m798;
-    char pad79C[0x7B4 - 0x79C];
+    int m79C[3];
+    int m7A8[3];
     int m7B4;
     float m7B8;
 };
