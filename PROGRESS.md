@@ -47,3 +47,10 @@
   - Not linkable yet: unity-TU parts; real TUs pending linkonce/rodata-pool questions (DECISIONS).
   | Owner: verify.py allowlist bug still open (DECISIONS); W2 (80 SDK functions) waits on it.
 - 2026-10-11 | Claude Opus 5.5 (hard-case matcher, work/opus-families) | game/tu_8007FF8C, tu_80084910, tu_80089894, tu_8008CE64, tu_80037250 | matched 25: the vcall family (10, pass-through arguments to fn_80071E2C), fn_80080374, fn_800393B0 and fn_80081BA8 (same mechanism), and the CSV loader family (12, pointer locals) | Trace wrappers family B with K != 0 and N == 0 (17 functions) stay open: mechanism found (sched1 adjust_priority), but no zero-cost source; see docs/NEARMISS.md | none
+- 2026-10-11 | Claude Opus 5.5 (lead) + 12 Sonnet + up to 3 Opus workers | checkpoint | main: 3,507 -> 7,750 functions at 100% (32% of all 24,158; 13.7% of code bytes) since the last checkpoint. Ranges 00-18 integrated; 19-25 running; second passes of 03/04/05/13 started.
+  - Opus families rounds 1-2: vcall family, CSV loaders, roster walk, passthrough args, callee return type and sched2, cr7 scc (docs/PATTERNS.md "Hard-case families" 1 and 2).
+  - Found a verifier gap: function scores ignore relocation targets (DECISIONS open question). New `tools/match/check_literals.py` and an integrate.py gate; 104 false matches on main are being fixed (work/false-matches).
+  - New lead tools: tools/match/passthru.py and check_literals.py; worker brief has quick tips.
+  - Next: ~10,400 functions sit in unsplit regions (0x803401A8-0x803663B0, .feoverlay, .dboverlay, EA/SDK tail). An Opus setup delegate is splitting them into code-only units.
+  - Incidents: a usage limit cut off all workers once (resumed from their transcripts, nothing lost); the progress bot races lead doc pushes (rebase and rerun).
+  | Owner: two open questions in DECISIONS (verify.py pragma allowlist; relocation-target checking). Neither blocks the team.
