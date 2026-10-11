@@ -14,6 +14,19 @@ void fn_801B25E4(Unk801AB63C_P* p, int n);
 void fn_801B2428(void* p);
 int fn_801B1380(Unk801AB63C_P* p);
 void fn_801B1FE8(void* p);
+inline int Unk801AEA58_B(unsigned char* b, int i) { return b[i]; }
+inline int Unk801AEA58_U8(Unk8019F8C0_Inner* a, int off) { return *((unsigned char*)a + off); }
+int fn_801C1638(Unk8019F8C0_Owner* o, int i);
+struct Unk801B1FE8_Q {
+    char pad0[0x5D8];
+    float m5D8;
+};
+Unk801B1FE8_Q* fn_801B6438(Unk801AB63C_P* p, int id);
+int fn_801B5F4C(Unk801AB63C_P* p);
+int fn_801B5FC4(void* p, int t);
+int fn_801B20F0(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
+extern float lbl_805CF6D8;
+
 
 /* Script-command style classes (hash 0xE608C67F, size 0xB4, vtable 0x8065FB08;
  * hash 0xEA9F4BCE, size 0x88, vtable 0x8065FB68); slot 2 registers the attributes. */
@@ -49,6 +62,8 @@ void fn_801AE6A8(Unk801AB63C_P* p);
 int fn_8014D8AC(void* a, int b, const char* c, int d);
 int fn_80259C28(void* a, void* q);
 extern char lbl_805CF058[];
+extern float lbl_805CF08C;
+extern float lbl_805CF098;
 
 struct Unk801AE30C_Tbl {
     int m0;
@@ -107,21 +122,21 @@ void fn_801AE3A8(Unk801AE30C_Pair* p, int* a, int* b)
     *b = fn_801AE304(&p->m4);
 }
 
-/* near-miss: loop shape differs (retail keeps the m2c-style `if (i <= 1)` at the loop head and bumps e/i in
- * the else path); ~6 loop/while forms tried. */
 void fn_801AE3F0(Unk801AE30C_Tbl* t, int a, int b)
 {
     if (a != 0 && b != 0) {
+        int i = 0;
         Unk801AB63C_E* e = t->m4;
-        for (int i = 0; i <= 1; i++, e++) {
-            if (!fn_801AE2C0(e)) {
-                fn_801AE2A4(e, a, b);
-                t->m0 += 1;
-                break;
-            }
+        while (i <= 1 && fn_801AE2C0(e) != 0) {
             if (fn_801AE304(e) == b && fn_801AE2FC(e) == a) {
-                break;
+                return;
             }
+            e++;
+            i++;
+        }
+        if (i <= 1) {
+            fn_801AE2A4(e, a, b);
+            t->m0 += 1;
         }
     }
 }
@@ -132,7 +147,7 @@ void fn_801AE494(Unk801AE30C_Pair* p, int* a, int* b)
     *b = fn_801AE304(&p->mC);
 }
 
-/* near-miss: same loop-shape difference as fn_801AE3F0. */
+/* near-miss: same loop-shape problem; retail keeps a second pointer copy (r29) alive across the call (35 vs 36 insns). */
 void fn_801AE4DC(Unk801AE30C_Tbl* t, int v)
 {
     if (v != 0) {
@@ -151,6 +166,24 @@ void fn_801AE4DC(Unk801AE30C_Tbl* t, int v)
     }
 }
 
+void fn_801AE5F0(void* pp)
+{
+    Unk801AB63C_P* p = (Unk801AB63C_P*)pp;
+    fn_801AE6A8(p);
+    int z = 0;
+    char* s = lbl_805CF058;
+    p->m20[0] = z;
+    p->m20[1] = z;
+    p->m20[2] = z;
+    p->m20[3] = z;
+    p->m20[4] = z;
+    p->m20[5] = z;
+    p->m20[6] = z;
+    p->m20[7] = z;
+    p->m18 = fn_8014D8AC(p->m8->m554, 2, s, 0x52) + 1;
+    p->m1C = fn_8014D8AC(p->m8->m554, 2, s, 0x53) + 1;
+}
+
 Unk801AE5C0::Unk801AE5C0(int a, int b) : Unk801B5A44(a, b)
 {
     m10 = fn_801B1090();
@@ -163,6 +196,58 @@ Unk801AE5C0::~Unk801AE5C0() {}
 void fn_801AE688(void* p)
 {
     fn_801AE5F0(p);
+}
+
+void fn_801AE6A8(Unk801AB63C_P* p)
+{
+    char* s = lbl_805CF058;
+    p->m14 = -1;
+    float k = lbl_805CF08C;
+    p->m40 = (float)(unsigned)fn_8014D8AC(p->m8->m554, 0xf4240, s, 0x63) * k * lbl_805CF098;
+    p->m44 = fn_8014D8AC(p->m8->m554, 0x64, s, 0x64);
+}
+
+/* near-miss: same code; retail reloads m14[2].m8 for the second team index (subfic/adde), ours shares the first load
+ * and branches (85 vs 86 insns). */
+int fn_801AEA58(Unk801AB63C_P* p)
+{
+    int r = -1;
+    int a = 1;
+    if (fn_801C1638(p->m8, 0xa) == 0) {
+        a = 0;
+    }
+    int b = 1;
+    if (fn_801C1638(p->m8, 0xc) == 0) {
+        b = 0;
+    }
+    Unk8019F8C0_Owner* o = p->m8;
+    Unk8019F8C0_Inner* m = o->m6F8->m14;
+    int f = 0;
+    if (m[2].m8 != 0) {
+        f = 1;
+    }
+    Unk8019F8C0_Inner* ia = m + f;
+    int sa = 0;
+    for (int i = 0; i < 128; i++) {
+        sa += Unk801AEA58_B(ia->m1B4, (unsigned char)i);
+    }
+    Unk8019F8C0_Inner* ib = m + (m[2].m8 == 0);
+    int sb = 0;
+    for (int i = 0; i < 128; i++) {
+        sb += Unk801AEA58_B(ib->m1B4, (unsigned char)i);
+    }
+    int d = sa - sb;
+    int x = Unk801AEA58_U8(m, 0x1cca);
+    int y = Unk801AEA58_U8(m, 0x1cc9);
+    if (a != 0) {
+        if (x == 2 || (x == 1 && (unsigned)fn_8014D8AC(o->m554, 0x64, lbl_805CF058, 0x133) <= 0x31)) {
+            r = 0x20;
+        }
+    }
+    if (y <= 1 && b != 0 && d > -4) {
+        r = 0x10;
+    }
+    return r;
 }
 
 void fn_801AE75C() {}
@@ -332,6 +417,38 @@ int fn_801B1D60(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d)
         return fn_801B13D0(p, q, t, c);
     }
     return 0;
+}
+
+void fn_801B1FE8(void* pp)
+{
+    Unk801AB63C_P* p = (Unk801AB63C_P*)pp;
+    if (fn_801B5F4C(p) <= 1) {
+        int n = fn_801B5FC4(p, 3);
+        int side = 1;
+        if (fn_801B5F4C(p) <= 0) {
+            side = 2;
+        }
+        if (fn_801B6438(p, 2) != 0) {
+            n++;
+        }
+        Unk801B1FE8_Q* a = fn_801B6438(p, 1);
+        if (a != 0) {
+            n++;
+            if ((unsigned)n <= 1) {
+                if (!(a->m5D8 >= lbl_805CF6D8)) {
+                    fn_801B20F0(p, (Unk801AB63C_Q*)a, side, 0);
+                }
+            }
+        }
+        Unk801B1FE8_Q* b = fn_801B6438(p, 0);
+        if (b != 0) {
+            if ((unsigned)(n + 1) <= 1) {
+                if (!(b->m5D8 >= lbl_805CF6D8)) {
+                    fn_801B20F0(p, (Unk801AB63C_Q*)b, side, 0);
+                }
+            }
+        }
+    }
 }
 
 int fn_801B20F0(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d)

@@ -28,11 +28,14 @@ struct Unk801AB63C_P {
     void* m4;
     Unk8019F8C0_Owner* m8;
     int mC;
-    char pad10[0x18 - 0x10];
+    int m10;
+    int m14;
     int m18;
     int m1C;
     int m20[8];
-    char pad40[0x5C - 0x40];
+    float m40;
+    int m44;
+    char pad48[0x5C - 0x48];
     int m5C;
     Unk801AB63C_Ent m60[1];
 };
