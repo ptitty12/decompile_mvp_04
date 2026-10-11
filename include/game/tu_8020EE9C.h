@@ -144,6 +144,9 @@ struct Obj36C {
 struct Obj4_36C {
     char pad0[0x36C];
     Obj36C* m36C;
+    char pad370[4];
+    Obj36C* m374;
+    int m378;
 };
 /* Block reached through CtxOwner::m6F8 -> +0x14 (byte at +0x1CC9). */
 struct Ctx6F8Inner {
@@ -204,7 +207,13 @@ struct TaskInner {
     Slots4 mD4;
     char padE4[0x19C - 0xE4];
     int m19C;
-    char pad1A0[0x9FC - 0x1A0];
+    char pad1A0[0x1D8 - 0x1A0];
+    int m1D8;
+    char pad1DC[0x1F4 - 0x1DC];
+    int m1F4;
+    char pad1F8[0x20C - 0x1F8];
+    int m20C;
+    char pad210[0x9FC - 0x210];
     Rec16 m9FC[8];
     char padA7C[0xCA8 - 0xA7C];
     RecQueue mCA8[4];
@@ -227,6 +236,8 @@ struct Task : Sub {
     int mB8;
     char padBC[0xE8 - 0xBC];
     float mE8;
+    char padEC[0xF8 - 0xEC];
+    float mF8;
 };
 
 /* Objects compared in fn_8021157C .. fn_80211648 (floats at +4, +8). */
@@ -356,6 +367,14 @@ struct Obj74 {
 };
 
 extern "C" void fn_80204CCC(Rec* r);
+
+/* Object-table lookup with the byte offset in a local: gives retail's
+ * 'lwzx rD,rBase,rIdx' operand order (fn_8021DB40, fn_8022321C). */
+inline void* ObjAt(void** a, int i)
+{
+    int o = i * 4;
+    return *(void**)((char*)a + o);
+}
 
 /* Functions of tu_8020EE9C.cpp used by the neighbouring units. */
 extern "C" {

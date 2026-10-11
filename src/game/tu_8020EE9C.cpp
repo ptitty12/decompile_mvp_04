@@ -480,16 +480,19 @@ void fn_802123D4(Task* t, int kind, int)
     }
 }
 
+extern Vec3f lbl_805D5C98;
+/* The zero comes from a global struct (lbl_805D5C98): a load from an aggregate stays below the
+   record stores, as in retail (a scalar or literal float is hoisted above them). */
+extern Vec3f lbl_805D5C98;
 void fn_8021247C(Task* t)
 {
     RecQueue* q = t->m9C->m3A60;
-    if (q->count > 0) {
-        Rec* e = &q->e[0];
-        e->mA4 = 1;
-        e->mAC = 0;
-        e->m80 = 0.0f;
-        e->m9C = 0;
-    }
+    if (q->count <= 0) return;
+    Rec* e = &q->e[0];
+    e->mA4 = 1;
+    e->m80 = lbl_805D5C98.x;
+    e->m9C = 0;
+    e->mAC = 0;
 }
 
 void fn_802124B8(Task* t)
