@@ -140,6 +140,16 @@ struct Unk8017F744_T {
 };
 void fn_80034CA4(void* p);
 
+struct Unk8017E030_Rec {
+    char pad0[0x1CC9];
+    unsigned char m1CC9;
+    char pad1CCA[0x1CD0 - 0x1CCA];
+    int m1CD0;
+};
+int fn_8006BE18(void* a);
+int fn_80081B60(void* p);
+int fn_80096988(void* p, int a, int b);
+
 struct Unk8017DCCC_Obj {
     char pad0[0x704];
     int m704;

@@ -49,14 +49,6 @@ int fn_8017DD64(Unk8017DD64_T* p, int idx)
     return ((Unk8017DD64_Item*)((char*)p->m4->m6F8->m14 + off))->m78;
 }
 
-int fn_8017ED94(Unk8017DD64_Ctx* p)
-{
-    if (p) {
-        return p->m704;
-    }
-    return 0;
-}
-
 void fn_8017DD80(Unk8017DD64_T* p, int idx, int* out0, int* out1)
 {
     *out0 = 0;
@@ -72,6 +64,39 @@ void fn_8017DD80(Unk8017DD64_T* p, int idx, int* out0, int* out1)
         int h = fn_80099B50(it, 1);
         *out1 = fn_801A49F0(p->m4, idx, h);
     }
+}
+
+int fn_8017E030(Unk8017DD64_T* p, int a, int b)
+{
+    if (fn_8006BE18(p->m4->m6F8) == 1) {
+        return 0;
+    }
+    int h = fn_80081B60(p->m4->m6F8->m14);
+    int off = a * 0xE64;
+    int r = fn_80096988((char*)p->m4->m6F8->m14 + off, h, b);
+    int k = 0;
+    if (((Unk8017E030_Rec*)p->m4->m6F8->m14)->m1CD0 != 0) {
+        k = 1;
+    }
+    if (k == a && r == 1) {
+        return 0;
+    }
+    int k2 = 0;
+    if (((Unk8017E030_Rec*)p->m4->m6F8->m14)->m1CD0 != 0) {
+        k2 = 1;
+    }
+    if (k2 == a && r == 2 && ((Unk8017E030_Rec*)p->m4->m6F8->m14)->m1CC9 == 3) {
+        return 0;
+    }
+    return r;
+}
+
+int fn_8017ED94(Unk8017DD64_Ctx* p)
+{
+    if (p) {
+        return p->m704;
+    }
+    return 0;
 }
 
 /* near-miss: retail keeps the counter in a stack slot (reloaded and stored each pass) and
