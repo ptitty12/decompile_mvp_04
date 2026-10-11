@@ -52,6 +52,11 @@ ealib/tu_80369878.cpp:
 	.ctors      start:0x805A2C60 end:0x805A2C64
 	.bss        start:0x80693D10 end:0x80693D24
 
+ealib/tu_8036A490.cpp:
+	.text       start:0x8036A490 end:0x8036AEE4
+	.ctors      start:0x805A2C64 end:0x805A2C68
+	.bss        start:0x80693D24 end:0x80693D38
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
