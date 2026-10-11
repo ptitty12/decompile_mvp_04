@@ -37,6 +37,16 @@ void fn_801C4530(void* p);
 void fn_80235164(void* p);
 Unk8019F8C0_M2* fn_801A4CE8(Unk8019F8C0_Owner* o, int i);
 extern int lbl_8061B9C8;
+inline int Unk801A22F4_At(int* a, int off)
+{
+    return *(int*)((char*)a + off);
+}
+void fn_8024C0D0(int v);
+int fn_800968C0(Unk8019F8C0_Inner* t, int key, int c);
+int fn_80097300(Unk8019F8C0_Inner* t, int v);
+int fn_80097190(Unk8019F8C0_Inner* t, int v);
+int fn_801A49F0(Unk8019F8C0_Owner* o, int team, int key);
+unsigned char fn_801A48F8(Unk8019F8C0_Owner* o, int i);
 void fn_8016C4FC(void* p);
 struct Unk801A22F4_G {
     char pad0[0x2C];
@@ -270,16 +280,50 @@ void fn_801A3CA4(void* a, void* b)
     fn_8040A208(a, b, 0x14, fn_801A3C7C);
 }
 
-/* near-miss: retail steps byte offsets (+4 per column, +100 per row) with count-down loops; 14 slots differ. */
+/* The team counter lives in memory (stack slot reloaded per use): a volatile local reproduces it. */
+/* near-miss: same code; retail's registers for the memory counter / index (r0 vs r9) differ (5 slots). */
+void fn_801A4674(Unk8019F8C0_Owner* o)
+{
+    volatile int c = 0;
+    int t = 0;
+    do {
+        unsigned n = fn_801A48F8(o, t);
+        unsigned k = 0;
+        if (k < n) {
+            int j = 0;
+            do {
+                k++;
+                int v = Unk801A22F4_At(o->m594, j + c * 100);
+                j += 4;
+                fn_8024C0D0(v);
+            } while (k < n);
+        }
+        int w = c;
+        int r;
+        if (w > 1) {
+            r = w;
+        } else {
+            r = w + 1;
+        }
+        c = r;
+        t = r;
+    } while (t <= 1);
+}
+
+/* near-miss: same code; retail shares r0 between the byte offset and the loaded value (4 slots differ). */
 void fn_801A4884(Unk8019F8C0_Owner* o)
 {
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 25; j++) {
-            int v = o->m594[i * 25 + j];
+    int row = 0;
+    for (int a = 2; a != 0; a--) {
+        int col = 0;
+        for (int b = 25; b != 0; b--) {
+            int v = Unk801A22F4_At(o->m594, col + row);
+            col += 4;
             if (v) {
                 fn_80242E28(v, lbl_805CE7E4);
             }
         }
+        row += 100;
     }
 }
 
@@ -287,6 +331,30 @@ unsigned char fn_801A48F8(Unk8019F8C0_Owner* o, int i)
 {
     Unk8019F8C0_Inner* p = o->m6F8->m14 + i;
     return p->m3E4;
+}
+
+int fn_801A4A94(Unk8019F8C0_Owner* o, int key)
+{
+    volatile int c = 0;
+    int i = 0;
+    for (;;) {
+        int r = fn_800968C0(&o->m6F8->m14[i], key, 0);
+        if (r != 0xFF) {
+            return Unk801A22F4_At(o->m594, c * 100 + r * 4);
+        }
+        int v = c;
+        int n;
+        if (v > 1) {
+            n = v;
+        } else {
+            n = v + 1;
+        }
+        c = n;
+        i = n;
+        if (i > 1) {
+            return 0;
+        }
+    }
 }
 
 Unk8019F8C0_W* fn_801A4B34(Unk8019F8C0_Owner* o)
@@ -297,6 +365,22 @@ Unk8019F8C0_W* fn_801A4B34(Unk8019F8C0_Owner* o)
     }
     Unk8019F8C0_Inner* t = &o->m6F8->m14[f];
     return (Unk8019F8C0_W*)o->m594[f * 25 + t->m168.m0[t->m168.mC]];
+}
+
+void fn_801A4B7C(Unk8019F8C0_Owner* o, int a, int flag)
+{
+    int team;
+    if (flag != 0) {
+        int f = 0;
+        if (o->m6F8->m14[2].m8 != 0) {
+            f = 1;
+        }
+        team = f;
+    } else {
+        team = o->m6F8->m14[2].m8 == 0;
+    }
+    Unk8019F8C0_Inner* t = &o->m6F8->m14[team];
+    fn_801A49F0(o, team, fn_80097300(t, fn_80097190(t, a)));
 }
 
 int fn_801A4C20(Unk8019F8C0_Owner* o)
