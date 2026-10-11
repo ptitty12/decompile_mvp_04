@@ -67,6 +67,9 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
 - Skip functions over ~0x400 bytes, and those that need inline-asm-only
   instructions (mftb, mfcr/mtcrf).
 - New types go in `include/game/tu_<first unit addr>.h`.
+- Overlay units (`src/fe/`, `src/db/`): every function definition carries
+  `FE_OVERLAY` / `DB_OVERLAY` from `include/game/overlay.h` (placement only;
+  without it objdiff can't pair the function). Same flags as game code.
 - Commit each unit with its own renames, after VERIFY PASS.
 
 ## Quick tips (details in docs/PATTERNS.md)
