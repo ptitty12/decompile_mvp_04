@@ -185,6 +185,15 @@ ealib/tu_80376598.cpp:
 	.bss        start:0x80693E78 end:0x80693E8C
 	.sbss       start:0x806EFBFC end:0x806EFC10
 
+ealibs/tu_803D7ED4.cpp:
+	.text       start:0x803D7ED4 end:0x803D8234
+	.ctors      start:0x805A2CD4 end:0x805A2CD8
+
+ealibs/tu_803D9FE8.cpp:
+	.text       start:0x803D9FE8 end:0x803DA188
+	.ctors      start:0x805A2CDC end:0x805A2CE0
+	.bss        start:0x806AA920 end:0x806AA984
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4

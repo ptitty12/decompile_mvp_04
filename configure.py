@@ -359,6 +359,8 @@ cflags_game = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
 
 # EA shared libraries (ProDG 3.9.3). Unlike game code they use r13 small data, so no -G0.
 cflags_ealib = ["-Os", "-fno-rtti", "-fno-exceptions", "-Iinclude"]
+# EA shared libraries (ProDG 3.9.3). Provisional: -G0 not yet confirmed for these.
+cflags_ealib = ["-Os", "-G0", "-fno-rtti", "-fno-exceptions"]
 
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
@@ -427,6 +429,16 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80375038.cpp"),
             Object(NonMatching, "ealib/tu_80375AE8.cpp"),
             Object(NonMatching, "ealib/tu_80376598.cpp"),
+        ],
+    },
+    {
+        "lib": "ealibs",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_ealib,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "ealibs/tu_803D7ED4.cpp"),
+            Object(NonMatching, "ealibs/tu_803D9FE8.cpp"),
         ],
     },
 ]
