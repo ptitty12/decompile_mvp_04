@@ -454,6 +454,93 @@ struct FxY {
     int m8;
     int mC;
 };
+struct FxZ {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+    float m10;
+    int m14;
+};
+/* Growable ring table of 16-byte entries plus 0x18-byte records (ctor fn_80324EF0, dtor fn_80324F78);
+ * vptr (lbl_80665E48) at +0x2C. m24 entries in m0, m28 records in m4, byte buffer mC (size m10). */
+class FxZT {
+public:
+    int* m0;
+    char* m4;
+    int m8;
+    int* mC;
+    int m10;
+    int* m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    virtual ~FxZT();
+};
+/* Pair of shorts at the pointer held by lbl_8061B8C0+0x30 (fn_803265F0). */
+struct FxShorts {
+    short m0;
+    short m2;
+};
+struct FxZ6C {
+    int m0;
+    int m4;
+    int m8;
+};
+struct FxAIB;
+struct FxAIC;
+struct FxAID;
+class FxZT;
+/* Controller object with its vptr at +0x4F4 (vtable lbl_80665E30; ctor fn_803263C4). */
+struct FxAI {
+    FxZT* m0;
+    FxZT* m4;
+    char pad8[0x4b0];
+    int m4B8;
+    FxAIB* m4BC;
+    int a4C0[13];
+    const void* m4F4;
+    char pad4F8[0x8];
+};
+/* Pointer chain of fn_80326C20: ctx->m4BC->m564->m14 is the state id. */
+struct FxAIC {
+    char pad0[0x14];
+    int m14;
+};
+struct FxAIB {
+    char pad0[0x564];
+    FxAIC* m564;
+};
+/* Two-level record walked by fn_80326DF0 / fn_80326E64 (ring of 16-byte entries). */
+struct FxRingH {
+    int* m0;
+    char pad4[0x14];
+    int m18;
+    int m1C;
+    int m20;
+};
+struct FxRing {
+    FxRingH* m0;
+    FxRingH* m4;
+};
+struct FxAID {
+    char pad0[0x18];
+    int m18;
+};
+struct FxV2 { float x; float y; };
+/* 0x18-byte record of FxZT::m4 (written by fn_80325080). */
+struct FxEnt {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+    float m10;
+    int m14;
+};
+struct FxPtr { FxZT* m0; };
+typedef int (*FxPred)(FxZ*, int);
 // STRUCTS-END
 
 extern int lbl_8061FF50;
