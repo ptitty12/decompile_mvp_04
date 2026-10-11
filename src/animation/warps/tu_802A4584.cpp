@@ -10,6 +10,27 @@
  * cHeadingWarp (0x806619A0), cTranslationWarp (0x80661920). One unit because
  * the groups' .data interleave (0x8061E894..0x8061E970 sits inside
  * 0x8061E87C..0x8061E97C).
+ *
+ * Hierarchy: Unk8037B3E8 (root, ctor 0x8037B3E8) <- Unk8035EAE8 (warp mid class,
+ * dtor 0x8035EAE8, slots 11-14 empty functions at 0x8035EB08..14) <- the seven
+ * warps. Each warp's dtor, slot 2 (attributes), slot 5 (factory) and its slot
+ * 11/12/13 overrides are in this unit; slots 3/4 (name, hash) and the vtable are
+ * at 0x802ACC04.. in the tail of the unity TU.
+ *
+ * Matching notes (details at the places they apply):
+ *  - Clamps use g++'s MAX operator: `x > hi ? hi : (x >? lo)`.
+ *  - Float locals are scoped stack slots reused newest-first; loop temporaries
+ *    are plain locals in the loop body.
+ *  - Vec3 values read from the player at +0x948 / +0x960 go through the getters
+ *    GetM948 / GetM960 (one struct copy straight into the caller's slot).
+ *  - fn_vslot3 takes the Vec3 by const reference: passing a temporary hoists the
+ *    vtable load above the argument computation, as in retail.
+ *  - The Vec3 operators and AngleDiff below duplicate the ones in
+ *    choosers/tu_80272B20.cpp (operator* there takes its vector by value; here a
+ *    const reference matched); they belong in one shared header of the unity TU.
+ *
+ * Not matched: cTimeWarp::cTimeWarp (0x802A477C) differs only in the order of
+ * two instructions (lwz of the second global before/after the vtable lis).
  */
 #include "game/warp.h"
 
@@ -44,7 +65,7 @@ inline Unk80273498_Vec3 operator*(const Unk80273498_Vec3& v, float s)
 }
 
 extern Unk80273498_Vec3 lbl_806055AC;    /* shared constant vector */
-extern int lbl_8061B9C8;                 /* integer read as the frame rate */
+extern int lbl_8061B9C8;                 /* integer converted to float and scaled by 1/60 (frame rate?) */
 float fn_8026FDB0(Unk80270BA0_Obj* o);
 float fn_80382348(Unk80271DBC_Link* link, unsigned int hash, int flag);
 unsigned int fn_80378568(const char* token, int len);
@@ -54,6 +75,20 @@ static unsigned int lbl_8068CE60;
 static int lbl_8068CE64;
 
 int fn_8023F330(Unk80270BA0_X* x, int a, int b, void* c, void* d, int e, int f, int g, int h);
+
+/* Accessors for the two vectors the limb/translation warps read from the player.
+ * Matching note: copying through a getter that returns the member (one struct
+ * copy into the caller's slot) is what gives retail's direct stores; a plain
+ * `Vec3 v = x->m948;` leaves a frame-address register shared with later reads. */
+inline Unk80273498_Vec3 GetM948(const Unk80270BA0_X* x)
+{
+    return x->m948;
+}
+
+inline Unk80273498_Vec3 GetM960(const Unk80270BA0_X* x)
+{
+    return x->m960;
+}
 
 inline Unk80379324_Vec4 MakeVec4(Unk80273498_Vec3 v, float w)
 {
@@ -158,6 +193,9 @@ public:
     int m8;                    /* "end" */
 };
 
+/* near-miss: retail loads lbl_8068D5B0 after the `lis` of the vtable address; this
+ * order puts the lwz first (2 instructions swapped). Tried: member initializers
+ * in both orders, locals, getters, unsigned types, defined instead of extern. */
 cTimeWarp::cTimeWarp() : Unk8035EAE8(0x1C105B31u)
 {
     m4 = lbl_8068D5AC;
@@ -577,7 +615,7 @@ void cLimbLockWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk8027
 {
     if (m4) {
         Unk80270BA0_X* x = obj->fn_vslot1();
-        Unk80273498_Vec3 pos = x->m948;
+        Unk80273498_Vec3 pos = GetM948(x);
 
         if (pos.y != -1000.0f) {
             int ok = 1;
@@ -745,7 +783,7 @@ void cTranslationWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk8
 
         if (x->m978 < x->m974) {
             Unk80273498_Vec3 d = x->m60 - m8;
-            Unk80273498_Vec3 w = x->m960;
+            Unk80273498_Vec3 w = GetM960(x);
 
             float sx = x->m96C;
             float sz = x->m970;
