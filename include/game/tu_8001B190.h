@@ -117,7 +117,10 @@ public:
     void fn_8001C410();
     void fn_8001C50C();
     void fn_8001C568();
-    void fn_8001CACC();
+    int fn_8001CACC();
+    int fn_8001CC7C();
+    int fn_8001CC9C();
+    int fn_8001CCD8();
     void fn_8001CC04(int* result, int v);
     int fn_8001CC40(int idx);
     char pad1C[8];
