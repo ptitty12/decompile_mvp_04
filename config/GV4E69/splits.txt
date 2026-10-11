@@ -186,6 +186,9 @@ game/tu_8003EF18.cpp:
 game/tu_800401E4.cpp:
 	.text       start:0x800401E4 end:0x80042DBC
 
+game/tu_80042DBC.cpp:
+	.text       start:0x80042DBC end:0x800437AC
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
