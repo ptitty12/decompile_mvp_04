@@ -21,7 +21,7 @@ public:
     virtual ~Unk802DE2C8_Svc();
     virtual void s2(int cond, const char* file, int line);
     virtual void s3(const char* msg);
-    virtual void s4();
+    virtual void* s4(unsigned size, const char* tag);
     virtual void s5(void* p);
 };
 extern Unk802DE2C8_Svc* lbl_8061F68C;
@@ -36,16 +36,20 @@ struct Unk802DE2C8_List {
     Unk802DE2C8_Node* m0;
     Unk802DE2C8_Node* m4;
     int m8;
+    ~Unk802DE2C8_List();
     int fn_802E0400(Unk802DE2C8_Node* n);
     int fn_802E04BC(Unk802DE2C8_Node* n);
     void fn_802E056C();
 };
 /* Free pool at lbl_8061F688: free count at +0xC, first at +0x10, last at +0x14. */
 struct Unk802DE2C8_Pool {
-    char pad0[0xC];
+    int m0;
+    int m4;
+    int m8;
     int mC;
     Unk802DE2C8_Node* m10;
     Unk802DE2C8_Node* m14;
+    Unk802DE2C8_Pool();
 };
 extern Unk802DE2C8_Pool* lbl_8061F688;
 
@@ -58,6 +62,7 @@ struct Unk802E21FC_R {
     int m8;
     int mC;
 };
+void fn_802E21FC(Unk802E21FC_R* d, Unk802E21FC_R* s);
 struct Unk802E22C4_E {
     char pad0[8];
     int m8;
