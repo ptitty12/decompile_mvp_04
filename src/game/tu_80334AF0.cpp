@@ -6,28 +6,12 @@
 #include "game/tu_80331C60.h"
 
 extern "C" {
-void fn_803E4A50(void* p);
 void fn_8032FB78(void* item, int v);
 void fn_80330BC8(Menu* p, int k);
 void fn_8032F120(void* item, const char* name, int v);
 void fn_803349D0(Menu* p);
 void fn_80334A60(Menu* p);
 UnkC128* fn_803349B8(Menu* p);
-}
-
-/* Base-menu constructor body, as inlined into the derived menu constructors
- * (fn_8033648C, fn_80334BC0, ...): the vptr is set to the base vtable before the
- * +0x210 member is constructed, then to the derived one. */
-extern const char lbl_80666A18[];
-inline void MenuInit(Menu* p, int a)
-{
-    p->m174 = 0;
-    p->m178 = 0;
-    p->m1FC = 0;
-    p->m200 = a;
-    p->m2DC = lbl_80666A18;
-    fn_803E4A50((char*)p + 0x210);
-    p->m2D8 = 0;
 }
 
 /* Enum item: m4C is the chosen index, m60 the value table. */
