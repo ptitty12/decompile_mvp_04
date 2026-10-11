@@ -195,6 +195,37 @@ extern "C" FE_OVERLAY void fn_8045369C(FeScr7* self)
     fn_80453D84(self, ((FeSub*)&self->m14C->m98)->s21());
 }
 
+extern "C" FE_OVERLAY void fn_80453980(FeScr7* self)
+{
+    int v = 0;
+    FeObj* cur = self->m168;
+    if (cur == self->m13C) {
+        v = FeGetI((char*)&self->m174, ((FeObjI*)cur)->v60() * 4);
+        fn_80122D40(self->m164, v, 1, 1, self->m240 ^ 1, 0);
+    } else if (cur == self->m140) {
+        v = FeGetI((char*)self + 0x1D8, ((FeObjI*)cur)->v60() * 4);
+        fn_80122D40(self->m164, v, 1, 1, self->m240 ^ 1, 0);
+    }
+    if (v != 0 && fn_80075808(self->m134) == 0) {
+        FeWidgetS* w = (FeWidgetS*)fn_800C8054(((FeObj*)self->m164)->v32("TEAMLOGO", 1));
+        FeSub1* s = (FeSub1*)&w->m98;
+        s->s8(self->m134);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80453AB8(FeScr7* self, FeObj* a)
+{
+    if (a == self->m144) {
+        fn_80453D84(self, ((FeSub*)&self->m150->mDC)->s21());
+    } else if (a == self->m148) {
+        int v = ((FeSub*)&self->m158->mDC)->s5();
+        fn_800D0074(&self->m14C->m98, v, 1);
+        fn_800D0074(&self->m150->mDC, v, 1);
+        fn_80453D84(self, ((FeSub*)&self->m14C->m98)->s21());
+    }
+    fn_80453980(self);
+}
+
 extern "C" void fn_80453D84(FeScr_8044974C* self, int a);
 extern "C" void fn_80453980(FeScr_8044974C* self);
 extern "C" FE_OVERLAY void fn_80453BA8(FeScr_8044974C* self, int a, int b)
@@ -238,6 +269,24 @@ extern "C" FE_OVERLAY int fn_80453C8C(FeScr_8044974C* self, FeObj* a, int unused
     }
     fn_80453980(self);
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_80453D84(FeScr7* self, int a)
+{
+    self->m134 = a;
+    ((FeSub2*)&((FeWidgetS*)self->m14C)->m98)->s20(a, 1);
+    ((FeSub2*)&((FeWidgetS*)self->m150)->mDC)->s20(a, 1);
+    FeObj* ft = fn_800B7AB8(UiGetMsgMgr(), "FTOPBAR");
+    int r = 1;
+    if (lbl_8061930C->fn_8007B3E0(0xE, lbl_8061930C->fn_80075948(a)) == 0)
+        r = 0;
+    fn_804A763C(ft, r ^ 1);
+    ((FeObj1*)self->m148)->v16(r);
+    ((FeObj1*)self->m148)->v44(r);
+    fn_804540CC(self);
+    ((FeObj1*)self->m168)->v68(0);
+    ((FeObj1*)self->m13C)->v14(0);
+    ((FeObj1*)self->m140)->v14(0);
 }
 
 extern "C" FE_OVERLAY void fn_80453F20(FeScr7* self, int a)
