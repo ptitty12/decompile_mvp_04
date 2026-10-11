@@ -164,3 +164,18 @@ evidence: the verifier decides. Add a line when a pattern matches twice.
 - Read `cc1plus -da` dumps (jump/cse/sched/greg) before a blind variant search
   when a register or ordering difference persists.
 
+## In-place float clamp: g++'s `>?` / `<?` operators (warps-B worker, 2026-10-11)
+
+- Retail clamps that keep the value in its own register with one shared
+  `fmr` come from GNU C++'s min/max operators: `a >? b` is max, `a <? b` is min.
+  `>?` expands as `r = x; if (r >= lo) skip; r = lo`.
+- Typical forms: `x > hi ? hi : (x >? lo)`, or `!(x > hi) ? (x >? lo) : hi`
+  when retail lays the hi arm out after the lo arm. Plain if/else or ternary
+  chains never produce the shared `fmr` (that was ~190 failed forms on
+  fn_8026FDB0).
+- Other warps-B notes: a data-less mid class with an implicit dtor forwards
+  (r4 unchanged) to the base dtor; inline virtual no-ops of a mid class are
+  still emitted as separate functions; `a*b + c*d` fuses the first product
+  into fmadds, so write the fused term first; arguments are evaluated right to
+  left (`m8 + d + x->m960` copies the by-value operand first).
+
