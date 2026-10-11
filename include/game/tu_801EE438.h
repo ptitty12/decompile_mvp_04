@@ -90,6 +90,15 @@ struct Unk801EE438_Sub2B4 {        /* G+0x2B4 */
     char pad2B0[0x364 - 0x2B0];
 };
 
+struct Unk801EE438_Pair {          /* G+0x684: two (sub-index, sub-index, selection) triples */
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
 struct Unk801EE438_Rec14 {         /* stride 0x14, G+0x62C (4 entries) */
     int m0;
     float m4;
@@ -173,7 +182,9 @@ struct Unk801EE438_G {
     Unk801EE438_Sub2B4 m2B4;
     char pad618[0x62C - 0x618];
     Unk801EE438_Rec14 m62C[4];
-    char pad67C[0x6A8 - 0x67C];
+    char pad67C[0x684 - 0x67C];
+    Unk801EE438_Pair m684;
+    char pad69C[0x6A8 - 0x69C];
     Unk801EE438_Sub6A8 m6A8;
     char pad6AC[0x6B8 - 0x6AC];
     Unk801EE438_Rec5C m6B8[10];
@@ -256,5 +267,10 @@ int fn_80204E58(Unk801EE438_Ent* e);
 int fn_80204F8C(Unk801EE438_Ent* e);
 int fn_80211BB0(Unk801EE438_Sub* s, int a);
 void fn_80211BA0(Unk801EE438_Sub* s, int a);
+}
+extern "C" {
+void fn_801EDE78(Unk801EE438_Scr* p, int a);
+void fn_801EF000(Unk801EE438_Scr* p, int a, int b);
+void fn_801F1928(Unk801EE438_Scr* p);
 }
 #endif

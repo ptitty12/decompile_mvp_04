@@ -6,6 +6,8 @@
 
 typedef Unk801EE438_Scr Scr;
 
+extern "C" int fn_802055F4(Unk801EE438_G* g);
+
 extern float lbl_805D4CB0;
 
 extern "C" {
@@ -65,6 +67,34 @@ int fn_801EEFA8(Scr* p, int a)
         fn_80211BA0(&p->m9C->mD4, k);
     }
     return r;
+}
+
+inline int PickVal(int* base, int i)
+{
+    if (i == -1)
+        return -1;
+    int* q = base + i;
+    return *q;
+}
+
+int fn_801EF460(Scr* p, int a, int b)
+{
+    Unk801EE438_Pair* pr = &p->m9C->m684;
+    int hit = 0;
+    int x = pr->m8;
+    if ((a == x || a == pr->m14) && (b == x || b == pr->m14))
+        hit = 1;
+    if (hit == 0 || fn_802055F4(p->m9C) == 1) {
+        p->m9C->m684.m8 = a;
+        p->m9C->m684.m14 = b;
+        fn_801EDE78(p, 1);
+        fn_801EF000(p, a, b);
+        p->m9C->m684.m0 = PickVal(&p->m9C->mC0.m0, a);
+        p->m9C->m684.m4 = PickVal(&p->m9C->mD4.m0, a);
+        p->m9C->m684.mC = PickVal(&p->m9C->mC0.m0, b);
+        p->m9C->m684.m10 = PickVal(&p->m9C->mD4.m0, b);
+    }
+    fn_801F1928(p);
 }
 
 int fn_801EFD64(Scr* p, int i)
