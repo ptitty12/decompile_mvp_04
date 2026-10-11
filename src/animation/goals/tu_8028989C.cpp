@@ -568,7 +568,6 @@ int fn_8028ADB8(Unk8028989C_Goal* g, Unk8028989C_Goal* o, float f, Unk80270BA0_X
 
 int fn_8028AE80(Unk8028989C_Goal* g, Unk80270BA0_X* x)
 {
-    /* near-miss: the second return-0 of the last check gets its own `li r3,0` (10 insns) */
     Unk80271DBC_Link* link = x->m618;
     int hash;
     float c;
@@ -600,9 +599,7 @@ int fn_8028AE80(Unk8028989C_Goal* g, Unk80270BA0_X* x)
     if (hash == (int)0xCE8E4E29) {
         if (fn_8027A8F0(g)->m10 == 4) {
             float v = fn_80382BD8(link, 0);
-            if (v < 0.0f) {
-                return 0;
-            } else if (v > 0.98f) {
+            if (v < 0.0f || v > 0.98f) {
                 return 0;
             }
             return 1;
