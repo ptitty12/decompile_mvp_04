@@ -253,9 +253,10 @@ float fn_80060A60(void* a, int b, int c, Ctx* ctx)
     return result;
 }
 
-/* near-miss: same control flow and loops as fn_8005F7D8 (two bdnz sums over
- * the 0x80 bytes at +0x1B4 of two adjacent 0xE64 records), but register numbers
- * differ, and retail keeps (id.mC >> 1) + 1 in a register across the loops. */
+/* near-miss: the two byte-sum loops now match (SumYBytes, address as an int, see
+ * tu_8005DF2C.h); what differs is the code around them: retail keeps ctx->m130
+ * in r4 across the loops and reloads m44C from it, and loads it before the
+ * 16-byte id copy; here the compiler keeps m44C itself in r4. */
 float fn_80060AB8(void* a, int b, int c, Ctx* ctx)
 {
     float result = 0.0f;
@@ -266,15 +267,10 @@ float fn_80060AB8(void* a, int b, int c, Ctx* ctx)
         Unk8005DF2C_O6F8* q = o->m44C->m6F8;
         int f = q->mC->m84 == 0;
         if (id.m0 == 2 && f) {
-            Unk8005DF2C_Y* y = q->m14;
-            int s0 = 0;
-            for (int i = 0; i < 128; i++)
-                s0 += y->m1B4[(unsigned char)i];
-            y++;
-            int s1 = 0;
-            for (int i = 0; i < 128; i++)
-                s1 += y->m1B4[(unsigned char)i];
+            int y = *(int*)((char*)q + 0x14);
             int h = (id.mC >> 1) + 1;
+            int s0 = SumYBytes(y);
+            int s1 = SumYBytes(y + 0xe64);
             if (((s0 >= s1 && id.m8 == h - 1) || (s1 >= s0 && id.m4 == h - 1)) && ctx->m3B8 && ctx->m3B4 == 1
                 && ctx->m4D4 == 0 && ctx->m3CC + ctx->m3D0 == 0 && ctx->m0 == o->m44C->m6F8->m10->m1C)
                 result = 100.0f;
