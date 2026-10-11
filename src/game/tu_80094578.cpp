@@ -502,6 +502,7 @@ extern "C" void fn_80099A44(Obj3* o, int a, int b);
 
 extern "C" void fn_80096830(Obj3* o, int a) { fn_80099A44(o, fn_800968C0(o, a, 1), 0); }
 
+/* near-miss: retail loads the two bytes in the opposite register order */
 extern "C" void fn_80096870(Obj3* o, unsigned a, unsigned b)
 {
     ByteVec* v = &o->m168;
@@ -540,6 +541,7 @@ extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
     return r;
 }
 
+/* near-miss: retail re-reads the count in the loop instead of keeping it in a register */
 extern "C" unsigned char fn_8009692C(Obj3* o, int key)
 {
     ByteVec* v = &o->m168;
@@ -644,6 +646,7 @@ extern "C" int fn_80097300(Obj3* o, int i)
     return o->m3E8[o->m168.m0[i]].m0;
 }
 
+/* near-miss: retail does no loop-invariant hoisting here (reloads +0, +4, +0x3E8 each pass) */
 struct Unk80097318 {
     unsigned char* m0;
     unsigned m4;
