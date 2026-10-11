@@ -114,6 +114,9 @@ game/tu_8001B190.cpp:
 game/tu_8001BA78.cpp:
 	.text       start:0x8001BA78 end:0x8001CACC
 
+game/tu_8001CACC.cpp:
+	.text       start:0x8001CACC end:0x8001D7F8
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
