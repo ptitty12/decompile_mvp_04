@@ -206,7 +206,9 @@ struct Unk80268190_C {
     Unk80268190_Ctx* m1F4;
     int m1F8;
     int m1FC;
-    char pad200[0x42C - 0x200];
+    char pad200[0x420 - 0x200];
+    int m420;
+    char pad424[0x42C - 0x424];
     int m42C;
     int m430;
     int m434;

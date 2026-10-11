@@ -49,6 +49,7 @@ int fn_80268684(M* m, Pl* p);
 void* fn_8040B320(void* p, int v, int n);
 void fn_80269E80(G* g, int idx, const char* s);
 int fn_80269F88(G* g, Pl* p, int ev);
+int fn_8026A0F4(G* g, Pl* p);
 int fn_8026A0DC(G* g, Pl* p);
 int fn_8025CBFC(void* x, Pl* p);
 void fn_8025D054(C* c, int a);
@@ -60,6 +61,9 @@ void fn_802665B4(void* x);
 void fn_8025E55C(C* c);
 void fn_8026AA04(R* self, int v, const char* file, int line);
 void fn_8025E26C(C* c, Cmd* cmd, int a, int type);
+int fn_8025DC40(C* c, int* a, int* b, int* cc, int* d);
+int fn_802665DC(void* x, int a, int b, int c);
+void fn_8035E664(void* x, Pl* p, int a);
 }
 
 struct Unk80268190_Msg5E : MsgB {
@@ -538,6 +542,34 @@ void fn_8026A1D4() {}
 void fn_8026AA04(R* self, int v, const char* file, int line)
 {
     self->rec[0].a0 = v;
+}
+
+/* near-miss (parked, 76 vs 75 insns): retail keeps the four out-values at r1+0x10 (8-aligned struct-like block) and returns 0 from one shared tail; register assignment cascades from that */
+int fn_8026A630(C* self, Cmd* cmd)
+{
+    int a;
+    int b;
+    int c;
+    int d;
+    if (fn_8025DC40(self, &a, &b, &c, &d) == 0)
+        return 0;
+    if (d == 0 && b == 0)
+        return 0;
+    Pl* p = cmd->m10;
+    int g = fn_8026A0F4((G*)((char*)self + 0x190), p);
+    A* ac = &p->m58C;
+    int r = fn_802665DC(self->m48, fn_8035E318(ac), g, 1);
+    if (ac->m3C != self->m420)
+        fn_8035E664((char*)self + 0x1CC, p, -1);
+    fn_8026AA04((R*)cmd, 5, lbl_805DB170, 0xF57);
+    cmd->m8 = 4;
+    cmd->m0 = 3;
+    cmd->mC = ac->m38;
+    cmd->m20 = r;
+    float f = (float)g;
+    cmd->m18 = f;
+    cmd->m1C = f;
+    return 1;
 }
 
 Pl* fn_8026B8C0(C* self, unsigned t)
