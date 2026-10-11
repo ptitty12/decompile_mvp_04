@@ -888,6 +888,8 @@ struct UnkGameP6F8 {
     char pad0[0x10];
     UnkGameP10* m10;
     UnkTeamArr* m14;
+    char pad18[0x3C];
+    int m54;
 };
 struct UnkGameP700 {
     char pad0[0x3C4];
