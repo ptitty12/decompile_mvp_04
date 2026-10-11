@@ -264,6 +264,67 @@ extern "C" FE_OVERLAY void fn_80453FD4(FeScr_8044974C* self, FeObj* a)
     fn_8045373C(self);
 }
 
+extern "C" FE_OVERLAY void fn_80454890(FeScr7* self, int a)
+{
+    fn_8001BC4C()->fn_8001BDAC(0xA3);
+    if (self->m16C == -1) {
+        if (self->m170 == -1) {
+            self->m16C = a;
+            ((FeObj3*)self->m13C)->v90(a, 1, 1);
+        } else {
+            fn_80454AE0(self, a, self->m170);
+        }
+    } else if (a == self->m16C) {
+        ((FeObj3*)self->m13C)->v90(a, 1, 0);
+        self->m16C = -1;
+    } else {
+        ((FeObj3*)self->m13C)->v90(self->m16C, 1, 0);
+        fn_80454BB0(self, a, self->m16C);
+        self->m16C = -1;
+        fn_804540CC(self);
+    }
+}
+
+/* near-miss: retail indexes the 0x1D8 table with the byte offset in r0 (slwi r0; lwzx r0,r9,r0); ours puts the offset in r11 (6 slots) */
+extern "C" FE_OVERLAY void fn_8045499C(FeScr7* self, int a)
+{
+    fn_8001BC4C()->fn_8001BDAC(0xA3);
+    int t = self->m170;
+    if (t == -1) {
+        if (self->m16C == -1) {
+            if (FeGetI((char*)self + 0x1D8, a * 4) != 0) {
+                self->m170 = a;
+                ((FeObj3*)self->m140)->v90(a, 1, 1);
+            }
+        } else {
+            if (FeGetI((char*)self + 0x1D8, a * 4) != 0)
+                fn_80454AE0(self, self->m16C, a);
+        }
+    } else if (a == t) {
+        ((FeObj3*)self->m140)->v90(a, 1, 0);
+        self->m170 = -1;
+    } else {
+        ((FeObj3*)self->m140)->v90(t, 1, 0);
+        self->m170 = a;
+        ((FeObj3*)self->m140)->v90(a, 1, 1);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80454AE0(FeScr7* self, int a, int b)
+{
+    int x = FeGetI((char*)lbl_80621650, a * 4);
+    Unk8007DB74_A* s = (Unk8007DB74_A*)lbl_8061930C;
+    int y = FeGetI((char*)self + 0x1D8, b * 4);
+    if (x != 0) {
+        ((FeObj3*)self->m13C)->v90(self->m16C, 1, 0);
+        ((FeObj3*)self->m140)->v90(self->m16C, 1, 0);
+        fn_8007DD38(s, self->m134, self->m138, x, y);
+        self->m16C = -1;
+        self->m170 = -1;
+        fn_804540CC(self);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_80454CFC(FeScr_8044974C* self)
 {
     if (self->m168 == self->m13C) {
