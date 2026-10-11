@@ -35,6 +35,14 @@ struct Slots4 {
     int m[4];
 };
 
+inline int GetSlot(Slots4* s, int x)
+{
+    if (x == -1) {
+        return -1;
+    }
+    return s->m[x];
+}
+
 /* Record of 0xD8 bytes in the queue at TaskInner::m3A60 (fn_802124B8, fn_80212550). */
 struct Rec {
     int m0;
@@ -67,7 +75,9 @@ struct RecQueue {
 
 /* Sub-object at +0x58C of a player (fn_80254984 .. fn_80255028). */
 struct PlayerSub {
-    char pad0[0x38];
+    char pad0[8];
+    float m8;
+    char padC[0x38 - 0xC];
     int m38;
 };
 
@@ -75,39 +85,59 @@ struct PlayerSub {
 struct Player {
     char pad0[0x458];
     int m458;
-    char pad45C[0x58C - 0x45C];
+    char pad45C[0x4C8 - 0x45C];
+    int m4C8;
+    char pad4CC[0x588 - 0x4CC];
+    int m588;
     PlayerSub m58C;
 };
 
 struct CtxOuter700 {
     char pad0[0x3B4];
     void* m3B4; /* list head for fn_80257B40 */
+    char pad3B8[0x3C4 - 0x3B8];
+    void* m3C4;
 };
 struct CtxOwner {
-    char pad0[0x700];
+    char pad0[0x684];
+    Player* m684;
+    char pad688[0x700 - 0x688];
     CtxOuter700* m700;
 };
-struct TaskOwner {
-    CtxOwner* m0;
+
+/* 16-byte records at TaskInner+0x9FC, indexed by m3A5C. */
+struct Rec16 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
 };
 
 /* Block at Task+0x9C: object table at +8 (indexed by m3A5C), two Slots4 at
  * +0xC0 and +0xD4, the record queue at +0x3A60. */
 struct TaskInner {
-    char pad0[8];
+    CtxOwner* m0;
+    char pad4[4];
     void* m8[10];
     int m30;
     char pad34[0xC0 - 0x34];
     Slots4 mC0;
     char padD0[0xD4 - 0xD0];
     Slots4 mD4;
-    char padE4[0x3A5C - 0xE4];
+    char padE4[0x9FC - 0xE4];
+    Rec16 m9FC[8];
+    char padA7C[0x3A5C - 0xA7C];
     int m3A5C;
     RecQueue* m3A60;
 };
 
-struct Task {
-    TaskOwner* m0;
+/* First field of the task objects, also present at Task+0x9C (the sub-object
+ * methods fn_80210C98.. are called with &task->m9C). */
+struct Sub {
+    TaskInner* m0;
+};
+
+struct Task : Sub {
     char pad4[0x9C - 4];
     TaskInner* m9C;
 };
@@ -237,5 +267,17 @@ struct Obj74 {
     float m78;
     Vec3f m7C;
 };
+
+/* Functions of tu_8020EE9C.cpp used by the neighbouring units. */
+extern "C" {
+int fn_80210C98(Sub* t, int kind);
+int fn_80210D20(Sub* t, int kind);
+int fn_80210FC4(Sub* t, int kind, int x, Player** out);
+int fn_80211064(Sub* t, int kind, Player* p, int* out);
+Player* fn_80211370(Sub* t);
+void fn_80211BA0(Slots4* s, int i);
+int fn_80211BB0(Slots4* s, int v);
+void fn_80212550(Task* t, Vec3f* pos, float a, float b, int c, int d);
+}
 
 #endif

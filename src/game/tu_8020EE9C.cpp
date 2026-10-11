@@ -12,8 +12,8 @@ int fn_80254A34(PlayerSub* p);
 int fn_80254B60(PlayerSub* p);
 int fn_80254BEC(PlayerSub* p);
 int fn_80255028(PlayerSub* p);
-int fn_80210DA8(Task* t, int kind, Player* p);
-int fn_802110F8(Task* t, int kind, Player* p, int x);
+int fn_80210DA8(Sub* t, int kind, Player* p);
+int fn_802110F8(Sub* t, int kind, Player* p, int x);
 void fn_80204CCC(Rec* r);
 int fn_8026DAE8(void* obj, int x);
 void fn_80214CE8(Task* t, float f, int a, int b, int c, int d);
@@ -24,7 +24,7 @@ float fabsf(float x);
 
 extern "C" {
 
-int fn_80210C98(Task* t, int kind)
+int fn_80210C98(Sub* t, int kind)
 {
     void* list = t->m0->m0->m700->m3B4;
     int r = 0;
@@ -37,7 +37,7 @@ int fn_80210C98(Task* t, int kind)
     return r;
 }
 
-int fn_80210D20(Task* t, int kind)
+int fn_80210D20(Sub* t, int kind)
 {
     void* list = t->m0->m0->m700->m3B4;
     int n = 0;
@@ -49,7 +49,7 @@ int fn_80210D20(Task* t, int kind)
     return n;
 }
 
-int fn_80210DA8(Task* t, int kind, Player* p)
+int fn_80210DA8(Sub* t, int kind, Player* p)
 {
     switch (kind) {
     case 0:
@@ -72,7 +72,7 @@ int fn_80210DA8(Task* t, int kind, Player* p)
     }
 }
 
-int fn_80210FC4(Task* t, int kind, int x, Player** out)
+int fn_80210FC4(Sub* t, int kind, int x, Player** out)
 {
     void* list = t->m0->m0->m700->m3B4;
     int r = 0;
@@ -88,7 +88,7 @@ int fn_80210FC4(Task* t, int kind, int x, Player** out)
     return r;
 }
 
-int fn_80211064(Task* t, int kind, Player* p, int* out)
+int fn_80211064(Sub* t, int kind, Player* p, int* out)
 {
     int r = 0;
     volatile int e = 0;
@@ -113,7 +113,7 @@ int fn_80211064(Task* t, int kind, Player* p, int* out)
     return r;
 }
 
-int fn_802112B4(Task* t, Player** out)
+int fn_802112B4(Sub* t, Player** out)
 {
     void* list = t->m0->m0->m700->m3B4;
     Player* found = 0;
@@ -137,7 +137,7 @@ int fn_802112B4(Task* t, Player** out)
     return -1;
 }
 
-Player* fn_80211370(Task* t)
+Player* fn_80211370(Sub* t)
 {
     void* list = t->m0->m0->m700->m3B4;
     Player* found = 0;
