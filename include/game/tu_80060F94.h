@@ -11,21 +11,15 @@
  * +4 receives a constant id (0xF6, 0x55, 0xBC, 0x168, 0x144), r5 is the Ctx of
  * tu_8005DF2C.h. Handlers that do not use all three still take them.
  *
- * Unk80060F94_G0 / G1: the nested globals reached through lbl_806192E0
- * (->m4->m14 is the array of 0xE64-byte records indexed by +0x708 of the
- * Ctx's m3B0 object, as in tu_8005F4E4.cpp).
+ * Unk80060F94_G0: the global behind lbl_806192E0; its +4 is the same
+ * Unk8005DF2C_O6F8 record as ctx->m130->m44C->m6F8 (->m14 is the array of
+ * 0xE64-byte records indexed by +0x708 of the Ctx's m3B0 object).
  */
-struct Unk80060F94_G1;
 struct Unk80060F94_G0;
-
-struct Unk80060F94_G1 {
-    char pad0[0x14];
-    Unk8005DF2C_Y* m14;
-};
 
 struct Unk80060F94_G0 {
     char pad0[0x4];
-    Unk80060F94_G1* m4;
+    Unk8005DF2C_O6F8* m4;
 };
 
 

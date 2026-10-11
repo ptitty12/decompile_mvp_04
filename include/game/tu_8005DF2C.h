@@ -186,7 +186,9 @@ struct Unk8005DF2C_O6F8C {
     int m1C;
     char pad20[0x8];
     int m28;
-    char pad2C[0x58];
+    char pad2C[0x4C];
+    int m78;
+    char pad7C[0x8];
     int m84;
 };
 

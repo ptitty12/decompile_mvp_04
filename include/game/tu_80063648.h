@@ -52,7 +52,9 @@ struct Unk800642F0 {
     void fn_80064AB0();
     void fn_80064BFC();
     void fn_80064D48();
+    void fn_80064F0C(Unk800642F0_Rec* r);
     void fn_80064F78();
+    int fn_800650C8(int key, int* out1, int* out2);
 
     int m0;
     int* m4;
