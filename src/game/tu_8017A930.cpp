@@ -345,6 +345,16 @@ int fn_8017C8C8(Unk8017A930_T* p)
     return p->m18;
 }
 
+int fn_8017C8D0(Unk8017A930_T* p)
+{
+    int r = 0;
+    int t = p->m4->m564->m14;
+    if (fn_8017D5F8(p) == 1 && fn_801A6D84(p->m4, 1)->m3D90 == 0 && t != 8 && t != 10 && t != 9) {
+        r = 1;
+    }
+    return r;
+}
+
 int fn_8017C94C(Unk8017A930_T* p)
 {
     return p->m414;
@@ -356,9 +366,50 @@ int fn_8017C954(Unk8017A930_T* p)
     return r->m1CCB + r->m1CCA * 4;
 }
 
+/* near-miss: retail ends with `cmpwi r3,0; li r3,0; beq; li r3,1; b end; li r3,0` (30 instrs); the
+ * return/flag spellings tried give 28 (4 slots differ). */
+int fn_8017CA14(Unk8017A930_T* p, int idx)
+{
+    Unk8017B0A4_Ctx* c = p->m4;
+    int off = idx * 0xE64;
+    Unk8017C954_Rec* r = (Unk8017C954_Rec*)((char*)c->m6F8->m14 + off);
+    if (r->m108 == 0 && r->m10C == 0 && p->m3DC == 2) {
+        if (fn_803272D0((char*)c + 0x50, 9) != 0) {
+            return 1;
+        }
+        return 0;
+    }
+    return 0;
+}
+
 void fn_8017CF00(Unk8017A930_T* p)
 {
     int old = p->m3DC;
     p->m3DC = 2;
     p->m3E0 = old;
+}
+
+/* near-miss: sub-then-clamp of m3E4 (g++ >? form, see PATTERNS). Retail spills four float parameters
+ * (k, lo, v, hi) in inline frames and compares in place; this spelling is one instruction short and
+ * the inline-frame spellings (4 tried) are 21+ slots off. */
+void fn_8017D22C(Unk8017A930_T* p)
+{
+    p->m3E4 = p->m3E4 - lbl_805CC8AC;
+    float t = p->m3E4;
+    t = !(t > lbl_805CC8B4) ? (t >? lbl_805CC8B0) : lbl_805CC8B4;
+    p->m3E4 = t;
+}
+
+int fn_8017D5F8(Unk8017A930_T* p)
+{
+    switch (p->m4->m564->m14) {
+    case 1:
+    case 2:
+    case 5:
+    case 6:
+    case 7:
+    case 11:
+        return 0;
+    }
+    return 1;
 }

@@ -8,7 +8,10 @@
  */
 
 struct Unk8017C954_Rec {
-    char pad0[0x1CCA];
+    char pad0[0x108];
+    int m108;
+    int m10C;
+    char pad110[0x1CCA - 0x110];
     unsigned char m1CCA;
     unsigned char m1CCB;
 };
@@ -29,8 +32,14 @@ public:
     virtual void fn_vslot7();
     virtual void fn_vslot8(int a);
 };
+struct Unk8017D5F8_Sub {
+    char pad0[0x14];
+    int m14;
+};
 struct Unk8017B0A4_Ctx {
-    char pad0[0x6C0];
+    char pad0[0x564];
+    Unk8017D5F8_Sub* m564;
+    char pad568[0x6C0 - 0x568];
     void* m6C0;
     char pad6C4[0x6CC - 0x6C4];
     Unk8017BE28_Obj* m6CC;
@@ -76,7 +85,6 @@ struct Unk8017EE24_T;
 void fn_8017EE24(Unk8017EE24_T* p);
 int fn_8017C6BC(Unk8017A930_T* p);
 void fn_8017C5F0(Unk8017A930_T* p, int a);
-int fn_8017D5F8(void* p);
 int fn_8018019C(void* p);
 int fn_801A57B8(void* p);
 void fn_80252460(void* p);
@@ -204,6 +212,16 @@ void fn_801DBDA4(void* p);
 void fn_80258070(void* p);
 void fn_80178F10(void* p);
 void fn_8017696C(void* p);
+int fn_8017D5F8(Unk8017A930_T* p);
+struct Unk8017C8D0_Obj {
+    char pad0[0x3D90];
+    int m3D90;
+};
+Unk8017C8D0_Obj* fn_801A6D84(void* ctx, int a);
+int fn_803272D0(void* p, int a);
+extern const float lbl_805CC8AC;
+extern const float lbl_805CC8B0;
+extern const float lbl_805CC8B4;
 void fn_80176B90(char* p);
 void fn_80176F04(char* p);
 void fn_8017671C(char* p);
