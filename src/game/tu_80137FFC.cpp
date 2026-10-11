@@ -16,7 +16,7 @@ struct UnkDC : UnkDC_Data {
     virtual void fn_vslot3();
     virtual void fn_vslot4();
     virtual int fn_vslot5();
-    virtual void fn_vslot6();
+    virtual void fn_vslot6(int a);
     virtual void fn_vslot7();
     virtual void fn_vslot8();
     virtual void fn_vslot9();
@@ -263,6 +263,62 @@ int fn_802D7CE0(int a, int b);
 void fn_80138AFC(Scr* x);
 void fn_80138B60(Scr* x, int a);
 void fn_800EEB2C(Unk800C7B40_Widget* w);
+}
+/* Widget-like object with its vptr at +0x3C whose slot 30 takes just a name. */
+struct Unk8013B218_Data {
+    char pad0[0x3C];
+};
+struct Unk8013B218_W : Unk8013B218_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30(const char* name);
+};
+extern const char lbl_805BC1A8[];
+extern const char lbl_805BA714[];
+extern const char lbl_805BD07C[];
+extern const char lbl_805C1A7C[];
+extern "C" {
+int fn_8007D050(void* g, int a, int b);
+int fn_8007D614(void* g, int a);
+int fn_8007D658(void* g, int a);
+int fn_8007D69C(void* g, int a);
+int fn_8007D6E0(void* g, int a);
+int fn_804089B4(char* dst, const char* fmt, ...);
+}
+extern const char lbl_805BF974[];
+extern const char lbl_805C0E04[];
+extern const char lbl_805C0E10[];
+extern "C" {
+int fn_8007AA84(void* g, int a, int b, int c);
+unsigned fn_8007E0E4(void* g, int a, int b);
+
 }
 
 struct UnkW140 : Unk800C7B40_Widget {
@@ -650,6 +706,36 @@ extern "C" void fn_801396B4(Scr* x, int a)
     fn_800D0074((char*)x->m174 + 0x98, a, 0);
 }
 
+/* near-miss: 146/146 insns, 17 slots differ; retail keeps cnt/n/i/g in r23/r24/r25/r26 (here r24/r25/r27/r26), a callee-saved-register priority difference; the guarded while loop shape matches */
+extern "C" void fn_80139760(Scr* x)
+{
+    unsigned i = 0;
+    void* g = lbl_8061930C;
+    x->m5DC = ((Unk80139ADC_Sub*)((char*)x->m15C + 0x98))->fn_vslot21();
+    int cnt = x->m154->fn_vslot60();
+    UnkDC* d = (UnkDC*)((char*)fn_800C8058(fn_800C8044(x->fn_vslot32(lbl_805BF974, 1))->fn_vslot32(lbl_805C0E04, 1)) + 0xDC);
+    d->fn_vslot6(x->m5D8);
+    unsigned n = fn_8007E0E4(g, x->m5DC, x->m5D8);
+    {
+        while (i < n) {
+            char buf1[80];
+            char buf2[36];
+            unsigned next = i + 1;
+            void* t = fn_8007DF5C(g, x->m5DC, x->m5D8, i);
+            i = next;
+            fn_800DE440(buf1, t, 1);
+            x->m154->fn_vslot43(next, 0, buf1, 5);
+            int a = fn_8007AA84(g, 0, (int)t, 0);
+            fn_804089B4(buf2, lbl_805C0E10, a, fn_8007AA84(g, 0, (int)t, 1));
+            x->m154->fn_vslot44(next, 1, buf2, 4);
+        }
+    }
+    x->m154->fn_vslot105(1);
+    x->m154->fn_vslot68(cnt);
+    x->m154->fn_vslot14(1);
+    fn_801399A8(x);
+}
+
 /* near-miss: 75/75 insns, one swap: retail emits mr r4,r28 before addi r3,r1,8 for fn_800DE440(buf, o, 1) */
 extern "C" void fn_801399A8(Scr* x)
 {
@@ -781,6 +867,34 @@ extern "C" void fn_8013B0AC(Scr* x)
     } else {
         fn_80125180(w, 0, 0x416F);
     }
+}
+
+extern "C" void fn_8013B218(Scr* x)
+{
+    void* g = lbl_8061930C;
+    char buf[400];
+    fn_804089B4(buf, lbl_805BC1A8, fn_8007D050(g, (int)x->m150, 8));
+    ((Unk8013B218_W*)fn_800C8040(((Unk800C7B40_Widget*)x->m138)->fn_vslot32(lbl_805BA714, 1)))->fn_vslot30(buf);
+    int n;
+    switch ((int)x->m134) {
+    case 0:
+        n = fn_8007D69C(g, (int)x->m150);
+        fn_804089B4(buf, lbl_805BD07C, n, 0x3F);
+        break;
+    case 1:
+        n = fn_8007D614(g, (int)x->m150);
+        fn_804089B4(buf, lbl_805BD07C, n, 0x77);
+        break;
+    case 2:
+        n = fn_8007D6E0(g, (int)x->m150);
+        fn_804089B4(buf, lbl_805BD07C, n, 2);
+        break;
+    case 3:
+        n = fn_8007D658(g, (int)x->m150);
+        fn_804089B4(buf, lbl_805BD07C, n, 0xF);
+        break;
+    }
+    ((Unk8013B218_W*)fn_800C8040(x->m140->fn_vslot32(lbl_805C1A7C, 1)))->fn_vslot30(buf);
 }
 
 extern "C" void fn_8013BB2C(Scr* x)
