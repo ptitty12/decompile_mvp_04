@@ -160,6 +160,7 @@ int fn_8031DB3C(const char* s) { return fn_8037CE98(fn_8037C7FC(), 0xE33E6A08, s
 
 FxK* fn_8031DB7C() { return fn_8031D988((FxK*)operator new(0x20, lbl_806EF9B4)); }
 
+/* near-miss: retail reloads the clamp constants (lis) for every field; ours CSEs them */
 void fn_8031DBAC(FxK* self) {
     self->m4 = self->m4 > lbl_805EA720 ? lbl_805EA720 : (self->m4 >? lbl_805EA724);
     self->m8 = self->m8 > lbl_805EA720 ? lbl_805EA720 : (self->m8 >? lbl_805EA724);
@@ -167,6 +168,7 @@ void fn_8031DBAC(FxK* self) {
     self->m10 = self->m10 > lbl_805EA720 ? lbl_805EA720 : (self->m10 >? lbl_805EA724);
 }
 
+/* near-miss: clamp of a float parameter: retail compares in f0/f13 the other way round */
 void fn_8031DC94(FxK* self, FxK* other, float* o1, float* o2, float* o3, float* o4, float t) {
     if (other == 0) {
         *o1 = self->m4;
@@ -278,6 +280,7 @@ void fn_8031E1D4(FxL* self, const char* a) {
     }
 }
 
+/* near-miss: stack layout: retail has the packed int at sp+8 and the color at sp+16; fmr chain */
 void fn_8031E23C(FxL* self) {
     if (self->m8 == 0) self->m8 = fn_80314740(lbl_8061FEDC);
     FxColor col;
@@ -309,6 +312,7 @@ float fn_8031E6E4(FxL* self) {
 
 float fn_8031E86C() { return lbl_805EA7B0; }
 
+/* near-miss: retail loads lbl_805EA7C8 before lbl_805EA7CC */
 void fn_8031E960(FxL* self) {
     fn_8031E6E4(self);
     float v = lbl_805EA7C0;
