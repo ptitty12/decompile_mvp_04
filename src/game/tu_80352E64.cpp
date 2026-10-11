@@ -17,7 +17,7 @@ extern char lbl_8064A5F0[];
 struct DtorAt18 { char pad[0x18]; const void* m; };
 extern char lbl_8064A550[];
 struct DtorAt10 { char pad[0x10]; const void* m; };
-struct Unk803536B0 { int m0; Unk80353234 m4; const void* m14; unsigned char m18[10]; int m24; unsigned char m28[0xC]; char m34[1]; };
+extern char lbl_8064B218[];
 extern char lbl_80649DA0[];
 struct DtorAt4 { char pad[0x4]; const void* m; };
 
@@ -296,6 +296,16 @@ void fn_803536B0(Unk803536B0* s)
     for (int i = 0; i < 10; i++)
         s->m18[i] = 0xff;
     s->m24 = 0;
+}
+
+void fn_8009619C(void* p);
+void fn_803536B0(Unk803536B0* s);
+Unk803536B0* fn_803537FC(Unk803536B0* s)
+{
+    s->m4.Init(s->m28, 9, lbl_8064B218);
+    fn_803536B0(s);
+    fn_8009619C(s->m34);
+    return s;
 }
 
 struct Unk80353870 {

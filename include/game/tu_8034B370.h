@@ -98,6 +98,30 @@ struct Unk803541D4_E {
     int m18;
     int m1C;
     int m20;
+    inline int EqLo(const Unk803541D4_E& o) const
+    {
+        int r = 0;
+        if (m8 == o.m8)
+            r = mC == o.mC;
+        return r;
+    }
+    inline int Eq(const Unk803541D4_E& o) const
+    {
+        int lo = EqLo(o);
+        int r = 0;
+        if (o.m0 == m0 && lo)
+            r = 1;
+        return r;
+    }
+    inline int EqAll(const Unk803541D4_E& o) const
+    {
+        int r = 0;
+        if (o.m1C == m1C && m20 == o.m20) {
+            if (Eq(o))
+                r = 1;
+        }
+        return r;
+    }
 };
 struct Unk803541D4 {
     Unk803541D4_E* m0;
@@ -141,6 +165,21 @@ struct Unk80355414_E {
     int m10;
     int m14;
     int m18;
+    inline int EqLo(const Unk80355414_E& o) const
+    {
+        int r = 0;
+        if (m8 == o.m8)
+            r = mC == o.mC;
+        return r;
+    }
+    inline int Eq(const Unk80355414_E& o) const
+    {
+        int lo = EqLo(o);
+        int r = 0;
+        if (o.m0 == m0 && lo)
+            r = 1;
+        return r;
+    }
 };
 struct Unk80355414 {
     Unk80355414_E* m0;
@@ -174,6 +213,68 @@ struct Unk80353930 {
     Unk80353930();
 };
 void fn_80355354(Unk80353930* z);
+
+/* Rings with a vptr at +0x10 whose virtual 3 returns the current element by
+ * value (fn_80354430, fn_80355608). */
+struct Unk80355608 : Unk80355414 {
+    virtual void v1();
+    virtual void v2();
+    virtual Unk80355414_E v3();
+};
+struct Unk80354430 : Unk803541D4 {
+    virtual void v1();
+    virtual void v2();
+    virtual Unk803541D4_E v3();
+};
+/* Rings that carry a vptr slot at +0x10 and are initialised over inline
+ * storage (fn_803537FC byte ring, fn_80353A9C / fn_80353B3C int rings). The
+ * Init() inline gives the sub-object pointer plus the offset-0 fold. */
+struct Unk803537FC_R {
+    unsigned char* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+    const void* m10;
+    inline void Init(unsigned char* buf, int n, const void* vt)
+    {
+        m10 = vt;
+        m0 = buf;
+        m8 = n;
+        fn_8040074C(m0, n);
+        m4 = 0;
+        mC = 0;
+    }
+    inline void Clear()
+    {
+        fn_8040074C(m0, m8);
+        m4 = 0;
+        mC = 0;
+    }
+};
+struct Unk803536B0 {
+    int m0;
+    Unk803537FC_R m4;
+    unsigned char m18[10];
+    int m24;
+    unsigned char m28[0xC];
+    char m34[1];
+};
+struct Unk80353A9C_R {
+    int* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+    const void* m10;
+    inline void Init(void* buf, int n, int bytes, const void* vt)
+    {
+        m10 = vt;
+        m0 = (int*)buf;
+        m8 = n;
+        fn_8040074C(m0, bytes);
+        m4 = 0;
+        mC = 0;
+    }
+};
 
 extern "C" void fn_80377408(void* p);
 extern "C" void fn_80377488(void* p);
