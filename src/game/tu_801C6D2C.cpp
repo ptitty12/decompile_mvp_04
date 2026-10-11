@@ -25,6 +25,7 @@ float fn_801C8CF4(Z* z);
 float fn_801C8AC0(Z* z);
 float fn_801C8A04(Z* z);
 float fn_801C8DB0(Z* z);
+void fn_801C93BC(Z* z, float a, float b, float c, float d);
 }
 
 extern "C" void fn_801C6D2C(Z* z, float f)
@@ -91,6 +92,15 @@ extern "C" float fn_801C8FB8(Z* z)
         break;
     }
     return r;
+}
+
+/* near-miss: two instructions swapped (retail stores the RandF scale slot before reloading x). */
+extern "C" void fn_801C90AC(Z* z)
+{
+    float x = fn_801C8FB8(z);
+    const float a = 43.0f;
+    const float b = 25.0f;
+    fn_801C93BC(z, x, RandF(z->m204->m554, 1.0f, 0x10CC), a, b);
 }
 
 extern "C" void fn_801C97AC(Z* z)
