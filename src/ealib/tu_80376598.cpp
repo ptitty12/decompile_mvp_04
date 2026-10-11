@@ -3,11 +3,9 @@
  * Registers one static node (5 words, intrusive list, ctor 0x803DA440) whose
  * arguments are a creator function and three data tables.
  *
- * Compiler flags: the two functions below only reproduce retail's loop
- * hoisting, scheduling and register choices at -O2; at the configured -Os they
- * do not (see the notes above each function). GXWGFifo (0xCC008000) is an
- * extern symbol: retail has lis 0xcc01 / -0x8000(rX) for it, which gcc 2.95
- * only produces for a symbol reference (a literal address gives lis/ori).
+ * GXWGFifo (0xCC008000) is an extern symbol: retail has lis 0xcc01 /
+ * -0x8000(rX) for it, which gcc 2.95 only produces for a symbol reference (a
+ * literal address gives lis/ori and different loop hoisting).
  */
 
 class Unk803DA440 {
@@ -82,7 +80,7 @@ extern int lbl_8062C664;
 
 struct Unk803DBE08Out {
     int m0;
-    int pad[7];
+    int m4;
     inline Unk803DBE08Out(void* state);
     inline void Begin(int n);
     inline void StoreHdr(int per);
@@ -154,13 +152,15 @@ inline void Unk803DBE08Out::Begin(int n)
 }
 
 /*
- * near-miss: at -O2 the instruction sequence is identical to retail except
- * that retail keeps &v (the Unk803DBE08Out on the stack) in two registers
- * (addi r31,r1,72; mr r4,r31; mr r22,r31, then lbz 3(r31) / lbz 3(r22)) while
- * this version folds it to sp-relative addressing (addi r4,r1,72; lbz 75(r1)).
- * That one difference shifts every callee-saved register after the call.
- * Tried: ctor + inline members (this), inline Init() returning the pointer,
- * explicit pointer locals, Setup() method, object at function scope.
+ * near-miss (-O2): 449/449 instructions, ~98% in objdiff. Remaining
+ * differences: in the two default-case index loops (b->m0 not 1..4) retail
+ * has i in r9 and j in r11, this has them swapped; and "li r25,1" / "mr r4,r28"
+ * are in the other order in the first-chunk call. GXWGFifo relocs also differ
+ * from retail's raw lis 0xcc01 immediates.
+ * What mattered: Unk803DBE08Out must be 8 bytes (frame layout), inline ctor and
+ * members for the &v register pair, "per = a / b; per = per / 12 * 12;" as two
+ * statements, "n *= m; n += 3;" in the tails, the if/else chain (not a switch),
+ * unsigned char i with an int "next" temp in the fill loop.
  */
 extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
 {
@@ -207,7 +207,8 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
         Unk803DBE08Out v(b->m4);
         int n = *(int*)a->m0[0].m4;
         if (lbl_8062C660) {
-            int per = (lbl_8062C664 - 3) / b->m0 / 12 * 12;
+            int per = (lbl_8062C664 - 3) / b->m0;
+            per = per / 12 * 12;
             fn_803DB9C0(b->m8, 2);
             if (*(int*)lbl_8062C660 == -1) {
                 v.StoreHdr(per);
@@ -268,7 +269,8 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
                     }
                 }
             }
-            n = n * b->m0 + 3;
+            n *= b->m0;
+            n += 3;
             while (n & 0x1f) {
                 n++;
                 GXWGFifo.u8 = 0;
@@ -300,7 +302,8 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
                     }
                 }
             }
-            n = (n + n) * b->m0 + 3;
+            n = (n + n) * b->m0;
+            n += 3;
             while (n & 0x1f) {
                 n++;
                 GXWGFifo.u8 = 0;
@@ -309,7 +312,6 @@ extern "C" void fn_80376598(Unk803E3C08* a, Unk80623E94* b)
     }
 }
 
-/* Matches retail at -O2 (diff_unit equivalent); at -Os it does not. */
 extern "C" void fn_80376C9C(void* x)
 {
     Unk803E3C08 a;
