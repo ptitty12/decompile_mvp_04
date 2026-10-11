@@ -221,4 +221,16 @@ FE_OVERLAY void fn_80463FE0(FeScrE* x, int a)
     x->m13C->fn_vslot14(a);
 }
 
+
+FE_OVERLAY FeScrF* fn_80464030(FeScrF* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_8067AB18);
+    self->m130 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 1;
+    self->m144 = 0;
+    return self;
+}
 }

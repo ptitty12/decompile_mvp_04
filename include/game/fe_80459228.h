@@ -234,14 +234,43 @@ FePair fn_8045A9C0(FeScrA* x, int idx);
 FePair fn_8045AAB4(FeScrA* x, int idx);
 }
 
-/* Singleton at lbl_8061A32C (0xD8 bytes, ctor fn_800B64BC). */
+/* Singleton at lbl_8061A32C (0xD8 bytes, ctor fn_800B64BC), created lazily. */
 struct FeMsgMgr {
     char padB8[0xB8];
     int mB8;
 };
 extern FeMsgMgr* lbl_8061A32C;
+extern "C" FeMsgMgr* fn_800B64BC(void* p);
+inline FeMsgMgr* FeGetMgr()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    }
+    return lbl_8061A32C;
+}
+/* Message / popup widget looked up by name through the manager (fn_800B7AB8). */
+struct FeMsg {
+    char name[16];
+};
+struct FePopup : FeW {
+    char pad40[0x30C - 0x40];
+    void* m30C;
+};
+struct FeGlobal80619948 {
+    char pad0[0x58];
+    int m58;
+    char pad5C[0x80 - 0x5C];
+    int m80;
+};
+extern FeGlobal80619948* lbl_80619948;
 extern "C" {
-FeMsgMgr* fn_800B64BC(void* p);
+void fn_8035682C(FeMsg* m);
+char* fn_8040B830(char* dst, const char* src, unsigned n);
+void fn_800B7B4C(FeMsgMgr* mgr, FeMsg* m, void* ctx);
+FePopup* fn_800B7AB8(FeMsgMgr* mgr, const char* name);
+void fn_8054899C(int v);
+}
+extern "C" {
 void fn_800B7ADC(FeMsgMgr* m, void* s);
 void fn_80125084(void* w, int a);
 void fn_80125100(void* w);
@@ -313,6 +342,8 @@ struct FeState {
     int m570;
     char pad574[8];
     int m57C;
+    char pad580[0x638 - 0x580];
+    int m638;
 };
 extern "C" FeState* fn_800B555C();
 extern "C" void fn_800ED254(void* x);
@@ -387,6 +418,84 @@ void fn_80463D60(FeScrE* x, FeW* w);
 void fn_80463044(FeScrE* x);
 int fn_80463CE4(FeScrE* x);
 void fn_804637FC(FeScrE* x);
+}
+
+/* Menu screen (ctor fn_80464030, vtable lbl_8067AB18). */
+struct FeScrF : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    FeW* m138;
+    int m13C;
+    int m140;
+    char* m144;
+};
+extern const char lbl_805F4F0C[];
+extern const char lbl_805F5284[];
+extern const char lbl_805F528C[];
+extern const char lbl_805F522C[];
+extern const char lbl_805F5894[];
+extern int lbl_8061A328;
+extern "C" {
+void fn_800ECAA4(void* x);
+int fn_80360ED8(char* p);
+void fn_80548EC0(char* p);
+void fn_80548E68(char* p, int v);
+void fn_8049AB94(FePopup* p);
+void fn_8049ABD4(FePopup* p);
+void fn_8046468C(FePopup* p);
+void fn_80464AF0(void* x);
+void fn_80464B60(void* x);
+void fn_80464C94();
+void fn_80464D68(void* x);
+void fn_8046488C(int a, void* x);
+void fn_80464A0C(int a, void* x);
+void fn_80449168(FePopup* p, int a, void* x, void (*cb)(void*));
+void fn_80131F34(FeW* w, void* self, void (*cb)(int, void*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
+}
+
+/* Menu screens with the 804D2AC0 base ctor (vtables lbl_80679BF0, lbl_80679920), the
+ * 0x130-field screen of lbl_80679678 and the screen of lbl_80681C88. */
+struct FeScrG : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[8];
+    int m13C;
+};
+struct FeScrH : FeW {
+    char pad40[0xF0];
+    int m130;
+};
+struct FeScrI : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[0x16C - 0x134];
+    int m16C;
+    char pad170[0x208 - 0x170];
+    int m208;
+    int m20C;
+    int m210;
+};
+extern const char lbl_8062167C[];
+extern const char lbl_80621714[];
+extern const char lbl_80679BF0[];
+extern const char lbl_80679920[];
+extern const char lbl_80679678[];
+extern const char lbl_80681C88[];
+extern const char lbl_8067AB18[];
+extern const char lbl_805F4F84[];
+extern const char lbl_805F3CA8[];
+extern int lbl_8061A308;
+extern "C" {
+void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const char* l);
+void fn_804D3164(void* x);
+void fn_804D2DC0(void* x, int v);
+void fn_804D32A0(void* x);
+void fn_800ECF18(void* x);
+void* fn_800B7A94(FeMsgMgr* m, const char* name);
+void fn_80124FA8(void* w, void* x);
+void fn_801250D8(void* w);
+void fn_800A2030(FeGlobal80619948* g, int v);
 }
 
 #endif
