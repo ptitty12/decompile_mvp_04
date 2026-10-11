@@ -220,7 +220,12 @@ int fn_80323830() { return lbl_8062014C; }
 
 int fn_8032383C() { return 0xE33E6A08; }
 
-/* near-miss: same as fn_80323848 */
+float fn_80323848(FxV* self) {
+    if (self->m44 == 0 && self->m48 != 0) return fn_80323848(self->m48);
+    return self->m4C;
+}
+
+/* near-miss: same as the neighbouring function */
 float fn_8032388C(FxV* self) {
     if (self->m44 == 0 && self->m48 != 0) return fn_8032388C(self->m48);
     return self->m50;
