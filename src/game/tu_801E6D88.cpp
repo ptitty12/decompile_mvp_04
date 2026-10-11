@@ -62,7 +62,19 @@ P* fn_801A497C(Unk801DB948_Game* g, int a, int b);
 int fn_802D7DB4(int a, int b);
 int fn_8020543C(Unk801DD660_Ctx* c);
 void fn_802053AC(Unk801DD660_Ctx* c);
+void fn_80253950(void* o, void* a);
+void fn_80253A30(void* o, void* a, void* b);
+void fn_801F5FD4(I* s, void* a);
 }
+
+struct Unk801EA03C_A {
+    char pad0[0x5B8];
+    int m5B8;
+};
+struct Unk801EA03C_Obj {
+    char pad0[0x580];
+    char m580[1];
+};
 
 extern "C" void fn_801E6E48(I* s, int chrg)
 {
@@ -396,4 +408,29 @@ extern "C" int fn_801E9E94(I* s)
     if ((unsigned)(c->m30 - 5) <= 2 || c->m44 == 1)
         return 1;
     return fn_8020543C(c) > 2;
+}
+
+/* near-miss: GCC shares the cur != -1 compare across the first call (cmpwi cr4 + mfcr/mtcrf), retail recomputes it (3 insns) */
+extern "C" void fn_801EA03C(I* s, Unk801EA03C_A* a, P* p, int k)
+{
+    if (p != 0) {
+        int v = p->m460;
+        Unk801DD660_Hist* h = &s->mAC;
+        if (v != h->m0) {
+            h->m4 = h->m0;
+            h->m0 = v;
+        }
+    }
+    int cur = s->mAC.m0;
+    if (cur != -1 && k != 6) {
+        Unk801EA03C_Obj** tbl = (Unk801EA03C_Obj**)((char*)s->m9C + 8);
+        fn_80253950(tbl[cur]->m580, a);
+    }
+    int prev = s->mAC.m4;
+    if (prev != -1 && cur != -1 && k != 6) {
+        Unk801EA03C_Obj** tbl = (Unk801EA03C_Obj**)((char*)s->m9C + 8);
+        fn_80253A30(tbl[prev]->m580, a, tbl[cur]);
+    }
+    if (a->m5B8 != -1)
+        fn_801F5FD4(s, a);
 }
