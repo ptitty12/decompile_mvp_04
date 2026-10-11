@@ -4,9 +4,14 @@
  */
 
 
+extern int lbl_8061930C;
+extern "C" void fn_805909D4(int a);
+extern "C" int fn_8007F7D0(int g, int a);
+extern "C" void fn_8007B320(int g, int a, int b);
+extern "C" void fn_80552054();
 extern "C" void* fn_805535A4(void* mem);
 extern "C" void fn_805536B4(void* p);
-extern int lbl_8061930C;
+extern "C" int fn_8007F9E8(int g);
 extern "C" int fn_8007F9B4(int a);
 extern "C" int fn_80566674(void* p);
 extern "C" int fn_80566520(void* p);
@@ -19,6 +24,50 @@ extern "C" int fn_800A55A4(void* p, int a, int b, int* c, int* d);
 extern "C" int fn_805701E4(void* p);
 extern "C" void fn_8006BE18(int a);
 extern "C" void fn_80081D88(int a);
+extern const float lbl_805B5DF0;
+extern const float lbl_805B5DF4;
+extern int lbl_8061994C;
+extern float lbl_80619950;
+extern const float lbl_805FF3E4;
+extern "C" float fn_8055248C(int x);
+
+/* state object of the game flow (fields seen in the unit: +0x70..+0x98) */
+struct Unk800A2688 {
+    char pad0[0x70];
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+};
+
+extern "C" void fn_800A6618(Unk800A2688* p, int a);
+extern "C" void fn_800A6484(Unk800A2688* p);
+
+extern "C" void fn_800A2688(Unk800A2688* p)
+{
+    fn_805909D4(*(int*)(lbl_8061930C + 0x30));
+    int t = fn_8007F7D0(lbl_8061930C, 0);
+    fn_8007B320(lbl_8061930C, 0, t);
+    fn_80552054();
+    fn_800A6618(p, 1);
+    p->m7C = p->m78;
+    p->m78 = 2;
+    p->m84 = fn_8007F9B4(lbl_8061930C) + 1;
+    p->m88 = -1;
+    p->m90 = -1;
+    p->m94 = -1;
+    p->m8C = -1;
+    p->m98 = 0;
+    fn_800A6484(p);
+    p->m70 = 1;
+}
 
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
 
@@ -35,6 +84,21 @@ extern "C" void fn_800A286C(Unk800A286C* p)
         p->m24 = fn_805535A4(operator new(0x33F4, 0x100));
     fn_805536B4(p->m24);
     p->mE8 = 0;
+}
+
+extern "C" void fn_800A2948(Unk800A2688* p)
+{
+    if (p->m74 != 2) {
+        int old = p->m84;
+        int g = lbl_8061930C;
+        p->m84 = fn_8007F9B4(g);
+        p->m88 = fn_8007F9E8(g);
+        p->m98 = p->m84 - old;
+        p->m8C = p->m84;
+        p->m90 = -1;
+        p->m94 = -1;
+        p->m74 = 1;
+    }
 }
 
 extern "C" void fn_800A2AE8() { fn_8007F9B4(lbl_8061930C); }
@@ -252,6 +316,33 @@ extern "C" void fn_800A3640(Unk800A3640* p) { fn_805700C0(p->m4C, lbl_806192E0->
 extern "C" void fn_800767DC(int a, Unk800A3604_Q* b);
 
 extern "C" void fn_800A3910() { fn_800767DC(lbl_8061930C, lbl_806192E0->m4); }
+
+struct Unk800A39C4 {
+    char pad0[0x9C];
+    int m9C;
+    float mA0;
+};
+
+extern "C" float fn_800A39C4(Unk800A39C4* p, int x);
+
+extern "C" float fn_800A3944(Unk800A39C4* p, int x, int kind)
+{
+    float r = lbl_805B5DF0;
+    r = (fn_800A39C4(p, x) - lbl_805B5DF4) * 2.0f;
+    if (lbl_8061994C != 0)
+        r = lbl_80619950;
+    if (kind == 1)
+        r = -r;
+    return r;
+}
+
+extern "C" float fn_800A39C4(Unk800A39C4* p, int x)
+{
+    if (p->m9C == 1)
+        return p->mA0;
+    float t = fn_8055248C(x);
+    return t / lbl_805FF3E4;
+}
 
 struct Unk800A3AB0_Q {
     char padDBC[0xDBC];
