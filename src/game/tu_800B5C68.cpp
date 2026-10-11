@@ -80,6 +80,12 @@ extern const char lbl_805BA46C[];
 extern const char lbl_805BA474[];
 extern const char lbl_805BA488[];
 extern int lbl_8061A324;
+struct Unk80090880;
+struct FEUsh {
+    unsigned short m0;
+};
+FEUsh* fn_80090880(Unk80090880* o, int id);
+extern Unk80090880* lbl_8061977C;
 extern const char lbl_805C2E58[];
 extern const char lbl_805BA218[];
 extern int lbl_8061A334;
@@ -184,6 +190,8 @@ Unk800B555C* fn_800B555C();
 void fn_800B80A4(void* self, unsigned a);
 int fn_802D7DB4(int a, int b);
 void fn_80377408(void* p);
+void* fn_803774A8(unsigned n, int heap);
+char* fn_804031BC(unsigned short* d, const char* s);
 void fn_80378C5C(const char* s, unsigned len, char* out, int size, int delim, int flag, unsigned* used);
 void fn_804089B4(char* dst, const char* fmt, ...);
 void fn_800C17D4(FEObj68* p);
@@ -209,6 +217,9 @@ Unk8031CECC* fn_8031D6B0(Unk8031CECC* o);
 
 
 
+
+
+
 /* ---- unit prototypes ---- */
 extern "C" {
 int fn_800B5C68();
@@ -223,6 +234,7 @@ void fn_800B5EF0(FEList* self, int c);
 void fn_800B5F90(FEList* self, const char* p);
 FEElem* fn_800B622C(FEElem* self);
 void fn_800B62FC(FEElem* self, int c);
+void fn_800B6384(FEElem* self, const char* s);
 void fn_800B6458(FEV64* self, const char* a);
 FEMgr* fn_800B64BC(FEMgr* self);
 void fn_800B6560(FEMgr* self, int c);
@@ -236,7 +248,7 @@ void fn_800B7A94(FEMgr* p, const char* s);
 void fn_800B7AB8(FEMgr* p, const char* s);
 void fn_800B7ADC(FEMgr* self, FEV3C* obj);
 int fn_800B7CDC(void* self, int a, int b);
-void fn_800B7FC4();
+void fn_800B7FC4(FEMgr* mgr);
 void fn_800B8044(FEMgr* self);
 void fn_800B80A4(void* self, unsigned a);
 void fn_800B8108();
@@ -378,6 +390,25 @@ extern "C" void fn_800B62FC(FEElem* self, int c)
     if (c & 1) {
         fn_80377408(self);
     }
+}
+
+extern "C" void fn_800B6384(FEElem* self, const char* s)
+{
+    int off = self->m34 * 4;
+    *(unsigned short**)((char*)self + off) = (unsigned short*)fn_803774A8((fn_8040B6A0(s) + 1) * 2, 0x100);
+    fn_804031BC(self->m[self->m34], s);
+    unsigned short* p = self->m[self->m34];
+    while (*p != 0) {
+        int c = *p;
+        if (c == 0xA || c == 0xD) {
+            *p = 0x20;
+        }
+        if (*p == 0x99) {
+            *p = fn_80090880(lbl_8061977C, 0x337E)->m0;
+        }
+        p++;
+    }
+    self->m34 = self->m34 + 1;
 }
 
 extern "C" void fn_800B6458(FEV64* self, const char* a)
@@ -526,7 +557,7 @@ extern "C" int fn_800B7CDC(void* self, int a, int b)
     return t;
 }
 
-extern "C" void fn_800B7FC4()
+extern "C" void fn_800B7FC4(FEMgr* mgr)
 {
     UiMsgBuf m;
     UiMsgBuf* p = &m;
