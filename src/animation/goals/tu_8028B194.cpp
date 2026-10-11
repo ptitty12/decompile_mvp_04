@@ -201,6 +201,38 @@ Unk8028B194* Unk8028B194::fn_8028B51C(float a)
     return this;
 }
 
+/* fn_8028B56C (0x8028B56C, 0x84C bytes, 531 instructions) is not attempted: it is
+ * the goal's per-frame update, int fn_8028B56C(Unk80270BA0_X* x), returning 0..3.
+ * Outline from the asm, for whoever picks it up:
+ *  - prologue: ang = &x->m734 (Unk8028B194_Angles view); f = fn_8027A928(this);
+ *    "if (ang->m190 == 1) ang->m60[0] = f; ang->m60[ang->m190] = f;" (the same
+ *    mirror write is repeated for m98 and m48 further down);
+ *    ctx = x->m44C; time = (float)ctx->m4C * (1/60); obj = ctx->m6CC->m36C converted
+ *    to Unk80270BA0_Obj* (null-checked +0x5F0, address taken: 0x140(r1)), then
+ *    other = obj ? obj->fn_vslot1() : 0.
+ *  - fn_8027AD3C(this, x, 0, &v, &f24, 0, 0, 0, 0) fills a vector and a float;
+ *    m6C = squared distance to m10 (dx*dx + dz*dz, 9999999 if m28 == 0).
+ *  - phase mC > 2 skips the first block. Block 1 (x->m5BC == 3): for goal ids
+ *    16/14/15 uses fn_8028DA0C(this, other) to set/clear mA8 bit 0x40000, calls
+ *    fn_8028C6B8 when bit 0x40000 changed; then fn_8028E788 decides between
+ *    fn_8028D200/fn_8028D808 (mA8 bit 0x200000) and "m48 = m4C; fn_8028C6B8".
+ *  - link->m838 == 0x5B23BCCF and m48 in {0x16,0x17,0x18}: fn_80382BD8(link, 0) < 0.9
+ *    or m6C > 3600 selects the exit; else fn_8028C264 / fn_8028E944 (-1 test).
+ *  - ids 2/0x16..0x19 with m2C: angle = atan2(...) (fn_80410CE8) normalised with
+ *    the AngleDiff pattern, written to m60 and the m98 mirror; mC clamped to >= 3;
+ *    fn_8028C560(m48, link->m838) picks the animation hash; m28/mA8 bit 0x400000
+ *    choose x->m93C = m10 or -1000; fn_803833B4/fn_803833F4 keep a handle in sync;
+ *    fn_80381E9C(link, hash, 0, 0) starts it and the function returns 1 unless
+ *    link->m838 changed.
+ *  - tail (mC > 2): m54 = time while mC <= 3; mC >= 4; with mA8 bit 0x100000 set
+ *    it runs fn_80386110 with a 0xC0-byte query record (the Unk8035EB7C pattern from
+ *    animation/choosers/tu_80279AE4.cpp) to compute a 0..1 ratio clamped into
+ *    ang->m48 (mirror write), then fn_8027C2D0(this, x, m78) (nonzero returns 2),
+ *    fn_8028BDB8 / fn_8028BFA8 with t = time - m54, and finally a
+ *    fn_8027A280(0)-based test that ends the goal (fn_8028B13C, fn_8028F440).
+ * Pool order (retail .rodata): 805DD6E8 (2^52+2^31 double), 805DD6F0 (1/60),
+ * 9999999, 0.9, 3600, 1/(2*pi), 0.5, 2*pi, -1000, -1, 1.5, 0, 1. */
+
 /* near-miss: 125 of 124 instructions (35 register-normalized diffs). Retail
  * keeps three distinct frame slots (0x18, 0x28, 0x38) for the vector
  * arguments of fn_803164C4 (twice) and fn_8024937C, with direct word stores;
