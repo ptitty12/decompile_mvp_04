@@ -141,6 +141,18 @@ extern "C" void fn_80400CE4(int a);
 Rec* fn_80082248();
 
 
+struct P8 {
+    int a;
+    int b;
+};
+extern P8 lbl_805B4244;
+extern P8 lbl_805B424C;
+void fn_80082A90(Node** root, Node** cur, P8* a, P8* b);
+
+
+void fn_800826D0(Node** root, Node** cur, P8* a, P8* b);
+
+
 Rec* fn_80082248()
 {
     int start = lbl_80619328;
@@ -215,6 +227,44 @@ void fn_80082510(Tree* self)
     self->m15F98 = 0;
     self->m0 = &lbl_8061932C;
     self->m4 = &lbl_8061932C;
+}
+
+void fn_80082840(Node** root, Node** cur)
+{
+    P8 a;
+    P8 b;
+    while (*cur != *root && (((*cur)->m0->mC & ~1) == 2)) {
+        Node* p = (*cur)->m0;
+        if (p == p->m0->m4) {
+            a = lbl_805B4244;
+            b = lbl_805B424C;
+            fn_800826D0(root, cur, &a, &b);
+        } else {
+            b = lbl_805B424C;
+            a = lbl_805B4244;
+            fn_800826D0(root, cur, &b, &a);
+        }
+    }
+    (*root)->mC = (*root)->mC & 1;
+}
+
+void fn_80082CB0(Node** root, Node** cur)
+{
+    P8 a;
+    P8 b;
+    while (*cur != *root && ((*cur)->mC & ~1) == 0) {
+        Node* x = *cur;
+        if (x == x->m0->m4) {
+            a = lbl_805B424C;
+            b = lbl_805B4244;
+            fn_80082A90(root, cur, &a, &b);
+        } else {
+            b = lbl_805B4244;
+            a = lbl_805B424C;
+            fn_80082A90(root, cur, &b, &a);
+        }
+    }
+    (*cur)->mC = (*cur)->mC & 1;
 }
 
 Node* fn_80082F4C(Tree* t, int key)
