@@ -15,6 +15,7 @@ m44C -> B (m6F8 -> C), C -> D (m10) and E (m14); E holds two 0xE64-byte
 per-side records and the flag m1CD0 that selects the side.
 */
 
+struct Unk80044C10_Obj590;
 struct Unk80044C10_Entry;
 struct Unk80044C10_Side;
 struct Unk80044C10_E;
@@ -27,6 +28,11 @@ struct Unk80048A10_Sub;
 struct Unk8004763C_Slot;
 struct Unk8004763C;
 struct Unk80044C98_Arg;
+
+struct Unk80044C10_Obj590 {
+    char pad0[0x590];
+    unsigned m590;
+};
 
 struct Unk80044C10_Entry {
     int m0;
@@ -70,7 +76,9 @@ struct Unk80044C10_B {
 struct Unk80044C10_A_Base {
     unsigned char m0;
     unsigned char m1;
-    char pad2[0x96];
+    char pad2[0x4E];
+    int m50;
+    char pad54[0x44];
 };
 
 class Unk80044C10_A_Vt : public Unk80044C10_A_Base {
@@ -105,9 +113,16 @@ class Unk80044C10_A : public Unk80044C10_A_Vt {
 public:
     char pad9C[0x94];
     Unk80044C10_A* m130;
-    char pad134[0x280];
+    char pad134[0x27C];
+    Unk80044C10_Obj590* m3B0;
     int m3B4;
-    char pad3B8[0x94];
+    char pad3B8[0x14];
+    int m3CC;
+    int m3D0;
+    char pad3D4[0x8];
+    int m3DC;
+    char pad3E0[0x68];
+    int m448;
     Unk80044C10_B* m44C;
     char pad450[0x8];
     int m458;
