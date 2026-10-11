@@ -259,8 +259,12 @@ struct FePopup : FeW {
 struct FeGlobal80619948 {
     char pad0[0x58];
     int m58;
-    char pad5C[0x80 - 0x5C];
+    char pad5C[0x74 - 0x5C];
+    int m74;
+    char pad78[0x80 - 0x78];
     int m80;
+    char pad84[0x8C - 0x84];
+    int m8C;
 };
 extern FeGlobal80619948* lbl_80619948;
 extern "C" {
@@ -469,9 +473,17 @@ struct FeScrH : FeW {
 struct FeScrI : FeW {
     char pad40[0xF0];
     int m130;
-    char pad134[0x16C - 0x134];
+    char pad134[4];
+    FeW* m138;
+    char pad13C[0x14C - 0x13C];
+    FeW* m14C;
+    char pad150[8];
+    FeW* m158;
+    char pad15C[0x16C - 0x15C];
     int m16C;
-    char pad170[0x208 - 0x170];
+    char pad170[0x17C - 0x170];
+    FeW* m17C;
+    char pad180[0x208 - 0x180];
     int m208;
     int m20C;
     int m210;
@@ -496,6 +508,141 @@ void* fn_800B7A94(FeMsgMgr* m, const char* name);
 void fn_80124FA8(void* w, void* x);
 void fn_801250D8(void* w);
 void fn_800A2030(FeGlobal80619948* g, int v);
+}
+
+/* Screen of lbl_80679128 (ctor fn_8046F770): m134 is the widget its nav buttons forward to. */
+struct FeScrK : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeW* m134;
+};
+/* Message dialog screen (vtable lbl_80678D58, ctor fn_8046FED8): m314 is the dialog kind, m30C
+ * the confirm callback, m324/m334/m338 its arguments. */
+struct FeScrL : FeW {
+    char pad40[0x29C];
+    int m2DC;
+    int m2E0;
+    int m2E4;
+    int m2E8;
+    int m2EC;
+    int m2F0;
+    int m2F4;
+    int m2F8;
+    int m2FC;
+    int m300;
+    char pad304[8];
+    void (*m30C)(int a, int b);
+    void (*m310)();
+    int m314;
+    int m318;
+    int m31C;
+    int m320;
+    int m324;
+    int m328;
+    float m32C;
+    int m330;
+    int m334;
+    int m338;
+    int m33C;
+    int m340;
+    int m344;
+    int m348;
+    int m34C;
+    int m350;
+    int m354;
+    int m358;
+};
+struct FeEvt {
+    char pad0[0xC];
+    char name[0x10];
+    int m1C;
+};
+struct FeObj138 {
+    char pad0[0x138];
+    int m138;
+};
+extern const char lbl_80679128[];
+extern const char lbl_805F5CB8[];
+extern const char lbl_805F4ED4[];
+extern const char lbl_805F5D84[];
+extern const char lbl_80678D58[];
+extern float lbl_805F5BEC;
+void fn_800E49A4();
+extern "C" {
+void fn_800A29C4(FeGlobal80619948* g, int v);
+void fn_800A2948(FeGlobal80619948* g, int v);
+int fn_800A2AE8(FeGlobal80619948* g);
+int fn_800C2208(void* p);
+void fn_80470E30(FeScrL* x, int a, int b, int c, int d);
+void fn_8047091C(FeScrL* x);
+void fn_80470C08(FeScrL* x, int c);
+void fn_80471D8C(FeScrL* x);
+void fn_8047083C(FeScrL* x);
+void fn_800A2B10(FeGlobal80619948* g);
+int fn_8040B574(const char* a, const char* b);
+void fn_800EAC30(void* x);
+void fn_800EC150(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+}
+
+/* Menu screen of lbl_806793D0 (ctor fn_8046C63C): m144 is its message dialog (FeScrL), m150 a name
+ * buffer written by fn_8046F3A8. */
+struct FeScrJ : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    FeW* m138;
+    char pad13C[4];
+    int m140;
+    FeScrL* m144;
+    int m148;
+    int m14C;
+    char m150[16];
+};
+struct FeObj144 {
+    char pad0[0x144];
+    int m144;
+};
+struct Unk8007F198_D;
+struct FeRet1E0 {
+    char pad0[0x1E0];
+    int m1E0;
+};
+FeRet1E0* fn_8007FE04(Unk8007F198_D* g);
+extern int lbl_8061A48C;
+extern const char lbl_805F5AA4[];
+extern const char lbl_805F5240[];
+extern const char lbl_805F5B68[];
+extern const char lbl_805F5B78[];
+extern "C" {
+void fn_80470710(FeScrL* x, int a);
+void fn_804705F0(FeScrL* x, int a, int b, int c);
+void fn_804704EC(FeScrL* x, int a, int b, int c, int d);
+void fn_80470558(FeScrL* x, int a, int b, int c, int d);
+void fn_8046DA10(FeScrJ* x);
+void fn_8046EB7C(FeScrJ* x);
+void fn_8046DC84(FeScrJ* x);
+void fn_8046D9E8(FeScrJ* x);
+void fn_8046F000(FeScrJ* x);
+void fn_8046F3A8(FeScrJ* x, const char* s);
+void fn_8049A760(FeScrL* x);
+void fn_8049A7E4(FeScrL* x);
+void fn_800E25E0(void* w, int a);
+}
+
+extern const char lbl_805F59C4[];
+extern const char lbl_805F5A38[];
+struct FeStr1 {
+    char c0;
+};
+extern FeStr1 lbl_805F36A0;
+extern const char lbl_806793D0[];
+extern "C" {
+FeW* fn_800C805C(FeW* w);
+void fn_8046BBC0(FeScrI* x, int a);
+int fn_8046C5C0(FeScrI* x);
+void fn_800C21D0(void* p);
+int fn_800C2248(void* p);
+void fn_800C2210(void* p);
 }
 
 #endif
