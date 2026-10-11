@@ -14,6 +14,7 @@ inline void* operator new(unsigned int, void* p) { return p; }
 
 // STRUCTS-BEGIN
 struct Vtx16 { float x; float y; float z; float w; };
+struct FxRec;
 /* Particle/effect-style object (vtable lbl_806658C0, vptr at +0x18).
  * Evidence: fn_80317B88 (dtor), fn_803188C4/fn_803188FC (slots at m124, counts m118..m120). */
 struct Fx {
@@ -129,7 +130,7 @@ public:
  * 0x14-byte entry of the two 5-element tables at FxC::a74 / FxC::aD8 (ctor fn_8031A7CC,
  * copy loop in fn_8031B2A8). */
 struct FxItem {
-    int m0;
+    FxRec* m0;
     float m4;
     float m8;
     float mC;
@@ -172,6 +173,135 @@ struct FxC {
     int m70;
     FxItem a74[5];
     FxItem aD8[5];
+};
+struct FxV3 { float x; float y; float z; };
+class FxEObj;
+/* Per-effect record of the FxD class (0x128 bytes; array at FxD::m24, kind at +0x38,
+ * rate floats at +0x30/+0x34, id at +0x20). Evidence: fn_8031B354, fn_8031B3E0, fn_8031C1E4. */
+struct FxRec2 {
+    char pad0[0x20];
+    int m20;
+    float m24;
+    int m28;
+    char pad2C[0x4];
+    float m30;
+    float m34;
+    int m38;
+    char pad3C[0xec];
+};
+/* 12-byte entry of the 5-element tables at FxD+0x2C / FxD+0x68 (ctor fn_8031B4EC). */
+struct FxItemD {
+    FxRec2* m0;
+    float m4;
+    int m8;
+};
+/* Variable-length source list: a count followed by FxItemD entries (fn_8031BFD8). */
+struct FxSrcD {
+    int m0;
+    FxItemD m4;
+};
+/* 12-byte entry of the table at FxD+0xA4 (fn_8031BF58 .. fn_8031BFD8); m4 points at an FxSrcD. */
+struct FxSlotD {
+    int m0;
+    FxSrcD* m4;
+    float m8;
+};
+/* Third effect class (vtable lbl_80665968, vptr at +0x18; ctor fn_8031B4EC). */
+struct FxD {
+    char pad0[0x14];
+    int m14;
+    const void* m18;
+    char pad1C[0x8];
+    FxRec2* m24;
+    int m28;
+    FxItemD a2C[5];
+    FxItemD a68[5];
+    FxSlotD aA4[6];
+    char padEC[0x14];
+};
+/* Fourth effect class (vtable lbl_80665128, vptr at +0x18; ctor fn_8031C62C): m2C is a
+ * one-shot flag, m24 the start time and m28 the duration (fn_8031C6C0, fn_8031C714). */
+struct FxG {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[0x8];
+    int m24;
+    int m28;
+    int m2C;
+};
+/* Fifth effect class (vtable lbl_806651B8, vptr at +0x18; ctor fn_8031CD88). */
+struct FxH {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[0x8];
+    int m24;
+    char pad28[0x8];
+};
+/* Float triples (20 entries from +0x2C) of the class that fn_8031B880 initialises. */
+struct FxE {
+    char pad0[0x20];
+    int m20;
+    float m24;
+    int m28;
+    FxV3 a2C[20];
+    int m11C;
+    FxEObj* m120;
+    float m124;
+    char pad128[0x8];
+};
+class FxEObj {
+public:
+    char pad0[0x98];
+    virtual ~FxEObj();
+};
+struct FxCtxB { int m0; int m4; };
+class FxIObj;
+/* Engine context at lbl_8061FEDC (fields read by fn_8031C714, fn_8031CB4C, fn_8031CED8). */
+struct FxCtx {
+    char pad0[0x14];
+    int m14;
+    int m18;
+    char pad1C[0xc];
+    int m28;
+    int m2C;
+    int m30;
+    char pad34[0x4];
+    FxCtxB* m38;
+    char pad3C[0x1c8];
+    int m204;
+    int m208;
+    char pad20C[0x4];
+};
+/* Object created by fn_8031CE68 (size 0x1B0, ctor fn_8031CED8); mCC is an embedded helper. */
+struct FxI {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    FxIObj* m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    int m34;
+    char pad38[0x8];
+    int m40;
+    int m44;
+    int m48;
+    char pad4C[0x80];
+    char mCC[220];
+    int m1A8;
+    int m1AC;
+};
+struct FxHooks { void* m0; void* m4; int m8; };
+class FxIObj {
+public:
+    int m0;
+    virtual ~FxIObj();
 };
 // STRUCTS-END
 
