@@ -51,7 +51,9 @@ extern int lbl_8068D5BC;
 
 /* Animation data reached through Entry::m4. */
 struct Unk802A4864_Anim {
-    char pad0[0x10];
+    char pad0[4];
+    float m4;                  /* read by cGenericTimeWarp's slot 12 (0x802A4B94) */
+    char pad8[0x10 - 0x8];
     Unk8037E64C m10;
 };
 

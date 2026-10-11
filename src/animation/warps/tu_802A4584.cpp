@@ -16,6 +16,45 @@
 float fn_80382BB8(Unk80271DBC_Link* p);
 void fn_80244858(Unk80270BA0_X* x, float v);
 
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator*(const Unk80273498_Vec3& v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+extern Unk80273498_Vec3 lbl_806055AC;    /* shared constant vector */
+extern int lbl_8061B9C8;                 /* integer read as the frame rate */
+float fn_8026FDB0(Unk80270BA0_Obj* o);
+float fn_80382348(Unk80271DBC_Link* link, unsigned int hash, int flag);
+unsigned int fn_80378568(const char* token, int len);
+
+/* Lazily computed hash of "cReleaseBall" (.bss 0x8068CE60) and its done flag (0x8068CE64). */
+static unsigned int lbl_8068CE60;
+static int lbl_8068CE64;
+
+int fn_8023F330(Unk80270BA0_X* x, int a, int b, void* c, void* d, int e, int f, int g, int h);
+
 /* Class name; read by cSwingTimeWarp's vtable slot 3 (0x802ACC04). */
 const char* lbl_8061E87C = "cSwingTimeWarp";
 
@@ -60,9 +99,7 @@ void cSwingTimeWarp::fn_vslot12(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk802
     if (o) {
         t = o->m3A4->m14C;
     }
-    /* near-miss: retail clamps t in place (fmr f0,f13 shared by both arms);
-     * the ternary chain copies t into a second register first. */
-    t = t > 10.0f ? 10.0f : t < 0.1f ? 0.1f : t;
+    t = t > 10.0f ? 10.0f : (t >? 0.1f);
     int n = h->count;
     float d;
     for (int i = 0; i < n; i++) {
@@ -201,6 +238,90 @@ cGenericTimeWarp::~cGenericTimeWarp()
 
 void cGenericTimeWarp::fn_vslot12(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk80270BA0_Obj* obj)
 {
+    Unk80270BA0_X* x = obj->fn_vslot1();
+
+    if (!(x->m71C & 0x800)) {
+        if (m4) {
+            switch (m8) {
+            case 0: {
+                Unk802726BC_Angles* p = &x->m734;
+                float* q = &p->m8[p->m190];
+                float a = *q * 0.0025399998f;
+                float b = fn_8026FDB0(x);
+                float c = a / b;
+                float d = x->mAB4;
+                int n;
+
+                d = !(d > 20.0f) ? (d >? 0.01f) : 20.0f;
+                n = h->count;
+                c = c / d;
+                for (int i = 0; i < n; i++) {
+                    float from = e[i].m14;
+                    float to = e[i].m10;
+                    float d = to - from;
+                    d = d * c;
+                    e[i].m10 = from + d;
+                }
+                break;
+            }
+            case 1: {
+                if (!lbl_8068CE64) {
+                    /* the pointer makes the compiler form the address before the call, as retail does */
+                    unsigned int* p = &lbl_8068CE60;
+                    *p = fn_80378568("cReleaseBall", 0);
+                    lbl_8068CE64 = 1;
+                }
+                float v = lbl_8061E978->fn_802AEB4C(e[0].m0);
+                v = v - 1.0f;
+                if (!(v <= 0.0f)) {
+                    float w = e[0].m4->m4;
+                    float u = fn_80382348(x->m618, lbl_8068CE60, 1);
+                    int n = h->count;
+
+                    if (!(u <= 0.0f)) {
+                        float t = 0.003f;
+                        float q;
+                        int iq;
+                        float r;
+                        float s;
+                        float y;
+                        float z;
+
+                        if (n == 1) {
+                            t = 0.0001f;
+                        }
+                        u = u + t;
+                        q = u / ((float)lbl_8061B9C8 * 0.016666668f);
+                        iq = (int)q;
+                        r = q - (float)iq;
+                        if (!(r <= 0.5f)) {
+                            r = r - 1.0f;
+                            iq = iq + 1;
+                        }
+                        s = w * 0.016666668f * (float)lbl_8061B9C8;
+                        if (!(s > 0.0f)) {
+                            s = 1.0f;
+                        }
+                        z = 1.0f;
+                        y = (float)iq / s;
+                        if (!(y <= 0.0f)) {
+                            z = r / y + 1.0f;
+                        }
+                        z = z > 5.0f ? 5.0f : (z >? 0.2f);
+                        for (int i = 0; i < n; i++) {
+                            float from = e[i].m14;
+                            float to = e[i].m10;
+                            float d = to - from;
+                            d = d * z;
+                            e[i].m10 = from + d;
+                        }
+                    }
+                }
+                break;
+            }
+            }
+        }
+    }
 }
 
 Unk8037B3E8* cGenericTimeWarp::fn_vslot5()
@@ -366,6 +487,53 @@ void cLimbLockWarp::fn_vslot11(float* a, Unk80270BA0_Obj* obj)
 
 void cLimbLockWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk80270BA0_Obj* obj)
 {
+    if (m4) {
+        Unk80270BA0_X* x = obj->fn_vslot1();
+        Unk80273498_Vec3 pos = x->m948;
+
+        if (pos.y != -1000.0f) {
+            int ok = 1;
+
+            if (mC) {
+                if (h->m2C) {
+                    ok = 0;
+                    if (!(e[0].m10 < h->m54)) {
+                        ok = e[0].m10 <= h->m58;
+                    }
+                } else {
+                    ok = 0;
+                }
+            }
+            if (ok) {
+                Unk80273498_Vec3 limb = lbl_806055AC;
+                int found = 0;
+
+                if (m8 == lbl_8068D5B8) {
+                    if (x->m618->m85C) {
+                        fn_8023F330(x, 0, 0, 0, &limb, 0, 0, 0, 0);
+                        found = 1;
+                    }
+                } else if (m8 == lbl_8068D5BC) {
+                    limb = x->m60;
+                    found = 1;
+                } else if (m8 == lbl_8068D5B4) {
+                    if (x->m618->m85C) {
+                        fn_8023F330(x, 0, 0, &limb, 0, 0, 0, 0, 0);
+                        found = 1;
+                    }
+                }
+                if (found) {
+                    Unk80273498_Vec3 d = pos - limb;
+
+                    if (!m10) {
+                        d.y = 0.0f;
+                    }
+                    Unk80273498_Vec3 target = x->m60 + d * 0.25f;
+                    x->fn_vslot3(&target);
+                }
+            }
+        }
+    }
 }
 
 Unk8037B3E8* cLimbLockWarp::fn_vslot5()
@@ -472,6 +640,22 @@ void cTranslationWarp::fn_vslot11(float* a, Unk80270BA0_Obj* obj)
 
 void cTranslationWarp::fn_vslot13(Unk802A4674_Entry* e, Unk802A4674_Hdr* h, Unk80270BA0_Obj* obj)
 {
+    if (m4) {
+        Unk80270BA0_X* x = obj->fn_vslot1();
+
+        if (x->m978 < x->m974) {
+            Unk80273498_Vec3 d = x->m60 - m8;
+            Unk80273498_Vec3 w = x->m960;
+
+            float sx = x->m96C;
+            float sz = x->m970;
+            d.x *= sx;
+            d.z *= sz;
+            Unk80273498_Vec3 r = m8 + d + w;
+            x->fn_vslot3(&r);
+            x->m978 = x->m978 + 1;
+        }
+    }
 }
 
 Unk8037B3E8* cTranslationWarp::fn_vslot5()
