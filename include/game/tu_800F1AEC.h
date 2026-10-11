@@ -854,6 +854,23 @@ struct UiV_138i_13Ci : UiObj {
     int m13C;
 };
 
+struct UiV_134i_140i : UiObj {
+    char pad40[0x134 - 0x40];
+    int m134;
+    char pad138[0x140 - 0x138];
+    int m140;
+};
+
+struct UiV_14Ci_19Ci_1A8_1ACb : UiObj {
+    char pad40[0x14C - 0x40];
+    int m14C;
+    char pad150[0x19C - 0x150];
+    int m19C;
+    char pad1A0[0x1A8 - 0x1A0];
+    UiObj* m1A8;
+    UiObjB* m1AC;
+};
+
 
 /* fn_800B555C(): global input/menu state; +0x570 is the current player/slot index
  * compared by the button handlers. */
@@ -973,7 +990,9 @@ struct UiWRaw {
     UiWRaw();
 };
 struct Ui700 {
-    char pad0[0x3C4];
+    char pad0[0x3A8];
+    int m3A8;
+    char pad3AC[0x3C4 - 0x3AC];
     Ui3C4* m3C4;
 };
 struct Ui1CD0 {
@@ -1334,6 +1353,35 @@ void fn_800F8698(UiObj* self);
 void fn_800F8AD8(UiObj* self);
 
 void fn_801268C4(UiObj* o, Ui6F8* p, int a, int b, int c, int d, int e, int f, void (*cb)(), int g, int h, int i, int j, int k, int l);
+
+int fn_8011BD94(Ui8011AA24* g, int p);
+int fn_8011BE1C(Ui8011AA24* g, int p);
+int fn_8011BF1C(Ui8011AA24* g, int p);
+void fn_80109660(UiObj* self);
+void fn_80109A98(UiObj* self);
+void fn_8010A3FC(UiObj* self);
+void fn_80118A70(UiObj* o);
+
+void fn_801A8198(int a);
+
+struct Ui80619D10 {
+    char pad0[0x444];
+    int m444;
+};
+void fn_80102BD4(UiObj* self, int a, UiObj* b);
+void fn_80102B7C(UiV_134_138* self, int a);
+void fn_80102B0C(UiV_134_138* self, int a);
+
+void fn_80097620(int p, int a, unsigned char b, int c);
+void fn_80097EA4(int p, int a, unsigned char b, int c, int d);
+
+void fn_800C3AB4(Ui800C33D0* g, int a);
+int fn_801A497C(Ui8011AA24* g, int a);
+int fn_801770E8(int a, int b);
+void fn_8010325C(UiObj* self, int a, int b, int c);
+
+void fn_800DFF0C(short* dst, const short* src);
+int fn_80403DE4(short* buf, const short* fmt, ...);
 
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);

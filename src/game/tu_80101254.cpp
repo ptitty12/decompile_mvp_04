@@ -210,6 +210,26 @@ UiScrRaw* fn_8010298C(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+extern char lbl_805BEA94[];
+extern char lbl_805BEA8C[];
+void fn_801029E0(UiV_134_138* self)
+{
+    fn_800ECF18(self);
+    self->m134 = fn_800C8044(self->v32((int)lbl_805BEA94, 1));
+    self->m134->v8(0);
+    fn_80102BD4(self, 0, self->m134);
+    self->m138 = fn_800C8044(self->v32((int)lbl_805BEA8C, 1));
+    fn_80102BD4(self, 1, self->m138);
+    self->m138->v8(0);
+    if (((Ui80619D10*)lbl_80619D10)->m444 == 10) {
+        fn_80102B7C(self, 1);
+        fn_80102B0C(self, 0);
+        return;
+    }
+    fn_80102B7C(self, 0);
+    fn_80102B0C(self, 1);
+}
+
 void fn_80102B0C(UiV_134_138* self, int a)
 {
     if (a == 1)
@@ -265,6 +285,38 @@ UiScrRaw* fn_801030F0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m3C = lbl_80652B78;
     self->m130 = 0;
     return self;
+}
+
+void fn_8010313C(UiObj* self)
+{
+    fn_800ECF18(self);
+    fn_800C3AB4(fn_800C33D0(), 2);
+    Ui8011AA24* g = fn_8011AA24(0);
+    int r = 0;
+    int t = g->m6F8->m14->m1CD0;
+    int v = t == 0;
+    if (v <= 1) {
+        if (v >= 0)
+            r = fn_801A497C(g, v);
+    }
+    int flag = 1;
+    int k = ((Ui80619D10*)lbl_80619D10)->m444;
+    switch (k) {
+    case 3:
+        break;
+    case 2:
+        flag = 0;
+        break;
+    case 4:
+        v = 0;
+        break;
+    case 5:
+        v = 1;
+        break;
+    }
+    if ((unsigned)(k - 4) <= 1)
+        r = fn_801770E8(g->m700->m3A8, v);
+    fn_8010325C(self, v, r, flag);
 }
 
 void fn_80103234(UiObj* self)
@@ -369,4 +421,62 @@ void fn_801044E8(UiV_134* self, int a, UiObj* obj)
     self->m134 = obj;
     obj->v8(0);
     fn_800C3DCC(fn_800C33D0(), self->m134, a);
+}
+
+/* near-miss: two arg moves swapped (retail: mr r3,r29 before mr r5,r27 before the sprintf-like call) */
+void fn_80104798(short* out, int n, int strId, int flag)
+{
+    short buf[20];
+    short tmp[12];
+    int g = lbl_8061977C;
+    buf[0] = 0;
+    if (flag != 0)
+        fn_800DFF0C(buf, (short*)fn_80090880(g, 0x19B5));
+    if (n > 1) {
+        short* fmt = (short*)fn_80090880(g, 0x19B3);
+        fn_80403DE4(tmp, fmt, n, (short*)fn_80090880(g, strId));
+        fn_800DFF0C(buf, tmp);
+    } else
+        fn_800DFF0C(buf, (short*)fn_80090880(g, strId));
+    fn_800DFF0C(out, buf);
+}
+
+void fn_8010486C(int unused, int p, int a, int sel)
+{
+    int k = 0;
+    switch (sel) {
+    case 5:
+        fn_80097620(p, 1, a, 0);
+        return;
+    case 0:
+        k = 2;
+        break;
+    case 1:
+        k = 3;
+        break;
+    case 2:
+        k = 4;
+        break;
+    case 3:
+        break;
+    case 4:
+        k = 1;
+        break;
+    case 6:
+        k = 6;
+        break;
+    case 9:
+        k = 5;
+        break;
+    case 10:
+        k = 10;
+        break;
+    case 7:
+        k = 8;
+        break;
+    case 8:
+        k = 9;
+        break;
+    }
+    fn_80097EA4(p, k, a, 2, 0);
 }
