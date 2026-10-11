@@ -678,6 +678,39 @@ struct UiV_194i_1A8i_1ACi_1B8i_1BCi : UiObj {
     int m1BC;
 };
 
+struct UiV_144s : UiObj {
+    char pad40[0x144 - 0x40];
+    const char* m144;
+};
+
+struct UiV_138_13C : UiObj {
+    char pad40[0x138 - 0x40];
+    UiObj* m138;
+    UiObj* m13C;
+};
+
+struct UiV_14Ci_158i_15Ci_160i_164i_168i_16Ci_170i_174i_178i_17Ci_180i_184i_188i_18Ci_19Ci : UiObj {
+    char pad40[0x14C - 0x40];
+    int m14C;
+    char pad150[0x158 - 0x150];
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    int m170;
+    int m174;
+    int m178;
+    int m17C;
+    int m180;
+    int m184;
+    int m188;
+    int m18C;
+    char pad190[0x19C - 0x190];
+    int m19C;
+};
+
 
 /* fn_800B555C(): global input/menu state; +0x570 is the current player/slot index
  * compared by the button handlers. */
@@ -887,7 +920,8 @@ inline UiMsgMgr* UiGetMsgMgr()
 }
 void fn_8035682C(UiMsg* m);
 void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, UiObj* ctx);
-UiObj* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
+struct UiV_140i_148_14C;
+UiV_140i_148_14C* fn_800B7AB8(UiMsgMgr* mgr, const char* name);
 
 /* Ring of byte indices at screen +0x168 (fn_800F26A0). */
 struct UiRing {
@@ -963,6 +997,7 @@ UiObj* fn_800C8040();
 struct Ui8010B1E0 {
     char pad0[0x704];
     int m704;
+    int m708;
 };
 int fn_8025416C(char* p, int a);
 void fn_800DE274(short* p, int a, int b);
@@ -1090,6 +1125,36 @@ void fn_80106890(UiObj* self);
 int fn_8011B5A4();
 void fn_800FEC24(UiV_0i_4i* self, int a, int b);
 
+UiObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
+void fn_80124FA8(UiObj* o, UiObj* self);
+void fn_801251CC(UiObj* o, int a, int b, int c);
+void fn_80125490(UiObj* o, int a, int b, int c, int d);
+
+/* Stack event object: id, then a vptr that the inlined ctor/dtor sequence switches
+ * between two vtables (lbl_80649DA0 / lbl_8065B888). */
+struct UiEvtRaw {
+    int id;
+    const void* vt;
+};
+void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
+void fn_8017D378(Ui700* p, int a);
+void fn_8010A0A4(UiObj* self);
+
+int fn_80097318(char* e, int p);
+int fn_80097380(char* e, int p);
+int fn_800973E8(char* e, int p);
+int fn_80097450(char* e, int p);
+int fn_800974B8(char* e, int p);
+void fn_8010D33C(UiObj* o, int a);
+
+void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+int fn_8010671C();
+void fn_80106690(int a, UiObj* b);
+extern int lbl_8061EE14;
+void fn_801A750C(int a, int b);
+void fn_802D7ADC();
+void fn_802D7A64();
+
 void fn_800F1970(UiObj* self);
 void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
@@ -1129,7 +1194,6 @@ int fn_800EC8B8(UiObj* self);
 void fn_800AB6B8(int a, int b);
 void fn_8035686C(UiScrRaw* self, int a);
 void fn_802D7ACC();
-void fn_8037893C(char* a, int b, int c, int d, int e);
 void fn_801A3704(Ui8011AA24* a, int b);
 UiV_2F0i* fn_804D2D50(UiObj* self);
 UiObj* fn_804D2CE0(UiObj* self);

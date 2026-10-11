@@ -54,6 +54,19 @@ void fn_8010838C(UiObj* self)
     fn_800ED254(self);
 }
 
+extern char lbl_805BA6D0[];
+void fn_801083AC(UiV_138* self)
+{
+    UiObj* o = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    self->m138 = o;
+    fn_80124FA8(o, self);
+    fn_801251CC(self->m138, 1, 0x1A0B, 0);
+    fn_80125490(self->m138, 1, 4, 0x38C8, 1);
+    UiObj* l = self->m138;
+    fn_800C80C0(l, fn_800B555C()->m570);
+    fn_801251CC(self->m138, 0, 0x1A0D, 2);
+}
+
 int fn_8010846C(UiScr134* self, int a)
 {
     if (fn_800B555C()->m570 == a)
@@ -125,6 +138,45 @@ void fn_8010878C(UiV_134* self, char* out)
     fn_8040B830(out, o->v33(5, 1)->name, 16);
 }
 
+/* near-miss: same code; the stack objects are swapped (retail: event object at sp+8, message buffer at sp+0x10; here message at 8, event at 24) */
+extern char lbl_805BE138[];
+extern char lbl_805BADC8[];
+extern char lbl_80649DA0[];
+extern char lbl_8065B888[];
+void fn_80108800(UiV_134* self, int a, int b)
+{
+    const char* s = 0;
+    switch (a) {
+    case 0:
+        s = lbl_805BE138;
+        break;
+    case 1: {
+        UiEvtRaw e;
+        e.vt = lbl_80649DA0;
+        e.id = 0x9E;
+        e.vt = lbl_8065B888;
+        s = lbl_805BADC8;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
+        e.vt = lbl_80649DA0;
+        break;
+    }
+    case 2:
+        if (fn_800B555C()->m570 == b) {
+            fn_80108958(self, self->m134->v60());
+            return;
+        }
+        break;
+    }
+    if (fn_800B555C()->m570 == b) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, s, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+    }
+}
+
 void fn_80108958(UiObj* a, int b)
 {
     switch (b) {
@@ -169,6 +221,19 @@ void fn_80108DB0(int a, UiObj* obj)
 void fn_80108E04(UiObj* self)
 {
     fn_800ED254(self);
+}
+
+extern char lbl_805BA6D0[];
+void fn_80108E24(UiV_138* self)
+{
+    UiObj* o = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    self->m138 = o;
+    fn_80124FA8(o, self);
+    fn_801251CC(self->m138, 1, 0x1A0B, 0);
+    fn_80125490(self->m138, 1, 4, 0x38C8, 1);
+    UiObj* l = self->m138;
+    fn_800C80C0(l, fn_800B555C()->m570);
+    fn_801251CC(self->m138, 0, 0x1A0D, 2);
 }
 
 int fn_80108EE4(UiScr134* self, int a)
@@ -240,6 +305,45 @@ void fn_801092E0(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
     fn_8040B830(out, o->v33(5, 1)->name, 16);
+}
+
+/* near-miss: same code; the stack objects are swapped (retail: event object at sp+8, message buffer at sp+0x10; here message at 8, event at 24) */
+extern char lbl_805BE138[];
+extern char lbl_805BADC8[];
+extern char lbl_80649DA0[];
+extern char lbl_8065B888[];
+void fn_80109354(UiV_134* self, int a, int b)
+{
+    const char* s = 0;
+    switch (a) {
+    case 0:
+        s = lbl_805BE138;
+        break;
+    case 1: {
+        UiEvtRaw e;
+        e.vt = lbl_80649DA0;
+        e.id = 0x9E;
+        e.vt = lbl_8065B888;
+        s = lbl_805BADC8;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
+        e.vt = lbl_80649DA0;
+        break;
+    }
+    case 2:
+        if (fn_800B555C()->m570 == b) {
+            fn_801094AC(self, self->m134->v60());
+            return;
+        }
+        break;
+    }
+    if (fn_800B555C()->m570 == b) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, s, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+    }
 }
 
 void fn_801094AC(UiObj* a, int b)
@@ -339,6 +443,33 @@ void fn_80109C1C(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
     fn_8040B830(out, o->v33(5, 1)->name, 16);
+}
+
+extern char lbl_80649DA0[];
+extern char lbl_8065B888[];
+void fn_80109E0C(UiObj* a, int b)
+{
+    if (b == 0) {
+        fn_8017D378(fn_8011AA24(0)->m700, 0);
+        UiEvtRaw e;
+        e.vt = lbl_80649DA0;
+        e.id = 0x9E;
+        e.vt = lbl_8065B888;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
+        e.vt = lbl_80649DA0;
+    }
+    fn_800B7ADC(UiGetMsgMgr(), a);
+}
+
+void fn_80109EC8(int unused, UiV_144s* self)
+{
+    fn_8010A0A4(self);
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    fn_8040B830(p->name, self->m144, 15);
+    p->name[15] = 0;
+    fn_800B7B4C(UiGetMsgMgr(), p, self);
 }
 
 int fn_80109F50()
