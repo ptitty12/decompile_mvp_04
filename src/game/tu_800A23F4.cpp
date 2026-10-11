@@ -150,6 +150,42 @@ extern "C" void fn_800A286C(Unk800A286C* p)
     p->mE8 = 0;
 }
 
+struct Unk800A2910_R {
+    char pad0[0x107F0];
+    int m107F0;
+    int m107F4;
+    int m107F8;
+};
+
+struct Unk800A28C4_Obj {
+    int m0;
+    int m4;
+    Unk800A2910_R* m8;
+    ~Unk800A28C4_Obj();
+};
+
+struct Unk800A28C4 {
+    char pad0[0x24];
+    Unk800A28C4_Obj* m24;
+};
+
+extern "C" void fn_80553DA0(Unk800A28C4_Obj* o);
+
+extern "C" void fn_800A28C4(Unk800A28C4* p)
+{
+    fn_80553DA0(p->m24);
+    if (p->m24) {
+        delete p->m24;
+        p->m24 = 0;
+    }
+}
+
+extern "C" void fn_800A2910(Unk800A28C4* p)
+{
+    if (p->m24->m8->m107F8 == 0)
+        fn_800A28C4(p);
+}
+
 extern "C" void fn_800A2948(Unk800A2688* p)
 {
     if (p->m74 != 2) {
@@ -294,6 +330,20 @@ extern "C" int fn_800A2F40(Unk800A2F40* p)
     if (!q)
         return 9;
     return q->m10;
+}
+
+extern "C" int fn_800A2F58(Unk800A28C4* p)
+{
+    int ret = 0;
+    if (p->m24) {
+        Unk800A2910_R* r = p->m24->m8;
+        int v = 0;
+        if (r)
+            v = r->m107F0 == 1;
+        if (v)
+            ret = 1;
+    }
+    return ret;
 }
 
 struct Unk800A31D0 {
