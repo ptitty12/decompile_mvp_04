@@ -379,10 +379,17 @@ public:
     void fn_8037B458(const char* name, int* field, int a, const char* b);               /* flag */
     void fn_8037B50C(const char* name, float* field, const char* range, int a);         /* float */
     void fn_8037B638(const char* name, int* field, const char* values);                 /* enum list */
-    /* Used by the animation events (animation/events/tu_802A89C8.cpp). */
-    void fn_8037B50C(const char* name, float* field, const char* range, const char* dflt);   /* float, string last argument */
+    /* Attribute registration used by the animation events (tu_802A79BC.cpp,
+     * tu_802A89C8.cpp). The last argument is usually the default value as a
+     * string (or null); the type code passed to fn_8037B76C is in the comment.
+     * fn_8037B674 has two overloads until its real last parameter type is known. */
+    void fn_8037B50C(const char* name, float* field, const char* range, const char* dflt);   /* float, 5 */
     void fn_8037B5FC(const char* name, int* field);                                     /* anim state */
     void fn_8037B674(const char* name, int* field, const char* values, int a);          /* enum list */
+    void fn_8037B674(const char* name, int* field, const char* values, const char* def);   /* enum with default, 0xD */
+    void fn_8037B494(const char* name, int* field, const char* range, const char* def);    /* int with range, 1 */
+    void fn_8037B7E8(const char* group);                                                    /* begin attribute group */
+    void fn_8037B830(const char* group);                                                    /* end attribute group */
 };
 
 #endif /* GAME_CHOOSER_H */
