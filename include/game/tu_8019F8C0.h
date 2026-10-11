@@ -60,6 +60,7 @@ struct Unk8019F8C0_Pl {
     void* m3B4;
     int m3B8;
     void* m3BC;
+    void* m3C0;
 };
 
 struct Unk8019F8C0_Ref {   /* fn_801A6D84 result */
