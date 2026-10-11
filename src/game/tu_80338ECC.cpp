@@ -25,6 +25,11 @@ struct KnotBuf { const void* m0; void* m4; int m8; };
 extern Rec24 lbl_80691BF4[];
 extern int lbl_80691DF4;
 extern Rec24 lbl_805EBA10;
+struct KnotV { char pad0[4]; float m4; float m8; float mC; };
+extern "C" void fn_80378D70(const char* src, unsigned int len, char* dst, int cap, int delim, unsigned int* outn);
+extern "C" double fn_80409D88(const char* s);
+struct Unk308 { char pad0[0x308]; int m308; int m30C; int m310; int m314; int m318; char pad31C[8]; int m324; char pad328[0xCC]; int m3F4; };
+extern Unk308* lbl_8061EA68;
 struct Unk54 { char pad0[0x54]; int m54; };
 extern Unk54* lbl_8061FEDC;
 extern int lbl_8061BE30, lbl_8061F958, lbl_8061F968, lbl_8061FF70, lbl_8061D2B8;
@@ -119,6 +124,23 @@ extern "C" void fn_8033BC68()
         lbl_8062157C = (int)fn_8030EBC8(lbl_8061FE10, (void*)lbl_8062157C, 1);
 }
 
+extern "C" void fn_8033C75C(Menu* p)
+{
+    Unk308* o = lbl_8061EA68;
+    SetV(IAt(p, 0x11C0), o->m310);
+    SetV(IAt(p, 0x1228), o->m314);
+    SetV(IAt(p, 0x1088), o->m308);
+    SetV(IAt(p, 0x1158), o->m3F4);
+    SetV(IAt(p, 0x10F0), o->m30C);
+    SetV(IAt(p, 0x1290), o->m318);
+    SetV(IAt(p, 0x12F8), o->m324);
+    p->m204 = 0;
+    p->m208 = 0;
+    p->items[p->m174]->s3();
+    p->m174 = 0;
+    p->items[p->m174]->s2();
+}
+
 /* fn_8033CAB4 */
 KnotA::KnotA()
 {
@@ -165,6 +187,21 @@ extern "C" void fn_8033CB88(KnotSet* p, int c)
     }
     if (c & 1)
         fn_80377408(p);
+}
+
+extern "C" void fn_8033CC0C(KnotV* o, const char* s, unsigned int len)
+{
+    const char* cur = s;
+    unsigned int n = 0;
+    char buf[0x20];
+    fn_80378D70(cur, len, buf, 0x19, 0x2C, &n);
+    o->mC = (float)fn_80409D88(buf);
+    cur += n + 1;
+    fn_80378D70(cur, len, buf, 0x19, 0x2C, &n);
+    o->m4 = (float)fn_80409D88(buf);
+    cur += n + 1;
+    fn_80378D70(cur, len, buf, 0x19, 0x23, &n);
+    o->m8 = (float)fn_80409D88(buf);
 }
 
 extern "C" KnotBuf* fn_8033CCE0(KnotBuf* p)
