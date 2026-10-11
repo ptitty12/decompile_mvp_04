@@ -41,10 +41,44 @@ struct Unk803414A4_Entry {
 };
 
 /* Sub-object at +0x1558 of Unk803414A4 (0x24 bytes; fn_802DC9CC ctor,
- * fn_802DC9F8 dtor: frees the pointers at +0xC and +0x10). */
+ * fn_802DC9F8 dtor: frees the pointers at +0xC and +0x10). Fields named from
+ * the methods in game/tu_802DBCB8.cpp: +0 state, +4 owner, +0xC buffer of
+ * vslot7() 8-byte entries, +0x10 buffer of m14 12-byte entries, +0x20 float. */
+class Unk803414A4;
 struct Unk802DC9F8 {
-    char m0[0x24];
+    int m0;
+    Unk803414A4* m4;
+    int m8;
+    char* mC;
+    char* m10;
+    int m14;
+    int m18;
+    int m1C;
+    float m20;
+    Unk802DC9F8();
     ~Unk802DC9F8();
+    void fn_802DCA64(Unk803414A4* o);
+    int fn_802DCA6C(int a);
+    int fn_802DCB5C();
+    int fn_802DCBB8();
+    int fn_802DCD60();
+    void fn_802DCE80();
+    void fn_802DCEC4();
+    void fn_802DD0BC();
+};
+
+/* 0x24-byte record of the table at +0x10BC of Unk803414A4 (cleared by
+ * fn_802DC8E4 at +0, +4, +0xC and +0x14). */
+struct Unk803414A4_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
 };
 
 /* Pad state written by the per-frame update and copied by fn_8000B2AC. */
@@ -60,11 +94,28 @@ extern const char* lbl_80615848;                      /* "gcpad" */
 class Unk803414A4 {
 public:
     Unk803414A4_Entry m0[0x10B];
-    char pad10B0[0x1558 - 0x10B0];
+    char pad10B0[8];
+    int m10B8;
+    Unk803414A4_Rec m10BC[0x20];
+    char pad153C[0x1550 - 0x153C];
+    int m1550;
+    int m1554;
     Unk802DC9F8 m1558;
 
     Unk803414A4();
     virtual ~Unk803414A4() {}
+    float fn_802DBCFC(int a, int b);
+    float fn_802DBDAC(int a, int b);
+    float fn_802DC1D8(int idx);
+    float fn_802DC264(int a, int b, int c, int d, int e, float f);
+    float fn_802DC3E8(int idx);
+    void fn_802DC518(int a);
+    void fn_802DC570();
+    int fn_802DC5C0();
+    void fn_802DC5D4();
+    void fn_802DC5F8();
+    void fn_802DC8E4();
+    void fn_802DC974();
     virtual void vslot2();
     virtual void vslot3();
     virtual void vslot4();
@@ -75,40 +126,40 @@ public:
     virtual void vslot9(int i, float f) = 0;
     virtual const char* vslot10() = 0;
     virtual int vslot11() = 0;
-    virtual void vslot12();
+    virtual int vslot12();
     virtual void vslot13();
-    virtual void vslot14();
-    virtual void vslot15();
-    virtual void vslot16();
+    virtual int vslot14();
+    virtual int vslot15();
+    virtual int vslot16();
     virtual void vslot17();
     virtual float vslot18() = 0;
     virtual void vslot19(float f) = 0;
-    virtual void vslot20();
+    virtual int vslot20();
     virtual int vslot21();
     virtual void vslot22(int a, float f);
     virtual void vslot23(int a, float f);
     virtual void vslot24(int a);
     virtual int vslot25(int n);
-    virtual void vslot26();
-    virtual void vslot27();
-    virtual void vslot28();
-    virtual void vslot29();
-    virtual void vslot30();
-    virtual void vslot31();
-    virtual void vslot32();
-    virtual void vslot33();
-    virtual void vslot34();
-    virtual void vslot35();
+    virtual const char* vslot26();
+    virtual const char* vslot27();
+    virtual int vslot28();
+    virtual int vslot29();
+    virtual int vslot30();
+    virtual int vslot31();
+    virtual int vslot32();
+    virtual int vslot33();
+    virtual int vslot34();
+    virtual int vslot35();
     virtual void vslot36();
     virtual void vslot37();
-    virtual void vslot38();
+    virtual int vslot38();
     virtual void vslot39();
-    virtual void vslot40();
+    virtual void vslot40(float f);
     virtual int vslot41() = 0;
     virtual void vslot42(Unk8000B258_State* out) = 0;
     virtual void vslot43(const Unk8000B258_State* s) = 0;
-    virtual void vslot44();
-    virtual void vslot45();
+    virtual void vslot44(Unk8000B258_State* s);
+    virtual void vslot45(const Unk8000B258_State* s);
     virtual void vslot46();
     virtual void vslot47();
     virtual void vslot48();
