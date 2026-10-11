@@ -26,8 +26,14 @@ struct Unk8022FE34_Row {
     unsigned char m70C;
     char pad3[0xE64 - 0x70D];
 };
+struct Unk8022FE34_GameC {
+    char pad0[0xC];
+    void* mC;
+};
 struct Unk8022FE34_Game {
-    char pad0[0x14];
+    char pad0[0xC];
+    Unk8022FE34_GameC* mC;
+    char pad10[4];
     Unk8022FE34_Row* m14;
 };
 struct Unk8022FE34_Ctx {
@@ -52,6 +58,10 @@ struct Unk8022FE34_V3 {
     int a;
     int b;
     int c;
+};
+struct Unk8022FE34_Pair {
+    int a;
+    int b;
 };
 struct Unk8022FE34_Owner;
 struct Unk8022FE34_Obj480 {
@@ -126,9 +136,17 @@ struct Unk8022FE34_Pai {
     void fn_80230B54(int i);
     void fn_80230B88(int i);
     void fn_80230BBC(int i);
+    void fn_80230268(int a, int b, Unk8022FE34_Ent* out);
 };
 
 struct Unk8022FE34_U;
+
+struct Unk8022FE34_Z {
+    Unk8022FE34_Ctx* m0;
+    Unk8022FE34_Z(Unk8022FE34_Ctx* c);
+    void fn_802361F8(float f, int a);
+    void fn_80236240(float f);
+};
 
 struct Unk8022FE34_Owner {
     Unk8022FE34_Ctx* m0;
@@ -140,13 +158,17 @@ struct Unk8022FE34_Owner {
     int m18;
     int m1C;
     Unk8022FE34_V2 m20;
-    char pad28[0x30 - 0x28];
+    Unk8022FE34_V2 m28;
     Unk8022FE34_V2 m30;
     Unk8022FE34_Pai m38;
     int m430;
     int m434;
-    char pad438[0x440 - 0x438];
+    Unk8022FE34_Pair m438;
     Unk8022FE34_W m440;
+    char pad444[0x728 - 0x444];
+    float m728;
+    char pad72C[0x734 - 0x72C];
+    char m734[4];
     void fn_80231D0C(int i);
     int fn_80231DDC();
     Unk8022FE34_V3 fn_80231E4C();
@@ -159,11 +181,86 @@ struct Unk8022FE34_Owner {
     void fn_802326C4(int i, int j);
 };
 
+struct Unk8022FE34_U8s {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+struct Unk8022FE34_U8 {
+    char pad0[0x8];
+    Unk8022FE34_U8s m8;
+    char pad1C[0x3A4 - 0x1C];
+    void* m3A4;
+};
+struct Unk8022FE34_X6D {
+    char pad0[0x14];
+    int m14;
+};
+
 struct Unk8022FE34_U {
     int m0;
     Unk8022FE34_Owner* m4;
+    Unk8022FE34_U8* m8;
+    char padC[0x44 - 0xC];
+    int m44;
+    int m48;
+    int m4C[5];
+    int m60;
+    int m64;
+    unsigned short m68;
+    short pad6A;
+    float m6C;
+    char pad70[0x78 - 0x70];
+    int m78;
+    char pad7C[4];
+    int m80;
     void fn_8023276C(int i);
     Unk8022FE34_Ctx* fn_80235FA8();
+    void fn_80234E0C(float f);
+    Unk8022FE34_Pai* fn_80234E38();
+    int fn_80234E44();
+    void fn_80235160();
+    void fn_8023533C();
+    void fn_80235364();
+    void fn_80235A28();
+    int fn_80235AB8();
+    void fn_80235AC4();
+    void fn_80235AD4();
+    Unk8022FE34_V2 fn_80235BE0();
+    Unk8022FE34_V2 fn_80235BFC();
+    Unk8022FE34_V2 fn_80235C18();
+    int fn_80235C68();
+    float fn_80235D80();
+    float fn_80235DA8();
+    int fn_80235E28();
+    int fn_80235E34(int a, int idx);
+    void fn_80235EDC(float f);
+    void fn_80235F7C();
+    void fn_80235164();
+    void fn_80235220();
+    void fn_8023522C(int a);
+    void fn_80235240();
+    void fn_80235294();
+    void fn_80235300();
+    void fn_802356D4();
+    void fn_802350F8();
+    void fn_80235618();
+    void fn_80235730();
+    void fn_80235780(int a, int b, int c);
+    void fn_8023584C();
+    void fn_802358D0();
+    void fn_8023590C();
+    void fn_8023596C();
+    void fn_80235A40();
+    float fn_802354AC();
+    Unk8022FE34_V3 fn_80235C34();
+    float fn_80235C74(int a);
+    Unk8022FE34_V3 fn_80235CEC(int a);
+    float fn_80235DD0(int a, int b);
+    int fn_80235E44(int a, int key);
+    int fn_80235E84(int a, int b);
 };
 
 #endif
