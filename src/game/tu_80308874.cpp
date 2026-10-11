@@ -144,6 +144,7 @@ void fn_80308AD0(Unk80308874_Mgr* m, int a, int b, int c, int i, float f)
     fn_80308414(m->m100 + i, a, b, c, f);
 }
 
+/* near-miss: retail uses r8 for the +4 base and r11/r10 for index/pointer; ours differs in registers (n and p read once) */
 void fn_80308B04(Unk80308874_Slots* m, int v, int i)
 {
     int n = m->s[i].n;
@@ -152,6 +153,7 @@ void fn_80308B04(Unk80308874_Slots* m, int v, int i)
     m->s[i].n = n + 1;
 }
 
+/* near-miss: retail keeps this in r30 and the argument in r29 (callee-saved order swapped; pass-through of r4 tried) */
 void fn_80308B28(Unk80308874_At4* m, int v)
 {
     fn_80308B5C(m, v);
@@ -178,6 +180,7 @@ void fn_80308DD8(Unk80308874_At18* p, int c)
     fn_80328374(p, c);
 }
 
+/* near-miss: same register order issue as fn_80308B28 */
 void fn_80308E28(Unk80308874_At4* p, int v)
 {
     fn_80308E5C(p, v);
