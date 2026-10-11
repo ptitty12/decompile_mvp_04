@@ -203,7 +203,11 @@ int fn_802A1070(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 /* near-miss: 240 of 240 instructions, 97.2%. Retail's first store of the int slot
  * at +0x158 is `li r9,0x158; stwx r11,r30,r9` (the same idiom as in fn_80280F08,
  * tu_8027FD64.cpp, and fn_802977FC, tu_8028F178.cpp); here it folds into
- * `stw r11,0x158(r30)`, which also lets the next float store move up. */
+ * `stw r11,0x158(r30)`, which also lets the next float store move up.
+ * Found: the idiom appears when the offset is computed from an index that is a
+ * variable at inline time (`int zi = 0; Set158(p, zi, 0);` with
+ * `int off = i * 4 + 0x158; *(int*)((char*)a + off) = v;`), but the constant then
+ * lands in r0 (retail: r9) and the stfs still moves, so the score does not improve. */
 int fn_802A11FC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80271DBC_Link* link = x->m618;
@@ -559,14 +563,29 @@ void fn_802A28EC(Unk8029B70C_Goal* g, Unk80270BA0_X* a, Unk80273498_Pos* b)
     }
 }
 
+/* near-miss: 70 of 70 instructions, about 96%. Same instructions as retail; the
+ * 3600.0f constant load is scheduled before the loads of the second position
+ * here and after them in retail (so the position pointer takes r10, not r9).
+ * Retail forms the pointer to the second position first, which the swapped
+ * argument order of SubR reproduces. Tried: no named Vec3, a by-value LenSq, a
+ * float local, `>` instead of `!(<=)`. */
 /* near-miss: 70 of 70 instructions, 95%. Same instructions as retail; the 3600.0f
  * constant load is scheduled before the vector subtraction here and after it in
  * retail, and the two position pointers take their registers in the other order.
  * Tried: no named Vec3, a by-value LenSq, a float local, `>` instead of `!(<=)`. */
+inline Unk80273498_Vec3 Unk802A2A64_SubR(const Unk80273498_Vec3& b, const Unk80273498_Vec3& a)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 void fn_802A2A64(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80273498_Pos* p)
 {
     if (x && p) {
-        Unk80273498_Vec3 d = x->m60 - p->m60;
+        Unk80273498_Vec3 d = Unk802A2A64_SubR(p->m60, x->m60);
         if (!(LenSq3(d) <= 3600.0f)) {
             fn_80249DF8(x, 1);
             fn_80249B40(x, p, 0, 0, 0.2f);
