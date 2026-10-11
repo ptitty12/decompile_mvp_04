@@ -64,6 +64,7 @@ void fn_80328318(FxBase* self, int a, int b);
 void fn_80328374(FxBase* self, int a);
 int fn_803283D8(int a, int b, int* idx, int* out);
 void fn_8032847C(int p);
+void fn_8032850C(int p);
 int fn_803285A0(int n);
 int fn_803285F4(int n);
 int fn_80328648(int n);
@@ -209,6 +210,18 @@ void fn_8032847C(int p) {
                     return;
                 }
             }
+        }
+    }
+}
+
+void fn_8032850C(int p) {
+    if (p != 0) {
+        int idx = fn_80328648(p);
+        fn_80328760((FxBase*)p);
+        if (idx >= 0) {
+            for (int k = 0; k < 20; k++) lbl_806E2184[idx][k] = 0;
+            lbl_806E2A44[idx] = 0;
+            lbl_806202EC = lbl_806202EC - 1;
         }
     }
 }
