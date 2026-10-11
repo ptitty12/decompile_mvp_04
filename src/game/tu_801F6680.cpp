@@ -9,11 +9,7 @@ typedef Unk801F6680_Menu Menu;
 extern int lbl_806609D0;
 extern const float lbl_805D4F34;
 
-struct Unk801F6680_Sel {
-    char pad0[0x794];
-    int m794;
-    int m798;
-};
+typedef Unk801EE438_Sel Unk801F6680_Sel;
 
 extern const float lbl_805D4EB0;
 extern float lbl_805D4F1C;
@@ -40,7 +36,7 @@ void fn_801FAFD0(Menu* m);
 void fn_801FB084(Menu* m);
 int fn_80211E30(const void* a, const void* b);
 void fn_8040A208(void* base, int n, int size, int (*cmp)(const void*, const void*));
-float fn_8018A214(int x);
+float fn_8018A214(Unk801EE438_Game* x);
 void fn_80202A24(int g);
 void fn_80201864(int g);
 void fn_80203EA4(int g);
@@ -48,8 +44,6 @@ void fn_802126B8(int g, int a);
 void fn_80203288(int g);
 void fn_80202FF0(int g);
 void fn_8035BED0(Unk801EE438_Rec14* r, int a);
-int fn_801E816C(Unk801F6680_Sel* o, int a);
-int fn_801E82CC(Unk801F6680_Sel* o, int a);
 void fn_80227564(Unk801EE438_Scr* p, int k, int a);
 int fn_80210C98(Unk801EE438_G** g, int a);
 int fn_802055F4(Unk801EE438_G* g);
