@@ -70,7 +70,9 @@ struct Unk8029B70C_Flags {
 struct Unk8029B70C_Goal {
     char pad0[0x4];
     Unk8029B70C_Sub* m4;
-    char pad8[0x38 - 0x8];
+    char pad8[0xC - 0x8];
+    int mC;
+    char pad10[0x38 - 0x10];
     int m38;
     char pad3C[0x48 - 0x3C];
     int m48;
@@ -80,11 +82,18 @@ struct Unk8029B70C_Goal {
     float m58;
     float m5C;
     Unk80273498_Pos* m60;
-    char pad64[0x6C - 0x64];
+    char pad64[0x68 - 0x64];
+    float m68;
     float m6C;
     float m70;
     float m74;
-    char pad78[0x9C - 0x78];
+    float m78;
+    char pad7C[0x88 - 0x7C];
+    float m88;
+    char pad8C[0x90 - 0x8C];
+    int m90;
+    char pad94[0x98 - 0x94];
+    float m98;
     Unk80273498_Vec3 m9C;
     float mA8;
     char padAC[0xB8 - 0xAC];
