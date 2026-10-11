@@ -50,7 +50,20 @@ int cShortestPathChooser::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* o
     return Unk8037B3E8::fn_vslot17(out, obj, c, d, e, f);
 }
 
-/* ---- path query helpers (functions 0x80279BB8..0x8027A4A4) ---- */
+/* ---- path query helpers (functions 0x80279BB8..0x8027A4A4) ----
+ *
+ * Not part of cShortestPathChooser (its slot 17 does not touch them): they are
+ * helper classes of this region, defined after the chooser. Names are
+ * placeholders. Evidence for the layouts is given above each class.
+ *
+ * Unk8035EB7C: 0xC0-byte query record. fn_8035EB7C (0x8035EB7C) and
+ * fn_8035EC3C (0x8035EC3C) are its methods (called with this in r3 by the
+ * constructors below; fn_80279DD0 contains fn_8035EB7C's body inline).
+ * Unk80279BB8: adds +0xCC..+0xD8 (copy ctor body 0x80279F40 copies D0, CC, D4
+ * after a 0xC0-byte block copy). Unk8027A05C: 3-entry cache of query results
+ * (entries at +0x20, stride 0x28, key = ints at +4/+8/+0xC/+0x10 and the 12
+ * bytes at +0x14 compared with fn_8040B100).
+ */
 
 extern const Unk80270BA0_Mtx lbl_8060E938;     /* identity matrix */
 extern const Unk80273498_Vec3 lbl_806055AC;    /* zero vector */
@@ -347,6 +360,20 @@ Unk80273498_Vec3 Unk8027A05C::fn_8027A358(int a)
     return v;
 }
 
+/* near-miss: 232 of 234 instructions, ~58 positional-aligned register-normalized
+ * differences left. What retail does that this does not:
+ *  1. "cmpwi cr4,r21,0" (flag != 0) is emitted early, before the entry stores,
+ *     and the final "beq cr4" reuses it; the prologue/epilogue save CR
+ *     ("mfcr r12 / mtcrf 8,r12"), frame 0x148 instead of 0x150. This code tests
+ *     flag at the end (cr0). Tried: copying flag into a local, "flag != 0" into
+ *     an int, swapping the branches, dead early "if (flag)" statements.
+ *  2. The three RMW updates of the flags word compile to "add rX,this,idx*40;
+ *     lwz 0x44(rX)" in retail; here "lwz 0x24(rX)" off an entry pointer (the
+ *     helper) or an indexed lwzx (plain m20[*idx].m24). Tried: |= vs x = x | c,
+ *     helper vs direct vs this-based helper for each of the 3 sites (27 combos).
+ *  3. Loads of m8/mC/m10 are scheduled just before their stores in retail.
+ * Locals a/b/c/d (copies of m4/m8/mC/m10) are right: they are reused as call
+ * arguments. q.Init() reproduces the pointer-based zeroing of q.m68/mA0/mBC. */
 void Unk8027A05C::fn_8027A4A4(int* idx, int flag, int unused)
 {
     if (*idx == -1) {
