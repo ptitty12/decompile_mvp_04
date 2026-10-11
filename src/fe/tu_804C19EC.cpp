@@ -6,6 +6,24 @@
 #include "game/fe_804BE560.h"
 
 extern const char lbl_8066FB70[];
+extern const char lbl_80670418[];
+extern "C" int fn_804C19EC(FeScrN* x, int a);
+extern "C" int fn_804C1A28(FeScrN* x);
+extern "C" int fn_804C1A68(FeScrN* x);
+extern "C" int fn_804C3920(FeScrN* x);
+extern "C" int fn_804C395C(FeScrN* x);
+extern "C" int fn_804C3998(FeScrN* x);
+extern "C" int fn_804C39D4(FeScrN* x);
+extern "C" FeScrN* fn_804C3A10(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_804C3A60(FeScrN* self);
+extern "C" int fn_804C3B4C(FeScrN* x);
+extern "C" int fn_804C3B88(FeScrN* x);
+extern "C" int fn_804C3BC4(FeScrN* x);
+extern "C" int fn_804C3C00(FeScrN* x);
+extern "C" int fn_804C3C3C(FeScrN* x);
+extern "C" void fn_804C3D68(FeScrN* x, char* dst);
+extern "C" FeScrN* fn_804C1AA4(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804C33E4(void* x, int a);
 
 extern "C" FE_OVERLAY int fn_804C19EC(FeScrN* x, int a)
 {
@@ -23,6 +41,33 @@ extern "C" FE_OVERLAY int fn_804C1A68(FeScrN* x)
 {
     x->m144->fn_vslot39();
     return 1;
+}
+
+extern "C" FE_OVERLAY FeScrN* fn_804C1AA4(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80670418);
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    return self;
+}
+
+extern "C" FE_OVERLAY int fn_804C33E4(void* x, int a)
+{
+    FeStats* s = (FeStats*)((Unk8007B2B0_Screen*)lbl_8061930C)->m30;
+    switch (a) {
+    case 0:
+        return s->m14;
+    case 1:
+        return s->m18;
+    case 2:
+        return s->m1C;
+    case 3:
+        return s->m20;
+    default:
+        return 0;
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804C3920(FeScrN* x)
