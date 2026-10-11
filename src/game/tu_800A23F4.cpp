@@ -5,13 +5,23 @@
 
 
 extern int lbl_8061930C;
+extern "C" void fn_80564EB0(void* a);
+extern "C" int fn_80566520(void* a);
+extern "C" void fn_80077CF8(int g);
+extern "C" void fn_80077DAC(int g);
+extern "C" int fn_8007B2B0(int g);
+extern "C" void fn_8007B6B8(int g, int a, int b, int c);
+extern "C" int fn_8007F9B4(int g);
+extern "C" int fn_8007F9E8(int g);
 extern "C" void fn_805909D4(int a);
 extern "C" int fn_8007F7D0(int g, int a);
 extern "C" int fn_8007B320(int g, int a, int b);
 extern "C" void fn_80552054();
 extern "C" void* fn_805535A4(void* mem);
 extern "C" void fn_805536B4(void* p);
-extern "C" int fn_8007F9E8(int g);
+extern "C" int fn_8007FB6C(int g, int e);
+extern "C" int fn_8007FBC0(int g, int a, int b);
+extern "C" int fn_8007FBDC(int g, int a, int b);
 extern "C" int fn_8007F9B4(int a);
 extern "C" int fn_8008FCC8(int a);
 extern "C" unsigned fn_8007C458(int g);
@@ -29,7 +39,6 @@ extern "C" int fn_8054C94C(void* p);
 extern "C" int fn_8007F84C(int g);
 extern "C" int fn_80083FC0(int e);
 extern "C" int fn_800A588C(void* o, int v);
-extern "C" int fn_8007B2B0(int g);
 extern "C" int fn_8007B648(int g, int a, int b);
 extern "C" int fn_8007B5D8(int g, int a, int b);
 extern "C" int fn_800A55A4(void* p, int a, int b, int* c, int* d);
@@ -43,7 +52,6 @@ extern float lbl_80619950;
 extern const float lbl_805FF3E4;
 extern "C" float fn_8055248C(int x);
 extern "C" int fn_80566570(void* a);
-extern "C" int fn_80566520(void* a);
 extern "C" int fn_80566674(void* a);
 extern "C" int fn_8007FB2C(int g, int a);
 extern "C" int fn_8007FDA8(int g, int a, int b);
@@ -63,6 +71,45 @@ struct Unk800A2688 {
     int m94;
     int m98;
 };
+
+struct Unk800A2598_Sub {
+    char pad0[0x1C];
+    void* m1C;
+};
+
+extern "C" void fn_800A6618(Unk800A2688* p, int a);
+
+extern "C" void fn_800A2598(Unk800A2688* p)
+{
+    Unk800A2598_Sub* sub = (Unk800A2598_Sub*)((char*)p + 0x2C);
+    fn_800A6618(p, 0);
+    fn_80564EB0(sub->m1C);
+    if (fn_80566520(sub->m1C) == 0) {
+        unsigned i = 0;
+        int g = lbl_8061930C;
+        fn_80077CF8(g);
+        fn_80077DAC(g);
+        unsigned n = fn_8007B2B0(g);
+        if (i < n) {
+            do {
+                fn_8007B6B8(g, 0x12, i, 0);
+                i++;
+            } while (i < n);
+        }
+        int old = p->m84;
+        p->m70 = 3;
+        p->m84 = fn_8007F9B4(g);
+        p->m88 = fn_8007F9E8(g);
+        p->m98 = p->m84 - old;
+        p->m8C = -1;
+        p->m90 = -1;
+        p->m94 = -1;
+    }
+    int t = p->m78;
+    p->m7C = t;
+    p->m78 = 0;
+    p->m74 = 0;
+}
 
 extern "C" void fn_800A6618(Unk800A2688* p, int a);
 extern "C" void fn_800A6484(Unk800A2688* p);
@@ -114,6 +161,47 @@ extern "C" void fn_800A2948(Unk800A2688* p)
         p->m8C = p->m84;
         p->m90 = -1;
         p->m94 = -1;
+        p->m74 = 1;
+    }
+}
+
+/* near-miss (10 of 73 slots): g and x take each other's callee-saved registers */
+
+extern "C" void fn_800A29C4(Unk800A2688* p, int limit)
+{
+    if (p->m74 != 2) {
+        int g = lbl_8061930C;
+        p->m8C = fn_8007F9B4(g);
+        int hiA = fn_8007F9E8(g);
+        int hiB = fn_8007F9B4(g);
+        volatile int sp8 = 0;
+        int e = 0;
+        do {
+            int a = fn_8007FB6C(g, e);
+            if (a != -1) {
+                int x = fn_8007FBC0(g, a, sp8);
+                int y = fn_8007FBDC(g, a, sp8);
+                if (hiB <= x) {
+                    hiB = x;
+                    if (hiA < y)
+                        hiA = y;
+                }
+            }
+            int c = sp8;
+            int t;
+            if (c > 3)
+                t = c;
+            else
+                t = c + 1;
+            sp8 = t;
+            e = t;
+        } while (e <= 3);
+        if (limit > hiB)
+            limit = hiB + 1;
+        if (p->m74 != 1 || (p->m90 != -1 && p->m90 < limit)) {
+            p->m90 = limit;
+            p->m94 = 0;
+        }
         p->m74 = 1;
     }
 }
