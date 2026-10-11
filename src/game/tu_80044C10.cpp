@@ -28,7 +28,7 @@ void fn_80044C98(Unk80044C98_Arg* a)
 {
     unsigned short t = a->mC;
     if (t != lbl_806EF9B0) {
-        fn_80057C30(fn_800475EC()->mB98, t);
+        fn_80057C30(fn_800475EC()->mFC.mA9C, t);
         lbl_806EF9B0 = t;
     }
     fn_800475EC()->fn_80047DE0(a->m0, a->m4, a->m8, a->m1C);
