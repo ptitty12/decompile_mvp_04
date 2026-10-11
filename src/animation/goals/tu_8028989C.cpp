@@ -55,12 +55,18 @@ static inline Unk80273498_Vec3 VSub(Unk80273498_Vec3 a, const Unk80273498_Vec3& 
     return r;
 }
 
+/* The int/float angle setters index with an explicit byte offset (retail forms
+ * (m190 * 4 + const) in a register, base register kept apart). For ints the
+ * first store goes through a zero index variable. */
 static inline void SetAngleI(Unk802726BC_Angles* p, int v)
 {
+    int i = 0;
     if (p->m190 == 1) {
-        p->m58[0] = v;
+        int off0 = i * 4 + 88;
+        *(int*)((char*)p + off0) = v;
     }
-    p->m58[p->m190] = v;
+    int off = p->m190 * 4 + 88;
+    *(int*)((char*)p + off) = v;
 }
 
 static inline void SetAngleF(Unk802726BC_Angles* p, float v)
@@ -68,7 +74,13 @@ static inline void SetAngleF(Unk802726BC_Angles* p, float v)
     if (p->m190 == 1) {
         p->mC0[0] = v;
     }
-    p->mC0[p->m190] = v;
+    int off = p->m190 * 4 + 192;
+    *(float*)((char*)p + off) = v;
+}
+
+static inline void SetAngleFb(Unk802726BC_Angles* p, float v)
+{
+    SetAngleF(p, v);
 }
 
 static inline void SetAngleF48(Unk802726BC_Angles* p, float v)
@@ -106,10 +118,14 @@ void fn_8028989C(Unk8028989C_Goal* g)
 
 void fn_802898FC(Unk8028989C_Goal* g, float f)
 {
-    if (!(f > 10.0f)) {
-        g->m64 = (f < 0.1f) ? 0.1f : f;
-    } else {
+    /* near-miss: retail stores the 0.1f case through f0 (fmr f0,f13) sharing
+     * the store of f, and keeps the 10.0f store separate. */
+    if (f > 10.0f) {
         g->m64 = 10.0f;
+    } else if (f >= 0.1f) {
+        g->m64 = f;
+    } else {
+        g->m64 = 0.1f;
     }
 }
 
@@ -131,8 +147,8 @@ Unk8028989C_Goal* fn_802899E8(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 {
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
-    g->m10.y = 0.0f;
     g->m10.z = v.z;
+    g->m10.y = 0.0f;
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 3;
@@ -143,8 +159,8 @@ Unk8028989C_Goal* fn_80289A4C(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 {
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
-    g->m10.y = 0.0f;
     g->m10.z = v.z;
+    g->m10.y = 0.0f;
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 4;
@@ -155,8 +171,8 @@ Unk8028989C_Goal* fn_80289AB0(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 {
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
-    g->m10.y = 0.0f;
     g->m10.z = v.z;
+    g->m10.y = 0.0f;
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 5;
@@ -167,8 +183,8 @@ Unk8028989C_Goal* fn_80289B14(Unk8028989C_Goal* g, float f, const Unk80273498_Ve
 {
     Unk80273498_Vec3 v = *p;
     g->m10.x = v.x;
-    g->m10.y = 0.0f;
     g->m10.z = v.z;
+    g->m10.y = 0.0f;
     g->m28 = 1;
     g->m6C = f;
     g->m48 = 6;
@@ -336,6 +352,8 @@ void fn_8028A21C(Unk8028989C_Goal* g, Unk80270BA0_X* x)
 void fn_8028A2E0(Unk8028989C_Goal* g, Unk80270BA0_X* x)
 {
     switch (g->m48) {
+    case 1:
+        break;
     case 3:
     case 5:
         SetAngleI(&x->m734, 0);
@@ -349,33 +367,28 @@ void fn_8028A2E0(Unk8028989C_Goal* g, Unk80270BA0_X* x)
         SetAngleI(&x->m734, v);
         break;
     }
-    case 2: {
-        float f;
+    case 2:
         switch (g->m4C) {
         case 1:
-            f = 0.1f;
+            SetAngleFb(&x->m734, 0.1f);
             break;
         case 2:
-            f = 0.2f;
+            SetAngleFb(&x->m734, 0.2f);
             break;
         case 3:
-            f = 0.3f;
+            SetAngleFb(&x->m734, 0.3f);
             break;
         case 4:
-            f = 0.5f;
+            SetAngleFb(&x->m734, 0.5f);
             break;
         case 5:
-            f = 0.6f;
+            SetAngleFb(&x->m734, 0.6f);
             break;
         case 6:
-            f = 0.7f;
+            SetAngleFb(&x->m734, 0.7f);
             break;
-        default:
-            return;
         }
-        SetAngleF(&x->m734, f);
         break;
-    }
     }
 }
 
