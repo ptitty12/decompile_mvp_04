@@ -807,6 +807,13 @@ struct FxItem3 {
     FxWid3* m74;
 };
 struct FxOne { int v; };
+/* 16-byte ring entry of FxZT::m0 (fn_8032713C). */
+struct FxEnt16 {
+    int m0;
+    int m4;
+    float m8;
+    int mC;
+};
 /* Float slider widget (value pointer +0x48, fallback value +0x4C, vptr +8; fn_8032E968). */
 class FxSldF : public FxLabelV {
 public:

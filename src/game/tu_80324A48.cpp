@@ -26,6 +26,7 @@ FxZ fn_80325158(FxZT* tab, int kind, float t);
 FxZ fn_80325410(FxZT* tab, int kind, float t);
 FxZ fn_80325848(FxZT* tab, int kind, float t);
 void fn_80326300(FxZT* t, int a, int b, int c, float f1, float f2);
+void fn_80326610(FxAI* self, int a, int b, float c);
 int fn_80324A24(FxZ* a);
 int fn_803249D4(FxY* a, FxY* b);
 int fn_80324C6C(FxZ* a, int b);
@@ -79,6 +80,7 @@ FxZ fn_80326FC4(FxPtr* p, int kind, float t);
 FxZ fn_80327044(FxPtr* p, int kind, float t);
 int fn_803270C4(FxPtr* p, int kind, int flag, float t);
 void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c);
+void fn_8032713C(FxAI* self, int a, int b);
 // PROTOS-END
 }
 
@@ -435,4 +437,29 @@ int fn_803270C4(FxPtr* p, int kind, int flag, float t) {
 
 void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c) {
     if (p->m0) fn_80326300(p->m0, a, b, c, f1, f2);
+}
+
+void fn_8032713C(FxAI* self, int a, int b) {
+    if (a != b) {
+        FxZT* z = ((FxZT**)self)[a];
+        int cnt = 0;
+        int i = z->m18;
+        FxEnt16* e = (FxEnt16*)z->m0;
+        int ref = e[i].m4;
+        while (i != z->m1C) {
+            int prev = i;
+            cnt++;
+            if (--i < 0) i = z->m24 - 1;
+            if (ref - e[i].m4 > 1) { i = prev; break; }
+        }
+        if (cnt > 0) {
+            int n = cnt;
+            do {
+                int off = i * 16;
+                FxEnt16* p = (FxEnt16*)(off + (int)z->m0);
+                fn_80326610(self, p->m0, p->m4, p->m8);
+                i = (i + 1) % z->m24;
+            } while (--n);
+        }
+    }
 }
