@@ -655,6 +655,9 @@ game/tu_801E2D84.cpp:
 game/tu_801E6D88.cpp:
 	.text       start:0x801E6D88 end:0x801EA36C
 
+game/tu_801EA36C.cpp:
+	.text       start:0x801EA36C end:0x801EE438
+
 animation/choosers/tu_8026DDE8.cpp:
 	.text       start:0x8026DDE8 end:0x8026FEB8
 	.rodata     start:0x805DC360 end:0x805DC4A4
