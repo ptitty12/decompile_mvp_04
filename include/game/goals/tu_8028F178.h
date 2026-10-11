@@ -25,10 +25,24 @@ struct Unk8028F178_Owner {
     char m18[4];
 };
 
-/* Request record written by fn_8028F178 (only +0xD8 is touched here). */
-struct Unk8028F178_Req {
-    char pad0[0xD8];
+/* Motion request record (0xDC bytes), the class constructed by 0x80279BB8
+ * (animation/choosers/tu_80279AE4.cpp). Evidence: fn_8028F178 sets +0xD8,
+ * fn_80291378 reads +0xD4 and builds it with the constructor taking the player. */
+class Unk80279BB8 {
+public:
+    Unk80279BB8(Unk80270BA0_X* x);
+    Unk80270BA0_Mtx m0;
+    char pad40[0xD4 - 0x40];
+    float mD4;
     int mD8;
+};
+typedef Unk80279BB8 Unk8028F178_Req;
+
+/* Player fields read by fn_80291378 (callers cast): +0x724 and +0x728 floats. */
+struct Unk8028F178_Player {
+    char pad0[0x724];
+    float m724;
+    float m728;
 };
 
 /* The flag word at +0x18C of the goal. fN is bit N counted from the most
@@ -104,16 +118,26 @@ struct Unk8028F178_Ctx {
     Unk80273498_Pos* m6CC;
 };
 
-int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk8028F178_Req* r, int a, int b, int c, int d, float f);
+int fn_802977FC(Unk8028F178_Goal* g, Unk80270BA0_X* x, Unk80279BB8* r, int a, int b, int c, int d, float f);
 void fn_802987C8(Unk8028F178_Goal* a, Unk8028F178_Goal* b);
 
 int fn_8029771C(Unk8028F178_Goal* g);
+int fn_80297740(Unk8028F178_Goal* g);
+float fn_80382BD8(Unk80271DBC_Link* link, int a);
+void fn_803814A4(Unk80271DBC_Link* link, unsigned int hash, float f, int c);
+int fn_8038614C(Unk80271DBC_Link* link, Unk80279BB8* req, int a, int b, float* c, int d, int e, int f, int flags);
+int fn_8026DAE8(Unk80270BA0_X* x, int a);
+int fn_8026D7B4(Unk80270BA0_X* x, int a);
+int fn_8026D838(Unk80270BA0_X* x, int a);
 float fn_80249298(Unk80270BA0_X* x, int a, int b);
 
 Unk80273498_Vec3 fn_80297614(Unk8028F178_Goal* g);
 int fn_80297668(Unk8028F178_Goal* g);
 Unk80273498_Vec3 fn_802976A8(Unk8028F178_Goal* g);
-int fn_8026DC18(Unk80270BA0_X* x, int a);
+int fn_8026DC18(Unk80270BA0_X* x, void* a);
+int fn_8026D7E0(Unk80270BA0_X* x, void* a);
+int fn_8026D6AC(Unk80270BA0_X* x, void* a);
+float fn_80248FC8(Unk80270BA0_X* x, int a);
 
 /* fn_8028F220 looks up a cMatrixChooser by hash and runs its fn_8026FB80 once (flag in
  * lbl_8061E770, result floats in lbl_806E0B70). Evidence: the vtable slot 4 call (class-name hash)
@@ -141,6 +165,8 @@ public:
 Unk8028F220_Entry* fn_80384A48(unsigned int hash);
 Unk8028F220_Chooser* fn_8037D028(Unk8037C7FC* mgr, int a);
 extern int lbl_8061E770[2];
+extern int lbl_806242B4;
+extern int lbl_806242B8;
 extern float lbl_806E0B70[2][5];
 
 #endif /* GAME_GOALS_TU_8028F178_H */
