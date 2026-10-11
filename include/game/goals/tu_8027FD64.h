@@ -57,15 +57,49 @@ struct Unk8027FD64_Flags {
 
 /* Same object as Unk8014D8AC_Ctx (reached through Unk80270BA0_X::m44C) with the
  * fields this unit reads; callers cast. Evidence: fn_80282B78 (+0x6CC, whose
- * target has an int at +0x38C). */
+ * target has an int at +0x38C) and fn_80280F08 (+0x680 position holder,
+ * +0x6F8 -> +0x14 -> byte at +0x1CC9, +0x700 -> +0x3B4 -> fn_80257B40). */
 struct Unk8027FD64_Pos6CC {
     char pad0[0x38C];
     int m38C;
 };
-struct Unk8027FD64_Ctx {
-    char pad0[0x6CC];
-    Unk8027FD64_Pos6CC* m6CC;
+struct Unk8027FD64_Ref6F8 {
+    char pad0[0x14];
+    struct Unk8027FD64_Ref14* m14;
 };
+struct Unk8027FD64_Ref14 {
+    char pad0[0x1CC9];
+    unsigned char m1CC9;
+};
+struct Unk8027FD64_Outer700 {
+    char pad0[0x3B4];
+    void* m3B4;
+};
+struct Unk8027FD64_Ctx {
+    char pad0[0x680];
+    Unk80273498_Pos* m680;
+    char pad684[0x6CC - 0x684];
+    Unk8027FD64_Pos6CC* m6CC;
+    char pad6D0[0x6F8 - 0x6D0];
+    Unk8027FD64_Ref6F8* m6F8;
+    char pad6FC[0x700 - 0x6FC];
+    Unk8027FD64_Outer700* m700;
+};
+
+/* Object returned by fn_80257B40; only the int at +0x458 is read. */
+struct Unk80257B40_Obj {
+    char pad0[0x458];
+    int m458;
+};
+Unk80257B40_Obj* fn_80257B40(void* p);
+
+/* Sets entry i of the int table at +0x168 of the angle block (fn_80280F08):
+ * an inline function, since its constant index stays in an index register. */
+inline void Unk8027FD64_SetSlot168(Unk802726BC_Angles* a, int i, int v)
+{
+    int off = i * 4 + 0x168;
+    *(int*)((char*)a + off) = v;
+}
 
 /* Object returned by fn_8027B304: only the float at +0x3F4 is read
  * (fn_80282E5C). */
@@ -108,6 +142,49 @@ struct Unk8027FD64_Goal {
     Unk80273498_Vec3 fn_GetVec() { return m1C; }
     Unk80273498_Vec3 fn_80286E70();
 };
+
+/* Query record built on the stack by fn_80280230 and filled in by fn_80386110.
+ * Size 0xC0; only the fields its constructor clears are known (+0x44 nibble,
+ * +0x68 vector, +0xA0, +0xBC). */
+/* Vector member of the query record, cleared with integer stores. */
+struct Unk80386110_Zero3 {
+    int x;
+    int y;
+    int z;
+    Unk80386110_Zero3()
+    {
+        x = 0;
+        y = 0;
+        z = 0;
+    }
+};
+
+struct Unk80386110_Query {
+    char pad0[0x44];
+    unsigned int mType : 4;
+    unsigned int mTypePad : 28;
+    char pad48[0x68 - 0x48];
+    Unk80386110_Zero3 m68;
+    char pad74[0xA0 - 0x74];
+    int mA0;
+    char padA4[0xBC - 0xA4];
+    int mBC;
+    char padC0[0xC0 - 0xC0];
+
+    Unk80386110_Query() : mType(0), mA0(0), mBC(0)
+    {
+    }
+};
+
+/* Anim record of a player (Unk80270BA0_X::m618): only +0x838 is read here. */
+struct Unk80280230_Anim {
+    char pad0[0x838];
+    int m838;
+};
+
+int fn_8027FC20(Unk8027FD64_Goal* g, int a);
+void fn_80386110(Unk80280230_Anim* a, Unk80386110_Query* q, unsigned int hash, int v, float* out, int flag);
+extern int lbl_806242B4;
 
 Unk8027B304_Obj* fn_8027B304(Unk8027FD64_Goal* g);
 int fn_8024D41C(Unk80270BA0_X* x);

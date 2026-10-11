@@ -8,6 +8,9 @@
 #include "game/chooser.h"
 #include "game/goals/tu_8027FD64.h"
 
+float lbl_8061E6D0 = 45.0f;
+extern Unk80273498_Vec3 lbl_805DED28;
+
 void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
 int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
 
@@ -24,12 +27,75 @@ int fn_8027FD64(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
     return 0;
 }
 
+float fn_80280230(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c)
+{
+    Unk80280230_Anim* pl = (Unk80280230_Anim*)x->m618;
+    float b = 0.0f;
+    float a = 0.0f;
+    Unk80386110_Query q;
+
+    q.mBC = 0;
+    if (g->m78 == 1) {
+        int h = pl->m838;
+        if (h != 0x7942CA79 && h != 0xCA50EF74 && h != 0x9FE2E6D1 && h != 0xA84A0C58 && h != 0xF90D27A1) {
+            fn_80386110(pl, &q, 0xFA52B1B5, lbl_806242B4, &a, 0);
+        }
+    } else if (g->m78 == 8) {
+        if (pl->m838 == 0x225A007B) {
+            fn_80386110(pl, &q, 0x225A007B, lbl_806242B4, &a, 0);
+        }
+    }
+    fn_80386110(pl, &q, c, fn_8027FC20(g, *(int*)g), &b, 0);
+    b += a;
+    return b;
+}
+
 void fn_802803A4(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c, int d)
 {
     fn_80280418(g, x, d);
     if (fn_802834E8(g, x, c)) {
         fn_80280418(g, x, d);
         fn_802834E8(g, x, c);
+    }
+}
+
+inline float Dist2D(Unk80273498_Vec3 a, const Unk80273498_Vec3& b)
+{
+    float dx = a.x - b.x;
+    float dz = a.z - b.z;
+    return dx * dx + dz * dz;
+}
+
+void fn_80280F08(Unk8027FD64_Goal* g, Unk80270BA0_X* x)
+{
+    int zero = 0;
+    Unk802726BC_Angles* p = &x->m734;
+
+    if (p->m190 == 1) {
+        Unk8027FD64_SetSlot168(p, 0, zero);
+    }
+    Unk8027FD64_SetSlot168(p, p->m190, zero);
+    if (g->mE8.f1 && g->m74 == 2 && g->mA0 == 0) {
+        Unk8027FD64_Ctx* ctx = (Unk8027FD64_Ctx*)x->m44C;
+        int active = 0;
+
+        if (fn_80257B40(ctx->m700->m3B4)->m458 == 9 || ((Unk8027FD64_Ctx*)x->m44C)->m6F8->m14->m1CC9 > 1) {
+            active = 1;
+        }
+        if (active) {
+            Unk80273498_Vec3 w = ctx->m680->m60;
+
+            w.y = 0.0f;
+            float d2 = Dist2D(w, lbl_805DED28);
+            if (!(d2 <= lbl_8061E6D0 * 144.0f * lbl_8061E6D0)) {
+                int one = 1;
+
+                if (p->m190 == 1) {
+                    *(int*)((char*)p + 0x168) = one;
+                }
+                Unk8027FD64_SetSlot168(p, p->m190, one);
+            }
+        }
     }
 }
 
