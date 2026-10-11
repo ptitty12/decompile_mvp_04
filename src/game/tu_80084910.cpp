@@ -285,6 +285,25 @@ void fn_80086F6C(Unk80084910_Q* self, int i, const short* str);
 void fn_800879B8(void* out, int a, VObj* obj);
 void fn_80087A50(Unk80084910_S* self, int v);
 
+void* fn_8040B61C(char* dst, const char* src);
+
+
+extern int lbl_806193B8[];
+void fn_804031BC(short* dst, const char* src);
+
+
+extern "C" double fn_804103C0(double x);
+
+
+extern int lbl_805B6B90[];
+int fn_8040B6A0(const char* s);
+void fn_8040B830(char* dst, const char* src, int n);
+
+
+extern int* lbl_8061977C;
+const short* fn_80090880(void* names, int id);
+
+
 int fn_80084910(void* self, int a, int b, int c)
 {
     return fn_8008453C(fn_80084660(self), a, b, c);
@@ -349,10 +368,52 @@ void fn_80084AE8(K30* self, unsigned i)
         fn_8040074C(&self->m24[i], 0x30);
 }
 
+char* fn_80084F6C(K30* self, int t, unsigned i, char* out)
+{
+    if (i < self->m1C) {
+        switch (t) {
+        case 0:
+            fn_8040B61C(out, (char*)self->m24 + i * 0x30 + 0x13);
+            break;
+        case 1:
+            fn_8040B61C(out, (char*)self->m24 + i * 0x30 + 0x1F);
+            break;
+        }
+    }
+    return out;
+}
+
 float fn_80084FEC(Unk80084910_PObj* o, int i, int a)
 {
     float r = (o->*lbl_805B6B60[i])(a);
     return r;
+}
+
+void fn_80085660(K30* self, signed char t, unsigned i, const char* str, int n)
+{
+    if (i < self->m1C) {
+        if (n <= 0)
+            n = fn_8040B6A0(str);
+        int mx = lbl_805B6B90[t] - 1;
+        if (n > mx)
+            n = mx;
+        switch (t) {
+        case 0: {
+            int o = i * 0x30;
+            fn_8040B830((char*)self->m24 + o + 0x13, str, n);
+            char* d = (char*)(o + (int)self->m24 + 0x13);
+            d[n] = 0;
+            break;
+        }
+        case 1: {
+            int o = i * 0x30;
+            fn_8040B830((char*)self->m24 + o + 0x1F, str, n);
+            char* d = (char*)(o + (int)self->m24 + 0x1F);
+            d[n] = 0;
+            break;
+        }
+        }
+    }
 }
 
 float fn_8008574C(G* self, int a)
@@ -492,6 +553,12 @@ int fn_80085FB0()
     return 4;
 }
 
+int fn_80085FB8(int i)
+{
+    int tbl[4] = { 0x12, 0x13, 0x14, 0x15 };
+    return tbl[i];
+}
+
 void fn_80085FF8(Unk80084910_N* self, int key)
 {
     for (int i = 0; i < 16; i++) {
@@ -551,11 +618,29 @@ int fn_80086D34(Unk80084910_W* self, int i)
     return self->m58[i];
 }
 
+/* near-miss (3 slots, register only): retail holds the stored value in r9, here r0. */
+void fn_80086D44(char* base, int idx, float f)
+{
+    float t = (float)fn_804103C0(f * 255.0f);
+    char* p = base + 4;
+    int v = !(t > 255.0f) ? (int)(t >? 0.0f) : 255;
+    p[idx] = v;
+}
+
 int fn_80086DD8(void* self, unsigned i)
 {
     if (i <= 0x17)
         return lbl_80619418[i];
     return 0;
+}
+
+extern "C" void fn_80086DFC(Unk80084910_Str* self, unsigned i)
+{
+    *(unsigned*)((char*)self + 0x22C) = i;
+    *(int*)((char*)self + 0x74) = fn_80086DD8(self, i);
+    short buf[18];
+    fn_804031BC(buf, (const char*)lbl_806193B8[i]);
+    fn_80086E58(self, buf);
 }
 
 void fn_80086E58(Unk80084910_Str* self, const short* str)
@@ -567,17 +652,31 @@ void fn_80086E58(Unk80084910_Str* self, const short* str)
     self->m204[n - 1] = 0;
 }
 
-/* near-miss: retail forms the destination as (i*34 + 0x88) from self and the
- * terminator offset as (n-1)*2 + i*34 from self+0x88; one slot of address
- * arithmetic differs. */
+extern "C" void fn_80086EC0(Unk80084910_Q* self, int slot, int v)
+{
+    int tbl[4] = { 0x261B, 0x261C, 0x3959, 0x395A };
+    char* b = (char*)self + 0x6C;
+    int o = slot * 4;
+    *(int*)(b + o) = v;
+    if (v != -1) {
+        int ok = 1;
+        if (*lbl_8061977C == 0)
+            ok = 0;
+        if (ok)
+            fn_80086F6C(self, v, fn_80090880(lbl_8061977C, tbl[v]));
+    }
+}
+
 void fn_80086F6C(Unk80084910_Q* self, int i, const short* str)
 {
     int n = fn_80403060(str) + 1;
     if (n > 0x10)
         n = 0x10;
-    short* dst = (short*)((char*)self + i * 0x22 + 0x88);
-    fn_8040316C(dst, str, n);
-    dst[n - 1] = 0;
+    int off = i * 0x22;
+    fn_8040316C((short*)((char*)self + (off + 0x88)), str, n);
+    char* b = (char*)self + 0x88;
+    int o2 = (n - 1) * 2 + off;
+    *(short*)(b + o2) = 0;
 }
 
 void fn_800879B8(void* out, int a, VObj* obj)
