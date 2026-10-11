@@ -906,6 +906,9 @@ animation/events/tu_802A89C8.cpp:
 animation/tu_802A9A04.cpp:
 	.text       start:0x802A9A04 end:0x802AA7A4
 
+game/tu_802AA7A4.cpp:
+	.text       start:0x802AA7A4 end:0x802AB810
+
 animation/tu_802AB810.cpp:
 	.text       start:0x802AB810 end:0x802AC2CC
 
