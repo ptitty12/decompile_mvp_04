@@ -91,14 +91,6 @@ int fn_8017E030(Unk8017DD64_T* p, int a, int b)
     return r;
 }
 
-int fn_8017ED94(Unk8017DD64_Ctx* p)
-{
-    if (p) {
-        return p->m704;
-    }
-    return 0;
-}
-
 /* near-miss: retail keeps the counter in a stack slot (reloaded and stored each pass) and
  * hoists p->m4 + 0x65C above the range test; a volatile counter and an inlined step
  * both differ by 15+ slots after 8 variants. */
@@ -141,6 +133,14 @@ void fn_8017E2E8(Unk8017E2E8_T* p, int a, int b, int c)
         fn_801ABC14(p->m3C8);
         break;
     }
+}
+
+int fn_8017ED94(Unk8017DD64_Ctx* p)
+{
+    if (p) {
+        return p->m704;
+    }
+    return 0;
 }
 
 Unk8017EDF0::Unk8017EDF0(Unk8017EE58_Ctx* ctx, int b)
