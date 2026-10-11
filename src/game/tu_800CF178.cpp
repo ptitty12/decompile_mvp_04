@@ -170,10 +170,13 @@ struct Unk800CFB88_Node {
 
 struct Unk800CFB38_Timer {
     int m0;
-    char pad4[0x14];
+    char pad4[0x10];
+    int m14;
     float m18;
     float m1C;
     Unk800CFB88_Node* m20;
+    char pad24[4];
+    Unk800CFB88_Node* m28;
 };
 
 extern int lbl_8061A328;
@@ -194,7 +197,7 @@ extern "C" void fn_800CFB88(Unk800CFB88_List* l, Unk800CFB88_Node* n)
 }
 
 struct Unk800CFBB8_Raw : Unk800CFB38_Timer {
-    char pad24[0xC];
+    char pad2C[4];
     const void* m30;
 };
 extern const char lbl_8065ABF0[];
@@ -209,6 +212,25 @@ extern "C" void fn_800CFBB8(Unk800CFBB8_Raw* o, int c)
     }
     if (c & 1)
         fn_80377408(o);
+}
+
+/* near-miss: 4 slots (retail lays the found-return block between the arms of the m28 select) */
+extern "C" int fn_800CFC28(Unk800CFB38_Timer* o, float t)
+{
+    t = t - o->m18;
+    if (o->m14 != 0)
+        t = t - (float)fn_80410634(t / o->m1C) * o->m1C;
+    o->m28 = o->m28 ? o->m28->m18 : o->m20;
+    while (o->m28 != 0) {
+        if (fn_800CFAE4((Unk800CFAE4_Range*)o->m28, t)) {
+            o->m28->m14 = 0;
+            return 1;
+        }
+        o->m28 = o->m28->m18;
+    }
+    if (!(t <= o->m1C))
+        o->m0 = 0;
+    return 0;
 }
 
 extern "C" void fn_800CFE84(Unk800CFB88_List* l)
