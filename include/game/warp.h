@@ -59,6 +59,24 @@ struct Unk80273498_Vec3 {
 
 class Unk80270BA0_X;
 
+/* Opaque; passed to fn_80189698, fn_8018959C and fn_8018C4D0. */
+struct Unk80189698_Ctx;
+
+/* Reached through Unk80270BA0_X::m44C (chooser.h's Unk8014D8AC_Ctx has more). */
+struct Unk8014D8AC_Ctx {
+    char pad0[0x6CC];
+    Unk80189698_Ctx* m6CC;
+};
+
+/* Sub-object at Unk80270BA0_X+0x734 (chooser.h's Unk802726BC_Angles): float
+ * pairs indexed by m190 (0 or 1). */
+struct Unk802726BC_Angles {
+    char pad0[0x48];
+    float m48[2];
+    char pad50[0x190 - 0x50];
+    int m190;
+};
+
 /* Reached through Unk80270BA0_X::m618 (chooser.h's Unk80271DBC_Link, which
  * also has m880). */
 struct Unk80271DBC_Link {
@@ -82,7 +100,8 @@ public:
 struct Unk80270BA0_XBase {
     char pad0[0x60];
     Unk80273498_Vec3 m60;
-    char pad6C[0x98 - 0x6C];
+    char pad6C[0x8C - 0x6C];
+    Unk80273498_Vec3 m8C;
 };
 
 class Unk80270BA0_XVirt : public Unk80270BA0_XBase {
@@ -98,7 +117,9 @@ public:
     char pad9C[0x320 - 0x9C];
     Unk80273498_Vec3 m320;
     Unk80273498_Vec3 m32C;
-    char pad338[0x5F0 - 0x338];
+    char pad338[0x44C - 0x338];
+    Unk8014D8AC_Ctx* m44C;
+    char pad450[0x5F0 - 0x450];
     /* By-value getters: reading the vectors through these gives the direct
      * stack copies of retail (a plain local copy takes an address register). */
     Unk80273498_Vec3 GetM320() { return m320; }
@@ -109,16 +130,23 @@ class Unk80270BA0_X : public Unk80270BA0_XMid, public Unk80270BA0_Obj {
 public:
     char pad5F4[0x618 - 0x5F4];
     Unk80271DBC_Link* m618;
-    char pad61C[0x93C - 0x61C];
+    char pad61C[0x734 - 0x61C];
+    Unk802726BC_Angles m734;
+    char pad8C8[0x93C - 0x8C8];
     Unk80273498_Vec3 m93C;
+    char pad948[0xAB4 - 0x948];
+    float mAB4;
     void fn_80244858(float a);
     Unk80273498_Vec3 GetM93C() { return m93C; }
 };
 
 /* State record at +0x44 of the Unk8037B128 object (second argument of
  * cFudgePosRotWarp::fn_802A3D8C; slot 11 receives it directly). */
+class Unk80384070_P;
 struct Unk802A3D8C_State {
-    char pad0[0x24];
+    char pad0[4];
+    Unk80384070_P* m4;
+    char pad8[0x24 - 8];
     int m24;
     char pad28[0x30 - 0x28];
     Unk80273498_Vec3 m30;
