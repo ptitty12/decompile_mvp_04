@@ -66,6 +66,20 @@ struct MIE { char pad0[0x4C]; int m4C; char pad50[0x10]; int* m60; };
 inline int EnumVal(MIE* i) { return i->m60[i->m4C]; }
 inline MIE* EAt(Menu* p, int off) { return (MIE*)((char*)p + off); }
 
+extern int lbl_8061D3A4, lbl_8061D3A8, lbl_8061D3AC, lbl_8061D3B0, lbl_8061D3B4, lbl_8061D3B8, lbl_8061D3BC, lbl_8061D3C0, lbl_8061D3C4;
+extern const char lbl_805EF288[], lbl_805EF298[], lbl_805EF2AC[], lbl_805EF2C4[], lbl_805EF2D4[], lbl_805EF2E4[], lbl_805EF2F8[], lbl_805EF310[], lbl_805EF328[];
+extern const char lbl_80666728[];
+extern "C" void fn_8032F19C(void* item, const char* name, int* val, int init);
+extern const char lbl_805EF48C[], lbl_805EED98[], lbl_805EF4A4[], lbl_805EF4B4[], lbl_805EF4D0[], lbl_805EF4E8[], lbl_805EF500[], lbl_805EF514[], lbl_805EF524[], lbl_805EF53C[], lbl_805EF550[], lbl_805EF564[];
+extern const char lbl_805F34B4[], lbl_805F34C4[], lbl_805F34D4[], lbl_806666D8[], lbl_80666E20[], lbl_80666DD0[];
+extern int lbl_8061CB80, lbl_806207B4, lbl_806207C4, lbl_806207D4, lbl_8061C68C, lbl_8061D034, lbl_8061D03C;
+extern "C" {
+void fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
+void fn_8033FBD8(void* item, void* cb);
+Menu* fn_8032BAF4(Menu* p, int a);
+void fn_803368B0();
+void fn_80336848();
+}
 extern const char lbl_80666778[];
 extern const char lbl_80665FA8[], lbl_80666E70[], lbl_805EBBF8[], lbl_80666EC0[];
 extern "C" void fn_8032D868(void* item, const char* name);
@@ -84,7 +98,6 @@ extern int lbl_8062080C, lbl_80620810;
 extern "C" {
 void fn_8032E70C(void* item, const char* name, float a, float b, float c, float d);
 void fn_8032E894(void* item, const char* name, int* val, float a, float b, float c, float d);
-void fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
 }
 extern float lbl_805EEF30, lbl_805EEF40;
 extern int lbl_8062076C, lbl_80620784, lbl_80620780, lbl_80620760, lbl_80620764, lbl_80620768;
@@ -302,6 +315,31 @@ void fn_80336518(Menu* p)
 
 void fn_803365B4(Menu* p) { lbl_8061CC00 = GetV(IAt(p, 0x2E0)); }
 
+Menu* fn_803365DC(Menu* p, int a)
+{
+    MenuInit(p, a);
+    p->m2DC = lbl_80666728;
+    fn_8032F19C((char*)p + 0X2E0, lbl_805EF288, &lbl_8061D3A4, lbl_8061D3A4);
+    fn_8032F19C((char*)p + 0X334, lbl_805EF298, &lbl_8061D3A8, lbl_8061D3A8);
+    fn_8032F19C((char*)p + 0X388, lbl_805EF2AC, &lbl_8061D3AC, lbl_8061D3AC);
+    fn_8032F19C((char*)p + 0X3DC, lbl_805EF2C4, &lbl_8061D3B0, lbl_8061D3B0);
+    fn_8032F19C((char*)p + 0X430, lbl_805EF2D4, &lbl_8061D3B4, lbl_8061D3B4);
+    fn_8032F19C((char*)p + 0X484, lbl_805EF2E4, &lbl_8061D3B8, lbl_8061D3B8);
+    fn_8032F19C((char*)p + 0X4D8, lbl_805EF2F8, &lbl_8061D3BC, lbl_8061D3BC);
+    fn_8032F19C((char*)p + 0X52C, lbl_805EF310, &lbl_8061D3C0, lbl_8061D3C0);
+    fn_8032F19C((char*)p + 0X580, lbl_805EF328, &lbl_8061D3C4, lbl_8061D3C4);
+    fn_80330ACC(p, (MItem*)((char*)p + 0X2E0));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X334));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X388));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X3DC));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X430));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X484));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X4D8));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X52C));
+    fn_80330ACC(p, (MItem*)((char*)p + 0X580));
+    return p;
+}
+
 void fn_803367CC(Menu* p)
 {
     p->m204 = 0;
@@ -344,6 +382,68 @@ void fn_803368B0()
     fn_8033E958(lbl_805EF438, lbl_8061D41C);
     fn_8033E958(lbl_805EBC74);
     fn_8033E958(lbl_805EF448);
+}
+
+/* near-miss (parked): 219 vs 222 instructions. Shape and calls are right; retail spills the
+ * 0x900 and 0xAC4 item pointers to the stack and keeps the others in r14..r31 in a different
+ * order than mine. Declaration order of the 15 pointer locals not searched. */
+Menu* fn_80336A10(Menu* p, int a)
+{
+    ItemB* i0 = (ItemB*)((char*)p + 0x2E0);
+    Menu* s0 = (Menu*)((char*)p + 0x32C);
+    void* i1 = (char*)p + 0x900;
+    void* i2 = (char*)p + 0x954;
+    void* i3 = (char*)p + 0x9B8;
+    void* i4 = (char*)p + 0xA0C;
+    void* i5 = (char*)p + 0xA70;
+    void* i6 = (char*)p + 0xAC4;
+    ItemB* i7 = (ItemB*)((char*)p + 0xB28);
+    Menu* s7 = (Menu*)((char*)p + 0xB74);
+    ItemB* i8 = (ItemB*)((char*)p + 0xEA8);
+    Menu* s8 = (Menu*)((char*)p + 0xEF4);
+    void* i9 = (char*)p + 0x1568;
+    ItemB* i10 = (ItemB*)((char*)p + 0x15BC);
+    ItemB* i11 = (ItemB*)((char*)p + 0x1608);
+    MenuInit(p, a);
+    p->m2DC = lbl_806666D8;
+    LabelInit(i0, lbl_805EF48C);
+    i0->m48 = s0;
+    i0->m8 = lbl_80666E20;
+    fn_803365DC(s0, (int)p);
+    fn_8032F19C(i1, lbl_805EED98, &lbl_8061CB80, 0);
+    fn_8032FAB0(i2, lbl_805EF4A4, &lbl_806207B4, lbl_805F34B4, 4, 1);
+    fn_8032F19C(i3, lbl_805EF4B4, &lbl_8061D030, 0);
+    fn_8032FAB0(i4, lbl_805EF4D0, &lbl_806207C4, lbl_805F34C4, 4, lbl_8061D034);
+    fn_8032F19C(i5, lbl_805EF4E8, &lbl_8061D038, 0);
+    fn_8032FAB0(i6, lbl_805EF500, &lbl_806207D4, lbl_805F34D4, 12, lbl_8061D03C);
+    LabelInit(i7, lbl_805EF514);
+    i7->m48 = s7;
+    i7->m8 = lbl_80666E20;
+    fn_8033648C(s7, (int)p);
+    LabelInit(i8, lbl_805EF524);
+    i8->m48 = s8;
+    i8->m8 = lbl_80666E20;
+    fn_8032BAF4(s8, (int)p);
+    fn_8032F19C(i9, lbl_805EF53C, &lbl_8061C68C, lbl_8061C68C);
+    LabelInit(i10, lbl_805EF550);
+    i10->m8 = lbl_80666DD0;
+    fn_8033FBD8(i10, (void*)fn_803368B0);
+    LabelInit(i11, lbl_805EF564);
+    i11->m8 = lbl_80666DD0;
+    fn_8033FBD8(i11, (void*)fn_80336848);
+    fn_80330ACC(p, (MItem*)i0);
+    fn_80330ACC(p, (MItem*)i1);
+    fn_80330ACC(p, (MItem*)i2);
+    fn_80330ACC(p, (MItem*)i3);
+    fn_80330ACC(p, (MItem*)i4);
+    fn_80330ACC(p, (MItem*)i5);
+    fn_80330ACC(p, (MItem*)i6);
+    fn_80330ACC(p, (MItem*)i7);
+    fn_80330ACC(p, (MItem*)i8);
+    fn_80330ACC(p, (MItem*)i9);
+    fn_80330ACC(p, (MItem*)i10);
+    fn_80330ACC(p, (MItem*)i11);
+    return p;
 }
 
 void fn_80336D88(Menu* p)
