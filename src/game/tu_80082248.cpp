@@ -133,6 +133,14 @@ extern char lbl_805B4254[];
 
 
 
+
+
+
+
+extern "C" void fn_80400CE4(int a);
+Rec* fn_80082248();
+
+
 Rec* fn_80082248()
 {
     int start = lbl_80619328;
@@ -244,6 +252,56 @@ int fn_80082FC4(Tree* t, Node* n)
     return c;
 }
 
+void fn_80083038(Tree* t, char** cursor, Node* n, Stream* s)
+{
+    if (n->m4 != &lbl_8061932C)
+        fn_80083038(t, cursor, n->m4, s);
+    if (n != &lbl_8061932C) {
+        Link* p = (Link*)n->m14;
+        unsigned char cnt = 0;
+        if (p != 0) {
+            do {
+                cnt++;
+                p = p->m0;
+            } while (p != 0);
+        }
+        p = (Link*)n->m14;
+        s->v08(cursor, &n->m10, 4);
+        s->v08(cursor, &cnt, 1);
+        if (p != 0) {
+            do {
+                s->v08(cursor, p, 0x14);
+                p = p->m0;
+            } while (p != 0);
+        }
+    }
+    if (n->m8 != &lbl_8061932C)
+        fn_80083038(t, cursor, n->m8, s);
+}
+
+void fn_80083160(Tree* t, char** cursor, int count, Stream* s)
+{
+    if (count > 0) {
+        int c = count;
+        do {
+            int key;
+            unsigned char cnt;
+            fn_80400CE4(0);
+            s->v08(cursor, &key, 4);
+            fn_80079FC0((void*)lbl_8061930C, cursor, &cnt, 1);
+            for (int j = 0; j < cnt; j++) {
+                Rec* r = fn_80082248();
+                s->v08(cursor, r, 0x14);
+                if (s->m0 == 0) {
+                    r->m0 = 0;
+                    fn_80082944(t, key, (Key*)r);
+                }
+            }
+            c--;
+        } while (c != 0);
+    }
+}
+
 void fn_80083258(void* self, int a, int h, int b, Key* k, int c)
 {
     k->h4 = h;
@@ -251,6 +309,42 @@ void fn_80083258(void* self, int a, int h, int b, Key* k, int c)
     k->m0 = 0;
     k->c = c;
     fn_80082944(self, a, k);
+}
+
+void fn_80083298(Holder* h, int key, int a, int b, V3* val)
+{
+    if (val->m0 != 0 || val->m4 != 0) {
+        int id = fn_8007A0D0(lbl_8061930C, b);
+        Node* n = fn_80082F4C(h->m0, key);
+        Link* l;
+        if (n != 0)
+            l = fn_800820C0(n, a, id, 1);
+        else
+            l = 0;
+        if (l == 0) {
+            l = (Link*)fn_80082248();
+            fn_80083258(h->m0, key, a, id, (Key*)l, 1);
+        }
+        *(V3*)((char*)l + 8) = *val;
+    }
+}
+
+void fn_80083370(Holder* h, int key, int a, int b, V3* val)
+{
+    if (val->m0 != 0 || val->m4 != 0) {
+        int id = fn_8007A0D0(lbl_8061930C, b);
+        Node* n = fn_80082F4C(h->m0, key);
+        Link* l;
+        if (n != 0)
+            l = fn_800820C0(n, a, id, 2);
+        else
+            l = 0;
+        if (l == 0) {
+            l = (Link*)fn_80082248();
+            fn_80083258(h->m0, key, a, id, (Key*)l, 2);
+        }
+        *(V3*)((char*)l + 8) = *val;
+    }
 }
 
 int fn_80083778(Tree* t, int key, int a, int b, Rec* out, int mode)
@@ -461,6 +555,23 @@ int fn_80084114(int t)
     return 4;
 }
 
+void fn_80084170(int t, int* a, int* b)
+{
+    switch (t) {
+    case 0: *a = t; *b = 2; break;
+    case 1: *a = 3; *b = 5; break;
+    case 2: *a = 6; *b = 8; break;
+    case 3: *a = 9; *b = 12; break;
+    case 4: *a = 13; *b = 14; break;
+    case 5: *a = 15; *b = 16; break;
+    case 6: *a = 17; *b = 18; break;
+    case 7: *a = 19; *b = 20; break;
+    case 8: *a = 21; *b = 22; break;
+    case 9: *a = 23; *b = 24; break;
+    default: *a = 0; *b = 5; break;
+    }
+}
+
 int fn_80084268(int t)
 {
     switch (t) {
@@ -564,6 +675,29 @@ int fn_800844A8(int t)
         return 0x8C;
     default:
         return 0;
+    }
+}
+
+void fn_8008453C(int t, int flag, int* a, int* b)
+{
+    int n = fn_800844A8(t);
+    int r = fn_80084600(t);
+    if (r == 1) {
+        if (flag == 0) {
+            *a = r;
+            *b = n / 2;
+        } else {
+            *a = n / 2 + 1;
+            *b = n;
+        }
+    } else {
+        if (flag == 0) {
+            *a = 1;
+            *b = n;
+        } else {
+            *a = n + 1;
+            *b = n + 1;
+        }
     }
 }
 
