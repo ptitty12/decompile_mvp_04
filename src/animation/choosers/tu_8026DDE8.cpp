@@ -12,3 +12,284 @@
  * as a global array.
  */
 #include "game/chooser.h"
+
+extern const char lbl_805DBC10[];   /* 0x148-byte tables in another unit's .rodata */
+extern const char lbl_805DBD58[];
+
+/* What fn_80383334 (hash lookup) returns; only slot 12 is called here. */
+class Unk8026DEF4_Obj {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual int fn_vslot12();
+};
+
+/* One parsed entry (0x18 bytes). Evidence: stride 0x18 in the parse function
+ * (0x8026DFE4), the id resolve (0x8026E2E8) and the accessors 0x8026DEF4,
+ * 0x8026DF9C and 0x8026DFC0. */
+struct Unk8026DDE8_Entry {
+    unsigned int hash;
+    int id;                    /* resolved from hash by fn_8026E2E8 */
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+};
+
+/* Position table for cMatrixChooser (vtable 0x80662688 with the parse function
+ * in slot 1 and the dtor in slot 2; base ctor 0x80356798; size 0x48, embedded in
+ * the chooser at +0xC).
+ *
+ * Parse format (slot 1): "count#" then per entry "hash,m8#...", then "m3C,",
+ * "m40#" and "count2#" followed by count2 byte triples "a,b,c#". */
+class Unk8026DDE8 : public Unk80356798 {
+public:
+    Unk8026DDE8();
+    virtual void fn_vslot1(char* buf, int len);
+    virtual ~Unk8026DDE8();
+    int fn_8026DEF4(int idx, int* id, float* a, float* b);
+    void fn_8026DF9C(int idx, float v);
+    void fn_8026DFC0(int idx, float v);
+    void fn_8026E2E8();
+
+    int m4;                    /* entry count */
+    Unk8026DDE8_Entry* m8;
+    int mC;                    /* triple count */
+    unsigned char* m10;        /* triples of entry indices */
+    float m14;                 /* last input (99999 = none) */
+    float m18;
+    int m1C;                   /* last result */
+    int m20;
+    int m24;
+    float m28;
+    float m2C;
+    float m30;
+    int m34;                   /* last result type */
+    int m38;                   /* set by the owner */
+    float m3C;                 /* default input */
+    float m40;
+    int m44;                   /* ids resolved */
+};
+
+Unk8026DDE8::Unk8026DDE8()
+{
+    m4 = 0;
+    mC = 0;
+    m44 = 0;
+    m8 = 0;
+    m10 = 0;
+    m3C = m40 = 0.0f;
+    m18 = m14 = 99999.0f;
+}
+
+Unk8026DDE8::~Unk8026DDE8()
+{
+    if (m4) {
+        m4 = 0;
+        if (m8) {
+            delete[] m8;
+        }
+        m8 = 0;
+    }
+    if (mC) {
+        mC = 0;
+        if (m10) {
+            delete[] m10;
+        }
+        m10 = 0;
+    }
+}
+
+int Unk8026DDE8::fn_8026DEF4(int idx, int* id, float* a, float* b)
+{
+    fn_8026E2E8();
+    if (idx >= 0 && idx < m4) {
+        *id = ((Unk8026DEF4_Obj*)m8[idx].id)->fn_vslot12();
+        *a = m8[idx].m8;
+        *b = m8[idx].mC;
+        return 1;
+    }
+    return 0;
+}
+
+void Unk8026DDE8::fn_8026DF9C(int idx, float v)
+{
+    m8[idx].m8 = v;
+}
+
+void Unk8026DDE8::fn_8026DFC0(int idx, float v)
+{
+    m8[idx].mC = v;
+}
+
+void Unk8026DDE8::fn_vslot1(char* buf, int len)
+{
+    m44 = 0;
+    if (len) {
+        char* cursor;
+        int remaining;
+        char* token;
+        int tokenLen;
+        char* token1;
+        int token1Len;
+        char* token2;
+        int token2Len;
+        char* token3;
+        int token3Len;
+        int i;
+        int err;
+
+        remaining = len;
+        cursor = buf;
+        err = 0;
+        fn_80378E48(&cursor, &remaining, '#', &token, &tokenLen);
+        m4 = fn_80409DAC(token);
+        if (m8) {
+            delete[] m8;
+        }
+        m8 = new (lbl_806EF9B4 | 0x100) Unk8026DDE8_Entry[m4];
+        for (i = 0; i < m4 && !err; i++) {
+            fn_80378E48(&cursor, &remaining, ',', &token1, &token1Len);
+            fn_80378E48(&cursor, &remaining, ',', &token2, &token2Len);
+            fn_80378E48(&cursor, &remaining, '#', &token3, &token3Len);
+            if (token1Len && token2Len && token3Len) {
+                m8[i].hash = fn_80378568(token1, token1Len);
+                m8[i].m8 = m8[i].m10 = (float)fn_80409D88(token2);
+                m8[i].mC = m8[i].m14 = (float)fn_80409D88(token3);
+            } else {
+                err = 1;
+            }
+        }
+        fn_80378E48(&cursor, &remaining, ',', &token, &tokenLen);
+        m3C = (float)fn_80409D88(token);
+        fn_80378E48(&cursor, &remaining, '#', &token, &tokenLen);
+        m40 = (float)fn_80409D88(token);
+        fn_80378E48(&cursor, &remaining, '#', &token, &tokenLen);
+        mC = fn_80409DAC(token);
+        if (m10) {
+            delete[] m10;
+            m10 = 0;
+        }
+        if (mC) {
+            unsigned char* p;
+            char* tokenA;
+            int tokenALen;
+
+            p = m10 = new (lbl_806EF9B4 | 0x100) unsigned char[mC * 3];
+            for (i = 0; i < mC && !err; i++) {
+                fn_80378E48(&cursor, &remaining, ',', &tokenA, &tokenALen);
+                *p++ = fn_80409DAC(tokenA);
+                fn_80378E48(&cursor, &remaining, ',', &tokenA, &tokenALen);
+                *p++ = fn_80409DAC(tokenA);
+                fn_80378E48(&cursor, &remaining, '#', &tokenA, &tokenALen);
+                *p++ = fn_80409DAC(tokenA);
+            }
+        }
+    }
+}
+
+void Unk8026DDE8::fn_8026E2E8()
+{
+    if (!m44) {
+        for (int i = 0; i < m4; i++) {
+            m8[i].id = fn_80383334(m8[i].hash);
+        }
+        m44 = 1;
+    }
+}
+
+/* "type" (also passed by other choosers' slot 2); right after the class name. */
+const char lbl_805DC394[] = "type";
+
+/* Class name; read by cMatrixChooser's vtable slot 3 (0x802AC838). */
+const char* lbl_8061E640 = "cMatrixChooser";
+
+class cMatrixChooser : public Unk8037B3E8 {
+public:
+    /* Declared first and defined in the unit at 0x802AC8xx (vtable slots 3/4),
+     * which makes g++ 2.95 emit this class's vtable there, as in retail. */
+    virtual const char* fn_vslot3();
+    virtual int fn_vslot4();
+
+    cMatrixChooser();
+    virtual void fn_vslot2();
+    virtual Unk8037B3E8* fn_vslot5();
+    virtual int fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
+    virtual int fn_vslot14(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj);
+    virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
+    void fn_8026F530(Unk80270BA0_Obj* obj);
+    int fn_8026F590(Unk80270BA0_Obj* obj, unsigned char* buf);
+    int fn_8026FB80(Unk80270BA0_Obj* obj, float* out);
+
+    int m4;                    /* state: -1, 0, 1 or 2 */
+    int m8;                    /* "type" enum */
+    Unk8026DDE8 mC;            /* "matrix2d"/"positions" */
+    int m54;                   /* "RepositionCatches_X" */
+    int m58;                   /* "RepositionCatches_Y" */
+    int m5C;
+};
+
+cMatrixChooser::cMatrixChooser() : Unk8037B3E8(lbl_8061E640)
+{
+    m8 = 3;
+    m4 = 0;
+    m54 = 0;
+    m58 = 0;
+    m5C = 0;
+}
+
+void cMatrixChooser::fn_vslot2()
+{
+    fn_8037B6B0(lbl_805DC394, &m8, "-,-,-,Swing,DirectionalCatch,Run,PopFlyCatch,Catch,BackCatch");
+    fn_8037B728("matrix2d", "positions", &mC, 0);
+    fn_8037B458("RepositionCatches_X", &m54, lbl_805DBC10, lbl_805DBD58);
+    fn_8037B458("RepositionCatches_Y", &m58, lbl_805DBC10, lbl_805DBD58);
+}
+
+int cMatrixChooser::fn_vslot13(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj)
+{
+    return m4 ? 0 : fn_vslot17(out, obj, 3, 0, 0, 0);
+}
+
+int cMatrixChooser::fn_vslot14(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj)
+{
+    if (m4 == 2) {
+        return fn_vslot17(out, obj, 1, 0, 0, 0);
+    }
+    if (m4 == 0) {
+        return fn_vslot17(out, obj, 3, 0, 0, 0);
+    }
+    return 0;
+}
+
+Unk8037B3E8* cMatrixChooser::fn_vslot5()
+{
+    return new (lbl_806EF9B4) cMatrixChooser;
+}
+
+void cMatrixChooser::fn_8026F530(Unk80270BA0_Obj* obj)
+{
+    if (!m5C) {
+        if (m54 || m58) {
+            fn_8026F590(obj, 0);
+        }
+        m5C = 1;
+    }
+}
+
+int fn_8026FB60(const float* a, const float* b)
+{
+    if (*a < *b) {
+        return -1;
+    }
+    return *a > *b;
+}
