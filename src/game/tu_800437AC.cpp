@@ -12,6 +12,12 @@
 #include "game/tu_800437AC.h"
 #include "game/tu_8003EF18.h"
 
+void* fn_800B555C();
+int fn_800B57EC(void* p);
+int fn_8009E1D4(void* p, int a, int b);
+int fn_800B5898(void* p);
+int fn_800B55A8(void* p);
+int fn_8006A1B4(void* p);
 int fn_80046828(float f);
 int fn_800467C0(float f);
 int fn_80046964(float f);
@@ -242,6 +248,150 @@ int fn_80043DAC(int a)
     return r;
 }
 
+int fn_80043DF0(Unk80043DF0_Obj* o)
+{
+    char* rec = o->m14;
+    char* rec2 = rec + 0xe64;
+    int h0 = fn_8009E1D4(rec + 0x8c, 0, 0);
+    int h1 = fn_8009E1D4(rec + 0xef0, 0, 0);
+    int k = o->mC->m84;
+    int is0 = k == 0;
+    int is1 = (k ^ 1) == 0;
+    int is2 = (k ^ 2) == 0;
+    int is3 = (k ^ 3) == 0;
+    int v;
+    if (fn_800B5898(fn_800B555C()) == 0) {
+        if (is0 != 0) {
+            if (h0 == 1 && h1 == 1)
+                v = 0x200;
+            else if (h0 == 0 && h1 == 0)
+                v = 0x100;
+            else
+                v = 0x400;
+        } else if (is1 != 0) {
+            if (h0 == 2 && h1 == 2)
+                v = 0x1000000;
+            else if (h0 == 3 && h1 == 3)
+                v = 0x4000000;
+            else
+                v = 0x400;
+            v |= 0x20000;
+        } else if (is2 != 0) {
+            if (h0 == 4 && h1 == 4)
+                v = 0x400000;
+            else if (h0 == 6 && h1 == 6)
+                v = 0x10000000;
+            else
+                v = 0x400;
+            v |= 0x10000;
+        } else {
+            v = 0x1000;
+            if (is3 != 0)
+                v = 0x20000000;
+        }
+    } else {
+        v = 0x800;
+    }
+    if (fn_800B57EC(fn_800B555C()) == 1) {
+        int r = fn_8006A1B4(o);
+        Unk800440E8_State st = *(Unk800440E8_State*)((char*)fn_800B555C() + 0x688);
+        switch (st.m0) {
+        case -1:
+            if (r == 1)
+                v = 1;
+            break;
+        case 0:
+            v = 0x4000;
+            if (is0 != 0) {
+                if (h0 == 1 && h1 == 1)
+                    v = 0x4080;
+                else if (h0 == 0 && h1 == 0)
+                    v |= 0x40;
+            }
+            break;
+        case 1:
+            v = 0x4000;
+            if (is0 != 0) {
+                if (h0 == 1 && h1 == 1)
+                    v = 0x6020;
+                else if (h0 == 0 && h1 == 0)
+                    v |= 0x2010;
+            }
+            break;
+        case 2:
+            v = 0x4000;
+            if (is0 != 0) {
+                v = 0x4002;
+                if (st.mC - 1 == st.m4 + st.m8)
+                    v = 0xc002;
+            }
+            break;
+        }
+    } else {
+        if (fn_800B55A8(fn_800B555C()) != 0)
+            v = 0x1000;
+    }
+    if (*(int*)(rec + 0x198) == *(int*)(rec2 + 0x198))
+        v = 0x1000;
+    {
+        int t = o->mC->m1C;
+        if (t == 0)
+            v = 0x200000;
+        else if (t == 1)
+            v = 0x800000;
+    }
+    return v;
+}
+
+int fn_800440E8(int a, int b, int c, Unk800438F8_Obj* o)
+{
+    int r = 0;
+    int kind = -1;
+    int sel = 0;
+    if (fn_800B57EC(fn_800B555C()) == 1) {
+        Unk800440E8_State st = *(Unk800440E8_State*)((char*)fn_800B555C() + 0x688);
+        kind = st.m0;
+        sel = st.m4 + st.m8 + 1;
+    }
+    if ((fn_800438F8(o) != 0 && kind == 0) || kind == 1 || kind == 2) {
+        switch (sel) {
+        case 1:
+            r = 0x20;
+            break;
+        case 2:
+            r = 0x40;
+            break;
+        case 3:
+            r = 1;
+            break;
+        case 4:
+            r = 2;
+            break;
+        case 5:
+            r = 4;
+            break;
+        case 6:
+            r = 8;
+            break;
+        case 7:
+            r = 0x10;
+            break;
+        }
+        switch (kind) {
+        case 0:
+            r |= 0x100;
+            break;
+        case 1:
+            r |= 0x200;
+            break;
+        case 2:
+            r |= 0x80;
+            break;
+        }
+    }
+    return r;
+}
+
 /* near-miss: 13/12 slots. Retail extracts (a == 0x1d) << 2 through
  * cmpwi cr7 + mfcr + rlwinm; plain C compiles to xori/addic/subfe. */
 int fn_80044240(int a)
@@ -253,8 +403,6 @@ int fn_80044240(int a)
     return 2;
 }
 
-/* near-miss: 85/86 slots, case-2/case-8 arms are laid out differently
- * (retail shares them with the b == 0 arms of cases 0/3 and 7/10). */
 int fn_80044580(int a, int b, int c)
 {
     int r = 0;
@@ -264,9 +412,6 @@ int fn_80044580(int a, int b, int c)
         r = 0x8001;
         if (b == 0)
             r |= 0x8000000;
-        break;
-    case 2:
-        r = 0x8008001;
         break;
     case 1:
         r = 0x1008001;
@@ -292,14 +437,17 @@ int fn_80044580(int a, int b, int c)
         if (b == 0)
             r = 0x4000101;
         break;
-    case 8:
-        r = 0x4000101;
-        break;
     case 11:
         r = 0xb;
         break;
     case 12:
         r = 3;
+        break;
+    case 8:
+        r = 0x4000101;
+        break;
+    case 2:
+        r = 0x8008001;
         break;
     }
     if (c == 1)

@@ -48,4 +48,29 @@ struct Unk80043884_Obj {
     Unk80043884_A* m130;
 };
 
+/* 16-byte record at +0x688 of the object returned by fn_800B555C (fn_800440E8
+ * reads kind = m0 and a 1-based selector m4 + m8 + 1 from it). */
+struct Unk800440E8_State {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+/* Object read by fn_80043DF0: +0xC points to a record with a mode word at
+ * +0x84 and another at +0x1C; +0x14 points to the pair of 0xE64-byte records
+ * (+0x8C and +0xEF0 are handed to fn_8009E1D4, +0x198 is compared). */
+struct Unk80043DF0_Sub {
+    char pad0[0x1C];
+    int m1C;
+    char pad20[0x84 - 0x20];
+    int m84;
+};
+struct Unk80043DF0_Obj {
+    char pad0[0xC];
+    Unk80043DF0_Sub* mC;
+    char pad10[4];
+    char* m14;
+};
+
 #endif
