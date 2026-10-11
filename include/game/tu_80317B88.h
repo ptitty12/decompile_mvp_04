@@ -415,6 +415,45 @@ struct FxR {
 };
 struct FxColor { float a; float b; float c; float d; };
 struct FxMat { float m[16]; };
+struct FxU {
+    int m0;
+    int m4;
+    FxU();
+};
+struct FxV;
+/* Two-int record initialised to -1 (ctor fn_803220E0).
+ * Second node of the class that fn_80323848 walks (m44 / m48 / m4C / m50, see FxL). */
+struct FxV {
+    char pad0[0x44];
+    int m44;
+    FxV* m48;
+    float m4C;
+    float m50;
+};
+struct FxW {
+    int m0;
+    const void* m4;
+    float m8;
+};
+/* Singleton helper (size 0x10, ctor fn_803224E8, vptr lbl_80665248 at +4).
+ * Object with the owner pointer at +8 (fn_803238D0, fn_80323904, fn_80323928). */
+struct FxX {
+    char pad0[0x8];
+    void* m8;
+    char padC[0x4];
+};
+/* Any object whose vptr sits at +0x18 (dtor stubs that only rewrite the vptr). */
+struct FxHdr {
+    char pad0[0x18];
+    const void* m18;
+};
+/* Key record compared by fn_803249D4 (int, float, int, int) and tested by fn_80324A24. */
+struct FxY {
+    int m0;
+    float m4;
+    int m8;
+    int mC;
+};
 // STRUCTS-END
 
 extern int lbl_8061FF50;
