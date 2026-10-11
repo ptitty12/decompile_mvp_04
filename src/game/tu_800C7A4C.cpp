@@ -147,21 +147,17 @@ extern "C" void fn_800C80C0(int* p, int v)
     *p = v;
 }
 
-/* near-miss: retail sets li r3,0 once before the first compare and then uses beqlr/bnelr for every early exit (o is loaded into r9, not r3) */
 extern "C" int fn_800C8070(Unk800C7B40_Data* w)
 {
     if (w->m0 != -1)
         return w->m0;
-    if (w->m1C == 0)
-        return 0;
-    Unk800C7B40_Data* o = lbl_8061ABE4;
-    if (o == 0)
-        return 0;
-    if (o->m1C != 0)
-        return 0;
-    if (o->m0 == -1)
-        return 0;
-    return o->m0;
+    int r = 0;
+    if (w->m1C != 0) {
+        Unk800C7B40_Data* o = lbl_8061ABE4;
+        if (o != 0 && o->m1C == 0 && o->m0 != -1)
+            r = o->m0;
+    }
+    return r;
 }
 
 extern "C" void fn_800C80C8(int* p)
