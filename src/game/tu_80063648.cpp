@@ -44,9 +44,8 @@ int fn_802B9C1C(Str* s, int* sz, int a);
 int fn_802B9804(int a, int b);
 int fn_80391B1C(int v);
 int fn_803FC438(int h, Str* s);
-void fn_8040B61C(Str* s);
-void fn_8040B61C(Str* s, const char* name);
-void fn_8040B448(Str* s, const char* t);
+Str* fn_8040B61C(Str* s, const char* name); /* strcpy: returns s */
+Str* fn_8040B448(Str* s, const char* t);    /* strcat: returns s */
 int fn_803FED48(int h, int a, int b, int* out);
 void fn_803FEDB8(int h, int a);
 void fn_803EDA0C(int h);
@@ -488,12 +487,10 @@ void Unk800642F0::fn_80064594()
     }
 }
 
-/* near-miss: only register numbers differ (retail: this r27, ok r28; here
- * this r28, ok r27). Declaration order, ok placement and update forms tried. */
 int Unk800642F0::fn_8006473C(const char* name, int h, Rec* r)
 {
     Str s1;
-    fn_8040B61C(&s1);
+    fn_8040B61C(&s1, name);
     int ok = 0;
     fn_8040B448(&s1, lbl_805AE378);
     Str s2;
