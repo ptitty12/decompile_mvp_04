@@ -5,3 +5,516 @@
  *
  * .text 0x80044C10-0x80045C8C only: every data object is extern by its lbl_ name.
  */
+#include "game/tu_80044C10.h"
+
+int fn_80044C10()
+{
+    if (lbl_806EF9A8 == 1) {
+        lbl_806E0288 = -1;
+        lbl_806EF9A8 = 0;
+    } else if (lbl_806E0288 != -1) {
+        lbl_806EF9A8 = 1;
+    }
+    if (lbl_806EF9AC == 2) {
+        lbl_806E028C = -1;
+        lbl_806EF9AC = 0;
+    } else if (lbl_806E028C != -1) {
+        lbl_806EF9AC += 1;
+    }
+    return 1;
+}
+
+void fn_80044C98(Unk80044C98_Arg* a)
+{
+    unsigned short t = a->mC;
+    if (t != lbl_806EF9B0) {
+        fn_80057C30(fn_800475EC()->mFC.mA9C, t);
+        lbl_806EF9B0 = t;
+    }
+    fn_800475EC()->fn_80047DE0(a->m0, a->m4, a->m8, a->m1C);
+}
+
+int fn_80044D00(unsigned a)
+{
+    return a > 1 ? 1 : 2;
+}
+
+int fn_80044D14(unsigned a)
+{
+    return a > 1 ? 1 : 2;
+}
+
+int fn_80044D28(int a)
+{
+    return a <= 1 ? 2 : 1;
+}
+
+int fn_80044D3C(int a)
+{
+    switch (a) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 4;
+    case 3:
+        return 8;
+    default:
+        return 0;
+    }
+}
+
+/* near-miss: result register is r7 here, r0 in retail, and the "r = 1" arm is hoisted above
+ * the first compare (35 vs 36 insns) */
+int fn_80044D90(unsigned a, unsigned b, int c, int d, int e, int f, int g)
+{
+    int r = 0;
+    if (a != 0) {
+        float t = (float)b / (float)a;
+        if (!(t > 0.34f)) {
+            r = 1;
+        } else {
+            r = 4;
+            if (!(t > 0.67f))
+                r = 2;
+        }
+    }
+    return r;
+}
+
+int fn_80044E60(unsigned a, unsigned b, int c, int d);
+
+void fn_80044E20(Unk80044C10_A* o)
+{
+    fn_80044E60(o->m130->m44C->m6F8->m10->m1C, o->m0, o->m1, o->m4D4);
+}
+
+int fn_80044E60(unsigned a, unsigned b, int c, int d)
+{
+    int r;
+    if (d == 3) {
+        r = 0x100;
+        if (c == 0)
+            r = 0x80;
+    } else if (c == 0) {
+        r = 8;
+        if (b == a)
+            r = 0x20;
+    } else {
+        r = 0x10;
+    }
+    if (b > a)
+        return r | 4;
+    if (b == a)
+        return r | 0x40;
+    return r;
+}
+
+int fn_80044EC0(int a, int b, int c, Unk80044C10_A* d, int e)
+{
+    float f;
+    int r = 0;
+    int ret = fn_80247858(e, &f);
+    if (!(f <= 57600.0f))
+        ret = -1;
+    if (d && d->m458 == 1 && a != 0) {
+        switch (ret) {
+        case -1:
+        case 3:
+            break;
+        case 0:
+            r = 8;
+            break;
+        case 1:
+            r = 2;
+            break;
+        case 2:
+            r = 4;
+            break;
+        }
+    } else if (c > 2) {
+        if (b == 11)
+            r = 1;
+        else if (b == 5)
+            r = 0x10;
+        else
+            r = 0x20;
+    }
+    return r;
+}
+
+int fn_80044FAC(unsigned a)
+{
+    int r = 0;
+    if (a == 0)
+        r = 0x400;
+    else if (a <= 10)
+        r = 1 << (a - 1);
+    else if (a <= 19)
+        r = 1 << a;
+    return r;
+}
+
+int fn_80044FF0(unsigned a)
+{
+    int r = 1;
+    if (a > 10)
+        r = 0;
+    else if (a == 0)
+        r = 0x400;
+    else
+        r <<= a - 1;
+    return r;
+}
+
+int fn_80045024(int a)
+{
+    int r = 1;
+    unsigned t = a - 1;
+    if (t > 30)
+        r = 0;
+    else
+        r <<= t;
+    return r;
+}
+
+int fn_80045044(int a, int b, int c, int d, int e, int f)
+{
+    int r = 0;
+    if (a == 2)
+        r = 2;
+    else if (a == 3)
+        r = 4;
+    if (b == 1)
+        r |= 1;
+    if (d == 1)
+        r |= 0x20;
+    if (c == 1)
+        r |= 0x40;
+    if (e == 1)
+        r |= 8;
+    if (f == 12)
+        r |= 0x10;
+    return r;
+}
+
+int fn_800450A8(int a, int b, int c, int d, int e, Unk80044C10_A* o)
+{
+    float f, x, y;
+    int r = 0;
+    fn_8018CA5C(o->m6CC, &f, &x, &y);
+    f *= 57.295773f;
+    if (((!(f < 25.0f) && f <= 38.0f) || (!(f < 52.0f) && !(f > 63.0f))) && a == 0) {
+        r = 0;
+    } else if (b == 4 || b == 6) {
+        switch (a) {
+        case 0:
+            break;
+        case 1:
+            r |= 0x800000;
+            break;
+        case 2:
+            r |= 0x8000;
+            break;
+        case 3:
+            r |= 0x100;
+            if (d == 1)
+                r |= 0x2000000;
+            if (e == 1)
+                r |= 0x4000000;
+            break;
+        }
+    } else {
+        switch (c) {
+        case 0:
+            switch (a) {
+            case 0:
+                r |= 0x80000;
+                break;
+            case 1:
+                r |= 0x1800000;
+                break;
+            case 2:
+                r |= 0x28000;
+                break;
+            case 3:
+                r |= 0x20300;
+                if (d == 1)
+                    r |= 0x2100000;
+                if (e == 1)
+                    r |= 0x4000000;
+                break;
+            }
+            break;
+        case 1:
+            switch (a) {
+            case 0:
+                r |= 0x80;
+                break;
+            case 1:
+                r |= 0xA00080;
+                break;
+            case 2:
+                r |= 0x8001;
+                break;
+            case 3:
+                r |= 0x109;
+                if (d == 1)
+                    r |= 0x2000004;
+                if (e == 1)
+                    r |= 0x4000000;
+                break;
+            }
+            break;
+        case 2:
+            switch (a) {
+            case 0:
+                r |= 0x2000;
+                break;
+            case 1:
+                r |= 0xC00000;
+                break;
+            case 2:
+                r |= 0x8800;
+                break;
+            case 3:
+                r |= 0x940;
+                if (d == 1)
+                    r |= 0x2004000;
+                if (e == 1)
+                    r |= 0x4000000;
+                break;
+            }
+            break;
+        }
+        if (b == 2) {
+            r = 0x40020;
+            if (a == 3)
+                r = 0x40030;
+        }
+        if (b == 8) {
+            r = 0x1020;
+            if (a == 3)
+                r = 0x1030;
+        }
+    }
+    return r;
+}
+
+int fn_80045348(int a, int b)
+{
+    if (a != 0 || b == -1)
+        return 0;
+    if (b == 0)
+        return 1;
+    if ((unsigned)(b - 1) <= 1)
+        return 2;
+    return 4;
+}
+
+int fn_8004570C(unsigned a)
+{
+    int r = 2;
+    if (a == 0)
+        r = 1;
+    else if (a <= 30)
+        r <<= a - 1;
+    else
+        r = 0;
+    return r;
+}
+
+int fn_80045740(unsigned a)
+{
+    int r = 2;
+    if (a == 0)
+        r = 1;
+    else if (a <= 30)
+        r <<= a - 1;
+    else
+        r = 0;
+    return r;
+}
+
+int fn_80045774(unsigned a)
+{
+    int r = 0;
+    if (a > 10)
+        r = 0x400;
+    else if (a != 0)
+        r = 1 << (a - 1);
+    return r;
+}
+
+int fn_800457A4(unsigned a)
+{
+    return a > 1 ? 1 : 2;
+}
+
+int fn_800457B8(unsigned a)
+{
+    unsigned t = a - 1;
+    int r = 0;
+    if (t <= 19) {
+        r = 1 << t;
+        if (a > 6)
+            return r | 0x100000;
+    }
+    return r;
+}
+
+int fn_800457E4(int a)
+{
+    switch (a) {
+    case 0:
+        return 1;
+    case 1:
+        return 2;
+    case 2:
+        return 4;
+    case 3:
+        return 8;
+    case 4:
+        return 0x10;
+    case 5:
+        return 0x20;
+    case 6:
+        return 0x40;
+    case 7:
+        return 0x80;
+    case 8:
+        return 0x100;
+    default:
+        return 0;
+    }
+}
+
+int fn_8004588C(int a)
+{
+    int r = 0;
+    if ((unsigned)(a - 1) <= 19)
+        r = 1 << a;
+    return r;
+}
+
+int fn_800458AC(unsigned a)
+{
+    return a > 1 ? 1 : 2;
+}
+
+/* near-miss: last arm ("a >= 0.75f ? 1 : 2") comes out with the li hoisted and bns instead of
+ * bso (23 vs 24 insns); ~10 spellings tried */
+int fn_800458C0(float a)
+{
+    int r = 0;
+    if (!(a < 0.0f)) {
+        if (!(a > 0.4f))
+            return 4;
+        if (!(a >= 0.75f))
+            return 2;
+        r = 1;
+    }
+    return r;
+}
+
+int fn_80045920(int a)
+{
+    return a != 1 ? 2 : 1;
+}
+
+int fn_80045934(int a, int b)
+{
+    int r;
+    if (b > 0x59)
+        r = 1;
+    else if (b > 0x54)
+        r = 2;
+    else
+        r = 4;
+    if (b > 0x63)
+        return r | 8;
+    if (b == 0x63)
+        return r | 0x100;
+    if (b == 0x62)
+        return r | 0x80;
+    if (b == 0x61)
+        return r | 0x40;
+    if (b == 0x60)
+        return r | 0x20;
+    if (b == 0x5F)
+        return r | 0x10;
+    return r;
+}
+
+/* near-miss: ~49 slots differ; the two 128-byte sum loops hoist the side base differently
+ * (retail reloads C->m14 after the first loop) */
+int fn_800459B0(Unk80044C10_A* o, unsigned a, unsigned b)
+{
+    Unk80044C10_B* tb = o->m44C;
+    int s708 = o->m708;
+    int side = 0;
+    Unk80044C10_C* tc = tb->m6F8;
+    int s460 = o->m460;
+    int s704 = o->m704;
+    int s458 = o->m458;
+    if (tc->m14->m1CD0 != 0)
+        side = 1;
+    Unk80044C10_A* other = fn_801A4B34(tb);
+    int r = 0;
+    if (s708 == side) {
+        if ((unsigned)(s458 - 10) <= 2)
+            r = 0x800;
+        else if (other->m460 == 9)
+            r = 0x200;
+        else if (other == o)
+            r = 0x1000;
+    } else if (s460 != 0) {
+        r = fn_80043B78(s460);
+    } else {
+        int found = 0;
+        int i = 0;
+        r = 0x400;
+        int oi = tb->m6F8->m14->m1CD0 == 0;
+        Unk80044C10_Side* s = &tc->m14->sides[oi];
+        for (i = 0; i < s->m54; i++) {
+            if (s704 == s->m3E8[s->m50[(unsigned char)i]].m0) {
+                found = 1;
+                break;
+            }
+        }
+        if (found == 1) {
+            float ratio = (float)b / (float)a;
+            int sum0 = 0;
+            Unk80044C10_C* c2 = tb->m6F8;
+            int oj = c2->m14->m1CD0 == 0;
+            int j;
+            for (j = 0; j < 0x80; j++)
+                sum0 += c2->m14->sides[oj].m1B4[(unsigned char)j];
+            int sum1 = 0;
+            for (j = 0; j < 0x80; j++)
+                sum1 += c2->m14->sides[side].m1B4[(unsigned char)j];
+            if (!(ratio <= 0.67f) && sum0 > sum1 && sum0 - sum1 <= 3)
+                r = 0x2000;
+        }
+    }
+    return r;
+}
+
+int fn_80045BD8(Unk80044C10_A* o)
+{
+    Unk80044C10_B* tb = o->m44C;
+    int s708 = o->m708;
+    Unk80044C10_A* other = fn_801A4B34(tb);
+    int side = 0;
+    if (tb->m6F8->m14->m1CD0 != 0)
+        side = 1;
+    int r = 0;
+    if (s708 == side) {
+        if (other == o)
+            r = fn_80043650(o->vslot24());
+    } else if (o->m460 == 0) {
+        r = fn_80043650(o->vslot22());
+    }
+    return r;
+}

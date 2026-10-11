@@ -5,3 +5,11 @@
  *
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
+#include "game/tu_8004B6BC.h"
+
+void fn_8004B910(Unk800493D4_Sm* s)
+{
+    int v = s->mA58;
+    if (v != 0)
+        s->mA58 = v - 1;
+}
