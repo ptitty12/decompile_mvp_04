@@ -188,8 +188,16 @@ class ProjectConfig:
             None  # Custom ninja build rules
         )
         self.custom_build_steps: Optional[Dict[str, List[Dict[str, Any]]]] = (
-            None  # Custom build steps, types are ["pre-compile", "post-compile", "post-link", "post-build"]
+            None  # Custom build steps, types are ["pre-split", "pre-compile", "post-compile", "post-link", "post-build"]
         )
+        # ProDG: options for SN ProDG (ngcld) linked games. See docs/DECISIONS.md.
+        self.ldscript_path: Optional[Path] = (
+            None  # Static linker script for ngcld (replaces dtk's generated ldscript.lcf)
+        )
+        self.dol_layout_path: Optional[Path] = (
+            None  # If set, build the DOL with tools/mkdol.py --layout instead of dtk elf2dol
+        )
+        self.split_implicit: List[Path] = []  # Extra implicit inputs of the split step
         self.generate_compile_commands: bool = (
             True  # Generate compile_commands.json for clangd
         )
@@ -297,6 +305,11 @@ def is_windows() -> bool:
 
 # On Windows, we need this to use && in commands
 CHAIN = "cmd /c " if is_windows() else ""
+
+
+# ProDG: toolchain versions named "ProDG/x.y.z" select SN's ngccc/ngcld
+def is_prodg(version: Optional[Union[str, Path]]) -> bool:
+    return version is not None and str(version).replace("\\", "/").startswith("ProDG/")
 # Native executable extension
 EXE = ".exe" if is_windows() else ""
 
@@ -694,6 +707,23 @@ def generate_build_ninja(
     mwld_cmd = f"{wrapper_cmd}{mwld} $ldflags -o $out @$out.rsp"
     mwld_implicit: List[Optional[Path]] = [compilers_implicit or mwld, wrapper_implicit]
 
+    # ProDG: SN ngcld replaces mwld when the linker version is "ProDG/..."
+    if is_prodg(config.linker_version):
+        mwld = compiler_path / "ngcld.exe"
+        mwld_cmd = f"{wrapper_cmd}{mwld} $ldflags -o $out @$out.rsp"
+        mwld_implicit = [compilers_implicit or mwld, wrapper_implicit]
+
+    # ProDG: SN ngccc driver (GCC 2.95.3 "SN BUILD"). It locates cc1/cc1plus via
+    # sn.ini in SN_NGC_PATH. Writes a gcc-style depfile next to the object.
+    ngccc = compiler_path / "ngccc.exe"
+    ngccc_env = (
+        f"{CHAIN}set SN_NGC_PATH=$sn_ngc_path&& "
+        if is_windows()
+        else "env SN_NGC_PATH=$sn_ngc_path "
+    )
+    ngccc_cmd = f"{ngccc_env}{wrapper_cmd}{ngccc} $cflags -MMD -MF $basefile.d -c $in -o $out"
+    ngccc_implicit: List[Optional[Path]] = [compilers_implicit or ngccc, wrapper_implicit]
+
     # GNU as
     gnu_as = binutils / f"powerpc-eabi-as{EXE}"
     gnu_as_cmd = (
@@ -730,10 +760,32 @@ def generate_build_ninja(
     n.newline()
 
     n.comment("Generate DOL")
+    elf2dol_implicit: List[Optional[Path]] = [dtk]
+    if config.dol_layout_path is not None:
+        # ProDG: pack sections into DOL slots per the retail layout (tools/mkdol.py)
+        mkdol = config.tools_dir / "mkdol.py"
+        layout = config.dol_layout_path
+        n.rule(
+            name="elf2dol",
+            command=f"$python {mkdol} --layout {serialize_path(layout)} $in $out",
+            description="DOL $out",
+        )
+        elf2dol_implicit = [mkdol, layout]
+    else:
+        n.rule(
+            name="elf2dol",
+            command=f"{dtk} elf2dol $in $out",
+            description="DOL $out",
+        )
+    n.newline()
+
+    n.comment("ProDG build")
     n.rule(
-        name="elf2dol",
-        command=f"{dtk} elf2dol $in $out",
-        description="DOL $out",
+        name="prodg",
+        command=ngccc_cmd,
+        description="PRODG $out",
+        depfile="$basefile.d",
+        deps="gcc",
     )
     n.newline()
 
@@ -876,11 +928,14 @@ def generate_build_ninja(
         return path.parent / (path.name + ".MAP")
 
     class LinkStep:
-        def __init__(self, config: BuildConfigModule) -> None:
-            self.name = config["name"]
-            self.module_id = config["module_id"]
-            self.ldscript: Optional[Path] = Path(config["ldscript"])
-            self.entry = config["entry"]
+        def __init__(self, module_config: BuildConfigModule) -> None:
+            self.name = module_config["name"]
+            self.module_id = module_config["module_id"]
+            self.ldscript: Optional[Path] = Path(module_config["ldscript"])
+            # ProDG: ngcld uses a static GNU-style script, not dtk's ldscript.lcf
+            if config.ldscript_path is not None and self.module_id == 0:
+                self.ldscript = config.ldscript_path
+            self.entry = module_config["entry"]
             self.inputs: List[str] = []
 
         def add(self, obj: Path) -> None:
@@ -902,10 +957,13 @@ def generate_build_ninja(
             n.comment(f"Link {self.name}")
             if self.module_id == 0:
                 elf_path = build_path / f"{self.name}.elf"
-                elf_ldflags = f"$ldflags -lcf {serialize_path(self.ldscript)}"
+                prodg = is_prodg(config.linker_version)
+                script_flag = "-T" if prodg else "-lcf"
+                elf_ldflags = f"$ldflags {script_flag} {serialize_path(self.ldscript)}"
                 if config.generate_map:
                     elf_map = map_path(elf_path)
-                    elf_ldflags += f" -map {serialize_path(elf_map)}"
+                    map_flag = "-Map" if prodg else "-map"
+                    elf_ldflags += f" {map_flag} {serialize_path(elf_map)}"
                 else:
                     elf_map = None
                 n.build(
@@ -1006,11 +1064,15 @@ def generate_build_ninja(
 
             cflags = obj.options["cflags"]
             extra_cflags = obj.options["extra_cflags"]
+            prodg = is_prodg(obj.options["mw_version"])
 
             # Add appropriate language flag if it doesn't exist already
             # Added directly to the source so it flows to other generation tasks
-            if not any(flag.startswith("-lang") for flag in cflags) and not any(
-                flag.startswith("-lang") for flag in extra_cflags
+            # (ProDG: GCC infers the language from the file extension)
+            if (
+                not prodg
+                and not any(flag.startswith("-lang") for flag in cflags)
+                and not any(flag.startswith("-lang") for flag in extra_cflags)
             ):
                 # Ensure extra_cflags is a unique instance,
                 # and insert into there to avoid modifying shared sets of flags
@@ -1049,6 +1111,12 @@ def generate_build_ninja(
                 build_implcit = mwcc_extab_implicit
                 variables["extab_padding"] = "".join(
                     f"{i:02x}" for i in obj.options["extab_padding"]
+                )
+            if prodg:
+                build_rule = "prodg"
+                build_implcit = ngccc_implicit
+                variables["sn_ngc_path"] = os.path.abspath(
+                    compilers / obj.options["mw_version"]
                 )
             n.comment(f"{obj.name}: {lib_name} (linked {obj.completed})")
             n.build(
@@ -1198,12 +1266,14 @@ def generate_build_ninja(
 
         # Check if all compiler versions exist
         for mw_version in used_compiler_versions:
-            mw_path = compilers / mw_version / "mwcceppc.exe"
+            cc_exe = "ngccc.exe" if is_prodg(mw_version) else "mwcceppc.exe"
+            mw_path = compilers / mw_version / cc_exe
             if config.compilers_path and not os.path.exists(mw_path):
                 sys.exit(f"Compiler {mw_path} does not exist")
 
         # Check if linker exists
-        mw_path = compilers / str(config.linker_version) / "mwldeppc.exe"
+        ld_exe = "ngcld.exe" if is_prodg(config.linker_version) else "mwldeppc.exe"
+        mw_path = compilers / str(config.linker_version) / ld_exe
         if config.compilers_path and not os.path.exists(mw_path):
             sys.exit(f"Linker {mw_path} does not exist")
 
@@ -1228,7 +1298,7 @@ def generate_build_ninja(
             outputs=link_steps[0].output(),
             rule="elf2dol",
             inputs=link_steps[0].partial_output(),
-            implicit=dtk,
+            implicit=elf2dol_implicit,
             order_only="post-link",
         )
 
@@ -1488,6 +1558,9 @@ def generate_build_ninja(
     # Split DOL
     ###
     build_config_path = build_path / "config.json"
+    # ProDG: steps that produce the split's input object (always emitted,
+    # since the split must run before build_config exists)
+    write_custom_step("pre-split")
     n.comment("Split DOL into relocatable objects")
     n.rule(
         name="split",
@@ -1500,7 +1573,7 @@ def generate_build_ninja(
         inputs=config.config_path,
         outputs=build_config_path,
         rule="split",
-        implicit=dtk,
+        implicit=[dtk, *config.split_implicit],
         variables={"out_dir": build_path},
     )
     n.newline()
@@ -1606,6 +1679,12 @@ def generate_objdiff_config(
         "GC/1.2.5": "mwcc_233_163",
         "GC/1.2.5e": "mwcc_233_163e",
         "GC/1.2.5n": "mwcc_233_163n",
+        # ProDG: decomp.me ids as used by dbalatoni13/nfsmw
+        "ProDG/3.5": "prodg_35",
+        "ProDG/3.5b140": "prodg_35_b140",
+        "ProDG/3.7": "prodg_37",
+        "ProDG/3.8.1": "prodg_381",
+        "ProDG/3.9.3": "prodg_393",
         "GC/1.3": "mwcc_242_53",
         "GC/1.3.2": "mwcc_242_81",
         "GC/1.3.2r": "mwcc_242_81r",

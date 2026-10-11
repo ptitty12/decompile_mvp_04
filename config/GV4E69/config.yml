@@ -1,0 +1,38 @@
+# GV4E69: MVP Baseball 2005 (USA, rev 0). See config.example.yml for documentation.
+#
+# Split input is the "analysis DOL": the disc's /mvp.elf converted with
+# `tools/mkdol.py --per-section` by the pre-split steps in configure.py. It has
+# the same bytes as the retail main.dol at every address, but keeps the real
+# ELF section boundaries (.init, .text, two code overlays, .ctors, .dtors, ...).
+# The final build is verified against the retail main.dol (build.sha1).
+name: main
+object: build/GV4E69/orig/main_sections.dol
+hash: cf3774202d9f153072a636816a6f4e938d145fbf
+symbols: config/GV4E69/symbols.txt
+splits: config/GV4E69/splits.txt
+
+# No mw_comment_version: the game was built with SN ProDG, not CodeWarrior,
+# so the split objects must not carry Metrowerks .comment sections.
+
+# Relocation overrides. Each entry changes only how a reference is expressed
+# (symbol + addend); the resulting bytes are identical either way.
+add_relocations:
+
+# fn_802C62xx indexes a 1-based array of 3-byte records as `(arr - 3) + i*3`:
+# `lis r9, 0x8062; addi r9, r9, -0x13DB` -> 0x8061EC25, one byte into the last
+# word of the pointer table before the array. Target the array (0x8061EC28).
+- source: .text:0x802C6358
+  type: ha
+  target: lbl_8061EC28
+  addend: -3
+- source: .text:0x802C635C
+  type: l
+  target: lbl_8061EC28
+  addend: -3
+
+# crt0 clears .sbss with memset(0x806EF380, 0, 0x806EFC40 - 0x806EF380).
+# dtk names the `ori` half `_stack_end` (a CodeWarrior convention) while the
+# `lis` half is lbl_806EFC40; keep the pair consistent.
+- source: .init:0x80003160
+  type: l
+  target: lbl_806EFC40

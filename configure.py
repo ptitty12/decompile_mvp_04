@@ -29,7 +29,7 @@ from tools.project import (
 # Game versions
 DEFAULT_VERSION = 0
 VERSIONS = [
-    "GAMEID",  # 0
+    "GV4E69",  # 0: MVP Baseball 2005 (USA, rev 0)
 ]
 
 parser = argparse.ArgumentParser()
@@ -157,9 +157,9 @@ if not config.non_matching:
 
 # Tool versions
 config.binutils_tag = "2.42-2"
-config.compilers_tag = "20251118"
-config.dtk_tag = "v1.8.3"
-config.objdiff_tag = "v3.6.1"
+config.compilers_tag = "20251118"  # files.decomp.dev; includes ProDG 3.5-3.9.3 and MWCC GC/*
+config.dtk_tag = "v1.8.4"
+config.objdiff_tag = "v3.8.2"
 config.sjiswrap_tag = "v1.2.2"
 config.wibo_tag = "1.0.3"
 
@@ -173,15 +173,76 @@ config.asflags = [
     f"-I build/{config.version}/include",
     f"--defsym BUILD_VERSION={version_num}",
 ]
-config.ldflags = [
-    "-fp hardware",
-    "-nodefaults",
+# SN ngcld. The script and DOL packing are described in docs/DECISIONS.md.
+config.ldflags = []
+config.ldscript_path = Path("config") / config.version / "ldscript.ld"
+config.dol_layout_path = Path("config") / config.version / "dol_layout.txt"
+
+###
+# Analysis input ("pre-split" steps)
+#
+# `dtk dol split` reads a DOL, but the retail main.dol merges sections into
+# segments (.text + overlays, .ctors + .dtors), which hides the real section
+# boundaries. The disc carries the stripped link output /mvp.elf (same bytes as
+# main.dol), so we convert it to a one-section-per-ELF-section "analysis DOL"
+# and split that. The final build is still verified against the retail
+# main.dol hash in config/GV4E69/build.sha1.
+###
+orig_dir = Path("orig") / config.version
+analysis_dir = config.build_dir / config.version / "orig"
+analysis_elf = analysis_dir / "mvp.elf"
+analysis_dol = analysis_dir / "main_sections.dol"
+disc_exts = (".iso", ".gcm", ".ciso", ".rvz", ".wia", ".wbfs", ".gcz", ".nfs", ".tgc")
+discs = sorted(p for p in orig_dir.glob("*") if p.suffix.lower() in disc_exts)
+dtk_exe = config.build_dir / "tools" / ("dtk.exe" if is_windows() else "dtk")
+config.custom_build_rules = [
+    {
+        "name": "extract_disc_file",
+        "command": f'{dtk_exe} vfs cp "$disc:$disc_path" $out',
+        "description": "EXTRACT $disc_path",
+    },
+    {
+        "name": "copy_file",
+        "command": "$python -c \"import shutil,sys; shutil.copyfile(sys.argv[1], sys.argv[2])\" $in $out",
+        "description": "COPY $out",
+    },
+    {
+        "name": "mkdol_sections",
+        "command": "$python tools/mkdol.py --per-section $in $out",
+        "description": "ANALYSIS DOL $out",
+    },
 ]
-if args.debug:
-    config.ldflags.append("-g")  # Or -gdwarf-2 for Wii linkers
-if args.map:
-    config.ldflags.append("-mapunused")
-    # config.ldflags.append("-listclosure") # For Wii linkers
+if (orig_dir / "mvp.elf").is_file():
+    elf_step = {
+        "outputs": analysis_elf,
+        "rule": "copy_file",
+        "inputs": orig_dir / "mvp.elf",
+    }
+elif len(discs) == 1:
+    elf_step = {
+        "outputs": analysis_elf,
+        "rule": "extract_disc_file",
+        "inputs": discs[0],
+        "implicit": dtk_exe,
+        "variables": {"disc": discs[0], "disc_path": "files/mvp.elf"},
+    }
+else:
+    sys.exit(
+        f"Expected exactly one disc image (or an extracted mvp.elf) in {orig_dir}, "
+        f"found {[p.name for p in discs]}"
+    )
+config.custom_build_steps = {
+    "pre-split": [
+        elf_step,
+        {
+            "outputs": analysis_dol,
+            "rule": "mkdol_sections",
+            "inputs": analysis_elf,
+            "implicit": Path("tools") / "mkdol.py",
+        },
+    ],
+}
+config.split_implicit = [analysis_dol]
 
 # Use for any additional files that should cause a re-configure when modified
 config.reconfig_deps = []
@@ -247,7 +308,7 @@ cflags_rel = [
     "-sdata2 0",
 ]
 
-config.linker_version = "GC/1.3.2"
+config.linker_version = "ProDG/3.9.3"  # SN ngcld 1.5.1.692; cc1plus = "2.95.3 SN BUILD v1.76"
 
 
 # Helper function for Dolphin libraries
@@ -284,18 +345,9 @@ def MatchingFor(*versions):
 
 config.warn_missing_config = True
 config.warn_missing_source = False
-config.libs = [
-    {
-        "lib": "Runtime.PPCEABI.H",
-        "mw_version": config.linker_version,
-        "cflags": cflags_runtime,
-        "progress_category": "sdk",  # str | List[str]
-        "objects": [
-            Object(NonMatching, "Runtime.PPCEABI.H/global_destructor_chain.c"),
-            Object(NonMatching, "Runtime.PPCEABI.H/__init_cpp_exceptions.cpp"),
-        ],
-    },
-]
+# No translation units are configured yet: every object is linked from the
+# dtk split (assembly). Units are added here as they are identified/matched.
+config.libs = []
 
 
 # Optional callback to adjust link order. This can be used to add, remove, or reorder objects.

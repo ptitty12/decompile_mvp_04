@@ -19,13 +19,24 @@ build/
 # Kit archive (contents are unpacked into the repo)
 *.zip
 
-# Tooling / local
+*.o
+*.MAP
+*.exe
+
+# Tooling / local (merged with dtk-template's .gitignore)
 __pycache__/
 *.pyc
+.mypy_cache
+.cache/
+.idea/
+.vs/
 .ninja_*
 build.ninja
 objdiff.json
 compile_commands.json
+ctx.*
+*.ctx
+/*.txt
 .vscode/
 .DS_Store
 Thumbs.db

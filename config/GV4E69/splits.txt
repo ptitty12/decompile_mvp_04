@@ -1,0 +1,13 @@
+Sections:
+	.init       type:code align:4
+	.text       type:code align:16
+	.feoverlay  type:code align:4
+	.dboverlay  type:code align:4
+	.ctors      type:rodata align:1
+	.dtors      type:rodata align:1
+	.rodata     type:rodata align:8
+	.data       type:data align:32
+	.bss        type:bss align:32
+	.sdata      type:data align:8
+	.sbss       type:bss align:8
+	.sdata2     type:rodata align:8
