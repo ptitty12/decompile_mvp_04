@@ -3,8 +3,37 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801CF054.h"
+#include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_8027C728.h"
 
 typedef Unk801CF054_Y Y;
+struct Unk801CF054_T {
+    char pad0[8];
+    Unk801B7FB0_P* m8[3];
+};
+extern Unk801CF054_T* lbl_8068B618;
+inline Unk801B7FB0_P* GetP(Unk801B7FB0_P** a, unsigned i)
+{
+    if (i <= 2)
+        return a[i];
+    return 0;
+}
+inline int GetJ(Unk801B7FB0_Arr* a, int i) { return a->m14[i]; }
+typedef Unk801C16B0_Z Z;
+
+/* Goal storage at goal+0x18 (full layout in goals/tu_80287600.h, which also declares
+ * globals const that retail reloads, so only the method is declared here). */
+class Unk80287D70 {
+public:
+    Unk80287D70* fn_80287DB8(int kind);
+};
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk801B7FB0_P* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
+extern "C" Vec3* fn_801C342C(Vec3* out, Z* z);
+extern "C" void fn_80187D20(Unk801B7FB0_P* c, int k, float a, float b, float c2);
+extern "C" Unk801B7FB0_P* fn_801A4B34(Unk801B7FB0_P* ctx);
+extern "C" void fn_8037893C(void* mgr, int type, void* ev, int a, void* t);
 typedef Unk801B7FB0_P P;
 extern const char lbl_805D26C8[];
 extern float lbl_805D26E8;
@@ -19,6 +48,41 @@ void fn_8035B1C8(void* p);
 void fn_801D6FE4(void* p);
 void fn_801D5CF0(Y* y);
 int fn_8022F138(void* p);
+}
+
+inline void SetMode(Unk801C16B0_Mode* m, int v)
+{
+    if (m->m0 != 0)
+        m->m4 = v;
+}
+
+extern "C" void fn_801CF304(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        if (z->m124 != 2) {
+            P* c = z->m204->m6CC;
+            if (c->m38C == 2)
+                fn_80187D20(c, 0, 1.0f, 1.0f, 1.0f);
+            if (z->m1CC == 0)
+                SetMode(&z->m28C, 3);
+            else
+                SetMode(&z->m28C, 2);
+            Unk8027C728_Goal* g = fn_802448F4(p, 2);
+            g->m10 = 0;
+            fn_8027C728(g);
+            *(int*)((char*)g + 0x60) = 2;
+            Unk8027C728_Goal* g0 = g->m0;
+            g0->m10 = 2;
+            fn_8027C728(g0);
+            Vec3 v;
+            fn_801C342C(&v, z);
+            ((Unk8027A84C*)g0->m18)->fn_8027A898(&v);
+            ((Unk80287D70*)g0->m18)->fn_80287DB8(9);
+            fn_8027D33C(g);
+            fn_8037893C(&z->m204->m704, 0x56, 0, 0, 0);
+        }
+    }
 }
 
 extern "C" void fn_801D0288(Y* y) { y->m1F4 = 1; }
@@ -131,14 +195,26 @@ extern "C" void fn_801D0440(Y* y)
     }
 }
 
+extern "C" int fn_801D0B48(Y* y)
+{
+    Unk801CF054_T* t = lbl_8068B618;
+    P* p = GetP(t->m8, t->m8[0] == y->m30);
+    int k = 0;
+    if (p->m6F8->m14->m1CD0 != 0)
+        k = 1;
+    return GetJ(p->m6F8->m10, k);
+}
+
 extern "C" int fn_801D0BB0(Y* y)
 {
     int e = y->m30->m6F8->m14->m1CD0 == 0;
     int ok = fn_801A2034(y->m30, e) != -1 ? 1 : 0;
-    if (!ok)
-        return 2;
-    return y->m30->m6F8->m10->m14[e];
+    if (ok)
+        return GetJ(y->m30->m6F8->m10, e);
+    return 2;
 }
+
+extern "C" int fn_801D0C30(void) { return 1; }
 
 extern "C" int fn_801D112C(Y* y)
 {
@@ -148,6 +224,10 @@ extern "C" int fn_801D112C(Y* y)
     return v;
 }
 
-extern "C" int fn_801D0C30(void) { return 1; }
-
 extern "C" int fn_801D1198(Y* y) { return fn_8022F138(((Unk801C16B0_M4*)y->m34)->m3B0) != 0; }
+
+extern "C" float fn_801D18B4(void)
+{
+    char buf[16];
+    return 0.0f;
+}
