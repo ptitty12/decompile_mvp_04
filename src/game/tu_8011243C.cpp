@@ -5,19 +5,8 @@
 #include "game/tu_8010E0F4.h"
 #include "game/tu_8001B190.h"
 
-/* Second front-end screen (TITLESLIDE-derived, vtable lbl_80650628, ctor fn_80114A20): the same
- * code as screen A (UnkScrA) at shifted offsets. Offsets are taken from the clone mapping
- * of A's matched functions (0x134->0x184, 0x150->0x198, 0x168->0x1B8, ...). */
 typedef Unk8010E0F4_Scr UnkScrA;
-struct Unk8011243C_Scr : Unk800C7B40_Widget {
-    char pad40[0x144];
-    int m184;
-    char pad188[0x10];
-    Unk800C7B40_Widget* m198;
-    char pad19C[0x1C];
-    int m1B8;
-};
-typedef Unk8011243C_Scr Scr;
+typedef Unk80114A20_Scr Scr;
 
 extern const char lbl_805BE138[];
 extern const char lbl_805BA6D8[];
@@ -157,6 +146,7 @@ void fn_80114A00(UnkScrA* self)
     fn_800ECAA4(self);
 }
 
+/* near-miss: clone of fn_8010FE70, same argument-order difference. */
 int fn_80114D14(Scr* self, int a)
 {
     if (fn_800B555C()->m570 == a) {
@@ -183,6 +173,7 @@ int fn_80114D14(Scr* self, int a)
     return 1;
 }
 
+/* near-miss: clone of fn_8010FFD8, same argument-order difference. */
 void fn_80114E7C(int a, Scr* b)
 {
     if (a == 1) {
