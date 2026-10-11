@@ -251,16 +251,10 @@ extern "C" void fn_8012E47C(int a, int b)
 
 extern "C" int fn_8012E7F4() { return 0; }
 
-/* near-miss: 46/46 insns; the constant stores are scheduled in a different order (retail keeps 0x184,0x188,0x190,0x19C,0x198 first, then the zeros in field order; here the -1/5/1 stores migrate up). Source order is retail order. */
 extern "C" Scr* fn_8012E7FC(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
     self->SetVptr(lbl_806554C8);
-    self->m184 = 5;
-    self->m188 = 2;
-    self->m190 = 0;
-    self->m19C = -1;
-    self->m198 = 1;
     self->m130 = 0;
     self->m134 = 0;
     self->m138 = 0;
@@ -278,8 +272,13 @@ extern "C" Scr* fn_8012E7FC(Scr* self, int a, int b, int c, int d, int e, int f,
     self->m174 = 0;
     self->m17C = 0;
     self->m180 = 5;
+    self->m184 = 5;
+    self->m188 = 2;
     self->m18C = 0;
+    self->m190 = 0;
     self->m194 = 1;
+    self->m19C = -1;
+    self->m198 = 1;
     return self;
 }
 
