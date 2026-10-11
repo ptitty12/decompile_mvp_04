@@ -6,6 +6,7 @@
 
 extern char lbl_80649780[];
 struct DtorAt7E0 { char pad[0x7e0]; const void* m; };
+extern char lbl_80649750[];
 
 int fn_80351150(Unk803BA44C_Obj** pp, int flag)
 {
@@ -846,6 +847,24 @@ int fn_80352D10(Unk803BA44C_Obj** pp, int flag)
 void fn_80352DD0(DtorAt7E0* self, int chrg)
 {
     self->m = lbl_80649780;
+    if (chrg & 1)
+        fn_80377408(self);
+}
+
+struct Unk80352E04 {
+    int m0;
+    int m4;
+    int m8;
+    int* mC;
+    const void* m10;
+};
+void fn_80352E04(Unk80352E04* self, int chrg)
+{
+    self->m10 = lbl_80649750;
+    if (self->mC != 0) {
+        delete[] self->mC;
+        self->mC = 0;
+    }
     if (chrg & 1)
         fn_80377408(self);
 }
