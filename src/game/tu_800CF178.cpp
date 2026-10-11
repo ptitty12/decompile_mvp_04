@@ -297,6 +297,24 @@ extern "C" void fn_800D0210(Unk800CFEEC_Sel* s, Unk800C7B40_Widget* p, int q)
     s->fn_vslot8(p);
 }
 
+extern "C" Unk800D028C_Raw* fn_800D028C(Unk800D028C_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0,
+                                        int s1, const Unk800D244C_Vec4* s2, int s3, const Unk800D244C_Vec4* s4, int s5, int s6,
+                                        int s7, int s8, float f)
+{
+    fn_800C7B40((Unk800D1614_Raw*)self, p1, 13, p2, p3, p4, p5, p6, p7, s0, s7, s8, 0, 1.0f);
+    self->m3C = lbl_80656F80;
+    self->b40_0 = s1;
+    self->b40_1 = s3;
+    self->m44 = *s2;
+    self->m54 = *s4;
+    self->m64 = s5;
+    self->m68 = s6;
+    SetM38(self, f);
+    self->m6C = f;
+    fn_800D03B4((Unk800D03B4_Obj*)self);
+    return self;
+}
+
 extern void* lbl_8061E978;
 
 extern "C" void fn_800D03B4(Unk800D03B4_Obj* o)
