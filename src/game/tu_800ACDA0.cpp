@@ -68,7 +68,6 @@ struct FE6F8H {
 extern "C" {
 FEO8B* fn_800AB80C(void* t, int i, int j);
 int fn_800AE150(char* self, int* oi, int* oj, int key);
-void fn_800AE3FC(char* self);
 void fn_800AD58C(char* self, int i, int j);
 void fn_800AD6FC(char* self);
 void fn_800AD1D4(char* self);
@@ -120,7 +119,20 @@ extern const char lbl_805B96DC[];
 extern const char lbl_805B6F58[];
 extern "C" void fn_8011A9B8(const char* a, int b, const char* c);
 
+struct FEV4 {
+    int m0;
+    int m4;
+    int m8;
+    float mC;
+};
+extern FEV4 lbl_8068B588;
+extern const float lbl_805B96AC;
+extern const float lbl_805B96B0;
+
 /* ---- generated externs ---- */
+
+
+
 
 
 
@@ -152,7 +164,10 @@ void fn_800ADED0(char* self, int a, int b);
 int fn_800ADF28(char* self, int a, int b);
 float fn_800ADF6C(char* self, int a, int b);
 int fn_800AE150(char* self, int* oi, int* oj, int key);
+FEV4 fn_800AE1BC(char* self, int x, int y);
 void fn_800AE2E4(void* p);
+int fn_800AE304(char* self, int id, int x, int y);
+int fn_800AE3FC(char* self, int id, int x, int y);
 void fn_800AE4F4(char* self);
 void fn_800AE944(void* p);
 void fn_800AE964(UnkAtEF0* p, int v);
@@ -406,14 +421,69 @@ extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
     return 0;
 }
 
+extern "C" FEV4 fn_800AE1BC(char* self, int x, int y)
+{
+    FEV4 v = lbl_8068B588;
+    FEV4* p = &v;
+    int n = *(int*)(self + 0xAA4);
+    if (x < n && x >= 0 && y < n && y >= 0) {
+        v = *(FEV4*)(self + 0xA14 + fn_800ADF28(self, x, y) * 16);
+        float f = fn_800ADF6C(self, x, y);
+        p->mC = f > lbl_805B96AC ? lbl_805B96AC : (f >? lbl_805B96B0);
+    }
+    return v;
+}
+
 extern "C" void fn_800AE2E4(void* p)
 {
     fn_800AD78C(p);
 }
 
+extern "C" int fn_800AE304(char* self, int id, int x, int y)
+{
+    int cnt = 0;
+    if (x >= 0 && x < *(int*)(self + 0xAA4) && y >= 0 && y < *(int*)(self + 0xAA4)) {
+        int c = fn_800ADF28(self, x, y);
+        if (c == id) {
+            char* b = self + 0x14;
+            int off = y * 0xC + x * 0x60;
+            if (*(int*)(b + off) == 0) {
+                cnt = 1;
+                *(int*)(b + off) = cnt;
+                cnt = fn_800AE304(self, c, x - 1, y) + 1;
+                cnt += fn_800AE304(self, c, x + 1, y);
+                cnt += fn_800AE304(self, c, x, y - 1);
+                cnt += fn_800AE304(self, c, x, y + 1);
+            }
+        }
+    }
+    return cnt;
+}
+
+extern "C" int fn_800AE3FC(char* self, int id, int x, int y)
+{
+    int cnt = 0;
+    if (x >= 0 && x < *(int*)(self + 0xAA4) && y >= 0 && y < *(int*)(self + 0xAA4)) {
+        int c = fn_800ADF28(self, x, y);
+        if (c == id) {
+            char* b = self + 0x14;
+            int off = y * 0xC + x * 0x60;
+            if (*(int*)(b + off) == 0) {
+                cnt = 1;
+                *(int*)(b + off) = cnt;
+                cnt = fn_800AE3FC(self, c, x - 1, y) + 1;
+                cnt += fn_800AE3FC(self, c, x + 1, y);
+                cnt += fn_800AE3FC(self, c, x, y - 1);
+                cnt += fn_800AE3FC(self, c, x, y + 1);
+            }
+        }
+    }
+    return cnt;
+}
+
 extern "C" void fn_800AE4F4(char* self)
 {
-    fn_800AE3FC(self);
+    ((void (*)(char*))fn_800AE3FC)(self);
     int i = 0;
     while (1) {
         if (!(i < *(int*)(self + 0xAA4))) {
