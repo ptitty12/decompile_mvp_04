@@ -162,7 +162,7 @@ void fn_80136250(Scr* x, int a, int b, int c);
 Unk801361EC_W* fn_800C8040(Unk800C7B40_Widget* p);
 void fn_801361EC(Scr* x, Unk801361EC_Arg* a, Unk801361EC_W* w);
 UnkFEState* fn_800B555C();
-Unk803567AC_V fn_803567AC();
+void fn_803567AC(Unk803567AC_V* v);
 void fn_80072E90(Scr* g, int a, int b, int c, int d, Unk803567AC_V* v);
 void fn_801354D4(Scr* g);
 void fn_801723F8(int a, int b);
