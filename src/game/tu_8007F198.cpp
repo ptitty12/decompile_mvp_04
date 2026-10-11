@@ -2,6 +2,7 @@
  * Game code, .text 0x8007F198-0x8007FF8C (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+#include "game/clampiter.h"
 #include "game/tu_8007F198.h"
 
 typedef Unk8007F198_A A;
@@ -220,9 +221,8 @@ int fn_8007F980(C* self, int idx)
     return fn_8052BD58(self->mC[idx]).w2;
 }
 
-/* fn_8007FA1C (0x8007FA1C, 68 instructions: a loop over the four fn_8052BD58
- * results that keeps the greatest 12-byte value by a three-word compare) is
- * not defined here; the original code stays linked. */
+/* fn_8007FA1C (0x8007FA1C): a loop over the four fn_8052BD58 results that keeps
+ * the greatest 12-byte value by a three-word compare; defined below, still a near-miss. */
 int fn_8007F9B4(C* self)
 {
     int a = 0;
@@ -235,6 +235,33 @@ int fn_8007F9E8(C* self)
     int a = 0;
     fn_8007FA1C(self, 0, &a);
     return a;
+}
+
+/* near-miss (7 slots): retail puts the iterator slot at sp+0x28 above the 12-byte temp at sp+0x18;
+ * here the iterator is at sp+0x18 and the temp at sp+0x20. */
+inline void InitS12(S12* p, int a, int b, int c) { p->w0 = a; p->w1 = b; p->w2 = c; }
+int fn_8007FA1C(C* self, int* o1, int* o2)
+{
+    S12 best;
+    InitS12(&best, -1, -1, 1);
+    Unk8006A138_It<3> it(0);
+    int k = 0;
+    do {
+        S12 cur = fn_8052BD58(self->mC[k]);
+        int g = cur.w0 > best.w0;
+        if (cur.w0 == best.w0)
+            g = cur.w1 > best.w1;
+        if (g == 1) {
+            if (best.w2 == 1)
+                best = cur;
+        } else if (cur.w2 == 0)
+            best = cur;
+        k = it.Next();
+    } while (k <= 3);
+    if (o1)
+        *o1 = best.w0;
+    if (o2)
+        *o2 = best.w1;
 }
 
 int fn_8007FB2C(C* self, int idx)
