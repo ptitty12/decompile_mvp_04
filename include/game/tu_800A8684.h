@@ -339,4 +339,58 @@ public:
     virtual void s2();
 };
 
+/* 0x68-byte sub-object of the manager (at +0x38): vptr at +0x64 (lbl_8065CBD0),
+ * ctor fn_800B85FC, dtor fn_800B8654, reset fn_800B86A0. */
+struct FEColor {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+/* Text-line table (fn_800B5E68): up to 0x2E4 element pointers, count at +0xB90, vptr at +0xB94. */
+struct FEList {
+    FEV64* m[0x2E4];
+    int mB90;
+    const void* mB94;
+};
+/* Element object, 0x68 bytes, vptr at +0x64 (ctor fn_800B622C, dtor fn_800B62FC): ints at
+ * 0..0x30, a count at +0x34, two colors at +0x40 and +0x50. */
+struct FEElem {
+    unsigned short* m[13];
+    int m34;
+    int m38;
+    int m3C;
+    FEColor m40;
+    FEColor m50;
+    int m60;
+    const void* m64;
+};
+extern const char lbl_806583A8[];
+extern const char lbl_80658680[];
+struct UiMsgBuf {
+    char name[16];
+};
+struct FEObj68 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    char m1C;
+    char pad1D[0x34 - 0x1D];
+    int m34;
+    int m38;
+    int m3C;
+    char m40;
+    char pad41[0x48 - 0x41];
+    int m48;
+    char pad4C[0x58 - 0x4C];
+    int m58;
+    int m5C;
+    int m60;
+    const void* m64;
+};
+
 #endif
