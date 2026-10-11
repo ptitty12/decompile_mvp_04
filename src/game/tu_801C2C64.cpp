@@ -110,6 +110,24 @@ extern Unk801C2C64_G lbl_8068C420;
 
 
 
+/* Object returned by fn_801A4CE8: its vptr sits at +8 (slot 10 is called). */
+struct Unk801C2C64_QBase {
+    char pad0[8];
+};
+struct Unk801C2C64_Q : public Unk801C2C64_QBase {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual int v10();
+};
+extern "C" Unk801C2C64_Q* fn_801A4CE8(P* ctx, int k);
+extern "C" void fn_801CF054(Z* z, float* a, float* b);
 inline int HashOf(P* p) { return p->m618->m838; }
 
 extern "C" void fn_801C3330(Z* z)
@@ -294,6 +312,21 @@ extern "C" int fn_801C4A54(Z* z, int* a, int* b)
         }
     }
     return ok;
+}
+
+extern "C" void fn_801C4B14(Z* z, float* a, float* b)
+{
+    *a = 0.0f;
+    *b = 0.0f;
+    if (fn_801C4128(z) == 0) {
+        fn_801CF054(z, a, b);
+        if (fn_801A4CE8(z->m204, 1)->v10())
+            *a = -*a;
+        *a = !(*a > 1.0f) ? (*a >? -1.0f) : 1.0f;
+        *b = !(*b > 1.0f) ? (*b >? -1.0f) : 1.0f;
+        if (fn_801A4B34(z->m204)->v24() == 0)
+            *a = -*a;
+    }
 }
 
 /* near-miss: same code, but retail puts the fn_801C34D0 result at 0x20 and the difference at 0x10. */
