@@ -8,7 +8,9 @@ void* operator new(unsigned int size, int heap);      /* 0x80377428 */
 void* operator new[](unsigned int size, int heap);    /* 0x803774A8 */
 void fn_80071604(void* self);
 void fn_80071688(void* self, int flags);
-void fn_80071E2C(void* self);
+/* fn_80071E2C is the base-class version of these functions: it takes the same
+ * (self, a, obj) and calls obj's slot 1 itself (r4/r5 used without a copy). */
+void fn_80071E2C(void* self, int a, void* obj);
 void* fn_8007366C(const char* a, const char* b);
 void fn_8040074C(void* p, int n);
 void* fn_8040B61C(char* dst, const char* src);
@@ -64,7 +66,6 @@ float fn_8008E864(G* self, int a);
 float fn_8008E8D4(G* self, int a);
 float fn_8008E950(G* self, int a);
 float fn_8008E9CC(G* self, int a);
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28. */
 void fn_8008EA20(Unk8008CE64_K<Unk8008CE64_T3C>* self, int a, VObj* obj);
 Unk8008CE64_K<Unk8008CE64_T10>* fn_8008EA7C(Unk8008CE64_K<Unk8008CE64_T10>* self);
 void fn_8008EAF8(Unk8008CE64_K<Unk8008CE64_T10>* self, int flags);
@@ -72,7 +73,6 @@ void fn_8008EB54(Unk8008CE64_K<Unk8008CE64_T10>* self, unsigned i);
 void* fn_8008F08C(void* self, int a, int b, char* buf);
 float fn_8008F0B8();
 void fn_8008F7E0();
-/* near-miss: same register-assignment difference as fn_8008EA20. */
 void fn_8008F7E4(Unk8008CE64_K<Unk8008CE64_T10>* self, int a, VObj* obj);
 Unk8008CE64_K<Unk8008CE64_T1C>* fn_8008F840(Unk8008CE64_K<Unk8008CE64_T1C>* self);
 void fn_8008F8A8(Unk8008CE64_K<Unk8008CE64_T1C>* self, int flags);
@@ -147,7 +147,6 @@ int fn_8008F940(void* self);
 int fn_8008F948(void* self);
 unsigned fn_8008F950(Unk8008CE64_K<Unk8008CE64_E1C>* self, int t, unsigned i);
 char* fn_8008F99C(Unk8008CE64_K<Unk8008CE64_T1C>* self, int t, unsigned i, char* buf);
-/* near-miss: same register-assignment difference as fn_8008EA20. */
 void fn_8008FB90(Unk8008CE64_K<Unk8008CE64_T1C>* self, int a, VObj* obj);
 int fn_8008FBE8(int v);
 int fn_8008FCC8(int t);
@@ -303,10 +302,9 @@ float fn_8008E9CC(G* self, int a)
     return r;
 }
 
-/* near-miss: same code; retail keeps obj, self and a in r30, r29, r28. */
 void fn_8008EA20(Unk8008CE64_K<Unk8008CE64_T3C>* self, int a, VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk8008CE64_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0x3C);
 }
@@ -354,10 +352,9 @@ void fn_8008F7E0()
 {
 }
 
-/* near-miss: same register-assignment difference as fn_8008EA20. */
 void fn_8008F7E4(Unk8008CE64_K<Unk8008CE64_T10>* self, int a, VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk8008CE64_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, self->m1C * 0x10);
 }
@@ -488,10 +485,9 @@ void fn_8008FAA8(Unk8008CE64_K<Unk8008CE64_T1C>* self, signed char t, unsigned i
     }
 }
 
-/* near-miss: same register-assignment difference as fn_8008EA20. */
 void fn_8008FB90(Unk8008CE64_K<Unk8008CE64_T1C>* self, int a, VObj* obj)
 {
-    fn_80071E2C(self);
+    fn_80071E2C(self, a, obj);
     Unk8008CE64_VT* vt = obj->m4;
     vt->pfn((char*)obj + vt->delta, a, self->m24, 0x348);
 }
