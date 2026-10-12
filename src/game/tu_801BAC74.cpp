@@ -413,6 +413,43 @@ extern "C" void fn_801BBFAC(A* a, P* q)
         fn_801B7FF8(p);
 }
 
+extern const Vec3 lbl_806055AC;
+extern "C" float fn_8018CA78(P* p);
+extern "C" float fn_8018CAF0(P* p);
+extern "C" void fn_801BC170(A* a, P* p, int mode, int z, int flag);
+
+extern "C" void fn_801BC02C(A* a, P* p)
+{
+    if (a->m14->m6CC == p && a->m14->m6F4 != 9) {
+        int flag = 0;
+        int mode;
+        if (p->m38C == 1) {
+            Vec3 v = lbl_806055AC;
+            fn_801BDB84(a->m8, p, 1, 0, &v);
+            if (a->m8->m0 == 1) {
+                mode = 5;
+            } else {
+                int g = 0;
+                float x = fn_8018CA78(p);
+                float y = fn_8018CAF0(p);
+                if (!(y < 0.0f))
+                    g = y < x;
+                P** t = a->m14->m65C;
+                P* e10 = t[10];
+                P* e11 = t[11];
+                P* e12 = t[12];
+                if (e10 && e11 && e12)
+                    flag = 1;
+                mode = 0;
+                if (g)
+                    mode = 1;
+            }
+        } else
+            mode = 2;
+        fn_801BC170(a, p, mode, 0, flag);
+    }
+}
+
 extern "C" void fn_801BC364(A* a)
 {
     Unk8006A138_It<0x15> it(9);
