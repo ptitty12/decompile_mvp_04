@@ -385,6 +385,73 @@ void fn_802B5D28(int* out, float x)
     *out = r;
 }
 
+int fn_802B5D78(Mgr*, int kind)
+{
+    Unk802B5D78_G* g = lbl_8061EA68;
+    if (kind == 0x18 || kind == 0x19)
+        return g->m328 == 0;
+    if (kind == 0x3E || kind == 0x3F) {
+        if (g->m328 != 0)
+            return 1;
+        return 0;
+    }
+    int a = g->m320;
+    if (kind == 0x35 || kind == 0x36 || kind == 0x3B) {
+        if (g->m328 == 0)
+            return 0;
+        return a == 0;
+    }
+    if (kind == 0x37 || kind == 0x38 || kind == 0x3C) {
+        if (g->m328 == 0)
+            return 0;
+        return (a ^ 1) == 0;
+    }
+    if (kind == 0x39 || kind == 0x3A || kind == 0x3D) {
+        if (g->m328 == 0)
+            return 0;
+        return (a ^ 2) == 0;
+    }
+    a = g->m3EC;
+    if (kind == 0x40) {
+        if (g->m328 == 0)
+            return 0;
+        if (g->m3E4 != 0)
+            return 0;
+        return (a ^ 2) == 0;
+    }
+    if (kind == 0x41) {
+        if (g->m328 == 0)
+            return 0;
+        if (g->m3E4 != 0)
+            return 0;
+        return a == 0;
+    }
+    if (kind == 0x42) {
+        if (g->m328 == 0)
+            return 0;
+        if (g->m3E4 != 0)
+            return 0;
+        return (a ^ 1) == 0;
+    }
+    a = g->m3F0;
+    if (kind == 0x43) {
+        if (g->m328 == 0)
+            return 0;
+        return a == 0;
+    }
+    if (kind == 0x44) {
+        if (g->m328 == 0)
+            return 0;
+        return (a ^ 1) == 0;
+    }
+    if (kind == 0x45) {
+        if (g->m328 == 0)
+            return 0;
+        return (a ^ 2) == 0;
+    }
+    return 1;
+}
+
 void fn_802B5EF4(Rr* self)
 {
     self->m0 = 0.0f;
