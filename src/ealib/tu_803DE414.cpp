@@ -11,6 +11,14 @@ struct Mtx4 {
     float m[16];
 };
 
+struct Unk803DFFE0Vec3 {
+    float x, y, z;
+};
+
+struct Unk803DEE7CVec4 {
+    float x, y, z, w;
+};
+
 /* Texture wrapper (state pointer at +0x54); the info record has width at +4, height at +6. */
 struct Unk803DE414Info {
     char pad0[4];
@@ -48,7 +56,46 @@ struct Unk803DE414Obj {
     int m34;
 };
 
+/* Screen-size source: three data words, then the vptr at +0xC; slot 3 returns width and height. */
+struct Unk803E0690SrcData {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Unk803E0690Src : Unk803E0690SrcData {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(float* w, float* h);
+};
+struct Unk803E0690Obj {
+    char pad0[0x14];
+    Unk803E0690Src* m14;
+};
+int fn_803D81FC();
+int fn_803D817C();
+
+struct Unk803E032CSub {
+    char pad0[0x14];
+    Unk803E0690Src* m14;
+};
+struct Unk803E032CObj {
+    char pad0[0x68];
+    int m68;
+    int m6C;
+    int m70;
+};
+extern int lbl_80627A80;
+void fn_803D81B4(int unused, int v);
 extern "C" {
+int fn_803E0898(Unk803DE414Light* self);
+void GXInvalidateVtxCache(void);
+void GXInvalidateTexAll(void);
+void fn_8042FF38(int fmt, int z);
+void fn_8043000C(int dither);
+}
+
+extern "C" {
+float sqrtf(float x);
 void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out);
 void fn_803FFA60(void* dst, const void* src, int n);
 void fn_803DE7D0(Mtx4* a, Mtx4* b);
@@ -117,10 +164,156 @@ inline void MtxTrans(Mtx4* m, float x, float y, float z)
     m->m[15] = 1.0f;
 }
 
+/* near-miss (98.6%): matrix to quaternion through a 3x3 stack copy read via a saved pointer. Retail keeps the
+   axis-selection index in r0 (li after the compare) and loads the y-branch operands in a different order;
+   ours puts the index in r9. Store order per branch was permuted exhaustively; index type/ternary variants tried. */
+extern "C" void fn_803DE51C(Mtx4* m, float* q, float* trans)
+{
+    float t[9];
+    float* p = t;
+    float a = m->m[0];
+    t[0] = a;
+    t[1] = m->m[1];
+    t[2] = m->m[2];
+    t[3] = m->m[4];
+    t[4] = m->m[5];
+    t[5] = m->m[6];
+    t[6] = m->m[8];
+    t[7] = m->m[9];
+    t[8] = m->m[10];
+    const float zero = 0.0f;
+    float s = a + p[4] + p[8];
+    if (s > zero) {
+        s = sqrtf(s + 1.0f);
+        q[3] = s * 0.5f;
+        s = 0.5f / s;
+        q[0] = (p[5] - p[7]) * s;
+        q[1] = (p[6] - p[2]) * s;
+        q[2] = (p[1] - p[3]) * s;
+    } else {
+        int i = 0;
+        if (p[4] > a)
+            i = 4;
+        if (p[8] > p[i]) {
+            s = sqrtf(p[8] - (a + p[4]) + 1.0f);
+            q[2] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[1] - p[3]) * s;
+            q[0] = (p[6] + p[2]) * s;
+            q[1] = (p[7] + p[5]) * s;
+        } else if (i != 0) {
+            s = sqrtf(p[4] - (p[8] + a) + 1.0f);
+            q[1] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[6] - p[2]) * s;
+            q[0] = (p[3] + p[1]) * s;
+            q[2] = (p[5] + p[7]) * s;
+        } else {
+            s = sqrtf(a - (p[4] + p[8]) + 1.0f);
+            q[0] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[5] - p[7]) * s;
+            q[1] = (p[1] + p[3]) * s;
+            q[2] = (p[2] + p[6]) * s;
+        }
+    }
+    trans[0] = m->m[12];
+    trans[1] = m->m[13];
+    trans[2] = m->m[14];
+    trans[3] = m->m[15];
+}
+
+extern "C" void fn_803DED40(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + m->m[12];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + m->m[13];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + m->m[14];
+    } else {
+        Unk803DFFE0Vec3 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + m->m[12];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + m->m[13];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + m->m[14];
+        *in = t;
+    }
+}
+
+extern "C" void fn_803DEE7C(Mtx4* m, Unk803DEE7CVec4* in, Unk803DEE7CVec4* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + in->w * m->m[12];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + in->w * m->m[13];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + in->w * m->m[14];
+        out->w = in->x * m->m[3] + in->y * m->m[7] + in->z * m->m[11] + in->w * m->m[15];
+    } else {
+        Unk803DEE7CVec4 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + in->w * m->m[12];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + in->w * m->m[13];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + in->w * m->m[14];
+        t.w = in->x * m->m[3] + in->y * m->m[7] + in->z * m->m[11] + in->w * m->m[15];
+        *in = t;
+    }
+}
+
+extern "C" void fn_803DF028(Mtx4* m, int count, char* in, int inStride, char* out, int outStride)
+{
+    if (count != 0) {
+        if (inStride == 0)
+            inStride = 12;
+        if (outStride == 0)
+            outStride = 12;
+        if (in == out) {
+            do {
+                Unk803DFFE0Vec3* p = (Unk803DFFE0Vec3*)in;
+                Unk803DFFE0Vec3 t;
+                t.x = p->x * m->m[0] + p->y * m->m[4] + p->z * m->m[8] + m->m[12];
+                t.y = p->x * m->m[1] + p->y * m->m[5] + p->z * m->m[9] + m->m[13];
+                t.z = p->x * m->m[2] + p->y * m->m[6] + p->z * m->m[10] + m->m[14];
+                in += inStride;
+                *(Unk803DFFE0Vec3*)out = t;
+                out += outStride;
+            } while (--count != 0);
+        } else {
+            do {
+                Unk803DFFE0Vec3* p = (Unk803DFFE0Vec3*)in;
+                Unk803DFFE0Vec3* q = (Unk803DFFE0Vec3*)out;
+                q->x = p->x * m->m[0] + p->y * m->m[4] + p->z * m->m[8] + m->m[12];
+                q->y = p->x * m->m[1] + p->y * m->m[5] + p->z * m->m[9] + m->m[13];
+                q->z = p->x * m->m[2] + p->y * m->m[6] + p->z * m->m[10] + m->m[14];
+                in += inStride;
+                out += outStride;
+            } while (--count != 0);
+        }
+    }
+}
+
 /* 803DE000 */
 inline void MtxMul(Mtx4* a, Mtx4* b, Mtx4* out)
 {
     fn_803DF1A0(a, b, out);
+}
+
+extern "C" void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out)
+{
+    out->m[0] = a->m[0] * b->m[0] + a->m[1] * b->m[4] + a->m[2] * b->m[8] + a->m[3] * b->m[12];
+    out->m[1] = a->m[0] * b->m[1] + a->m[1] * b->m[5] + a->m[2] * b->m[9] + a->m[3] * b->m[13];
+    out->m[2] = a->m[0] * b->m[2] + a->m[1] * b->m[6] + a->m[2] * b->m[10] + a->m[3] * b->m[14];
+    out->m[3] = a->m[0] * b->m[3] + a->m[1] * b->m[7] + a->m[2] * b->m[11] + a->m[3] * b->m[15];
+    out->m[4] = a->m[4] * b->m[0] + a->m[5] * b->m[4] + a->m[6] * b->m[8] + a->m[7] * b->m[12];
+    out->m[5] = a->m[4] * b->m[1] + a->m[5] * b->m[5] + a->m[6] * b->m[9] + a->m[7] * b->m[13];
+    out->m[6] = a->m[4] * b->m[2] + a->m[5] * b->m[6] + a->m[6] * b->m[10] + a->m[7] * b->m[14];
+    out->m[7] = a->m[4] * b->m[3] + a->m[5] * b->m[7] + a->m[6] * b->m[11] + a->m[7] * b->m[15];
+    out->m[8] = a->m[8] * b->m[0] + a->m[9] * b->m[4] + a->m[10] * b->m[8] + a->m[11] * b->m[12];
+    out->m[9] = a->m[8] * b->m[1] + a->m[9] * b->m[5] + a->m[10] * b->m[9] + a->m[11] * b->m[13];
+    out->m[10] = a->m[8] * b->m[2] + a->m[9] * b->m[6] + a->m[10] * b->m[10] + a->m[11] * b->m[14];
+    out->m[11] = a->m[8] * b->m[3] + a->m[9] * b->m[7] + a->m[10] * b->m[11] + a->m[11] * b->m[15];
+    out->m[12] = a->m[12] * b->m[0] + a->m[13] * b->m[4] + a->m[14] * b->m[8] + a->m[15] * b->m[12];
+    out->m[13] = a->m[12] * b->m[1] + a->m[13] * b->m[5] + a->m[14] * b->m[9] + a->m[15] * b->m[13];
+    out->m[14] = a->m[12] * b->m[2] + a->m[13] * b->m[6] + a->m[14] * b->m[10] + a->m[15] * b->m[14];
+    out->m[15] = a->m[12] * b->m[3] + a->m[13] * b->m[7] + a->m[14] * b->m[11] + a->m[15] * b->m[15];
 }
 
 extern "C" void fn_803DF66C(Mtx4* a, Mtx4* b)
@@ -340,6 +533,21 @@ extern "C" void fn_803DFF50(Mtx4* dst, Mtx4* other)
     fn_803E02E4(dst, &c);
 }
 
+extern "C" void fn_803DFFE0(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10];
+    } else {
+        Unk803DFFE0Vec3 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10];
+        *in = t;
+    }
+}
+
 /* near-miss (2 instructions longer): quaternion plus translation to matrix; ours needs a second
    callee-saved float register. */
 extern "C" void fn_803E01F4(Mtx4* out, float x, float y, float z, float w, float tx, float ty, float tz)
@@ -386,6 +594,111 @@ extern "C" void fn_803E02E4(Mtx4* dst, Mtx4* other)
     fn_803FFA60(dst, &t, 0x40);
 }
 
+extern "C" void fn_803E032C(Unk803E032CObj* self)
+{
+    Unk803E032CSub* sub = (Unk803E032CSub*)((char*)self + 0x3C);
+    float w = 640.0f;
+    float h = 480.0f;
+    float w2;
+    float h2;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&w, &h);
+    sub->m14->v3(&w2, &h2);
+    fn_803D81B4(fn_803D81FC() + 4, (int)self);
+    GXInvalidateVtxCache();
+    GXInvalidateTexAll();
+    lbl_80627A80 = self->m68;
+    lbl_80627A84 = self->m6C;
+    fn_803DB4CC();
+    int r = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
+    if (r != lbl_80627324) {
+        if (r != 0)
+            fn_8042FF38(1, 0);
+        else
+            fn_8042FF38(0, 0);
+    }
+    if (r != 0) {
+        int d = 0;
+        if (self->m70 != 0)
+            d = 1;
+        fn_8043000C(d);
+    }
+}
+
+struct Unk803E0458Info {
+    char pad0[4];
+    unsigned short m4;
+    unsigned short m6;
+    char pad8[4];
+    unsigned int mC;
+    int m10;
+};
+struct Unk803E0458Obj {
+    char pad0[0x54];
+    Unk803E0458Info** m54;
+};
+extern "C" {
+void GXSetTexCopySrc(unsigned short l, unsigned short t, unsigned short w, unsigned short h);
+void GXSetTexCopyDst(unsigned short w, unsigned short h, int fmt, int mipmap);
+void GXSetCopyFilter(unsigned char aa, unsigned char* pattern, unsigned char vf, unsigned char* vfilter);
+void GXCopyTex(void* dest, int clear);
+void fn_803D9E00(void* a, int* b, unsigned char** c);
+void fn_803D9268(void* p);
+void fn_8042FF38(int fmt, int z);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042FE78(int a);
+}
+
+extern "C" void fn_803E0458(Unk803E0458Obj* self)
+{
+    Unk803E032CSub* sub = (Unk803E032CSub*)((char*)self + 0x3C);
+    fn_803D81B4(fn_803D81FC() + 4, 0);
+    fn_8042FED0(1, 3, 1);
+    fn_8042FE78(1);
+    unsigned short w = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m4;
+    unsigned short h = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m6;
+    float a = 640.0f;
+    float b = 480.0f;
+    float c;
+    float d;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&a, &b);
+    sub->m14->v3(&c, &d);
+    float r;
+    if (a + c <= 640.0f)
+        r = a;
+    else
+        r = 0.0f;
+    GXSetTexCopySrc((unsigned short)(int)r, 0, w, h);
+    GXSetTexCopyDst(w, h, ((int*)self->m54)[3], 0);
+    int x;
+    unsigned char* y;
+    fn_803D81FC();
+    fn_803D9E00((char*)fn_803D817C() + 0x10, &x, &y);
+    GXSetCopyFilter(y[0x19], y + 0x1A, 0, y + 0x32);
+    Unk803E0458Info* t = (Unk803E0458Info*)fn_803DD7C0(self->m54);
+    void* dst;
+    if (t->mC & 0x10000000)
+        dst = (char*)t + t->m10;
+    else
+        dst = (char*)t + 0x10;
+    GXCopyTex(dst, 1);
+    GXSetCopyFilter(y[0x19], y + 0x1A, 1, y + 0x32);
+    int r2 = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
+    if (r2 != lbl_80627324) {
+        if (lbl_80627324 != 0)
+            fn_8042FF38(1, 0);
+        else
+            fn_8042FF38(0, 0);
+    }
+    fn_803D81FC();
+    fn_803D9268((char*)fn_803D817C() + 0x38);
+}
+
 extern "C" void fn_803E0658(int a, int b)
 {
     if (b == 0xFFFF && a != 0) {
@@ -393,6 +706,23 @@ extern "C" void fn_803E0658(int a, int b)
         lbl_8062C270[1] = 4;
         lbl_8062C270[2] = 1;
     }
+}
+
+extern "C" float fn_803E0690(Unk803E0690Obj* self)
+{
+    float w = 640.0f;
+    float h = 480.0f;
+    float w2;
+    float h2;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&w, &h);
+    self->m14->v3(&w2, &h2);
+    float r = w;
+    if (!(w + w2 <= 640.0f))
+        r = 0.0f;
+    return r;
 }
 
 extern "C" void fn_803E074C(Unk803DE414Tex* self, float* w, float* h)
@@ -464,9 +794,8 @@ extern "C" void fn_803E0950()
 }
 
 /*
- * Not attempted: fn_803DE414 (quaternion to matrix through a 3x3 temporary, 66 instructions),
- * fn_803DE51C (matrix to quaternion, 173), fn_803DE7D0 (348), fn_803DED40 (79), fn_803DEE7C (107),
- * fn_803DF028 (94), fn_803DF1A0 (209, the 4x4 multiply), fn_803DF4E4 (98), fn_803DF824 (105),
- * fn_803DFFE0 (67), fn_803E00EC (66), fn_803E032C (75), fn_803E0458 (128), fn_803E0690 (47).
+ * Not matched yet: fn_803DE414 (quaternion to 3x3 temporary to matrix, stack slot and loads right, float
+ * schedule 49 slots off), fn_803E00EC (scaled quaternion to matrix, needs a fourth saved float register),
+ * fn_803DE7D0, fn_803DF4E4 (axis-angle to matrix), fn_803DF824 (euler angles to matrix).
  * The original code stays linked for these.
  */

@@ -120,18 +120,19 @@ void fn_803D9664(void);
 int fn_803D96FC(Unk803D8234Rec* a, Unk803D8234Rec* b);
 void fn_803D9774(Unk803D8234Rec* r, int a, int b);
 void fn_803D96CC(Unk803D8234Rec* r);
-}
-
-extern "C" void fn_803D9110(int a, int b)
-{
-    if (b == 0xFFFF && a != 0) {
-        lbl_80627374[0] = 4;
-        lbl_80627374[1] = 4;
-        lbl_80627374[2] = 1;
-        lbl_80627380[0] = 3;
-        lbl_80627380[1] = 3;
-        lbl_80627380[2] = 1;
-    }
+void fn_803D9C34(void* o, int c);
+void fn_803D9AD0(struct Unk803D8234Sub* self, int c);
+void fn_803D95FC(int a, int b);
+int fn_803D98AC();
+void fn_803E2D18(void);
+void fn_803D9E70(void* o, int a, int b, unsigned short c, unsigned short d, unsigned short e, unsigned short f, int g, int h);
+void fn_803D9ECC(void* o, int a, int b, int c, int d);
+void fn_803D8828(void);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042FE78(int a);
+void fn_8042C3B0(int a);
+int OSReceiveMessage(void* q, void* msg, int flags);
+void GXCopyDisp(int dest, int clear);
 }
 
 /* Light-like sub-object (vptr at +0x1C). */
@@ -147,8 +148,6 @@ struct Unk803D8234Light {
     void* m20;
     int m24;
 };
-
-
 struct Unk803D8234Sub {
     int m0;
     int m4;
@@ -181,7 +180,251 @@ struct Unk803D8234Sub {
     int mAC;
     int mB0;
 };
+/* Second view of the render device for its destructor. */
+struct Unk803D8234Buf {
+    void* m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk803D8234DevB {
+    int m0;
+    int m4;
+    lbl_Impl* m8;
+    const void* mC;
+    char pad10[0x74 - 0x10];
+    int m74;
+    char pad78[0xB4 - 0x78];
+    void* mB4;
+    void* mB8;
+    char padBC[0xC4 - 0xBC];
+    int mC4;
+};
+extern int lbl_80627300;
+void fn_80364A50(void* p, int n);
+extern void (*lbl_8062C66C)(void* p, int size);
 
+extern "C" void fn_803D8234(Unk803D8234DevB* self, int c)
+{
+    self->mC = lbl_80686740;
+    Unk803D8234Buf* b = (Unk803D8234Buf*)lbl_80627310[0];
+    if (b) {
+        lbl_8062C66C(b->m0, b->m8);
+        b->m8 = 0;
+        fn_80364A50(b, 0x10);
+        lbl_80627310[0] = 0;
+    }
+    b = (Unk803D8234Buf*)lbl_80627310[1];
+    if (b) {
+        lbl_8062C66C(b->m0, b->m8);
+        b->m8 = 0;
+        fn_80364A50(b, 0x10);
+        lbl_80627310[1] = 0;
+    }
+    if (self->mB8) {
+        lbl_8062C66C(self->mB8, self->m74);
+        self->mB8 = 0;
+    }
+    if (self->mB4) {
+        lbl_8062C66C(self->mB4, self->mC4);
+        self->mB4 = 0;
+    }
+    lbl_80627300 = 0;
+    fn_803D9AD0((Unk803D8234Sub*)((char*)self + 0x38), 2);
+    fn_803D9C34((char*)self + 0x10, 2);
+    self->mC = lbl_80686770;
+    while (self->m8->mHead != 0)
+        ((lbl_Owner*)self)->fn_803DA098(self->m8->mHead);
+    if (c & 1)
+        lbl_8062C66C(self, 0xF0);
+}
+
+struct Unk803D83BCObj {
+    char pad0[0x1C];
+    float m1C;
+    float m20;
+    char pad24[0x94 - 0x24];
+    int m94;
+    float m98;
+};
+extern int lbl_80627A78;
+extern "C" {
+void fn_803DE3B4(int* a, int* b);
+void fn_803DE374(int a, int b);
+void fn_803DD794(int a);
+void fn_803DE1BC(float* m);
+void fn_803DE300(float* m, int a);
+void fn_803DE3D0(int a);
+void fn_803DDCD4();
+void fn_8042DC44(int a);
+void GXSetNumTexGens(int n);
+void GXSetNumTevStages(int n);
+void fn_803DB9C0(int a, int b);
+void fn_803DBF78(int a, int b, int c, int d, int e);
+void GXSetCullMode(int m);
+void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
+void fn_80430194(float* m, int type);
+void fn_80430364(int idx);
+void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void fn_8042FE24(int a, int b, int c, int d);
+void GXSetAlphaCompare(int a, int b, int c, int d, int e);
+void fn_8042FF04(int a);
+void fn_8042C8B0(int a, int b, int c);
+}
+
+/* near-miss (96.9%): fullscreen alpha quad (unsigned conversion of the fade value, ortho setup, four GX vertices).
+   Retail keeps 0.0 in f0 and loads self->m1C/m20 into f13/f12 around the volatile FIFO stores; ours picks other
+   float registers. Tried const float locals for 0.0/1.0 and the colour in place or in a new variable. */
+extern "C" void fn_803D83BC(Unk803D83BCObj* self)
+{
+    unsigned a = (unsigned)(self->m98 * 224.0f);
+    if (a != 0) {
+        float m1[16];
+        char pad[0x28];
+        float m2[16];
+        int s0;
+        int s1;
+        a |= 0xFFFFFF00;
+        fn_803DE3B4(&s0, &s1);
+        fn_803DE374(0, 0);
+        fn_803DD794(self->m94);
+        fn_803DE1BC(m1);
+        fn_803DE300(m1, 0);
+        fn_803DE3D0(1);
+        fn_803DDCD4();
+        fn_8042DC44(1);
+        GXSetNumTexGens(1);
+        GXSetNumTevStages(1);
+        fn_803DB9C0(0x5200, 1);
+        fn_803DBF78(5, 9, 1, 4, 0);
+        fn_803DBF78(5, 0xB, 1, 5, 0);
+        fn_803DBF78(5, 0xD, 1, 4, 0);
+        GXSetCullMode(0);
+        fn_80431564(m2, 0.0f, self->m20, 0.0f, self->m1C, 0.0f, -1.0f);
+        fn_80430194(m2, 1);
+        fn_80430364(0x3C);
+        fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
+        fn_8042FE24(1, 4, 5, 3);
+        GXSetAlphaCompare(7, 0, 1, 7, 0);
+        fn_8042FF04(0);
+        fn_8042FED0(0, 7, 0);
+        fn_8042C8B0(0x80, 5, 4);
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m1C;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m1C;
+        GXWGFifo.f32 = self->m20;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m20;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 1.0f;
+        fn_803DE374(s0, s1);
+        lbl_80627A78 = 0;
+    }
+}
+
+struct Unk803D8640Info {
+    char pad0[4];
+    unsigned short m4;
+    unsigned short m6;
+};
+struct Unk803D8640Ring {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk803D8640Dev {
+    char pad0[0x54];
+    float m54;
+    float m58;
+    char pad5C[0xB8 - 0x5C];
+    int mB8;
+    int mBC;
+    char padC0[0xCC - 0xC0];
+    int mCC;
+    float mD0;
+    int mD4;
+    int mD8;
+    int mDC;
+};
+extern int lbl_806272D4;
+extern unsigned char lbl_80627308;
+extern int lbl_80627390[];
+/* near-miss (96.6%): retail stores lbl_806272D4 = 0 and lbl_80627304 = 1 one after the other through r0; ours
+   hoists both constants above the first store. Tried one-int-struct globals and statement order. */
+extern "C" void fn_803D8640(Unk803D8640Dev* self)
+{
+    fn_803E2D18();
+    if (self->mCC != 0) {
+        if (self->mD0 > 0.0f) {
+            if (self->mD4 != 0)
+                fn_803D83BC((Unk803D83BCObj*)((char*)self + 0x38));
+            char* sub = (char*)self + 0x10;
+            unsigned short w = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m4;
+            unsigned short h = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m6;
+            unsigned short fx = (int)self->m54;
+            unsigned short fy = (int)self->m58;
+            int flag = 0;
+            if (self->mD8 != 0)
+                flag = 1;
+            fn_803D9E70(sub, 0, 0, fx, fy, w, h, 4, flag);
+            fn_803D9ECC(sub, self->mCC, 0, 0, 0);
+            if (self->mBC == 0)
+                self->mD4 = 1;
+        } else {
+            self->mD4 = 0;
+        }
+    } else {
+        self->mD4 = 0;
+    }
+    int msg;
+    fn_8042FED0(1, 3, 1);
+    fn_8042FE78(1);
+    lbl_806272E8 = self->mDC;
+    OSReceiveMessage(lbl_80627390, &msg, 1);
+    lbl_80627304 = 1;
+    lbl_806272D4 = 0;
+    fn_8042C3B0(0x8000);
+    fn_803D95FC(0, (int)fn_803D8828);
+    GXCopyDisp(self->mB8, lbl_80627308);
+    fn_8042C020();
+    lbl_8062731C ^= 1;
+    Unk803D8640Ring* r = (Unk803D8640Ring*)fn_803D98AC();
+    int used = r->m4 - r->m0;
+    if (used > r->mC)
+        r->mC = used;
+    r->m4 = r->m0;
+    lbl_806272D0--;
+    lbl_806279B8++;
+}
+
+extern "C" void fn_803D9110(int a, int b)
+{
+    if (b == 0xFFFF && a != 0) {
+        lbl_80627374[0] = 4;
+        lbl_80627374[1] = 4;
+        lbl_80627374[2] = 1;
+        lbl_80627380[0] = 3;
+        lbl_80627380[1] = 3;
+        lbl_80627380[2] = 1;
+    }
+}
 
 extern "C" Unk803D8234Dev* fn_803D9160(Unk803D8234Dev* self, int a, int b, int c)
 {
@@ -538,8 +781,7 @@ extern "C" void* fn_803D9BE0(Unk803D8234Light* self, void* owner)
 }
 
 /*
- * Not attempted: fn_803D8234 (98 instructions), fn_803D83BC (161), fn_803D8640 (122), fn_803D8918 (510);
- * fn_803D8828 and fn_803D9378 read the time base (mftb); fn_803D9528 ends in a trap word after the
- * fatal-error call. The original code stays linked for these.
+ * Not matched yet: fn_803D8918 (510 instructions); fn_803D8828 and fn_803D9378 read the time base (mftb);
+ * fn_803D9528 ends in a trap word after the fatal-error call. The original code stays linked for these.
  * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
  */

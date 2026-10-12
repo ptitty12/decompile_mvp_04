@@ -19,6 +19,115 @@ extern "C" void fn_80377408(void* p);
 extern "C" void fn_803E0F9C(Unk803E1F98_Node* n);
 extern "C" void fn_803E1F0C(Unk803E198C_View* v);
 
+/* Orthographic projection setup: the matrix helper at 0x80431564 takes (mtx, t, b, l, r, n, f); the
+ * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by fn_80430194(mtx, 1). */
+extern "C" void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
+extern "C" void fn_80430194(float* m, int type);
+/* Fog parameter block (pointed to by the first word of the owner at View+0). */
+struct Unk803E1A38Fog {
+    int m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk803E1A38Col {
+    int v;
+};
+struct Unk803E1A38Mid {
+    Unk803E1A38Fog* m0;
+};
+extern "C" void fn_8042F93C(int type, Unk803E1A38Col color, float startz, float endz, float nearz, float farz);
+extern "C" void fn_8042FB50(unsigned short* table, unsigned short width, float* projmtx);
+extern "C" void fn_8042FD00(int enable, unsigned short center, unsigned short* table);
+
+/* Node viewed with absolute offsets (View sits at Node+0xC, so Node+0x158 is View.m14C). */
+struct Unk803E0DD0Obj {
+    char pad0[0x10];
+    int m10;
+    char pad14[4];
+    float m18;
+    char pad1C[0x2C - 0x1C];
+    float m2C;
+    char pad30[8];
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    char pad58[0xF0 - 0x58];
+    float mF0;
+    float mF4;
+    float mF8;
+    float mFC;
+    char pad100[0x118 - 0x100];
+    float m118;
+    float m11C;
+    float m120;
+    float m124;
+    float m128;
+    float m12C;
+    float m130;
+    float m134;
+    float m138;
+    float m13C;
+    float m140;
+    float m144;
+    char pad148[0x158 - 0x148];
+    float m158[16];
+};
+extern "C" {
+float tanf(float x);
+float atanf(float x);
+float fn_8041171C(float x);
+void fn_80431494(float* m, float fovy, float aspect, float n, float f);
+void fn_80430194(float* m, int type);
+}
+
+/* near-miss (96.3%): perspective setup (fn_80431494 takes fov, aspect 1.0, near, far). Retail emits the
+   n->m10 = 0 store before the two pool loads for the tanf argument; ours interleaves them. Store orders
+   permuted, constant folding forms tried. */
+extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn, float zf)
+{
+    n->mF0 = fov;
+    n->mF4 = aspect;
+    n->mF8 = zn;
+    n->mFC = zf;
+    fn_80431494(n->m158, fov, 1.0f, zn, zf);
+    float m5 = n->m158[5] * aspect;
+    n->m18 = n->m158[0];
+    n->m38 = n->m158[2];
+    n->m3C = n->m158[6];
+    n->m40 = n->m158[10];
+    n->m44 = -1.0f;
+    n->m50 = n->m158[11];
+    n->m48 = 0.0f;
+    n->m4C = 0.0f;
+    n->m54 = 0.0f;
+    n->m158[5] = m5;
+    n->m2C = m5;
+    fn_80430194(n->m158, 0);
+    n->m10 = 0;
+    float t = tanf(fov * 0.5f * 0.017453292f);
+    float nt = -t;
+    float a0 = atanf(nt * n->m138);
+    float a1 = atanf(t * n->m13C);
+    float a2 = atanf((t * n->m140) / aspect);
+    float a3 = atanf((nt * n->m144) / aspect);
+    n->m118 = tanf(a0);
+    n->m11C = fn_8041171C(1.5707964f - a0);
+    n->m120 = tanf(a1);
+    n->m124 = fn_8041171C(1.5707964f - a1);
+    n->m128 = tanf(a2);
+    n->m12C = fn_8041171C(1.5707964f - a2);
+    n->m130 = tanf(a3);
+    n->m134 = fn_8041171C(1.5707964f - a3);
+}
+
 extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* node)
 {
     v->m4 = 1;
@@ -57,6 +166,30 @@ extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* 
     return v;
 }
 
+extern "C" void fn_803E1A38(Unk803E198C_View* v)
+{
+    Unk803E1A38Mid* o = (Unk803E1A38Mid*)v->m0;
+    if (o) {
+        Unk803E1A38Col color = *(Unk803E1A38Col*)&o->m0->m10;
+        if (o->m0->m0) {
+            fn_8042F93C(o->m0->mC, color, o->m0->m4, o->m0->m8, v->mEC, v->mF0);
+            if (((Unk803E1A38Mid*)v->m0)->m0->m14) {
+                unsigned short tbl[10];
+                unsigned short* t = tbl;
+                fn_8042FB50(t, (unsigned short)(int)v->mD4, v->m14C);
+                int w = (int)(v->mD4 * 0.5f + v->mCC);
+                if (w < 0)
+                    w = 0;
+                fn_8042FD00(1, (unsigned short)w, t);
+            } else {
+                fn_8042FD00(0, 0, 0);
+            }
+        } else {
+            fn_8042F93C(0, color, 0.0f, 0.0f, 0.0f, 0.0f);
+        }
+    }
+}
+
 /* static initializer: copies a 64-byte constant block and sets two more globals */
 extern "C" void fn_803E1B54(int initialize, int priority)
 {
@@ -85,11 +218,6 @@ extern "C" void fn_803E1C44(Unk803E1F98_Node* n, Unk803E097C_Blk64* src)
     if (n->mC.m18C)
         fn_803E1F0C(&n->mC);
 }
-
-/* Orthographic projection setup: the matrix helper at 0x80431564 takes (mtx, t, b, l, r, n, f); the
- * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by fn_80430194(mtx, 1). */
-extern "C" void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
-extern "C" void fn_80430194(float* m, int type);
 
 extern "C" void fn_803E1CDC(Unk803E1F98_Node* n, float a, float b, float c)
 {
@@ -170,3 +298,8 @@ extern "C" void fn_803E1F6C()
 {
     fn_803E1B54(1, 0xFFFF);
 }
+
+/*
+ * Not matched yet: fn_803E0ACC, fn_803E0F9C, fn_803E1578, fn_803E1850 (collision test through fn_803DED40).
+ * The original code stays linked for these.
+ */
