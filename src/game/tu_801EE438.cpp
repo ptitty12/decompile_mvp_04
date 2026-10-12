@@ -77,6 +77,53 @@ inline int PickVal(int* base, int i)
     return *q;
 }
 
+struct Unk801EF308_Ent {
+    char pad0[0x44];
+    Unk801EE438_Vec m44;
+    char pad50[0xA8 - 0x50];
+    int mA8;
+};
+struct Unk801EF308_G {
+    char pad0[0xAC];
+    Unk801EE438_Vec mAC;
+};
+extern const Unk801EE438_Vec lbl_806055DC;
+Unk801EE438_Vec fn_8014E388(unsigned idx);
+int fn_80204F30(Unk801EE438_Ent* e);
+
+/* near-miss (3 slots): retail keeps the scan pointer in r3 at the loop head and copies it to r30 before the call; ours keeps it in r30 */
+int fn_801EF308(Scr* p, int k, int other)
+{
+    int r = 0;
+    int v = PickVal(&p->m9C->mC0.m0, k);
+    if (v == other) {
+        r = 1;
+    } else if (v != -1) {
+        Unk801EE438_Slot* base = p->m9C->mCA8;
+        Unk801EE438_Slot* q = &base[v];
+        int i = 0;
+        Unk801EE438_Ent* e = &q->m4[0];
+        while (i < q->m0) {
+            if (fn_80204F8C(e) != 1)
+                break;
+            e++;
+            i++;
+        }
+        if (i < q->m0 && fn_80204F30(e) == 1) {
+            Unk801EE438_Vec a = lbl_806055DC;
+            Unk801EE438_Vec* pa = &a;
+            if (((Unk801EF308_Ent*)e)->mA8 == 1)
+                a = ((Unk801EF308_G*)p->m9C)->mAC;
+            else
+                a = ((Unk801EF308_Ent*)e)->m44;
+            Unk801EE438_Vec b = fn_8014E388(k);
+            if (!((a.m0 - b.m0) * (a.m0 - b.m0) + (pa->m8 - b.m8) * (pa->m8 - b.m8) <= 0.0f))
+                r = 1;
+        }
+    }
+    return r;
+}
+
 int fn_801EF460(Scr* p, int a, int b)
 {
     Unk801EE438_Pair* pr = &p->m9C->m684;
@@ -164,6 +211,87 @@ int fn_801EFD64(Scr* p, int i)
 }
 
 void fn_801F0194(Scr* p);
+struct Unk801F0004_Obj {
+    char pad0[0x5C8];
+    int m5C8;
+};
+struct Unk801F0004_S {
+    char pad0[0x24];
+    Unk801F0004_Obj* m24;
+};
+struct Unk801F0004_Pl {
+    char pad0[0x458];
+    int m458;
+    char pad45C[0x58C - 0x45C];
+    char m58C[0x34];
+    int m5C0;
+};
+struct Unk801F0004_C9 {
+    char pad0[0x1CC9];
+    unsigned char m1CC9;
+};
+struct Unk801F0004_Y {
+    char pad0[0x14];
+    Unk801F0004_C9* m14;
+};
+struct Unk801F0004_Ow {
+    char pad0[0x6F8];
+    Unk801F0004_Y* m6F8;
+};
+struct Unk801F0004_G {
+    Unk801F0004_Ow* m0;
+    char pad4[0xE8 - 4];
+    int mE8;
+    char padEC[0x53C - 0xEC];
+    int m53C;
+    char pad540[0x5EC - 0x540];
+    Unk801F0004_S m5EC;
+};
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8026DC5C(Unk8026C414_O* self, Unk8026C414_X* ctx);
+Unk801F0004_Pl* fn_80211D34(void* l);
+float fn_80211DE0(void* l);
+int fn_80211E1C(void* l);
+
+/* near-miss (2 slots): retail emits the first dead float store (sp+8) before the (sp+0x10) one; ours swaps them */
+int fn_801F0004(Scr* p, void** out)
+{
+    Unk801F0004_G* g = (Unk801F0004_G*)p->m9C;
+    Unk801F0004_S* s = &g->m5EC;
+    if (s->m24 != 0) {
+        if ((void*)s->m24 == (void*)fn_80211D34(&g->mE8))
+            return 0;
+        int c9 = ((Unk801F0004_G*)p->m9C)->m0->m6F8->m14->m1CC9;
+        if (c9 <= 1) {
+            if (fn_80211E1C(&((Unk801F0004_G*)p->m9C)->mE8) == 1)
+                return 0;
+            if (((Unk801F0004_G*)p->m9C)->m53C != 0) {
+                Unk801F0004_Pl* pl = fn_80211D34(&((Unk801F0004_G*)p->m9C)->mE8);
+                if (pl != 0) {
+                    int* sub = (int*)pl->m58C;
+                    if (fn_80254EA4(sub, 0) != -1) {
+                        if (pl->m458 != 9 && sub[0x34 / 4] == -1)
+                            return 0;
+                        if (fn_80211D34(&((Unk801F0004_G*)p->m9C)->mE8)->m458 != 9 || s->m24->m5C8 != 2) {
+                            float a = 0.6f;
+                            const float b = 0.9f;
+                            float c = 0.6f;
+                            if (fn_8026DC5C((Unk8026C414_O*)p->m9C->m0->m6CC->m36C, 0) == 1)
+                                c = b;
+                            if (!(fn_80211DE0(&((Unk801F0004_G*)p->m9C)->mE8) < c)) {
+                                *out = s->m24;
+                                return 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 void fn_801F0174(Scr* p)
 {
     fn_801F0194(p);
