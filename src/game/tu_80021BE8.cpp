@@ -484,6 +484,39 @@ void fn_8003B23C(Unk8003A5DC* self, int i);
 typedef void (*Unk80023838_Fn3)(Unk8003A5DC*, int, int);
 extern "C" void fn_80378A34(void* sub, void* o);
 
+extern char lbl_80649940[];
+extern char lbl_80649968[];
+extern char lbl_80649DB8[];
+extern "C" void fn_8005C75C(Unk80038EB4_Obj* o, int a, int b);
+extern "C" void fn_8037866C(void* p);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80378620(void* p, int a);
+extern "C" void fn_80021BB4(Unk80023AC4_Obj* self, int chrg);
+struct Unk8034449C;
+void fn_80344504(Unk8034449C* p, int a);
+
+extern "C" void fn_80023758(Unk80023AC4_Obj* x, int chrg)
+{
+    *(const void**)((char*)x + 0xC4) = lbl_80649940;
+    char* sub = (char*)x + 0xBC;
+    *(const void**)((char*)x + 0xB8) = lbl_80649968;
+    fn_80048968(fn_800475EC());
+    fn_8005C75C(fn_8005BA9C(), 0, 0x12C);
+    fn_8005C75C(fn_8005BA9C(), 1, 0x12C);
+    fn_8005C75C(fn_8005BA9C(), 3, 0x12C);
+    fn_800396D0(fn_80038EB4(), 1);
+    x->m80[0] = 0;
+    x->mC8 = 0;
+    x->mCC = 0;
+    x->mD0 = 0;
+    fn_8037866C(sub);
+    fn_80377408(x->m6B8);
+    fn_80344504((Unk8034449C*)((char*)x + 0x728), 2);
+    *(const void**)(sub + 8) = lbl_80649DB8;
+    fn_80378620(sub, 0);
+    fn_80021BB4(x, chrg);
+}
+
 extern "C" int fn_80023838(Unk80023AC4_Obj* x, Unk8001F2C4_World* w)
 {
     int r = -1;
