@@ -125,7 +125,31 @@ extern VT18* lbl_8061B998;
 extern void* lbl_8061E978;
 extern Unk806192E0_8014D488* lbl_806192E0;
 
+struct Unk80615854;
+extern Unk80615854 lbl_80615854;
+extern Unk80615854 lbl_8061589C;
+extern const char* lbl_8061BD30[];
+extern const char lbl_8061BD1C[];
+struct OSCtx8014F05C { char b[0x2C8]; };
+void fn_8000C50C(int v);
+void fn_8000C540(const Unk80615854* c);
+void fn_8000C574(const Unk80615854* c);
+void fn_8000C5A8();
 extern "C" {
+void VISetBlack(int b);
+void VIFlush();
+void fn_80433814(OSCtx8014F05C* c);
+void fn_8043364C(OSCtx8014F05C* c);
+void fn_80434F9C();
+void* fn_80433CE8(const char* file, int line, const char* msg, ...);
+void fn_8014F954(char* self);
+void VISetBlack(int b);
+void VIFlush();
+void fn_80433814(OSCtx8014F05C* c);
+void fn_8043364C(OSCtx8014F05C* c);
+void fn_80434F9C();
+
+void fn_8014F954(char* self);
 int fn_8031C6A8();
 void fn_8031C6B4();
 void fn_80149DD4(void* a, int b);
@@ -935,6 +959,69 @@ void* fn_8014F008(int a, int b, int c, int d)
         r = fn_8014F05C(r, a, b, c, d);
     }
     return r;
+}
+
+void* fn_8014F05C(void* sv, int code0, int ctxp, int dsisr, int dar) /* 8014F05C */
+{
+    char* self = (char*)sv;
+    unsigned code = code0;
+    Ctx8014ECA8* ctx = (Ctx8014ECA8*)ctxp;
+    OSCtx8014F05C c;
+    fn_80433814(&c);
+    fn_8043364C(&c);
+    fn_80434F9C();
+    fn_8014F34C((int)"crash.txt");
+    VISetBlack(0);
+    VIFlush();
+    VISetBlack(0);
+    VIFlush();
+    VISetBlack(0);
+    VIFlush();
+    fn_8000C50C(0);
+    fn_8000C540(&lbl_8061589C);
+    fn_8000C574(&lbl_80615854);
+    if (self[0x284] == 0) {
+        char buf[0x50] = "";
+        fn_8000C674(1, 1, "Exception:");
+        OSReport("\n");
+        OSReport("Exception: ");
+        if (code <= 0x10) {
+            fn_8000C674(0xC, 1, lbl_8061BD30[code]);
+            OSReport("%s\n", lbl_8061BD30[code]);
+            sprintf(buf, "%s\n", lbl_8061BD30[code]);
+            fn_8014F3A8(buf);
+        } else {
+            fn_8000C674(0xC, 1, lbl_8061BD1C);
+            OSReport("%s\n", lbl_8061BD1C);
+            sprintf(buf, "%s\n", lbl_8061BD1C);
+            fn_8014F3A8(buf);
+        }
+        OSReport("\n");
+    } else {
+        fn_8000C674(1, 1, "RelAssert:");
+        char* name = self + 0x284;
+        OSReport("\n");
+        OSReport("RelAssert: ");
+        fn_8000C674(0xC, 1, name);
+        OSReport("%s\n", name);
+        char buf[0x50] = "";
+        sprintf(buf, "%s\n", name);
+        fn_8014F3A8(buf);
+        OSReport("\n");
+    }
+    fn_8014ECA8((int)self, ctx, dsisr, dar);
+    int pc = ctx->srr0;
+    if ((pc & 3) == 0) {
+        fn_8014ED80((int)self, (unsigned*)pc);
+    }
+    fn_8014EF0C((int)self, pc, (Frame8014EF0C*)ctx->r[1]);
+    fn_8014F954(self);
+    fn_8000C50C(0);
+    fn_8000C5A8();
+    fn_8014F42C();
+    fn_8043364C((OSCtx8014F05C*)ctx);
+    fn_80433814(&c);
+    return fn_80433CE8("C:/mvp2004/source/gc/exception/ddtrap.cpp", 0x2F8, "cExceptionHandler calling OSHalt()\n");
 }
 
 void fn_8014F34C(int a)

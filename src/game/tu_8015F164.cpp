@@ -6,6 +6,13 @@
 
 extern const Unk80326F44_Out lbl_805EBA10;
 
+extern "C" void fn_80326ED4(Unk801527C8_Sub* s, float* a, float* b);
+
+extern "C" int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
+struct V2s80161924 { float x; float y; };
+inline int Chk80161924(Unk801527C8_Sub* s, int id, int n, float t) { return fn_803270C4(s, id, n, t) != 0; }
+extern "C" int fn_80176FD4__FP13Unk8017706C_Ti(void* t, int i);
+extern "C" void fn_801615C0(Unk80159F28* self, int i);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -163,6 +170,30 @@ int Unk80159F28::fn_80160E64() /* 80160E64 */
         return 2;
     }
     return 1;
+}
+
+extern "C" void fn_80161924(Unk80159F28* self) /* 80161924 */
+{
+    int r = self->mC->m6F8->fn_8006BE18();
+    if (r == 0) {
+        Unk801527C8_Sub* s = &self->mC->m50;
+        V2s80161924 v;
+        fn_80326ED4(s, &v.x, &v.y);
+        int ok = Chk80161924(s, 0x42, 1, -1.0f);
+        if (ok != 0 && self->mC->m6F8->m14->m1CC9 != 3) {
+            if (self->m2C != 0) {
+                self->m2C = 0;
+                if (fn_80176FD4__FP13Unk8017706C_Ti(self->mC->m700->m3A8, 1) != 0) {
+                    fn_801615C0(self, 1);
+                }
+            } else if (self->m28 != 0) {
+                self->m28 = 0;
+                if (fn_80176FD4__FP13Unk8017706C_Ti(self->mC->m700->m3A8, 0) != 0) {
+                    fn_801615C0(self, 0);
+                }
+            }
+        }
+    }
 }
 
 void Unk80159F28::fn_80161A34() /* 80161A34 */
