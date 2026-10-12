@@ -306,7 +306,13 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     float m528;
     int m52C;
     int m530;
-    char pad534[0x30];
+    char pad534[0x8];
+    int m53C;
+    char pad540[0x8];
+    int m548;
+    char pad54C[0xC];
+    int m558;
+    char pad55C[0x8];
     int m564;
     int m568;
     int m56C;
@@ -317,7 +323,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     unsigned m5A0;
     char pad5A4[0x4];
     int m5A8;
-    char pad5AC[0x14];
+    int m5AC;
+    char pad5B0[0x10];
     Unk801A4B34_Pos* m5C0;
     char pad5C4[0x4];
     Unk801A4B34_Vec3 m5C8;
