@@ -38,6 +38,43 @@ struct FeDate3 {
 extern const char lbl_805F4F28[];
 extern "C" int fn_8044643C(FeScr2* self, int a, int b);
 
+extern int lbl_80622C1C;
+extern float lbl_80622C20;
+extern int lbl_80622DD4;
+extern float lbl_80622DD8[1];
+extern float lbl_80622DDC[1];
+extern float lbl_80622DE0[1];
+extern float lbl_80622DE4[1];
+extern float lbl_80622DE8[1];
+extern int lbl_8061995C;
+extern float lbl_80619960;
+extern int lbl_80619954;
+extern int lbl_80619958;
+extern int lbl_80619310;
+extern float lbl_80619314;
+extern int lbl_80622DEC;
+extern int lbl_80622DF0;
+
+extern "C" FE_OVERLAY void fn_80443E4C(char* self)
+{
+    lbl_80622C1C = FeItemGet((FeItem*)(self + 0x334));
+    lbl_80622C20 = FeTunableGet((FeTunable*)(self + 0x388));
+    lbl_80622DD4 = FeItemGet((FeItem*)(self + 0x450));
+    lbl_80622DD8[0] = FeTunableGet((FeTunable*)(self + 0x4A4));
+    lbl_80622DDC[0] = FeTunableGet((FeTunable*)(self + 0x508));
+    lbl_80622DE0[0] = FeTunableGet((FeTunable*)(self + 0x56C));
+    lbl_80622DE4[0] = FeTunableGet((FeTunable*)(self + 0x5D0));
+    lbl_80622DE8[0] = FeTunableGet((FeTunable*)(self + 0x634));
+    lbl_8061995C = FeItemGet((FeItem*)(self + 0x698));
+    lbl_80619960 = FeTunableGet((FeTunable*)(self + 0x6EC));
+    lbl_80619954 = FeItemGet((FeItem*)(self + 0x7B4));
+    lbl_80619958 = FeItemGetB((FeItem*)(self + 0x808));
+    lbl_80619310 = FeItemGet((FeItem*)(self + 0x870));
+    lbl_80619314 = FeTunableGet((FeTunable*)(self + 0x8C4));
+    lbl_80622DEC = FeItemGet((FeItem*)(self + 0x928));
+    lbl_80622DF0 = FeItemGetB((FeItem*)(self + 0x97C));
+}
+
 extern "C" FE_OVERLAY void fn_80444090(void* self, int a)
 {
     fn_80330BC8(self, a);
@@ -304,6 +341,37 @@ extern "C" FE_OVERLAY void fn_80445DA8(FeScr2* self)
         r++;
     } while (r <= 4);
     fn_804469DC(self, 1);
+}
+
+extern "C" FE_OVERLAY int fn_80446334(FeScr2* self, int* arr, int n, int target, int* out1, int* out2, int g)
+{
+    FeDate3 d;
+    FeDate3 t;
+    FeDate3* pd = &d;
+    int i;
+    int r;
+    *out1 = -1;
+    *out2 = -1;
+    d.a = 0;
+    Unk8007F198_C* gm = (Unk8007F198_C*)lbl_8061930C;
+    pd->b = 0;
+    pd->c = 0;
+    for (i = 0; i < n; i++) {
+        fn_80329FA0(&t, fn_8007FBC0(gm, arr[i], g));
+        d = t;
+        if (target == pd->b) {
+            if (*out1 != -1) {
+                *out2 = arr[i];
+                fn_80444738(1);
+                break;
+            }
+            *out1 = arr[i];
+        }
+    }
+    r = 0;
+    if (*out1 != -1)
+        r = 1;
+    return r;
 }
 
 extern "C" FE_OVERLAY int fn_80446430(FeScr2* self, int i)

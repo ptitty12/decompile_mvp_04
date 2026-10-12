@@ -74,6 +74,37 @@ inline void FeMenuSimInit(FeMenuSim* p, int a)
     p->m2D8 = 0;
 }
 
+extern "C" int sprintf(char* s, const char* fmt, ...);
+extern "C" unsigned int strlen(const char* s);
+struct FeD3 {
+    unsigned char a;
+    unsigned char b;
+    unsigned short c;
+};
+extern "C" void fn_80172118__Fv(const char* name);
+extern "C" void fn_8017211C__Fv(const char* name, const char* data, int n);
+extern "C" void fn_80402FCC(char* dst, const void* src);
+
+struct FeArrL {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A2A8[];
+extern const char lbl_8064A4C8[];
+int fn_8007F29C(Unk8007F198_A* s, int a, int b);
+extern "C" {
+void fn_8040074C(void* p, int n);
+void fn_805371C4(FeArrL* l, int a);
+void fn_80535764(FeArrL* l, int a);
+}
+inline int IntAt(char* b, int o) { return *(int*)(b + o); }
+
 extern "C" FE_OVERLAY void fn_8043FDC0(void)
 {
 }
@@ -166,6 +197,53 @@ extern "C" FE_OVERLAY void fn_80440368(void)
     fn_8040B830(p->name, "BACK", 15);
     p->name[15] = 0;
     fn_800B7B4C(UiGetMsgMgr(), &m, 0);
+}
+
+extern "C" FE_OVERLAY void fn_804403E8(void)
+{
+    FeArrL l1;
+    int b1[0x82];
+    FeArrL l2;
+    int b2[0x28];
+    FeArrL* s1 = &l1;
+    FeArrL* s2 = &l2;
+    unsigned i;
+    unsigned j;
+    s1->m10 = lbl_8064B298;
+    l1.m0 = (char*)b1;
+    s1->m8 = 0x82;
+    Unk8007F198_A* g = (Unk8007F198_A*)lbl_8061930C;
+    fn_8040074C(l1.m0, 0x208);
+    s1->m4 = 0;
+    s1->mC = 0;
+    s1->m10 = lbl_8064A550;
+    fn_8040074C(l1.m0, s1->m8 * 4);
+    s1->m4 = 0;
+    s1->mC = 0;
+    s1->m10 = lbl_8064A2A8;
+    s1->m14 = 0;
+    l2.m0 = (char*)b2;
+    l2.m10 = lbl_8064B298;
+    s2->m8 = 0x28;
+    fn_8040074C(l2.m0, l2.m8 * 4);
+    s2->m4 = 0;
+    s2->mC = 0;
+    l2.m10 = lbl_8064A550;
+    fn_8040074C(l2.m0, l2.m8 * 4);
+    s2->m4 = 0;
+    s2->mC = 0;
+    s2->m14 = 0;
+    l2.m10 = lbl_8064A4C8;
+    fn_805371C4(s1, 0x1FFFFFF);
+    i = 0;
+    for (; i < (unsigned)s1->m4; i++) {
+        int id = IntAt(l1.m0, i * 4);
+        fn_80535764(s2, id);
+        for (j = 0; j < (unsigned)l2.m4; j++)
+            fn_8007F29C(g, id, IntAt(l2.m0, j * 4));
+    }
+    l2.m10 = lbl_8064A550;
+    l1.m10 = lbl_8064A550;
 }
 
 extern "C" FE_OVERLAY void fn_80442364(void* self, int a)
@@ -279,6 +357,30 @@ extern "C" FE_OVERLAY void fn_80442930(void)
     if (lbl_806215DC == 0) {
         lbl_806215DC = fn_803774A8(40000, 0x100);
         lbl_806215E0 = 0;
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80442984(void)
+{
+    char out[0x40];
+    char str[0x80];
+    FeD3 d;
+    int i;
+    const char* hd = "Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+";
+    fn_80172118__Fv("HappyTrack.csv");
+    i = 0;
+    fn_8017211C__Fv("HappyTrack.csv", "Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+", strlen("Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+"));
+    for (; i < lbl_806215E0; i++) {
+        fn_80402FCC(str, (void*)((FeRec28*)(i * 0x28 + (int)lbl_806215DC))->m24);
+        fn_80329FA0(&d, *(int*)(i * 0x28 + (int)lbl_806215DC));
+        FeRec28* e = (FeRec28*)(i * 0x28 + (int)lbl_806215DC);
+        unsigned short y = (unsigned)d.c % 100;
+        sprintf(out, "%02d/%02d/%02d,%3.3f,%1.3f,%3.3f,%1.3f,%3.3f,%1.3f,%s
+", d.b, d.a, y, e->m4, e->m14, e->m8, e->m18, e->mC, e->m1C, str);
+        fn_8017211C__Fv("HappyTrack.csv", out, strlen(out));
     }
 }
 

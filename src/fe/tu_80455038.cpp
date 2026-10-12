@@ -5,6 +5,112 @@
 #include "game/tu_8043FDC0.h"
 
 extern char lbl_8067B860[];
+extern "C" void fn_80360B80(void* p);
+struct FePr {
+    int a;
+    int b;
+    FePr() { fn_80360B80(this); }
+};
+struct FeSelT {
+    int m0;
+    FePr m4[9][10];
+    FePr m2D4[116];
+    int m674;
+};
+struct FeCurT { int m0, m4, m8, mC, m10; };
+struct FeScrAr {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    char pad134[0x14C - 0x134];
+    int m14C, m150, m154, m158, m15C;
+    int m160;
+    char pad164[0x7D4 - 0x164];
+};
+extern char lbl_8067B5B8[];
+
+struct FeArrL {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+struct FeLV {
+    char pad0[0x134];
+    int m134, m138, m13C;
+    char pad140[8];
+    int m148, m14C;
+    char pad150[0x164 - 0x150];
+    int m164;
+    char pad168[4];
+    int m16C, m170;
+};
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A4C8[];
+int fn_8007F198(Unk8007F198_A* s, int a);
+extern "C" {
+void fn_8040074C(void* p, int n);
+void fn_80537E80(FeArrL* l, int a, int b, int c);
+void fn_805362AC(FeArrL* l, int a);
+void fn_80456F94(FeScr8* self);
+int fn_80458200(int a, int b);
+int sprintf(char* s, const char* fmt, ...);
+}
+inline int IntAt(char* b, int o) { return *(int*)(b + o); }
+
+extern int lbl_805F53A4[];
+
+extern int lbl_805F53CC[];
+
+class FeObjP4 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+    virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+    virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39(); virtual void v40();
+    virtual void v41(); virtual void v42(); virtual void v43(int a, int b, void* c, int d);
+    virtual void v44(); virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48();
+    virtual void v49(); virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53();
+    virtual void v54(); virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58();
+    virtual void v59(); virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63();
+    virtual void v64(); virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68();
+    virtual void v69(); virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73();
+    virtual void v74(); virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+    virtual void v79(); virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83();
+    virtual void v84(); virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88();
+    virtual void v89(); virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93();
+    virtual void v94(); virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98();
+    virtual void v99(); virtual void v100(); virtual void v101(); virtual void v102(); virtual void v103();
+    virtual void v104(); virtual void v105(); virtual void v106(); virtual void v107(); virtual void v108();
+    virtual void v109(); virtual void v110(); virtual void v111(); virtual void v112(); virtual void v113();
+    virtual void v114(); virtual void v115(); virtual void v116(); virtual void v117(); virtual void v118();
+    virtual void v119(); virtual void v120(); virtual void v121(); virtual void v122(); virtual void v123();
+    virtual void v124(); virtual void v125(); virtual void v126(); virtual void v127();
+};
+struct FeS8x { char pad0[0x160]; int m160; };
+extern const char lbl_805F4F8C[];
+extern const char lbl_805F556C[];
+extern "C" {
+void fn_8045A8D8(void* self);
+void fn_8045A638(void* self);
+void fn_80458AAC(FeScr8b* self, int a);
+void fn_80458B58(FeScr8b* self, int a);
+void fn_80459FEC(void* self);
+void fn_80459224(void);
+void fn_804031BC(char* dst, const char* src);
+}
+
+extern "C" FeObj* fn_800C8068(void* p);
+extern "C" FeObj* fn_800C8038(void* p);
+
 extern "C" FE_OVERLAY FeScr8Raw* fn_80455038(FeScr8Raw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     int i;
@@ -72,6 +178,45 @@ extern "C" FE_OVERLAY int fn_80455E0C(FeScr8* self, FeRec1C* rec)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_80455EAC(void* sp, FeObj* w, int unused, int idx)
+{
+    FeArrL lst;
+    int buf[0x28];
+    FeScr8* self = (FeScr8*)sp;
+    FeObj* g = self->m1C0;
+    if (g->m24 < 0) {
+        if (fn_800C8060(g->v32("PLAYERGRID", 1)) == w) {
+            FeArrL* s = &lst;
+            s->m10 = lbl_8064B298;
+            lst.m0 = (char*)buf;
+            s->m8 = 0x28;
+            fn_8040074C(lst.m0, 0xA0);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A550;
+            fn_8040074C(lst.m0, s->m8 * 4);
+            s->m10 = lbl_8064A4C8;
+            s->m4 = 0;
+            s->mC = 0;
+            s->m14 = 0;
+            int k = fn_80458200((int)self, self->m140);
+            fn_80537E80(s, self->m134, k, 0);
+            fn_805362AC(s, 1);
+            FeLV* L = (FeLV*)self->m1C4;
+            fn_80126CF4(L, L->m164, IntAt(lst.m0, idx * 4), L->m134, L->m16C, L->m170, 0, L->m138, L->m13C, L->m148, L->m14C);
+            ((FeObj2*)self->m1C4)->v84(1, 0);
+            ((FeObj2*)w)->v67(idx, 0);
+            s->m10 = lbl_8064A550;
+            return 1;
+        }
+        if (fn_800C8060(self->m1C0->v32("BATTING", 1)) == w)
+            ((FeObj1*)self)->v41(fn_800C8070(self));
+        if (fn_800C8060(self->m1C0->v32("PITCHING", 1)) == w)
+            ((FeObj1*)self)->v41(fn_800C8070(self));
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_80456110(FeScr8* self)
 {
     if (self->m1CC == -1) {
@@ -102,6 +247,60 @@ extern "C" FE_OVERLAY int fn_8045618C(FeScr8* self)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_80456208(void* sp)
+{
+    FeArrL lst;
+    int buf[0x28];
+    FeScr8* self = (FeScr8*)sp;
+    if (self->m1CC != -1) {
+        FeObj* r = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
+        if (r->m24 < 0) {
+            r->v50();
+            FeArrL* s = &lst;
+            s->m10 = lbl_8064B298;
+            lst.m0 = (char*)buf;
+            s->m8 = 0x28;
+            fn_8040074C(lst.m0, 0xA0);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A550;
+            fn_8040074C(lst.m0, s->m8 * 4);
+            s->m10 = lbl_8064A4C8;
+            s->m4 = 0;
+            s->mC = 0;
+            s->m14 = 0;
+            int k = fn_80458200((int)self, self->m140);
+            fn_80537E80(s, self->m134, k, 0);
+            fn_805362AC(s, 1);
+            int idx = ((FeObjI*)r)->v60();
+            FeLV* L = (FeLV*)self->m1C4;
+            fn_80126CF4(L, L->m164, IntAt(lst.m0, idx * 4), L->m134, L->m16C, L->m170, 0, L->m138, L->m13C, L->m148, L->m14C);
+            ((FeObj2*)self->m1C4)->v84(1, 0);
+            s->m10 = lbl_8064A550;
+            return 1;
+        }
+        FeObj* a = fn_800C8060(self->m1C0->v32("BATTING", 1));
+        FeObj* b = fn_800C8060(self->m1C0->v32("PITCHING", 1));
+        if (a->m24 < 0) {
+            a->v50();
+            return 1;
+        }
+        if (b->m24 < 0) {
+            b->v50();
+            return 1;
+        }
+    } else {
+        int t = lbl_805F53A4[self->m140];
+        if (t != 10) {
+            self->m140 = t;
+            fn_80456A00(self, t);
+            fn_8001BC4C()->fn_8001BDAC(0x99);
+        }
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_804564A0(FeScr8* self)
 {
     if (self->m1CC != -1) {
@@ -117,6 +316,60 @@ extern "C" FE_OVERLAY int fn_804564A0(FeScr8* self)
                 return 0;
         }
         o->v51();
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804565C0(void* sp)
+{
+    FeArrL lst;
+    int buf[0x28];
+    FeScr8* self = (FeScr8*)sp;
+    if (self->m1CC != -1) {
+        FeObj* r = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
+        if (r->m24 < 0) {
+            r->v52();
+            FeArrL* s = &lst;
+            s->m10 = lbl_8064B298;
+            lst.m0 = (char*)buf;
+            s->m8 = 0x28;
+            fn_8040074C(lst.m0, 0xA0);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A550;
+            fn_8040074C(lst.m0, s->m8 * 4);
+            s->m10 = lbl_8064A4C8;
+            s->m4 = 0;
+            s->mC = 0;
+            s->m14 = 0;
+            int k = fn_80458200((int)self, self->m140);
+            fn_80537E80(s, self->m134, k, 0);
+            fn_805362AC(s, 1);
+            int idx = ((FeObjI*)r)->v60();
+            FeLV* L = (FeLV*)self->m1C4;
+            fn_80126CF4(L, L->m164, IntAt(lst.m0, idx * 4), L->m134, L->m16C, L->m170, 0, L->m138, L->m13C, L->m148, L->m14C);
+            ((FeObj2*)self->m1C4)->v84(1, 0);
+            s->m10 = lbl_8064A550;
+            return 1;
+        }
+        FeObj* a = fn_800C8060(self->m1C0->v32("BATTING", 1));
+        FeObj* b = fn_800C8060(self->m1C0->v32("PITCHING", 1));
+        if (a->m24 < 0) {
+            a->v52();
+            return 1;
+        }
+        if (b->m24 < 0) {
+            b->v52();
+            return 1;
+        }
+    } else {
+        int t = lbl_805F53CC[self->m140];
+        if (t != 10) {
+            self->m140 = t;
+            fn_80456A00(self, t);
+            fn_8001BC4C()->fn_8001BDAC(0x9A);
+        }
         return 1;
     }
     return 0;
@@ -148,6 +401,66 @@ extern "C" FE_OVERLAY void fn_80456978(FeScr8* self, int a, int b)
     FeObj* g = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
     if (g->m24 < 0)
         ((FeObj1*)g)->v68(0);
+}
+
+extern "C" FE_OVERLAY void fn_80456A00(void* sp, int idx)
+{
+    FeScr8* self = (FeScr8*)sp;
+    char* b = (char*)self + 0x148;
+    int off = idx * 4;
+    ((FeObj1*)fn_800C8068(FeGetP(b, self->m144 * 4)->v32("FC2", 0)))->v14(0);
+    ((FeObj1*)FeGetP(b, self->m144 * 4)->v32("STARGLOW", 0))->v8(0);
+    ((FeObj1*)FeGetP(b, self->m144 * 4)->v32("STARSPIN", 0))->v8(0);
+    ((FeObj1*)FeGetP(b, self->m144 * 4)->v32("POSITION", 0))->v14(0);
+    ((FeObj1*)FeGetP(b, self->m144 * 4)->v32("NUM", 0))->v14(0);
+    ((FeObj1*)fn_800C8068(FeGetP(b, off)->v32("FC2", 0)))->v14(1);
+    ((FeObj1*)fn_800C8038(FeGetP(b, off)->v32("STARGLOW", 0)))->v8(1);
+    ((FeObj1*)fn_800C8038(FeGetP(b, off)->v32("STARSPIN", 0)))->v8(1);
+    ((FeObj1*)fn_800C8038(FeGetP(b, off)->v32("STARSPIN", 0)))->v14(1);
+    ((FeObj1*)FeGetP(b, off)->v32("POSITION", 0))->v14(1);
+    ((FeObj1*)FeGetP(b, off)->v32("NUM", 0))->v14(1);
+    ((FeObj1*)self->m170[idx])->v14(0);
+    self->m144 = idx;
+}
+
+extern "C" FE_OVERLAY void fn_80456D6C(void* sp, int a)
+{
+    FeArrL lst;
+    int buf[0x28];
+    char sbuf[8];
+    FeScr8* self = (FeScr8*)sp;
+    self->m134 = a;
+    fn_80456F94(self);
+    fn_80456A00(self, self->m140);
+    sprintf(sbuf, "%d", fn_8007F198((Unk8007F198_A*)lbl_8061930C, a));
+    ((FeObj1*)fn_800C8040(((FeObj*)self)->v32("NUMPLAYERS", 1)))->v30((int)sbuf);
+    if (self->m1CC != -1) {
+        FeObj* r = fn_800C8060(self->m1C0->v32("PLAYERGRID", 1));
+        if (r->m24 < 0) {
+            fn_80457010(self, 0, 1);
+            FeArrL* s = &lst;
+            s->m10 = lbl_8064B298;
+            lst.m0 = (char*)buf;
+            s->m8 = 0x28;
+            fn_8040074C(lst.m0, 0xA0);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A550;
+            fn_8040074C(lst.m0, s->m8 * 4);
+            s->m10 = lbl_8064A4C8;
+            s->m4 = 0;
+            s->mC = 0;
+            s->m14 = 0;
+            int k = fn_80458200((int)self, self->m140);
+            fn_80537E80(s, self->m134, k, 0);
+            fn_805362AC(s, 1);
+            int idx = ((FeObjI*)r)->v60();
+            FeLV* L = (FeLV*)self->m1C4;
+            fn_80126CF4(L, L->m164, IntAt(lst.m0, idx * 4), L->m134, L->m16C, L->m170, 0, L->m138, L->m13C, L->m148, L->m14C);
+            ((FeObj2*)self->m1C4)->v84(1, 0);
+            s->m10 = lbl_8064A550;
+        }
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80456F94(FeScr8* self)
@@ -192,7 +505,93 @@ extern "C" FE_OVERLAY int fn_80458200(int a, int b)
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 
+extern "C" FE_OVERLAY FeScrAr* fn_804582C4(FeScrAr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeSelT* t = (FeSelT*)&self->m160;
+    fn_800EC648((FeScrRaw*)self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_8067B5B8;
+    self->m130 = 0;
+    FeCurT* cu = (FeCurT*)&self->m14C;
+    cu->m0 = 1;
+    cu->m10 = 1;
+    cu->m8 = -1;
+    cu->mC = -1;
+    cu->m4 = 0;
+    t->m0 = 0;
+    FePr (*r)[10] = t->m4;
+    int i = 8;
+    do {
+        FePr* p = *r;
+        int j = 9;
+        do {
+            fn_80360B80(p);
+            p++;
+        } while (j-- != 0);
+        r++;
+    } while (i-- != 0);
+    FePr* q = t->m2D4;
+    int j = 0x73;
+    do {
+        fn_80360B80(q);
+        q++;
+    } while (j-- != 0);
+    t->m674 = 0;
+    return self;
+}
+
 extern "C" void fn_800ECAA4(void* self);
+extern "C" FE_OVERLAY void fn_80458398(FeScr8* self)
+{
+    fn_800ECE34(self);
+    FeWidgetS* w = (FeWidgetS*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1));
+    FeSub* sub = &w->mDC;
+    sub->s15();
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE75, 1);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE76, 2);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE77, 3);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE78, 4);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE79, 5);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE7A, 6);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE7B, 7);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE7C, 8);
+    ((FeObj2*)fn_800C8058(((FeObj*)self)->v32("POSITIONNAME", 1)))->v51(0xE7D, 9);
+}
+
+extern "C" FE_OVERLAY void fn_8045866C(FeScr8* self)
+{
+    char fmt[16];
+    char buf[8];
+    int i;
+    fn_804031BC(fmt, "%2d:");
+    fn_800ECF18(self);
+    self->m13C = (int)fn_800C8060(fn_800C8044(((FeObj*)self)->v32("POSITIONGRP", 1))->v32(lbl_805F556C, 1));
+    self->m144 = (int)fn_800C805C(((FeObj*)self)->v32("POSITIONSG", 1));
+    self->m140 = (int)fn_800C8060(fn_800C8044(((FeObj*)self)->v32("ROSTERGRP", 1))->v32(lbl_805F556C, 1));
+    self->m148[0] = fn_800C805C(((FeObj*)self)->v32("ROSTERSG", 1));
+    ((FeObj1*)self->m13C)->v105(1);
+    ((FeObj1*)self->m140)->v105(1);
+    ((FeS8x*)self)->m160 = (int)fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+    fn_8045A8D8(self);
+    fn_8045A638(self);
+    FeObj* w = fn_800B7AB8(UiGetMsgMgr(), lbl_805F4F8C);
+    self->m138 = (int)w;
+    fn_80126CF4(w, 0, 0, 0, 1, (int)fn_80459224, 0, 1, 1, 1, 1);
+    ((FeObj2*)self->m138)->v88(0, 1);
+    ((FeObj2*)self->m138)->v88(1, 1);
+    fn_80458AAC((FeScr8b*)self, 1);
+    self->m134 = (int)fn_800B7A94(UiGetMsgMgr(), "NAVBAR");
+    fn_80124FA8((FeObj*)self->m134, self);
+    fn_80459FEC(self);
+    i = 0;
+    while (i < ((FeObjI*)self->m13C)->v59()) {
+        int n = i + 1;
+        ((void (*)(char*, const char*, ...))fn_80403DE4)(buf, fmt, n);
+        ((FeObjP4*)self->m13C)->v43(i, 0, buf, 5);
+        i = n;
+    }
+    fn_80458B58((FeScr8b*)self, 2);
+}
+
 extern "C" FE_OVERLAY void fn_8045899C(void* self)
 {
     fn_800ECAA4(self);
