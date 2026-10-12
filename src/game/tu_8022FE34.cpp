@@ -441,6 +441,38 @@ void Unk8022FE34_Owner::fn_80231FC0()
     }
 }
 
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8026DC18(Unk8026C414_O* o, Unk8026C414_X* x);
+int fn_8026D6AC(Unk8026C414_O* o, Unk8026C414_X* x);
+struct Obj5BC {
+    char pad0[0x5BC];
+    int m5BC;
+};
+
+extern const float lbl_805D7098;
+
+/* near-miss: 78/78 insns, register roles differ: retail loads the Ctx (m0) into the register that held this (lwz r28,0(r28))
+   before copying the weight table and keeps the result in r31; ours keeps this in r31 and reloads m0 later. */
+int Unk8022FE34_Owner::fn_80232084()
+{
+    int r = 0;
+    if (fn_801A2034(m0, 4) == -1) {
+        Obj5BC* g = (Obj5BC*)m0->m68C;
+        if (g != 0 && g->m5BC == 3) {
+            if (fn_8026DC18((Unk8026C414_O*)g, 0) != 0 || fn_8026D6AC((Unk8026C414_O*)g, 0) != 0) {
+                Unk8022FE34_Ctx* c = m0;
+                float tbl[4] = { 0.6f, 0.5f, 0.25f, 0.0f };
+                int idx = c->m6F8->m14[2].m3;
+                if (!(RandF((Unk8014D8AC*)c->m554, lbl_805D6EDC, lbl_805D7098, 0x668) >= tbl[idx])) {
+                    r = 1;
+                }
+            }
+        }
+    }
+    return r;
+}
+
 extern "C" void fn_80190F04(int a, int b);
 void fn_8027D33C(Unk8027C728_Goal* g);
 extern "C" void fn_8037893C(char* queue, int id, void* ev, int a, int b);

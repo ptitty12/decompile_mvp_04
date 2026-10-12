@@ -19,7 +19,9 @@
  */
 struct Unk8022FE34_Row {
     unsigned char m0;
-    char pad9[0x7];
+    char pad1b[2];
+    unsigned char m3;
+    char pad9[0x4];
     int m8;
     char pad1[0x78 - 0xC];
     int m78;
@@ -46,7 +48,9 @@ struct Unk8022FE34_Ctx {
     void* m65C;
     char pad2[0x680 - 0x660];
     char* m680;
-    char pad684[0x6CC - 0x684];
+    char pad684[0x68C - 0x684];
+    void* m68C;
+    char pad690[0x6CC - 0x690];
     int m6CC;
     char pad3[0x6F4 - 0x6D0];
     int m6F4;
@@ -209,6 +213,7 @@ struct Unk8022FE34_Owner {
     void fn_8023246C();
     int fn_802324E0();
     int fn_802324EC();
+    int fn_80232084();
     void fn_8023262C(int i, Unk8022FE34_Pl* pl, Unk8022FE34_Row* r);
     void fn_802326C4(int i, int j);
 };
