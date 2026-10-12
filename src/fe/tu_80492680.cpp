@@ -53,7 +53,7 @@ FE_OVERLAY void fn_8049693C(char* x)
         char* b = x + 0x1A8;
         int o = FeI(x, 0x188) * 4;
         int id = *(int*)(b + o);
-        if (fn_80096988((void*)id, (int)fn_80081B60(FeP(x, 0x1A4)), 0) == 1) {
+        if (fn_80096988((void*)id, (int)fn_80081B60__FP13Unk8007FF8C_Y(FeP(x, 0x1A4)), 0) == 1) {
             fn_804982C0(x);
         }
     }
