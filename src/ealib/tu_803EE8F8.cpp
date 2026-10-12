@@ -334,6 +334,62 @@ extern "C" void fn_803EEECC()
     lbl_806AAD80[0] = lbl_8060E220;
 }
 
+struct RcShort2 {
+    short a, b;
+};
+struct RcSysV {
+    int m0, m4;
+    char pad8[0x2c];
+    RcShort2 m34;
+    char pad38[0x34];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+    const void* vp;
+};
+inline void RcClr(RcShort2* s)
+{
+    s->b = 0;
+}
+extern RcSysV lbl_806AACF4;
+extern int lbl_806EF45C;
+extern "C" int atexit(void (*)());
+
+extern "C" RcSysV* fn_803EEEE0(int unused, int n)
+{
+    if (lbl_806AAD9C[0] != 0)
+        lbl_806AAD9C[1] += n;
+    RcSysV* ret = 0;
+    if (lbl_806EF45C == 0) {
+        lbl_806AACF4.m34.a = 0;
+        RcClr(&lbl_806AACF4.m34);
+        lbl_806AACF4.m0 = 0;
+        lbl_806AACF4.vp = lbl_8060E220;
+        lbl_806AACF4.m4 = 0;
+        fn_803EFE60((RcSys*)&lbl_806AACF4);
+        lbl_806EF45C = 1;
+        atexit(fn_803EEECC);
+    }
+    lbl_806AACF4.m0 = 0;
+    lbl_806AACF4.m4 = 0;
+    lbl_806AACF4.m6C = 0;
+    lbl_806AACF4.m70 = 0;
+    lbl_806AACF4.m74 = 0;
+    lbl_806AACF4.m78 = 0;
+    lbl_806AACF4.m7C = 0;
+    lbl_806AACF4.m80 = 0;
+    lbl_806AACF4.m84 = 0;
+    lbl_806AACF4.m88 = 0;
+    if (lbl_806EEA40 != 0) {
+        ((RcIfA*)lbl_806EEA38)->v3();
+        const void* volatile sv = lbl_806AACF4.vp;
+        lbl_806AACF4 = *(RcSysV*)lbl_806EEA40;
+        lbl_806AACF4.vp = sv;
+        ret = &lbl_806AACF4;
+        lbl_806EEA40 = 0;
+        ((RcIfA*)lbl_806EEA38)->v4();
+    }
+    return ret;
+}
+
 extern "C" void fn_803EF05C(int unused, int msg, int arg)
 {
     lbl_806EEA38->v3();
