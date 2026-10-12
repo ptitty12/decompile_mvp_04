@@ -389,14 +389,20 @@ int fn_8043E1E8(u32 page)
     return lbl_806EF94C[(page >> 12) & 0x1FFF] >> 31;
 }
 
-/* near-miss (96%): retail copies the arena pointer into r4 (mr r4,r3; addis r3,r4,1; stw r4,...;
- * addi r3,r3,-32768) before the store; this form stores first and needs no copy */
+/* the arena-lo getter is a small inline here: its result copy is what makes retail keep the pointer in r4 */
+static inline void* GetLo(void)
+{
+    return fn_80432CBC();
+}
+
 void fn_8043E1FC(void)
 {
     u32 i;
+    u32* base;
 
-    lbl_806EF94C = (u32*)fn_80432CBC();
-    fn_80432CCC((void*)((u32)lbl_806EF94C + 0x8000));
+    base = (u32*)GetLo();
+    lbl_806EF94C = base;
+    fn_80432CCC(base + 0x2000);
     for (i = 0; i < 0x8000; i += 4) {
         *(u32*)((char*)lbl_806EF94C + i) = 0;
     }
