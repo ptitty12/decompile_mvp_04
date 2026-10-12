@@ -202,7 +202,7 @@ extern "C" int fn_801E0684(I* i, Rec* r, P* p)
     return 1;
 }
 
-/* near-miss: retail keeps the 2/7 select in r0 and stores it before the Vec3 copy (r8 here) */
+/* near-miss (7 slots): the 2/7 store now precedes the Vec3 copy as in retail; the copy loads use r0/r11 swapped */
 extern "C" int fn_801E06F8(I* i, Rec* r, P* p)
 {
     int res = 1;
@@ -215,7 +215,10 @@ extern "C" int fn_801E06F8(I* i, Rec* r, P* p)
         fn_8035B710(r, 1);
     } else {
         res = 0;
-        r->m4 = !(i->m778 <= lbl_805D3BA4) ? 7 : 2;
+        if (!(i->m778 <= lbl_805D3BA4))
+            r->m4 = 7;
+        else
+            r->m4 = 2;
         Put(&r->m28, v);
         Vec3 w = fn_801E0A6C(i, p, &v, v.w);
         Put(&r->m64, w);
@@ -224,7 +227,12 @@ extern "C" int fn_801E06F8(I* i, Rec* r, P* p)
     return res;
 }
 
-/* near-miss: retail computes ((m4C ^ 1) == 0) ^ 1 with xori/subfic/adde; fold rewrites it to != 1 */
+static inline int Unk801E0834_IsOne(int v)
+{
+    return v == 1;
+}
+
+
 extern "C" int fn_801E0834(I* i, P* p, Unk801DB948_Vec4* v)
 {
     int r = 2;
@@ -241,7 +249,7 @@ extern "C" int fn_801E0834(I* i, P* p, Unk801DB948_Vec4* v)
                 y = 0;
             int f = 0;
             if (y != 0)
-                f = (((y->m4C ^ 1) == 0) ^ 1);
+                f = Unk801E0834_IsOne(y->m4C) ^ 1;
             if (f == 1)
                 r = 0;
         }
