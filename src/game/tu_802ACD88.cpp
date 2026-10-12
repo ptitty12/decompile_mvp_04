@@ -325,10 +325,12 @@ int fn_802AEBF0(void* a, void* b)
     return fn_802AF624(a, b, 0);
 }
 
-/* near-miss (parked, 2 insns swapped): retail saves flag (r5) to r30 before s (r4) to r31 in the prologue; every loop shape tried gives the opposite order */
-int fn_802AF624(Mgr* m, const char* s, int flag)
+/* The cursor is a local copy of the parameter: combine folds the parameter copy into it, so `mr r31,r4`
+ * comes after the flag copy (retail order), and before the n store because it is declared first. */
+int fn_802AF624(Mgr* m, const char* str, int flag)
 {
     char buf[0x1388];
+    const char* s = str;
     int n = 0;
     while (fn_80379094(s, fn_8040B6A0(s), 0), *s != 0) {
         fn_80378EF8(s, fn_8040B6A0(s), buf, 0x1388, &n);
