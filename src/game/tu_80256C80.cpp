@@ -3,6 +3,8 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8024EF40.h"
+#include "game/goals/tu_8027C728.h"
+#include "game/goals/tu_8028B194.h"
 
 typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
@@ -374,6 +376,30 @@ void fn_802572CC(Unk80256C80_M* self)
     fn_80269DE4((char*)self->m4 + 0x190);
 }
 
+extern int fn_80258C90(Unk80256C80_M* self);
+extern void* fn_8027C67C(Unk8027C728_Goal* g);
+extern void fn_8027C728(Unk8027C728_Goal* g);
+extern int fn_80258C90(Unk80256C80_M* self);
+extern void* fn_8027C67C(Unk8027C728_Goal* g);
+extern void fn_8027C728(Unk8027C728_Goal* g);
+extern int fn_80258C90(Unk80256C80_M* self);
+extern void* fn_8027C67C(Unk8027C728_Goal* g);
+void fn_802572F4(Unk80256C80_M* self, P* p, Unk8027C728_Goal* g)
+{
+    int idx = p->m708;
+    g->m10 = 10;
+    fn_8027C728(g);
+    ((Unk8028B194*)g->m18)->fn_8028B260(idx, 0);
+    if (fn_80258C90(self) != 0 && p->m44C->m6F4 != 3)
+        ((Unk8028B194*)g->m18)->fn_8028B308();
+    int one = 1;
+    *(int*)((char*)fn_8027C67C(g) + 0x38) = one;
+    *(int*)(g->m104 + 0x38) = one;
+    g = g->m0;
+    g->m10 = 3;
+    fn_8027C728(g);
+}
+
 /* near-miss: 46 vs 47 instructions; retail reloads m44 after the q tests (lwz 0x44(r11) twice), ours keeps it in a register. Tried tests as nested ifs, a go flag, inline accessors */
 void fn_8025739C(M* self, P* p)
 {
@@ -433,6 +459,29 @@ P* fn_80257B40(M* self)
     if (d != 0 && d->m458 == 9)
         return d;
     return 0;
+}
+
+extern "C" P* fn_80257BD0(M* self, P* p, int flag)
+{
+    unsigned t = p->m458;
+    if (p == 0 || t <= 8)
+        return 0;
+    P* r;
+    if (flag != 0) {
+        r = fn_8026B918(self->m4, t);
+    } else {
+        r = fn_8026B918(self->m4, t);
+        while (r == 0 || fn_80254984(&r->m58C) == 0) {
+            t--;
+            if (t - 9 > 3)
+                goto done;
+            r = Roster(fn_802570D4(self), t);
+        }
+        done:;
+    }
+    if (r != 0 && r->m458 == 9 && fn_80254984(&r->m58C) == 0)
+        r = 0;
+    return r;
 }
 
 int fn_80257CC0(M* self, P* p)
