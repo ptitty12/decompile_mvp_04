@@ -68,6 +68,15 @@ int fn_803EE348(int a);
 extern "C" int fn_80166BD0(Unk80159F28* self);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
 extern "C" int fn_8017706C__FP13Unk8017706C_Ti(void* t, int i);
+extern "C" int fn_8025416C__FP13Unk8024EF40_Wi(void* w, int i);
+extern "C" unsigned fn_8014D8AC(void* rng, int max, const char* file, int line);
+extern const char lbl_805C8C20[];
+inline int Chance80162C28(void* rng, float k)
+{
+    const char* nm = lbl_805C8C20;
+    unsigned r = fn_8014D8AC(rng, 1000000, nm, 0xDF9);
+    return (float)r * k * 0.000001f < 0.7f;
+}
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -434,6 +443,40 @@ extern "C" int fn_80162A3C(Unk80159F28* self) /* 80162A3C */
     }
     RecObj8015F164 rec;
     self->fn_80157514(0x65, (int)&rec, 1, 0x28, 0, lbl_8068B828);
+    fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    return 1;
+}
+
+extern "C" int fn_80162C28(Unk80159F28* self) /* 80162C28 */
+{
+    if (self->m10 == 0 || self->m38 != 0) {
+        return 0;
+    }
+    RecObj8015F164 rec;
+    ElemView8015F164* e = (ElemView8015F164*)&rec;
+    for (int j = 0; j < 8; j++, e++) {
+        e->name[0] = 0;
+        e->m3C = 0;
+        e->m40 = 0;
+        e->m44 = 0;
+        e->m48 = 0;
+        e->m4C = 0;
+        e->m50 = lbl_805EBA10;
+        e->m68 = lbl_805EBA10;
+        e->m80 = lbl_805EBA10;
+        e->m98 = 0;
+        e->m9C = 0xAE;
+    }
+    int flag = 0;
+    Unk80189300* o = fn_801A4B34(self->mC);
+    if (o != 0 && fn_8025416C__FP13Unk8024EF40_Wi((char*)o + 0x588, 0x21) != 0) {
+        flag = Chance80162C28(self->mC->m554, 1.0f);
+    }
+    if (flag != 0) {
+        self->fn_80157514(0x4B, (int)&rec, 1, 1, 0, lbl_8068B828);
+    } else {
+        self->fn_80157514(0x4A, (int)&rec, 1, 1, 0, lbl_8068B828);
+    }
     fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
     return 1;
 }
