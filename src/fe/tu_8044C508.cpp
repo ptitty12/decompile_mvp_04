@@ -172,13 +172,9 @@ extern "C" FE_OVERLAY void fn_8044DF60(FeScr5* self, FeRec8* r)
         int sid = lbl_8061930C->fn_80078A38(self->m14C);
         *(int*)db = r->mC;
         int x = fn_80329E74((int*)db);
-        if (r->m8 != 0) {
-            *(int*)db = r->mC;
-            if (fn_8044E08C((int)self, (unsigned*)db) == 0) {
-                if (x == fn_800A2AE8(lbl_80619948) && fn_8056AB84(lbl_80619948->m28, x, sid) != 0)
-                    c = 1;
-            }
-        }
+        if (r->m8 == 0 || (*(int*)db = r->mC, fn_8044E08C((int)self, (unsigned*)db) != 0) ||
+            (x == fn_800A2AE8(lbl_80619948) && fn_8056AB84(lbl_80619948->m28, x, sid) != 0))
+            c = 1;
         if (c != 0) {
             fn_8044E210(self, 0);
             return;
