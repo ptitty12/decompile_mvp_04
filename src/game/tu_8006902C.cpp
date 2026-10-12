@@ -49,8 +49,11 @@ inline int SumBytes(Unk8006902C_Side* s)
 {
     int t = 0;
     int i;
-    for (i = 0; i < 0x80; i++)
-        t += s->m1B4[(unsigned char)i];
+    for (i = 0; i < 0x80; i++) {
+        int ba = (int)s + 0x1B4;
+        int bo = (unsigned char)i;
+        t += *(unsigned char*)(ba + bo);
+    }
     return t;
 }
 
@@ -58,6 +61,8 @@ int fn_80075808(int id);
 void fn_80080DBC(Unk8006902C_Players* p);
 int fn_8008CFD8(void* attrs, int k, unsigned char j);
 void fn_80096EE8(Unk8006902C_Side* s, int a, int b);
+/* Retail treats the vcall thunk as returning nothing (sched2 arg-move order); the member declares int. */
+extern "C" void fn_8007A94C__18Unk8007A4DC_Screeniii(Unk8007A4DC_Screen* s, int a, int b, int c);
 
 void fn_80069EE0(void)
 {
@@ -143,15 +148,28 @@ int Unk80069F0C::fn_8006A138()
     return ok;
 }
 
-/* near-miss: 2 slots; retail compares 12 before 13 (cmpwi 12; beq; cmpwi 13), the switch tree tests 13 first. */
 int Unk80069F0C::fn_8006A1B4()
 {
-    switch (m10->m22C) {
-    case 0xC:
-    case 0xD:
+    int lo = 0xC, hi = 0xD;
+    int k = m10->m22C;
+    if (k == lo || k == hi) {
         return fn_8006A138();
     }
     return 0;
+}
+
+void Unk80069F0C::fn_8006A1F4()
+{
+    char buf[0xA0];
+    int k = mC->m24;
+    switch (k) {
+    case 0x25:
+        k = 0;
+        break;
+    case 0x26:
+        k = 0;
+        break;
+    }
 }
 
 int Unk80069F0C::fn_8006A214()
@@ -177,7 +195,6 @@ int Unk80069F0C::fn_8006A238(int idx)
     return total;
 }
 
-/* near-miss: 3 slots; the order of the argument moves for the two fn_8007A94C calls differs. */
 void Unk80069F0C::fn_8006B880()
 {
     Unk8007A4DC_Screen* o = lbl_8061930C;
@@ -195,8 +212,8 @@ void Unk80069F0C::fn_8006B880()
                 Unk8006902C_Rec* rr = sd->m3E8;
                 int off = j * 0x34;
                 int e = o->fn_8007A11C(*(int*)((char*)rr + off));
-                o->fn_8007A94C(0x1E, e, a);
-                o->fn_8007A94C(0x1F, e, b);
+                fn_8007A94C__18Unk8007A4DC_Screeniii(o, 0x1E, e, a);
+                fn_8007A94C__18Unk8007A4DC_Screeniii(o, 0x1F, e, b);
             }
         }
         idx = it.Next();
@@ -242,14 +259,8 @@ int Unk80069F0C::fn_8006BE18()
     int lim = 3;
     if (p->m1CD0 == 0)
         d = p->GetC9() >= lim;
-    int s0 = 0;
-    int i;
-    for (i = 0; i < 0x80; i++)
-        s0 += p->s[0].m1B4[(unsigned char)i];
-    int s1 = 0;
-    int j;
-    for (j = 0; j < 0x80; j++)
-        s1 += p->s[1].m1B4[(unsigned char)j];
+    int s0 = SumBytes(&p->s[0]);
+    int s1 = SumBytes(&p->s[1]);
     if (a == 1) {
         if (d == 1)
             return s0 != s1;
@@ -260,21 +271,18 @@ int Unk80069F0C::fn_8006BE18()
     return 0;
 }
 
-/* near-miss: 17 slots; the second SumBytes loop uses r10/r11 where retail reuses r8/r10,
- * and the final return arms are laid out in the other order. */
 int Unk80069F0C::fn_8006BF10()
 {
     Unk8006902C_Players* p = m14.m0;
-    if (p->GetC8() <= 0 && p->m1CD0 != 0) {
-        if (SumBytes(&p->s[1]) <= 0) {
-            if (SumBytes(&p->s[0]) > 0 || p->GetC9() > 0 || p->GetCB() > 0 || p->GetCA() > 0
+    if (p->GetC8() > 0 || p->m1CD0 == 0)
+        return 1;
+    if (SumBytes(&p->s[1]) > 0)
+        return 1;
+    if (SumBytes(&p->s[0]) > 0 || p->GetC9() > 0 || p->GetCB() > 0 || p->GetCA() > 0
                 || *fn_80081D08(p, 0) != 0xFF || *fn_80081D08(m14.m0, 1) != 0xFF
                 || *fn_80081D08(m14.m0, 2) != 0xFF)
-                return 1;
-            return 0;
-        }
-    }
-    return 1;
+        return 1;
+    return 0;
 }
 
 void Unk80069F0C::fn_8006C02C()
@@ -403,7 +411,6 @@ void Unk80069F0C::fn_8006C930()
         m14.m0->m1CC8++;
 }
 
-/* near-miss: 4 slots; retail keeps the m14 pointer in a caller-saved register. */
 void Unk80069F0C::fn_8006CFA4(Unk8006902C_EvCFA4* ev)
 {
     int side = 0;
@@ -413,8 +420,11 @@ void Unk80069F0C::fn_8006CFA4(Unk8006902C_EvCFA4* ev)
     Unk8006902C_Side* sd = &m14.m0->s[side];
     void* l = sd->m92C;
     fn_8006FC40(l, 1, c, fn_8006FB28(l, 1, c) + 1);
-    if (ev->m8 == 3)
-        ((unsigned char*)sd + c * 0x34)[0x3F2]++;
+    if (ev->m8 == 3) {
+        int o = c * 0x34;
+        int b = (int)sd;
+        (*(unsigned char*)(b + o + 0x3F2))++;
+    }
     fn_8006EC94(c, 9);
     fn_8006EC94(c, 2);
 }

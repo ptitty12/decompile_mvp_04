@@ -167,6 +167,7 @@ struct Unk8006902C_Players {
     int GetC9() { return m1CC9; }
     int GetCA() { return m1CCA; }
     int GetCB() { return m1CCB; }
+    int GetD0() { return m1CD0; }
 };
 
 struct Unk8006902C_Handle {
@@ -228,6 +229,7 @@ struct Unk80069F0C {
     void fn_8006C17C(Unk8006902C_EvC17C* ev);
     void fn_8006A22C();
     int fn_8006A214();
+    void fn_8006A1F4();
     void fn_8006C02C();
     void fn_8006C064();
     void fn_8006C038(void* a);
