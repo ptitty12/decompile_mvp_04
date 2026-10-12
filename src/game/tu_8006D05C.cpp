@@ -4,6 +4,8 @@
  */
 #include "game/tu_80070DDC.h"
 #include "game/tu_8007FF8C.h"
+int fn_80076584(int a, int b);
+extern "C" void fn_8006E910(Unk80069F0C* self, unsigned char c, int k);
 extern const char lbl_805B2CB0[];
 void fn_80080BFC(Unk8007FF8C_Y* y);
 extern "C" void fn_800962B4(void* p);
@@ -452,6 +454,48 @@ struct Unk8006F594_Obj {
     char mA0[0x560];
     int m600;
 };
+
+extern "C" void fn_8006E710(Unk80069F0C* self)
+{
+    Unk8006902C_Players* p = self->m14.m0;
+    int side = 0;
+    int old = p->m1CD0;
+    if (old != 0)
+        side = 1;
+    int z = old == 0;
+    Unk8006DF80_S* mine = (Unk8006DF80_S*)((char*)p + side * 0xE64);
+    Unk8006DF80_S* other = (Unk8006DF80_S*)((char*)p + z * 0xE64);
+    unsigned char cb = mine->m168[mine->m174];
+    unsigned char ca = other->m17C;
+    int ra = fn_8008CFD8(other->mC9C, 9, ca);
+    int rb = fn_8008CFD8(mine->mC9C, 8, cb);
+    int xb = rb == 0;
+    int sel = fn_80076584(ra, rb);
+    if (rb == 2)
+        xb = 1;
+    int os = sel * 4;
+    char* tm = (char*)mine + 0x954;
+    char* to = (char*)other + 0x924;
+    int ob = xb * 4;
+    char* l = (char*)other + 0x95C;
+    int n1 = (*(Unk8006DF80_R**)(tm + os))->v5(5, cb) + 1;
+    (*(Unk8006DF80_R**)(tm + os))->v8(5, cb, n1);
+    self->fn_8006EC94(cb, 0xF);
+    int n2 = (*(Unk8006DF80_R**)(to + ob))->v5(2, ca) + 1;
+    (*(Unk8006DF80_R**)(to + ob))->v8(2, ca, n2);
+    fn_8006E910(self, ca, 0);
+    fn_8006E910(self, ca, 5);
+    char* pz = (char*)self->m14.m0 + z * 0xE64;
+    unsigned char c2 = *(unsigned char*)(pz + 0x17D);
+    fn_80080828(l, 0, c2, fn_80080724(l, 0, c2) + 1);
+    if (z == 0)
+        p->m1CD0 = 1;
+    else
+        p->m1CD0 = old;
+    fn_80353C60(self->mC->mC, 2);
+    fn_80353CB4(self->mC->mC, 0xF);
+    fn_80089164(self->mC->mC);
+}
 
 Unk8006902C_Handle* fn_8006F4D0(Unk8006902C_Handle* h)
 {
