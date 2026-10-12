@@ -358,6 +358,50 @@ extern "C" void fn_801BB1E0(A* a, int flag)
         fn_801BDA38(a, cur);
 }
 
+extern "C" int fn_801DC10C(int h);
+struct Unk801BB338_Five {
+    float v[5];
+};
+extern Unk801BB338_Five lbl_805CFCA4;
+extern Unk801BB338_Five lbl_805CFCB8;
+inline float Unk801BB338_Pick(const Unk801BB338_Five* t, int idx)
+{
+    Unk801BB338_Five tbl = *t;
+    return tbl.v[idx];
+}
+inline float Unk801BB338_Roll(A* a, const char* file, int line, float k)
+{
+    unsigned n = a->m14->m554->fn_8014D8AC(1000000, file, line);
+    return (float)n * k * 1e-6f;
+}
+extern "C" void fn_801BB338(A* a, int x, int y)
+{
+    Unk801C16B0_M4* m10 = (Unk801C16B0_M4*)a->m10;
+    Unk801B7FB0_Game* g = a->m14->m6F8;
+    int kind = fn_801DC10C(m10->m3B8);
+    if (x == 0 && y == 0 && (kind == 0xB || kind == 0xD)) {
+        int w = fn_803445A0((int*)((char*)m10->m3A4 + 0x28C));
+        if ((unsigned)(w - 2) <= 1) {
+            int f = 0;
+            Unk801B7FB0_Teams* t = g->m14;
+            int idx = *(int*)((char*)a->m14->m6F8->m10 + 0x140);
+            if (Unk801BAC74_Byte(t->m1CCA) > 1 || Unk801BAC74_Byte(t->m1CCB) > 2)
+                f = 1;
+            float lim = 0.0f;
+            if (w == 2 || f != 0) {
+                Unk801BB338_Five tbl = lbl_805CFCA4;
+                lim = tbl.v[idx];
+            } else {
+                Unk801BB338_Five tbl = lbl_805CFCB8;
+                lim = tbl.v[idx];
+            }
+            a->m24 = 0;
+            if (!(Unk801BB338_Roll(a, lbl_805CFBAC, 0x556, 1.0f) > lim))
+                a->m24 = 1;
+        }
+    }
+}
+
 extern "C" void fn_801BB4D8(A* a, int x)
 {
     B* b = a->m8;
