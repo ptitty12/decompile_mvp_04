@@ -4,6 +4,9 @@
  */
 #include "game/tu_8020EE9C.h"
 
+struct Unk8019F8C0_Owner;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k); /* C++ linkage: mangled by the owner type */
+
 extern "C" {
 int fn_802055F4(TaskInner* in);
 int fn_80205664(TaskInner* in);
@@ -93,6 +96,65 @@ void fn_8021FFD4(Task* t, int, RecQueue* q)
     e->mAC = 0;
 }
 
+struct Unk80220808_In {
+    char pad0[0x1A0];
+    int m1A0;
+};
+struct Unk80220808_O {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x36C - 0x6C];
+    Obj36C* m36C;
+};
+struct Unk80220330_In { char pad0[0x9C]; int m9C; };
+extern int lbl_8061B9C8;
+void fn_802099F8(void* p, int a); /* retail: Unk801EE438_Scr* */
+void fn_80205784(void* p, int a, int b);
+int fn_801F0004(Task* t, int* out);
+void fn_801EDE78(Task* t, int a);
+void fn_80220330(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    int lim = 0xF0 / lbl_8061B9C8;
+    if (e->mA4 == 1) {
+        e->mA4 = 0;
+        e->m90 = 0.0f;
+    }
+    e->m90 = e->m90 + 1.0f;
+    if ((int)e->m90 % 3 == 0) {
+        void* sub = (char*)t + 0xA8;
+        fn_802099F8(sub, 0);
+        fn_80205784(sub, 0, 0);
+        int z = 0;
+        if (fn_801F0004(t, &z) == 0 || !(e->m90 < (float)lim)) {
+            ((Unk80220330_In*)t->m9C)->m9C = 1;
+            fn_801EDE78(t, 1);
+            fn_801F0174(t, a, 1);
+        }
+    }
+}
+
+void fn_80220808(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    TaskInner* in = t->m9C;
+    Unk80220808_O* o = (Unk80220808_O*)in->m4;
+    Obj36C* x = (Obj36C*)ObjAt(in->m8, a);
+    if (e->mA4 == 1) {
+        e->mA4 = 0;
+    }
+    if (o->m36C == x) {
+        e->m90 = e->m90 - 0.016666668f;
+        if (e->m90 <= 0.0f || ((Unk80220808_In*)t->m9C)->m1A0 == 0) {
+            fn_801F0174(t, a, 0);
+        }
+    } else {
+        e->m94 = 1;
+        e->m50 = o->m60 - x->m60;
+        e->m50.y = 0.0f;
+    }
+}
+
 void fn_80220E48(Task* t, int a, Player* p)
 {
     TaskInner* in = t->m9C;
@@ -168,6 +230,57 @@ int fn_802219EC(Task* t)
             return 1;
         }
         fn_8014E108(p);
+    }
+    return 0;
+}
+
+/* near-miss: loop pointer lives in r31 here; retail passes it in r3 and keeps a copy in r31 (3 slots) */
+unsigned fn_801BBF24(int x);
+int fn_80204F8C(Rec* r);
+int fn_80204F30(Rec* r);
+struct Unk80221A70_Ow {
+    char pad0[0x3BC];
+    int m3BC;
+};
+struct Unk80221A70_Ctx {
+    char pad0[0x6CC];
+    Obj4_36C* m6CC;
+    char pad6D0[0x700 - 0x6D0];
+    Unk80221A70_Ow* m700;
+};
+struct Unk80221A70_It {
+    char pad0[8];
+    int m8;
+    char padC[0x18 - 0xC];
+    int Cur() { return m8; }
+};
+int fn_80221A70(Task* t)
+{
+    if (fn_801A2034((Unk8019F8C0_Owner*)t->m9C->m0, 4) != -1)
+        return 1;
+    Unk80221A70_Ctx* c = (Unk80221A70_Ctx*)t->m9C->m0;
+    if (c->m6CC->m36C != 0)
+        return 1;
+    if (fn_801BBF24(c->m700->m3BC) <= 2)
+        return 1;
+    Unk80221A70_It it;
+    fn_8014E09C((IterObj*)&it, t->m9C->m0, 1);
+    while (it.Cur() != 10) {
+        RecQueue* base = t->m9C->mCA8;
+        RecQueue* q = &base[it.Cur()];
+        int i = 0;
+        Rec* r = &q->e[0];
+        while (i < q->count) {
+            if (fn_80204F8C(r) != 1)
+                break;
+            r++;
+            i++;
+        }
+        if (i < q->count) {
+            if (fn_80204F30(r) != 0 || r->m0 == 0x1B)
+                return 1;
+        }
+        fn_8014E108((IterObj*)&it);
     }
     return 0;
 }
