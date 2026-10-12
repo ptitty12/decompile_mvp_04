@@ -74,6 +74,17 @@ inline void FeMenuSimInit(FeMenuSim* p, int a)
     p->m2D8 = 0;
 }
 
+extern "C" int sprintf(char* s, const char* fmt, ...);
+extern "C" unsigned int strlen(const char* s);
+struct FeD3 {
+    unsigned char a;
+    unsigned char b;
+    unsigned short c;
+};
+extern "C" void fn_80172118__Fv(const char* name);
+extern "C" void fn_8017211C__Fv(const char* name, const char* data, int n);
+extern "C" void fn_80402FCC(char* dst, const void* src);
+
 extern "C" FE_OVERLAY void fn_8043FDC0(void)
 {
 }
@@ -279,6 +290,30 @@ extern "C" FE_OVERLAY void fn_80442930(void)
     if (lbl_806215DC == 0) {
         lbl_806215DC = fn_803774A8(40000, 0x100);
         lbl_806215E0 = 0;
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80442984(void)
+{
+    char out[0x40];
+    char str[0x80];
+    FeD3 d;
+    int i;
+    const char* hd = "Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+";
+    fn_80172118__Fv("HappyTrack.csv");
+    i = 0;
+    fn_8017211C__Fv("HappyTrack.csv", "Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+", strlen("Date,MLB Chemistry,MLB Win%,AAA Chemistry,AAA Win%,AA Chemistry,AA Win%,Grade
+"));
+    for (; i < lbl_806215E0; i++) {
+        fn_80402FCC(str, (void*)((FeRec28*)(i * 0x28 + (int)lbl_806215DC))->m24);
+        fn_80329FA0(&d, *(int*)(i * 0x28 + (int)lbl_806215DC));
+        FeRec28* e = (FeRec28*)(i * 0x28 + (int)lbl_806215DC);
+        unsigned short y = (unsigned)d.c % 100;
+        sprintf(out, "%02d/%02d/%02d,%3.3f,%1.3f,%3.3f,%1.3f,%3.3f,%1.3f,%s
+", d.b, d.a, y, e->m4, e->m14, e->m8, e->m18, e->mC, e->m1C, str);
+        fn_8017211C__Fv("HappyTrack.csv", out, strlen(out));
     }
 }
 
