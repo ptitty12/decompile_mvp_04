@@ -148,6 +148,7 @@ struct Unk80279BB8 {
     float mD4;
     int mD8;
     Unk80279BB8(Unk8027C728_Player* player);        /* 0x80279BB8 */
+    Unk80279BB8(Unk80270BA0_X* x);                  /* 0x80279BB8: retail symbol is __11Unk80279BB8P13Unk80270BA0_X */
 };
 
 /* Pair of ints built on the stack by fn_8027D3E8 and passed to fn_8027D150. */

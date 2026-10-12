@@ -6,6 +6,15 @@
 #include "game/chooser.h"
 #include "game/tu_8024EF40.h"
 
+extern const float lbl_805D9680;
+extern const float lbl_805D9684;
+extern const float lbl_805D9690;
+extern int lbl_8061D4D0;
+extern int lbl_8061D4D4;
+
+int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* out, int c);
+extern const float lbl_805D967C;
+
 extern const Unk8024B99C_V3 lbl_806055DC;
 int fn_8025416C(Unk8024EF40_W* self, int a);
 float fn_801A20F8(Unk8022FE34_Ctx* c, int a, float f1, float f2);
@@ -448,6 +457,37 @@ int fn_8024D708(Unk80270BA0_X* x)
     return r <= chance;
 }
 
+int fn_8024D8A0(Unk80270BA0_X* x, int* outA, float* outB)
+{
+    Unk8027C728_Goal* g = ((Unk8024B99C_V*)x)->m934;
+    int r = 0;
+    if (outA)
+        *outA = 0;
+    if (outB)
+        *outB = lbl_805D967C;
+    if (g) {
+        char* p = 0;
+        if (g->m10 == 0x11)
+            p = g->m18;
+        if (p) {
+            int k = *(int*)(p + 0x48);
+            if ((unsigned)(k - 1) <= 1 && *(int*)(p + 0x4C) != 0) {
+                r = 1;
+                if (outB) {
+                    Unk80279BB8 q(x);
+                    float f;
+                    Unk80271DBC_Link* l = x->m618;
+                    if (fn_80386110(l, &q, l->m838, 0xA0756559, &f, 0) & 0x10000)
+                        *outB = f;
+                }
+                if (k == 1 && outA)
+                    *outA = k;
+            }
+        }
+    }
+    return r;
+}
+
 int fn_8024D9A0(Unk80270BA0_X* x, int* out)
 {
     int r = 0;
@@ -513,6 +553,65 @@ int fn_8024D9A0(Unk80270BA0_X* x, int* out)
 }
 
 void fn_8024DB54() {}
+
+/* near-miss (97.6%): 15 slots differ: the switch tree pivot (retail roots at 2, ours at 1), the order of the e[1]/e[2] loads
+   and the f0/f13 numbering in the last compare. Tried switch/if forms, local declaration orders and t[] store orders */
+void fn_8024DB58(Unk80270BA0_X* x, int k, float* e)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    float hi = lbl_805D9680;
+    float lo = lbl_805D9680;
+    if (k == 13) {
+        hi = e[2];
+        lo = e[1];
+    } else if (k == 14) {
+        hi = e[2];
+        lo = e[1];
+    }
+    if (!(lo < lbl_805D9684)) {
+        float t[4];
+        float frac;
+        float w;
+        float r;
+        volatile int pad;
+        float s;
+        int i = (int)lo;
+        frac = lo - (float)i;
+        t[0] = v->m720;
+        t[1] = v->m724;
+        t[2] = v->m728;
+        t[3] = v->m72C;
+        w = lbl_805D9684 - frac;
+        r = lbl_805D9680;
+        switch (i) {
+        case 0:
+            break;
+        case 1:
+            r = w * t[0] + frac * t[1];
+            break;
+        case 2:
+            r = w * t[1] + frac * t[2];
+            break;
+        case 3:
+            r = w * t[2] + frac * t[3];
+            break;
+        default:
+            r = t[3];
+            break;
+        }
+        s = r;
+        v->m8D4 = 0;
+        v->m8D8 = lbl_8061D4D0;
+        v->m8D0 = s;
+    }
+    if (hi > lbl_805D9690 || !(hi >= lbl_805D9690)) {
+        float r2 = hi * lbl_805D9690;
+        float s2 = r2;
+        v->m8E4 = lbl_8061D4D4;
+        v->m8E0 = 0;
+        v->m8DC = s2;
+    }
+}
 
 int fn_8024DCFC(int k)
 {

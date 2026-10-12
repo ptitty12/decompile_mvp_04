@@ -83,7 +83,9 @@ public:
     float m24;
     int m28;                   /* target valid */
     int m2C;
-    char pad30[0x40 - 0x30];
+    char pad30[0x38 - 0x30];
+    int m38;
+    char pad3C[0x40 - 0x3C];
     int m40;
     char pad44[0x48 - 0x44];
     int m48;                   /* current goal id */

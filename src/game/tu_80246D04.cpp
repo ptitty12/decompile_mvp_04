@@ -4,6 +4,68 @@
  */
 #include "game/tu_8024B99C.h"
 #include "game/chooser.h"
+#include "game/tu_8026C414.h"
+#include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_8028C6B8.h"
+
+struct Unk80249070_A {
+    char pad0[0x38];
+    int m38;
+    char pad3C[0x4C - 0x3C];
+    float m4C;
+};
+struct Unk80256C80_M;
+int fn_80259440(Unk80256C80_M* self);
+float fn_8024902C();
+float fn_80249048(Unk80270BA0_X* x);
+float fn_80249064(Unk80270BA0_X* x);
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+extern const float lbl_805D93B8;
+inline float Unk80249070_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+
+/* Views of the player object for fn_8024A468 (offsets from the asm). */
+struct Unk8024A468_Sub {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk8024A468_Ref {
+    char pad0[0x44];
+    int m44;
+};
+struct Unk8024A468_Ctx {
+    char pad0[0x54C];
+    Unk8024A468_Ref* m54C;
+    char pad550[0x6CC - 0x550];
+    Unk8026C414_M* m6CC;
+    char pad6D0[0x744 - 0x6D0];
+    Unk8024A468_Sub* m744;
+};
+struct Unk8024A468_X {
+    char pad0[0x44C];
+    Unk8024A468_Ctx* m44C;
+    char pad450[0x71C - 0x450];
+    unsigned m71C;
+    char pad720[0xAB8 - 0x720];
+    int mAB8;
+    char padABC[0xB20 - 0xABC];
+    char mB20[0xC];
+    char mB2C[0xC];
+    float mB38;
+    unsigned mB3C;
+};
+extern int lbl_8061D2B4;
+extern const float lbl_805D94C0;
+Unk8026C414_V3 fn_8026CB70(Unk8026C414_M* self, int i);
+extern "C" void fn_8038AC30(int a, float f, const Unk8026C414_V3& b, int c, void* d);
+
+extern "C" void fn_80244A64(Unk8027C728_Player* x, Unk8027C728_Goal* g, int flag);
+extern "C" void fn_8037EBE8(Unk80271DBC_Link* l);
+extern "C" void fn_803814A4(Unk80271DBC_Link* l, unsigned hash, int a, float b);
+extern const float lbl_805D94C4;
 
 /* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
  * unchanging, so sched1 keeps them below preceding stores (retail's order). */
@@ -39,6 +101,48 @@ void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
 void fn_80249D64(Unk80270BA0_X* x, int a);
 float fn_8023C868(Unk80270BA0_X* x);
 
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Unk80246D04_LenSq(const Unk80273498_Vec3& v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+inline Unk80273498_Vec3 Unk80246D04_Copy(const Unk80273498_Vec3* p)
+{
+    return *p;
+}
+
+extern const float lbl_805D9278;
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk80270BA0_X* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, float* d);
+void fn_8027D368(Unk8027C728_Goal* g);
+
+extern const float lbl_805D9270;
+void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p);
+extern "C" void fn_80255058__Fv(void* p);
+float fn_804028E4(float x);
+
+int fn_8024778C(Unk80270BA0_X* x, Unk80273498_Vec3* p)
+{
+    Unk80273498_Pos* t = ((Unk8024B99C_V*)x)->m928;
+    if (t != 0) {
+        if (!(fn_804028E4(Unk80246D04_LenSq(*p - t->m60)) >= lbl_805D9270)) {
+            fn_8024A674(x, t);
+            fn_80255058__Fv((char*)t + 0x58C);
+        }
+    }
+    return 1;
+}
+
 void fn_80247858(Unk80270BA0_X* x)
 {
     fn_8014E498(x->m60);
@@ -49,6 +153,22 @@ float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g,
 float atan2f(float y, float x);
 /* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
    equal-priority parameters); tried single-call, result-variable and else forms */
+extern "C" float fn_802478A0(void* o, void* p, int a, int b)
+{
+    float f;
+    Unk8027C728_Goal* g = fn_802448F4((Unk80270BA0_X*)o, 1);
+    Unk8027A84C* g104;
+    ((Unk8028C6B8_Goal*)(g->m10 = 4, g104 = (Unk8027A84C*)g->m104, fn_8027C728(g), g->m18))->fn_8028ED30(*(Unk80273498_Vec3*)p);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = b;
+    g104->m40 = b;
+    if (fn_8027D390(g, &f, 0, 0, 0) == 0)
+        f = lbl_805D9278;
+    fn_8027D368(g);
+    return f;
+}
+
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
 {
     float len = fn_804028E4((p->x - q->x) * (p->x - q->x) + (p->z - q->z) * (p->z - q->z));
@@ -102,15 +222,36 @@ float fn_8024902C()
     return r;
 }
 
-float fn_80249048()
+float fn_80249048(Unk80270BA0_X* x)
 {
     float r = lbl_805D93B4;
     return r;
 }
 
-float fn_80249064()
+float fn_80249064(Unk80270BA0_X* x)
 {
     return lbl_8061D4B4;
+}
+
+float fn_80249070(Unk80270BA0_X* x)
+{
+    float a = fn_8024902C();
+    float b = fn_80249048(x);
+    Unk80249070_A* ctl = (Unk80249070_A*)((char*)x + 0x58C);
+    float t = ctl->m4C;
+    if (x->m458 == 9 && ctl->m38 < 0) {
+        Unk8027107C_Outer* o = x->m44C->m700;
+        if (o != 0 && fn_80259440((Unk80256C80_M*)o->m3B4) != 0) {
+            float d = fn_80249064(x);
+            float e = d - (a - d);
+            float g = fn_8024D0C4(x, 0x3F, e, a);
+            b = g;
+        }
+    }
+    if (!(t >= lbl_805D93B8))
+        t = lbl_805D93B8;
+    float r = Unk80249070_Lerp(b, t, a);
+    return fn_80248F70(x, r);
 }
 
 float fn_80249188(Unk80270BA0_X* x, float f)
@@ -286,6 +427,23 @@ void fn_80249DF8(Unk80270BA0_X* x, int a)
     fn_80249D64(x, a);
 }
 
+void fn_8024A468(Unk8024A468_X* x)
+{
+    if (lbl_8061D2B4 == 0) {
+        Unk8024A468_Ctx* c = x->m44C;
+        int t = (x->m71C >> 12) & 1;
+        if (c->m744->m20 != 0 || c->m54C->m44 != 0)
+            t = 0;
+        if (x->mB38 != lbl_805D94C0 && t == 0) {
+            if (c->m6CC != 0 && (x->mB3C & 0x40000000) != 0) {
+                fn_8038AC30(x->mAB8, x->mB38, fn_8026CB70(c->m6CC, 1), 0, x->mB2C);
+            } else {
+                fn_8038AC30(x->mAB8, x->mB38, *(Unk8026C414_V3*)x->mB20, 0, x->mB2C);
+            }
+        }
+    }
+}
+
 void fn_8024A550(Unk80270BA0_X* x, float f)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
@@ -300,4 +458,26 @@ void fn_8024A584(Unk80270BA0_X* x, float f)
     ((Unk8024B99C_V*)x)->mB18 = f;
 }
 
-void fn_8024A674() {}
+void fn_8024A59C(Unk80270BA0_X* x, int s)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    if (v->m264 != s) {
+        if (s != 0) {
+            fn_80244A64((Unk8027C728_Player*)x, 0, 0);
+            for (int i = 0; i < 3; i++) {
+                Unk80271DBC_Link* l = v->m618[i];
+                fn_8037EBE8(l);
+                fn_803814A4(l, 0, 0, lbl_805D94C4);
+            }
+        }
+        v->m264 = s;
+        if (s == 0 && v->m934 == 0) {
+            Unk8027C728_Goal* g = fn_802448F4(x, 1);
+            g->m10 = 2;
+            fn_8027C728(g);
+            fn_80244A64((Unk8027C728_Player*)x, g, 0);
+        }
+    }
+}
+
+void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p) {}

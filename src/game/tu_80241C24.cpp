@@ -6,6 +6,8 @@
 #include "game/tu_8026C414.h"
 #include "game/goals/tu_8027A84C.h"
 
+int fn_8027CFA8(Goal* a, Goal* b, Player* p, Unk80279BB8* r);
+
 /* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
  * unchanging, so sched1 keeps them below preceding stores (retail's order). */
 template <class T> inline float Unk80241C24_Secs(T n)
@@ -273,6 +275,63 @@ static inline char* GoalData2(Goal* g)
         r = g->m18;
     return r;
 }
+extern "C" void fn_80244A64(Player* player, Goal* g, int flag)
+{
+    if (g != 0 && flag == 0 && (*(unsigned*)((char*)player + 0x71C) & 0x1000)) {
+        fn_8024497C(player, g);
+        return;
+    }
+    Goal* cur = ((Unk8024B99C_V*)player)->m934;
+    Goal* la = 0;
+    Goal* lb = 0;
+    int found = 0;
+    Goal* a = cur;
+    int moved = 0;
+    Goal* b = g;
+    Goal* c;
+    if (b != 0) {
+        b = fn_8027D2FC(b, -1);
+        c = b;
+        if (cur != 0) {
+            goto test;
+        loop:
+            a = a->m0;
+            c = c->m0;
+        test:
+            if (a != 0 && c != 0) {
+                if (fn_8027CFA8(a, c, player, 0) != 0) {
+                    found = 1;
+                    moved = 1;
+                    lb = a;
+                    la = c;
+                    goto loop;
+                }
+                found = 0;
+            }
+        }
+    }
+    if (found != 0) {
+        fn_8024497C(player, b);
+        ((Unk8024B99C_V*)player)->m934 = cur;
+        return;
+    }
+    if (moved != 0) {
+        Goal* t1 = la->m0;
+        Goal* t2 = lb->m0;
+        lb->m0 = t1;
+        if (t1 != 0)
+            t1->m4 = lb;
+        la->m0 = t2;
+        if (t2 != 0)
+            t2->m4 = la;
+        Goal* t = cur;
+        cur = b;
+        b = t;
+    }
+    ((Unk8024B99C_V*)player)->m934 = b;
+    fn_8024497C(player, cur);
+}
+
 void fn_80244BA4(Unk80270BA0_X* x, Goal* g, int flag)
 {
     if (g != 0) {
