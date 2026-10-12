@@ -78,6 +78,44 @@ struct Unk803E68B0_Key {
     int m30;
 };
 
+inline void SubCtor(Unk803E6660* o)
+{
+    o->m0 = 0xB8;
+    o->m8 = 0;
+    o->mC = 0;
+    o->m10 = 0;
+    o->m14 = 0;
+    o->m18 = 0;
+    o->m1C = 0;
+    o->m20 = 0;
+    o->m24 = 0;
+    o->m28 = 0;
+    o->m2C = -1;
+    o->m30 = 0;
+    o->m4 = fn_803D700C(lbl_8062C668(0x58, 0));
+    o->m38 = (int*)lbl_8062C668(0x104, 0);
+    *o->m38 = -1;
+}
+
+inline void ArrDel(int* p)
+{
+    if (p) {
+        int* b = p - 1;
+        lbl_8062C66C(b, *b + 4);
+    }
+}
+
+inline void SubDtor(Unk803E6660* o)
+{
+    if (o->mC) {
+        int* base = (int*)o->mC - 1;
+        lbl_8062C66C(base, *base + 4);
+    }
+    if (o->m4)
+        fn_803D7600(o->m4, 3);
+    lbl_8062C66C(o->m38, 0x104);
+}
+
 extern "C" void fn_803E4164(float* dst, const float* src)
 {
     float* d = dst;
@@ -144,23 +182,115 @@ extern "C" void fn_803E4964(Unk803E6660* o, int idx)
     }
 }
 
-extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
+extern "C" void fn_803DBD84(void* p, int chrg);
+extern "C" void* fn_803E9B98(const char* name, int* count);
+extern "C" void* fn_803DBD54(void* p);
+extern char lbl_8060CAE0[];
+extern char lbl_80693CFC[];
+extern char lbl_806AABD0[];
+
+/* Sub-object (data pointer, flag at +0x10, name handle at +0x14) built by the ctors below. */
+struct Unk803E4A50_S4C {
+    const char* m0;
+    int m4;
+    char pad8[8];
+    int m10;
+    void* m14;
+};
+
+struct Unk803E4A50 {
+    int* m0;
+    int* m4;
+    int* m8;
+    Unk803E6660 sub;
+    int m48;
+    Unk803E4A50_S4C s4C;
+};
+
+extern "C" Unk803E4A50* fn_803E4A50(Unk803E4A50* o)
 {
-    o->m2C = -1;
-    o->m0 = 0xB8;
+    o->m0 = 0;
+    o->m4 = 0;
+    o->m8 = 0;
+    SubCtor(&o->sub);
+    Unk803E4A50_S4C* q = &o->s4C;
+    int n;
+    o->s4C.m0 = lbl_80693CFC;
+    o->m48 = 0xB8;
+    q->m4 = 0;
+    q->m14 = fn_803E9B98(lbl_8060CAE0, &n);
+    q->m10 = 1;
+    fn_803DBD54((char*)o + 0x7C);
+    return o;
+}
+
+struct Unk803E4B40 {
+    int* m0;
+    int* m4;
+    char pad8[4];
+    Unk803E6660 sub;
+};
+
+extern "C" void fn_803E4B40(Unk803E4B40* o, int chrg)
+{
+    ArrDel(o->m0);
+    ArrDel(o->m4);
+    fn_803DBD84((char*)o + 0x7C, 2);
+    SubDtor(&o->sub);
+    if (chrg & 1)
+        lbl_8062C66C(o, 0xC8);
+}
+
+struct Unk803E56F8 {
+    int* m0;
+    int* m4;
+    int* m8;
+    int* mC;
+    Unk803E6660 sub;
+    int m4C;
+    Unk803E4A50_S4C s50;
+};
+
+extern "C" Unk803E56F8* fn_803E56F8(Unk803E56F8* o)
+{
+    o->m0 = 0;
+    o->m4 = 0;
     o->m8 = 0;
     o->mC = 0;
-    o->m10 = 0;
-    o->m14 = 0;
-    o->m18 = 0;
-    o->m1C = 0;
-    o->m20 = 0;
-    o->m24 = 0;
-    o->m28 = 0;
-    o->m30 = 0;
-    o->m4 = fn_803D700C(lbl_8062C668(0x58, 0));
-    o->m38 = (int*)lbl_8062C668(0x104, 0);
-    *o->m38 = -1;
+    SubCtor(&o->sub);
+    Unk803E4A50_S4C* q = &o->s50;
+    int n;
+    o->s50.m0 = lbl_806AABD0;
+    o->m4C = 0x98;
+    q->m4 = 0;
+    q->m14 = fn_803E9B98(lbl_8060CAE0, &n);
+    q->m10 = 1;
+    fn_803DBD54((char*)o + 0x90);
+    return o;
+}
+
+struct Unk803E57F0 {
+    int* m0;
+    int* m4;
+    int* m8;
+    char padC[4];
+    Unk803E6660 sub;
+};
+
+extern "C" void fn_803E57F0(Unk803E57F0* o, int chrg)
+{
+    ArrDel(o->m0);
+    ArrDel(o->m4);
+    ArrDel(o->m8);
+    fn_803DBD84((char*)o + 0x90, 2);
+    SubDtor(&o->sub);
+    if (chrg & 1)
+        lbl_8062C66C(o, 0xDC);
+}
+
+extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
+{
+    SubCtor(o);
     return o;
 }
 
