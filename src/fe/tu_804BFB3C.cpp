@@ -4,6 +4,31 @@
  */
 
 #include "game/fe_804BE560.h"
+extern "C" void fn_805296AC(int a, void* x);
+typedef void (*FeCbF)(int, void*);
+extern "C" void fn_801321D4(FeW* o, void* self, FeCbF cb, int a, void* b, int c, int d, int e, const char* s1, const char* s2,
+                            const char* s3, int f, int g, int h);
+extern char lbl_805F4F48[];
+struct FeObjR {
+    FeW* m0;
+    char pad4[0x18];
+    int m1C;
+    char pad20[4];
+    FeW* m24;
+};
+extern char lbl_805F5138[];
+extern "C" int fn_8056A580(int a, int b, int c, int d);
+extern "C" int fn_8007FDA8__FP13Unk8007F198_Cii(void* g, int a, int b);
+extern "C" FeW* fn_800C8054(FeW* w);
+struct FeObjQ {
+    FeW* m0;
+    int m4;
+};
+extern char lbl_805F4EAC[];
+extern char lbl_805F5124[];
+extern char lbl_805F5144[];
+extern char lbl_805F7ECC[];
+extern char lbl_805F7EDC[];
 struct FeWV42 : Unk800C7B40_Data {
     virtual ~FeWV42();
     virtual void s2();
@@ -388,6 +413,26 @@ extern "C" FE_OVERLAY void fn_804BFB3C(FeD20* self, int c)
     }
 }
 
+extern "C" FE_OVERLAY void fn_804BFBA0(FeObjQ* o, FeW* w, int b)
+{
+    o->m4 = b;
+    o->m0 = w;
+    FeW* c = fn_800C8044(w->fn_vslot32(lbl_805F4EAC, 1));
+    c->fn_vslot32(lbl_805F5124, 1)->fn_vslot8(0);
+    c->fn_vslot32(lbl_805F5144, 1)->fn_vslot8(0);
+    c->fn_vslot32(lbl_805F5130, 1)->fn_vslot8(0);
+    if (lbl_80621964 == 0) {
+        lbl_80621964 = (int)fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    }
+    if (lbl_8062196C == 0) {
+        lbl_8062196C = ((FeS30*)((Unk8007B2B0_Screen*)lbl_8061930C)->m30)->m10;
+    }
+    if (lbl_80621968 == 0) {
+        FeW* d = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F7ECC);
+        lbl_80621968 = (int)fn_800C8044(d->fn_vslot32(lbl_805F7EDC, 1));
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804BFD98(FeObjP* x)
 {
     x->m24->fn_vslot8(0);
@@ -401,6 +446,27 @@ extern "C" FE_OVERLAY int fn_804BFDE8(FeObj10* x)
         return 1;
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804BFE54(FeObjR* o, int f, int id)
+{
+    FeW* c = fn_800C8044(o->m0->fn_vslot32(lbl_805F4EAC, 1));
+    FeW* a = c->fn_vslot30(lbl_805F5138, 1);
+    c->fn_vslot8(1);
+    FeW* b = c->fn_vslot30(lbl_805F4F48, 1);
+    if (b != 0) {
+        int u = ((Fe19948X*)lbl_80619948)->m28;
+        if (fn_8056A580(u, ((FeStateX*)fn_800B555C())->m608, id, lbl_8062163C) == 1) {
+            ((FeSubV*)((char*)fn_800C8054(b) + 0x98))->s20(o->m1C, 0);
+            b->fn_vslot8(1);
+        } else {
+            b->fn_vslot8(0);
+        }
+    }
+    if (a != 0) {
+        a->fn_vslot8(f != 0 || fn_8007FDA8__FP13Unk8007F198_Cii(lbl_8061930C, id, 0) != 0);
+    }
+    o->m24->fn_vslot8(fn_80596538(lbl_8062196C, id));
 }
 
 extern "C" FE_OVERLAY void fn_804C0164(FeVt20* x)
@@ -598,6 +664,35 @@ extern "C" FE_OVERLAY void fn_804C0CEC(FeScrC* x)
     } while (i <= 15);
     ((FeWV69*)x->m14C)->s69(1);
     x->m14C->fn_vslot14(1);
+}
+
+extern "C" FE_OVERLAY void fn_804C0EC0(FeScrN* v)
+{
+    FeScrC* x = (FeScrC*)v;
+    char b20[0x1F8];
+    float lim;
+    char b220[0xC8];
+    float t;
+    FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F0C);
+    void* tbl = lbl_8061977C;
+    int k = x->m14C->fn_vslot60();
+    FeEnt594240* e = fn_80594240((FeW*)x->m158, k);
+    lim = *(float*)(*(char**)((Unk8007B2B0_Screen*)lbl_8061930C)->m30 + 0x12B78);
+    t = fn_804C1384((FeScrN*)x, k);
+    if (t <= lim || !(t > 0.0f)) {
+        fn_800DF254(b220, 0, 3, t);
+        const char* s0 = fn_80090880__FP11Unk80090880(tbl, 0x170C);
+        int m = fn_80593E68(x->m158, k);
+        int o = k * 4;
+        char* b = (char*)x + 0x15C;
+        int v = *(int*)(b + o) * m;
+        fn_80403DE4(b20, s0, v, fn_80090880__FP11Unk80090880(tbl, e->m10), b220);
+        fn_801321D4(p, x, (FeCbF)fn_804C10D4, 0, b20, 2, -1, 1, fn_80090880__FP11Unk80090880(tbl, 0x26DF),
+                    fn_80090880__FP11Unk80090880(tbl, 0x26DE), 0, 0, 0, 0);
+    } else {
+        fn_80131F34(p, x, fn_805296AC, 0, 0x170D, 1, -1, 1, 0x26DE, 0, 0, 0, 0, 0);
+    }
+    p->fn_vslot86();
 }
 
 extern "C" FE_OVERLAY void fn_804C10D4(int a, void* x)
