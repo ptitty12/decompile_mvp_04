@@ -12,6 +12,15 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 /* Command record (same layout as the one fn_8035E410 initialises, see tu_8035DA48.cpp). */
 extern char lbl_805DABF0[];
 struct Unk8035E410_V3 {
@@ -568,6 +577,81 @@ void fn_8025D070(int self, int a, int* o1, int* o2)
 void fn_8025D0B0(I* self, int a, int b)
 {
     fn_8025D0D4(self, a, b, a);
+}
+
+extern int fn_8028F0D0(void* g);
+int fn_8025D1F0(I* self, int idx)
+{
+    int r = 0;
+    P* cur = self->m438[idx];
+    A* ca = &cur->m58C;
+    int o1;
+    int o2;
+    fn_8025D070((int)self, ca->m38, &o1, &o2);
+    int nx = idx + 1;
+    if (nx < self->m448) {
+        P* next = self->m438[nx];
+        float v;
+        Unk80273498_Vec3 d = ((Unk80273498_Pos*)next)->m60 - ((Unk80273498_Pos*)cur)->m60;
+        v = d.x * d.x + d.z * d.z;
+        if (next != 0) {
+            A* na = &next->m58C;
+            if (ca->m38 == na->m38) {
+                if (v < 3600.0f) {
+                    r = 1;
+                } else {
+                    int t = na->m30;
+                    if (t < o1) {
+                        r = 1;
+                    } else if (t == o1) {
+                        if (!(v >= 57600.0f)) {
+                            Unk8027C728_Goal* g = ((Unk8027C728_Player*)next)->m934;
+                            void* gd = 0;
+                            if (g->m10 == 4)
+                                gd = g->m18;
+                            if (gd != 0 && fn_8028F0D0(gd) != 0)
+                                r = 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
+int fn_8025D348(I* self, int idx)
+{
+    int r = 0;
+    P* cur = self->m438[idx];
+    A* ca = &cur->m58C;
+    int o1;
+    int o2;
+    fn_8025D070((int)self, ca->m38, &o1, &o2);
+    if (idx - 1 >= 0) {
+        P* prev = self->m438[idx - 1];
+        if (prev != 0) {
+            A* pa = &prev->m58C;
+            if (ca->m38 == pa->m38) {
+                float v;
+                Unk80273498_Vec3 d = ((Unk80273498_Pos*)prev)->m60 - ((Unk80273498_Pos*)cur)->m60;
+                v = d.x * d.x + d.z * d.z;
+                if (v < 3600.0f) {
+                    r = 1;
+                } else if (pa->m30 == ca->m30) {
+                    Unk8027C728_Goal* g = ((Unk8027C728_Player*)prev)->m934;
+                    void* gd = 0;
+                    if (g->m10 == 4)
+                        gd = g->m18;
+                    if (v < 14400.0f)
+                        r = 1;
+                    else if (!(v >= 57600.0f) && gd != 0 && fn_8028F0D0(gd) != 0)
+                        r = 1;
+                }
+            }
+        }
+    }
+    return r;
 }
 
 void fn_8025D9E0(I* self, P* p, int k)
