@@ -74,12 +74,21 @@ struct RcFile {
 struct RcCtx {
     int m0, m4, m8;
 };
+struct RcBuf14 {
+    int m0, m4, m8, mC, m10;
+};
+extern RcBuf14 lbl_806ADE8C;
+extern void (*lbl_806ADE94[3])(int);
+extern "C" int fn_803FBC34(int, int*, int);
+extern "C" int fn_80401710(void*, void*);
+extern "C" void fn_80432FD4(void*, int);
+extern "C" void fn_803FFA60(void*, void*, int);
 extern "C" int fn_803FBF54(int, RcCtx*);
 extern "C" int fn_803FA3B4(int (*)(int, RcCtx*), int, int, RcArgs*);
 extern "C" void fn_803FBD78(int, char*, int);
 extern "C" void fn_804017D0(char*);
-extern "C" void fn_803FC064(int);
-extern "C" void fn_803FC1B0(int);
+extern "C" int fn_803FC064(int, int);
+extern "C" int fn_803FC1B0(int, char*, int);
 extern "C" int fn_803FC798(int, int, int, int, int, int, int);
 extern "C" int fn_803FCCAC(int, int, int, int, int, int, int);
 extern "C" int fn_803FC438(int, int);
@@ -90,6 +99,8 @@ extern "C" int fn_80400828(void*);
 extern "C" int fn_8040084C(void*);
 extern "C" void fn_803F972C(int, int);
 extern "C" char* strcpy(char*, const char*);
+extern "C" int strcmp(const char*, const char*);
+extern "C" int fn_803F9CE8(int, int, RcFile*);
 
 extern "C" int fn_803F9A80(int);
 extern "C" int fn_803F9C58(void*, int, int, void*);
@@ -164,14 +175,43 @@ extern "C" void fn_803FC034(int a)
     fn_804017D0(buf);
 }
 
-extern "C" void fn_803FC190(int a)
+/* near-miss: 2 slots; retail moves r3 (src) before r4 (len) for the fn_80432FD4 call; return-type toggles of the neighbouring callees did not change it */
+extern "C" int fn_803FC064(int a, int b)
 {
-    fn_803FC064(a);
+    int sz;
+    char* src = (char*)fn_803FBC34(a, &sz, b);
+    if (src == 0)
+        return 0;
+    int len = ((int (*)(char*))fn_804017D0)(src);
+    if (sz != 0 && len != 0) {
+        RcBuf14* q = &lbl_806ADE8C;
+        char* tmp = (char*)((void* (*)(int, int, int))q->m4)(a, sz, b ^ 0x100);
+        if (tmp == 0) {
+            ((void (*)(char*))q->m8)(src);
+            return 0;
+        }
+        fn_803FFA60(tmp, src, sz);
+        ((void (*)(char*))q->m8)(src);
+        src = (char*)((void* (*)(int, int, int))q->m4)(a, len, b);
+        if (src != 0 && fn_80401710(tmp, src) == 0) {
+            char* t = src;
+            src = 0;
+            ((void (*)(char*))q->m8)(t);
+        }
+        lbl_806ADE94[0]((int)tmp);
+        fn_80432FD4(src, len);
+    }
+    return (int)src;
 }
 
-extern "C" void fn_803FC2E0(int a)
+extern "C" void fn_803FC190(int a, int b)
 {
-    fn_803FC1B0(a);
+    fn_803FC064(a, b);
+}
+
+extern "C" void fn_803FC2E0(int a, char* b, int c)
+{
+    fn_803FC1B0(a, b, c);
 }
 
 extern "C" int fn_803FC300(const unsigned char* p)
@@ -279,6 +319,33 @@ extern "C" int fn_803FC610(const unsigned char* p)
     case 1:
         r = ((p[2] << 8) | p[3]) + 4;
         break;
+    }
+    return r;
+}
+
+extern "C" int fn_803FC698(const unsigned char* base, int* pa, int* pb)
+{
+    int r = 0;
+    const unsigned char* e = base + fn_803FC610(base);
+    const unsigned char* s = e - 8;
+    unsigned c0 = s[0];
+    if (c0 - 0x41 <= 0x19 || c0 - 0x61 <= 0x19) {
+        unsigned c1 = s[1];
+        if (c1 - 0x30 <= 9) {
+            unsigned c2 = s[2];
+            if (c2 - 0x30 <= 9) {
+                unsigned c3 = s[3];
+                if (c3 - 0x30 <= 9) {
+                    r = 8;
+                    if (pa != 0)
+                        *pa = ((char)c1 - 0x30) * 100 + ((char)c2 - 0x30) * 10 + ((char)c3 - 0x30);
+                    if (pb != 0) {
+                        const unsigned char* t = e - 4;
+                        *pb = (e[-4] << 24) | (t[1] << 16) | (t[2] << 8) | t[3];
+                    }
+                }
+            }
+        }
     }
     return r;
 }
@@ -586,6 +653,32 @@ extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
             fn_803FD494(o, o->m48);
     }
     return n->m0;
+}
+
+extern "C" void fn_803FE7E0(RcHnd* h, char* p)
+{
+    RcFile* o;
+    RcHnd* hh;
+    if (fn_803FCCCC(h, &o, &hh) == 0 && (unsigned)p >= (unsigned)o->pad3C && (unsigned)p <= (unsigned)(o->m40 - 8)
+        && (((unsigned char)p[3] << 24) | ((unsigned char)p[2] << 16) | ((unsigned char)p[1] << 8) | (unsigned char)p[0]) != -2) {
+        p[0] = -2;
+        const unsigned char* t = (unsigned char*)p + 4;
+        p[1] = -1;
+        p[2] = -1;
+        p[3] = -1;
+        fn_803FCD4C(o, (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | (unsigned char)p[4]);
+        fn_80400828(o->m4);
+        int v = o->m44;
+        if (v == 2)
+            o->m44 = 1;
+        fn_8040084C(o->m4);
+        if (v == 2) {
+            if (o->m54 != 0)
+                fn_803FD5F8(o, o->m4C);
+            else
+                fn_803FD5F8(o, o->m48);
+        }
+    }
 }
 
 extern "C" int fn_803FE914(RcHnd* h)
