@@ -6,12 +6,18 @@
 
 typedef Unk801B7FB0_P P;
 typedef Unk801C16B0_Z Z;
+struct Unk801C6D2C_V2 {
+    float x;
+    float y;
+};
 
 extern "C" {
 float fn_801C6D2C(Z* z, float f);
 float fn_801C66E8(Z* z, float f);
 float fn_801C6A34(Z* z, float f);
 float fn_801C6BB0(Z* z, float f);
+Vec3 fn_801C5BD4(Z* z);
+float fn_804028E4(float x);
 float fn_801C8170(Z* z);
 void fn_801C7F38(Z* z, float f);
 void fn_801CB8B0(Z* z, float f);
@@ -30,6 +36,19 @@ void fn_801C93BC(Z* z, float a, float b, float c, float d);
 float fn_801C7964(Z* z);
 float fn_801C5D74(Z* z);
 float fn_801C72FC(Z* z, float f, float a, float b);
+void fn_801CC894(Z* z);
+void fn_801C84FC(Z* z);
+void fn_801CFCAC(Z* z);
+int fn_801CDA84(Z* z);
+void fn_801CB360(Z* z);
+void fn_801CBE08(Z* z);
+void fn_801C983C(Z* z);
+void fn_801CA144(Z* z);
+void fn_801CA654(Z* z);
+void fn_801C97AC(Z* z);
+void fn_801C97F4(Z* z);
+void fn_801C9184(Z* z);
+void fn_801C92A0(Z* z);
 P* fn_801A4B34(P* ctx);
 float fn_801C7BF0(Z* z, float f);
 float fn_801C7D90(Z* z, float f);
@@ -50,6 +69,9 @@ extern int lbl_80620358;
 extern float lbl_8062035C;
 float fn_801CD068(Z* z);
 extern int lbl_80620378;
+extern int lbl_8062034C;
+extern int lbl_8068C6C8;
+extern Unk801C6D2C_V2 lbl_80691DBC;
 
 /* The callees' float result is left in f1 (a `return` per arm changes the branch layout). */
 extern "C" float fn_801C6D2C(Z* z, float f)
@@ -77,6 +99,55 @@ extern "C" float fn_801C6FD8(Z* z)
         r = AbsF(z->m140) * u;
     else
         r = z->m140 * e;
+    return r;
+}
+
+struct Unk801C6D2C_Pt {
+    float x;
+    float y;
+};
+struct Unk801C6D2C_Curve {
+    Unk801C6D2C_Pt p[25];
+};
+extern Unk801C6D2C_Curve lbl_805D15B4;
+
+/* near-miss: same code; retail keeps the table index in r11 and the scan counter in r9 (ours r10/r9). */
+extern "C" float fn_801C7070(float t)
+{
+    Unk801C6D2C_Curve c = lbl_805D15B4;
+    if (!(t < c.p[24].x))
+        return c.p[24].y;
+    int idx = 0;
+    int j = 0;
+    if (c.p[j].x > t)
+        goto done;
+again:
+    j = j + 1;
+    if (j > 24)
+        goto done;
+    if (c.p[j].x <= t)
+        goto again;
+    idx = j;
+done:
+    if (idx == 0)
+        return c.p[0].y;
+    float dx = c.p[idx].x - c.p[idx - 1].x;
+    if (!(dx > 0.1f))
+        return c.p[idx].y;
+    float u = (t - c.p[idx - 1].x) / dx;
+    u = !(u > 1.0f) ? (u >? 0.0f) : 1.0f;
+    return u * c.p[idx].y + (1.0f - u) * c.p[idx - 1].y;
+}
+
+extern "C" float fn_801C71EC(Z* z)
+{
+    const float lo = 65.0f;
+    const float hi = 105.0f;
+    Vec3 v = fn_801C5BD4(z);
+    float t = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z) * 0.05681818f;
+    t = t / z->m204->m6CC->m3E8;
+    float r = !(t > hi) ? ((t >? lo) - lo) * 0.025f : 1.0f;
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
     return r;
 }
 
@@ -234,6 +305,68 @@ extern "C" float fn_801C8FB8(Z* z)
     return r;
 }
 
+/* near-miss: same code; the switch tree differs by one range node (retail tests cases 0..1 as
+ * `cmpwi 0; blt; cmpwi 1; ble`, ours as two beq). */
+extern "C" void fn_801C8790(Z* z)
+{
+    int one = 1;
+    z->m120 = one;
+    fn_801CC894(z);
+    fn_801C84FC(z);
+    fn_801CFCAC(z);
+    if (lbl_8062034C == 0) {
+        if (z->m1A8 != 4) {
+            if (fn_801CDA84(z) == 0)
+                z->m1A8 = one;
+            if (z->m12C != 0)
+                z->m1A8 = 5;
+        }
+        switch (z->m1A8) {
+        case 4:
+            fn_801CBE08(z);
+            break;
+        case 0:
+            fn_801CB360(z);
+            break;
+        case 1:
+            fn_801CB360(z);
+            break;
+        case 3:
+            fn_801CB360(z);
+            break;
+        case 5:
+            fn_801CB360(z);
+            break;
+        case 6:
+            if (fn_801C8154(z) != 0) {
+                z->m1AC = 1;
+                fn_801C983C(z);
+                {
+                    int* q = &lbl_8068C6C8;
+                    *q = z->m130;
+                }
+                if (z->m128 == 5) {
+                    if (z->m130 == 5)
+                        fn_801C97AC(z);
+                    else
+                        fn_801C9184(z);
+                } else {
+                    if (z->m130 == 5)
+                        fn_801C97F4(z);
+                    else
+                        fn_801C92A0(z);
+                }
+                fn_801CA144(z);
+                fn_801CA654(z);
+                lbl_80691DBC = *(Unk801C6D2C_V2*)z->m150;
+            } else {
+                fn_801CB360(z);
+            }
+            break;
+        }
+    }
+}
+
 /* near-miss: two instructions swapped (retail stores the RandF scale slot before reloading x). */
 extern "C" void fn_801C90AC(Z* z)
 {
@@ -241,6 +374,33 @@ extern "C" void fn_801C90AC(Z* z)
     const float a = 43.0f;
     const float b = 25.0f;
     fn_801C93BC(z, x, RandF(z->m204->m554, 1.0f, 0x10CC), a, b);
+}
+
+typedef Unk801C6D2C_V2 (*Unk801C6D2C_VaFn)(Z*, ...);
+extern "C" Unk801C6D2C_V2 fn_801CD94C(Z* z);
+
+extern "C" void fn_801C9184(Z* z)
+{
+    float a = RandF(z->m204->m554, 0.499f, 0x10D9);
+    Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
+    if (!(v.x >= (double)1.775f) && !(v.x <= (double)-1.775f))
+        a = a + 0.5f;
+    fn_801CB8B0(z, a);
+    float b = fn_801C8FB8(z);
+    const float c = 50.0f;
+    fn_801C93BC(z, b, a, 40.0f, c);
+}
+
+extern "C" void fn_801C92A0(Z* z)
+{
+    float a = RandF(z->m204->m554, 0.499f, 0x10F4);
+    Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
+    if (!(v.x >= (double)1.775f) && !(v.x <= (double)-1.775f))
+        a = a + 0.5f;
+    fn_801CB8B0(z, a);
+    float b = fn_801C8FB8(z);
+    const float c = 85.0f;
+    fn_801C93BC(z, b, a, 40.0f, c);
 }
 
 extern "C" void fn_801C97AC(Z* z)
