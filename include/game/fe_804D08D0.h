@@ -10,6 +10,11 @@
 
 #include "game/fe_80459228.h"
 
+/* A list record: name text at +0, a type byte at +3. */
+struct FeRec3 {
+    char name[3];
+    unsigned char m3;
+};
 /* BEGIN-FEWX */
 /* Widget base views with the slot signatures that differ from FeW's (reached by a cast). Slot N = vtable byte offset / 8. */
 struct FeWX : Unk800C7B40_Data {
@@ -45,7 +50,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s30();
     virtual void s31();
     virtual void s32();
-    virtual void s33();
+    virtual FeRec3* s33(int a);
     virtual void s34();
     virtual void s35();
     virtual void s36();
@@ -173,7 +178,7 @@ struct FeWY : Unk800C7B40_Data {
     virtual void s29();
     virtual void s30(const char* a);
     virtual void s31();
-    virtual void s32();
+    virtual int s32();
     virtual void s33();
     virtual void s34();
     virtual void s35();
@@ -665,14 +670,14 @@ struct FeSubX : FeSubData {
     virtual void s3();
     virtual void s4();
     virtual int s5();
-    virtual void s6();
+    virtual void s6(int a);
     virtual void s7();
     virtual void s8();
     virtual void s9();
     virtual void s10();
     virtual void s11();
     virtual void s12();
-    virtual void s13();
+    virtual int s13();
     virtual void s14();
     virtual void s15();
     virtual void s16();
@@ -756,6 +761,107 @@ void fn_804D54DC(FeS804D4704* x);
 void fn_804D563C(FeS804D4704* x);
 void fn_804D512C(FeS804D4704* x);
 void fn_804D60AC(FeS804D4704* x, int a);
+}
+
+
+/* ---- unit 804D6180 ------------------------------------------------------------------ */
+
+/* Screen of lbl_8067FD70 (ctor fn_804D6184, base ctor fn_800EC594). m160 is a list control
+ * (sub-object at +0x98: s5 = selected index, s13 = count; its vslot 33 returns the record). */
+struct FeS804D6184 : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    FeW* m140;
+    char pad144[4];
+    int m148;
+    char pad14C[8];
+    FeW* m154;
+    int m158;
+    FeW* m15C;
+    FeW* m160;
+    FeW* m164;
+    FeW* m168;
+    int m16C;
+    int m170;
+    int m174;
+    int m178;
+    int m17C;
+    FeW* m180;
+    FeW* m184;
+};
+extern const char lbl_8067FD70[];
+extern const char* lbl_80621AF8[];
+extern int lbl_805FCADC[];
+extern unsigned char lbl_806221BC[];
+inline FeRec3* FeCurRec(FeS804D6184* x)
+{
+    int i = ((FeSubX*)((char*)x->m160 + 0x98))->s5();
+    return ((FeWX*)x->m160)->s33(i);
+}
+extern "C" {
+int fn_8007DA28__18Unk8007B2B0_Screen(void* g);
+int fn_8007DA34__18Unk8007B2B0_Screeni(void* g, int a);
+int fn_800E62C4__Fii(int a, int b);
+int fn_8040B574(const char* a, const char* b);
+void fn_804D7C78(FeS804D6184* x);
+int fn_804D6EC0(FeS804D6184* x);
+}
+
+
+/* Screen of lbl_8066E840 (ctor fn_804D7FE0, base ctor fn_800EC594): m154 is the TOPBAR widget,
+ * m170 a second panel; m164 caches the selected index. */
+struct FeS804D7FE0 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    int m138;
+    char pad13C[0x18];
+    FeW* m154;
+    FeW* m158;
+    FeW* m15C;
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    FeW* m170;
+};
+extern const char lbl_8066E840[];
+extern const char lbl_805F9614[];
+extern const char lbl_805F962C[];
+extern const char lbl_805F9644[];
+extern const char lbl_805F9660[];
+extern const char lbl_805F9678[];
+extern const char lbl_805F9690[];
+extern const char lbl_805F4EE0[];
+extern const char lbl_805F565C[];
+extern const char lbl_805F96B8[];
+extern const char lbl_805F96C4[];
+extern const char lbl_805F96D8[];
+extern "C" {
+void fn_804D81DC(FeS804D7FE0* x);
+void fn_804D87CC(FeS804D7FE0* x);
+}
+struct FeStateC {
+    char pad0[0x664];
+    int m664;
+};
+inline int FeFlag()
+{
+    fn_800B555C();
+    return fn_800B57EC();
+}
+
+
+extern const char lbl_805F95D4[];
+extern const char lbl_805F95DC[];
+extern const char lbl_805F95E8[];
+extern int lbl_80621AF4;
+extern "C" {
+void fn_80125128(void* w, int a);
+void fn_800C4720(void* a, FeW* w);
 }
 
 #endif
