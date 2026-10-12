@@ -6,6 +6,29 @@
 
 #include "game/tu_8001FDA8.h"
 #include "game/tu_802ACD88.h"
+struct Unk8014AD2C_V2 {
+    float x;
+    float y;
+};
+struct Unk8014AD2C_Pair {
+    Unk8014AD2C_V2 a;
+    Unk8014AD2C_V2 b;
+};
+struct Unk8014AD2C_Col {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+struct Unk8014AD2C_Rect {
+    float x0;
+    float y0;
+    float x1;
+    float y1;
+};
+extern "C" Unk8014AD2C_Col* fn_8014DBA0(Unk8014AD2C_Col*, int, int, int, int);
+extern "C" void fn_80314034(int, Unk8014AD2C_V2*, Unk8014AD2C_V2*, Unk8014AD2C_Col*);
+extern float lbl_8068B4CC[];
 struct Unk8014BC64_Va {
     virtual void fn_vslot1();
     virtual void fn_vslot2(int a);
@@ -497,6 +520,46 @@ void fn_8014AA64(int a)
     if (lbl_80620298 == 0) {
         fn_8014AD2C(a);
     }
+}
+
+void fn_8014AD2C(int self)
+{
+    Unk8014A928_Obj* p = (Unk8014A928_Obj*)self;
+    Unk8014AD2C_Rect r;
+    r.x1 = p->m34 + p->m24;
+    r.y0 = p->m28;
+    r.y1 = 0.0f;
+    r.x0 = p->m34;
+    int i = 5;
+    do {
+        float t = lbl_8068B4CC[i];
+        r.y1 = p->m50 - t * (p->m1C / (float)p->m30);
+        if (!(r.y1 >= p->m2C))
+            p->m2C = r.y1;
+        Unk8014AD2C_Pair pr;
+        Unk8014AD2C_Col col;
+        Unk8014AD2C_V2 lo = { 0.0f, 0.0f };
+        Unk8014AD2C_V2 hi = { 0.0f, 0.0f };
+        lo.x = r.x0;
+        lo.y = r.y0;
+        hi.x = r.x1;
+        hi.y = r.y1;
+        if (!(t >= 60.0f)) {
+            pr.a = lo;
+            pr.b = hi;
+            fn_8014DBA0(&col, 255, 0, 0, 255);
+            fn_80314034(lbl_8061FEDC, &pr.a, &pr.b, &col);
+        } else {
+            pr.b = lo;
+            pr.a = hi;
+            fn_8014DBA0(&col, 0, 0, 255, 255);
+            fn_80314034(lbl_8061FEDC, &pr.b, &pr.a, &col);
+        }
+        r.x0 = r.x1;
+        r.x1 = r.x1 + p->m24;
+        r.y0 = r.y1;
+    } while (--i >= 0);
+    p->m28 = r.y1;
 }
 
 void fn_8014AF14() { lbl_80687CE4 = lbl_806557A8; ((Unk8037B3E8*)&lbl_80687CE4)->Unk8037B3E8::~Unk8037B3E8(); }
