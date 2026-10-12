@@ -47,6 +47,17 @@ extern "C" Db8058DE40_R* fn_8007FE04__FP13Unk8007F198_D(void* a0);
 /* near-miss: 99.5%; retail keeps rec in r30 and the flag in r29 (callee-saved pair swapped) */
 
 extern "C" int fn_8007FDF8__FP13Unk8007F198_D(void* a0);
+
+extern "C" float fn_8007BB28__18Unk8007B2B0_Screeniii(void* a0, int a1, int a2, int a3);
+struct Db8058CD14_O {
+    char pad0[0x198];
+    int m198;
+};
+
+extern "C" int fn_800968C0(void* p, int b, int c);
+extern "C" int fn_8009764C(void* p, int a, unsigned char c, int d);
+
+extern "C" int fn_80097EA4(void* p, int a, unsigned char b, int c, int d);
 /* forward declarations (definitions are in address order) */
 extern "C" Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self);
 extern "C" void fn_8058BF68(Db805822D0_V* self);
@@ -55,6 +66,9 @@ extern "C" int fn_8058C304();
 extern "C" Db805822D0_Base* fn_8058C34C(Db805822D0_Base* self);
 extern "C" void fn_8058C388(char* self);
 extern "C" void fn_8058C9B8(Db8058C9B8_P* out, int unused, int k);
+extern "C" int fn_8058CA64(void* self, int a, int b, Db8058CD14_O* o, int c);
+extern "C" int fn_8058CBC0(void* self, int a, int b, Db8058CD14_O* o, int c);
+extern "C" int fn_8058CD14(void* self, int a, int b, Db8058CD14_O* o, int c);
 extern "C" int fn_8058CE38(void* self, unsigned short* rec);
 extern "C" void fn_8058CE50(void* self, unsigned short* rec, unsigned short* dst);
 extern "C" int fn_8058CF18(int a, int b, void* rec);
@@ -167,6 +181,52 @@ extern "C" DB_OVERLAY void fn_8058C9B8(Db8058C9B8_P* out, int unused, int k)
         }
         break;
     }
+}
+
+extern "C" DB_OVERLAY int fn_8058CA64(void* self, int a, int b, Db8058CD14_O* o, int c)
+{
+    int w = o->m198;
+    int k = fn_800968C0(o, a, 1);
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int n = s->fn_800739E0(0xB, a, 1, 2);
+    n += fn_80097EA4(o, 0xB, k, 2, 0);
+    int t = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(s, 2, w, 1);
+    if (t > 0) {
+        float x = (float)n * ((float)c / (float)t);
+        float y = ((float)b * x) / (float)n;
+        return (int)y;
+    }
+    return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8058CBC0(void* self, int a, int b, Db8058CD14_O* o, int c)
+{
+    int w = o->m198;
+    int k = fn_800968C0(o, a, 1);
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int n = s->fn_80074754(1, a, 1);
+    n += fn_8009764C(o, 1, k, 0);
+    int t = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(s, 2, w, 1);
+    if (t > 0) {
+        float x = (float)n * ((float)c / (float)t);
+        float y = ((float)b * x) / (float)n;
+        return (int)y;
+    }
+    return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8058CD14(void* self, int a, int b, Db8058CD14_O* o, int c)
+{
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int w = o->m198;
+    int n = s->fn_80074754(0, a, 1) + 1;
+    int t = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(s, 2, w, 1);
+    if (t > 0) {
+        float x = (float)n * ((float)c / (float)t);
+        float y = ((float)b * x) / (float)n;
+        return (int)y;
+    }
+    return 0;
 }
 
 extern "C" DB_OVERLAY int fn_8058CE38(void* self, unsigned short* rec)
