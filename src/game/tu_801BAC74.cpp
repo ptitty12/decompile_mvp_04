@@ -9,6 +9,42 @@
 typedef Unk801B7FB0_P P;
 typedef Unk801B7FB0_B B;
 typedef Unk801B7FB0_Ai A;
+extern int lbl_8061CB78;
+extern int lbl_8061CB7C;
+struct Unk801BAC74_PV32 : public Unk801B7FB0_PBase {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual int v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8(int x);
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual int v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual void v30();
+    virtual void v31(void* x);
+    virtual void v32(void* x);
+};
 struct Unk801BAC74_Rec {
     char pad0[0x2C];
     int m2C;
@@ -111,6 +147,44 @@ extern "C" void fn_801BAF08(A* a)
     a->m14->m6F8->m14->t[0].m110 = 0;
     Unk801B7FB0_Team* e = &a->m14->m6F8->m14->t[1];
     e->m110 = 0;
+}
+
+/* near-miss: same code; retail loads the iterator slot after the slot stores, ours before them (alias order). */
+extern "C" void fn_801BAFA4(A* a)
+{
+    lbl_8061CB78 = 0;
+    lbl_8061CB7C = 0;
+    a->m8->m10 = 0;
+    a->m8->m18 = 0;
+    a->m8->m1C = 0;
+    a->m8->m20 = 0;
+    a->m1C = 0;
+    a->m20 = 0;
+    a->m4 = 0;
+    B* b = a->m8;
+    b->m2C = 6;
+    b->mC = 0;
+    Unk8006A138_It<3> it(0);
+    int i = it.v;
+    do {
+        char* q = (char*)(i * 12 + (int)a);
+        q += 0x38;
+        Unk801B7FB0_Slot* s = (Unk801B7FB0_Slot*)q;
+        s->m0 = 0;
+        s->m4 = -1;
+        s->m8 = 0.0f;
+        i = it.Next();
+    } while (i <= 3);
+    if (a->m14->m6F4 == 0) {
+        void* v = a->m14->m65C[9];
+        if (v) {
+            for (int j = 0; j <= 3; j++) {
+                P* p = fn_801A4C74(a->m14, j);
+                if (p)
+                    ((Unk801BAC74_PV32*)p)->v32(v);
+            }
+        }
+    }
 }
 
 extern "C" void fn_801BB0C8(A* a)
