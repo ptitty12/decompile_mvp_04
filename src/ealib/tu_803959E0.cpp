@@ -148,6 +148,66 @@ void fn_80395C08(Vp6Ctx** h)
     *h = 0;
 }
 
+struct Vp6Frm {
+    unsigned m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    unsigned m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+};
+
+struct Vp6SizeView {
+    char pad0[0x148];
+    int m148;
+    char pad14C[0x19C - 0x14C];
+    unsigned char m19C;
+    char pad19D[3];
+    int m1A0;
+    char pad1A4[8];
+    unsigned char m1AC;
+    char pad1AD[3];
+    unsigned m1B0;
+    unsigned m1B4;
+    int m1B8;
+    int m1BC;
+    char pad1C0[0x1DC - 0x1C0];
+    int m1DC;
+    char pad1E0[0x208 - 0x1E0];
+    int m208;
+    int m20C;
+    char pad210[0x21C - 0x210];
+    int m21C;
+    int m220;
+    int m224;
+    char pad228[0x23C - 0x228];
+    int m23C;
+    int m240;
+    char pad244[0x254 - 0x244];
+    int m254;
+    char pad258[4];
+    int m25C;
+    int m260;
+    int m264;
+    char pad268[0x298 - 0x268];
+    Vp6Buf* m298;
+    char pad29C[0x6A0 - 0x29C];
+    int m6A0;
+    char pad6A4[0x493C - 0x6A4];
+    int m493C;
+    int m4940;
+    int m4944;
+};
+
+typedef void (*Vp6Fn5R)(Vp6Buf*, int, int, int, int);
+extern Vp6Fn5R lbl_806EF400;
+extern "C" void fn_803A0C9C(Vp6Buf*, int, Vp6Frm*);
+extern "C" void fn_80396604(Vp6Buf*, unsigned char, unsigned char, int, int, int, int, int, int, int);
+
 /* near-miss: 4 slots (li r4 / stw order around the memsets). */
 Vp6Ctx* fn_80395C68()
 {
@@ -493,6 +553,77 @@ void fn_8039733C(Vp6Ctx* c, unsigned kind, int val)
     case 6:
         c->m4940 = val;
         break;
+    }
+}
+
+void fn_80397438(Vp6SizeView* c, Vp6Frm* o)
+{
+    if (c->m1A0 != 0 || (c->m1DC != 0 && c->m4944 != 0)) {
+        if (c->m25C == 0) {
+            int t0 = c->m208 + c->m20C * 2 + 0x20;
+            int sz = c->m1B8 + t0;
+            int p = (int)fn_803985F4(sz, 0);
+            c->m260 = p;
+            c->m25C = (p + 0x1f) & ~0x1f;
+            fn_80395FBC(c->m298);
+        }
+        fn_80396604(c->m298, c->m19C, c->m1AC, c->m1A0, c->m6A0, c->m254, c->m25C, c->m148, 4, 1);
+        if (c->m493C != 0)
+            lbl_806EF400(c->m298, c->m493C, c->m4940, c->m25C, c->m25C);
+    }
+    unsigned w = c->m1B0;
+    if (w < c->m23C || c->m1B4 < c->m240) {
+        int a = c->m23C + 0x20;
+        o->m0 = a;
+        int h = a / 2;
+        int b = c->m240 + 0x20;
+        o->m8 = a;
+        o->mC = h;
+        o->m14 = h;
+        o->m4 = b;
+        int hb = b / 2;
+        int ab = a * b;
+        o->m10 = hb;
+        int hh = h * hb;
+        o->m18 = c->m264;
+        o->m1C = c->m264 + ab;
+        o->m20 = c->m264 + ab + hh;
+        o->m24 = c->m264;
+        if (c->m1A0 != 0)
+            fn_803A0C9C(c->m298, c->m25C, o);
+        else
+            fn_803A0C9C(c->m298, c->m254, o);
+        o->m18 = o->m18 + ((((o->m4 - c->m240) >> 1) * o->m8) + ((o->m0 - c->m23C) >> 1));
+        o->m0 = c->m23C;
+        o->m4 = c->m240;
+        o->m1C = o->m1C + ((((o->m10 - ((unsigned)c->m240 >> 1)) >> 1) * o->m14) + ((o->mC - ((unsigned)c->m23C >> 1)) >> 1));
+        o->m20 = o->m20 + ((((o->m10 - ((unsigned)c->m240 >> 1)) >> 1) * o->m14) + ((o->mC - ((unsigned)c->m23C >> 1)) >> 1));
+        o->mC = (unsigned)c->m23C >> 1;
+        o->m10 = (unsigned)c->m240 >> 1;
+        return;
+    }
+    o->m0 = w;
+    o->m4 = c->m1B4;
+    o->m8 = c->m1B8;
+    o->mC = c->m1B0 >> 1;
+    o->m10 = c->m1B4 >> 1;
+    o->m14 = c->m1BC;
+    if (c->m1A0 != 0 || (c->m1DC != 0 && c->m4944 != 0)) {
+        int t18 = c->m21C + c->m1B8 * 0x30 + 0x30;
+        o->m18 = c->m25C + t18;
+        int t1C = c->m220 + c->m1BC * 0x18 + 0x18;
+        o->m1C = c->m25C + t1C;
+        int t20 = c->m224 + c->m1BC * 0x18 + 0x18;
+        o->m20 = c->m25C + t20;
+        o->m24 = c->m25C + c->m21C;
+    } else {
+        int t18 = c->m21C + c->m1B8 * 0x30 + 0x30;
+        o->m18 = c->m254 + t18;
+        int t1C = c->m220 + c->m1BC * 0x18 + 0x18;
+        o->m1C = c->m254 + t1C;
+        int t20 = c->m224 + c->m1BC * 0x18 + 0x18;
+        o->m20 = c->m254 + t20;
+        o->m24 = c->m254 + c->m21C;
     }
 }
 

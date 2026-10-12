@@ -66,6 +66,32 @@ void fn_80396114(Vp6Buf* b, const Vp6Params* p);
 int fn_8039F0C0(Vp6Ctx* c);
 int fn_8039F2EC(Vp6Ctx* c, int n);
 
+struct VpEnt {
+    unsigned char m0;
+    char pad1[3];
+    int m4;
+    short m8;
+    short mA;
+    int mC;
+};
+
+struct VpCtxE {
+    char pad0[0x10C];
+    VpEnt* m10C;
+    VpEnt* m110;
+    VpEnt* m114;
+    char pad118[0x124 - 0x118];
+    short m124[3];
+    char pad12A[2];
+    short m12C[3];
+    char pad132[2];
+    short m134[3];
+    char pad13A[0x19C - 0x13A];
+    unsigned char m19C;
+    char pad19D[0x1F8 - 0x19D];
+    unsigned m1F8;
+};
+
 /* near-miss: loop structure right, the k counter and table base registers are allocated differently. */
 void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
 {
@@ -153,6 +179,48 @@ void fn_8039BC28(Vp6Hdr* h)
     h->mCC[1].m8 = 4;
     h->mCC[2].m8 = 4;
     h->mCC[3].m8 = 4;
+}
+
+void fn_8039BCC8(VpCtxE* c)
+{
+    unsigned i = 0;
+    if ((int)c->m1F8 != -8) {
+        do {
+            c->m10C[i].m4 = -1;
+            c->m10C[i].m8 = 4;
+            c->m10C[i].mA = 0;
+            c->m10C[i].m0 = 0;
+            i++;
+        } while (i < c->m1F8 + 8);
+    }
+    i = 0;
+    if ((int)(c->m1F8 >> 1) != -8) {
+        do {
+            c->m110[i].m4 = -1;
+            c->m110[i].m8 = 4;
+            c->m110[i].m0 = 0;
+            c->m110[i].mA = 0;
+            c->m114[i].m4 = -1;
+            c->m114[i].m8 = 4;
+            c->m114[i].m0 = 0;
+            c->m114[i].mA = 0;
+            i++;
+        } while (i < (c->m1F8 >> 1) + 8);
+    }
+    if (c->m19C <= 5) {
+        c->m110[1].m4 = 0;
+        c->m110[1].m8 = 0;
+        c->m114[1].m4 = 0;
+        c->m114[1].m8 = 0;
+    }
+    c->m12C[0] = 0x80;
+    c->m134[0] = 0x80;
+    c->m124[0] = 0;
+    for (i = 1; i <= 2; i++) {
+        c->m124[i] = 0;
+        c->m12C[i] = 0;
+        c->m134[i] = 0;
+    }
 }
 
 int fn_8039CC38(Vp6Ctx* c)
