@@ -373,6 +373,18 @@ extern "C" FE_OVERLAY int fn_804F9AAC(void* self, UiItemN* it)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_804F9B14(FeCap* self, int i, int n)
+{
+    int a[3] = { 110, 110, 140 };
+    int b[3] = { 7, 7, 7 };
+    int m = b[i];
+    int r = a[i];
+    int d = n - 0x42;
+    if (d > 0)
+        r += m * d;
+    return r;
+}
+
 extern "C" FE_OVERLAY int fn_804F9B84(FeCap* self)
 {
     int r;
