@@ -5,22 +5,39 @@
 #include "game/db_80584CBC.h"
 
 extern "C" void* fn_8052E444(void* self, char a);
-extern const char lbl_80683688[];
-extern const char lbl_80683720[];
-extern "C" int fn_8058A3B8(void* self, void* rec);
-extern "C" int fn_8058252C(void* self, int a);
-extern "C" int fn_8058AADC(void* self, int a);
-extern "C" int fn_8058BA94(void* self, int k, int b, int a);
-extern "C" void fn_80582314(void* self);
+
 struct Db80588434_S { char pad[0xB8]; int m[4]; };
-extern "C" void fn_80582C54(char* self, int a, Unk80070DDC_Stream* io);
-extern "C" int fn_805826AC(void* self);
+
+struct Db80619948_O { char pad[0x28]; void* m28; };
 
 struct Db805881E4_Item {
     int m0; int m4; char m8[0x18]; int m20; int m24; int m28;
     void Set(int a, int b, int c) { m0 = 0; m4 = 0; fn_8052E444(m8, 0x10); m20 = a; m24 = b; m28 = c; }
 };
+
 struct Db805881E4_Q { int m0; const void* m4; Db805881E4_Item it[4]; };
+
+extern "C" void* fn_8052E444(void* self, char a);
+extern const char lbl_80683688[];
+extern const char lbl_80683720[];
+extern "C" int fn_8058A3B8(void* self, void* rec);
+extern "C" int fn_8058252C(void* self, int a);
+extern "C" int fn_8058AADC(void* self, int a, int b);
+extern "C" int fn_8058BA94(void* self, int k, int b, int a);
+extern "C" void fn_80582314(void* self);
+extern "C" void fn_80582C54(char* self, int a, Unk80070DDC_Stream* io);
+extern "C" int fn_805826AC(void* self);
+extern Unk8007A4DC_Screen* lbl_8061930C;
+int fn_8007F7D0(Unk8007F198_B* self, unsigned i);
+int fn_80083FC0(int a);
+extern "C" int fn_8056B628(void* o, int a, int b);
+extern "C" int fn_8056B658(void* o, int a, int b);
+extern "C" int fn_8056A5F4(void* o, int a, int b, int c);
+extern "C" void fn_8055AC44(void* o, int a);
+extern "C" int fn_8055ADD4(void* o, int a);
+extern "C" int fn_8055AE1C(void* o, int a);
+extern "C" int fn_8055AE68(void* o, int a);
+extern "C" int fn_8055AEB4(void* o, int a);
 
 /* near-miss (4 slots): retail copies the call result to r0 first (mr r0,r3), compares r0 and builds the result in r3. */
 extern "C" DB_OVERLAY int fn_805881E4(void* self)
@@ -144,11 +161,22 @@ extern "C" DB_OVERLAY int fn_8058AA48(void* self, int a)
 
 extern "C" DB_OVERLAY int fn_8058AA90(void* self, int a)
 {
-    int k = fn_8058AADC(self, a);
+    int k = ((int (*)(void*, int))fn_8058AADC)(self, a);
     int r = 0;
     if (k != 0)
         r = fn_8058BA94(self, k, 1, a);
     return r;
+}
+
+extern "C" DB_OVERLAY int fn_8058AADC(void* self, int a, int b)
+{
+    int t = fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+    void* o = ((Db80619948_O*)lbl_80619948)->m28;
+    int h = fn_80083FC0(a);
+    int u = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B320(h, t);
+    if (fn_8056B628(o, b, u) == 1)
+        return fn_8056A5F4(o, a, fn_8056B658(o, b, u), u);
+    return 0;
 }
 
 extern "C" DB_OVERLAY char* fn_8058ADAC(char* p, int k)
@@ -179,4 +207,52 @@ extern "C" DB_OVERLAY char* fn_8058AE00(char* p, int k)
         return p + 0x8C;
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8058BD8C(void* self, int a, int b, int* out)
+{
+    char o[0x460];
+    fn_8055AC44(o, ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80078A38(a));
+    int best = 5;
+    *out = fn_8055ADD4(o, a) + b;
+    int v = fn_8055AE1C(o, a) + b;
+    if (v > *out) {
+        *out = v;
+        best = 4;
+    }
+    v = fn_8055AE68(o, a) + b;
+    if (v > *out) {
+        *out = v;
+        best = 6;
+    }
+    v = fn_8055AEB4(o, a) + b;
+    if (v > *out) {
+        *out = v;
+        best = 7;
+    }
+    return best;
+}
+
+extern "C" DB_OVERLAY int fn_8058BE5C(void* self, int a, int b, int* out)
+{
+    char o[0x460];
+    fn_8055AC44(o, ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80078A38(a));
+    int best = 1;
+    *out = fn_8055ADD4(o, a) + b;
+    int v = fn_8055AE1C(o, a) + b;
+    if (v < *out) {
+        *out = v;
+        best = 0;
+    }
+    v = fn_8055AE68(o, a) + b;
+    if (v < *out) {
+        *out = v;
+        best = 3;
+    }
+    v = fn_8055AEB4(o, a) + b;
+    if (v < *out) {
+        *out = v;
+        best = 2;
+    }
+    return best;
 }
