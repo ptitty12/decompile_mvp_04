@@ -146,6 +146,21 @@ extern "C" void fn_80394EE4(int a, int b)
     lbl_8069BEC0[lbl_80624450[0]].b = b;
 }
 
+extern "C" void fn_80394F24(int seed)
+{
+    int i;
+    for (i = 0; i < 32; i++) {
+        lbl_8069BEC0[i].a = -1;
+        lbl_8069BEC0[i].b = -1;
+    }
+    seed = seed + (seed << 16);
+    lbl_80624450[0] = 0;
+    fn_80394DE8(seed);
+    int n = 0x20 - (seed % 32);
+    for (i = 0; i < n; i++)
+        fn_80394FD4(10, -1);
+}
+
 extern "C" int fn_80395250(int x, unsigned y)
 {
     int r = 0;
