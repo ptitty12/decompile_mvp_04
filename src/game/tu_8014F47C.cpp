@@ -384,21 +384,16 @@ void fn_8014F738(char* self)
     } while (bad == 0);
     int i = 0;
     char* p0 = self + 0x22;
-    OSReport("
-Call Stack:
-");
+    OSReport("\nCall Stack:\n");
     char* p1 = self;
     fn_8000C674(1, 10, "Call Stack:");
     int off = 0;
-    fn_8014F3A8("
-CallStack:
-");
+    fn_8014F3A8("\nCallStack:\n");
     do {
         if (GetW(self + 0x4C, off) != 0) {
             char s[0x100] = "";
             sprintf(s, "%s:%s", p1, p0);
-            OSReport("%s
-", s);
+            OSReport("%s\n", s);
             fn_8014F3A8(s);
             s[0x26] = 0;
             fn_8000C674(2, i + 11, s);
