@@ -49,7 +49,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s25();
     virtual void s26();
     virtual void s27();
-    virtual void s28();
+    virtual void s28(void* a);
     virtual void s29();
     virtual void s30();
     virtual void s31();
@@ -89,7 +89,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s65();
     virtual void s66();
     virtual void s67();
-    virtual void s68();
+    virtual void s68(void* a, int b);
     virtual void s69(int a);
     virtual void s70();
     virtual void s71();
@@ -100,12 +100,12 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s76();
     virtual void s77();
     virtual void s78();
-    virtual void s79();
+    virtual void s79(void* a);
     virtual void s80();
     virtual void s81();
     virtual void s82();
     virtual void s83();
-    virtual void s84();
+    virtual void s84(int a);
     virtual void s85();
     virtual void s86();
     virtual void s87();
@@ -263,8 +263,10 @@ struct FeGlobal80619948 {
     int m74;
     char pad78[0x80 - 0x78];
     int m80;
-    char pad84[0x8C - 0x84];
+    int m84;
+    char pad88[0x8C - 0x88];
     int m8C;
+    int m90;
 };
 extern FeGlobal80619948* lbl_80619948;
 extern "C" {
@@ -589,9 +591,9 @@ void fn_800EC150(void* self, int a, int b, int c, int d, int e, int f, int g, in
 struct FeScrJ : FeW {
     char pad40[0xF0];
     int m130;
-    char pad134[4];
+    int m134;
     FeW* m138;
-    char pad13C[4];
+    FeW* m13C;
     int m140;
     FeScrL* m144;
     int m148;
