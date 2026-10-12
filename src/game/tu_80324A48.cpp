@@ -13,7 +13,7 @@ extern const void* const lbl_80665E48[];
 extern int lbl_80620860;
 extern int lbl_80620298;
 extern const float lbl_805EBA58;
-extern FxZ lbl_805EBA10;
+extern const FxZ lbl_805EBA10;
 struct FxShorts;
 struct FxGlobal { char pad0[0x30]; FxShorts* m30; };
 extern FxGlobal* lbl_8061B8C0;
@@ -25,11 +25,13 @@ void fn_80327274(FxAI* self);
 FxZ fn_80325158(FxZT* tab, int kind, float t);
 FxZ fn_80325410(FxZT* tab, int kind, float t);
 FxZ fn_80325848(FxZT* tab, int kind, float t);
+FxZ fn_80326080(FxZT* self);
+FxZ fn_80325AB0(FxZT* tab, int kind, float t);
 void fn_80326300(FxZT* t, int a, int b, int c, float f1, float f2);
 void fn_80326610(FxAI* self, int a, int b, float c);
 int fn_80324A24(FxZ* a);
 int fn_803249D4(FxY* a, FxY* b);
-int fn_80324C6C(FxZ* a, int b);
+int fn_80324C6C(FxZ* a, FxZT* tab);
 void fn_80377488(void* p);
 void fn_80377408(void* p);
 void* fn_803774A8(unsigned size, int heap);
@@ -146,9 +148,22 @@ int fn_80324C48(FxZ* a, int unused) {
     return r;
 }
 
-/* near-miss: register choice of the float constant */
+extern "C" int fn_80324C6C(FxZ* a, FxZT* tab) {
+    if (fn_80324C48(a, 0)) {
+        if (a->m10 <= 0.25f) return 1;
+        if (a->m0 == 0x62) {
+            const float c = 0.5f;
+            FxZ z = ((FxZ(*)(FxZT*, int, int, float))fn_80325158)(tab, 0xBA, 0, a->m4);
+            if (z.mC == a->mC && !(z.m4 - a->m4 >= c)) return 1;
+            FxZ z2 = ((FxZ(*)(FxZT*, int, int, float))fn_80325410)(tab, 0xBA, 0, a->m4);
+            if (z2.mC == a->mC && a->m4 - z2.m4 < 0.5f) return 1;
+        }
+    }
+    return 0;
+}
+
 int fn_80324D74(FxZ* a) {
-    const float t = lbl_805EBA30;
+    const float t = 72.0f;
     int r = 0;
     if (a->m0 == 0xAE) r = a->m10 <= t;
     return r;
@@ -181,14 +196,13 @@ int fn_80324E54(FxZ* a) {
 
 int fn_80324E6C(FxZ* a) { return (unsigned)(a->m0 - 0xAD) <= 1; }
 
-/* near-miss: register assignment of the walk pointers */
 int fn_80324E84(short* p) {
-    short* last = p;
     short* cur = p;
+    short* last = p;
     while (cur) {
         int d = cur[0];
         short* nx = 0;
-        if (d) nx = (short*)(d + (int)cur);
+        if (d) nx = (short*)((int)cur + d);
         cur = nx;
         if (cur) last = cur;
     }
@@ -267,6 +281,37 @@ float fn_80325128(FxZT* self, int flag, float a) {
     return a;
 }
 
+typedef int (*FxPredT)(FxZ*, FxZT*);
+/* near-miss: 2 slots. Retail spills the float parameter (stfs f1,8(r1)) before the copy of the int parameter
+   flag (mr r29,r5); here the copy comes first. Everything else, including layout and registers, is identical. */
+int fn_803256C8(FxZT* self, int kind, int flag, float t) {
+    int cnt = 0;
+    if (fn_80326F30(kind)) {
+        FxPredT pred = (FxPredT)fn_80325D18(self, kind);
+        if (pred) {
+            t = fn_803250F8(self, flag, t);
+            for (int i = 0; i < self->m8; i++) {
+                if (pred((FxZ*)(self->m4 + i * 0x18), self)) {
+                    if (!(((FxZ*)(self->m4 + i * 0x18))->m4 <= t)) cnt++;
+                }
+            }
+        } else {
+            FxZ z = ((FxZ(*)(FxZT*, int, int, float))fn_80325158)(self, kind, 0, 0.0f);
+            int ok = 1;
+            if (z.m0 == 0xC7) ok = 0;
+            if (ok) cnt = 1;
+        }
+    } else {
+        t = fn_803250F8(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            if (*(int*)(self->m4 + i * 0x18) == kind) {
+                if (!(((FxZ*)(self->m4 + i * 0x18))->m4 <= t)) cnt++;
+            }
+        }
+    }
+    return cnt;
+}
+
 FxPred fn_80325D18(void* self, int kind) {
     switch (kind) {
     case 0xB6: return (FxPred)fn_80324C48;
@@ -287,11 +332,47 @@ FxPred fn_80325D18(void* self, int kind) {
     return 0;
 }
 
-/* near-miss: loop shape (retail jumps into a bottom-tested loop, keeps scanning after a hit) and key layout */
+extern "C" FxZ fn_80325E38(FxZT* self, int kind, float t) {
+    switch (kind) {
+    case 0xB3:
+        return fn_80326080(self);
+    case 0xB4:
+        return fn_80325848(self, 0xAE, t);
+    case 0xB8:
+        return fn_80325848(self, 0xB6, t);
+    case 0xB5: {
+        FxZ z = fn_80325158(self, 0xAD, 0.0f);
+        if (!(z.m4 <= t)) return z;
+        break;
+    }
+    }
+    return lbl_805EBA10;
+}
+
+extern "C" FxZ fn_80325F5C(FxZT* self, int kind, float t) {
+    switch (kind) {
+    case 0xB3:
+        return fn_80326080(self);
+    case 0xB4:
+        return fn_80325AB0(self, 0xAE, t);
+    case 0xB8:
+        return fn_80325AB0(self, 0xB6, t);
+    case 0xB5: {
+        FxZ z = fn_80325158(self, 0xAD, 0.0f);
+        if (!(z.m4 >= t)) return z;
+        break;
+    }
+    }
+    return lbl_805EBA10;
+}
+
+/* near-miss: frame layout now matches (key at 16, t1/t2 at 40/44, no early return after a hit). Retail keeps &key in a
+   callee-saved register (stw 20(r28)) and re-evaluates self->m4 + i * 0x18 at each use, with an entry jump into a bottom test;
+   pointer-local and expression-repeat variants all scored worse (29 slots here). */
 void fn_80326300(FxZT* self, int a, int b, int c, float f1, float f2) {
-    float t1 = f1;
-    float t2 = lbl_805EBA58;
     FxZ key;
+    float t1 = f1;
+    float t2 = 0.0f;
     key.m0 = a;
     key.m4 = t1;
     key.m8 = b;
@@ -302,7 +383,6 @@ void fn_80326300(FxZT* self, int a, int b, int c, float f1, float f2) {
         FxZ* e = (FxZ*)(self->m4 + i * 0x18);
         if (fn_803249D4((FxY*)e, (FxY*)&key)) {
             if (!(e->m10 <= f2)) e->m10 = f2;
-            return;
         }
     }
 }
@@ -432,10 +512,9 @@ FxZ fn_80327044(FxPtr* p, int kind, float t) {
     return lbl_805EBA10;
 }
 
-/* near-miss: branch polarity of the kind test is inverted relative to retail */
 int fn_803270C4(FxPtr* p, int kind, int flag, float t) {
-    if (p->m0 == 0) return 0;
-    return fn_803256C8(p->m0, kind, flag, t);
+    if (p->m0 != 0) return fn_803256C8(p->m0, kind, flag, t);
+    return 0;
 }
 
 void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c) {
