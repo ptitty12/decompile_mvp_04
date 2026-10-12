@@ -103,6 +103,19 @@ void fn_802547C0(A* a, int v);
 void fn_802553BC(A* a, int v);
 void fn_8025505C(A* a, int v, int w);
 void fn_8025E924(I* i, P* p, int f);
+struct Unk8025C8A0_Pair {
+    int idx;
+    int (*fn)(void*);
+};
+struct Unk8025C8A0_Ev {
+    char pad0[4];
+    int m4;
+    char pad8[0xC];
+    int m14;
+};
+extern int lbl_8061E54C;
+extern int (*lbl_8068CD54[18])(void*);
+extern Unk8025C8A0_Pair lbl_805DAE50[18];
 struct Unk8025CB28_I {
     char pad0[0x1F0];
     M* m1F0;
@@ -176,6 +189,21 @@ Unk8027C728_Goal* fn_8025C378(void* self, P* p, int* z)
         z[0xD] = two;
     }
     return g;
+}
+
+int fn_8025C8A0(void* self, int unused, Unk8025C8A0_Ev* ev)
+{
+    if (lbl_8061E54C == 0) {
+        lbl_8061E54C = 1;
+        for (int i = 0; i < 18; i++)
+            lbl_8068CD54[i] = 0;
+        for (int i = 0; i < 18; i++)
+            lbl_8068CD54[lbl_805DAE50[i].idx] = lbl_805DAE50[i].fn;
+    }
+    int r = ev->m14;
+    if (r == 0)
+        r = lbl_8068CD54[ev->m4](self);
+    return r;
 }
 
 F* fn_8025C960(F* self, int a, int b)
