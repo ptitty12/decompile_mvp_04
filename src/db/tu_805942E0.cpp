@@ -703,6 +703,58 @@ extern "C" DB_OVERLAY void fn_80596760(char* self, int a, Unk80070DDC_Stream* io
     io->v08(a, self + 0x540, 4);
 }
 
+struct Db805967DC_TabF {
+    float v[16];
+};
+struct Db805967DC_TabI {
+    int v[16];
+};
+extern Db805967DC_TabF lbl_80600F50;
+extern Db805967DC_TabF lbl_80600F90;
+extern Db805967DC_TabI lbl_80600FD0;
+extern Db805967DC_TabF lbl_80601010;
+extern "C" int fn_8040ABA0();
+extern "C" int fn_8055207C();
+
+extern "C" DB_OVERLAY float fn_805967DC(DbQuadTab* self, int id)
+{
+    float res = 0.0f;
+    if (fn_80596538(self, id)) {
+        DbQuad* q = fn_805965DC(self, id);
+        Db805967DC_TabF a = lbl_80600F50;
+        Db805967DC_TabF b = lbl_80600F90;
+        Db805967DC_TabI c = lbl_80600FD0;
+        res = a.v[q->mC];
+        res += (float)(fn_8040ABA0() % 100) * ((b.v[q->mC] - a.v[q->mC]) * 0.01f);
+        int prod = q->m8 * fn_80593E68(self, q->mC);
+        if (prod <= 3000)
+            res = res * (float)(prod / 30) * 0.01f;
+        int r = fn_80596BAC(self, id, q->mC);
+        int lim = c.v[q->mC];
+        if (r > lim) {
+            r -= lim;
+            Db805967DC_TabF e = lbl_80601010;
+            for (int n = 0; n < r; n++)
+                res *= e.v[q->mC];
+        }
+        fn_80596388((Db805937A4_Mgr**)self, id);
+        switch (fn_8055207C()) {
+        case 0:
+            break;
+        case 1:
+            res *= 0.9f;
+            break;
+        case 2:
+            res *= 0.8f;
+            break;
+        case 3:
+            res *= 0.5f;
+            break;
+        }
+    }
+    return res;
+}
+
 /* near-miss (25 slots): retail forms &row[0].m4 before the call and keeps it in r30, one more callee-saved register than here. */
 extern "C" DB_OVERLAY int fn_80596BAC(DbQuadTab* self, int a, int b)
 {
