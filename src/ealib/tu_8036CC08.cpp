@@ -6,7 +6,7 @@
 
 class Unk803DA440 {
 public:
-    Unk803DA440(void (*fn)(), const void* a, const void* b, const void* c);
+    Unk803DA440(void (*fn)(), void* a, void* b, void* c);
     int m[5];
 };
 
@@ -77,9 +77,9 @@ void fn_803E3C08(Unk803E3C08* self, void* x, int n);
 void fn_8036CC08(Unk803E3C08* a, UnkCfg* b);
 }
 
-extern const char lbl_80623600[];
-extern const char lbl_80623638[];
-extern const char lbl_80603F3C[];
+extern char lbl_80623600[];
+extern char lbl_80623638[];
+extern char lbl_80603F3C[];
 
 extern int lbl_80627290;
 extern UnkCfg lbl_80623680;
