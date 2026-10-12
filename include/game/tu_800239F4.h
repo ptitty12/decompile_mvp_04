@@ -75,7 +75,9 @@ struct Unk80023F98_Vec2 {
 /* Entry of the stride-0x28 array at Obj+0x294 (fn_80023E18, fn_80023F98, fn_80029074). */
 struct Unk80023E18_Ent {
     int m0;
-    char pad4[0xC];
+    int m4;
+    int m8;
+    int mC;
     Unk80023F98_Vec2 m10;
     Unk80023F98_Vec2 m18;
     int m20;
@@ -287,7 +289,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk80023E18_Ent m294[1];
     char pad2BC[0x118];
     int m3D4;
-    char pad3D8[0xC];
+    char pad3D8[0x8];
+    int m3E0;
     int m3E4;
     char pad3E8[0x10];
     int m3F8[10][2];
@@ -347,7 +350,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     char pad708[0x4];
     int m70C;
     int m710;
-    char pad714[0x4];
+    int m714;
     Unk801A4B34_Pos* m718;
     int m71C;
     char pad720[0x4];
