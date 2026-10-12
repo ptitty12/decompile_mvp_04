@@ -8,6 +8,64 @@
 typedef Unk802028E4_Obj Obj;
 typedef Unk801EE438_Scr Scr;
 
+struct Unk80204AC8_E {
+    int m0;
+    float m4;
+    float m8;
+};
+struct Unk80204AC8_S {
+    int m0;
+    int m4;
+    int m8;
+    void Init()
+    {
+        m0 = -1;
+        m4 = 0;
+        m8 = 0;
+    }
+};
+struct Unk80204AC8_O {
+    int m0;
+    int m4;
+    int m8;
+    float mC;
+    Unk801EE438_Rec5C m10[9];
+    char pad324[0x34C - 0x10 - 9 * 0x5C];
+    Unk802028E4_Pair m34C[9];
+    Unk80204AC8_E m3DC[3][9];
+    Unk801EE438_Vec m520;
+    Unk801EE438_Vec m52C;
+    char pad538[0x544 - 0x538];
+    Unk801EE438_Vec m544;
+    Unk801EE438_Vec m550;
+    Unk801EE438_Vec m55C;
+    Unk801EE438_Vec m568;
+    char pad574[0x580 - 0x574];
+    Unk801EE438_Vec m580;
+    Unk801EE438_Vec m58C;
+    Unk801EE438_Vec m598;
+    Unk801EE438_Vec m5A4;
+    float m5B0;
+    float m5B4;
+    float m5B8;
+    float m5BC;
+    char pad5C0[4];
+    float m5C4;
+    float m5C8;
+    char pad5CC[4];
+    float m5D0;
+    float m5D4;
+    float m5D8;
+    float m5DC;
+    Unk80204AC8_S m5E0;
+};
+extern "C" void fn_80204AAC(Unk802028E4_Pair* o);
+inline void Init80204AC8(Unk80204AC8_E* e)
+{
+    e->m0 = -1;
+    e->m4 = -1.0f;
+    e->m8 = 0.0f;
+}
 extern "C" {
 void fn_80205A5C(Obj* o);
 }
@@ -215,6 +273,50 @@ struct Unk80204CCC_Rec {
 extern const Unk801EE438_Vec lbl_806055DC;
 extern const float lbl_805D5358;
 extern const float lbl_805D535C;
+
+/* near-miss (7 slots, 98.9%): the loop body matches retail's schedule but the strength-reduced base pointer is the
+   middle array (m448) where retail uses the last one (m4B4) with -0x6C/-0xD8 offsets; the three init calls were tried
+   in all orders. */
+extern "C" void fn_80204AC8(Unk801EE438_Sub6A8* s)
+{
+    Unk80204AC8_O* o = (Unk80204AC8_O*)s;
+    o->m5B4 = 0.0f;
+    o->m0 = 0;
+    o->m4 = 0;
+    o->m8 = 0;
+    Unk80204AC8_E* c = o->m3DC[2];
+    Unk802028E4_Pair* pr = o->m34C;
+    Unk801EE438_Rec5C* r = o->m10;
+    for (int i = 9; i != 0; i--) {
+        fn_802049E8(r++);
+        fn_80204AAC(pr++);
+        Init80204AC8(c - 18);
+        Init80204AC8(c);
+        Init80204AC8(c - 9);
+        c++;
+    }
+    o->mC = -1.0f;
+    o->m5B8 = -1.0f;
+    o->m5BC = -1.0f;
+    o->m5C4 = -1.0f;
+    o->m5D0 = -1.0f;
+    o->m5C8 = -1.0f;
+    o->m5DC = -1.0f;
+    o->m5D4 = -1.0f;
+    o->m5D8 = -1.0f;
+    o->m5B0 = -1.0f;
+    o->m520 = lbl_806055AC;
+    o->m52C = lbl_806055AC;
+    o->m544 = lbl_806055AC;
+    o->m550 = lbl_806055AC;
+    o->m55C = lbl_806055AC;
+    o->m568 = lbl_806055AC;
+    o->m580 = lbl_806055AC;
+    o->m58C = lbl_806055AC;
+    o->m598 = lbl_806055AC;
+    o->m5A4 = lbl_806055AC;
+    o->m5E0.Init();
+}
 
 /* near-miss (50 slots after a 14-pass swap/move hill climb from ascending order; the true statement order is
    not reached): all stores and the 7 Vec copies are present, frame and length (99 insns) match */
