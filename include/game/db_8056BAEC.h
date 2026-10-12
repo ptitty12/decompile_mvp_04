@@ -230,9 +230,12 @@ public:
 struct DbSrcC {
     char pad0[0x84];
     int m84;
+    char pad88[4];
+    int m8C;
 };
 struct DbSelSrcB {
-    char pad0[0x20];
+    char pad0[0x1C];
+    int m1C;
     int m20;
     char pad24[4];
     int m28;
@@ -300,7 +303,7 @@ struct DbMgr {
     DbSub50 m50;
     DbSel mCC;
     DbScr mFC;
-    char pad114[4];
+    int m114;
     int m118;
 };
 extern "C" {
