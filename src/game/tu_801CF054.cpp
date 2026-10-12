@@ -101,7 +101,7 @@ struct Unk801CF054_F4 {
 };
 extern Unk801CF054_F4 lbl_805D2788;
 extern "C" float fn_801D1994(Y* y);
-extern "C" float fn_801D15C0(Y* y);
+extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_8024D0F8(P* p, int k);
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v);
 extern "C" void fn_801D0C38(Y* y, Unk801CF054_V2 in, Unk801CF054_V2* out);
@@ -584,6 +584,40 @@ extern "C" int fn_801D14A0(Y* y)
     return RandF4(y->m30, 1.0f, lbl_805D25E0, 0x283) <= f;
 }
 
+struct Unk801CF054_Mgr {
+    char pad0[0x9C];
+    float m9C;
+};
+struct Unk8022FE34_U {
+    int fn_80235E28();
+};
+struct Unk8024F40C_Mgr;
+struct Unk8024EF40_Q;
+int fn_8024F40C(Unk8024F40C_Mgr* self, int a, Unk8024EF40_Q* q, int k);
+int fn_8024F54C(int k);
+extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v);
+extern "C" float fn_801D18C8(Y* y);
+
+extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v)
+{
+    int h = ((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235E28();
+    P* p = fn_801A4B34(y->m30);
+    int cls = fn_8024F54C(h);
+    float a = fn_801D1D3C(y, v);
+    a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
+    float r = a;
+    Unk801CF054_Mgr* mgr = (Unk801CF054_Mgr*)p->mA0C;
+    float b = (float)fn_8024F40C((Unk8024F40C_Mgr*)mgr, p->mA04, (Unk8024EF40_Q*)p->m44C, cls) * 0.01f;
+    b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+    float c = 1.0f - mgr->m9C;
+    c = !(c > 1.0f) ? (c >? 0.0f) : 1.0f;
+    float t = (c + b) * 0.5f;
+    r = r * LerpATB(0.9f, t, 1.1f);
+    float d = fn_801D18C8(y);
+    r = r * LerpATB(0.75f, 1.0f - d, 1.0f);
+    return r;
+}
+
 extern "C" float fn_801D17D0(Y* y, Unk801CF054_V2* pos)
 {
     float r = 0.0f;
@@ -632,7 +666,7 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     if (small)
         t = fn_801D1994(y);
     else
-        t = fn_801D15C0(y);
+        t = fn_801D15C0(y, v);
     P* q = fn_801A4B34(y->m30);
     t = t + LerpATB(-0.25f, fn_8024D0F8(q, 0x11), 0.25f);
     return t;
