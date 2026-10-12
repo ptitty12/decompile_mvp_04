@@ -37,6 +37,7 @@ struct Unk8024F048_Tbl {
 struct Unk80087A58_O;
 extern Unk8024F048_Tbl lbl_805D9794;
 extern float lbl_8062030C;
+extern float lbl_80620310;
 float fn_80088EA4(Unk80087A58_O* o);
 int fn_802536D0(P* x);
 
@@ -258,6 +259,38 @@ extern "C" float fn_8024F048(Unk8024F048_Obj* self, int i, Unk8024EF40_Q* q, int
         }
         w = Unk80251000_Lerp(0.8f, w, 1.2f);
         s = s * w;
+        m = fn_80088EA4((Unk80087A58_O*)((Unk8024F40C_Sub*)q->m6F8)->mC->mC);
+        m = !(m > 1.25f) ? (m >? 1.0f) : 1.25f;
+        s = s * m;
+    }
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    return s;
+}
+
+/* near-miss (98.4%): 4 slots; same table-copy store order as fn_8024F048 */
+extern "C" float fn_8024F20C(Unk8024F048_Obj* self, int i, Unk8024EF40_Q* q, int k, int flag)
+{
+    float s = 0.0f;
+    if (lbl_80620308 != 0)
+        s = lbl_80620310;
+    else {
+        char* b = (char*)self + 4;
+        int off = i * 0x4C;
+        s = *(float*)(b + off);
+    }
+    float m = 1.0f;
+    if (flag == 0) {
+        float w;
+        if (fn_801A2034(q, k) == -1) {
+            w = fn_8024D0F8(self->mA0, 0xA);
+            Unk8024F048_Tbl t = lbl_805D9794;
+            w += t.v[fn_802536D0(self->mA0)];
+        } else {
+            w = fn_8024D0F8(self->mA0, 9);
+        }
+        w = Unk80251000_Lerp(0.8f, w, 1.2f);
+        s = s * w;
+        s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
         m = fn_80088EA4((Unk80087A58_O*)((Unk8024F40C_Sub*)q->m6F8)->mC->mC);
         m = !(m > 1.25f) ? (m >? 1.0f) : 1.25f;
         s = s * m;
