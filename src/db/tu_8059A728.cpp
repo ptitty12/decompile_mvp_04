@@ -18,13 +18,6 @@ struct Db8059A728_Pair {
     const void* m8;
 };
 
-//@8059A728
-extern "C" DB_OVERLAY void fn_8059A728(Db8059A728_Pair* self, int a, Unk80070DDC_Stream* io)
-{
-    io->v08(a, self, 2);
-    io->v08(a, &self->m4, 4);
-}
-
 struct Db8059A728_Bits {
     unsigned a : 8;
     unsigned b : 5;
@@ -40,6 +33,211 @@ struct Db8059A728_Rec {
     const void* m24;
 };
 
+extern const char lbl_806012B0[];
+extern "C" void fn_8040321C(short* dst, const short* fmt, const short* a, const short* b);
+
+struct Db8059AB2C_Obj {
+    int m0;
+    char m4[0x14];
+};
+
+struct Db8059AB84_Obj {
+    int m0;
+    int m4[5];
+};
+
+struct Db8059AC0C_Name {
+    short m0[0x1C];
+    unsigned m38;
+};
+
+extern "C" {
+int fn_804030C8(const short* a, const short* b);
+int fn_80403DE4(const short* dst, const short* fmt, ...);
+void fn_800A6D60(void* p);
+}
+
+struct Unk80090880;
+const short* fn_80090880(Unk80090880* p);
+extern Unk80090880* lbl_8061977C;
+extern const short lbl_806022AC[];
+extern const char lbl_805FEC2C[];
+
+/* Player stat record: name (9 wide chars), packed counters at +0x14..+0x23, scalars to +0x34. */
+struct Db8059A728_Obj {
+    unsigned short m0[9];
+    char pad12[2];
+    unsigned a0 : 3;
+    unsigned a1 : 1;
+    unsigned a2 : 10;
+    unsigned a3 : 14;
+    unsigned apad : 4;
+    unsigned b0 : 14;
+    unsigned b1 : 14;
+    unsigned bpad : 4;
+    unsigned c0 : 15;
+    unsigned c1 : 12;
+    unsigned cpad : 5;
+    unsigned short m20;
+    unsigned short m22;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    unsigned m38;
+    char m3C[0x18];
+    char m54[0x1C];
+    char m70[0x10];
+    Db8059A728_Rec m80[6];
+    Db8059A728_Pair m170[4];
+    char m1A0[1];
+};
+
+extern "C" {
+int fn_8059B988(Db8059A728_Obj* self, int k);
+void fn_8059BABC(Db8059A728_Obj* self, int k, unsigned v);
+}
+
+extern "C" {
+}
+
+struct Db8059B6AC_Obj {
+    char pad0[0x38];
+    unsigned m38;
+    unsigned short s[11];
+};
+
+struct Db8059F05C_Obj {
+    char pad0[0x60];
+    unsigned p0 : 24;
+    unsigned f0 : 1;
+    unsigned f1 : 1;
+    unsigned f2 : 1;
+    unsigned f3 : 1;
+    unsigned f4 : 1;
+    unsigned f5 : 1;
+    unsigned f6 : 1;
+    unsigned f7 : 1;
+    unsigned g0 : 1;
+    unsigned g1 : 1;
+    unsigned g2 : 1;
+    unsigned g3 : 1;
+    unsigned g4 : 1;
+    unsigned g5 : 1;
+    unsigned g6 : 1;
+    unsigned gpad : 25;
+};
+
+struct Db8059D5C4_Obj {
+    char pad0[0x20];
+    unsigned short m20;
+    char pad22[0x3E];
+    unsigned m60;
+    int m64;
+    char pad68[4];
+    unsigned m6C;
+};
+
+enum Db8059F05C_K { Db8059F05C_Neg = -1, Db8059F05C_Lo = 0, Db8059F05C_Hi = 14 };
+
+extern "C" {
+int fn_8059E708(Db8059D5C4_Obj* self, int k);
+int fn_8059F18C(Db8059D5C4_Obj* self, int k);
+int fn_8059F64C(Db8059D5C4_Obj* self, int k);
+}
+
+struct Db8059B524_EntData {
+    unsigned short m0;
+    unsigned short m2[15];
+    Db8059A728_Bits m20;
+};
+struct Db8059B524_Ent : Db8059B524_EntData {
+    virtual void v08(int chrg);
+};
+struct Db8059B524_ItemData {
+    short m0;
+    char pad2[2];
+    int m4;
+};
+struct Db8059B524_Item : Db8059B524_ItemData {
+    virtual void v08(int chrg);
+};
+struct Db8059B524_Self {
+    char pad0[0x3C];
+    unsigned short m3C;
+    unsigned short m3E;
+    unsigned short m40;
+    unsigned short m42;
+    unsigned short m44;
+    unsigned short m46;
+    unsigned short m48;
+    unsigned short m4A;
+    unsigned short m4C;
+    unsigned short m4E;
+    unsigned short m50;
+    char pad52[0x80 - 0x52];
+    Db8059B524_Ent ents[6];
+    Db8059B524_Item items[1];
+};
+extern "C" void fn_8059B524(Db8059B524_Self* s, int kind, int start, int cap, int n, int year, int a, int id);
+/* forward declarations (definitions are in address order) */
+extern "C" void fn_8059A728(Db8059A728_Pair* self, int a, Unk80070DDC_Stream* io);
+extern "C" void fn_8059A79C(Db8059A728_Rec* self);
+extern "C" void fn_8059A7E4(Db8059A728_Rec* self, int year, int a, int id);
+extern "C" void fn_8059A8E4(Db8059A728_Rec* self, short* dst, int unused);
+extern "C" int fn_8059A968(Db8059A728_Rec* self, int k);
+extern "C" void fn_8059A9D4(Db8059A728_Rec* self, int k, unsigned v);
+extern "C" void fn_8059AA7C(Db8059A728_Rec* self, int a, Unk80070DDC_Stream* io);
+extern "C" void fn_8059AB2C(Db8059AB2C_Obj* self);
+extern "C" void fn_8059AB5C(Db8059AB2C_Obj* self, int k, int v);
+extern "C" int fn_8059AB6C(Db8059AB2C_Obj* self, int k);
+extern "C" void fn_8059AB84(Db8059AB84_Obj* self, int a, Unk80070DDC_Stream* io);
+extern "C" void fn_8059AC0C(Db8059AC0C_Name* self, const short* src, int n);
+extern "C" void fn_8059AC80(const short* src, short* dst, unsigned n);
+extern "C" void fn_8059AD30(Db8059A728_Obj* self);
+extern "C" void fn_8059ADF8(Db8059A728_Obj* self, const short* b, int c);
+extern "C" void fn_8059AE4C(Db8059A728_Obj* self, int both, int b, int c);
+extern "C" void fn_8059AF50(Db8059B524_Self* self, int kind, int a, int b, int c);
+extern "C" int fn_8059B158(void* self, int k);
+extern "C" int fn_8059B1EC(void* self, int k);
+extern "C" void fn_8059B280(Db8059A728_Obj* self, int k, int a, short* b, int c);
+extern "C" int fn_8059B308(Db8059A728_Obj* self, int k, int a, int b);
+extern "C" int fn_8059B3D4(Db8059A728_Obj* self, int k, int a);
+extern "C" int fn_8059B47C(Db8059A728_Obj* self, int k, int a);
+extern "C" int fn_8059B6AC(Db8059B6AC_Obj* self, int k);
+extern "C" void fn_8059B780(Db8059B6AC_Obj* self, int k, unsigned v);
+extern "C" int fn_8059B988(Db8059A728_Obj* self, int k);
+extern "C" int fn_8059BAA4(Db8059A728_Obj* self, int k);
+extern "C" void fn_8059BABC(Db8059A728_Obj* self, int k, unsigned v);
+extern "C" void fn_8059BCD4(Db8059A728_Obj* self, int k, int v);
+extern "C" void fn_8059BCF0(Db8059A728_Obj* self, int k, unsigned v);
+extern "C" void fn_8059BD58(Db8059A728_Obj* self, unsigned d);
+extern "C" void fn_8059BDD0(Db8059A728_Obj* self, unsigned d);
+extern "C" int fn_8059D5C4(Db8059D5C4_Obj* self, int k);
+extern "C" int fn_8059D5E8(Db8059D5C4_Obj* self, int k, int flag);
+extern "C" int fn_8059E5D0(Db8059D5C4_Obj* self, int k, int flag);
+extern "C" int fn_8059E684(Db8059D5C4_Obj* self, int k, int flag);
+extern "C" int fn_8059F040(Db8059D5C4_Obj* self, int k);
+extern "C" int fn_8059F05C(Db8059F05C_Obj* self, int k);
+extern "C" int fn_8059F64C(Db8059D5C4_Obj* self, int k);
+extern "C" int fn_8059F680(void* self, int k);
+extern "C" int fn_8059FA44(void* self, int k);
+extern "C" int fn_8059FADC(void* self, int k);
+extern "C" int fn_8059FC90(Db8059D5C4_Obj* self, int k);
+extern "C" int fn_8059FCB0(Db8059D5C4_Obj* self, int k);
+extern "C" int fn_8059FCC4(Db8059D5C4_Obj* self);
+extern "C" int fn_8059FD1C(Db8059D5C4_Obj* self);
+extern "C" int fn_8059FD74(Db8059D5C4_Obj* self);
+extern "C" int fn_8059FDCC(Db8059D5C4_Obj* self);
+
+//@8059A728
+extern "C" DB_OVERLAY void fn_8059A728(Db8059A728_Pair* self, int a, Unk80070DDC_Stream* io)
+{
+    io->v08(a, self, 2);
+    io->v08(a, &self->m4, 4);
+}
+
 //@8059A79C
 extern "C" DB_OVERLAY void fn_8059A79C(Db8059A728_Rec* self)
 {
@@ -48,10 +246,22 @@ extern "C" DB_OVERLAY void fn_8059A79C(Db8059A728_Rec* self)
     fn_8040074C(&self->m20, 4);
 }
 
-extern "C" void fn_8059A8E4(Db8059A728_Rec* self, short* dst, int unused);
-
-extern const char lbl_806012B0[];
-extern "C" void fn_8040321C(short* dst, const short* fmt, const short* a, const short* b);
+extern "C" DB_OVERLAY void fn_8059A7E4(Db8059A728_Rec* self, int year, int a, int id)
+{
+    Unk8007A4DC_Screen* sc = (Unk8007A4DC_Screen*)lbl_8061930C;
+    unsigned short buf[32];
+    sc->fn_8007A7C8(0, id, (char*)buf);
+    self->m0 = buf[0];
+    sc->fn_8007A7C8(1, id, (char*)buf);
+    unsigned n = fn_80403060((short*)buf);
+    if (n > 14)
+        n = 14;
+    fn_8040316C((short*)self->m2, (short*)buf, n);
+    fn_8059A9D4(self, 0, year - 0x7D4);
+    fn_8059A9D4(self, 1, sc->fn_8007A6A0(5, id));
+    fn_8059A9D4(self, 2, ((Unk8007B2B0_Screen*)sc)->fn_8007B8C4(0, a));
+    fn_8059A9D4(self, 3, ((Unk8007B2B0_Screen*)sc)->fn_8007B8C4(1, a));
+}
 
 //@8059A8E4
 extern "C" DB_OVERLAY void fn_8059A8E4(Db8059A728_Rec* self, short* dst, int unused)
@@ -136,11 +346,6 @@ extern "C" DB_OVERLAY void fn_8059AA7C(Db8059A728_Rec* self, int a, Unk80070DDC_
     io->v08(a, &self->m20, 4);
 }
 
-struct Db8059AB2C_Obj {
-    int m0;
-    char m4[0x14];
-};
-
 //@8059AB2C
 extern "C" DB_OVERLAY void fn_8059AB2C(Db8059AB2C_Obj* self)
 {
@@ -163,11 +368,6 @@ extern "C" DB_OVERLAY int fn_8059AB6C(Db8059AB2C_Obj* self, int k)
     return 0;
 }
 
-struct Db8059AB84_Obj {
-    int m0;
-    int m4[5];
-};
-
 //@8059AB84
 extern "C" DB_OVERLAY void fn_8059AB84(Db8059AB84_Obj* self, int a, Unk80070DDC_Stream* io)
 {
@@ -175,11 +375,6 @@ extern "C" DB_OVERLAY void fn_8059AB84(Db8059AB84_Obj* self, int a, Unk80070DDC_
     for (unsigned i = 0; i < 5; i++)
         io->v08(a, &self->m4[i], 4);
 }
-
-struct Db8059AC0C_Name {
-    short m0[0x1C];
-    unsigned m38;
-};
 
 //@8059AC0C
 extern "C" DB_OVERLAY void fn_8059AC0C(Db8059AC0C_Name* self, const short* src, int n)
@@ -194,18 +389,6 @@ extern "C" DB_OVERLAY void fn_8059AC0C(Db8059AC0C_Name* self, const short* src, 
     self->m38 |= 0x80000000;
 }
 
-extern "C" {
-int fn_804030C8(const short* a, const short* b);
-int fn_80403DE4(const short* dst, const short* fmt, ...);
-void fn_800A6D60(void* p);
-}
-
-struct Unk80090880;
-const short* fn_80090880(Unk80090880* p);
-extern Unk80090880* lbl_8061977C;
-extern const short lbl_806022AC[];
-extern const char lbl_805FEC2C[];
-
 //@8059AC80
 extern "C" DB_OVERLAY void fn_8059AC80(const short* src, short* dst, unsigned n)
 {
@@ -219,37 +402,6 @@ extern "C" DB_OVERLAY void fn_8059AC80(const short* src, short* dst, unsigned n)
         dst[n - 1] = 0;
     }
 }
-
-/* Player stat record: name (9 wide chars), packed counters at +0x14..+0x23, scalars to +0x34. */
-struct Db8059A728_Obj {
-    unsigned short m0[9];
-    char pad12[2];
-    unsigned a0 : 3;
-    unsigned a1 : 1;
-    unsigned a2 : 10;
-    unsigned a3 : 14;
-    unsigned apad : 4;
-    unsigned b0 : 14;
-    unsigned b1 : 14;
-    unsigned bpad : 4;
-    unsigned c0 : 15;
-    unsigned c1 : 12;
-    unsigned cpad : 5;
-    unsigned short m20;
-    unsigned short m22;
-    int m24;
-    int m28;
-    int m2C;
-    int m30;
-    int m34;
-    unsigned m38;
-    char m3C[0x18];
-    char m54[0x1C];
-    char m70[0x10];
-    Db8059A728_Rec m80[6];
-    Db8059A728_Pair m170[4];
-    char m1A0[1];
-};
 
 //@8059AD30
 extern "C" DB_OVERLAY void fn_8059AD30(Db8059A728_Obj* self)
@@ -272,19 +424,12 @@ extern "C" DB_OVERLAY void fn_8059AD30(Db8059A728_Obj* self)
     fn_800A6D60(self->m1A0);
 }
 
-extern "C" void fn_8059BCD4(Db8059A728_Obj* self, int k, int v);
-
 //@8059ADF8
 extern "C" DB_OVERLAY void fn_8059ADF8(Db8059A728_Obj* self, const short* b, int c)
 {
     fn_8059AD30(self);
     fn_8059AC0C((Db8059AC0C_Name*)self, b, 0);
     fn_8059BCD4(self, 0, c);
-}
-
-extern "C" {
-int fn_8059B988(Db8059A728_Obj* self, int k);
-void fn_8059BABC(Db8059A728_Obj* self, int k, unsigned v);
 }
 
 //@8059AE4C
@@ -302,6 +447,46 @@ extern "C" DB_OVERLAY void fn_8059AE4C(Db8059A728_Obj* self, int both, int b, in
         fn_8059BABC(self, 6, fn_8059B988(self, 6) + 1);
         if (both)
             fn_8059BABC(self, 7, fn_8059B988(self, 7) + 1);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_8059AF50(Db8059B524_Self* self, int kind, int a, int b, int c)
+{
+    fn_8059B780((Db8059B6AC_Obj*)self, kind, fn_8059B6AC((Db8059B6AC_Obj*)self, kind) + 1);
+    switch (kind) {
+    case 0:
+        fn_8059B524(self, 2, 0, 3, self->m3C, a, b, c);
+        break;
+    case 1:
+        fn_8059B524(self, 1, 0, 3, self->m3E, a, b, c);
+        break;
+    case 2:
+        fn_8059B524(self, 2, 3, 1, self->m40, a, b, c);
+        break;
+    case 3:
+        fn_8059B524(self, 1, 3, 1, self->m42, a, b, c);
+        break;
+    case 4:
+        fn_8059B524(self, 1, 4, 1, self->m44, a, b, c);
+        break;
+    case 5:
+        fn_8059B524(self, 1, 5, 1, self->m46, a, b, c);
+        break;
+    case 6:
+        fn_8059B524(self, 0, 0, 0, self->m48, a, b, c);
+        break;
+    case 7:
+        fn_8059B524(self, 0, 0, 0, self->m4A, a, b, c);
+        break;
+    case 8:
+        fn_8059B524(self, 0, 0, 0, self->m4C, a, b, c);
+        break;
+    case 9:
+        fn_8059B524(self, 0, 0, 0, self->m4E, a, b, c);
+        break;
+    case 10:
+        fn_8059B524(self, 0, 0, 0, self->m50, a, b, c);
+        break;
     }
 }
 
@@ -365,9 +550,6 @@ extern "C" DB_OVERLAY int fn_8059B1EC(void* self, int k)
     default:
         return 0;
     }
-}
-
-extern "C" {
 }
 
 /* Every case assigns s (zero arms too) and there is no default arm. */
@@ -510,12 +692,6 @@ extern "C" DB_OVERLAY int fn_8059B47C(Db8059A728_Obj* self, int k, int a)
     }
     return *(int*)((char*)self + ((s + a) * 12 + 0x174));
 }
-
-struct Db8059B6AC_Obj {
-    char pad0[0x38];
-    unsigned m38;
-    unsigned short s[11];
-};
 
 //@8059B6AC
 extern "C" DB_OVERLAY int fn_8059B6AC(Db8059B6AC_Obj* self, int k)
@@ -852,39 +1028,6 @@ extern "C" DB_OVERLAY void fn_8059BDD0(Db8059A728_Obj* self, unsigned d)
     fn_8059BABC(self, 8, fn_8059B988(self, 8) - d);
 }
 
-struct Db8059F05C_Obj {
-    char pad0[0x60];
-    unsigned p0 : 24;
-    unsigned f0 : 1;
-    unsigned f1 : 1;
-    unsigned f2 : 1;
-    unsigned f3 : 1;
-    unsigned f4 : 1;
-    unsigned f5 : 1;
-    unsigned f6 : 1;
-    unsigned f7 : 1;
-    unsigned g0 : 1;
-    unsigned g1 : 1;
-    unsigned g2 : 1;
-    unsigned g3 : 1;
-    unsigned g4 : 1;
-    unsigned g5 : 1;
-    unsigned g6 : 1;
-    unsigned gpad : 25;
-};
-
-extern "C" int fn_8059F05C(Db8059F05C_Obj* self, int k);
-
-struct Db8059D5C4_Obj {
-    char pad0[0x20];
-    unsigned short m20;
-    char pad22[0x3E];
-    unsigned m60;
-    int m64;
-    char pad68[4];
-    unsigned m6C;
-};
-
 //@8059D5C4
 extern "C" DB_OVERLAY int fn_8059D5C4(Db8059D5C4_Obj* self, int k)
 {
@@ -895,8 +1038,6 @@ extern "C" DB_OVERLAY int fn_8059D5C4(Db8059D5C4_Obj* self, int k)
     }
     return 1;
 }
-
-extern "C" int fn_8059FA44(void* self, int k);
 
 //@8059D5E8
 extern "C" DB_OVERLAY int fn_8059D5E8(Db8059D5C4_Obj* self, int k, int flag)
@@ -1075,10 +1216,6 @@ extern "C" DB_OVERLAY int fn_8059D5E8(Db8059D5C4_Obj* self, int k, int flag)
     return ret;
 }
 
-extern "C" int fn_8059FC90(Db8059D5C4_Obj* self, int k);
-extern "C" int fn_8059FCB0(Db8059D5C4_Obj* self, int k);
-extern "C" void fn_8059BDD0(Db8059A728_Obj* self, unsigned d);
-
 //@8059E5D0
 extern "C" DB_OVERLAY int fn_8059E5D0(Db8059D5C4_Obj* self, int k, int flag)
 {
@@ -1140,8 +1277,6 @@ extern "C" DB_OVERLAY int fn_8059F040(Db8059D5C4_Obj* self, int k)
         return (self->m60 >> 8) & 1;
     return 0;
 }
-
-enum Db8059F05C_K { Db8059F05C_Neg = -1, Db8059F05C_Lo = 0, Db8059F05C_Hi = 14 };
 
 //@8059F05C
 extern "C" DB_OVERLAY int fn_8059F05C(Db8059F05C_Obj* self, int k)
@@ -1631,12 +1766,6 @@ extern "C" DB_OVERLAY int fn_8059FCB0(Db8059D5C4_Obj* self, int k)
     if (k == 0)
         return 10000;
     return 0;
-}
-
-extern "C" {
-int fn_8059E708(Db8059D5C4_Obj* self, int k);
-int fn_8059F18C(Db8059D5C4_Obj* self, int k);
-int fn_8059F64C(Db8059D5C4_Obj* self, int k);
 }
 
 //@8059FCC4

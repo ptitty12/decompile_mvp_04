@@ -225,6 +225,61 @@ extern "C" void fn_8038FAFC(McSrc* s, int a)
         fn_8038EAF4(s->m30, a);
 }
 
+struct McVT {
+    char pad0[0x30];
+    short m30;
+    short pad32;
+    void (*m34)(void*);
+};
+struct McSrcV {
+    McVT* m0;
+    char pad4[8];
+    int mC;
+    char pad10[8];
+    int m18;
+    int m1C;
+};
+extern "C" int fn_8038FB28(McSrc* s, int p);
+/* near-miss (95.5%): retail copies &p into r4 before saving it in r28 and keeps p in r30 across the tail; one extra `ble` in the
+   short-count loop is not reproduced (the loop is entered through two tests). */
+extern "C" int fn_8038FEF4(McSrcV* o, int n)
+{
+    int p;
+    int* pp = &p;
+    fn_8038FAB8((McSrc*)o, pp);
+    if (o->mC == 0) {
+        int d = n - o->m1C;
+        if (d > 2) {
+            do {
+                fn_8038FAFC((McSrc*)o, p);
+                fn_8038FAB8((McSrc*)o, pp);
+            } while (fn_8038F784((McFcc*)p) != 0x4D41446B);
+        } else if (d > 0) {
+            int k = d;
+            if (k > 0) {
+                do {
+                    if (fn_8038F784((McFcc*)p) == 0x4D414465) {
+                        fn_8038FAFC((McSrc*)o, p);
+                        fn_8038FAB8((McSrc*)o, pp);
+                    }
+                    k--;
+                } while (k != 0);
+            }
+        }
+    }
+    int q = p;
+    if (q != 0) {
+        int r = fn_8038FB28((McSrc*)o, q);
+        fn_8038FAFC((McSrc*)o, p);
+        return r;
+    }
+    if (o->m18 != 0) {
+        o->m0->m34((char*)o + o->m0->m30);
+        o->m18 = q;
+    }
+    return 0;
+}
+
 extern "C" McFrame* fn_80390020(McPool* p)
 {
     McNode* n = p->free.next;
@@ -441,6 +496,26 @@ extern "C" void fn_8039084C(short* src, unsigned char* dst, int stride)
     }
 }
 
+extern int lbl_806EF394;
+extern int lbl_806EF398;
+extern int lbl_80607218[];
+extern int lbl_806242E0[];
+extern int lbl_8069ACB8[];
+extern "C" int fn_80401BBC(int a, int b);
+extern "C" void fn_80390248();
+extern "C" void fn_803908EC(unsigned char* src, int a, int b)
+{
+    if (lbl_806EF394 == 0)
+        fn_80390248();
+    lbl_806EF38C = ((src[1] << 8 | src[0]) << 16) | (src[3] << 8 | src[2]);
+    lbl_806EF390 = 0x20;
+    lbl_806EF388 = src + 4;
+    lbl_806EF398 = a;
+    lbl_8069ACB8[0] = fn_80401BBC(lbl_80607218[0] << 16, lbl_806242E0[0]);
+    for (int i = 1; i < 64; i++)
+        lbl_8069ACB8[i] = fn_80401BBC((b * lbl_80607218[i]) << 13, lbl_806242E0[i]);
+}
+
 extern "C" void fn_80390CFC(int n)
 {
     unsigned buf = lbl_806EF38C << n;
@@ -454,4 +529,29 @@ extern "C" void fn_80390CFC(int n)
     lbl_806EF390 = cnt + 16;
     lbl_806EF388 = p + 2;
     lbl_806EF38C = buf | (w << (16 - cnt));
+}
+
+extern int lbl_8069B5B8[];
+extern int lbl_8069B6B8[];
+extern int lbl_8069B6D8[];
+extern "C" void fn_80390EC0(int* in, int* out);
+extern "C" void fn_80391060(int* in, int* out);
+extern "C" void fn_80391194(int* dst, int stride)
+{
+    fn_80390EC0(lbl_8069B5B8 + 0, lbl_8069B6B8 + 0);
+    fn_80390EC0(lbl_8069B5B8 + 8, lbl_8069B6B8 + 1);
+    fn_80390EC0(lbl_8069B5B8 + 16, lbl_8069B6B8 + 2);
+    fn_80390EC0(lbl_8069B5B8 + 24, lbl_8069B6B8 + 3);
+    fn_80390EC0(lbl_8069B5B8 + 32, lbl_8069B6B8 + 4);
+    fn_80390EC0(lbl_8069B5B8 + 40, lbl_8069B6B8 + 5);
+    fn_80390EC0(lbl_8069B5B8 + 48, lbl_8069B6B8 + 6);
+    fn_80390EC0(lbl_8069B5B8 + 56, lbl_8069B6B8 + 7);
+    fn_80391060(lbl_8069B6B8, dst);
+    fn_80391060(lbl_8069B6D8 + 0, dst + stride * 1);
+    fn_80391060(lbl_8069B6D8 + 8, dst + stride * 2);
+    fn_80391060(lbl_8069B6D8 + 16, dst + stride * 3);
+    fn_80391060(lbl_8069B6D8 + 24, dst + stride * 4);
+    fn_80391060(lbl_8069B6D8 + 32, dst + stride * 5);
+    fn_80391060(lbl_8069B6D8 + 40, dst + stride * 6);
+    fn_80391060(lbl_8069B6D8 + 48, dst + stride * 7);
 }

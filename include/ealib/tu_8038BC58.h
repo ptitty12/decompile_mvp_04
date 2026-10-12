@@ -142,7 +142,13 @@ public:
     unsigned m40;
     unsigned m44;
     float m48;
-    char pad4C[0x68 - 0x4C];
+    int m4C;
+    char pad50[4];
+    int m54;
+    int m58;
+    int m5C;
+    VdClock* m60;
+    char pad64[4];
     VdCbObj* m68;
     int m6C;
     char pad70[0x78 - 0x70];
