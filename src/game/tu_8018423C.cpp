@@ -3,6 +3,50 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8018423C.h"
+
+extern "C" int strcmp(const char* a, const char* b);
+struct Unk80186EF4_R {
+    int m0;
+    char m4[16];
+};
+struct Unk80186EF4_L {
+    int m0;
+    Unk80186EF4_R* m4;
+    int* m8;
+};
+struct Unk80186EF4_M {
+    char pad0[0x37AC];
+    Unk80186EF4_L m37AC;
+};
+extern Unk80186EF4_M* lbl_8061E978;
+struct Unk803DF824_Mtx {
+    float m[16];
+};
+extern "C" void fn_803DF824(Unk803DF824_Mtx* m, float a, float b, float c, float d, float e, float f, float g, float h, float i);
+
+struct Unk8018514C_Y {
+    char pad0[0xC];
+    Unk8018423C_B* mC;
+};
+struct Unk8018514C_Ctx {
+    char pad0[0x6F8];
+    Unk8018514C_Y* m6F8;
+};
+struct Unk8018514C_O {
+    char pad0[0x1D40];
+    Unk8018514C_Ctx* m1D40;
+};
+extern "C" {
+int fn_8018469C(Unk80183918_Vec3* p, Unk80183918_Vec3* out, float* r);
+float fn_8037AC20(Unk80183918_Vec3* p, void* a, void* b, int c, int* hit);
+}
+extern char lbl_8061C910[];
+extern char lbl_8061C91C[];
+extern Unk80183918_Vec3 lbl_8061C928;
+extern float lbl_8061C934;
+extern Unk80183918_Vec3 lbl_806055C4;
+
+
 //@BODY
 //@8018423C
 extern "C" void fn_8018423C(Unk80181140* o, char* a, Unk8018423C_B* b)
@@ -65,6 +109,29 @@ extern "C" int fn_801850B4(Unk801850B4_Obj* o, float* v, int idx, float* out)
         return 1;
     }
     return 0;
+}
+
+//@8018514C
+extern "C" float fn_8018514C(Unk8018514C_O* o, Unk80183918_Vec3* p, Unk80183918_Vec3* out)
+{
+    float r = 0.0f;
+    if (fn_8018469C(p, out, &r) != 0)
+        return r;
+    int mode = o->m1D40->m6F8->mC->m24;
+    if (mode == 0x10 || mode == 0x36) {
+        float t = p->m8 * -1.0833334f - p->m0;
+        if (!(t >= -7411.0f)) {
+            int hit = 0;
+            t = fn_8037AC20(p, lbl_8061C910, lbl_8061C91C, 0, &hit);
+            if (hit != 0 && !(t >= 280.0f)) {
+                *out = lbl_8061C928;
+                t = t / lbl_8061C934;
+                return t;
+            }
+        }
+    }
+    *out = lbl_806055C4;
+    return 0.0f;
 }
 
 //@80185424
@@ -298,6 +365,24 @@ void Unk80185CD4::fn_80186890()
 {
     fn_80185E38(this);
     fn_80186738(m1C->m6F8->m14->m1CC8);
+}
+
+//@80186EF4
+extern "C" void fn_80186EF4(Unk80181140* o, const char* name, const Unk80183918_Vec3* pos)
+{
+    Unk80186EF4_L* l = &lbl_8061E978->m37AC;
+    if (l != 0) {
+        Unk80186EF4_R* d = l->m4;
+        if (d != 0) {
+            for (int i = 0; i < l->m0; i++) {
+                if (strcmp(name, d[i].m4) == 0) {
+                    Unk80181140_E* e = &o->m1160[i];
+                    *(Unk80183918_Vec3*)&e->m60 = *pos;
+                    fn_803DF824((Unk803DF824_Mtx*)&e->m20, 1.0f, 1.0f, 1.0f, pos->m0, pos->m4, pos->m8, e->m0.m0, e->m0.m4, e->m0.m8);
+                }
+            }
+        }
+    }
 }
 
 //@80187190
