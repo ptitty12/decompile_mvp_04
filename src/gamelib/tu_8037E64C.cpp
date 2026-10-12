@@ -68,7 +68,7 @@ extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 
 extern "C" void fn_8037E6F4(Unk8037E6F4* o)
 {
-    o->m0 = 1.0f;
+    o->m0 = 60.0f;
     o->m4 = 0;
     o->m8 = 0;
 }
