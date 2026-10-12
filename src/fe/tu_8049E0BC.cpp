@@ -22,6 +22,16 @@ extern "C" void fn_800C2034(void*, int);
 extern const char lbl_805F7504[];
 extern const char lbl_805F4F48[];
 extern const char lbl_805F75E8[];
+extern "C" void fn_8055AC44(void*, int);
+struct FeE6B8 : FeScrH {
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    int m144;
+    int m148;
+    int m14C;
+};
 extern "C" void fn_800DD800(void*, void*, int, int);
 struct UiS;
 void fn_800DDF2C(UiS*);
@@ -99,6 +109,51 @@ FE_OVERLAY FeScrH* fn_8049E1B4(FeScrH* self, int a, int b, int c, int d, int e, 
     self->m130 = 0;
     FeI(self, 0x16C) = 0;
     return self;
+}
+
+FE_OVERLAY void fn_8049E6B8(FeE6B8* x)
+{
+    fn_800ECF18(x);
+    FeState* st = fn_800B555C();
+    x->m14C = 0;
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(w, x);
+    int k = st->m0;
+    fn_8055AC44((char*)x + 0x230, 0);
+    fn_8055AC44((char*)x + 0x690, 1);
+    fn_8055AC44((char*)x + 0xAF0, 2);
+    fn_8055AC44((char*)x + 0xF50, 3);
+    switch (k) {
+    case 0x11:
+        x->m140 = 0;
+        x->m144 = 1;
+        x->m14C = 1;
+        fn_8049E830(x, 1);
+        break;
+    case 0x12:
+        x->m144 = 0;
+        x->m140 = 1;
+        fn_8049E830(x, 6);
+        break;
+    case 0x13:
+        x->m144 = 0;
+        x->m14C = 0;
+        x->m140 = 1;
+        fn_8049E830(x, 1);
+        break;
+    case 0x15:
+        fn_8049E830(x, 2);
+        break;
+    case 0xF:
+        fn_8049E830(x, 3);
+        break;
+    case 0x10:
+        fn_8049E830(x, 4);
+        break;
+    case 0x14:
+        fn_8049E830(x, 5);
+        break;
+    }
 }
 
 FE_OVERLAY void fn_8049E830(void* x, int a)
