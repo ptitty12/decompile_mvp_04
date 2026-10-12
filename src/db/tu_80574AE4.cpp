@@ -69,7 +69,22 @@ inline void GrowTo(DbSL* l, unsigned idx)
     if (idx >= (unsigned)l->m4)
         l->m4 = idx + 1;
 }
+
+/* Growable record list (data at +0, count at +4, capacity at +8, cursor at +0xC); a second buffer at +0x14. */
+struct DbList {
+    void* m0;
+    int m4;
+    int m8;
+    int mC;
+    char pad10[4];
+    void* m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+extern "C" void fn_8057487C(char* p);
 /* forward declarations (definitions are in address order) */
+extern "C" void fn_805788CC(char* self);
 extern "C" int fn_80578974(DbHost* self, int a, int b);
 extern "C" void fn_80578A60(DbHost* self, int a, int b);
 extern "C" void fn_80578AE8(DbHost* self, int a, int b);
@@ -86,6 +101,31 @@ extern "C" void fn_8057CBA4(DbSL* self);
 extern "C" unsigned fn_8057CC30(DbSL* self, int id);
 extern "C" int fn_8057CCA4(DbSL* self, int id);
 extern "C" void fn_8057CCE8(DbSL* self);
+
+/* near-miss: ~20 slots; retail walks one base (self+0x1990) with the first list at negative offsets, we pick the lower list as the base */
+extern "C" DB_OVERLAY void fn_805788CC(char* self)
+{
+    unsigned i = 0;
+    DbList* b = (DbList*)(self + 0x1990);
+    fn_8057487C(self);
+    do {
+        i += 1;
+        DbList* a = (DbList*)((char*)b - 0xBD0);
+        fn_8040074C(a->m0, a->m8 * 0x24);
+        a->m4 = 0;
+        a->mC = 0;
+        fn_8040074C(a->m14, a->m1C * 4);
+        a->m18 = 0;
+        a->m20 = 0;
+        fn_8040074C(b->m0, b->m8 * 0x24);
+        b->m4 = 0;
+        b->mC = 0;
+        fn_8040074C(b->m14, b->m1C * 4);
+        b->m18 = 0;
+        b->m20 = 0;
+        b = (DbList*)((char*)b + 0x150);
+    } while (i <= 8);
+}
 
 extern "C" DB_OVERLAY int fn_80578974(DbHost* self, int a, int b)
 {
