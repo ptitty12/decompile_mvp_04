@@ -5,6 +5,8 @@
 #include "game/tu_8024EF40.h"
 #include "game/goals/tu_8027C728.h"
 #include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_80287600.h"
+#include "game/goals/tu_8028B194.h"
 
 inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
@@ -28,6 +30,28 @@ typedef Unk8024EF40_P P;
 typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
+
+struct Unk8025B59C_O {
+    char pad0[0xC];
+    int mC;
+    char pad10[0x34 - 0x10];
+    int m34;
+};
+struct Unk8025B59C_Ctx {
+    char pad0[0x3A4];
+    void* m3A4;
+};
+struct Unk8025B59C_Q {
+    char pad0[0x700];
+    Unk8025B59C_Ctx* m700;
+};
+extern "C" void fn_801C33B0(void* ctx, Unk80273498_Vec3* a, Unk80273498_Vec3* b);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8025AA28(Unk8027A84C* g, P* p, int sel);
+inline void Unk8025B59C_SetPos(Unk8027A84C* s, Unk80273498_Vec3 v)
+{
+    s->fn_8027A898(&v);
+}
 
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
@@ -322,6 +346,39 @@ extern "C" void fn_8025E804(F* self);
 inline float Lerp3(float a, float b, float t)
 {
     return a + t * (b - a);
+}
+
+/* near-miss (98.2%): only the callee-saved numbering of the player (retail r30) and the goal base (retail r29) is swapped;
+   moving the base into the branches or copying the player did not change the priority order */
+Unk8027C728_Goal* fn_8025B59C(Unk8025B59C_Q* q, P* p, Unk8025B59C_O* o)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 10;
+    fn_8027C728(g);
+    Unk8028B194* gb = (Unk8028B194*)g->m18;
+    gb->m40 = 11;
+    if (p->m458 == 9) {
+        Unk80273498_Vec3 a;
+        Unk80273498_Vec3 b;
+        fn_801C33B0(q->m700->m3A4, &a, &b);
+        gb->fn_8028B194(a);
+        gb->m38 = 1;
+        Unk8027C728_Goal* g0 = g->m0;
+        g0->m10 = 2;
+        fn_8027C728(g0);
+        Unk8027A84C* s = (Unk8027A84C*)g0->m18;
+        Unk8025B59C_SetPos(s, b);
+        ((Unk80287D70*)s)->fn_80287DB8(10);
+    } else {
+        gb->fn_8028B1F0(p->m58C.m38);
+        gb->m38 = 1;
+        Unk8027C728_Goal* g0 = g->m0;
+        g0->m10 = 2;
+        fn_8027C728(g0);
+        fn_8025AA28((Unk8027A84C*)g0->m18, p, o->mC);
+    }
+    o->m34 = 0;
+    return g;
 }
 
 Unk8027C728_Goal* fn_8025BA38(void* self, P* p, int* z)
