@@ -60,7 +60,7 @@ int fn_803F9D74(int a, int b, void* c, int d, int e, int f);
 void fn_803FEC9C(int a, int b);
 void fn_80377488(void* p);
 int fn_8000446C(int a, int b);
-void fn_804017B0(int a, int b);
+int fn_804017B0(int a, int b);
 int fn_80401904(int a);
 void fn_80433004(void* p, int n);
 int fn_803EBFF8(void* p);
@@ -575,6 +575,37 @@ void fn_802BA274(Unk802B9F40* t, Unk802B9F40_A0* s, const void* a1, int n1, cons
     fn_8040B190(s->m4, a2, n2);
 }
 
+extern const char lbl_805E0134[];
+char* fn_8040B830(char* dst, const char* src, unsigned n);
+Unk802B9F40_A0* fn_802BA47C(Unk802B9F40* t);
+
+void fn_802BA310(Unk802B9F40* t, const char* name)
+{
+    Unk802B9F40_A0* a = fn_802BA47C(t);
+    if (a != 0) {
+        unsigned int n1 = 0;
+        const char* h1 = fn_802B9300(name, 0x500, 14, &n1);
+        n1 = (n1 + 0x1F) & ~0x1F;
+        void* p = fn_803774A8(fn_80401904((int)h1), 0x500);
+        fn_804017B0((int)h1, (int)p);
+        fn_802BA194((Unk802B9F40*)a, (Unk802B9FF0_Hdr*)p);
+        if (p != 0)
+            fn_80377488(p);
+        char buf[0x400] = "";
+        fn_8040B830(buf, name, 0x400);
+        buf[0] = 'a';
+        buf[0x3FF] = 0;
+        unsigned int n2 = 0;
+        const char* h2 = fn_802B9300(buf, 0x100, 13, &n2);
+        n2 = (n2 + 0x1F) & ~0x1F;
+        fn_802BA274(t, a, h1, n1, h2, n2);
+        fn_802B961C(h2, 13);
+        fn_8040B61C((char*)a + 8, (int)name);
+        if (h1 != 0)
+            fn_80377488((void*)h1);
+    }
+}
+
 int fn_802BA45C(Unk802B9F40*, Unk802B9F40_A0* s)
 {
     return s->m0 == 0 && s->m4 == 0;
@@ -672,6 +703,7 @@ void fn_802BA708(Unk802B9F40* t)
         fn_802BA67C(t, &t->a1EF0[i]);
     }
 }
+
 
 /* near-miss (52 vs 53 insns): retail uses a do-while with s=r29, off=r28, e=r27 and forms t+4 inside the branch; ours hoists it. */
 void fn_802BA750(Unk802B9F40* t)
@@ -807,7 +839,6 @@ extern const int lbl_805E101C[];
 extern void* lbl_8061EAEC;
 
 int fn_804089B4(char* buf, const char* fmt, ...);
-void fn_802BADC0(Unk802BACDC_Bat* b, const char* name, void* a, void* c, void* d, int e);
 void fn_802AD2B8(void* a, void* b, const char* name, void* c, int d);
 void fn_8035A71C(void* a, void* b);
 void fn_80314D60(int a);
@@ -901,12 +932,103 @@ void* fn_802BAD84(void* o, char* base, int idx)
     return o;
 }
 
+struct Unk802BADC0_Hdr {
+    int m0;
+    int m4;
+    int m8;
+};
+
+struct Unk802BADC0_S {
+    int m0;
+    char m4[0x148];
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+};
+
+struct Unk802BADC0_T {
+    Unk802BADC0_T()
+    {
+        m0 = 0;
+        m8 = 0;
+    }
+    int m0;
+    int m4;
+    int m8;
+};
+
+extern const char lbl_805DEFC4[];
+extern const char lbl_805DEFDC[];
+extern const char lbl_805DEFE4[];
+extern const char lbl_805E0FD4[];
+extern const char lbl_805E0FDC[];
+extern const char lbl_8060D190[];
+extern void* (*lbl_8062C668)(int size, int heap);
+void fn_80312700();
+void* fn_803E9640(void* a, const char* b, int c, void (*f)());
+void fn_803E9994(int a, const char* b, int* c, Unk802BADC0_T* d);
+int fn_803EBD14(int a, const char* b);
+void fn_803D74A0(int h, const char* s, int v);
+void fn_803D775C(int* out, int h, const char* s, ...);
+void fn_803D7378(int* out, int h, const char* s, ...);
+void fn_8030ACCC(void* p);
+void fn_80305C88(void* p, int v);
+void fn_80305C30(void* base, char* a, int b, int c);
+
+/* near-miss (131/132): retail recomputes slots + off for the fn_80305C30 base (add r3,r26,r28); ours reuses the slot pointer (mr r3,r31) */
+void fn_802BADC0(Unk802BACDC_Bat* b, const char* name, Unk802BADC0_Hdr* hdr, char* slots, char* arg4, int arg5)
+{
+    unsigned int sz;
+    hdr->m0 = (int)fn_802B9300(name, 0x400, 1, &sz);
+    hdr->m8 = 1;
+    hdr->m4 = (int)fn_803E9640(lbl_8062C668(0x30, 0), (const char*)hdr->m0, sz, fn_80312700);
+    int cnt = 0;
+    unsigned char i = 0;
+    do {
+        Unk802BADC0_T t;
+        char buf[0x10];
+        fn_803E9994(hdr->m4, lbl_8060D190, &cnt, &t);
+        int h = t.m8;
+        int next = i + 1;
+        int off = i * 0x168;
+        fn_804089B4(buf, lbl_805E0FD4, next);
+        Unk802BADC0_S* slot = (Unk802BADC0_S*)(off + (int)slots);
+        fn_803D74A0(h, lbl_805E0FDC, fn_803EBD14(b->m0, buf));
+        fn_80314D60(h);
+        slot->m0 = 0;
+        fn_8030ACCC(slot->m4);
+        slot->m0 = h;
+        if (h != 0) {
+            int v1, v2, v3, v4, v5, v6;
+            fn_803D775C(&v1, slot->m0, lbl_805DEFC4);
+            slot->m14C = v1;
+            fn_803D7378(&v2, slot->m0, lbl_805DEFC4);
+            slot->m150 = v2;
+            fn_803D775C(&v3, slot->m0, lbl_805DEFDC);
+            slot->m154 = v3;
+            fn_803D7378(&v4, slot->m0, lbl_805DEFDC);
+            slot->m158 = v4;
+            fn_803D775C(&v5, slot->m0, lbl_805DEFE4);
+            slot->m15C = v5;
+            fn_803D7378(&v6, slot->m0, lbl_805DEFE4);
+            slot->m160 = v6;
+            fn_80305C88(slot, 0);
+        }
+        if (arg4 != 0)
+            fn_80305C30((char*)(off + (int)slots), arg4, arg5, 0);
+        i = next;
+    } while (i <= 7);
+}
+
 void fn_802BAFD0(Unk802BACDC_Bat* b)
 {
-    fn_802BADC0(b, lbl_805E0FE4, &b->m4, &b->m10, 0, 0);
+    fn_802BADC0(b, lbl_805E0FE4, (Unk802BADC0_Hdr*)&b->m4, (char*)&b->m10, 0, 0);
     Unk802BACDC_Bat* c = b;
     char* d = lbl_8061C9F0;
-    fn_802BADC0(c, lbl_805E0FF4, &c->mB50, &c->mB5C, d, 2);
+    fn_802BADC0(c, lbl_805E0FF4, (Unk802BADC0_Hdr*)&c->mB50, (char*)&c->mB5C, d, 2);
 }
 
 void fn_802BB038(Unk802BACDC_Bat* b)
