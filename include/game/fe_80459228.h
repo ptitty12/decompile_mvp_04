@@ -50,8 +50,8 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s26();
     virtual void s27();
     virtual void s28(void* a);
-    virtual void s29();
-    virtual void s30();
+    virtual void s29(int a);
+    virtual void s30(const char* a);
     virtual void s31();
     virtual void s32();
     virtual void s33();
@@ -72,7 +72,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s48();
     virtual void s49();
     virtual void s50();
-    virtual void s51();
+    virtual void s51(int a, int b);
     virtual void s52();
     virtual void s53();
     virtual void s54();
@@ -111,7 +111,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s87();
     virtual void s88();
     virtual void s89();
-    virtual void s90();
+    virtual void s90(int a, int b, int c);
     virtual void s91();
     virtual void s92();
     virtual void s93();

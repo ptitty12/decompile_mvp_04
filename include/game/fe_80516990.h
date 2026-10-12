@@ -117,6 +117,26 @@ public:
     virtual void s38();
     virtual void s39();
 };
+/* Same object where slots 11 and 12 take an index and return a value (fn_8051F848). */
+class FeV10E {
+public:
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual int s11(int a);
+    virtual int s12(int a);
+};
 struct FeV10D : FeV10 {
     int m14;
     int m18;
@@ -132,7 +152,7 @@ public:
     virtual void s2();
     virtual void s3();
     virtual void s4();
-    virtual void s5();
+    virtual int s5();
     virtual void s6(int a);
     virtual int s7(int a);
     virtual int s8(int a);
@@ -142,6 +162,7 @@ public:
     virtual void s12();
     virtual void s13();
     virtual void s14();
+    virtual void s15();
 };
 extern "C" void* fn_8051F4D8(void* x);
 inline FeSub24* FeSubOf(void* x)
@@ -242,9 +263,9 @@ struct FeSet {
     int m528;
     char pad52C[0x580 - 0x52C];
     int m580;
-    char pad584[4];
+    int m584;
     int m588;
-    char pad58C[4];
+    int m58C;
     int m590;
 };
 inline FeSet* FeGetSet()
