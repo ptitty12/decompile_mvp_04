@@ -558,6 +558,94 @@ extern "C" void fn_8023C858(Unk8023C744* p, int i, int v)
     p->m10[i] = v;
 }
 
+struct Unk8024EF40_P;
+struct Unk80270BA0_X;
+struct Unk8023C868_Ctx {
+    char pad0[0x3B8];
+    int m3B8;
+};
+struct Unk8023C868_Q {
+    char pad0[0x6F4];
+    int m6F4;
+    char pad6F8[8];
+    Unk8023C868_Ctx* m700;
+};
+struct Unk8023C868_P {
+    char pad0[0x44C];
+    Unk8023C868_Q* m44C;
+    char pad450[8];
+    unsigned m458;
+    char pad45C[0x708 - 0x45C];
+    int m708;
+};
+struct Unk8019F8C0_Owner;
+extern float lbl_805D8EA4;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+int fn_802536D0(Unk8024EF40_P* p);
+void fn_8025374C(Unk8024EF40_P* p);
+float fn_8024D0F8(Unk80270BA0_X* x, int k);
+int fn_801DCB48(int a);
+inline float Unk8023C868_Lerp(float a, float t, float b)
+{
+    return t * (b - a) + a;
+}
+
+float fn_8023C868(Unk8023C868_P* x)
+{
+    if (x->m44C->m6F4 == 1 || x->m458 > 13 || x->m44C == 0)
+        return lbl_805D8EA4;
+    unsigned k = x->m458;
+    int a = k <= 8;
+    int b = k - 9 <= 3u;
+    int e = fn_801A2034((Unk8019F8C0_Owner*)x->m44C, x->m708) == -1;
+    if (e)
+        fn_8025374C((Unk8024EF40_P*)x);
+    else
+        fn_802536D0((Unk8024EF40_P*)x);
+    float val = lbl_805D8EA4;
+    int c = k - 6 <= 2u;
+    if (a) {
+        if (e) {
+            if (c) {
+                val = fn_8024D0F8((Unk80270BA0_X*)x, 0x14);
+                float v[4] = { -0.1f, -0.1f, -0.05f, -0.0f };
+                val += v[fn_802536D0((Unk8024EF40_P*)x)];
+            } else {
+                val = fn_8024D0F8((Unk80270BA0_X*)x, 0x17);
+                float v[4] = { -0.3f, -0.3f, -0.3f, -0.25f };
+                val += v[fn_802536D0((Unk8024EF40_P*)x)];
+            }
+        } else {
+            if (c) {
+                if (fn_801DCB48(x->m44C->m700->m3B8) != 0) {
+                    val = fn_8024D0F8((Unk80270BA0_X*)x, 0x12);
+                    const float w = 0.05f;
+                    val += w;
+                } else {
+                    val = fn_8024D0F8((Unk80270BA0_X*)x, 0x13);
+                    const float w = 0.2f;
+                    val += w;
+                }
+            } else {
+                if (fn_801DCB48(x->m44C->m700->m3B8) != 0) {
+                    val = fn_8024D0F8((Unk80270BA0_X*)x, 0x15);
+                } else {
+                    val = fn_8024D0F8((Unk80270BA0_X*)x, 0x16);
+                    const float w = 0.2f;
+                    val += w;
+                }
+            }
+        }
+    } else if (b) {
+        if (e)
+            val = fn_8024D0F8((Unk80270BA0_X*)x, 0x21);
+        else
+            val = fn_8024D0F8((Unk80270BA0_X*)x, 0x20);
+    }
+    val = Unk8023C868_Lerp(0.8f, val, 1.2f);
+    return val;
+}
+
 int* fn_8023CAF0()
 {
     return &lbl_8068CCDC;
