@@ -399,6 +399,201 @@ void* Unk801527C8_Ctx::fn_8016C7A8(unsigned int idx) /* 8016C7A8 */
     return fn_803272D0(&mA4C->m50, idx);
 }
 
+struct Unk8019F8C0_Owner;
+int fn_801A4A94(Unk8019F8C0_Owner* o, int a);
+int fn_801A4C74(Unk8019F8C0_Owner* o, int a);
+int fn_801A4C20(Unk8019F8C0_Owner* o);
+int fn_801A4C3C(Unk8019F8C0_Owner* o, int a, int b);
+extern "C" int fn_801A497C(Unk801527C8_Actor* a, int b, int c);
+extern "C" int fn_80097190(void* s, int a);
+extern "C" int fn_80097300(void* s, int a);
+
+Unk80189300* Unk801527C8_Ctx::fn_8016C804(int id)
+{
+    Unk801527C8_Actor* a = mA4C;
+    Unk80189300* r = 0;
+    switch (id) {
+    case 0:
+        r = (Unk80189300*)fn_8016C7A8(0);
+        break;
+    case 1:
+        r = (Unk80189300*)fn_8016C7A8(1);
+        break;
+    case 2:
+        r = (Unk80189300*)fn_8016C7A8(2);
+        break;
+    case 3:
+        r = (Unk80189300*)fn_8016C7A8(3);
+        break;
+    case 4:
+        r = (Unk80189300*)fn_8016C7A8(4);
+        break;
+    case 5:
+        r = (Unk80189300*)fn_8016C7A8(5);
+        break;
+    case 6:
+        r = (Unk80189300*)fn_8016C7A8(6);
+        break;
+    case 7:
+        r = (Unk80189300*)fn_8016C7A8(7);
+        break;
+    case 8:
+        r = (Unk80189300*)fn_8016C7A8(8);
+        break;
+    case 9:
+        break;
+    case 10:
+        r = (Unk80189300*)fn_8016C7A8(9);
+        break;
+    case 59:
+    {
+        Unk801527C8_Teams* p = a->m6F8->m14;
+        int side = 0;
+        if (p->m1CD0 != 0)
+            side = 1;
+        void* s = (char*)p + side * 0xE64;
+        r = (Unk80189300*)fn_801A4A94((Unk8019F8C0_Owner*)a, fn_80097300(s, fn_80097190(s, 1)));
+        break;
+    }
+    case 54:
+        r = (Unk80189300*)fn_8016C7A8(10);
+        break;
+    case 55:
+        r = (Unk80189300*)fn_8016C7A8(11);
+        break;
+    case 56:
+        r = (Unk80189300*)fn_8016C7A8(12);
+        break;
+    case 11:
+        r = (Unk80189300*)fn_801A497C(a, 3, 0);
+        break;
+    case 12:
+        r = (Unk80189300*)fn_801A497C(a, 3, 1);
+        break;
+    case 13:
+        r = (Unk80189300*)fn_801A497C(a, 3, 2);
+        break;
+    case 14:
+        r = (Unk80189300*)fn_801A497C(a, 3, 3);
+        break;
+    case 15:
+        r = (Unk80189300*)fn_801A497C(a, 3, 4);
+        break;
+    case 16:
+        r = (Unk80189300*)fn_801A497C(a, 3, 5);
+        break;
+    case 17:
+        r = (Unk80189300*)fn_801A497C(a, 3, 6);
+        break;
+    case 18:
+        r = (Unk80189300*)fn_801A497C(a, 3, 7);
+        break;
+    case 19:
+        r = (Unk80189300*)fn_801A497C(a, 3, 8);
+        break;
+    case 20:
+        r = (Unk80189300*)fn_801A497C(a, 3, 9);
+        break;
+    case 21:
+        r = (Unk80189300*)fn_801A4C74((Unk8019F8C0_Owner*)a, 0);
+        break;
+    case 22:
+        r = (Unk80189300*)fn_801A4C74((Unk8019F8C0_Owner*)a, 1);
+        break;
+    case 23:
+        r = (Unk80189300*)fn_801A4C74((Unk8019F8C0_Owner*)a, 2);
+        break;
+    case 24:
+        r = (Unk80189300*)fn_801A4C74((Unk8019F8C0_Owner*)a, 3);
+        break;
+    case 25:
+        r = (Unk80189300*)fn_801A4C20((Unk8019F8C0_Owner*)a);
+        break;
+    case 26:
+        r = (Unk80189300*)fn_801A497C(a, 0, 0);
+        break;
+    case 27:
+        r = (Unk80189300*)fn_801A497C(a, 0, 1);
+        break;
+    case 28:
+        r = (Unk80189300*)fn_801A497C(a, 0, 2);
+        break;
+    case 29:
+        r = (Unk80189300*)fn_801A497C(a, 0, 3);
+        break;
+    case 30:
+        r = (Unk80189300*)fn_801A497C(a, 0, 4);
+        break;
+    case 31:
+        r = (Unk80189300*)fn_801A497C(a, 0, 5);
+        break;
+    case 32:
+        r = (Unk80189300*)fn_801A497C(a, 0, 6);
+        break;
+    case 33:
+        r = (Unk80189300*)fn_801A497C(a, 0, 7);
+        break;
+    case 34:
+        r = (Unk80189300*)fn_801A497C(a, 0, 8);
+        break;
+    case 35:
+        r = (Unk80189300*)fn_801A497C(a, 0, 9);
+        break;
+    case 36:
+        r = (Unk80189300*)fn_801A497C(a, 1, 0);
+        break;
+    case 37:
+        r = (Unk80189300*)fn_801A497C(a, 1, 1);
+        break;
+    case 38:
+        r = (Unk80189300*)fn_801A497C(a, 1, 2);
+        break;
+    case 39:
+        r = (Unk80189300*)fn_801A497C(a, 1, 3);
+        break;
+    case 40:
+        r = (Unk80189300*)fn_801A497C(a, 1, 4);
+        break;
+    case 41:
+        r = (Unk80189300*)fn_801A497C(a, 1, 5);
+        break;
+    case 42:
+        r = (Unk80189300*)fn_801A497C(a, 1, 6);
+        break;
+    case 43:
+        r = (Unk80189300*)fn_801A497C(a, 1, 7);
+        break;
+    case 44:
+        r = (Unk80189300*)fn_801A497C(a, 1, 8);
+        break;
+    case 46:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 1);
+        break;
+    case 47:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 2);
+        break;
+    case 48:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 3);
+        break;
+    case 49:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 4);
+        break;
+    case 50:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 5);
+        break;
+    case 51:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 6);
+        break;
+    case 52:
+        r = (Unk80189300*)fn_80178E6C(a->m700->m3AC, mA50->m3D44, 7);
+        break;
+    case 53:
+        r = (Unk80189300*)fn_801A4C3C((Unk8019F8C0_Owner*)a, 0, mA50->m3D44);
+        break;
+    }
+    return r;
+}
+
 void Unk801527C8_Ctx::fn_8016CE5C(int idx) /* 8016CE5C */
 {
     int off = idx * 0xAC;
