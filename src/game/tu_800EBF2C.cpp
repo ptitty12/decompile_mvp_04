@@ -176,6 +176,76 @@ extern "C" void fn_800ECAA4(UiS* self)
     }
 }
 
+struct UiMsgMgrCC {
+    char pad0[0xCC];
+    int mCC;
+};
+struct UiNode8EC {
+    int m0;
+    char pad4[0x24 - 4];
+    UiNode8EC* m24;
+    int m28;
+};
+struct UiSelfB0 {
+    char pad0[0x4C];
+    UiNode8EC* m4C;
+    char pad50[0x64 - 0x50];
+    UiS* m64;
+    char pad68[4];
+};
+int fn_800CFC28(UiNode8EC* n, float t);
+void fn_800CFD1C(UiNode8EC* n, int* a, int* b, float* c, float t);
+extern int lbl_8061A328;
+inline void SetIntAt(char* b, int off, int v)
+{
+    *(int*)(b + off) = v;
+}
+inline void SetFloatAt(char* b, int off, float v)
+{
+    *(float*)(b + off) = v;
+}
+/* near-miss: one pair swapped (retail loads ang before the i2 store; ours after) */
+extern "C" void fn_800ECB0C(UiSelfB0* self0)
+{
+    UiS* self = (UiS*)self0;
+    int count = 0;
+    UiNode8EC* n = ((UiSelfB0*)self)->m4C;
+    float t = (float)lbl_8061A328 * 0.016666668f;
+    UiRec12 rec[50];
+    float ang = 0.0f;
+    int i1;
+    int i2;
+    if (n != 0) {
+        do {
+            if (n->m0 != 0) {
+                int off = count * 12;
+                n->m28 = 0;
+                while (fn_800CFC28(n, t) != 0) {
+                    fn_800CFD1C(n, &i1, &i2, &ang, t);
+                    char* base = (char*)self + 0x68;
+                    int o1 = i1 * 4;
+                    int o2 = i2 * 4;
+                    UiS* a = *(UiS**)(base + o1);
+                    UiS* b = *(UiS**)(base + o2);
+                    if (a != 0 && b != 0 && (a->m48 & 0x40000000) && (b->m48 & 0x40000000)) {
+                        SetIntAt((char*)rec, off, i1);
+                        count++;
+                        SetIntAt((char*)rec + 4, off, i2);
+                        float* pf = (float*)((char*)rec + 8);
+                        *(float*)((char*)pf + off) = ang;
+                        off += 12;
+                    }
+                }
+            }
+            n = n->m24;
+        } while (n != 0);
+    }
+    if (count != 0) {
+        fn_800ECC9C(self, ((UiSelfB0*)self)->m64->m4, rec, count);
+        ((UiMsgMgrCC*)UiGetMsgMgr())->mCC = 1;
+    }
+}
+
 /* near-miss: ~20 slots, register numbering of self/arr and lwzx base/index order of the table reads */
 void fn_800ECC9C(UiS* self, UiS* node, UiRec12* arr, int n)
 {
