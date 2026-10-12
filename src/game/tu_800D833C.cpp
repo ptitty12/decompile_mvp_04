@@ -479,6 +479,46 @@ void fn_800DB5F4()
     lbl_8061B2B4 = 1;
 }
 
+extern const char lbl_805BD828[];
+char* fn_804031BC(char* dst, const char* src);
+int fn_8007F828(int s, char* name);
+void fn_8007F7FC(int s, int h, int v);
+int fn_8007F910(int s, int idx, int a, int b, int c, int d, int e);
+int fn_80075808(int a);
+int fn_80075948(int s, int a);
+void fn_80086EC0(Unk800D878C_C* p, int a, int b);
+void fn_800A3490(int g, int a, int b, int c);
+int fn_800A2AE8(int g);
+void fn_800C2034(void* o, int v);
+
+extern "C" void fn_800DB66C(int a, int b, int c, int d)
+{
+    int s = lbl_8061930C;
+    Unk800D878C_C* c10 = lbl_806192E0->m4->m10;
+    int g = lbl_80619948;
+    int v;
+    if (c != -1)
+        v = a;
+    else
+        v = b;
+    char buf[0x18];
+    fn_804031BC(buf, lbl_805BD828);
+    int h = fn_8007F828(s, buf);
+    fn_8007F7FC(s, h, fn_80075948(s, v));
+    fn_800C2034((char*)fn_800B555C() + 8, 0);
+    *(int*)((char*)fn_800B555C() + 0x610) = 0;
+    int t = fn_800A2AE8(g);
+    fn_8007F8E4(s, 0);
+    fn_8007F910(s, 0, a, b, t, 0, 0);
+    fn_8007F910(s, 0, a, b, t, 0, 0);
+    int flag = 0;
+    if (fn_80075808(b) == 1)
+        flag = fn_80075808(a) == 1;
+    fn_800A3490(g, 0, 0, flag ^ 1);
+    fn_80086EC0(c10, 0, c);
+    fn_80086EC0(c10, 1, d);
+}
+
 void fn_800DB7DC()
 {
     if (lbl_8061B2B4 != 0) {
