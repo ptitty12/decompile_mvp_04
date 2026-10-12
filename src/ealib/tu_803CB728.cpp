@@ -369,6 +369,32 @@ extern "C" int fn_803CD700(EAGLSelfE* s, unsigned* bits, int* cnt, int* lo, int*
     return 1;
 }
 
+inline int EAGLCnt(EAGLCount* c) { return c->m0; }
+
+extern "C" int fn_803CD7F0(EAGLSelfE* s, unsigned* bits, int* cnt, int* lo, int* hi)
+{
+    EAGLRecE* r = s->mC;
+    int n = r->m4->m0;
+    int i;
+    for (i = n / 4 - 1; i >= 0; i--) {
+        int b = (unsigned)r->mA[i] / 12;
+        if (!EAGLTestBit(bits, b)) {
+            if (*cnt == 0) {
+                *lo = b;
+                *hi = b;
+            } else {
+                if (b < *lo)
+                    *lo = b;
+                if (b > *hi)
+                    *hi = b;
+            }
+            *cnt += 1;
+            fn_803BE6F4(bits, b, 1);
+        }
+    }
+    return 1;
+}
+
 extern "C" void fn_803CD8E4(EAGLObjD* s, int chrg)
 {
     s->m0 = lbl_80685EE8;
@@ -419,6 +445,30 @@ extern "C" int fn_803CDA34(EAGLSelfF* s, unsigned* bits, int* cnt, int* lo, int*
 extern "C" void fn_803CDB24(Unk803D2B20* self, int a, float x, float y)
 {
     self->v7(a, y, 0);
+}
+
+extern "C" int fn_803CDB60(EAGLSelfF* s, unsigned* bits, int* cnt, int* lo, int* hi)
+{
+    EAGLRecF* r = s->mC;
+    int n = r->m4->m0;
+    int i;
+    for (i = n / 4 - 1; i >= 0; i--) {
+        int b = (unsigned)r->mE[i] / 12;
+        if (!EAGLTestBit(bits, b)) {
+            if (*cnt == 0) {
+                *lo = b;
+                *hi = b;
+            } else {
+                if (b < *lo)
+                    *lo = b;
+                if (b > *hi)
+                    *hi = b;
+            }
+            *cnt += 1;
+            fn_803BE6F4(bits, b, 1);
+        }
+    }
+    return 1;
 }
 
 extern "C" void fn_803CEA5C(char* p)
