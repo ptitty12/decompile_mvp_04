@@ -332,4 +332,13 @@ int fn_805320B0(int c, int a, int b, float f);
 int fn_8007FBC0(Unk8007F198_C* s, int a, int b);
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
 
+/* ---- unit 8054CBBC ---- */
+/* Entry tracker: id, a Screen pointer and (at +8) a vptr slot (ctor fn_8054CBBC). */
+struct Db8054CBBC_O {
+    int m0;
+    Unk8007B2B0_Screen* m4;
+    const void* m8;
+};
+extern int lbl_806025EC[];
+
 #endif
