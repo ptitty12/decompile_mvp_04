@@ -826,7 +826,10 @@ struct FeMenuSim {
     int m200;
     int m204;
     int m208;
-    char pad20C[0x32C - 0x20C];
+    char pad20C[0x2D8 - 0x20C];
+    int m2D8;
+    const void* m2DC;
+    char pad2E0[0x32C - 0x2E0];
     FeItem m32C;
     char pad380[0x394 - 0x380];
     FeItem m394;
@@ -1111,7 +1114,14 @@ extern void* lbl_8061FEDC;
 
 /* Menu with five float tunables (fn_80442840): m474's value word holds the target object. */
 struct FeMenuF {
-    char pad0[0x474];
+    FeItem* items[93];
+    int m174;
+    char pad178[0x204 - 0x178];
+    int m204;
+    int m208;
+    char pad20C[0x410 - 0x20C];
+    FeTunable m410;
+    char pad460[0x474 - 0x460];
     FeItem m474;
     char pad4C8[0x4D4 - 0x4C8];
     FeTunable m4D4;
@@ -1121,9 +1131,12 @@ struct FeMenuF {
     FeTunable m59C;
     char pad5EC[0x600 - 0x5EC];
     FeTunable m600;
-    char pad650[0x6CC - 0x650];
+    char pad650[0x664 - 0x650];
+    FeItem m664;
+    char pad6B8[0x6CC - 0x6B8];
     FeTunable m6CC;
-    char pad71C[0x734 - 0x71C];
+    char pad71C[0x730 - 0x71C];
+    int m730;
     void* m734;
 };
 inline void* FeItemObj(FeItem* it)

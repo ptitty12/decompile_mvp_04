@@ -4,6 +4,76 @@
  */
 #include "game/tu_8043FDC0.h"
 
+inline void FeTunableSet(FeTunable* t, float v)
+{
+    if (t->m48 == 0)
+        t->m4C = v;
+    else
+        *t->m48 = v;
+}
+
+extern "C" {
+void fn_8032F574(void* it, int a);
+float fn_80551984(void* o, int k);
+float fn_805519CC(int k);
+float fn_8055248C();
+}
+int fn_8007F84C(Unk8007F198_B* s);
+
+
+struct FeItemB {
+    float m0;
+    float m4;
+    const void* m8;
+    int mC;
+};
+extern "C" {
+void fn_8032D868(void* self, const char* name);
+void fn_8033FBD8(void* self, void* cb);
+FeItem* fn_8032EC38(void* mem, const char* name, int a, int b, int c, int d);
+FeItem* fn_8032F428(void* mem, const char* name, int* val, int a, int b);
+}
+extern char lbl_80666A18[];
+extern const char lbl_80666EC0[];
+extern const char lbl_80666E70[];
+extern const char lbl_80666DD0[];
+extern const char lbl_80667238[];
+extern const char lbl_806671E8[];
+extern const char lbl_805F4C70[];
+extern const char lbl_805F4C7C[];
+extern const char lbl_805F4C90[];
+extern int lbl_806215F4;
+extern void* lbl_806215CC;
+extern void* lbl_806215D0;
+
+inline void FeLabelInit(FeItemB* it, const char* name)
+{
+    it->m8 = lbl_80666EC0;
+    it->m0 = 0.0f;
+    it->m4 = 0.0f;
+    it->m8 = lbl_80666E70;
+    it->mC = 0;
+    fn_8032D868(it, name);
+}
+
+inline void FeButtonInit(FeItemB* it, const char* name, void* cb)
+{
+    FeLabelInit(it, name);
+    it->m8 = lbl_80666DD0;
+    fn_8033FBD8(it, cb);
+}
+
+inline void FeMenuSimInit(FeMenuSim* p, int a)
+{
+    p->m174 = 0;
+    p->m178 = 0;
+    p->m1FC = 0;
+    p->m200 = a;
+    p->m2DC = lbl_80666A18;
+    fn_803E4A50((char*)p + 0x210);
+    p->m2D8 = 0;
+}
+
 extern "C" FE_OVERLAY void fn_8043FDC0(void)
 {
 }
@@ -168,6 +238,29 @@ extern "C" FE_OVERLAY FeMenuEmail* fn_80442594(FeMenuEmail* self, int a)
     return self;
 }
 
+extern "C" FE_OVERLAY void fn_80442640(FeMenuF* self)
+{
+    int z = 0;
+    self->m204 = z;
+    self->m208 = z;
+    self->items[self->m174]->s3();
+    self->m174 = z;
+    self->items[z]->s2();
+    self->m730 = z;
+    fn_8032F574(&self->m474, 0);
+    self->m734 = (void*)1;
+    FeItemSet(&self->m664, 1);
+    FeTunableSet(&self->m4D4, fn_80551984(FeItemObj(&self->m474), 0));
+    FeTunableSet(&self->m538, fn_80551984(FeItemObj(&self->m474), 1));
+    FeTunableSet(&self->m59C, fn_80551984(FeItemObj(&self->m474), 2));
+    FeTunableSet(&self->m600, fn_80551984(FeItemObj(&self->m474), 3));
+    FeTunableSet(&self->m6CC, fn_805519CC((int)self->m734 - 1));
+    if (fn_8007F84C((Unk8007F198_B*)lbl_8061930C) != 0) {
+        fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+        FeTunableSet(&self->m410, fn_8055248C());
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80442840(FeMenuF* self)
 {
     fn_805519A0(FeItemObj(&self->m474), 0, FeTunableGet(&self->m4D4));
@@ -254,6 +347,21 @@ extern "C" FE_OVERLAY void fn_80443614(FeMenuSim* self, int a)
     }
 }
 
+extern "C" FE_OVERLAY FeMenuSim* fn_804436B4(FeMenuSim* self, int a)
+{
+    FeMenuSimInit(self, a);
+    self->m2DC = lbl_80667238;
+    FeItemB* b = (FeItemB*)((char*)self + 0x2E0);
+    FeButtonInit(b, lbl_805F4C70, (void*)fn_80440210);
+    fn_8032EC38(&self->m32C, lbl_805F4C7C, 1, 1, 0, 0x64);
+    fn_8032F428(&self->m394, lbl_805F4C90, &lbl_806215F4, 4, 0);
+    fn_80330ACC(self, (FeItem*)b);
+    lbl_806215CC = b;
+    fn_80330ACC(self, &self->m32C);
+    fn_80330ACC(self, &self->m394);
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804437EC(FeMenuEmail* self)
 {
     int z = 0;
@@ -276,4 +384,17 @@ extern "C" FE_OVERLAY void fn_80443868(FeMenuSim* self, int a)
         if (cur == &self->m32C)
             lbl_80621608 = FeItemGetB(cur);
     }
+}
+
+extern "C" FE_OVERLAY FeMenuSim* fn_804438DC(FeMenuSim* self, int a)
+{
+    FeMenuSimInit(self, a);
+    self->m2DC = lbl_806671E8;
+    FeItemB* b = (FeItemB*)((char*)self + 0x2E0);
+    FeButtonInit(b, lbl_805F4C70, (void*)fn_80440210);
+    fn_8032EC38(&self->m32C, lbl_805F4C7C, 1, 1, 0, 0x64);
+    fn_80330ACC(self, (FeItem*)b);
+    lbl_806215D0 = b;
+    fn_80330ACC(self, &self->m32C);
+    return self;
 }
