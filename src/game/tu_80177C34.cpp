@@ -567,8 +567,10 @@ int fn_80179284(Unk80179284_T* p, Unk80179284_Ctx* ctx)
     return 0;
 }
 
-/* near-miss: 98.8%; only the callee-saved pair is swapped (retail: j in r31, list pointer in r30; ours the reverse,
- * priorities 0.260 vs 0.267 in global alloc). Tried: j hoisted, no list local, ++j, do-while, byte temp. */
+/* near-miss: 99.3%; the two scan loops now match (k declared once outside both). Only the first loop's callee-saved
+ * pair is swapped (retail: j in r31, list pointer in r30; ours the reverse, priorities 0.260 vs 0.267 in global
+ * alloc) and the second loop keeps its zero-extended index in r5 (ours r0). Tried: j hoisted, no list local, ++j,
+ * do-while, byte temp. */
 void fn_801792BC(void* self)
 {
     Unk80177C34_Sub* p = (Unk80177C34_Sub*)self;
@@ -581,14 +583,16 @@ void fn_801792BC(void* self)
     Unk801792BC_List* l = &side->m168;
     if (l->m4 != 0) {
         int first = fn_80097300(side, fn_80097190(side, 1));
-        for (unsigned j = 0; j < l->m4; j++) {
+        unsigned j;
+        for (j = 0; j < l->m4; j++) {
             int t = fn_80097300(side, (unsigned char)j);
             if (first != t) {
                 fn_8017940C(p, t);
             }
         }
     }
-    for (unsigned k = 0; k < 25; k++) {
+    unsigned k;
+    for (k = 0; k < 25; k++) {
         int e = side->m3E8[(unsigned char)k].m0;
         if (e != 0) {
             int q = fn_8008CFD8(side->mC9C, 5);
@@ -597,7 +601,7 @@ void fn_801792BC(void* self)
             }
         }
     }
-    for (unsigned k = 0; k < 25; k++) {
+    for (k = 0; k < 25; k++) {
         int e = side->m3E8[(unsigned char)k].m0;
         if (e != 0) {
             fn_8017940C(p, e);
