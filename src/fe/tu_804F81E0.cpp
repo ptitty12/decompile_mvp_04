@@ -27,6 +27,11 @@ extern "C" char* strcpy(char* d, const char* s);
 extern "C" int fn_804D1278(void* self);
 extern "C" void fn_80123610(FeObj* w);
 extern "C" int fn_800B57EC();
+#define FE_LO30(X)     X(1) X(2) X(3) X(4) X(5) X(6) X(7) X(8) X(9) X(10) X(11) X(12) X(13) X(14) X(15) X(16) X(17)     X(18) X(19) X(20) X(21) X(22) X(23) X(24) X(25) X(26) X(27) X(28) X(29) X(30)
+class FeObjR31 : public UiBase {
+public:
+    FE_LO30(FE_V0) virtual const void* v31(); virtual FeObj* v32(const char* a, int b); FE_HI(FE_V0)
+};
 struct FeCap : FeObj {
     char pad40[0x134 - 0x40];
     FeObjI* m134;
@@ -44,12 +49,16 @@ struct FeCap : FeObj {
     int m630;
     char pad634[0x650 - 0x634];
     FeObjS* m650;
-    char pad654[0x680 - 0x654];
+    FeObjR31* m654;
+    FeObjR31* m658;
+    char pad65C[0x680 - 0x65C];
     FeObj* m680;
     FeObj* m684;
     char pad688[0x7F4 - 0x688];
     UiS* m7F4[14];
-    char pad82C[0x1100 - 0x82C];
+    char pad82C[0x870 - 0x82C];
+    int m870;
+    char pad874[0x1100 - 0x874];
     FeObj* m1100;
 };
 extern "C" {
@@ -82,12 +91,16 @@ extern "C" void fn_805283FC(void);
 extern "C" int fn_804F9D10(FeCap* self, int a);
 extern "C" void fn_804F83C8(FeCap* self);
 void fn_800DC580(UiS* w, float f);
-#define FE_LO30(X)     X(1) X(2) X(3) X(4) X(5) X(6) X(7) X(8) X(9) X(10) X(11) X(12) X(13) X(14) X(15) X(16) X(17)     X(18) X(19) X(20) X(21) X(22) X(23) X(24) X(25) X(26) X(27) X(28) X(29) X(30)
-class FeObjR31 : public UiBase {
-public:
-    FE_LO30(FE_V0) virtual const void* v31(); virtual FeObj* v32(const char* a, int b); FE_HI(FE_V0)
-};
 extern const int lbl_805FD394[];
+extern char lbl_805FB378[];
+extern char lbl_805FB380[];
+extern char lbl_805FB388[];
+extern char lbl_805FB390[];
+extern float lbl_805FB394;
+extern "C" int strcmp(const char* a, const char* b);
+void fn_800E633C(char* s);
+extern "C" void fn_80402FCC(char* dst, const void* src);
+extern "C" int fn_804F9C64(void* l, int k);
 extern const int lbl_805FD3B4[];
 extern const int lbl_805FD3D4[];
 extern "C" {
@@ -147,6 +160,17 @@ inline void FeArDtor(FeAr* a)
 }
 
 extern "C" void fn_80538368(FeAr* a, int v);
+struct FeSq : FeObj {
+    char pad40[0x740 - 0x40];
+    FeObj* a[9];
+    FeObj* p0;
+    FeObj* b[9];
+    FeObj* p1;
+    char pad790[0x844 - 0x790];
+    FeObj* m844;
+    FeObj* m848;
+};
+extern "C" FeObj* fn_800C8034(void* p);
 /* Q16-DECL-END */
 
 extern "C" int fn_804FB7F4(FeS19* s);
@@ -210,6 +234,7 @@ extern "C" FE_OVERLAY void fn_804F8534(void* p)
     }
 }
 
+/* near-miss: loop bound compiles to cmpwi 105 / bgt where retail has cmpwi 106 / bge (2 slots differ) */
 /* near-miss: loop bound compiles to cmpwi 105 / bgt where retail has cmpwi 106 / bge (2 slots differ) */
 /* near-miss: loop bound compiles to cmpwi 105 / bgt where retail has cmpwi 106 / bge (2 slots differ) */
 extern "C" FE_OVERLAY int fn_804F8668(void* self, int key, int thr, int* out)
@@ -635,6 +660,57 @@ extern "C" FE_OVERLAY int fn_804FB8EC(FeCap3* s, int x)
         || x == s->m740[17] || x == s->m740[18])
         return 1;
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804FBF58(void* p)
+{
+    FeSq* self = (FeSq*)p;
+    FeObj* r = 0;
+    if (self->m844->m24 < 0) {
+        if (self->a[0]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("TOPLEFTSQUARE", 1));
+        else if (self->a[1]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("TOPSQUARE", 1));
+        else if (self->a[2]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("TOPRIGHTSQUARE", 1));
+        else if (self->a[3]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("LEFTSQUARE", 1));
+        else if (self->a[4]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("CENTERSQUARE", 1));
+        else if (self->a[5]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("RIGHTSQUARE", 1));
+        else if (self->a[6]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("BOTTOMLSQUARE", 1));
+        else if (self->a[7]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("BOTTOMSQUARE", 1));
+        else if (self->a[8]->m24 & 0x10000000)
+            r = fn_800C8034(self->p0->v32("BOTTOMRSQUARE", 1));
+    } else if (self->m848->m24 < 0) {
+        if (self->b[0]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("TOPLEFTSQUARE", 1));
+        else if (self->b[1]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("TOPSQUARE", 1));
+        else if (self->b[2]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("TOPRIGHTSQUARE", 1));
+        else if (self->b[3]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("LEFTSQUARE", 1));
+        else if (self->b[4]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("CENTERSQUARE", 1));
+        else if (self->b[5]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("RIGHTSQUARE", 1));
+        else if (self->b[6]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("BOTTOMLSQUARE", 1));
+        else if (self->b[7]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("BOTTOMSQUARE", 1));
+        else if (self->b[8]->m24 & 0x10000000)
+            r = fn_800C8034(self->p1->v32("BOTTOMRSQUARE", 1));
+    }
+    if (r != 0) {
+        ((FeObj1*)r)->v8(1);
+        ((FeObj1*)r)->v16(1);
+        ((FeObj1*)r)->v14(1);
+        r->m24 &= 0xFEFFFFFF;
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804FD3C4(FeS20* s, int a)
