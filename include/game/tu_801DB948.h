@@ -109,7 +109,9 @@ public:
     Unk801DB948_PlSub m4D8;
     char pad4D8b[0x618 - 0x4D8 - sizeof(Unk801DB948_PlSub)];
     Unk801DB948_Cfg* m618;
-    char pad61C[0x710 - 0x61C];
+    char pad61C[0x708 - 0x61C];
+    int m708;
+    char pad70C[4];
     Unk801DB948_Vec3 m710;
     unsigned m71C;
     char pad720[0x8F0 - 0x720];
@@ -268,9 +270,13 @@ struct Unk801DB948_Vec4 : public Unk801DB948_Vec3 {
 struct Unk801DD660_Rec {
     char pad0[4];
     int m4;
-    char pad8[4];
+    int m8;
     int mC;
-    char pad10[0x28 - 0x10];
+    int m10;
+    char pad14[4];
+    int m18;
+    char pad1C[0x24 - 0x1C];
+    int m24;
     Unk801DB948_Vec3 m28;
     char pad34[0x64 - 0x34];
     Unk801DB948_Vec3 m64;
