@@ -35,7 +35,7 @@ struct Fx {
     char pad1C[0x8];
     int m24;
     int m28;
-    char pad2C[0x4];
+    int m2C;
     int* m30;
     int* m34;
     int* m38;
@@ -43,7 +43,9 @@ struct Fx {
     char m7C[60];
     char mB8[60];
     int mF4;
-    char padF8[0x20];
+    char padF8[4];
+    int mFC;
+    int m100[6];
     int m118;
     int m11C;
     int m120;
@@ -51,7 +53,7 @@ struct Fx {
     FxPart* m13C;
     FxPart* m140;
     FxPart24* m144;
-    int* m148[6];
+    unsigned short* m148[6];
     char pad160[0x10];
 };
 /* 0x98-byte particle record (array at FxB::mF8; fn_80319C2C, fn_80319D78). */
@@ -198,7 +200,14 @@ struct FxCfg7 {
 };
 /* 0x24-byte record of Fx::m144 (id at +0x20; fn_803188FC removes entries by id). */
 struct FxPart24 {
-    char pad0[0x20];
+    unsigned short* m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
+    float m14;
+    int m18;
+    int m1C;
     int m20;
 };
 struct FxV2f { float x; float y; };
@@ -220,7 +229,8 @@ struct FxRec2 {
     float m30;
     float m34;
     int m38;
-    char pad3C[0xec];
+    char pad3C[0xe8];
+    float m124;
 };
 /* 12-byte entry of the 5-element tables at FxD+0x2C / FxD+0x68 (ctor fn_8031B4EC). */
 struct FxItemD {
@@ -240,11 +250,13 @@ struct FxSlotD {
     float m8;
 };
 /* Third effect class (vtable lbl_80665968, vptr at +0x18; ctor fn_8031B4EC). */
+struct FxActT;
 struct FxD {
     char pad0[0x14];
     int m14;
     const void* m18;
-    char pad1C[0x8];
+    FxActT* m1C;
+    char pad20[0x4];
     FxRec2* m24;
     int m28;
     FxItemD a2C[5];
