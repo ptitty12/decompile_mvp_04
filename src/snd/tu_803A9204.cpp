@@ -15,7 +15,7 @@ extern int lbl_80625208;
 extern void (*lbl_8062520C)();
 extern void (*lbl_80625210)();
 extern int lbl_8069CAD4;
-extern float lbl_80609598;
+extern const float lbl_80609598;
 
 extern "C" int fn_803B0798();
 extern "C" void fn_803AF9C0();
@@ -119,7 +119,7 @@ extern "C" void fn_803A9450()
     }
 }
 
-/* near-miss: 152 insns; mine hoists the 0.0f constant into f31 (retail reloads lbl_80609598 in each block with lis/lfs, so no loop-invariant move) and lays out the fade clamp branches differently; extern float, local float and goto-stop forms tried */
+/* near-miss: 152 insns, same control flow as retail now (the fade clamp is `if (fade < Z) {if (!(v > t)) clamp} else {if (!(v < t)) clamp}`, as matched in fn_803AAE30), but the zero constant (extern const float lbl_80609598) is hoisted out of the loop into f31/a saved register; retail reloads it with lis/lfs in each block. Literal 0.0f, extern float, local float and single-clamp goto forms tried */
 extern "C" void fn_803A94BC()
 {
     int i = 0;
@@ -143,15 +143,21 @@ extern "C" void fn_803A94BC()
                 if (++p->curvollfoentry >= p->vollfolength)
                     p->curvollfoentry = 0;
             }
-            float f = p->fadePer100Hz;
-            if (f != 0.0f) {
+            if (p->fadePer100Hz != lbl_80609598) {
                 dirty = 1;
-                p->programmedVol += f;
-                if (f >= 0.0f ? !(p->programmedVol < p->fadeTargetVol) : !(p->programmedVol > p->fadeTargetVol)) {
-                    p->programmedVol = p->fadeTargetVol;
-                    p->fadePer100Hz = 0.0f;
+                p->programmedVol += p->fadePer100Hz;
+                if (p->fadePer100Hz < lbl_80609598) {
+                    if (!(p->programmedVol > p->fadeTargetVol)) {
+                        p->programmedVol = p->fadeTargetVol;
+                        p->fadePer100Hz = lbl_80609598;
+                    }
+                } else {
+                    if (!(p->programmedVol < p->fadeTargetVol)) {
+                        p->programmedVol = p->fadeTargetVol;
+                        p->fadePer100Hz = lbl_80609598;
+                    }
                 }
-                if (p->programmedVol < 0.0f) {
+                if (p->programmedVol < lbl_80609598) {
                     fn_803AB480(p->handle);
                     continue;
                 }
