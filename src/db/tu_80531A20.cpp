@@ -65,6 +65,56 @@ extern "C" DB_OVERLAY void fn_80531A20(Unk80531A20_T14* self)
     }
 }
 
+extern "C" double fn_80409D88(const char* s);
+
+extern "C" DB_OVERLAY void fn_80531A7C(Unk80531A20_T14* self, const char* path)
+{
+    Unk80533E58_Names nm = *(Unk80533E58_Names*)lbl_805FE998;
+    unsigned n = 0;
+    char* buf = fn_802B9300(path, 0x100, 6, &n);
+    char* end = buf + n;
+    char* p = buf;
+    while (*p != 10 && p < end)
+        p++;
+    char c;
+    do {
+        c = *++p;
+    } while (!((unsigned)(c - 0x30) <= 9 || (unsigned)(c - 0x61) <= 0x19 || (unsigned)(c - 0x41) <= 0x19));
+    unsigned idx = 2;
+    while (p < end) {
+        int len = fn_80379174(p);
+        unsigned k;
+        for (k = 0; k <= 13; k++) {
+            if (fn_8040B750(nm.w[k], p, len) == 0) {
+                idx = k;
+                break;
+            }
+        }
+        while (*p != 0x2C && p < end)
+            p++;
+        p++;
+        float f = (float)fn_80409D88(p);
+        self->m8[idx] = f;
+        unsigned m = 0;
+        unsigned j = 0;
+        do {
+            while (*p != 0x2C && p < end)
+                p++;
+            p++;
+            m++;
+            float g = (float)fn_80409D88(p);
+            self->m40[idx][j] = g;
+            j++;
+        } while (m <= 4);
+        while (*p != 10 && p < end)
+            p++;
+        c = *p;
+        while (!((unsigned)(c - 0x30) <= 9 || (unsigned)(c - 0x61) <= 0x19 || (unsigned)(c - 0x41) <= 0x19) && p < end)
+            c = *++p;
+    }
+    fn_802B961C(buf, 6);
+}
+
 extern "C" DB_OVERLAY float fn_80531D04(Unk80531A20_T14* self, int i)
 {
     return self->m8[i];
@@ -86,6 +136,87 @@ extern "C" DB_OVERLAY void fn_80531D2C(Unk80531D2C_T3* self)
                 self->m8[i][j][k] = lbl_805FE9D0;
         }
     }
+}
+
+extern const char* lbl_80622A28[];
+extern int lbl_8060137C[];
+extern unsigned char lbl_8060139C[];
+extern float lbl_805FE9E0;
+extern "C" void fn_80532078(Unk80531D2C_T3* self, int a, int b, int c, float f);
+
+/* near-miss: 3 differing slots. Control flow, the peeled lookup loop and every call match; the
+ * second-loop counter k2 lands in r28 where retail keeps it in r27 (sharing k with the first
+ * loop, or reordering declarations, moves the first-loop registers instead). */
+extern "C" DB_OVERLAY void fn_80531D84(Unk80531D2C_T3* self, const char* path)
+{
+    int cols[20];
+    unsigned n = 0;
+    char* buf = fn_802B9300(path, 0x100, 6, &n);
+    char* end = buf + n;
+    if (buf != 0 && (int)n > 0) {
+        char* p = buf;
+        while (*p != 0x2C && p < end)
+            p++;
+        p++;
+        unsigned k = 0;
+        do {
+            while (*p != 0x2C && p < end)
+                p++;
+            p++;
+            int v = fn_80409DAC(p);
+            unsigned m;
+            for (m = 0; m <= 19; m++) {
+                if (v == lbl_8060139C[m]) {
+                    cols[k] = m;
+                    break;
+                }
+            }
+            k++;
+        } while (k <= 19);
+        while (*p != 10 && p < end)
+            p++;
+        char c;
+        do {
+            c = *++p;
+        } while (p < end && !((unsigned)(c - 0x30) <= 9) && c != 0x2D);
+        int kind = 0;
+        if (p < end) {
+            do {
+                int col = fn_80409DAC(p) - 1;
+                if (col >= 0) {
+                    while (p < end && *p != 0x2C)
+                        p++;
+                    p++;
+                    char* q = p;
+                    while (p < end && *p != 0x2C)
+                        p++;
+                    int len = p - q;
+                    unsigned s;
+                    for (s = 0; s <= 7; s++) {
+                        if (fn_8040B750(lbl_80622A28[s], q, len) == 0) {
+                            kind = lbl_8060137C[s];
+                            break;
+                        }
+                    }
+                    unsigned k2 = 0;
+                    unsigned j = 0;
+                    do {
+                        while (*p != 0x2C && p < end)
+                            p++;
+                        p++;
+                        k2++;
+                        float f = (float)fn_80409DAC(p) * lbl_805FE9E0;
+                        fn_80532078(self, col, kind, cols[j], f);
+                        j++;
+                    } while (k2 <= 19);
+                }
+                while (*p != 10 && p < end)
+                    p++;
+                p++;
+            } while (p < end);
+        }
+    }
+    fn_802B961C(buf, 6);
 }
 
 extern "C" DB_OVERLAY float fn_80532050(Unk80531D2C_T3* self, int a, int b, int c)
