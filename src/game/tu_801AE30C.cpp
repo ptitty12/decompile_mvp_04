@@ -98,15 +98,28 @@ struct Unk801AE30C_Pair {
     Unk801AB63C_E m4;
     Unk801AB63C_E mC;
 };
+/* Element of the pair table: its constructor is fn_801AE2B0 (loop in fn_801AE30C, evidence: do/while
+ * post-decrement over two 8-byte entries starting at +4). */
+struct Unk801AE30C_Elem : Unk801AB63C_E {
+    Unk801AE30C_Elem() { fn_801AE2B0(this); }
+};
 struct Unk801AE30C_Clr {
     int m0;
-    Unk801AB63C_E m4[2];
+    Unk801AE30C_Elem m4[2];
+    Unk801AE30C_Clr();
 };
 
 struct Unk801AE30C_St {
     char pad0[0x14];
     int m14;
 };
+
+void fn_801AE360(Unk801AE30C_Clr* p);
+
+Unk801AE30C_Clr::Unk801AE30C_Clr()
+{
+    fn_801AE360(this);
+}
 
 void fn_801AE360(Unk801AE30C_Clr* p)
 {
