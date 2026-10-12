@@ -171,10 +171,11 @@ extern const float lbl_805A5FEC;
 extern const float lbl_805A5FF0;
 extern "C" float fn_80410CE8(float y, float x);
 
-/* near-miss (170/170 insns, two load pairs swapped): retail loads the m8C field (m4C, m40) before the spilled
- * local `c` in the second and third compare blocks and compares fcmpu c,field; here `c` is loaded first, and
- * the swapped spelling (field < c) gives the right load order but fcmpu field,c. Same cause as fn_80022A28.
- * The mode chain, the cr7 compare sharing and the 8-byte fabs temp (inline Abs) all match. */
+/* Field reads through inline accessors: an inline's result is computed while the compare's
+ * second operand is expanded, so the field load comes before the spilled float operand, as
+ * in retail (fcmpu c,field). A plain `c > m->m4C` loads c first. */
+inline float Unk80022780_M4C(const Unk8002118C* m) { return m->m4C; }
+inline float Unk80022780_M40(const Unk8002118C* m) { return m->m40; }
 inline float Unk80022780_Abs(float v) { return (float)__builtin_fabs(v); }
 
 extern "C" int fn_80022780(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode, float a, float b, float c, float d, int side, int cnt)
@@ -215,9 +216,9 @@ extern "C" int fn_80022780(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode,
             r = 1;
         } else {
             Unk8002118C* m = x->m8C;
-            if (!(len > m->m50) && !(c > m->m4C))
+            if (!(len > m->m50) && !(c > Unk80022780_M4C(m)))
                 r = 3;
-            else if (!(c > m->m40))
+            else if (!(c > Unk80022780_M40(m)))
                 r = 6;
             else if (!(c > m->m44) && !(len > m->m48))
                 r = 2;
@@ -248,9 +249,7 @@ static inline float Unk80022BE0_Len(const Unk801A4B34_Vec3& v)
 
 extern const float lbl_805A5FF4;
 
-/* near-miss (110/110 insns, one load pair swapped): retail loads m5C before the spilled `a` for the first
- * compare of the block (fcmpu a,m5C); every spelling gives a-first or the swapped fcmpu. Same cause as
- * fn_80022BE0. The goto chain reproduces retail's threaded branch layout. */
+inline float Unk80022A28_M5C(Unk8002118C* m) { return m->m5C; }
 extern "C" int fn_80022A28(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode, float a, float b)
 {
     int r = -1;
@@ -263,7 +262,7 @@ extern "C" int fn_80022A28(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode,
         r = 4;
         goto end;
     }
-    if (a <= x->m8C->m5C)
+    if (a <= Unk80022A28_M5C(x->m8C))
         goto l80;
     if (a <= x->m8C->m78)
         goto l40;
@@ -297,8 +296,7 @@ end:
     return r;
 }
 
-/* near-miss (97%): retail loads m20 first and compares fcmpu len1,m20; every spelling tried
- * (len1 > m20, m20 < len1, >=, nested, local) gives len1-first or the swapped branch. */
+inline float Unk80022BE0_M20(const Unk8002118C* m) { return m->m20; }
 extern "C" int fn_80022BE0(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode)
 {
     float len1;
@@ -307,7 +305,7 @@ extern "C" int fn_80022BE0(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode)
     float len2 = Unk80022BE0_Len(*pos);
     if (len1 <= x->m8C->m1C || !(Unk80022BE0_Len(*pos) > x->m8C->m1C))
         return 0;
-    if (!(len1 > x->m8C->m20))
+    if (!(len1 > Unk80022BE0_M20(x->m8C)))
         return 1;
     float thr = 0.0f;
     switch (mode) {
@@ -318,11 +316,16 @@ extern "C" int fn_80022BE0(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode)
         thr = x->m90 + x->m8C->m24;
         break;
     case 1:
+        thr = x->m94 + x->m8C->m24;
+        break;
     case 3:
         thr = x->m94 + x->m8C->m24;
         break;
     }
-    return len2 > thr ? 3 : 2;
+    int r = 3;
+    if (!(len2 > thr))
+        r = 2;
+    return r;
 }
 
 extern "C" void fn_80022D64(Unk80021A60_Data* x, Unk801A4B34_Vec3 a, Unk801A4B34_Vec3 b, Unk801A4B34_Vec3 c)
@@ -504,22 +507,24 @@ extern "C" int fn_80023838(Unk80023AC4_Obj* x, Unk8001F2C4_World* w)
     return r;
 }
 
-/* near-miss: 37/38 insns. Retail keeps the index in r31 inside the `idx == 0` branch
- * (stwx/lwzx with the register); here GCC folds it to 0. Tried <=, unsigned and else forms. */
+/* In the idx == 0 branch CSE knows idx is 0: the zero stores take idx's register (r31), and the
+ * slot is addressed as arr + idx (an unscaled offset, equal to arr[0] there), as retail's
+ * lwzx/stwx with r31 show. A scaled arr[idx] folds to a plain 128(x) access, and so does the
+ * offset when it goes through an inline parameter. */
 extern "C" void fn_8002395C(Unk80023AC4_Obj* x, int idx)
 {
     if (idx == 0) {
         Unk8001F2C4_World** arr = x->m80;
         char* sub = (char*)x + 0xBC;
-        fn_80378ACC(sub, fn_801A4CE8(arr[idx], 1));
+        fn_80378ACC(sub, fn_801A4CE8(*(Unk8001F2C4_World**)((char*)arr + idx), 1));
         char* q = 0;
-        if (arr[idx]->m6E4 != 0)
-            q = arr[idx]->m6E4 + 0x360;
+        if ((*(Unk8001F2C4_World**)((char*)arr + idx))->m6E4 != 0)
+            q = (*(Unk8001F2C4_World**)((char*)arr + idx))->m6E4 + 0x360;
         fn_80378ACC(sub, q);
         fn_8003A058(fn_80038EB4(), 0);
-        arr[idx] = (Unk8001F2C4_World*)idx;
-        x->mCC = idx;
-        x->mC8 = (Unk8001F5CC_Tbl*)idx;
+        *(Unk8001F2C4_World**)((char*)arr + idx) = 0;
+        x->mC8 = 0;
+        x->mCC = 0;
         x->m7C = -1;
         fn_8003B378(x->m6C8);
     }
