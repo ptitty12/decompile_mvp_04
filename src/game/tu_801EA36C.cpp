@@ -225,6 +225,50 @@ extern "C" void fn_801E81C8(I* o);
 
 /* near-miss: control flow and calls match; retail stores the three zero ints with a fresh li r0,0 (not the r30 result flag) and
    schedules the float constant loads and the mF8 block stores differently */
+struct Unk801EAC60_V {
+    char pad0[0x3F4];
+    float m3F4;
+    char pad3F8[0x448 - 0x3F8];
+    int m448;
+};
+extern "C" float fn_8018A214(void* o);
+extern "C" int fn_8018AD2C(void* o);
+extern "C" float fn_8018CDB8(void* o, int k, float t);
+extern "C" int fn_80195E60(int o, int q);
+
+extern "C" void fn_801EAC60(I* s)
+{
+    Unk801DB948_Obj* o = s->m9C->m4;
+    float a = fn_8018A214(o);
+    float b = fn_8018CDB8(o, 4, ((Unk801EAC60_V*)o)->m3F4);
+    float c = fn_8018CDB8(o, 3, ((Unk801EAC60_V*)o)->m3F4);
+    float d = 12.0f;
+    if (s->m9C->m0->m6F4 != 9 || o->m38C == 1) {
+        if (c != -1.0f) {
+            if (!(c >= d))
+                d = c + 0.5f;
+        }
+        if (fn_8018AD2C(o) != 0) {
+            int r = fn_80195E60(((Unk801EAC60_V*)o)->m448, ((Unk801EAC60_V*)o)->m448 + 0xAB4);
+            if (r == 1) {
+                s->mC0 = 1;
+            } else {
+                if (!(b <= 0.0f))
+                    a = d;
+                if (a >= d)
+                    s->mC0 = 1;
+                else {
+                    float e1 = fn_8018CDB8(o, 1, ((Unk801EAC60_V*)o)->m3F4);
+                    if (!(e1 <= 0.0f))
+                        s->mC0 = 1;
+                }
+            }
+        }
+        if ((unsigned)(s->m9C->m34 - 2) <= 2)
+            s->mC0 = 1;
+    }
+}
+
 extern "C" int fn_801EADD4(I* s)
 {
     int r = 0;
