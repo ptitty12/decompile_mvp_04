@@ -325,6 +325,30 @@ extern "C" FE_OVERLAY int fn_805073EC(FeScrN* x)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_80507474(FeScrQ* q)
+{
+    FeScrA* s = (FeScrA*)q;
+    if (s->m154 == 0) {
+        ((FeWQ7*)s->m144[0])->s38(1);
+        fn_80507E8C(q);
+        fn_80505F40(q, 2, -1, -1);
+    } else if (fn_80507C80(s) == 0) {
+        if (((FeWQ7*)s->m13C[1])->s59() > 0) {
+            if (((FeWQ7*)s->m13C[1])->s60() + 10 < ((FeWQ7*)s->m13C[1])->s59()) {
+                FeWQ7* t = (FeWQ7*)s->m13C[1];
+                t->s68(t->s60() + 10);
+            } else {
+                FeWQ7* t = (FeWQ7*)s->m13C[1];
+                t->s68(t->s59() - 1);
+            }
+            ((FeWQ7*)fn_800C805C(s->fn_vslot32(lbl_805FB5E0, 1)))->s38(1);
+            fn_80507DD0(q);
+            fn_80505F40(q, -1, -1, -1);
+        }
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_80507640(FeScrN* x)
 {
     x->m144->fn_vslot39();
