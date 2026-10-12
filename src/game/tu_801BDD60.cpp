@@ -30,7 +30,16 @@ void fn_801B8248(P* p, const Vec3* v);
 void fn_801B848C(P* p);
 void fn_801B84D0(P* p);
 void fn_801B8514(P* p);
+void fn_801B8558(P* p);
+void fn_801B8874(P* p);
+void fn_801B82AC(P* p, const Vec3* a, P* q, int flag);
+void fn_801B838C(P* p, const Vec3* a, P* q, int flag);
+int fn_801BBC54(A* a);
 }
+struct Unk801BDD60_Sim {
+    char pad0[0x3BC];
+    A* m3BC;
+};
 
 extern Vec3 lbl_806055AC;
 extern Vec3 lbl_805D0058;
@@ -217,6 +226,25 @@ extern "C" void fn_801BFCEC(O* o, P* q)
     }
 }
 
+extern "C" void fn_801BFEC0(O* o, P* q, int mode)
+{
+    const Vec3* pos = &q->m60;
+    Vec3 v = *pos;
+    P* p = fn_801C0248(o, &v);
+    if (p) {
+        if (mode == 1) {
+            v = *pos;
+            fn_801B82AC(p, &v, q, 1);
+        } else if (fn_801BBC54(((Unk801BDD60_Sim*)o->m0->m700)->m3BC) == 1) {
+            v = *pos;
+            fn_801B838C(p, &v, q, 0);
+        } else {
+            v = *pos;
+            fn_801B838C(p, &v, q, 1);
+        }
+    }
+}
+
 extern "C" void fn_801BFFCC(O* o, P* q)
 {
     P* p = fn_801C01E4(o, 3);
@@ -250,6 +278,24 @@ extern "C" void fn_801C00BC(O* o, P* q)
         fn_801B8514(p);
 }
 
+/* near-miss: same code; retail loads v.z (f13) before the first compare, ours after the branch. */
+extern "C" void fn_801C0134(O* o, P* q)
+{
+    P* a = 0;
+    P* b = 0;
+    Vec3 v = q->m60;
+    int xp = v.x > 0.0f;
+    if (!xp) {
+        if (!(v.z <= 0.0f))
+            a = fn_801C01E4(o, 0);
+    } else
+        b = fn_801C01E4(o, 2);
+    if (a)
+        fn_801B8558(a);
+    else if (b)
+        fn_801B8874(b);
+}
+
 extern "C" P* fn_801C01E4(O* o, int i)
 {
     int j;
@@ -268,6 +314,24 @@ extern "C" P* fn_801C01E4(O* o, int i)
         break;
     }
     return fn_801A4C74(o->m0, j);
+}
+
+extern "C" P* fn_801C0248(O* o, const Vec3* v)
+{
+    float best = 0.0f;
+    int bi = -1;
+    int j = 0;
+    do {
+        P* p = fn_801A4C74(o->m0, j);
+        Vec3 d = *v - p->m60;
+        float dist = d.x * d.x + d.z * d.z;
+        if (bi == -1 || !(dist >= best)) {
+            best = dist;
+            bi = j;
+        }
+        j++;
+    } while (j <= 3);
+    return fn_801A4C74(o->m0, bi);
 }
 
 Unk801C0334::Unk801C0334()
