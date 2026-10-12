@@ -6,6 +6,15 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+struct Unk8024EF40_W;
+struct Unk80057204_Mgr;
+extern "C" int rand();
+void fn_80011F78();
+void fn_800135A4(int a, int b);
+void fn_800136D0();
+int fn_800974B8(void* p, int a);
+int fn_80253DF4(Unk8024EF40_W* w, int a, int b);
+int fn_80045C8C(Unk80044C10_A* a);
 struct Unk8004D56C_Slot {
     int m0;
     int m4;
@@ -299,6 +308,31 @@ void fn_8004C4D0(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
             }
         }
     }
+}
+
+void fn_8004C8E0(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    unsigned sa = 0;
+    int t = a->m3B4;
+    Unk80044C10_B* b = EntObj(s, idx);
+    int o0 = t * 0xE64;
+    unsigned char* base = (unsigned char*)b->m6F8->m14;
+    sa = Unk8004BC9C_SumRow((Unk8004BC9C_Row*)(base + o0));
+    int z = t == 0;
+    int o1 = z * 0xE64;
+    unsigned sb = Unk8004BC9C_SumRow((Unk8004BC9C_Row*)(base + o1));
+    if (rand() % 10 == 5 && a->m0 > 1)
+        fn_80011F78();
+    Unk80044C10_A* g = a->m130;
+    if (fn_800974B8((char*)b->m6F8->m14 + g->m708 * 0xE64, g->m704) != 0 && fn_80253DF4((Unk8024EF40_W*)((char*)a->m130 + 0x588), 1, 0) == 1)
+        fn_800136D0();
+    if (fn_80253DF4((Unk8024EF40_W*)((char*)a->m130 + 0x588), 1, 0) == 7 && a->m0 == 7 && sb < sa) {
+        int x = fn_80045C8C(a->m130);
+        fn_800135A4(x, ((Unk8001CE80*)a)->fn_8001DC58());
+    }
+    s->mA54 = 0;
+    s->mA58 = (unsigned)rand() % 6;
+    fn_80058060((Unk80057204_Mgr*)s->mA9C, 1);
 }
 
 void fn_8004CA98(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
