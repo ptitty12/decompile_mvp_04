@@ -1089,7 +1089,7 @@ config.libs = [
             Object(Matching, "snd/cmn/sbplay.c"),
             Object(NonMatching, "snd/tu_803A8648.cpp"),
             Object(Matching, "snd/cmn/sbvalid.c"),
-            Object(NonMatching, "snd/cmn/scheckpo.c"),
+            Object(Matching, "snd/cmn/scheckpo.c"),
             Object(NonMatching, "snd/tu_803A8860.cpp"),
             Object(NonMatching, "snd/cmn/smemcpy.c"),
             Object(NonMatching, "snd/cmn/smemman.c"),
