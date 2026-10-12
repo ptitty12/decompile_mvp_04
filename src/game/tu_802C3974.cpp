@@ -223,6 +223,74 @@ void fn_802C3C08(Unk802C3B60* o, int c)
     }
 }
 
+struct Unk802C3D2C_Elem {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+};
+
+extern const char lbl_805E1438[];
+extern int lbl_806EE9F0;
+void* fn_803774A8(unsigned n, int heap);
+void* fn_802BB19C();
+int fn_802BB27C(void* o, int idx);
+int fn_803ED604(const char* name, int size, int flags);
+int fn_803ED634(const char* name, int size, int flags);
+
+/* near-miss (101/101 insns, register names only): retail keeps the byte offset in r27, the array base in r28 and the label hi-part in r26; ours r28/r26/r27 */
+void fn_802C3D2C(Unk802C3B60* o, int n)
+{
+    if (o->m24C != 0)
+        fn_802C3EC0(o);
+    int i = 0;
+    void* p = fn_803774A8((n + 3) * 0x30, 0);
+    o->m250 = n;
+    o->m24C = (int)p;
+    int h = fn_802BB27C(fn_802BB19C(), 0);
+    if (o->m250 + 3 > 0) {
+        int off = 0;
+        do {
+            char* base = (char*)o->m24C;
+            Unk802C3D2C_Elem* e = (Unk802C3D2C_Elem*)(base + off);
+            e->m18 = fn_802C72F4(0x10, 0x10, 0x10);
+            int v;
+            if (i == 0 || i > 2) {
+                e->mC = fn_802C72F4(0x100, 0x20, 0);
+                e->m10 = fn_802C72F4(0x40, 0x40, 0);
+                e->m14 = fn_802C72F4(0x20, 0x20, 0);
+                e->m4 = fn_803ED634(lbl_805E1438, 0x4070, h | 0x400);
+                if (e->m4 == 0)
+                    e->m4 = fn_803ED604(lbl_805E1438, 0x4070, lbl_806EE9F0 | 0x400);
+                v = e->m4;
+            } else {
+                e->mC = ((Unk802C3D2C_Elem*)o->m24C)->mC;
+                e->m10 = ((Unk802C3D2C_Elem*)o->m24C)->m10;
+                e->m14 = ((Unk802C3D2C_Elem*)o->m24C)->m14;
+                e->m4 = ((Unk802C3D2C_Elem*)o->m24C)->m4;
+                v = ((Unk802C3D2C_Elem*)o->m24C)->m0;
+            }
+            *(int*)(base + off) = v;
+            i++;
+            e->m24 = 0;
+            off += 0x30;
+            e->m8 = 0;
+            e->m28 = 0;
+            e->m2C = 0;
+            e->m20 = 0;
+            e->m1C = 0;
+        } while (i < o->m250 + 3);
+    }
+}
+
 void fn_802C4030(Unk802C3B60* o)
 {
     if (o->m24C != 0) {
@@ -524,4 +592,41 @@ unsigned fn_802C6B74(unsigned r, unsigned g, unsigned b)
 unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b)
 {
     return (r << 16) | 0xFF000000 | (g << 8) | b;
+}
+
+struct Unk802C72F4_Tex {
+    char pad0[0xC];
+    unsigned int mC;
+    int m10;
+};
+
+int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+Unk802C72F4_Tex* fn_803EBF90();
+int fn_803EC984(int h);
+void fn_803EC054(int h);
+void fn_802C6BA4(int a, int b);
+
+/* near-miss (51 vs 52 insns): retail copies the fn_803EC984 result into a second callee-saved register after fn_803EC054 (mr r31,r30) and returns that copy */
+int fn_802C72F4(int a, int b, int c)
+{
+    int n = 8;
+    if (c > 0)
+        n = c;
+    int h;
+    if (n == 8) {
+        h = fn_803EBBA4(a, b, 8, 0xF, 0, 0x500, 0, 0);
+        Unk802C72F4_Tex* t = fn_803EBF90();
+        int* p;
+        if (t->mC & 0x10000000)
+            p = (int*)((char*)t + t->m10);
+        else
+            p = (int*)((char*)t + 0x10);
+        *p = 0;
+    } else {
+        h = fn_803EBBA4(a, b, n, 0, 0, 0x500, 0, 0);
+    }
+    int r = fn_803EC984(h);
+    fn_803EC054(h);
+    fn_802C6BA4(r, n);
+    return r;
 }
