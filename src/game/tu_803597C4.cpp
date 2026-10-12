@@ -171,9 +171,7 @@ void fn_80359C08(void* self, int c)
         fn_80377408(self);
 }
 
-extern "C" /* near-miss: 1 slot. Retail's first memset (after the vptr store) has `crclr cr1eq`, the second does not: the
-   first is a compiler-generated clear (a polymorphic class: vptr store and member init), the second an
-   explicit call. A `m4()` member initialiser clears before the base ctor call instead. */
+extern "C"
 Unk80359C58* fn_80359C58()
 {
     if (lbl_8068B8A8 == 0) {
@@ -184,7 +182,6 @@ Unk80359C58* fn_80359C58()
     return &lbl_8068B884;
 }
 
-/* near-miss: same crclr slot as fn_80359C58 (inline ctor of Unk80359C58) */
 Unk80359C58* fn_80359CF8() { return new (0x100) Unk80359C58; }
 
 int fn_80359D78(int* self) { return ++self[8]; }
