@@ -520,7 +520,7 @@ struct Unk800CFEEC_Data {
 };
 struct Unk800CFEEC_Raw : Unk800CFEEC_Data {
     const void* m24;
-    void fn_800CFEEC(int flag);
+    Unk800CFEEC_Raw* fn_800CFEEC(int flag); /* ctor: r3 = this at its blr */
 };
 struct Unk800CFEEC_Sel : Unk800CFEEC_Data {
     virtual int fn_vslot1();
