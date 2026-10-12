@@ -4,6 +4,7 @@
  */
 #include "game/tu_801D31D8.h"
 #include "game/tu_801800FC.h"
+#include "game/tu_801B7FB0.h"
 
 inline void* operator new(unsigned int, void* p) { return p; }
 
@@ -138,6 +139,57 @@ extern "C" void fn_801D5650(B* s)
     t = (float)r * x * lbl_805D2C10;
     hi = lbl_805D2C14;
     s->m44.m4 = b * (t * (hi - lo) + lo) + a;
+}
+
+struct Unk801D31D8_V2 {
+    float x;
+    float y;
+};
+struct Unk801D31D8_M34 {
+    char pad0[0x3A4];
+    void* m3A4;
+};
+typedef Unk801D31D8_V2 (*Unk801D31D8_VaFn)(void*, ...);
+extern "C" Unk801D31D8_V2 fn_801CD94C(void* p);
+extern "C" int fn_801D112C(B* s);
+extern "C" int fn_801D1198(B* s);
+extern "C" void fn_801D49CC(B* s);
+extern "C" void fn_801D5158(B* s);
+extern "C" void fn_801D53D4(B* s);
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
+{
+    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+struct Unk801D31D8_W {
+    char pad0[0x34];
+    Unk801D31D8_M34* m34;
+};
+
+extern "C" void fn_801D573C(B* s)
+{
+    if (fn_801D3798(s))
+        fn_801D5650(s);
+    else if (fn_801D112C(s))
+        fn_801D5158(s);
+    else if (fn_801D1198(s))
+        fn_801D53D4(s);
+    else
+        fn_801D49CC(s);
+    if (s->m44.m8 == 0) {
+        int h = ((Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30))->v24();
+        Unk801D31D8_V2 v = ((Unk801D31D8_VaFn)fn_801CD94C)(((Unk801D31D8_W*)s)->m34->m3A4);
+        float t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
+        if (h != 0)
+            t = -t;
+        int ok = 1;
+        if (!(AbsF(t) <= 0.85f))
+            ok = RandG(s->m30, 1.0f, lbl_805D25E0, 0x855) >= 0.25f;
+        if (ok)
+            s->m44.mC = t;
+        else
+            s->m44.mC = -t;
+    }
 }
 
 extern "C" int fn_801D5914(B* s, int a, int b)
