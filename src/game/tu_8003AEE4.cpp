@@ -21,7 +21,7 @@ int fn_80235C68(int a);
 int fn_8040ABA0();
 int fn_80047218(int a);
 void fn_8001B674(int a, int b);
-void fn_8003D944(Unk8003A5DC* self, int a, int b, int c, int d);
+int fn_8003D944(Unk8003A5DC* self, int a, int b, int c, int d);
 void fn_8003E7F4();
 int fn_8009E1D4(void* p, int a, int b);
 int fn_800471DC(int a, int b, int c);
@@ -536,10 +536,7 @@ void fn_8003C710(Unk8003A5DC* self, int a)
     }
 }
 
-/* near-miss: 97/97 slots, only the argument setup of the seven fn_8003D944
- * calls differs: retail puts "mr r3,r31" last for the calls with 0x78, 0x12C,
- * 0x1E0 and 0x3FC but early for 0x294 and 0x348, and after "li r4" for the
- * last one; here it is early everywhere. An inline helper did not change it. */
+/* fn_8003D944 returns int (ends mr r3,r10); that decides where each "mr r3,r31" lands. */
 void fn_8003C804(Unk8003A5DC* self, int a)
 {
     Unk800475EC_Obj* o = fn_800475EC();
