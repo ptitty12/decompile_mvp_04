@@ -309,7 +309,7 @@ extern "C" float fn_801CC30C(Z* z)
     if (p->v4() == 0)
         w = -w;
     float c = UNK801CAFA0_CLAMP(AbsF(v.x), 0.0f, 0.5f);
-    c = 2.0f * (1.0f - c);
+    c = 2.0f * (0.5f - c);
     c = !(c > 0.7f) ? (c >? 0.0f) : 0.7f;
     w = w * 0.75f;
     float d = w - v.x;
