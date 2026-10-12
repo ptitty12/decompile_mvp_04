@@ -4,6 +4,8 @@
  */
 #include "game/tu_8024B99C.h"
 #include "game/chooser.h"
+#include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_8028C6B8.h"
 
 /* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
  * unchanging, so sched1 keeps them below preceding stores (retail's order). */
@@ -39,6 +41,48 @@ void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
 void fn_80249D64(Unk80270BA0_X* x, int a);
 float fn_8023C868(Unk80270BA0_X* x);
 
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Unk80246D04_LenSq(const Unk80273498_Vec3& v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+inline Unk80273498_Vec3 Unk80246D04_Copy(const Unk80273498_Vec3* p)
+{
+    return *p;
+}
+
+extern const float lbl_805D9278;
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk80270BA0_X* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, float* d);
+void fn_8027D368(Unk8027C728_Goal* g);
+
+extern const float lbl_805D9270;
+void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p);
+extern "C" void fn_80255058__Fv(void* p);
+float fn_804028E4(float x);
+
+int fn_8024778C(Unk80270BA0_X* x, Unk80273498_Vec3* p)
+{
+    Unk80273498_Pos* t = ((Unk8024B99C_V*)x)->m928;
+    if (t != 0) {
+        if (!(fn_804028E4(Unk80246D04_LenSq(*p - t->m60)) >= lbl_805D9270)) {
+            fn_8024A674(x, t);
+            fn_80255058__Fv((char*)t + 0x58C);
+        }
+    }
+    return 1;
+}
+
 void fn_80247858(Unk80270BA0_X* x)
 {
     fn_8014E498(x->m60);
@@ -49,6 +93,22 @@ float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g,
 float atan2f(float y, float x);
 /* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
    equal-priority parameters); tried single-call, result-variable and else forms */
+extern "C" float fn_802478A0(void* o, void* p, int a, int b)
+{
+    float f;
+    Unk8027C728_Goal* g = fn_802448F4((Unk80270BA0_X*)o, 1);
+    Unk8027A84C* g104;
+    ((Unk8028C6B8_Goal*)(g->m10 = 4, g104 = (Unk8027A84C*)g->m104, fn_8027C728(g), g->m18))->fn_8028ED30(*(Unk80273498_Vec3*)p);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = b;
+    g104->m40 = b;
+    if (fn_8027D390(g, &f, 0, 0, 0) == 0)
+        f = lbl_805D9278;
+    fn_8027D368(g);
+    return f;
+}
+
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
 {
     float len = fn_804028E4((p->x - q->x) * (p->x - q->x) + (p->z - q->z) * (p->z - q->z));
@@ -300,4 +360,4 @@ void fn_8024A584(Unk80270BA0_X* x, float f)
     ((Unk8024B99C_V*)x)->mB18 = f;
 }
 
-void fn_8024A674() {}
+void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p) {}

@@ -14,6 +14,7 @@
  * +0x91C Vec3 copies (fn_8024D1A4/D178), +0x918 an int.
  */
 struct Unk80270BA0_X;
+struct Unk80273498_Pos;
 
 struct Unk8024B99C_V3 {
     int a;
@@ -75,7 +76,8 @@ struct Unk8024B99C_V {
     int m914;
     int m918;
     Unk8024B99C_V3 m91C;
-    char pad928[0x934 - 0x928];
+    Unk80273498_Pos* m928;
+    char pad92C[0x934 - 0x92C];
     Unk8027C728_Goal* m934;
     char pad938[0xAE0 - 0x938];
     int mAE0;
