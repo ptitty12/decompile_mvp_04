@@ -174,6 +174,82 @@ inline int CurId(Unk8016C1C4_List* l)
     return 0;
 }
 
+extern "C" char* fn_801519D8(int id);
+extern "C" int fn_80151A18(char* h, int j);
+extern "C" int fn_80151A28(char* h, int j);
+extern "C" int fn_80151A38(char* h, int j);
+extern "C" void fn_803295F0();
+extern "C" void fn_803296AC();
+struct Unk8016C004_X {
+    char pad0[0x120];
+    int m120;
+};
+struct Unk8016C004_W {
+    char pad0[0x10];
+    Unk8016C004_X* m10;
+};
+struct Unk8016C004_G {
+    char pad0[4];
+    Unk8016C004_W* m4;
+};
+extern Unk8016C004_G* lbl_806192E0;
+
+/* near-miss (99.9%): only the registers of the two strided list pointers in the last loop are swapped
+ * (retail r27 = +0x15C, r28 = +0x158; here the other way round). The CR0 save (mfcr/mtcrf) comes from the
+ * redundant second test of h. */
+void Unk8016C1C4_List::fn_8016C004(int a, int b) /* 8016C004 */
+{
+    char* h = fn_801519D8(a);
+    if (h == 0) {
+        ((Unk8016ACAC_Slot*)this)->fn_8016C6DC();
+        return;
+    }
+    if (b != 0) {
+        int p = (int)this;
+        int end = p + 0x968;
+        do {
+            fn_80359948((Unk8016C1C4_List*)p, 0);
+            ((Unk8016C1C4_List*)p)->mCur = 0;
+            p += 0xAC;
+        } while (p <= end);
+    }
+    for (int j = 0; j <= 0xC; j++) {
+        ((Unk801527C8_Ctx*)this)->fn_8016CE5C(j + 2);
+    }
+    fn_803295F0();
+    fn_803296AC();
+    if (h != 0) {
+        int one = 1;
+        if (mCur >= 0) {
+            m4[mCur].m0 = one;
+        }
+        fn_8016C620(0, (int)h + 4);
+        Unk8016C1C4_List* l1 = this + 1;
+        if (l1->mCur >= 0) {
+            l1->m4[l1->mCur].m0 = one;
+        }
+        fn_8016C620(1, (int)h + 0x14);
+        for (int j = 0; j <= 0xC; j++) {
+            if (fn_80151A28(h, j) != 0) {
+                char* pe = (char*)this + 0x15C + j * 0xAC;
+                int* pc = (int*)((char*)this + 0x158 + j * 0xAC);
+                int c = *pc;
+                int w = 1;
+                if (c >= 0) {
+                    *(int*)(pe + c * 0x14) = w;
+                }
+                int n = j + 2;
+                ((Unk801527C8_Ctx*)this)->fn_8016D038(n, fn_80151A38(h, j));
+                fn_8016C620(n, fn_80151A18(h, j));
+            }
+        }
+    }
+    ((Unk8016ACAC_Slot*)this)->mA20 = a;
+    if (lbl_806192E0->m4->m10->m120 == 1) {
+        *(float*)fn_801A6D84(((Unk801527C8_Ctx*)this)->mA4C, 1) = -1.0f;
+    }
+}
+
 int Unk8016C1C4_List::fn_8016C1C4(int idx) /* 8016C1C4 */
 {
     return CurId(this + idx);
@@ -792,6 +868,54 @@ void fn_8016D458(Unk8016D778_S* self) /* 8016D458 */
     }
 }
 
+int fn_8016D580(Unk8016D778_S* self) /* 8016D580 */
+{
+    if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AF4C() != 0) {
+        return 0;
+    }
+    int flag = 0;
+    int c;
+    int d;
+    int a = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 4);
+    int b = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 3);
+    if (lbl_806192E0->m4->m10->m120 == 1) {
+        if (*(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) != -1.0f) {
+            *(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) -= 1.0f;
+            flag = *(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) < 0.0f;
+        }
+    }
+    if (a == -1 && b == -1) {
+        int i;
+        for (i = 0; i <= 3; i++) {
+            if (fn_802D7DB4(i, 0x5A) != 0 || fn_802D7DB4(i, 0xB8) != 0) {
+                flag = 1;
+                break;
+            }
+        }
+    } else {
+        c = 0;
+        d = 0;
+        if (a != -1) {
+            if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AD7C(4) != 0) {
+                c = 1;
+            }
+        }
+        if (b != -1) {
+            if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AD7C(3) != 0) {
+                d = 1;
+            }
+        }
+        if (c != 0 && (fn_802D7DB4(a, 0x5A) != 0 || fn_802D7DB4(a, 0xB8) != 0)) {
+            flag = 1;
+        }
+        if (d != 0 && (fn_802D7DB4(b, 0x5A) != 0 || fn_802D7DB4(b, 0xB8) != 0)) {
+yes:
+            flag = 1;
+        }
+    }
+    return flag;
+}
+
 /* near-miss: frame layout only (8 slots): retail has the two ids at sp+8/0xC and the clamp iterator at sp+0x10;
  * here the iterator (dtor object) gets sp+8 and the ids sp+0x10. Declaration order, scopes, volatile counter and
  * dtor-bearing id struct tried. */
@@ -896,6 +1020,31 @@ int Unk8016D9A0::fn_8016DBF0() /* 8016DBF0 */
         }
     }
     return 0;
+}
+
+void Unk8016D9A0::fn_8016DFD0() /* 8016DFD0 */
+{
+    int p = (int)this;
+    int end = p + 0x1900;
+    do {
+        Unk8016D128_Elem* e = (Unk8016D128_Elem*)p;
+        for (int j = 0; j < 8; j++, e++) {
+            e->name[0] = 0;
+            e->m3C = 0;
+            e->m40 = 0;
+            e->m44 = 0;
+            e->m48 = 0;
+            e->m4C = 0;
+            e->m50 = lbl_805EBA10;
+            e->m68 = lbl_805EBA10;
+            e->m80 = lbl_805EBA10;
+            e->m98 = 0;
+            e->m9C = 0xAE;
+        }
+        p += 0x500;
+    } while (p <= end);
+    m1E00 = 0;
+    fn_8016E18C();
 }
 
 /* near-miss: retail keeps a separate copy of the previous offset (r29 = r27) for the loop update; 4 loop forms tried */

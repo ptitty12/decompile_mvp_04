@@ -71,7 +71,7 @@ public:
     virtual int fn_80005B74(int a);
     virtual int fn_801757C8();
     virtual void fn_80005A7C(Unk8016FF40* info);
-    virtual int fn_80005E8C();
+    virtual int fn_80005E8C(int a);
     virtual void fn_80005A50();
     virtual void fn_80005F4C(int a, int b, int c);
     virtual int fn_80170B3C();

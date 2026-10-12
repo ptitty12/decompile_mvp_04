@@ -171,7 +171,7 @@ public:
     char pad4E[2];
     int m50[4];                  /* 0x50..0x100 is cleared as one 0xB0-byte block */
     int m60[4];
-    char pad70[4];
+    int m70;
     int m74;
     unsigned short m78[0xB];
     unsigned short m8E[0x10];

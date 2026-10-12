@@ -178,6 +178,11 @@ Unk8037B3E8* cScriptLoadAnimations::fn_vslot5() /* 80169878 */
     return new (lbl_806EF9B4) cScriptLoadAnimations;
 }
 
+void Unk8016D9A0_Rec::fn_80169BF8(const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e) /* 80169BF8 */
+{
+    fn_8016994C(name, 0xAE, a, b, c, d, blk, e);
+}
+
 int fn_80169DC4(char* base) /* 80169DC4 */
 {
     int p = (int)base;
@@ -197,6 +202,87 @@ int fn_80169DC4(char* base) /* 80169DC4 */
     return 0;
 }
 
+extern "C" void* fn_80151684(void* self);
+extern "C" void* fn_801522E4(void* self);
+extern "C" void* fn_80150E1C(void* self);
+extern "C" void* fn_80151A48(void* self);
+extern "C" void* fn_80151C40(void* self);
+extern "C" void* fn_801525F0(void* self);
+
+void fn_80169E38() /* 80169E38 */
+{
+    fn_80151684(operator new(0x160, lbl_806EF9B4));
+    new (lbl_806EF9B4) cTeleportActor;
+    new (lbl_806EF9B4) cPlayAnimation;
+    new (lbl_806EF9B4) cScriptUmpireSignal;
+    new (lbl_806EF9B4) cScriptRunGoal;
+    new (lbl_806EF9B4) cScriptReachGoal;
+    new (lbl_806EF9B4) cScriptIdleGoal;
+    new (lbl_806EF9B4) cGoto;
+    new (lbl_806EF9B4) cLoop;
+    new (lbl_806EF9B4) cGosub;
+    new (lbl_806EF9B4) cPlayManagerArgumentScript;
+    new (lbl_806EF9B4) cPause;
+    fn_801522E4(operator new(0x14, lbl_806EF9B4));
+    new (lbl_806EF9B4) cAssignOnDeckBatter;
+    new (lbl_806EF9B4) cSimToEndOfPlay;
+    new (lbl_806EF9B4) cScriptStopSavingReplay;
+    new (lbl_806EF9B4) cScriptCrowdCameraFlash;
+    new (lbl_806EF9B4) cScriptWaitGoal;
+    new (lbl_806EF9B4) cSetCamera;
+    new (lbl_806EF9B4) cScriptPIP;
+    new (lbl_806EF9B4) cScriptViewport;
+    fn_80150E1C(operator new(0x14, lbl_806EF9B4));
+    new (lbl_806EF9B4) cWaitForAnimation;
+    new (lbl_806EF9B4) cSetOverlay;
+    new (lbl_806EF9B4) cGeneralScriptConditional;
+    fn_80151A48(operator new(0x1C, lbl_806EF9B4));
+    new (lbl_806EF9B4) cGosubRandom;
+    new (lbl_806EF9B4) cScriptReplay;
+    fn_80151C40(operator new(0x68, lbl_806EF9B4));
+    new (lbl_806EF9B4) cTransitionWipe;
+    new (lbl_806EF9B4) cWait;
+    new (lbl_806EF9B4) cHomerunCelebration;
+    new (lbl_806EF9B4) cScriptParticleEffect;
+    new (lbl_806EF9B4) cWaitForActiveActors;
+    new (lbl_806EF9B4) cPlayerAttributes;
+    new (lbl_806EF9B4) cSpawnProcess;
+    new (lbl_806EF9B4) cSetDepthOfField;
+    fn_801525F0(operator new(0x1C, lbl_806EF9B4));
+    new (lbl_806EF9B4) cScriptLoadAnimations;
+}
+
+extern const char lbl_8065EC38[];
+extern "C" void fn_80359A40(int* p);
+
+class Unk8016A5C0_SlotV {
+public:
+    char pad0[0xA58];
+    virtual void fn_vslot1(int a);
+};
+
+void fn_8016A5C0(Unk8016ACAC* p, int c) /* 8016A5C0 */
+{
+    Unk8061FEDC_Sub* g = &lbl_8061FEDC->m40;
+    *(const void**)((char*)p + 0x42A4) = lbl_8065EC38;
+    int z = 0;
+    fn_80359A40(&g->m4);
+    g->m8 = z;
+    Unk8016A5C0_SlotV* a = (Unk8016A5C0_SlotV*)((char*)p + 0x1E28);
+    if (a != 0) {
+        Unk8016A5C0_SlotV* s = (Unk8016A5C0_SlotV*)((char*)p + 0x3D3C);
+        if (a != s) {
+            do {
+                s--;
+                s->fn_vslot1(0);
+            } while (a != s);
+        }
+    }
+    if (c & 1) {
+        delete p;
+    }
+}
+
 void fn_8016A660(Unk8016ACAC_Slot* s, int c) /* 8016A660 */
 {
     *(const void**)((char*)s + 0xA58) = lbl_8065EC50;
@@ -214,6 +300,24 @@ void Unk8016ACAC_Slot::fn_8016A6AC() /* 8016A6AC */
     mA20 = 0;
     ((Unk801527C8_Ctx*)this)->fn_8016AC3C();
     mLists[0].fn_8016D258();
+}
+
+void fn_803296AC();
+
+/* near-miss (99.25%): same code, but the scratch registers and the this/actor callee-saved pair are swapped
+ * (retail this=r30, actor=r31; here this=r31, actor=r30). */
+void Unk8016ACAC::fn_8016A708() /* 8016A708 */
+{
+    Unk801527C8_Actor* a = m4294;
+    if (a->m44 != 0) {
+        fn_803296AC();
+        a->m44 = 0;
+        unsigned int n = *(unsigned int*)&m3D3C->m4C;
+        float t = (float)n * 0.016666668f;
+        m4294->m4C = t;
+    }
+    float k = 0.016666668f;
+    *(float*)&m4294->m50 = k;
 }
 
 void Unk8016ACAC::fn_8016A7A8(Unk8016D9A0_Rec* rec) /* 8016A7A8 */
@@ -357,6 +461,43 @@ int Unk8016ACAC::fn_8016AF4C() /* 8016AF4C */
     for (int i = 0; i <= 2; s++, i++) {
         int h = s->mA20;
         if (h == (int)0x99948727 || h == 0x231AA27A) {
+            r = 1;
+            break;
+        }
+    }
+    return r;
+}
+
+int Unk8016ACAC::fn_8016AF9C() /* 8016AF9C */
+{
+    int r = 0;
+    Unk8016ACAC_Slot* s = m1E28;
+    for (int i = 0; i <= 2; s++, i++) {
+        int h = s->mA20;
+        if (h == (int)0xF461F8E8
+            || h == (int)0xE5B188AF
+            || h == (int)0x48C5C923
+            || h == (int)0x6F37A402
+            || h == (int)0x80A5282D
+            || h == (int)0x08CE57B4
+            || h == (int)0xCF7C78C8
+            || h == (int)0x92547307
+            || h == (int)0xF4628549
+            || h == (int)0xE9BC19D0
+            || h == (int)0xCE227E64
+            || h == (int)0x73423523
+            || h == (int)0x80B740AE
+            || h == (int)0x8E2B0CF5
+            || h == (int)0x006FD629
+            || h == (int)0x17B12848
+            || h == (int)0xF46311AA
+            || h == (int)0xEDC6AAF1
+            || h == (int)0x537F33A5
+            || h == (int)0x774CC644
+            || h == (int)0x80C9592F
+            || h == (int)0x1387C236
+            || h == (int)0x3163338A
+            || h == (int)0x9D0DDD89) {
             r = 1;
             break;
         }
