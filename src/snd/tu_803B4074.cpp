@@ -16,6 +16,43 @@ struct U {
 
 extern unsigned short lbl_80626418[];
 
+struct Unk803B4074_Parser {
+    unsigned char* m0;
+    int m4;
+    int m8;
+    unsigned char* mC;
+    unsigned int m10;
+};
+
+extern "C" int fn_803B3F60(const unsigned char* p, int n);
+
+extern "C" int fn_803B4074(Unk803B4074_Parser* s)
+{
+    int c;
+    while (*s->m0 == 0xFC)
+        s->m0++;
+    c = *s->m0;
+    s->m4 = c;
+    if (c == 0xFF)
+        return 0;
+    s->m0++;
+    if (c == 0xFD)
+        return 1;
+    if (c == 0xFE)
+        return 1;
+    s->m10 = *s->m0;
+    if (s->m10 == 0xFF) {
+        s->m10 = fn_803B3F60(s->m0 + 1, 4);
+        s->m0 = s->m0 + 4;
+    }
+    s->m0 = s->m0 + 1;
+    s->mC = s->m0;
+    if (s->m10 <= 4)
+        s->m8 = fn_803B3F60(s->m0, s->m10);
+    s->m0 = s->m0 + s->m10;
+    return 1;
+}
+
 extern "C" int fn_803B4160(int shandle, int cutoff)
 {
     int setvoice;
@@ -26,6 +63,40 @@ extern "C" int fn_803B4160(int shandle, int cutoff)
             SNDPLATFORM_highpass(setvoice, cutoff);
     }
     return voice;
+}
+
+struct Unk803B41C8_Ch {
+    char pad0[0x2B];
+    signed char m2B;
+    char pad2C[0xC];
+    float m38;
+    char pad3C[4];
+    short m40;
+    char pad42[6];
+    float m48;
+    char pad4C[0x1F];
+    unsigned char m6B;
+    char pad6C[8];
+    SCALINGTABLE* m74;
+    char pad78[4];
+    SCALINGTABLE* m7C;
+    char pad80[0x10];
+};
+extern Unk803B41C8_Ch* lbl_8069CA48;
+
+extern "C" void fn_803B41C8(int ch)
+{
+    Unk803B41C8_Ch* pv = &lbl_8069CA48[ch];
+    float v = (float)pv->m2B * pv->m38 * (float)pv->m40 * 6.200012e-05f;
+    pv->m48 = v;
+    if (pv->m7C != 0)
+        pv->m48 = v * (float)pv->m7C->xlate[pv->m6B] * 0.007874016f;
+    if (pv->m74 != 0) {
+        float t = pv->m48 * 127.0f;
+        int r = (int)(t >= 0.0f ? t + 0.5f : t - 0.5f);
+        pv->m48 = (float)pv->m74->xlate[r];
+    }
+    pv->m48 = pv->m48 * Snd::gMasterVol;
 }
 
 extern "C" void fn_803B4330(SNDLINKLIST* list)

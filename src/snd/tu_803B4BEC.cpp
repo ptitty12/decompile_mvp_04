@@ -51,7 +51,7 @@ struct Unk806AA88C_Entry {
 
 struct Unk806AA88C {
     unsigned short m0;
-    short m2;
+    unsigned short m2;
     unsigned int m4;
     unsigned int m8;
     Unk806AA88C_Entry* mC;
@@ -845,4 +845,37 @@ extern "C" void fn_803B6AB0()
     lbl_806AA2D4[0x28 / 4] = (int)fn_803B79BC;
     lbl_806AA2D4[0x2c / 4] = (int)fn_803B7C78;
     lbl_806AA2D4[0x74 / 4] = 0x3c;
+}
+
+struct Unk803B5F18 {
+    char pad0[0x1C];
+    char m1C[0x34];
+    float m50;
+};
+
+extern "C" void fn_803B6080(void* o, int type);
+
+extern "C" void fn_803B5F18(Unk803B5F18* o, int* buf)
+{
+    float f = (float)(buf[0] >> 7) / (float)(buf[1] >> 8);
+    o->m50 = f;
+    fn_803B6080(o->m1C, 3);
+}
+
+struct Unk803B65FC {
+    char pad0[0x20];
+    float m20;
+    float m24;
+};
+
+extern "C" void fn_803B65FC(Unk803B65FC* o, int* in)
+{
+    float f = (2.0f * (float)in[0]) / (float)in[1];
+    float g = 1.0f - f;
+    o->m24 = f;
+    o->m20 = g;
+    f = f * 0.00390625f;
+    g = g * 0.00390625f;
+    o->m24 = f * (float)in[2];
+    o->m20 = g * (float)in[2];
 }

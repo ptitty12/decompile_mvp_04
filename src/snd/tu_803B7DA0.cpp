@@ -5,6 +5,17 @@
  * Every data object is extern by its lbl_ name.
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
+#include "csis/csis_internal.h"
+#include <cstring>
+
+using namespace Csis;
+
+extern ModList lbl_806AA89C;
+
+extern "C" {
+int fn_803B9DDC();
+int fn_803B9E08();
+}
 
 struct SndPair {
     float a;
@@ -29,13 +40,22 @@ struct SndStream {
     void* mA0;
 };
 
-/* 0xD68-byte decoder object (fn_803B9448 initialises it). */
+/* 0xD68-byte decoder object (fn_803B9448 initialises it). The first 0xC bytes are the bit
+ * reader used by fn_803B8524/fn_803B8584. */
 struct SndDec {
-    int pad0;
-    int m4;
-    char pad8[0xD3C];
+    unsigned char* m0;
+    unsigned m4;
+    int m8;
+    int mC;
+    int m10;
+    float m14[64];
+    float m114[12];
+    float m144[12];
+    float m174[0x144];
+    char pad684[0x6C0];
     int mD44;
-    char padD48[8];
+    unsigned char* mD48;
+    int mD4C;
     short mD50;
     short mD52;
     int mD54;
@@ -44,6 +64,8 @@ struct SndDec {
     int mD60;
     int mD64;
 };
+
+extern unsigned lbl_80626940[];
 
 extern void* (*lbl_806AA884)();
 extern void (*lbl_806AA888)();
@@ -104,6 +126,82 @@ extern "C" void fn_803B84F8()
     lbl_806AA888();
 }
 
+extern "C" unsigned fn_803B8524(SndDec* s, int n)
+{
+    unsigned res = s->m4 & lbl_80626940[n];
+    s->m4 >>= n;
+    s->m8 -= n;
+    if (s->m8 <= 7) {
+        s->m4 |= *s->m0++ << s->m8;
+        s->m8 += 8;
+    }
+    return res;
+}
+
+extern "C" void fn_803B8584(SndDec* s, int n)
+{
+    s->m4 >>= n;
+    s->m8 -= n;
+    if (s->m8 <= 7) {
+        s->m4 |= *s->m0++ << s->m8;
+        s->m8 += 8;
+    }
+}
+
+extern "C" void fn_803B87C4(float* a)
+{
+    int i;
+    for (i = 0; i <= 107; i += 2) {
+        a[i] = (a[i - 1] + a[i + 1]) * 0.5973859429359436f + (a[i - 3] + a[i + 3]) * -0.1145915612578392f
+            + (a[i - 5] + a[i + 5]) * 0.018032679334282875f;
+    }
+}
+
+extern "C" void fn_803B882C(float* ac, float* out)
+{
+    float tmp[12];
+    float k[12];
+    int i, m;
+    for (i = 10; i >= 0; i--)
+        tmp[i + 1] = ac[i];
+    tmp[0] = 1.0f;
+    for (m = 0; m <= 11; m++) {
+        float acc = -ac[11] * tmp[11];
+        for (i = 10; i >= 0; i--) {
+            acc -= ac[i] * tmp[i];
+            tmp[i + 1] = ac[i] * acc + tmp[i];
+        }
+        tmp[0] = acc;
+        k[m] = acc;
+        for (i = 0; i < m; i++)
+            acc -= out[i] * k[m - i - 1];
+        out[m] = acc;
+    }
+}
+
+extern "C" void fn_803B8EE0(void* unused, unsigned char* data, SndDec* s, int flag)
+{
+    int i;
+    data++;
+    s->m0 = data;
+    s->m8 = 8;
+    s->m4 = data[-1];
+    if (flag != 0) {
+        s->mC = fn_803B8524(s, 1);
+        s->m10 = 32 - fn_803B8524(s, 4);
+        s->m14[0] = (float)(unsigned)(fn_803B8524(s, 4) + 1) * 8.0f;
+        float f = (float)(unsigned)fn_803B8524(s, 6) * 0.001f + 1.04f;
+        for (i = 1; i <= 0x3F; i++)
+            s->m14[i] = s->m14[i - 1] * f;
+        for (i = 0; i <= 11; i++) {
+            s->m114[i] = 0.0f;
+            s->m144[i] = 0.0f;
+        }
+        for (i = 0; i <= 0x143; i++)
+            s->m174[i] = 0.0f;
+    }
+}
+
 extern "C" SndDec* fn_803B9448(SndDec* d)
 {
     d->mD44 = 0;
@@ -115,6 +213,28 @@ extern "C" SndDec* fn_803B9448(SndDec* d)
     d->mD5C = 0;
     d->mD60 = 0;
     return d;
+}
+
+extern "C" int fn_803B9478(SndDec* d, unsigned char* data, int a5, int a6)
+{
+    if (data == 0 || d->mD54 != 0)
+        return -1;
+    int mode = d->mD64;
+    int z = d->mD54;
+    d->mD54 = a6;
+    d->mD58 = a5;
+    d->mD44 = z;
+    d->mD48 = data;
+    if (mode == 1) {
+        if (data[0] == 0xEE)
+            d->mD60 = mode;
+        else
+            d->mD60 = z;
+        fn_803B8EE0(d, data + 1, d, d->mD5C);
+    } else {
+        fn_803B8EE0(d, data, d, d->mD5C);
+    }
+    return 0;
 }
 
 extern "C" SndT3 fn_803B9730(SndDec* d)
@@ -136,4 +256,56 @@ extern "C" void fn_803B9770(SndDec* d, SndT3* t, int unused)
 extern "C" void fn_803B978C(SndDec* d, int v)
 {
     d->mD64 = v;
+}
+
+extern "C" void fn_803B9794(int n, float* src, float* dst, int* idx, unsigned* fr, unsigned stepHi, unsigned stepLo)
+{
+    int i;
+    unsigned step = (stepHi << 16) | (stepLo >> 16);
+    *fr = ((unsigned short*)fr)[0];
+    for (i = 0; i < n; i++) {
+        float a = src[*idx];
+        float t = (float)*fr * 1.5258e-5f;
+        dst[i] = t * (src[*idx + 1] - a) + a;
+        *fr += step;
+        *idx += *fr >> 16;
+        *fr = ((unsigned short*)fr)[1];
+    }
+    *fr <<= 16;
+}
+
+extern "C" int fn_803B9858(FunctionHandle* h, const InterfaceId* id)
+{
+    fn_803B9DDC();
+    int r = h->SetFast(id);
+    fn_803B9E08();
+    return r;
+}
+
+Result FunctionHandle::SetFast(const InterfaceId* id)
+{
+    int tried = 0;
+retry:
+    {
+        Module* m;
+        for (ModLink* l = lbl_806AA89C.head; l != 0; l = m->link.next) {
+            m = (Module*)((char*)l - 0x20);
+            FnEntry* tbl = m->fn;
+            int n = m->nFn;
+            if (m->crc == id->systemCrc || tried != 0) {
+                for (int i = 0; i < n; i++) {
+                    FnEntry* e = (FnEntry*)(i * 12 + (int)tbl);
+                    if (id->interfaceCrc == e->u.k.crc && strcmp(id->pString, e->name) == 0) {
+                        mpPrivate = e;
+                        mKey = e->u.key;
+                        return RESULT_OK;
+                    }
+                }
+            }
+        }
+        if (tried != 0)
+            return RESULT_ERR_NOTFOUND;
+        tried = 1;
+        goto retry;
+    }
 }

@@ -6,6 +6,7 @@
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
 #include "snd/cmn/sndcmn.h"
+#include <string.h>
 
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
@@ -62,7 +63,7 @@ struct Unk803B21EC {
     int m48;
     Unk803B31B4* m4C;
     Unk803B27DC_Obj* m50;
-    int m54;
+    Unk803B27DC_Obj* m54;
     Unk803B27DC_Obj* m58;
 };
 
@@ -85,15 +86,26 @@ extern void (*lbl_806AA2D8)(int);
 extern "C" void fn_803B21EC(int idx);
 
 extern "C" void fn_803B5F9C(Unk803B21EC_Node** head, void* node);
+extern "C" void fn_803B65BC(void* obj);
+extern "C" void fn_803B65FC(void* obj, int* buf);
+extern unsigned short lbl_8069C8A2;
 extern "C" void fn_803B6004(Unk803B21EC_Node** head, void* node);
 extern "C" void fn_803B5EC4(void* obj);
 extern "C" void fn_803B5F18(void* obj, int* buf);
 extern "C" void fn_803B31B4(Unk803B31B4* obj, int v);
 
+struct Unk803B3334;
+struct Unk803B3334_Src {
+    int (*fn)(Unk803B3334_Src* self, int a, float* b, float* c, int d);
+};
+
 struct Unk803B3334 {
     void* m0;
     void* m4;
-    char pad8[0x14];
+    Unk803B3334_Src* m8;
+    char padC[0xE];
+    unsigned char m1A;
+    char pad1B;
     unsigned char* m1C;
     int m20;
     float m24;
@@ -112,7 +124,10 @@ struct Unk803B3334 {
 extern "C" int fn_803B02CC(int v);
 extern "C" int fn_803B4BEC(int v);
 extern "C" int fn_803B3F60(const unsigned char* p, int n);
-extern "C" void fn_803B31F4();
+extern "C" int fn_803B2C0C(int n, unsigned char** pp, float* ps, float x);
+extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst);
+extern "C" int fn_803B2F48(Unk803B3334* o, int count);
+extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst);
 extern "C" void fn_803B3334(Unk803B3334* o);
 extern int lbl_8069CBC0;
 
@@ -202,6 +217,34 @@ extern "C" void fn_803B27DC(int idx, int n)
     }
 }
 
+extern "C" void fn_803B28AC(int idx, float v)
+{
+    Unk803B21EC* e = &lbl_806AA4B0[idx];
+    if (v < 1.0f) {
+        if (e->m54 == 0) {
+            Unk803B27DC_Obj* o = (Unk803B27DC_Obj*)SNDMEMI_allocz(0x28);
+            e->m54 = o;
+            o->m4 = 0;
+            e->m54->m18 = 0x28;
+            e->m54->m1A = 0;
+            fn_803B65BC(e->m54);
+            fn_803B5F9C(&e->m40, e->m54);
+        }
+        int buf[3];
+        float t;
+        buf[1] = lbl_8069C8A2 << 8;
+        t = v * (float)(int)lbl_8069C8A2;
+        int r = (int)(t >= 0.0f ? t + 0.5f : t - 0.5f);
+        buf[0] = r << 7;
+        buf[2] = 0x100;
+        fn_803B65FC(e->m54, buf);
+    } else if (e->m54 != 0) {
+        fn_803B6004(&e->m40, e->m54);
+        SNDMEMI_free(e->m54);
+        e->m54 = 0;
+    }
+}
+
 extern "C" void fn_803B29F8(int idx, int v)
 {
     Unk803B21EC* e = &lbl_806AA2D4.m1DC[idx];
@@ -230,6 +273,64 @@ extern "C" void fn_803B2AB4(int idx, int v)
         fn_803B31B4(e->m4C, v);
 }
 
+extern "C" void fn_803B2AF0(float* a, float* b, float* out, int n, int shift)
+{
+    int off;
+    float step, start;
+    if (shift > 0) {
+        off = shift;
+        step = -1.0f / (float)n;
+        start = 1.0f;
+    } else {
+        off = -shift;
+        step = 1.0f / (float)n;
+        start = 0.0f;
+    }
+    int i;
+    for (i = off; i < n; i++) {
+        out[i - off] = start * a[i] + (1.0f - start) * a[i - off];
+        start += step;
+    }
+    for (i = 0; i < off; i++) {
+        out[n - off + i] = start * b[i] + (1.0f - start) * a[n - off + i];
+        start += step;
+    }
+}
+
+extern "C" void fn_803B2D58(Unk803B3334* o, float** pp, int shift)
+{
+    float* a;
+    float* b;
+    if (o->m34 > 0) {
+        a = (float*)((char*)o + 0x40);
+        b = *pp;
+    } else {
+        a = *pp;
+        b = a + o->m2C;
+    }
+    if (shift == 0) {
+        Snd::Util::MemCpy((char*)o + 0x838, a, o->m2C * 4);
+        o->m30 = o->m30 - o->m2C;
+        o->m38 = o->m2C;
+        *pp = b;
+    } else if (shift > 0) {
+        int n = shift * 4;
+        Snd::Util::MemCpy((char*)o + 0x838, a, n);
+        fn_803B2AF0(a, b, (float*)((char*)o + (n + 0x838)), o->m2C, shift);
+        o->m30 = o->m30 - o->m2C;
+        o->m38 = o->m2C + shift;
+        *pp = b;
+    } else {
+        fn_803B2AF0(a, b, (float*)((char*)o + 0x838), o->m2C, shift);
+        Snd::Util::MemCpy((char*)o + (o->m2C * 4 + 0x838), b - shift, (o->m2C + shift) * 4);
+        o->m30 = o->m30 - o->m2C * 2;
+        o->m38 = o->m2C * 2 + shift;
+        *pp = b + o->m2C;
+    }
+    o->m34 = 0;
+    o->m3C = 0;
+}
+
 /* near-miss: 38 vs 39 insns: retail keeps o in r31 and n in r29 (loads m3C, m38, *count up front, then n = m38 / *count); ours swaps those two saved registers and orders the loads differently; local-variable and load-order variants tried */
 extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
 {
@@ -247,9 +348,83 @@ extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
     return n;
 }
 
+extern "C" int fn_803B2F48(Unk803B3334* o, int count)
+{
+    if (count > o->m38) {
+        int total = 0;
+        int last = 0;
+        unsigned char* sp8 = o->m1C;
+        float spC = o->m28;
+        int avail;
+        count -= o->m38;
+        avail = o->m30;
+        if (count > 0 && avail >= o->m2C) do {
+            int used;
+            int got;
+            if (avail < o->m2C * 2)
+                last = 0;
+            else
+                last = fn_803B2C0C(o->m2C, &sp8, &spC, o->m24);
+            if (last >= 0) {
+                used = o->m2C;
+                got = used + last;
+            } else {
+                used = o->m2C * 2;
+                got = used + last;
+            }
+            total += used;
+            avail -= used;
+            if (count <= got)
+                count = 0;
+            else
+                count -= got;
+            if (count <= 0) break;
+        } while (avail >= o->m2C);
+        if (last > 0)
+            total += o->m2C;
+        if (count > 0) {
+            if (count > avail)
+                total += avail;
+            else
+                total += count;
+        }
+        if (total > o->m34)
+            return total - o->m34;
+    }
+    return 0;
+}
+
 extern "C" void fn_803B31B4(Unk803B31B4* o, int v)
 {
     o->m24 = v * 0.000244140625f;
+}
+
+extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst)
+{
+    float* buf = src;
+    int need;
+    int r;
+    if (o->m30 == 0)
+        return o->m8->fn(o->m8, 0xC8, dst, buf, o->m1A);
+    need = fn_803B2F48(o, count);
+    if (o->m20 >= 0 && need > SNDPKTPLAY_framesoutstanding(o->m20))
+        return 0;
+    if (need > 0) {
+        if (need * 4 > o->m1830) {
+            int sz = need & ~0x3F;
+            sz += 0x40;
+            if (o->m182C < sz)
+                Snd::Util::ReallocBuf(&o->m1828, &o->m182C, sz, 4);
+            buf = (float*)((char*)o->m1828 + 8);
+        }
+        r = o->m8->fn(o->m8, need, dst, buf, o->m1A);
+        if (r <= 0)
+            return r;
+    }
+    r = fn_803B306C(o, count, buf, dst);
+    if (r < count)
+        memset(dst + r, 0, (count - r) * 4);
+    return count;
 }
 
 extern "C" void fn_803B3334(Unk803B3334* o)
@@ -350,4 +525,26 @@ extern "C" int fn_803B3CF8(int shandle, int v)
             fn_803B1080(setvoice, v);
     }
     return voice;
+}
+
+extern CHANPUB* lbl_8069CA48; /* sndgs.chan (sndgs + 0x1CC), named by its own symbols.txt entry */
+
+void iSNDcalcpitch(int chan)
+{
+    CHANPUB* c = &lbl_8069CA48[chan];
+    if (c->detunepitch == 0) {
+        int pitch = c->initialdetune;
+        if (c->bendrange != 0) {
+            signed char v;
+            if (c->pbendtable != 0)
+                v = ((signed char*)c->pbendtable)[c->pitchbend];
+            else
+                v = c->pitchbend;
+            pitch += ((v - 0x40) * (short)c->bendrange) >> 6;
+        }
+        if (c->ppitchlfo != 0)
+            pitch += ((((signed char*)c->ppitchlfo)[c->curpitchlfoentry] - 0x40) * c->pitchlfodepth) >> 6;
+        c->detunepitch = fn_803B3B98(pitch);
+    }
+    c->finalpitch = (c->detunepitch * c->progpitch) >> 12;
 }

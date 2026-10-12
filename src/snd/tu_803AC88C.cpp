@@ -74,7 +74,8 @@ extern "C" int fn_803AEB50(int a, int b, int c, int d, int e);
 struct Unk8069E200_RecA {
     char pad0[0x18];
     int m18;
-    char pad1C[3];
+    char m1C;
+    char pad1D[2];
     unsigned char m1F;
     char pad20[4];
     unsigned char m24;
@@ -229,6 +230,43 @@ extern "C" int fn_803AD9BC()
     return 0;
 }
 
+extern "C" void fn_803B41C8(int voice);
+extern int lbl_80625448;
+
+extern "C" int fn_803ADA2C(int shandle, int vol)
+{
+    int voice = SNDVOICEI_get(shandle);
+    if (voice >= 0) {
+        int setvoice = -1;
+        float v = (float)vol * 0.007874016f;
+        while (iSNDpatchkey(voice, &setvoice)) {
+            int changed = 0;
+            int i;
+            CHANPUB* c = &sndgs.chan[setvoice];
+            for (i = 0; i < c->numchan; i++) {
+                int vc = c->voices[i];
+                CHANPUB* p = &sndgs.chan[vc];
+                p->fadePer100Hz = 0.0f;
+                if (p->programmedVol != v) {
+                    p->programmedVol = v;
+                    fn_803B41C8(vc);
+                    changed = 1;
+                    Snd::Hal::SetVol(vc);
+                }
+            }
+            if (changed) {
+                if (c->rendermode & 4) {
+                    for (i = 0; i < lbl_80625448; i++)
+                        SNDPLATFORM_setfxlevel(voice, i);
+                } else {
+                    SNDPLATFORM_setfxlevel(voice, 0);
+                }
+            }
+        }
+    }
+    return voice;
+}
+
 extern "C" void fn_803ADD08(Unk803ADD08* p)
 {
     p->m4 = 0x50000000;
@@ -295,6 +333,102 @@ extern "C" void fn_803ADE98(int v)
     for (i = 0; i < 64; i++)
         fn_803ADD08(&lbl_8069CBC4[i]);
     lbl_8069E1C4 = v;
+}
+
+struct Unk803ADEEC_Vpb {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    char pad20[0x124];
+    short m144;
+    char pad146[4];
+    unsigned short m14A;
+    short m14C;
+    unsigned short m14E;
+    short m150;
+    unsigned short m152;
+    short m154;
+    unsigned short m156;
+    short m158;
+    unsigned short m15A;
+    short m15C;
+    unsigned short m15E;
+    short m160;
+    unsigned short m162;
+    short m164;
+    unsigned short m166;
+    short m168;
+    unsigned short m16A;
+    short m16C;
+    char pad16E[0x2E];
+    short m19C;
+    short m19E;
+};
+
+extern "C" void fn_803ADEEC(Unk803ADEEC_Vpb* vpb, int flags, int a2, short a3, int a4, float* a5, unsigned int a6, int a7)
+{
+    Unk803ADD08* e = &lbl_8069CBC4[vpb->m18];
+    e->m0 = (int)vpb;
+    e->m4 = flags & 4;
+    int mask;
+    mask = 0;
+    e->m8 = a2;
+    fn_803ADE24((Unk803AE0E0*)vpb, a3, 1);
+    e->m40 = e->m42;
+    e->m44 = e->m46;
+    e->m48 = e->m4A;
+    fn_803ADD4C((Unk803AE0E0*)vpb, a5, a6, a7);
+    e->m34 = e->m36;
+    e->m38 = e->m3A;
+    e->m4C = e->m4E;
+    e->m50 = e->m52;
+    if (e->m4 & 4)
+        e->m30 = 0;
+    else
+        e->m30 = a2;
+    unsigned int en = OSDisableInterrupts();
+    unsigned short t;
+    vpb->m19C = e->m30;
+    vpb->m19E = 0;
+    vpb->m14A = e->m34;
+    if (vpb->m14A != 0)
+        mask |= 1;
+    vpb->m14C = 0;
+    vpb->m14E = e->m38;
+    if (vpb->m14E != 0)
+        mask |= 2;
+    vpb->m150 = 0;
+    vpb->m152 = e->m40;
+    if (vpb->m152 != 0)
+        mask |= 0x10;
+    vpb->m154 = 0;
+    vpb->m156 = e->m44;
+    if (vpb->m156 != 0)
+        mask |= 0x20;
+    vpb->m158 = 0;
+    vpb->m15A = e->m4C;
+    if (vpb->m15A != 0)
+        mask |= 0x200;
+    vpb->m15C = 0;
+    vpb->m15E = e->m50;
+    if (vpb->m15E != 0)
+        mask |= 0x400;
+    vpb->m160 = 0;
+    vpb->m162 = e->m54;
+    if (vpb->m162 != 0)
+        mask |= 0x1000;
+    vpb->m164 = 0;
+    vpb->m166 = e->m3C;
+    if (vpb->m166 != 0)
+        mask |= 4;
+    vpb->m168 = 0;
+    vpb->m16A = e->m48;
+    if (vpb->m16A != 0)
+        mask |= 0x80;
+    vpb->m144 = mask;
+    vpb->m16C = 0;
+    vpb->m1C = vpb->m1C | 0x212;
+    OSRestoreInterrupts(en);
 }
 
 extern "C" void fn_803AE0E0(Unk803AE0E0* p)
@@ -449,6 +583,49 @@ extern "C" void fn_803AEC70(int id)
     OSRestoreInterrupts(en);
 }
 
+struct Unk803AED08_Mix {
+    char pad0[0x14];
+    int* m14;
+};
+extern Unk803AED08_Mix lbl_806AA2D4;
+extern int lbl_8069E1E0;
+extern unsigned char lbl_8069C8BB;
+extern int lbl_80625C68;
+extern char lbl_8069FFE0[];
+extern "C" unsigned int fn_80434F9C();
+extern "C" void fn_804383B8(void* p);
+extern "C" int fn_803B1364(int i);
+
+extern "C" void fn_803AED08(int** outs)
+{
+    unsigned int en = fn_80434F9C();
+    if (lbl_8069E200.mC048 != 0) {
+        int i;
+        for (i = 0; i < lbl_80625448; i++) {
+            if (lbl_806AA2D4.m14[i] != 0) {
+                float* buf = (float*)fn_803B1364(i);
+                int* src = outs[0];
+                int j;
+                lbl_8069E1E0 = (int)buf;
+                for (j = 0; j <= 0x9F; j++)
+                    buf[j] = (float)src[j];
+            }
+        }
+        if (lbl_8069C8BB <= 3) {
+            Snd::Util::MemCpy(outs[1], (void*)lbl_8069E200.mAligned[0], 0x280);
+            Snd::Util::MemCpy(outs[0], (void*)lbl_8069E200.mAligned[1], 0x280);
+        } else {
+            Snd::Util::MemCpy(outs[1], (void*)lbl_8069E200.mAligned[0], 0x280);
+            Snd::Util::MemCpy(outs[2], (void*)lbl_8069E200.mAligned[2], 0x280);
+            Snd::Util::MemCpy(outs[0], (void*)lbl_8069E200.mAligned[3], 0x280);
+            Snd::Util::MemCpy(outs[3], (void*)lbl_8069E200.mAligned[1], 0x280);
+        }
+    }
+    fn_804383B8(lbl_8069FFE0);
+    lbl_80625C68++;
+    OSRestoreInterrupts(en);
+}
+
 extern "C" void fn_803AEE98()
 {
     Unk803AEE98 b;
@@ -511,6 +688,29 @@ extern "C" int fn_803AF374()
     return 0;
 }
 
+extern "C" int fn_803AF42C()
+{
+    SNDSYSSET s = sndgs.sso.set;
+    if (sndgs.installed != 0)
+        sndgs.sso.set = sndgs.prevset;
+    s.outputrate = 0x7D00;
+    if (s.outputchannels < sndgs.sso.cap.outputchannelsmin)
+        s.outputchannels = sndgs.sso.cap.outputchannelsmin;
+    if (s.outputchannels > sndgs.sso.cap.outputchannelsmax)
+        s.outputchannels = sndgs.sso.cap.outputchannelsmax;
+    if (s.voicesmaincpu > sndgs.sso.cap.voicesmaincpumax)
+        s.voicesmaincpu = sndgs.sso.cap.voicesmaincpumax;
+    if (s.voicesdsp > sndgs.sso.cap.voicesdspmax)
+        s.voicesdsp = sndgs.sso.cap.voicesdspmax;
+    if (s.maxstreams > 0x20)
+        s.maxstreams = 0x20;
+    if (sndgs.installed != 0)
+        return 0;
+    sndgs.voicestotal = s.voicesmaincpu + s.voicesdsp;
+    sndgs.sso.set = s;
+    return 0;
+}
+
 extern "C" int fn_803AF934()
 {
     fn_8041818C(0, 0);
@@ -543,5 +743,33 @@ extern "C" int fn_803AFD88(SNDIPATCHHEADER* pph, int base, int* poff)
     if (*poff == 0)
         *poff = pph->sampleoffset[0];
     *pph->paudioramaddr = base + (pph->sampleoffset[0] - *poff);
+    return 0;
+}
+
+extern char lbl_8069E23C[];
+extern "C" void fn_803B2320(int idx, int ch, float v);
+
+int SNDPLATFORM_setfxlevel(int voice, int bus)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 0x200) {
+        int i = 0;
+        float v = c->finalvol * (&c->pFxVolume->fxLevel)[bus];
+        for (; i < c->numchan; i++) {
+            if (i == 5)
+                v = 0.0f;
+            ((void (*)(Unk803AE0E0*, unsigned short, int))fn_803ADE24)(*(Unk803AE0E0**)(lbl_8069E23C + (c->voices[i] << 6)), (unsigned short)(int)(v * 32767.0f), 1);
+        }
+    } else if (c->rendermode & 4) {
+        int i = 0;
+        float v = c->finalvol * (&c->pFxVolume->fxLevel)[bus];
+        for (; i < c->numchan; i++) {
+            if (i == 5)
+                v = 0.0f;
+            fn_803B2320(c->voices[i] - sndgs.sso.set.voicesdsp, bus, v);
+        }
+    } else {
+        return -15;
+    }
     return 0;
 }
