@@ -48,6 +48,9 @@ extern const float lbl_805D7C18;
 extern const char lbl_805D7978[];
 extern float lbl_8061D220;
 extern const float lbl_805D7B1C;
+extern const char lbl_80660E00[];
+extern const char lbl_80660E30[];
+extern const char lbl_80660E48[];
 extern const float lbl_805D7A94;
 extern const float lbl_805D7A98;
 struct Unk80270BA0_X;
@@ -191,6 +194,27 @@ inline int At(char* base, int i)
 {
     int o = i * 4;
     return *(int*)(base + o);
+}
+
+/* fn_80237734 (48 insns): not matched; builds two V2 ranges and passes them by value to fn_80237154 (best attempts 37+ slots off). */
+extern "C" void fn_80237734(Unk802362A8_Cpu* self);
+extern "C" Unk802362A8_Cpu* fn_802376A0(Unk802362A8_Cpu* self, Unk8022FE34_Owner* o, Unk8022FE34_U* u, Unk8022FE34_Ctx* c)
+{
+    Unk802362A8_Slots* s = &self->m4;
+    *(const void**)((char*)self + 0x2F0) = lbl_80660E00;
+    *(const void**)((char*)s + 0x2D4) = lbl_80660E30;
+    char* e = (char*)self + 0x98;
+    for (int i = 0; i < 11; i++) {
+        *(const void**)(e + 0x30) = lbl_80660E48;
+        e += 0x34;
+    }
+    s->m90 = (Unk8014D8AC_Ctx*)c;
+    s->fn_80237114();
+    self->m2DC = o;
+    self->m2E0 = u;
+    self->m2E4 = c;
+    fn_80237734(self);
+    return self;
 }
 
 void Unk802362A8_Cpu::fn_80237B60(float* out)
