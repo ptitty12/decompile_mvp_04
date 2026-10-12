@@ -164,7 +164,6 @@ extern "C" void fn_801BAF08(A* a)
     e->m110 = 0;
 }
 
-/* near-miss: same code; retail loads the iterator slot after the slot stores, ours before them (alias order). */
 extern "C" void fn_801BAFA4(A* a)
 {
     lbl_8061CB78 = 0;
