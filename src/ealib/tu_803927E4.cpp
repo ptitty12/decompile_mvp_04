@@ -934,6 +934,37 @@ struct McTable {
     unsigned char m91;
 };
 
+/* near-miss (48 of 50 words): d is kept in r29 here and r31 in retail (the `mr.` and the `mr r5` differ in the register only);
+ * `int r = d;` lowers the result variable priority, other spellings left r in the wrong register. */
+extern "C" int fn_80393F64(int* a, McBufB* b, McHdrP* c, int unused, int d)
+{
+    int r = d;
+    if (d > 0 || c->m3 != 0) {
+        fn_80393C00((McHdr5*)c, b);
+        r = fn_80393D18(c, b, d);
+        goto join;
+    }
+    goto start;
+fail:
+    r = 0;
+    goto out;
+start:
+    {
+        int i = 0;
+        r = 1;
+        int n = c->m2 >> 2;
+        for (; i < n; i++) {
+            McHdr7* e = (McHdr7*)b + i;
+            if (e->m9 == 0 || fn_80393E1C(e) == 0)
+                goto fail;
+        }
+    }
+join:
+    fn_80393E60(a, b, c);
+out:
+    return r;
+}
+
 extern "C" void fn_8039437C(McTable* p)
 {
     p->m91 = 0;
