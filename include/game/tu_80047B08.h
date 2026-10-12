@@ -23,6 +23,17 @@ void fn_800490D0(Unk80048A10_Sub* p);
 void fn_800490F8(Unk80048A10_Sub* p);
 void fn_800490FC(Unk80048A10_Sub* p);
 extern char lbl_805B09F4[];
+extern char lbl_80649AB0[];
+void fn_800575E4(void* sink, int c);
+
+/* Object held at Sub + 0xADC: 0x7E0 data bytes, then the vptr; slot 1 is the virtual destructor (fn_80048B2C). */
+struct Unk80048B2C_Base {
+    char pad0[0x7E0];
+};
+class Unk80048B2C_Obj : public Unk80048B2C_Base {
+public:
+    virtual ~Unk80048B2C_Obj();
+};
 void fn_80048464(Unk8004763C* t, int i);
 extern int lbl_80617804;
 extern int lbl_80617808;
