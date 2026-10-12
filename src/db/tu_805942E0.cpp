@@ -305,6 +305,68 @@ extern "C" DB_OVERLAY Db80594A10_P* fn_80594A10(Db80594A10_P* self, int a, Db805
     return self;
 }
 
+struct Db80594C2C_Rec {
+    float a;
+    float b;
+    int c;
+};
+struct Db80594C2C_Obj : Db805942E0_V {
+    Db80593CD0_Data* m18;
+};
+extern Db80594C2C_Rec lbl_80601B70[];
+extern Db80594C2C_Rec lbl_80601BE8[];
+extern float lbl_806E0328[];
+extern "C" int fn_8040ABA0();
+extern "C" int fn_80591A50(Db805919E8_M* m);
+extern "C" int fn_80592E04(Db805937A4_Mgr* m, int i);
+extern "C" void fn_80591B8C(Db805919E8_M* m, int x, int j, int a3, int a4, int flag);
+
+inline float Db80594C2C_At(float* b, int o)
+{
+    return *(float*)((char*)b + o);
+}
+extern "C" DB_OVERLAY void fn_80594C2C(Db80594C2C_Obj* self)
+{
+    int i = 0;
+    Db805919E8_M* mgr = (Db805919E8_M*)self->m0;
+    int off = 0;
+    int total = fn_8059394C((Db805937A4_Mgr*)mgr, fn_80592E04((Db805937A4_Mgr*)mgr, fn_80591A50(mgr)));
+    do {
+        int cap = fn_80594810(self->m18, i);
+        if (cap > 0) {
+            int v = 0;
+            float d = fn_80594418(self, i) - self->v30(i)->m0;
+            if (d == 0.0f) {
+                v = (int)((float)total * Db80594C2C_At(lbl_806E0328, off));
+            } else if (!(d <= 0.0f)) {
+                int idx = ((int)(d + d) - 1) * 12;
+                Db80594C2C_Rec* rec = (Db80594C2C_Rec*)((char*)lbl_80601BE8 + idx);
+                float s = Db80594C2C_At(lbl_806E0328, off) * (float)total;
+                float t = (float)(fn_8040ABA0() % 100);
+                t = t * 0.01f;
+                t = t * rec->a;
+                v = (int)(s - (Db80594C2C_At(lbl_806E0328, off) * (t + rec->b + (float)rec->c) * (float)total));
+            } else if (!(d >= 0.0f)) {
+                int idx = ((int)(d * -2.0f) - 1) * 12;
+                Db80594C2C_Rec* rec = (Db80594C2C_Rec*)((char*)lbl_80601B70 + idx);
+                float t = (float)(fn_8040ABA0() % 100);
+                t = t * 0.01f;
+                t = t * rec->a;
+                v = (int)(Db80594C2C_At(lbl_806E0328, off) * (t + rec->b + (float)rec->c) * (float)total);
+            }
+            int w = v;
+            if (w > cap)
+                w = cap;
+            v = w;
+            Db805919E8_M* m = (Db805919E8_M*)self->m0;
+            fn_80594418(self, i);
+            fn_80591B8C(m, 1, i, cap, v, 0);
+        }
+        i++;
+        off += 4;
+    } while (i <= 12);
+}
+
 extern "C" DB_OVERLAY void fn_80594FC4(Db805942E0_Data* self, int i)
 {
     if (fn_800B5758(fn_800B555C()) && i == 0xC) {
