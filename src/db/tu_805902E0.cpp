@@ -4,26 +4,34 @@
  */
 #include "game/db_80584CBC.h"
 
+struct Db80590EB4_S { Db805919E8_M* m0; char pad4[0x20]; int m24; };
+
+struct Db80619948_G { char pad[0x84]; int m84; };
+
+struct Db80590EB4_S2 { Db805919E8_M* m0; };
+
+struct Db805909D4_S { Db805919E8_M* m0; char pad4[0x20]; int m24; int m28; int m2C; float m30[1]; };
+
+struct Db8059124C_S { char pad[0x28]; void* m28; };
+
 extern "C" void fn_80591DEC(Db805919E8_M* m);
 extern "C" float fn_805922D4(Db805919E8_M* m, int x, int i);
 extern "C" float fn_80592288(Db805919E8_M* m, int x);
-struct Db80590EB4_S { Db805919E8_M* m0; char pad4[0x20]; int m24; };
-struct Db80619948_G { char pad[0x84]; int m84; };
 extern "C" Db800B555C_Obj* fn_800B555C();
 extern "C" int fn_800B5758(Db800B555C_Obj* o);
 extern "C" int fn_800A2E90(void* p);
 extern "C" void fn_805921E4(Db805919E8_M* m);
 extern Unk8007A4DC_Screen* lbl_8061930C;
-struct Db80590EB4_S2 { Db805919E8_M* m0; };
 int fn_8007F7D0(Unk8007F198_B* self, unsigned i);
 extern "C" void fn_80591B40(Db805919E8_M* m, int x);
 extern "C" void fn_805919E8(Db805919E8_M* m, int x, int i, int k, float f);
 extern "C" float fn_80079CF8(Unk8007B2B0_Screen* s, int a);
-struct Db805909D4_S { Db805919E8_M* m0; char pad4[0x20]; int m24; int m28; int m2C; float m30[1]; };
 extern "C" int fn_805560A8(int a, int b);
 extern "C" void fn_805920BC(Db805919E8_M* m);
 unsigned fn_8007FBC0(Unk8007F198_C* self, int a, int c);
 int fn_8007FB2C(Unk8007F198_C* self, int idx);
+extern "C" void fn_80596E3C(void* p);
+extern "C" void fn_80596FCC(void* p);
 
 extern "C" DB_OVERLAY void fn_805909D4(Db805909D4_S* self)
 {
@@ -74,6 +82,16 @@ extern "C" DB_OVERLAY void fn_80590EB4(Db80590EB4_S* self)
             } while (n > self->m24);
         }
     }
+}
+
+extern "C" DB_OVERLAY void fn_8059124C(Db8059124C_S* self)
+{
+    fn_80596E3C(self->m28);
+}
+
+extern "C" DB_OVERLAY void fn_80591378(Db8059124C_S* self)
+{
+    fn_80596FCC(self->m28);
 }
 
 extern "C" DB_OVERLAY float fn_8059139C(Db805909D4_S* self, int id)
