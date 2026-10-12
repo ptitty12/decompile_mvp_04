@@ -817,7 +817,8 @@ struct UnkFESub {
     int m4DC;
 };
 struct UnkFEState {
-    char pad0[8];
+    int m0;
+    char pad4[4];
     UnkFESub m8;
     char pad4E8[0x88];
     int m570;
