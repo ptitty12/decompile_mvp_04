@@ -31,7 +31,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s12();
     virtual void s13();
     virtual void s14();
-    virtual void s15();
+    virtual void s15(int a);
     virtual void s16();
     virtual void s17();
     virtual void s18();
@@ -101,7 +101,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s82();
     virtual void s83();
     virtual void s84();
-    virtual void s85();
+    virtual void s85(int a);
     virtual void s86();
     virtual void s87();
     virtual void s88();
@@ -164,6 +164,7 @@ void fn_800DFF0C(char* a, const char* b);
 void fn_801321D4(FeW* o, void* self, FeCbF cb, int a, void* b, int c, int d, int e, const char* s1, const char* s2,
                  const char* s3, int f, int g, int h);
 void fn_80134D68(void* p);
+char* fn_8040B61C(char* dst, const char* src);
 FeW* fn_800C8060(FeW* w);
 int fn_80075948__18Unk8007B2B0_Screeni(void* g, int a);
 void fn_8055F5A0(int a);
@@ -171,6 +172,142 @@ void fn_8055EAFC(int a);
 void fn_8052844C(int a, void* x);
 void fn_80528450(int a, void* x);
 }
+
+/* Screen with every word from +0x134 on read as an int (int-field accessors of these units). */
+struct FeScrQ : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    int m144;
+    int m148;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    int m170;
+    int m174;
+    int m178;
+    int m17C;
+    int m180;
+    int m184;
+    int m188;
+    int m18C;
+    int m190;
+    int m194;
+    int m198;
+    int m19C;
+    int m1A0;
+    int m1A4;
+    int m1A8;
+    int m1AC;
+    int m1B0;
+    int m1B4;
+    int m1B8;
+    int m1BC;
+    int m1C0;
+    int m1C4;
+    int m1C8;
+    int m1CC;
+    int m1D0;
+    int m1D4;
+    int m1D8;
+    int m1DC;
+    int m1E0;
+    int m1E4;
+    int m1E8;
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+    int m200;
+    int m204;
+    int m208;
+    int m20C;
+    int m210;
+    int m214;
+    int m218;
+    int m21C;
+    int m220;
+    int m224;
+    int m228;
+    int m22C;
+    int m230;
+    int m234;
+    int m238;
+    int m23C;
+    int m240;
+    int m244;
+    int m248;
+    int m24C;
+    int m250;
+    int m254;
+    int m258;
+    int m25C;
+    int m260;
+    int m264;
+    int m268;
+    int m26C;
+    int m270;
+    int m274;
+    int m278;
+    int m27C;
+    int m280;
+    int m284;
+    int m288;
+    int m28C;
+    int m290;
+    int m294;
+    int m298;
+    int m29C;
+    int m2A0;
+    int m2A4;
+    int m2A8;
+    int m2AC;
+    int m2B0;
+    int m2B4;
+    int m2B8;
+    int m2BC;
+};
+
+/* Sub-object of a list control (second base at +0xDC, vptr at +0x24 of it) whose slot 11 returns an int. */
+struct FeSub11 : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual int s11();
+};
+
+/* Record with a 4-entry id table at +0x78 and its count at +0x88 (fn_80514DF8). */
+struct FeIdTab {
+    char pad0[0x78];
+    int m78[4];
+    int m88;
+};
+
+/* Screen whose +0x134 word points at an id table indexed by the int at +0x140 (fn_804FFBAC). */
+struct FeScrIdx : FeW {
+    char pad40[0xF0];
+    int m130;
+    int* m134;
+    char pad138[8];
+    int m140;
+};
 
 /* Roster-main screen (ctor fn_804FE8AC, vtable lbl_80680960). m138 is a name buffer
  * (fn_804FF0F8 strcpy's into it, fn_804FF18C copies it out); m10EC/m10F0 are two widgets, m10F4
