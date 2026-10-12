@@ -206,9 +206,10 @@ void fn_80359E0C(char* self) { fn_8040084C(self + 4); }
 void fn_80359E30(char* self, int c)
 {
     PUT(0, lbl_8065ED60);
-    if (F(int, self, 0x330) != 0)
+    if (F(int, self, 0x330) != 0) {
         fn_8035A09C(self, 0);
-    fn_803FFEB8(self + 0x14);
+        fn_803FFEB8(self + 0x14);
+    }
     if (c & 1)
         fn_80377408(self);
 }
