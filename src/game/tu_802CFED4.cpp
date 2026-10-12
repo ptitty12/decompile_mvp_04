@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_802CFED4.h"
+#include "game/tu_802CBD04.h"
 
 extern Unk802D0B4C_Vec3 lbl_806055AC;
 extern const char lbl_805E3BA4[];
@@ -176,6 +177,117 @@ Unk802D1278* fn_802D1E74()
     return new (lbl_806EF9B4) Unk802D1278;
 }
 
+void fn_802CF894(void* o, void* reg);
+void fn_802CF368(Unk802CF368_Self* o);
+extern const char lbl_805E2568[];
+extern const char lbl_805E26D8[];
+extern const char lbl_805E331C[];
+extern const char lbl_805E3454[];
+extern const char lbl_805E3488[];
+extern const char lbl_805E3848[];
+extern const char lbl_805E39F8[];
+extern const char lbl_805E3BA4[];
+extern const char lbl_805E3BEC[];
+extern const char lbl_805E3D40[];
+extern const char lbl_805E3D44[];
+extern const char lbl_805E3D58[];
+extern const char lbl_805E3D6C[];
+extern const char lbl_805E3D7C[];
+extern const char lbl_805E3D8C[];
+extern const char lbl_805E3D98[];
+extern const char lbl_805E3DA8[];
+extern const char lbl_805E3DB4[];
+extern const char lbl_805E3DB8[];
+extern const char lbl_805E3DC4[];
+extern const char lbl_805E3DD0[];
+extern const char lbl_805E3DDC[];
+extern const char lbl_805E3DE8[];
+extern const char lbl_805E3DF0[];
+extern const char lbl_805E3E00[];
+extern const char lbl_805E3E08[];
+extern const char lbl_805E3E10[];
+extern const char lbl_805E3E28[];
+extern const char lbl_805E3E40[];
+extern const char lbl_805E3E54[];
+extern const char lbl_805E3E5C[];
+extern const char lbl_805E3E68[];
+extern const char lbl_805E3E78[];
+extern const char lbl_805E3EA4[];
+extern const char lbl_805E3EAC[];
+extern const char lbl_805E3EB8[];
+extern const char lbl_805E3EC4[];
+extern const char lbl_805E3ED4[];
+extern const char lbl_805E3EE0[];
+extern const char lbl_805E3EEC[];
+extern const char lbl_805E3EFC[];
+extern const char lbl_805E3F00[];
+extern const char lbl_805E3F0C[];
+extern const char* lbl_8061ECA8;
+class Unk802D1FA8_Self : public Unk802CF368_Self {
+public:
+    Unk802D1FA8_Self(const char* name);   /* never defined */
+    int m20;
+    int m24;
+    float m28;
+    char pad2C[0x38 - 0x2C];
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
+    float m5C;
+    int m60;
+    float m64;
+    float m68;
+    float m6C;
+    float m70;
+    float m74;
+    char pad78[0x12C - 0x78];
+    int m12C;
+    int m130;
+};
+
+void fn_802D1FA8(Unk802D1FA8_Self* r)
+{
+    r->fn_8037B7E4(lbl_805E3D40);
+    fn_802CF368(r);
+    r->fn_8037B7E8(lbl_805E3BA4);
+    r->fn_8037B458(lbl_805E3D44, &r->m12C, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B458(lbl_805E3D58, &r->m130, lbl_805E2568, lbl_805E331C);
+    r->fn_8037B7E8(lbl_805E3D6C);
+    r->fn_8037B674(lbl_805E3D7C, &r->m20, lbl_805E3488, 0);
+    r->fn_8037B458(lbl_805E3BEC, &r->m24, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3D8C, &r->m28, lbl_805E3D98, lbl_805E39F8);
+    r->fn_8037B50C(lbl_805E3DA8, &r->m44, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3DB8, &r->m48, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3DC4, &r->m4C, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3DD0, &r->m50, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3DDC, &r->m54, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B830(lbl_805E3D6C);
+    r->fn_8037B50C(lbl_805E3DE8, &r->m38, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3E00, &r->m3C, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3E08, &r->m40, lbl_805E3DF0, 0);
+    r->fn_8037B548(lbl_805E3E10, lbl_805E3E28);
+    r->fn_8037B548(lbl_805E3E40, lbl_805E3E28);
+    r->fn_8037B50C(lbl_805E3E54, &r->m58, lbl_805E3454, lbl_805E26D8);
+    r->fn_8037B728(lbl_805E3E5C, lbl_805E3E68, (char*)r + 0x2C, (int)lbl_805E3E78);
+    r->fn_8037B7E8(lbl_805E3EA4);
+    r->fn_8037B50C(lbl_805E3EAC, &r->m5C, lbl_805E3EB8, 0);
+    r->fn_8037B458(lbl_805E3EC4, &r->m60, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3ED4, &r->m64, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3EE0, &r->m68, lbl_805E3848, lbl_805E3DB4);
+    r->fn_8037B50C(lbl_805E3EEC, &r->m6C, lbl_805E3848, lbl_805E3EFC);
+    r->fn_8037B830(lbl_805E3EA4);
+    r->fn_8037B50C(lbl_805E3F00, &r->m70, lbl_8061ECA8, 0);
+    r->fn_8037B50C(lbl_805E3F0C, &r->m74, lbl_8061ECA8, 0);
+    r->fn_8037B830(lbl_805E3BA4);
+    fn_802CF894((char*)r + 0x78, r);
+}
+
 Unk802D1EA4* fn_802D2314()
 {
     return new (lbl_806EF9B4) Unk802D1EA4;
@@ -211,6 +323,58 @@ void fn_802D331C()
 void fn_802D3320(Unk802D3320* o)
 {
     o->m20.Scale(12.0f);
+}
+
+extern const char lbl_805E3F68[];
+extern const char lbl_805E3BA4[];
+extern const char lbl_805E3F6C[];
+extern const char lbl_805E3DF0[];
+extern const char lbl_805E3F78[];
+extern const char lbl_805E3F84[];
+extern const char lbl_805E3E54[];
+extern const char lbl_805E3454[];
+extern const char lbl_805E26D8[];
+extern const char lbl_805E3464[];
+extern const char lbl_805E3F90[];
+extern const char lbl_805E3F98[];
+extern const char lbl_805E3FA0[];
+extern const char lbl_805E39B4[];
+extern const char lbl_805E39C0[];
+extern const char lbl_805E39C4[];
+int fn_804089B4(char* buf, const char* fmt, ...);
+
+class Unk802D3364_Self : public Unk802CF368_Self {
+public:
+    Unk802D3364_Self(const char* name);   /* never defined */
+    char pad20[0x20 - 0x20];
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+};
+
+void fn_802D3364(Unk802D3364_Self* r)
+{
+    char buf[0x40];
+    r->fn_8037B7E4(lbl_805E3F68);
+    fn_802CF368(r);
+    r->fn_8037B7E8(lbl_805E3BA4);
+    r->fn_8037B50C(lbl_805E3F6C, &r->m20, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3F78, &r->m24, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3F84, &r->m28, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3E54, &r->m2C, lbl_805E3454, lbl_805E26D8);
+    r->fn_8037B830(lbl_805E3BA4);
+    r->fn_8037B7E8(lbl_805E3464);
+    r->fn_8037B50C(lbl_805E3F90, &r->m30, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3F98, &r->m34, lbl_805E3DF0, 0);
+    r->fn_8037B50C(lbl_805E3FA0, &r->m38, lbl_805E3DF0, 0);
+    fn_804089B4(buf, lbl_805E39B4, 0.1f, 72.0f);
+    r->fn_8037B50C(lbl_805E39C0, &r->m3C, buf, lbl_805E39C4);
+    r->fn_8037B830(lbl_805E3464);
 }
 
 Unk802D3268* fn_802D34EC()
