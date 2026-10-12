@@ -12,6 +12,7 @@ extern const char lbl_805F66F0[];
 extern const char lbl_805F6934[];
 extern const char lbl_805F6940[];
 extern const char lbl_805F69E4[];
+extern "C" void fn_800E3418(int a, int b, int c, int d);
 extern "C" {
 
 extern "C" void fn_800E49DC(FeScrD* x);
@@ -246,6 +247,27 @@ FE_OVERLAY int fn_80491D30(void* x)
     return 1;
 }
 
+FE_OVERLAY int fn_80491D6C(FeW* x, FeW* w, int a)
+{
+    if (FeI(x, 0x13C) == 0) {
+        if (FeI(x, 0x134) == 1) {
+            if (FeW24(FeP(x, 0x198)) >= 0) {
+                int u = ((FeWI*)FeMem(x, 0x21C))->s60();
+                fn_800E3418(FeI(x, 0x1E4), FeI(x, 0x15C), 0, u);
+            }
+            return 1;
+        }
+        if ((w == fn_800C8060(FeMem(x, 0x1DC)->fn_vslot32(lbl_805F6934, 1))
+                || w == fn_800C8060(FeMem(x, 0x1D8)->fn_vslot32(lbl_805F6940, 1))
+                || w == fn_800C8060(FeMem(x, 0x1E0)->fn_vslot32(lbl_805F69E4, 1)))
+            && FeW24(FeP(x, 0x198)) >= 0) {
+            x->fn_vslot67(0, fn_800C8070((void*)a));
+            return 1;
+        }
+    }
+    return 0;
+}
+
 FE_OVERLAY void fn_80491EE0(char* x)
 {
     int i = FeI(x, 0x188);
@@ -254,6 +276,42 @@ FE_OVERLAY void fn_80491EE0(char* x)
     char* b = x + 0x24C;
     int r = fn_800E2E8C(*(int*)(a + o), i, *(int*)(b + o), 0);
     *(int*)(b + FeI(x, 0x188) * 4) = r;
+}
+
+FE_OVERLAY void fn_80491F34(void* x)
+{
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    ((int (*)(void*, int))fn_80125084)(w, 0);
+    ((int (*)(void*, int))fn_80125084)(w, 1);
+    ((int (*)(void*, int))fn_80125084)(w, 2);
+    ((int (*)(void*, int))fn_80125084)(w, 3);
+    switch (FeI(x, 0x134)) {
+    case 0:
+        ((int (*)(void*, int))fn_80125128)(w, 0);
+        if (FeI(x, 0x13C) == 0) {
+            fn_80125154(w, 1);
+        }
+        ((int (*)(void*, int, int, int))fn_801251CC)(w, 2, 0x4DA3, 3);
+        ((int (*)(void*, int, int, int))fn_801251CC)(w, 3, 0x1A2F, 2);
+        break;
+    case 1:
+        if (FeI(fn_800B555C(), 0x628) != 0) {
+            FeI(fn_800B555C(), 0x628) = 0;
+        } else {
+            fn_80125154(w, 1);
+        }
+        ((int (*)(void*, int))fn_80125128)(w, 0);
+        ((int (*)(void*, int, int, int))fn_801251CC)(w, 3, 0x1A2F, 2);
+        break;
+    case 2:
+        ((int (*)(void*, int))fn_80125128)(w, 0);
+        fn_80125154(w, 1);
+        break;
+    case 3:
+        ((int (*)(void*, int, int, int))fn_801251CC)(w, 2, 0x4DA3, 3);
+        ((int (*)(void*, int))fn_80125128)(w, 0);
+        break;
+    }
 }
 
 }
