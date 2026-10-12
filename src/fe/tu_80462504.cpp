@@ -193,12 +193,11 @@ FE_OVERLAY void fn_80462A7C(FeScrE* x, FeW* w)
     }
 }
 
-/* near-miss: lwzx operand order (retail base,index; ours index,base) in the two array reads: 2 slots (lwzx base/index family, see PATTERNS) */
 FE_OVERLAY void fn_80462AE8(FeScrE* x, FeW* w)
 {
     if (w == x->m134) {
         if (x->m14C->fn_vslot86() != 0) {
-            int v = (*(int**)((char*)x + 0x210))[w->fn_vslot60()];
+            int v = *(int*)((char*)*(int**)((char*)x + 0x210) + (w->fn_vslot60() << 2));
             FeList* l = (FeList*)x->m14C;
             fn_80126CF4(l, v, l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
             return;
@@ -206,7 +205,7 @@ FE_OVERLAY void fn_80462AE8(FeScrE* x, FeW* w)
     }
     if (x->m13C == x->m138) {
         if (x->m14C->fn_vslot87() != 0) {
-            int v = (*(int**)((char*)x + 0x158))[w->fn_vslot60()];
+            int v = *(int*)((char*)*(int**)((char*)x + 0x158) + (w->fn_vslot60() << 2));
             FeList* l = (FeList*)x->m14C;
             fn_80126CF4(l, l->m164, v, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
         }
@@ -319,7 +318,6 @@ FE_OVERLAY int fn_80462FFC(FeScrE* x)
     return 1;
 }
 
-/* near-miss: lwzx base,index operand order in the two list reads (2 slots; lwzx family) */
 FE_OVERLAY int fn_8046356C(FeScrE* x)
 {
     if (x->m13C->fn_vslot59() != 0) {
@@ -332,7 +330,7 @@ FE_OVERLAY int fn_8046356C(FeScrE* x)
             } else {
                 FeArrL* la = (FeArrL*)((char*)x + 0x158);
                 FeList* l = (FeList*)x->m14C;
-                fn_80126CF4(l, l->m164, ((int*)la->m0)[idx], l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+                fn_80126CF4(l, l->m164, *(int*)(la->m0 + (idx << 2)), l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
                 x->m14C->fn_vslot84(1, 0);
                 ((FeW88*)x->m14C)->s88(1, (unsigned)la->m4 > 1);
             }
@@ -342,7 +340,7 @@ FE_OVERLAY int fn_8046356C(FeScrE* x)
         } else {
             FeArrL* lb = (FeArrL*)((char*)x + 0x210);
             FeList* l = (FeList*)x->m14C;
-            fn_80126CF4(l, ((int*)lb->m0)[idx], l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+            fn_80126CF4(l, *(int*)(lb->m0 + (idx << 2)), l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
             x->m14C->fn_vslot84(0, 0);
             ((FeW88*)x->m14C)->s88(0, (unsigned)lb->m4 > 1);
         }
