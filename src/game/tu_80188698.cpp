@@ -3,6 +3,9 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80188698.h"
+#include "game/tu_8018C9C8.h"
+
+
 //@BODY
 //@80188698
 extern "C" void fn_80188698(Unk80188698* o, float f)
@@ -215,6 +218,25 @@ extern "C" void fn_8018A8C4(Unk80188698* o, float a, float b, float c)
     if (!(c <= lbl_805CDC1C.m0))
         c = c + o->m3F4;
     fn_801965CC(o->m448, o->m3F4 + a, o->m3F4 + b, c);
+}
+
+//@8018A930
+extern "C" void fn_8018A930(Unk80188698* o, int a, float t, void* b, void* c, void* d)
+{
+    int mode = o->m38C;
+    if (a == 0 || mode != 1 || o->m388 != 3) {
+        mode = 4;
+        fn_8037893C((char*)o->m44C + 0x704, 0x43, 0, 0, 0);
+    }
+    int prev = o->m38C;
+    o->m38C = mode;
+    o->m390 = prev;
+    ((Unk8018C9C8_Bits*)&o->m4A4)->b10 = fn_8018AABC(o);
+    ((Unk8018C9C8_Bits*)&o->m4A4)->b9 = fn_8018B4D0(o);
+    Unk80183918_Vec3 pos = o->m60;
+    if (d)
+        pos = *(Unk80183918_Vec3*)d;
+    fn_8018A254(o, (int)&pos, &lbl_806055AC, (int)b, (int)c, o->m38C, 1);
 }
 
 //@8018AA44
