@@ -202,6 +202,56 @@ int fn_80169DC4(char* base) /* 80169DC4 */
     return 0;
 }
 
+extern "C" void* fn_80151684(void* self);
+extern "C" void* fn_801522E4(void* self);
+extern "C" void* fn_80150E1C(void* self);
+extern "C" void* fn_80151A48(void* self);
+extern "C" void* fn_80151C40(void* self);
+extern "C" void* fn_801525F0(void* self);
+
+void fn_80169E38() /* 80169E38 */
+{
+    fn_80151684(operator new(0x160, lbl_806EF9B4));
+    new (lbl_806EF9B4) cTeleportActor;
+    new (lbl_806EF9B4) cPlayAnimation;
+    new (lbl_806EF9B4) cScriptUmpireSignal;
+    new (lbl_806EF9B4) cScriptRunGoal;
+    new (lbl_806EF9B4) cScriptReachGoal;
+    new (lbl_806EF9B4) cScriptIdleGoal;
+    new (lbl_806EF9B4) cGoto;
+    new (lbl_806EF9B4) cLoop;
+    new (lbl_806EF9B4) cGosub;
+    new (lbl_806EF9B4) cPlayManagerArgumentScript;
+    new (lbl_806EF9B4) cPause;
+    fn_801522E4(operator new(0x14, lbl_806EF9B4));
+    new (lbl_806EF9B4) cAssignOnDeckBatter;
+    new (lbl_806EF9B4) cSimToEndOfPlay;
+    new (lbl_806EF9B4) cScriptStopSavingReplay;
+    new (lbl_806EF9B4) cScriptCrowdCameraFlash;
+    new (lbl_806EF9B4) cScriptWaitGoal;
+    new (lbl_806EF9B4) cSetCamera;
+    new (lbl_806EF9B4) cScriptPIP;
+    new (lbl_806EF9B4) cScriptViewport;
+    fn_80150E1C(operator new(0x14, lbl_806EF9B4));
+    new (lbl_806EF9B4) cWaitForAnimation;
+    new (lbl_806EF9B4) cSetOverlay;
+    new (lbl_806EF9B4) cGeneralScriptConditional;
+    fn_80151A48(operator new(0x1C, lbl_806EF9B4));
+    new (lbl_806EF9B4) cGosubRandom;
+    new (lbl_806EF9B4) cScriptReplay;
+    fn_80151C40(operator new(0x68, lbl_806EF9B4));
+    new (lbl_806EF9B4) cTransitionWipe;
+    new (lbl_806EF9B4) cWait;
+    new (lbl_806EF9B4) cHomerunCelebration;
+    new (lbl_806EF9B4) cScriptParticleEffect;
+    new (lbl_806EF9B4) cWaitForActiveActors;
+    new (lbl_806EF9B4) cPlayerAttributes;
+    new (lbl_806EF9B4) cSpawnProcess;
+    new (lbl_806EF9B4) cSetDepthOfField;
+    fn_801525F0(operator new(0x1C, lbl_806EF9B4));
+    new (lbl_806EF9B4) cScriptLoadAnimations;
+}
+
 void fn_8016A660(Unk8016ACAC_Slot* s, int c) /* 8016A660 */
 {
     *(const void**)((char*)s + 0xA58) = lbl_8065EC50;
