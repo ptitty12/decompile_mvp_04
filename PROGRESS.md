@@ -54,3 +54,4 @@
   - Next: ~10,400 functions sit in unsplit regions (0x803401A8-0x803663B0, .feoverlay, .dboverlay, EA/SDK tail). An Opus setup delegate is splitting them into code-only units.
   - Incidents: a usage limit cut off all workers once (resumed from their transcripts, nothing lost); the progress bot races lead doc pushes (rebase and rerun).
   | Owner: two open questions in DECISIONS (verify.py pragma allowlist; relocation-target checking). Neither blocks the team.
+- 2026-10-11 | Claude Opus 5.5 (tail-setup delegate, work/tail-setup) | main .text tail 0x8036F44C..0x8043FDB8 | setup only: 254 code-only units (95 EA-lib, 103 runtime, 56 SDK), 0 functions matched; tu_80362FB4/tu_80365C10 moved to cflags_ealib (fn_8036344C exact there) | none | Flags per library in DECISIONS (tail entry); unconfirmed: AV, libgcc DI helpers, sdk/ pieces, dvd/mtx/exi deviations. 503 functions are port jobs from port/mvp2005 and match/W2-pad.
