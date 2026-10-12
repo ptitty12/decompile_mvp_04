@@ -60,6 +60,36 @@ public:
 };
 extern "C" void* fn_80319330(void* p, int a);
 
+extern "C" float __builtin_fabsf(float x);
+inline float Unk801852A4_Abs(float v)
+{
+    return __builtin_fabsf(v);
+}
+inline Unk80183918_Vec3 Unk801852A4_Sub(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+inline Unk80183918_Vec3 Unk801852A4_Add(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m0 + b.m0;
+    r.m4 = a.m4 + b.m4;
+    r.m8 = a.m8 + b.m8;
+    return r;
+}
+inline Unk80183918_Vec3 Unk801852A4_Mul(Unk80183918_Vec3 v, float s)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+
 //@BODY
 //@8018423C
 extern "C" void fn_8018423C(Unk80181140* o, char* a, Unk8018423C_B* b)
@@ -145,6 +175,23 @@ extern "C" float fn_8018514C(Unk8018514C_O* o, Unk80183918_Vec3* p, Unk80183918_
     }
     *out = lbl_806055C4;
     return 0.0f;
+}
+
+//@801852A4
+/* near-miss (99.6%): instructions identical, only stack offsets differ. Retail: Mul param copy 0x20, Sub local and
+ * the final return temp share 0x30, Mul result temp 0x40, Add local 0x68 (frame 0x78); here the return temp is
+ * allocated first (0x20) and the frame is 0x70. Tried named/nested Sub/Mul/Add results and by-ref/by-value params. */
+extern "C" int fn_801852A4(void* self, Unk80183918_Vec3* a, Unk80183918_Vec3* b, Unk80183918_Vec3* out, Unk80183918_Vec3* out2, float* t)
+{
+    if (!(a->m4 <= 0.0f) && !(b->m4 >= 0.0f)) {
+        float fa = Unk801852A4_Abs(a->m4 - b->m4);
+        float fb = Unk801852A4_Abs(a->m4);
+        *t = fb / fa;
+        *out = Unk801852A4_Add(*a, Unk801852A4_Mul(Unk801852A4_Sub(*b, *a), *t));
+        *out2 = lbl_806055C4;
+        return 1;
+    }
+    return 0;
 }
 
 //@80185424
