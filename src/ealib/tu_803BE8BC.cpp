@@ -410,6 +410,27 @@ inline int EAGLTestBit(unsigned* bits, int idx)
 
 extern "C" void fn_803BE6F4(unsigned* set, int k, int v);
 
+struct EAGLChild10 {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual int v10(float, float, int, int);
+};
+
+struct EAGLSelfArr10 {
+    char pad0[0xC];
+    EAGLRecArr* mC;
+    EAGLChild10** m10;
+    int m14;
+    unsigned char m18;
+};
+
 extern "C" EAGLSelfA* fn_803BE8EC(EAGLSelfA* s)
 {
     s->m0 = lbl_80685860;
@@ -443,6 +464,26 @@ extern "C" int fn_803BE950(EAGLSelfA* s)
 extern "C" int fn_803BE958(EAGLSelfB* s)
 {
     return s->mC->m2;
+}
+
+extern "C" int fn_803BE964(EAGLSelfArr10* s, float x, float y, int a, int b)
+{
+    EAGLRecArr* rec = s->mC;
+    int r = 0;
+    int i;
+    if (s->m10 == 0) {
+        s->m10 = (EAGLChild10**)lbl_80626DD0->v6(rec->m8 * 4);
+        for (i = rec->m8 - 1; i >= 0; i--)
+            s->m10[i] = (EAGLChild10*)lbl_80626DD0->v11(rec->mC[i]);
+    }
+    if (s->m14 != 0) {
+        float k = (float)(int)s->m18;
+        x *= k;
+        y *= k;
+    }
+    for (i = rec->m8 - 1; i >= 0; i--)
+        r = (r != 0) | (s->m10[i]->v10(x, y, a, b) != 0);
+    return r;
 }
 
 extern "C" int fn_803BEAF4(EAGLSelfArr7* s, float t, int a, int b)
