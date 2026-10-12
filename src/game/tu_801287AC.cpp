@@ -94,6 +94,24 @@ extern const char lbl_805BDBE4[];
 extern const char lbl_805BDBE8[];
 extern const char lbl_805BDBEC[];
 extern const char lbl_805BDBF0[];
+extern int lbl_8061930C;
+extern int lbl_8061977C;
+extern const char lbl_805C064C[];
+extern const char lbl_805C0658[];
+extern const char lbl_805C0660[];
+extern const char lbl_805C066C[];
+extern const char lbl_805C0678[];
+extern const char lbl_805C0680[];
+extern const char lbl_805C02E8[];
+extern const int lbl_805C3D34[];
+extern const int lbl_805C3D44[];
+extern const int lbl_805C3D58[];
+extern "C" int fn_8007A270(int, int);
+extern "C" void fn_8012E514(int, short*);
+extern "C" void fn_800DFE40(short*, int);
+extern "C" void fn_804031BC(short*, const char*);
+extern "C" void fn_80403DE4(short*, short*, ...);
+extern "C" int fn_80090880(int, int);
 // PROTOS-BEGIN
 extern "C" {
 void fn_801287AC(int a, int b, int c, int d);
@@ -169,6 +187,48 @@ void fn_80128850(int a, int b, int c, int d)
     t->fn_vslot44(5, 1, buf, 4);
     fn_804089B4(buf, lbl_805BC1A8, fn_800DBCC8(slot, 0, k, c, 2, 1, d));
     t->fn_vslot44(6, 1, buf, 4);
+}
+
+void fn_801292A4(int a, int b, int c)
+{
+    int g = lbl_8061930C;
+    Wid* w = fn_800C8044(((Wid*)b)->fn_vslot32(lbl_805C064C, 1));
+    short wfmt[100];
+    short sD0[52];
+    short s138[100];
+    short s200[1000];
+    int r29 = fn_8007A6A0(g, 0x19, c);
+    int r30;
+    if (r29 == 1) {
+        r30 = fn_80090880(lbl_8061977C, 0x1C5F);
+    } else {
+        r30 = fn_80090880(lbl_8061977C, 0x1C5E);
+    }
+    fn_804031BC(wfmt, lbl_805C0658);
+    fn_80403DE4(s138, wfmt, r29, r30);
+    fn_800C8040(w->fn_vslot32(lbl_805C0660, 1))->fn_vslot28(s138);
+    fn_800DFE40(sD0, c);
+    fn_804031BC(wfmt, lbl_805C066C);
+    fn_80403DE4(s138, wfmt, sD0, fn_80090880(lbl_8061977C, 0x2351), fn_80090880(lbl_8061977C, 0x2352));
+    fn_800C8040(w->fn_vslot32(lbl_805C064C, 1))->fn_vslot28(s138);
+    int k = fn_8007A6A0(g, 0x32, c);
+    int t1;
+    int t2;
+    if (fn_8007A270(g, c) != 0) {
+        t2 = lbl_805C3D44[k % 5];
+        t1 = lbl_805C3D58[k / 5];
+    } else {
+        t2 = lbl_805C3D34[k % 4];
+        t1 = lbl_805C3D58[k / 4];
+    }
+    fn_804031BC(wfmt, lbl_805C02E8);
+    fn_80403DE4(s138, wfmt, fn_80090880(lbl_8061977C, t1), fn_80090880(lbl_8061977C, t2));
+    fn_800C8040(w->fn_vslot32(lbl_805C0678, 1))->fn_vslot28(s138);
+    Wid* x = w->fn_vslot30(lbl_805C0680, 1);
+    if (x != 0) {
+        fn_8012E514(c, s200);
+        fn_800C8040(x)->fn_vslot28(s200);
+    }
 }
 
 int fn_801295DC(int a, int b, int c)
