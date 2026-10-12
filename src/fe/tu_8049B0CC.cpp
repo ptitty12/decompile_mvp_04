@@ -5,6 +5,9 @@
 
 #include "game/fe_8048E6A0.h"
 
+extern const char lbl_805F74C4[];
+extern "C" char* strncpy(char*, const char*, unsigned);
+extern "C" char fn_800B56C4(void* s);
 extern "C" {
 
 FE_OVERLAY void fn_8049B0CC(void* x)
@@ -33,6 +36,25 @@ FE_OVERLAY int fn_8049B140(FeScrB* x)
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     }
     fn_800B7ADC(lbl_8061A32C, x);
+    return 1;
+}
+
+FE_OVERLAY int fn_8049B19C(FeW* x)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    char t = fn_800B56C4(fn_800B555C());
+    if (t != 0) {
+        strncpy(mp->name, lbl_805F3CA8, 15);
+        mp->name[15] = 0;
+    } else if (fn_800B5758(fn_800B555C()) != 0) {
+        strncpy(mp->name, lbl_805F74C4, 15);
+        mp->name[15] = t;
+    } else {
+        ((FeWQ*)x)->s79((int)mp);
+    }
+    fn_800B7B4C(FeGetMgr(), &m, x);
     return 1;
 }
 
@@ -180,6 +202,15 @@ FE_OVERLAY int fn_8049CEA8(FeScrF* x)
 {
     x->m138->fn_vslot53();
     return 1;
+}
+
+FE_OVERLAY int fn_8049CEE4(FeScrF* x, FeW* w, int a, int b)
+{
+    if (w == x->m138) {
+        w->fn_vslot68(b);
+        x->fn_vslot67(2, 0);
+    }
+    return 0;
 }
 
 FE_OVERLAY void fn_8049D430(char* x)
