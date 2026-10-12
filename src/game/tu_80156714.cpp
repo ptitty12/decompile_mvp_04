@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8015AA94.h"
+#include "game/tu_80167DCC.h"
 
 extern float lbl_805C8C1C;
 
@@ -86,6 +87,13 @@ int fn_801A2034(Unk801527C8_Actor* a, int i);
 struct V2_80159E40 { float x; float y; };
 V2_80159E40 fn_8022EA60(void* a, ...);
 inline float AbsF80159E40(float v) { return (float)__builtin_fabs(v); }
+extern int lbl_80619D10;
+extern const Unk8015AB2C_Blk lbl_8068B828;
+int fn_800AB528(int g);
+int fn_800AC330();
+void fn_800AC36C();
+void fn_8031E1D4(Unk801527C8_Actor* a, const char* s);
+extern "C" int fn_80326C20(Unk801527C8_Sub* s);
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
@@ -430,6 +438,34 @@ void cScriptParticleEffect::fn_vslot2() /* 80156EB4 */
 
 int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
 {
+}
+
+extern "C" void fn_801597F0(Unk80159F28* self) /* 801597F0 */
+{
+    self->m334 = -1.0f;
+    int g = lbl_80619D10;
+    if (fn_800AB528(g) == 0 || (fn_800AB528(g), fn_800AC330() != 0)) {
+        if (fn_80326C20(&self->mC->m50) != 0) {
+            Unk80189300* o = fn_801A4B34(self->mC);
+            if (o != 0) {
+                self->m32C = 1;
+                Unk801527C8_Actor* a = fn_801A04A8(self->mC, 5);
+                if (o->fn_v4() != 0) {
+                    fn_8031E1D4(a, "batterreplayleft");
+                    ((Unk8016ACAC*)a->m40)->fn_8016BB50("batterreplay_left_foul", 0, 0, lbl_8068B828, 0);
+                } else {
+                    fn_8031E1D4(a, "batterreplayright");
+                    ((Unk8016ACAC*)a->m40)->fn_8016BB50("batterreplay_right_foul", 0, 0, lbl_8068B828, 0);
+                }
+                int g2 = lbl_80619D10;
+                a->m4 = 1;
+                if (fn_800AB528(g2) != 0) {
+                    fn_800AB528(g2);
+                    fn_800AC36C();
+                }
+            }
+        }
+    }
 }
 
 extern "C" void fn_80159E40(Unk80159F28* self, int* a, int* b) /* 80159E40 */
