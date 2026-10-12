@@ -87,6 +87,24 @@ void fn_803A3E08(const unsigned char* src, short* dst, int stride, const int* ta
 void fn_80397CD0(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 void fn_80397F98(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
 
+struct Vp6McView2 {
+    char pad0[0x74];
+    int m74;
+    char pad78[4];
+    int m7C;
+    char pad80[8];
+    int m88;
+    char pad8C[0x13C - 0x8C];
+    Vp6Tbl* m13C;
+    char pad140[0x290 - 0x140];
+    int m290;
+};
+
+typedef void (*Vp6Fn3)(int, int, int);
+extern Vp6Fn3 lbl_806EF3A4;
+extern Vp6Fn3 lbl_806EF3A0;
+extern Vp6Fn4 lbl_806EF43C;
+
 /* near-miss: same weights as fn_803A00DC; load and multiply scheduling differ (72 vs 62 insns). */
 void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
 {
@@ -481,6 +499,33 @@ unsigned fn_803A4094(const unsigned char* p, int stride)
         p += stride;
     }
     return (sq * 16 - sum * sum) >> 8;
+}
+
+void fn_803A4104(Vp6McView2* c, int base, int a, int b)
+{
+    int p = c->m290;
+    int x, y;
+    if (a > 0)
+        x = a >> c->m7C;
+    else
+        x = -(-a >> c->m7C);
+    if (b > 0)
+        y = b >> c->m7C;
+    else
+        y = -(-b >> c->m7C);
+    int d = c->m88 * y + x - c->m74 * 2 - 2;
+    lbl_806EF43C(base + d, p, c->m74, 16);
+    int rx = (8 - (x & 7)) & 7;
+    int ry = (8 - (y & 7)) & 7;
+    if (rx != 0) {
+        int o1 = rx + 2;
+        lbl_806EF3A4(c->m13C->m0, p + o1, 16);
+    }
+    if (ry != 0) {
+        Vp6Tbl* tb = c->m13C;
+        int o2 = ry * 16 + 0x20;
+        lbl_806EF3A0(tb->m0, p + o2, 16);
+    }
 }
 
 }
