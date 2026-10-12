@@ -4,6 +4,32 @@
  */
 #include "game/db_8054FA04.h"
 #include "game/clampiter.h"
+extern "C" char* fn_802B9300(const char* path, int a, int b, unsigned* n);
+extern "C" void fn_802B961C(char* buf, int b);
+extern "C" void fn_80329AEC(const char** pp, const char** out, unsigned* pn, int delim);
+extern "C" int fn_80329C4C(const char** pp, unsigned* pn, int* out, int lo, int hi, int delim);
+extern "C" int fn_80329B98(const char** pp, unsigned* pn, float* out, int delim);
+/* 0x1114-byte object (new (0x100)): a float table from +0 (5 x 28 x 3, filled by fn_805566BC) and a
+ * mode word at +0x1110 (fn_80556D20 stores 5, 3). */
+struct Db80556D20_Obj {
+    char pad0[0x1110];
+    int m1110;
+};
+/* Pair of Db80556D20_Obj pointers (fn_80556D20 builds both). */
+struct Db80556D20_S {
+    Db80556D20_Obj* m0;
+    Db80556D20_Obj* m4;
+};
+extern "C" void fn_805566BC(Db80556D20_Obj* o, const char* path);
+extern "C" void fn_805567D8(Db80556D20_Obj* o, const void* a, const void* b);
+extern char lbl_805FF5D0[];
+extern char lbl_805FF5E0[];
+extern char lbl_805FF5F0[];
+extern char lbl_805FF600[];
+extern char lbl_805FF610[];
+extern char lbl_805FF620[];
+void fn_802B8E1C();
+void fn_802B8E84();
 
 extern Unk8007A4DC_Screen* lbl_8061930C;
 extern int lbl_80622C9C[];
@@ -25,7 +51,7 @@ void fn_8007FE18(Unk8007F198_E* self);
 extern "C" void fn_80560314(int obj, int j, int k);
 extern "C" int fn_8033E888(int a, int b);
 
-extern "C" void fn_805559D4(int a, void* idx, int b, int c);
+extern "C" int fn_805559D4(int a, void* idx, int b, int c);
 extern "C" int fn_805481D8(void* p);
 extern "C" void fn_80546D5C(void* p, int a);
 
@@ -82,6 +108,11 @@ extern "C" int fn_80555EB0(int k, int i);
 extern "C" int fn_80555F18(int k, int i);
 extern "C" int fn_805562B8(int a);
 extern "C" Db8055638C_Idx* fn_80556348(Db8055638C_Idx* self);
+int fn_8007FB2C(Unk8007F198_C* s, int a);
+/* Array element with the inline constructor call (fn_80555F80 builds twelve on the stack). */
+struct Db80555F80_Idx : Db8055638C_Idx {
+    Db80555F80_Idx() { fn_80556348(this); }
+};
 extern "C" void fn_8055638C(Db8055638C_Idx* self);
 extern "C" int fn_805563C4(Db8055638C_Idx* self);
 extern "C" int fn_80556410(Db8055638C_Idx* self);
@@ -278,6 +309,42 @@ extern "C" DB_OVERLAY int fn_80555F18(int k, int i)
     return 0;
 }
 
+extern "C" DB_OVERLAY int fn_80555F80(int a)
+{
+    int k = fn_8057CE00(a);
+    if ((unsigned)k <= 2) {
+        Db80555F80_Idx arr[12];
+        int n = fn_805559D4(k, arr, 12, a);
+        int i = 0;
+        if (i < n) {
+            Db8055638C_Idx* p = arr;
+            do {
+                if (fn_805564DC(p) == 0)
+                    return 0;
+                i++;
+                p++;
+            } while (i < n);
+        }
+        if (k <= 1) {
+            int s = fn_8007FB2C((Unk8007F198_C*)lbl_8061930C, a);
+            int t = 0;
+            switch (k + 1) {
+            case 1:
+                t = fn_80555D88(0, a);
+                break;
+            case 2:
+                t = fn_80555D88(0, a);
+                t += fn_80555D88(1, a);
+                break;
+            }
+            if (s > t)
+                return 0;
+        }
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" DB_OVERLAY int fn_805562B8(int a)
 {
     if (fn_8057CE00(0) == 3) {
@@ -392,6 +459,43 @@ extern "C" DB_OVERLAY void fn_8055669C(Db8055638C_Idx* self, int v)
     self->m8 = self->m8 + 1;
 }
 
+/* near-miss (97%): one swap, retail emits the compare for the first delimiter before the add that forms the
+ * row pointer (cmpwi r28,2 / add r30), ours the other way round. Tried pointer-arithmetic spellings, loop forms
+ * and callee return types. */
+extern "C" DB_OVERLAY void fn_805566BC(Db80556D20_Obj* obj, const char* path)
+{
+    unsigned n = 0;
+    char* buf = fn_802B9300(path, 0x100, 7, &n);
+    const char* text = buf;
+    const char* s;
+    fn_80329AEC(&text, &s, &n, 10);
+    int o = 0;
+    int a = 5;
+    do {
+        int m = 0;
+        int b = 28;
+        do {
+            int x1;
+            int x2;
+            fn_80329C4C(&text, &n, &x1, 0x12, 0x2d, 0x2c);
+            fn_80329C4C(&text, &n, &x2, 1, 5, 0x2c);
+            float* q = (float*)(o + m + (int)obj);
+            int j = 0;
+            do {
+                float f;
+                int d = j == 2 ? 10 : 0x2c;
+                j++;
+                fn_80329B98(&text, &n, &f, d);
+                *q = f;
+                q++;
+            } while (j <= 2);
+            m += 0x3c;
+        } while (--b != 0);
+        o += 0xc;
+    } while (--a != 0);
+    fn_802B961C(buf, 7);
+}
+
 extern "C" DB_OVERLAY char* fn_8055696C(char* base, int a, int mode, float f)
 {
     int k;
@@ -409,6 +513,31 @@ extern "C" DB_OVERLAY char* fn_8055696C(char* base, int a, int mode, float f)
     default:
         return 0;
     }
+}
+
+extern "C" DB_OVERLAY Db80556D20_S* fn_80556D20(Db80556D20_S* s)
+{
+    s->m0 = 0;
+    s->m4 = 0;
+    fn_802B8E1C();
+    if (s->m0 == 0) {
+        Db80556D20_Obj* o = new (0x100) Db80556D20_Obj;
+        o->m1110 = 5;
+        s->m0 = o;
+    }
+    fn_805566BC(s->m0, lbl_805FF5D0);
+    fn_805567D8(s->m0, lbl_805FF5E0, lbl_805FF5F0);
+    s->m0->m1110 = 5;
+    if (s->m4 == 0) {
+        Db80556D20_Obj* o = new (0x100) Db80556D20_Obj;
+        o->m1110 = 5;
+        s->m4 = o;
+    }
+    fn_805566BC(s->m4, lbl_805FF600);
+    fn_805567D8(s->m4, lbl_805FF610, lbl_805FF620);
+    s->m4->m1110 = 3;
+    fn_802B8E84();
+    return s;
 }
 
 extern "C" DB_OVERLAY void fn_80556E0C(Db80556E0C_S* self, int chrg)
