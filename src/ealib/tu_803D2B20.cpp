@@ -69,6 +69,41 @@ struct Unk803D2B20Obj {
     unsigned char m13;
 };
 
+struct Unk803D2BC0Quat {
+    float x, y, z, w;
+};
+struct Unk803D2BC0Self {
+    char pad0[0x48];
+    Unk803D2BC0Quat q;
+};
+struct Unk803D2BC0Other {
+    char pad0[0x10];
+    Unk803D2BC0Quat q;
+};
+
+struct Unk803D39C0Rec {
+    char pad0[0xC];
+    unsigned char* mC;
+    Unk803D2B20* m10;
+    char pad14[2];
+    unsigned char m16;
+};
+struct Unk803D39C0Obj {
+    char pad0[0xC];
+    Unk803D39C0Rec* mC;
+};
+
+struct Unk803D4A7CRec {
+    char pad0[0xC];
+    unsigned short* mC;
+    char pad10[2];
+    unsigned char m12;
+};
+struct Unk803D4A7CObj {
+    char pad0[0xC];
+    Unk803D4A7CRec* mC;
+};
+
 extern const void* lbl_80686518[];
 extern const void* lbl_806865D0[];
 extern const void* lbl_80686688[];
@@ -95,6 +130,21 @@ extern "C" int fn_803D2B64(float t, float lo, float hi)
     if (!(t < hi))
         return (int)((t - hi) / d) + 1;
     return 0;
+}
+
+inline void QMul(Unk803D2BC0Quat* t, Unk803D2BC0Quat* a, Unk803D2BC0Quat* b)
+{
+    t->x = b->w * a->x + (b->z * a->y + (b->x * a->w - b->y * a->z));
+    t->y = b->w * a->y + ((b->x * a->z + b->y * a->w) - b->z * a->x);
+    t->z = b->w * a->z + (b->z * a->w + (-b->x * a->y + b->y * a->x));
+    t->w = ((-b->x * a->x - b->y * a->y) - b->z * a->z) + b->w * a->w;
+}
+
+extern "C" void fn_803D2BC0(Unk803D2BC0Self* self, Unk803D2BC0Other* other)
+{
+    Unk803D2BC0Quat t;
+    QMul(&t, &self->q, &other->q);
+    other->q = t;
 }
 
 /* near-miss (5 instructions short): sorted-table search by 16-bit key. Retail keeps a stack copy of the key
@@ -206,6 +256,37 @@ extern "C" int fn_803D394C(Unk803D2B20* self, int a, int* b, int* c, int* d)
     return self->v18(a, b, c, d);
 }
 
+inline int BitTest(unsigned* set, int id)
+{
+    int o = (id >> 5) * 4;
+    return (*(unsigned*)((char*)set + o) & (1 << (id & 31))) != 0;
+}
+
+extern "C" int fn_803D39C0(Unk803D39C0Obj* self, unsigned* set, int* count, int* lo, int* hi)
+{
+    Unk803D39C0Rec* rec = self->mC;
+    for (int k = rec->m16 - 1; k >= 0; k--) {
+        unsigned char id = rec->mC[k];
+        if (!BitTest(set, id)) {
+            if (*count == 0) {
+                *lo = id;
+                *hi = id;
+            } else {
+                if (id < *lo)
+                    *lo = id;
+                if (id > *hi)
+                    *hi = id;
+            }
+            *count = *count + 1;
+            fn_803BE6F4(set, id, 1);
+        }
+    }
+    Unk803D2B20* child = rec->m10;
+    if (child)
+        return child->v18((int)set, count, lo, hi);
+    return 1;
+}
+
 extern "C" unsigned short fn_803D480C(Unk803D2B20Obj* self)
 {
     return self->mC->m2;
@@ -278,6 +359,28 @@ extern "C" int fn_803D4A08(Unk803D2B20* self, int a, int* b, int* c, int* d)
     return self->v18(a, b, c, d);
 }
 
+extern "C" int fn_803D4A7C(Unk803D4A7CObj* self, unsigned* set, int* count, int* lo, int* hi)
+{
+    Unk803D4A7CRec* rec = self->mC;
+    for (int k = rec->m12 - 1; k >= 0; k--) {
+        unsigned short id = rec->mC[k] / 12;
+        if (!BitTest(set, id)) {
+            if (*count == 0) {
+                *lo = id;
+                *hi = id;
+            } else {
+                if (id < *lo)
+                    *lo = id;
+                if (id > *hi)
+                    *hi = id;
+            }
+            *count = *count + 1;
+            fn_803BE6F4(set, id, 1);
+        }
+    }
+    return 1;
+}
+
 extern "C" unsigned short fn_803D508C(Unk803D2B20Obj* self)
 {
     return self->mC->m2;
@@ -293,8 +396,7 @@ extern "C" Unk803D2B20Obj* fn_803D5098(Unk803D2B20Obj* self)
 }
 
 /*
- * Not attempted: fn_803D2BC0 (63, 3x4 matrix product through a stack temporary), fn_803D2CBC (46, range wrap),
- * fn_803D2DFC (370), fn_803D33C4 (225), fn_803D39C0 (66, bit-set walk with fn_803BE6F4), fn_803D3AC8 (369),
- * fn_803D408C (263), fn_803D44A8 (217), fn_803D4A7C (57, twin of fn_803D39C0), fn_803D4B60 (331, uses sqrtf).
+ * Not matched yet: fn_803D2CBC (range wrap, same float/int conversion shape as fn_803D17E4 in tu_803CECA4),
+ * fn_803D2DFC, fn_803D33C4, fn_803D3AC8, fn_803D408C, fn_803D44A8, fn_803D4B60 (uses sqrtf).
  * The original code stays linked for these.
  */
