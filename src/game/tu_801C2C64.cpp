@@ -420,20 +420,21 @@ extern "C" int fn_801C3F60(Z* z)
     return 0;
 }
 
-/* near-miss (85 vs 86 instructions): g++ reuses the loaded +0x378 value for p after the equality test; retail keeps p. */
+/* near-miss: same length now (inverted `!=` early return); g++ still replaces p by the loaded +0x378 value after the
+ * equality test (it lives in r30, p in r29), retail keeps p in r30 and the loaded value in r0. */
 extern "C" int fn_801C3FD0(Z* z, P* p)
 {
     if (z->m4->m418 == 0) {
         if (p->m264 != 0)
             return 1;
         if (fn_801C4C3C(z)) {
-            if (z->m204->m6E4->m378 == (int)p) {
-                if (fn_801C3F00(z) != 0 || HashOf(p) == (int)0x94C34DBD || HashOf(p) == 0x18A18DEB || HashOf(p) == 0x53CFCF84
+            if (z->m204->m6E4->m378 != (int)p)
+                return 1;
+            if (fn_801C3F00(z) != 0 || HashOf(p) == (int)0x94C34DBD || HashOf(p) == 0x18A18DEB || HashOf(p) == 0x53CFCF84
                     || HashOf(p) == 0x18AC23C2 || HashOf(p) == 0x0E29BCC7 || HashOf(p) == 0x0AB6992B || HashOf(p) == (int)0xB8C36BDD
                     || HashOf(p) == (int)0x85882CD7 || HashOf(p) == (int)0xBB8F4C9B || HashOf(p) == (int)0x9E6889E3
                     || HashOf(p) == (int)0x9913AB0D || HashOf(p) == 0x1BD7330D)
-                    return 0;
-            }
+                return 0;
         }
     }
     return 1;
