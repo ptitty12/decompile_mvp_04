@@ -46,6 +46,19 @@ extern Unk80183918_Vec3 lbl_8061C928;
 extern float lbl_8061C934;
 extern Unk80183918_Vec3 lbl_806055C4;
 
+extern Unk80183918_Vec3 lbl_8068BD54;
+extern Unk80183918_Vec3 lbl_8068BD60;
+extern Unk80183918_Vec3 lbl_8068BD6C;
+class Unk80186FD4_V : public Unk80182E54_Base8 {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6(void* m, int k);
+};
+extern "C" void* fn_80319330(void* p, int a);
 
 //@BODY
 //@8018423C
@@ -381,6 +394,52 @@ extern "C" void fn_80186EF4(Unk80181140* o, const char* name, const Unk80183918_
                     fn_803DF824((Unk803DF824_Mtx*)&e->m20, 1.0f, 1.0f, 1.0f, pos->m0, pos->m4, pos->m8, e->m0.m0, e->m0.m4, e->m0.m8);
                 }
             }
+        }
+    }
+}
+
+//@80186FD4
+/* near-miss (95.3%): same instruction count; strength reduction folds +0x6C into the loop pointers
+ * (retail keeps lwz 108(rX) on the element pointers), the idx lwzx operands swap, and the A.z/C.z
+ * stores swap. Explicit pointer loops share one o+0x1160 copy instead (tried 3 shapes). */
+extern "C" void fn_80186FD4(Unk80181140* o)
+{
+    Unk80186FD4_V* v = (Unk80186FD4_V*)fn_80319330((char*)o + 0x244, 0x16);
+    lbl_8068BD54.m0 = 0.0f;
+    lbl_8068BD54.m4 = lbl_8068BD54.m4 + 10.01f;
+    lbl_8068BD60.m0 = lbl_8068BD60.m0 + 10.0f;
+    lbl_8068BD6C.m0 = 0.0f;
+    lbl_8068BD6C.m4 = 0.01f;
+    lbl_8068BD6C.m8 = 0.0f;
+    Unk80186EF4_L* l = &lbl_8061E978->m37AC;
+    lbl_8068BD60.m4 = 0.0f;
+    lbl_8068BD60.m8 = 0.0f;
+    lbl_8068BD54.m8 = 0.0f;
+    fn_80186EF4(o, "FirstBase", &lbl_8068BD54);
+    fn_80186EF4(o, "SecondBase", &lbl_8068BD60);
+    fn_80186EF4(o, "ThirdBase", &lbl_8068BD6C);
+    fn_80186EF4(o, "HomeBase", &lbl_8068BD6C);
+    if (v) {
+        int off = 0;
+        for (int i = 0; i < o->m1144; i++, off += 4) {
+            Unk80181140_E* ei = &o->m1160[i];
+            int idx = 0;
+            if (l)
+                idx = *(int*)((char*)l->m8 + off);
+            for (int j = 0; j < o->m1144; j++) {
+                Unk80181140_E* ej = &o->m1160[j];
+                Unk80182E54_H* h;
+                int f;
+                if (i == j) {
+                    h = (Unk80182E54_H*)ei->m6C;
+                    f = 1;
+                } else {
+                    h = (Unk80182E54_H*)ej->m6C;
+                    f = 0;
+                }
+                h->h2 = f;
+            }
+            v->v6(&o->m1160[idx].m20, 0);
         }
     }
 }
