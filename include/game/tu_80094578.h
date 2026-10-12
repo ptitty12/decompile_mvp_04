@@ -61,5 +61,23 @@ struct Obj3 {
     int mD6C;
 };
 
+/*
+ * Two copies of the same 0x2C-byte state record, seen in fn_80096C10 and fn_80096AB4:
+ * the live one at +0x164 (int, ByteVec at +0x168, byte list at +0x17C, int at +0x188)
+ * and a saved one at +0xD78 (int, ByteVec at +0xD7C, byte list at +0xD90, int at +0xD9C).
+ */
+struct Snap80096C10 {
+    int m0;
+    ByteVec v;
+    unsigned char list[12];
+    int m24;
+};
+
+struct View80096C10 {
+    char pad0[0x164];
+    Snap80096C10 cur;
+    char pad[0xD78 - 0x164 - sizeof(Snap80096C10)];
+    Snap80096C10 saved;
+};
 
 #endif
