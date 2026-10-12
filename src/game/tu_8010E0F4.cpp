@@ -63,6 +63,22 @@ extern const char lbl_805BA6D8[];
 
 Unk8001BC8C* fn_8001BC4C();
 
+extern const char lbl_805BADC8[];
+extern const char lbl_8065B888[];
+extern const char lbl_80649DA0[];
+extern const char lbl_805BF19C[];
+struct UnkEvR {
+    int id;
+    const void* vt;
+};
+struct UnkMsgEv {
+    char name[16];
+    UnkEvR e;
+};
+void fn_8037893C(char* p, int id, UnkEvR* e, int a, int b);
+extern "C" void fn_8011452C(Scr* self);
+extern "C" void fn_80114664(Scr* self, int b);
+
 extern "C" {
 void fn_8010F1E4(Scr* self);
 void fn_8010D33C(Scr* self, int a);
@@ -510,6 +526,36 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     self->m168 = 0;
     self->m16C[0] = 0;
     return self;
+}
+
+int fn_8010FC20(Scr* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        fn_8011452C(self);
+        if (self->m134 == 0) {
+            UnkMgrA* mg = lbl_806192E0->m4;
+            int x = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m158, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            int y = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m160, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            if ((self->m164 != y || self->m15C != x) && mg->mC->m600 == 0) {
+                fn_80114664(self, 1);
+                return 1;
+            }
+        }
+        UnkMsgEv s;
+        char* np = s.name;
+        fn_8035682C(np);
+        fn_8040B830(np, lbl_805BADC8, 15);
+        np[15] = 0;
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+        fn_800B7B4C(lbl_8061A32C, np, self);
+        const void* base = lbl_80649DA0;
+        s.e.id = 0x9E;
+        s.e.vt = lbl_8065B888;
+        fn_8037893C((char*)&fn_8011AA24(0)->m704, s.e.id, &s.e, 0, 0);
+        s.e.vt = base;
+    }
+    return 1;
 }
 
 /* near-miss: 2 slots; retail loads the fn_8040B830 arguments as lis r4, li r5, addi r4, mr r3 (name pointer last). */
