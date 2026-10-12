@@ -99,6 +99,14 @@ def main():
         m = re.match(r"^(\S+) = [.\w]+:0x([0-9A-Fa-f]+);", line)
         if m:
             addr_of[m.group(1)] = int(m.group(2), 16)
+    # Sources written before a symbol got its real name still reference the
+    # old placeholder; resolve those through the alias table.
+    aliases = ROOT / "tools" / "match" / "symbol_aliases.tsv"
+    if aliases.is_file():
+        for line in aliases.read_text().splitlines():
+            parts = line.split("	")
+            if len(parts) >= 2 and not line.startswith("#") and parts[1] in addr_of:
+                addr_of.setdefault(parts[0], addr_of[parts[1]])
     bad = checked = unresolved = 0
     for u in report["units"]:
         name = u["name"].split("/", 1)[1]
@@ -133,6 +141,12 @@ def main():
                     continue
                 if sym[4] == 0:  # undefined in our object: compare addresses
                     checked += 1
+                    if sym[0] not in addr_of:
+                        # A C++ declaration of a placeholder (fn_<addr>__Fi...)
+                        # names its address in the mangled name.
+                        pm = re.match(r"^fn_([0-9A-Fa-f]{8})__", sym[0])
+                        if pm:
+                            addr_of[sym[0]] = int(pm.group(1), 16)
                     if sym[0] not in addr_of:
                         unresolved += 1
                         if verbose:
