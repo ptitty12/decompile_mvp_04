@@ -13,6 +13,23 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+/* Request record of fn_8025AC0C: +0xC sel, +0x28 target position, +0x34 state. */
+struct Unk8025AC0C_E {
+    char pad0[0xC];
+    int mC;
+    char pad10[0x28 - 0x10];
+    Unk80273498_Vec3 m28;
+    int m34;
+};
+inline Unk80273498_Vec3 Unk8025AC0C_Pos34(Unk8027C728_Goal* g)
+{
+    return *(Unk80273498_Vec3*)((char*)g + 0x34);
+}
+inline Unk80273498_Vec3 Unk8025AC0C_Pos28(Unk8025AC0C_E* e)
+{
+    return e->m28;
+}
+
 inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
     Unk80273498_Vec3 r;
@@ -677,6 +694,45 @@ void fn_8025AB00(Unk8027A84C* g, P* p)
 int fn_8025AC04()
 {
     return 0;
+}
+
+/* near-miss: 106 vs 106 insns, 4 differ: the vector copy in the no-goal-data arm sits at sp+8 in ours, sp+0x30 in retail (all three copies share one frame slot there). Tried function-level temporaries */
+extern float atan2f(float y, float x);
+extern void fn_801C33B0(char* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c);
+extern void fn_80299B98(P* p, const Unk80273498_Vec3& pos, float* ang);
+Unk8027C728_Goal* fn_8025AC0C(Q* self, P* p, Unk8025AC0C_E* e)
+{
+    p->m58C.m30 = e->mC;
+    Unk8027C728_Goal* g = fn_802448F4(p, 1);
+    if (p->m458 == 9 && e->mC == -1) {
+        Unk8027A84C* gd = (Unk8027A84C*)g->m18;
+        Unk80273498_Vec3 v1;
+        Unk80273498_Vec3 v2;
+        fn_801C33B0(*(char**)((char*)self->m700 + 0x3A4), &v1, &v2);
+        float ang = atan2f(v2.x, v2.z);
+        fn_80299B98(p, v1, &ang);
+        g->m10 = 2;
+        fn_8027C728(g);
+        Unk80273498_Vec3 w = v2;
+        gd->fn_8027A898(&w);
+        ((Unk80287D70*)gd)->fn_80287DB8(9);
+    } else {
+        g->m10 = 2;
+        Unk8027A84C* gd = (Unk8027A84C*)g->m18;
+        fn_8027C728(g);
+        fn_8025AA28(gd, p, e->mC);
+        if (gd->m2C != 0) {
+            Unk80273498_Vec3 t = Unk8025AC0C_Pos34(g);
+            float ang = atan2f(t.x, t.z);
+            Unk80273498_Vec3 w = Unk8025AC0C_Pos28(e);
+            fn_80299B98(p, w, &ang);
+        } else {
+            Unk80273498_Vec3 w = Unk8025AC0C_Pos28(e);
+            fn_80299B98(p, w, 0);
+        }
+    }
+    e->m34 = 0;
+    return g;
 }
 
 Unk8027C728_Goal* fn_8025ADB4(void* o, void* p, A* a)
