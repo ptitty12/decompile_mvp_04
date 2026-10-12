@@ -614,7 +614,7 @@ public:
     virtual void s21();
     virtual void s22();
     virtual void s23();
-    virtual void s24();
+    virtual void s24(int a);
     virtual int s25();
 };
 class FEW3Ca {
@@ -1331,6 +1331,71 @@ extern "C" void fn_800B26CC(FEOb26* self)
         } else {
             self->m6C = self->m6C - lbl_805B9BA4;
             fn_800412AC(fn_8004072C(), 0x31, 0, 0, 0, 0);
+        }
+    }
+}
+
+struct FEOb2784 {
+    char pad0[0x68];
+    float m68;
+    char pad6C[0xD8 - 0x6C];
+    int mD8;
+    void* mDC;
+    int mE0[12];
+    char pad110x[0x110 - 0x110];
+    int m110;
+    int m114;
+    char pad118[0x140 - 0x118];
+    int m140;
+    char pad144[4];
+    int m148;
+    int m14C;
+};
+extern int lbl_80620730;
+extern int lbl_8061A330;
+extern "C" int fn_800B57EC(Unk800B555C* p);
+extern "C" void fn_800B3198(void* self, int a);
+extern "C" void fn_8011B3E8(int a, int* b, int* c);
+extern "C" void fn_800B2FCC(void* self);
+
+extern "C" void fn_800B2784(FEOb2784* self)
+{
+    if (((FEG18*)lbl_80619D10)->s25() == 0 && lbl_8061B8C0->m24 == 0) {
+        if (lbl_80620730 != 0) {
+            self->m110 = lbl_80620730;
+            lbl_80620730 = 0;
+        }
+        lbl_8061A330 = 1;
+        fn_8011B3E8(self->m140, &self->m148, &self->m14C);
+        if (fn_800B214C((FEOb214*)self) != 0) {
+            if (self->mDC) {
+                fn_80120144(self->mDC, self->m68);
+            }
+            fn_800B232C((FEOb232C*)self);
+            int i = self->m114;
+            if (i > 11) {
+                i = 11;
+            }
+            self->mE0[i] = self->m110;
+            if (fn_800B205C((FEOb210*)self) != 0) {
+                ((FEG18*)lbl_80619D10)->s24(0);
+                fn_800B2DD4(self, 4);
+                if (lbl_8061A32C == 0) {
+                    lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+                }
+                if (*(int*)((char*)lbl_8061A32C + 0xBC) == 0 && fn_800B57EC(fn_800B555C()) == 0 && *(int*)(lbl_806192E0->m4->mC + 0x600) == 0) {
+                    fn_800B3198(self, fn_800B1FCC((FEOb210*)self));
+                }
+            } else {
+                fn_800B2DD4(self, 3);
+            }
+        } else {
+            if (self->mD8 == 1) {
+                fn_800B2544(self);
+            } else {
+                fn_800B243C(self);
+            }
+            fn_800B2FCC(self);
         }
     }
 }
