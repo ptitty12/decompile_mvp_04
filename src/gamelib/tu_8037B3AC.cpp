@@ -240,6 +240,8 @@ Unk8037B3E8::Unk8037B3E8(unsigned int hash)
     fn_8037B9D4(this, hash);
 }
 
+Unk8037B3E8::~Unk8037B3E8() {}
+
 extern "C" int fn_8037BA74(int hash)
 {
     if (lbl_806EFC14 != hash) {
