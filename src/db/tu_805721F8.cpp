@@ -373,6 +373,28 @@ extern "C" DB_OVERLAY float fn_80573FB8(Db80573FB8_S* self, DbT* t)
     return r;
 }
 
+extern "C" DB_OVERLAY float fn_805741DC(void* unused, DbT* t)
+{
+    int cur = t->m17C;
+    char* pt = (char*)t + 0xC74;
+    unsigned i = 0;
+    float s = fn_80089E48__FP15Unk80089894_Objii(pt, 0, cur);
+    int cnt = 1;
+    int k = 9;
+    int j = 6;
+    while (fn_80089AA0__FP20Unk80089894_PackTabDUiUi(pt, j, (unsigned char)cur) != 0) {
+        i += 1;
+        s += Db80573E10_R(pt, k, (unsigned char)cur);
+        cnt += 1;
+        k += 5;
+        j += 5;
+        if (i > 3)
+            break;
+    }
+    float r = s / (float)cnt;
+    return r;
+}
+
 /* near-miss: ~10 slots; retail passes the byte `cur` through clrlwi once and keeps `i*5+6` as an explicit step variable */
 extern "C" DB_OVERLAY float fn_805742B0(void* unused, DbT* t)
 {
