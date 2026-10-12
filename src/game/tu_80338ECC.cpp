@@ -42,9 +42,9 @@ extern Unk308* lbl_8061EA68;
 extern int lbl_80621574, lbl_80621578;
 extern const char lbl_80666598[], lbl_805F2F00[], lbl_805F2F10[], lbl_805F2F20[], lbl_805F2F30[], lbl_805F2F44[], lbl_805F2F5C[], lbl_805F2F6C[], lbl_805F2F84[], lbl_805F2F98[];
 extern "C" {
-void fn_8032ECD8(void* item, int a, int b, int c, int d);
+void* fn_8032ECD8(void* item, int a, int b, int c, int d);
 void* fn_8032EC38(void* mem, const char* name, int a, int b, int c, int d);
-void fn_8032F120(void* item, const char* name, int v);
+void* fn_8032F120(void* item, const char* name, int v);
 void fn_8032D868(void* item, const char* name);
 }
 extern int lbl_8061E690, lbl_8068CD14, lbl_8068CD18;
@@ -375,10 +375,10 @@ extern "C" void fn_8033C288(Menu* p)
     p->items[p->m174]->s2();
 }
 
-/* near-miss: 179/179 insns, 10 diffs. The two 3-arg fn_8032F120 calls set r5 before r3
- * in the original (mine r3 first, same unsolved item-ctor arg order as fn_80331DB8), and
- * the loop givs are initialised/incremented in a different order. The index form
- * (p + 0x2E0 + i * 0x68) stops gcse sharing p + 0x2E0 with the 32-item ctor loop. */
+/* near-miss: 179/179 insns, 6 diffs. The 3-arg fn_8032F120 calls match now that the
+ * callee returns void*; only the loop givs are initialised/incremented in a different
+ * order (retail: o-name, item, o+0x14, offset). The index form (p + 0x2E0 + i * 0x68)
+ * stops gcse sharing p + 0x2E0 with the 32-item ctor loop. */
 extern "C" Menu* fn_8033C490(Menu* p, int a)
 {
     MenuInit(p, a);
