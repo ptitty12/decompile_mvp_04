@@ -325,6 +325,14 @@ struct Db8056BAEC_T {
     unsigned char m234;
 };
 
+extern const float lbl_805FFB64;
+extern const float lbl_805FFB68;
+struct Db8056D994_S {
+    float m0, m4, m8, mC, m10, m14, m18, m1C, m20, m24, m28, m2C;
+    int* m30;
+    int m34;
+    DbScrB* m38;
+};
 /* forward declarations (definitions are in address order) */
 extern "C" void fn_8056BAEC(DbScr* self, int a, int b, int c);
 extern "C" void fn_8056BD50(void* self);
@@ -351,6 +359,7 @@ extern "C" void fn_8056CB30(DbScr* self, int a);
 extern "C" void fn_8056CC50(DbF12* p);
 extern "C" void fn_8056CC8C(Db8056CC8C* self, int a, int b, int c, int d);
 extern "C" int fn_8056CCD0(void* unused, DbScrB* scr, int side);
+extern "C" void fn_8056D994(Db8056D994_S* self);
 extern "C" void fn_8056DA98(DbF12* p);
 extern "C" void fn_8056DE14(DbF12* p);
 extern "C" void fn_8056DE4C(void* p);
@@ -690,6 +699,27 @@ extern "C" DB_OVERLAY int fn_8056CCD0(void* unused, DbScrB* scr, int side)
     if (Round(g) <= 1 && q0 != 0xFF && (q1 == 0xFF || q2 == 0xFF) && d <= 2)
         return 1;
     return 0;
+}
+
+extern "C" DB_OVERLAY void fn_8056D994(Db8056D994_S* self)
+{
+    int side = *self->m30;
+    DbScrB* scr = self->m38;
+    DbT* t = TeamAt(scr->m14, side);
+    if (fn_8056CCD0(self, scr, side) == 1) {
+        int r = fn_8008CFD8((char*)t + 0xC9C, 5, t->m168[t->m174]);
+        self->m2C = lbl_805FFB64;
+        if (r == 0 || r == 10) {
+            float s1 = self->m4 + self->m8 + self->mC + self->m10 + self->m20;
+            float s2 = (self->m14 = self->m14 * lbl_805FFB68) + (self->m18 = self->m18 * lbl_805FFB68) + (self->m1C = self->m1C * lbl_805FFB68);
+            self->m4 = lbl_805FFB64;
+            self->m8 = lbl_805FFB64;
+            self->mC = lbl_805FFB64;
+            self->m10 = lbl_805FFB64;
+            self->m20 = lbl_805FFB64;
+            self->m2C = s1 + s2;
+        }
+    }
 }
 
 extern "C" DB_OVERLAY void fn_8056DA98(DbF12* p)
