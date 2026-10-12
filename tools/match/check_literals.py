@@ -174,6 +174,19 @@ def main():
                     # point to instead (the C string, or 4 bytes).
                     tsym = ours.syms[dr[0]]
                     tdata = ours.sec_bytes(tsym[4]) if 0 < tsym[4] < len(ours.secs) else None
+                    if tsym[4] == ot and fn in addr_of:
+                        # A code pointer (switch jump table entry, callback): compare the
+                        # function and offset it lands on, not the unrelocated code bytes.
+                        tdata = None
+                        base = addr_of[fn] - gv  # original unit .text start
+
+                        def where(funcs, o):
+                            for fname, (fv, fsz) in funcs.items():
+                                if fv <= o < fv + max(fsz, 1):
+                                    return f"{fname}+{o - fv:#x}"
+                            return f"?{o:#x}"
+                        mine = where(of, tsym[1] + dr[2]).encode()
+                        theirs = where(gf, struct.unpack(">I", theirs)[0] - base).encode()
                     if tdata is not None:
                         tstart = tsym[1] + dr[2]
                         end = tdata.find(b"\0", tstart)
