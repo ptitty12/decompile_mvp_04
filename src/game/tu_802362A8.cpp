@@ -46,6 +46,16 @@ extern const char lbl_805D7698[];
 extern int lbl_8068CA8C;
 extern const float lbl_805D7C18;
 extern const char lbl_805D7978[];
+extern const float lbl_805D7C8C;
+extern const float lbl_805D7C90;
+extern const float lbl_805D7C94;
+extern float lbl_8061D220;
+extern "C" float fn_801A0AA8(Unk8022FE34_Ctx* c, float a, float b);
+
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
 
 cPitcherTunables::cPitcherTunables() : Unk8037B3E8(0x1011A855)
 {
@@ -171,4 +181,15 @@ void Unk802362A8_Slots::fn_80237114()
     m84 = 0;
     m88 = 0;
     m8C = 0;
+}
+
+/* near-miss: 35/35 insns, 6 slots; retail loads lbl_8061D220 (f2) before lbl_805D7C8C (f1) for the fn_801A0AA8 call,
+   ours the reverse. Tried const/non-const globals, declaration order, a local for the second argument */
+void Unk802362A8_Cpu::fn_8023A13C()
+{
+    char* p = (char*)m2E0 + 0xC;
+    float t = fn_801A0AA8(m2E4, lbl_805D7C8C, lbl_8061D220);
+    t = Lerp(lbl_805D7C90, t, lbl_805D7C94);
+    *(float*)(p + 0x14) = lbl_805D7C94;
+    *(float*)(p + 0x18) = t;
 }
