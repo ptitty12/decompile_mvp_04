@@ -165,7 +165,9 @@ struct Ctx6F8 {
     Ctx6F8Inner* m14;
 };
 struct CtxOwner {
-    char pad0[0x680];
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x680 - 0x50];
     int m680;
     Player* m684;
     char pad688[0x6CC - 0x688];

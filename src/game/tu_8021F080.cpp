@@ -34,9 +34,16 @@ public:
     void fn_802A9BA4(int a);
 };
 
+extern const float lbl_805D6320;
+extern const float lbl_805D6330;
+extern const float lbl_805D6334;
+
 extern "C" {
 
+float fn_802478A0(void* o, void* p, int a, int b);
+
 extern Vec3f lbl_805D6244;
+
 void fn_8021FFD4(Task* t, int, RecQueue* q)
 {
     Rec* e = &q->e[0];
@@ -73,6 +80,18 @@ void fn_80220E48(Task* t, int a, Player* p)
             fn_8037893C(t->m9C->m0->m704, e.m0, &e, 0, 0);
             t->m9C->m74 = f;
         }
+    }
+}
+
+void fn_802217E0(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    void* x = ObjAt(t->m9C->m8, a);
+    if (e->mA4 == 1) {
+        if (!(e->m80 >= lbl_805D6320)) {
+            e->m80 = (float)t->m9C->m0->m4C * lbl_805D6330 + fn_802478A0(x, (char*)q + 0x3C, e->mC, e->m10) + lbl_805D6334;
+        }
+        e->mA4 = 0;
     }
 }
 
@@ -115,10 +134,11 @@ int fn_80221974(Task* t)
 int fn_802219EC(Task* t)
 {
     IterObj it;
+    fn_8014E09C(&it, t->m9C->m0, 1);
     IterObj* p = &it;
-    fn_8014E09C(p, t->m9C->m0, 1);
     while (p->m8 != 10) {
-        if (fn_8026D940(t->m9C->m8[p->m8], 0) != 0) {
+        int i = p->m8;
+        if (fn_8026D940(ObjAt(t->m9C->m8, i), 0) != 0) {
             return 1;
         }
         fn_8014E108(p);
