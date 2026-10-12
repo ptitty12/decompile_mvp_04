@@ -191,7 +191,6 @@ extern const float lbl_806010D4;
 extern const float lbl_806010D8;
 extern const float lbl_806010DC;
 extern const float lbl_806010E0;
-extern void* lbl_80619948;
 extern "C" int fn_800A2EB4(void* p);
 extern "C" int fn_8057CE00(int a);
 
