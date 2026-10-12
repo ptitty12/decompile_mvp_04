@@ -529,6 +529,63 @@ extern "C" void fn_80080828(void* p, int a, int k, int b);
 extern "C" int fn_80099620(Obj3* o);
 extern "C" void fn_80099A44(Obj3* o, int k, int slot);
 
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+extern "C" void fn_800999CC(Obj3* o, int k, int slot);
+extern "C" int fn_80099B50(Obj3* o, int i);
+
+struct Item8009984C {
+    int m0;
+    unsigned char m4;
+    unsigned char m5;
+    unsigned char m6;
+    unsigned char m7;
+};
+struct Obj8009984C {
+    char pad0[0x238];
+    Item8009984C items[16];
+};
+
+/* near-miss: retail forms the new item pointer with an update-form store (stwu) and keeps o in r31 */
+extern "C" void fn_8009984C(Obj3* o, int a1, int a2, int a3, int a4, int a5)
+{
+    Obj8009984C* w = (Obj8009984C*)o;
+    unsigned char id = fn_800968C0(o, a1, 1);
+    if (id != 0xFF) {
+        int s = fn_8008CFD8((char*)o + 0xC9C, 5, id);
+        if (s == 0 || s == 10) {
+            w->items[o->m235 - 1].m6 = a2 - a3;
+            w->items[o->m235 - 1].m5 = a4;
+            Item8009984C* it = (Item8009984C*)(o->m235 * 8 + (int)o + 0x238);
+            it->m0 = 0;
+            it->m7 = 0;
+            it->m4 = 0;
+            it->m5 = 0;
+            it->m6 = 0;
+            char* b = (char*)o + 0x238;
+            *(int*)(b + o->m235 * 8) = a1;
+            w->items[o->m235].m4 = a4;
+            w->items[o->m235].m7 = a5;
+            o->m235 = o->m235 + 1;
+        }
+        fn_800999CC(o, id, 0);
+    }
+    unsigned i;
+    for (i = 0; i < o->m74.m4; i++) {
+        if (fn_80099B50(o, i) == a1) {
+            ByteVec* v = &o->m74;
+            unsigned char j0 = (unsigned char)i;
+            if (j0 < v->m4) {
+                unsigned j = j0;
+                do {
+                    v->m0[j] = v->m0[j + 1];
+                    j++;
+                } while (j < v->m4);
+                v->m4 = v->m4 - 1;
+            }
+        }
+    }
+}
+
 extern "C" void fn_800999CC(Obj3* o, int k, int slot)
 {
     if (o->m17C[slot] != k) {
