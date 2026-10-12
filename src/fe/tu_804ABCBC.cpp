@@ -5,6 +5,12 @@
 
 #include "game/fe_804ABCBC.h"
 
+struct FeArrL { char* m0; int m4; int m8; int mC; const void* m10; int m14; };
+extern const char lbl_80673DD8[];
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A4C8[];
+extern "C" void fn_8040074C(void* p, int n);
 extern "C" FE_OVERLAY int fn_804ABCBC(FeSc1* x)
 {
     x->m138->v56();
@@ -390,5 +396,32 @@ extern "C" FE_OVERLAY FeRaw* fn_804ACFC8(FeRaw* self, int a, int b, int c, int d
     FeSub14* s = (FeSub14*)((char*)self + 0x144);
     s->m14 = lbl_806841F8;
     fn_8052DD58(s);
+    return self;
+}
+
+extern "C" FE_OVERLAY FeRaw* fn_804AEC04(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeArrL* s = (FeArrL*)((char*)self + 0x19C);
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_80673DD8;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 0;
+    self->m144 = 0;
+    self->m148 = 0;
+    s->m10 = lbl_8064B298;
+    s->m0 = (char*)self + 0x1B4;
+    s->m8 = 0x28;
+    fn_8040074C(s->m0, 0xA0);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m10 = lbl_8064A4C8;
     return self;
 }
