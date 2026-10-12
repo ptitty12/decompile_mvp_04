@@ -346,6 +346,41 @@ struct Unk803E56F8 {
     Unk803E4A50_S4C s50;
 };
 
+/* fn_803D987C takes no parameters; r3 is not set at the call. */
+inline int ReadyInl(Unk803E6660* o)
+{
+    ((void (*)())fn_803D987C)();
+    o->m18 = 1;
+    return 1;
+}
+
+extern "C" void fn_803E54B8(char* o, Unk803E6660_Rec* rec, int* val)
+{
+    if (*(int*)(o + 8) == 0xC0) {
+        Unk803E6660* s = (Unk803E6660*)(o + 0xc);
+        FlushInl(s);
+        int st = *(int*)(o + 8);
+        if (st != 0) {
+            BuildInl((Unk803E6660*)(o + 0xc), st);
+            *(int*)(o + 8) = 0;
+        }
+        ReadyInl((Unk803E6660*)(o + 0xc));
+        switch (*(int*)(o + 0x48)) {
+        case 0x98:
+            fn_803E54B8(o, (Unk803E6660_Rec*)(*(char**)o + 0x8E8), (int*)(*(char**)(o + 4) + 0x2F8));
+            fn_803E54B8(o, (Unk803E6660_Rec*)(*(char**)o + 0x8F4), (int*)(*(char**)(o + 4) + 0x2FC));
+            break;
+        case 0xB0:
+            fn_803E54B8(o, (Unk803E6660_Rec*)(*(char**)o + 0x8F4), (int*)(*(char**)(o + 4) + 0x2FC));
+            break;
+        }
+    }
+    int n = *(int*)(o + 8);
+    *(Unk803E6660_Rec*)(*(char**)o + n * 12) = *rec;
+    ((int*)*(char**)(o + 4))[*(int*)(o + 8)] = *val;
+    *(int*)(o + 8) = *(int*)(o + 8) + 1;
+}
+
 extern "C" Unk803E56F8* fn_803E56F8(Unk803E56F8* o)
 {
     o->m0 = 0;
