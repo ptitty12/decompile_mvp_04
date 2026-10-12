@@ -5,7 +5,44 @@
 
 #include "game/fe_8048E6A0.h"
 
+extern "C" void fn_804AB224(void* x);
+extern "C" int fn_800E4874(void* p);
+struct FeArrL { char* m0; int m4; int m8; int mC; const void* m10; int m14; };
+extern const char lbl_80673338[];
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8065C1B0[];
+extern "C" void fn_8040074C(void* p, int n);
 extern "C" {
+
+FE_OVERLAY FeScrH* fn_804AA58C(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeArrL* s = (FeArrL*)((char*)self + 0x14C);
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80673338);
+    self->m130 = 0;
+    FeI(self, 0x134) = 0;
+    FeI(self, 0x138) = 0;
+    FeI(self, 0x13C) = 0;
+    FeI(self, 0x140) = 0;
+    FeI(self, 0x144) = 0;
+    FeI(self, 0x148) = 0;
+    s->m10 = lbl_8064B298;
+    s->m0 = (char*)self + 0x164;
+    s->m8 = 0xFA;
+    fn_8040074C(s->m0, 0x3E8);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m10 = lbl_8065C1B0;
+    FeI(self, 0x54C) = -1;
+    FeI(self, 0x550) = 0;
+    return self;
+}
 
 FE_OVERLAY void fn_804AAA28(void* x, int a)
 {
@@ -31,6 +68,20 @@ FE_OVERLAY void fn_804AAA28(void* x, int a)
 FE_OVERLAY void fn_804AAA9C(void* x, int a)
 {
     if (a == FeI(x, 0x140)) {
+        fn_804AB774(x);
+        fn_804AB860(x);
+    }
+}
+
+FE_OVERLAY void fn_804AAADC(void* x, int a)
+{
+    if (a == FeI(x, 0x144)) {
+        int s = ((FeWI*)FeMem(x, 0x140))->s61();
+        fn_804AB224(x);
+        ((FeW3*)FeMem(x, 0x140))->s87(FeI(x, 0x54C), FeI(x, 0x550) ^ 1, (int)((char*)x + 0x14C));
+        ((FeWQ*)FeMem(x, 0x140))->s69(s);
+        if (((FeWI*)FeMem(x, 0x140))->s59() == 0)
+            ((FeWQ*)FeMem(x, 0x140))->s14(0);
         fn_804AB774(x);
         fn_804AB860(x);
     }
@@ -132,6 +183,21 @@ FE_OVERLAY void fn_804AAF34(void* x)
     fn_800B7B4C(FeGetMgr(), p, x);
 }
 
+FE_OVERLAY void fn_804AAFE8(void* x)
+{
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    int s = ((FeWI*)FeMem(x, 0x140))->s61();
+    if (s != FeI(x, 0x54C)) {
+        FeI(x, 0x54C) = s;
+        FeI(x, 0x550) = s == 2;
+    }
+    char* p = (char*)x + 0x14C;
+    ((FeW3*)FeMem(x, 0x140))->s87(1, FeI(x, 0x550) ^ 1, (int)p);
+    ((FeW3*)FeMem(x, 0x140))->s87(s, FeI(x, 0x550), (int)p);
+    FeI(x, 0x550) = FeI(x, 0x550) ^ 1;
+    fn_804AB774(x);
+}
+
 FE_OVERLAY void fn_804AB0C8(void* x)
 {
     fn_8001BC4C()->fn_8001BDAC(0x9D);
@@ -152,6 +218,41 @@ FE_OVERLAY void fn_804AB188(void* x)
     FeMem(x, 0x144)->fn_vslot16(1);
 }
 
+FE_OVERLAY void fn_804AB774(void* x)
+{
+    int sel = ((FeWI*)FeMem(x, 0x140))->s60();
+    int v;
+    if (FeI(x, 0x150) != 0) {
+        int o = sel * 4;
+        v = *(int*)((char*)FeP(x, 0x14C) + o);
+    } else {
+        v = 0;
+    }
+    if (((FeWI*)FeMem(x, 0x138))->s87() != 0) {
+        void* s = FeMem(x, 0x138);
+        fn_80126CF4((FeList*)s, FeI(s, 0x164), v, FeI(s, 0x134), FeI(s, 0x16C), FeI(s, 0x170), 0, FeI(s, 0x138), FeI(s, 0x13C), FeI(s, 0x148), FeI(s, 0x14C));
+    }
+    fn_804A96A4(FeP(x, 0x13C), v, 1, 2, 1, 0, 0, 0);
+}
+
+FE_OVERLAY void fn_804AB860(void* x)
+{
+    if (FeI(x, 0x150) != 0) {
+        fn_801251CC(FeP(x, 0x134), 0, 0x10, 1);
+        if (((FeWI*)FeMem(x, 0x138))->s87() == 0) {
+            fn_801251CC(FeP(x, 0x134), 3, 0x1A2F, 3);
+            fn_801251CC(FeP(x, 0x134), 2, 0x201A, 2);
+        } else {
+            fn_801251CC(FeP(x, 0x134), 3, 0x37A2, 4);
+            fn_80125084(FeP(x, 0x134), 2);
+        }
+    } else {
+        fn_80125084(FeP(x, 0x134), 0);
+        fn_80125084(FeP(x, 0x134), 3);
+        fn_80125084(FeP(x, 0x134), 2);
+    }
+}
+
 /* near-miss (2 slots): retail stores the vptr before addi r3,self+0x144; all 5040 statement orders tried. */
 FE_OVERLAY FeScrM* fn_804AB940(FeScrM* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -166,6 +267,21 @@ FE_OVERLAY FeScrM* fn_804AB940(FeScrM* self, int a, int b, int c, int d, int e, 
     self->m1C8 = -1;
     fn_8040B320(self->m144, 0, 0x80);
     return self;
+}
+
+FE_OVERLAY void fn_804ABADC(void* x, int a)
+{
+    fn_800ED310(x, a);
+    if (a != 0) {
+        if (fn_800E4874(FeP(x, 0x140)) > 0)
+            ((FeWQ*)FeMem(x, 0x134))->s14(1);
+        else
+            ((FeWQ*)FeMem(x, 0x134))->s14(0);
+        ((FeWQ*)FeMem(x, 0x138))->s14(1);
+    } else {
+        ((FeWQ*)FeMem(x, 0x134))->s14(0);
+        ((FeWQ*)FeMem(x, 0x138))->s14(0);
+    }
 }
 
 FE_OVERLAY int fn_804ABBCC(void* x)
