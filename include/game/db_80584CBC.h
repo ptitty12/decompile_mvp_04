@@ -307,16 +307,18 @@ struct Db805919E8_M {
     float t1[4][16];
     float t2[13][16];
     float t3[4][16];
-    Db805922EC_Grp a[85];
-    char pad10780[0x109C0 - 0x10780];
+    Db805922EC_Grp a[84];
+    Db805937A4_Row ra[84];
     Db805922EC_Grp b[11];
-    char pad12AC0[0x12B70 - 0x12AC0];
+    Db805937A4_Row rb[11];
     int m12B70;
     int m12B74;
     float m12B78;
     float m12B7C;
     int m12B80;
     int m12B84;
+    int m12B88;
+    int m12B8C;
 };
 
 #endif
