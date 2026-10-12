@@ -212,6 +212,57 @@ void fn_800E49A4()
     s->m51C = 0;
 }
 
+int fn_800A1C54(void* g, int b, int c, int d, int e, int f);
+extern "C" void fn_800A19E4(int a, int flag);
+extern int lbl_8061A308;
+void fn_800E63A4(Ue63A4* t);
+
+extern "C" void fn_800E49DC()
+{
+    int sel = 3;
+    if (fn_800B56C4(fn_800B555C()) == 1)
+        sel = 0;
+    else if (fn_800B5758(fn_800B555C()) == 1)
+        sel = 1;
+    int flags = 2;
+    if (fn_800B555C()->m530 == 0)
+        flags = 6;
+    if (fn_800B555C()->m588 != 0) {
+        switch (fn_800B555C()->m58C) {
+        case 0:
+            flags |= 8;
+            break;
+        case 1:
+            flags |= 0x10;
+            break;
+        case 2:
+            flags |= 0x20;
+            break;
+        default:
+            flags |= 8;
+            break;
+        }
+    }
+    int i = 0;
+    int a = fn_800B555C()->m588;
+    int b = fn_800B555C()->m590;
+    int c = *(int*)((char*)fn_800B555C() + 0x528);
+    fn_800A1C54(lbl_80619948, sel, flags, a, b, c);
+    fn_800A19E4(0x3F, 1);
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int n = s->fn_8007B2B0();
+    if (i < n) {
+        do {
+            int h = s->fn_8007B2FC(i);
+            i++;
+            s->fn_8007B4A8(0x10, h, s->fn_8007B8C4(0x37, s->fn_8007B320(0, h)));
+        } while (i < n);
+    }
+    fn_800B555C()->m530 = 1;
+    if (lbl_8061A308 == 0)
+        fn_800E63A4((Ue63A4*)fn_8007FE04((Unk8007B2B0_Screen*)lbl_8061930C));
+}
+
 void fn_800E4B70()
 {
     int flags = 2;
