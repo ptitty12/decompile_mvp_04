@@ -673,6 +673,30 @@ int fn_80088640(O* o, int a, int b)
     return fn_80087E0C(&o->mF60, a, b);
 }
 
+struct Unk8008882C_Teams {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk8008882C_Self {
+    Unk8008882C_Teams* m0;
+};
+extern "C" unsigned char fn_800968C0(void* o, int key, int flag);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+int fn_8008882C(Unk8008882C_Self* s, int k, int side, int k2)
+{
+    int z = side == 0;
+    int off1 = side * 0xE64;
+    int a = fn_800968C0(s->m0->m14 + off1, k, 1);
+    int off2 = z * 0xE64;
+    int b = fn_800968C0(s->m0->m14 + off2, k2, 1);
+    int c = fn_8008CFD8(s->m0->m14 + off1 + 0xC9C, 9, a);
+    int d = fn_8008CFD8(s->m0->m14 + off2 + 0xC9C, 8, b);
+    if (d == 2)
+        d = c == 0;
+    return d == 1;
+}
+
 float fn_80088E74(O* o)
 {
     float r = (o->m1748 - lbl_805B4860) * lbl_805B4864;
