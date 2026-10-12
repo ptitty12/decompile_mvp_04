@@ -51,7 +51,11 @@ void fn_8022359C(Task* t, int a, RecQueue* q)
     }
 }
 
-/* near-miss: 8 slots: retail forms in+3240 as its own base register (add. r10,r9,r11 / lwzx r0,r9,r11); ours folds it into the index */
+inline RecQueue* RqAt(RecQueue* b, int k)
+{
+    return b + k;
+}
+
 void fn_80223910(Task* t, int a)
 {
     TaskInner* in = t->m9C;
@@ -66,7 +70,7 @@ void fn_80223910(Task* t, int a)
         Slots4* s = &in->mD4;
         int k = s->m[3];
         if (k != -1) {
-            RecQueue* rq = &in->mCA8[k];
+            RecQueue* rq = RqAt(in->mCA8, k);
             if (rq && rq->count != 0) {
                 if ((unsigned)(rq->e[0].m0 - 0xC) <= 1) {
                     fn_80211BA0(s, 3);
