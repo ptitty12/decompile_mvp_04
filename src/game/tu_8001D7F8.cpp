@@ -257,6 +257,31 @@ void fn_8001E108()
     fn_800471B0(lbl_8061E978->m4);
 }
 
+int fn_8040ABA0();
+int fn_8004712C(float x);
+extern float lbl_805A5168[];
+
+int Unk8001CE80::fn_8001E134()
+{
+    const float th = 0.15f;
+    Unk8001D47C_Level* l = m130->m44C->m6F8;
+    Unk8001E0C8_Rec* rec = l->mC;
+    int b = rec->m7C;
+    int a = rec->m2C;
+    float t = (float)(fn_8040ABA0() % 100) * 0.01f;
+    int off = ((unsigned)b >> 24 & 0xFF) * 8 - 16;
+    off = off + a * 64;
+    char* tb = (char*)lbl_805A5168;
+    char* tb4 = tb + 4;
+    float val = t * (*(float*)(tb4 + off) - *(float*)(tb + off)) + *(float*)(tb + off);
+    int r = fn_8004712C(val);
+    if ((unsigned)(l->mC->m80 - 1) <= 1) {
+        if (!((float)(fn_8040ABA0() % 100) * 0.01f >= th) && r != 4)
+            r += r;
+    }
+    return r;
+}
+
 void Unk8001CE80::fn_8001E294()
 {
     fn_800466E4(fn_80075E7C(m130->m44C->m6F8->mC->m24), m130->m44C->m6F8->mC->m80);

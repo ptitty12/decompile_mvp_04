@@ -31,7 +31,10 @@ struct Unk8001D62C_Rec {
 struct Unk8001E0C8_Rec {
     char pad0[0x24];
     int m24;
-    char pad28[0x80 - 0x28];
+    char pad28[4];
+    int m2C;
+    char pad30[0x7C - 0x30];
+    int m7C;
     int m80;
     char pad84[4];
     int m88;
@@ -192,6 +195,7 @@ public:
     void fn_8001DA7C();
     int fn_8001DA9C();
     void fn_8001E0C8();
+    int fn_8001E134();
     void fn_8001E294();
     void fn_8001E2EC();
     void fn_8001E31C();
