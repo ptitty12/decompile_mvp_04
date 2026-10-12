@@ -63,6 +63,15 @@ void fn_803D74A0(int a, const char* b, int c);
 void fn_802C4CB4(int a, int b, int c, int d);
 void fn_802C51C0(int a, int b, int c, int d);
 int fn_802C440C(Unk802C3B60* o, int* p, int x);
+int fn_802B9804(const char* path, int a);
+int fn_803FC4C0(int h);
+char* fn_803FC410(int h, int a, int b, int c, int* out);
+int fn_803FC034(char* name);
+int fn_8040B6A0(const char* s);
+int fn_8040B574(const char* a, const char* b);
+extern const char lbl_805E0E44[];
+extern const char lbl_805E1858[];
+extern const char lbl_805E1860[];
 
 unsigned char* fn_802C3A2C(int a, int b);
 
@@ -1334,4 +1343,42 @@ void fn_802C75D0(Unk802C75D0_Own* p, int c)
     p->~Unk802C75D0_Own();
     if (c & 1)
         fn_80377408(p);
+}
+
+void fn_802C7720()
+{
+    int i = 0;
+    int h = fn_802B9804(lbl_805E0E44, 0x100);
+    int a = 0;
+    int b = 0;
+    int c = 0;
+    int n = fn_803FC4C0(h);
+    int d = 0;
+    for (; i < n; i++) {
+        int sz = 0;
+        char* name = fn_803FC410(h, 0, i, 0, &sz);
+        int len = fn_8040B6A0(name);
+        if ((name[0] == 'c' || name[0] == 'g') && fn_8040B574(name + (len - 4), lbl_805E1858) == 0) {
+            int t = fn_803FC034(name);
+            if (t < a)
+                t = a;
+            a = t;
+            int u = sz;
+            if (u < b)
+                u = b;
+            b = u;
+        } else if ((name[0] == 'c' || name[0] == 'g') && fn_8040B574(name + (len - 4), lbl_805E1860) == 0) {
+            int u = sz;
+            if (u < c)
+                u = c;
+            c = u;
+        } else if (name[0] == 'c' && fn_8040B574(name + (len - 3), lbl_805DFC34) == 0) {
+            int t = fn_803FC034(name);
+            if (t < d)
+                t = d;
+            d = t;
+        }
+    }
+    fn_803EDA0C(h);
+    float f = 0.9f;
 }
