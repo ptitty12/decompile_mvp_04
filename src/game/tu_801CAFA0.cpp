@@ -82,6 +82,7 @@ void fn_801CCE0C(Z* z);
 void fn_801CB344(Z* z);
 void fn_801CB324(Z* z);
 void fn_801CD0F0(Z* z);
+int fn_801C8974(Z* z);
 void fn_801CB148(Z* z);
 void fn_801CD400(Z* z);
 void fn_801C90AC(Z* z);
@@ -283,6 +284,31 @@ extern "C" float fn_801CD068(Z* z)
         r = !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
     }
     return r;
+}
+
+/* near-miss: same code; retail schedules the RandF scale slot stores after the file-pointer moves and
+ * ends with `li 2; cror; bso; li 1` (ours bns/li 2). */
+extern "C" void fn_801CD0F0(Z* z)
+{
+    if (z->m204->m6F4 == 2) {
+        z->m130 = 5;
+    } else {
+        float x = fn_801CD068(z);
+        x = !(x > 1.0f) ? (x >? 0.2f) : 1.0f;
+        if (!(x <= RandF(z->m204->m554, 1.0f, 0x1713))) {
+            z->m130 = 5;
+        } else if (fn_801C8974(z)) {
+            if (RandF(z->m204->m554, 1.0f, 0x1720) < 0.5f)
+                z->m130 = 3;
+            else
+                z->m130 = 0;
+        } else {
+            if (RandF(z->m204->m554, 1.0f, 0x172B) >= 0.5f)
+                z->m130 = 2;
+            else
+                z->m130 = 1;
+        }
+    }
 }
 
 /* near-miss (62 vs 61 instructions): retail emits the 0..3 case block before the case 6 test. */
