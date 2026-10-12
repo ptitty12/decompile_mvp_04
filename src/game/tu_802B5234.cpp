@@ -94,7 +94,7 @@ extern "C++" {
 int fn_802B96C4(const char* name, int a);
 void* fn_802B9300(const char* name, int a, int b, int c);
 void* fn_802B98AC(const char* name, int a);
-void fn_803FED48(const char* name, int a, int b, void* c);
+int fn_803FED48(const char* name, int a, int b, void* c);
 void fn_803FEDB8(void* p, int a);
 void fn_803EDA0C(void* p);
 int fn_8040B574(const char* a, const char* b);
@@ -338,7 +338,6 @@ void fn_802B8388(Mgr* m)
     }
 }
 
-/* near-miss: retail forms the offset pointer (subi r6) before the name address (addi r3) */
 void fn_802B8548(Mgr* m)
 {
     fn_803FED48(lbl_805E0E44, 0, 0, (char*)m + 0x18704);
@@ -470,7 +469,6 @@ void fn_802B8AFC(Mgr* m, void* o)
     fn_802C9284((char*)m + 0x12204, *(int*)((char*)o + 0x2C), o, 0, 1);
 }
 
-/* near-miss: retail orders the argument setup li r4/li r5/addi r6 before addi r3 (name) */
 void fn_802B8B34()
 {
     if (fn_802B96C4(lbl_805E0EAC, 0) != 0) {
@@ -491,7 +489,6 @@ void fn_802B8BBC()
     }
 }
 
-/* near-miss: retail orders the argument setup li r4/li r5/addi r6 before addi r3 (name) */
 void fn_802B8BFC()
 {
     if (fn_802B96C4(lbl_805E0ECC, 0) != 0) {
