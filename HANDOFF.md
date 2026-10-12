@@ -25,6 +25,7 @@ DECISIONS "Open questions for owner"; then keep working.
   - items 6 and 7 were no-ops;
   - item 9 is done (228 branches deleted);
   - item 5 (Opus round 7): the slot `-match` is on work/opus-families-7 and held. Families 5, 7 and 9 remain; on resume, skip tu_801EE438 and tu_80216CF4 until p4-15 merges, and skip family 8 if p4-21 matched it.
+- **Stopped 2026-10-12 ~16:00 CDT by the lead (usage nearly exhausted); main 20,341 functions.** All 13 workers committed and stopped, and all their branches are merged. Their batches are unfinished (p4-13..17, p4-19..21, p4-32b, p5-15, p5-18, p5-19, p5-22): resume each worker with SendMessage (ids in state/agents_session2.txt) or prep.sh the slot to a new p5 batch from queue/p5_order.txt. Leftover uncommitted edits to stash before reassigning: W2 (fn_801DE660), W3 (fn_80218AF8), W6 (fn_802C7C08), W8 (a broken include/game/tu_80317B88.h edit), W1 (a stray ealib edit). Open: the OSTime pair needs a nopeephole split (dolphin/os). Never run two integ jobs at once: they share the orch worktree and break each other's verify.
 - Usage limit: the full fleet burns roughly 35% of a 5 h window per hour. When the limit hits, every agent stops; resume each one with SendMessage to its agentId (context survives) rather than relaunching.
 - Known fragile point: two branches adding the same declaration to a shared header merge cleanly into a duplicate, and the build gate catches it. Fix it on the branch (git merge origin/main, dedupe), then re-integrate.
 
