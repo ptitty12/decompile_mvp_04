@@ -205,6 +205,29 @@ int fn_801A37D8(Unk8019F8C0_Owner* o);
 extern "C" void fn_8037893C(void* q, int id, int a, int b, int c);
 extern int lbl_8061F880;
 
+inline float Abs1(float v)
+{
+    return __builtin_fabs(v);
+}
+inline float Lerp3(float a, float t, float b)
+{
+    return t * (b - a) + a;
+}
+
+float fn_802F9330(float x, float mx, float dz, float g)
+{
+    float r = x;
+    float q = Abs1(x) / dz;
+    float u = (Abs1(x) - dz) / (mx - dz);
+    if (!(q > 1.0f))
+        r = Lerp3(0.0f, q, g);
+    else
+        r = Lerp3(g, u, 1.0f);
+    if (!(x >= 0.0f))
+        r = -r;
+    return r;
+}
+
 extern "C" void fn_802F99D8(Unk802F8324_O3* o, int a, Unk802F8324_Rec* r)
 {
     if (fn_801A37D8((Unk8019F8C0_Owner*)o->m64) != 0)
