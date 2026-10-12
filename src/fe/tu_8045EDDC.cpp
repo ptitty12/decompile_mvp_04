@@ -3,6 +3,16 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+struct FeMsgC0 {
+    char pad0[0xC0];
+    int mC0;
+};
+extern "C" {
+int fn_804615C4(FeScrD* x);
+int fn_800B57EC();
+int fn_800B5758(void* s);
+void fn_80125490(void* w, int a, int b, int c, int d);
+}
 
 struct FeW88 : Unk800C7B40_Data {
     virtual ~FeW88();
@@ -99,6 +109,7 @@ int fn_80461370(FeScrD* x);
 int fn_804612F0(FeScrD* x);
 void fn_80460AFC(FeScrD* x);
 }
+
 inline int FeFlagA(FeScrD* x)
 {
     int f = 0;
@@ -106,6 +117,7 @@ inline int FeFlagA(FeScrD* x)
         f = 1;
     return f;
 }
+
 inline int FeFlagB(FeScrD* x)
 {
     int f = 0;
@@ -113,6 +125,7 @@ inline int FeFlagB(FeScrD* x)
         f = fn_804612F0(x) == 0;
     return f;
 }
+
 Unk8001BC8C* fn_8001BC4C();
 
 
@@ -397,6 +410,41 @@ FE_OVERLAY void fn_8045F374(FeScrD* x)
     fn_80460750(x);
 }
 
+FE_OVERLAY void fn_8045F394(FeScrD* x)
+{
+    fn_80460AFC(x);
+    if (x->m14C == x->m144) {
+        if (x->m14C->fn_vslot61() != 1)
+            ((FeWV*)x->m14C)->s69(1);
+    } else if (x->m14C == x->m148) {
+        if (x->m14C->fn_vslot61() != 1)
+            ((FeWV*)x->m14C)->s69(1);
+    }
+    if (fn_804612F0(x) != 0) {
+        if (x->m14C == x->m144) {
+            int cur = x->m174->fn_vslot86();
+            if (cur != x->m3468[x->m14C->fn_vslot60()]) {
+                int k = x->m3468[x->m14C->fn_vslot60()];
+                FeList* l = (FeList*)x->m174;
+                fn_80126CF4(l, k, l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+                ((FeW88*)x->m174)->s88(0, x->m14C->fn_vslot59() > 1);
+                if (x->m3468[x->m14C->fn_vslot60()] == 0) {
+                    x->m150->fn_vslot16(1);
+                    x->m14C->fn_vslot16(1);
+                }
+            }
+        } else if (x->m14C == x->m148) {
+            int cur = x->m174->fn_vslot87();
+            if (cur != x->m6730[x->m14C->fn_vslot60()]) {
+                int k = x->m6730[x->m14C->fn_vslot60()];
+                FeList* l = (FeList*)x->m174;
+                fn_80126CF4(l, l->m164, k, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+                ((FeW88*)x->m174)->s88(1, x->m14C->fn_vslot59() > 1);
+            }
+        }
+    }
+}
+
 FE_OVERLAY void fn_8045F6FC(FeScrD* x, FeStr10* out)
 {
     if (x->m138 != 0) {
@@ -538,6 +586,64 @@ FE_OVERLAY int fn_8045FD00(FeScrD* x)
 FE_OVERLAY void fn_80460714(FeScrD* x)
 {
     x->m160->fn_vslot8(0);
+}
+
+FE_OVERLAY void fn_80460AFC(FeScrD* x)
+{
+    int f = fn_804615C4(x) ^ 1;
+    if (x->m14C->fn_vslot59() > 0) {
+        if (fn_804612F0(x) != 0)
+            fn_801251CC((void*)x->m170, 3, 0x37A2, 8);
+        else
+            fn_801251CC((void*)x->m170, 3, 0x1A2F, 8);
+    } else {
+        fn_80125084((void*)x->m170, 3);
+    }
+    if (f != 0) {
+        if (x->m14C == x->m144 && x->m14C->fn_vslot59() > 0)
+            fn_801251CC((void*)x->m170, 0, 0x3A95, 2);
+        else
+            fn_80125084((void*)x->m170, 0);
+        if (x->m134 == 1) {
+            x->fn_vslot32("AUTOFINISH", 1)->fn_vslot8(1);
+            x->fn_vslot32("AUTOFINISH", 1)->fn_vslot14(0);
+        } else {
+            x->fn_vslot32("AUTOFINISH", 1)->fn_vslot8(0);
+            fn_80125490((void*)x->m170, 0, 4, 0x10D6, 7);
+        }
+        ((FeMsgC0*)FeGetMgr())->mC0 = 0;
+    }
+    int g = 0;
+    if (fn_800B5758(fn_800B555C()) != 0 || fn_8007FE04((Unk8007F198_D*)lbl_8061930C)->m1E0 == 1)
+        g = 1;
+    fn_800B555C();
+    int k = fn_800B57EC();
+    if (x->m134 == 4 || (k != 0 && fn_804615C4(x) != 0 && g == 0)) {
+        if (x->m14C->fn_vslot59() > 0) {
+            if (x->m14C == x->m144)
+                fn_801251CC((void*)x->m170, 0, 0x1A45, 3);
+            else
+                fn_801251CC((void*)x->m170, 0, 0x3A94, 5);
+        } else {
+            fn_80125084((void*)x->m170, 0);
+        }
+    } else {
+        if (x->m14C->fn_vslot59() > 0) {
+            if (f != 0) {
+                if (x->m14C == x->m144)
+                    fn_801251CC((void*)x->m170, 0, 0x3A95, 2);
+                else
+                    fn_80125084((void*)x->m170, 0);
+            } else {
+                if (x->m14C == x->m144)
+                    fn_801251CC((void*)x->m170, 0, 0x3A96, 4);
+                else
+                    fn_801251CC((void*)x->m170, 0, 0x3A94, 5);
+            }
+        } else {
+            fn_80125084((void*)x->m170, 0);
+        }
+    }
 }
 
 FE_OVERLAY int fn_80461218(FeScrD* x, int i)
