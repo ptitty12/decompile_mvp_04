@@ -15,6 +15,15 @@ extern char lbl_80682D30[];
 
 extern "C" void fn_80377408(void* p);
 
+extern char lbl_80682EB0[];
+
+extern "C" DB_OVERLAY void fn_80596DCC(void* self, int c)
+{
+    PUT(0x34, lbl_80682EB0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
 extern "C" DB_OVERLAY void fn_80597A70(U* self, int chrg)
 {
     PUT(0x18, lbl_80682D30);
