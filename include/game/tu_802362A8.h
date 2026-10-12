@@ -68,8 +68,11 @@ struct Unk802362A8_Slots {
     int m84;
     int m88;
     int m8C;
-    int m90;
+    Unk8014D8AC_Ctx* m90;
     void fn_80237114();
+    char* fn_80236B90();
+    char* fn_80236B98();
+    char* fn_80236BA0(int k);
 };
 
 /*

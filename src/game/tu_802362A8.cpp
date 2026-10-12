@@ -45,6 +45,7 @@ extern const char lbl_805D7684[];
 extern const char lbl_805D7698[];
 extern int lbl_8068CA8C;
 extern const float lbl_805D7C18;
+extern const char lbl_805D7978[];
 
 cPitcherTunables::cPitcherTunables() : Unk8037B3E8(0x1011A855)
 {
@@ -101,6 +102,32 @@ void fn_802366B0()
 }
 
 void fn_80236B8C() {}
+
+char* Unk802362A8_Slots::fn_80236B90()
+{
+    return (char*)this + 0x268;
+}
+
+char* Unk802362A8_Slots::fn_80236B98()
+{
+    return (char*)this + 0x29C;
+}
+
+char* Unk802362A8_Slots::fn_80236BA0(int k)
+{
+    int idx;
+    if (k == 6) {
+        int a[3] = { 1, 5, 7 };
+        idx = a[m90->m554->fn_8014D8AC(3, lbl_805D7978, 0xCA)];
+    } else if (k == 7) {
+        int a[2] = { 3, 4 };
+        idx = a[m90->m554->fn_8014D8AC(2, lbl_805D7978, 0xD1)];
+    } else {
+        int a[3] = { 2, 6, 8 };
+        idx = a[m90->m554->fn_8014D8AC(3, lbl_805D7978, 0xD7)];
+    }
+    return (char*)this + (idx * 0x34 + 0x94);
+}
 
 float fn_802398C8()
 {
