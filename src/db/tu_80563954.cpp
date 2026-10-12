@@ -4,9 +4,42 @@
  */
 #include "game/db_8054FA04.h"
 #include "game/clampiter.h"
+/* Source object (lbl_8061930C): four ints from +0xC copied into the singleton (fn_80564D40). */
+struct Db80564D40_Src {
+    char pad0[0xC];
+    int mC[4];
+};
+/* Singleton (lbl_80622D88 holds it, lbl_80622D8C counts it; dtor fn_80564E28): m0 source, m4 flag,
+ * constants at +8..+0x24, four ints at +0x28 (fn_80564D40). */
+struct Db80564D40_S {
+    Db80564D40_Src* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28[4];
+};
+extern Db80564D40_Src* lbl_8061930C;
+/* lbl_80619948 as read by fn_805652E8: only the table-set pointer at +0x28. */
+struct Db80619948_G {
+    char pad0[0x28];
+    Unk8052B978_Tbl** m28;
+};
+extern Db80619948_G* lbl_80619948;
+extern "C" int fn_800B548C();
+int fn_80075CC0(int a);
+int fn_80076104(int a, int b, int c);
+int fn_80084408(int a);
+int fn_80084458(int a);
 
 extern "C" int fn_80565D48(Db80565CDC_S* s);
 extern "C" int fn_80565DDC(Db80565CDC_S* s);
+extern "C" int fn_8056AC74(Unk8052B978_Tbl** t, Unk8052B978_Tbl* tb, int idx);
 extern "C" int fn_80565E9C(Db80565CDC_S* s);
 extern "C" int fn_80568D64(Db80565CDC_S* s, int a, int b, int c);
 extern "C" float fn_80563954(float f);
@@ -56,6 +89,7 @@ inline Unk8052B978_Tbl* Db805650DC_At(Db80565CDC_S* s, int off)
     char* b = (char*)s + 0x28;
     return *(Unk8052B978_Tbl**)(b + off);
 }
+
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_80563B4C(float f);
 extern "C" float fn_80563BA0(int a);
@@ -114,6 +148,34 @@ extern "C" DB_OVERLAY void fn_80564A98(Db80563F0C_S* s)
     s->m4 = lbl_805FF914;
 }
 
+extern "C" DB_OVERLAY Db80564D40_S* fn_80564D40(Db80564D40_S* s)
+{
+    if (lbl_80622D88 != 0) {
+        if (s != 0)
+            fn_80564E28(s, 3);
+    } else {
+        lbl_80622D88 = (int)s;
+        lbl_80622D8C = lbl_80622D8C + 1;
+        s->m0 = lbl_8061930C;
+        Unk8006A138_It<3> it(0);
+        int k = 0;
+        do {
+            s->m28[k] = s->m0->mC[k];
+            k = it.Next();
+        } while (k <= 3);
+        s->m4 = 1;
+        s->m20 = 3;
+        s->m8 = 5;
+        s->mC = 7;
+        s->m10 = 7;
+        s->m14 = 5;
+        s->m18 = 5;
+        s->m24 = 5;
+        s->m1C = 7;
+    }
+    return s;
+}
+
 extern "C" DB_OVERLAY void fn_80564E28(void* self, int chrg)
 {
     lbl_80622D88 = 0;
@@ -156,6 +218,24 @@ extern "C" DB_OVERLAY void fn_805650DC(Db80565CDC_S* self, int y)
     fn_8052BBF8(t, y % 2);
     fn_8052BC4C(t, h);
     fn_802B8DDC();
+}
+
+extern "C" DB_OVERLAY void fn_805652E8(Unk8007B2B0_Screen** pp, Unk8052B978_Tbl* tb, int a)
+{
+    unsigned i = 0;
+    fn_80076104(fn_80075CC0(a), 0, 0);
+    int k = fn_800B548C();
+    int g = (*pp)->fn_8007B8C4(0, k);
+    int v1 = fn_80084408(g);
+    int v2 = fn_80084458(g);
+    unsigned n = tb->m4;
+    Unk8052B978_Tbl** t = lbl_80619948->m28;
+    for (; i < n; i++) {
+        if (fn_8056AC74(t, tb, i) == 1) {
+            *(int*)((char*)tb->m8 + i * 0x1C + 4) = v1;
+            *(int*)((char*)tb->m8 + i * 0x1C + 0x10) = v2;
+        }
+    }
 }
 
 extern "C" DB_OVERLAY int fn_805653B4(Db80565CDC_S* s, int a, int b, int c, int d)
