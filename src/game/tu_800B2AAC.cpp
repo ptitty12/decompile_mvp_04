@@ -4,6 +4,15 @@
  */
 #include "game/tu_800A8684.h"
 #include "game/tu_8007A4DC.h"
+struct UnkAt4C6C {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+extern const float lbl_805B9DC8;
 
 struct UnkAt5C {
     char pad0[0x5C];
@@ -276,7 +285,6 @@ inline int FEIsBC(int v)
     }
     return 0;
 }
-
 
 /* ---- unit prototypes ---- */
 extern "C" {
@@ -586,6 +594,16 @@ extern "C" int fn_800B4B28(GObj5C* self, int k)
 extern "C" int fn_800B4C64()
 {
     return 1;
+}
+
+extern "C" void fn_800B4C6C(UnkAt4C6C* o, float a, float b, float c, float d)
+{
+    o->m8 = (int)(a * lbl_805B9DC8);
+    o->m4 = 1;
+    o->mC = (int)(b * lbl_805B9DC8);
+    o->m10 = (int)c;
+    o->m14 = (int)d;
+    o->m0 = 1;
 }
 
 extern "C" void* fn_800B4CFC(UnkAt1C24* p)
