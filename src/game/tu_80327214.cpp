@@ -33,6 +33,69 @@ extern int lbl_80620360;
 extern const float lbl_805ECABC;
 extern int lbl_80691AEC;
 
+class FxEffW {
+public:
+    char pad0[0x18];
+    virtual void v1();
+    virtual void v2();
+    virtual int v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual int v8(char** pp);
+};
+extern const float lbl_805EC848;
+struct FxScrW {
+    FxLabelV* a0[93];
+    int m174;
+    char pad178[0x204 - 0x178];
+    int m204;
+    int m208;
+    char pad20C[0xA4C - 0x20C];
+    void* aA4C[9];
+};
+struct FxPosC {
+    char pad0[0x44C];
+    int m44C;
+    char pad450[0x708 - 0x450];
+    int m708;
+    char pad70C[0xA04 - 0x70C];
+    int mA04;
+};
+inline void FxSldSet(FxSldF* s, float v)
+{
+    float* p = s->m48;
+    if (p == 0)
+        s->m4C = v;
+    else
+        *p = v;
+}
+extern int lbl_80620308;
+extern FxApp* lbl_8068B618;
+struct FxSldI { char pad0[0x48]; int* m48; int m4C; };
+inline int FxGetI(FxSldI* s)
+{
+    int* p = s->m48;
+    return p != 0 ? *p : s->m4C;
+}
+inline float FxGetF(FxSldF* s)
+{
+    float* p = s->m48;
+    return p == 0 ? s->m4C : *p;
+}
+extern int lbl_80620308;
+extern float lbl_8062030C;
+extern float lbl_80620310;
+extern float lbl_80620314;
+extern int lbl_80620318;
+extern float lbl_8062031C;
+extern float lbl_80620320;
+extern int lbl_80620324;
+extern float lbl_80620328;
+extern int lbl_8062032C;
+extern float lbl_80620330;
+extern int lbl_80691D98[];
 extern "C" {
 FxEffV* fn_80303AC4();
 void* fn_801A04A8(FxActS* a, int i);
@@ -111,8 +174,25 @@ unsigned char fn_8032A2CC(int a, int b);
 int fn_8032A338(unsigned y);
 char* fn_8032A394(char* base, int target);
 void fn_8032ABC8();
+int fn_80329E74(FxDate* p);
+FxShorts* fn_803265F0(void* self);
+char* fn_80324EC8(char* a);
+void fn_80324ED0(short* p, int v);
+void fn_80326610(FxAI* self, char* name, int a, float c);
+void fn_803289F0(int a);
+void* fn_801A4B34(FxView* v);
+float fn_8024F048(void* a, int b, int c, int d, int e);
+float fn_8024F20C(void* a, int b, int c, int d, int e);
+float fn_8024EF40(void* a, int b, int c);
+int fn_801D7A3C(void* a, int b);
+void fn_8032F574(void* it, int a);
+void fn_8032AA18(FxScrW* self);
+void fn_801D7AC4(int t, FxView* v);
+void fn_80330BC8(FxScrW* self, int a);
+void fn_8032A800(FxScrW* self, int arg);
 // PROTOS-END
 }
+short fn_8035FF34(int a);
 
 inline int AtD(int* p, int i) { int off = i * 4; return *(int*)((char*)p + off); }
 
@@ -348,6 +428,48 @@ void fn_80328858(void* tab, int n, int a) {
 
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
+void fn_803289F0(int a)
+{
+    int actor = fn_803285A0(a);
+    int row = fn_80328648(actor);
+    if (actor != 0) {
+        char* base = (char*)actor + 0x50;
+        int k = 0;
+        FxShorts* h0 = fn_803265F0(base);
+        FxShorts* h = h0;
+        char* sp8 = (char*)h0;
+        int* r = lbl_806E2184[row];
+        for (k = 0; k < lbl_805EA810; k++) {
+            int idx = r[*(int*)((char*)&lbl_80620168 + k * 4)];
+            while (idx > 0) {
+                FxSlot8* s = &lbl_806E2274[idx];
+                FxEffW* o = (FxEffW*)s->m0;
+                int nx = 0;
+                if (o) {
+                    if (o->v3()) {
+                        h->m2 = fn_8035FF34(o->v3());
+                        sp8 = fn_80324EC8((char*)h);
+                        ((FxShorts*)sp8)->m0 = 0;
+                        ((FxShorts*)sp8)->m2 = 0;
+                        if (o->v8(&sp8)) {
+                            fn_80324ED0((short*)h, sp8 - (char*)h);
+                            FxShorts* nxt = 0;
+                            if (h->m0 != 0)
+                                nxt = (FxShorts*)((char*)h + h->m0);
+                            h = nxt;
+                        }
+                    }
+                    nx = s->m4;
+                }
+                idx = nx;
+            }
+        }
+        h->m0 = 0;
+        h->m2 = 0;
+        fn_80326610((FxAI*)base, (char*)h0, *(int*)(actor + 0x4C), lbl_805EC848);
+    }
+}
+
 void fn_80329498() {
     int* a = &lbl_806202FC;
     int* b = &lbl_806202F4;
@@ -557,6 +679,42 @@ int fn_80329E50() {
 /* The result record is a local with a trivial destructor (BLKmode): its fields are stored straight into the frame
    slot, as retail does; a plain FxDate local goes through an address register. */
 struct FxDateL { unsigned a : 8; unsigned b : 8; unsigned c : 16; ~FxDateL() {} };
+int fn_80329E74(FxDate* p)
+{
+    FxDate d = *p;
+    if (d.c <= 99)
+        d.c += 1900;
+    d.a -= 1;
+    int total = 0;
+    int months = d.a;
+    for (int i = 0; i < months; i++)
+        total += fn_8032A2CC(i % 12, d.c);
+    total += d.b;
+    int y = lbl_80691AF2;
+    int done = 0;
+    while (!done) {
+        int n = y + 4;
+        int yr = d.c;
+        if (n > yr) {
+            while (!done) {
+                int n1 = y + 1;
+                if (n1 > yr) {
+                    done = 1;
+                } else {
+                    int yl = fn_8032A338((unsigned short)y) == 1 ? 0x16E : 0x16D;
+                    total += yl;
+                    y = n1;
+                }
+            }
+        } else {
+            int len = fn_8032A338((unsigned short)y) == 1 ? 0x5B5 : 0x5B4;
+            total += len;
+            y = n;
+        }
+    }
+    return total;
+}
+
 FxDate fn_80329FA0(char* p) {
     int days = (int)p;
     if (days <= 0) return *(FxDate*)&lbl_80691AF0;
@@ -681,6 +839,54 @@ char* fn_8032A394(char* base, int target) {
         if (fn_8032A130((w >> 24) - 1, (w >> 16) & 0xFF, w & 0xFFFF) == target) return p;
     }
     return base;
+}
+
+void fn_8032A800(FxScrW* self, int arg)
+{
+    lbl_80620308 = FxGetI((FxSldI*)((char*)self + 0x2E0));
+    lbl_8062030C = FxGetF((FxSldF*)((char*)self + 0x334));
+    lbl_80620310 = FxGetF((FxSldF*)((char*)self + 0x398));
+    lbl_80620314 = FxGetF((FxSldF*)((char*)self + 0x3FC));
+    for (int i = 0; i < 9; i++)
+        lbl_80691D98[i] = ((FxSldI*)self->aA4C[i])->m4C;
+    FxView* v = lbl_8068B618->m8;
+    if (v) {
+        int t = (int)v->m700->m3A4 + 8;
+        if (t)
+            fn_801D7AC4(t, v);
+    }
+    lbl_80620318 = FxGetI((FxSldI*)((char*)self + 0x7C0));
+    lbl_8062031C = FxGetF((FxSldF*)((char*)self + 0x814));
+    lbl_80620320 = FxGetF((FxSldF*)((char*)self + 0x878));
+    lbl_80620324 = FxGetI((FxSldI*)((char*)self + 0x8DC));
+    lbl_80620328 = FxGetF((FxSldF*)((char*)self + 0x930));
+    lbl_8062032C = FxGetI((FxSldI*)((char*)self + 0x994));
+    lbl_80620330 = FxGetF((FxSldF*)((char*)self + 0x9E8));
+    fn_80330BC8(self, arg);
+}
+
+void fn_8032AA18(FxScrW* self)
+{
+    int z = 0;
+    self->m204 = z;
+    self->m208 = z;
+    self->a0[self->m174]->s3();
+    self->m174 = z;
+    self->a0[z]->s2();
+    if (lbl_80620308 == 0) {
+        FxPosC* c = (FxPosC*)fn_801A4B34(lbl_8068B618->m8);
+        char* tt = (char*)lbl_8068B618->m8->m700->m3A4 + 8;
+        if (c) {
+            char* ref = (char*)c + 0xA0C;
+            FxSldSet((FxSldF*)((char*)self + 0x334), fn_8024F048(ref, c->mA04, c->m44C, c->m708, 1));
+            FxSldSet((FxSldF*)((char*)self + 0x398), fn_8024F20C(ref, c->mA04, c->m44C, c->m708, 1));
+            FxSldSet((FxSldF*)((char*)self + 0x3FC), fn_8024EF40(ref, c->m44C, c->m708));
+        }
+        if (tt) {
+            for (int i = 0; i <= 8; i++)
+                fn_8032F574(self->aA4C[i], fn_801D7A3C(tt, i + 2));
+        }
+    }
 }
 
 void fn_8032ABC8() {
