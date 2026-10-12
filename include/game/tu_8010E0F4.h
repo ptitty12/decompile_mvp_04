@@ -227,7 +227,7 @@ struct UnkLabel : Unk800C7B40_Data {
     virtual int fn_vslot31();
     virtual void fn_vslot32();
     virtual void fn_vslot33();
-    virtual void fn_vslot34();
+    virtual int fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
     virtual void fn_vslot37();
