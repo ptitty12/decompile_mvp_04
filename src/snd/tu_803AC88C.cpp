@@ -19,6 +19,112 @@ extern "C" void fn_80400C1C(int (*fn)(), int a, int b);
 extern "C" void fn_80400690(int (*fn)());
 extern "C" int fn_803B3E88();
 
+extern "C" void fn_803B9E08(DtorAt0* s, int chrg);
+
+extern void (*lbl_8062520C)(DtorAt0*, int);
+extern void (*lbl_80625210)(DtorAt0*, int);
+
+extern "C" void fn_803AC88C();
+
+struct Unk803ADD08 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    char pad1C[0x14];
+    short m30;
+    short m32;
+    short m34;
+    short m36;
+    short m38;
+    short m3A;
+    short m3C;
+    short m3E;
+    short m40;
+    short m42;
+    short m44;
+    short m46;
+    short m48;
+    short m4A;
+    short m4C;
+    short m4E;
+    short m50;
+    short m52;
+    short m54;
+    short m56;
+};
+extern Unk803ADD08 lbl_8069CBC4[64];
+
+struct Unk803AE0E0 {
+    char pad[0x18];
+    int m18;
+};
+extern int lbl_8069E1C4;
+
+extern "C" unsigned int OSDisableInterrupts();
+extern "C" void OSRestoreInterrupts(unsigned int);
+extern "C" void fn_80417B10(void* p);
+extern "C" void fn_804176B0(void* p);
+extern "C" void fn_803AEB50(int a, int b, int c, int d, int e);
+
+struct Unk8069E200_RecA {
+    char pad0[0x1F];
+    unsigned char m1F;
+    char pad20[0x1C];
+    void* m3C;
+};
+
+struct Unk8069E200_RecB {
+    int m0;
+    int m4;
+    char pad8[0x1C];
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    char pad34[0xC];
+};
+
+struct Unk8069E200 {
+    Unk8069E200_RecA recA[0x30];
+    char padC00[0x1410 - 0xC00];
+    void* mVoices[16];
+    char pad1450[0x9DE8 - 0x1450];
+    int m9DE8;
+    char pad9DEC[0x9E30 - 0x9DEC];
+    Unk8069E200_RecB recB[64];
+    char padAE30[0xC048 - 0xAE30];
+    unsigned char mC048;
+    unsigned char mC049;
+    char padC04A[6];
+    void* mBufs[6];
+    unsigned int mAligned[6];
+};
+extern Unk8069E200 lbl_8069E200;
+
+extern "C" void fn_803B14D0();
+extern "C" void fn_803B5ACC();
+extern "C" int fn_8041818C(int a, int b);
+extern "C" void fn_80437D18(void* p);
+extern "C" void fn_80417808();
+extern "C" void fn_803A979C();
+extern "C" void fn_803A975C();
+extern "C" void fn_803AEF88();
+extern char lbl_8069FCC8[];
+
+struct Unk803AEE98 {
+    unsigned int w0;
+    void (*fn)(int);
+    unsigned char m10;
+    unsigned char m11;
+    unsigned char m12;
+};
+extern void (*lbl_806AA4C8)(Unk803AEE98*);
+extern void (*lbl_806AA4CC)();
+
 extern "C" void fn_803AC88C()
 {
     if (sndgs.installed) {
@@ -33,15 +139,10 @@ extern "C" void fn_803AC904(DtorAt0* s, int chrg)
     fn_803B9DDC(s, chrg);
 }
 
-extern "C" void fn_803B9E08(DtorAt0* s, int chrg);
-
 extern "C" void fn_803AC924(DtorAt0* s, int chrg)
 {
     fn_803B9E08(s, chrg);
 }
-
-extern void (*lbl_8062520C)(DtorAt0*, int);
-extern void (*lbl_80625210)(DtorAt0*, int);
 
 extern "C" int fn_803AC944()
 {
@@ -85,8 +186,6 @@ extern "C" int fn_803AD258(int shandle, int v)
     return 0;
 }
 
-extern "C" void fn_803AC88C();
-
 extern "C" int fn_803AD994()
 {
     fn_803AC88C();
@@ -107,44 +206,6 @@ extern "C" int fn_803AD9BC()
     fn_80400690(fn_803B3E88);
     return 0;
 }
-
-struct Unk803ADD08 {
-    int m0;
-    int m4;
-    int m8;
-    int mC;
-    int m10;
-    int m14;
-    int m18;
-    char pad1C[0x14];
-    short m30;
-    short m32;
-    short m34;
-    short m36;
-    short m38;
-    short m3A;
-    short m3C;
-    short m3E;
-    short m40;
-    short m42;
-    short m44;
-    short m46;
-    short m48;
-    short m4A;
-    short m4C;
-    short m4E;
-    short m50;
-    short m52;
-    short m54;
-    short m56;
-};
-extern Unk803ADD08 lbl_8069CBC4[64];
-
-struct Unk803AE0E0 {
-    char pad[0x18];
-    int m18;
-};
-extern int lbl_8069E1C4;
 
 extern "C" void fn_803ADD08(Unk803ADD08* p)
 {
@@ -204,9 +265,113 @@ extern "C" void fn_803AE0FC(Unk803AE0E0* p, int v)
     e->m4 = t | 0x10000000;
 }
 
+extern "C" void fn_803AE550()
+{
+    int i;
+    if (lbl_8069E200.mC049 != 0) {
+        for (i = 0; i <= 0x2f; i++) {
+            if (lbl_8069E200.recA[i].m1F != 0) {
+                fn_80417B10(lbl_8069E200.recA[i].m3C);
+                lbl_8069E200.recA[i].m1F = 0;
+                lbl_8069E200.mC049--;
+                lbl_8069E200.recA[i].m3C = 0;
+                if (lbl_8069E200.mC049 == 0)
+                    break;
+            }
+        }
+    }
+}
+
 extern "C" void fn_803AE5EC(int v)
 {
     SNDVOICEI_free(v + sndgs.sso.set.voicesdsp);
+}
+
+extern "C" int fn_803AEA78(int v)
+{
+    int i = 0;
+    unsigned int en = OSDisableInterrupts();
+    while (i < 64 && lbl_8069E200.recB[i].m0 != -1)
+        i++;
+    lbl_8069E200.recB[i].m0 = v;
+    OSRestoreInterrupts(en);
+    return i;
+}
+
+extern "C" void fn_803AEB04(Unk8069E200_RecB* r)
+{
+    int i;
+    lbl_8069E200.m9DE8 = r->m4;
+    for (i = 0; i <= 63; i++) {
+        if (lbl_8069E200.recB[i].m0 == r->m4) {
+            lbl_8069E200.recB[i].m0 = -1;
+            return;
+        }
+    }
+}
+
+extern "C" void fn_803AEC70(int id)
+{
+    int i;
+    unsigned int en = OSDisableInterrupts();
+    for (i = 0; i <= 63; i++) {
+        if (lbl_8069E200.recB[i].m0 == id) {
+            fn_804176B0(&lbl_8069E200.recB[i].m4);
+            fn_803AEB50(lbl_8069E200.recB[i].m24, lbl_8069E200.recB[i].m28, lbl_8069E200.recB[i].m2C, lbl_8069E200.recB[i].m30, i);
+        }
+    }
+    OSRestoreInterrupts(en);
+}
+
+extern "C" void fn_803AEE98()
+{
+    Unk803AEE98 b;
+    int i;
+    fn_803B14D0();
+    b.m10 = sndgs.sso.set.voicesmaincpu;
+    if (sndgs.sso.set.outputchannels != 1)
+        b.m11 = sndgs.sso.set.outputchannels;
+    else
+        b.m11 = 2;
+    b.w0 = sndgs.sso.set.outputrate;
+    b.fn = fn_803AE5EC;
+    b.m12 = 0;
+    lbl_806AA4C8(&b);
+    fn_803A975C();
+    for (i = 0; i < b.m11; i++) {
+        void* p = SNDMEMI_allocz(0x2a0);
+        lbl_8069E200.mBufs[i] = p;
+        lbl_8069E200.mAligned[i] = ((unsigned int)p + 0x1f) & ~0x1f;
+    }
+    fn_803A979C();
+    lbl_8069E200.mC048 = 1;
+}
+
+extern "C" void fn_803AEF88()
+{
+    int i;
+    lbl_8069E200.mC048 = 0;
+    fn_803A975C();
+    for (i = 0; i < sndgs.sso.set.outputchannels; i++)
+        SNDMEMI_free(lbl_8069E200.mBufs[i]);
+    fn_803A979C();
+    lbl_806AA4CC();
+}
+
+extern "C" int fn_803AF934()
+{
+    fn_8041818C(0, 0);
+    if (lbl_8069E200.mC048 != 0)
+        fn_803AEF88();
+    fn_803B5ACC();
+    if (sndgs.incritical != 0) {
+        do {
+            fn_803A979C();
+        } while (sndgs.incritical != 0);
+    }
+    fn_80437D18(lbl_8069FCC8);
+    fn_80417808();
+    return 0;
 }
 
 extern "C" void fn_803AFD44(int flags, int* a, int* b)
