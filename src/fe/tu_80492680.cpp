@@ -36,7 +36,53 @@ struct Fe4F94 {
     Fe4F94B p[4];
 };
 extern "C" void fn_80496EE4(void* x, int a, int b, int c, int d, void* w, int e, int f, int g);
+extern const char lbl_805F6AA8[];
+extern const char lbl_805F6AB8[];
+extern "C" void fn_8009E93C(char* p, int a, int b, char* out);
 extern "C" {
+
+//// a
+inline void Fe2FB4Get(char* rec, char* nm)
+{
+    fn_8009E93C(rec + 0x8C, 3, 0, nm);
+}
+inline char* FeIdc(char* p)
+{
+    return p;
+}
+/* near-miss (97.5%): the second range bound compiles to cmpwi 10 / ble where retail has cmpwi 11 / blt */
+FE_OVERLAY void fn_80492FB4(void* x)
+{
+    char suf[0x10];
+    char fmt[0x20];
+    char nm[0x20];
+    char out[0x80];
+    unsigned char b = *(unsigned char*)((char*)FeP(x, 0x1A4) + 0x1CC8);
+    int n = b + 1;
+    int m = b + 1;
+    if (n <= 0xD && b + 1 >= 0xB) {
+        fn_804031BC(suf, lbl_805F6AA8);
+    } else {
+        switch (n % 10) {
+        case 1:
+            fn_804031BC(suf, lbl_805F6AAC);
+            break;
+        case 2:
+            fn_804031BC(suf, lbl_805F6AB0);
+            break;
+        case 3:
+            fn_804031BC(suf, lbl_805F6AB4);
+            break;
+        default:
+            fn_804031BC(suf, lbl_805F6AA8);
+            break;
+        }
+    }
+    fn_804031BC(fmt, lbl_805F6AB8);
+    Fe2FB4Get((char*)((FeScrB*)x)->m1A8[FeI(x, 0x184)], nm);
+    ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, FeIdc(nm), n, suf);
+    fn_80492BA8(x, out);
+}
 
 FE_OVERLAY void fn_804933A0(void* x)
 {
