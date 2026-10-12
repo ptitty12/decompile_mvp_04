@@ -22,7 +22,7 @@ void fn_8000C674(short x, short y, const char* fmt, ...);
 #include "game/tu_8006902C.h"
 void fn_802D7538();
 struct Unk8014D5C0_Obj { char pad0[0x6F8]; Unk80069F0C* m6F8; };
-struct Unk8014D5C0_Own { char pad0[8]; Unk8014D5C0_Obj* m8[3]; };
+struct Unk8014D5C0_Own { char pad0[8]; Unk8014D5C0_Obj* m8[3]; char pad14[0x24 - 0x14]; int m24; };
 inline Unk8014D5C0_Obj* Get8014D5C0(Unk8014D5C0_Own* p, unsigned i) { return i <= 2 ? p->m8[i] : 0; }
 void fn_80071F00();
 /* Polymorphic 8-byte object built by fn_80353218 (m0 = 0, vptr lbl_8064B718 at +4); same class as in tu_800A23F4.cpp. */
@@ -116,11 +116,14 @@ extern V0_8014D6A4* lbl_8061B984;
 extern VT18* lbl_8068F1F4;
 extern VT18* lbl_8068F1FC;
 class V2DC_8014D488 { public: char pad0[0x2DC]; virtual ~V2DC_8014D488(); };
-struct Unk806192E0_8014D488 { int m0; int m4; };
+struct P74_8014D1EC { char pad0[0x74]; int m74; };
+struct PObj_8014D1EC { char pad0[0x10]; P74_8014D1EC* m10; };
+struct Unk806192E0_8014D488 { int m0; PObj_8014D1EC* m4; int m8; };
 extern int lbl_8061FEDC;
 extern int lbl_8061FE20;
 extern int lbl_8061C688;
 extern V2DC_8014D488* lbl_8061B99C;
+extern V2DC_8014D488* lbl_8061B9A0;
 extern VT18* lbl_8061B998;
 extern void* lbl_8061E978;
 extern Unk806192E0_8014D488* lbl_806192E0;
@@ -135,6 +138,55 @@ void fn_8000C50C(int v);
 void fn_8000C540(const Unk80615854* c);
 void fn_8000C574(const Unk80615854* c);
 void fn_8000C5A8();
+struct X1DC_8014D1EC { char pad0[0x1DC]; int m1DC; };
+class V18c_8014D1EC {
+public:
+    char pad0[0x18];
+    virtual ~V18c_8014D1EC();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual void s18(int a);
+    virtual int s19();
+};
+struct B8C0_8014D1EC { char pad0[8]; void* m8; };
+struct Unk802D58E8;
+extern int lbl_8061B9A4;
+extern int lbl_80620424;
+extern int lbl_80620428;
+extern int lbl_8061D45C;
+extern B8C0_8014D1EC* lbl_8061B8C0;
+extern const char lbl_80666A18[];
+extern const char lbl_8065D550[];
+void fn_802D7A74();
+void fn_802D5BF4(Unk802D58E8* o, int a, const char* s);
+extern "C" {
+void fn_8006A1F4__11Unk80069F0C(void* self);
+void fn_80316614(void* o, int a, float f);
+int fn_801498C0(void* a, void* b);
+void fn_801810C8();
+void fn_8014CBE8(void* a, int b);
+Unk802D58E8* fn_801A4CE8(void* a, int b);
+void fn_802D7ACC();
+void fn_803E4A50(void* p);
+void fn_80357B58(void* p);
+void* fn_80335604(void* self, void* o, int a);
+void fn_8032D36C();
+void fn_803164A0__Fv(void* x);
+}
 extern "C" {
 void VISetBlack(int b);
 void VIFlush();
@@ -152,7 +204,7 @@ void fn_80434F9C();
 void fn_8014F954(char* self);
 int fn_8031C6A8();
 void fn_8031C6B4();
-void fn_80149DD4(void* a, int b);
+void fn_80149DD4(void* a, void* b);
 void fn_80312018(int a);
 void fn_802B832C__FP15Unk802ACD88_Mgr(void* mgr);
 void* fn_802BB19C__Fv();
@@ -339,6 +391,70 @@ void fn_8014C540()
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     }
     lbl_8061A32C->mB8 = 1;
+}
+
+/* near-miss (2 slots, 98.8%): retail stores 0x174 before forming o+0x210 (addi r3); the scheduler here hoists the addi above the first store; 120 store orders and a local for the sub-object pointer tried */
+int fn_8014D1EC() /* 8014D1EC */
+{
+    X1DC_8014D1EC* x = (X1DC_8014D1EC*)lbl_8061FEDC;
+    lbl_8061B9A4 = 0;
+    fn_802D7A74();
+    if (!lbl_8061A32C) {
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    }
+    ((VT18*)lbl_8061A32C)->s19();
+    int k1 = 0x1B;
+    int k2 = 0x1C;
+    lbl_80620424 = k1;
+    lbl_80620428 = k2;
+    if (lbl_8061B998 != 0) {
+        delete lbl_8061B998;
+        lbl_8061B998 = 0;
+    }
+    if (lbl_8061B9A0 != 0) {
+        delete lbl_8061B9A0;
+        lbl_8061B9A0 = 0;
+    }
+    PObj_8014D1EC* p = lbl_806192E0->m4;
+    fn_8006A1F4__11Unk80069F0C(p);
+    fn_8014C540();
+    fn_8014C3BC();
+    fn_80316614(x, 1, 0.02f);
+    fn_80316614(x, 3, 0.02f);
+    fn_80316614(x, 5, 0.02f);
+    fn_802BB1E4__FP15Unk802BB1E4_Obji(fn_802BB19C__Fv(), 1);
+    if (fn_801498C0(lbl_8068B618, p) == 0) {
+        return 0;
+    }
+    fn_801810C8();
+    fn_8014CBE8(p, lbl_806192E0->m8);
+    if (lbl_8061D45C != 0) {
+        fn_802D5BF4(fn_801A4CE8(lbl_8061B8C0->m8, 1), 1, "HeadViewer");
+    }
+    lbl_8068B618->m24 = 0;
+    fn_802D7ACC();
+    if (p->m10->m74 != 0xA) {
+        char* o = (char*)operator new(0x2E0, 0);
+        *(int*)(o + 0x174) = 0;
+        *(const void**)(o + 0x2DC) = lbl_80666A18;
+        *(int*)(o + 0x178) = 0;
+        *(int*)(o + 0x1FC) = 0;
+        *(int*)(o + 0x200) = 0;
+        fn_803E4A50(o + 0x210);
+        *(int*)(o + 0x2D8) = 0;
+        *(const void**)(o + 0x2DC) = lbl_8065D550;
+        fn_80357B58(o);
+        lbl_8061B99C = (V2DC_8014D488*)o;
+        lbl_8061B998 = (VT18*)fn_80335604(operator new(0x30C, 0), lbl_8061B99C, 0);
+    }
+    fn_8032D36C();
+    x->m1DC = 0;
+    if (!lbl_8061A32C) {
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    }
+    ((V18c_8014D1EC*)lbl_8061A32C)->s18(3);
+    fn_803164A0__Fv(x);
+    return 1;
 }
 
 void fn_8014D488()
