@@ -43,7 +43,9 @@ struct FEOb118 {
 struct FEOb210 {
     char pad0[0x5C];
     int m5C;
-    char pad60[0x7C - 0x60];
+    char pad60[4];
+    int m64;
+    char pad68[0x7C - 0x68];
     int m7C[12];
     char padAC[0xD4 - 0xAC];
     int mD4;
@@ -811,6 +813,23 @@ extern "C" int fn_800B2048(char* p)
     return q[*(int*)(p + 0x70) * 3];
 }
 
+extern "C" int fn_800B205C(FEOb210* self)
+{
+    int r = 0;
+    if (self->mD8 == 1) {
+        if (fn_800B20E0((FEOb68*)self) != 0) {
+            r = self->m64 == 0;
+        }
+    } else {
+        int i = self->m114;
+        if (i > 11) {
+            i = 11;
+        }
+        r = self->m7C[i] > self->m110;
+    }
+    return r;
+}
+
 extern "C" int fn_800B20E0(FEOb68* self)
 {
     int r = 0;
@@ -871,7 +890,6 @@ extern "C" int fn_800B2204(FEOb210* self)
     return self->m7C[v];
 }
 
-/* near-miss (4 slots): retail roots the compare tree at 2 and tests case 1 after case 0 (beqlr on the pre-set r3); enum-typed index did not move the root */
 extern "C" int fn_800B2238(FEOb2390* self)
 {
     int r = 0;
@@ -887,6 +905,7 @@ extern "C" int fn_800B2238(FEOb2390* self)
     case 3:
         r = 3;
         break;
+    case 4:
     default:
         r = 4;
         break;
