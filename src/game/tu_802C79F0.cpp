@@ -68,14 +68,13 @@ void fn_802C85AC(char* p);
 float fn_802AEAA0(Unk802AEB4C* o, int id);
 float fn_802AE9C8(Unk802AEB4C* o, int id);
 
-/* near-miss (88 vs 89 insns): everything else matches, including the g++ array-new ctor loop (new (0) T[cnt]); retail copies the trip count into a new register
-   (mr r30,r31; li r31,0) in the first loop where ours coalesces count and offset registers. */
 void fn_802C79F0(Unk802C7B54* o, int flag)
 {
+    int i;
     int n = lbl_805E1B34[0];
     int h = fn_802BB27C(fn_802BB19C(), 1);
     if (n > 0) {
-        int c = n;
+        i = n;
         int off = 0;
         do {
             char* b = (char*)o + 0xA8;
@@ -84,16 +83,16 @@ void fn_802C79F0(Unk802C7B54* o, int flag)
                 *(int*)(b + off) = fn_803ED604(lbl_805E186C, 0xD6D8, lbl_806EE9F0 | 0x400);
             }
             off += 0xC;
-        } while (--c != 0);
+        } while (--i != 0);
     }
     o->m3D4 = flag ? 0xA : 0x23;
     int cnt = o->m3D4;
     Unk802C83A4* arr = new (0) Unk802C83A4[cnt];
     o->m3C0 = (char*)arr;
-    for (int i = 0; i < o->m3D4; i++) {
+    for (i = 0; i < o->m3D4; i++) {
         fn_802C851C((Unk802C851C*)(o->m3C0 + i * 0x10));
     }
-    for (int i = 0; i < o->m3D4; i++) {
+    for (i = 0; i < o->m3D4; i++) {
         fn_802C8564((Unk802C851C*)(o->m3C0 + i * 0x10));
     }
 }
@@ -147,17 +146,21 @@ void fn_802C7E80(Unk802C7B54* o)
 
 /* near-miss (68 vs 68 insns, register names only): retail uses k in r29 and three separate byte-offset registers (r3/r4/r5) for the table loads and
    even indexes the k == 0 arm by r29 itself (k known to be 0 there); ours picks different registers. */
+/* near-miss (66/68 insns): shared function-scope counter and invariant temps (b before a) match the loop shape; remaining diffs are the index/base operand order of the first loop's table load and which arm gets the copied base register. */
 void fn_802C7EF8(Unk802C7B54* o)
 {
-    for (int i = 0; i < 2; i++) {
-        fn_802AD2B8((char*)o + 0xF0 + i * 0x168, (char*)o + 0x30 + i * 0xC, lbl_8061EC90[i], lbl_8061D2BC, 0x2E);
+    int i;
+    for (i = 0; i < 2; i++) {
+        fn_802AD2B8((char*)o + 0xF0 + i * 0x168, (char*)o + 0x30 + i * 0xC, *(int*)((char*)lbl_8061EC90 + i * 4), lbl_8061D2BC, 0x2E);
     }
-    for (int k = 0; k < 4; k++) {
-        for (int j = 0; j < lbl_805E1B34[k]; j++) {
-            if (k == 0) {
-                o->m3C4[k][j].m43C = (char*)o + 0xF0;
+    for (i = 0; i < 4; i++) {
+        for (int j = 0; j < lbl_805E1B34[i]; j++) {
+            char* b = (char*)o + 0x258;
+            char* a = (char*)o + 0xF0;
+            if (i == 0) {
+                o->m3C4[i][j].m43C = a;
             } else {
-                o->m3C4[k][j].m43C = (char*)o + 0x258;
+                o->m3C4[i][j].m43C = b;
             }
         }
     }
