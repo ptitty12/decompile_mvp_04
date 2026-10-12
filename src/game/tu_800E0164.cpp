@@ -252,14 +252,14 @@ int fn_800E24F4(int x)
     return -1;
 }
 
-/* near-miss: argument setup order of the two calls (mr r3,rX placement) */
+/* near-miss: 1 call differs: retail sets r3 before the other arguments of s->fn_8007CF44, which needs the method declared void (tu_8007CAC4.cpp defines it int) */
 void fn_800E25E0(int a, int b)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
     int h = s->fn_8007DA28();
     if (h != -1) {
         char buf[0x18];
-        fn_8007CF44(s, h, (int)buf, 0);
+        s->fn_8007CF44(h, (int)buf, 0);
         fn_801254EC(a, 1, 3, buf, b);
         if (s->fn_8007DADC(h) != 0) {
             fn_80125C84(a, 1);
