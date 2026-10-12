@@ -420,6 +420,45 @@ struct PX {
 };
 extern "C" void fn_80383C78(PX* o, float* a, float* b, int* c, int* d);
 
+struct Obj14 {
+    char pad0[0x14];
+    int m14;
+};
+struct VX13 {
+    virtual ~VX13();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual Obj14* s13(int key);
+};
+struct GObj1 {
+    virtual float s1(int key);
+};
+struct SegEnt {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+};
+struct SegList {
+    char pad0[0x10];
+};
+struct SegBase {
+    int m0;
+    int m4;
+    SegEnt* m8;
+};
+extern GObj1* lbl_80624278;
+extern int lbl_806242B0;
+
 extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 {
     for (int i = 0; i < o->m4; i++) {
@@ -738,6 +777,49 @@ extern "C" int fn_803814A4(Unk8037E9D0* o, int a, float f, int b)
     } else
         fn_8037E9D0(o);
     return ret;
+}
+
+extern "C" int fn_803818BC(int ov, int pv, int key, float a, float b)
+{
+    VX13* o = (VX13*)ov;
+    SegList* p = (SegList*)pv;
+    Obj14* r = o->s13(lbl_806242B0);
+    if (r == 0 || r->m14 <= 0) {
+        if (p != 0) {
+            float sc;
+            float lo;
+            float hi;
+            sc = -1.0f;
+            lo = 0.0f;
+            hi = 0.0f;
+            SegBase* sb = (SegBase*)((char*)p + 0x10);
+            int i = sb->m4;
+            if (r == 0 && i-- != 0) {
+                                do {
+                    r = o->s13(sb->m8[i].m0);
+                    if (r == 0 || r->m14 > 0) {
+                        if (!(sc >= 0.0f)) {
+                            sc = lbl_80624278->s1(key);
+                            lo = a * sc;
+                            hi = b * sc;
+                        }
+                        float e8 = sb->m8[i].m8;
+                        if (e8 >= hi)
+                            r = 0;
+                        else {
+                            float sum = e8 + sb->m8[i].mC;
+                            if (!(sum >= lo))
+                                r = 0;
+                        }
+                    } else
+                        r = 0;
+                    if (r != 0)
+                        break;
+                } while (i-- != 0);
+            }
+        }
+    }
+    return (int)r;
 }
 
 extern "C" void fn_80381A5C(Unk8037E9D0* o)
