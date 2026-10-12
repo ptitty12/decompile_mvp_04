@@ -94,7 +94,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s70();
     virtual void s71();
     virtual void s72();
-    virtual void s73();
+    virtual void s73(int a);
     virtual void s74();
     virtual void s75();
     virtual void s76();
@@ -344,7 +344,12 @@ struct FeSub : FeSubData {
     virtual void s6(int a);
 };
 struct FeState {
-    char pad0[0x570];
+    int m0;
+    char pad4[0x30];
+    int m34;
+    int m38;
+    int m3C;
+    char pad40[0x570 - 0x40];
     int m570;
     char pad574[8];
     int m57C;
