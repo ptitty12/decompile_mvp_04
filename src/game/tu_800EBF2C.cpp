@@ -93,10 +93,9 @@ void fn_800EC644()
 {
 }
 
-/* near-miss: 47/47 insns, only the temporaries of the argument shuffle (c/d/e in r0/r11/r3) are allocated differently */
 extern "C" UiScrRaw* fn_800EC648(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
-    fn_800CEEF0(self, a, 0, b, c, d, e, f, g, 0, 0, 0, lbl_805BE168);
+    fn_800CEEF0(self, a, 0, b, c, d, e, f, g, 0, 0, 0, 1.0f);
     self->m44 = 0;
     self->m48 &= 0x3FFFFFFF;
     self->m4C = 0;
@@ -301,6 +300,18 @@ UiS* fn_800ED534(UiS* self)
         r = fn_800C8040(r);
     self->m1CC = r;
     return self;
+}
+
+/* near-miss: 8 slots; the pointer-to-member dispatch is right but the virtual-arm temporaries are numbered r9/r0 (retail r11/r9); tried loop shapes, a PMF copy, const, the .* form */
+void fn_800ED590(Unk800ED590_C* self, int a, Unk800ED590_Fn f)
+{
+    for (int i = self->m1C4 - 1; i >= 0; i--) {
+        Unk800ED590_W* w = self->m34[i];
+        if (w->m24 & 0x40000000) {
+            if ((w->*f)(a) != 0)
+                break;
+        }
+    }
 }
 
 UiScrRaw* fn_800ED654(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)

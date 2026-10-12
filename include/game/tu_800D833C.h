@@ -154,4 +154,35 @@ int fn_803FEE14(char* s, int a);
 int fn_802C3A2C(int a, int b);
 extern char lbl_805B9A30[];
 Unk80084910_N fn_800D9978(int a, int b);
+
+/* fn_800DA3D8: lbl_8061B8C0->m8 is the game object; its m6F8->m14 is an array of 0xE64-byte slots
+ * (m0 points at a byte pair, records of 0x34 bytes start at +0x3E8). */
+struct Unk800DA3D8_Ev {
+    char m0;
+    unsigned char m1;
+    unsigned char m2;
+};
+struct Unk800DA3D8_Slot {
+    Unk800DA3D8_Ev* m0;
+};
+struct Unk800DA3D8_Tbl {
+    char m0[0x14];
+    char* m14;
+};
+struct Unk800DA3D8_Game {
+    char m0[0x6F8];
+    Unk800DA3D8_Tbl* m6F8;
+    char m6FC[4];
+    int m700;
+};
+struct Unk800DA3D8_Glob {
+    char m0[8];
+    Unk800DA3D8_Game* m8;
+};
+extern Unk800DA3D8_Glob* lbl_8061B8C0;
+int fn_801A49F0(void* g, int idx, int rec);
+void fn_8017DE28(int a, int b);
+void fn_800DA208(Unk800D876C_A* t, int a, int b);
+void fn_800DA3D8(Unk800D876C_A* t, int idx);
+void fn_801A23B8(int a, int b);
 #endif
