@@ -98,8 +98,11 @@ void fn_8022359C(Task* t, int a, RecQueue* q)
     }
 }
 
-/* near-miss: 86/86 insns, 2 slots differ: retail puts the m8[idx] byte offset in r10, ours in r0. Tried base-first, offset-first,
-   cast-array and temp forms. */
+/* TaskInner::m8[] lookup through an inline: keeps the byte offset out of r0 as retail does. */
+inline Obj36C* ObjAt80(TaskInner* in, int i)
+{
+    return (Obj36C*)in->m8[i];
+}
 inline Vec3f Unk80223628_Flat(Obj36C* o)
 {
     Vec3f v = o->m60;
@@ -116,7 +119,7 @@ void fn_8021BA44(Task* t);
 void fn_80223628(Task* t, int idx, RecQueue* q)
 {
     Rec* e = &q->e[0];
-    Obj36C* o = (Obj36C*)t->m9C->m8[idx];
+    Obj36C* o = ObjAt80(t->m9C, idx);
     const float lim = 5184.0f;
     float d2 = Unk80223628_Len2(Unk80223628_Flat(o) - e->m38);
     if (!(d2 >= lim)) {
@@ -205,6 +208,46 @@ void fn_80223910(Task* t, int a)
         fn_801EE6F4(t, a);
         fn_802123D4(t, 1, 1);
         fn_80213B80(t, 3, 2, 3);
+    }
+}
+
+inline void SetSlot80(Slots4* s, int x, int v)
+{
+    s->m[x] = v;
+}
+inline Vec3f Unk802252F4_Flat(Obj36C* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+void fn_8014E388(Vec3f* p, unsigned i);
+int fn_801EEFA8(Task* t, int a);
+void fn_8021AA44(Task* t, int a, int b);
+void fn_802252F4(Task* t, int a, RecQueue* q)
+{
+    int k = q->e[0].m18;
+    if (GetSlot(&t->m9C->mC0, k) != a) {
+        if (GetSlot(&t->m9C->mC0, k) == -1) {
+            SetSlot80(&t->m9C->mC0, k, a);
+            return;
+        }
+        float d2;
+        Obj36C* o = ObjAt80(t->m9C, a);
+        Vec3f flat = Unk802252F4_Flat(o);
+        Vec3f p;
+        fn_8014E388(&p, k);
+        d2 = (flat.x - p.x) * (flat.x - p.x) + (flat.z - p.z) * (flat.z - p.z);
+        if (!(d2 > 17424.0f)) {
+            int prev = GetSlot(&t->m9C->mC0, k);
+            fn_80205450(t->m9C, a);
+            fn_801EE6F4(t, prev);
+            fn_801EEFA8(t, a);
+            fn_80213988(t, k, 1);
+            fn_80205450(t->m9C, prev);
+            fn_802123D4(t, 1, 1);
+            fn_8021AA44(t, k, a);
+        }
     }
 }
 
