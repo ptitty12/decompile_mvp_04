@@ -246,7 +246,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int mD4;
     char padD8[0x4];
     int mDC;
-    char padE0[0x14];
+    char padE0[0x10];
+    int mF0;
     int mF4;
     int mF8;
     int mFC;
