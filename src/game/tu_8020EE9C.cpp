@@ -465,23 +465,23 @@ inline Vec3f Flat1A18(PosObj* o)
     return v;
 }
 
-/* near-miss: 20 slots: arithmetic and the Vec3 copy chain match; retail puts the operator- result temp at sp+0x28 and the
-   volatile counter above it at sp+0x38 (frame 0x48), ours has the counter at 0x28 and the temp at 0x30 (frame 0x50) */
+/* near-miss (13 slots): frame layout now matches (counter as a plain int touched only through *(volatile int*)&cnt sits above
+   the temps); left: y/z operand load order in the subtraction and the stfsx store form */
 extern "C" void fn_80211A18(Unk802116B4* o, int idx)
 {
     Vec3f a = Flat1A18((PosObj*)ObjAt(o->m0->m8, idx));
-    volatile int sp38 = 0;
+    int cnt = 0;
     int e = 0;
     do {
         Vec3f d = lbl_805D6760[e] - a;
         int c;
-        *(float*)((char*)o + 0x14 + (c = sp38) * 12) = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+        *(float*)((char*)o + 0x14 + (c = *(volatile int*)&cnt) * 12) = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
         int t;
         if (c > 3)
             t = c;
         else
             t = c + 1;
-        sp38 = t;
+        *(volatile int*)&cnt = t;
         e = t;
     } while (e <= 3);
     fn_8040A208(o->mC, 4, 12, fn_80211648);
