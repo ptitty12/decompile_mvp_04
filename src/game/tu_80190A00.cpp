@@ -111,17 +111,11 @@ Unk8037B3E8* Unk8019186C::fn_vslot5()
 }
 
 //@80191AD8
-/* near-miss: 38/38 insns, ~12 slots differ: the mode 1/2/3 bodies match (sub-object pointer
- * for the +4 record, Vec3 copies, store order) but retail shares the `m4 = -1.0f` tail of
- * modes 1 and 2 as one block at the end (beq from both tests); here it is laid out first. */
 extern "C" void fn_80191AD8(Unk80191AD8_S* s, int mode)
 {
     s->m0 = mode;
-    if (mode == 2) {
-        s->m4 = -1.0f;
-    } else if (mode > 2) {
-        if (mode != 3)
-            return;
+    switch (mode) {
+    case 3: {
         Unk80191AD8_Q* q = (Unk80191AD8_Q*)&s->m4;
         q->m0 = -1.0f;
         q->m4 = lbl_806055AC;
@@ -129,8 +123,14 @@ extern "C" void fn_80191AD8(Unk80191AD8_S* s, int mode)
         s->m18 = lbl_806055AC;
         q->m20 = -1.0f;
         q->m24 = 0;
-    } else if (mode == 1) {
+        break;
+    }
+    case 1:
         s->m4 = -1.0f;
+        break;
+    case 2:
+        s->m4 = -1.0f;
+        break;
     }
 }
 
@@ -157,8 +157,6 @@ extern "C" Unk80191B70_S* fn_80191BE0(Unk80191B70_S* s, void* owner)
 }
 
 //@80191C5C
-/* near-miss: 54/54 insns, 2 slots differ: the m70 and m0 stores swap places (400 orders of the
- * last eight stores sampled). */
 extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
 {
     s->m24 = 0;
@@ -173,9 +171,9 @@ extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
     s->m68 = 0;
     s->m6C = 0;
     s->m60 = 0.0f;
-    s->m78 = (char*)owner + 0xD4;
     s->m74 = 0;
     s->m0 = owner;
+    s->m78 = (char*)owner + 0xD4;
     s->m70 = 0;
 }
 
@@ -293,6 +291,11 @@ extern "C" void fn_801938F0(Unk80193750_H* h, Unk80193750_Ent* rec)
 }
 
 //@80193A4C
+/* near-miss: 24 vs 25 insns: retail copies the source pointer first (`mr r9,r4`, then
+ * `addi r11,r9,16` for the 16-byte record) and reads the outer words off r9 and the middle
+ * words off r11; ours forms one pointer (addi r9,r4,16). Frame layout, the float slot at
+ * 0x28 and the stores already match. ~12 spellings of the inline (param copies, local
+ * pointers, byte-wise copies) tried. */
 extern "C" void fn_80193A4C(Unk80193750_H* h, Unk80193A4C_S* s, int id, float t)
 {
     Unk80193750_Ent e;
