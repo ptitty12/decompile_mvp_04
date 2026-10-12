@@ -19,7 +19,81 @@ struct UnkAt2CCS { char pad0[0x2CC]; char m2CC[0x10]; };
 
 void fn_8000C674(short x, short y, const char* fmt, ...);
 
+#include "game/tu_8006902C.h"
+void fn_802D7538();
+struct Unk8014D5C0_Obj { char pad0[0x6F8]; Unk80069F0C* m6F8; };
+struct Unk8014D5C0_Own { char pad0[8]; Unk8014D5C0_Obj* m8[3]; };
+inline Unk8014D5C0_Obj* Get8014D5C0(Unk8014D5C0_Own* p, unsigned i) { return i <= 2 ? p->m8[i] : 0; }
+void fn_80071F00();
+/* Polymorphic 8-byte object built by fn_80353218 (m0 = 0, vptr lbl_8064B718 at +4); same class as in tu_800A23F4.cpp. */
+struct Unk80353218 {
+    int m0;
+    Unk80353218(); /* fn_80353218 */
+    virtual void vf0();
+};
+#include "game/tu_8000E618.h"
+/* 8-byte object built by __11Unk803567AC (m0 = 0, vptr-like pointer at +4). */
+struct Unk803567AC {
+    int m0;
+    Unk803567AC();
+    virtual void vf0();
+};
+unsigned fn_800734D4(void* self, unsigned flags);
+Unk8000E618* fn_8000E65C();
+void fn_80071F48();
+struct Vec3f8014E40C { float x; float y; float z; };
+struct Unk8014E40C_Obj { char pad0[0x60]; Vec3f8014E40C m60; };
+extern "C" void fn_8014E388(V3i* p, unsigned i);
+inline Vec3f8014E40C DiffAt8014E40C(Unk8014E40C_Obj* self, unsigned i)
+{
+    Vec3f8014E40C t;
+    fn_8014E388((V3i*)&t, i);
+    const Vec3f8014E40C& b = self->m60;
+    Vec3f8014E40C r;
+    r.x = t.x - b.x;
+    r.y = t.y - b.y;
+    r.z = t.z - b.z;
+    return r;
+}
+inline Vec3f8014E40C DiffAtP8014E498(Vec3f8014E40C* pb, unsigned i)
+{
+    Vec3f8014E40C t;
+    fn_8014E388((V3i*)&t, i);
+    const Vec3f8014E40C& b = *pb;
+    Vec3f8014E40C r;
+    r.x = b.x - t.x;
+    r.y = b.y - t.y;
+    r.z = b.z - t.z;
+    return r;
+}
+struct Vec4f8014DAFC { float x; float y; float z; float w; };
+inline Vec4f8014DAFC Div8014DAFC(const Vec4f8014DAFC& a, float s)
+{
+    Vec4f8014DAFC r;
+    float inv = 1.0f / s;
+    r.x = a.x * inv;
+    r.y = a.y * inv;
+    r.z = a.z * inv;
+    r.w = a.w * inv;
+    return r;
+}
+inline Vec4f8014DAFC Copy8014DF5C(const Vec4f8014DAFC* p) { return *p; }
+
+struct PackBits8014E01C { unsigned a : 8; unsigned b : 8; unsigned c : 8; unsigned d : 8; };
+union Pack8014E01C { PackBits8014E01C p; unsigned u; };
 extern "C" {
+void fn_80422EE4(void* blk, void* buf, int len, int off, void* cb, int prio);
+int fn_80425064(void* blk);
+void fn_80437A10();
+void* fn_803774A8(unsigned n, int heap);
+int fn_80072E90(void* g, void* a, int b, int c, int d, void* out);
+void fn_800A59F0(void* p);
+void fn_80377488(void* p);
+extern void* lbl_8061B9B4;
+extern int lbl_8061B9B0;
+extern void* lbl_80619948;
+int fn_80148404(void*);
+void fn_80148438(void*);
 int fn_8014E6E0(void* self, char* buf, int n);
 void fn_8040B320(char*, int, int, ...);
 int fn_8040B574(const char* a, const char* b);
@@ -65,10 +139,10 @@ void fn_80378744();
 extern UnkB8_Obj* lbl_8061A32C;
 UnkB8_Obj* fn_800B64BC(void*);
 void fn_8014C468();
-extern int lbl_8061930C;
-void fn_80072B98(int);
+extern void* lbl_8061930C;
+void fn_80072B98(void*);
 void fn_8014C3DC();
-extern int* lbl_8068B618;
+extern Unk8014D5C0_Own* lbl_8068B618;
 void __main();
 void fn_8014C5A4(int, int);
 void fn_8014C8BC();
@@ -103,7 +177,8 @@ int fn_803FEBDC(int, int, int, int*);
 int fn_803FEC9C(int, int);
 
 struct Self8014E588 {
-    char pad0[0x2004];
+    char pad0[0x2000];
+    int m2000;
     int m2004;
     int m2008;
     int m200C;
@@ -129,6 +204,28 @@ void fn_8014BEA4()
 
 void fn_8014C3BC() { fn_80378744(); }
 
+void fn_8014C3DC()
+{
+    unsigned n = fn_800734D4(lbl_8061930C, 0x03531311);
+    lbl_8061B9B0 = n;
+    lbl_8061B9B4 = fn_803774A8(n, fn_8000E65C()->fn_8000E6F0() | 0x500);
+    Unk803567AC sp8;
+    fn_80072E90(lbl_8061930C, lbl_8061B9B4, lbl_8061B9B0, 0x03531311, 0, &sp8);
+    fn_80071F48();
+}
+
+void fn_8014C468()
+{
+    fn_80071F00();
+    Unk80353218 sp8;
+    fn_80072E90(lbl_8061930C, lbl_8061B9B4, lbl_8061B9B0, 0x03531311, 0, &sp8);
+    fn_800A59F0(lbl_80619948);
+    if (lbl_8061B9B4 != 0) {
+        fn_80377488(lbl_8061B9B4);
+    }
+    lbl_8061B9B4 = 0;
+}
+
 void fn_8014C4E8()
 {
     if (!lbl_8061A32C) {
@@ -146,6 +243,18 @@ void fn_8014C540()
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     }
     lbl_8061A32C->mB8 = 1;
+}
+
+void fn_8014D5C0()
+{
+    fn_802D7538();
+    int i = 0;
+    while (i < fn_80148404(lbl_8068B618)) {
+        Unk8014D5C0_Obj* o = Get8014D5C0(lbl_8068B618, i);
+        i++;
+        o->m6F8->fn_8006A070();
+    }
+    fn_80148438(lbl_8068B618);
 }
 
 void fn_8014D63C(int a, int b)
@@ -194,6 +303,12 @@ Unk8014D9C4_Obj* fn_8014D9C4(Unk8014D9C4_Obj* p)
     return p;
 }
 
+Vec4f8014DAFC fn_8014DAFC(Vec4f8014DAFC v, float s)
+{
+    Vec4f8014DAFC t = Div8014DAFC(v, s);
+    return t;
+}
+
 void fn_8014DD30()
 {
     unsigned c = fn_8014DDAC();
@@ -213,6 +328,28 @@ int fn_8014DD68(int a0, int a1, unsigned a2, unsigned a3)
 
 /* near-miss (27 vs 30 insns): all 720 store orders tried; retail computes the element pointer with mulli/add
    before the vptr-like stores and keeps the three symbol addresses in distinct registers */
+void fn_8014DF5C(Vec4f8014DAFC* out, Vec4f8014DAFC* pa, Vec4f8014DAFC* pb, float t)
+{
+    Vec4f8014DAFC a = Copy8014DF5C(pa);
+    Vec4f8014DAFC b = Copy8014DF5C(pb);
+    float it = 1.0f - t;
+    out->x = it * a.x + t * b.x;
+    out->y = it * a.y + t * b.y;
+    out->z = it * a.z + t * b.z;
+    out->w = it * a.w + t * b.w;
+}
+
+unsigned fn_8014E01C(Vec4f8014DAFC* v)
+{
+    const float s = 255.0f;
+    Pack8014E01C c;
+    c.p.a = (int)(v->z * s);
+    c.p.b = (int)(v->y * s);
+    c.p.c = (int)(v->x * s);
+    c.p.d = (int)(v->w * s);
+    return c.u;
+}
+
 /* near-miss (29 vs 27 insns): retail keeps a, b in r4, r5 for the pass-through call; ours copies them to r6, r7 first */
 Unk8014E09C_Obj* fn_8014E09C(Unk8014E09C_Obj* p, int a, int b)
 {
@@ -317,6 +454,33 @@ int fn_8014E3E0(int a)
     return a;
 }
 
+float fn_8014E40C(Unk8014E40C_Obj* self, unsigned i)
+{
+    Vec3f8014E40C d = DiffAt8014E40C(self, i);
+    return d.x * d.x + d.z * d.z;
+}
+
+int fn_8014E498(Vec3f8014E40C* p, float* out)
+{
+    int idx = -1;
+    int i = 0;
+    float d2;
+    float best = 144000000.0f;
+    do {
+        Vec3f8014E40C d = DiffAtP8014E498(p, i);
+        d2 = d.x * d.x + d.z * d.z;
+        if (!(d2 >= best)) {
+            best = d2;
+            idx = i;
+        }
+        i++;
+    } while (i <= 3);
+    if (out != 0) {
+        *out = best;
+    }
+    return idx;
+}
+
 void fn_8014E57C(UnkAt2014* p) { p->m2014 = 0x0; }
 
 void fn_8014E588(void* sv, const char* a)
@@ -339,6 +503,30 @@ void fn_8014E588(void* sv, const char* a)
         t = s->m204C;
     }
     s->m2008 = t;
+}
+
+char fn_8014E614(Self8014E588* s)
+{
+    if (s->m2014 == 0) {
+        return 0;
+    }
+    if (s->m2010 != 0 || s->m2000 > 0x1FFF) {
+        s->m2000 = 0;
+        char* blk = s->m2018;
+        fn_80422EE4(blk, s, 0x2000, s->m2004, 0, 2);
+        int r;
+        while ((r = fn_80425064(blk)) != 0) {
+            fn_80437A10();
+        }
+        s->m2010 = r;
+        s->m2004 += 0x2000;
+        if (s->m2004 >= s->m2008) {
+            s->m200C = 1;
+        }
+    }
+    int i = s->m2000;
+    s->m2000 = i + 1;
+    return ((char*)s)[i];
 }
 
 void fn_8014E7EC(void* self, const char* target)
