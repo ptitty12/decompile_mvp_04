@@ -36,6 +36,14 @@ extern "C" void fn_800DD800(void*, void*, int, int);
 struct UiS;
 void fn_800DDF2C(UiS*);
 extern "C" void fn_8049FC58(void* x, int a);
+extern const char lbl_805F57D0[];
+extern const char lbl_805F75AC[];
+extern const char lbl_805F5100[];
+extern "C" FeW* fn_800C8038(FeW*);
+extern "C" void fn_800DD204(FeW*, FeW*);
+struct Unk80090880;
+const char* fn_80090880(Unk80090880* t, int id);
+extern Unk80090880* lbl_8061977C;
 extern "C" void fn_804A15FC(char* x);
 extern "C" void fn_8049E94C(void* x);
 extern "C" void fn_8049EDC8(void* x);
@@ -381,6 +389,44 @@ FE_OVERLAY void fn_8049FB38(FeW* x)
     FeP(x, 0x224) = w;
     ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(FeI(x, 0x178)), 0);
     fn_8049FC58(x, 7);
+}
+
+FE_OVERLAY void fn_8049FC58(void* xx, int a)
+{
+    FeW* x = (FeW*)xx;
+    Unk80090880* t = lbl_8061977C;
+    const char* s = 0;
+    switch (a) {
+    case 1:
+        if (FeI(x, 0x16C) == 1 && fn_800B555C()->m0 != 0x13)
+            s = fn_80090880(t, 0x299B);
+        else
+            s = fn_80090880(t, 0x4DA2);
+        break;
+    case 2:
+        s = fn_80090880(t, 0x1AEA);
+        break;
+    case 3:
+        s = fn_80090880(t, 0x251C);
+        break;
+    case 4:
+        s = fn_80090880(t, 0x3856);
+        break;
+    case 5:
+        s = fn_80090880(t, 0x1F86);
+        break;
+    case 6:
+        s = fn_80090880(t, 0x1AE0);
+        break;
+    case 7:
+        s = fn_80090880(t, 0x299D);
+        break;
+    }
+    FeW* p = fn_800C8044(x->fn_vslot32(lbl_805F57D0, 1));
+    ((FeWQ*)fn_800C8040(p->fn_vslot32(lbl_805F57D0, 1)))->s28((int)s);
+    ((FeWQ*)fn_800C8040(p->fn_vslot32(lbl_805F75AC, 1)))->s28((int)s);
+    FeW* q = fn_800C8040(p->fn_vslot32(lbl_805F75AC, 1));
+    fn_800DD204(q, fn_800C8038(p->fn_vslot32(lbl_805F5100, 1)));
 }
 
 FE_OVERLAY void fn_8049FE54(void* x)
