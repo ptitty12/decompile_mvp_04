@@ -355,6 +355,50 @@ void fn_8022A438(Task* t, int a, int b)
         SetSlot(&t->m9C->mC0, a, t->m9C->m3A5C);
 }
 
+void fn_801E8428(Obj3A64* p, int k, Vec3f* pos, float* ang);
+struct Unk8022A580_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x928 - 0x6C];
+    Player* m928;
+};
+void fn_8022A580(Task* t, int ai)
+{
+    Unk8022A580_Obj* a = (Unk8022A580_Obj*)ai;
+    RecQueue* q = t->m9C->m3A60;
+    Unk8022A580_Obj* cur = (Unk8022A580_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    cur->m928 = (Player*)a;
+    Vec3f pos;
+    float ang;
+    fn_801E8428(t->m9C->m3A64, t->m9C->m3A5C, &pos, &ang);
+    e->m4 = 0x2D;
+    e->m0 = 0x2F;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m80 = -1.0f;
+    e->m9C = 1;
+    e->m28 = (Player*)a;
+    e->m38 = pos;
+    e->m8C = ang;
+    const Vec3f* pa = &a->m60;
+    const Vec3f* pc = &cur->m60;
+    Vec3f d = *pa - *pc;
+    e->m50 = d;
+    e->m94 = 1;
+    t->m9C->m60 = 0;
+}
+
 void fn_8022AB04(Task* t)
 {
     t->m9C->m30 = 6;
