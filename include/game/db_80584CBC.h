@@ -244,4 +244,36 @@ struct Db8058F924_P : Db80593CD0_P {
     int m44[6][5];
 };
 
+
+/*
+ * Unit 0x805942E0: float-slot table (ctor fn_805942E0): manager pointer m0, a user value m4,
+ * 0x14-byte entries behind m8, slot count mC, float array m10, vptr at +0x14.
+ */
+struct Db805942E0_Ent {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    int m10;
+    Db805942E0_Ent() { m10 = 0; mC = m8 = m4 = m0 = 0.0f; }
+};
+struct Db805942E0_Data {
+    Db805937A4_Mgr* m0;
+    int m4;
+    Db805942E0_Ent* m8;
+    int mC;
+    float* m10;
+};
+struct Db805942E0_P : Db805942E0_Data {
+    const void* m14;
+};
+struct Db805942E0_V : Db805942E0_Data {
+    virtual void v08(int chrg);
+    virtual void v10();
+    virtual void v18();
+    virtual void v20();
+    virtual void v28();
+    virtual Db805942E0_Ent* v30(int i);
+};
+
 #endif
