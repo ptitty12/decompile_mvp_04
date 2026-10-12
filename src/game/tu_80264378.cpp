@@ -106,6 +106,44 @@ inline int EntLevel(Unk8024EF40_Ent* e)
     return *((unsigned char*)e + 0x1CC9);
 }
 
+extern P* fn_80257DFC(void* list, P* p, int a);
+extern int fn_80254984(A* a);
+extern int fn_80258740(void* list, P* p);
+extern int fn_8025A3A4(float* f);
+extern void fn_8035E664(int* t, P* p, int v);
+extern char* fn_8035E8CC(char* t, unsigned i);
+extern void fn_8025F474(I* self, P* p, char* e, int a);
+extern void fn_80264378(I* self, char* t, int b);
+void fn_80264678(I* self, char* t, int a, int b)
+{
+    if (fn_8025A3A4((float*)((char*)self + 0x468)) == 0) {
+        for (int i = 0; i < self->m448; i++) {
+            P* pl = self->m438[i];
+            P* n = fn_80257DFC(self->m1F0, pl, 0);
+            while (n != 0) {
+                if (pl != 0 && n != 0) {
+                    A* ap = &pl->m58C;
+                    if (fn_80254984(ap) != 0) {
+                        A* an = &n->m58C;
+                        if (fn_80254984(an) != 0) {
+                            int vn = an->m30;
+                            if (ap->m30 > vn && fn_80258740(self->m1F0, pl) >= vn) {
+                                ap->m30 = vn;
+                                fn_8035E664((int*)((char*)self + 0x1CC), pl, vn);
+                                char* e = fn_8035E8CC(t, pl->m458);
+                                *(int*)(e + 0xC) = ap->m30;
+                                fn_8025F474(self, pl, e, a);
+                            }
+                        }
+                    }
+                }
+                n = fn_80257DFC(self->m1F0, n, 0);
+            }
+        }
+        fn_80264378(self, t, b);
+    }
+}
+
 void fn_802647C0(I* self, int a)
 {
     if (EntLevel(self->m1EC->m6F8->m14) > 2) {
