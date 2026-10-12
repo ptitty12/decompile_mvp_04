@@ -64,7 +64,6 @@ void fn_802C4CB4(int a, int b, int c, int d);
 void fn_802C51C0(int a, int b, int c, int d);
 int fn_802C440C(Unk802C3B60* o, int* p, int x);
 
-/* near-miss (7 slots): retail keeps the byte offset in r3 (also the return register), the table base in r11 and the second byte as (base + 1)[off]. */
 unsigned char* fn_802C3A2C(int a, int b);
 
 void fn_802C3974(Unk802C2188* o)
@@ -88,13 +87,14 @@ int fn_802C39DC(unsigned char a, unsigned char b)
     return r;
 }
 
+inline unsigned char Unk802C3A2C_At(unsigned char* b, int o) { return b[o]; }
 unsigned char* fn_802C3A2C(int a, int b)
 {
     unsigned char ua = a;
     unsigned char ub = b;
     int off = 0;
     for (int i = 0; i < 0x1AF; i++, off += 4) {
-        if (lbl_805E1B9A[off] == ua && lbl_805E1B9A[off + 1] == ub) {
+        if (Unk802C3A2C_At(lbl_805E1B9A, off) == ua && Unk802C3A2C_At(lbl_805E1B9A + 1, off) == ub) {
             return lbl_805E1B9A + off;
         }
     }
