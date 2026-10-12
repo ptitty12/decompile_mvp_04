@@ -73,7 +73,16 @@ public:
 };
 class Unk8028B194 {
 public:
+    char pad0[0x34];
+    int m34;
+    int m38;
+    char pad3C[4];
+    int m40;
     Unk8028B194* fn_8028B194(Unk80273498_Vec3 v);
+    void fn_8028B1F0(int a);
+    void fn_8028B3D8();
+    void fn_8028B3FC();
+    void fn_8028B420();
     void fn_8028B48C(float f);
     void fn_8028B4D0(float f);
 };
@@ -84,7 +93,9 @@ struct Unk801E4E60_Src {
     int m10;
     int m14;
     int m18;
-    char pad1C[0xC];
+    char pad1C[4];
+    int m20;
+    char pad24[4];
     Unk80273498_Vec3 m28;
     char pad34[0x30];
     Unk80273498_Vec3 m64;
@@ -381,6 +392,53 @@ extern "C" Unk8027C728_Goal* fn_801E54E4(void* self, Unk80270BA0_X* p, Unk801E4E
     ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = six;
     g104->m40 = six;
     Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    Unk8027A84C* hb = (Unk8027A84C*)hs->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        hb->fn_8027A898(&w);
+    }
+    int a2 = x->mC;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = a2;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    h104->m38 = a2;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    int c2 = x->m18;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
+    h104->m40 = c2;
+    return g;
+}
+
+/* near-miss: 97 vs 98 insns. Retail copies g into the child pointer right after the first fn_8027C728 call
+ * (mr r28,r27) and loads h = *h from that copy; copy-propagation removes the copy here (same cause as
+ * fn_801E5D7C). Tried plain alias, reassign, inline taking the goal by value. */
+extern "C" Unk8027C728_Goal* fn_801E5A8C(void* self, Unk80270BA0_X* p, Unk801E4E60_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    ((Unk801E54E4_P*)p)->m5BC = x->m10;
+    g->m10 = 0xA;
+    Unk8028B194* gs = (Unk8028B194*)g->m18;
+    fn_8027C728(g);
+    Unk8027C728_Goal* h = g;
+    gs->fn_8028B1F0(x->m10);
+    gs->fn_8028B3D8();
+    gs->m38 = x->mC;
+    gs->m40 = 6;
+    gs->m34 = x->m8;
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        ((Unk8027A84C*)gs)->fn_8027A898(&w);
+    }
+    int c = x->m20;
+    if (c == 0x16)
+        gs->fn_8028B3FC();
+    else if (c == 0x17)
+        gs->fn_8028B420();
+    h = h->m0;
     h->m10 = 2;
     fn_8027C728(h);
     Unk80287D70* hs = (Unk80287D70*)h->m18;
