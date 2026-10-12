@@ -1040,4 +1040,64 @@ extern const char lbl_805F97A0[];
 extern const char lbl_805F97D8[];
 extern const char lbl_805F97EC[];
 
+
+/* ---- unit 804DDAB4 ------------------------------------------------------------------ */
+
+struct FeS804DDB20 : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeW* m134;
+};
+/* Screen of lbl_8066CCF8 (ctor fn_804DDDA8): an embedded object at +0x134 (ctor fn_80134E38,
+ * dtor fn_80134EC8) with its own vptr at +0x17C; m180 the list widget, m184 the popup. */
+struct FeS804DDDA8 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char m134[0x48];
+    const void* m17C;
+    FeW* m180;
+    FeW* m184;
+    int m188;
+    int m18C;
+    int m190;
+    int m194;
+    int m198;
+};
+struct FeS804DE5F8 : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    char m138[0x14];
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+};
+struct FeStateE {
+    char pad0[0x4C4];
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
+};
+extern const char lbl_8065C4E0[];
+extern const char lbl_8066CCE0[];
+extern const char lbl_8066CCF8[];
+extern const char lbl_8066D7B0[];
+extern const char lbl_805F9804[];
+extern const char lbl_805F9810[];
+extern const char lbl_805F981C[];
+extern float lbl_805F9830;
+extern int lbl_8061ABD8;
+extern "C" {
+void fn_80134E38(void* p, int a);
+void fn_80134EC8(void* p, int a);
+void fn_800D876C__FP13Unk800D876C_A(void* p);
+void* fn_8007FDD4__FP13Unk8007F198_D(void* g, int a);
+void fn_80529784();
+void fn_804DE138(FeS804DDDA8* x);
+void fn_804DE13C(FeS804DDDA8* x);
+void fn_804DE55C(int a, void* x);
+}
+
 #endif
