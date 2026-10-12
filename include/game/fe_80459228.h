@@ -343,7 +343,7 @@ struct FeSub : FeSubData {
     virtual int s7(int a);
     virtual void s8();
     virtual void s9();
-    virtual void s10();
+    virtual int s10(int a);
     virtual void s11();
     virtual void s12();
     virtual int s13();
