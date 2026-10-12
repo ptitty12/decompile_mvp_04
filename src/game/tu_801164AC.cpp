@@ -14,6 +14,14 @@ inline void SetSub98(Wid* w, int v)
 }
 
 extern const char lbl_805BFB7C[];
+extern const char lbl_805BFB84[];
+extern const char lbl_805BFB88[];
+extern const char lbl_805BFB8C[];
+extern const char lbl_805BFB90[];
+extern const char lbl_805BFBA4[];
+extern const char lbl_805BFBB0[];
+extern const char lbl_805BFBBC[];
+extern const char lbl_805BFBC8[];
 extern const char lbl_805BFCDC[];
 extern const float lbl_805BFCE4;
 extern const float lbl_805BFCE8;
@@ -45,6 +53,92 @@ struct EvtRaw {
     ~EvtRaw() {}
 };
 // PROTOS-BEGIN
+struct WidV91 : Unk800C7B40_Data {
+    virtual ~WidV91();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(); virtual void s29(); virtual void s30(); virtual void s31();
+    virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35(); virtual void s36();
+    virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40(); virtual void s41();
+    virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46();
+    virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50(); virtual void s51();
+    virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55(); virtual void s56();
+    virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60(); virtual void s61();
+    virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65(); virtual void s66();
+    virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70(); virtual void s71();
+    virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75(); virtual void s76();
+    virtual void s77(); virtual void s78(); virtual void s79(); virtual void s80(); virtual void s81();
+    virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85(); virtual void s86();
+    virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90();
+    virtual void s91(int a, int b, int c); virtual void s92(); virtual void s93(); virtual void s94();
+    virtual void s95(); virtual void s96(); virtual void s97(); virtual void s98(); virtual void s99();
+    virtual void s100(); virtual void s101(); virtual void s102(); virtual void s103(); virtual void s104();
+    virtual void s105(); virtual void s106(); virtual void s107(); virtual void s108(); virtual void s109();
+    virtual void s110(); virtual void s111(); virtual void s112(); virtual void s113(); virtual void s114();
+    virtual void s115(); virtual void s116(); virtual void s117(); virtual void s118(); virtual void s119();
+    virtual void s120(); virtual void s121(); virtual void s122(); virtual void s123(); virtual void s124();
+    virtual void s125(); virtual void s126(); virtual void s127();
+};
+inline void SetSub(Wid* w, int v)
+{
+    ((UnkSub*)((char*)w + 0xDC))->fn_vslot6(v);
+}
+extern const char lbl_805BC19C[];
+extern const char lbl_805BF19C[];
+int fn_8011AD00(int mode, int idx);
+int fn_8011AE28(int mode, int idx);
+
+struct Ui1A0 {
+    char pad0[0x50];
+    int m50;
+    char pad54[0x124 - 0x54];
+    int m124;
+    char pad128[0x184 - 0x128];
+    int m184;
+};
+
+struct Unk80084910_W;
+void fn_80086D24(Unk80084910_W* w, int i, int v);
+
+int fn_802D7CE0(int a, int b);
+int fn_802D7D64(int a);
+int fn_80086D34(Unk80084910_W* w, int i);
+
+extern const char lbl_805BEFE4[];
+extern const char lbl_805BDD9C[];
+extern const char lbl_805BD934[];
+void fn_8011A518(int a, Wid* w, const char* name);
+
+struct Unk800ABDC4_R {
+    char pad0[8];
+    int m8;
+    char padC[4];
+    int m10;
+    int m14;
+};
+extern int lbl_80619D10;
+extern const char lbl_805BBE2C[];
+extern const char lbl_805BE3D0[];
+extern const char lbl_805BFC94[];
+extern const char lbl_805BFC9C[];
+extern const char lbl_805BFCA8[];
+extern const char lbl_805BFCB4[];
+extern const char lbl_805BDC84[];
+int fn_801C1638(UnkGame* g, int a);
+int fn_801A4B34(UnkGame* g);
+Unk800ABDC4_R* fn_800ABDC4(int a, UnkGame* g);
+int fn_800ABC58(int a, UnkGame* g);
+int fn_80144BF4(int a);
+
+extern const float lbl_805BFB08;
+
+extern const char lbl_805BF5CC[];
+float fn_80097F68(UnkPlayerRec* r, int a, unsigned char i, int b, int c);
+int fn_80097A70(UnkPlayerRec* r, int a, unsigned char i, int b);
+
 extern "C" {
 int fn_80116A64(Scr* self, int b);
 void fn_80117634(Scr* self);
@@ -111,6 +205,47 @@ void fn_8037893C(char* p, int id, EvtRaw* e, int a, int b);
 
 extern "C" {
 
+void fn_801164AC(Scr* self)
+{
+    {
+        int v0 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+        fn_80086D24((Unk80084910_W*)self->m1A0, 0, v0);
+        if (self->m1A4 != 0)
+            fn_80086D24((Unk80084910_W*)self->m1A4, 0, v0);
+    }
+    {
+        int v1 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+        fn_80086D24((Unk80084910_W*)self->m1A0, 1, v1);
+        if (self->m1A4 != 0)
+            fn_80086D24((Unk80084910_W*)self->m1A4, 1, v1);
+    }
+    {
+        int v2 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+        fn_80086D24((Unk80084910_W*)self->m1A0, 2, v2);
+        if (self->m1A4 != 0)
+            fn_80086D24((Unk80084910_W*)self->m1A4, 2, v2);
+    }
+    {
+        int v3 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+        fn_80086D24((Unk80084910_W*)self->m1A0, 3, v3);
+        if (self->m1A4 != 0)
+            fn_80086D24((Unk80084910_W*)self->m1A4, 3, v3);
+    }
+}
+
+void fn_801167AC(Scr* self)
+{
+    Unk8001BC8C* g = fn_8001BC4C();
+    float t0 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(3, t0 * lbl_805BFB08, 1);
+    float t1 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(1, t1 * lbl_805BFB08, 1);
+    float t2 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(4, t2 * lbl_805BFB08, 1);
+    float t3 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(2, t3 * lbl_805BFB08, 1);
+}
+
 int fn_80116A64(Scr* self, int b)
 {
     if (b <= 1) {
@@ -120,6 +255,87 @@ int fn_80116A64(Scr* self, int b)
         }
     }
     return 0;
+}
+
+void fn_80116AA8(Scr* self)
+{
+    int a0 = fn_8011AE28(self->m180, 0);
+    int a1 = fn_8011AE28(self->m180, 1);
+    ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(a0);
+    ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(a1);
+    int c0 = (fn_8011AD00(self->m180, 0) ^ fn_800B555C()->m570) == 0;
+    int c1 = (fn_8011AD00(self->m180, 1) ^ fn_800B555C()->m570) == 0;
+    ((WidV91*)self->m198)->s91(0, 0, c0);
+    ((WidV91*)self->m198)->s91(1, 0, c1);
+}
+
+void fn_80116CA8(Scr* self)
+{
+    switch (self->m180) {
+    case 0:
+        break;
+    case 6: {
+        int a = ((Ui1A0*)self->m1A0)->m124;
+        int b = ((Ui1A0*)self->m1A0)->m50;
+        ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot33(10, 1)) + 0xDC))->fn_vslot6(a);
+        ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(1, 0)->fn_vslot33(10, 1)) + 0xDC))->fn_vslot6(b);
+        break;
+    }
+    case 5: {
+        int a = ((Ui1A0*)self->m1A0)->m184;
+        ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot33(10, 1)) + 0xDC))->fn_vslot6(a);
+        break;
+    }
+    case 3: {
+        int a = ((Ui1A0*)self->m1A0)->m124;
+        ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(a);
+        break;
+    }
+    }
+    self->m198->fn_vslot68(0);
+}
+
+void fn_80116EE8(Scr* self)
+{
+    Wid* w0 = fn_800C8058(fn_800C805C(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1));
+    if (fn_802D7CE0(0, 0) == 0 || fn_802D7D64(0) == 0)
+        SetSub(w0, 0);
+    else
+        SetSub(w0, fn_80086D34((Unk80084910_W*)self->m1A0, 0));
+    Wid* w1 = fn_800C8058(fn_800C805C(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1));
+    if (fn_802D7CE0(1, 0) == 0 || fn_802D7D64(1) == 0)
+        SetSub(w1, 0);
+    else
+        SetSub(w1, fn_80086D34((Unk80084910_W*)self->m1A0, 1));
+    int v2;
+    if (fn_802D7CE0(2, 0) == 0 || fn_802D7D64(2) == 0)
+        v2 = 0;
+    else
+        v2 = fn_80086D34((Unk80084910_W*)self->m1A0, 2);
+    ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(v2);
+    int v3;
+    if (fn_802D7CE0(3, 0) == 0 || fn_802D7D64(3) == 0)
+        v3 = 0;
+    else
+        v3 = fn_80086D34((Unk80084910_W*)self->m1A0, 3);
+    ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(v3);
+}
+
+void fn_80117288(Scr* self)
+{
+    UnkGameP6F8* p = fn_8011AA24(0)->m6F8;
+    int a0 = (int)((float)((unsigned char*)p->m10)[7] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a0 + 0.5f));
+    self->m188 = a0;
+    int a1 = (int)((float)((unsigned char*)p->m10)[5] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a1 + 0.5f));
+    self->m18C = a1;
+    int a2 = (int)((float)((unsigned char*)p->m10)[8] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a2 + 0.5f));
+    self->m190 = a2;
+    int a3 = (int)((float)((unsigned char*)p->m10)[6] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a3 + 0.5f));
+    self->m194 = a3;
 }
 
 void fn_80117634(Scr* self)
@@ -397,6 +613,59 @@ void fn_80118A70(Unk80117D20_Scr* self)
     int v = r->m198;
     SetSub98(fn_800C8054(self->fn_vslot33(9, 1)), v);
     fn_80118D14(fn_800C8044(self->fn_vslot32(lbl_805BFB7C, 1)));
+}
+
+void fn_80118B2C(Scr* self)
+{
+    UnkGame* g = fn_8011AA24(0);
+    const char* tbl1[4] = { lbl_805BFB84, lbl_805BFB88, lbl_805BFB8C, lbl_805BFB90 };
+    const char* tbl2[4] = { lbl_805BFBA4, lbl_805BFBB0, lbl_805BFBBC, lbl_805BFBC8 };
+    int k = 0;
+    for (unsigned i = 9; (int)i <= 12; i++, k++) {
+        int v;
+        if (i <= 12) {
+            char* b = (char*)g + 0x65C;
+            int off = i * 4;
+            v = *(int*)(b + off);
+        } else
+            v = 0;
+        Wid* c = fn_800C8044(self->fn_vslot32(lbl_805BEFE4, 1));
+        Wid* b = fn_800C8034(c->fn_vslot32(tbl1[k], 1));
+        Wid* d = fn_800C8044(c->fn_vslot32(tbl2[k], 1));
+        if (v != 0) {
+            d->fn_vslot8(1);
+            b->fn_vslot15(1);
+            fn_8011A14C(v, d, lbl_805BDD9C, 1);
+            fn_8011A518(v, d, lbl_805BD934);
+        } else {
+            d->fn_vslot8(0);
+            b->fn_vslot15(0);
+        }
+    }
+}
+
+void fn_80119D44(UnkGame* g, Wid* w, int flag)
+{
+    int v;
+    if (g->m6F8->m10->m74 == 2)
+        v = fn_801C1638(g, 0);
+    else
+        v = fn_801A4B34(g);
+    fn_8011A14C(v, w, lbl_805BDC84, 0);
+    char buf[100] = "";
+    fn_804089B4(buf, lbl_805BBE2C, fn_8025416C((char*)v + 0x588, 7));
+    fn_800C8038(w->fn_vslot32(lbl_805BE3D0, 1))->fn_vslot8(0);
+    Unk800ABDC4_R* r = fn_800ABDC4(lbl_80619D10, g);
+    fn_8011A0A4(r->m10, w, lbl_805BFC9C);
+    fn_8011A0A4(r->m14, w, lbl_805BFCA8);
+    fn_8011A0A4(r->m8, w, lbl_805BFCB4);
+    if (flag != 0) {
+        fn_800C8058(w->fn_vslot32(lbl_805BFC94, 1))->fn_vslot8(1);
+        int gg = lbl_80619D10;
+        int a = fn_80144BF4(gg);
+        int c = (a ^ fn_800ABC58(gg, g)) == 0;
+        ((UnkSub*)((char*)fn_800C8058(w->fn_vslot32(lbl_805BFC94, 1)) + 0xDC))->fn_vslot6(c ^ 1);
+    }
 }
 
 void fn_80119F48(char* buf, float v)

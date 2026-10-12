@@ -4,10 +4,138 @@
  */
 #include "game/tu_800F1AEC.h"
 
+extern "C" void* fn_800C8058(int);
+
+#include "game/tu_8001B190.h"
+extern char lbl_805BF3D4[];
+extern char lbl_805BF468[];
+extern char lbl_805BF470[];
+extern char lbl_805BF478[];
+extern char lbl_805BF480[];
+extern char lbl_805BF488[];
+void fn_8011A2F4(int a, Ui8011AA24* g, UiObj* c, char* s, int f);
+void fn_8011A2AC(int a, UiObj* c, char* s);
+void fn_8011A3CC(int a, UiObj* c, char* s);
+void fn_8011A414(int a, UiObj* c, char* s);
+void fn_8011A468(int a, UiObj* c, char* s);
+extern char lbl_805BF3C4[];
+extern char lbl_805BE5B8[];
+extern char lbl_805BE3BC[];
+extern char lbl_805BE5C0[];
+extern char lbl_805BE5C8[];
+extern char lbl_805BF458[];
+extern char lbl_805BF460[];
+extern char lbl_805BF564[];
+struct UiP70C {
+    char pad0[0x70C];
+    unsigned char m70C;
+};
+struct UiEnt {
+    char pad0[0x17C];
+    unsigned char m17C;
+    char pad17D[0xC9C - 0x17D];
+    char mC9C[1];
+};
+extern "C" int fn_80099570(void* o, int a, unsigned char b, int c);
+int fn_8008CFD8(char* p, int a, unsigned char b);
+extern char lbl_805BF3A8[];
+extern char lbl_805BEAB8[];
+extern char lbl_805BEAC0[];
+extern char lbl_805BEA84[];
+extern char lbl_805BF3B4[];
+struct UiQ1CC8 {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0xFFC - 0x19C];
+    int mFFC;
+    char pad1000[0x1CC8 - 0x1000];
+    unsigned char m1CC8;
+    char pad1CC9[7];
+    int m1CD0;
+};
+struct UiP54 {
+    char pad0[0x14];
+    UiQ1CC8* m14;
+    char pad18[0x54 - 0x18];
+    int m54;
+};
+void fn_80118770(UiObj* a);
+void fn_8011A0A4(int a, UiObj* b, char* c);
+extern char lbl_805BF240[];
+extern char lbl_805BE5A4[];
+Unk8001BC8C* fn_8001BC4C();
+void fn_801006D4(UiV_20i_24i_28i_2Ci* self, int idx);
+void fn_801015EC(void* self, UiObj* obj, int idx);
+
+inline int UiIntAt(char* b, int i)
+{
+    int o = i * 4;
+    return *(int*)(b + o);
+}
+
+extern int lbl_8061B3B8;
+struct Ui2B4Obj : UiObj {
+    char pad40[0x198 - 0x40];
+    int m198;
+};
+struct UiScr2B4 : UiScr2A8 {
+    char pad2B0[4];
+    Ui2B4Obj* m2B4;
+};
+extern char lbl_805BF19C[];
+
+extern char lbl_806592A0[];
+extern char lbl_806597A0[];
+extern char lbl_80659828[];
+extern char lbl_80659908[];
+extern char lbl_80659A60[];
+extern "C" void fn_80356CE0(void*, int);
+void fn_80356D14(void*, int);
+void fn_80356D8C(void*, int);
+struct UiDtor101278 {
+    char pad0[0x3C];
+    const char* m3C;
+    char pad40[0x19C - 0x40];
+    const char* m19C;
+    char pad1A0[0x1E0 - 0x1A0];
+    const char* m1E0;
+    char pad1E4[0x1F0 - 0x1E4];
+    const char* m1F0;
+    char pad1F4[0x208 - 0x1F4];
+    const char* m208;
+    char pad20C[0x220 - 0x20C];
+    const char* m220;
+    char pad224[0x238 - 0x224];
+    const char* m238;
+    char pad23C[0x2A4 - 0x23C];
+    const char* m2A4;
+};
 
 int fn_80101254(void* self)
 {
     return fn_800B555C()->m570;
+}
+
+void fn_80101278(UiDtor101278* self, int chrg)
+{
+    self->m3C = lbl_806592A0;
+    lbl_8061B3BC = 0;
+    self->m2A4 = lbl_806597A0;
+    self->m238 = lbl_80659A60;
+    self->m220 = lbl_80659A60;
+    self->m208 = lbl_80659A60;
+    self->m1F0 = lbl_80659A60;
+    self->m1E0 = lbl_80659A60;
+    char* a = (char*)self + 0x1A0;
+    *(const char**)(a + 0xC) = lbl_80659828;
+    fn_80356CE0(a, 2);
+    self->m19C = lbl_80659A60;
+    char* b = (char*)self + 0x15C;
+    *(const char**)(b + 0xC) = lbl_80659908;
+    fn_80356CE0(b, 2);
+    fn_80356D8C((char*)self + 0x148, 2);
+    fn_80356D14((char*)self + 0x134, 2);
+    fn_8035686C((UiScrRaw*)self, chrg);
 }
 
 int fn_80101344(UiV_2ACi* self)
@@ -21,12 +149,80 @@ int fn_80101344(UiV_2ACi* self)
     return a == b;
 }
 
+void fn_801016A0(UiScr2A8* self)
+{
+    Ui8011AA24* g = fn_8011AA24(0);
+    self->m2AC = 0;
+    int pid = UiIntAt((char*)g->m6F8->m10 + 0x6C, self->m2AC);
+    if (pid != fn_80101254(self))
+        self->m2AC = 1;
+    lbl_8061B3BC = 1;
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    for (int i = 0; i < 10; i++)
+        self->m244[i]->w10(0);
+    UiObj* o = (UiObj*)fn_800C8058(self->m2A8->v32((int)lbl_805BF19C, 1));
+    ((UiSubAtDC*)((char*)o + 0xDC))->v15();
+    if (fn_80101344((UiV_2ACi*)self) != 0) {
+        fn_801015EC(self, o, 0);
+        fn_801015EC(self, o, 1);
+        fn_801015EC(self, o, 2);
+        fn_801015EC(self, o, 3);
+        fn_801015EC(self, o, 4);
+        fn_801015EC(self, o, 5);
+    } else {
+        fn_801015EC(self, o, 1);
+        fn_801015EC(self, o, 0);
+        fn_801015EC(self, o, 2);
+        fn_801015EC(self, o, 3);
+        fn_801015EC(self, o, 4);
+        fn_801015EC(self, o, 5);
+        fn_801015EC(self, o, 6);
+        fn_801015EC(self, o, 7);
+        fn_801015EC(self, o, 8);
+        fn_801015EC(self, o, 9);
+    }
+    fn_801006D4((UiV_20i_24i_28i_2Ci*)((char*)self + 0x270), self->m2AC);
+    self->m26C = 10;
+    self->m2A8->v37(0);
+    fn_801018F4(self);
+    fn_80101A64(self);
+}
+
+void fn_801018F4(UiScr2A8* self)
+{
+    if (self->m26C != 10)
+        self->m244[self->m26C]->w10(0);
+    self->m26C = ((UiSubAtDC*)((char*)fn_800C8058(self->m2A8->v32((int)lbl_805BF19C, 1)) + 0xDC))->v11();
+    self->m244[self->m26C]->w3();
+    self->m244[self->m26C]->w10(1);
+    fn_80101A64(self);
+}
+
 void fn_801019F0(UiObj* self)
 {
     if (lbl_8061B8C0->m24 == 0) {
         int r = fn_80101254(self);
         if (fn_802D7DB4(r, 0x78) != 0)
             self->v67(0, r);
+    }
+}
+
+void fn_80101A64(UiScr2A8* x)
+{
+    UiScr2B4* self = (UiScr2B4*)x;
+    int a, b;
+    self->m244[self->m26C]->w7(&a, &b);
+    if (b == 0) {
+        self->m2B4->v8(0);
+        self->m2B4->m198 = -1;
+    } else {
+        self->m2B4->v8(1);
+        self->m2B4->m198 = -0x63;
+        Ui6F8* p = fn_8011AA24(0)->m6F8;
+        if (lbl_8061B3B8 != 0)
+            fn_801268C4(self->m2B4, p, 5, 0, a, b, 0, 1, 0, 0, 1, 0, 0, 0, 1);
+        else
+            fn_801268C4(self->m2B4, p, a, b, 5, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1);
     }
 }
 
@@ -278,6 +474,29 @@ UiScrRaw* fn_80102F5C(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+void fn_80102FA8(UiObj* self)
+{
+    fn_800ECF18(self);
+    Ui1CD0* base = fn_8011AA24(0)->m6F8->m14;
+    int t = 0;
+    if (base->m1CD0 != 0)
+        t = 1;
+    Ui1CD0* e = (Ui1CD0*)((char*)base + (t ^ 1) * 0xE64);
+    UiObj* o = fn_800C8040(self->v32((int)lbl_805BF240, 1));
+    switch (fn_800B555C()->m624) {
+    case 0:
+        o->v29(0x2607);
+        break;
+    case 1:
+        o->v29(0x4061);
+        break;
+    case 2:
+        o->v29(0x4062);
+        break;
+    }
+    ((UiSubAt98*)((char*)fn_800C8054(self->v32((int)lbl_805BE5A4, 1)) + 0x98))->v20(e->m198, 0);
+}
+
 extern char lbl_80652B78[];
 UiScrRaw* fn_801030F0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -388,6 +607,28 @@ UiScrRaw* fn_80103B58(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     return self;
 }
 
+void fn_80103BA4(UiObj* self)
+{
+    fn_800ECF18(self);
+    UiP54* p = (UiP54*)fn_8011AA24(0)->m6F8;
+    UiQ1CC8* q = p->m14;
+    UiObj* a = (UiObj*)fn_800C8060(self->v32((int)lbl_805BF3A8, 1));
+    ((UiSubAtDC*)((char*)fn_800C8058(a->v73(1, 0)->v32((int)lbl_805BEAB8, 1)) + 0xDC))->v20(q->mFFC, 0);
+    ((UiSubAtDC*)((char*)fn_800C8058(a->v73(2, 0)->v32((int)lbl_805BEAC0, 1)) + 0xDC))->v20(q->m198, 0);
+    fn_80118770(a);
+    int var;
+    if (p->m54 != 0 && p->m14->m1CD0 != 0)
+        var = p->m14->m1CC8;
+    else
+        var = p->m14->m1CC8 + 1;
+    int k = 0x260;
+    UiObj* c = fn_800C8044(self->v32((int)lbl_805BEA84, 1));
+    fn_8011A0A4(var, c, lbl_805BEA84);
+    if (var == 1)
+        k = 0x3A63;
+    fn_800C8040(c->v32((int)lbl_805BF3B4, 1))->v29(k);
+}
+
 void fn_80103DAC(Ui8010B1E0* a, int b, UiObj* c, int d)
 {
     int t = fn_8025416C((char*)a + 0x588, 5);
@@ -421,6 +662,25 @@ void fn_801044E8(UiV_134* self, int a, UiObj* obj)
     self->m134 = obj;
     obj->v8(0);
     fn_800C3DCC(fn_800C33D0(), self->m134, a);
+}
+
+void fn_80104544(UiObj* self, int a)
+{
+    Ui8011AA24* g = fn_8011AA24(0);
+    UiObj* c = fn_800C8044(self->v32((int)lbl_805BF3D4, 1));
+    c->v8(1);
+    fn_800C8040(c->v32((int)lbl_805BE5B8, 1))->v29(0x196A);
+    fn_8011A2F4(a, g, c, lbl_805BE3BC, 1);
+    fn_800C8040(c->v32((int)lbl_805BE5C0, 1))->v29(0x196B);
+    fn_8011A2AC(a, c, lbl_805BE5C8);
+    fn_800C8040(c->v32((int)lbl_805BF458, 1))->v29(0x199E);
+    fn_8011A3CC(a, c, lbl_805BF460);
+    fn_800C8040(c->v32((int)lbl_805BF468, 1))->v29(0x1997);
+    fn_8011A414(a, c, lbl_805BF470);
+    fn_800C8040(c->v32((int)lbl_805BF478, 1))->v29(0x2012);
+    fn_8011A468(a, c, lbl_805BF480);
+    fn_800ED2B0((int)self, lbl_805BF488);
+    fn_800CFB38();
 }
 
 /* near-miss: two arg moves swapped (retail: mr r3,r29 before mr r5,r27 before the sprintf-like call) */
@@ -479,4 +739,26 @@ void fn_8010486C(int unused, int p, int a, int sel)
         break;
     }
     fn_80097EA4(p, k, a, 2, 0);
+}
+
+void fn_80104BF8(UiObj* self, UiP70C* a1, UiEnt* a2, UiEnt* a3)
+{
+    int b = a1->m70C;
+    int e = fn_8008CFD8(a2->mC9C, 9, a2->m17C) == 1;
+    int f = !e;
+    int s1 = fn_80099570(a3, 0, b, f);
+    int s2 = fn_80099570(a3, 1, b, f);
+    int s3 = fn_8008CFD8(a3->mC9C, 0xD, b);
+    UiObj* c = fn_800C8044(self->v32((int)lbl_805BF3C4, 1));
+    c->v8(1);
+    UiObj* d = fn_800C8040(c->v32((int)lbl_805BE5B8, 1));
+    d->v29(!f ? 0x2443 : 0x2442);
+    fn_8011A0A4(s1, c, lbl_805BE3BC);
+    d = fn_800C8040(c->v32((int)lbl_805BE5C0, 1));
+    d->v29(!f ? 0x2445 : 0x2444);
+    fn_8011A0A4(s2, c, lbl_805BE5C8);
+    fn_800C8040(c->v32((int)lbl_805BF458, 1))->v29(0x2457);
+    fn_8011A0A4(s3, c, lbl_805BF460);
+    fn_800ED2B0((int)self, lbl_805BF564);
+    fn_800CFB38();
 }

@@ -71,7 +71,7 @@ public:
     virtual void v42();
     virtual void v43(int a, int b, int c, int d);
     virtual void v44(int a, int b, int c, int d);
-    virtual void v45();
+    virtual void v45(int a);
     virtual void v46();
     virtual void v47();
     virtual void v48();
@@ -84,8 +84,8 @@ public:
     virtual void v55();
     virtual void v56();
     virtual void v57();
-    virtual void v58();
-    virtual void v59();
+    virtual float v58();
+    virtual int v59();
     virtual int v60();
     virtual void v61();
     virtual void v62();
@@ -99,7 +99,7 @@ public:
     virtual UiObj* v70();
     virtual void v71();
     virtual void v72();
-    virtual void v73();
+    virtual UiObj* v73(int a, int b);
     virtual void v74();
     virtual void v75();
     virtual void v76();
@@ -110,16 +110,16 @@ public:
     virtual void v81();
     virtual void v82();
     virtual void v83();
-    virtual void v84();
-    virtual void v85();
-    virtual void v86();
-    virtual void v87();
+    virtual void v84(int a, int b);
+    virtual int v85();
+    virtual int v86();
+    virtual int v87();
     virtual int v88(int a);
     virtual void v89();
     virtual void v90();
     virtual void v91(int a, int b, int c);
     virtual void v92();
-    virtual void v93();
+    virtual int v93(int a, int b);
     virtual void v94();
     virtual void v95();
     virtual void v96();
@@ -196,7 +196,7 @@ public:
     virtual void v34();
     virtual void v35();
     virtual void v36();
-    virtual void v37();
+    virtual void v37(int a);
     virtual void v38(int a);
     virtual void v39();
     virtual void v40(int a);
@@ -467,7 +467,7 @@ public:
     virtual void w4();
     virtual void w5();
     virtual void w6(Ui8011AA24* a, int b);
-    virtual void w7();
+    virtual void w7(int* a, int* b);
     virtual void w8();
     virtual void w9();
     virtual void w10(int a);
@@ -879,7 +879,11 @@ struct Ui800B555C {
     unsigned int m4;
     char pad8[0x570 - 8];
     int m570;
-    char pad574[0x664 - 0x574];
+    int m574;
+    int m578;
+    char pad57C[0x624 - 0x57C];
+    int m624;
+    char pad628[0x664 - 0x628];
     int m664;
     int m668;
 };
@@ -1320,7 +1324,7 @@ int fn_80097380(char* e, int p);
 int fn_800973E8(char* e, int p);
 int fn_80097450(char* e, int p);
 int fn_800974B8(char* e, int p);
-void fn_8010D33C(UiObj* o, int a);
+extern "C" void fn_8010D33C(UiObj* o, int a);
 
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 int fn_8010671C();
@@ -1513,5 +1517,32 @@ void fn_800F84F4(UiObj* self);
 void fn_8010D258();
 void fn_801083AC(UiObj* self);
 void fn_8010A0A4(UiObj* self);
+
+/* Sub-objects of a screen item, reached through fn_800C8058 (+0xDC) / fn_800C8054 (+0x98): a 0x24-byte
+ * data pad, then the vptr. Evidence: fn_801018F4, fn_80102FA8, fn_80103BA4. */
+struct UiSubPad24 {
+    char pad0[0x24];
+};
+class UiSubAt98 : public UiSubPad24 {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
+    virtual void v20(int a, int b);
+};
+class UiSubAtDC : public UiSubPad24 {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(int a); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual int v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20(int a, int b);
+};
+
+/* A UiObj-derived item with a selection value at +0x2F0 (set to -0x63 after fn_80131F34 set-up). Evidence: fn_8010D0C0, fn_80105AE8. */
+struct Ui2F0Obj : UiObj {
+    char pad40[0x2F0 - 0x40];
+    int m2F0;
+};
 
 #endif

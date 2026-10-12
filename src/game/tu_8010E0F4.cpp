@@ -63,6 +63,39 @@ extern const char lbl_805BA6D8[];
 
 Unk8001BC8C* fn_8001BC4C();
 
+extern const char lbl_805BADC8[];
+extern const char lbl_8065B888[];
+extern const char lbl_80649DA0[];
+extern const char lbl_805BF19C[];
+struct UnkEvR {
+    int id;
+    const void* vt;
+};
+struct UnkMsgEv {
+    char name[16];
+    UnkEvR e;
+};
+void fn_8037893C(char* p, int id, UnkEvR* e, int a, int b);
+extern "C" void fn_8011452C(Scr* self);
+extern "C" void fn_80114664(Scr* self, int b);
+
+extern "C" void fn_80086D24(UnkGameP10* p, int i, int v);
+
+extern "C" void fn_80114528(Scr* self);
+extern const char lbl_805B955C[];
+extern "C" void fn_80110F7C(Scr* self);
+extern "C" void fn_801114CC(Scr* self);
+extern "C" void fn_80111E50(Scr* self);
+extern "C" void fn_801120EC(Scr* self);
+
+extern "C" void fn_8010EE30(Scr* self, UnkPly* a, UnkPly* b);
+UnkPly* fn_801A49F0(UnkGame* g, int idx, int v);
+void fn_8017D640(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, int d);
+void fn_8017D984(UnkGameP700* p, int a, UnkPly* b, UnkPly* c);
+void fn_8017D6B8(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, UnkPly* d, UnkPly* e);
+void fn_8017DF2C(UnkGameP700* p, UnkPly* a);
+void fn_8017DE28(UnkGameP700* p, UnkPly* a);
+
 extern "C" {
 void fn_8010F1E4(Scr* self);
 void fn_8010D33C(Scr* self, int a);
@@ -341,6 +374,60 @@ int fn_8010EAF4(Scr* self)
     return r;
 }
 
+void fn_8010EBD8(Scr* self)
+{
+    switch (self->m144) {
+    case 0:
+    case 1:
+    case 5: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pa, pb);
+        fn_8017D640(g->m700, self->m168, pb, pa, 0);
+        fn_8010EF84(self);
+        break;
+    }
+    case 2: {
+        UnkGame* g = fn_8011AA24(0);
+        if (self->m158 != 0)
+            fn_8017DF2C(g->m700, fn_801A49F0(g, self->m168, self->m158));
+        if (self->m15C != 0)
+            fn_8017DE28(g->m700, fn_801A49F0(g, self->m168, self->m15C));
+        break;
+    }
+    case 3: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8017D640(g->m700, self->m168, pb, pa, 0);
+        break;
+    }
+    case 4: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pa, pb);
+        fn_8017D984(g->m700, pb->m708, pb, pa);
+        fn_8010EF84(self);
+        break;
+    }
+    case 6:
+        break;
+    case 7: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m164);
+        UnkPly* pc = fn_801A49F0(g, self->m168, self->m160);
+        UnkPly* pd = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pc, pd);
+        fn_8017D6B8(g->m700, self->m168, pb, pa, pd, pc);
+        fn_8010EF84(self);
+        break;
+    }
+    }
+}
+
 void fn_8010EF84(Scr* self)
 {
     fn_8010EFD0(self, lbl_80687CB8.m0, 0);
@@ -512,6 +599,36 @@ void* fn_8010FBB0(Scr* self, int a, int b, int c, int d, int e, int f, int g, in
     return self;
 }
 
+int fn_8010FC20(Scr* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        fn_8011452C(self);
+        if (self->m134 == 0) {
+            UnkMgrA* mg = lbl_806192E0->m4;
+            int x = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m158, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            int y = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m160, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            if ((self->m164 != y || self->m15C != x) && mg->mC->m600 == 0) {
+                fn_80114664(self, 1);
+                return 1;
+            }
+        }
+        UnkMsgEv s;
+        char* np = s.name;
+        fn_8035682C(np);
+        fn_8040B830(np, lbl_805BADC8, 15);
+        np[15] = 0;
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+        fn_800B7B4C(lbl_8061A32C, np, self);
+        const void* base = lbl_80649DA0;
+        s.e.id = 0x9E;
+        s.e.vt = lbl_8065B888;
+        fn_8037893C((char*)&fn_8011AA24(0)->m704, s.e.id, &s.e, 0, 0);
+        s.e.vt = base;
+    }
+    return 1;
+}
+
 /* near-miss: 2 slots; retail loads the fn_8040B830 arguments as lis r4, li r5, addi r4, mr r3 (name pointer last). */
 
 int fn_8010FE70(Scr* self, int a)
@@ -563,6 +680,56 @@ void fn_80110088(Scr* self)
     fn_801142C4(self);
     if (self->m134 == 3)
         fn_8011415C(self);
+}
+
+/* near-miss: 1 slot; retail's case 2 loads the lbl_8061A32C high half as `lis r30,0x8062` (plain immediate), ours is the symbol relocation (same as fn_80114F6C) */
+int fn_801100C8(Scr* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        char name[16];
+        char* np = name;
+        fn_8035682C(np);
+        fn_8040B830(np, lbl_805B955C, 0xF);
+        np[15] = 0;
+        switch (self->m134) {
+        case 0: {
+            int x = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m158, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            int y = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(self->m160, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+            UnkMgrA* mg = lbl_806192E0->m4;
+            if ((self->m164 != y || self->m15C != x) && mg->mC->m600 == 0) {
+                fn_80114664(self, 0);
+            } else {
+                fn_80110F7C(self);
+                fn_80114528(self);
+                if (lbl_8061A32C == 0)
+                    lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+                fn_800B7B4C(lbl_8061A32C, name, self);
+            }
+            break;
+        }
+        case 1:
+            fn_801114CC(self);
+            fn_80114528(self);
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, name, self);
+            break;
+        case 2:
+            fn_80111E50(self);
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, np, self);
+            break;
+        case 3:
+            fn_801120EC(self);
+            fn_80114528(self);
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, np, self);
+            break;
+        }
+    }
+    return 1;
 }
 
 void fn_80110A7C(Scr* self)
@@ -659,4 +826,17 @@ void fn_80110DDC(Scr* self, int a)
     self->m150->fn_vslot8(1);
 }
 
+
+void fn_80111E50(Scr* self)
+{
+    UnkGameP6F8* p = fn_8011AA24(0)->m6F8;
+    int v0 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(0, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    fn_80086D24(p->m10, 0, v0);
+    int v1 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(1, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    fn_80086D24(p->m10, 1, v1);
+    int v2 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(2, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    fn_80086D24(p->m10, 2, v2);
+    int v3 = ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m150->fn_vslot73(3, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    fn_80086D24(p->m10, 3, v3);
+}
 }
