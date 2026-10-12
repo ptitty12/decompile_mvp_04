@@ -121,7 +121,7 @@ struct Unk8017F744_T {
     Unk8017F744_Ctx* m0;
     int m4;
     int m8;
-    char padC[4];
+    void* mC;
     char m10[0x10];
     float m20;
     float m24;
@@ -164,7 +164,7 @@ struct Unk8017E2E8_T {
     char pad3BC[0x3C8 - 0x3BC];
     void* m3C8;
 };
-void fn_8023522C(void* p);
+void fn_8023522C(void* p, int a, int b, int c);
 void fn_801DBE30(void* p, int a, int b, int c);
 void fn_8017F67C(char* p, int a, int b, int c);
 void fn_801ABC14(void* p);

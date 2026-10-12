@@ -13,7 +13,7 @@ struct Unk8017C954_Rec {
     int m10C;
     char pad110[0x1CC8 - 0x110];
     unsigned char m1CC8;
-    char pad1CC9[1];
+    unsigned char m1CC9;
     unsigned char m1CCA;
     unsigned char m1CCB;
     char pad1CCC[4];
@@ -41,13 +41,19 @@ struct Unk8017D5F8_Sub {
     int m14;
 };
 struct Unk8017B0A4_Ctx {
-    char pad0[0x564];
+    char pad0[0x4C];
+    unsigned int m4C;
+    char pad50[0x564 - 0x50];
     Unk8017D5F8_Sub* m564;
-    char pad568[0x6C0 - 0x568];
+    char pad568[0x660 - 0x568];
+    void* m660;
+    char pad664[0x6C0 - 0x664];
     void* m6C0;
     char pad6C4[0x6CC - 0x6C4];
     Unk8017BE28_Obj* m6CC;
-    char pad6D0[0x6F4 - 0x6D0];
+    char pad6D0[0x6E4 - 0x6D0];
+    Unk8017BE28_Obj* m6E4;
+    char pad6E8[0x6F4 - 0x6E8];
     int m6F4;
     Unk8017C954_Mid* m6F8;
 };

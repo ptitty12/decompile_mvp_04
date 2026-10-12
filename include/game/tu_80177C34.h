@@ -1,6 +1,10 @@
 #ifndef GAME_TU_80177C34_H
 #define GAME_TU_80177C34_H
 
+#include "game/chooser.h"
+
+struct Unk80181140;
+
 /*
  * Declarations for game/tu_80177C34.cpp (reconstructed; placeholders only).
  */
@@ -8,7 +12,11 @@
 struct Unk80177C34_Rec {
     char pad0[0x108];
     int m108;
-    char pad10C[0x1CD0 - 0x10C];
+    char pad10C[0x114 - 0x10C];
+    int m114;
+    char pad118[0xF78 - 0x118];
+    int mF78;
+    char padF7C[0x1CD0 - 0xF7C];
     int m1CD0;
 };
 struct Unk80177C34_Mid {
@@ -26,7 +34,9 @@ struct Unk80177C34_P744 {
 struct Unk80177C34_Ctx {
     char pad0[0x564];
     Unk80177C34_P564* m564;
-    char pad568[0x6F8 - 0x568];
+    char pad568[0x6B8 - 0x568];
+    Unk80181140* m6B8;
+    char pad6BC[0x6F8 - 0x6BC];
     Unk80177C34_Mid* m6F8;
     char pad6FC[0x744 - 0x6FC];
     Unk80177C34_P744* m744;
@@ -51,6 +61,24 @@ struct Unk80179B90_T {
     int m8;
 };
 
+/* One team side (0xE64 bytes, see Unk80177C34_Rec): a counted list at +0x168/+0x16C and a table of
+ * 25 0x34-byte entries at +0x3E8 whose first word is an id (fn_801792BC). */
+struct Unk801792BC_Ent {
+    int m0;
+    char pad4[0x34 - 4];
+};
+struct Unk801792BC_List {
+    int m0;
+    unsigned int m4;
+};
+struct Unk801792BC_Side {
+    char pad0[0x168];
+    Unk801792BC_List m168;
+    char pad170[0x3E8 - 0x170];
+    Unk801792BC_Ent m3E8[25];
+    char pad8FC[0xC9C - 0x8FC];
+    char mC9C[4];
+};
 /* 0x94-byte entry; two of them at container+0xC */
 struct Unk80177C34_Sub {
     int m0[8];
@@ -66,7 +94,8 @@ struct Unk80178BBC_Entry {
     int m8;
 };
 struct Unk80178BBC_T {
-    char pad0[8];
+    void* m0;
+    int m4;
     Unk80177C34_Ctx* m8;
     Unk80177C34_Sub mC[2];
     Unk80178BBC_Entry m134[2];
@@ -102,10 +131,42 @@ struct Unk8017A880_T {
     int m424;
     int m428;
 };
+/* Player object (vptr at +0x98; see tu_8017A930.h Unk8017BE28_Obj): slot 8 is used here. */
+class Unk80179CD0_Obj {
+public:
+    char pad0[0x98];
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+/* Same object with the data after the vptr (a derived class keeps the vptr at +0x98). */
+class Unk80179648_Obj : public Unk80179CD0_Obj {
+public:
+    char pad9C[0x458 - 0x9C];
+    int m458;
+};
+struct Unk80179CD0_Ctx {
+    char pad0[0x6B8];
+    Unk80181140* m6B8;
+    char pad6BC[0x6E8 - 0x6BC];
+    Unk80179CD0_Obj* m6E8;
+};
+struct Unk80179CD0_T {
+    Unk80179CD0_Obj* m0;
+    int m4;
+    Unk80179CD0_Ctx* m8;
+};
 extern const float lbl_805CC758;
 extern const Unk8017A880_V6 lbl_805EBA10;
 struct Unk80177C34_X {
-    char pad0[0x40];
+    char pad0[0x28];
+    Unk80273498_Vec3 m28;
+    char pad34[0x40 - 0x34];
     void* m40;
 };
 void fn_80177900(void* self, void* a);
@@ -129,5 +190,11 @@ void fn_801792BC(void* self);
 void fn_801794B8();
 void fn_80179BBC(void* self);
 void fn_80179BDC();
+Unk80177C34_Sub* fn_801791A0(Unk80177C34_Sub* p);
+void fn_801791DC(Unk801791DC_T* p, int a, int b);
+int* fn_80179B58(int* p);
+void fn_80179B90(Unk80179B90_T* p, int a, int b);
+int fn_80179464(Unk80177C34_Sub* s);
+int fn_801797C4(Unk80177C34_Sub* p, int id);
 
 #endif
