@@ -119,7 +119,7 @@ int fn_80089EE0__FP20Unk80089894_PackTabDUiUii(void* a0, unsigned a1, unsigned a
 int fn_8008FE14__Fi(int a0);
 int fn_8009005C__Fif(int a0, float a1);
 int fn_800DD44C__FP13Unk800DD610_PPvi(void* a0, void* a1, int a2);
-int fn_800DE538__Fiiii(int a0, int a1, int a2, int a3);
+int fn_800DE538__Fiiii(unsigned short* a0, int a1, int a2, int a3);
 int fn_802B8E1C__Fv();
 int fn_802B8E84__Fv();
 int fn_8035A2D0__FPvi(void* a0, int a1);
@@ -153,8 +153,17 @@ struct DbEnt34 {
     int m0;
     char pad4[0x30];
 };
+/* Byte list (data, count, capacity, cursor, flag), 0x14 bytes. */
+struct DbBL {
+    unsigned char* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    unsigned m10;
+};
 struct DbT {
-    char pad0[0x168];
+    DbBL l[5];
+    char pad64[0x168 - 0x64];
     unsigned char* m168;
     char pad16C[0x174 - 0x16C];
     int m174;
@@ -278,7 +287,7 @@ struct DbSub50 {
  */
 struct DbMgr {
     int m0;
-    char pad4[4];
+    int m4;
     DbSelSrc* m8;
     DbG* mC;
     int m10;
@@ -303,6 +312,12 @@ void fn_8056C6BC(DbScr* p);
 void fn_8056DEF4(DbSel* p);
 void fn_8056E130(DbSel* p);
 void fn_8056BD50(void* q);
+void fn_8056BE34(void* q);
+void fn_8056BDD0(void* q);
+void fn_8056C1C4(DbScr* self, int a);
+void fn_8056BAEC(DbScr* self, int a, int b, int c);
+void fn_8056C0A0(DbScr* self, int a);
+void fn_8056E02C(DbSel* self, int a, int flags);
 void fn_80377408(void* p);
 }
 
