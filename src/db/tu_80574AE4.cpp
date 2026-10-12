@@ -83,7 +83,13 @@ struct DbList {
     int m20;
 };
 extern "C" void fn_8057487C(char* p);
+
+struct DbScan {
+    int m0;
+    void* m4;
+};
 /* forward declarations (definitions are in address order) */
+extern "C" int fn_8057763C(DbScan* self, int a);
 extern "C" void fn_805788CC(char* self);
 extern "C" int fn_80578974(DbHost* self, int a, int b);
 extern "C" void fn_80578A60(DbHost* self, int a, int b);
@@ -101,6 +107,27 @@ extern "C" void fn_8057CBA4(DbSL* self);
 extern "C" unsigned fn_8057CC30(DbSL* self, int id);
 extern "C" int fn_8057CCA4(DbSL* self, int id);
 extern "C" void fn_8057CCE8(DbSL* self);
+
+extern "C" DB_OVERLAY int fn_8057763C(DbScan* self, int a)
+{
+    int total = 0;
+    int hit = 0;
+    unsigned n = fn_8007FB2C__FP13Unk8007F198_Ci(self->m4, self->m0);
+    unsigned i = fn_8007FB40__FP13Unk8007F198_Ci(self->m4, self->m0);
+    if (i < n) {
+        do {
+            int p0 = fn_8007FB98__FP13Unk8007F198_Ciii(self->m4, i, 0, self->m0);
+            int p1 = fn_8007FB98__FP13Unk8007F198_Ciii(self->m4, i, 1, self->m0);
+            if (a == p0 || a == p1) {
+                total += 1;
+                if (fn_8007FDA8__FP13Unk8007F198_Cii(self->m4, i, self->m0) == 1)
+                    hit += 1;
+            }
+            i += 1;
+        } while (i < n);
+    }
+    return total - hit;
+}
 
 /* near-miss: ~20 slots; retail walks one base (self+0x1990) with the first list at negative offsets, we pick the lower list as the base */
 extern "C" DB_OVERLAY void fn_805788CC(char* self)
