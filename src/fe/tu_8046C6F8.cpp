@@ -3,6 +3,10 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+extern "C" {
+int strcmp(const char* a, const char* b);
+char* strncpy(char* a, const char* b, unsigned n);
+}
 
 
 struct FeState608 {
@@ -236,6 +240,50 @@ FE_OVERLAY int fn_8046E4AC(FeScrJ* x, int v)
     fn_800B555C()->m570 = v;
     fn_8046DC84(x);
     return 1;
+}
+
+FE_OVERLAY void fn_8046E8F8(FeScrJ* x, char* dst)
+{
+    int r0 = strcmp(x->m150, "");
+    int f = 1;
+    if (r0 == 0)
+        f = 0;
+    if (f == 0) {
+        fn_8046F3A8(x, (char*)x->m138->fn_vslot70()->fn_vslot33(5, 1) + 0xC);
+        if (strcmp(x->m150, "SCOUTINGREPORT") == 0) {
+            int r = fn_8057CE00(((FeState608*)fn_800B555C())->m608);
+            if (r == 3) {
+                fn_8046F3A8(x, "PLAYOFFAWARDS");
+            } else if (r == -1 && fn_8007F980__FP13Unk8007F198_Ci(lbl_8061930C, 0) == 1) {
+                fn_8046F3A8(x, "SEASONAWARDS");
+            }
+        }
+        if (strcmp(x->m150, "TEAMGOALS") == 0) {
+            if (fn_800A2E6C(lbl_80619948) != 0) {
+                fn_8046F3A8(x, "MINIGAMES");
+            } else if (fn_800B5758(fn_800B555C()) != 0) {
+                fn_8046F3A8(x, "ORGINFO");
+            }
+        }
+    }
+    char* nm = x->m150;
+    if (strcmp(nm, "SAVE") == 0) {
+        if (fn_800B56C4(fn_800B555C()) != 0) {
+            const char* s = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x610);
+            FeFlags4D4* g = (FeFlags4D4*)((char*)fn_800B555C() + 8);
+            g->m4D4 = 1;
+            g->m4D8 = 0x01101311;
+            g->m4DC = (int)s;
+        } else {
+            const char* s = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x61E);
+            FeFlags4D4* g = (FeFlags4D4*)((char*)fn_800B555C() + 8);
+            g->m4D4 = 1;
+            g->m4D8 = 0x02131311;
+            g->m4DC = (int)s;
+        }
+    }
+    strncpy(dst, nm, 15);
+    dst[15] = 0;
 }
 
 FE_OVERLAY int fn_8046EB00(FeScrJ* x, FeW* w, int c, int d, int e)
