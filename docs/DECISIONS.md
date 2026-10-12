@@ -107,6 +107,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
   Split: 254 code-only units (.text only, data extern by lbl_), ~25-60 functions each, cut at ctor-stub TU ends, library starts and reference file boundaries. Units carry the real file name where a reference range exists (libc, libm, libsn, snd/cmn, CARD/GX/DVD/OS/AX files, W2's dsp/pad/si/vi), so those sources can be ported 1:1. Only `__save_gpr`/`__restore_gpr` (original code) and `.init` stay in dtk auto units. main.dol OK and verify PASS after each setup commit.
   | Covers the last unsplit .text | commits 47e84bc, 7965e8f, f15dbab, 4628a18 |
 
+- 2026-10-11 | **Flags: ealib/tu_803912F8 and tu_803927E4 = ProDG -O2 -G0 -fno-strength-reduce** (`cflags_ealib_nsr`) *[lead, owner authority]*. These units use no r13 small data (every global via lis/lwz) and keep `slwi`/`mulli` index math per iteration. Rebuilt under the new flags, objdiff matches go 8 -> 11 and 11 -> 13 with no regressions. The flags match cflags_snd's codegen here (same counts). tu_80394744 has the same shape but ends in fn_803959D8, which really uses small data; it stays on `ealib_sda` (6 vs 7 matched) until its boundary is re-split at 0x803959D8. | tail-01 worker evidence plus lead rebuild | report.json counts before/after |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
