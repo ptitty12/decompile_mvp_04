@@ -47,6 +47,7 @@ struct Unk803E9994_Hdr {
 
 extern "C" Unk803E9994_Ent fn_803E92E8(Unk803E9994_Hdr** c, int i);
 extern "C" int strcmp(const char* a, const char* b);
+extern "C" int strlen(const char* s);
 
 extern "C" void fn_803E6FB8(void* a, void* b)
 {
@@ -239,6 +240,73 @@ struct Unk803E945C_T {
 extern char lbl_8060D8BC[];
 extern "C" int fn_803E7320(int level, const char* fmt, ...);
 
+struct Unk803E910C_Obj {
+    Unk803E945C_T* m0;
+    char pad4[0x18];
+    int (*m1C)(const char*, int*);
+};
+
+extern char lbl_8060D86C[];
+
+/* near-miss: 2 slots; retail shifts the bucket index in place (r9) where ours takes r0 */
+extern "C" int fn_803E910C(Unk803E910C_Obj* o, const char* key2, const char* key, int* out)
+{
+    *out = 0;
+    Unk803E945C_T* t = o->m0;
+    if (t == 0)
+        return 0;
+    const char* p = key;
+    Unk803E945C_Ent* ents = t->m14;
+    unsigned int h = 0;
+    if (*p != 0) {
+        do {
+            int c = *p;
+            p++;
+            h = (h << 4) + c;
+            unsigned int g = h & 0xf0000000;
+            if (g != 0)
+                h ^= g >> 24;
+            h &= ~g;
+        } while (*p != 0);
+    }
+    unsigned int i = t->m20[h & 0xff];
+    if (i != 0xffffffff) {
+        do {
+            if (i > t->m10) {
+                fn_803E7320(0, lbl_8060D86C, i, t->m10);
+            } else {
+                int off = i * 16;
+                const char* nm = t->m8 + *(int*)(off + (int)ents);
+                const char* q = nm + strlen(key);
+                const char* s2 = q + 2;
+                if ((unsigned char)q[1] != 0x7f)
+                    s2 = q;
+                if (strcmp(key, nm) == 0 && strcmp(key2, s2) == 0) {
+                    Unk803E945C_Ent* e = (Unk803E945C_Ent*)(off + (int)ents);
+                    unsigned char kind = *((unsigned char*)e + 0xd);
+                    int k = e->mE;
+                    if (kind == 1) {
+                        *out = e->m4;
+                        return 1;
+                    }
+                    if (k > 0 && k < t->m1C->m30) {
+                        *out = t->m18[k].m10 + e->m4;
+                        return 1;
+                    }
+                }
+            }
+            i = t->m420[i];
+        } while (i != 0xffffffff);
+    }
+    if (o->m1C != 0) {
+        int z = 0;
+        *out = o->m1C(key, &z);
+        if (z != 0)
+            return 1;
+    }
+    return 0;
+}
+
 /* near-miss: 3 slots; the bound t->m10 is loaded into r6 (ours r0) and the entry address is ents + i*16 in the other operand order */
 extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
 {
@@ -260,9 +328,9 @@ extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
     if (i != 0xffffffff) {
         do {
             if (i > t->m10)
-                fn_803E7320(0, lbl_8060D8BC, i);
+                fn_803E7320(0, lbl_8060D8BC, i, t->m10);
             if (t->m424[i] != 0) {
-                Unk803E945C_Ent* e = &ents[i];
+                Unk803E945C_Ent* e = (Unk803E945C_Ent*)(i * 16 + (int)ents);
                 if (strcmp(name, t->m8 + e->m0) == 0) {
                     int k = e->mE;
                     if (k > 0 && k < t->m1C->m30)
