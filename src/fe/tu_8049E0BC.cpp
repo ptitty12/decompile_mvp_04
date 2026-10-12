@@ -40,6 +40,29 @@ FE_OVERLAY FeScrH* fn_8049E1B4(FeScrH* self, int a, int b, int c, int d, int e, 
     return self;
 }
 
+FE_OVERLAY void fn_8049ED34(void* a, void* cb)
+{
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    if (FeI(fn_800B555C(), 0x588) == 0) {
+        fn_80125268(w, 2, cb, 0);
+    } else {
+        fn_80125084(w, 2);
+    }
+}
+
+FE_OVERLAY void fn_8049F00C(char* x)
+{
+    Unk8006A138_It<3> it(0);
+    int i = 0;
+    do {
+        char* b = x + 0x18C;
+        int o = i * 0x28;
+        FeW* w = *(FeW**)(b + o);
+        w->fn_vslot8(0);
+        i = it.Next();
+    } while (i <= 3);
+}
+
 FE_OVERLAY void fn_8049F2A8(void* x)
 {
     FeMem(x, 0x180)->fn_vslot8(0);
@@ -79,6 +102,15 @@ FE_OVERLAY void fn_804A2734(FeScrD* x)
     fn_800ED254(x);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+FE_OVERLAY void fn_804A2964(void)
+{
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    ((FeWQ*)w)->s85(0);
+    FeGlobal80619948* g = lbl_80619948;
+    FeI(w, 0x314) = 1;
+    fn_800A2030(g, 1);
 }
 
 }
