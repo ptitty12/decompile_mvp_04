@@ -18,6 +18,10 @@ struct Db80541F40_R1DC {
     int m1DC;
 };
 extern char lbl_80692F08[];
+
+unsigned fn_8007F198(Unk8007F198_A* a, int x);
+int fn_8007F24C(Unk8007F198_A* a, int x, unsigned char i);
+int fn_8055FD00(int a);
 /* end Q18 types */
 
 extern "C" {
@@ -43,6 +47,7 @@ void fn_80542FC0(Db80541F40_Obj* o, int a, int b);
 void fn_80542FCC();
 int fn_80543A68(Db80541F40_Obj* o);
 void fn_80543D28(L* l);
+int fn_80545110(Db80541F40_Obj* o, int mode, int* best);
 int fn_8054593C(int u);
 int fn_80545AFC(int a);
 int fn_805464B4(int a, int b);
@@ -411,6 +416,63 @@ DB_OVERLAY void fn_80543D28(L* l)
             } while (i < n);
         }
     }
+}
+
+/* near-miss: 99.8%; the last test's layout: retail branches on low < 0.85f straight to the return-0 block, ours branches on the inverse to return 1 */
+DB_OVERLAY int fn_80545110(Db80541F40_Obj* o, int mode, int* best)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int pl = o->m44;
+    float thr = 1.0f;
+    int cls = s->fn_80078A38(pl);
+    switch (cls) {
+    case 0:
+        thr = 0.65f;
+        break;
+    case 1:
+        thr = 0.5f;
+        break;
+    case 2:
+        thr = 0.35f;
+        break;
+    case 3:
+        thr = 0.2f;
+        break;
+    default:
+        thr = 0.2f;
+        break;
+    }
+    float low = 0.0f;
+    int cnt = 0;
+    *best = 0;
+    unsigned i = 0;
+    unsigned n = fn_8007F198((Unk8007F198_A*)s, pl);
+    for (; i < n; i++) {
+        int id = fn_8007F24C((Unk8007F198_A*)s, pl, i);
+        if (mode == 0) {
+            if (((Unk8007A4DC_Screen*)s)->fn_8007A270(id) == 0)
+                continue;
+        } else {
+            int w = fn_8055FD00(mode);
+            int a = ((Unk8007A4DC_Screen*)s)->fn_8007A6A0(5, id);
+            int b = ((Unk8007A4DC_Screen*)s)->fn_8007A6A0(6, id);
+            if (a != w && b != w)
+                continue;
+        }
+        float v = fn_8007824C(id, 0);
+        if (!(v < thr))
+            cnt++;
+        if (*best == 0 || !(v >= low)) {
+            *best = id;
+            low = v;
+        }
+    }
+    int lim = mode == 0 ? 7 : 3;
+    if (cnt >= lim)
+        return 1;
+    if (cls != 0 || cnt <= 1 || low < 0.85f)
+        return 0;
+    return 1;
 }
 
 DB_OVERLAY int fn_8054593C(int u)
