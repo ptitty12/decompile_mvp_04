@@ -211,7 +211,7 @@ extern "C" FE_OVERLAY int fn_80475774(int a, int b, int c)
 {
     int* t;
     int o;
-    if (fn_8007A270__18Unk8007A4DC_Screeni(lbl_8061930C, a, c) == 0) {
+    if (fn_8007A270__18Unk8007A4DC_Screeni(lbl_8061930C, a) == 0) {
         o = (b << 2) + (c << 4);
         t = lbl_805FD54C;
     } else {
@@ -219,6 +219,13 @@ extern "C" FE_OVERLAY int fn_80475774(int a, int b, int c)
         t = lbl_805FD4FC;
     }
     return *(int*)((char*)t + o);
+}
+
+extern "C" FE_OVERLAY int fn_80476134(int x, int b)
+{
+    if (b != 0)
+        return 3 - x / 5;
+    return 3 - x / 4;
 }
 
 extern "C" FE_OVERLAY int fn_80476178(int x, int b)
@@ -240,9 +247,32 @@ extern "C" FE_OVERLAY int fn_804761D0(int x, int b)
     return t[fn_80476178(x, b)];
 }
 
-extern "C" FE_OVERLAY int fn_80476220(void* x)
+extern "C" FE_OVERLAY int fn_80476220(int x, int b)
 {
-    return lbl_806217E8[fn_80476134(x)];
+    return lbl_806217E8[fn_80476134(x, b)];
+}
+
+extern "C" FE_OVERLAY void fn_804766FC(void* x)
+{
+    FeW* w = FeWp(x, 0x15C);
+    void* g = lbl_8061930C;
+    ((FeSubV15*)((char*)w + 0xDC))->s15();
+    if (fn_8007A270__18Unk8007A4DC_Screeni(g, FeI(x, 0x138)) != 0) {
+        int i;
+        for (i = 0; i < 5; i++)
+            ((FeWV51*)FeWp(x, 0x15C))->s51(lbl_806217C4[i], 0);
+    } else {
+        int i;
+        for (i = 0; i < 4; i++)
+            ((FeWV51*)FeWp(x, 0x15C))->s51(lbl_806217D8[i], 0);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80476A28(int a, void* x)
+{
+    FeWp(x, 0x164)->fn_vslot14(1);
+    if (a == 1)
+        fn_80475FFC(x);
 }
 
 extern "C" FE_OVERLAY void fn_80476C24(FeScrD* x)
@@ -258,6 +288,16 @@ extern "C" FE_OVERLAY int fn_80476DB4(void* x)
         return 1;
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_80476DEC(void* x, int a)
+{
+    if (a == FeI(x, 0x164)) {
+        if (fn_80476DB4(x) != 0)
+            fn_801251CC(FeVp(x, 0x178), 0, 0x10, 3);
+        else
+            fn_80125084(FeVp(x, 0x178), 0);
+    }
 }
 
 extern "C" FE_OVERLAY int fn_80476E50(FeW* x, int a)
