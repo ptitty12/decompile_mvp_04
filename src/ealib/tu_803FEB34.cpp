@@ -79,12 +79,18 @@ void fn_804001E4(void);
 int fn_80437A4C(void* thread, void* entry, int arg, int stackTop, int stackSize, int prio, int attr);
 void fn_80437ED4(void* thread);
 void OSInitMessageQueue(void* q, void* msgs, int n);
-int OSReceiveMessage(void* q, int* msg, int flags);
+void OSReceiveMessage(void* q, int* msg, int flags);
 void fn_804061F0(void);
 int fn_80406200(int h, int a, int b);
 int fn_804061F8(int h, int a);
 int fn_804002BC(const char* fmt, ...);
 int fn_803FF618();
+int fn_80406210(int h, int a, int b);
+int fn_804250B0();
+int fn_803FF424(void* p, int a, int c, int b);
+void fn_803FF244(void* p);
+void fn_803FA888(int);
+void fn_803FFFA8(int);
 }
 extern unsigned char lbl_806EEAB1;
 extern char lbl_806B82E0[0x28];
@@ -92,7 +98,7 @@ extern char lbl_806B5F20[0x318];
 extern char lbl_806B8258[0x88];
 extern int lbl_806EEAA8;
 extern int lbl_806EEAAC;
-extern int lbl_806EEAE0;
+extern volatile int lbl_806EEAE0;
 extern volatile int lbl_806EEAE4;
 typedef void (*Fn0)(void);
 extern Fn0 lbl_8062EE40[8];
@@ -222,6 +228,30 @@ extern "C" void fn_803FEE70()
 
 extern "C" void fn_8040021C(int on);
 
+extern "C" int fn_803FEEE8(int h, unsigned mode, int* out)
+{
+    switch (mode & 7) {
+    case 0:
+        *out = fn_80406200(h, 2, 0);
+        break;
+    case 1:
+        *out = fn_80406200(h, 0, 0);
+        break;
+    case 2:
+        *out = fn_80406200(h, 2, 0);
+        if (*out != -1)
+            break;
+    case 6:
+        *out = fn_804061F8(h, 0);
+        break;
+    default:
+        fn_804002BC(lbl_8060E7D4, mode);
+        *out = -1;
+        return 0;
+    }
+    return *out != -1;
+}
+
 extern "C" void fn_803FEFC4(char* dst, const unsigned char* src)
 {
     int i = 0;
@@ -277,6 +307,37 @@ extern "C" void fn_803FF5E8(int, int)
 {
     OSSendMessage(lbl_806B8238, 1, 1);
 }
+
+extern "C" int fn_803FF618()
+{
+    int msg;
+    for (;;) {
+        OSReceiveMessage(lbl_806B8238, &msg, 1);
+        int c = ((volatile FsState*)&lbl_806ADEC0)->m44;
+        FsState* d = (FsState*)((volatile FsState*)&lbl_806ADEC0)->m3C;
+        int b = ((volatile FsState*)&lbl_806ADEC0)->m48;
+        int a = ((volatile FsState*)&lbl_806ADEC0)->m40;
+        if (d->m0 == 3) {
+            fn_80406220(((int*)d)[0x108 / 4], c, 0);
+            fn_80406210(((int*)d)[0x108 / 4], a, b);
+        } else {
+            fn_803FF424((char*)d + 0x108, a, c, b);
+            OSReceiveMessage(lbl_806B8238, &msg, 1);
+            while (lbl_806ADEC0.m0 != 5) {
+                fn_803FF244((char*)d + 0x108);
+                OSReceiveMessage(lbl_806B8238, &msg, 1);
+            }
+        }
+        for (;;) {
+            int r = fn_804250B0();
+            if (r == 0 || r == 8 || r == 1)
+                break;
+            fn_803FFFA8(100);
+        }
+        fn_803FA888(1);
+    }
+}
+
 
 /* near-miss: same length; the queue address (lis/addi) is formed between the stores in retail. */
 extern "C" int fn_803FF714(int a, int b, int c, int d)
@@ -338,6 +399,17 @@ extern "C" void fn_803FF994()
         lbl_806EEAB1 = 0;
         fn_80432568(lbl_806B82E0);
         fn_804001E4();
+    }
+}
+
+extern "C" void fn_803FF9D4()
+{
+    lbl_806EEAE0++;
+    lbl_806EEAE4++;
+    for (int i = 0; i < 8; i++) {
+        Fn0 f = lbl_8062EE40[i];
+        if (f != 0)
+            f();
     }
 }
 
