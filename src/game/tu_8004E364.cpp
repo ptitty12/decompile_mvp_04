@@ -6,6 +6,11 @@
  * .text 0x8004E364-0x80050A68 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004E364.h"
+void fn_800121F0(int a, int b);
+void fn_80019ABC(int a, int b, int c, int d);
+void fn_8001217C(int a, int b, int c, int d);
+void fn_80019A58(int a, int b);
+void fn_80019E68(int a, int b);
 int fn_80054DCC(Unk80052794_Ctx* c, Unk80052794_Obj* o, int k);
 int fn_80054DAC(Unk80052794_Ctx* c, Unk80052794_Obj* o, int k);
 int fn_80054D98(Unk80052794_Ctx* c);
@@ -264,6 +269,63 @@ void fn_8004F4B4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
                     int z = ((Unk8001CE80*)a)->fn_8001E2EC();
                     int u = ((Unk8001CE80*)a)->fn_8001DA9C();
                     fn_8001251C(x, y, z, 2, u, fn_8001EFB4(a));
+                }
+            }
+        }
+        fn_800527DC((Unk80052794_Ctx*)s, idx, (Unk80052794_Obj*)a);
+    }
+}
+
+void fn_8004F6EC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    Unk8005089C_Obj* o = (Unk8005089C_Obj*)a;
+    int w29 = 0;
+    if (fn_80054DCC((Unk80052794_Ctx*)s, (Unk80052794_Obj*)a, 9) != 0 && fn_80054DAC((Unk80052794_Ctx*)s, (Unk80052794_Obj*)a, 1) != 0)
+        w29 = 1;
+    int w30 = fn_80054D98((Unk80052794_Ctx*)s);
+    Unk8005089C_Slot* q = 0;
+    int i;
+    for (i = o->m100 - 1; i >= 0; i--) {
+        int off = i * 0x24;
+        char* b = (char*)o + 0x70;
+        if (*(int*)(b + off) == o->m3B0) {
+            char* c = (char*)o + 0x78;
+            if (*(int*)(c + off) == 1) {
+                q = (Unk8005089C_Slot*)((char*)o + (off + 0x70));
+                break;
+            }
+        }
+    }
+    if (q != 0 && !(a->m3B0->m590 & 0x20000000)) {
+        int t = fn_8004FF78(s, s->m9D8, 0x2A);
+        int f = 1;
+        int z = 0;
+        if (t >= 0)
+            f = fn_8004FF78(s, t, 0x21) < z;
+        if (f != 0 && o->m44 == 0) {
+            if (o->m48 > 0 && w29 != 0) {
+                int x = ((Unk8001CE80*)a)->fn_8001DB4C();
+                fn_800121F0(x, ((Unk8001CE80*)a)->fn_8001DB70());
+            } else {
+                int r = rand() % 100;
+                if (r <= 0x31 && w30 != 0) {
+                    int x = ((Unk8001CE80*)a)->fn_8001DA28();
+                    int y = fn_8001EFB4(a);
+                    int z = ((Unk8001CE80*)a)->fn_8001DA9C();
+                    fn_80019ABC(x, y, z, ((Unk8001CE80*)a)->fn_8001DB70());
+                } else if (r <= 0x4F && w29 != 0) {
+                    int x = ((Unk8001CE80*)a)->fn_8001D974();
+                    int y = ((Unk8001CE80*)a)->fn_8001DA28();
+                    int z = ((Unk8001CE80*)a)->fn_8001D6CC();
+                    fn_8001217C(x, y, z, ((Unk8001CE80*)a)->fn_8001E2EC());
+                } else if (r <= 0x59 && s->mA20 != 0) {
+                    if (w30 != 0) {
+                        int x = ((Unk8001CE80*)a)->fn_8001DA28();
+                        fn_80019A58(x, fn_8001F45C(a, s->mA14[0]));
+                    }
+                } else if (w30 != 0) {
+                    int x = ((Unk8001CE80*)a)->fn_8001DA9C();
+                    fn_80019E68(x, fn_8001EFB4(a));
                 }
             }
         }
