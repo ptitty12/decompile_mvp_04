@@ -406,8 +406,19 @@ void fn_80382CD0(Unk8037E9D0* o, int v);
 extern "C" {
 void fn_80381330(Unk8037E9D0* o, Unk80362DFC* s);
 void fn_80381198(Unk8037E9D0* o, Unk80362DFC* s);
-void fn_80380C14(Unk8037E9D0* o, int a, int b, int c, int d, float f);
+void fn_80380C14(Unk8037E9D0* o, int a, float f, int b, int c, int d);
 }
+
+struct PX {
+    int m0;
+    int m4;
+    int m8;
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+};
+extern "C" void fn_80383C78(PX* o, float* a, float* b, int* c, int* d);
 
 extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 {
@@ -701,7 +712,7 @@ extern "C" int fn_803814A4(Unk8037E9D0* o, int a, float f, int b)
         o->m848 = 0;
         o->m83C = 0;
         if (fn_80380BB0((char*)o, a) != 0) {
-            fn_80380C14(o, a, 0, 0, 0, 0.0f);
+            fn_80380C14(o, a, 0.0f, 0, 0, 0);
             o->m83C = a;
             if (b != 0)
                 o->m840 = a;
@@ -791,6 +802,47 @@ extern "C" int fn_80381E9C(Unk8037E9D0* o, int a, int b, int c)
     } else
         fn_8037E9D0(o);
     return 1;
+}
+
+extern "C" void fn_80381F94(Unk8037E9D0* o, PX* p)
+{
+    int a = o->m83C;
+    if (a != 0 && o->m834 != 0) {
+        float f = 0.0f;
+        float g;
+        int c;
+        int cnt = 0;
+        int h;
+        VOut* v = (VOut*)o->m844;
+        if (v != 0) {
+            h = v->s11(a, o->m884);
+            fn_80380BB0((char*)o, h);
+        } else
+            h = a;
+        if (p != 0) {
+            fn_80383C78(p, &f, &g, &c, &cnt);
+            fn_80380C14(o, h, g, c, p->m4, p->m8);
+        } else
+            fn_80380C14(o, h, 0.0f, 0, 0, 0);
+        o->q868.a = 0.0f;
+        o->q868.b = 1.0f;
+        if (p != 0) {
+            if (cnt == 1) {
+                o->q868.d = 1.0f;
+                o->q868.c = 1.0f;
+            } else {
+                o->q868.d = 0.0f;
+                o->q868.c = 0.0f;
+            }
+            o->q868.e = f * 0.016666668f;
+            o->m87C = 0.0f;
+        } else {
+            o->q868.c = 0.0f;
+            o->q868.e = 0.06666667f;
+            o->q868.d = 0.0f;
+            o->m87C = 0.0f;
+        }
+    }
 }
 
 extern "C" int fn_80382B94(U* self, void* p)
