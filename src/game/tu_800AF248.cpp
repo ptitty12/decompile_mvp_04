@@ -876,6 +876,111 @@ inline int FEScrH()
     return 0x1E0;
 }
 
+class FEWb {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(float f);
+};
+struct FEOwn19AC {
+    char pad0[0x1A8];
+    FEV3Cz* m1A8;
+    char pad1AC[0x1CC - 0x1AC];
+    FEWb* m1CC;
+    FEWb* m1D0;
+    char pad1D4[0x244 - 0x1D4];
+    FEWb* m244;
+    FEWb* m248;
+};
+struct FEObj19AC {
+    char pad0[0x10];
+    FEOwn19AC* m10;
+};
+extern "C" void fn_800FCA30(FEOwn19AC* o, int a);
+extern "C" void fn_800FCAA0(FEOwn19AC* o);
+
+extern float lbl_80619D20;
+
+class FEV3Cs;
+struct FEPair2;
+extern "C" void fn_800B1B34(void* unused, FEV3Cs* w, FEPair2* pos);
+
+extern "C" int fn_800B19AC(FEObj19AC* self, int kind, int arg, FEPair2* pos)
+{
+    FEOwn19AC* o = self->m10;
+    if (o == 0) {
+        return 1;
+    }
+    int r = 0;
+    FEWb* w;
+    switch (kind) {
+    case 0:
+        w = o->m244;
+        if (w == 0) {
+            break;
+        }
+        if (arg != 0 && pos != 0) {
+            fn_800B1B34(self, (FEV3Cs*)w, pos);
+            w->s20(lbl_80619D20);
+        }
+        w->s8(arg);
+        break;
+    case 1:
+        w = o->m248;
+        goto common;
+    case 2: {
+        FEWb* x = o->m1D0;
+        if (x == 0) {
+            break;
+        }
+        x->s8(arg);
+        break;
+    }
+    case 3:
+        w = o->m1CC;
+    common:
+        if (w == 0) {
+            break;
+        }
+        if (arg != 0 && pos != 0) {
+            fn_800B1B34(self, (FEV3Cs*)w, pos);
+        }
+        w->s8(arg);
+        break;
+    case 4:
+        fn_800C8044(o->m1A8)->s8(arg);
+        break;
+    case 5:
+        fn_800FCA30(o, arg);
+        break;
+    case 6:
+        fn_800FCAA0(o);
+        break;
+    default:
+        r = 1;
+        break;
+    }
+    return r;
+}
+
 extern "C" void fn_800B1B34(void* unused, FEV3Cs* w, FEPair2* pos)
 {
     int x = (int)(pos->x * (float)FEScrW());
