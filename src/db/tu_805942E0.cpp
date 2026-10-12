@@ -4,15 +4,22 @@
  */
 #include "game/db_80584CBC.h"
 
-extern "C" void fn_80595378(Db80593CD0_Data* self);
+struct DbQuad { int m0; int m4; int m8; int mC; };
 
+struct DbQuadTab { char pad[0x20]; DbQuad q[0x52]; int m540; };
+
+struct Db80619948_O { char pad[0x28]; void* m28; };
+
+struct Db80594A10_P : Db805942E0_P { int m18; };
+
+struct Db805951B8_T { char pad[0x1C]; const void* m1C; int a[6][14]; };
+
+extern "C" void fn_80595378(Db80593CD0_Data* self);
 unsigned fn_8007FBC0(Unk8007F198_C* self, int a, int c);
 extern "C" void fn_805942A8(Db80593CD0_Data* self);
 extern const char lbl_806845F8[];
 extern "C" void fn_80594428(Db805942E0_Data* self, int i, float f);
 extern "C" int fn_80593E7C(Db80593CD0_Data* self, int i);
-struct DbQuad { int m0; int m4; int m8; int mC; };
-struct DbQuadTab { char pad[0x20]; DbQuad q[0x52]; int m540; };
 extern "C" int fn_8059377C(Db805937A4_Mgr* m, int id);
 extern "C" int fn_8059394C(Db805937A4_Mgr* m, int id);
 extern "C" Db80593CD0_Ent* fn_80594240(Db80593CD0_Data* self, int i);
@@ -28,7 +35,6 @@ extern "C" Db800B555C_Obj* fn_800B555C();
 extern "C" int fn_800B5758(Db800B555C_Obj* o);
 extern "C" int fn_800B5520(int a);
 extern "C" void fn_805950A0(Db805942E0_Data* self, int a);
-struct Db80619948_O { char pad[0x28]; void* m28; };
 extern "C" float fn_805938E8(Db805937A4_Mgr* m, int id);
 extern "C" int fn_8056AC44(void* o, int a, int b);
 extern "C" int fn_8056A5F4(void* o, int a, int b, int c);
@@ -40,14 +46,12 @@ extern "C" void fn_80594538(Db805942E0_V* self);
 extern "C" void fn_80595044(Db805942E0_Data* self);
 extern const char lbl_80682CC8[];
 extern const char lbl_806845B0[];
-struct Db80594A10_P : Db805942E0_P { int m18; };
 extern const char lbl_806828C8[];
 extern const char lbl_80682C50[];
 extern "C" Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f);
 extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
 extern "C" void fn_805962F4(Db8058F924_L* self);
 extern const char lbl_80682878[];
-struct Db805951B8_T { char pad[0x1C]; const void* m1C; int a[6][14]; };
 
 extern "C" DB_OVERLAY Db805942E0_P* fn_805942E0(Db805942E0_P* self, Db805937A4_Mgr* m, int n, int x)
 {
@@ -223,6 +227,18 @@ extern "C" DB_OVERLAY void fn_80595044(Db805942E0_Data* self)
         int k = i;
         i++;
         fn_80594428(self, k, e->m0);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_805950A0(Db805942E0_Data* self, int key)
+{
+    int ka[30] = { 0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF, 0x10, 0x1D, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C };
+    int kb[30] = { 0x580D, 0x580E, 0x580F, 0x5810, 0x5811, 0x5812, 0x5813, 0x5814, 0x5815, 0x5816, 0x5817, 0x5818, 0x5819, 0x581A, 0x581B, 0x581C, 0x581D, 0x581E, 0x581F, 0x5820, 0x5821, 0x5822, 0x5823, 0x5824, 0x5825, 0x5826, 0x5827, 0x5828, 0x5829, 0x582A };
+    for (int i = 0; i <= 0x1D; i++) {
+        if (key == ka[i]) {
+            fn_805944D0(self, 0xC, kb[i], 4.5f, 0.5f, 9.0f, 1.0f);
+            break;
+        }
     }
 }
 
