@@ -357,6 +357,65 @@ extern "C" void fn_800AD17C(char* self, int c)
     }
 }
 
+struct FEVec2 {
+    float x;
+    float y;
+};
+inline FEVec2 operator-(const FEVec2& a, const FEVec2& b)
+{
+    FEVec2 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    return r;
+}
+
+inline FEVec2 operator*(const FEVec2& a, float s)
+{
+    FEVec2 r;
+    r.x = a.x * s;
+    r.y = a.y * s;
+    return r;
+}
+
+struct FECell {
+    int m0;
+    FEVec2 p0;
+    FEVec2 p1;
+    FEVec2 out;
+};
+struct FERow {
+    FECell c[8];
+};
+struct FERowsObj {
+    char pad0[0x314];
+    FERow rows[8];
+    char pad[0xAA4 - 0x314 - 0x700];
+    int mAA4;
+};
+
+inline FEVec2 operator+(const FEVec2& a, const FEVec2& b)
+{
+    FEVec2 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+#define FECELL(s, i, j) (((FERowsObj*)(s))->rows[i].c[j])
+extern "C" void fn_800AD58C(char* self, int i, int j)
+{
+    FEVec2 P = *(FEVec2*)(self + 0xA74);
+    FEVec2* st = (FEVec2*)(self + 0xA68);
+    P.x = P.x - st->x * (float)i;
+    P.y = P.y - st->y * (float)j;
+    FEVec2 Q = P;
+    Q.x = Q.x - st->x;
+    Q.y = Q.y - st->y;
+    FEVec2 R = Q + P;
+    FEVec2 S = R * 0.5f;
+    FECELL(self, i, j).m0 = 0;
+    FECELL(self, i, j).p1 = FECELL(self, i, j).out = FECELL(self, i, j).p0 = S;
+}
+
 /* near-miss (retail reloads the count before the inner loop pre-test and keeps self in r31; ours reuses r0 and swaps r30/r31): 4 loop forms tried */
 extern "C" void fn_800AD6FC(char* self)
 {
@@ -408,41 +467,6 @@ extern "C" void fn_800AD78C(void* p)
     }
 }
 
-struct FEVec2 {
-    float x;
-    float y;
-};
-inline FEVec2 operator-(const FEVec2& a, const FEVec2& b)
-{
-    FEVec2 r;
-    r.x = a.x - b.x;
-    r.y = a.y - b.y;
-    return r;
-}
-
-inline FEVec2 operator*(const FEVec2& a, float s)
-{
-    FEVec2 r;
-    r.x = a.x * s;
-    r.y = a.y * s;
-    return r;
-}
-
-struct FECell {
-    int m0;
-    FEVec2 p0;
-    FEVec2 p1;
-    FEVec2 out;
-};
-struct FERow {
-    FECell c[8];
-};
-struct FERowsObj {
-    char pad0[0x314];
-    FERow rows[8];
-    char pad[0xAA4 - 0x314 - 0x700];
-    int mAA4;
-};
 extern "C" void fn_800AD838(void* p, float s)
 {
     FERowsObj* self = (FERowsObj*)p;
@@ -494,6 +518,7 @@ inline float FEMin(float a, float b)
 {
     return a <? b;
 }
+
 extern "C" void fn_800AD9C0(void* p, int id)
 {
     char* self = (char*)p;
@@ -550,6 +575,40 @@ extern "C" void fn_800ADAD8(char* self)
 extern "C" UnkFEPair fn_800ADB34(char* base, int a, int b)
 {
     return *(UnkFEPair*)(base + a * 0xe0 + b * 0x1c + 0x328);
+}
+
+extern "C" int fn_800ADB5C(char* self, FEVec2* pt, int* oi, int* oj)
+{
+    FEVec2 pv = *pt;
+    *oi = -1;
+    *oj = -1;
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = 0;
+        while (1) {
+            if (!(j < *(int*)(self + 0xAA4))) {
+                break;
+            }
+            FEVec2 P = *(FEVec2*)(self + 0xA74);
+            FEVec2* st = (FEVec2*)(self + 0xA68);
+            P.x = P.x - st->x * (float)i;
+            P.y = P.y - st->y * (float)j;
+            FEVec2 Q = P;
+            Q.x = Q.x - st->x;
+            Q.y = Q.y - st->y;
+            if (!(pv.x <= P.x || pv.x >= Q.x || pv.y >= P.y || pv.y <= Q.y)) {
+                *oi = i;
+                *oj = j;
+                return 1;
+            }
+            j++;
+        }
+        i++;
+    }
+    return 0;
 }
 
 extern "C" void fn_800ADE10(void* p)
