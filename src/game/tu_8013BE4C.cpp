@@ -5,6 +5,85 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+extern "C" Unk800C7B40_Widget* fn_800C805C(Unk800C7B40_Widget* p);
+struct Unk8013F60C_VD {
+    char pad0[0x3C];
+};
+struct Unk8013F60C_V : Unk8013F60C_VD {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+    virtual void fn_vslot41();
+    virtual void fn_vslot42();
+    virtual void fn_vslot43();
+    virtual void fn_vslot44();
+    virtual void fn_vslot45();
+    virtual void fn_vslot46();
+    virtual void fn_vslot47();
+    virtual void fn_vslot48();
+    virtual void fn_vslot49();
+    virtual void fn_vslot50();
+    virtual void fn_vslot51(int a, int b);
+};
+struct Unk8013F60C_SD {
+    char pad0[0x24];
+};
+struct Unk8013F60C_S : Unk8013F60C_SD {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+};
+extern const char lbl_805BA684[];
+extern "C" int fn_80075E18(int, int);
 extern const char lbl_805C02E0[];
 extern const char lbl_805BE138[];
 extern const char lbl_805C1B34[];
@@ -874,6 +953,52 @@ extern "C" void fn_8013F2C0(Scr* x)
     fn_800C3BE0();
     fn_800C5E28();
     fn_800C5EB0();
+}
+
+/* near-miss (99%): one slot differs, the final slot-8 call loads its vptr through the held +0xDC pointer (0x24(r25)); retail reads 0x100(w) while keeping r25 as this. Fresh expressions at either call or a holder at either position tried. */
+extern "C" void fn_8013F60C(int id, int sel, void* wv, void* gv)
+{
+    Unk800C7B40_Widget* w = (Unk800C7B40_Widget*)wv;
+    Unk800C7B40_Widget* g = (Unk800C7B40_Widget*)gv;
+    Unk8013F60C_S* sub = (Unk8013F60C_S*)((char*)w + 0xDC);
+    int cnt = 0;
+    int f = 0;
+    ((Unk8013F60C_S*)((char*)w + 0xDC))->fn_vslot15();
+    if (fn_80075E18(id, 0) == 1) {
+        if (id == 30 || id == 10 || id == 25 || id == 39)
+            ((Unk8013F60C_V*)w)->fn_vslot51(0x45C4, 0);
+        else
+            ((Unk8013F60C_V*)w)->fn_vslot51(0xD53, 0);
+        cnt = 1;
+        f = 1;
+    } else if (sel == 0) {
+        sel = 1;
+    }
+    if (fn_80075E18(id, 1) == 1) {
+        cnt++;
+        ((Unk8013F60C_V*)w)->fn_vslot51(0xD4C, 1);
+    } else if (sel == 1) {
+        if (f == 1)
+            sel = 0;
+        else
+            sel = 2;
+    }
+    if (fn_80075E18(id, 2) == 1) {
+        cnt++;
+        ((Unk8013F60C_V*)w)->fn_vslot51(0xD52, 2);
+    } else if (sel == 2) {
+        if (f == 1)
+            sel = 0;
+        else
+            sel = 1;
+    }
+    if (g != 0) {
+        g->fn_vslot16(cnt > 0);
+        fn_800C805C(g->fn_vslot29(lbl_805BA684))->fn_vslot16(cnt > 0);
+        w->fn_vslot16(cnt > 0);
+        g->fn_vslot16(cnt != 1);
+    }
+    sub->fn_vslot8(sel);
 }
 
 extern "C" void fn_8013F898(void* a, int* out1, void* b, int* out2)
