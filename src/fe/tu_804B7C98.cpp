@@ -4,6 +4,62 @@
  */
 
 #include "game/fe_804ABCBC.h"
+struct FeRecN {
+    float m0;
+    float m4;
+    int m8;
+    int mC;
+    int m10;
+};
+class FeObjS4 : public UiBase {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual void v30();
+    virtual void v31();
+    virtual FeObj* v32(const char* a, int b);
+    virtual void v33();
+    virtual void v34();
+    virtual void v35();
+    virtual void v36();
+    virtual void v37();
+    virtual void v38();
+    virtual void v39();
+    virtual void v40();
+    virtual void v41();
+    virtual void v42(int a, int b, int c, int d);
+    virtual void v43(int a, int b, char* c, int d);
+    virtual void v44(int a, int b, char* c, int d);
+};
+extern "C" float fn_805922D4(int h, int a, int b);
+extern "C" int sprintf(char* d, const char* f, ...);
 extern "C" void fn_804B9740(int a, FeObj* w);
 class FeV1Cf {
 public:
@@ -90,6 +146,41 @@ extern "C" FE_OVERLAY void fn_804B7FE4(FeScr* x)
 {
     ((FeObjS79*)x->m134)->v79(FI(x->m140, 0x14), 0);
     x->m134->v3();
+}
+
+extern "C" FE_OVERLAY void fn_804B8050(FeScr* x, int kind, int u, int a, int b, int idx)
+{
+    char b8[0x68];
+    char b70[0x38];
+    switch (kind) {
+    case 0:
+        ((FeObjS4*)x->m134)->v42(a, b, ((FeRecN*)fn_80594240(x->m140, idx))->m10, 5);
+        break;
+    case 1:
+        ((char* (*)(char*, int, int, float))fn_800DF254)(b8, 0, 3, ((FeRecN*)fn_80594240(x->m140, idx))->m0);
+        ((FeObjS4*)x->m134)->v43(a, b, b8, 5);
+        break;
+    case 2: {
+        int n = fn_80593E7C(x->m140, idx);
+        sprintf(b70, "%d/%d", n, ((FeRecN*)fn_80594240(x->m140, idx))->m8);
+        ((FeObjS4*)x->m134)->v44(a, b, b70, 5);
+        break;
+    }
+    case 3:
+        ((char* (*)(char*, int, int, float))fn_800DF254)(b8, 0, 3, ((FeRecN*)fn_80594240(x->m140, idx))->m4);
+        ((FeObjS4*)x->m134)->v43(a, b, b8, 5);
+        break;
+    case 4: {
+        FeRecN* r = (FeRecN*)fn_80594240(x->m140, idx);
+        ((char* (*)(char*, int, int, float))fn_800DF254)(b8, 0, 3, r->m4 * (float)fn_80593E7C(x->m140, idx));
+        ((FeObjS4*)x->m134)->v43(a, b, b8, 5);
+        break;
+    }
+    case 5:
+        ((char* (*)(char*, int, int, float))fn_800DF254)(b8, 0, 3, fn_805922D4(FI(x, 0x144), ((FeObjI*)x)->v84(), idx));
+        ((FeObjS4*)x->m134)->v43(a, b, b8, 5);
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804B8288(FeScr* x)
