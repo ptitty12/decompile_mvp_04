@@ -210,6 +210,68 @@ extern "C" int fn_800983C8(char* o, int a, int b) { return fn_80097620(o, a, b, 
 
 extern "C" int fn_8009841C(char* o, int a, int b) { return fn_8009764C(o, a, b, 0) + fn_8009764C(o, a, b, 1); }
 
+extern "C" float fn_80097678(char* o, int a, int b, int c);
+extern "C" int fn_8009896C(char* o, int a, int b, int c);
+extern "C" float fn_800989C8(char* o, int a, int b, int c);
+
+extern "C" float fn_80098470(char* o, int k, int p)
+{
+    float r = 0.0f;
+    switch (k) {
+    case 1: {
+        float a = (float)fn_8009841C(o, 6, p);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a * 9.0f / d;
+        break;
+    }
+    case 2:
+        r = fn_80097678(o, 2, p, 1);
+        break;
+    case 3: {
+        float s = (float)fn_8009896C(o, 0, p, 2);
+        float t = fn_800989C8(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = (s + t) / d;
+        break;
+    }
+    case 6: {
+        float a = (float)fn_8009896C(o, 2, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 5: {
+        float a = (float)fn_8009896C(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 7: {
+        float a = fn_800989C8(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 4:
+        r = fn_80097678(o, 4, p, 1);
+        break;
+    default:
+        r = fn_80097678(o, k, p, 0) + fn_80097678(o, k, p, 1);
+        break;
+    }
+    return r;
+}
+
 extern "C" int fn_80098918(char* o, int a, int b) { return fn_80097A70(o, a, b, 0) + fn_80097A70(o, a, b, 1); }
 
 extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i);
@@ -217,6 +279,49 @@ extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i);
 extern "C" int fn_8009896C(char* o, int a, int b, int c) { return fn_80097A9C(o, a, b, c, 0) + fn_80097A9C(o, a, b, c, 1); }
 
 extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i);
+
+extern "C" float fn_800989C8(char* o, int k, int p, int c)
+{
+    float r = 0.0f;
+    switch (k) {
+    case 3: {
+        float a = fn_800989C8(o, 0, p, c);
+        float b = fn_800989C8(o, 1, p, c);
+        r = a / b;
+        break;
+    }
+    case 4: {
+        float b0 = fn_800989C8(o, 0, p, c);
+        float s0 = (float)fn_8009896C(o, 0, p, c);
+        float s3 = (float)fn_8009896C(o, 3, p, c);
+        float s8 = (float)fn_8009896C(o, 8, p, c);
+        float b1 = fn_800989C8(o, 1, p, c);
+        r = 0.0f;
+        float tot = b1 + s0 + s3 + s8;
+        if (!(tot <= 0.0f))
+            r = (b0 + s0 + s3) / tot;
+        break;
+    }
+    case 5: {
+        float a = fn_800989C8(o, 2, p, c);
+        float b = fn_800989C8(o, 1, p, c);
+        r = 0.0f;
+        if (!(b <= 0.0f))
+            r = a / b;
+        break;
+    }
+    case 6: {
+        float a = fn_800989C8(o, 4, p, c);
+        float b = fn_800989C8(o, 5, p, c);
+        r = a + b;
+        break;
+    }
+    default:
+        r = fn_80097B60(o, k, p, c, 0) + fn_80097B60(o, k, p, c, 1);
+        break;
+    }
+    return r;
+}
 
 extern "C" int fn_80098C68(char* o, int a, int b, int c) { return fn_80097EA4(o, a, b, c, 0) + fn_80097EA4(o, a, b, c, 1); }
 
