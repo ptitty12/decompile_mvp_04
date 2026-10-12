@@ -267,6 +267,8 @@ struct FeGlobal80619948 {
     char pad88[0x8C - 0x88];
     int m8C;
     int m90;
+    char pad94[0xA4 - 0x94];
+    int mA4;
 };
 extern FeGlobal80619948* lbl_80619948;
 extern "C" {
