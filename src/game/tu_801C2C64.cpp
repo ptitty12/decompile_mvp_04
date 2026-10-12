@@ -582,6 +582,38 @@ extern int lbl_806242A0;
 extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
 extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
 
+struct Unk801C2C64_Q4 {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct Unk801C2C64_PV {
+    char pad0[0xAB8];
+    void* mAB8;
+};
+extern char lbl_806EF9C4;
+extern "C" int fn_80389B34(void* x, int a, Vec3* p1, void* p2, int p3, int flags);
+extern "C" Unk801C2C64_Q4 fn_80379C80(const Vec3* a, const Vec3* b, const Vec3* c);
+
+extern "C" Unk801C2C64_Q4 fn_801C59A8(Z* z, P* p, const Vec3* a, const Vec3* b)
+{
+    char w[0x28];
+    Vec3 v = lbl_806055AC;
+    fn_80389B34(((Unk801C2C64_PV*)p)->mAB8, lbl_806EF9C4, &v, w, 0, 3);
+    Unk801C2C64_Q4 q;
+    char e[16];
+    char f[16];
+    char g[16];
+    fn_801C5740(z, p, &v, w, (int)a, (int)b, (int)e, (int)f, (int)g);
+    q.w = 0.0f;
+    *(Vec3*)&q = lbl_806055AC;
+    Vec3 r = *a;
+    r.y = 0.0f;
+    q = fn_80379C80(a, &r, b);
+    return q;
+}
+
 extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t)
 {
     lbl_806242A0 = 1;
