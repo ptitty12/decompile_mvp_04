@@ -21,7 +21,6 @@ int fn_8017C94C(void* p);
 void fn_80249B40(P* p, float f, int a, int b, int c);
 int fn_801BBF0C(Unk801B7FB0_Ai* a);
 void* fn_8024D218(P* p);
-void fn_80303BC4(const char* fmt, ...);
 void fn_801C4F98(Z* z);
 P* fn_801A4B34(P* ctx);
 int fn_801A2034(P* ctx, int k);
@@ -30,6 +29,7 @@ int fn_801D5974(void* p);
 int fn_801C4128(Z* z);
 }
 
+void fn_80303BC4(const char* fmt, float a, float b, ...);
 struct Unk801C2C64_Rec {
     int m0;
     int m4;
