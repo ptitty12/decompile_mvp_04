@@ -79,7 +79,7 @@ inline int ObjC(DbRecO* o)
 }
 
 /* forward declarations (definitions are in address order) */
-extern "C" int fn_80582578(DbSubX* self);
+extern "C" int fn_80582578(DbSubX* self, int a);
 extern "C" int fn_80582DF4(int unused, int k, int* arr);
 extern "C" int fn_80582E38(int unused, int a, int b);
 extern "C" int fn_80582EE4(int unused, int a);
@@ -124,7 +124,7 @@ public:
 };
 extern "C" void fn_80582238(int* p, int a, DbStream* io);
 /* forward declarations (definitions are in address order) */
-extern "C" int fn_80582578(DbSubX* self);
+extern "C" int fn_80582578(DbSubX* self, int a);
 extern "C" int fn_80582DF4(int unused, int k, int* arr);
 extern "C" int fn_80582E38(int unused, int a, int b);
 extern "C" int fn_80582EE4(int unused, int a);
@@ -151,13 +151,101 @@ extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
 extern "C" void fn_80582AA0(DbSubX* self);
 extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
 
-extern "C" DB_OVERLAY int fn_80582578(DbSubX* self)
+struct DbTri {
+    int w0;
+    int w1;
+    int w2;
+};
+extern DbTri lbl_806005E8;
+
+struct DbTbl13 {
+    int w[13];
+};
+extern DbTbl13 lbl_8060055C;
+extern int lbl_80622D90[];
+
+extern const float lbl_806005D0;
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_80582578(DbSubX* self, int a);
+extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
+extern "C" void fn_80582AA0(DbSubX* self);
+extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
+extern "C" int fn_80582DF4(int unused, int k, int* arr);
+extern "C" int fn_80582E38(int unused, int a, int b);
+extern "C" int fn_80582EE4(int unused, int a);
+extern "C" int fn_80583324(int unused, int b);
+extern "C" int fn_80583354(int unused, int x, int c);
+extern "C" int fn_805833A8(void* unused, int a, int b);
+extern "C" DbSubObj* fn_80583404(DbSubObj* self);
+extern "C" int fn_805838E8(void* self, void* a);
+extern "C" int fn_8058391C(int unused, void* a);
+extern "C" DbSubObj* fn_80583964(DbSubObj* self);
+extern "C" int fn_805839A0(void);
+extern "C" void fn_80583A48(DbSubX* self, int a, int b);
+extern "C" void fn_80583B04(DbSubX* self, int a);
+extern "C" void fn_80583BB0(DbSubX* self, int a);
+extern "C" int fn_80583C70(int unused, int x, int y, int z);
+extern "C" int fn_805842F8(int unused, void* a);
+extern "C" void fn_80584504(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
+extern "C" int fn_80584634(void* self, void* a);
+extern "C" int fn_805848B8(int unused, void* a);
+extern "C" void fn_80584918(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
+extern "C" int fn_80584C00(void* self, void* a);
+extern "C" DbSubObj* fn_80584C80(DbSubObj* self);
+extern "C" int fn_805845BC(int u, int k);
+extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
+extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_80582578(DbSubX* self, int a);
+extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
+extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
+extern "C" void fn_80582AA0(DbSubX* self);
+extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
+extern "C" int fn_80582DF4(int unused, int k, int* arr);
+extern "C" int fn_80582E38(int unused, int a, int b);
+extern "C" int fn_80582EE4(int unused, int a);
+extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
+extern "C" int fn_80583324(int unused, int b);
+extern "C" int fn_80583354(int unused, int x, int c);
+extern "C" int fn_805833A8(void* unused, int a, int b);
+extern "C" DbSubObj* fn_80583404(DbSubObj* self);
+extern "C" int fn_805838E8(void* self, void* a);
+extern "C" int fn_8058391C(int unused, void* a);
+extern "C" DbSubObj* fn_80583964(DbSubObj* self);
+extern "C" int fn_805839A0(void);
+extern "C" void fn_80583A48(DbSubX* self, int a, int b);
+extern "C" void fn_80583B04(DbSubX* self, int a);
+extern "C" void fn_80583BB0(DbSubX* self, int a);
+extern "C" int fn_80583C70(int unused, int x, int y, int z);
+extern "C" int fn_805842F8(int unused, void* a);
+extern "C" void fn_80584504(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
+extern "C" int fn_805845BC(int u, int k);
+extern "C" int fn_80584634(void* self, void* a);
+extern "C" int fn_805848B8(int unused, void* a);
+extern "C" void fn_80584918(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
+extern "C" int fn_80584C00(void* self, void* a);
+extern "C" DbSubObj* fn_80584C80(DbSubObj* self);
+
+extern "C" DB_OVERLAY int fn_80582578(DbSubX* self, int a)
 {
     int r = self->v6();
     int t = 0;
     if (r != -1)
         t = 1;
     return t;
+}
+
+extern "C" DB_OVERLAY int fn_805825BC(DbSubX* self, int a, int* o1, int* o2)
+{
+    *o1 = 0;
+    int idx = self->v6();
+    if (fn_80582578(self, a) != 0) {
+        DbTbl13 t = lbl_8060055C;
+        *o2 = lbl_80622D90[idx];
+        *o1 = t.w[idx];
+        return 1;
+    }
+    return 0;
 }
 
 extern "C" DB_OVERLAY void fn_8058284C(DbSubX* self, int idx, int p, int q)
@@ -246,6 +334,20 @@ extern "C" DB_OVERLAY int fn_80582EE4(int unused, int a)
     else if (r == 0xA)
         k = 2;
     return k;
+}
+
+extern "C" DB_OVERLAY int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c)
+{
+    int ia = (int)(pa * lbl_806005D0);
+    int ib = (int)(pb * lbl_806005D0);
+    int r = fn_8040ABA0();
+    r = r % 100;
+    if (r >= 0 && r < ia)
+        return a;
+    int ret = c;
+    if (r >= ia && r < ib)
+        ret = b;
+    return ret;
 }
 
 extern "C" DB_OVERLAY int fn_80583324(int unused, int b)
@@ -419,6 +521,16 @@ extern "C" DB_OVERLAY void fn_80584504(DbFmt* self, DbFlagRec* a, unsigned short
         }
         fn_80360AF0(p, 2);
     }
+}
+
+extern "C" DB_OVERLAY int fn_805845BC(int u, int k)
+{
+    DbTri a = lbl_806005E8;
+    a.w1 = 0x1D69;
+    a.w2 = 0x1E20;
+    a.w0 = 0x5BCF;
+    DbTri b = a;
+    return fn_80582DF4(u, k, (int*)&b);
 }
 
 extern "C" DB_OVERLAY int fn_80584634(void* self, void* a)
