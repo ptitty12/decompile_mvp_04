@@ -819,6 +819,67 @@ void fn_802BB29C(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
 struct Unk802BB0E4_O;
 Unk802BB0E4_O* fn_802BB0E4(Unk802BB0E4_O* p);
 
+struct Unk802BAAB0_List {
+    int w[0x52];
+};
+extern const char lbl_806604E0[];
+void* fn_8030AC4C(Unk802BAAB0_List* p);
+
+struct Unk802BAAB0_SlotD {
+    int m0;
+    Unk802BAAB0_List m4;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+};
+
+class Unk802BAAB0_Slot : public Unk802BAAB0_SlotD {
+public:
+    Unk802BAAB0_Slot()
+    {
+        m0 = 0;
+        fn_8030AC4C(&m4);
+        m14C = 0;
+        m150 = 0;
+        m154 = 0;
+        m158 = 0;
+        m15C = 0;
+        m160 = 0;
+    }
+    virtual ~Unk802BAAB0_Slot();
+};
+
+struct Unk802BAAB0_H3 {
+    Unk802BAAB0_H3()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0;
+    }
+    int m0;
+    int m4;
+    int m8;
+};
+
+struct Unk802BAAB0 {
+    Unk802BAAB0();
+    int m0;
+    Unk802BAAB0_H3 h4;
+    Unk802BAAB0_Slot a[8];
+    Unk802BAAB0_H3 hB50;
+    Unk802BAAB0_Slot b[8];
+    Unk802BAAB0_H3 h169C;
+    Unk802BAAB0_Slot c;
+};
+
+/* near-miss (72 vs 73 insns): retail addresses the last slot off this (no pointer pseudo) and keeps this/zero/pointer in r30/r29/r31; ours r29/r31/r30 */
+Unk802BAAB0::Unk802BAAB0() : m0(0)
+{
+}
+
 void fn_802BACDC(Unk802BACDC_Bat* b)
 {
     char buf[0x40];
