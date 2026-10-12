@@ -98,6 +98,45 @@ void fn_8022359C(Task* t, int a, RecQueue* q)
     }
 }
 
+/* near-miss: 86/86 insns, 2 slots differ: retail puts the m8[idx] byte offset in r10, ours in r0. Tried base-first, offset-first,
+   cast-array and temp forms. */
+inline Vec3f Unk80223628_Flat(Obj36C* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+inline float Unk80223628_Len2(Vec3f v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+void fn_801A656C(CtxOwner* c, Obj36C* o, int k);
+int fn_801F18A0(Task* t);
+void fn_8021BA44(Task* t);
+void fn_80223628(Task* t, int idx, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Obj36C* o = (Obj36C*)t->m9C->m8[idx];
+    const float lim = 5184.0f;
+    float d2 = Unk80223628_Len2(Unk80223628_Flat(o) - e->m38);
+    if (!(d2 >= lim)) {
+        e->mA4 = 1;
+        e->m80 = 0.0f;
+        e->m9C = 0;
+        e->mAC = 0;
+        fn_801A656C(t->m9C->m0, o, 0xD);
+        int r = fn_801F18A0(t);
+        if (r == 1) {
+            e->mA4 = r;
+            e->m80 = 0.0f;
+            e->m9C = 0;
+            e->mAC = 0;
+            fn_80205450(t->m9C, idx);
+            fn_8021BA44(t);
+        }
+    }
+}
+
 inline RecQueue* RqAt(RecQueue* b, int k)
 {
     return b + k;
