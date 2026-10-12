@@ -312,9 +312,9 @@ extern "C" void* fn_80383644()
     return new (lbl_806EF9B4) Unk80383548;
 }
 
-extern "C" void fn_80383674(Unk80383548* o)
+extern "C" int fn_80383674(Unk80383548* o)
 {
-    fn_8037C7FC()->fn_8037CE98(lbl_8069595C, (int)o, 0);
+    return fn_8037C7FC()->fn_8037CE98(lbl_8069595C, (int)o, 0);
 }
 
 extern "C" void fn_803836B4(Unk80383548* o, int a)

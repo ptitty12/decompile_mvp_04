@@ -245,10 +245,10 @@ extern "C" int fn_80383F08(Unk80383C9C_W* self)
     return self->b.top;
 }
 
-extern "C" void fn_80383FB0(Unk80383C9C_W* o, int a)
+extern "C" int fn_80383FB0(Unk80383C9C_W* o, int a)
 {
     fn_80383E74(o);
-    o->m4.fn_803851A0(a, 0);
+    return o->m4.fn_803851A0(a, 0);
 }
 
 struct Out24 {
@@ -297,9 +297,9 @@ Unk80384858::~Unk80384858()
 {
 }
 
-extern "C" void fn_80384A48(void* o)
+extern "C" int fn_80384A48(void* o)
 {
-    fn_8037C7FC()->fn_8037CE98(lbl_80699B0C, (int)o, 0);
+    return fn_8037C7FC()->fn_8037CE98(lbl_80699B0C, (int)o, 0);
 }
 
 extern "C" Unk80384858* fn_80384A88()
@@ -345,13 +345,13 @@ extern "C" void fn_80384B44(char* a, char* b)
     fn_80384F74((Unk80384F28*)(b + 0x18), (Unk80384F28*)(a + 0x18));
 }
 
-extern "C" void fn_80384B70(Unk80384858* o, int a, int* b, int c)
+extern "C" int fn_80384B70(Unk80384858* o, int a, int* b, int c)
 {
     if ((o->m8 & 0x10000000) == 0) {
         o->m8 |= 0x10000000;
         o->m18.fn_80385344(o->fn_vslot3());
     }
-    fn_80385220(&o->m18, a, b, c);
+    return fn_80385220(&o->m18, a, b, c);
 }
 
 /* 80384BF4 */
