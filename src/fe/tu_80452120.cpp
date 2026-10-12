@@ -5,6 +5,13 @@
 #include "game/tu_8043FDC0.h"
 
 extern char lbl_8067BB08[];
+extern "C" {
+void fn_80125100(FeObj* o);
+int fn_80125180(FeObj* o, int a, int b);
+int fn_80454CFC(FeScr_8044974C* self);
+}
+inline int IntAt(char* b, int o) { return *(int*)(b + o); }
+
 extern "C" FE_OVERLAY FeScr7Raw* fn_80452120(FeScr7Raw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648((FeScrRaw*)self, a, b, c, d, e, f, g, h);
@@ -193,6 +200,53 @@ extern "C" FE_OVERLAY void fn_8045369C(FeScr7* self)
     fn_800D0074(&self->m14C->m98, v, 1);
     fn_800D0074(&self->m150->mDC, v, 1);
     fn_80453D84(self, ((FeSub*)&self->m14C->m98)->s21());
+}
+
+extern "C" FE_OVERLAY void fn_8045373C(FeScr7* self)
+{
+    fn_80125100((FeObj*)self->m15C);
+    if (fn_80454D9C(self) != 0) {
+        fn_80125084((FeObj*)self->m15C, 0);
+    } else {
+        int v = 0;
+        int u;
+        if (self->m16C != -1) {
+            v = 1;
+        } else if (self->m170 != -1) {
+            v = 1;
+            if (self->m168 == self->m140)
+                v = 0;
+        }
+        if (v != 0)
+            fn_80125180((FeObj*)self->m15C, 0, 0xE12);
+        else
+            fn_80125180((FeObj*)self->m15C, 0, 0x10);
+        FeObj* c = self->m168;
+        u = 0;
+        if ((c == self->m13C && self->m16C == ((FeObjI*)c)->v60()) ||
+            (self->m168 == self->m140 && self->m170 == ((FeObjI*)self->m168)->v60()))
+            u = 1;
+        if (u != 0)
+            fn_80125180((FeObj*)self->m15C, 0, 0x3B97);
+    }
+    if (((FeScr7Raw*)self)->m23C != 0 && fn_80454D9C(self) == 0)
+        fn_80125180((FeObj*)self->m15C, 2, 0xE10);
+    else
+        fn_80125084((FeObj*)self->m15C, 2);
+    int h = self->m15C;
+    int k;
+    if (fn_80454CFC(self) != 0)
+        k = 0x37A2;
+    else
+        k = 0x1A2F;
+    fn_80125180((FeObj*)h, 3, k);
+    FeObj* d = self->m168;
+    if ((d == self->m140 && IntAt((char*)self + 0x1D8, ((FeObjI*)d)->v60() * 4) == 0) ||
+        (self->m168 == self->m13C && IntAt((char*)self + 0x174, ((FeObjI*)self->m168)->v60() * 4) == 0)) {
+        fn_80125084((FeObj*)self->m15C, 3);
+        if (self->m168 == self->m140)
+            fn_80125084((FeObj*)self->m15C, 0);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80453980(FeScr7* self)
