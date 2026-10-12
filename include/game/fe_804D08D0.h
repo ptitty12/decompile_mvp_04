@@ -495,9 +495,15 @@ struct FeG3 {
     char pad0[0x600];
     int m600;
 };
+struct FeG10 {
+    char pad0[0x6C];
+    int m6C;
+    int m70;
+};
 struct FeG2 {
     char padC[0xC];
     FeG3* mC;
+    FeG10* m10;
 };
 struct FeG1 {
     char pad0[4];
@@ -517,5 +523,127 @@ void fn_80125154(void* w, int a);
 void fn_8012E1C4(void* w, int a, int b);
 void fn_8007DA8C__18Unk8007B2B0_Screenii(void* g, int a, int b);
 }
+
+/* ---- unit 804D2AC0 ------------------------------------------------------------------ */
+
+/* The first words of the state object returned by fn_800B555C (m4 is a flag word). */
+struct FeStateB {
+    int m0;
+    int m4;
+};
+/* The message manager's heap id at +0x38 (FeMsgMgr only declares the fields up to mB8). */
+struct FeMgr38 {
+    char pad0[0x38];
+    int m38;
+};
+
+/* A list item (created by fn_80521184); its vptr is at +0x10, m4 holds the item id. */
+struct FeItemData {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct FeItem : FeItemData {
+    virtual ~FeItem();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10(int a);
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16(int a);
+};
+
+/* Base of the list-style menu screens (ctor fn_804D2AC0, vtable lbl_80679EC0, dtor fn_804D2BCC):
+ * m15C holds m154 items created from the m158 table; m144/m148/m14C are the lazily looked-up
+ * widgets (fn_804D2C7C/2CE0/2D50). Evidence: fn_804D2AC0, fn_804D2EC0, fn_804D3164. */
+struct FeBase2 : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    FeW* m144;
+    FeW* m148;
+    FeW* m14C;
+    int m150;
+    int m154;
+    int* m158;
+    FeItem** m15C;
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    int m170;
+};
+extern const char lbl_80679EC0[];
+extern const char lbl_805F4EF4[];
+extern const char lbl_805F54F8[];
+extern const char lbl_805F851C[];
+extern const char lbl_805F7BBC[];
+extern const char lbl_805F4450[];
+extern const char lbl_805F7944[];
+extern const char lbl_805F852C[];
+extern void* lbl_8061977C;
+extern void* lbl_80622648;
+extern FeW* lbl_80622644;
+extern "C" {
+FeW* fn_804D3CA8(FeBase2* x, int a);
+void* fn_805210A0();
+FeItem* fn_80521184(void* mgr, int id);
+void fn_805228DC();
+void fn_8035686C(void* x, int c);
+void* fn_803774A8(unsigned size, int heap);
+void fn_80377488(void* p);
+const char* fn_80090880__FP11Unk80090880(void* g, int id);
+void fn_800DD204__FP3UiST0(FeW* a, FeW* b);
+FeW* fn_800C8038(FeW* w);
+FeW* fn_800C8040(FeW* w);
+FeW* fn_800C8044(FeW* w);
+FeW* fn_8051F42C(FeItem* it);
+int fn_8051F51C(FeItem* it);
+int fn_802D7CE0(int a, int b);
+int fn_802D7D64__Fi(int a);
+FeW* fn_801389A4(FeW* w, int a);
+void fn_80528FB4();
+FeW* fn_804D2C7C(FeBase2* x);
+FeW* fn_804D2CE0(FeBase2* x);
+FeW* fn_804D2D50(FeBase2* x);
+FeItem* fn_804D2EC0(FeBase2* x, int i);
+FeItem* fn_804D2ED0(FeBase2* x, int id);
+void fn_804D2F38(FeBase2* x);
+void fn_804D2F9C(FeBase2* x);
+void fn_804D3000(FeBase2* x);
+void fn_804D304C(FeBase2* x);
+void fn_804D3098(FeBase2* x);
+int fn_804D3B18(FeBase2* x, int a);
+int fn_804D3B48(FeBase2* x, int a);
+void fn_804D3570(int a, void* x);
+int fn_804D3328(FeBase2* x, int a);
+int fn_804D3A54(FeBase2* x, int a);
+void fn_800EC594__FP8UiScrRawiiiiiiii(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_800EC5F4__FP8UiScrRaw(void* self);
+}
+
+/* Screen of lbl_8067FA30 (ctor fn_804D3D74, base ctor fn_800EC594). */
+struct FeS804D3D74 : FeW {
+    char pad40[0x114];
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+};
+extern const char lbl_8067FA30[];
 
 #endif
