@@ -61,7 +61,7 @@ struct Unk803B21EC {
     int (*m44)(int);
     int m48;
     Unk803B31B4* m4C;
-    void* m50;
+    Unk803B27DC_Obj* m50;
     int m54;
     Unk803B27DC_Obj* m58;
 };
@@ -117,6 +117,10 @@ extern "C" void fn_803B3334(Unk803B3334* o);
 extern int lbl_8069CBC0;
 
 extern "C" void fn_803B1080(int voice, int v);
+
+extern "C" void fn_803B69AC(Unk803B27DC_Obj* o, int a, int flag);
+extern "C" void fn_803B66CC(Unk803B27DC_Obj* o, int v);
+extern unsigned char lbl_8069C9EB;
 
 extern "C" void fn_803B21AC(int idx)
 {
@@ -196,6 +200,27 @@ extern "C" void fn_803B27DC(int idx, int n)
         SNDMEMI_free(e->m58);
         e->m58 = 0;
     }
+}
+
+extern "C" void fn_803B29F8(int idx, int v)
+{
+    Unk803B21EC* e = &lbl_806AA2D4.m1DC[idx];
+    int big = 0;
+    if (v > 0x40000)
+        v = 0x40000;
+    Unk803B27DC_Obj* old = e->m50;
+    if (old == 0) {
+        Unk803B27DC_Obj* o = (Unk803B27DC_Obj*)SNDMEMI_allocz(0x3c);
+        e->m50 = o;
+        if (lbl_806AA2D4.mE > 0x31)
+            big = 1;
+        o->m4 = 0;
+        e->m50->m18 = 0xa0;
+        e->m50->m1A = 0;
+        fn_803B69AC(e->m50, lbl_8069C9EB, big);
+        fn_803B5F9C(&e->m40, e->m50);
+    }
+    fn_803B66CC(e->m50, v);
 }
 
 extern "C" void fn_803B2AB4(int idx, int v)
