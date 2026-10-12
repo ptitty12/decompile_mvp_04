@@ -376,7 +376,6 @@ int fn_80075F1C(int id, int a, int b)
     return 0;
 }
 
-/* near-miss: 6 slots; retail loads the last table entry into r0 and copies it to r3 (mr r3,r0). */
 int fn_80076058(int i, int kind)
 {
     int v = -1;
@@ -391,11 +390,18 @@ int fn_80076058(int i, int kind)
         v = lbl_805B6A48[i];
         break;
     }
-    int t;
-    int u;
-    if (v >= 0 || ((t = lbl_805B6968[i]) == -1 && (t = lbl_805B6A48[i]) == -1 && (u = lbl_805B6888[i], t = u, u == -1)))
+    if (v >= 0)
         return v;
-    return t;
+    int a = lbl_805B6968[i];
+    if (a != -1)
+        return a;
+    int b = lbl_805B6A48[i];
+    if (b != -1)
+        return b;
+    int c = lbl_805B6888[i];
+    if (c != -1)
+        return c;
+    return v;
 }
 
 int fn_80076104(int id, int a, int b)
@@ -509,4 +515,117 @@ int fn_8007668C(int a, int b)
     if (a <= 9)
         return (lbl_805B6B28[a] >> b) & 1;
     return 0;
+}
+
+/* Four-slot view of the db widget table object used by fn_800766B8 / fn_80076758. */
+struct Unk800766B8_Obj {
+    char pad0[0xC];
+    void* mC;
+    void* m10;
+    void* m14;
+    void* m18;
+    char pad1C[0x14];
+    void* m30;
+};
+struct Unk80076758_Ev {
+    char pad0[0xC];
+    struct Unk80076758_Ev0* mC;
+};
+struct Unk80076758_Ev0 {
+    char pad0[0x84];
+    int m84;
+    int m88;
+};
+struct Unk80076758_G {
+    char pad0[0x5C];
+    void* m5C;
+};
+void fn_802B8D74();
+void fn_802B8DDC();
+extern "C" void fn_8052BAA8(void* p, int a);
+extern "C" void fn_8052BAFC(void* p, int a);
+extern "C" void fn_8052BB50(void* p, int a);
+extern "C" void fn_8052BBA4(void* p, int a);
+extern "C" void fn_8052BF14(void* p, int a, void* ev);
+extern "C" void fn_8006A860(void* ev);
+extern "C" void fn_80590CA8(void* p);
+extern "C" int fn_800A2EB4(void* g);
+extern "C" void fn_8053FC0C(void* p);
+extern Unk80076758_G* lbl_80619948;
+
+extern "C" void fn_800766B8(Unk800766B8_Obj* self, int k)
+{
+    fn_802B8D74();
+    switch (k) {
+    case 0:
+        {
+            char* b = (char*)self + 0xC;
+            fn_8052BAA8(*(void**)(b + k), 0);
+        }
+        break;
+    case 1:
+        fn_8052BAFC(self->m10, 0);
+        break;
+    case 2:
+        fn_8052BB50(self->m14, 0);
+        break;
+    case 3:
+        fn_8052BBA4(self->m18, 0);
+        break;
+    }
+    fn_802B8DDC();
+}
+
+void fn_80076758(Unk800766B8_Obj* self, Unk80076758_Ev* ev)
+{
+    Unk80076758_G** g = &lbl_80619948;
+    int k = ev->mC->m84;
+    char* tb = (char*)self + 0xC;
+    int to = k * 4;
+    fn_8052BF14(*(void**)(tb + to), ev->mC->m88, ev);
+    fn_8006A860(ev);
+    fn_80590CA8(self->m30);
+    if (fn_800A2EB4(*g) == 1 && k == 0)
+        fn_8053FC0C((*g)->m5C);
+}
+
+/* near-miss (pass 2): same loop structure and iterator; retail keeps `total` in r31 and forms the
+ * record address as (i*0x1C + base) with a byte offset j*12+4, ours folds the offsets differently. */
+int Unk8007B2B0_Screen::fn_80076A24(int id)
+{
+    int idx = fn_80078A38(id);
+    int total = 0;
+    unsigned n = mC[idx]->m4;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        Unk8006A138_It<1> it(0);
+        int j = 0;
+        while (j <= 1) {
+            Unk80076A24_Rec* r = &mC[idx]->m8[i];
+            if (r->m4[j].m0 == id)
+                total += r->m4[j].m4;
+            j = it.Next();
+        }
+    }
+    return total;
+}
+
+/* near-miss (pass 2): as fn_80076A24; the key is read from the other entry ((j == 0) as subfic/adde in retail). */
+int Unk8007B2B0_Screen::fn_80076AE4(int id)
+{
+    int idx = fn_80078A38(id);
+    int total = 0;
+    unsigned n = mC[idx]->m4;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        Unk8006A138_It<1> it(0);
+        int j = 0;
+        while (j <= 1) {
+            Unk80076A24_Rec* r = &mC[idx]->m8[i];
+            if (r->m4[j == 0].m0 == id)
+                total += r->m4[j].m4;
+            j = it.Next();
+        }
+    }
+    return total;
 }

@@ -412,6 +412,8 @@ struct Unk8007B2B0_Screen {
     int fn_80075948(int a);
     int fn_80075C64(int id);
     int fn_80078A38(int a);
+    int fn_80076A24(int id);
+    int fn_80076AE4(int id);
     int fn_80079094(int a, int b, int c, int d, int e, int kind);
     int fn_80079264(int a, int b, int c, int d, int e);
     float fn_800799D0(int n);
