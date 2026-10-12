@@ -6,6 +6,15 @@
  * .text 0x8004E364-0x80050A68 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004E364.h"
+extern "C" int rand();
+extern "C" int fn_800507A8(Unk80052794_Ctx* ctx, int idx);
+int fn_80050D24(Unk800493D4_Sm* s, Unk80044C10_A* a);
+int fn_800457E4(int a);
+void fn_80010A48(int a);
+void fn_80011324();
+int fn_80047584(int a);
+void fn_80017B74(int a, int b);
+int fn_8009E1D4(void* p, int a, int b);
 struct Unk8004FA94_AV {
     char pad0[0x20];
     int m20[2];
@@ -25,6 +34,28 @@ void fn_800125A0();
 void fn_80012254();
 void fn_80012050(int a);
 void fn_800106F8(int a);
+
+void fn_8004E954(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    if (a->m4D8 == 2 && s->mA5C == 0) {
+        float v = fn_800547A4((Unk80052794_Ctx*)s, (unsigned char*)a, idx);
+        s->mA0C[a->m3B4 == 0]++;
+        s->mA5C = 1;
+        if (((int (*)(Unk800493D4_Sm*, int, Unk80044C10_A*))fn_800507A8)(s, idx, a) && !(v <= 0.34f) && a->m448 == 0) {
+            fn_80011324();
+        } else {
+            fn_80010A48(fn_800457E4(fn_80050D24(s, a)));
+        }
+        if (rand() % 100 > 0x46) {
+            int sum = s->mA0C[0] + s->mA0C[1];
+            int o = a->m3B4 * 0xE64;
+            int x = fn_8009E1D4((char*)a->m130->m44C->m6F8->m14 + o + 0x8C, 2, 0);
+            fn_80017B74(fn_80047584(sum), x);
+        }
+        if (((Unk80069F0C*)a->m130->m44C->m6F8)->fn_8006BE18() != 0)
+            fn_80050324(s, idx, a, 0, 0);
+    }
+}
 
 void fn_8004EAD4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
