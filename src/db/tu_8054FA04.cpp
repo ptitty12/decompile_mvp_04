@@ -57,6 +57,12 @@ extern "C" void fn_80547C5C(char* p);
 extern "C" void fn_80547D28(char* p);
 
 #include "game/clampiter.h"
+extern "C" void* memset(void* p, int c, ...);
+extern "C" float fn_805520E4(int a, float* p0, float* p1, float* p2, float* p3);
+extern int lbl_805FF48C[];
+extern float lbl_805FF49C;
+extern float lbl_805FF4A0;
+extern float lbl_805FF4A4;
 extern char lbl_8065C1B0[];
 extern char lbl_80684150[];
 extern char lbl_80683EF8[];
@@ -73,6 +79,7 @@ struct Db80553284_S {
     char pad650[0xA38 - 0x650];
     Db80553284_Sub mA38;
 };
+
 inline void Db80553284_SubInit(Db80553284_Sub* o)
 {
     *(const void**)((char*)o + 4) = lbl_80684150;
@@ -362,6 +369,30 @@ extern "C" DB_OVERLAY int fn_80552650(int a)
     if (n == 0)
         return 0;
     return (int)((Unk80537D24_Screen*)sc)->fn_8007BB28(2, n, flag);
+}
+
+extern "C" DB_OVERLAY int fn_80552BE0(int a, int b, int* out)
+{
+    float v[4];
+    float* p = v;
+    memset(p, 0, 16);
+    float f = fn_805520E4(a, p, &v[1], &v[2], &v[3]);
+    if (!(f >= lbl_805FF49C)) {
+        float best = lbl_805FF4A0;
+        float cur = lbl_805FF4A4;
+        int i = 0;
+        int k = fn_80552650(a);
+        do {
+            cur = p[i] / fn_8055260C(a, b, lbl_805FF48C[i], k);
+            if (!(cur >= best)) {
+                best = cur;
+                *out = i;
+            }
+            i++;
+        } while (i <= 3);
+        return 1;
+    }
+    return 0;
 }
 
 extern "C" DB_OVERLAY int fn_80552CE8(float f)
