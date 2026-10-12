@@ -214,7 +214,10 @@ Pair8 fn_8022EA60(Fe8022* c)
     return c->m4->m28;
 }
 
-/* near-miss: frame is 8 bytes larger in retail (extra Pair8 temp); 25 slots off */
+inline float AbsF(float v)
+{
+    return fabsf(v);
+}
 int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
 {
     Pair8 v;
@@ -223,12 +226,11 @@ int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
     } else {
         v = c->m4->m28;
     }
-    float x = v.x;
-    if (fabsf(x) > eps) {
-        return 0;
+    int r = 0;
+    if (!(AbsF(v.x) > eps)) {
+        r = AbsF(v.y) <= eps;
     }
-    float y = v.y;
-    return fabsf(y) <= eps;
+    return r;
 }
 
 int fn_8022EAF4(Fe8022* c, Pair8* p)
