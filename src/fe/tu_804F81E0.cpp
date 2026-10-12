@@ -440,6 +440,52 @@ extern "C" FE_OVERLAY int fn_804F9C64(void* l, int k)
     return r;
 }
 
+/* near-miss: 99.3%; only self and the loop counter swap callee-saved registers (retail self=r29, i=r28). Declaration-order, loop-shape and ternary variants tried */
+extern "C" FE_OVERLAY int fn_804F9D10(FeCap* self, int arg)
+{
+    float v;
+    float k;
+    char a[16];
+    char b[16];
+    const char* s1;
+    const char* s2;
+    const char* s3;
+    const char* s4;
+    if (self->m870 == 0) {
+        if (fn_800B555C()->m0 == 0x2E && arg != 0) {
+            Unk8007A4DC_Screen* sc = (Unk8007A4DC_Screen*)lbl_8061930C;
+            int id = sc->fn_8007A6A0(0x31, arg);
+            k = lbl_805FB394;
+            for (int i = 2; i <= 0xD; i++) {
+                int n;
+                if ((unsigned)(i - 2) <= 1)
+                    n = 10;
+                else
+                    n = fn_804F9C64(self, i);
+                int idx = fn_804FA284(self, i);
+                v = fn_80080110((Unk8007FF8C_G*)sc, id, n);
+                if (v < lbl_80622220[idx] - lbl_805FB394 || v > lbl_80622220[idx] + lbl_80622240[idx] + lbl_805FB394)
+                    goto found;
+            }
+        }
+        s1 = lbl_805FB378;
+        s2 = lbl_805FB380;
+        s3 = lbl_805FB388;
+        s4 = lbl_805FB390;
+        fn_80402FCC(a, self->m654->v31());
+        fn_80402FCC(b, self->m658->v31());
+        fn_800E633C(a);
+        fn_800E633C(b);
+        if ((strcmp(a, s1) == 0 || strcmp(a, s2) == 0 || strcmp(a, s3) == 0) && strcmp(b, s4) == 0) {
+        found:
+            self->m870 = 1;
+            fn_804F9B84(self);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY void fn_804F9F14(FeCap* self, int x)
 {
     fn_804FA1AC(self, 2, x);
