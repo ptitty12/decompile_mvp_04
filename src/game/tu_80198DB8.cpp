@@ -71,6 +71,12 @@ extern "C" {
 void* fn_801A4910(Unk8019F8C0_Owner* o, int side, int i);
 }
 
+extern "C" {
+int fn_8019CCE4(int a);
+int fn_802C0218(int a, int b, int c, float* t, void* p1, void* p2, float k);
+}
+
+
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -503,6 +509,32 @@ Unk8019B9CC::~Unk8019B9CC()
 extern "C" void fn_8019BA30(void** o, float t)
 {
     fn_802C0888(*o, t);
+}
+
+//@8019BA5C
+/* near-miss (98.9%): same instructions; callee-saved registers differ (retail: a r30, b r29, hit r26,
+ * p1 r28, p2 r27, r1 r25; here p1 r30, p2 r29, hit r28, a r27, b r26). The cr4 save/restore matches. */
+extern "C" int fn_8019BA5C(int* ctx, int a, int b, float t, int c, int flag, float* hit, Unk80183918_Vec3* p1, Unk80183918_Vec3* p2, int* sx, int* sy, int sz)
+{
+    if (flag == 0 && fn_8019CCE4(*ctx) != 0)
+        return -1;
+    *sy = 1;
+    int r1 = ((int (*)(int, int, int, float*, void*, void*, int*, int, float))fn_802C0888)(*ctx, a, b, hit, p1, p2, sx, sz, t);
+    int r2 = -1;
+    Unk80183918_Vec3 v10;
+    Unk80183918_Vec3 v20;
+    float f30;
+    if (flag != 0 || c != 0 || *sx != 0)
+        r2 = fn_802C0218(*ctx, a, b, &f30, &v10, &v20, t);
+    if (r2 != -1 && (r1 == -1 || !(f30 >= *hit))) {
+        *hit = f30;
+        *p1 = v10;
+        *p2 = v20;
+    }
+    int r = r1;
+    if (r == -1)
+        r = r2;
+    return r;
 }
 
 //@8019BBC0
