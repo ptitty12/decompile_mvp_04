@@ -56,7 +56,6 @@ int fn_8010A7A0(int a)
     }
 }
 
-/* near-miss: sth/li/addi order of the buffer setup differs from retail (addi r3 comes last there) */
 void fn_8010AE78(int unused, UiObj* list, int a, int b)
 {
     short buf[100];
