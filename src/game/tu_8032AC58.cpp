@@ -84,6 +84,19 @@ struct FxTripFQ {
     int m88;
     int m8C;
 };
+extern const float lbl_805ED908;
+struct FxPairFQ {
+    char pad0[0x54];
+    float* m54;
+    float m58;
+    char pad5C[8];
+    float lo0;
+    float lo1;
+    float hi0;
+    float hi1;
+    int m74;
+    int m78;
+};
 extern "C" {
 void fn_801A750C(void* v, int a);
 float fn_801C3370(void* p);
@@ -148,6 +161,7 @@ FxListD* fn_8032F120(FxListD* self, int a, int b);
 void fn_80330ACC(FxStack* self, int v);
 void* fn_803E4A50(void* p);
 int fn_8032E4D4(FxTripW* p, int k);
+int fn_8032DEBC(FxPairW* p, int k);
 // PROTOS-END
 }
 
@@ -501,6 +515,43 @@ void fn_8032DDD0(FxPairW* self) {
     fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
 }
 
+int fn_8032DEBC(FxPairW* p, int k) {
+    FxPairFQ* self = (FxPairFQ*)p;
+    int ret = 0;
+    if (self->m74 != 1) {
+        int r = ((int (*)(FxPairW*))fn_8032D8C8)(p);
+        float step = self->m54 ? *self->m54 : self->m58;
+        float acc = lbl_805ED908;
+        if (r == 0) {
+            r = 1;
+            switch (k) {
+            case 3:
+                acc -= step;
+                break;
+            case 4:
+                acc += step;
+                break;
+            case 8: {
+                int* q = &self->m78;
+            }
+            case 9:
+                self->m78 = self->m78 ^ 1;
+                break;
+            default:
+                r = 0;
+            }
+        }
+        FxV2f v = ((FxV2f (*)(FxCmd*))fn_8032E054)((FxCmd*)p);
+        if (self->m78 == 0)
+            v.x = (v.x + acc > self->hi0) ? self->hi0 : ((v.x + acc) >? self->lo0);
+        else
+            v.y = (v.y + acc > self->hi1) ? self->hi1 : ((v.y + acc) >? self->lo1);
+        ((void (*)(FxCmd*, FxV2f))fn_8032E088)((FxCmd*)p, v);
+        ret = r;
+    }
+    return ret;
+}
+
 void fn_8032E054(FxInt2* out, FxCmd* src) {
     FxInt2* p = (FxInt2*)src->m48;
     if (p) {
@@ -596,16 +647,13 @@ void fn_8032E38C(FxTripW* self) {
     fn_803144A0(lbl_8061FEDC, p, w, self->m4, self->mC, 0x16);
 }
 
-/* near-miss (4 slots): retail issues the lis of lbl_805ED984 before the stfs of step; the three clamps, the by-value fn_8032E344 call and the switch match */
 int fn_8032E4D4(FxTripW* p, int k) {
     FxTripFQ* self = (FxTripFQ*)p;
     int ret = 0;
     if (self->m84 != 1) {
         int r = ((int (*)(FxTripW*))fn_8032D8C8)(p);
         FxF3 v = ((FxF3 (*)(FxCmd*))fn_8032E2FC)((FxCmd*)p);
-        float step;
-        if (self->m58) step = *self->m58;
-        else step = self->m5C;
+        float step = self->m58 ? *self->m58 : self->m5C;
         float acc = lbl_805ED984;
         if (r == 0) {
             r = 1;
