@@ -335,7 +335,6 @@ FE_OVERLAY void fn_804A4AEC(void* x)
     }
 }
 
-//// a
 FE_OVERLAY void fn_804A4B88(FeW* x, FeW* w, int d)
 {
     if (w == fn_800C805C(fn_800C8044(x->fn_vslot32(lbl_805F77C4, 1))->fn_vslot32(lbl_805F59C4, 1))) {
