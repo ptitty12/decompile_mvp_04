@@ -24,6 +24,16 @@ extern Unk8007A4DC_Screen* lbl_8061930C;
 extern "C" int fn_8055FB50(Db8055F7B8_List* l, int x);
 
 #include "game/clampiter.h"
+extern "C" void fn_80535F5C(Unk805352B0_List* self, int a);
+extern "C" void fn_80079564(Unk8007A4DC_Screen* sc, int v, int z);
+extern char lbl_8065C1B0[];
+extern "C" void fn_80563628(int a, int b, int c);
+int fn_8007F724(Unk8007F198_A* self, int a, int b, int c, int d);
+extern "C" void fn_80563740(int a, int b);
+extern "C" void fn_80563140(int a, int b);
+int fn_8007F6C4(Unk8007F198_A* self, int a, int b, int c);
+void fn_8007F61C(Unk8007F198_A* self, int a, int b, int c);
+void fn_8007F330(Unk8007F198_A* self, int a, int b);
 extern Unk80538DD8_G* lbl_80619948;
 extern float lbl_805FF7C4;
 extern float lbl_805FF7D8;
@@ -240,6 +250,25 @@ extern "C" DB_OVERLAY int fn_8055FD8C(int unused, Db8055F7B8_List* l)
     return 0;
 }
 
+extern "C" DB_OVERLAY int fn_8055FE10(int unused, Db8055F7B8_List* l)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int best = 0;
+    int bestv = 0;
+    unsigned i = 0;
+    for (; i < l->m4; i++) {
+        int e = l->At(i);
+        int a = (sc->fn_8007AA84(1, e, 0) * 2 + sc->fn_8007AA84(1, e, 1) * 4) / 6;
+        int b = (sc->fn_8007AA84(0, e, 0) * 2 + sc->fn_8007AA84(0, e, 1) * 4) / 6;
+        int t = a + b;
+        if (best == 0 || t > bestv) {
+            best = e;
+            bestv = t;
+        }
+    }
+    return best;
+}
+
 extern "C" DB_OVERLAY void fn_8055FF28(int a, Db8055FF28_Obj* self, int b)
 {
     Db8055FF28_G* g = (Db8055FF28_G*)lbl_80619948;
@@ -321,4 +350,75 @@ extern "C" DB_OVERLAY int fn_8056087C(void* self)
         }
     }
     return idx;
+}
+
+extern "C" DB_OVERLAY int fn_80560900(int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0xFA];
+    Unk80535650_Tmp* q = &t;
+
+    q->C1(buf, 0xFA);
+    q->C2();
+    q->C3(lbl_8065C1B0);
+
+    fn_80535F5C((Unk805352B0_List*)q, x);
+
+    int n = q->m4;
+    int i = 0;
+    for (; i < n; i++) {
+        int v = t.m0[q->mC];
+        if (sc->fn_8007A6A0(0x19, v) == 0) {
+            q->vp = lbl_8064A550;
+            return 1;
+        }
+        q->mC = (q->mC + 1) % q->m4;
+    }
+    t.vp = lbl_8064A550;
+    return 0;
+}
+
+extern "C" DB_OVERLAY void fn_80560A24(int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0xFA];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0xFA);
+    q->C2();
+    q->C3(lbl_8065C1B0);
+    fn_80535F5C((Unk805352B0_List*)q, x);
+    int n = q->m4;
+    if (n > 0) {
+        int k = n;
+        do {
+            int v = t.m0[q->mC];
+            if (sc->fn_8007A6A0(0x19, v) == 0)
+                fn_80079564(sc, v, 0);
+            q->mC = (q->mC + 1) % q->m4;
+            k--;
+        } while (k != 0);
+    }
+    t.vp = lbl_8064A550;
+}
+
+extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int r = fn_8007F6C4((Unk8007F198_A*)sc, a, b, c);
+    int v = sc->fn_8007A6A0(0x1F, r);
+    int w = fn_800A2AE8(lbl_80619948);
+    fn_8007F61C((Unk8007F198_A*)sc, a, b, r);
+    if (v > 0x3B) {
+        fn_8007F5BC((Unk8007F198_A*)sc, a, b, r, w);
+        return;
+    }
+    if (v > 0xE && (unsigned)fn_8007F674((Unk8007F198_A*)sc, a, b) <= 1) {
+        fn_8007F5BC((Unk8007F198_A*)sc, a, 0, r, w);
+        return;
+    }
+    fn_80563740(a, sc->fn_8007A270(r));
+    fn_8007F330((Unk8007F198_A*)sc, a, r);
+    fn_80563140(a, r);
 }
