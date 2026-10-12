@@ -866,7 +866,8 @@ struct UnkGameP10 {
     int m6C;
     int m70;
     int m74;
-    char pad78[0xAC];
+    char pad78[0xA8];
+    int m120;
     int m124;
 };
 /* One 0xE64-byte per-team record of the array at +0x14 (+0x198 is a value used for display). */
