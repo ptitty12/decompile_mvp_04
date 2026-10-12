@@ -132,7 +132,7 @@ void fn_80125268(Scr* self, int a, int str, int c);
 int fn_801252B8(Scr* self, int a);
 void fn_80125300(Scr* self, int a, int b, int id);
 int fn_80125354(Scr* self, int i, int a, int str);
-void fn_80125490(Scr* self, int a, int b, int id, int e);
+int fn_80125490(Scr* self, int a, int b, int id, int e);
 void fn_801254EC(Scr* self, int a, int b, int c, int d);
 int fn_80125538(Scr* self);
 void fn_80125700(Scr* self);
@@ -430,7 +430,7 @@ int fn_80125354(Scr* self, int i, int a, int str)
     return 1;
 }
 
-void fn_80125490(Scr* self, int a, int b, int id, int e)
+int fn_80125490(Scr* self, int a, int b, int id, int e)
 {
     fn_801254EC(self, a, b, fn_80090880(lbl_8061977C, id), e);
 }

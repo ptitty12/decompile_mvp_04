@@ -506,7 +506,7 @@ Ui8011AA24* fn_8011AA24(int a);
 void fn_8037893C(char* p, int id, UiEvtRaw* e, int a, int b);
 UiLabel* fn_800C8048(UiLabel* p);
 UiS* fn_800B7A94(UiMsgMgr* mgr, const char* name);
-void fn_80125490(UiS* o, int a, int b, int c, int d);
+int fn_80125490(UiS* o, int a, int b, int c, int d);
 void fn_801251CC(UiS* o, int a, int b, int c);
 void fn_80125084(UiS* o, int a);
 void fn_80131F34(UiS* o, UiS* self, void (*cb)(int, void*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);

@@ -1304,7 +1304,7 @@ void fn_800FEC24(UiV_0i_4i* self, int a, int b);
 UiObj* fn_800B7A94(UiMsgMgr* mgr, const char* name);
 void fn_80124FA8(UiObj* o, UiObj* self);
 void fn_801251CC(UiObj* o, int a, int b, int c);
-void fn_80125490(UiObj* o, int a, int b, int c, int d);
+int fn_80125490(UiObj* o, int a, int b, int c, int d);
 
 /* Stack event object: id, then a vptr that the inlined ctor/dtor sequence switches
  * between two vtables (lbl_80649DA0 / lbl_8065B888). */
