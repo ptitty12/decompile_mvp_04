@@ -228,6 +228,22 @@ char* fn_800DD6D4(int n)
     return lbl_806E02B8;
 }
 
+extern char lbl_805B7FE4[];
+extern char lbl_805B7FF0[];
+extern char lbl_805BD93C[];
+extern char lbl_805BD948[];
+extern char lbl_805BD950[];
+extern char lbl_805BD934[];
+
+void fn_800DDF2C(UiS* self)
+{
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805B7FE4, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805B7FF0, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD93C, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD948, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD950, 1))->v32(lbl_805BD934, 1)))->v29(0x4D9D);
+}
+
 void* fn_800DE160(int x)
 {
     int id = 0;
@@ -519,4 +535,93 @@ extern "C" void fn_800DFF0C(char* dst, const char* name)
     char a[0x190];
     fn_804031BC(a, lbl_805BDBA8);
     fn_8040321C(dst, a, dst, name);
+}
+
+extern "C" int fn_80403060(const unsigned short* s);
+
+extern "C" void fn_800DFF5C(unsigned short* s)
+{
+    int n = fn_80403060(s);
+    for (int i = 0; i < n; i++) {
+        switch (s[i]) {
+        case 0x61:
+            s[i] = 0x41;
+            break;
+        case 0x62:
+            s[i] = 0x42;
+            break;
+        case 0x63:
+            s[i] = 0x43;
+            break;
+        case 0x64:
+            s[i] = 0x44;
+            break;
+        case 0x65:
+            s[i] = 0x45;
+            break;
+        case 0x66:
+            s[i] = 0x46;
+            break;
+        case 0x67:
+            s[i] = 0x47;
+            break;
+        case 0x68:
+            s[i] = 0x48;
+            break;
+        case 0x69:
+            s[i] = 0x49;
+            break;
+        case 0x6A:
+            s[i] = 0x4A;
+            break;
+        case 0x6B:
+            s[i] = 0x4B;
+            break;
+        case 0x6C:
+            s[i] = 0x4C;
+            break;
+        case 0x6D:
+            s[i] = 0x4D;
+            break;
+        case 0x6E:
+            s[i] = 0x4E;
+            break;
+        case 0x6F:
+            s[i] = 0x4F;
+            break;
+        case 0x70:
+            s[i] = 0x50;
+            break;
+        case 0x71:
+            s[i] = 0x51;
+            break;
+        case 0x72:
+            s[i] = 0x52;
+            break;
+        case 0x73:
+            s[i] = 0x53;
+            break;
+        case 0x74:
+            s[i] = 0x54;
+            break;
+        case 0x75:
+            s[i] = 0x55;
+            break;
+        case 0x76:
+            s[i] = 0x56;
+            break;
+        case 0x77:
+            s[i] = 0x57;
+            break;
+        case 0x78:
+            s[i] = 0x58;
+            break;
+        case 0x79:
+            s[i] = 0x59;
+            break;
+        case 0x7A:
+            s[i] = 0x5A;
+            break;
+        }
+    }
 }

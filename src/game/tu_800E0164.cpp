@@ -272,6 +272,103 @@ void fn_800E25E0(int a, int b)
     fn_80125490(a, 1, 3, 0x3FB4, b);
 }
 
+struct Ue26B4_Scr {
+    void fn_8007CF44(unsigned i, int a, int b);
+};
+class Ue26B4_S {
+public:
+    char pad0[0x24];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+class Ue26B4_P {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30(const char* s);
+};
+UiS* fn_800C8054(UiS* p);
+extern char lbl_805BDC84[];
+extern char lbl_805BDD84[];
+extern char lbl_805BA714[];
+extern char lbl_805BDD8C[];
+extern char lbl_805BC1A8[];
+extern "C" int sprintf(char*, const char*, ...);
+void fn_800E1A1C(int a, unsigned short* dst);
+
+extern "C" void fn_800E26B4(int sel, UiS* self)
+{
+    char b8[0x40];
+    char b48[0x10];
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    UiS* w1 = (UiS*)fn_800C8040(self->v32(lbl_805BDC84, 1));
+    UiS* w2 = (UiS*)fn_800C8040(self->v32(lbl_805BDD84, 1));
+    UiS* w3 = (UiS*)fn_800C8040(self->v32(lbl_805BA714, 1));
+    UiS* w4 = fn_800C8054(self->v32(lbl_805BDD8C, 1));
+    if (sel == -1) {
+        w1->v28((char*)fn_80090880(lbl_8061977C, 0x3FB5));
+        w2->v28((char*)fn_80090880(lbl_8061977C, 0x1A4B));
+        w3->v28((char*)fn_80090880(lbl_8061977C, 0x1A4B));
+        w4->v8(0);
+    } else {
+        ((Ue26B4_Scr*)sc)->fn_8007CF44(sel, (int)b8, 0);
+        w1->v28(b8);
+        int val = sc->fn_8007D098(sel, 0);
+        fn_800E1A1C(val, (unsigned short*)b8);
+        w2->v28(b8);
+        sprintf(b48, lbl_805BC1A8, sc->fn_8007D050(sel, 8));
+        ((Ue26B4_P*)w3)->s30(b48);
+        ((Ue26B4_S*)((char*)w4 + 0x98))->s20(val, 0);
+        w4->v8(1);
+    }
+}
+
 void fn_800E2944(int a, int b)
 {
     int o = lbl_8061930C;
@@ -410,4 +507,306 @@ int fn_800E2E8C(void* t, int idx, int b, int c)
     fn_800E31A8(t, e, r);
     fn_800E3D4C(t, r);
     return r;
+}
+
+class Ue31A8_P {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual int s30(const char* s, int a);
+};
+class Ue31A8_W {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44(int a, int b, char* c, int d);
+};
+extern "C" int fn_800968C0(int g, int b, int c);
+extern "C" float fn_80097B60(int g, int a, int t, int c, int d);
+extern "C" int fn_80097A9C(int g, int a, int t, int c, int d);
+extern "C" int fn_8009764C(int g, int a, int t, int c);
+extern "C" void fn_80099B7C(int g);
+extern "C" int fn_800DC580(UiS* w);
+extern char lbl_805BDDA8[];
+extern char lbl_805BC1A8[];
+extern char lbl_805BC180[];
+extern "C" int sprintf(char*, const char*, ...);
+
+extern "C" int fn_800C33D0();
+int fn_800DE440(char* out, int a, int b);
+extern "C" void fn_800C3ED4(int h, int a, int b);
+extern "C" int fn_80097318(int a, int b);
+extern "C" int fn_80097380(int a, int b);
+extern "C" int fn_800973E8(int a, int b);
+extern "C" int fn_80097450(int a, int b);
+extern "C" int fn_800974B8(int a, int b);
+extern char lbl_805BDC38[];
+extern char lbl_805BDC40[];
+extern char lbl_805BDD9C[];
+
+extern "C" void fn_800E2F24(UiS* self, int a1, int a2)
+{
+    char buf[200];
+    int h = fn_800C33D0();
+    fn_800C3ED4(h, (int)fn_800C8038((UiS*)self->v32(lbl_805BDC38, 1)), a2);
+    fn_800DE440(buf, a2, 3);
+    ((UiS*)fn_800C8040(self->v32(lbl_805BDD9C, 1)))->v28(buf);
+    if (fn_80097318(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE80);
+    } else if (fn_80097380(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE83);
+    } else if (fn_800973E8(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE84);
+    } else if (fn_80097450(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE85);
+    } else if (fn_800974B8(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE7F);
+    } else {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE88);
+    }
+}
+
+extern "C" int fn_800E31A8(UiS* self, int g, int a2)
+{
+    char buf[0x68];
+    unsigned char t = fn_800968C0(g, a2, 1);
+    int v0 = (int)fn_80097B60(g, 0, t, 2, 0);
+    int v1 = fn_80097A9C(g, 2, t, 2, 0);
+    int v2 = fn_8009764C(g, 6, t, 0);
+    int v3 = fn_80097A9C(g, 7, t, 2, 0);
+    int v4 = fn_80097A9C(g, 0, t, 2, 0);
+    Ue31A8_W* w = (Ue31A8_W*)fn_800C8060(self->v32(lbl_805BDDA8, 1));
+    sprintf(buf, lbl_805BC1A8, v0);
+    w->s44(0, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v1);
+    w->s44(1, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v2);
+    w->s44(2, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v3);
+    w->s44(3, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v4);
+    w->s44(4, 1, buf, 4);
+    int r = ((Ue31A8_P*)self)->s30(lbl_805BC180, 1);
+    if (r != 0) {
+        UiS* x = fn_800C8044((UiS*)r);
+        fn_80099B7C(g);
+        r = fn_800DC580(x);
+    }
+    return r;
+}
+
+class Ue3FE0_W {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43(int a, int b, char* c, int d);
+    virtual void s44(int a, int b, char* c, int d);
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101(int a, int b);
+};
+extern "C" int fn_80077BC4(void* g, int a);
+extern "C" int fn_80084014(int a, int b);
+extern "C" float fn_800748D4(int s, int a, int b, int c);
+extern "C" void fn_80119FF0(char* buf, float f);
+extern "C" int fn_800DB9A8(int o, int a, int s, int g);
+extern "C" float fn_8007824C(int a, int b);
+extern "C" int sprintf(char*, const char*, ...);
+extern char lbl_805BDDEC[];
+extern char lbl_805BD07C[];
+extern char lbl_805BDBC8[];
+
+void fn_800E3FE0(UiS* self, int slot, int g, int k)
+{
+    char text[0x190];
+    char name[200];
+    int* gp = &lbl_8061930C;
+    int o = 0;
+    int s = 5;
+    Ue3FE0_W* w = (Ue3FE0_W*)self;
+    fn_800DC3D8(&o, &s, g);
+    fn_800DE440(name, g, 1);
+    w->s43(slot, 0, name, 5);
+    int r1 = fn_80077BC4((void*)*gp, g);
+    int t = fn_80084014(((Unk8007B2B0_Screen*)*gp)->fn_80078A38(r1), 1);
+    int v3 = ((Unk8007A4DC_Screen*)*gp)->fn_80074754(3, g, t);
+    int v4 = ((Unk8007A4DC_Screen*)*gp)->fn_80074754(4, g, t);
+    sprintf(text, lbl_805BDDEC, v3, v4);
+    w->s44(slot, 1, text, 5);
+    float f = fn_800748D4(*gp, 1, g, t);
+    fn_80119FF0(text, f);
+    w->s44(slot, 2, text, 5);
+    int a = fn_800DB9A8(o, 0x1B, s, g);
+    int b = fn_800DB9A8(o, 0, s, g);
+    sprintf(text, lbl_805BD07C, a, b);
+    w->s44(slot, 3, text, 5);
+    float x = fn_800E0164(fn_8007824C(g, 0));
+    sprintf(text, lbl_805BDBC8, x);
+    w->s44(slot, 4, text, 4);
+    w->s101(slot, k);
 }

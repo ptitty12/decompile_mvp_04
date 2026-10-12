@@ -46,6 +46,49 @@ extern "C" void fn_800D1A24(Unk800D2338_Obj* o)
     c->a = !(a > lbl_805BC848) ? (a >? lbl_805BC84C) : lbl_805BC848;
 }
 
+struct Unk802ACD88_Mgr;
+void fn_802B0444(Unk802ACD88_Mgr* m, int a, int b);
+extern "C" char* strncpy(char* d, const char* s, unsigned n);
+extern "C" char* strcpy(char* d, const char* s);
+extern "C" char* strcat(char* d, const char* s);
+extern "C" int sprintf(char*, const char*, ...);
+extern const char lbl_805BC850[];
+
+extern "C" void fn_800D1B14(Unk800D2338_Obj* o)
+{
+    if (o->b68_2 && o->m64 != 0)
+        fn_802B0444((Unk802ACD88_Mgr*)lbl_8061E978, o->m7C, lbl_8061A328);
+    fn_800C7EE8(o);
+    if (o->b68_0) {
+        char fmt[0x10];
+        char na[4];
+        char nb[4];
+        int f = (*(unsigned*)((char*)o + 0x68) >> 30) & 1;
+        if (f) {
+            char* p = o->m4A;
+            int v = (lbl_8061A328 / o->m50) % o->m58 + o->m54;
+            strncpy(p, o->m40, o->m60);
+            p[o->m60] = 0;
+            sprintf(fmt, lbl_805BC850, 4 - o->m60);
+            sprintf(na, fmt, v);
+            strcat(p, na);
+            fn_800D24A4(o);
+        } else if (lbl_8061A328 < o->m5C + o->m58 * o->m50) {
+            char* p = o->m4A;
+            int v = ((lbl_8061A328 - o->m5C) / o->m50) % o->m58 + o->m54;
+            strncpy(p, o->m40, o->m60);
+            p[o->m60] = 0;
+            sprintf(fmt, lbl_805BC850, 4 - o->m60);
+            sprintf(nb, fmt, v);
+            strcat(p, nb);
+            fn_800D24A4(o);
+        } else {
+            strcpy(o->m4A, o->m45);
+            fn_800D24A4(o);
+        }
+    }
+}
+
 /* near-miss: 7 slots (retail returns 1 inline after bne and keeps the end pointer in r30 = p + 76) */
 extern "C" int fn_800D1CA4(const char* name)
 {
@@ -426,6 +469,78 @@ extern "C" void fn_800D3824(Unk800D1614_Obj* o, int a)
     o->m48->fn_vslot8(a);
 }
 
+struct Unk800D388C_Q {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk800D388C_Raw : Unk800C7B40_Data {
+    const void* m3C;
+    int m40;
+    int m44;
+    int m48;
+    Unk800D388C_Q m4C;
+    int m5C;
+    int m60;
+    int m64;
+    unsigned b68_0 : 1;
+    unsigned b68_1 : 1;
+    unsigned b68_2 : 1;
+    unsigned b68_3 : 1;
+    unsigned rest68 : 28;
+    int m6C;
+    unsigned m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+};
+extern const char lbl_8065BC68[];
+extern "C" void* fn_803774A8(unsigned n, int heap);
+extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s);
+extern "C" void fn_800D3F0C(Unk800D3F0C_Obj* o, int id);
+
+/* near-miss (2 slots): retail inserts b68_2 (rlwimi) before clearing b68_3 (rlwinm); ours emits the clear first, and every statement order with b2 before b3 loses more elsewhere */
+extern "C" Unk800D388C_Raw* fn_800D388C(Unk800D388C_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                        int s2, int s3, int s4, int s5, Unk800D388C_Q* q, int s7, int s8, int s9, int s10, int s11,
+                                        int s12)
+{
+    fn_800C7B40((Unk800D1614_Raw*)self, p1, 4, p2, p3, p4, p5, p6, p7, s0, s11, s12, 0, 1.0f);
+    self->m44 = -1;
+    self->m3C = lbl_8065BC68;
+    self->m48 = s3;
+    self->m40 = 0;
+    self->m4C = *q;
+    self->m5C = s1;
+    self->b68_0 = s7;
+    self->b68_1 = s8;
+    self->m60 = s2;
+    self->b68_3 = 0;
+    self->b68_2 = s10;
+    self->m64 = s5;
+    self->m6C = 15;
+    self->m70 &= 0x1FFFFFFF;
+    self->m74 = s9;
+    self->m80 = 0;
+    self->m84 = 0;
+    self->m88 = 0;
+    if (self->b68_0) {
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = fn_800B64BC((Unk800B64BC_Mgr*)operator new(0xD8, 0));
+        self->m40 = (int)fn_803774A8(0x31E, *(int*)((char*)lbl_8061A32C + 0x38) | 0x100);
+        self->m80 = 0x18F;
+        self->m78 = -2;
+        self->m88 = 0;
+        fn_800D4208((Unk800C7B40_Widget*)self, &lbl_805B6F58);
+    } else {
+        fn_800D3F0C((Unk800D3F0C_Obj*)self, s4);
+    }
+    return self;
+}
+
 extern "C" void fn_800D3A38(Unk800D3A38_Raw* o, int c)
 {
     o->m3C = lbl_8065BC68;
@@ -483,6 +598,61 @@ extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s)
 
 extern "C" void fn_800D4254(const char* s, void* font, float* a, float* b);
 
+struct Unk800D4254_Cfg {
+    char pad0[0x204];
+    int m204;
+    int m208;
+};
+extern Unk800D4254_Cfg* lbl_8061FEDC;
+struct Unk800D4254_Font {
+    char pad0[0xA];
+    unsigned short mA;
+    unsigned int mC;
+    int m10;
+    int m14;
+};
+extern "C" void fn_803EB434(Unk800D4254_Font* font, const unsigned short* s, float* a, int c, float* b, int d);
+extern "C" int fn_80403060(const unsigned short* s);
+extern "C" char* fn_803EB2AC(int ch, char* tbl, int n, int stride);
+
+inline char* FindGlyph(Unk800D4254_Font* font, unsigned short ch)
+{
+    char* tbl = (char*)font + font->m14;
+    int stride = (font->mC & 0x40000) ? 0x10 : 0xC;
+    int idx = ch - 0x20;
+    if (idx < (int)font->mA) {
+        char* g = tbl + idx * stride;
+        if (*(unsigned short*)g == ch)
+            return g;
+    }
+    return fn_803EB2AC(ch, tbl, font->mA, stride);
+}
+extern "C" void fn_800D4254(const char* s0, void* f0, float* a, float* b)
+{
+    const unsigned short* s = (const unsigned short*)s0;
+    Unk800D4254_Font* font = (Unk800D4254_Font*)f0;
+    fn_803EB434(font, s, a, 0, b, 0);
+    int n = fn_80403060(s);
+    if (n > 0) {
+        char* g = FindGlyph(font, s[n - 1]);
+        if (g != 0) {
+            int w;
+            if (font->mC & 0x40000)
+                w = *(short*)(g + 0xE);
+            else
+                w = *(signed char*)(g + 8);
+            *b -= (float)(int)*(unsigned char*)(g + 2);
+            *b += (float)w;
+        }
+    }
+    float sc = 640.0f;
+    if (lbl_8061FEDC->m204 != 0 && lbl_8061FEDC->m208 == 0)
+        sc = 960.0f;
+    float r = 640.0f / sc;
+    *b *= r;
+    *a *= r;
+}
+
 extern "C" int fn_800D43F0(Unk800D3F0C_Obj* o, int v)
 {
     float x;
@@ -524,4 +694,36 @@ extern "C" void fn_800D4B88(Unk800D4B88_Obj* o, int a, int c)
 {
     o->b0 = a;
     o->m84 = c;
+}
+
+struct Unk800D4B9C_Q {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk800D4B9C_Obj : Unk800C7B40_Data {
+    const void* m3C;
+    char pad40[0x4C];
+    Unk800D4B9C_Q m8C;
+    Unk800D4B9C_Q m9C;
+    Unk800D4B9C_Q mAC;
+    Unk800D4B9C_Q mBC;
+    Unk800D4B9C_Q mCC;
+};
+extern const char lbl_8065A4A8[];
+
+extern "C" Unk800D4B9C_Obj* fn_800D4B9C(Unk800D4B9C_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                        int s2, int s3, int s4, int s5, int s6, int s7, Unk800D4B9C_Q* q0, Unk800D4B9C_Q* q2,
+                                        Unk800D4B9C_Q* q1, Unk800D4B9C_Q* q3, Unk800D4B9C_Q* q4, int s13, int s14, int s15, int s16)
+{
+    fn_800D388C((Unk800D388C_Raw*)self, p1, p2, p3, p4, p5, p6, p7, s0, s1, s2, s3, s4, s5, (Unk800D388C_Q*)q0, s13, s6, s7, s14, s15, s16);
+    self->m3C = lbl_8065A4A8;
+    self->m8C = *q0;
+    self->m9C = *q1;
+    self->mAC = *q2;
+    self->mBC = *q3;
+    self->mCC = *q4;
+    self->m1C = 5;
+    return self;
 }

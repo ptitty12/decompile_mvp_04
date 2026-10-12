@@ -167,6 +167,76 @@ void fn_802B0224(void* obj, const char* buf, int n);
 int fn_803FED48(const char* path, int a, int b, int* c);
 }
 
+struct Unk802ACD88_Mgr;
+struct Unk800C1830_T {
+    char pad0[0x24];
+    int m24;
+};
+extern char lbl_805BB020[];
+extern char lbl_805BB034[];
+extern char lbl_805BA574[];
+extern char lbl_805BA54C[];
+extern char lbl_805BA560[];
+extern char lbl_805BB048[];
+extern char lbl_805BB060[];
+extern char lbl_805BB074[];
+extern char lbl_805BB088[];
+extern char lbl_805BB0A0[];
+extern char lbl_805BB0B8[];
+extern char lbl_805BB0D0[];
+extern char lbl_805BB0E8[];
+void fn_800E2C80(char* s, int n);
+void fn_802B0140(Unk802ACD88_Mgr* m, const char* s, int a, int b, int c);
+int fn_80076270(int a);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void fn_800C1A24();
+
+extern "C" void fn_800C1830(int k)
+{
+    switch (k) {
+    case 0:
+        fn_800E2C80(lbl_805BB020, 0x400);
+        fn_800E2C80(lbl_805BB034, 0x400);
+        fn_800E2C80(lbl_805BA574, 0x400);
+        break;
+    case 2:
+        fn_800E2C80(lbl_805BA54C, 0x400);
+        fn_800E2C80(lbl_805BA560, 0x400);
+    case 1:
+        fn_800E2C80(lbl_805BB048, 0x400);
+        break;
+    case 3: {
+        char buf[0x40];
+        if (fn_80076270((*(Unk800C1830_T**)((char*)lbl_806192E0->m4 + 0xC))->m24) != 0)
+            fn_800E2C80(lbl_805BB060, 0x400);
+        else
+            fn_800E2C80(lbl_805BB074, 0x400);
+        fn_800E2C80(lbl_805BA560, 0x400);
+        int v = lbl_806192E0->m4->m10->m74;
+        switch (v) {
+        case 1:
+        case 2:
+        case 3:
+            fn_800E2C80(lbl_805BB088, 0x400);
+            break;
+        case 5:
+            fn_800E2C80(lbl_805BB0A0, 0x400);
+            break;
+        case 6:
+            fn_800E2C80(lbl_805BB0B8, 0x400);
+            break;
+        }
+        sprintf(buf, lbl_805BB0D0, lbl_805BB0E4);
+        fn_802B0140((Unk802ACD88_Mgr*)lbl_8061E978, buf, 0, 0x400, 1);
+        sprintf(buf, lbl_805BB0E8, lbl_805BB0E4);
+        fn_802B0140((Unk802ACD88_Mgr*)lbl_8061E978, buf, 0, 0x400, 0);
+        if (v != 10)
+            fn_800C1A24();
+        break;
+    }
+    }
+}
+
 extern "C" void fn_800C1A24()
 {
     void* obj = lbl_8061E978;

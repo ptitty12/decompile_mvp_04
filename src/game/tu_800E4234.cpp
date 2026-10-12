@@ -212,6 +212,57 @@ void fn_800E49A4()
     s->m51C = 0;
 }
 
+int fn_800A1C54(void* g, int b, int c, int d, int e, int f);
+extern "C" void fn_800A19E4(int a, int flag);
+extern int lbl_8061A308;
+void fn_800E63A4(Ue63A4* t);
+
+extern "C" void fn_800E49DC()
+{
+    int sel = 3;
+    if (fn_800B56C4(fn_800B555C()) == 1)
+        sel = 0;
+    else if (fn_800B5758(fn_800B555C()) == 1)
+        sel = 1;
+    int flags = 2;
+    if (fn_800B555C()->m530 == 0)
+        flags = 6;
+    if (fn_800B555C()->m588 != 0) {
+        switch (fn_800B555C()->m58C) {
+        case 0:
+            flags |= 8;
+            break;
+        case 1:
+            flags |= 0x10;
+            break;
+        case 2:
+            flags |= 0x20;
+            break;
+        default:
+            flags |= 8;
+            break;
+        }
+    }
+    int i = 0;
+    int a = fn_800B555C()->m588;
+    int b = fn_800B555C()->m590;
+    int c = *(int*)((char*)fn_800B555C() + 0x528);
+    fn_800A1C54(lbl_80619948, sel, flags, a, b, c);
+    fn_800A19E4(0x3F, 1);
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int n = s->fn_8007B2B0();
+    if (i < n) {
+        do {
+            int h = s->fn_8007B2FC(i);
+            i++;
+            s->fn_8007B4A8(0x10, h, s->fn_8007B8C4(0x37, s->fn_8007B320(0, h)));
+        } while (i < n);
+    }
+    fn_800B555C()->m530 = 1;
+    if (lbl_8061A308 == 0)
+        fn_800E63A4((Ue63A4*)fn_8007FE04((Unk8007B2B0_Screen*)lbl_8061930C));
+}
+
 void fn_800E4B70()
 {
     int flags = 2;
@@ -639,4 +690,121 @@ void fn_800E6888(Ue6888* t)
     ((UiVF*)b)->v79(t->m10, 0);
     ((UiVF*)b)->v68(0);
     ((UiVF*)b)->v14(1);
+}
+
+class Ue7888_W {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43(int a, int b, unsigned short* c, int d);
+};
+struct Ue7888_T {
+    char pad0[0x14];
+    char* m14;
+};
+struct Ue7888_O {
+    Ue7888_W* m0;
+    int m4;
+    Ue7888_T* m8;
+    int mC;
+    int m10;
+};
+extern "C" int fn_8009764C(char* r, int a, int b, int c);
+extern "C" int fn_800968C0(char* r, int q, int c);
+extern "C" void fn_800DFEAC(unsigned short* d, const char* s);
+void fn_800DE354(int a0, void* o, int idx, int q, int f);
+extern "C" int fn_80403060(unsigned short* s);
+extern "C" int sprintf(char*, const char*, ...);
+extern char lbl_805BDFE8[];
+extern char lbl_805BE020[];
+extern char lbl_805BE024[];
+extern char lbl_805BE02C[];
+
+void fn_800E7888(Ue7888_O* o, int idx)
+{
+    unsigned short t1[0xC8];
+    unsigned short t2[0xC8];
+    char t3[0x10];
+    int* c = &o->m10;
+    Ue7888_W* w = o->m0;
+    char* rec = o->m8->m14 + idx * 0xE64;
+    *c = *c + 1;
+    int count = 0;
+    int i = 0;
+    fn_80403144(t1, fn_80090880(lbl_8061977C, 0xC82));
+    fn_800DFEAC(t1, lbl_805BDFE8);
+    w->s43(*c, 0, t1, 4);
+    *c = *c + 1;
+    fn_80403144(t1, fn_80090880(lbl_8061977C, 0x1982));
+    fn_800DFEAC(t1, lbl_805BE020);
+    unsigned char cnt = rec[0x235];
+    for (; i < cnt; i++) {
+        int off = (i * 8) & 0x7F8;
+        char* b = rec + 0x238;
+        int q = *(int*)(b + off);
+        int n = fn_8009764C(rec, 0xD, fn_800968C0(rec, q, 1), 0);
+        if (n > 0) {
+            count++;
+            if (count > 1)
+                fn_800DFEAC(t1, lbl_805BE024);
+            fn_800DE354((int)t2, o->m8, idx, q, 1);
+            if (n > 1) {
+                sprintf(t3, lbl_805BE02C, n);
+                fn_800DFEAC(t2, t3);
+            }
+            if (fn_80403060(t1) + fn_80403060(t2) > 0x3E) {
+                w->s43(*c, 0, t1, 4);
+                fn_80403144(t1, t2);
+                *c = *c + 1;
+            } else {
+                fn_800DFF0C(t1, t2);
+            }
+        }
+    }
+    if (count > 0) {
+        w->s43(*c, 0, t1, 4);
+        *c = *c + 1;
+    }
+    *c = *c + 1;
 }

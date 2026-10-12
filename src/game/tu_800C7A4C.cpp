@@ -208,6 +208,83 @@ extern "C" Unk800D1614_Raw* fn_800C842C(Unk800D1614_Raw* self, int p1, int p2, i
     return self;
 }
 
+class Ue84B0_V {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual Ue84B0_V* s31(int a, int b);
+};
+extern "C" void fn_800C8FE8(void* unused, Unk800C7B40_Widget* w);
+extern const char lbl_805B9EB8[];
+extern const char lbl_805BC12C[];
+extern const char lbl_805BC130[];
+extern const char lbl_805BC134[];
+extern const char lbl_805BA68C[];
+
+extern "C" void fn_800C84B0(Unk800D1614_Obj* o)
+{
+    o->m44 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805B9EB8, 1));
+    o->m48 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC12C, 1));
+    o->m4C = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC130, 1));
+    o->m50 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC134, 1));
+    o->m54 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BA68C, 1));
+    Ue84B0_V* r;
+    r = ((Ue84B0_V*)o->m44)->s31(2, 1);
+    if (r == 0)
+        o->m44 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m44);
+    r = ((Ue84B0_V*)o->m48)->s31(2, 1);
+    if (r == 0)
+        o->m48 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m48);
+    r = ((Ue84B0_V*)o->m4C)->s31(2, 1);
+    if (r == 0)
+        o->m4C = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m4C);
+    r = ((Ue84B0_V*)o->m50)->s31(2, 1);
+    if (r == 0)
+        o->m50 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m50);
+    r = ((Ue84B0_V*)o->m54)->s31(2, 1);
+    if (r == 0)
+        o->m54 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m54);
+}
+
 extern "C" void fn_800C8B9C(Unk800C7B40_Widget* w, int v)
 {
     if (w->b7)
@@ -292,6 +369,100 @@ extern "C" void fn_800C8FE8(void* unused, Unk800C7B40_Widget* w)
         if (x != 0)
             ((Unk800C8FE8_Flags*)fn_800C8038(x))->m68 |= 0x02000000;
     }
+}
+
+struct Unk800C9084_Obj : Unk800C7B40_Data {
+    const void* m3C;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    unsigned c0 : 1;
+    unsigned c1 : 1;
+    unsigned c2 : 1;
+    unsigned c3 : 1;
+    unsigned c4 : 1;
+    unsigned c5 : 1;
+    unsigned c6 : 1;
+    unsigned c7 : 1;
+    unsigned c8 : 1;
+    unsigned c9 : 23;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    char padA0[0x50];
+    float mF0;
+    int mF4;
+};
+
+/* near-miss (96%): retail stores m60/m64 right after the flag word and before the zero stores (ours puts them last), and loads the constant 8 into r0 after the m1C store setup; no statement order found */
+extern "C" Unk800C9084_Obj* fn_800C9084(Unk800C9084_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                        int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12,
+                                        int s13, int s14, float f)
+{
+    fn_800CEEF0((Unk800D1614_Raw*)self, p1, p2, p3, p4, p5, p6, p7, s0, s9, s13, s14, f);
+    self->m3C = lbl_806574E0;
+    self->m44 = 100;
+    if (s10)
+        self->m48 = s3;
+    else
+        self->m48 = s1;
+    if (s10)
+        self->m4C = s4;
+    else
+        self->m4C = s2;
+    self->m50 = s1;
+    self->m54 = s2;
+    self->m58 = s3;
+    self->m5C = s4;
+    self->m60 = s5;
+    self->m64 = s6;
+    self->m68 = s5;
+    self->m6C = s6;
+    self->m70 = 0;
+    self->m74 = 0;
+    self->m78 = 0;
+    self->m7C = 0;
+    self->c0 = s8;
+    self->c1 = s7;
+    self->c2 = s10;
+    self->c3 = 0;
+    self->c4 = 1;
+    self->c5 = 0;
+    self->c6 = 0;
+    self->c7 = 0;
+    self->c8 = 1;
+    self->m84 = s11;
+    self->m88 = 0;
+    self->m8C = 0;
+    self->m90 = 0;
+    self->m94 = 0;
+    self->m98 = 0;
+    self->m9C = 0;
+    new ((char*)self + 0xA0) Unk800D0D3C_Obj;
+    new ((char*)self + 0xB4) Unk800D0D3C_Obj;
+    new ((char*)self + 0xC8) Unk800D0D3C_Obj;
+    new ((char*)self + 0xDC) Unk800D0D3C_Obj;
+    self->mF0 = 0.0f;
+    self->m1C = 8;
+    self->mF4 = s12;
+    return self;
 }
 
 extern "C" void fn_800C91EC(Unk800D1614_Raw* o, int c)
