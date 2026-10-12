@@ -148,3 +148,10 @@ extern "C" FE_OVERLAY void fn_804B23D8(FeScr* x)
 {
     fn_804B243C((FeScr*)(void*)fn_800B7AB8(UiGetMsgMgr(), "CSSETUP"), (int)x);
 }
+
+extern "C" FE_OVERLAY void fn_804B243C(FeScr* x, int a)
+{
+    FI(x, 0x150) = 1;
+    ((FeObj*)x->m138)->v28();
+    ((FeObj1*)x->m13C)->v28(a);
+}
