@@ -26,33 +26,6 @@ inline float Unk80249070_Lerp(float a, float t, float b)
     return a + t * (b - a);
 }
 
-struct Unk802494C4_Obj {
-    char pad0[0x110];
-    int m110;
-};
-struct Unk802494C4_C {
-    char pad0[0x6F8];
-    Unk8022FE34_Game* m6F8;
-    char pad6FC[0x738 - 0x6FC];
-    void* m738;
-};
-struct Unk802494C4_X {
-    char pad0[0x60];
-    Unk80273498_Vec3 m60;
-    char pad6C[0x44C - 0x6C];
-    Unk802494C4_C* m44C;
-    char pad450[0xAC4 - 0x450];
-    int mAC4;
-    char pad_AC8[0xAD0 - 0xAC8];
-    float mAD0;
-    Unk80273498_Vec3 mAD4;
-};
-extern Unk802494C4_Obj* lbl_8061FE10;
-extern const float lbl_805D9410;
-extern const float lbl_805D9414;
-extern const float lbl_805D9418;
-extern float lbl_8061D4C0;
-extern "C" void fn_8030D1E4(void* pp, int idx, Unk80273498_Vec3* a, void* b, int depth, float f);
 
 /* Views of the player object for fn_8024A468 (offsets from the asm). */
 struct Unk8024A468_Sub {
@@ -89,7 +62,7 @@ extern const float lbl_805D94C0;
 Unk8026C414_V3 fn_8026CB70(Unk8026C414_M* self, int i);
 extern "C" void fn_8038AC30(int a, float f, const Unk8026C414_V3& b, int c, void* d);
 
-extern "C" void fn_80244A64(Unk80270BA0_X* x, Unk8027C728_Goal* g, int flag);
+extern "C" void fn_80244A64(Unk8027C728_Player* x, Unk8027C728_Goal* g, int flag);
 extern "C" void fn_8037EBE8(Unk80271DBC_Link* l);
 extern "C" void fn_803814A4(Unk80271DBC_Link* l, unsigned hash, int a, float b);
 extern const float lbl_805D94C4;
@@ -490,7 +463,7 @@ void fn_8024A59C(Unk80270BA0_X* x, int s)
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
     if (v->m264 != s) {
         if (s != 0) {
-            fn_80244A64(x, 0, 0);
+            fn_80244A64((Unk8027C728_Player*)x, 0, 0);
             for (int i = 0; i < 3; i++) {
                 Unk80271DBC_Link* l = v->m618[i];
                 fn_8037EBE8(l);
@@ -502,7 +475,7 @@ void fn_8024A59C(Unk80270BA0_X* x, int s)
             Unk8027C728_Goal* g = fn_802448F4(x, 1);
             g->m10 = 2;
             fn_8027C728(g);
-            fn_80244A64(x, g, 0);
+            fn_80244A64((Unk8027C728_Player*)x, g, 0);
         }
     }
 }
