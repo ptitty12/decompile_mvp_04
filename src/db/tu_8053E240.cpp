@@ -453,6 +453,52 @@ DB_OVERLAY int fn_80540E60(int id)
     return fn_8033E888(h, fn_80329E74(d)) <= 0x1D;
 }
 
+extern "C" int fn_8007DDC8__FP13Unk8007DB74_Aiii(void* a, int b, int c, int d);
+struct Db8053E240_R1C {
+    char pad0[0x1C];
+    unsigned m1C;
+};
+extern "C" Db8053E240_R1C* fn_8007FE04__FP13Unk8007F198_D(void* g);
+/* near-miss: 97%; only the order of the five prologue moves (lis/mr r30, stfs f1, mr r20/r21) differs */
+DB_OVERLAY int fn_805419C8(int self_, int k, int n, int p_, int a, int b_, float f)
+{
+    Db8053E240_It* self = (Db8053E240_It*)self_;
+    Db8053E240_EntF* p = (Db8053E240_EntF*)p_;
+    Db8053E240_Ent12* b = (Db8053E240_Ent12*)b_;
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    if (n == 0)
+        return 0;
+    unsigned pass = 0;
+    float yr = fn_8007FE04__FP13Unk8007F198_D(s)->m1C;
+    self->s1();
+    for (; pass < self->m4; pass++) {
+        int g = self->s3();
+        for (unsigned side = 0; side <= 1; side++) {
+            int idx = fn_8007DDC8__FP13Unk8007DB74_Aiii(s, g, side != 0 ? 2 : 0, 9);
+            float v1;
+            float v2;
+            float bestv = 0.0f;
+            float r;
+            float iv;
+            if (fn_80541EC8(idx, 0, a, b) == 0) {
+                int flag = 1;
+                if (k == 0)
+                    flag = 0;
+                v1 = fn_8007BB28__18Unk8007B2B0_Screeniii(s, 0, g, flag);
+                v2 = fn_8007BB28__18Unk8007B2B0_Screeniii(s, 1, g, flag);
+                iv = s->fn_800739E0(0xB, idx, k, 2);
+                r = fn_80541CDC(yr, v1 + v2, 3.1f, 2.0f, 1.0f);
+                if (!(iv < f * r)) {
+                    bestv = fn_80541D3C(idx, k, v1);
+                    fn_80541C04(p, n, idx, g, bestv);
+                }
+            }
+        }
+        self->s10();
+    }
+    return fn_80541CAC((Db8053E240_Ent12*)p, n);
+}
+
 DB_OVERLAY void fn_80541C04(Db8053E240_EntF* arr, int n, int id, int v, float key)
 {
     int i = 0;
