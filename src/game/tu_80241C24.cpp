@@ -6,6 +6,13 @@
 #include "game/tu_8026C414.h"
 #include "game/goals/tu_8027A84C.h"
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps them below preceding stores (retail's order). */
+template <class T> inline float Unk80241C24_Secs(T n)
+{
+    return (float)n * 0.016666668f;
+}
+
 extern const float lbl_805D9128;
 
 void fn_802423A8(int a, Unk80241C24_B* b)
@@ -363,12 +370,11 @@ void fn_80245694(Unk80270BA0_X* x, int a, float f, int b, int c, int d, int e, i
     v->m610 = h;
 }
 
-/* near-miss: only the order of the lbl_805D9128 load vs the reload of f differs (f11/f12 swapped) */
 void fn_802456C8(Unk80270BA0_X* x, int a, int b, float f)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
     if (a == 1) {
-        v->m90C = (float)x->m44C->m4C * lbl_805D9128 + f;
+        v->m90C = Unk80241C24_Secs(x->m44C->m4C) + f;
         v->m910 = b;
         v->m914 = a;
     } else
