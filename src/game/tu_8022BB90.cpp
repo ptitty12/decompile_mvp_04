@@ -94,7 +94,14 @@ struct GoalSub54 {
     float m54;
 };
 
-/* near-miss: 69/69 insns, 2 slots: retail loads the 0.0 constant before reloading f from its stack slot (same as fn_8022EC1C) */
+inline float SubF(GoalSub54* s)
+{
+    if (s != 0) {
+        return s->m54;
+    }
+    return -1.0f;
+}
+
 void fn_8022D5F4(Task* t, int a)
 {
     Unk8027C728_Goal* g = fn_80244C84((Unk80270BA0_X*)ObjAt(t->m9C->m8, a));
@@ -107,7 +114,7 @@ void fn_8022D5F4(Task* t, int a)
     } else {
         s = 0;
     }
-    float f = s != 0 ? s->m54 : -1.0f;
+    float f = SubF(s);
     if (!(f <= 0.0f)) {
         t->m9C->mA4 = a;
         t->m9C->mA8 = f;
@@ -182,7 +189,8 @@ void fn_8022E7D0(Fe8022* c)
     fn_8022E748(c);
 }
 
-/* near-miss: retail reads th into f31 before the fn_80235FA8 call (arguments evaluated last-to-first here); 42 slots off */
+/* near-miss: retail reads th into f31 before the fn_80235FA8 call (arguments evaluated last-to-first here); 42 slots off.
+   Tried th as the first parameter (63 insns, worse). */
 float fn_8022E7F0(Fe8022* c, int k)
 {
     float th = 80.0f;
@@ -297,16 +305,17 @@ int fn_8022EB74(Fe8022* c, Pair8* a, Pair8* b)
     return d <= th;
 }
 
-/* near-miss: 2 slots: retail loads the 0.75 constant before reloading v from its stack slot */
+inline float Pick(Fe73C* d)
+{
+    if (lbl_80620750) {
+        return lbl_80620754;
+    }
+    return d->m14;
+}
+
 int fn_8022EC1C(Fe8022* c)
 {
-    Fe73C* d = c->m4;
-    float v;
-    if (lbl_80620750) {
-        v = lbl_80620754;
-    } else {
-        v = d->m14;
-    }
+    float v = Pick(c->m4);
     return fabsf(v) >= 0.75f;
 }
 
