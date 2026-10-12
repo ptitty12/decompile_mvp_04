@@ -5,6 +5,102 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+struct Unk8013013C_VD {
+    char pad0[0x3C];
+};
+struct Unk8013013C_V : Unk8013013C_VD {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+    virtual void fn_vslot41();
+    virtual void fn_vslot42();
+    virtual void fn_vslot43();
+    virtual void fn_vslot44();
+    virtual void fn_vslot45();
+    virtual void fn_vslot46();
+    virtual void fn_vslot47();
+    virtual void fn_vslot48();
+    virtual void fn_vslot49();
+    virtual void fn_vslot50();
+    virtual void fn_vslot51();
+    virtual void fn_vslot52();
+    virtual void fn_vslot53();
+    virtual void fn_vslot54();
+    virtual void fn_vslot55();
+    virtual void fn_vslot56();
+    virtual void fn_vslot57();
+    virtual void fn_vslot58();
+    virtual void fn_vslot59();
+    virtual void fn_vslot60();
+    virtual void fn_vslot61();
+    virtual void fn_vslot62();
+    virtual void fn_vslot63();
+    virtual void fn_vslot64();
+    virtual void fn_vslot65();
+    virtual void fn_vslot66();
+    virtual void fn_vslot67();
+    virtual void fn_vslot68();
+    virtual void fn_vslot69();
+    virtual void fn_vslot70();
+    virtual void fn_vslot71();
+    virtual void fn_vslot72();
+    virtual void fn_vslot73();
+    virtual void fn_vslot74();
+    virtual void fn_vslot75();
+    virtual void fn_vslot76();
+    virtual void fn_vslot77();
+    virtual void fn_vslot78();
+    virtual void fn_vslot79();
+    virtual void fn_vslot80();
+    virtual void fn_vslot81();
+    virtual void fn_vslot82();
+    virtual void fn_vslot83();
+    virtual void fn_vslot84(int a);
+    virtual int fn_vslot85();
+    virtual void fn_vslot86();
+    virtual void fn_vslot87();
+    virtual void fn_vslot88(int a, int b);
+};
+extern const char lbl_805BDC38[];
+extern "C" void fn_801303A0(void* x);
+extern "C" void fn_80130F04(void* x);
 
 struct Unk8012CCF4_Obj {
     char pad0[0x14];
@@ -44,6 +140,7 @@ struct Unk8012E7FC : Unk800C7B40_Widget {
     int m19C;
 };
 typedef Unk8012E7FC Scr;
+
 static inline int IsBusy(Scr* x)
 {
     if (x->m188 != 0 || x->m18C != 0) {
@@ -538,6 +635,44 @@ extern "C" void fn_8012E8DC(Scr* x)
 extern "C" void fn_8013011C(Scr* x)
 {
     fn_800ECAA4(x);
+}
+
+extern "C" void fn_8013013C(Scr* x, int a1, int a2, int a3, int a4, int a5, int a6, int a7, int s8, int sC, int s10, int s14)
+{
+    x->m13C = s10;
+    x->m180 = 5;
+    x->m134 = a5;
+    x->m138 = sC;
+    x->m148 = s14;
+    x->m17C = 0;
+    x->m184 = 5;
+    x->m174 = a7;
+    x->m168 = a2;
+    x->m16C = a4;
+    x->m170 = (void (*)())a6;
+    x->m160 = a1;
+    x->m164 = a3;
+    if (s10 == 0) {
+        if (a1 != 0) {
+            if (((Unk8013013C_V*)x)->fn_vslot85() != 0)
+                ((Unk8013013C_V*)x)->fn_vslot84(0);
+        } else if (a3 != 0) {
+            if (((Unk8013013C_V*)x)->fn_vslot85() != 1)
+                ((Unk8013013C_V*)x)->fn_vslot84(1);
+        } else {
+            if (((Unk8013013C_V*)x)->fn_vslot85() != 2)
+                ((Unk8013013C_V*)x)->fn_vslot84(2);
+        }
+    }
+    if (x->m138 == 0) {
+        ((Unk8013013C_V*)x)->fn_vslot88(0, 0);
+        ((Unk8013013C_V*)x)->fn_vslot88(1, 0);
+    }
+    fn_800C8044(x->fn_vslot32(lbl_805C0A08, 1))->fn_vslot32(lbl_805BDC38, 1)->fn_vslot8(0);
+    fn_800C8044(x->fn_vslot32(lbl_805C0A14, 1))->fn_vslot32(lbl_805BDC38, 1)->fn_vslot8(0);
+    fn_8012E9D4(x);
+    fn_801303A0(x);
+    fn_80130F04(x);
 }
 
 extern "C" int fn_8013080C(Scr* x, Unk800C7B40_Widget* a)
