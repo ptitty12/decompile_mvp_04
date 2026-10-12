@@ -89,6 +89,74 @@ struct Unk8037E118 {
 extern "C" int atoi(const char* s);
 extern "C" double atof(const char* s);
 void* operator new[](unsigned int size, int heap);
+extern "C" void fn_8037E600(Unk8037E600* o, int idx);
+struct Unk80379324 {
+    Unk80379324();
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct E3B8_V3 {
+    float x;
+    float y;
+    float z;
+};
+struct E3B8_Ent {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+};
+struct E3B8_Arg0 {
+    char pad0[8];
+    E3B8_Ent* m8;
+};
+struct E3B8_VB31 {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual int s14();
+    virtual int s15();
+};
+struct E3B8_Obj31 : E3B8_VB31 {
+    E3B8_V3 m4;
+    Unk80379324 m10;
+};
+struct E3B8_Arg4 {
+    virtual void s1();
+    virtual void s2(int a, E3B8_V3* b, int c, Unk80379324* d);
+};
+struct E3B8_Arg5 {
+    char pad0[8];
+    virtual void s1();
+    virtual void s2(int a, int b, int c);
+};
+struct E3B8_VB27 {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12(int a, E3B8_Arg5* b, float f1, float f2);
+    virtual E3B8_Obj31* s13();
+};
 struct V4F {
     float x;
     float y;
@@ -709,6 +777,49 @@ extern "C" void fn_8037E118(Unk8037E118* o, char* data, int len)
                 i++;
             }
         } while (i < o->m4 - 1);
+    }
+}
+
+extern int lbl_8062427C;
+inline void CpQ(Unk80379324* d, const Unk80379324& s)
+{
+    *d = s;
+}
+inline void CpV(E3B8_V3* d, const E3B8_V3& s)
+{
+    *d = s;
+}
+extern int lbl_8062427C;
+extern "C" void fn_8037E3B8(E3B8_Arg0* o, int arg1, int* keys, int n, E3B8_Arg4* a4, E3B8_Arg5* a5)
+{
+    int k0 = lbl_8062427C;
+    for (int i = 0; i < n; i++) {
+        int key = keys[i];
+        if (key == -1) {
+            a5->s2(k0, 0, 0);
+        } else if (key == -2) {
+            a5->s2(k0, 0, 1);
+        } else {
+            E3B8_VB27* p = ((E3B8_VB27 * (*)(E3B8_Arg0*, int)) fn_8037E600)(o, key);
+            if (p != 0) {
+                E3B8_Obj31* q = p->s13();
+                if (a4 != 0 && q != 0) {
+                    E3B8_V3 sp8;
+                    if (q->s15() != 0) {
+                        Unk80379324 sp18;
+                        a4->s2(q->s14(), &sp8, 0, &sp18);
+                        CpQ(&q->m10, sp18);
+                        q->m4 = sp8;
+                    } else {
+                        a4->s2(q->s14(), &sp8, 0, 0);
+                        q->m4 = sp8;
+                    }
+                }
+                int kk = keys[i] << 4;
+                E3B8_Ent* e = (E3B8_Ent*)(kk + (int)o->m8);
+                p->s12(arg1, a5, e->m8, e->mC);
+            }
+        }
     }
 }
 
