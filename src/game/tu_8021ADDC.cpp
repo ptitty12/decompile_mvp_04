@@ -35,7 +35,56 @@ inline float UF(unsigned v)
 }
 
 extern float lbl_805D6148[1];
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8026D730(Unk8026C414_O* o, Unk8026C414_X* x);
 extern "C" {
+
+void fn_801EDE78(Task* t, int x);
+struct Unk8021C24C_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x928 - 0x6C];
+    Player* m928;
+};
+void fn_8021C24C(Task* t, Player* p)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8021C24C_Obj* cur = (Unk8021C24C_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    Rec16* r = (Rec16*)((char*)t->m9C + (t->m9C->m3A5C * 0x10 + 0x9F4));
+    cur->m928 = p;
+    int s = fn_80211BB0(&t->m9C->mC0, t->m9C->m3A5C);
+    if (s != -1) {
+        fn_80211BA0(&t->m9C->mC0, s);
+        r->mC = 1;
+        fn_801EDE78(t, 0);
+    }
+    int isX = fn_8026D730((Unk8026C414_O*)p, 0) == 1;
+    e->m4 = isX ? 3 : 0x1F;
+    e->m9C = 1;
+    e->m0 = 0x1A;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m28 = p;
+    e->m80 = -1.0f;
+    e->m94 = 1;
+    const Vec3f* pc = &cur->m60;
+    Vec3f d = lbl_806055AC - *pc;
+    e->m50 = d;
+    if (s != -1)
+        r->m4 = s;
+}
 
 void fn_8021C424(Task* t, int a)
 {
