@@ -331,6 +331,24 @@ void fn_801B4C6C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
     }
 }
 
+struct Unk801B4D2C_Five {
+    float a[5];
+};
+extern Unk801B4D2C_Five lbl_805CF7B4;
+unsigned fn_801B616C(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+
+void fn_801B4D2C(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    Unk801B4D2C_Five tbl = lbl_805CF7B4;
+    unsigned k = q->m4C8 - 0xF;
+    int idx = 0;
+    if (k <= 4) {
+        idx = k;
+    }
+    float f = tbl.a[idx];
+    *acc += (unsigned)((float)fn_801B616C(p, q) * f);
+}
+
 void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
 {
     if (q->m708 == (p->m8->m6F8->m14[2].m8 == 0)) {
