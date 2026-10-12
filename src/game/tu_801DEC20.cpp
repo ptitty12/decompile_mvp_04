@@ -231,6 +231,47 @@ Z:
     r->mC = ok;
 }
 
+struct Unk801DF5C8_Q {
+    char pad0[0x38];
+    int m38;
+};
+inline Vec3 Unk801DF5C8_Flat(const Vec3& p)
+{
+    Vec3 r = p;
+    r.y = 0.0f;
+    return r;
+}
+
+extern "C" void fn_801DF5C8(I* i, Rec* r, P* p)
+{
+    if (((Unk801DF5C8_Q*)i->m9C->m0->m700->m3B0)->m38 != 0) {
+        r->m4 = 4;
+        r->mC = 3;
+        const Vec3* pv = &p->m60;
+        Vec3 w = fn_801E0A6C(i, p, &Unk801DF5C8_Flat(*pv), 0);
+        r->m64 = w;
+        fn_8035B710(r, 1);
+        fn_801DD4A8(&i->m134, p->m460, 0);
+    } else {
+        Unk801DB948_Vec4 v = fn_801E6E7C(i, p->m460, 2);
+        if (fn_801E08E0(i, p, &v) == 1) {
+            r->m4 = 4;
+            r->mC = 3;
+            Vec3 w = fn_801E0A6C(i, p, &v, v.w);
+            Put(&r->m64, w);
+            fn_8035B710(r, 1);
+            if (v.w == 0)
+                fn_801DD4A8(&i->m134, p->m460, 0);
+        } else {
+            r->m4 = 8;
+            r->m28 = v;
+            Vec3 w = fn_801E0A6C(i, p, &v, v.w);
+            Put(&r->m64, w);
+            fn_8035B710(r, 1);
+        }
+    }
+}
+
 extern "C" void fn_801DFF5C(I* i, Rec* r, P* p)
 {
     r->m4 = 4;
