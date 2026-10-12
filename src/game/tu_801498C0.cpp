@@ -6,6 +6,10 @@
 
 #include "game/tu_8001FDA8.h"
 #include "game/tu_802ACD88.h"
+extern const char lbl_805C507C[];
+extern const char lbl_805C508C[];
+extern const char lbl_805C50F0[];
+extern const char lbl_805C5100[];
 struct Unk8014A468_Obj {
     int m0;
     char pad4[4];
@@ -577,6 +581,29 @@ int fn_8014A740(Unk8014A740_Obj* p, int a, int b)
         return 1;
     }
     return 0;
+}
+
+void fn_8014A784(void* self, int a, int b, int c, int d, int e)
+{
+    char s1[0x100] = "";
+    int h;
+    *(int*)self = a;
+    fn_8014A290(self, (int)s1, a);
+    char s2[0x100] = "";
+    fn_804089B4(s2, lbl_805C507C, lbl_805C4DD4);
+    char s3[0x100] = "";
+    if (fn_803FEE14(s2, 0x64) == 0) {
+        if (fn_803FEBDC(s2, 6, 0x64, &h) == 0)
+            return;
+        fn_804089B4(s3, lbl_805C508C, s1, b, c, d, e);
+    } else {
+        if (fn_803FEBDC(s2, 0, 0x64, &h) == 0)
+            return;
+        fn_804089B4(s3, lbl_805C50F0, s1, b, c, d, e);
+    }
+    fn_8014A2B8(self, h, fn_803FECF8(h, 0x64), s3);
+    fn_803FEC9C(h, 0x64);
+    fn_8014A1BC(self, (int)lbl_805C5100, s1);
 }
 
 void* fn_8014A928(void* self)
