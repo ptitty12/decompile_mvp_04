@@ -20,17 +20,13 @@ inline int EntLevel(Unk8024EF40_Ent* e)
     return *((unsigned char*)e + 0x1CC9);
 }
 
-/* near-miss (parked, 28 vs 28 insns, 8 slots): only the callee-saved pair is swapped (retail self=r31, p=r30; ours the reverse);
-   no passthru hit, extra uses of self not found */
 int fn_8025F7F0(I* self, P* p)
 {
-    int r = 0;
-    if (p != 0) {
-        if (fn_8026BE3C(self, p) == 0)
-            fn_8025F89C(self, p);
-        r = fn_8026BE3C(self, p) != 0;
-    }
-    return r;
+    if (p == 0)
+        return 0;
+    if (fn_8026BE3C(self, p) == 0)
+        fn_8025F89C(self, p);
+    return fn_8026BE3C(self, p) != 0;
 }
 
 void fn_8025F860(I* self, P* p, int a)
