@@ -249,7 +249,7 @@ void fn_80201738(Unk801EE438_G* g);
 void fn_802121D0(int* s);
 void fn_80204AC8(Unk801EE438_Sub6A8* s);
 Unk801EE438_Player* fn_801EDE4C(Unk801EE438_Scr* p, Unk801EE438_Game* g);
-void fn_801F2668(Unk801EE438_Scr* p, void* out, void* v, int k);
+float fn_801F2668(Unk801EE438_Scr* p, void* out, void* v, int k);
 void fn_8024FC74(void* sub, int a);
 void fn_8014E09C(Unk801EE438_It* it, Unk801EE438_Owner* owner, int k);
 void fn_8014E108(Unk801EE438_It* it);
