@@ -5,10 +5,32 @@
 
 #include "game/fe_804E02E0.h"
 
+/* Q16-DECL-BEGIN */
+extern "C" void fn_800B8268(FeB8144* b, float a, float c, float d, float e);
+struct FeP4SlotX {
+    int a;
+    unsigned char b;
+    int c;
+};
+struct FeP4RecX {
+    int m0;
+    int m4;
+    unsigned m8;
+    int mC;
+    FeP4SlotX s[0x68];
+    int m4F0;
+};
+struct FeP4TabX {
+    int m0;
+    FeP4RecX e[4];
+};
+/* Q16-DECL-END */
+
 extern char lbl_80667378[];
 extern char lbl_80667390[];
 
 extern char lbl_8066B4E0[];
+
 extern "C" FE_OVERLAY FeScrRaw* fn_804EA2E4(FeScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -373,4 +395,12 @@ extern "C" FE_OVERLAY int fn_804ECCEC(FeS15* self)
         fn_8001BC4C()->fn_8001BDAC(0xA3);
     }
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_804ECD6C()
+{
+    fn_800B82D0(fn_800B8144(), -1, 1);
+    fn_800B8144()->m1C = (FeVf)fn_804ECD6C;
+    fn_800B82D0(fn_800B8144(), 8, 0);
+    fn_800B8268(fn_800B8144(), 260.0f, 115.0f, 340.0f, 215.0f);
 }
