@@ -175,6 +175,14 @@ inline void Unk801984FC_Scale(Unk80183918_Vec3* v, float s)
     v->m8 *= s;
 }
 
+struct Unk80379324 {
+    Unk80379324();
+    float m0, m4, m8, mC;
+};
+extern "C" {
+float sqrtf(float x);
+}
+
 //@BODY
 //@80194D44
 extern "C" int fn_80194D44(Unk80194D44_O* o)
@@ -316,9 +324,6 @@ extern "C" int fn_80195FD8(Unk80194D44_O* o, float t)
 }
 
 //@801964C8
-//@801964C8
-//@801964C8
-//@801964C8
 extern "C" int fn_801964C8(Unk801964C8_O* o, float* out, float t)
 {
     t -= o->m44;
@@ -355,8 +360,44 @@ extern "C" float fn_80196990(Unk80195404* o, Unk801973F4_P* a, Unk801973F4_P* b,
     return frac;
 }
 
-//@801973F4
-//@801973F4
+inline void Unk801971B8_Lerp(Unk80379324* q, const float* pa, const float* pb, float s)
+{
+    if (!(pa[0] * pb[0] + pa[1] * pb[1] + pa[2] * pb[2] + pa[3] * pb[3] <= 0.0f)) {
+        q->m0 = s * (pb[0] - pa[0]) + pa[0];
+        q->m4 = s * (pb[1] - pa[1]) + pa[1];
+        q->m8 = s * (pb[2] - pa[2]) + pa[2];
+        q->mC = s * (pb[3] - pa[3]) + pa[3];
+    } else {
+        q->m0 = pa[0] - s * (pb[0] + pa[0]);
+        q->m4 = pa[1] - s * (pb[1] + pa[1]);
+        q->m8 = pa[2] - s * (pb[2] + pa[2]);
+        q->mC = pa[3] - s * (pb[3] + pa[3]);
+    }
+}
+
+//@801971B8
+/* near-miss (99.99%): identical instructions; only the stack slot of the reciprocal float differs (retail
+ * 0x74 in the gap after the second float parameter slot 0x70, here 0x7C). Named return value (`return r`) keeps the
+ * result in the hidden-pointer slot; the copy ctor call goes through an int-returning cast for the argument order. */
+extern "C" Unk80189C38_Vec4 fn_801971B8(Unk80195404* o, float t) return r
+{
+    Unk801973F4_P a;
+    Unk801973F4_P b;
+    float f = fn_80196990(o, &a, &b, t);
+    Unk80379324 q;
+    float s = f;
+    float* pa = (float*)&a;
+    float* pb = (float*)&b;
+    Unk801971B8_Lerp(&q, pa, pb, s);
+    float n = q.m0 * q.m0 + q.m4 * q.m4 + q.m8 * q.m8 + q.mC * q.mC;
+    float inv = 1.0f / sqrtf(n);
+    q.m0 *= inv;
+    q.m4 *= inv;
+    q.m8 *= inv;
+    q.mC *= inv;
+    ((int (*)(void*, const char*))fn_8037936C)(&r, (const char*)&q);
+}
+
 //@801973F4
 extern "C" int fn_801973F4(Unk80195404* o, float t)
 {
