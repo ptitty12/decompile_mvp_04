@@ -9,6 +9,18 @@ typedef Unk8024EF40_P P;
 typedef Unk8024EF40_W W;
 typedef Unk8024EF40_Q Q;
 
+extern const float lbl_805D9BC8;
+extern const float lbl_805D9BCC;
+extern const float lbl_805D9BD0;
+extern const float lbl_805D9BD4;
+extern float lbl_805D9BE0[1];
+struct Unk80270BA0_X;
+float fn_8024D050(Unk80270BA0_X* x, int a, int b, float f1, float f2);
+inline float Unk80252EB8_Clamp(float x)
+{
+    return !(x > lbl_805D9BE0[0]) ? (x >? lbl_805D9BD4) : lbl_805D9BE0[0];
+}
+
 extern "C++" {
 int fn_80250AC4(P* x);
 int fn_80250A90(P* x, int k);
@@ -195,7 +207,7 @@ struct Unk80253678_V : Unk80256A90_Data {
     virtual void v21();
     virtual int v22();
 };
-void fn_80252EB8(C* self, float v);
+extern "C" void fn_80252EB8(C* self, float v);
 extern const float lbl_805D9C20;
 extern const float lbl_805D9C24;
 extern const float lbl_805D9C28;
@@ -475,6 +487,34 @@ extern "C" void fn_80252DF4(char* p, float v)
     float m = n * v;
     self->m24 = m;
     fn_80252EB8(self, lbl_805D9BB8);
+}
+
+/* a, b and c are only stored (retail keeps three float-store spills at 0xC..0x14 that nothing reads back) */
+extern "C" void fn_80252EB8(C* self, float v)
+{
+    float a = lbl_805D9BC8;
+    float b = lbl_805D9BCC;
+    float c = lbl_805D9BD0;
+    float d = fn_8024D050((Unk80270BA0_X*)self->m4, 4, 3, lbl_805D9BC8, lbl_805D9BCC);
+    d = d + lbl_805D9BD0;
+    self->m24 = self->m24 - v * d;
+    if (!(self->m24 >= lbl_805D9BD4))
+        self->m24 = lbl_805D9BD4;
+    float t = (float)fn_80254374(&self->m4->m588, 0);
+    if (!(t > lbl_805D9BD4)) {
+        self->m28 = lbl_805D9BD4;
+    } else {
+        self->m28 = self->m24 / t;
+        self->m28 = Unk80252EB8_Clamp(self->m28);
+    }
+    char* g = lbl_8068CCA8;
+    *(int*)(g + 8) = 0;
+    int n = fn_80254374(&self->m4->m588, 0);
+    *(int*)(g + 8) = 1;
+    float nf = (float)n;
+    int val = (int)(nf * self->m28 + lbl_805D9BC8);
+    P* p = self->m4;
+    fn_80089EE0((Unk80089894_PackTabD*)((char*)EntOf(p) + 0xC74), 0x1B, p->m70C, val);
 }
 
 void fn_8025309C(C* self, float v)
