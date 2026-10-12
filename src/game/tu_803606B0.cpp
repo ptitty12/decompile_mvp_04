@@ -161,6 +161,23 @@ extern "C" void fn_80360AF0(U* self, int chrg)
         fn_80377408(self);
 }
 
+struct Unk8052E408_Obj {
+    char pad0[0x14];
+    const void* m14;
+};
+
+extern "C" void fn_80360AB4(Unk8052E408_Obj* self);
+
+extern char lbl_80682810[];
+
+extern "C" Unk8052E408_Obj* fn_80360B24(Unk8052E408_Obj* self)
+{
+    fn_80360AB4(self);
+    self->m14 = lbl_80682810;
+    return self;
+}
+
+
 extern "C" void fn_80360B60(U* self, int chrg)
 {
     fn_8035686C(self, chrg);
