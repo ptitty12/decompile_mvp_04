@@ -389,6 +389,38 @@ extern const float lbl_805D5C58;
 extern "C" float fn_804028E4(float x); /* square root */
 extern "C" void fn_8040A208(void* base, int n, int size, int (*cmp)(CmpPos*, CmpPos*));
 
+extern "C" void* fn_8040B320(void* dst, int c, unsigned n, ...);
+extern "C" void fn_801DC8C4(void* o, Vec3f* out);
+extern "C" void fn_8021183C(Unk802116B4* o, Vec3f* pos, int flag);
+
+struct Unk80211778_C {
+    char pad0[0x3B8];
+    void* m3B8;
+};
+
+struct Unk80211778_V : Vec3f {
+    Unk80211778_V() { fn_8040B320(this, 0, 12); }
+};
+
+inline Vec3f FlatXZ1778(const Vec3f& v)
+{
+    Unk80211778_V r;
+    r.x = v.x;
+    r.z = v.z;
+    return r;
+}
+
+/* by-value copies through two inline layers (each "Vec3f t = f(v); return t;" adds one 12-byte copy in retail) */
+inline Vec3f Pass1778A(const Vec3f& v) { Vec3f t = FlatXZ1778(v); return t; }
+inline Vec3f Pass1778B(const Vec3f& v) { Vec3f t = Pass1778A(v); return t; }
+extern "C" void fn_80211778(Unk802116B4* o, int flag)
+{
+    Vec3f pos;
+    fn_801DC8C4(((Unk80211778_C*)o->m0->m0->m700)->m3B8, &pos);
+    pos = Pass1778B(pos);
+    fn_8021183C(o, &pos, flag);
+}
+
 inline Vec3f Flat183C(PosObj* o)
 {
     Vec3f v = o->m60;
