@@ -3,6 +3,7 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" void fn_8047D24C(void* p, void* a, int b);
 
 /* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
 extern "C" FE_OVERLAY FeScrArr2* fn_8047BB8C(FeScrArr2* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -138,6 +139,28 @@ extern "C" FE_OVERLAY int fn_8047C2E0(void* x, FeW* w, int b, int c, int d)
         r = 1;
     }
     return r;
+}
+
+extern "C" FE_OVERLAY void fn_8047C35C(FeScrArr2* self)
+{
+    FeArr* s = &self->mD78;
+    void* g = lbl_8061930C;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->Reset();
+    s->m14 = 0;
+    fn_80535360((void**)s, self->m394);
+    unsigned n = s->m4;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        int e = FePick(self->mD78.m0, i * 4);
+        float f = ((float (*)(int, int))fn_8007824C)(e, 0);
+        int* p = (int*)((char*)self + 0x3A0) + i * 5;
+        *p = e;
+        fn_8047D1AC(p, f);
+        fn_8047D24C(p, g, e);
+    }
+    self->fn_vslot80(1);
+    fn_8049A988(self->m374);
 }
 
 extern "C" FE_OVERLAY int fn_8047C444(char* x, int key)
