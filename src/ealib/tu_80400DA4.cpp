@@ -61,6 +61,28 @@ extern "C" int fn_80400E84()
     return lbl_806EEADC;
 }
 
+extern int lbl_806EEAD4;
+extern void (*lbl_8062EE20[8])(void);
+
+extern "C" int fn_80400E8C(unsigned x)
+{
+    return (x >= 0x80003100 && x <= 0x82FFFFFF)
+        || (x >= 0xC0003100 && x <= 0xC2FFFFFF)
+        || (x >= 0xE0000000 && x <= 0xE0004000)
+        || (x >= 0xC8000000 && x <= 0xC8083FFF)
+        || (x >= 0x7E000000 && x <= 0x7FFFFFFF);
+}
+
+extern "C" void fn_80400EF8()
+{
+    lbl_806EEAD4++;
+    for (int i = 0; i < 8; i++) {
+        void (*f)(void) = lbl_8062EE20[i];
+        if (f != 0)
+            f();
+    }
+}
+
 extern "C" void fn_80400F54()
 {
     OSReport(lbl_8060E8E8);
@@ -84,20 +106,76 @@ extern "C" void fn_80400FE4(char* s)
     OSReceiveMessage(s + 4, &msg, 1);
 }
 
-struct DtorAt0 { const void* m; };
-
-extern "C" void fn_80401710(DtorAt0*, int);
-
-extern "C" void fn_804017B0(DtorAt0* s, int chrg)
+extern "C" unsigned fn_80401010(const unsigned char* a, const unsigned char* b, unsigned n)
 {
-    fn_80401710(s, chrg);
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        if (*a++ != *b++)
+            break;
+    }
+    return i;
 }
 
-extern "C" void fn_804017D0(DtorAt0*, int);
+extern "C" int fn_80401548(int a, int v, unsigned char* buf);
 
-extern "C" void fn_80401904(DtorAt0* s, int chrg)
+extern "C" int fn_80401610(int a, int v, unsigned char* buf, int flag)
 {
-    fn_804017D0(s, chrg);
+    return fn_80401548(a, v, flag ? buf : 0);
+}
+
+extern "C" int fn_80401924(int a, const unsigned char* p, int b);
+
+extern "C" int fn_80401710(const unsigned char* p, int a);
+
+extern "C" int fn_804017B0(const unsigned char* p, int a)
+{
+    return fn_80401710(p, a);
+}
+
+extern "C" int fn_804017D0(const unsigned char* p)
+{
+    int r = 0;
+    if (p[1] == 0xFB) {
+        switch (p[0] & 0xFE) {
+        case 0x10:
+        case 0x18:
+        case 0x1A:
+        case 0x1E:
+        case 0x30:
+        case 0x32:
+        case 0x34:
+        case 0x46: {
+            const unsigned char* q = p + 2;
+            r = (p[2] << 16) | (q[1] << 8) | q[2];
+            break;
+        }
+        case 0x90:
+        case 0x98:
+        case 0x9A:
+        case 0x9E:
+        case 0xB0:
+        case 0xB2:
+        case 0xB4:
+        case 0xC6: {
+            const unsigned char* q = p + 2;
+            r = (p[2] << 24) | (q[1] << 16) | (q[2] << 8) | q[3];
+            break;
+        }
+        case 0xC0:
+            break;
+        }
+    }
+    return r;
+}
+
+extern "C" int fn_80401904(const unsigned char* p)
+{
+    return fn_804017D0(p);
+}
+
+extern "C" int fn_80401BBC(int a, int b)
+{
+    return (int)(((long long)a * b + 0x8000) >> 16);
 }
 
 extern "C" void fn_80402570(int a, int b);
