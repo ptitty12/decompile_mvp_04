@@ -42,7 +42,7 @@ struct SndAemsVolatileView {
 };
 #define SNDAEMS_V (*reinterpret_cast<SndAemsVolatileView*>(&sndaems))
 
-struct Vp6ListHead {
+struct StreamListHead {
     CListDNode* phead;
 };
 
@@ -77,7 +77,7 @@ int fn_803A6D80(int priority)
     CListDNode* head = sndaems.freestreams.GetHead();
     if (head != NULL) {
         CListDNode* next = head->GetNext();
-        reinterpret_cast<Vp6ListHead*>(&sndaems.freestreams)->phead = next;
+        reinterpret_cast<StreamListHead*>(&sndaems.freestreams)->phead = next;
         if (next != NULL) {
             next->SetPrev(NULL);
         }
