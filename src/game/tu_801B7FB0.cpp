@@ -601,6 +601,74 @@ extern "C" void fn_801BA288(B* u, unsigned i)
     }
 }
 
+class Unk801BA2B0_Ev {
+public:
+    Unk801BA2B0_Ev(int id) { m0 = id; }
+    int m0;
+    virtual ~Unk801BA2B0_Ev() {}
+};
+class Unk801BA2B0_E39 : public Unk801BA2B0_Ev {
+public:
+    Unk801BA2B0_E39() : Unk801BA2B0_Ev(0x39)
+    {
+        m8 = 0;
+        m18 = 0;
+        m1C = -1.0f;
+    }
+    virtual ~Unk801BA2B0_E39() {}
+    int m8;
+    int mC;
+    float m10;
+    char m14;
+    char m15;
+    char m16;
+    int m18;
+    float m1C;
+};
+extern "C" void fn_802A9C34__11Unk802A9C34ifcicc(Unk801BA2B0_E39* e, int a, float f, unsigned char b, int c, unsigned char d, unsigned char g);
+extern "C" float fn_8018A214(P* p);
+extern "C" void fn_8018959C(Vec3* out, P* p, float f);
+extern "C" float fn_8018CDB8(P* p, int k, float f);
+extern "C" int fn_801BFA20(const Vec3* v);
+extern "C" int fn_801BFA54(const Vec3* v);
+extern "C" void fn_801BFCEC(void* o, P* p);
+extern "C" int fn_801BC660(A* a, P* q, P* p3, int mode, int flag);
+extern "C" P* fn_801A4B34(P* p);
+struct Unk80256C80_M;
+void fn_80257F3C(Unk80256C80_M* m, int i);
+extern "C" void fn_801BA2B0(B* u)
+{
+    P* p = u->m4->m6CC;
+    float lim = 1.4f;
+    if (p->m38C == 1 && u->m14 != 0) {
+        float d = p->m3F0 - p->m3F4;
+        if (!(d > fn_8018A214(p))) {
+            Vec3 v;
+            fn_8018959C(&v, p, d);
+            v.y = 0.0f;
+            int t = fn_801BFA20(&v);
+            if (t != 0) {
+                u->m14 = 0;
+            } else if (d < 1.4f || fn_801BFA54(&v) == 0) {
+                u->m14 = t;
+            } else {
+                float c = fn_8018CDB8(p, 0x19, 0.0f);
+                if (!(p->m3F4 < c)) {
+                    u->m14 = t;
+                    if (fn_801BC660(u->m8, fn_801A4B34(u->m4), 0, 7, 1) == 1) {
+                        fn_801BFCEC(u->m8->mC, p);
+                        fn_80257F3C((Unk80256C80_M*)*(int*)((char*)u->m4->m700 + 0x3B4), 1);
+                        fn_8037893C(&u->m4->m704, 0x4A, 0, 0, 0);
+                        Unk801BA2B0_E39 m;
+                        fn_802A9C34__11Unk802A9C34ifcicc(&m, 7, 0.0f, *(unsigned char*)((char*)fn_801A4B34(u->m4) + 0x70C), -1, 0xFF, 0xFF);
+                        fn_8037893C(&u->m4->m704, m.m0, &m, 0, 0);
+                    }
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_801BA4A8(void) {}
 
 extern "C" void fn_801BA4AC(void) {}
