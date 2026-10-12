@@ -7,7 +7,6 @@
  */
 #include "snd/cmn/sndcmn.h"
 
-extern int lbl_80625448;
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
 extern "C" void fn_803B4160(int shandle, int cutoff);
@@ -20,6 +19,15 @@ extern "C" unsigned int fn_803B53DC(int h);
 extern "C" int fn_803FE914(int h);
 extern "C" void fn_803FDD78(int h, int v);
 extern "C" void fn_803AD258(int shandle, int v);
+
+extern unsigned char lbl_8069C9E4[7];
+extern int lbl_8062543C;
+extern "C" int fn_803AC5CC();
+
+extern const signed char lbl_80609630[6][6];
+extern int lbl_80625448;
+
+/* SNDSTRM_setvol: reference structure from the ported sstvol.c; MVP's build differs in detail. */
 
 extern "C" Snd::SNDSTREAMREQUEST* fn_803AB310(int h)
 {
@@ -172,14 +180,71 @@ extern "C" int fn_803AB984(int h, int v)
     return 0;
 }
 
+extern "C" int fn_803AB9F0(int h, int sourceChannel, float volume)
+{
+    int i = 0;
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
+
+    if (pssc == 0) {
+        return -8;
+    }
+
+    if (sourceChannel == -1) {
+        for (; i < 6; i++) {
+            Snd::StreamVolSetState(&pssc->sourceChannelState[i], volume);
+        }
+    } else {
+        Snd::StreamVolSetState(&pssc->sourceChannelState[sourceChannel], volume);
+    }
+
+    int voice = SNDVOICEI_get(pssc->shandle);
+    if (voice >= 0) {
+        if (sourceChannel == -1) {
+            CHANPUB* pVoice = &sndgs.chan[voice];
+            bool volChanged = false;
+            for (i = 0; i < pVoice->numchan; i++) {
+                CHANPUB* pv = &sndgs.chan[pVoice->voices[i]];
+                int sourceVoice = pVoice->voices[i];
+
+                if (pv->programmedVol != volume) {
+                    pv->programmedVol = volume;
+                    Snd::Util::FastVol(pv);
+                    volChanged = true;
+                    Snd::Hal::SetVol(sourceVoice);
+                }
+            }
+            if (volChanged) {
+                for (i = 0; i < lbl_80625448; i++)
+                    SNDPLATFORM_setfxlevel(voice, i);
+            }
+        } else {
+            CHANPUB* pVoice = &sndgs.chan[voice];
+            int channelIndex = lbl_80609630[pVoice->numchan - 1][sourceChannel];
+            if (channelIndex == -0x80)
+                goto done;
+
+            CHANPUB* pv = &sndgs.chan[pVoice->voices[channelIndex]];
+            int sourceVoice = pVoice->voices[channelIndex];
+
+            pv->fadePer100Hz = 0.0f;
+            if (pv->programmedVol != volume) {
+                pv->programmedVol = volume;
+                Snd::Util::FastVol(pv);
+                Snd::Hal::SetVol(sourceVoice);
+                for (i = 0; i < lbl_80625448; i++)
+                    SNDPLATFORM_setfxlevel(voice, i);
+            }
+        }
+    }
+
+done:
+    return 0;
+}
+
 extern "C" int fn_803ABEDC()
 {
     return -5;
 }
-
-extern unsigned char lbl_8069C9E4[7];
-extern int lbl_8062543C;
-extern "C" int fn_803AC5CC();
 
 extern "C" int fn_803AC11C()
 {
