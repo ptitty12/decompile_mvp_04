@@ -40,7 +40,7 @@ public:
 struct Unk8015F164_Evt {
     char pad0[4];
     float m4;
-    char pad8[4];
+    int m8;
     int mC;
 };
 

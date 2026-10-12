@@ -129,6 +129,7 @@ struct Unk80326F44_Out {
 struct Unk801527C8_Sub {
     void fn_80326EF4(float t, float k, int id, int a, int b, int flags);
     Unk80326F44_Out fn_80326F44(int id, int flag, float t);
+    Unk80326F44_Out fn_80326FC4(int id, int flag, float t);
     char pad0[0x40];
 };
 

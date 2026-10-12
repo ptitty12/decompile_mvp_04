@@ -90,6 +90,7 @@ struct Ev8015F348 { int m0; float m4; int m8; int mC; int m10; int m14; };
 inline int IsValidId(int id) { return id != 0xC7; }
 inline int Has8015F348(int v, int bit) { return (v & bit) != 0; }
 int fn_80324D74(void* e, int i);
+enum E1_8015F508 { E1_Neg = -1, E1_9 = 9, E1_12 = 12 };
 inline int Chance80162C28(void* rng, float k)
 {
     const char* nm = lbl_805C8C20;
@@ -207,6 +208,54 @@ extern "C" int fn_8015F348(Unk80159F28* self, Ev8015F348* e) /* 8015F348 */
         }
     }
     return 0;
+}
+
+extern "C" Unk80326F44_Out fn_8015F508(Unk80159F28* self, Unk8015F164_Evt* e) /* 8015F508 */
+{
+    Unk801527C8_Sub* s = &self->mC->m50;
+    int id1 = 0xC7;
+    switch ((E1_8015F508)e->m8) {
+    case 9:
+        id1 = 0xBC;
+        break;
+    case 10:
+        id1 = 0xBD;
+        break;
+    case 11:
+        id1 = 0xBE;
+        break;
+    case 12:
+        id1 = 0xBF;
+        break;
+    }
+    int id2 = 0xC7;
+    switch (e->mC) {
+    case 0:
+        break;
+    case 1:
+        id2 = 0xC0;
+        break;
+    case 2:
+        id2 = 0xC1;
+        break;
+    case 3:
+        id2 = 0xC2;
+        break;
+    }
+    Unk80326F44_Out a = lbl_805EBA10;
+    if (id2 != 0xC7) {
+        a = s->fn_80326FC4(id2, 1, 2000000.0f);
+        while (IsValid(a) && a.m8 != e->m8) {
+            a = s->fn_80326FC4(id2, 1, a.m4);
+        }
+    }
+    if (IsValid(a)) {
+        return a;
+    }
+    if (id1 != 0xC7) {
+        return s->fn_80326F44(id1, 1, -1.0f);
+    }
+    return lbl_805EBA10;
 }
 
 int Unk80159F28::fn_8015F744(Unk8015F744_Evt* e) /* 8015F744 */
