@@ -5,7 +5,6 @@
  * Every data object is extern by its lbl_ name.
  */
 
-extern "C" void fn_803FADD0(int, int);
 
 union RcH {
     int i;
@@ -62,7 +61,7 @@ extern "C" int fn_804002BC(const char*, ...);
 extern "C" void fn_80435D20(void*);
 extern "C" void fn_80435DFC(void*);
 extern "C" void fn_803FFC58(void*, int, int);
-extern "C" void fn_803F9A80(int);
+extern "C" int fn_803F9A80(int);
 extern "C" void fn_803FA410(int);
 extern "C" int fn_80400008(int);
 extern "C" void fn_80400CE4(int);
@@ -74,6 +73,45 @@ extern "C" RcJob* fn_803FA94C();
 extern "C" int fn_803FAA84(RcJob*);
 extern "C" void fn_803FA948(RcJob*);
 extern "C" char* strncpy(char*, const char*, unsigned);
+
+extern "C" void* memset(void*, int, unsigned, ...);
+extern "C" void fn_803F9EFC(int, int, int);
+struct RcB30x {
+    int w[12];
+};
+/* Object whose vptr sits at +0x44 (data-only base, then the virtuals). */
+struct RcPad44 {
+    char pad[0x44];
+};
+struct RcObj44 : RcPad44 {
+    virtual void v0();
+};
+
+extern "C" void fn_803FADD0(int, int);
+
+extern RcJob* lbl_806ADE60[3];
+extern char lbl_8060E790[];
+extern "C" int fn_803F9544(int, int, int, void*);
+extern "C" int fn_803F9434();
+extern "C" int fn_803F9464();
+
+extern "C" int fn_803F963C(int a, int b, int c);
+
+extern "C" void fn_80435CE8(void*);
+extern "C" void fn_803FEE70(void);
+
+extern "C" int strncmp(const char*, const char*, unsigned);
+extern char lbl_8060E7AC[];
+typedef void* (*RcAllocFn)(const char*, int, int);
+
+extern "C" void fn_803F9350(RcObj44* o, int* a, RcB30x* b, int c)
+{
+    o->v0();
+    *(int*)((char*)o + 8) = a[0];
+    *(RcB30x*)((char*)o + 0xc) = *b;
+    *(int*)((char*)o + 0x3c) = c;
+    *(int*)((char*)o + 0x40) = 0;
+}
 
 extern "C" int fn_803F93F4(int h)
 {
@@ -92,6 +130,47 @@ extern "C" int fn_803F9434()
 extern "C" int fn_803F9464()
 {
     fn_804002BC(lbl_8060E748);
+    return 0;
+}
+
+extern "C" int fn_803F9494(int a, int b, int c)
+{
+    RcBuf14* q = &lbl_806ADE8C;
+    if (q->m4 == 0) {
+        q->m4 = (int)fn_803F9434;
+        q->m8 = (int)fn_803F9464;
+    }
+    if (lbl_806ADE4C.m0 == 0) {
+        void* mem = ((void* (*)(const char*, int, int))q->m4)(lbl_8060E790, fn_803F963C(a, b, c), 0);
+        return fn_803F9544(a, b, c, mem);
+    }
+    return 0;
+}
+
+extern "C" int fn_803F9544(int a, int b, int c, void* mem)
+{
+    if (a == 0)
+        a = 0x18;
+    if (b == 0)
+        b = 0x800;
+    if (c == 0)
+        c = 0xa;
+    RcBuf14* q = &lbl_806ADE8C;
+    if (q->m4 == 0) {
+        q->m4 = (int)fn_803F9434;
+        q->m8 = (int)fn_803F9464;
+    }
+    if (lbl_806ADE4C.m0 == 0) {
+        lbl_806ADE4C.m18 = (RcJob*)mem;
+        lbl_806ADE4C.m8 = 0xff;
+        lbl_806ADE4C.m0 = c;
+        lbl_806ADE4C.m4 = a;
+        fn_80435CE8(lbl_806ADE74);
+        fn_803FFC58(lbl_806ADE4C.m18, 0, fn_803F963C(a, b, c));
+        lbl_806ADE4C.m1C = (char*)lbl_806ADE4C.m18 + lbl_806ADE4C.m0 * 0x30;
+        fn_803FEE70();
+        return 1;
+    }
     return 0;
 }
 
@@ -252,6 +331,19 @@ extern "C" int fn_803F9E90(RcJob* x, int a, int b)
     return j->m0;
 }
 
+extern "C" void fn_803FA068(int h, int k, RcJob* req)
+{
+    int sav = (lbl_806ADE64[0] + ((unsigned char*)&h)[3])->m10;
+    int x = fn_803F9A80(h);
+    if (k != 1) {
+        ((RcJob*)req->m10)->mC = 4;
+        fn_803FA410(req->m10);
+    } else {
+        h = fn_803F9D74((RcJob*)x, 0, req->m0, 0x800, sav, (int)req);
+        fn_803F96B0(h, (void (*)(int, int, int))fn_803F9EFC);
+    }
+}
+
 extern "C" void fn_803FA214(int a, int b, int p)
 {
     fn_803F9A80(a);
@@ -271,6 +363,28 @@ extern "C" int fn_803FA3B4(int (*cb)(int, int), int unused, int ctx, int arg)
 
 extern "C" void fn_803FA948()
 {
+}
+
+extern "C" RcJob* fn_803FA94C()
+{
+    int i = 0;
+    fn_80435D20(lbl_806ADE74);
+    for (; i < lbl_806ADE4C.m0; i++) {
+        if (*((unsigned char*)(lbl_806ADE4C.m18 + i) + 2) == 0) {
+            *((unsigned char*)(lbl_806ADE4C.m18 + i) + 2) = 1;
+            *((unsigned char*)(lbl_806ADE4C.m18 + i) + 3) = i;
+            lbl_806EEA90++;
+            if (lbl_806EEA90 == 0)
+                lbl_806EEA90 = 1;
+            *(unsigned short*)(lbl_806ADE4C.m18 + i) = lbl_806EEA90;
+            break;
+        }
+    }
+    fn_80435DFC(lbl_806ADE74);
+    if (i == lbl_806ADE4C.m0)
+        for (;;)
+            ;
+    return lbl_806ADE64[0] + i;
 }
 
 extern "C" void fn_803FAA38(void* p)
