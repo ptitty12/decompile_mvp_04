@@ -145,11 +145,6 @@ char* Unk802362A8_Slots::fn_80236BA0(int k)
     return (char*)this + (idx * 0x34 + 0x94);
 }
 
-float fn_802398C8()
-{
-    return lbl_805D7C18;
-}
-
 /* near-miss: retail presets li r3,0 and ends in a shared 'li r3,0; blr'; case 6 then returns through beqlr.
    Tried return-chain, int r preset (39 vs 41 insns) and empty-case-6 forms */
 int fn_80236F34(void* p, int k)
@@ -260,6 +255,11 @@ int Unk802362A8_Cpu::fn_80239448()
         return r;
     }
     return (unsigned)(b - 5) > 1;
+}
+
+float fn_802398C8(Unk8022FE34_W* w)
+{
+    return lbl_805D7C18;
 }
 
 void Unk802362A8_Cpu::fn_8023A13C()
