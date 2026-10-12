@@ -50,7 +50,7 @@ void fn_80329AAC(FxSing* p, int a);
 FxDate fn_80329FA0(char* p);
 int fn_8032A130(int a, int b, int c);
 void fn_80378D70(char* src, unsigned n, char* dst, int cap, int delim, int* outLen);
-void fn_80379094(char* s, int len, int a);
+int fn_80379094(char* s, int len, int a);
 double fn_80409D88(const char* s);
 int fn_80409DAC(const char* s);
 void fn_801A750C(void* v, int a);
@@ -161,22 +161,22 @@ void fn_803272F0(FxAI* self) {
 
 void fn_80328208() { fn_80327354(1, 0xFFFF); }
 
-/* near-miss: retail stores the second field before forming the lbl_805EBBF8 pool address */
 FxBase* fn_80328234(FxBase* self, int a, int b) {
+    const char* e = "";
     self->m14 = 0;
     self->m18 = lbl_80664020;
-    fn_8040B61C(self, lbl_805EBBF8);
+    fn_8040B61C(self, e);
     self->m20 = 0;
     self->m18 = lbl_80666F98;
     fn_80328318(self, a, b);
     return self;
 }
 
-/* near-miss: same as the neighbouring function */
 FxBase* fn_803282A8(FxBase* self, int a) {
+    const char* e = "";
     self->m14 = 0;
     self->m18 = lbl_80664020;
-    fn_8040B61C(self, lbl_805EBBF8);
+    fn_8040B61C(self, e);
     self->m20 = 0;
     self->m18 = lbl_80666F98;
     fn_80328318(self, 0x13, a);
@@ -343,12 +343,13 @@ void fn_80328858(void* tab, int n, int a) {
 
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
-/* near-miss: callee-saved lis registers for lbl_806202FC / lbl_806202F4 swapped */
 void fn_80329498() {
-    lbl_806202F4 = 1;
-    fn_80321628(&lbl_80691AEC, lbl_806202FC);
-    lbl_806202F4 = 0;
-    lbl_806202FC = 0;
+    int* a = &lbl_806202FC;
+    int* b = &lbl_806202F4;
+    *b = 1;
+    fn_80321628(&lbl_80691AEC, *a);
+    *a = 0;
+    *b = 0;
 }
 
 void fn_803294E8() {
@@ -486,7 +487,6 @@ void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim) {
     }
 }
 
-/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     int len = 0;
     fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
@@ -502,7 +502,6 @@ int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     return 1;
 }
 
-/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
     int len = 0;
     int ok = 1;
@@ -520,7 +519,6 @@ int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
     return ok;
 }
 
-/* near-miss: same as the neighbouring function */
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim) {
     int len = 0;
     int ok = 1;
