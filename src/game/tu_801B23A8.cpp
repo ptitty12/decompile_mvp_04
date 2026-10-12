@@ -629,12 +629,11 @@ void fn_801B37A0(void* p)
 
 int fn_801B37C0(void* a, Unk801B23A8_Q* q)
 {
-    int v = fn_8025416C(q->m588, 0x16);
-    if (v == 3) {
-        return 6;
-    }
-    if (v == 4) {
+    switch (fn_8025416C(q->m588, 0x16)) {
+    case 4:
         return 7;
+    case 3:
+        return 6;
     }
     return 5;
 }
@@ -642,7 +641,8 @@ int fn_801B37C0(void* a, Unk801B23A8_Q* q)
 int fn_801B380C(void* a, Unk801B23A8_Q* q)
 {
     int v = fn_8025416C(q->m588, 0x16);
-    return (v == 3 || v == 4) ? 4 : 3;
+    int x = 3, y = 4;
+    return (v == x || v == y) ? 4 : 3;
 }
 
 int fn_801B3850(Unk801AB63C_P* a, Unk801B23A8_Q* q, int c)
@@ -824,10 +824,16 @@ int fn_801B3FD8(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 
 int fn_801B3FD0() { return 0; }
 
-/* near-miss: retail loads the flag word straight into r3 (lwz r3 / srwi r3,r3), 2 slots differ. */
 int fn_801B40DC(void* a, Unk801B23A8_Q* q)
 {
-    return q ? q->m4C4 >> 31 : 0;
+    unsigned r;
+    if (q) {
+        r = q->m4C4;
+        r = r >> 31;
+    } else {
+        r = 0;
+    }
+    return r;
 }
 
 int fn_801B40F8(Unk801AB63C_P* a, Unk801B23A8_Q* q)
