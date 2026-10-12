@@ -4,8 +4,95 @@
  */
 #include "game/tu_8024B99C.h"
 #include "game/chooser.h"
+#include "game/tu_8026C414.h"
 #include "game/goals/tu_8027A84C.h"
 #include "game/goals/tu_8028C6B8.h"
+
+struct Unk80249070_A {
+    char pad0[0x38];
+    int m38;
+    char pad3C[0x4C - 0x3C];
+    float m4C;
+};
+struct Unk80256C80_M;
+int fn_80259440(Unk80256C80_M* self);
+float fn_8024902C();
+float fn_80249048(Unk80270BA0_X* x);
+float fn_80249064(Unk80270BA0_X* x);
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+extern const float lbl_805D93B8;
+inline float Unk80249070_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+struct Unk802494C4_Obj {
+    char pad0[0x110];
+    int m110;
+};
+struct Unk802494C4_C {
+    char pad0[0x6F8];
+    Unk8022FE34_Game* m6F8;
+    char pad6FC[0x738 - 0x6FC];
+    void* m738;
+};
+struct Unk802494C4_X {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+    char pad6C[0x44C - 0x6C];
+    Unk802494C4_C* m44C;
+    char pad450[0xAC4 - 0x450];
+    int mAC4;
+    char pad_AC8[0xAD0 - 0xAC8];
+    float mAD0;
+    Unk80273498_Vec3 mAD4;
+};
+extern Unk802494C4_Obj* lbl_8061FE10;
+extern const float lbl_805D9410;
+extern const float lbl_805D9414;
+extern const float lbl_805D9418;
+extern float lbl_8061D4C0;
+extern "C" void fn_8030D1E4(void* pp, int idx, Unk80273498_Vec3* a, void* b, int depth, float f);
+
+/* Views of the player object for fn_8024A468 (offsets from the asm). */
+struct Unk8024A468_Sub {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk8024A468_Ref {
+    char pad0[0x44];
+    int m44;
+};
+struct Unk8024A468_Ctx {
+    char pad0[0x54C];
+    Unk8024A468_Ref* m54C;
+    char pad550[0x6CC - 0x550];
+    Unk8026C414_M* m6CC;
+    char pad6D0[0x744 - 0x6D0];
+    Unk8024A468_Sub* m744;
+};
+struct Unk8024A468_X {
+    char pad0[0x44C];
+    Unk8024A468_Ctx* m44C;
+    char pad450[0x71C - 0x450];
+    unsigned m71C;
+    char pad720[0xAB8 - 0x720];
+    int mAB8;
+    char padABC[0xB20 - 0xABC];
+    char mB20[0xC];
+    char mB2C[0xC];
+    float mB38;
+    unsigned mB3C;
+};
+extern int lbl_8061D2B4;
+extern const float lbl_805D94C0;
+Unk8026C414_V3 fn_8026CB70(Unk8026C414_M* self, int i);
+extern "C" void fn_8038AC30(int a, float f, const Unk8026C414_V3& b, int c, void* d);
+
+extern "C" void fn_80244A64(Unk80270BA0_X* x, Unk8027C728_Goal* g, int flag);
+extern "C" void fn_8037EBE8(Unk80271DBC_Link* l);
+extern "C" void fn_803814A4(Unk80271DBC_Link* l, unsigned hash, int a, float b);
+extern const float lbl_805D94C4;
 
 /* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
  * unchanging, so sched1 keeps them below preceding stores (retail's order). */
@@ -162,15 +249,36 @@ float fn_8024902C()
     return r;
 }
 
-float fn_80249048()
+float fn_80249048(Unk80270BA0_X* x)
 {
     float r = lbl_805D93B4;
     return r;
 }
 
-float fn_80249064()
+float fn_80249064(Unk80270BA0_X* x)
 {
     return lbl_8061D4B4;
+}
+
+float fn_80249070(Unk80270BA0_X* x)
+{
+    float a = fn_8024902C();
+    float b = fn_80249048(x);
+    Unk80249070_A* ctl = (Unk80249070_A*)((char*)x + 0x58C);
+    float t = ctl->m4C;
+    if (x->m458 == 9 && ctl->m38 < 0) {
+        Unk8027107C_Outer* o = x->m44C->m700;
+        if (o != 0 && fn_80259440((Unk80256C80_M*)o->m3B4) != 0) {
+            float d = fn_80249064(x);
+            float e = d - (a - d);
+            float g = fn_8024D0C4(x, 0x3F, e, a);
+            b = g;
+        }
+    }
+    if (!(t >= lbl_805D93B8))
+        t = lbl_805D93B8;
+    float r = Unk80249070_Lerp(b, t, a);
+    return fn_80248F70(x, r);
 }
 
 float fn_80249188(Unk80270BA0_X* x, float f)
@@ -346,6 +454,23 @@ void fn_80249DF8(Unk80270BA0_X* x, int a)
     fn_80249D64(x, a);
 }
 
+void fn_8024A468(Unk8024A468_X* x)
+{
+    if (lbl_8061D2B4 == 0) {
+        Unk8024A468_Ctx* c = x->m44C;
+        int t = (x->m71C >> 12) & 1;
+        if (c->m744->m20 != 0 || c->m54C->m44 != 0)
+            t = 0;
+        if (x->mB38 != lbl_805D94C0 && t == 0) {
+            if (c->m6CC != 0 && (x->mB3C & 0x40000000) != 0) {
+                fn_8038AC30(x->mAB8, x->mB38, fn_8026CB70(c->m6CC, 1), 0, x->mB2C);
+            } else {
+                fn_8038AC30(x->mAB8, x->mB38, *(Unk8026C414_V3*)x->mB20, 0, x->mB2C);
+            }
+        }
+    }
+}
+
 void fn_8024A550(Unk80270BA0_X* x, float f)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
@@ -358,6 +483,28 @@ void fn_8024A550(Unk80270BA0_X* x, float f)
 void fn_8024A584(Unk80270BA0_X* x, float f)
 {
     ((Unk8024B99C_V*)x)->mB18 = f;
+}
+
+void fn_8024A59C(Unk80270BA0_X* x, int s)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    if (v->m264 != s) {
+        if (s != 0) {
+            fn_80244A64(x, 0, 0);
+            for (int i = 0; i < 3; i++) {
+                Unk80271DBC_Link* l = v->m618[i];
+                fn_8037EBE8(l);
+                fn_803814A4(l, 0, 0, lbl_805D94C4);
+            }
+        }
+        v->m264 = s;
+        if (s == 0 && v->m934 == 0) {
+            Unk8027C728_Goal* g = fn_802448F4(x, 1);
+            g->m10 = 2;
+            fn_8027C728(g);
+            fn_80244A64(x, g, 0);
+        }
+    }
 }
 
 void fn_8024A674(Unk80270BA0_X* x, Unk80273498_Pos* p) {}
