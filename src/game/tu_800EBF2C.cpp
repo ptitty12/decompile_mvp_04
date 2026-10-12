@@ -276,6 +276,50 @@ extern "C" UiN* fn_800ED2B0(UiS* self, const char* name)
     return 0;
 }
 
+void fn_800C7E90();
+UiS* fn_800C804C(UiS* p);
+UiS* fn_800C8050(UiS* p);
+UiS* fn_800C805C(UiS* p);
+class UiV39 : public UiS0 {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+  virtual void v36(); virtual void v37(); virtual void v38(); virtual int v39();
+};
+void fn_800ED310(UiS* self, int a)
+{
+    fn_800C7E90();
+    if (a == 0) {
+        for (UiS* n = self->m4; n != 0; n = n->m4) {
+            switch (n->m1C) {
+            case 11:
+                fn_800C805C(n)->v41();
+                ((UiV39*)fn_800C805C(n))->v39();
+                break;
+            case 8:
+                fn_800C8060(n)->v51();
+                fn_800C8060(n)->v53();
+                fn_800C8060(n)->v57();
+                fn_800C8060(n)->v55();
+                break;
+            case 6:
+                fn_800C804C(n)->v46();
+                fn_800C804C(n)->v48();
+                break;
+            case 7:
+                fn_800C8050(n)->v46();
+                fn_800C8050(n)->v48();
+                break;
+            }
+        }
+    }
+}
+
 void fn_800ED4CC(char* t, const char* s)
 {
     fn_8040B61C(t + 0x54, s);
