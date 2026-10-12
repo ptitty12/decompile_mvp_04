@@ -56,7 +56,9 @@ public:
 
 /* Deeper objects of the script run context (only the fields the commands read). */
 struct Unk801527C8_Team {
-    char pad0[0x1B4];
+    char pad0[0x198];
+    int m198;
+    char pad19C[0x1B4 - 0x19C];
     unsigned char m1B4[0x80];
     char pad234[0xD70 - 0x234];
     int mD70;

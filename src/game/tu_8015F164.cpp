@@ -79,6 +79,13 @@ inline int Pick80162FE4(int f)
     }
     return t;
 }
+extern "C" int fn_80326C20(Unk801527C8_Sub* s);
+inline int Chance2_801609EC(void* rng, float k)
+{
+    const char* nm = lbl_805C8C20;
+    unsigned r = fn_8014D8AC(rng, 1000000, nm, 0xAC8);
+    return (float)r * k * 0.000001f >= 0.85f;
+}
 inline int Chance80162C28(void* rng, float k)
 {
     const char* nm = lbl_805C8C20;
@@ -263,6 +270,72 @@ extern "C" void fn_80160640(Unk80159F28* self) /* 80160640 */
             self->fn_80157514(0x39, (int)&rec, 1, 4, 1, lbl_8068B828);
             fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
             self->m48 = 1;
+        }
+    }
+}
+
+/* near-miss (99.3%): instruction stream identical; retail keeps idx/sa/ta in r8/r7/r6 across the two sum loops, here r10/r8/r7 (same allocation issue as fn_80160E64; 11 declaration orders and 3 counter forms tried) */
+extern "C" void fn_801609EC(Unk80159F28* self) /* 801609EC */
+{
+    self->m48 = 0;
+    Unk801527C8_Sub* s = &self->mC->m50;
+    if (fn_80326C20(s) != 0) {
+        V2s80161924 v;
+        fn_80326ED4(s, &v.x, &v.y);
+        Unk80326F44_Out a = s->fn_80326F44(0xB1, 1, -1.0f);
+        if (IsValid(a)) {
+            Obj708_8015F164* o = (Obj708_8015F164*)fn_801A4B34(self->mC);
+            if (o != 0) {
+                Unk801527C8_Mgr* m = self->mC->m6F8;
+                if (m->fn_8006BE18() == 1) {
+                    fn_80160640(self);
+                } else {
+                    RecObj8015F164 rec;
+                    int id = 0x52;
+                    int idx = o->m708;
+                    Unk801527C8_Team* ta = &m->m14->m0[idx];
+                    int sa = 0;
+                    for (int i = 0; i < 128; i++) {
+                        sa += ta->m1B4[(unsigned char)i];
+                    }
+                    int z = idx == 0;
+                    Unk801527C8_Team* tb = &m->m14->m0[z];
+                    int sb = 0;
+                    for (int i = 0; i < 128; i++) {
+                        sb += tb->m1B4[(unsigned char)i];
+                    }
+                    if (ta->m198 == 0xB87DA69) {
+                        if (sa == sb || sa == sb + 1) {
+                            id = 0x51;
+                        }
+                    }
+                    switch (fn_8025416C__FP13Unk8024EF40_Wi((char*)o + 0x588, 0)) {
+                    case 0x153:
+                        id = 0x4D;
+                        break;
+                    case 0x294:
+                        id = 0x4F;
+                        break;
+                    case 0x2D4:
+                        id = 0x4E;
+                        break;
+                    case 0x340:
+                        id = 0x4C;
+                        break;
+                    case 0x4D7:
+                        id = 0x50;
+                        break;
+                    }
+                    int roll = 1;
+                    if (id == 0x52) {
+                        roll = Chance2_801609EC(self->mC->m554, 1.0f);
+                    }
+                    if (roll != 0) {
+                        self->fn_80157514(id, (int)&rec, 1, 0, 0, lbl_8068B828);
+                        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+                    }
+                }
+            }
         }
     }
 }
