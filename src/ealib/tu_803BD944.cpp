@@ -147,6 +147,38 @@ extern char lbl_80609E00[];
 extern char lbl_80685688[];
 extern char lbl_80685708[];
 
+struct EAGLFmt {
+    char pad0[8];
+    unsigned char m8;
+    char pad9;
+    unsigned short mA[1];
+};
+struct EAGLSelfFmt {
+    char pad0[0xC];
+    EAGLFmt* mC;
+};
+struct EAGLFld {
+    unsigned char kind;
+    unsigned char size;
+    unsigned char off;
+    ~EAGLFld() {}
+};
+
+extern "C" void fn_803BE184(EAGLSelfFmt* self, unsigned char* src, char* dst);
+struct EAGLObjQ {
+    virtual int v1(void*);
+};
+struct EAGLRows {
+    char pad0[6];
+    unsigned short m6;
+    unsigned char m8;
+    unsigned char m9;
+};
+struct EAGLSelfRows {
+    char pad0[0xC];
+    EAGLRows* mC;
+};
+
 extern "C" void* fn_803BDCFC(void* unused, unsigned short* p)
 {
     EAGLTypeK k;
@@ -299,6 +331,66 @@ extern "C" void fn_803BE0FC(void* unused, EAGLObjV* o)
     lbl_80626DD0->v9(o->m8s[1], o);
 }
 
+extern "C" void fn_803BE184(EAGLSelfFmt* self, unsigned char* src, char* dst)
+{
+    EAGLFmt* f = self->mC;
+    int v = 0;
+    int i = 0;
+    unsigned char bit = 0;
+    if (i < f->m8) {
+        unsigned short* p = f->mA;
+        do {
+            unsigned short d = *p++;
+            EAGLFld fld;
+            fld.kind = d >> 13;
+            fld.size = ((d >> 11) & 3) + 1;
+            fld.off = d;
+            switch (fld.kind) {
+            case 5:
+                v = *(int*)src;
+                src += 4;
+                break;
+            case 4:
+                v = *(unsigned short*)src;
+                src += 2;
+                break;
+            case 3:
+                v = *src;
+                src += 1;
+                break;
+            case 2:
+                bit += 4;
+                v = (*src >> (8 - bit)) & 0xF;
+                break;
+            case 1:
+                bit += 2;
+                v = (*src >> (8 - bit)) & 3;
+                break;
+            case 0:
+                bit += 1;
+                v = (*src >> (8 - bit)) & 1;
+                break;
+            }
+            if (bit > 7) {
+                src += 1;
+                bit = 0;
+            }
+            switch (fld.size) {
+            case 4:
+                *(int*)(dst + fld.off) = v;
+                break;
+            case 2:
+                *(short*)(dst + fld.off) = v;
+                break;
+            case 1:
+                *(char*)(dst + fld.off) = v;
+                break;
+            }
+            i++;
+        } while (i < f->m8);
+    }
+}
+
 extern "C" void fn_803BE4C0(const void** self, int chrg)
 {
     *self = lbl_80685708;
@@ -324,6 +416,36 @@ struct U {
 
 
 extern "C" void fn_803BE6B4(void* p, int flag);
+
+/* near-miss: lfsx/add index operands come out swapped (2 slots of 60); retail has the row base first. */
+
+extern "C" int fn_803BE594(EAGLSelfRows* self, EAGLObjQ* o, float t, float* out)
+{
+    int i = 0;
+    EAGLRows* r = self->mC;
+    if (i < r->m6) {
+        do {
+            unsigned char* base;
+            if (r->m8 & 1)
+                base = (unsigned char*)r + (r->m8 * 2 + 0xA);
+            else
+                base = (unsigned char*)((r->m8 * 2) + (int)r) + 0xC;
+            unsigned char* ofs = (unsigned char*)(i * r->m9);
+            unsigned char* row = ofs + (int)base;
+            float ti = *(float*)row;
+            if (!(ti <= t)) {
+                char buf[0x50];
+                fn_803BE184((EAGLSelfFmt*)self, row + 4, buf);
+                if (o->v1(buf)) {
+                    *out = ti;
+                    return 1;
+                }
+            }
+            i++;
+        } while (i < r->m6);
+    }
+    return 0;
+}
 
 extern "C" U* fn_803BE684(U* self, int flag)
 {
