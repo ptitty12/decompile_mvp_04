@@ -157,12 +157,19 @@ extern "C" float fn_805747E4(int a, int b);
 extern "C" float fn_80574830(int a, int b);
 extern "C" int fn_800A2AE8(void* p);
 inline void FEPut90(Unk800A6114_C* c, float v) { c->m90 = v; }
+
 inline void FEPut94(Unk800A6114_C* c, float v) { c->m94 = v; }
+
 inline void FEPut98(Unk800A6114_C* c, float v) { c->m98 = v; }
+
 inline void FEPut9C(Unk800A6114_C* c, float v) { c->m9C = v; }
+
 inline void FEPutQ90(Unk800A641C_Q* q, float v) { FEPut90(q->mC, v); }
+
 inline void FEPutQ94(Unk800A641C_Q* q, float v) { FEPut94(q->mC, v); }
+
 inline void FEPutQ98(Unk800A641C_Q* q, float v) { FEPut98(q->mC, v); }
+
 inline void FEPutQ9C(Unk800A641C_Q* q, float v) { FEPut9C(q->mC, v); }
 
 inline void FERecInit(Unk800A4F54_Rec* r)
@@ -174,6 +181,7 @@ inline void FERecInit(Unk800A4F54_Rec* r)
     r->m14 = 0;
     r->m18 = 0;
 }
+
 extern "C" void fn_800A4F54(Unk800A4F54* p)
 {
     char* sub = (char*)p + 0x2C;
@@ -244,6 +252,61 @@ extern "C" void fn_800A50F0(void* self, int (*arr)[2])
         sp8 = t;
         e1 = t;
     } while (e1 <= 1);
+}
+
+extern "C" int fn_8007F3A0(int g);
+extern "C" void fn_80078AE0(int g, int a, int* b, int* c, int* d, int* e);
+extern "C" int fn_8007FDF8(int g);
+extern "C" float fn_80079EFC(int g, int a);
+
+/* near-miss (99.5%): lim and idx take r30/r29 swapped */
+extern "C" int fn_800A588C(void* self, int idx)
+{
+    int g = lbl_8061930C;
+    int r = fn_8007F3A0(g);
+    if (r != 0) {
+        return r;
+    }
+    int h = fn_80075948(g, idx);
+    if (h != 0) {
+        int k = fn_80078A38(g, idx);
+        int lim = 0;
+        switch (k) {
+        case 0:
+            lim = 0x19;
+            break;
+        case 1:
+            lim = 0x14;
+            break;
+        case 2:
+            lim = 0x14;
+            break;
+        case 3:
+            lim = 0x14;
+            break;
+        }
+        if ((int)fn_8007F198(g, idx) < lim) {
+            return 5;
+        }
+    }
+    int a;
+    int b;
+    int c;
+    int d;
+    fn_80078AE0(g, idx, &a, &b, &c, &d);
+    if (d <= 9) {
+        return 3;
+    }
+    if (fn_8007FDF8(g) == 0xC || fn_8007FDF8(g) == 0xD) {
+        int one = *(int*)((char*)fn_8007FE04(g) + 0x1E0) == 1;
+        if (h != 0 && one) {
+            float s = fn_80079EFC(g, h);
+            if (s < 0.0f) {
+                return 7;
+            }
+        }
+    }
+    return 0;
 }
 
 struct Unk800A59F0 {
