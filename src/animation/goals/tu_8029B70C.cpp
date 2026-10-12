@@ -206,9 +206,6 @@ int fn_8029C4E4(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
     return state;
 }
 
-/* near-miss: 136 of 136 instructions, 2 swapped (retail loads g->mB8.x for the
- * by-value copy before reloading g->m4). Tried: member-call form, statement
- * orders, a local for g->m4, pointer arithmetic on the table. */
 int fn_8029C914(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     if (!x) {

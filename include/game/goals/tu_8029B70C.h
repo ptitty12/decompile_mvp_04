@@ -51,7 +51,7 @@ struct Unk8029B70C_Sub {
     char pad44[0x98 - 0x44];
     void* m98;
 
-    void fn_8028F45C(Unk80273498_Vec3 v);
+    Unk8029B70C_Sub* fn_8028F45C(Unk80273498_Vec3 v); /* returns the goal (tu_8028F178) */
     void fn_8028F528(Unk80273498_Vec3 v);
 };
 
