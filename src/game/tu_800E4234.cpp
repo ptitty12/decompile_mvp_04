@@ -243,7 +243,6 @@ int fn_800E4FDC()
     return 1;
 }
 
-/* near-miss: 5 slots, retail sets the local buffer address (`addi r3,r1,8`) after the integer arguments */
 void fn_800E4FE4(UiS* self, int x)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
