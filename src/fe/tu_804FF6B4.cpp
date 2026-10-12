@@ -5,6 +5,85 @@
 
 #include "game/fe_804FE34C.h"
 
+/* Q16-DECL-BEGIN */
+extern "C" FeW* fn_800C8040(FeW* w);
+/* Cursor list object embedded at +0x134 of the team-select screens: data pointer, count, capacity,
+ * cursor, then its own vptr at +0x10. */
+class FeLstV {
+public:
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+};
+
+inline int FeLstAtLast(FeLstV* l)
+{
+    if (l->m4 != 0)
+        return l->mC == l->m4 - 1;
+    return l->mC == 0;
+}
+
+struct FeScrLV : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeLstV ml;
+    char pad148[0x1EC - 0x148];
+    int m1EC;
+};
+extern "C" char* fn_800C8048(void* w);
+extern "C" void fn_8040074C(void* p, int n);
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A330[];
+extern const char lbl_806803F0[];
+struct FeAr {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* vp;
+    int m14;
+};
+inline void FeArBase(FeAr* a, int* buf, int cap)
+{
+    a->vp = lbl_8064B298;
+    a->m0 = buf;
+    a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+
+inline void FeArMid(FeAr* a)
+{
+    a->m4 = 0;
+    a->mC = 0;
+    a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
+
+inline void FeArD(FeAr* a)
+{
+    a->vp = lbl_8064A330;
+    a->m4 = 0;
+    a->mC = 0;
+    a->m14 = 0;
+}
+
+struct FeScrAr : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeAr ar;
+    int buf[40];
+};
+/* Q16-DECL-END */
+
 struct FeSub134 { int m0; int m4; int m8; int mC; };
 
 extern float lbl_805FB59C;
@@ -60,6 +139,17 @@ extern "C" FE_OVERLAY char* fn_804FF710(FeScrN* x, char* out)
     return fn_8040B61C(out, x->m134->fn_vslot70()->fn_vslot33(5, 1)->mC);
 }
 
+extern "C" FE_OVERLAY FeScrAr* fn_804FF780(FeScrAr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_806803F0);
+    self->m130 = 0;
+    FeArBase(&self->ar, self->buf, 0x28);
+    FeArMid(&self->ar);
+    FeArD(&self->ar);
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804FF834(FeScrD* x)
 {
     fn_800ECE34(x);
@@ -86,10 +176,44 @@ extern "C" FE_OVERLAY int fn_804FF8F8(FeS1EC* x, int a)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_804FF904(FeScrLV* x, int a)
+{
+    if (x->m1EC == a) {
+        FeLstV* l = (FeLstV*)&x->ml;
+        if (FeLstAtLast(l))
+            l->mC = 0;
+        else
+            ((FeLstV*)&x->ml)->v6();
+        fn_804FFBF4(x);
+        ((FeWX*)x->fn_vslot32(lbl_805FB57C, 1))->s15(1);
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" FE_OVERLAY int fn_804FF9EC(FeScrQ* x, int a)
 {
     if (x->m1EC == a) {
         ((FeWX*)x->fn_vslot32(lbl_805FB57C, 1))->s15(0);
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804FFA64(FeScrLV* x, int a)
+{
+    if (x->m1EC == a) {
+        FeLstV* l = (FeLstV*)&x->ml;
+        if (l->mC == 0) {
+            int c = l->m4;
+            int r = 0;
+            if (c != 0)
+                r = c - 1;
+            l->mC = r;
+        } else
+            ((FeLstV*)&x->ml)->v7();
+        fn_804FFBF4(x);
+        ((FeWX*)x->fn_vslot32(lbl_805FB588, 1))->s15(1);
         return 1;
     }
     return 0;
@@ -113,6 +237,17 @@ extern "C" FE_OVERLAY int fn_804FFBAC(FeScrIdx* x)
     char buf[0x38];
     fn_8007B924__18Unk8007B2B0_ScreeniiPc(lbl_8061930C, 0, x->m134[x->m140], buf);
     return fn_800736EC__FPCc(buf);
+}
+
+extern "C" FE_OVERLAY void fn_804FFBF4(void* q)
+{
+    FeScrIdx* x = (FeScrIdx*)q;
+    FeSub134* p = (FeSub134*)&x->m134;
+    char buf[0x38];
+    fn_8007B924__18Unk8007B2B0_ScreeniiPc(lbl_8061930C, 1, x->m134[p->mC], buf);
+    fn_800C8040((FeW*)x->fn_vslot32("TEAMNAME", 1));
+    fn_8007B924__18Unk8007B2B0_ScreeniiPc(lbl_8061930C, 3, x->m134[p->mC], buf);
+    fn_800C8040((FeW*)x->fn_vslot32("TEAMCITY", 1));
 }
 
 extern "C" FE_OVERLAY FeScrN* fn_804FFCB4(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -188,6 +323,28 @@ extern "C" FE_OVERLAY void fn_80500030(void* x)
     fn_8040B830(mp->name, lbl_805FA738, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, x);
+}
+
+extern "C" FE_OVERLAY void fn_805000B4(FeScrN* x, int kind)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    switch (kind) {
+    case 0:
+        fn_8040B830(mp->name, lbl_805F4450, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    case 1:
+        if (x->m138->fn_vslot60() != 0) {
+            fn_8040B830(mp->name, fn_800C8048(x->m138->fn_vslot70()->fn_vslot33(5, 1)) + 0xC, 15);
+            mp->name[15] = 0;
+            fn_800B7B4C(FeGetMgr(), mp, x);
+        } else
+            ((FeWX*)x)->s84();
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY FeScrQ* fn_80500210(FeScrQ* self, int a, int b, int c, int d, int e, int f, int g, int h)

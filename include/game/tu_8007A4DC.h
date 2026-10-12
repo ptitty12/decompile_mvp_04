@@ -523,10 +523,18 @@ struct Unk8007B2B0_Screen {
     int fn_8007CE3C(int a, int b, int c);
     int fn_8007CEA4(int a, int b, char* c);
     int fn_8007CF0C(int a, int b, int c);
+#ifdef FE_SCREEN_CF44_VOID /* retail schedules some callers (fe overlay screens) as a void call */
+    void fn_8007CF44(unsigned i, int a, int b);
+#else
     int fn_8007CF44(unsigned i, int a, int b);
+#endif
     int fn_8007CF90(unsigned i, int a);
     Entry* fn_8007CFDC(unsigned i);
+#ifdef FE_SCREEN_D004_VOID /* same as FE_SCREEN_CF44_VOID: callers scheduled as for a void call */
+    void fn_8007D004(unsigned i, int a, int b);
+#else
     int fn_8007D004(unsigned i, int a, int b);
+#endif
     int fn_8007D050(unsigned i, int a);
     int fn_8007D098(unsigned i, int a);
     int fn_8007D0E0(unsigned i, int a, int b);

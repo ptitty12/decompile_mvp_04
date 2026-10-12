@@ -5,6 +5,68 @@
 
 #include "game/fe_804FE34C.h"
 
+/* Q16-DECL-BEGIN */
+struct FeIdx40 {
+    char b[0x28];
+};
+extern "C" {
+int fn_80555998(int a);
+int fn_805559D4(int a, FeIdx40* idx, int b, int c);
+FeIdx40* fn_80556348(FeIdx40* self);
+int fn_805563C4(FeIdx40* self);
+int fn_80556410(FeIdx40* self);
+}
+#define FS_V(n) virtual void s##n();
+#define FS_A(X) \
+    X(2) X(3) X(4) X(5) X(6) X(7) X(8) X(9) X(10) X(11) X(12) X(13) X(14) X(15) X(16) X(17) X(18) X(19) \
+    X(20) X(21) X(22) X(23) X(24) X(25) X(26) X(27) X(28) X(29) X(30) X(31) X(32) X(33) X(34) X(35) X(36) \
+    X(37) X(38) X(39) X(40) X(41) X(42) X(43) X(44) X(45) X(46) X(47) X(48) X(49) X(50) X(51) X(52) X(53) \
+    X(54) X(55) X(56) X(57) X(58) X(59) X(60) X(61) X(62) X(63) X(64) X(65) X(66)
+#define FS_B(X) \
+    X(69) X(70) X(71) X(72) X(73) X(74) X(75) X(76) X(77) X(78) X(79) X(80) X(81) X(82)
+#define FS_C(X) X(85)
+#define FS_D(X) \
+    X(88) X(89) X(90) X(91) X(92) X(93) X(94) X(95) X(96) X(97) X(98) X(99) X(100) X(101) X(102) X(103) \
+    X(104) X(105) X(106) X(107) X(108) X(109) X(110) X(111) X(112) X(113) X(114) X(115) X(116) X(117) \
+    X(118) X(119) X(120) X(121) X(122) X(123) X(124) X(125) X(126) X(127)
+/* Widget view: slot 67 (int,int), 68 (int), 83 and 84 and 87 return int. */
+struct FeWQ5 : Unk800C7B40_Data {
+    virtual ~FeWQ5();
+    FS_A(FS_V) virtual void s67(int a, int b); virtual void s68(int a); FS_B(FS_V) virtual int s83(); virtual int s84(); FS_C(FS_V) virtual void s86(int a, int b, int* c); virtual int s87(); FS_D(FS_V)
+};
+class FeSubI11 {
+public:
+    char pad0[0x24];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+};
+extern "C" {
+int fn_805053A8(int a);
+int fn_80505310(int a);
+int fn_80505400(int a, int b);
+void fn_80123830(FeW* w, int a, int b, int c, int d, int e);
+}
+int fn_80084014(int a, int b);
+struct FeT12 {
+    int a;
+    int b;
+    int c;
+};
+extern FeT12 lbl_805FD5F8[];
+extern FeT12 lbl_805FD700[];
+extern FeT12 lbl_805FD8BC[];
+extern FeT12 lbl_805FD91C[];
+/* Q16-DECL-END */
+
 extern "C" void fn_80500AC0(FeScrQ* x);
 extern const char lbl_805FB5A0[];
 extern "C" FeW* fn_800C8040(FeW* w);
@@ -57,6 +119,27 @@ extern "C" int fn_805053A8(int v);
 extern "C" int fn_80505400(int a, int b);
 extern "C" int fn_8050544C(int a, int b);
 
+extern "C" FE_OVERLAY void fn_80500AC0(FeScrQ* q)
+{
+    FeScrN* x = (FeScrN*)q;
+    if (((FeWQ5*)x->m154)->s87() != 0) {
+        fn_801251CC(x->m158, 3, 0x37A2, 2);
+        fn_80125084(x->m158, 2);
+        fn_80125084(x->m158, 0);
+    } else {
+        fn_801251CC(x->m158, 3, 0x1A2F, 2);
+        if (((FeSubI11*)((char*)x->m148 + 0xDC))->s11() == 0 && (int)x->m164 != 3 && (int)x->m164 != 2)
+            fn_801251CC(x->m158, 2, 0x204E, 3);
+        else
+            fn_80125084(x->m158, 2);
+        fn_801251CC(x->m158, 0, 0x201A, 1);
+    }
+    if (x->m134->fn_vslot59() == ((FeWQ5*)x->m134)->s83()) {
+        fn_80125084(x->m158, 3);
+        fn_80125084(x->m158, 0);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80500C20(FeScrD* x)
 {
     fn_800ED254(x);
@@ -67,6 +150,33 @@ extern "C" FE_OVERLAY void fn_80500ED8(FeScrQ* x)
     char buf[0xC8];
     fn_80505288(buf, x->m164, x->m1E8);
     fn_800C8040(x->fn_vslot32(lbl_805FB5A0, 1))->fn_vslot28(buf);
+}
+
+/* near-miss: loop pointers o/q/c land in r31/r29/r30 where retail has r30/r31/r29 (registers only) */
+extern "C" FE_OVERLAY int fn_80500F54(void* self, int* out, int a)
+{
+    FeIdx40 buf[12];
+    int h = fn_80555998(a);
+    FeIdx40* p = buf;
+    int k = 11;
+    do {
+        fn_80556348(p);
+        p++;
+    } while (k-- != 0);
+    int n = fn_805559D4(h, buf, 12, a);
+    if (n > 0) {
+        int* o = out;
+        FeIdx40* q = buf;
+        int c = n;
+        do {
+            o[0] = fn_805563C4(q);
+            o[1] = fn_80556410(q);
+            q++;
+            o += 2;
+            c--;
+        } while (c != 0);
+    }
+    return n * 2;
 }
 
 extern "C" FE_OVERLAY int fn_80501004(void* self, int* arr, int n, int v)
@@ -259,6 +369,76 @@ extern "C" FE_OVERLAY void fn_80504938(FeScrQ* x, int a)
     } else if (a == x->m144) {
         fn_80500C40((FeScrN*)x, a);
     }
+}
+
+extern "C" FE_OVERLAY void fn_80504978(void* self, int a)
+{
+    FeScrQ* x = (FeScrQ*)self;
+    if (x->m16C != 0) {
+        FeWQ5* p = (FeWQ5*)fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1));
+        if (x->m1E0 == a)
+            x->m1E4 = x->m1E4 ^ 1;
+        else {
+            x->m1E4 = 1;
+            x->m1E0 = a;
+        }
+        int v;
+        int k = a - 1;
+        int c = x->m164;
+        if (c == 0)
+            v = lbl_805FD5F8[k].b;
+        else if (c == 1)
+            v = lbl_805FD700[k].b;
+        else if (c == 2)
+            v = lbl_805FD8BC[k].b;
+        else if (c == 3)
+            v = lbl_805FD91C[k].b;
+        else
+            v = 1;
+        if (x->m1E4 == 0)
+            v ^= 1;
+        p->s86(1, v ^ 1, (int*)((char*)x + 0x168));
+        p->s86(a, v, (int*)((char*)x + 0x168));
+        fn_80504AD8((FeScrD*)x);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80504AD8(FeScrD* d)
+{
+    FeScrQ* x = (FeScrQ*)d;
+    FeW* p = fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1));
+    int idx = p->fn_vslot60();
+    char* b168 = (char*)x + 0x168;
+    int off = idx * 4;
+    int sel = *(int*)(b168 + off);
+    int a = fn_805053A8(x->m1E8);
+    int w = x->m1DC;
+    int b = fn_80505400(w, fn_80505310(x->m1E8));
+    if (sel == 0) {
+        ((FeW*)x->m150)->fn_vslot8(0);
+    } else {
+        ((FeW*)x->m150)->fn_vslot8(1);
+        int six = 0;
+        if (b != 0)
+            six = 1;
+        if (six == 1 && x->m160 != 0)
+            six = fn_80084014(((FeSubI11*)((char*)x->m148 + 0xDC))->s11(), 1);
+        fn_80123830((FeW*)x->m150, sel, 1, six, a, x->m164 == 0);
+    }
+}
+
+extern "C" FE_OVERLAY int fn_80504C30(FeScrN* x, FeW* w, int c, int a, int b)
+{
+    if (w == fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1))) {
+        FeWQ5* v = (FeWQ5*)w;
+        if (a == 0 && !(b < v->s84())) {
+            fn_80504978(x, b);
+            v->s67(v->s83(), b);
+        } else if (a >= v->s83() && b < v->s84()) {
+            v->s68(a);
+        }
+    }
+    return 0;
 }
 
 extern "C" FE_OVERLAY void fn_80504D68(FeScrD* x)
