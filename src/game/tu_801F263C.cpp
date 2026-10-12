@@ -114,6 +114,22 @@ inline Unk801EE438_Player* PlayerAt4EF4(Unk801EE438_Player** a, int i)
     return *q;
 }
 
+extern const float lbl_805D4E34;
+extern const Unk801EE438_Vec lbl_805D6784;
+
+inline Unk801EE438_Vec Flat4E80(Unk801EE438_Game* g)
+{
+    Unk801EE438_Vec v = *(Unk801EE438_Vec*)((char*)g + 0x60);
+    v.m4 = lbl_805D4E34;
+    return v;
+}
+
+float fn_801F4E80(Scr* p)
+{
+    Unk801EE438_Vec w = Flat4E80(p->m9C->m4);
+    return (w.m0 - lbl_805D6784.m0) * (w.m0 - lbl_805D6784.m0) + (w.m8 - lbl_805D6784.m8) * (w.m8 - lbl_805D6784.m8);
+}
+
 int fn_801F4EF4(Scr* p, int a1, int a2)
 {
     Unk801EE438_G* g = p->m9C;
