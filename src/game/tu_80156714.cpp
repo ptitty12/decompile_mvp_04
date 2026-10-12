@@ -644,6 +644,19 @@ extern const char lbl_805C8DB8[];
 extern const char lbl_805C8DD0[];
 extern const char lbl_805C8DE8[];
 extern const char lbl_805C8DFC[];
+struct Ent8015A6A0 { int m0, m4, m8, mC, m10, m14; };
+extern const float lbl_805C8E50;
+inline float Id8015A6A0(float v) { return v; }
+extern "C" unsigned int strlen(const char* s);
+inline int AllEmpty8015A6A0(RecObj8015F164* r)
+{
+    for (int j = 0; j < 8; j++) {
+        if (strlen(r->e[j].name) != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
 /* near-miss (96.2%): the three by-value Blk temporaries all sit at r1+0x10 here; retail puts the
  * side_ball and top_hit copies at r1+0x8 (the float argument slot is a freed temp there) and merges the
  * tail of the top_ball/side_ball calls (2 slots). Tried: inline Chk with/without a float param, cast and
@@ -850,4 +863,46 @@ extern "C" void fn_8015A5A4(Unk80159F28* self) /* 8015A5A4 */
         fn_801609EC(self);
         fn_80161924(self);
     }
+}
+
+extern "C" int fn_8015A6A0(Unk80159F28* self) /* 8015A6A0 */
+{
+    Unk801527C8_Sub* s = &self->mC->m50;
+    Ent8015A6A0* e;
+    int n;
+    fn_80326ED4(s, (Unk80156838_Entry**)&e, &n);
+    RecObj8015F164 rec;
+    int f79 = 0;
+    int f3c = 0;
+    int f7b = 0;
+    int c = fn_803270C4(s, 0x87, 1, Id8015A6A0(lbl_805C8E50)) != 0;
+    if (c == 0) {
+        return 0;
+    }
+    for (int i = 0; i < n; i++) {
+        if (e[i].m0 == 0x79 && e[i].m8 == 0) {
+            f79 = 1;
+        }
+        int id = e[i].m0;
+        if (id == 0x7B) {
+            f7b = 1;
+        }
+        if (id == 0x3C) {
+            f3c = 1;
+        }
+    }
+    if (f3c != 0 && f79 != 0) {
+        f3c = 0;
+    }
+    if (f7b != 0) {
+        fn_80157514(self, 0x62, (int)&rec, 1, 9, 0, lbl_8068B828);
+    } else if (f79 != 0) {
+        fn_80157514(self, 0x60, (int)&rec, 1, 6, 0, lbl_8068B828);
+    } else if (f3c != 0) {
+        fn_80157514(self, 0x61, (int)&rec, 1, 8, 0, lbl_8068B828);
+    }
+    if (!AllEmpty8015A6A0(&rec)) {
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    }
+    return 1;
 }
