@@ -46,7 +46,7 @@ struct Unk80171A10_Menu {
     int m4;
     int m8[4];
     int m18;
-    char pad1C[0x3C - 0x1C];
+    Unk8017227C_Pair m1C[4];
     Unk80171940* m3C;
     int m40;
     int m44;

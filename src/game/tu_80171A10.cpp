@@ -339,6 +339,16 @@ void fn_80173ADC(Unk80171A10_Menu* p)
     fn_80174318(p, 0x11, lbl_805CB18C);
 }
 
+void fn_80173B1C(Unk80171A10_Menu* p)
+{
+    Unk8016FF40 info;
+    for (int i = 1; i < 4; i++) {
+        Unk8016FF40_Entry* v = (Unk8016FF40_Entry*)&p->m1C[i];
+        info.m108[i] = v;
+    }
+    fn_80174318(p, 0xF, lbl_805CB174);
+}
+
 void fn_80173BA4(Unk80171A10_Menu* p, unsigned short* buf)
 {
     if (p->m48 != 0) {
