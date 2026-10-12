@@ -603,6 +603,34 @@ extern "C" void fn_80159F28(Unk80159F28* self, int a, int b) /* 80159F28 */
     }
 }
 
+extern "C" Unk8015ABB8_Rec fn_8015AE08(Unk80159F28* self, int a);
+extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Rec* rec);
+extern int lbl_8061BE30;
+extern const char* lbl_80620150;
+extern char* lbl_8061E978;
+struct Unk802B0ACC_T;
+void fn_802B2EE0(Unk802B0ACC_T* t);
+extern "C" void fn_80316BC0__FP16Unk80313C14_P200(void* p, int b);
+extern "C" void fn_8015A1D4(Unk80159F28* self) /* 8015A1D4 */
+{
+    if (lbl_8061BE30 == 0) {
+        Unk801527C8_Actor* a = fn_801A04A8(self->mC, 0);
+        fn_8031E1D4(a, lbl_80620150);
+        a->m4 = 1;
+        fn_80316BC0__FP16Unk80313C14_P200(lbl_8061FEDC, 0);
+        Unk8015ABB8_Rec r = fn_8015AE08(self, 4);
+        if (r.w[0] != 0) {
+            RecObj8015F164 rec;
+            fn_8015FC00(self, r, (Unk8016D9A0_Rec*)&rec);
+            ((Unk8016ACAC*)a->m40)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+        }
+        RecObj8015F164 rec2;
+        self->fn_80157514(0x6B, (int)&rec2, 0, 0, 0, lbl_8068B828);
+        ((Unk8016ACAC*)a->m40)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec2);
+        fn_802B2EE0((Unk802B0ACC_T*)(lbl_8061E978 + 0xAF4));
+    }
+}
+
 extern "C" void fn_8015A5A4(Unk80159F28* self) /* 8015A5A4 */
 {
     if (!(self->m334 <= 0.0f)) {
