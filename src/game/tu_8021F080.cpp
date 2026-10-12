@@ -285,6 +285,74 @@ int fn_80221A70(Task* t)
     return 0;
 }
 
+extern const char lbl_80660A90[];
+struct Unk80221B8C_El {
+    int m0;
+    float m4;
+    float m8;
+};
+struct Unk80221B8C_Obj {
+    int m0;
+    int m4;
+    const void* m8;
+    Unk80221B8C_El mC[9];
+    ~Unk80221B8C_Obj() { m8 = lbl_80660A90; }
+};
+struct Unk80221B8C_It {
+    char pad0[8];
+    int m8;
+    char padC[0x18 - 0xC];
+    int Cur() { return m8; }
+};
+struct Unk80221B8C_Pl {
+    char pad0[0x71C];
+    unsigned m71C;
+};
+int fn_8020CD10(void* unused, int k);
+Unk80221B8C_Obj* fn_802116B4(Unk80221B8C_Obj* o, TaskInner* g);
+void fn_80211778(Unk80221B8C_Obj* o, int a);
+void fn_80205450(TaskInner* g, int i);
+void fn_802123D4(Task* t, int a, int b);
+void fn_80214B10(Task* t, int a, int b);
+
+/* near-miss (10 slots, registers only in the inner scan loop) */
+void fn_80221B8C(Task* t)
+{
+    int n = 0;
+    int lim = 2;
+    if (fn_8020CD10((char*)t->m9C + 0x2C, t->m9C->mA4) == 0 || fn_801A2034((Unk8019F8C0_Owner*)t->m9C->m0, 4) == -1)
+        lim = 1;
+    Unk80221B8C_It it;
+    fn_8014E09C((IterObj*)&it, t->m9C->m0, 7);
+    while (it.Cur() != 10) {
+        TaskInner* in = t->m9C;
+        int i = it.Cur();
+        RecQueue* base = in->mCA8;
+        RecQueue* q = &base[i];
+        if (!(((Unk80221B8C_Pl*)ObjAt(in->m8, i))->m71C & 0x1000) && q->count != 0 && q->e[0].m0 == 0x1D) {
+            n++;
+            if (n > lim) {
+                Unk80221B8C_Obj o;
+                fn_802116B4(&o, t->m9C);
+                fn_80211778(&o, 1);
+                int j = 8;
+                do {
+                    RecQueue* rb = t->m9C->mCA8;
+                    RecQueue* r = &rb[o.mC[j].m0];
+                    if (r->count > 0 && r->e[0].m0 == 0x1D) {
+                        fn_80205450(t->m9C, o.mC[j].m0);
+                        n--;
+                        fn_802123D4(t, 1, 1);
+                        fn_80214B10(t, 2, 2);
+                        break;
+                    }
+                } while (--j >= 0);
+            }
+        }
+        fn_8014E108((IterObj*)&it);
+    }
+}
+
 int fn_80221D0C(Task* t, int k)
 {
     int r = 0;
