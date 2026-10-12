@@ -5,6 +5,17 @@
 
 #include "game/fe_804BE560.h"
 
+struct FeCnt {
+    int m0;
+    int m4;
+};
+extern int lbl_806219E8[];
+extern int lbl_80621998[][2];
+extern int lbl_80621970[];
+extern int lbl_80621A88[];
+extern int lbl_80621A38[][2];
+extern int lbl_80621A10[];
+
 extern const char lbl_80670EF0[];
 extern const char lbl_80672168[];
 extern "C" void fn_804CD878(FeScrE0C* x);
@@ -197,6 +208,24 @@ extern "C" FE_OVERLAY void fn_804CE004(FePair* p)
     ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B320(p->a, p->b);
 }
 
+extern "C" FE_OVERLAY int fn_804CE038(FeCnt* p)
+{
+    switch (p->m0) {
+    case 0:
+        p->m0 = 1;
+        break;
+    case 1:
+        p->m0 = 2;
+        break;
+    case 2:
+        p->m0 = 3;
+        break;
+    case 3:
+        return 0;
+    }
+    return ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B320(p->m0, p->m4);
+}
+
 extern "C" FE_OVERLAY int fn_804CE0C8(int k)
 {
     switch (k) {
@@ -209,4 +238,72 @@ extern "C" FE_OVERLAY int fn_804CE0C8(int k)
     default:
         return 0x4637;
     }
+}
+
+extern "C" FE_OVERLAY int fn_804CE10C(int k, int i, int j)
+{
+    if (i > 9)
+        i = 0;
+    if (k == 0)
+        return lbl_806219E8[i];
+    if (k == 1) {
+        if (j > 1)
+            j = 1;
+        return lbl_80621998[i][j];
+    }
+    if (k == 2)
+        return lbl_80621970[i];
+    return 0x37B6;
+}
+
+extern "C" FE_OVERLAY int fn_804CE188(int k, int i, int j)
+{
+    if (i > 9)
+        i = 0;
+    if (k == 0)
+        return lbl_80621A88[i];
+    if (k == 1) {
+        if (j > 1)
+            j = 1;
+        return lbl_80621A38[i][j];
+    }
+    if (k == 2)
+        return lbl_80621A10[i];
+    return 0x37B6;
+}
+
+extern "C" FE_OVERLAY int fn_804CE204(int k)
+{
+    int r = 0;
+    switch (k) {
+    case 0:
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 12;
+        break;
+    case 3:
+        r = 13;
+        break;
+    case 4:
+        r = 14;
+        break;
+    case 5:
+        r = 15;
+        break;
+    case 6:
+        r = 16;
+        break;
+    case 7:
+        r = 17;
+        break;
+    case 8:
+        r = 18;
+        break;
+    case 9:
+        r = 19;
+        break;
+    }
+    return r;
 }
