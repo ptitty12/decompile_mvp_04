@@ -97,6 +97,17 @@ struct FeS16z : FeObj {
     int m158;
 };
 extern "C" int fn_804EC3E8(void* self, FeD64* o, FeObjZ* w, int* out);
+class FeD64c {
+public:
+    char pad0[0x64];
+    virtual int s1(); virtual int s2(); virtual int s3(); virtual int s4(); virtual int s5(); virtual int s6();
+    virtual int s7(); virtual int s8(); virtual int s9(); virtual int s10(); virtual int s11(); virtual int s12();
+    virtual int s13(); virtual int s14(); virtual int s15(); virtual int s16(); virtual int s17(); virtual int s18();
+};
+extern "C" void fn_800ECAA4(void* x);
+extern "C" void fn_804EC734(FeS15* self);
+extern char lbl_805F5A48[];
+extern "C" void fn_804ECD6C();
 /* Q16-DECL-END */
 
 extern char lbl_80667378[];
@@ -531,6 +542,52 @@ extern "C" FE_OVERLAY void fn_804EC9C4(FeS15* s)
     s->m1E0[24] = 0;
     s->m17C[24] = (int)top;
     s->m160--;
+}
+
+/* near-miss: 99.7%; retail allocates the +0x17C pointer copy to r0 and the lha temps to r4 (ours r9/r0). Statement-order and declaration variants tried */
+extern "C" FE_OVERLAY void fn_804ECA60(FeS15* self)
+{
+    fn_800ECAA4(self);
+    fn_800B8144()->m1C = (FeVf)fn_804ECD6C;
+    self->m178 = 1;
+    fn_800B82D0(fn_800B8144(), 8, 0);
+    fn_800B8268(fn_800B8144(), 260.0f, 115.0f, 340.0f, 215.0f);
+    int* p = fn_800ED2B0(self, lbl_805F5A48);
+    if (self->m16C == 0 && *p == 0 && (self->m24 & 0x40000000)) {
+        fn_80125180(((FeS12*)self)->m13C, 3, 0x39F9);
+        fn_80125180(((FeS12*)self)->m13C, 0, 0x39F8);
+        if (!(lbl_8061A328 < self->m164)) {
+            self->m164 = lbl_8061A328 + 0xB4;
+            if (self->m168 != 0) {
+                int n = 0;
+                fn_804EC734(self);
+                if (self->m160 > 0) {
+                    FeObj1* o = (FeObj1*)self->m17C[0];
+                    int* p0 = self->m17C;
+                    int h = o->m2C;
+                    int base = o->m28 - 3;
+                    if (base >= 0) {
+                        int k = 0;
+                        int* pp = p0;
+                        int lim;
+                        do {
+                            n++;
+                            FeD64c* w = (FeD64c*)self->m1E0[k];
+                            k++;
+                            lim = base + h + w->s18();
+                            o->v10(base);
+                            if (n >= self->m160)
+                                break;
+                            o = (FeObj1*)*++pp;
+                            h = o->m2C;
+                            base = o->m28 - 3;
+                        } while (base >= lim);
+                    }
+                }
+            } else
+                fn_804EBCB4((FeS16*)self);
+        }
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804ECC0C(FeObj* self)
