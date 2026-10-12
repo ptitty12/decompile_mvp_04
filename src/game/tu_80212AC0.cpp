@@ -14,6 +14,10 @@ int fn_8026DC5C(Unk8026C414_O* self, Unk8026C414_X* ctx);
 int fn_8026DA60(Unk8026C414_O* self, Unk8026C414_X* ctx);
 int fn_8026D7E0(Unk8026C414_O* self, Unk8026C414_X* ctx);
 
+struct Unk8021646C_Obj {
+    char pad0[0x458];
+    int m458;
+};
 extern "C" {
 void fn_80213988(Task* t, int x, int y);
 void fn_80213B80(Task* t, int a, int b, int c);
@@ -707,6 +711,47 @@ extern "C" void fn_801F0F30(Task* t);
 
 /* near-miss: 37 slots, 4 insns out of place: everything but the first block matches; retail keeps "li r3,8; b" inside
    the bne-skipped block, ours hoists the li above the branch (tried if/else, goto, result var, ternary, operand swap) */
+extern "C" int fn_8021646C(void* self, Unk8021646C_Obj* o, int a, int b, int c)
+{
+    int t[3][3][2] = {
+        { { 5, 3 }, { 4, 2 }, { 8, 6 } },
+        { { 5, 3 }, { 4, 2 }, { 9, 7 } },
+        { { 5, 5 }, { 4, 4 }, { 9, 9 } },
+    };
+    int f = c == 1;
+    int bi = 0;
+    int ai = 0;
+    switch (b) {
+    case 2:
+        bi = 0;
+        break;
+    case 1:
+        bi = 1;
+        break;
+    case 0:
+        bi = 2;
+        break;
+    }
+    switch (a) {
+    case 0:
+        ai = 0;
+        break;
+    case 1:
+        ai = 1;
+        break;
+    case 2:
+        ai = 2;
+        break;
+    }
+    int r = t[ai][bi][f];
+    int k = o->m458;
+    if (k == 0 && r == 6)
+        r = 7;
+    if (k == 1 && r == 8)
+        r = 9;
+    return r;
+}
+
 int fn_8021693C(Task* t, Player* o, int x, Player* pl, int mode, float f1, float f2)
 {
     if (x == -1) {
