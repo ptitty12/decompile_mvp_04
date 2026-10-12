@@ -604,7 +604,6 @@ void fn_8004E010(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     }
 }
 
-/* near-miss (96%): m3CC+m3D0 sum registers swapped (retail loads m3CC into r9, sum in r0) */
 void fn_8004E14C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (idx >= 0 && a->m3D0 < *lbl_8061B9C4 && a->m50 == 0 && ((Unk8004E14C_AV*)a)->m38 == 0) {
@@ -616,7 +615,7 @@ void fn_8004E14C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
         }
         int ok = 0;
         if (((Unk8004E14C_SmV*)s)->mA54 == 0 && s->mA58 == 0) {
-            int x = a->m3CC + a->m3D0;
+            int x = a->m3D0 + a->m3CC;
             ok = x <= 2;
         }
         if (ok)
