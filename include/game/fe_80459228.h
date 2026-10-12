@@ -317,6 +317,7 @@ struct FeScrB : FeW {
     FeList* m1EC;
     void* m1F0;
     int m1F4[3];
+    int m200;
 };
 extern const char lbl_8067B310[];
 extern "C" {
@@ -402,6 +403,8 @@ struct FeScrD : FeW {
     FeW* m67AC;
     FeW* m67B0;
     FeW* m67B4;
+    int m67B8;
+    int m67BC;
 };
 extern "C" {
 void fn_804613EC(FeScrD* x, FeW* w);
