@@ -41,6 +41,7 @@ extern "C" void fn_8050A8EC(void* x);
 extern "C" void fn_8050A970(void* p);
 extern "C" FeRecList* fn_8050AB58(FeRecList* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_8050BED4(FeScrD* x);
+extern "C" void fn_8050BEFC(FeScrN* x, int a);
 extern "C" int fn_8050BFC0(FeScrN* x);
 extern "C" int fn_8050C000(FeScrN* x, int a);
 extern "C" int fn_8050C03C(FeScrN* x);
@@ -221,6 +222,18 @@ extern "C" FE_OVERLAY void fn_8050BED4(FeScrD* x)
     fn_800ED254(x);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+extern "C" FE_OVERLAY void fn_8050BEFC(FeScrN* x, int a)
+{
+    fn_800ED310(x, a);
+    if (a != 0) {
+        fn_8050C408(x)->fn_vslot16(1);
+        fn_8050C408(x)->fn_vslot14(1);
+    } else {
+        x->fn_vslot14(0);
+        fn_8050C408(x)->fn_vslot16(0);
+    }
 }
 
 extern "C" FE_OVERLAY int fn_8050BFC0(FeScrN* x)
