@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_802F8324.h"
+#include "game/goals/tu_8027C728.h"
 
 extern char lbl_80664D18[];
 extern char lbl_806604E0[];
@@ -46,13 +47,27 @@ struct Unk80300848_W {
 struct Unk80300848_Blk {
     int w[0x5A];
 };
+struct Unk80300848_P224 {
+    char pad0[0x618];
+    char* m618;
+};
+struct Unk80300848_Q4C {
+    char pad0[0x4C];
+    unsigned m4C;
+};
 struct Unk80300848_S;
 extern Unk80300848_S* lbl_8061F928;
 extern int lbl_8061F92C;
 struct Unk80300848_S {
     char pad0[0x18];
     const void* m18;
-    char pad1C[0x23C - 0x1C];
+    char pad1C[0x224 - 0x1C];
+    Unk80300848_P224* m224;
+    Unk80300848_Q4C* m228;
+    float m22C;
+    float m230;
+    int m234;
+    float m238;
     int m23C;
     int m240;
     int m244;
@@ -75,6 +90,43 @@ struct Unk80300848_P1124 {
     int m1124;
 };
 
+struct Unk80300848_SpdM {
+    char pad0[4];
+    float m4;
+};
+struct Unk80300848_Spd {
+    char pad0[4];
+    void* m4;
+    Unk80300848_SpdM* m8;
+    char padC[8];
+    float m14;
+};
+struct Unk8019F8C0_Owner;
+struct Unk802ACD88_Mgr;
+float fn_802AEB4C(Unk802ACD88_Mgr* m, void* p);
+float fn_801A0744(Unk8019F8C0_Owner* o);
+void fn_801A0790(Unk8019F8C0_Owner* o, float v);
+void fn_801A07D8(Unk8019F8C0_Owner* o, float v);
+extern Unk802ACD88_Mgr* lbl_8061E978;
+struct Unk80300848_Sl {
+    int m0;
+    char pad4[0x14C - 4];
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+};
+struct Unk80300848_Ob {
+    char pad0[0x24];
+    int m24;
+};
+struct Unk80305C88_P;
+void fn_80305C88(Unk80305C88_P* p, short v);
+extern const char lbl_805E7B04[];
+extern const char lbl_805E7B1C[];
+extern const char lbl_805E7B24[];
 extern "C" {
 void fn_800ABA88(void* mgr, int a, int b, int c);
 void* fn_803282A8(void* p, int a);
@@ -90,7 +142,15 @@ void fn_803125D0(void* g);
 void fn_803144A0(void* g, const char* text, float x, float y, int color, int k);
 void fn_803021A4(Unk80300848_S* p);
 void fn_803022A8(Unk80300848_S* p);
+Unk8027C728_Goal* fn_802448F4(void* o, int a);
+void fn_8028B138__FP16Unk8028989C_Goal(char* a, char* b);
+void fn_80244A64(void* o, Unk8027C728_Goal* g, int flag);
+void fn_8030ACCC(void* p);
+void fn_803D775C(int* out, int h, const char* s, ...);
+void fn_803D7378(int* out, int h, const char* s, ...);
 }
+
+void fn_8027C728(Unk8027C728_Goal* g);
 
 void fn_80301730()
 {
@@ -163,6 +223,20 @@ void fn_803020BC(Unk80300848_S* p)
     p->m240 = p->m240 - 1;
     if (p->m240 <= 0)
         p->m23C = 1;
+}
+
+void fn_803020DC(Unk80300848_S* p)
+{
+    p->m22C = (float)p->m228->m4C * 0.016666668f + 0.033333335f;
+    p->m230 = p->m22C + 10.0f;
+    if (p->m224 != 0) {
+        Unk8027C728_Goal* g = fn_802448F4(p->m224, 1);
+        g->m10 = 8;
+        fn_8028B138__FP16Unk8028989C_Goal(g->m18, (char*)p + 0x24);
+        fn_8027C728(g);
+        fn_80244A64(p->m224, g, 1);
+    }
+    p->m23C = 2;
 }
 
 const char* fn_803039DC()
@@ -311,6 +385,30 @@ void fn_80304218(Unk80300848_P188* p, const Unk80300848_Blk* src)
     volatile int t = *(int*)((char*)p + 0x188);
     p->m24 = *src;
     *(int*)((char*)p + 0x188) = t;
+}
+
+void fn_8030427C(Unk80300848_Ob* p, int h)
+{
+    Unk80300848_Sl* slot = (Unk80300848_Sl*)&p->m24;
+    p->m24 = 0;
+    fn_8030ACCC((char*)p + 0x28);
+    p->m24 = h;
+    if (h != 0) {
+        int v1, v2, v3, v4, v5, v6;
+        fn_803D775C(&v1, p->m24, lbl_805E7B04);
+        slot->m14C = v1;
+        fn_803D7378(&v2, p->m24, lbl_805E7B04);
+        slot->m150 = v2;
+        fn_803D775C(&v3, p->m24, lbl_805E7B1C);
+        slot->m154 = v3;
+        fn_803D7378(&v4, p->m24, lbl_805E7B1C);
+        slot->m158 = v4;
+        fn_803D775C(&v5, p->m24, lbl_805E7B24);
+        slot->m15C = v5;
+        fn_803D7378(&v6, p->m24, lbl_805E7B24);
+        slot->m160 = v6;
+        fn_80305C88((Unk80305C88_P*)slot, 0);
+    }
 }
 
 /* near-miss: retail puts the two vtable addresses in r11/r10, ours r9/r11 (statement permutations and typed vptr fields tried) */
