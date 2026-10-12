@@ -56,13 +56,12 @@ void fn_800DC50C(UiS* self, float f1, float f2)
     self->v12((int)(f2 * f1));
 }
 
-/* near-miss: 6 slots; the clamp constants and the value use f13/f0 in the opposite assignment (compare operands swapped) */
 void fn_800DC580(UiS* self, float f)
 {
-    if (f > lbl_805BD8CC)
-        f = lbl_805BD8CC;
-    else if (!(f >= lbl_805BD8D0))
-        f = lbl_805BD8D0;
+    if (f > 1.0f)
+        f = 1.0f;
+    else if (!(f >= 0.0f))
+        f = 0.0f;
     float w = self->v32(lbl_805BC188, 1)->m2A;
     float h = *(short*)((char*)self->v32(lbl_805BC188, 1) + 0x26);
     UiS* t = self->v32(lbl_805BD8C0, 1);
@@ -266,8 +265,8 @@ extern "C" void fn_800DE274(int a0, UdE274_T* x, int a2)
     char b8[0x18];
     char b20[0x18];
     char b38[0x20];
-    fn_802542E8(sub, 0, b20);
-    fn_802542E8(sub, 1, b8);
+    fn_802542E8((Unk8024EF40_W*)sub, 0, (int)b20);
+    fn_802542E8((Unk8024EF40_W*)sub, 1, (int)b8);
     fn_8040B320(b38, 0, 0x20);
     if (a2 & 0x10) {
         Unk800DB840_Slot* o = 0;
