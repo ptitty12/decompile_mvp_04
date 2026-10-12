@@ -1,3 +1,7 @@
+db/tu_80535360
+ealib/tu_803BD944
+fe/tu_80520BE0
+fe/tu_805283C4
 game/tu_80021BE8
 game/tu_800239F4
 game/tu_80029000
@@ -85,3 +89,7 @@ game/tu_801AE30C
 game/tu_801B460C
 game/tu_801B7FB0
 game/tu_801BAC74
+game/tu_801EE438
+game/tu_80216CF4
+game/tu_8021F080
+game/tu_8032ECD8

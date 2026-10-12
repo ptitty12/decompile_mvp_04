@@ -86,3 +86,11 @@
     - The PROGRESS snapshot above is stale.
     - The main checkout's `main` has diverged, with 2 unpushed progress-bot commits.
   - Progress bot: healthy since 2026-10-11 12:20 (7 checkout failures before that); history.csv is current.
+- 2026-10-12 | Claude Opus 5.5 (lead session 2, from 10:28 CDT) | fleet coordination | **19,329 -> 19,681 functions at 100%** by 11:00 (81.5%; 41.8% of code bytes).
+  - The first lead session ended at 10:20 and its 12 workers died with it. Their committed branches (p3-28, p4-22..30, p4-33) were all integrated (+345 functions, verify PASS each). Uncommitted leftovers are kept as `git stash` entries named `leftover work/<batch>`.
+  - Lead kit committed (`tools/team/lead/`). Worker helper scripts made portable: they hardcoded other worktrees' paths and could have edited the wrong worktree. integ.sh no longer reports a `[remote rejected]` push as merged.
+  - EXI split: EXIUart.c (`dolphin/exi/tu_804286AC.c`, 4/4) and the GXInit.c head (`dolphin/gx/tu_80428C64.c`, 3/3) were split off EXIBios.c.
+  - `ealib/tu_80394744`: moved to cflags_ealib_sda_nsr instead of a re-split. Its last function is already matched there, so a split would be a verify regression.
+  - HANDOFF section 7 items 6 (OSExceptionVector labels: none are mis-typed in symbols.txt) and 7 (relocname fixes: all 19 already 100%) needed no change. 228 merged stale branches were deleted.
+  - Running: 13 Sonnet workers on p4_00..p4_12; 1 Opus worker on hard-case families 5, 7, 8, 9 (round 7). Queued: p4_13..p4_21, p4_32 (no commits last time), then p5 (`tools/team/lead/gen_p5.py`: 0% functions of 0x400-0x800, plus small ones in units no p4 batch covered).
+  - Blockers: none new. The owner-only questions in DECISIONS are unchanged.
