@@ -337,6 +337,73 @@ extern char lbl_8064A550[];
 extern char lbl_806800B0[];
 extern char lbl_80655E98[];
 extern char lbl_80655BA8[];
+UiScrRaw* fn_800EB518(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D4704(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D7FE0(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D6184(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D3D74(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804D24E8(char* self, char* sub);
+void fn_8040074C(void* p, unsigned n);
+void fn_800C3AB4(Ui800C33D0* p, int a);
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A4C8[];
+struct UiBufList {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+};
+/* near-miss: the sub-object constructor calls move the first argument (mr r3) before r4..r10; retail moves it last (24 slots, 97.9%) */
+UiScrRaw* fn_800F3E00(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EB518(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_80654130;
+    char* s1 = (char*)self + 0x1CC;
+    fn_804D4704(s1, a, b, c, d, e, f, g, h);
+    char* s2 = (char*)self + 0x37C;
+    fn_804D7FE0(s2, a, b, c, d, e, f, g, h);
+    char* s3 = (char*)self + 0x4F0;
+    fn_804D6184(s3, a, b, c, d, e, f, g, h);
+    char* s4 = (char*)self + 0x678;
+    UiBufList* t = (UiBufList*)((char*)self + 0x7E0);
+    fn_804D3D74(s4, a, b, c, d, e, f, g, h);
+    t->C1((int*)((char*)self + 0x7F8), 0x28);
+    t->C2();
+    t->C3(lbl_8064A4C8);
+    char* sub = (char*)self + 0x144;
+    fn_804D24E8(sub, s1);
+    fn_804D24E8(sub, s2);
+    fn_804D24E8(sub, s3);
+    if (fn_800B57EC(fn_800B555C()) == 0)
+        fn_804D24E8(sub, s4);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    return self;
+}
+
 void fn_800F3FCC(UiScr3FCC* self, int a)
 {
     self->m3C = lbl_80654130;
