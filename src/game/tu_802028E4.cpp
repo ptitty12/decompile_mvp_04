@@ -174,47 +174,49 @@ extern const Unk801EE438_Vec lbl_806055DC;
 extern const float lbl_805D5358;
 extern const float lbl_805D535C;
 
+/* near-miss (50 slots after a 14-pass swap/move hill climb from ascending order; the true statement order is
+   not reached): all stores and the 7 Vec copies are present, frame and length (99 insns) match */
 extern "C" void fn_80204CCC(Unk80204CCC_Rec* r)
 {
+    r->m80 = lbl_805D5358;
     r->m0 = 0;
-    r->m4 = 0;
-    r->m8 = 2;
+    r->mCC = -1;
+    r->m8C = lbl_805D535C;
     r->mC = 2;
     r->m10 = 0xA;
+    r->mA4 = 1;
     r->m14 = 0;
     r->m18 = 0;
     r->m1C = -1;
     r->m20 = 0;
     r->m24 = 0;
-    r->m28 = 0;
-    r->v[0] = lbl_806055DC;
-    r->v[1] = lbl_806055DC;
-    r->v[2] = lbl_806055DC;
     r->v[3] = lbl_806055DC;
-    r->v[4] = lbl_806055DC;
-    r->v[5] = lbl_806055DC;
-    r->v[6] = lbl_806055DC;
-    r->m80 = lbl_805D5358;
+    r->mA0 = 0;
     r->m84 = lbl_805D535C;
     r->m88 = lbl_805D535C;
-    r->m8C = lbl_805D535C;
+    r->m8 = 2;
     r->m90 = lbl_805D535C;
     r->m94 = 0;
     r->m98 = 0;
     r->m9C = 0;
-    r->mA0 = 0;
-    r->mA4 = 1;
+    r->mC8 = 0x11;
     r->mA8 = 0;
     r->mAC = 0;
     r->mB0 = 0;
     r->mB4 = 0;
     r->mB8 = 0;
+    r->v[5] = lbl_806055DC;
     r->mBC = 0;
     r->mC0 = 0;
     r->mC4 = 0;
-    r->mC8 = 0x11;
-    r->mCC = -1;
+    r->m28 = 0;
+    r->m4 = 0;
     r->mD0 = 0;
+    r->v[2] = lbl_806055DC;
+    r->v[1] = lbl_806055DC;
+    r->v[4] = lbl_806055DC;
+    r->v[0] = lbl_806055DC;
+    r->v[6] = lbl_806055DC;
     r->mD4 = 0;
 }
 
