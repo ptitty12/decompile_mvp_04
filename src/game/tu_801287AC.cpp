@@ -424,7 +424,6 @@ void fn_8012A8D0(int a, int b, int c)
     t->fn_vslot44(5, 1, buf, 4);
 }
 
-/* near-miss (99.06%): same instructions, callee-saved registers permuted (retail: b r31, widget r29, 0x4330 constant r30; here r30, r31, r29). Locals for b, ordering of the final sum/ternary and a (a,b) pass-through to fn_80127550 tried. */
 void fn_8012AB7C(int a, int b, int c)
 {
     int slot = 0;
@@ -438,16 +437,19 @@ void fn_8012AB7C(int a, int b, int c)
     fn_8012B2A0(a, c, (Wid*)b, fn_800C8044(w->fn_vslot32(lbl_805BDC1C, 1)), 0);
     fn_8012B2A0(a, c, (Wid*)b, fn_800C8044(w->fn_vslot32(lbl_805C0840, 1)), 1);
     char buf[0x68];
-    int t0 = (int)((float)(fn_800DBE54(slot, 0x14, k, c, 0) + fn_800DBE54(slot, 0x14, k, c, 1)) * 0.5f);
+    int v = fn_800DBE54(slot, 0x14, k, c, 0);
+    int t0 = (int)((float)(v + fn_800DBE54(slot, 0x14, k, c, 1)) * 0.5f);
     fn_804089B4(buf, lbl_805C0848, t0);
     fn_800C8040(fn_800C8044(w->fn_vslot32(lbl_805BA6A4, 1))->fn_vslot32(lbl_805C084C, 1))->fn_vslot30(buf);
-    int t1 = (int)((float)(fn_800DBE54(slot, 0x16, k, c, 0) + fn_800DBE54(slot, 0x16, k, c, 1)) * 0.5f);
+    v = fn_800DBE54(slot, 0x16, k, c, 0);
+    int t1 = (int)((float)(v + fn_800DBE54(slot, 0x16, k, c, 1)) * 0.5f);
     fn_804089B4(buf, lbl_805C0848, t1);
     fn_800C8040(fn_800C8044(w->fn_vslot32(lbl_805BDEE0, 1))->fn_vslot32(lbl_805C084C, 1))->fn_vslot30(buf);
-    int s = fn_800DBE54(slot, 0x15, k, c, 0) + fn_800DBE54(slot, 0x15, k, c, 1);
+    v = fn_800DBE54(slot, 0x15, k, c, 0);
+    int s = v + fn_800DBE54(slot, 0x15, k, c, 1);
     int r = 0;
     if (s != 0)
-        r = 100 - t1 - t0;
+        r = 100 - t0 - t1;
     fn_804089B4(buf, lbl_805C0848, r);
     fn_800C8040(fn_800C8044(w->fn_vslot32(lbl_805BDEDC, 1))->fn_vslot32(lbl_805C084C, 1))->fn_vslot30(buf);
 }
