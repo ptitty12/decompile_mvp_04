@@ -478,7 +478,6 @@ extern "C" void fn_800961E0(Sub198* p)
         p->m1C[i] = 0;
 }
 
-/* near-miss: retail copies x through r0 before the call */
 extern int lbl_8061930C;
 struct Unk8007B2B0_Screen {
     int fn_80078A38(int a);
