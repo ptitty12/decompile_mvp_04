@@ -1,7 +1,7 @@
-/*
- * SN ProDG libm, newlib 1.8.2 fdlibm (cflags_libm: -O2 -mfast-cast -msafe-sda -G 1024
- * -fno-builtin -mstrict-align),
- * .text 0x80410634-0x80410790 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* SN ProDG libm (newlib 1.8.2 fdlibm): floor() (double). Compiled as C++ through this wrapper, as in
+ * emoose/re4 (src/lib/s_floor.cpp): g++ drops folded static consts defined in an included file
+ * and keeps tables in small data, which is what SN's libm has. */
+/* Game code still refers to this function by its placeholder name; the rename to floor waits for
+ * a project-wide pass over those sources. */
+#define floor fn_80410634
+#include "fdlibm/s_floor.c"

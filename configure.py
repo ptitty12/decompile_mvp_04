@@ -1205,10 +1205,10 @@ config.libs = [
         "objects": [
             Object(NonMatching, "libm/e_exp.c"),
             Object(NonMatching, "libm/e_log.cpp"),
-            Object(NonMatching, "libm/e_sqrt.cpp"),
+            Object(Matching, "libm/e_sqrt.cpp"),
             Object(NonMatching, "libm/s_ceil.c"),
             Object(NonMatching, "libm/s_cos.cpp"),
-            Object(NonMatching, "libm/s_fabs.cpp"),
+            Object(Matching, "libm/s_fabs.cpp"),
             Object(NonMatching, "libm/s_floor.cpp"),
             Object(NonMatching, "libm/s_sin.c"),
             Object(NonMatching, "libm/ef_acos.cpp"),

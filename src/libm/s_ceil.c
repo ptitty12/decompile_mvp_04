@@ -1,7 +1,7 @@
-/*
- * SN ProDG libm, newlib 1.8.2 fdlibm (cflags_libm: -O2 -mfast-cast -msafe-sda -G 1024
- * -fno-builtin -mstrict-align),
- * .text 0x804103C0-0x80410518 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* SN ProDG libm (newlib 1.8.2 fdlibm): ceil() (double). Compiled as C, as SN built its libm: a C
+ * build keeps the file's unreferenced static consts in .sdata2, and MVP's .sdata2 has them in
+ * link order (the re4 units' .cpp wrappers drop them; docs/sdk.md). re4 has no s_ceil. */
+/* Game code still refers to this function by its placeholder name; the rename to ceil waits for
+ * a project-wide pass over those sources. */
+#define ceil fn_804103C0
+#include "fdlibm/s_ceil.c"
