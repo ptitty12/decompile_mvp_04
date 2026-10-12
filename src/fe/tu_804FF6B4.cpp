@@ -39,6 +39,49 @@ struct FeScrLV : FeW {
     int m1EC;
 };
 extern "C" char* fn_800C8048(void* w);
+extern "C" void fn_8040074C(void* p, int n);
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A330[];
+extern const char lbl_806803F0[];
+struct FeAr {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* vp;
+    int m14;
+};
+inline void FeArBase(FeAr* a, int* buf, int cap)
+{
+    a->vp = lbl_8064B298;
+    a->m0 = buf;
+    a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+
+inline void FeArMid(FeAr* a)
+{
+    a->m4 = 0;
+    a->mC = 0;
+    a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
+
+inline void FeArD(FeAr* a)
+{
+    a->vp = lbl_8064A330;
+    a->m4 = 0;
+    a->mC = 0;
+    a->m14 = 0;
+}
+
+struct FeScrAr : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeAr ar;
+    int buf[40];
+};
 /* Q16-DECL-END */
 
 struct FeSub134 { int m0; int m4; int m8; int mC; };
@@ -94,6 +137,17 @@ extern "C" FE_OVERLAY int fn_804FF6B4(FeScrB* x)
 extern "C" FE_OVERLAY char* fn_804FF710(FeScrN* x, char* out)
 {
     return fn_8040B61C(out, x->m134->fn_vslot70()->fn_vslot33(5, 1)->mC);
+}
+
+extern "C" FE_OVERLAY FeScrAr* fn_804FF780(FeScrAr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_806803F0);
+    self->m130 = 0;
+    FeArBase(&self->ar, self->buf, 0x28);
+    FeArMid(&self->ar);
+    FeArD(&self->ar);
+    return self;
 }
 
 extern "C" FE_OVERLAY void fn_804FF834(FeScrD* x)
