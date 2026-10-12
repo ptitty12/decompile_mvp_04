@@ -98,7 +98,9 @@ struct Unk8069E200_RecB {
 
 struct Unk8069E200 {
     Unk8069E200_RecA recA[0x30];
-    char padC00[0x1410 - 0xC00];
+    char padC00[0x1400 - 0xC00];
+    float m1400;
+    char pad1404[0xC];
     void* mVoices[16];
     char pad1450[0x9DE8 - 0x1450];
     int m9DE8;
@@ -659,6 +661,46 @@ extern "C" void fn_803AEF88()
         SNDMEMI_free(lbl_8069E200.mBufs[i]);
     fn_803A979C();
     lbl_806AA4CC();
+}
+
+extern "C" void fn_803A94BC();
+extern "C" void fn_803A9450();
+extern "C" void fn_804382CC(void* p);
+extern void (*lbl_806AA4D0)(void*, int);
+extern char lbl_806AA268[];
+extern float lbl_80625C6C;
+extern int lbl_8069CAD4;
+/* SND server loop; the lbl_8069CAD4 store goes through a local pointer, as in retail. */
+extern "C" void fn_803AF238()
+{
+    for (;;) {
+        ((void (*)())lbl_8062520C)();
+        if (sndgs.profileenter != 0)
+            sndgs.profileenter();
+        if (lbl_8069E200.mC048 != 0) {
+            lbl_806AA4D0(lbl_806AA268, 0xA0);
+            SNDPKTPLAYI_flushcallbackdata();
+        }
+        if (lbl_80625C68 & 1) {
+            fn_803A94BC();
+            int* pq = &lbl_8069CAD4;
+            lbl_80625C6C = lbl_80625C6C + lbl_8069E200.m1400;
+            float t = lbl_80625C6C;
+            int iv;
+            if (!(t < 0.0f))
+                iv = (int)(t + 0.5f);
+            else
+                iv = (int)(t - 0.5f);
+            *pq = iv;
+            if (!(lbl_80625C6C <= 30.0f))
+                lbl_80625C6C -= 30.0f;
+            fn_803A9450();
+        }
+        if (sndgs.profileleave != 0)
+            sndgs.profileleave();
+        ((void (*)())lbl_80625210)();
+        fn_804382CC(lbl_8069FFE0);
+    }
 }
 
 extern "C" int fn_803AF374()
