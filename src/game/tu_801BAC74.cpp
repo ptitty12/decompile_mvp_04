@@ -231,6 +231,50 @@ extern "C" void fn_801BB1A4(A* a) { fn_801BDDC8(a->m8, a->m14->m6CC); }
 
 extern "C" void fn_801BB1D0(A* a) { a->m8->m1C = 1; }
 
+struct Unk8017A930_T;
+void fn_8017B994(Unk8017A930_T* p);
+extern int* lbl_8061B9C4;
+extern "C" {
+void fn_801BBC9C(A* a, int* out);
+void fn_801BB338(A* a, int x, int y);
+int fn_801D0294(void* p);
+void* fn_801C1638(P* p, unsigned i);
+void fn_801BD878(A* a, P* q);
+void fn_801BDA38(A* a, P* q);
+void fn_801BDB38(A* a, P* q);
+int fn_801BBF0C(A* a);
+int fn_801BBF18(A* a);
+}
+
+extern "C" void fn_801BB1E0(A* a, int flag)
+{
+    a->m8->m28 = 3;
+    if (flag) {
+        a->m8->m0 = 0;
+        a->m4 = 1;
+    } else
+        a->m4 = flag;
+    a->m24 = 0;
+    int r = 0;
+    fn_801BBC9C(a, &r);
+    int m10 = a->m10;
+    P* cur = a->m14->m6CC;
+    Unk801B7FB0_Game* g = a->m14->m6F8;
+    fn_801BB338(a, flag, r);
+    if (fn_801D0294((char*)((Unk801C16B0_M4*)m10)->m3A4 + 0x28C) != 0 || r != 0) {
+        if (g->m14->m1CCA == *lbl_8061B9C4 - 1 && (fn_801BBF0C(a) != 0 || fn_801BBF18(a) != 0)) {
+            int ok = fn_801C1638(a->m14, 10) != 0;
+            if (ok == 0 || g->m14->m1CC9 == 2) {
+                fn_8017B994((Unk8017A930_T*)m10);
+                fn_801BDB38(a, cur);
+            } else
+                fn_801BD878(a, cur);
+        } else
+            fn_801BD878(a, cur);
+    } else
+        fn_801BDA38(a, cur);
+}
+
 extern "C" void fn_801BB4D8(A* a, int x)
 {
     B* b = a->m8;
@@ -571,7 +615,7 @@ extern "C" void fn_801BDA38(A* a, P* q)
     }
 }
 
-extern "C" void fn_801BDB38(A* a)
+extern "C" void fn_801BDB38(A* a, P* q)
 {
     fn_8037893C(&a->m14->m704, 0x55, 0, 0, 0);
     fn_801BFC1C(a->mC);
