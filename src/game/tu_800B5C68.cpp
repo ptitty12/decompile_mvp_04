@@ -232,7 +232,7 @@ void fn_80377408(void* p);
 void* fn_803774A8(unsigned n, int heap);
 char* fn_804031BC(unsigned short* d, const char* s);
 void fn_80378C5C(const char* s, unsigned len, char* out, int size, int delim, int flag, unsigned* used);
-void fn_804089B4(char* dst, const char* fmt, ...);
+int fn_804089B4(char* dst, const char* fmt, ...);
 void fn_800C17D4(FEObj68* p);
 void fn_802B0DB0(void* p);
 void fn_800B8B3C(FEObj68* p, int a);
