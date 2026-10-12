@@ -3,6 +3,10 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+struct FeSt63C {
+    char pad0[0x63C];
+    int m63C;
+};
 extern "C" {
 int fn_80084408__Fi(int v);
 int strcmp(const char* a, const char* b);
@@ -305,6 +309,51 @@ extern "C" FE_OVERLAY void fn_80479A28(int a)
 {
     if (a != 0)
         fn_8047AE14(fn_800B7A94(FeGetMgr(), "FPLAYORSIMMULTI"), 6);
+}
+
+/* near-miss: 2 slots differ (the two global loads at the top are swapped: retail loads lbl_8061930C first into r29) */
+extern "C" FE_OVERLAY void fn_80479A90(char* x)
+{
+    FeGlobal80619948* g2 = lbl_80619948;
+    int g = (int)lbl_8061930C;
+    volatile int sp8 = 0;
+    int best = 4;
+    int ba = -1;
+    int bb = -1;
+    int e = 0;
+    do {
+        unsigned k = fn_8007FB40__FP13Unk8007F198_Ci(g, e);
+        if (k < fn_8007FB2C__FP13Unk8007F198_Ci(g, sp8)) {
+            int a = fn_8007FBC0__FP13Unk8007F198_Cii(g, k, sp8);
+            int b = (int)fn_8007FBDC__FP13Unk8007F198_Cii(g, k, sp8);
+            if ((ba == -1 || a <= ba) && (bb == -1 || b <= bb || a < ba)) {
+                best = sp8;
+                ba = a;
+                bb = b;
+            }
+        }
+        int c = sp8;
+        int t;
+        if (c > 3)
+            t = c;
+        else
+            t = c + 1;
+        sp8 = t;
+        e = t;
+    } while (e <= 3);
+    if (fn_800A4558(g2, best) != 0)
+        fn_800A3490(g2, best, 1, 1);
+    if (g2->m80 != 0xD) {
+        fn_800A3578(g2);
+        while (fn_800A35A8(g2) == 0) {
+        }
+        fn_800A3670(g2);
+    } else {
+        char* b = x + 0x154;
+        *(int*)(b + FeI(x, 0x144) * 12) = -1;
+    }
+    FeSt63C* s = (FeSt63C*)((char*)fn_800B555C() + 8);
+    s->m63C--;
 }
 
 extern "C" FE_OVERLAY void fn_80479BFC(char* x)
