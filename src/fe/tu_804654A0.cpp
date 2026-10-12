@@ -3,6 +3,10 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+extern "C" {
+int fn_8007B320__18Unk8007B2B0_Screenii(void* g, int a, int b);
+int fn_8007B8C4__18Unk8007B2B0_Screenii(void* g, int a, int b);
+}
 struct FeSub11 : FeSubData {
     virtual void s1();
     virtual void s2();
@@ -56,6 +60,32 @@ FE_OVERLAY int fn_80466ED0(int a, int b, int c)
     if (b == a || c == a) {
     yes:
         return 1;
+    }
+no:
+    return 0;
+}
+
+/* near-miss: 1 instruction short (retail hoists `li r3,1` ahead of the last beq; tried 12 tail forms) */
+FE_OVERLAY int fn_804672F4(unsigned k, int a, int b)
+{
+    void* g = lbl_8061930C;
+    if (k <= 1) {
+        if (a == 0 || fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_80075948__18Unk8007B2B0_Screeni(g, a))) != k) {
+            if (b != 0) {
+                if (fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_80075948__18Unk8007B2B0_Screeni(g, b))) == k)
+                    goto yes;
+            }
+            goto no;
+        }
+        goto yes;
+    }
+    if (a != 0 && fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, a) == k) {
+yes:
+        return 1;
+    }
+    if (b != 0) {
+        if (fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, b) == k)
+            goto yes;
     }
 no:
     return 0;
