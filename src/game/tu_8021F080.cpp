@@ -17,6 +17,23 @@ void fn_802044A4(Task* t, int a, void* p, float f);
 void fn_801F0EA8(Task* t, int a);
 }
 
+extern char lbl_80660C48[];
+
+class Unk802A9B9C : public EvBase {
+public:
+    int m8;
+    int mC;
+    Unk802A9B9C(int id) : EvBase(id)
+    {
+        m4 = lbl_80660C48;
+        mC = 0;
+        m8 = 0;
+    }
+    ~Unk802A9B9C() { m4 = lbl_80649DA0; }
+    void fn_802A9B9C(int a);
+    void fn_802A9BA4(int a);
+};
+
 extern "C" {
 
 extern Vec3f lbl_805D6244;
@@ -41,6 +58,22 @@ void fn_8021FFD4(Task* t, int, RecQueue* q)
     e->m80 = lbl_805D6244.x;
     e->m9C = 0;
     e->mAC = 0;
+}
+
+void fn_80220E48(Task* t, int a, Player* p)
+{
+    TaskInner* in = t->m9C;
+    int z = in->m74;
+    if (z == 0 && in->m70 == 1) {
+        int f = p->m58C.m4b;
+        if (f == 1) {
+            Unk802A9B9C e(0x6E);
+            e.fn_802A9B9C((int)p);
+            e.fn_802A9BA4(a);
+            fn_8037893C(t->m9C->m0->m704, e.m0, &e, 0, 0);
+            t->m9C->m74 = f;
+        }
+    }
 }
 
 extern Vec3f lbl_805D6338;
