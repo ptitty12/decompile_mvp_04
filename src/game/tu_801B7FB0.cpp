@@ -150,13 +150,11 @@ extern "C" void fn_801B8248(P* p, const Vec3* a)
     p->mB80 = 1.0f;
 }
 
-/* near-miss: retail loads the int argument (lwz r4) before the three lis for the float
- * constants and the format string; the scheduler here puts it after. */
 extern "C" void fn_801B82AC(P* p, const Vec3* a, P* q, int flag)
 {
     Unk801B7FB0_Sub58C* s = &q->m58C;
     if (s->mC != 0.0f)
-        fn_80303CA0(lbl_805CF95C, s->m10 + 1, lbl_805CF978, lbl_805CF97C, lbl_805CF980);
+        ((void (*)(const char*, int, float, float, float, ...))fn_80303CA0)(lbl_805CF95C, s->m10 + 1, 4.0f, 0.1f, 0.8f);
     if (flag == 1) {
         Vec3 v = *a;
         fn_801B9620(p->mB88, &v, 0xD);
@@ -170,9 +168,10 @@ extern "C" void fn_801B82AC(P* p, const Vec3* a, P* q, int flag)
 extern "C" void fn_801B838C(P* p, const Vec3* a, P* q, int flag)
 {
     if (q->m5A0 != 0.0f)
-        fn_80303CA0(lbl_805CF984, lbl_805CF998, lbl_805CF99C, lbl_805CF9A0);
+        ((void (*)(const char*, float, float, float, ...))fn_80303CA0)(lbl_805CF984, 4.0f, 0.1f, 0.8f);
     if (p->mB88->m8 != q) {
-        if (p->m44C->m6F8->m14->m1CCB <= 3) {
+        int c = p->m44C->m6F8->m14->m1CCB;
+        if (c <= 3) {
             if (flag == 1) {
                 Vec3 v = *a;
                 fn_801B9620(p->mB88, &v, 0xB);
