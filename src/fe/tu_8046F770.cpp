@@ -265,6 +265,27 @@ FE_OVERLAY void fn_80470F20(FeScrL* x)
     }
 }
 
+FE_OVERLAY void fn_80471830(FeScrL* x)
+{
+    float f;
+    int lo = x->m328;
+    FeGlobal80619948* g = lbl_80619948;
+    int cur = g->m84;
+    int hi = g->m90;
+    if (lo != hi) {
+        f = (float)(cur - lo) / (float)(hi - lo);
+    } else {
+        f = 1.0f;
+    }
+    if (!(f >= 0.0f)) {
+        f = 0.0f;
+    }
+    if (!(f <= 1.0f)) {
+        f = 1.0f;
+    }
+    fn_800DC50C__FP3UiSff(x->m34C, x->m32C, f);
+}
+
 FE_OVERLAY void fn_80471910(FeScrL* x)
 {
     x->fn_vslot8(0);
