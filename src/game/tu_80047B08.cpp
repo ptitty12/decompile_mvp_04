@@ -299,6 +299,67 @@ void fn_80048BE4(Unk80048A10_Sub* s)
     fn_80057950(s->mA9C);
 }
 
+void fn_80048C08(Unk80048A10_Sub* s)
+{
+    s->mAD0 = 0;
+    s->mACC = 0;
+    s->m9FC = 0;
+    s->mA00 = 0;
+    s->m9F4 = 1;
+    s->mA20 = 0;
+    s->mA24 = 0;
+    s->mA2C = 0;
+    s->mA30 = 0;
+    s->mA34 = 0;
+    s->mA40 = 0;
+    s->mA44 = 0;
+    s->mA48 = 0;
+    s->mA4C = 0;
+    s->mA50 = 0;
+    s->mA54 = 0;
+    s->m9D8 = -1;
+    s->m9DC = -1;
+    s->m9E0 = -1;
+    s->mA58 = (unsigned)fn_8040ABA0() % 6;
+    s->mA5C = 0;
+    s->mA60 = 0;
+    s->mA64 = 0;
+    s->mA68 = 0;
+    s->mA6C = 0;
+    s->mA70 = 0;
+    s->mA74 = 0;
+    s->mA78 = 0;
+    s->mA7C = 0;
+    s->mA80 = 0;
+    s->mA88 = 1;
+    s->mA90 = 0;
+    s->m9F8 = 0;
+    s->mA04 = 0;
+    s->mAC0 = 0;
+    s->mA8C = 1;
+    s->mA94 = 0;
+    s->mAC4 = 0;
+    s->mAC8 = 0;
+    for (int i = 0; i < 35; i++) {
+        s->mEnt[i].m0 = -1;
+        s->mEnt[i].m38 = 0;
+        s->mEnt[i].m3C = 0;
+        s->mEnt[i].m40 = 0.0f;
+        s->mEnt[i].m44 = 0;
+    }
+    for (int i = 0; i < 2; i++) {
+        s->mA0C[i] = 0;
+        s->mA38[i] = 0;
+    }
+    for (int i = 0; i < 3; i++)
+        s->mA14[i] = 0;
+    fn_80057A4C(s->mA9C);
+    fn_800449D8();
+    ((Unk800652F4*)s->mADC)->fn_80065338();
+    s->mAD8 = -1;
+    s->mAD4 = -1;
+}
+
 void fn_80048DA4(Unk80048A10_Sub* s)
 {
     int i;

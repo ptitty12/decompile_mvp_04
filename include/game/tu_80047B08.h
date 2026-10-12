@@ -61,10 +61,14 @@ int fn_802B9300(const char* name, int a, int b, int* out);
 int fn_80395250(int buf, int x);
 struct Unk800652F4 {
     Unk800652F4();
+    void fn_80065338();
     char pad0[0x7E4];
 };
 extern "C" void* fn_80057370(void* obj, void* owner);
 void fn_80048C08(Unk80048A10_Sub* s);
+int fn_8040ABA0();
+void fn_80057A4C(void* mgr);
+void fn_800449D8();
 /* 12-byte entries at 0x8061780C: a key word, then a pointer to member function of the sub-manager. */
 class Unk8061780C_Cls {
 public:
