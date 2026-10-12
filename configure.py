@@ -722,8 +722,9 @@ config.libs = [
             Object(NonMatching, "game/tu_80361580.cpp"),
             Object(NonMatching, "game/tu_80361F98.cpp"),
             Object(NonMatching, "game/tu_80362A30.cpp"),
-            Object(NonMatching, "game/tu_80362FB4.cpp"),
-            Object(NonMatching, "game/tu_80365C10.cpp"),
+            # EA-lib flags, not game flags: see DECISIONS (fn_8036344C matches only at -O2 without -ffloat-store).
+            Object(NonMatching, "game/tu_80362FB4.cpp", cflags=[*cflags_ealib, "-Iinclude"]),
+            Object(NonMatching, "game/tu_80365C10.cpp", cflags=[*cflags_ealib, "-Iinclude"]),
             Object(NonMatching, "animation/choosers/tu_8026DDE8.cpp"),
             Object(NonMatching, "animation/choosers/randomchooser.cpp"),
             Object(NonMatching, "animation/choosers/playeridchooser.cpp"),
