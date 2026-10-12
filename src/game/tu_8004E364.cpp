@@ -6,6 +6,34 @@
  * .text 0x8004E364-0x80050A68 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004E364.h"
+int fn_80054DCC(Unk80052794_Ctx* c, Unk80052794_Obj* o, int k);
+int fn_80054DAC(Unk80052794_Ctx* c, Unk80052794_Obj* o, int k);
+int fn_80054D98(Unk80052794_Ctx* c);
+void fn_800527DC(Unk80052794_Ctx* c, int idx, Unk80052794_Obj* o);
+float fn_80254128(Unk8024EF40_W* w, int a, int b);
+void fn_8001251C(int a, int b, int c, int d, int e, int f);
+int fn_8001EFB4(Unk80044C10_A* a);
+struct Unk8005089C_Slot {
+    int m0;
+    int m4;
+    int m8;
+    char padC[0x18];
+};
+struct Unk8005089C_Obj {
+    char pad0[0x44];
+    int m44;
+    int m48;
+    char pad4C[0x24];
+    Unk8005089C_Slot m70[4];
+    int m100;
+    char pad104[0x2AC];
+    int m3B0;
+};
+void fn_800100E8(int a, int b);
+int fn_80253F0C(Unk8024EF40_W* w, int a, int b, int c);
+void fn_800118E4(int a, int b, int c);
+int fn_80044D14(unsigned a);
+void fn_80010FA0(int a, int b, int c, int d, int e);
 void fn_80012834();
 int fn_80056D0C(int a);
 void fn_80012784(int a);
@@ -189,6 +217,57 @@ void fn_8004ECAC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
             }
             fn_8004E68C(s, idx, a);
         }
+    }
+}
+
+void fn_8004F4B4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    Unk8005089C_Obj* o = (Unk8005089C_Obj*)a;
+    int w27 = 0;
+    if (fn_80054DCC((Unk80052794_Ctx*)s, (Unk80052794_Obj*)a, 9) != 0 && fn_80054DAC((Unk80052794_Ctx*)s, (Unk80052794_Obj*)a, 2) != 0)
+        w27 = 1;
+    int w28 = fn_80054D98((Unk80052794_Ctx*)s);
+    Unk8005089C_Slot* q = 0;
+    int i;
+    for (i = o->m100 - 1; i >= 0; i--) {
+        int off = i * 0x24;
+        char* b = (char*)o + 0x70;
+        if (*(int*)(b + off) == o->m3B0) {
+            char* c = (char*)o + 0x78;
+            if (*(int*)(c + off) == 2) {
+                q = (Unk8005089C_Slot*)((char*)o + (off + 0x70));
+                break;
+            }
+        }
+    }
+    if (q != 0 && !(a->m3B0->m590 & 0x20000000)) {
+        int f = 1;
+        int t = fn_8004FF78(s, s->m9D8, 0x2A);
+        if (t >= 0 && fn_8004FF78(s, t, 0x21) >= 0 && fn_8004FF78(s, t, 0x38) == -1)
+            f = 0;
+        if (f != 0) {
+            fn_80054684((Unk80052794_Ctx*)s, idx, 0);
+            fn_80054684((Unk80052794_Ctx*)s, idx, 1);
+            float sp = 0.0f;
+            fn_800B555C();
+            if (fn_800B57EC() == 1) {
+                fn_80254128((Unk8024EF40_W*)((char*)a->m3B0 + 0x588), 0, 2);
+                sp = fn_80254128((Unk8024EF40_W*)((char*)a->m3B0 + 0x588), 2, 2);
+            }
+            if (s->mABC == 0) {
+                if (o->m44 > 0 && ((Unk8004F990_AV*)a)->m450 > 0) {
+                    if (w28 != 0)
+                        fn_800125A0();
+                } else if (w27 != 0) {
+                    int x = ((Unk8001CE80*)a)->fn_8001D974();
+                    int y = ((Unk8001CE80*)a)->fn_8001DA28();
+                    int z = ((Unk8001CE80*)a)->fn_8001E2EC();
+                    int u = ((Unk8001CE80*)a)->fn_8001DA9C();
+                    fn_8001251C(x, y, z, 2, u, fn_8001EFB4(a));
+                }
+            }
+        }
+        fn_800527DC((Unk80052794_Ctx*)s, idx, (Unk80052794_Obj*)a);
     }
 }
 
@@ -425,4 +504,48 @@ int fn_80050850(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     if (fn_800507D8(s, idx, a) != 0 && a->m104 > 0)
         r = 1;
     return r;
+}
+
+void fn_8005089C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    Unk8005089C_Obj* o = (Unk8005089C_Obj*)a;
+    if (s->mA70 == 0) {
+        Unk8005089C_Slot* q = 0;
+        int i;
+        for (i = o->m100 - 1; i >= 0; i--) {
+            int off = i * 0x24;
+            char* b = (char*)o + 0x70;
+            if (*(int*)(b + off) == o->m3B0) {
+                char* c = (char*)o + 0x78;
+                if (*(int*)(c + off) == 1) {
+                    q = (Unk8005089C_Slot*)((char*)o + (off + 0x70));
+                    break;
+                }
+            }
+        }
+        if (q != 0 && o->m44 == 0 && fn_8005000C(s, idx, 6) == -1) {
+            fn_8005039C(s, idx, a);
+            if (o->m48 > 0) {
+                if (fn_80050850(s, idx, a) == 0) {
+                    int x = ((Unk8001CE80*)a)->fn_8001DB4C();
+                    fn_800100E8(x, ((Unk8001CE80*)a)->fn_8001DB70());
+                    return;
+                }
+                goto l15;
+            }
+            if (fn_80050850(s, idx, a) != 0) {
+            l15:
+                int x = ((Unk8001CE80*)a)->fn_8001DB4C();
+                int y = ((Unk8001CE80*)a)->fn_8001D974();
+                fn_800118E4(x, y, fn_8001F45C(a, q->m0));
+                return;
+            }
+            int t = o->m3B0;
+            int x = ((Unk8001CE80*)a)->fn_8001D974();
+            int y = ((Unk8001CE80*)a)->fn_8001DE9C();
+            int z = fn_80044D14(fn_80253F0C((Unk8024EF40_W*)(t + 0x588), 3, 2, 0) + s->mA90);
+            int w = ((Unk8001CE80*)a)->fn_8001DB70();
+            fn_80010FA0(x, y, z, w, fn_8001F904(a));
+        }
+    }
 }
