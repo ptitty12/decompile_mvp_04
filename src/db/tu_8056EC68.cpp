@@ -19,6 +19,77 @@ extern const float lbl_805FFCF0;
 
 extern "C" void fn_8056DE50(DbSel* self, DbSelSrc* src, DbScr* scr, int* sidep, void* x);
 
+extern "C" {
+void fn_805706B8(DbMgr* self, int mode);
+int fn_8056FDC8(int a, int b);
+}
+
+/* Stack-slot down counter (saturates at -1), cf. Unk8006A138_It. */
+struct DbDownIt {
+    int v;
+    DbDownIt(int x) { v = x; }
+    ~DbDownIt() {}
+    int Next()
+    {
+        int t;
+        if (v > -1)
+            t = v - 1;
+        else
+            t = v;
+        v = t;
+        return t;
+    }
+};
+
+extern "C" void fn_8056EEA8(DbSel* self, int idx, int flag);
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_8056F6C8(void);
+extern "C" void fn_8056FF68(DbMgr* self, int c);
+extern "C" float fn_8056FFB0(void);
+extern "C" void fn_8057001C(DbMgr* self, DbSelSrc* src);
+extern "C" void fn_805700C0(DbMgr* self, DbSelSrc* src);
+extern "C" void fn_80570138(DbMgr* self);
+extern "C" void fn_80570170(DbMgr* self);
+extern "C" void fn_80570C14(DbMgr* self);
+extern "C" void fn_805715D8(DbMgr* self);
+extern "C" void fn_805718E8(DbMgr* self);
+extern "C" void fn_80571A94(DbMgr* self);
+extern "C" void fn_8056F640(DbSel* self);
+extern "C" void fn_80570630(DbMgr* self);
+extern "C" void fn_80571AF8(DbMgr* self);
+extern "C" void fn_80571EA0(DbMgr* self);
+extern "C" void fn_8056F494(DbSel* self);
+
+/* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
+extern "C" DB_OVERLAY void fn_8056F494(DbSel* self)
+{
+    DbDownIt it(2);
+    if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 != 0xFF) {
+        int i;
+        do {
+            if (Round(self->m10) > 2)
+                break;
+            fn_8056EEA8(self, it.v, 0);
+            i = it.Next();
+        } while (i >= 0);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_8056F640(DbSel* self)
+{
+    unsigned char x = self->m8->m0;
+    if (x != 0xFF) {
+        fn_8056C0A0(self->m18, x);
+        fn_80080B98__FP13Unk8007FF8C_Q(self->m8);
+    }
+    DbQ* q = self->m4;
+    fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q->m0, q->m1, 0);
+    fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+    q = self->m0;
+    fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m4, q->m0, q->m1, 0);
+    fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
+}
+
 extern "C" DB_OVERLAY int fn_8056F6C8(void)
 {
     int r = 2;
@@ -93,6 +164,21 @@ extern "C" DB_OVERLAY void fn_80570170(DbMgr* self)
     fn_8056BD50(&self->mFC);
 }
 
+extern "C" DB_OVERLAY void fn_80570630(DbMgr* self)
+{
+    if (Round(self->mC) > 2) {
+        DbG* g = self->m8->m14;
+        unsigned char a = g->m1CC8;
+        int b = g->m1CD0;
+        DbScr* s = &self->mFC;
+        fn_8056BE34(s);
+        DbG* g2 = self->m8->m14;
+        if (g2->m1CC8 != a || g2->m1CD0 != b)
+            fn_8056BDD0(s);
+        fn_80573918(&self->m50, self->m8);
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80570C14(DbMgr* self)
 {
     fn_8056F228(&self->mCC);
@@ -122,4 +208,42 @@ extern "C" DB_OVERLAY void fn_80571A94(DbMgr* self)
     self->m118 = v;
     fn_8056C6BC(&self->mFC);
     fn_8056E130(&self->mCC);
+}
+
+extern "C" DB_OVERLAY void fn_80571AF8(DbMgr* self)
+{
+    fn_805706B8(self, self->m4);
+    self->m118 = fn_8056FDC8(self->m4, self->m0);
+    DbG* g = self->m8->m14;
+    fn_8056E02C(&self->mCC, 0, self->m0);
+    if (Round(g) <= 2) {
+        int side = 0;
+        if (g->m1CD0 != 0)
+            side = 1;
+        DbT* t = TeamAt(g, side);
+        DbT* u = TeamAt(g, side ^ 1);
+        unsigned char other = u->m17C;
+        unsigned char cur = t->m168[t->m174];
+        DbScr* s = &self->mFC;
+        fn_8056C1C4(s, 1);
+        fn_8056BAEC(s, cur, side, 0);
+        fn_80081C94__FP13Unk8007FF8C_Yiiii(g, 0, cur, other, 1);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80571EA0(DbMgr* self)
+{
+    fn_805706B8(self, self->m4);
+    self->m118 = fn_8056FDC8(self->m4, self->m0);
+    DbG* g = self->m8->m14;
+    fn_8056E02C(&self->mCC, 3, self->m0);
+    if (Round(g) <= 2) {
+        int side = self->m50.m0;
+        DbT* t = TeamAt(g, side);
+        unsigned char cur = t->m168[t->m174];
+        DbScr* s = &self->mFC;
+        fn_8056C1C4(s, 4);
+        fn_8056BAEC(s, cur, side, 0);
+        fn_8056C0A0(s, cur);
+    }
 }
