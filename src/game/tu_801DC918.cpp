@@ -18,7 +18,8 @@ extern const float lbl_805D3A20;
 extern const float lbl_805D3A24;
 extern const float lbl_805D3A30;
 extern const float lbl_805D3AD8;
-extern float lbl_805D3B1C;
+struct Unk805D3B1C_F { float v; };
+extern Unk805D3B1C_F lbl_805D3B1C;
 extern const float lbl_805D3B20;
 extern const float lbl_805D3B28;
 extern const float lbl_805D3B30;
@@ -366,13 +367,13 @@ extern "C" void fn_801DDD0C(I* i)
     i->m11C.m4 = 0;
 }
 
-/* near-miss: retail keeps the lfs of lbl_805D3B1C after the int stores (statement permutations tried) */
+/* lbl_805D3B1C is a one-float struct so its load stays below the int stores through s */
 extern "C" void fn_801DDD18(I* i)
 {
     Unk801DD660_Sub* s = &i->m11C;
     s->m8 = 0;
     s->mC = -1;
-    s->m14 = s->m10 = lbl_805D3B1C;
+    s->m14 = s->m10 = lbl_805D3B1C.v;
     fn_801DD420(&i->m134);
     i->m168 = 2;
     fn_801DD98C(i, 1);

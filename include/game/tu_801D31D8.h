@@ -42,9 +42,15 @@ struct Unk801D31D8_T {
     char pad0[0x14];
     Unk801D31D8_T2* m14;
 };
+struct Unk801D31D8_X3C0 {
+    char pad0[0x14];
+    int m14;
+};
 struct Unk801D31D8_X700 {
     char pad0[0x3B0];
     int m3B0;
+    char pad3B4[0x3C0 - 0x3B4];
+    Unk801D31D8_X3C0* m3C0;
 };
 struct Unk801D31D8_Obj;
 
