@@ -48,6 +48,10 @@ extern int lbl_80691CDC;
 
 inline float G_8061DC44(void* p) { return lbl_8061DC44; }
 
+extern float lbl_8061DC48;
+extern int lbl_80691D14;
+inline float G_8061DC48(void* p) { return lbl_8061DC48; }
+
 struct Unk802531FC_C {
     int m0;
     P* m4;
@@ -192,6 +196,11 @@ struct Unk80253678_V : Unk80256A90_Data {
     virtual int v22();
 };
 void fn_80252EB8(C* self, float v);
+extern const float lbl_805D9C20;
+extern const float lbl_805D9C24;
+extern const float lbl_805D9C28;
+
+float fn_80253434(C* self);
 extern const float lbl_805D9C10;
 extern const float lbl_805D9C14;
 extern const int lbl_805D9E94[5];
@@ -249,6 +258,11 @@ int fn_80253100(C* self, int a);
 /* near-miss: 71 vs 71 instructions, ~40 slots differ in register choice. Retail sums with `addi r11,ea,0x1B4` inside the bdnz loop and lbzx on the masked index;
    ours folds the 0x1B4 into the lbz displacement. unsigned char counter gives andi./no bdnz. Tried int counter with unsigned char k, separate k++, int-cast address forms */
 
+inline float Clamp01_356C(float x)
+{
+    return !(x > lbl_805D9C24) ? (x >? lbl_805D9C20) : lbl_805D9C24;
+}
+
 inline float Clamp01_3434(float x)
 {
     return !(x > lbl_805D9C14) ? (x >? lbl_805D9C10) : lbl_805D9C14;
@@ -263,6 +277,18 @@ void fn_80252460(P* x)
             p = 0.0f;
         if (!(p >= t))
             fn_80250B28(x, 0xC);
+    }
+}
+
+void fn_80252588(P* x, int k)
+{
+    if ((k == 5 || k == 7 || k == 6 || k == 8) && fn_80250AC4(x) != 0 && fn_80250A90(x, 0x1A) != 0) {
+        float p = RandPct(x, lbl_805D990C, 0x648);
+        float t = fn_80251000(x, 0x2B) * G_8061DC48(fn_8023CB44(x));
+        if (lbl_8061DC54 != 0 || lbl_80691D14 != 0)
+            p = 0.0f;
+        if (!(p >= t))
+            fn_80250B28(x, 0x1A);
     }
 }
 
@@ -464,6 +490,22 @@ float fn_80253434(C* self)
         return lbl_805D9C14;
     float x = (float)n / (float)lim;
     return Clamp01_3434(x);
+}
+
+extern "C" float fn_8025356C(void* p)
+{
+    C* self = (C*)p;
+    if (fn_802530E8(self) == 0)
+        return lbl_805D9C20;
+    float a = self->m28 + self->m2C;
+    float b = fn_80253434(self);
+    b = Clamp01_356C(b);
+    if (!(b >= lbl_805D9C24)) {
+        float t = (lbl_805D9C24 - b) * lbl_805D9C28;
+        a = a - t;
+    }
+    a = Clamp01_356C(a);
+    return a;
 }
 
 int fn_80253678(Unk80253678_S* self)
