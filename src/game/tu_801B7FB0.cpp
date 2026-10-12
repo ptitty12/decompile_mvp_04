@@ -315,6 +315,55 @@ extern "C" void fn_801B9348(U* u)
     fn_8027D33C(g);
 }
 
+struct Unk8034449C {
+    int m0;
+    const void* m4;
+    P* m8;
+    int mC;
+    Unk8034449C(int id)
+    {
+        m4 = lbl_80649D88;
+        m0 = id;
+        m8 = 0;
+        mC = 0;
+    }
+};
+void fn_803444D0(Unk8034449C* m, int c);
+Unk8027C728_Goal* fn_801B9438(P* p, int ev, Vec3 pos);
+
+/* near-miss: same code; the 0..6 / 0xA..0xE / 0x10..0x11 event-id range tests lay out differently (one blt vs b). */
+extern "C" void fn_801B9620(U* u, const Vec3* pos, int ev)
+{
+    if (u->m4->m44C->m6F4 == 0) {
+        fn_8027D33C(fn_801B9438(u->m4, ev, *pos));
+        P* p = u->m4;
+        Vec3 a = p->m44C->m6CC->m60;
+        Vec3 b = p->m44C->m65C[1]->m60;
+        if (!(a.x <= b.x) && !(a.z <= b.z)) {
+            p->mB84 = 120.0f;
+        }
+        int lo1 = 0xA;
+        int hi1 = 6;
+        int lo2 = 0x10;
+        int hi2 = 0x11;
+        if (ev <= 0xE) {
+            if (ev >= lo1) {
+                return;
+            }
+            if (ev <= hi1 && ev >= 0) {
+                return;
+            }
+        } else if (!(ev > hi2 || ev < lo2)) {
+            return;
+        }
+        Unk8034449C m(0x3B);
+        m.mC = ev;
+        m.m8 = u->m4;
+        fn_8037893C(&u->m4->m44C->m704, m.m0, &m, 0, 0);
+        fn_803444D0(&m, 2);
+    }
+}
+
 extern "C" void fn_801B979C(U* u, P* p)
 {
     u->m8 = p;
