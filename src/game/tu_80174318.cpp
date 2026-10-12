@@ -590,6 +590,82 @@ struct Unk8017757C_View {
     Unk80273498_Vec3 m320;
 };
 inline void SetPos(Unk8017757C_View* o, Unk80273498_Vec3 v) { o->m320 = v; }
+struct Unk80270BA0_X;
+struct Unk8016C788_Obj;
+extern "C" float atan2f(float y, float x);
+void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& pos, float* ang);
+
+struct Unk8027C728_Goal {
+    char pad0[0x10];
+    int m10;
+    char pad14[0x28 - 0x14];
+    Unk80273498_Vec3 m28;
+    char pad34[0x40 - 0x34];
+    int m40;
+};
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk8016C788_Obj* o, int a);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
+
+struct Unk80287D70 {
+    void fn_80287DB8(int a);
+    char pad0[0x28];
+    int m28;
+};
+struct Unk8027A84C {
+    void fn_8027A898(const Unk80273498_Vec3* v);
+};
+
+class Unk801773E4_Obj {
+public:
+    char pad0[0x98];
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+struct Unk801773E4_T {
+    char pad0[8];
+    void* m8;
+    char padC[0x28 - 0xC];
+    Unk80273498_Vec3 m28;
+    Unk80273498_Vec3 m34;
+    Unk801773E4_Obj* m40;
+};
+
+inline void SetPos28(Unk8027C728_Goal* g, Unk80273498_Vec3 v)
+{
+    g->m28 = v;
+}
+
+/* near-miss (2 slots): `li r4,12` precedes `mr r3,r29` before the fn_80287DB8 call in retail; here the order is
+ * swapped. Everything else matches (stack layout needs ang declared before the scoped Vec3). */
+void fn_801773E4(Unk801773E4_T* p) /* 801773E4 */
+{
+    fn_801A656C(p->m8, p->m40, 0x10);
+    p->m40->fn_vslot8(0);
+    float ang;
+    {
+        Unk80273498_Vec3 v = Scale(p->m28, -1.0f);
+        ang = atan2f(v.x, v.z);
+    }
+    fn_80299B98((Unk80270BA0_X*)p->m40, p->m34, &ang);
+    Unk8027C728_Goal* g = fn_802448F4((Unk8016C788_Obj*)p->m40, 1);
+    g->m10 = 2;
+    fn_8027C728(g);
+    Unk80287D70* s = (Unk80287D70*)((char*)g + 0x18);
+    s->fn_80287DB8(0xC);
+    SetPos28(g, p->m34);
+    s->m28 = 1;
+    Unk80273498_Vec3 w = Scale(p->m28, -1.0f);
+    ((Unk8027A84C*)s)->fn_8027A898(&w);
+    fn_8027D33C(g);
+}
+
 void fn_8017757C(Unk8017757C_T* self, int a) /* 8017757C */
 {
     fn_80177C74(self, 1);
