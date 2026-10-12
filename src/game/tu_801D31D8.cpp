@@ -195,6 +195,7 @@ struct Unk801D31D8_Tbl4 {
     float v[4];
 };
 extern Unk801D31D8_Tbl4 lbl_805D2B7C;
+extern Unk801D31D8_Tbl4 lbl_805D2BBC;
 struct Unk801D31D8_Z2C {
     char pad0[0x1FC];
     float m1FC;
@@ -221,6 +222,24 @@ extern "C" void fn_801D5158(B* s)
     float a = fn_801CF8CC(s->m2C, s->m44.mC);
     float b = fn_801CF740(s->m2C);
     s->m44.m4 = b * LerpATB(-0.2f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x7E5), 0.2f) + a;
+}
+
+extern "C" void fn_801D53D4(B* s)
+{
+    Unk801D31D8_Tbl4 t = lbl_805D2BBC;
+    float v = t.v[fn_801D0BB0(s)];
+    float w = ((Unk801D31D8_Z2C*)s->m2C)->m1FC;
+    v *= LerpATB(0.8f, w, 1.1f);
+    Unk801D31D8_V2b vv;
+    fn_8022EA60(&vv, ((Unk801D31D8_Wb*)s)->m34->m3B0);
+    if (!(AbsF(vv.x) >= 0.4f) && !(AbsF(vv.y) >= 0.4f))
+        v *= 1.25f;
+    v = !(v > 0.98f) ? (v >? 0.0f) : 0.98f;
+    if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0x80A) >= v))
+        s->m44.m8 = 1;
+    float a = fn_801CF8CC(s->m2C, s->m44.mC);
+    float b = fn_801CF740(s->m2C);
+    s->m44.m4 = b * LerpATB(-0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x812), 0.6f) + a;
 }
 
 extern "C" void fn_801D5650(B* s)
