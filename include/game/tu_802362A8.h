@@ -85,6 +85,9 @@ struct Unk802362A8_Req {
     char pad0[0x14];
     int m14;
 };
+struct Unk802362A8_Pg {
+    char* m0;
+};
 struct Unk802362A8_Cpu {
     int m0;
     Unk802362A8_Slots m4;
@@ -101,6 +104,7 @@ struct Unk802362A8_Cpu {
     int fn_80239448();
     int fn_80238088(Unk802362A8_Req* p);
     int fn_80238B84();
+    float fn_802377F4(Unk802362A8_Pg* p);
     void fn_80237B60(float* out);
     int fn_80238110();
     int fn_802394CC();

@@ -212,6 +212,25 @@ extern "C" Unk802362A8_Cpu* fn_802376A0(Unk802362A8_Cpu* self, Unk8022FE34_Owner
     return self;
 }
 
+/* near-miss: 59/59 insns, 8 slots: retail loads the 0.0 initial constant after lwz r9,0(r31) and the six argument loads
+   (ours hoists all pool reads to the top). Tried scalar/array/inline-wrapped constants. */
+float Unk802362A8_Cpu::fn_802377F4(Unk802362A8_Pg* p)
+{
+    float r = 0.0f;
+    char* g = p->m0;
+    if (!(fn_8024F048(g + 0xA0C, *(int*)(g + 0xA04), *(int*)(g + 0x44C), *(int*)(g + 0x708), 1) <= 0.9f)) {
+        r += 0.03f;
+    }
+    if (!(*(float*)(p->m0 + 0x5D8) <= 0.95f)) {
+        r -= 0.06f;
+    } else if (!(*(float*)(p->m0 + 0x5D8) <= 0.9f)) {
+        r -= 0.04f;
+    } else if (!(*(float*)(p->m0 + 0x5D8) <= 0.85f)) {
+        r -= 0.02f;
+    }
+    return r;
+}
+
 void Unk802362A8_Cpu::fn_80237B60(float* out)
 {
     float tbl[4] = { -0.6f, -0.5f, -0.3f, -0.2f };
