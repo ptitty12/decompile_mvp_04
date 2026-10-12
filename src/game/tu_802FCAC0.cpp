@@ -119,40 +119,6 @@ struct Unk802FDE1C_G {
 extern Unk802FDE1C_G* lbl_8061FF44;
 extern "C" {
 void fn_803188FC(void* p, int a);
-struct Unk8019F8C0_Owner;
-int fn_801A37D8(Unk8019F8C0_Owner* o);
-struct Unk802FDCD8_A {
-    char pad0[0x20];
-    int m20;
-};
-struct Unk802FDCD8_S {
-    char pad0[0x744];
-    Unk802FDCD8_A* m744;
-};
-struct Unk802FDCD8_O {
-    char pad0[0x24];
-    Unk8019F8C0_Owner* m24;
-    char pad28[0x40 - 0x28];
-    int m40[3];
-};
-struct Unk802FDCD8_M {
-    char pad0[0x2C];
-    int m2C;
-};
-struct Unk802FDCD8_G {
-    char pad0[0x20];
-    int m20;
-    int m24;
-};
-extern Unk802FDCD8_G* lbl_8061B8C0;
-extern int lbl_8061FE9C;
-extern "C" {
-void fn_800ABA88(void* mgr, int a, int b, int c);
-void fn_800AB528(void* mgr);
-int fn_800AC398();
-int fn_802FD4F8(void* p);
-}
-
 int fn_802FDCD8(void* p);
 void fn_802FDEC4(void* p);
 void fn_802FDFE8(void* p);
@@ -375,6 +341,115 @@ void fn_802FDAB4(void* p, int a)
     fn_802FDAD4(p);
 }
 
+struct Unk8019F8C0_Owner;
+int fn_801A37D8(Unk8019F8C0_Owner* o);
+struct Unk802FDCD8_A {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk802FDCD8_S {
+    char pad0[0x744];
+    Unk802FDCD8_A* m744;
+};
+struct Unk802FDCD8_O {
+    char pad0[0x24];
+    Unk8019F8C0_Owner* m24;
+    char pad28[0x40 - 0x28];
+    int m40[3];
+};
+struct Unk802FDCD8_M {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Unk802FDCD8_G {
+    char pad0[0x20];
+    int m20;
+    int m24;
+};
+extern Unk802FDCD8_G* lbl_8061B8C0;
+extern int lbl_8061FE9C;
+extern "C" {
+void fn_800ABA88(void* mgr, int a, int b, int c);
+void fn_800AB528(void* mgr);
+int fn_800AC398();
+int fn_802FD4F8(void* p);
+}
+
+struct Unk802FDAD4_X {
+    char pad0[0xC];
+    int mC;
+};
+struct Unk802FDAD4_Y {
+    char pad0[0x3D90];
+    int m3D90;
+};
+struct Unk802FDAD4_Z {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Unk802FDAD4_K {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk802FDAD4_L {
+    char pad0[0x3BC];
+    int m3BC;
+};
+struct Unk802FDAD4_S {
+    char pad0[0x564];
+    Unk802FDAD4_K* m564;
+    char pad568[0x700 - 0x568];
+    Unk802FDAD4_L* m700;
+    char pad704[0x744 - 0x704];
+    Unk802FDCD8_A* m744;
+    char pad748[0x780 - 0x748];
+    int m780;
+    int m784;
+};
+struct Unk802FDAD4_O {
+    char pad0[0x24];
+    Unk802FDAD4_S* m24;
+};
+extern "C" {
+Unk802FDAD4_X* fn_801A4CE8(void* o, int a);
+int fn_801BBF24(int a);
+Unk802FDAD4_Z* fn_8031C6A8();
+}
+Unk802FDAD4_Y* fn_801A6D84(Unk8019F8C0_Owner* o, int a);
+
+int fn_802FDAD4(void* p)
+{
+    Unk802FDAD4_O* o = (Unk802FDAD4_O*)p;
+    int k = o->m24->m564->m14;
+    if (o->m24->m744->m20 != 0)
+        return 0;
+    if (lbl_8061B8C0->m24 != 0)
+        return 0;
+    if (((Unk802F8324_VT18*)lbl_80619D10)->s17() != 0) {
+        fn_800AB528(lbl_80619D10);
+        if (fn_800AC398() != 0)
+            return 0;
+    }
+    if (fn_801A4CE8(o->m24, 1)->mC != 0)
+        return 0;
+    if (fn_801BBF24(o->m24->m700->m3BC) == 5)
+        return 0;
+    if (fn_801A6D84((Unk8019F8C0_Owner*)o->m24, 1)->m3D90 != 0)
+        return 0;
+    int f = fn_8031C6A8()->m2C != 0;
+    if (f != 0)
+        return 0;
+    int g = 0;
+    if (o->m24->m780 != 0 || o->m24->m784 != 0)
+        g = 1;
+    if (g != 0)
+        return 0;
+    int r = 0;
+    if ((unsigned)(k - 3) <= 3 || k == 8 || k == 7)
+        r = 1;
+    return r;
+}
+
 void fn_802FDC34(Unk802FD1D4_O* p)
 {
     int r = fn_802FDAD4(p);
@@ -590,6 +665,90 @@ int fn_8011AA4C();
 void fn_8014E09C(Unk802FFA20_It* it, void* o, int k);
 void fn_8014E108(Unk802FFA20_It* it);
 int fn_801A497C(void* o, int a, int b);
+}
+
+struct Unk80300848_S;
+void fn_80301798(Unk80300848_S* p);
+void fn_802FFA20(Unk802FFA20_A* a, Unk802FFA20_S* s);
+int fn_802FFE94(Unk802FCAC0_P24* p);
+struct Unk802FF894_M {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk802FF894_N {
+    char pad0[0xC];
+    int mC;
+};
+struct Unk802FF894_L {
+    char pad0[0x10];
+    Unk802FF894_N* m10;
+};
+struct Unk802FF894_S {
+    char pad0[0x550];
+    int m550;
+    char pad554[0x6F4 - 0x554];
+    int m6F4;
+    Unk802FF894_L* m6F8;
+    char pad6FC[0x744 - 0x6FC];
+    Unk802FF894_M* m744;
+};
+struct Unk802FF894_O {
+    char pad0[0x24];
+    Unk802FF894_S* m24;
+    char pad28[0x3C - 0x28];
+    Unk802FFA20_A m3C;
+    int m64;
+};
+extern "C" {
+void fn_80300848(void* o);
+void fn_803005CC(void* o);
+void fn_80300B4C(void* o);
+void fn_80300F44(void* o);
+void fn_803013D8(void* o);
+void fn_803015D8(void* o);
+void fn_803017D4(void* o);
+}
+
+void fn_802FF894(Unk802FF894_O* o)
+{
+    fn_803188FC(lbl_8061FF44, 4);
+    lbl_8061FF44->m2C = 4;
+    if (o->m24->m550 == 1) {
+        if (o->m64 == 0)
+            fn_802FF7AC((Unk802FCAC0_Obj*)o);
+        if (o->m24->m744->m20 != 0 || fn_801A6D84((Unk8019F8C0_Owner*)o->m24, 1)->m3D90 != 0) {
+            fn_80301798((Unk80300848_S*)o);
+            ((void (*)(void*))fn_802FF868)(o);
+            fn_802FFA20(&o->m3C, (Unk802FFA20_S*)o->m24);
+            if (fn_801A6D84((Unk8019F8C0_Owner*)o->m24, 1)->m3D90 == 0 && fn_8011AA4C() != 10) {
+                fn_80300848(o);
+                fn_803005CC(o);
+                fn_80300B4C(o);
+            }
+        } else {
+            int t = o->m24->m6F8->m10->mC;
+            if (fn_802FFE94((Unk802FCAC0_P24*)o) != 0) {
+                fn_802FFA20(&o->m3C, (Unk802FFA20_S*)o->m24);
+                if (o->m24->m6F4 != 8) {
+                    fn_80300848(o);
+                    fn_803005CC(o);
+                    fn_80300B4C(o);
+                    fn_80300F44(o);
+                    fn_803017D4(o);
+                    fn_803013D8(o);
+                    fn_803015D8(o);
+                }
+            } else if (t == 2) {
+                fn_802FFA20(&o->m3C, (Unk802FFA20_S*)o->m24);
+                fn_803017D4(o);
+                fn_803013D8(o);
+                fn_803015D8(o);
+            } else {
+                fn_80301798((Unk80300848_S*)o);
+                ((void (*)(void*))fn_802FF868)(o);
+            }
+        }
+    }
 }
 
 void fn_802FFA20(Unk802FFA20_A* a, Unk802FFA20_S* s)
