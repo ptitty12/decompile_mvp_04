@@ -76,6 +76,57 @@ void Unk8007A4DC_Screen::fn_80073994(int a, int b, int i, int c)
         m190[i].m0->v40(a, b, c);
 }
 
+struct Unk739E0_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008395C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int fn_800801DC(Unk8007A4DC_Screen* s);
+/* near-miss (pass 2, ~60 slots): same structure and 137 vs 140 instructions; retail moves d into r4, keeps
+ * the m190 base in a callee-saved register across the two vcalls of the d > 1 arm and holds the first result in r26. */
+int Unk8007A4DC_Screen::fn_800739E0(int a, int id, int c, int d)
+{
+    if (c <= 1) {
+        if (d <= 1) {
+            W* w = m190[c].m4[d];
+            return w->v28(a, fn_80071814(w, id));
+        }
+        W* w1 = m190[c].m4[0];
+        int r1 = w1->v28(a, fn_80071814(w1, id));
+        W* w2 = m190[c].m4[1];
+        return r1 + w2->v28(a, fn_80071814(w2, id));
+    }
+    if (fn_800801DC(this) == 1) {
+        Unk8007A4DC_Obj1E8* o = m1E8;
+        int p = fn_80080198();
+        Unk739E0_Out sp;
+        fn_8008395C(o, id, p, fn_800849C0(c), &sp.a);
+        switch (a) {
+        case 0:
+            return sp.b & 0x7F;
+        case 1:
+            return (sp.b >> 15) & 0xFF;
+        case 2:
+            return (sp.b >> 23) - (sp.b & 0x7F);
+        case 5:
+            return (sp.c >> 15) & 0xFF;
+        case 6:
+            return (sp.c >> 7) & 0xFF;
+        case 7:
+            break;
+        case 8:
+            return sp.c & 0x7F;
+        case 10:
+            break;
+        case 11:
+            return (sp.a >> 22) + ((sp.c >> 7) & 0xFF) + (sp.c & 0x7F);
+        }
+    }
+    return 0;
+}
+
 void Unk8007A4DC_Screen::fn_800743A0(int a, int b, int i, int j, int c)
 {
     if (j <= 1 && i <= 1) {
@@ -137,6 +188,47 @@ void Unk8007A4DC_Screen::fn_80074708(int a, int b, int i, int c)
 {
     if (i <= 4)
         m1A8[i]->v40(a, b, c);
+}
+
+struct Unk74754_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008397C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int Unk8007A4DC_Screen::fn_80074754(int a, int x, int i)
+{
+    if (i <= 1) {
+        W* w = m1CC[i].m0;
+        return w->v28(a, fn_80071814(w, x));
+    }
+    Unk8007A4DC_Obj1E8* o = m1E8;
+    int p = fn_80080198();
+    Unk74754_Out sp;
+    fn_8008397C(o, x, p, fn_800849C0(i), &sp.a);
+    switch (a) {
+    case 0:
+        return sp.a & 0x7F;
+    case 1:
+        return sp.b >> 23;
+    case 2:
+        return (sp.b >> 21) & 3;
+    case 3:
+        return (sp.b >> 15) & 0x3F;
+    case 4:
+        return (sp.b >> 9) & 0x3F;
+    case 6:
+        return sp.a >> 24;
+    case 7:
+        return sp.c >> 25;
+    case 8:
+        return (sp.c >> 19) & 0x3F;
+    case 9:
+        return (sp.c >> 7) & 0x3F;
+    default:
+        return 0;
+    }
 }
 
 void Unk8007A4DC_Screen::fn_80074F50(int a, int b, int i, int c)
