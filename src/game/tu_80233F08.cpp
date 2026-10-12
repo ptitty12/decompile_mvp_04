@@ -291,6 +291,50 @@ void Unk8022FE34_U::fn_8023538C()
     m4->m72C = 0;
 }
 
+/* Table lookup in the owner's weight table at m4->m738: row k (0..3), column idx (0..3). */
+struct Unk80256C80_M;
+int fn_80257B40(Unk80256C80_M* m);
+extern "C" int fn_801A4B34(Unk8022FE34_Ctx* c);
+extern const float lbl_805D7308;
+float Unk8022FE34_U::fn_802354AC()
+{
+    float r = lbl_805D7308;
+    if (fn_801A6DB8(fn_80235FA8())->m14 == 0) {
+        r = lbl_805D7308;
+    } else {
+        float* tbl = m4->m738;
+        int a = fn_801A2034(fn_80235FA8(), 4);
+        int b = fn_801A2034(fn_80235FA8(), 3);
+        int k;
+        if (a == -1) {
+            k = (b == -1) ? 0 : 1;
+        } else {
+            k = (b == -1) ? 2 : 3;
+        }
+        int f = 0;
+        unsigned char* rb = (unsigned char*)fn_80235FA8()->m6F8->m14;
+        unsigned char hi = rb[0x1CCB];
+        unsigned char lo = rb[0x1CCA];
+        if (hi == 0)
+            f = lo == 0;
+        int e = fn_80257B40(*(Unk80256C80_M**)((char*)m8 + 0x3B4)) == fn_801A4B34(fn_80235FA8());
+        int d = e ^ 1;
+        int idx = 4;
+        if (f == 0 && d == 0)
+            idx = 0;
+        else if (f == 0 && d == 1)
+            idx = 1;
+        else if (f == 1 && d == 0)
+            idx = 2;
+        else if (f == 1 && d == 1)
+            idx = 3;
+        char* bb = (char*)tbl + 0x28;
+        int off = idx * 4 + k * 16;
+        r = *(float*)(bb + off);
+    }
+    return r;
+}
+
 void Unk8022FE34_U::fn_80235618()
 {
     if (m4->m8 == 2)
