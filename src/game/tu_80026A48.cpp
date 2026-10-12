@@ -73,6 +73,44 @@ extern "C" void fn_80027CCC(Unk80023AC4_Obj* x)
     fn_8003EAB0(x->m6C8);
 }
 
+extern "C" int fn_8002BD04(Unk80023AC4_Obj* x, Unk801A4B34_Pos* p);
+void fn_800357F4(int a, int b, int c, int d, int e, int f, int g);
+void fn_8003D33C(int a, int b, int c);
+void fn_8003CB00(int a);
+int fn_8002A2D4(Unk80023AC4_Obj* x);
+
+extern "C" void fn_80027E70(Unk80023AC4_Obj* x)
+{
+    int z = x->m514 == 0;
+    x->m160.m40 = x->m160.m40 + 1;
+    x->m160.m48 = x->m160.m48 + 1;
+    char* b490 = (char*)x + 0x490;
+    int o = z * 0xC;
+    *(int*)(b490 + o) = *(int*)(b490 + o) + 1;
+    char* b470 = (char*)x + 0x470;
+    int o2 = z * 4;
+    *(int*)(b470 + o2) = *(int*)(b470 + o2) + 1;
+    Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x61);
+    Unk801A4B34_Pos* pos = fn_801A4910(x->m80[0], x->m514, m->mC);
+    unsigned a = Unk8001F5CC_RowSum(&x->mC8->m14->e[0]);
+    unsigned b = Unk8001F5CC_RowSum(&x->mC8->m14->e[1]);
+    int same = (a ^ b) == 0;
+    int f = 1;
+    int v = fn_8006BE18(x->m80[0]->m6F8);
+    if (x->m638 <= 0)
+        f = 0;
+    int d = x->mD0;
+    if (d != 0) {
+        int c = x->m514;
+        fn_800357F4(d, c, fn_8002BD04(x, pos), same, v, f, fn_8002A2D4(x));
+    }
+    x->m794 = (int)pos;
+    x->fn_800233B4(0x1F, 1, 0);
+    fn_8003D33C(x->m6C8, Unk8001F5CC_RowSum(&x->mC8->m14->e[0]), Unk8001F5CC_RowSum(&x->mC8->m14->e[1]));
+    fn_8003CB00(x->m6C8);
+    x->m6BC = 0;
+}
+
 extern "C" void fn_80028088(Unk80023AC4_Obj* x)
 {
     if (fn_801C3F00(x->m80[0]->m700->m3A4) == 0)
