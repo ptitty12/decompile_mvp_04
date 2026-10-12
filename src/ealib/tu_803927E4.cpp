@@ -112,7 +112,7 @@ struct McRec12 {
     unsigned char m8;
     unsigned char m9;
     unsigned char mA;
-    char padB;
+    unsigned char mB;
 };
 
 struct McBufB {
@@ -133,8 +133,8 @@ extern int lbl_8069B80C[];
 extern int lbl_80624414;
 extern "C" int fn_80392098(int);
 extern "C" void fn_803943A8(unsigned);
-extern "C" int fn_80394650(int);
-extern "C" int fn_80392AA4(int);
+extern "C" int fn_80394650(unsigned);
+extern "C" int fn_80392AA4(unsigned);
 extern "C" int fn_80394638(int);
 extern "C" int fn_80394C0C(int);
 
@@ -172,11 +172,11 @@ struct McHdrP {
 };
 
 extern "C" int fn_80393D18(McHdrP*, McBufB*, int);
-extern "C" void fn_80393E60(int, McBufB*, McHdrP*);
+extern "C" void fn_80393E60(int*, McBufB*, McHdrP*);
 
 extern "C" void fn_803927E4(unsigned);
 
-extern "C" void fn_80392BC0();
+extern "C" void fn_80392BC0(int);
 
 struct McEnt8W {
     unsigned m0;
@@ -193,6 +193,34 @@ struct McSrcW {
 };
 extern "C" int fn_80391DC4(int*, unsigned char**);
 
+extern "C" int fn_80393918(McBufB*, McHdrP*);
+
+extern "C" char* fn_80395774(void*, int);
+
+struct McSp {
+    unsigned short a;
+    short b;
+};
+
+extern "C" void fn_8039539C(int*, int, unsigned char, int*);
+extern "C" void fn_8039402C(int*, int, McHdrP*);
+extern "C" void fn_80394170(int, int, int*);
+
+extern "C" int fn_803925A8(unsigned);
+extern "C" void fn_80392884(unsigned);
+
+struct McCtxA {
+    char pad0[0x90];
+    unsigned char m90;
+    unsigned char m91;
+};
+
+extern "C" int fn_8039387C(McHdr5*, McSrc*);
+extern "C" int fn_8039305C(McSrc*, unsigned*, McRec12*);
+extern "C" int fn_803933E8(McCtxA*, McHdr5*, McRec12*, McSrc*, unsigned*);
+
+extern "C" int fn_80391914(McB*, int);
+
 extern "C" void fn_803927E4(unsigned n)
 {
     if (n <= 15) {
@@ -201,7 +229,7 @@ extern "C" void fn_803927E4(unsigned n)
         int off = n * 16;
         int v = *(int*)((char*)pc + off);
         if (v != 0) {
-            ((void (*)(int))fn_80392BC0)(v);
+            fn_80392BC0(v);
             *(int*)((char*)pc + off) = 0;
         }
         unsigned char* q = (unsigned char*)(t + off);
@@ -218,13 +246,12 @@ extern "C" void fn_803927E4(unsigned n)
     }
 }
 
-/* near-miss: retail keeps the result in r9 (mr r9,r3 / mr r3,r9) and sets it before the call; 6 spellings tried. */
-extern "C" int fn_80392948()
+extern "C" int fn_80392948(int* p)
 {
-    int (*f)() = lbl_8069B7C4[0];
+    int (*f)(int*) = (int (*)(int*))lbl_8069B7C4[0];
     int r = 1;
     if (f != 0)
-        r = f();
+        r = f(p);
     return r;
 }
 
@@ -258,26 +285,54 @@ extern "C" int fn_80392A28(int n)
     return r;
 }
 
+extern "C" int fn_80392AA4(unsigned n)
+{
+    int r = 0;
+    if (n <= 7 && lbl_8069B80C[n] != 0) {
+        char* t = (char*)lbl_8069B80C;
+        int* pc = (int*)(t + 0x4c);
+        for (;;) {
+            int idx = fn_803925A8(n);
+            if (idx < 0)
+                break;
+            int sp = **(int**)((char*)pc + idx * 16);
+            if (fn_80392948(&sp) == 1) {
+                fn_803943A8(n);
+                r = fn_80394C0C(idx);
+                if (r == 0)
+                    fn_803927E4(idx);
+            } else {
+                fn_803927E4(idx);
+            }
+            if (r != 0) {
+                fn_80392884(idx);
+                fn_803927E4(idx);
+                break;
+            }
+        }
+    }
+    return r;
+}
+
 extern "C" void fn_80392B6C(int (*a)(), void (*b)())
 {
     lbl_806243E0[0] = a;
     lbl_806243E4[0] = b;
 }
 
-/* near-miss: same as fn_80392948 */
-extern "C" int fn_80392B80()
+extern "C" int fn_80392B80(int x)
 {
-    int (*f)() = lbl_806243E0[0];
+    int (*f)(int) = (int (*)(int))lbl_806243E0[0];
     int r = 0;
     if (f != 0)
-        r = f();
+        r = f(x);
     return r;
 }
 
-extern "C" void fn_80392BC0()
+extern "C" void fn_80392BC0(int v)
 {
     if (lbl_806243E4[0] != 0)
-        lbl_806243E4[0]();
+        ((void (*)(int))lbl_806243E4[0])(v);
 }
 
 /* needs -fno-strength-reduce */
@@ -510,6 +565,51 @@ extern "C" int fn_8039335C(McSrc* p, McHdr6* q, int* tab)
     return r;
 }
 
+extern "C" int fn_803933E8(McCtxA* a, McHdr5* b, McRec12* rec, McSrc* g, unsigned* c)
+{
+    int has = fn_80392ED8(g);
+    int cnt = 0;
+    McB* tbl = (McB*)lbl_806243F8[0][rec->m4].m4;
+    int best = 0;
+    int bestIdx = -1;
+    int n = tbl->m5;
+    if (fn_8039335C(g, (McHdr6*)tbl, (int*)c) != 0) {
+        int stride = (tbl->m4 & 0x7f) + 2;
+        unsigned char* p = (unsigned char*)tbl + 0xe;
+        int i = 0;
+        if (cnt < n) {
+            do {
+                if (fn_80392F2C(b, (McSrcW*)g, (int*)c, p) != 0 && fn_80393284((McA6*)rec, tbl, i) != 0) {
+                    int sc = fn_80391914(tbl, i);
+                    if (sc > 0) {
+                        if (sc > best) {
+                            best = sc;
+                            bestIdx = i;
+                        }
+                    } else {
+                        if (((int (*)(McBuf*, int))fn_8039332C)((McBuf*)a, i) != 0)
+                            cnt++;
+                        if (has != 0)
+                            fn_80392E50(b, g, p);
+                    }
+                }
+                i++;
+                p += stride;
+            } while (i < n);
+        }
+        char* base = (char*)tbl + 0xc;
+        if (cnt == 0 && bestIdx != -1) {
+            if (((int (*)(McBuf*, int))fn_8039332C)((McBuf*)a, bestIdx) != 0)
+                cnt = 1;
+            if (has != 0) {
+                p = (unsigned char*)(base + bestIdx * stride);
+                fn_80392E50(b, g, p + 2);
+            }
+        }
+    }
+    return cnt;
+}
+
 extern "C" int fn_80393584(int x)
 {
     int r = 0;
@@ -518,7 +618,7 @@ extern "C" int fn_80393584(int x)
     return r;
 }
 
-extern "C" void fn_803935A8(McHdr5* p, McBufB* q)
+extern "C" int fn_803935A8(McHdr5* p, McBufB* q)
 {
     int sum = 0;
     int cnt = p->m2 >> 2;
@@ -577,6 +677,45 @@ extern "C" void fn_80393828(McHdr5* p)
         base[i] = 0;
 }
 
+extern "C" int fn_80393AD0(McCtxA* a, McHdr5* b, unsigned* c, int d)
+{
+    int r = 1;
+    int tries = 200;
+    int all;
+    unsigned n = b->m2 >> 2;
+    if ((int)n > 12 || fn_803937E4((unsigned char*)b, d) == 0)
+        goto fail;
+    fn_80393828(b);
+    a->m90 = n;
+    do {
+        all = 1;
+        tries--;
+        for (int i = 0; i < (int)n; i++) {
+            unsigned char* ids = (unsigned char*)b + 8;
+            McSrc* g = (McSrc*)((char*)b + ids[i] * 4);
+            McRec12* rec = (McRec12*)a + i;
+            if (fn_8039387C(b, g) == 0) {
+                all = 0;
+            } else if (rec->mB == 0) {
+                rec->m8 = a->m91;
+                if (fn_8039305C(g, c, rec) == 0)
+                    goto fail;
+                int v = fn_803933E8(a, b, rec, g, c);
+                if (v == 0)
+                    goto fail;
+                rec->m9 = v;
+                rec->mB = 1;
+            }
+        }
+    } while (all == 0 && tries > 0);
+    if (tries != 0)
+        goto done;
+fail:
+    r = 0;
+done:
+    return r;
+}
+
 extern "C" void fn_80393C00(McHdr5* p, McBufB* q)
 {
     int cnt = p->m2 >> 2;
@@ -598,10 +737,84 @@ extern "C" void fn_80393C00(McHdr5* p, McBufB* q)
     }
 }
 
+extern "C" int fn_80393C98(McHdr5* p, McBufB* q)
+{
+    int r = 0;
+    int done = 0;
+    int i = (p->m2 >> 2) - 1;
+    McRec12* rec = (McRec12*)q + i;
+    int t9 = rec->m9;
+    int lim = rec->m8 + t9;
+    do {
+        rec->mA = rec->mA + 1;
+        if (rec->mA < lim) {
+            done = 1;
+        } else {
+            rec->mA = rec->m8;
+            i--;
+            if (i < 0) {
+                done = 1;
+                r = 1;
+            }
+            rec = (McRec12*)q + i;
+            t9 = rec->m9;
+            lim = rec->m8 + t9;
+        }
+    } while (done == 0);
+    return r;
+}
+
+extern "C" int fn_80393D18(McHdrP* a, McBufB* b, int x)
+{
+    int ok = 0;
+    int wrapped = 0;
+    int cnt = a->m2 >> 2;
+    for (int i = 0; i < cnt; i++) {
+        McRec12* e = (McRec12*)b + i;
+        e->mA = e->m8;
+    }
+    while (wrapped == 0 && ok == 0) {
+        ok = 1;
+        if (x != 0)
+            ok = fn_803935A8((McHdr5*)a, b) <= x;
+        if (ok) {
+            if (a->m3 != 0) {
+                if (fn_80393918(b, a) == 0)
+                    ok = 0;
+            }
+        }
+        if (ok == 0)
+            wrapped = fn_80393C98((McHdr5*)a, b);
+    }
+    return ok;
+}
+
 extern "C" int fn_80393E1C(McHdr7* p)
 {
     p->mA = p->m8 + fn_80394FD4(p->m9, p->m4);
     return 1;
+}
+
+extern "C" void fn_80393E60(int* a, McBufB* b, McHdrP* c)
+{
+    unsigned char* out;
+    if (fn_80391DC4(a, &out) != 0) {
+        int n = c->m2 >> 2;
+        for (int i = 0; i < n; i++) {
+            unsigned char* ids = (unsigned char*)c + 8;
+            McSrc* g = (McSrc*)((char*)c + ids[i] * 4);
+            for (int j = 0; j < g->m4; j++) {
+                McEnt8* ge = g->m8;
+                McEnt8* e = &ge[j];
+                if (e->m4 == 0xfe && !(e->m6 & 0x80)) {
+                    McRec12* rec = (McRec12*)b + i;
+                    char* t = fn_80395774(lbl_806243F8[0][rec->m4].m4, b->m92[rec->mA]);
+                    if (t != 0)
+                        out[e->m6] = t[j];
+                }
+            }
+        }
+    }
 }
 
 /* needs -fno-strength-reduce */
@@ -630,4 +843,36 @@ extern "C" int fn_80394638(int i)
 {
     McRow160* r = (McRow160*)(i * 0xA0 + (int)lbl_8069B9C0);
     return r->m9;
+}
+
+extern "C" int fn_80394650(unsigned n)
+{
+    int r = 0;
+    if (n <= 7 && fn_80394638(n) != 0) {
+        char* t = (char*)lbl_8069B9C0;
+        int off = n * 160;
+        int* c = (int*)(t + 0xc);
+        int* p = *(int**)((char*)c + off);
+        int sp = *p;
+        int* c4 = (int*)(t + 4);
+        fn_8039539C(&sp, *(int*)(t + off), ((unsigned char*)(t + off))[8], p);
+        fn_8039402C(&sp, *(int*)(t + off), *(McHdrP**)((char*)c4 + off));
+        fn_80394170(*(int*)(t + off), *(int*)((char*)c4 + off), &sp);
+        r = (*(McHdr5**)((char*)c4 + off))->m2 >> 2;
+        char* s = (char*)lbl_8069B94C;
+        int so = n * 8;
+        int v;
+        int* s4;
+        if (((McSp*)&sp)->a == *(unsigned short*)(s + so)) {
+            s4 = (int*)(s + 4);
+            v = *(int*)((char*)s4 + so) + 1;
+        } else {
+            s4 = (int*)(s + 4);
+            ((int*)s)[n * 2] = sp;
+            v = 1;
+        }
+        *(int*)((char*)s4 + so) = v;
+    }
+    fn_803943A8(n);
+    return r;
 }
