@@ -134,14 +134,13 @@ int fn_80254A34(A* self)
     return r;
 }
 
-/* near-miss: one instruction too many; float constant/compare placement differs */
 int fn_80254A90(A* self)
 {
     if ((fn_80254A34(self) == 1 || fn_80254964(self) != 0) && !self->b2) {
         float t = self->m8;
         if (!(t > 0.0f))
             return 1;
-        float lo = 0.4f;
+        const float lo = 0.4f;
         float d = Secs(self->m0->m44C) - t;
         if (d < lo)
             return 1;
