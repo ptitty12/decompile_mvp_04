@@ -153,8 +153,6 @@ extern "C" void fn_8018D254()
 }
 
 //@8018D258
-/* near-miss: 37/37 insns, 3 slots differ: the three trailing field stores (m378, m37C,
- * m374) come out in another order; all 6 source orders tried. */
 extern "C" void fn_8018D258(Unk80188698* o)
 {
     int old = o->m38C;
@@ -162,9 +160,9 @@ extern "C" void fn_8018D258(Unk80188698* o)
     o->m390 = old;
     ((Unk8018C9C8_Bits*)&o->m4A4)->b10 = fn_8018AABC(o);
     ((Unk8018C9C8_Bits*)&o->m4A4)->b9 = fn_8018B4D0(o);
+    o->m374 = 0;
     o->m378 = 0;
     o->m37C = 0.0f;
-    o->m374 = 0;
     fn_8037893C((char*)o->m44C + 0x704, 0x43, 0, 0, 0);
 }
 

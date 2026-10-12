@@ -32,18 +32,17 @@ Unk80195404::~Unk80195404()
 }
 
 //@80195928
-/* near-miss: 19/19 insns, 5 slots differ: only the registers of the zeroing loop (offset
- * in r11 / base in r10 in retail, swapped here). The clamp shape matches. */
 extern "C" void fn_80195928(Unk80194D44_O* o, int i)
 {
     for (int k = 0; k < 3; k++)
         o->mAF8[k] = 0;
-    if (i <= 2) {
-        if (i < 0)
-            i = 0;
+    int j = i;
+    if (j <= 2) {
+        if (j < 0)
+            j = 0;
     } else
-        i = 2;
-    o->mAF8[i] = 1;
+        j = 2;
+    o->mAF8[j] = 1;
 }
 
 //@80195E60
