@@ -27,7 +27,14 @@ extern Vp6Fn lbl_806EF3F8, lbl_806EF3FC, lbl_806EF3F0, lbl_806EF3DC, lbl_806EF3E
 typedef int* (*Vp6DqFn)(Vp6Dq*, int);
 extern Vp6DqFn lbl_806EF3F4;
 extern const int* lbl_806EF454;
-extern Vp6Fn lbl_806EF3E4, lbl_806EF3E8, lbl_806EF3EC, lbl_806EF3D4, lbl_806EF3D8, lbl_806EF3C0;
+extern int* lbl_806EF448;
+extern int* lbl_806EF44C;
+typedef void (*Vp6McFn)(Vp6Buf*, unsigned char*, unsigned char*, int, unsigned, int, int*);
+extern Vp6McFn lbl_806EF3EC;
+extern Vp6McFn lbl_806EF3E4;
+extern Vp6McFn lbl_806EF3E8;
+extern int* lbl_806EF450;
+extern Vp6Fn lbl_806EF3D4, lbl_806EF3D8, lbl_806EF3C0;
 extern Vp6Fn lbl_806EF3CC, lbl_806EF3D0, lbl_806EF3C4, lbl_806EF3B8, lbl_806EF3BC, lbl_806EF3C8;
 extern Vp6Fn lbl_806EF3B0, lbl_806EF3B4, lbl_806EF3AC, lbl_806EF3A8, lbl_806EF3A4, lbl_806EF3A0;
 extern Vp6Fn lbl_806EF404, lbl_806EF400, lbl_806EF408;
@@ -87,6 +94,12 @@ void fn_80397DBC(const unsigned char* src, int* dst, int stride, int step, unsig
 void fn_80397EA8(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 void fn_8039800C(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 void fn_8039868C(Vp6Buf* b, unsigned char* base);
+void fn_8039B058(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* src, unsigned char* dst, int* tbl);
+void fn_80399808(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void fn_80398C5C(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void fn_80399BF0(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void fn_8039AE60(Vp6Buf* b, unsigned char* src, unsigned char* dst, unsigned plane);
+void fn_80398BEC(Vp6Dq* d);
 void fn_80398138(const int* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 
 void fn_80397CAC()
@@ -224,9 +237,9 @@ void fn_80398324()
     lbl_806EF3F4 = fn_80398B40;
     lbl_806EF3DC = fn_8039D830;
     lbl_806EF3E0 = fn_8039D120;
-    lbl_806EF3E4 = fn_80398FE0;
-    lbl_806EF3E8 = fn_80399EA8;
-    lbl_806EF3EC = fn_8039A778;
+    lbl_806EF3E4 = (Vp6McFn)fn_80398FE0;
+    lbl_806EF3E8 = (Vp6McFn)fn_80399EA8;
+    lbl_806EF3EC = (Vp6McFn)fn_8039A778;
     lbl_806EF3D4 = fn_80396E5C;
     lbl_806EF3D8 = fn_80396F4C;
     lbl_806EF3C0 = fn_803A0554;
@@ -469,6 +482,146 @@ void fn_80398BEC(Vp6Dq* d)
     } else {
         d->m38 = lbl_806EF3F4(d, lbl_806EF454[d->mC]);
     }
+}
+
+/* near-miss: 126 vs 125 insns; plane setup registers allocated differently. */
+void fn_8039AE60(Vp6Buf* b, unsigned char* a, unsigned char* c, unsigned plane)
+{
+    Vp6McFn fn;
+    Vp6McFn end;
+    int* tbl = 0;
+    int off;
+    int stride;
+    int base;
+    unsigned w;
+    unsigned h;
+    unsigned char* dst;
+    unsigned char* src;
+    unsigned i;
+    unsigned j;
+    int k;
+    if (reinterpret_cast<Vp6Dq*>(b)->m0 > 1) {
+        fn = lbl_806EF3E8;
+        end = fn_80399808;
+    } else {
+        fn = lbl_806EF3E4;
+        end = fn_80398C5C;
+    }
+    if (plane == 0) {
+        off = b->m78;
+        base = 0;
+        stride = b->m98;
+        dst = c + off;
+        src = a + off;
+        w = b->m90;
+        h = b->m94;
+    } else if (plane == 1) {
+        off = b->m7C;
+        w = (unsigned)b->m90 >> 1;
+        h = (unsigned)b->m94 >> 1;
+        dst = c + off;
+        src = a + off;
+        stride = b->m9C;
+        base = b->m84;
+    } else {
+        off = b->m80;
+        w = (unsigned)b->m90 >> 1;
+        h = (unsigned)b->m94 >> 1;
+        dst = c + off;
+        src = a + off;
+        stride = b->m9C;
+        base = b->m84 + b->m88;
+    }
+    if (reinterpret_cast<Vp6Dq*>(b)->m0 > 1) {
+        if (plane == 0) {
+            tbl = lbl_806EF448;
+        } else if (plane <= 2) {
+            tbl = lbl_806EF44C;
+        }
+    } else {
+        tbl = lbl_806EF450;
+    }
+    for (i = 0; i <= 3; i++) {
+        k = i * stride;
+        for (j = 0; j < (unsigned)stride; j++) {
+            dst[k] = src[k];
+            k++;
+        }
+    }
+    for (j = 1; j < h; j++) {
+        base += w;
+        src += stride << 3;
+        dst += stride << 3;
+        fn(b, src, dst, stride, w, base, tbl);
+    }
+    for (i = 0; i <= 3; i++) {
+        k = (i + 4) * stride;
+        for (j = 0; j < (unsigned)stride; j++) {
+            dst[k] = src[k];
+            k++;
+        }
+    }
+    end(b, src, dst, stride, w, base, tbl);
+}
+
+/* near-miss: 75 insns like the original code; stride and the copy pointer swap r29/r30 (priority of the loop pointer). */
+void fn_8039B058(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* X, unsigned char* Y, int* tbl)
+{
+    Vp6McFn fn = lbl_806EF3EC;
+    Vp6McFn last = fn_80399BF0;
+    unsigned i;
+    unsigned j;
+    unsigned char* x = X;
+    unsigned char* y = Y;
+    for (i = 0; i <= 3; i++) {
+        MEMCPY_V(y, x, stride);
+        x += stride;
+        y += stride;
+    }
+    for (j = 1; j < h; j++) {
+        X += stride << 3;
+        Y += stride << 3;
+        fn(b, X, Y, stride, w, a, tbl);
+        a += w;
+    }
+    y = Y + stride * 4;
+    x = X + stride * 4;
+    for (i = 0; i <= 3; i++) {
+        MEMCPY_V(y, x, stride);
+        x += stride;
+        y += stride;
+    }
+    last(b, X, Y, stride, w, a, tbl);
+}
+
+void fn_8039B184(Vp6Buf* b, unsigned char* src, unsigned char* dst)
+{
+    memset(b->m28, 0, b->m8C * 4);
+    if (reinterpret_cast<Vp6Dq*>(b)->m0 > 1) {
+        fn_80398BEC(reinterpret_cast<Vp6Dq*>(b));
+    }
+    if (reinterpret_cast<Vp6Dq*>(b)->m0 > 4) {
+        fn_8039B058(b, b->m98, 0, b->m90, b->m94, src + b->m78, dst + b->m78, lbl_806EF448);
+        fn_8039B058(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m7C, dst + b->m7C, lbl_806EF44C);
+        fn_8039B058(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m80, dst + b->m80, lbl_806EF44C);
+    } else {
+        fn_8039AE60(b, src, dst, 0);
+        fn_8039AE60(b, src, dst, 1);
+        fn_8039AE60(b, src, dst, 2);
+    }
+}
+
+void fn_8039B2B0(Vp6Buf* b, unsigned char* a, unsigned char* c)
+{
+    fn_80398BEC(reinterpret_cast<Vp6Dq*>(b));
+    void* save = b->m28;
+    memset(save, 0, b->m8C * 4);
+    fn_8039B058(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + b->m78, c + b->m78, lbl_806EF448);
+    b->m28 = reinterpret_cast<int*>(b->m28) + (((unsigned)(b->m90 * b->m94)) >> 1);
+    fn_8039B058(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + (b->m78 + b->m98), c + (b->m78 + b->m98), lbl_806EF448);
+    b->m28 = save;
+    fn_8039B058(b, b->m9C, b->m84, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m7C, c + b->m7C, lbl_806EF44C);
+    fn_8039B058(b, b->m9C, b->m84 + b->m88, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m80, c + b->m80, lbl_806EF44C);
 }
 
 }
