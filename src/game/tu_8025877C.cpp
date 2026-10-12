@@ -109,6 +109,27 @@ struct Unk8025877C_Sub {
 };
 extern char lbl_805DAC40[];
 int fn_801A2034(Q* q, int k);
+struct Unk80259FFC_F4 {
+    float v[4];
+};
+extern Unk80259FFC_F4 lbl_805DAD04;
+extern float lbl_805DBAC8[];
+extern float lbl_805DBA88[][4];
+extern char lbl_805DAD14[];
+extern const float lbl_805DAD44;
+extern const float lbl_805DAD50;
+extern float lbl_805DAD54;
+extern float lbl_805DAD58;
+extern float lbl_805DAD5C;
+float fn_8025454C(Unk8024EF40_W* w, int k);
+float fn_80254618(Unk8024EF40_W* w, int k);
+P* fn_801C1638(Q* q, int k);
+inline float RandK_9FFC(Q* q, const char* f, int line)
+{
+    float k = lbl_805DAD44;
+    return (float)fn_8014D8AC(q->m554, 1000000, f, line) * k * lbl_805DAD50;
+}
+
 struct Unk80258BA8_E {
     char pad0[8];
     int m8;
@@ -472,6 +493,25 @@ float fn_80259FB8(void* self, P* p, int c)
 {
     Unk80259E3C_F* f = (Unk80259E3C_F*)self;
     return f->b[fn_8025A664(self, p)][c];
+}
+
+/* near-miss: 105 vs 105 instructions, 6 slots (fcmpu operand order and the f12/f13 pair of the two `(r - 0.05) max 0.0` clamps). Written `K >? (r - k)`; `(r - k) >? K` loads k first and compares the other way round */
+float fn_80259FFC(void* so, int po)
+{
+    Unk8025A1A0_O* self = (Unk8025A1A0_O*)so;
+    P* p = (P*)po;
+    self->m50 = p->m44C;
+    float a = fn_8025454C(&p->m588, 0x15);
+    Unk80259FFC_F4 tbl = lbl_805DAD04;
+    int i = fn_80259F60(self, lbl_805DBAC8, 4, a);
+    float r;
+    r = RandK_9FFC(self->m50, lbl_805DAD14, 0x71);
+    P* pl = fn_801C1638(self->m50, 0);
+    if (*(int*)((char*)p + 0xA04) == 1)
+        r = lbl_805DAD58 >? (r - lbl_805DAD54);
+    if (!(fn_80254618(&pl->m588, 1) < lbl_805DAD5C))
+        r = lbl_805DAD58 >? (r - lbl_805DAD54);
+    return tbl.v[fn_80259F60(self, lbl_805DBA88[i], 4, r)];
 }
 
 int fn_8025A3A4(float* p)
