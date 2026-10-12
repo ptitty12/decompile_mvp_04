@@ -358,7 +358,9 @@ struct Unk801E1B9C_Src {
     int m10;
     char pad14[4];
     int m18;
-    char pad1C[0xC];
+    char pad1C[4];
+    int m20;
+    char pad24[4];
     Unk80273498_Vec3 m28;
     char pad34[0x30];
     Unk80273498_Vec3 m64;
@@ -405,6 +407,54 @@ extern "C" Unk8027C728_Goal* fn_801E1B9C(void* self, P* p, GSrc* x)
 }
 
 extern const float lbl_805D3C28;
+
+extern "C" Unk8027C728_Goal* fn_801E1C7C(void* self, P* p, GSrc* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 0xA;
+    fn_8027C728(g);
+    Unk8028B194* gs = (Unk8028B194*)g->m18;
+    int t = x->m20;
+    int k = 0x14;
+    if (t != 0)
+        k = t;
+    const Unk80273498_Vec3* pv = &x->m64;
+    gs->fn_8028B31C(k);
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)gs)->fn_8027A898(&w);
+    }
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    int c = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c;
+    g104->m40 = c;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    hs->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)hs)->fn_8027A898(&w);
+    }
+    int a2 = x->mC;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = a2;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    h104->m38 = a2;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    int c2 = x->m18;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
+    h104->m40 = c2;
+    return g;
+}
 
 extern "C" Unk8027C728_Goal* fn_801E1DF4(void* self, P* p, GSrc* x)
 {
