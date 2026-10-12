@@ -600,11 +600,54 @@ extern "C" DB_OVERLAY void fn_8052BED8(Unk8052B978_Tbl* self, int i)
         s->m4++;
 }
 
-extern "C" DB_OVERLAY void fn_8052C9B0(char** pp)
+inline int KeyAt(Unk8052B978_Tbl* t, int i)
 {
-    fn_80378FB0(pp, 0x40, 0x20);
-    while (**pp == 0x20)
-        ++*pp;
+    return *(unsigned short*)((char*)t->m8 + i * 0x1C);
+}
+
+/* near-miss: lower-bound binary search over the 0x1C-byte entries (u16 key at +0). Retail keeps hi in
+ * r3 (also the return register), enters the loop without folding lo = 0, and tests (hi - lo) >> 1
+ * at the loop head; ours folds the first test and keeps hi in r11 (62 vs 65 insns). Tried for(;;)
+ * with an inner test, while with goto, and a result variable. */
+extern "C" DB_OVERLAY int fn_8052C390(Unk8052B978_Tbl* self, int key)
+{
+    int lo = 0;
+    int hi = self->m4;
+    if (hi != 0 && !(key > KeyAt(self, hi - 1)) && !(key < KeyAt(self, 0))) {
+        int v;
+        int mid;
+        unsigned d;
+        while ((d = (unsigned)(hi - lo) >> 1) > 0) {
+            mid = lo + d;
+            v = KeyAt(self, mid);
+            if (v > key)
+                hi = mid;
+            else if (v < key)
+                lo = mid;
+            else
+                goto found;
+            if (hi == lo)
+                goto found;
+        }
+        if (KeyAt(self, hi) == key)
+            return hi;
+        if (KeyAt(self, lo) == key)
+            return lo;
+        return -1;
+    found:
+        if (v != key)
+            return -1;
+        if ((unsigned)mid > (unsigned)lo) {
+            int j;
+            for (j = mid; j >= 0; j--) {
+                if (KeyAt(self, j) != key)
+                    return j + 1;
+            }
+            return 0;
+        }
+        return mid;
+    }
+    return -1;
 }
 
 extern "C" DB_OVERLAY void fn_8052C494(Unk8052B978_Tbl* self, int a, Unk80070DDC_Stream* io)
@@ -613,6 +656,51 @@ extern "C" DB_OVERLAY void fn_8052C494(Unk8052B978_Tbl* self, int a, Unk80070DDC
     unsigned i;
     for (i = 0; i < (unsigned)self->m0; i++)
         fn_8052B644(&self->m8[i], a, io);
+}
+
+extern "C" int fn_804089B4(char* dst, const char* fmt, ...);
+extern "C" int fn_80409DAC(const char* s);
+extern "C" int fn_8040B6A0(const char* s);
+extern const char* lbl_806228B0;
+extern const char* lbl_806228B4;
+extern "C" void fn_8052B6DC(Unk8052B5C4_Ent* e, char** pp, Unk80070DDC_Stream* io);
+extern "C" void fn_8052C9B0(char** pp);
+extern "C" void fn_8052CA10(char** pp);
+
+extern "C" DB_OVERLAY void fn_8052C520(Unk8052B978_Tbl* self, char** pp, Unk80070DDC_Stream* io)
+{
+    char* cur = *pp;
+    if (io->v10() == 1) {
+        fn_804089B4(cur, lbl_806228B0, self->m4);
+        cur += fn_8040B6A0(cur);
+    } else {
+        fn_8052C9B0(&cur);
+        self->m4 = fn_80409DAC(cur);
+        fn_8052CA10(&cur);
+    }
+    *pp = cur;
+    unsigned i;
+    for (i = 0; i < (unsigned)self->m0; i++)
+        fn_8052B6DC(&self->m8[i], pp, io);
+    if (io->v10() == 1) {
+        cur = *pp;
+        fn_804089B4(cur, lbl_806228B4);
+        cur += fn_8040B6A0(cur);
+    } else {
+        cur = *pp;
+        fn_8052CA10(&cur);
+        fn_8052CA10(&cur);
+        fn_8052CA10(&cur);
+        fn_8052CA10(&cur);
+    }
+    *pp = cur;
+}
+
+extern "C" DB_OVERLAY void fn_8052C9B0(char** pp)
+{
+    fn_80378FB0(pp, 0x40, 0x20);
+    while (**pp == 0x20)
+        ++*pp;
 }
 
 extern "C" DB_OVERLAY void fn_8052CA10(char** pp)
