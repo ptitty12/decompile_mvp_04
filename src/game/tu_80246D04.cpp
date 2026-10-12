@@ -85,6 +85,8 @@ extern const float lbl_805D93EC;
 extern const float lbl_805D93F0;
 extern const float lbl_805D93F4;
 extern const float lbl_805D9484;
+/* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
+   equal-priority parameters); tried single-call, result-variable and else forms */
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e);
 void fn_80254784(void* p);
 
@@ -151,8 +153,6 @@ void fn_80247858(Unk80270BA0_X* x)
 float fn_804028E4(float x);
 float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
 float atan2f(float y, float x);
-/* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
-   equal-priority parameters); tried single-call, result-variable and else forms */
 extern "C" float fn_802478A0(void* o, void* p, int a, int b)
 {
     float f;

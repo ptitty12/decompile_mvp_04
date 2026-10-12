@@ -27,6 +27,20 @@ inline float Unk80251000_Lerp(float a, float t, float b)
     return a + t * (b - a);
 }
 
+struct Unk8024F048_Obj {
+    char pad0[0xA0];
+    P* mA0;
+};
+struct Unk8024F048_Tbl {
+    float v[4];
+};
+struct Unk80087A58_O;
+extern Unk8024F048_Tbl lbl_805D9794;
+extern float lbl_8062030C;
+extern float lbl_80620310;
+float fn_80088EA4(Unk80087A58_O* o);
+int fn_802536D0(P* x);
+
 /* Views for fn_8024FE4C: the world's context at +0x700 (table object at +0x3A4) and the player's +0x56C id. */
 struct Unk8024FE4C_Ctx {
     char pad0[0x3A4];
@@ -220,6 +234,66 @@ extern "C" float fn_8024EF40(Unk8024EF40_Obj* self, Unk8024EF40_Q* q, int k)
             w = fn_8024D0F8(self->mA0, 0xD);
         w = Unk80251000_Lerp(0.8f, w, 1.2f);
         s = s * w;
+    }
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    return s;
+}
+
+/* near-miss (98.2%): 4 slots; retail stores word 0 of the table copy (stw r11,24(r1)) before loading the other three words */
+extern "C" float fn_8024F048(Unk8024F048_Obj* self, int i, Unk8024EF40_Q* q, int k, int flag)
+{
+    float s = 0.0f;
+    if (lbl_80620308 != 0)
+        s = lbl_8062030C;
+    else
+        s = *(float*)((char*)self + i * 0x4C);
+    float m = 1.0f;
+    if (flag == 0) {
+        float w;
+        if (fn_801A2034(q, k) == -1) {
+            w = fn_8024D0F8(self->mA0, 0xC);
+            Unk8024F048_Tbl t = lbl_805D9794;
+            w += t.v[fn_802536D0(self->mA0)];
+        } else {
+            w = fn_8024D0F8(self->mA0, 0xB);
+        }
+        w = Unk80251000_Lerp(0.8f, w, 1.2f);
+        s = s * w;
+        m = fn_80088EA4((Unk80087A58_O*)((Unk8024F40C_Sub*)q->m6F8)->mC->mC);
+        m = !(m > 1.25f) ? (m >? 1.0f) : 1.25f;
+        s = s * m;
+    }
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    return s;
+}
+
+/* near-miss (98.4%): 4 slots; same table-copy store order as fn_8024F048 */
+extern "C" float fn_8024F20C(Unk8024F048_Obj* self, int i, Unk8024EF40_Q* q, int k, int flag)
+{
+    float s = 0.0f;
+    if (lbl_80620308 != 0)
+        s = lbl_80620310;
+    else {
+        char* b = (char*)self + 4;
+        int off = i * 0x4C;
+        s = *(float*)(b + off);
+    }
+    float m = 1.0f;
+    if (flag == 0) {
+        float w;
+        if (fn_801A2034(q, k) == -1) {
+            w = fn_8024D0F8(self->mA0, 0xA);
+            Unk8024F048_Tbl t = lbl_805D9794;
+            w += t.v[fn_802536D0(self->mA0)];
+        } else {
+            w = fn_8024D0F8(self->mA0, 9);
+        }
+        w = Unk80251000_Lerp(0.8f, w, 1.2f);
+        s = s * w;
+        s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+        m = fn_80088EA4((Unk80087A58_O*)((Unk8024F40C_Sub*)q->m6F8)->mC->mC);
+        m = !(m > 1.25f) ? (m >? 1.0f) : 1.25f;
+        s = s * m;
     }
     s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
     return s;

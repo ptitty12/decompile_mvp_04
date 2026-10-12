@@ -9,6 +9,25 @@ typedef Unk8024EF40_P P;
 typedef Unk8024EF40_W W;
 typedef Unk8024EF40_Q Q;
 
+extern const float lbl_805D9BC8;
+extern const float lbl_805D9BCC;
+extern const float lbl_805D9BD0;
+extern const float lbl_805D9BD4;
+extern float lbl_805D9BE0[1];
+struct Unk80270BA0_X;
+float fn_8024D050(Unk80270BA0_X* x, int a, int b, float f1, float f2);
+
+extern const float lbl_805D9BF8;
+extern const float lbl_805D9BFC;
+extern const float lbl_805D9C00;
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+float fn_8024D0F8(Unk80270BA0_X* x, int a);
+extern "C" P* fn_801A497C(Q* q, int a, int b);
+inline float Unk80252EB8_Clamp(float x)
+{
+    return !(x > lbl_805D9BE0[0]) ? (x >? lbl_805D9BD4) : lbl_805D9BE0[0];
+}
+
 extern "C++" {
 int fn_80250AC4(P* x);
 int fn_80250A90(P* x, int k);
@@ -195,7 +214,7 @@ struct Unk80253678_V : Unk80256A90_Data {
     virtual void v21();
     virtual int v22();
 };
-void fn_80252EB8(C* self, float v);
+extern "C" void fn_80252EB8(C* self, float v);
 extern const float lbl_805D9C20;
 extern const float lbl_805D9C24;
 extern const float lbl_805D9C28;
@@ -477,6 +496,34 @@ extern "C" void fn_80252DF4(char* p, float v)
     fn_80252EB8(self, lbl_805D9BB8);
 }
 
+/* a, b and c are only stored (retail keeps three float-store spills at 0xC..0x14 that nothing reads back) */
+extern "C" void fn_80252EB8(C* self, float v)
+{
+    float a = lbl_805D9BC8;
+    float b = lbl_805D9BCC;
+    float c = lbl_805D9BD0;
+    float d = fn_8024D050((Unk80270BA0_X*)self->m4, 4, 3, lbl_805D9BC8, lbl_805D9BCC);
+    d = d + lbl_805D9BD0;
+    self->m24 = self->m24 - v * d;
+    if (!(self->m24 >= lbl_805D9BD4))
+        self->m24 = lbl_805D9BD4;
+    float t = (float)fn_80254374(&self->m4->m588, 0);
+    if (!(t > lbl_805D9BD4)) {
+        self->m28 = lbl_805D9BD4;
+    } else {
+        self->m28 = self->m24 / t;
+        self->m28 = Unk80252EB8_Clamp(self->m28);
+    }
+    char* g = lbl_8068CCA8;
+    *(int*)(g + 8) = 0;
+    int n = fn_80254374(&self->m4->m588, 0);
+    *(int*)(g + 8) = 1;
+    float nf = (float)n;
+    int val = (int)(nf * self->m28 + lbl_805D9BC8);
+    P* p = self->m4;
+    fn_80089EE0((Unk80089894_PackTabD*)((char*)EntOf(p) + 0xC74), 0x1B, p->m70C, val);
+}
+
 void fn_8025309C(C* self, float v)
 {
     self->m2C = v;
@@ -523,6 +570,55 @@ void fn_80253220(C* self)
     self->m38 = self->m38 + 1;
     if (self->f1)
         self->f1 = 0;
+}
+
+/* near-miss (95.8%): 7 slots: retail emits the f1/f2 loads before "li r4,8" and loads the table entry after the base spill; same instructions */
+void fn_80253244(C* self, int a, int b)
+{
+    const int* tbl = lbl_805D9E94;
+    unsigned k = self->m48 - 0xF;
+    int idx = 0;
+    if (k <= 4)
+        idx = k;
+    float base = lbl_805D9BF8;
+    int st = self->m4->m458;
+    int tv = tbl[idx];
+    float mul = fn_8024D0C4((Unk80270BA0_X*)self->m4, 8, lbl_805D9BFC, lbl_805D9C00);
+    int dd = (int)(base * mul);
+    if (st == 0) {
+        int m = self->m30;
+        if (m < tv) {
+            self->m30 = m + a;
+            int lim = tv + dd;
+            int n = self->m30;
+            if (n > lim)
+                n = lim;
+            self->m30 = n;
+        }
+    } else if (st == 13) {
+        if (fn_801A497C(self->m4->m44C, self->m4->m708, 0) != self->m4)
+            self->m30 = self->m30 - 1;
+        if (self->m30 < 0)
+            self->m30 = 0;
+    } else if (st == 15) {
+        int n = self->m30 + a;
+        self->m30 = n;
+        self->m34 = self->m34 + a;
+        if (b == 0) {
+            int lim = tv + dd;
+            if (n > lim) {
+                if (fn_801A2034(self->m4->m44C, self->m4->m708) != -1) {
+                    float x = fn_8024D0F8((Unk80270BA0_X*)self->m4, 7);
+                    float y = (x * (float)tv) / (float)tbl[0];
+                    fn_80252EB8(self, y);
+                }
+                int m = self->m30;
+                if (m > lim)
+                    m = lim;
+                self->m30 = m;
+            }
+        }
+    }
 }
 
 /* near-miss: same 78 instructions, register choice differs (retail n in r10 with m38/m30 loaded into r9/r10; ours r0/r11). Tried operand order, temps, table pointer */
