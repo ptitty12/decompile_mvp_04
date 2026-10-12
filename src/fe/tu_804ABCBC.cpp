@@ -154,7 +154,7 @@ extern "C" FE_OVERLAY void fn_804AC478(FeSc1* x, int a)
     }
 }
 
-extern "C" FE_OVERLAY int fn_804ACAFC(int unused, int k)
+extern "C" FE_OVERLAY int fn_804ACAFC(FeSc1* unused, int k)
 {
     int r = 0;
     switch (k) {
@@ -227,8 +227,168 @@ extern "C" FE_OVERLAY void fn_804AE920(FeSc1* x)
     p->v86();
 }
 
-extern "C" FE_OVERLAY void fn_804AD040(FeScr* x)
+/* near-miss: retail moves r3 (out) before r4/r5 in the fn_80403DE4 call; 3 slots differ */
+extern "C" FE_OVERLAY void fn_804ACA20(FeSc1* x)
+{
+    char buf[0x100];
+    char fmt[0x20];
+    char out[0x20];
+    int i = 0;
+    do {
+        int p = (int)fn_800E4874(i);
+        fn_80403144(buf, fn_80090880(lbl_8061977C, fn_804ACAFC(x, i)));
+        if (p != 0) {
+            fn_804031BC(fmt, "(%d)");
+            fn_80403DE4(out, fmt, p);
+            fn_800DFF0C(buf, out);
+        }
+        ((FeObjS43*)x->m138)->v43(0, i, buf, 5);
+        i++;
+    } while (i <= 3);
+}
+
+extern "C" FE_OVERLAY void fn_804AE37C(FeSc1* x, int a)
+{
+    char fmtd[0x200];
+    char name[0x200];
+    Unk80090880* t = lbl_8061977C;
+    fn_800DE440(name, a, 0);
+    fn_80403DE4(fmtd, fn_80090880(t, 0x1CF0), name);
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_801321D4(p, x, (FeCb)fn_805291C8, 0, fmtd, 1, -1, 1, fn_80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY int fn_804ACDDC(FeSc1* x)
+{
+    int idx = ((FeObjI*)x->m134)->v60();
+    if (idx >= 0 && fn_800E4874(FI(x, 0x140)) != 0) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "EMAILITEM", 15);
+        p->name[15] = 0;
+        fn_804ACD0C(x, idx);
+        fn_800B7B4C(UiGetMsgMgr(), &m, x);
+        return 1;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804ACEAC(FeSc1* x, FeObj* w, int u, int c, int d)
+{
+    if ((int)w == FI(x, 0x134) && fn_800E4874(FI(x, 0x140)) != 0) {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "EMAILITEM", 15);
+        p->name[15] = 0;
+        fn_804ACD0C(x, c);
+        fn_800B7B4C(UiGetMsgMgr(), &m, x);
+    } else {
+        if ((int)w != FI(x, 0x138))
+            return 0;
+        FeObj* r = (FeObj*)((FeObjP2*)w)->v73(0, FI(x, 0x140));
+        ((FeObj1*)r)->v14(0);
+        FI(x, 0x140) = d;
+        fn_804AC564(x);
+    }
+    return 1;
+}
+
+extern "C" FE_OVERLAY void fn_804AE53C(FeSc1* x, int a, int b)
+{
+    char fmtd[0x200];
+    char name[0x200];
+    Unk80090880* t = lbl_8061977C;
+    fn_800DE440(name, b, 0);
+    int s = fn_800E190C(a);
+    fn_8040321C(fmtd, fn_80090880(t, 0x1CEF), name, (char*)fn_80090880(t, s));
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_801321D4(p, x, (FeCb)fn_805291C8, 0, fmtd, 1, -1, 1, fn_80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY void fn_804AE7D8(FeSc1* x, int a, int b, int c)
+{
+    char fmtd[0x200];
+    char name[0x200];
+    Unk80090880* t = lbl_8061977C;
+    fn_800DE440(name, a, 0);
+    int s1 = fn_80083F6C(b);
+    int s2 = fn_80083F6C(c);
+    fn_80403DE4(fmtd, fn_80090880(t, 0x1CEC), name, fn_80090880(t, s1), fn_80090880(t, s2));
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_801321D4(p, x, (FeCb)fn_805291C8, 0, fmtd, 1, -1, 1, fn_80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY void fn_804AE9DC(FeSc1* x, int a)
+{
+    char fmtd[0x200];
+    char name[0x200];
+    Unk80090880* t = lbl_8061977C;
+    fn_800DE440(name, a, 0);
+    fn_80403DE4(fmtd, fn_80090880(t, 0x1CE8), name);
+    int k = fn_80077BC4(lbl_8061930C, a);
+    if (k == 0) {
+        fn_800DFF0C(fmtd, (char*)fn_80090880(t, 0x1CEA));
+    } else {
+        int j = lbl_8061930C->fn_80078A38(k);
+        if (j == 0) {
+            fn_80403DE4(name, fn_80090880(t, 0x1CE9), fn_80090880(t, fn_800E18D4(k)));
+        } else {
+            int q = lbl_8061930C->fn_80075948(k);
+            int s = lbl_8061930C->fn_8007B320(0, q);
+            fn_80403DE4(name, fn_80090880(t, 0x1CEB), fn_80090880(t, fn_800E190C(s)), fn_80090880(t, fn_80083F6C(j)), fn_80090880(t, fn_800E190C(k)));
+        }
+        fn_800DFF0C(fmtd, name);
+    }
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_801321D4(p, x, (FeCb)fn_805291C8, 0, fmtd, 1, -1, 1, fn_80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY void fn_804AD040(FeSc1* x)
 {
     fn_800ECE34(x);
-    x->m138 = (FeObj*)fn_800B7AB8(UiGetMsgMgr(), "PLAYERINFOBAR");
+    x->m138 = fn_800B7AB8(UiGetMsgMgr(), "PLAYERINFOBAR");
+}
+
+extern "C" FE_OVERLAY void fn_804ABF48(FeSc1* x, int a)
+{
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+    if (a != 0)
+        fn_80131F34(p, x, (FeCb)fn_804AC0E0, 0, 0x1D08, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    else
+        fn_80131F34(p, x, (FeCb)fn_804AC0AC, 0, 0x1D3E, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY void fn_804ABE1C(FeSc1* x)
+{
+    char buf[0x190];
+    int s1 = fn_804ACAFC(x, FI(x, 0x140));
+    Unk80090880* t = lbl_8061977C;
+    fn_80403DE4(buf, fn_80090880(t, 0x1D10), fn_80090880(t, s1));
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+    const char* a = fn_80090880(t, 0x1D11);
+    const char* b = fn_80090880(t, 0x1D12);
+    fn_801321D4(p, x, (FeCb)fn_804AC060, 0, buf, 3, -1, 1, a, b, fn_80090880(t, 0x26DF), 0, 0, 0);
+    p->v86();
+}
+
+extern "C" FE_OVERLAY FeRaw* fn_804ACFC8(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_80674080;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = -1;
+    FeSub14* s = (FeSub14*)((char*)self + 0x144);
+    s->m14 = lbl_806841F8;
+    fn_8052DD58(s);
+    return self;
 }

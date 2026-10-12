@@ -10,6 +10,8 @@
 
 #include "game/tu_8043FDC0.h"
 
+struct FeRec4;
+
 /* A widget pointer stored at a byte offset of a screen (beyond FeScr's named fields). */
 #define FeP(x, o) (*(FeObj**)((char*)(x) + (o)))
 /* An int field of a screen at a byte offset. */
@@ -181,6 +183,134 @@ struct FeRaw : FeScrRaw {
     int m3F4;
     int m3F8;
     int m3FC;
+    int m400;
+    int m404;
+    int m408;
+    int m40C;
+    int m410;
+    int m414;
+    int m418;
+    int m41C;
+    int m420;
+    int m424;
+    int m428;
+    int m42C;
+    int m430;
+    int m434;
+    int m438;
+    int m43C;
+    int m440;
+    int m444;
+    int m448;
+    int m44C;
+    int m450;
+    int m454;
+    int m458;
+    int m45C;
+    int m460;
+    int m464;
+    int m468;
+    int m46C;
+    int m470;
+    int m474;
+    int m478;
+    int m47C;
+    int m480;
+    int m484;
+    int m488;
+    int m48C;
+    int m490;
+    int m494;
+    int m498;
+    int m49C;
+    int m4A0;
+    int m4A4;
+    int m4A8;
+    int m4AC;
+    int m4B0;
+    int m4B4;
+    int m4B8;
+    int m4BC;
+    int m4C0;
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
+    int m4D4;
+    int m4D8;
+    int m4DC;
+    int m4E0;
+    int m4E4;
+    int m4E8;
+    int m4EC;
+    int m4F0;
+    int m4F4;
+    int m4F8;
+    int m4FC;
+    int m500;
+    int m504;
+    int m508;
+    int m50C;
+    int m510;
+    int m514;
+    int m518;
+    int m51C;
+    int m520;
+    int m524;
+    int m528;
+    int m52C;
+    int m530;
+    int m534;
+    int m538;
+    int m53C;
+    int m540;
+    int m544;
+    int m548;
+    int m54C;
+    int m550;
+    int m554;
+    int m558;
+    int m55C;
+    int m560;
+    int m564;
+    int m568;
+    int m56C;
+    int m570;
+    int m574;
+    int m578;
+    int m57C;
+    int m580;
+    int m584;
+    int m588;
+    int m58C;
+    int m590;
+    int m594;
+    int m598;
+    int m59C;
+    int m5A0;
+    int m5A4;
+    int m5A8;
+    int m5AC;
+    int m5B0;
+    int m5B4;
+    int m5B8;
+    int m5BC;
+    int m5C0;
+    int m5C4;
+    int m5C8;
+    int m5CC;
+    int m5D0;
+    int m5D4;
+    int m5D8;
+    int m5DC;
+    int m5E0;
+    int m5E4;
+    int m5E8;
+    int m5EC;
+    int m5F0;
+    int m5F4;
+    int m5F8;
+    int m5FC;
 };
 
 extern "C" {
@@ -482,6 +612,67 @@ public:
     virtual void s13();
     virtual void s14();
 };
+class FeObjS43 : public UiBase {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual void v30();
+    virtual void v31();
+    virtual FeObj* v32(const char* a0, int a1);
+    virtual void v33();
+    virtual void v34();
+    virtual void v35();
+    virtual void v36();
+    virtual void v37();
+    virtual void v38();
+    virtual void v39();
+    virtual void v40();
+    virtual void v41();
+    virtual void v42();
+    virtual void v43(int a0, int a1, char* a2, int a3);
+};
+class FeV4 {
+public:
+    char pad0[0x4];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual FeRec4* s11(int a0);
+};
 /* END-VIEWS */
 
 extern "C" {
@@ -498,5 +689,92 @@ extern "C" void fn_804B8570(FeScr* x, int a, int b);
 
 extern "C" void* fn_80594240(FeObj* l, int i);
 extern "C" void* fn_80593B68(FeObj* l, int i);
+
+extern "C" void fn_805818C8(int h, int id, int flag);
+
+/* Record behind the list handle of fn_8058211C's object (fn_804AF2A0): +0 and +4 are flags, +0x28 a value. */
+struct FeRec4 {
+    int m0;
+    int m4;
+    char pad8[0x28 - 8];
+    int m28;
+};
+inline int FeNz0(FeRec4* r)
+{
+    if (r->m0 != 0)
+        return 1;
+    return 0;
+}
+inline int FeNz1(FeRec4* r)
+{
+    int v = 1;
+    if (r->m0 == 0)
+        v = 0;
+    return v;
+}
+extern "C" FeV4* fn_8058211C(int h);
+
+extern "C" {
+void* fn_800E4874(int i);
+int fn_804ACAFC(FeSc1* x, int k);
+void fn_800DE440(char* out, int a, int b);
+void fn_804ACD0C(FeSc1* x, int i);
+}
+
+extern "C" void fn_804031BC(char* dst, const char* src);
+
+int fn_800E190C(int i); /* C++ symbol fn_800E190C__Fi */
+int fn_800E18D4(int i); /* C++ symbol fn_800E18D4__Fi */
+extern "C" int fn_80077BC4(void* g, int a);
+
+extern "C" void fn_8052DD58(void* p);
+
+extern char lbl_80674080[];
+extern char lbl_806841F8[];
+
+/* Sub-object embedded at +0x144 of the screen of fn_804ACFC8: vptr at +0x14, ctor fn_8052DD58. */
+struct FeSub14 {
+    char pad0[0x14];
+    const void* m14;
+};
+
+
+extern "C" int fn_804B797C(FeScr* x);
+extern "C" int fn_800B5520(int a);
+
+/* Drawing batch of unit 804BB110 (ctor fn_804BB110): eight floats (a rect), a flag word at +0x20,
+ * four 0x324-byte records of 100 float pairs and a point count, then the record count (+0xCB4),
+ * flags (+0xCB8), a widget (+0xCBC), the vptr (+0xCC0) and a scale (+0xCC4). */
+struct FeCamPair {
+    float a;
+    float b;
+};
+struct FeCamRec {
+    FeCamPair p[100];
+    int cnt;
+};
+struct FeCam {
+    float m0, m4, m8, mC, m10, m14, m18, m1C;
+    int m20;
+    FeCamRec rec[4];
+    int mCB4;
+    int mCB8;
+    FeObj* mCBC;
+    const void* mCC0;
+    float mCC4;
+};
+struct FeTbl30 {
+    char pad0[0x14];
+    int m14;
+    int m18;
+    int m1C;
+};
+struct FeMgr30 {
+    char pad0[0x30];
+    FeTbl30* m30;
+};
+extern "C" void fn_804BB334(FeCam* c);
+extern "C" void fn_804BB3D0(FeCam* c, float a, float b, float c2, float d);
+extern "C" void fn_800CFB38(FeObj* w);
 
 #endif
