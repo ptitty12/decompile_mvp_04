@@ -199,6 +199,19 @@ extern "C" FE_OVERLAY void fn_804CA12C(int a)
     }
 }
 
+extern "C" FE_OVERLAY int fn_804CA1E8(void* x)
+{
+    FeW* w = ((FeScrN*)x)->m150->fn_vslot70();
+    if (w->fn_vslot30("SALARY", 1) != 0)
+        return 0;
+    if (w->fn_vslot30("TERM", 1) != 0)
+        return 1;
+    if (w->fn_vslot30("RESIGNPLAYERST", 1) != 0)
+        return 4;
+    w->fn_vslot30("RELEASEPLAYERST", 1);
+    return 5;
+}
+
 /* near-miss: 2 slots (retail compares `cmpwi r3,4; bge`, we emit `cmpwi r3,3; bgt`). The
  * comma form below is the closest of ~14 spellings of `n >= 4 && n <= 5`. */
 extern "C" FE_OVERLAY int fn_804CA2F0(void* x)
@@ -243,6 +256,25 @@ extern "C" FE_OVERLAY FeScrN* fn_804CA3F8(FeScrN* self, int a, int b, int c, int
 extern "C" FE_OVERLAY void fn_804CA448(FeScrN* x)
 {
     fn_800ECAA4(x);
+}
+
+extern "C" FE_OVERLAY void fn_804CA664(FeScrN* x, int sel)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    switch (sel) {
+    case 0:
+        fn_8040B830(mp->name, "BACK", 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    case 1:
+        fn_8040B830(mp->name, (char*)x->m134->fn_vslot70()->fn_vslot33(5, 1) + 0xC, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804CA788(FeScrN* x)
