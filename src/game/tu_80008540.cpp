@@ -13,7 +13,7 @@
 #include "game/tu_80008540.h"
 
 extern "C" {
-void fn_8043BA64(int);                      /* called once before the pads are created */
+void SISetSamplingRate(int);                      /* called once before the pads are created */
 void* fn_8040B320(void* dst, int val, unsigned int n);   /* memset */
 void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
 void fn_804393B4(unsigned int mask);
@@ -27,7 +27,7 @@ const char* lbl_80615848 = "gcpad";
 /* Allocates the pad objects into arr and returns n. */
 int fn_80008540(Unk800085B0** arr, int n)
 {
-    fn_8043BA64(1);
+    SISetSamplingRate(1);
     for (int i = 0; i < n; i++) {
         arr[i] = new (0) Unk800085B0(i);
     }
