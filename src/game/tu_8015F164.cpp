@@ -64,6 +64,10 @@ struct ElemView8015F164 {
 };
 int fn_801A4F40(Unk8019F8C0_Owner* o);
 extern "C" void fn_80169BF8(Unk8016D9A0_Rec* rec, const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
+int fn_803EE348(int a);
+extern "C" int fn_80166BD0(Unk80159F28* self);
+void fn_80303CA0(const char* s, float a, float b, float c, ...);
+extern "C" int fn_8017706C__FP13Unk8017706C_Ti(void* t, int i);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -185,6 +189,32 @@ void Unk80159F28::fn_8015FB84(int a, int b, Unk8015FB08_Rec rec) /* 8015FB84 */
     fn_80157514(a, b, 0, 0, 0, rec.m4);
 }
 
+extern "C" void fn_80160640(Unk80159F28* self) /* 80160640 */
+{
+    if (fn_803EE348(0) > 0x1B7FF) {
+        int r = fn_80166BD0(self);
+        fn_80303CA0("End of game intensity %d", 4.0f, 0.4f, 0.4f, r + 1);
+        if (r != 3) {
+            int f = 0;
+            if (r != 2) {
+                if (r <= 2) {
+                    f = r >= 0;
+                }
+            }
+            RecObj8015F164 rec;
+            if (f != 0) {
+                self->fn_80157514(0x53, (int)&rec, 1, 4, 0, lbl_8068B828);
+            } else {
+                self->fn_80157514(0x54, (int)&rec, 1, 4, 0, lbl_8068B828);
+            }
+            self->fn_80157514(8, (int)&rec, 1, 0x15, 1, lbl_8068B828);
+            self->fn_80157514(0x39, (int)&rec, 1, 4, 1, lbl_8068B828);
+            fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+            self->m48 = 1;
+        }
+    }
+}
+
 int Unk80159F28::fn_80160DEC() /* 80160DEC */
 {
     int r = fn_80160E64();
@@ -231,6 +261,28 @@ int Unk80159F28::fn_80160E64() /* 80160E64 */
         return 2;
     }
     return 1;
+}
+
+extern "C" void fn_801615C0(Unk80159F28* self, int which) /* 801615C0 */
+{
+    if ((unsigned)which <= 1) {
+        int g = fn_8017706C__FP13Unk8017706C_Ti(self->mC->m700->m3A8, which);
+        RecObj8015F164 rec;
+        if (which == 1) {
+            if (g == 1) {
+                self->fn_80157514(1, (int)&rec, 1, 0xB, 0, lbl_8068B828);
+            } else {
+                self->fn_80157514(2, (int)&rec, 1, 0xB, 0, lbl_8068B828);
+            }
+        } else {
+            if (g == 1) {
+                self->fn_80157514(3, (int)&rec, 1, 0xC, 0, lbl_8068B828);
+            } else {
+                self->fn_80157514(4, (int)&rec, 1, 0xC, 0, lbl_8068B828);
+            }
+        }
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    }
 }
 
 extern "C" void fn_80161924(Unk80159F28* self) /* 80161924 */
