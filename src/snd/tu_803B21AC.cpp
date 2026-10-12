@@ -6,6 +6,7 @@
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
 #include "snd/cmn/sndcmn.h"
+#include <string.h>
 
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
@@ -90,10 +91,18 @@ extern "C" void fn_803B5EC4(void* obj);
 extern "C" void fn_803B5F18(void* obj, int* buf);
 extern "C" void fn_803B31B4(Unk803B31B4* obj, int v);
 
+struct Unk803B3334;
+struct Unk803B3334_Src {
+    int (*fn)(Unk803B3334_Src* self, int a, float* b, float* c, int d);
+};
+
 struct Unk803B3334 {
     void* m0;
     void* m4;
-    char pad8[0x14];
+    Unk803B3334_Src* m8;
+    char padC[0xE];
+    unsigned char m1A;
+    char pad1B;
     unsigned char* m1C;
     int m20;
     float m24;
@@ -112,7 +121,10 @@ struct Unk803B3334 {
 extern "C" int fn_803B02CC(int v);
 extern "C" int fn_803B4BEC(int v);
 extern "C" int fn_803B3F60(const unsigned char* p, int n);
-extern "C" void fn_803B31F4();
+extern "C" int fn_803B2C0C(int n, unsigned char** pp, float* ps, float x);
+extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst);
+extern "C" int fn_803B2F48(Unk803B3334* o, int count);
+extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst);
 extern "C" void fn_803B3334(Unk803B3334* o);
 extern int lbl_8069CBC0;
 
@@ -305,9 +317,83 @@ extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
     return n;
 }
 
+extern "C" int fn_803B2F48(Unk803B3334* o, int count)
+{
+    if (count > o->m38) {
+        int total = 0;
+        int last = 0;
+        unsigned char* sp8 = o->m1C;
+        float spC = o->m28;
+        int avail;
+        count -= o->m38;
+        avail = o->m30;
+        if (count > 0 && avail >= o->m2C) do {
+            int used;
+            int got;
+            if (avail < o->m2C * 2)
+                last = 0;
+            else
+                last = fn_803B2C0C(o->m2C, &sp8, &spC, o->m24);
+            if (last >= 0) {
+                used = o->m2C;
+                got = used + last;
+            } else {
+                used = o->m2C * 2;
+                got = used + last;
+            }
+            total += used;
+            avail -= used;
+            if (count <= got)
+                count = 0;
+            else
+                count -= got;
+            if (count <= 0) break;
+        } while (avail >= o->m2C);
+        if (last > 0)
+            total += o->m2C;
+        if (count > 0) {
+            if (count > avail)
+                total += avail;
+            else
+                total += count;
+        }
+        if (total > o->m34)
+            return total - o->m34;
+    }
+    return 0;
+}
+
 extern "C" void fn_803B31B4(Unk803B31B4* o, int v)
 {
     o->m24 = v * 0.000244140625f;
+}
+
+extern "C" int fn_803B31F4(Unk803B3334* o, int count, float* src, float* dst)
+{
+    float* buf = src;
+    int need;
+    int r;
+    if (o->m30 == 0)
+        return o->m8->fn(o->m8, 0xC8, dst, buf, o->m1A);
+    need = fn_803B2F48(o, count);
+    if (o->m20 >= 0 && need > SNDPKTPLAY_framesoutstanding(o->m20))
+        return 0;
+    if (need > 0) {
+        if (need * 4 > o->m1830) {
+            int sz = need & ~0x3F;
+            sz += 0x40;
+            if (o->m182C < sz)
+                Snd::Util::ReallocBuf(&o->m1828, &o->m182C, sz, 4);
+            buf = (float*)((char*)o->m1828 + 8);
+        }
+        r = o->m8->fn(o->m8, need, dst, buf, o->m1A);
+        if (r <= 0)
+            return r;
+    }
+    r = fn_803B306C(o, count, buf, dst);
+    if (r < count)
+        memset(dst + r, 0, (count - r) * 4);
+    return count;
 }
 
 extern "C" void fn_803B3334(Unk803B3334* o)
