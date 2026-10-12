@@ -160,7 +160,8 @@ public:
     int m3D0;
     char pad3D4[0x8];
     int m3DC;
-    char pad3E0[0x8];
+    int m3E0;
+    char pad3E4[0x4];
     int m3E8;
     char pad3EC[0x4];
     int m3F0;
@@ -183,7 +184,8 @@ public:
     int m458;
     char pad45C[0x4];
     int m460;
-    char pad464[0x70];
+    int m464;
+    char pad468[0x6C];
     int m4D4;
     int m4D8;
     char pad4DC[0xAC];

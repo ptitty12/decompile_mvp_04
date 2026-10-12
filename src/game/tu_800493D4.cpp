@@ -297,6 +297,61 @@ void fn_8004AF94(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     fn_80010548(t, r);
 }
 
+void fn_8004B070(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    char* b4 = (char*)s + 4;
+    int o = idx * 0x48;
+    int cur = *(int*)(b4 + o);
+    if (cur < a->m4D4) {
+        char* rec = (char*)a + (cur * 0x18 + 0x48C);
+        int k = fn_8005000C(s, idx, 0xB);
+        Unk8001CE80* g = (Unk8001CE80*)a;
+        if (k != -1) {
+            int ko = k * 0x48;
+            int id = *(int*)(rec + 8);
+            if (*(int*)(b4 + ko) == id) {
+                char* e = (char*)s + ko + 4;
+                int st = *(int*)(e + 4);
+                if (a->m3F8 != 0) {
+                    if (a->m3E8 != 0)
+                        fn_80018694();
+                } else {
+                    if (!(*(float*)(e + 0x10) >= 0.7f) && st != 6 && st != 7 && st != 8 && st != 5 && a->m3E0 != 0) {
+                        int x = g->fn_8001D6CC();
+                        fn_80015880(x, fn_8001F45C(a, *(int*)(rec + 8)));
+                    } else {
+                        int flag = 0;
+                        if ((id != 0 && fn_8024D41C((Unk80270BA0_X*)id) != 0 && a->m464 != 0) || !(*(float*)(e + 0x10) <= 0.7f))
+                            flag = 1;
+                        if (flag == 1 || st == 6 || st == 8 || st == 5 || st == 7) {
+                            if (a->m3E8 != 0) {
+                                int x = fn_8001F3FC(a, *(int*)(rec + 8));
+                                int y = g->fn_8001D70C();
+                                int z = fn_8001F45C(a, *(int*)(rec + 8));
+                                fn_80010BC0(x, y, z, g->fn_8001D6CC());
+                            } else {
+                                fn_800183E8(g->fn_8001DA4C());
+                            }
+                        } else if (a->m3E8 != 0) {
+                            int x = fn_8001F3FC(a, *(int*)(rec + 8));
+                            int y = fn_8001F45C(a, *(int*)(rec + 8));
+                            fn_80010B54(x, y, g->fn_8001DA28());
+                        } else {
+                            int t = g->fn_8001DA4C();
+                            fn_80018384(t, fn_8001F45C(a, *(int*)(rec + 8)));
+                        }
+                    }
+                }
+            }
+        } else if (a->m3E8 == 0) {
+            int t = g->fn_8001DA4C();
+            fn_80018384(t, fn_8001F45C(a, *(int*)(rec + 8)));
+        }
+        fn_8004FCDC(s, idx, a);
+        fn_8004B910(s, idx, a);
+    }
+}
+
 void fn_8004B314(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (fn_8004FF78(s, s->m9D8, 0x2D) == -1 && fn_8004FF78(s, s->m9D8, 0x49) == -1) {
