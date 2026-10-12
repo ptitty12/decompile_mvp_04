@@ -3,6 +3,7 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+extern "C" int fn_800B56C4(FeState* s);
 extern "C" {
 int fn_800A2E6C(void* g);
 }
@@ -154,6 +155,32 @@ FE_OVERLAY void fn_8046F7BC(FeScrK* x)
 {
     fn_800ECE34(x);
     fn_800E49A4();
+}
+
+FE_OVERLAY void fn_8046F7E0(FeScrK* x)
+{
+    fn_800ECF18(x);
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(w, x);
+    fn_80125100(w);
+    fn_801250D8(w);
+    if (fn_800B5758(fn_800B555C()) != 0) {
+        x->fn_vslot32("OWNER", 1)->fn_vslot8(1);
+        x->fn_vslot32("OWNER", 1)->fn_vslot16(1);
+        x->fn_vslot32("DYNASTY", 1)->fn_vslot8(0);
+        x->fn_vslot32("DYNASTY", 1)->fn_vslot16(0);
+        x->fn_vslot32("OWNER", 1);
+        fn_800C8044()->fn_vslot32("CELL", 1);
+        x->m134 = (FeW*)fn_800C8060();
+    } else if (fn_800B56C4(fn_800B555C()) != 0) {
+        x->fn_vslot32("OWNER", 1)->fn_vslot8(0);
+        x->fn_vslot32("OWNER", 1)->fn_vslot16(0);
+        x->fn_vslot32("DYNASTY", 1)->fn_vslot8(1);
+        x->fn_vslot32("DYNASTY", 1)->fn_vslot16(1);
+        x->fn_vslot32("DYNASTY", 1);
+        fn_800C8044()->fn_vslot32("CELL", 1);
+        x->m134 = (FeW*)fn_800C8060();
+    }
 }
 
 FE_OVERLAY void fn_8046FAC8(FeScrK* x)
