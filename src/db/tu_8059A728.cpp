@@ -414,16 +414,12 @@ extern "C" DB_OVERLAY void fn_8059B280(Db8059A728_Obj* self, int k, int a, short
 }
 
 //@8059B308
+/* The zero arms share labels non-adjacently (0,6,8,10 and 1,7,9): labels with several uses are not followed by CSE,
+   so each arm keeps its own s = 0 and the full compare tree stays. Same shape in fn_8059B3D4 and fn_8059B47C. */
 extern "C" DB_OVERLAY int fn_8059B308(Db8059A728_Obj* self, int k, int a, int b)
 {
     int s = 0;
     switch (k) {
-    case 0:
-        s = 0;
-        break;
-    case 1:
-        s = 0;
-        break;
     case 2:
         s = 3;
         break;
@@ -436,22 +432,15 @@ extern "C" DB_OVERLAY int fn_8059B308(Db8059A728_Obj* self, int k, int a, int b)
     case 5:
         s = 5;
         break;
+    case 0:
     case 6:
-        s = 0;
-        break;
-    case 7:
-        s = 0;
-        break;
     case 8:
-        s = 0;
-        break;
-    case 9:
-        s = 0;
-        break;
     case 10:
         s = 0;
         break;
-    default:
+    case 1:
+    case 7:
+    case 9:
         s = 0;
         break;
     }
@@ -463,12 +452,6 @@ extern "C" DB_OVERLAY int fn_8059B3D4(Db8059A728_Obj* self, int k, int a)
 {
     int s = 0;
     switch (k) {
-    case 0:
-        s = 0;
-        break;
-    case 1:
-        s = 0;
-        break;
     case 2:
         s = 3;
         break;
@@ -481,22 +464,15 @@ extern "C" DB_OVERLAY int fn_8059B3D4(Db8059A728_Obj* self, int k, int a)
     case 5:
         s = 5;
         break;
+    case 0:
     case 6:
-        s = 0;
-        break;
-    case 7:
-        s = 0;
-        break;
     case 8:
-        s = 0;
-        break;
-    case 9:
-        s = 0;
-        break;
     case 10:
         s = 0;
         break;
-    default:
+    case 1:
+    case 7:
+    case 9:
         s = 0;
         break;
     }
@@ -508,12 +484,6 @@ extern "C" DB_OVERLAY int fn_8059B47C(Db8059A728_Obj* self, int k, int a)
 {
     int s = 0;
     switch (k) {
-    case 0:
-        s = 0;
-        break;
-    case 1:
-        s = 0;
-        break;
     case 2:
         s = 3;
         break;
@@ -526,22 +496,15 @@ extern "C" DB_OVERLAY int fn_8059B47C(Db8059A728_Obj* self, int k, int a)
     case 5:
         s = 5;
         break;
+    case 0:
     case 6:
-        s = 0;
-        break;
-    case 7:
-        s = 0;
-        break;
     case 8:
-        s = 0;
-        break;
-    case 9:
-        s = 0;
-        break;
     case 10:
         s = 0;
         break;
-    default:
+    case 1:
+    case 7:
+    case 9:
         s = 0;
         break;
     }
