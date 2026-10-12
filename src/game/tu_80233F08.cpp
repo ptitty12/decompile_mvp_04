@@ -40,12 +40,14 @@ int fn_801A48F8(Unk8022FE34_Ctx* c, int i);
 Unk8022FE34_Pl* fn_801A4910(Unk8022FE34_Ctx* c, int i, int k);
 void fn_80253244(Unk8022FE34_Obj480* o, int a, int b);
 extern const float lbl_805D730C;
-extern float lbl_805D7310;
+/* Declared as an array so that loads of it count as in-struct memory and stay below the int stores
+   (a scalar global is hoisted above them by the scheduler). */
+extern float lbl_805D7310[1];
 extern const float lbl_805D7314;
 extern const float lbl_805D7318;
 extern const float lbl_805D731C;
-extern float lbl_805D7320;
-extern float lbl_805D7324;
+extern float lbl_805D7320[1];
+extern float lbl_805D7324[1];
 extern int lbl_8061D150[];
 int fn_80088234(void* o, int i);
 
@@ -77,7 +79,7 @@ int Unk8022FE34_U::fn_80234E44()
 inline void ArmA(Unk8022FE34_Owner* t, float f)
 {
     t->m438.a = 1;
-    t->m438.b = (int)(f * lbl_805D7310);
+    t->m438.b = (int)(f * lbl_805D7310[0]);
 }
 
 void Unk8022FE34_U::fn_802350F8()
@@ -108,6 +110,8 @@ void Unk8022FE34_U::fn_80235164()
             break;
         case 3:
             fn_80235160();
+            break;
+        case 4: /* no code in retail; the extra node moves the switch tree's root from case 1 to case 2 */
             break;
         }
     }
@@ -156,7 +160,6 @@ void Unk8022FE34_U::fn_80235364()
     fn_8022F2B8(m4, 0);
 }
 
-/* near-miss: retail loads the float constant after the m438 store (our scheduler hoists it) */
 void Unk8022FE34_U::fn_80235618()
 {
     if (m4->m8 == 2)
@@ -164,9 +167,9 @@ void Unk8022FE34_U::fn_80235618()
     if (m80 == 0)
         m6C = lbl_805D730C;
     fn_8022F2B8(m4, 0);
-    m44 = 0;
     m78 = 0;
     m64 = 0;
+    m44 = 0;
     float f = fn_802354AC();
     ArmA(m4, f);
     fn_802398C8(&m4->m440);
@@ -239,7 +242,6 @@ void Unk8022FE34_U::fn_8023590C()
     fn_80188698(fn_80235FA8()->m6CC, lbl_805D7318);
 }
 
-/* near-miss: same constant-load placement as fn_80235618; m4 is loaded once into a pointer first in retail */
 void Unk8022FE34_U::fn_8023596C()
 {
     fn_8022F174(this, 0);
@@ -247,7 +249,7 @@ void Unk8022FE34_U::fn_8023596C()
     Unk8022FE34_Owner* t = m4;
     float f = lbl_805D731C;
     t->m438.a = 1;
-    t->m438.b = (int)(f * lbl_805D7320);
+    t->m438.b = (int)(f * lbl_805D7320[0]);
     Unk8022FE34_VObj* o = fn_801C1638(fn_80235FA8(), 0);
     if (o != 0) {
         int k = *(int*)((char*)o + 0x708);
@@ -261,17 +263,19 @@ void Unk8022FE34_U::fn_80235A28()
     m4->m18 = 0;
 }
 
-/* near-miss: retail forms &m438 in place in r30 (addi r30,r30,0x438) after the first store */
+inline void ArmP(Unk8022FE34_Pair* p, float f)
+{
+    p->a = 1;
+    p->b = (int)(f * lbl_805D7324[0]);
+}
+
 void Unk8022FE34_U::fn_80235A40()
 {
     int k = fn_80235C68();
     if (k <= 1) {
         if (k >= 0) {
             Unk8022FE34_Owner* t = m4;
-            float f = fn_802354AC();
-            t->m438.a = 1;
-            Unk8022FE34_Pair* p = &t->m438;
-            p->b = (int)(f * lbl_805D7324);
+            ArmP(&t->m438, fn_802354AC());
         }
     }
 }
@@ -316,24 +320,26 @@ int Unk8022FE34_U::fn_80235C68()
     return m4->m8;
 }
 
-/* near-miss: register numbers swap (this/flag in r31/r29 vs ours r29/r31); instruction order is identical */
-float Unk8022FE34_U::fn_80235C74(int a)
+inline int Flag(Unk8022FE34_Ctx* c)
 {
     int f = 0;
-    if (fn_80235FA8()->m6F8->m14[2].m8 != 0)
+    if (c->m6F8->m14[2].m8 != 0)
         f = 1;
+    return f;
+}
+
+float Unk8022FE34_U::fn_80235C74(int a)
+{
+    int f = Flag(fn_80235FA8());
     f = f ^ 1;
     Unk8022FE34_Ent e;
     m4->m38.fn_80230268(f, a, &e);
     return e.m8;
 }
 
-/* near-miss: same register swap as fn_80235C74 */
 Unk8022FE34_V3 Unk8022FE34_U::fn_80235CEC(int a)
 {
-    int f = 0;
-    if (fn_80235FA8()->m6F8->m14[2].m8 != 0)
-        f = 1;
+    int f = Flag(fn_80235FA8());
     f = f ^ 1;
     Unk8022FE34_Ent e;
     m4->m38.fn_80230268(f, a, &e);
