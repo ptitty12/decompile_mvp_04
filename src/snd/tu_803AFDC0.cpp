@@ -29,6 +29,7 @@ extern "C" int fn_803B02CC(int v)
     return m;
 }
 
+/* near-miss: one register: retail keeps masterchan in r0 (lha r0), we use r9; lha/short/inline-index variants tried */
 extern "C" int fn_803B02FC(int v)
 {
     int idx = v + sndgs.sso.set.voicesdsp;
