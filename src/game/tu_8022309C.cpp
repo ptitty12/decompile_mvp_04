@@ -169,6 +169,35 @@ void fn_80223910(Task* t, int a)
     }
 }
 
+/* Object in TaskInner::m8[] whose position (a Vec3f) sits at +0x60 (fn_80225488). */
+struct Unk80225488_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+Vec3f fn_801F492C(Task* s, Vec3f* pos, int c, float f);
+int fn_8020CDA0(void* p, Vec3f* v);
+inline Vec3f Unk80225488_Flat(Unk80225488_Obj* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+inline float Unk80225488_Len2(const Vec3f& a, const Vec3f& b)
+{
+    return (a.x - b.x) * (a.x - b.x) + (a.z - b.z) * (a.z - b.z);
+}
+int fn_80225488(Task* t, int idx, Vec3f* out)
+{
+    Unk80225488_Obj* o = (Unk80225488_Obj*)t->m9C->m8[idx];
+    Vec3f b = Unk80225488_Flat(o);
+    *out = b;
+    if (fn_8020CDA0((char*)t->m9C + 0x2C, out) == 0) {
+        *out = fn_801F492C(t, out, (int)out, 168.0f);
+    }
+    const float lim = 576.0f;
+    return Unk80225488_Len2(b, *out) > lim;
+}
+
 int fn_8022559C(Task* t)
 {
     if (fn_8026DAE8(t->m9C->m8[0], 0) != 0) {
