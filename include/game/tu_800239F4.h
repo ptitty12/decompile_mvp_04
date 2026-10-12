@@ -75,7 +75,9 @@ struct Unk80023F98_Vec2 {
 /* Entry of the stride-0x28 array at Obj+0x294 (fn_80023E18, fn_80023F98, fn_80029074). */
 struct Unk80023E18_Ent {
     int m0;
-    char pad4[0xC];
+    int m4;
+    int m8;
+    int mC;
     Unk80023F98_Vec2 m10;
     Unk80023F98_Vec2 m18;
     int m20;
@@ -244,7 +246,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int mD4;
     char padD8[0x4];
     int mDC;
-    char padE0[0x14];
+    char padE0[0x10];
+    int mF0;
     int mF4;
     int mF8;
     int mFC;
@@ -256,7 +259,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m114;
     unsigned m118;
     int m11C;
-    char pad120[0x4];
+    int m120;
     int m124;
     unsigned m128;
     int m12C;
@@ -279,14 +282,16 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk80023ED8_Ent m1D0[1];
     char pad1F4[0x6C];
     int m260;
-    char pad264[0xC];
+    int m264;
+    char pad268[0x8];
     Unk80023ED8_Pair m270[3];
     char pad288[0x8];
     Unk801A4B34_Pos* m290;
     Unk80023E18_Ent m294[1];
     char pad2BC[0x118];
     int m3D4;
-    char pad3D8[0xC];
+    char pad3D8[0x8];
+    int m3E0;
     int m3E4;
     char pad3E8[0x10];
     int m3F8[10][2];
@@ -307,7 +312,11 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m570;
     int m574;
     int m578;
-    char pad57C[0x4C];
+    char pad57C[0x2C];
+    int m5A8;
+    char pad5AC[0x14];
+    Unk801A4B34_Pos* m5C0;
+    char pad5C4[0x4];
     Unk801A4B34_Vec3 m5C8;
     Unk801A4B34_Vec3 m5D4;
     Unk801A4B34_Vec3 m5E0;
@@ -316,14 +325,16 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m638;
     char pad63C[0x4];
     Unk801A4B34_Vec3 m640[9];
-    char pad6AC[0xC];
+    int m6AC;
+    char pad6B0[0x8];
     Unk800256F8_Rec* m6B8;
     Unk8002569C_Msg* m6BC;
     char pad6C0[0x8];
     int m6C8;
     float m6CC;
     int m6D0;
-    char pad6D4[0x8];
+    int m6D4;
+    char pad6D8[0x4];
     int m6DC;
     int m6E0;
     int m6E4;
@@ -340,7 +351,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     char pad708[0x4];
     int m70C;
     int m710;
-    char pad714[0x4];
+    int m714;
     Unk801A4B34_Pos* m718;
     int m71C;
     char pad720[0x4];

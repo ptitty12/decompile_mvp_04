@@ -7,6 +7,7 @@
  */
 #include "game/tu_8001B190.h"
 #include "game/tu_8001CACC.h"
+#include "game/tu_8022FE34.h"
 
 void* fn_803774A8(unsigned n, int heap);
 int fn_803AC11C();
@@ -195,6 +196,23 @@ void Unk8001CE80::fn_8001CEA8(float* b, float* a)
     *b = fn_80254474((char*)m3B0 + 0x588, 1, h);
 }
 
+void fn_8040A208(void* arr, int n, int sz, void (*f)(void*));
+void fn_8022F2C0(void* p);
+
+extern "C" int fn_8001CF18(Unk8001CE80* x, Unk8022FE34_Ent* arr)
+{
+    int i = 0;
+    Unk8001D47C_Mid* w = x->m130->m44C;
+    int side = *(int*)(w->m6F8->m14 + 0x1cd0) == 0;
+    Unk8022FE34_Pai* pai = ((Unk8022FE34_U*)w->m700->m3B0)->fn_80234E38();
+    int n = pai->fn_80230024(side);
+    for (i = 0; i < n; i++) {
+        pai->fn_8023003C(side, i, &arr[i], 0);
+    }
+    fn_8040A208(arr, n, 0x2c, fn_8022F2C0);
+    return n;
+}
+
 struct Unk806192E0_B {
     char pad0[0x14];
     char* m14;
@@ -296,6 +314,44 @@ void Unk8001CE80::fn_8001D248()
     fn_80045934(m154[m274].m0, m154[m274].m4);
 }
 
+extern "C" int fn_8001FA20(Unk8001CE80* x);
+extern "C" int fn_8001EDBC(Unk8001CE80* x);
+
+extern "C" int fn_8001D280(Unk8001CE80* x)
+{
+    int r = 0;
+    unsigned char* t = x->m130->m44C->m6F8->m14;
+    int o0 = x->m3B4 * 0xE64;
+    int a = Unk8001D47C_SumRow((Unk8001D47C_Row*)(t + o0));
+    int z = x->m3B4 == 0;
+    int o1 = z * 0xE64;
+    int b = Unk8001D47C_SumRow((Unk8001D47C_Row*)(t + o1));
+    int ok = 0;
+    if (*(int*)&x->m3B8 != 0 && x->m0 == 1 && x->m3B4 == 1 && x->m3C == 1 && x->m4D4 == 0 && x->m104 == 0 && a == 0) {
+        ok = b == 0;
+    }
+    if (ok) {
+        r |= 2;
+    }
+    if (*(int*)&x->m3B8 != 0 && x->m1 == 0 && a == 0 && b == 0 && x->m104 == 0 && x->m4D4 == 0) {
+        r |= 1;
+    }
+    if (fn_8001FA20(x) == 0x4000) {
+        r |= 4;
+    }
+    if (fn_8001EDBC(x) == 4) {
+        r |= 8;
+    }
+    float va;
+    float vb;
+    x->fn_8001CEA8(&vb, &va);
+    const float th = 1.6f;
+    if (!(vb + va < th)) {
+        r |= 0x10;
+    }
+    return r;
+}
+
 void Unk8001CE80::fn_8001D42C()
 {
     fn_80042E68(m3CC, m3D0);
@@ -310,30 +366,20 @@ int fn_8004705C(int a);
 int fn_80047118(int a);
 int fn_80046FD4(int a);
 
-/* near-miss (fn_8001D47C, fn_8001D538): retail forms `entry + 0x1b4` inside the loop and loads with lbzx (addi r11,r8,436; lbzx r0,r11,r9);
- * these two come out with the right length but an `add` + `lbz 436(r9)` per element. Tried: pointer in the loop body, struct field array, unsigned char counter. */
-static inline int SumBytes(unsigned char* p)
-{
-    int s = 0;
-    for (int i = 0; i < 0x80; i++) {
-        s += p[0x1b4 + (unsigned char)i];
-    }
-    return s;
-}
-
 int Unk8001CE80::fn_8001D47C()
 {
-    int a = SumBytes(m130->m44C->m6F8->m14);
-    int b = SumBytes(m130->m44C->m6F8->m14 + 0xe64);
+    int a = Unk8001D47C_SumRow((Unk8001D47C_Row*)m130->m44C->m6F8->m14);
+    int b = Unk8001D47C_SumRow((Unk8001D47C_Row*)(m130->m44C->m6F8->m14 + 0xe64));
+    int sum = a + b;
     int d = a - b;
     int r = fn_8004705C(d < 0 ? -d : d);
-    return r | fn_80047118(a + b);
+    return r | fn_80047118(sum);
 }
 
 int Unk8001CE80::fn_8001D538()
 {
-    int a = SumBytes(m130->m44C->m6F8->m14);
-    int b = SumBytes(m130->m44C->m6F8->m14 + 0xe64);
+    int a = Unk8001D47C_SumRow((Unk8001D47C_Row*)m130->m44C->m6F8->m14);
+    int b = Unk8001D47C_SumRow((Unk8001D47C_Row*)(m130->m44C->m6F8->m14 + 0xe64));
     int d = a - b;
     return fn_80046FD4(d < 0 ? -d : d);
 }
@@ -373,6 +419,13 @@ void Unk8001CE80::fn_8001D70C()
 void Unk8001CE80::fn_8001D75C()
 {
     fn_80043628(m45C);
+}
+
+int fn_800435E8(int a, int b);
+
+void Unk8001CE80::fn_8001D780()
+{
+    fn_800435E8(m454, ((Unk8001D780_VT*)m3B0)->s24());
 }
 
 void Unk8001CE80::fn_8001D7D0()

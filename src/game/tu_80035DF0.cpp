@@ -385,5 +385,33 @@ extern "C" int fn_80036B40(void* x, const char** pp, unsigned int* pn, int delim
     return r;
 }
 
-/* fn_80036BCC / fn_80036D70 / fn_80036F14 (row parsers, 0x1A4 bytes each) are not matched: the stores come out as
- * pointer-stepped stb with constant offsets, retail keeps `stbx` with a separate index register. */
+extern "C" void fn_800370B8(char* buf, unsigned char* out, const char* text, int lo3, int hi3, int lo5, int hi5)
+{
+    unsigned int n = 0;
+    unsigned int* pn = &n;
+    const char* start = fn_802B9300(text, 0x500, 0xB, pn);
+    const char* cur = start;
+    const char* end = start + n;
+    int v0, v1, v2, v3;
+    if (n != 0) {
+        const char** pc = &cur;
+        fn_803792AC(pc, pn);
+        while (cur != end && n > 1) {
+            if (!fn_800365A4(buf, &v0, pc, pn)
+                || !fn_800361D8(buf, pc, pn, &v1, lo3, hi3, 0x2C)
+                || !fn_800361D8(buf, pc, pn, &v2, lo5, hi5, 0x2C)
+                || !fn_80036628(buf, &v3, pc, pn))
+                fn_803792AC(pc, pn);
+            else if (!fn_8003641C(buf, out + v0 * 0xC0 + v1 * 0x30 + v2 * 0x10 + v3 * 4, pc, pn))
+                fn_803792AC(pc, pn);
+        }
+    }
+    fn_802B961C(start, 0xB);
+}
+
+/* fn_80036BCC / fn_80036D70 / fn_80036F14 (row parsers, 0x1A4 bytes each) are not matched (best 23/105 slots off).
+ * Recipe found: the stores must be `unsigned char* bK = out + K; bK[off] = v;` declared right before each store
+ * (retail's `addi r9,out,K; stbx r0,r9,off`, no stepped pointer), the first one `*(unsigned char*)(off + (int)out)`,
+ * `const char* data = 0;` declared first (its register doubles as the zero for the four stack inits), cur declared
+ * before len. Left: retail issues `mr r3,r31` (the &cur argument) LAST in every call's argument setup (r4,r5,..,r3);
+ * ours issues it first. Return type, prototype and pointer-local variants did not change the order. */

@@ -25,6 +25,59 @@ extern "C" int fn_8001E444(Unk8001E444_Obj* x)
     return r;
 }
 
+extern int lbl_805B19D0[];
+int fn_80253678(void* p);
+int fn_80254228(void* p, int a, int b);
+extern "C" int fn_80046B98(float f);
+struct Unk8024EF40_W;
+float fn_80253F54(Unk8024EF40_W* p, int a, int b, int c);
+
+extern "C" int fn_8001E4F4(Unk8001E444_Obj* x)
+{
+    Unk8001E444_Owner* o = x->m130;
+    Unk8001F5CC_Ent* e = (Unk8001F5CC_Ent*)((char*)o->m44C->m6F8->m14 + x->m3B0->m708 * 0xE64);
+    int c = e->m19C;
+    int h = fn_80253678(o->m480);
+    int v = fn_80254228(x->m3B0->m588, 0, h);
+    float d = 2.0f * (float)lbl_805B19D0[c];
+    float ratio = ((float)v / d) <? 1.0f;
+    int r = fn_80046B98(ratio);
+    fn_800B555C();
+    if (fn_800B57EC() != 0) {
+        float q = fn_80253F54((Unk8024EF40_W*)x->m3B0->m588, 2, 2, 1);
+        if ((unsigned)(r - 1) <= 1) {
+            if (!(q >= 0.275f))
+                r = 0;
+        } else if ((r == 4 || r == 8) && !(q < 0.275f)) {
+            r = 0;
+        }
+    }
+    return r;
+}
+
+
+extern int lbl_805B19E0[];
+int fn_80097520(Unk8001F5CC_Ent* row, int id);
+void fn_800446D8(float b, float c, int a);
+
+extern "C" void fn_8001E664(Unk8001E444_Obj* x)
+{
+    Unk8001E444_Owner* o = x->m130;
+    Unk8001F5CC_Tbl* t = o->m44C->m6F8;
+    Unk8001F5CC_Ent* e = (Unk8001F5CC_Ent*)((char*)t->m14 + x->m3B0->m708 * 0xE64);
+    int c = e->m19C;
+    int h = fn_80253678(o->m480);
+    int a = fn_80254228(x->m3B0->m588, 0, h);
+    int b = fn_80254228(x->m3B0->m588, 1, h);
+    float d1 = 2.0f * (float)lbl_805B19E0[c];
+    float d0 = 2.0f * (float)lbl_805B19D0[c];
+    float p10 = ((float)b / d1) <? 1.0f;
+    float p14 = ((float)a / d0) <? 1.0f;
+    int z = t->m14->m1CD0 == 0;
+    Unk8001F5CC_Ent* row = &t->m14->e[z];
+    fn_800446D8(p14, p10, fn_80097520(row, x->m130->m704));
+}
+
 extern "C" void fn_8001E810(Unk8001E444_Obj* x)
 {
     int a = x->m154[x->m274].m4;

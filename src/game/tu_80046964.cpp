@@ -7,17 +7,202 @@
  */
 #include "game/tu_80046964.h"
 
-/* near-miss: interval classifier; same length as retail but x is kept in f13 here, retail keeps the
- * lfs value in f13 and the fmr copy in f12 and reloads from the slot later (family: 80046964..80046E68) */
+/* Interval classifier family (fn_80046964 .. fn_80046DCC, fn_8004712C): written with the jumps spelled out
+ * (`if (x >= hi) goto s_next;` straight into the next interval's upper test, as retail's threaded
+ * branches). The plain `if (!(x < lo) && !(x >= hi))` chain compiled to the same length with a
+ * different register split. */
 int fn_80046964(float x)
 {
     int r = 0;
-    if (!(x < 0.0) && !(x >= 0.4))
-        r = 0x1000;
-    if (!(x < 0.4) && !(x >= 0.6))
-        r |= 0x2000;
-    if (!(x < 0.6) && !(x >= 1.01))
-        r |= 0x400;
+    if (x < 0.0) goto f1;
+    if (x >= 0.4) goto s1;
+    r = 0x1000;
+f1:
+    if (x < 0.4) goto f2;
+s1:
+    if (x >= 0.6) goto s2;
+    r |= 0x2000;
+f2:
+    if (x < 0.6) goto end;
+s2:
+    if (x >= 1.01) goto end;
+    r |= 0x400;
+end:
+    return r;
+}
+
+int fn_80046A00(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.6) goto s1;
+    r = 8;
+f1:
+    if (x < 0.6) goto f2;
+s1:
+    if (x >= 0.8) goto s2;
+    r |= 4;
+f2:
+    if (x < 0.8) goto f3;
+s2:
+    if (x >= 0.9) goto s3;
+    r |= 2;
+f3:
+    if (x < 0.9) goto end;
+s3:
+    if (x >= 1.01) goto end;
+    r |= 1;
+end:
+    return r;
+}
+
+int fn_80046ACC(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.6) goto s1;
+    r = 8;
+f1:
+    if (x < 0.6) goto f2;
+s1:
+    if (x >= 0.8) goto s2;
+    r |= 4;
+f2:
+    if (x < 0.8) goto f3;
+s2:
+    if (x >= 0.9) goto s3;
+    r |= 2;
+f3:
+    if (x < 0.9) goto end;
+s3:
+    if (x >= 1.01) goto end;
+    r |= 1;
+end:
+    return r;
+}
+
+extern "C" int fn_80046B98(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.6) goto s1;
+    r = 8;
+f1:
+    if (x < 0.6) goto f2;
+s1:
+    if (x >= 0.7) goto s2;
+    r |= 4;
+f2:
+    if (x < 0.7) goto f3;
+s2:
+    if (x >= 0.85) goto s3;
+    r |= 2;
+f3:
+    if (x < 0.85) goto end;
+s3:
+    if (x >= 1.01) goto end;
+    r |= 1;
+end:
+    return r;
+}
+
+extern "C" int fn_80046C64(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.5) goto s1;
+    r = 8;
+f1:
+    if (x < 0.5) goto f2;
+s1:
+    if (x >= 0.7) goto s2;
+    r |= 4;
+f2:
+    if (x < 0.7) goto f3;
+s2:
+    if (x >= 0.8) goto s3;
+    r |= 2;
+f3:
+    if (x < 0.8) goto end;
+s3:
+    if (x >= 1.01) goto end;
+    r |= 1;
+end:
+    return r;
+}
+
+extern "C" int fn_80046D30(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.65) goto s1;
+    r = 4;
+f1:
+    if (x < 0.65) goto f2;
+s1:
+    if (x >= 0.85) goto s2;
+    r |= 2;
+f2:
+    if (x < 0.85) goto end;
+s2:
+    if (x >= 1.01) goto end;
+    r |= 1;
+end:
+    return r;
+}
+
+extern "C" int fn_80046DCC(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.3) goto s1;
+    r = 0x20;
+f1:
+    if (x < 0.3) goto f2;
+s1:
+    if (x >= 0.5) goto s2;
+    r |= 0x10;
+f2:
+    if (x < 0.5) goto end;
+s2:
+    if (x >= 1.01) goto end;
+    r |= 8;
+end:
+    return r;
+}
+
+int fn_80046E68(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 0.05) goto s1;
+    r = 1;
+f1:
+    if (x < 0.05) goto f2;
+s1:
+    if (x >= 0.1) goto s2;
+    r |= 2;
+f2:
+    if (x < 0.1) goto f3;
+s2:
+    if (x >= 0.2) goto s3;
+    r |= 4;
+f3:
+    if (x < 0.2) goto f4;
+s3:
+    if (x >= 0.3) goto s4;
+    r |= 8;
+f4:
+    if (x < 0.3) goto f5;
+s4:
+    if (x >= 0.4) goto s5;
+    r |= 0x10;
+f5:
+    if (x < 0.4) goto end;
+s5:
+    if (x >= 0.5) goto end;
+    r |= 0x20;
+end:
     return r;
 }
 
@@ -110,6 +295,25 @@ int fn_8004705C(int a)
 int fn_80047118(int a)
 {
     return (unsigned)a <= 5 ? 0x2000 : 0;
+}
+
+int fn_8004712C(float x)
+{
+    int r = 0;
+    if (x < 0.0) goto f1;
+    if (x >= 60.0) goto s1;
+    r = 4;
+f1:
+    if (x < 60.0) goto f2;
+s1:
+    if (x >= 80.0) goto s2;
+    r |= 2;
+f2:
+    if (x < 80.0) goto end;
+s2:
+    r |= 1;
+end:
+    return r;
 }
 
 int fn_800471B0(int a)
