@@ -490,6 +490,57 @@ void fn_802D3958(Unk802D3958* o)
     fn_803DFB48(&o->m120);
 }
 
+class Unk802D3B40_A {
+public:
+    virtual ~Unk802D3B40_A();
+};
+struct Unk802D3B40_BD {
+    char pad0[0x98];
+};
+class Unk802D3B40_B : public Unk802D3B40_BD {
+public:
+    virtual ~Unk802D3B40_B();
+};
+struct Unk802D3B40_Self {
+    int m0;
+    int m4;
+    const void* m8;
+    char padC[0x68 - 0xC];
+    Unk802D3B40_A* m68;
+    Unk802D3B40_B* m6C;
+    Unk802D3B40_B* m70;
+    Unk802D3B40_B* m74;
+    Unk802D3B40_B* m78;
+};
+extern const void* lbl_80664430[];
+extern const void* lbl_80649DB8[];
+void fn_80378620(void* self, int chrg);
+
+/* near-miss (80/81 insns, 78 words equal): retail keeps the zero of the m78 store in r30 across the m6C delete and reuses it for m6C; ours loads a second zero (li r0,0) for m6C */
+void fn_802D3B40(Unk802D3B40_Self* s, int chrg)
+{
+    s->m8 = lbl_80664430;
+    if (s->m74 != 0) {
+        if (s->m68 != 0)
+            delete s->m68;
+        s->m68 = 0;
+        if (s->m74 != 0)
+            delete s->m74;
+        s->m74 = 0;
+    }
+    if (s->m78 != 0)
+        delete s->m78;
+    s->m78 = 0;
+    if (s->m6C != 0)
+        delete s->m6C;
+    s->m6C = 0;
+    if (s->m70 != 0)
+        delete s->m70;
+    s->m70 = 0;
+    s->m8 = lbl_80649DB8;
+    fn_80378620(s, chrg);
+}
+
 void fn_802D3E10(Unk802D3E10* o)
 {
     o->s7();
