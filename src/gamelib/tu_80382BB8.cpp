@@ -145,31 +145,6 @@ extern "C" void fn_80382BC0(Unk80382BB8* o, float f)
     o->m888 = f;
 }
 
-/* near-miss: switch tree matches; retail computes i*0x88 after the m854 test and copies it (mr r11,r9) */
-extern "C" float fn_80382BD8(Unk80382BB8* o, int idx)
-{
-    int i;
-    switch (idx) {
-    case 1:
-        i = (o->m861 + 1) % 3;
-        break;
-    case 2:
-        i = (o->m861 + 2) % 3;
-        break;
-    case 0:
-    default:
-        i = o->m861;
-        break;
-    }
-    float r;
-    float* fp = (float*)((char*)o + 0x14);
-    if (o->m854 != 0 && *(int*)((char*)o + i * 0x88 + 0x94) != 0)
-        r = *(float*)((char*)fp + i * 0x88);
-    else
-        r = -1.0f;
-    return r;
-}
-
 extern "C" int fn_80382C8C(Unk80382BB8* o)
 {
     return o->m1A8;
