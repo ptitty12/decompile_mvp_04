@@ -532,6 +532,50 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     return t;
 }
 
+extern "C" int fn_801D25AC(Y* y)
+{
+    Unk801CF054_V2 v;
+    fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    float ax = AbsF(v.x);
+    float ay = AbsF(v.y);
+    if (!(ax >= 0.5f)) {
+        if (ay < 0.5f)
+            goto ret1;
+    }
+    if (!(ax >= 1.0f) && !(ay >= 1.0f)) {
+        if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x433) >= 0.95f)
+            goto ret0;
+    ret1:
+        return 1;
+    }
+    if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x43B) < 0.25f)
+        return 1;
+ret0:
+    return 0;
+}
+
+extern "C" int fn_801D2748(Y* y)
+{
+    Unk801CF054_V2 v;
+    fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    float ax = AbsF(v.x);
+    float ay = AbsF(v.y);
+    if (!(ax >= 0.8f)) {
+        if (ay < 0.8f)
+            goto ret1;
+    }
+    if (!(ax >= 1.0f) && !(ay >= 1.0f)) {
+        if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x456) >= 0.95f)
+            goto ret0;
+    ret1:
+        return 1;
+    }
+    if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x45E) < 0.25f)
+        return 1;
+ret0:
+    return 0;
+}
+
 extern "C" void fn_801D28E4(Y* y)
 {
     y->m54 = 0.75f + RandF4(y->m30, 0.25f, lbl_805D25E0, 0x46C);
