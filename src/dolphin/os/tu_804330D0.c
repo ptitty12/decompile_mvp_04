@@ -12,8 +12,9 @@
  * so functions that use several strings only match when each file is compiled as its own unit. The "flags:" tags
  * give the compiler flags a function needs: untagged functions match with the configured flags; the OSCache,
  * OSContext and OSInterrupt files compile with -opt nopeephole after their first original-code function.
- * Not matched yet: fn_80434314 (callee-saved regs r29/r30 swapped), fn_80434590, fn_80434654 and fn_80434AD8
- * (not attempted), fn_8043402C (string base / table base registers swapped), fn_80435350 and
+ * Not matched yet: fn_80434314 (callee-saved regs r29/r30 swapped), fn_80434590 (exact at -opt nopeephole except a
+ * frame 8 bytes larger and `cmpwi` on the 0x800030F4 word; the OSExec file needs nopeephole as a whole), fn_80434654 and
+ * fn_80434AD8 (not attempted), fn_8043402C (string base / table base registers swapped), fn_80435350 and
  * __OSUnmaskInterrupts (callee-saved regs permuted), fn_80435460, fn_804357F4, the OSFont functions.
  */
 #include <dolphin.h>
@@ -418,6 +419,15 @@ u32 fn_80435078(u32 mask, u32 current);
 u32 fn_80435350(u32 global);
 void fn_80435460(u16 exception, OSContext* context);
 void fn_804357F4(void);
+
+__OSInterruptHandler __OSSetInterruptHandler(__OSInterrupt interrupt, __OSInterruptHandler handler)
+{
+    __OSInterruptHandler old;
+
+    old = lbl_806EF810[interrupt];
+    lbl_806EF810[interrupt] = handler;
+    return old;
+}
 
 /* __OSGetInterruptHandler */
 InterruptHandler fn_80434FF0(s16 interrupt)
