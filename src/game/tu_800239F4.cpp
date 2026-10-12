@@ -155,8 +155,14 @@ extern "C" void fn_8002437C(Unk80023AC4_Obj* x)
     fn_8002A244(x, 4, (float)x->m80[0]->m48 * lbl_805A60C8);
 }
 
-/* near-miss: 53/53 insns, ~15 slots differ (same instructions; register numbers and the
- * placement of the unsigned-int conversion constant loads differ). */
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk800239F4_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x)
 {
     float a, b, c;
@@ -164,7 +170,7 @@ extern "C" void fn_800243D4(Unk80023AC4_Obj* x)
     x->m51C = 1;
     c = c * lbl_805A60CC;
     x->m528 = x->m80[0]->m700->m3A4->m1F8;
-    x->m520 = (float)x->m80[0]->m48 * lbl_805A60D8;
+    x->m520 = Unk800239F4_Secs(x->m80[0]->m48);
     int t = (int)c;
     x->m1BC = t;
     fn_80021D6C(x, x->m80[0], t);
@@ -315,8 +321,6 @@ extern "C" int fn_80026330(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B
     return r;
 }
 
-/* near-miss: 72/72 insns, 12 slots differ (register numbers of the constant-pool loads and
- * the m1C0 base; same instructions). Tried statement order and pointer-local forms. */
 extern "C" void fn_800263D4(Unk80023AC4_Obj* x)
 {
     unsigned idx = Unk8002569C_Cast(x->m6BC, 0x6A)->m8;
@@ -326,7 +330,7 @@ extern "C" void fn_800263D4(Unk80023AC4_Obj* x)
         x->m3E4 = x->m3E4 + 1;
         x->m1C0[idx] = x->m1C0[idx] + 1;
         x->m578 = 0;
-        fn_8002A244(x, 0xC, (float)x->m80[0]->m48 * lbl_805A6190);
+        fn_8002A244(x, 0xC, Unk800239F4_Secs(x->m80[0]->m48));
         if (x->mD0 != 0)
             fn_80035AE8(x->mD0, x->m514, x->m3E4);
         if (x->m514 == 0)
@@ -336,16 +340,14 @@ extern "C" void fn_800263D4(Unk80023AC4_Obj* x)
     x->m6D0 = 1;
 }
 
-/* near-miss: 44/44 insns, ~17 slots differ (register numbers and store order of the two
- * constants at the end; swapping the last two statements makes it worse). */
 extern "C" void fn_800264F4(Unk80023AC4_Obj* x)
 {
     Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x6F);
     x->m12C = m->m8;
     x->m130.i = m->mC;
-    fn_8002A244(x, 0x88, (float)x->m80[0]->m48 * lbl_805A61A0);
-    x->m6BC = 0;
+    fn_8002A244(x, 0x88, Unk800239F4_Secs(x->m80[0]->m48));
     x->m710 = 1;
+    x->m6BC = 0;
 }
 
 extern "C" void fn_800265A4(Unk80023AC4_Obj* x)
