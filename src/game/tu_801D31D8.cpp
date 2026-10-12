@@ -97,6 +97,7 @@ extern "C" void fn_801D34E4(B* s)
 }
 
 static inline int Ok(int f) { int ok; if ((unsigned)(f + 1) > 1) { ok = 1; if ((f & 8) == 0) ok = 0; } else ok = 0; return ok; }
+
 extern "C" int fn_801D3798(B* s)
 {
     Unk801D31D8_Game* g = s->m30;
@@ -176,6 +177,69 @@ extern "C" void fn_801D5A50(B* s, float* a, float* b)
 {
     *a = s->m44.mC;
     *b = s->m44.m10;
+}
+
+static inline int Ok2(int f)
+{
+    int t;
+    if ((unsigned)(f + 1) > 1) {
+        int u = 1;
+        if ((f & 8) == 0)
+            u = 0;
+        t = u;
+    } else
+        t = 0;
+    return t;
+}
+
+struct Unk801D31D8_Obj {
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
+};
+extern "C" float fn_80190F0C(Unk801D31D8_Obj* o);
+extern const double lbl_805D2C48;
+
+extern "C" int fn_801D5A64(B* s, int* o1, int* o2, int* o3)
+{
+    Unk801D31D8_Game* g = s->m30;
+    int ok = Ok2(g->m700->m3C0->m14);
+    Unk801D31D8_Obj* o = (Unk801D31D8_Obj*)g->m6CC;
+    *o2 = 0;
+    *o3 = 0;
+    float d;
+    if (ok != 0) {
+        if (fn_801D3798(s) == 0) {
+            int v = 0;
+            if (fn_8035B3BC((char*)s->m2C + 0x28C) != 0 && (s->m38 == 0 || s->m44.m0 != 0))
+                v = 1;
+            if (v != 0) {
+                *o1 = 2;
+                return 1;
+            }
+            return 0;
+        }
+        if (s->m38 != 0 && s->m44.m0 != 0 && o->m38C == 2) {
+            d = fn_80190F0C(o) - o->m3F4;
+            if (!(d > s->m44.m4 + lbl_805D2C48)) {
+                *o1 = 1;
+                *o2 = 1;
+                *o3 = s->m44.m8;
+                return 1;
+            }
+        }
+        return 0;
+    }
+    if (s->m38 != 0 && s->m44.m0 != 0 && o->m38C == 2) {
+        d = fn_80190F0C(o) - o->m3F4;
+        if (!(d > s->m44.m4 + lbl_805D2C48)) {
+            *o1 = 1;
+            *o3 = s->m44.m8;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 extern "C" void fn_801D5C1C(B* s)
@@ -491,4 +555,3 @@ extern "C" void* fn_801D70A8(void* mem)
 {
     return new (mem) Unk801D70A8_Obj;
 }
-
