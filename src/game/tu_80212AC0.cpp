@@ -18,6 +18,12 @@ struct Unk8021646C_Obj {
     char pad0[0x458];
     int m458;
 };
+extern "C" void fn_8023CAF0__Fv(Player* p);
+extern const float lbl_805D5E04;
+extern const float lbl_805D5E08;
+extern const float lbl_805D5E0C;
+extern const float lbl_805D5E10;
+extern float lbl_8061D560;
 extern "C" {
 void fn_80213988(Task* t, int x, int y);
 void fn_80213B80(Task* t, int a, int b, int c);
@@ -421,6 +427,51 @@ void fn_802151D0(Task* t)
 
 extern const float lbl_805D5E28;
 extern const float lbl_805D5E2C;
+
+void fn_802152E0(Task* t, int a, int b, int c)
+{
+    TaskInner* in = t->m9C;
+    if ((unsigned)(in->m30 - 5) <= 1 && in->m64 == 1) {
+        fn_80214F1C(t, 1, 2, lbl_805D5E04);
+        return;
+    }
+    RecQueue* q = in->m3A60;
+    Obj4_36C* g = in->m4;
+    Player* pl = (Player*)in->m8[in->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    const Vec3f& pos = ((PosObj*)pl)->m60;
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m0 = 6;
+    e->m80 = lbl_805D5E04;
+    e->m4 = 0xB;
+    e->mC = b;
+    e->m8C = lbl_805D5E08;
+    e->m8 = a;
+    e->m9C = 1;
+    e->m38 = pos;
+    e->m44 = pos;
+    fn_8023CAF0__Fv(pl);
+    e->m20 = c;
+    e->m24 = 1;
+    e->m44.y = lbl_8061D560 * lbl_805D5E0C;
+    e->m94 = 1;
+    if (g->m36C != 0) {
+        e->m50 = g->m36C->m60 - pos;
+    } else {
+        e->m50 = *(Vec3f*)((char*)g + 0x60) - pos;
+    }
+    e->m50.y = lbl_805D5E10;
+    e->m84 = lbl_805D5E04;
+}
 
 void fn_80215540(Task* t, Vec3f* pos, int a, int b, int c)
 {

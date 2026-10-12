@@ -231,7 +231,8 @@ struct TaskInner {
     char pad4C[0x5C - 0x4C];
     int m5C;
     int m60;
-    char pad64[0x6C - 0x64];
+    int m64;
+    char pad68[0x6C - 0x68];
     int m6C;
     int m70;
     int m74;
