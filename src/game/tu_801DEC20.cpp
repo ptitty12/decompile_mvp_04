@@ -347,8 +347,8 @@ public:
 };
 class Unk8028C6B8_Goal {
 public:
-    void fn_8028ED30(Unk80273498_Vec3 v);
-    void fn_8028EF14(Unk80273498_Vec3 v);
+    Unk8028C6B8_Goal* fn_8028ED30(Unk80273498_Vec3 v);
+    Unk8028C6B8_Goal* fn_8028EF14(Unk80273498_Vec3 v);
     void fn_8028EF98(float f);
 };
 struct Unk801E1B9C_Src {
@@ -626,5 +626,40 @@ extern "C" Unk8027C728_Goal* fn_801E2464(void* self, P* p, GSrc* x)
     int c2 = x->m18;
     ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
     h104->m40 = c2;
+    return g;
+}
+
+extern const Unk80273498_Vec3 lbl_8068C7F0;
+extern const Unk80273498_Vec3 lbl_805D6790;
+inline Unk8028C6B8_Goal* Unk801E25E8_Init(Unk8027C728_Goal* g)
+{
+    g->m10 = 4;
+    fn_8027C728(g);
+    return (Unk8028C6B8_Goal*)g->m18;
+}
+
+extern "C" Unk8027C728_Goal* fn_801E25E8(void* self, P* p)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk801E25E8_Init(g)->fn_8028ED30(lbl_805D6790)->fn_8028EF14(lbl_8068C7F0);
+    int one = 1;
+    int ten = 0xA;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = one;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    g104->m38 = one;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = one;
+    g104->m34 = one;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+    g104->m40 = ten;
+    Unk8027C728_Goal* h = g->m0;
+    Unk80273498_Vec3 w = lbl_8068C7F0;
+    h->m10 = 2;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    fn_8027C728(h);
+    ((Unk8027A84C*)((Unk80287D70*)h->m18)->fn_80287DB8(8))->fn_8027A898(&w);
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = one;
+    h104->m38 = one;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = one;
+    h104->m34 = one;
     return g;
 }
