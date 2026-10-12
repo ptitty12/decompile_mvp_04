@@ -105,6 +105,125 @@ void fn_802D3E44(Unk802D58E8* o, int a, int b, int c)
 
 enum KeyE { KeyE_Neg = -1, KeyE_Lo = 0x2B, KeyE_Hi = 0x6A };
 
+struct Unk802D3F38_Vec {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct Unk802D3F38_Own {
+    char pad0[0x6CC];
+    int m6CC;
+};
+struct Unk802D3F38_Own700 {
+    char pad0[0x3A4];
+    int m3A4;
+    char pad3A8[0x3BC - 0x3A8];
+    int m3BC;
+};
+struct Unk802D3F38_View {
+    char pad0[0x54];
+    int m54;
+};
+extern float lbl_8061EDD8;
+extern float lbl_8061EDDC;
+extern float lbl_8061EDE0;
+extern float lbl_805E4064;
+extern float lbl_805E4068;
+extern float lbl_805E406C;
+extern float lbl_805E4070;
+void fn_8018959C(Unk802D3F38_Vec* out, int obj, float f);
+int fn_8018AD2C(int a);
+int fn_801BBF24(int a);
+int fn_801D0314(int a);
+void fn_8037893C(void* p, int a, int b, int c, int d);
+float fn_804028E4(float v);
+inline float Unk802D3F38_LenSq(const Unk802D3F38_Vec* v)
+{
+    return v->z * v->z + (v->x * v->x + v->y * v->y);
+}
+void fn_802D5970(Unk802D58E8* o);
+inline int& M150(Unk802D58E8* o)
+{
+    return *(int*)((char*)o + 0x150);
+}
+
+void fn_802D3F38(Unk802D58E8* o, int key, int, int)
+{
+    Unk802D3F38_Vec v;
+    int sp18;
+    switch ((KeyE)key) {
+    case 0x69:
+        fn_802D58E8(o, 1);
+        fn_802D5970(o);
+        break;
+    case 0x6A:
+        M150(o) = 1;
+        break;
+    case 0x5B:
+    case 0x31:
+    case 0x2F:
+        fn_802D58E8(o, 2);
+        break;
+    case 0x3D: {
+        sp18 = o->m60->m6F8->m10->m124;
+        fn_802D5D24(o, &sp18);
+        break;
+    }
+    case 0x43:
+    case 0x4B:
+    case 0x4C:
+    case 0x4D:
+    case 0x4E:
+    case 0x4F:
+        if (o->m7C == 2) {
+            if (fn_8018AD2C(((Unk802D3F38_Own*)o->m60)->m6CC) != 0) {
+                if (fn_801BBF24(((Unk802D3F38_Own700*)o->m60->m700)->m3BC) != 5) {
+                    fn_802D58E8(o, 3);
+                    fn_802D5970(o);
+                }
+            }
+        }
+        break;
+    case 0x42: {
+        int go = 1;
+        if (((Unk802D3F38_View*)o->m64)->m54 != 1) {
+            if (fn_8018AD2C(((Unk802D3F38_Own*)o->m60)->m6CC) == 0) {
+                fn_8037893C((char*)o->m60 + 0x704, 0x46, 0, 0, 0);
+                go = 0;
+            }
+        }
+        if (go != 0) {
+            if (fn_801D0314(((Unk802D3F38_Own700*)o->m60->m700)->m3A4 + 0x28C) == 2) {
+                o->m88 = 3;
+                o->m8C = lbl_8061EDD8;
+            } else {
+                o->m88 = 1;
+                fn_8018959C(&v, ((Unk802D3F38_Own*)o->m60)->m6CC, lbl_805E4064);
+                if (fn_804028E4(Unk802D3F38_LenSq(&v)) > lbl_805E4068 || !(v.y <= lbl_805E406C))
+                    o->m8C = lbl_8061EDDC;
+                else
+                    o->m8C = lbl_8061EDE0;
+            }
+            fn_802D5970(o);
+        }
+        break;
+    }
+    case 0x30:
+        fn_802D58E8(o, 4);
+        fn_802D5970(o);
+        break;
+    case 0x57:
+        if (M150(o) != 0) {
+            o->m88 = 1;
+            fn_802D5970(o);
+            o->m8C = lbl_805E4070;
+            M150(o) = 0;
+        }
+        break;
+    }
+}
+
 void fn_802D41C0(Unk802D58E8* o, int key, int, int)
 {
     Unk802D58E8_Owner* ow = o->m60;
