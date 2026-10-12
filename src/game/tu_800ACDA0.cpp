@@ -53,6 +53,19 @@ struct FEBar {
     float m20;
     float m24;
 };
+inline float Clamp01(float r)
+{
+    return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+}
+/* reading the divisor through an inline puts the m24 load before the m20 load, as in retail */
+inline float Dur(FEBar* s)
+{
+    return s->m24;
+}
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
 /* ratio u/d written to o->m10, 0.0f when d is not positive (inline body shared with tu_800AB0E8) */
 inline void Ratio(FEBarO* o, float d, float u)
 {
@@ -90,6 +103,7 @@ int fn_800AE150(char* self, int* oi, int* oj, int key);
 void fn_800AD58C(char* self, int i, int j);
 void fn_800AD6FC(char* self);
 void fn_800AD1D4(char* self);
+void fn_800AD838(void* p, float f);
 void fn_800AB3F8(void* self);
 int fn_800ABC30(void* t, int i);
 void fn_8033E5C4(void* o, int a);
@@ -289,6 +303,19 @@ extern "C" void fn_800ACDA4(UnkAt1C20* self)
 {
     fn_800ADCD8(self->m1C);
     self->m20 = lbl_805B95A4;
+}
+
+extern "C" void fn_800ACDE0(FEBar* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    float r = Clamp01(self->m20 / Dur(self));
+    float v = Lerp(0.0f, r, 0.6f);
+    fn_800AD948((char*)self->m1C, 3, v);
+    fn_800AD838(self->m1C, 1.0f - r);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 0);
+    }
 }
 
 extern "C" void fn_800ACF24(UnkAt1C* p)
