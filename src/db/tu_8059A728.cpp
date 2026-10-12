@@ -370,15 +370,17 @@ extern "C" DB_OVERLAY int fn_8059B1EC(void* self, int k)
 extern "C" {
 }
 
-/* near-miss: retail's tree keeps only the dead 'cmpwi r4,8' of the zero cases (34 vs 36 insns) */
+/* Every case assigns s (zero arms too) and there is no default arm. */
 //@8059B280
 extern "C" DB_OVERLAY void fn_8059B280(Db8059A728_Obj* self, int k, int a, short* b, int c)
 {
     int s = 0;
     switch (k) {
     case 0:
+        s = 0;
         break;
     case 1:
+        s = 0;
         break;
     case 2:
         s = 3;
@@ -393,16 +395,18 @@ extern "C" DB_OVERLAY void fn_8059B280(Db8059A728_Obj* self, int k, int a, short
         s = 5;
         break;
     case 6:
+        s = 0;
         break;
     case 7:
+        s = 0;
         break;
     case 8:
+        s = 0;
         break;
     case 9:
+        s = 0;
         break;
     case 10:
-        break;
-    default:
         s = 0;
         break;
     }
@@ -1226,6 +1230,253 @@ extern "C" DB_OVERLAY int fn_8059F64C(Db8059D5C4_Obj* self, int k)
     return 0;
 }
 
+/* One return per case (119 cases): jump2 merges the equal returns, the compares stay. */
+//@8059F680
+extern "C" DB_OVERLAY int fn_8059F680(void* self, int k)
+{
+    switch (k) {
+    case 0:
+        return 25;
+    case 1:
+        return 25;
+    case 2:
+        return 25;
+    case 3:
+        return 25;
+    case 4:
+        return 25;
+    case 5:
+        return 25;
+    case 6:
+        return 50;
+    case 7:
+        return 50;
+    case 8:
+        return 50;
+    case 9:
+        return 50;
+    case 10:
+        return 50;
+    case 11:
+        return 50;
+    case 12:
+        return 75;
+    case 13:
+        return 75;
+    case 14:
+        return 75;
+    case 15:
+        return 75;
+    case 16:
+        return 75;
+    case 17:
+        return 75;
+    case 18:
+        return 100;
+    case 19:
+        return 100;
+    case 20:
+        return 100;
+    case 21:
+        return 100;
+    case 22:
+        return 100;
+    case 23:
+        return 100;
+    case 24:
+        return 125;
+    case 25:
+        return 125;
+    case 26:
+        return 125;
+    case 27:
+        return 125;
+    case 28:
+        return 125;
+    case 29:
+        return 125;
+    case 30:
+        return 150;
+    case 31:
+        return 150;
+    case 32:
+        return 150;
+    case 33:
+        return 150;
+    case 34:
+        return 150;
+    case 35:
+        return 150;
+    case 36:
+        return 175;
+    case 37:
+        return 175;
+    case 38:
+        return 175;
+    case 39:
+        return 175;
+    case 40:
+        return 175;
+    case 41:
+        return 200;
+    case 42:
+        return 200;
+    case 43:
+        return 200;
+    case 44:
+        return 200;
+    case 45:
+        return 200;
+    case 46:
+        return 250;
+    case 47:
+        return 250;
+    case 48:
+        return 250;
+    case 49:
+        return 250;
+    case 50:
+        return 250;
+    case 51:
+        return 300;
+    case 52:
+        return 300;
+    case 53:
+        return 300;
+    case 54:
+        return 300;
+    case 55:
+        return 300;
+    case 56:
+        return 350;
+    case 57:
+        return 350;
+    case 58:
+        return 350;
+    case 59:
+        return 350;
+    case 60:
+        return 350;
+    case 61:
+        return 400;
+    case 62:
+        return 400;
+    case 63:
+        return 400;
+    case 64:
+        return 400;
+    case 65:
+        return 400;
+    case 66:
+        return 450;
+    case 67:
+        return 450;
+    case 68:
+        return 450;
+    case 69:
+        return 450;
+    case 70:
+        return 450;
+    case 71:
+        return 500;
+    case 72:
+        return 500;
+    case 73:
+        return 500;
+    case 74:
+        return 500;
+    case 75:
+        return 500;
+    case 76:
+        return 550;
+    case 77:
+        return 550;
+    case 78:
+        return 550;
+    case 79:
+        return 550;
+    case 80:
+        return 600;
+    case 81:
+        return 600;
+    case 82:
+        return 600;
+    case 83:
+        return 600;
+    case 84:
+        return 600;
+    case 85:
+        return 650;
+    case 86:
+        return 650;
+    case 87:
+        return 650;
+    case 88:
+        return 650;
+    case 89:
+        return 700;
+    case 90:
+        return 700;
+    case 91:
+        return 700;
+    case 92:
+        return 700;
+    case 93:
+        return 750;
+    case 94:
+        return 750;
+    case 95:
+        return 750;
+    case 96:
+        return 800;
+    case 97:
+        return 800;
+    case 98:
+        return 800;
+    case 99:
+        return 800;
+    case 100:
+        return 850;
+    case 101:
+        return 850;
+    case 102:
+        return 850;
+    case 103:
+        return 850;
+    case 104:
+        return 900;
+    case 105:
+        return 900;
+    case 106:
+        return 900;
+    case 107:
+        return 900;
+    case 108:
+        return 950;
+    case 109:
+        return 950;
+    case 110:
+        return 950;
+    case 111:
+        return 950;
+    case 112:
+        return 1000;
+    case 113:
+        return 1000;
+    case 114:
+        return 1000;
+    case 115:
+        return 1000;
+    case 116:
+        return 1000;
+    case 117:
+        return 1000;
+    case 118:
+        return 1000;
+    }
+    return 0;
+}
+
 //@8059FA44
 extern "C" DB_OVERLAY int fn_8059FA44(void* self, int k)
 {
@@ -1260,6 +1511,140 @@ extern "C" DB_OVERLAY int fn_8059FA44(void* self, int k)
         return 3000;
     case 14:
         return 2500;
+    }
+    return 0;
+}
+
+//@8059FADC
+extern "C" DB_OVERLAY int fn_8059FADC(void* self, int k)
+{
+    switch (k) {
+    case 0:
+        return 2500;
+    case 1:
+        return 2500;
+    case 2:
+        return 2500;
+    case 3:
+        return 2500;
+    case 4:
+        return 2500;
+    case 5:
+        return 2500;
+    case 6:
+        return 2500;
+    case 7:
+        return 2500;
+    case 8:
+        return 2500;
+    case 9:
+        return 2500;
+    case 10:
+        return 2500;
+    case 11:
+        return 3000;
+    case 12:
+        return 3000;
+    case 13:
+        return 3000;
+    case 14:
+        return 3000;
+    case 15:
+        return 3000;
+    case 16:
+        return 3000;
+    case 17:
+        return 3000;
+    case 18:
+        return 3000;
+    case 19:
+        return 3000;
+    case 20:
+        return 3000;
+    case 21:
+        return 3000;
+    case 22:
+        return 3500;
+    case 23:
+        return 3500;
+    case 24:
+        return 3500;
+    case 25:
+        return 3500;
+    case 26:
+        return 3500;
+    case 27:
+        return 3500;
+    case 28:
+        return 3500;
+    case 29:
+        return 3500;
+    case 30:
+        return 3500;
+    case 31:
+        return 3500;
+    case 32:
+        return 3500;
+    case 33:
+        return 3500;
+    case 34:
+        return 3500;
+    case 35:
+        return 3500;
+    case 36:
+        return 3500;
+    case 37:
+        return 4000;
+    case 38:
+        return 4000;
+    case 39:
+        return 4000;
+    case 40:
+        return 4000;
+    case 41:
+        return 4000;
+    case 42:
+        return 4000;
+    case 43:
+        return 4000;
+    case 44:
+        return 4000;
+    case 45:
+        return 4000;
+    case 46:
+        return 4500;
+    case 47:
+        return 4500;
+    case 48:
+        return 4500;
+    case 49:
+        return 4500;
+    case 50:
+        return 4500;
+    case 51:
+        return 4500;
+    case 52:
+        return 4500;
+    case 53:
+        return 4500;
+    case 54:
+        return 4500;
+    case 55:
+        return 4500;
+    case 56:
+        return 4500;
+    case 57:
+        return 4500;
+    case 58:
+        return 5000;
+    case 59:
+        return 5000;
+    case 60:
+        return 5000;
+    case 61:
+        return 0;
+    case 62:
+        return 0;
     }
     return 0;
 }
