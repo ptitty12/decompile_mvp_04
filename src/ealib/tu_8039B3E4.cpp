@@ -50,6 +50,7 @@ extern const unsigned char lbl_80608678[];
 
 extern "C" {
 
+void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride);
 void fn_80398614(void* p);
 void* fn_803985F4(int size, int flags);
 int fn_803A0EBC(Vp6Rc* rc);
@@ -90,6 +91,52 @@ void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
             v->m5FC[i] = max + 1;
         }
     }
+}
+
+/* near-miss: same instruction count; scratch registers are numbered differently. */
+void fn_8039B47C(const unsigned char* p, int* out)
+{
+    unsigned c0, A, B, C, E, G;
+    out[11] = ((unsigned)p[0] * p[1]) >> 8;
+    out[0] = ((unsigned)p[0] * (255U - p[1])) >> 8;
+    c0 = 255U - p[0];
+    out[1] = (c0 * p[2]) >> 8;
+    A = (c0 * (255U - p[2])) >> 8;
+    B = (A * p[3]) >> 8;
+    out[2] = (B * p[4]) >> 8;
+    C = (B * (255U - p[4])) >> 8;
+    out[3] = (C * p[5]) >> 8;
+    out[4] = (C * (255U - p[5])) >> 8;
+    A = (A * (255U - p[3])) >> 8;
+    E = (A * p[6]) >> 8;
+    out[5] = (E * p[7]) >> 8;
+    out[6] = (E * (255U - p[7])) >> 8;
+    A = (A * (255U - p[6])) >> 8;
+    G = (A * p[8]) >> 8;
+    out[7] = (G * p[9]) >> 8;
+    out[8] = (G * (255U - p[9])) >> 8;
+    A = (A * (255U - p[8])) >> 8;
+    out[9] = (A * p[10]) >> 8;
+    out[10] = (A * (255U - p[10])) >> 8;
+}
+
+/* near-miss: same instruction count; scratch registers are numbered differently. */
+void fn_8039B5D8(const unsigned char* p, int* out)
+{
+    unsigned t, u;
+    t = ((unsigned)p[0] * p[1]) >> 8;
+    out[0] = (t * p[2]) >> 8;
+    out[1] = (t * (255U - p[2])) >> 8;
+    t = ((unsigned)p[0] * (255U - p[1])) >> 8;
+    out[2] = (t * p[3]) >> 8;
+    out[3] = (t * (255U - p[3])) >> 8;
+    u = ((((255U - p[0]) * p[4]) >> 8) * p[5]) >> 8;
+    out[4] = (u * p[6]) >> 8;
+    out[5] = (u * (255U - p[6])) >> 8;
+    u = ((((255U - p[0]) * p[4]) >> 8) * (255U - p[5])) >> 8;
+    out[6] = (u * p[7]) >> 8;
+    out[7] = (u * (255U - p[7])) >> 8;
+    out[8] = ((255U - p[0]) * (255U - p[4])) >> 8;
 }
 
 void fn_8039BC28(Vp6Hdr* h)
@@ -499,6 +546,103 @@ void fn_8039FBB0(int x, unsigned char* p, int stride)
         p[0] = lbl_8069C140[p[0] - e];
         p++;
     }
+}
+
+/* near-miss: 87 insns like the original code; the original keeps the clamped value in r0 and reloads the low byte (lbz) instead of copying it. */
+void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
+{
+    int i;
+    int v;
+    unsigned char r;
+    for (i = 0; i < 8; i++) {
+        v = src[0];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[0] = r;
+        v = src[1];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[1] = r;
+        v = src[2];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[2] = r;
+        v = src[3];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[3] = r;
+        v = src[4];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[4] = r;
+        v = src[5];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[5] = r;
+        v = src[6];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[6] = r;
+        v = src[7];
+        if (v >= 0) {
+            r = 255;
+            if (v <= 255) r = v;
+        } else {
+            r = 0;
+        }
+        dst[7] = r;
+        dst += dstride;
+        src += sstride;
+    }
+}
+
+void fn_8039FF6C(short* tmp, unsigned char* dst, const unsigned char* a, const unsigned char* b, const short* res, int stride)
+{
+    short* t = tmp;
+    int i;
+    for (i = 0; i < 8; i++) {
+        t[0] = res[0] + ((a[0] + b[0]) >> 1);
+        t[1] = res[1] + ((a[1] + b[1]) >> 1);
+        t[2] = res[2] + ((a[2] + b[2]) >> 1);
+        t[3] = res[3] + ((a[3] + b[3]) >> 1);
+        t[4] = res[4] + ((a[4] + b[4]) >> 1);
+        t[5] = res[5] + ((a[5] + b[5]) >> 1);
+        t[6] = res[6] + ((a[6] + b[6]) >> 1);
+        t[7] = res[7] + ((a[7] + b[7]) >> 1);
+        a += stride;
+        b += stride;
+        res += 8;
+        t += 8;
+    }
+    fn_8039FE10(dst, tmp, stride, 8);
 }
 
 void fn_803A00A0(const void* src, unsigned n, void* dst)
