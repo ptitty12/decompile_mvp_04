@@ -38,13 +38,18 @@ struct Unk802F8324_Rec {
     int m10;
     char pad14[0xC];
     int m20;
-    char pad24[8];
+    int m24;
+    int m28;
     int m2C;
     int m30;
     int m34;
     int m38;
     char pad3C[4];
     int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
 };
 struct Unk802F8324_Own2 {
     char pad0[0x6F4];
@@ -195,6 +200,78 @@ int fn_802F92CC(Unk802F8324_Obj* o)
     return __builtin_fabs(a) <= fn_8033CDC4(lbl_8068E0FC, 1.0f);
 }
 
+struct Unk8019F8C0_Owner;
+int fn_801A37D8(Unk8019F8C0_Owner* o);
+extern "C" void fn_8037893C(void* q, int id, int a, int b, int c);
+extern int lbl_8061F880;
+
+inline float Abs1(float v)
+{
+    return __builtin_fabs(v);
+}
+inline float Lerp3(float a, float t, float b)
+{
+    return t * (b - a) + a;
+}
+
+float fn_802F9330(float x, float mx, float dz, float g)
+{
+    float r = x;
+    float q = Abs1(x) / dz;
+    float u = (Abs1(x) - dz) / (mx - dz);
+    if (!(q > 1.0f))
+        r = Lerp3(0.0f, q, g);
+    else
+        r = Lerp3(g, u, 1.0f);
+    if (!(x >= 0.0f))
+        r = -r;
+    return r;
+}
+
+extern "C" void fn_802F99D8(Unk802F8324_O3* o, int a, Unk802F8324_Rec* r)
+{
+    if (fn_801A37D8((Unk8019F8C0_Owner*)o->m64) != 0)
+        return;
+    o->m6C = 1;
+    if (a == -1) {
+        r->m0 = 1;
+        r->m4 = lbl_8061F880;
+        return;
+    }
+    if (r->m0 == 0) {
+        r->m4 = 0;
+        if (fn_802D7DB4(a, 0xA2) != 0) {
+            r->m8 = 0x67;
+            r->m4 = r->m40;
+            r->mC = 0xA2;
+        } else if (fn_802D7DB4(a, 0xA3) != 0) {
+            r->m8 = 0x68;
+            r->m4 = r->m44;
+            r->mC = 0xA3;
+        } else if (fn_802D7DB4(a, 0xA4) != 0) {
+            r->m8 = 0x69;
+            r->m4 = r->m48;
+            r->mC = 0xA4;
+        } else if (fn_802D7DB4(a, 0xA5) != 0) {
+            r->m8 = 0x6A;
+            r->m4 = r->m4C;
+            r->mC = 0xA5;
+        } else if (fn_802D7DB4(a, 0xA6) != 0) {
+            r->m8 = 0x6B;
+            r->m4 = r->m50;
+            r->mC = 0xA6;
+        }
+        if (r->m4 != 0)
+            r->m0 = 1;
+        if (r->m0 == 0)
+            return;
+    }
+    fn_8037893C((char*)o->m64 + 0x704, 0x59, 0, 0, 0);
+    o->m6C = 2;
+    o->mAC = 0.0f;
+    o->mB0 = 0;
+}
+
 float fn_802F9B60(Unk802F8324_Obj* o)
 {
     float r = fn_802F9BB8(o) * lbl_8061F7D0;
@@ -207,6 +284,104 @@ inline int AtD(int* p, int i)
 {
     int off = i * 4;
     return *(int*)((char*)p + off);
+}
+
+extern "C" int fn_801C1638(void* p, int k);
+
+struct Unk8024EF40_W;
+float fn_80254618(Unk8024EF40_W* w, int a);
+extern "C" {
+char* fn_801A497C(void* o, int a, int b);
+float fn_8025356C(void* p);
+}
+struct Unk802F9DD0_M {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Unk802F9DD0_L {
+    char pad0[0x3B0];
+    Unk802F9DD0_M* m3B0;
+};
+struct Unk802F9DD0_Own {
+    char pad0[0x700];
+    Unk802F9DD0_L* m700;
+};
+struct Unk802F9DD0_O {
+    char pad0[0x64];
+    Unk802F9DD0_Own* m64;
+};
+extern float lbl_8061F754;
+extern float lbl_8061F758;
+
+inline float Clamp01(float v)
+{
+    return !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
+}
+
+float fn_802F9DD0(Unk802F9DD0_O* o)
+{
+    char* ch = fn_801A497C(o->m64, 4, 0);
+    float r = 0.0f;
+    if (o->m64->m700->m3B0->m2C == 0) {
+        r = lbl_8061F754;
+        if (ch != 0) {
+            float t = fn_8025356C(ch + 0x480);
+            t = Clamp01(t);
+            t = 1.0f - t;
+            t = t * t;
+            t = 1.0f - t;
+            r = (lbl_8061F758 - lbl_8061F754) * (1.0f - t) + lbl_8061F754;
+        }
+    } else {
+        const float k = 0.4f;
+        float d = k - lbl_8061F754;
+        float s = fn_80254618((Unk8024EF40_W*)(ch + 0x588), 1);
+        r = (d - d * s) + lbl_8061F754;
+    }
+    return r;
+}
+
+extern "C" void fn_802FA80C(Unk802F8324_O3* o, int a, Unk802F8324_Rec* r)
+{
+    int ok = o->m64->m6F4 == 0;
+    if (ok == 1) {
+        if (fn_802D7DB4(a, 0xA7) != 0 || fn_802D7DB4(a, 0xB0) != 0) {
+            int f = fn_801C1638(o->m64, 0xA) != 0;
+            if (f != 0) {
+                r->m20 = 1;
+                r->m24 = fn_802D7DB4(a, 0xB0);
+                r->m28 = 0;
+                r->m4 = r->m40;
+                r->m8 = 0x68;
+                r->mC = 0xA3;
+            }
+        } else if (fn_802D7DB4(a, 0xA8) != 0 || fn_802D7DB4(a, 0xB1) != 0) {
+            int f = fn_801C1638(o->m64, 0xB) != 0;
+            if (f != 0) {
+                r->m20 = 1;
+                r->m24 = fn_802D7DB4(a, 0xB1);
+                r->m28 = 1;
+                r->m4 = r->m40;
+                r->m8 = 0x6A;
+                r->mC = 0xA5;
+            }
+        } else if (fn_802D7DB4(a, 0xA9) != 0 || fn_802D7DB4(a, 0xB2) != 0) {
+            int f = fn_801C1638(o->m64, 0xC) != 0;
+            if (f != 0) {
+                r->m20 = 1;
+                r->m24 = fn_802D7DB4(a, 0xB2);
+                r->m28 = 2;
+                r->m4 = r->m40;
+                r->m8 = 0x69;
+                r->mC = 0xA4;
+            }
+        }
+        if (r->m20 == 1) {
+            o->m6C = 2;
+            o->mAC = 0.0f;
+            o->mB0 = 0;
+        }
+    }
 }
 
 /* near-miss: same 7 stores, scheduled in a different order than retail (40 random permutations of the statement order tried) */
