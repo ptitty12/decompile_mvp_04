@@ -516,6 +516,27 @@ extern "C" int fn_803931B4(unsigned char* bits, int n)
     return bits[i] & (unsigned char)(1 << (n - i * 8));
 }
 
+extern "C" int fn_803931EC(McA6* a, McB* b, int x)
+{
+    int r = 0;
+    int s = a->m6;
+    if (b->mA > s) {
+        int c4 = b->m4;
+        int c5 = b->m5;
+        int idx = x + c5 * s;
+        int k = c4 & 0x7f;
+        unsigned char* p = (unsigned char*)b + ((c5 * (k + 2) + 15) & ~3) + k * 4;
+        int off = 0;
+        if (c4 & 0x80)
+            off = ((c5 + 7) >> 3) + 1;
+        p += off;
+        if (b->m6)
+            p += b->m6 + 1;
+        r = fn_803931B4(p, idx);
+    }
+    return r;
+}
+
 extern "C" int fn_80393284(McA6* a, McB* b, int x)
 {
     int r = 1;
