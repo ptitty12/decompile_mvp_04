@@ -5,6 +5,15 @@
 
 #include "game/fe_804BE560.h"
 
+struct FeCnt5 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+extern "C" int fn_8058F1F0(void* o, int n);
+
 extern "C" void fn_804CB51C(FeScrN* x, int a);
 extern "C" FeW* fn_800C8060(FeW* w);
 extern const char lbl_805F4450[];
@@ -73,6 +82,66 @@ extern "C" FE_OVERLAY int fn_804CCF20(void* x, int a)
         return s->m1C;
     case 3:
         return s->m20;
+    default:
+        return 0;
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804CCF80(FeScrN* x, int sel)
+{
+    switch (sel) {
+    case 0: {
+        FeMsg m;
+        FeMsg* mp = &m;
+        fn_8035682C(mp);
+        fn_8040B830(mp->name, lbl_805F4450, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    }
+    case 1:
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        fn_804CB51C(x, 1);
+        fn_801251CC(x->m138, 3, 0x37F2, 2);
+        break;
+    case 2:
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        fn_804CB51C(x, 0);
+        fn_801251CC(x->m138, 3, 0x57FD, 1);
+        break;
+    }
+}
+
+extern "C" FE_OVERLAY int fn_804CD088(void* x, int k)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    FeCnt5* c = (FeCnt5*)s->m30;
+    void* o = *(void**)((char*)s + 0x34);
+    switch (k) {
+    case 0:
+        return 0;
+    case 1:
+        return 0;
+    case 2:
+        return fn_8058F1F0(o, 0);
+    case 3:
+        return fn_8058F1F0(o, 1);
+    case 4:
+        return fn_8058F1F0(o, 2);
+    case 5:
+        return fn_8058F1F0(o, 3);
+    case 6:
+        return fn_8058F1F0(o, 4);
+    case 7:
+        return fn_8058F1F0(o, 5);
+    case 8:
+        return c->m8;
+    case 9:
+        return c->m10;
+    case 10:
+        return c->m4;
+    case 11:
+        return c->mC;
     default:
         return 0;
     }
