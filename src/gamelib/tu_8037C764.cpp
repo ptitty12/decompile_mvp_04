@@ -68,6 +68,48 @@ struct Unk8037D92C {
     char pad0[0x60];
     V3S m60;
 };
+struct V4F {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct Unk8037D958 {
+    char pad0[0x98];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(V3F* r);
+};
+inline V3F operator-(const V3F& a, const V3F& b)
+{
+    V3F r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline V3F operator+(const V3F& a, const V3F& b)
+{
+    V3F r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+inline V3F operator*(const V3F& v, float s)
+{
+    V3F r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+struct Unk8037DAD0 {
+    char pad0[0x6C];
+    int m6C;
+    V3S m70;
+    V4F m7C;
+};
 
 
 extern "C" {
@@ -537,6 +579,34 @@ extern "C" void fn_8037D8DC(Unk8037D768* o, int a, int b)
     if (o->m0 == 0)
         fn_8037D768(o);
     fn_803DED40((char*)o + 0x20, a, b);
+}
+
+extern "C" void fn_8037D92C(Unk8037D92C* s, V3S** out)
+{
+    *(*out)++ = s->m60;
+}
+
+extern "C" void fn_8037D958(Unk8037D958* o, V3F** pa, V3F** pb, float t)
+{
+    float tt = t;
+    if (*pa != 0 && *pb != 0) {
+        V3F a = *(*pa)++;
+        V3F b = *(*pb)++;
+        o->s3(&((b - a) * tt + a));
+    }
+}
+
+extern "C" void fn_8037DAD0(Unk8037DAD0* o, float** out)
+{
+    if (o->m6C != 0) {
+        const V4F& q = o->m7C;
+        *(*out)++ = q.x;
+        *(*out)++ = q.y;
+        *(*out)++ = q.z;
+        *(*out)++ = q.w;
+    } else {
+        *(*(V3S**)out)++ = o->m70;
+    }
 }
 
 extern "C" void fn_8037E050(int x)
