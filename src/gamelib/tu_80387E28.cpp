@@ -37,6 +37,63 @@ extern GlCb* lbl_80624278;
 struct GlV3 {
     float x, y, z;
 };
+
+struct E1FC_Q {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+extern E1FC_Q lbl_806E9928;
+struct E1FC_Obj {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual int v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26(GlV3* out);
+    virtual void v27(GlV3* out);
+    virtual void v28(GlV3* out);
+    virtual void v29(GlV3* out);
+};
+struct E1FC_G {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual int v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual int v9();
+    virtual int v10();
+};
+struct E1FC_Owner {
+    char pad0[0x18];
+    E1FC_Obj* m18;
+    char pad1C[0x290 - 0x1C];
+    char* m290;
+};
 extern "C" void fn_803895A4(void* self, char* a, float* out, float f0, float f1);
 
 extern "C" void fn_80387E28(GlPool* self, int flags)
@@ -169,6 +226,64 @@ struct GlEntry {
 extern float lbl_80605DA8;
 extern "C" void fn_80388490(GlPool* self, int flags, GlEntry* arr, int n, int* out);
 
+inline void CopyV3(GlV3* d, const GlV3* s)
+{
+    *(float*)d = s->x;
+    d->y = s->y;
+    d->z = s->z;
+}
+inline void E1FC_Scl(GlV3* v, float k)
+{
+    v->x *= k;
+    v->y *= k;
+    v->z *= k;
+}
+inline void E1FC_CopyQ(E1FC_Q* d, const E1FC_Q* s)
+{
+    d->x = s->x;
+    d->y = s->y;
+    d->z = s->z;
+    d->w = s->w;
+}
+extern "C" void fn_803881FC(E1FC_Owner* o, int flag)
+{
+    E1FC_Obj* p = o->m18;
+    GlV3 a;
+    GlV3 b;
+    if (flag == 0) {
+        p->v26(&a);
+        p->v27(&b);
+        E1FC_Scl(&a, 4.235f);
+        E1FC_Scl(&b, 4.235f);
+        char* b1 = o->m290;
+        int off1 = ((E1FC_G*)lbl_80624278)->v9() * 0x30 + 0x20;
+        CopyV3((GlV3*)(b1 + off1), &a);
+        char* b2 = o->m290;
+        int off2 = ((E1FC_G*)lbl_80624278)->v10() * 0x30 + 0x20;
+        CopyV3((GlV3*)(b2 + off2), &b);
+    }
+    int off = ((E1FC_G*)lbl_80624278)->v5();
+    if (off != -1) {
+        off *= 0x30;
+        p->v28(&a);
+        char* b3 = o->m290;
+        CopyV3((GlV3*)(b3 + off), &a);
+        if (p->v9() == 0) {
+            p->v29(&b);
+            float k = 4.235f;
+            b.x *= k;
+            b.y *= k;
+            b.z *= k;
+            int o2 = off + 0x20;
+            char* b4 = o->m290;
+            CopyV3((GlV3*)(b4 + o2), &b);
+            int o3 = off + 0x10;
+            char* b5 = o->m290;
+            E1FC_CopyQ((E1FC_Q*)(b5 + o3), &lbl_806E9928);
+        }
+    }
+}
+
 /* near-miss: 57/59 slots; retail loads the compare operand f1 (stack reload) before the zero constant f13, ours the reverse */
 extern "C" void fn_8038871C(GlPool* self, GlEntry* arr, int n, int flags)
 {
@@ -236,12 +351,6 @@ struct GlOwner18 {
 
 extern float lbl_80605DD0;
 
-static inline void CopyV3(GlV3* d, const GlV3* s)
-{
-    d->x = s->x;
-    d->y = s->y;
-    d->z = s->z;
-}
 
 struct Gl8035Vec3 {
     float x, y, z;
