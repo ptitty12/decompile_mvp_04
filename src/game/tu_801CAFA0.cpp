@@ -19,6 +19,9 @@ int fn_80235E28(void* p);
 float fn_801D7818(int h, int k);
 float fn_801D7828(int h);
 float fn_801CCBE8(Z* z);
+float fn_801CF740(Z* z);
+float fn_80190F0C(P* p);
+float fn_801CF8CC(float x);
 int fn_801D7998(void* self, V2 v);
 int fn_801D7A3C(void* self, int k);
 struct Unk801CAFA0_R {
@@ -60,7 +63,9 @@ struct Unk801CAFA0_G {
     float m7C;
     int m80;
     V2 m84;
-    char pad8C[0x390 - 0x8C];
+    float m8C;
+    float m90;
+    char pad94[0x390 - 0x94];
     float m390;
     float m394;
     float m398;
@@ -138,6 +143,30 @@ extern "C" float fn_801CC028(Z* z)
     float t = fn_80235DD0(z->m4->m3B0, p->m708, h);
     t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
     return t;
+}
+
+extern "C" float fn_801CC0CC(Z* z)
+{
+    P* c = z->m204->m6CC;
+    float scale = fn_801CF740(z);
+    z->m1A8 = 6;
+    z->m144 = 0.0f;
+    z->m148 = 0.0f;
+    float out = 0.0f;
+    if (c->m38C == 2) {
+        float d = fn_80190F0C(c) - c->m3F4;
+        float e = ((float (*)(Z*, float))fn_801CF8CC)(z, z->m13C);
+        z->m148 = d - e;
+        z->m144 = z->m148 / scale;
+        if (z->m144 >= 1.0f || !(z->m144 > -1.0f))
+            z->m1A8 = 3;
+        z->m144 = !(z->m144 > 1.0f) ? (z->m144 >? -1.0f) : 1.0f;
+        if (z->m1A8 == 6)
+            out = 1.0f - AbsF(z->m144);
+        lbl_8068C420.m8C = z->m148;
+        lbl_8068C420.m90 = z->m144;
+    }
+    return out;
 }
 
 extern "C" float fn_801CC218(Z* z)

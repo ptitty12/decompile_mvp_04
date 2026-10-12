@@ -62,7 +62,8 @@ struct Unk801C16B0_Z {
     float m13C;
     float m140;
     float m144;
-    char pad148[0x150 - 0x148];
+    float m148;
+    float m14C;
     float m150[2];
     char pad158[0x180 - 0x158];
     float m180;
