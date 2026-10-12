@@ -483,6 +483,61 @@ extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s)
 
 extern "C" void fn_800D4254(const char* s, void* font, float* a, float* b);
 
+struct Unk800D4254_Cfg {
+    char pad0[0x204];
+    int m204;
+    int m208;
+};
+extern Unk800D4254_Cfg* lbl_8061FEDC;
+struct Unk800D4254_Font {
+    char pad0[0xA];
+    unsigned short mA;
+    unsigned int mC;
+    int m10;
+    int m14;
+};
+extern "C" void fn_803EB434(Unk800D4254_Font* font, const unsigned short* s, float* a, int c, float* b, int d);
+extern "C" int fn_80403060(const unsigned short* s);
+extern "C" char* fn_803EB2AC(int ch, char* tbl, int n, int stride);
+
+inline char* FindGlyph(Unk800D4254_Font* font, unsigned short ch)
+{
+    char* tbl = (char*)font + font->m14;
+    int stride = (font->mC & 0x40000) ? 0x10 : 0xC;
+    int idx = ch - 0x20;
+    if (idx < (int)font->mA) {
+        char* g = tbl + idx * stride;
+        if (*(unsigned short*)g == ch)
+            return g;
+    }
+    return fn_803EB2AC(ch, tbl, font->mA, stride);
+}
+extern "C" void fn_800D4254(const char* s0, void* f0, float* a, float* b)
+{
+    const unsigned short* s = (const unsigned short*)s0;
+    Unk800D4254_Font* font = (Unk800D4254_Font*)f0;
+    fn_803EB434(font, s, a, 0, b, 0);
+    int n = fn_80403060(s);
+    if (n > 0) {
+        char* g = FindGlyph(font, s[n - 1]);
+        if (g != 0) {
+            int w;
+            if (font->mC & 0x40000)
+                w = *(short*)(g + 0xE);
+            else
+                w = *(signed char*)(g + 8);
+            *b -= (float)(int)*(unsigned char*)(g + 2);
+            *b += (float)w;
+        }
+    }
+    float sc = 640.0f;
+    if (lbl_8061FEDC->m204 != 0 && lbl_8061FEDC->m208 == 0)
+        sc = 960.0f;
+    float r = 640.0f / sc;
+    *b *= r;
+    *a *= r;
+}
+
 extern "C" int fn_800D43F0(Unk800D3F0C_Obj* o, int v)
 {
     float x;
