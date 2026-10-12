@@ -5,3 +5,10 @@
  * Every data object is extern by its lbl_ name.
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
+#include "snd/cmn/sndcmn.h"
+
+/* True when the shandle no longer maps to a voice. */
+extern "C" int fn_803A914C(int shandle)
+{
+    return SNDVOICEI_get(shandle) < 0;
+}
