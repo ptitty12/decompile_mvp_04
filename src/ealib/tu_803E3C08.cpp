@@ -18,7 +18,8 @@ struct Unk803E6660_Src {
 };
 
 struct Unk803E6660_Hdr {
-    char pad0[8];
+    char pad0[4];
+    int* m4;
     int* m8;
 };
 
@@ -453,6 +454,34 @@ extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
     lbl_8062C66C(o->m38, 0x104);
     if (chrg & 1)
         lbl_8062C66C(o, 0x3C);
+}
+
+extern "C" void fn_803D707C(void* self, void* item);
+
+extern char lbl_8060CB24[];
+
+extern "C" int fn_803E67A0(Unk803E6660* o, Unk803E6660_Holder* h)
+{
+    o->m8 = h;
+    int ok = 0;
+    fn_803D707C(o->m4, h);
+    o->m10 = 0;
+    while (o->m8->m0->m4[o->m10] != 0)
+        o->m10++;
+    int sz = o->m10 * 12;
+    int* blk = (int*)lbl_8062C668(sz + 4, (int)lbl_8060CB24);
+    *blk = sz;
+    Unk803E6660_Rec* a = (Unk803E6660_Rec*)(blk + 1);
+    o->mC = a;
+    if (a != 0) {
+        for (int i = 0; i < o->m10; i++) {
+            o->mC[i].m0 = 0;
+            o->mC[i].m4 = 0;
+            o->mC[i].m8 = -1;
+        }
+        ok = 1;
+    }
+    return ok;
 }
 
 extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
