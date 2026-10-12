@@ -493,6 +493,51 @@ inline P* GetPB(P** a, unsigned i)
     return 0;
 }
 
+struct Unk801CF054_X3C0 {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk801CF054_X700 {
+    char pad0[0x3C0];
+    Unk801CF054_X3C0* m3C0;
+};
+static inline int OkF(int f)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & 8) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+
+extern "C" void fn_801D094C(Y* y)
+{
+    if (OkF(((Unk801CF054_X700*)y->m30->m700)->m3C0->m14) == 0) {
+        Unk801CF054_V2 v;
+        int flag = 0;
+        fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+        if (v.x > 0.9f || !(v.x >= -0.9f))
+            flag = 1;
+        if (v.y > 0.9f || !(v.y >= -0.9f))
+            flag = 1;
+        if (flag != 0) {
+            float thr = 0.15f;
+            if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x143) >= thr)) {
+                y->m58 = 1;
+                if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x147) >= 0.75f)) {
+                    y->m5C = 0;
+                    y->m60 = 1;
+                } else {
+                    y->m5C = y->m30->m554->fn_8014D8AC(3, lbl_805D25E0, 0x155) + 2;
+                }
+            }
+        }
+    }
+}
+
 extern "C" int fn_801D0B48(Y* y)
 {
     Unk801CF054_T* t = lbl_8068B618;
