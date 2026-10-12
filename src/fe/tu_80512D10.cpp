@@ -9,6 +9,10 @@ struct FeP94 { char pad[0x94]; FeW* m94; };
 struct FeP2A8 { char pad[0x2A8]; FeP94* m2A8; };
 struct FeP298_1E0 { char pad[0x1E0]; FeW* m1E0; char pad2[0x298 - 0x1E0 - 4]; FeW* m298; };
 
+extern "C" void fn_8051457C(FeScrQ* x, void* y);
+extern "C" void fn_805146C0(FeScrQ* x, void* y);
+extern "C" void fn_805148D0(FeScrQ* x, void* y);
+extern "C" void fn_805140D8(FeScrQ* x);
 extern const char lbl_80667920[];
 extern "C" FeScrN* fn_80512D10(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_80512D60(FeScrD* x);
@@ -21,12 +25,20 @@ extern "C" int fn_80513108(FeScrN* x);
 extern "C" void fn_80513144(FeScrN* x, char* dst);
 extern "C" int fn_805131B8(FeScrB* x);
 extern "C" void fn_80513270(FeScrD* x);
+extern "C" void fn_80514340(FeScrQ* x, int a);
+extern "C" void fn_80514538(FeScrQ* x);
+extern "C" void fn_80514DB0(FeScrQ* x, void* y);
+extern "C" int fn_80514DF8(void* self, FeIdTab* y, int v);
+extern "C" void fn_805158B0();
+extern "C" int fn_80515F64();
+extern "C" int fn_80516014();
 extern "C" int fn_8051601C(FeP2A8* x);
 extern "C" int fn_8051605C(FeP2A8* x);
 extern "C" int fn_8051609C(FeP2A8* x);
 extern "C" int fn_805160DC(FeP2A8* x);
 extern "C" int fn_80516474(FeP298_1E0* x);
 extern "C" int fn_80516550(FeP298_1E0* x);
+extern "C" void fn_8051687C();
 
 extern "C" FE_OVERLAY FeScrN* fn_80512D10(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -103,6 +115,51 @@ extern "C" FE_OVERLAY void fn_80513270(FeScrD* x)
     fn_800ECE34(x);
 }
 
+extern "C" FE_OVERLAY void fn_80514340(FeScrQ* x, int a)
+{
+    x->m2AC = a;
+    fn_805140D8(x);
+}
+
+extern "C" FE_OVERLAY void fn_80514538(FeScrQ* x)
+{
+    fn_80514DB0(x, &x->m134);
+    fn_80514DB0(x, (char*)x + 0x1EC);
+    fn_805140D8(x);
+}
+
+extern "C" FE_OVERLAY void fn_80514DB0(FeScrQ* x, void* y)
+{
+    fn_8051457C(x, y);
+    fn_805146C0(x, y);
+    fn_805148D0(x, y);
+}
+
+extern "C" FE_OVERLAY int fn_80514DF8(void* self, FeIdTab* y, int v)
+{
+    int n = y->m88;
+    for (int i = 0; i < n; i++) {
+        if (v == y->m78[i]) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_805158B0()
+{
+}
+
+extern "C" FE_OVERLAY int fn_80515F64()
+{
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_80516014()
+{
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_8051601C(FeP2A8* x)
 {
     x->m2A8->m94->fn_vslot50();
@@ -139,4 +196,8 @@ extern "C" FE_OVERLAY int fn_80516550(FeP298_1E0* x)
     x->m298->fn_vslot39();
     x->m1E0->fn_vslot39();
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8051687C()
+{
 }
