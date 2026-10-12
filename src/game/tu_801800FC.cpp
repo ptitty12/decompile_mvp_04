@@ -459,6 +459,38 @@ extern "C" void fn_80182E54(Unk80181140* o)
     }
 }
 
+//@801837F4
+extern "C" Unk80183918_Vec3 fn_801837F4(Unk80181140* o, int idx)
+{
+    Unk801808A4_Ctx* c = o->mBC;
+    if (idx > 2) {
+        int f = 0;
+        if (c->m6F8->m14->m1CD0) {
+            f = 1;
+        }
+        if (idx != 3) {
+            idx = f ^ 1;
+        } else {
+            idx = f;
+        }
+    }
+    Unk80183918_Vec3 v;
+    if (idx == 1) {
+        v.m0 = -540.0f;
+        v.m4 = 0.0f;
+        v.m8 = 360.0f;
+    } else {
+        v.m0 = 540.0f;
+        v.m4 = 0.0f;
+        v.m8 = -360.0f;
+    }
+    Unk80182464_Rec* r = fn_80150FC0(idx == 0 ? 0xA11D9236 : 0xE4687FDF);
+    if (r != 0) {
+        v = Unk80182464_Pos(r);
+    }
+    return v;
+}
+
 //@80183918
 extern "C" Unk80183918_Vec3 fn_80183918(Unk80181140* o, int idx, int k)
 {
