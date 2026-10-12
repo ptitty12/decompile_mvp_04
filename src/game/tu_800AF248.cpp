@@ -373,6 +373,7 @@ struct FEOb74 {
     char pad6C[0x74 - 0x6C];
     int m74;
 };
+
 inline float FMax2(float a, float b)
 {
     return b >? a;
@@ -562,6 +563,7 @@ extern "C" void fn_800AFD2C(FEObj58* self)
 }
 
 inline int At4(char* b, int i) { int o = i * 4; return *(int*)(b + o); }
+
 extern "C" void fn_800AFD70(FEObAF* self)
 {
     int v = At4((char*)self->m4->m6F8->m10 + 0x154, self->m0);
@@ -706,6 +708,14 @@ extern "C" void fn_800B0884(UnkAt10P* p)
     if (p->m10) {
         fn_800FC6B4(p->m10);
     }
+}
+
+extern "C" int fn_800B08B0(UnkAt10* p)
+{
+    if (p->m10) {
+        return 0;
+    }
+    return 0;
 }
 
 extern "C" void fn_800B1C7C(FEObR* self)
