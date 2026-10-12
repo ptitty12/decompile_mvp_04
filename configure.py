@@ -1057,7 +1057,7 @@ config.libs = [
             Object(NonMatching, "ealib/tu_8038F73C.cpp"),
             Object(NonMatching, "ealib/tu_803912F8.cpp", cflags=cflags_ealib_nsr),
             Object(NonMatching, "ealib/tu_803927E4.cpp", cflags=cflags_ealib_nsr),
-            Object(NonMatching, "ealib/tu_80394744.cpp"),
+            Object(NonMatching, "ealib/tu_80394744.cpp", cflags=cflags_ealib_sda_nsr),  # loops keep per-iteration index math; -G8 for fn_803959D8 (docs/DECISIONS.md 2026-10-12)
             Object(NonMatching, "ealib/tu_803959E0.cpp"),
             Object(NonMatching, "ealib/tu_80397CAC.cpp"),
             Object(NonMatching, "ealib/tu_8039B3E4.cpp"),
