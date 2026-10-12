@@ -55,7 +55,6 @@ struct Unk8019F8C0_Owner { char pad0[0x554]; void* m554; };
 struct Ent3C { char pad0[0x3C]; Unk802D5618* m3C; };
 struct Ctx8015 { char pad0[0xA4C]; Unk8019F8C0_Owner* mA4C; Ent3C* mA50; Ent3C* mA54; };
 void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
-extern const float lbl_805C7BA8;
 extern const float lbl_805C7CD4;
 struct Sub8061FEDC { int m0; int m4; int m8; float mC; };
 struct Obj8061FEDC { char pad0[0x40]; Sub8061FEDC m40; };
@@ -593,13 +592,11 @@ void fn_80151FA0(Unk80151FA0_Obj* p)
     }
 }
 
-/* near-miss: 31/31 insns; retail passes the six float arguments as a chain (fmr f2,f1; fmr f3,f2; ...) interleaved with the li's;
-   ours copies f1 into each; const local, extern float and pointer-deref forms tried */
 void fn_80151FE8(char* self, Ctx8015* ctx, float f1, float f2, float f3)
 {
     Unk802D5618* o = ctx->mA54->m3C;
     fn_802D5618(o);
-    fn_802D5A64(o, 0, 0, 0, self + 0x24, 1, lbl_805C7BA8, lbl_805C7BA8, lbl_805C7BA8, lbl_805C7BA8, lbl_805C7BA8, lbl_805C7BA8);
+    fn_802D5A64(o, 0, 0, 0, self + 0x24, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 }
 
 float fn_80152064(UnkAt20F2* p, float f)
