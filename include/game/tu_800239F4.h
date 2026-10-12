@@ -279,7 +279,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     Unk80023ED8_Ent m1D0[1];
     char pad1F4[0x6C];
     int m260;
-    char pad264[0xC];
+    int m264;
+    char pad268[0x8];
     Unk80023ED8_Pair m270[3];
     char pad288[0x8];
     Unk801A4B34_Pos* m290;

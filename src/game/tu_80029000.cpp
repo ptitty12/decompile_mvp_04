@@ -146,6 +146,60 @@ extern "C" void fn_80029C38(Unk80023AC4_Obj* x)
     }
 }
 
+int fn_80254EA4(void* p, int a);
+extern "C" void fn_80021E30(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, int n);
+extern "C" void fn_80023F98(Unk80023AC4_Obj* x);
+struct Unk80029DB8_Outer {
+    char pad0[0x3BC];
+    int* m3BC;
+};
+
+extern "C" void fn_80029DB8(Unk80023AC4_Obj* x)
+{
+    int one = 1;
+    x->m52C = x->m52C + 1;
+    int z = x->m514 == 0;
+    char* b460 = (char*)x + 0x460;
+    char* b4E0 = (char*)x + 0x4E0;
+    char* b190 = (char*)x + 0x190;
+    int o4 = z * 4;
+    int o12 = z * 0xC;
+    *(int*)(b460 + o4) = *(int*)(b460 + o4) + 1;
+    *(int*)(b4E0 + o12) = *(int*)(b4E0 + o12) + 1;
+    *(int*)(b190 + o4) = *(int*)(b190 + o4) + 1;
+    *(int*)((char*)x + 0x560) = one;
+    for (int i = 0; i < x->m260; i++) {
+        if (fn_80254EA4((char*)x->m1D0[i].m0 + 0x58C, 1) != -1)
+            x->m1D0[i].m14 = -1;
+    }
+    if (x->m264 == 3) {
+        char* b188 = (char*)x + 0x188;
+        int o = x->m514 * 4;
+        *(int*)(b188 + o) = *(int*)(b188 + o) + 1;
+    }
+    fn_800245D0(x);
+    if (x->m6DC == 0) {
+        x->m264 = fn_8002A4C0(x, x->m80[0]);
+        x->m270[0].m0 = fn_8002A534(x, x->m80[0]);
+        x->m270[1].m0 = fn_8002A53C(x, x->m80[0]);
+        x->m270[2].m0 = fn_8002A544(x, x->m80[0]);
+    }
+    Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x3A);
+    x->m6D4 = m->m10;
+    x->m6DC = m->m14;
+    if (x->m52C > 4)
+        x->m52C = 4;
+    if (x->m6DC == 1)
+        fn_80021E30(x, x->m80[0], x->m1BC);
+    Unk8001F2C4_World* w = x->m80[0];
+    if (((Unk80029DB8_Outer*)w->m700)->m3BC[9] != 0)
+        fn_8002A244(x, 0x60, (float)w->m48 * 0.016666668f);
+    else
+        x->fn_800233B4(0xB, 0x3C, 0);
+    x->m6BC = 0;
+    fn_80023F98(x);
+}
+
 extern "C" void fn_8002A218(Unk80023AC4_Obj* x)
 {
     if (x->m6DC == 0)
