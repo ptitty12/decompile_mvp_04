@@ -104,6 +104,28 @@ extern "C" void fn_803EB434(void* self, int a)
     fn_8036578C(self, a);
 }
 
+/* SysV varargs record, same as include/game/tu_8000C2C4.h */
+struct va_list_tag {
+    char gpr;
+    char fpr;
+    char* overflow_arg_area;
+    char* reg_save_area;
+};
+typedef va_list_tag va_list[1];
+#define va_start(AP, LASTARG) (__builtin_next_arg(LASTARG), *(AP) = *(va_list_tag*)__builtin_saveregs())
+
+extern "C" int vsprintf(char* buf, const char* fmt, va_list ap);
+
+extern "C" void fn_803EB454(int obj, float f1, float f2, const char* fmt, ...)
+{
+    va_list ap;
+    char buf[0x2000];
+    char* p = buf;
+    va_start(ap, fmt);
+    vsprintf(p, fmt, ap);
+    ((int (*)(int, float, float, char*))fn_803EB3CC)(obj, f1, f2, p);
+}
+
 extern "C" void fn_803EB520(Unk803EB2AC_Hooks* h)
 {
     lbl_806EE9D8 = h;
@@ -206,6 +228,32 @@ extern "C" int fn_803EB6F8(int c)
     return fn_803EC03C(&ch);
 }
 
+extern "C" int fn_803EB730(int w, int h, int fmt, int lvl)
+{
+    int k = fn_803EB6F8(fmt);
+    int total = 0;
+    int bpp = 0x10;
+    if (k != 0xf)
+        bpp = k;
+    if ((unsigned)(w - 1) > 0xffff || h <= 0 || h > 0x10000 || w * h > 1000000000 || fn_803EC9D4(k) == 0)
+        return 0;
+    int i;
+    for (i = 0; i <= lvl; i++) {
+        int ch = h >> i;
+        int cw = w >> i;
+        if (cw <= 0)
+            cw = 1;
+        if (ch <= 0)
+            ch = 1;
+        if (total != 0)
+            total = (total + 0x1f) & ~0x1f;
+        total += (cw * bpp + 7) / 8 * ch;
+        if (cw == 1 && ch == 1)
+            break;
+    }
+    return total;
+}
+
 extern "C" int fn_803EB83C(int k)
 {
     switch (k) {
@@ -218,16 +266,163 @@ extern "C" int fn_803EB83C(int k)
     }
 }
 
-extern "C" void fn_803EBC70(void* menu, int a);
+extern "C" int fn_803EB864(int a, int b, int c, int d, int e, int f, int g)
+{
+    int k = fn_803EB6F8(c);
+    int sz = fn_803EB730(a, b, c, e);
+    sz += 0x10;
+    if (k <= 8 && d != 0) {
+        if (d == 0xf)
+            d = 0x10;
+        if (sz != 0)
+            sz = (sz + 0x1f) & ~0x1f;
+        int w = fn_803EB83C(k) * d / 8 + 0x10;
+        sz = ((sz + 0xf) & ~0xf) + w;
+    }
+    if (f != 0)
+        sz = sz + (8 + f);
+    if (g != 0)
+        sz = sz + (0x10 + g);
+    return sz;
+}
 
-extern "C" void fn_803EBD14(void* self, int a)
+extern char lbl_8060DBF8[];
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void fn_803EB940(int r, int a, int b, int c, int d, int e, int g, int h);
+extern int (*lbl_806EE9E4)(int a, int b, int c, int d, int e);
+
+extern "C" int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    int r = 0;
+    int sz = fn_803EB864(a, b, c, d, e, g, h);
+    if (sz != 0) {
+        char buf[16];
+        sprintf(buf, lbl_8060DBF8, a, b, c);
+        r = lbl_806EE9E4((int)buf, sz, 0, 0x10, f);
+        if (r != 0)
+            fn_803EB940(r, a, b, c, d, e, g, h);
+    }
+    return r;
+}
+
+struct Unk803EBC70_Ent {
+    int off;
+    int m4;
+};
+
+struct Unk803EBC70_Tbl {
+    int m0, m4, m8, mC, m10;
+    Unk803EBC70_Ent e[1];
+};
+
+extern "C" int fn_803EC3D4(int x);
+extern "C" void fn_803EC814(Unk803EBC70_Tbl* t, int i, char* out);
+extern "C" int strcmp(const char*, const char*);
+
+/* near-miss (flags): exact at -O2 -fno-strength-reduce (see fn_803EB5E4); with the configured flags the loop is strength-reduced */
+extern "C" char* fn_803EBC70(Unk803EBC70_Tbl* t, int name)
+{
+    int i;
+    int n = t->m8;
+    for (i = 0; i < n; i++) {
+        char buf[8];
+        char* s = (char*)fn_803EC3D4((int)((char*)t + *(int*)((char*)t + i * 8 + 0x14)));
+        if (s == 0) {
+            buf[4] = 0;
+            fn_803EC814(t, i, buf);
+            s = buf;
+        }
+        if (strcmp(s, (const char*)name) == 0)
+            return (char*)t + t->e[i].off;
+    }
+    return 0;
+}
+
+extern "C" void fn_803EBD14(Unk803EBC70_Tbl* self, int a)
 {
     fn_803EBC70(self, a);
 }
 
-extern int (*lbl_806EE9E4)(int a, int b, int c, int d, int e);
 extern "C" int fn_803EBD34(int x);
 extern "C" void fn_803EBDF4(int r, int x);
+extern "C" int fn_803EC368(int c);
+extern "C" int fn_803EC6F8(unsigned char* n);
+
+struct Unk803EBDF4_Nd {
+    unsigned tag : 8;
+    int off : 24;
+    short s4;
+};
+
+extern char lbl_8060DC04[];
+extern "C" void fn_80400774(void* dst, void* src, int n);
+
+/* size of a chain of nodes (24-bit relative links) with 16/32 byte alignment between them */
+inline unsigned char* Unk803EBD34_Next(unsigned char* n)
+{
+    int o = (*(int*)n << 8) >> 8;
+    unsigned char* r = 0;
+    if (o != 0)
+        r = n + o;
+    return r;
+}
+
+extern "C" int fn_803EBD34(int x)
+{
+    unsigned char* n = (unsigned char*)x;
+    int r = 0;
+    int a32 = (((int)n + 0x1f) & ~0x1f) - (int)n;
+    int a16 = (((int)n + 0xf) & ~0xf) - (int)n;
+    if (n != 0) {
+        int k = a32 - 0x10;
+        do {
+            int sz = fn_803EC6F8(n);
+            if (r != 0) {
+                if (fn_803EC368(*n) != 0)
+                    r = (((r - a32) + 0x2f) & ~0x1f) + k;
+                else
+                    r = (((r - a16) + 0xf) & ~0xf) + a16;
+            }
+            r += sz;
+            n = Unk803EBD34_Next(n);
+        } while (n != 0);
+    }
+    return r;
+}
+
+extern "C" void fn_803EBDF4(int dst, int x)
+{
+    Unk803EBDF4_Nd* n = (Unk803EBDF4_Nd*)x;
+    int a32 = (((int)n + 0x1f) & ~0x1f) - (int)n;
+    int a16 = (((int)n + 0xf) & ~0xf) - (int)n;
+    int pos = 0;
+    Unk803EBDF4_Nd* prev = 0;
+    if (n != 0) {
+        int k = a32 - 0x10;
+        do {
+            int sz = fn_803EC6F8((unsigned char*)n);
+            if (pos != 0) {
+                if (fn_803EC368(n->tag) != 0)
+                    pos = (((pos - a32) + 0x2f) & ~0x1f) + k;
+                else
+                    pos = (((pos - a16) + 0xf) & ~0xf) + a16;
+            }
+            Unk803EBDF4_Nd* p0 = prev;
+            prev = (Unk803EBDF4_Nd*)(dst + pos);
+            if (p0 != 0)
+                p0->off = (char*)prev - (char*)p0;
+            prev->off = 0;
+            if (sz != 0) {
+                fn_80400774(prev, n, sz);
+                if (prev->tag == 0x69 && sz > 0x14)
+                    sprintf((char*)prev + 0x10, lbl_8060DC04, prev->s4);
+            }
+            pos += sz;
+            n = (Unk803EBDF4_Nd*)Unk803EBD34_Next((unsigned char*)n);
+        } while (n != 0);
+    }
+}
+
 extern "C" int fn_803EC3D4(int x);
 
 extern "C" int fn_803EBF2C(int x)
