@@ -19,7 +19,6 @@ void* fn_8052E408(void* obj, void* a);
 int fn_80587728(void* obj);
 void fn_80360AF0(void* obj, int chrg);
 void fn_805822D0(DbSubObj* p);
-int fn_805826AC(void* self, void* a);
 int fn_805833A8(void* unused, int a, int b);
 int fn_80077BC4(void* g, int a);
 int fn_8057CED4(int a, int b);
@@ -78,26 +77,6 @@ inline int ObjC(DbRecO* o)
     return o->c;
 }
 
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_80582578(DbSubX* self, int a);
-extern "C" int fn_80582DF4(int unused, int k, int* arr);
-extern "C" int fn_80582E38(int unused, int a, int b);
-extern "C" int fn_80582EE4(int unused, int a);
-extern "C" int fn_80583324(int unused, int b);
-extern "C" int fn_80583354(int unused, int x, int c);
-extern "C" int fn_805833A8(void* unused, int a, int b);
-extern "C" DbSubObj* fn_80583404(DbSubObj* self);
-extern "C" int fn_805838E8(void* self, void* a);
-extern "C" int fn_8058391C(int unused, void* a);
-extern "C" DbSubObj* fn_80583964(DbSubObj* self);
-extern "C" int fn_805839A0(void);
-extern "C" int fn_80583C70(int unused, int x, int y, int z);
-extern "C" int fn_805842F8(int unused, void* a);
-extern "C" int fn_80584634(void* self, void* a);
-extern "C" int fn_805848B8(int unused, void* a);
-extern "C" int fn_80584C00(void* self, void* a);
-extern "C" DbSubObj* fn_80584C80(DbSubObj* self);
-
 extern "C" {
 void* fn_8052E198(void* obj, int id, int b, int c, int d, int e, int f, int g, int h, int i);
 int fn_80582CF8(DbSubX* self, void* obj, int a, int b, int c);
@@ -123,33 +102,6 @@ public:
     virtual int v08(int a, void* data, int size);
 };
 extern "C" void fn_80582238(int* p, int a, DbStream* io);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_80582578(DbSubX* self, int a);
-extern "C" int fn_80582DF4(int unused, int k, int* arr);
-extern "C" int fn_80582E38(int unused, int a, int b);
-extern "C" int fn_80582EE4(int unused, int a);
-extern "C" int fn_80583324(int unused, int b);
-extern "C" int fn_80583354(int unused, int x, int c);
-extern "C" int fn_805833A8(void* unused, int a, int b);
-extern "C" DbSubObj* fn_80583404(DbSubObj* self);
-extern "C" int fn_805838E8(void* self, void* a);
-extern "C" int fn_8058391C(int unused, void* a);
-extern "C" DbSubObj* fn_80583964(DbSubObj* self);
-extern "C" int fn_805839A0(void);
-extern "C" int fn_80583C70(int unused, int x, int y, int z);
-extern "C" int fn_805842F8(int unused, void* a);
-extern "C" int fn_80584634(void* self, void* a);
-extern "C" int fn_805848B8(int unused, void* a);
-extern "C" int fn_80584C00(void* self, void* a);
-extern "C" DbSubObj* fn_80584C80(DbSubObj* self);
-extern "C" void fn_80583B04(DbSubX* self, int a);
-extern "C" void fn_80583A48(DbSubX* self, int a, int b);
-extern "C" void fn_80583BB0(DbSubX* self, int a);
-extern "C" void fn_80584504(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
-extern "C" void fn_80584918(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
-extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
-extern "C" void fn_80582AA0(DbSubX* self);
-extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
 
 struct DbTri {
     int w0;
@@ -165,46 +117,72 @@ extern DbTbl13 lbl_8060055C;
 extern int lbl_80622D90[];
 
 extern const float lbl_806005D0;
+
+struct DbTbl16i {
+    int w[16];
+};
+extern DbTbl16i lbl_80600590;
+extern "C" {
+int fn_8007F7D0__FP13Unk8007F198_BUi(void* g, unsigned a);
+int fn_8058320C(void* self, int id, int k);
+}
+
+extern const float lbl_806005E0;
+
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A440[];
+extern "C" void fn_80535360(void* self, int x);
+
+/* Stack list with an embedded id buffer; construction steps and vptr names as in db/tu_80535360.cpp. */
+struct DbStkList {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void D() { vp = lbl_8064A550; }
+};
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_80582578(DbSubX* self, int a);
+extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
+extern "C" int fn_805826AC(DbSubX* self, DbRec12* rec);
 extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
 extern "C" void fn_80582AA0(DbSubX* self);
 extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
 extern "C" int fn_80582DF4(int unused, int k, int* arr);
 extern "C" int fn_80582E38(int unused, int a, int b);
 extern "C" int fn_80582EE4(int unused, int a);
-extern "C" int fn_80583324(int unused, int b);
-extern "C" int fn_80583354(int unused, int x, int c);
-extern "C" int fn_805833A8(void* unused, int a, int b);
-extern "C" DbSubObj* fn_80583404(DbSubObj* self);
-extern "C" int fn_805838E8(void* self, void* a);
-extern "C" int fn_8058391C(int unused, void* a);
-extern "C" DbSubObj* fn_80583964(DbSubObj* self);
-extern "C" int fn_805839A0(void);
-extern "C" void fn_80583A48(DbSubX* self, int a, int b);
-extern "C" void fn_80583B04(DbSubX* self, int a);
-extern "C" void fn_80583BB0(DbSubX* self, int a);
-extern "C" int fn_80583C70(int unused, int x, int y, int z);
-extern "C" int fn_805842F8(int unused, void* a);
-extern "C" void fn_80584504(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
-extern "C" int fn_80584634(void* self, void* a);
-extern "C" int fn_805848B8(int unused, void* a);
-extern "C" void fn_80584918(DbFmt* self, DbFlagRec* a, unsigned short* b, int c);
-extern "C" int fn_80584C00(void* self, void* a);
-extern "C" DbSubObj* fn_80584C80(DbSubObj* self);
-extern "C" int fn_805845BC(int u, int k);
-extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
 extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_80582578(DbSubX* self, int a);
-extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
-extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
-extern "C" void fn_80582AA0(DbSubX* self);
-extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
-extern "C" int fn_80582DF4(int unused, int k, int* arr);
-extern "C" int fn_80582E38(int unused, int a, int b);
-extern "C" int fn_80582EE4(int unused, int a);
-extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
+extern "C" int fn_80583000(int unused, int a);
+extern "C" int fn_8058320C(void* unused, int id, int k);
 extern "C" int fn_80583324(int unused, int b);
 extern "C" int fn_80583354(int unused, int x, int c);
 extern "C" int fn_805833A8(void* unused, int a, int b);
@@ -243,6 +221,37 @@ extern "C" DB_OVERLAY int fn_805825BC(DbSubX* self, int a, int* o1, int* o2)
         DbTbl13 t = lbl_8060055C;
         *o2 = lbl_80622D90[idx];
         *o1 = t.w[idx];
+        return 1;
+    }
+    return 0;
+}
+
+/* near-miss: ~25 slots (register naming); retail forms a second address pseudo for the record object after the ctor call */
+extern "C" DB_OVERLAY int fn_805826AC(DbSubX* self, DbRec12* rec)
+{
+    if (fn_80582578(self, (int)rec) != 0) {
+        DbTbl16i t = lbl_80600590;
+        int w = t.w[rec->a];
+        if (w != 0) {
+            char obj[0x18];
+            fn_8052E408(obj, rec);
+            char* p = obj;
+            int id = fn_80587728(p);
+            int k = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+            if ((w & 1) && fn_8058320C(self, id, k) == 0) {
+                fn_80360AF0(p, 2);
+                return 7;
+            }
+            if ((w & 2) && fn_80583324((int)self, id) != 0) {
+                fn_80360AF0(obj, 2);
+                return 8;
+            }
+            if ((w & 4) && fn_80583354((int)self, id, k) != 0) {
+                fn_80360AF0(obj, 2);
+                return 9;
+            }
+            fn_80360AF0(obj, 2);
+        }
         return 1;
     }
     return 0;
@@ -350,6 +359,48 @@ extern "C" DB_OVERLAY int fn_80582F40(void* self, float pa, float pb, float pc, 
     return ret;
 }
 
+extern "C" DB_OVERLAY int fn_80583000(int unused, int a)
+{
+    int t = fn_8009005C__Fif(a, (float)(fn_8040ABA0() % 10000) * lbl_806005E0);
+    switch (t) {
+    case 4:
+    case 0:
+        return fn_8040ABA0() % 3;
+    case 3:
+    case 1:
+        return fn_8040ABA0() % 3 + 1;
+    case 2:
+        return fn_8040ABA0() % 3 + 2;
+    default:
+        return 2;
+    }
+}
+
+/* near-miss: ~14 slots; same structure, retail reads t.m0 and the final vptr store directly off sp and orders the C3 stores m4, mC, m14 */
+extern "C" DB_OVERLAY int fn_8058320C(void* unused, int id, int k)
+{
+    DbStkList t;
+    int buf[0x78];
+    DbStkList* q = &t;
+    q->C1(buf, 0x78);
+    q->C2();
+    q->C3(lbl_8064A440);
+    fn_80535360(&t, k);
+    unsigned n = q->m4;
+    unsigned i = 0;
+    q->mC = 0;
+    for (; i < n; i++) {
+        int c = q->mC;
+        if (t.At(c) == id) {
+            q->D();
+            return 1;
+        }
+        q->mC = (c + 1) % q->m4;
+    }
+    t.D();
+    return 0;
+}
+
 extern "C" DB_OVERLAY int fn_80583324(int unused, int b)
 {
     return fn_80077BC4(lbl_8061930C, b) == 0;
@@ -384,7 +435,7 @@ extern "C" DB_OVERLAY DbSubObj* fn_80583404(DbSubObj* self)
 
 extern "C" DB_OVERLAY int fn_805838E8(void* self, void* a)
 {
-    int r = fn_805826AC(self, a);
+    int r = fn_805826AC((DbSubX*)self, (DbRec12*)a);
     if (r == 1)
         return 4;
     return r;
@@ -535,7 +586,7 @@ extern "C" DB_OVERLAY int fn_805845BC(int u, int k)
 
 extern "C" DB_OVERLAY int fn_80584634(void* self, void* a)
 {
-    int r = fn_805826AC(self, a);
+    int r = fn_805826AC((DbSubX*)self, (DbRec12*)a);
     if (r == 1) {
         char obj[0x18];
         char* p = obj;
@@ -586,7 +637,7 @@ extern "C" DB_OVERLAY void fn_80584918(DbFmt* self, DbFlagRec* a, unsigned short
 
 extern "C" DB_OVERLAY int fn_80584C00(void* self, void* a)
 {
-    int r = fn_805826AC(self, a);
+    int r = fn_805826AC((DbSubX*)self, (DbRec12*)a);
     if (r == 1) {
         char obj[0x18];
         char* p = obj;
