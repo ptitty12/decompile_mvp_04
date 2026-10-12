@@ -57,11 +57,13 @@ void fn_80540BBC(int a, Db8053E240_Ent12* e, int n);
 void fn_80541C04(Db8053E240_EntF* arr, int n, int id, int v, float key);
 int fn_80541CAC(Db8053E240_Ent12* e, int n);
 float fn_80541CDC(float a, float b, float c, float d, float e);
+float fn_80541D3C(int a, int b, float base);
 int fn_80541EC8(int id, int flag, int n, Db8053E240_Ent12* e);
 /* end Q18 protos */
 
 int fn_8053E2E8(C30* c, int k, int a, int b, int n, C30* c2, float f);
 /* Q18 decls */
+extern "C" float fn_80073C10(void* s, int a, int b, int c, int d);
 extern char lbl_80649EC0[];
 Db8054CBBC_O* fn_8054CBBC(Db8054CBBC_O* o, int a, Unk8007B2B0_Screen* b);
 void fn_8054F4F8(Db8054CBBC_O* o);
@@ -414,6 +416,18 @@ DB_OVERLAY float fn_80541CDC(float a, float b, float c, float d, float e)
     else
         r = d;
     return r * b;
+}
+
+DB_OVERLAY float fn_80541D3C(int a, int b, float base)
+{
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    float f0 = s->fn_80073710(3, a, b);
+    float f1 = s->fn_800739E0(1, a, b, 2);
+    float f2 = fn_80073C10(s, 3, a, b, 2);
+    float f3 = fn_80073C10(s, 5, a, b, 2);
+    float f4 = s->fn_80073710(1, a, b);
+    float f5 = s->fn_8007A6A0(0x16, a);
+    return f5 * 10.0f + (f3 * 100.0f + f2 * 100.0f + f1 + f0 + f4) + base;
 }
 
 DB_OVERLAY int fn_80541EC8(int id, int flag, int n, Db8053E240_Ent12* e)
