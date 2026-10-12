@@ -4,6 +4,37 @@
  */
 
 #include "game/fe_804BE560.h"
+extern "C" void fn_804CD590(FeScrE0C* x);
+extern "C" float fn_804CDCE8(FeScrN* x, int a, int sel);
+extern "C" char* fn_800DF254(char* out, int a, int b, float f);
+struct FeF1 {
+    float v;
+};
+extern "C" int fn_80591AA0(void* h);
+extern "C" FeW* fn_800C805C(FeW* w);
+extern "C" FeW* fn_800C8058(FeW* w);
+extern "C" FeW* fn_800C8044(FeW* w);
+extern "C" FeW* fn_800C8040(FeW* w);
+extern "C" void fn_800E5380(FeW* w);
+extern "C" int fn_80125154(void* w, int a);
+extern const char lbl_805F82BC[];
+extern const char lbl_805F82C8[];
+extern const char lbl_805F7B50[];
+extern const char lbl_805F5854[];
+extern "C" void fn_80124FA8(void* w, void* x);
+struct FeScrCm : FeW {
+    char pad40[0xF0];
+    int m130;
+    float m134;
+    float m138;
+    int m13C;
+};
+struct FeCamC {
+    char pad0[0xCC0];
+    const void* mCC0;
+};
+extern const char lbl_80672048[];
+extern "C" FeCamC* fn_804BB110(FeCamC* c);
 
 struct FeAttr {
     float m0;
@@ -189,11 +220,61 @@ extern "C" FE_OVERLAY int fn_804CD248(FeScrN* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY FeScrCm* fn_804CD284(FeScrCm* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeCamC* cam = (FeCamC*)((char*)self + 0x144);
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80670EF0);
+    self->m130 = 0;
+    self->m134 = 0.0f;
+    self->m138 = 0.0f;
+    self->m13C = 0;
+    fn_804BB110(cam);
+    cam->mCC0 = lbl_80672048;
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804CD2FC(FeScrE0C* x)
 {
     x->SetVptr(lbl_80670EF0);
     x->mE04 = lbl_80672168;
     fn_8035686C(x);
+}
+
+/* near-miss: 2 of 127 slots. Retail loads the 500000.0f constant of the m134 loop once before the loop (`lfs f11`),
+ * ours loads it inside the loop into f0; the float loop value must live in a one-member struct (FeF1) to stay out of
+ * the -ffloat-store slots. */
+extern "C" FE_OVERLAY void fn_804CD334(FeScrE0C* x)
+{
+    char buf[0x400];
+    fn_800ECF18(x);
+    x->m140 = (FeW*)*(int*)((Unk8007B2B0_Screen*)lbl_8061930C)->m30;
+    x->mE14 = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(x->mE14, x);
+    fn_80125154(x->mE14, 0);
+    x->mE0C = fn_800C805C(x->fn_vslot32(lbl_805F82BC, 1));
+    x->mE10 = (int)fn_800C8058(x->mE0C->fn_vslot32(lbl_805F82C8, 1));
+    fn_804CD590(x);
+    *(float*)&x->m134 = 500000.0f;
+    for (int i = 0; i < fn_80591AA0(x->m140); i++) {
+        float t = fn_804CDCE8((FeScrN*)x, i, 0);
+        FeF1 f;
+        f.v = *(float*)&x->m134;
+        if (!(t <= f.v)) {
+            FeF1 g;
+            do {
+                g.v = f.v + 500000.0f;
+                f.v = g.v;
+            } while (t > g.v);
+            *(float*)&x->m134 = f.v;
+        }
+    }
+    FeW* w = fn_800C8044(x->fn_vslot32(lbl_805F7B50, 1));
+    fn_800DF254(buf, 0, 0, *(float*)((char*)x->m140 + 0x12B78));
+    fn_800C8040(w->fn_vslot32(lbl_805F5854, 1))->fn_vslot28(buf);
+    fn_800E5380(w);
+    fn_804CD878(x);
+    fn_804CD530(x);
 }
 
 extern "C" FE_OVERLAY void fn_804CD530(FeScrE0C* x)
