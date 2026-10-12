@@ -79,8 +79,8 @@ void fn_8017D640(void* a, int b, Unk801AB63C_Q* c, int d, int e);
 int fn_8017D6B8(void* a, int b, Unk801AB63C_Q* c, int d, int e, int f);
 void fn_801B2944(void* a, int b, int c, int d, int e, int f, int g, int h);
 void fn_80235780(void* a, int b, int c, int d);
-void fn_801AD470(void* a, int b, int c);
-void fn_801AD900(void* a, int b, int c);
+int fn_801AD470(void* a, int b, int c);
+int fn_801AD900(void* a, int b, int c);
 int fn_801A4B34(Unk8019F8C0_Owner* o);
 int fn_801B5DE8(void* a, void* q, int c);
 int fn_801AD31C(void* a, Unk801AB63C_Q* q, int c);
@@ -111,7 +111,7 @@ void fn_801ACF2C(Unk801AB63C_P* p);
 void fn_801AD118(Unk801AB63C_P* p);
 void fn_801B25E4(Unk801AB63C_P* p, int n);
 int fn_8006BC74(void* m, int f);
-void fn_801AC594(Unk801AB63C_P* p, void* q);
+void fn_801AC594(Unk801AB63C_P* p, Unk801AB63C_Q* q);
 void fn_801AC7E4(Unk801AB63C_P* p, int f, int a, int b);
 void* fn_801A497C(Unk8019F8C0_Owner* o, int f, int n);
 void fn_801AB914(Unk801AB63C_P* p, int x);
@@ -236,7 +236,7 @@ void fn_801AB964(Unk801AB63C_P* p)
     int f = p->m8->m6F8->m14[2].m8 == 0;
     if (fn_801ABCDC(p, f) == 1) {
         if (fn_8006BC74(p->m8->m6F8, f) == 1) {
-            fn_801AC594(p, fn_801A497C(p->m8, f, 0));
+            fn_801AC594(p, (Unk801AB63C_Q*)fn_801A497C(p->m8, f, 0));
         }
         fn_801AB914(p, f);
     }
@@ -326,6 +326,79 @@ int fn_801ABD44(Unk801AB63C_P* p, int a, Unk801AB63C_Q* c, int d, int e)
 void fn_801ABD88(Unk801AB63C_P* p, int a, Unk801AB63C_Q* c)
 {
     fn_8017D640(p->m4, c->m708, c, a, 0);
+}
+
+struct Unk801B23A8_Q;
+int fn_801B371C(void* a, Unk801B23A8_Q* q, int c);
+int fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+int fn_801B3850(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c);
+int fn_801B5DE8(void* a, void* b, int c);
+int fn_801B5EDC(Unk801AB63C_P* p, int i, int c);
+int fn_801B5FC4(void* a, int b);
+Unk801AB63C_Q* fn_801B63A0(Unk801AB63C_P* p, int t);
+int fn_801C1870(void* a, int b, int c);
+int fn_801C18C4(void* a, int b, int c);
+int fn_801ACB68(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c, int d);
+int fn_801AD6FC(void* a, int b);
+int fn_801AD720(void* a, int b);
+int fn_801ADCE8(Unk801AB63C_P* p, int a);
+
+void fn_801AC594(Unk801AB63C_P* p, Unk801AB63C_Q* q)
+{
+    int d = -1;
+    int r = 0;
+    int g = 0;
+    if (fn_801B371C(p, (Unk801B23A8_Q*)q, 0) != 0) {
+        d = fn_801B2834(p, (Unk801B23A8_Q*)q);
+        fn_801AC7E4(p, q->m708, 8, d);
+        return;
+    }
+    Unk801AB63C_Q* t = fn_801B63A0(p, q->m708);
+    if (t != 0 && fn_801B5DE8(p, t, 0) == 0) {
+        g = 1;
+    } else if (fn_801B5DE8(p, q, 0) == 0) {
+        g = 1;
+    }
+    if (g == 1) {
+        if (r == 0) {
+            if (fn_801AD6FC(p, (int)q) == 1) {
+                r = fn_801ACB68(p, q, 0, -1);
+            }
+            if (r == 0) {
+                if (fn_801AD720(p, (int)q) == 1) {
+                    r = fn_801ACB68(p, q, 1, -1);
+                }
+                if (r == 0) {
+                    if (fn_801ADCE8(p, (int)q) == 1) {
+                        r = fn_801ACB68(p, q, 2, -1);
+                    }
+                    if (r == 0) {
+                        d = fn_801B2834(p, (Unk801B23A8_Q*)q);
+                        if (d <= 0x77) {
+                            int f = 0;
+                            int x = fn_801B5FC4(p, q->m708);
+                            int y = fn_801B3850(p, (Unk801B23A8_Q*)q, 1);
+                            int z = fn_801B5EDC(p, q->m708, 0);
+                            if (*(int*)((char*)q + 0x4C4) < 0 && fn_801C1870(p, z, 0) != 0) {
+                                f = 1;
+                            }
+                            if ((fn_801C18C4(p, 2, x) != 0 && y > 4) || f != 0) {
+                                r = fn_801ACB68(p, q, 3, d);
+                            }
+                        } else {
+                            r = fn_801ACB68(p, q, 3, d);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (r == 0) {
+        if (d == -1) {
+            d = fn_801B2834(p, (Unk801B23A8_Q*)q);
+        }
+        fn_801AC7E4(p, q->m708, 8, d);
+    }
 }
 
 void fn_801ACB30(void* a, int b, int c, int d)
@@ -567,14 +640,14 @@ int fn_801AD558(Unk801AB63C_P* p, Unk801AB63C_Q* q)
     return r;
 }
 
-void fn_801AD6FC(void* a, int b)
+int fn_801AD6FC(void* a, int b)
 {
-    fn_801AD470(a, b, 0);
+    return fn_801AD470(a, b, 0);
 }
 
-void fn_801AD720(void* a, int b)
+int fn_801AD720(void* a, int b)
 {
-    fn_801AD900(a, b, 1);
+    return fn_801AD900(a, b, 1);
 }
 
 int fn_801B40F8(Unk801AB63C_P* p, Unk801B23A8_Q* q);
