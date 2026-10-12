@@ -242,6 +242,8 @@ struct Unk8007A4DC_Screen {
     unsigned fn_8007F674(int a, int b);
     int fn_8007F6C4(int a, int b, unsigned i);
     int fn_80080198();
+    float fn_800774E8(int a, int b);
+    float fn_80077A18(int a, int b);
     Unk8007B2B0_Screen* C2() { return (Unk8007B2B0_Screen*)this; }
 };
 

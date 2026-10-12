@@ -99,6 +99,34 @@ int Unk8007A4DC_Screen::fn_80077404(int a, int b)
     return total;
 }
 
+float Unk8007A4DC_Screen::fn_800774E8(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned t0 = 0;
+    unsigned t1 = 0;
+    unsigned t2 = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1) {
+            t0 += fn_8007455C(0, id, b);
+            t1 += fn_8007455C(1, id, b);
+            t2 += fn_8007455C(2, id, b);
+        }
+    }
+    float tot = ((float)t0 + (float)t2) + (float)t1;
+    float res = 0.0f;
+    if (!(tot <= 0.0f))
+        res = ((float)t0 + (float)t2) / tot;
+    return res;
+}
+
 int Unk8007A4DC_Screen::fn_80077684(int a, int b)
 {
     Unk805A19C8_Roster* r = m58;
@@ -173,6 +201,34 @@ int Unk8007A4DC_Screen::fn_80077934(int a, int b)
             total += fn_80074754(11, id, b);
     }
     return total;
+}
+
+float Unk8007A4DC_Screen::fn_80077A18(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned t0 = 0;
+    unsigned t1 = 0;
+    unsigned t2 = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1) {
+            t0 += fn_80074754(1, id, b);
+            t1 += fn_80074754(2, id, b);
+            t2 += fn_80074754(6, id, b);
+        }
+    }
+    float den = (float)t0 + (float)t1 * 0.33333334f;
+    float res = 0.0f;
+    if (t0 != 0 || t1 != 0)
+        res = (float)t2 * 9.0f / den;
+    return res;
 }
 
 static inline unsigned Cnt4C(Handle* h)
