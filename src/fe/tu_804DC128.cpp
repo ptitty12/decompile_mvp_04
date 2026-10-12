@@ -5,6 +5,9 @@
 
 #include "game/fe_804D08D0.h"
 
+extern "C" unsigned fn_8007DBB0__FP13Unk8007DB74_A(void* g);
+extern "C" void fn_8007CF44__18Unk8007B2B0_ScreenUiii(void* g, unsigned i, char* out, int a);
+
 extern "C" FeW* fn_800C8048(FeW* w);
 
 extern "C" {
@@ -81,6 +84,28 @@ FE_OVERLAY int fn_804DC468(FeS804DC128* x)
 {
     x->m158->fn_vslot53();
     return 1;
+}
+
+FE_OVERLAY void fn_804DC4A4(FeS804DC128* x)
+{
+    char buf[0x18];
+    void* s = lbl_8061930C;
+    unsigned i = 0;
+    unsigned n = fn_8007DBB0__FP13Unk8007DB74_A(s);
+    x->m158->fn_vslot79(n + 1, 0);
+    x->m158->fn_vslot3();
+    x->m158->fn_vslot43(0, 0, (char*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3FB5), 5);
+    int sel = fn_8007DA34__18Unk8007B2B0_Screeni(s, x->m138);
+    for (; i < n; i++) {
+        fn_8007CF44__18Unk8007B2B0_ScreenUiii(s, i, buf, 9);
+        x->m158->fn_vslot43(i + 1, 0, buf, 5);
+    }
+    fn_804DC64C(x);
+    if (sel == -1)
+        x->m158->fn_vslot67(0, 0);
+    else
+        x->m158->fn_vslot67(sel + 1, 0);
+    x->m158->fn_vslot14(1);
 }
 
 FE_OVERLAY void fn_804DC64C(FeS804DC128* x)
