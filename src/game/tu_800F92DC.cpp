@@ -26,6 +26,55 @@ struct UiScr138_1AC_1E4 : UiObj {
     UiObj* m1E4;
 };
 struct Unk8017A930_T;
+struct UiAA24x {
+    char pad0[0x720];
+    struct UiAA24y* m720;
+};
+struct UiAA24y {
+    char pad0[0xD0];
+    int mD0;
+};
+struct UiScrFB : UiBase {
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    float m140;
+    char pad144[4];
+    char m148[0x84];
+    int m1CC;
+    int m1D0;
+    int m1D4;
+    int m1D8;
+    int m1DC;
+    int m1E0;
+    int m1E4;
+    int a1E8[2];
+    int a1F0[2];
+    int a1F8[2];
+    int a200[2];
+    int a208[2];
+    int a210[2];
+    int a218[2];
+    int a220[2];
+    int a228[2];
+    int m230;
+    int m234;
+    int m238;
+    int m23C;
+    int m240;
+    int m244;
+    int m248;
+    int a24C[4];
+    int m25C;
+    int m260;
+    char pad264[4];
+    int m268;
+    int m26C;
+};
+
 int fn_8017C8C8(Unk8017A930_T* a);
 class UiSub98 {
     char pad0[0x24];
@@ -159,6 +208,51 @@ int fn_800F9CB8(UiScr134* self, int a)
 
 extern char lbl_80658FB0[];
 extern int lbl_80619D10;
+extern float lbl_805BE70C;
+UiScrFB* fn_800F9D0C(UiScrFB* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648((UiScrA70C*)self, a, b, c, d, e, f, g, h);
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m1CC = 0;
+    self->m1D0 = 0;
+    self->m1D4 = 0;
+    self->m3C = lbl_80658FB0;
+    self->m140 = lbl_805BE70C;
+    self->m1D8 = 0;
+    self->m1DC = 0;
+    self->m1E0 = 0;
+    self->m1E4 = 0;
+    self->m230 = 0;
+    self->m234 = 0;
+    self->m238 = 0;
+    self->m23C = 0;
+    self->m240 = 0;
+    self->m244 = 0;
+    self->m13C = 0xC7;
+    self->m248 = 0;
+    self->m25C = 0;
+    self->m260 = 0;
+    fn_803FFC58(self->m148, 0, 0x84);
+    for (int i = 0; i < 2; i++) {
+        self->a1E8[i] = 0;
+        self->a1F0[i] = 0;
+        self->a1F8[i] = 0;
+        self->a200[i] = 0;
+        self->a208[i] = 0;
+        self->a210[i] = 0;
+        self->a218[i] = 0;
+        self->a220[i] = 0;
+        self->a228[i] = 0;
+    }
+    for (int i = 0; i < 4; i++)
+        self->a24C[i] = 0;
+    self->m268 = 0;
+    self->m26C = 0;
+    return self;
+}
+
 void fn_800F9E4C(UiScrRaw* self, int a)
 {
     self->m3C = lbl_80658FB0;
@@ -203,6 +297,41 @@ void fn_800FB02C(UiObj* self)
     fn_802D7A74();
     lbl_8061B8C0->m24 = 0;
     fn_802D7ACC();
+}
+
+void fn_800FB0E4(UiScrFB* self)
+{
+    fn_800ED254((UiObj*)self);
+    self->m13C = 0xC7;
+    fn_803FFC58(self->m148, 0, 0x84);
+    self->m1D8 = 0;
+    self->m1D4 = 0;
+    self->m1D0 = 0;
+    self->m1CC = 0;
+    for (int i = 0; i < 2; i++) {
+        self->a1E8[i] = 0;
+        self->a1F0[i] = 0;
+        self->a1F8[i] = 0;
+        self->a200[i] = 0;
+        self->a208[i] = 0;
+        self->a210[i] = 0;
+        self->a218[i] = 0;
+        self->a220[i] = 0;
+        self->a228[i] = 0;
+    }
+    self->m230 = 0;
+    self->m1E0 = 0;
+    self->m1E4 = 0;
+    self->m234 = 0;
+    self->m238 = 0;
+    self->m23C = 0;
+    self->m240 = 0;
+    for (int i = 0; i < 4; i++)
+        self->a24C[i] = 0;
+    fn_802D8294(2);
+    fn_802D7A64();
+    fn_802D7ADC();
+    ((UiAA24x*)fn_8011AA24(0))->m720->mD0 = 5;
 }
 
 int fn_800FB200(UiScr138_1AC_1E4* self, int a)
