@@ -2417,7 +2417,10 @@ dolphin/dvd/tu_80425BE4.c:
 	.text       start:0x80425BE4 end:0x80425E54
 
 dolphin/exi/tu_80425E54.c:
-	.text       start:0x80425E54 end:0x80428F14
+	.text       start:0x80425E54 end:0x80426CD0
+
+dolphin/exi/tu_80426CD0.c:
+	.text       start:0x80426CD0 end:0x80428F14
 
 dolphin/gx/tu_80428F14.c:
 	.text       start:0x80428F14 end:0x8042AB48

@@ -1,18 +1,13 @@
 /*
- * Dolphin SDK EXI (MWCC GC/1.2.5n, cflags_dolphin_sdk with -O3,p as EXIBios.c needs;
- * EXIUart.c at the end of this range may want -O4,p),
- * .text 0x80425E54-0x80428F14 (code-only unit, 51 functions; TU boundaries approximate, placeholder).
+ * Dolphin SDK dvdlow.c (MWCC GC/1.2.5n, cflags_dolphin_sdk = -O4,p),
+ * .text 0x80425E54-0x80426CD0 (code-only unit, 21 functions; DI registers at 0xCC006000).
  * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
+ * Split from the rest of the former exi unit (now tu_80426CD0.c) on flag evidence (docs/DECISIONS.md, 2026-10-12):
+ * 19 of 21 functions are byte-identical at -O4,p and not at the EXI flags (-O3,p). The unit keeps its old name
+ * because the verifier keys regressions by unit name.
+ * The statics below are volatile only where that reproduces the original load/store order (empirical; the SDK
+ * declares them volatile).
  */
-/* FLAGS EVIDENCE (worker tail-09): 0x80425E54..0x80426CD0 is dvdlow.c (DVDLow*, DI registers at 0xCC006000,
- * not EXI). It compiles byte-identical (19 of 21 functions) with MWCC GC/1.2.5n -O4,p (cflags_dolphin_sdk /
- * cflags_dolphin_dvd), but this unit is configured with cflags_dolphin_exi (-O3,p), under which only
- * fn_80426C98 matches. The unit needs a split at 0x80426CD0 (EXIBios.c starts at fn_80426C54's successor
- * 0x80426CD0) with the DVD flags for the first part. The statics below are volatile only where that
- * reproduces the original load/store order (empirical; the SDK declares them volatile).
- * Parked: fn_80426174 (ProcessNextCommand) and fn_804263F8 (DVDLowRead), same instruction count, register
- * assignment differs because Prev/Curr are separate statics in the original. */
 #include <dolphin.h>
 #include <dolphin/dvd.h>
 #include <dolphin/os.h>

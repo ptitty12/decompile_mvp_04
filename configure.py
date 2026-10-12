@@ -1319,7 +1319,8 @@ config.libs = [
         "cflags": cflags_dolphin_exi,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "dolphin/exi/tu_80425E54.c"),
+            Object(NonMatching, "dolphin/exi/tu_80425E54.c", cflags=cflags_dolphin_sdk),  # dvdlow.c: -O4,p (docs/DECISIONS.md 2026-10-12)
+            Object(NonMatching, "dolphin/exi/tu_80426CD0.c"),
         ],
     },
     {
