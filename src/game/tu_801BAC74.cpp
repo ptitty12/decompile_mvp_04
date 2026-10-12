@@ -687,6 +687,80 @@ extern "C" void fn_801BC02C(A* a, P* p)
     }
 }
 
+extern "C" void fn_801BC364(A* a);
+extern "C" void fn_801BC3D0(A* a);
+extern "C" void fn_801BC478(A* a);
+extern "C" void fn_801BFFCC(void* o, P* p);
+extern "C" void fn_801C0044(void* o, P* p);
+extern "C" void fn_801C00BC(void* o, P* p);
+class Unk801BC170_Ev : public Unk801BB668_Ev {
+public:
+    Unk801BC170_Ev() : Unk801BB668_Ev(0x49)
+    {
+        m8 = 0;
+        mC = 0;
+        m10 = 0;
+    }
+    virtual ~Unk801BC170_Ev() {}
+    int m8;
+    int mC;
+    int m10;
+    P* m14;
+};
+extern "C" void fn_801BC170(A* a, P* p, int mode, int z, int flag)
+{
+    int pre = -1;
+    if (p->m38C == 1) {
+        Vec3 v = lbl_806055AC;
+        fn_801BDB84(a->m8, p, 1, 0, &v);
+        pre = a->m8->m0;
+    }
+    Unk801BC170_Ev ev;
+    int kind;
+    switch (mode) {
+    case 0:
+        kind = 1;
+        break;
+    case 1:
+        kind = 2;
+        break;
+    case 2:
+        kind = 3;
+        break;
+    case 5:
+        kind = 4;
+        break;
+    default:
+        kind = 0;
+        break;
+    }
+    ev.m8 = kind;
+    ev.mC = z;
+    ev.m10 = flag;
+    ev.m14 = p;
+    fn_8037893C(&a->m14->m704, ev.m0, &ev, 0, 0);
+    if (pre != 1) {
+        fn_8017B658(a->m10, mode);
+        if (a->m14->m6F4 == 0) {
+            if (mode == 0) {
+                fn_801BC364(a);
+                fn_801BFFCC(a->mC, p);
+                int f = 0;
+                if (a->m14->m6F8->m14->m1CD0 != 0)
+                    f = 1;
+                if (f == 0)
+                    a->m8->m10 = 1;
+            } else if (mode == 1) {
+                fn_801BC3D0(a);
+                fn_801C0044(a->mC, p);
+            } else if (mode == 2) {
+                fn_801BC478(a);
+                fn_801C00BC(a->mC, p);
+            }
+        }
+    }
+}
+
 extern "C" void fn_801BC364(A* a)
 {
     Unk8006A138_It<0x15> it(9);
