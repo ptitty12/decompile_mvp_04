@@ -46,6 +46,9 @@ const char* fn_80090880(Unk80090880* t, int id);
 extern Unk80090880* lbl_8061977C;
 extern "C" void fn_804A15FC(char* x);
 extern const char lbl_805F7664[];
+extern const char lbl_805F754C[];
+extern const char lbl_805F7558[];
+extern const char lbl_805F6548[];
 extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
 extern "C" void fn_8049E94C(void* x);
@@ -238,6 +241,39 @@ FE_OVERLAY void fn_8049F00C(char* x)
         w->fn_vslot8(0);
         i = it.Next();
     } while (i <= 3);
+}
+
+FE_OVERLAY void fn_8049F088(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    FeI(x, 0x134) = 1;
+    FeI(x, 0x138) = 1;
+    FeI(x, 0x164) = 0;
+    FeI(x, 0x13C) = 0;
+    FeI(x, 0x150) = 0;
+    FeI(x, 0x154) = 0;
+    FeI(x, 0x158) = 0;
+    FeI(x, 0x15C) = 0;
+    FeI(x, 0x160) = 0;
+    if (FeI(x, 0x174) == 0)
+        FeI(x, 0x178) = fn_800B5520((int)fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0));
+    int id = fn_800B548C(FeI(x, 0x178));
+    fn_804A15FC((char*)x);
+    FeW* a = fn_800C8044(x->fn_vslot32(lbl_805F758C, 1));
+    FeP(x, 0x180) = a;
+    a->fn_vslot8(1);
+    FeW* w = fn_800C8054(FeMem(x, 0x180)->fn_vslot32(lbl_805F4F48, 1));
+    FeP(x, 0x224) = w;
+    ((FeSubB*)((char*)w + 0x98))->s20(id, 0);
+    w = fn_800C8054(FeMem(x, 0x180)->fn_vslot32(lbl_805F754C, 1));
+    FeP(x, 0x228) = w;
+    ((FeSubB*)((char*)w + 0x98))->s20(id, 0);
+    FeW* b = fn_800C8044(FeMem(x, 0x180)->fn_vslot32(lbl_805F7558, 1));
+    w = fn_800C8054(b->fn_vslot32(lbl_805F6548, 1));
+    FeP(x, 0x22C) = w;
+    ((FeSubB*)((char*)w + 0x98))->s20(id, 0);
+    fn_8049ED34(x, (void*)fn_80090880(lbl_8061977C, 0x299C));
+    fn_8049FC58(x, 6);
 }
 
 FE_OVERLAY void fn_8049F2A8(void* x)
