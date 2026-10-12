@@ -121,7 +121,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s101();
     virtual void s102();
     virtual void s103();
-    virtual void s104();
+    virtual void s104(int a);
     virtual void s105();
     virtual void s106();
     virtual void s107();
@@ -366,7 +366,7 @@ struct FeWZ : Unk800C7B40_Data {
     virtual void s88();
     virtual void s89();
     virtual void s90();
-    virtual void s91();
+    virtual void s91(int a, int b, int c);
     virtual void s92();
     virtual void s93();
     virtual void s94();
@@ -952,5 +952,92 @@ extern "C" {
 int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
 void fn_8009C54C(FeTeamRec* t, int a);
 }
+
+
+/* ---- unit 804DC128 ------------------------------------------------------------------ */
+
+/* Screen of lbl_80668EA0 (ctor fn_804DC128, base ctor fn_800EC594): m158 is the list widget,
+ * two embedded button panels (the FeS804DB050 type) sit at +0x1E0 and +0x434. */
+struct FeS804DC128 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    int m138;
+    int m13C;
+    FeW* m140;
+    char pad144[0xC];
+    int m150;
+    FeW* m154;
+    FeW* m158;
+    FeW* m15C;
+    int m160;
+    char pad164[0x17C - 0x164];
+    int m17C;
+    char pad180[0x1C0 - 0x180];
+    int m1C0;
+    char pad1C4[0x1D4 - 0x1C4];
+    int m1D4;
+    char pad1D8[8];
+    FeW* m1E0;
+    FeW* m1E4;
+    FeW* m1E8;
+    FeW* m1EC;
+    char pad1F0[0x688 - 0x1F0];
+    FeW* m688;
+    FeW* m68C;
+    FeW* m690;
+    FeW* m694;
+    FeW* m698;
+    FeW* m69C;
+};
+struct FeS804DD760 : FeW {
+    char pad40[0xF0];
+    int m130;
+};
+struct FeS804DD904 : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeW* m134;
+};
+struct FeStateD {
+    char pad0[0x650];
+    int m650;
+};
+extern const char lbl_80668EA0[];
+extern const char lbl_805F85E0[];
+extern const char lbl_805F8698[];
+extern const char lbl_805F977C[];
+extern const char lbl_80681998[];
+extern const char lbl_8066D508[];
+extern "C" {
+void fn_804CF368(void* x);
+void fn_804CEF98(void* x);
+int fn_804DD6A0(FeS804DC128* x, int a);
+int fn_804DD6EC(FeS804DC128* x, int a);
+void fn_804DC344(FeS804DC128* x);
+void fn_804DC64C(FeS804DC128* x);
+void fn_804CF948(void* x, int a, int b);
+int fn_800B5BD4(FeState* s);
+void fn_800A3578(FeGlobal80619948* g);
+void fn_80131380(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_80131450(void* x);
+void fn_801314B8(FeS804DD760* x);
+void fn_801315AC(FeS804DD760* x);
+void fn_801315CC(FeS804DD760* x);
+void fn_80134700(FeS804DD760* x);
+}
+
+extern const char lbl_805F9788[];
+extern const char lbl_805F97CC[];
+extern "C" {
+void fn_804DC4A4(FeS804DC128* x);
+void fn_804DC764(FeS804DC128* x);
+void fn_804DC854(FeS804DC128* x);
+}
+
+extern const char lbl_805F978C[];
+extern const char lbl_805F97A0[];
+extern const char lbl_805F97D8[];
+extern const char lbl_805F97EC[];
 
 #endif
