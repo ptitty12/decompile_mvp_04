@@ -170,7 +170,6 @@ FE_OVERLAY void fn_804937C8(void* x, int a, int b)
     fn_80492BA8(x, out);
 }
 
-//// a
 FE_OVERLAY void fn_80494F94(Fe4F94* x)
 {
     for (int i = 0; i < 4; i++) {
