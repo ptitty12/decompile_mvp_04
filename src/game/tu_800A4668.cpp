@@ -65,6 +65,11 @@ struct Unk800A6114_C {
     char pad1C[0x84 - 0x1C];
     int m84;
     int m88;
+    char pad8C[4];
+    float m90;
+    float m94;
+    float m98;
+    float m9C;
 };
 
 struct Unk800A641C_Q {
@@ -108,6 +113,103 @@ extern "C" void fn_800A4EE4(Unk800A4EE4* p)
         e->m1EC = 0;
         break;
     }
+}
+
+struct Unk800A4F54_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+};
+struct Unk800A4F54 {
+    char pad0[0x28 + 0x2C];
+    char pad54[0x70 - 0x54];
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    float mA0;
+    int mA4;
+    char padA8[0xDC - 0xA8];
+    int mDC;
+    int mE0;
+    int mE4;
+    char padE8[4];
+    Unk800A4F54_Rec mEC;
+};
+extern "C" int fn_8007290C(int g, int a);
+extern "C" void fn_80086278(int a, void* b);
+extern "C" void fn_8006A004(Unk800A641C_Q* q);
+extern "C" float fn_80574750(int a, int b);
+extern "C" float fn_80574798(int a, int b);
+extern "C" float fn_805747E4(int a, int b);
+extern "C" float fn_80574830(int a, int b);
+extern "C" int fn_800A2AE8(void* p);
+inline void FEPut90(Unk800A6114_C* c, float v) { c->m90 = v; }
+inline void FEPut94(Unk800A6114_C* c, float v) { c->m94 = v; }
+inline void FEPut98(Unk800A6114_C* c, float v) { c->m98 = v; }
+inline void FEPut9C(Unk800A6114_C* c, float v) { c->m9C = v; }
+inline void FEPutQ90(Unk800A641C_Q* q, float v) { FEPut90(q->mC, v); }
+inline void FEPutQ94(Unk800A641C_Q* q, float v) { FEPut94(q->mC, v); }
+inline void FEPutQ98(Unk800A641C_Q* q, float v) { FEPut98(q->mC, v); }
+inline void FEPutQ9C(Unk800A641C_Q* q, float v) { FEPut9C(q->mC, v); }
+
+inline void FERecInit(Unk800A4F54_Rec* r)
+{
+    r->m8 = 4;
+    r->m4 = -1;
+    r->mC = -1;
+    r->m10 = -1;
+    r->m14 = 0;
+    r->m18 = 0;
+}
+extern "C" void fn_800A4F54(Unk800A4F54* p)
+{
+    char* sub = (char*)p + 0x2C;
+    int g = lbl_8061930C;
+    int h = fn_8007290C(g, 0);
+    Unk800A641C_Q* q = lbl_806192E0->m4;
+    int own = *(int*)((char*)q + 0x10);
+    fn_80086278(own, fn_8007FE04(lbl_8061930C));
+    fn_8006A004(q);
+    float a = fn_80574750(*(int*)(sub + 0x28), h);
+    float b = fn_80574798(*(int*)(sub + 0x28), h);
+    float c = fn_805747E4(*(int*)(sub + 0x28), h);
+    float d = fn_80574830(*(int*)(sub + 0x28), h);
+    FEPutQ90(q, a);
+    FEPutQ94(q, b);
+    FEPutQ98(q, c);
+    FEPutQ9C(q, d);
+    p->m70 = 0;
+    p->m74 = 0;
+    p->m78 = 0;
+    p->m7C = 0;
+    p->m80 = 0;
+    p->m84 = ((int (*)(void*))fn_800A2AE8)(p);
+    p->mA0 = 0.0f;
+    p->mEC.m0 = -1;
+    p->m88 = -1;
+    p->m98 = 0;
+    p->m8C = -1;
+    p->m90 = -1;
+    p->m94 = -1;
+    p->m9C = 0;
+    p->mA4 = 0;
+    p->mDC = 0;
+    p->mE0 = 0;
+    p->mE4 = 0;
+    FERecInit(&p->mEC);
 }
 
 extern "C" void fn_800A50F0(void* self, int (*arr)[2])
@@ -373,12 +475,14 @@ inline unsigned FeArCount(FeAr* a)
 {
     return a->m4;
 }
+
 inline int FeArGet(FeAr* a, int i)
 {
     char* b = (char*)a->m0;
     int off = i * 4;
     return *(int*)(b + off);
 }
+
 extern "C" void fn_800A6484()
 {
     int g = lbl_8061930C;
