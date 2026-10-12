@@ -37,6 +37,26 @@ extern "C" int fn_80394FD4(int a, int b);
 extern "C" int fn_80395150(int x, unsigned y);
 extern "C" void fn_803958FC(int x);
 
+struct McRec67 {
+    char pad0[6];
+    unsigned char m6;
+    unsigned char m7;
+};
+
+extern "C" void fn_8039566C(McRec67*, int, int*, int*);
+
+struct McObjB {
+    char pad0[0xB];
+    signed char mB;
+};
+
+typedef void* (*McMemcpyV)(void*, const void*, ...);
+extern "C" void* memcpy(void*, const void*, unsigned);
+extern "C" McObjB* fn_80391CCC(int*);
+extern "C" int fn_80392B80(int);
+extern "C" int fn_803920BC(int*);
+extern "C" void fn_80392BC0(int);
+
 /* near-miss: 15 vs 16 instructions (retail branches on cmpwi 1 / cmpwi 2 through a shared tail). */
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
@@ -98,6 +118,16 @@ extern "C" int fn_80395250(int x, unsigned y)
     return r;
 }
 
+extern "C" int fn_80395714(McRec67* p, int i, int c, int d)
+{
+    int x;
+    int y;
+    fn_8039566C(p, i, &x, &y);
+    y = y & ~d;
+    x = x & y;
+    return (y & c) == x;
+}
+
 /* near-miss: retail uses mullw (i * size) with a different add order and one fewer instruction; 4 spellings tried. */
 extern "C" char* fn_80395774(McRec* p, int i)
 {
@@ -118,6 +148,22 @@ extern "C" int fn_8039582C()
 extern "C" char* fn_80395864()
 {
     return lbl_806243E8;
+}
+
+extern "C" void fn_80395870(void* src, int key)
+{
+    int sp = key;
+    McObjB* o = fn_80391CCC(&sp);
+    if (o != 0) {
+        int sz = o->mB * 4;
+        int* buf = (int*)fn_80392B80(sz + 4);
+        if (buf != 0) {
+            buf[0] = sp;
+            ((McMemcpyV)memcpy)(buf + 1, src, sz);
+            if (fn_803920BC(buf) == 0)
+                fn_80392BC0((int)buf);
+        }
+    }
 }
 
 extern "C" void fn_803959D8(void* p)
