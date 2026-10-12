@@ -108,6 +108,40 @@ FE_OVERLAY int fn_804AAE74(void* x)
     return 1;
 }
 
+FE_OVERLAY void fn_804AAF34(void* x)
+{
+    FeMsg m;
+    FeMsg* p = &m;
+    fn_8035682C(p);
+    int idx = FeMem(x, 0x140)->fn_vslot60();
+    int o = idx * 4;
+    int id = *(int*)((char*)FeP(x, 0x14C) + o);
+    FeI(fn_800B555C(), 0x614) = id;
+    fn_8040B830(p->name, lbl_805F5510, 15);
+    p->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), p, x);
+}
+
+FE_OVERLAY void fn_804AB0C8(void* x)
+{
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    int idx = FeMem(x, 0x140)->fn_vslot60();
+    FeList* l = (FeList*)FeP(x, 0x138);
+    int o = idx * 4;
+    fn_80126CF4(l, l->m164, *(int*)((char*)FeP(x, 0x14C) + o), l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    fn_804AB860(x);
+    FeMem(x, 0x144)->fn_vslot16(0);
+}
+
+FE_OVERLAY void fn_804AB188(void* x)
+{
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    FeList* l = (FeList*)FeP(x, 0x138);
+    fn_80126CF4(l, l->m164, 0, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    fn_804AB860(x);
+    FeMem(x, 0x144)->fn_vslot16(1);
+}
+
 /* near-miss (2 slots): retail stores the vptr before addi r3,self+0x144; all 5040 statement orders tried. */
 FE_OVERLAY FeScrM* fn_804AB940(FeScrM* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
