@@ -178,6 +178,21 @@ extern "C" void fn_803927E4(unsigned);
 
 extern "C" void fn_80392BC0();
 
+struct McEnt8W {
+    unsigned m0;
+    unsigned char m4;
+    char pad5;
+    unsigned char m6;
+    char pad7;
+};
+struct McSrcW {
+    char pad0[4];
+    signed char m4;
+    char pad5[3];
+    McEnt8W m8[1];
+};
+extern "C" int fn_80391DC4(int*, unsigned char**);
+
 extern "C" void fn_803927E4(unsigned n)
 {
     if (n <= 15) {
@@ -387,6 +402,48 @@ extern "C" int fn_80392ED8(McSrc* p)
     return r;
 }
 
+extern "C" int fn_80392F2C(McHdr5* p, McSrcW* q, int* tab, unsigned char* codes)
+{
+    int r = 1;
+    int n = q->m4;
+    int i = 0;
+    if (i < n) {
+        do {
+            unsigned c = codes[i];
+            r = 0;
+            if (c > 31)
+                break;
+            McEnt8W* qe = q->m8;
+            McEnt8W* e = &qe[i];
+            unsigned bit = 1 << c;
+            unsigned e4 = e->m4;
+            if (bit & e->m0) {
+                if (e4 == 0 || e4 == 0xfe) {
+                    r = 1;
+                } else if (e4 == 0xff) {
+                    unsigned b6 = e->m6;
+                    if (b6 & 0x80) {
+                        int* bits = (int*)((char*)p + ((((p->m2 >> 2) + 3) & ~3) + 8)) + p->m4;
+                        if (bit & bits[b6 & 0x7f])
+                            r = 1;
+                    } else {
+                        int sp = *tab;
+                        unsigned char* out;
+                        if (fn_80391DC4(&sp, &out) != 0 && c == out[b6])
+                            r = 1;
+                    }
+                } else if (bit & tab[e4]) {
+                    r = 1;
+                }
+            }
+            if (r == 0)
+                break;
+            i++;
+        } while (i < n);
+    }
+    return r;
+}
+
 extern "C" void fn_80393154(McHdr6* p, int n)
 {
     int i = n / 8;
@@ -433,6 +490,22 @@ extern "C" int fn_8039332C(McBuf* p, unsigned char v)
         p->m92[c] = v;
         r = 1;
         p->m91 = p->m91 + 1;
+    }
+    return r;
+}
+
+extern "C" int fn_8039335C(McSrc* p, McHdr6* q, int* tab)
+{
+    int r = 1;
+    int k = q->m4 & 0x7f;
+    int* bits = (int*)((char*)q + ((q->m5 * (k + 2) + 15) & ~3));
+    for (int i = 0; i < k; i++) {
+        McEnt8* qe = p->m8;
+        McEnt8* e = &qe[i];
+        if (e->m4 != 0 && e->m4 != 0xff && e->m4 != 0xfe && (bits[i] & tab[e->m4]) == 0) {
+            r = 0;
+            break;
+        }
     }
     return r;
 }
