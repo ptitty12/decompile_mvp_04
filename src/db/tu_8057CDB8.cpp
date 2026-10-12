@@ -134,6 +134,114 @@ extern "C" int fn_80581368(int a, int b);
 extern "C" int fn_80581374(unsigned i);
 extern "C" int fn_80581398(unsigned i);
 extern "C" void fn_805814EC(DbV8** list);
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_8057CDB8(DbIdList* self, int k);
+extern "C" int fn_8057CE00(int a);
+extern "C" int fn_8057CED4(int a, int b);
+extern "C" void fn_8057CF60(int a, int b);
+extern "C" void fn_8057CFA8(int a, int b);
+extern "C" int fn_8057D084(int a);
+extern "C" int fn_8057D0F0(int a);
+extern "C" int fn_8057D15C(int a);
+extern "C" float fn_8057D4EC(void* self, int mode);
+extern "C" void fn_8057D550(DbTop4* self);
+extern "C" char* fn_8057DDB4(char* p, int i);
+extern "C" char* fn_8057DDC4(char* self, int id);
+extern "C" int fn_8057DE6C(int k);
+extern "C" void fn_8057DF2C(int* p);
+extern "C" void fn_8057DF38(void* p, int c);
+extern "C" void fn_8057DF60(void);
+extern "C" int fn_8057DF80(int* out);
+extern "C" void fn_8057E03C(void* self, int c);
+extern "C" int fn_80581368(int a, int b);
+extern "C" int fn_80581374(unsigned i);
+extern "C" int fn_80581398(unsigned i);
+extern "C" void fn_805814EC(DbV8** list);
+
+struct DbHdr {
+    void* m0;
+    char pad4[0x28 - 4];
+    int m28;
+    char pad2C[4];
+    int m30;
+};
+/* Polymorphic list item: header pointer and id before the vptr at +8; slots 2..4 used. */
+class DbItemV {
+public:
+    DbHdr* m0;
+    int m4;
+    virtual void v1();
+    virtual int v2();
+    virtual void v3();
+    virtual int v4();
+};
+
+struct DbPair8 {
+    int a;
+    int b;
+};
+extern DbPair8 lbl_80600260;
+extern "C" int fn_80097620(void* team, int a, int idx, int b);
+
+struct DbOwner {
+    char pad0[8];
+    struct DbTeamSrc* m8;
+    char pad0C[0x30 - 0xC];
+    int m30;
+};
+struct DbTeamSrc {
+    char pad0[4];
+    char* m4;
+};
+
+/* Item base (owner pointer and id before the vptr at +8) and the derived item posted to the list scan;
+ * the derived vtable is a retail data object. */
+class DbItemBase {
+public:
+    DbItemBase() {}
+    DbOwner* m0;
+    int m4;
+    virtual ~DbItemBase();
+};
+class DbItemObj : public DbItemBase {
+public:
+    DbItemObj(DbOwner* o, unsigned char i)
+    {
+        m4 = 0x12;
+        mC = i;
+        m10.a = lbl_80600260.a;
+        m10.b = lbl_80600260.b;
+        m0 = o;
+    }
+    virtual ~DbItemObj();
+    unsigned char mC;
+    DbPair8 m10;
+};
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_8057CDB8(DbIdList* self, int k);
+extern "C" int fn_8057CE00(int a);
+extern "C" int fn_8057CED4(int a, int b);
+extern "C" void fn_8057CF60(int a, int b);
+extern "C" void fn_8057CFA8(int a, int b);
+extern "C" int fn_8057D084(int a);
+extern "C" int fn_8057D0F0(int a);
+extern "C" int fn_8057D15C(int a);
+extern "C" float fn_8057D4EC(void* self, int mode);
+extern "C" void fn_8057D550(DbTop4* self);
+extern "C" char* fn_8057DDB4(char* p, int i);
+extern "C" char* fn_8057DDC4(char* self, int id);
+extern "C" int fn_8057DE6C(int k);
+extern "C" void fn_8057DF2C(int* p);
+extern "C" void fn_8057DF38(void* p, int c);
+extern "C" void fn_8057DF60(void);
+extern "C" int fn_8057DF80(int* out);
+extern "C" void fn_8057E03C(void* self, int c);
+extern "C" int fn_80581368(int a, int b);
+extern "C" int fn_80581374(unsigned i);
+extern "C" int fn_80581398(unsigned i);
+extern "C" void fn_805814EC(DbV8** list);
+extern "C" int fn_805813C0(DbItemV** list);
+extern "C" int fn_8057ECE4(DbOwner* self);
 
 extern "C" DB_OVERLAY int fn_8057CDB8(DbIdList* self, int k)
 {
@@ -398,4 +506,60 @@ extern "C" DB_OVERLAY void fn_805814EC(DbV8** list)
             q++;
         } while (*q);
     }
+}
+
+extern "C" DB_OVERLAY int fn_805813C0(DbItemV** list)
+{
+    int n = 0;
+    if (*list != 0) {
+        int i = 0;
+        do {
+            DbItemV* it = list[i];
+            int a = 0;
+            DbHdr* h = it->m0;
+            if (h->m28 != -1)
+                a = 1;
+            int b = 0;
+            if (a != 0 && h->m30 != 0)
+                b = 1;
+            int c = 0;
+            if (b != 0 && (fn_80581398(it->m4) != 0 || fn_8007D9E0__18Unk8007B2B0_ScreenUii(it->m0->m0, it->m0->m28, it->m4) == 0))
+                c = 1;
+            if (c != 0) {
+                if (list[i]->v2() != 0) {
+                    n += list[i]->v4();
+                    list[i]->v3();
+                }
+            }
+            i += 1;
+        } while (list[i] != 0);
+    }
+    return n;
+}
+
+/* near-miss: ~8 slots; retail copies the new object pointer into a second register for list[0] and sets list[1] from the same zero register */
+extern "C" DB_OVERLAY int fn_8057ECE4(DbOwner* self)
+{
+    int total = 0;
+    DbTeamSrc* e = (DbTeamSrc*)((char*)self + 8);
+    unsigned i = 0;
+    unsigned n = *(unsigned char*)(e->m4 + 0x3E4);
+    for (; i < n; i++) {
+        unsigned char idx = i;
+        int ok = 0;
+        if (fn_80097620(e->m4, 0, idx, 0) > 0)
+            ok = 1;
+        int go = 0;
+        if (ok != 0 && self->m30 != 0)
+            go = 1;
+        if (go != 0) {
+            DbItemObj* it = new (0x100) DbItemObj(self, idx);
+            DbItemV* list[2];
+            list[0] = (DbItemV*)it;
+            list[1] = 0;
+            total += fn_805813C0(list);
+            fn_805814EC((DbV8**)list);
+        }
+    }
+    return total;
 }
