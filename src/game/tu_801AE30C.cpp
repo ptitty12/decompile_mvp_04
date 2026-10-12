@@ -449,6 +449,43 @@ int fn_801AEA58(Unk801AB63C_P* p)
 
 void fn_801AE75C() {}
 
+struct Unk80253678_S;
+struct Unk80270BA0_X;
+int fn_80253678(Unk80253678_S* s);
+float fn_80254474(Unk8024EF40_W* w, int a, int b);
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float b, float c);
+int fn_801B62E4(Unk801AB63C_P* p, int i);
+float fn_8025454C(Unk8024EF40_W* w, int a);
+inline int Unk801AEBB0_I(Unk8019F8C0_Inner* a, int off) { return *(int*)((char*)a + off); }
+int fn_801AEBB0(void* a, void* q)
+{
+    Unk801AB63C_P* p = (Unk801AB63C_P*)a;
+    int res = -1;
+    void* o = (void*)fn_801C1638(p->m8, 0);
+    if (q == 0 || o == 0)
+        return -1;
+    Unk8024EF40_W* s = (Unk8024EF40_W*)((char*)q + 0x588);
+    int tt = fn_80253678((Unk80253678_S*)((char*)o + 0x480));
+    float f1 = fn_8025454C(s, 0xC);
+    float f2 = fn_80254474(s, 1, tt);
+    int c = fn_801B5F4C(p);
+    float f3 = fn_8025454C(s, 0xD);
+    Unk8019F8C0_Inner* t = p->m8->m6F8->m14;
+    int b1 = Unk801AEA58_U8(t, 0x1CCA);
+    int b2 = Unk801AEA58_U8(t, 0x1CCB);
+    if (f3 < 0.9f || f1 < 0.8f || f2 > 0.65f || c <= 2 || b1 > 0 || b2 > 1 || fn_801B62E4(p, Unk801AEBB0_I(t, 0x1CD0) == 0) > 0)
+        return -1;
+    ((void (*)(void*))fn_801AE75C)(p);
+    float lo = 0.0f;
+    float hi = 2.0f;
+    float f4 = fn_8024D0C4((Unk80270BA0_X*)q, 0x41, 0.0f, 2.0f);
+    float prod = f3 * (f1 * 5.0f) * f4;
+    float lim = p->m40;
+    if (!(lim >= prod))
+        res = 8;
+    return res;
+}
+
 void fn_801B032C() {}
 
 void fn_801B0330() {}
