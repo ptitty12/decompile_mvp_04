@@ -3,6 +3,8 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+
+
 struct FeState608 {
     char pad0[0x608];
     int m608;
@@ -28,7 +30,7 @@ int fn_800A2E6C(void* g);
 extern const char lbl_805F5324[];
 extern const char lbl_805F5AB0[];
 extern "C" {
-void* fn_800C8040();
+FeW* fn_800C8040(FeW* w);
 void fn_80329FA0(void*, ...);
 void fn_800DD44C__FP13Unk800DD610_PPvi(void*, void*, int);
 }
@@ -92,6 +94,21 @@ FE_OVERLAY void fn_8046D988(void)
 FE_OVERLAY void fn_8046D9E8(FeScrJ* x)
 {
     fn_80470710(x->m144, 0);
+}
+
+FE_OVERLAY void fn_8046DA10(FeScrJ* x)
+{
+    char sp8[0x40];
+    int d1;
+    int d2;
+    FeW* a = fn_800C8040(x->m13C->fn_vslot32(lbl_805F5324, 1));
+    FeW* b = fn_800C8040(x->m13C->fn_vslot32(lbl_805F5AB0, 1));
+    fn_80329FA0(&d1, fn_800A2AE8(lbl_80619948));
+    fn_80329FA0(&d2, fn_800C2248((char*)fn_800B555C() + 8));
+    fn_800DD44C__FP13Unk800DD610_PPvi(&d1, sp8, 1);
+    ((FeWV*)a)->s28(sp8);
+    fn_800DD44C__FP13Unk800DD610_PPvi(&d2, sp8, 1);
+    ((FeWV*)b)->s28(sp8);
 }
 
 FE_OVERLAY void fn_8046DB30(FeScrJ* x)
