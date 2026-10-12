@@ -7,6 +7,31 @@
 #include "game/goals/tu_8027A84C.h"
 #include "game/tu_8017A930.h"
 #include "game/tu_801A57C8.h"
+struct Unk801799AC_Mid {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk801799AC_Ctx {
+    char pad0[0x554];
+    Unk8014D8AC* m554;
+    char pad558[0x6F8 - 0x558];
+    Unk801799AC_Mid* m6F8;
+    char pad6FC[4];
+    void* m700;
+};
+float fn_8017CC70(void* pl, int team, void* ev);
+extern "C" void fn_8009DCAC(void* o, int x);
+
+inline float Unk801799AC_Rand(Unk8014D8AC* r, float s)
+{
+    return (float)(unsigned)r->fn_8014D8AC(1000000, "C:/mvp2004/source/common/ai/bullpen/bullpenai.cpp", 0x2D5) * s * 0.000001f;
+}
+
+inline float Unk801799AC_Clamp(float lo, float v, float hi)
+{
+    return !(v > hi) ? (v >? lo) : hi;
+}
+
 struct Unk80177C74_T {
     int m0;
     float m4;
@@ -717,6 +742,27 @@ int fn_80179990(int* arr, unsigned i)
         return 0;
     }
     return arr[i];
+}
+
+/* near-miss (99.5% fuzzy): the two pooled constants 0.67f and 1.0f swap f12/f13 and the lis order differs.
+ * The inline Clamp(lo, v, hi) and the if/else return shape are what fix the stack slots and branch layout. */
+int fn_801799AC(Unk80177C34_Sub* p, void* ev, float f)
+{
+    float base = fn_8017CC70(((Unk801799AC_Ctx*)p->m88)->m700, p->m84, ev);
+    const float one = 0.35f;
+    float d = f - base;
+    float e = one - d;
+    e = e * 2.857143f;
+    e = Unk801799AC_Clamp(-1.0f, e, 1.0f);
+    const float y = 0.33f;
+    float thresh = f * 0.67f + y;
+    if (Unk801799AC_Rand(((Unk801799AC_Ctx*)p->m88)->m554, 1.0f) <= thresh) {
+        int n = (int)(e * f * 5.0f);
+        fn_8009DCAC(((Unk801799AC_Ctx*)p->m88)->m6F8->m14 + p->m84 * 0xE64, n);
+        return n;
+    } else {
+        return 0;
+    }
 }
 
 int* fn_80179B58(int* p)
