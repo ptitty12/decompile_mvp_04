@@ -614,19 +614,20 @@ extern "C" void fn_80099A44(Obj3* o, int a, int b);
 
 extern "C" void fn_80096830(Obj3* o, int a) { fn_80099A44(o, fn_800968C0(o, a, 1), 0); }
 
-/* near-miss: retail loads the two bytes in the opposite register order */
+inline void Set80096870(ByteVec* v, unsigned i, unsigned char c)
+{
+    if (i >= v->m4)
+        v->m4 = i + 1;
+    v->m0[i] = c;
+}
+
 extern "C" void fn_80096870(Obj3* o, unsigned a, unsigned b)
 {
     ByteVec* v = &o->m168;
-    unsigned char* p = v->m0;
-    unsigned char ta = p[a];
-    unsigned char tb = p[b];
-    if (a >= v->m4)
-        v->m4 = a + 1;
-    v->m0[a] = tb;
-    if (b >= v->m4)
-        v->m4 = b + 1;
-    v->m0[b] = ta;
+    unsigned ta = v->m0[a];
+    unsigned tb = v->m0[b];
+    Set80096870(v, a, tb);
+    Set80096870(v, b, ta);
 }
 
 extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
