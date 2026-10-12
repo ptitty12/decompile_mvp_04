@@ -22,6 +22,18 @@ extern "C" FE_OVERLAY int fn_80474660(FeScrK* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_804746CC(FeW* x)
+{
+    if (fn_8040B574((char*)FeWp(x, 0x134)->fn_vslot70()->fn_vslot33(5, 1) + 0xC, "AUTODOROSTERS") == 0) {
+        fn_804749D8(x);
+    } else if (fn_8040B574((char*)FeWp(x, 0x134)->fn_vslot70()->fn_vslot33(5, 1) + 0xC, "AUTOSELECT") == 0) {
+        fn_80474AF8(x);
+    } else {
+        fn_800B7ADC(FeGetMgr(), x);
+    }
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_804747E8(void* x)
 {
     FeAt(x, 0x134)->fn_vslot52();
@@ -105,6 +117,29 @@ extern "C" FE_OVERLAY FeScrH* fn_80474C44(FeScrH* self, int a, int b, int c, int
     self->SetVptr(lbl_80677818);
     self->m130 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804753E8(FeW* x, int sel, int c)
+{
+    switch (sel) {
+    case 0:
+        fn_804756F0(x);
+        break;
+    case 1:
+        fn_804757EC(x);
+        break;
+    case 2:
+        fn_80475EF0(x);
+        break;
+    case 3: {
+        int r = fn_80476C44(x);
+        if (r == 4)
+            x->fn_vslot67(1, c);
+        else if (r == 5)
+            x->fn_vslot67(2, c);
+        break;
+    }
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804754C0(void* x)
