@@ -107,6 +107,26 @@ struct McEntH {
     unsigned mC;
 };
 
+/* Record behind the lbl_8069B7CC slots (see tu_803912F8.cpp McRec/McSlot): +8/+9 tag bytes, +0x10 halfword,
+ * +0x12 byte count, byte ring after the header. */
+struct McHdrB {
+    char pad0[8];
+    unsigned char m8;
+    unsigned char m9;
+    char padA[6];
+    unsigned short m10;
+    unsigned char m12;
+};
+
+struct McSlotB {
+    McHdrB* m0;
+    int m4;
+};
+
+extern McSlotB lbl_8069B7CC[];
+extern "C" void fn_80392E3C(int x, int* a, int* b);
+extern "C" void fn_803950B4(int key);
+
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
@@ -230,6 +250,33 @@ extern "C" int fn_80394FD4(int a, int b)
         fn_80394EE4(pick, b);
     }
     return v;
+}
+
+extern "C" int fn_80395150(int x, unsigned y)
+{
+    int r = 0;
+    if ((*(int*)x & 0xFFFF0000) == 0x03120000) {
+        int a;
+        int b;
+        fn_80392E3C(x, &a, &b);
+        int i;
+        for (i = 0; i <= 7; i++) {
+            McHdrB* s = lbl_8069B7CC[i].m0;
+            if (s != 0 && s->m9 == b && s->m8 == a)
+                goto out;
+        }
+        for (i = 0; i <= 7; i++) {
+            if (lbl_8069B7CC[i].m0 == 0) {
+                lbl_8069B7CC[i].m0 = (McHdrB*)x;
+                r = 1;
+                lbl_8069B7CC[i].m4 = y;
+                break;
+            }
+        }
+        fn_803950B4(y);
+    }
+out:
+    return r;
 }
 
 extern "C" int fn_80395250(int x, unsigned y)
