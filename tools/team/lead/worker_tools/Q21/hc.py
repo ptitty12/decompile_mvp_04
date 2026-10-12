@@ -4,7 +4,8 @@ Each line must be a self-contained statement (one line). Scores with score_varia
 import sys, os, re, random, subprocess
 
 W = (os.environ.get('WT') or os.getcwd())
-SP = os.path.dirname(os.path.abspath(__file__)).replace(chr(92), '/')
+import tempfile
+SP = (os.environ.get('QDIR') or tempfile.mkdtemp(prefix='hc_')).replace(chr(92), '/')  # per-worker scratch
 unit, fn, first, last = sys.argv[1:5]
 rounds = int(sys.argv[5]) if len(sys.argv) > 5 else 10
 apply_ = '--apply' in sys.argv

@@ -15,7 +15,9 @@ pos = []
 for mk, n in blocks:
     i = next(j for j in range(fi, len(lines)) if mk in lines[j])
     pos.append((i + 1, n))
-vd = os.path.join(R, 'vp'); shutil.rmtree(vd, ignore_errors=True); os.makedirs(vd)
+import tempfile
+vd = os.path.join(os.environ.get('QDIR') or tempfile.mkdtemp(prefix='perm_'), 'vp')  # per-worker scratch
+shutil.rmtree(vd, ignore_errors=True); os.makedirs(vd)
 perms = [list(itertools.permutations(range(n))) for _, n in pos]
 cnt = 0
 for combo in itertools.product(*perms):

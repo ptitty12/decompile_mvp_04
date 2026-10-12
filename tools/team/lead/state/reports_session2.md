@@ -46,3 +46,11 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
   BLKmode locals at declaration order, address-taken scalars / 8-byte V2 late in address-taken order -> group V2s in one struct;
   struct-returning helper return type changes sched2; by-value structs go by invisible reference with LIFO temp reuse.
 - Tool ideas (SPEEDUPS): fn_vslotN view-class emitter with a per-slot signature table; ins.py option to put declarations after the unit's types.
+## p4-10 (W9) merged 15:05 as 2d1131eb: +32 (to 20,061). tu_80177C34 37->49, tu_8017A930 35->44, tu_8017D640 41->51, tu_801800FC 24->25.
+- fn_8017E264 kept at 84% (below 95%) because baseline held it at 77% and removing it fails verify. Pass-through params: callee prototypes with too few params.
+- Patterns: chain of range tests sharing one cmpwi crN = switch; default-label node shifts root, add `case 1:` to default group;
+  `(float)(int)ucharField` selects signed conversion; inline `Byte(unsigned char)` turns cmplwi into cmpwi; comma sequence fixes load/cmpw order.
+## p4-12 (W12) merged 15:06 as 0ee1f1c8: +22 total (to 20,079). tu_801BAC74 44->53.
+- Patterns: float-store slot layout rules (inline param slots before argument inline frames; nested `{}` frees BLKmode slot;
+  never-read `float unused;` reserves a slot); const-ref binding of a call result uses the call temp; branch polarity `!(x >= c)` vs `x < c`.
+- Host trap: lone CR (\r\r\n) makes git skip CRLF normalisation -> whole-file diff.

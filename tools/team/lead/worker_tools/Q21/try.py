@@ -3,7 +3,8 @@ import sys,os,subprocess,re
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from ins import insert
 W=(os.environ.get('WT') or os.getcwd())
-SP=os.path.dirname(os.path.abspath(__file__)).replace(chr(92),'/')
+import tempfile
+SP=(os.environ.get('QDIR') or tempfile.mkdtemp(prefix='try_')).replace(chr(92),'/')  # per-worker scratch
 unit,fn,nf=sys.argv[1:4]
 show=None; pre=''; extra=[]
 a=sys.argv[4:]

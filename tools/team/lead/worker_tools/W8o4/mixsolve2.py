@@ -30,7 +30,7 @@ for form in ("r", "ret"):
                     s += f"    case {c}: " + (f"r = {vals[c]}; break;\n" if form == "r" else f"return {vals[c]};\n")
                 s += "    }\n    return " + ("r" if form == "r" else str(dflt)) + ";\n}\n"
                 src += s
-path = os.path.join(here, f"mix2_{fn}.cpp")
+path = os.path.join(os.environ.get("QDIR") or here, f"mix2_{fn}.cpp")  # per-worker scratch
 open(path, "w").write(src)
 r = subprocess.run([sys.executable, os.path.join(here, "cmp.py"), root, unit, fn, path], capture_output=True, text=True)
 hits = [l.strip() for l in r.stdout.splitlines() if "MATCH" in l]

@@ -14,7 +14,9 @@ src=open(f'{WT}/src/{unit}.cpp').read()
 m=re.search(r'^'+re.escape(header)+r'\n\{\n.*?^\}\n',src,re.S|re.M)
 assert m,'header not found'
 pre,post=src[:m.start()],src[m.end():]
-d=HERE+'/hc'
+# Per-worker scratch under $QDIR: workers share this script's folder, so never write next to it.
+import tempfile
+d=(os.environ.get('QDIR') or tempfile.mkdtemp(prefix='hill_'))+'/hc'
 os.makedirs(d,exist_ok=True)
 def score_many(perms):
     for f in os.listdir(d): os.remove(d+'/'+f)

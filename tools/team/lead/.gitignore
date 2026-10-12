@@ -1,0 +1,7 @@
+# Worker scratch output that older helper versions wrote next to themselves
+worker_tools/**/hc/
+worker_tools/**/rvtmp/
+worker_tools/**/vp/
+worker_tools/**/v/
+worker_tools/**/mix2_*.cpp
+__pycache__/
