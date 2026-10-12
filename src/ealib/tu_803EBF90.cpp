@@ -146,6 +146,46 @@ extern "C" char* fn_803EC3D4(RcNode* n)
     return 0;
 }
 
+extern "C" unsigned fn_803EC418(RcBlk* t, int x, int y, int lvl)
+{
+    unsigned r = 0;
+    if (x >= 0 && x < t->m4.s.s4 && y >= 0 && y < t->m4.s.s6 && lvl >= 0 && lvl <= (int)((t->mC >> 12) & 0xf)) {
+        int off = fn_803EC084(t, x, y, lvl);
+        unsigned char* b;
+        if (t->mC & 0x10000000)
+            b = (unsigned char*)t + t->m10;
+        else
+            b = (unsigned char*)t + 0x10;
+        int idx = off >> 3;
+        unsigned char* p = b + idx;
+        switch (fn_803EC03C((RcNode*)t)) {
+        case 4:
+            if (off & 4)
+                r = b[idx] & 0xf;
+            else
+                r = b[idx] >> 4;
+            break;
+        case 8:
+            r = b[idx];
+            break;
+        case 0xf:
+        case 0x10:
+            r = *(unsigned short*)(b + idx);
+            break;
+        case 0x18:
+            r = (b[idx] << 16) | (p[1] << 8) | p[2];
+            break;
+        case 0x20:
+            if (t->mC & 0x20000000)
+                r = (*(unsigned short*)(b + idx) << 16) | *(unsigned short*)(p + 0x20);
+            else
+                r = *(unsigned*)(b + idx);
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" int fn_803EC6F8(RcBlk* n)
 {
     int r = 0;
