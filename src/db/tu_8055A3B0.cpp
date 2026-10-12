@@ -4,6 +4,8 @@
  */
 #include "game/db_8054FA04.h"
 #include "game/clampiter.h"
+extern "C" void* memset(void* p, int c, unsigned n);
+extern int lbl_80622D64[];
 
 struct Db8055A880_Rec {
     int m0;
@@ -565,6 +567,45 @@ extern "C" DB_OVERLAY void fn_8055D2E8(Unk8007A4DC_Screen* sc, Unk805352B0_List*
     unsigned n = l->m4;
     for (; i < n; i++)
         sc->fn_8007A808(0x19, l->At(i), 0);
+}
+
+extern "C" DB_OVERLAY int fn_8055D350(Unk8007A4DC_Screen* sc, Unk805352B0_List* l, int n, int* out)
+{
+    int cnt[14];
+    int c;
+    out[8] = n;
+    out[2] = n;
+    out[3] = n;
+    out[4] = n;
+    out[5] = n;
+    out[6] = n;
+    out[7] = n;
+    out[1] = n * 2;
+    out[0] = n * 10;
+    memset(cnt, 0, 0x38);
+    int t = l->m4;
+    if (t > 0) {
+        c = t;
+        int o = 0;
+        do {
+            int id = *(int*)((char*)l->m0 + o);
+            int flag = sc->fn_8007A6A0(0x1E, id) != 0;
+            if (id != 0 && flag == 0)
+                cnt[sc->fn_8007A6A0(5, id)]++;
+            o += 4;
+        } while (--c != 0);
+    }
+    int sum = 0;
+    c = 0;
+    for (; c < 9; c++) {
+        out[c] = out[c] - cnt[lbl_80622D64[c]];
+        if (c == 0)
+            out[0] = out[0] - cnt[10];
+        if (!(out[c] > 0))
+            out[c] = 0;
+        sum += out[c];
+    }
+    return sum;
 }
 
 extern "C" DB_OVERLAY void fn_8055D4B4(Db8055D4B4_L* self)
