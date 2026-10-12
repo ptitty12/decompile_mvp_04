@@ -574,6 +574,70 @@ void fn_80100348(UiWM* self)
     fn_800FF0C4(b, fn_800C8044(self->m4->v32((int)lbl_805BD828, 1)));
 }
 
+class UiX17v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(int a);
+};
+struct UiV3 {
+    float x;
+    float y;
+    float z;
+};
+struct UiGauge {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+    char pad20[0x30 - 0x20];
+    UiObj* m30;
+};
+float fn_804028E4(float x);
+extern char lbl_805BEFE4[];
+extern int lbl_8061B3C0[];
+extern char lbl_805C2CCC[];
+inline UiV3 V3Sub(UiV3* a, UiV3* b)
+{
+    UiV3 r;
+    r.x = a->x - b->x;
+    r.y = a->y - b->y;
+    r.z = a->z - b->z;
+    return r;
+}
+inline int IntAtT(char* b, int off)
+{
+    return *(int*)(b + off);
+}
+void fn_801003C4(UiGauge* self, UiObj* o)
+{
+    self->m30 = o;
+    UiRect26* r = (UiRect26*)fn_800C8038(o->v32((int)lbl_805BEFE4, 1));
+    self->m0 = r->m26;
+    self->m4 = r->m28;
+    self->m8 = r->m2A;
+    self->mC = r->m2C;
+    self->m10 = ((UiRect26*)fn_800C8034(self->m30->v32(lbl_8061B3C0[0], 1)))->m2A;
+    self->m14 = ((UiRect26*)fn_800C8034(self->m30->v32(lbl_8061B3C0[0], 1)))->m2C;
+    UiV3* a = (UiV3*)lbl_805C2CCC;
+    UiV3* b = (UiV3*)(lbl_805C2CCC + 0x18);
+    UiV3 d = V3Sub(a, b);
+    UiV3* pd = &d;
+    self->m18 = 36.0f / fn_804028E4(d.x * d.x + pd->y * pd->y + pd->z * pd->z);
+    self->m1C = self->mC * 0.00020833334f;
+    int off = 0;
+    int n = 7;
+    do {
+        ((UiX17v*)fn_800C8034(self->m30->v32(IntAtT((char*)lbl_8061B3C0, off), 1)))->v17(1);
+        off += 4;
+    } while (--n != 0);
+}
+
 void fn_80100644(UiV_28i* self, int a)
 {
     self->m28 = a;
