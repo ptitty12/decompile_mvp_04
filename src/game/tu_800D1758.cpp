@@ -525,3 +525,37 @@ extern "C" void fn_800D4B88(Unk800D4B88_Obj* o, int a, int c)
     o->b0 = a;
     o->m84 = c;
 }
+
+struct Unk800D4B9C_Q {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk800D4B9C_Obj : Unk800C7B40_Data {
+    const void* m3C;
+    char pad40[0x4C];
+    Unk800D4B9C_Q m8C;
+    Unk800D4B9C_Q m9C;
+    Unk800D4B9C_Q mAC;
+    Unk800D4B9C_Q mBC;
+    Unk800D4B9C_Q mCC;
+};
+extern const char lbl_8065A4A8[];
+extern "C" void fn_800D388C(Unk800D4B9C_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1, int s2,
+                            int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12);
+
+extern "C" Unk800D4B9C_Obj* fn_800D4B9C(Unk800D4B9C_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                        int s2, int s3, int s4, int s5, int s6, int s7, Unk800D4B9C_Q* q0, Unk800D4B9C_Q* q2,
+                                        Unk800D4B9C_Q* q1, Unk800D4B9C_Q* q3, Unk800D4B9C_Q* q4, int s13, int s14, int s15, int s16)
+{
+    fn_800D388C(self, p1, p2, p3, p4, p5, p6, p7, s0, s1, s2, s3, s4, s5, (int)q0, s13, s6, s7, s14, s15, s16);
+    self->m3C = lbl_8065A4A8;
+    self->m8C = *q0;
+    self->m9C = *q1;
+    self->mAC = *q2;
+    self->mBC = *q3;
+    self->mCC = *q4;
+    self->m1C = 5;
+    return self;
+}
