@@ -459,6 +459,49 @@ void fn_8022A580(Task* t, int ai)
     t->m9C->m60 = 0;
 }
 
+void fn_801E8250(Obj3A64* p, int a);
+inline float Unk8022A934_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+struct Unk8022A934_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+void fn_8022A934(Task* t, Vec3f* v, int a, int b)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8022A934_Obj* cur = (Unk8022A934_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    *(int*)((char*)t->m9C + 0xA0) = 1;
+    v->y = 0.0f;
+    e->m4 = 0x2A;
+    e->m0 = 0x31;
+    e->mC = b;
+    e->m8 = a;
+    e->m9C = 1;
+    const Vec3f* pc = &cur->m60;
+    e->m38 = *v;
+    e->m8C = 1.0f;
+    e->m88 = -1.0f;
+    e->m80 = -1.0f;
+    e->m84 = Unk8022A934_Secs(t->m9C->m0->m4C);
+    e->m94 = 1;
+    Vec3f d = *v - *pc;
+    e->m50 = d;
+    fn_801E8250(t->m9C->m3A64, t->m9C->m3A5C);
+}
+
 void fn_8022AB04(Task* t)
 {
     t->m9C->m30 = 6;
