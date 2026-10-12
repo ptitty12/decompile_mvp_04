@@ -76,6 +76,17 @@ int fn_8019CCE4(int a);
 int fn_802C0218(int a, int b, int c, float* t, void* p1, void* p2, float k);
 }
 
+struct Unk80199928_O {
+    char pad0[0x384];
+    int m384;
+    char pad388[0x3E4 - 0x388];
+    Unk80183918_Vec3 m3E4;
+    Unk80183918_Vec3 m3F0;
+};
+extern "C" {
+int fn_80199418(Unk80199928_O* o, int a);
+void fn_80199AF8(Unk80199928_O* o, int a, int b, int c, int d, int e, int f, float x, float y);
+}
 
 //@BODY
 //@80198DB8
@@ -180,6 +191,44 @@ extern "C" void fn_80199158(Unk80198E5C_Obj* o)
 //@80199414
 extern "C" void fn_80199414()
 {
+}
+
+inline void Unk80199928_ScaleRf(Unk80183918_Vec3& v, float s)
+{
+    v.m0 *= s;
+    v.m4 *= s;
+    v.m8 *= s;
+}
+
+inline void Unk80199928_Damp(Unk80183918_Vec3& v)
+{
+    Unk80199928_ScaleRf(v, 0.1f);
+}
+
+//@80199928
+/* near-miss (98.3%): identical instructions; one scheduling swap remains (retail loads the 0.1f constant
+ * before `addi r5,r31,0x3F0`, here the addi comes first; tried the Scale/Damp inline shapes). */
+extern "C" void fn_80199928(Unk80199928_O* o, int a1, int a2, int a3, int a4, int a5, int a6)
+{
+    fn_80198F20((Unk80198E5C_Obj*)o);
+    int c5 = fn_80199418(o, a5);
+    fn_80198F44((Unk80198E5C_Obj*)o);
+    int c6 = fn_80199418(o, a6);
+    if (c5 != 0) {
+        if (c6 != 0) {
+            o->m3E4.m4 = o->m3E4.m4 * (!(o->m3E4.m4 >= 0.0f) ? -0.25f : 0.25f);
+            Unk80199928_Damp(o->m3F0);
+            if (!(o->m3E4.m4 >= 10.0f)) {
+                o->m3E4 = lbl_806055AC;
+                o->m3F0 = lbl_806055AC;
+                o->m384 = 0;
+            }
+            return;
+        }
+        fn_80199AF8(o, a2, a3, a1, a5, a6, a4, fn_80198F20((Unk80198E5C_Obj*)o), fn_80198F44((Unk80198E5C_Obj*)o));
+    }
+    if (c6 != 0)
+        fn_80199AF8(o, a3, a2, a1, a6, a5, a4, fn_80198F44((Unk80198E5C_Obj*)o), fn_80198F20((Unk80198E5C_Obj*)o));
 }
 
 //@8019A314
