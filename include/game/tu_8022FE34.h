@@ -118,8 +118,8 @@ struct Unk8022FE34_Sub {
     int m1D8;
     int m1DC;
     int m1E0;
-    int m1E4;
-    int m1E8;
+    float m1E4;
+    float m1E8;
     float m1EC;
     int m1F0;
     int m1F4;
@@ -128,6 +128,8 @@ struct Unk8022FE34_Sub {
     void fn_80230CC8(const Unk8022FE34_Ent* e);
     void fn_80231018();
     void fn_80230BF4();
+    void fn_80230D54();
+    void fn_80230EB4();
 };
 
 struct Unk8022FE34_Pai {

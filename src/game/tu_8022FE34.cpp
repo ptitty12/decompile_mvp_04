@@ -112,6 +112,48 @@ void Unk8022FE34_Sub::fn_80230CC8(const Unk8022FE34_Ent* e)
     m1D0++;
 }
 
+extern "C" int fn_8018AA44(int v);
+
+void Unk8022FE34_Sub::fn_80230D54()
+{
+    m1E8 = 0.0f;
+    m1D8 = 0;
+    int i = 0;
+    for (; i < m1D0; i++) {
+        Unk8022FE34_Ent e = m4[i];
+        if (fn_8018AA44(e.m0) == 0) {
+            m1E8 += fn_8023A888(&e);
+            m158[m1D8].m0 = i;
+            m158[m1D8].m4 = 0.0f;
+            m1D8++;
+        }
+    }
+    for (; i <= 4; i++) {
+        m158[i].m0 = i;
+        m158[i].m4 = 0.0f;
+    }
+}
+
+void Unk8022FE34_Sub::fn_80230EB4()
+{
+    m1E4 = 0.0f;
+    m1D4 = 0;
+    int i = 0;
+    for (; i < m1D0; i++) {
+        Unk8022FE34_Ent e = m4[i];
+        if (fn_8018AA44(e.m0) != 0) {
+            m1E4 += fn_8023A888(&e);
+            m11C[m1D4].m0 = i;
+            m11C[m1D4].m4 = 0.0f;
+            m1D4++;
+        }
+    }
+    for (; i <= 4; i++) {
+        m11C[i].m0 = -1;
+        m11C[i].m4 = 0.0f;
+    }
+}
+
 struct Unk8017A930_T;
 extern const Unk8022FE34_V3 lbl_8068C8D4;
 Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
