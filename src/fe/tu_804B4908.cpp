@@ -4,6 +4,43 @@
  */
 
 #include "game/fe_804ABCBC.h"
+extern "C" float fn_80592474(int h, int a, int i);
+extern "C" int fn_80593088(int h, int a, int i);
+extern int fn_8007F9B4(Unk8007F198_C* s);
+extern "C" int fn_80592E04(int h, int i);
+extern "C" int fn_800E52F8__Fi(int a);
+extern "C" int fn_805931BC(int h, int a, int b, int c);
+extern "C" float fn_80592F94(int h, int a, int b, int c);
+class FeSub20 {
+public:
+    char pad0[0x24];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+extern "C" int fn_804B78A8(FeScr* x);
+extern "C" int fn_804B79FC(FeScr* x);
+extern "C" int sprintf(char* d, const char* f, ...);
+extern "C" int fn_800A3C98(void* g, int a, int b);
+extern "C" int fn_805901AC(int a, int b);
+extern "C" int fn_800E1930__Fi(int a);
 class FeObj4i : public UiBase {
 public:
     FE_LO(FE_V0) virtual FeObj* v32(const char* a, int b);
@@ -20,10 +57,13 @@ public:
 };
 struct FeRct4 {
     float m0, m4, m8, mC;
+    int m10;
 };
 class FeV14 {
 public:
-    char pad0[0x14];
+    char pad0[0xC];
+    int mC;
+    char pad10[4];
     virtual void s1();
     virtual void s2();
     virtual void s3();
@@ -81,6 +121,31 @@ extern "C" FE_OVERLAY void fn_804B4BC4(FeObj* x)
     fn_800C3BE0();
 }
 
+extern "C" FE_OVERLAY void fn_804B4BEC(FeScr* x)
+{
+    char b8[0x68];
+    char b70[0x38];
+    int i = 0;
+    ((FeObj2*)x->m134)->v79(((FeV14*)FI(x, 0xE14))->mC, 0);
+    ((FeObj*)x->m134)->v3();
+    ((FeObj1*)x->m134)->v88(1);
+    FeV14* e = (FeV14*)FI(x, 0xE14);
+    for (; i < e->mC; i++, e = (FeV14*)FI(x, 0xE14)) {
+        ((FeObj4i*)x->m134)->v42(i, 0, ((FeV14*)FI(x, 0xE14))->s6(i)->m10, 5);
+        ((char* (*)(char*, float, int, int))fn_800DF254)(b8, fn_80594418(FI(x, 0xE14), i), ((FeObjI*)x)->v98() == 1, 3);
+        ((FeObjS43*)x->m134)->v43(i, 1, b8, 4);
+        fn_800DF254(b8, 0, 3, fn_80592474(FI(x, 0xE18), ((FeObjI*)x)->v98(), i));
+        ((FeObjS43*)x->m134)->v43(i, 4, b8, 5);
+        if (fn_80591AA0(FI(x, 0xE18)) > 0) {
+            sprintf(b70, "%d%%", fn_80593088(FI(x, 0xE18), ((FeObjI*)x)->v98(), i));
+            fn_804031BC(b8, b70);
+            ((FeObjS43*)x->m134)->v43(i, 3, b8, 5);
+        } else {
+            ((FeObj4i*)x->m134)->v42(i, 3, 0x1A4B, 5);
+        }
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804B4E8C(FeScr* x, int i)
 {
     char buf[0x68];
@@ -113,6 +178,60 @@ extern "C" FE_OVERLAY void fn_804B530C(FeScr* x)
     ((FeObj1*)fn_800C8040(((FeObj*)x->m140)->v32("BANK", 1)))->v28((int)buf);
     fn_800E5380(x->m140);
     ((FeObj*)x)->v88();
+}
+
+extern "C" FE_OVERLAY void fn_804B53B8(FeScr* x)
+{
+    char buf[16];
+    FeObj* g = fn_800C8044(((FeObj*)x->m138)->v32("NEXTGAME", 1));
+    FeObj* h = fn_800C8054(g->v32("OPPLOGO", 1));
+    int sel = fn_804B78A8(x);
+    if (sel == -1) {
+        ((FeObj1*)h)->v8(0);
+        ((FeObj1*)fn_800C8040(g->v32("TEAM", 1)))->v29(0x1A4B);
+        ((FeObj1*)fn_800C8040(g->v32("IMPACT", 1)))->v29(0x1A4B);
+        ((FeObj1*)fn_800C8040(g->v32("CAPACITY", 1)))->v29(0x1A4B);
+        return;
+    }
+    ((FeObj1*)h)->v8(1);
+    fn_800D0074(&((FeHolder*)h)->m98, 0, 0);
+    ((FeSub20*)((char*)h + 0x98))->s20(fn_804B797C(x), 0);
+    ((FeObj1*)fn_800C8040(g->v32("TEAM", 1)))->v29(fn_800E1930__Fi(fn_804B79FC(x)));
+    sprintf(buf, "%d/10", fn_800A3C98(lbl_80619948, sel, ((FeObjI*)x)->v96()));
+    ((FeObj1*)fn_800C8040(g->v32("IMPACT", 1)))->v30((int)buf);
+    sprintf(buf, "%d", fn_805901AC(FI(x, 0xE1C), FI(x, 0xE20)));
+    ((FeObj1*)fn_800C8040(g->v32("CAPACITY", 1)))->v30((int)buf);
+}
+
+extern "C" FE_OVERLAY void fn_804B5C1C(FeScr* x, int a)
+{
+    char b8[16];
+    char b18[0x68];
+    FeObj* g = fn_800C8044(((FeObj*)x->m138)->v32("LASTSEVEN", 1));
+    int i = fn_80591A50(FI(x, 0xE18));
+    while (i >= 0) {
+        int t = fn_8007F9B4((Unk8007F198_C*)lbl_8061930C);
+        Unk8007F198_C* s = (Unk8007F198_C*)lbl_8061930C;
+        if (!(t - fn_8007FBC0(s, fn_80592E04(FI(x, 0xE18), i), 0) <= 0x1E))
+            break;
+        i--;
+    }
+    int k = fn_80591A50(FI(x, 0xE18)) - i;
+    if (k <= 0) {
+        ((FeObj1*)fn_800C8040(g->v32("NUMGAMES", 1)))->v29(0x1A4B);
+        ((FeObj1*)fn_800C8040(g->v32("AVGATTEND", 1)))->v29(0x1A4B);
+        ((FeObj1*)fn_800C8040(g->v32("AVGSOLD", 1)))->v29(0x1A4B);
+        ((FeObj1*)fn_800C8040(g->v32("AVGREV", 1)))->v29(0x1A4B);
+        return;
+    }
+    sprintf(b8, "%d", k);
+    ((FeObj1*)fn_800C8040(g->v32("NUMGAMES", 1)))->v30((int)b8);
+    sprintf(b8, "%d", fn_800E52F8__Fi(k));
+    ((FeObj1*)fn_800C8040(g->v32("AVGATTEND", 1)))->v30((int)b8);
+    sprintf(b8, "%3d%%", fn_805931BC(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, k));
+    ((FeObj1*)fn_800C8040(g->v32("AVGSOLD", 1)))->v30((int)b8);
+    ((char* (*)(char*, float, int, int))fn_800DF254)(b18, fn_80592F94(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, k), 0, 3);
+    ((FeObj1*)fn_800C8040(g->v32("AVGREV", 1)))->v28((int)b18);
 }
 
 extern "C" FE_OVERLAY void fn_804B5FC4(FeScr* x)
