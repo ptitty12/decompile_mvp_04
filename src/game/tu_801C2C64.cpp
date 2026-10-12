@@ -30,6 +30,7 @@ int fn_801C4128(Z* z);
 }
 
 void fn_80303BC4(const char* fmt, float a, float b, ...);
+enum Unk801C2C64_Sw { Sw_Neg = -1, Sw_Lo = 0, Sw_Hi = 0x41 };
 struct Unk801C2C64_Rec {
     int m0;
     int m4;
@@ -162,6 +163,43 @@ extern "C" void fn_801C2DEC(Z* z, int force)
     }
 }
 
+extern "C" void fn_801D85FC(void* o, P* other);
+extern "C" int fn_8035E318(void* s);
+
+extern "C" void fn_801C2F28(Z* z, P* other, int unused, int mode)
+{
+    P* c = z->m204->m6CC;
+    if (c->m38C == 1 && c->m388 == 3) {
+        Vec3 pos = c->m60;
+        float dist;
+        Vec3 d = pos - lbl_805D30D4;
+        dist = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+        int ok = 1;
+        if (z->m204->m65C[12] == 0)
+            ok = 0;
+        if (!(dist <= 2000.0f) && ok == 1 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2)
+            z->mEC = ok;
+        else
+            z->mF0 = 1;
+    }
+    P* r = z->m204->m65C[9];
+    if (other != fn_801A4B34(z->m204)) {
+        Unk801B7FB0_Sub58C* s = &other->m58C;
+        int a = *(int*)((char*)s + 0x38);
+        if (!(a > fn_8035E318(s))) {
+            int f = 0;
+            if (r != 0 && r->m5C4 < 0)
+                f = mode == 1;
+            if (f != 0 || mode == 4)
+                fn_801D85FC(z->mE0, other);
+        }
+    } else {
+        if (r != 0 && r->m5C4 < 0)
+            z->m118 = 0;
+    }
+    z->mF4 = 1;
+}
+
 extern "C" void fn_801C3330(Z* z)
 {
     fn_801C2284(z);
@@ -210,6 +248,91 @@ extern "C" Vec3* fn_801C34D0(Vec3* out, Z* z)
 {
     *out = z->m29C[1].a;
     return out;
+}
+
+extern "C" float fn_801C34F4(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    float a = 0.16666667f;
+    float r = 0.0f;
+    if (p) {
+        int k = fn_8025416C(&p->m588, 0x21);
+        switch ((Unk801C2C64_Sw)k) {
+    case 6:
+    case 25:
+    case 34:
+    case 35:
+    case 41:
+    case 56:
+    case 57:
+    case 60:
+    case 64:
+            r = 0.16666667f;
+            break;
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 20:
+    case 21:
+    case 22:
+    case 24:
+    case 26:
+    case 27:
+    case 29:
+    case 30:
+    case 33:
+    case 36:
+    case 39:
+    case 40:
+    case 43:
+    case 44:
+    case 46:
+    case 47:
+    case 48:
+    case 49:
+    case 51:
+    case 52:
+    case 53:
+    case 54:
+    case 58:
+    case 59:
+    case 61:
+    case 62:
+    case 63:
+    case 65:
+            r = 0.0f;
+            break;
+    case 4:
+    case 11:
+    case 18:
+    case 19:
+    case 23:
+    case 28:
+    case 31:
+    case 32:
+    case 37:
+    case 38:
+    case 42:
+    case 45:
+    case 50:
+    case 55:
+            r = -0.16666667f;
+            break;
+        }
+    }
+    return r;
 }
 
 extern "C" float fn_801C36AC(Z* z)
