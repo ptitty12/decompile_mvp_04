@@ -45,25 +45,6 @@ extern const float lbl_805FFEA8;
 extern const float lbl_805FFEAC;
 extern const float lbl_805FFEB0;
 
-extern "C" float fn_80573D44(DbSub50* p, int i);
-/* forward declarations (definitions are in address order) */
-extern "C" float fn_8057375C(DbMgr* self);
-extern "C" void fn_80573840(DbSub50* p);
-extern "C" void fn_805738F0(DbSub50* p, DbSelSrc* src);
-extern "C" float fn_80573D44(DbSub50* p, int i);
-extern "C" void fn_80573D84(DbSub50* p, int i, float v);
-extern "C" int fn_80574420(DbSub50* p, DbT* t);
-extern "C" DbTbl16* fn_80574478(DbTbl16* t);
-extern "C" unsigned fn_80574728(DbTbl16* t, int idx);
-extern "C" float fn_80574750(DbTbl16* t, int idx);
-extern "C" float fn_80574798(DbTbl16* t, int idx);
-extern "C" float fn_805747E4(DbTbl16* t, int idx);
-extern "C" float fn_80574830(DbTbl16* t, int idx);
-extern "C" void fn_8057487C(char* p);
-extern "C" int fn_80573440(DbMgr* self, int side, int id, float thr);
-extern "C" int fn_805736CC(DbMgr* self, int side);
-extern "C" int fn_80573548(DbMgr* self, int side);
-
 extern const float lbl_805FFF08;
 
 extern const float lbl_805FFE18;
@@ -82,30 +63,6 @@ extern const float lbl_805FFE28;
 extern "C" {
 float fn_80089E48__FP15Unk80089894_Objii(void* pt, unsigned i, int cur);
 }
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_80573440(DbMgr* self, int side, int id, float thr);
-extern "C" int fn_80573548(DbMgr* self, int side);
-extern "C" int fn_805736CC(DbMgr* self, int side);
-extern "C" float fn_8057375C(DbMgr* self);
-extern "C" void fn_80573840(DbSub50* p);
-extern "C" void fn_805738F0(DbSub50* p, DbSelSrc* src);
-extern "C" float fn_80573D44(DbSub50* p, int i);
-extern "C" void fn_80573D84(DbSub50* p, int i, float v);
-extern "C" int fn_80574420(DbSub50* p, DbT* t);
-extern "C" DbTbl16* fn_80574478(DbTbl16* t);
-extern "C" unsigned fn_80574728(DbTbl16* t, int idx);
-extern "C" float fn_80574750(DbTbl16* t, int idx);
-extern "C" float fn_80574798(DbTbl16* t, int idx);
-extern "C" float fn_805747E4(DbTbl16* t, int idx);
-extern "C" float fn_80574830(DbTbl16* t, int idx);
-extern "C" void fn_8057487C(char* p);
-extern "C" int fn_8057493C(DbHost* self, int a, int b);
-extern "C" float fn_80574A04(DbHost* self, int a, int b);
-extern "C" int fn_805725E4(int unused, int k, float x);
-extern "C" int fn_805724AC(int unused, int a, int b, int c, int d, int e, float x);
-extern "C" int fn_80572648(int unused, int a, int b, int c, int d, int e, int p6, int f, float x, int g, int h);
-extern "C" float fn_805742B0(void* unused, DbT* t);
-extern "C" float fn_8057437C(void* unused, DbT* t);
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_805724AC(int unused, int a, int b, int c, int d, int e, float x);
 extern "C" int fn_805725E4(int unused, int k, float x);
