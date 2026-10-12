@@ -23,12 +23,73 @@ struct McEntryHdr {
     unsigned short mA;
 };
 
+/* Record behind McEntry::m4 (and McSlot::m0). Evidence: fn_803915D0 searches the table on the u16 at +0,
+ * fn_80391734 reads +0xA, fn_80391C68 compares the bytes at +8/+9 with a tag, fn_803919B0/fn_8039188C/
+ * fn_80391914 walk a byte ring buffer after the header (m4 low 7 bits and m5 size it, m6 = depth). */
+struct McRec {
+    unsigned short m0;
+    unsigned short m2;
+    unsigned char m4;
+    unsigned char m5;
+    volatile unsigned char m6;
+    char pad7;
+    unsigned char m8;
+    unsigned char m9;
+    unsigned short mA;
+    char padC[4];
+    unsigned short m10;
+    unsigned short m12;
+    unsigned short m14;
+    char pad16[2];
+    unsigned short m18[1];
+};
+
+/* 8-entry table lbl_8069B7CC: pointer to the record, then an extra word (cleared by fn_80391E2C). */
+struct McSlot {
+    McRec* m0;
+    void* m4;
+};
+
+/* Tag word built by fn_80391C04: halfword, then the two bytes compared with McRec::m9/m8. */
+struct McTag {
+    unsigned short c;
+    unsigned char b;
+    unsigned char a;
+};
+
+/* Channel table lbl_8069B80C (fn_80391EA4 resets it, fn_80392708 tears it down): eight counters, eight
+ * positions (-1 = none), then 16 channel records of 16 bytes (flag at +6, slot index at +7, buffer at +0xC). */
+struct McChan {
+    int m0;
+    short m4;
+    char m6;
+    unsigned char m7;
+    int m8;
+    void* mC;
+};
+struct McState {
+    int cnt[8];
+    int pos[8];
+    McChan ch[16];
+};
+extern McState lbl_8069B80C;
+extern int lbl_8069B9B8[];
+extern short lbl_8069B9BC[];
+extern "C" void fn_80392BC0(void* p);
+extern "C" void fn_80392BF4();
+
 /* Declared as arrays of unknown size: retail reaches these with lis/lwz (not r13), i.e. this part of the
  * library was built without small data; an array of unknown size is never put in .sdata by -G8. */
 extern McEntry* lbl_806243F8[];
 extern int lbl_806243FC[];
 extern int lbl_80624400[];
 extern int lbl_80624404[];
+extern McSlot lbl_8069B7CC[8];
+extern int lbl_806243F4[];
+extern int lbl_8069B98C[];
+extern "C" void fn_803919B0(McRec* r);
+extern "C" void fn_80391A3C(McRec* r);
+extern "C" int fn_80391C68(McTag* k, McSlot** out);
 
 extern "C" void fn_803912F8()
 {
@@ -46,6 +107,22 @@ extern "C" void fn_80391320()
     lbl_806243FC[0] = 0;
 }
 
+extern "C" void fn_80391348(int x)
+{
+    if (lbl_806243F4[0] != 0) {
+        lbl_8069B98C[0] = x;
+        if (lbl_806243F8[0] != 0) {
+            for (int i = 0; i < lbl_80624400[0]; i++) {
+                McRec* r = (McRec*)lbl_806243F8[0][i].m4;
+                if (r != 0 && (r->m4 & 0x80)) {
+                    fn_803919B0(r);
+                    fn_80391A3C(r);
+                }
+            }
+        }
+    }
+}
+
 extern "C" int fn_803913F4(int x)
 {
     return x << 3;
@@ -61,6 +138,49 @@ extern "C" void fn_803913FC(int n, McEntry* tbl)
         tbl[i].m0 = 0;
         tbl[i].m4 = 0;
     }
+}
+
+extern "C" short fn_803915D0(unsigned key, int* out)
+{
+    int lo = 0;
+    int hi = lbl_80624404[0] - 1;
+    if (lbl_806243F8[0] != 0 && lbl_80624404[0] != 0 && lo <= hi) {
+        do {
+            int mid = (lo + hi) / 2;
+            McRec* r = (McRec*)lbl_806243F8[0][mid].m4;
+            if (key == r->m0) {
+                *out = lbl_806243F8[0][mid].m0;
+                return mid;
+            }
+            if (key > r->m0)
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        } while (lo <= hi);
+    }
+    return -1;
+}
+
+extern "C" short fn_80391668(unsigned a, unsigned b, int* out)
+{
+    int lo = 0;
+    int hi = lbl_80624404[0] - 1;
+    if (lbl_806243F8[0] != 0 && lbl_80624404[0] != 0 && lo <= hi) {
+        do {
+            int mid = (lo + hi) / 2;
+            McRec* r = (McRec*)lbl_806243F8[0][mid].m4;
+            if (a == r->m0 && b == r->m2) {
+                *out = lbl_806243F8[0][mid].m0;
+                return mid;
+            }
+            r = (McRec*)lbl_806243F8[0][mid].m4;
+            if (a > r->m0 || (a == r->m0 && b > r->m2))
+                lo = mid + 1;
+            else
+                hi = mid - 1;
+        } while (lo <= hi);
+    }
+    return -1;
 }
 
 extern "C" int fn_80391734(int idx, unsigned x)
@@ -85,6 +205,98 @@ extern "C" int fn_80391784(int x)
     return -1;
 }
 
+/* near-miss (96%): retail loads the count into r0 for the guard and copies it (mr r7,r0) for the loop; 6 spellings tried. */
+extern "C" void fn_803917D0(int key)
+{
+    if (lbl_806243F8[0] != 0) {
+        int idx = fn_80391784(key);
+        if (idx >= 0) {
+            int n = lbl_80624404[0];
+            if (idx < n) {
+                McEntry* tbl = lbl_806243F8[0];
+                do {
+                    if (idx == n - 1) {
+                        tbl[idx].m0 = 0;
+                        tbl[idx].m4 = 0;
+                    } else {
+                        tbl[idx].m0 = tbl[idx + 1].m0;
+                    }
+                    tbl[idx].m4 = tbl[idx + 1].m4;
+                    idx++;
+                } while (idx < n);
+            }
+            lbl_80624404[0]--;
+        }
+    }
+}
+
+extern "C" void fn_8039188C(McRec* r, char v)
+{
+    if (r->m6 != 0) {
+        int n = r->m4 & 0x7F;
+        int w = r->m5;
+        int n4 = n << 2;
+        unsigned char* p = (unsigned char*)r + ((w * (n + 2) + 0xF) & ~3) + n4;
+        int off = 0;
+        if (r->m4 & 0x80)
+            off = ((w + 7) / 8) + 1;
+        unsigned char* q = p + off;
+        unsigned char i = *q;
+        if (i < r->m6)
+            q[i + 1] = v;
+        i = i + 1;
+        if (i >= r->m6)
+            i = 0;
+        *q = i;
+    }
+}
+
+extern "C" int fn_80391914(McRec* r, int key)
+{
+    int res = 0;
+    int cnt = r->m6;
+    if (cnt > 0) {
+        int n = r->m4 & 0x7F;
+        int w = r->m5;
+        int n4 = n << 2;
+        unsigned char* p = (unsigned char*)r + ((w * (n + 2) + 0xF) & ~3) + n4;
+        int off = 0;
+        if (r->m4 & 0x80)
+            off = ((w + 7) / 8) + 1;
+        unsigned char* q = p + off;
+        int pos = *q;
+        q++;
+        int i = 0;
+        if (i < cnt) {
+            do {
+                pos--;
+                if (pos < 0)
+                    pos = cnt - 1;
+                if (q[pos] == key) {
+                    res = i + 1;
+                    break;
+                }
+                i++;
+            } while (i < cnt);
+        }
+    }
+    return res;
+}
+
+extern "C" void fn_803919B0(McRec* r)
+{
+    int n = r->m4 & 0x7F;
+    int w = r->m5;
+    int n4 = n << 2;
+    unsigned char* b = (unsigned char*)r + ((w * (n + 2) + 0xF) & ~3);
+    unsigned char* q = b + n4;
+    if (b[n4] != 0) {
+        int cnt = (w + 7) / 8;
+        for (int i = 1; i <= cnt; i++)
+            q[i] = 0;
+    }
+}
+
 /* near-miss (with -fno-strength-reduce too): one extra `mr r0,r3` for a; 4 spellings tried. */
 extern "C" int fn_80391A10(unsigned a, int b, int c)
 {
@@ -93,6 +305,31 @@ extern "C" int fn_80391A10(unsigned a, int b, int c)
     if (a > r)
         return q * a + r;
     return q * a + a;
+}
+
+extern "C" void fn_80391A3C(McRec* r)
+{
+    int n = r->m4 & 0x7F;
+    int w = r->m5;
+    int n4 = n << 2;
+    unsigned char* b = (unsigned char*)r + ((w * (n + 2) + 0xF) & ~3);
+    int cnt = b[n4];
+    unsigned char* q = b + n4;
+    if (cnt > 0) {
+        unsigned seed = lbl_8069B98C[0];
+        seed = seed % cnt;
+        unsigned a = fn_80391A10(seed, w, cnt);
+        int len = fn_80391A10(seed + 1, w, cnt) - a;
+        int byte = (a >> 3) + 1;
+        int bit = a & 7;
+        for (int i = 0; i < len; i++) {
+            q[byte] |= 1 << bit;
+            if (bit++ == 7) {
+                bit = 0;
+                byte++;
+            }
+        }
+    }
 }
 
 union McTagU {
@@ -113,7 +350,79 @@ extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short
     return *(unsigned*)&t;
 }
 
-extern McEntry lbl_8069B7CC[8];
+/* near-miss: lhzx operand order and the r0/r9 temps swapped (retail indexes (i*2, base+0x18)); 12 spellings tried. */
+extern "C" unsigned short* fn_80391C20(McRec* r, int key)
+{
+    int i = 0;
+    int n = r->m10;
+    while (i < n) {
+        unsigned short* e = (unsigned short*)((char*)r + r->m18[i] * 4);
+        if (*e == key)
+            return e;
+        i++;
+    }
+    return 0;
+}
+
+extern "C" int fn_80391C68(McTag* k, McSlot** out)
+{
+    int r = 0;
+    int i = 0;
+    do {
+        McRec* n = lbl_8069B7CC[i].m0;
+        if (n != 0 && n->m9 == k->b && n->m8 == k->a) {
+            r = 1;
+            *out = &lbl_8069B7CC[i];
+            break;
+        }
+        i++;
+    } while (i <= 7);
+    return r;
+}
+
+extern "C" unsigned short* fn_80391CCC(McTag* k)
+{
+    unsigned short* r = 0;
+    McSlot* s;
+    if (fn_80391C68(k, &s))
+        r = fn_80391C20(s->m0, k->c);
+    return r;
+}
+
+extern "C" int fn_80391D20(McTag* k, int* out)
+{
+    int r = 0;
+    McSlot* s;
+    if (fn_80391C68(k, &s)) {
+        r = 1;
+        *out = (int)s->m4;
+    }
+    return r;
+}
+
+extern "C" int fn_80391D70(McTag* k, int* out)
+{
+    int r = 0;
+    McSlot* s;
+    if (fn_80391C68(k, &s)) {
+        r = 1;
+        *out = s->m0->m9;
+    }
+    return r;
+}
+
+/* near-miss (98.7%): slot pointer in r10 and the halfword in r9, retail has r9 and r0; 11 spellings tried. */
+extern "C" int fn_80391DC4(McTag* k, void** out)
+{
+    int r = 0;
+    McSlot* s;
+    if (fn_80391C68(k, &s)) {
+        r = 1;
+        McRec* n = s->m0;
+        *out = (char*)n + (((n->m10 * 2 + 3) & ~3) + 0x18);
+    }
+    return r;
+}
 
 extern "C" void fn_80391E2C()
 {
@@ -123,12 +432,48 @@ extern "C" void fn_80391E2C()
     }
 }
 
-extern int lbl_8069B80C[];
+extern "C" unsigned short fn_80391E5C(McTag* k)
+{
+    unsigned short r = 0;
+    McSlot* s;
+    if (fn_80391C68(k, &s))
+        r = s->m0->m14;
+    return r;
+}
+
+struct McRaw {
+    char pad0[0x44];
+    short m44;
+    char m46;
+    unsigned char m47;
+};
+
+extern "C" void fn_80391EA4()
+{
+    int i;
+    for (i = 0; i <= 7; i++) {
+        lbl_8069B80C.cnt[i] = 0;
+        lbl_8069B80C.pos[i] = -1;
+    }
+    for (i = 0; i <= 15; i++) {
+        McRaw* p = (McRaw*)((char*)&lbl_8069B80C + i * 16);
+        p->m46 = 0;
+        p->m44 = 0;
+        lbl_8069B80C.ch[i].m0 = 0;
+        lbl_8069B80C.ch[i].m8 = 0;
+        p->m47 = 0xFF;
+        if (lbl_8069B80C.ch[i].mC != 0)
+            fn_80392BC0(lbl_8069B80C.ch[i].mC);
+        lbl_8069B80C.ch[i].mC = 0;
+    }
+    lbl_8069B9B8[0] = 0;
+    lbl_8069B9BC[0] = 0;
+}
 
 /* near-miss: retail forms lbl+0x20 first and indexes it; 3 spellings of the +8 index tried. */
 extern "C" int fn_80392098(int i)
 {
-    return (unsigned)lbl_8069B80C[i + 8] <= 15;
+    return (unsigned)lbl_8069B80C.pos[i] <= 15;
 }
 
 extern "C" void fn_80392388(int* p)
@@ -154,6 +499,30 @@ extern "C" int fn_80392398(int x, McShortList* s)
     return r;
 }
 
+extern "C" void fn_80392708()
+{
+    int i;
+    for (i = 0; i <= 15; i++) {
+        int off = i * 16;
+        McRaw* p = (McRaw*)((char*)&lbl_8069B80C + off);
+        if (p->m46 != 0) {
+            p->m46 = 0;
+            if (lbl_8069B80C.ch[i].mC != 0) {
+                fn_80392BC0(lbl_8069B80C.ch[i].mC);
+                lbl_8069B80C.ch[i].mC = 0;
+            }
+            lbl_8069B80C.cnt[p->m47]--;
+        }
+    }
+    for (i = 0; i <= 7; i++) {
+        int v = lbl_8069B80C.cnt[i];
+        lbl_8069B80C.pos[i] = -1;
+        if (v != 0)
+            lbl_8069B80C.cnt[i] = 0;
+    }
+    fn_80392BF4();
+}
+
 extern int lbl_806E2A50[];
 
-extern "C" int fn_803927D0(int i) { return lbl_8069B80C[i]; }
+extern "C" int fn_803927D0(int i) { return lbl_8069B80C.cnt[i]; }
