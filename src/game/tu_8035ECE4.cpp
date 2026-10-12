@@ -319,3 +319,7 @@ int fn_8035F60C() { return 1; }
 void fn_8035F614() {}
 
 void fn_8035F618() {}
+
+extern "C" void fn_8037B424(void*, int);
+
+extern "C" void fn_8035F61C(void* a, int b) { fn_8037B424(a, b); }
