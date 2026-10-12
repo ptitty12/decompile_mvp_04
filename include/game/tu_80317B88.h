@@ -734,6 +734,32 @@ public:
     int m5C;
     int* m60;
 };
+/* Root widget class (vtable lbl_80666EC0, vptr at +8; dtor fn_8035FF78) and the
+ * inlined root ctor: vptr, then m4 = m0 = 0.0f. Keep it an inline function: the
+ * 0.0f constant-pool read the inliner copies is not an unchanging MEM, so sched1
+ * keeps it after the root vptr store and flow2 does not delete that store as
+ * dead (PATTERNS.md, "Hard-case families 3"). Users: the widget ctors in
+ * tu_8032AC58 and tu_8032ECD8. */
+extern const void* const lbl_80666EC0[];
+extern const void* const lbl_80666E70[];
+inline void FxRootInit(FxListV* self) {
+    *(const void**)((char*)self + 8) = lbl_80666EC0;
+    self->m4 = self->m0 = 0.0f;
+}
+/* Integer-entry widget (vtable lbl_80666C90; ctors fn_8032EB84, fn_8032EC38, fn_8032ECD8). */
+class FxIntD : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+};
 class FxModal {
 public:
     char pad0[0x2DC];

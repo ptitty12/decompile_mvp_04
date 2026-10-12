@@ -16,8 +16,6 @@ extern const float lbl_805ED9F8;
 extern const float lbl_805EDAAC;
 extern const float lbl_805EDAB0;
 extern const float lbl_805EDAB4;
-extern const void* const lbl_80666EC0[];
-extern const void* const lbl_80666E70[];
 extern const void* const lbl_80666C40[];
 extern const void* const lbl_80666B70[];
 extern const void* const lbl_80666A18[];
@@ -52,15 +50,6 @@ extern int lbl_80620134;
 extern int lbl_8061B898;
 
 extern "C" void fn_8032D868(void* self, int a);
-/* Inlined root-widget ctor (vtable lbl_80666EC0, vptr at +8, zeroes m0/m4). The
- * 0.0f read comes from an inlined body, so it is not an unchanging MEM: sched1
- * keeps it after the root vptr store and flow2 then keeps that store alive
- * (PATTERNS, "Hard-case families 3"). */
-inline void FxRootInit(FxListV* self) {
-    *(const void**)((char*)self + 8) = lbl_80666EC0;
-    self->m4 = self->m0 = 0.0f;
-}
-
 /* Inlined mid-level widget ctor (vtable lbl_80666E70): root, mC = 0, set the name. */
 inline void FxWidInit(FxListD* self, int name) {
     FxRootInit(self);
@@ -68,21 +57,6 @@ inline void FxWidInit(FxListD* self, int name) {
     self->mC = 0;
     fn_8032D868(self, name);
 }
-/* Integer-entry widget (vtable lbl_80666C90; ctor fn_8032ECD8). */
-class FxIntD : public FxListV {
-public:
-    int mC;
-    char pad10[0x38];
-    int m48;
-    int m4C;
-    int m50;
-    int m54;
-    int m58;
-    int m5C;
-    int m60;
-    int m64;
-};
-
 /* Polymorphic int ring (vptr lbl_8064B298 at +0x10; see Unk80353E68 in tu_8034B370.h). */
 struct FxRingI {
     int* m0;
