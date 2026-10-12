@@ -7,6 +7,32 @@
 
 extern UiP2 lbl_805BE4B8;
 extern UiP2 lbl_805BE4C0;
+void fn_8011AF34(UiObj* o);
+void fn_800F5870(UiObj* a);
+extern char lbl_805BA6D0[];
+extern char lbl_805BE4B0[];
+extern char lbl_805BE22C[];
+void fn_800F56B4(UiV_134_138* self)
+{
+    fn_800ECF18(self);
+    self->m138 = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    fn_80124FA8(self->m138, self);
+    fn_80125490(self->m138, 1, 4, 0x38C8, 1);
+    fn_801251CC(self->m138, 1, 0x1A0B, 0);
+    fn_801251CC(self->m138, 0, 0x1A0D, 2);
+    UiObj* w = self->m138;
+    fn_800C80C0(w, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
+    self->m134 = (UiObj*)fn_800C8060((int)self->v33(8, 1));
+    self->m134->v79(0, 0);
+    self->m134->v8(1);
+    fn_800F5870(self);
+    if (fn_8011AA24(0)->m6F8->m10->m74 != 0)
+        fn_8011AF34(fn_800C8040(self->v32((int)lbl_805BE22C, 1)));
+    else
+        fn_80118A70(fn_800C8044(self->v32((int)lbl_805BE4B0, 1)));
+}
+
 void fn_800F5870(UiObj* a)
 {
     UiP2 s1;
@@ -29,6 +55,58 @@ void fn_800F5870(UiObj* a)
         fn_800F595C(a, 0, 0);
         break;
     }
+}
+
+class UiX61v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+  virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39(); virtual void v40();
+  virtual void v41(); virtual void v42(int a, int b, int c, int d); virtual void v43(); virtual void v44();
+  virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+  virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+  virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+  virtual void v60(); virtual void v61(); virtual int v62(); virtual void v63(); virtual void v64();
+  virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+  virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74();
+  virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+  virtual void v79(int a, int b);
+};
+struct UiTbl5 {
+    int m[5];
+};
+class UiS595C : public UiObj {
+public:
+    char pad40[0x134 - 0x40];
+    UiX61v* m134;
+    int m138;
+    int a13C[5];
+};
+extern UiTbl5 lbl_805BE4C8;
+int fn_800F5AA8(UiObj* self, int a, int* b, int c);
+void fn_800F595C(UiS595C* self, int* a, int b)
+{
+    UiTbl5 t = lbl_805BE4C8;
+    int n = 0;
+    int k = 0;
+    self->m134->v79(self->m134->v62(), 0);
+    for (int i = 0; i <= 4; i++) {
+        if (fn_800F5AA8(self, i, a, b) == 0) {
+            int v = t.m[i];
+            if (i == 3)
+                v = 0x3BBE;
+            self->m134->v42(n, 0, v, 5);
+            n++;
+            self->a13C[k] = i;
+            k++;
+        }
+    }
+    self->m134->v79(n, 0);
 }
 
 int fn_800F5AA8(UiObj* self, int a, int* arr, int n)
@@ -290,11 +368,81 @@ void fn_800F6AF4(UiObj* self)
 }
 
 extern char lbl_8065A640[];
+struct UiEvt16 {
+    int id;
+    const void* vt;
+    int m8;
+    int mC;
+};
+/* near-miss: registers/stack slots of the event and message locals are swapped (5 slots differ) */
+void fn_800F6F0C(UiObj* self, int kind, int a)
+{
+    switch (kind) {
+    case 3:
+        if (fn_800B555C()->m570 == a) {
+            lbl_8061B8C0->m24 = 1;
+            fn_802D7ADC();
+            UiMsg m;
+            UiMsg* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, lbl_805BE138, 15);
+            p->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), p, self);
+        }
+        break;
+    case 4:
+        if (fn_800B555C()->m570 == a) {
+            UiMsg m;
+            UiEvt16 e;
+            UiEvt16* pe = &e;
+            const void* base = lbl_80649DA0;
+            pe->vt = base;
+            e.id = 0x9E;
+            pe->vt = lbl_8065B888;
+            fn_8037893C(fn_8011AA24(0)->m704, e.id, (UiEvtRaw*)pe, 0, 0);
+            fn_8035682C(&m);
+            UiMsg* p = &m;
+            fn_8040B830(p->name, lbl_805BADC8, 15);
+            p->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), p, self);
+            pe->vt = base;
+        }
+        break;
+    }
+}
+
 UiScrRaw* fn_800F7084(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_8011BFAC(self, a, b, c, d, e, f, g, h);
     self->m3C = lbl_8065A640;
     return self;
+}
+
+extern char lbl_805B9704[];
+extern char lbl_805B9710[];
+extern char lbl_805B9778[];
+extern char lbl_805BE598[];
+void fn_8011C04C();
+void fn_800F7338(int unused, int a, UiObj* obj);
+extern char lbl_805B9704[];
+extern char lbl_805B9710[];
+extern char lbl_805B9778[];
+extern char lbl_805BE598[];
+void fn_8011C04C();
+void fn_800F7338(int unused, int a, UiObj* obj);
+void fn_800F7614(int unused, int a, UiObj* obj);
+/* near-miss: only the placement of three lis (hi) instructions differs; retail hoists them above the earlier calls */
+void fn_800F70C8(UiObj* self)
+{
+    fn_8011C04C();
+    fn_800B555C()->m570 = -1;
+    int a = (int)lbl_8068B618->m8;
+    fn_800F7614((int)self, a, fn_800C8044(fn_800C8044(self->v32((int)lbl_805B9704, 1))->v32((int)lbl_805B9710, 1)));
+    fn_800F7338((int)self, a, fn_800C8044(fn_800C8044(self->v32((int)lbl_805BE598, 1))->v32((int)lbl_805B9710, 1)));
+    int b = (int)lbl_8068B618->mC;
+    fn_800F7614((int)self, b, fn_800C8044(fn_800C8044(self->v32((int)lbl_805B9704, 1))->v32((int)lbl_805B9778, 1)));
+    fn_800F7338((int)self, b, fn_800C8044(fn_800C8044(self->v32((int)lbl_805BE598, 1))->v32((int)lbl_805B9778, 1)));
+    fn_800C80C0(self, fn_800B555C()->m570);
 }
 
 void fn_800F7294(UiObj* self)
@@ -354,6 +502,7 @@ int fn_800F7C34(UiScr13C* self, int a)
         return 1;
     return 0;
 }
+
 
 int fn_800F7E64(UiV_13Ci* self, int a)
 {
