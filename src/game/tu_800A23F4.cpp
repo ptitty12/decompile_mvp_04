@@ -798,6 +798,48 @@ extern "C" int fn_800A3BC0(Unk800A2EB4* p, int a, int b)
     return 2;
 }
 
+struct Unk800A3C98 {
+    char pad0[0x28];
+    int m28;
+};
+extern int lbl_80619954;
+extern int lbl_80619958;
+extern "C" int fn_8007B8C4(int g, int a, int b);
+extern "C" int fn_8056A5F4(int a, int k, int b, int c);
+extern "C" int fn_8055B078(int a, int b, int c);
+extern "C" int fn_8056B3CC(int a, int b);
+extern "C" int fn_800D6FA0();
+extern "C" int fn_800D7160(int a, int b, int c, int d, int e, int f, int g, void* h, int i);
+
+extern "C" int fn_800A3C98(Unk800A3C98* p, int a, int b)
+{
+    if (lbl_80619954 == 0) {
+        int g = lbl_8061930C;
+        int k = fn_80078A38(g, b);
+        if (k == 4) {
+            return 10;
+        }
+        void* r22 = fn_800A3A10((Unk800A3AB0*)p, k);
+        int r24 = 3;
+        int h = fn_8056A5F4(p->m28, k, a, b);
+        int t = fn_8055B078(*(int*)(g + 0x68), b, h);
+        int same = fn_8007B8C4(g, 1, b) == fn_8007B8C4(g, 1, h);
+        int c = fn_800A2EB4((Unk800A2EB4*)p);
+        int d = fn_800A2E6C((Unk800A2E6C*)lbl_80619948);
+        if (t != 0) {
+            r24 = 0;
+            if (same) {
+                r24 = 2;
+            }
+        } else if (same) {
+            r24 = 1;
+        }
+        int e = fn_8056B3CC(p->m28, b);
+        return fn_800D7160(fn_800D6FA0(), a, k, c, d, b, e, r22, r24);
+    }
+    return lbl_80619958;
+}
+
 extern "C" void fn_800A3DF4() {}
 
 struct Unk800A3E6C {
