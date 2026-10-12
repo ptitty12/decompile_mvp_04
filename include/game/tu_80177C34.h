@@ -195,5 +195,6 @@ void fn_801791DC(Unk801791DC_T* p, int a, int b);
 int* fn_80179B58(int* p);
 void fn_80179B90(Unk80179B90_T* p, int a, int b);
 int fn_80179464(Unk80177C34_Sub* s);
+int fn_801797C4(Unk80177C34_Sub* p, int id);
 
 #endif

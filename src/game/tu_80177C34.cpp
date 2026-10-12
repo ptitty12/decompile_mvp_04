@@ -5,6 +5,22 @@
 #include "game/tu_80177C34.h"
 #include "game/goals/tu_8027C728.h"
 #include "game/goals/tu_8027A84C.h"
+struct Unk801797C4_L {
+    int m0;
+    int m4;
+};
+struct Unk801797C4_Side {
+    char pad0[0x74];
+    Unk801797C4_L m74;
+    char pad7C[0x3E8 - 0x7C];
+    Unk801792BC_Ent m3E8[25];
+};
+extern "C" {
+int fn_80097210(void* s, int i);
+int fn_80099B50(void* s, int i);
+}
+int fn_80353870(void* p);
+unsigned char* fn_80081CF8(void* p, int i);
 extern "C" {
 unsigned char fn_80097190(Unk801792BC_Side* s, int j);
 int fn_80097300(Unk801792BC_Side* s, int x);
@@ -549,6 +565,55 @@ void fn_80179784()
 void fn_801797A4()
 {
     fn_801794B8();
+}
+
+int fn_801797C4(Unk80177C34_Sub* self, int id)
+{
+    Unk80177C34_Rec* z = self->m88->m6F8->m14;
+    int f = 0;
+    if (z->m1CD0 != 0) {
+        f = 1;
+    }
+    int e = z->m1CD0 == 0;
+    Unk801797C4_Side* a = (Unk801797C4_Side*)((char*)z + f * 0xE64);
+    Unk801797C4_Side* b = (Unk801797C4_Side*)((char*)z + e * 0xE64);
+    int g = 0;
+    if (z->m1CD0 != 0) {
+        g = 1;
+    }
+    if (self->m84 == g) {
+        Unk801792BC_Ent* t = a->m3E8;
+        if (t[fn_80353870(a)].m0 == id) {
+            return 0;
+        }
+        fn_80097300((Unk801792BC_Side*)a, fn_80097190((Unk801792BC_Side*)a, 1));
+        for (int i = 0; i <= 2; i++) {
+            int k = *fn_80081CF8(self->m88->m6F8->m14, i);
+            if (k != 0xFF && t[k].m0 == id) {
+                return 0;
+            }
+        }
+        Unk801797C4_L* l = &a->m74;
+        for (int i = 0; i < l->m4; i++) {
+            if (fn_80099B50(a, i) == id) {
+                return 0;
+            }
+        }
+        return 1;
+    } else {
+        for (int i = 0; i <= 8; i++) {
+            if (id == fn_80097210(b, i)) {
+                return 0;
+            }
+        }
+        Unk801797C4_L* l = &b->m74;
+        for (int i = 0; i < l->m4; i++) {
+            if (fn_80099B50(b, i) == id) {
+                return 0;
+            }
+        }
+        return 1;
+    }
 }
 
 int fn_8017995C(int* arr, int v)
