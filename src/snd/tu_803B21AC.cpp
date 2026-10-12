@@ -86,6 +86,9 @@ extern void (*lbl_806AA2D8)(int);
 extern "C" void fn_803B21EC(int idx);
 
 extern "C" void fn_803B5F9C(Unk803B21EC_Node** head, void* node);
+extern "C" void fn_803B65BC(void* obj);
+extern "C" void fn_803B65FC(void* obj, int* buf);
+extern unsigned short lbl_8069C8A2;
 extern "C" void fn_803B6004(Unk803B21EC_Node** head, void* node);
 extern "C" void fn_803B5EC4(void* obj);
 extern "C" void fn_803B5F18(void* obj, int* buf);
@@ -211,6 +214,34 @@ extern "C" void fn_803B27DC(int idx, int n)
         fn_803B6004(&e->m40, e->m58);
         SNDMEMI_free(e->m58);
         e->m58 = 0;
+    }
+}
+
+extern "C" void fn_803B28AC(int idx, float v)
+{
+    Unk803B21EC* e = &lbl_806AA4B0[idx];
+    if (v < 1.0f) {
+        if (e->m54 == 0) {
+            Unk803B27DC_Obj* o = (Unk803B27DC_Obj*)SNDMEMI_allocz(0x28);
+            e->m54 = o;
+            o->m4 = 0;
+            e->m54->m18 = 0x28;
+            e->m54->m1A = 0;
+            fn_803B65BC(e->m54);
+            fn_803B5F9C(&e->m40, e->m54);
+        }
+        int buf[3];
+        float t;
+        buf[1] = lbl_8069C8A2 << 8;
+        t = v * (float)(int)lbl_8069C8A2;
+        int r = (int)(t >= 0.0f ? t + 0.5f : t - 0.5f);
+        buf[0] = r << 7;
+        buf[2] = 0x100;
+        fn_803B65FC(e->m54, buf);
+    } else if (e->m54 != 0) {
+        fn_803B6004(&e->m40, e->m54);
+        SNDMEMI_free(e->m54);
+        e->m54 = 0;
     }
 }
 
