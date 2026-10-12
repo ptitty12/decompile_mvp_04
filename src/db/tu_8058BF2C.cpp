@@ -45,6 +45,8 @@ struct Db8058DE40_R {
 extern "C" Db8058DE40_R* fn_8007FE04__FP13Unk8007F198_D(void* a0);
 
 /* near-miss: 99.5%; retail keeps rec in r30 and the flag in r29 (callee-saved pair swapped) */
+
+extern "C" int fn_8007FDF8__FP13Unk8007F198_D(void* a0);
 /* forward declarations (definitions are in address order) */
 extern "C" Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self);
 extern "C" void fn_8058BF68(Db805822D0_V* self);
@@ -58,6 +60,7 @@ extern "C" void fn_8058CE50(void* self, unsigned short* rec, unsigned short* dst
 extern "C" int fn_8058CF18(int a, int b, void* rec);
 extern "C" void fn_8058D028(char* self, int a, Unk80070DDC_Stream* io);
 extern "C" Db805822D0_Base* fn_8058D080(Db805822D0_Base* self);
+extern "C" int fn_8058D580(int self, int b, void* rec);
 extern "C" int fn_8058D78C();
 extern "C" void fn_8058D81C(void* self, void* rec, unsigned short* dst);
 extern "C" int fn_8058DB0C(void* self, unsigned short* rec);
@@ -68,6 +71,7 @@ extern "C" void fn_8058DE9C(Db805822D0_V* self, int a, int b, int c, int d);
 extern "C" int fn_8058E044(int a, int b, void* rec);
 extern "C" Db805822D0_Base* fn_8058E144(Db805822D0_Base* self);
 extern "C" void fn_8058E180(Db805822D0_V* self, int a);
+extern "C" int fn_8058E244(int self, int b, void* rec);
 extern "C" int fn_8058E470();
 extern "C" int fn_8058E550();
 
@@ -217,6 +221,34 @@ extern "C" DB_OVERLAY Db805822D0_Base* fn_8058D080(Db805822D0_Base* self)
     fn_805822D0(self);
     self->m4 = lbl_80683098;
     return self;
+}
+
+extern "C" DB_OVERLAY int fn_8058D580(int self, int b, void* rec)
+{
+    Db80586420_Tri t = { -1, -1, -1 };
+    Db80586420_Ent e(rec);
+    int x = 0;
+    int lo = 0, hi = 3;
+    int f = e.mC.f;
+    if (f != 0) {
+        if (f >= lo && f <= hi)
+            x = 0x1D5F;
+    } else {
+        x = 0x1D1A;
+    }
+    if (e.m4 == 0) {
+        if (fn_8007FDF8__FP13Unk8007F198_D(lbl_8061930C) == 12) {
+            Db80586420_Tri tb[2] = { { x, 0x1D67, 0x1E1C }, { x, 0x1D67, 0x1E1C } };
+            t = tb[((unsigned short*)rec)[8] & 1];
+        } else {
+            Db80586420_Tri u = { x, 0x1D67, 0x1E1C };
+            t = u;
+        }
+    } else {
+        Db80586420_Tri tb[2] = { { 0x1D54, 0x1D81, 0x1E1E }, { 0x1D54, 0x1D81, 0x1E1F } };
+        t = tb[((unsigned short*)rec)[8] & 1];
+    }
+    return fn_80582DF4(self, b, t);
 }
 
 extern "C" DB_OVERLAY int fn_8058D78C()
@@ -383,6 +415,89 @@ extern "C" DB_OVERLAY void fn_8058E180(Db805822D0_V* self, int a)
     fn_8052E234(&e, 15, u, k, 0, 0, (char)a, 0, 0);
     fn_80582CF8(self, &e, 0, 0, 0);
     fn_80360AF0((Db80586420_Ent*)&e, 2);
+}
+
+extern "C" DB_OVERLAY int fn_8058E244(int self, int b, void* rec)
+{
+    int kind = ((int (*)(int, void*))fn_8058E550)(self, rec);
+    Db80586420_Tri t = { -1, -1, -1 };
+    Db80586420_Ent e(rec);
+    t.a = 0x5A15;
+    switch (kind) {
+    case 1:
+        t.b = 0x1D95;
+        t.c = 0x5C55;
+        break;
+    case 2:
+        t.b = 0x5C6B;
+        t.c = 0x5C6C;
+        break;
+    case 5:
+        t.b = 0x5C56;
+        t.c = 0x5C57;
+        break;
+    case 6:
+        t.b = 0x5C58;
+        t.c = 0x5C59;
+        break;
+    case 7:
+        t.b = 0x5C5A;
+        t.c = 0x5C5B;
+        break;
+    case 8:
+        t.b = 0x5C5C;
+        t.c = 0x5C5D;
+        break;
+    case 9:
+        t.b = 0x5C5E;
+        t.c = 0x5C5F;
+        break;
+    case 3:
+        t.b = 0x5C60;
+        t.c = 0x5C61;
+        break;
+    case 4:
+        t.b = 0x5C62;
+        t.c = 0x5C63;
+        break;
+    case 10:
+        t.b = 0x5D0E;
+        t.c = 0x5D0F;
+        break;
+    case 11:
+        t.b = 0x5DC2;
+        t.c = 0x5DC3;
+        break;
+    case 12:
+        t.b = 0x5DC4;
+        t.c = 0x5DC5;
+        break;
+    case 13:
+        t.b = 0x5DC6;
+        t.c = 0x5DC7;
+        break;
+    case 14:
+        t.b = 0x5DC8;
+        t.c = 0x5DC9;
+        break;
+    case 15:
+        t.b = 0x5DCA;
+        t.c = 0x5DCB;
+        break;
+    case 16:
+        t.b = 0x5DCD;
+        t.c = 0x5DCE;
+        break;
+    case 17:
+        t.b = 0x5DCF;
+        t.c = 0x5DD0;
+        break;
+    case 18:
+        t.b = 0x5DD1;
+        t.c = 0x5DD2;
+        break;
+    }
+    return fn_80582DF4(self, b, t);
 }
 
 extern "C" DB_OVERLAY int fn_8058E470()
