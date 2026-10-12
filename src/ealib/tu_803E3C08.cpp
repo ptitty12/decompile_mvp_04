@@ -455,6 +455,60 @@ extern "C" int fn_803E4C30(Unk803E4A50* o)
     return 1;
 }
 
+extern "C" void fn_803DBDD8(void* m, int a);
+
+/* fn_803D987C takes no parameters; r3 is not set at the call. */
+inline int ReadyInl(Unk803E6660* o)
+{
+    ((void (*)())fn_803D987C)();
+    o->m18 = 1;
+    return 1;
+}
+
+extern "C" void fn_803E50BC(char* o, int k)
+{
+    if (k != *(int*)(o + 0x48)) {
+        int st = *(int*)(o + 8);
+        if (st != 0) {
+            BuildInl((Unk803E6660*)(o + 0xc), st);
+            *(int*)(o + 8) = 0;
+        }
+        *(int*)(o + 0x48) = k;
+        Unk803E68B0_Key* kk = (Unk803E68B0_Key*)(o + 0xc);
+        int k2 = k;
+        int v = 0;
+        switch (k2) {
+        case -4:
+        case 0x80:
+        case 0x90:
+        case 0xA8:
+        case 0xB8:
+            break;
+        case 0x98:
+            v = 2;
+            break;
+        case 0xA0:
+            v = -1;
+            break;
+        default:
+            v = -1;
+            break;
+        }
+        *(volatile int*)&kk->m30 = v;
+        int t = kk->m30;
+        if (t != -1) {
+            kk->m0 = k2;
+            int hi = 0xFFFF - t;
+            int lo = hi + t;
+            kk->m24 = hi;
+            kk->m20 = lo;
+            kk->m28 = lo;
+        }
+        fn_803DBDD8(o + 0x7c, *(int*)(o + 0x48));
+    }
+    ReadyInl((Unk803E6660*)(o + 0xc));
+}
+
 extern "C" void fn_803E5270(char* o)
 {
     Unk803E6660* s = (Unk803E6660*)(o + 0xc);
@@ -483,14 +537,6 @@ struct Unk803E56F8 {
     int m4C;
     Unk803E4A50_S4C s50;
 };
-
-/* fn_803D987C takes no parameters; r3 is not set at the call. */
-inline int ReadyInl(Unk803E6660* o)
-{
-    ((void (*)())fn_803D987C)();
-    o->m18 = 1;
-    return 1;
-}
 
 extern "C" void fn_803E54B8(char* o, Unk803E6660_Rec* rec, int* val)
 {
@@ -619,6 +665,50 @@ extern "C" int fn_803E5904(Unk803E56F8* o)
     FindSet(s, lbl_8060CBD4, (int)lbl_8062C294, 0, -1);
     o->mC = 0;
     return 1;
+}
+
+extern "C" void fn_803E5E90(char* o, int k)
+{
+    if (k != *(int*)(o + 0x4c)) {
+        int st = *(int*)(o + 0xc);
+        if (st != 0) {
+            BuildInl((Unk803E6660*)(o + 0x10), st);
+            *(int*)(o + 0xc) = 0;
+        }
+        *(int*)(o + 0x4c) = k;
+        Unk803E68B0_Key* kk = (Unk803E68B0_Key*)(o + 0x10);
+        int k2 = k;
+        int v = 0;
+        switch (k2) {
+        case -4:
+        case 0x80:
+        case 0x90:
+        case 0xA8:
+        case 0xB8:
+            break;
+        case 0x98:
+            v = 2;
+            break;
+        case 0xA0:
+            v = -1;
+            break;
+        default:
+            v = -1;
+            break;
+        }
+        *(volatile int*)&kk->m30 = v;
+        int t = kk->m30;
+        if (t != -1) {
+            kk->m0 = k2;
+            int hi = 0xFFFF - t;
+            int lo = hi + t;
+            kk->m24 = hi;
+            kk->m20 = lo;
+            kk->m28 = lo;
+        }
+        fn_803DBDD8(o + 0x90, *(int*)(o + 0x4c));
+    }
+    ReadyInl((Unk803E6660*)(o + 0x10));
 }
 
 extern "C" void fn_803E6044(char* o)
