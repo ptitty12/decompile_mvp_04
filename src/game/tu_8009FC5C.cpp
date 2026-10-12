@@ -793,6 +793,165 @@ extern "C" int fn_800A1B74()
     return 0;
 }
 
+struct Unk800A1C54 {
+    char pad0[0x24];
+    void* m24;
+    char pad28[0x48 - 0x28];
+    int m48;
+    char pad4C[0x64 - 0x4C];
+    int m64;
+    char pad68[0x6C - 0x68];
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    char pad7C[4];
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    char pad9C[0xD4 - 0x9C];
+    int mD4;
+    int mD8;
+};
+class FEVobj1C54 {
+public:
+    char pad0[0x13D2C];
+    virtual ~FEVobj1C54();
+};
+struct Unk800B555C_R {
+    char pad0[0x594];
+    int m594;
+};
+struct Unk800A2328;
+extern "C" void fn_800A2328(Unk800A2328* p, int v);
+extern "C" void fn_800A4EE4(void* p);
+extern "C" void fn_800A4F54(void* p);
+extern "C" void fn_804EAEE0(int a);
+extern "C" void fn_800A2B1C(void* p);
+extern "C" char* fn_80546600(char* o);
+extern "C" void fn_80547610(char* o, int a, int b);
+extern "C" void fn_800A2BE0(void* p);
+extern "C" void fn_800A2DCC(void* p);
+extern "C" void fn_8054788C(char* o, int a);
+extern "C" void fn_80590A4C(int a);
+extern "C" void fn_8058EF94(int a);
+struct Unk800A2030_E {
+    char pad0[0x1E0];
+    int m1E0;
+};
+extern "C" Unk800A2030_E* fn_8007FE04(int g);
+extern "C" void fn_80581770(int a);
+extern "C" void fn_800A28C4(void* p);
+extern "C" void fn_800A286C(void* p, int a);
+extern "C" void fn_80554228(void* o);
+extern "C" void fn_80554260(void* o, int k, int a);
+extern "C" void fn_80554284(void* o, int a, int b);
+extern "C" void fn_805542A8(void* o);
+extern "C" void fn_805542CC(void* o);
+extern "C" Unk800B555C_R* fn_800B555C();
+extern "C" void fn_8007C134(int g);
+extern "C" void fn_80077CF8(int g);
+extern "C" void fn_80564E6C(int a);
+extern "C" int fn_8007F9B4(int g);
+extern "C" void fn_805526D4();
+extern "C" void fn_800A3E6C(void* p);
+extern "C" void fn_8007295C(int g);
+
+extern "C" void fn_800A1C54(Unk800A1C54* p, int x, int flags, int a, int b)
+{
+    int g = lbl_8061930C;
+    char* sub = (char*)p + 0x2C;
+    fn_800A2328((Unk800A2328*)p, x);
+    fn_800A4EE4(p);
+    fn_800A4F54(p);
+    fn_804EAEE0(*(int*)(sub + 0x38));
+    if (flags & 1) {
+        fn_8007295C(g);
+    }
+    if (flags & 4) {
+        fn_800A2B1C(p);
+    }
+    char* o = fn_80546600((char*)operator new(0x13D30, 0x100));
+    fn_80547610(o, 0, 0);
+    if (p->m6C == 0) {
+        fn_800A2BE0(p);
+        fn_8054788C(o, 0);
+    } else if (p->m6C == 1) {
+        fn_800A2DCC(p);
+        fn_8054788C(o, 1);
+    }
+    if (o) {
+        delete (FEVobj1C54*)o;
+    }
+    if (p->m6C == 1) {
+        fn_80590A4C(*(int*)(g + 0x30));
+        fn_8058EF94(*(int*)(g + 0x34));
+        fn_8007FE04(g)->m1E0 = 0;
+    }
+    fn_80581770(*(int*)(lbl_8061930C + 0x2C));
+    fn_800A286C(p, p->m6C);
+    fn_80554228(p->m24);
+    p->mD4 = 0;
+    p->mD8 = 0;
+    int f1 = 0;
+    if (a != 0 && (flags & 0x38)) {
+        f1 = 1;
+    }
+    int f2 = 1;
+    if (b == 0) {
+        f2 = 0;
+    }
+    if (f2 == 1) {
+        int t = fn_800B555C()->m594;
+        fn_80554284(p->m24, t, b);
+        fn_8007C134(g);
+        if (t == 2) {
+            p->mD8 = f2;
+        }
+    } else if (p->m6C == 0) {
+        fn_80554284(p->m24, 0, 1);
+        fn_805542A8(p->m24);
+    } else if (p->m6C == 1) {
+        fn_80554284(p->m24, 0, 1);
+        fn_805542CC(p->m24);
+    }
+    if (f1 == 1) {
+        int k = 2;
+        if (flags & 8) {
+            k = 0;
+        } else if (flags & 0x10) {
+            k = 1;
+        }
+        if (k == 2) {
+            p->mD4 = 1;
+        }
+        fn_80554260(p->m24, k, a);
+        p->m80 = 0xF;
+        p->m78 = 2;
+        p->m70 = 2;
+        p->m90 = -1;
+        p->m94 = -1;
+        p->m74 = 2;
+    }
+    if (f2 == 0 && f1 == 0) {
+        fn_800A28C4(p);
+    }
+    if (p->m6C != 2) {
+        fn_80077CF8(g);
+    }
+    fn_80564E6C(*(int*)(sub + 0x1C));
+    int v = fn_8007F9B4(lbl_8061930C);
+    p->m8C = v;
+    p->m84 = v;
+    p->m98 = 0;
+    fn_805526D4();
+    fn_800A3E6C(p);
+}
+
 struct Unk800A1F24 {
     char pad0[0x24];
     void* m24;
@@ -810,15 +969,10 @@ struct Unk800A1F24 {
     int mD4;
     int mD8;
 };
-struct Unk800B555C_R {
-    char pad0[0x594];
-    int m594;
-};
 extern "C" void fn_800A286C(void* p, int a);
 extern "C" void fn_80554228(void* o);
 extern "C" void fn_80554260(void* o, int k, int a);
 extern "C" void fn_80554284(void* o, int a, int b);
-extern "C" Unk800B555C_R* fn_800B555C();
 extern "C" void fn_8007C134(int g);
 
 extern "C" void fn_800A1F24(Unk800A1F24* p, int flags, int a, int b)
@@ -870,11 +1024,6 @@ struct Unk800A2030 {
     int m7C;
     int m80;
 };
-struct Unk800A2030_E {
-    char pad0[0x1E0];
-    int m1E0;
-};
-extern "C" Unk800A2030_E* fn_8007FE04(int g);
 extern "C" void fn_8007F858(int g);
 extern "C" void fn_8007295C(int g);
 extern "C" void fn_8007F8E4(int g, int e);
