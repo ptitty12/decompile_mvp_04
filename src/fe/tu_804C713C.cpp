@@ -5,6 +5,9 @@
 
 #include "game/fe_804BE560.h"
 
+extern "C" int fn_800A2EFC(FeGlobal80619948* g);
+extern "C" void fn_804C846C(FeScrN* x);
+
 extern const char lbl_805F8074[];
 
 extern "C" char* fn_800DF254(char* out, int a, int b, float f);
@@ -296,6 +299,29 @@ extern "C" FE_OVERLAY void fn_804C8314(FeScrN* x, int a)
     if (a == (int)x->m160) {
         fn_804C7ACC(x);
         fn_804C7FE4(x);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804C8354(void* x)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    if (fn_800B555C()->m0 == 0x13) {
+        fn_8040B830(mp->name, "BACK_ORGINFO", 15);
+        mp->name[15] = 0;
+        fn_800B555C()->m3C = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+    } else {
+        int g = fn_800A2EFC(lbl_80619948);
+        if (g != 0) {
+            fn_804C846C((FeScrN*)x);
+        } else {
+            fn_8040B830(mp->name, "BACK", 15);
+            mp->name[15] = 0;
+            fn_800B555C()->m3C = 0;
+            fn_800B7B4C(FeGetMgr(), mp, x);
+        }
     }
 }
 
