@@ -47,13 +47,25 @@ struct Vp6Link {
 extern unsigned char lbl_8069C140[];
 extern const int* lbl_806EF458;
 
+extern const int lbl_80608AC8[];
+extern const unsigned char lbl_80608678[];
+
 extern "C" {
 
 void fn_80398614(void* p);
 void* fn_803985F4(int size, int flags);
-int fn_803A0EBC(Vp6BitReader* br);
+int fn_803A0EBC(Vp6Rc* rc);
+int fn_8039EF84(Vp6Rc* rc, int n);
+int fn_803A0E18(Vp6Rc* rc, int prob);
+int fn_8039CC38(Vp6Ctx* c);
+void fn_8039C980(Vp6Ctx* c);
 int fn_8039E9E0(void* ctx);
 void fn_8039F264(Vp6Ctx* c);
+void fn_8039EFD4(Vp6Ctx* c);
+void fn_8039733C(Vp6Ctx* c, unsigned kind, int val);
+void fn_80396114(Vp6Buf* b, const Vp6Params* p);
+int fn_8039F0C0(Vp6Ctx* c);
+int fn_8039F2EC(Vp6Ctx* c, int n);
 
 /* near-miss: loop structure right, the k counter and table base registers are allocated differently. */
 void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
@@ -96,6 +108,68 @@ void fn_8039BC28(Vp6Hdr* h)
     h->mCC[1].m8 = 4;
     h->mCC[2].m8 = 4;
     h->mCC[3].m8 = 4;
+}
+
+int fn_8039CC38(Vp6Ctx* c)
+{
+    Vp6Rc* rc = &c->m150;
+    if (!fn_803A0E18(rc, 0xCD)) {
+        return 0;
+    }
+    int sign = fn_803A0EBC(rc) * -2 + 1;
+    if (!fn_803A0E18(rc, 0xAB)) {
+        return sign << (3 - fn_803A0E18(rc, 0x53));
+    }
+    if (!fn_803A0E18(rc, 0xC7)) {
+        if (fn_803A0E18(rc, 0x8C)) {
+            return sign * 12;
+        }
+        if (fn_803A0E18(rc, 0x7D)) {
+            return sign << 4;
+        }
+        if (fn_803A0E18(rc, 0x68)) {
+            return sign * 20;
+        }
+        return sign * 24;
+    }
+    return (sign * fn_8039EF84(rc, 7)) << 2;
+}
+
+/* near-miss: 82 vs 84 insns; the original code keeps separate copies of the two table base pointers. */
+void fn_8039CD38(Vp6Ctx* c)
+{
+    Vp6Rc* rc = &c->m150;
+    int i;
+    int j;
+    for (i = 0; i <= 2; i++) {
+        if (fn_803A0E18(rc, 0xAE)) {
+            int idx = fn_8039EF84(rc, 4);
+            const unsigned char* src = lbl_80608678 + (idx * 0x14 + i * 0x140);
+            for (j = 0; j < 10; j++) {
+                c->m72C[i].b[j] = src[j * 2];
+                c->m72C[i].a[j] = src[j * 2 + 1];
+            }
+        }
+        if (fn_803A0E18(rc, 0xFE)) {
+            for (j = 0; j <= 9; j++) {
+                int v = fn_8039CC38(c) + c->m72C[i].b[j];
+                if (v >= 0) {
+                    if (v > 255) v = 255;
+                    c->m72C[i].b[j] = v;
+                } else {
+                    c->m72C[i].b[j] = 0;
+                }
+                v = fn_8039CC38(c) + c->m72C[i].a[j];
+                if (v >= 0) {
+                    if (v > 255) v = 255;
+                    c->m72C[i].a[j] = v;
+                } else {
+                    c->m72C[i].a[j] = 0;
+                }
+            }
+        }
+    }
+    fn_8039C980(c);
 }
 
 /* near-miss: callee-saved registers are allocated in a different order (stride r28, rows r30 in the original code). */
@@ -156,7 +230,7 @@ int fn_8039EF48(void* ctx)
     return r;
 }
 
-int fn_8039EF84(Vp6BitReader* br, int n)
+int fn_8039EF84(Vp6Rc* br, int n)
 {
     int v = 0;
     for (int i = n - 1; i >= 0; i--) {
@@ -193,6 +267,46 @@ void fn_8039EFD4(Vp6Ctx* c)
     c->m6F0 = 0;
 }
 
+int fn_8039F0C0(Vp6Ctx* c)
+{
+    fn_8039EFD4(c);
+    c->m0 = fn_803985F4(0x320, 0);
+    if (c->m0 != 0) {
+        c->m4 = ((int)c->m0 + 0x1F) & ~0x1F;
+        c->m118 = fn_803985F4(c->m1F8 * 16 + 0xA0, 0);
+        if (c->m118 != 0) {
+            c->m10C = ((int)c->m118 + 0x1F) & ~0x1F;
+            c->m11C = fn_803985F4(((c->m1F8 << 3) & ~0xF) + 0xA0, 0);
+            if (c->m11C != 0) {
+                c->m110 = ((int)c->m11C + 0x1F) & ~0x1F;
+                c->m120 = fn_803985F4(((c->m1F8 << 3) & ~0xF) + 0xA0, 0);
+                if (c->m120 != 0) {
+                    c->m114 = ((int)c->m120 + 0x1F) & ~0x1F;
+                    c->m6F8 = fn_803985F4(c->m228 + 0x20, 0);
+                    if (c->m6F8 != 0) {
+                        c->m6EC = ((int)c->m6F8 + 0x1F) & ~0x1F;
+                        c->m6FC = fn_803985F4(c->m228 + 0x20, 0);
+                        if (c->m6FC != 0) {
+                            c->m6F0 = ((int)c->m6FC + 0x1F) & ~0x1F;
+                            c->m700 = fn_803985F4(c->m228 * 4 + 0x20, 0);
+                            if (c->m700 != 0) {
+                                c->m6F4 = ((int)c->m700 + 0x1F) & ~0x1F;
+                                c->m14C = fn_803985F4(c->m1FC * 4 + 0x20, 0);
+                                if (c->m14C != 0) {
+                                    c->m148 = ((int)c->m14C + 0x1F) & ~0x1F;
+                                    return 1;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fn_8039EFD4(c);
+    return 0;
+}
+
 void fn_8039F264(Vp6Ctx* c)
 {
     if (c->m248) fn_80398614(c->m248);
@@ -227,6 +341,64 @@ int fn_8039F2EC(Vp6Ctx* c, int n)
     }
     fn_8039F264(c);
     return 0;
+}
+
+/* near-miss: 28 slots; same instruction count, the flag/total temporaries get other callee-saved registers. */
+int fn_8039F3A8(Vp6Ctx* c)
+{
+    if (c->m1A8 != 0) {
+        fn_8039733C(c, 1, c->m1A8);
+    }
+    unsigned w, h, pw, ph, cols, rows, mbs, ysize, lsize, q, total;
+    w = c->m1B0.m0;
+    h = c->m1B0.m4;
+    pw = w + 0x60;
+    ph = h + 0x60;
+    cols = w / c->m1B0.m10;
+    rows = h / c->m1B0.m14;
+    mbs = rows * cols;
+    ysize = pw * ph;
+    lsize = w * h;
+    q = ysize / 4;
+    total = ysize + q * 2;
+    c->m1B0.m8 = pw;
+    c->m1B0.mC = (int)pw / 2;
+    c->m210 = 0;
+    c->m21C = 0;
+    c->m1F8 = cols;
+    c->m1F4 = rows;
+    c->m1FC = mbs * 3 / 2;
+    c->m200 = mbs;
+    c->m204 = mbs / 4;
+    c->m1EC = lsize;
+    c->m1F0 = lsize / 4;
+    c->m208 = ysize;
+    c->m20C = q;
+    c->m214 = lsize;
+    c->m218 = lsize + lsize / 4;
+    c->m220 = ysize;
+    c->m224 = ysize + q;
+    c->m22C = (h >> 4) + 6 + ((h & 0xF) != 0);
+    c->m230 = (w >> 4) + 6 + ((w & 0xF) != 0);
+    c->m228 = c->m22C * c->m230;
+    for (int i = 0; i < 12; i++) {
+        c->m6A8[i] = lbl_80608AC8[i * 2] * c->m230 + lbl_80608AC8[i * 2 + 1];
+    }
+    fn_80396114(c->m298, &c->m1B0);
+    if (!fn_8039F0C0(c)) {
+        return 0;
+    }
+    if (!fn_8039F2EC(c, total)) {
+        fn_8039EFD4(c);
+        return 0;
+    }
+    if (c->m264 == 0 && c->m23C != 0) {
+        if (c->m1B0.m0 != c->m23C || c->m1B0.m4 != c->m240) {
+            c->m268 = fn_803985F4((((c->m23C + 0x20) * ((c->m240 + 0x20) * 3)) >> 1) + 0x20, 0);
+            c->m264 = ((int)c->m268 + 0x1F) & ~0x1F;
+        }
+    }
+    return 1;
 }
 
 void fn_8039F5BC(Vp6Ctx* c)

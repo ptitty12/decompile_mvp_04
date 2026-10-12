@@ -17,6 +17,18 @@ struct Vp6Allocator {
     virtual void Free(void* p, int flags);
 };
 
+/* Probability pair table: two 10-entry rows per entry (fn_8039CD38). */
+struct Vp6Tab {
+    unsigned char a[10];
+    unsigned char b[10];
+};
+
+/* Range (bool) decoder state: range, value, bit counter, byte position and buffer. */
+struct Vp6Rc {
+    int m0, m4, m8, mC, m10;
+    const unsigned char* m14;
+};
+
 struct Vp6Ctx;
 struct Vp6SubB;
 struct Vp6Tbl;
@@ -131,13 +143,32 @@ struct Vp6Ctx {
     char pad140[0x8];
     int m148;
     void* m14C;
-    char pad150[0x50];
+    Vp6Rc m150;
+    char pad168[0x38];
     int m1A0;
     int m1A4;
     int m1A8;
     char pad1AC[0x4];
     Vp6Params m1B0;
-    char pad1E8[0x4C];
+    char pad1E8[0x4];
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+    int m200;
+    int m204;
+    int m208;
+    int m20C;
+    int m210;
+    int m214;
+    int m218;
+    int m21C;
+    int m220;
+    int m224;
+    int m228;
+    int m22C;
+    int m230;
     int m234;
     int m238;
     int m23C;
@@ -164,14 +195,18 @@ struct Vp6Ctx {
     int m290;
     void* m294;
     Vp6Buf* m298;
-    char pad29C[0x450];
+    char pad29C[0x40C];
+    int m6A8[12];
+    char pad6D8[0x14];
     int m6EC;
     int m6F0;
     int m6F4;
     void* m6F8;
     void* m6FC;
     void* m700;
-    char pad704[0x4238];
+    char pad704[0x28];
+    Vp6Tab m72C[3];
+    char pad768[0x41D4];
     int m493C;
     int m4940;
     int m4944;

@@ -14,11 +14,6 @@ struct Vp6TapPair {
 };
 extern const Vp6TapPair lbl_8062453C[];
 
-struct Vp6Rc {
-    int m0, m4, m8, mC, m10;
-    const unsigned char* m14;
-};
-
 /* Plane copy descriptor (fn_8039894C): luma rows/stride, then chroma. */
 struct Vp6Planes {
     int m0, m4, m8, mC, m10, m14;
