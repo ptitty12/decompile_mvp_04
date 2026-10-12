@@ -100,7 +100,7 @@ extern "C" unsigned char fn_8009FDE0(Unk8009FDE0* p, int ch, unsigned idx)
 {
     unsigned char r = 0;
     if (idx < p->m1C) {
-        switch (ch) {
+        switch ((unsigned)ch) {
         case 0:
             r = p->m24[idx * 4];
             break;
@@ -122,6 +122,61 @@ extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
 
 extern "C" void fn_8009FE64(int a, int b, int c, char* out) { fn_8040B61C(out, lbl_80619308); }
+
+struct Unk8009FE90_Obj {
+    virtual float M(int a);
+};
+typedef float (Unk8009FE90_Obj::*Unk8009FE90_Pmf)(int);
+extern Unk8009FE90_Pmf lbl_805B6DD8[];
+
+extern "C" float fn_8009FE90(Unk8009FE90_Obj* o, int i, int a)
+{
+    return (o->*lbl_805B6DD8[i])(a);
+}
+
+extern "C" void fn_8009FF20(Unk8009FDE0* p, int ch, unsigned idx, int v)
+{
+    if (idx < p->m1C) {
+        switch ((unsigned)ch) {
+        case 0: {
+            int b = (int)p->m24;
+            unsigned char* q = (unsigned char*)(idx * 4 + b);
+            if (v <= 255) {
+                if (v < 0)
+                    v = 0;
+                q[0] = v;
+            } else
+                q[0] = 255;
+            break;
+        }
+        case 1: {
+            unsigned char* q = (unsigned char*)(idx * 4 + (int)p->m24);
+            if (v <= 255) {
+                if (v < 0)
+                    v = 0;
+                q[1] = v;
+            } else
+                q[1] = 255;
+            break;
+        }
+        case 2: {
+            unsigned char* q = (unsigned char*)(idx * 4 + (int)p->m24);
+            if (v <= 255) {
+                if (v < 0)
+                    v = 0;
+                q[2] = v;
+            } else
+                q[2] = 255;
+            break;
+        }
+        case 3: {
+            unsigned char* q = (unsigned char*)(idx * 4 + (int)p->m24);
+            q[3] = v > 255 ? 255 : (v < 0 ? 0 : v);
+            break;
+        }
+        }
+    }
+}
 
 extern "C" void fn_800A001C() {}
 
@@ -171,48 +226,30 @@ extern "C" float fn_800A02EC(Unk800A0020* p, int idx)
     return a + b;
 }
 
-extern const float lbl_805B5DB0;
-
 extern "C" float fn_800A03B0(Unk800A0020* p, int idx)
 {
     float a = p->v7(0, idx);
     float b = p->v7(1, idx);
     float s = a + b;
-    float r;
-    if (!(s <= lbl_805B5DB0))
-        r = a / s;
-    else
-        r = lbl_805B5DB0;
+    float r = !(s <= 0.0f) ? a / s : 0.0f;
     return r;
 }
-
-extern const float lbl_805B5DC0;
 
 extern "C" float fn_800A0460(Unk800A0020* p, int idx)
 {
     float a = (float)p->v5(0, idx);
     float b = (float)p->v5(1, idx);
     float s = a + b;
-    float r;
-    if (!(s <= lbl_805B5DC0))
-        r = a / s;
-    else
-        r = lbl_805B5DC0;
+    float r = !(s <= 0.0f) ? a / s : 0.0f;
     return r;
 }
-
-extern const float lbl_805B5DD0;
 
 extern "C" float fn_800A0554(Unk800A0020* p, int idx)
 {
     float a = (float)p->v5(2, idx);
     float b = (float)p->v5(3, idx);
     float s = a + b;
-    float r;
-    if (!(s <= lbl_805B5DD0))
-        r = a / s;
-    else
-        r = lbl_805B5DD0;
+    float r = !(s <= 0.0f) ? a / s : 0.0f;
     return r;
 }
 
@@ -267,6 +304,30 @@ extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
 
 extern "C" void fn_800A0810(int a, int b, int c, char* out) { fn_8040B61C(out, lbl_80619308); }
+
+extern "C" void fn_800A08C8(Unk8009FDE0* p, int ch, unsigned idx, int v)
+{
+    if (idx < p->m1C) {
+        switch ((unsigned)ch) {
+        case 0: {
+            int b = (int)p->m24;
+            unsigned short* q = (unsigned short*)(idx * 4 + b);
+            if (v <= 65535) {
+                if (v < 0)
+                    v = 0;
+                q[0] = v;
+            } else
+                q[0] = 65535;
+            break;
+        }
+        case 1: {
+            unsigned short* q = (unsigned short*)(idx * 4 + (int)p->m24);
+            q[1] = v > 65535 ? 65535 : (v < 0 ? 0 : v);
+            break;
+        }
+        }
+    }
+}
 
 extern "C" void fn_800A0954() {}
 
@@ -324,6 +385,27 @@ extern "C" void fn_800A0AF4(void* p, int c)
     fn_800A1164(p);
     if (c & 1)
         fn_80377408(p);
+}
+
+extern "C" void fn_80328374(void* p, int c);
+extern const char lbl_80649F20[];
+struct Unk800A14B8 {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[0xC];
+    int* m28;
+};
+
+extern "C" void fn_800A14B8(Unk800A14B8* p, int c)
+{
+    p->m18 = lbl_80649F20;
+    fn_800A1164((char*)p + 0x2C);
+    if (p->m28) {
+        delete p->m28;
+        p->m28 = 0;
+    }
+    fn_800A0AF4((char*)p + 0x2C, 2);
+    fn_80328374(p, c);
 }
 
 extern "C" void fn_800A13A4(void* p);
