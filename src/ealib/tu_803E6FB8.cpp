@@ -28,6 +28,26 @@ extern "C" void* fn_803E9F50(void* p, int a, int* count);
 extern "C" void fn_803EA08C(void* p);
 extern "C" void fn_803EDA0C(void* menu, int a);
 
+struct Unk803E9994_Ent {
+    int m0;
+    const char* m4;
+    int m8;
+    int mC;
+    Unk803E9994_Ent()
+    {
+        m0 = 0;
+        m8 = 0;
+    }
+};
+
+struct Unk803E9994_Hdr {
+    char pad0[0x10];
+    int m10;
+};
+
+extern "C" Unk803E9994_Ent fn_803E92E8(Unk803E9994_Hdr** c, int i);
+extern "C" int strcmp(const char* a, const char* b);
+
 extern "C" void fn_803E6FB8(void* a, void* b)
 {
     fn_803ED634(b, a, 0);
@@ -135,6 +155,54 @@ extern "C" void fn_803E73F4(int v)
     lbl_8062C674 = v;
 }
 
+struct Unk803E7E88_Obj {
+    Unk803E7008_Ent* m0;
+    int m4;
+    int* m8;
+};
+
+extern Unk803E7008_Pair lbl_806AAB80;
+extern char lbl_8060D220[];
+extern void* (*lbl_8062C668)(int size, const char* tag);
+extern "C" int fn_803E9978(Unk803E7008_Ent** pp);
+
+extern "C" void fn_803E7E88(Unk803E7E88_Obj* c)
+{
+    int cnt = 0;
+    int i = 0;
+    int n = fn_803E9978(&c->m0);
+    for (; i < n; i++) {
+        Unk803E9994_Ent e = fn_803E92E8((Unk803E9994_Hdr**)c, i);
+        if (e.mC != 0 && fn_803E70F4(&lbl_806AAB80, (int)e.m4) != 0)
+            cnt++;
+    }
+    if (cnt > 0) {
+        int size = cnt * 8;
+        cnt = 0;
+        int j = 0;
+        c->m8 = (int*)lbl_8062C668(size, lbl_8060D220);
+        if (cnt < n) {
+            int off = 0;
+            do {
+                Unk803E9994_Ent e = fn_803E92E8((Unk803E9994_Hdr**)c, j);
+                if (e.mC != 0) {
+                    void* fp = fn_803E70F4(&lbl_806AAB80, (int)e.m4);
+                    if (fp != 0) {
+                        cnt++;
+                        int v = (int)fn_803E7128(&lbl_806AAB80, (int)e.m4);
+                        ((void (*)(int, Unk803E7E88_Obj*, int))fp)(e.m8, c, e.m0);
+                        *(int*)(off + (int)c->m8) = v;
+                        *(int*)(off + (int)c->m8 + 4) = e.m8;
+                        off += 8;
+                    }
+                }
+                j++;
+            } while (j < n);
+        }
+    }
+    c->m4 = cnt;
+}
+
 struct Unk803E945C_Ent {
     int m0;
     int m4;
@@ -208,7 +276,6 @@ extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
 }
 
 /* Static initializer / destructor for lbl_806AAB6C, lbl_806AAB80 and lbl_806AABA8 (single element, two pairs). */
-extern Unk803E7008_Pair lbl_806AAB80;
 extern Unk803E7008_Pair lbl_806AABA8;
 extern "C" void fn_803EA068(void* p);
 
@@ -384,26 +451,6 @@ extern "C" int fn_803E9978(Unk803E7008_Ent** pp)
         return 0;
     return e->m10;
 }
-
-struct Unk803E9994_Ent {
-    int m0;
-    const char* m4;
-    int m8;
-    int mC;
-    Unk803E9994_Ent()
-    {
-        m0 = 0;
-        m8 = 0;
-    }
-};
-
-struct Unk803E9994_Hdr {
-    char pad0[0x10];
-    int m10;
-};
-
-extern "C" Unk803E9994_Ent fn_803E92E8(Unk803E9994_Hdr** c, int i);
-extern "C" int strcmp(const char* a, const char* b);
 
 inline int Unk803E9994_Count(Unk803E9994_Hdr** c)
 {
