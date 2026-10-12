@@ -101,7 +101,14 @@ int fn_801BFAF8(const Vec3* v);
 void fn_801B9880(B* b, P* q);
 void fn_801B7FF8(P* p);
 void fn_801BB0C8(A* a);
+void fn_801BDE24(B* b, P* p);
+void fn_801BDE58(B* b, P* p, int z);
+int fn_8017E1E0(int h, P* p, P* q);
+int fn_801BDD18(A* a, P* q);
+void fn_801BB668(A* a, P* q);
 }
+struct Unk8024EF40_P;
+void fn_80252588(Unk8024EF40_P* p, int n);
 
 
 
@@ -347,6 +354,38 @@ extern "C" void fn_801BB544(A* a, int flag)
 }
 
 extern "C" void fn_801BB65C(A* a) { a->m1C = 1; }
+
+extern const Vec3 lbl_806055AC;
+inline int Unk801BB800_M4A4(P* p) { return *(int*)((char*)p + 0x4A4); }
+extern "C" void fn_801BB800(A* a, int kind, P* p, P* q, int x)
+{
+    if (p == a->m14->m6CC) {
+        if (kind == 1) {
+            fn_801BDDC8(a->m8, p);
+        } else if (kind == 0 || kind == 2) {
+            if (p->m38C == 1 && Unk801BB800_M4A4(p) >= 0) {
+                int k = q->m458;
+                if (k == 9) {
+                    if (fn_8017E1E0(a->m10, p, q) == 0) {
+                        fn_80252588((Unk8024EF40_P*)q, x);
+                        fn_801BDE24(a->m8, p);
+                        fn_801BDE58(a->m8, p, 0);
+                    } else {
+                        fn_801BB668(a, q);
+                    }
+                } else if ((unsigned)(k - 10) <= 2 && fn_801BDD18((A*)a->m8, p)) {
+                    fn_801BB668(a, q);
+                } else {
+                    Vec3 v = lbl_806055AC;
+                    fn_801BDB84(a->m8, p, 1, 0, &v);
+                }
+            }
+        } else if (kind == 3) {
+            Vec3 v = lbl_806055AC;
+            fn_801BDB84(a->m8, p, 1, 0, &v);
+        }
+    }
+}
 
 extern "C" void fn_801BB988(A* a) { a->m24 = 0; }
 
