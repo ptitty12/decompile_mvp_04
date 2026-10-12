@@ -87,8 +87,8 @@ int fn_8033E958(const char* fmt, ...);
 char* fn_8040B8FC(const char* s, int c);
 int fn_802AF6F8(Mgr* m, char* buf, int flag);
 void fn_802B7C50(void* p);
-void fn_802C40BC(void* p);
-void fn_802C40DC(void* p);
+void fn_802C40BC(void* p, void* a);
+void fn_802C40DC(void* p, void* a);
 void* fn_80086140(void* x, char* buf);
 void* fn_8014EB44(void* x);
 void fn_8014EC24(void* x, char* buf);
@@ -215,19 +215,17 @@ void fn_802AE42C(Mgr* m)
     fn_802B7C50((char*)m + 8);
 }
 
-/* near-miss: retail copies x to r30 before forming m+0x11F78 (mr/addis swapped) */
 void fn_802AE474(Mgr* m, void* x)
 {
     char buf[16];
-    fn_802C40BC((char*)m + 0x11F78);
+    fn_802C40BC((char*)m + 0x11F78, x);
     fn_8014EC24(fn_8014EB44(fn_80086140(x, buf)), buf);
 }
 
-/* near-miss: same swap as fn_802AE474 */
 void fn_802AE4C0(Mgr* m, void* x)
 {
     char buf[16];
-    fn_802C40DC((char*)m + 0x11F78);
+    fn_802C40DC((char*)m + 0x11F78, x);
     fn_8014EC5C(fn_8014EB44(fn_80086140(x, buf)), buf);
 }
 
