@@ -111,9 +111,9 @@ public:
     virtual void v82();
     virtual void v83();
     virtual void v84(int a, int b);
-    virtual void v85();
-    virtual void v86();
-    virtual void v87();
+    virtual int v85();
+    virtual int v86();
+    virtual int v87();
     virtual int v88(int a);
     virtual void v89();
     virtual void v90();

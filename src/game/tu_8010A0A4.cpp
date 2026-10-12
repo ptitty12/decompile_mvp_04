@@ -3,6 +3,18 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800F1AEC.h"
+struct Ui10DD24 : UiObj {
+    char pad40[0x13C - 0x40];
+    UiObj* m13C;
+    int m140;
+    char pad144[0x148 - 0x144];
+    UiObj* m148;
+    UiObj* m14C;
+    char pad150[0x168 - 0x150];
+    int m168;
+    int a16C[25];
+    int a1D0[25];
+};
 struct Ui198Obj : UiObj {
     char pad40[0x198 - 0x40];
     int m198;
@@ -706,5 +718,44 @@ void fn_8010DC5C(UiV_140i_148_14C* self, int a)
     } else {
         self->m148->v14(0);
         self->m14C->v14(0);
+    }
+}
+
+void fn_8010DD24(Ui10DD24* self)
+{
+    Ui6F8* p = fn_8011AA24(0)->m6F8;
+    switch (self->m140) {
+    case 0:
+    case 2:
+        if (!(self->m148->m24 & 0x10000000) && (self->m24 & 0x40000000))
+            self->m148->v14(1);
+        self->m14C->v14(0);
+        if (self->m13C != 0 && self->m13C->m24 < 0 && self->m13C->v85() == 0 && self->m13C->v86() != 0) {
+            char* a = (char*)self->a16C;
+            int off = self->m148->v60() * 4;
+            if (*(int*)(a + off) != self->m13C->v86())
+                fn_801268C4(self->m13C, p, self->m168, UiIntAt(a, self->m148->v60()), 5, 0, 1, 1, fn_8010D258, 0, 1, 0, 1, 0, 0);
+            if (UiIntAt(a, self->m148->v60()) == 0)
+                self->m148->v16(1);
+        }
+        break;
+    case 1:
+        if (!(self->m14C->m24 & 0x10000000) && (self->m24 & 0x40000000))
+            self->m14C->v14(1);
+        self->m148->v14(0);
+        if (self->m13C != 0 && self->m13C->m24 < 0) {
+            int r = self->m13C->v85();
+            if (r == 1) {
+                if (self->m13C->v87() != 0) {
+                    char* a = (char*)self->a1D0;
+                    int off = self->m14C->v60() * 4;
+                    if (*(int*)(a + off) != self->m13C->v87())
+                        fn_801268C4(self->m13C, p, 5, 0, self->m168, UiIntAt(a, self->m14C->v60()), 1, 1, fn_8010D258, 0, 1, 0, 1, 0, 0);
+                    if (UiIntAt(a, self->m14C->v60()) == 0)
+                        self->m14C->v16(1);
+                }
+            }
+        }
+        break;
     }
 }
