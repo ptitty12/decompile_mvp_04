@@ -445,7 +445,6 @@ FxSing* fn_80329988() {
     return lbl_80620304;
 }
 
-/* near-miss: tail shape */
 void fn_803299D4(FxSing* self) {
     if (self->m4) {
         if (fn_80329AE4((void*)self->m4) && *(int*)self->m4 != 0xB) {
@@ -555,7 +554,9 @@ int fn_80329E50() {
     return 1;
 }
 
-/* near-miss: loop structure and registers match; retail stores the three result fields straight into the stack slot, ours goes through an address register (addi r9,r1,8) */
+/* The result record is a local with a trivial destructor (BLKmode): its fields are stored straight into the frame
+   slot, as retail does; a plain FxDate local goes through an address register. */
+struct FxDateL { unsigned a : 8; unsigned b : 8; unsigned c : 16; ~FxDateL() {} };
 FxDate fn_80329FA0(char* p) {
     int days = (int)p;
     if (days <= 0) return *(FxDate*)&lbl_80691AF0;
@@ -586,11 +587,11 @@ FxDate fn_80329FA0(char* p) {
         int t = m + 1;
         m = t - t / 12 * 12;
     }
-    FxDate d;
+    FxDateL d;
     d.b = days;
     d.a = m + 1;
     d.c = y16;
-    return d;
+    return *(FxDate*)&d;
 }
 
 FxMS fn_8032A0C0(int t) {
