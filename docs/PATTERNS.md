@@ -718,6 +718,86 @@ Matched 17 functions in 7 units with these recipes. Each recipe is one source ch
   - Retail has the spill one slot later. In sched1 it was issued after
     `lwz r11` and before `lwz r0`.
 
+## Hard-case families 3 (Opus, 2026-10-11)
+
+Matched 23 functions in 7 units, and cut one near-miss from 10 to 6 slots. Each recipe is one
+source change.
+
+### Two vptr stores in a row: why retail keeps the first (widget ctors, 16 functions)
+- Dead stores to memory are deleted by flow (life_analysis), twice: once
+  before sched1 and again after reload (flow2). Going backwards through a
+  block it keeps a list of stored MEMs and drops a store when the same address
+  is stored again later. An entry leaves the list when, in between, there is
+  - a read that may alias it (anti_dependence),
+  - a store that may alias it (output_dependence), or
+  - a call or a block boundary.
+- Writing the base ctor out by hand loses the first store: the 0.0f literal is
+  an unchanging MEM, so sched1 hoists its load above the root vptr store, and
+  flow2 then sees nothing between the two vptr stores.
+- Recipe A (root ctor as an inline): `FxRootInit(self)` in
+  include/game/tu_80317B88.h stores lbl_80666EC0, then `m4 = m0 = 0.0f`.
+  - A constant-pool read copied by the inliner is a plain `(mem:SF (lo_sum ..))`,
+    without the unchanging flag.
+  - sched1 cannot move it above the vptr store, and flow2 sees a read that may
+    alias between the two stores.
+  - The literal is still CSE'd across later calls through its REG_EQUAL note,
+    so retail's single `lfs f31` survives.
+  - Mid level: `FxWidInit(self, name)` = root, vptr lbl_80666E70, `mC = 0`,
+    fn_8032D868. Matched fn_8032ECD8, fn_8032F120, fn_8032F19C, fn_8032F38C,
+    fn_8032F428, fn_8032F4CC, and 9 ctors in tu_8032AC58.
+- Recipe B (sub-object ctor as an inline): when a sub-object at a nonzero
+  offset is initialised between the two stores, write its init as an inline
+  that takes the sub-object pointer (`FESub10Init((FESub10*)((char*)o + 0x10))`).
+  - Its stores keep their own base register (`stw r11,12(r8)` with
+    r8 = o + 0x10). CSE folds only offset-0 stores back to `o + 0x10`.
+  - flow cannot prove the `r8`-based stores disjoint from `o + 0xC`, so the
+    earlier `mC` store stays. Matched fn_800AEA68.
+- Tell: retail has `stw <vtA>,8(rX) ... stw <vtB>,8(rX)` with no call between,
+  and an `lfs` of a per-function 0.0f (or a store through another base
+  register) between them.
+- Scanner: `scratchpad/W8o/vfam.py <repo>` lists every function with two
+  vtable stores to the same slot and no call between them, with its match
+  status. About 40 more of these (root lbl_80649DA0, UI units 0x800F..0x802F)
+  are not done yet.
+
+### Inline-argument recipes found on the same ctors
+- By-value struct argument for a setter call (`fn_8032E088(self, &tmp)`):
+  - Retail copies the pair or triple to `8(r1)`/`12(r1)` right at the call.
+  - Pass it through an inline that takes the struct by value
+    (`FxPairSet(self, self->m5C)`), or copy it inside the inline body
+    (`FxTripSet`: `FxInt3 v = self->m60; fn_8032E344(self, &v);`).
+  - Taking `&param` of the ctor's own by-value parameter spills it at entry
+    instead. Matched fn_8032DC2C, DD00, E0B4 and E1DC.
+- Callback or pointer arguments that retail keeps in callee-saved registers
+  across the item's name call (`lis r29,fn_80332930` before
+  `bl fn_8032D868`) are inline parameters. `ButtonInit(it, name, cb)` and
+  `SubInit(it, name, sub, p)` matched fn_80332978. It had been parked at
+  150 vs 152 instructions, with one callee-saved register short.
+- A string or literal byte read from an inline stays after the surrounding
+  stores (`FxRecName(this, lbl_805E7988)`, __5FxRec). It is not unchanging,
+  for the same reason as Recipe A.
+
+### Callee returns `this`: declare it (3-arg item ctor calls, 4 functions)
+- Tell: `li r5,0` comes before `mr r3,<item>` in retail, ours is the other way
+  round, and the callee ends with `mr r3,r30; ... blr`.
+- Recipe: declare the callee as returning a pointer. That covers fn_8032F120,
+  fn_8032F428, fn_8032FAB0 and fn_8032ECD8 (all ctors that return self).
+  It is the same sched rule as "the callee's return type changes sched2"
+  (Hard-case families 2).
+- Matched fn_80331DB8, fn_80332DBC and fn_80333A70. fn_8033C490 went from 10
+  to 6 slots; the rest is loop giv order.
+
+### Small ctor orders
+- `FxS::FxS(int)`: store the vptr first (`m8; m4; m0`). That gives retail's
+  this/vtable register pair.
+- `FxU::FxU() : m0(-1), m4(-1) {}` stores m4 first. `m4 = m0 = -1;` does too.
+- __5FxRec: stores in ascending order, plus the inline name byte above.
+
+### Not reached this round
+- Dead-cmpwi switch family (about 20 functions) and the sched1 constant-set
+  hoisting in fn_800E9074: not attempted. The mechanism notes in Hard-case
+  families 2 still stand.
+
 ## Ranges 10-19 recipes (2026-10-11, condensed from worker reports)
 
 Literals and constants
