@@ -12,7 +12,7 @@ struct DtorAt0 { const void* m; };
 /* Slot pools of a gamelib object: two arrays of 15 slots (0x14 bytes each), at +0x1C and
  * +0x148; bit 3 of the flags argument selects the second. Evidence: fn_80387E28 zeroes m0 of
  * 15 slots from +0x1C or +0x148; fn_80387EEC claims the first slot with m4 == 0. */
-struct GlSlot { int m0; int m4; int m8; int mC; int m10; };
+struct GlSlot { int m0; int m4; int m8; int mC; union { int m10; float m10f; }; };
 
 struct GlCb {
     virtual void v1(int, int, int);
@@ -26,12 +26,18 @@ struct GlPool {
     char pad14[0x1C - 0x14];
     GlSlot a1C[15];
     GlSlot a148[15];
-    char pad274[0x288 - 0x274];
+    char pad274[0x284 - 0x274];
+    float m284;
     char m288;
     char m289;
 };
 
 extern GlCb* lbl_80624278;
+
+struct GlV3 {
+    float x, y, z;
+};
+extern "C" void fn_803895A4(void* self, char* a, float* out, float f0, float f1);
 
 extern "C" void fn_80387E28(GlPool* self, int flags)
 {
@@ -102,6 +108,187 @@ extern "C" void fn_80388020(GlPool* self, int flags)
     self->m288 = 0;
 }
 
+struct GlBig {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual int v14();
+    virtual int v15();
+    virtual void v16();
+    virtual int v17();
+    virtual int v18();
+};
+
+struct GlBufs {
+    char* m0;
+    char* m4;
+    char* m8;
+};
+extern GlBufs lbl_806242D4;
+extern "C" void* fn_803FFA60(void* d, const void* s, int n);
+
+extern "C" void fn_8038806C(GlPool* self, int flags)
+{
+    fn_80387E58(self, flags);
+    if ((flags & 8) && self->m288 != 0) {
+        int a = ((GlBig*)lbl_80624278)->v18();
+        int b = ((GlBig*)lbl_80624278)->v17();
+        if (self->m288 & 1) {
+            int n = a * 0x30;
+            fn_803FFA60(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
+            fn_803FFA60(lbl_806242D4.m0 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
+        }
+        if (self->m288 & 2) {
+            int n = a * 0x30;
+            fn_803FFA60(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v15() * 0x30, lbl_806242D4.m8, n);
+            fn_803FFA60(lbl_806242D4.m4 + ((GlBig*)lbl_80624278)->v14() * 0x30, lbl_806242D4.m8 + n, b * 0x30);
+        }
+    }
+}
+
+struct GlEntry {
+    char pad0[4];
+    char* m4;
+    char pad8[8];
+    float m10;
+    float m14;
+    float m18;
+    char pad1C[0x68 - 0x1C];
+};
+
+extern float lbl_80605DA8;
+extern "C" void fn_80388490(GlPool* self, int flags, GlEntry* arr, int n, int* out);
+
+/* near-miss: 57/59 slots; retail loads the compare operand f1 (stack reload) before the zero constant f13, ours the reverse */
+extern "C" void fn_8038871C(GlPool* self, GlEntry* arr, int n, int flags)
+{
+    if (n != 0) {
+        GlSlot* b = (flags & 8) ? self->a148 : self->a1C;
+        int idx[8];
+        fn_80388490(self, flags, arr, n, idx);
+        for (int i = 0; i < n; i++) {
+            int k = idx[i];
+            float f = lbl_80605DA8;
+            if (k >= 0)
+                f = b[k].m10f;
+            else
+                f = self->m284;
+            char* a = arr[i].m4;
+            arr[i].m14 = arr[i].m10;
+            if (!(f <= lbl_80605DA8))
+                fn_803895A4(self, a, &arr[i].m10, f, arr[i].m18);
+        }
+    }
+}
+
+struct GlV11 {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual int v11();
+};
+
+struct GlF2 {
+    float m0;
+    float m4;
+};
+
+struct GlV12 {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual GlF2* v12();
+    virtual void v13();
+    virtual GlF2* v14();
+    virtual void v15(GlV3* p);
+    virtual void v16(float f);
+};
+
+struct GlOwner18 {
+    char pad0[0x18];
+    GlV12* m18;
+};
+
+extern float lbl_80605DD0;
+
+static inline void CopyV3(GlV3* d, const GlV3* s)
+{
+    d->x = s->x;
+    d->y = s->y;
+    d->z = s->z;
+}
+
+struct Gl8035Vec3 {
+    float x, y, z;
+};
+extern Gl8035Vec3 lbl_806055AC;
+
+struct Unk80379324 {
+    Unk80379324();
+    float x, y, z, w;
+};
+
+struct Unk8035A618;
+extern "C" void fn_8035A618(Unk8035A618* o);
+extern "C" int fn_8035F248(int a, Unk8035A618* o);
+
+/* Local transform object (size 0x9C, vptr at +0x98; same class as in include/game/warp_b.h). */
+struct Unk8035A618 {
+    Unk8035A618() { fn_8035A618(this); }
+    virtual ~Unk8035A618() {}
+    virtual void fn_vslot2(float x, float y, float z);
+    virtual void fn_vslot3(const Gl8035Vec3& v);
+    void A() { m6C = 0; }
+    void B() { m0 = 0; }
+    void V70(const Gl8035Vec3& v) { m70 = v; }
+    void V60(const Gl8035Vec3& v) { m60 = v; }
+    int m0;
+    char pad4[0x5C];
+    Gl8035Vec3 m60;
+    int m6C;
+    Gl8035Vec3 m70;
+    Unk80379324 m7C;
+    float m8C;
+    float m90;
+    float m94;
+};
+
+extern "C" int fn_8038950C(int arg0, float f)
+{
+    Unk8035A618 t;
+    t.V60(lbl_806055AC);
+    t.B();
+    t.A();
+    t.V70(lbl_806055AC);
+    fn_8035F248(arg0, &t);
+    return arg0;
+}
+
 extern "C" void fn_803BB7A8(int a, int b, int c, int d, void* e, float f);
 extern char lbl_80699B14[];
 
@@ -137,7 +324,17 @@ extern "C" void fn_803899CC(GlPool* self, float f, int a, int b, int idx)
     fn_803BB7A8(self->m289, b, a, a, lbl_80699B14 + idx * 32, f);
 }
 
-struct GlV3 { float x, y, z; };
+extern "C" void fn_80389A1C(GlOwner18* self, char* base)
+{
+    int off = ((GlV11*)lbl_80624278)->v11() * 0x30 + 0x20;
+    GlV3 v;
+    CopyV3(&v, (GlV3*)(base + off));
+    self->m18->v16(v.y);
+    v.y = self->m18->v14()->m4;
+    GlV3 w = v;
+    self->m18->v15(&w);
+}
+
 struct GlB40 { char d[0x40]; };
 struct GlB28 { GlV3 v; char pad[0x28 - 12]; };
 
@@ -174,6 +371,17 @@ extern "C" int fn_80389B34(void* x, int a, GlV3* p1, GlV3* p2, int p3, int flags
     return 1;
 }
 
+extern "C" void fn_80389FAC(GlOwner18* self, char* base, int flag)
+{
+    int off = ((GlV11*)lbl_80624278)->v11() * 0x30 + 0x20;
+    GlV3 v;
+    CopyV3(&v, (GlV3*)(base + off));
+    v.x = lbl_80605DD0;
+    v.z = lbl_80605DD0;
+    if (flag != 0)
+        v.y /= self->m18->v12()->m4;
+    CopyV3((GlV3*)(base + off), &v);
+}
 
 struct GlVt13 {
     virtual void v1();
