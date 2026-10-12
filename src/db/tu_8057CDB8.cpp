@@ -130,6 +130,34 @@ public:
     unsigned char mC;
     DbPair8 m10;
 };
+
+extern const float lbl_80600008;
+extern const float lbl_8060000C;
+extern const float lbl_80600010;
+extern const float lbl_80600014;
+extern const float lbl_80600020;
+extern const float lbl_80600024;
+extern const float lbl_80600028;
+extern const float lbl_805FFFD8[5];
+extern const float lbl_805FFFEC[5];
+struct Db8057D62C_R {
+    int m0;
+    char pad4[4];
+    float m8;
+    float mC;
+    char pad10[4];
+    unsigned m14;
+    char pad18[0x1C];
+};
+struct Db8057D62C_O {
+    char pad0[0x64];
+    Db8057D62C_R r[1];
+};
+struct Db8057D62C_Sc {
+    char pad0[0x1F4];
+    float m1F4;
+    float m1F8;
+};
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_8057CDB8(DbIdList* self, int k);
 extern "C" int fn_8057CE00(int a);
@@ -141,6 +169,7 @@ extern "C" int fn_8057D0F0(int a);
 extern "C" int fn_8057D15C(int a);
 extern "C" float fn_8057D4EC(void* self, int mode);
 extern "C" void fn_8057D550(DbTop4* self);
+extern "C" float fn_8057D62C(Db8057D62C_O* o, int i, int n);
 extern "C" char* fn_8057DDB4(char* p, int i);
 extern "C" char* fn_8057DDC4(char* self, int id);
 extern "C" int fn_8057DE6C(int k);
@@ -292,6 +321,37 @@ extern "C" DB_OVERLAY void fn_8057D550(DbTop4* self)
             break;
         }
     }
+}
+
+/* near-miss: 3 slots; retail allocates the screen-term constant to f11 and the +0x1F4 load to f13 (swapped here) */
+extern "C" DB_OVERLAY float fn_8057D62C(Db8057D62C_O* o, int i, int n)
+{
+    float v8;
+    float vC;
+    float v10;
+    float v14;
+    float v18;
+    float t;
+    float v20;
+    float v24;
+    float v28;
+    float v2C;
+    float v30;
+    float v34;
+    float v38;
+    v8 = lbl_80600010 - (((float)o->r[i].m0 - lbl_80600008) * lbl_8060000C);
+    vC = lbl_80600010 - (o->r[i].mC / (((Db8057D62C_Sc*)lbl_8061930C)->m1F8 * lbl_80600014 + ((Db8057D62C_Sc*)lbl_8061930C)->m1F4));
+    v10 = (float)o->r[i].m14 * lbl_80600020;
+    v14 = o->r[i].m8 * o->r[i].m8;
+    v18 = lbl_80600024;
+    t = (float)(5 - n) * lbl_80600028;
+    v20 = lbl_805FFFD8[0] + t * (lbl_805FFFEC[0] - lbl_805FFFD8[0]);
+    v24 = lbl_805FFFD8[1] + t * (lbl_805FFFEC[1] - lbl_805FFFD8[1]);
+    v28 = lbl_805FFFD8[2] + t * (lbl_805FFFEC[2] - lbl_805FFFD8[2]);
+    v2C = lbl_805FFFD8[3] + t * (lbl_805FFFEC[3] - lbl_805FFFD8[3]);
+    v30 = lbl_805FFFD8[4] + t * (lbl_805FFFEC[4] - lbl_805FFFD8[4]);
+    v38 = v14 * v2C + (v10 * v28 + (v8 * v20 + vC * v24));
+    return v38;
 }
 
 extern "C" DB_OVERLAY char* fn_8057DDB4(char* p, int i)
