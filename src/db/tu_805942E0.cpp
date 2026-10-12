@@ -4,6 +4,8 @@
  */
 #include "game/db_80584CBC.h"
 
+extern "C" void fn_80595378(Db80593CD0_Data* self);
+
 unsigned fn_8007FBC0(Unk8007F198_C* self, int a, int c);
 extern "C" void fn_805942A8(Db80593CD0_Data* self);
 extern const char lbl_806845F8[];
@@ -40,6 +42,12 @@ extern const char lbl_80682CC8[];
 extern const char lbl_806845B0[];
 struct Db80594A10_P : Db805942E0_P { int m18; };
 extern const char lbl_806828C8[];
+extern const char lbl_80682C50[];
+extern "C" Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f);
+extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
+extern "C" void fn_805962F4(Db8058F924_L* self);
+extern const char lbl_80682878[];
+struct Db805951B8_T { char pad[0x1C]; const void* m1C; int a[6][14]; };
 
 extern "C" DB_OVERLAY Db805942E0_P* fn_805942E0(Db805942E0_P* self, Db805937A4_Mgr* m, int n, int x)
 {
@@ -218,6 +226,37 @@ extern "C" DB_OVERLAY void fn_80595044(Db805942E0_Data* self)
     }
 }
 
+extern "C" DB_OVERLAY Db805951B8_T* fn_805951B8(Db805951B8_T* self, Db805937A4_Mgr* m, int x, float f)
+{
+    fn_80593CD0((Db80593CD0_P*)self, m, 0xB, 6, x, f);
+    self->m1C = lbl_80682878;
+    for (int r = 0; r < 6; r++)
+        for (int j = 0; j < 14; j++)
+            self->a[r][j] = 0;
+    *(int*)((char*)self + 0x100) = 0x82;
+    *(int*)((char*)self + 0xD8) = 0x294;
+    *(int*)((char*)self + 0x108) = 0x82;
+    *(int*)((char*)self + 0x104) = 0x140;
+    *(int*)((char*)self + 0xD4) = 0x82;
+    *(int*)((char*)self + 0xDC) = 0xA28;
+    *(int*)((char*)self + 0x154) = 0x514;
+    *(int*)((char*)self + 0x158) = 0x3C0;
+    *(int*)((char*)self + 0x150) = 0xA28;
+    *(int*)((char*)self + 0xB4) = 0x514;
+    *(int*)((char*)self + 0xB8) = 0x79E;
+    *(int*)((char*)self + 0xBC) = 0x514;
+    *(int*)((char*)self + 0x88) = 0x3C0;
+    *(int*)((char*)self + 0x54) = 0x294;
+    fn_80595378((Db80593CD0_Data*)self);
+    fn_80594250((Db80593CD0_Data*)self, 4, 0x583C, 1, 1, 900000.0f, 1000000.0f);
+    fn_80594250((Db80593CD0_Data*)self, 3, 0x583D, 1, 1, 500000.0f, 500000.0f);
+    fn_80594250((Db80593CD0_Data*)self, 5, 0x583E, 1, 1, 800000.0f, 800000.0f);
+    fn_80594250((Db80593CD0_Data*)self, 2, 0x583F, 1, 1, 300000.0f, 300000.0f);
+    fn_80594250((Db80593CD0_Data*)self, 1, 0x5840, 1, 1, 200000.0f, 200000.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0, 0x5841, 1, 1, 200000.0f, 100000.0f);
+    return self;
+}
+
 extern "C" DB_OVERLAY void fn_80595378(Db80593CD0_Data* self)
 {
     fn_805942A8(self);
@@ -321,6 +360,40 @@ extern "C" DB_OVERLAY Db805942E0_P* fn_80595F8C(Db805942E0_P* self, Db805937A4_M
 
 extern "C" DB_OVERLAY void fn_8059603C()
 {
+}
+
+extern "C" DB_OVERLAY DbQuadTab* fn_80596040(DbQuadTab* self, Db805937A4_Mgr* m, int x)
+{
+    fn_80593CD0((Db80593CD0_P*)self, m, 9, 0x10, x, 0.0f);
+    *(const void**)((char*)self + 0x1C) = lbl_80682C50;
+    DbQuad* p = self->q;
+    int n = 0x52;
+    do {
+        p->m4 = 1;
+        p->m0 = 0;
+        p->m8 = 0;
+        p->mC = 0x10;
+        p++;
+        n--;
+    } while (n != 0);
+    fn_80594250((Db80593CD0_Data*)self, 0, 0x5847, 0x2710, 0x3E8, 2000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 1, 0x5848, 0x2710, 0x3E8, 5000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 2, 0x5849, 0x2710, 0x3E8, 3500.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 3, 0x584A, 0x2710, 0x3E8, 15000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 4, 0x584B, 0x2710, 0x3E8, 30000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 5, 0x584C, 0x2710, 0x3E8, 10000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 6, 0x584D, 0x2710, 0x3E8, 3000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 7, 0x584E, 0x2710, 0x3E8, 10000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 8, 0x584F, 0x2710, 0x3E8, 15000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 9, 0x5850, 0x2710, 0x3E8, 4000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xA, 0x5851, 0x2710, 0x3E8, 20000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xB, 0x5852, 0x2710, 0x3E8, 8000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xC, 0x5853, 0x2710, 0x3E8, 30000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xD, 0x5854, 0x2710, 0x3E8, 0.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xE, 0x5856, 0x2710, 0x3E8, 15000.0f, 0.0f);
+    fn_80594250((Db80593CD0_Data*)self, 0xF, 0x5857, 0x2710, 0x3E8, 4000.0f, 0.0f);
+    fn_805962F4((Db8058F924_L*)self);
+    return self;
 }
 
 extern "C" DB_OVERLAY void fn_805962F4(Db8058F924_L* self)
