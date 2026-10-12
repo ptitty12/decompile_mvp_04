@@ -21,6 +21,55 @@ FE_OVERLAY void fn_80498F9C(void)
     fn_800C3BE0();
 }
 
+FE_OVERLAY int fn_80499740(FeW* x)
+{
+    switch (FeI(x, 0x134)) {
+    case 0:
+        ((FeWV*)fn_800C805C(x->fn_vslot29(lbl_805F73E0)))->s41();
+        break;
+    case 1:
+        fn_800C8060(FeMem(x, 0x150)->fn_vslot32(lbl_805F7328, 0))->fn_vslot57();
+        break;
+    }
+    return 1;
+}
+
+FE_OVERLAY int fn_80499910(FeW* x)
+{
+    switch (FeI(x, 0x134)) {
+    case 0:
+        fn_800C805C(x->fn_vslot29(lbl_805F73E0))->fn_vslot39();
+        break;
+    case 1:
+        fn_800C8060(FeMem(x, 0x150)->fn_vslot32(lbl_805F7328, 0))->fn_vslot55();
+        break;
+    }
+    return 1;
+}
+
+FE_OVERLAY int fn_804999D0(FeW* x, FeW* y, int z)
+{
+    if (y == fn_800C8060(FeMem(x, 0x150)->fn_vslot32(lbl_805F7328, 0)) || y == fn_800C8060(FeMem(x, 0x150)->fn_vslot32(lbl_805F73EC, 0))) {
+        x->fn_vslot67(0, fn_800C8070((void*)z));
+    }
+    return 1;
+}
+
+FE_OVERLAY void fn_80499B08(void* x)
+{
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    FeW125084(w, 0);
+    FeW125084(w, 1);
+    FeW125084(w, 3);
+    switch (FeI(x, 0x134)) {
+    case 0:
+    case 1:
+        ((int (*)(void*, int))fn_80125128)(w, 0);
+        fn_801251CC(w, 2, 0x3FC7, 2);
+        break;
+    }
+}
+
 FE_OVERLAY FeScrL* fn_8049A1F0(FeScrL* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_8046FED8(self, a, b, c, d, e, f, g, h);
@@ -40,6 +89,24 @@ FE_OVERLAY void fn_8049A330(void* x, int a)
     } else {
         FeI(x, 0x36C) = 0;
         fn_80470F20((FeScrL*)x, a);
+    }
+}
+
+FE_OVERLAY void fn_8049A3B8(char* x)
+{
+    if (FeI(x, 0x36C) != 0) {
+        if (FeI(x, 0x338) != 0) {
+            float f = (float)(lbl_8061A328 - FeI(x, 0x35C)) * lbl_805F7448;
+            if (lbl_8061A328 > FeI(x, 0x360)) {
+                f = lbl_805F744C;
+            }
+            if (!(f <= *(float*)(x + 0x368))) {
+                *(float*)(x + 0x368) = f;
+                fn_800DC50C(FeP(x, 0x34C), *(float*)(x + 0x32C), f);
+            }
+        }
+    } else {
+        fn_80471830(x);
     }
 }
 
