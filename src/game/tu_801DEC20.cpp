@@ -12,6 +12,13 @@ typedef Unk8035B718 Tbl;
 typedef Unk80270BA0_X P;
 
 extern const Vec3 lbl_806055AC;
+extern const Vec3 lbl_806055DC;
+struct Unk80273498_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+extern const Unk80273498_Vec3 lbl_805D6790;
 extern const float lbl_805D3B3C;
 
 extern "C" {
@@ -257,6 +264,36 @@ extern "C" int fn_801E0834(I* i, P* p, Unk801DB948_Vec4* v)
     return r;
 }
 
+struct Unk8022FE34_U {
+    Vec3 fn_80235C34();
+};
+inline Vec3 Unk801E0A6C_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" Vec3 fn_801E0A6C(I* i, P* p, const void* v, int w)
+{
+    Vec3 r = lbl_806055DC;
+    if (p->m460 == 0) {
+        r = ((Unk8022FE34_U*)i->m9C->m0->m700->m3B0)->fn_80235C34();
+    } else {
+        switch (w) {
+        case 0:
+            r = Unk801E0A6C_Sub(lbl_806055AC, *(const Vec3*)v);
+            break;
+        case 1:
+            r = Unk801E0A6C_Sub(*(const Vec3*)&lbl_805D6790, *(const Vec3*)v);
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" void fn_801E11C8(I* i, Tbl* t)
 {
     if (i->m9C->m0->m6F4 == 0 && fn_801C3F00(i->m9C->m0->m700->m3A4) == 1) {
@@ -300,11 +337,6 @@ extern "C" int fn_801E1A04()
 
 /* Goal-builder family (functions that fill a goal from fn_802448F4): minimal local views of the
  * goal classes; the full layouts are in goals/*.h, which clash with this unit's headers. */
-struct Unk80273498_Vec3 {
-    float x;
-    float y;
-    float z;
-};
 struct Unk8027C728_Goal {
     Unk8027C728_Goal* m0;
     Unk8027C728_Goal* m4;
@@ -372,10 +404,9 @@ struct Unk801E1B9C_Src {
 typedef Unk801E1B9C_Src GSrc;
 extern "C" {
 Unk8027C728_Goal* fn_802448F4(P* p, int k);
-int fn_801DCC1C(P* p, const Unk80273498_Vec3* v);
+int fn_801DCC1C(P* p, const Vec3* v);
 }
 void fn_8027C728(Unk8027C728_Goal* g);
-extern const Unk80273498_Vec3 lbl_806055DC;
 
 inline Unk80273498_Vec3 GPos(const Unk80273498_Vec3* p)
 {
@@ -680,7 +711,6 @@ extern "C" Unk8027C728_Goal* fn_801E2464(void* self, P* p, GSrc* x)
 }
 
 extern const Unk80273498_Vec3 lbl_8068C7F0;
-extern const Unk80273498_Vec3 lbl_805D6790;
 inline Unk8028C6B8_Goal* Unk801E25E8_Init(Unk8027C728_Goal* g)
 {
     g->m10 = 4;
