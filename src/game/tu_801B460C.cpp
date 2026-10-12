@@ -13,6 +13,7 @@ extern float lbl_805CF6E8[];
 extern int lbl_805CF6F8[];
 void fn_801B6778(void* p);
 void fn_801B8D1C(void* p, int n);
+extern "C" void* fn_801A4910(Unk8019F8C0_Owner* o, int team, unsigned char slot);
 void fn_801B6A24(void* p)
 {
     fn_801B6778(p);
@@ -163,6 +164,9 @@ struct Unk801B6438_Obj {
     char pad0[0x58C];
     Unk801B6438_Sub m58C;
 };
+int fn_801B5F8C(Unk801AB63C_P* p);
+Unk801B6438_Obj* fn_801B6438(Unk801AB63C_P* p, int id);
+int fn_801B5EDC(Unk801AB63C_P* p, int b, int c);
 void fn_801B564C(Unk801B460C_Tbl* t);
 int fn_801B5790(Unk801B460C_Tbl* t);
 int fn_801B57EC(Unk801B460C_Tbl* t);
@@ -382,6 +386,54 @@ void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
     }
 }
 
+struct Unk801B4F14_Pair {
+    float a;
+    float b;
+};
+struct Unk801B4F14_O {
+    char pad0[0x44C];
+    int m44C;
+    char pad450[0x708 - 0x450];
+    int m708;
+    char pad70C[0xA04 - 0x70C];
+    int mA04;
+    char padA08[4];
+    char mA0C[4];
+};
+extern Unk801B4F14_Pair lbl_805CF7E0;
+extern Unk801B4F14_Pair lbl_805CF7D8;
+float fn_8024F048(char* p, int a, int b, int c, int d);
+float fn_8024F20C(char* p, int a, int b, int c, int d);
+inline float Unk801B4F14_Norm(float lo, float t, float hi)
+{
+    float span = hi - lo;
+    if (!(span <= 0.0f))
+        return (t - lo) / span;
+    return 0.0f;
+}
+inline float Unk801B4F14_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+void fn_801B4F14(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    int r = 0;
+    float x = 0.0f;
+    Unk801B4F14_O* o = (Unk801B4F14_O*)fn_801B63A0(p, q->m708);
+    if (o) {
+        x = fn_8024F048(o->mA0C, o->mA04, o->m44C, o->m708, 1) + fn_8024F20C(o->mA0C, o->mA04, o->m44C, o->m708, 1);
+    }
+    Unk801B4F14_Pair rng = lbl_805CF7E0;
+    Unk801B4F14_Pair out = lbl_805CF7D8;
+    if (!(x < rng.a)) {
+        float u = Unk801B4F14_Norm(rng.a, x, rng.b);
+        u = !(u > 1.0f) ? (u >? 0.0f) : 1.0f;
+        float res = Unk801B4F14_Lerp(out.a, u, out.b);
+        r = (int)res;
+    }
+    *acc += r;
+}
+
 void fn_801B50B4(Unk801AB63C_P* a, Unk801B23A8_Q* q, int* acc)
 {
     int r = 0;
@@ -421,6 +473,136 @@ int fn_801B51E4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
     fn_801B4E24(p, q, &s);
     fn_801B4F14(p, q, &s);
     return s;
+}
+
+int fn_801B5F8C(Unk801AB63C_P* p);
+struct Unk801B5298_T3 {
+    int v[3];
+};
+extern Unk801B5298_T3 lbl_805CF7F0;
+unsigned fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+int fn_801B5DE8(void* a, void* q, int c);
+int fn_801C1638(Unk8019F8C0_Owner* o, int i);
+int fn_801B5298(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int v = 0;
+    unsigned sc = 0;
+    int t = fn_801B5EDC(p, q->m708, 0);
+    if (fn_801B5DE8(p, q, 0) == 1)
+        sc = fn_801B2834(p, q);
+    if (sc > 0x6D) {
+        v = 0x5A;
+    } else if (sc > 0x59) {
+        v = 0x41;
+    } else if (fn_801C1870(p, t, 4) != 0) {
+        int x = sc;
+        if (x > 0x41)
+            x = 0x41;
+        v = x;
+    }
+    int d = fn_801B5FC4(p, q->m708);
+    if (d <= -4)
+        v += 0x1E;
+    else if (d <= -1)
+        v += 0x14;
+    else if (d <= 0)
+        v += 0xA;
+    else if (d > 3)
+        v -= 0xA;
+    int idx = fn_801B5F8C(p);
+    Unk801B5298_T3 tbl = lbl_805CF7F0;
+    int off = idx * 4;
+    char* tb = (char*)&tbl;
+    v += *(int*)(tb + off);
+    int ok = fn_801C1638(p->m8, 0xA);
+    int f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 5;
+    ok = fn_801C1638(p->m8, 0xB);
+    f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 0xA;
+    ok = fn_801C1638(p->m8, 0xC);
+    f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 0x14;
+    if (t <= 0)
+        v += 0x32;
+    else if (t == 1)
+        v += 0x28;
+    else if (t == 2)
+        v += 0x1E;
+    else if (t == 3)
+        v += 0xA;
+    else if (t > 5)
+        v -= 0xA;
+    return v;
+}
+int fn_801B5F8C(Unk801AB63C_P* p);
+Unk801B6438_Obj* fn_801B6438(Unk801AB63C_P* p, int id);
+int fn_801B5EDC(Unk801AB63C_P* p, int b, int c);
+/* near-miss: same code (99.4%); retail keeps p in r31 and the first out pointer in r30 (mine swaps them, 13 slots).
+ * Allocation priorities: out1 5 refs/40 insns (0.25) vs p 8 refs/99 insns (0.242). Tried: p->m8 reloads, order of
+ * declarations, inline team selector. */
+void fn_801B5498(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* a, int* b, int* c, int* d, int* e, int* f)
+{
+    Unk8019F8C0_Owner* o = p->m8;
+    int idx = q->m708;
+    if (idx == (o->m6F8->m14[2].m8 == 0)) {
+        if (a)
+            *a = (int)fn_801B63A0(p, 2);
+        if (b)
+            *b = fn_801B5F8C(p);
+        if (c) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 0);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *c = v;
+        }
+        if (d) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 1);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *d = v;
+        }
+        if (e) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 2);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *e = v;
+        }
+    } else {
+        if (a) {
+            int t;
+            if (idx > 2) {
+                t = 3;
+                if (idx == 3)
+                    t = 4;
+            } else
+                t = idx == 0;
+            Unk8019F8C0_Inner* en = p->m8->m6F8->m14 + t;
+            *a = (int)fn_801A4910(o, t, en->m168.m0[(unsigned char)en->m168.mC]);
+        }
+        if (b)
+            *b = 0;
+        if (c)
+            *c = 0;
+        if (d)
+            *d = 0;
+        if (e)
+            *e = 0;
+    }
+    if (f)
+        *f = fn_801B5EDC(p, q->m708, 0);
 }
 
 void fn_801B564C(Unk801B460C_Tbl* t)
@@ -847,6 +1029,129 @@ void fn_801B6778(void* p)
     self->mB98 = 0;
     self->mB9C = -1;
     self->mB84 = lbl_805CF8E8;
+}
+
+struct Unk801B6830_P {
+    char pad0[0x384];
+    unsigned m384;
+    char pad388[0x398 - 0x388];
+    unsigned m398;
+    unsigned m39C;
+    int m3A0;
+    int m3A4;
+    int m3A8;
+    int m3AC;
+    int m3B0;
+    int m3B4;
+    int m3B8;
+    int m3BC;
+    int m3C0;
+    int m3C4;
+    int m3C8;
+    char pad3CC[0x458 - 0x3CC];
+    int m458;
+    char pad45C[0x708 - 0x45C];
+    int m708;
+};
+struct Unk801B6830_R {
+    char m0[0x20];
+    unsigned m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    int mA0;
+    int mA4;
+    int mA8;
+    int mAC;
+    int mB0;
+    int mB4;
+    int mB8;
+};
+extern int lbl_8061D460;
+extern int lbl_8061D468;
+extern int lbl_8061B9BC;
+int fn_80337830(int i);
+int fn_80337844(int i);
+int fn_8023EB80(void* p, int i);
+void fn_801B6830(Unk801B6830_P* p, Unk801B6830_R* r, int slot)
+{
+    r->m0[0] = 0;
+    r->m20 = fn_80378568(r->m0, 0);
+    r->m58 = 0;
+    r->m24 = p->m384 >> 25;
+    r->m2C = 0x385;
+    if (lbl_8061D460 != 0)
+        r->m2C = lbl_8061D468;
+    r->m30 = (p->m39C >> 21) & 1;
+    r->m28 = 0;
+    if (lbl_8061D460 != 0)
+        r->m28 = 1;
+    r->m34 = (p->m398 >> 20) & 7;
+    r->m38 = 0;
+    r->m3C = 2;
+    if (lbl_8061B9BC != 0 && lbl_8061D460 != 0) {
+        r->m60 = fn_80337830(lbl_8061D468);
+        r->m30 = (fn_80337844(lbl_8061D468) ^ 1) == 0;
+    } else {
+        r->m60 = fn_8023EB80(p, r->m2C - 0x385);
+    }
+    r->m48 = 0;
+    r->m4C = 0;
+    r->m50 = 0;
+    r->m54 = 1;
+    r->m5C = 0;
+    r->m64 = p->m708;
+    int s = slot;
+    if (s == -1)
+        s = p->m458;
+    r->m68 = s;
+    r->m6C = 0;
+    r->m8C = p->m3A0 ^ 1;
+    r->m90 = p->m3A4 ^ 1;
+    r->m94 = p->m3B8 ^ 1;
+    r->m98 = p->m3B0 ^ 1;
+    r->m9C = p->m3B4 ^ 1;
+    r->mA0 = p->m3A8 ^ 1;
+    r->mA4 = p->m3AC ^ 1;
+    r->mA8 = p->m3BC ^ 1;
+    r->mAC = p->m3C0 ^ 1;
+    r->mB0 = p->m3C4 ^ 1;
+    r->mB4 = p->m3C8 ^ 1;
+    r->m74 = 1;
+    r->mB8 = 0;
+    r->m70 = 0;
+    r->m84 = 0;
+    r->m80 = 0;
+    r->m40 = 0;
+    r->m44 = 0;
 }
 
 Unk8037B3E8* Unk801B64B0::fn_vslot5()
