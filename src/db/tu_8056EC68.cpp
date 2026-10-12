@@ -41,7 +41,6 @@ struct DbDownIt {
     }
 };
 
-
 extern "C" void fn_8056E1D8(DbSel* s);
 
 extern "C" {
@@ -168,6 +167,13 @@ extern const float lbl_805FFCA4;
 extern "C" void fn_8056CA20(void* q, int a);
 extern "C" void fn_8056C8E4(void* q, int a);
 extern "C" void fn_8056C988(void* q, int a, int b);
+
+extern const float lbl_805FFD88;
+inline float Db805706B8_R(DbMgr* self, int side, int idx, int id, int who)
+{
+    void** arr = (void**)((char*)TeamAt(self->m8->m14, side) + 0xCC4);
+    return ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(arr[idx], id, who);
+}
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
 extern "C" void fn_8056ED54(DbSel* self, int idx);
@@ -191,6 +197,7 @@ extern "C" int fn_805701E4(DbMgr* self);
 extern "C" void fn_805702CC(DbMgr* self, int a, int b, int c);
 extern "C" void fn_805704CC(DbMgr* self);
 extern "C" void fn_80570630(DbMgr* self);
+extern "C" void fn_805706B8(DbMgr* self, int k);
 extern "C" void fn_80570828(DbMgr* self);
 extern "C" void fn_80570C14(DbMgr* self, int a, int b);
 extern "C" void fn_80570C38(DbMgr* self, int a, int b);
@@ -682,6 +689,41 @@ extern "C" DB_OVERLAY void fn_80570630(DbMgr* self)
             fn_8056BDD0(s);
         fn_80573918(&self->m50, self->m8);
     }
+}
+
+/* near-miss: 2 slots; retail prints the indexed loads of the rating object as base,index (lwzx r3,r11,r29), ours index,base */
+extern "C" DB_OVERLAY void fn_805706B8(DbMgr* self, int k)
+{
+    float v8;
+    float vC;
+    float v10;
+    float v14;
+    float v18;
+    v8 = fn_8056FFB0();
+    vC = fn_8056FFB0();
+    if ((k == 1 && v8 < self->m50.m6C) || k == 5) {
+        self->m0 |= 8;
+    } else if (k == 6) {
+        int side = self->m50.m0;
+        int idx = self->m50.m10;
+        unsigned char who = TeamAt(self->m8->m14, side)->m168[TeamAt(self->m8->m14, side)->m174];
+        v10 = Db805706B8_R(self, side, idx, 1, who);
+        v14 = Db805706B8_R(self, side, idx, 0, who);
+        v18 = (v10 + v14) * lbl_805FFD88;
+        if (!(vC >= v18))
+            self->m0 |= 0x10;
+    } else {
+        self->m0 |= 0x10;
+    }
+    DbSub50* s = &self->m50;
+    v18 = s->m60;
+    v14 = s->m5C + v18;
+    if (!(vC >= v18))
+        self->m0 |= 1;
+    else if (!(vC >= v14))
+        self->m0 |= 2;
+    else
+        self->m0 |= 4;
 }
 
 extern "C" DB_OVERLAY void fn_80570828(DbMgr* self)
