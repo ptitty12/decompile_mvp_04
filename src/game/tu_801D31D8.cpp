@@ -99,6 +99,64 @@ extern "C" void fn_801D34E4(B* s)
 
 static inline int Ok(int f) { int ok; if ((unsigned)(f + 1) > 1) { ok = 1; if ((f & 8) == 0) ok = 0; } else ok = 0; return ok; }
 
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
+{
+    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+struct Unk801D31D8_Q66 {
+    char pad0[0x60];
+    Vec3 m60;
+};
+struct Unk801D31D8_GV {
+    char pad0[0x66C];
+    Unk801D31D8_Q66* m66C;
+    char pad670[0x688 - 0x670];
+    int m688;
+};
+extern "C" Vec3 fn_8014E388(int idx);
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" void fn_801D35AC(B* s)
+{
+    int flag = 1;
+    s->m44.mC = 0.9f;
+    s->m44.m10 = -0.2f;
+    if (((Unk801D31D8_GV*)s->m30)->m688 == 0)
+        flag = 0;
+    Unk801B7FB0_P* p = (Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30);
+    if (p) {
+        int near = 0;
+        Unk801D31D8_Q66* q = ((Unk801D31D8_GV*)s->m30)->m66C;
+        if (q) {
+            float d2;
+            Vec3 d = q->m60 - fn_8014E388(3);
+            d2 = d.x * d.x + d.z * d.z;
+            near = d2 < 1166400.0f;
+        }
+        if (flag != 0 || near != 0) {
+            s->m44.mC = 0.95f;
+        } else {
+            float r = RandG(s->m30, 1.0f, lbl_805D25E0, 0x570);
+            if (!(r >= 0.65f)) {
+                s->m44.mC = -0.95f;
+            } else {
+                s->m44.mC = 0.8f;
+                s->m44.m10 = 0.5f;
+            }
+        }
+        if (p->v24() == 0)
+            s->m44.mC = -s->m44.mC;
+    }
+}
+
 extern "C" int fn_801D3798(B* s)
 {
     Unk801D31D8_Game* g = s->m30;
@@ -156,11 +214,6 @@ extern "C" int fn_801D1198(B* s);
 extern "C" void fn_801D49CC(B* s);
 extern "C" void fn_801D5158(B* s);
 extern "C" void fn_801D53D4(B* s);
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
-inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
-{
-    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
-}
 struct Unk801D31D8_W {
     char pad0[0x34];
     Unk801D31D8_M34* m34;
