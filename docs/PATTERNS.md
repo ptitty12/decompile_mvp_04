@@ -859,7 +859,7 @@ address both have a general recipe now. Scratch tools are in `scratchpad/W8o4/`.
     `r = v` and `return v` forms. A run takes seconds.
   - `cmp.py <repo> <unit> <fn> file.cpp` scores every function in a scratch file
     against one target.
-- Solved in scratch but not committed (busy units). The owners can paste these:
+- Solved in scratch first, all committed in the second pass (below):
   - db/tu_8052CA60: fn_8052CC18 is all-zero 0..16; fn_8052CB74 is `r = v` 0..16.
   - db/tu_8052E4C0: fn_8052E8D8 is all-zero 0..34; fn_8052E754 is `r = v` 0..34;
     fn_8052F554 and fn_8052F590 are all-zero 0..12.
@@ -921,6 +921,55 @@ address both have a general recipe now. Scratch tools are in `scratchpad/W8o4/`.
   `int r = 0; switch (p->m10) { case 0..3: r = 0; break; } return r;` gives the
   right instructions, but the `li` lands after the compare instead of before it.
 - fn_8006A1F4 (0xA8 frame, `cmpwi 0x25; beq; cmpwi 0x26`): not attempted.
+
+### Second pass (families 4b): 35 more functions in 16 units
+- Every busy-unit recipe listed above is now committed, and so are their value
+  twins: fn_8052CB74, fn_80530024, fn_8053CDB0, fn_80084B24, fn_800898D0,
+  fn_8008AC18, fn_8008B368, fn_8008EB90 and fn_8008CE64.
+  - When `mixsolve.py` accepts two Ns (fn_8053CDB0 15/16, fn_8008BEF0 11/12),
+    take the column count of the sibling getter.
+- `pureall2.py <repo> <busy>` lists every unmatched function that is only a
+  compare tree (index in r3..r6, branches, `li r3`), in any unit.
+  - `mixsolve2.py <repo> <unit> <fn> <r3|r4|r5> <maxv>` handles the general case:
+    cases a..b, the default value read past the range, `r = v` or `return v`.
+  - It solved fn_80084728, a 25-case id table taking `(int k)`.
+  - It also solved fn_804F9C64 (`int r = 12`, cases 4..13).
+- Grouping tells, read from the tree:
+  - A bounded range node (`blt`/`bgt` to a label with no eq test) is two values
+    under one label, e.g. `case 4: case 5:`.
+  - A value with its own `cmpwi X; beq` needs its own body even when the value
+    equals a neighbour's: fn_8010F4D4 needs `case 2: return 0xC82; case 3: return 0xC82;`.
+  - `cmpwi hi; bgt; cmpwi lo; li r3,1; bgelr` is a two-value range leaf:
+    `switch (v) { case 0x31: case 0x32: return 1; } return 0;` (fn_80166440).
+    An inline `v > hi ? 0 : v >= lo` gives an mfcr scc instead.
+  - fn_8056A1DC is `int r = 1;` with a `case 0: r = 1;` arm, which still emits
+    the `beqlr`.
+- ealib: `scratchpad/W8o4/dump.sh` takes the `CFLAGS_OVR` env, e.g.
+  `"-O2 -fno-rtti -fno-exceptions"` for the -G8 RealCore units.
+  - Two 4-byte `.sdata` wide strings come back as `li r3,X@sda21` only when their
+    size is known: `extern unsigned short lbl_806EEA5C[2];` (fn_803F644C).
+  - fn_803EB83C is `switch (k) { case 8: return 0x100; case 4: return 0x10; default: return 0; }`.
+- More per-call frame addresses:
+  - The fe `FePair` argument of fn_804D21B8 is really an 8-byte
+    pointer-to-member passed by value (its definition is in tu_804D08D0). Call
+    it through a by-value cast (fn_804CF304, fn_804CF368).
+  - fn_80134F48's local is the class whose out-of-line ctor retail calls
+    (`__11Unk803567AC`), not a struct filled by fn_803567AC. Declare the class in
+    the unit with a trivial `~Unk803567AC() {}` (BLKmode), so `&v` is rebuilt per
+    call and the frame is 24 bytes.
+  - fn_8053DD68: give the buffer a unit-local type with Buf3's layout and a
+    trivial dtor, then read `b2.b` into a local before the subtraction. Otherwise
+    the halfword load narrows to `lbz`.
+- Still open after this pass:
+  - fn_803F73B0 (ealib, cases -128 and -14..0, default 16): the case set is
+    right but the tree differs (60 slots).
+  - snd/tu_803AB310 fn_803ABCB4, fn_803ABDD0 and fn_803AC164 have dead
+    `cmpwi -18/-10/-7` trees after the calls (an error-code switch whose arms
+    are empty). They are not written yet; the port/mvp2005 reference source
+    should give their shape.
+  - fn_8053DB30: the by-value Date copy and the buffer sit at swapped frame
+    offsets.
+  - fn_80299FD4 (animation/goals) differs in more than the frame address.
 
 ## Ranges 10-19 recipes (2026-10-11, condensed from worker reports)
 

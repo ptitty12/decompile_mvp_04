@@ -46,27 +46,110 @@ DB_OVERLAY void fn_8053CD74(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x2C, 0x2C);
 }
 
-/* near-miss: retail loads r3 = 0 first and compares cases 0..14 linearly (beqlr); the
- * switch below scores 13 slots out of range */
-DB_OVERLAY int fn_8053CDB0(void* self, int k)
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+DB_OVERLAY int fn_8053CDB0(void* l, int k)
 {
     int r = 0;
-    switch (k) {
-    case 0: r = 0; break;
-    case 1: break;
-    case 2: r = 0; break;
-    case 3: break;
-    case 4: r = 0; break;
-    case 5: break;
-    case 6: r = 0; break;
-    case 7: break;
-    case 8: r = 0; break;
-    case 9: break;
-    case 10: r = 0x64; break;
-    case 11: r = 0x64; break;
-    case 12: r = 0x64; break;
-    case 13: r = 0x64; break;
-    case 14: r = 0x64; break;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 100;
+        break;
+    case 11:
+        r = 100;
+        break;
+    case 12:
+        r = 100;
+        break;
+    case 13:
+        r = 100;
+        break;
+    case 14:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+DB_OVERLAY int fn_8053CE50(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
     }
     return r;
 }
@@ -521,16 +604,24 @@ DB_OVERLAY void* fn_8053DD34(void* self, int a)
     return self;
 }
 
-/* near-miss: same stack-buffer addressing as fn_8053DB30 (retail: addi r3,r1,8 / addi r3,r1,12
- * per call, halfwords read from the frame); ours also narrows the subtraction to bytes. */
+/* Same layout as Db8053CC9C_Buf3, but with a trivial destructor: that makes it BLKmode and
+   addressable from its declaration, so each `&b` is rebuilt (`addi r3,r1,N`) and the fields
+   are read straight from the frame. */
+struct Db8053DD68_Buf {
+    unsigned short a;
+    unsigned short b;
+    ~Db8053DD68_Buf() {}
+};
+
 DB_OVERLAY Db8053CC9C_SrcBits* fn_8053DD68(Db8053CC9C_SrcBits* dst, Db8053CC9C_Src2* src)
 {
-    Db8053CC9C_Buf3 b1;
-    Db8053CC9C_Buf3 b2;
+    Db8053DD68_Buf b1;
+    Db8053DD68_Buf b2;
     fn_80329FA0(&b1, 1);
     unsigned short y1 = b1.b;
     fn_80329FA0(&b2, src->f0);
-    dst->yr = b2.b - y1;
+    unsigned short y2 = b2.b;
+    dst->yr = y2 - y1;
     dst->g1 = src->f9;
     dst->g2 = src->f5;
     return dst;

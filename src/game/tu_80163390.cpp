@@ -404,15 +404,12 @@ void Unk80159F28::fn_8016630C(int p, Unk8015FB08_Rec rec) /* 8016630C */
     }
 }
 
-inline int InRange(int v, int lo, int hi)
-{
-    if (v > hi) {
-        return 0;
-    }
-    return v >= lo;
-}
-
 int fn_80166440(void* self, int v) /* 80166440 */
 {
-    return InRange(v, 0x31, 0x32);
+    switch (v) {
+    case 0x31:
+    case 0x32:
+        return 1;
+    }
+    return 0;
 }
