@@ -753,6 +753,79 @@ extern "C" void fn_800A1F24(Unk800A1F24* p, int flags, int a, int b)
     }
 }
 
+struct Unk800A2030 {
+    char pad0[0x24];
+    void* m24;
+    char pad28[0x6C - 0x28];
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+};
+struct Unk800A2030_E {
+    char pad0[0x1E0];
+    int m1E0;
+};
+extern "C" Unk800A2030_E* fn_8007FE04(int g);
+extern "C" void fn_8007F858(int g);
+extern "C" void fn_8007295C(int g);
+extern "C" void fn_8007F8E4(int g, int e);
+extern "C" void fn_8058F08C(int a);
+extern "C" void fn_80590A48(int a);
+extern "C" void fn_80581770(int a);
+extern "C" void fn_800A4F54(void* p);
+extern "C" void fn_800A6618(void* p, int a);
+extern "C" void fn_80553668(void* p, int a);
+extern "C" int fn_800A2EB4(Unk800A1A6C* p);
+extern "C" void fn_800766B8(int g, int a);
+
+extern "C" void fn_800A2030(Unk800A2030* p, int flag)
+{
+    if (p->m6C == 1) {
+        if (flag != 0) {
+            if (fn_800A1A6C((Unk800A1A6C*)p) != 0) {
+                fn_800A6618(p, 0);
+            } else if (fn_800A1AC0((Unk800A1A6C*)p) != 0 || fn_800A2EB4((Unk800A1A6C*)p) != 0) {
+                fn_800A6618(p, 1);
+            }
+        }
+        fn_8007FE04(lbl_8061930C)->m1E0 = 1;
+    }
+    fn_8058F08C(*(int*)(lbl_8061930C + 0x34));
+    fn_8007F858(lbl_8061930C);
+    fn_8007295C(lbl_8061930C);
+    fn_80590A48(*(int*)(lbl_8061930C + 0x30));
+    fn_80581770(*(int*)(lbl_8061930C + 0x2C));
+    fn_800A4F54(p);
+    volatile int sp8 = 0;
+    int e = 0;
+    do {
+        fn_8007F8E4(lbl_8061930C, e);
+        int c = sp8;
+        int t;
+        if (c > 3) {
+            t = c;
+        } else {
+            t = c + 1;
+        }
+        sp8 = t;
+        e = t;
+    } while (e <= 3);
+    fn_800766B8(lbl_8061930C, 0);
+    p->m6C = 3;
+    p->m70 = 0;
+    p->m74 = 0;
+    p->m78 = 0;
+    p->m7C = 0;
+    p->m80 = 0;
+    if (p->m24 != 0) {
+        fn_80553668(p->m24, 3);
+        p->m24 = 0;
+    }
+}
+
 struct Unk800A22F0 {
     char pad0[0x60];
     int m60;
