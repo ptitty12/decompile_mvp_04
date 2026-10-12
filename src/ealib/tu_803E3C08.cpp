@@ -317,6 +317,148 @@ inline int FlushInl(Unk803E6660* o)
     return 1;
 }
 
+/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
+struct Unk803E6950_Names {
+    char pad0[4];
+    char** m4;
+};
+
+struct Unk803E6950_Tbl {
+    Unk803E6950_Names* m0;
+    char pad4[4];
+    Unk803E6660_Ent e[1];
+};
+
+struct Unk803E6950 {
+    int m0;
+    int m4;
+    Unk803E6950_Tbl* m8;
+    Unk803E6660_Rec* mC;
+    int m10;
+    char pad14[0x2C - 0x14];
+    int m2C;
+};
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
+
+inline int FindSet(Unk803E6950* o, const char* name, int a, int b, int c)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
+            found = i;
+            break;
+        }
+    }
+    return fn_803E6A70(o, found, a, b, c);
+}
+
+extern "C" void fn_803DBDD8(void* m, int a);
+extern "C" void fn_803D707C(void* self, void* item);
+extern char lbl_8060CB24[];
+extern char lbl_8060CB74[];
+extern char lbl_8060CB90[];
+extern char lbl_8060CBAC[];
+extern char lbl_8060CBB8[];
+extern char lbl_8060CBC4[];
+extern char lbl_8060CBCC[];
+extern char lbl_8060CBD4[];
+extern int* lbl_8062C294;
+
+inline int InitInl(Unk803E6660* o, Unk803E6660_Holder* h)
+{
+    o->m8 = h;
+    int ok = 0;
+    fn_803D707C(o->m4, h);
+    o->m10 = 0;
+    while (o->m8->m0->m4[o->m10] != 0)
+        o->m10++;
+    int sz = o->m10 * 12;
+    int* blk = (int*)lbl_8062C668(sz + 4, (int)lbl_8060CB24);
+    *blk = sz;
+    Unk803E6660_Rec* a = (Unk803E6660_Rec*)(blk + 1);
+    o->mC = a;
+    if (a != 0) {
+        for (int i = 0; i < o->m10; i++) {
+            o->mC[i].m0 = 0;
+            o->mC[i].m4 = 0;
+            o->mC[i].m8 = -1;
+        }
+        ok = 1;
+    }
+    return ok;
+}
+
+inline int FindIdx(Unk803E6950* o, const char* name)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
+            found = i;
+            break;
+        }
+    }
+    return found;
+}
+
+/* near-miss (99.2%, 291 of 291 instructions): the whole body matches except the position of `li r0,0` for the
+   key switch: retail loads it before the first compare (case 0 stores r0 directly); ours rematerializes it in
+   the case 0 arm. Tried: ok as register/unsigned/hoisted, v-form switch, KeyInl returning ok, volatile re-read. */
+extern "C" int fn_803E4C30(Unk803E4A50* o)
+{
+    int n1 = 0x900;
+    int n2 = 0x300;
+    int* a = (int*)lbl_8062C668(n1 + 4, (int)lbl_8060CB74);
+    *a = n1;
+    o->m0 = a + 1;
+    int* b = (int*)lbl_8062C668(n2 + 4, (int)lbl_8060CB90);
+    *b = n2;
+    o->m4 = b + 1;
+    fn_803DBDD8((char*)o + 0x7c, o->m48);
+    InitInl(&o->sub, (Unk803E6660_Holder*)&o->s4C);
+    Unk803E68B0_Key* kk = (Unk803E68B0_Key*)&o->sub;
+    int k = o->m48;
+    int ok = 0;
+    switch (k) {
+    case -4:
+    case 0x80:
+    case 0x90:
+    case 0xA8:
+    case 0xB8:
+        kk->m30 = ok;
+        break;
+    case 0x98:
+        kk->m30 = 2;
+        break;
+    case 0xA0:
+        kk->m30 = -1;
+        break;
+    default:
+        kk->m30 = -1;
+        break;
+    }
+    int t = kk->m30;
+    if (t != -1) {
+        kk->m0 = k;
+        ok = 1;
+        int hi = 0xFFFF - t;
+        int lo = hi + t;
+        kk->m24 = hi;
+        kk->m20 = lo;
+        kk->m28 = lo;
+    }
+    Unk803E6950* s = (Unk803E6950*)&o->sub;
+    int found = FindIdx(s, lbl_8060CBAC);
+    s->m2C = found;
+    FindSet(s, lbl_8060CBB8, (int)o->m0, 0xC, -1);
+    FindSet(s, lbl_8060CBC4, (int)o->m4, 4, -1);
+    FindSet(s, lbl_8060CBAC, (int)o + 0xB8, 0, -1);
+    FindSet(s, lbl_8060CBCC, (int)o + 0x7C, 0, -1);
+    FindSet(s, lbl_8060CBD4, (int)lbl_8062C294, 0, -1);
+    o->m8 = 0;
+    return 1;
+}
+
 extern "C" void fn_803E5270(char* o)
 {
     Unk803E6660* s = (Unk803E6660*)(o + 0xc);
@@ -416,42 +558,6 @@ extern "C" void fn_803E57F0(Unk803E57F0* o, int chrg)
     SubDtor(&o->sub);
     if (chrg & 1)
         lbl_8062C66C(o, 0xDC);
-}
-
-/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
-struct Unk803E6950_Names {
-    char pad0[4];
-    char** m4;
-};
-
-struct Unk803E6950_Tbl {
-    Unk803E6950_Names* m0;
-    char pad4[4];
-    Unk803E6660_Ent e[1];
-};
-
-struct Unk803E6950 {
-    int m0;
-    int m4;
-    Unk803E6950_Tbl* m8;
-    Unk803E6660_Rec* mC;
-    int m10;
-    char pad14[0x2C - 0x14];
-    int m2C;
-};
-
-extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
-
-inline int FindSet(Unk803E6950* o, const char* name, int a, int b, int c)
-{
-    int found = -1;
-    for (int i = 0; i < o->m10; i++) {
-        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
-            found = i;
-            break;
-        }
-    }
-    return fn_803E6A70(o, found, a, b, c);
 }
 
 extern "C" void fn_803E6044(char* o)
