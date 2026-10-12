@@ -1,6 +1,71 @@
-/*
- * Dolphin SDK (MWCC GC/1.2.5n, cflags_dolphin_sdk),
- * .text 0x8043580C-0x80435A10 (code-only unit, 3 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from doldecomp/dolsdk2004 @ 2328b416 (src/os/OSMessage.c). Nintendo Dolphin SDK 2004 Patch 1, os library; names are Nintendo's. */
+#include <dolphin.h>
+#include <dolphin/os.h>
+
+void OSInitMessageQueue(OSMessageQueue* mq, void* msgArray, s32 msgCount) {
+    OSInitThreadQueue(&mq->queueSend);
+    OSInitThreadQueue(&mq->queueReceive);
+    mq->msgArray = msgArray;
+    mq->msgCount = msgCount;
+    mq->firstIndex = 0;
+    mq->usedCount = 0;
+}
+
+int OSSendMessage(OSMessageQueue* mq, void* msg, s32 flags) {
+    BOOL enabled;
+    s32 lastIndex;
+
+    enabled = OSDisableInterrupts();
+    while(mq->msgCount <= mq->usedCount) {
+        if (!(flags & 1)) {
+            OSRestoreInterrupts(enabled);
+            return 0;
+        }
+        OSSleepThread(&mq->queueSend);
+    }
+    lastIndex = (mq->firstIndex + mq->usedCount) % mq->msgCount;
+    ((u32*)mq->msgArray)[lastIndex] = (u32)msg;
+    mq->usedCount++;
+    OSWakeupThread(&mq->queueReceive);
+    OSRestoreInterrupts(enabled);
+    return 1;
+}
+
+int OSReceiveMessage(OSMessageQueue* mq, void* msg, s32 flags) {
+    BOOL enabled = OSDisableInterrupts();
+
+    while(mq->usedCount == 0) {
+        if (!(flags & 1)) {
+            OSRestoreInterrupts(enabled);
+            return 0;
+        }
+        OSSleepThread(&mq->queueReceive);
+    }
+    if(msg != NULL) {
+       *(u32*)msg = ((u32*)mq->msgArray)[mq->firstIndex];
+    }
+    
+    mq->firstIndex = (mq->firstIndex + 1) % mq->msgCount;
+    mq->usedCount--;
+    OSWakeupThread(&mq->queueSend);
+    OSRestoreInterrupts(enabled);
+    return 1;
+}
+
+int OSJamMessage(OSMessageQueue* mq, void* msg, s32 flags) {
+    BOOL enabled = OSDisableInterrupts();
+
+    while(mq->msgCount <= mq->usedCount) {
+        if(!(flags & 1)) {
+            OSRestoreInterrupts(enabled);
+            return 0;
+        }
+        OSSleepThread(&mq->queueSend);
+    }
+    mq->firstIndex = (mq->firstIndex + mq->msgCount - 1) % mq->msgCount;
+    ((u32*)mq->msgArray)[mq->firstIndex] = (u32)msg;
+    mq->usedCount++;
+    OSWakeupThread(&mq->queueReceive);
+    OSRestoreInterrupts(enabled);
+    return 1;
+}
