@@ -75,13 +75,14 @@ class Unk8028B194 {
 public:
     Unk8028B194* fn_8028B194(Unk80273498_Vec3 v);
     void fn_8028B48C(float f);
+    void fn_8028B4D0(float f);
 };
 struct Unk801E4E60_Src {
     char pad0[8];
     int m8;
     int mC;
     int m10;
-    char pad14[4];
+    int m14;
     int m18;
     char pad1C[0xC];
     Unk80273498_Vec3 m28;
@@ -103,6 +104,84 @@ inline Unk8028B194* Unk801E54E4_Init(Unk8027C728_Goal* g)
     g->m10 = 0xA;
     fn_8027C728(g);
     return (Unk8028B194*)g->m18;
+}
+
+extern const float lbl_805D3C4C;
+
+extern "C" Unk8027C728_Goal* fn_801E3698(void* self, Unk80270BA0_X* p, Unk801E4E60_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    const Unk80273498_Vec3* pv = &x->m28;
+    Unk8028B194* o = Unk801E54E4_Init(g)->fn_8028B194(Unk801E4E60_Pos(pv));
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        ((Unk8027A84C*)o)->fn_8027A898(&w);
+    }
+    if (!(x->m74 <= lbl_805D3C4C))
+        o->fn_8028B4D0(x->m74);
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    Unk8027A84C* hb = (Unk8027A84C*)hs->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        hb->fn_8027A898(&w);
+    }
+    int a2 = x->mC;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = a2;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    h104->m38 = a2;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    return g;
+}
+
+struct Unk80296C78_Goal;
+Unk80296C78_Goal* fn_80298E9C(Unk80296C78_Goal* g, Unk80270BA0_X* x, int a);
+
+extern "C" Unk8027C728_Goal* fn_801E465C(void* self, Unk80270BA0_X* p, Unk801E4E60_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    int six = 6;
+    g->m10 = 0xD;
+    fn_8027C728(g);
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    fn_80298E9C((Unk80296C78_Goal*)g->m18, (Unk80270BA0_X*)x->m14, 1);
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = six;
+    g104->m40 = six;
+    Unk8027C728_Goal* h = g->m0;
+    const Unk80273498_Vec3* pv = &x->m64;
+    Unk80273498_Vec3 v = Unk801E4E60_Pos(pv);
+    h->m10 = 2;
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    fn_8027C728(h);
+    ((Unk8027A84C*)hs->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC)))->fn_8027A898(&v);
+    int a2 = x->mC;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = a2;
+    h104->m38 = a2;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    int c2 = x->m18;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
+    h104->m40 = c2;
+    return g;
 }
 
 extern const float lbl_805D3C68;
@@ -368,33 +447,31 @@ void fn_8037CF5C(Unk8037C7FC* reg, unsigned hash, void* s);
 }
 
 extern const float lbl_805D3C8C;
+extern const char lbl_80660B98[];
+extern const char lbl_80660B38[];
+extern const char lbl_80660AD8[];
 struct Unk801E5E44_V3 {
     float x;
     float y;
     float z;
 };
-class Unk801E5E44_Obj : public Unk8037B3E8 {
-public:
-    virtual const char* fn_vslot3();
-    Unk801E5E44_Obj() : Unk8037B3E8(0xDA07F2A0u)
-    {
-        for (int i = 0; i < 6; i++) {
-            m4[i].x = lbl_805D3C8C;
-            m4[i].y = lbl_805D3C8C;
-            m4[i].z = lbl_805D3C8C;
-        }
-    }
+struct Unk801E5E44_Obj {
+    const void* m0;
     Unk801E5E44_V3 m4[6];
 };
 
 extern "C" void* fn_801E5E44(void* mem)
 {
-    return new (mem) Unk801E5E44_Obj;
+    Unk801E5E44_Obj* o = (Unk801E5E44_Obj*)mem;
+    new (mem) Unk8037B3E8(0xDA07F2A0u);
+    o->m0 = lbl_80660B98;
+    for (int i = 0; i < 6; i++) {
+        o->m4[i].x = lbl_805D3C8C;
+        o->m4[i].y = lbl_805D3C8C;
+        o->m4[i].z = lbl_805D3C8C;
+    }
+    return o;
 }
-
-extern const char lbl_80660B98[];
-extern const char lbl_80660B38[];
-extern const char lbl_80660AD8[];
 
 struct Unk801E5EBC {
     const void* m0;
@@ -543,25 +620,24 @@ extern "C" int fn_801E6290(unsigned x)
 }
 
 extern const float lbl_805D3DF0;
-class Unk801E62A4_Obj : public Unk8037B3E8 {
-public:
-    virtual const char* fn_vslot3();
-    Unk801E62A4_Obj() : Unk8037B3E8(0xEC1BCE8Du)
-    {
-        for (int i = 0; i < 6; i++) {
-            m4[i].x = lbl_805D3DF0;
-            m4[i].y = lbl_805D3DF0;
-            m4[i].z = lbl_805D3DF0;
-            m4C[i] = 1;
-        }
-    }
+struct Unk801E62A4_Obj {
+    const void* m0;
     Unk801E5E44_V3 m4[6];
     int m4C[6];
 };
 
 extern "C" void* fn_801E62A4(void* mem)
 {
-    return new (mem) Unk801E62A4_Obj;
+    Unk801E62A4_Obj* o = (Unk801E62A4_Obj*)mem;
+    new (mem) Unk8037B3E8(0xEC1BCE8Du);
+    o->m0 = lbl_80660B38;
+    for (int i = 0; i < 6; i++) {
+        o->m4[i].x = lbl_805D3DF0;
+        o->m4[i].y = lbl_805D3DF0;
+        o->m4[i].z = lbl_805D3DF0;
+        o->m4C[i] = 1;
+    }
+    return o;
 }
 
 extern "C" void fn_801E6330(Unk801E5EBC* s)
@@ -656,28 +732,27 @@ struct Unk801E67C8_E {
     int w;
     int v;
 };
-class Unk801E67C8_Obj : public Unk8037B3E8 {
-public:
-    virtual const char* fn_vslot3();
-    Unk801E67C8_Obj() : Unk8037B3E8(0xEAB27FC1u)
-    {
-        for (int i = 0; i < 3; i++) {
-            m4[i].x = lbl_805D3EB8;
-            m4[i].y = lbl_805D3EB8;
-            m1C[i].x = lbl_805D3EB8;
-            m1C[i].y = lbl_805D3EB8;
-            m1C[i].z = lbl_805D3EB8;
-            m1C[i].w = 0;
-            m1C[i].v = 2;
-        }
-    }
+struct Unk801E67C8_Obj {
+    const void* m0;
     Unk801E67C8_F2 m4[3];
     Unk801E67C8_E m1C[3];
 };
 
 extern "C" void* fn_801E67C8(void* mem)
 {
-    return new (mem) Unk801E67C8_Obj;
+    Unk801E67C8_Obj* o = (Unk801E67C8_Obj*)mem;
+    new (mem) Unk8037B3E8(0xEAB27FC1u);
+    o->m0 = lbl_80660AD8;
+    for (int i = 0; i < 3; i++) {
+        o->m4[i].x = lbl_805D3EB8;
+        o->m4[i].y = lbl_805D3EB8;
+        o->m1C[i].x = lbl_805D3EB8;
+        o->m1C[i].y = lbl_805D3EB8;
+        o->m1C[i].z = lbl_805D3EB8;
+        o->m1C[i].w = 0;
+        o->m1C[i].v = 2;
+    }
+    return o;
 }
 
 extern "C" void fn_801E6870(Unk801E5EBC* s)
