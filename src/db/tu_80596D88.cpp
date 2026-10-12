@@ -130,6 +130,53 @@ extern "C" DB_OVERLAY void fn_80597A70(U* self, int chrg)
         fn_80377408(self);
 }
 
+extern const float lbl_806E02FC;
+extern const float lbl_806E0300;
+extern const float lbl_806E0304;
+extern const float lbl_806E0308;
+extern const float lbl_806E030C;
+extern const float lbl_806E0310;
+
+//@80597FE4
+extern "C" DB_OVERLAY float fn_80597FE4(void* self, int k)
+{
+    if (k <= 2)
+        return lbl_806E02FC;
+    if (k <= 4)
+        return lbl_806E0300;
+    if (k == 5)
+        return lbl_806E0304;
+    if (k <= 8)
+        return lbl_806E0308;
+    if (k <= 10)
+        return lbl_806E030C;
+    return lbl_806E0310;
+}
+
+extern const float lbl_806010C4;
+extern const float lbl_806010C8;
+extern const float lbl_806010CC;
+extern const float lbl_806010D0;
+extern const float lbl_806E0314;
+extern const float lbl_806E0318;
+extern const float lbl_806E031C;
+extern const float lbl_806E0320;
+extern const float lbl_806E0324;
+
+//@80598054
+extern "C" DB_OVERLAY float fn_80598054(float x)
+{
+    if (!(x > lbl_806010C4))
+        return lbl_806E0314;
+    if (!(x > lbl_806010C8))
+        return lbl_806E0318;
+    if (!(x > lbl_806010CC))
+        return lbl_806E031C;
+    if (x <= lbl_806010D0)
+        return lbl_806E0320;
+    return lbl_806E0324;
+}
+
 extern char lbl_806842A0[];
 extern const char lbl_805FE19C[];
 
@@ -138,6 +185,30 @@ extern "C" DB_OVERLAY void fn_805980E4(void* self, int a, Unk80070DDC_Stream* io
 {
     io->v08(a, self, 4);
     io->v08(a, (char*)self + 4, 0x14);
+}
+
+extern const float lbl_806010D4;
+extern const float lbl_806010D8;
+extern const float lbl_806010DC;
+extern const float lbl_806010E0;
+extern void* lbl_80619948;
+extern "C" int fn_800A2EB4(void* p);
+extern "C" int fn_8057CE00(int a);
+
+//@80598158
+extern "C" DB_OVERLAY float fn_80598158()
+{
+    float r = lbl_806010D4;
+    if (fn_800A2EB4(lbl_80619948)) {
+        int m = fn_8057CE00(0);
+        if (m == 0)
+            r += lbl_806010D8;
+        else if (m == 1)
+            r += lbl_806010DC;
+        else if (m == 2)
+            r += lbl_806010E0;
+    }
+    return r;
 }
 
 extern "C" int fn_8059841C(void* self);
@@ -164,15 +235,14 @@ extern const float lbl_8060116C;
 extern const float lbl_80601170;
 extern const float lbl_80601174;
 
-/* near-miss: retail branches 'blt' to the multiply arm and falls into the 80601174 return (5 slots) */
 //@80598924
 extern "C" DB_OVERLAY float fn_80598924(float x)
 {
     if (!(x > lbl_80601164))
         return lbl_80601168;
-    if (!(x < lbl_8060116C))
-        return lbl_80601174;
-    return x * lbl_80601170;
+    if (x < lbl_8060116C)
+        return x * lbl_80601170;
+    return lbl_80601174;
 }
 
 struct Unk800C7B40_Data {
