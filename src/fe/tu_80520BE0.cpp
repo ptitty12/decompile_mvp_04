@@ -39,15 +39,28 @@ extern "C" int fn_805239B4(void* x, int a);
 extern "C" int fn_80523A08(void* x, int a);
 extern "C" int fn_80523A5C(void* x, int a, int b, int c, int d);
 extern "C" void fn_805243C4(void* x);
+extern "C" FeScrN* fn_805244C8(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_805246C4(FeScrG* x);
+extern "C" FeScrN* fn_80524708(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_80524850(void);
 extern "C" void fn_80524BE8(void* x);
 extern "C" FeScrN* fn_80524C1C(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_80524C94(void* x);
 extern "C" void fn_805255F8(void);
 extern "C" FeScrH* fn_80525624(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
-extern "C" FeScrN* fn_805244C8(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
-extern "C" FeScrN* fn_80524708(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_80520C0C(FeV10B* x);
+extern "C" void fn_80520C60(FeV10B* x);
+
+extern "C" FE_OVERLAY void fn_80520C0C(FeV10B* x)
+{
+    int v = fn_8051E910(x->m4, lbl_80622648);
+    x->s3(v);
+}
+
+extern "C" FE_OVERLAY void fn_80520C60(FeV10B* x)
+{
+    fn_8051EDDC(x->m4, lbl_80622648, x->s2());
+}
 
 extern "C" FE_OVERLAY FeSingle* fn_805210A0(void)
 {
