@@ -14,6 +14,8 @@ extern "C" int fn_801DCC1C(Unk80270BA0_X* p, const Unk80273498_Vec3* v);
 struct Unk80299920_Goal {
     char pad0[0x60];
     int m60;
+    Unk80299920_Goal* fn_80299F0C(Unk80273498_Vec3* v);
+    void fn_80299F5C(struct Unk80299920_Tgt* t);
     void fn_80299F64(int v);
 };
 struct Unk801E4048_Src {
@@ -158,6 +160,109 @@ extern "C" Unk8027C728_Goal* fn_801E3698(void* self, Unk80270BA0_X* p, Unk801E4E
 
 struct Unk80296C78_Goal;
 Unk80296C78_Goal* fn_80298E9C(Unk80296C78_Goal* g, Unk80270BA0_X* x, int a);
+
+struct Unk801E3AE8_Src {
+    char pad0[0x1C];
+    int m1C;
+    char pad20[0x34 - 0x20];
+    Unk80273498_Vec3 m34;
+    char pad40[0x64 - 0x40];
+    Unk80273498_Vec3 m64;
+};
+struct Unk801E3AE8_P {
+    char pad0[0x8F0];
+    int m8F0;
+    char pad8F4[0x91C - 0x8F4];
+    Unk80273498_Vec3 m91C;
+};
+
+struct Unk80299920_Tgt;
+struct Unk8024B99C_V3 {
+    float x;
+    float y;
+    float z;
+};
+void fn_8024D178(Unk80270BA0_X* x, int a);
+void fn_8024D1A4(Unk80270BA0_X* x, const Unk8024B99C_V3* p);
+struct Unk801E3990_Src {
+    char pad0[0x14];
+    Unk80270BA0_X* m14;
+    char pad18[0x1C - 0x18];
+    int m1C;
+    char pad20[0x34 - 0x20];
+    Unk80273498_Vec3 m34;
+    char pad40[0x64 - 0x40];
+    Unk80273498_Vec3 m64;
+    char pad70[0x88 - 0x70];
+    int m88;
+};
+struct Unk801E3990_Self {
+    char pad0[0x684];
+    Unk80299920_Tgt* m684;
+};
+
+/* near-miss 97.8%: callee-saved register numbering (x, g, &pos) differs; retail also keeps a second copy of g (mr r28,r27) for the child-goal load */
+extern "C" Unk8027C728_Goal* fn_801E3990(Unk801E3990_Self* self, Unk80270BA0_X* p, Unk801E3990_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk80273498_Vec3 pos = Unk801E4E60_Pos(&x->m34);
+    g->m10 = 5;
+    fn_8027C728(g);
+    Unk80299920_Goal* sub = (Unk80299920_Goal*)g->m18;
+    {
+        Unk80273498_Vec3 v = pos;
+        sub->fn_80299F0C(&v);
+    }
+    sub->fn_80299F64(x->m1C);
+    {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        ((Unk8027A84C*)sub)->fn_8027A898(&w);
+    }
+    int k88 = x->m88;
+    if (k88 == 1)
+        goto L1;
+    if (k88 == 2) {
+L1:
+        sub->fn_80299F5C(self->m684);
+    }
+    if (x->m88 != 4) {
+        Unk80270BA0_X* k = x->m14;
+        fn_8024D178(p, (int)k);
+        ((Unk801E3AE8_P*)p)->m8F0 = 2;
+        fn_8024D1A4(k, (const Unk8024B99C_V3*)&pos);
+    }
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    ((Unk80287D70*)h->m18)->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    return g;
+}
+
+/* near-miss 98.6%: callee-saved register numbering (g, &pos, x, sub) differs */
+extern "C" Unk8027C728_Goal* fn_801E3AE8(void* self, Unk80270BA0_X* p, Unk801E3AE8_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk80273498_Vec3 pos = Unk801E4E60_Pos(&x->m34);
+    g->m10 = 5;
+    fn_8027C728(g);
+    Unk80299920_Goal* sub = (Unk80299920_Goal*)g->m18;
+    {
+        Unk80273498_Vec3 v = pos;
+        sub->fn_80299F0C(&v);
+    }
+    sub->fn_80299F64(x->m1C);
+    {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        ((Unk8027A84C*)sub)->fn_8027A898(&w);
+    }
+    ((Unk801E3AE8_P*)p)->m8F0 = 2;
+    ((Unk801E3AE8_P*)p)->m91C = pos;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    ((Unk80287D70*)h->m18)->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    return g;
+}
 
 extern "C" Unk8027C728_Goal* fn_801E465C(void* self, Unk80270BA0_X* p, Unk801E4E60_Src* x)
 {
