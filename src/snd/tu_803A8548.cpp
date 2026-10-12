@@ -5,3 +5,12 @@
  * Every data object is extern by its lbl_ name.
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
+#include "snd/cmn/sndcmn.h"
+
+extern "C" int fn_803A8548(int bhandle, int patnum)
+{
+    if (SNDBANKI_valid(bhandle) >= 0) {
+        return SNDBANKI_getppatch(sndgs.banklist[bhandle].phdr, patnum) != NULL ? 1 : 0;
+    }
+    return -8;
+}
