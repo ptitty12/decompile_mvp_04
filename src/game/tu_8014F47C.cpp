@@ -207,6 +207,11 @@ extern const char lbl_805C7884[];
 extern const char* lbl_8061BD80;
 int sprintf(char* buf, const char* fmt, ...);
 extern "C" {
+void OSReport(const char* msg, ...);
+void fn_8000C674(short x, short y, const char* fmt, ...);
+void fn_8014E8DC(void* p);
+int fn_8014E904(char* self, char* a, char* b, char* c);
+void fn_8014F3A8(const char* str);
 unsigned fn_8014D8AC(void* rng, int max, const char* file, int line);
 void fn_802D5A64(Unk802D5618* o, int a, int b, int c, void* d, int e, float f1, float f2, float f3, float f4, float f5, float f6);
 void fn_80244A64(void* p, int a, int b);
@@ -352,6 +357,57 @@ int fn_8014F684(Unk50Ent* base, const char* a, const char* b)
         off += 0x50;
     } while (i <= 7);
     return found != 0 ? -1 : -2;
+}
+
+void fn_8014F738(char* self)
+{
+    fn_8014E8DC(*(void**)(self + 0x280));
+    int idx;
+    int bad;
+    do {
+        char a[9] = "";
+        char b[9] = "";
+        char c[0x401] = "";
+        char d[9] = "";
+        bad = fn_8014E904(*(char**)(self + 0x280), a, b, c) ^ 1;
+        if (fn_8014F644(self, (unsigned char*)c) != 0) {
+            fn_8014F5D4(self, a, b, d);
+            idx = fn_8014F684((Unk50Ent*)self, a, d);
+            if (idx >= 0) {
+                int o = idx * 0x50;
+                fn_8040B830(self + o + 9, c, 0x40);
+                SetW(self + 0x4C, o, 1);
+            } else if (idx == -2) {
+                break;
+            }
+        }
+    } while (bad == 0);
+    int i = 0;
+    char* p0 = self + 0x22;
+    OSReport("
+Call Stack:
+");
+    char* p1 = self;
+    fn_8000C674(1, 10, "Call Stack:");
+    int off = 0;
+    fn_8014F3A8("
+CallStack:
+");
+    do {
+        if (GetW(self + 0x4C, off) != 0) {
+            char s[0x100] = "";
+            sprintf(s, "%s:%s", p1, p0);
+            OSReport("%s
+", s);
+            fn_8014F3A8(s);
+            s[0x26] = 0;
+            fn_8000C674(2, i + 11, s);
+        }
+        off += 0x50;
+        i++;
+        p0 += 0x50;
+        p1 += 0x50;
+    } while (i <= 7);
 }
 
 int fn_80150D8C() { return lbl_8061B880; }
