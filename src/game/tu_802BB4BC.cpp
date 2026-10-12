@@ -102,76 +102,47 @@ extern char lbl_8068D9E0[];
 extern const char* lbl_8061EAF8[];
 int fn_8040B3B4(const char* a, const char* b);
 
-/* near-miss (17 slots, same length): retail needs only 5 callee-saved registers (r27..r31); ours takes 6 (the chain value v joins
-   13 goto arms). Retail shares out's register with the case-1 pointer. */
 int fn_802BB58C(int kind, const char* name, int* out, char** out2)
 {
-    char v;
     int r = 0;
+    int i;
     switch (kind) {
     case 0:
-        if (fn_8040B3B4(name, lbl_805E1144) == 0) {
-            v = lbl_806EF9DD;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E114C) == 0) {
-            v = lbl_806EF9DC;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1158) == 0) {
-            v = lbl_806EF9CC;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1164) == 0) {
-            v = lbl_806EF9CB;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E116C) == 0) {
-            v = lbl_806EF9DE;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1174) == 0) {
-            v = lbl_806EF9DF;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E117C) == 0) {
-            v = lbl_806EF9CA;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1184) == 0) {
-            v = lbl_806EF9E0;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E118C) == 0) {
-            v = lbl_806EF9E1;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1194) == 0) {
-            v = lbl_806EF9E2;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11A4) == 0) {
-            v = lbl_806EF9E3;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11B4) == 0) {
-            v = lbl_806EF9E4;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11BC) == 0) {
-            v = lbl_806EF9E5;
-store:
-            *out = v;
-        }
+        if (fn_8040B3B4(name, lbl_805E1144) == 0)
+            *out = lbl_806EF9DD;
+        else if (fn_8040B3B4(name, lbl_805E114C) == 0)
+            *out = lbl_806EF9DC;
+        else if (fn_8040B3B4(name, lbl_805E1158) == 0)
+            *out = lbl_806EF9CC;
+        else if (fn_8040B3B4(name, lbl_805E1164) == 0)
+            *out = lbl_806EF9CB;
+        else if (fn_8040B3B4(name, lbl_805E116C) == 0)
+            *out = lbl_806EF9DE;
+        else if (fn_8040B3B4(name, lbl_805E1174) == 0)
+            *out = lbl_806EF9DF;
+        else if (fn_8040B3B4(name, lbl_805E117C) == 0)
+            *out = lbl_806EF9CA;
+        else if (fn_8040B3B4(name, lbl_805E1184) == 0)
+            *out = lbl_806EF9E0;
+        else if (fn_8040B3B4(name, lbl_805E118C) == 0)
+            *out = lbl_806EF9E1;
+        else if (fn_8040B3B4(name, lbl_805E1194) == 0)
+            *out = lbl_806EF9E2;
+        else if (fn_8040B3B4(name, lbl_805E11A4) == 0)
+            *out = lbl_806EF9E3;
+        else if (fn_8040B3B4(name, lbl_805E11B4) == 0)
+            *out = lbl_806EF9E4;
+        else if (fn_8040B3B4(name, lbl_805E11BC) == 0)
+            *out = lbl_806EF9E5;
         r = *out >= 0;
         if (r != 0) {
             lbl_806E03EC[lbl_8061EAF4++] = *out;
         }
         break;
     case 1: {
-        int i = 0;
+        i = 0;
         char* p = lbl_8068D9E0;
-        for (; i <= 2; i++, p += 0x24) {
+        for (; i <= 2; p += 0x24, i++) {
             if (fn_8040B3B4(p, name) == 0) {
                 *out2 = p;
                 r = 1;
@@ -186,7 +157,7 @@ store:
     }
     case 2:
         *out = -1;
-        for (int i = 0; i <= 15; i++) {
+        for (i = 0; i <= 15; i++) {
             if (fn_8040B3B4(lbl_8061EAF8[i], name) == 0) {
                 *out = i;
                 r = 1;
