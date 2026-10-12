@@ -387,6 +387,43 @@ int Unk8016ACAC::fn_8016AF4C() /* 8016AF4C */
     return r;
 }
 
+int Unk8016ACAC::fn_8016AF9C() /* 8016AF9C */
+{
+    int r = 0;
+    Unk8016ACAC_Slot* s = m1E28;
+    for (int i = 0; i <= 2; s++, i++) {
+        int h = s->mA20;
+        if (h == (int)0xF461F8E8
+            || h == (int)0xE5B188AF
+            || h == (int)0x48C5C923
+            || h == (int)0x6F37A402
+            || h == (int)0x80A5282D
+            || h == (int)0x08CE57B4
+            || h == (int)0xCF7C78C8
+            || h == (int)0x92547307
+            || h == (int)0xF4628549
+            || h == (int)0xE9BC19D0
+            || h == (int)0xCE227E64
+            || h == (int)0x73423523
+            || h == (int)0x80B740AE
+            || h == (int)0x8E2B0CF5
+            || h == (int)0x006FD629
+            || h == (int)0x17B12848
+            || h == (int)0xF46311AA
+            || h == (int)0xEDC6AAF1
+            || h == (int)0x537F33A5
+            || h == (int)0x774CC644
+            || h == (int)0x80C9592F
+            || h == (int)0x1387C236
+            || h == (int)0x3163338A
+            || h == (int)0x9D0DDD89) {
+            r = 1;
+            break;
+        }
+    }
+    return r;
+}
+
 void fn_8016B148() /* 8016B148 */
 {
     lbl_80619D10->fn_800AB9A8(4);
