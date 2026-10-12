@@ -673,6 +673,30 @@ int fn_80088640(O* o, int a, int b)
     return fn_80087E0C(&o->mF60, a, b);
 }
 
+struct Unk8008882C_Teams {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk8008882C_Self {
+    Unk8008882C_Teams* m0;
+};
+extern "C" unsigned char fn_800968C0(void* o, int key, int flag);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+int fn_8008882C(Unk8008882C_Self* s, int k, int side, int k2)
+{
+    int z = side == 0;
+    int off1 = side * 0xE64;
+    int a = fn_800968C0(s->m0->m14 + off1, k, 1);
+    int off2 = z * 0xE64;
+    int b = fn_800968C0(s->m0->m14 + off2, k2, 1);
+    int c = fn_8008CFD8(s->m0->m14 + off1 + 0xC9C, 9, a);
+    int d = fn_8008CFD8(s->m0->m14 + off2 + 0xC9C, 8, b);
+    if (d == 2)
+        d = c == 0;
+    return d == 1;
+}
+
 float fn_80088E74(O* o)
 {
     float r = (o->m1748 - lbl_805B4860) * lbl_805B4864;
@@ -756,6 +780,38 @@ int fn_80089114(void* s, Unk80087A58_V2* v)
     else if (!(AbsF(v->y) <= lbl_805B4868))
         r = 1;
     return r;
+}
+
+struct Unk80089164_Y {
+    char pad0[0x3A4];
+    int m3A4;
+};
+struct Unk80089164_X {
+    char pad0[0x700];
+    Unk80089164_Y* m700;
+};
+extern "C" int fn_801D0294(int x);
+void fn_80353C60(O* o, int a);
+void fn_800895F8(char* base, int a, int b, int c, Unk80087A58_V2* v);
+
+/* near-miss: stack slots of the pair copy are swapped (retail: out-pair at 0x10, copy at 8), crclr/li order */
+void fn_80089164(O* o)
+{
+    Unk80087A58_X* x = fn_80087B14();
+    if (x != 0 && o->m1744 != 0 && fn_80353D9C(o) != 0 && o->m1750 == 0) {
+        if (fn_80088FBC(o, -1) == 2 && fn_801D0294(((Unk80089164_X*)((Unk80087A58_X*(*)(O*))fn_80089798)(o))->m700->m3A4 + 0x28C) != 0)
+            fn_80353C60(o, 3);
+        if (fn_80088FBC(o, -1) != 6) {
+            int f = ((Unk80087A58_X2*)o->m0)->m14->m1CD0 == 0;
+            int k = fn_80088FBC(o, -1);
+            int a = fn_80088FFC(o, -1);
+            Unk80087A58_Pair p;
+            ((Unk80087A58_Pair*(*)(Unk80087A58_Pair*, O*, ...))fn_8008903C)(&p, o, -1);
+            Unk80087A58_Pair q = p;
+            fn_800895F8((char*)o + 0xC, f, a, k, (Unk80087A58_V2*)&q);
+            o->m1744 = 0;
+        }
+    }
 }
 
 void fn_8008928C(O* o)

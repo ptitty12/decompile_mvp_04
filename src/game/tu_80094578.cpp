@@ -478,7 +478,6 @@ extern "C" void fn_800961E0(Sub198* p)
         p->m1C[i] = 0;
 }
 
-/* near-miss: retail copies x through r0 before the call */
 extern int lbl_8061930C;
 struct Unk8007B2B0_Screen {
     int fn_80078A38(int a);
@@ -614,19 +613,20 @@ extern "C" void fn_80099A44(Obj3* o, int a, int b);
 
 extern "C" void fn_80096830(Obj3* o, int a) { fn_80099A44(o, fn_800968C0(o, a, 1), 0); }
 
-/* near-miss: retail loads the two bytes in the opposite register order */
+inline void Set80096870(ByteVec* v, unsigned i, unsigned char c)
+{
+    if (i >= v->m4)
+        v->m4 = i + 1;
+    v->m0[i] = c;
+}
+
 extern "C" void fn_80096870(Obj3* o, unsigned a, unsigned b)
 {
     ByteVec* v = &o->m168;
-    unsigned char* p = v->m0;
-    unsigned char ta = p[a];
-    unsigned char tb = p[b];
-    if (a >= v->m4)
-        v->m4 = a + 1;
-    v->m0[a] = tb;
-    if (b >= v->m4)
-        v->m4 = b + 1;
-    v->m0[b] = ta;
+    unsigned ta = v->m0[a];
+    unsigned tb = v->m0[b];
+    Set80096870(v, a, tb);
+    Set80096870(v, b, ta);
 }
 
 extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
@@ -653,10 +653,14 @@ extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
     return r;
 }
 
-/* near-miss: retail re-reads the count in the loop instead of keeping it in a register */
+struct VolVec8009692C {
+    unsigned char* m0;
+    volatile unsigned m4;
+    unsigned m8;
+};
 extern "C" unsigned char fn_8009692C(Obj3* o, int key)
 {
-    ByteVec* v = &o->m168;
+    VolVec8009692C* v = (VolVec8009692C*)&o->m168;
     unsigned char i = 0;
     unsigned char r = 0xFF;
     if (i < v->m4) {
@@ -664,13 +668,15 @@ extern "C" unsigned char fn_8009692C(Obj3* o, int key)
         if (p[0] == key) {
             r = 0;
         } else {
-            do {
+            for (;;) {
                 i++;
                 if (!(i < v->m4))
                     break;
-            } while (p[i] != key);
-            if (i < v->m4)
-                r = i;
+                if (p[i] == key) {
+                    r = i;
+                    break;
+                }
+            }
         }
     }
     return r;
