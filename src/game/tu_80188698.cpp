@@ -3,6 +3,11 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80188698.h"
+#include "game/tu_8018C9C8.h"
+
+extern "C" float fn_8018CDB8(Unk80188698* o, int k, float t);
+extern float lbl_805CDCA8;
+
 //@BODY
 //@80188698
 extern "C" void fn_80188698(Unk80188698* o, float f)
@@ -217,6 +222,25 @@ extern "C" void fn_8018A8C4(Unk80188698* o, float a, float b, float c)
     fn_801965CC(o->m448, o->m3F4 + a, o->m3F4 + b, c);
 }
 
+//@8018A930
+extern "C" void fn_8018A930(Unk80188698* o, int a, float t, void* b, void* c, void* d)
+{
+    int mode = o->m38C;
+    if (a == 0 || mode != 1 || o->m388 != 3) {
+        mode = 4;
+        fn_8037893C((char*)o->m44C + 0x704, 0x43, 0, 0, 0);
+    }
+    int prev = o->m38C;
+    o->m38C = mode;
+    o->m390 = prev;
+    ((Unk8018C9C8_Bits*)&o->m4A4)->b10 = fn_8018AABC(o);
+    ((Unk8018C9C8_Bits*)&o->m4A4)->b9 = fn_8018B4D0(o);
+    Unk80183918_Vec3 pos = o->m60;
+    if (d)
+        pos = *(Unk80183918_Vec3*)d;
+    fn_8018A254(o, (int)&pos, &lbl_806055AC, (int)b, (int)c, o->m38C, 1);
+}
+
 //@8018AA44
 extern "C" int fn_8018AA44(int v)
 {
@@ -260,6 +284,36 @@ extern "C" int fn_8018B43C(Unk80188698* o, int a, Unk80183918_Vec3* p, float rr)
             return 1;
     }
     return 0;
+}
+
+//@8018B4D0
+extern "C" int fn_8018B4D0(Unk80188698* o)
+{
+    int r = 0;
+    if (o->m38C == 1) {
+        if (fn_8018AD20(o) != 0)
+            return 0;
+        float a = fn_8018CDB8(o, 3, 0.0f);
+        float b = o->m3F4;
+        if (a != -1.0f) {
+            float x = -1.0f;
+            float lo = fn_8018CDB8(o, 0xA, 0.0f);
+            float hi = fn_8018CDB8(o, 0xB, 0.0f);
+            Unk80183918_Vec3 v = fn_8018959C(o, a);
+            if (!(lo >= 0.0f))
+                x = hi;
+            else if (!(hi < 0.0f))
+                x = lo <? hi;
+            else
+                x = lo;
+            if ((!(x <= lbl_805CDCA8) && x < a) || v.m0 < 0.0f || !(v.m8 >= 0.0f)) {
+                r = 0;
+            } else if (b > a || !(*(float*)((char*)o->m448 + 0xAF4) <= 180.0f)) {
+                r = 1;
+            }
+        }
+    }
+    return r;
 }
 
 //@8018B648

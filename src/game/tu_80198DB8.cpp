@@ -16,6 +16,116 @@ inline void Unk8019B04C_Put(int*& p, int v)
 {
     *p++ = v;
 }
+
+extern "C" {
+float fn_8037A9AC(const Unk80183918_Vec3* a, const Unk80183918_Vec3* b);
+void fn_80379DA0(Unk80198CC0_Vec4* out, Unk80183918_Vec3* axis, float angle);
+Unk80198CC0_Vec4* fn_8019A4F4(Unk80198CC0_Vec4* out, const Unk80183918_Vec3* a, const Unk80183918_Vec3* b);
+}
+
+struct Unk8019B390_P {
+    char pad0[0x60];
+    Unk80183918_Vec3 m60;
+    char pad6C[0xB68 - 0x6C];
+    int mB68;
+};
+struct Unk8019B390_E {
+    Unk8019B390_P* m0;
+    char pad4[4];
+    float m8;
+    int mC;
+};
+struct Unk8019B390_C {
+    char pad0[0x374];
+    int m374;
+    char pad378[0x38C - 0x378];
+    int m38C;
+};
+struct Unk8019B390_T {
+    char pad0[0x6CC];
+    Unk8019B390_C* m6CC;
+};
+struct Unk8019B390_O {
+    char pad0[0x24];
+    Unk8019B390_T* m24;
+    Unk8019B390_E m28[60];
+    int m3E8;
+};
+int fn_8026D940(Unk8026C414_O* o, Unk8026C414_X* x);
+
+struct Unk8019BC10_P {
+    float x;
+    float z;
+};
+
+struct Unk8019F8C0_Owner;
+struct Unk8019B490_V {
+    char pad0[0x24];
+    Unk801808A4_Ctx* m24;
+    char pad28[0x3E8 - 0x28];
+    int m3E8;
+};
+int fn_801A48F8(Unk8019F8C0_Owner* o, int side);
+int fn_801A4C74(Unk8019F8C0_Owner* o, int i);
+extern "C" {
+void* fn_801A4910(Unk8019F8C0_Owner* o, int side, int i);
+}
+
+extern "C" {
+int fn_8019CCE4(int a);
+int fn_802C0218(int a, int b, int c, float* t, void* p1, void* p2, float k);
+}
+
+struct Unk80199928_O {
+    char pad0[0x384];
+    int m384;
+    char pad388[0x3E4 - 0x388];
+    Unk80183918_Vec3 m3E4;
+    Unk80183918_Vec3 m3F0;
+};
+extern "C" {
+int fn_80199418(Unk80199928_O* o, int a);
+void fn_80199AF8(Unk80199928_O* o, int a, int b, int c, int d, int e, int f, float x, float y);
+}
+
+extern Unk80183918_Vec3 lbl_806055B8;
+extern Unk80183918_Vec3 lbl_806055F8;
+
+struct Unk80379324 {
+    Unk80379324();
+    float m0, m4, m8, mC;
+};
+struct Unk8019A998_Ring {
+    int m0;
+    char* m4;
+    char pad8[4];
+    int mC;
+};
+struct Unk8019A998_Base {
+    int m0;
+    char pad4[0x6C - 4];
+    int m6C;
+    char pad70[0x7C - 0x70];
+    Unk80379324 m7C;
+    char pad8C[0x98 - 0x8C];
+};
+class Unk8019A998_Virt : public Unk8019A998_Base {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(void* p);
+};
+struct Unk8019A998_Obj : public Unk8019A998_Virt {
+    char pad9C[0x384 - 0x9C];
+    int m384;
+    int m388;
+    char pad38C[0x3E4 - 0x38C];
+    Unk80183918_Vec3 m3E4;
+    Unk80183918_Vec3 m3F0;
+    Unk8019A998_Ring m3FC;
+};
+extern "C" void fn_80198694(Unk8019A998_Ring* r, char* a, char* b, char* c, void* p1, void* p2);
+
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -121,6 +231,44 @@ extern "C" void fn_80199414()
 {
 }
 
+inline void Unk80199928_ScaleRf(Unk80183918_Vec3& v, float s)
+{
+    v.m0 *= s;
+    v.m4 *= s;
+    v.m8 *= s;
+}
+
+inline void Unk80199928_Damp(Unk80183918_Vec3& v)
+{
+    Unk80199928_ScaleRf(v, 0.1f);
+}
+
+//@80199928
+/* near-miss (98.3%): identical instructions; one scheduling swap remains (retail loads the 0.1f constant
+ * before `addi r5,r31,0x3F0`, here the addi comes first; tried the Scale/Damp inline shapes). */
+extern "C" void fn_80199928(Unk80199928_O* o, int a1, int a2, int a3, int a4, int a5, int a6)
+{
+    fn_80198F20((Unk80198E5C_Obj*)o);
+    int c5 = fn_80199418(o, a5);
+    fn_80198F44((Unk80198E5C_Obj*)o);
+    int c6 = fn_80199418(o, a6);
+    if (c5 != 0) {
+        if (c6 != 0) {
+            o->m3E4.m4 = o->m3E4.m4 * (!(o->m3E4.m4 >= 0.0f) ? -0.25f : 0.25f);
+            Unk80199928_Damp(o->m3F0);
+            if (!(o->m3E4.m4 >= 10.0f)) {
+                o->m3E4 = lbl_806055AC;
+                o->m3F0 = lbl_806055AC;
+                o->m384 = 0;
+            }
+            return;
+        }
+        fn_80199AF8(o, a2, a3, a1, a5, a6, a4, fn_80198F20((Unk80198E5C_Obj*)o), fn_80198F44((Unk80198E5C_Obj*)o));
+    }
+    if (c6 != 0)
+        fn_80199AF8(o, a3, a2, a1, a6, a5, a4, fn_80198F44((Unk80198E5C_Obj*)o), fn_80198F20((Unk80198E5C_Obj*)o));
+}
+
 //@8019A314
 extern "C" void fn_8019A314(Unk8019A314_O* o, float* a, void* out1, void* out2)
 {
@@ -143,6 +291,78 @@ extern "C" void fn_8019A404(void* o, void* x, float* out)
     out[0] = *(float*)((char*)o + 0x30);
     out[1] = *(float*)((char*)o + 0x34);
     out[2] = *(float*)((char*)o + 0x38);
+}
+
+inline Unk80183918_Vec3 Unk8019A4F4_Cross(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m4 * b.m8 - b.m4 * a.m8;
+    r.m8 = a.m0 * b.m4 - b.m0 * a.m4;
+    r.m4 = b.m0 * a.m8 - a.m0 * b.m8;
+    return r;
+}
+
+inline void Unk8019A44C_Cp(Unk80183918_Vec3* d, const Unk80183918_Vec3* s)
+{
+    *d = *s;
+}
+
+//@8019A44C
+extern "C" void fn_8019A44C(void* o, void* x)
+{
+    Unk80198CC0_Vec4 t;
+    Unk80183918_Vec3 b;
+    fn_804023C4(&lbl_806055F8, (Unk8018A254_Ret*)o, &t);
+    Unk80198CC0_Vec4* tp = &t;
+    Unk80198CC0_Vec4 q;
+    q.m[0] = tp->m[0];
+    q.m[1] = tp->m[1];
+    q.m[2] = tp->m[2];
+    Unk8019A44C_Cp(&b, (Unk80183918_Vec3*)&q);
+    fn_8019A4F4(&q, &lbl_806055B8, &b);
+    *(Unk80198CC0_Vec4*)x = q;
+}
+
+//@8019A4F4
+extern "C" Unk80198CC0_Vec4* fn_8019A4F4(Unk80198CC0_Vec4* out, const Unk80183918_Vec3* a, const Unk80183918_Vec3* b)
+{
+    float ang = fn_8037A9AC(a, b);
+    if (!(ang >= 1e-6) && !(ang <= -1e-6)) {
+        fn_8037936C(out, (const char*)&lbl_8069428C);
+    } else {
+        Unk80183918_Vec3 axis = Unk8019A4F4_Cross(*a, *b);
+        fn_80379DA0(out, &axis, ang);
+    }
+    return out;
+}
+
+inline void Unk8019A998_Cp(Unk80183918_Vec3* d, const Unk80183918_Vec3* s)
+{
+    *d = *s;
+}
+
+//@8019A998
+extern "C" void fn_8019A998(Unk8019A998_Obj* o)
+{
+    Unk8019A998_Ring* r = &o->m3FC;
+    fn_80198F68(o);
+    o->m388 = 0;
+    o->m384 = 2;
+    fn_80198DD8((Unk80198E5C_Obj*)o, 0);
+    Unk80379324 q;
+    Unk80379324* qp = &q;
+    Unk80183918_Vec3 v;
+    if (r->mC == -1) {
+        Unk8019A998_Cp(&v, &lbl_806055AC);
+        *qp = *(Unk80379324*)&lbl_8069428C;
+    } else {
+        fn_8019A404(r->m4 + (r->mC << 7) + 0x20, qp, (float*)&v);
+    }
+    o->m0 = 0;
+    o->m6C = 1;
+    o->m7C = q;
+    o->v3(&v);
+    fn_80198694(r, fn_80198E78((Unk80198E5C_Obj*)o), fn_80198EB0((Unk80198E5C_Obj*)o), fn_80198EE8((Unk80198E5C_Obj*)o), &o->m3E4, &o->m3F0);
 }
 
 //@8019AAF0
@@ -352,6 +572,48 @@ extern "C" void fn_8019B2E0(char* o, Unk8019B2E0_P* p, int flag)
     *(int*)(o + 0x3E8) = *(int*)(o + 0x3E8) + 1;
 }
 
+//@8019B390
+extern "C" void fn_8019B390(Unk8019B390_O* o)
+{
+    Unk8019B390_C* c = o->m24->m6CC;
+    int a = c->m374;
+    int is3 = c->m38C == 3;
+    for (int i = 0; i < o->m3E8; i++) {
+        Unk8019B390_P* p = o->m28[i].m0;
+        Unk80183918_Vec3 d = p->m60;
+        o->m28[i].m8 = fn_804028E4(d.m0 * d.m0 + d.m8 * d.m8);
+        int f = 1;
+        if (o->m28[i].m0->mB68 == 0)
+            f = 0;
+        o->m28[i].mC = f;
+        if ((is3 && a == (int)o->m28[i].m0) || fn_8026D940((Unk8026C414_O*)o->m28[i].m0, 0) != 0)
+            o->m28[i].mC = 1;
+    }
+}
+
+//@8019B490
+extern "C" void fn_8019B490(void* oo)
+{
+    Unk8019B490_V* o = (Unk8019B490_V*)oo;
+    int i;
+    o->m3E8 = 0;
+    int side = 0;
+    if (o->m24->m6F8->m14->m1CD0 != 0)
+        side = 1;
+    int n = fn_801A48F8((Unk8019F8C0_Owner*)o->m24, side);
+    for (i = 0; i < n; i++)
+        fn_8019B2E0((char*)o, (Unk8019B2E0_P*)fn_801A4910((Unk8019F8C0_Owner*)o->m24, side, i), 1);
+    int other = o->m24->m6F8->m14->m1CD0 == 0;
+    n = fn_801A48F8((Unk8019F8C0_Owner*)o->m24, other);
+    for (i = 0; i < n; i++)
+        fn_8019B2E0((char*)o, (Unk8019B2E0_P*)fn_801A4910((Unk8019F8C0_Owner*)o->m24, other, i), 0);
+    i = 0;
+    do {
+        fn_8019B2E0((char*)o, (Unk8019B2E0_P*)fn_801A4C74((Unk8019F8C0_Owner*)o->m24, i), 0);
+        i++;
+    } while (i <= 3);
+}
+
 //@8019B5AC
 extern "C" int fn_8019B5AC(float* a, float* b)
 {
@@ -386,6 +648,32 @@ extern "C" void fn_8019BA30(void** o, float t)
     fn_802C0888(*o, t);
 }
 
+//@8019BA5C
+/* near-miss (98.9%): same instructions; callee-saved registers differ (retail: a r30, b r29, hit r26,
+ * p1 r28, p2 r27, r1 r25; here p1 r30, p2 r29, hit r28, a r27, b r26). The cr4 save/restore matches. */
+extern "C" int fn_8019BA5C(int* ctx, int a, int b, float t, int c, int flag, float* hit, Unk80183918_Vec3* p1, Unk80183918_Vec3* p2, int* sx, int* sy, int sz)
+{
+    if (flag == 0 && fn_8019CCE4(*ctx) != 0)
+        return -1;
+    *sy = 1;
+    int r1 = ((int (*)(int, int, int, float*, void*, void*, int*, int, float))fn_802C0888)(*ctx, a, b, hit, p1, p2, sx, sz, t);
+    int r2 = -1;
+    Unk80183918_Vec3 v10;
+    Unk80183918_Vec3 v20;
+    float f30;
+    if (flag != 0 || c != 0 || *sx != 0)
+        r2 = fn_802C0218(*ctx, a, b, &f30, &v10, &v20, t);
+    if (r2 != -1 && (r1 == -1 || !(f30 >= *hit))) {
+        *hit = f30;
+        *p1 = v10;
+        *p2 = v20;
+    }
+    int r = r1;
+    if (r == -1)
+        r = r2;
+    return r;
+}
+
 //@8019BBC0
 extern "C" int fn_8019BBC0(void** o, void* a, void* b, float* t, void* p1, void* p2, float k)
 {
@@ -396,4 +684,29 @@ extern "C" int fn_8019BBC0(void** o, void* a, void* b, float* t, void* p1, void*
 extern "C" void fn_8019BBEC(void** o)
 {
     fn_802C0EC4(*o);
+}
+
+//@8019BC10
+extern "C" int fn_8019BC10(const Unk8019BC10_P* a, const Unk8019BC10_P* b, void* obj)
+{
+    float pts[4][3];
+    char b38[16];
+    char b48[16];
+    float f58, f5C, f60;
+    for (int i = 0; i < 4; i++) {
+        pts[i][0] = i <= 1 ? a->x : b->x;
+        pts[i][1] = 0.0f;
+        pts[i][2] = (unsigned)(i - 1) <= 1 ? b->z : a->z;
+    }
+    int i = 0;
+    for (;;) {
+        int next = i + 1;
+        int j = next % 4;
+        if (((int (*)(void*, void*, void*, void*, void*, void*, void*, void*, float))fn_802C0888)(obj, pts[i], pts[j], &f58, b38, b48, &f60, &f5C, 0.0f) == -1) {
+            i = next;
+            if (i > 3)
+                return 1;
+        } else
+            return 0;
+    }
 }
