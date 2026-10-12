@@ -380,6 +380,156 @@ void fn_80084AE8(K30* self, unsigned i)
         fn_8040074C(&self->m24[i], 0x30);
 }
 
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+int fn_80084B24(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    case 18:
+        r = 100;
+        break;
+    case 19:
+        r = 100;
+        break;
+    case 20:
+        r = 100;
+        break;
+    case 21:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+int fn_80084BDC(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    case 18:
+        r = 0;
+        break;
+    case 19:
+        r = 0;
+        break;
+    case 20:
+        r = 0;
+        break;
+    case 21:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 unsigned fn_80084C50(Unk80084910_PackTabA* self, unsigned t, unsigned i)
 {
     unsigned r = 0;
