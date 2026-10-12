@@ -27,6 +27,9 @@ our C++ game units as they are.
 | v8__11Tbl80094800, v8__11Tbl800956D8 | game/tu_80094578.cpp | 77 vs 78, 64 vs 65 insns | &buf (char[0x14] at frame offset 16) is a force_operand pseudo that CSE keeps in r28; retail rematerialises `addi r3,r1,24` per call (and saves r29-r31 with r31 unused) | struct/array/&buf[0] forms (Opus 2) |
 | fn_80097318 (+ clones 97380, 973E8, 97450, 974B8) | game/tu_80094578.cpp | 22 vs 26 insns | retail's loop re-reads +0, +4, +0x3E8 every pass and keeps the index as an int with clrlwi per use; ours hoists and rotates the loop differently | read only (Opus 2) |
 | fn_80079F54 | game/tu_80077238.cpp | 15/15, 3 differ | fmadds operand/register order: retail loads m204 before the int->float conversion and m1F4 after it | operand orders, float temp (Opus 2) |
+| fn_803302D4 | game/tu_8032ECD8.cpp | 44/44, 2 differ | widget with a 10-int ring at +0x48: retail stores the vptr (lbl_80666A68) before m5C; every order of the tail stores puts m5C first or swaps the ring/vtable registers r28/r29. The ring vptr lbl_8064B298 is stored twice (via r28 in the ring init, via self at +0x58), which suggests the ring is a base or member whose vtable g++ re-stores | 24+720 tail orders, FxRingInit inline vs open-coded (Opus 3) |
+| fn_8033C490 | game/tu_80338ECC.cpp | 179/179, 6 differ | loop giv order only: retail initialises/increments the item pointer second (o-name, item, o+0x14, offset); ours puts it last | k/nm temporaries, index forms (Opus 3) |
+| fn_8032FD58 | game/tu_8032ECD8.cpp | not written | widget ctor with a 126-int ring at +0x48 (same family as fn_803302D4) plus a fill loop from a singleton (fn_800B64BC); FxWidInit + FxRingInit cover the head | none (Opus 3) |
 
 Matched by the near-miss sweep (W4, 2026-10-11; recipes in PATTERNS.md,
 "Near-miss sweep"): cTimeWarp::cTimeWarp, fn_8027F504, fn_8027FC80,
@@ -38,3 +41,9 @@ Matched by Opus hard-case families 2 (2026-10-11; recipes in PATTERNS.md, "Hard-
 families 2"): fn_8004961C, fn_8004A8F8, fn_8004B538, fn_800488C4, fn_80051E68,
 fn_80051014, fn_8006473C, fn_80088EFC, fn_80077238, fn_80077320, fn_80077404,
 fn_80077684, fn_8007776C, fn_80077850, fn_80077934, fn_80078D00, fn_800A3DF8.
+
+Matched by Opus hard-case families 3 (2026-10-11; recipes in PATTERNS.md, "Hard-case
+families 3"): fn_8032ECD8, fn_8032F120, fn_8032F19C, fn_8032F38C, fn_8032F428,
+fn_8032F4CC, fn_8032DC2C, fn_8032DD00, fn_8032E0B4, fn_8032E1DC, fn_8032E70C,
+fn_8032E7C0, fn_8032E894, fn_8032EB84, fn_8032EC38, fn_800AEA68, __5FxRec, __3FxSi,
+__3FxU, fn_80331DB8, fn_80332978, fn_80332DBC, fn_80333A70.

@@ -357,8 +357,8 @@ void fn_8031F0A0(FxQ* self, FxVec* out) { *out = self->mC->m60; }
 
 // fn_8031F0C4
 FxS::FxS(int a) {
-    m4 = a;
     m8 = lbl_80665110;
+    m4 = a;
     m0 = lbl_8061E978->m3654;
 }
 
