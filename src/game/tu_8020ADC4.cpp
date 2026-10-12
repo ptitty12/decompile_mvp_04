@@ -50,6 +50,68 @@ extern "C" int fn_8020B898(Scr* p)
     return r;
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_80660C78[];
+extern Unk8020C5FC_Tbl lbl_805D5940;
+
+struct Unk8020C4B4_Ev {
+    int m0;
+    const void* vptr;
+    int m8;
+    int mC;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived()
+    {
+        vptr = lbl_80660C78;
+        m8 = -1;
+    }
+    ~Unk8020C4B4_Ev() { vptr = lbl_80649DA0; }
+};
+
+struct Unk8020C4B4_Own {
+    char pad0[0x660];
+    void* m660;
+};
+
+struct Unk8020C4B4_J {
+    char pad0[0x41C];
+    int m41C;
+};
+
+extern "C" int fn_80259330(int x);
+extern "C" int fn_8020C90C(Scr* p);
+extern "C" int fn_8017C94C(void* j);
+extern "C" void fn_8037893C(void* q, int id, Unk8020C4B4_Ev* e, int a, int b);
+
+extern "C" int fn_8020C4B4(Scr* s)
+{
+    int r = 1;
+    if (fn_80259330(s->m0->m0->m700->m3B4) == 1) {
+        int idx = fn_8020C90C(s);
+        if (idx == -1)
+            idx = 3;
+        Unk8020C5FC_Tbl t = lbl_805D5940;
+        r = t.m[idx];
+        Unk8020C4B4_Ev e;
+        e.Base(0x69);
+        e.Derived();
+        e.m8 = idx;
+        fn_8037893C((char*)s->m0->m0 + 0x704, e.m0, &e, 0, 0);
+    } else if (fn_8017C94C(s->m0->m0->m700) == 1) {
+        r = 0x44;
+        Unk801EE438_Game* g = s->m0->m0->m6CC;
+        if ((void*)g->m36C == ((Unk8020C4B4_Own*)s->m0->m0)->m660)
+            r = 0x43;
+    } else if (((Unk8020C4B4_J*)s->m0->m0->m700)->m41C != 0xA) {
+        r = 0x43;
+    }
+    return r;
+}
+
 extern "C" int fn_8020C5F4(Scr* p)
 {
     return 0x42;
