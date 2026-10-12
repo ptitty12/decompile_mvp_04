@@ -80,7 +80,7 @@ void fn_80377488(int p);
 int fn_8040B574(const char* a, const char* b);
 extern char lbl_805BA560[];
 void fn_80125490(int o, int a, int b, int c, int d);
-void fn_801254EC(int o, int a, int b, char* p, int c);
+int fn_801254EC(int o, int a, int b, char* p, int c);
 void fn_80125C84(int o, int a);
 void fn_80125CF8(int o);
 int fn_8007CF44(Unk8007B2B0_Screen* s, unsigned h, int a, int b);

@@ -436,7 +436,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(Matching, "libgcc/_main.c"),
-            Object(NonMatching, "libgcc/tu_80413940.c"),
+            Object(NonMatching, "libgcc/tu_80413940.c", cflags=["-O2", "-G 1024"]),
         ],
     },
     {
@@ -1286,7 +1286,7 @@ config.libs = [
             Object(NonMatching, "dolphin/gx/GXBump.c"),
             Object(NonMatching, "dolphin/gx/GXTev.c"),
             Object(NonMatching, "dolphin/gx/tu_8042F93C.c"),
-            Object(NonMatching, "dolphin/os/tu_80431828.c"),
+            Object(NonMatching, "dolphin/os/tu_80431828.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),
             Object(NonMatching, "dolphin/os/tu_804321CC.c"),
             Object(NonMatching, "dolphin/os/tu_804330D0.c"),
             Object(NonMatching, "dolphin/os/OSMessage.c"),
@@ -1308,7 +1308,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "dolphin/dvd/tu_804227D4.c"),
             Object(NonMatching, "dolphin/dvd/dvdqueue.c"),
-            Object(NonMatching, "dolphin/dvd/tu_80425954.c"),
+            Object(NonMatching, "dolphin/dvd/tu_80425954.c", cflags=[f if f != "-inline auto" else "-inline noauto" for f in cflags_dolphin_dvd]),  # dvderror.c: ErrorCode2Num stays out of line
             Object(NonMatching, "dolphin/dvd/dvdidutils.c"),
             Object(NonMatching, "dolphin/dvd/tu_80425BE4.c"),
         ],
@@ -1319,7 +1319,8 @@ config.libs = [
         "cflags": cflags_dolphin_exi,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "dolphin/exi/tu_80425E54.c"),
+            Object(NonMatching, "dolphin/exi/tu_80425E54.c", cflags=cflags_dolphin_sdk),  # dvdlow.c: -O4,p (docs/DECISIONS.md 2026-10-12)
+            Object(NonMatching, "dolphin/exi/tu_80426CD0.c"),
         ],
     },
     {

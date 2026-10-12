@@ -3,6 +3,8 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801C2C64.h"
+#include "game/goals/tu_8027C728.h"
+#include "game/tu_801C6D2C.h"
 
 typedef Unk801B7FB0_P P;
 typedef Unk801C16B0_Z Z;
@@ -19,7 +21,6 @@ int fn_8017C94C(void* p);
 void fn_80249B40(P* p, float f, int a, int b, int c);
 int fn_801BBF0C(Unk801B7FB0_Ai* a);
 void* fn_8024D218(P* p);
-void fn_80303BC4(const char* fmt, ...);
 void fn_801C4F98(Z* z);
 P* fn_801A4B34(P* ctx);
 int fn_801A2034(P* ctx, int k);
@@ -28,10 +29,15 @@ int fn_801D5974(void* p);
 int fn_801C4128(Z* z);
 }
 
+void fn_80303BC4(const char* fmt, float a, float b, ...);
+enum Unk801C2C64_Sw { Sw_Neg = -1, Sw_Lo = 0, Sw_Hi = 0x41 };
 struct Unk801C2C64_Rec {
     int m0;
     int m4;
 };
+extern "C" Unk8027C728_Goal* fn_802448F4(P* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
 struct Unk801C2C64_Sim {
     char pad0[0x3BC];
     Unk801B7FB0_Ai* m3BC;
@@ -63,6 +69,12 @@ inline Vec3 operator-(const Vec3& a, const Vec3& b)
 }
 
 float fn_80410CE8(float y, float x);
+extern "C" float fn_801C6FD8(Z* z);
+extern "C" float fn_801C6D88(Z* z);
+struct Unk801C2C64_F1 {
+    float m0;
+};
+extern Unk801C2C64_F1 lbl_8068C7A8;
 float fn_804028E4(float x);
 Vec3 fn_80189618(P* p, float f);
 extern float lbl_8068C4C4;
@@ -82,7 +94,9 @@ struct Unk801C2C64_G {
     float mC;
     char pad10[0x60 - 0x10];
     float m60;
-    char pad64[0x2A0 - 0x64];
+    char pad64[0x39C - 0x64];
+    float m39C;
+    float m3A0;
 };
 extern Unk801C2C64_G lbl_8068C420;
 
@@ -129,6 +143,65 @@ struct Unk801C2C64_Q : public Unk801C2C64_QBase {
 extern "C" Unk801C2C64_Q* fn_801A4CE8(P* ctx, int k);
 extern "C" void fn_801CF054(Z* z, float* a, float* b);
 inline int HashOf(P* p) { return p->m618->m838; }
+
+extern Vec3 lbl_805D30D4;
+
+inline int Byte1CC9(unsigned char c) { return c; }
+
+extern "C" void fn_801C2DEC(Z* z, int force)
+{
+    P* c = z->m204->m6CC;
+    if ((c->m38C == 1 && c->m388 == 3) || force) {
+        Vec3 pos = c->m60;
+        float dist;
+        Vec3 d = pos - lbl_805D30D4;
+        dist = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+        int ok = 1;
+        if (z->m204->m65C[12] == 0)
+            ok = 0;
+        if (!(dist <= 1920.0f) && ok == 1 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2)
+            z->mEC = ok;
+        else
+            z->mF0 = 1;
+    }
+}
+
+extern "C" void fn_801D85FC(void* o, P* other);
+extern "C" int fn_8035E318(void* s);
+
+extern "C" void fn_801C2F28(Z* z, P* other, int unused, int mode)
+{
+    P* c = z->m204->m6CC;
+    if (c->m38C == 1 && c->m388 == 3) {
+        Vec3 pos = c->m60;
+        float dist;
+        Vec3 d = pos - lbl_805D30D4;
+        dist = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+        int ok = 1;
+        if (z->m204->m65C[12] == 0)
+            ok = 0;
+        if (!(dist <= 1920.0f) && ok == 1 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2)
+            z->mEC = ok;
+        else
+            z->mF0 = 1;
+    }
+    P* r = z->m204->m65C[9];
+    if (other != fn_801A4B34(z->m204)) {
+        Unk801B7FB0_Sub58C* s = &other->m58C;
+        int a = *(int*)((char*)s + 0x38);
+        if (!(a > fn_8035E318(s))) {
+            int f = 0;
+            if (r != 0 && r->m5C4 < 0)
+                f = mode == 1;
+            if (f != 0 || mode == 4)
+                fn_801D85FC(z->mE0, other);
+        }
+    } else {
+        if (r != 0 && r->m5C4 < 0)
+            z->m118 = 0;
+    }
+    z->mF4 = 1;
+}
 
 extern "C" void fn_801C3330(Z* z)
 {
@@ -180,6 +253,91 @@ extern "C" Vec3* fn_801C34D0(Vec3* out, Z* z)
     return out;
 }
 
+extern "C" float fn_801C34F4(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    float a = 0.16666667f;
+    float r = 0.0f;
+    if (p) {
+        int k = fn_8025416C(&p->m588, 0x21);
+        switch ((Unk801C2C64_Sw)k) {
+    case 6:
+    case 25:
+    case 34:
+    case 35:
+    case 41:
+    case 56:
+    case 57:
+    case 60:
+    case 64:
+            r = 0.16666667f;
+            break;
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 5:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+    case 12:
+    case 13:
+    case 14:
+    case 15:
+    case 16:
+    case 17:
+    case 20:
+    case 21:
+    case 22:
+    case 24:
+    case 26:
+    case 27:
+    case 29:
+    case 30:
+    case 33:
+    case 36:
+    case 39:
+    case 40:
+    case 43:
+    case 44:
+    case 46:
+    case 47:
+    case 48:
+    case 49:
+    case 51:
+    case 52:
+    case 53:
+    case 54:
+    case 58:
+    case 59:
+    case 61:
+    case 62:
+    case 63:
+    case 65:
+            r = 0.0f;
+            break;
+    case 4:
+    case 11:
+    case 18:
+    case 19:
+    case 23:
+    case 28:
+    case 31:
+    case 32:
+    case 37:
+    case 38:
+    case 42:
+    case 45:
+    case 50:
+    case 55:
+            r = -0.16666667f;
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" float fn_801C36AC(Z* z)
 {
     const float k = 2.0f;
@@ -197,6 +355,45 @@ extern "C" int fn_801C38F0(Z* z, float f)
         return 1;
     }
     return 0;
+}
+
+struct Unk801C2C64_V2 {
+    float x;
+    float y;
+};
+
+void fn_802D7B88(int a, int b, int c, float f);
+
+/* near-miss: first half matches; retail folds the final lerp to `u * 0.4 + 0.6` (pool 0.4 and 0.6) yet still
+ * stores 0.6 and 1.0 to frame slots 0x10/0x14 before the call, ours either keeps the (b - a) subtract or drops the
+ * two stores (tried LerpATB, const/plain float locals, other inline lerp shapes). */
+extern "C" void fn_801C39D8(Z* z, int i)
+{
+    float t = z->m1F8;
+    t = !(t > 0.99f) ? (t >? 0.37f) : 0.99f;
+    if (i != -1) {
+        float u = 0.0f;
+        if (!(t <= 0.8f))
+            u = (t - 0.8f) * 5.2631578f;
+        else
+            u = (0.8f - t) * 2.3255813f;
+        u = !(u > 1.0f) ? (u >? 0.0f) : 1.0f;
+        fn_802D7B88(i, 1, (int)(u * 10.0f) + 4, LerpATB(0.6f, u, 1.0f));
+    }
+}
+
+extern "C" void fn_801C3D44(Z* z, float* a, float* b)
+{
+    Unk801C2C64_V2 p = *(Unk801C2C64_V2*)z->m150;
+    float t = fn_801C34F4(z);
+    P* q = fn_801A4B34(z->m204);
+    if (q && q->v4())
+        t = -t;
+    t = t / z->m204->m6CC->m438;
+    const float k1 = 0.28f;
+    const float k2 = 0.4f;
+    *a = (t + p.x) * 0.3f + 0.5f;
+    *b = p.y * k1 + k2;
 }
 
 extern "C" int fn_801C3E28(Z* z)
@@ -243,20 +440,21 @@ extern "C" int fn_801C3F60(Z* z)
     return 0;
 }
 
-/* near-miss (85 vs 86 instructions): g++ reuses the loaded +0x378 value for p after the equality test; retail keeps p. */
+/* near-miss: same length now (inverted `!=` early return); g++ still replaces p by the loaded +0x378 value after the
+ * equality test (it lives in r30, p in r29), retail keeps p in r30 and the loaded value in r0. */
 extern "C" int fn_801C3FD0(Z* z, P* p)
 {
     if (z->m4->m418 == 0) {
         if (p->m264 != 0)
             return 1;
         if (fn_801C4C3C(z)) {
-            if (z->m204->m6E4->m378 == (int)p) {
-                if (fn_801C3F00(z) != 0 || HashOf(p) == (int)0x94C34DBD || HashOf(p) == 0x18A18DEB || HashOf(p) == 0x53CFCF84
+            if (z->m204->m6E4->m378 != (int)p)
+                return 1;
+            if (fn_801C3F00(z) != 0 || HashOf(p) == (int)0x94C34DBD || HashOf(p) == 0x18A18DEB || HashOf(p) == 0x53CFCF84
                     || HashOf(p) == 0x18AC23C2 || HashOf(p) == 0x0E29BCC7 || HashOf(p) == 0x0AB6992B || HashOf(p) == (int)0xB8C36BDD
                     || HashOf(p) == (int)0x85882CD7 || HashOf(p) == (int)0xBB8F4C9B || HashOf(p) == (int)0x9E6889E3
                     || HashOf(p) == (int)0x9913AB0D || HashOf(p) == 0x1BD7330D)
-                    return 0;
-            }
+                return 0;
         }
     }
     return 1;
@@ -269,6 +467,27 @@ extern "C" int fn_801C415C(Z* z)
     if (fn_801C4128(z) == 0)
         return fn_802D7DB4(fn_801A2034(z->m204, 3), 0xBA) != 0;
     return fn_801D5974(z->m20C);
+}
+
+extern "C" int fn_801C4334(Z* z)
+{
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        P* c = z->m204;
+        if (!(z->m294 >= (float)c->m4C * 0.016666668f)) {
+            int h = p->m618->m838;
+            if (h == 0x62F631D0)
+                return 1;
+            if (h == (int)0x94C34DBD || h == 0x0AB6992B || h == (int)0xBB8F4C9B || h == 0x18AC23C2 || h == (int)0x85882CD7 || h == 0x128EDBC5 || h == 0x53CFCF84) {
+                Unk8027C728_Goal* g = fn_802448F4(fn_801A4B34(c), 1);
+                g->m10 = 0x11;
+                fn_8027C728(g);
+                *(int*)((char*)g + 0x60) = 3;
+                fn_8027D33C(g);
+            }
+        }
+    }
+    return 0;
 }
 
 extern "C" int fn_801C4474(Z* z)
@@ -358,6 +577,28 @@ extern "C" void fn_801C53D8(void) {}
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
 
+extern const Vec3 lbl_806055AC;
+extern int lbl_806242A0;
+extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
+extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
+
+extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t)
+{
+    lbl_806242A0 = 1;
+    if (!(t >= 0.0f))
+        t = 0.0f;
+    char w[0x28];
+    Vec3 v = lbl_806055AC;
+    int ok = fn_80244DC4(b, &v, w, t, z->m14C);
+    if (ok) {
+        fn_801C5740(z, b, &v, w, c, d, e, f, g);
+        lbl_806242A0 = 0;
+        return 1;
+    }
+    lbl_806242A0 = ok;
+    return 0;
+}
+
 extern "C" Vec3 fn_801C5BD4(Z* z)
 {
     P* c = z->m204->m6CC;
@@ -377,4 +618,36 @@ extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c)
     Vec3 t = fn_801C5C70(a, b, c);
     float r = fn_80410CE8(t.x, t.z);
     return r * 57.295773f;
+}
+
+extern "C" float fn_801C6A34(Z* z, float f)
+{
+    float a = fn_801C6FD8(z);
+    float b = fn_801C6D88(z);
+    float d = 0.0f;
+    float c = 1.05f;
+    float t = f * c;
+    lbl_8068C420.m39C = a;
+    lbl_8068C420.m3A0 = b;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    d = t * a + (1.0f - t) * b;
+    lbl_8068C7A8.m0 = d;
+    d = d + LerpATB(-12.0f, RandFP(z->m204, 1.0f, 0xC36), 12.0f);
+    return d;
+}
+
+extern "C" float fn_801C6BB0(Z* z, float f)
+{
+    float a = fn_801C6FD8(z);
+    float b = fn_801C6D88(z);
+    float d = 0.0f;
+    float c = 1.05f;
+    float t = f * c;
+    lbl_8068C420.m39C = a;
+    lbl_8068C420.m3A0 = b;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    d = t * a + (1.0f - t) * b;
+    lbl_8068C7A8.m0 = d;
+    d = d + LerpATB(-20.0f, RandFP(z->m204, 1.0f, 0xC4F), 20.0f);
+    return d;
 }

@@ -4,6 +4,7 @@
  */
 #include "game/tu_802BB4BC.h"
 #include "game/tu_802B9218.h"
+#include "game/tu_802ACD88.h"
 
 extern Unk802BB4FC* lbl_8061EAF0;
 extern const void* lbl_80664080[];
@@ -101,76 +102,47 @@ extern char lbl_8068D9E0[];
 extern const char* lbl_8061EAF8[];
 int fn_8040B3B4(const char* a, const char* b);
 
-/* near-miss (17 slots, same length): retail needs only 5 callee-saved registers (r27..r31); ours takes 6 (the chain value v joins
-   13 goto arms). Retail shares out's register with the case-1 pointer. */
 int fn_802BB58C(int kind, const char* name, int* out, char** out2)
 {
-    char v;
     int r = 0;
+    int i;
     switch (kind) {
     case 0:
-        if (fn_8040B3B4(name, lbl_805E1144) == 0) {
-            v = lbl_806EF9DD;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E114C) == 0) {
-            v = lbl_806EF9DC;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1158) == 0) {
-            v = lbl_806EF9CC;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1164) == 0) {
-            v = lbl_806EF9CB;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E116C) == 0) {
-            v = lbl_806EF9DE;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1174) == 0) {
-            v = lbl_806EF9DF;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E117C) == 0) {
-            v = lbl_806EF9CA;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1184) == 0) {
-            v = lbl_806EF9E0;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E118C) == 0) {
-            v = lbl_806EF9E1;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E1194) == 0) {
-            v = lbl_806EF9E2;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11A4) == 0) {
-            v = lbl_806EF9E3;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11B4) == 0) {
-            v = lbl_806EF9E4;
-            goto store;
-        }
-        if (fn_8040B3B4(name, lbl_805E11BC) == 0) {
-            v = lbl_806EF9E5;
-store:
-            *out = v;
-        }
+        if (fn_8040B3B4(name, lbl_805E1144) == 0)
+            *out = lbl_806EF9DD;
+        else if (fn_8040B3B4(name, lbl_805E114C) == 0)
+            *out = lbl_806EF9DC;
+        else if (fn_8040B3B4(name, lbl_805E1158) == 0)
+            *out = lbl_806EF9CC;
+        else if (fn_8040B3B4(name, lbl_805E1164) == 0)
+            *out = lbl_806EF9CB;
+        else if (fn_8040B3B4(name, lbl_805E116C) == 0)
+            *out = lbl_806EF9DE;
+        else if (fn_8040B3B4(name, lbl_805E1174) == 0)
+            *out = lbl_806EF9DF;
+        else if (fn_8040B3B4(name, lbl_805E117C) == 0)
+            *out = lbl_806EF9CA;
+        else if (fn_8040B3B4(name, lbl_805E1184) == 0)
+            *out = lbl_806EF9E0;
+        else if (fn_8040B3B4(name, lbl_805E118C) == 0)
+            *out = lbl_806EF9E1;
+        else if (fn_8040B3B4(name, lbl_805E1194) == 0)
+            *out = lbl_806EF9E2;
+        else if (fn_8040B3B4(name, lbl_805E11A4) == 0)
+            *out = lbl_806EF9E3;
+        else if (fn_8040B3B4(name, lbl_805E11B4) == 0)
+            *out = lbl_806EF9E4;
+        else if (fn_8040B3B4(name, lbl_805E11BC) == 0)
+            *out = lbl_806EF9E5;
         r = *out >= 0;
         if (r != 0) {
             lbl_806E03EC[lbl_8061EAF4++] = *out;
         }
         break;
     case 1: {
-        int i = 0;
+        i = 0;
         char* p = lbl_8068D9E0;
-        for (; i <= 2; i++, p += 0x24) {
+        for (; i <= 2; p += 0x24, i++) {
             if (fn_8040B3B4(p, name) == 0) {
                 *out2 = p;
                 r = 1;
@@ -185,7 +157,7 @@ store:
     }
     case 2:
         *out = -1;
-        for (int i = 0; i <= 15; i++) {
+        for (i = 0; i <= 15; i++) {
             if (fn_8040B3B4(lbl_8061EAF8[i], name) == 0) {
                 *out = i;
                 r = 1;
@@ -298,6 +270,201 @@ void fn_802BBAE0(int a, int b, int n, int* lo, int* hi)
     }
     *lo = a;
     *hi = b;
+}
+
+extern const char lbl_805E02C0[];
+extern float lbl_805E11D8;
+extern Unk802B0ACC_T* lbl_8061EA68;
+int fn_802B1EE8(Unk802B0ACC_T* t, const char* name);
+int fn_8040B574(const char* a, const char* b);
+int fn_8040B6A0(const char* s);
+char* fn_8040B61C(char* d, const char* s);
+void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
+int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
+int fn_80329B98(const char** pp, int* pn, float* out, int delim);
+
+void* fn_803774A8(unsigned n, int heap);
+
+int* fn_802BBB20(const char* text)
+{
+    int len = fn_8040B6A0(text);
+    int count = 0;
+    int i = 0;
+    int* blk = 0;
+    char name[0x18];
+    fn_80329C4C(&text, &len, &count, 0, 100000, 10);
+    if (i < count) {
+        do {
+            const char* s;
+            int lvl;
+            fn_80329AEC(&text, &s, &len, 0x2C);
+            fn_8040B61C(name, s);
+            fn_80329C4C(&text, &len, &lvl, 0, 0x7FFFFFFF, 10);
+            if (lvl == fn_802B1EE8(lbl_8061EA68, name) || fn_8040B574(name, lbl_805E02C0) == 0) {
+                int n = 0;
+                fn_80329C4C(&text, &len, &n, 0, 100000, 10);
+                int row = 0;
+                blk = (int*)fn_803774A8(n * 0x24 + 4, 0x100);
+                *blk = n;
+                if (row < *blk) {
+                    char* p = (char*)blk + 4;
+                    do {
+                        int off = 0;
+                        int j = 3;
+                        char* q2 = p + 8;
+                        char* q1 = p + 4;
+                        do {
+                            fn_80329B98(&text, &len, (float*)(p + off), 0x2C);
+                            off += 0xC;
+                            fn_80329B98(&text, &len, (float*)q1, 0x2C);
+                            q1 += 0xC;
+                            fn_80329B98(&text, &len, (float*)q2, 0xA);
+                            q2 += 0xC;
+                        } while (--j != 0);
+                        row++;
+                        p += 0x24;
+                    } while (row < *blk);
+                }
+            } else {
+                int n2 = 0;
+                fn_80329C4C(&text, &len, &n2, 0, 100000, 10);
+                int row = 0;
+                if (row < n2) {
+                    do {
+                        int k = 3;
+                        do {
+                            float f;
+                            fn_80329B98(&text, &len, &f, 0x2C);
+                            fn_80329B98(&text, &len, &f, 0x2C);
+                            fn_80329B98(&text, &len, &f, 0xA);
+                        } while (--k != 0);
+                        row++;
+                    } while (row < n2);
+                }
+            }
+            i++;
+        } while (i < count);
+    }
+    return blk;
+}
+
+int fn_802BBD80(const char* text)
+{
+    int len = fn_8040B6A0(text);
+    int n = 0;
+    int count = 0;
+    int i = 0;
+    int total = 0;
+    char name[0x18];
+    fn_80329C4C(&text, &len, &count, 0, 100000, 10);
+    if (i < count) {
+        do {
+            const char* s;
+            int lvl;
+            fn_80329AEC(&text, &s, &len, 0x2C);
+            fn_8040B61C(name, s);
+            fn_80329C4C(&text, &len, &lvl, 0, 0x7FFFFFFF, 10);
+            int have = fn_802B1EE8(lbl_8061EA68, name);
+            fn_80329C4C(&text, &len, &n, 0, 100000, 10);
+            if (lvl <= have || fn_8040B574(name, lbl_805E02C0) == 0)
+                total += n;
+            int j = 0;
+            if (j < n) {
+                do {
+                    int v = 0;
+                    fn_80329C4C(&text, &len, &v, 0x80000000, 0x7FFFFFFF, 10);
+                    int k = 3;
+                    do {
+                        float f = lbl_805E11D8;
+                        fn_80329B98(&text, &len, &f, 0x2C);
+                        fn_80329B98(&text, &len, &f, 0x2C);
+                        fn_80329B98(&text, &len, &f, 0xA);
+                    } while (--k != 0);
+                    j++;
+                } while (j < n);
+            }
+            i++;
+        } while (i < count);
+    }
+    return total;
+}
+
+struct Unk802BBF54_Rec {
+    float f[9];
+    int v;
+};
+
+struct Unk802BBF54_Blk {
+    int n;
+    Unk802BBF54_Rec rec[1];
+};
+
+extern float lbl_805E11DC;
+
+/* near-miss (175/181): same code as retail; the two strength-reduced record pointers (v field / float base) get swapped registers (r19/r20, r26/r27). 1680 header orders tried. */
+Unk802BBF54_Blk* fn_802BBF54(const char* text)
+{
+    int total = fn_802BBD80(text);
+    int n = 0;
+    int len = fn_8040B6A0(text);
+    Unk802BBF54_Blk* blk = (Unk802BBF54_Blk*)fn_803774A8((total * 0x28) | 4, 0x100);
+    blk->n = total;
+    int count = 0;
+    int idx = 0;
+    int i = 0;
+    char name[0x18];
+    fn_80329C4C(&text, &len, &count, 0, 100000, 10);
+    if (i < count) {
+        do {
+            const char* s;
+            int lvl;
+            fn_80329AEC(&text, &s, &len, 0x2C);
+            fn_8040B61C(name, s);
+            fn_80329C4C(&text, &len, &lvl, 0, 0x7FFFFFFF, 10);
+            if (lvl <= fn_802B1EE8(lbl_8061EA68, name) || fn_8040B574(name, lbl_805E02C0) == 0) {
+                int row = 0;
+                fn_80329C4C(&text, &len, &n, 0, 100000, 10);
+                if (row < n) {
+                    do {
+                        int off = 0;
+                        fn_80329C4C(&text, &len, &blk->rec[idx].v, 0x80000000, 0x7FFFFFFF, 10);
+                        int j = 3;
+                        float* q2 = &blk->rec[idx].f[2];
+                        float* q1 = &blk->rec[idx].f[1];
+                        do {
+                            fn_80329B98(&text, &len, (float*)((char*)&blk->rec[idx] + off), 0x2C);
+                            off += 0xC;
+                            fn_80329B98(&text, &len, q1, 0x2C);
+                            q1 += 3;
+                            fn_80329B98(&text, &len, q2, 0xA);
+                            q2 += 3;
+                        } while (--j != 0);
+                        row++;
+                        idx++;
+                    } while (row < n);
+                }
+            } else {
+                int v = 0;
+                int row = 0;
+                fn_80329C4C(&text, &len, &n, 0, 100000, 10);
+                if (row < n) {
+                    do {
+                        int j = 3;
+                        fn_80329C4C(&text, &len, &v, 0x80000000, 0x7FFFFFFF, 10);
+                        do {
+                            float f = lbl_805E11DC;
+                            fn_80329B98(&text, &len, &f, 0x2C);
+                            fn_80329B98(&text, &len, &f, 0x2C);
+                            fn_80329B98(&text, &len, &f, 0xA);
+                        } while (--j != 0);
+                        row++;
+                    } while (row < n);
+                }
+            }
+            i++;
+        } while (i < count);
+    }
+    return blk;
 }
 
 /* near-miss (57 vs 56 insns): retail adds m.x through the stack slot (lfs f0,8(r1) ... stfs f0,8(r1)) but y and z through a

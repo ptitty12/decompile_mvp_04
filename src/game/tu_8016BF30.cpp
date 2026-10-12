@@ -4,6 +4,113 @@
  */
 #include "game/tu_80167DCC.h"
 
+struct Unk8016D778_S {
+    char pad0[0x24];
+    Unk801527C8_Actor* m24;
+};
+struct Unk8016D850_B {
+    char pad0[0x6C];
+    int m6C;
+};
+struct Unk8016D850_G {
+    char pad0[8];
+    Unk801527C8_Actor* m8;
+    Unk801527C8_Actor* mC;
+    char pad10[0x10];
+    int m20;
+    int m24;
+};
+struct Unk8016D458_P {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk8016D458_O {
+    char pad0[0x744];
+    Unk8016D458_P* m744;
+};
+struct Unk8017A930_T;
+int fn_8016D580(Unk8016D778_S* self);
+int fn_8016D778(Unk8016D778_S* self);
+void fn_8016D850(Unk8016D778_S* self);
+void fn_802D74FC();
+int fn_80359964(char* p);
+extern "C" int fn_8031C6A8();
+extern "C" void fn_8031C6C0(int a, int b, int c, int d);
+void fn_8017CD04(Unk8017A930_T* t, int k, int z);
+extern Unk8016D850_G* lbl_8061B8C0;
+void fn_8016D924(void* self, Unk8016ACAC* m);
+#include "game/clampiter.h"
+
+struct Unk8016D128_V6 {
+    int m0, m4, m8, mC, m10, m14;
+};
+extern const Unk8016D128_V6 lbl_805EBA10;
+/* One 0xA0-byte element of the script queue (Unk8016ACAC::m3D94). */
+struct Unk8016D128_Elem {
+    char name[0x3C];
+    int m3C, m40, m44, m48, m4C;
+    Unk8016D128_V6 m50;
+    Unk8016D128_V6 m68;
+    Unk8016D128_V6 m80;
+    int m98;
+    int m9C;
+};
+struct Unk8019F8C0_Owner;
+struct Unk8017A930_T;
+Unk8016ACAC* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
+Unk801527C8_Actor* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
+int fn_801A2034(Unk8019F8C0_Owner* o, int i);
+int fn_8017CA14(Unk8017A930_T* t, int i);
+extern "C" int fn_802D7DB4(int id, int k);
+extern "C" Unk8016D850_B* fn_801A6DB8(Unk8019F8C0_Owner* o);
+
+Unk801A6D84_Obj* fn_801A6D84(Unk801527C8_Actor* a, int i);
+
+extern "C" char* strcat(char* d, const char* s);
+extern "C" char* strcpy(char* d, const char* s);
+void fn_8037CA20(Unk8037C7FC* mgr, const char* name);
+
+/* Dtor-only views of two script classes whose vtables (0x8065E968, 0x8065E8F0) are emitted elsewhere;
+ * the mid class stores vtable 0x8065EC68 and the root dtor follows. */
+class Unk8016F38C_Mid : public Unk8037B3E8 {
+public:
+    Unk8016F38C_Mid(unsigned h) : Unk8037B3E8(h) {}
+    virtual ~Unk8016F38C_Mid() {}
+    virtual void fn_vslot2() = 0;
+    virtual const char* fn_vslot3() = 0;
+    virtual int fn_vslot4() = 0;
+    virtual Unk8037B3E8* fn_vslot5() = 0;
+};
+class Unk80151048 {
+public:
+    ~Unk80151048();
+    char m0[4];
+};
+class Unk8033CD28 {
+public:
+    ~Unk8033CD28();
+    char m0[4];
+};
+class Unk8016F38C_A : public Unk8016F38C_Mid {
+public:
+    Unk8016F38C_A(unsigned h);
+    virtual const char* fn_vslot3();
+    virtual ~Unk8016F38C_A();
+    char pad4[8];
+    Unk80151048 mC;
+};
+class Unk8016F400_A : public Unk8016F38C_Mid {
+public:
+    Unk8016F400_A(unsigned h);
+    virtual const char* fn_vslot3();
+    virtual ~Unk8016F400_A();
+    char pad4[0x58];
+    Unk8033CD28 m5C;
+};
+
+extern const char lbl_8065EBA8[];
+void* fn_803282A8(void* p, int a);
+
 extern float lbl_805CAD78;
 extern const char lbl_805CAD7C[];
 extern float lbl_805CAD8C;
@@ -40,6 +147,15 @@ void fn_80244A64(Unk8016C788_Obj* o, int a, int b);
 extern void* lbl_8061E978;
 void fn_80359910(Unk8016C1C4_List* l);
 void fn_803596DC(void* p);
+
+void fn_8016BF30(void* self, const char* s) /* 8016BF30 */
+{
+    char buf[0x50];
+    strcpy(buf, "script_");
+    strcat(buf, s);
+    strcat(buf, ".txt");
+    fn_8037CA20(fn_8037C7FC(), buf);
+}
 
 float Unk8016C1C4_List::fn_8016BF94() /* 8016BF94 */
 {
@@ -167,6 +283,29 @@ void Unk8016ACAC::fn_8016C4A0() /* 8016C4A0 */
     fn_8016D128();
 }
 
+void Unk8016ACAC::fn_8016C4FC() /* 8016C4FC */
+{
+    Unk8016ACAC_Slot* s = m1E28;
+    for (int i = 3; i != 0; i--, s++) {
+        s->fn_8016C448();
+    }
+    Unk8016D128_Elem* e = (Unk8016D128_Elem*)m3D94;
+    for (int j = 0; j < 8; j++, e++) {
+        e->name[0] = 0;
+        e->m3C = 0;
+        e->m40 = 0;
+        e->m44 = 0;
+        e->m48 = 0;
+        e->m4C = 0;
+        e->m50 = lbl_805EBA10;
+        e->m68 = lbl_805EBA10;
+        e->m80 = lbl_805EBA10;
+        e->m98 = 0;
+        e->m9C = 0xAE;
+    }
+    fn_8016A880();
+}
+
 void Unk8016C1C4_List::fn_8016C620(int idx, int p) /* 8016C620 */
 {
     int base = idx * 0xAC;
@@ -201,6 +340,23 @@ void Unk8016C1C4_List::fn_8016C698(int a) /* 8016C698 */
         this[i].mCur = this[i].mCur + 1;
     }
     fn_8016C004(a, 0);
+}
+
+void Unk8016ACAC_Slot::fn_8016C6DC() /* 8016C6DC */
+{
+    int i;
+    for (i = 0; i < 15; i++) {
+        int c = mLists[i].mCur;
+        if (c == 0) {
+            fn_80359948(&mLists[i], 0);
+            mLists[i].mCur = c;
+        } else {
+            mLists[i].mCur = c - 1;
+        }
+    }
+    for (i = 0; i <= 12; i++) {
+        ((Unk801527C8_Ctx*)this)->fn_8016CE5C(i + 2);
+    }
 }
 
 int Unk8016ACAC::fn_8016C764(int idx) /* 8016C764 */
@@ -295,6 +451,61 @@ void Unk80159F28::fn_8016CFC4(Unk8016C788_Obj* o) /* 8016CFC4 */
     }
 }
 
+void Unk801527C8_Ctx::fn_8016D038(int idx, int id) /* 8016D038 */
+{
+    if (id == 0x39) {
+        void* sl = mA4C->m700->m3AC;
+        int k = 0;
+        do {
+            Unk8016C788_Obj* o = fn_80178E6C(sl, 0, k);
+            k++;
+            ((Unk80159F28*)this)->fn_8016CFC4(o);
+        } while (k <= 7);
+    } else if (id == 0x3A) {
+        void* sl = mA4C->m700->m3AC;
+        int k = 0;
+        do {
+            Unk8016C788_Obj* o = fn_80178E6C(sl, 1, k);
+            k++;
+            ((Unk80159F28*)this)->fn_8016CFC4(o);
+        } while (k <= 7);
+    } else {
+        Unk8016C788_Obj* o = (Unk8016C788_Obj*)fn_8016C804(id);
+        if (o != 0) {
+            int* pA4 = (int*)((char*)this + 0xA4);
+            *(Unk8016C788_Obj**)((char*)pA4 + idx * 0xAC) = o;
+            ((Unk80159F28*)this)->fn_8016CFC4(o);
+        }
+    }
+    int* pA8 = (int*)((char*)this + 0xA8);
+    *(int*)((char*)pA8 + idx * 0xAC) = id;
+}
+
+extern "C" void fn_8016D128(void* p) /* 8016D128 */
+{
+    Unk8016ACAC* self = (Unk8016ACAC*)p;
+    self->m4298 = 0;
+    Unk8016ACAC_Slot* s = self->m1E28;
+    for (int i = 3; i != 0; i--, s++) {
+        s->mLists[0].fn_8016D258();
+    }
+    Unk8016D128_Elem* e = (Unk8016D128_Elem*)self->m3D94;
+    for (int j = 0; j < 8; j++, e++) {
+        e->name[0] = 0;
+        e->m3C = 0;
+        e->m40 = 0;
+        e->m44 = 0;
+        e->m48 = 0;
+        e->m4C = 0;
+        e->m50 = lbl_805EBA10;
+        e->m68 = lbl_805EBA10;
+        e->m80 = lbl_805EBA10;
+        e->m98 = 0;
+        e->m9C = 0xAE;
+    }
+    self->m3D90 = self->fn_8016C39C();
+}
+
 void Unk8016C1C4_List::fn_8016D258() /* 8016D258 */
 {
     int p = (int)this;
@@ -349,6 +560,98 @@ void Unk8016C1C4_List::fn_8016D3DC(int idx) /* 8016D3DC */
     int off = cur * 0x14 + base;
     *(int*)((char*)pC + off) = *(int*)((char*)pC + off) + 1;
     *(float*)((char*)p14 + off) = lbl_805CAD94;
+}
+
+void* fn_8016D410(void* self, int a) /* 8016D410 */
+{
+    fn_803282A8(self, 0);
+    *(const void**)((char*)self + 0x18) = lbl_8065EBA8;
+    *(int*)((char*)self + 0x24) = a;
+    return self;
+}
+
+void fn_8016D458(Unk8016D778_S* self) /* 8016D458 */
+{
+    int f = 0;
+    if (((Unk8016D458_O*)self->m24)->m744->m20 == 0 && lbl_8061B8C0->m24 == 0 && lbl_8061B8C0->m20 != 1) {
+        f = 1;
+    }
+    int a = fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->m3D90;
+    if (f != 0 && a != 0) {
+        int r = fn_8016D580(self);
+        int k = fn_8016D778(self);
+        if (r != 0 || k != 2) {
+            fn_802D74FC();
+            fn_8016D850(self);
+        }
+        if (r != 0) {
+            if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->m3D90 != 0) {
+                if (fn_80359964((char*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) + 4) == 1) {
+                    fn_8031C6C0(fn_8031C6A8(), 1, 0xC, 0);
+                }
+            }
+        }
+        if (k != 2) {
+            fn_8017CD04((Unk8017A930_T*)self->m24->m700, k, 0);
+        }
+    }
+}
+
+/* near-miss: frame layout only (8 slots): retail has the two ids at sp+8/0xC and the clamp iterator at sp+0x10;
+ * here the iterator (dtor object) gets sp+8 and the ids sp+0x10. Declaration order, scopes, volatile counter and
+ * dtor-bearing id struct tried. */
+int fn_8016D778(Unk8016D778_S* self) /* 8016D778 */
+{
+    if (fn_801A04A8((Unk8019F8C0_Owner*)self->m24, 1)->m44 != 0) {
+        int ids[2];
+        ids[1] = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 1);
+        ids[0] = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 0);
+        Unk8006A138_It<1> it(0);
+        int idx = 0;
+        while (idx <= 1) {
+            if (fn_8017CA14((Unk8017A930_T*)self->m24->m700, idx) != 0 && ids[it.v] != -1 && fn_802D7DB4(ids[it.v], 0x5B) != 0) {
+                return it.v;
+            }
+            idx = it.Next();
+        }
+    }
+    return 2;
+}
+
+void fn_8016D850(Unk8016D778_S* self) /* 8016D850 */
+{
+    if (fn_801A6DB8((Unk8019F8C0_Owner*)self->m24)->m6C != 0) {
+        Unk8016D850_G* g = lbl_8061B8C0;
+        Unk801527C8_Actor* a = g->m8;
+        Unk801527C8_Actor* b = g->mC;
+        if (a != 0) {
+            fn_8016D924(self, fn_801A6D84((Unk8019F8C0_Owner*)a, 1));
+        }
+        if (b != 0) {
+            fn_8016D924(self, fn_801A6D84((Unk8019F8C0_Owner*)b, 1));
+        }
+    } else {
+        fn_8016D924(self, fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1));
+        if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 5)->m3D90 != 0) {
+            fn_8016D924(self, fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 5));
+        }
+    }
+}
+
+void fn_8016D924(void* self, Unk8016ACAC* m) /* 8016D924 */
+{
+    int ok = 1;
+    if (m->m4298 <= 0) {
+        ok = 0;
+    }
+    if (ok == 0) {
+        int v = 4;
+        if ((void*)m == (void*)fn_801A6D84(m->m3D3C, 1) && m->fn_8016B174() != 0) {
+            m->fn_8016B95C();
+            v = 0x1B;
+        }
+        m->m4298 = v;
+    }
 }
 
 void Unk8016D9A0::fn_8016D9A0(Unk8016D9A0_Rec* rec) /* 8016D9A0 */
@@ -477,6 +780,10 @@ int fn_8016F380() /* 8016F380 */
     return 0x37EF0C2A;
 }
 
+Unk8016F38C_A::~Unk8016F38C_A() /* 8016F38C */
+{
+}
+
 const char* fn_8016F3E8() /* 8016F3E8 */
 {
     return lbl_805C7958;
@@ -485,4 +792,8 @@ const char* fn_8016F3E8() /* 8016F3E8 */
 int fn_8016F3F4() /* 8016F3F4 */
 {
     return 0x323DA6EA;
+}
+
+Unk8016F400_A::~Unk8016F400_A() /* 8016F400 */
+{
 }

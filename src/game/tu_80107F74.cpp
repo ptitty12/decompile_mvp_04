@@ -4,6 +4,35 @@
  */
 #include "game/tu_800F1AEC.h"
 
+extern char lbl_80649DA0[];
+extern char lbl_8065B888[];
+struct UiEvtBase80108800 {
+    int id;
+    const void* vt;
+    UiEvtBase80108800(int i)
+    {
+        vt = lbl_80649DA0;
+        id = i;
+    }
+    ~UiEvtBase80108800() { vt = lbl_80649DA0; }
+};
+struct UiEvt80108800 : UiEvtBase80108800 {
+    UiEvt80108800() : UiEvtBase80108800(0x9E) { vt = lbl_8065B888; }
+    ~UiEvt80108800() { vt = lbl_80649DA0; }
+};
+inline UiMsg* UiMsgInit(UiMsg* m)
+{
+    fn_8035682C(m);
+    return m;
+}
+struct UiV_134_140 : UiObj {
+    char pad40[0x134 - 0x40];
+    UiObj* m134;
+    char pad138[0x140 - 0x138];
+    int m140;
+};
+int fn_8010A6C0();
+
 
 void fn_80107F74(UiArr158* self, int i, int a)
 {
@@ -173,7 +202,6 @@ void fn_8010878C(UiV_134* self, char* out)
     fn_8040B830(out, o->v33(5, 1)->name, 16);
 }
 
-/* near-miss: same code; the stack objects are swapped (retail: event object at sp+8, message buffer at sp+0x10; here message at 8, event at 24) */
 extern char lbl_805BE138[];
 extern char lbl_805BADC8[];
 extern char lbl_80649DA0[];
@@ -186,13 +214,9 @@ void fn_80108800(UiV_134* self, int a, int b)
         s = lbl_805BE138;
         break;
     case 1: {
-        UiEvtRaw e;
-        e.vt = lbl_80649DA0;
-        e.id = 0x9E;
-        e.vt = lbl_8065B888;
+        UiEvt80108800 e;
         s = lbl_805BADC8;
-        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
-        e.vt = lbl_80649DA0;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, (UiEvtRaw*)&e, 0, 0);
         break;
     }
     case 2:
@@ -204,8 +228,7 @@ void fn_80108800(UiV_134* self, int a, int b)
     }
     if (fn_800B555C()->m570 == b) {
         UiMsg m;
-        UiMsg* p = &m;
-        fn_8035682C(p);
+        UiMsg* p = UiMsgInit(&m);
         fn_8040B830(p->name, s, 15);
         p->name[15] = 0;
         fn_800B7B4C(UiGetMsgMgr(), p, self);
@@ -355,7 +378,6 @@ void fn_801092E0(UiV_134* self, char* out)
     fn_8040B830(out, o->v33(5, 1)->name, 16);
 }
 
-/* near-miss: same code; the stack objects are swapped (retail: event object at sp+8, message buffer at sp+0x10; here message at 8, event at 24) */
 extern char lbl_805BE138[];
 extern char lbl_805BADC8[];
 extern char lbl_80649DA0[];
@@ -368,13 +390,9 @@ void fn_80109354(UiV_134* self, int a, int b)
         s = lbl_805BE138;
         break;
     case 1: {
-        UiEvtRaw e;
-        e.vt = lbl_80649DA0;
-        e.id = 0x9E;
-        e.vt = lbl_8065B888;
+        UiEvt80108800 e;
         s = lbl_805BADC8;
-        fn_8037893C(fn_8011AA24(0)->m704, e.id, &e, 0, 0);
-        e.vt = lbl_80649DA0;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, (UiEvtRaw*)&e, 0, 0);
         break;
     }
     case 2:
@@ -386,8 +404,7 @@ void fn_80109354(UiV_134* self, int a, int b)
     }
     if (fn_800B555C()->m570 == b) {
         UiMsg m;
-        UiMsg* p = &m;
-        fn_8035682C(p);
+        UiMsg* p = UiMsgInit(&m);
         fn_8040B830(p->name, s, 15);
         p->name[15] = 0;
         fn_800B7B4C(UiGetMsgMgr(), p, self);
@@ -522,6 +539,39 @@ void fn_80109C1C(UiV_134* self, char* out)
 {
     UiObj* o = self->m134->v70();
     fn_8040B830(out, o->v33(5, 1)->name, 16);
+}
+
+void fn_80109C90(UiV_134_140* self, int a, int b)
+{
+    const char* s = 0;
+    switch (a) {
+    case 0:
+        s = lbl_805BE138;
+        break;
+    case 1: {
+        if (self->m140 != 0 && fn_8010A6C0() == 0) {
+            fn_8010A3FC(self);
+            return;
+        }
+        UiEvt80108800 e;
+        s = lbl_805BADC8;
+        fn_8037893C(fn_8011AA24(0)->m704, e.id, (UiEvtRaw*)&e, 0, 0);
+        break;
+    }
+    case 2:
+        if (fn_800B555C()->m570 == b) {
+            fn_80109E0C(self, self->m134->v60());
+            return;
+        }
+        break;
+    }
+    if (fn_800B555C()->m570 == b) {
+        UiMsg m;
+        UiMsg* p = UiMsgInit(&m);
+        fn_8040B830(p->name, s, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+    }
 }
 
 extern char lbl_80649DA0[];

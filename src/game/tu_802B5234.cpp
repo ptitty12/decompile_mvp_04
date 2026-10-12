@@ -56,6 +56,19 @@ extern const char lbl_805E0F34[];
 extern const char lbl_805E0F48[];
 
 extern void* lbl_8061E978;
+struct Unk802B5D78_G {
+    char pad0[0x320];
+    int m320;
+    char pad324[4];
+    int m328;
+    char pad32C[0x3E4 - 0x32C];
+    int m3E4;
+    char pad3E8[4];
+    int m3EC;
+    int m3F0;
+};
+
+extern Unk802B5D78_G* lbl_8061EA68;
 extern void* lbl_8061EA64;
 extern int lbl_8061EA00[];
 extern void* lbl_8061FF44;
@@ -104,7 +117,6 @@ char* fn_8040B61C(char* d, const char* s);
 void fn_803188FC(void* a, int b);
 void fn_803DD73C(void* a, int b);
 int fn_802B86D4(Mgr* m, const char* s, int* idx);
-/* near-miss (parked, 44 vs 47 insns): retail keeps a register copy of the loop index and stores it to idx (stack) after each increment, re-reading idx for the strcpy */
 void fn_802B8760(Mgr* m, const char* s);
 void fn_802B881C(Mgr* m, const char* s);
 int fn_800968C0(void* o, int x, int y);
@@ -125,6 +137,74 @@ int fn_80089AA0(void* o, int a, int b);
 int fn_8008CFD8(void* o, int a, int b);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_802C9284(void* p, int a, void* o, int b, int c);
+int fn_803E96B8(void* a, int b, int c, int d, int e, void (*f)());
+int fn_80313C14(int r, int a, int b);
+void fn_803E97C4(int a);
+void fn_80312700();
+char* fn_803EC814(void* a, int b, char* c);
+void fn_802B2F64(void* m, int f, void* slot, int a, int b);
+void fn_803DDA8C(void* a, void* b);
+int fn_803D81FC();
+int fn_803D817C();
+int fn_803EC03C(void* im);
+int fn_803EC9D4(int f);
+void fn_803D9E70(void* o, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_803D9ECC(void* o, void* img, int a, int b, int c);
+
+void* fn_803EC324(void* a);
+int fn_8040B750(const char* a, const char* b, int n);
+}
+
+struct Unk802B5234_Self {
+    char pad0[0x190 - 0x0];
+    int m190;
+    char pad194[0x1A0 - 0x194];
+    int m1A0;
+    char pad1A4[0x228 - 0x1A4];
+    int m228;
+    char pad22C[0x238 - 0x22C];
+    int m238;
+    char pad23C[0x248 - 0x23C];
+    int m248;
+    char pad24C[0x258 - 0x24C];
+    int m258;
+    char pad25C[0x268 - 0x25C];
+    int m268;
+    char pad26C[0xAB8 - 0x26C];
+    int mAB8;
+    char padABC[0xAC8 - 0xABC];
+    int mAC8;
+    char padACC[0xAD8 - 0xACC];
+    int mAD8;
+    char padADC[0xAE8 - 0xADC];
+    int mAE8;
+};
+
+void fn_802B5234(Unk802B5234_Self* self)
+{
+    void* mgr = lbl_8061EA68;
+    if (self->m238 != 0)
+        fn_802B2F64(mgr, self->m238, (char*)self + 0x3704, 1, 0);
+    if (self->m190 != 0)
+        fn_802B2F64(mgr, self->m190, (char*)self + 0x3714, 1, 0);
+    if (self->m228 != 0)
+        fn_802B2F64(mgr, self->m228, (char*)self + 0x3724, 1, 0);
+    if (self->m1A0 != 0)
+        fn_802B2F64(mgr, self->m1A0, (char*)self + 0x3734, 1, 0);
+    if (self->m258 != 0)
+        fn_802B2F64(mgr, self->m258, (char*)self + 0x3744, 1, 0);
+    if (self->m268 != 0)
+        fn_802B2F64(mgr, self->m268, (char*)self + 0x3754, 1, 0);
+    if (self->mAB8 != 0)
+        fn_802B2F64(mgr, self->mAB8, (char*)self + 0x3764, 1, 0);
+    if (self->mAC8 != 0)
+        fn_802B2F64(mgr, self->mAC8, (char*)self + 0x3774, 1, 0);
+    if (self->mAD8 != 0)
+        fn_802B2F64(mgr, self->mAD8, (char*)self + 0x3784, 1, 0);
+    if (self->m248 != 0)
+        fn_802B2F64(mgr, self->m248, (char*)self + 0x3794, 1, 0);
+    if (self->mAE8 != 0)
+        fn_802B2F64(mgr, self->mAE8, (char*)self + 0x37A4, 1, 0);
 }
 
 Unk802B5234_T* fn_802B53C4(Unk802B5234_T* self)
@@ -188,6 +268,77 @@ Unk802B5234_V3 fn_802B5480()
     b.y = 19463.4f;
     b.z = -6725.12f;
     return b;
+}
+
+struct Unk802B560C_Slot {
+    int m0;
+    int m4;
+    int m8;
+};
+
+struct Unk802B560C_Self {
+    char pad0[0x3650];
+    int m3650;
+};
+
+struct Unk802B54F4_Hdr {
+    char pad0[8];
+    int m8;
+    char padC[8];
+    int m14;
+};
+
+struct Unk802B54F4_Tex {
+    char pad0[4];
+    short m4;
+    short m6;
+};
+
+int fn_802B54F4(Unk802B54F4_Hdr* self)
+{
+    int cnt = self->m8;
+    int total = 0;
+    int extra = 0;
+    int i = 0;
+    char tag[5] = "stcs";
+    char name[32];
+    if (total < cnt) {
+        int* e = &self->m14;
+        do {
+            Unk802B54F4_Tex* t = (Unk802B54F4_Tex*)((char*)self + *e);
+            e += 2;
+            if (t != 0) {
+                fn_803EC814(self, i, name);
+                if (fn_8040B750(name, tag, 4) == 0) {
+                    int* q = (int*)fn_803EC324(t);
+                    int n = q[-1];
+                    int j;
+                    extra = n / 2;
+                    for (j = 1; j < n; j += 2) {
+                        int v = q[j * 2] * q[j * 2 + 1] + 0x400;
+                        total += v;
+                    }
+                } else {
+                    int v = t->m4 * t->m6 + 0x400;
+                    total += v;
+                }
+            }
+            i++;
+        } while (i < cnt);
+    }
+    int ex = extra - 1;
+    return total + (cnt + ex) * 0x187;
+}
+
+void fn_802B560C(Unk802B560C_Self* self, Unk802B560C_Slot* slot, int* out, int* tbl, int idx, int a, int b, int* c, int flag)
+{
+    void* h = lbl_8062C668(0x30, 0);
+    int r = fn_803E96B8(h, slot->m0, tbl[idx], a, 0, fn_80312700);
+    slot->m8 = 14;
+    slot->m4 = r;
+    *out = fn_80313C14(r, c ? *c : self->m3650, b);
+    if (flag)
+        fn_803E97C4(slot->m4);
 }
 
 void fn_802B56C8()
@@ -338,6 +489,43 @@ void fn_802B8388(Mgr* m)
     }
 }
 
+struct Unk802B8418_ObjData {
+    char pad0[0xC];
+};
+
+class Unk802B8418_Obj : public Unk802B8418_ObjData {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(float* a, float* b);
+};
+
+void fn_802B8418(Mgr* m)
+{
+    char* b = (char*)m + 0x20000;
+    if (*(void**)(b - 0x78E8) != 0) {
+        char* g = (char*)lbl_8061E978 + 8;
+        if (*(int*)(g + 0xAEC) != 0) {
+            fn_803DDA8C(*(void**)(b - 0x78E8), *(void**)(g + 0xB18));
+            return;
+        }
+        fn_803DDA8C(*(void**)(b - 0x78E8), *(void**)(b - 0x78E4));
+        fn_803D81FC();
+        Unk802B8418_Obj* o = (Unk802B8418_Obj*)fn_803D817C();
+        void* sub = (char*)o + 0x10;
+        short* im = *(short**)(b - 0x78E4);
+        int w = im[2];
+        int h = im[3];
+        int fmt = fn_803EC9D4(fn_803EC03C(im)) & 0xF;
+        float x;
+        float y;
+        o->s3(&x, &y);
+        int a = (int)(x * 0.5f) - w;
+        fn_803D9E70(sub, a, 0, (int)x - a * 2, (int)y, w, h, fmt, 1);
+        fn_803D9ECC(sub, *(void**)(b - 0x78E8), 0, 1, 0);
+    }
+}
+
 void fn_802B8548(Mgr* m)
 {
     fn_803FED48(lbl_805E0E44, 0, 0, (char*)m + 0x18704);
@@ -387,20 +575,19 @@ int fn_802B86D4(Mgr* m, const char* s, int* idx)
     return 0;
 }
 
-/* near-miss (parked, 44 vs 47 insns): retail keeps a register copy of the loop index and stores it to idx (stack) after each increment, re-reading idx for the strcpy */
 void fn_802B8760(Mgr* m, const char* s)
 {
     int idx;
     if (fn_802B86D4(m, s, &idx) != 0) {
         m->ent[idx].cnt++;
-    } else {
-        for (idx = 0; idx <= 31; idx++) {
-            if (m->ent[idx].cnt == 0) {
-                m->ent[idx].cnt = 1;
-                fn_8040B61C(m->ent[idx].name, s);
-                fn_802AEBCC(lbl_8061E978, s);
-                break;
-            }
+        return;
+    }
+    for (idx = 0; idx <= 31; idx++) {
+        if (m->ent[idx].cnt == 0) {
+            m->ent[idx].cnt = 1;
+            fn_8040B61C(m->ent[idx].name, s);
+            fn_802AEBCC(lbl_8061E978, s);
+            return;
         }
     }
 }
@@ -507,6 +694,14 @@ void fn_802B8C84()
         fn_803EDA0C(lbl_8061EAB8);
         lbl_8061EAB8 = 0;
     }
+}
+
+void fn_802B8CC4()
+{
+}
+
+void fn_802B8CC8()
+{
 }
 
 void fn_802B8CCC()

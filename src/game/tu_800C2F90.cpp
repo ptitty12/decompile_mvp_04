@@ -28,7 +28,8 @@ int fn_804089B4(char* dst, const char* fmt, ...);
 }
 
 extern const float lbl_805BBE14;
-extern float lbl_805BBE18;
+struct Unk805BBE18_F { float v; };
+extern Unk805BBE18_F lbl_805BBE18;
 extern const float lbl_805BBE28;
 extern const float lbl_805BBE34;
 extern const float lbl_805BBE40;
@@ -494,7 +495,6 @@ extern "C" void fn_800C3828(Unk800C341C_Mgr* m)
     }
 }
 
-/* near-miss: the loop matches except the order of the five stores (retail: stw 0, stb 4, stw 0x404, lfs, stw 0x40C, stfs 0x408); lbl_805BBE18 must be non-const to keep the lfs in the loop */
 extern "C" void fn_800C3A10(Unk800C341C_Mgr* m)
 {
     Unk800C3A10_Rec* r = m->recs;
@@ -502,8 +502,8 @@ extern "C" void fn_800C3A10(Unk800C341C_Mgr* m)
         r->m0 = 0;
         r->m4 = 0;
         r->m404 = 0;
+        r->m408 = lbl_805BBE18.v;
         r->m40C = 0;
-        r->m408 = lbl_805BBE18;
         r++;
     }
     m->m5D94 = 0;

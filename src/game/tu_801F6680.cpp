@@ -11,7 +11,10 @@ extern const float lbl_805D4F34;
 
 typedef Unk801EE438_Sel Unk801F6680_Sel;
 
-extern const float lbl_805D4EB0;
+struct Unk805D4EB0_F {
+    float v;
+};
+extern Unk805D4EB0_F lbl_805D4EB0;
 extern float lbl_805D4F1C;
 extern const float lbl_805D4F28;
 extern const float lbl_805D4F2C;
@@ -49,15 +52,88 @@ int fn_80210C98(Unk801EE438_G** g, int a);
 int fn_802055F4(Unk801EE438_G* g);
 }
 
-/* near-miss (6 slots): loop and call match; store order inside the loop body (all 24 orders and chained
- * forms tried) leaves the first int store after the constant load in ours. */
+extern char lbl_80649DA0[];
+extern char lbl_80660C30[];
+extern char lbl_80660C18[];
+extern float lbl_805D4EAC;
+
+struct Unk801F6680_Ev {
+    int m0;
+    const void* vptr;
+    int m8;
+    int mC;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+        m8 = 0;
+    }
+    void Set(int a, int b)
+    {
+        mC = a;
+        m8 = b;
+    }
+    ~Unk801F6680_Ev() { vptr = lbl_80649DA0; }
+};
+
+struct Unk801F6680_Own {
+    char pad0[0x6F4];
+    int m6F4;
+};
+
+struct Unk801F6680_P {
+    char pad0[0x460];
+    int m460;
+};
+
+struct Unk801F6680_Q {
+    char pad0[0x56C];
+    int m56C;
+};
+
+extern "C" void fn_8037893C(void* q, int id, Unk801F6680_Ev* e, int a, int b);
+
+extern "C" void fn_801F6680(Unk801EE438_Scr* s, Unk801F6680_P* a, Unk801F6680_Q* b, int n, int c)
+{
+    if (b != 0 && n > 1) {
+        b->m56C = a->m460;
+        Unk801F6680_Ev e;
+        Unk801F6680_Ev* p = &e;
+        p->Base(0x6F);
+        p->Set(n, c);
+        p->vptr = lbl_80660C30;
+        fn_8037893C((char*)s->m9C->m0 + 0x704, e.m0, p, 0, 0);
+    }
+    int is9 = ((Unk801F6680_Own*)s->m9C->m0)->m6F4 == 9;
+    if (is9 == 1) {
+        Unk801F6680_Ev e;
+        Unk801F6680_Ev* p = &e;
+        p->Base(0x70);
+        p->vptr = lbl_80660C18;
+        float* q = (float*)((char*)s + 0xC4);
+        float x18 = q[2];
+        float x1c = q[4];
+        float k = lbl_805D4EAC;
+        if (!(x18 >= x1c - lbl_805D4EAC)) {
+            p->m8 = is9;
+        } else {
+            int v = 2;
+            if (n > 1)
+                v = 3;
+            p->m8 = v;
+        }
+        fn_8037893C((char*)s->m9C->m0 + 0x704, e.m0, p, 0, 0);
+    }
+}
+
 extern "C" void fn_801F67E0(Unk801EE438_Scr* p)
 {
     Unk801EE438_Rec14* base = p->m9C->m62C;
     Unk801EE438_Rec14* r = base;
     for (int i = 0; i < 4; i++, r++) {
-        r->mC = r->m0 = 0;
-        r->m8 = r->m4 = lbl_805D4EB0;
+        r->m0 = 0;
+        r->m8 = r->m4 = lbl_805D4EB0.v;
+        r->mC = 0;
     }
     fn_8035BED0(base, 0);
 }

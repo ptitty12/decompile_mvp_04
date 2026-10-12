@@ -110,8 +110,12 @@ void fn_802CC53C(Unk802CBD04* o)
     }
 }
 
-/* near-miss (2 slots): retail loads o->mD8 (lwz r3,0xd8(r31)) before the cmplwi idx,12 test; ours loads it after (in the taken arm). Local d before/after the
-   branch, ternary and early-return forms tried. */
+inline int Unk802CC580_Get(Unk802CC580_Data* d, unsigned idx)
+{
+    if (idx <= 0xC)
+        return d->m65C[idx];
+    return 0;
+}
 int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
 {
     Unk802CC580_T* t = fn_801A04A8(o->mD8, k);
@@ -120,11 +124,7 @@ int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
     }
     int r;
     if (t->m44 == 0) {
-        if (idx <= 0xC) {
-            r = o->mD8->m65C[idx];
-        } else {
-            r = 0;
-        }
+        r = Unk802CC580_Get(o->mD8, idx);
     } else {
         r = fn_803272D0(o->mD8->m50, idx);
     }
@@ -207,4 +207,195 @@ void fn_802CF70C(Unk802CF70C_In* a, Unk802CF70C_Out* o, int p, int q)
         o->x = o->x + fn_802CF5CC(p, q, a->m8, a->mC, a->m4);
         o->y = o->y + fn_802CF5CC(p, q, a->m14, a->m18, a->m10);
     }
+}
+
+extern const char lbl_805E2568[];
+extern const char lbl_805E26D8[];
+extern const char lbl_805E3444[];
+extern const char lbl_805E3454[];
+extern const char lbl_805E3460[];
+extern const char lbl_805E3464[];
+extern const char lbl_805E346C[];
+extern const char lbl_805E3478[];
+extern const char lbl_805E3488[];
+extern const char lbl_805E37EC[];
+extern const char lbl_805E37F8[];
+extern const char lbl_805E380C[];
+extern const char lbl_805E383C[];
+extern const char lbl_805E3848[];
+extern const char lbl_805E385C[];
+extern const char lbl_805E3868[];
+extern const char lbl_805E3874[];
+extern const char lbl_805E3880[];
+extern const char lbl_805E3890[];
+extern const char lbl_805E389C[];
+extern const char lbl_805E38A4[];
+extern const char lbl_805E38B0[];
+extern const char lbl_805E38C4[];
+extern const char lbl_805E38D4[];
+extern const char lbl_805E38E0[];
+extern const char lbl_805E38EC[];
+extern const char lbl_805E38FC[];
+extern const char lbl_805E3908[];
+extern const char lbl_805E3914[];
+extern const char lbl_805E391C[];
+extern const char lbl_805E3924[];
+extern const char lbl_805E392C[];
+extern const char lbl_805E3940[];
+extern const char lbl_805E3954[];
+extern const char lbl_805E3968[];
+extern const char lbl_805E3978[];
+extern const char lbl_805E3980[];
+extern const char lbl_805E398C[];
+extern const char lbl_805E3998[];
+extern const char lbl_805E39A4[];
+extern const char lbl_805E39AC[];
+extern const char lbl_805E39C0[];
+extern const char lbl_805E39C4[];
+extern const char lbl_805E39CC[];
+extern const char lbl_805E39E0[];
+extern const char lbl_805E39EC[];
+extern const char lbl_805E39F8[];
+extern const char lbl_805E39FC[];
+extern const char lbl_805E3A08[];
+extern const char lbl_805E3A10[];
+extern const char lbl_805E3A20[];
+extern const char lbl_805E3A2C[];
+extern const char lbl_805E3A40[];
+extern const char lbl_805E3A50[];
+extern const char lbl_805E3A5C[];
+extern const char lbl_805E3A70[];
+extern const char lbl_805E3A80[];
+extern const char lbl_805E3A90[];
+extern const char lbl_805E3A9C[];
+extern const char lbl_805E3AAC[];
+extern const char lbl_805E3AB8[];
+extern const char lbl_805E3AD0[];
+extern const char lbl_805E3AE0[];
+extern const char lbl_805E3AF0[];
+extern const char lbl_805E3B08[];
+extern const char lbl_805E3B18[];
+extern const char lbl_805E3B28[];
+extern const char lbl_805E3B34[];
+extern const char lbl_805E3B44[];
+extern const char* lbl_8061ECA8;
+int fn_804089B4(char* buf, const char* fmt, ...);
+extern const char lbl_805E381C[];
+extern const char lbl_805E382C[];
+extern const char lbl_805E39B4[];
+class Unk802CF894_Reg : public Unk8037B3E8 {
+public:
+    Unk802CF894_Reg(const char* name);   /* never defined */
+    void fn_8037B548(const char* name, const char* def);
+    void fn_8037B5C0(const char* name, int* field, const char* values);
+};
+
+struct Unk802CF894_Self {
+    float m0;
+    float m4;
+    float m8;
+    int mC;
+    float m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    int m34;
+    int m38;
+    int m3C;
+    float m40;
+    float m44;
+    float m48;
+    int m4C;
+    int m50;
+    float m54;
+    int m58;
+    float m5C;
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    int m70;
+    float m74;
+    float m78;
+    float m7C;
+    float m80;
+    int m84;
+    int m88;
+    int m8C;
+    float m90;
+    float m94;
+};
+
+void fn_802CF894(Unk802CF894_Self* s, Unk802CF894_Reg* r)
+{
+    char buf[0x68];
+    r->fn_8037B50C(lbl_805E3444, &s->m68, lbl_805E3454, lbl_805E3460);
+    r->fn_8037B7E8(lbl_805E3464);
+    r->fn_8037B7E8(lbl_805E346C);
+    r->fn_8037B674(lbl_805E3478, &s->m34, lbl_805E3488, 0);
+    r->fn_8037B674(lbl_805E37EC, &s->m38, lbl_805E37F8, 0);
+    r->fn_8037B7E8(lbl_805E380C);
+    r->fn_8037B5C0(lbl_805E381C, &s->m3C, lbl_805E382C);
+    r->fn_8037B830(lbl_805E380C);
+    r->fn_8037B50C(lbl_805E383C, &s->m40, lbl_805E3848, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E385C, &s->m44, lbl_805E3848, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3868, &s->m48, lbl_805E3848, lbl_805E26D8);
+    r->fn_8037B830(lbl_805E346C);
+    r->fn_8037B7E8(lbl_805E3874);
+    r->fn_8037B674(lbl_805E3880, &s->m4C, lbl_805E3488, 0);
+    r->fn_8037B674(lbl_805E3890, &s->m50, lbl_805E37F8, 0);
+    r->fn_8037B50C(lbl_805E389C, &s->m54, lbl_805E38A4, 0);
+    r->fn_8037B7E8(lbl_805E38B0);
+    r->fn_8037B458(lbl_805E38C4, &s->m58, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E38D4, &s->m5C, lbl_805E38E0, 0);
+    r->fn_8037B50C(lbl_805E38EC, &s->m60, lbl_805E38FC, 0);
+    r->fn_8037B830(lbl_805E38B0);
+    r->fn_8037B830(lbl_805E3874);
+    r->fn_8037B7E8(lbl_805E3908);
+    r->fn_8037B50C(lbl_805E3914, &s->m0, lbl_8061ECA8, 0);
+    r->fn_8037B50C(lbl_805E391C, &s->m4, lbl_8061ECA8, 0);
+    r->fn_8037B50C(lbl_805E3924, &s->m8, lbl_8061ECA8, 0);
+    r->fn_8037B458(lbl_805E392C, &s->mC, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B548(lbl_805E3940, lbl_805E3954);
+    r->fn_8037B548(lbl_805E3968, lbl_805E3954);
+    r->fn_8037B830(lbl_805E3908);
+    r->fn_8037B7E8(lbl_805E3978);
+    r->fn_8037B50C(lbl_805E3980, &s->m24, lbl_805E3454, 0);
+    r->fn_8037B50C(lbl_805E398C, &s->m28, lbl_805E3454, 0);
+    r->fn_8037B50C(lbl_805E3998, &s->m2C, lbl_805E3454, 0);
+    r->fn_8037B50C(lbl_805E39A4, &s->m30, lbl_805E3454, lbl_805E26D8);
+    r->fn_8037B830(lbl_805E3978);
+    fn_802CF4B4((Unk802CF4B4_Self*)((char*)s + 0x98), r);
+    r->fn_8037B7E8(lbl_805E39AC);
+    fn_804089B4(buf, lbl_805E39B4, 0.1f, 72.0f);
+    r->fn_8037B50C(lbl_805E39C0, &s->m10, buf, lbl_805E39C4);
+    r->fn_8037B458(lbl_805E39CC, &s->m20, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B458(lbl_805E39E0, &s->m14, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E39EC, &s->m18, buf, lbl_805E39F8);
+    r->fn_8037B50C(lbl_805E39FC, &s->m1C, buf, lbl_805E3A08);
+    r->fn_8037B830(lbl_805E39AC);
+    r->fn_8037B50C(lbl_805E3A10, &s->m64, lbl_805E3A20, 0);
+    r->fn_8037B548(lbl_805E3A2C, lbl_805E39C0);
+    r->fn_8037B548(lbl_805E3A40, lbl_805E39C0);
+    r->fn_8037B7E8(lbl_805E3A50);
+    r->fn_8037B458(lbl_805E3A5C, &s->m6C, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B674(lbl_805E3A70, &s->m70, lbl_805E3488, 0);
+    r->fn_8037B50C(lbl_805E3A80, &s->m74, lbl_805E3A90, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3A9C, &s->m7C, lbl_805E3AAC, lbl_805E26D8);
+    r->fn_8037B458(lbl_805E3AB8, &s->m84, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3AD0, &s->m78, lbl_805E3A90, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3AE0, &s->m80, lbl_805E3AAC, lbl_805E26D8);
+    r->fn_8037B458(lbl_805E3AF0, &s->m88, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B830(lbl_805E3A50);
+    r->fn_8037B7E8(lbl_805E3B08);
+    r->fn_8037B458(lbl_805E3B18, &s->m8C, lbl_805E2568, lbl_805E26D8);
+    r->fn_8037B50C(lbl_805E3B28, &s->m90, lbl_805E3454, lbl_805E3460);
+    r->fn_8037B50C(lbl_805E3B34, &s->m94, lbl_805E3454, lbl_805E3460);
+    r->fn_8037B830(lbl_805E3B44);
+    r->fn_8037B830(lbl_805E3B08);
 }

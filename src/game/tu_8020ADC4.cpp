@@ -50,6 +50,68 @@ extern "C" int fn_8020B898(Scr* p)
     return r;
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_80660C78[];
+extern Unk8020C5FC_Tbl lbl_805D5940;
+
+struct Unk8020C4B4_Ev {
+    int m0;
+    const void* vptr;
+    int m8;
+    int mC;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived()
+    {
+        vptr = lbl_80660C78;
+        m8 = -1;
+    }
+    ~Unk8020C4B4_Ev() { vptr = lbl_80649DA0; }
+};
+
+struct Unk8020C4B4_Own {
+    char pad0[0x660];
+    void* m660;
+};
+
+struct Unk8020C4B4_J {
+    char pad0[0x41C];
+    int m41C;
+};
+
+extern "C" int fn_80259330(int x);
+extern "C" int fn_8020C90C(Scr* p);
+extern "C" int fn_8017C94C(void* j);
+extern "C" void fn_8037893C(void* q, int id, Unk8020C4B4_Ev* e, int a, int b);
+
+extern "C" int fn_8020C4B4(Scr* s)
+{
+    int r = 1;
+    if (fn_80259330(s->m0->m0->m700->m3B4) == 1) {
+        int idx = fn_8020C90C(s);
+        if (idx == -1)
+            idx = 3;
+        Unk8020C5FC_Tbl t = lbl_805D5940;
+        r = t.m[idx];
+        Unk8020C4B4_Ev e;
+        e.Base(0x69);
+        e.Derived();
+        e.m8 = idx;
+        fn_8037893C((char*)s->m0->m0 + 0x704, e.m0, &e, 0, 0);
+    } else if (fn_8017C94C(s->m0->m0->m700) == 1) {
+        r = 0x44;
+        Unk801EE438_Game* g = s->m0->m0->m6CC;
+        if ((void*)g->m36C == ((Unk8020C4B4_Own*)s->m0->m0)->m660)
+            r = 0x43;
+    } else if (((Unk8020C4B4_J*)s->m0->m0->m700)->m41C != 0xA) {
+        r = 0x43;
+    }
+    return r;
+}
+
 extern "C" int fn_8020C5F4(Scr* p)
 {
     return 0x42;
@@ -180,6 +242,24 @@ extern "C" int fn_8020CD38(int unused, int a, int b)
     return r;
 }
 
+extern const Unk801EE438_Vec lbl_805D6790;
+extern const float lbl_805D59AC;
+
+inline Unk801EE438_Vec VecSub(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+
+extern "C" int fn_8020CFA8(Scr*, Unk801EE438_Vec* a)
+{
+    Unk801EE438_Vec d = VecSub(*a, lbl_805D6790);
+    return d.m0 * d.m0 + d.m8 * d.m8 < lbl_805D59AC;
+}
+
 extern "C" void fn_8020DF6C(Unk8020DF6C_Buf* b)
 {
     if (b->m0 != 0) {
@@ -209,9 +289,74 @@ extern "C" void fn_8020E6A0(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, i
     fn_8020E71C(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6));
 }
 
+extern const float lbl_805D5B28;
+extern const float lbl_805D5B2C;
+extern const Unk801EE438_Vec lbl_806055DC;
+extern "C" float fn_804028E4(float x); /* square root */
+extern "C" float fn_80250338(void* o, float a, float b);
+extern "C" float fn_80189D88(int a, int b, Unk801EE438_Vec* pos, const Unk801EE438_Vec* v, float f);
+
+inline float Len20E71C(Unk801EE438_Vec v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+
+extern "C" float fn_8020E71C(Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t)
+{
+    Unk801EE438_Vec w = lbl_806055DC;
+    float f18 = lbl_805D5B28;
+    float r = fn_8020E074(p, a1, a2, v, t, (int)&w, (int)&f18);
+    float c = fn_80250338((void*)(a2 + 0x4D8), Len20E71C(VecSub(w, v)), f18);
+    float q = fn_80189D88(a1, a2, &w, &v, c);
+    return r + q;
+}
+
 /* near-miss (2 slots): the two argument moves for the fn_80216590 call (mr r8,r9 / mr r5,r11) are
  * ordered the other way round than retail. */
 extern "C" void fn_8020E82C(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, int a5, int a6, int a7)
 {
     fn_8020E8B4(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6), a7);
+}
+
+extern "C" float fn_8020E8B4(Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7)
+{
+    Unk801EE438_Vec w = lbl_806055DC;
+    float f18 = lbl_805D5B2C;
+    float r = fn_8020E2A0(p, a1, a2, v, t, (int)&w, (int)&f18, a7);
+    float dist = Len20E71C(VecSub(w, v));
+    float c = fn_80250338((void*)(a2 + 0x4D8), dist, f18);
+    float q = fn_80189D88(a1, a2, &w, &v, c);
+    return r + q;
+}
+
+extern const float lbl_805D5B48;
+extern const float lbl_805D5B4C;
+extern const float lbl_805D5B50;
+extern const float lbl_805D5B54;
+extern const float lbl_805D5B58;
+extern const float lbl_805D5B5C;
+extern const float lbl_805D5B60;
+extern const float lbl_805D5B64;
+extern const float lbl_805D5B68;
+
+extern "C" float fn_8020EDA8(Scr*, int, int, Unk801EE438_Vec* a, Unk801EE438_Vec* b, float* out)
+{
+    float d2;
+    Unk801EE438_Vec d = VecSub(*a, *b);
+    d2 = d.m0 * d.m0 + d.m8 * d.m8;
+    float v1 = lbl_805D5B48;
+    float v0;
+    if (!(d2 >= lbl_805D5B4C)) {
+        v0 = lbl_805D5B50;
+        v1 = lbl_805D5B54;
+    } else if (!(d2 >= lbl_805D5B58)) {
+        v0 = lbl_805D5B5C;
+        v1 = lbl_805D5B60;
+    } else {
+        v0 = lbl_805D5B64;
+        v1 = lbl_805D5B68;
+    }
+    if (out != 0)
+        *out = v1;
+    return v0;
 }

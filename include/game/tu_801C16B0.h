@@ -25,9 +25,13 @@ struct Unk801C16B0_Sub8 {
 struct Unk801C16B0_M4 {
     char pad0[8];
     Unk801C16B0_Sub8 s8;
-    char pad18[0x3B0 - 0x18];
+    char pad18[0x3A4 - 0x18];
+    void* m3A4;
+    char pad3A8[0x3B0 - 0x3A8];
     void* m3B0;
-    char pad3B4[0x418 - 0x3B4];
+    int m3B4;
+    int m3B8;
+    char pad3BC[0x418 - 0x3BC];
     int m418;
 };
 
@@ -50,7 +54,13 @@ struct Unk801C16B0_Z {
     Unk801C16B0_M4* m4;
     char m8[0xE0 - 8];
     char mE0[4];
-    char padE4[0x120 - 0xE4];
+    char padE4[0xEC - 0xE4];
+    int mEC;
+    int mF0;
+    int mF4;
+    char padF8[0x118 - 0xF8];
+    int m118;
+    int m11C;
     int m120;
     int m124;
     int m128;
@@ -60,7 +70,8 @@ struct Unk801C16B0_Z {
     float m13C;
     float m140;
     float m144;
-    char pad148[0x150 - 0x148];
+    float m148;
+    float m14C;
     float m150[2];
     char pad158[0x180 - 0x158];
     float m180;
@@ -71,9 +82,12 @@ struct Unk801C16B0_Z {
     char pad1BC[0x1C8 - 0x1BC];
     int m1C8;
     int m1CC;
-    char pad1D0[0x1DC - 0x1D0];
+    float m1D0;
+    float m1D4;
+    float m1D8;
     float m1DC[6];
-    char pad1F4[0x1FC - 0x1F4];
+    char pad1F4[4];
+    float m1F8;
     float m1FC;
     char pad200[0x204 - 0x200];
     Unk801B7FB0_P* m204;

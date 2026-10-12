@@ -135,6 +135,7 @@ public:
     int m18;
     int m1C;
     void fn_8037B548(const char* name, int a);   /* begin/flag registration used with a null default */
+    void fn_8037B548(const char* name, const char* def);
 };
 
 #endif

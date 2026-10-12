@@ -553,13 +553,13 @@ int fn_801B5F8C(Unk801AB63C_P* p)
     return p->m8->m6F8->m14[2].m1;
 }
 
-/* near-miss: retail loads the table index byte into r9 (reusing the array pointer's register) and
- * adds r9+r4; 2 slots differ. */
+inline int Unk801B5FA0_At(unsigned char* t, int k) { int o = k; return t[o]; }
 int fn_801B5FA0(Unk801AB63C_P* p, int i)
 {
     Unk8019F8C0_Inner* m14 = p->m8->m6F8->m14;
+    Unk8019F8C0_Inner* e = m14 + i;
     unsigned char k = m14[2].m0;
-    return m14[i].m1B4[k];
+    return Unk801B5FA0_At(e->m1B4, k);
 }
 
 inline int Unk801B5FC4_B(unsigned char* b, int i) { return b[i]; }

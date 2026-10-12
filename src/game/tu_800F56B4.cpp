@@ -142,6 +142,28 @@ int fn_800F60C0(UiV_134* self, int a)
     return 1;
 }
 
+extern "C" {
+void fn_80125300(UiObj* o, int a, int b, int c);
+void fn_80125180(UiObj* o, int a, int b);
+}
+extern char lbl_805BA6D0[];
+extern char lbl_805BE4B0[];
+void fn_800F6184(UiV_134_138* self)
+{
+    self->m138 = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    fn_80124FA8(self->m138, self);
+    fn_80125300(self->m138, 1, 4, 0x38C8);
+    UiObj* w = self->m138;
+    fn_800C80C0(w, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
+    fn_80125180(self->m138, 1, 0x1A0B);
+    fn_80125180(self->m138, 0, 0x1A0D);
+    self->m134 = (UiObj*)fn_800C8060((int)self->v33(8, 1));
+    if (fn_8011AA24(0)->m6F8->m10->m74 == 0)
+        fn_80118A70(fn_800C8044(self->v32((int)lbl_805BE4B0, 1)));
+    self->m134->v8(1);
+}
+
 int fn_800F62D8(UiScr134* self, int a)
 {
     if (fn_800B555C()->m570 == a)
@@ -218,6 +240,47 @@ UiScrRaw* fn_800F6664(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m3C = lbl_8064F8C8;
     self->m130 = 0;
     return self;
+}
+
+struct UiV_174_1D0 : UiObj {
+    char pad40[0x174 - 0x40];
+    UiObj* m174;
+    char pad178[0x1D0 - 0x178];
+    UiObj* m1D0;
+};
+struct UiRow78 {
+    char pad0[0x78];
+    int m78;
+};
+extern "C" {
+int fn_80099B50(void* e, int i);
+int fn_801A49F0(void* g, int a, int b);
+void fn_800F6B24(void* self, int a, int b);
+}
+int fn_80177148(int* a, int b);
+/* near-miss: 5 slots; the first fn_80125490 call has mr r3,w last in retail (after the four li), first here (tried an int-returning fn_80124FA8) */
+void fn_800F6964(UiV_174_1D0* self)
+{
+    lbl_8061B8C0->m24 = 0;
+    fn_802D7ACC();
+    Ui8011AA24* g = fn_8011AA24(0);
+    self->m174->v8(0);
+    self->m1D0->v8(0);
+    int p = g->m788;
+    UiRow78* e = (UiRow78*)((char*)g->m6F8->m14 + p * 0xE64);
+    int n = e->m78;
+    for (int i = 0; i < n;) {
+        int r = fn_80099B50(e, i);
+        i++;
+        int x = fn_801A49F0(g, p, r);
+        fn_800F6B24(self, fn_80177148((int*)g->m700->m3A8, x) == 1, x);
+    }
+    UiObj* w = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    fn_80124FA8(w, self);
+    fn_80125490(w, 1, 1, 0x1A0B, 3);
+    fn_80125490(w, 2, 4, 0x38C8, 4);
+    fn_800C80C0(w, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
 }
 
 void fn_800F6AF4(UiObj* self)

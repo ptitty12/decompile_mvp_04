@@ -372,8 +372,13 @@ extern "C" void fn_80181D48(Unk80181140* o)
 /* near-miss family (this and the getters at 0x80183918, 0x8018398C, 0x801839F8, 0x80183A44,
  * 0x80183AB8, 0x80183B38): the side select matches instruction for instruction, except that
  * retail compares the incoming index register (cmpwi r4,2) where this compiles cmpwi r0,2
- * (the copy t), and schedules the ctx load before `mr r0,r4`. Nine spellings of the select
- * (t copy, else arm, early returns, ternary, f^=1) were scored; none changes the compare. */
+ * (the copy t), and schedules the ctx load before `mr r0,r4`. Cause (cse.c make_regs_eqv):
+ * when `t = idx` is entered into idx's equivalence class, a pseudo that lives past the
+ * extended basic block with a later last use becomes the class head, so the compare is
+ * rewritten onto t. Retail's compare kept idx, so retail's copy of idx must not have
+ * qualified for that rule (source form not found). ~25 spellings of the select were scored
+ * (t copy, else arm, early returns, ternary, f^=1, block-local copies); none changes the
+ * compare. */
 extern "C" int fn_8018240C(Unk80181140* o, int side)
 {
     int t = Unk801808A4_Sel(o->m1D40, side);

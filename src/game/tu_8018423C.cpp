@@ -48,25 +48,23 @@ extern "C" int fn_80184E0C(void* unused, Unk80184E0C_Vec* a, Unk80184E0C_Vec* b,
 }
 
 //@801850B4
-/* near-miss: 38 vs 37 insns, ~14 slots differ: with float literals the constant stays in
- * its register as in retail; what is left is the layout after the call: retail puts the
- * failed arm (`li r3,0; b`) right after the bne, here the success arm comes first. ~9
- * forms tried (early returns, default result, if/else, inline). */
+inline float GetF(Unk801850B4_Obj* o, int idx)
+{
+    char* b = (char*)o + 0x1C7C;
+    int off = idx * 0x30;
+    return *(float*)(b + off);
+}
 extern "C" int fn_801850B4(Unk801850B4_Obj* o, float* v, int idx, float* out)
 {
-    int r;
     *out = 0.0f;
     const float c = -240.0f;
-    if (v[0] < c || !(v[2] >= c)) {
-        if (fn_80184E5C(o, v, idx) == 0)
-            r = 0;
-        else {
-            *out = *(float*)((char*)o + 0x1C7C + idx * 0x30);
-            r = 1;
-        }
-    } else
-        r = 0;
-    return r;
+    if (!(v[0] < c || !(v[2] >= c)))
+        return 0;
+    if (fn_80184E5C(o, v, idx) != 0) {
+        *out = GetF(o, idx);
+        return 1;
+    }
+    return 0;
 }
 
 //@80185424
@@ -168,15 +166,16 @@ extern "C" void fn_8018567C(Unk80181140* o, int a, Unk80183918_Vec3* p, const ch
 }
 
 //@80185728
-/* near-miss: 43/43 insns, 4 slots differ: the m6C store uses a displacement off the
- * element pointer in retail but an indexed store off o+0x11CC here (the other two
- * stores match). All 6 statement orders tried. */
+inline Unk80181140_E* AtE(Unk80181140* o)
+{
+    return &o->m1160[o->m1144];
+}
 extern "C" void fn_80185728(Unk80181140* o, int a, Unk80183918_Vec3* p, const char* name)
 {
     if (o->m1144 <= 0xF) {
         fn_8040B830(o->m1160[o->m1144].m70, name, 0x20);
-        o->m1160[o->m1144].m70[0x1F] = 0;
-        o->m1160[o->m1144].m6C = a;
+        AtE(o)->m70[0x1F] = 0;
+        AtE(o)->m6C = a;
         o->m1160[o->m1144].m0 = *p;
         o->m1144 = o->m1144 + 1;
     }
@@ -255,20 +254,16 @@ void Unk80185CD4::fn_80186704(int a)
 }
 
 //@80186738
-/* near-miss: 20/20 insns, 8 slots differ: retail lays the `t = 1` arm right after the
- * `a <= 3` test (bgt over it, then b END); every spelling tried hoists li 1 above the
- * branch or puts the a > 3 arm first. ~6 forms tried. */
 void Unk80185CD4::fn_80186738(int a)
 {
     int t = 0;
     if (a > 1) {
         if (a <= 3)
             t = 1;
-        else {
+        else if (a <= 5)
+            t = 2;
+        else
             t = 3;
-            if (a <= 5)
-                t = 2;
-        }
     }
     fn_80186704(t);
 }

@@ -256,12 +256,12 @@ void fn_8031BFAC(FxD* self, int i) {
     *(FxSlotD*)((char*)self + off) = self->aA4[1];
 }
 
-/* near-miss: slot address: add + displacement in retail, addi + lwzx here */
+/* near-miss: slot address now matches (i * 12 + (int)self, then + 0xA4); the copy loop keeps dst/src cursors in swapped registers (pointer-cursor forms tried) */
 void fn_8031BFD8(FxD* self, int i) {
-    FxSrcD* src = self->aA4[i].m4;
+    FxSrcD* src = ((FxSlotD*)((char*)(i * 12 + (int)self) + 0xA4))->m4;
     for (int k = 0; k < 5; k++) {
         self->a68[k].m0 = 0;
-        self->a68[k].m4 = lbl_805EA5DC;
+        self->a68[k].m4 = 0.0f;
         self->a68[k].m8 = 1;
     }
     if (src) {
@@ -372,54 +372,50 @@ void fn_8031C714(FxG* self) {
     }
 }
 
-/* near-miss: float temporaries: retail has one stack slot, ours three */
 void fn_8031CB4C(void* unused, float* out) {
     FxCtx* c = lbl_8061FEDC;
     if (c->m204 != 0 && c->m208 == 0) {
-        float a = lbl_805EA624;
-        out[7] = lbl_805EA62C;
-        out[3] = lbl_805EA628;
-        out[6] = a + lbl_805EA62C;
-        out[4] = -a;
+        float a = 0.16666667f;
         out[0] = -a;
-        out[1] = lbl_805EA628;
-        out[2] = a + lbl_805EA62C;
-        out[5] = lbl_805EA62C;
+        out[1] = 0.0f;
+        out[2] = a + 1.0f;
+        out[3] = 0.0f;
+        out[4] = -a;
+        out[5] = 1.0f;
+        out[6] = a + 1.0f;
+        out[7] = 1.0f;
     } else {
-        out[4] = lbl_805EA628;
-        out[7] = lbl_805EA62C;
-        out[0] = lbl_805EA628;
-        out[1] = lbl_805EA628;
-        out[2] = lbl_805EA62C;
-        out[3] = lbl_805EA628;
-        out[5] = lbl_805EA62C;
-        out[6] = lbl_805EA62C;
+        out[0] = 0.0f;
+        out[1] = 0.0f;
+        out[2] = 1.0f;
+        out[3] = 0.0f;
+        out[4] = 0.0f;
+        out[5] = 1.0f;
+        out[6] = 1.0f;
+        out[7] = 1.0f;
     }
 }
 
 void fn_8031CBF4() {}
 
-/* near-miss: eight float stores; store order not found */
 void fn_8031CBF8(void* unused, float* out) {
-    out[4] = lbl_805EA630;
-    out[7] = lbl_805EA634;
-    out[0] = lbl_805EA630;
-    out[1] = lbl_805EA630;
-    out[2] = lbl_805EA634;
-    out[3] = lbl_805EA630;
-    out[5] = lbl_805EA634;
-    out[6] = lbl_805EA634;
+    out[0] = 0.0f;
+    out[1] = 0.0f;
+    out[2] = 1.0f;
+    out[3] = 0.0f;
+    out[4] = 0.0f;
+    out[5] = 1.0f;
+    out[6] = 1.0f;
+    out[7] = 1.0f;
 }
 
-/* near-miss: retail copies the repeated float argument through an fmr chain (f3<-f2, f5<-f3); ours takes it straight from f1 */
 void* fn_8031CC2C(void* self, float t) {
-    fn_8014D9EC(self, lbl_805EA650, lbl_805EA650, lbl_805EA650, t, lbl_805EA650);
+    fn_8014D9EC(self, 1.0f, 1.0f, 1.0f, t, 1.0f);
     return self;
 }
 
-/* near-miss: same fmr chain as the neighbouring function */
 void* fn_8031CC78(void* self, float t) {
-    fn_8014D9EC(self, lbl_805EA654, lbl_805EA654, lbl_805EA654, t, lbl_805EA658);
+    fn_8014D9EC(self, 0.0f, 0.0f, 0.0f, t, 1.0f);
     return self;
 }
 

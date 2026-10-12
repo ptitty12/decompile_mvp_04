@@ -187,6 +187,34 @@ extern "C" void fn_801C195C(void) { fn_801C0538(1, 0xFFFF); }
 
 extern "C" void fn_801C1988(void) { fn_801C0538(0, 0xFFFF); }
 
+extern "C" float fn_80410CE8(float y, float x);
+extern "C" float fn_804028E4(float x);
+extern float lbl_806203AC;
+extern float lbl_806203B0;
+extern float lbl_806203B4;
+extern float lbl_806203BC;
+extern float lbl_806203C0;
+extern float lbl_806203C4;
+extern Vec3 lbl_80691AF4;
+extern Vec3 lbl_806203CC;
+extern int lbl_80691CA8;
+
+extern "C" void fn_801C19B4(const Vec3* a, const Vec3* b, const Vec3* c)
+{
+    float yaw = fn_80410CE8(a->x, a->z);
+    float pitch = fn_80410CE8(a->y, fn_804028E4(a->x * a->x + a->z * a->z));
+    lbl_806203AC = yaw * 57.295773f;
+    lbl_806203B0 = pitch * 57.295773f;
+    lbl_806203B4 = fn_804028E4(a->x * a->x + a->y * a->y + a->z * a->z) * 0.05681818f;
+    if (lbl_80691CA8 == 0) {
+        lbl_806203BC = lbl_806203AC;
+        lbl_806203C0 = lbl_806203B0;
+        lbl_806203C4 = lbl_806203B4;
+    }
+    lbl_80691AF4 = *b;
+    lbl_806203CC = *c;
+}
+
 Unk801C1AF0::~Unk801C1AF0() {}
 
 extern "C" void fn_801C1E24(void* self) { fn_801C1E44(self); }
