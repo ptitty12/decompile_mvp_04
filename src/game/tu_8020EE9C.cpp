@@ -72,6 +72,38 @@ int fn_80210DA8(Sub* t, int kind, Player* p)
     }
 }
 
+extern const float lbl_805D5C14;
+extern "C" float fn_80259A74(void* list, int id, int k);
+extern "C" int fn_80254EA4(PlayerSub* p, int a);
+
+inline float AbsF(float v)
+{
+    return fabsf(v);
+}
+
+int fn_80210E64(Sub* t, int a, Player** out, float* outf, float f)
+{
+    void* list = t->m0->m0->m700->m3B4;
+    Player* p = fn_80257B40(list);
+    *out = 0;
+    float best = lbl_805D5C14;
+    for (; p; p = fn_80257BD0(list, p, 0)) {
+        if (fn_802110F8(t, 2, p, a) == 1 || fn_802110F8(t, 4, p, a) == 1) {
+            float d = fn_80259A74(list, p->m458, a);
+            int k = fn_80254EA4(&p->m58C, 0);
+            if (k != -1 && k != a)
+                d = 2.0f * fn_80259A74(list, p->m458, k);
+            float diff = f - d;
+            if (!(AbsF(diff) >= AbsF(best))) {
+                *outf = d;
+                best = diff;
+                *out = p;
+            }
+        }
+    }
+    return *out != 0;
+}
+
 int fn_80210FC4(Sub* t, int kind, int x, Player** out)
 {
     void* list = t->m0->m0->m700->m3B4;
@@ -86,6 +118,67 @@ int fn_80210FC4(Sub* t, int kind, int x, Player** out)
         }
     }
     return r;
+}
+
+struct PlayerSubX {
+    char pad0[8];
+    float m8;
+    char padC[0x28 - 0xC];
+    int m28;
+    char pad2C[4];
+    int m30;
+    char pad34[4];
+    int m38;
+    int m3C;
+};
+
+extern const float lbl_805D5C18;
+extern "C" int fn_802113E8(Sub* t, Player* p, int x);
+
+int fn_802110F8(Sub* t, int kind, Player* p, int x)
+{
+    switch (kind) {
+    case 0: {
+        PlayerSubX* s = (PlayerSubX*)&p->m58C;
+        int r = 0;
+        if (s->m8 != lbl_805D5C18)
+            r = s->m3C == x;
+        return r;
+    }
+    case 1: {
+        PlayerSubX* s = (PlayerSubX*)&p->m58C;
+        int r = 0;
+        if (s->m8 != lbl_805D5C18 && s->m3C == x && x != 3 && x == s->m38 && s->m28 != 0x11)
+            r = 1;
+        return r;
+    }
+    case 2: {
+        PlayerSubX* s = (PlayerSubX*)&p->m58C;
+        int r = 0;
+        if (fn_80254B60((PlayerSub*)s) == 1 && (s->m30 == x || fn_80255028((PlayerSub*)s) == x))
+            r = 1;
+        return r;
+    }
+    case 3: {
+        PlayerSubX* s = (PlayerSubX*)&p->m58C;
+        if (fn_80254984((PlayerSub*)s) == 1) {
+            if (x == 0) {
+                if (s->m38 == -1)
+                    return 1;
+            } else if (s->m38 == x - 1)
+                return 1;
+        }
+        return 0;
+    }
+    case 4:
+        return fn_80254EA4(&p->m58C, 0) == x;
+    case 5:
+        return fn_802113E8(t, p, x);
+    case 6:
+        return *(int*)((char*)p + 0x5C4) == x;
+    default:
+        return 0;
+    }
 }
 
 int fn_80211064(Sub* t, int kind, Player* p, int* out)
@@ -149,6 +242,57 @@ Player* fn_80211370(Sub* t)
         }
     }
     return found;
+}
+
+extern const float lbl_805D5C2C;
+extern const float lbl_805D5C30;
+extern const float lbl_805D5C34;
+extern const float lbl_805D5C38;
+extern const float lbl_805D5C3C;
+extern "C" int fn_8025995C(void* list, int id, float* a, int* b, int* c);
+
+/* near-miss (30 slots): control flow, stack triple and calls match; retail keeps pl in r31 and &pl->m58C in r30 (ours the
+   reverse) and loads a before the constant in each arm of the last compare */
+struct Unk802113E8_Q {
+    float a;
+    int b;
+    int c;
+};
+
+int fn_802113E8(Sub* t, Player* pl, int x)
+{
+    int r = 0;
+    if (pl != 0) {
+        PlayerSub* s = &pl->m58C;
+        if (fn_80254984(s) == 1) {
+            Unk802113E8_Q q;
+            if (fn_8025995C(t->m0->m0->m700->m3B4, pl->m458, &q.a, &q.b, &q.c) == 1) {
+                int k = fn_80254EA4(s, 0);
+                int v = fn_80255028(s);
+                if (v == -1)
+                    v = q.c;
+                if (k != -1 && k < q.b && (q.b != 3 || q.c != 0)) {
+                    v = k;
+                    q.c = k + 1;
+                    q.a = lbl_805D5C2C;
+                    q.b = k;
+                }
+                if (q.b == x) {
+                    if (v == x || v == -1 || k == x) {
+                        if (!(q.a >= lbl_805D5C30))
+                            r = 1;
+                    } else if (k != q.c) {
+                        if (!(q.a >= lbl_805D5C34))
+                            r = 1;
+                    }
+                } else if (q.c == x) {
+                    if (!(q.a <= ((v != q.c && v != -1) ? lbl_805D5C3C : lbl_805D5C38)))
+                        r = 1;
+                }
+            }
+        }
+    }
+    return r;
 }
 
 int fn_8021157C(CmpPos* a, CmpPos* b)
