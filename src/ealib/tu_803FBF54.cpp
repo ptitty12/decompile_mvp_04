@@ -29,27 +29,6 @@ struct RcHnd {
     int m8;
 };
 
-struct RcObjH {
-    char pad[0x38];
-    int m38;
-    int pad3C;
-    int m40;
-    int m44;
-    int m48;
-    int m4C;
-};
-
-extern "C" void fn_803FBF54();
-extern "C" int fn_803FA3B4(void (*)(), int, int, RcArgs*);
-extern "C" void fn_803FBD78(int, char*, int);
-extern "C" void fn_804017D0(char*);
-extern "C" void fn_803FC064(int);
-extern "C" void fn_803FC1B0(int);
-extern "C" int fn_803FC798(int, int, int, int, int, int, int);
-extern "C" int fn_803FCCAC(int, int, int, int, int, int, int);
-extern "C" int fn_803FC438(int, int);
-extern "C" int fn_803FCCCC(RcHnd*, RcObjH**, RcHnd**);
-
 struct RcNd {
     int m0;
     int m4;
@@ -57,11 +36,25 @@ struct RcNd {
     RcNd* mC;
 };
 
+struct RcMap {
+    int m0;
+    int m4;
+    int m8;
+};
+
+/* evidence: fn_803FCCCC (handle -> object 'MRTS'), fn_803FCDCC/CE50/CF1C (node lists at +0x68..+0x74), fn_803FDBC4 (map at +0x28/+0x2C) */
 struct RcFile {
     int m0;
-    char m4[0x40];
+    char m4[0x24];
+    RcMap* m28;
+    int m2C;
+    char* m30;
+    int m34;
+    int m38;
+    int pad3C;
+    int m40;
     int m44;
-    int pad48;
+    int m48;
     int m4C;
     int m50;
     int m54;
@@ -71,21 +64,32 @@ struct RcFile {
     RcNd* m6C;
     RcNd* m70;
     RcNd* m74;
-    char pad78[0x108];
+    char pad78[0x100];
+    int m178;
+    int m17C;
     int m180;
+    int m184;
 };
+
+struct RcCtx {
+    int m0, m4, m8;
+};
+extern "C" int fn_803FBF54(int, RcCtx*);
+extern "C" int fn_803FA3B4(int (*)(int, RcCtx*), int, int, RcArgs*);
+extern "C" void fn_803FBD78(int, char*, int);
+extern "C" void fn_804017D0(char*);
+extern "C" void fn_803FC064(int);
+extern "C" void fn_803FC1B0(int);
+extern "C" int fn_803FC798(int, int, int, int, int, int, int);
+extern "C" int fn_803FCCAC(int, int, int, int, int, int, int);
+extern "C" int fn_803FC438(int, int);
+extern "C" int fn_803FCCCC(RcHnd*, RcFile**, RcHnd**);
 
 extern int lbl_806EF478;
 extern "C" int fn_80400828(void*);
 extern "C" int fn_8040084C(void*);
 extern "C" void fn_803F972C(int, int);
 extern "C" char* strcpy(char*, const char*);
-
-struct RcMap {
-    int m0;
-    int m4;
-    int m8;
-};
 
 extern "C" int fn_803F9A80(int);
 extern "C" int fn_803F9C58(void*, int, int, void*);
@@ -97,6 +101,29 @@ struct RcMapTab {
     RcMap* m28;
     int m2C;
 };
+
+extern "C" int fn_803FE418(int);
+extern "C" int fn_80400008(int);
+extern "C" void fn_80400CE4(int);
+extern "C" void fn_803FFFA8(int);
+extern "C" void fn_804007FC(void*);
+extern "C" void fn_803FEC9C(int, int);
+extern "C" void fn_803FDDEC(int, int);
+
+extern "C" int fn_803FEBDC(int, int, int, int*);
+extern "C" int fn_803FEC74(int, int, int, int, int);
+
+extern "C" int fn_803FBF54(int n, RcCtx* ctx)
+{
+    int out;
+    if (fn_803FEBDC(ctx->m0, 6, n, &out) != 0) {
+        int m = n - 1;
+        int v = fn_803FEC74(out, 0, ctx->m4, ctx->m8, m);
+        fn_803FEC9C(out, m);
+        return v == ctx->m8;
+    } else
+        return 0;
+}
 
 extern "C" int fn_803FBFE0(int a, int b, int c)
 {
@@ -239,7 +266,7 @@ extern "C" int fn_803FCCAC(int a, int b, int c, int d, int e, int f, int g)
     return fn_803FC798(a, b, c, d, e, f, g);
 }
 
-extern "C" int fn_803FCCCC(RcHnd* h, RcObjH** o1, RcHnd** o2)
+extern "C" int fn_803FCCCC(RcHnd* h, RcFile** o1, RcHnd** o2)
 {
     if (h == 0)
         return 1;
@@ -247,7 +274,7 @@ extern "C" int fn_803FCCCC(RcHnd* h, RcObjH** o1, RcHnd** o2)
     if (q[0] != 0x4d525453)
         return 1;
     *o2 = h;
-    *o1 = (RcObjH*)q;
+    *o1 = (RcFile*)q;
     return 0;
 }
 
@@ -392,9 +419,54 @@ extern "C" int fn_803FD944(int a, int b, int c)
     return t3 + t1 + t2 + 0x20;
 }
 
+extern "C" void fn_803FDBC4(int h, int a, int b, int c, int d)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+        if (a > 0) {
+            RcFile* q = o;
+            if (a <= o->m2C) {
+                if (a == o->m2C && (b | c) != 0)
+                    return;
+                if (d > 0 || d == -1 || d == -2) {
+                    if (d <= o->m34) {
+                        if (o->m44 == 0) {
+                            char* tab = (char*)o->m28;
+                            int off = a * 0xc - 0xc;
+                            *(int*)(tab + off) = b;
+                            tab += off;
+                            ((RcMap*)tab)->m4 = c;
+                            ((RcMap*)tab)->m8 = d;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+extern "C" void fn_803FDC80(int h)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+        fn_803FE418(h);
+        while (o->m44 == 1) {
+            if (fn_80400008(0) != 0)
+                fn_80400CE4(0);
+            fn_803FFFA8(0);
+        }
+        o->m0 = 0;
+        fn_804007FC(o->m4);
+        if (o->m178 != 0)
+            fn_803FEC9C(o->m178, 0x64);
+    }
+}
+
 extern "C" void fn_803FDD28(RcHnd* h, int a, int b)
 {
-    RcObjH* o;
+    RcFile* o;
     RcHnd* p;
     if (fn_803FCCCC(h, &o, &p) == 0) {
         o->m48 = a;
@@ -402,9 +474,43 @@ extern "C" void fn_803FDD28(RcHnd* h, int a, int b)
     }
 }
 
+extern "C" void fn_803FDD78(int h, int v)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+        int old = o->m50;
+        o->m50 = v;
+        int a = o->m58 < v;
+        int b = o->m58 < old;
+        if (b != a)
+            fn_803FDDEC(h, a);
+    }
+}
+
+extern "C" void fn_803FDDEC(int h, int flag)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC((RcHnd*)h, &o, &p) == 0) {
+        o->m54 = flag;
+        if (flag != 0 && o->m44 == 1)
+            fn_803F972C(o->m180, o->m4C);
+    }
+}
+
+extern "C" char* fn_803FDE54(int h, int n)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC((RcHnd*)h, &o, &p) != 0 || n <= 0 || n > o->m34)
+        return 0;
+    return o->m30 + (n * 16 - 16);
+}
+
 extern "C" int fn_803FE914(RcHnd* h)
 {
-    RcObjH* o;
+    RcFile* o;
     RcHnd* p;
     int r;
     if (fn_803FCCCC(h, &o, &p) == 0)
@@ -416,7 +522,7 @@ extern "C" int fn_803FE914(RcHnd* h)
 
 extern "C" int fn_803FE954(RcHnd* h)
 {
-    RcObjH* o;
+    RcFile* o;
     RcHnd* p;
     int r;
     if (fn_803FCCCC(h, &o, &p) == 0)
@@ -428,7 +534,7 @@ extern "C" int fn_803FE954(RcHnd* h)
 
 extern "C" int fn_803FE994(RcHnd* h)
 {
-    RcObjH* o;
+    RcFile* o;
     RcHnd* p;
     if (fn_803FCCCC(h, &o, &p) != 0)
         return 0;
@@ -440,7 +546,7 @@ extern "C" int fn_803FE994(RcHnd* h)
 
 extern "C" int fn_803FE9F0(RcHnd* h)
 {
-    RcObjH* o;
+    RcFile* o;
     RcHnd* p;
     if (fn_803FCCCC(h, &o, &p) != 0)
         return 0;
