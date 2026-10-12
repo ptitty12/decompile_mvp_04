@@ -639,6 +639,47 @@ extern "C" void fn_801D6CE4(B* s, float a, float b)
         fn_801D67CC(s);
 }
 
+extern float lbl_8061CBE4;
+extern float lbl_8061CBE8;
+extern float lbl_8061CBEC;
+extern float lbl_8061CBF0;
+extern float lbl_8061CBF4;
+
+extern "C" void fn_801D6D30(B* s, float a, float b)
+{
+    if (!(a >= lbl_8061CBE4 * lbl_8061CBF4)) {
+        fn_801D63A8(s);
+        return;
+    }
+    if (a < lbl_8061CBE8 * lbl_8061CBF4) {
+        fn_801D6538(s);
+        return;
+    }
+    if (!(a >= lbl_8061CBEC * lbl_8061CBF4)) {
+        fn_801D64A0(s, 0);
+        return;
+    }
+    if (!(a >= lbl_8061CBF0 * lbl_8061CBF4)) {
+        float r = RandG(s->m30, 1.0f, lbl_805D25E0, 0xAD6);
+        if (!(r >= 0.1f)) {
+            fn_801D66C8(s);
+            return;
+        }
+        if (!(r >= 0.2f)) {
+            fn_801D6538(s);
+            return;
+        }
+        fn_801D6404(s, 0);
+        return;
+    }
+    float t = b + 0.3f;
+    t = !(t > 0.9f) ? (t >? 0.0f) : 0.9f;
+    if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0xAEA) >= t))
+        fn_801D67CC(s);
+    else
+        fn_801D66C8(s);
+}
+
 extern "C" void fn_801D6F6C(B* s)
 {
     float a = lbl_805D2D78;
