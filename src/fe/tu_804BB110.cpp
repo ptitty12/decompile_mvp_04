@@ -4,6 +4,46 @@
  */
 
 #include "game/fe_804ABCBC.h"
+extern char lbl_805F7E0C[];
+extern char lbl_805F7E10[];
+extern char lbl_805F7E04[];
+class FeObjB : public UiBase {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual void v24();
+    virtual void v25();
+    virtual void v26();
+    virtual void v27();
+    virtual void v28();
+    virtual void v29();
+    virtual int v30(const char* a, int b);
+    virtual void v31();
+    virtual FeObj* v32(const char* a, int b);
+};
+extern char lbl_805F7E54[];
+extern char lbl_805F7E60[];
 extern float lbl_805F7DF0;
 extern float lbl_805F7E18;
 extern char lbl_80670C10[];
@@ -30,29 +70,6 @@ extern "C" FE_OVERLAY FeCam* fn_804BB110(FeCam* c)
     return c;
 }
 
-extern "C" FE_OVERLAY void fn_804BB334(FeCam* c)
-{
-    c->mCBC = 0;
-    c->mCB4 = 0;
-    c->mCB8 = 15;
-    c->m20 = 1;
-    c->m0 = lbl_805F7DF0;
-    c->m4 = lbl_805F7DF0;
-    c->m8 = lbl_805F7DF0;
-    c->mC = lbl_805F7DF0;
-    c->m10 = lbl_805F7DF0;
-    c->m1C = lbl_805F7DF0;
-    c->m14 = lbl_805F7DF0;
-    c->m18 = lbl_805F7DF0;
-    for (int i = 0; i < 4; i++) {
-        c->rec[i].cnt = 0;
-        for (int j = 0; j < 100; j++) {
-            c->rec[i].p[j].a = lbl_805F7DF0;
-            c->rec[i].p[j].b = lbl_805F7DF0;
-        }
-    }
-}
-
 extern "C" FE_OVERLAY void fn_804BB3D0(FeCam* c, float a, float b, float d, float e)
 {
     c->m0 = a;
@@ -77,6 +94,32 @@ extern "C" FE_OVERLAY void fn_804BB58C(FeScr* x, int a, int b)
 {
     ((FeObj1*)fn_800C8040(((FeObj*)FeP(x, 0xCBC))->v32("XAXIS", 1)))->v28(a);
     ((FeObj1*)fn_800C8040(((FeObj*)FeP(x, 0xCBC))->v32("YAXIS", 1)))->v28(b);
+}
+
+extern "C" FE_OVERLAY void fn_804BB64C(FeCam* c, int a, int b)
+{
+    char buf[7];
+    if (((FeObjB*)c->mCBC)->v30(lbl_805F7E04, 1) != 0) {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E04, 1));
+        fn_804089B4(buf, lbl_805F7E0C, b);
+        if (w->v30(buf, 1) != 0) {
+            FeObjB* w2 = (FeObjB*)fn_800C8044(w->v32(buf, 1));
+            ((FeObj1*)fn_800C8040(w2->v32(lbl_805F7E10, 1)))->v29(a);
+        }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804BB780(FeCam* c, int a, int b)
+{
+    char buf[7];
+    if (((FeObjB*)c->mCBC)->v30(lbl_805F7E04, 1) != 0) {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E04, 1));
+        fn_804089B4(buf, lbl_805F7E0C, b);
+        if (w->v30(buf, 1) != 0) {
+            FeObjB* w2 = (FeObjB*)fn_800C8044(w->v32(buf, 1));
+            ((FeObj1*)fn_800C8040(w2->v32(lbl_805F7E10, 1)))->v30(a);
+        }
+    }
 }
 
 /* near-miss: retail forms the three base addresses with addi and reloads the count each time; 11 slots differ */
@@ -109,6 +152,15 @@ extern "C" FE_OVERLAY int fn_804BB9C0(FeCam* c)
     return m;
 }
 
+extern "C" FE_OVERLAY void fn_804BC124(FeCam* c)
+{
+    if (c->mCB8 & 2) {
+        ((FeObj1*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E04, 1)))->v8(1);
+    } else if (((FeObjB*)c->mCBC)->v30(lbl_805F7E04, 1) != 0) {
+        ((FeObj1*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E04, 1)))->v8(0);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_804BC218(FeCam* c)
 {
     if (c->m4 >= 0.0f)
@@ -131,6 +183,56 @@ extern "C" FE_OVERLAY void fn_804BC2B0(FeCam* c, float a, float b)
 extern "C" FE_OVERLAY void fn_804BC414(FeCam* c, float a)
 {
     c->mCC4 = a;
+}
+
+extern "C" FE_OVERLAY void fn_804BC42C(FeCam* c, int a, int b)
+{
+    char buf[7];
+    if (((FeObjB*)c->mCBC)->v30(lbl_805F7E54, 1) != 0) {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E54, 1));
+        fn_804089B4(buf, lbl_805F7E60, b);
+        if (w->v30(buf, 1) != 0) {
+            ((FeObj1*)fn_800C8040(w->v32(buf, 1)))->v29(a);
+        }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804BC538(FeCam* c, int a, int b)
+{
+    char buf[7];
+    if (((FeObjB*)c->mCBC)->v30(lbl_805F7E54, 1) != 0) {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E54, 1));
+        fn_804089B4(buf, lbl_805F7E60, b);
+        if (w->v30(buf, 1) != 0) {
+            ((FeObj1*)fn_800C8040(w->v32(buf, 1)))->v30(a);
+        }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804BC644(FeCam* c, int a, int b)
+{
+    char buf[7];
+    if (((FeObjB*)c->mCBC)->v30(lbl_805F7E54, 1) != 0) {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E54, 1));
+        fn_804089B4(buf, lbl_805F7E60, b);
+        if (w->v30(buf, 1) != 0) {
+            ((FeObj1*)fn_800C8040(w->v32(buf, 1)))->v28(a);
+        }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804BC750(FeCam* c)
+{
+    char buf[7];
+    int i = 0;
+    int f = ((unsigned)c->mCB8 >> 6) & 1;
+    do {
+        FeObjB* w = (FeObjB*)fn_800C8044(((FeObjB*)c->mCBC)->v32(lbl_805F7E54, 1));
+        fn_804089B4(buf, lbl_805F7E60, i++);
+        if (w->v30(buf, 1) != 0 && f == 0) {
+            ((FeObj1*)fn_800C8040(w->v32(buf, 1)))->v8(0);
+        }
+    } while (i <= 99);
 }
 
 extern "C" FE_OVERLAY FeRaw* fn_804BD37C(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
