@@ -79,6 +79,8 @@ struct Unk8037BB0C_View {
     virtual int v10();
 };
 
+extern "C" Unk8037B3E8* fn_8037D680(int c, int hash, int a);
+
 extern "C" void fn_8037B458(Unk8037B3E8* self, int p1, int p2, int p3, int p4)
 {
     fn_8037B76C(self, 4, 0, p1, p2, p3, p4, 0);
@@ -276,6 +278,39 @@ extern "C" void fn_8037BD34(const char* name, const char* group)
     ((Unk8037BCC0_Entry*)lbl_80624254)[lbl_806EFC10].m3C = 0;
     ((Unk8037BCC0_Entry*)lbl_80624254)[lbl_806EFC10].m40 = 0;
     lbl_806EFC10++;
+}
+
+extern "C" Unk8037B3E8* fn_8037BDA8(int hash, int a, int c)
+{
+    Unk8037B3E8* result = 0;
+    if (fn_8037BA74(hash) != 0) {
+        int i = 0;
+        int found = 0;
+        int idx = fn_8037C5D8(hash);
+        if (idx != -1) {
+            Unk8037B3E8* o = lbl_806E9684[idx];
+            if (o != 0)
+                o->fn_vslot6();
+            Unk8037B3E8* r = fn_8037D680(c, hash, a);
+            if (r != 0) {
+                result = r;
+                found = 1;
+            }
+        }
+        if (found == 0 && i != lbl_80624250) {
+            do {
+                Unk8037B3E8* o = lbl_806E9684[i];
+                if (o != 0 && hash == o->fn_vslot4()) {
+                    found = 1;
+                    result = lbl_806E9684[i]->fn_vslot5();
+                }
+                i++;
+                if (found != 0)
+                    break;
+            } while (i != lbl_80624250);
+        }
+    }
+    return result;
 }
 
 extern "C" int fn_8037BEE4(int hash, const char* name)
