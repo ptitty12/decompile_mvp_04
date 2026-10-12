@@ -393,7 +393,7 @@ cflags_snd = [
 
 # SN ProDG runtime libraries (flags from mitsevox/mvp2005 via port/mvp2005, re-measured).
 cflags_libsn = ["-O2", "-G0", "-fno-common"]
-cflags_libc = ["-O2", "-fno-common"]
+cflags_libc = ["-O2", "-fno-common", "-isystem include/prodg"]
 cflags_libm = ["-O2", "-mfast-cast", "-msafe-sda", "-G 1024", "-fno-builtin", "-mstrict-align"]
 
 # Dolphin SDK libraries other than the existing OS/AI units: dolsdk2004 release flags (as used by
@@ -1132,16 +1132,16 @@ config.libs = [
         "cflags": cflags_libc,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "libc/fclose.c"),
-            Object(NonMatching, "libc/fflush.c"),
+            Object(Matching, "libc/fclose.c"),
+            Object(Matching, "libc/fflush.c"),
             Object(NonMatching, "libc/fopen.c"),
-            Object(NonMatching, "libc/fprintf.c"),
-            Object(NonMatching, "libc/fseek.c"),
-            Object(NonMatching, "libc/fwalk.c"),
-            Object(NonMatching, "libc/makebuf.c"),
+            Object(Matching, "libc/fprintf.c"),
+            Object(Matching, "libc/fseek.c"),
+            Object(Matching, "libc/fwalk.c"),
+            Object(Matching, "libc/makebuf.c"),
             Object(NonMatching, "libc/printf.c"),
-            Object(NonMatching, "libc/refill.c"),
-            Object(NonMatching, "libc/sprintf.c"),
+            Object(Matching, "libc/refill.c"),
+            Object(Matching, "libc/sprintf.c"),
             Object(NonMatching, "libc/sscanf.c"),
             Object(NonMatching, "libc/stdio.c"),
             Object(NonMatching, "libc/vfscanf.c"),

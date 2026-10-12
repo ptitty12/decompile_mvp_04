@@ -1,6 +1,15 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x804081A4-0x80408238 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/fprintf.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib 1.8.2 libc/stdio/fprintf.c */
+#include "newlib_stdio.h"
+
+/* printf to a stream (vfprintf); used by the debug log through stdout. */
+int fprintf(FILE *fp, const char *fmt, ...)
+{
+    int ret;
+    va_list ap;
+
+    va_start(ap, fmt);
+    ret = vfprintf(fp, fmt, ap);
+    va_end(ap);
+    return ret;
+}
