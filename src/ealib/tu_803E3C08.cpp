@@ -265,6 +265,63 @@ extern "C" void fn_803E4B40(Unk803E4B40* o, int chrg)
         lbl_8062C66C(o, 0xC8);
 }
 
+inline int BuildInl(Unk803E6660* o, int total)
+{
+    int ok = 0;
+    if (o->m18 == 0) {
+        o->m1C = total;
+        int* hdr = o->m38;
+        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
+        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
+            lbl_8062C660 = hdr;
+            lbl_8062C664 = 0x104;
+        }
+        for (int i = 0; i < o->m14; i++) {
+            fn_803E4964(o, i);
+            fn_803D71F0(o->m4);
+        }
+        lbl_8062C660 = 0;
+        lbl_8062C664 = 0;
+        ok = 1;
+    }
+    return ok;
+}
+
+inline int FlushInl(Unk803E6660* o)
+{
+    if (o->m18) {
+        for (int i = 0; i < o->m10; i++) {
+            int off = i * 12;
+            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
+            if (r->m4 && r->m8 > 0)
+                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
+        }
+        GXInvalidateVtxCache();
+        fn_8041A5DC();
+    }
+    o->m18 = 0;
+    return 1;
+}
+
+extern "C" void fn_803E5270(char* o)
+{
+    Unk803E6660* s = (Unk803E6660*)(o + 0xc);
+    FlushInl(s);
+    int st = *(int*)(o + 8);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0xc), st);
+        *(int*)(o + 8) = 0;
+    }
+    int k = *(int*)(o + 0x48);
+    if (k == 0x98 || k == 0xb0) {
+        int st2 = *(int*)(o + 8);
+        if (st2 != 0) {
+            BuildInl((Unk803E6660*)(o + 0xc), st2);
+            *(int*)(o + 8) = 0;
+        }
+    }
+}
+
 struct Unk803E56F8 {
     int* m0;
     int* m4;
@@ -346,44 +403,6 @@ inline int FindSet(Unk803E6950* o, const char* name, int a, int b, int c)
         }
     }
     return fn_803E6A70(o, found, a, b, c);
-}
-
-inline int BuildInl(Unk803E6660* o, int total)
-{
-    int ok = 0;
-    if (o->m18 == 0) {
-        o->m1C = total;
-        int* hdr = o->m38;
-        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
-        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
-            lbl_8062C660 = hdr;
-            lbl_8062C664 = 0x104;
-        }
-        for (int i = 0; i < o->m14; i++) {
-            fn_803E4964(o, i);
-            fn_803D71F0(o->m4);
-        }
-        lbl_8062C660 = 0;
-        lbl_8062C664 = 0;
-        ok = 1;
-    }
-    return ok;
-}
-
-inline int FlushInl(Unk803E6660* o)
-{
-    if (o->m18) {
-        for (int i = 0; i < o->m10; i++) {
-            int off = i * 12;
-            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
-            if (r->m4 && r->m8 > 0)
-                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
-        }
-        GXInvalidateVtxCache();
-        fn_8041A5DC();
-    }
-    o->m18 = 0;
-    return 1;
 }
 
 extern "C" void fn_803E6044(char* o)
