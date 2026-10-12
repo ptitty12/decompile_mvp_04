@@ -27,6 +27,7 @@ extern "C" DB_OVERLAY int fn_80586420(int a, int b, void* rec)
     return fn_80582DF4(a, b, t);
 }
 
+/* near-miss (2 slots): retail sets r6, r4 and then r3 (mr) for the fn_800DE538 call; here r3 comes before r4. */
 extern "C" DB_OVERLAY void fn_80586560(void* self, void* rec, unsigned short* dst)
 {
     fn_8058233C(self);
