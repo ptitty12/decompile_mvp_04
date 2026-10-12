@@ -332,6 +332,47 @@ extern "C" void fn_801E1274(I* i, Tbl* t, int k)
     r->m24 = 0;
 }
 
+struct Unk801E13E4_T2 {
+    char pad0[0x1CCA];
+    unsigned char m1CCA;
+};
+extern const float lbl_805D3BD4;
+extern const float lbl_805D3BD8;
+extern "C" int fn_8022F168(int x);
+extern "C" int fn_801E1518(I* i, P* p, int flag, float f);
+
+extern "C" int fn_801E13E4(I* i, P* p, int flag, int c, float f)
+{
+    int r;
+    int own = ((Unk801E13E4_T2*)i->m9C->m0->m6F8->m14)->m1CCA == 2;
+    if (flag == 0 && own == 0)
+        c = 0;
+    if (fn_8022F168(i->m9C->m0->m700->m3B0) == 1)
+        return 0x11;
+    if (!(f >= lbl_805D3BD4) && c == 0)
+        return 0xB;
+    if (!(f >= lbl_805D3BD8)) {
+        if (fn_801E1518(i, p, c, f) == 0) {
+            if (flag == 0 && own == 0)
+                goto D;
+            r = 0xC;
+            if (c == 1)
+                r = 0xF;
+        } else {
+            r = 0xB;
+            if (c == 1)
+                r = 0xE;
+        }
+        return r;
+    }
+    r = 0x10;
+    if (flag == 0 && own == 0) {
+D:
+        r = 0xD;
+    }
+    return r;
+}
+
 extern "C" void fn_801E1638(I* i)
 {
     Unk801DB948_It it;
