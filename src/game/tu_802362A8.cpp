@@ -147,6 +147,66 @@ char* Unk802362A8_Slots::fn_80236BA0(int k)
 
 /* near-miss: retail presets li r3,0 and ends in a shared 'li r3,0; blr'; case 6 then returns through beqlr.
    Tried return-chain, int r preset (39 vs 41 insns) and empty-case-6 forms */
+struct Unk80236C9C_P {
+    int a;
+    int b;
+};
+extern Unk80236C9C_P lbl_8060558C;
+void fn_802366E8(char* slot, Unk8014D8AC_Ctx* c, Unk80236C9C_P* r, int flag);
+char* fn_80236DB0(Unk802362A8_Slots* s, int k);
+Unk80236C9C_P fn_80236C9C(Unk802362A8_Slots* s, int k)
+{
+    Unk80236C9C_P r = lbl_8060558C;
+    switch (k) {
+    case 1:
+        fn_802366E8(fn_80236DB0(s, 1), s->m90, &r, 1);
+        break;
+    case 0:
+        fn_802366E8((char*)s + 0x94, s->m90, &r, 0);
+        break;
+    case 2:
+        break;
+    case 3:
+    case 4:
+    case 5:
+        fn_802366E8(fn_80236DB0(s, k), s->m90, &r, 1);
+        break;
+    case 6:
+    case 7:
+    case 8:
+        fn_802366E8(s->fn_80236BA0(k), s->m90, &r, 1);
+        break;
+    case 9:
+        fn_802366E8(s->fn_80236B90(), s->m90, &r, 1);
+        break;
+    case 10:
+        fn_802366E8(s->fn_80236B98(), s->m90, &r, 1);
+        break;
+    }
+    return r;
+}
+
+char* fn_80236DB0(Unk802362A8_Slots* s, int k)
+{
+    int idx = 0;
+    if (k <= 1) {
+        return (char*)s + (s->m90->m554->fn_8014D8AC(8, lbl_805D7978, 0x11C) * 0x34 + 0xC8);
+    }
+    if (k == 5 && s->m8C > 0) {
+        idx = s->m58[s->m90->m554->fn_8014D8AC(s->m8C, lbl_805D7978, 0x123)];
+    } else if ((unsigned)(k - 4) <= 1 && s->m88 > 0) {
+        idx = s->m2C[s->m90->m554->fn_8014D8AC(s->m88, lbl_805D7978, 0x128)];
+    } else if ((unsigned)(k - 3) <= 2 && s->m84 > 0) {
+        idx = s->m0[s->m90->m554->fn_8014D8AC(s->m84, lbl_805D7978, 0x12D)];
+    } else if (k == 3 && s->m84 == 0) {
+        if (s->m88 > 0)
+            idx = s->m2C[s->m90->m554->fn_8014D8AC(s->m88, lbl_805D7978, 0x134)];
+        else
+            idx = s->m58[s->m90->m554->fn_8014D8AC(s->m8C, lbl_805D7978, 0x139)];
+    }
+    return (char*)s + (idx * 0x34 + 0x94);
+}
+
 int fn_80236F34(void* p, int k)
 {
     switch (k) {
@@ -170,6 +230,48 @@ int fn_80236F34(void* p, int k)
         return 8;
     }
     return 0;
+}
+
+int fn_801D7A3C(void* p, int k);
+inline void Unk80236FD8_Put(char* b, int off, int v)
+{
+    *(int*)(b + off) = v;
+}
+void fn_80236FD8(Unk802362A8_Slots* s)
+{
+    for (int i = 0; i < 11; i++) {
+        s->m0[i] = -1;
+        s->m2C[i] = -1;
+        s->m58[i] = -1;
+    }
+    s->m84 = 0;
+    s->m88 = 0;
+    s->m8C = 0;
+    char* base = (char*)s->m90->m700->m3A4 + 8;
+    int k = 2;
+    int off = 0;
+    for (; k <= 10; k++) {
+        int v = fn_801D7A3C(base, k);
+        char* tb = base + 0x24;
+        int e = *(int*)(tb + off);
+        Unk80236FD8_Put((char*)s + 0x9C, fn_80236F34(s, k) * 0x34, v);
+        if (v == -1)
+            v = 1;
+        if (v == 0) {
+            if (e != -1) {
+                s->m58[s->m8C++] = e;
+            }
+        } else if (v == 1) {
+            if (e != -1) {
+                s->m2C[s->m88++] = e;
+            }
+        } else if (v == 2) {
+            if (e != -1) {
+                s->m0[s->m84++] = e;
+            }
+        }
+        off += 4;
+    }
 }
 
 void Unk802362A8_Slots::fn_80237114()
@@ -255,6 +357,36 @@ int Unk802362A8_Cpu::fn_80238088(Unk802362A8_Req* p)
         r = 1;
     }
     return r;
+}
+
+struct Unk8017A930_T;
+int fn_8017C954(Unk8017A930_T* p);
+int Unk802362A8_Cpu::fn_802382F4(Unk802362A8_Req* p)
+{
+    int k = fn_8017C954((Unk8017A930_T*)((Unk8014D8AC_Ctx*)m2E4)->m700);
+    if (fn_80238110() != 0)
+        return 10;
+    if (fn_80238B84() != 0)
+        return 10;
+    switch (k) {
+    case 3:
+    case 7:
+    case 11:
+        return fn_80238088(p);
+    case 2:
+    case 6:
+    case 10:
+        return fn_80237E9C(p);
+    case 0:
+    case 1:
+    case 5:
+        return fn_802378E0(p);
+    case 4:
+    case 8:
+    case 9:
+        return fn_80237C24(p);
+    }
+    return 5;
 }
 
 int Unk802362A8_Cpu::fn_80239448()
