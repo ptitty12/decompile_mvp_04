@@ -170,6 +170,12 @@ struct DbStkList {
     }
     void D() { vp = lbl_8064A550; }
 };
+
+struct DbRecObj {
+    char pad0[0xC];
+    unsigned mC;
+    char pad10[8];
+};
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_80582578(DbSubX* self, int a);
 extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
@@ -187,6 +193,7 @@ extern "C" int fn_80583324(int unused, int b);
 extern "C" int fn_80583354(int unused, int x, int c);
 extern "C" int fn_805833A8(void* unused, int a, int b);
 extern "C" DbSubObj* fn_80583404(DbSubObj* self);
+extern "C" int fn_805837DC(int self, int k, DbRec12* rec);
 extern "C" int fn_805838E8(void* self, void* a);
 extern "C" int fn_8058391C(int unused, void* a);
 extern "C" DbSubObj* fn_80583964(DbSubObj* self);
@@ -431,6 +438,33 @@ extern "C" DB_OVERLAY DbSubObj* fn_80583404(DbSubObj* self)
     fn_805822D0(self);
     *(const void**)((char*)self + 4) = lbl_80683428;
     return self;
+}
+
+/* near-miss: ~25 slots; retail keeps self/k in r29/r28 and addresses the record object straight off sp; arm order of the t == 0 / t == 1 cases also differs */
+extern "C" DB_OVERLAY int fn_805837DC(int self, int k, DbRec12* rec)
+{
+    DbTri a = lbl_806005E8;
+    DbRecObj obj;
+    fn_8052E408(&obj, rec);
+    int t = fn_8058391C(self, rec);
+    if (t != 0) {
+        if (t == 1) {
+            a.w0 = 0x1D5A;
+            a.w1 = 0x1D78;
+            a.w2 = 0x1E33;
+        }
+    } else {
+        a.w0 = 0x1D5A;
+        a.w1 = 0x1D77;
+        if (!(obj.mC & 0xFC0000))
+            a.w2 = 0x1E31;
+        else
+            a.w2 = 0x1E32;
+    }
+    DbTri b = a;
+    int r = fn_80582DF4(self, k, (int*)&b);
+    fn_80360AF0(&obj, 2);
+    return r;
 }
 
 extern "C" DB_OVERLAY int fn_805838E8(void* self, void* a)
