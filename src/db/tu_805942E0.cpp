@@ -460,6 +460,87 @@ extern "C" DB_OVERLAY Db805942E0_P* fn_80595B64(Db805942E0_P* self, Db805937A4_M
     return self;
 }
 
+struct Db80595C84_S30 {
+    char pad0[0x10];
+    DbQuadTab* m10;
+    char pad14[0x2C - 0x14];
+    int* m2C;
+};
+struct Db80595C84_Scr {
+    char pad0[0x30];
+    Db80595C84_S30* m30;
+    char* m34;
+};
+struct Db80595C84_Self {
+    Db805919E8_M* m0;
+};
+extern "C" char* fn_8058F1F0(char* p, int k);
+extern "C" int fn_80590188(char* p, int i);
+extern "C" int fn_80591A50(Db805919E8_M* m);
+extern "C" int fn_80592E04(Db805937A4_Mgr* m, int i);
+extern "C" int fn_80593E68(DbQuadTab* self, int i);
+extern "C" void fn_80591B8C(Db805919E8_M* m, int x, int j, int a3, int a4, int flag);
+extern "C" void* memset(void* p, int c, ...);
+
+extern "C" DB_OVERLAY void fn_80595C84(Db80595C84_Self* self)
+{
+    int i = 0;
+    int total = 0;
+    int off = 0;
+    char* lst = fn_8058F1F0(((Db80595C84_Scr*)lbl_8061930C)->m34, 1);
+    Db805919E8_M* mgr = self->m0;
+    int* tbl = ((Db80595C84_Scr*)lbl_8061930C)->m30->m2C;
+    int idx = fn_80592E04((Db805937A4_Mgr*)mgr, fn_80591A50(mgr));
+    int a1[5];
+    int a2[5];
+    float fr[5];
+    memset(a2, 0, 0x14);
+    do {
+        int v = fn_80590188(lst, i);
+        i++;
+        total += v;
+        *(int*)((char*)a1 + off) = v;
+        off += 4;
+    } while (i <= 4);
+    for (int k = 0; k < 4; k++)
+        fr[k] = (float)a1[k] / (float)total;
+    DbQuadTab* t = ((Db80595C84_Scr*)lbl_8061930C)->m30->m10;
+    if (fn_80596538(t, idx)) {
+        DbQuad* q = fn_805965DC(t, idx);
+        if (q->mC == 0xD) {
+            int tot = q->m8 * fn_80593E68(t, 0xD);
+            int rem = tot;
+            for (int k = 0; k < 4; k++) {
+                int v = (int)(fr[k] * (float)tot + 0.5f);
+                a2[k] = v;
+                rem -= v;
+            }
+            if (rem > 0)
+                a2[1] -= rem;
+            else if (rem < 0)
+                a2[0] -= rem;
+            a2[4] = 0;
+        }
+    }
+    if (total > 0) {
+        i = 0;
+        off = 0;
+        do {
+            char* b1 = (char*)tbl + 4;
+            char* b2 = (char*)a2;
+            int v = *(int*)(b1 + off) - *(int*)(b2 + off);
+            if (v < 0)
+                v = 0;
+            Db805919E8_M* m = self->m0;
+            fn_80594418((Db805942E0_Data*)self, i);
+            int c = *(int*)(off + (int)a1);
+            off += 4;
+            fn_80591B8C(m, 0, i, c, v, 0);
+            i++;
+        } while (i <= 4);
+    }
+}
+
 extern "C" DB_OVERLAY int fn_80595EEC(Db805942E0_V* self, int i)
 {
     float lo = self->v30(i)->mC;
