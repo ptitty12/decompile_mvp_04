@@ -226,7 +226,7 @@ inline void FESub10Init(FESub10* s)
 }
 
 extern "C" {
-void fn_800ACFEC(void* p, int a);
+void* fn_800ACFEC(void* p, int a);
 void fn_800B1C7C(void* p);
 void fn_800B2C6C(void* p);
 }
@@ -347,6 +347,38 @@ extern "C" void fn_800ACFE8()
 {
 }
 
+extern "C" void* fn_800AC6D8(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC744(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC7B0(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC81C(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC888(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC8F4(void* mem, int owner, void* parent, int k, float f);
+extern "C" void fn_8014D9C4(void* p);
+extern "C" void fn_8033E464(void* parent, void* child);
+
+extern "C" void* fn_800ACFEC(void* p, int owner)
+{
+    char* self = (char*)p;
+    *(int*)(self + 0) = 0;
+    *(int*)(self + 4) = 0;
+    *(const void**)(self + 0xC) = lbl_8065B268;
+    char* q = self + 0xA14;
+    int n = 4;
+    do {
+        fn_8014D9C4(q);
+        q += 0x10;
+    } while (n-- != 0);
+    *(int*)(self + 0xA84) = owner;
+    fn_8033E464(self, fn_800AC6D8(operator new(0x28, 0), owner, self, 0, -1.0f));
+    fn_8033E464(self, fn_800AC744(operator new(0x28, 0), owner, self, 1, 0.15f));
+    fn_8033E464(self, fn_800AC7B0(operator new(0x28, 0), owner, self, 2, 0.15f));
+    fn_8033E464(self, fn_800AC81C(operator new(0x28, 0), owner, self, 3, 0.1f));
+    fn_8033E464(self, fn_800AC888(operator new(0x28, 0), owner, self, 4, 0.2f));
+    fn_8033E464(self, fn_800AC8F4(operator new(0x28, 0), owner, self, 5, 0.5f));
+    fn_800AD1D4(self);
+    return self;
+}
+
 extern "C" void fn_800AD17C(char* self, int c)
 {
     *(const void**)(self + 0xC) = lbl_8065B268;
@@ -400,6 +432,7 @@ inline FEVec2 operator+(const FEVec2& a, const FEVec2& b)
     r.y = a.y + b.y;
     return r;
 }
+
 #define FECELL(s, i, j) (((FERowsObj*)(s))->rows[i].c[j])
 extern "C" void fn_800AD58C(char* self, int i, int j)
 {
