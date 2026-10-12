@@ -6,6 +6,24 @@
 
 #include "game/tu_8001FDA8.h"
 #include "game/tu_802ACD88.h"
+struct Unk8014A468_Obj {
+    int m0;
+    char pad4[4];
+    int m8;
+    int mC;
+    char pad10[0xC];
+    int m1C;
+    int m20;
+    int m24;
+};
+extern const char lbl_805C4DD4[];
+extern const char lbl_805C5030[];
+extern const char lbl_805C5044[];
+extern const char lbl_805C5054[];
+extern const char lbl_805C506C[];
+int fn_803FEE14(char*, int);
+int fn_803FECF8(int, int);
+char* fn_8040B448(char*, const char*);
 struct Unk8014AD2C_V2 {
     float x;
     float y;
@@ -485,6 +503,59 @@ int fn_8014A3E8(Unk8014A3E8_Obj* p, int a, int b, int c)
         }
     }
     return 0;
+}
+
+void fn_8014A468(Unk8014A468_Obj* self, int a, int b, int c, int d, int e)
+{
+    if (fn_8014A3E8((Unk8014A3E8_Obj*)self, c, d, e) != 0) {
+        if (b != self->m0) {
+            self->m8 = 1;
+            self->m1C = a;
+            self->m24 = a;
+            self->m20 = a;
+            self->m0 = b;
+        } else {
+            self->m1C += a;
+            self->m8 += 1;
+            if (a < self->m24)
+                self->m24 = a;
+            else if (a > self->m20)
+                self->m20 = a;
+        }
+        if (self->m8 == self->mC) {
+            char s1[0x40];
+            char s2[0x100];
+            char s3[0x40];
+            char s4[0x80];
+            int h;
+            s1[0] = lbl_805C5020;
+            fn_8040B320(s1 + 1, 0, 0x3F);
+            s2[0] = lbl_805C5020;
+            fn_8040B320(s2 + 1, 0, 0xFF);
+            s3[0] = lbl_805C5020;
+            fn_8040B320(s3 + 1, 0, 0x3F);
+            h = 0;
+            fn_804089B4(s1, lbl_805C5030, lbl_805C4DD4);
+            fn_8014A290(self, (int)s2, self->m0);
+            fn_804089B4(s3, lbl_805C5044, fn_8014A390((Unk8014A390_Obj*)self), self->m24, self->m20);
+            fn_8040B448(s2, s3);
+            if (fn_803FEE14(s1, 0x64) != 0) {
+                if (fn_803FEBDC(s1, 0, 0x64, &h) == 0)
+                    return;
+            } else {
+                if (fn_803FEBDC(s1, 2, 0x64, &h) == 0)
+                    return;
+                fn_804089B4(s4, lbl_805C5054);
+                fn_803FEC74(h, 0, s4, fn_8040B6A0(s4), 0x64);
+            }
+            int pos = fn_803FECF8(h, 0x64);
+            fn_803FEC74(h, pos, s2, fn_8040B6A0(s2), 0x64);
+            fn_803FEC9C(h, 0x64);
+            s2[0] = 0;
+            fn_8014A290(self, (int)s2, self->m0);
+            fn_8014A1BC(self, (int)lbl_805C506C, s2);
+        }
+    }
 }
 
 void* fn_8014A6D8(void* self)
