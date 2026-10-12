@@ -81,6 +81,20 @@ extern "C" int fn_80098C68(char* o, int a, int b, int c) { return fn_80097EA4(o,
 /* near-miss: case order / jump layout of the switch differs */
 extern "C" int fn_8008AC94(void* p);
 
+extern "C" int fn_8009908C(Obj3* o, int kind, int p);
+
+extern "C" float fn_800991AC(Obj3* o, int mode, int p)
+{
+    float r = 0.0f;
+    if (mode == 0) {
+        float x = (float)fn_8009908C(o, 2, p);
+        float y = (float)fn_8009908C(o, 1, p);
+        if (!(y <= 0.0f))
+            r = x / y;
+    }
+    return r;
+}
+
 extern "C" int fn_80099278(Obj3* o, int k, int p)
 {
     int base = fn_8008AC94((char*)o + 0xD44);
@@ -130,7 +144,6 @@ extern "C" void fn_800994D4(char* o, int x)
     fn_800975A8(o, 1, x, b, 0);
 }
 
-/* near-miss: retail lays out the c <= 1 branch first */
 struct Unk80099570 {
     char pad0[0xCC4];
     Rec* mCC4;
@@ -139,11 +152,16 @@ struct Unk80099570 {
 
 extern "C" int fn_80099570(Unk80099570* o, int a, int b, int c)
 {
-    if (c <= 1)
-        return (&o->mCC4)[c]->v5(a, b);
-    Rec* x = o->mCC8;
-    int r = x->v5(a, b);
-    return r + o->mCC4->v5(a, b);
+    int r;
+    if (c <= 1) {
+        char* base = (char*)&o->mCC4;
+        r = (*(Rec**)(base + c * 4))->v5(a, b);
+    } else {
+        Rec* x = o->mCC8;
+        int y = x->v5(a, b);
+        r = y + o->mCC4->v5(a, b);
+    }
+    return r;
 }
 
 extern "C" int fn_800997DC(Obj3* o, ByteVec* v);
@@ -280,4 +298,114 @@ extern "C" int fn_80099B50(Obj3* o, int i)
     if (s <= 0x18)
         r = o->m3E8[s].m0;
     return r;
+}
+
+struct Unk80089894_PackTabD;
+int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
+
+extern "C" float fn_80099B7C(Obj3* o)
+{
+    unsigned char k = o->m17C[0];
+    Unk80089894_PackTabD* t = (Unk80089894_PackTabD*)((char*)o + 0xC74);
+    float a = (float)fn_80089AA0(t, 0, k);
+    float b = (float)fn_80089AA0(t, 0x1B, k);
+    float r = !(a <= 0.0f) ? b / a : 0.0f;
+    return r;
+}
+
+/* Container with its vptr at +0x10: count at +4, cursor at +0xC (the ByteVec of Obj3). */
+struct VecObj8009A4A4 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    virtual void v1();
+    virtual void v2();
+    virtual int v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+};
+
+extern "C" void fn_8009A4A4(Obj3* o, VecObj8009A4A4* v, int* out, int n)
+{
+    int cnt = v->m4;
+    if (cnt > n)
+        cnt = n;
+    v->v1();
+    if (cnt > 0) {
+        do {
+            *out = v->v3();
+            out++;
+            v->v10();
+        } while (--cnt != 0);
+    }
+    v->mC = 0;
+}
+
+extern "C" void* fn_800B555C();
+extern "C" int fn_800B57EC(void* p);
+
+extern "C" void fn_8009A548(Obj3* o, int n, int* arr, int slot, int off, int mode)
+{
+    signed char i = 0;
+    signed char r = -1;
+    if (i < n) {
+        char* b = (char*)o + 0x3E8;
+        int so = slot * 0x34;
+        if (*(volatile int*)(b + so) == arr[0]) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < n))
+                    break;
+            } while (*(volatile int*)(b + so) != arr[i]);
+            if (i < n)
+                r = i;
+        }
+    }
+    if (fn_800B57EC(fn_800B555C()) != 0 && mode == 1) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x40A;
+        p[off + so2] = r;
+    } else if (fn_800B57EC(fn_800B555C()) == 0 || mode == 0) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x412;
+        p[off + so2] = r;
+    }
+}
+
+extern "C" void fn_8009A620(Obj3* o, int n, int* arr, int slot, int off, int mode)
+{
+    unsigned char i = 0;
+    signed char r = -1;
+    if (i < n) {
+        char* b = (char*)o + 0x3E8;
+        int so = slot * 0x34;
+        if (*(volatile int*)(b + so) == arr[0]) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < n))
+                    break;
+            } while (*(volatile int*)(b + so) != arr[i]);
+            if (i < n)
+                r = i;
+        }
+    }
+    if (fn_800B57EC(fn_800B555C()) != 0 && mode == 1) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x3FE;
+        p[off + so2] = r;
+    } else if (fn_800B57EC(fn_800B555C()) == 0 || mode == 0) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x404;
+        p[off + so2] = r;
+    }
 }
