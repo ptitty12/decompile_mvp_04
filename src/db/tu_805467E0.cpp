@@ -33,6 +33,12 @@ int fn_8008FBE8(int a);
 int fn_8008FE14(int a);
 
 unsigned fn_8007F84C(Unk8007F198_B* g);
+
+struct Db805467E0_T3 {
+    float f;
+    int a;
+    int b;
+};
 /* end Q18 types */
 
 extern "C" {
@@ -47,6 +53,8 @@ void fn_80546D4C(char* o);
 void fn_80546D5C(char* o, int a);
 int fn_805474B8(char* o, int a);
 void fn_80547594(char* o, int a);
+void fn_805479F0(char* o, int kind, int x);
+void fn_80547B38(char* o, int kind, int x);
 void fn_80547C5C(char* o);
 int fn_80547E10(char* o, int a);
 int fn_80547FFC(char* o, int a, int id);
@@ -78,6 +86,7 @@ Ev* fn_80548E3C(Q* q, int i);
 Db805467E0_W3* fn_80548E48(Q* q, int i);
 int* fn_80548E58(Q* q, int i);
 void fn_80548E68(Q* q, int n);
+void fn_805494DC(char* o, int id, int a, int b, int c, int flag, int d, float f);
 /* end Q18 protos */
 
 /* protos */
@@ -115,10 +124,18 @@ int* fn_80548E58(Q* q, int i);
 void fn_80548E68(Q* q, int n);
 /* end protos */
 /* Q18 decls */
+extern "C" void fn_8053967C(void* l);
+extern "C" void fn_8053971C(void* l);
+extern "C" void fn_805362AC(char* o, int a);
+extern "C" int rand();
+extern "C" void fn_80535EAC(void* l);
+extern "C" void fn_80400CE4(int a);
+extern "C" void fn_800A1930(void* g, int id, int b, int d, float f);
+extern "C" int fn_80077BC4(void* s, int id);
+extern "C" void fn_800793E8(void* s, int id, void* p1, void* p2, void* p3);
 extern "C" int fn_80564ABC(int a, int b, int c, int d, float* e, int* f, int g);
 extern "C" void fn_80539DB4(void* l, int e);
 extern "C" void fn_8053A044(void* l, int a, int b);
-extern "C" void fn_80547EC0(char* o, int id);
 extern "C" void fn_80539EDC(void* l, int e);
 extern "C" void fn_80542580(void* o);
 /* end Q18 decls */
@@ -306,6 +323,96 @@ DB_OVERLAY void fn_80547594(char* o, int a)
     *(int*)(p + 0xC) = z;
     fn_805381F0(o);
     fn_805362AC(o, 1);
+}
+
+/* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */
+DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
+{
+    IntSet(o + 0x10000, 0x7F8, x);
+    IntSet(o + 0x10000, 0x7F0, 1);
+    char* l = o + 0x32E0;
+    fn_80546D0C(o);
+    unsigned i = 0;
+    fn_8053967C(l);
+    if (kind == 0) {
+    } else if (kind == 1) {
+        Db8053967C_List* ll = (Db8053967C_List*)l;
+        if (i < ll->m4) {
+            int off = 0;
+            do {
+                ll = (Db8053967C_List*)(o + 0x32E0);
+                unsigned r;
+                if (ll->m4 != i)
+                    r = rand() % (ll->m4 - i);
+                else
+                    r = 0;
+                unsigned j = r + i;
+                int jo = j * 4;
+                int* d = (int*)IntAt(o, 0x32E0);
+                int xv = *(int*)((char*)d + jo);
+                int yv = *(int*)((char*)d + off);
+                if (i >= ll->m4)
+                    ll->m4 = i + 1;
+                *(int*)(off + IntAt(o, 0x32E0)) = xv;
+                if (j >= ll->m4)
+                    ll->m4 = j + 1;
+                *(int*)(jo + IntAt(o, 0x32E0)) = yv;
+                i++;
+                off += 4;
+            } while (i < ll->m4);
+        }
+    } else if (kind == 2) {
+        fn_805482D4(o);
+    }
+    IntSet(o, 0x32EC, 0);
+    fn_8053971C(o);
+    IntSet(o + 0x10000, 0x7EC, *(int*)(o + 4));
+    fn_805362AC(o, 1);
+    fn_80542580(o + 0x10800);
+    fn_80400CE4(0);
+}
+
+/* near-miss: 95.9%; callee-saved registers permuted (retail reuses the list/kind registers inside the loop); instruction stream identical */
+DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
+{
+    IntSet(o + 0x10000, 0x7FC, x);
+    IntSet(o + 0x10000, 0x7F4, 1);
+    char* l = o + 0x3500;
+    fn_80546D4C(o);
+    unsigned i = 0;
+    fn_80535EAC(l);
+    if (kind == 0) {
+    } else if (kind == 1) {
+        Db8053967C_List* ll = (Db8053967C_List*)l;
+        if (i < ll->m4) {
+            int off = 0;
+            do {
+                ll = (Db8053967C_List*)(o + 0x3500);
+                unsigned r;
+                if (ll->m4 != i)
+                    r = rand() % (ll->m4 - i);
+                else
+                    r = 0;
+                unsigned j = r + i;
+                int jo = j * 4;
+                int* d = (int*)IntAt(o, 0x3500);
+                int xv = *(int*)((char*)d + jo);
+                int yv = *(int*)((char*)d + off);
+                if (i >= ll->m4)
+                    ll->m4 = i + 1;
+                *(int*)(off + IntAt(o, 0x3500)) = xv;
+                if (j >= ll->m4)
+                    ll->m4 = j + 1;
+                *(int*)(jo + IntAt(o, 0x3500)) = yv;
+                i++;
+                off += 4;
+            } while (i < ll->m4);
+        }
+    } else if (kind == 2) {
+        fn_805483C4(o);
+    }
+    IntSet(o, 0x350C, 0);
+    fn_80400CE4(0);
 }
 
 DB_OVERLAY void fn_80547C5C(char* o)
@@ -719,6 +826,32 @@ DB_OVERLAY void fn_80548E68(Q* q, int n)
     l->m4 = 0;
     l->mC = 0;
     l->m14 = 0;
+}
+
+DB_OVERLAY void fn_805494DC(char* o, int id, int a, int b, int c, int flag, int d, float f)
+{
+    Db805467E0_T3 v1;
+    Db805467E0_T3 v2;
+    Db805467E0_T3 v3;
+    v1.f = f;
+    v1.a = b;
+    v1.b = c;
+    v2.f = *(float*)(o + 4);
+    v2.a = *(int*)(o + 0xC);
+    v2.b = *(int*)(o + 0x1C);
+    v3.f = *(float*)(o + 8);
+    v3.a = *(int*)(o + 0x10);
+    v3.b = *(int*)(o + 0x18);
+    if (flag != 0) {
+        fn_800A1930(lbl_80619948, id, b, d, v1.f);
+    } else {
+        Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+        int h = s->fn_80075948(a);
+        if (fn_80077BC4(s, id) != 0)
+            fn_800793E8(s, id, &v1, &v2, &v3);
+        else
+            s->fn_80079094(id, h, (int)&v1, (int)&v2, (int)&v3, d);
+    }
 }
 
 }
