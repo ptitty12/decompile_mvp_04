@@ -99,6 +99,33 @@ extern "C" int fn_803B445C(int shandle, int cutoff)
     return voice;
 }
 
+extern "C" float fn_803B44E4(float x)
+{
+    while (x > 6.2831855f)
+        x -= 6.2831855f;
+    float x2 = x * x;
+    float x4 = x2 * x2;
+    float x6 = x2 * x4;
+    float x8 = x4 * x4;
+    float x10 = x2 * x8;
+    float x12 = x6 * x6;
+    return x12 * 2.0876758e-09f + (x8 * 2.4801588e-05f + ((x4 * 0.041666668f + (1.0f - x2 * 0.5f)) - x6 * 0.0013888889f) - x10 * 2.755732e-07f);
+}
+
+extern "C" float fn_803B457C(float x)
+{
+    while (x > 6.2831855f)
+        x -= 6.2831855f;
+    float x2 = x * x;
+    float x3 = x2 * x;
+    float x5 = x2 * x3;
+    float x7 = x2 * x5;
+    float x9 = x2 * x7;
+    float x11 = x2 * x9;
+    float x13 = x2 * x11;
+    return x13 * 1.6059e-10f + (x9 * 2.7557319e-06f + (x5 * 0.00833333f + (x - x3 * 0.16666667f) - x7 * 0.0001984127f) - x11 * 2.5052108e-08f);
+}
+
 extern "C" unsigned int fn_803B4610(int i)
 {
     return lbl_80626418[i];
