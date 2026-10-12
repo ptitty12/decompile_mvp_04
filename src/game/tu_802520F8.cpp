@@ -16,6 +16,13 @@ extern const float lbl_805D9BD4;
 extern float lbl_805D9BE0[1];
 struct Unk80270BA0_X;
 float fn_8024D050(Unk80270BA0_X* x, int a, int b, float f1, float f2);
+
+extern const float lbl_805D9BF8;
+extern const float lbl_805D9BFC;
+extern const float lbl_805D9C00;
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+float fn_8024D0F8(Unk80270BA0_X* x, int a);
+extern "C" P* fn_801A497C(Q* q, int a, int b);
 inline float Unk80252EB8_Clamp(float x)
 {
     return !(x > lbl_805D9BE0[0]) ? (x >? lbl_805D9BD4) : lbl_805D9BE0[0];
@@ -563,6 +570,55 @@ void fn_80253220(C* self)
     self->m38 = self->m38 + 1;
     if (self->f1)
         self->f1 = 0;
+}
+
+/* near-miss (95.8%): 7 slots: retail emits the f1/f2 loads before "li r4,8" and loads the table entry after the base spill; same instructions */
+void fn_80253244(C* self, int a, int b)
+{
+    const int* tbl = lbl_805D9E94;
+    unsigned k = self->m48 - 0xF;
+    int idx = 0;
+    if (k <= 4)
+        idx = k;
+    float base = lbl_805D9BF8;
+    int st = self->m4->m458;
+    int tv = tbl[idx];
+    float mul = fn_8024D0C4((Unk80270BA0_X*)self->m4, 8, lbl_805D9BFC, lbl_805D9C00);
+    int dd = (int)(base * mul);
+    if (st == 0) {
+        int m = self->m30;
+        if (m < tv) {
+            self->m30 = m + a;
+            int lim = tv + dd;
+            int n = self->m30;
+            if (n > lim)
+                n = lim;
+            self->m30 = n;
+        }
+    } else if (st == 13) {
+        if (fn_801A497C(self->m4->m44C, self->m4->m708, 0) != self->m4)
+            self->m30 = self->m30 - 1;
+        if (self->m30 < 0)
+            self->m30 = 0;
+    } else if (st == 15) {
+        int n = self->m30 + a;
+        self->m30 = n;
+        self->m34 = self->m34 + a;
+        if (b == 0) {
+            int lim = tv + dd;
+            if (n > lim) {
+                if (fn_801A2034(self->m4->m44C, self->m4->m708) != -1) {
+                    float x = fn_8024D0F8((Unk80270BA0_X*)self->m4, 7);
+                    float y = (x * (float)tv) / (float)tbl[0];
+                    fn_80252EB8(self, y);
+                }
+                int m = self->m30;
+                if (m > lim)
+                    m = lim;
+                self->m30 = m;
+            }
+        }
+    }
 }
 
 /* near-miss: same 78 instructions, register choice differs (retail n in r10 with m38/m30 loaded into r9/r10; ours r0/r11). Tried operand order, temps, table pointer */
