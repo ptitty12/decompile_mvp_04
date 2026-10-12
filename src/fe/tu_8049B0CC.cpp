@@ -247,7 +247,6 @@ FE_OVERLAY void fn_8049D454(void* x, FeW* w)
     }
 }
 
-//// a
 FE_OVERLAY void fn_8049DE70(char* x)
 {
     int idx = FeMem(x, 0x138)->fn_vslot60();
