@@ -4,6 +4,27 @@
  */
 
 #include "game/fe_80516990.h"
+struct FeScr2DC : FeScrN {
+    char pad194[0x2DC - 0x194];
+    int m2DC;
+    int m2E0;
+    int m2E4;
+    float m2E8;
+    int m2EC;
+    int m2F0;
+    int m2F4;
+    int m2F8;
+    int m2FC;
+    int m300;
+    int m304;
+    int m308;
+    int m30C;
+    int m310;
+    int m314[3];
+    int m320[3];
+    int m32C;
+    int m330;
+};
 extern "C" int fn_800B5634(void* st);
 extern "C" void fn_800E63A4__FP6Ue63A4(void* p);
 extern "C" void fn_804D3CA8(void* x, int a);
@@ -183,6 +204,33 @@ extern "C" FE_OVERLAY void fn_805228DC(FeSingle* x)
     }
     x->mA8 = 0;
     x->mAC = 0;
+}
+
+extern "C" FE_OVERLAY FeScr2DC* fn_80522904(FeScr2DC* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC150(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_8067EBE8);
+    self->m2DC = 0;
+    self->m2E0 = 0;
+    self->m2E4 = -1;
+    self->m2E8 = lbl_805FC0B4;
+    self->m2EC = 0;
+    self->m2F0 = 0;
+    self->m2F4 = 0;
+    self->m2F8 = 0;
+    self->m2FC = 0;
+    self->m300 = 0;
+    self->m304 = 0;
+    self->m308 = 0;
+    self->m30C = 0;
+    self->m310 = 0;
+    self->m32C = 0;
+    self->m330 = 0;
+    for (int i = 0; i < 3; i++) {
+        self->m314[i] = 0;
+        self->m320[i] = 0;
+    }
+    return self;
 }
 
 extern "C" FE_OVERLAY void fn_805229C0(FeW* x)
