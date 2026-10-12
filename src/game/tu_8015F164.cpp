@@ -53,6 +53,17 @@ extern "C" Unk8015ABB8_Rec fn_8015AE08(Unk80159F28* self, int a);
 extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Rec* rec);
 int fn_80166440(void* self, int v);
 extern "C" void fn_8015F918(Unk80159F28* self, int a);
+struct ElemView8015F164 {
+    char name[0x3C];
+    int m3C, m40, m44, m48, m4C;
+    Unk80326F44_Out m50;
+    Unk80326F44_Out m68;
+    Unk80326F44_Out m80;
+    int m98;
+    int m9C;
+};
+int fn_801A4F40(Unk8019F8C0_Owner* o);
+extern "C" void fn_80169BF8(Unk8016D9A0_Rec* rec, const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -280,6 +291,35 @@ extern "C" int fn_80161FBC(Unk80159F28* self) /* 80161FBC */
     self->fn_80157514(0xF, (int)&rec, 0, tbl[self->m4C], 0, lbl_8068B828);
     fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
     return 1;
+}
+
+extern "C" void fn_80162264(Unk80159F28* self) /* 80162264 */
+{
+    self->m330 = -1.0f;
+    RecObj8015F164 rec;
+    ElemView8015F164* e = (ElemView8015F164*)&rec;
+    for (int j = 0; j < 8; j++, e++) {
+        e->name[0] = 0;
+        e->m3C = 0;
+        e->m40 = 0;
+        e->m44 = 0;
+        e->m48 = 0;
+        e->m4C = 0;
+        e->m50 = lbl_805EBA10;
+        e->m68 = lbl_805EBA10;
+        e->m80 = lbl_805EBA10;
+        e->m98 = 0;
+        e->m9C = 0xAE;
+    }
+    if (self->mC->m700->m3BC->m24 != 0) {
+        fn_801A4F40((Unk8019F8C0_Owner*)self->mC);
+    } else {
+        fn_80169BF8((Unk8016D9A0_Rec*)&rec, "walk_live", 0, 0, 0, 0, lbl_8068B828, 0);
+    }
+    fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    if (fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->m3D40 != 0) {
+        fn_801A4F40((Unk8019F8C0_Owner*)self->mC);
+    }
 }
 
 int Unk80159F28::fn_80162534() /* 80162534 */
