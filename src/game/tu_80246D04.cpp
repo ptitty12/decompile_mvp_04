@@ -5,6 +5,13 @@
 #include "game/tu_8024B99C.h"
 #include "game/chooser.h"
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps them below preceding stores (retail's order). */
+template <class T> inline float Unk80246D04_Secs(T n)
+{
+    return (float)n * 0.016666668f;
+}
+
 extern const float lbl_805D93D0;
 extern const float lbl_805D93D4;
 extern const float lbl_805D93D8;
@@ -206,12 +213,11 @@ void fn_802495CC(Unk802495CC_X* x)
     }
 }
 
-/* near-miss: only the order of 'stw r4,0xae0' vs 'lwz r8,0x44c' differs (3 source orderings tried) */
 void fn_802496BC(Unk80270BA0_X* x, int a)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
     v->mAE0 = a;
-    v->mAE4 = (float)x->m44C->m4C * lbl_805D9440;
+    v->mAE4 = Unk80246D04_Secs(x->m44C->m4C);
     v->mAE8 = 1;
     fn_80249750(x);
 }
