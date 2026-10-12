@@ -162,7 +162,10 @@ public:
     int m3DC;
     char pad3E0[0x8];
     int m3E8;
-    char pad3EC[0x10];
+    char pad3EC[0x4];
+    int m3F0;
+    char pad3F4[0x4];
+    int m3F8;
     int m3FC;
     char pad400[0xC];
     int m40C;
