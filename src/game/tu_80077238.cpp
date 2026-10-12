@@ -551,7 +551,6 @@ int Unk8007A4DC_Screen::fn_8007A270(int a)
     return x;
 }
 
-/* near-miss: 8 slots; the order of the argument moves (mr r3,r30 first) differs. */
 void Unk8007A4DC_Screen::fn_8007A2B4(int flags)
 {
     unsigned i = 0;
