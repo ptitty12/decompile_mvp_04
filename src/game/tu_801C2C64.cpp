@@ -199,6 +199,25 @@ extern "C" int fn_801C38F0(Z* z, float f)
     return 0;
 }
 
+struct Unk801C2C64_V2 {
+    float x;
+    float y;
+};
+
+extern "C" void fn_801C3D44(Z* z, float* a, float* b)
+{
+    Unk801C2C64_V2 p = *(Unk801C2C64_V2*)z->m150;
+    float t = fn_801C34F4(z);
+    P* q = fn_801A4B34(z->m204);
+    if (q && q->v4())
+        t = -t;
+    t = t / z->m204->m6CC->m438;
+    const float k1 = 0.28f;
+    const float k2 = 0.4f;
+    *a = (t + p.x) * 0.3f + 0.5f;
+    *b = p.y * k1 + k2;
+}
+
 extern "C" int fn_801C3E28(Z* z)
 {
     if (z->m144 >= 1.0f)
@@ -357,6 +376,29 @@ extern "C" void fn_801C4D04(void)
 extern "C" void fn_801C53D8(void) {}
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
+
+extern Vec3 lbl_806055AC;
+extern int lbl_806242A0;
+extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
+extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
+
+/* near-miss: one slot differs (retail stores word 0 of the Vec3 copy before loading words 2 and 1). */
+extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t)
+{
+    lbl_806242A0 = 1;
+    if (!(t >= 0.0f))
+        t = 0.0f;
+    char w[0x28];
+    Vec3 v = lbl_806055AC;
+    int ok = fn_80244DC4(b, &v, w, t, z->m14C);
+    if (ok) {
+        fn_801C5740(z, b, &v, w, c, d, e, f, g);
+        lbl_806242A0 = 0;
+        return 1;
+    }
+    lbl_806242A0 = ok;
+    return 0;
+}
 
 extern "C" Vec3 fn_801C5BD4(Z* z)
 {
