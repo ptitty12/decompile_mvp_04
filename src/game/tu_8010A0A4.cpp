@@ -98,10 +98,6 @@ void fn_8010F2CC(void* a);
 int fn_8010D1C8();
 void fn_8010D1D0();
 extern char lbl_805BA6D8[];
-struct Ui2F0Obj : UiObj {
-    char pad40[0x2F0 - 0x40];
-    int m2F0;
-};
 struct Ui10D0C0 : UiObj {
     char pad40[0x134 - 0x40];
     Ui2F0Obj* m134;

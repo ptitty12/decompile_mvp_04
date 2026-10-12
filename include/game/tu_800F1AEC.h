@@ -71,7 +71,7 @@ public:
     virtual void v42();
     virtual void v43(int a, int b, int c, int d);
     virtual void v44(int a, int b, int c, int d);
-    virtual void v45();
+    virtual void v45(int a);
     virtual void v46();
     virtual void v47();
     virtual void v48();
@@ -84,8 +84,8 @@ public:
     virtual void v55();
     virtual void v56();
     virtual void v57();
-    virtual void v58();
-    virtual void v59();
+    virtual float v58();
+    virtual int v59();
     virtual int v60();
     virtual void v61();
     virtual void v62();
@@ -1534,9 +1534,15 @@ public:
 class UiSubAtDC : public UiSubPad24 {
 public:
     virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
-    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v6(int a); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
     virtual int v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
     virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20(int a, int b);
+};
+
+/* A UiObj-derived item with a selection value at +0x2F0 (set to -0x63 after fn_80131F34 set-up). Evidence: fn_8010D0C0, fn_80105AE8. */
+struct Ui2F0Obj : UiObj {
+    char pad40[0x2F0 - 0x40];
+    int m2F0;
 };
 
 #endif
