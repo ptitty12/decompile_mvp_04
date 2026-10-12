@@ -14,6 +14,20 @@
 
 void* operator new(unsigned int size, int heap); /* 0x80377428 */
 
+/* Record returned by fn_8008007C: bit field word at +0xC (see DbRecO), halfword at +0x12. */
+struct DbRec12 {
+    char pad0[0xC];
+    unsigned f0 : 1;
+    unsigned fl : 1;
+    unsigned a : 6;
+    unsigned b : 6;
+    unsigned c : 6;
+    unsigned d : 6;
+    unsigned e : 6;
+    char pad10[2];
+    unsigned short m12;
+};
+
 /* 12-byte record behind fn_80081D08 (Unk8007FF8C_Q): byte at +0, int at +4 and +8. */
 struct DbQ {
     unsigned char m0;
@@ -76,9 +90,9 @@ int fn_8007FDA8__FP13Unk8007F198_Cii(void* a0, int a1, int a2);
 int fn_8007FDF8__FP13Unk8007F198_D(void* a0);
 int fn_8007FE04__FP13Unk8007F198_D(void* a0);
 int fn_80080028__FP13Unk8007FF8C_G(void* a0);
-int fn_8008004C__FP13Unk8007FF8C_G(void* a0);
+int fn_8008004C__FP13Unk8007FF8C_G(void* a0, int a1);
 int fn_80080070__FP13Unk8007FF8C_G(void* a0);
-int fn_8008007C__FP13Unk8007FF8C_GUi(void* a0, unsigned a1);
+DbRec12* fn_8008007C__FP13Unk8007FF8C_GUi(void* a0, unsigned a1);
 int fn_800800A4__FP13Unk8007FF8C_G(void* a0);
 int fn_80080B98__FP13Unk8007FF8C_Q(void* a0);
 int fn_80080BB4__FP13Unk8007FF8C_Qiii(void* a0, int a1, int a2, int a3);
@@ -96,15 +110,14 @@ int fn_8008463C__Fi(int a0);
 int fn_80084660__Fi(int a0);
 int fn_800848EC__Fi(int a0);
 int fn_80084910__FPviii(void* a0, int a1, int a2, int a3);
-int fn_80084954__FPv(void* a0);
-int fn_80084978__FPv(void* a0);
-int fn_8008499C__FPv(void* a0);
+int fn_80084954__FPv(int a0);
+int fn_80084978__FPv(int a0);
+int fn_8008499C__FPv(int a0);
 int fn_80089AA0__FP20Unk80089894_PackTabDUiUi(void* a0, unsigned a1, unsigned a2);
 int fn_80089E48__FP15Unk80089894_Objii(void* a0, int a1, int a2);
 int fn_80089EE0__FP20Unk80089894_PackTabDUiUii(void* a0, unsigned a1, unsigned a2, int a3);
 int fn_8008FE14__Fi(int a0);
 int fn_8009005C__Fif(int a0, float a1);
-int fn_80090880__FP11Unk80090880(void* a0);
 int fn_800DD44C__FP13Unk800DD610_PPvi(void* a0, void* a1, int a2);
 int fn_800DE538__Fiiii(int a0, int a1, int a2, int a3);
 int fn_802B8E1C__Fv();
@@ -125,6 +138,7 @@ int fn_800971C8(void* team, int a);
 int fn_80097148(void* team, int a);
 int fn_8008CFD8(char* p, int a, int b);
 void fn_8040074C(void* p, unsigned n); /* bzero */
+void fn_80329FA0(void* out, int v, ...);
 int fn_8040ABA0(void);
 }
 extern char lbl_80649DA0[];
@@ -291,5 +305,64 @@ void fn_8056E130(DbSel* p);
 void fn_8056BD50(void* q);
 void fn_80377408(void* p);
 }
+
+/*
+ * Roster host object (retail global lbl_80619948 hands out instances via fn_800A3A10): data up to
+ * +0xDBC, then the vptr. Only the slots used by db/tu_8057CDB8 are named; evidence: the vcalls
+ * at +0x20/+0x28/+0x40/+0x48/+0x50 of the vtable in fn_8057CFA8, fn_8057D084, fn_8057D0F0.
+ */
+class DbHost {
+public:
+    char pad0[0xDBC];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4(int a);
+    virtual int v5(int a);
+    virtual void v6();
+    virtual void v7();
+    virtual void v8(int a);
+    virtual void v9(int a);
+    virtual int v10(int a);
+};
+extern "C" DbHost* fn_800A3A10(void* glob, int id);
+
+/*
+ * Sub-object of the 16-part menu manager of db/tu_8058154C: an int at +0, the vptr at +4. Slot N is
+ * at vtable byte offset 8*N (slots 2, 9 and 12 are called by fn_80581770, fn_8058205C, fn_8058185C).
+ */
+class DbSubObj {
+public:
+    int m0;
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9(int a);
+    virtual void v10();
+    virtual void v11();
+    virtual void v12(int a, int b);
+};
+
+/*
+ * Packed record object built by fn_8052E408 (sizeof >= 0x18; vptr at +0x14): a word at +8, a bit
+ * field word at +0xC (two flag bits, then five 6-bit fields; evidence: the extrwi/clrlwi operands of
+ * fn_8058391C, fn_805839A0, fn_80583C70, fn_805848B8) and the destructor fn_80360AF0.
+ */
+struct DbRecO {
+    char pad0[8];
+    int m8;
+    unsigned f0 : 1;
+    unsigned fl : 1;
+    unsigned a : 6;
+    unsigned b : 6;
+    unsigned c : 6;
+    unsigned d : 6;
+    unsigned e : 6;
+};
 
 #endif
