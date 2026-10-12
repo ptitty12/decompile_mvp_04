@@ -12,6 +12,27 @@ extern const char lbl_80673338[];
 extern const char lbl_8064B298[];
 extern const char lbl_8064A550[];
 extern const char lbl_8065C1B0[];
+extern const char lbl_805F73FC[];
+extern char lbl_806841F8[];
+struct Unk80360AB4;
+extern "C" void fn_8052DD58(Unk80360AB4* self);
+struct Unk80360AB4B {
+    int m0, m4, m8, mC, m10;
+};
+struct Unk80360AB4 : Unk80360AB4B {
+    Unk80360AB4() { fn_8052DD58(this); }
+    ~Unk80360AB4() {}
+    virtual void vfn();
+};
+struct FeMsgB8 {
+    char pad0[0x3C];
+    Unk80360AB4 m3C;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+};
+extern "C" int fn_8058200C(int a, int b);
 extern "C" void fn_8040074C(void* p, int n);
 extern "C" {
 
@@ -267,6 +288,25 @@ FE_OVERLAY FeScrM* fn_804AB940(FeScrM* self, int a, int b, int c, int d, int e, 
     self->m1C8 = -1;
     fn_8040B320(self->m144, 0, 0x80);
     return self;
+}
+
+FE_OVERLAY void fn_804AB9B8(FeScrM* x)
+{
+    fn_800ECE34(x);
+    x->m134 = (int)fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1));
+    x->m138 = (int)fn_800C8060(x->fn_vslot32(lbl_805F73FC, 1));
+    FeMsgB8* g8 = (FeMsgB8*)((char*)fn_800B555C() + 8);
+    if (g8->m60 != 0) {
+        Unk80360AB4 tmp;
+        Unk80360AB4* tp = &tmp;
+        *tp = g8->m3C;
+        int k = g8->m5C;
+        int j = g8->m54;
+        FeI(x, 0x1C8) = k;
+        fn_8058200C(FeI(lbl_8061930C, 0x2C), j);
+        FeI(x, 0x1C8) = FeI(x, 0x1C8) - 1;
+    }
+    g8->m60 = 0;
 }
 
 FE_OVERLAY void fn_804ABADC(void* x, int a)
