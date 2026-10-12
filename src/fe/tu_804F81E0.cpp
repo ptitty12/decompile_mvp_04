@@ -5,6 +5,9 @@
 
 #include "game/fe_804E02E0.h"
 
+extern "C" int fn_804FB7F4(FeS19* s);
+extern "C" int fn_804FB84C(FeS19* s);
+
 extern "C" FE_OVERLAY void fn_804F84A0(void)
 {
     FeObj* p = fn_800B7A94(UiGetMsgMgr(), "CREATEAPLAYER");
@@ -27,6 +30,41 @@ extern "C" FE_OVERLAY int fn_804F87F8(FeS21* s)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_804F885C(FeS22* self)
+{
+    if (self->m868 != lbl_805FD1A0[self->m3B4])
+        return 1;
+    if (self->m630 == 1 || fn_804FB7F4((FeS19*)self) != 0 || fn_804FB84C((FeS19*)self) != 0) {
+        if (self->m864 != lbl_805FD2A8[self->m484])
+            return 1;
+        return 0;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804F8A58(FeS22* self)
+{
+    void* g = lbl_8061E978;
+    char buf[64];
+    if (self->m864 >= 0) {
+        fn_804089B4(buf, "SIGP%04d", self->m864);
+        fn_802AEBF0(g, buf);
+    }
+    if (self->m868 >= 0) {
+        fn_804089B4(buf, "SIGB%04d", self->m868);
+        fn_802AEBF0(g, buf);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804F8AE0(FeS22* self, int a)
+{
+    fn_800ED310(self, a);
+    int k = ((FeSub*)((char*)fn_800C8058(((FeObjQ*)self->m604)->v33(10, 1)) + 0xDC))->s5();
+    FeObj1* w = (FeObj1*)self->m82C[k];
+    if (w != 0)
+        w->v14(a);
+}
+
 extern "C" FE_OVERLAY int fn_804F8B84(FeS18* s, int* out)
 {
     for (int i = 0; i < 25; i++) {
@@ -37,6 +75,81 @@ extern "C" FE_OVERLAY int fn_804F8B84(FeS18* s, int* out)
     }
     *out = 0;
     return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804F9AAC(void* self, UiItemN* it)
+{
+    char* n = it->name;
+    if (fn_8040B574(n, "FNAMETB") == 0 || fn_8040B574(n, "LNAMETB") == 0)
+        fn_804F8534(self);
+    return 0;
+}
+
+/* near-miss: retail keeps i in r4 and scales it per branch (no mr r10,r4); ours reuses r4 as a table pointer (6 slots differ) */
+extern "C" FE_OVERLAY float fn_804FA098(FeS23* self, int i, float x)
+{
+    float r = 0.0f;
+    float* a;
+    float* b;
+    if (self->m870 != 0) {
+        a = lbl_80622260;
+        b = lbl_80622280;
+    } else {
+        a = lbl_80622220;
+        b = lbl_80622240;
+    }
+    r = b[i] * x + a[i];
+    return r;
+}
+
+/* near-miss: retail loads a[i] inside each branch and b[i] after the join; same register-reuse problem as fn_804FA098 */
+extern "C" FE_OVERLAY float fn_804FA104(FeS23* self, int i, int flag, float x)
+{
+    float r = 0.0f;
+    float* a;
+    float* b;
+    if (self->m870 != 0 && flag == 0) {
+        a = lbl_80622260;
+        b = lbl_80622280;
+    } else {
+        a = lbl_80622220;
+        b = lbl_80622240;
+    }
+    r = (x - a[i]) / b[i];
+    if (r < 0.0f)
+        r = 0.0f;
+    else if (!(r <= 1.0f))
+        r = 1.0f;
+    return r;
+}
+
+extern "C" FE_OVERLAY int fn_804FA284(void* self, int v)
+{
+    switch (v) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+    case 3:
+        return 2;
+    case 4:
+    case 5:
+        return 3;
+    case 6:
+    case 7:
+        return 4;
+    case 8:
+    case 9:
+        return 5;
+    case 10:
+    case 11:
+        return 6;
+    case 12:
+    case 13:
+        return 7;
+    }
+    return 7;
 }
 
 extern "C" FE_OVERLAY int fn_804FA320(void* self, int v)

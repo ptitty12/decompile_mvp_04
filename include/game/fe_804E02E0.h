@@ -707,6 +707,39 @@ struct FeRawBig {
     int m10EC, m10F0, m10F4, m10F8, m10FC, m1100;
 };
 
+extern "C" {
+int fn_804089B4(char* dst, const char* fmt, ...);
+void fn_804F8534(void* self);
+}
+void fn_802AEBF0(void* a, void* b);
+extern void* lbl_8061E978;
+extern int lbl_805FD1A0[];
+extern int lbl_805FD2A8[];
+struct FeS22 : FeObj {
+    char pad40[0x3B4 - 0x40];
+    int m3B4;
+    char pad3B8[0x484 - 0x3B8];
+    int m484;
+    char pad488[0x604 - 0x488];
+    FeObj* m604;
+    char pad608[0x630 - 0x608];
+    int m630;
+    char pad634[0x82C - 0x634];
+    FeObj* m82C[8];
+    char pad84C[0x864 - 0x84C];
+    int m864;
+    int m868;
+};
+
+extern float lbl_80622220[];
+extern float lbl_80622240[];
+extern float lbl_80622260[];
+extern float lbl_80622280[];
+struct FeS23 : FeObj {
+    char pad40[0x870 - 0x40];
+    int m870;
+};
+
 /* BEGIN-VWRAP */
 /* Screens whose only data is one widget pointer at the given offset (one-call button handlers). */
 struct FeWf134 : FeObj { char pad40[0x134 - 0x40]; FeObj* m134; };
