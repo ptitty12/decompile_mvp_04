@@ -141,11 +141,10 @@ void fn_80229948(Task* t, int a)
     }
 }
 
-/* near-miss: 2 slots: slwi/lwzx use r11 in retail, r0 here (t->m9C->m8[c] index register) */
 int fn_80229E50(Task* t, int a, int b, int c, int d)
 {
-    void* x = t->m9C->m8[a];
-    void* y = t->m9C->m8[c];
+    void* x = ObjAt(t->m9C->m8, a);
+    void* y = ObjAt(t->m9C->m8, c);
     float f = fn_80218DCC(t, x, y, d);
     float k1 = 0.4f;
     float k2 = 0.85f;
