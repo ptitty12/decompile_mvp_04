@@ -111,7 +111,7 @@ public:
     virtual int s91();
     virtual int s92();
     virtual int s93();
-    virtual int s94();
+    virtual int s94(int a);
     virtual int s95();
     virtual int s96();
     virtual int s97();
@@ -310,7 +310,8 @@ struct FeScrM : FeW {
     int m1D4;
     char pad1D8[0x3E8 - 0x1D8];
     FeRow60 m3E8[7];
-    char pad688[0x97C - 0x688];
+    char pad688[0x960 - 0x688];
+    int m960[7];
     int m97C[7];
     void* m998;
     int m99C;

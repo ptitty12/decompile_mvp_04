@@ -5,6 +5,19 @@
 
 #include "game/fe_804BE560.h"
 
+inline int FeFl9A8(FeScrM* x)
+{
+    int f = 0;
+    if (x->m9A8 != 0)
+        f = 1;
+    return f;
+}
+
+
+extern "C" int fn_802D7CE0(int id, int a);
+extern "C" void fn_804D27B4(FeSlot44* p, int a);
+extern "C" void fn_804D233C(FeSlot44* p);
+
 struct FeE8D {
     char pad0[8];
 };
@@ -53,11 +66,9 @@ extern "C" void fn_804CF81C(FeScrM* x);
 extern "C" int fn_804CF8AC(FeScrM* x);
 extern "C" int fn_804D0860(FeScrM* x, int a);
 
-struct FeGame;
+extern "C" void fn_804CE9D0(FeScrM* g);
 
-extern "C" void fn_804CE9D0(FeGame* g);
-
-extern FeGame* lbl_80621AB0;
+extern FeScrM* lbl_80621AB0;
 
 /* near-miss: 98.1%. Retail recomputes the second array end (addi r31,r30,1672) and reuses r29 for its start;
  * ours lets gcse copy it from the first array start (mr r31,r29), which shifts the callee-saved registers and the
@@ -90,6 +101,21 @@ extern "C" FE_OVERLAY void fn_804CE714(FeScrM* x, int c)
     *(const void**)((char*)x + 0x39C) = lbl_80666EC0;
     *(const void**)((char*)x + 0x334) = lbl_80666EC0;
     fn_80330870(x, c);
+}
+
+extern "C" FE_OVERLAY void fn_804CE9D0(FeScrM* x)
+{
+    int id = ((int*)x->m998)[x->m9A0];
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    s->fn_8007AF7C(x->m97C[0], id, x->m960[0]);
+    s->fn_800743A0(x->m97C[1], id, 1, FeFl9A8(x), x->m960[1]);
+    s->fn_8007389C(x->m97C[2], id, 1, x->m960[2]);
+    s->fn_80074640(x->m97C[3], id, 1, x->m960[3]);
+    if (s->fn_8007A270(id) != 0) {
+        s->fn_8007B114(x->m97C[4], id, x->m960[4]);
+        s->fn_800755FC(x->m97C[5], id, 1, FeFl9A8(x), x->m960[5]);
+        s->fn_80074F50(x->m97C[6], id, 1, x->m960[6]);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804CEAEC(FeScrM* x)
@@ -244,6 +270,32 @@ extern "C" FE_OVERLAY void fn_804CF5F8(FeScrM* x)
     fn_8040B830(mp->name, lbl_80621AF0, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, x);
+}
+
+extern "C" FE_OVERLAY void fn_804CF6A4(FeScrM* x)
+{
+    fn_800ECAA4(x);
+    if (x->m1D4 == 0) {
+        FeSlot44* a = &x->m188;
+        ((FeVQ*)x)->s90();
+        if (fn_802D7CE0(a->m38, 0) == 0) {
+            fn_804D0318(x, 0);
+            if (a->m38 != -1) {
+                fn_804D27B4(a, 0);
+                ((FeVQ*)x)->s94(0);
+            }
+        }
+        FeSlot44* b = &x->m144;
+        if (fn_802D7CE0(b->m38, 0) == 0) {
+            fn_804D0318(x, 1);
+            if (b->m38 != -1) {
+                fn_804D27B4(b, 0);
+                ((FeVQ*)x)->s94(1);
+            }
+        }
+    }
+    fn_804D233C(&x->m188);
+    fn_804D233C(&x->m144);
 }
 
 extern "C" FE_OVERLAY void fn_804CF7B4(FeScrM* x)
