@@ -309,6 +309,100 @@ void fn_8025505C(A* self, int a, int b)
     fn_8017BA50(p->m44C->m700, p, a, 7);
 }
 
+struct U;
+void fn_8035E1E0(U* self, int chrg);
+extern char lbl_80660ED8[];
+float fn_80255754(A* self);
+float fn_802558E0(A* self);
+
+struct Unk802A9BAC_Obj {
+    char pad0[0x5BC];
+    int m5BC;
+};
+struct Unk802A9BAC {
+    void fn_802A9BAC(int a, Unk802A9BAC_Obj* b, int c, int d);
+    int m0;
+    const void* vptr;
+    int m8;
+    Unk802A9BAC_Obj* mC;
+    int m10;
+    int m14;
+    float m18;
+    void Base() { vptr = lbl_80649DA0; }
+    void Derived()
+    {
+        vptr = lbl_80660ED8;
+        m18 = -1.0f;
+    }
+};
+
+inline void Unk802550A8_Post(Unk8024EF40_Q* q, Unk802A9BAC* o)
+{
+    fn_8037893C(q->m704, o->m0, o, 0, 0);
+    fn_8035E1E0((U*)o, 2);
+}
+
+void fn_802550A8(A* self, int a, int b)
+{
+    Unk802A9BAC m;
+    int kind;
+    switch (self->m28) {
+    case 0:
+        kind = 6;
+        break;
+    case 1:
+    case 2:
+        kind = 6;
+        break;
+    case 4:
+        kind = 6;
+        break;
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        kind = 6;
+        break;
+    case 0x13:
+    case 0x14:
+        kind = 6;
+        break;
+    case 0x1A:
+        kind = 6;
+        break;
+    default:
+        kind = 6;
+        break;
+    case 0xB ... 0x10:
+        kind = 5;
+        break;
+    case 0x11:
+        kind = 4;
+        break;
+    case 0x12:
+        kind = 2;
+        break;
+    }
+    Unk802A9BAC* mp = &m;
+    m.Base();
+    m.m0 = 0x62;
+    m.Derived();
+    Unk802A9BAC_Obj* o = (Unk802A9BAC_Obj*)self->m0;
+    int d = 1;
+    if (self->m38 == b)
+        d = 0;
+    m.fn_802A9BAC(a, o, kind, d);
+    A* aa = &self->m0->m58C;
+    if (aa->m18 != 0.0f) {
+        float t = Secs(self->m0->m44C) - fn_802558E0(aa);
+        mp->m18 = t;
+    } else if (aa->m14 != 0.0f) {
+        float t = Secs(self->m0->m44C) - fn_80255754(aa);
+        mp->m18 = t;
+    }
+    Unk802550A8_Post(self->m0->m44C, &m);
+}
+
 /* The search call is written twice (before the loop and at its end): jump2 cross-jumps the two copies'
  * common tail, which gives retail's entry jump into the middle of the argument setup. */
 int fn_80255284(A* self, int a)
