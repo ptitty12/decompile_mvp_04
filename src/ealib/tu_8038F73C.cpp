@@ -536,6 +536,57 @@ extern int lbl_8069B6B8[];
 extern int lbl_8069B6D8[];
 extern "C" void fn_80390EC0(int* in, int* out);
 extern "C" void fn_80391060(int* in, int* out);
+extern const unsigned lbl_80699BB8[];
+extern const unsigned lbl_8069A3B8[];
+extern const unsigned lbl_8069A7B8[];
+extern const int lbl_80607318[];
+extern "C" int fn_80390D54()
+{
+    lbl_8069B5B8[0] = ((int)lbl_806EF38C >> 24) * lbl_8069ACB8[0];
+    fn_80390CFC(8);
+    int* z = lbl_8069B5B8 + 1;
+    for (int i = 0; i < 9; i++) {
+        z[0] = 0;
+        z[1] = 0;
+        z[2] = 0;
+        z[3] = 0;
+        z[4] = 0;
+        z[5] = 0;
+        z[6] = 0;
+        z += 7;
+    }
+    int k = 1;
+    for (;;) {
+        unsigned e = lbl_80699BB8[lbl_806EF38C >> 23];
+        int n = e & 0xFF;
+        if (n > 9) {
+            if (!(e & 0x20)) {
+                if (!(e & 0x10)) {
+                    fn_80390CFC(9);
+                    e = lbl_8069A3B8[*(unsigned char*)&lbl_806EF38C];
+                    n = e & 0xFF;
+                } else {
+                    fn_80390CFC(6);
+                    e = lbl_8069A7B8[*(unsigned char*)&lbl_806EF38C];
+                    n = e & 0xFF;
+                }
+            } else {
+                if (e & 0x10) {
+                    fn_80390CFC(2);
+                    return k;
+                }
+                fn_80390CFC(6);
+                e = lbl_806EF38C;
+                n = 0x10;
+            }
+        }
+        fn_80390CFC(n);
+        k += (e >> 16) & 0x3F;
+        lbl_8069B5B8[lbl_80607318[k]] = ((int)e >> 22) * lbl_8069ACB8[lbl_80607318[k]];
+        k++;
+    }
+}
+
 extern "C" void fn_80391194(int* dst, int stride)
 {
     fn_80390EC0(lbl_8069B5B8 + 0, lbl_8069B6B8 + 0);
