@@ -4,6 +4,38 @@
  */
 
 #include "game/fe_804ABCBC.h"
+class FeObj4i : public UiBase {
+public:
+    FE_LO(FE_V0) virtual FeObj* v32(const char* a, int b);
+    virtual void v33();
+    virtual void v34();
+    virtual void v35();
+    virtual void v36();
+    virtual void v37();
+    virtual void v38();
+    virtual void v39();
+    virtual void v40();
+    virtual void v41();
+    virtual void v42(int a, int b, int c, int d);
+};
+struct FeRct4 {
+    float m0, m4, m8, mC;
+};
+class FeV14 {
+public:
+    char pad0[0x14];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual int s5();
+    virtual FeRct4* s6(int i);
+};
+extern "C" float fn_80594418(int h, int i);
+extern "C" void fn_80594428(int h, int i, float v);
+extern "C" int fn_80591A50(int h);
+extern "C" int fn_80591AA0(int h);
+extern "C" int fn_805934C0(int h, int a, int b, int c);
 
 extern "C" void fn_804BB17C(FeCam* c, FeObj* w, int n);
 extern "C" void fn_804BC414(FeCam* c, float a);
@@ -19,11 +51,54 @@ extern "C" int fn_8056A5F4(int a, int b, int c, int d);
 extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern FeGame* lbl_80619948;
 
+extern "C" FE_OVERLAY void fn_804B4908(FeScr* x)
+{
+    FeObj* z = 0;
+    fn_800ECF18(x);
+    fn_800C2034((char*)fn_800B555C() + 8, 0);
+    ((FeObj1*)fn_800C8040(((FeObj*)x)->v32("TITLE", 1)))->v29(((FeV14*)FI(x, 0xE14))->s5());
+    FeObj* t = fn_800C8040(((FeObj*)x)->v32("TITLE", 1));
+    fn_800DD204(t, fn_800C8038(((FeObj*)x)->v32("SH1", 1)));
+    FeObj4i* g = (FeObj4i*)fn_800C8060(fn_800C8044(((FeObj*)x)->v32("LASTFOUR", 1))->v32("LAST4", 1));
+    g->v42(0, 0, 0x578E, 4);
+    g->v42(0, 1, 0x5781, 4);
+    g->v42(0, 2, 0x578F, 4);
+    g->v42(0, 3, 0x578D, 4);
+    x->m148 = z;
+    x->m144 = fn_800B7AB8(UiGetMsgMgr(), "NAVBAR");
+    fn_80124FA8(x->m144, x);
+    ((FeObj*)x)->v85();
+    ((FeObj*)x)->v97();
+    ((FeObj*)x)->v87();
+    ((FeObj*)x)->v86();
+    ((FeObj*)x)->v89();
+}
+
 extern "C" FE_OVERLAY void fn_804B4BC4(FeObj* x)
 {
     fn_800ED254(x);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+extern "C" FE_OVERLAY void fn_804B4E8C(FeScr* x, int i)
+{
+    char buf[0x68];
+    float v = !(fn_80594418(FI(x, 0xE14), i) + ((FeV14*)FI(x, 0xE14))->s6(i)->m4 <= ((FeV14*)FI(x, 0xE14))->s6(i)->m8) ? ((FeV14*)FI(x, 0xE14))->s6(i)->m8 : !(fn_80594418(FI(x, 0xE14), i) + ((FeV14*)FI(x, 0xE14))->s6(i)->m4 >= ((FeV14*)FI(x, 0xE14))->s6(i)->mC) ? ((FeV14*)FI(x, 0xE14))->s6(i)->mC : fn_80594418(FI(x, 0xE14), i) + ((FeV14*)FI(x, 0xE14))->s6(i)->m4;
+    fn_80594428(FI(x, 0xE14), i, v);
+    ((char* (*)(char*, float, int, int))fn_800DF254)(buf, fn_80594418(FI(x, 0xE14), i), ((FeObjI*)x)->v98() == 1, 3);
+    ((FeObjS43*)x->m134)->v43(i, 1, buf, 4);
+    ((FeObj1*)x->m134)->v14(1);
+}
+
+extern "C" FE_OVERLAY void fn_804B50B8(FeScr* x, int i)
+{
+    char buf[0x68];
+    float v = !(fn_80594418(FI(x, 0xE14), i) - ((FeV14*)FI(x, 0xE14))->s6(i)->m4 <= ((FeV14*)FI(x, 0xE14))->s6(i)->m8) ? ((FeV14*)FI(x, 0xE14))->s6(i)->m8 : !(fn_80594418(FI(x, 0xE14), i) - ((FeV14*)FI(x, 0xE14))->s6(i)->m4 >= ((FeV14*)FI(x, 0xE14))->s6(i)->mC) ? ((FeV14*)FI(x, 0xE14))->s6(i)->mC : fn_80594418(FI(x, 0xE14), i) - ((FeV14*)FI(x, 0xE14))->s6(i)->m4;
+    fn_80594428(FI(x, 0xE14), i, v);
+    ((char* (*)(char*, float, int, int))fn_800DF254)(buf, fn_80594418(FI(x, 0xE14), i), ((FeObjI*)x)->v98() == 1, 3);
+    ((FeObjS43*)x->m134)->v43(i, 1, buf, 4);
+    ((FeObj1*)x->m134)->v14(1);
 }
 
 extern "C" FE_OVERLAY void fn_804B52E4(FeScr* x)
@@ -228,4 +303,42 @@ extern "C" FE_OVERLAY int fn_804B7A30(FeScr* x, int a, int b)
         return p->m8 * 100 / fn_805932E4(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, b)->m4;
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804B7B18(FeScr* x, int* out, int a, int max, int rev)
+{
+    int n = 0;
+    if (a == 0) {
+        if (max > fn_80591AA0(FI(x, 0xE18))) {
+            n = fn_80591AA0(FI(x, 0xE18));
+        } else {
+            n = max;
+            if (n < 0)
+                n = 0;
+        }
+        out[0] = fn_80591A50(FI(x, 0xE18));
+        for (int i = 1; i < n; i++)
+            out[i] = out[i - 1] - 1;
+    } else if (fn_80591A50(FI(x, 0xE18)) >= 0) {
+        int h = FI(x, 0xE18);
+        out[0] = fn_805934C0(h, a, fn_80591A50(h), 0);
+        if (n < max && out[0] != -1) {
+            int j = 0;
+            do {
+                n++;
+                out[j + 1] = fn_805934C0(FI(x, 0xE18), a, out[j], 1);
+                j++;
+            } while (n < max && out[j] != -1);
+        }
+    }
+    if (rev == 0) {
+        for (int i = 0; i < n / 2; i++) {
+            int u = out[i];
+            int k = n - 1 - i;
+            int t = out[k];
+            out[i] = t;
+            out[k] = u;
+        }
+    }
+    return n;
 }
