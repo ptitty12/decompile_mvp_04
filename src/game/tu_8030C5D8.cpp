@@ -101,6 +101,32 @@ int fn_8030CE18(int p)
     return fn_8037C7FC()->fn_8037CE98(0x77F3B9AB, p, 0);
 }
 
+struct Unk802FCAC0_Ent {
+    char pad0[4];
+    int m4;
+    char pad8[0xC - 8];
+    int mC;
+    char pad10[0x24 - 0x10];
+    Unk802F8324_V2 m24;
+};
+
+struct Unk802FCAC0_Obj {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[8];
+    int m24;
+    Unk802FCAC0_Ent* m28[3];
+    int m34_unused;
+};
+
+extern "C" void fn_8030D090(Unk802FCAC0_Obj* p);
+
+extern "C" void fn_8030D170(Unk802FCAC0_Obj* p)
+{
+    fn_8030D090(p);
+}
+
+
 void fn_8030D190(Unk8030C5D8_At18* p, int c)
 {
     p->m18 = lbl_80665308;

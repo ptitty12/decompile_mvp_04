@@ -2,3 +2,392 @@
  * Game code, .text 0x8035AB44-0x8035B60C (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+
+#include "game/tu_80355A6C.h"
+
+void fn_8035AB44(void* self, int c)
+{
+    PUT(0x8, lbl_80649DB8);
+    fn_80378620(self, c);
+}
+
+void* fn_8035AB74(void* self)
+{
+    fn_803785E4(self);
+    PUT(8, lbl_80660100);
+    return self;
+}
+
+extern "C" void fn_8035ABB0(Unk8035ABB0* s)
+{
+    s->m0 = lbl_805CFFF4;
+    s->m4 = lbl_806055AC;
+    s->m10 = lbl_8069429C;
+}
+
+void* fn_8035AC10(Unk8035AC10* s, Unk8035AC10* o)
+{
+    fn_8037936C(s, o);
+    s->m10 = o->m10;
+    s->m1C = o->m1C;
+    return s;
+}
+
+struct Unk8035AC6C {
+    int m0;
+    Unk8035AC10 m4;
+    int m24;
+    Unk806055AC m28;
+    Unk806055AC m34;
+    Unk806055AC m40;
+    Unk806055AC m4C;
+    float m58;
+    float m5C;
+    float m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    Unk8035AC6C(const Unk8035AC6C& o);
+};
+Unk8035AC6C::Unk8035AC6C(const Unk8035AC6C& o)
+{
+    m0 = o.m0;
+    fn_8035AC10(&m4, (Unk8035AC10*)&o.m4);
+    m24 = o.m24;
+    m28 = o.m28;
+    m34 = o.m34;
+    m40 = o.m40;
+    m4C = o.m4C;
+    m58 = o.m58;
+    m5C = o.m5C;
+    m60 = o.m60;
+    m64 = o.m64;
+    m68 = o.m68;
+    m6C = o.m6C;
+    m70 = o.m70;
+    m74 = o.m74;
+    m78 = o.m78;
+}
+
+void fn_8035AD80() {}
+
+void fn_8035AD84() {}
+
+void fn_8035AD88(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035ADBC(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035ADF0(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AE24(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AE58(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AE8C(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AEC0(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AEF4(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+int fn_8035AF28(void* p) { return F(int, p, 0x38); }
+
+void fn_8035AF30(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AF64(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AF98(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035AFCC(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B000(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B034(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B068(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B09C(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B0D0(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B104(void* self, int c)
+{
+    PUT(0x0, lbl_8065F9B0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B138(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+extern "C" void fn_8035B16C(char* self, int c)
+{
+    fn_8033CD28(self + 0x1d4, 2);
+    fn_8033CD28(self + 0x1c8, 2);
+    fn_8033CD28(self + 0x1bc, 2);
+    fn_8037B424(self, c);
+}
+
+extern "C" void fn_8035B1C8(Unk8035B1C8* s)
+{
+    s->m0 = 0;
+    s->m4 = lbl_805D30A4;
+    s->m8 = 0;
+    s->mC = lbl_805D30A4;
+    s->m10 = lbl_805D30A4;
+    s->m24 = lbl_805D30A4;
+    s->m14 = 0;
+    s->m18 = 0;
+    s->m1C = 0;
+    s->m20 = 0;
+}
+
+struct Unk8035B200 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    Unk8060558C m30;
+    Unk806055AC m38;
+    float m44;
+    Unk806055AC m48;
+    Unk806055AC m54;
+    float m60;
+    Unk806055AC m64;
+    Unk806055AC m70;
+    Unk806055AC m7C;
+    int m88;
+    int m8C;
+    Unk806055AC m90;
+    Unk806055AC m9C;
+    int mA8;
+    int mAC;
+    float mB0;
+    float mB4;
+    float mB8;
+    float mBC[6];
+    int mD4;
+    float mD8;
+};
+void fn_8035B200(Unk8035B200* s)
+{
+    s->m0 = 0;
+    s->m10 = 5;
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m1C = lbl_805D30A8;
+    s->m2C = lbl_805D30AC;
+    s->m20 = lbl_805D30A8;
+    s->m24 = lbl_805D30A8;
+    s->m28 = lbl_805D30A8;
+    s->m30 = lbl_8060558C;
+    s->m18 = lbl_805D30A8;
+    s->m60 = lbl_805D30A8;
+    s->m64 = lbl_806055AC;
+    s->m70 = lbl_806055AC;
+    s->m44 = lbl_805D30A8;
+    s->m38 = lbl_806055AC;
+    s->m48 = lbl_806055AC;
+    s->m54 = lbl_806055AC;
+    s->m7C = lbl_806055AC;
+    s->m88 = 6;
+    s->m8C = 0;
+    s->m90 = lbl_806055AC;
+    s->m9C = lbl_806055AC;
+    s->mA8 = 0;
+    s->mAC = 0;
+    s->mB0 = lbl_805D30A8;
+    s->mB4 = lbl_805D30A8;
+    s->mD4 = 0;
+    s->mB8 = lbl_805D30A8;
+    s->mD8 = lbl_805D30A8;
+    for (int i = 0; i < 6; i++)
+        s->mBC[i] = lbl_805D30A8;
+}
+
+void fn_8035B3AC(int* p)
+{
+    p[0] = 0;
+    p[1] = 0;
+}
+
+extern "C" int fn_8035B3BC(void* p) { return F(int, p, 0x0); }
+
+struct Unk8035B3C4 {
+    Unk806055AC m0;
+    Unk806055AC mC;
+};
+void fn_8035B3C4(Unk8035B3C4* s)
+{
+    s->m0 = lbl_806055AC;
+    s->mC = lbl_806055AC;
+}
+
+void fn_8035B404(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B438(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B46C(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B4A0(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B4D4(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B508(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+extern "C" void* fn_8035B53C(char* self)
+{
+    fn_8014D9C4(self + 0x14);
+    return self;
+}
+
+void fn_8035B570(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B5A4(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}
+
+void fn_8035B5D8(void* self, int c)
+{
+    PUT(0x4, lbl_80649DA0);
+    if (c & 1)
+        fn_80377408(self);
+}

@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80070DDC.h"
+#include "game/tu_8007FF8C.h"
 
 void* operator new[](unsigned int size, int heap);
 extern char lbl_80649DB8[];
@@ -494,6 +495,15 @@ unsigned fn_80070004(void* l, int k, unsigned c)
     }
     return r;
 }
+
+extern Unk8007FF8C_Pmf lbl_805B63E0[];
+
+extern "C" float fn_800701B0(Unk8007FF8C_PObj* o, int i, int a)
+{
+    float r = (o->*lbl_805B63E0[i])(a);
+    return r;
+}
+
 
 void fn_80070248(void* l, int k, unsigned c, int v)
 {

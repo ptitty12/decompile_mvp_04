@@ -211,6 +211,17 @@ void fn_80303A3C(Unk80300848_S* p, int c)
     fn_80328374(p, c);
 }
 
+extern "C" void fn_803029AC(int a, int b);
+
+extern "C" void fn_80303A6C()
+{
+    fn_803029AC(1, 0xFFFF);
+}
+
+extern "C" void fn_80303A98() { fn_803029AC(0, 0xFFFF); }
+
+
+
 int fn_80303AC4()
 {
     return lbl_8068F1F4;
