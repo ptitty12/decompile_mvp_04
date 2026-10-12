@@ -50,7 +50,7 @@ void fn_80329AAC(FxSing* p, int a);
 FxDate fn_80329FA0(char* p);
 int fn_8032A130(int a, int b, int c);
 void fn_80378D70(char* src, unsigned n, char* dst, int cap, int delim, int* outLen);
-void fn_80379094(char* s, int len, int a);
+int fn_80379094(char* s, int len, int a);
 double fn_80409D88(const char* s);
 int fn_80409DAC(const char* s);
 void fn_801A750C(void* v, int a);
@@ -118,14 +118,14 @@ inline int AtD(int* p, int i) { int off = i * 4; return *(int*)((char*)p + off);
 
 // FUNCS-BEGIN
 
-/* near-miss: retail indexes the table with a zero register (lwzx r3,r31,r0) */
+/* The zero index is a register in retail (lwzx r3,r31,r0): `(old != 0) - 1` is 0 here, but cse leaves it as a register. */
 void fn_80327214(FxAI* self) {
     fn_803272F0(self);
     int old = self->m4B8;
     if (old) {
-        int idx = 0;
-        self->m4B8 = idx;
+        int idx = (old != 0) - 1;
         FxZT* t = (&self->m0)[idx];
+        self->m4B8 = idx;
         if (t) fn_80325000(t);
         fn_8032713C(self, old, self->m4B8);
     }
@@ -161,22 +161,22 @@ void fn_803272F0(FxAI* self) {
 
 void fn_80328208() { fn_80327354(1, 0xFFFF); }
 
-/* near-miss: retail stores the second field before forming the lbl_805EBBF8 pool address */
 FxBase* fn_80328234(FxBase* self, int a, int b) {
+    const char* e = "";
     self->m14 = 0;
     self->m18 = lbl_80664020;
-    fn_8040B61C(self, lbl_805EBBF8);
+    fn_8040B61C(self, e);
     self->m20 = 0;
     self->m18 = lbl_80666F98;
     fn_80328318(self, a, b);
     return self;
 }
 
-/* near-miss: same as the neighbouring function */
 FxBase* fn_803282A8(FxBase* self, int a) {
+    const char* e = "";
     self->m14 = 0;
     self->m18 = lbl_80664020;
-    fn_8040B61C(self, lbl_805EBBF8);
+    fn_8040B61C(self, e);
     self->m20 = 0;
     self->m18 = lbl_80666F98;
     fn_80328318(self, 0x13, a);
@@ -196,7 +196,6 @@ void fn_80328374(FxBase* self, int a) {
     if (a & 1) fn_80377408(self);
 }
 
-/* near-miss: retail keeps two copies of the fail block */
 int fn_803283D8(int a, int b, int* idx, int* out) {
     int i = *idx;
     if (i <= 0) {
@@ -209,12 +208,12 @@ int fn_803283D8(int a, int b, int* idx, int* out) {
             return 0;
         }
     }
-    if (*idx > 0) {
-        *out = lbl_806E2274[*idx].m0;
-        return 1;
+    if (*idx <= 0) {
+        *out = 0;
+        return 0;
     }
-    *out = 0;
-    return 0;
+    *out = lbl_806E2274[*idx].m0;
+    return 1;
 }
 
 void fn_8032847C(int p) {
@@ -274,19 +273,25 @@ int fn_80328648(int n) {
     return -1;
 }
 
-/* near-miss: retail keeps two separate -1 constants (list tail index in r29, search cursor stored to sp+8); ours merges them */
+/* near-miss: 5 slots. Layout now matches (exit code inside the loop, body last). Retail materialises the cursor's -1 (li r0,-1)
+   after the fn_80328648 call and keeps the list-tail -1 in r29; here cur is initialised first and cse shares one constant. */
 void fn_80328690(FxBase* self, int a) {
     self->m20 = a;
+    int cur = -1;
     int last = -1;
     int row = fn_80328648(self->m1C);
-    int cur = -1;
     int tmp;
-    while (fn_803283D8(row, a, &cur, &tmp)) last = cur;
-    cur = fn_803296E8(self);
-    if (last > 0) lbl_806E2274[last].m4 = cur;
-    else lbl_806E2184[row][a] = cur;
-    lbl_806E2274[cur].m4 = 0;
-    lbl_806E2274[cur].m0 = (int)self;
+    for (;;) {
+        if (!fn_803283D8(row, a, &cur, &tmp)) {
+            cur = fn_803296E8(self);
+            if (last <= 0) lbl_806E2184[row][a] = cur;
+            else lbl_806E2274[last].m4 = cur;
+            lbl_806E2274[cur].m0 = (int)self;
+            lbl_806E2274[cur].m4 = 0;
+            return;
+        }
+        last = cur;
+    }
 }
 
 /* near-miss: loop shape matches (goto form keeps it unrotated); retail shares one lis for the slot table across the unlink stores, ours emits it twice */
@@ -343,12 +348,13 @@ void fn_80328858(void* tab, int n, int a) {
 
 void fn_803289C0(int a) { fn_80328858(&lbl_806202A8, 0x11, a); }
 
-/* near-miss: callee-saved lis registers for lbl_806202FC / lbl_806202F4 swapped */
 void fn_80329498() {
-    lbl_806202F4 = 1;
-    fn_80321628(&lbl_80691AEC, lbl_806202FC);
-    lbl_806202F4 = 0;
-    lbl_806202FC = 0;
+    int* a = &lbl_806202FC;
+    int* b = &lbl_806202F4;
+    *b = 1;
+    fn_80321628(&lbl_80691AEC, *a);
+    *a = 0;
+    *b = 0;
 }
 
 void fn_803294E8() {
@@ -439,7 +445,6 @@ FxSing* fn_80329988() {
     return lbl_80620304;
 }
 
-/* near-miss: tail shape */
 void fn_803299D4(FxSing* self) {
     if (self->m4) {
         if (fn_80329AE4((void*)self->m4) && *(int*)self->m4 != 0xB) {
@@ -486,7 +491,6 @@ void fn_80329AEC(char** cur, const char** out, unsigned* n, int delim) {
     }
 }
 
-/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     int len = 0;
     fn_80378D70(*cur, *n, lbl_80691D18, 0x80, delim, &len);
@@ -502,7 +506,6 @@ int fn_80329B98(char** cur, unsigned* n, float* out, int delim) {
     return 1;
 }
 
-/* near-miss: retail clears the length slot (li r5,0) before forming the buffer address */
 int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
     int len = 0;
     int ok = 1;
@@ -520,7 +523,6 @@ int fn_80329C4C(char** cur, unsigned* n, int* out, int lo, int hi, int delim) {
     return ok;
 }
 
-/* near-miss: same as the neighbouring function */
 int fn_80329D1C(char** cur, unsigned* n, unsigned* out, unsigned lo, unsigned hi, int delim) {
     int len = 0;
     int ok = 1;
@@ -552,7 +554,9 @@ int fn_80329E50() {
     return 1;
 }
 
-/* near-miss: loop structure and registers match; retail stores the three result fields straight into the stack slot, ours goes through an address register (addi r9,r1,8) */
+/* The result record is a local with a trivial destructor (BLKmode): its fields are stored straight into the frame
+   slot, as retail does; a plain FxDate local goes through an address register. */
+struct FxDateL { unsigned a : 8; unsigned b : 8; unsigned c : 16; ~FxDateL() {} };
 FxDate fn_80329FA0(char* p) {
     int days = (int)p;
     if (days <= 0) return *(FxDate*)&lbl_80691AF0;
@@ -583,11 +587,11 @@ FxDate fn_80329FA0(char* p) {
         int t = m + 1;
         m = t - t / 12 * 12;
     }
-    FxDate d;
+    FxDateL d;
     d.b = days;
     d.a = m + 1;
     d.c = y16;
-    return d;
+    return *(FxDate*)&d;
 }
 
 FxMS fn_8032A0C0(int t) {

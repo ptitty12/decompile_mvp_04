@@ -338,8 +338,6 @@ extern char lbl_80666DD0[];
 extern char lbl_80666E20[];
 extern char lbl_80666E70[];
 extern char lbl_806841F8[];
-extern char lbl_8068B8AC[];
-extern char lbl_8068BBE0[];
 extern char lbl_80691BEC[];
 extern char lbl_80691CAC[];
 extern char lbl_80691CB0[];
@@ -489,7 +487,7 @@ struct Unk80359C58 {
         m0 = lbl_8065EDB8;
         fn_8040B320(m4, 0, 0x1C);
         m20 = 1;
-        fn_8040B320(m4, 0, 0x1C);
+        ((void* (*)(void*, int, int))fn_8040B320)(m4, 0, 0x1C);
         fn_804007D4(m4);
     }
 };
@@ -516,6 +514,32 @@ public:
 };
 extern Unk80359C58 lbl_8068B884;
 extern int lbl_8068B8A8;
+/* Thread object (0x334 bytes). Evidence: ctor fn_80359F30/fn_80359E94 (vptr lbl_8065ED60, m4 = 1, mC = 0x19000,
+   memset of m14[0x318]), dtor fn_80359E30 (m330 flag, fn_803FFEB8(m14)), setters fn_8035A028/fn_8035A09C. */
+void* fn_8035A134(void*);
+struct Unk80359E94 {
+    const void* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    char m14[0x318];
+    int m32C;
+    int m330;
+    Unk80359E94()
+    {
+        fn_8035A134(this);
+        m0 = lbl_8065ED60;
+        m4 = 1;
+        mC = 0x19000;
+        m10 = 0;
+        fn_8040B320(m14, 0, 0x318);
+        m32C = 0;
+        m330 = 0;
+    }
+};
+extern Unk80359E94 lbl_8068B8AC;
+extern int lbl_8068BBE0;
 struct Unk80359A40 {
     int m0;
     int m4;

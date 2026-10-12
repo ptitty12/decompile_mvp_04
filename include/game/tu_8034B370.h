@@ -81,6 +81,13 @@ struct Unk80353234 {
         m4 = 0;
         mC = 0;
     }
+    inline void Add(unsigned char v)
+    {
+        if (m4 < m8) {
+            m0[m4] = v;
+            m4++;
+        }
+    }
 };
 void fn_80341598(Unk8034151C* t, int v);
 void fn_8034166C(Unk803415F0* t, int v);
@@ -128,6 +135,19 @@ struct Unk803541D4 {
     unsigned m4;
     int m8;
     unsigned mC;
+    inline void Clear()
+    {
+        fn_8040074C(m0, m8 * 0x24);
+        m4 = 0;
+        mC = 0;
+    }
+    inline void Add(Unk803541D4_E v)
+    {
+        if (m4 < m8) {
+            m0[m4] = v;
+            m4++;
+        }
+    }
 };
 
 /* Pool of Unk803541D4_E elements (ring at +0), vptr at +0x10 (virtual 19
@@ -186,6 +206,19 @@ struct Unk80355414 {
     unsigned m4;
     int m8;
     unsigned mC;
+    inline void Clear()
+    {
+        fn_8040074C(m0, m8 * 0x1C);
+        m4 = 0;
+        mC = 0;
+    }
+    inline void Add(Unk80355414_E v)
+    {
+        if (m4 < m8) {
+            m0[m4] = v;
+            m4++;
+        }
+    }
 };
 
 /* Block of 0x3C bytes whose four 12-byte records are cleared by fn_80080B98
