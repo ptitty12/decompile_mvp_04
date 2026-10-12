@@ -426,6 +426,78 @@ extern "C" void fn_800D3824(Unk800D1614_Obj* o, int a)
     o->m48->fn_vslot8(a);
 }
 
+struct Unk800D388C_Q {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk800D388C_Raw : Unk800C7B40_Data {
+    const void* m3C;
+    int m40;
+    int m44;
+    int m48;
+    Unk800D388C_Q m4C;
+    int m5C;
+    int m60;
+    int m64;
+    unsigned b68_0 : 1;
+    unsigned b68_1 : 1;
+    unsigned b68_2 : 1;
+    unsigned b68_3 : 1;
+    unsigned rest68 : 28;
+    int m6C;
+    unsigned m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+};
+extern const char lbl_8065BC68[];
+extern "C" void* fn_803774A8(unsigned n, int heap);
+extern "C" void fn_800D4208(Unk800C7B40_Widget* w, const char* s);
+extern "C" void fn_800D3F0C(Unk800D3F0C_Obj* o, int id);
+
+/* near-miss (2 slots): retail inserts b68_2 (rlwimi) before clearing b68_3 (rlwinm); ours emits the clear first, and every statement order with b2 before b3 loses more elsewhere */
+extern "C" Unk800D388C_Raw* fn_800D388C(Unk800D388C_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                        int s2, int s3, int s4, int s5, Unk800D388C_Q* q, int s7, int s8, int s9, int s10, int s11,
+                                        int s12)
+{
+    fn_800C7B40((Unk800D1614_Raw*)self, p1, 4, p2, p3, p4, p5, p6, p7, s0, s11, s12, 0, 1.0f);
+    self->m44 = -1;
+    self->m3C = lbl_8065BC68;
+    self->m48 = s3;
+    self->m40 = 0;
+    self->m4C = *q;
+    self->m5C = s1;
+    self->b68_0 = s7;
+    self->b68_1 = s8;
+    self->m60 = s2;
+    self->b68_3 = 0;
+    self->b68_2 = s10;
+    self->m64 = s5;
+    self->m6C = 15;
+    self->m70 &= 0x1FFFFFFF;
+    self->m74 = s9;
+    self->m80 = 0;
+    self->m84 = 0;
+    self->m88 = 0;
+    if (self->b68_0) {
+        if (lbl_8061A32C == 0)
+            lbl_8061A32C = fn_800B64BC((Unk800B64BC_Mgr*)operator new(0xD8, 0));
+        self->m40 = (int)fn_803774A8(0x31E, *(int*)((char*)lbl_8061A32C + 0x38) | 0x100);
+        self->m80 = 0x18F;
+        self->m78 = -2;
+        self->m88 = 0;
+        fn_800D4208((Unk800C7B40_Widget*)self, &lbl_805B6F58);
+    } else {
+        fn_800D3F0C((Unk800D3F0C_Obj*)self, s4);
+    }
+    return self;
+}
+
 extern "C" void fn_800D3A38(Unk800D3A38_Raw* o, int c)
 {
     o->m3C = lbl_8065BC68;
@@ -597,14 +669,12 @@ struct Unk800D4B9C_Obj : Unk800C7B40_Data {
     Unk800D4B9C_Q mCC;
 };
 extern const char lbl_8065A4A8[];
-extern "C" void fn_800D388C(Unk800D4B9C_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1, int s2,
-                            int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12);
 
 extern "C" Unk800D4B9C_Obj* fn_800D4B9C(Unk800D4B9C_Obj* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
                                         int s2, int s3, int s4, int s5, int s6, int s7, Unk800D4B9C_Q* q0, Unk800D4B9C_Q* q2,
                                         Unk800D4B9C_Q* q1, Unk800D4B9C_Q* q3, Unk800D4B9C_Q* q4, int s13, int s14, int s15, int s16)
 {
-    fn_800D388C(self, p1, p2, p3, p4, p5, p6, p7, s0, s1, s2, s3, s4, s5, (int)q0, s13, s6, s7, s14, s15, s16);
+    fn_800D388C((Unk800D388C_Raw*)self, p1, p2, p3, p4, p5, p6, p7, s0, s1, s2, s3, s4, s5, (Unk800D388C_Q*)q0, s13, s6, s7, s14, s15, s16);
     self->m3C = lbl_8065A4A8;
     self->m8C = *q0;
     self->m9C = *q1;
