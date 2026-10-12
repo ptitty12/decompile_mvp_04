@@ -211,7 +211,7 @@ inline T* EvAs(Unk8006902C_EvBase* ev, int kind)
     }
     return r;
 }
-extern "C" void fn_8006DD60(Unk80069F0C* self);
+void fn_8006DD60();
 extern "C" void fn_8006DAD0(Unk80069F0C* self, Unk8006902C_EvBase* e);
 extern "C" void fn_8006C218(Unk80069F0C* self, Unk8006902C_EvBase* e);
 extern "C" void fn_8006D508__11Unk80069F0C(Unk80069F0C* self, Unk8006902C_EvBase* e);
@@ -245,7 +245,7 @@ void Unk80069F0C::fn_8006A2C4(int kind, Unk8006902C_EvBase* ev)
         fn_8006DDF4();
         break;
     case 66:
-        fn_8006DD60(this);
+        fn_8006DD60();
         break;
     case 58:
     {
