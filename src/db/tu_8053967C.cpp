@@ -704,4 +704,20 @@ DB_OVERLAY void fn_8053CC1C(X* x)
     x->m14.mC = 0;
 }
 
+static inline int IdxOf(Db8053967C_Bytes* p, int v)
+{
+    for (unsigned i = 0; i < p->m4; i++) {
+        if (p->m0[i] == v)
+            return i;
+    }
+    return -1;
+}
+DB_OVERLAY int fn_8053CC28(X* x, int id)
+{
+    unsigned char idx = fn_8053B210((R*)x, id);
+    if (idx != 0xFF)
+        return IdxOf(&x->m14, idx);
+    return -1;
+}
+
 }
