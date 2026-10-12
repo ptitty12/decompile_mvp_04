@@ -302,7 +302,6 @@ int fn_8021446C(Task* t, int k)
     return 0;
 }
 
-/* near-miss: 5 slots: a/b swap r29/r30 (retail keeps a in r30, b in r29) */
 void fn_8021458C(Task* t, int a, int b)
 {
     if (fn_802142C8(t, a) == 1 && fn_801F0E78(t) == -1) {
@@ -339,6 +338,51 @@ void fn_80214C68(Task* t, int a, int b)
     Vec3f v = { 84.0f, 0.0f, 2388.0f };
     fn_80212550(t, &v, -1.0f, -1.0f, a, b);
     fn_80214F1C(t, 1, 2, -1.0f);
+}
+
+struct Own4C {
+    char pad0[0x4C];
+    unsigned int m4C;
+};
+extern const float lbl_805D5DDC;
+extern const float lbl_805D5DE8;
+
+/* near-miss: 26 slots: body, frame and store order match; register numbering is shifted by one (retail keeps the constant 1
+   in r4 and the record pointer in r5) and the 2^52 conversion literal is loaded after lbl_805D5DE8 instead of before it */
+void fn_80214CE8(Task* t, int sel, Vec3f* pos, int a, int b, float f)
+{
+    if (!(f <= lbl_805D5DDC)) {
+        RecQueue* q = t->m9C->m3A60;
+        int n = q->count;
+        if (n > 5) {
+            for (int i = 0; i < n; i++) {
+            }
+            for (int i = 0; i < n; i++) {
+            }
+            q->count = 0;
+        }
+        fn_80204CCC(&q->e[q->count]);
+        Rec* e = &q->e[q->count];
+        q->count++;
+        e->m4 = 3;
+        e->m0 = 1;
+        e->mC = b;
+        e->m8 = a;
+        e->m80 = (float)((Own4C*)t->m9C->m0)->m4C * lbl_805D5DE8 + f;
+        TaskInner* in = t->m9C;
+        PosObj* pl = (PosObj*)in->m8[in->m3A5C];
+        if (sel == 1) {
+            Vec3f d = ((PosObj*)in->m4)->m60 - pl->m60;
+            e->m50 = d;
+            e->m50.y = lbl_805D5DDC;
+            e->m94 = 1;
+        } else if (pos != 0) {
+            Vec3f d = *pos - pl->m60;
+            e->m50 = d;
+            e->m50.y = lbl_805D5DDC;
+            e->m94 = 1;
+        }
+    }
 }
 
 extern const float lbl_805D5E00;
