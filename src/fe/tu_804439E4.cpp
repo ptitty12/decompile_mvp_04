@@ -4,6 +4,22 @@
  */
 #include "game/tu_8043FDC0.h"
 
+
+extern int lbl_80621638;
+extern "C" {
+int fn_80446430(FeScr2* self, int i);
+int fn_80446534(void);
+}
+
+
+struct FeDate3 {
+    unsigned char a;
+    unsigned char b;
+    unsigned short c;
+};
+extern const char lbl_805F4F28[];
+extern "C" int fn_8044643C(FeScr2* self, int a, int b);
+
 extern "C" FE_OVERLAY void fn_80444090(void* self, int a)
 {
     fn_80330BC8(self, a);
@@ -176,6 +192,30 @@ extern "C" FE_OVERLAY void fn_80445B74(FeScr2* self)
     fn_80445BB4(self, fn_800A2AE8(lbl_80619948));
 }
 
+extern "C" FE_OVERLAY void fn_80445BB4(FeScr2* self, int a)
+{
+    FeDate3 d;
+    fn_80329FA0(&d, a);
+    int r = fn_8044643C(self, d.a - 1, d.b);
+    FeWidgetS* month = (FeWidgetS*)fn_800C8058(self->m134->v32(lbl_805F4F28, 1));
+    FeSub* s = &month->mDC;
+    if (r < s->s13()) {
+        ((FeObj1*)self->m134)->v37(r);
+        self->m144 = d.a - 1;
+        int t = fn_804464B0(self, d.a);
+        int v;
+        if (t > 0 && t <= d.b)
+            v = d.b - t;
+        else {
+            int w = fn_8032A130(d.a - 1, 1, d.c) - 1;
+            v = d.b + w;
+        }
+        ((FeObj2*)self->m138)->v67(fn_80445D5C((int)self, v), fn_80445D7C((int)self, v));
+        ((FeObj2*)self->m13C)->v67(fn_80445D5C((int)self, v), fn_80445D7C((int)self, v));
+        fn_80445DA8(self);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_80445D5C(int a, int idx)
 {
     return idx / 7;
@@ -253,6 +293,62 @@ extern "C" FE_OVERLAY int fn_80446534(void)
     if ((fn_8044477C() != 0 && lbl_80621638 == 0) || lbl_80621638 == 1)
         return 1;
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_80446588(FeScr2* self)
+{
+    if (self->m24 & 0x40000000) {
+        int r = 0;
+        FeWidgetS* month = (FeWidgetS*)fn_800C8058(self->m134->v32(lbl_805F4F28, 1));
+        FeSub* ms = (FeSub*)&month->mDC;
+        int a = ms->s5();
+        int g = lbl_8061930C->fn_80078A38(self->m14C);
+        int b = fn_80446430(self, a);
+        int c = fn_8057CE00(g);
+        if (b != self->m144) {
+            self->m144 = b;
+            r = 1;
+        }
+        if (r != 0) {
+            fn_80445DA8(self);
+        } else if (((int (*)(FeScr2*))fn_80446534)(self) != 0) {
+            lbl_80621638 = r;
+            if (c == -1) {
+                if (fn_8007FB2C((Unk8007F198_C*)lbl_8061930C, g) > self->m154) {
+                    fn_800B555C()->m4 = 1;
+                    ((FeObj*)self)->v87();
+                    ((FeObj*)self)->v84();
+                } else {
+                    int i = 0;
+                    do {
+                        int j = 0;
+                        do {
+                            fn_80445090((FeTimer*)((FeObjP2*)self)->v90(i, j));
+                            j++;
+                        } while (j <= 6);
+                        i++;
+                    } while (i <= 4);
+                    ((FeObj*)self)->v85();
+                }
+            } else if (self->m160 < 0) {
+                self->m160 = r;
+                fn_800B555C()->m4 = 1;
+                ((FeObj*)self)->v78();
+            } else {
+                fn_800B555C()->m4 = r;
+                FeDate3 d;
+                int k = fn_8007FB2C((Unk8007F198_C*)lbl_8061930C, g) - 1;
+                fn_80329FA0(&d, fn_8007FBC0((Unk8007F198_C*)lbl_8061930C, k, g));
+                FeWidgetS* m2 = (FeWidgetS*)fn_800C8058(self->m134->v32(lbl_805F4F28, 1));
+                FeSub* ms2 = (FeSub*)&m2->mDC;
+                int q = ms2->s13();
+                if (d.a - 1 > fn_80446430(self, q - 1))
+                    ((FeObj*)self)->v87();
+                fn_80445DA8(self);
+            }
+        }
+        fn_804469DC(self, 0);
+    }
 }
 
 /* near-miss: retail evaluates self->m144 before the MONTH lookup call (4 slots) */
