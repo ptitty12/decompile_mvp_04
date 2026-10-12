@@ -85,7 +85,9 @@ struct Unk80044C10_C {
 struct Unk80044C10_F;
 
 struct Unk80044C10_B {
-    char pad0[0x6F8];
+    char pad0[0x6CC];
+    void* m6CC;
+    char pad6D0[0x28];
     Unk80044C10_C* m6F8;
     char pad6FC[0x4];
     Unk80044C10_F* m700;
@@ -164,7 +166,9 @@ public:
     int m3FC;
     char pad400[0xC];
     int m40C;
-    char pad410[0x18];
+    char pad410[0x8];
+    int m418;
+    char pad41C[0xC];
     float m428;
     char pad42C[0x4];
     float m430;
