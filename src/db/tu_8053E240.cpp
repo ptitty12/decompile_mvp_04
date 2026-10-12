@@ -371,6 +371,22 @@ DB_OVERLAY void fn_80540BBC(int a, Db8053E240_Ent12* e, int n)
     }
 }
 
+DB_OVERLAY int fn_80540E60(int id)
+{
+    Db8053CC9C_Date d;
+    int f = lbl_80619948->m84;
+    d.m0 = 0;
+    d.m2 = 0;
+    d.m1 = 1;
+    d.m0 = 3;
+    int out;
+    fn_80329FA0(&out, f);
+    int t = out;
+    d.m2 = t;
+    int h = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(1, id);
+    return fn_8033E888(h, fn_80329E74(d)) <= 0x1D;
+}
+
 DB_OVERLAY void fn_80541C04(Db8053E240_EntF* arr, int n, int id, int v, float key)
 {
     int i = 0;
