@@ -167,25 +167,18 @@ extern "C" void fn_8002A2C4(Unk80023AC4_Obj* x, float f)
 {
 }
 
-/* near-miss: 62/66 insns. Retail reloads tbl->m14 before each byte-sum loop (lwz r7/r9,0x14(r8))
- * and hoists `addi r6,r9,0xe64` for the second row; here the second row's base folds into the
- * loop (addi r9,r10,4120) and the two loads merge. Tried row-pointer locals, an inline row-sum
- * helper and casts (same shape as fn_8001F788 in tu_8001F64C.cpp). */
+/* Row sums: the table pointer is re-read through x->mC8 each time (a local pointer variable makes the
+ * compiler share the m14 load across the two loops; retail reloads it). */
 extern "C" int fn_8002A2D4(Unk80023AC4_Obj* x)
 {
-    Unk8001F5CC_Tbl* t = x->mC8;
-    unsigned a = 0;
-    for (int i = 0; i < 0x80; i++)
-        a += t->m14->e[0].m1B4[(unsigned char)i];
-    unsigned b = 0;
-    for (int j = 0; j < 0x80; j++)
-        b += t->m14->e[1].m1B4[(unsigned char)j];
+    unsigned a = Unk8001F5CC_RowSum(&x->mC8->m14->e[0]);
+    unsigned b = Unk8001F5CC_RowSum(&x->mC8->m14->e[1]);
     int r = 0;
     if (a >= b + 4)
         return 2;
     if (b >= a + 4)
         return 3;
-    if ((float)(t->m14->m1CC8 + 1) / (float)t->m10->m1C > lbl_805A6350)
+    if (!((float)(x->mC8->m14->m1CC8 + 1) / (float)x->mC8->m10->m1C <= lbl_805A6350))
         r = 1;
     return r;
 }
