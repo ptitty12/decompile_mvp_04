@@ -14,6 +14,14 @@ inline void SetSub98(Wid* w, int v)
 }
 
 extern const char lbl_805BFB7C[];
+extern const char lbl_805BFB84[];
+extern const char lbl_805BFB88[];
+extern const char lbl_805BFB8C[];
+extern const char lbl_805BFB90[];
+extern const char lbl_805BFBA4[];
+extern const char lbl_805BFBB0[];
+extern const char lbl_805BFBBC[];
+extern const char lbl_805BFBC8[];
 extern const char lbl_805BFCDC[];
 extern const float lbl_805BFCE4;
 extern const float lbl_805BFCE8;
@@ -610,9 +618,8 @@ void fn_80118A70(Unk80117D20_Scr* self)
 void fn_80118B2C(Scr* self)
 {
     UnkGame* g = fn_8011AA24(0);
-    /* addresses of the strings at 0x805BFB84.. and 0x805BFBA4.., as literals (check_literals does not follow a pointer table's relocations) */
-    int tbl1[4] = { 0x805BFB84, 0x805BFB88, 0x805BFB8C, 0x805BFB90 };
-    int tbl2[4] = { 0x805BFBA4, 0x805BFBB0, 0x805BFBBC, 0x805BFBC8 };
+    const char* tbl1[4] = { lbl_805BFB84, lbl_805BFB88, lbl_805BFB8C, lbl_805BFB90 };
+    const char* tbl2[4] = { lbl_805BFBA4, lbl_805BFBB0, lbl_805BFBBC, lbl_805BFBC8 };
     int k = 0;
     for (unsigned i = 9; (int)i <= 12; i++, k++) {
         int v;
@@ -623,8 +630,8 @@ void fn_80118B2C(Scr* self)
         } else
             v = 0;
         Wid* c = fn_800C8044(self->fn_vslot32(lbl_805BEFE4, 1));
-        Wid* b = fn_800C8034(c->fn_vslot32((const char*)tbl1[k], 1));
-        Wid* d = fn_800C8044(c->fn_vslot32((const char*)tbl2[k], 1));
+        Wid* b = fn_800C8034(c->fn_vslot32(tbl1[k], 1));
+        Wid* d = fn_800C8044(c->fn_vslot32(tbl2[k], 1));
         if (v != 0) {
             d->fn_vslot8(1);
             b->fn_vslot15(1);
