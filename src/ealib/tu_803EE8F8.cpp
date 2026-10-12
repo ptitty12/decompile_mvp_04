@@ -32,6 +32,30 @@ struct RcSys {
 };
 
 extern RcSys lbl_806AB4C8;
+extern "C" void fn_803F13A0();
+extern "C" void fn_803F149C();
+extern "C" void fn_803F1568();
+extern "C" void fn_803F16A0();
+extern "C" void fn_803F1760();
+extern "C" void fn_803F1874();
+extern "C" void fn_803F1924();
+extern "C" void fn_803F1AAC();
+extern "C" void fn_803F1C34();
+extern "C" void fn_803F1D04();
+extern "C" void fn_803F1DB0();
+extern "C" void fn_803F1F08();
+extern "C" void fn_803F2000();
+extern "C" void fn_803F24E8();
+extern "C" void fn_803F28A4();
+extern "C" void fn_803F2A70();
+extern "C" void fn_803F2CA8();
+extern "C" void fn_803F391C();
+extern "C" void fn_803F4448();
+extern "C" void fn_803F4B50();
+extern "C" void fn_803F4EE4();
+extern "C" void fn_803F564C();
+extern "C" void fn_803F5C90();
+extern RcSys* lbl_806EEA40;
 extern "C" void fn_803EFE60(RcSys*);
 
 inline void RcSysInit(RcSys* s)
@@ -102,6 +126,7 @@ struct RcIfA {
     virtual void v3();
     virtual void v4();
     virtual void v5(int);
+    virtual void v6(int);
 };
 
 struct RcIfC {
@@ -144,6 +169,105 @@ extern "C" void fn_803EEB08(const void** self, int c)
     fn_803F693C(self, 0);
     if (c & 1)
         fn_803F6FC4(self, 0x1c);
+}
+
+extern "C" int fn_803EEC20()
+{
+    if (lbl_806EEA3C == 0) {
+        do {
+            RcSys* t = lbl_806EEA40;
+            if (t == 0 && lbl_806AADAC[0] != 0) {
+                ((RcIfA*)lbl_806EEA38)->v3();
+                lbl_806AB4C8.m0 = (int)t;
+                lbl_806AB4C8.m4 = (int)t;
+                lbl_806AB4C8.m6C = (int)t;
+                lbl_806AB4C8.m70 = (int)t;
+                lbl_806AB4C8.m74 = (int)t;
+                lbl_806AB4C8.m78 = (int)t;
+                lbl_806AB4C8.m7C = (int)t;
+                lbl_806AB4C8.m80 = (int)t;
+                lbl_806AB4C8.m84 = (int)t;
+                lbl_806AB4C8.m88 = (int)t;
+                lbl_806EEA40 = t;
+                switch (((int*)lbl_806AADAC[0])[1]) {
+                    case 1:
+                        fn_803F24E8();
+                        break;
+                    case 2:
+                        fn_803F28A4();
+                        break;
+                    case 3:
+                        fn_803F2A70();
+                        break;
+                    case 5:
+                        fn_803F391C();
+                        break;
+                    case 4:
+                        fn_803F2CA8();
+                        break;
+                    case 6:
+                        fn_803F4448();
+                        break;
+                    case 7:
+                        fn_803F4B50();
+                        break;
+                    case 8:
+                        fn_803F4EE4();
+                        break;
+                    case 9:
+                        fn_803F564C();
+                        break;
+                    case 25:
+                        fn_803F5C90();
+                        break;
+                    case 10:
+                        fn_803F13A0();
+                        break;
+                    case 11:
+                        fn_803F149C();
+                        break;
+                    case 12:
+                        fn_803F1568();
+                        break;
+                    case 13:
+                        fn_803F16A0();
+                        break;
+                    case 16:
+                        fn_803F1760();
+                        break;
+                    case 17:
+                        fn_803F1874();
+                        break;
+                    case 20:
+                        fn_803F1924();
+                        break;
+                    case 21:
+                        fn_803F1AAC();
+                        break;
+                    case 19:
+                        fn_803F1C34();
+                        break;
+                    case 22:
+                        fn_803F1D04();
+                        break;
+                    case 18:
+                        fn_803F1DB0();
+                        break;
+                    case 23:
+                        fn_803F1F08();
+                        break;
+                    case 24:
+                        fn_803F2000();
+                        break;
+                }
+                if (lbl_806AB4C8.m0 != 0)
+                    lbl_806EEA40 = &lbl_806AB4C8;
+                ((RcIfA*)lbl_806EEA38)->v4();
+            }
+            lbl_806EEA34->v6(5);
+        } while (lbl_806EEA3C == 0);
+    }
+    return 0;
 }
 
 extern "C" void fn_803EEECC()
