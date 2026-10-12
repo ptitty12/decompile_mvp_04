@@ -306,6 +306,37 @@ extern "C" FE_OVERLAY void fn_80445DA8(FeScr2* self)
     fn_804469DC(self, 1);
 }
 
+extern "C" FE_OVERLAY int fn_80446334(FeScr2* self, int* arr, int n, int target, int* out1, int* out2, int g)
+{
+    FeDate3 d;
+    FeDate3 t;
+    FeDate3* pd = &d;
+    int i;
+    int r;
+    *out1 = -1;
+    *out2 = -1;
+    d.a = 0;
+    Unk8007F198_C* gm = (Unk8007F198_C*)lbl_8061930C;
+    pd->b = 0;
+    pd->c = 0;
+    for (i = 0; i < n; i++) {
+        fn_80329FA0(&t, fn_8007FBC0(gm, arr[i], g));
+        d = t;
+        if (target == pd->b) {
+            if (*out1 != -1) {
+                *out2 = arr[i];
+                fn_80444738(1);
+                break;
+            }
+            *out1 = arr[i];
+        }
+    }
+    r = 0;
+    if (*out1 != -1)
+        r = 1;
+    return r;
+}
+
 extern "C" FE_OVERLAY int fn_80446430(FeScr2* self, int i)
 {
     return self->m148 + i;
