@@ -269,7 +269,7 @@ extern "C" void fn_8038B8AC(void* self, int c)
 extern "C" void fn_8038B8DC(void* self, int c)
 {
     PUT(0x0, lbl_80684E18);
-    ((Unk80384F28*)((char*)self + 4))->~Unk80384F28();
+    ((Unk80384F28*)((char*)self + 4))->Unk80384F28::~Unk80384F28();
     PUT(0x0, lbl_806626C0);
     fn_8037B424(self, c);
 }

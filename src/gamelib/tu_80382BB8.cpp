@@ -6,6 +6,7 @@
  */
 #include "game/chooser.h"
 #include "game/tu_80317B88.h"
+#include "game/tu_80377048.h"
 
 struct Unk80382BB8 {
     char pad0[0x14];
@@ -83,62 +84,6 @@ extern unsigned lbl_806242B0;
 extern unsigned lbl_806242B4;
 extern unsigned lbl_806242B8;
 
-
-struct Zero3 {
-    int m0;
-    int m4;
-    int m8;
-    Zero3()
-    {
-        m0 = 0;
-        m4 = 0;
-        m8 = 0;
-    }
-};
-
-/* Result record of the lookups behind the chooser tables (type in the top nibble). */
-struct ResBig {
-    unsigned type : 4;
-    unsigned pad0 : 28;
-    int id;
-    char pad8[0x24 - 8];
-    Zero3 z24;
-    char pad30[0x60 - 0x30];
-    ResBig() : type(0) {}
-};
-
-struct Tgt38 {
-    char pad0[0x38];
-    int m38;
-};
-
-struct VCls2 {
-    virtual ~VCls2();
-    virtual void s2();
-    virtual void s3();
-    virtual void s4();
-    virtual void s5();
-    virtual void s6();
-    virtual void s7();
-    virtual void s8();
-    virtual void s9();
-    virtual void s10();
-    virtual Tgt38* s11();
-};
-
-struct VCls {
-    virtual ~VCls();
-    virtual void s2();
-    virtual void s3();
-    virtual void s4();
-    virtual void s5();
-    virtual void s6();
-    virtual void s7();
-    virtual void s8();
-    virtual void s9();
-    virtual void s10();
-    virtual void s11(ResBig* out, int b, int c, int d);
-};
 
 class Unk80383548 : public Unk8037B3E8 {
 public:
@@ -551,7 +496,7 @@ void fn_80362EAC(DtorAt0* s, int chrg);
 extern "C" void fn_80383D70(Unk80383D70* s, int chrg)
 {
     s->m0 = lbl_80684C50;
-    s->m4.~Unk80384F28();
+    s->m4.Unk80384F28::~Unk80384F28();
     fn_80362EAC((DtorAt0*)s, chrg);
 }
 

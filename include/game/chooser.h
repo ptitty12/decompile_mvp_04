@@ -304,15 +304,18 @@ float fn_8026D504(Unk80270BA0_X* x, int a);
 
 /* Container embedded in event/hand/pitch choosers at +8 (ctor 0x80384F28,
  * dtor 0x8038501C). Size 0x10. */
-class Unk80384F28 {
+struct SortArr;
+class Unk80384F28 : public Unk80356798 {
 public:
     Unk80384F28();
-    ~Unk80384F28();
+    virtual ~Unk80384F28();
     void fn_80385344(const char* name);
     int fn_803851A0(int a, int b);
     int* fn_803852FC(int a);
     int fn_803852E4();         /* returns m0C ? m0C->m4 : 0 (cHandChooser slot 15, 0x802AC9A4) */
-    char pad0[0x10];
+    int m4;                    /* default key (hash) */
+    int m8;                    /* default value */
+    SortArr* mC;               /* sorted array of {key, m4, m8} records (include/game/tu_80377048.h) */
 };
 
 extern const char lbl_805DC0E4[];   /* 0x14-byte string in another unit's .rodata */
