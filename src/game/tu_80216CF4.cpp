@@ -247,6 +247,63 @@ void fn_802198AC(Task* t, Player* x)
 /* near-miss: 61/61 insns, 4 slots: retail keeps the running element pointer in r3 (recomputed as cur + 1 after the call)
    and copies it into the callee-saved cur each iteration; ours increments the saved register in place. Tried NextRec(),
    for/while forms. The two flag tests are separate nested ifs (a combined mask is merged into 0x6000). */
+struct Unk802199E0_O {
+    char pad0[0x414];
+    float m414;
+};
+struct Unk802199E0_Ow {
+    char pad0[0x6CC];
+    Unk802199E0_O* m6CC;
+};
+struct Unk802199E0_G {
+    Unk802199E0_Ow* m0;
+    char pad4[0x48 - 4];
+    int m48;
+};
+int fn_801E816C(Obj3A64* o, int i);
+int fn_801E82CC(Obj3A64* o, int i);
+int fn_801F0E78(Task* t);
+int fn_801F0E84(Task* t);
+void fn_801F0EA8(Task* t, int a);
+int fn_801F41A4(Task* t);
+int fn_80204F04(Rec* r);
+int fn_80219B8C(Task* t, int k);
+
+/* near-miss (5 slots): scan pointer register split (r3/r31) and the order of the argument move vs. the saved-index load */
+int fn_802199E0(Task* t, int a)
+{
+    int sel = -1;
+    Obj3A64* o = t->m9C->m3A64;
+    if (o->m798 > 0)
+        sel = fn_801E816C(o, 0);
+    else if (o->m794 > 0)
+        sel = fn_801E82CC(o, 0);
+    if (sel == a || ((Unk802199E0_G*)t->m9C)->m0->m6CC->m414 <= 0.0f || ((Unk802199E0_G*)t->m9C)->m48 != 0 || a == 0 || a == 2)
+        return 0;
+    int saved = t->m9C->m3A5C;
+    int i = 0;
+    fn_801F0EA8(t, a);
+    RecQueue* qb = t->m9C->mCA8;
+    RecQueue* q = &qb[a];
+    Rec* e = &q->e[0];
+    while (i < q->count) {
+        if (fn_80204F8C(e) != 1)
+            break;
+        e++;
+        i++;
+    }
+    if (i < q->count && e != 0 && fn_80204F04(e) == 1)
+        return 0;
+    int k;
+    if (fn_801F0E78(t) == -1 && fn_801F0E84(t) == -1 && (fn_80205450(t->m9C, a), k = fn_801F41A4(t), k != -1) &&
+        (fn_802123D4(t, 0, 0), fn_80219B8C(t, k) != 0)) {
+        t->m9C->m3A5C = saved;
+        return 1;
+    }
+    t->m9C->m3A5C = saved;
+    return 0;
+}
+
 int fn_8021A194(Task* t, int a)
 {
     TaskInner* in = t->m9C;
