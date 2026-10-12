@@ -160,7 +160,9 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
 struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char pad9C[0x1C8];
     int m264;
-    char pad268[0x104];
+    char pad268[0xB8];
+    Vec3 m320;
+    char pad32C[0x40];
     Unk801B7FB0_P* m36C;
     char pad370[0x8];
     int m378;

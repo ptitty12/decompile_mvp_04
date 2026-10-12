@@ -14,6 +14,11 @@ P* fn_801A4B34(P* ctx);
 float fn_8024F20C(void* a, int b, P* c, int d, int e);
 float fn_8024F048(void* a, int b, P* c, int d, int e);
 float fn_80235DA8(void* p);
+int fn_80235E28(void* p);
+float fn_80235DD0(void* p, int a, int b);
+P* fn_801C1638(P* c, int i);
+float fn_804028E4(float x);
+Vec3* fn_801C34D0(Vec3* out, Z* z);
 float fn_801CD068(Z* z);
 float fn_801A0AA8(P* p, float f1, float f2);
 int fn_80380964(Unk801B7FB0_Link* l);
@@ -85,6 +90,17 @@ extern "C" float fn_801CBFC8(Z* z)
     float v = fn_80235DA8(z->m4->m3B0);
     v = !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
     return v;
+}
+
+extern "C" float fn_801CC028(Z* z)
+{
+    int h = fn_80235E28(z->m4->m3B0);
+    P* p = fn_801C1638(z->m204, 0);
+    if (!p)
+        return 0.0f;
+    float t = fn_80235DD0(z->m4->m3B0, p->m708, h);
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    return t;
 }
 
 extern "C" void fn_801CC894(Z* z)
@@ -264,4 +280,21 @@ extern "C" int fn_801CEADC(Z* z)
     if (f > 1.0f)
         return 2;
     return 1;
+}
+
+inline Vec3 Pos320(P* p) { return p->m320; }
+
+extern "C" float fn_801CEB34(Z* z)
+{
+    float r = 0.0f;
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        float a;
+        Vec3 v = Pos320(p);
+        a = fn_804028E4(v.x * v.x + v.z * v.z);
+        fn_801C34D0(&v, z);
+        float b = fn_804028E4(v.x * v.x + v.z * v.z);
+        r = b - a;
+    }
+    return r;
 }
