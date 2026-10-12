@@ -218,6 +218,37 @@ extern "C" int fn_80401644(const unsigned char* p, int* outLen)
 
 extern "C" int fn_80401710(const unsigned char* p, int a);
 
+extern "C" int fn_80401924(unsigned char* dst, const unsigned char* src, int* outLen);
+
+extern "C" int fn_80401710(const unsigned char* p, int a)
+{
+    int r = 0;
+    if (p[1] == 0xFB) {
+        switch (p[0] & 0xFE) {
+        case 0x10:
+        case 0x90:
+            r = fn_80401924((unsigned char*)a, p, 0);
+            break;
+        case 0x18:
+        case 0x1A:
+        case 0x1C:
+        case 0x30:
+        case 0x32:
+        case 0x34:
+        case 0x46:
+        case 0x98:
+        case 0x9A:
+        case 0x9E:
+        case 0xB0:
+        case 0xB2:
+        case 0xB4:
+        case 0xC6:
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" int fn_804017B0(const unsigned char* p, int a)
 {
     return fn_80401710(p, a);
@@ -268,6 +299,12 @@ extern "C" int fn_80401BBC(int a, int b)
 {
     return (int)(((long long)a * b + 0x8000) >> 16);
 }
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
 
 extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
 {
