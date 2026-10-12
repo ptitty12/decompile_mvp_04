@@ -303,7 +303,6 @@ int fn_800D641C(Unk800D4D0C_D* t, int x)
     return -1;
 }
 
-/* near-miss: 1 slot; retail schedules `mr r3,r30` after the other argument moves (tried free-function and method-call forms) */
 UiScrRaw2* fn_800D649C(UiScrRaw2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k)
 {
     self->fn_800D0D9C(a, 7, b, c, d, e, f, g, h, i, j, k);
@@ -311,22 +310,21 @@ UiScrRaw2* fn_800D649C(UiScrRaw2* self, int a, int b, int c, int d, int e, int f
     return self;
 }
 
-/* near-miss: register allocation differs (this in r30 instead of r31, vptr of a loaded early) */
 void fn_800D6528(Unk800D4D0C_D* t)
 {
     Unk800D4D0C_A* a = t->vslot31();
     Unk800D4D0C_A* b = t->vslot29();
     if (b != 0 && a != 0) {
-        short s2C = b->m2C;
         short s28 = b->m28;
+        short s2C = b->m2C;
         short a2C = a->m2C;
         float f;
         if (t->vslot32() == 1) {
-            f = lbl_805BCA0C;
+            f = 0.0f;
         } else {
             f = (float)(s2C - a2C) / (float)(t->vslot32() - 1);
         }
-        int v = (int)((float)t->vslot34() * f + (float)s28);
+        int v = (int)((float)s28 + (float)t->vslot34() * f);
         a->vslot10(v);
     }
 }

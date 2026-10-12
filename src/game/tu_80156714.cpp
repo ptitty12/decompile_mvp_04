@@ -45,21 +45,17 @@ extern const char* lbl_8061BD80;
 
 Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
 
+extern int lbl_8061D460;
+extern "C" int fn_80163748(Unk80159F28* self);
+extern "C" int fn_80163390(Unk80159F28* self);
+extern "C" int fn_80162FE4(Unk80159F28* self);
+extern "C" int fn_80162C28(Unk80159F28* self);
+extern "C" int fn_80161FBC(Unk80159F28* self);
+extern "C" void fn_801599DC(Unk80159F28* self);
+
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
-}
-
-void cWait::fn_vslot2() /* 80156714 */
-{
-    fn_8037B6B0(lbl_805C8468, &m4, lbl_8061BE0C);
-    fn_8037B458(lbl_805C8988, &mC, 0, lbl_805C6240);
-    fn_8037B50C(lbl_805C89A8, &m8, lbl_805C89B4, 0);
-    fn_8037B584(lbl_805C7994, 0, 0, lbl_805C89C0);
-}
-
-int cWait::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801567B4 */
-{
 }
 
 int cWait::fn_801567CC(Unk80156838_Entry* e) /* 801567CC */
@@ -126,6 +122,64 @@ void cWaitForAnimation::fn_vslot2() /* 80156D00 */
 {
 }
 
+void Unk80159F28::fn_80157410() /* 80157410 */
+{
+    m34 = 2;
+    m40 = 5;
+    m10 = 0;
+    m4C = -1;
+    m14 = 0;
+    m18 = 0;
+    m1C = 0;
+    m44 = -1;
+    m20 = 0;
+    m24 = 0;
+    m28 = 0;
+    m2C = 0;
+    m30 = 0;
+    m38 = 0;
+    m3C = 0;
+    m32C = 0;
+    m330 = lbl_805C8C1C;
+    m334 = lbl_805C8C1C;
+    m338 = lbl_805C8C1C;
+    m48 = 0;
+    fn_80161A34();
+    for (int i = 0; i <= 6; i++) {
+        for (unsigned char j = 0; j <= 24; j++) {
+            *fn_80161A5C(i, j) = 0;
+        }
+    }
+}
+
+int fn_80157708(void* self, int v) /* 80157708 */
+{
+    if ((unsigned int)(v - 0x18) <= 1 || v == 0xA || v == 0x27) {
+        return 0;
+    }
+    return 1;
+}
+
+void Unk80159F28::fn_801593D8() /* 801593D8 */
+{
+    fn_8015A1D4();
+}
+
+extern "C" void fn_801593F8(Unk80159F28* self)
+{
+    if (lbl_8061D460 == 0) {
+        int a = fn_80163748(self);
+        int b = fn_80163390(self);
+        int c = fn_80162FE4(self);
+        int d = self->fn_801625FC();
+        int e = fn_80162C28(self);
+        int f = fn_80161FBC(self);
+        if (e == 0 && f == 0 && b == 0 && a == 0 && c == 0 && d == 0) {
+            fn_801599DC(self);
+        }
+    }
+}
+
 int cWaitForAnimation::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80156D04 */
 {
     Unk8016C788_Obj* o = fn_8016C788(ctx, a);
@@ -170,17 +224,6 @@ Unk8037B3E8* cHomerunCelebration::fn_vslot5() /* 80156E38 */
 cScriptParticleEffect::cScriptParticleEffect() : Unk80359B48(0x1A5105BEu) /* 80156E68 */
 {
     m4 = 1;
-}
-
-void cScriptParticleEffect::fn_vslot2() /* 80156EB4 */
-{
-    fn_8037B7E8(lbl_805C8A6C);
-    fn_8037B674(lbl_805C8A80, &m4, lbl_805C8A94, 0);
-    fn_8037B830(lbl_805C8A6C);
-}
-
-int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
-{
 }
 
 int cScriptParticleEffect::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80156F18 */
@@ -292,45 +335,25 @@ Unk8037B3E8* cSetDepthOfField::fn_vslot5() /* 801572CC */
     return new (lbl_806EF9B4) cSetDepthOfField;
 }
 
-void Unk80159F28::fn_80157410() /* 80157410 */
+void cWait::fn_vslot2() /* 80156714 */
 {
-    m34 = 2;
-    m40 = 5;
-    m10 = 0;
-    m4C = -1;
-    m14 = 0;
-    m18 = 0;
-    m1C = 0;
-    m44 = -1;
-    m20 = 0;
-    m24 = 0;
-    m28 = 0;
-    m2C = 0;
-    m30 = 0;
-    m38 = 0;
-    m3C = 0;
-    m32C = 0;
-    m330 = lbl_805C8C1C;
-    m334 = lbl_805C8C1C;
-    m338 = lbl_805C8C1C;
-    m48 = 0;
-    fn_80161A34();
-    for (int i = 0; i <= 6; i++) {
-        for (unsigned char j = 0; j <= 24; j++) {
-            *fn_80161A5C(i, j) = 0;
-        }
-    }
+    fn_8037B6B0(lbl_805C8468, &m4, lbl_8061BE0C);
+    fn_8037B458(lbl_805C8988, &mC, 0, lbl_805C6240);
+    fn_8037B50C(lbl_805C89A8, &m8, lbl_805C89B4, 0);
+    fn_8037B584(lbl_805C7994, 0, 0, lbl_805C89C0);
 }
 
-int fn_80157708(void* self, int v) /* 80157708 */
+int cWait::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801567B4 */
 {
-    if ((unsigned int)(v - 0x18) <= 1 || v == 0xA || v == 0x27) {
-        return 0;
-    }
-    return 1;
 }
 
-void Unk80159F28::fn_801593D8() /* 801593D8 */
+void cScriptParticleEffect::fn_vslot2() /* 80156EB4 */
 {
-    fn_8015A1D4();
+    fn_8037B7E8(lbl_805C8A6C);
+    fn_8037B674(lbl_805C8A80, &m4, lbl_805C8A94, 0);
+    fn_8037B830(lbl_805C8A6C);
+}
+
+int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
+{
 }

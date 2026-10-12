@@ -92,7 +92,7 @@ int fn_800DC0F4(UnkTeamArr* t, int a, int b);
 void fn_800E0AD4(Unk800C7B40_Widget* w, int a, int b, int c, int d);
 void fn_8010F5E8(Scr* self, UnkTextBox* w, UnkPly* t);
 void fn_8010F7E0(Scr* self, UnkTextBox* w, UnkPly* t);
-void fn_80125180(Unk800C7B40_Widget* self, int a, int id);
+int fn_80125180(Unk800C7B40_Widget* self, int a, int id);
 UnkTextBox* fn_80110D90(Scr* self, int a);
 void fn_8011243C(Scr* self);
 void fn_80112D90(Scr* self);

@@ -604,7 +604,6 @@ extern "C" int fn_8013D534(Scr* x, int c)
     return (x->m3C0 >> 2) & 1;
 }
 
-/* near-miss: 54/54 insns, 10 slots: retail stores m1B4 and m1D8 right after the vptr, then the zero stores in field order, then m1D4 and the byte copy of lbl_805B6F58 at the end; all 24 orders of the four trailing stores tried */
 extern "C" Scr* fn_8013D590(Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -639,9 +638,9 @@ extern "C" Scr* fn_8013D590(Scr* self, int a, int b, int c, int d, int e, int f,
     self->m1AC = 0;
     self->m1B0 = 0;
     self->m1D4 = 5;
-    self->m1D8 = 5;
-    self->m144 = lbl_805B6F58[0];
     self->m1B4 = 0;
+    self->m1D8 = 5;
+    self->m144 = *(char*)lbl_805B6F58;
     return self;
 }
 

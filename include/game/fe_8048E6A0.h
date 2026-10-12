@@ -771,7 +771,7 @@ FeW* fn_800C8040(FeW* w);
 FeW* fn_800C8044(FeW* w);
 FeW* fn_800C8054(FeW* w);
 void fn_804031BC(char* dst, const char* src);
-void fn_800DE440(char* buf, int o, int a);
+int fn_800DE440(char* buf, int o, int a); /* tail-returns fn_800DE6A8 */
 int fn_80403DE4(char* dst, const char* fmt, ...);
 void fn_80492BA8(void* x, char* s);
 void fn_804A96A4(void* a, int b, int c, int d, int e, int f, int g, int h);

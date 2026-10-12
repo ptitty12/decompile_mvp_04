@@ -31,7 +31,6 @@ u8 fn_80425954(u32 errorCode) {
     return 29;
 }
 
-/* near-miss: byte-identical with the extra flag -inline noauto (or off); at the configured -inline auto the compiler inlines fn_80425954 here. */
 void fn_80425A70(u32 error) {
     u8 num;
     OSSramEx* sram;

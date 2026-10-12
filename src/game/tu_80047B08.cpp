@@ -150,6 +150,21 @@ void fn_800489B4(Unk8004763C* t, int idx, int v)
     fn_8005C654(o, *(void**)((char*)lbl_805B09F4 + 0xD4 + idx * 0xD8), v, 0);
 }
 
+void fn_80048B2C(Unk80048A10_Sub* s, int flags)
+{
+    s->mAE0 = lbl_80649AB0;
+    if (s->mA9C != 0) {
+        fn_800575E4(s->mA9C, 3);
+        s->mA9C = 0;
+    }
+    if (s->mADC != 0) {
+        delete s->mADC;
+        s->mADC = 0;
+    }
+    if (flags & 1)
+        fn_80377408(s);
+}
+
 void fn_80048BC0(Unk80048A10_Sub* s)
 {
     fn_80057778(s->mA9C);

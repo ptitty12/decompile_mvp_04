@@ -554,10 +554,22 @@ struct FxAIB {
 /* Two-level record walked by fn_80326DF0 / fn_80326E64 (ring of 16-byte entries). */
 struct FxRingH {
     int* m0;
-    char pad4[0x14];
+    int m4;
+    int m8;
+    unsigned mC;
+    int m10;
+    unsigned m14;
     int m18;
     int m1C;
     int m20;
+    int m24;
+};
+/* 16-byte entry of FxRingH::m0 (fn_80326610 / fn_803267C0). */
+struct FxRingE {
+    unsigned m0;
+    int m4;
+    float m8;
+    int mC;
 };
 struct FxRing {
     FxRingH* m0;
@@ -788,11 +800,11 @@ public:
     char pad0[0x10];
     virtual ~FxEmb();
     virtual void s2();
-    virtual void s3();
-    virtual void s4();
+    virtual int s3();
+    virtual int s4();
     virtual void s5();
     virtual void s6();
-    virtual void s7();
+    virtual int s7();
 };
 class FxStackObj {
 public:

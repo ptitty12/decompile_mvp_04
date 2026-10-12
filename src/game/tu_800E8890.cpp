@@ -54,7 +54,10 @@ void fn_800E8890(Ue8890* t, int idx, int a2, int a3)
     }
 }
 
-/* near-miss: 3 slots, lwzx base/index order of the quad table reads (retail: lwzx r25,r27,r30 and a precomputed &loc+4) */
+inline int At8A6C(void* b, int o)
+{
+    return *(int*)((char*)b + o);
+}
 void fn_800E8A6C(Ue8A6C* m)
 {
     int i = 0;
@@ -75,16 +78,15 @@ void fn_800E8A6C(Ue8A6C* m)
         fn_800E7E48(m, k);
     }
     UiQuad loc = lbl_805BE0E0;
-    char* q = (char*)&loc;
     int off = 0;
     int j = 2;
     do {
         i = 0;
-        int v = *(int*)(q + off);
+        int v = *(int*)(off + (int)&loc);
         while (i < m->mF4) {
             int k = m->mEC[i];
             i++;
-            fn_800E8890(m, k, *(int*)(q + 4 + off), v);
+            fn_800E8890(m, k, At8A6C((char*)&loc + 4, off), v);
         }
         off += 8;
         j--;

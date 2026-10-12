@@ -171,9 +171,7 @@ void fn_80359C08(void* self, int c)
         fn_80377408(self);
 }
 
-extern "C" /* near-miss: 1 slot. Retail's first memset (after the vptr store) has `crclr cr1eq`, the second does not: the
-   first is a compiler-generated clear (a polymorphic class: vptr store and member init), the second an
-   explicit call. A `m4()` member initialiser clears before the base ctor call instead. */
+extern "C"
 Unk80359C58* fn_80359C58()
 {
     if (lbl_8068B8A8 == 0) {
@@ -184,7 +182,6 @@ Unk80359C58* fn_80359C58()
     return &lbl_8068B884;
 }
 
-/* near-miss: same crclr slot as fn_80359C58 (inline ctor of Unk80359C58) */
 Unk80359C58* fn_80359CF8() { return new (0x100) Unk80359C58; }
 
 int fn_80359D78(int* self) { return ++self[8]; }
@@ -213,10 +210,17 @@ void fn_80359E30(char* self, int c)
         fn_80377408(self);
 }
 
-/* fn_80359E94: not matched. Lazy singleton of the 0x334-byte thread object (same crclr memset issue as fn_80359C58,
-   plus a dead lis/ori 0x19000); the original code stays linked */
+extern "C" Unk80359E94* fn_80359E94()
+{
+    if (lbl_8068BBE0 == 0) {
+        new (&lbl_8068B8AC) Unk80359E94;
+        lbl_8068BBE0 = 1;
+        fn_80409CF0(fn_801704C0);
+    }
+    return &lbl_8068B8AC;
+}
 
-/* fn_80359F30: not matched. Factory for the same object (see fn_80359E94); the original code stays linked */
+extern "C" Unk80359E94* fn_80359F30() { return new (0x100) Unk80359E94; }
 
 int fn_80359FB0(int* o)
 {

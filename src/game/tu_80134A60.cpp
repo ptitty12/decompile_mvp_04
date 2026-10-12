@@ -158,6 +158,16 @@ extern const char lbl_805BA744[];
 extern const char lbl_805BC9DC[];
 extern const char lbl_805BEC94[];
 static inline Unk8061A32C* FE();
+struct Unk800A3E6C;
+extern Unk800A3E6C* lbl_80619948;
+int fn_800E2BAC();
+void fn_800E2BCC();
+/* Polymorphic 8-byte object built by fn_80353218 (m0 = 0, vptr lbl_8064B718 at +4); same class as in tu_800A23F4.cpp. */
+struct Unk80353218 {
+    int m0;
+    Unk80353218();
+    virtual void vf0();
+};
 extern "C" {
 Unk8061A32C* fn_800B64BC(void* p);
 Scr* fn_800B7A94(Unk8061A32C* m, const char* name);
@@ -179,6 +189,7 @@ void fn_800ECE34(void* x);
 void fn_80138080(void* x);
 int fn_800ED2B0(void* x, int a);
 void fn_800CFB38();
+void fn_800A3DF8(Unk800A3E6C* o, int a, int b, int c, int d);
 }
 
 /* 0x1C-byte table entries: the base pointer goes through an inline parameter, which keeps
@@ -187,10 +198,12 @@ static inline int KeyAt(char* b, int off)
 {
     return *(int*)(b + off);
 }
+
 static inline void SetAt(char* b, int off, int v)
 {
     *(int*)(b + off) = v;
 }
+
 static inline Unk8061A32C* FE()
 {
     if (lbl_8061A32C == 0) {
@@ -198,6 +211,7 @@ static inline Unk8061A32C* FE()
     }
     return lbl_8061A32C;
 }
+
 extern const char lbl_8064C578[];
 extern const char lbl_80656758[];
 extern const char lbl_80656770[];
@@ -353,12 +367,10 @@ extern "C" void fn_80134D74(Unk80134D74* x)
     w->fn_vslot10(x->mE0C + (x->mE14 - h) / 2);
 }
 
-/* near-miss: 36/36 insns, 7 slots (the order of the zero stores m2C..m44; retail has m48, m4, m28, m44, m0, then m2C..m40) after all 120 orders of the five distinct stores */
 extern "C" Unk80134E38* fn_80134E38(Unk80134E38* s, int a)
 {
     s->m48 = lbl_80656A18;
     s->m0 = 0;
-    s->m44 = 0;
     s->m4 = 6;
     s->m28 = 0x11;
     s->m2C = 0;
@@ -367,6 +379,7 @@ extern "C" Unk80134E38* fn_80134E38(Unk80134E38* s, int a)
     s->m38 = 0;
     s->m3C = 0;
     s->m40 = 0;
+    s->m44 = 0;
     s->m0 = fn_80172120(operator new(0x124, 0x100));
     if (a == 0) {
         fn_802B9000();
@@ -387,11 +400,22 @@ extern "C" void fn_80134EC8(Unk80134E38* s, int chrg)
     }
 }
 
-/* near-miss: 21/20 insns: retail keeps no register for &v (addi r3,r1,8 and addi r8,r1,8 after the call, frame 0x18); here the 8-byte local lives in r29. Tried inline wrappers, int[2], struct return. */
 extern "C" void fn_80134F48(Unk80134F48* x)
 {
     Unk803567AC v;
     fn_80072E90(lbl_8061930C, x->m40, x->m44, x->m28, x->m2C, &v);
+}
+
+extern "C" void fn_80134F98(Unk80134F48* x)
+{
+    if (x->m28 & 0x3000000) {
+        fn_800E2BAC();
+        fn_800A3DF8(lbl_80619948, x->m40, x->m44, x->m28, x->m2C);
+        fn_800E2BCC();
+    } else {
+        Unk80353218 v;
+        fn_80072E90(lbl_8061930C, x->m40, x->m44, x->m28, x->m2C, (Unk803567AC*)&v);
+    }
 }
 
 extern "C" void fn_8013501C(Unk80134E38* s)

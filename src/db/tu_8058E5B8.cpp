@@ -36,7 +36,7 @@ extern "C" Db8058F924_P* fn_8058FAF4(Db8058F924_P* self, Db805937A4_Mgr* m, int 
 extern "C" Db80593CD0_P* fn_8058FDCC(Db80593CD0_P* self, Db805937A4_Mgr* m, int c, float f);
 extern int* lbl_80622DD0;
 extern const float lbl_80600ABC;
-extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
+extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, float f0, float f1, int b, int c); /* float position from the callers' schedule */
 extern const char lbl_80683908[];
 
 inline void DbLimit(Db8058F62C_V* o, int n)
@@ -313,7 +313,7 @@ extern "C" DB_OVERLAY void fn_8058F990(Db8058F924_L* self, int id, int v, int c,
         f0 *= lbl_80600ABC;
         f1 *= lbl_80600ABC;
         float t = lbl_80600ABC;
-        fn_80594250(self, self->m38, id, 1, c, f0, f1);
+        fn_80594250(self, self->m38, id, f0, f1, 1, c);
         self->m20[self->m38] = v;
         self->m38++;
     }
@@ -419,16 +419,15 @@ extern "C" DB_OVERLAY void fn_8058FD98(Db8058F924_L* self)
     self->m3C = -1;
 }
 
-/* near-miss (3 slots): retail loads f2 (fmr) before the li r6/r7 of the last call, as in the first four calls. */
 extern "C" DB_OVERLAY Db80593CD0_P* fn_8058FDCC(Db80593CD0_P* self, Db805937A4_Mgr* m, int c, float f)
 {
     fn_80593CD0(self, m, 0xC, 5, c, f);
     self->m1C = lbl_80683908;
-    fn_80594250(self, 0, 0x1612, 0x3E80, 1, 0.0f, 0.0f);
-    fn_80594250(self, 1, 0x1613, 0x5DC0, 1, 0.0f, 0.0f);
-    fn_80594250(self, 2, 0x1614, 0x7D0, 1, 0.0f, 0.0f);
-    fn_80594250(self, 3, 0x1615, 0x59D8, 1, 0.0f, 0.0f);
-    fn_80594250(self, 4, 0x1616, 0x32, 1, 0.0f, 0.0f);
+    fn_80594250(self, 0, 0x1612, 0.0f, 0.0f, 0x3E80, 1);
+    fn_80594250(self, 1, 0x1613, 0.0f, 0.0f, 0x5DC0, 1);
+    fn_80594250(self, 2, 0x1614, 0.0f, 0.0f, 0x7D0, 1);
+    fn_80594250(self, 3, 0x1615, 0.0f, 0.0f, 0x59D8, 1);
+    fn_80594250(self, 4, 0x1616, 0.0f, 0.0f, 0x32, 1);
     return self;
 }
 

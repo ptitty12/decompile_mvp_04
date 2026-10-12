@@ -321,14 +321,13 @@ void fn_8033D6C0(Spline* dst, Spline* src)
     }
 }
 
-/* near-miss: 1 slot differs (retail keeps n = m0 - 2 in r9 and copies it into
- * seg with `mr r3,r9`; mine folds n into r3). Tried: n/seg split, inline clamps. */
 int fn_8033D79C(Spline* s, float* tp)
 {
     int i = (int)*tp;
     int n = s->m0 - 2;
-    int seg = n;
-    if (!(i > n)) {
+    int seg;
+    if (i > n) seg = n;
+    else {
         seg = i;
         if (seg < 0)
             seg = 0;
@@ -340,8 +339,9 @@ int fn_8033D79C(Spline* s, float* tp)
 
 /* Finds the parameter u whose point lies `len` away from the point at t (Newton-style step
  * refinement with tolerance band [len^2*mB8, len^2*mB4]; mAC is the stored step).
- * near-miss (173/173 instructions, stack slots all match): retail keeps `s` in r30 and the
- * &A pointer in r31, mine has them swapped, which shifts most register operands. */
+ * near-miss (173/173 instructions, stack slots all match). A pointer local to A (`SplVec3* pa = &A;`, used for the second
+ * assignment) gives &A the extra reference that puts it above s in global-alloc (registers now match retail); what is left is
+ * the order of the A copy-out loads and the SubV temporaries (84 differing slots, 30 aligned). */
 extern "C" float fn_8033D860(Spline* s, int* out, float t, float len)
 {
     if (!(t >= 0.0f)) {
@@ -359,6 +359,7 @@ extern "C" float fn_8033D860(Spline* s, int* out, float t, float len)
     }
     SplVec3 B;
     SplVec3 A = fn_8033D3EC(s, t);
+    SplVec3* pa = &A;
     float d2;
     float step;
     float u;
@@ -374,7 +375,7 @@ extern "C" float fn_8033D860(Spline* s, int* out, float t, float len)
     else
         step = s->mAC;
     int iter = 1;
-    A = fn_8033D3EC(s, t);
+    *pa = fn_8033D3EC(s, t);
     u = t + step;
     int result;
     goto test;

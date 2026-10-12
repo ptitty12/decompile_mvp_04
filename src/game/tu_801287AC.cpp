@@ -92,7 +92,6 @@ void fn_801287AC(int a, int b, int c)
     }
 }
 
-/* near-miss: retail tests b <= 0x3C with bgt-first layout (li r3,6 after the branch); GCC hoists the li here. */
 int fn_801295DC(int a, int b, int c)
 {
     int r = 0;
@@ -101,10 +100,10 @@ int fn_801295DC(int a, int b, int c)
             r = 3;
         } else if (b <= 0x3C) {
             r = 6;
+        } else if (b <= 0x50) {
+            r = 9;
         } else {
             r = 0xC;
-            if (b <= 0x50)
-                r = 9;
         }
     }
     if (a <= 0x16)
@@ -117,18 +116,16 @@ int fn_801295DC(int a, int b, int c)
     return r;
 }
 
-/* near-miss: retail keeps the result in r3 with a shared epilogue (single exit); this form uses r11. */
 int fn_8012964C(int a, int c, float v)
 {
     int r = 0;
     if (!(v < lbl_805C068C)) {
-        if (!(v >= lbl_805C0690)) {
+        if (!(v >= lbl_805C0690))
             r = 3;
-        } else {
+        else if (!(v >= lbl_805C0694))
+            r = 6;
+        else
             r = 9;
-            if (!(v >= lbl_805C0694))
-                r = 6;
-        }
     }
     if (a <= 0x16)
         return c + 0xC;
@@ -140,23 +137,31 @@ int fn_8012964C(int a, int c, float v)
     return r;
 }
 
-/* near-miss: retail splits the switch into nested compares on b (80 insns vs 69). */
 int fn_801296DC(int a, int b, int c)
 {
+    int r = 0;
     switch (b) {
-    case 0:
+    case 0: {
+        int t = fn_8007AA84(a, b, c, 0) + fn_8007AA84(a, b, c, 1);
+        r = t / 2;
+        break;
+    }
     case 1: {
         int t = fn_8007AA84(a, b, c, 0) + fn_8007AA84(a, b, c, 1);
-        return t / 2;
+        r = t / 2;
+        break;
     }
     case 2:
-        return fn_8007A6A0(a, 0xD, c);
+        r = fn_8007A6A0(a, 0xD, c);
+        break;
     case 3:
-        return (int)((float)fn_8007A6A0(a, 0x10, c) * lbl_805C06A0);
+        r = (int)((float)fn_8007A6A0(a, 0x10, c) * lbl_805C06A0);
+        break;
     case 4:
-        return (int)((float)fn_8007A6A0(a, 0xE, c) * lbl_805C06A0);
+        r = (int)((float)fn_8007A6A0(a, 0xE, c) * lbl_805C06A0);
+        break;
     }
-    return 0;
+    return r;
 }
 
 void fn_8012981C(int a, int b, int* out)
@@ -195,31 +200,6 @@ Wid* fn_8012B960(Scr* self, int id, int* out)
     return 0;
 }
 
-int fn_8012BBF4(Scr* self, int id)
-{
-    int out;
-    int c;
-    if (self->m188 != 0 || self->m18C != 0)
-        c = 1;
-    else
-        c = 0;
-    if (c != 0) {
-        Wid* w = fn_8012B960(self, id, &out);
-        if (w != 0)
-            fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
-        return 1;
-    }
-    if (fn_8012E3F4(self) != 0) {
-        Wid* w;
-        if (self->m184 == 0)
-            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
-        else
-            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
-        fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
-    }
-    return 0;
-}
-
 int fn_8012B9EC(Scr* self, int id)
 {
     int out;
@@ -254,6 +234,31 @@ int fn_8012B9EC(Scr* self, int id)
         else
             w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
         fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(1);
+    }
+    return 0;
+}
+
+int fn_8012BBF4(Scr* self, int id)
+{
+    int out;
+    int c;
+    if (self->m188 != 0 || self->m18C != 0)
+        c = 1;
+    else
+        c = 0;
+    if (c != 0) {
+        Wid* w = fn_8012B960(self, id, &out);
+        if (w != 0)
+            fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
+        return 1;
+    }
+    if (fn_8012E3F4(self) != 0) {
+        Wid* w;
+        if (self->m184 == 0)
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0424, 1));
+        else
+            w = fn_800C8044(self->fn_vslot32(lbl_805C0438, 1));
+        fn_800C8034(w->fn_vslot32(lbl_805C088C, 1))->fn_vslot15(0);
     }
     return 0;
 }
@@ -398,6 +403,5 @@ int fn_8012C2BC(Scr* self, int id)
     }
     return 1;
 }
-
 
 }

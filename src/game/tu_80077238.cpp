@@ -634,7 +634,6 @@ int Unk8007A4DC_Screen::fn_8007A270(int a)
 }
 
 /* Retail treats the vcall thunk as returning nothing (sched2 argument-move order); the member declares int. */
-extern "C" void fn_8007A94C__18Unk8007A4DC_Screeniii(Unk8007A4DC_Screen* s, int a, int b, int c);
 void Unk8007A4DC_Screen::fn_8007A2B4(int flags)
 {
     unsigned i = 0;
@@ -644,12 +643,12 @@ void Unk8007A4DC_Screen::fn_8007A2B4(int flags)
         if ((i & 0x1F) == 0)
             fn_80400CE4(0);
         if (flags & 1) {
-            fn_8007A94C__18Unk8007A4DC_Screeniii(this, 0x1D, i, v);
-            fn_8007A94C__18Unk8007A4DC_Screeniii(this, 0x1C, i, 0);
+            fn_8007A94C(0x1D, i, v);
+            fn_8007A94C(0x1C, i, 0);
         }
         if (flags & 2) {
-            fn_8007A94C__18Unk8007A4DC_Screeniii(this, 0x1E, i, 0);
-            fn_8007A94C__18Unk8007A4DC_Screeniii(this, 0x1F, i, 0);
+            fn_8007A94C(0x1E, i, 0);
+            fn_8007A94C(0x1F, i, 0);
         }
     }
 }

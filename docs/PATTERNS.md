@@ -915,7 +915,8 @@ address both have a general recipe now. Scratch tools are in `scratchpad/W8o4/`.
     (`li r30,0` ... `mr r31,r30`). That gives the result a fourth reference and a
     global-alloc priority above col and self (r30, not r28).
   - CSE turns every source copy tried back into `li`: `i = r`, `r = i`,
-    `r = i = 0`, and the int/unsigned mixes.
+    `r = i = 0`, and the int/unsigned mixes. (Solved in Hard-case families 5:
+    `unsigned i = 0;` first, then `for (i = r; ...)`.)
 - The FeArr m4/mC store swap (fe fn_8047BB8C, fn_8048A2AC): not attempted (busy units).
 - fn_800B08B0 (`lwz r0,16(r3); li r3,0; cmpwi r0,0; blr`):
   `int r = 0; switch (p->m10) { case 0..3: r = 0; break; } return r;` gives the
@@ -1037,7 +1038,7 @@ Objects
 Still open (Opus queue)
 - `t == 1 || t == 2` kept as two compares in retail (fold_range_test):
   fn_80254964, fn_8025E5E0, fn_8025CDD8.
-- Loop test at the top with a back edge to it: fn_80255284, fn_80257DFC.
+- Loop test at the top with a back edge to it: fn_80255284 (solved: the call is written twice, Hard-case families 5), fn_80257DFC.
 - Dead `cmpwi` before a constant return: solved, see Hard-case families 4.
 
 ## Ranges 20-27 and second passes (2026-10-11, condensed)
@@ -1175,8 +1176,8 @@ Still open (Opus queue)
   - dead-compare switch family (db units, about 8): solved, Hard-case families 4;
   - (solved, Hard-case families 4) nonzero-frame-offset local kept in a callee-saved register instead of
     `addi r4,r1,8` per call;
-  - callee-saved permutation cluster (80533120, 80536F28, 80537054,
-    8053923C);
+  - callee-saved permutation cluster (80533120 solved in Hard-case families 5;
+    80536F28, 80537054, 8053923C still open);
   - sibling-arm vcall tail sharing (fn_804D0860).
 
 ## Ranges 33-46, tail 00-01 and pass-2 g16-g19 (2026-10-12, condensed)
@@ -1208,7 +1209,7 @@ Still open (Opus queue)
   - `while (n-- != 0)` gives `addi -1; cmpwi`.
   - `do {...} while (k-- != 0)` gives the post-decrement ctor loop.
   - `for (;;) { if (!c) break; ... }` keeps the reload that `while (c)` CSEs away.
-  - The `test at top, entry jump into the middle` shape is still open.
+  - The `test at top, entry jump into the middle` shape: a loop call written twice, see Hard-case families 5.
 - Data structures:
   - Member-array dtors in extern "C" units: element classes whose inline dtor forwards to the real element function, plus an owner `~Owner(){ vp = lbl; }` and `fn_X(Owner* p,int c){ p->~Owner(); if (c&1) delete; }`.
   - A class `operator delete` explains an `andi. r,1` then hook `blrl` tail.
@@ -1230,3 +1231,119 @@ Still open (Opus queue)
   - ealib/tu_803912F8 and tu_803927E4 take `cflags_ealib_nsr` (-G0 -fno-strength-reduce).
   - Wide strings in sda units are `extern unsigned short lbl[N]`.
   - SDK sources may `#define` a real name onto a placeholder that game code still calls (e.g. GXBegin -> fn_8042C8B0).
+
+## Hard-case families 5 (Opus, 2026-10-12)
+
+Matched 41 functions in 30 units. Three more are solved in scratch for units that turned busy
+(below). Scratch tools are in `scratchpad/W8o5/`.
+
+### Argument moves in the wrong order: callee return types (26 functions)
+- Tell: same instructions, and two or three argument moves before a `bl` are in a different
+  order (often `mr r3,..` / `addi r3,r1,N` first in ours and last in retail, or the reverse).
+- Mechanism (haifa sched_analyze, both sched passes):
+  - A value-returning call *sets* r3, so it becomes `reg_last_sets[r3]`.
+  - A void call only *clobbers* r3, so `reg_last_sets[r3]` stays on the earlier r3 argument
+    move. The next r3 write (the next call's `r3 = ..`, or the function's return value) then
+    gets an output dependence on that argument move.
+  - One more dependent wins the rank_for_schedule tie (priority, then class, then number of
+    dependents, then LUID). So the callee's declared return type moves the r3 argument move.
+  - The callee that decides is usually the call right after the reordered moves (its result
+    or clobber meets the next r3 write); sometimes it is the call before them.
+- Recipe: flip the callee's declared return type, either way:
+  - void to int/pointer: fn_800DE440, fn_800DE274, fn_800DE538 (tail calls of fn_800DE6A8,
+    which ends `mr r3,r24`), fn_80582CF8 (`li r3,1`), fn_8003D944, fn_803FED48, fn_80134A60,
+    fn_802542E8, fn_800DBC50, fn_80125180, fn_800DF254; ctors that return this:
+    fn_800CFEEC, fn_8028F45C.
+  - int/pointer to void: fn_80403DE4 (wide sprintf, three units), fn_8040321C, fn_803FFA60
+    (memcpy, r3 advanced), fn_80402EF8, fn_8007A94C and fn_8007B440 (forwarders to a
+    v40 virtual; the definitions in tu_8007A4DC are void now), the (int*, int, ...) overload
+    of fn_80329FA0.
+  - The epilogue is evidence only for the void-to-int direction. A void declaration of a
+    function that does return a value is still what some callers' schedules need; the
+    caller decides.
+  - fn_8058C020 and fn_8058E180 (new, same shape as fn_8058BF68) use the int fn_80582CF8.
+  - Where only one call site needs the other type, call through a cast:
+    `((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, p);` (fn_804ACA20).
+- Tool: `W8o5/rettoggle.py <repo> <unit> <fn>` preprocesses the unit, flips each callee's
+  declared return type in the `.i` (all declarations of that name) and scores the function.
+  `PAIRS=1` also tries every pair (fn_800E25E0 needed two flips). `W8o5/reorder_scan.py
+  <repo> [minpct]` lists unmatched functions whose only difference is a reorder, with the
+  calls around each cluster. All single flips over every free function at 90-99% were run;
+  everything they found is committed or listed below.
+
+### Float arguments: their position in the prototype (3 functions)
+- f-register arguments do not show where the float sits in the parameter list, but the
+  argument moves are emitted in prototype order and sched breaks ties by that order.
+- Tell: `lfs f1`/`fmr f2` lands after (or before) an integer argument move that retail
+  orders the other way.
+- Recipe: move the float parameters in the caller's declaration (extern "C" names do not
+  change) and reorder the call arguments. fn_80591AF4 / fn_805919E8 take
+  `(m, float v, x, i, k)` (fn_8059403C, fn_80593F30); fn_80594250 takes
+  `(self, i, a, f0, f1, b, c)` (fn_8058FDCC). The definitions were left alone.
+
+### Callee-saved permutations (family 2): four different causes
+- fn_80533120: retail copies the result's zero into the counter (`li r30,0` ... `mr r31,r30`).
+  CSE folds any `i = r` back to `li`, except when i already holds the same value: CSE leaves
+  a set that does not change the destination's value class alone. Recipe:
+  `int r = 0; unsigned i = 0; ... for (i = r; i <= 9; i++)`. Flow deletes the dead
+  `i = 0`, the copy survives, and r has a fourth reference, which lifts it above col and
+  self in global-alloc.
+- fn_8025F7F0: `int r = 0; if (p) {...} return r;` makes p live one insn shorter than
+  self, so p wins the priority tie (4 refs each). `if (p == 0) return 0; ...; return f(..) != 0;`
+  gives both 4 refs over 14 insns, and the lower pseudo (self) gets r31 as in retail.
+- fn_804E2014: the getter call was inside the loop (`fn_8005B87C(fn_8005ACE4(), i, ..)`).
+  Hoisting it into a local gives the same instructions, because branch targets are masked
+  in the diff, but a different allocation. Check where retail's back edge lands before
+  blaming the allocator.
+- fn_802AF624: the order of the prologue parameter copies. assign_parms emits them in order
+  and nothing reorders them. With the cursor as a local copy of the parameter
+  (`const char* s = str;`), combine merges the parameter copy into the local copy, so
+  `mr r31,r4` comes after the other parameter copies. Declare the local before
+  `int n = 0` so it stays ahead of the n store.
+- Still open: fn_80536F28, fn_80537054, fn_8053923C (db/tu_80535360, bubble sorts). The
+  &bufB address pseudo (4 refs over 13 insns, 0.615) outranks self (11 refs over 66, 0.5);
+  retail has self first. Statement and loop-form variants changed nothing.
+
+### Entry jump into the middle of a loop (family 3, 2 functions)
+- Retail's `b` lands inside the argument setup of the loop's call, after a pre-loop copy of
+  the first part. That is a call written twice in the source, once before the loop and once
+  at its end; jump2 cross-jumps the identical tails of the two copies.
+- A `while ((n = f(...)) != 0)` condition can't produce this: duplicate_loop_exit_test
+  refuses exit tests that contain a CALL_INSN, so the loop stays rotated.
+- Recipe: `P* n = f(list, p, 0); while (n != 0) { ...; p = n; n = f(list, p, 0); }`
+  (fn_80255284, fn_80254EA4). fn_80254EA4 also needed `int st = p->m44C->m700->m3BC;`
+  before the `a != 0 ||` test, so its loads come ahead of the branch.
+- Still open: fn_8056A908, fn_8056B658 (db/tu_8056A248) and fn_80555D88. Retail neither
+  strength-reduces i*28 nor hoists the table load, yet weights the loop's references like a
+  real loop. A goto loop stops the strength reduction but changes the allocation, and the
+  first KeyAt then cross-jumps with the loop's copy; that copy reuses the table pointer in
+  r11 in retail.
+
+### Smaller recipes
+- Mangled callee names give the true arity: fn_802C40BC is
+  `__FP11Unk802C3B60P16Unk802C2188_Pair`, so it takes two arguments. Passing the caller's
+  x as the second one fixed the prologue order of fn_802AE474 and fn_802AE4C0.
+- `if (r == 1) return 5; return r;` stores straight into the return register; jump's
+  "x = b; if (c) x = a" rewrite then hoists `li r3,5` above the branch, and r gets r0
+  (fn_805881E4, fn_805898A4). A `k` result variable lost r3 to r.
+- `int k = a == 4 ? -10000000 : a == 3 ? -5000000 : 0;` lays the a == 4 arm out last
+  (fn_8058E180).
+
+### Solved in scratch, units busy at commit time
+- game/tu_80101254 fn_80104798: declare both fn_80403DE4 overloads in tu_800F1AEC.h void
+  (tu_800F56B4, the other includer, stays 44/60).
+- game/tu_800D4D0C fn_800D649C: `UiScrRaw2* fn_800D0D9C(...)` in tu_800D4D0C.h (a ctor that
+  returns this).
+- game/tu_800E0164 fn_800E25E0: in tu_800E0164.h, `int fn_801254EC(...)` and
+  `void fn_8007CF44(...)`.
+- Patches: `W8o5/busy_*.patch`.
+
+### Still open (tried this round)
+- Member-vptr dtors fn_8052849C, fn_80528588, fn_80528648 (fe/tu_805283C4): retail's self
+  copy is r8 because some pseudo held r9 and later vanished. All six store orders, with and
+  without inline member-dtor helpers, give r9.
+- `mr.` vs `cmpwi r3,0` (fn_8052390C family, fe/tu_80520BE0): combine merges the copy of
+  the call result into the compare (`mr.`); retail compares r3 and returns it untouched on
+  the false path. Forms that drop the copy (`if (r != 0) {...; return 1;} return r;`) get
+  `cmpwi`, but CSE then turns the false-path return into `li r3,0`. Ternary, switch,
+  inline, unsigned and assignment-in-condition forms all keep the `mr.`.

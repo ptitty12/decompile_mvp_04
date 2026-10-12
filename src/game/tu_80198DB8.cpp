@@ -3,6 +3,19 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80198DB8.h"
+#include "game/tu_80144CF0.h"
+#include "game/tu_8026C414.h"
+int fn_8026CA8C(Unk8026C414_M* self, char** pp);
+
+struct Unk8019B04C_Q {
+    char pad0[0x708];
+    int m708;
+    unsigned char m70C;
+};
+inline void Unk8019B04C_Put(int*& p, int v)
+{
+    *p++ = v;
+}
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -86,12 +99,11 @@ extern "C" float fn_80198F44(Unk80198E5C_Obj* o)
 }
 
 //@80199158
-/* near-miss: 21 vs 22 insns: retail tests case 1, then `ble` to the end, then cases 2 and 3
- * in a straight line (case bodies out of line); a three-case switch compiles here as a tree
- * rooted at 2, nested ifs give the other layout. */
 extern "C" void fn_80199158(Unk80198E5C_Obj* o)
 {
     switch (o->m384) {
+    case 0:
+        break;
     case 1:
         fn_80198F68(o);
         break;
@@ -198,6 +210,28 @@ extern "C" void fn_8019B004(Unk80198E5C_Obj* o)
     o->v9(1);
 }
 
+extern "C" int fn_8019B04C(Unk80198E5C_Obj* o, int** pp)
+{
+    if (o->m264 == 0) {
+        fn_8026CA8C((Unk8026C414_M*)o, (char**)pp);
+        Unk8019B04C_Q* q = *(Unk8019B04C_Q**)((char*)o + 0x378);
+        int a = 0xFF;
+        int b = 0;
+        int* p = *pp;
+        if (q) {
+            a = q->m70C;
+            b = q->m708;
+        }
+        Unk8019B04C_Put(p, o->m380);
+        Unk8019B04C_Put(p, o->m37C);
+        Unk8019B04C_Put(p, a);
+        Unk8019B04C_Put(p, b);
+        *pp = p;
+        return 1;
+    }
+    return 0;
+}
+
 //@8019B0E4
 extern "C" void fn_8019B0E4(Unk8019B0E4_Obj* self, int chrg)
 {
@@ -281,6 +315,12 @@ extern "C" void fn_8019B2A0(Unk80198E5C_Obj* o)
     o->m3E8 = 0;
 }
 
+//@8019B2AC
+extern "C" void fn_8019B2AC(VT18* o)
+{
+    o->s17();
+}
+
 //@8019B2E0
 extern "C" void fn_8019B2E0(char* o, Unk8019B2E0_P* p, int flag)
 {
@@ -357,4 +397,3 @@ extern "C" void fn_8019BBEC(void** o)
 {
     fn_802C0EC4(*o);
 }
-

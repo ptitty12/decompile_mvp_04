@@ -14,8 +14,8 @@ extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, f
 extern const char lbl_80683A88[];
 extern void* lbl_8061930C;
 void fn_80079FC0(void* self, char** cursor, void* dst, int n);
-extern "C" void fn_805919E8(Db805937A4_Mgr* m, int x, int i, int k, float v);
-extern "C" void fn_80591AF4(Db805937A4_Mgr* m, int x, int i, int k, float v);
+extern "C" void fn_805919E8(Db805937A4_Mgr* m, float v, int x, int i, int k); /* float position from the callers' f1 schedule */
+extern "C" void fn_80591AF4(Db805937A4_Mgr* m, float v, int x, int i, int k);
 
 extern "C" DB_OVERLAY int fn_8059377C(Db805937A4_Mgr* m, int id)
 {
@@ -193,7 +193,6 @@ extern "C" DB_OVERLAY int fn_80593EB0(Db80593CD0_Data* self, int i, int n)
     return r;
 }
 
-/* near-miss (2 slots): retail loads f1 for the second fn_805919E8 call before r4 (lwz). */
 extern "C" DB_OVERLAY void fn_80593F30(Db80593CD0_Data* self, int i, int n, float f0, float f1)
 {
     float a = f0 * (float)n;
@@ -202,18 +201,17 @@ extern "C" DB_OVERLAY void fn_80593F30(Db80593CD0_Data* self, int i, int n, floa
     float b = f1 * (float)n;
     if (!(b >= 0.0f))
         b = self->m10[i].m4 * (float)n;
-    fn_805919E8(self->m0, self->m4, i, 0, a);
-    fn_805919E8(self->m0, self->m4, i, 1, b);
+    fn_805919E8(self->m0, a, self->m4, i, 0);
+    fn_805919E8(self->m0, b, self->m4, i, 1);
     self->m18[i] += n;
 }
 
-/* near-miss (2 slots): same f1-before-r4 order in the second fn_80591AF4 call. */
 extern "C" DB_OVERLAY void fn_8059403C(Db80593CD0_Data* self, int i, int n)
 {
     float a = self->m10[i].m0 * self->m8 * (float)n;
     float b = self->m10[i].m4 * (float)n;
-    fn_80591AF4(self->m0, self->m4, i, 0, a);
-    fn_80591AF4(self->m0, self->m4, i, 1, b);
+    fn_80591AF4(self->m0, a, self->m4, i, 0);
+    fn_80591AF4(self->m0, b, self->m4, i, 1);
     self->m18[i] -= n;
 }
 

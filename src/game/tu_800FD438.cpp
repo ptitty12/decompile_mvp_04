@@ -4,6 +4,71 @@
  */
 #include "game/tu_800F1AEC.h"
 
+/* Widget (vptr at +0xC) that picks an object out of the table at owner+0x2B8 through the
+ * index array at +0x10 (fn_800FF404, fn_800FF508). Evidence: those two functions. */
+struct UiVt0 {
+    virtual void s1(int a, int b);
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual int s5(int a);
+};
+struct UiTblOwner {
+    char pad0[0x2AC];
+    int m2AC;
+    char pad2B0[0x2B8 - 0x2B0];
+    UiVt0* a2B8[8];
+};
+class UiWI : public UiW {
+public:
+    int a10[8];
+};
+class UiWV13 : public UiWBase {
+public:
+    virtual void k1();
+    virtual void k2();
+    virtual void k3();
+    virtual void k4();
+    virtual void k5();
+    virtual void k6();
+    virtual void k7();
+    virtual void k8();
+    virtual void k9();
+    virtual void k10();
+    virtual void k11();
+    virtual void k12();
+    virtual int k13();
+};
+extern "C" int fn_80097300(char* e, unsigned char p);
+struct UiOwner298 {
+    char pad0[0x298];
+    int m298;
+};
+inline int UiIntAt(char* b, int i)
+{
+    int o = i * 4;
+    return *(int*)(b + o);
+}
+class UiWV13b : public UiWV13 {
+public:
+    Ui3C4* m10;
+};
+struct Unk80178BBC_T;
+struct Unk80179284_Ctx;
+struct Unk8019F8C0_Owner;
+struct Ui700b {
+    char pad0[0x3AC];
+    Unk80178BBC_T* m3AC;
+};
+void fn_80178F64(Unk80178BBC_T* a, Unk80179284_Ctx* b);
+void fn_80178FF0(Unk80178BBC_T* a);
+void fn_801A3ACC(Unk8019F8C0_Owner* a, int b);
+inline UiVt0* UiTblAt2(char* b, int i)
+{
+    int o = i * 4;
+    return *(UiVt0**)(b + o);
+}
+
 
 void fn_800FD4F8()
 {
@@ -26,7 +91,6 @@ int fn_800FE390(UiV_1DCi* self)
     return r;
 }
 
-/* near-miss: same code; the scaled index lands in r0 here (retail r11) */
 extern char lbl_805BE138[];
 void fn_800FEB30(const char* s, int idx)
 {
@@ -34,7 +98,7 @@ void fn_800FEB30(const char* s, int idx)
     if (name == 0)
         name = lbl_805BE138;
     else {
-        int pid = ((Ui6F8_10b*)fn_8011AA24(0)->m6F8->m10)->a6C[idx];
+        int pid = UiIntAt((char*)fn_8011AA24(0)->m6F8->m10 + 0x6C, idx);
         fn_800B555C()->m570 = pid;
         fn_802DC9C0();
         lbl_8061B8C0->m24 = 1;
@@ -112,6 +176,14 @@ void fn_800FF224(UiV_8_2Ci* self)
     self->m8->v79(0, 0);
 }
 
+void fn_800FF404(UiWI* self, int* a, int* b)
+{
+    int k = self->m8->v60();
+    *a = ((UiTblOwner*)self->m0)->m2AC;
+    int j = self->a10[k];
+    *b = UiTblAt2((char*)self->m0 + 0x2B8, j)->s5(*a);
+}
+
 int fn_800FF494(UiWM* self, int a)
 {
     if ((UiObj*)a == self->m8) {
@@ -121,9 +193,46 @@ int fn_800FF494(UiWM* self, int a)
     return 0;
 }
 
+void fn_800FF508(UiWI* self, int a, int b)
+{
+    int k = self->m8->v60();
+    int j = self->a10[k];
+    UiTblAt2((char*)self->m0 + 0x2B8, j)->s1(a, b);
+}
+
 int fn_800FF590(UiPtr0* self)
 {
     return self->m0->m2AC;
+}
+
+void fn_800FF59C(UiWV13b* self, int a)
+{
+    self->m4->v8();
+    int v = self->k13();
+    int t;
+    if (fn_8011AA24(0)->m6F8->m14->m1CD0 != 0)
+        t = 1;
+    else
+        t = 0;
+    if (v == t) {
+        Unk80178BBC_T* o = ((Ui700b*)fn_8011AA24(0)->m700)->m3AC;
+        if (a == 1)
+            fn_80178F64(o, (Unk80179284_Ctx*)self->m10);
+        else
+            fn_80178FF0(o);
+        fn_801A3ACC((Unk8019F8C0_Owner*)fn_8011AA24(0), a);
+    } else
+        fn_801A3A54(fn_8011AA24(0), a);
+}
+
+void fn_800FFA1C(UiWV13* self, int* a, int* b)
+{
+    *a = self->k13();
+    char* e = (char*)fn_8011AA24(0)->m6F8->m14 + *a * 0xE64;
+    if (self->m8 == 0)
+        *b = 0;
+    else
+        *b = fn_80097300(e, self->m8->v60());
 }
 
 void fn_800FFAC0(UiCopy* self, UiV4* p)
@@ -235,12 +344,22 @@ void fn_80100B38(UiWM* self)
     fn_80100644((UiV_28i*)((char*)self->m0 + 0x270), lbl_805BF008[row][self->m14]);
 }
 
-/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
 extern int lbl_805BF008[][2];
-void fn_80100BA4(UiWM* self)
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+extern int lbl_805BF008[][2];
+/* near-miss: same code; the loop counter lands in r8 here, retail has it in r4 (3 slots, register names only) */
+extern int lbl_805BF008[][2];
+void fn_80100BA4(UiWM* self, int a, int b)
 {
-    fn_80100A98(self);
-    int cur = self->m10->a48[self->m0->m2AC];
+    fn_80100A98(self, a, b);
+    int cur = UiIntAt((char*)self->m10 + 0x48, self->m0->m2AC);
     for (int i = 0; i < 8; i++) {
         if (cur == lbl_805BF008[i][self->m14]) {
             self->m8->v68();
@@ -257,6 +376,36 @@ void fn_80100C58(UiWM* self)
     fn_80100668((UiV_2Ci*)((char*)self->m0 + 0x270), lbl_805BF048[row]);
 }
 
+void fn_80100CB8(UiWM* self)
+{
+    int flag = ((UiOwner298*)self->m0)->m298 == 0xB;
+    for (int i = 0; i < 4; i++) {
+        int en = 1;
+        if (flag) {
+            int v = lbl_805BF048[i];
+            if (v != 2)
+                en = v == 1;
+        }
+        self->m8->v101(i, en);
+    }
+}
+
+/* near-miss: same code; the loop counter lands in r8 here, retail has it in r4 (3 slots, register names only) */
+void fn_80100D58(UiWM* self, int a, int b)
+{
+    fn_80100A98(self, a, b);
+    int cur = UiIntAt((char*)self->m10 + 0x50, self->m0->m2AC);
+    int i = 0;
+    do {
+        if (cur == lbl_805BF048[i]) {
+            self->m8->v68();
+            self->w13();
+            break;
+        }
+        i++;
+    } while (i < 4);
+}
+
 extern int lbl_805BF058[][2];
 void fn_80100E00(UiWM* self)
 {
@@ -264,12 +413,13 @@ void fn_80100E00(UiWM* self)
     fn_8010068C((UiV_20i*)((char*)self->m0 + 0x270), lbl_805BF058[row][self->m14]);
 }
 
-/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
 extern int lbl_805BF058[][2];
-void fn_80100E6C(UiWM* self)
+/* near-miss: same code; the loop counter lands in r8 here, retail has it in r4 (3 slots, register names only) */
+extern int lbl_805BF058[][2];
+void fn_80100E6C(UiWM* self, int a, int b)
 {
-    fn_80100A98(self);
-    int cur = self->m10->a38[self->m0->m2AC];
+    fn_80100A98(self, a, b);
+    int cur = UiIntAt((char*)self->m10 + 0x38, self->m0->m2AC);
     for (int i = 0; i < 10; i++) {
         if (cur == lbl_805BF058[i][self->m14]) {
             self->m8->v68();
@@ -286,12 +436,13 @@ void fn_80100F20(UiWM* self)
     fn_801006B0((UiV_24i*)((char*)self->m0 + 0x270), lbl_805BF0A8[row][self->m14]);
 }
 
-/* near-miss: same code; retail keeps m0 in r9 and the loop counter in r4 (here r11 and r8) */
 extern int lbl_805BF0A8[][2];
-void fn_80100F8C(UiWM* self)
+/* near-miss: same code; the loop counter lands in r8 here, retail has it in r4 (3 slots, register names only) */
+extern int lbl_805BF0A8[][2];
+void fn_80100F8C(UiWM* self, int a, int b)
 {
-    fn_80100A98(self);
-    int cur = self->m10->a40[self->m0->m2AC];
+    fn_80100A98(self, a, b);
+    int cur = UiIntAt((char*)self->m10 + 0x40, self->m0->m2AC);
     for (int i = 0; i < 4; i++) {
         if (cur == lbl_805BF0A8[i][self->m14]) {
             self->m8->v68();

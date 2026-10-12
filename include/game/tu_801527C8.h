@@ -186,6 +186,7 @@ struct Unk801527C8_Ctx {
     void fn_8016D2F4(const char* s);
     void fn_8016AC3C();
     void fn_8016CE5C(int idx);
+    void fn_8016D038(int idx, int id);
     void fn_8016CF38(struct Unk8016C788_Obj* o);
     Unk80189300* fn_8016C804(int id);
     void* fn_8016C7A8(unsigned int idx);
@@ -524,6 +525,7 @@ public:
     virtual Unk8037B3E8* fn_vslot5();
     virtual int fn_cslot8();
     virtual int fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3);
+    void fn_801556A4(struct Unk8016C788_Obj* o);
 
     int m4;
     float m8;

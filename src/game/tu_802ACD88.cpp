@@ -87,8 +87,8 @@ int fn_8033E958(const char* fmt, ...);
 char* fn_8040B8FC(const char* s, int c);
 int fn_802AF6F8(Mgr* m, char* buf, int flag);
 void fn_802B7C50(void* p);
-void fn_802C40BC(void* p);
-void fn_802C40DC(void* p);
+void fn_802C40BC(void* p, void* a);
+void fn_802C40DC(void* p, void* a);
 void* fn_80086140(void* x, char* buf);
 void* fn_8014EB44(void* x);
 void fn_8014EC24(void* x, char* buf);
@@ -215,19 +215,17 @@ void fn_802AE42C(Mgr* m)
     fn_802B7C50((char*)m + 8);
 }
 
-/* near-miss: retail copies x to r30 before forming m+0x11F78 (mr/addis swapped) */
 void fn_802AE474(Mgr* m, void* x)
 {
     char buf[16];
-    fn_802C40BC((char*)m + 0x11F78);
+    fn_802C40BC((char*)m + 0x11F78, x);
     fn_8014EC24(fn_8014EB44(fn_80086140(x, buf)), buf);
 }
 
-/* near-miss: same swap as fn_802AE474 */
 void fn_802AE4C0(Mgr* m, void* x)
 {
     char buf[16];
-    fn_802C40DC((char*)m + 0x11F78);
+    fn_802C40DC((char*)m + 0x11F78, x);
     fn_8014EC5C(fn_8014EB44(fn_80086140(x, buf)), buf);
 }
 
@@ -325,10 +323,12 @@ int fn_802AEBF0(void* a, void* b)
     return fn_802AF624(a, b, 0);
 }
 
-/* near-miss (parked, 2 insns swapped): retail saves flag (r5) to r30 before s (r4) to r31 in the prologue; every loop shape tried gives the opposite order */
-int fn_802AF624(Mgr* m, const char* s, int flag)
+/* The cursor is a local copy of the parameter: combine folds the parameter copy into it, so `mr r31,r4`
+ * comes after the flag copy (retail order), and before the n store because it is declared first. */
+int fn_802AF624(Mgr* m, const char* str, int flag)
 {
     char buf[0x1388];
+    const char* s = str;
     int n = 0;
     while (fn_80379094(s, fn_8040B6A0(s), 0), *s != 0) {
         fn_80378EF8(s, fn_8040B6A0(s), buf, 0x1388, &n);

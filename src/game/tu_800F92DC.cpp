@@ -4,6 +4,40 @@
  */
 #include "game/tu_800F1AEC.h"
 
+struct UiOwner3E0 {
+    char pad0[0x3E0];
+    int m3E0;
+};
+inline int UiIntAt(char* b, int i)
+{
+    int o = i * 4;
+    return *(int*)(b + o);
+}
+struct UiG65C {
+    char pad0[0x65C];
+    int m65C;
+};
+struct UiScr138_1AC_1E4 : UiObj {
+    char pad40[0x138 - 0x40];
+    int m138;
+    char pad13C[0x1AC - 0x13C];
+    int m1AC;
+    char pad1B0[0x1E4 - 0x1B0];
+    UiObj* m1E4;
+};
+struct Unk8017A930_T;
+int fn_8017C8C8(Unk8017A930_T* a);
+class UiSub98 {
+    char pad0[0x24];
+public:
+    virtual void q1();
+    virtual void q2();
+    virtual void q3();
+    virtual void q4();
+    virtual void q5();
+    virtual void q6();
+};
+
 
 int fn_800F92DC(UiV_138* self, int a)
 {
@@ -123,13 +157,12 @@ int fn_800F9CB8(UiScr134* self, int a)
     return 1;
 }
 
-/* near-miss: one insn order differs (retail: addi of the vtable address before mr r30,r4) */
 extern char lbl_80658FB0[];
 extern int lbl_80619D10;
 void fn_800F9E4C(UiScrRaw* self, int a)
 {
     self->m3C = lbl_80658FB0;
-    fn_800AB6B8(lbl_80619D10, a);
+    fn_800AB6B8(lbl_80619D10);
     fn_8035686C(self, a);
 }
 
@@ -170,6 +203,47 @@ void fn_800FB02C(UiObj* self)
     fn_802D7A74();
     lbl_8061B8C0->m24 = 0;
     fn_802D7ACC();
+}
+
+int fn_800FB200(UiScr138_1AC_1E4* self, int a)
+{
+    Ui6F8_10* t = fn_8011AA24(0)->m6F8->m10;
+    int ok;
+    if (((UiG65C*)fn_8011AA24(0))->m65C == 0)
+        ok = 0;
+    else
+        ok = 1;
+    if (ok != 0) {
+        if (self->m1E4->m24 < 0)
+            return 1;
+        if (fn_800C8044(self->m1AC)->m24 >= 0) {
+            fn_800B555C()->m570 = a;
+            int hit = 0;
+            if (a == t->m70 || a == ((int*)t)[0x6C / 4])
+                hit = 1;
+            if (hit != 0) {
+                if (fn_8017C8C8((Unk8017A930_T*)fn_8011AA24(0)->m700) == 0)
+                    fn_800B7ADC(UiGetMsgMgr(), self);
+            } else {
+                self->m138 = 1;
+                fn_800B7ADC(UiGetMsgMgr(), self);
+            }
+        }
+    }
+    return 1;
+}
+
+int fn_800FB83C(int a, int b, UiObj* p, float f)
+{
+    if (p != 0) {
+        if (!(f <= 0.75f)) {
+            ((UiSub98*)((char*)p + 0x98))->q6();
+            p->v8(1);
+            return 1;
+        }
+        p->v8(0);
+    }
+    return 0;
 }
 
 int fn_800FC084()
@@ -299,6 +373,19 @@ void fn_800FCA30(UiV_1E0b* self)
 void fn_800FCA68(UiV_1E4b* self)
 {
     self->m1E4->v8();
+}
+
+void fn_800FCAA0(UiV_1E4* self)
+{
+    Ui8011AA24* g = fn_8011AA24(0);
+    int z = 0;
+    int ok = self->m1E4->m24 >= z;
+    int k = ((UiOwner3E0*)g->m700)->m3E0;
+    if (ok) {
+        if (UiIntAt((char*)fn_8011AA24(0)->m6F8->m10 + 0x6C, k) == -1)
+            return;
+    }
+    self->m1E4->v8(ok);
 }
 
 int fn_800FCFA4()

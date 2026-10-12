@@ -102,7 +102,7 @@ struct Owner {
 struct Unk8007A4DC_Screen;
 struct Unk8007B2B0_Screen;
 void fn_80377E90(Obj* list, int* a, int* b, int idx);
-char* fn_80402EF8(char* dst, const char* src);
+void fn_80402EF8(char* dst, const char* src);
 int fn_800803F0(Unk8007A4DC_Screen* s, int a, int b);
 int fn_80080464(Unk8007A4DC_Screen* s, int a, int b);
 
@@ -211,7 +211,7 @@ struct Unk8007A4DC_Screen {
     int fn_8007A870(int a, int b, int c);
     int fn_8007A8DC(int a, int b);
     int fn_8007A914(int a, int b, char* c);
-    int fn_8007A94C(int a, int b, int c);
+    void fn_8007A94C(int a, int b, int c);
     int fn_8007A984(int a);
     int fn_8007AA10(int a);
     int fn_8007AA84(int a, int b, int i);
@@ -438,7 +438,7 @@ struct Unk8007B2B0_Screen {
     int fn_8007B320(int a, int b);
     int fn_8007B380(int a, int b);
     int fn_8007B3E0(int a, int b);
-    int fn_8007B440(int a, int b, int c);
+    void fn_8007B440(int a, int b, int c);
     int fn_8007B4A8(int a, int b, int c);
     int fn_8007B510(int a, int b);
     int fn_8007B570(int a, int b, int c);

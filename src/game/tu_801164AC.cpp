@@ -8,11 +8,11 @@
 typedef Unk80114A20_Scr Scr;
 typedef Unk800C7B40_Widget Wid;
 
-
 inline void SetSub98(Wid* w, int v)
 {
     ((UnkSub*)((char*)w + 0x98))->fn_vslot20(v, 0);
 }
+
 extern const char lbl_805BFB7C[];
 extern const char lbl_805BFCDC[];
 extern const float lbl_805BFCE4;
@@ -36,6 +36,14 @@ extern const char lbl_805BADC8[];
 extern const char lbl_8064E8D8[];
 extern const char lbl_8064E630[];
 
+extern char lbl_8065B888[];
+extern char lbl_80649DA0[];
+extern const char lbl_805BADC8[];
+struct EvtRaw {
+    int id;
+    const void* vt;
+    ~EvtRaw() {}
+};
 // PROTOS-BEGIN
 extern "C" {
 int fn_80116A64(Scr* self, int b);
@@ -98,6 +106,7 @@ int fn_80097288(int a, int b);
 const char* fn_800E5E4C(int a);
 void fn_800DE274(UnkTextArg* p, int a, int b);
 void fn_80131F34(Unk800C7B40_Widget* w, void* self, void (*cb)(int, void*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
+void fn_8037893C(char* p, int id, EvtRaw* e, int a, int b);
 }
 
 extern "C" {
@@ -129,12 +138,12 @@ void fn_80117634(Scr* self)
 void fn_80117764(Scr* self)
 {
     UnkGame* g = fn_8011AA24(0);
-    int v = g->m6F8->m10->m124;
-    fn_802D61AC(fn_801A4CE8(g, 1), v, 0);
+    int v1 = g->m6F8->m10->m124;
+    fn_802D61AC(fn_801A4CE8(g, 1), v1, 0);
     if (self->m1A4 != 0) {
-        g = fn_8011AA24(1);
-        v = g->m6F8->m10->m124;
-        fn_802D61AC(fn_801A4CE8(g, 1), v, 0);
+        UnkGame* h = fn_8011AA24(1);
+        int v2 = h->m6F8->m10->m124;
+        fn_802D61AC(fn_801A4CE8(h, 1), v2, 0);
     }
 }
 
@@ -225,6 +234,41 @@ void fn_80117B60(int a, Scr* b)
     fn_801178D8(b);
 }
 
+void fn_80117BBC(Scr* self)
+{
+    char nm[16];
+    char* np = nm;
+    fn_80117844(self);
+    fn_80117840(self);
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805BADC8, 0xF);
+    np[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, self);
+    EvtRaw e;
+    const void* base = lbl_80649DA0;
+    e.vt = base;
+    e.id = 0x9E;
+    e.vt = lbl_8065B888;
+    fn_8037893C((char*)fn_8011AA24(0) + 0x704, e.id, &e, 0, 0);
+    e.vt = base;
+}
+
+void fn_80117C8C(Scr* self)
+{
+    char nm[16];
+    char* np = nm;
+    fn_8035682C(np);
+    fn_8040B830(np, lbl_805B955C, 0xF);
+    np[15] = 0;
+    fn_80117844(self);
+    fn_80117840(self);
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+    fn_800B7B4C(lbl_8061A32C, np, self);
+}
+
 void* fn_80117D20(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -297,6 +341,33 @@ void* fn_80117FDC(Unk80117D20_Scr* self, int a, int b, int c, int d, int e, int 
     self->m130 = 0;
     self->SetVptr(lbl_8064E630);
     return self;
+}
+
+/* near-miss: shape of fn_80117D70 (same selection); retail has the index in r0 with extra copies (2 insns more). */
+void fn_80118028(Unk80117D20_Scr* self)
+{
+    fn_800ECF18(self);
+    UnkGame* g = fn_8011AA24(0);
+    UnkGameP6F8* p = g->m6F8;
+    int n = fn_801A71D0() != 0 ? 3 : 4;
+    int idx = n;
+    if (n > 2) {
+        int t = 0;
+        if (g->m6F8->m14->m1CD0 != 0)
+            t = 1;
+        idx = t;
+        if (n != 3)
+            idx ^= 1;
+    }
+    UnkPlayerRec* rec = &p->m14->rec[idx];
+    const char* name;
+    if (idx == 0)
+        name = lbl_805BFB3C;
+    else
+        name = lbl_805BFB4C;
+    SetSub98(fn_800C8054(self->fn_vslot29(name)), rec->m198);
+    for (Wid* c = ((UnkGroupW*)self)->m40; c != 0; c = (Wid*)c->m8)
+        fn_80118144(self, c, rec->m198);
 }
 
 void fn_80118144(Unk80117D20_Scr* self, Wid* w, int v)
@@ -380,6 +451,21 @@ void fn_8011A268(char* base, Unk800C7B40_Widget* w, const char* name)
 void fn_8011A2AC(int a, Unk800C7B40_Widget* w, const char* name)
 {
     fn_8011A0A4(fn_8011B784(0, a, 2), w, name);
+}
+
+/* near-miss: 2 slots (retail sets r5=39 after mr r28,r6; li r4,0; 8 spellings of the buffer init tried). */
+void fn_8011A2F4(char* p, int unused, Wid* w, const char* name, int flag)
+{
+    char buf[40];
+    buf[0] = lbl_805B9A30;
+    fn_8040B320(&buf[1], 0, 39);
+    int s = fn_8025416C(p + 0x588, 9) == 1;
+    int c = 2;
+    if (flag == 0)
+        c = s ^ 1;
+    float f = fn_8011B81C(2, (int)p, c);
+    fn_80119F48(buf, f);
+    fn_800C8040(w->fn_vslot32(name, 1))->fn_vslot30(buf);
 }
 
 void fn_8011A3CC(int a, Unk800C7B40_Widget* w, const char* name)

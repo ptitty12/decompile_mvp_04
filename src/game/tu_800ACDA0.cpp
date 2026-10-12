@@ -43,6 +43,38 @@ extern const float lbl_805B96A4;
 extern const char lbl_8065B360[];
 extern const char lbl_8065B268[];
 extern const char lbl_8065B690[];
+struct FEBarO {
+    char pad0[0x10];
+    float m10;
+};
+struct FEBar {
+    char pad0[0x1C];
+    FEBarO* m1C;
+    float m20;
+    float m24;
+};
+inline float Clamp01(float r)
+{
+    return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+}
+/* reading the divisor through an inline puts the m24 load before the m20 load, as in retail */
+inline float Dur(FEBar* s)
+{
+    return s->m24;
+}
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+/* ratio u/d written to o->m10, 0.0f when d is not positive (inline body shared with tu_800AB0E8) */
+inline void Ratio(FEBarO* o, float d, float u)
+{
+    if (!(d >= 0.0f)) {
+        o->m10 = 0.0f;
+    } else {
+        o->m10 = u / d;
+    }
+}
 struct UnkAt1C20 {
     char pad0[0x1C];
     void* m1C;
@@ -71,6 +103,7 @@ int fn_800AE150(char* self, int* oi, int* oj, int key);
 void fn_800AD58C(char* self, int i, int j);
 void fn_800AD6FC(char* self);
 void fn_800AD1D4(char* self);
+void fn_800AD838(void* p, float f);
 void fn_800AB3F8(void* self);
 int fn_800ABC30(void* t, int i);
 void fn_8033E5C4(void* o, int a);
@@ -272,6 +305,19 @@ extern "C" void fn_800ACDA4(UnkAt1C20* self)
     self->m20 = lbl_805B95A4;
 }
 
+extern "C" void fn_800ACDE0(FEBar* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    float r = Clamp01(self->m20 / Dur(self));
+    float v = Lerp(0.0f, r, 0.6f);
+    fn_800AD948((char*)self->m1C, 3, v);
+    fn_800AD838(self->m1C, 1.0f - r);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 0);
+    }
+}
+
 extern "C" void fn_800ACF24(UnkAt1C* p)
 {
     fn_800ADE10(p->m1C);
@@ -280,6 +326,15 @@ extern "C" void fn_800ACF24(UnkAt1C* p)
 extern "C" void fn_800ACF48(UnkAt20F* p)
 {
     p->m20 = lbl_805B95B8;
+}
+
+extern "C" void fn_800ACF58(FEBar* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 0);
+    }
 }
 
 extern "C" void fn_800ACFE8()
@@ -347,7 +402,6 @@ extern "C" void fn_800AD78C(void* p)
     }
 }
 
-/* near-miss (2 slots): add/addi order of the cell address; nested loops need the explicit `while (1) { if (!c) break; ... }` pre-test or CSE merges the count load */
 extern "C" void fn_800AD948(char* self, int key, float v)
 {
     int i = 0;
@@ -360,8 +414,8 @@ extern "C" void fn_800AD948(char* self, int key, float v)
             if (!(j >= 0)) {
                 break;
             }
-            char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
+            char* b1 = self + 0x14;
             if (*(int*)(b1 + off) == key) {
                 char* b2 = self + 0x1C;
                 *(float*)(b2 + off) = v;
@@ -461,7 +515,6 @@ extern "C" float fn_800ADF6C(char* self, int a, int b)
     return r;
 }
 
-/* near-miss (2 slots): add/addi order of the cell address */
 extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
 {
     int i = 0;
@@ -474,8 +527,8 @@ extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
             if (!(j >= 0)) {
                 break;
             }
-            char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
+            char* b1 = self + 0x14;
             if (*(int*)(b1 + off) == key) {
                 *oi = i;
                 *oj = j;
@@ -593,24 +646,25 @@ extern "C" void fn_800AE96C(char* self)
     fn_800AD1D4(p);
 }
 
-/* near-miss (7 slots): second branch keeps temporaries in r0 / result in r3 in retail */
 extern "C" int fn_800AEA04(char* self, int k)
 {
     int* p = (int*)(self + 0xED0);
+    int r;
     if (k == 1) {
         int a = *(int*)(self + 0xED0);
         int b = p[3];
-        int r = a * b;
+        r = a * b;
         if (p[6] != 0) {
             if (a != 0) {
                 r += b / 2;
             }
         }
-        return r;
+    } else {
+        int a = *(int*)(self + 0xED0);
+        int b = p[3];
+        r = a * a * b / 2;
     }
-    int a = *(int*)(self + 0xED0);
-    int b = p[3];
-    return a * a * b / 2;
+    return r;
 }
 
 extern "C" void fn_800AEA64()

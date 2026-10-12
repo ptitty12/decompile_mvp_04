@@ -109,7 +109,7 @@ int fn_800B5758(Ui800B555C* p);
 int fn_8008FE14(int id);
 extern char lbl_805BDC74[];
 int fn_800B56C4(Ui800B555C* p);
-void fn_800DF254(char* dst, int a, int b, float f);
+char* fn_800DF254(char* dst, int a, int b, float f);
 struct Ue1E0 {
     char pad0[0x1DC];
     int m1DC;

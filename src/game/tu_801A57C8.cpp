@@ -38,6 +38,12 @@ extern char lbl_805CEA28[];
 void fn_8028709C(void* x, unsigned h);
 int fn_801A2034(Unk8019F8C0_Owner* o, int i);
 void fn_801A7764(void* w, int t);
+struct Unk801A7764_St {
+    char pad0[0x570];
+    int m570;
+};
+Unk801A7764_St* fn_800B555C();
+extern char lbl_805CEAD4[];
 int fn_80400E84();
 int fn_80400DA4();
 void fn_80107F74(int a, int b, int c);
@@ -279,6 +285,7 @@ struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
 float fn_801A78E4(Unk801A57C8_Wrap* w);
+int fn_801A7950(Unk801A57C8_Wrap* w);
 float fn_801A745C(Unk801A745C_T* t);
 struct Unk801A57C8_Timer {
     char pad0[0x28];
@@ -357,6 +364,66 @@ void fn_801A5D3C(Unk8019F8C0_Owner* o)
         }
         idx = it.Next();
     } while (idx <= 1);
+}
+
+struct Unk801A5E50_Obj {
+    char pad0[0x618];
+    int m618;
+};
+int fn_80381E9C(int obj, unsigned hash, int a, int b);
+void fn_803814A4(int obj, int a, int b, float f);
+extern char lbl_805CE9AC[];
+extern char lbl_805CE9D4[];
+extern float lbl_805CEA00;
+
+void fn_801A5E50(Unk8019F8C0_Owner* o)
+{
+    fn_8033E958(lbl_805CE9AC);
+    Unk801A5E50_Obj* p = (Unk801A5E50_Obj*)o->m594[0];
+    if (p) {
+        int t = p->m618;
+        if (t != 0) {
+            fn_80381E9C(t, 0xDB7AB022u, 0, 0);
+            fn_80381E9C(t, 0x0E246B08u, 0, 0);
+            fn_80381E9C(t, 0x7BF65171u, 0, 0);
+            fn_80381E9C(t, 0xF4318E1Du, 0, 0);
+            fn_80381E9C(t, 0x4C226115u, 0, 0);
+            fn_80381E9C(t, 0x512ADB3Cu, 0, 0);
+            fn_80381E9C(t, 0xEE1B6C46u, 0, 0);
+            fn_80381E9C(t, 0x8CFB37B7u, 0, 0);
+            fn_80381E9C(t, 0x1F8D6080u, 0, 0);
+            fn_80381E9C(t, 0x9D44D7EEu, 0, 0);
+            fn_80381E9C(t, 0x5C53C627u, 0, 0);
+            fn_80381E9C(t, 0xC0F46231u, 0, 0);
+            fn_80381E9C(t, 0xE14981C4u, 0, 0);
+            fn_80381E9C(t, 0x9D803AF7u, 0, 0);
+            fn_80381E9C(t, 0xD484ACC6u, 0, 0);
+            fn_80381E9C(t, 0x8249F53Cu, 0, 0);
+            fn_80381E9C(t, 0xE433AA50u, 0, 0);
+            fn_80381E9C(t, 0x9CEA8000u, 0, 0);
+            fn_80381E9C(t, 0x8C1988B6u, 0, 0);
+            fn_80381E9C(t, 0xFA01EA4Au, 0, 0);
+            fn_80381E9C(t, 0x34CFAED1u, 0, 0);
+            fn_80381E9C(t, 0xA68012D3u, 0, 0);
+            fn_80381E9C(t, 0x0C0032D1u, 0, 0);
+            fn_80381E9C(t, 0x1407B459u, 0, 0);
+            fn_80381E9C(t, 0x07CBFA4Bu, 0, 0);
+            fn_80381E9C(t, 0x36E74862u, 0, 0);
+            fn_80381E9C(t, 0xE9868307u, 0, 0);
+            fn_80381E9C(t, 0x8CFF6EBEu, 0, 0);
+            fn_80381E9C(t, 0xC7BBCB74u, 0, 0);
+            fn_80381E9C(t, 0x7455EBC7u, 0, 0);
+            fn_80381E9C(t, 0x2F83EEFCu, 0, 0);
+            fn_80381E9C(t, 0x7BEFBEB9u, 0, 0);
+            fn_80381E9C(t, 0x9EF2CB16u, 0, 0);
+            fn_80381E9C(t, 0x15EA1EBDu, 0, 0);
+            fn_80381E9C(t, 0xA87C30D2u, 0, 0);
+            fn_80381E9C(t, 0x4F7CB175u, 0, 0);
+            fn_80381E9C(t, 0x9EF2CB16u, 0, 0);
+            fn_803814A4(t, 0, 0, lbl_805CEA00);
+        }
+    }
+    fn_8033E958(lbl_805CE9D4);
 }
 
 void fn_801A6240(Unk8019F8C0_Owner* o)
@@ -577,11 +644,11 @@ int fn_801A7048(Unk8019F8C0_Owner* o)
     return 0;
 }
 
-/* near-miss: retail returns the -1 case from a shared tail at the end (3 slots differ). */
 int fn_801A7130(Unk8019F8C0_Owner* o, int i)
 {
     if (o->m58C[i] != -1) {
-        return o->m6F8->m14[i].m108 != 0;
+        Unk8019F8C0_Inner* e = &o->m6F8->m14[i];
+        return e->m108 != 0;
     }
     return 1;
 }
@@ -686,6 +753,24 @@ float fn_801A745C(Unk801A745C_T* t)
         }
     }
     return f;
+}
+
+/* near-miss: same code; callee-saved roles differ (retail: buffer pointer r31, w r30, t r29, queue global r30;
+ * mine: w/global r31, t r30, buffer r29), 13 slots. */
+void fn_801A7764(void* w, int t)
+{
+    if (fn_801A7950((Unk801A57C8_Wrap*)w)) {
+        *(int*)((char*)w + 0x18) = 1;
+        fn_800B555C()->m570 = t;
+        Unk8035682C buf;
+        Unk8035682C* s = &buf;
+        fn_8040B830(s, lbl_805CEAD4, 0xF);
+        s->m0[0xF] = 0;
+        if (lbl_8061A32C == 0) {
+            lbl_8061A32C = new (0) Unk800B64BC;
+        }
+        fn_800B7B4C(lbl_8061A32C, s, 0);
+    }
 }
 
 void fn_801A7808(Unk801A745C_T* t)
@@ -877,14 +962,14 @@ void Unk801A9610::Init()
     fn_801AA038(this, 1);
 }
 
-/* near-miss: retail keeps x-2 in r0 and copies it to r3 before the compare (4 slots differ). */
 int fn_801A96A8(int x)
 {
     unsigned t = x - 2;
-    if (t > 3) {
-        return 0;
+    int r = t;
+    if (t <= 3) {
+        return r;
     }
-    return t;
+    return 0;
 }
 
 void fn_801A96C0(void* p)

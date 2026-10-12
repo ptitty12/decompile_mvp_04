@@ -61,8 +61,6 @@ int fn_80075808(int id);
 void fn_80080DBC(Unk8006902C_Players* p);
 int fn_8008CFD8(void* attrs, int k, unsigned char j);
 void fn_80096EE8(Unk8006902C_Side* s, int a, int b);
-/* Retail treats the vcall thunk as returning nothing (sched2 arg-move order); the member declares int. */
-extern "C" void fn_8007A94C__18Unk8007A4DC_Screeniii(Unk8007A4DC_Screen* s, int a, int b, int c);
 
 void fn_80069EE0(void)
 {
@@ -409,8 +407,8 @@ void Unk80069F0C::fn_8006B880()
                 Unk8006902C_Rec* rr = sd->m3E8;
                 int off = j * 0x34;
                 int e = o->fn_8007A11C(*(int*)((char*)rr + off));
-                fn_8007A94C__18Unk8007A4DC_Screeniii(o, 0x1E, e, a);
-                fn_8007A94C__18Unk8007A4DC_Screeniii(o, 0x1F, e, b);
+                o->fn_8007A94C(0x1E, e, a);
+                o->fn_8007A94C(0x1F, e, b);
             }
         }
         idx = it.Next();

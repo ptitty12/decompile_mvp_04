@@ -69,6 +69,7 @@ extern float lbl_805CEEF4;
 struct Unk801AE30C_Clr {
     int m0;
     Unk801AB63C_E m4[2];
+    Unk801AE30C_Clr();
 };
 void fn_801AE360(Unk801AE30C_Clr* p);
 struct Unk801AB5CC_Obj {
@@ -785,36 +786,48 @@ int fn_801AB460(Unk801AB460_T* p, int i)
     return p->m2C[i];
 }
 
-/* near-miss: same stores; retail's store order is 0x78, 0x6C, 0x7C, 0x68, 0x70, 0x74 (no permutation found, 2 slots differ). */
 void fn_801AB470(Unk801A96E0_Late* p)
 {
-    p->m78 = 0;
-    p->m6C = -1;
     p->m7C = lbl_805CEEF8;
     p->m68 = 0;
     p->m70 = 0;
+    p->m78 = 0;
     p->m74 = -1;
+    p->m6C = -1;
 }
 
-/* near-miss: same code; retail loads m74 before storing m68 (2 slots swapped). */
 void fn_801AB49C(Unk801A96E0_Late* p)
 {
-    float lo = lbl_805CEEFC;
-    float k = (float)(unsigned)p->m8->m4C * lbl_805CEF08;
+    float lo = 0.2f;
+    float k = (float)(unsigned)p->m8->m4C * 0.016666668f;
     int s = p->m70;
     int t;
     if (s == 1) {
-        t = p->m74;
+        int w = p->m74;
         p->m68 = s;
+        t = w;
     } else {
         if (p->m68 != p->m78) {
-            if (!(k <= p->m7C + lbl_805CEEFC)) {
+            if (!(k <= p->m7C + 0.2f)) {
                 p->m68 = p->m78;
             }
         }
         t = -1;
     }
     p->m6C = t;
+}
+
+inline void* operator new(unsigned int, void* p) { return p; }
+
+Unk801AB59C::Unk801AB59C(int a, int b) : Unk801B2490(a, b)
+{
+    Unk801AE30C_Clr* e = (Unk801AE30C_Clr*)((char*)this + 0x60);
+    int i = 1;
+    do {
+        new (e) Unk801AE30C_Clr;
+        e++;
+    } while (i-- != 0);
+    fn_801AB5CC(this);
 }
 
 void fn_801AB5CC(void* p)

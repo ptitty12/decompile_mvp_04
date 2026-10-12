@@ -144,7 +144,6 @@ extern "C" void fn_800D2614(Unk800D2338_Obj* o, float f)
     o->b68_5 = 1;
 }
 
-/* near-miss: 2 slots (retail sets r4 before r3 for the fn_800CFEEC call) */
 extern "C" Unk800D26C8_Raw* fn_800D26C8(Unk800D26C8_Raw* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0,
                                         int s1, int s2, int s3, int s4, int s5, float f1, float f2)
 {

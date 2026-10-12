@@ -5,15 +5,13 @@
 #include "game/db_8054FA04.h"
 #include "game/clampiter.h"
 
-extern "C" int fn_80565CDC(Db80565CDC_S* s);
 extern "C" int fn_80565D48(Db80565CDC_S* s);
 extern "C" int fn_80565DDC(Db80565CDC_S* s);
 extern "C" int fn_80565E9C(Db80565CDC_S* s);
-extern "C" int fn_80565C70(Db80565CDC_S* s, int k);
 extern "C" int fn_80568D64(Db80565CDC_S* s, int a, int b, int c);
 extern "C" float fn_80563954(float f);
 extern "C" Unk8007F198_S12 fn_8052BD58(Unk8052B978_Tbl* t);
-extern "C" int fn_805650DC(Db80565CDC_S* s, int y);
+extern "C" void fn_805650DC(Db80565CDC_S* s, int y);
 extern "C" int fn_8056516C(Db80565CDC_S* s, int y);
 extern "C" void* fn_800B555C();
 extern "C" int fn_800B57EC(void* p);
@@ -41,6 +39,40 @@ struct Db80563F0C_S {
     int m18;
     int m1C;
 };
+
+extern "C" int fn_80555EB0(int k, int i);
+extern "C" int fn_80555F18(int k, int i);
+
+extern "C" void fn_8052BA70(Unk8052B978_Tbl* self);
+extern "C" void fn_8052BBF8(Unk8052B978_Tbl* self, int idx);
+extern "C" void fn_8052BC4C(Unk8052B978_Tbl* self, int v);
+extern "C" int fn_805668A4(Db80565CDC_S* self, int y);
+void fn_802B8D74();
+void fn_802B8DDC();
+
+/* near-miss: 17 slots, register allocation of the loop (retail keeps the index in r31 starting at 4 and self in r28) */
+inline Unk8052B978_Tbl* Db805650DC_At(Db80565CDC_S* s, int off)
+{
+    char* b = (char*)s + 0x28;
+    return *(Unk8052B978_Tbl**)(b + off);
+}
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_80563B4C(float f);
+extern "C" float fn_80563BA0(int a);
+extern "C" void fn_80563F0C(Db80563F0C_S* s);
+extern "C" void fn_80564A98(Db80563F0C_S* s);
+extern "C" void fn_80564E28(void* self, int chrg);
+extern "C" void fn_80564E6C(Db80565CDC_S* s);
+extern "C" void fn_8056503C(Db80565CDC_S* s);
+extern "C" void fn_80565090(Db80565CDC_S* s);
+extern "C" void fn_805650DC(Db80565CDC_S* self, int y);
+extern "C" int fn_805653B4(Db80565CDC_S* s, int a, int b, int c, int d);
+extern "C" int fn_80565BFC(Db80565CDC_S* s);
+extern "C" int fn_80565C70(Db80565CDC_S* s, int k);
+extern "C" int fn_80565CDC(Db80565CDC_S* s);
+extern "C" int fn_80565D48(Db80565CDC_S* self);
+extern "C" int fn_80565DDC(Db80565CDC_S* self);
+extern "C" int fn_80565E9C(Db80565CDC_S* self);
 
 extern "C" DB_OVERLAY int fn_80563B4C(float f)
 {
@@ -112,6 +144,20 @@ extern "C" DB_OVERLAY void fn_80565090(Db80565CDC_S* s)
     fn_8056516C(s, o.m2);
 }
 
+extern "C" DB_OVERLAY void fn_805650DC(Db80565CDC_S* self, int y)
+{
+    fn_802B8D74();
+    int i;
+    for (i = 0; i < 3; i++)
+        fn_8052BA70(Db805650DC_At(self, i * 4 + 4));
+    Unk8052B978_Tbl* t = *(Unk8052B978_Tbl**)((char*)self + 0x28);
+    int h = fn_805668A4(self, (unsigned short)y);
+    y -= 0x7D5;
+    fn_8052BBF8(t, y % 2);
+    fn_8052BC4C(t, h);
+    fn_802B8DDC();
+}
+
 extern "C" DB_OVERLAY int fn_805653B4(Db80565CDC_S* s, int a, int b, int c, int d)
 {
     int r0 = fn_80565448(s, a);
@@ -161,4 +207,58 @@ extern "C" DB_OVERLAY int fn_80565CDC(Db80565CDC_S* s)
         return 0;
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY int fn_80565D48(Db80565CDC_S* self)
+{
+    int n = self->m14;
+    int res = 0;
+    int c = n * 4;
+    if (self->m2C->m4 >= (unsigned)(c + (n + n))) {
+        int a = fn_80568D64(self, c, n, 1);
+        int b = fn_80568D64(self, c | 1, n, 1);
+        int t = 0;
+        if (a != 0 && b != 0)
+            t = 1;
+        res = t;
+    }
+    return res;
+}
+
+extern "C" DB_OVERLAY int fn_80565DDC(Db80565CDC_S* self)
+{
+    int n = *(int*)((char*)self + 0x18);
+    int k = *(int*)((char*)self + 0x1C);
+    int res = 0;
+    int c = (n + n + n) * 2;
+    if ((*(Unk8052B978_Tbl**)((char*)self + 0x30))->m4 >= (unsigned)(c + (n + n + k))) {
+        int a = fn_80568D64(self, c, n, 2);
+        int b = fn_80568D64(self, c + 1, n, 2);
+        int d = fn_80568D64(self, c + 2, k, 2);
+        int t = 0;
+        if (a != 0 && b != 0 && d != 0)
+            t = 1;
+        res = t;
+    }
+    return res;
+}
+
+extern "C" DB_OVERLAY int fn_80565E9C(Db80565CDC_S* self)
+{
+    int p0 = fn_80555EB0(0, 3) * fn_80555F18(0, 7);
+    int p1 = fn_80555EB0(1, 3) * fn_80555F18(1, 7);
+    int s = p0 + p1;
+    int p2 = fn_80555EB0(2, 3) * fn_80555F18(2, 7);
+    int t = s + p2;
+    int res = 0;
+    if ((*(Unk8052B978_Tbl**)((char*)self + 0x34))->m4 >= (unsigned)t) {
+        int a = fn_80568D64(self, s, fn_80555F18(2, 7), 3);
+        int b = fn_80568D64(self, s + 1, fn_80555F18(2, 8), 3);
+        int c = fn_80568D64(self, s + 2, fn_80555F18(2, 9), 3);
+        int r = 0;
+        if (a != 0 && b != 0 && c != 0)
+            r = 1;
+        res = r;
+    }
+    return res;
 }

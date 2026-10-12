@@ -332,7 +332,7 @@ extern "C" void fn_800CFE84(Unk800CFB88_List* l)
 
 extern const char lbl_8065A370[];
 
-void Unk800CFEEC_Raw::fn_800CFEEC(int flag)
+Unk800CFEEC_Raw* Unk800CFEEC_Raw::fn_800CFEEC(int flag)
 {
     m24 = lbl_8065A370;
     m0 = 0;
@@ -345,6 +345,7 @@ void Unk800CFEEC_Raw::fn_800CFEEC(int flag)
     m20 = 0;
     for (int i = 0; i < 4; i++)
         m10[i] = 0;
+    return this;
 }
 
 extern "C" void fn_800CFF48(Unk800CFEEC_Data* c, int i)

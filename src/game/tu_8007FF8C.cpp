@@ -106,7 +106,6 @@ void fn_80096C10(void* p);
 void fn_8009C398(void* p);
 void fn_800999CC(void* p, int v, int q); /* indexes +0x17C with r5 */
 void fn_80082034(Y* self);
-extern float lbl_805B40D4;
 
 
 
@@ -499,8 +498,6 @@ void fn_80080BB4(Q* q, int a, int b, int c)
         q->m1 = 0xFF;
 }
 
-/* near-miss: two slots (an iterator init store is scheduled before the byte
- * stores here, after them in retail). */
 void fn_80080BFC(Y* self)
 {
     Unk8007FF8C_Iter<1> it1;
@@ -511,9 +508,9 @@ void fn_80080BFC(Y* self)
     } while (k <= 1);
     self->m1D50 = 0;
     self->m1D40 = 2;
-    self->m1D44 = lbl_805B40D4;
-    self->m1D48 = lbl_805B40D4;
-    self->m1D4C = lbl_805B40D4;
+    self->m1D44 = 0.0f;
+    self->m1D48 = 0.0f;
+    self->m1D4C = 0.0f;
     fn_80082034(self);
     Z* z = &self->z1;
     z->b0 = 0;
@@ -522,8 +519,8 @@ void fn_80080BFC(Y* self)
     z->b2 = 0;
     z->b4 = 0;
     z->b5 = 0;
-    z->b1 = 0;
     Unk8007FF8C_Iter<3> it2;
+    z->b1 = 0;
     k = 0;
     do {
         fn_80080B98(&z->q[k]);
