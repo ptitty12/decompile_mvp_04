@@ -180,6 +180,45 @@ extern "C" int fn_803F7584(void* o, int a, void* b, int* out)
     return (unsigned)(n + d - 1) / d;
 }
 
+extern "C" int fn_803F7748(void* o, unsigned short* h);
+
+extern "C" int fn_803F7748(void* o, unsigned short* h);
+
+extern "C" int fn_803F7604(char* o, unsigned short* p)
+{
+    int saved = RCI(o, 0x2c4);
+    int a = 0;
+    int b = 0;
+    if (lbl_806EEA84 != 0) {
+        if (*p != *(unsigned short*)(o + 0x2c4)) {
+            fn_803F78CC(o, (unsigned short*)(o + 0x2c4));
+            a = 1;
+            fn_803F7748(o, p);
+        }
+    } else {
+        b = 1;
+        fn_803F7748(o, p);
+    }
+    int r = 0;
+    int out = 0;
+    do {
+        r = fn_8041BAB4(*p, &out);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    int rc = fn_803F73B0(o, r);
+    if (rc != 0) {
+        if (rc == 3)
+            out = lbl_806EEA80;
+    }
+    if (a) {
+        fn_803F78CC(o, p);
+        fn_803F7748(o, (unsigned short*)&saved);
+    } else if (b) {
+        fn_803F78CC(o, p);
+    }
+    return out;
+}
+
 extern "C" void fn_803F773C()
 {
     lbl_806EEA88 = 0;
