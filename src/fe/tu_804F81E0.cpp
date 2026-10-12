@@ -85,6 +85,44 @@ extern "C" FE_OVERLAY int fn_804F9AAC(void* self, UiItemN* it)
     return 0;
 }
 
+extern "C" FE_OVERLAY int fn_804F9C64(void* l, int k)
+{
+    int r = 12;
+    switch (k) {
+    case 4:
+        r = 12;
+        break;
+    case 5:
+        r = 7;
+        break;
+    case 6:
+        r = 13;
+        break;
+    case 7:
+        r = 8;
+        break;
+    case 8:
+        r = 16;
+        break;
+    case 9:
+        r = 14;
+        break;
+    case 10:
+        r = 17;
+        break;
+    case 11:
+        r = 15;
+        break;
+    case 12:
+        r = 21;
+        break;
+    case 13:
+        r = 22;
+        break;
+    }
+    return r;
+}
+
 /* near-miss: retail keeps i in r4 and scales it per branch (no mr r10,r4); ours reuses r4 as a table pointer (6 slots differ) */
 extern "C" FE_OVERLAY float fn_804FA098(FeS23* self, int i, float x)
 {
