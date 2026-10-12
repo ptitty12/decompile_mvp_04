@@ -208,7 +208,7 @@ extern const Unk80177A90_V3 lbl_806055AC;
 extern const char lbl_805CB1DC[];
 extern const char lbl_805CB208[];
 int fn_802B9300(int n, int a, int b, int c);
-void fn_80402DE4(int a, int b);
+int fn_80402DE4(int a, int b);
 void fn_80402BEC(int a, int b, int c);
 int fn_804089B4(char* dst, const char* fmt, ...);
 void fn_8040074C(void* p, unsigned int n);
