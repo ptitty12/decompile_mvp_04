@@ -15,6 +15,19 @@ void fn_8022F328(Unk8022FE34_Sub* s, int i);
 /* near-miss: right length and structure; retail hoists all the table addresses and keeps
    the 1.0 load after the -1.0 stores (7 saved regs r25-r31 vs our 5). Tried 40+ store orders. */
 
+extern "C" int fn_8018AA44(int v);
+
+class Unk8014D8AC {
+public:
+    int fn_8014D8AC(int max, const char* file, int line);
+};
+extern const char lbl_805D6EDC[];
+
+inline float RandF(Unk8014D8AC* r, const char* file, float scale, int line)
+{
+    return (float)(unsigned)r->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+
 void Unk8022FE34_Sub::fn_8022FE34(Unk8022FE34_Owner* o)
 {
     m0 = o;
@@ -70,6 +83,163 @@ int Unk8022FE34_Pai::fn_80230024(int i)
     return m4[i].m1D0;
 }
 
+extern Unk8022FE34_Ent lbl_8068C978[3];
+extern Unk8022FE34_Ent lbl_8068C9FC[3];
+
+/* Object at Ctx::m65C: vptr at +0x98, the called virtual is entry 22 (offset 0xB0). */
+struct Unk8022FE34_VObj22 : Unk8022FE34_VBase {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual int s22();
+};
+
+inline int SideFlag(Unk8022FE34_Ctx* c)
+{
+    int f = 0;
+    if (c->m6F8->m14[2].m8 != 0)
+        f = 1;
+    return f;
+}
+
+/* near-miss: 139/139 insns, ~20 slots: retail copies this into r10 first and keeps the Ctx pointer (m3F4) in r3, ours keeps
+   this in r3 and puts the Ctx in r9. Tried a Ctx local, self alias, direct m3F4 reads. */
+void Unk8022FE34_Pai::fn_8023003C(int i, int idx, Unk8022FE34_Ent* out, int flag)
+{
+    int side = SideFlag(m3F4);
+    side = side ^ 1;
+    if (flag) {
+        idx = idx % 3;
+        *out = lbl_8068C978[idx];
+        Unk8022FE34_VObj22* o = (Unk8022FE34_VObj22*)m3F4->m65C;
+        if (o != 0) {
+            if (o->s22() == 1) {
+                *out = lbl_8068C9FC[idx];
+            }
+        }
+    } else {
+        *out = m4[side].m4[idx];
+    }
+}
+
+void Unk8022FE34_Pai::fn_80230500(int i, Unk8022FE34_Ent* out)
+{
+    float r = RandF((Unk8014D8AC*)m3F4->m554, lbl_805D6EDC, 1.0f, 0x3A1);
+    float acc = 0.0f;
+    float prev = 0.0f;
+    float hi = 0.0f;
+    float w;
+    int k = 0;
+    while (k < fn_80230024(i)) {
+        prev = acc;
+        w = m4[i].mE0[k].m4;
+        hi = acc + w;
+        if (!(r < prev) && !(r > hi)) {
+            *out = m4[i].m4[k];
+            return;
+        }
+        acc = acc + w;
+        k++;
+    }
+    fn_8023003C(i, 0, out, 0);
+}
+
+void Unk8022FE34_Pai::fn_802306CC(int i, Unk8022FE34_Ent* out)
+{
+    if (m4[i].m1DC == 0) {
+        fn_80230500(i, out);
+        return;
+    }
+    float r = RandF((Unk8014D8AC*)m3F4->m554, lbl_805D6EDC, 1.0f, 0x3C1);
+    float acc = 0.0f;
+    float prev = 0.0f;
+    float hi = 0.0f;
+    float w;
+    int k = 0;
+    while (k < m4[i].m1DC) {
+        prev = acc;
+        w = m4[i].m194[k].m4;
+        hi = acc + w;
+        if (!(r < prev) && r <= hi) {
+            fn_8023003C(i, m4[i].m194[k].m0, out, 0);
+            return;
+        }
+        acc = acc + w;
+        k++;
+    }
+    fn_8023003C(i, 0, out, 0);
+}
+
+void Unk8022FE34_Pai::fn_8023084C(int i, Unk8022FE34_Ent* out)
+{
+    if (m4[i].m1D4 == 0) {
+        fn_80230500(i, out);
+        return;
+    }
+    float r = RandF((Unk8014D8AC*)m3F4->m554, lbl_805D6EDC, 1.0f, 0x3E3);
+    float acc = 0.0f;
+    float prev = 0.0f;
+    float hi = 0.0f;
+    float w;
+    int k = 0;
+    while (k < m4[i].m1D4) {
+        prev = acc;
+        w = m4[i].m11C[k].m4;
+        hi = acc + w;
+        if (!(r < prev) && r <= hi) {
+            fn_8023003C(i, m4[i].m11C[k].m0, out, 0);
+            return;
+        }
+        acc = acc + w;
+        k++;
+    }
+    fn_8023003C(i, 0, out, 0);
+}
+
+void Unk8022FE34_Pai::fn_802309CC(int i, Unk8022FE34_Ent* out)
+{
+    if (m4[i].m1D8 == 0) {
+        fn_80230500(i, out);
+        return;
+    }
+    float r = RandF((Unk8014D8AC*)m3F4->m554, lbl_805D6EDC, 1.0f, 0x404);
+    float acc = 0.0f;
+    float prev = 0.0f;
+    float hi = 0.0f;
+    float w;
+    int k = 0;
+    while (k < m4[i].m1D8) {
+        prev = acc;
+        w = m4[i].m158[k].m4;
+        hi = acc + w;
+        if (!(r < prev) && r <= hi) {
+            fn_8023003C(i, m4[i].m158[k].m0, out, 0);
+            return;
+        }
+        acc = acc + w;
+        k++;
+    }
+    fn_8023003C(i, 0, out, 0);
+}
+
 void fn_80230B4C() {}
 
 void fn_80230B50(Unk8022FE34_Sub* s) {}
@@ -111,8 +281,6 @@ void Unk8022FE34_Sub::fn_80230CC8(const Unk8022FE34_Ent* e)
     m4[m1D0] = *e;
     m1D0++;
 }
-
-extern "C" int fn_8018AA44(int v);
 
 void Unk8022FE34_Sub::fn_80230D54()
 {

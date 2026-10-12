@@ -143,6 +143,11 @@ struct Unk8022FE34_Pai {
     void fn_80230B88(int i);
     void fn_80230BBC(int i);
     void fn_80230268(int a, int b, Unk8022FE34_Ent* out);
+    void fn_8023003C(int i, int a, Unk8022FE34_Ent* out, int b);
+    void fn_80230500(int i, Unk8022FE34_Ent* out);
+    void fn_802306CC(int i, Unk8022FE34_Ent* out);
+    void fn_8023084C(int i, Unk8022FE34_Ent* out);
+    void fn_802309CC(int i, Unk8022FE34_Ent* out);
 };
 
 struct Unk8022FE34_VBase {
