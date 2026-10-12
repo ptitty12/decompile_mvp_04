@@ -228,6 +228,12 @@ struct McHdr16 {
     unsigned short mC[1];
 };
 
+/* Object behind a channel record's +8 pointer (fn_80392884): flags byte at +0xA. */
+struct McFlagsH {
+    char pad0[0xA];
+    unsigned char mA;
+};
+
 extern "C" void fn_803927E4(unsigned n)
 {
     if (n <= 15) {
@@ -250,6 +256,31 @@ extern "C" void fn_803927E4(unsigned n)
         *(int*)(t + k4) = c;
         if (c < 0)
             *(int*)(t + k4) = 0;
+    }
+}
+
+/* near-miss (48 of 49 words): the v load is `lwzx r0,r11,r26` here and `lwzx r0,r26,r11` in retail (operand order only);
+ * registers and schedule match. About 450 spellings of the table accesses tried. */
+extern "C" void fn_80392884(unsigned n)
+{
+    int off = n * 16;
+    char* r = (char*)lbl_8069B80C + off;
+    unsigned short h = *(unsigned short*)(r + 0x44);
+    unsigned char tag = ((unsigned char*)r)[0x47];
+    char* t40 = (char*)lbl_8069B80C + 0x40;
+    unsigned v0 = *(unsigned*)(t40 + off);
+    char* t48 = (char*)lbl_8069B80C + 0x48;
+    for (int i = 0; i <= 15; i++) {
+        int io = i * 16;
+        char* e = (char*)lbl_8069B80C + io;
+        if (i != n && e[0x46] != 0 && (unsigned char)e[0x47] == tag) {
+            unsigned v = *(unsigned*)((char*)lbl_8069B80C + 0x40 + io);
+            unsigned short hh = *(unsigned short*)(e + 0x44);
+            if (v < v0 || (v == v0 && hh < h)) {
+                if (!((*(McFlagsH**)((char*)t48 + io))->mA & 4))
+                    fn_803927E4(i);
+            }
+        }
     }
 }
 
