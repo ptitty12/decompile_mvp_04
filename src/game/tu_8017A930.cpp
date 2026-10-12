@@ -3,6 +3,24 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8017A930.h"
+extern int lbl_80620864;
+struct Unk8017B238_O {
+    char pad0[0x2C];
+    int m2C;
+};
+void fn_8017EE58(Unk8017EE24_T* p);
+void fn_8017EED0(void* p);
+void fn_801A4884(void* p);
+void fn_80235618(void* p);
+void fn_801C21EC(void* p);
+void fn_801B0334(void* p);
+void fn_801ABB0C(void* p);
+void fn_801B127C(void* p);
+void fn_801BAFA4(void* p);
+void fn_801DBAE4(void* p);
+void fn_80258668(void* p);
+void fn_80178CA8(void* p);
+void fn_8017BEAC(void* p, char* q);
 void fn_80258E70(void* p, int q);
 void fn_801DBC24(void* p, int a);
 void fn_801C2A18(void* p, int a);
@@ -162,6 +180,56 @@ void fn_8017B1A4(Unk8017A930_T* p)
     fn_80178C08(p->m3AC);
     p->m3D4 = 0;
     fn_8017E264(p);
+    fn_803295F0();
+}
+
+extern "C" void fn_8017B238(void* self)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    if (lbl_80620860 != 0) {
+        if (lbl_80620870 == 2) {
+            Unk8017B0A4_Ctx* o = p->m4;
+            lbl_80620860 = 0;
+            lbl_8062086C = (float)o->m4C * 0.016666668f - 0.033333335f;
+            fn_801A0790(o, lbl_8062086C);
+            lbl_80620860 = 1;
+        }
+    }
+    (*(Unk8017B238_O**)((char*)p->m4 + 0x720))->m2C = 1;
+    if (lbl_80620860 != 0) {
+        int t = lbl_80620864;
+        if (t > 0) {
+            if (!(t > p->m4->m6F8->m14->m1CC8)) {
+                Unk8017B0A4_Ctx* c = p->m4;
+                lbl_80620860 = 0;
+                fn_801A0790(c, (float)c->m4C * 0.016666668f);
+            }
+        }
+    }
+    fn_8017EE58((Unk8017EE24_T*)((char*)p + 8));
+    int z = 0;
+    fn_801A4884(p->m4);
+    *(int*)((char*)p->m4 + 0x6FC) = z;
+    fn_80235618(p->m3B0);
+    fn_801C21EC(p->m3A4);
+    if (p->m4->m6F4 == 0) {
+        fn_801B0334(p->m3C0);
+        fn_801ABB0C(p->m3C8);
+        fn_801B127C(p->m3CC);
+    }
+    fn_801BAFA4(p->m3BC);
+    fn_801DBAE4(p->m3B8);
+    fn_80258668(p->m3B4);
+    fn_80178CA8(p->m3AC);
+    p->m414 = z;
+    p->m418 = z;
+    *(int*)((char*)p + 0x41C) = 10;
+    fn_8017EED0((char*)p + 0x228);
+    fn_8037893C((char*)p->m4 + 0x704, 0x31, 0, 0, 0);
+    fn_801A1EDC(p->m4);
+    if (p->m4->m6F4 == 0) {
+        fn_8017BEAC(p, lbl_8068BE40);
+    }
     fn_803295F0();
 }
 
