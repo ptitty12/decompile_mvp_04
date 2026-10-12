@@ -4,32 +4,11 @@
  */
 #include "game/tu_80163390.h"
 
-extern float lbl_805C9100;
-extern float lbl_805C9104;
 
-extern float lbl_805C9204;
-extern float lbl_805C9208;
 
-extern float lbl_805C9248;
-extern float lbl_805C924C;
-extern float lbl_805C9250;
 
 extern const char lbl_805C8C20[];
-extern float lbl_805C91D8;
-extern float lbl_805C91DC;
-extern float lbl_805C9234;
-extern float lbl_805C9240;
-extern float lbl_805C9244;
 
-extern float lbl_805C9200;
-extern float lbl_805C920C;
-extern float lbl_805C9210;
-extern float lbl_805C9214;
-extern float lbl_805C9218;
-extern float lbl_805C921C;
-extern float lbl_805C9220;
-extern float lbl_805C922C;
-extern float lbl_805C9230;
 
 extern float lbl_805EBA00;
 extern int lbl_8062087C;
@@ -68,17 +47,17 @@ void Unk80159F28::fn_80163AF4(int id) /* 80163AF4 */
 {
     Unk801527C8_Actor* a = mC;
     Unk801527C8_Sub* s = &a->m50;
-    float t = (float)*(unsigned int*)&a->m4C * lbl_805C9100;
+    float t = (float)*(unsigned int*)&a->m4C * 0.016666668f;
     switch (id) {
     case 0x10:
     case 0x3D:
     case 0x44:
     case 0x56:
-        s->fn_80326EF4(t, lbl_805C9104, id, -1, -1, 0);
+        s->fn_80326EF4(t, 0.0f, id, -1, -1, 0);
         break;
     case 0x5A:
         fn_80163A98();
-        s->fn_80326EF4(t, lbl_805C9104, 0x5A, -1, -1, 0);
+        s->fn_80326EF4(t, 0.0f, 0x5A, -1, -1, 0);
         break;
     case 0x32:
         fn_80327274(s);
@@ -88,8 +67,8 @@ void Unk80159F28::fn_80163AF4(int id) /* 80163AF4 */
         fn_80161A74();
         break;
     case 0x42: {
-        float u = a->m700->m3A4->m180 - lbl_805C9100;
-        s->fn_80326EF4(u, lbl_805C9104, 0x42, -1, -1, 0);
+        float u = a->m700->m3A4->m180 - 0.016666668f;
+        s->fn_80326EF4(u, 0.0f, 0x42, -1, -1, 0);
         break;
     }
     }
@@ -149,7 +128,7 @@ void Unk80159F28::fn_80164F48(Unk801654F0_Evt* e, float t) /* 80164F48 */
         }
         if (is != 0) {
             if (fn_80259330(mC->m700->m3B4) == 0) {
-                m330 = (float)*(unsigned int*)&mC->m4C * lbl_805C91D8 + lbl_805C91DC;
+                m330 = (float)*(unsigned int*)&mC->m4C * 0.016666668f + 1.0f;
             }
         }
     }
@@ -158,37 +137,39 @@ void Unk80159F28::fn_80164F48(Unk801654F0_Evt* e, float t) /* 80164F48 */
 void Unk80159F28::fn_80165328(Unk80165328_Evt* e, float t) /* 80165328 */
 {
     Unk801527C8_Sub* s = &mC->m50;
-    s->fn_80326EF4(t, lbl_805C9200, 0x3D, -1, -1, 0);
+    s->fn_80326EF4(t, 0.0f, 0x3D, -1, -1, 0);
     float u = t + e->m10;
-    s->fn_80326EF4(u, lbl_805C9200, 0xAC, -1, -1, 0);
+    s->fn_80326EF4(u, 0.0f, 0xAC, -1, -1, 0);
 }
 
-/* near-miss: structure differs (retail computes the (x+y > c) flag once into an int before the branches); 3 forms tried */
+/* near-miss: 80/80 insns, instruction stream identical; retail's frame is 40 bytes (the 12-byte vector keeps 4-byte alignment), ours 48 */
 void Unk80159F28::fn_801653B0(int id, float t) /* 801653B0 */
 {
+    float x;
     Unk80273498_Vec3 v;
-    fn_8022EA60(&v, mC->m700->m3B0);
+    Unk80273498_Vec3* pv = &v;
+    fn_8022EA60(pv, mC->m700->m3B0);
     if (fn_8015F840() != 0) {
         v.x = -v.x;
     }
-    int g = v.x + v.y > lbl_805C9204;
-    float x = lbl_805EBA00;
+    int g = v.x + pv->y > 0.0f;
+    x = lbl_805EBA00;
     int flags;
-    if (!(v.x - v.y <= lbl_805C9204)) {
+    if (!(v.x - pv->y <= 0.0f)) {
         if (g) {
             flags = 0x8000;
-            x = v.x - lbl_805C9208;
+            x = v.x - 1.0f;
         } else {
             flags = 0x2000;
-            x = -v.y - lbl_805C9208;
+            x = -pv->y - 1.0f;
         }
     } else {
         if (g) {
             flags = 0x1000;
-            x = v.y - lbl_805C9208;
+            x = pv->y - 1.0f;
         } else {
             flags = 0x4000;
-            x = -v.x - lbl_805C9208;
+            x = -v.x - 1.0f;
         }
     }
     if (id == 0x41) {
@@ -200,9 +181,9 @@ void Unk80159F28::fn_801653B0(int id, float t) /* 801653B0 */
 void Unk80159F28::fn_801654F0(Unk801654F0_Evt* e, float t) /* 801654F0 */
 {
     if (e->m8 == 2) {
-        mC->m50.fn_80326EF4(t, lbl_805C920C, 0xAF, -1, -1, 0);
+        mC->m50.fn_80326EF4(t, 0.0f, 0xAF, -1, -1, 0);
     } else if (e->m8 == 1) {
-        mC->m50.fn_80326EF4(t, lbl_805C920C, 0xB0, -1, -1, 0);
+        mC->m50.fn_80326EF4(t, 0.0f, 0xB0, -1, -1, 0);
     }
 }
 
@@ -210,7 +191,7 @@ void Unk80159F28::fn_80165578(Unk80165578_Evt* e, float t) /* 80165578 */
 {
     Unk80165578_Obj* o = (Unk80165578_Obj*)fn_801A49F0(mC, e->mC, e->m8);
     if (o != 0 && o->m458 == 0) {
-        mC->m50.fn_80326EF4(t, lbl_805C9210, 0x79, 0, -1, 0);
+        mC->m50.fn_80326EF4(t, 0.0f, 0x79, 0, -1, 0);
     }
 }
 
@@ -231,15 +212,15 @@ void Unk80159F28::fn_80165790(Unk80165790_Evt* e, float t) /* 80165790 */
 
 void Unk80159F28::fn_801657EC(Unk801657EC_Evt* e, float t) /* 801657EC */
 {
-    mC->m50.fn_80326EF4(t, lbl_805C9214, 0x68, -1, e->m8, 0);
+    mC->m50.fn_80326EF4(t, 0.0f, 0x68, -1, e->m8, 0);
 }
 
-/* near-miss: same code; retail loads the float constant (lbl_805C9218) after the two int operands, here it is hoisted above them; 4 variants tried */
+/* near-miss: same code; retail loads the float constant (0.0f) after the two int operands, here it is hoisted above them; 4 variants tried */
 void Unk80159F28::fn_80165834(Unk80165834_Evt* e, float t) /* 80165834 */
 {
     int id = e->mC->m458;
     int b = e->m8;
-    mC->m50.fn_80326EF4(t, lbl_805C9218, 0x7F, id, b, 0);
+    mC->m50.fn_80326EF4(t, 0.0f, 0x7F, id, b, 0);
 }
 
 /* near-miss: same code; retail loads e->m8 before the float constant for the last call (2 instructions swapped); 6 variants tried */
@@ -256,16 +237,15 @@ void Unk80159F28::fn_80165884(Unk80165884_Evt* e, float t) /* 80165884 */
     if (o != 0) {
         int id = o->m458;
         int b = e->m8;
-        s->fn_80326EF4(t, lbl_805C921C, 0x5F, id, b, 0);
+        s->fn_80326EF4(t, 0.0f, 0x5F, id, b, 0);
     }
 }
 
-/* near-miss: same code; scheduling of the lis/lwz pair for mC and the constants differs (6 diff lines); 4 variants tried */
 void Unk80159F28::fn_80165908(Unk80165834_Evt* e, float t) /* 80165908 */
 {
     Unk801527C8_Sub* s = &mC->m50;
     float x = lbl_805EBA00;
-    if (!(e->m18 < lbl_805C9220)) {
+    if (!(e->m18 < 0.0f)) {
         x = -e->m18;
     }
     s->fn_80326EF4(t, x, 0x62, e->mC->m458, e->m8, 0);
@@ -277,7 +257,7 @@ void Unk80159F28::fn_80165AF4(Unk80165AF4_Evt* e, float t) /* 80165AF4 */
     float x = lbl_805EBA00;
     int id = 0xAD;
     if (e->mC == 0) {
-        x = lbl_805C922C;
+        x = 0.0f;
         id = 0xAE;
     }
     s->fn_80326EF4(t, x, id, e->m8->m458, -1, 0x200);
@@ -312,11 +292,11 @@ void Unk80159F28::fn_80165BE0(Unk80165BE0_Evt* e, float t) /* 80165BE0 */
     int n = e->mC;
     if (e->m8 == 3) {
         if (n > fn_8014E310(id)) {
-            s->fn_80326EF4(t, lbl_805C9230, 0x60, id, n, 0);
+            s->fn_80326EF4(t, 0.0f, 0x60, id, n, 0);
         }
     }
     float x = lbl_805EBA00;
-    if (!(e->m1C < lbl_805C9230)) {
+    if (!(e->m1C < 0.0f)) {
         x = -e->m1C;
     }
     s->fn_80326EF4(t, x, 0x39, id, e->mC, 0);
@@ -334,10 +314,10 @@ int Unk80159F28::fn_80165CC8() /* 80165CC8 */
     }
     Unk801527C8_Team* tm = t->m0 + k;
     if (tm->mD70 > 1 && m->mC->m84 == 0) {
-        float p = lbl_805C9234;
+        float p = 1.0f;
         const char* file = lbl_805C8C20;
         unsigned int n = a->m554->fn_8014D8AC(1000000, file, 0x1359);
-        if (!((float)n * p * lbl_805C9240 < lbl_805C9244)) {
+        if (!((float)n * p * 0.000001f < 0.8f)) {
             r = 1;
         }
     }
@@ -375,7 +355,7 @@ void Unk80159F28::fn_801660A4(int p, Unk8015FB08_Rec rec) /* 801660A4 */
 {
     float a, b, c;
     fn_8018CA5C(mC->m6CC, &a, &b, &c);
-    if (!(a <= lbl_805C9248)) {
+    if (!(a <= 0.78539824f)) {
         fn_8015FB08(0x70, p, rec);
     } else {
         fn_8015FB08(0x71, p, rec);
@@ -386,7 +366,7 @@ void Unk80159F28::fn_801661D8(int p, Unk8015FB08_Rec rec) /* 801661D8 */
 {
     float a, b, c;
     fn_8018CA5C(mC->m6CC, &a, &b, &c);
-    if (!(a <= lbl_805C924C)) {
+    if (!(a <= 0.78539824f)) {
         fn_8015FB08(0x72, p, rec);
     } else {
         fn_8015FB08(0x73, p, rec);
@@ -397,7 +377,7 @@ void Unk80159F28::fn_8016630C(int p, Unk8015FB08_Rec rec) /* 8016630C */
 {
     float a, b, c;
     fn_8018CA5C(mC->m6CC, &a, &b, &c);
-    if (!(a <= lbl_805C9250)) {
+    if (!(a <= 0.78539824f)) {
         fn_8015FB08(0x74, p, rec);
     } else {
         fn_8015FB08(0x75, p, rec);

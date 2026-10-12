@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801527C8.h"
+#include "game/goals/tu_8028C6B8.h"
 
 extern float lbl_805C88D4;
 
@@ -18,6 +19,34 @@ extern float lbl_805C8418;
 extern float lbl_805C84F4;
 extern float lbl_805C8580;
 extern float lbl_805C8978;
+
+struct Unk80178BBC_T;
+Unk8016C788_Obj* fn_80178E6C(Unk80178BBC_T* sl, unsigned a, unsigned b);
+struct Unk8016C1C4_List {
+    int fn_8016C798(int idx);
+    Unk8016C788_Obj* fn_8016C788(int idx);
+};
+class Vt80155A0 {
+public:
+    char pad0[0x18];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+};
+struct Obj708 {
+    char pad0[0x708];
+    int m708;
+};
 
 struct Unk802A2DA4_Goal;
 void fn_802A2DC0(Unk802A2DA4_Goal* g, float t);
@@ -307,6 +336,46 @@ int cScriptRunGoal::fn_cslot8() /* 80155590 */
     m18 = n;
     if (n < 0) {
         m18 = 3;
+    }
+}
+
+int cScriptRunGoal::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 801555BC */
+{
+    int v = ((Unk8016C1C4_List*)ctx)->fn_8016C798(a);
+    if (v == 0x39) {
+        Unk80178BBC_T* l = (Unk80178BBC_T*)ctx->mA4C->m700->m3AC;
+        for (int i = 0; i <= 7; ) {
+            fn_801556A4(fn_80178E6C(l, 0, i++));
+        }
+    } else if (v == 0x3A) {
+        Unk80178BBC_T* l = (Unk80178BBC_T*)ctx->mA4C->m700->m3AC;
+        for (int i = 0; i <= 7; ) {
+            fn_801556A4(fn_80178E6C(l, 1, i++));
+        }
+    } else {
+        fn_801556A4(((Unk8016C1C4_List*)ctx)->fn_8016C788(a));
+    }
+}
+
+void cScriptRunGoal::fn_801556A4(Unk8016C788_Obj* o) /* 801556A4 */
+{
+    if (o != 0) {
+        Unk8027C728_Goal* g = fn_802448F4(o, 1);
+        g->m10 = 4;
+        fn_8027C728(g);
+        Unk8028C6B8_Goal* gg = (Unk8028C6B8_Goal*)((char*)g + 0x18);
+        gg->fn_8028F01C(m1C);
+        gg->m34 = 1;
+        if (m4 != 0) {
+            gg->fn_8028EE4C(((Obj708*)o)->m708, 0);
+            gg->fn_8028EEF4();
+        } else if (m14 != 0) {
+            gg->fn_8028EDD0(m18);
+        } else {
+            gg->fn_8028ED30(*(Unk80273498_Vec3*)&m8);
+        }
+        fn_8015152C(o, g);
+        ((Vt80155A0*)((char*)o + 0xA0))->s13();
     }
 }
 

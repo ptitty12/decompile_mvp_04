@@ -525,6 +525,7 @@ public:
     virtual Unk8037B3E8* fn_vslot5();
     virtual int fn_cslot8();
     virtual int fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3);
+    void fn_801556A4(struct Unk8016C788_Obj* o);
 
     int m4;
     float m8;

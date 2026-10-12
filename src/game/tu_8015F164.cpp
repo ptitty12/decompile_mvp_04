@@ -4,21 +4,16 @@
  */
 #include "game/tu_8015AA94.h"
 
-extern float lbl_805C8EE8;
-extern const float lbl_805C8EC8;
-extern const float lbl_805C8ECC;
-extern Unk80326F44_Out lbl_805EBA10;
-extern float lbl_805C8EEC;
+extern const Unk80326F44_Out lbl_805EBA10;
 
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
 }
 
-/* near-miss: same logic; retail keeps the constant in f31 across the call and tests the result through a bool temp (li 1; cmpwi 0xC7; bne; li 0); const globals and inline IsValid tried */
 int Unk80159F28::fn_8015F164(Unk8015F164_Evt* e) /* 8015F164 */
 {
-    const float c = lbl_805C8EC8;
+    const float c = 0.6f;
     Unk80326F44_Out a = mC->m50.fn_80326F44(0x39, 0, e->m4);
     if (IsValid(a)) {
         if (a.m4 - e->m4 < c) {
@@ -28,11 +23,10 @@ int Unk80159F28::fn_8015F164(Unk8015F164_Evt* e) /* 8015F164 */
     return 0;
 }
 
-/* near-miss: same shape as fn_8015F164 (constant kept in f31, bool temp); 6 instructions more in retail */
 Unk80326F44_Out Unk80159F28::fn_8015F1F4(Unk8015F164_Evt* e) /* 8015F1F4 */
 {
-    const float c = lbl_805C8ECC;
     Unk801527C8_Sub* s = &mC->m50;
+    const float c = 0.6f;
     int id;
     switch (e->mC) {
     case 0:
@@ -51,7 +45,7 @@ Unk80326F44_Out Unk80159F28::fn_8015F1F4(Unk8015F164_Evt* e) /* 8015F1F4 */
         return lbl_805EBA10;
     }
     Unk80326F44_Out a = s->fn_80326F44(id, 1, e->m4 - c);
-    if (a.m0 != 0xC7) {
+    if (IsValid(a)) {
         if (!(a.m4 - e->m4 >= c)) {
             return a;
         }
@@ -103,7 +97,7 @@ int Unk80159F28::fn_8015F840() /* 8015F840 */
 void Unk80159F28::fn_8015F87C() /* 8015F87C */
 {
     Unk801527C8_Actor* a = mC;
-    if (!((float)*(unsigned int*)&a->m4C * lbl_805C8EE8 > lbl_805C8EEC)) {
+    if (!((float)*(unsigned int*)&a->m4C * 0.016666668f > 21600.0f)) {
         Unk801527C8_Mgr* m = a->m6F8;
         int r = m->m10->m13C;
         if (m->fn_8006BE18() != 0 && r != 0) {
