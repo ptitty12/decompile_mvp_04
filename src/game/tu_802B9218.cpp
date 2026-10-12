@@ -746,17 +746,10 @@ void fn_802BA8C8()
     }
 }
 
-/* near-miss: retail keeps v in the sp+8 float temp and f13 = v - m0 directly; ours spills through sp+12. */
 void fn_802BA908(Unk802BA828* p)
 {
     float v = fn_801A0744(p->m8);
-    float d;
-    if (p->m0 < 0.0f) {
-        d = 0.0f;
-    } else {
-        d = v - p->m0;
-    }
-    p->m4 = d;
+    p->m4 = !(p->m0 < 0.0f) ? v - p->m0 : 0.0f;
     p->m0 = v;
 }
 
@@ -819,10 +812,12 @@ void fn_802AD2B8(void* a, void* b, const char* name, void* c, int d);
 void fn_8035A71C(void* a, void* b);
 void fn_80314D60(int a);
 void* fn_803773D8(unsigned int n);
-void* fn_802BB0E4(void* p);
 void fn_802BB4BC(Unk802BB1E4_Obj* o);
+void fn_802BB4B8(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*);
 void fn_802BB334(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
 void fn_802BB29C(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
+struct Unk802BB0E4_O;
+Unk802BB0E4_O* fn_802BB0E4(Unk802BB0E4_O* p);
 
 void fn_802BACDC(Unk802BACDC_Bat* b)
 {
@@ -870,10 +865,65 @@ void fn_802BB074(Unk802BACDC_Bat* b)
     }
 }
 
+struct Unk802BB0E4_O {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    const char* m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    const char* m34;
+};
+
+extern const char lbl_805E1024[];
+extern const char lbl_805E1040[];
+extern const char lbl_805E105C[];
+extern const char lbl_805E108C[];
+extern const char lbl_805E1B78[];
+void fn_8043FDC0();
+void fn_8052A220();
+int fn_80400560(int p, int n);
+void* fn_8014EB44();
+void fn_8014EB90(void* h, int ok, const char* msg);
+void* fn_8040B320(void* dst, int c, unsigned int n);
+void fn_802BB400(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*);
+void fn_802BB474(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*);
+int fn_803FED48(const char* name, int a, int b, void* c);
+int fn_803FEDB8(void* p, int a);
+int fn_802B9A04(int a);
+int fn_802B9954(int a, int b, int c);
+
+/* near-miss (parked): retail forms the end addresses 0x8052A208 / 0x805A2BB0 as lis+addi (address-style @ha/@l); a plain integer constant gives lis+ori */
+Unk802BB0E4_O* fn_802BB0E4(Unk802BB0E4_O* p)
+{
+    p->m8 = 0;
+    p->mC = 0;
+    p->m10 = 0;
+    p->m0 = (int)fn_8043FDC0;
+    p->m4 = 0x8052A208 - (int)fn_8043FDC0;
+    p->m14 = fn_80400560(p->m0, p->m4);
+    p->m2C = 0;
+    p->m24 = 0;
+    p->m28 = 0;
+    p->m20 = 0x805A2BB0 - (int)fn_8052A220;
+    p->m18 = lbl_805E1024;
+    p->m1C = (int)fn_8052A220;
+    p->m30 = fn_80400560(p->m1C, p->m20);
+    p->m34 = lbl_805E1040;
+    return p;
+}
+
 void* fn_802BB19C()
 {
     if (lbl_8061EAEC == 0) {
-        lbl_8061EAEC = fn_802BB0E4(fn_803773D8(0x38));
+        lbl_8061EAEC = fn_802BB0E4((Unk802BB0E4_O*)fn_803773D8(0x38));
     }
     return lbl_8061EAEC;
 }
@@ -903,6 +953,37 @@ int fn_802BB27C(char* o, int idx)
     return *(int*)(b + t * 0x1C);
 }
 
+void fn_802BB29C(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+{
+    void* r = fn_8014EB44();
+    int cs = fn_80400560(o->m0, o->m4);
+    fn_8014EB90(r, cs == o->m14, lbl_805E105C);
+    o->m10 = 1;
+    fn_8040B320((void*)o->m0, 0, o->m4);
+    fn_802BB4B8(self, o);
+    fn_802BB400(self, o);
+    fn_802BB4BC(self);
+}
+
+void fn_802BB334(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+{
+    int z = 0;
+    int sp8;
+    fn_802BB4BC(self);
+    o->m10 = z;
+    fn_802BB474(self, o);
+    fn_8040B320((void*)o->m0, 0, o->m4);
+    sp8 = z;
+    fn_803FED48(lbl_805E1B78, 0x100, 0, &sp8);
+    int v = fn_802B9A04(o->m18);
+    fn_802B9954(o->m18, o->m0, v);
+    fn_803FEDB8((void*)sp8, 0);
+    sp8 = z;
+    void* r = fn_8014EB44();
+    int cs = fn_80400560(o->m0, o->m4);
+    fn_8014EB90(r, cs == o->m14, lbl_805E108C);
+}
+
 void fn_802BB400(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
 {
     int h = fn_803ED9D4();
@@ -919,6 +1000,6 @@ void fn_802BB474(Unk802BB1E4_Obj*, Unk802BB1E4_Obj* o)
     o->mC = 0;
 }
 
-void fn_802BB4B8()
+void fn_802BB4B8(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*)
 {
 }
