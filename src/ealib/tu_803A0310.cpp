@@ -78,7 +78,7 @@ void fn_8039868C(Vp6BufView* b, unsigned char* base);
 void fn_803A0884(Vp6BufView* b, unsigned char* base, Vp6Out* r, int a, int c);
 
 int fn_803A0EBC(Vp6Rc* rc);
-int fn_803A0E18(Vp6Rc* rc, int prob);
+int fn_803A0E18(Vp6Rc* rc, unsigned prob);
 
 /* near-miss: same weights as fn_803A00DC; load and multiply scheduling differ (72 vs 62 insns). */
 void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
@@ -235,6 +235,104 @@ void fn_803A0D54(Vp6Ctx* c)
             }
         }
     }
+}
+
+/* near-miss: 41 insns like the original code; range/value swap r7/r8 (the original keeps range in r8). */
+int fn_803A0E18(Vp6Rc* rc, unsigned prob)
+{
+    unsigned range = rc->m4;
+    int bit = 0;
+    unsigned value = rc->m8;
+    int count = rc->mC;
+    unsigned split = (((range - 1) * prob) >> 8) + 1;
+    unsigned big = split << 24;
+    if (value >= big) {
+        range = rc->m4 - split;
+        value -= big;
+        bit = 1;
+    } else {
+        range = split;
+    }
+    if (range > 127) {
+        rc->m4 = range;
+        rc->m8 = value;
+        return bit;
+    }
+    do {
+        range <<= 1;
+        value <<= 1;
+        count--;
+        if (count == 0) {
+            value |= rc->m14[rc->m10];
+            rc->m10++;
+            count = 8;
+        }
+    } while (range < 128);
+    rc->m4 = range;
+    rc->mC = count;
+    rc->m8 = value;
+    return bit;
+}
+
+int fn_803A0EBC(Vp6Rc* rc)
+{
+    unsigned range = rc->m4;
+    unsigned value = rc->m8;
+    int count = rc->mC;
+    unsigned split = (range + 1) >> 1;
+    unsigned big = split << 24;
+    int bit;
+    if (value >= big) {
+        range = (range - split) << 1;
+        value = (value - big) << 1;
+        bit = 1;
+    } else {
+        range = split << 1;
+        value <<= 1;
+        bit = 0;
+    }
+    count--;
+    if (count == 0) {
+        value |= rc->m14[rc->m10];
+        rc->m10++;
+        count = 8;
+    }
+    rc->mC = count;
+    rc->m8 = value;
+    rc->m4 = range;
+    return bit;
+}
+
+/* near-miss: 37 insns like the original code; range and value swap r7/r8. */
+int fn_803A0F38(Vp6Rc* rc, unsigned prob)
+{
+    unsigned range = rc->m4;
+    int bit = 0;
+    int count = rc->mC;
+    unsigned value = rc->m8;
+    unsigned split = (((range - 1) * prob) >> 8) + 1;
+    unsigned big = split << 24;
+    if (value >= big) {
+        range -= split;
+        value -= big;
+        bit = 1;
+    } else {
+        range = split;
+    }
+    while (range < 128) {
+        range <<= 1;
+        value <<= 1;
+        count--;
+        if (count == 0) {
+            value |= rc->m14[rc->m10];
+            rc->m10++;
+            count = 8;
+        }
+    }
+    rc->m4 = range;
+    rc->mC = count;
+    rc->m8 = value;
+    return bit;
 }
 
 int fn_803A2524(Vp6Ctx* c)

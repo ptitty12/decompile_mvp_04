@@ -55,7 +55,7 @@ void fn_80398614(void* p);
 void* fn_803985F4(int size, int flags);
 int fn_803A0EBC(Vp6Rc* rc);
 int fn_8039EF84(Vp6Rc* rc, int n);
-int fn_803A0E18(Vp6Rc* rc, int prob);
+int fn_803A0E18(Vp6Rc* rc, unsigned prob);
 int fn_8039CC38(Vp6Ctx* c);
 void fn_8039C980(Vp6Ctx* c);
 int fn_8039E9E0(void* ctx);
