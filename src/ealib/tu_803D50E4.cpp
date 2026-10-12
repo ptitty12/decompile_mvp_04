@@ -318,6 +318,93 @@ extern "C" Unk803D50E4Mat* fn_803D700C(Unk803D50E4Mat* self)
     return self;
 }
 
+
+struct Unk803D707CObj {
+    char pad0[0x44];
+    int m44;
+    int m48;
+    int* m4C;
+    int* m50;
+};
+extern void* (*lbl_8062C668)(int size, const char* tag);
+extern "C" void* memset(void* p, int c, unsigned n);
+
+extern "C" int fn_803D707C(Unk803D707CObj* self, int item)
+{
+    int cap = self->m44;
+    if (self->m48 >= cap) {
+        if (cap > 15)
+            self->m44 = cap * 2;
+        else
+            self->m44 = 16;
+        int* np = (int*)lbl_8062C668(self->m44 * 4, "Dynamic Model Geoprim list");
+        for (int i = 0; i < self->m48; i++)
+            np[i] = self->m4C[i];
+        if (self->m4C)
+            lbl_8062C66C(self->m4C, cap * 4);
+        self->m4C = np;
+        int* np2 = (int*)lbl_8062C668(self->m44 * 4, "Dynamic Model Draw Array list");
+        memset(np2, 0, self->m44 * 4);
+        for (int i = 0; i < self->m48; i++)
+            np2[i] = self->m50[i];
+        if (self->m50)
+            lbl_8062C66C(self->m50, cap * 4);
+        self->m50 = np2;
+    }
+    self->m4C[self->m48++] = item;
+    return self->m48 - 1;
+}
+
+struct Unk803D71F0Obj {
+    Mtx4 m0;
+    char pad40[8];
+    int m48;
+    int m4C;
+    void** m50;
+};
+extern Mtx4 lbl_806AAA10;
+extern Mtx4 lbl_806AA9D0;
+extern Mtx4 lbl_806AAA50;
+extern Mtx4 lbl_806AAA90;
+extern Mtx4 lbl_806AAAD0;
+extern int lbl_80627290;
+extern int lbl_806279C0;
+extern int lbl_806279C4;
+extern void (*lbl_806279C8)();
+extern "C" {
+void fn_804315FC(Mtx4* a, Mtx4* b, Mtx4* c);
+int fn_803D9DF4();
+void fn_803D9528();
+void fn_803E6D00(void* a, void* b);
+void fn_803E6C28(void* a, int b);
+}
+
+extern "C" void fn_803D71F0(int p)
+{
+    Unk803D71F0Obj* self = (Unk803D71F0Obj*)p;
+    lbl_806AAA10 = self->m0;
+    fn_804315FC(&lbl_806AAA10, &lbl_806AAA90, &lbl_806AAAD0);
+    fn_804315FC(&lbl_806AAA10, &lbl_806AA9D0, &lbl_806AAA50);
+    lbl_80627290 = 0;
+    if (fn_803D9DF4() != 0)
+        fn_803D9528();
+    lbl_806279C0 = 0;
+    lbl_806279C4 = -1;
+    for (int i = 0; i < self->m48; i++) {
+        if (self->m50[i] != 0) {
+            fn_803E6D00(self->m50[i], self);
+            fn_803E6C28(self->m50[i], ((int*)self->m50[i])[0x34 / 4]);
+        } else {
+            void* o = ((void**)self->m4C)[i];
+            (**(void (***)(void*))o)(o);
+        }
+    }
+    if (lbl_806279C8 != 0) {
+        lbl_806279C8();
+        lbl_806279C8 = 0;
+    }
+}
+
 /* near-miss (2 instructions longer): the reverse search over the 16-byte records; retail keeps the
    record pointer one element ahead and rebuilds the end pointer on exit. */
 extern "C" Unk803D50E4It fn_803D7378(Unk803D50E4Seq* s, const char* name)
@@ -451,7 +538,6 @@ extern "C" void fn_803D7804()
 }
 
 /*
- * Not attempted yet: fn_803D5130 (126), fn_803D5328 (219), fn_803D5694 (424), fn_803D6144 (249), fn_803D6528 (141),
- * fn_803D675C (84), fn_803D68AC (246), fn_803D6C84 (226), fn_803D707C (93), fn_803D71F0 (98).
- * The original code stays linked for these.
+ * Not matched yet: fn_803D5130, fn_803D5328, fn_803D5694, fn_803D6144, fn_803D6528, fn_803D675C (iterator
+ * compare loop), fn_803D68AC, fn_803D6C84. The original code stays linked for these.
  */
