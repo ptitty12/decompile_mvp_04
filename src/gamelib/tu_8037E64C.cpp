@@ -472,12 +472,49 @@ struct VM848 {
     virtual void s10();
     virtual void s11();
     virtual void s12();
-    virtual void s13();
-    virtual void s14();
+    virtual int s13(int key);
+    virtual int s14();
     virtual int s15();
 };
 extern "C" float fn_80381650(VX13** objs, int n, SegList* p, int key, int* out1, Obj14** out2, float a, float b);
 extern "C" int fn_80381BCC(Unk8037E9D0* o, int a);
+
+struct VB4 {
+    virtual ~VB4();
+    virtual void s2();
+    virtual void s3();
+    virtual int s4();
+};
+struct VY884 {
+    virtual ~VY884();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25(int a, VB4* b, int c);
+};
+extern int lbl_8062427C;
+extern int lbl_806242B4;
+
 
 extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 {
@@ -994,6 +1031,42 @@ extern "C" void fn_80381F94(Unk8037E9D0* o, PX* p)
             o->q868.d = 0.0f;
             o->m87C = 0.0f;
         }
+    }
+}
+
+extern "C" void fn_80382118(Unk8037E9D0* o, int a, VB4* b, int c)
+{
+    if (o->m850 == 0) {
+        if (a == lbl_8062427C) {
+            o->m84C = 0;
+            VM848* t = (VM848*)o->m848;
+            if (t != 0 && t->s14() != 0)
+                o->m84C = ((VM848*)o->m848)->s13(lbl_806242B4);
+            if (o->m84C != 0 || !((o->m844 == 0 || c != 0) && o->m838 == o->m83C)) {
+                o->m850 = 1;
+            } else {
+                VOut* r = fn_80381E08(o, o->m834, o->m838);
+                if (r != 0) {
+                    fn_80381BCC(o, (int)r);
+                    o->m850 = 1;
+                    t = (VM848*)o->m848;
+                    if (t != 0 && t->s14() != 0)
+                        o->m84C = ((VM848*)o->m848)->s13(lbl_806242B4);
+                    else
+                        o->m84C = 0;
+                }
+            }
+        } else {
+            fn_8037893C((int)o, a, b, c, 0);
+            VM848* t = (VM848*)o->m848;
+            if (t != 0 && t->s14() != 0) {
+                o->m84C = ((VM848*)o->m848)->s13(b->s4());
+                if (o->m84C != 0)
+                    o->m850 = 1;
+            }
+        }
+        if (o->m850 != 0)
+            ((VY884*)o->m884)->s25(a, b, c);
     }
 }
 
