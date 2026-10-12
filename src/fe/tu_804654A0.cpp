@@ -3,8 +3,64 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+struct FeSub11 : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual int s11();
+};
+extern const char lbl_805F59C4[];
+extern "C" {
+void fn_800D0074(void* p, int v, int c);
+int fn_80078A38__18Unk8007B2B0_Screeni(void* g, int a);
+int fn_80075948__18Unk8007B2B0_Screeni(void* g, int a);
+}
+
+static inline FeW*& FeWpq(void* x, int off)
+{
+    return *(FeW**)((char*)x + off);
+}
 
 extern "C" {
+FE_OVERLAY void fn_80466E08(void* x)
+{
+    FeW* a = FeWpq(x, 0x15C);
+    int v = ((FeSub11*)((char*)a + 0xDC))->s11();
+    fn_800D0074((char*)FeWpq(x, 0x150) + 0x98, v, 0);
+    fn_800D0074((char*)FeWpq(x, 0x154) + 0xDC, v, 0);
+    ((FeWV*)x)->s68(fn_800C805C(FeWpq(x, 0x13C)->fn_vslot32(lbl_805F59C4, 1)), 1);
+}
+
+FE_OVERLAY int fn_80466ED0(int a, int b, int c)
+{
+    void* g = lbl_8061930C;
+    if (fn_80078A38__18Unk8007B2B0_Screeni(g, a) == 0) {
+        if (b == 0 || fn_80075948__18Unk8007B2B0_Screeni(g, a) != fn_80075948__18Unk8007B2B0_Screeni(g, b)) {
+            if (c != 0) {
+                if (fn_80075948__18Unk8007B2B0_Screeni(g, a) == fn_80075948__18Unk8007B2B0_Screeni(g, c)) {
+                    goto yes;
+                }
+                goto no;
+            }
+            goto no;
+        }
+        goto yes;
+    }
+    if (b == a || c == a) {
+    yes:
+        return 1;
+    }
+no:
+    return 0;
+}
+
 FE_OVERLAY int fn_8046BDE0(FeScrI* x)
 {
     if (fn_8046C5C0(x) != 0) {
