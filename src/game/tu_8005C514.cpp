@@ -150,18 +150,38 @@ void fn_8005CAC0(Unk8005BA1C_Obj* o)
     o->m4 = 0;
 }
 
-/* near-miss (7 slots): same instruction stream as retail, but the local
- * allocator gives the byte index r0 and the element address r9 where retail
- * has r9 and r11, which shifts the base/counter registers too. The same loop
- * shape is in fn_80053220 and fn_80054684. */
+/* Base and byte offset are plain ints so neither address operand is pointer-flagged;
+ * regclass then keeps both out of r0 (retail's r9/r11). Same loop shape in
+ * fn_80053220 and fn_80054684. */
 static inline int SumRow(Unk80052794_Row* r)
 {
     int s = 0;
     for (int i = 0; i < 0x80; i++) {
-        s += r->vals[(unsigned char)i];
+        int ba = (int)r + 0x1B4;
+        int bo = (unsigned char)i;
+        s += *(unsigned char*)(ba + bo);
     }
     return s;
 }
+
+int fn_8005CACC(Unk8005C97C_Q* q, Unk8005C97C_Elem* e)
+{
+    unsigned i = 0;
+    Unk8005C97C_Elem tmp = *e;
+    for (; i < q->m4; i++) {
+        if (!(e->m0 <= q->m8[i].m0)) {
+            Unk8005C97C_Elem t2 = q->m8[i];
+            q->m8[i] = tmp;
+            tmp = t2;
+        }
+    }
+    if (i < q->m0) {
+        q->m8[i] = *e;
+    }
+    q->m4 = q->m4 + 1;
+    return 1;
+}
+
 
 Unk8005C97C_Elem* fn_8005CD20(Unk8005C97C_Q* q)
 {
@@ -191,17 +211,15 @@ int fn_8005CDC4(Unk80057204_Mgr* self, Unk80052794_Obj* obj)
     return (d < 0 ? -d : d) <= 3;
 }
 
-/* near-miss (6 slots): same compares; retail keeps the first constant in f13 and
- * the second in f1 (f1 then overwritten by fmr), this picks other float registers. */
 float fn_8005CE4C(Unk80057204_Mgr* self, float x)
 {
-    if (x == lbl_805ADC6C) {
-        return lbl_805ADC70;
+    if (x == 100.0f) {
+        return 0.0f;
     }
-    if (x == lbl_805ADC70) {
-        return lbl_805ADC6C;
+    if (x == 0.0f) {
+        return 100.0f;
     }
-    return lbl_805ADC70;
+    return 0.0f;
 }
 
 float fn_8005CE90(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
