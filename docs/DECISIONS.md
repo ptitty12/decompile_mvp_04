@@ -117,6 +117,9 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
+- 2026-10-12 | **Reference reading of a public NFS:MW decomp for EA SND** (lead, recorded for the owner). The tail-03 worker read three EA SND files (spktplay.c, sstvol.c, sfxlevel.c) from a public Need for Speed: Most Wanted decompilation via `gh api` (printed only, nothing saved to disk). It used them as references: the functions came out byte-identical, and 14 SNDPKTPLAY* names were taken from them, backed by body matches plus sndcmn.h prototypes. No game data was involved. That repo's license was not checked; the mitsevox port (CC0) was. | Options: (a) allow reading public decomps of other EA titles as references, with names only when body-matched (current practice); (b) restrict references to CC0/permissive projects; (c) forbid. Workers continue under (a) until the owner says otherwise. |
+
+
 - 2026-10-11 | **verify.py ignores every `#pragma` line in its allowlist** (it treats lines starting with `#` as comments). Owner's approved pragmas therefore have no effect. One-line fix: treat lines starting with `#pragma` as entries. The exact PowerShell command was given to the owner in chat. Options: apply / leave (W2 can't merge).
 
 
