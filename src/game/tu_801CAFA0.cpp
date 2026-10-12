@@ -308,7 +308,6 @@ extern "C" void fn_801CD0F0(Z* z)
     }
 }
 
-/* near-miss (62 vs 61 instructions): retail emits the 0..3 case block before the case 6 test. */
 extern "C" void fn_801CD2CC(Z* z)
 {
     fn_801CCE0C(z);
@@ -319,16 +318,12 @@ extern "C" void fn_801CD2CC(Z* z)
         z->m120 = one;
         if (fn_801CDA84(z) == 0)
             z->m1A8 = one;
-        switch (z->m1A8) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-            fn_801CB324(z);
-            break;
-        case 4:
-            break;
-        case 6:
+        int s = z->m1A8;
+        if (s == 4) {
+        } else if (s <= 4) {
+            if (s >= 0)
+                fn_801CB324(z);
+        } else if (s == 6) {
             z->m1AC = one;
             fn_801CD0F0(z);
             lbl_8068C6C8 = z->m130;
@@ -340,7 +335,6 @@ extern "C" void fn_801CD2CC(Z* z)
             fn_801CA144(z);
             fn_801CA654(z);
             lbl_80691DBC = *(V2*)z->m150;
-            break;
         }
     }
 }
