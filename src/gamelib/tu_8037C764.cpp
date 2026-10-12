@@ -68,6 +68,27 @@ struct Unk8037D92C {
     char pad0[0x60];
     V3S m60;
 };
+struct Ent16F {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+    Ent16F()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0.0f;
+        mC = 0.0f;
+    }
+};
+struct Unk8037E118 {
+    char pad0[4];
+    int m4;
+    Ent16F* m8;
+};
+extern "C" int atoi(const char* s);
+extern "C" double atof(const char* s);
+void* operator new[](unsigned int size, int heap);
 struct V4F {
     float x;
     float y;
@@ -637,6 +658,58 @@ extern "C" void fn_8037E0C0(KnotBuf* p, int chrg)
         fn_80377488((void*)p->m8);
     if (chrg & 1)
         fn_80377408(p);
+}
+
+extern "C" void fn_8037E118(Unk8037E118* o, char* data, int len)
+{
+    o->m4 = atoi(data);
+    if (o->m8 != 0) {
+        fn_80377488(o->m8);
+        o->m8 = 0;
+    }
+    int n = o->m4;
+    if (n != 0) {
+        o->m8 = new (lbl_806EF9B4 | 0x100) Ent16F[n];
+    }
+    char* cursor = data;
+    int rem = len;
+    char* tok;
+    int tokLen;
+    int i = 0;
+    fn_80378E48(&cursor, &rem, '#', &tok, &tokLen);
+    if (i < o->m4) {
+        int off = 0;
+        do {
+            i++;
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            *(unsigned*)(off + (int)o->m8) = fn_80378568(tok, tokLen);
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->m4 = fn_80378568(tok, tokLen);
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->m8 = (float)atof(tok);
+            fn_80378E48(&cursor, &rem, '#', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->mC = (float)atof(tok);
+            off += 0x10;
+        } while (i < o->m4);
+    }
+    i = 0;
+    if (o->m4 - 1 > 0) {
+        do {
+            int off = i * 0x10;
+            Ent16F* e = (Ent16F*)(off + (int)o->m8);
+            Ent16F* f = e + 1;
+            if (!(e->m8 <= f->m8)) {
+                Ent16F t;
+                t = *f;
+                *f = t;
+                o->m8[i] = t;
+                if (i > 0)
+                    i--;
+            } else {
+                i++;
+            }
+        } while (i < o->m4 - 1);
+    }
 }
 
 extern "C" void fn_8037E600(Unk8037E600* o, int idx)
