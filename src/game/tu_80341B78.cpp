@@ -255,7 +255,7 @@ extern "C" {
 const char* fn_802B9300(const char* s, int a, int b, unsigned* outn);
 void fn_802B961C(const char* p, int a);
 void fn_803792AC(const char** pp, unsigned* pn);
-void fn_80329D1C(const char** pp, unsigned* pn, unsigned* out, int lo, int hi, int delim);
+int fn_80329D1C(const char** pp, unsigned* pn, unsigned* out, int lo, int hi, int delim);
 void fn_80329AEC(const char** pp, const char** out, unsigned* pn, int delim);
 int strcmp(const char* a, const char* b);
 }

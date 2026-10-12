@@ -83,7 +83,7 @@ struct Unk8018E8F4_Ctx {
 extern Unk80183918_Vec3 lbl_806055B8;
 extern "C" {
 int fn_8019BBC0(void** o, void* a, void* b, float* t, void* p1, void* p2, float k);
-void fn_801923CC(void* ret, void* a, void* b, void* c, void* d, int e, int f);
+int fn_801923CC(void* ret, void* a, void* b, void* c, void* d, int e, int f);
 void fn_8017BB18(void* p, int a, void* o, int b, int c);
 void fn_8017BB3C(void* p, int a, void* o, int b);
 void fn_8018A930(Unk80188698* o, int a, float t, void* b, void* c, void* d);

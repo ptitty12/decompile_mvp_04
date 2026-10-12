@@ -81,7 +81,7 @@ void fn_803DDA8C(void* a, void* b);
 void fn_802AF1C4(Mgr* m, void* a, int b);
 void fn_802BBA88(void* p);
 int fn_8040B6A0(const char* s);
-void fn_80379094(const char* s, int len, int a);
+int fn_80379094(const char* s, int len, int a);
 void fn_80378EF8(const char* s, int len, char* buf, int cap, int* n);
 int fn_8033E958(const char* fmt, ...);
 char* fn_8040B8FC(const char* s, int c);

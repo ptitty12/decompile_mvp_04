@@ -130,7 +130,7 @@ struct FeRaw174 {
     char m174[0x48];
     const void* m1BC;
 };
-extern "C" void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
+extern "C" int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 extern char lbl_805F36A0[];
 extern int lbl_806221E0;
 

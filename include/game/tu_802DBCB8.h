@@ -23,7 +23,7 @@ struct Unk802DD0BC_Rec {
 
 extern "C" int fn_802DC9C0();
 extern "C" {
-void fn_803FEBDC(int name, int mode, int bufsize, int* handle);   /* open */
+int fn_803FEBDC(int name, int mode, int bufsize, int* handle);   /* open */
 void fn_803FEC4C(int h, int pos, char* buf, int n, int mode);     /* read */
 int fn_803FEC74(int h, int pos, char* buf, int n, int mode);      /* write */
 void fn_803FEC9C(int h, int mode);                                /* close */

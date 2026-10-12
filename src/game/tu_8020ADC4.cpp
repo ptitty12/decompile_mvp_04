@@ -386,9 +386,9 @@ extern "C" float fn_8020E71C(Scr* p, int a1, int a2, const Unk801EE438_Vec& v, i
 
 /* near-miss (2 slots): the two argument moves for the fn_80216590 call (mr r8,r9 / mr r5,r11) are
  * ordered the other way round than retail. */
-extern "C" void fn_8020E82C(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, int a5, int a6, int a7)
+extern "C" float fn_8020E82C(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, int a5, int a6, int a7)
 {
-    fn_8020E8B4(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6), a7);
+    return fn_8020E8B4(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6), a7);
 }
 
 extern "C" float fn_8020E8B4(Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7)
