@@ -416,6 +416,59 @@ void fn_801A29B8(Unk8019F8C0_Owner* o)
     }
 }
 
+struct Unk801A2A3C_Mtx {
+    float m[16];
+};
+extern "C" double log(double x);
+extern "C" double exp(double x);
+extern "C" void fn_803DF4E4(Unk801A2A3C_Mtx* m, float a, float b, float c, float d);
+extern "C" void fn_803DED40(Unk801A2A3C_Mtx* m, Unk801A2608_V* in, Unk801A2608_V* out);
+
+inline void Unk801A2A3C_Add(Unk801A2608_V* d, const Unk801A2608_V* s)
+{
+    d->x += s->x;
+    d->y += s->y;
+    d->z += s->z;
+}
+
+inline float Unk801A2A3C_Ln(float x)
+{
+    return (float)log(x);
+}
+
+extern "C" void fn_801A2A3C(void* self, Unk801A2608_V* c, Unk801A2608_V* o1, Unk801A2608_V* o2, Unk801A2608_V* o3, Unk801A2608_V* o4, float a, float b)
+{
+    Unk801A2608_V z = lbl_806055AC;
+    Unk801A2A3C_Mtx m;
+    float v = b;
+    float unused; /* never read; its float-store slot sits between v and t in the original frame */
+    float t = v * 3.0f;
+    o1->x = z.x + a;
+    o1->y = z.y;
+    o1->z = z.z + a;
+    o2->x = z.x + a;
+    o2->y = z.y;
+    o2->z = z.z - a;
+    o3->x = z.x - a;
+    o3->y = z.y;
+    o3->z = z.z + a;
+    o4->x = z.x - a;
+    o4->y = z.y;
+    o4->z = z.z - a;
+    float k = 0.25f;
+    float y = Unk801A2A3C_Ln(t) * k;
+    v = (float)exp(y) * 14.0f;
+    fn_803DF4E4(&m, v * 57.295773f, 0.0f, 1.0f, 0.0f);
+    fn_803DED40(&m, o1, o1);
+    fn_803DED40(&m, o2, o2);
+    fn_803DED40(&m, o3, o3);
+    fn_803DED40(&m, o4, o4);
+    Unk801A2A3C_Add(o1, c);
+    Unk801A2A3C_Add(o2, c);
+    Unk801A2A3C_Add(o3, c);
+    Unk801A2A3C_Add(o4, c);
+}
+
 void fn_801A3704(Unk8019F8C0_Owner* o, int v)
 {
     if (v != 0) {
