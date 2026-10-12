@@ -871,6 +871,87 @@ void fn_801B6A80(void* p)
     fn_80249B08(p, 0, lbl_805CF8EC);
 }
 
+class Unk80287D70 {
+public:
+    Unk80287D70* fn_80287DB8(int kind);
+};
+struct Unk8027C728_Goal {
+    Unk8027C728_Goal* m0;
+    char pad4[0x10 - 0x4];
+    int m10;
+    char pad14[0x18 - 0x14];
+    char m18[0x104 - 0x18];
+    char m104[4];
+};
+class Unk8027A84C {
+public:
+    int m0;
+    Unk8027A84C* m4;
+    void* m8;
+    int mC;
+    char pad10[0x34 - 0x10];
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    void fn_8027A898(const Unk80273498_Vec3* v);
+};
+class Unk8027A84C_Owner {
+public:
+    Unk8027A84C* fn_8027C67C();
+};
+class Unk8028B194 {
+public:
+    Unk8028B194* fn_8028B194(Unk80273498_Vec3 v);
+};
+struct Unk801B7BC4_P {
+    char pad0[0xB84];
+    float mB84;
+};
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk801B7BC4_P* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
+extern float lbl_805CF944;
+
+/* near-miss: same code; retail keeps a second copy of the goal pointer (mr r26,r31) alive until the final g->m0 load, so its callee-saved set is r24-r31 (mine r25-r31), 53 slots differ. */
+void fn_801B7BC4(Unk801B7BC4_P* p, const Unk80273498_Vec3* a, const Unk80273498_Vec3* b, int mode)
+{
+    if (!(p->mB84 > lbl_805CF944)) {
+        int ten = 0xA;
+        Unk8027C728_Goal* g = fn_802448F4(p, 2);
+        g->m10 = ten;
+        fn_8027C728(g);
+        ((Unk8028B194*)g->m18)->fn_8028B194(*b);
+        Unk80273498_Vec3 u = *a;
+        ((Unk8027A84C*)g->m18)->fn_8027A898(&u);
+        if (mode == 1) {
+            int three = 3;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = three;
+            Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+            g104->m38 = three;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = three;
+            g104->m34 = three;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+            g104->m40 = ten;
+        } else {
+            int two = 2;
+            int five = 5;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = two;
+            Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+            g104->m38 = two;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = two;
+            g104->m34 = two;
+            ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = five;
+            g104->m40 = five;
+        }
+        Unk8027C728_Goal* h = g->m0;
+        h->m10 = 2;
+        fn_8027C728(h);
+        ((Unk80287D70*)h->m18)->fn_80287DB8(0xF);
+        fn_8027D33C(g);
+    }
+}
+
 void fn_801B7ED8(void* p, Unk801B460C_Ob* o)
 {
     if (o) {

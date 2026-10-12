@@ -970,6 +970,72 @@ int fn_801A5580(Unk8019F8C0_Owner* o)
     return (int)o->m6E0[i].m4;
 }
 
+struct Unk801A55A8_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk801A55A8_Ent {
+    char pad0[0x60];
+    Unk801A55A8_V m60;
+    char pad6C[0x388 - 0x6C];
+    int m388;
+    int m38C;
+    char pad390[0x4A4 - 0x390];
+    unsigned m4A4;
+    char pad4A8[0x4DC - 0x4A8];
+    int m4DC;
+};
+struct Unk801A55A8_T {
+    char pad0[0x64];
+    int m64;
+};
+extern "C" float fn_804028E4(float x);
+extern float lbl_805CE814;
+inline float Unk801A55A8_Len(const Unk801A55A8_V& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+void fn_801A55A8(Unk8019F8C0_Owner* o)
+{
+    int n = o->m6D8;
+    for (int i = 0; i < n; i++) {
+        int d = 0;
+        Unk801A55A8_Ent* e = (Unk801A55A8_Ent*)o->m6E0[i].m4;
+        int ok;
+        if (o->m6F4 == 7) {
+            int a = e->m38C;
+            ok = 0;
+            if (a == 1 || a == 4) {
+                ok = 1;
+            }
+        } else {
+            ok = 0;
+            if (e->m38C == 1) {
+                int b = e->m388;
+                if (b == 3) {
+                    ok = 1;
+                } else if (b == 4) {
+                    ok = 1;
+                } else if (b == 5) {
+                    ok = 1;
+                }
+            }
+        }
+        if (ok != 0) {
+            Unk801A55A8_V v;
+            v = e->m60;
+            v.y = 0.0f;
+            d = (int)(Unk801A55A8_Len(v) * lbl_805CE814);
+            if ((v.x < 0.0f || !(v.z >= 0.0f)) && !(e->m4A4 & 0x2000000) && ((Unk801A55A8_T*)fn_801A6DB8(o))->m64 != 0) {
+                d = -d;
+            }
+        }
+        e->m4DC = d;
+    }
+}
+
 void fn_801A5708(Unk8019F8C0_Owner* o)
 {
     if (o->m6E4 == 0) {
