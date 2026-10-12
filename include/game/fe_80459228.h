@@ -358,7 +358,8 @@ struct FeSub : FeSubData {
     virtual int s21();
 };
 struct FeState {
-    char pad0[0x30];
+    int m0;
+    char pad4[0x30 - 4];
     int m30;
     char pad34[0x508 - 0x34];
     int m508;
