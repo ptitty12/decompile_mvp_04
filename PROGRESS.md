@@ -54,3 +54,24 @@
   - Next: ~10,400 functions sit in unsplit regions (0x803401A8-0x803663B0, .feoverlay, .dboverlay, EA/SDK tail). An Opus setup delegate is splitting them into code-only units.
   - Incidents: a usage limit cut off all workers once (resumed from their transcripts, nothing lost); the progress bot races lead doc pushes (rebase and rerun).
   | Owner: two open questions in DECISIONS (verify.py pragma allowlist; relocation-target checking). Neither blocks the team.
+
+### 2026-10-11 checkpoint (lead, after range-33 / Opus families 3)
+- main: 13,362 functions at 100% (of 24,158; 55%); code bytes about 23%. The remaining work is dominated by large functions.
+- Merged this stretch:
+  - game ranges 28, 29, 30 and pass2-04;
+  - fe ranges 33-36;
+  - db ranges 41 and 42 (first 3 units);
+  - clone.py (repo-wide twin cloner, about 150 clones);
+  - Opus families 3: two-vptr widget ctors solved, plus the callee `void*` return rule.
+- Running:
+  - fe ranges 37-40;
+  - db ranges 42 (units 4-7) and 43-46;
+  - pass-2 groups g16 and g17;
+  - Opus families 4 (dead-compare switches, frame-offset locals, callee-saved permutations);
+  - Opus tail setup (split about 3,500 EA-lib/SDK functions; flags survey; tu_80362FB4 -ffloat-store question).
+- Queued: 31 pass-2 groups (about 120 small unmatched functions each), then large-function strategy, then the tail ranges.
+- Blockers, owner-only (recorded in DECISIONS): the verify.py `#pragma` allowlist bug, which blocks W2's SDK branch; relocation-blind scoring, covered by the check_literals gate.
+- Known unresolved names, not mismatches:
+  - fn_803567AC: tu_80134A60 declares it as a free function; it is now `__11Unk803567AC`.
+  - fn_8037B424, now `_._11Unk8037B3E8`.
+  - fn_80090880: callers pass 2 arguments; use the cast recipe.
