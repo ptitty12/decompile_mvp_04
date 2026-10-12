@@ -1,6 +1,14 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x80409CC0-0x80409CF0 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* newlib 1.8.2 libc/stdlib/assert.c, as built into SN ProDG's libc (MVP links it, re4 does not; written
+ * here in the form of the other newlib units). */
+#include "newlib_stdio.h"
+
+extern int fiprintf(FILE *, const char *, ...);
+extern void abort(void);
+
+/* The assert() failure path: reports the expression, file and line on stderr and aborts. */
+void __assert(const char *file, int line, const char *failedexpr)
+{
+    (void)fiprintf(_stderr_r(_REENT), "assertion \"%s\" failed: file \"%s\", line %d\n", failedexpr, file, line);
+    abort();
+    /* NOTREACHED */
+}

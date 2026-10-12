@@ -1,6 +1,9 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x80409D88-0x80409DAC (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/atof.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib libc/stdlib/atof.c */
+#include "newlib_local.h"
+
+/* String to double. */
+double atof(const char *s)
+{
+    return strtod(s, NULL);
+}
