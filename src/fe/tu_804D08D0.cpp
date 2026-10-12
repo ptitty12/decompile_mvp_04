@@ -251,6 +251,7 @@ FE_OVERLAY void fn_804D1C00(FeS804D1070* x, FeW* w)
 
 }
 
+/* near-miss: same length; retail stores the vptr before the m14[] member-init loop and reuses the loop counter (-1) for m34/m38; the manual vptr store comes after the member inits here (a real virtual dtor would move it but emits a local vtable) */
 FE_OVERLAY FeNav::FeNav()
 {
     m40 = lbl_80655E98;
