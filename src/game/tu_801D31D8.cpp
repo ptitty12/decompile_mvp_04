@@ -82,6 +82,57 @@ static inline int FlagNZ(B* s)
     return t;
 }
 
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
+{
+    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+struct Unk801D31D8_V2 {
+    float x;
+    float y;
+};
+struct Unk801D31D8_M34 {
+    char pad0[0x3A4];
+    void* m3A4;
+};
+typedef Unk801D31D8_V2 (*Unk801D31D8_VaFn)(void*, ...);
+extern "C" Unk801D31D8_V2 fn_801CD94C(void* p);
+struct Unk801D31D8_W {
+    char pad0[0x34];
+    Unk801D31D8_M34* m34;
+};
+inline float LerpATB(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+extern "C" float fn_801D2E0C(B* s);
+
+extern "C" void fn_801D31D8(B* s)
+{
+    int h = ((Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30))->v24();
+    Unk801D31D8_V2 v = ((Unk801D31D8_VaFn)fn_801CD94C)(((Unk801D31D8_W*)s)->m34->m3A4);
+    float t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
+    float u = fn_801D2E0C(s);
+    float w = LerpATB(0.0f, 1.0f - u, 1.7f);
+    if (!(t <= 0.0f))
+        s->m44.mC = t - w;
+    else
+        s->m44.mC = t + w;
+    if (h != 0)
+        s->m44.mC = -s->m44.mC;
+    s->m44.mC = !(s->m44.mC > 1.0f) ? (s->m44.mC >? -1.0f) : 1.0f;
+    float r = RandG(s->m30, 1.0f, lbl_805D25E0, 0x535);
+    if (!(r >= 0.3f))
+        s->m44.m10 = LerpATB(-1.0f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x539), 0.3f);
+    else if (!(r >= 0.6f))
+        s->m44.m10 = LerpATB(0.3f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x53E), 0.6f);
+    else if (!(r >= 0.8f))
+        s->m44.m10 = LerpATB(0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x543), 1.0f);
+    else
+        s->m44.m10 = 1.0f;
+}
+
 extern "C" void fn_801D34E4(B* s)
 {
     float lo = lbl_805D29D8;
@@ -99,11 +150,6 @@ extern "C" void fn_801D34E4(B* s)
 
 static inline int Ok(int f) { int ok; if ((unsigned)(f + 1) > 1) { ok = 1; if ((f & 8) == 0) ok = 0; } else ok = 0; return ok; }
 
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
-inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
-{
-    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
-}
 struct Unk801D31D8_Q66 {
     char pad0[0x60];
     Vec3 m60;
@@ -178,6 +224,157 @@ extern "C" int fn_801D3798(B* s)
     return r;
 }
 
+struct Unk801D31D8_V2b {
+    float x;
+    float y;
+};
+struct Unk801D31D8_M34b {
+    char pad0[0x3B0];
+    void* m3B0;
+};
+struct Unk801D31D8_Wb {
+    char pad0[0x34];
+    Unk801D31D8_M34b* m34;
+};
+extern "C" void fn_8022EA60(Unk801D31D8_V2b* out, void* a, ...);
+struct Unk801D31D8_Tbl4 {
+    float v[4];
+};
+extern Unk801D31D8_Tbl4 lbl_805D2B7C;
+extern Unk801D31D8_Tbl4 lbl_805D2BBC;
+struct Unk801D31D8_Z2C {
+    char pad0[0x1FC];
+    float m1FC;
+};
+extern "C" int fn_801D0BB0(B* s);
+
+extern Unk801D31D8_Tbl4 lbl_805D296C;
+extern "C" float fn_80235DA8(void* p);
+extern "C" float fn_801A0AA8(Unk801B7FB0_P* p, float a, float b);
+extern "C" float fn_801D18C8(B* s);
+struct Unk80087A58_O;
+float fn_80088E74(Unk80087A58_O* o);
+struct Unk801D31D8_GMV {
+    char pad0[0xC];
+    Unk80087A58_O* mC;
+};
+struct Unk801D31D8_G6V {
+    char pad0[0xC];
+    Unk801D31D8_GMV* mC;
+};
+
+static inline int OkM(int f, int m)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & m) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+extern "C" int fn_801D112C(B* s);
+extern "C" int fn_801D1198(B* s);
+extern "C" void fn_801D2A40(B* s);
+extern "C" void fn_801D2C74(B* s);
+
+extern "C" void fn_801D386C(B* s)
+{
+    Unk801D31D8_X3C0* x = s->m30->m700->m3C0;
+    if (OkM(x->m14, 8) != 0) {
+        if (fn_801D3798(s) != 0) {
+            fn_801D34E4(s);
+            return;
+        }
+        fn_801D35AC(s);
+        return;
+    }
+    if (fn_801D112C(s) != 0)
+        fn_801D2A40(s);
+    else if (fn_801D1198(s) != 0)
+        fn_801D2C74(s);
+    else
+        fn_801D31D8(s);
+    if (OkM(x->m14, 4) != 0) {
+        s->m44.m10 = LerpATB(-1.0f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5BC), -0.2f);
+        return;
+    }
+    if (OkM(x->m14, 0x10) != 0) {
+        s->m44.m10 = LerpATB(0.75f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5C1), 1.0f);
+        return;
+    }
+    if (OkM(x->m14, 0x20) != 0) {
+        float v = LerpATB(0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5C6), 1.0f);
+        if (((Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30))->v4() != 0)
+            v = -v;
+        s->m44.mC = v;
+        s->m44.m10 = LerpATB(-0.5f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5CE), 0.2f);
+    }
+}
+
+extern "C" float fn_801D40AC(B* s)
+{
+    float r = 0.0f;
+    int flag = 0;
+    if (!(fn_80235DA8(((Unk801D31D8_Wb*)s)->m34->m3B0) <= 0.75f))
+        flag = RandG(s->m30, 1.0f, lbl_805D25E0, 0x626) < 0.25f;
+    if (flag != 0) {
+        r = RandG(s->m30, 0.3f, lbl_805D25E0, 0x62E);
+    } else {
+        Unk801D31D8_Tbl4 t = lbl_805D296C;
+        r = t.v[fn_801D0BB0(s)];
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float x = ((Unk801D31D8_Z2C*)s->m2C)->m1FC;
+        x = !(x > 1.0f) ? (x >? 0.0f) : 1.0f;
+        r *= LerpATB(0.8f, x, 1.2f);
+        r = fn_801A0AA8((Unk801B7FB0_P*)s->m30, r, 0.25f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float y = fn_801D18C8(s);
+        y = !(y > 1.0f) ? (y >? 0.0f) : 1.0f;
+        r *= LerpATB(1.0f, y, 1.25f);
+        r *= LerpATB(1.0f, fn_80088E74(((Unk801D31D8_G6V*)s->m30->m6F8)->mC->mC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
+}
+
+extern "C" void fn_801D5158(B* s)
+{
+    Unk801D31D8_Tbl4 t = lbl_805D2B7C;
+    float v = t.v[fn_801D0BB0(s)];
+    float w = ((Unk801D31D8_Z2C*)s->m2C)->m1FC;
+    v *= LerpATB(0.9f, w, 1.1f);
+    Unk801D31D8_V2b vv;
+    fn_8022EA60(&vv, ((Unk801D31D8_Wb*)s)->m34->m3B0);
+    if (!(AbsF(vv.x) >= 0.4f) && !(AbsF(vv.y) >= 0.4f))
+        v *= 1.25f;
+    v = !(v > 0.98f) ? (v >? 0.0f) : 0.98f;
+    if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0x7DD) >= v))
+        s->m44.m8 = 1;
+    float a = fn_801CF8CC(s->m2C, s->m44.mC);
+    float b = fn_801CF740(s->m2C);
+    s->m44.m4 = b * LerpATB(-0.2f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x7E5), 0.2f) + a;
+}
+
+extern "C" void fn_801D53D4(B* s)
+{
+    Unk801D31D8_Tbl4 t = lbl_805D2BBC;
+    float v = t.v[fn_801D0BB0(s)];
+    float w = ((Unk801D31D8_Z2C*)s->m2C)->m1FC;
+    v *= LerpATB(0.8f, w, 1.1f);
+    Unk801D31D8_V2b vv;
+    fn_8022EA60(&vv, ((Unk801D31D8_Wb*)s)->m34->m3B0);
+    if (!(AbsF(vv.x) >= 0.4f) && !(AbsF(vv.y) >= 0.4f))
+        v *= 1.25f;
+    v = !(v > 0.98f) ? (v >? 0.0f) : 0.98f;
+    if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0x80A) >= v))
+        s->m44.m8 = 1;
+    float a = fn_801CF8CC(s->m2C, s->m44.mC);
+    float b = fn_801CF740(s->m2C);
+    s->m44.m4 = b * LerpATB(-0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x812), 0.6f) + a;
+}
+
 extern "C" void fn_801D5650(B* s)
 {
     float a;
@@ -199,25 +396,11 @@ extern "C" void fn_801D5650(B* s)
     s->m44.m4 = b * (t * (hi - lo) + lo) + a;
 }
 
-struct Unk801D31D8_V2 {
-    float x;
-    float y;
-};
-struct Unk801D31D8_M34 {
-    char pad0[0x3A4];
-    void* m3A4;
-};
-typedef Unk801D31D8_V2 (*Unk801D31D8_VaFn)(void*, ...);
-extern "C" Unk801D31D8_V2 fn_801CD94C(void* p);
 extern "C" int fn_801D112C(B* s);
 extern "C" int fn_801D1198(B* s);
 extern "C" void fn_801D49CC(B* s);
 extern "C" void fn_801D5158(B* s);
 extern "C" void fn_801D53D4(B* s);
-struct Unk801D31D8_W {
-    char pad0[0x34];
-    Unk801D31D8_M34* m34;
-};
 
 extern "C" void fn_801D573C(B* s)
 {
@@ -405,6 +588,51 @@ extern "C" void fn_801D5CF0(B* s)
     s->m40 = 0;
 }
 
+extern "C" void fn_80088664(void* o, int a, int* out, float* val);
+struct Unk801D31D8_GM2 {
+    char pad0[0xC];
+    void* mC;
+};
+struct Unk801D31D8_G6W {
+    char pad0[0xC];
+    Unk801D31D8_GM2* mC;
+    char pad10[4];
+    Unk801D31D8_T2* m14;
+};
+
+extern "C" void fn_801D5D00(B* s)
+{
+    if (s->m30->m6F4 == 0) {
+        Unk801D31D8_G6W* g = (Unk801D31D8_G6W*)s->m30->m6F8;
+        int out = 0;
+        float val = 0.0f;
+        fn_80088664(g->mC->mC, g->m14->m1CD0 == 0, &out, &val);
+        float tgt = 0.0f;
+        float lo = 0.01f;
+        float hi = 0.2f;
+        float c2 = 0.5f;
+        float c1 = 1.0f;
+        int flag = 0;
+        if (out <= 9 || (!(val <= -0.5f) && !(val >= 0.5f)))
+            flag = 1;
+        if (flag != 0) {
+            tgt = 0.01f;
+        } else {
+            float a = AbsF(val);
+            float b = 2.0f * (a - 0.5f);
+            b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+            tgt = LerpATB(0.01f, b, 0.2f);
+        }
+        if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0x995) >= tgt)) {
+            s->m3C = 1;
+            if (val > 0.0f)
+                s->m40 = 1;
+            else
+                s->m40 = 0;
+        }
+    }
+}
+
 extern "C" void fn_801D5F2C(B* s)
 {
     if (s->m30->m6F4 == 0)
@@ -573,6 +801,47 @@ extern "C" void fn_801D6CE4(B* s, float a, float b)
         fn_801D6D30(s, a, b);
     else
         fn_801D67CC(s);
+}
+
+extern float lbl_8061CBE4;
+extern float lbl_8061CBE8;
+extern float lbl_8061CBEC;
+extern float lbl_8061CBF0;
+extern float lbl_8061CBF4;
+
+extern "C" void fn_801D6D30(B* s, float a, float b)
+{
+    if (!(a >= lbl_8061CBE4 * lbl_8061CBF4)) {
+        fn_801D63A8(s);
+        return;
+    }
+    if (a < lbl_8061CBE8 * lbl_8061CBF4) {
+        fn_801D6538(s);
+        return;
+    }
+    if (!(a >= lbl_8061CBEC * lbl_8061CBF4)) {
+        fn_801D64A0(s, 0);
+        return;
+    }
+    if (!(a >= lbl_8061CBF0 * lbl_8061CBF4)) {
+        float r = RandG(s->m30, 1.0f, lbl_805D25E0, 0xAD6);
+        if (!(r >= 0.1f)) {
+            fn_801D66C8(s);
+            return;
+        }
+        if (!(r >= 0.2f)) {
+            fn_801D6538(s);
+            return;
+        }
+        fn_801D6404(s, 0);
+        return;
+    }
+    float t = b + 0.3f;
+    t = !(t > 0.9f) ? (t >? 0.0f) : 0.9f;
+    if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0xAEA) >= t))
+        fn_801D67CC(s);
+    else
+        fn_801D66C8(s);
 }
 
 extern "C" void fn_801D6F6C(B* s)

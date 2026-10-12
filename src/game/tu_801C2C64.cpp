@@ -814,6 +814,32 @@ extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c)
     return r * 57.295773f;
 }
 
+extern "C" float fn_801C66E8(Z* z, float f)
+{
+    float a = fn_801C6FD8(z);
+    float b = fn_801C6D88(z);
+    lbl_8068C420.m39C = a;
+    lbl_8068C420.m3A0 = b;
+    float d = 0.0f;
+    float c = 1.1f;
+    if (!(a >= 14.0f) && !(a <= 0.0f))
+        c = 1.25f;
+    float t = f * c;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    d = t * a + (1.0f - t) * b;
+    if (!(a <= 20.0f)) {
+        lbl_8068C7A8.m0 = d;
+        d = d + LerpATB(-5.0f, RandFP(z->m204, 1.0f, 0xC10), 12.0f);
+    } else {
+        lbl_8068C7A8.m0 = d;
+        if (!(RandFP(z->m204, 1.0f, 0xC17) <= 0.5f))
+            d = d + LerpATB(0.0f, RandFP(z->m204, 1.0f, 0xC19), 2.5f);
+        else
+            d = d - LerpATB(0.0f, RandFP(z->m204, 1.0f, 0xC1D), 11.0f);
+    }
+    return d;
+}
+
 extern "C" float fn_801C6A34(Z* z, float f)
 {
     float a = fn_801C6FD8(z);

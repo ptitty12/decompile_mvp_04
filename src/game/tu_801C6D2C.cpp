@@ -86,6 +86,29 @@ extern "C" float fn_801C6D2C(Z* z, float f)
 
 inline float AbsF(float v) { return (float)__builtin_fabs(v); }
 
+
+/* near-miss (98.4%): code identical; the inline frame slots differ. Retail puts the second AbsF parameter at
+ * 0x30 after the LerpATB slots (0x18..0x20) in the x < 0 arm and the LerpATB slots at 0x20 in the other; ours
+ * allocates them 0x20/0x28 apart. */
+extern "C" float fn_801C6D88(Z* z)
+{
+    const float lo1 = 55.0f;
+    const float hi1 = 100.0f;
+    const float lo2 = 5.0f;
+    const float hi2 = 50.0f;
+    if (!(AbsF(z->m1D8) <= 0.35f)) {
+        if (!(z->m1D8 < 0.0f))
+            return LerpATB(lo1, z->m1D8, hi1);
+        return -LerpATB(lo2, AbsF(z->m1D8), hi2);
+    }
+    float r;
+    if (!(RandFP(z->m204, 1.0f, 0xCA9) < 0.4f))
+        r = -LerpATB(lo2, RandFP(z->m204, 1.0f, 0xCB1), hi2);
+    else
+        r = LerpATB(lo1, RandFP(z->m204, 1.0f, 0xCAC), hi1);
+    return r;
+}
+
 extern "C" float fn_801C6FD8(Z* z)
 {
     float r = 0.0f;
@@ -475,4 +498,52 @@ extern "C" void fn_801C9D28(Z* z)
     float hi = 60.0f;
     z->m1B0 = fn_801CE6E4(z, k, ang, w);
     fn_801CA654(z);
+}
+
+struct Unk801C6D2C_Tbl10 {
+    float v[10];
+};
+extern Unk801C6D2C_Tbl10 lbl_805D198C;
+
+extern "C" float fn_801C9EEC(Z* z, float f)
+{
+    float r = 0.0f;
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    Unk801C6D2C_Tbl10 t = lbl_805D198C;
+    if (!(f > 0.1f)) {
+        r = t.v[0];
+    } else if (!(f < 1.0f)) {
+        r = t.v[9];
+    } else {
+        float x = f * 10.0f - 1.0f;
+        int i = (int)(float)fn_80410634(x);
+        int k;
+        if (i <= 8) {
+            k = i;
+            if (k < 0)
+                k = 0;
+        } else {
+            k = 8;
+        }
+        int k1 = k + 1;
+        float fr = x - (float)fn_80410634(x);
+        fr = !(fr > 1.0f) ? (fr >? 0.0f) : 1.0f;
+        r = t.v[k] * (1.0f - fr) + t.v[k1] * fr;
+    }
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        float s = p->mAB4;
+        if (!(s <= 0.1f))
+            r *= s;
+        if (*(unsigned*)&p->mB3C & 0x01000000) {
+            r = 2.0f * r;
+        } else {
+            int v = p->mB3C.f;
+            if (lbl_80620378 != 0)
+                v = 1;
+            if (v != 0)
+                r = r * 0.5f;
+        }
+    }
+    return r;
 }

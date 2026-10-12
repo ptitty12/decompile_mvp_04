@@ -296,6 +296,37 @@ extern "C" float fn_801CC218(Z* z)
     return r;
 }
 
+extern "C" int fn_802536D0(P* p);
+#define UNK801CAFA0_CLAMP(x, lo, hi) (!((x) > (hi)) ? (!((x) < (lo)) ? (x) : (lo)) : (hi))
+
+extern "C" float fn_801CC30C(Z* z)
+{
+    if (z->m204->m6F4 == 2)
+        return 0.85f;
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    float w = z->m13C;
+    P* p = fn_801A4B34(z->m204);
+    if (p->v4() == 0)
+        w = -w;
+    float c = UNK801CAFA0_CLAMP(AbsF(v.x), 0.0f, 0.5f);
+    c = 2.0f * (0.5f - c);
+    c = !(c > 0.7f) ? (c >? 0.0f) : 0.7f;
+    w = w * 0.75f;
+    float d = w - v.x;
+    float e = 1.0f - AbsF(d);
+    e = !(e > 1.0f) ? (e >? 0.0f) : 1.0f;
+    e = !(e > 1.0f) ? (e >? c) : 1.0f;
+    int r = fn_802536D0(fn_801A4B34(z->m204));
+    if (r == 0) {
+        e = e + 0.25f;
+        e = !(e <= 1.0f) ? 1.0f : (e >? 0.0f);
+    } else if (r == 1) {
+        e = e + 0.1f;
+        e = !(e > 1.0f) ? (e >? 0.0f) : 1.0f;
+    }
+    return e;
+}
+
 extern "C" float fn_801CC578(Z* z)
 {
     float a = z->m1D4;
