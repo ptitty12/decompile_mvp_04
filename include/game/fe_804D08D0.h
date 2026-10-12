@@ -1101,4 +1101,32 @@ void fn_804DE55C(int a, void* x);
 void fn_804DE558(void* x);
 }
 
+
+/* ---- unit 804DE730 ------------------------------------------------------------------ */
+
+struct FeS804E008C : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+};
+extern const char lbl_805F7B70[];
+extern const char lbl_8066DD00[];
+extern const char lbl_805F98E0[];
+extern const char lbl_805F8034[];
+extern "C" {
+int fn_804027DC();
+unsigned fn_804DE9EC(unsigned n);
+void fn_800D878C__FP13Unk800D876C_A(void* p);
+void fn_802D7EE4(int a);
+void fn_800E25E0__Fii(void* w, int a);
+void fn_804DF6E4(int a, void* x);
+void fn_804DFE9C(FeW* x);
+}
+
+extern const char lbl_805F5B98[];
+extern const char lbl_805F98D4[];
+extern const char lbl_805F9874[];
+extern const char lbl_805F98FC[];
+extern const char lbl_805F9908[];
+
 #endif
