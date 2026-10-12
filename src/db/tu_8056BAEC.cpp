@@ -282,7 +282,6 @@ struct Db8056CC8C {
     int m38;
 };
 extern "C" void fn_8056D15C(Db8056CC8C* self, int a);
-extern "C" void fn_8056DBB8(Db8056CC8C* self);
 
 extern "C" void fn_8056ED54(DbSel* self, int a);
 
@@ -333,6 +332,9 @@ struct Db8056D994_S {
     int m34;
     DbScrB* m38;
 };
+
+extern const float lbl_805FFB90;
+extern const float lbl_805FFB94;
 /* forward declarations (definitions are in address order) */
 extern "C" void fn_8056BAEC(DbScr* self, int a, int b, int c);
 extern "C" void fn_8056BD50(void* self);
@@ -361,6 +363,7 @@ extern "C" void fn_8056CC8C(Db8056CC8C* self, int a, int b, int c, int d);
 extern "C" int fn_8056CCD0(void* unused, DbScrB* scr, int side);
 extern "C" void fn_8056D994(Db8056D994_S* self);
 extern "C" void fn_8056DA98(DbF12* p);
+extern "C" void fn_8056DBB8(Db8056CC8C* self);
 extern "C" void fn_8056DE14(DbF12* p);
 extern "C" void fn_8056DE4C(void* p);
 extern "C" void fn_8056DE50(DbSel* self, DbSelSrc* src, DbScr* scr, int* sidep, void* x);
@@ -742,6 +745,48 @@ extern "C" DB_OVERLAY void fn_8056DA98(DbF12* p)
     p->m14 = p->m14 + f;
     p->m20 = p->m20 + g;
     p->m1C = p->m1C + h;
+}
+
+extern "C" DB_OVERLAY void fn_8056DBB8(Db8056CC8C* self)
+{
+    Db8056D994_S* p = (Db8056D994_S*)self;
+    DbG* g = p->m38->m14;
+    int qb = g->m1CCB;
+    int qa = g->m1CCA;
+    if (qb > 0) {
+        float k = (float)qb * lbl_805FFB90;
+        p->m20 += k * p->m2C;
+        p->m20 += k * p->m14;
+        p->m20 += k * p->m18;
+        p->m20 += k * p->m1C;
+        p->m20 += k * p->m0;
+        p->m2C -= k * p->m2C;
+        p->m14 -= k * p->m14;
+        p->m18 -= k * p->m18;
+        p->m1C -= k * p->m1C;
+        p->m0 -= k * p->m0;
+        p->m4 -= k * p->m4;
+        p->m8 -= k * p->m8;
+        p->mC -= k * p->mC;
+        p->m10 -= k * p->m10;
+    }
+    if (qa > 0) {
+        float k = (float)qa * lbl_805FFB94;
+        p->m14 += k * p->m2C;
+        p->m14 += k * p->m20;
+        p->m14 += k * p->m18;
+        p->m14 += k * p->m1C;
+        p->m14 += k * p->m0;
+        p->m2C -= k * p->m2C;
+        p->m20 -= k * p->m20;
+        p->m18 -= k * p->m18;
+        p->m1C -= k * p->m1C;
+        p->m0 -= k * p->m0;
+        p->m4 -= k * p->m4;
+        p->m8 -= k * p->m8;
+        p->mC -= k * p->mC;
+        p->m10 -= k * p->m10;
+    }
 }
 
 extern "C" DB_OVERLAY void fn_8056DE14(DbF12* p)
