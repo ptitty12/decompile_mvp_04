@@ -5,6 +5,9 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+extern const char lbl_805C0C48[];
+extern const char lbl_805C0C54[];
+extern "C" Unk800C7B40_Widget* fn_800C8038(Unk800C7B40_Widget* p);
 extern const char lbl_805C0B94[];
 extern const char lbl_805C0B9C[];
 extern const char lbl_805C0BA4[];
@@ -802,6 +805,39 @@ extern "C" void fn_80132A38(Scr* x)
     fn_800C8048(x->fn_vslot32(lbl_805C0BDC, 1))->fn_vslot28((char*)x + 0x3AE);
     fn_800C8048(x->fn_vslot32(lbl_805C0BE4, 1))->fn_vslot28((char*)x + 0x430);
     fn_800C8048(x->fn_vslot32(lbl_805C0BEC, 1))->fn_vslot28((char*)x + 0x4B2);
+}
+
+extern "C" void fn_801340B8(Scr* x, int a, int b)
+{
+    int v = a - 0x18;
+    Unk800C7B40_Widget* w26 = fn_800C8038(x->fn_vslot32(lbl_805C0C48, 1));
+    Unk800C7B40_Widget* w27 = fn_800C8038(x->fn_vslot32(lbl_805C0C54, 1));
+    Unk800C7B40_Widget* w30 = x->fn_vslot32(lbl_805C0B94, 1);
+    Unk800C7B40_Widget* w29 = x->fn_vslot32(lbl_805C0B9C, 1);
+    const float k = 0.3f;
+    w30->fn_vslot12(v);
+    w29->fn_vslot12(v);
+    int hw = w30->m2A / 2;
+    v = x->mE08 + (x->mE10 / 2 - hw);
+    w30->fn_vslot9(v);
+    w29->fn_vslot9(v);
+    v = b - 0x18;
+    w30->fn_vslot13(v);
+    w29->fn_vslot13(v);
+    v = x->mE14 / 2 - w30->m2C / 2;
+    w30->fn_vslot10(v);
+    w29->fn_vslot10(v);
+    v = (int)((float)a * k);
+    w26->fn_vslot12(v);
+    w27->fn_vslot12(v);
+    w26->fn_vslot9(w30->m26);
+    w27->fn_vslot9(w30->m26 + w30->m2A - w27->m2A);
+    short t = w30->m2C;
+    w26->fn_vslot13(t);
+    w27->fn_vslot13(t);
+    short u = w30->m28;
+    w26->fn_vslot10(u);
+    w27->fn_vslot10(u);
 }
 
 extern "C" void fn_8013440C(Scr* x)
