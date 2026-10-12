@@ -4,6 +4,20 @@
  */
 #include "game/tu_8017D640.h"
 #include "game/clampiter.h"
+struct Unk8017E1E0_Vec {
+    float x;
+    float y;
+    float z;
+};
+struct Unk8017E1E0_Obj {
+    char pad0[0x60];
+    Unk8017E1E0_Vec m60;
+    char pad6C[0x458 - 0x6C];
+    int m458;
+    char pad45C[0x5C4 - 0x45C];
+    int m5C4;
+};
+extern "C" void fn_801C33B0(void* z, Unk8017E1E0_Vec* a, Unk8017E1E0_Vec* b);
 
 extern const float lbl_805CCB84;
 
@@ -106,6 +120,31 @@ inline int Slot(Unk8017DD64_T* p, int i)
         x = *(int*)((char*)t + o);
     return x;
 }
+
+int fn_8017E120(Unk8017A930_T* p, int unused, Unk8017E1E0_Obj* o)
+{
+    int r = 0;
+    if (o->m458 == 9 && o->m5C4 == -1) {
+        Unk8017E1E0_Vec v0;
+        Unk8017E1E0_Vec c = o->m60;
+        Unk8017E1E0_Vec v1;
+        fn_801C33B0(p->m3A4, &v0, &v1);
+        if (!((c.x - v0.x) * (c.x - v0.x) + (c.z - v0.z) * (c.z - v0.z) < 1296.0f)) {
+            r = c.x * c.x + c.z * c.z < 9216.0f;
+        }
+    }
+    return r;
+}
+
+int fn_8017E1E0(Unk8017A930_T* p, int unused, Unk8017E1E0_Obj* o)
+{
+    Unk8017E1E0_Vec v0;
+    Unk8017E1E0_Vec c = o->m60;
+    Unk8017E1E0_Vec v1;
+    fn_801C33B0(p->m3A4, &v0, &v1);
+    return (c.x - v0.x) * (c.x - v0.x) + (c.z - v0.z) * (c.z - v0.z) >= 1296.0f;
+}
+
 int fn_8017E264(Unk8017DD64_T* p)
 {
     Unk8006A138_It<21> it(0);
@@ -258,6 +297,36 @@ void fn_8017F744(Unk8017F744_T* p)
         p->m4C[i] = p->m20;
     }
     p->m1E0 = 1;
+}
+
+/* near-miss: 97.3%; the one-float struct keeps -ffloat-store from spilling the running sum, but the add
+ * comes out as `fadds f0,f0,f13; fmr f13,f0` (retail: `fadds f13,f13,f0`). Tried += / s = s + x / x + s,
+ * the cnt clamp in four spellings, register, loop forms. */
+struct Unk8017F7F0_F {
+    float f;
+};
+float fn_8017F7F0(Unk8017F744_T* p, unsigned n)
+{
+    unsigned cnt = n > 100 ? 100 : (n == 0 ? 1 : n);
+    int idx = p->m1DC;
+    float sum = 0.0f;
+    float avg = 0.0f;
+    if (cnt != 0) {
+        Unk8017F7F0_F s;
+        s.f = sum;
+        do {
+            s.f += p->m4C[idx];
+            idx--;
+            if (idx < 0) {
+                idx = 99;
+            }
+        } while (--cnt != 0);
+        sum = s.f;
+    }
+    if (n != 0) {
+        avg = sum / (float)n;
+    }
+    return avg;
 }
 
 void fn_8017F8A0(Unk8017F8A0_T* p)
