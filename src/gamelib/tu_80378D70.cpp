@@ -357,7 +357,7 @@ struct fn_80379C80_Plane {
     float x, y, z, w;
 };
 
-extern "C" void fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n);
+extern "C" fn_80379C80_Plane* fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n);
 
 inline Unk80379324_Vec3 fn_80379C80_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
 {
@@ -377,6 +377,44 @@ inline Unk80379324_Vec3 fn_80379C80_Cross(const Unk80379324_Vec3& a, const Unk80
     return r;
 }
 
+inline Unk80379324_Vec3 fn_80379B34_Norm(const Unk80379324_Vec3& v, float len)
+{
+    Unk80379324_Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_80379B34_NormD(const Unk80379324_Vec3& v)
+{
+    float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (len != 0.0f)
+        return fn_80379B34_Norm(v, len);
+    return lbl_806055AC;
+}
+
+inline float fn_80379B34_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+struct fn_80379B34_Pl {
+    Unk80379324_Vec3 n;
+    float d;
+};
+
+extern "C" fn_80379C80_Plane* fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n)
+{
+    fn_80379B34_Pl pl;
+    Unk80379324_Vec3 nn = fn_80379B34_NormD(*n);
+    pl.n = nn;
+    pl.d = fn_80379B34_Dot(*p, pl.n);
+    *(fn_80379B34_Pl*)out = pl;
+    return out;
+}
+
 extern "C" fn_80379C80_Plane* fn_80379C80(fn_80379C80_Plane* out, const Unk80379324_Vec3* p0, const Unk80379324_Vec3* p1, const Unk80379324_Vec3* p2)
 {
     Unk80379324_Vec3 a = fn_80379C80_Sub(*p1, *p0);
@@ -384,6 +422,28 @@ extern "C" fn_80379C80_Plane* fn_80379C80(fn_80379C80_Plane* out, const Unk80379
     Unk80379324_Vec3 c = fn_80379C80_Cross(a, b);
     fn_80379B34(out, p0, &c);
     return out;
+}
+
+/* Quaternion returned by value; its copy constructor is fn_8037936C (a second Vec4 copy ctor). */
+struct Unk80379DA0_Quat {
+    float x, y, z, w;
+    Unk80379DA0_Quat(const Unk80379DA0_Quat& o);
+};
+
+inline Unk80379324_Vec3 fn_80379DA0_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+/* near-miss (97.9%): same instructions except the order of `fmr f1,f31` and `mr r3,r30` before the fn_803793D4 call (retail loads the return-slot pointer last, as in fn_8037B310). */
+extern "C" Unk80379DA0_Quat fn_80379DA0(const Unk80379324_Vec3* axis, float angle)
+{
+    Unk803793D4_Vec4 t = fn_803793D4(fn_80411554(angle * 0.5f), &(const Unk80379324_Vec3&)fn_80379DA0_Scale(fn_80379B34_NormD(*axis), fn_8041171C(angle * 0.5f)));
+    return *(Unk80379DA0_Quat*)&t;
 }
 
 extern "C" float fn_80379F1C(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* c, Unk80379324_Vec3* out)
