@@ -204,4 +204,44 @@ struct Db80593CD0_P : Db80593CD0_Data {
     const void* m1C;
 };
 
+
+/*
+ * Unit 0x8058E5B8, second half: classes derived from the slot table (vptr at +0x1C).
+ * Db8058F924_V carries the virtual calls (slot index = vtable byte offset / 8);
+ * Db8058F924_L adds the data after the vptr: six ints at +0x20, a count at +0x38, the
+ * current index at +0x3C, a sub-object pointer at +0x40 and six rows of five ints.
+ */
+struct Db8058F924_V : Db80593CD0_Data {
+    virtual void v08(int chrg);
+    virtual void v10(int k, int a, float f0, float f1);
+    virtual void v18(int k, int a);
+    virtual void v20();
+    virtual void v28();
+    virtual void v30(int a, int b);
+    virtual void v38();
+    virtual void v40();
+    virtual int v48();
+    virtual int v50();
+    virtual void v58();
+    virtual void v60(int a, float f0, float f1);
+    virtual void v68();
+    virtual void v70();
+    virtual void v78();
+    virtual void v80();
+};
+struct Db8058F924_L : Db8058F924_V {
+    int m20[6];
+    int m38;
+    int m3C;
+    Db8058F924_V* m40;
+    int m44[6][5];
+};
+struct Db8058F924_P : Db80593CD0_P {
+    int m20[6];
+    int m38;
+    int m3C;
+    Db8058F924_V* m40;
+    int m44[6][5];
+};
+
 #endif
