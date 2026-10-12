@@ -830,6 +830,48 @@ struct FeS804D7FE0 : FeW {
     int m16C;
     FeW* m170;
 };
+/* The 0x18-byte stack list of three inlined constructors in a row (same as Unk80535650_Tmp, db): vtables
+ * lbl_8064B298, lbl_8064A550, lbl_8064A4C8 go into the vptr slot in turn around a 0x28-int buffer. */
+extern "C" void fn_8040074C(void* p, unsigned n); /* bzero */
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A4C8[];
+struct FeTmp18 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    unsigned Count() { return m4; }
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void D() { vp = lbl_8064A550; }
+};
 extern const char lbl_8066E840[];
 extern const char lbl_805F9614[];
 extern const char lbl_805F962C[];

@@ -5,6 +5,13 @@
 
 #include "game/fe_804E02E0.h"
 
+struct Unk8007F198_D;
+struct FeRetA {
+    char pad0[0xA];
+    unsigned short mA;
+};
+FeRetA* fn_8007FE04(Unk8007F198_D* g);
+
 extern "C" FE_OVERLAY int fn_804E1A6C(FeMask* self)
 {
     FeObjK* o = (FeObjK*)self->m184;
@@ -96,6 +103,32 @@ extern "C" FE_OVERLAY void fn_804E2074(int a, FeMask* self)
 extern "C" FE_OVERLAY int fn_804E2108(void)
 {
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804E2110(FeMask* self, int sel)
+{
+    switch (sel) {
+    case 0: {
+        FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+        if (self->m180 != 0) {
+            fn_80131F34(p, self, (FeCb)fn_804E2074, fn_804E2108, 0x3364, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+            p->v86();
+        } else {
+            fn_804E2074(1, self);
+        }
+        break;
+    }
+    case 1: {
+        fn_8007FE04((Unk8007F198_D*)lbl_8061930C)->mA = self->m188;
+        UiMsg m;
+        UiMsg* mp = &m;
+        fn_8035682C(mp);
+        fn_8040B830(mp->name, "BACK", 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), mp, self);
+        break;
+    }
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804E2274(void* self, int v, int i)

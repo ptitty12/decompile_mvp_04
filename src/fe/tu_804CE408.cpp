@@ -5,6 +5,36 @@
 
 #include "game/fe_804BE560.h"
 
+inline int FeFl9A8(FeScrM* x)
+{
+    int f = 0;
+    if (x->m9A8 != 0)
+        f = 1;
+    return f;
+}
+
+
+extern "C" int fn_802D7CE0(int id, int a);
+extern "C" void fn_804D27B4(FeSlot44* p, int a);
+extern "C" void fn_804D233C(FeSlot44* p);
+
+struct FeE8D {
+    char pad0[8];
+};
+class FeE8V : public FeE8D {
+public:
+    virtual void s1(int c);
+};
+struct FeE68 : FeE8V {
+    char pad[0x68 - 12];
+};
+struct FeE60 : FeE8V {
+    char pad[0x60 - 12];
+};
+extern const char lbl_80667328[];
+extern const char lbl_80666EC0[];
+extern "C" void fn_80330870(void* x, int c);
+
 extern "C" void fn_804D0318(FeScrM* x, int a);
 extern "C" void fn_804D2118(FeSlot44* p, int a);
 extern "C" void fn_804D292C(FeSlot44* p, int a);
@@ -36,11 +66,57 @@ extern "C" void fn_804CF81C(FeScrM* x);
 extern "C" int fn_804CF8AC(FeScrM* x);
 extern "C" int fn_804D0860(FeScrM* x, int a);
 
-struct FeGame;
+extern "C" void fn_804CE9D0(FeScrM* g);
 
-extern "C" void fn_804CE9D0(FeGame* g);
+extern FeScrM* lbl_80621AB0;
 
-extern FeGame* lbl_80621AB0;
+/* near-miss: 98.1%. Retail recomputes the second array end (addi r31,r30,1672) and reuses r29 for its start;
+ * ours lets gcse copy it from the first array start (mr r31,r29), which shifts the callee-saved registers and the
+ * order of the three vptr stores. Statement-order and end-pointer spellings tried (a, b2+7, single char* base). */
+extern "C" FE_OVERLAY void fn_804CE714(FeScrM* x, int c)
+{
+    *(const void**)((char*)x + 0x2DC) = lbl_80667328;
+    lbl_80621AB0 = 0;
+    FeE68* b1 = (FeE68*)((char*)x + 0x688);
+    if (b1 != 0) {
+        FeE68* e1 = (FeE68*)((char*)x + 0x960);
+        if (b1 != e1) {
+            do {
+                e1--;
+                e1->s1(0);
+            } while (b1 != e1);
+        }
+    }
+    FeE60* b2 = (FeE60*)((char*)x + 0x3E8);
+    if (b2 != 0) {
+        FeE60* e2 = (FeE60*)((char*)x + 0x688);
+        if (b2 != e2) {
+            do {
+                e2--;
+                e2->s1(0);
+            } while (b2 != e2);
+        }
+    }
+    *(const void**)((char*)x + 0x2E8) = lbl_80666EC0;
+    *(const void**)((char*)x + 0x39C) = lbl_80666EC0;
+    *(const void**)((char*)x + 0x334) = lbl_80666EC0;
+    fn_80330870(x, c);
+}
+
+extern "C" FE_OVERLAY void fn_804CE9D0(FeScrM* x)
+{
+    int id = ((int*)x->m998)[x->m9A0];
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    s->fn_8007AF7C(x->m97C[0], id, x->m960[0]);
+    s->fn_800743A0(x->m97C[1], id, 1, FeFl9A8(x), x->m960[1]);
+    s->fn_8007389C(x->m97C[2], id, 1, x->m960[2]);
+    s->fn_80074640(x->m97C[3], id, 1, x->m960[3]);
+    if (s->fn_8007A270(id) != 0) {
+        s->fn_8007B114(x->m97C[4], id, x->m960[4]);
+        s->fn_800755FC(x->m97C[5], id, 1, FeFl9A8(x), x->m960[5]);
+        s->fn_80074F50(x->m97C[6], id, 1, x->m960[6]);
+    }
+}
 
 extern "C" FE_OVERLAY void fn_804CEAEC(FeScrM* x)
 {
@@ -196,6 +272,32 @@ extern "C" FE_OVERLAY void fn_804CF5F8(FeScrM* x)
     fn_800B7B4C(FeGetMgr(), mp, x);
 }
 
+extern "C" FE_OVERLAY void fn_804CF6A4(FeScrM* x)
+{
+    fn_800ECAA4(x);
+    if (x->m1D4 == 0) {
+        FeSlot44* a = &x->m188;
+        ((FeVQ*)x)->s90();
+        if (fn_802D7CE0(a->m38, 0) == 0) {
+            fn_804D0318(x, 0);
+            if (a->m38 != -1) {
+                fn_804D27B4(a, 0);
+                ((FeVQ*)x)->s94(0);
+            }
+        }
+        FeSlot44* b = &x->m144;
+        if (fn_802D7CE0(b->m38, 0) == 0) {
+            fn_804D0318(x, 1);
+            if (b->m38 != -1) {
+                fn_804D27B4(b, 0);
+                ((FeVQ*)x)->s94(1);
+            }
+        }
+    }
+    fn_804D233C(&x->m188);
+    fn_804D233C(&x->m144);
+}
+
 extern "C" FE_OVERLAY void fn_804CF7B4(FeScrM* x)
 {
     fn_804D2310(&x->m188)->fn_vslot71();
@@ -271,6 +373,48 @@ extern "C" FE_OVERLAY int fn_804D0310(void)
     return 0;
 }
 
+extern "C" FE_OVERLAY void fn_804D0318(FeScrM* x, int a)
+{
+    if (a == 1) {
+        FeW* w = x->m1CC;
+        if (w != 0 && FeW24(w) < 0) {
+            w->fn_vslot8(0);
+            FeSlot44* s = &x->m144;
+            fn_804D2310(s)->fn_vslot97();
+            fn_804D2118(s, 1);
+        }
+    } else {
+        FeW* w = x->m1D0;
+        if (w != 0 && FeW24(w) < 0) {
+            w->fn_vslot8(0);
+            FeSlot44* s = &x->m188;
+            fn_804D2310(s)->fn_vslot97();
+            fn_804D2118(s, 1);
+        }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804D0414(FeScrM* x, int a)
+{
+    if (a == 1) {
+        FeW* w = x->m1CC;
+        if (w != 0 && FeW24(w) >= 0) {
+            w->fn_vslot8(1);
+            FeSlot44* s = &x->m144;
+            fn_804D2310(s)->fn_vslot96();
+            fn_804D2118(s, 0);
+        }
+    } else {
+        FeW* w = x->m1D0;
+        if (w != 0 && FeW24(w) >= 0) {
+            w->fn_vslot8(1);
+            FeSlot44* s = &x->m188;
+            fn_804D2310(s)->fn_vslot96();
+            fn_804D2118(s, 0);
+        }
+    }
+}
+
 extern "C" FE_OVERLAY int fn_804D0510(FeScrM* x, int a)
 {
     if (a == 1) {
@@ -285,6 +429,19 @@ extern "C" FE_OVERLAY int fn_804D0510(FeScrM* x, int a)
         }
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804D0548(FeScrM* x, int a)
+{
+    if (a == 1) {
+        fn_804D2310(&x->m144)->fn_vslot91();
+        FeList* l = (FeList*)x->m138;
+        fn_80126CF4(l, 0, l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    } else {
+        fn_804D2310(&x->m188)->fn_vslot91();
+        FeList* l = (FeList*)x->m138;
+        fn_80126CF4(l, l->m164, 0, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    }
 }
 
 /* near-miss: retail shares the vcall tail between the slot 86/87 arms (the arm only picks
