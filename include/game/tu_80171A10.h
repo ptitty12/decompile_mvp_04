@@ -40,21 +40,24 @@ struct Unk80171A10_Menu;
 typedef void (Unk80171A10_Menu::*Unk80171A10_PFn)();
 
 /* Menu/popup object (vptr at +0x120): state, text buffers and the handler set by fn_80174318. */
+class Unk80170518;
 struct Unk80171A10_Menu {
+    Unk80171A10_Menu();
     virtual ~Unk80171A10_Menu();
-    int m0;
+    Unk80170518* m0[1];
     int m4;
     int m8[4];
     int m18;
-    char pad1C[0x3C - 0x1C];
+    Unk8017227C_Pair m1C[4];
     Unk80171940* m3C;
     int m40;
     int m44;
     int m48;
-    char pad4C[0x54 - 0x4C];
+    int m4C;
+    int m50;
     int m54;
     int m58;
-    char pad5C[4];
+    int m5C;
     int m60;
     int m64;
     int m68;
@@ -84,6 +87,7 @@ extern "C" int fn_80090880(int a, int b);
 extern int lbl_8061977C;
 void fn_80172B60(Unk80171A10_Menu* p, int a, int b);
 void fn_80174318(Unk80171A10_Menu* p, int state, Unk80171A10_Fn f);
+void fn_80174348(Unk80171A10_Menu* p);
 void fn_801743E0(Unk80171A10_Menu* p);
 void fn_80172678(Unk80171A10_Menu* p);
 void fn_80174438(Unk80171A10_Menu* p);
