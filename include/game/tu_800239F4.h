@@ -50,7 +50,7 @@ struct Unk8001CE80_Sub {
     int m4C;
     int m50;
     int m54;
-    char pad58[0x5C - 0x58];
+    int m58;
 };
 struct Unk8001F5CC_Tbl;
 struct Unk80038EB4_Obj;
@@ -65,6 +65,7 @@ union Unk80023AC4_Word {
 /* Record behind Obj::m6B8 (its first word is compared against 3 in fn_800256F8). */
 struct Unk800256F8_Rec {
     int m0;
+    int m4;
 };
 
 struct Unk80023F98_Vec2 {
@@ -312,7 +313,9 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m570;
     int m574;
     int m578;
-    char pad57C[0x2C];
+    char pad57C[0x24];
+    unsigned m5A0;
+    char pad5A4[0x4];
     int m5A8;
     char pad5AC[0x14];
     Unk801A4B34_Pos* m5C0;
@@ -354,7 +357,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m714;
     Unk801A4B34_Pos* m718;
     int m71C;
-    char pad720[0x4];
+    int m720;
     Unk801A4B34_Pos* m724;
     char pad728[0x4C];
     Unk801A4B34_Pos* m774;
@@ -366,7 +369,9 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m79C;
     char pad7A0[0x1C];
     int m7BC;
-    char pad7C0[0x20];
+    int m7C0;
+    int m7C4;
+    char pad7C8[0x18];
     int m7E0;
     char pad7E4[0x10];
     int m7F4;

@@ -359,9 +359,101 @@ extern "C" void fn_800265B0()
 {
 }
 
+/* Message record of type 0x57 behind Unk80023AC4_Obj::m6BC (fn_800265B4). */
+struct Unk800265B4_Msg {
+    int m0;
+    int m4;
+    Unk801A4B34_Pos* m8;
+    int mC;
+    int m10;
+    struct Unk800265B4_Pos* m14;
+    int m18;
+    int m1C;
+};
+struct Unk800265B4_Pos {
+    char pad0[0x388];
+    int m388;
+    int m38C;
+    char pad390[0x60];
+    float m3F0;
+    float m3F4;
+    float m3F8;
+};
+extern const float lbl_805A61A4;
+extern const float lbl_805A61A8;
+extern "C" void fn_80022124(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p, int a, int n);
+
+extern "C" void fn_800265B4(Unk80023AC4_Obj* x)
+{
+    x->m720 = 0;
+    Unk800265B4_Msg* m = (Unk800265B4_Msg*)Unk8002569C_Cast(x->m6BC, 0x57);
+    Unk800265B4_Pos* p = m->m14;
+    x->m1BC = (int)(p->m3F8 * lbl_805A61A4);
+    Unk801A4B34_Pos* a = m->m8;
+    if ((Unk801A4B34_Pos*)p == x->m80[0]->m6CC) {
+        fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 0, x->m1BC);
+        x->m5A0 = (unsigned)((p->m3F0 - p->m3F4) * lbl_805A61A8);
+        x->m7C0 = (int)a;
+        x->m160.m58 = x->m160.m58 + 1;
+        x->m7C4 = m->mC;
+        x->m6B8->m0 = p->m38C;
+        x->m6B8->m4 = p->m388;
+        if (m->m1C != 0)
+            x->m114 = 1;
+        x->fn_800233B4(0xF, 1, 0);
+    } else {
+        int flag = 0;
+        if (x->m80[0]->m780 != 0 || x->m80[0]->m784 != 0)
+            flag = 1;
+        if ((flag != 0 || (x->m80[0]->fn_801A6D84(1), fn_8016ADC4() != 0))
+            && fn_80026330(x, x->m80[0], (Unk801A4B34_Pos*)p, a) != 0)
+            fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 0, x->m1BC);
+    }
+    x->m6BC = 0;
+}
+
 extern "C" void fn_80026784(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x82, (float)x->m80[0]->m48 * lbl_805A61C0);
+}
+
+struct Unk8017A930_T;
+int fn_80247858(Unk801A4B34_Pos* p, int a);
+int fn_8017C94C(Unk8017A930_T* t);
+
+extern "C" void fn_800267DC(Unk80023AC4_Obj* x)
+{
+    if ((x->m100 == 0 && x->fn_80023430(0xA, 0, 0) == 0 && x->fn_80023430(7, 0, 0) == 0) || x->m6D4 == 1) {
+        if (x->m710 == 1) {
+            int v = x->m5A0 >> 2;
+            if (v > 0x3C)
+                v = 0x3C;
+            x->fn_800233B4(0x10, v, 0);
+        }
+        if (x->m6D0 == 0) {
+            x->m134 = x->m1BC;
+            x->m12C = x->m7C0;
+            x->m130.i = x->m7C4;
+            if (x->m6D4 != 0) {
+                x->m138 = 1;
+                if (x->m270[fn_80247858((Unk801A4B34_Pos*)x->m7C4, 0)].m0 != 0)
+                    fn_8002A244(x, 0xD, Unk800239F4_Secs(x->m80[0]->m48));
+            } else {
+                int r = fn_8017C94C((Unk8017A930_T*)x->m80[0]->m700);
+                if (r != 0)
+                    x->m138 = 1;
+                else
+                    x->m138 = r;
+            }
+            fn_8002A244(x, 0xA, Unk800239F4_Secs(x->m80[0]->m48));
+            if (x->m114 != 0) {
+                x->m12C = ((Unk801A4B34_Pos*)x->m7C4)->m460;
+                fn_8002A244(x, 0x2C, Unk800239F4_Secs(x->m80[0]->m48));
+                x->m114 = 0;
+            }
+        }
+    }
+    x->m6D0 = 0;
 }
 
 extern "C" void fn_800269E0(Unk80023AC4_Obj* x)
