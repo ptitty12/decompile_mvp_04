@@ -348,8 +348,6 @@ inline float Lerp3(float a, float b, float t)
     return a + t * (b - a);
 }
 
-/* near-miss (98.2%): only the callee-saved numbering of the player (retail r30) and the goal base (retail r29) is swapped;
-   moving the base into the branches or copying the player did not change the priority order */
 Unk8027C728_Goal* fn_8025B59C(Unk8025B59C_Q* q, P* p, Unk8025B59C_O* o)
 {
     Unk8027C728_Goal* g = fn_802448F4(p, 2);
@@ -357,13 +355,14 @@ Unk8027C728_Goal* fn_8025B59C(Unk8025B59C_Q* q, P* p, Unk8025B59C_O* o)
     fn_8027C728(g);
     Unk8028B194* gb = (Unk8028B194*)g->m18;
     gb->m40 = 11;
+    Unk8027C728_Goal* g0;
     if (p->m458 == 9) {
         Unk80273498_Vec3 a;
         Unk80273498_Vec3 b;
         fn_801C33B0(q->m700->m3A4, &a, &b);
         gb->fn_8028B194(a);
         gb->m38 = 1;
-        Unk8027C728_Goal* g0 = g->m0;
+        g0 = g->m0;
         g0->m10 = 2;
         fn_8027C728(g0);
         Unk8027A84C* s = (Unk8027A84C*)g0->m18;
@@ -372,7 +371,7 @@ Unk8027C728_Goal* fn_8025B59C(Unk8025B59C_Q* q, P* p, Unk8025B59C_O* o)
     } else {
         gb->fn_8028B1F0(p->m58C.m38);
         gb->m38 = 1;
-        Unk8027C728_Goal* g0 = g->m0;
+        g0 = g->m0;
         g0->m10 = 2;
         fn_8027C728(g0);
         fn_8025AA28((Unk8027A84C*)g0->m18, p, o->mC);
