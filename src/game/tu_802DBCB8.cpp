@@ -250,12 +250,16 @@ int Unk802DC9F8::fn_802DCBB8(int name)
     return 1;
 }
 
+inline int Unk802DCCCC_At(char* b, int i)
+{
+    return b[i];
+}
 int fn_802DCCCC(int h, int* pos, int* out)
 {
     char buf[0x14];
     fn_803FEC4C(h, *pos, buf, 0x14, 0x64);
     int i = 0;
-    while (buf[i] != 10 && buf[i] != 32) {
+    while (Unk802DCCCC_At(buf, i) != 10 && Unk802DCCCC_At(buf, i) != 32) {
         i++;
     }
     *pos = *pos + i + 1;
