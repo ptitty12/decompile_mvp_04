@@ -36,6 +36,41 @@ extern const Db8058C9B8_P lbl_8060095C;
 extern const Db8058C9B8_P lbl_80600964;
 extern const Db8058C9B8_P lbl_8060096C;
 
+extern "C" int fn_805826AC(void* self, void* rec);
+extern "C" int fn_800A4EA4(void* o);
+struct Db8058DE40_R {
+    char pad0[0x1D4];
+    int m1D4;
+};
+extern "C" Db8058DE40_R* fn_8007FE04__FP13Unk8007F198_D(void* a0);
+
+/* near-miss: 99.5%; retail keeps rec in r30 and the flag in r29 (callee-saved pair swapped) */
+/* forward declarations (definitions are in address order) */
+extern "C" Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self);
+extern "C" void fn_8058BF68(Db805822D0_V* self);
+extern "C" void fn_8058C020(Db805822D0_V* self);
+extern "C" int fn_8058C304();
+extern "C" Db805822D0_Base* fn_8058C34C(Db805822D0_Base* self);
+extern "C" void fn_8058C388(char* self);
+extern "C" void fn_8058C9B8(Db8058C9B8_P* out, int unused, int k);
+extern "C" int fn_8058CE38(void* self, unsigned short* rec);
+extern "C" void fn_8058CE50(void* self, unsigned short* rec, unsigned short* dst);
+extern "C" int fn_8058CF18(int a, int b, void* rec);
+extern "C" void fn_8058D028(char* self, int a, Unk80070DDC_Stream* io);
+extern "C" Db805822D0_Base* fn_8058D080(Db805822D0_Base* self);
+extern "C" int fn_8058D78C();
+extern "C" void fn_8058D81C(void* self, void* rec, unsigned short* dst);
+extern "C" int fn_8058DB0C(void* self, unsigned short* rec);
+extern "C" void fn_8058DBEC(void* self, unsigned short* rec, unsigned short* dst);
+extern "C" int fn_8058DCB4(int a, int b, void* rec);
+extern "C" int fn_8058DE40(void* self, void* rec);
+extern "C" void fn_8058DE9C(Db805822D0_V* self, int a, int b, int c, int d);
+extern "C" int fn_8058E044(int a, int b, void* rec);
+extern "C" Db805822D0_Base* fn_8058E144(Db805822D0_Base* self);
+extern "C" void fn_8058E180(Db805822D0_V* self, int a);
+extern "C" int fn_8058E470();
+extern "C" int fn_8058E550();
+
 extern "C" DB_OVERLAY Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self)
 {
     fn_805822D0(self);
@@ -138,6 +173,39 @@ extern "C" DB_OVERLAY int fn_8058CE38(void* self, unsigned short* rec)
     return r;
 }
 
+/* near-miss: 99.5%; rec and the flag swap r29/r30 relative to retail */
+extern "C" DB_OVERLAY void fn_8058CE50(void* self, unsigned short* rec, unsigned short* dst)
+{
+    fn_8058233C(self);
+    int fl = rec[8] & 1;
+    if (fn_800B5758(fn_800B555C()) && fl) {
+        Db80586420_Ent e(rec);
+        Db80586420_Ent* pe = &e;
+        if (pe->m8 != 0) {
+            unsigned short b[0x80];
+            char n[0x80];
+            Unk80090880* tb = lbl_8061977C;
+            fn_800DE538((int)n, 3, pe->m8, 1);
+            fn_80403DE4(b, ((DbLook)fn_80090880)(tb, 0x5C65), n, dst);
+            fn_80403144(dst, b);
+        }
+    }
+}
+
+extern "C" DB_OVERLAY int fn_8058CF18(int a, int b, void* rec)
+{
+    Db80586420_Tri t = { -1, -1, -1 };
+    Db80586420_Ent e(rec);
+    int k = ((unsigned short*)rec)[8] & 1;
+    int ta[2] = { 0x1D5A, 0x5C51 };
+    t.a = ta[k];
+    int tbb[2] = { 0x1D75, 0x1D76 };
+    t.b = tbb[k];
+    int tc[2] = { 0x1E2F, 0x1E30 };
+    t.c = tc[k];
+    return fn_80582DF4(a, b, t);
+}
+
 extern "C" DB_OVERLAY void fn_8058D028(char* self, int a, Unk80070DDC_Stream* io)
 {
     fn_80582C54(self, a, io);
@@ -163,6 +231,139 @@ extern "C" DB_OVERLAY int fn_8058D78C()
         return 7;
     }
     return 4;
+}
+
+extern "C" DB_OVERLAY void fn_8058D81C(void* self, void* rec, unsigned short* dst)
+{
+    fn_8058233C(self);
+    if (fn_800B5758(fn_800B555C())) {
+        Db80586420_Ent e(rec);
+        Db80586420_Ent* pe = &e;
+        int t = pe->m8;
+        if (pe->m4 == 0 && t != 0) {
+            unsigned short b[0x80];
+            char n[0x80];
+            Unk80090880* tb = lbl_8061977C;
+            fn_800DE538((int)n, 0, t, 1);
+            fn_80403DE4(b, ((DbLook)fn_80090880)(tb, 0x5C65), n, dst);
+            fn_80403144(dst, b);
+        }
+    }
+}
+
+extern "C" DB_OVERLAY int fn_8058DB0C(void* self, unsigned short* rec)
+{
+    int k = rec[8] & 3;
+    Db80586420_Ent e(rec);
+    Db80586420_Ent* pe = &e;
+    switch (k) {
+    case 0: {
+        int t = pe->mC.f;
+        int lo = 0, hi = 2;
+        if (t != 0 && t >= lo && t <= hi)
+            return 1;
+        return 2;
+    }
+    case 1:
+        return 13;
+    case 2: {
+        int t = pe->mC.e;
+        if (t == 0)
+            return 3;
+        if (t == 1)
+            return 1;
+        return 1;
+    }
+    case 3:
+        return 2;
+    default:
+        return 2;
+    }
+}
+
+extern "C" DB_OVERLAY void fn_8058DBEC(void* self, unsigned short* rec, unsigned short* dst)
+{
+    fn_8058233C(self);
+    int fl = rec[8] & 3;
+    if (fn_800B5758(fn_800B555C()) && fl == 1) {
+        Db80586420_Ent e(rec);
+        Db80586420_Ent* pe = &e;
+        if (pe->m8 != 0) {
+            unsigned short b[0x80];
+            char n[0x80];
+            Unk80090880* tb = lbl_8061977C;
+            fn_800DE538((int)n, 3, pe->m8, 1);
+            fn_80403DE4(b, ((DbLook)fn_80090880)(tb, 0x5C65), n, dst);
+            fn_80403144(dst, b);
+        }
+    }
+}
+
+extern "C" DB_OVERLAY int fn_8058DCB4(int a, int b, void* rec)
+{
+    Db80586420_Tri t = { -1, -1, -1 };
+    Db80586420_Ent e(rec);
+    Db80586420_Tri tb[4] = { { 0x1D5C, 0x1D6B, 0x1E44 }, { 0x5C51, 0x1D86, 0x1E45 }, { 0x1D5C, 0x1D6C, 0x1E46 }, { 0x1D5A, 0x1D87, 0x1E47 } };
+    int k = ((unsigned short*)rec)[8] & 3;
+    t = tb[k];
+    if (k == 0) {
+        int a0[3] = { 0x1D5A, 0x1D58, 0x1D55 };
+        t.a = a0[e.mC.f];
+    } else if (k == 2) {
+        int a2[2] = { 0x5CFD, 0x1D5E };
+        t.a = a2[e.mC.e];
+    }
+    return fn_80582DF4(a, b, t);
+}
+
+extern "C" DB_OVERLAY int fn_8058DE40(void* self, void* rec)
+{
+    int r = fn_805826AC(self, rec);
+    if (r == 1) {
+        if (fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C)->m1D4 == 1 && fn_800A4EA4(lbl_80619948) != 0)
+            return 3;
+        return 6;
+    }
+    return r;
+}
+
+extern "C" DB_OVERLAY void fn_8058DE9C(Db805822D0_V* self, int a, int b, int c, int d)
+{
+    if (self->m0 == 0) {
+        Unk8007A4DC_Screen* s = lbl_8061930C;
+        Unk8007B2B0_Screen* sb = (Unk8007B2B0_Screen*)s;
+        if (sb->fn_80078A38(b) == 0) {
+            int z = sb->fn_80078A38(d);
+            if (z == 0) {
+                int x = s->fn_8007A6A0(0x16, a);
+                int y = s->fn_8007A6A0(0x16, c);
+                if (x > 2 || y > 2) {
+                    char p = sb->fn_8007A0D0(b);
+                    char q = sb->fn_8007A0D0(d);
+                    if (y > x) {
+                        Db8052E198_E e;
+                        fn_8052E198(&e, self->v18(), c, a, 0, q, p, 0, z, z);
+                        fn_80582CF8(self, &e, 0, 0, 0);
+                        fn_80360AF0((Db80586420_Ent*)&e, 2);
+                    } else {
+                        Db8052E198_E e;
+                        fn_8052E198(&e, self->v18(), a, c, 0, p, q, 0, z, z);
+                        fn_80582CF8(self, &e, 0, 0, 0);
+                        fn_80360AF0((Db80586420_Ent*)&e, 2);
+                    }
+                }
+            }
+        }
+    }
+}
+
+extern "C" DB_OVERLAY int fn_8058E044(int a, int b, void* rec)
+{
+    Db80586420_Tri t = { -1, -1, -1 };
+    Db80586420_Ent e(rec);
+    Db80586420_Tri tb[2] = { { 0x1D5A, 0x1D6D, 0x1E24 }, { 0x1D5A, 0x1D88, 0x1E25 } };
+    t = tb[((unsigned short*)rec)[8] & 1];
+    return fn_80582DF4(a, b, t);
 }
 
 extern "C" DB_OVERLAY Db805822D0_Base* fn_8058E144(Db805822D0_Base* self)
