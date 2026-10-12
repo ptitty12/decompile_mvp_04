@@ -11,6 +11,9 @@ functions in symbols.txt (the .text range from splits.txt):
      common subsequence);
   3. equal-length runs left between those anchors are paired in order, but
      only where the two sizes are within 25% of each other.
+     Before that, a function whose masked code equals exactly one target
+     function in the unit is pinned to it (catches real C++ ctors/dtors
+     that size-order pairing would put at the wrong address).
 
 Anything else is left unpaired and reported. Wrong source order, say, never
 yields a wrong name.
@@ -77,6 +80,51 @@ def elf_text_functions(path: Path) -> List[Tuple[int, int, str]]:
     return uniq
 
 
+def masked_bodies(path: Path) -> Dict[int, Tuple[int, ...]]:
+    """{offset in its code section: masked instruction words} for FUNC symbols.
+
+    Branch displacements and relocated immediates are masked (as in
+    tools/match/cmp_objects.py), so a compiled function and its retail
+    original compare equal when only symbol addresses differ."""
+    data = path.read_bytes()
+    shoff, = struct.unpack_from(">I", data, 0x20)
+    shentsize, shnum, shstrndx = struct.unpack_from(">HHH", data, 0x2E)
+    secs = [struct.unpack_from(">IIIIIIIIII", data, shoff + i * shentsize) for i in range(shnum)]
+
+    def cstr(off: int) -> str:
+        return data[off:data.index(b"\0", off)].decode("latin-1")
+
+    names = [cstr(secs[shstrndx][4] + s[0]) for s in secs]
+    relocs: Dict[int, set] = {}
+    for s in secs:
+        if s[1] == 4:  # SHT_RELA
+            offs = relocs.setdefault(s[7], set())
+            for i in range(s[5] // 12):
+                off, = struct.unpack_from(">I", data, s[4] + i * 12)
+                offs.add(off & ~3)
+    out: Dict[int, Tuple[int, ...]] = {}
+    for s in secs:
+        if s[1] != 2:
+            continue
+        for i in range(s[5] // 16):
+            _, value, size, info, _, shndx = struct.unpack_from(">IIIBBH", data, s[4] + i * 16)
+            if info & 0xF != 2 or not (0 < shndx < len(names)) or names[shndx] not in CODE_SECTIONS:
+                continue
+            sec, r, words = secs[shndx], relocs.get(shndx, set()), []
+            for k in range(0, size - size % 4, 4):
+                w, = struct.unpack_from(">I", data, sec[4] + value + k)
+                op = w >> 26
+                if op == 16:
+                    w &= 0xFFFF0003
+                elif op == 18:
+                    w &= 0xFC000003
+                elif value + k in r:
+                    w &= 0xFFE00000 if op in (14, 15) else 0xFFFF0000
+                words.append(w)
+            out.setdefault(value, tuple(words))
+    return out
+
+
 def text_range(splits: Path, unit: str) -> Tuple[int, int]:
     cur = None
     for line in splits.read_text(encoding="utf-8").splitlines():
@@ -123,17 +171,22 @@ def pair_segment(src: List[Tuple[int, int, str]], dst: List[Tuple[int, int, str]
     return pairs
 
 
-def pair(src: List[Tuple[int, int, str]], dst: List[Tuple[int, int, str]]) -> List[Tuple[int, int]]:
+def pair(src: List[Tuple[int, int, str]], dst: List[Tuple[int, int, str]],
+         content: Optional[Dict[int, int]] = None) -> List[Tuple[int, int]]:
     """Index pairs (i in src, j in dst), in order.
 
-    Names that start with fn_<address> pin first (keeping only pins that agree
-    in order); the stretches between pins are paired by pair_segment."""
+    Names that start with fn_<address> pin first, then functions whose masked
+    code equals exactly one target function (`content`, src index -> dst
+    index), keeping only pins that agree in order; the stretches between pins
+    are paired by pair_segment."""
     j_of_addr = {d[0]: j for j, d in enumerate(dst)}
     pins = []
     for i, (_, _, name) in enumerate(src):
         pm = ADDR_PREFIX.match(name)
         if pm and int(pm.group(1), 16) in j_of_addr:
             pins.append((i, j_of_addr[int(pm.group(1), 16)]))
+        elif content and i in content:
+            pins.append((i, content[i]))
     chain: List[Tuple[int, int]] = []  # longest run of pins increasing in both
     best: List[List[Tuple[int, int]]] = []
     for k, (i, j) in enumerate(pins):
@@ -220,8 +273,23 @@ def main() -> None:
 
     print(f"{args.unit}: {len(src)} functions in {obj.name}, {len(dst)} in symbols.txt "
           f"for {lo:08X}..{hi:08X}")
+    # Content pins: a compiled function whose masked code equals exactly one
+    # target function in this unit pairs with it, whatever its size order.
+    content: Dict[int, int] = {}
+    target = ROOT / "build" / "GV4E69" / "obj" / Path(args.unit).with_suffix(".o")
+    if target.is_file():
+        tb, sb = masked_bodies(target), masked_bodies(obj)
+        js_of_body: Dict[Tuple[int, ...], List[int]] = {}
+        for j, (addr, _, _) in enumerate(dst):
+            body = tb.get(addr - lo)
+            if body and len(body) >= 2:
+                js_of_body.setdefault(body, []).append(j)
+        for i, (off, _, _) in enumerate(src):
+            js = js_of_body.get(sb.get(off, ()), [])
+            if len(js) == 1:
+                content[i] = js[0]
     renames: List[Tuple[str, str]] = []
-    paired = pair(src, dst)
+    paired = pair(src, dst, content)
     for i, j in paired:
         _, ssz, new = src[i]
         addr, dsz, old = dst[j]
