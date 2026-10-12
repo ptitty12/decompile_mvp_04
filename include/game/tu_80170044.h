@@ -66,7 +66,7 @@ typedef void (Unk80170518::*Unk80170518_Fn)();
 class Unk80170518 {
 public:
     Unk80170518(int mode);
-    virtual void fn_80005B88(Unk8016FF40* info);
+    virtual int fn_80005B88(Unk8016FF40* info);
     virtual int fn_8000850C(int a);
     virtual int fn_80005B74(int a);
     virtual int fn_801757C8();
