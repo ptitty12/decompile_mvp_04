@@ -19,6 +19,29 @@ extern "C" void fn_80377408(void* p);
 extern "C" void fn_803E0F9C(Unk803E1F98_Node* n);
 extern "C" void fn_803E1F0C(Unk803E198C_View* v);
 
+/* Orthographic projection setup: the matrix helper at 0x80431564 takes (mtx, t, b, l, r, n, f); the
+ * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by fn_80430194(mtx, 1). */
+extern "C" void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
+extern "C" void fn_80430194(float* m, int type);
+/* Fog parameter block (pointed to by the first word of the owner at View+0). */
+struct Unk803E1A38Fog {
+    int m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk803E1A38Col {
+    int v;
+};
+struct Unk803E1A38Mid {
+    Unk803E1A38Fog* m0;
+};
+extern "C" void fn_8042F93C(int type, Unk803E1A38Col color, float startz, float endz, float nearz, float farz);
+extern "C" void fn_8042FB50(unsigned short* table, unsigned short width, float* projmtx);
+extern "C" void fn_8042FD00(int enable, unsigned short center, unsigned short* table);
+
 extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* node)
 {
     v->m4 = 1;
@@ -57,6 +80,30 @@ extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* 
     return v;
 }
 
+extern "C" void fn_803E1A38(Unk803E198C_View* v)
+{
+    Unk803E1A38Mid* o = (Unk803E1A38Mid*)v->m0;
+    if (o) {
+        Unk803E1A38Col color = *(Unk803E1A38Col*)&o->m0->m10;
+        if (o->m0->m0) {
+            fn_8042F93C(o->m0->mC, color, o->m0->m4, o->m0->m8, v->mEC, v->mF0);
+            if (((Unk803E1A38Mid*)v->m0)->m0->m14) {
+                unsigned short tbl[10];
+                unsigned short* t = tbl;
+                fn_8042FB50(t, (unsigned short)(int)v->mD4, v->m14C);
+                int w = (int)(v->mD4 * 0.5f + v->mCC);
+                if (w < 0)
+                    w = 0;
+                fn_8042FD00(1, (unsigned short)w, t);
+            } else {
+                fn_8042FD00(0, 0, 0);
+            }
+        } else {
+            fn_8042F93C(0, color, 0.0f, 0.0f, 0.0f, 0.0f);
+        }
+    }
+}
+
 /* static initializer: copies a 64-byte constant block and sets two more globals */
 extern "C" void fn_803E1B54(int initialize, int priority)
 {
@@ -85,11 +132,6 @@ extern "C" void fn_803E1C44(Unk803E1F98_Node* n, Unk803E097C_Blk64* src)
     if (n->mC.m18C)
         fn_803E1F0C(&n->mC);
 }
-
-/* Orthographic projection setup: the matrix helper at 0x80431564 takes (mtx, t, b, l, r, n, f); the
- * result is mirrored into the node's 4x4 block at Node+0x18 and loaded by fn_80430194(mtx, 1). */
-extern "C" void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
-extern "C" void fn_80430194(float* m, int type);
 
 extern "C" void fn_803E1CDC(Unk803E1F98_Node* n, float a, float b, float c)
 {
@@ -170,3 +212,8 @@ extern "C" void fn_803E1F6C()
 {
     fn_803E1B54(1, 0xFFFF);
 }
+
+/*
+ * Not matched yet: fn_803E0ACC, fn_803E0DD0, fn_803E0F9C, fn_803E1578, fn_803E1850 (collision test through
+ * fn_803DED40). The original code stays linked for these.
+ */
