@@ -4,6 +4,15 @@
  */
 #include "game/db_8054FA04.h"
 #include "game/clampiter.h"
+extern "C" int fn_805668F0(Db80565CDC_S* self, int y);
+extern "C" void fn_8052BAA8(Unk8052B978_Tbl* self, int v);
+extern "C" void fn_8052BAFC(Unk8052B978_Tbl* self, int v);
+extern "C" void fn_8052BB50(Unk8052B978_Tbl* self, int v);
+extern "C" void fn_8052BBA4(Unk8052B978_Tbl* self, int v);
+extern "C" void fn_8052C1C8(Unk8052B978_Tbl* self);
+extern "C" void fn_805652E8(Unk8007B2B0_Screen** pp, Unk8052B978_Tbl* tb, int a);
+extern float lbl_805FF878;
+extern float lbl_805FF888;
 /* Source object (lbl_8061930C): four ints from +0xC copied into the singleton (fn_80564D40). */
 struct Db80564D40_Src {
     char pad0[0xC];
@@ -125,6 +134,27 @@ extern "C" DB_OVERLAY float fn_80563BA0(int a)
     else
         r = lbl_805FF874;
     return r;
+}
+
+extern "C" DB_OVERLAY float fn_80563BF0(int a, int b, float* c)
+{
+    float r = lbl_805FF878;
+    float fa = (float)a;
+    float fb = (float)b;
+    r = r + c[0];
+    float b2 = fb * fb;
+    r = c[1] * fb + r;
+    r = c[2] * b2 + r;
+    float b3 = b2 * fb;
+    float b4 = b2 * b2;
+    r = c[3] * b3 + r;
+    r = c[4] * b4 + r;
+    r = c[5] * fa + r;
+    r = c[6] * fa * fb + r;
+    r = c[7] * fa * b2 + r;
+    r = c[8] * fa * b3 + r;
+    r = c[9] * fa * b4 + r;
+    return r + lbl_805FF888;
 }
 
 /* near-miss: retail's ctor-shaped bodies copy r3 (mr r9,r3) and load the float in r11 (one more insn).
