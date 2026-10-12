@@ -4,6 +4,8 @@
  */
 #include "game/tu_80167DCC.h"
 
+extern const char lbl_8065EC50[];
+
 extern float lbl_805CAD10;
 extern float lbl_805CAD14;
 
@@ -193,6 +195,15 @@ int fn_80169DC4(char* base) /* 80169DC4 */
         off += 0xA0;
     } while (p <= end);
     return 0;
+}
+
+void fn_8016A660(Unk8016ACAC_Slot* s, int c) /* 8016A660 */
+{
+    *(const void**)((char*)s + 0xA58) = lbl_8065EC50;
+    ((Unk801527C8_Ctx*)s)->fn_8016AC3C();
+    if (c & 1) {
+        delete s;
+    }
 }
 
 void Unk8016ACAC_Slot::fn_8016A6AC() /* 8016A6AC */
