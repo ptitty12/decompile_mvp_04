@@ -11,6 +11,8 @@ struct Obj4_390 : Obj4_36C {
 struct Unk8026C414_O;
 struct Unk8026C414_X;
 int fn_8026DC5C(Unk8026C414_O* self, Unk8026C414_X* ctx);
+int fn_8026DA60(Unk8026C414_O* self, Unk8026C414_X* ctx);
+int fn_8026D7E0(Unk8026C414_O* self, Unk8026C414_X* ctx);
 
 extern "C" {
 void fn_80213988(Task* t, int x, int y);
@@ -248,6 +250,37 @@ void fn_80213FAC(Task* t, int x)
     } else {
         fn_80213E84(t, x);
     }
+}
+
+extern const float lbl_805D5D78;
+extern const float lbl_805D5D7C;
+
+/* near-miss: 23 slots (9 out of order): all slots, frame and temps match; retail has no store in the else arm of the l2
+   select (both arms leave the value in f0 and share one stfs), ours stores per arm with different registers */
+inline float LenXZ42C8(Vec3f v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+
+int fn_802142C8(Task* t, int k)
+{
+    float hi = lbl_805D5D78;
+    float lo = lbl_805D5D7C;
+    int m = t->m9C->m3A5C;
+    if (m != 0 && m != 2) {
+        if (k == 0)
+            return 0;
+        int c = fn_801F0E78(t) != -1;
+        if (c)
+            return 1;
+        float l = LenXZ42C8(((TaskInnerAC*)t->m9C)->mAC - lbl_805D6760[k]);
+        float l2 = k == 3 ? l : LenXZ42C8(((TaskInnerAC*)t->m9C)->mAC - lbl_805D6760[3]);
+        if (!(l2 <= lbl_805D5D7C)) {
+            if (l > lbl_805D5D78)
+                return 1;
+        }
+    }
+    return 0;
 }
 
 /* near-miss: logic and Vec3 temps match; retail reloads lbl_805D5D80 with its own lis after the call (the unused
@@ -492,7 +525,6 @@ int fn_80215F40(Task* t, void* obj, int, int, int k, int* out)
 }
 
 extern const float lbl_805D5E78;
-int fn_8026DA60(Unk8026C414_O* self, Unk8026C414_X* ctx);
 
 int fn_80216014(void*, PosObj* o, Vec3f* q, int a, int b, int c, int mode)
 {
@@ -504,6 +536,56 @@ int fn_80216014(void*, PosObj* o, Vec3f* q, int a, int b, int c, int mode)
             return DistSq5D28(qq, pos) <= lbl_805D5E78;
     }
     return 0;
+}
+
+struct Unk80270BA0_X;
+class Unk80279BB8 {
+public:
+    Unk80279BB8();
+    void fn_80279DD0(Unk80270BA0_X* x);
+    char pad0[0xDC];
+};
+struct Unk80271DBC_Link {
+    char pad0[0x838];
+    int m838;
+};
+struct Own6134 {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x458 - 0x6C];
+    int m458;
+    char pad45C[4];
+    int m460;
+    char pad464[0x618 - 0x464];
+    Unk80271DBC_Link* m618;
+};
+extern const float lbl_805D5E7C;
+extern const float lbl_805D5E80;
+extern const float lbl_805D5E84;
+extern const float lbl_805D5E88;
+extern "C" int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* out, int c);
+
+int fn_80216134(Task* t, Own6134* o, Vec3f* q, int a, int, int c)
+{
+    if (a != 0 || (c != 0 && o->m460 != 0))
+        return 0;
+    Unk80271DBC_Link* link = o->m618;
+    int h = link->m838;
+    Vec3f pos = o->m60;
+    Vec3f qq = *q;
+    if (fn_8026D7E0((Unk8026C414_O*)o, 0) == 0 || ((PosObj*)t->m9C->m0->m6CC)->m60.y > lbl_805D5E7C)
+        return 0;
+    float l = DistSq5D28(qq, pos);
+    float thr = lbl_805D5E80;
+    float thr2 = lbl_805D5E84;
+    if (l > lbl_805D5E80 || (o->m458 == 0 && !(l <= lbl_805D5E84)))
+        return 0;
+    float fl = lbl_805D5E88;
+    Unk80279BB8 qy;
+    qy.fn_80279DD0((Unk80270BA0_X*)o);
+    if (!(fn_80386110(link, &qy, h, 0xFF18E0CC, &fl, 0) & 0x10000))
+        return 0;
+    return 1;
 }
 
 /* near-miss: 24 slots: retail lays out the return-0 block right after the flag/kind tests (beq to the body), ours puts it last */
