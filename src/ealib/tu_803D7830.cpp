@@ -148,6 +148,71 @@ extern "C" int fn_803D7AFC(Unk803D7830* self, int a, int b)
     return 1;
 }
 
+struct Unk803D7B40Node {
+    char pad0[0xC];
+    const char* mC;
+    Unk803D7B40Node* m10;
+};
+struct Unk803D7B40Obj {
+    char pad0[4];
+    char sub[4];
+    char pad8[4];
+    void* mC;
+};
+extern int lbl_8062729C;
+extern int lbl_806272A0;
+extern Unk803D7B40Node* lbl_806272AC;
+extern char lbl_806AAB80[];
+extern char lbl_806AABA8[];
+extern char lbl_806AAB6C[];
+extern const char lbl_8060AE70[];
+extern const char lbl_8060AE7C[];
+extern const char lbl_8060AE84[];
+extern const char lbl_8060AE98[];
+extern const char lbl_8060AEBC[];
+extern const char lbl_8060AEDC[];
+extern const char lbl_8060AEFC[];
+extern const char lbl_8060AF20[];
+extern const char lbl_8060AF48[];
+extern "C" {
+void fn_803D8094(void* pool, void* item);
+void fn_803E7074(char* a, const char* b);
+void fn_803E71CC(char* a, const char* b);
+void fn_803E9B6C(const char* s);
+void fn_803EA08C(char* a);
+void fn_803E72B8(char* a);
+void fn_803E72EC(char* a);
+void fn_803D7E50(void* p, int c);
+void fn_803D7E80(void* p, int c);
+}
+
+extern "C" void fn_803D7B40(Unk803D7B40Obj* self, int c)
+{
+    while (self->mC != 0)
+        fn_803D8094(self, self->mC);
+    lbl_8062729C = 0;
+    lbl_806272A0 = 0;
+    fn_803E7074(lbl_806AAB80, lbl_8060AE70);
+    fn_803E7074(lbl_806AAB80, lbl_8060AE7C);
+    fn_803E71CC(lbl_806AABA8, lbl_8060AE70);
+    fn_803E71CC(lbl_806AABA8, lbl_8060AE84);
+    fn_803E9B6C(lbl_8060AE98);
+    fn_803E9B6C(lbl_8060AEBC);
+    fn_803E9B6C(lbl_8060AEDC);
+    fn_803E9B6C(lbl_8060AEFC);
+    fn_803E9B6C(lbl_8060AF20);
+    fn_803E9B6C(lbl_8060AF48);
+    fn_803EA08C(lbl_806AAB6C);
+    fn_803E72B8(lbl_806AABA8);
+    fn_803E72EC(lbl_806AAB80);
+    for (Unk803D7B40Node* n = lbl_806272AC; n != 0; n = n->m10)
+        fn_803E9B6C(n->mC);
+    fn_803D7E50(self->sub, 2);
+    fn_803D7E80(self, 2);
+    if (c & 1)
+        lbl_8062C66C(self, 0x14);
+}
+
 extern "C" void fn_803D7CA4(int a, int b)
 {
     if (b == 0xFFFF && a != 0) {
@@ -195,6 +260,6 @@ extern "C" void fn_803D7EA8()
 }
 
 /*
- * Not attempted: fn_803D7B40 (89 instructions, 20 data references: teardown of the registered classes/lists);
- * fn_803D7D20 needs mtspr GQR2..GQR5 (instructions only inline assembly can emit); the original code stays linked.
+ * Not matched: fn_803D7D20 needs mtspr GQR2..GQR5 (instructions only inline assembly can emit); the original
+ * code stays linked.
  */
