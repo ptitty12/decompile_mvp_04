@@ -1178,3 +1178,55 @@ Still open (Opus queue)
   - callee-saved permutation cluster (80533120, 80536F28, 80537054,
     8053923C);
   - sibling-arm vcall tail sharing (fn_804D0860).
+
+## Ranges 33-46, tail 00-01 and pass-2 g16-g19 (2026-10-12, condensed)
+
+- Float constants:
+  - With a literal `0.1f`, a `const float c` local stays in f31 across calls. `extern const float lbl_X` reloads it from its stack slot.
+  - A scalar float global gets hoisted by sched1 above earlier int stores. Declare it `extern float g[1]` and read `g[0]` to keep it below them.
+  - A non-const extern float keeps its load after earlier stores; `extern const float` lets the `lfs` hoist above them.
+- Stack message objects (id at +0, vptr at +4, root vtable lbl_80649DA0):
+  - Use inline `Base(id){vptr=root; m0=id;}`, then a derived ctor that stores its own vptr, then `Fill(...)`, then an inline dtor that restores root.
+  - Because m0 is stored sp-based and the vptr through `this`, the first vptr store survives.
+  - Name the derived class after the callee's class so mangled setters match.
+- Dead compares, more forms:
+  - An identical body in both arms (`if (f()==2) g(s,6); else g(s,6);`) leaves `cmpwi; b`.
+  - A `case 2:` with the same body as `default:` does the same.
+- Switch-tree root off by one: add a dummy `case N+1: break;`, or an enum index with a negative enumerator. A two-case tree needs an empty `case hi+1: break;`.
+- Arguments and evaluation order:
+  - `m->m18->v1(f(m, idx))` loads the vtable before the argument call. Hoist the call into a local to get retail's order.
+  - A conditional argument written inline (`w->v16(v != 4 ? 1 : 0)`) keeps the `lwz` between the compare and the argument.
+  - When a callee's real arity or return type differs from the shared header, call it through a cast: `((int(*)(void*,int))fn_X)(p,0)` or `((void(*)(T*,Pair))fn_X)(...)`. Both emit a direct `bl`.
+  - An empty callee that retail calls with `self` in r3 needs the parameter.
+- Frame and locals:
+  - Size the frame from the prologue (`char buf[N]`; `stwu r1,-80` leaves 64 bytes of locals). A 12-byte Vec3 gives 0x90 where a 20-byte struct gives 0x98.
+  - The first-declared float local gets the lowest slot. An unused `volatile float pad;` or `float u;` reserves a gap.
+  - The order of `&x` takes decides slot order, not the declaration order.
+  - A BLKmode (odd-size or dtor-bearing) stack temp gets a per-use `addi r3,r1,8`. A `char* p = buf;` pointer local keeps the address in a saved register.
+  - Frame-address arguments recomputed per call come from an inline wrapper `inline void Cpy(char* d,const char* s){fn(d,s);}`.
+- Loops:
+  - `while (n-- != 0)` gives `addi -1; cmpwi`.
+  - `do {...} while (k-- != 0)` gives the post-decrement ctor loop.
+  - `for (;;) { if (!c) break; ... }` keeps the reload that `while (c)` CSEs away.
+  - The `test at top, entry jump into the middle` shape is still open.
+- Data structures:
+  - Member-array dtors in extern "C" units: element classes whose inline dtor forwards to the real element function, plus an owner `~Owner(){ vp = lbl; }` and `fn_X(Owner* p,int c){ p->~Owner(); if (c&1) delete; }`.
+  - A class `operator delete` explains an `andi. r,1` then hook `blrl` tail.
+  - A static init pair needs the global object defined in the unit. The compiler then emits `__static_initialization_and_destruction_0` plus `_GLOBAL_.I/.D` byte-identically. Rename those by hand: they are local and per-TU.
+  - Bitfield views reproduce `rlwimi` with a shared `li`. A raw mask gives `rlwinm` plus `or`.
+  - `f0 = 1; f1 = 0;` gives `oris` plus `rlwinm`. `int f = p->bits; if (f == 1)` gives `rlwinm.`.
+- Pairing:
+  - A function that is written and matching can still be unpaired. Check the rename.py SKIP lines.
+  - If other units call it by plain name, define it `extern "C"` with their parameter types and cast inside.
+  - rename.py pins by masked code. Real ctors whose fn_ name is still referenced elsewhere must be renamed by hand.
+- Tooling:
+  - Run `ninja` before `check_literals.py`; it reads report.json and the rebuilt objects. `ninja build/GV4E69/report.json` takes about 1 s.
+  - sort_functions.py moves declarations that sit above a function along with it. Keep every declaration in the file head (`R44\hoist.py`, `P18\hoist.py`).
+  - Store-order hill climb: start from retail's emission order (`P16\hill.py`, `P18\hc.py`, `T00\bf.py`).
+  - Variant scorers: `R40\hc.py`, `P18\vtry.py`, `R45\cand.py`, and `T01\tv.py` (takes a FLAGS env var).
+  - Switch tables: `W8o4\mixsolve2.py` finds the form, signedness and case count in seconds. `W8o4\deadcmp.py` scans for them.
+- Library notes:
+  - The gamelib (0x80377048..0x8038BC58) is -Os -ffloat-store.
+  - ealib/tu_803912F8 and tu_803927E4 take `cflags_ealib_nsr` (-G0 -fno-strength-reduce).
+  - Wide strings in sda units are `extern unsigned short lbl[N]`.
+  - SDK sources may `#define` a real name onto a placeholder that game code still calls (e.g. GXBegin -> fn_8042C8B0).
