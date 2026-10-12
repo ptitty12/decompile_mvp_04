@@ -331,6 +331,15 @@ extern "C" void fn_800A08C8(Unk8009FDE0* p, int ch, unsigned idx, int v)
 
 extern "C" void fn_800A0954() {}
 
+extern "C" float fn_800A0958(Unk800A0020* p, int idx)
+{
+    float a = (float)p->v5(0, idx);
+    float b = (float)p->v5(1, idx);
+    float s = a + b;
+    float r = !(s <= 0.0f) ? a / s : 0.0f;
+    return r;
+}
+
 extern "C" void fn_800A0A4C(Unk8009FC5C* p, int a, Unk8009FC5C_Stream* s)
 {
     fn_80071E2C(p, a, s);
