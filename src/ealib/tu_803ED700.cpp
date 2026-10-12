@@ -41,10 +41,10 @@ extern RcHeap* lbl_806AABF4[64];
 extern "C" int fn_804007FC(void*);
 extern "C" int fn_803FFC58(void*, int, int);
 extern "C" int fn_803EDA0C(void*);
-extern "C" int fn_803EE020(int, const void*, int (*)(void));
+extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
 extern "C" void fn_803EE878();
-extern "C" int fn_803EDF10();
+extern "C" int fn_803EDF10(const char* fmt, ...);
 extern "C" int fn_803EE238();
 extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
 extern "C" int fn_803EDC98(void*, int);
@@ -74,6 +74,19 @@ extern "C" int fn_803EE4B8(RcBlk*);
 extern "C" int fn_803EE5A0(RcBlk*);
 extern "C" int fn_803EE688(RcBlk*);
 extern "C" int fn_803EE708(int);
+
+/* SysV varargs record, same as include/game/tu_8000C2C4.h */
+struct va_list_tag {
+    char gpr;
+    char fpr;
+    char* overflow_arg_area;
+    char* reg_save_area;
+};
+typedef va_list_tag va_list[1];
+#define va_start(AP, LASTARG) (__builtin_next_arg(LASTARG), *(AP) = *(va_list_tag*)__builtin_saveregs())
+
+extern "C" int vsprintf(char* buf, const char* fmt, va_list ap);
+extern "C" int fn_80400ADC(int level, const char* s, ...);
 
 inline unsigned RcRdBE(const unsigned char* b)
 {
@@ -265,6 +278,16 @@ extern "C" void fn_803EDEE8(RcBlk* b)
     next->m14 = prev;
     b->m0 = 0x424f;
     b->m2 &= 0xbfff;
+}
+
+extern "C" int fn_803EDF10(const char* fmt, ...)
+{
+    va_list ap;
+    char buf[0x200];
+    char* p = buf;
+    va_start(ap, fmt);
+    vsprintf(p, fmt, ap);
+    return fn_80400ADC(2, p);
 }
 
 extern "C" int fn_803EDFCC(int a)
