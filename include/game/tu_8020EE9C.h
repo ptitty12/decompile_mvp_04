@@ -154,6 +154,8 @@ struct Obj4_36C {
     int m378;
     char pad37C[0x38C - 0x37C];
     int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
 };
 /* Block reached through CtxOwner::m6F8 -> +0x14 (byte at +0x1CC9). */
 struct Ctx6F8Inner {
@@ -200,6 +202,15 @@ struct IterObj {
     char padC[0x18 - 0xC];
 };
 
+/* 0x5C-byte entries of the table at TaskInner+0x6D0 (fn_80221D0C). */
+struct Ent5C {
+    float m0;
+    int m4;
+    char pad8[0x34 - 8];
+    int m34;
+    char pad38[0x5C - 0x38];
+};
+
 /* Block at Task+0x9C: object table at +8 (indexed by m3A5C), two Slots4 at
  * +0xC0 and +0xD4, the record queue at +0x3A60. */
 struct TaskInner {
@@ -230,7 +241,9 @@ struct TaskInner {
     int m1F4;
     char pad1F8[0x20C - 0x1F8];
     int m20C;
-    char pad210[0x9FC - 0x210];
+    char pad210[0x6D0 - 0x210];
+    Ent5C m6D0[8]; /* nine entries are indexed (k <= 8); the ninth reaches 0xA0C and overlaps m9FC in the declaration */
+    char pad9B0[0x9FC - 0x9B0];
     Rec16 m9FC[8];
     char padA7C[0xC90 - 0xA7C];
     int mC90;

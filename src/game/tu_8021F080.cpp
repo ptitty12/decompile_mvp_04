@@ -41,6 +41,7 @@ extern const float lbl_805D6334;
 extern "C" {
 
 float fn_802478A0(void* o, void* p, int a, int b);
+float fn_8018D2EC(Obj4_36C* o, int a);
 
 extern Vec3f lbl_805D6244;
 
@@ -144,6 +145,25 @@ int fn_802219EC(Task* t)
         fn_8014E108(p);
     }
     return 0;
+}
+
+int fn_80221D0C(Task* t, int k)
+{
+    int r = 0;
+    if (k <= 8) {
+        TaskInner* in = t->m9C;
+        if ((!(in->m6D0[k].m0 < 0.0f) && in->m6D0[k].m4 >= 0) || in->m6D0[k].m34 != 0) {
+            r = 1;
+        }
+    }
+    const float c = 0.25f;
+    float d = t->m9C->m6D0[k].m0 - (float)t->m9C->m0->m4C * 0.016666668f;
+    Obj4_36C* o = t->m9C->m0->m6CC;
+    float e = fn_8018D2EC(o, 0) - o->m3F4;
+    if (!(d - c <= e)) {
+        r = 0;
+    }
+    return r;
 }
 
 void fn_80222AE0(Task* t, int a, RecQueue* q)
