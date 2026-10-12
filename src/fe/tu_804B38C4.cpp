@@ -166,3 +166,11 @@ extern "C" FE_OVERLAY void fn_804B47C0(FeScr* x)
     ((FeObj1*)x->m134)->v105(1);
     ((FeObj*)x)->v84();
 }
+
+extern "C" FE_OVERLAY void fn_804B3F2C(FeScr* x)
+{
+    fn_800ECAA4(x);
+    FeObj* w = x->m134;
+    if (w != 0 && FI(w, 0) == 0)
+        fn_800CFB38(w);
+}
