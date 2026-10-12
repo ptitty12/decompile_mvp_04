@@ -62,6 +62,11 @@ struct GObj {
     FEV3C* mDC;
     char padE0[0x110 - 0xE0];
     int m110;
+    char pad114[0x140 - 0x114];
+    int m140;
+    int m144;
+    int m148;
+    int m14C;
 };
 struct GVec {
     float m0;
@@ -426,6 +431,73 @@ extern "C" void fn_800B2D88(GObj* self, int a, int b)
 {
     if (self->mDC) {
         self->mDC->s92(self->m4, a, b);
+    }
+}
+
+extern "C" void fn_800412AC(Unk8004072C* o, int a, int b, int c, int d, int e);
+extern "C" void fn_8011C534(FEV3C* o);
+extern "C" void fn_8011F360(FEV3C* o, int a);
+extern "C" void fn_8011F274(FEV3C* o);
+extern "C" void fn_8011F1A4(FEV3C* o, int a, int b);
+extern "C" void fn_8011B24C(int a, int b, int c, int d, int* e, int* f);
+extern "C" char* fn_800AB5C8(void* g);
+extern "C" int fn_800AEA04(char* self, int k);
+extern void* lbl_80619D10;
+
+extern "C" void fn_800B2DD4(GObj* self, int k)
+{
+    switch (k) {
+    case 0:
+        break;
+    case 3:
+        if (self->mDC) {
+            fn_8011C534(self->mDC);
+        }
+        break;
+    case 4:
+        if (self->mDC) {
+            self->mDC->s84();
+        }
+        break;
+    case 1:
+        if (self->mDC) {
+            fn_800412AC(fn_8004072C(), 0x2B, 0, 0, 0, 0);
+            if (self->m144 != 0) {
+                fn_8011F360(self->mDC, self->m144);
+            }
+            fn_800B302C(self);
+        }
+        break;
+    case 5:
+        if (self->mDC) {
+            fn_8011F274(self->mDC);
+            fn_800412AC(fn_8004072C(), 0x30, 0, 0, 0, 0);
+            if (self->mD8 == 0) {
+                fn_801200C4(self->mDC, 10 - self->mD4);
+            }
+        }
+        break;
+    case 2:
+        if (self->mDC) {
+            int r = fn_800AEA04(fn_800AB5C8(lbl_80619D10), self->mD8);
+            int f = self->mD8 == 1 ? r > 0x12B : r > 0x1C1;
+            if (r > 0) {
+                if (f) {
+                    fn_800412AC(fn_8004072C(), 0x2F, r, 0, 0, 0);
+                } else {
+                    fn_800412AC(fn_8004072C(), 0x2E, r, 0, 0, 0);
+                }
+                fn_8011F1A4(self->mDC, r, f);
+                self->m140 = r;
+                if (self->mD8 == 1) {
+                    int lvl = self->m110;
+                    fn_8011B24C(lvl - r, lvl, fn_800B2204(self), 0x14, &self->m148, &self->m14C);
+                }
+            }
+        }
+        break;
+    case 6:
+        break;
     }
 }
 
