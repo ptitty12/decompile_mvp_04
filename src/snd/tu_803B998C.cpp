@@ -8,6 +8,16 @@
 
 extern "C" void fn_803BA988(int a, int b);
 
+struct SndErrObj {
+    int pad0;
+    int m4;
+};
+
+extern "C" void fn_803B99DC(SndErrObj* s)
+{
+    s->m4 = -3;
+}
+
 extern "C" void fn_803BA9B0()
 {
     fn_803BA988(1, 0xFFFF);
