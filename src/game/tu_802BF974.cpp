@@ -203,6 +203,57 @@ void fn_802C23BC(Unk802C2188* o, Unk802C2188_Pair* a)
     fn_802C2A20(o, 0, (int)a);
 }
 
+extern "C" int sprintf(char* buf, const char* fmt, ...);
+extern const char lbl_805E13AC[];
+extern const char lbl_805E13B8[];
+extern const char lbl_805DFC34[];
+extern const char* lbl_8061EB38[];
+struct Unk80084910_N;
+void fn_80086140(Unk80084910_N* self, char* buf);
+int fn_803EBC70(int h, const char* name);
+int fn_800E1990(int a);
+int fn_800E19CC(int a);
+void fn_802C37F8(Unk802C2188* o);
+struct Unk802C2A20_P {
+    int m0;
+};
+
+void fn_802C2A20(Unk802C2188* o, Unk802C2188_Pair* a, int b)
+{
+    char buf[0x40];
+    if (a != 0) {
+        fn_80086140((Unk80084910_N*)a, buf);
+    } else if (b != 0) {
+        sprintf(buf, lbl_805E13AC, lbl_805DFC34);
+    } else {
+        sprintf(buf, lbl_805E13B8, lbl_805DFC34);
+    }
+    o->m0 = 0xE;
+    int ok = fn_802B96C4(buf, 0);
+    if (ok == 0) {
+        o->m4 = (char*)ok;
+        buf[4] = 0x61;
+        ok = fn_802B96C4(buf, 0);
+    }
+    if (ok != 0)
+        o->m4 = (char*)fn_802B98AC(buf, 0x400);
+    for (int i = 0; i <= 0x21; i++) {
+        if (o->m4 != 0 && lbl_8061EB38[i][0] != 0)
+            o->a8[i] = fn_803EBC70((int)o->m4, lbl_8061EB38[i]);
+        else
+            o->a8[i] = 0;
+    }
+    if (a != 0) {
+        o->mB4 = fn_800E1990(((Unk802C2A20_P*)a)->m0) != 0 ? 1 : 0;
+        o->mB8 = fn_800E19CC(((Unk802C2A20_P*)a)->m0);
+        fn_802C37F8(o);
+    } else {
+        o->mB0 = b != 0 ? 0x794 : 0x7D4;
+        o->mB4 = 0;
+        o->mB8 = 0;
+    }
+}
+
 void fn_802C2BB8(Unk802C2188* o, Unk802C2188_Pair* a)
 {
     char buf[0x40];

@@ -369,6 +369,99 @@ Unk802C94A0::Unk802C94A0()
     m4B0 = 0;
 }
 
+/* near-miss (3 slots): retail puts the first loop's index in r11 and the found flag in r8 (ours r8/r11); declaration order and flag type did not change the allocation. */
+extern "C" {
+char* strcpy(char* d, const char* s);
+char* strcat(char* d, const char* s);
+}
+extern const char lbl_805E1858[];
+extern const char lbl_805E1860[];
+extern int lbl_8061E9F4;
+void fn_802C8BC8(Unk802C7B54* o, Unk802C920C_Req* req, void* rec, int c);
+
+struct Unk802C9284_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+void fn_802C9284(Unk802C7B54* o, int id, Unk802C920C_Req* req, int c, int skip)
+{
+    int idx = -1;
+    unsigned char i = 0;
+    int found = 0;
+    if (i < o->m3D4) {
+        Unk802C9284_Rec* rec = (Unk802C9284_Rec*)o->m3C0;
+        if (rec[0].m8 == id) {
+            found = 1;
+            idx = 0;
+        } else {
+            for (;;) {
+                i++;
+                if (!(i < o->m3D4))
+                    break;
+                if (rec[i].m8 == id) {
+                    idx = i;
+                    found = 1;
+                    break;
+                }
+            }
+        }
+    }
+    if (!found) {
+        int minVal = lbl_8061E9F4 - 1;
+        int emptyIdx = -1;
+        int minIdx = -1;
+        int fnd2 = 0;
+        unsigned char j = 0;
+        unsigned char n = o->m3D4;
+        if (j < n) {
+            Unk802C9284_Rec* rec = (Unk802C9284_Rec*)o->m3C0;
+            if (rec[0].m8 == 0) {
+                emptyIdx = 0;
+                fnd2 = 1;
+            } else {
+                for (;;) {
+                    if (rec[j].mC < minVal) {
+                        minVal = rec[j].mC;
+                        minIdx = j;
+                    }
+                    j++;
+                    if (!(j < n))
+                        break;
+                    if (rec[j].m8 == 0) {
+                        emptyIdx = j;
+                        fnd2 = 1;
+                        break;
+                    }
+                }
+            }
+        }
+        if (fnd2 != 0) {
+            idx = emptyIdx;
+        } else if (minIdx == -1) {
+            return;
+        } else {
+            idx = minIdx;
+        }
+        Unk802C9284_Rec* e = (Unk802C9284_Rec*)(o->m3C0 + idx * 16);
+        char buf1[0x40] = "";
+        char buf2[0x40] = "";
+        fn_802C920C(buf1, req);
+        strcpy(buf2, buf1);
+        strcat(buf2, lbl_805E1858);
+        fn_802C85F0((Unk802C851C*)e, buf2);
+        strcpy(buf2, buf1);
+        strcat(buf2, lbl_805E1860);
+        fn_802C8654((Unk802C851C*)e, buf2);
+        e->m8 = id;
+        e->mC = lbl_8061E9F4;
+    }
+    if (skip == 0)
+        fn_802C8BC8(o, req, o->m3C0 + idx * 16, c);
+}
+
 void fn_802C959C(Unk802C95F8* o, int v)
 {
     if (v != o->m4B0) {

@@ -106,6 +106,19 @@ int fn_80276758(Rec* a, Rec* b)
     return AbsF(a->m14) > AbsF(b->m14);
 }
 
+void fn_802770A4(Unk80276DB8* self, Unk80270BA0_Obj* o, Unk80270BA0_Result* out);
+
+int Unk80276DB8::fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f)
+{
+    Unk80270BA0_X* x = obj->fn_vslot1();
+    out->type = 0;
+    fn_802770A4(this, x, out);
+    int r = 0;
+    if (Unk8037B3E8::fn_vslot17(out, x, c, d, e, f) != 0 && out->type != 0)
+        r = 1;
+    return r;
+}
+
 void fn_802771A0(void* p)
 {
     if (p)
