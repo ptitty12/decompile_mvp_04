@@ -85,13 +85,21 @@ extern "C" DB_OVERLAY void fn_805A1C00(Vc4_2* p)
 extern char lbl_80683E88[];
 extern char lbl_80683E00[];
 
+struct DtorAt10 {
+    char pad[0x10];
+    const void* m;
+};
+
+void fn_803628C8(DtorAt10* self, int chrg);
+void fn_803628FC(DtorAt10* self, int chrg);
+
 struct DbE150 {
     char pad[0x150];
-    ~DbE150();
+    ~DbE150() { fn_803628C8((DtorAt10*)this, 0); }
 };
 struct DbEA0 {
     char pad[0xA0];
-    ~DbEA0();
+    ~DbEA0() { fn_803628FC((DtorAt10*)this, 0); }
 };
 
 struct DbArrB {
@@ -320,7 +328,7 @@ extern "C" DB_OVERLAY void fn_805A234C(DtorAt1C* self, int a)
     fn_80593DD8(self, a);
 }
 
-void fn_8058FFE4(char* p, int chrg);
+extern "C" void fn_8058FFE4(char* p, int chrg);
 extern char lbl_80683850[];
 
 //@805A237C
