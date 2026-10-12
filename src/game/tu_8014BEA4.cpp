@@ -94,7 +94,64 @@ struct Unk8014E15C_Y { char pad0[0x14]; void* m14; };
 struct Unk8014E15C_Ctx { char pad0[0x6F4]; int m6F4; Unk8014E15C_Y* m6F8; };
 struct Unk8014E15C_Obj { Unk8014E15C_Ctx* m0; int m4; int m8; int* mC; int* m10; int* m14; };
 extern "C" int fn_80081B60__FP13Unk8007FF8C_Y(void* y);
+struct Unk80634ADC;
+struct Self8014E9E0 {
+    char pad0[0x280];
+    void* m280;
+    char m284;
+    char pad285[0x2AC - 0x285];
+    char m2AC[0x10];
+    char m2BC[0x10];
+    char m2CC[0x10];
+};
+int fn_803D817C();
+void fn_803D81FC();
+void fn_8000C4A8(unsigned char* fb, Unk80634ADC* rmode);
+class V0_8014D6A4 { public: virtual ~V0_8014D6A4(); };
+extern int lbl_8061B9B8;
+extern VT18* lbl_80620140;
+extern VT18* lbl_8062013C;
+extern int lbl_8061F688;
+extern V0_8014D6A4* lbl_8061B984;
+extern VT18* lbl_8068F1F4;
+extern VT18* lbl_8068F1FC;
+class V2DC_8014D488 { public: char pad0[0x2DC]; virtual ~V2DC_8014D488(); };
+struct Unk806192E0_8014D488 { int m0; int m4; };
+extern int lbl_8061FEDC;
+extern int lbl_8061FE20;
+extern int lbl_8061C688;
+extern V2DC_8014D488* lbl_8061B99C;
+extern VT18* lbl_8061B998;
+extern void* lbl_8061E978;
+extern Unk806192E0_8014D488* lbl_806192E0;
+
 extern "C" {
+int fn_8031C6A8();
+void fn_8031C6B4();
+void fn_80149DD4(void* a, int b);
+void fn_80312018(int a);
+void fn_802B832C__FP15Unk802ACD88_Mgr(void* mgr);
+void* fn_802BB19C__Fv();
+void fn_802BB1E4__FP15Unk802BB1E4_Obji(void* o, int i);
+}
+extern "C" {
+void fn_80329A50();
+void fn_8031D0F0();
+void fn_8014BC64();
+void fn_8037C764();
+void fn_8037B8EC();
+void fn_802E3980__15Unk802E3980_Mgr(int self);
+void fn_8024F6CC__Fv();
+void fn_8037C7FC__Fv();
+void fn_8001C394__Fv();
+void fn_8001C410__11Unk8001C314();
+void fn_802B8BBC__Fv();
+}
+extern "C" {
+void fn_8014F3A8(const char* str);
+void fn_8014F47C(void* p);
+void fn_803D9E00(int a, unsigned char** b, Unk80634ADC** c);
+void* fn_80433E14(unsigned short sig, void* handler);
 int sprintf(char* buf, const char* fmt, ...);
 void fn_8014F4B4(int a, char* s);
 void fn_8014F738(int a);
@@ -260,6 +317,34 @@ void fn_8014C540()
     lbl_8061A32C->mB8 = 1;
 }
 
+void fn_8014D488()
+{
+    int x = lbl_8061FEDC;
+    if (fn_8031C6A8() != 0) {
+        fn_8031C6A8();
+        fn_8031C6B4();
+    }
+    if (!lbl_8061A32C) {
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    }
+    ((VT18*)lbl_8061A32C)->s19();
+    if (lbl_8061B99C != 0) {
+        delete lbl_8061B99C;
+        lbl_8061B99C = 0;
+    }
+    if (lbl_8061B998 != 0) {
+        delete lbl_8061B998;
+        lbl_8061B998 = 0;
+    }
+    fn_802B832C__FP15Unk802ACD88_Mgr(lbl_8061E978);
+    fn_80149DD4(lbl_8068B618, lbl_806192E0->m4);
+    fn_80312018(x + 0x40);
+    lbl_8061FE20 = 0;
+    fn_802BB1E4__FP15Unk802BB1E4_Obji(fn_802BB19C__Fv(), 0);
+    fn_8014C4E8();
+    lbl_8061C688 = 0;
+}
+
 void fn_8014D5C0()
 {
     fn_802D7538();
@@ -285,6 +370,48 @@ void fn_8014D63C(int a, int b)
             }
         }
         fn_8014D488();
+    }
+}
+
+void fn_8014D6A4()
+{
+    if (lbl_8061B9B8 == 0) {
+        lbl_8061B9B8 = 1;
+        if (lbl_80620140 != 0) {
+            delete lbl_80620140;
+            lbl_80620140 = 0;
+        }
+        lbl_80620140 = 0;
+        if (lbl_8062013C != 0) {
+            delete lbl_8062013C;
+            lbl_8062013C = 0;
+        }
+        lbl_8062013C = 0;
+        fn_80329A50();
+        if (lbl_8061F688 != 0) {
+            fn_802E3980__15Unk802E3980_Mgr(lbl_8061F688);
+        }
+        fn_8024F6CC__Fv();
+        if (lbl_8061B984 != 0) {
+            delete lbl_8061B984;
+            lbl_8061B984 = 0;
+        }
+        if (lbl_8068F1F4 != 0) {
+            delete lbl_8068F1F4;
+            lbl_8068F1F4 = 0;
+        }
+        if (lbl_8068F1FC != 0) {
+            delete lbl_8068F1FC;
+            lbl_8068F1FC = 0;
+        }
+        fn_8031D0F0();
+        fn_8014BC64();
+        fn_8037C7FC__Fv();
+        fn_8037C764();
+        fn_8001C394__Fv();
+        fn_8001C410__11Unk8001C314();
+        fn_802B8BBC__Fv();
+        fn_8037B8EC();
     }
 }
 
@@ -684,6 +811,40 @@ int fn_8014E904(char* self, char* a, char* b, char* c)
     return bad ^ 1;
 }
 
+void* fn_8014E9E0(void* sv)
+{
+    Self8014E9E0* s = (Self8014E9E0*)sv;
+    void* old[18];
+    s->m280 = 0;
+    if (lbl_8061B9BC != 0) {
+        s->m284 = 0;
+        s->m2AC[0] = 0;
+        s->m2BC[0] = 0;
+        s->m2CC[0] = 0;
+        s->m280 = fn_8014E88C(operator new(0x4060, 0));
+        fn_8014F47C(s);
+        unsigned char* fb = 0;
+        Unk80634ADC* rm = 0;
+        fn_803D81FC();
+        fn_803D9E00(fn_803D817C() + 0x10, &fb, &rm);
+        fn_8000C4A8(fb, rm);
+        void* h = (void*)fn_8014F008;
+        old[6] = fn_80433E14(6, h);
+        old[10] = fn_80433E14(10, h);
+        old[12] = fn_80433E14(12, h);
+        old[0] = fn_80433E14(0, h);
+        old[1] = fn_80433E14(1, h);
+        old[2] = fn_80433E14(2, h);
+        old[3] = fn_80433E14(3, h);
+        old[5] = fn_80433E14(5, h);
+        old[11] = fn_80433E14(11, h);
+        old[13] = fn_80433E14(13, h);
+        old[14] = fn_80433E14(14, h);
+        old[15] = fn_80433E14(15, h);
+    }
+    return s;
+}
+
 void* fn_8014EB44() { if (!lbl_8061BD74) lbl_8061BD74 = fn_8014E9E0(operator new(0x2DC, 0)); return lbl_8061BD74; }
 
 void fn_8014EB90(Self8014EB90* s, int* a, const char* name)
@@ -714,6 +875,38 @@ void fn_8014ECA8(int unused, Ctx8014ECA8* c, int dsisr, int dar)
     OSReport("SRR0 = 0x%08x                   SRR1 = 0x%08x\n", c->srr0, c->srr1);
     OSReport("DSISR= 0x%08x                   DAR  = 0x%08x\n", dsisr, dar);
     OSReport("\n");
+}
+
+/* near-miss (2 slots): the first fn_8000C674 call loads r3 before r4 here, r4 (2) before r3 (1) in retail */
+void fn_8014ED80(int a, unsigned* addr)
+{
+    fn_8000C674(1, 2, "Disassembly:");
+    unsigned* p = addr - 4;
+    OSReport("\nDisassembly:\n");
+    int row = 13;
+    fn_8014F3A8("\nDisassembly:\n");
+    do {
+        char buf[16] = "";
+        if (p == addr) {
+            OSReport("      -->");
+            fn_8000C674(3, row - 10, "      -->");
+            fn_8014F3A8("-->");
+        } else {
+            OSReport("%08x:", p);
+            sprintf(buf, "%08x:", p);
+            fn_8000C674(3, row - 10, buf);
+            fn_8014F3A8(buf);
+        }
+        if (fn_8014EC94(a, (unsigned)p, 4) != 0) {
+            OSReport("%08x:\n", *p);
+            sprintf(buf, "%08x:", *p);
+            fn_8000C674(0xC, row - 10, buf);
+            fn_8014F3A8(buf);
+        }
+        row++;
+        p++;
+        fn_8014F3A8("\n");
+    } while (row <= 19);
 }
 
 void fn_8014EF0C(int a, int unused, Frame8014EF0C* sp0)
