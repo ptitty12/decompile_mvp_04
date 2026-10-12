@@ -229,6 +229,51 @@ extern "C" void fn_801CF68C(Z* z, float* a, float* b, float* c)
     *c = t.v[r].z;
 }
 
+
+extern Unk801CF054_F4 lbl_805D1D8C;
+extern int lbl_80620364;
+extern float lbl_80620368;
+extern float lbl_8068C4BC;
+struct Unk801CF054_G {
+    char pad0[0x94];
+    float m94;
+    float m98;
+};
+extern Unk801CF054_G lbl_8068C420;
+extern "C" float fn_801CD068(Z* z);
+
+extern "C" float fn_801CF740(Z* z)
+{
+    float r = 0.0f;
+    if (z->m204->m6F4 == 2) {
+        int i = fn_802536D0(fn_801A4B34(z->m204));
+        Unk801CF054_F4 t = lbl_805D1D8C;
+        r = t.v[i];
+    } else {
+        float a = 0.0f;
+        float b = 0.0f;
+        float c = 0.0f;
+        fn_801CF68C(z, &a, &b, &c);
+        float k = 0.0f;
+        if (z->m128 == 5)
+            k = fn_801CD068(z);
+        else
+            k = z->m1FC;
+        k = !(k > 1.0f) ? (k >? 0.0f) : 1.0f;
+        r = (b - a) * k + a;
+        if (fn_8022F138(z->m4->m3B0))
+            r = c;
+        lbl_8068C420.m94 = a;
+        lbl_8068C420.m98 = b;
+    }
+    if (lbl_80620364 != 0)
+        r = lbl_80620368;
+    else
+        lbl_80620368 = r;
+    lbl_8068C4BC = r;
+    return r;
+}
+
 extern "C" float fn_801CF8CC(float x)
 {
     float a = 0.033333335f;
