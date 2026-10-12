@@ -404,6 +404,74 @@ extern "C" void fn_800A2B1C()
     }
 }
 
+extern "C" int fn_80085FB0();
+extern "C" int fn_80085FB8(int j);
+extern "C" unsigned fn_8007C3E8(int g);
+extern "C" void fn_8007C644(int g, int a, int i, int k);
+extern "C" int fn_8052DD18();
+extern "C" int fn_8052DD20(int j);
+extern "C" unsigned fn_8007C6B4(int g);
+extern "C" void fn_8007C8A0(int g, int a, int i, int k);
+extern "C" int fn_8053125C();
+extern "C" int fn_80531264(int j);
+extern "C" unsigned fn_8007C8D8(int g);
+extern "C" void fn_8007CAC4(int g, int a, int i, int k);
+extern "C" int fn_8053DDE8();
+extern "C" int fn_8053DDF0(int j);
+extern "C" unsigned fn_8007CAFC(int g);
+extern "C" void fn_8007CCE8(int g, int a, int i, int k);
+extern "C" int fn_80599A64();
+extern "C" int fn_80599A6C(int j);
+extern "C" unsigned fn_8007CD20(int g);
+extern "C" void fn_8007CF0C(int g, int a, int i, int k);
+extern "C" void fn_80072CE8(int g);
+
+extern "C" void fn_800A2BE0()
+{
+    int g = lbl_8061930C;
+    {
+        int n = fn_80085FB0();
+        for (unsigned i = 0; i < fn_8007C3E8(g); i++) {
+            for (int j = 0; j < n; j++) {
+                fn_8007C644(g, fn_80085FB8(j), i, 0x46);
+            }
+        }
+    }
+    {
+        int n = fn_8052DD18();
+        for (unsigned i = 0; i < fn_8007C6B4(g); i++) {
+            for (int j = 0; j < n; j++) {
+                fn_8007C8A0(g, fn_8052DD20(j), i, 0x46);
+            }
+        }
+    }
+    {
+        int n = fn_8053125C();
+        for (unsigned i = 0; i < fn_8007C8D8(g); i++) {
+            for (int j = 0; j < n; j++) {
+                fn_8007CAC4(g, fn_80531264(j), i, 0x46);
+            }
+        }
+    }
+    {
+        int n = fn_8053DDE8();
+        for (unsigned i = 0; i < fn_8007CAFC(g); i++) {
+            for (int j = 0; j < n; j++) {
+                fn_8007CCE8(g, fn_8053DDF0(j), i, 0x46);
+            }
+        }
+    }
+    {
+        int n = fn_80599A64();
+        for (unsigned i = 0; i < fn_8007CD20(g); i++) {
+            for (int j = 0; j < n; j++) {
+                fn_8007CF0C(g, fn_80599A6C(j), i, 0x46);
+            }
+        }
+    }
+    fn_80072CE8(g);
+}
+
 extern "C" void fn_800A2DCC()
 {
     int g = lbl_8061930C;
