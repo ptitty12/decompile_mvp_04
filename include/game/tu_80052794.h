@@ -1,6 +1,8 @@
 #ifndef GAME_TU_80052794_H
 #define GAME_TU_80052794_H
 
+#include "game/tu_800401E4.h"
+
 /*
  * Shared placeholder types and callee prototypes for the code-only units
  * game/tu_80052794 .. game/tu_8005D268 (AI / event callbacks in the game TU
@@ -975,12 +977,8 @@ public:
     Unk803785E4_Mid() {}
     virtual ~Unk803785E4_Mid() {}
 };
-class Unk800401E4_Sub {
-public:
-    char pad0[0x3C];
-    Unk800401E4_Sub();
-    ~Unk800401E4_Sub();
-};
+/* The real 0x3C-byte slot class (ctor 0x800401E4); Unk800401E4_Sub was a placeholder for it. */
+typedef Unk800401E4 Unk800401E4_Sub;
 class Unk8005ADD0_Obj : public Unk803785E4_Mid {
 public:
     Unk8005ADD0_Chan mC[9];

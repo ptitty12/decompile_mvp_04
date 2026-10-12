@@ -109,6 +109,37 @@ void fn_8005B06C(Unk8005ADD0_Obj* o)
     }
 }
 
+extern const char lbl_805B07A1[];
+extern char lbl_80687628[];
+extern "C" void fn_803A9204(void* p);
+extern "C" int fn_803A85B0(int h, int a, void* b);
+
+/* near-miss (2 slots): retail loads o->m78 (r4) before the handle (r3) for the fn_803ADA2C call. */
+void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
+{
+    o->mC[ch].mHandle = -1;
+    Unk800401E4* s = &o->mAC;
+    if (s->m8 == 0)
+        s->fn_8004028C(lbl_805B07A1 + ch * 0x42, 0, 0, 0);
+    if (s->m8 == 1) {
+        int h = s->m4;
+        fn_803A9204(lbl_80687628);
+        char* b = lbl_80687628;
+        lbl_80687628[0] = 0;
+        fn_803A975C();
+        o->mC[ch].mHandle = fn_803A85B0(h, 0, b);
+        fn_803A979C();
+        if (o->mC[ch].mHandle >= 0) {
+            fn_803A975C();
+            fn_803ADA2C(o->mC[ch].mHandle, o->m78);
+            fn_803A979C();
+            o->mC[ch].mState = 3;
+            return;
+        }
+    }
+    o->mC[ch].mState = 5;
+}
+
 void fn_8005B414(Unk8005ADD0_Obj* o)
 {
     int ok = 0;
