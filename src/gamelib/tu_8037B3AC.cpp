@@ -81,6 +81,23 @@ struct Unk8037BB0C_View {
 
 extern "C" Unk8037B3E8* fn_8037D680(int c, int hash, int a);
 
+extern "C" int fn_803EE310(void* o);
+extern "C" void fn_803FFA60(void* dst, const void* src, unsigned n);
+extern "C" void fn_803EDA0C(void* p);
+
+/* View of the root class vtable with the true signatures of slots 5 and 7..9 (fn_8037C3F8). */
+struct Unk8037C3F8_View {
+    virtual ~Unk8037C3F8_View();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void* v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8(int a);
+    virtual void v9();
+};
+
 extern "C" void fn_8037B458(Unk8037B3E8* self, int p1, int p2, int p3, int p4)
 {
     fn_8037B76C(self, 4, 0, p1, p2, p3, p4, 0);
@@ -334,6 +351,32 @@ extern "C" void fn_8037BF88()
 {
     for (int i = 0; i < lbl_80624250; i++)
         lbl_806E9684[i] = 0;
+}
+
+/* near-miss (99.9%): swaps the live object with the registered one; same instructions, but retail loads the tested registry entry into r4 where ours uses r0 (one cmpwi pair). */
+extern "C" void fn_8037C3F8(int hash, int a, int flag, Unk8037C3F8_View* obj)
+{
+    int idx = fn_8037C5D8(hash);
+    if (idx != -1) {
+        Unk8037C3F8_View* reg = (Unk8037C3F8_View*)lbl_806E9684[idx];
+        if (reg != 0)
+            reg->v8(a);
+        if (obj == 0) {
+            Unk8037C7FC* mgr = fn_8037C7FC();
+            obj = (Unk8037C3F8_View*)mgr->fn_8037CE98(hash, a, 0);
+        }
+        if (obj != 0 && lbl_806E9684[idx] != 0) {
+            if (flag == 0)
+                obj->v7();
+            obj->~Unk8037C3F8_View();
+            int n = fn_803EE310(obj);
+            fn_803FFA60(obj, lbl_806E9684[idx], n);
+            void* v = ((Unk8037C3F8_View*)lbl_806E9684[idx])->v5();
+            fn_803FFA60(lbl_806E9684[idx], v, n);
+            fn_803EDA0C(v);
+            obj->v9();
+        }
+    }
 }
 
 extern "C" int fn_8037C544(int key)
