@@ -43,7 +43,9 @@ struct FEOb118 {
 struct FEOb210 {
     char pad0[0x5C];
     int m5C;
-    char pad60[0x7C - 0x60];
+    char pad60[4];
+    int m64;
+    char pad68[0x7C - 0x68];
     int m7C[12];
     char padAC[0xD4 - 0xAC];
     int mD4;
@@ -559,12 +561,10 @@ extern "C" void fn_800AFD2C(FEObj58* self)
     self->m58 = 0;
 }
 
-/* near-miss (3 slots): retail loads the switch index into r11 (not r0) before the table add; forms with a local index, byte offset or int* base tried */
+inline int At4(char* b, int i) { int o = i * 4; return *(int*)(b + o); }
 extern "C" void fn_800AFD70(FEObAF* self)
 {
-    char* t = (char*)self->m4->m6F8->m10 + 0x154;
-    int o = self->m0 * 4;
-    int v = *(int*)(t + o);
+    int v = At4((char*)self->m4->m6F8->m10 + 0x154, self->m0);
     int r;
     switch (v) {
     case 0:
@@ -708,7 +708,6 @@ extern "C" void fn_800B0884(UnkAt10P* p)
     }
 }
 
-/* near-miss (4 slots): retail emits `stfs` (m68) before `li r0,0` and the 0x144 store first; ours schedules the zero constant first; all 720 orders of the six stores tried */
 extern "C" void fn_800B1C7C(FEObR* self)
 {
     FE74c* g = self->m4->m6F8->m10;
@@ -718,7 +717,11 @@ extern "C" void fn_800B1C7C(FEObR* self)
     }
     self->mD8 = f;
     ((FEV0b*)((char*)self + 0xC))->s2();
-    self->m68 = g->m120 ? lbl_805B9AEC : lbl_805B9AE8;
+    if (g->m120 == 0) {
+        self->m68 = 30.0f;
+    } else {
+        self->m68 = 65.0f;
+    }
     self->m74 = 0;
     self->m78 = 0;
     self->m114 = 0;
@@ -811,6 +814,23 @@ extern "C" int fn_800B2048(char* p)
     return q[*(int*)(p + 0x70) * 3];
 }
 
+extern "C" int fn_800B205C(FEOb210* self)
+{
+    int r = 0;
+    if (self->mD8 == 1) {
+        if (fn_800B20E0((FEOb68*)self) != 0) {
+            r = self->m64 == 0;
+        }
+    } else {
+        int i = self->m114;
+        if (i > 11) {
+            i = 11;
+        }
+        r = self->m7C[i] > self->m110;
+    }
+    return r;
+}
+
 extern "C" int fn_800B20E0(FEOb68* self)
 {
     int r = 0;
@@ -871,7 +891,6 @@ extern "C" int fn_800B2204(FEOb210* self)
     return self->m7C[v];
 }
 
-/* near-miss (4 slots): retail roots the compare tree at 2 and tests case 1 after case 0 (beqlr on the pre-set r3); enum-typed index did not move the root */
 extern "C" int fn_800B2238(FEOb2390* self)
 {
     int r = 0;
@@ -887,6 +906,7 @@ extern "C" int fn_800B2238(FEOb2390* self)
     case 3:
         r = 3;
         break;
+    case 4:
     default:
         r = 4;
         break;
@@ -951,14 +971,13 @@ extern "C" void fn_800B243C(void* p)
     fn_800B245C((FEOb245*)p);
 }
 
-/* near-miss (4 slots): retail loads m68 into f0 and the constant into f13 (compare operands swapped in ours); 5 operand forms tried */
 extern "C" void fn_800B245C(FEOb245* self)
 {
     if (fn_802D7DB4(fn_801A2034(self->m4, 4), 0x106)) {
         int did = 0;
         if (self->mD8 == 1) {
-            if (!(self->m68 < lbl_805B9B7C)) {
-                self->m68 = FMax2(self->m68 - lbl_805B9B7C, lbl_805B9B80);
+            if (!(self->m68 < 5.0f)) {
+                self->m68 = FMax2(self->m68 - 5.0f, 0.0f);
                 did = 1;
             }
         } else {

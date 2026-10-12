@@ -206,7 +206,7 @@ void fn_800B83F8(FEObj20* self, int a, int b);
 void fn_800B8654(FEObj68* p, int c);
 const char* fn_802B9300(int s, int a, int b, int c);
 void fn_802B961C(const char* p, int a);
-FEColor fn_8014DBA0(int r, int g, int b, int a);
+FEColor* fn_8014DBA0(FEColor* out, int r, int g, int b, int a);
 FEColor* fn_8014D9C4(FEColor* p);
 void fn_800B5F90(FEList* self, const char* p);
 FEV64* fn_800B5FEC(FEList* self, const char** cur, FEV64* prev);
@@ -232,7 +232,7 @@ void fn_80377408(void* p);
 void* fn_803774A8(unsigned n, int heap);
 char* fn_804031BC(unsigned short* d, const char* s);
 void fn_80378C5C(const char* s, unsigned len, char* out, int size, int delim, int flag, unsigned* used);
-void fn_804089B4(char* dst, const char* fmt, ...);
+int fn_804089B4(char* dst, const char* fmt, ...);
 void fn_800C17D4(FEObj68* p);
 void fn_802B0DB0(void* p);
 void fn_800B8B3C(FEObj68* p, int a);
@@ -408,14 +408,14 @@ extern "C" void fn_800B5F90(FEList* self, const char* p)
     self->mB90 = n;
 }
 
-/* near-miss (2 slots): retail has `li r7,255` before `addi r3,r1,8` for the fn_8014DBA0 hidden pointer; the store order is the best of 720 */
 extern "C" FEElem* fn_800B622C(FEElem* self)
 {
     self->m64 = lbl_80658680;
     fn_8014D9C4(&self->m40);
     fn_8014D9C4(&self->m50);
     for (int i = 0; i < 13; i++) self->m[i] = 0;
-    FEColor c = fn_8014DBA0(0xc0, 0xc0, 0xc0, 0xff);
+    FEColor c;
+    fn_8014DBA0(&c, 0xc0, 0xc0, 0xc0, 0xff);
     self->m34 = 0;
     self->m38 = 0x17;
     self->m3C = 0x17;
