@@ -333,8 +333,6 @@ extern "C" float fn_801C8FB8(Z* z)
     return r;
 }
 
-/* near-miss: same code; the switch tree differs by one range node (retail tests cases 0..1 as
- * `cmpwi 0; blt; cmpwi 1; ble`, ours as two beq). */
 extern "C" void fn_801C8790(Z* z)
 {
     int one = 1;
@@ -350,14 +348,16 @@ extern "C" void fn_801C8790(Z* z)
                 z->m1A8 = 5;
         }
         switch (z->m1A8) {
+        case 6:
+            goto six;
         case 4:
             fn_801CBE08(z);
             break;
         case 0:
-            fn_801CB360(z);
-            break;
         case 1:
             fn_801CB360(z);
+            break;
+        case 2:
             break;
         case 3:
             fn_801CB360(z);
@@ -365,7 +365,7 @@ extern "C" void fn_801C8790(Z* z)
         case 5:
             fn_801CB360(z);
             break;
-        case 6:
+        six:
             if (fn_801C8154(z) != 0) {
                 z->m1AC = 1;
                 fn_801C983C(z);
