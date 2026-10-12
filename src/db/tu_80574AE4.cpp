@@ -28,6 +28,27 @@ struct DbGlob28 {
 extern DbGlob28* lbl_80619948;
 extern const float lbl_805FFFAC;
 
+extern const float lbl_805FFF90;
+extern const float lbl_805FFF94;
+extern const float lbl_805FFF98;
+extern const float lbl_805FFF9C;
+extern const float lbl_805FFFA0;
+extern const float lbl_805FFFA4;
+extern const float lbl_805FFFA8;
+extern "C" double log(double x);
+extern "C" double exp(double x);
+inline float Db8057BF64_Ln(float x)
+{
+    return (float)log(x);
+}
+inline float Db8057BF64_Ex(float x)
+{
+    return (float)exp(x);
+}
+inline float Db8057BF64_Pw(float a, float b)
+{
+    return Db8057BF64_Ex(Db8057BF64_Ln(a) * b);
+}
 extern "C" {
 int fn_8056A2F8(void* o, int cur, int mode, int a, int b, int who, int p6, int p7, int s8, int sC);
 int fn_8056A838(void* o, int cur, int who);
@@ -469,6 +490,23 @@ extern "C" DB_OVERLAY void fn_8057BA4C(DbHost* self)
     fn_805371C4(q, 0x71000000);
     self->v6(q, 0x18);
     q->D();
+}
+
+extern "C" DB_OVERLAY float fn_8057BF64(float x)
+{
+    float c0 = lbl_805FFF90;
+    float c1 = lbl_805FFF94;
+    float n = lbl_805FFF98;
+    float fact = lbl_805FFF98;
+    float term = lbl_805FFF9C;
+    float sum = lbl_805FFF9C;
+    do {
+        term = (lbl_805FFF98 / Db8057BF64_Pw(lbl_805FFF94, x * x * lbl_805FFFA0)) * ((Db8057BF64_Pw(x, n) / fact) * lbl_805FFF90);
+        n = n + lbl_805FFFA4;
+        sum += term;
+        fact *= n;
+    } while (term > lbl_805FFFA8);
+    return sum;
 }
 
 /* near-miss: 9 slots; same instructions, retail interleaves the parameter copies and stack-argument loads differently */
