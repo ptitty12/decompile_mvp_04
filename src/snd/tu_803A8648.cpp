@@ -17,7 +17,6 @@ int fn_803AD2F0(void* ppatch, void* attr);
 void fn_803A81E0(void* attr, int type);
 void fn_803B115C(int a, void* p);
 
-/* near-miss: 3 slots (the original code copies the patch pointer into r9 for the null test). */
 int fn_803A8648(int bhandle)
 {
     int i;
@@ -43,8 +42,8 @@ int fn_803A8648(int bhandle)
     void* cursor;
     for (patnum = 0; patnum < phdr->numpatches; patnum++) {
         char attr[0x100];
-        ppatch = SNDBANKI_getppatch(phdr, patnum);
-        cursor = ppatch;
+        void* cursor = SNDBANKI_getppatch(phdr, patnum);
+        TAGGEDPATCH* ppatch = static_cast<TAGGEDPATCH*>(cursor);
         if (ppatch != NULL) {
             int more;
             cursor = reinterpret_cast<char*>(ppatch) + 4;
