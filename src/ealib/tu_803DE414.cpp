@@ -11,6 +11,14 @@ struct Mtx4 {
     float m[16];
 };
 
+struct Unk803DFFE0Vec3 {
+    float x, y, z;
+};
+
+struct Unk803DEE7CVec4 {
+    float x, y, z, w;
+};
+
 /* Texture wrapper (state pointer at +0x54); the info record has width at +4, height at +6. */
 struct Unk803DE414Info {
     char pad0[4];
@@ -87,6 +95,7 @@ void fn_8043000C(int dither);
 }
 
 extern "C" {
+float sqrtf(float x);
 void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out);
 void fn_803FFA60(void* dst, const void* src, int n);
 void fn_803DE7D0(Mtx4* a, Mtx4* b);
@@ -155,10 +164,157 @@ inline void MtxTrans(Mtx4* m, float x, float y, float z)
     m->m[15] = 1.0f;
 }
 
+/* near-miss (98.6%): matrix to quaternion through a 3x3 stack copy read via a saved pointer. Retail keeps the
+   axis-selection index in r0 (li after the compare) and loads the y-branch operands in a different order;
+   ours puts the index in r9. Store order per branch was permuted exhaustively; index type/ternary variants tried. */
+extern "C" void fn_803DE51C(Mtx4* m, float* q, float* trans)
+{
+    float t[9];
+    float* p = t;
+    float a = m->m[0];
+    t[0] = a;
+    t[1] = m->m[1];
+    t[2] = m->m[2];
+    t[3] = m->m[4];
+    t[4] = m->m[5];
+    t[5] = m->m[6];
+    t[6] = m->m[8];
+    t[7] = m->m[9];
+    t[8] = m->m[10];
+    const float zero = 0.0f;
+    float s = a + p[4] + p[8];
+    if (s > zero) {
+        s = sqrtf(s + 1.0f);
+        q[3] = s * 0.5f;
+        s = 0.5f / s;
+        q[0] = (p[5] - p[7]) * s;
+        q[1] = (p[6] - p[2]) * s;
+        q[2] = (p[1] - p[3]) * s;
+    } else {
+        int i = 0;
+        if (p[4] > a)
+            i = 4;
+        if (p[8] > p[i]) {
+            s = sqrtf(p[8] - (a + p[4]) + 1.0f);
+            q[2] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[1] - p[3]) * s;
+            q[0] = (p[6] + p[2]) * s;
+            q[1] = (p[7] + p[5]) * s;
+        } else if (i != 0) {
+            s = sqrtf(p[4] - (p[8] + a) + 1.0f);
+            q[1] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[6] - p[2]) * s;
+            q[0] = (p[3] + p[1]) * s;
+            q[2] = (p[5] + p[7]) * s;
+        } else {
+            s = sqrtf(a - (p[4] + p[8]) + 1.0f);
+            q[0] = s * 0.5f;
+            if (s != zero)
+                s = 0.5f / s;
+            q[3] = (p[5] - p[7]) * s;
+            q[1] = (p[1] + p[3]) * s;
+            q[2] = (p[2] + p[6]) * s;
+        }
+    }
+    trans[0] = m->m[12];
+    trans[1] = m->m[13];
+    trans[2] = m->m[14];
+    trans[3] = m->m[15];
+}
+
+
+extern "C" void fn_803DED40(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + m->m[12];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + m->m[13];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + m->m[14];
+    } else {
+        Unk803DFFE0Vec3 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + m->m[12];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + m->m[13];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + m->m[14];
+        *in = t;
+    }
+}
+
+extern "C" void fn_803DEE7C(Mtx4* m, Unk803DEE7CVec4* in, Unk803DEE7CVec4* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + in->w * m->m[12];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + in->w * m->m[13];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + in->w * m->m[14];
+        out->w = in->x * m->m[3] + in->y * m->m[7] + in->z * m->m[11] + in->w * m->m[15];
+    } else {
+        Unk803DEE7CVec4 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8] + in->w * m->m[12];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9] + in->w * m->m[13];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10] + in->w * m->m[14];
+        t.w = in->x * m->m[3] + in->y * m->m[7] + in->z * m->m[11] + in->w * m->m[15];
+        *in = t;
+    }
+}
+
+extern "C" void fn_803DF028(Mtx4* m, int count, char* in, int inStride, char* out, int outStride)
+{
+    if (count != 0) {
+        if (inStride == 0)
+            inStride = 12;
+        if (outStride == 0)
+            outStride = 12;
+        if (in == out) {
+            do {
+                Unk803DFFE0Vec3* p = (Unk803DFFE0Vec3*)in;
+                Unk803DFFE0Vec3 t;
+                t.x = p->x * m->m[0] + p->y * m->m[4] + p->z * m->m[8] + m->m[12];
+                t.y = p->x * m->m[1] + p->y * m->m[5] + p->z * m->m[9] + m->m[13];
+                t.z = p->x * m->m[2] + p->y * m->m[6] + p->z * m->m[10] + m->m[14];
+                in += inStride;
+                *(Unk803DFFE0Vec3*)out = t;
+                out += outStride;
+            } while (--count != 0);
+        } else {
+            do {
+                Unk803DFFE0Vec3* p = (Unk803DFFE0Vec3*)in;
+                Unk803DFFE0Vec3* q = (Unk803DFFE0Vec3*)out;
+                q->x = p->x * m->m[0] + p->y * m->m[4] + p->z * m->m[8] + m->m[12];
+                q->y = p->x * m->m[1] + p->y * m->m[5] + p->z * m->m[9] + m->m[13];
+                q->z = p->x * m->m[2] + p->y * m->m[6] + p->z * m->m[10] + m->m[14];
+                in += inStride;
+                out += outStride;
+            } while (--count != 0);
+        }
+    }
+}
+
 /* 803DE000 */
 inline void MtxMul(Mtx4* a, Mtx4* b, Mtx4* out)
 {
     fn_803DF1A0(a, b, out);
+}
+
+extern "C" void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out)
+{
+    out->m[0] = a->m[0] * b->m[0] + a->m[1] * b->m[4] + a->m[2] * b->m[8] + a->m[3] * b->m[12];
+    out->m[1] = a->m[0] * b->m[1] + a->m[1] * b->m[5] + a->m[2] * b->m[9] + a->m[3] * b->m[13];
+    out->m[2] = a->m[0] * b->m[2] + a->m[1] * b->m[6] + a->m[2] * b->m[10] + a->m[3] * b->m[14];
+    out->m[3] = a->m[0] * b->m[3] + a->m[1] * b->m[7] + a->m[2] * b->m[11] + a->m[3] * b->m[15];
+    out->m[4] = a->m[4] * b->m[0] + a->m[5] * b->m[4] + a->m[6] * b->m[8] + a->m[7] * b->m[12];
+    out->m[5] = a->m[4] * b->m[1] + a->m[5] * b->m[5] + a->m[6] * b->m[9] + a->m[7] * b->m[13];
+    out->m[6] = a->m[4] * b->m[2] + a->m[5] * b->m[6] + a->m[6] * b->m[10] + a->m[7] * b->m[14];
+    out->m[7] = a->m[4] * b->m[3] + a->m[5] * b->m[7] + a->m[6] * b->m[11] + a->m[7] * b->m[15];
+    out->m[8] = a->m[8] * b->m[0] + a->m[9] * b->m[4] + a->m[10] * b->m[8] + a->m[11] * b->m[12];
+    out->m[9] = a->m[8] * b->m[1] + a->m[9] * b->m[5] + a->m[10] * b->m[9] + a->m[11] * b->m[13];
+    out->m[10] = a->m[8] * b->m[2] + a->m[9] * b->m[6] + a->m[10] * b->m[10] + a->m[11] * b->m[14];
+    out->m[11] = a->m[8] * b->m[3] + a->m[9] * b->m[7] + a->m[10] * b->m[11] + a->m[11] * b->m[15];
+    out->m[12] = a->m[12] * b->m[0] + a->m[13] * b->m[4] + a->m[14] * b->m[8] + a->m[15] * b->m[12];
+    out->m[13] = a->m[12] * b->m[1] + a->m[13] * b->m[5] + a->m[14] * b->m[9] + a->m[15] * b->m[13];
+    out->m[14] = a->m[12] * b->m[2] + a->m[13] * b->m[6] + a->m[14] * b->m[10] + a->m[15] * b->m[14];
+    out->m[15] = a->m[12] * b->m[3] + a->m[13] * b->m[7] + a->m[14] * b->m[11] + a->m[15] * b->m[15];
 }
 
 extern "C" void fn_803DF66C(Mtx4* a, Mtx4* b)
@@ -378,10 +534,6 @@ extern "C" void fn_803DFF50(Mtx4* dst, Mtx4* other)
     fn_803E02E4(dst, &c);
 }
 
-struct Unk803DFFE0Vec3 {
-    float x, y, z;
-};
-
 extern "C" void fn_803DFFE0(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
 {
     if (in != out) {
@@ -573,6 +725,6 @@ extern "C" void fn_803E0950()
 /*
  * Not matched yet: fn_803DE414 (quaternion to 3x3 temporary to matrix, stack slot and loads right, float
  * schedule 49 slots off), fn_803E00EC (scaled quaternion to matrix, needs a fourth saved float register),
- * fn_803DE51C, fn_803DE7D0, fn_803DED40, fn_803DEE7C, fn_803DF028, fn_803DF1A0, fn_803DF4E4, fn_803DF824,
- * fn_803E0458. The original code stays linked for these.
+ * fn_803DE7D0, fn_803DF4E4 (axis-angle to matrix), fn_803DF824 (euler angles to matrix), fn_803E0458.
+ * The original code stays linked for these.
  */
