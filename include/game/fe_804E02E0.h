@@ -628,6 +628,85 @@ void fn_804EC294(void* self, FeD64* o);
 void fn_800B82AC(FeB8144* b);
 }
 
+/* Member object at +0xDC whose slot signatures take one int (see FeSub in tu_8043FDC0.h). */
+class FeSubB {
+public:
+    char pad0[0x24];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6(int a);
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+};
+struct FeS17 : FeObj {
+    char pad40[0x604 - 0x40];
+    FeObj* m604;
+    char pad608[0x618 - 0x608];
+    FeObj* m618;
+    char pad61C[0x630 - 0x61C];
+    int m630;
+};
+extern "C" {
+int fn_805283F4();
+void fn_804FC260(void* self);
+void fn_804FBF58(void* self);
+}
+extern int lbl_806221F8;
+extern int lbl_806221FC;
+extern int lbl_8061D384;
+extern int lbl_8061D388;
+
+/* Create-a-player screens (unit 804F81E0..): per-slot records (stride 0xC) from +0x1F8, mode at +0x630, id at +0x86C. */
+struct FeE12 {
+    int a;
+    int b;
+    int c;
+};
+struct FeS18 : FeObj {
+    char pad40[0x1F8 - 0x40];
+    FeE12 e[25];
+};
+struct FeS19 : FeObj {
+    char pad40[0x630 - 0x40];
+    int m630;
+    char pad634[0x86C - 0x634];
+    int m86C;
+};
+struct FeS20 : FeObj {
+    char pad40[0x844 - 0x40];
+    int m844;
+    int m848;
+};
+struct FeS21 : FeObj {
+    char pad40[0x4A0 - 0x40];
+    int m4A0;
+    char pad4A4[0x4B4 - 0x4A4];
+    int m4B4;
+    char pad4B8[0x4C8 - 0x4B8];
+    int m4C8;
+    char pad4CC[0x4DC - 0x4CC];
+    int m4DC;
+};
+int fn_800765A8(int a);
+void fn_803043D4(int a, int b);
+
+struct FeRawBig {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x10EC - 0x40];
+    int m10EC, m10F0, m10F4, m10F8, m10FC, m1100;
+};
+
 /* BEGIN-VWRAP */
 /* Screens whose only data is one widget pointer at the given offset (one-call button handlers). */
 struct FeWf134 : FeObj { char pad40[0x134 - 0x40]; FeObj* m134; };
@@ -639,6 +718,7 @@ struct FeWf140b : FeObj { char pad40[0x140 - 0x40]; FeObj1* m140; };
 struct FeWf184 : FeObj { char pad40[0x184 - 0x40]; FeObj* m184; };
 struct FeWf604 : FeObj { char pad40[0x604 - 0x40]; FeObj* m604; };
 struct FeWf604b : FeObj { char pad40[0x604 - 0x40]; FeObj1* m604; };
+struct FeWf618 : FeObj { char pad40[0x618 - 0x40]; FeObj* m618; };
 /* END-VWRAP */
 
 #endif
