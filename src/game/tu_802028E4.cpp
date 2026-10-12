@@ -510,6 +510,105 @@ inline Unk8020593C_Pl* PlAt593C(Unk801EE438_Owner* o, unsigned k)
 
 /* near-miss (same family as fn_80205688): retail reloads w->m1CD0 after the first 0x80-byte sum loop, ours keeps the value
    loaded before it in a register (volatile reads and re-derived w did not help) */
+struct Unk80205784_Pl {
+    char pad0[0x458];
+    int m458;
+};
+struct Unk80205784_E {
+    int m0;
+    int m4;
+    char pad8[0x24 - 8];
+    Unk80205784_Pl* m24;
+    int m28;
+    Unk801EE438_Vec m2C;
+};
+struct Unk80205784_R {
+    char pad0[0x30];
+    Unk801EE438_Vec m30;
+    char pad3C[4];
+};
+struct Unk80205784_G {
+    char pad0[0x98];
+    int m98;
+    char pad9C[0xE8 - 0x9C];
+    int mE8;
+    int mEC;
+    int mF0;
+    Unk80205784_E mF4[3];
+    int m19C;
+    char pad1A0[8];
+    int m1A8;
+    int m1AC;
+    char pad1B0[0x220 - 0x1B0];
+    Unk80205784_R m220[13];
+    char pad560[0x3A6C - 0x560];
+    int m3A6C;
+};
+extern "C" int fn_80211D8C(void* l, void* g);
+extern "C" void fn_80211D14(void* l);
+extern "C" void fn_80211CAC(void* l);
+extern "C" int fn_8020543C(Obj* o);
+extern "C" void fn_80205FA8(Obj* o);
+extern "C" void fn_80205A3C(Obj* o);
+
+inline Unk80205784_G* GOf5784(Scr* p)
+{
+    return (Unk80205784_G*)p->m0;
+}
+
+extern "C" void fn_80205784(Scr* p, int unused, int flag)
+{
+    if (GOf5784(p)->m1AC != GOf5784(p)->m3A6C || flag != 0) {
+        GOf5784(p)->m1AC = GOf5784(p)->m3A6C;
+        GOf5784(p)->m1A8 = flag;
+        if (fn_80211D8C(&GOf5784(p)->mE8, (void*)unused) != -1) {
+            if (flag == 1)
+                GOf5784(p)->mF0++;
+        } else {
+            fn_80211D14(&GOf5784(p)->mE8);
+            fn_80211CAC(&GOf5784(p)->mE8);
+            int v = fn_80205688(p);
+            GOf5784(p)->m98 = v;
+            switch (fn_8020543C((Obj*)p->m0)) {
+            case 0:
+                ((void (*)(Scr*, int))fn_80205A3C)(p, GOf5784(p)->m98);
+                break;
+            case 1:
+                ((void (*)(Scr*, int))fn_80205A5C)(p, GOf5784(p)->m98);
+                break;
+            case 2:
+                ((void (*)(Scr*, int))fn_80205FA8)(p, GOf5784(p)->m98);
+                break;
+            default:
+                GOf5784(p)->m19C = 1;
+                break;
+            }
+            Unk80205784_G* g = GOf5784(p);
+            int i = 0;
+            if (i < g->mEC) {
+                int off = 0;
+                do {
+                    char* b1 = (char*)g + 0xF8;
+                    if (*(int*)(b1 + off) == 2) {
+                        char* b2 = (char*)g + 0x118;
+                        int k = (*(Unk80205784_Pl**)(b2 + off))->m458;
+                        char* b3 = (char*)g + 0x2B4;
+                        Unk80205784_R* r;
+                        if ((unsigned)(k - 9) > 3)
+                            r = 0;
+                        else
+                            r = (Unk80205784_R*)(b3 + (k * 0x40 - 0x94));
+                        *(Unk801EE438_Vec*)(off + 0x120 + (char*)GOf5784(p)) = r->m30;
+                    }
+                    g = GOf5784(p);
+                    i++;
+                    off += 0x38;
+                } while (i < g->mEC);
+            }
+        }
+    }
+}
+
 extern "C" int fn_8020593C(Scr* p, int idx)
 {
     if (idx == -1)
