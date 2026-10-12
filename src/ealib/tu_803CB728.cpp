@@ -12,6 +12,16 @@ extern "C" void fn_803BE90C(void* s, int a);
 
 extern "C" void fn_803CEC78(void* p, int n);
 
+struct EAGLSetC {
+    char pad0[0xC];
+    int mC;
+};
+
+extern "C" void fn_803CB728(EAGLSetC* s, int v)
+{
+    s->mC = v;
+}
+
 extern "C" void fn_803CEC24(DtorAt0* s, int chrg)
 {
     s->m = lbl_80686268;
