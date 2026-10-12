@@ -200,6 +200,30 @@ extern "C" FE_OVERLAY void fn_804EAD3C(void* self, int* out)
         out[i - 1] = i;
 }
 
+extern "C" FE_OVERLAY FeP4TabX* fn_804EAD5C(FeP4TabX* self)
+{
+    self->m0 = 0;
+    FeP4RecX* r = self->e;
+    int i = 3;
+    do {
+        r->m0 = 0;
+        r->m4 = 0;
+        r->m8 = 0;
+        r->mC = 0;
+        FeP4SlotX* p = r->s;
+        int j = 0x68;
+        do {
+            p->a = -1;
+            p->b = 0;
+            p->c = 0;
+            p++;
+        } while (--j);
+        r->m4F0 = 0;
+        r++;
+    } while (i-- != 0);
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804EADC4(FeP4Tab* t, int idx, int v)
 {
     FeSetAt((char*)t + 8, idx * 0x4F4, v);
