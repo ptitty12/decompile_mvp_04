@@ -43,6 +43,25 @@ extern const float lbl_805B96A4;
 extern const char lbl_8065B360[];
 extern const char lbl_8065B268[];
 extern const char lbl_8065B690[];
+struct FEBarO {
+    char pad0[0x10];
+    float m10;
+};
+struct FEBar {
+    char pad0[0x1C];
+    FEBarO* m1C;
+    float m20;
+    float m24;
+};
+/* ratio u/d written to o->m10, 0.0f when d is not positive (inline body shared with tu_800AB0E8) */
+inline void Ratio(FEBarO* o, float d, float u)
+{
+    if (!(d >= 0.0f)) {
+        o->m10 = 0.0f;
+    } else {
+        o->m10 = u / d;
+    }
+}
 struct UnkAt1C20 {
     char pad0[0x1C];
     void* m1C;
@@ -280,6 +299,15 @@ extern "C" void fn_800ACF24(UnkAt1C* p)
 extern "C" void fn_800ACF48(UnkAt20F* p)
 {
     p->m20 = lbl_805B95B8;
+}
+
+extern "C" void fn_800ACF58(FEBar* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 0);
+    }
 }
 
 extern "C" void fn_800ACFE8()
@@ -593,24 +621,25 @@ extern "C" void fn_800AE96C(char* self)
     fn_800AD1D4(p);
 }
 
-/* near-miss (7 slots): second branch keeps temporaries in r0 / result in r3 in retail */
 extern "C" int fn_800AEA04(char* self, int k)
 {
     int* p = (int*)(self + 0xED0);
+    int r;
     if (k == 1) {
         int a = *(int*)(self + 0xED0);
         int b = p[3];
-        int r = a * b;
+        r = a * b;
         if (p[6] != 0) {
             if (a != 0) {
                 r += b / 2;
             }
         }
-        return r;
+    } else {
+        int a = *(int*)(self + 0xED0);
+        int b = p[3];
+        r = a * a * b / 2;
     }
-    int a = *(int*)(self + 0xED0);
-    int b = p[3];
-    return a * a * b / 2;
+    return r;
 }
 
 extern "C" void fn_800AEA64()
