@@ -70,7 +70,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot7();
     virtual void fn_vslot8(int a);
     virtual void fn_vslot9(int a);
-    virtual void fn_vslot10();
+    virtual void fn_vslot10(int a);
     virtual void fn_vslot11();
     virtual void fn_vslot12(int a);
     virtual void fn_vslot13();
@@ -97,7 +97,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
-    virtual void fn_vslot37();
+    virtual void fn_vslot37(int a);
     virtual void fn_vslot38(int a);
     virtual void fn_vslot39();
     virtual void fn_vslot40(int a);
@@ -227,7 +227,7 @@ struct UnkLabel : Unk800C7B40_Data {
     virtual int fn_vslot31();
     virtual void fn_vslot32();
     virtual void fn_vslot33();
-    virtual void fn_vslot34();
+    virtual int fn_vslot34();
     virtual void fn_vslot35();
     virtual void fn_vslot36();
     virtual void fn_vslot37();
@@ -817,7 +817,8 @@ struct UnkFESub {
     int m4DC;
 };
 struct UnkFEState {
-    char pad0[8];
+    int m0;
+    char pad4[4];
     UnkFESub m8;
     char pad4E8[0x88];
     int m570;
@@ -931,7 +932,9 @@ struct UnkMgrB {
     int m600;
 };
 struct UnkMgrC {
-    char pad0[0x74];
+    char pad0[0x18];
+    int m18;
+    char pad1C[0x58];
     int m74;
     char pad78[0xA8];
     int m120;

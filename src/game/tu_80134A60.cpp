@@ -5,6 +5,123 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+extern const char lbl_805BE274[];
+extern const char lbl_805BE284[];
+extern int lbl_8061A328;
+extern "C" int fn_804089B4(char*, const char*, ...);
+struct Unk80135328_Arg {
+    char pad0[8];
+    int m8;
+    int mC;
+};
+struct Unk80134A60_VD {
+    char pad0[0x3C];
+};
+struct Unk80134A60_V : Unk80134A60_VD {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5(int a, int b, int c, int d);
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual void fn_vslot29();
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual Unk80134A60_V* fn_vslot32(const char* name, int a);
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35();
+    virtual void fn_vslot36();
+    virtual void fn_vslot37();
+    virtual void fn_vslot38();
+    virtual void fn_vslot39();
+    virtual void fn_vslot40();
+    virtual void fn_vslot41();
+    virtual void fn_vslot42();
+    virtual void fn_vslot43();
+    virtual void fn_vslot44();
+    virtual void fn_vslot45();
+    virtual void fn_vslot46();
+    virtual void fn_vslot47();
+    virtual void fn_vslot48();
+    virtual void fn_vslot49();
+    virtual void fn_vslot50();
+    virtual void fn_vslot51();
+    virtual void fn_vslot52();
+    virtual void fn_vslot53();
+    virtual void fn_vslot54();
+    virtual void fn_vslot55();
+    virtual void fn_vslot56();
+    virtual void fn_vslot57();
+    virtual void fn_vslot58();
+    virtual void fn_vslot59();
+    virtual void fn_vslot60();
+    virtual void fn_vslot61();
+    virtual void fn_vslot62();
+    virtual void fn_vslot63();
+    virtual void fn_vslot64();
+    virtual void fn_vslot65();
+    virtual void fn_vslot66();
+    virtual void fn_vslot67();
+    virtual void fn_vslot68();
+    virtual void fn_vslot69();
+    virtual void fn_vslot70();
+    virtual void fn_vslot71();
+    virtual void fn_vslot72();
+    virtual void fn_vslot73();
+    virtual void fn_vslot74();
+    virtual void fn_vslot75();
+    virtual void fn_vslot76();
+    virtual void fn_vslot77();
+    virtual void fn_vslot78();
+    virtual void fn_vslot79();
+    virtual void fn_vslot80();
+    virtual void fn_vslot81();
+    virtual void fn_vslot82();
+    virtual void fn_vslot83();
+    virtual void fn_vslot84(int a);
+    virtual void fn_vslot85();
+    virtual void fn_vslot86();
+    virtual int fn_vslot87(int a);
+    virtual void fn_vslot88();
+    virtual void fn_vslot89();
+    virtual void fn_vslot90();
+    virtual void fn_vslot91();
+};
+extern int lbl_8061977C;
+extern "C" int fn_80090880(int, int);
+extern const char lbl_805BAFF0[];
+extern const char lbl_805BE43C[];
+extern const char lbl_805C02E8[];
+extern "C" void fn_804031BC(short*, const char*);
+extern "C" void fn_80403DE4(short*, short*, ...);
+extern "C" void fn_800DD204(void*, void*);
+extern "C" Unk800C7B40_Widget* fn_800C8038(Unk800C7B40_Widget* p);
+extern const char lbl_805BEF38[];
+extern "C" int fn_80403088(int, int);
+extern "C" void fn_8040316C(void*, int, int);
 
 struct Unk80172120_Data {
     char pad0[0x120];
@@ -148,6 +265,7 @@ struct Unk80135680 : Unk800C7B40_Widget {
 typedef Unk80135680 Scr;
 extern Scr* lbl_8061B59C;
 extern Scr* lbl_8061930C;
+extern "C" void fn_801321D4(Scr* x, int a1, int (*a2)(int, int), int (*a3)(), int a4, int a5, int a6, int a7, int s8, int sC, int s10, int s14, int s18, int s1C);
 struct Unk8061A32C {
     char padB8[0xB8];
     int mB8;
@@ -181,7 +299,7 @@ void fn_80072E90(Scr* g, int a, int b, int c, int d, Unk803567AC* v);
 void fn_801354D4(Scr* g);
 void fn_801723F8(int a, int b);
 void fn_80135200(Scr* x, int chrg);
-void fn_801365F4(Scr* x);
+int fn_801365F4(Scr* x);
 void fn_80172514(int a);
 char* fn_8040B61C(char* dst, const char* src);
 void fn_800EC648(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -231,6 +349,7 @@ void fn_801369B8(Scr* x, const char* s);
 struct Unk8017191C_Ret {
     int m0;
     int m4;
+    int m8;
 };
 struct Unk80136A14_Obj {
     char pad0[0x48];
@@ -495,6 +614,30 @@ extern "C" void fn_801352DC(int i)
     fn_801723F8(lbl_8061B59C->m134, lbl_8061B59C->m184[i]);
 }
 
+extern "C" void fn_80135328(Scr* x, Unk80135328_Arg* o)
+{
+    int tbl[4] = { 0, 0, 0, 0 };
+    unsigned i = 0;
+    fn_801354D4(x);
+    unsigned n = fn_801718E8(o);
+    while (i < n) {
+        tbl[i] = fn_8017191C(o, i)->m4;
+        x->m184[i] = fn_8017191C(o, i)->m8;
+        i++;
+    }
+    if (n != 0 && *(unsigned short*)tbl[0] == 0)
+        n = 0;
+    int t = -1;
+    if (n == 0 && o->m8 == 0)
+        t = 5;
+    x->m180->m2F0 = t;
+    ((Unk80134A60_V*)x->m180)->fn_vslot8(1);
+    fn_801321D4((Scr*)x->m180, (int)x, (int (*)(int, int))fn_801352DC, fn_801352D4, o->mC, n, -1, 1, tbl[0], tbl[1], tbl[2], 0, 0, n == 0);
+    ((Unk80134A60_V*)x->m180)->fn_vslot84(0);
+    ((Unk80134A60_V*)x->m180)->fn_vslot86();
+    x->m1D4 = 1;
+}
+
 extern "C" void fn_801354D4(Scr* x)
 {
     if (x->m1D4 != 0) {
@@ -638,6 +781,31 @@ extern "C" void fn_80135FA8()
     fn_801725C4(o->m134, 0);
 }
 
+extern "C" void fn_80136014(Scr* x)
+{
+    int t = 0;
+    switch (x->m138) {
+    case 0:
+        t = fn_80090880(lbl_8061977C, 0x619);
+        break;
+    case 1:
+        t = fn_80090880(lbl_8061977C, 0x618);
+        break;
+    case 2:
+        t = fn_80090880(lbl_8061977C, 0x61A);
+        break;
+    case 3:
+        t = fn_80090880(lbl_8061977C, 0x608);
+        break;
+    }
+    short out[0x20];
+    short fmt[0x20];
+    fn_804031BC(fmt, lbl_805C02E8);
+    fn_80403DE4(out, fmt, t, (char*)x + 0x13C);
+    fn_800C8040(x->fn_vslot32(lbl_805BAFF0, 1))->fn_vslot28((const char*)out);
+    fn_800DD204(fn_800C8040(x->fn_vslot32(lbl_805BAFF0, 1)), fn_800C8038(x->fn_vslot32(lbl_805BE43C, 1)));
+}
+
 extern "C" void fn_80136174(Scr* x, Unk801361EC_Arg* a)
 {
     fn_801361EC(x, a, fn_800C8040(x->fn_vslot32(lbl_805BEC94, 1)));
@@ -651,6 +819,26 @@ extern "C" void fn_801361EC(Scr* unused, Unk801361EC_Arg* a, Unk801361EC_W* w)
     } else {
         w->fn_vslot30(lbl_805BC9DC);
     }
+}
+
+extern "C" int fn_801365F4(Scr* x)
+{
+    int idx = ((UnkW1DC*)x)->m1DC->fn_vslot60();
+    int cnt = ((UnkW1DC*)x)->m1DC->fn_vslot59();
+    if (cnt > 0 && idx >= 0 && idx < cnt) {
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        char* buf = (char*)x + 0x240;
+        char* tb = (char*)x + 0x1F0;
+        int off = idx * 4;
+        fn_801723F8(x->m134, *(int*)(tb + off));
+        int s = ((Unk800C7B40_Widget*)fn_800C8040(((UnkW1DC*)x)->m1DC->fn_vslot70()->fn_vslot32(lbl_805BEF38, 1)))->fn_vslot31();
+        int len = fn_80403088(s, 0x20);
+        fn_8040316C(buf, s, len > 8 ? 8 : len);
+        int off2 = (len > 8 ? 8 : len) * 2;
+        *(short*)(buf + off2) = 0;
+        return 1;
+    }
+    return 0;
 }
 
 extern "C" void fn_80136750(Scr* x)
@@ -824,7 +1012,71 @@ extern "C" int fn_80136CB8(Scr* x, int key)
     return 0;
 }
 
+extern "C" int fn_80137648(Scr* x, int i)
+{
+    int off = i * 0x1C;
+    if (KeyAt((char*)x + 0x144, off) != 0 && KeyAt((char*)x + 0x148, off) == 0) {
+        int n = i + 1;
+        char buf[0x18];
+        fn_804089B4(buf, lbl_805BE274, n);
+        Unk80134A60_V* w1 = ((Unk80134A60_V*)x)->fn_vslot32(buf, 1);
+        fn_804089B4(buf, lbl_805BE284, n);
+        Unk80134A60_V* w2 = ((Unk80134A60_V*)x)->fn_vslot32(buf, 1);
+        switch (((Unk80134A60_V*)x)->fn_vslot87(i)) {
+        case 0:
+            fn_8001BC4C()->fn_8001BDAC(0x9B);
+            w1->fn_vslot5(KeyAt((char*)x + 0x150, off), KeyAt((char*)x + 0x154, off), lbl_8061A328, lbl_8061A328 + 0xC);
+            w2->fn_vslot5(KeyAt((char*)x + 0x158, off), KeyAt((char*)x + 0x15C, off), lbl_8061A328, lbl_8061A328 + 0xC);
+            SetAt((char*)x + 0x14C, off, -1);
+            break;
+        case 1:
+            break;
+        case -1:
+            if (fn_80136CB8(x, 1) != 0) {
+                fn_8001BC4C()->fn_8001BDAC(0x9B);
+                w1->fn_vslot5(x->m1B4[2], x->m1B4[3], lbl_8061A328, lbl_8061A328 + 0xC);
+                w2->fn_vslot5(x->m1B4[6], x->m1B4[7], lbl_8061A328, lbl_8061A328 + 0xC);
+                SetAt((char*)x + 0x14C, off, 1);
+            }
+            break;
+        }
+    }
+    return 0;
+}
+
 extern "C" int fn_80137848() { return 0; }
+
+extern "C" int fn_80137850(Scr* x, int i)
+{
+    int off = i * 0x1C;
+    if (KeyAt((char*)x + 0x144, off) != 0 && KeyAt((char*)x + 0x148, off) == 0) {
+        int n = i + 1;
+        char buf[0x18];
+        fn_804089B4(buf, lbl_805BE274, n);
+        Unk80134A60_V* w1 = ((Unk80134A60_V*)x)->fn_vslot32(buf, 1);
+        fn_804089B4(buf, lbl_805BE284, n);
+        Unk80134A60_V* w2 = ((Unk80134A60_V*)x)->fn_vslot32(buf, 1);
+        switch (((Unk80134A60_V*)x)->fn_vslot87(i)) {
+        case 0:
+            break;
+        case 1:
+            fn_8001BC4C()->fn_8001BDAC(0x9C);
+            w1->fn_vslot5(KeyAt((char*)x + 0x150, off), KeyAt((char*)x + 0x154, off), lbl_8061A328, lbl_8061A328 + 0xC);
+            w2->fn_vslot5(KeyAt((char*)x + 0x158, off), KeyAt((char*)x + 0x15C, off), lbl_8061A328, lbl_8061A328 + 0xC);
+            SetAt((char*)x + 0x14C, off, -1);
+            break;
+        case -1:
+            if (fn_80136CB8(x, 0) != 0) {
+                fn_8001BC4C()->fn_8001BDAC(0x9C);
+                w1->fn_vslot5(x->m1B4[0], x->m1B4[1], lbl_8061A328, lbl_8061A328 + 0xC);
+                w2->fn_vslot5(x->m1B4[4], x->m1B4[5], lbl_8061A328, lbl_8061A328 + 0xC);
+                SetAt((char*)x + 0x14C, off, 0);
+            }
+            break;
+        }
+    }
+    return 0;
+}
 
 extern "C" int fn_80137A58() { return 0; }
 
