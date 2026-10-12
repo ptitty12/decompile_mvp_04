@@ -180,7 +180,7 @@ extern "C" void fn_801C2F28(Z* z, P* other, int unused, int mode)
         int ok = 1;
         if (z->m204->m65C[12] == 0)
             ok = 0;
-        if (!(dist <= 2000.0f) && ok == 1 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2)
+        if (!(dist <= 1920.0f) && ok == 1 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2)
             z->mEC = ok;
         else
             z->mF0 = 1;
