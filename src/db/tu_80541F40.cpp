@@ -361,6 +361,43 @@ DB_OVERLAY int fn_80542B2C(char* o)
     return n;
 }
 
+int fn_80546BCC(void* g, int a, int b);
+int fn_80546B18(void* g, int a, int b);
+DB_OVERLAY void fn_80542BE8(Db80541F40_Slot* o)
+{
+    Db80541F40_Cur* g = fn_800A1960(lbl_80619948);
+    int done[0x4B];
+    for (int z = 0; z < 0x4B; z++)
+        done[z] = 0;
+    for (int pass = 0; pass < 2; pass++) {
+        for (int idx = 0; idx <= 0x4A; idx++) {
+            if (done[idx] == 0) {
+                int s = 0;
+                int* cnt = (int*)((char*)g + 0x32E0);
+                while (s < cnt[1]) {
+                    if (fn_80546BCC(g, s, idx) == o->m0) {
+                        int e = fn_80546B18(g, s, idx);
+                        if (e != 0) {
+                            for (int k = 0; k <= 0x18; k++) {
+                                if (o->m8[k] == 0) {
+                                    if ((pass == 0 && fn_8054289C(o, e, k) != 0)
+                                        || (pass == 1 && fn_805428CC((int)o, e, k) != 0)) {
+                                        o->m8[k] = 1;
+                                        done[idx] = 1;
+                                        o->m4++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    s++;
+                }
+            }
+        }
+    }
+}
+
 DB_OVERLAY void* fn_80542F88(void* self)
 {
     fn_80599B24(self);
