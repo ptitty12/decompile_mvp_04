@@ -182,7 +182,8 @@ struct DbG {
     DbT t[2];
     unsigned char m1CC8;
     unsigned char m1CC9;
-    char pad1CCA[2];
+    unsigned char m1CCA;
+    unsigned char m1CCB;
     int m1CCC;
     int m1CD0;
 };
@@ -230,9 +231,12 @@ public:
 struct DbSrcC {
     char pad0[0x84];
     int m84;
+    char pad88[4];
+    int m8C;
 };
 struct DbSelSrcB {
-    char pad0[0x20];
+    char pad0[0x1C];
+    int m1C;
     int m20;
     char pad24[4];
     int m28;
@@ -300,7 +304,7 @@ struct DbMgr {
     DbSub50 m50;
     DbSel mCC;
     DbScr mFC;
-    char pad114[4];
+    int m114;
     int m118;
 };
 extern "C" {
@@ -309,7 +313,7 @@ void fn_8056BA80(DbScr* scr, DbSelSrc* src, int flag);
 void fn_8056BACC(DbScr* p);
 void fn_80573840(DbSub50* p);
 void fn_80573918(DbSub50* p, DbSelSrc* src);
-void fn_8056F228(DbSel* s);
+void fn_8056F228(DbSel* s, int a, int b); /* a, b are passed through from fn_80570C14 */
 void fn_8056C2B4(DbScr* p);
 void fn_8056C520(DbScr* p);
 void fn_8056C6BC(DbScr* p);
@@ -350,8 +354,8 @@ public:
     virtual void v3();
     virtual DbRows* v4(int a);
     virtual int v5(int a);
-    virtual void v6();
-    virtual void v7();
+    virtual void v6(void* list, int id);
+    virtual void v7(int a);
     virtual int v8(int a);
     virtual DbRows* v9(int a);
     virtual int v10(int a);
