@@ -35,6 +35,8 @@ extern "C" void fn_805206EC(FeV10* x);
 extern "C" void fn_8052073C(FeV10* x);
 extern "C" void fn_80520794(FeV10* x);
 extern "C" void fn_805207E4(FeV10* x);
+extern "C" void fn_8052088C(FeV10B* x);
+extern "C" void fn_805208E0(FeV10B* x);
 
 extern "C" FE_OVERLAY void fn_8051E878(void* x, int a)
 {
@@ -92,6 +94,7 @@ extern "C" FE_OVERLAY void fn_8051F748(void* x)
     FeSubOf(x)->s11();
 }
 
+/* near-miss: the else-arm FeSubOf(x)->s8(a) call gets the two-register delta form in ours, retail uses add r3,r3,r0 (int/void s8 both tried) */
 extern "C" FE_OVERLAY void fn_8051F784(FeV10* x, int a)
 {
     if (FeSubOf(x)->s7(a) == -1) {
@@ -107,6 +110,7 @@ extern "C" FE_OVERLAY void fn_8051F964(FeV10* x)
     x->s5(fn_8051E910(x->m4, lbl_80622648));
 }
 
+/* near-miss: retail loads x->m4 and lbl into callee-saved regs between fn_8051F4D8 and the vcall; ours reorders (4 spellings tried) */
 extern "C" FE_OVERLAY void fn_8051F9C0(FeV10* x)
 {
     FeSub24* s = FeSubOf(x);
@@ -197,4 +201,15 @@ FE_OVERLAY FeRecC::FeRecC(int a, int b, int c, int d, int e)
     m1C = e;
     m20 = 0;
     mC = d / e;
+}
+
+extern "C" FE_OVERLAY void fn_8052088C(FeV10B* x)
+{
+    int v = fn_8051E910(x->m4, lbl_80622648);
+    x->s3(v);
+}
+
+extern "C" FE_OVERLAY void fn_805208E0(FeV10B* x)
+{
+    fn_8051EDDC(x->m4, lbl_80622648, x->s2());
 }
