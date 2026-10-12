@@ -72,6 +72,41 @@ extern "C" unsigned fn_80394CE0();
 extern "C" int fn_80394E3C(int a, int n, int b);
 extern "C" void fn_80394EE4(int a, int b);
 
+/* Record of fn_803958FC: +4 offset of a table of 32-byte entries, +8/+9 tag bytes, +0xB "built" flag, +0x10 entry
+ * count, +0x18 halfword indices. */
+struct McRecD {
+    char pad0[4];
+    int m4;
+    unsigned char m8;
+    unsigned char m9;
+    char padA;
+    unsigned char mB;
+    char padC[4];
+    unsigned short m10;
+    char pad12[6];
+    unsigned short m18[1];
+};
+
+struct McEntD {
+    int m0;
+    int m4;
+    char m8[8];
+    char m10[8];
+    void* m18;
+    unsigned m1C;
+};
+
+extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short c);
+extern "C" void fn_803B9858(void* a, void* b);
+extern "C" void fn_803BA118(void* a, void* b);
+extern "C" void fn_80395870(void* src, int key);
+
+struct McEntH {
+    char pad0[8];
+    void* m8;
+    unsigned mC;
+};
+
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
@@ -252,6 +287,29 @@ extern "C" void fn_80395870(void* src, int key)
             if (fn_803920BC(buf) == 0)
                 fn_80392BC0((int)buf);
         }
+    }
+}
+
+extern "C" void fn_803958FC(int x)
+{
+    McRecD* r = (McRecD*)x;
+    if (r != 0 && r->m4 != 0 && r->mB == 0) {
+        McEntD* base = (McEntD*)((char*)r + r->m4);
+        McEntD* end = base + r->m10;
+        int i;
+        for (i = 0; i < r->m10; i++) {
+            int off = i << 5;
+            McEntD* e = (McEntD*)(off + (int)base);
+            e->m0 = (int)end + e->m0;
+            fn_803B9858(e->m8, e);
+            McEntH* e2 = (McEntH*)((char*)e + 0x10);
+            e2->m8 = (void*)fn_80395870;
+            int ioff = i * 2;
+int tb = (int)r->m18;
+            e2->mC = fn_80391C04(r->m8, r->m9, *(unsigned short*)((char*)r + *(unsigned short*)(ioff + tb) * 4));
+            fn_803BA118(e->m8, e2);
+        }
+        r->mB = 1;
     }
 }
 
