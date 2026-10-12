@@ -21,6 +21,10 @@ extern "C" void fn_805819C8(void*, int);
 extern "C" void fn_800C2034(void*, int);
 extern const char lbl_805F7504[];
 extern const char lbl_805F4F48[];
+extern const char lbl_805F75E8[];
+extern "C" void fn_800DD800(void*, void*, int, int);
+struct UiS;
+void fn_800DDF2C(UiS*);
 extern "C" void fn_8049FC58(void* x, int a);
 extern "C" void fn_804A15FC(char* x);
 extern "C" void fn_8049E94C(void* x);
@@ -61,6 +65,7 @@ struct FeTrk {
 extern "C" FeTrk* fn_8054CBBC(FeTrk* o, int a, void* b);
 extern "C" void fn_8054F2C4(FeTrk* o);
 extern "C" int fn_800A2E90(void* g);
+
 extern "C" {
 
 FE_OVERLAY int fn_8049E0BC(void* x)
@@ -411,6 +416,27 @@ struct FeA13A8 {
     char pad0[0x14];
     void* arr[3];
 };
+FE_OVERLAY void fn_804A0D48(char* x)
+{
+    int arr[4];
+    arr[0] = (int)(x + 0x230);
+    arr[1] = (int)(x + 0x690);
+    arr[2] = (int)(x + 0xAF0);
+    arr[3] = (int)(x + 0xF50);
+    Unk8006A138_It<3> it(0);
+    int i = 0;
+    do {
+        int off = i * 0x28 + 0x184;
+        FeW* w = fn_800C8044(FeMem(x + off, 8)->fn_vslot32(lbl_805F75E8, 1));
+        int id = fn_800B548C(FeI(x, off));
+        if (FeI(fn_800B555C(), 0x588) == 0)
+            fn_800DD800(w, (void*)arr[it.v], id, 1);
+        else
+            fn_800DDF2C((UiS*)w);
+        i = it.Next();
+    } while (i <= 3);
+}
+
 FE_OVERLAY void fn_804A13A8(char* x)
 {
     int i = 0;
