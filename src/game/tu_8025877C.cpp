@@ -13,6 +13,15 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 extern "C++" {
 Q* fn_802570D4(M* self);
 P* fn_80257B40(M* self);
@@ -382,6 +391,40 @@ int fn_80259434(M* self)
     return self->m4->m1FC;
 }
 
+/* near-miss: 75 vs 75 insns, 3 differ: retail loads the +0x6CC player into r3 (lwz r3,0x6cc(r3)), ours uses r9. Tried a Q* temporary, split ifs, a constant temporary */
+extern const char lbl_805DACC4[];
+extern float lbl_8061E4D4;
+extern int fn_801DC67C(int a);
+extern int fn_8018B648();
+extern int fn_8024D41C(int x);
+extern float fn_80259A74(M* self, int a, int b);
+extern float fn_80266D70(void* t, int k);
+extern int fn_802679D4(void* t, int a, int b);
+extern void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
+extern void* fn_801A4B34(void* w);
+int fn_80259440(M* self)
+{
+    int r = 0;
+    if (fn_801DC67C(((Unk8024EF40_Ctx*)self->m10)->m3B8) != 0) {
+        P* c = (P*)fn_801A4B34(fn_802570D4(self));
+        if (c != 0 && c->m58C.m38 == -1) {
+            P* t = fn_802570D4(self)->m6CC;
+            if (t != 0 && t->m38C == 1 && fn_8018B648() == 0) {
+                int o = fn_802679D4((char*)self->m4 + 0x48, 0, 0);
+                if (o != 0 && fn_8024D41C(o) != 0) {
+                    float a = fn_80259A74(self, 9, 0);
+                    float b = fn_80266D70((char*)self->m4 + 0x48, 0);
+                    if (!(a + lbl_8061E4D4 <= b)) {
+                        r = 1;
+                        fn_80303CA0(lbl_805DACC4, 8.0f, 0.4f, 0.05f);
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
 void fn_8025956C(M* self, P* p)
 {
     if (p->m458 == 9 && p->m618->m838 != 0x1463E9BA)
@@ -405,6 +448,27 @@ void fn_80259918(void* self, P* p, int* out, int* idx)
     }
     if (*idx > 2)
         *idx = 3;
+}
+
+extern Unk80273498_Vec3 fn_8014E388(int idx);
+extern float fn_804028E4(float x);
+extern "C" int fn_8025995C(M* self, unsigned t, float* out, int* a, int* b)
+{
+    P* p = fn_8026B8C0(self->m4, t);
+    if (p == 0 || p->m58C.b2) {
+        *out = 0.0f;
+        *a = -1;
+        *b = -1;
+        return 0;
+    }
+    float len;
+    fn_80259918(self, p, a, b);
+    const Unk80273498_Vec3& pos = ((Unk80273498_Pos*)p)->m60;
+    Unk80273498_Vec3 d = pos - fn_8014E388(*a);
+    len = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+    const float k = 0.00092592591f;
+    *out = len * k;
+    return 1;
 }
 
 void fn_80259C00(M* self, int a)
