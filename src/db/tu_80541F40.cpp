@@ -263,6 +263,54 @@ DB_OVERLAY void fn_80542688(Db80541F40_Slot* e, int id)
         e->m8[i] = 0;
 }
 
+DB_OVERLAY int fn_805426B8(Db80541F40_Slot* o, int a)
+{
+    Db80541F40_Cur* g = fn_800A1960(lbl_80619948);
+    Db80541F40_IL* list = fn_800A1978(lbl_80619948);
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    int cur = *(int*)((char*)g + 0x107E8) % 25;
+    if (o->m4 < cur && o->m4 == 0)
+        fn_80542BE8(o);
+    int best = 0;
+    int pass = 0;
+    int key = fn_80542B2C((char*)o);
+    float bestv = lbl_805FEF50;
+    do {
+        for (unsigned i = 0; i < list->m4; i++) {
+            if (fn_80546C88(g, i) == 0) {
+                int io = i * 4;
+                int id = *(int*)((char*)list->m0 + io);
+                if (pass == 0) {
+                    if (fn_8054289C(o, id, key) == 0)
+                        continue;
+                } else if (pass == 1) {
+                    if (fn_805428CC((int)o, id, key) == 0)
+                        continue;
+                } else if (pass == 2) {
+                    if (s->fn_8007A270(id) == 1)
+                        continue;
+                } else if (pass == 3) {
+                    if (s->fn_8007A270(id) == 0)
+                        continue;
+                }
+                float v = fn_8007824C(id, 0);
+                if (best != 0 && v <= bestv)
+                    continue;
+                if (fn_805474B8(g, id) == 0) {
+                    best = id;
+                    bestv = v;
+                }
+            }
+        }
+        if (best != 0)
+            break;
+        pass++;
+    } while (pass <= 3);
+    o->m8[key] = 1;
+    o->m4++;
+    return best;
+}
+
 DB_OVERLAY int fn_8054289C(void* self, int id, int k)
 {
     return fn_805428FC(self, id, lbl_80622B84[k]);
