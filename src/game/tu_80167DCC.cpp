@@ -252,6 +252,37 @@ void fn_80169E38() /* 80169E38 */
     new (lbl_806EF9B4) cScriptLoadAnimations;
 }
 
+extern const char lbl_8065EC38[];
+extern "C" void fn_80359A40(int* p);
+
+class Unk8016A5C0_SlotV {
+public:
+    char pad0[0xA58];
+    virtual void fn_vslot1(int a);
+};
+
+void fn_8016A5C0(Unk8016ACAC* p, int c) /* 8016A5C0 */
+{
+    Unk8061FEDC_Sub* g = &lbl_8061FEDC->m40;
+    *(const void**)((char*)p + 0x42A4) = lbl_8065EC38;
+    int z = 0;
+    fn_80359A40(&g->m4);
+    g->m8 = z;
+    Unk8016A5C0_SlotV* a = (Unk8016A5C0_SlotV*)((char*)p + 0x1E28);
+    if (a != 0) {
+        Unk8016A5C0_SlotV* s = (Unk8016A5C0_SlotV*)((char*)p + 0x3D3C);
+        if (a != s) {
+            do {
+                s--;
+                s->fn_vslot1(0);
+            } while (a != s);
+        }
+    }
+    if (c & 1) {
+        delete p;
+    }
+}
+
 void fn_8016A660(Unk8016ACAC_Slot* s, int c) /* 8016A660 */
 {
     *(const void**)((char*)s + 0xA58) = lbl_8065EC50;
