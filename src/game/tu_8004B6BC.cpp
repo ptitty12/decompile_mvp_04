@@ -6,6 +6,14 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+struct Unk8004CE04_Pair {
+    int m0;
+    int m4;
+};
+struct Unk8004CE04_AV {
+    char pad0[0x110];
+    Unk8004CE04_Pair t[3];
+};
 void fn_800113D4(int a);
 void fn_80010990(int a, int b);
 void fn_800114E0();
@@ -494,7 +502,6 @@ void fn_8004CAEC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     fn_8004D56C(s, idx, a);
 }
 
-/* near-miss (96%): retail copies the loop offset (mr r9,r5; addi r5,r9,8) and increments in the order off, i */
 void fn_8004CE04(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     int f = fn_80056D0C(0xE7);
@@ -509,13 +516,11 @@ void fn_8004CE04(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
         if (m == 0 || (m == 1 && (a->m3B0->m590 & 0x20000000)))
             ok = 1;
         if (ok != 0) {
-            int i = 0;
-            int off = 0;
-            for (; i <= 2; off += 8, i++) {
-                char* p110 = (char*)a + 0x110;
-                if (*(int*)(p110 + off) == Unk8004CE04_M4(s, idx)) {
-                    char* p114 = (char*)a + 0x114;
-                    if (*(int*)(p114 + off) > 1)
+            int i;
+            Unk8004CE04_AV* v = (Unk8004CE04_AV*)a;
+            for (i = 0; i <= 2; i++) {
+                if (v->t[i].m0 == Unk8004CE04_M4(s, idx)) {
+                    if (v->t[i].m4 > 1)
                         fn_80012AAC();
                     break;
                 }
