@@ -554,19 +554,19 @@ int fn_8024D9A0(Unk80270BA0_X* x, int* out)
 
 void fn_8024DB54() {}
 
-/* near-miss (97.6%): 15 slots differ: the switch tree pivot (retail roots at 2, ours at 1), the order of the e[1]/e[2] loads
-   and the f0/f13 numbering in the last compare. Tried switch/if forms, local declaration orders and t[] store orders */
+/* near-miss: 3 slots differ: retail numbers the hi reload f0 and the constant f13 in the last compare.
+   A "case 4:" label before default makes the switch root 2 as in retail. Tried switch/if forms, declaration orders, operand orders */
 void fn_8024DB58(Unk80270BA0_X* x, int k, float* e)
 {
     Unk8024B99C_V* v = (Unk8024B99C_V*)x;
-    float hi = lbl_805D9680;
     float lo = lbl_805D9680;
+    float hi = lbl_805D9680;
     if (k == 13) {
-        hi = e[2];
         lo = e[1];
+        hi = e[2];
     } else if (k == 14) {
-        hi = e[2];
         lo = e[1];
+        hi = e[2];
     }
     if (!(lo < lbl_805D9684)) {
         float t[4];
@@ -595,6 +595,7 @@ void fn_8024DB58(Unk80270BA0_X* x, int k, float* e)
         case 3:
             r = w * t[2] + frac * t[3];
             break;
+        case 4:
         default:
             r = t[3];
             break;
@@ -605,8 +606,9 @@ void fn_8024DB58(Unk80270BA0_X* x, int k, float* e)
         v->m8D0 = s;
     }
     if (hi > lbl_805D9690 || !(hi >= lbl_805D9690)) {
-        float r2 = hi * lbl_805D9690;
-        float s2 = r2;
+        float s2;
+        float r2 = lbl_805D9690 * hi;
+        s2 = r2;
         v->m8E4 = lbl_8061D4D4;
         v->m8E0 = 0;
         v->m8DC = s2;
