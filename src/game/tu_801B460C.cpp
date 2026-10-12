@@ -13,6 +13,7 @@ extern float lbl_805CF6E8[];
 extern int lbl_805CF6F8[];
 void fn_801B6778(void* p);
 void fn_801B8D1C(void* p, int n);
+extern "C" void* fn_801A4910(Unk8019F8C0_Owner* o, int team, unsigned char slot);
 void fn_801B6A24(void* p)
 {
     fn_801B6778(p);
@@ -163,6 +164,9 @@ struct Unk801B6438_Obj {
     char pad0[0x58C];
     Unk801B6438_Sub m58C;
 };
+int fn_801B5F8C(Unk801AB63C_P* p);
+Unk801B6438_Obj* fn_801B6438(Unk801AB63C_P* p, int id);
+int fn_801B5EDC(Unk801AB63C_P* p, int b, int c);
 void fn_801B564C(Unk801B460C_Tbl* t);
 int fn_801B5790(Unk801B460C_Tbl* t);
 int fn_801B57EC(Unk801B460C_Tbl* t);
@@ -421,6 +425,67 @@ int fn_801B51E4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
     fn_801B4E24(p, q, &s);
     fn_801B4F14(p, q, &s);
     return s;
+}
+
+int fn_801B5F8C(Unk801AB63C_P* p);
+Unk801B6438_Obj* fn_801B6438(Unk801AB63C_P* p, int id);
+int fn_801B5EDC(Unk801AB63C_P* p, int b, int c);
+/* near-miss: same code (99.4%); retail keeps p in r31 and the first out pointer in r30 (mine swaps them, 13 slots).
+ * Allocation priorities: out1 5 refs/40 insns (0.25) vs p 8 refs/99 insns (0.242). Tried: p->m8 reloads, order of
+ * declarations, inline team selector. */
+void fn_801B5498(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* a, int* b, int* c, int* d, int* e, int* f)
+{
+    Unk8019F8C0_Owner* o = p->m8;
+    int idx = q->m708;
+    if (idx == (o->m6F8->m14[2].m8 == 0)) {
+        if (a)
+            *a = (int)fn_801B63A0(p, 2);
+        if (b)
+            *b = fn_801B5F8C(p);
+        if (c) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 0);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *c = v;
+        }
+        if (d) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 1);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *d = v;
+        }
+        if (e) {
+            Unk801B6438_Obj* ob = fn_801B6438(p, 2);
+            int v = 1;
+            if (ob == 0)
+                v = 0;
+            *e = v;
+        }
+    } else {
+        if (a) {
+            int t;
+            if (idx > 2) {
+                t = 3;
+                if (idx == 3)
+                    t = 4;
+            } else
+                t = idx == 0;
+            Unk8019F8C0_Inner* en = p->m8->m6F8->m14 + t;
+            *a = (int)fn_801A4910(o, t, en->m168.m0[(unsigned char)en->m168.mC]);
+        }
+        if (b)
+            *b = 0;
+        if (c)
+            *c = 0;
+        if (d)
+            *d = 0;
+        if (e)
+            *e = 0;
+    }
+    if (f)
+        *f = fn_801B5EDC(p, q->m708, 0);
 }
 
 void fn_801B564C(Unk801B460C_Tbl* t)
