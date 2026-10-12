@@ -757,3 +757,35 @@ extern "C" int fn_801EA118(I* s, int a, P* p)
     }
     return 0;
 }
+
+Unk801DB948_Rt* fn_801A6DB8(Unk801DB948_Game* g);
+void fn_801EC5F8(I* s, int v);
+void fn_802456C8(P* p, int a, int b, float f);
+extern const float lbl_805D4A30;
+extern const float lbl_805D4A40;
+extern const float lbl_805D4A44;
+/* near-miss: 89 vs 88 insns, 11 slots: retail compares fabs(d) against the lim register f11 itself;
+ * here lim is a dead spill and the compare constant is re-read (extra fmr f12,f11). Tried const lim, lim only,
+ * cur const, fabs inline (extra param spill), d initialised. */
+extern "C" void fn_801EA20C(I* s, int mode, int a, P* p)
+{
+    if (fn_801A6DB8(s->m9C->m0)->m4 != 0) {
+        if (mode == 1) {
+            if (fn_802055F4(s->m9C) == 0)
+                fn_801EC5F8(s, -1);
+        } else if (mode == 0) {
+            Unk801DD660_Ctx* c = s->m9C;
+            if (c->m30 != 0) {
+                float lim = lbl_805D4A30;
+                float cur = (float)c->m0->m4C * lbl_805D4A40;
+                float d;
+                if (p->m460 != c->mA4 || (d = cur - c->mA8, !(__builtin_fabs(d) <= lbl_805D4A30))) {
+                    if (fn_801EA118(s, a, p) == 0)
+                        fn_801EC5F8(s, s->m9C->mA4);
+                }
+            } else if (p->m458 == 9 && c->m0->m660 != 0) {
+                fn_802456C8(c->m0->m660, 1, 0, lbl_805D4A44);
+            }
+        }
+    }
+}
