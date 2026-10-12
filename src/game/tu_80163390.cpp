@@ -944,3 +944,104 @@ int fn_80166440(void* self, int v) /* 80166440 */
     }
     return 0;
 }
+
+/* Sum of the 128 bytes at Row+0x1B4 (row pointer taken as a parameter: see Unk8001D47C_SumRow). */
+struct Unk80166E40_Row {
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+};
+inline int Unk80166E40_SumRow(Unk80166E40_Row* r)
+{
+    int s = 0;
+    for (int i = 0; i < 0x80; i++) {
+        s += r->m1B4[(unsigned char)i];
+    }
+    return s;
+}
+struct Unk80166E40_G {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk80166E40_T {
+    char pad0[0x14];
+    Unk80166E40_G* m14;
+};
+class Unk80166E40_Obj {
+public:
+    char pad0[0x98];
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int a);
+};
+struct Unk80166E40_A {
+    char pad0[0x6B8];
+    void* m6B8;
+    char pad6BC[0x6CC - 0x6BC];
+    Unk80166E40_Obj* m6CC;
+    char pad6D0[0x6F8 - 0x6D0];
+    Unk80166E40_T* m6F8;
+    char pad6FC[0x704 - 0x6FC];
+    char m704[0x1C];
+};
+struct Unk80166E40_S {
+    char pad0[0xC];
+    Unk80166E40_A* mC;
+    char pad10[0x48 - 0x10];
+    int m48;
+};
+/* Event posted with fn_8037893C: id at +0, vptr at +4 (base vtable lbl_80649DA0, derived lbl_8065EA28). */
+class Unk80166E40_EvBase {
+public:
+    Unk80166E40_EvBase(int id) { m0 = id; }
+    int m0;
+    virtual ~Unk80166E40_EvBase() {}
+};
+class Unk80166E40_Ev : public Unk80166E40_EvBase {
+public:
+    Unk80166E40_Ev() : Unk80166E40_EvBase(0xA4)
+    {
+        mC = 0;
+        m10 = 2;
+        m8 = 4;
+    }
+    virtual ~Unk80166E40_Ev() {}
+    int m8;
+    int mC;
+    int m10;
+};
+int fn_80166BD0(void* self);
+void fn_80166FEC(void* self, int a, int b, int c, int d);
+int fn_8018240C(void* p, int f);
+int fn_803EE348(int a);
+void fn_80303CA0(const char* s, float a, float b, float c, ...);
+extern "C" void fn_8037893C(void* q, int id, void* e, int a, int b);
+
+/* near-miss (99.6%): only the first SumRow loop differs. Retail holds the byte index in r9, the element
+ * address in r11 and the counter in r10 (as in the second loop, which matches); here the index shares r0
+ * with the loaded byte, the address is r9 and the counter r11. Same open SumRow register-choice family
+ * as fn_80361FCC / fn_8001F788; ~25 row-pointer, statement-order and loop-body forms left it unchanged. */
+void fn_80166E40(void* self) /* 80166E40 */
+{
+    Unk80166E40_S* s = (Unk80166E40_S*)self;
+    if (fn_803EE348(0) > 0x1B7FF && s->m48 != 1) {
+        s->mC->m6CC->fn_vslot8(1);
+        int n = fn_80166BD0(self);
+        fn_80303CA0("End of game intensity %d", 4.0f, 0.4f, 0.4f, n + 1);
+        Unk80166E40_G* g = s->mC->m6F8->m14;
+        int x = Unk80166E40_SumRow((Unk80166E40_Row*)g);
+        int y = Unk80166E40_SumRow((Unk80166E40_Row*)((char*)g + 0xE64));
+        int le = x <= y;
+        int c = 0;
+        if (le == 0) {
+            c = g->m1CD0 == 1;
+        }
+        fn_80166FEC(self, n, le, c, fn_8018240C(s->mC->m6B8, le));
+        Unk80166E40_Ev e;
+        fn_8037893C(s->mC->m704, e.m0, &e, 0, 0);
+    }
+}
