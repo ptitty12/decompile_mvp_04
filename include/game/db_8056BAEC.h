@@ -42,8 +42,8 @@ int fn_80077934__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
 int fn_80078A38__18Unk8007B2B0_Screeni(void* a0, int a1);
 int fn_80078A64__18Unk8007A4DC_Screeniii(void* a0, int a1, int a2, int a3);
 int fn_800799D0__18Unk8007B2B0_Screeni(void* a0, int a1);
-int fn_80079E74__18Unk8007B2B0_Screeni(void* a0, int a1);
-int fn_8007A0D0__18Unk8007B2B0_Screeni(void* a0, int a1);
+float fn_80079E74__18Unk8007B2B0_Screeni(void* a0, int a1);
+unsigned fn_8007A0D0__18Unk8007B2B0_Screeni(void* a0, int a1);
 int fn_8007A11C__18Unk8007A4DC_Screeni(void* a0, int a1);
 int fn_8007A270__18Unk8007A4DC_Screeni(void* a0, int a1);
 int fn_8007A3FC__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
@@ -55,7 +55,7 @@ int fn_8007B8C4__18Unk8007B2B0_Screenii(void* a0, int a1, int a2);
 int fn_8007B924__18Unk8007B2B0_ScreeniiPc(void* a0, int a1, int a2, char* a3);
 int fn_8007B98C__18Unk8007B2B0_Screeniii(void* a0, int a1, int a2, int a3);
 int fn_8007BA34__18Unk8007B2B0_Screeniii(void* a0, int a1, int a2, int a3);
-int fn_8007BB28__18Unk8007B2B0_Screeniii(void* a0, int a1, int a2, int a3);
+float fn_8007BB28__18Unk8007B2B0_Screeniii(void* a0, int a1, int a2, int a3);
 int fn_8007D9E0__18Unk8007B2B0_ScreenUii(void* a0, unsigned a1, int a2);
 int fn_8007DA28__18Unk8007B2B0_Screen(void* a0);
 int fn_8007DA34__18Unk8007B2B0_Screeni(void* a0, int a1);
@@ -230,5 +230,66 @@ struct DbSel {
     int m28;
     int m2C;
 };
+
+/* 0x18-byte entry of DbSub50 (a counter and five floats; entry 0 at +0x14). */
+struct DbEnt18 {
+    int m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+};
+/*
+ * Sub-object at +0x50 of DbMgr (sizeof 0x7C): side flag and its complement at +0/+4, two DbEnt18
+ * at +0x14, thirteen floats from +0x44, two flags at +0x74/+0x78. Evidence: fn_80573840 (ctor
+ * clearing the floats), fn_805738F0, fn_80573D44, fn_80573D84.
+ */
+struct DbSub50 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    DbEnt18 e[2];
+    float m44, m48, m4C, m50, m54, m58, m5C, m60, m64, m68, m6C, m70;
+    int m74;
+    int m78;
+};
+
+/*
+ * Menu object of db/tu_8056EC68 (sizeof >= 0x11C): source object at +8, game state at +0xC, a
+ * sub-object at +0x50, the selection state DbSel at +0xCC (0x30 bytes), a DbScr at +0xFC and a
+ * mode word at +0x118. Evidence: fn_8057001C, fn_805700C0 (ctors), fn_805715D8, fn_805718E8.
+ */
+struct DbMgr {
+    int m0;
+    char pad4[4];
+    DbSelSrc* m8;
+    DbG* mC;
+    int m10;
+    int m14;
+    char pad18[0x50 - 0x18];
+    DbSub50 m50;
+    DbSel mCC;
+    DbScr mFC;
+    char pad114[4];
+    int m118;
+};
+extern "C" {
+void fn_8056BA20(void* p, int c);
+void fn_8056BA80(DbScr* scr, DbSelSrc* src, int flag);
+void fn_8056BACC(DbScr* p);
+void fn_80573840(DbSub50* p);
+void fn_80573918(DbSub50* p, DbSelSrc* src);
+void fn_8056F228(DbSel* s);
+void fn_8056C2B4(DbScr* p);
+void fn_8056C520(DbScr* p);
+void fn_8056C6BC(DbScr* p);
+void fn_8056DEF4(DbSel* p);
+void fn_8056E130(DbSel* p);
+void fn_8056BD50(void* q);
+void fn_80377408(void* p);
+}
 
 #endif
