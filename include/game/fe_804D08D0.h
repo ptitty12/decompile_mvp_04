@@ -41,7 +41,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s26();
     virtual void s27();
     virtual void s28();
-    virtual void s29();
+    virtual void s29(int a);
     virtual void s30();
     virtual void s31();
     virtual void s32();
@@ -56,7 +56,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s41();
     virtual void s42();
     virtual void s43();
-    virtual void s44();
+    virtual void s44(int a);
     virtual void s45();
     virtual void s46();
     virtual void s47();
@@ -171,7 +171,7 @@ struct FeWY : Unk800C7B40_Data {
     virtual void s27();
     virtual void s28();
     virtual void s29();
-    virtual void s30();
+    virtual void s30(const char* a);
     virtual void s31();
     virtual void s32();
     virtual void s33();
@@ -496,7 +496,10 @@ struct FeG3 {
     int m600;
 };
 struct FeG10 {
-    char pad0[0x6C];
+    char pad0[0x14];
+    int m14;
+    int m18;
+    char pad1C[0x6C - 0x1C];
     int m6C;
     int m70;
 };
@@ -637,13 +640,122 @@ void fn_800EC5F4__FP8UiScrRaw(void* self);
 
 /* Screen of lbl_8067FA30 (ctor fn_804D3D74, base ctor fn_800EC594). */
 struct FeS804D3D74 : FeW {
-    char pad40[0x114];
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    int m138;
+    int m13C;
+    char pad140[8];
+    int m148;
+    char pad14C[8];
+    FeW* m154;
+    int m158;
+    FeW* m15C;
+    FeW* m160;
+    int m164;
+};
+extern const char lbl_8067FA30[];
+
+/* ---- unit 804D3E00 ------------------------------------------------------------------ */
+
+/* A second base object (vptr at +0x24 of the sub-object) with the slots used here. */
+struct FeSubX : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual int s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+    virtual int s21();
+};
+extern const char lbl_805F853C[];
+extern const char lbl_805F8554[];
+extern const char lbl_805F8584[];
+extern const char lbl_805F859C[];
+extern const char lbl_805F85CC[];
+extern const char lbl_805F85D8[];
+extern "C" {
+void fn_800EC624__FP13Unk800EC624_Tiii(void* x, void* w, int a);
+FeW* fn_800C8054(FeW* w);
+int fn_8040ABA0();
+int fn_800B5B04(FeState* s);
+void fn_804D4430(FeS804D3D74* x);
+int fn_804D46B8(FeS804D3D74* x, int n);
+}
+
+
+/* Screen of lbl_806800B0 (ctor fn_804D4704, base ctor fn_800EC594). m188 is the LEAGUE button
+ * list, m194..m1AC spinner controls (sub-object at +0x98, or +0xDC for m1A0). */
+struct FeS804D4704 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    int m138;
+    char pad13C[4];
+    FeW* m140;
+    int m144;
+    char pad148[0xC];
     int m154;
     int m158;
     int m15C;
     int m160;
     int m164;
+    FeW* m168;
+    FeW* m16C;
+    int m170;
+    void* m174;
+    void* m178;
+    void* m17C;
+    int* m180;
+    FeW* m184;
+    FeW* m188;
+    FeW* m18C;
+    int m190;
+    FeW* m194;
+    FeW* m198;
+    FeW* m19C;
+    FeW* m1A0;
+    FeW* m1A4;
+    FeW* m1A8;
+    FeW* m1AC;
 };
-extern const char lbl_8067FA30[];
+struct FeBuf464 {
+    char b[0x45C];
+};
+extern const char lbl_806800B0[];
+extern const char lbl_805F8798[];
+extern const char lbl_805F5A48[];
+extern const char lbl_805F5080[];
+extern "C" {
+FeW* fn_800C8058(FeW* w);
+int* fn_800ED2B0(FeW* w, const char* name);
+int fn_800ED4F0(void* x, int a);
+void fn_800CFB38(void* w);
+void fn_800D0074(void* w, int a, int b);
+void fn_8055AC44(FeBuf464* out, int a);
+void fn_800DD800(void* w, FeBuf464* b, int a, int c);
+int fn_80075948__18Unk8007B2B0_Screeni(void* g, int a);
+int fn_8007B3E0__18Unk8007B2B0_Screenii(void* g, int a, int b);
+int fn_8057CF60(int a, int b);
+void fn_804D53B8(FeS804D4704* x, int a);
+void fn_804D54DC(FeS804D4704* x);
+void fn_804D563C(FeS804D4704* x);
+void fn_804D512C(FeS804D4704* x);
+void fn_804D60AC(FeS804D4704* x, int a);
+}
 
 #endif
