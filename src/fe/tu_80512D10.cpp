@@ -4,6 +4,18 @@
  */
 
 #include "game/fe_804FE34C.h"
+struct FeRec84 {
+    char pad0[4];
+    int m4[29];
+    int m78[3];
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    FeW* m94;
+    FeW* m98;
+};
+extern "C" void fn_805168D8(void* self, FeRec84* x);
 
 struct FeP298_1E0 { char pad[0x1E0]; FeW* m1E0; char pad2[0x298 - 0x1E0 - 4]; FeW* m298; };
 
@@ -136,6 +148,22 @@ extern "C" FE_OVERLAY FeScrQ* fn_80513214(FeScrQ* self, int a, int b, int c, int
 extern "C" FE_OVERLAY void fn_80513270(FeScrD* x)
 {
     fn_800ECE34(x);
+}
+
+extern "C" FE_OVERLAY void fn_80514020(void* self, FeRec84* x)
+{
+    int tmp[3];
+    int i;
+    for (i = 0; i < 3; i++) {
+        tmp[i] = x->m78[i];
+    }
+    fn_805168D8(self, x);
+    x->m98->fn_vslot79(0, 0);
+    x->m98->fn_vslot3();
+    x->m88 = 0;
+    for (i = 0; i < 3; i++) {
+        x->m78[i] = 0;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_80514340(FeScrQ* x, int a)
@@ -330,4 +358,23 @@ extern "C" FE_OVERLAY int fn_80516550(FeP298_1E0* x)
 
 extern "C" FE_OVERLAY void fn_8051687C()
 {
+}
+
+extern "C" FE_OVERLAY void fn_80516880(int unused, FeScrQ* x)
+{
+    char* a[2];
+    a[0] = (char*)x + 0x134;
+    a[1] = (char*)x + 0x1EC;
+    for (int i = 0; i < 2; i++) {
+        *(int*)(a[i] + 0x88) = 0;
+    }
+    fn_80514538(x);
+}
+
+extern "C" FE_OVERLAY void fn_805168D8(void* self, FeRec84* x)
+{
+    for (int i = 0; i < x->m84; i++) {
+        ((FeWV*)x->m94)->s90(i, 1, fn_80514DF8(self, (FeIdTab*)x, x->m4[i]));
+    }
+    x->m94->fn_vslot14(1);
 }

@@ -111,7 +111,7 @@ struct FeWV : Unk800C7B40_Data {
     virtual void s87();
     virtual void s88();
     virtual void s89();
-    virtual void s90();
+    virtual void s90(int a, int b, int c);
     virtual void s91();
     virtual void s92();
     virtual void s93();
