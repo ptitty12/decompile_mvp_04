@@ -1,6 +1,20 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040B70C-0x8040B750 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* newlib 1.8.2 libc/string/strlwr.c, as built into SN ProDG's libc (MVP links it, re4 does not; written
+ * here in the form of the other newlib units). */
+#include "newlib_local.h"
+
+/* newlib's <ctype.h> tolower for GCC */
+#define tolower(c) __extension__({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x; })
+
+/* Lower-cases a string in place (ASCII) and returns it. */
+char *strlwr(char *a)
+{
+    char *ret = a;
+
+    while (*a != '\0') {
+        if (isupper(*a))
+            *a = tolower(*a);
+        ++a;
+    }
+
+    return ret;
+}

@@ -1,6 +1,42 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040B830-0x8040B8FC (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/strncpy.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib libc/string/strncpy.c */
+#include "newlib_local.h"
+
+#define UNALIGNED(X, Y) (((long)X & (sizeof(long) - 1)) | ((long)Y & (sizeof(long) - 1)))
+#define TOO_SMALL(LEN) ((LEN) < sizeof(long))
+
+/* Copies at most count characters, zero-padding the rest. */
+char *strncpy(char *dst0, const char *src0, size_t count)
+{
+    char *dst = dst0;
+    const char *src = src0;
+    long *aligned_dst;
+    const long *aligned_src;
+
+    /* If SRC and DEST is aligned and count large enough, then copy words.  */
+    if (!UNALIGNED(src, dst) && !TOO_SMALL(count)) {
+        aligned_dst = (long *)dst;
+        aligned_src = (long *)src;
+
+        /* SRC and DEST are both "long int" aligned, try to do "long int"
+           sized copies.  */
+        while (count >= sizeof(long int) && !DETECTNULL(*aligned_src)) {
+            count -= sizeof(long int);
+            *aligned_dst++ = *aligned_src++;
+        }
+
+        dst = (char *)aligned_dst;
+        src = (char *)aligned_src;
+    }
+
+    while (count > 0) {
+        --count;
+        if ((*dst++ = *src++) == '\0')
+            break;
+    }
+
+    while (count-- > 0)
+        *dst++ = '\0';
+
+    return dst0;
+}
