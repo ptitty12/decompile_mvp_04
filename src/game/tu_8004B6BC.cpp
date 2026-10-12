@@ -6,6 +6,10 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+void fn_800109F4();
+void fn_80011378(int a);
+void fn_80011534();
+void fn_800108C8(int a, int b, int c);
 struct Unk8004BC9C_Row {
     char pad0[0x1B4];
     unsigned char m1B4[0x80];
@@ -61,7 +65,7 @@ void fn_800130DC(int a, int b);
 void fn_80010754(int a, int b);
 void fn_80011218();
 
-int fn_8004B6BC(Unk800493D4_Sm* s, int idx)
+int fn_8004B6BC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* unused)
 {
     int a = fn_8005000C(s, idx, 0x24);
     int b = fn_8005000C(s, a, 0x24);
@@ -233,6 +237,42 @@ void fn_8004C3F4(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
         if (*(int*)(rec + 4))
             fn_8004B910(s, idx, a);
         fn_8004FCDC(s, idx, a);
+    }
+}
+
+void fn_8004C4D0(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    int o = idx * 0x48;
+    char* b4 = (char*)s + 4;
+    int k = *(int*)(b4 + o);
+    if (k < a->m4D4) {
+        int off = k * 0x18 + 0x48C;
+        char* rec = (char*)a + off;
+        if (*(int*)(rec + 4) != 0) {
+            fn_8004B910(s);
+            if (fn_8004B6BC(s, idx, a) == 0) {
+                int m = a->m4D8;
+                if (m == 2 && s->mA5C == 0 && a->m104 == 1) {
+                    fn_8004E954(s, idx, a);
+                } else if (m == 3 && s->mA60 == 0) {
+                    fn_8004EAD4(s, idx, a);
+                } else {
+                    int t = fn_8005000C(s, idx, 0x59);
+                    if (t != -1 && *(int*)(b4 + t * 0x48) == *(int*)(rec + 4))
+                        fn_800109F4();
+                    if (fn_800507D8(s, idx, a) != 0 || *(int*)(rec + 0xC) == 3) {
+                        fn_80011378(fn_80044D3C(*(int*)(rec + 0xC)));
+                    } else {
+                        int x = fn_80044D3C(*(int*)(rec + 0xC));
+                        int y = ((Unk8001CE80*)a)->fn_8001DE9C();
+                        fn_800108C8(x, y, fn_8001F45C(a, *(int*)(rec + 8)));
+                    }
+                    if (*(int*)(rec + 0x10) == 1)
+                        fn_80011534();
+                }
+                fn_8004FCDC(s, idx, a);
+            }
+        }
     }
 }
 
