@@ -5,3 +5,31 @@
  * Every data object is extern by its lbl_ name.
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
+#include "snd/sndo.h"
+#include "snd/cmn/sndcmn.h"
+#undef override
+#include "snd/extern/aemsdef.h"
+#include "snd/cmn/saemsi.h"
+
+extern "C" {
+
+void fn_803A6D1C(int a, int b)
+{
+    if (b != 0xFFFF) {
+        return;
+    }
+    if (a == 0) {
+        return;
+    }
+    sndaems.timerclient = CListDStack();
+    sndaems.modulebank = CListDStack();
+    sndaems.allocatedstreams = CListDStack();
+    sndaems.freestreams = CListDStack();
+}
+
+void fn_803A6D54()
+{
+    fn_803A6D1C(1, 0xFFFF);
+}
+
+}
