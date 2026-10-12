@@ -177,6 +177,14 @@ struct Unk801655F0_Evt {          /* fn_801655F0 */
     int m14;
 };
 
+struct Unk80164624_Evt {          /* fn_80164624 */
+    int m0;
+    char pad4[4];
+    int m8;
+    char padC[4];
+    int m10;
+};
+
 #define EVK(T, k) ((T*)(e ? ((k) == e->m0 ? e : 0) : 0))
 
 
@@ -238,7 +246,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         fn_801654F0(EVK(Unk801654F0_Evt, id), t);
         break;
     case 0xA4:
-        fn_80164624(EVK(Unk80163CC4_Evt, id));
+        fn_80164624(EVK(Unk80164624_Evt, id));
         break;
     case 0x30:
         fn_80163A98();
@@ -350,6 +358,92 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
 }
 
 #undef EVK
+
+struct Unk8017A930_T;
+struct Unk80178BBC_T;
+void fn_8017CF00(Unk8017A930_T* t);
+void fn_80179114(Unk80178BBC_T* t, int a);
+extern "C" int fn_80097190(Unk801527C8_Team* t, int a);
+extern "C" int fn_80097300(Unk801527C8_Team* t, int a);
+extern "C" int fn_800968C0(Unk801527C8_Team* t, int a, int b);
+
+struct Unk80164624_Slots {
+    char pad0[0x3AC];
+    Unk80178BBC_T* m3AC;
+};
+
+void Unk80159F28::fn_80164624(Unk80164624_Evt* e) /* 80164624 */
+{
+    if (e != 0) {
+        int sel = -1;
+        switch (e->m8) {
+        case 0x26:
+            m1C = 0;
+            break;
+        case 0x27:
+            m20 = 0;
+            break;
+        case 0x28:
+            m24 = 0;
+            break;
+        case 1:
+            m10 = 0;
+            break;
+        case 0xD:
+            sel = 0;
+            break;
+        case 0xE:
+            sel = 1;
+            break;
+        case 0xF:
+            sel = 2;
+            break;
+        case 0x10:
+            sel = 3;
+            break;
+        case 0x11:
+            sel = 4;
+            break;
+        case 0x12:
+            sel = 5;
+            break;
+        case 0x13:
+            sel = 6;
+            break;
+        case 0x29:
+            m14 = 0;
+            m18 = 0;
+            break;
+        case 0x1C:
+        case 0x1D:
+        case 0x1E:
+            m30 = 0;
+            m38 = 0;
+            break;
+        case 0x1F:
+            fn_8017CF00((Unk8017A930_T*)mC->m700);
+            m3C = 0;
+            break;
+        case 0x23:
+        case 0x24:
+        case 0x25:
+            fn_80179114(((Unk80164624_Slots*)mC->m700)->m3AC, e->m10);
+            break;
+        }
+        if (sel != -1) {
+            int t = 0;
+            if (mC->m6F8->m14->m1CD0 != 0) {
+                t = 1;
+            }
+            Unk801527C8_Team* team = &mC->m6F8->m14->m0[t];
+            int* slot = fn_80161A5C(sel, fn_800968C0(team, fn_80097300(team, fn_80097190(team, 1)), 1));
+            *slot = 1;
+            m30C[sel] = 1;
+            m4C = -1;
+            m328 = m328 + 1;
+        }
+    }
+}
 
 void Unk80159F28::fn_8016482C() /* 8016482C */
 {
