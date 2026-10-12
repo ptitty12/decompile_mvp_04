@@ -371,6 +371,38 @@ extern "C" int fn_80389B34(void* x, int a, GlV3* p1, GlV3* p2, int p3, int flags
     return 1;
 }
 
+extern "C" void fn_80389EBC(GlPool* self)
+{
+    int off = 0;
+    for (int i = 0; i < 15; i++) {
+        char* b24 = (char*)self + 0x24;
+        char* b150 = (char*)self + 0x150;
+        int v = *(int*)(b24 + off);
+        if (v != 0) {
+            char* b20 = (char*)self + 0x20;
+            char* b28 = (char*)self + 0x28;
+            lbl_80624278->v3(*(int*)(b20 + off), v, *(int*)(b28 + off));
+        }
+        int w = *(int*)(b150 + off);
+        if (w != 0) {
+            char* b14C = (char*)self + 0x14C;
+            char* b154 = (char*)self + 0x154;
+            lbl_80624278->v3(*(int*)(b14C + off), w, *(int*)(b154 + off));
+        }
+        char* c20 = (char*)self + 0x20;
+        *(int*)(c20 + off) = 0;
+        *(int*)(b24 + off) = 0;
+        char* c28 = (char*)self + 0x28;
+        *(int*)(c28 + off) = 0;
+        char* c14C = (char*)self + 0x14C;
+        *(int*)(c14C + off) = 0;
+        *(int*)(b150 + off) = 0;
+        char* c154 = (char*)self + 0x154;
+        *(int*)(c154 + off) = 0;
+        off += 0x14;
+    }
+}
+
 extern "C" void fn_80389FAC(GlOwner18* self, char* base, int flag)
 {
     int off = ((GlV11*)lbl_80624278)->v11() * 0x30 + 0x20;
