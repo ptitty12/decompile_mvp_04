@@ -352,6 +352,28 @@ extern "C" FE_OVERLAY unsigned char fn_8047D240(char* x, int i)
     return b[i];
 }
 
+extern "C" FE_OVERLAY void fn_8047D24C(void* p, void* g, int id)
+{
+    if (fn_8007A270__18Unk8007A4DC_Screeni(g, id) != 0) {
+        int i = 0;
+        do {
+            fn_8047D21C((char*)p, i, ((char (*)(float))fn_800E01C8__Ff)(((float (*)(int, int))fn_800DEE38)(i, id)));
+            char t = fn_800DEDC0__Fii(i, id);
+            int k = i;
+            i++;
+            fn_8047D234((char*)p, k, t);
+        } while (i <= 4);
+        fn_8047D21C((char*)p, 5, fn_8007AB9C__18Unk8007A4DC_Screenii((int)g, 0, id));
+    } else {
+        fn_8047D21C((char*)p, 0, fn_8007AA84__18Unk8007A4DC_Screeniii((int)g, 1, id, 0));
+        fn_8047D21C((char*)p, 1, fn_8007AA84__18Unk8007A4DC_Screeniii((int)g, 0, id, 0));
+        fn_8047D21C((char*)p, 2, ((char (*)(void*, int, int))fn_8007A6A0__18Unk8007A4DC_Screenii)(g, 0xD, id));
+        fn_8047D21C((char*)p, 3, fn_8007AA84__18Unk8007A4DC_Screeniii((int)g, 1, id, 1));
+        fn_8047D21C((char*)p, 4, fn_8007AA84__18Unk8007A4DC_Screeniii((int)g, 0, id, 1));
+        fn_8047D21C((char*)p, 5, ((char (*)(void*, int, int))fn_8007A6A0__18Unk8007A4DC_Screenii)(g, 0xD, id));
+    }
+}
+
 extern "C" FE_OVERLAY FeScrH* fn_8047D3D0(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
