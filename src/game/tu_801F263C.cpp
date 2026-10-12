@@ -272,6 +272,35 @@ int fn_801F5214(float* a, float* b)
     return *a > *b;
 }
 
+struct Unk801F522C_Ow {
+    char pad0[0x6BC];
+    void** m6BC;
+};
+extern const Unk801EE438_Vec lbl_806055AC;
+int fn_8019BA30(void** o, Unk801EE438_Vec* a, Unk801EE438_Vec* b, float* t, Unk801EE438_Vec* v, Unk801EE438_Vec* out, int* i, double* e, float f);
+
+/* near-miss (4 slots): retail puts the 8-byte scratch at sp+0x20 and the first vector copy at sp+0x28; ours swaps them */
+int fn_801F522C(Scr* p, const Unk801EE438_Vec* a, const Unk801EE438_Vec* b, Unk801EE438_Vec* out, Unk801EE438_Vec* out2, float f)
+{
+    void** o = ((Unk801F522C_Ow*)p->m9C->m0)->m6BC;
+    if (o == 0) {
+        *out = lbl_806055AC;
+        return 0;
+    }
+    float x = 0.0f;
+    Unk801EE438_Vec v = lbl_806055AC;
+    int iv = 0;
+    Unk801EE438_Vec a2 = *a;
+    a2.m4 = a->m4 >? 6.0f;
+    double e;
+    Unk801EE438_Vec b2 = *b;
+    b2.m4 = b->m4 >? 6.0f;
+    int r = fn_8019BA30(o, &a2, &b2, &x, &v, out, &iv, &e, f) == -1 ? 0 : 1;
+    if (out2 != 0)
+        *out2 = v;
+    return r;
+}
+
 int fn_801F5394()
 {
     char buf[0xB8];
