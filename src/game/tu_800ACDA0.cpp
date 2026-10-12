@@ -53,19 +53,23 @@ struct FEBar {
     float m20;
     float m24;
 };
+
 inline float Clamp01(float r)
 {
     return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
 }
+
 /* reading the divisor through an inline puts the m24 load before the m20 load, as in retail */
 inline float Dur(FEBar* s)
 {
     return s->m24;
 }
+
 inline float Lerp(float a, float t, float b)
 {
     return a + t * (b - a);
 }
+
 /* ratio u/d written to o->m10, 0.0f when d is not positive (inline body shared with tu_800AB0E8) */
 inline void Ratio(FEBarO* o, float d, float u)
 {
@@ -75,6 +79,7 @@ inline void Ratio(FEBarO* o, float d, float u)
         o->m10 = u / d;
     }
 }
+
 struct UnkAt1C20 {
     char pad0[0x1C];
     void* m1C;
@@ -219,6 +224,7 @@ inline void FESub10Init(FESub10* s)
     s->m0 = 0;
     s->m4 = 0;
 }
+
 extern "C" {
 void fn_800ACFEC(void* p, int a);
 void fn_800B1C7C(void* p);
@@ -402,6 +408,64 @@ extern "C" void fn_800AD78C(void* p)
     }
 }
 
+struct FEVec2 {
+    float x;
+    float y;
+};
+inline FEVec2 operator-(const FEVec2& a, const FEVec2& b)
+{
+    FEVec2 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    return r;
+}
+
+inline FEVec2 operator*(const FEVec2& a, float s)
+{
+    FEVec2 r;
+    r.x = a.x * s;
+    r.y = a.y * s;
+    return r;
+}
+
+struct FECell {
+    int m0;
+    FEVec2 p0;
+    FEVec2 p1;
+    FEVec2 out;
+};
+struct FERow {
+    FECell c[8];
+};
+struct FERowsObj {
+    char pad0[0x314];
+    FERow rows[8];
+    char pad[0xAA4 - 0x314 - 0x700];
+    int mAA4;
+};
+extern "C" void fn_800AD838(void* p, float s)
+{
+    FERowsObj* self = (FERowsObj*)p;
+    int i = 0;
+    while (1) {
+        if (!(i < self->mAA4)) {
+            break;
+        }
+        int j = self->mAA4 - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
+            FECell* e = &self->rows[i].c[j];
+            if (e && e->m0) {
+                e->out = e->p1 - (e->p1 - e->p0) * s;
+            }
+            j--;
+        }
+        i++;
+    }
+}
+
 extern "C" void fn_800AD948(char* self, int key, float v)
 {
     int i = 0;
@@ -419,6 +483,43 @@ extern "C" void fn_800AD948(char* self, int key, float v)
             if (*(int*)(b1 + off) == key) {
                 char* b2 = self + 0x1C;
                 *(float*)(b2 + off) = v;
+            }
+            j--;
+        }
+        i++;
+    }
+}
+
+inline float FEMin(float a, float b)
+{
+    return a <? b;
+}
+extern "C" void fn_800AD9C0(void* p, int id)
+{
+    char* self = (char*)p;
+    const float a = 0.02f;
+    const float b = 0.2f;
+    const float c = 0.025f;
+    float st = FEMin(b, (float)*(int*)(self + 0xA88) * c + a);
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
+            int off = j * 0xC + i * 0x60;
+            char* b2 = self + 0x14;
+            FECell* e = &((FERowsObj*)self)->rows[i].c[j];
+            if (*(int*)(b2 + off) == id) {
+                if (!(e->out.x >= e->p0.x)) {
+                    e->out.x = e->p0.x + st;
+                } else {
+                    e->out.x = e->p0.x - st;
+                }
             }
             j--;
         }
