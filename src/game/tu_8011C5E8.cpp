@@ -109,6 +109,11 @@ extern const char lbl_805C00C8[];
 extern const char lbl_805C00D4[];
 extern const char lbl_805C00E0[];
 
+extern const char lbl_805BE42C[];
+extern const char lbl_805C006C[];
+extern const char lbl_805C007C[];
+extern const char lbl_805C008C[];
+extern const char lbl_805C009C[];
 // PROTOS-BEGIN
 extern "C" {
 void fn_8011C5E8(Unk80117D20_Scr* self);
@@ -359,6 +364,27 @@ void fn_8011DC70(Scr* self, int a)
         }
     }
     self->m1C4 = (Wid*)a;
+}
+
+void fn_8011DD28(Scr* self, int a)
+{
+    char buf[0x20];
+    fn_804089B4(buf, lbl_805BE42C, a);
+    fn_800C8048(self->m170)->fn_vslot30(buf);
+    switch (a) {
+    case 0x32:
+        fn_800CFB38(fn_800ED2B0(self->m1A4, lbl_805C006C));
+        break;
+    case 0x64:
+        fn_800CFB38(fn_800ED2B0(self->m1A4, lbl_805C007C));
+        break;
+    case 0x190:
+        fn_800CFB38(fn_800ED2B0(self->m1A4, lbl_805C008C));
+        break;
+    case 0x3E8:
+        fn_800CFB38(fn_800ED2B0(self->m1A4, lbl_805C009C));
+        break;
+    }
 }
 
 void fn_8011E220(Scr* self, int a)
