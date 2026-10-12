@@ -130,6 +130,45 @@ extern "C" int fn_8007F7D0__FP13Unk8007F198_BUi(int g, unsigned i);
 extern "C" int fn_8007B6F0__18Unk8007B2B0_Screen(int g, int a, int b, int c);
 extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
 
+extern int lbl_8061930C;
+extern "C" int fn_80097210(Obj3* o, int i);
+extern "C" int fn_8007E2D8__FP13Unk8007DB74_AiiPi(int g, int a, int b, int* out);
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+struct Unk80089894_PackTabD;
+int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
+extern "C" float fn_8056FFB0();
+extern "C" void fn_8009D9AC(Obj3* o);
+
+/* near-miss: the ratio is stored in each arm of the ternary; retail joins them with one store */
+extern "C" void fn_8009D0D4(void* ov)
+{
+    Obj3* o = (Obj3*)ov;
+    float thr;
+    float tmp;
+    int kind;
+    int g = lbl_8061930C;
+    int id = fn_80097210(o, 0);
+    kind = 0;
+    fn_8007E2D8__FP13Unk8007DB74_AiiPi(g, o->m198.m0, id, &kind);
+    thr = 0.0f;
+    if (kind == 3) {
+        thr = 0.05f;
+    } else if (kind == 4) {
+        thr = 0.15f;
+    } else {
+        Unk80089894_PackTabD* t = (Unk80089894_PackTabD*)((char*)o + 0xC74);
+        unsigned char k = fn_800968C0(o, id, 1);
+        int num = fn_80089AA0(t, 0x1B, k);
+        int den = fn_80089AA0(t, 0, k);
+        tmp = !((float)den <= 0.0f) ? (float)num / (float)den : 0.0f;
+        if (!(tmp >= 0.7f))
+            thr = 1.0f;
+    }
+    tmp = fn_8056FFB0();
+    if (!(tmp >= thr))
+        fn_8009D9AC(o);
+}
+
 extern "C" void fn_8009D8A8(Obj3* o, int a, ByteVec* v)
 {
     int g = lbl_8061930C;
