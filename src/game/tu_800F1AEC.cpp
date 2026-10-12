@@ -338,9 +338,9 @@ extern char lbl_806800B0[];
 extern char lbl_80655E98[];
 extern char lbl_80655BA8[];
 UiScrRaw* fn_800EB518(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D4704(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D7FE0(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D6184(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+int fn_804D4704(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+int fn_804D7FE0(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
+int fn_804D6184(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_804D3D74(char* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_804D24E8(char* self, char* sub);
 void fn_8040074C(void* p, unsigned n);
@@ -377,7 +377,6 @@ struct UiBufList {
         m14 = 0;
     }
 };
-/* near-miss: the sub-object constructor calls move the first argument (mr r3) before r4..r10; retail moves it last (24 slots, 97.9%) */
 UiScrRaw* fn_800F3E00(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EB518(self, a, b, c, d, e, f, g, h);
