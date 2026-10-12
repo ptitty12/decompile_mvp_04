@@ -352,6 +352,30 @@ FE_OVERLAY void fn_8047083C(FeScrL* x)
     }
 }
 
+FE_OVERLAY void fn_80470C08(FeScrL* x, int c)
+{
+    if (c != 0) {
+        ((FeW*)x->m348)->fn_vslot32("TEXT", 1)->fn_vslot8(0);
+        ((FeW*)x->m348)->fn_vslot32("VARTEXT", 1)->fn_vslot8(1);
+        ((FeW*)x->m348)->fn_vslot32("VARTEXT", 1);
+        fn_800C8044()->fn_vslot32("CAPTION", 1);
+        FeW* w = (FeW*)fn_800C8040();
+        switch (c) {
+        case 1: ((FeWV*)w)->s29(0x392D); break;
+        case 2: ((FeWV*)w)->s29(0x3926); break;
+        case 3: ((FeWV*)w)->s29(0x392B); break;
+        case 4: ((FeWV*)w)->s29(0x392C); break;
+        case 5: ((FeWV*)w)->s29(0x3923); break;
+        case 6: ((FeWV*)w)->s29(0x3925); break;
+        case 7: ((FeWV*)w)->s29(0x3924); break;
+        case 8: ((FeWV*)w)->s29(0x3921); break;
+        case 9: ((FeWV*)w)->s29(0x3922); break;
+        case 10: ((FeWV*)w)->s29(0x419F); break;
+        case 11: ((FeWV*)w)->s29(0x4FBD); break;
+        }
+    }
+}
+
 /* near-miss: store/load order of the m338/m328/m324 group differs */
 FE_OVERLAY void fn_80470E30(FeScrL* x, int a, int b, int c, int d)
 {
