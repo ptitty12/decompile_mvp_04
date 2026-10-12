@@ -386,6 +386,54 @@ void fn_801B4E24(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
     }
 }
 
+struct Unk801B4F14_Pair {
+    float a;
+    float b;
+};
+struct Unk801B4F14_O {
+    char pad0[0x44C];
+    int m44C;
+    char pad450[0x708 - 0x450];
+    int m708;
+    char pad70C[0xA04 - 0x70C];
+    int mA04;
+    char padA08[4];
+    char mA0C[4];
+};
+extern Unk801B4F14_Pair lbl_805CF7E0;
+extern Unk801B4F14_Pair lbl_805CF7D8;
+float fn_8024F048(char* p, int a, int b, int c, int d);
+float fn_8024F20C(char* p, int a, int b, int c, int d);
+inline float Unk801B4F14_Norm(float lo, float t, float hi)
+{
+    float span = hi - lo;
+    if (!(span <= 0.0f))
+        return (t - lo) / span;
+    return 0.0f;
+}
+inline float Unk801B4F14_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+void fn_801B4F14(Unk801AB63C_P* p, Unk801B23A8_Q* q, int* acc)
+{
+    int r = 0;
+    float x = 0.0f;
+    Unk801B4F14_O* o = (Unk801B4F14_O*)fn_801B63A0(p, q->m708);
+    if (o) {
+        x = fn_8024F048(o->mA0C, o->mA04, o->m44C, o->m708, 1) + fn_8024F20C(o->mA0C, o->mA04, o->m44C, o->m708, 1);
+    }
+    Unk801B4F14_Pair rng = lbl_805CF7E0;
+    Unk801B4F14_Pair out = lbl_805CF7D8;
+    if (!(x < rng.a)) {
+        float u = Unk801B4F14_Norm(rng.a, x, rng.b);
+        u = !(u > 1.0f) ? (u >? 0.0f) : 1.0f;
+        float res = Unk801B4F14_Lerp(out.a, u, out.b);
+        r = (int)res;
+    }
+    *acc += r;
+}
+
 void fn_801B50B4(Unk801AB63C_P* a, Unk801B23A8_Q* q, int* acc)
 {
     int r = 0;
