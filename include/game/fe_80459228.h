@@ -499,10 +499,10 @@ extern const char lbl_805F4F84[];
 extern const char lbl_805F3CA8[];
 extern int lbl_8061A308;
 extern "C" {
-void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const char* l);
+void* fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const char* l);
 void fn_804D3164(void* x);
 void fn_804D2DC0(void* x, int v);
-void fn_804D32A0(void* x);
+int fn_804D32A0(void* x);
 void fn_800ECF18(void* x);
 void* fn_800B7A94(FeMsgMgr* m, const char* name);
 void fn_80124FA8(void* w, void* x);

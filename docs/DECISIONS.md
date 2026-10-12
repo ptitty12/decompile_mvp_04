@@ -83,6 +83,30 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | 77 fe and 41 db code-only units for range workers. Build OK; main.dol == retail. | probe on work/setup-tail
 
+- 2026-10-11 | **Tail of main .text (0x8036F44C..0x8043FDB8): library map, flags and split** *[lead, owner authority]* (proposed by the tail-setup delegate). Probes compile one function or one reference file with candidate flags and compare it word for word to retail (relocation fields masked). "Reference" means the unmerged `port/mvp2005` branch (sources ported from mitsevox/mvp2005, CC0, commit f1e1763b; its unit ranges come from that project's filemap built from SN link maps) and W2's `match/W2-pad` branch; both are already in this repo.
+
+  | Range | Library | Configure lib / flags | Evidence |
+  |---|---|---|---|
+  | 0x80362FB4..0x803663B0 | EA libs (units keep their `game/` paths) | per-object `cflags_ealib` | fn_8036344C: exact at -O2 -G0; 11 slots off at -Os; 37 off with -ffloat-store (retail keeps the float params in f30/f31). The 29+39 functions already matching in tu_80362FB4/tu_80362A30 match either way. fn_80365C10 follows a 0xC alignment gap and opens the GX shader family of ealib/. |
+  | 0x8036F44C..0x8036FEA0 | EA shader TU "MVPNet" (was unsplit) | `ealib` | `_GLOBAL_.I` at 0x8036FE74 (.ctors 0x805A2C7C, moved from tu_8036FEA0) |
+  | 0x80377048..0x8038BC58 | EA gamelib (`C:/mvp2004/libraries/gamelib`: soa allocator, datafile, animlib) | `gamelib` = `cflags_game` | fn_80377624 exact only at -Os; fn_8037B92C 4/42 slots off at -Os vs 35 at -O2 (retail recomputes loop invariants); 232 float stores reloaded immediately from the same slot (the -ffloat-store tell; 0 in EAGL) |
+  | 0x8038BC58..0x8038EC58 | AV / VD (stream buffers, tBigSwizzler) | `ealib` | no r13 use; loops hoist invariants. Flags unconfirmed (no exact probe). |
+  | 0x8038EC58..0x803A4214 | VP6, MAD codecs, SPCH 3.18.01 | `ealib_sda` = -O2, default -G8 | 55 .sbss/.sdata variables reached via r13 (impossible at -G0); fn_8039055C exact at -O2 (also at -Os); invariants hoisted. -O2 over -Os is by the loop heuristic only. |
+  | 0x803A4214..0x803BA9DC | EA SND 9.02.04 + csis | `snd` (mitsevox flags, C++) | reference saems.c 74/74, smemman.c 5/5, salloc.c 4/4 exact; `cflags_ealib` gives 54/74. csis loops keep `mulli` per iteration (-fno-strength-reduce). |
+  | 0x803BA9DC..0x803EB2AC | EAGLAnim + EAGL (with the 2 `ealibs/` units) | `ealib` | fn_803BD8BC exact only at -O2 -G0; the ealibs units match at -O2 -G0. One r13 load in fn_803E7320 is `_impure_ptr`, which newlib declares in .sdata. |
+  | 0x803EB2AC..0x80403E80 | RealCore (realmem/realfile/realmemcard/...) and the formatting code after it | `ealib_sda` | r13 to its own .sdata/.sbss variables; fn_803EB2EC and fn_803EE450 exact at -O2 (G8); fn_803FF008 hoists the ctype table address (-O2; -Os does not) |
+  | 0x80403E80..0x80406DCC | SN libsn debug kernel | `libsn` | hand-written (`lis rX,@h; nop` pairs, exception stubs, 4-byte PC* traps): original code, excluded from matching |
+  | 0x80406DCC..0x80407C64, 0x8043EDC4..0x8043EFA4 | libsn C parts | `libsn` = -O2 -G0 -fno-common | reference FSasync.c 13/13 and dummy.c 8/8 exact; FSasync.c drops to 2/13 at default -G8 and 4/13 at -Os |
+  | 0x80407C64..0x8040FCA0, 0x8043EFA4 | SN libc (newlib 1.8.2) | `libc` = -O2 -fno-common | reference memcpy, strcmp, qsort, rand, strtok, errno, atexit, fclose, vfprintf (7/7) exact; -G0 breaks the small-data users; -Os breaks all |
+  | 0x8040FCA0..0x80413878 | SN libm (fdlibm) | `libm` = -O2 -mfast-cast -msafe-sda -G 1024 -fno-builtin -mstrict-align | reference e_exp, s_floor, ef_atan2, k_rem_pio2, sf_sin exact; plain -O2 fails all |
+  | 0x80413940..0x80414F30 | libgcc DI-mode helpers + terminate support | `libgcc` | unconfirmed: `__clz_tab` is reached via r13, so -G0 may be wrong for these |
+  | 0x80414F30..0x8043D960 | Dolphin SDK (AI, amcstubs, AR, ARQ, AX, base, CARD, DB, DSP, DVD, EXI, GX, MTX, OS, PAD, SI, VI) | `dolphin_sdk` (dolsdk2004 release flags); `dolphin_dvd`/`dolphin_mtx` -char signed, `dolphin_exi` -O3,p | reference CARDBlock.c 6/6, GXTev.c 14/14, dvdqueue.c 5/5, OSMessage.c 3/3 exact under GC/1.2.5n. The dvd/mtx/exi deviations are mitsevox's, not re-measured. Library starts from the 13 OSRegisterVersion callers. The existing OS.c/AI.c units keep their flags. |
+  | 0x8043D960..0x8043E344 | SDK VM | `dolphin_vm` (GC/2.0) | prologue saves LR after the stack update (MWCC 2.x), as mitsevox reports |
+  | 0x8043E344..0x8043EDC4, 0x8043F058..0x8043FDB8 | `sdk/` (library unconfirmed; the second is probably DebuggerDriver) | `dolphin_sdk` / `dolphin_dbg` (GC/2.0) | prologue styles only |
+
+  Split: 254 code-only units (.text only, data extern by lbl_), ~25-60 functions each, cut at ctor-stub TU ends, library starts and reference file boundaries. Units carry the real file name where a reference range exists (libc, libm, libsn, snd/cmn, CARD/GX/DVD/OS/AX files, W2's dsp/pad/si/vi), so those sources can be ported 1:1. Only `__save_gpr`/`__restore_gpr` (original code) and `.init` stay in dtk auto units. main.dol OK and verify PASS after each setup commit.
+  | Covers the last unsplit .text | commits 47e84bc, 7965e8f, f15dbab, 4628a18 |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 

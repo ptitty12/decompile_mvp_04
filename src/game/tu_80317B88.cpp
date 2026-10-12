@@ -494,13 +494,15 @@ void fn_8031AB8C(FxRec* r, int x, int y) {
 }
 
 // fn_8031AC48
-/* near-miss: retail schedules the string-byte load after the stores */
+/* The name byte is read inside an inline: that read is not an unchanging MEM, so
+ * sched keeps it after the int stores, as in retail. */
+inline void FxRecName(FxRec* r, const char* s) { r->name[0] = s[0]; }
 FxRec::FxRec() { // fn_8031AC48
-    m3C = 0;
-    m38 = -1;
     m28 = 0;
     m2C = 0;
-    name[0] = lbl_805E7988[0];
+    m38 = -1;
+    m3C = 0;
+    FxRecName(this, lbl_805E7988);
 }
 
 void fn_8031AC74() {}
