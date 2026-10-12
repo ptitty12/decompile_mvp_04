@@ -62,7 +62,7 @@ struct Unk803B21EC {
     int m48;
     Unk803B31B4* m4C;
     Unk803B27DC_Obj* m50;
-    int m54;
+    Unk803B27DC_Obj* m54;
     Unk803B27DC_Obj* m58;
 };
 
@@ -230,6 +230,30 @@ extern "C" void fn_803B2AB4(int idx, int v)
         fn_803B31B4(e->m4C, v);
 }
 
+extern "C" void fn_803B2AF0(float* a, float* b, float* out, int n, int shift)
+{
+    int off;
+    float step, start;
+    if (shift > 0) {
+        off = shift;
+        step = -1.0f / (float)n;
+        start = 1.0f;
+    } else {
+        off = -shift;
+        step = 1.0f / (float)n;
+        start = 0.0f;
+    }
+    int i;
+    for (i = off; i < n; i++) {
+        out[i - off] = start * a[i] + (1.0f - start) * a[i - off];
+        start += step;
+    }
+    for (i = 0; i < off; i++) {
+        out[n - off + i] = start * b[i] + (1.0f - start) * a[n - off + i];
+        start += step;
+    }
+}
+
 /* near-miss: 38 vs 39 insns: retail keeps o in r31 and n in r29 (loads m3C, m38, *count up front, then n = m38 / *count); ours swaps those two saved registers and orders the loads differently; local-variable and load-order variants tried */
 extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
 {
@@ -350,4 +374,26 @@ extern "C" int fn_803B3CF8(int shandle, int v)
             fn_803B1080(setvoice, v);
     }
     return voice;
+}
+
+extern CHANPUB* lbl_8069CA48; /* sndgs.chan (sndgs + 0x1CC), named by its own symbols.txt entry */
+
+void iSNDcalcpitch(int chan)
+{
+    CHANPUB* c = &lbl_8069CA48[chan];
+    if (c->detunepitch == 0) {
+        int pitch = c->initialdetune;
+        if (c->bendrange != 0) {
+            signed char v;
+            if (c->pbendtable != 0)
+                v = ((signed char*)c->pbendtable)[c->pitchbend];
+            else
+                v = c->pitchbend;
+            pitch += ((v - 0x40) * (short)c->bendrange) >> 6;
+        }
+        if (c->ppitchlfo != 0)
+            pitch += ((((signed char*)c->ppitchlfo)[c->curpitchlfoentry] - 0x40) * c->pitchlfodepth) >> 6;
+        c->detunepitch = fn_803B3B98(pitch);
+    }
+    c->finalpitch = (c->detunepitch * c->progpitch) >> 12;
 }
