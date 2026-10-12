@@ -28,6 +28,10 @@ int fn_801D7A3C(void* self, int k);
 struct Unk801CAFA0_R {
     char pad0[0x30];
     int m30;
+    char pad34[0x40];
+    int m74;
+    char pad78[4];
+    int m7C;
 };
 Unk801CAFA0_R* fn_801A6DB8(P* p);
 float fn_801CCA40(Z* z);
@@ -60,7 +64,14 @@ float fn_801CC0CC(Z* z);
 
 struct Unk801CAFA0_G {
     float m0[6];
-    char pad18[0x78 - 0x18];
+    char pad18[0x48 - 0x18];
+    float m48;
+    float m4C;
+    float m50;
+    char pad54[0x68 - 0x54];
+    float m68;
+    float m6C;
+    char pad70[0x78 - 0x70];
     float m78;
     float m7C;
     int m80;
@@ -91,6 +102,97 @@ void fn_801CA654(Z* z);
 int fn_801CDA84(Z* z);
 }
 extern float lbl_805D1C18;
+struct Unk8019F8C0_Owner;
+int fn_801A37D8(Unk8019F8C0_Owner* o);
+extern "C" int fn_801D5A64(void* s, int* o1, int* o2, int* o3);
+extern "C" int fn_801C4A54(Z* z, int* a, int* b);
+extern "C" void fn_801CF430(Z* z);
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" float fn_801CAFA0(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    P* p = fn_801A4B34(z->m204);
+    int k = p->v4();
+    float rem = 1.0f - f;
+    int r = 1;
+    if (AbsF(z->m144) <= 0.65f || !(AbsF(v.x) < 0.4f)) {
+        if (k != 0) {
+            if (!(v.x >= 0.0f))
+                r = 0;
+        } else {
+            if (!(v.x <= 0.0f))
+                r = 0;
+        }
+    } else {
+        r = 0;
+    }
+    if (r) {
+        float a = 0.37f;
+        if (z->m128 == 5)
+            a = 0.55f;
+        return 0.8f - ((0.8f - a) * rem);
+    }
+    float a = 0.99f;
+    if (z->m128 == 5)
+        a = 0.99f;
+    return (a - 0.8f) * rem + 0.8f;
+}
+
+inline Vec3 Scale(const Vec3* v, float s)
+{
+    Vec3 r;
+    r.x = v->x * s;
+    r.y = v->y * s;
+    r.z = v->z * s;
+    return r;
+}
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+struct Unk801CAFA0_ZW {
+    char pad0[0x168];
+    Vec3 m168;
+    Vec3 m174;
+    float m180;
+    Vec3 m184;
+};
+struct Unk801CAFA0_V4 {
+    Vec3 v;
+    float w;
+};
+extern "C" int fn_801CF588(Z* z, void* out, Vec3* in, Vec3* b, float f);
+
+extern "C" void fn_801CB148(Z* z)
+{
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    *(V2*)z->m150 = v;
+    z->m1F8 = 0.8f;
+    float t = ((Unk801CAFA0_ZW*)z)->m180 - (float)z->m204->m4C * 0.016666668f;
+    Unk801CAFA0_V4 a;
+    Unk801CAFA0_V4 b;
+    Unk801CAFA0_V4 q;
+    if (fn_801CF588(z, &q, &a.v, &b.v, t)) {
+        Vec3 d = b.v - a.v;
+        ((Unk801CAFA0_ZW*)z)->m184 = a.v + Scale(&d, z->m1F8);
+        ((Unk801CAFA0_ZW*)z)->m174 = b.v;
+        ((Unk801CAFA0_ZW*)z)->m168 = a.v;
+    }
+}
 
 extern "C" void fn_801CB324(Z* z) { fn_801CB360(z); }
 
@@ -118,8 +220,6 @@ extern "C" float fn_801CBEBC(Z* z)
     float r = fn_8024F048(p->mA0C, p->mA04, p->m44C, p->m708, 0);
     return r;
 }
-
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
 
 extern "C" float fn_801CBF04(Z* z)
 {
@@ -220,6 +320,31 @@ extern "C" float fn_801CC648(Z* z)
     return r;
 }
 
+extern "C" void fn_801CC718(Z* z)
+{
+    if (z->m204->m6CC->m38C != 2) {
+        z->m1FC = 0.0f;
+    } else {
+        float a = fn_801CBE74(z);
+        float b = fn_801CBF04(z);
+        float c = fn_801CBFC8(z);
+        float d = fn_801CC028(z);
+        lbl_8068C420.m68 = a;
+        lbl_8068C420.m6C = fn_801CBEBC(z);
+        lbl_8068C420.m4C = b;
+        lbl_8068C420.m48 = c;
+        lbl_8068C420.m50 = d;
+        float t = d;
+        t = t * c;
+        t = t * (1.0f - b);
+        if (fn_801A6DB8(z->m204)->m74 != 0)
+            t = 0.0f;
+        t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+        a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
+        z->m1FC = (a - t) * 0.5f + 0.5f;
+    }
+}
+
 extern "C" void fn_801CC894(Z* z)
 {
     for (int i = 0; i < 6; i++)
@@ -272,6 +397,36 @@ extern "C" float fn_801CCA40(Z* z)
         r = t;
     }
     return r;
+}
+
+struct Unk801CAFA0_Tbl16 {
+    float v[16][2];
+};
+extern Unk801CAFA0_Tbl16 lbl_805D1B60;
+extern float lbl_8068C7C4;
+
+extern "C" float fn_801CCBE8(Z* z)
+{
+    float lo = 18.0f;
+    float hi = -18.0f;
+    if (z->m204->m6CC->m38C != 2)
+        return 0.0f;
+    float av = AbsF(fn_80235DA8(z->m4->m3B0));
+    Unk801CAFA0_Tbl16 t = lbl_805D1B60;
+    int idx = fn_80235E28(z->m4->m3B0);
+    float a = t.v[idx][0];
+    float b = t.v[idx][1];
+    float mix = av;
+    if (idx == 3)
+        mix = RandFP(z->m204, 1.0f, 0x1682);
+    float r = mix * a + (1.0f - mix) * b;
+    float res = 0.0f;
+    lbl_8068C7C4 = r;
+    if (!(r >= 0.0f))
+        res = !(r * 0.055555556f > 0.0f) ? (r * 0.055555556f >? -1.0f) : 0.0f;
+    else
+        res = !(r * 0.055555556f > 1.0f) ? (r * 0.055555556f >? 0.0f) : 1.0f;
+    return res;
 }
 
 extern "C" float fn_801CD068(Z* z)
@@ -505,4 +660,46 @@ extern "C" void fn_801CEE40(Z* z)
     z->m140 = !(z->m140 > 1.0f) ? (z->m140 >? -1.0f) : 1.0f;
     lbl_8068C420.m78 = z->m13C;
     lbl_8068C420.m7C = z->m140;
+}
+
+/* near-miss (95.4%): retail loads the m7C test into r0 (ours keeps it in r29 and reuses it as the zero for m12C)
+ * and stores m128 before loading b; neither the order nor the scoping of the locals changed it. */
+extern "C" int fn_801CEF18(Z* z)
+{
+    int r = 0;
+    if (fn_801A37D8((Unk8019F8C0_Owner*)z->m204) != 0)
+        return 0;
+    if (fn_801A6DB8(z->m204)->m7C != 0)
+        return 0;
+    if (fn_801C4128(z)) {
+        int a = 0;
+        int b = 0;
+        r = fn_801D5A64(z->m20C, &z->m124, &a, &b);
+        if (r) {
+            int t = a;
+            if (t)
+                t = 5;
+            z->m128 = t;
+            if (b == 0)
+                z->m12C = 1;
+            else
+                z->m12C = 0;
+        }
+    } else {
+        int c = 0;
+        r = fn_801C4A54(z, &z->m124, &c);
+        if (r) {
+            int t = c;
+            if (t)
+                t = 5;
+            z->m128 = t;
+        }
+    }
+    if (fn_801A4B34(z->m204)->m618->m838 == 0x0AB6992B && z->m124 == 2) {
+        r = 0;
+        z->m124 = 0;
+    }
+    if (r)
+        fn_801CF430(z);
+    return r;
 }

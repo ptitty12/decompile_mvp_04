@@ -4,6 +4,7 @@
  */
 #include "game/tu_801C2C64.h"
 #include "game/goals/tu_8027C728.h"
+#include "game/goals/tu_8027A84C.h"
 #include "game/tu_801C6D2C.h"
 
 typedef Unk801B7FB0_P P;
@@ -147,6 +148,50 @@ inline int HashOf(P* p) { return p->m618->m838; }
 extern Vec3 lbl_805D30D4;
 
 inline int Byte1CC9(unsigned char c) { return c; }
+
+extern "C" void fn_801C39D8(Z* z, int i);
+extern "C" int fn_801C38F0(Z* z, float f);
+extern "C" P* fn_801C1638(P* c, int i);
+extern "C" int fn_8018AD20(P* p);
+extern "C" int fn_8018AD2C(P* p);
+extern "C" void fn_801D8788(void* p, P* q, int k);
+struct Unk801C2C64_ZW {
+    char pad0[0xE8];
+    int mE8;
+};
+
+extern "C" void fn_801C2C64(Z* z)
+{
+    int flag = 0;
+    if (z->m204->m6F8->m14->m1CD0 != 0)
+        flag = 1;
+    fn_801C39D8(z, fn_801A2034(z->m204, flag));
+    z->m28C.m0 = 0;
+    int k2 = 2;
+    int k3 = 3;
+    int k4 = 4;
+    int mode = z->m204->m6F4;
+    if (mode != k2 && mode != k3 && mode != k4) {
+        int go = 1;
+        if (z->m128 != 5 && fn_8018AD20(z->m204->m6CC) != 0 && fn_8018AD2C(z->m204->m6CC) != 0)
+            go = fn_801C38F0(z, 0.0f) ^ 1;
+        if (go != 0)
+            fn_801C34AC(z, 9);
+        if (z->m124 == 2 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 1) {
+            int a = 1;
+            if (fn_801C1638(z->m204, 0xA) == 0)
+                a = 0;
+            int b = 1;
+            if (fn_801C1638(z->m204, 0xB) == 0)
+                b = 0;
+            int c = fn_801C1638(z->m204, 0xC) != 0;
+            if (a != 0 || b != 0 || c != 0)
+                ((Unk801C2C64_ZW*)z)->mE8 = 1;
+        }
+        P* q = fn_801A4B34(z->m204);
+        fn_801D8788(z->mE0, q, 0);
+    }
+}
 
 extern "C" void fn_801C2DEC(Z* z, int force)
 {
@@ -469,6 +514,36 @@ extern "C" int fn_801C415C(Z* z)
     return fn_801D5974(z->m20C);
 }
 
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+struct Unk80270BA0_X;
+int fn_80244E3C(Unk80270BA0_X* x, Vec3* out);
+struct Unk801C2C64_ZV {
+    char pad0[0x298];
+    int m298;
+};
+
+extern "C" void fn_801C41C0(Z* z, P* p)
+{
+    if (((Unk801C2C64_ZV*)z)->m298 == 0 && p != 0) {
+        Vec3 v;
+        if (fn_80244E3C((Unk80270BA0_X*)p, &v)) {
+            Vec3 d = z->m29C[1].a - z->m29C[2].a;
+            z->m29C[0].b = v + d;
+            z->m29C[1].b = v;
+            z->m29C[2].b = v - d;
+            ((Unk801C2C64_ZV*)z)->m298 = 1;
+        }
+    }
+}
+
 extern "C" int fn_801C4334(Z* z)
 {
     P* p = fn_801A4B34(z->m204);
@@ -573,6 +648,93 @@ extern "C" void fn_801C4D04(void)
     }
 }
 
+class Unk80287D70 {
+public:
+    void fn_80287D50(int v);
+    Unk80287D70* fn_80287DB8(int kind);
+};
+struct Unk802A2DA4_Goal;
+Unk802A2DA4_Goal* fn_802A2DC0(Unk802A2DA4_Goal* g, float f);
+static inline void SetAngleF8(Unk802726BC_Angles* p, float v)
+{
+    if (p->m190 == 1) {
+        p->m8[0] = v;
+    }
+    int off = p->m190 * 4 + 8;
+    *(float*)((char*)p + off) = v;
+}
+
+/* near-miss (98.3%): registers and code match; retail puts the Vec3 v on top of the freed float slots at
+ * frame 0x8 (frame 0x30), ours allocates v at 0x8 and the float slots at 0x18/0x20 (frame 0x40). */
+extern "C" void fn_801C4DA4(Z* z, int k)
+{
+    Vec3 v;
+    int sel = 0;
+    Unk8027C728_Goal* g;
+    P* p = fn_801A4B34(z->m204);
+    switch (k) {
+    case 3:
+        sel = 1;
+        break;
+    case 4:
+        sel = 1;
+        break;
+    case 7:
+        sel = 1;
+        break;
+    }
+    if (sel != 0) {
+        int mode = z->m204->m6F4;
+        if (mode == 3) {
+            g = fn_802448F4(p, 4);
+            g->m10 = 0x10;
+            fn_8027C728(g);
+            float f = 59.055118f;
+            *(int*)((char*)g + 0x60) = k;
+            Unk8027C728_Goal* g0 = g->m0;
+            SetAngleF8((Unk802726BC_Angles*)((char*)p + 0x734), f);
+            g0->m10 = 0xB;
+            fn_8027C728(g0);
+            ((Unk80287D70*)g0->m18)->fn_80287D50(0x2D9F492A);
+            Unk8027C728_Goal* g1 = g0->m0;
+            g1->m10 = 9;
+            fn_8027C728(g1);
+            fn_802A2DC0((Unk802A2DA4_Goal*)g1->m18, 1.0f);
+            Unk8027C728_Goal* g2 = g1->m0;
+            g2->m10 = mode;
+            fn_8027C728(g2);
+            *(int*)((char*)g2 + 0x60) = 1;
+            fn_8027D33C(g);
+            return;
+        }
+        if (fn_8017C94C(z->m4) == 0)
+            sel = 0;
+        if (sel != 0) {
+            g = fn_802448F4(p, 2);
+            g->m10 = 0x10;
+            fn_8027C728(g);
+            Unk8027C728_Goal* g2 = g->m0;
+            *(int*)((char*)g + 0x60) = k;
+            g2->m10 = 3;
+            fn_8027C728(g2);
+            *(int*)((char*)g2 + 0x60) = 1;
+            fn_8027D33C(g);
+            return;
+        }
+    }
+    g = fn_802448F4(p, 2);
+    g->m10 = 0x10;
+    fn_8027C728(g);
+    Unk8027C728_Goal* g0 = g->m0;
+    *(int*)((char*)g + 0x60) = k;
+    g0->m10 = 2;
+    fn_8027C728(g0);
+    fn_801C342C(&v, z);
+    ((Unk8027A84C*)g0->m18)->fn_8027A898(&v);
+    ((Unk80287D70*)g0->m18)->fn_80287DB8(9);
+    fn_8027D33C(g);
+}
+
 extern "C" void fn_801C53D8(void) {}
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
@@ -581,6 +743,38 @@ extern const Vec3 lbl_806055AC;
 extern int lbl_806242A0;
 extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
 extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
+
+struct Unk801C2C64_Q4 {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct Unk801C2C64_PV {
+    char pad0[0xAB8];
+    void* mAB8;
+};
+extern char lbl_806EF9C4;
+extern "C" int fn_80389B34(void* x, int a, Vec3* p1, void* p2, int p3, int flags);
+extern "C" Unk801C2C64_Q4 fn_80379C80(const Vec3* a, const Vec3* b, const Vec3* c);
+
+extern "C" Unk801C2C64_Q4 fn_801C59A8(Z* z, P* p, const Vec3* a, const Vec3* b)
+{
+    char w[0x28];
+    Vec3 v = lbl_806055AC;
+    fn_80389B34(((Unk801C2C64_PV*)p)->mAB8, lbl_806EF9C4, &v, w, 0, 3);
+    Unk801C2C64_Q4 q;
+    char e[16];
+    char f[16];
+    char g[16];
+    fn_801C5740(z, p, &v, w, (int)a, (int)b, (int)e, (int)f, (int)g);
+    q.w = 0.0f;
+    *(Vec3*)&q = lbl_806055AC;
+    Vec3 r = *a;
+    r.y = 0.0f;
+    q = fn_80379C80(a, &r, b);
+    return q;
+}
 
 extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t)
 {

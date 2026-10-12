@@ -263,6 +263,79 @@ extern "C" void fn_801C21EC(Z* z)
         fn_801C3B04(z, p);
 }
 
+extern char lbl_80660650[];
+struct Unk801C16B0_Msg5B {
+    int m0;
+    const void* vptr;
+    int m8;
+    int mC;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived(int b, int a)
+    {
+        vptr = lbl_80660650;
+        mC = b;
+        m8 = a;
+    }
+};
+struct Unk801C16B0_PW {
+    char pad0[0x70C];
+    unsigned char m70C;
+};
+struct Unk8024EF40_A;
+void fn_80254DA4(Unk8024EF40_A* a, int b);
+extern "C" int fn_80097190(Unk801B7FB0_Team* t, int a);
+extern "C" int fn_80097300(Unk801B7FB0_Team* t, int a);
+extern "C" P* fn_801A49F0(P* p, int k, int v);
+extern "C" void fn_801A6A5C(P* p, Unk801B7FB0_Team* t, int idx, P* a, P* c, P* b);
+extern "C" void fn_8037893C(void* mgr, int type, void* ev, int a, void* t);
+void fn_8035B508(void* self, int c);
+inline int Byte1CC9(unsigned char c) { return c; }
+extern "C" void fn_801D043C(void* p);
+extern "C" void fn_801C2284(Z* z);
+extern "C" void fn_801D7AC4(void* p, P* q);
+
+extern "C" void fn_801C2544(Z* z)
+{
+    fn_801C2284(z);
+    fn_801D043C(z->m20C);
+    fn_801D7AC4(z->m8, z->m204);
+    fn_801C34AC(z, 0);
+    P* c = z->m204->m65C[9];
+    int idx = c->m708;
+    if (c)
+        fn_80254DA4((Unk8024EF40_A*)&c->m58C, 0);
+    if (Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 2) {
+        P* d = z->m204->m65C[0];
+        unsigned char e1 = 0xFF;
+        unsigned char e2 = 0xFF;
+        if (c)
+            e1 = ((Unk801C16B0_PW*)c)->m70C;
+        if (d)
+            e2 = ((Unk801C16B0_PW*)d)->m70C;
+        Unk801C16B0_Msg5B m;
+        m.Base(0x5B);
+        m.Derived(e1, e2);
+        fn_8037893C(&z->m204->m704, m.m0, &m, 0, 0);
+        z->m288 = 0;
+        fn_8035B508(&m, 2);
+    }
+    P* a = 0;
+    P* b = 0;
+    Unk801B7FB0_Team* t = &z->m204->m6F8->m14->t[idx];
+    int e1 = fn_80097300(t, fn_80097190(t, -1));
+    int e2 = fn_80097300(t, fn_80097190(t, 1));
+    Unk801B7FB0_Team* t2 = &z->m204->m6F8->m14->t[idx];
+    if (e1 != 0)
+        a = fn_801A49F0(z->m204, idx, e1);
+    if (e2 != 0)
+        b = fn_801A49F0(z->m204, idx, e2);
+    fn_801A6A5C(z->m204, t2, idx, a, c, b);
+}
+
 extern "C" void fn_801C26FC(void* self) { fn_801C38F0(self, 2.0f); }
 
 extern "C" void fn_801C2724(Z* z)

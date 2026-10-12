@@ -101,7 +101,7 @@ struct Unk801CF054_F4 {
 };
 extern Unk801CF054_F4 lbl_805D2788;
 extern "C" float fn_801D1994(Y* y);
-extern "C" float fn_801D15C0(Y* y);
+extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_8024D0F8(P* p, int k);
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v);
 extern "C" void fn_801D0C38(Y* y, Unk801CF054_V2 in, Unk801CF054_V2* out);
@@ -229,6 +229,51 @@ extern "C" void fn_801CF68C(Z* z, float* a, float* b, float* c)
     *c = t.v[r].z;
 }
 
+
+extern Unk801CF054_F4 lbl_805D1D8C;
+extern int lbl_80620364;
+extern float lbl_80620368;
+extern float lbl_8068C4BC;
+struct Unk801CF054_G {
+    char pad0[0x94];
+    float m94;
+    float m98;
+};
+extern Unk801CF054_G lbl_8068C420;
+extern "C" float fn_801CD068(Z* z);
+
+extern "C" float fn_801CF740(Z* z)
+{
+    float r = 0.0f;
+    if (z->m204->m6F4 == 2) {
+        int i = fn_802536D0(fn_801A4B34(z->m204));
+        Unk801CF054_F4 t = lbl_805D1D8C;
+        r = t.v[i];
+    } else {
+        float a = 0.0f;
+        float b = 0.0f;
+        float c = 0.0f;
+        fn_801CF68C(z, &a, &b, &c);
+        float k = 0.0f;
+        if (z->m128 == 5)
+            k = fn_801CD068(z);
+        else
+            k = z->m1FC;
+        k = !(k > 1.0f) ? (k >? 0.0f) : 1.0f;
+        r = (b - a) * k + a;
+        if (fn_8022F138(z->m4->m3B0))
+            r = c;
+        lbl_8068C420.m94 = a;
+        lbl_8068C420.m98 = b;
+    }
+    if (lbl_80620364 != 0)
+        r = lbl_80620368;
+    else
+        lbl_80620368 = r;
+    lbl_8068C4BC = r;
+    return r;
+}
+
 extern "C" float fn_801CF8CC(float x)
 {
     float a = 0.033333335f;
@@ -243,6 +288,67 @@ extern "C" float fn_801CF8CC(float x)
     else
         c = x * 0.033333335f + c;
     return c;
+}
+
+inline Vec3 VNormalize(const Vec3& v, float len)
+{
+    Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline float LengthR(const Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+extern const Vec3 lbl_806055AC;
+struct Unk801CF054_PlE {
+    Unk801CF054_Q4 a;
+    Unk801CF054_V2 b;
+};
+inline Vec3 MakeV(float x, float y, float z)
+{
+    Vec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+inline Vec3 VUnit(const Vec3& v)
+{
+    float len = LengthR(v);
+    if (len != 0.0f) {
+        return VNormalize(v, len);
+    }
+    return lbl_806055AC;
+}
+extern "C" int fn_80190F14(P* p, Unk801CF054_Q4* a, Unk801CF054_Q4* b, void* c);
+extern "C" float fn_80379AF4(const Unk801CF054_Q4* a, const Unk801CF054_Q4* b);
+
+extern "C" int fn_801CF96C(Z* z, float f, float* out)
+{
+    P* c = z->m204->m6CC;
+    if (c->m38C == 2) {
+        Unk801CF054_Q4 q;
+        char t20[16];
+        char t30[16];
+        Unk801CF054_PlE pl;
+        Unk801CF054_Q4 p2;
+        fn_801CF588(z, &q, (Vec3*)t20, (int)t30, f);
+        int r = fn_80190F14(c, &q, &pl.a, &pl.b);
+        if (r != 0) {
+            Vec3 n = VUnit(MakeV(1.0f, 0.0f, 1.0f));
+            *(Vec3*)&p2 = n;
+            p2.w = 0.0f;
+            *out = fn_80379AF4(&pl.a, &p2);
+        }
+        return r;
+    }
+    return 0;
 }
 
 extern "C" void fn_801CFB28(Z* z, float a, float b, float c)
@@ -387,6 +493,51 @@ inline P* GetPB(P** a, unsigned i)
     return 0;
 }
 
+struct Unk801CF054_X3C0 {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk801CF054_X700 {
+    char pad0[0x3C0];
+    Unk801CF054_X3C0* m3C0;
+};
+static inline int OkF(int f)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & 8) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+
+extern "C" void fn_801D094C(Y* y)
+{
+    if (OkF(((Unk801CF054_X700*)y->m30->m700)->m3C0->m14) == 0) {
+        Unk801CF054_V2 v;
+        int flag = 0;
+        fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+        if (v.x > 0.9f || !(v.x >= -0.9f))
+            flag = 1;
+        if (v.y > 0.9f || !(v.y >= -0.9f))
+            flag = 1;
+        if (flag != 0) {
+            float thr = 0.15f;
+            if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x143) >= thr)) {
+                y->m58 = 1;
+                if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x147) >= 0.75f)) {
+                    y->m5C = 0;
+                    y->m60 = 1;
+                } else {
+                    y->m5C = y->m30->m554->fn_8014D8AC(3, lbl_805D25E0, 0x155) + 2;
+                }
+            }
+        }
+    }
+}
+
 extern "C" int fn_801D0B48(Y* y)
 {
     Unk801CF054_T* t = lbl_8068B618;
@@ -433,6 +584,40 @@ extern "C" int fn_801D14A0(Y* y)
     return RandF4(y->m30, 1.0f, lbl_805D25E0, 0x283) <= f;
 }
 
+struct Unk801CF054_Mgr {
+    char pad0[0x9C];
+    float m9C;
+};
+struct Unk8022FE34_U {
+    int fn_80235E28();
+};
+struct Unk8024F40C_Mgr;
+struct Unk8024EF40_Q;
+int fn_8024F40C(Unk8024F40C_Mgr* self, int a, Unk8024EF40_Q* q, int k);
+int fn_8024F54C(int k);
+extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v);
+extern "C" float fn_801D18C8(Y* y);
+
+extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v)
+{
+    int h = ((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235E28();
+    P* p = fn_801A4B34(y->m30);
+    int cls = fn_8024F54C(h);
+    float a = fn_801D1D3C(y, v);
+    a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
+    float r = a;
+    Unk801CF054_Mgr* mgr = (Unk801CF054_Mgr*)p->mA0C;
+    float b = (float)fn_8024F40C((Unk8024F40C_Mgr*)mgr, p->mA04, (Unk8024EF40_Q*)p->m44C, cls) * 0.01f;
+    b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+    float c = 1.0f - mgr->m9C;
+    c = !(c > 1.0f) ? (c >? 0.0f) : 1.0f;
+    float t = (c + b) * 0.5f;
+    r = r * LerpATB(0.9f, t, 1.1f);
+    float d = fn_801D18C8(y);
+    r = r * LerpATB(0.75f, 1.0f - d, 1.0f);
+    return r;
+}
+
 extern "C" float fn_801D17D0(Y* y, Unk801CF054_V2* pos)
 {
     float r = 0.0f;
@@ -472,6 +657,34 @@ extern "C" float fn_801D18C8(Y* y)
     return t;
 }
 
+struct Unk801CF054_Tbl12 {
+    float v[12][2];
+};
+extern Unk801CF054_Tbl12 lbl_805D27C4;
+extern "C" int fn_8017C954(void* p);
+#define UNK801CF054_CLAMP(x, lo, hi) (!((x) > (hi)) ? (!((x) < (lo)) ? (x) : (lo)) : (hi))
+
+extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v)
+{
+    Unk801CF054_Tbl12 t = lbl_805D27C4;
+    int r = fn_8017C954(y->m30->m700);
+    int i;
+    if (r <= 11) {
+        i = r;
+        if (i < 0)
+            i = 0;
+    } else {
+        i = 11;
+    }
+    float dx = UNK801CF054_CLAMP(AbsF(v->x) - 1.0f, 0.0f, 1.0f);
+    float dy = UNK801CF054_CLAMP(AbsF(v->y) - 1.0f, 0.0f, 1.0f);
+    float d = fn_804028E4(dx * dx + dy * dy);
+    float s = !(d * 1.3333334f > 1.0f) ? (d * 1.3333334f >? 0.0f) : 1.0f;
+    float a = t.v[i][0];
+    float b = t.v[i][1];
+    return LerpATB(a, 1.0f - s, b);
+}
+
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
 {
     int small = 0;
@@ -481,10 +694,54 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     if (small)
         t = fn_801D1994(y);
     else
-        t = fn_801D15C0(y);
+        t = fn_801D15C0(y, v);
     P* q = fn_801A4B34(y->m30);
     t = t + LerpATB(-0.25f, fn_8024D0F8(q, 0x11), 0.25f);
     return t;
+}
+
+extern "C" int fn_801D25AC(Y* y)
+{
+    Unk801CF054_V2 v;
+    fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    float ax = AbsF(v.x);
+    float ay = AbsF(v.y);
+    if (!(ax >= 0.5f)) {
+        if (ay < 0.5f)
+            goto ret1;
+    }
+    if (!(ax >= 1.0f) && !(ay >= 1.0f)) {
+        if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x433) >= 0.95f)
+            goto ret0;
+    ret1:
+        return 1;
+    }
+    if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x43B) < 0.25f)
+        return 1;
+ret0:
+    return 0;
+}
+
+extern "C" int fn_801D2748(Y* y)
+{
+    Unk801CF054_V2 v;
+    fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    float ax = AbsF(v.x);
+    float ay = AbsF(v.y);
+    if (!(ax >= 0.8f)) {
+        if (ay < 0.8f)
+            goto ret1;
+    }
+    if (!(ax >= 1.0f) && !(ay >= 1.0f)) {
+        if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x456) >= 0.95f)
+            goto ret0;
+    ret1:
+        return 1;
+    }
+    if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x45E) < 0.25f)
+        return 1;
+ret0:
+    return 0;
 }
 
 extern "C" void fn_801D28E4(Y* y)

@@ -443,3 +443,36 @@ extern "C" void fn_801C97F4(Z* z)
     fn_801C8014(z, t);
     fn_801CB8B0(z, t);
 }
+
+struct Unk801C6D2C_ZV {
+    char pad0[0x158];
+    Vec3 m158;
+    char pad164[0x188 - 0x164];
+    float m188;
+    char pad18C[0x194 - 0x18C];
+    float m194;
+};
+extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c);
+
+extern "C" void fn_801C9D28(Z* z)
+{
+    Vec3 fwd = fn_801C5BD4(z);
+    float ang = fn_801C5D20(z, &fwd, &((Unk801C6D2C_ZV*)z)->m158);
+    float k = 0.0f;
+    float d = ((Unk801C6D2C_ZV*)z)->m194 - ((Unk801C6D2C_ZV*)z)->m188;
+    d = !(d > 3.0f) ? (d >? -3.0f) : 3.0f;
+    float u = 0.0f;
+    if (!(d < 0.0f)) {
+        u = d * 0.33333334f;
+        k = LerpATB(0.0f, u, 145.0f);
+    } else {
+        u = d * -0.33333334f;
+        k = LerpATB(0.0f, u, 145.0f);
+        k = -k;
+    }
+    float w = LerpATB(20.0f, u, 60.0f);
+    float lo = 20.0f;
+    float hi = 60.0f;
+    z->m1B0 = fn_801CE6E4(z, k, ang, w);
+    fn_801CA654(z);
+}
