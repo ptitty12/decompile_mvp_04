@@ -45,6 +45,10 @@ struct Unk801BAC74_PV32 : public Unk801B7FB0_PBase {
     virtual void v31(void* x);
     virtual void v32(void* x);
 };
+struct Unk801BAC74_O {
+    char pad0[0x1750];
+    int m1750;
+};
 struct Unk801BAC74_Rec {
     char pad0[0x2C];
     int m2C;
@@ -78,6 +82,12 @@ int fn_801BFA20(const Vec3* v);
 void fn_801BFC8C(void* o);
 void fn_801BFBEC(void* o);
 void fn_801BDDC8(B* b, P* p);
+int fn_801C1950(A* a);
+P* fn_801A4B34(P* ctx);
+int fn_8014E310(int x);
+P* fn_80257DFC(int h, P* q, int dir);
+int fn_8035E318(void* p);
+void fn_8017B658(int a, int k);
 void* fn_80234E44(void* p);
 void fn_8017B9F8(int a);
 void fn_801BDB84(B* b, P* p, int a, int c, const Vec3* v);
@@ -230,6 +240,39 @@ extern "C" int fn_801BB4EC(A* a) { return a->m8->m0 == -1 ? 0 : 1; }
 extern "C" int fn_801BB508(A* a) { return a->m8->m0 == 1; }
 
 extern "C" void fn_801BB520(A* a) { fn_801B9EC0(a->m8); }
+
+/* near-miss: same code; the list cursor and its saved copy swap r30/r31. */
+extern "C" void fn_801BB544(A* a, int flag)
+{
+    if (fn_801C1950(a) == 0) {
+        ((Unk801BAC74_O*)a->m14->m6F8->mC->mC)->m1750 = 1;
+        fn_801BDDC8(a->m8, a->m14->m6CC);
+    }
+    a->m20 = 1;
+    P* p = fn_801A4B34(a->m14);
+    P* last = 0;
+    if (p) {
+        P* cur;
+        do {
+            p->m5CC = fn_8014E310(p->m458 + 1);
+            cur = p;
+            p = fn_80257DFC(((Unk801C16B0_M4*)a->m10)->m3B4, cur, 1);
+        } while (p);
+        last = fn_80257DFC(((Unk801C16B0_M4*)a->m10)->m3B4, cur, 0);
+    }
+    if (flag) {
+        P* q = last;
+        if (q) {
+            do {
+                Unk801B7FB0_Sub58C* s = &q->m58C;
+                *(int*)((char*)s + 0x40) = fn_8035E318(s);
+                q = fn_80257DFC(((Unk801C16B0_M4*)a->m10)->m3B4, q, 1);
+            } while (q);
+        }
+        fn_8017B658(a->m10, 3);
+        a->m8->m28 = 2;
+    }
+}
 
 extern "C" void fn_801BB65C(A* a) { a->m1C = 1; }
 
