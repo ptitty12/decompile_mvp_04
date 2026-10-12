@@ -14,6 +14,8 @@ extern const float lbl_805D6000;
 extern const Vec3f lbl_805D6760[];
 extern const Vec3f lbl_805D676C;
 
+extern "C" void fn_80379F1C(const Vec3f* a, const Vec3f& b, const Vec3f& c, Vec3f* out);
+extern const float lbl_805D6014;
 extern "C" {
 float fn_80248450(void* p, const Vec3f* v, int a, int b);
 void fn_8021A53C(Task* t, Vec3f* a, Vec3f* b);
@@ -340,6 +342,41 @@ int fn_8021A194(Task* t, int a)
         r = 1;
     }
     return r;
+}
+
+void fn_8021A288(Task* t, int a, Player* b)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* g = in->m4;
+    RecQueue* q = in->m3A60;
+    Player* pl = (Player*)ObjAt(in->m8, in->m3A5C);
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    const Vec3f& gp = ((PosObj*)g)->m60;
+    const Vec3f& pp = ((PosObj*)pl)->m60;
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    Vec3f out = lbl_806055DC;
+    fn_80379F1C(&lbl_805D6760[a], FlatPos(gp), FlatPos(pp), &out);
+    e->m4 = 6;
+    e->m0 = 0x14;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m9C = 1;
+    e->m38 = out;
+    e->m1C = a;
+    e->m28 = b;
+    e->m88 = lbl_805D6014;
+    e->m80 = lbl_805D6014;
+    e->m94 = 1;
+    e->m50 = gp - pp;
 }
 
 void fn_8021A4A0(Task* t, int i)
