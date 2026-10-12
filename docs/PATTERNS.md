@@ -1445,3 +1445,34 @@ Matched 20 functions in 10 units. Scratch tools are in `scratchpad/W8o6/`.
 - Families 4 to 9 of the round-6 list were not reached: the row parser's `mr r3,r31`,
   scan-loop pointer copies, the duplicated goal pointer, the ealib switch subtree, the
   separate zero registers, and the round-5 leftovers.
+
+## Pass 4 (p4-00..p4-12, 2026-10-12, condensed from worker reports)
+
+Callees and calls:
+- A callee's declared return type changes argument-move order and cross-jumping of call tails. Toggle void/int (W8o5/rettoggle.py). When the prototype lives in a shared header, declare a local overload with a distinct pointer parameter type instead of editing the header.
+- A callee that reads r4..r6 its caller never sets takes the caller's parameters: pass them through, or widen the callee's prototype (`tools/match/passthru.py .`).
+- `bl` with `crclr cr1eq`: call through a variadic function-pointer cast. `crset`: a float passed to a varargs callee.
+- A function whose unmangled symbol another unit references can't be renamed by rename.py: define it `extern "C"` (change the TU's forward declaration too).
+- A virtual slot whose signature differs from the shared class: a local view class `class V { char pad0[0xVPTR]; virtual void s1(); ... virtual R sN(args); }` and a cast. g++ 2.95 puts the vptr after the data unless there is a polymorphic base; use an empty polymorphic base for vptr at 0. A virtual call on an embedded member binds statically; go through a pointer cast.
+
+Stack frames and floats (-ffloat-store):
+- BLKmode locals (structs > 8 bytes, arrays) get slots at their declaration, in order; address-taken scalars and 8-byte two-float structs get slots late, in address-taken order. Group V2s in one struct declared first to fix the layout. A never-read `float unused;` still reserves a slot; locals in a nested `{}` free their slot after the block.
+- An inline's float params get their own slots (outer inline first). Use pointer accessors, or a pass-through `inline float Id(float v)` to share one temp slot.
+- `const float k = 10.0f;` stays in a callee-saved FPR across calls; one initialised from an extern const is spilled and reloaded.
+- Nested `Len(Sub(a, b))` with no named Vec3 gives retail's slots; a named temp does not. A call result bound to a const reference uses the call temp directly.
+- Stack buffer sizes set the frame: try 0x3C/0x40/0x44 when only the frame differs.
+- `char buf[N] = "";` gives lbz/stb of the pooled empty string plus `memset(buf+1, 0, N-1)` with crclr.
+
+Registers and scheduling:
+- One loop counter shared across sibling loops raises its allocation priority.
+- Per-function volatile view of one field reproduces retail re-reads (never volatile in a shared header).
+- gcse merges `base + const` across joins: compute each use's base from a shared `off` local (`char* e2 = tbl + off;`).
+- `int r; if (c) r = ...; else {...} return r;` keeps the first arm first; `if (call() != 0) return 0;` hoists `li r3,0`.
+- `int z = 0; f = x < z;` keeps cmpwi+mfcr; `x < 0` folds to srwi. GT-bit extract (`rlwinm 30,31,31` after mfcr) means `>`.
+
+Switches:
+- `switch ((unsigned)kind)` gives the 1, <1, 2, 3 test order. Dummy `case 0: break;` / `case 6: break;` shape the root and leaves. GNU `case 0 ... 25:` ranges reproduce range trees; a dead statement between stacked labels stops range grouping. A default-label node moves the root: add `case 1:` to the default group.
+
+Data and literals:
+- Never write a symbol's address as an integer literal: name the symbol. check_literals resolves pointers to externs since 2026-10-12.
+- A struct of two floats `{0,0}` gives word stores; a 16-byte `{0,0,0,0}` gives a memset call.
