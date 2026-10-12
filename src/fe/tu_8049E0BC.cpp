@@ -634,8 +634,13 @@ FE_OVERLAY void fn_804A29F4(FeW* x)
     FeMsg* p = &m;
     x->fn_vslot80(1);
     fn_8035682C(p);
-    fn_8040B830(p->name, fn_800B5758(fn_800B555C()) == 1 ? lbl_805F75B8 : lbl_805F4450, 15);
-    p->name[15] = 0;
+    if (fn_800B5758(fn_800B555C()) == 1) {
+        fn_8040B830(p->name, lbl_805F75B8, 15);
+        p->name[15] = 0;
+    } else {
+        fn_8040B830(p->name, lbl_805F4450, 15);
+        p->name[15] = 0;
+    }
     fn_800B7B4C(FeGetMgr(), &m, x);
 }
 
