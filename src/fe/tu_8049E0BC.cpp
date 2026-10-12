@@ -51,6 +51,13 @@ extern const char lbl_805F7558[];
 extern const char lbl_805F6548[];
 extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
+extern "C" void fn_804A0E40(char* x);
+extern "C" void fn_804A1078(char* x);
+extern "C" void fn_804A1A18(char* x);
+extern "C" void fn_804A1C98(char* x);
+extern "C" void fn_804A282C(FeW* x);
+extern "C" void fn_804A13A8(char* x);
+extern "C" void fn_804A0D48(char* x);
 extern "C" void fn_804A1724(int a, FeW* x);
 extern "C" int fn_80552D98(void);
 struct Unk8007B2B0_Screen {
@@ -659,6 +666,60 @@ struct FeA13A8 {
     char pad0[0x14];
     void* arr[3];
 };
+FE_OVERLAY void fn_804A0B18(void* xx)
+{
+    char* x = (char*)xx;
+    int t = fn_800B548C(FeI(x, 0x178));
+    fn_804A0948(x, t);
+    if (FeI(x, 0x15C) != 0)
+        fn_804A1A18(x);
+    int c = fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, t);
+    int r = ((int (*)(void*, int, int))fn_804A0900)(x, FeI(x, 0x17C), c);
+    switch (FeI(x, 0x174)) {
+    case 1:
+        fn_804A13A8(x);
+        fn_804A0D48(x);
+        break;
+    case 6:
+        fn_804A0E40(x);
+        fn_804A1078(x);
+        fn_804A0A78(x, fn_800B548C(r));
+        fn_804A282C((FeW*)x);
+        break;
+    case 3:
+    case 4: {
+        FeW* w = FeMem(x, 0x224);
+        ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(r), 0);
+        fn_804A1078(x);
+        fn_804A282C((FeW*)x);
+        break;
+    }
+    case 5: {
+        FeW* w = FeMem(x, 0x224);
+        ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(r), 0);
+        fn_804A1C98(x);
+        fn_804A1078(x);
+        fn_804A282C((FeW*)x);
+        break;
+    }
+    case 7: {
+        FeW* w = FeMem(x, 0x224);
+        ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(r), 0);
+        int v = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, t);
+        fn_800C2034((char*)fn_800B555C() + 8, v);
+        break;
+    }
+    case 2: {
+        FeW* w = FeMem(x, 0x224);
+        ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(r), 0);
+        fn_804A1C98(x);
+        fn_804A1078(x);
+        fn_804A282C((FeW*)x);
+        break;
+    }
+    }
+}
+
 FE_OVERLAY void fn_804A0D48(char* x)
 {
     int arr[4];
