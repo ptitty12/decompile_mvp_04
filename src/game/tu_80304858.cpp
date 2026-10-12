@@ -96,6 +96,39 @@ struct Unk80304858_Sx {
     int m194;
 };
 extern int lbl_8061F94C;
+struct Unk8030741C_E {
+    char pad0[4];
+    float m4;
+};
+struct Unk8030741C_L {
+    char pad0[4];
+    Unk8030741C_E* e[15];
+};
+struct Unk8030741C_T {
+    int n;
+    char pad4[0x3C - 4];
+};
+struct Unk8030741C_O2 {
+    char pad0[0x54];
+    int m54;
+};
+struct Unk8030741C_O1 {
+    char pad0[0x54C];
+    Unk8030741C_O2* m54C;
+};
+struct Unk8030741C_P {
+    char pad0[0x1C];
+    Unk8030741C_O1* m1C;
+    char pad20[4];
+    int m24;
+    char pad28[0x40 - 0x28];
+    Unk8030741C_T t[5];
+    char pad16C[0x208 - 0x16C];
+    Unk8030741C_L* m208;
+    char pad20C[0x254 - 0x20C];
+    float m254;
+    unsigned m258;
+};
 extern "C" {
 void fn_80304098(void* p, int a, int b, int c, int d, int e);
 void fn_80304388(void* p, int c);
@@ -495,6 +528,24 @@ void fn_80306AC0(int obj, int mode)
         p->m214 = a;
     if (p->m218 != b)
         p->m218 = b;
+}
+
+void fn_8030741C(Unk8030741C_P* p)
+{
+    if (p->m24 != 0 && p->m1C->m54C->m54 == 3) {
+        unsigned idx = p->m258;
+        if (idx <= 4) {
+            int n = p->t[idx].n;
+            float sp8 = (float)n;
+            float spC = 1.0f / sp8;
+            int k = (int)(p->m254 * (float)(n - 1) + (!(p->m254 * (float)(n - 1) < 0.0f) ? 0.5f : -0.5f));
+            for (int i = 0; i < 15; i++) {
+                Unk8030741C_E* e = p->m208->e[i];
+                if (e != 0)
+                    e->m4 = ((sp8 - 1.0f) - (float)k) * -spC;
+            }
+        }
+    }
 }
 
 void fn_80307E20(Unk80304858_Slots* p, int i)
