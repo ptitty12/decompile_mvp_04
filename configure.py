@@ -385,6 +385,8 @@ cflags_snd = [
     "-mps-float",
     "-x c++",
     "-Iinclude",
+    "-Iinclude/libc",
+    "-Isrc",
     "-DEA_PLATFORM_GAMECUBE",
     "-DGEKKO",
 ]
