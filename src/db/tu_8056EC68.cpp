@@ -83,7 +83,6 @@ extern "C" void fn_8056DA98(void* p);
 extern "C" void fn_80570828(DbMgr* self);
 extern "C" void fn_80570E80(DbMgr* self);
 extern "C" void fn_80571618(DbMgr* self);
-extern "C" void fn_8056F10C(DbSel* self);
 
 extern "C" void fn_8056BEC8(DbScr* self);
 extern "C" void fn_8056BE98(void* self);
@@ -115,8 +114,35 @@ extern "C" void fn_8056E630(DbSel* s, int a);
 extern "C" int fn_80572710(DbMgr* self);
 extern "C" int fn_805721F8(DbMgr* self);
 extern "C" int fn_80571F4C(DbMgr* self, int a, int b);
+
+template <int MAX>
+struct Db80571060_It {
+    int v;
+    ~Db80571060_It() {}
+    int Next()
+    {
+        int t;
+        if (v > MAX)
+            t = v;
+        else
+            t = v + 1;
+        v = t;
+        return t;
+    }
+};
+
+extern const float lbl_805FFCA8;
+extern const float lbl_805FFCAC;
+
+struct Db8056ED54_T {
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+};
+extern const float lbl_805FFC7C;
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
+extern "C" void fn_8056ED54(DbSel* self, int idx);
+extern "C" void fn_8056F10C(DbSel* self);
 extern "C" void fn_8056F494(DbSel* self);
 extern "C" int fn_8056F51C(DbSel* self, int idx, void* p3);
 extern "C" void fn_8056F640(DbSel* self);
@@ -169,6 +195,66 @@ extern "C" DB_OVERLAY int fn_8056EC68(DbSel* self, int a, int b, int c, int d)
         fn_8056F640(self);
     }
     return r == 0;
+}
+
+extern "C" DB_OVERLAY void fn_8056ED54(DbSel* self, int idx)
+{
+    DbQ* q = fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, idx);
+    if (q->m0 != 0xFF && q->m8 != 1) {
+        int* sub = self->m14;
+        DbG* g = self->m10;
+        Db8056ED54_T* ta = (Db8056ED54_T*)TeamAt(g, sub[0]);
+        Db8056ED54_T* tb = (Db8056ED54_T*)TeamAt(g, sub[1]);
+        int rd = Round(g);
+        int sa = 0;
+        for (int i = 0; i < 0x80; i++)
+            sa += ta->m1B4[(unsigned char)i];
+        int sb = 0;
+        for (int i = 0; i < 0x80; i++)
+            sb += tb->m1B4[(unsigned char)i];
+        if (rd <= 1 && sa - sb <= 4) {
+            if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, idx + 1)->m0 == 0xFF) {
+                unsigned char b = q->m0;
+                if (b != 0xFF) {
+                    q->m8 = 1;
+                    float f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)ta + 0xC9C, 0x14, b);
+                    float p = f * lbl_805FFC7C * f;
+                    float rr = fn_8056FFB0();
+                    if (!(rr >= p))
+                        fn_8056EEA8(self, idx, 0);
+                }
+            }
+        }
+    }
+}
+
+extern "C" DB_OVERLAY void fn_8056F10C(DbSel* self)
+{
+    float f;
+    float p;
+    int did = 0;
+    if (Round(self->m10) <= 1) {
+        Unk8006A138_It<3> it(0);
+        int i = 0;
+        do {
+            if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, i)->m0 != 0xFF) {
+                int side = self->m14[0];
+                unsigned char bt = fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, it.v)->m0;
+                f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)TeamAt(self->m10, side) + 0xC9C, 0x15, bt);
+                p = (lbl_805FFCA8 - f) * lbl_805FFCAC;
+                if (!(fn_8056FFB0() >= p)) {
+                    self->m20 = 1;
+                    fn_8056EEA8(self, it.v, 0);
+                    did = 1;
+                    self->m20 = 0;
+                    break;
+                }
+            }
+            i = it.Next();
+        } while (i <= 2);
+    }
+    if (did == 0)
+        self->m20 = 1;
 }
 
 /* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
@@ -535,22 +621,6 @@ extern "C" DB_OVERLAY void fn_80570D4C(DbMgr* self)
             self->m118 = 0x1D;
     }
 }
-
-template <int MAX>
-struct Db80571060_It {
-    int v;
-    ~Db80571060_It() {}
-    int Next()
-    {
-        int t;
-        if (v > MAX)
-            t = v;
-        else
-            t = v + 1;
-        v = t;
-        return t;
-    }
-};
 
 extern "C" DB_OVERLAY int fn_80571060(DbMgr* self, int mode)
 {
