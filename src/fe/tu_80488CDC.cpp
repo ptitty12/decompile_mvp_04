@@ -3,6 +3,12 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+typedef int (*Fn9764_t)(void*, int, int, int);
+/* fn_8009764C takes its third argument as int here (the header's unsigned char adds a clrlwi). */
+static inline int FeCheck9764(void* t, int k, int r, int z)
+{
+    return ((Fn9764_t)fn_8009764C)(t, k, r, z);
+}
 
 extern "C" FE_OVERLAY FeScrH* fn_80488CDC(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -55,6 +61,30 @@ extern "C" FE_OVERLAY int fn_8048986C(FeW* x, int w)
     if (w == FeI(x, 0x154))
         x->fn_vslot41(fn_800C8070(x));
     return 1;
+}
+
+extern "C" FE_OVERLAY int fn_80489A44(int u, int idx, int mode)
+{
+    char* team = (char*)lbl_806192E0->m4->m14 + idx * 0xE64;
+    int i;
+    int n = *(unsigned char*)(team + 0x235);
+    for (i = 0; i < n; i++) {
+        int off = (unsigned char)i * 8;
+        char* arr = team + 0x238;
+        int id = *(int*)(arr + off);
+        int r = fn_800968C0(team, id, 1);
+        if (FeCheck9764(team, 3, r, 0) != 0) {
+            if (mode == 0) {
+                return id;
+            }
+        } else if (FeCheck9764(team, 4, r, 0) != 0 && mode == 1) {
+            return id;
+        }
+        if (FeCheck9764(team, 7, r, 0) != 0 && mode == 2) {
+            return id;
+        }
+    }
+    return 0;
 }
 
 /* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
