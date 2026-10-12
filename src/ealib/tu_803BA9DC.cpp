@@ -149,6 +149,93 @@ extern "C" void fn_803BB21C(EAGLSk* sk, char* a, char* out, unsigned* mask)
     }
 }
 
+struct EAGLSk2 {
+    char pad0[8];
+    int m8;
+    float* mC;
+};
+
+extern "C" void fn_803BB334(EAGLSk2* sk, float* out, unsigned* mask)
+{
+    int n = sk->m8;
+    int i;
+    if (mask != 0) {
+        if (sk->mC != 0) {
+            for (i = 0; i < n; i++) {
+                if (EAGLTestBit(mask, i)) {
+                    float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+                    out[0] = m[0];
+                    out[1] = m[1];
+                    out[2] = m[2];
+                    out[3] = sk->mC[i];
+                    out[4] = m[4];
+                    out[5] = m[5];
+                    out[6] = m[6];
+                    out[7] = m[7];
+                    out[8] = m[8];
+                    out[9] = m[9];
+                    out[10] = m[10];
+                    out[11] = 1.0f;
+                }
+                out += 12;
+            }
+        } else {
+            for (i = 0; i < n; i++) {
+                if (EAGLTestBit(mask, i)) {
+                    float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+                    out[0] = m[0];
+                    out[1] = m[1];
+                    out[2] = m[2];
+                    out[3] = 1.0f;
+                    out[4] = m[4];
+                    out[5] = m[5];
+                    out[6] = m[6];
+                    out[7] = m[7];
+                    out[8] = m[8];
+                    out[9] = m[9];
+                    out[10] = m[10];
+                    out[11] = 1.0f;
+                }
+                out += 12;
+            }
+        }
+    } else if (sk->mC != 0) {
+        for (i = 0; i < n; i++) {
+            float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+            out[0] = m[0];
+            out[1] = m[1];
+            out[2] = m[2];
+            out[3] = sk->mC[i];
+            out[4] = m[4];
+            out[5] = m[5];
+            out[6] = m[6];
+            out[7] = m[7];
+            out[8] = m[8];
+            out[9] = m[9];
+            out[10] = m[10];
+            out[11] = 1.0f;
+            out += 12;
+        }
+    } else {
+        for (i = 0; i < n; i++) {
+            float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+            out[0] = m[0];
+            out[1] = m[1];
+            out[2] = m[2];
+            out[3] = 1.0f;
+            out[4] = m[4];
+            out[5] = m[5];
+            out[6] = m[6];
+            out[7] = m[7];
+            out[8] = m[8];
+            out[9] = m[9];
+            out[10] = m[10];
+            out[11] = 1.0f;
+            out += 12;
+        }
+    }
+}
+
 extern "C" void fn_803BB600(EAGLSk* sk, char* a, char* out, unsigned* mask)
 {
     int n = sk->m8;
