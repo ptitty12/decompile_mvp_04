@@ -281,6 +281,11 @@ struct Task : Sub {
     float mE8;
     char padEC[0xF8 - 0xEC];
     float mF8;
+    char padFC[4];
+    float m100;
+    float m104;
+    char pad108[0x118 - 0x108];
+    int m118;
 };
 
 /* Objects compared in fn_8021157C .. fn_80211648 (floats at +4, +8). */
