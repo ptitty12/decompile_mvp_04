@@ -34,10 +34,13 @@ struct SndStream {
     int m4;
     int m8;
     int mC;
-    char pad10[0x88];
+    float* m10;
+    char pad14[0x80];
+    int m94;
     float m98;
     float m9C;
     void* mA0;
+    float* mA4;
 };
 
 /* 0xD68-byte decoder object (fn_803B9448 initialises it). The first 0xC bytes are the bit
@@ -143,6 +146,59 @@ extern "C" int fn_803B8294(SndStream* o, void* data, int bytes, int cnt)
     o->mC = bytes;
     o->mA0 = data;
     return 0;
+}
+
+extern "C" int fn_803B82D0(SndStream* o, float** pout, int want)
+{
+    int total = 0;
+    int j;
+    o->mA4 = *pout;
+    if (o->m8 == 0)
+        return 0;
+    int n = o->m8;
+    if (n > want)
+        n = want;
+    if (o->m4 != 0) {
+        int k;
+        if (o->m4 <= n)
+            k = o->m4;
+        else
+            k = n;
+        for (j = 0; j < k; j++) {
+            *o->mA4 = *o->m10;
+            o->mA4++;
+            o->m10++;
+        }
+        n -= k;
+        o->m8 -= k;
+        o->m4 -= k;
+        total = k;
+    }
+    int blocks = n / 28 * 28;
+    int rem = n - blocks;
+    o->m94 = blocks;
+    if (blocks > 0) {
+        total += blocks;
+        fn_803B80C4((SndRdU16*)&o->m94);
+        o->m8 -= blocks;
+    }
+    if (rem > 0) {
+        float* dst = o->mA4;
+        o->m94 = rem;
+        o->mA4 = (float*)((char*)o + 0x24);
+        j = 0;
+        fn_803B80C4((SndRdU16*)&o->m94);
+        o->m8 -= rem;
+        o->m10 = o->mA4 + o->m94;
+        o->m4 = -o->m94;
+        o->mA4 = o->mA4 - 28;
+        for (; j < rem; j++)
+            dst[j] = o->mA4[j];
+        total += rem;
+    }
+    if (o->m8 <= 0)
+        o->m4 = 0;
+    return total;
 }
 
 extern "C" SndPair fn_803B8488(SndStream* o)
