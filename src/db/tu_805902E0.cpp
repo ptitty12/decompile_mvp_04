@@ -92,10 +92,19 @@ struct Db805935B8_Inner {
     char pad0[0x14];
     int m14;
     float m18;
+    char pad1C[0x84 - 0x1C];
+    int m84;
+    int m88;
+};
+struct Db805935B8_Obj14 {
+    char pad0[0x198];
+    int m198;
 };
 struct Db805935B8_Obj {
     char pad0[0xC];
     Db805935B8_Inner* mC;
+    char pad10[4];
+    Db805935B8_Obj14* m14;
 };
 struct Db805935B8_Mgr {
     char pad0[4];
@@ -177,6 +186,12 @@ struct Db80590F40_S14 : Db80590F40_Pad14 {
     virtual void v20(int a, Unk80070DDC_Stream* io);
 };
 extern "C" void fn_80551A04(int a, Unk80070DDC_Stream* io);
+
+extern "C" int fn_800B5520(int a);
+extern "C" int fn_800A2AE8(void* p);
+extern "C" int fn_8056AC44(int a, int b, int c);
+extern "C" int fn_80075CF0__Fii(int a, int b);
+extern "C" int fn_8007F980__FP13Unk8007F198_Ci(void* p, int i);
 /* forward declarations (definitions are in address order) */
 extern "C" Db80590A4C_S* fn_805902E0(Db80590A4C_S* s);
 extern "C" void fn_8059055C(Db80590A4C_S* s, int chrg);
@@ -187,6 +202,7 @@ extern "C" void fn_80590A48();
 extern "C" void fn_80590A4C(Db80590A4C_S* s);
 extern "C" void fn_80590BA0(Db80590EB4_S2* self);
 extern "C" void fn_80590C24(Db80590EB4_S2* self);
+extern "C" void fn_80590CA8(Db80590A4C_S* s);
 extern "C" void fn_80590EB4(Db80590EB4_S* self);
 extern "C" void fn_80590F40(Db80590A4C_S* s, int a, Unk80070DDC_Stream* io);
 extern "C" void fn_8059124C(Db8059124C_S* self);
@@ -440,6 +456,48 @@ extern "C" DB_OVERLAY void fn_80590C24(Db80590EB4_S2* self)
         fn_80591B40(self->m0, 1);
         float f = s->fn_80079BF8(t);
         fn_805919E8(self->m0, 1, 0, 1, f);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80590CA8(Db80590A4C_S* s)
+{
+    if (fn_800B5758(fn_800B555C()) == 1) {
+        Db805934C0_G* g = (Db805934C0_G*)lbl_80619948;
+        if (fn_800A2E90(g) != 0 || fn_800A2EB4(g) != 0) {
+            Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+            Db805935B8_Obj* o = lbl_806192E0->m4;
+            int a = sc->fn_80075948(o->m14->m198);
+            int t = fn_8007F7D0((Unk8007F198_B*)sc, 0);
+            Db805935B8_Inner* p = o->mC;
+            int m88 = p->m88;
+            if (p->m84 == 0) {
+                int i;
+                for (i = 0; i < fn_80591AA0(s->m0); i++) {
+                    if (fn_80592E04((Db805937A4_Mgr*)s->m0, i) == m88)
+                        return;
+                }
+                int ok = t == a;
+                if (!ok) {
+                    if (fn_8056AC44(g->m28, m88, 0) != 0) {
+                        int h = fn_800B5520(sc->fn_8007B320(0, t));
+                        if (fn_80075CF0__Fii(h, fn_800A2AE8(g)) != 0)
+                            ok = 1;
+                    }
+                }
+                if (ok) {
+                    int j = fn_80591A50(s->m0);
+                    int cur = j >= 0 ? fn_80592E04((Db805937A4_Mgr*)s->m0, j) : -1;
+                    if (m88 > cur || fn_800A2EB4(g) != 0) {
+                        fn_805935B8(s->m0, m88);
+                        s->m14->v10();
+                        s->m18->v10();
+                        s->m1C->v10();
+                    }
+                }
+                if (fn_8007F980__FP13Unk8007F198_Ci(sc, 0) != 0)
+                    s->m10->v48();
+            }
+        }
     }
 }
 
