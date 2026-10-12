@@ -285,3 +285,11 @@ extern "C" FE_OVERLAY void fn_804B933C(FeScr* x)
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("NAME", 1)))->v29(FI(fn_80594240(x->m140, ((FeObjI*)x->m134)->v60()), 0x10));
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("PROS", 1)))->v29(FI(fn_80593B68(l, ((FeObjI*)x->m134)->v60()), 0));
 }
+
+extern "C" FE_OVERLAY void fn_804B83A4(FeScr* x)
+{
+    char buf[0x400];
+    fn_800DF254(buf, 0, 0, *(float*)((char*)FI(x, 0x144) + 0x12B78));
+    ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("BANK", 1)))->v28((int)buf);
+    fn_800E5380(x->m138);
+}
