@@ -5,6 +5,20 @@
 #include "game/tu_80174318.h"
 
 extern const float lbl_805CBCFC;
+struct Unk80273498_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
 extern "C" void* fn_8035AB00(void* self);
 
 extern const Unk80174318_Fn lbl_805CB1CC;
@@ -457,6 +471,79 @@ int fn_80177148(int* p, int a)
     return 0;
 }
 
+struct Unk8019F8C0_Owner;
+struct Unk80177170_Inner {
+    char pad0[0xAF0];
+    int mAF0;
+};
+struct Unk80177170_Obj {
+    char pad0[0x448];
+    Unk80177170_Inner* m448;
+};
+Unk80177170_Obj* fn_801A5218(Unk8019F8C0_Owner* o);
+extern "C" float fn_804028E4(float x);
+
+struct Unk80177170_T {
+    char pad0[8];
+    Unk8019F8C0_Owner* m8;
+    char padC[4];
+    Unk80273498_Vec3 m10;
+    Unk80273498_Vec3 m1C;
+    Unk80273498_Vec3 m28;
+    Unk80273498_Vec3 m34;
+    char pad40[4];
+    Unk80177170_Obj* m44;
+};
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 Scale(const Unk80273498_Vec3& v, float k)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+
+inline Unk80273498_Vec3 Normalize(const Unk80273498_Vec3& v, float len)
+{
+    Unk80273498_Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline Unk80273498_Vec3 NormalizeOrDefault(const Unk80273498_Vec3& v)
+{
+    float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (len != 0.0f) {
+        return Normalize(v, len);
+    }
+    return *(const Unk80273498_Vec3*)&lbl_806055AC;
+}
+
+void fn_80177170(Unk80177170_T* p) /* 80177170 */
+{
+    Unk80273498_Vec3 d = p->m1C - p->m10;
+    d.y = 0.0f;
+    p->m28 = NormalizeOrDefault(d);
+    p->m34 = p->m1C + Scale(p->m28, 66.0f);
+    if (p->m44 == 0) {
+        p->m44 = fn_801A5218(p->m8);
+    }
+    p->m44->m448->mAF0 = 0;
+}
+
 void fn_8017739C(Unk80176C0C_Entry* p, int a)
 {
     if (p->m44 == a) {
@@ -469,11 +556,6 @@ void fn_8017739C(Unk80176C0C_Entry* p, int a)
 }
 
 struct Unk80270BA0_X;
-struct Unk80273498_Vec3 {
-    float x;
-    float y;
-    float z;
-};
 void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& pos, float* ang);
 void fn_80244858(Unk80270BA0_X* x, float f);
 extern "C" float atan2f(float y, float x);
@@ -524,15 +606,6 @@ void fn_8017757C(Unk8017757C_T* self, int a) /* 8017757C */
 struct Unk8026C414_O;
 struct Unk8026C414_X;
 int fn_8026D5FC(Unk8026C414_O* o, Unk8026C414_X* x);
-
-inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
-{
-    Unk80273498_Vec3 r;
-    r.x = a.x - b.x;
-    r.y = a.y - b.y;
-    r.z = a.z - b.z;
-    return r;
-}
 
 struct Unk80177654_Obj {
     char pad0[0x60];
