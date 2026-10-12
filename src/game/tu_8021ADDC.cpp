@@ -108,6 +108,46 @@ void fn_8021C424(Task* t, int a)
     e->mD4 = a;
 }
 
+struct Unk8021C6FC_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+inline Vec3f Unk8021C6FC_Flat(Unk8021C6FC_Obj* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+void fn_8021C6FC(Task* t, Unk8021C6FC_Obj* p)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8021C6FC_Obj* cur = (Unk8021C6FC_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 4;
+    e->m0 = 0x21;
+    e->m9C = 1;
+    e->m88 = -1.0f;
+    e->m80 = -1.0f;
+    e->mC = 2;
+    e->m10 = 4;
+    e->m8 = 1;
+    e->m38 = Unk8021C6FC_Flat(cur);
+    e->m90 = 99.0f;
+    e->m94 = 1;
+    e->m28 = (Player*)p;
+    e->m50 = Unk8021C6FC_Flat(p) - Unk8021C6FC_Flat(cur);
+}
+
 void fn_8021D0C8(Task* t, float f)
 {
     RecQueue* q = t->m9C->m3A60;
