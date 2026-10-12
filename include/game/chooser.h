@@ -405,6 +405,7 @@ public:
     void fn_8037B7E8(const char* group);                                                    /* begin attribute group */
     void fn_8037B830(const char* group);                                                    /* end attribute group */
     void fn_8037B7E4(const char* name);                                                     /* first call of slot 2 registrations (tu_8001FDA8.cpp) */
+    void fn_8037B6EC(const char* name, int* field);                                         /* colour (tu_80310934.cpp) */
 };
 
 #endif /* GAME_CHOOSER_H */
