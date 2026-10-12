@@ -29,6 +29,28 @@ extern int lbl_80625448;
 
 /* SNDSTRM_setvol: reference structure from the ported sstvol.c; MVP's build differs in detail. */
 
+extern "C" int fn_803AC214(SNDSYSOPTS* sso);
+
+static inline void ErrNop(int) { }
+static inline int ErrCode(int e) { switch (e) { case -18: case -10: case -7: break; } return 0; }
+
+struct Unk8069CB5C {
+    unsigned char mVal;
+    char pad[3];
+    int mFlag;
+};
+extern Unk8069CB5C lbl_8069CB5C[];
+extern "C" int fn_803AC368(SNDSYSOPTS* sso);
+
+extern int lbl_8069CBA4;
+
+struct Unk8069CB9C {
+    int mVal;
+    int mFlag;
+};
+extern Unk8069CB9C lbl_8069CB9C;
+extern int lbl_80625440;
+
 extern "C" Snd::SNDSTREAMREQUEST* fn_803AB310(int h)
 {
     if (h < 0)
@@ -241,6 +263,107 @@ done:
     return 0;
 }
 
+extern "C" int fn_803ABCB4(int k, int* out)
+{
+    SNDSYSOPTS sso;
+    int r = 0;
+    *out = 0;
+    int e = fn_803AC214(&sso);
+    switch (e) {
+    case -18:
+        e = 0;
+        break;
+    case -10:
+        break;
+    case -7:
+        e = 0;
+        break;
+    }
+    switch (k) {
+    case 1:
+        if (sso.cap.outputchannelsmax > 1)
+            *out = k;
+        break;
+    case 0:
+    case 8:
+        *out = 1;
+        break;
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+        break;
+    }
+    return 0;
+}
+
+extern "C" int fn_803ABD58(int a)
+{
+    int tmp;
+    fn_803ABCB4(a, &tmp);
+    if (tmp == 0)
+        return -5;
+    if (lbl_8069C9E4[0] == 0) {
+        lbl_80625440 = a;
+    } else {
+        lbl_8069CB9C.mVal = a;
+        lbl_8069CB9C.mFlag = 1;
+    }
+    return 0;
+}
+
+/* near-miss: same instructions, callee-saved registers differ: retail has &sso in r30 and the value in r29 (k in r31); ours puts the value in r30 and &sso in r29. pointer-local forms (ps->) change the stores to 42(r29) so they are not usable */
+extern "C" int fn_803ABDD0(int k, int v)
+{
+    SNDSYSOPTS sso;
+    SNDSYSOPTS* ps = &sso;
+    int e = fn_803AC214(ps);
+    switch (e) {
+    case -18:
+        e = 0;
+        break;
+    case -10:
+        break;
+    case -7:
+        e = 0;
+        break;
+    }
+    switch (k) {
+    case 0:
+        if (lbl_8069C9E4[0] == 0) {
+            sso.set.voicesmaincpu = v;
+        } else {
+            lbl_8069CB5C[k].mVal = v;
+            lbl_8069CB5C[k].mFlag = 1;
+        }
+        break;
+    case 2:
+        if (lbl_8069C9E4[0] == 0) {
+            sso.set.voicesdsp = v;
+        } else {
+            lbl_8069CB5C[k].mVal = v;
+            lbl_8069CB5C[k].mFlag = 1;
+        }
+        break;
+    default:
+        return -5;
+    }
+    if (lbl_8069C9E4[0] == 0) {
+        e = fn_803AC368(ps);
+        switch (e) {
+        case -18:
+            e = 0;
+            break;
+        case -10:
+            break;
+        case -7:
+            e = 0;
+            break;
+        }
+    }
+    return 0;
+}
+
 extern "C" int fn_803ABEDC()
 {
     return -5;
@@ -255,6 +378,49 @@ extern "C" int fn_803AC134()
 {
     fn_803AC5CC();
     lbl_8062543C = 0;
+    return 0;
+}
+
+/* near-miss: same instructions, r30/r31 swapped for the second argument and &sso (retail a=r31, &sso=r30); dead error switch is `case -18: e = 0; break; case -10: break; case -7: e = 0; break;` */
+extern "C" int fn_803AC164(int k, int a, int b)
+{
+    switch (k) {
+    case 0:
+        lbl_8062543C = a;
+        lbl_8069CBA4 = b;
+        break;
+    case 2: {
+        SNDSYSOPTS sso;
+        SNDSYSOPTS* ps = &sso;
+        int e = fn_803AC214(ps);
+        switch (e) {
+        case -18:
+            e = 0;
+            break;
+        case -10:
+            break;
+        case -7:
+            e = 0;
+            break;
+        }
+        ps->set.arampooladdr = a;
+        ps->set.arampoolsize = b;
+        e = fn_803AC368(ps);
+        switch (e) {
+        case -18:
+            e = 0;
+            break;
+        case -10:
+            break;
+        case -7:
+            e = 0;
+            break;
+        }
+        break;
+    }
+    default:
+        return -5;
+    }
     return 0;
 }
 
