@@ -33,7 +33,7 @@ extern "C" int CARDClose(void*);
 extern "C" int fn_8041E4E0(int);
 extern "C" int fn_8041B964(int, int*, int*);
 extern "C" int fn_8042030C(int, int, int);
-extern "C" int fn_803F8CB4(void*, void*, int*);
+extern "C" int fn_803F8CB4(void*, const char*, int*);
 extern "C" void fn_803F8A2C(void*);
 extern "C" void* memset(void*, int, unsigned);
 extern "C" int strncmp(const char*, const char*, unsigned);
@@ -50,6 +50,13 @@ struct RcRecA {
     char m14[4];
     char m18[2];
 };
+
+extern "C" int CARDFastDelete(int, int);
+extern "C" int CARDDelete(int, const char*);
+extern "C" int CARDGetStatus(int, int, void*);
+extern "C" int CARDRead(void*, void*, int, int);
+extern "C" int CARDWrite(void*, void*, int, int);
+extern "C" int strcmp(const char*, const char*);
 
 extern "C" int fn_803F73B0(void* o, int k)
 {
@@ -158,6 +165,26 @@ extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
     return r;
 }
 
+extern "C" int fn_803F87A8(void* o, unsigned short* h, int* name)
+{
+    int r;
+    do {
+        if (h[1] == 1) {
+            int s8 = -1;
+            r = fn_803F8CB4(o, (const char*)*name, &s8);
+            if (r == 0) {
+                int q = CARDFastDelete(h[0], s8);
+                r = fn_803F73B0(o, q);
+            }
+        } else {
+            int q = CARDDelete(h[0], (const char*)*name);
+            r = fn_803F73B0(o, q);
+        }
+        lbl_806EEA34->v6(1);
+    } while (r == 1);
+    return r;
+}
+
 extern "C" int fn_803F885C(void* o, unsigned short* h, int* name1, const char* name2)
 {
     int r;
@@ -208,7 +235,7 @@ extern "C" int fn_803F8C44(void* o, int* a, void* b, int c)
 {
     unsigned cur = a[0];
     int s8 = -1;
-    int r = fn_803F8CB4(o, b, &s8);
+    int r = fn_803F8CB4(o, (const char*)b, &s8);
     if (r == 0) {
         int q;
         do {
@@ -217,6 +244,36 @@ extern "C" int fn_803F8C44(void* o, int* a, void* b, int c)
         r = fn_803F73B0(o, q);
     }
     return r;
+}
+
+extern "C" int fn_803F8CB4(void* o, const char* name, int* out)
+{
+    char buf[0x70];
+    *out = -1;
+    int i = 0;
+    do {
+        int r;
+        do {
+            r = CARDGetStatus(0, i, buf);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+        int rc = fn_803F73B0(o, r);
+        switch (rc) {
+        case 0:
+            if (strcmp(buf, name) == 0) {
+                *out = i;
+                return 0;
+            }
+            break;
+        case 4:
+        case 10:
+            break;
+        default:
+            return rc;
+        }
+        i++;
+    } while (i <= 0x7e);
+    return 4;
 }
 
 extern "C" int fn_803F8D8C(int unused, void* f, int off, int whence)
@@ -233,6 +290,54 @@ extern "C" int fn_803F8D8C(int unused, void* f, int off, int whence)
     if (p < 0 || p >= RCI(f, 0x7c))
         return 0xb;
     return 0;
+}
+
+extern "C" int fn_803F8DDC(void* o, char* f, void* buf, int len, int* outlen)
+{
+    int r;
+    do {
+        r = CARDRead(f + 0x48, buf, len, RCI(f, 0xcc));
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    int rc = fn_803F73B0(o, r);
+    switch (rc) {
+    case 0:
+        *outlen = len;
+        RCI(f, 0xcc) += len;
+        return rc;
+    case 0xb:
+        *outlen = 0;
+        return 0;
+    default:
+        *outlen = len;
+        return 0xf;
+    }
+}
+
+/* near-miss: tree shape; retail roots the 0/0xa/0xb switch at 0xa (enum-typed index tried), 55/55 insns here */
+extern "C" int fn_803F8EA4(void* o, char* f, void* buf, int len, int* outlen)
+{
+    int r;
+    do {
+        r = CARDWrite(f + 0x48, buf, len, RCI(f, 0xcc));
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    int rc = fn_803F73B0(o, r);
+    switch (rc) {
+    case 0:
+        *outlen = len;
+        RCI(f, 0xcc) += len;
+        return rc;
+    case 0xa:
+        *outlen = -1;
+        return 0;
+    case 0xb:
+        *outlen = 0;
+        return 0;
+    default:
+        *outlen = 0;
+        return rc;
+    }
 }
 
 extern "C" int fn_803F8F80(void* o, char* p)
