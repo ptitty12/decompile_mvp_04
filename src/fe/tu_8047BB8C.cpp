@@ -4,11 +4,56 @@
  */
 #include "game/fe_80471EBC.h"
 
+/* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
+extern "C" FE_OVERLAY FeScrArr2* fn_8047BB8C(FeScrArr2* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_8049A1F0(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80677078);
+    self->m398 = -1;
+    self->m370 = 0;
+    self->m374 = 0;
+    self->m378 = 0;
+    self->m37C = 0;
+    self->m380 = 0;
+    self->m384 = 0;
+    self->m388 = 0;
+    self->m38C = 0;
+    self->m390 = 0;
+    self->m394 = 0;
+    self->m39C = 0;
+    FeArr* s = &self->mD78;
+    s->m10 = lbl_8064B298;
+    s->m0 = self->mD90;
+    s->m8 = 0xFA;
+    fn_8040074C(s->m0, 0x3E8);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->m10 = lbl_8065C1B0;
+    s->mC = 0;
+    s->m4 = 0;
+    s->m14 = 0;
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_8047BF48(FeScrD* x)
 {
     fn_800ED254(x);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+extern "C" FE_OVERLAY int fn_8047BF70(void* x)
+{
+    FeMsg m;
+    FeMsg* p = &m;
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    fn_8035682C(p);
+    fn_8040B830(p->name, "ADVANCE", 15);
+    p->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), p, x);
+    return 1;
 }
 
 extern "C" FE_OVERLAY void fn_8047C004(void* x, int sel)
@@ -82,6 +127,19 @@ extern "C" FE_OVERLAY int fn_8047C2A4(void* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_8047C2E0(void* x, FeW* w, int b, int c, int d)
+{
+    int r;
+    if (w != FeWp(x, 0x38C)) {
+        r = 0;
+    } else {
+        w->fn_vslot67(c, d);
+        fn_8047C9A0(x, FePick((char*)FeVp(x, 0xD78), c * 4));
+        r = 1;
+    }
+    return r;
+}
+
 extern "C" FE_OVERLAY int fn_8047C444(char* x, int key)
 {
     int i;
@@ -92,6 +150,14 @@ extern "C" FE_OVERLAY int fn_8047C444(char* x, int key)
         p = (int*)((char*)p + 0x14);
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8047C900(void* x)
+{
+    if (FeW24(FeWp(x, 0x370)) < 0)
+        fn_801251CC(FeVp(x, 0x378), 3, 0x37A2, 1);
+    else
+        fn_801251CC(FeVp(x, 0x378), 3, 0x1A2F, 0);
 }
 
 extern "C" FE_OVERLAY void fn_8047C958(char* buf, int v)
