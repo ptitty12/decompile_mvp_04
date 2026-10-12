@@ -759,6 +759,70 @@ extern const void* lbl_80664430[];
 extern const void* lbl_80649DB8[];
 void fn_80378620(void* self, int chrg);
 
+struct Unk802D39EC_V {
+    char pad0[0xC];
+    void* mC;
+};
+struct Unk802D39EC_S {
+    char pad0[8];
+    const void* m8;
+    char padC[0x44 - 0xC];
+    Unk802CF484 m44;
+    int m60;
+    Unk802D39EC_V* m64;
+    void* m68;
+    void* m6C;
+    void* m70;
+    void* m74;
+    void* m78;
+    char pad7C[0xC4 - 0x7C];
+    int mC4;
+    char padC8[0x160 - 0xC8];
+    void* m160;
+};
+extern const void* lbl_80664430[];
+extern const char lbl_805E3FF4[];
+void fn_803785E4(void* p);
+void fn_80378A34(void* p, int q);
+void* fn_802CB924(void* mem, int a);
+void fn_802D3C80(void* p);
+void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
+void* fn_802CF168(void* name);
+
+extern "C" void* fn_802D39EC(void* mem, int a, void* owner, int b)
+{
+    Unk802D39EC_S* self = (Unk802D39EC_S*)mem;
+    fn_803785E4(self);
+    self->m8 = lbl_80664430;
+    new (&self->m44) Unk802CF484;
+    self->m60 = a;
+    self->m64 = (Unk802D39EC_V*)owner;
+    self->mC4 = b;
+    self->m68 = 0;
+    self->m6C = 0;
+    self->m70 = 0;
+    self->m74 = 0;
+    self->m78 = 0;
+    self->m160 = fn_802CF168((void*)lbl_805E3FF4);
+    fn_80378A34(self, a + 0x704);
+    if (b != 0) {
+        self->m70 = fn_802CB924(operator new(0x1E0, 0), a);
+        ((Unk802D39EC_V*)owner)->mC = self->m70;
+    } else {
+        self->m68 = new (0) Unk802D1278;
+        self->m74 = fn_802CB924(operator new(0x1E0, 0), a);
+        if (self->m74 != 0)
+            fn_802CBDBC((Unk802CBD04*)self->m74, (int)self->m68, 1, 0);
+        self->m6C = fn_802CB924(operator new(0x1E0, 0), a);
+        void* r = fn_802CB924(operator new(0x1E0, 0), a);
+        self->m70 = r;
+        ((Unk802D39EC_V*)owner)->mC = r;
+        self->m78 = fn_802CB924(operator new(0x1E0, 0), a);
+    }
+    fn_802D3C80(self);
+    return self;
+}
+
 /* near-miss (80/81 insns, 78 words equal): retail keeps the zero of the m78 store in r30 across the m6C delete and reuses it for m6C; ours loads a second zero (li r0,0) for m6C */
 void fn_802D3B40(Unk802D3B40_Self* s, int chrg)
 {
