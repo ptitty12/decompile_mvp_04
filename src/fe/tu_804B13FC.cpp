@@ -5,6 +5,15 @@
 
 #include "game/fe_804ABCBC.h"
 
+extern "C" float fn_8058FA38(void* o, int i);
+
+class FeV1Cz { public: char pad0[0x1C]; virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6(); virtual void s7(); virtual void s8(); virtual int s9(); virtual void s10(); virtual void s11(); virtual void s12(); virtual void s13(int a); virtual int s14(); };
+
+class FeSrcD { public: char pad0[0xC]; virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6(); virtual void s7(int a); };
+
+extern "C" void fn_8058F698(int a, int b);
+class FeSrcC { public: char pad0[0xC]; virtual void s1(); virtual int s2(); virtual int s3(int a); virtual int s4(); };
+
 #define FE_VI2(n) virtual int v##n(int a, int b);
 
 class FeObjI2 : public UiBase { public: FE_LO(FE_VI2) virtual FeObj* v32(const char* a, int b); FE_HI(FE_VI2) };
@@ -47,6 +56,20 @@ extern "C" FE_OVERLAY FeRaw* fn_804B1404(FeRaw* self, int a, int b, int c, int d
 }
 
 extern char lbl_8066AA40[];
+extern "C" FE_OVERLAY void fn_804B1B84(int unused, FeSrcC* src, FeObj* dst)
+{
+    FeHolder* h = (FeHolder*)dst;
+    int i = 0;
+    int n = src->s2();
+    ((FeSub*)&h->mDC)->s15();
+    while (i < n) {
+        ((FeObj2*)dst)->v51(src->s3(i), 0);
+        i++;
+    }
+    int v = src->s4();
+    ((FeSub1*)&h->mDC)->s6(v);
+}
+
 extern "C" FE_OVERLAY void fn_804B1C78(FeScr* x)
 {
     fn_800ECAA4(x);
@@ -84,6 +107,24 @@ extern "C" FE_OVERLAY void fn_804B1DA0(FeScr* x, int a)
     ((FeObj1*)x->m13C)->v8(a);
     FeObj* r = (FeObj*)((FeObjP2*)x->m140)->v73(0, 0);
     ((FeObj1*)((FeObj*)r)->v32("BUTTON", 1))->v8(a);
+}
+
+extern "C" FE_OVERLAY void fn_804B20A8(FeScr* x)
+{
+    int o = 0;
+    int n = 13;
+    do {
+        char* wb = (char*)x + 0x15C;
+        FeHolder* h = *(FeHolder**)(wb + o);
+        int v = ((FeSub*)&h->mDC)->s5();
+        char* sb = (char*)x + 0x154;
+        FeSrcD* e = *(FeSrcD**)(sb + o);
+        o += 12;
+        e->s7(v);
+    } while (--n != 0);
+    FeHolder* h0 = (FeHolder*)FeP(x, 0x15C);
+    if (((FeSub*)&h0->mDC)->s5() == 0)
+        fn_8058F698(FI(x, 0x154), ((FeObjI*)x->m13C)->v31());
 }
 
 extern "C" FE_OVERLAY void fn_804B23D8(FeScr* x)
@@ -194,6 +235,31 @@ extern "C" FE_OVERLAY void fn_804B2D6C(FeScr* x, int k)
     }
 }
 
+/* near-miss: one argument move; in the cur == sel arm retail passes sel (r29), ours cur (r31) */
+extern "C" FE_OVERLAY void fn_804B3110(FeScr* x, char* out)
+{
+    float sum;
+    int cur;
+    int sel;
+    sel = ((FeObjI*)x->m134)->v60();
+    cur = ((FeV1Cz*)x->m144)->s9();
+    if (sel > ((FeV1Cz*)x->m144)->s9() || cur == 0) {
+        fn_80403144(out, fn_80090880(lbl_8061977C, 0x1A4B));
+    } else {
+        sum = 0.5f;
+        if (cur == sel) {
+            sum += fn_8058FA38(x->m144, sel);
+        } else if (cur > sel) {
+            do {
+                int t = cur;
+                cur--;
+                sum += fn_8058FA38(x->m144, t);
+            } while (cur > sel);
+        }
+        fn_800DF254(out, 0, 3, sum);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804B3234(int a, int b)
 {
     if (a == 1)
@@ -208,6 +274,24 @@ extern "C" FE_OVERLAY void fn_804B3260(int a)
     else
         fn_804B3424(x);
     fn_804B2B40(x, ((FeObjI*)x->m134)->v60());
+}
+
+extern "C" FE_OVERLAY void fn_804B330C(FeScr* x)
+{
+    int cur = ((FeV1Cz*)x->m144)->s9();
+    if (cur != 0) {
+        int sel = ((FeObjI*)x->m134)->v60();
+        if (sel == cur) {
+            ((FeV1Cz*)x->m144)->s13(sel);
+        } else if (((FeV1Cz*)x->m144)->s14() != 0) {
+            cur = ((FeV1Cz*)x->m144)->s9();
+            while (cur > sel) {
+                ((FeV1Cz*)x->m144)->s13(cur);
+                cur--;
+            }
+        }
+        fn_804B34B8(x);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804B3424(FeScr* x)
