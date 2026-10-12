@@ -151,35 +151,33 @@ extern "C" float fn_801C71EC(Z* z)
     return r;
 }
 
-/* near-miss: same code; only the temporaries (f0/f13, r10/r11) of the second RandF/Lerp setup are numbered differently. */
 extern "C" float fn_801C7BF0(Z* z, float f)
 {
     float a = 0.0f;
     float b = 0.0f;
-    if (!(RandF(z->m204->m554, 1.0f, 0xE34) >= 0.5f)) {
+    if (!(RandFP(z->m204, 1.0f, 0xE34) >= 0.5f)) {
         const float c = 30.0f;
         b = a - (1.0f - f) * c;
     } else {
         const float c = 18.0f;
         b = (1.0f - f) * c + a;
     }
-    b = b * LerpATB(0.8f, RandF(z->m204->m554, 1.0f, 0xE46), 1.2f);
+    b = b * LerpATB(0.8f, RandFP(z->m204, 1.0f, 0xE46), 1.2f);
     return b;
 }
 
-/* near-miss: same code as fn_801C7BF0 (sum instead of product); register numbering of the setup temporaries differs. */
 extern "C" float fn_801C7D90(Z* z, float f)
 {
     float a = 30.0f;
     float b = 0.0f;
-    if (!(RandF(z->m204->m554, 1.0f, 0xE56) >= 0.5f)) {
+    if (!(RandFP(z->m204, 1.0f, 0xE56) >= 0.5f)) {
         const float c = 15.0f;
         b = a - (1.0f - f) * c;
     } else {
         const float c = 15.0f;
         b = (1.0f - f) * c + a;
     }
-    b = b + LerpATB(-6.0f, RandF(z->m204->m554, 1.0f, 0xE66), 6.0f);
+    b = b + LerpATB(-6.0f, RandFP(z->m204, 1.0f, 0xE66), 6.0f);
     return b;
 }
 
@@ -283,13 +281,12 @@ extern "C" float fn_801C8CF4(Z* z)
     return -LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x107C), hi);
 }
 
-/* near-miss: same code, but retail keeps z in r28 and the 0x4330 constant in r29 (ours swapped). */
 extern "C" float fn_801C8DB0(Z* z)
 {
     const float hi = 85.0f;
     const float lo = 88.0f;
-    float v = LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1083), hi);
-    if (!(RandF(z->m204->m554, 1.0f, 0x1085) >= 0.5f))
+    float v = LerpATB(lo, RandFP(z->m204, 1.0f, 0x1083), hi);
+    if (!(RandFP(z->m204, 1.0f, 0x1085) >= 0.5f))
         v = -v;
     return v;
 }
@@ -398,13 +395,12 @@ extern "C" void fn_801C8790(Z* z)
     }
 }
 
-/* near-miss: two instructions swapped (retail stores the RandF scale slot before reloading x). */
 extern "C" void fn_801C90AC(Z* z)
 {
     float x = fn_801C8FB8(z);
     const float a = 43.0f;
     const float b = 25.0f;
-    fn_801C93BC(z, x, RandF(z->m204->m554, 1.0f, 0x10CC), a, b);
+    fn_801C93BC(z, x, RandFP(z->m204, 1.0f, 0x10CC), a, b);
 }
 
 typedef Unk801C6D2C_V2 (*Unk801C6D2C_VaFn)(Z*, ...);
@@ -412,7 +408,7 @@ extern "C" Unk801C6D2C_V2 fn_801CD94C(Z* z);
 
 extern "C" void fn_801C9184(Z* z)
 {
-    float a = RandF(z->m204->m554, 0.499f, 0x10D9);
+    float a = RandFP(z->m204, 0.499f, 0x10D9);
     Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
     if (!(v.x >= 0.6) && !(v.x <= -0.6))
         a = a + 0.5f;
@@ -424,7 +420,7 @@ extern "C" void fn_801C9184(Z* z)
 
 extern "C" void fn_801C92A0(Z* z)
 {
-    float a = RandF(z->m204->m554, 0.499f, 0x10F4);
+    float a = RandFP(z->m204, 0.499f, 0x10F4);
     Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
     if (!(v.x >= 0.6) && !(v.x <= -0.6))
         a = a + 0.5f;

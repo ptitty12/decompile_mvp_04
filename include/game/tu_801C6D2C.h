@@ -18,6 +18,14 @@ inline float RandF(Unk8014D8AC* r, float scale, int line)
     return (float)(unsigned)r->fn_8014D8AC(1000000, f, line) * scale * 1e-6f;
 }
 
+/* Same random float, but the player object is the argument and the RNG pointer (m554) is loaded
+ * inside, after the scale slot store, as retail does in the scalers (fn_801C6A34 family). */
+inline float RandFP(Unk801B7FB0_P* p, float scale, int line)
+{
+    const char* f = lbl_805D1404;
+    return (float)(unsigned)p->m554->fn_8014D8AC(1000000, f, line) * scale * 1e-6f;
+}
+
 inline float Lerp(float a, float b, float t)
 {
     return a + t * (b - a);
