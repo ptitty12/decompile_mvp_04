@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8017D640.h"
+#include "game/clampiter.h"
 
 extern const float lbl_805CCB84;
 
@@ -91,30 +92,32 @@ int fn_8017E030(Unk8017DD64_T* p, int a, int b)
     return r;
 }
 
-/* near-miss: retail keeps the counter in a stack slot (reloaded and stored each pass) and
- * hoists p->m4 + 0x65C above the range test; a volatile counter and an inlined step
- * both differ by 15+ slots after 8 variants. */
+/* near-miss (18 of 33 slots differ): the clamp-iterator step, the loop counter copy and the
+ * hoisted p->m4 + 0x65C match. Retail returns the call result in r3 with no saved copy
+ * (`mr r3,r0` is the argument move before `cmpwi r0,0`) and computes slwi before the cmplwi;
+ * ours keeps r in r30 (stmw). Tried: r = x / x = f(x) / shared x, Slot as inline with byte
+ * offset (kept), plain volatile counter. */
+inline int Slot(Unk8017DD64_T* p, int i)
+{
+    int* t = p->m4->m65C;
+    int o = i * 4;
+    int x = 0;
+    if ((unsigned)i <= 12)
+        x = *(int*)((char*)t + o);
+    return x;
+}
 int fn_8017E264(Unk8017DD64_T* p)
 {
-    volatile int sp = 0;
+    Unk8006A138_It<21> it(0);
     int i = 0;
     int r;
     do {
-        int* t = p->m4->m65C;
-        int x = 0;
-        if ((unsigned)i <= 12) {
-            x = t[i];
-        }
-        r = x;
-        if (x) {
-            r = fn_802491D8(x);
-        }
-        int n = sp + 1;
-        if (sp > 0x15) {
-            n = sp;
-        }
-        sp = n;
-        i = n;
+    int r;
+    int x = Slot(p, i);
+    r = x;
+    if (x)
+        r = fn_802491D8(x);
+        i = it.Next();
     } while (i <= 12);
     return r;
 }
