@@ -121,7 +121,12 @@ struct Unk8024EF40_P {
     int m264;
     char pad268[0x36C - 0x268];
     int m36C;
-    char pad370[0x44C - 0x370];
+    char pad370[0x378 - 0x370];
+    int m378;
+    char pad37C[0x388 - 0x37C];
+    int m388;
+    int m38C;
+    char pad390[0x44C - 0x390];
     Unk8024EF40_Q* m44C;
     char pad450[8];
     int m458;
@@ -218,13 +223,15 @@ struct Unk80256C80_Inner {
     int m194;
     char pad198[0x1EC - 0x198];
     Unk8024EF40_Q* m1EC;
-    char pad1F0[0x1FC - 0x1F0];
+    void* m1F0;
+    char pad1F4[0x1FC - 0x1F4];
     int m1FC;
     char pad200[0x434 - 0x200];
     Unk8024EF40_P* m434;
     Unk8024EF40_P* m438[4];
     int m448;
-    char pad44C[0x464 - 0x44C];
+    unsigned m44C; /* flag word: 0x40000000 / 0x20000000 (fn_80265DDC, fn_80265E40) */
+    char pad450[0x464 - 0x450];
     int m464;
     char pad468[0x4C4 - 0x468];
     int m4C4[4];
