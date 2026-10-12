@@ -102,6 +102,9 @@ extern const float lbl_806008B4;
 extern const float lbl_806008B8;
 extern const float lbl_806008BC;
 extern const float lbl_806008C0;
+extern "C" int rand(void);
+extern "C" int fn_8009005C__Fif(int a, float b);
+extern const float lbl_80600890;
 extern "C" void* fn_8052E2C4(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i);
 extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* s, int id);
 extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* s, int id, int i);
@@ -604,6 +607,45 @@ extern "C" DB_OVERLAY char* fn_8058AE00(char* p, int k)
         return p + 0x8C;
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8058AE54(void* self, int id)
+{
+    Db8058B628_E e;
+    int a;
+    int b;
+    b = 0;
+    a = 0;
+    int pick = 0;
+    int sc = 0;
+    int bonus = 0;
+    if (fn_800B5758(fn_800B555C())) {
+        sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(6), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        if (sc != 0) {
+            int q = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007CBB8(0xE, sc);
+            bonus = (fn_8009005C__Fif(q, (float)(rand() % 10000) * lbl_80600890) - 2) * -5;
+        } else
+            bonus = 0;
+    }
+    int ra = fn_8058BE5C(self, id, bonus, &a);
+    int rb = fn_8058BD8C(self, id, bonus, &b);
+    if (a > 9 && b <= 20) {
+        if (rand() & 1)
+            pick = 1;
+    } else if (a <= 10) {
+        pick = 1;
+    } else {
+        if (b <= 19)
+            return 0;
+        pick = 0;
+    }
+    int w = rb;
+    if (pick != 0)
+        w = ra;
+    fn_8052E198(&e, 0xB, id, 0, sc, (char)w, 0, 1, 0, 0);
+    fn_80582CF8(self, &e, 0, 0, 0);
+    fn_80360AF0((Db80586420_Ent*)&e, 2);
+    return 1;
 }
 
 extern "C" DB_OVERLAY int fn_8058B628(void* self, int unused, int id)
