@@ -465,6 +465,29 @@ void fn_802B2BD0()
     }
 }
 
+struct Unk802B2C58_S {
+    char pad0[0x24];
+    void* m24;
+    int m28;
+    int pad2C;
+    int m30;
+    int m34;
+    void* a38[1];
+};
+
+Unk802B2C58_S* fn_802B2C58(Unk802B2C58_S* self)
+{
+    for (int i = 0; i < 1; i++) {
+        void* z = 0;
+        self->a38[i] = z;
+    }
+    self->m24 = 0;
+    self->m28 = 0;
+    self->m34 = 0;
+    self->m30 = 0;
+    return self;
+}
+
 void fn_802B2ED0(T* self, int a)
 {
     *(int*)((char*)self + 0x20) = a;
