@@ -28,6 +28,22 @@ struct Unk802F4F40_V3 {
     int m4;
     int m8;
 };
+struct Unk802F44D0_V3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk802F44D0_Own {
+    char pad0[0x3BC];
+    struct Unk802F44D0_Lim* m3BC;
+};
+struct Unk802F44D0_Lim {
+    char pad0[0x28];
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+};
 /* Record at +0x6CC of the object at +0x64 (fn_802F4F40). */
 struct Unk802F4F40_P {
     char pad0[0x38C];
@@ -36,10 +52,19 @@ struct Unk802F4F40_P {
     Unk802F4F40_V3 m3C0;
     char pad3CC[0x3F4 - 0x3CC];
     float m3F4;
+    char pad3F8[0x420 - 0x3F8];
+    Unk802F44D0_V3 m420;
+    char pad42C[0x438 - 0x42C];
+    float m438;
+    float m43C;
+    float m440;
+    float m444;
 };
 struct Unk802F4F40_Q {
     char pad0[0x6CC];
     Unk802F4F40_P* m6CC;
+    char pad6D0[0x700 - 0x6D0];
+    Unk802F44D0_Own* m700;
 };
 float fn_80190F0C(Unk802F4F40_P* p);
 int fn_80328648(Unk802F4F40_Q* q);
@@ -52,12 +77,15 @@ public:
     int m24;
     int m28;
     int m2C;
-    char pad30[0x3C - 0x30];
+    Unk802F44D0_V3 m30;
     float m3C;
     float m40;
     float m44;
     float m48;
-    char pad4C[0x5C - 0x4C];
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
     float m5C;
     float m60;
     Unk802F4F40_Q* m64;
@@ -95,6 +123,7 @@ public:
     void fn_802F4368();
     void fn_802F4F40();
     void fn_802F4628();
+    void fn_802F44D0();
 };
 
 /* Object with the two extents at +0x3C/+0x40 read by fn_802F7EE8 / fn_802F7F04. */
