@@ -91,6 +91,41 @@ void fn_80199AF8(Unk80199928_O* o, int a, int b, int c, int d, int e, int f, flo
 extern Unk80183918_Vec3 lbl_806055B8;
 extern Unk80183918_Vec3 lbl_806055F8;
 
+struct Unk80379324 {
+    Unk80379324();
+    float m0, m4, m8, mC;
+};
+struct Unk8019A998_Ring {
+    int m0;
+    char* m4;
+    char pad8[4];
+    int mC;
+};
+struct Unk8019A998_Base {
+    int m0;
+    char pad4[0x6C - 4];
+    int m6C;
+    char pad70[0x7C - 0x70];
+    Unk80379324 m7C;
+    char pad8C[0x98 - 0x8C];
+};
+class Unk8019A998_Virt : public Unk8019A998_Base {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(void* p);
+};
+struct Unk8019A998_Obj : public Unk8019A998_Virt {
+    char pad9C[0x384 - 0x9C];
+    int m384;
+    int m388;
+    char pad38C[0x3E4 - 0x38C];
+    Unk80183918_Vec3 m3E4;
+    Unk80183918_Vec3 m3F0;
+    Unk8019A998_Ring m3FC;
+};
+extern "C" void fn_80198694(Unk8019A998_Ring* r, char* a, char* b, char* c, void* p1, void* p2);
+
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -299,6 +334,35 @@ extern "C" Unk80198CC0_Vec4* fn_8019A4F4(Unk80198CC0_Vec4* out, const Unk8018391
         fn_80379DA0(out, &axis, ang);
     }
     return out;
+}
+
+inline void Unk8019A998_Cp(Unk80183918_Vec3* d, const Unk80183918_Vec3* s)
+{
+    *d = *s;
+}
+
+//@8019A998
+extern "C" void fn_8019A998(Unk8019A998_Obj* o)
+{
+    Unk8019A998_Ring* r = &o->m3FC;
+    fn_80198F68(o);
+    o->m388 = 0;
+    o->m384 = 2;
+    fn_80198DD8((Unk80198E5C_Obj*)o, 0);
+    Unk80379324 q;
+    Unk80379324* qp = &q;
+    Unk80183918_Vec3 v;
+    if (r->mC == -1) {
+        Unk8019A998_Cp(&v, &lbl_806055AC);
+        *qp = *(Unk80379324*)&lbl_8069428C;
+    } else {
+        fn_8019A404(r->m4 + (r->mC << 7) + 0x20, qp, (float*)&v);
+    }
+    o->m0 = 0;
+    o->m6C = 1;
+    o->m7C = q;
+    o->v3(&v);
+    fn_80198694(r, fn_80198E78((Unk80198E5C_Obj*)o), fn_80198EB0((Unk80198E5C_Obj*)o), fn_80198EE8((Unk80198E5C_Obj*)o), &o->m3E4, &o->m3F0);
 }
 
 //@8019AAF0
