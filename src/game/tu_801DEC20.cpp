@@ -304,6 +304,34 @@ extern "C" void fn_801E11C8(I* i, Tbl* t)
     }
 }
 
+struct Unk801E1274_V2 {
+    Vec3 a;
+    Vec3 b;
+};
+extern const Unk801E1274_V2 lbl_805D3BBC;
+
+extern "C" void fn_801E1274(I* i, Tbl* t, int k)
+{
+    Rec* r = &t->m0[k];
+    P* p = fn_801A497C(i->m9C->m0, 4, k);
+    Unk801E1274_V2 pr = lbl_805D3BBC;
+    Vec3 sel = lbl_806055AC;
+    if (k == 2)
+        sel = pr.a;
+    else if (k == 4)
+        sel = pr.b;
+    r->m4 = 5;
+    r->mC = 2;
+    r->m8 = 2;
+    r->m18 = 5;
+    Put(&r->m28, sel);
+    Vec3 q = fn_801E0A6C(i, p, &sel, 0);
+    Put(&r->m64, q);
+    fn_8035B710(r, 1);
+    r->m10 = 3;
+    r->m24 = 0;
+}
+
 extern "C" void fn_801E1638(I* i)
 {
     Unk801DB948_It it;

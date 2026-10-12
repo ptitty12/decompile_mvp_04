@@ -268,9 +268,13 @@ struct Unk801DB948_Vec4 : public Unk801DB948_Vec3 {
 struct Unk801DD660_Rec {
     char pad0[4];
     int m4;
-    char pad8[4];
+    int m8;
     int mC;
-    char pad10[0x28 - 0x10];
+    int m10;
+    char pad14[4];
+    int m18;
+    char pad1C[0x24 - 0x1C];
+    int m24;
     Unk801DB948_Vec3 m28;
     char pad34[0x64 - 0x34];
     Unk801DB948_Vec3 m64;
