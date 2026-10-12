@@ -11,7 +11,10 @@ extern const float lbl_805D4F34;
 
 typedef Unk801EE438_Sel Unk801F6680_Sel;
 
-extern const float lbl_805D4EB0;
+struct Unk805D4EB0_F {
+    float v;
+};
+extern Unk805D4EB0_F lbl_805D4EB0;
 extern float lbl_805D4F1C;
 extern const float lbl_805D4F28;
 extern const float lbl_805D4F2C;
@@ -123,15 +126,14 @@ extern "C" void fn_801F6680(Unk801EE438_Scr* s, Unk801F6680_P* a, Unk801F6680_Q*
     }
 }
 
-/* near-miss (6 slots): loop and call match; store order inside the loop body (all 24 orders and chained
- * forms tried) leaves the first int store after the constant load in ours. */
 extern "C" void fn_801F67E0(Unk801EE438_Scr* p)
 {
     Unk801EE438_Rec14* base = p->m9C->m62C;
     Unk801EE438_Rec14* r = base;
     for (int i = 0; i < 4; i++, r++) {
-        r->mC = r->m0 = 0;
-        r->m8 = r->m4 = lbl_805D4EB0;
+        r->m0 = 0;
+        r->m8 = r->m4 = lbl_805D4EB0.v;
+        r->mC = 0;
     }
     fn_8035BED0(base, 0);
 }
