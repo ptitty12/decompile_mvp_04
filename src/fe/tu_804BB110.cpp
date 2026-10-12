@@ -98,3 +98,79 @@ extern "C" FE_OVERLAY void fn_804BDEB4(FeScr* x)
     ((FeObj*)x)->v84();
     ((FeObj*)x)->v87();
 }
+
+extern "C" FE_OVERLAY void fn_804BC414(FeCam* c, float a)
+{
+    c->mCC4 = a;
+}
+
+extern "C" FE_OVERLAY void fn_804BB3D0(FeCam* c, float a, float b, float d, float e)
+{
+    c->m0 = a;
+    c->m4 = b;
+    c->m8 = d;
+    c->mC = e;
+}
+
+extern "C" FE_OVERLAY void fn_804BC270(FeCam* c)
+{
+    fn_804BB334(c);
+    c->mCB8 = 0x4B;
+    c->mCC4 = 0.75f;
+}
+
+extern "C" FE_OVERLAY void fn_804BC2B0(FeCam* c, float a, float b)
+{
+    fn_804BB3D0(c, 0.0f, a, 1.0f, b);
+}
+
+extern "C" FE_OVERLAY void fn_804BB988(FeCam* c, int i, int j, float a, float b)
+{
+    c->rec[i].p[j].a = a;
+    c->rec[i].p[j].b = b;
+}
+
+/* near-miss: retail forms the three base addresses with addi and reloads the count each time; 11 slots differ */
+extern "C" FE_OVERLAY int fn_804BB92C(FeCam* c, int i, float a, float b)
+{
+    int o = i * 0x324;
+    char* cnt = (char*)c + 0x344;
+    char* pa = (char*)c + 0x24;
+    char* pb = (char*)c + 0x28;
+    *(float*)(pa + (*(int*)(cnt + o) * 8 + o)) = a;
+    *(float*)(pb + (*(int*)(cnt + o) * 8 + o)) = b;
+    int r = *(int*)(cnt + o);
+    *(int*)(cnt + o) = r + 1;
+    return r;
+}
+
+extern "C" FE_OVERLAY int fn_804BB9C0(FeCam* c)
+{
+    int m = 0;
+    for (int i = 0; i < c->mCB4; i++) {
+        if (c->rec[i].cnt > m)
+            m = c->rec[i].cnt;
+    }
+    return m;
+}
+
+extern "C" FE_OVERLAY int fn_804BDAA8(int unused, int k)
+{
+    FeTbl30* t = ((FeMgr30*)lbl_8061930C)->m30;
+    switch (k) {
+    case 0:
+        return t->m14;
+    case 1:
+        return t->m18;
+    case 2:
+        return t->m1C;
+    }
+    return 0;
+}
+
+extern "C" FE_OVERLAY int fn_804BC218(FeCam* c)
+{
+    if (c->m4 >= 0.0f)
+        return 0;
+    return (int)(-c->m4 / (c->mC - c->m4) * (c->m1C - c->m14));
+}
