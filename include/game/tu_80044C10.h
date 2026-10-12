@@ -190,16 +190,62 @@ public:
     int m708;
 };
 
+/* 13-word block at Ent + 4 (copied by fn_80048E50). */
+struct Unk80048A10_Blk {
+    int w[13];
+};
+
 struct Unk80048A10_Ent {
-    char pad0[0x3C];
+    int m0;
+    Unk80048A10_Blk m4;
+    int m38;
     int m3C;
-    char pad40[0x4];
+    float m40;
     int m44;
 };
 
 struct Unk80048A10_Sub {
     Unk80048A10_Ent mEnt[35];
-    char pad9D8[0xC4];
+    int m9D8;
+    int m9DC;
+    int m9E0;
+    float m9E4;
+    float m9E8;
+    float m9EC;
+    float m9F0;
+    int m9F4;
+    char pad9F8[0x4];
+    int m9FC;
+    int mA00;
+    char padA04[0x1C];
+    int mA20;
+    int mA24;
+    char padA28[0x4];
+    int mA2C;
+    int mA30;
+    int mA34;
+    char padA38[0x8];
+    int mA40;
+    int mA44;
+    int mA48;
+    int mA4C;
+    int mA50;
+    int mA54;
+    int mA58;
+    int mA5C;
+    int mA60;
+    int mA64;
+    int mA68;
+    int mA6C;
+    int mA70;
+    int mA74;
+    int mA78;
+    int mA7C;
+    int mA80;
+    char padA84[0x8];
+    int mA8C;
+    int mA90;
+    char padA94[0x8];
     void* mA9C;
     char padAA0[0x3C];
     struct Unk80048B2C_Obj* mADC;
@@ -261,10 +307,10 @@ int fn_80047B08(Unk8004763C* t);
 void fn_80047CA4(Unk8004763C* t);
 void fn_80047D40(Unk8004763C* t, int i);
 int fn_80048294(Unk8004763C* t, int i);
-void fn_8004838C(Unk8004763C* t, int i);
+int fn_8004838C(Unk8004763C* t, int i);
 int fn_800484A8(Unk8004763C* t, int i);
 void fn_80048818(Unk8004763C* t, int i);
-void fn_80048A10(Unk80048A10_Sub* p);
+Unk80048A10_Sub* fn_80048A10(Unk80048A10_Sub* p);
 void fn_80048B2C(Unk80048A10_Sub* p, int flags);
 void fn_80048BC0(Unk80048A10_Sub* p);
 void fn_80048BE4(Unk80048A10_Sub* p);
