@@ -580,6 +580,28 @@ DB_OVERLAY int fn_8053BAD0(R* r, int h, int id, int now)
     return res;
 }
 
+struct Db8053967C_RecV {
+    char pad0[0x1DC];
+    virtual ~Db8053967C_RecV();
+};
+struct Db8053967C_Obj58D {
+    char pad0[0x10];
+    Db8053967C_RecV* m10;
+    char pad14[0x40];
+    const void* m54;
+};
+extern char lbl_80684660[];
+DB_OVERLAY void fn_8053BDA8(Db8053967C_Obj58D* self, int chrg)
+{
+    self->m54 = lbl_80684660;
+    if (self->m10) {
+        delete[] self->m10;
+        self->m10 = 0;
+    }
+    if (chrg & 1)
+        delete self;
+}
+
 DB_OVERLAY void fn_8053BE58(O58* o)
 {
     o->m4->m4 = 0;
