@@ -31,6 +31,19 @@ extern "C" FE_OVERLAY FeScrH* fn_80481634(FeScrH* self, int a, int b, int c, int
     return self;
 }
 
+extern "C" FE_OVERLAY int fn_80482348(void* x)
+{
+    if (fn_804849FC(x) != 0)
+        return 0;
+    int idx = FeWp(x, 0x16C)->fn_vslot60();
+    FeW* cur = FeWp(x, 0x16C);
+    if (cur == FeWp(x, 0x13C))
+        fn_80484178(x, idx);
+    else if (cur == FeWp(x, 0x140))
+        fn_8048432C(x, idx);
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_804828CC(void* x)
 {
     FeAt(x, 0x16C)->fn_vslot50();
@@ -124,6 +137,15 @@ extern "C" FE_OVERLAY int fn_80482C58(void* x)
         FeWp(x, 0x148)->fn_vslot38(1);
         fn_80482D1C(x);
         fn_80483094(x);
+    }
+    return 1;
+}
+
+extern "C" FE_OVERLAY int fn_80482CC0(void* x)
+{
+    if (FeI(x, 0x244) != 0) {
+        ((FeWV*)FeWp(x, 0x148))->s39();
+        fn_80482D1C(x);
     }
     return 1;
 }
