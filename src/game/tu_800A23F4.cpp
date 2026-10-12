@@ -251,7 +251,7 @@ extern "C" void fn_800A29C4(Unk800A2688* p, int limit)
     }
 }
 
-extern "C" void fn_800A2AE8() { fn_8007F9B4(lbl_8061930C); }
+extern "C" int fn_800A2AE8(void* p) { return fn_8007F9B4(lbl_8061930C); }
 
 struct Unk800A2B10 {
     char pad0[0x74];
@@ -777,6 +777,59 @@ extern "C" void fn_800A3E6C(Unk800A3E6C* p)
     p->m84 = fn_8007F9B4(lbl_8061930C);
 }
 
+struct Unk800A4180 {
+    char pad0[0x48];
+    int m48;
+    char pad4C[0x70 - 0x4C];
+    int m70;
+    int m74;
+    int m78;
+    char pad7C[4];
+    int m80;
+};
+extern "C" int fn_805653B4(int a, void* b, void* c, void* d, void* e);
+extern "C" int fn_80565BFC(int a);
+extern "C" int fn_800A449C(void* p);
+
+extern "C" void fn_800A4180(Unk800A4180* p)
+{
+    int k = p->m70;
+    p->m74 = 0;
+    p->m78 = 0;
+    switch (k) {
+    case 2: {
+        void* a = fn_800A3AB0((Unk800A3AB0*)p);
+        void* b = fn_800A3AF4((Unk800A3AB0*)p);
+        void* c = fn_800A3B38((Unk800A3AB0*)p);
+        void* d = fn_800A3B7C((Unk800A3AB0*)p);
+        if (fn_805653B4(p->m48, a, b, c, d) == 1) {
+            p->m74 = k;
+            p->m80 = 8;
+        }
+        break;
+    }
+    case 3: {
+        int r = fn_80565BFC(p->m48);
+        if (r == 1) {
+            if (fn_800A449C(p) == 1) {
+                p->m74 = 2;
+                p->m80 = 9;
+            } else {
+                fn_800A29C4((Unk800A2688*)p, fn_800A2AE8(p) + 0x16D);
+                p->m74 = r;
+            }
+        }
+        break;
+    }
+    case 4:
+        if (fn_800A449C(p) == 1) {
+            p->m74 = 2;
+            p->m80 = 0xB;
+        }
+        break;
+    }
+}
+
 extern "C" void fn_800A42A4(Unk800A42A4* p, int v)
 {
     switch (v) {
@@ -814,7 +867,7 @@ extern "C" void fn_800A42EC(Unk800A3E6C* p)
 
 /* near-miss: ok/v swap registers, one mr missing */
 
-extern "C" int fn_800A449C()
+extern "C" int fn_800A449C(void* p)
 {
     int g = lbl_8061930C;
     int ok = 1;
