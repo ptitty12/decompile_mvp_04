@@ -7,6 +7,8 @@
  */
 #include "game/tu_80052794.h"
 
+void fn_80057B10(void);
+
 Unk80056A08_Ring::~Unk80056A08_Ring()
 {
     if (mC != 0) {
@@ -266,6 +268,76 @@ int fn_80057938(Unk80057204_Mgr* m)
         return 1;
     }
     return 0;
+}
+
+struct Unk80057950_E {
+    virtual ~Unk80057950_E();
+};
+struct Unk803416F4;
+struct Unk803417B0;
+struct Unk8034186C;
+struct Unk80341928;
+struct Unk803419E4;
+struct Unk80341AA0;
+struct Unk80341B5C;
+struct Unk80341C1C;
+struct Unk80341CDC;
+struct Unk80341D9C;
+struct Unk80341E5C;
+struct Unk80341F1C;
+void fn_8034170C(Unk803416F4* p);
+void fn_803417C8(Unk803417B0* p);
+void fn_80341884(Unk8034186C* p);
+void fn_80341940(Unk80341928* p);
+void fn_803419FC(Unk803419E4* p);
+void fn_80341AB8(Unk80341AA0* p);
+void fn_80341B78(Unk80341B5C* p);
+void fn_80341C38(Unk80341C1C* p);
+void fn_80341CF8(Unk80341CDC* p);
+void fn_80341DB8(Unk80341D9C* p);
+void fn_80341E78(Unk80341E5C* p);
+void fn_80341F38(Unk80341F1C* p);
+
+void fn_80057950(Unk80057204_Mgr* m)
+{
+    unsigned i = 0;
+    unsigned n = m->mC0;
+    for (; i < n; i++) {
+        Unk80057950_E* e = (Unk80057950_E*)m->mF4[i];
+        if (e != 0) {
+            delete e;
+            m->mF4[i] = 0;
+        }
+    }
+    if (m->mF4 != 0) {
+        delete[] m->mF4;
+        m->mF4 = 0;
+    }
+    char* b = (char*)m;
+    fn_8034170C((Unk803416F4*)(b + 0x4));
+    fn_803417C8((Unk803417B0*)(b + 0x14));
+    fn_80341884((Unk8034186C*)(b + 0x24));
+    fn_80341940((Unk80341928*)(b + 0x34));
+    fn_803419FC((Unk803419E4*)(b + 0x44));
+    fn_80341AB8((Unk80341AA0*)(b + 0x54));
+    fn_80341B78((Unk80341B5C*)(b + 0x64));
+    fn_80341C38((Unk80341C1C*)(b + 0x7C));
+    fn_80341CF8((Unk80341CDC*)(b + 0x94));
+    fn_80341DB8((Unk80341D9C*)(b + 0xAC));
+    fn_80341E78((Unk80341E5C*)(b + 0xC4));
+    fn_80341F38((Unk80341F1C*)(b + 0xDC));
+}
+
+void fn_80057A4C(Unk80057204_Mgr* m)
+{
+    if (fn_80057938(m)) {
+        unsigned n = m->mC0;
+        for (unsigned i = 0; i < n; i++) {
+            m->mF4[i]->v2();
+        }
+        m->m100 = 0;
+        ((void (*)(Unk80057204_Mgr*))fn_80057B10)(m);
+    }
 }
 
 void fn_80057AD4(void* self, Unk80052794_Rec* rec, Unk80052794_Obj* obj)
