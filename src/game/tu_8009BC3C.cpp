@@ -94,6 +94,57 @@ extern "C" void fn_8009CB5C(void* o, int kind, int x)
     }
 }
 
+extern int lbl_80619780[10][5];
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+/* near-miss: register choice only (retail keeps the loaded table value in r0 and the byte offset in r9) */
+extern "C" void fn_8009CCB0(Obj3* o, int* out, int n)
+{
+    int c = (n - 1) / 2;
+    int cl;
+    if (c <= 5) {
+        cl = c;
+        if (cl < 0)
+            cl = 0;
+    } else
+        cl = 5;
+    volatile int sp8 = 0;
+    int i = 0;
+    do {
+        if (i == 0) {
+            out[0] = i;
+        } else {
+            unsigned char b = o->m17C[i];
+            int v;
+            int off;
+            if (b != 0xFF) {
+                int q = fn_8008CFD8((char*)o + 0xC9C, 0x1D, b) / 10;
+                int q2;
+                if (q <= 9) {
+                    q2 = q;
+                    if (q2 < 0)
+                        q2 = 0;
+                } else
+                    q2 = 9;
+                v = lbl_80619780[q2][cl];
+                off = sp8 * 4;
+            } else {
+                off = i * 4;
+                v = 0;
+            }
+            *(int*)((char*)out + off) = v;
+        }
+        int t;
+        int c2 = sp8;
+        if (c2 > 9)
+            t = c2;
+        else
+            t = c2 + 1;
+        sp8 = t;
+        i = t;
+    } while (i <= 9);
+}
+
 extern "C" int fn_8009CDC8(void* self, int* arr)
 {
     int best = 0;
