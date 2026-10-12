@@ -4,6 +4,17 @@
  */
 #include "game/tu_8017D640.h"
 #include "game/clampiter.h"
+struct Unk8017E9C0_Obj {
+    char pad0[0x458];
+    int m458;
+    char pad45C[0x590 - 0x45C];
+    int m590;
+    char pad594[0x70C - 0x594];
+    unsigned char m70C;
+};
+extern "C" int fn_8014E310();
+void fn_80081C94(void* g, int a, int b, int c, int d);
+void fn_80081D18(void* g, int a, int b);
 struct Unk8017F428_M6F8 {
     char pad0[0x14];
     char* m14;
@@ -441,6 +452,27 @@ void fn_8017E2E8(Unk8017E2E8_T* p, int a, int b, int c)
     case 0x9F:
         fn_801ABC14(p->m3C8);
         break;
+    }
+}
+
+/* near-miss (97.2% fuzzy): the sign-bit mask keeps the branchy flag (a `< 0` test folds to srwi). Retail keeps
+ * the context in r11 (so `o->m458` lands in r3 and `mr r3,r11` precedes fn_801C1638); ours holds it in r3. Tried:
+ * switch, swapped arms, flag declared earlier, kind local, p->m4 re-read. */
+void fn_8017E9C0(Unk8017A930_T* p, Unk8017E9C0_Obj* o, int a)
+{
+    Unk8017B0A4_Ctx* c = p->m4;
+    void* g = c->m6F8->m14;
+    if (o != 0 && g != 0) {
+        if (o->m458 == 9) {
+            int fl = 1;
+            if ((o->m590 & 0x80000000) == 0) {
+                fl = 0;
+            }
+            int b = o->m70C;
+            fn_80081C94(g, a, b, ((Unk8017E9C0_Obj*)fn_801C1638(c, 0))->m70C, fl);
+        } else if (a <= 2) {
+            fn_80081D18(g, fn_8014E310(), a);
+        }
     }
 }
 
