@@ -444,8 +444,9 @@ void fn_800EB704(UiS* self);
 void fn_800DD204(UiS* a, UiS* b);
 void* fn_800B8144();
 void fn_800B83F8(void* self, int a, int b);
-void fn_80125128(UiObj* o, int a);
-void fn_80125154(UiObj* o, int a);
+int fn_80125128(UiObj* o, int a);
+int fn_801251CC(UiV_140i_148_14C* o, int a, int b, int c);
+int fn_80125154(UiObj* o, int a);
 void fn_804D28B4(void* p);
 extern char lbl_805BAFF0[];
 extern char lbl_805BE43C[];
@@ -472,7 +473,6 @@ public:
   virtual void v91(); virtual void v92(); virtual void v93(); virtual void v94(int a);
 };
 extern char lbl_805BA6D0[];
-/* near-miss: three arg-setup pairs (li r4 before mr r3) are ordered the other way round */
 void fn_800F4158(UiObj* self)
 {
     fn_800EB704((UiS*)self);
@@ -481,7 +481,7 @@ void fn_800F4158(UiObj* self)
     fn_80124FA8(w, self);
     fn_80125128(w, -1);
     fn_80125154(w, -2);
-    fn_801251CC(w, 3, 0x3BEE, -4);
+    fn_801251CC((UiV_140i_148_14C*)w, 3, 0x3BEE, -4);
     UiObj* o = fn_800C8044(self->v32((int)lbl_805BAFF0, 1));
     UiObj* p = fn_800C8040(o->v32((int)lbl_805BAFF0, 1));
     UiObj* q = fn_800C8038(o->v32((int)lbl_805BE43C, 1));
@@ -560,9 +560,8 @@ inline int UiIntAtF(char* b, int i)
     return *(int*)(b + o);
 }
 int fn_804D24B0(UiSub144* s);
-int fn_80126CF4(UiScrH* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+void fn_80126CF4(UiScrH* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 extern char lbl_805BE454[];
-/* near-miss: arg setup of the first fn_80126CF4 call (mr r3 / li r9) is ordered the other way round */
 extern "C" void fn_800F4A30(UiS4A30* self)
 {
     UiSub144* s = &self->m144;
