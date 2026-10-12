@@ -16,7 +16,7 @@ extern const float lbl_805D93EC;
 extern const float lbl_805D93F0;
 extern const float lbl_805D93F4;
 extern const float lbl_805D9484;
-float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, int a, int b, int c, int d);
+float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e);
 void fn_80254784(void* p);
 
 extern const float lbl_805D93AC;
@@ -37,9 +37,24 @@ void fn_80247858(Unk80270BA0_X* x)
     fn_8014E498(x->m60);
 }
 
+float fn_804028E4(float x);
+float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
+float atan2f(float y, float x);
+/* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
+   equal-priority parameters); tried single-call, result-variable and else forms */
+float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
+{
+    float len = fn_804028E4((p->x - q->x) * (p->x - q->x) + (p->z - q->z) * (p->z - q->z));
+    if (len > 24.0f) {
+        float ang = atan2f(q->x - p->x, q->z - p->z);
+        return fn_8024796C(x, 0, c, d, e, &ang, 0, q, len);
+    }
+    return fn_8024796C(x, 0, c, d, e, 0, 0, q, len);
+}
+
 extern "C" float fn_80248450(Unk80270BA0_X* x, int a, int b, int c)
 {
-    return fn_80248370(x, &x->m60, a, b, c, 0);
+    return fn_80248370(x, &x->m60, (Unk80273498_Vec3*)a, b, c, 0);
 }
 
 float fn_80248F70(Unk80270BA0_X* x, float f)
