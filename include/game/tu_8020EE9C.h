@@ -189,8 +189,11 @@ struct Rec16 {
     int mC;
 };
 
+struct TaskInner;
 struct Obj3A64 {
-    char pad0[0x794];
+    char pad0[0x9C];
+    TaskInner* m9C;
+    char padA0[0x794 - 0xA0];
     int m794;
     int m798;
 };
@@ -220,7 +223,8 @@ struct TaskInner {
     int m30;
     char pad34[0x40 - 0x34];
     int m40;
-    char pad44[0x60 - 0x44];
+    char pad44[0x5C - 0x44];
+    int m5C;
     int m60;
     char pad64[0x70 - 0x64];
     int m70;
