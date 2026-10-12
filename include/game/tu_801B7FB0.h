@@ -160,13 +160,18 @@ struct Unk801B7FB0_PV : public Unk801B7FB0_PBase {
 struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     char pad9C[0x1C8];
     int m264;
-    char pad268[0x104];
+    char pad268[0xB8];
+    Vec3 m320;
+    char pad32C[0x40];
     Unk801B7FB0_P* m36C;
     char pad370[0x8];
     int m378;
-    char pad37C[0x10];
+    char pad37C[0xC];
+    int m388;
     int m38C;
-    char pad390[0x60];
+    char pad390[0x58];
+    float m3E8;
+    float m3EC;
     float m3F0;
     float m3F4;
     char pad3F8[0x40];
@@ -181,7 +186,8 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     int m588;
     Unk801B7FB0_Sub58C m58C;
     float m5A0;
-    char pad5A4[0x24];
+    char pad5A4[0x20];
+    int m5C4;
     int m5C8;
     int m5CC;
     char pad5D0[0x48];
@@ -230,7 +236,7 @@ struct Unk801B7FB0_Slot {
 
 struct Unk801B7FB0_Ai {
     void* m0;
-    char pad4[0x4];
+    int m4;
     Unk801B7FB0_B* m8;
     void* mC;
     int m10;
