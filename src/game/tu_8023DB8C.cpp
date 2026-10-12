@@ -11,6 +11,8 @@ int fn_80319330(void* p, int id);
 void fn_8023EC24(Unk8023DB8C_P* p);
 int fn_8023DDD0(Unk8023DB8C_P* p);
 void fn_8023E448(Unk8023DB8C_P* p);
+extern int lbl_8061B9C8;
+int fn_8023EB94(Unk8023DB8C_P* p, int a, int b);
 
 void fn_802C959C(void* p, int a);
 void* fn_80179058(int a);
@@ -18,6 +20,44 @@ void* fn_80179058(int a);
 void fn_8023DB8C(Unk8023DB8C_P* p)
 {
     fn_802546E4(p->m58C);
+}
+
+/* near-miss: 19 slots; retail derives the zero test from the first cmpwi via mfcr (rlwinm r11,r11,3,31,31),
+ * ours recompares into cr7 (31 vs 30 insns in the first form, 30 vs 30 here) */
+int fn_8023DDD0(Unk8023DB8C_P* p)
+{
+    int v = p->m44C->m6F8->m14->m1CD0;
+    int f = 0;
+    if (v != 0)
+        f = 1;
+    int z = f ^ 1;
+    if (p->m264 != 0)
+        return p->m708 == z;
+    if (p->m708 == f || p->m458 == 14)
+        return 0;
+    return p->m458 != 1;
+}
+
+void fn_8023DE48(Unk8023DB8C_P* p)
+{
+    if (p->m458 == 9) {
+        lbl_8061B9C8 = 1;
+        ((Unk8023DE48_Q*)((char*)p + 0xA0))->v5();
+    } else if (p->mB54 != 0) {
+        lbl_8061B9C8 = 2;
+        ((Unk8023DE48_Q*)((char*)p + 0xA0))->v5();
+    }
+}
+
+void fn_8023DED0(Unk8023DB8C_P* p)
+{
+    if (p->m458 == 9) {
+        lbl_8061B9C8 = 1;
+        ((Unk8023DE48_Q*)((char*)p + 0xA0))->v5();
+    } else if (p->mB54 == 0) {
+        lbl_8061B9C8 = 2;
+        ((Unk8023DE48_Q*)((char*)p + 0xA0))->v5();
+    }
 }
 
 int fn_8023E604(Unk8023DB8C_P* p, int k)
@@ -41,6 +81,24 @@ int fn_8023E604(Unk8023DB8C_P* p, int k)
 int fn_8023EB80(void* p, int i)
 {
     return lbl_8061D420[i];
+}
+
+int fn_8023EB94(Unk8023DB8C_P* p, int a, int b)
+{
+    int v = 0;
+    Unk8023DB8C_Ctx* c = p->m44C;
+    if (c == 0 || c->m6F4 == 1) {
+        int k = p->m458;
+        if (k == 9) {
+            v = a;
+            if (v == 2)
+                v = 1;
+        } else if (k == 1)
+            v = 0;
+        else
+            v = b;
+    }
+    return v == 1;
 }
 
 int fn_8023EBF4(Unk8023DB8C_P* p, int i)
