@@ -3,6 +3,25 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" FeW* fn_800C805C(FeW* w);
+extern "C" {
+void fn_80489BEC(void* x, int a);
+void fn_804898CC(void* x);
+}
+struct FeRow9B3C {
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+};
+
+static inline int FeSumRow(FeRow9B3C* r)
+{
+    int s = 0;
+    for (int i = 0; i < 0x80; i++) {
+        s += r->m1B4[(unsigned char)i];
+    }
+    return s;
+}
+
 typedef int (*Fn9764_t)(void*, int, int, int);
 /* fn_8009764C takes its third argument as int here (the header's unsigned char adds a clrlwi). */
 static inline int FeCheck9764(void* t, int k, int r, int z)
@@ -63,6 +82,21 @@ extern "C" FE_OVERLAY int fn_8048986C(FeW* x, int w)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_804898CC(void* xv)
+{
+    FeW* x = (FeW*)xv;
+    char buf[12];
+    FeNode4* n = lbl_806192E0->m4;
+    FeW* w0 = ((FeW* (*)(FeW*))fn_800C8040)(x->fn_vslot29("TEAMSCORE/HOMESCORE"));
+    FeW* w1 = ((FeW* (*)(FeW*))fn_800C8040)(x->fn_vslot29("TEAMSCORE/AWAYSCORE"));
+    w0->fn_vslot8(1);
+    w1->fn_vslot8(1);
+    fn_804089B4(buf, "%d", FeSumRow((FeRow9B3C*)n->m14));
+    ((FeWV*)w0)->s30(buf);
+    fn_804089B4(buf, "%d", FeSumRow((FeRow9B3C*)((char*)n->m14 + 0xE64)));
+    ((FeWV*)w1)->s30(buf);
+}
+
 extern "C" FE_OVERLAY int fn_80489A44(int u, int idx, int mode)
 {
     char* team = (char*)lbl_806192E0->m4->m14 + idx * 0xE64;
@@ -85,6 +119,41 @@ extern "C" FE_OVERLAY int fn_80489A44(int u, int idx, int mode)
         }
     }
     return 0;
+}
+
+extern "C" FE_OVERLAY int fn_80489B3C(void* self, int mode)
+{
+    int a = FeSumRow((FeRow9B3C*)((char*)lbl_806192E0->m4->m14 + 0xE64));
+    int b = FeSumRow((FeRow9B3C*)lbl_806192E0->m4->m14);
+    int gt = a > b;
+    if ((mode == 1 && gt) || (mode == 0 && !gt))
+        return 1;
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8048A144(FeW* x)
+{
+    char* t0 = (char*)lbl_806192E0->m4->m14;
+    char* t1 = t0 + 0xE64;
+    int a;
+    int b;
+    if (fn_80489B3C(x, 1) != 0) {
+        a = fn_80489A44((int)x, 1, 0);
+        b = fn_80489A44((int)x, 0, 1);
+    } else {
+        b = fn_80489A44((int)x, 0, 0);
+        a = fn_80489A44((int)x, 1, 1);
+    }
+    FeW* wl = ((FeW* (*)(FeW*))fn_800C8044)(x->fn_vslot32("LEFTPLAYER", 1));
+    FeW* wr = ((FeW* (*)(FeW*))fn_800C8044)(x->fn_vslot32("RIGHTPLAYER", 1));
+    fn_800E2F24(wl, (int)t1, a);
+    fn_800E2F24(wr, (int)t0, b);
+    fn_800E31A8(wl, (int)t1, a);
+    fn_800E31A8(wr, (int)t0, b);
+    fn_80489BEC(x, 1);
+    fn_80489BEC(x, 0);
+    fn_804898CC(x);
+    fn_80590CA8(*(int*)((char*)lbl_8061930C + 0x30));
 }
 
 /* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
@@ -239,11 +308,48 @@ extern "C" FE_OVERLAY void fn_8048B7A0(FeW* x)
     }
 }
 
+extern "C" FE_OVERLAY int fn_8048B840(void* xv)
+{
+    FeW* x = (FeW*)xv;
+    FeW* w = ((FeW* (*)(FeW*))fn_800C8058)(fn_800C805C(x->fn_vslot32("INFOMODE", 1))->fn_vslot33(10, 1));
+    int cur = FeI(x, 0x134);
+    if (!(FeW24(x->fn_vslot32("INFOMODE", 1)) & 0x40000000))
+        return 0;
+    fn_800C805C(x->fn_vslot32("INFOMODE", 1))->fn_vslot40(1);
+    do {
+        cur--;
+        if (cur < 0)
+            cur = 5;
+    } while ((fn_8048E450(x) == 0 && cur == 3) || (fn_8048E480(x) == 0 && cur == 2) || (fn_8048E4D8(x) == 0 && (unsigned)(cur - 4) <= 1));
+    ((FeSub*)((char*)w + 0xDC))->s6(cur);
+    FeI(x, 0x134) = cur;
+    fn_8048BCE4(x);
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_8048B9B8(FeW* x)
 {
     FeW* p = x->fn_vslot32("INFOMODE", 1);
     ((FeWV*)fn_800C805C(p))->s41();
     return 0;
+}
+
+extern "C" FE_OVERLAY int fn_8048BA18(void* xv)
+{
+    FeW* x = (FeW*)xv;
+    FeW* w = ((FeW* (*)(FeW*))fn_800C8058)(fn_800C805C(x->fn_vslot32("INFOMODE", 1))->fn_vslot33(10, 1));
+    int cur = FeI(x, 0x134);
+    if (!(FeW24(x->fn_vslot32("INFOMODE", 1)) & 0x40000000))
+        return 0;
+    fn_800C805C(x->fn_vslot32("INFOMODE", 1))->fn_vslot38(1);
+    do {
+        if (cur++ == 5)
+            cur = 0;
+    } while ((fn_8048E450(x) == 0 && cur == 3) || (fn_8048E480(x) == 0 && cur == 2) || (fn_8048E4D8(x) == 0 && (unsigned)(cur - 4) <= 1));
+    ((FeSub*)((char*)w + 0xDC))->s6(cur);
+    FeI(x, 0x134) = cur;
+    fn_8048BCE4(x);
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_8048BB94(FeW* x)
@@ -292,4 +398,31 @@ extern "C" FE_OVERLAY int fn_8048E4D8(void* x)
 {
     fn_800B555C();
     return fn_800B5758();
+}
+
+extern "C" FE_OVERLAY void fn_8048E4FC(void* xv, int unused, int mode)
+{
+    FeW* x = (FeW*)xv;
+    FeW* w = ((FeW* (*)(FeW*))fn_800C8058)(fn_800C805C(x->fn_vslot32("INFOMODE", 1))->fn_vslot33(10, 1));
+    int cur = FeI(x, 0x134);
+    if (FeW24(x->fn_vslot32("INFOMODE", 1)) & 0x40000000) {
+        switch (mode) {
+        case 0:
+            do {
+                cur--;
+                if (cur < 0)
+                    cur = 5;
+            } while ((fn_8048E450(x) == 0 && cur == 3) || (fn_8048E480(x) == 0 && cur == 2) || (fn_8048E4D8(x) == 0 && (unsigned)(cur - 4) <= 1));
+            break;
+        case 1:
+            do {
+                if (cur++ == 5)
+                    cur = 0;
+            } while ((fn_8048E450(x) == 0 && cur == 3) || (fn_8048E480(x) == 0 && cur == 2) || (fn_8048E4D8(x) == 0 && (unsigned)(cur - 4) <= 1));
+            break;
+        }
+        ((FeSub*)((char*)w + 0xDC))->s6(cur);
+        FeI(x, 0x134) = cur;
+        fn_8048BCE4(x);
+    }
 }
