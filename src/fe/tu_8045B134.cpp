@@ -390,7 +390,6 @@ FE_OVERLAY void fn_8045C0BC(FeScrB* x, int a, int b)
     fn_8045D338(x);
 }
 
-/* near-miss: lwzx operand order in the first copy loop (retail base,index; ours index,base): 1 slot */
 FE_OVERLAY int fn_8045C0FC(FeScrB* x)
 {
     FeArrL lst;
@@ -417,7 +416,7 @@ FE_OVERLAY int fn_8045C0FC(FeScrB* x)
     int total = n + c0 + c1;
     unsigned i = 0;
     for (i = 0; i < n; i++)
-        x->m144[i] = ((int*)s->m0)[i];
+        x->m144[i] = *(int*)(s->m0 + (i << 2));
     for (i = 0; i < c0; i++)
         x->m1A8[i] = fn_8007F6C4__FP13Unk8007F198_Aiii(g, x->m134, 0, i);
     for (i = 0; i < c1; i++)
