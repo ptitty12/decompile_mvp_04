@@ -73,7 +73,9 @@ extern "C" void fn_803AEB50(int a, int b, int c, int d, int e);
 struct Unk8069E200_RecA {
     char pad0[0x1F];
     unsigned char m1F;
-    char pad20[0x1C];
+    char pad20[4];
+    unsigned char m24;
+    char pad25[0x17];
     void* m3C;
 };
 
@@ -124,6 +126,16 @@ struct Unk803AEE98 {
 };
 extern void (*lbl_806AA4C8)(Unk803AEE98*);
 extern void (*lbl_806AA4CC)();
+
+extern "C" int fn_80415A70();
+
+extern "C" void fn_803AE964(int v, int k);
+extern unsigned short lbl_80625468[][4];
+
+struct Unk803AE618 {
+    char pad0[0x14];
+    int m14;
+};
 
 extern "C" void fn_803AC88C()
 {
@@ -225,6 +237,29 @@ extern "C" void fn_803ADD08(Unk803ADD08* p)
     p->m30 = 0;
 }
 
+extern "C" void fn_803ADD4C(Unk803AE0E0* o, float* in, unsigned int v, int flag)
+{
+    Unk803ADD08* e = &lbl_8069CBC4[o->m18];
+    if (lbl_8069E1C4 == 4) {
+        unsigned int idx = v >> 8;
+        if (flag == 0) {
+            e->m3A = lbl_80625468[idx][1];
+            e->m52 = lbl_80625468[idx][3];
+            e->m4E = lbl_80625468[idx][2];
+            e->m36 = lbl_80625468[idx][0];
+        } else {
+            e->m36 = 0;
+            e->m4E = 0;
+            e->m52 = 0;
+            e->m3A = 0;
+        }
+    } else {
+        e->m3A = (short)(in[0] * 32767.0f);
+        e->m36 = (short)(in[1] * 32767.0f);
+    }
+    e->m4 |= 0x40000000;
+}
+
 extern "C" void fn_803ADE24(Unk803AE0E0* p, short v, int kind)
 {
     Unk803ADD08* e = &lbl_8069CBC4[p->m18];
@@ -285,6 +320,29 @@ extern "C" void fn_803AE550()
 extern "C" void fn_803AE5EC(int v)
 {
     SNDVOICEI_free(v + sndgs.sso.set.voicesdsp);
+}
+
+/* near-miss: 53 vs 54 insns: retail loads o->m14 into r11 before the chan base (lbl_8069CA48 in r10) and keeps both live for the second chan index; ours loads m14 into r0 and rebuilds the base */
+extern "C" void fn_803AE618(Unk803AE618* o)
+{
+    int idx = o->m14;
+    CHANPUB* c = &sndgs.chan[idx];
+    int m = c->masterchan;
+    int base = m;
+    if (m == -1)
+        base = idx;
+    CHANPUB* mc = &sndgs.chan[base];
+    int i;
+    for (i = 0; i < mc->numchan; i++) {
+        int v = mc->voices[i];
+        if (lbl_8069E200.recA[v].m3C != 0) {
+            if (v == o->m14)
+                fn_803AE964(v, 1);
+            else
+                fn_803AE964(v, 2);
+            lbl_8069E200.recA[mc->voices[i]].m24 = 0;
+        }
+    }
 }
 
 extern "C" int fn_803AEA78(int v)
@@ -356,6 +414,33 @@ extern "C" void fn_803AEF88()
         SNDMEMI_free(lbl_8069E200.mBufs[i]);
     fn_803A979C();
     lbl_806AA4CC();
+}
+
+extern "C" int fn_803AF374()
+{
+    sndgs.sso.cap.voicesdspmax = 0x30;
+    sndgs.sso.cap.outputchannelsmax = 4;
+    sndgs.sso.set.initaram = 1;
+    sndgs.sso.set.outputrate = 0x7d00;
+    sndgs.sso.set.outputchannels = 2;
+    sndgs.sso.cap.outputratemin = 0x7d00;
+    sndgs.sso.cap.voicesmaincpumax = 0x20;
+    sndgs.sso.cap.outputchannelsmin = 1;
+    sndgs.sso.cap.rendermode[0] = 0x220;
+    sndgs.sso.set.rendermode[0] = 0x220;
+    sndgs.sso.cap.rendermode[1] = 0x24;
+    sndgs.sso.set.numrendermodes = 2;
+    sndgs.sso.set.voicesmaincpu = 8;
+    sndgs.sso.set.rendermode[1] = 0x24;
+    sndgs.sso.set.voicesdsp = 0x30;
+    sndgs.sso.set.maxstreams = 8;
+    sndgs.sso.cap.numrendermodes = 2;
+    sndgs.sso.cap.outputratemax = 0x7d00;
+    sndgs.sso.set.outputspdifmode = 1;
+    int a = fn_80415A70() + 0x100;
+    sndgs.sso.set.arampooladdr = a;
+    sndgs.sso.set.arampoolsize = 0x800000 - a;
+    return 0;
 }
 
 extern "C" int fn_803AF934()
