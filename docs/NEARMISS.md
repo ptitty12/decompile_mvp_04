@@ -38,6 +38,8 @@ our C++ game units as they are.
 | fn_800B08B0 | game/tu_800AF248.cpp | 4/4, 2 slots | `int r = 0; switch (p->m10) { case 0..3: r = 0; }` gives `lwz; cmpwi; li; blr`, retail has the `li r3,0` before the dead `cmpwi` | case ranges 0..5, int/unsigned, if forms (Opus 4) |
 | fn_803F73B0 | ealib/tu_803F73B0.cpp | not written; best 60 slots | error-code table: cases -128 and -14..0 (value = -k, -128 -> 15), default 16; case set and values right, tree layout differs | `r = v` / `return v` forms, -14/-15 lower bound (Opus 4b) |
 | fn_803ABCB4, fn_803ABDD0, fn_803AC164 | snd/tu_803AB310.cpp | not written | dead `cmpwi -18/-10/-7` trees after calls: an error-code switch with empty arms (PATTERNS, Hard-case families 4); the port/mvp2005 reference source should give the rest | none (Opus 4b) |
+| fn_80022DF8 | game/tu_80021BE8.cpp | 99/100 insns | retail reloads `b` (`lfs f13,8(r1)`) before the cross-jumped tail; GCSE keeps it in f13 here; the goto reconstruction is probably not the original if/else | inline tails (spill), goto layouts (earlier); PATTERNS, Hard-case families 6 |
+| fn_80027CF0, fn_8002B430 | game/tu_80026A48.cpp, game/tu_8002B430.cpp | not written | family 3 shape: use the Secs inline (PATTERNS, Hard-case families 6); fn_80027CF0 also has a volatile saturating loop over m270[0..2] and undeclared fields m740/m798/m7C8/m7CC | none (Opus 6) |
 
 Matched by the near-miss sweep (W4, 2026-10-11; recipes in PATTERNS.md,
 "Near-miss sweep"): cTimeWarp::cTimeWarp, fn_8027F504, fn_8027FC80,
@@ -77,3 +79,8 @@ fn_80132630, fn_80110DDC, fn_800DE1C4, fn_800DE274, fn_800DE440, fn_8010AE78, fn
 fn_800E1A1C, fn_80096244, fn_80085F2C, fn_802B8548, fn_802B8B34, fn_802B8BFC, fn_8029C914,
 fn_8007A2B4, fn_8007C328, fn_8006B880, fn_805A0000, fn_80533120, fn_804E2014, fn_8025F7F0,
 fn_802AF624, fn_80255284, fn_80254EA4, fn_802AE474, fn_802AE4C0, fn_8058FDCC.
+
+Matched by Opus hard-case families 6 (2026-10-12; PATTERNS.md, "Hard-case families 6"):
+fn_80163CC4, fn_80143134, fn_80022780, fn_80022A28, fn_80022BE0, fn_8002395C, fn_800292EC,
+fn_800297D4, fn_80029FE4, fn_8002BB3C, fn_8002BE10, fn_8002BF20, fn_8002C540, fn_800243D4,
+fn_800263D4, fn_800264F4, fn_80291378, fn_8029D094, fn_802456C8, fn_802496BC.
