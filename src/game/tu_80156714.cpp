@@ -635,6 +635,73 @@ int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
 {
 }
 
+extern "C" int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
+extern const float lbl_805C8E10;
+extern "C" int fn_801D0314(void* p);
+extern "C" void fn_80159E40(Unk80159F28* self, int* a, int* b);
+extern const char lbl_805C8DA0[];
+extern const char lbl_805C8DB8[];
+extern const char lbl_805C8DD0[];
+extern const char lbl_805C8DE8[];
+extern const char lbl_805C8DFC[];
+/* near-miss (96.2%): the three by-value Blk temporaries all sit at r1+0x10 here; retail puts the
+ * side_ball and top_hit copies at r1+0x8 (the float argument slot is a freed temp there) and merges the
+ * tail of the top_ball/side_ball calls (2 slots). Tried: inline Chk with/without a float param, cast and
+ * literal float arguments, per-use scopes, branch order, a named local Blk. */
+extern "C" void fn_801594A8(Unk80159F28* self) /* 801594A8 */
+{
+    int flag = 0;
+    if (fn_80326C20(&self->mC->m50) != 0) {
+        Unk801527C8_Sub* s = &self->mC->m50;
+        Unk80156838_Entry* e;
+        int n;
+        fn_80326ED4(s, &e, &n);
+        float t = lbl_805C8E10;
+        int c1 = fn_803270C4(s, 0x10, 1, t) != 0;
+        if (c1 && fn_801D0314((char*)self->mC->m700->m3A4 + 0x28C) != 2) {
+            t = lbl_805C8E10;
+            int c2 = fn_803270C4(s, 0x44, 1, t) != 0;
+            if (!c2) {
+                t = lbl_805C8E10;
+                int z = fn_803270C4(s, 0x56, 1, t) != 0;
+                if (!z) {
+                    t = lbl_805C8E10;
+                    int c3 = fn_803270C4(s, 0x42, 1, t) != 0;
+                    if (!c3) {
+                        flag = 1;
+                    }
+                    fn_801A04A8(self->mC, 5);
+                    Unk801527C8_Actor* a = fn_801A04A8(self->mC, 5);
+                    Unk80189300* o = fn_801A4B34(self->mC);
+                    if (o != 0) {
+                        if (flag != 0) {
+                            int p = 0;
+                            int q = 0;
+                            fn_80159E40(self, &p, &q);
+                            if (p == 0) {
+                                return;
+                            }
+                            if (q != 0) {
+                                ((Unk8016ACAC*)a->m40)->fn_8016BB50(lbl_805C8DA0, 0, 0, lbl_8068B828, 0);
+                            } else {
+                                ((Unk8016ACAC*)a->m40)->fn_8016BB50(lbl_805C8DB8, 0, 0, lbl_8068B828, 0);
+                            }
+                        } else {
+                            ((Unk8016ACAC*)a->m40)->fn_8016BB50(lbl_805C8DD0, 0, 0, lbl_8068B828, 0);
+                        }
+                        if (o->fn_v4() != 0) {
+                            fn_8031E1D4(a, lbl_805C8DE8);
+                        } else {
+                            fn_8031E1D4(a, lbl_805C8DFC);
+                        }
+                        a->m4 = 1;
+                    }
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_801597F0(Unk80159F28* self) /* 801597F0 */
 {
     self->m334 = -1.0f;
