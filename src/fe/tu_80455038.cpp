@@ -259,10 +259,10 @@ extern "C" FE_OVERLAY int fn_80458FE8(void* s, FeObj* a, int unused, int c)
             ((FeObj2*)self)->v67(1, fn_800C8070(self));
     } else if (a == self->m13C[0]) {
         fn_80458AAC(self, 0);
-    L0A4:
-        if (self->m158 == -1 && self->m154 == -1)
+        if (self->m158 == -1 && self->m154 == -1) {
+        L0A4:
             ((FeObj2*)self)->v67(0, fn_800C8070(self));
-        else if (self->m158 == c)
+        } else if (self->m158 == c)
             ((FeObj2*)self)->v67(1, fn_800C8070(self));
     }
     fn_804589BC(self);

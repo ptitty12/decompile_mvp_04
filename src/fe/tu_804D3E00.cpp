@@ -197,8 +197,8 @@ FE_OVERLAY void fn_804D4640(FeS804D3D74* x, int a)
     if (a == 0) {
         fn_8001BC4C()->fn_8001BDAC(0xA3);
         x->m154->fn_vslot68(fn_804D46B8(x, 4));
+        fn_804D4430(x);
     }
-    fn_804D4430(x);
 }
 
 FE_OVERLAY int fn_804D46B8(FeS804D3D74* x, int n)
