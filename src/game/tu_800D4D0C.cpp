@@ -3,6 +3,53 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800D4D0C.h"
+struct Unk800CFEEC_Raw {
+    char pad0[0x28];
+    Unk800CFEEC_Raw* fn_800CFEEC(int flag);
+};
+extern char lbl_8065A0A8[];
+extern char lbl_8065A2B0[];
+extern "C" void fn_800D4B9C(void* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1, int s2, int s3, int s4,
+                            int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12, int s13, int s14, int s15, int s16);
+extern "C" int strcmp(const char* a, const char* b);
+extern "C" int sprintf(char*, const char*, ...);
+extern const char lbl_805BCA08[];
+extern "C" char* fn_800DF254(char* dst, int a, int b, float f);
+extern "C" void fn_800D4000(Unk800D4D0C_D* t, char* s);
+extern "C" void fn_800D4208(Unk800D4D0C_D* t, const char* s);
+class Unk800D53F8_V {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29(int a);
+};
 
 void fn_800D4D0C(Unk800D4D0C_D* t, int v)
 {
@@ -54,6 +101,42 @@ void fn_800D5288(Unk800D4D0C_D* t, int a)
     fn_800C8070(t);
     fn_802D7EE4();
     fn_800D4538(t, a);
+}
+
+extern "C" Unk800D4D0C_D* fn_800D52E4(Unk800D4D0C_D* self, int p1, int p2, int p3, int p4, int p5, int p6, int p7, int s0, int s1,
+                                      int s2, int s3, int s4, int s5, int s6, int s7, int s8, int s9, int s10, int s11, int s12,
+                                      int s13, int s14, int s15)
+{
+    fn_800D4B9C(self, p1, p2, p3, p4, p5, p6, p7, s0, s1, s2, s3, 0xBBC, s4, s10, s11, s5, s6, s7, s8, s9, 0, s13, s14, s15);
+    ((Unk800CFEEC_Raw*)((char*)self + 0xDC))->fn_800CFEEC(s12);
+    *(const void**)((char*)self + 0x100) = lbl_8065A2B0;
+    *(const void**)((char*)self + 0x3C) = lbl_8065A0A8;
+    self->m104 = -1;
+    self->m318 = 0;
+    self->m31C = 0.0f;
+    self->m324 = 1.0f;
+    self->m320 = 0.0f;
+    self->m328 = 0.0f;
+    *(int*)((char*)self + 0x1C) = 10;
+    return self;
+}
+
+void fn_800D53F8(Unk800D4D0C_D* t)
+{
+    char b8[0x68];
+    char b70[200];
+    if (t->m318 != 0) {
+        char* s = t->m32C;
+        if (strcmp(s, lbl_805BCA08) == 0) {
+            fn_800DF254(b70, 0, 3, t->m328);
+            fn_800D4000(t, b70);
+        } else {
+            sprintf(b8, s, t->m328);
+            fn_800D4208(t, b8);
+        }
+    } else if (t->bslot13() > 0) {
+        ((Unk800D53F8_V*)t)->s29(t->m108[t->bslot5()]);
+    }
 }
 
 int fn_800D54FC(Unk800D4D0C_D* t)
