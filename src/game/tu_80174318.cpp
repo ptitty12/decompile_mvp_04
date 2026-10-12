@@ -21,6 +21,30 @@ inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_V
 }
 extern "C" void* fn_8035AB00(void* self);
 
+struct Unk8019F8C0_Owner;
+struct Unk80177170_Inner {
+    char pad0[0xAF0];
+    int mAF0;
+};
+struct Unk80177170_Obj {
+    char pad0[0x448];
+    Unk80177170_Inner* m448;
+};
+Unk80177170_Obj* fn_801A5218(Unk8019F8C0_Owner* o);
+extern "C" float fn_804028E4(float x);
+
+struct Unk80177170_T {
+    char pad0[8];
+    Unk8019F8C0_Owner* m8;
+    char padC[4];
+    Unk80273498_Vec3 m10;
+    Unk80273498_Vec3 m1C;
+    Unk80273498_Vec3 m28;
+    Unk80273498_Vec3 m34;
+    char pad40[4];
+    Unk80177170_Obj* m44;
+};
+
 extern const Unk80174318_Fn lbl_805CB1CC;
 extern int lbl_8061C668;
 extern const Unk80174318_Fn lbl_805CB1D4;
@@ -362,6 +386,43 @@ void fn_80176C0C(Unk80176C0C_T* p)
     }
 }
 
+struct Unk8019F8C0_Owner;
+void* fn_801A4C5C(Unk8019F8C0_Owner* o, int a, int b);
+extern "C" Unk80273498_Vec3 fn_80183A44(void* obj, int a, int b);
+extern const Unk80177A90_V3 lbl_805D0058;
+void fn_80177170(Unk80177170_T* p);
+struct Unk80176C4C_Ctx {
+    char pad0[0x6B8];
+    void* m6B8;
+};
+
+void fn_80176C4C(Unk80176C0C_T* p) /* 80176C4C */
+{
+    fn_80176C0C(p);
+    ((Unk80177170_T*)&p->mC[0])->m10 = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 0, 0);
+    ((Unk80177170_T*)&p->mC[0])->m1C = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 0, 2);
+    ((Unk80177170_T*)&p->mC[1])->m10 = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 0, 1);
+    ((Unk80177170_T*)&p->mC[1])->m1C = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 0, 3);
+    ((Unk80177170_T*)&p->mC[2])->m10 = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 1, 0);
+    ((Unk80177170_T*)&p->mC[2])->m1C = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 1, 2);
+    ((Unk80177170_T*)&p->mC[3])->m10 = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 1, 1);
+    ((Unk80177170_T*)&p->mC[3])->m1C = fn_80183A44(((Unk80176C4C_Ctx*)p->m8)->m6B8, 1, 3);
+    ((Unk80177170_T*)&p->mC[4])->m10 = *(const Unk80273498_Vec3*)&lbl_805D0058;
+    ((Unk80177170_T*)&p->mC[4])->m1C = *(const Unk80273498_Vec3*)&lbl_806055AC;
+    fn_80177BCC(&p->mC[0], fn_801A4C5C((Unk8019F8C0_Owner*)p->m8, 0, 0));
+    fn_80177BCC(&p->mC[1], fn_801A4C5C((Unk8019F8C0_Owner*)p->m8, 0, 1));
+    fn_80177BCC(&p->mC[2], fn_801A4C5C((Unk8019F8C0_Owner*)p->m8, 1, 0));
+    fn_80177BCC(&p->mC[3], fn_801A4C5C((Unk8019F8C0_Owner*)p->m8, 1, 1));
+    int n = 5;
+    Unk80176C0C_Entry* e = &p->mC[0];
+    do {
+        fn_80177170((Unk80177170_T*)e);
+        e++;
+        n--;
+    } while (n != 0);
+    p->m174 = n;
+}
+
 void fn_80176F04(Unk80176C0C_T* p, int a)
 {
     Unk80176C0C_Entry* e = p->mC;
@@ -470,30 +531,6 @@ int fn_80177148(int* p, int a)
     }
     return 0;
 }
-
-struct Unk8019F8C0_Owner;
-struct Unk80177170_Inner {
-    char pad0[0xAF0];
-    int mAF0;
-};
-struct Unk80177170_Obj {
-    char pad0[0x448];
-    Unk80177170_Inner* m448;
-};
-Unk80177170_Obj* fn_801A5218(Unk8019F8C0_Owner* o);
-extern "C" float fn_804028E4(float x);
-
-struct Unk80177170_T {
-    char pad0[8];
-    Unk8019F8C0_Owner* m8;
-    char padC[4];
-    Unk80273498_Vec3 m10;
-    Unk80273498_Vec3 m1C;
-    Unk80273498_Vec3 m28;
-    Unk80273498_Vec3 m34;
-    char pad40[4];
-    Unk80177170_Obj* m44;
-};
 
 inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
 {
