@@ -4,6 +4,32 @@
  */
 
 #include "game/fe_804ABCBC.h"
+struct Fe4164R {
+    char pad0[0xC];
+    unsigned p0 : 2;
+    unsigned id : 6;
+    unsigned rest : 24;
+    unsigned short m10;
+};
+class Fe4164L {
+public:
+    char pad0[4];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual int s6(Fe4164R* r);
+    virtual int s7(Fe4164R* r);
+};
+struct Fe4164Mgr {
+    char pad0[0x1D4];
+    int m1D4;
+};
+extern "C" int fn_805825BC(Fe4164L* l, Fe4164R* r, int* a, int* b);
+extern "C" Fe4164Mgr* fn_8007FE04__FP13Unk8007F198_D(void* g);
+extern "C" int fn_800A4EA4(FeGame* g);
+int fn_800E4FDC();
 
 struct FeArrL { char* m0; int m4; int m8; int mC; const void* m10; int m14; };
 extern const char lbl_80673DD8[];
@@ -424,4 +450,33 @@ extern "C" FE_OVERLAY FeRaw* fn_804AEC04(FeRaw* self, int a, int b, int c, int d
     s->m14 = 0;
     s->m10 = lbl_8064A4C8;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804AE164(FeScr* x, Fe4164R* r)
+{
+    Unk8007B2B0_Screen** sp = &lbl_8061930C;
+    FeGame** gp = &lbl_80619948;
+    Fe4164L* lst = ((Fe4164L * (*)(int, int)) fn_8058211C)(((FeScrMgrView*)*sp)->m2C, r->id);
+    int a = 0;
+    int b = 0;
+    if (fn_805825BC(lst, r, &a, &b) != 0) {
+        int t = lst->s7(r);
+        if (t == 2) {
+            int g = fn_800A2AE8(*gp);
+            if (r->m10 != g)
+                return;
+        } else if (t == 3) {
+            if (fn_8007FE04__FP13Unk8007F198_D(*sp)->m1D4 == 1 && fn_800A4EA4(*gp) != 0)
+                return;
+        } else if (t == 4) {
+            if (fn_800A2E90(*gp) == 0)
+                return;
+        }
+        if (fn_800E4FDC() == 0) {
+            int tbl[13] = { 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0 };
+            if (tbl[lst->s6(r)] != 0)
+                return;
+        }
+        fn_801251CC(x->m134, 0, a, 2);
+    }
 }

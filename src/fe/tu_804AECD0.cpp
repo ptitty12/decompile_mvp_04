@@ -4,6 +4,8 @@
  */
 
 #include "game/fe_804ABCBC.h"
+extern "C" void fn_804AEF3C(FeScr* x);
+extern "C" void fn_800DD44C__FP13Unk800DD610_PPvi(void* a, void* b, int c);
 
 extern char lbl_80673B30[];
 extern "C" FE_OVERLAY FeRaw* fn_804AFF98(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -313,3 +315,67 @@ extern "C" FE_OVERLAY void fn_804AF2A0(FeScr* x)
         fn_80125084(x->m134, 0);
     }
 }
+
+extern "C" FE_OVERLAY void fn_804B054C(FeScr* x, int mode)
+{
+    switch (mode) {
+    case 0:
+        if (x->m138 != 0) {
+            FeObj* p = fn_800B7AB8(UiGetMsgMgr(), "POPUP");
+            fn_80131F34(p, x, (FeCb)fn_804B0504, 0, 0x3364, 2, -1, 1, 0x26DF, 0x26DE, 0, 0, 0, 0);
+            p->v86();
+        } else {
+            ((FeObj2*)x)->v67(1, 0);
+        }
+        break;
+    case 1: {
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "BACK", 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, x);
+        break;
+    }
+    case 2: {
+        x->v40();
+        UiMsg m;
+        UiMsg* p = &m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, "ADVANCE", 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, x);
+        break;
+    }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804AECD0(FeScr* x)
+{
+    int i = 0;
+    char b18[0x40];
+    char b58[8];
+    fn_800ECF18(x);
+    do {
+        fn_804AF1B8((char*)x, i, 0x10, -1);
+        i++;
+    } while (i <= 9);
+    x->m134 = fn_800B7AB8(UiGetMsgMgr(), "NAVBAR");
+    FeObj* l = fn_800B7AB8(UiGetMsgMgr(), "PLAYERINFOBAR");
+    x->m148 = l;
+    fn_80126CF4(l, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0);
+    x->m138 = fn_800C8060(x->v32("CELL", 1));
+    ((FeObj1*)x->m138)->v105(1);
+    x->m140 = fn_800C8044(x->v32("PLAYER", 0));
+    ((FeObj1*)x->m140)->v8(0);
+    ((FeObj1*)x->m140)->v18(x->m140->m2E + 1);
+    x->m13C = fn_800C8060(x->m140->v32("CELL", 1));
+    fn_80124FA8(x->m134, x);
+    fn_80125154(x->m134, 0);
+    fn_80329FA0(b58, lbl_80619948->m84);
+    fn_800DD44C__FP13Unk800DD610_PPvi(b58, b18, 1);
+    ((FeObj1*)fn_800C8040(x->v32("DATE", 1)))->v28((int)b18);
+    fn_804AEF3C(x);
+    fn_804AF2A0(x);
+}
+
