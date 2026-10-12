@@ -289,6 +289,28 @@ extern "C" void fn_800A625C(char* o)
     *(int*)((char*)q->m14 + 0x1BD4) = b;
 }
 
+extern "C" int fn_8007FB40(int g, int a);
+extern "C" unsigned fn_8007FB2C(int g, int a);
+extern "C" int fn_8007FB98(int g, int a, int b, int c);
+extern "C" int fn_8007B8C4(int g, int a, int b);
+extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+struct Unk800A6340 {
+    char pad0[0x28];
+    int m28;
+};
+
+extern "C" void fn_800A6340(Unk800A6340* o)
+{
+    int g = lbl_8061930C;
+    Unk800A641C_Q* q = lbl_806192E0->m4;
+    int h = q->mC->m84;
+    int pl = q->m14->m198;
+    int r = fn_8056A2F8(o->m28, fn_8007FB40(g, h) + 1, 0, 1, h, pl, 0, 0, 0, 0x1A);
+    if (r != -1 && (unsigned)r < fn_8007FB2C(g, h)) {
+        *(int*)((char*)q->m14 + 0x1D50) = fn_8007B8C4(g, 2, fn_8007FB98(g, r, 1, h));
+    }
+}
+
 extern "C" void fn_800A641C()
 {
     int g = lbl_8061930C;
