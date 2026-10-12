@@ -3,6 +3,17 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+struct FeS134 {
+    char pad0[0x134];
+    int m134;
+    int m138;
+    int m13C;
+};
+struct FeSt634 {
+    char pad0[0x634];
+    int m634;
+};
+extern "C" int fn_805290E0();
 
 extern "C" FE_OVERLAY FeScrH* fn_80471EBC(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -101,6 +112,36 @@ extern "C" FE_OVERLAY FeScrH* fn_80472E04(FeScrH* self, int a, int b, int c, int
     self->m130 = 0;
     FeI(self, 0x13C) = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_80472E54(void* p)
+{
+    FeS134* x = (FeS134*)p;
+    fn_800ECF18(x);
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(w, x);
+    fn_801250D8(w);
+    fn_800C2034((char*)fn_800B555C() + 8, 0);
+    fn_800B555C();
+    if (fn_800B5758() != 0) {
+        ((FeW*)x)->fn_vslot32("OWNER", 1);
+        x->m134 = (int)fn_800C8060();
+        ((FeW*)x)->fn_vslot32("DYNASTY", 1)->fn_vslot8(0);
+    } else {
+        ((FeW*)x)->fn_vslot32("DYNASTY", 1);
+        x->m134 = (int)fn_800C8060();
+        ((FeW*)x)->fn_vslot32("OWNER", 1)->fn_vslot8(0);
+    }
+    ((FeW*)x->m134)->fn_vslot8(1);
+    x->m138 = (int)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    x->m13C = (int)fn_800B7AB8(FeGetMgr(), lbl_805F528C);
+    if (fn_800B555C()->m0 == 0x55) {
+        FeSt634* s = (FeSt634*)((char*)fn_800B555C() + 8);
+        s->m634++;
+    }
+    ((FeW*)x->m134)->fn_vslot105(1);
+    fn_804730A4(x);
+    fn_804739BC((FeW*)x);
 }
 
 extern "C" FE_OVERLAY void fn_804730A4(void* x)
@@ -267,6 +308,43 @@ extern "C" FE_OVERLAY int fn_80473718(void* x)
 {
     int v = FeWp(x, 0x134)->fn_vslot60();
     return v > FeI(fn_800B555C(), 0x63C);
+}
+
+extern "C" FE_OVERLAY void fn_80473770(void* x, int k)
+{
+    char buf[1400];
+    fn_800B555C();
+    if ((fn_800B56C4() != 0 && k == 7) || ((fn_800B555C(), fn_800B5758() != 0) && k == 8)) {
+        int id;
+        fn_800B555C();
+        id = 0x1D;
+        if (fn_800B56C4() != 0) {
+            id = 0x4FBA;
+        } else {
+            fn_800B555C();
+            if (fn_800B5758() != 0)
+                id = 0x5740;
+        }
+        fn_80131F34(FeWp(x, 0x138), x, (FeCbT)fn_80473684, (int)fn_805290E0, id, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+        FeWp(x, 0x138)->fn_vslot86();
+    } else if (fn_80473718(x) != 0) {
+        int g = lbl_8061977C;
+        fn_800B555C();
+        if ((fn_800B56C4() != 0 && k == 6) || ((fn_800B555C(), fn_800B5758() != 0) && k == 7)) {
+            fn_80403144(buf, fn_80090880__FP11Unk80090880(g, 0x4FBC));
+        } else {
+            FeWp(x, 0x134)->fn_vslot70()->fn_vslot33(5, 1);
+            FeW* w = (FeW*)fn_800C8048();
+            int s = fn_80090880__FP11Unk80090880(g, 0x1911);
+            fn_804031F8(buf, s, w->fn_vslot31());
+        }
+        int s1 = fn_80090880__FP11Unk80090880(g, 0x3E9);
+        int s2 = fn_80090880__FP11Unk80090880(g, 0x3E8);
+        fn_801321D4(FeWp(x, 0x138), x, (FeCbT)fn_80473650, 0, buf, 2, -1, 1, (const char*)s1, (const char*)s2, 0, 0, 0, 0);
+        FeWp(x, 0x138)->fn_vslot86();
+    } else {
+        fn_80473560((FeScrD*)x);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804739BC(FeW* x)
