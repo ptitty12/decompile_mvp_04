@@ -5,6 +5,24 @@
 
 #include "game/fe_804BE560.h"
 
+struct FeAttr {
+    float m0;
+    char pad4[4];
+    int m8;
+};
+struct FeCntC {
+    char pad0[0xC];
+    int mC;
+};
+struct FeStat14 {
+    char pad0[0x14];
+    FeCntC* m14;
+    FeCntC* m18;
+    FeCntC* m1C;
+};
+extern "C" FeAttr* fn_805932E4(void* o, int t, int i, int a);
+extern "C" float fn_80593370(void* o, int a);
+
 struct FeCnt5 {
     int m0;
     int m4;
@@ -248,6 +266,38 @@ extern "C" FE_OVERLAY void fn_804CD84C(FeScrE0C* x, int a)
     if (a == (int)x->mE0C) {
         fn_804CD878(x);
     }
+}
+
+extern "C" FE_OVERLAY float fn_804CDCE8(FeScrN* x, int a, int sel)
+{
+    float sum = 0.0f;
+    FeStat14* st = (FeStat14*)((Unk8007B2B0_Screen*)lbl_8061930C)->m30;
+    int t;
+    int n;
+    switch (sel) {
+    case 0:
+        return fn_80593370(x->m140, a);
+    case 1:
+        t = 0;
+        n = st->m14->mC;
+        break;
+    case 2:
+        t = 2;
+        n = st->m1C->mC;
+        break;
+    case 3:
+        t = 1;
+        n = st->m18->mC;
+        break;
+    default:
+        return 0.0f;
+    }
+    int i = 0;
+    while (i < n) {
+        FeAttr* p = fn_805932E4(x->m140, t, i, a);
+        sum = sum + (float)p->m8 * fn_805932E4(x->m140, t, i++, a)->m0;
+    }
+    return sum;
 }
 
 extern "C" FE_OVERLAY FeScrH* fn_804CDE24(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
