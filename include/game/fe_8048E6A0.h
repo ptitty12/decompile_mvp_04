@@ -422,6 +422,60 @@ inline void FeStF(char* b, int o, float v)
     *(float*)(b + o) = v;
 }
 
+/* Sub-object at +0x98 of a widget (data pad 0x24, vptr at +0x24 of it); slot 20 takes (a, b). */
+struct FeSubBD {
+    char pad0[0x24];
+};
+struct FeSubB : FeSubBD {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+
+/* Sub-object at +0xDC of a widget, every slot returning int (vptr at +0x24 of it). */
+struct FeSubI : FeSubBD {
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual int s18();
+    virtual int s19();
+    virtual int s20();
+};
+
+/* fn_80125084 returns a value (int); fe_80459228.h declares it void, so value-using callers go through this. */
+#define FeW125084 ((int (*)(void*, int))fn_80125084)
+
 /* Raw field access by byte offset (placeholder for named fields of the screens). */
 #define FeI(x, off) (*(int*)((char*)(x) + (off)))
 #define FeP(x, off) (*(void**)((char*)(x) + (off)))
@@ -432,6 +486,8 @@ struct FeStateX {
     int m650;
 };
 void fn_8001C168();
+int fn_800D83A0();
+void fn_800E2944(int a, int b);
 
 /* Screen of fn_804AB940 (vtable lbl_80674328): m144 is a 0x80-byte buffer cleared with fn_8040B320. */
 struct FeScrM : FeScrH {
@@ -497,6 +553,21 @@ extern const char lbl_805F7114[];
 extern const float lbl_805F7110;
 extern const char lbl_805F5ABC[];
 extern const char lbl_805F4F84[];
+extern const float lbl_805F66FC;
+extern const char lbl_806745D0[];
+extern const char lbl_805F535C[];
+extern const char lbl_805F7654[];
+extern const char lbl_805F765C[];
+extern const char lbl_805F5510[];
+extern const char lbl_805F73E0[];
+extern const char lbl_805F7328[];
+extern const char lbl_805F755C[];
+extern const char lbl_805F5060[];
+extern const float lbl_805F7448;
+extern const float lbl_805F744C;
+extern const char lbl_805F73EC[];
+extern const char lbl_805F75B8[];
+extern const char lbl_805F4450[];
 extern const char lbl_805F763C[];
 extern const char lbl_805F7648[];
 int fn_80083FC0(int a);
@@ -679,7 +750,7 @@ int fn_804A50E0(void* x);
 int fn_804A5140(void* x);
 FeX10* fn_804D2ED0(void* x, int a);
 void fn_8007295C__18Unk8007A4DC_Screen(void* g);
-void* fn_80081B60(void* p);
+void* fn_80081B60__FP13Unk8007FF8C_Y(void* p);
 int fn_80096988(void* p, int a, int b);
 void fn_804982C0(void* x);
 void fn_8040B320(void* p, int v, int n);
@@ -733,6 +804,62 @@ void fn_80498590(int a, void* x);
 void fn_8049CC98(void* x);
 void fn_8049ED34(void* a, void* cb);
 void fn_804A2964(void);
+FeW* fn_804D2D50(void* x);
+void fn_804D3BA0(void* x);
+void fn_80132438(void* w, void* self, void (*a)(void*), void (*b)(FeW*), void (*c)(), int d, int e, int f, float g);
+int fn_8048E9C8(void* x, int a);
+void fn_8049C440(FeScrB* x);
+void fn_8049CBD4(void* x);
+void fn_804A0A78(void* x, int a);
+FeScrH* fn_804A4048(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_804A4AEC(void* x);
+FeW* fn_800C8058(FeW* w);
+void fn_80125128(void* w, int a);
+void fn_80499B08(void* x);
+void fn_8049FF38(FeW* x, FeW* y);
+int fn_804A1510(void* x, FeEvt* ev);
+int fn_80499740(FeW* x);
+int fn_80499910(FeW* x);
+void fn_804A2674(FeW* x, int a);
+int fn_804A5348(void* x);
+int fn_804A554C(void* x);
+void fn_800DC50C(void* a, float b, float c);
+void fn_80471830(void* x);
+void fn_8049A3B8(char* x);
+void fn_8049CD30(void* x, FeW* y);
+void fn_804A8ED4(void* x);
+int fn_800B5758(void* s);
+void* fn_8007F7D0__FP13Unk8007F198_BUi(void* g, unsigned a);
+int fn_8007B3E0__18Unk8007B2B0_Screenii(void* g, int a, void* t);
+void fn_8007B4A8__18Unk8007B2B0_Screeniii(void* g, int a, void* t, int v);
+int fn_804999D0(FeW* x, FeW* y, int z);
+void fn_804A256C(void* a, FeW* x);
+void fn_804A29F4(FeW* x);
+int fn_804A3224(FeW* x);
+void fn_804983A8(void);
+void fn_80498580(void);
+void fn_804987E8(void);
+void fn_8049AD4C(void);
+void fn_8049AD50(void);
+void fn_8049AD54(void);
+int fn_8049AE10(void);
+void fn_8049B134(void);
+void fn_8049B138(void);
+void fn_8049B13C(void);
+int fn_8049B280(void);
+int fn_804A0470(void);
+int fn_804A0478(void);
+int fn_804A0480(void);
+int fn_804A0488(void);
+void fn_804A3218(void);
+void fn_804A321C(void);
+void fn_804A3220(void);
+int fn_804A334C(void);
+int fn_804A3354(void);
+void fn_804A7284(void);
+void fn_804A7E68(void);
+int fn_804A7FAC(void);
+int fn_804A7FB4(void);
 }
 
 #endif
