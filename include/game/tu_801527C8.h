@@ -66,7 +66,8 @@ struct Unk801527C8_Team {
 struct Unk801527C8_Teams {
     Unk801527C8_Team m0[2];
     unsigned char m1CC8;
-    char pad1CC9[7];
+    unsigned char m1CC9;
+    char pad1CCA[6];
     int m1CD0;
 };
 
@@ -96,12 +97,14 @@ struct Unk801527C8_Ent3BC {
 struct Unk801527C8_Obj3A4 {
     char pad0[0x180];
     float m180;
+    char pad184[0x200 - 0x184];
+    int m200;
 };
 
 struct Unk801527C8_Slots {
     char pad0[0x3A4];
     Unk801527C8_Obj3A4* m3A4;
-    char pad3A8[4];
+    void* m3A8;
     void* m3AC;
     void* m3B0;
     void* m3B4;
