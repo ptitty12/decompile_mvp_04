@@ -88,7 +88,12 @@ int fn_8007FC00__FP13Unk8007F198_Cii(void* a0, int a1, int a2);
 int fn_8007FD2C__FP13Unk8007F198_Ciii(void* a0, int a1, int a2, int a3);
 int fn_8007FDA8__FP13Unk8007F198_Cii(void* a0, int a1, int a2);
 int fn_8007FDF8__FP13Unk8007F198_D(void* a0);
-int fn_8007FE04__FP13Unk8007F198_D(void* a0);
+struct DbR1D4 {
+    char pad0[0x1D4];
+    int m1D4;
+    int m1D8;
+};
+DbR1D4* fn_8007FE04__FP13Unk8007F198_D(void* a0);
 int fn_80080028__FP13Unk8007FF8C_G(void* a0);
 int fn_8008004C__FP13Unk8007FF8C_G(void* a0, int a1);
 int fn_80080070__FP13Unk8007FF8C_G(void* a0);
@@ -114,7 +119,6 @@ int fn_80084954__FPv(int a0);
 int fn_80084978__FPv(int a0);
 int fn_8008499C__FPv(int a0);
 int fn_80089AA0__FP20Unk80089894_PackTabDUiUi(void* a0, unsigned a1, unsigned a2);
-int fn_80089E48__FP15Unk80089894_Objii(void* a0, int a1, int a2);
 int fn_80089EE0__FP20Unk80089894_PackTabDUiUii(void* a0, unsigned a1, unsigned a2, int a3);
 int fn_8008FE14__Fi(int a0);
 int fn_8009005C__Fif(int a0, float a1);
@@ -326,20 +330,46 @@ void fn_80377408(void* p);
  * +0xDBC, then the vptr. Only the slots used by db/tu_8057CDB8 are named; evidence: the vcalls
  * at +0x20/+0x28/+0x40/+0x48/+0x50 of the vtable in fn_8057CFA8, fn_8057D084, fn_8057D0F0.
  */
+/* Row of the host's tables (0x24 bytes): key at +0, result words at +0x10 and +0x20. */
+struct DbRow24 {
+    int m0;
+    char pad4[0xC];
+    int m10;
+    char pad14[0xC];
+    int m20;
+};
+struct DbRows {
+    DbRow24* m0;
+    unsigned m4;
+};
 class DbHost {
 public:
     char pad0[0xDBC];
     virtual void v1();
     virtual void v2();
     virtual void v3();
-    virtual void v4(int a);
+    virtual DbRows* v4(int a);
     virtual int v5(int a);
     virtual void v6();
     virtual void v7();
-    virtual void v8(int a);
-    virtual void v9(int a);
+    virtual int v8(int a);
+    virtual DbRows* v9(int a);
     virtual int v10(int a);
+    virtual void v11(int a, int b);
+    virtual void v12(int a, int b);
+    virtual void v13();
+    virtual void v14(int a, int b);
 };
+/* Index of the row whose key equals `key`, or -1. */
+inline int FindRow(DbRows* l, int key)
+{
+    unsigned n = l->m4;
+    for (unsigned i = 0; i < n; i++) {
+        if (l->m0[i].m0 == key)
+            return i;
+    }
+    return -1;
+}
 extern "C" DbHost* fn_800A3A10(void* glob, int id);
 
 /*
