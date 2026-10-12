@@ -1,7 +1,4 @@
-/*
- * SN ProDG libm, newlib 1.8.2 fdlibm (cflags_libm: -O2 -mfast-cast -msafe-sda -G 1024
- * -fno-builtin -mstrict-align),
- * .text 0x80411188-0x80411280 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* SN ProDG libm (newlib 1.8.2 fdlibm): sqrtf(). Compiled as C++ through this wrapper, as in
+ * emoose/re4 (src/lib/ef_sqrt.cpp): g++ drops folded static consts defined in an included file
+ * and keeps tables in small data, which is what SN's libm has. */
+#include "fdlibm/ef_sqrt.c"
