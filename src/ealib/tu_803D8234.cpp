@@ -120,18 +120,8 @@ void fn_803D9664(void);
 int fn_803D96FC(Unk803D8234Rec* a, Unk803D8234Rec* b);
 void fn_803D9774(Unk803D8234Rec* r, int a, int b);
 void fn_803D96CC(Unk803D8234Rec* r);
-}
-
-extern "C" void fn_803D9110(int a, int b)
-{
-    if (b == 0xFFFF && a != 0) {
-        lbl_80627374[0] = 4;
-        lbl_80627374[1] = 4;
-        lbl_80627374[2] = 1;
-        lbl_80627380[0] = 3;
-        lbl_80627380[1] = 3;
-        lbl_80627380[2] = 1;
-    }
+void fn_803D9C34(void* o, int c);
+void fn_803D9AD0(struct Unk803D8234Sub* self, int c);
 }
 
 /* Light-like sub-object (vptr at +0x1C). */
@@ -147,8 +137,6 @@ struct Unk803D8234Light {
     void* m20;
     int m24;
 };
-
-
 struct Unk803D8234Sub {
     int m0;
     int m4;
@@ -181,7 +169,77 @@ struct Unk803D8234Sub {
     int mAC;
     int mB0;
 };
+/* Second view of the render device for its destructor. */
+struct Unk803D8234Buf {
+    void* m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk803D8234DevB {
+    int m0;
+    int m4;
+    lbl_Impl* m8;
+    const void* mC;
+    char pad10[0x74 - 0x10];
+    int m74;
+    char pad78[0xB4 - 0x78];
+    void* mB4;
+    void* mB8;
+    char padBC[0xC4 - 0xBC];
+    int mC4;
+};
+extern int lbl_80627300;
+void fn_80364A50(void* p, int n);
+extern void (*lbl_8062C66C)(void* p, int size);
 
+
+extern "C" void fn_803D8234(Unk803D8234DevB* self, int c)
+{
+    self->mC = lbl_80686740;
+    Unk803D8234Buf* b = (Unk803D8234Buf*)lbl_80627310[0];
+    if (b) {
+        lbl_8062C66C(b->m0, b->m8);
+        b->m8 = 0;
+        fn_80364A50(b, 0x10);
+        lbl_80627310[0] = 0;
+    }
+    b = (Unk803D8234Buf*)lbl_80627310[1];
+    if (b) {
+        lbl_8062C66C(b->m0, b->m8);
+        b->m8 = 0;
+        fn_80364A50(b, 0x10);
+        lbl_80627310[1] = 0;
+    }
+    if (self->mB8) {
+        lbl_8062C66C(self->mB8, self->m74);
+        self->mB8 = 0;
+    }
+    if (self->mB4) {
+        lbl_8062C66C(self->mB4, self->mC4);
+        self->mB4 = 0;
+    }
+    lbl_80627300 = 0;
+    fn_803D9AD0((Unk803D8234Sub*)((char*)self + 0x38), 2);
+    fn_803D9C34((char*)self + 0x10, 2);
+    self->mC = lbl_80686770;
+    while (self->m8->mHead != 0)
+        ((lbl_Owner*)self)->fn_803DA098(self->m8->mHead);
+    if (c & 1)
+        lbl_8062C66C(self, 0xF0);
+}
+
+extern "C" void fn_803D9110(int a, int b)
+{
+    if (b == 0xFFFF && a != 0) {
+        lbl_80627374[0] = 4;
+        lbl_80627374[1] = 4;
+        lbl_80627374[2] = 1;
+        lbl_80627380[0] = 3;
+        lbl_80627380[1] = 3;
+        lbl_80627380[2] = 1;
+    }
+}
 
 extern "C" Unk803D8234Dev* fn_803D9160(Unk803D8234Dev* self, int a, int b, int c)
 {
@@ -538,7 +596,7 @@ extern "C" void* fn_803D9BE0(Unk803D8234Light* self, void* owner)
 }
 
 /*
- * Not attempted: fn_803D8234 (98 instructions), fn_803D83BC (161), fn_803D8640 (122), fn_803D8918 (510);
+ * Not matched yet: fn_803D83BC (161 instructions), fn_803D8640 (122), fn_803D8918 (510);
  * fn_803D8828 and fn_803D9378 read the time base (mftb); fn_803D9528 ends in a trap word after the
  * fatal-error call. The original code stays linked for these.
  * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
