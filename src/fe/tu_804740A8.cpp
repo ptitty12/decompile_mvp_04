@@ -3,6 +3,24 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+struct FeV10D {
+    char pad0[0x10];
+};
+struct FeV10 : FeV10D {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual int s13(int a);
+};
 extern "C" char* strncpy(char*, const char*, unsigned);
 extern "C" {
 void fn_80476258(void* x);
@@ -302,6 +320,60 @@ extern "C" FE_OVERLAY void fn_804766FC(void* x)
         for (i = 0; i < 4; i++)
             ((FeWV51*)FeWp(x, 0x15C))->s51(lbl_806217D8[i], 0);
     }
+}
+
+extern "C" FE_OVERLAY void fn_804767E4(int a, FeScrD* x)
+{
+    int c = 0;
+    if (FeI(x, 0x140) != 0) {
+        int cnt = 0;
+        int i = 0;
+        int cat = fn_800A1960(lbl_80619948);
+        FeV10* o = (FeV10*)fn_800A199C(lbl_80619948);
+        int k = o->s13(FeI(x, 0x134));
+        while (fn_80546B18(cat, k, i) != 0) {
+            if (fn_80546CA8(cat, k, i) == 0)
+                cnt++;
+            i++;
+        }
+        c = cnt == 0;
+    } else if (FeI(x, 0x13C) == 0) {
+        FeArr arr;
+        char buf[1000];
+        FeArr* s = &arr;
+        int cnt = 0;
+        int i;
+        s->m10 = lbl_8064B298;
+        s->m0 = buf;
+        s->m8 = 0xFA;
+        fn_8040074C(s->m0, 0x3E8);
+        s->m4 = 0;
+        s->mC = 0;
+        s->m10 = lbl_8064A550;
+        fn_8040074C(s->m0, s->m8 * 4);
+        s->m10 = lbl_8065C1B0;
+        s->m4 = 0;
+        s->mC = 0;
+        s->m14 = 0;
+        fn_80535360((void**)s, fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(x, 0x134)));
+        int n = s->m4;
+        for (i = 0; i < n; i++) {
+            if (((int (*)(void*, int, int))fn_8007A6A0__18Unk8007A4DC_Screenii)(lbl_8061930C, 0x19, FePick(arr.m0, i * 4)) == 0)
+                cnt++;
+        }
+        c = cnt == 0;
+        s->m10 = lbl_8064A550;
+    }
+    const char* str = "SIGNED";
+    if (c != 0 && (FeI(fn_800B555C(), 4) & 0x1000) != 0)
+        str = "EMPTY";
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    strncpy(mp->name, str, 15);
+    mp->name[15] = 0;
+    ((FeW*)x)->fn_vslot80(1);
+    fn_800B7B4C(FeGetMgr(), mp, x);
 }
 
 extern "C" FE_OVERLAY void fn_80476A28(int a, void* x)
