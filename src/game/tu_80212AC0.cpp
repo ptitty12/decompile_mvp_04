@@ -414,6 +414,39 @@ void fn_802156DC(Task* t, Vec3f* pos, int a, int b, int c)
     e->m90 = lbl_805D5E34;
 }
 
+struct Own6F4 {
+    char pad0[0x6F4];
+    int m6F4;
+};
+extern const float lbl_805D5E64;
+extern const float lbl_805D5E68;
+extern const Vec3f lbl_805D6784;
+
+/* squared distance; the operator- temp slot is reused across calls only when the subtraction lives inside an inline
+   body with a local Vec3f (fn_80215D28, fn_80216014) */
+inline float DistSq5D28(const Vec3f& a, const Vec3f& b)
+{
+    Vec3f d = a - b;
+    return d.x * d.x + d.y * d.y + d.z * d.z;
+}
+
+int fn_80215D28(Task* t, PosObj* p, Vec3f* q)
+{
+    if (((Own6F4*)t->m9C->m0)->m6F4 != 9) {
+        float thr = lbl_805D5E64;
+        Vec3f pos = p->m60;
+        float l = DistSq5D28(lbl_805D6784, pos);
+        if (!(l < lbl_805D5E64)) {
+            float l2 = DistSq5D28(*q, pos);
+            float thr2 = lbl_805D5E68;
+            if (l2 > lbl_805D5E68)
+                return 2;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fn_80215E6C(void*, Unk8026C414_O* o)
 {
     return fn_8026DC5C(o, 0);
@@ -456,6 +489,21 @@ int fn_80215F40(Task* t, void* obj, int, int, int k, int* out)
         *out = 2;
     }
     return 1;
+}
+
+extern const float lbl_805D5E78;
+int fn_8026DA60(Unk8026C414_O* self, Unk8026C414_X* ctx);
+
+int fn_80216014(void*, PosObj* o, Vec3f* q, int a, int b, int c, int mode)
+{
+    if (mode != 1 && a == 0 && (b != 0 || c == 0)) {
+        Vec3f pos = o->m60;
+        Vec3f qq = *q;
+        float thr = lbl_805D5E78;
+        if (fn_8026DA60((Unk8026C414_O*)o, 0) != 0)
+            return DistSq5D28(qq, pos) <= lbl_805D5E78;
+    }
+    return 0;
 }
 
 /* near-miss: 24 slots: retail lays out the return-0 block right after the flag/kind tests (beq to the body), ours puts it last */
@@ -518,6 +566,46 @@ int fn_8021638C(void*, void*, int a2, int a3, int a4)
         break;
     }
     return *(int*)((char*)&t + (k * 4 + i * 8 + j * 0x18));
+}
+
+struct TaskInner70 {
+    char pad0[0x70];
+    int m70;
+};
+extern const float lbl_805D5F04;
+extern const float lbl_805D5F08;
+struct Unk80270BA0_X;
+int fn_8024D434(Unk80270BA0_X* x);
+extern "C" int fn_80254EA4(PlayerSub* p, int a);
+extern "C" void fn_801F0F30(Task* t);
+
+/* near-miss: 37 slots, 4 insns out of place: everything but the first block matches; retail keeps "li r3,8; b" inside
+   the bne-skipped block, ours hoists the li above the branch (tried if/else, goto, result var, ternary, operand swap) */
+int fn_8021693C(Task* t, Player* o, int x, Player* pl, int mode, float f1, float f2)
+{
+    if (x == -1) {
+        if (fn_801F0E78(t) == o->m460)
+            return 8;
+        fn_801F0F30(t);
+        return 1;
+    }
+    if (pl != 0) {
+        int e = fn_80254EA4(&pl->m58C, 0) == x;
+        float lo = lbl_805D5F04;
+        float hi = lbl_805D5F08;
+        float d = f2 - f1;
+        if (!e && (mode == 0x1C || ((TaskInner70*)t->m9C)->m70 == 1)) {
+            return fn_8024D434((Unk80270BA0_X*)pl) == 1 ? 4 : 6;
+        } else if (!(d >= lbl_805D5F08)) {
+            return e == 1 ? 3 : 4;
+        } else if (!(d >= lbl_805D5F04)) {
+            if (e == 1) {
+                return x == 0 ? 2 : 3;
+            }
+            return 5;
+        }
+    }
+    return 4;
 }
 
 void fn_802168B4(Task* t, PosObj* a, Vec3f* pos, int* out)
