@@ -428,6 +428,42 @@ void* fn_802B11E0(Mgr* m, const char* s)
     return 0;
 }
 
+extern "C" char* strcpy(char* d, const char* s);
+void fn_80329AEC(const char** pp, const char** out, int* pn, int delim);
+int fn_80329C4C(const char** pp, int* pn, int* out, int lo, int hi, int delim);
+void* fn_803774A8(unsigned n, int heap);
+
+struct Unk802B136C_Rec {
+    int m0;
+    char* m4;
+};
+
+void fn_802B136C(Mgr* m, const char* text, int len)
+{
+    char name[0x10];
+    const char* s = name;
+    int i = 0;
+    int cnt = i;
+    T* t = lbl_8061EA68;
+    fn_80329C4C(&text, &len, &cnt, 0, 0x7FFFFFFF, 10);
+    t->m304 = cnt;
+    for (i = 0; i < t->m304; i++) {
+        fn_80329AEC(&text, &s, &len, 10);
+        Unk802B136C_Rec* r = (Unk802B136C_Rec*)fn_802B11E0(m, s);
+        int c2 = 0;
+        fn_80329C4C(&text, &len, &c2, 0, 0x7FFFFFFF, 10);
+        r->m0 = c2;
+        r->m4 = 0;
+        if (c2 != 0)
+            r->m4 = (char*)fn_803774A8(c2 * 0x14, 0);
+        for (int j = 0; j < c2; j++) {
+            fn_80329AEC(&text, &s, &len, 0x2C);
+            strcpy(r->m4 + j * 0x14 + 4, s);
+            fn_80329C4C(&text, &len, (int*)(r->m4 + j * 0x14), 0, 0x7FFFFFFF, 10);
+        }
+    }
+}
+
 void fn_802B1CB4()
 {
     if (lbl_8061EA68 == 0) {
