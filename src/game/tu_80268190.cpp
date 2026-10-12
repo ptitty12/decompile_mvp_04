@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80268190.h"
+#include "game/tu_8024EF40.h"
 
 typedef Unk80268190_M M;
 typedef Unk80268190_Pl Pl;
@@ -536,6 +537,30 @@ int fn_8026A0F4(G* self, Pl* p)
 }
 
 void fn_8026A10C() {}
+
+extern int fn_801A37D8(void* q);
+extern void fn_8025DED4(Unk80256C80_Inner* self);
+extern void fn_8025D738(Unk80256C80_Inner* self, int a);
+extern void fn_8025DD20(Unk80256C80_Inner* self, void* p);
+extern void fn_8026A1D8(Unk80256C80_Inner* self, int a, int b);
+extern void fn_8025D4A4(Unk80256C80_Inner* self, int a);
+extern void fn_8026A1D4();
+void fn_8026A110(Unk80256C80_Inner* self, int a, int b)
+{
+    if (fn_801A37D8(self->m1EC) == 0) {
+        int f = 0;
+        if (a == 2 || a == 4 || a == 5)
+            f = 1;
+        fn_8025DED4(self);
+        fn_8025D738(self, a);
+        if (f != 0)
+            fn_8025DD20(self, self->m434);
+        fn_8026A1D8(self, a, b);
+        fn_8025D4A4(self, a);
+        if (a != 2)
+            ((void (*)(Unk80256C80_Inner*, int))fn_8026A1D4)(self, b);
+    }
+}
 
 void fn_8026A1D4() {}
 
