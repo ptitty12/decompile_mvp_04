@@ -1389,7 +1389,7 @@ void fn_80125128(void*, int);
 void fn_80125154(void*, int);
 void fn_80125AAC(int);
 void fn_8012E1C4(int, int, int);
-void fn_801321D4(void*, void*, void*, void*, void*, float*, int, int, int);
+void fn_801321D4(void* o, void* self, FeCbT cb, int a, void* b, int c, int d, int e, const char* s1, const char* s2, const char* s3, int f, int g, int h);
 void fn_8014DBA0(void*, int, int, int, int);
 void fn_8032A0C0(void*, unsigned);
 void fn_80402EF8(float*, void*);

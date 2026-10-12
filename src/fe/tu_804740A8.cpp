@@ -3,6 +3,10 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" {
+int fn_800E5D74__Fi(int v);
+int fn_8013484C();
+}
 
 extern "C" FE_OVERLAY FeScrH* fn_804740A8(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -219,6 +223,19 @@ extern "C" FE_OVERLAY int fn_80475774(int a, int b, int c)
         t = lbl_805FD4FC;
     }
     return *(int*)((char*)t + o);
+}
+
+extern "C" FE_OVERLAY void fn_80475EF0(void* x)
+{
+    char small[200];
+    char big[1000];
+    fn_800DE440(small, FeI(x, 0x138), 1);
+    fn_804031F8(big, fn_80090880__FP11Unk80090880(lbl_8061977C, fn_800E5D74__Fi(FeI(x, 0x138))), (int)small);
+    ((FeWV*)FeWp(x, 0x168))->s84(1);
+    const char* s1 = (const char*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E9);
+    const char* s2 = (const char*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E8);
+    fn_801321D4(FeWp(x, 0x168), x, (FeCbT)fn_80476A28, (int)fn_8013484C, big, 2, -1, 1, s1, s2, 0, 0, 0, 0);
+    FeWp(x, 0x168)->fn_vslot86();
 }
 
 extern "C" FE_OVERLAY int fn_80476134(int x, int b)
