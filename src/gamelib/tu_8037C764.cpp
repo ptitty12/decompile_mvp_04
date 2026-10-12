@@ -377,18 +377,26 @@ extern "C" int fn_8037D028(Unk8037C7FC_F* m, int key)
     int r = 0;
     if (m->m8 != 0)
         r = fn_8037D72C(m->m8, key);
-    if (r == -1) goto t1;
-    if (r != 0) goto done;
+    if (r == -1)
+        goto t1;
+    if (r != 0)
+        goto n1;
 t1:
     if (m->mC != 0)
         r = fn_8037D72C(m->mC, key);
-    if (r == -1) goto t2;
-    if (r != 0) goto done;
+n1:
+    if (r == -1)
+        goto t2;
+    if (r != 0)
+        goto n2;
 t2:
     if (m->m4 != 0)
         r = fn_8037D72C(m->m4, key);
-    if (r == -1) goto t3;
-    if (r != 0) goto done;
+n2:
+    if (r == -1)
+        goto t3;
+    if (r != 0)
+        goto done;
 t3:
     if (m->m0 != 0)
         r = fn_8037D72C(m->m0, key);
