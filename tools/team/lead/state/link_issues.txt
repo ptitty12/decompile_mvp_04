@@ -1,0 +1,11 @@
+# Cross-unit signature conflicts (fix before linking phase)
+- fn_8000446C: tu_800042B0 defines int(); tu_802B9218 calls (int,int) via local overload
+- fn_802B96C4: tu_800401E4 (const char*,int), tu_80063648 (Str*,int), tu_802B9218 (int)
+- fn_802B9764, fn_802B9C1C: tu_80063648 (Str*,int*,int)->int vs tu_802B9218 (int,int*,int)->void*
+- fn_8024D408: tu_8029EE50.h mangled C++ vs extern "C" definition (range-18)
+- 6 extern "C" pseudo-dtors calling fn_8037B424 by plain name (tu_8014013C, tu_801445F4, tu_801465AC, tu_801E2D84) now unresolved
+- tu_801DB948.h redefines Unk80270BA0_X/Unk8014D8AC (not includable with chooser.h)
+- tu_80299920.h vs tu_80287600.h redefine each other's types
+- memset: compiler emits memset for char buf[N]=""; retail calls fn_8040B320 (likely memset, MSL) -> rename symbol when SDK/MSL units are named
+- fn_80090880 called with 2 args in tu_800C7A4C/tu_800D1758 but defined with 1 (tu_80090880); also flagged by fe range-31
+- fn_803567AC renamed to __11Unk803567AC (ctor, range-28); tu_80134A60 still declares it as a free function -> unresolved there

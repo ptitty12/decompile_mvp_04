@@ -1,0 +1,10 @@
+# Opus families round 6 candidates
+1. Switch case value NOT constant-propagated into case bodies: retail keeps id live (cmpw r31,r0 / mr r4,r31) inside case bodies of event dispatchers; our g++ folds to cmpwi K. fn_80163CC4 (600 insns, 597/600), likely fn_8016AF9C siblings. (scratch P03/g03 harness)
+2. Load-order: retail loads member field before spilled float local in first compare of a block (fcmpu local,field + bgt). fn_80022A28, fn_80022BE0, fn_80022780 (tu_80021BE8), fn_80022DF8.
+3. lis-cluster hoisting above a store before a float-converting call arg: fn_80029FE4 (90.6%), fn_800297D4, fn_80027CF0, fn_8002B430.
+4. Row parser `mr r3,r31` last in arg setup: tu_80035DF0 fn_80036BCC/D70/F14.
+5. Scan loop pointer kept in r3 with mr r30,r3 copy before call: fn_80221A70, fn_801EF308, fn_802199E0, fn_80221B8C.
+6. Duplicated goal-pointer copy kept alive (mr r26,r31): fn_801B7BC4.
+7. Switch subtree shape [1-2] root with 0 left child: fn_803BDDB4 (ealib -O2).
+8. Second zero register kept separate from loop counter (li r27,0 vs li r28,0): fn_80330668; join copy p?*p:m4C in r0+mr: fn_8032EFB8/fn_8032EE00.
+9. Leftover from round 5: member-vptr dtors mr r8 vs r9 (fn_8052849C fam), mr. vs cmpwi (fn_8052390C fam), callee-saved cluster fn_80536F28/80537054/8053923C.

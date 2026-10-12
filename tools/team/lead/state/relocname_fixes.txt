@@ -1,0 +1,19 @@
+# Functions whose masked code equals retail but objdiff scores <100% (relocation symbol-name differences).
+# Fix by making the referenced symbol name match the target's (symbols.txt name vs source name), e.g.
+# sndgs vs lbl_8069CA48, __8UiMsgMgr vs fn_800B64BC, __builtin_vec_delete vs fn_80377488 (spell out delete[]).
+db/tu_8059A728 fn_8059B308 fn_8059B3D4 fn_8059B47C
+fe/tu_8044C508 fn_8044DF60
+fe/tu_8044F550 fn_804502F4
+fe/tu_80455038 fn_80458FE8
+fe/tu_804D3E00 fn_804D4640
+fe/tu_804EA2E4 fn_804EB078
+fe/tu_805002DC fn_80505400
+game/tu_8019C1F8 v4__11Unk8019EF70
+game/tu_801CF054 fn_801CF054
+game/tu_802547C0 fn_802548BC__FP13Unk8024EF40_Ai
+game/tu_80304858 fn_803063F8__Fv fn_80306438
+game/tu_80324A48 fn_80325D18
+game/tu_80338ECC fn_8033CDC4
+game/tu_803597C4 fn_80359E30__FPci
+snd/tu_803AC88C fn_803AE964
+dolphin/ax/tu_8041783C fn_80418BD4

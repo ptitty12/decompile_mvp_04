@@ -1,0 +1,1 @@
+gamelib/tu_80387E28 snd/tu_803AB310 snd/tu_803AC88C snd/tu_803AFDC0 snd/tu_803B21AC snd/tu_803B4074 snd/tu_803B4BEC snd/tu_803B7DA0 snd/tu_803B998C
