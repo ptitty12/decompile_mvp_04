@@ -58,6 +58,22 @@ void fn_802517F4(Unk8022FE34_Pl* pl);
 Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
 int fn_8033E420(void* p);
 int fn_801A2034(Unk8022FE34_Ctx* c, int i);
+struct Unk8024EF40_P;
+int fn_802536D0(Unk8024EF40_P* p);
+extern "C" void fn_80252DF4(char* p, float f);
+extern "C" int fn_8018AD2C(int o);
+extern "C" float* fn_80191800(int id);
+extern int lbl_8061C958[];
+struct Unk8024EF40_W;
+float fn_80254618(Unk8024EF40_W* w, int i);
+extern "C" void fn_80252EB8(char* p, float f);
+
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+extern "C" void fn_80189300(int a, void* b);
 void fn_80234B18(Unk8022FE34_U* u);
 void fn_80234E4C(Unk8022FE34_U* u);
 
@@ -103,6 +119,32 @@ int Unk8022FE34_U::fn_802348F4()
         }
     }
     return 0;
+}
+
+void fn_802349E8(Unk8022FE34_Owner* t)
+{
+    if (fn_801A6DB8(t->m0)->m48 != 0) {
+        Unk8022FE34_Pl* pl = fn_801A497C(t->m0, 4, 0);
+        float* o = fn_80191800(lbl_8061C958[t->mC]);
+        if (o != 0) {
+            float* tb = t->m738;
+            float c;
+            float a;
+            float b;
+            a = 100.0f / tb[0x1C / 4];
+            b = 36.0f / tb[0x20 / 4];
+            c = o[1];
+            float d = fn_80254618((Unk8024EF40_W*)((char*)pl + 0x588), 0);
+            float r = Lerp(b, d, a);
+            if (fn_801A6DB8(t->m0)->m48 != 0) {
+                if (*(int*)((char*)pl + 0x480) == 0) {
+                    const float k = 1.1f;
+                    c = c * k;
+                }
+            }
+            fn_80252EB8((char*)pl + 0x480, c * r);
+        }
+    }
 }
 
 int Unk8022FE34_U::fn_80234D5C()
@@ -215,6 +257,38 @@ void Unk8022FE34_U::fn_8023533C()
 void Unk8022FE34_U::fn_80235364()
 {
     fn_8022F2B8(m4, 0);
+}
+
+void Unk8022FE34_U::fn_8023538C()
+{
+    fn_80235FB4();
+    int a = fn_80235FA8()->m6CC;
+    void* b = fn_80235FA8()->m65C;
+    if (a != 0 && b != 0) {
+        if (fn_8018AD2C(a) == 1) {
+            fn_80189300(a, b);
+        }
+    }
+    if (fn_80235FA8()->m6F4 == 3) {
+        Unk8022FE34_Pl* pl = fn_801A497C(fn_80235FA8(), 0, 0);
+        float f = 1.0f;
+        switch (fn_802536D0((Unk8024EF40_P*)pl)) {
+        case 0:
+            f = 0.85f;
+            break;
+        case 1:
+            f = 0.55f;
+            break;
+        case 2:
+            f = 0.35f;
+            break;
+        case 3:
+            f = 0.15f;
+            break;
+        }
+        fn_80252DF4((char*)pl + 0x480, f);
+    }
+    m4->m72C = 0;
 }
 
 void Unk8022FE34_U::fn_80235618()

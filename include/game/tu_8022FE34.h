@@ -196,7 +196,8 @@ struct Unk8022FE34_Owner {
     Unk8022FE34_W m440;
     char pad444[0x728 - 0x444];
     float m728;
-    char pad72C[0x734 - 0x72C];
+    int m72C;
+    char pad730[0x734 - 0x730];
     char m734[4];
     float* m738;
     void fn_80231D0C(int i);
@@ -232,6 +233,7 @@ struct Unk8022FE34_X6D {
     int m3C;
     int m40;
     int m44;
+    int m48;
 };
 
 struct Unk8022FE34_U {
@@ -305,6 +307,7 @@ struct Unk8022FE34_U {
     int fn_802348F4();
     void fn_80235FB4();
     void fn_80235AE4();
+    void fn_8023538C();
 };
 
 #endif
