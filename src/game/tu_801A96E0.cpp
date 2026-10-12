@@ -197,6 +197,70 @@ void fn_801A9700(void* p)
     fn_801AA038(p, 0);
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_8065FC90[];
+int fn_801A9AF8(Unk801A96E0_Init* o);
+void fn_801AA598(void* p);
+void fn_8037893C(void* a, int b, void* c, void* d, int e);
+void fn_8035AD88(void* self, int c);
+/* Stack message (id at +0, vptr at +4: root vtable, then the derived one); four before/after pairs. */
+struct Unk801A9724_Base {
+    int m0;
+    const void* m4;
+    Unk801A9724_Base(int id)
+    {
+        m4 = lbl_80649DA0;
+        m0 = id;
+    }
+};
+struct Unk801A9724_Msg : public Unk801A9724_Base {
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    Unk801A9724_Msg(int a0, int a1, int a2, int a3, int b0, int b1, int b2, int b3) : Unk801A9724_Base(0x92)
+    {
+        m4 = lbl_8065FC90;
+        m8 = 0;
+        mC = a0;
+        m14 = a1;
+        m1C = a2;
+        m24 = a3;
+        m10 = b0;
+        m18 = b1;
+        m20 = b2;
+        m28 = b3;
+    }
+};
+
+void fn_801A9724(Unk801A96E0_Init* o)
+{
+    int a0 = fn_801A99B4(o);
+    int a1 = fn_801A9A20(o);
+    int a2 = fn_801A9A8C(o);
+    int a3 = fn_801A9AF8(o);
+    fn_801AA598(o);
+    int b0 = fn_801A99B4(o);
+    int b1 = fn_801A9A20(o);
+    int b2 = fn_801A9A8C(o);
+    int b3 = fn_801A9AF8(o);
+    if (a0 != b0 || a1 != b1 || a2 != b2 || a3 != b3) {
+        Unk801A9724_Msg msg(a0, a1, a2, a3, b0, b1, b2, b3);
+        fn_8037893C((char*)o->m8 + 0x704, msg.m0, &msg, 0, 0);
+        fn_8035AD88(&msg, 2);
+    }
+    o->m58 = b0;
+    o->m5C = b1;
+    o->m60 = b2;
+    o->m64 = b3;
+    fn_801AB470((Unk801A96E0_Late*)o);
+}
+
 void fn_801A985C(void* p)
 {
     fn_801AB470(p);
