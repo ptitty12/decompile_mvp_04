@@ -71,7 +71,10 @@ inline Vec3 operator-(const Vec3& a, const Vec3& b)
 float fn_80410CE8(float y, float x);
 extern "C" float fn_801C6FD8(Z* z);
 extern "C" float fn_801C6D88(Z* z);
-extern float lbl_8068C7A8;
+struct Unk801C2C64_F1 {
+    float m0;
+};
+extern Unk801C2C64_F1 lbl_8068C7A8;
 float fn_804028E4(float x);
 Vec3 fn_80189618(P* p, float f);
 extern float lbl_8068C4C4;
@@ -597,7 +600,7 @@ extern "C" float fn_801C5D20(void* a, const Vec3* b, const Vec3* c)
     return r * 57.295773f;
 }
 
-/* near-miss: same code; retail stores the Lerp/RandF argument slots (0x20, 0x30) before loading z->m204->m554. */
+/* near-miss: same code; retail stores the Lerp/RandF argument slots (0x20, 0x30) earlier (before the fmadds). */
 extern "C" float fn_801C6A34(Z* z, float f)
 {
     float a = fn_801C6FD8(z);
@@ -609,7 +612,24 @@ extern "C" float fn_801C6A34(Z* z, float f)
     lbl_8068C420.m3A0 = b;
     t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
     d = t * a + (1.0f - t) * b;
-    lbl_8068C7A8 = d;
+    lbl_8068C7A8.m0 = d;
     d = d + LerpATB(-12.0f, RandF(z->m204->m554, 1.0f, 0xC36), 12.0f);
+    return d;
+}
+
+/* near-miss: twin of fn_801C6A34 (same open scheduling difference of the Lerp/RandF slot stores). */
+extern "C" float fn_801C6BB0(Z* z, float f)
+{
+    float a = fn_801C6FD8(z);
+    float b = fn_801C6D88(z);
+    float d = 0.0f;
+    float c = 1.05f;
+    float t = f * c;
+    lbl_8068C420.m39C = a;
+    lbl_8068C420.m3A0 = b;
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    d = t * a + (1.0f - t) * b;
+    lbl_8068C7A8.m0 = d;
+    d = d + LerpATB(-20.0f, RandF(z->m204->m554, 1.0f, 0xC4F), 20.0f);
     return d;
 }
