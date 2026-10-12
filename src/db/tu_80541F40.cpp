@@ -665,4 +665,60 @@ DB_OVERLAY int fn_80546548(int a, int x)
     return 0;
 }
 
+struct Db80541F40_Big {
+    Db8053E240_Tmp l0;
+    int b0[0xCB2];
+    Db8053E240_Tmp l1;
+    int b1[0x82];
+    Db8053E240_Tmp l2;
+    int b2[0x28];
+    Db8053E240_Tmp l3;
+    int b3[0x1BE];
+    char pad3CC8[0x107F8 - 0x3CC8];
+    int m107F8;
+    int m107FC;
+    char slots[126 * 0x6C];
+    int m13D28;
+    const void* m13D2C;
+};
+extern char lbl_80683C48[];
+extern char lbl_8064A3B8[];
+extern char lbl_80684170[];
+extern char lbl_80666F10[];
+extern "C" void* __11Unk80361630(void* p);
+static inline void C3b(Db8053E240_Tmp* t, const void* v)
+{
+    t->m4 = 0;
+    t->mC = 0;
+    t->m14 = 0;
+    t->vp = v;
+}
+DB_OVERLAY Db80541F40_Big* fn_80546600(Db80541F40_Big* self)
+{
+    self->m13D2C = lbl_80683C48;
+    self->l0.C1(self->b0, 0xCB2);
+    self->l0.C2();
+    C3b(&self->l0, lbl_8064A3B8);
+    self->l1.C1(self->b1, 0x82);
+    self->l1.C2();
+    C3b(&self->l1, lbl_8064A2A8);
+    self->l2.C1(self->b2, 0x28);
+    self->l2.C2();
+    C3b(&self->l2, lbl_80684170);
+    self->l3.C1(self->b3, 0x1BE);
+    self->l3.C2();
+    C3b(&self->l3, lbl_80666F10);
+    self->m107F8 = 0;
+    self->m107FC = 0;
+    Db80541F40_Slots* sl = (Db80541F40_Slots*)self->slots;
+    char* p = (char*)sl;
+    int n = 0x7D;
+    do {
+        __11Unk80361630(p);
+        p += 0x6C;
+    } while (n-- != 0);
+    *(int*)((char*)sl + 0x3528) = 0;
+    return self;
+}
+
 }
