@@ -156,9 +156,57 @@ void fn_803DD73C(void* h, int k);
 int fn_803D9E1C(int k);
 int fn_80400C1C(void (*f)(), int a, int b);
 void* fn_80317810(void* p, int a, int b, int c, int d);
+int fn_803E9994(void* a, char* tbl, int* n, void* z);
+void fn_803D6144(int a, int b);
+int fn_803E9A54(void* a, const char* key, int* n, int* out);
+void fn_803DD7C8(int h, int v);
 }
 
+struct Unk80313C14_Z {
+    int m0;
+    int m4;
+    int m8;
+};
+extern char lbl_8060D190[];
+extern const char lbl_8060D1CC[];
+struct Unk802ACD88_Mgr;
+void fn_802B8418(Unk802ACD88_Mgr* m);
+struct Unk80313C14_Eng2 {
+    char padA[0xAF4];
+    int mAF4;
+    char padB[0x18718 - 0xAF8];
+    int m18718;
+};
+struct Unk80313C14_V4 {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+extern Unk80313C14_V4 lbl_806E2124;
+
 void fn_8000446C();
+
+extern "C" int fn_80313C14(void* obj, int a, int* out)
+{
+    int h = 0;
+    int n = 0;
+    Unk80313C14_Z z;
+    Unk80313C14_Z* pz = &z;
+    z.m0 = 0;
+    pz->m8 = 0;
+    fn_803E9994(obj, lbl_8060D190, &n, pz);
+    h = z.m8;
+    fn_803D6144(h, a);
+    n = 0;
+    int v;
+    int r = fn_803E9A54(obj, lbl_8060D1CC, &n, &v);
+    if (r)
+        *out = v;
+    else
+        *out = r;
+    return h;
+}
 
 extern "C" void fn_80313D9C(void* sp, int kind)
 {
@@ -196,6 +244,17 @@ extern "C" float fn_80313E94(void* sp, int x)
     return d / (float)self->m18;
 }
 
+extern "C" float fn_80313F28(void* sp, int x)
+{
+    Unk80313C14_Fl* self = (Unk80313C14_Fl*)sp;
+    float a = 0.0f;
+    float b = 0.0f;
+    float c = 0.0f;
+    float d = 0.0f;
+    fn_803EB414(lbl_8061E978->m11EE0, x, &a, &b, &c, &d);
+    return c / (float)((Unk80313C14_Sz*)self)->m14;
+}
+
 void fn_80313FBC(Unk80313C14_Ld* self)
 {
     int t = fn_803E4A50(lbl_8062C668(0xC8, 0));
@@ -227,6 +286,27 @@ extern "C" void fn_80314688(void* o, int x, int y, char* str, int flag, int idx)
             fn_803EB454(lbl_8061E978->t[idx], str, (float)x, (float)y);
         }
     }
+}
+
+extern "C" void fn_8031479C(void* g)
+{
+    ((Unk80313C14_P200*)g)->m200 = 1;
+    Unk80313C14_Eng2* e = (Unk80313C14_Eng2*)lbl_8061E978;
+    int h = e->m18718;
+    if (e->mAF4 == 0) {
+        lbl_806E2124.m0 = 1279.0f;
+        lbl_806E2124.m4 = 447.0f;
+        lbl_806E2124.m8 = 1.0f;
+        lbl_806E2124.mC = 1.0f;
+        fn_802B8418((Unk802ACD88_Mgr*)e);
+    } else {
+        lbl_806E2124.m0 = 1.0f;
+        lbl_806E2124.m4 = 1.0f;
+        lbl_806E2124.m8 = 1.0f;
+        lbl_806E2124.mC = 1.0f;
+        fn_802B8418((Unk802ACD88_Mgr*)e);
+    }
+    fn_803DD7C8(h, 0);
 }
 
 void fn_80314740(Unk80313C14_P38H* p)
