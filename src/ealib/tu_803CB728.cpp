@@ -229,6 +229,25 @@ extern void (*lbl_8062C66C)(void*, int);
 
 extern "C" void fn_803CEBF8(void* p, int n);
 
+struct EAGLBlendChild {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4(int, float, float);
+};
+
+struct EAGLBlend {
+    char pad0[0xC];
+    EAGLBlendChild* mC;
+    EAGLBlendChild* m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    int m24;
+    int m28;
+};
+
 extern "C" void fn_803CB728(EAGLSetC* s, int v)
 {
     s->mC = v;
@@ -477,6 +496,28 @@ extern "C" void fn_803CEA5C(char* p)
     fn_803D5098(&t);
     *(void**)(p - 0x10) = t.m0;
     fn_803BE90C(&t, 0);
+}
+
+extern "C" void fn_803CEAA0(EAGLBlend* s, float x, float y, int a)
+{
+    if (y <= s->m1C) {
+        s->mC->v4(a, x - s->m14, y - s->m14);
+    } else if (y >= s->m20) {
+        s->m10->v4(a, x - s->m18, y - s->m18);
+    } else {
+        switch (s->m28) {
+        case 0:
+            s->mC->v4(a, x - s->m14, y - s->m14);
+            break;
+        case 1:
+            s->m10->v4(a, x - s->m18, y - s->m18);
+            break;
+        default:
+            s->mC->v4(a, x - s->m14, y - s->m14);
+            s->m10->v4(a, x - s->m18, y - s->m18);
+            break;
+        }
+    }
 }
 
 extern "C" void fn_803CEBC0(DtorAt0* s, int chrg)
