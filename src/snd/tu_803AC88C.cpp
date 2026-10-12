@@ -355,10 +355,12 @@ extern "C" void fn_803AE618(Unk803AE618* o)
     }
 }
 
+extern CHANPUB* lbl_8069CA48; /* sndgs.chan (sndgs + 0x1CC), named by its own symbols.txt entry */
+
 extern "C" void fn_803AE964(int v, int mode)
 {
     Unk8069E200_RecA* r = &lbl_8069E200.recA[v];
-    CHANPUB* c = &sndgs.chan[v];
+    CHANPUB* c = &lbl_8069CA48[v];
     void* p = r->m3C;
     fn_803AE0E0((Unk803AE0E0*)p);
     r->m18 = -1;
@@ -370,7 +372,8 @@ extern "C" void fn_803AE964(int v, int mode)
             r->m3C = 0;
         }
     } else if (mode == 2) {
-        if (r->m25 == 0 && p != 0) {
+        /* the signed read keeps the compiler from threading this exit past the m25 retest below */
+        if ((signed char)r->m25 == 0 && p != 0) {
             r->m1F = 1;
             lbl_8069E200.mC049++;
         }
