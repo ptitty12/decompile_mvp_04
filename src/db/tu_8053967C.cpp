@@ -281,6 +281,50 @@ DB_OVERLAY void fn_80539C44(L* self, int a)
     self->m14 = 1;
 }
 
+struct Db8053967C_LV {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual int s13(int key);
+};
+DB_OVERLAY void fn_80539DB4(L* self, int a)
+{
+    fn_80539C44(self, a);
+    unsigned i = 0;
+    int n = fn_8008FBE8(a);
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    unsigned cnt = s->fn_8007B2B0();
+    for (; i < cnt; i++) {
+        if (s->fn_8007B648(0xE, i) != 0) {
+            for (int j = 0; j < n; j++) {
+                int h = s->fn_8007B610(fn_8008FE14(fn_8008FC40(a, j)), i);
+                if (h != 0) {
+                    unsigned k = ((Db8053967C_LV*)self)->s13(h);
+                    if (k != (unsigned)-1 && k < self->m4) {
+                        for (; k < self->m4; k++)
+                            self->m0[k] = self->m0[k + 1];
+                        self->m4--;
+                    }
+                }
+            }
+        }
+    }
+    self->m14 = 1;
+}
+
 DB_OVERLAY void fn_80539EDC(L* self, int a)
 {
     fn_8040074C(self->m0, self->m8 * 4);
