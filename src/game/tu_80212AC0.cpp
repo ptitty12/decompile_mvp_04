@@ -55,6 +55,150 @@ void fn_802138AC(Task* t, int a, int b, float f)
         fn_8021354C(t, a, b);
 }
 
+struct TaskInner64 {
+    char pad0[0x64];
+    int m64;
+};
+
+struct TaskInnerD {
+    char pad0[0x4];
+    Obj4_36C* m4;
+};
+
+extern const float lbl_805D5D60;
+extern const float lbl_805D5D64;
+extern int lbl_8061CB80;
+extern "C" int fn_8018B648(Obj4_36C* o);
+extern "C" void fn_80204CCC(Rec* r);
+extern "C" void fn_80224228(Task* t, int a, Rec* e);
+extern const Vec3f lbl_806055DC;
+
+inline void PutI3988(Slots4* s, int i, int v)
+{
+    int o = i * 4;
+    *(int*)((char*)s + o) = v;
+}
+
+void fn_80213988(Task* t, int x, int mode)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o4 = in->m4;
+    if (((unsigned)(in->m30 - 5) <= 1 || fn_8018B648(o4) != 0) && lbl_8061CB80 == 0 && ((TaskInner64*)t->m9C)->m64 == 1) {
+        fn_80214F1C(t, 1, 2, lbl_805D5D60);
+        return;
+    }
+    TaskInner* b = t->m9C;
+    int idx = b->m3A5C;
+    Rec16* r16 = (Rec16*)((char*)b + (idx * 16 + 0x9F4));
+    int k = 0;
+    if (mode == 1)
+        PutI3988(&b->mC0, x, idx);
+    RecQueue* q = t->m9C->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = k; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 0x21;
+    e->m0 = 0x10;
+    e->m9C = 1;
+    e->m38 = lbl_806055DC;
+    e->m80 = lbl_805D5D60;
+    e->mC = 2;
+    e->m1C = x;
+    if (k == 1)
+        e->m8 = k;
+    else
+        e->m8 = 3;
+    e->m10 = 0xB;
+    e->m94 = 1;
+    e->m20 = 0;
+    e->m24 = 0;
+    e->m50 = lbl_806055DC;
+    e->m8C = lbl_805D5D64;
+    r16->m0 = x;
+    r16->mC = 0;
+    fn_80224228(t, t->m9C->m3A5C, e);
+}
+
+extern const float lbl_805D5D68;
+extern "C" int fn_80259330(void* l);
+extern "C" int fn_801EF308(Task* t, int a, int b);
+extern "C" void fn_801EE6F4(Task* t, int a);
+extern "C" void fn_801F0EA8(Task* t, int a);
+extern "C" void fn_8021D4A4(Task* t);
+extern "C" void fn_80205450(TaskInner* g, int i);
+extern "C" void fn_80224630(Task* t, int a, Rec* e);
+
+inline void PutI3B80(Slots4* s, int i, int v)
+{
+    int o = i * 4;
+    *(int*)((char*)s + o) = v;
+}
+
+/* near-miss (2 insns over, registers/CSE): the whole record push matches fn_80213988's shape; retail re-forms &in->mD4 for the
+   second GetSlot (ours reuses the first address) and keeps `in` in r10 */
+void fn_80213B80(Task* t, int a, int b, int c)
+{
+    TaskInner* in = t->m9C;
+    if ((unsigned)(in->m30 - 5) <= 1 && ((TaskInner64*)in)->m64 == 1) {
+        fn_80214F1C(t, 1, 2, lbl_805D5D68);
+        return;
+    }
+    if (GetSlot(&in->mD4, a) != -1 && GetSlot(&in->mD4, a) != in->m3A5C) {
+        fn_8021D4A4(t);
+        return;
+    }
+    if (a == 1 && fn_80259330(t->m9C->m0->m700->m3B4) == 0) {
+        fn_8021D4A4(t);
+        return;
+    }
+    if (fn_801EF308(t, a, t->m9C->m3A5C) == 1) {
+        fn_80211BA0(&t->m9C->mC0, a);
+        fn_80205450(t->m9C, t->m9C->m3A5C);
+        fn_801EE6F4(t, t->m9C->m3A5C);
+        fn_801F0EA8(t, t->m9C->m3A5C);
+        fn_80213988(t, a, 1);
+        return;
+    }
+    TaskInner* d = t->m9C;
+    RecQueue* q = d->m3A60;
+    Rec16* r16 = (Rec16*)((char*)d + (d->m3A5C * 16 + 0x9F4));
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 0x22;
+    e->m0 = 0x11;
+    e->mC = c;
+    e->m8 = b;
+    e->m9C = 1;
+    e->m10 = 1;
+    e->m1C = a;
+    e->m38 = lbl_806055DC;
+    e->m50 = lbl_806055DC;
+    e->m94 = 1;
+    e->m80 = lbl_805D5D68;
+    e->m88 = lbl_805D5D68;
+    PutI3B80(&t->m9C->mD4, a, t->m9C->m3A5C);
+    r16->mC = 0;
+    r16->m0 = a;
+    fn_80224630(t, t->m9C->m3A5C, e);
+}
+
 void fn_80213DF4(Task* t, int x)
 {
     t->m9C->m9FC[t->m9C->m3A5C].m0 = 1;
@@ -162,6 +306,36 @@ void fn_80214C68(Task* t, int a, int b)
     Vec3f v = { 84.0f, 0.0f, 2388.0f };
     fn_80212550(t, &v, -1.0f, -1.0f, a, b);
     fn_80214F1C(t, 1, 2, -1.0f);
+}
+
+extern const float lbl_805D5E00;
+extern const Vec3f lbl_8068C7F0;
+
+void fn_802151D0(Task* t)
+{
+    TaskInner* in = t->m9C;
+    if ((unsigned)(in->m30 - 5) <= 1 && ((TaskInner64*)in)->m64 == 1) {
+        fn_80214F1C(t, 1, 2, lbl_805D5E00);
+        return;
+    }
+    RecQueue* q = in->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 1;
+    e->m0 = 0x20;
+    e->m80 = lbl_805D5E00;
+    e->m9C = 1;
+    e->m94 = 1;
+    e->m50 = lbl_8068C7F0;
 }
 
 int fn_80215E6C(void*, Unk8026C414_O* o)
