@@ -5,10 +5,17 @@
 #include "game/db_80584CBC.h"
 
 extern "C" int fn_80593E7C(Db80593CD0_Data* self, int i);
-
 extern "C" void fn_805942A8(Db80593CD0_Data* self);
-
 extern "C" int fn_805937A4(Db805937A4_Mgr* m, int id);
+extern "C" Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f);
+extern const char lbl_80682960[];
+extern "C" void fn_80593B78(Db80593CD0_Data* self, int i, int a, int b, int c, int d, int e, float f0, float f1);
+extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
+extern const char lbl_80683A88[];
+extern void* lbl_8061930C;
+void fn_80079FC0(void* self, char** cursor, void* dst, int n);
+extern "C" void fn_805919E8(Db805937A4_Mgr* m, int x, int i, int k, float v);
+extern "C" void fn_80591AF4(Db805937A4_Mgr* m, int x, int i, int k, float v);
 
 extern "C" DB_OVERLAY int fn_8059377C(Db805937A4_Mgr* m, int id)
 {
@@ -37,7 +44,6 @@ extern "C" DB_OVERLAY int fn_805937A4(Db805937A4_Mgr* m, int id)
     return r;
 }
 
-extern "C" int fn_805937A4(Db805937A4_Mgr* m, int id);
 extern "C" DB_OVERLAY unsigned char fn_80593880(Db805937A4_Mgr* m, int id)
 {
     int i = fn_805937A4(m, id);
@@ -46,7 +52,6 @@ extern "C" DB_OVERLAY unsigned char fn_80593880(Db805937A4_Mgr* m, int id)
     return m->b[i].mC;
 }
 
-extern "C" int fn_805937A4(Db805937A4_Mgr* m, int id);
 extern "C" DB_OVERLAY float fn_805938E8(Db805937A4_Mgr* m, int id)
 {
     int i = fn_805937A4(m, id);
@@ -55,7 +60,6 @@ extern "C" DB_OVERLAY float fn_805938E8(Db805937A4_Mgr* m, int id)
     return m->b[i].m8;
 }
 
-extern "C" int fn_805937A4(Db805937A4_Mgr* m, int id);
 extern "C" DB_OVERLAY int fn_8059394C(Db805937A4_Mgr* m, int id)
 {
     int i = fn_805937A4(m, id);
@@ -71,9 +75,6 @@ extern "C" DB_OVERLAY int fn_805939B0(Db805937A4_Mgr* m)
     return m->m12B88;
 }
 
-extern "C" Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f);
-extern const char lbl_80682960[];
-extern "C" void fn_80593B78(Db80593CD0_Data* self, int i, int a, int b, int c, int d, int e, float f0, float f1);
 extern "C" DB_OVERLAY Db80593CD0_P* fn_80593A00(Db80593CD0_P* self, Db805937A4_Mgr* m, int c, float f)
 {
     fn_80593CD0(self, m, 8, 6, c, f);
@@ -97,7 +98,6 @@ extern "C" DB_OVERLAY char* fn_80593B68(char* self, int i)
     return self + (i * 8 + 0x20);
 }
 
-extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
 extern "C" DB_OVERLAY void fn_80593B78(Db80593CD0_Data* self, int i, int a, int b, int c, int d, int e, float f0, float f1)
 {
     fn_80594250(self, i, a, b, c, f0, f1);
@@ -132,7 +132,6 @@ extern "C" DB_OVERLAY float fn_80593BD4(Db80593CD0_Data* self)
     return b;
 }
 
-extern const char lbl_80683A88[];
 extern "C" DB_OVERLAY Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f)
 {
     self->m0 = m;
@@ -150,7 +149,6 @@ extern "C" DB_OVERLAY Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_M
     return self;
 }
 
-extern const char lbl_80683A88[];
 extern "C" DB_OVERLAY void fn_80593DD8(Db80593CD0_P* self, int chrg)
 {
     self->m1C = lbl_80683A88;
@@ -195,13 +193,35 @@ extern "C" DB_OVERLAY int fn_80593EB0(Db80593CD0_Data* self, int i, int n)
     return r;
 }
 
+/* near-miss (2 slots): retail loads f1 for the second fn_805919E8 call before r4 (lwz). */
+extern "C" DB_OVERLAY void fn_80593F30(Db80593CD0_Data* self, int i, int n, float f0, float f1)
+{
+    float a = f0 * (float)n;
+    if (!(a >= 0.0f))
+        a = self->m10[i].m0 * (float)n;
+    float b = f1 * (float)n;
+    if (!(b >= 0.0f))
+        b = self->m10[i].m4 * (float)n;
+    fn_805919E8(self->m0, self->m4, i, 0, a);
+    fn_805919E8(self->m0, self->m4, i, 1, b);
+    self->m18[i] += n;
+}
+
+/* near-miss (2 slots): same f1-before-r4 order in the second fn_80591AF4 call. */
+extern "C" DB_OVERLAY void fn_8059403C(Db80593CD0_Data* self, int i, int n)
+{
+    float a = self->m10[i].m0 * self->m8 * (float)n;
+    float b = self->m10[i].m4 * (float)n;
+    fn_80591AF4(self->m0, self->m4, i, 0, a);
+    fn_80591AF4(self->m0, self->m4, i, 1, b);
+    self->m18[i] -= n;
+}
+
 extern "C" DB_OVERLAY float fn_80594100(Db80593CD0_Data* self, int i, int n)
 {
     return self->m10[i].m0 * self->m8 * n;
 }
 
-extern void* lbl_8061930C;
-void fn_80079FC0(void* self, char** cursor, void* dst, int n);
 extern "C" DB_OVERLAY void fn_80594148(Db80593CD0_Data* self, int a, Unk80070DDC_Stream* io)
 {
     int r = io->v10();
