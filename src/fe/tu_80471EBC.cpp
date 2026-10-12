@@ -297,6 +297,42 @@ extern "C" FE_OVERLAY FeScrH* fn_80473AE8(FeScrH* self, int a, int b, int c, int
     return self;
 }
 
+extern "C" FE_OVERLAY void fn_80473B38(void* x)
+{
+    fn_800ECF18(x);
+    fn_800B555C();
+    if (fn_800B56C4() != 0) {
+        void* g = lbl_8061930C;
+        int st = fn_8007FE04((Unk8007F198_D*)g)->m1E0;
+        if (lbl_806217C0 == 0 && st == 1) {
+            int i;
+            int n = fn_8007B2B0__18Unk8007B2B0_Screen(g);
+            for (i = 0; i < n; i++) {
+                void* k = fn_8007B2FC__18Unk8007B2B0_Screeni(g, i);
+                if (!(fn_80079EFC__18Unk8007B2B0_Screeni(g, k) > 0.0f)) {
+                    float a = fn_80079E74__18Unk8007B2B0_Screeni(g, k);
+                    float b = a * 1.01f;
+                    fn_8007B4A8__18Unk8007B2B0_Screeniii(g, 0x15, k, fn_80079F90__18Unk8007B2B0_Screenf(g, b));
+                }
+            }
+        }
+        lbl_806217C0 = st;
+    }
+    void* p = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(p, x);
+    fn_80125100(p);
+    fn_801250D8(p);
+    ((FeW*)x)->fn_vslot32(lbl_805F4EF4, 1);
+    FeI(x, 0x134) = (int)fn_800C8060();
+    fn_800B555C();
+    if (fn_800B57EC() != 0 && fn_800A2E6C(lbl_80619948) != 0) {
+        FePopup* q = fn_800B7AB8(FeGetMgr(), "FTOPBAR");
+        fn_800C2034((char*)fn_800B555C() + 8, 0);
+        fn_804A7760(q);
+        q->fn_vslot8(0);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_80473D44(void* x)
 {
     FeW* w = FeWp(x, 0x134)->fn_vslot70()->fn_vslot33(5, 1);
