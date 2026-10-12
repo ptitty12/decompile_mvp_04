@@ -147,6 +147,29 @@ extern "C" void fn_803D2BC0(Unk803D2BC0Self* self, Unk803D2BC0Other* other)
     other->q = t;
 }
 
+extern "C" float fn_803D2CBC(float x, float lo, float hi)
+{
+    float range = hi - lo;
+    float t;
+    int k;
+    if (x < lo) {
+        t = lo - x;
+        float m;
+        k = (int)(t / range);
+        m = t - (float)k * range;
+        return hi - m;
+    }
+    if (x >= hi) {
+        t = x - hi;
+        float m;
+        k = (int)(t / range);
+        m = t - (float)k * range;
+        return lo + m;
+    }
+    return x;
+}
+
+
 /* near-miss (5 instructions short): sorted-table search by 16-bit key. Retail keeps a stack copy of the key
    (sth r0,8(r1)) while comparing a register copy, tests lo <= hi at the top of the loop, and returns the
    entry through the table register (li r3,0 on a miss). The stack copy only survives when the key
