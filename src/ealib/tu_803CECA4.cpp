@@ -267,6 +267,91 @@ extern "C" int fn_803CED14(Unk803CECA4Obj* self, int a, int b, float t)
     return 1;
 }
 
+struct Unk80364310;
+void fn_80364310(float** pp, float* out);
+void fn_80364358(float** pp, Unk80364310* o);
+extern "C" {
+void fn_803641CC();
+void fn_80364390();
+void fn_803646DC();
+void fn_803648C0();
+int printf(const char* fmt, ...);
+}
+
+struct Unk803CED44Obj {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10[1];
+};
+
+extern "C" void fn_803CED44(Unk803CED44Obj* s)
+{
+    int i = 0;
+    int n = s->m4;
+    int* p = s->m10;
+    while (i < n) {
+        int c = *p;
+        i++;
+        p++;
+        if (c > 0) {
+            int j = c;
+            do {
+                int v = *p;
+                i++;
+                switch (v) {
+                case 1:
+                    *p = (int)fn_803641CC;
+                    break;
+                case 0:
+                    *p = (int)fn_80364310;
+                    break;
+                case 2:
+                    *p = (int)fn_80364358;
+                    break;
+                default:
+                    printf("Bad signature channel type\n");
+                    break;
+                }
+                p++;
+                j--;
+            } while (j != 0);
+        }
+    }
+    int* q = s->m10;
+    p = q + s->m4;
+    i = 0;
+    while (i < n) {
+        int c = *p;
+        i++;
+        p++;
+        if (c > 0) {
+            int j = c;
+            do {
+                int v = *p;
+                i++;
+                switch (v) {
+                case 1:
+                    *p = (int)fn_80364390;
+                    break;
+                case 0:
+                    *p = (int)fn_803646DC;
+                    break;
+                case 2:
+                    *p = (int)fn_803648C0;
+                    break;
+                default:
+                    printf("Bad signature channel type\n");
+                    break;
+                }
+                p++;
+                j--;
+            } while (j != 0);
+        }
+    }
+}
+
 extern "C" void fn_803CF2EC(char* self)
 {
     Unk803CECA4Tmp o;
@@ -475,6 +560,55 @@ extern "C" void fn_803D1A04(Unk803D1A30Obj* self, float* out)
     ((void (*)(Unk803D1A30Obj*, float*, float, float))fn_803D14E8)(self, out, 0.0f, 0.0f);
 }
 
+struct Unk803D1E54Obj {
+    char pad0[0x10];
+    void* m10;
+    char pad14[0x14];
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+};
+
+extern "C" {
+int printf(const char* fmt, ...);
+int fn_803D2B64(Unk803D1E54Obj* s, float t, float lo, float hi);
+float fn_803D2CBC(Unk803D1E54Obj* s, float t, float lo, float hi);
+void fn_803D1C78(Unk803D1E54Obj* s, float t);
+void fn_803D2170(Unk803D1E54Obj* s, int n);
+int fn_803D1FE8(Unk803D1FE8Obj* self, Unk803D0FFCVec2* out, float t0, float t1);
+void fn_803D240C(Unk803D240CSelf* self, float* v2);
+}
+
+/* near-miss (99.4%, 7 slots): retail multiplies m38*m28 before m38*m2C (f13/f0/f12 swapped); the scheduler here
+   issues the m2C product first. t, c1 and the x/y results are updated in place (two callee-saved floats). */
+extern "C" int fn_803D1E54(Unk803D1E54Obj* s, Unk803D0FFCVec2* out, float t)
+{
+    s->m3C = t;
+    if (s->m10 == 0)
+        fn_803D1C78(s, 0.0f);
+    t += s->m40;
+    int n = fn_803D2B64(s, t, 0.0f, 2.0f / s->m38);
+    printf("currTime: %g  offset: %g   cycle: %g\n", t, s->m40, 1.0f / s->m38);
+    printf("offset0: %g  offset1: %g\n", s->m30, s->m34);
+    printf("cycle0: %g  cycle1: %g\n", s->m28, s->m2C);
+    float c1 = s->m38 * s->m2C * t;
+    t = s->m38 * s->m28 * t;
+    printf("before offset t0: %g  t1: %g
+", t, c1);
+    t = fn_803D2CBC(s, t, 0.0f, 2.0f * s->m28) - s->m30;
+    c1 = fn_803D2CBC(s, c1, 0.0f, 2.0f * s->m2C) - s->m34;
+    if (fn_803D1FE8((Unk803D1FE8Obj*)s, out, t, c1)) {
+        fn_803D2170(s, n);
+        fn_803D240C((Unk803D240CSelf*)s, (float*)out);
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" int fn_803D1FE8(Unk803D1FE8Obj* self, Unk803D0FFCVec2* out, float t0, float t1)
 {
     Unk803D0FFCVec2 a;
@@ -551,7 +685,7 @@ extern "C" void fn_803D2A78(Unk803D2A14Obj* self, int c)
 
 /*
  * Not matched yet: fn_803D1A30 (retail passes the 5th argument register on as the 4th
- * argument of fn_803D14E8 without setting the 3rd), fn_803CED44, fn_803CEECC, fn_803CF14C, fn_803CF3C0,
+ * argument of fn_803D14E8 without setting the 3rd), fn_803CEECC, fn_803CF14C, fn_803CF3C0,
  * fn_803CF5F4, fn_803CF77C, fn_803CF968, fn_803CFE8C, fn_803D00DC, fn_803D062C, fn_803D0944, fn_803D0C0C,
  * fn_803D1184, fn_803D14E8, fn_803D1AB8, fn_803D1C78, fn_803D1E54, fn_803D2170, fn_803D2524, fn_803D279C.
  * The original code stays linked for these.

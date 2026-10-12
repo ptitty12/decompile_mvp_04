@@ -81,10 +81,50 @@ struct EAGLSk {
 extern void (*lbl_80626DC8)(void*, void*, void*);
 extern "C" void fn_803DFB48(void*);
 extern "C" void fn_803BB02C(EAGLSk* sk, char* a, char* out, unsigned* mask);
+extern "C" void fn_803E00EC(void* p, float a, float b, float c, float d, float e, float f, float g, float h, float i, float j);
 
 extern "C" void fn_803DF66C(void* a, void* b);
 extern "C" void fn_803BCE38(void* p, int n);
 extern "C" void fn_803BD800(int a, int b);
+
+extern "C" void fn_803BB02C(EAGLSk* sk, char* a, char* out, unsigned* mask)
+{
+    if (mask != 0) {
+        int n = sk->m8;
+        int i;
+        float* m = (float*)a;
+        for (i = 0; i < n; i++) {
+            if (EAGLTestBit(mask, i)) {
+                float* o = (float*)(out + i * 0x40);
+                int* pp = (int*)((char*)sk + 0x1C + i * 0x70);
+                fn_803E00EC(o, m[0], m[1], m[2], m[4], m[5], m[6], m[7], m[8], m[9], m[10]);
+                o[0] = o[0] * m[3];
+                o[4] = o[4] * m[3];
+                o[8] = o[8] * m[3];
+                int par = *pp;
+                if (par >= 0)
+                    lbl_80626DC8(o, out + (par << 6), o);
+            }
+            m += 12;
+        }
+    } else {
+        int n = sk->m8;
+        int i;
+        float* m = (float*)a;
+        for (i = 0; i < n; i++) {
+            float* o = (float*)(out + i * 0x40);
+            int* pp = (int*)((char*)sk + 0x1C + i * 0x70);
+            fn_803E00EC(o, m[0], m[1], m[2], m[4], m[5], m[6], m[7], m[8], m[9], m[10]);
+            o[0] = o[0] * m[3];
+            o[4] = o[4] * m[3];
+            o[8] = o[8] * m[3];
+            int par = *pp;
+            if (par >= 0)
+                lbl_80626DC8(o, out + (par << 6), o);
+            m += 12;
+        }
+    }
+}
 
 extern "C" void fn_803BB21C(EAGLSk* sk, char* a, char* out, unsigned* mask)
 {
@@ -105,6 +145,93 @@ extern "C" void fn_803BB21C(EAGLSk* sk, char* a, char* out, unsigned* mask)
         for (i = 0; i < n; i++) {
             lbl_80626DC8(out + i * 0x40, out + i * 0x40, (char*)sk + 0x40 + i * 0x70);
             fn_803DFB48(out + i * 0x40);
+        }
+    }
+}
+
+struct EAGLSk2 {
+    char pad0[8];
+    int m8;
+    float* mC;
+};
+
+extern "C" void fn_803BB334(EAGLSk2* sk, float* out, unsigned* mask)
+{
+    int n = sk->m8;
+    int i;
+    if (mask != 0) {
+        if (sk->mC != 0) {
+            for (i = 0; i < n; i++) {
+                if (EAGLTestBit(mask, i)) {
+                    float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+                    out[0] = m[0];
+                    out[1] = m[1];
+                    out[2] = m[2];
+                    out[3] = sk->mC[i];
+                    out[4] = m[4];
+                    out[5] = m[5];
+                    out[6] = m[6];
+                    out[7] = m[7];
+                    out[8] = m[8];
+                    out[9] = m[9];
+                    out[10] = m[10];
+                    out[11] = 1.0f;
+                }
+                out += 12;
+            }
+        } else {
+            for (i = 0; i < n; i++) {
+                if (EAGLTestBit(mask, i)) {
+                    float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+                    out[0] = m[0];
+                    out[1] = m[1];
+                    out[2] = m[2];
+                    out[3] = 1.0f;
+                    out[4] = m[4];
+                    out[5] = m[5];
+                    out[6] = m[6];
+                    out[7] = m[7];
+                    out[8] = m[8];
+                    out[9] = m[9];
+                    out[10] = m[10];
+                    out[11] = 1.0f;
+                }
+                out += 12;
+            }
+        }
+    } else if (sk->mC != 0) {
+        for (i = 0; i < n; i++) {
+            float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+            out[0] = m[0];
+            out[1] = m[1];
+            out[2] = m[2];
+            out[3] = sk->mC[i];
+            out[4] = m[4];
+            out[5] = m[5];
+            out[6] = m[6];
+            out[7] = m[7];
+            out[8] = m[8];
+            out[9] = m[9];
+            out[10] = m[10];
+            out[11] = 1.0f;
+            out += 12;
+        }
+    } else {
+        for (i = 0; i < n; i++) {
+            float* m = (float*)((char*)sk + 0x10 + i * 0x70);
+            out[0] = m[0];
+            out[1] = m[1];
+            out[2] = m[2];
+            out[3] = 1.0f;
+            out[4] = m[4];
+            out[5] = m[5];
+            out[6] = m[6];
+            out[7] = m[7];
+            out[8] = m[8];
+            out[9] = m[9];
+            out[10] = m[10];
+            out[11] = 1.0f;
+            out += 12;
         }
     }
 }
@@ -194,6 +321,30 @@ extern "C" int fn_803BD2B4(EAGLNameTab* t, const char* name, int* ins)
             return t->m4[mid].val;
     }
     return -1;
+}
+
+struct Mtx4B { float m[16]; };
+
+extern "C" void fn_803BD358(Mtx4B* out, Mtx4B* a, Mtx4B* b)
+{
+    Mtx4B t;
+    t.m[0] = b->m[0] * a->m[0] + b->m[1] * a->m[4] + b->m[2] * a->m[8] + b->m[3] * a->m[12];
+    t.m[1] = b->m[0] * a->m[1] + b->m[1] * a->m[5] + b->m[2] * a->m[9] + b->m[3] * a->m[13];
+    t.m[2] = b->m[0] * a->m[2] + b->m[1] * a->m[6] + b->m[2] * a->m[10] + b->m[3] * a->m[14];
+    t.m[3] = b->m[0] * a->m[3] + b->m[1] * a->m[7] + b->m[2] * a->m[11] + b->m[3] * a->m[15];
+    t.m[4] = b->m[4] * a->m[0] + b->m[5] * a->m[4] + b->m[6] * a->m[8] + b->m[7] * a->m[12];
+    t.m[5] = b->m[4] * a->m[1] + b->m[5] * a->m[5] + b->m[6] * a->m[9] + b->m[7] * a->m[13];
+    t.m[6] = b->m[4] * a->m[2] + b->m[5] * a->m[6] + b->m[6] * a->m[10] + b->m[7] * a->m[14];
+    t.m[7] = b->m[4] * a->m[3] + b->m[5] * a->m[7] + b->m[6] * a->m[11] + b->m[7] * a->m[15];
+    t.m[8] = b->m[8] * a->m[0] + b->m[9] * a->m[4] + b->m[10] * a->m[8] + b->m[11] * a->m[12];
+    t.m[9] = b->m[8] * a->m[1] + b->m[9] * a->m[5] + b->m[10] * a->m[9] + b->m[11] * a->m[13];
+    t.m[10] = b->m[8] * a->m[2] + b->m[9] * a->m[6] + b->m[10] * a->m[10] + b->m[11] * a->m[14];
+    t.m[11] = b->m[8] * a->m[3] + b->m[9] * a->m[7] + b->m[10] * a->m[11] + b->m[11] * a->m[15];
+    t.m[12] = b->m[12] * a->m[0] + b->m[13] * a->m[4] + b->m[14] * a->m[8] + b->m[15] * a->m[12];
+    t.m[13] = b->m[12] * a->m[1] + b->m[13] * a->m[5] + b->m[14] * a->m[9] + b->m[15] * a->m[13];
+    t.m[14] = b->m[12] * a->m[2] + b->m[13] * a->m[6] + b->m[14] * a->m[10] + b->m[15] * a->m[14];
+    t.m[15] = b->m[12] * a->m[3] + b->m[13] * a->m[7] + b->m[14] * a->m[11] + b->m[15] * a->m[15];
+    *out = t;
 }
 
 extern "C" void fn_803BD61C(int arg)
