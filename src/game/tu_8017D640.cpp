@@ -4,6 +4,72 @@
  */
 #include "game/tu_8017D640.h"
 #include "game/clampiter.h"
+struct Unk8017F428_M6F8 {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk8017F428_Ctx {
+    char pad0[0x6F8];
+    Unk8017F428_M6F8* m6F8;
+};
+class Unk80069F0C {
+public:
+    int fn_8006A1B4();
+};
+struct Unk8017F428_T {
+    Unk8017F428_Ctx* m0;
+    int m4;
+    int m8;
+    int mC;
+    char m10[0x10];
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+    int m48;
+    char pad4C[0x1DC - 0x4C];
+    int m1DC;
+    int m1E0;
+    int m1E4;
+    int m1E8;
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+    const void* m200;
+};
+struct Unk8017F428_V {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk8017F428_S {
+    char pad0[0x688];
+    Unk8017F428_V m688;
+};
+extern char lbl_80660290[];
+extern int lbl_8068BE9C;
+extern const float lbl_805CCB80;
+extern "C" {
+void fn_80034B94(void* p);
+int fn_8009E1D4(void* p, int a, int b);
+Unk8017F428_S* fn_800B555C();
+int fn_800B57EC(void* o);
+int fn_800B5898(void* o);
+int fn_800B55A8(void* o);
+int fn_800B59DC(void* o);
+}
+int fn_8017F3B4(int a);
+struct Unk8017FA08_T;
+extern "C" float fn_8017FA08(Unk8017FA08_T* p);
 struct Unk8017FCE4_F {
     float m0;
     float m4;
@@ -472,9 +538,9 @@ Unk8017EF7C::Unk8017EF7C() : Unk8037B3E8(0xEF8A9748) {}
 
 Unk8017EF7C::~Unk8017EF7C() {}
 
-void fn_8017F3B4(int a)
+int fn_8017F3B4(int a)
 {
-    fn_8037C7FC()->fn_8037CE98(0xEF8A9748, a, 0);
+    return fn_8037C7FC()->fn_8037CE98(0xEF8A9748, a, 0);
 }
 
 Unk8037B3E8* Unk8017EF7C::fn_vslot5()
@@ -484,6 +550,76 @@ Unk8037B3E8* Unk8017EF7C::fn_vslot5()
 
 void fn_8017F424() {}
 
+/* near-miss: 95.9%; retail copies the ctx parameter (`mr r0,r4`) before the member zero stores and stores it
+ * after the vptr; the switch (cases -1, 0, 1 with the index reused as the stored 1, 2) and everything else match. */
+extern "C" Unk8017F428_T* fn_8017F428(Unk8017F428_T* self, Unk8017F428_Ctx* ctx)
+{
+    self->m4 = 0;
+    self->m8 = 0;
+    self->mC = 0;
+    self->m200 = lbl_80660290;
+    self->m0 = ctx;
+    fn_80034B94(self->m10);
+    self->m48 = 0;
+    self->m1E0 = 0;
+    self->m1E4 = 0;
+    self->m1E8 = 0;
+    self->m1EC = 0;
+    self->m1F0 = 0;
+    self->m1F4 = 0;
+    self->m1F8 = 0;
+    self->m1FC = 0;
+    self->m44 = lbl_805CCB80;
+    self->m1DC = -1;
+    self->m20 = lbl_805CCB80;
+    self->m24 = lbl_805CCB80;
+    self->m28 = lbl_805CCB80;
+    self->m2C = lbl_805CCB80;
+    self->m30 = lbl_805CCB80;
+    self->m34 = lbl_805CCB80;
+    self->m38 = lbl_805CCB80;
+    self->m3C = lbl_805CCB80;
+    self->m40 = lbl_805CCB80;
+    self->mC = fn_8017F3B4(lbl_8068BE9C);
+    Unk8017F428_M6F8* m = self->m0->m6F8;
+    char* r = m->m14;
+    char* a = r + 0x8C;
+    int hi = fn_8009E1D4(r + 0xEF0, 2, 0) + 0x15;
+    self->m1E4 = fn_8009E1D4(a, 3, 0);
+    self->m1E8 = 0;
+    if (hi <= 0x35) {
+        self->m1E8 = fn_8009E1D4(a, hi, 0);
+    }
+    if (fn_800B57EC(fn_800B555C()) == 1 || fn_800B5898(fn_800B555C()) == 1) {
+        Unk8017F428_V v = fn_800B555C()->m688;
+        switch (v.m0) {
+        case -1: {
+            int t = ((Unk80069F0C*)m)->fn_8006A1B4();
+            self->m1EC = t;
+            self->m1F0 = t ^ 1;
+            break;
+        }
+        case 0:
+            self->m1F4 = 1;
+            break;
+        case 1:
+            self->m1F4 = 1;
+            break;
+        case 2:
+            self->m1F8 = 1;
+            break;
+        }
+    } else if (fn_800B55A8(fn_800B555C()) != 0) {
+        self->m1F0 = 1;
+    }
+    if (fn_800B59DC(fn_800B555C()) != 0) {
+        self->m1FC = 1;
+    }
+    self->m20 = fn_8017FA08((Unk8017FA08_T*)self);
+    return self;
+}
+
+/* 8017F628 */
 Unk8017F628::~Unk8017F628() {}
 
 void fn_8017F67C(Unk8017F67C_C* self, int key)
