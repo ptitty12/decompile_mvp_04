@@ -2326,11 +2326,179 @@ libgcc/tu_80413940.c:
 dolphin/ai/AI.c:
 	.text       start:0x80414F30 end:0x80415814
 
+dolphin/amcstubs/AmcExi2Stubs.c:
+	.text       start:0x80415814 end:0x8041583C
+
+dolphin/ar/ar.c:
+	.text       start:0x8041583C end:0x80417314
+
+dolphin/ar/arq.c:
+	.text       start:0x80417314 end:0x80417798
+
+dolphin/ax/AX.c:
+	.text       start:0x80417798 end:0x8041783C
+
+dolphin/ax/tu_8041783C.c:
+	.text       start:0x8041783C end:0x8041A5A4
+
+dolphin/base/tu_8041A5A4.c:
+	.text       start:0x8041A5A4 end:0x8041A6C4
+
+dolphin/card/tu_8041A6C4.c:
+	.text       start:0x8041A6C4 end:0x8041BC70
+
+dolphin/card/CARDBlock.c:
+	.text       start:0x8041BC70 end:0x8041C074
+
+dolphin/card/CARDDir.c:
+	.text       start:0x8041C074 end:0x8041C2D8
+
+dolphin/card/tu_8041C2D8.c:
+	.text       start:0x8041C2D8 end:0x8041E534
+
+dolphin/card/CARDOpen.c:
+	.text       start:0x8041E534 end:0x8041EC24
+
+dolphin/card/CARDCreate.c:
+	.text       start:0x8041EC24 end:0x8041EFBC
+
+dolphin/card/CARDRead.c:
+	.text       start:0x8041EFBC end:0x8041F430
+
+dolphin/card/CARDWrite.c:
+	.text       start:0x8041F430 end:0x8041F7AC
+
+dolphin/card/CARDDelete.c:
+	.text       start:0x8041F7AC end:0x8041FB1C
+
+dolphin/card/CARDStat.c:
+	.text       start:0x8041FB1C end:0x8041FFE4
+
+dolphin/card/CARDRename.c:
+	.text       start:0x8041FFE4 end:0x80420228
+
+dolphin/card/tu_80420228.c:
+	.text       start:0x80420228 end:0x80420354
+
+dolphin/card/CARDUnlock.c:
+	.text       start:0x80420354 end:0x804215B4
+
+dolphin/card/CARDRdwr.c:
+	.text       start:0x804215B4 end:0x80421844
+
+dolphin/card/CARDStatEx.c:
+	.text       start:0x80421844 end:0x80421B84
+
+dolphin/db/db.c:
+	.text       start:0x80421B84 end:0x80421C70
+
+dolphin/dsp/dsp.c:
+	.text       start:0x80421C70 end:0x80421F00
+
+dolphin/dsp/dsp_debug.c:
+	.text       start:0x80421F00 end:0x80421F50
+
+dolphin/dsp/dsp_task.c:
+	.text       start:0x80421F50 end:0x804227D4
+
+dolphin/dvd/tu_804227D4.c:
+	.text       start:0x804227D4 end:0x8042575C
+
+dolphin/dvd/dvdqueue.c:
+	.text       start:0x8042575C end:0x80425954
+
+dolphin/dvd/tu_80425954.c:
+	.text       start:0x80425954 end:0x80425AEC
+
+dolphin/dvd/dvdidutils.c:
+	.text       start:0x80425AEC end:0x80425BE4
+
+dolphin/dvd/tu_80425BE4.c:
+	.text       start:0x80425BE4 end:0x80425E54
+
+dolphin/exi/tu_80425E54.c:
+	.text       start:0x80425E54 end:0x80428F14
+
+dolphin/gx/tu_80428F14.c:
+	.text       start:0x80428F14 end:0x8042AB48
+
+dolphin/gx/GXAttr.c:
+	.text       start:0x8042AB48 end:0x8042BF8C
+
+dolphin/gx/tu_8042BF8C.c:
+	.text       start:0x8042BF8C end:0x8042C830
+
+dolphin/gx/GXGeometry.c:
+	.text       start:0x8042C830 end:0x8042CB6C
+
+dolphin/gx/GXFrameBuf.c:
+	.text       start:0x8042CB6C end:0x8042D84C
+
+dolphin/gx/tu_8042D84C.c:
+	.text       start:0x8042D84C end:0x8042DD30
+
+dolphin/gx/GXTexture.c:
+	.text       start:0x8042DD30 end:0x8042EDC0
+
+dolphin/gx/GXBump.c:
+	.text       start:0x8042EDC0 end:0x8042F2E0
+
+dolphin/gx/GXTev.c:
+	.text       start:0x8042F2E0 end:0x8042F93C
+
+dolphin/gx/tu_8042F93C.c:
+	.text       start:0x8042F93C end:0x804310E0
+
+dolphin/mtx/tu_804310E0.c:
+	.text       start:0x804310E0 end:0x80431828
+
+dolphin/os/tu_80431828.c:
+	.text       start:0x80431828 end:0x804321A0
+
 dolphin/os/OS.c:
 	.text       start:0x804321A0 end:0x804321CC
+
+dolphin/os/tu_804321CC.c:
+	.text       start:0x804321CC end:0x804330D0
+
+dolphin/os/tu_804330D0.c:
+	.text       start:0x804330D0 end:0x8043580C
+
+dolphin/os/OSMessage.c:
+	.text       start:0x8043580C end:0x80435A10
+
+dolphin/os/tu_80435A10.c:
+	.text       start:0x80435A10 end:0x80437444
+
+dolphin/os/tu_80437444.c:
+	.text       start:0x80437444 end:0x80438778
+
+dolphin/pad/Padclamp.c:
+	.text       start:0x80438778 end:0x80438A2C
+
+dolphin/pad/Pad.c:
+	.text       start:0x80438A2C end:0x8043A374
+
+dolphin/si/SIBios.c:
+	.text       start:0x8043A374 end:0x8043BA64
+
+dolphin/si/SISamplingRate.c:
+	.text       start:0x8043BA64 end:0x8043BB6C
+
+dolphin/vi/vi.c:
+	.text       start:0x8043BB6C end:0x8043D960
+
+dolphin/vm/tu_8043D960.c:
+	.text       start:0x8043D960 end:0x8043E344
+
+sdk/tu_8043E344.c:
+	.text       start:0x8043E344 end:0x8043EDC4
 
 libsn/dummy.c:
 	.text       start:0x8043EDC4 end:0x8043EFA4
 
 libc/tolower.c:
 	.text       start:0x8043EFA4 end:0x8043EFC0
+
+sdk/tu_8043F058.c:
+	.text       start:0x8043F058 end:0x8043FDB8
