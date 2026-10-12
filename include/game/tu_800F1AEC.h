@@ -1162,7 +1162,7 @@ struct Ui800ABF3C {
 };
 Ui800ABF3C* fn_800ABF3C(int a, Ui8011AA24* b);
 void fn_800AB5C8(int a);
-void fn_800AEC80();
+void* fn_800AEC80();
 int fn_800B1FCC();
 void fn_800C80C0(UiObj* o, int a);
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);

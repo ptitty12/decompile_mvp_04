@@ -206,6 +206,44 @@ void fn_800EF2B8(UiScrRaw* self)
 }
 
 enum E48Sel { E48Sel_Neg = -1, E48Sel_Lo = 0, E48Sel_Hi = 1 };
+class UiV5q : public UiS0 {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4();
+  virtual void v5(int a, int b, int c, int d);
+};
+inline int UiAtI(char* b, int off)
+{
+    return *(int*)(b + off);
+}
+/* near-miss: two instruction pairs ordered differently (li of the loop counters; copy of the second table vs the last store of the first) */
+void fn_800EF2FC(UiS* self)
+{
+    fn_800EE540(self);
+    int off = 0;
+    int i = 0;
+    int n = 4;
+    ((UiVB*)self)->v85();
+    UiStr4 a = lbl_805BE2DC;
+    UiStr4 b = lbl_805BE2FC;
+    do {
+        UiS* o = self->v32(a.m[i], 1);
+        ((UiV5q*)o)->v5(UiAtI((char*)self + 0x148, off), UiAtI((char*)self + 0x14C, off), lbl_8061A328, lbl_8061A328);
+        UiS* o2 = self->v32(b.m[i], 1);
+        i++;
+        ((UiV5q*)o2)->v5(UiAtI((char*)self + 0x150, off), UiAtI((char*)self + 0x154, off), lbl_8061A328, lbl_8061A328);
+        off += 0x10;
+        n--;
+    } while (n != 0);
+    if (self->m1A8 != -1) {
+        ((UiV5q*)self->v32(a.m[self->m1A8], 1))->v5(self->m188, self->m18C, lbl_8061A328, lbl_8061A328);
+        ((UiV5q*)self->v32(b.m[self->m1A8], 1))->v5(self->m198, self->m19C, lbl_8061A328, lbl_8061A328);
+    }
+    if (self->m1AC != -1) {
+        ((UiV5q*)self->v32(a.m[self->m1AC], 1))->v5(self->m190, self->m194, lbl_8061A328, lbl_8061A328);
+        ((UiV5q*)self->v32(b.m[self->m1AC], 1))->v5(self->m1A0, self->m1A4, lbl_8061A328, lbl_8061A328);
+    }
+}
+
 /* near-miss: 136 vs 139 insns; local UiStr4 copies and field reads through byte offsets differ */
 int fn_800EF7D8(UiS* self, int idx)
 {
