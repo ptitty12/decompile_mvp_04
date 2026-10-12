@@ -17,6 +17,7 @@ struct Unk8025DF8C_O {
     char pad0[0x14];
     int m14;
 };
+
 struct Unk8025DF8C_Ctx {
     char pad0[0x3C0];
     Unk8025DF8C_O* m3C0;
@@ -552,6 +553,39 @@ void fn_8025DA78(I* self, P* p)
     char* g = (char*)self + 0x190;
     fn_80269F88(g, p, 3);
     fn_80269E84(g, p, 1);
+}
+
+extern int lbl_8062072C;
+extern void fn_80269DD0(void* g, int a, int b);
+extern int fn_8035E540(void* g, int a);
+extern int fn_8035E548(void* g, int a);
+extern int fn_8035E558(void* g, int a);
+void fn_8025DAC0(I* self)
+{
+    int i = 0;
+    if (i < self->m448) {
+        do {
+            P* pl = self->m438[i];
+            if (pl != 0) {
+                char* g = (char*)self + 0x190;
+                int t = pl->m458;
+                Unk8025DF8C_O* o = ((Unk8025DF8C_Ctx*)self->m1EC->m700)->m3C0;
+                if ((Unk8025DF8C_Bit(o, 1) && t == 0xA) || (Unk8025DF8C_Bit(o, 2) && t == 0xB))
+                    fn_80269DD0(g, t, 2);
+                if (lbl_8062072C != 0)
+                    fn_80269DD0(g, pl->m458, lbl_8062072C - 1);
+                int x = fn_8035E548(g, fn_8035E540(g, t));
+                int y = fn_8035E558(g, fn_8035E540(g, t));
+                if (fn_8026DAE8(pl, 0) != 0 && x != y) {
+                    if (x < y)
+                        fn_80269F88(g, pl, 8);
+                    else if (x > y)
+                        fn_80269F88(g, pl, 7);
+                }
+            }
+            i++;
+        } while (i < self->m448);
+    }
 }
 
 int fn_8025DC40(I* self, int* a, int* b, int* c, int* d)
