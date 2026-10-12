@@ -94,3 +94,15 @@
   - HANDOFF section 7 items 6 (OSExceptionVector labels: none are mis-typed in symbols.txt) and 7 (relocname fixes: all 19 already 100%) needed no change. 228 merged stale branches were deleted.
   - Running: 13 Sonnet workers on p4_00..p4_12; 1 Opus worker on hard-case families 5, 7, 8, 9 (round 7). Queued: p4_13..p4_21, p4_32 (no commits last time), then p5 (`tools/team/lead/gen_p5.py`: 0% functions of 0x400-0x800, plus small ones in units no p4 batch covered).
   - Blockers: none new. The owner-only questions in DECISIONS are unchanged.
+- 2026-10-12 | Claude Opus 5.5 (lead session 2, update 15:10 CDT) | fleet | **19,681 -> 20,118 functions at 100%** (83.3%) since the 11:00 entry; +789 this session.
+  - All 13 p4 batches p4-00..p4-12 merged: 18-46 functions each (median about 30). A usage-limit cutoff at 10:55 stopped every worker; they were resumed at 13:15 with SendMessage and kept their context.
+  - Lead fixes:
+    - **p4-00 header merge:** two batches added the same three method declarations, and the build failed; fixed on the branch.
+    - **p4-06 address literals:** two string-address tables were written as integer literals, because check_literals compared unrelocated pointer words. The functions now name the symbols, and check_literals resolves pointers to externs (repo-wide still 0 mismatches). The worker prompt forbids address literals.
+    - **Worker helpers:** several (hill.py, rv.py, Q21, perm.py) wrote variants into the shared tools folder, and 295 such files were committed by mistake, then removed. They now write to $QDIR, and rv.py --apply keeps CRLF.
+  - Running (13 Sonnet workers): p4-13..p4-21, p4-32b (Dolphin OS/VM, a rerun), p5-18, p5-19, p5-22. The Opus hard-case round 7 is held. The pass-5 queue (28 batches, 0% functions up to 0x800) is ordered in tools/team/lead/queue/p5_order.txt.
+  - Open families from reports:
+    - SumRow byte-sum loop temp registers (fn_80166E40, fn_800493D4, fn_80118770, fn_801609EC);
+    - the inlined stack Unk803597C4 record ctor prologue (fn_80163390 and 3 more);
+    - fn_80097318 plus 4 siblings (one shape).
+  - Blockers: none new. Functions that need `mftb` stay unmatched (inline-asm-only, existing rule).
