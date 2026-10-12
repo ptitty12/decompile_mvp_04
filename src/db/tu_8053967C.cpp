@@ -361,6 +361,43 @@ DB_OVERLAY void fn_80539FC0(L* self)
     self->m14 = 1;
 }
 
+extern "C" int fn_800787E8(void* g, int a, int b);
+DB_OVERLAY void fn_8053A044(L* self, int a, int dir)
+{
+    int keys[0x1BE];
+    unsigned n = self->m4;
+    void* g = lbl_8061930C;
+    unsigned i = 0;
+    for (i = 0; i < n; i++) {
+        int o = i * 4;
+        keys[i] = fn_800787E8(g, a, *(int*)((char*)self->m0 + o));
+    }
+    int* kp = keys;
+    unsigned i2 = 0;
+    unsigned n3 = self->m4;
+    for (; i2 < n3; i2++) {
+        for (unsigned j = i2 + 1; j < n3; j++) {
+            if ((dir == 1 && kp[i2] < kp[j]) || (dir == 0 && kp[i2] > kp[j])) {
+                int x = kp[j];
+                int y = kp[i2];
+                kp[i2] = x;
+                kp[j] = y;
+                int oi = i2 * 4;
+                int vi = *(int*)((char*)self->m0 + oi);
+                int oj = j * 4;
+                int vj = *(int*)((char*)self->m0 + oj);
+                if (i2 >= self->m4)
+                    self->m4 = i2 + 1;
+                self->m0[i2] = vj;
+                if (j >= self->m4)
+                    self->m4 = j + 1;
+                self->m0[j] = vi;
+            }
+        }
+    }
+    self->m14 = 1;
+}
+
 DB_OVERLAY void fn_8053A190()
 {
     fn_803791BC();
