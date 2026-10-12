@@ -51,7 +51,10 @@ struct Unk801C16B0_Z {
     Unk801C16B0_M4* m4;
     char m8[0xE0 - 8];
     char mE0[4];
-    char padE4[0x11C - 0xE4];
+    char padE4[0xEC - 0xE4];
+    int mEC;
+    int mF0;
+    char padF4[0x11C - 0xF4];
     int m11C;
     int m120;
     int m124;
