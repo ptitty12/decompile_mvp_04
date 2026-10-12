@@ -4,7 +4,25 @@
  */
 #include "game/fe_80459228.h"
 
+
+struct FeArrL {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+extern const char lbl_8067ADC0[];
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A4C8[];
 extern "C" {
+void fn_8040074C(void* p, int n);
+}
+
+extern "C" {
+
 FE_OVERLAY int fn_80462504(FeScrD* x, int a)
 {
     int r;
@@ -29,6 +47,40 @@ FE_OVERLAY int fn_8046255C(FeScrD* x, int a)
     return r;
 }
 
+FE_OVERLAY FeScrE* fn_804625B4(FeScrE* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeArrL* s = (FeArrL*)((char*)self + 0x158);
+    FeArrL* t = (FeArrL*)((char*)self + 0x210);
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_8067ADC0);
+    self->m130 = 0;
+    s->m10 = lbl_8064B298;
+    s->m0 = (char*)self + 0x170;
+    s->m8 = 0x28;
+    fn_8040074C(s->m0, 0xA0);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m10 = lbl_8064A4C8;
+    t->m10 = lbl_8064B298;
+    t->m0 = (char*)self + 0x228;
+    t->m8 = 0x28;
+    fn_8040074C(t->m0, 0xA0);
+    t->m4 = 0;
+    t->mC = 0;
+    t->m10 = lbl_8064A550;
+    fn_8040074C(t->m0, t->m8 * 4);
+    t->m4 = 0;
+    t->mC = 0;
+    t->m14 = 0;
+    t->m10 = lbl_8064A4C8;
+    return self;
+}
+
 FE_OVERLAY void fn_804626B4(FeScrE* x)
 {
     fn_800ECE34(x);
@@ -40,6 +92,26 @@ FE_OVERLAY void fn_80462A7C(FeScrE* x, FeW* w)
         x->m2C8 = 0;
         x->m150 = fn_800B548C(((FeSub*)((char*)x->m144 + 0x98))->s5());
         fn_804637FC(x);
+    }
+}
+
+/* near-miss: lwzx operand order (retail base,index; ours index,base) in the two array reads: 2 slots (lwzx base/index family, see PATTERNS) */
+FE_OVERLAY void fn_80462AE8(FeScrE* x, FeW* w)
+{
+    if (w == x->m134) {
+        if (x->m14C->fn_vslot86() != 0) {
+            int v = (*(int**)((char*)x + 0x210))[w->fn_vslot60()];
+            FeList* l = (FeList*)x->m14C;
+            fn_80126CF4(l, v, l->m168, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+            return;
+        }
+    }
+    if (x->m13C == x->m138) {
+        if (x->m14C->fn_vslot87() != 0) {
+            int v = (*(int**)((char*)x + 0x158))[w->fn_vslot60()];
+            FeList* l = (FeList*)x->m14C;
+            fn_80126CF4(l, l->m164, v, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+        }
     }
 }
 
@@ -221,7 +293,6 @@ FE_OVERLAY void fn_80463FE0(FeScrE* x, int a)
     x->m13C->fn_vslot14(a);
 }
 
-
 FE_OVERLAY FeScrF* fn_80464030(FeScrF* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -233,4 +304,5 @@ FE_OVERLAY FeScrF* fn_80464030(FeScrF* self, int a, int b, int c, int d, int e, 
     self->m144 = 0;
     return self;
 }
+
 }
