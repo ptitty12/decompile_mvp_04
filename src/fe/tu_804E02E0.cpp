@@ -5,6 +5,17 @@
 
 #include "game/fe_804E02E0.h"
 
+struct Unk80171A10_Menu;
+struct Unk80174318_T;
+void fn_80172334(Unk80171A10_Menu* m, int a, int b, const unsigned short* t, const char* s);
+void fn_80174760(Unk80174318_T* t);
+extern "C" void fn_8013501C(void* p);
+struct FeMenuP {
+    char pad0[0x40];
+    int m40;
+    int m44;
+};
+
 extern "C" void fn_804D32A0(void* menu, int a);
 
 extern "C" FE_OVERLAY int fn_804E02E0(FeObj* self)
@@ -226,6 +237,32 @@ extern "C" FE_OVERLAY void fn_804E0FE0(FeTitle* self)
     fn_800ECAA4(self);
     if (self->m1F4 == 0)
         fn_804E1020(self);
+}
+
+extern "C" FE_OVERLAY void fn_804E14EC(FeTitle* self, int a)
+{
+    switch (a) {
+    case 4:
+        fn_8013501C(self->m134);
+        *(int*)(self->m134 + 0x28) = 0;
+        fn_80174760(*(Unk80174318_T**)self->m134);
+        break;
+    case 5: {
+        (*(FeMenuP**)self->m134)->m40 = 1;
+        (*(FeMenuP**)self->m134)->m44 = 1;
+        *(int*)(self->m134 + 0x28) = 0x11;
+        fn_8013501C(self->m134);
+        const unsigned short* s = (const unsigned short*)fn_80090880(lbl_8061977C, 0x60E);
+        fn_80172334(*(Unk80171A10_Menu**)self->m134, 0, *(int*)(self->m134 + 0x28), s, "Save Game");
+        break;
+    }
+    case 6:
+        fn_804E14EC(self, ++self->m1D8);
+        break;
+    case 7:
+        fn_800B7ADC(UiGetMsgMgr(), self);
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804E15FC(FeTitle* self, char* out)
