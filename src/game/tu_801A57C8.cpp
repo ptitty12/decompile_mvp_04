@@ -38,6 +38,12 @@ extern char lbl_805CEA28[];
 void fn_8028709C(void* x, unsigned h);
 int fn_801A2034(Unk8019F8C0_Owner* o, int i);
 void fn_801A7764(void* w, int t);
+struct Unk801A7764_St {
+    char pad0[0x570];
+    int m570;
+};
+Unk801A7764_St* fn_800B555C();
+extern char lbl_805CEAD4[];
 int fn_80400E84();
 int fn_80400DA4();
 void fn_80107F74(int a, int b, int c);
@@ -279,6 +285,7 @@ struct Unk801A57C8_Wrap {
     Unk8019F8C0_Owner* m0;
 };
 float fn_801A78E4(Unk801A57C8_Wrap* w);
+int fn_801A7950(Unk801A57C8_Wrap* w);
 float fn_801A745C(Unk801A745C_T* t);
 struct Unk801A57C8_Timer {
     char pad0[0x28];
@@ -577,11 +584,11 @@ int fn_801A7048(Unk8019F8C0_Owner* o)
     return 0;
 }
 
-/* near-miss: retail returns the -1 case from a shared tail at the end (3 slots differ). */
 int fn_801A7130(Unk8019F8C0_Owner* o, int i)
 {
     if (o->m58C[i] != -1) {
-        return o->m6F8->m14[i].m108 != 0;
+        Unk8019F8C0_Inner* e = &o->m6F8->m14[i];
+        return e->m108 != 0;
     }
     return 1;
 }
@@ -686,6 +693,24 @@ float fn_801A745C(Unk801A745C_T* t)
         }
     }
     return f;
+}
+
+/* near-miss: same code; callee-saved roles differ (retail: buffer pointer r31, w r30, t r29, queue global r30;
+ * mine: w/global r31, t r30, buffer r29), 13 slots. */
+void fn_801A7764(void* w, int t)
+{
+    if (fn_801A7950((Unk801A57C8_Wrap*)w)) {
+        *(int*)((char*)w + 0x18) = 1;
+        fn_800B555C()->m570 = t;
+        Unk8035682C buf;
+        Unk8035682C* s = &buf;
+        fn_8040B830(s, lbl_805CEAD4, 0xF);
+        s->m0[0xF] = 0;
+        if (lbl_8061A32C == 0) {
+            lbl_8061A32C = new (0) Unk800B64BC;
+        }
+        fn_800B7B4C(lbl_8061A32C, s, 0);
+    }
 }
 
 void fn_801A7808(Unk801A745C_T* t)
@@ -877,14 +902,14 @@ void Unk801A9610::Init()
     fn_801AA038(this, 1);
 }
 
-/* near-miss: retail keeps x-2 in r0 and copies it to r3 before the compare (4 slots differ). */
 int fn_801A96A8(int x)
 {
     unsigned t = x - 2;
-    if (t > 3) {
-        return 0;
+    int r = t;
+    if (t <= 3) {
+        return r;
     }
-    return t;
+    return 0;
 }
 
 void fn_801A96C0(void* p)
