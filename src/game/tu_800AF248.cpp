@@ -708,7 +708,6 @@ extern "C" void fn_800B0884(UnkAt10P* p)
     }
 }
 
-/* near-miss (4 slots): retail emits `stfs` (m68) before `li r0,0` and the 0x144 store first; ours schedules the zero constant first; all 720 orders of the six stores tried */
 extern "C" void fn_800B1C7C(FEObR* self)
 {
     FE74c* g = self->m4->m6F8->m10;
@@ -718,7 +717,11 @@ extern "C" void fn_800B1C7C(FEObR* self)
     }
     self->mD8 = f;
     ((FEV0b*)((char*)self + 0xC))->s2();
-    self->m68 = g->m120 ? lbl_805B9AEC : lbl_805B9AE8;
+    if (g->m120 == 0) {
+        self->m68 = 30.0f;
+    } else {
+        self->m68 = 65.0f;
+    }
     self->m74 = 0;
     self->m78 = 0;
     self->m114 = 0;
@@ -968,14 +971,13 @@ extern "C" void fn_800B243C(void* p)
     fn_800B245C((FEOb245*)p);
 }
 
-/* near-miss (4 slots): retail loads m68 into f0 and the constant into f13 (compare operands swapped in ours); 5 operand forms tried */
 extern "C" void fn_800B245C(FEOb245* self)
 {
     if (fn_802D7DB4(fn_801A2034(self->m4, 4), 0x106)) {
         int did = 0;
         if (self->mD8 == 1) {
-            if (!(self->m68 < lbl_805B9B7C)) {
-                self->m68 = FMax2(self->m68 - lbl_805B9B7C, lbl_805B9B80);
+            if (!(self->m68 < 5.0f)) {
+                self->m68 = FMax2(self->m68 - 5.0f, 0.0f);
                 did = 1;
             }
         } else {
