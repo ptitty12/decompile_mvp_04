@@ -34,7 +34,6 @@ int fn_8056A838(void* o, int cur, int who);
 void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
 }
 
-extern "C" void fn_8057C2C4(void* self, int* a, int* b, int* c);
 extern "C" void fn_80377408(void* p);
 extern char lbl_8064A550[];
 
@@ -88,7 +87,17 @@ struct DbScan {
     int m0;
     void* m4;
 };
+
+struct Db80577508_S {
+    int m0;
+    void* m4;
+    void* m8;
+};
+
+extern "C" int fn_8056A5B0(void* o, int kind, int idx, int who);
+extern "C" int fn_8056B1D0(void* o, int* cur, int a);
 /* forward declarations (definitions are in address order) */
+extern "C" int fn_80577508(Db80577508_S* self, int* a, int* b);
 extern "C" int fn_8057763C(DbScan* self, int a);
 extern "C" void fn_805788CC(char* self);
 extern "C" int fn_80578974(DbHost* self, int a, int b);
@@ -97,6 +106,7 @@ extern "C" void fn_80578AE8(DbHost* self, int a, int b);
 extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
 extern "C" int fn_8057C21C(int id);
 extern "C" int fn_8057C270(int id);
+extern "C" void fn_8057C2C4(void* self, int* a, int* b, int* c);
 extern "C" int fn_8057C3F8(void* self);
 extern "C" DbFixList* fn_8057C8F8(DbFixList* self, unsigned flags);
 extern "C" void fn_8057C99C(void* self, int chrg);
@@ -107,6 +117,26 @@ extern "C" void fn_8057CBA4(DbSL* self);
 extern "C" unsigned fn_8057CC30(DbSL* self, int id);
 extern "C" int fn_8057CCA4(DbSL* self, int id);
 extern "C" void fn_8057CCE8(DbSL* self);
+
+extern "C" DB_OVERLAY int fn_80577508(Db80577508_S* self, int* a, int* b)
+{
+    int s = fn_80078A38__18Unk8007B2B0_Screeni(self->m4, *a);
+    int cur = fn_8007FB6C__FP13Unk8007F198_Ci(self->m4, s) + 1;
+    unsigned ra = fn_8056A2F8(self->m8, cur, 1, 0, s, *a, 0, 2, 0, 0x1A);
+    unsigned rb = fn_8056A2F8(self->m8, cur, 1, 0, s, *b, 0, 2, 0, 0x1A);
+    if (ra == (unsigned)-1 || rb == (unsigned)-1)
+        return 0;
+    if (ra < rb)
+        return 1;
+    if (rb < ra)
+        return 2;
+    if (fn_8056A838(self->m8, ra, *a) == 1)
+        return 3;
+    int r = 0;
+    if (fn_8056A838(self->m8, rb, *b) == 1)
+        r = 4;
+    return r;
+}
 
 extern "C" DB_OVERLAY int fn_8057763C(DbScan* self, int a)
 {
@@ -225,6 +255,28 @@ extern "C" DB_OVERLAY int fn_8057C270(int id)
     int a, b;
     fn_8057C0B8(&a, &b, &f, 0, 0, id, 0, 1, 0, 0x1A, 0);
     return a;
+}
+
+extern "C" DB_OVERLAY void fn_8057C2C4(void* self, int* a, int* b, int* c)
+{
+    *a = 0;
+    *b = 0;
+    *c = 0;
+    void* obj = lbl_80619948->m28;
+    int cur = 0;
+    while ((cur = fn_8056A2F8(obj, cur, 0, 0, 0, (int)self, 1, 2, 0, 0x1A)) != -1) {
+        int k = fn_8056A5B0(obj, 0, cur, (int)self);
+        if (k == 2)
+            k = 1;
+        int t = fn_8056B1D0(obj, &cur, 0);
+        if (t == 3)
+            continue;
+        *a += 1;
+        if ((k == 0 && t == 0) || (k == 1 && t == 1))
+            *b += 1;
+        else if ((k == 0 && t == 1) || (k == 1 && t == 0))
+            *c += 1;
+    }
 }
 
 extern "C" DB_OVERLAY int fn_8057C3F8(void* self)
