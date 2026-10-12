@@ -823,6 +823,68 @@ extern "C" Unk8027C728_Goal* fn_801E5A8C(void* self, Unk80270BA0_X* p, Unk801E4E
 }
 
 /* near-miss: retail keeps a second pointer copy of g (mr r31,r29) and reuses r0 for the 8/9 select (2 insns) */
+struct Unk8029B6C8_S;
+Unk8029B6C8_S* fn_8029B6C8(Unk8029B6C8_S* s, float f);
+Unk8029B6C8_S* fn_8029B6F0(Unk8029B6C8_S* s, int v);
+struct Unk801E5C14_Src {
+    char pad0[8];
+    int m8;
+    int mC;
+    char pad10[4];
+    int m14;
+    int m18;
+    char pad1C[0xC];
+    Unk80273498_Vec3 m28;
+    char pad34[0x78 - 0x34];
+    float m78;
+};
+class Unk801E5C14_Goal {
+public:
+    void* fn_8029B648(const Unk80273498_Vec3* v);
+};
+inline void Unk801E5C14_Put(Unk80273498_Vec3* d, const Unk80273498_Vec3& s)
+{
+    *d = s;
+}
+inline Unk80273498_Vec3 Unk801E5C14_Sub(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" Unk8027C728_Goal* fn_801E5C14(void* self, Unk80270BA0_X* p, Unk801E5C14_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk80273498_Vec3 cur;
+    Unk801E5C14_Put(&cur, p->m60);
+    const Unk80273498_Vec3* pt = &x->m28;
+    Unk80273498_Vec3 tgt = Unk801E4E60_Pos(pt);
+    float spd = x->m78;
+    Unk80273498_Vec3 d = Unk801E5C14_Sub(tgt, cur);
+    g->m10 = 0xE;
+    fn_8027C728(g);
+    Unk8029B6C8_S* s = (Unk8029B6C8_S*)((Unk801E5C14_Goal*)g->m18)->fn_8029B648(&d);
+    fn_8029B6F0(fn_8029B6C8(s, spd), x->m14);
+    int a1 = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a1;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    g104->m38 = a1;
+    int b1 = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b1;
+    g104->m34 = b1;
+    int c1 = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c1;
+    g104->m40 = c1;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    ((Unk80287D70*)h->m18)->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    return g;
+}
+
 extern "C" Unk8027C728_Goal* fn_801E5D7C(void* self, Unk80270BA0_X* p, Unk801E5D7C_Src* x)
 {
     Unk8027C728_Goal* g = fn_802448F4(p, 2);
