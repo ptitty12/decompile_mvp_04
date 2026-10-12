@@ -316,6 +316,16 @@ int fn_800DA1AC(int a)
     return (fn_8040ABA0() % 0x708) / 600;
 }
 
+void fn_800DA3D8(Unk800D876C_A* t, int idx)
+{
+    Unk800DA3D8_Game* g = lbl_8061B8C0->m8;
+    char* base = g->m6F8->m14;
+    int o = idx * 0xE64;
+    char* rec = base + o + 0x3E8;
+    fn_8017DE28(g->m700, fn_801A49F0(g, idx, *(int*)(rec + (*(Unk800DA3D8_Ev**)(base + o))->m1 * 0x34)));
+    fn_8017DE28(g->m700, fn_801A49F0(g, idx, *(int*)(rec + (*(Unk800DA3D8_Ev**)(base + o))->m2 * 0x34)));
+}
+
 void fn_800DA544(Unk800D876C_A* t, int v)
 {
     t->m10 = v;
