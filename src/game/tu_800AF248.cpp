@@ -588,6 +588,124 @@ extern "C" void fn_800AFD70(FEObAF* self)
     self->mC = r;
 }
 
+class FEG18 {
+public:
+    char pad0[0x18];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual int s25();
+};
+class FEW3Ca {
+public:
+    char pad0[0x24];
+    int m24;
+    char pad28[0x3C - 0x28];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void* s32(const char* s, int a);
+};
+class FEW3Cb {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15(int a);
+};
+struct FEArg4DC {
+    char pad0[0x4DC];
+    int m4DC;
+};
+extern "C" int fn_804089B4(char* dst, const char* fmt, ...);
+extern "C" void fn_8011A9B8(const char* a, void* b, const char* c);
+extern "C" void* fn_800C8048(void* p);
+extern const char lbl_805B96DC[];
+
+extern "C" void fn_800AFDDC(void* unused, FEW3Ca* self, FEArg4DC* arg)
+{
+    if (((FEG18*)lbl_80619D10)->s25() != 0) {
+        self->s8(0);
+        return;
+    }
+    if (self->m24 < 0) {
+        int v = 0;
+        if (arg) {
+            v = arg->m4DC;
+        }
+        if (v < 0) {
+            char buf[16];
+            fn_804089B4(buf, "FOUL %d", v);
+            fn_8011A9B8(buf, self, lbl_805B96DC);
+            ((FEW3Cb*)fn_800C8048(self->s32(lbl_805B96DC, 1)))->s15(1);
+        } else {
+            fn_8011A0A4((void*)v, self, lbl_805B96DC);
+            ((FEW3Cb*)fn_800C8048(self->s32(lbl_805B96DC, 1)))->s15(0);
+        }
+    }
+}
+
 extern "C" void fn_800AFF34(FEObFF* self)
 {
     fn_800AF688(self);
@@ -716,6 +834,54 @@ extern "C" int fn_800B08B0(UnkAt10* p)
         return 0;
     }
     return 0;
+}
+
+class FEV3Cs {
+public:
+    char pad0[0x2A];
+    short m2A;
+    short m2C;
+    char pad2E[0x3C - 0x2E];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9(int a);
+    virtual void v10(int a);
+};
+struct FEPair2 {
+    float x;
+    float y;
+};
+inline void FEEnsureMgr()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+    }
+}
+
+inline int FEScrW()
+{
+    FEEnsureMgr();
+    return 0x280;
+}
+
+inline int FEScrH()
+{
+    FEEnsureMgr();
+    return 0x1E0;
+}
+
+extern "C" void fn_800B1B34(void* unused, FEV3Cs* w, FEPair2* pos)
+{
+    int x = (int)(pos->x * (float)FEScrW());
+    int y = (int)(pos->y * (float)FEScrH()) - w->m2C / 2;
+    w->v9(x - w->m2A / 2);
+    w->v10(y);
 }
 
 extern "C" void fn_800B1C7C(FEObR* self)
