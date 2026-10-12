@@ -1234,8 +1234,8 @@ config.libs = [
             Object(NonMatching, "libm/kf_rem_pio2.cpp"),
             Object(NonMatching, "libm/s_scalbn.cpp"),
             Object(NonMatching, "libm/sf_scalbn.cpp"),
-            Object(NonMatching, "libm/s_copysign.cpp"),
-            Object(NonMatching, "libm/sf_copysign.cpp"),
+            Object(Matching, "libm/s_copysign.cpp"),
+            Object(Matching, "libm/sf_copysign.cpp"),
         ],
     },
     {
