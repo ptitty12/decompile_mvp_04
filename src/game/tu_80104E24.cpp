@@ -36,6 +36,9 @@ void fn_80105A40(UiV_144i* self);
 extern char lbl_8065B888[];
 extern char lbl_80649DA0[];
 extern char lbl_805BF58C[];
+extern char lbl_805BF594[];
+extern char lbl_805BF59C[];
+extern char lbl_805BF5A4[];
 extern char lbl_805BE37C[];
 extern char lbl_805BF5B8[];
 extern char lbl_805BF544[];
@@ -186,8 +189,7 @@ void fn_80105048(UiObj* self, int a, Ui1CD0* t)
     Ui8011AA24* g = fn_8011AA24(0);
     UiObj* c = fn_800C8044(self->v32((int)lbl_805BF58C, 1));
     ((UiSubAt98*)((char*)fn_800C8054(self->v32((int)lbl_805BE37C, 1)) + 0x98))->v20(t->m198, 0);
-    /* addresses of the strings lbl_805BF594 / lbl_805BF59C / lbl_805BF5A4, as literals (a pointer table's relocations are not followed by check_literals) */
-    int tbl[3] = { 0x805BF594, 0x805BF59C, 0x805BF5A4 };
+    int tbl[3] = { (int)lbl_805BF594, (int)lbl_805BF59C, (int)lbl_805BF5A4 };
     do {
         UiObj* d = fn_800C8044(c->v32(tbl[i], 1));
         char* r = fn_801A49F0(g, a, fn_80097300((char*)t, fn_80097190((char*)t, i)));
