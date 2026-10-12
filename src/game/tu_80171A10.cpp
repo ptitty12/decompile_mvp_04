@@ -381,6 +381,48 @@ void fn_80172D00(Unk80171A10_Menu* p)
 extern "C" int fn_804030F0(const unsigned short* a, const unsigned short* b, int n);
 int fn_801730E8(Unk80171A10_Menu* p, unsigned short* s, int* out);
 
+/* near-miss (97.6%): only the prologue copies differ. Retail copies the parameter into r29, then i = k into r31
+ * before the slwi; here i takes r4 directly (r31) and k is copied from it afterwards. */
+int fn_80172D44(Unk80171A10_Menu* p, int k) /* 80172D44 */
+{
+    int i = k;
+    Unk80170518** q = (Unk80170518**)(i * 4 + (int)p);
+    for (; i <= 0; q++, i++) {
+        if ((*q)->fn_80005B74(i) != 0) {
+            break;
+        }
+    }
+    if (p->m40 != 0) {
+        int j = k;
+        if (j <= 0 && i == 1) {
+            Unk80170518** q2 = (Unk80170518**)(j * 4 + (int)p);
+            do {
+                if ((*q2++)->fn_80005E8C(1) != 0) {
+                    i = j;
+                }
+                j++;
+            } while (j <= 0 && i == 1);
+        }
+    } else if (p->m114 != -1) {
+        i = p->m114;
+    }
+    if (i == 0) {
+        p->m4 = i;
+        fn_801728E8(p);
+        int r = ((Unk80170518*)fn_80173274((Unk80173274_T*)p))->fn_80005E8C(1);
+        if (r != 0) {
+            if (((Unk80171A10_Svc*)fn_80173274((Unk80173274_T*)p))->mC4 == 0) {
+                r = 0;
+            }
+        }
+        if (r == 0) {
+            p->m114 = -1;
+        }
+        return r;
+    }
+    return 0;
+}
+
 int fn_80172EA4(Unk80171A10_Menu* p) /* 80172EA4 */
 {
     unsigned int sel = -1;
@@ -578,6 +620,48 @@ void fn_80173534(Unk80171A10_Menu* p)
     fn_80174318(p, 0xA, lbl_805CB15C);
 }
 
+extern const Unk80171A10_Fn lbl_805CB16C;
+extern const Unk80171A10_Fn lbl_805CB17C;
+extern const Unk80171A10_Fn lbl_805CB184;
+extern const Unk80171A10_Fn lbl_805CB194;
+
+void fn_80173870(Unk80171A10_Menu* p) /* 80173870 */
+{
+    if (fn_80172EA4(p) != 0) {
+        switch (p->m68) {
+        case 1:
+            if (p->m18 == 4) {
+                fn_80174318(p, 0xC, lbl_805CB16C);
+            } else if (p->m4C != 0) {
+                fn_80174318(p, 0xF, lbl_805CB174);
+            } else {
+                fn_80174318(p, 0xF, lbl_805CB17C);
+            }
+            break;
+        case 0:
+            if (p->m44 == 0 && p->m4C == 0) {
+                fn_80174318(p, 0xF, lbl_805CB184);
+            } else {
+                fn_80174318(p, 0x11, lbl_805CB18C);
+            }
+            break;
+        case 2:
+            fn_80172B60(p, 0x10, 1);
+            fn_80174318(p, 0xF, lbl_805CB194);
+            break;
+        }
+    } else if (p->m44 != 0) {
+        if (fn_80172D44(p, p->m4 + 1) != 0) {
+            fn_80174318(p, 7, lbl_805CB14C);
+        } else if (p->m4C != 0 && p->m68 == 1) {
+            fn_80172D44(p, 0);
+            fn_80174318(p, 0xF, lbl_805CB16C);
+        } else {
+            fn_80174318(p, 1, lbl_805CB11C);
+        }
+    }
+}
+
 void fn_80173A24(Unk80171A10_Menu* p)
 {
     fn_80172B60(p, 7, 1);
@@ -616,6 +700,60 @@ void fn_80173BA4(Unk80171A10_Menu* p, unsigned short* buf)
     }
 }
 
+extern const Unk80171A10_Fn lbl_805CB19C;
+
+/* near-miss: the loop over the info slots keeps retail's layout (jump to a bottom test) via gotos, but retail
+ * recomputes p+8 after the loop (loop-invariant hoist) while CSE reuses it here (3 slots). */
+void fn_80173C14(Unk80171A10_Menu* p) /* 80173C14 */
+{
+    if (p->m48 != 0) {
+        fn_80173BA4(p, p->mA4);
+    }
+    if (p->mA4[0] == 0xFFFF) {
+        fn_80174318(p, 0, lbl_805CB114);
+        return;
+    }
+    if (p->mA4[0] != 0) {
+        int sel = -1;
+        if (fn_801730E8(p, p->mA4, &sel) != 0) {
+            p->m18 = sel;
+        }
+        if (p->m18 == 4) {
+            int idx = 0;
+            int* base = p->m8;
+            p->m18 = idx;
+            goto test;
+body:
+            idx = p->m18 + 1;
+            p->m18 = idx;
+            if ((unsigned int)idx > 3) {
+                goto done;
+            }
+test:
+            if (((Unk8016FF40*)base[idx])->m0 != 0) {
+                goto body;
+            }
+done:
+            fn_8017008C((Unk8016FF40*)p->m8[p->m18], p->m88);
+            fn_80174318(p, 0x10, lbl_805CB19C);
+        } else {
+            fn_80174318(p, 0x11, lbl_805CB18C);
+        }
+        fn_80170158((Unk8016FF40*)p->m8[p->m18], p->mA4);
+        fn_801701B4((Unk8016FF40*)p->m8[p->m18], p->mDA, p->m64);
+        return;
+    }
+    if (p->m60 == 0) {
+        unsigned short buf[0x1B];
+        if (fn_80172FCC(p, buf, 0x1B) != 0) {
+            fn_80403144(p->mA4, buf);
+        } else {
+            fn_80171F80((Unk80171A10_Holder*)(void*)p->m3C, buf);
+            p->m60 = 2;
+        }
+    }
+}
+
 void fn_80173DF4(Unk80171A10_Menu* p)
 {
     if (p->m5C != 0) {
@@ -639,6 +777,31 @@ void fn_80173EBC(Unk80171A10_Menu* p)
 void fn_80173EFC(Unk80171A10_Menu* p)
 {
     fn_80174318(p, 0x12, lbl_805CB1AC);
+}
+
+extern const Unk80171A10_Fn lbl_805CB1B4;
+
+void fn_80173F3C(Unk80171A10_Menu* p) /* 80173F3C */
+{
+    switch (p->m68) {
+    case 1:
+        fn_801701B4((Unk8016FF40*)p->m8[p->m18], p->mDA, p->m64);
+        fn_801728A0(p, (Unk8016FF40*)p->m8[p->m18], 1);
+        fn_80174318(p, 0x12, lbl_805CB1B4);
+        break;
+    case 0:
+        fn_801728A0(p, (Unk8016FF40*)p->m8[p->m18], 0);
+        fn_80174318(p, 0x12, lbl_805CB1AC);
+        break;
+    case 2:
+        fn_801728A0(p, (Unk8016FF40*)p->m8[p->m18], 2);
+        fn_80174318(p, 0x15, lbl_805CB1A4);
+        break;
+    default:
+        fn_80174318(p, 0x15, lbl_805CB1A4);
+        break;
+    }
+    fn_80171C20((Unk80171A10_Holder*)(void*)p->m3C, p->m70);
 }
 
 void fn_80174080(Unk80171A10_Menu* p)
