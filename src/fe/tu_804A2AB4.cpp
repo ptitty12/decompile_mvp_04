@@ -14,6 +14,18 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+extern const char lbl_805F64F0[];
+extern const char lbl_805F664C[];
+extern const char lbl_805F653C[];
+extern const char lbl_805F6548[];
+extern const char lbl_805F77F8[];
+extern const char lbl_805F5348[];
+struct Udd344_T;
+void fn_800DD344(Udd344_T*, void*);
+extern "C" int fn_8032A0C0(char*, ...);
+extern "C" int fn_8007FBDC__FP13Unk8007F198_Cii(void* g, int a, int b);
+extern "C" void fn_800D0074(void* a, int b, int c);
+extern "C" void fn_804A5E8C(FeW* x);
 extern const char lbl_805F7824[];
 extern const char lbl_805F5364[];
 struct UiS;
@@ -520,6 +532,35 @@ FE_OVERLAY int fn_804A554C(void* x)
     return 0;
 }
 
+
+FE_OVERLAY void fn_804A560C(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    char b8[0x68];
+    char b70[8];
+    if (FeI(x, 0x218) != 0) {
+        int s = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(x, 0x13C));
+        ((int (*)(char*, ...))fn_8032A0C0)(b70, fn_8007FBDC__FP13Unk8007F198_Cii(lbl_8061930C, FeI(x, 0x134), s));
+        fn_804A5E8C(x);
+        FeW* p = fn_800C8044(x->fn_vslot32(lbl_805F64F0, 1));
+        FeW* w = fn_800C8054(p->fn_vslot32(lbl_805F664C, 1));
+        FeP(x, 0x22C) = w;
+        fn_800D0074((char*)w + 0x98, s, 0);
+        FeW* w1 = FeMem(x, 0x22C);
+        ((FeSubB*)((char*)w1 + 0x98))->s20(FeI(x, 0x13C), 0);
+        FeW* w2 = fn_800C8054(p->fn_vslot32(lbl_805F77F8, 1));
+        FeP(x, 0x230) = w2;
+        ((FeSubB*)((char*)w2 + 0x98))->s20(FeI(x, 0x13C), 0);
+        FeW* w3 = fn_800C8054(p->fn_vslot32(lbl_805F653C, 1));
+        FeP(x, 0x234) = w3;
+        ((FeSubB*)((char*)w3 + 0x98))->s20(FeI(x, 0x13C), 0);
+        FeW* w4 = fn_800C8054(p->fn_vslot32(lbl_805F6548, 1));
+        FeP(x, 0x238) = w4;
+        ((FeSubB*)((char*)w4 + 0x98))->s20(FeI(x, 0x13C), 0);
+        fn_800DD344((Udd344_T*)b70, b8);
+        ((FeWQ*)fn_800C8040(p->fn_vslot32(lbl_805F5348, 1)))->s28((int)b8);
+    }
+}
 
 FE_OVERLAY void fn_804A5E8C(FeW* x)
 {
