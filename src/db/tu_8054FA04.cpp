@@ -57,6 +57,7 @@ extern "C" void fn_80547C5C(char* p);
 extern "C" void fn_80547D28(char* p);
 
 #include "game/clampiter.h"
+int fn_8007F9B4(Unk8007F198_C* s);
 extern "C" void* memset(void* p, int c, ...);
 extern "C" float fn_805520E4(int a, float* p0, float* p1, float* p2, float* p3);
 extern int lbl_805FF48C[];
@@ -623,6 +624,41 @@ extern "C" DB_OVERLAY void fn_805542F0(Db805542F0_S* self, int mode)
 
 extern "C" DB_OVERLAY void fn_8055440C()
 {
+}
+
+extern "C" DB_OVERLAY void fn_80554410(Db80554540_S* self, int mode)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    unsigned i = 0;
+    unsigned n = sc->fn_8007B2B0();
+    int g = fn_8007F9B4((Unk8007F198_C*)sc);
+    for (; i < n; i++) {
+        fn_80400CE4(0);
+        if (sc->fn_8007B648(0xE, i) != 0) {
+            int flag = 1;
+            int id = sc->fn_8007B2FC(i);
+            if (mode == 0) {
+                unsigned j;
+                for (j = 0; j < (unsigned)fn_8007F84C__FP13Unk8007F198_B(sc); j++) {
+                    if (id == fn_8007F7D0__FP13Unk8007F198_BUi(sc, j)) {
+                        flag = 0;
+                        break;
+                    }
+                }
+            } else if (mode == 1) {
+                flag = 0;
+                unsigned j;
+                for (j = 0; j < (unsigned)fn_8007F84C__FP13Unk8007F198_B(sc); j++) {
+                    if (id == fn_8007F7D0__FP13Unk8007F198_BUi(sc, j)) {
+                        flag = 1;
+                        break;
+                    }
+                }
+            }
+            if (flag == 1)
+                fn_80554540(self, id, g);
+        }
+    }
 }
 
 extern "C" DB_OVERLAY void fn_80554540(Db80554540_S* self, int a, int b)
