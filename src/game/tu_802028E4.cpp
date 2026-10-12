@@ -155,6 +155,21 @@ extern "C" void fn_80205450(Unk801EE438_G* g, int i)
     g->m3A60 = &a[i];
 }
 
+struct Unk80205468_G {
+    Unk801EE438_Owner* m0;
+    Unk801EE438_Game* m4;
+    char pad8[0xA8 - 8];
+    float mA8;
+};
+
+extern const float lbl_805D5680;
+extern const float lbl_805D5684;
+
+extern "C" int fn_80205468(Unk80205468_G* g)
+{
+    return (g->m4->m36C != 0 || !(g->mA8 - (float)g->m0->m4C * lbl_805D5680 >= lbl_805D5684)) ? 1 : 0;
+}
+
 extern "C" int fn_802055F4(Obj* o)
 {
     Unk802028E4_Y* y = o->m0->m6F8;
@@ -214,7 +229,38 @@ extern "C" int fn_80205688(Scr* p)
     return 1;
 }
 
+struct Unk8020667C_Rec {
+    int m0;
+    int m4;
+    float m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+extern const float lbl_805D56D4;
+
+inline Unk8020667C_Rec* RecAt667C(Unk801EE438_G* g, int i)
+{
+    char* b = (char*)g + 0x2B4;
+    int o = i * 0x40 - 0x94;
+    Unk8020667C_Rec* r = (Unk8020667C_Rec*)(b + o);
+    if ((unsigned)(i - 9) > 3)
+        r = 0;
+    return r;
+}
+
 extern "C" void fn_80205A3C(Obj* o)
 {
     fn_80205A5C(o);
+}
+
+extern "C" int fn_8020667C(Scr* p)
+{
+    for (int i = 12; i >= 9; i--) {
+        Unk8020667C_Rec* r = RecAt667C(p->m0, i);
+        if (r->m4 == 2 && r->m14 == 1 && r->mC == 1 && !(r->m8 >= lbl_805D56D4))
+            return r->m0;
+    }
+    return -1;
 }
