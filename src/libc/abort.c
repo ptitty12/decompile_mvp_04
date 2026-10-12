@@ -1,6 +1,10 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040FBC8-0x8040FBE0 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* abort as built into SN ProDG's libc (MVP links it, re4 does not). Decompiled from MVP: SN's only calls
+ * _exit(1), with no signal first, and _exit is called without a prototype and does not return. */
+
+extern volatile void _exit();
+
+/* Ends the program with status 1. */
+void abort(void)
+{
+    _exit(1);
+}

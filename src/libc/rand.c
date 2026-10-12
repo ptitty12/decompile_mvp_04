@@ -1,6 +1,17 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040AB94-0x8040ABC4 (code-only unit, 2 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* newlib 1.8.2 libc/stdlib/rand.c, as built into SN ProDG's libc (MVP links it, re4 does not; written
+ * here in the form of the other newlib units). */
+#include "newlib_stdio.h"
+
+#define RAND_MAX 0x7fffffff
+
+/* Seeds rand() for the calling reent. */
+void srand(unsigned int seed)
+{
+    _REENT->_new._reent._rand_next = seed;
+}
+
+/* The ANSI linear congruential generator: next = next * 1103515245 + 12345, low 31 bits. */
+int rand(void)
+{
+    return ((_REENT->_new._reent._rand_next = _REENT->_new._reent._rand_next * 1103515245 + 12345) & RAND_MAX);
+}

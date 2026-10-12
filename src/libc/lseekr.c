@@ -1,6 +1,14 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040F6A4-0x8040F6FC (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/lseekr.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib 1.8.2 libc/reent/lseekr.c */
+#include "newlib_stdio.h"
+
+/* Reentrant lseek wrapper storing errno into the reent structure. */
+off_t _lseek_r(struct _reent *ptr, int fd, off_t pos, int whence)
+{
+    off_t ret;
+
+    errno = 0;
+    if ((ret = lseek(fd, pos, whence)) == (off_t)-1 && errno != 0)
+        ptr->_errno = errno;
+    return ret;
+}

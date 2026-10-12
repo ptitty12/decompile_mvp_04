@@ -1,6 +1,18 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x80409E6C-0x80409EEC (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/exit.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib 1.8.2 libc/stdlib/exit.c */
+#include "newlib_stdio.h"
+
+/* Runs the atexit handlers and the stdio cleanup, then _exit. */
+void exit(int code)
+{
+    register struct _atexit *p;
+    register int n;
+
+    for (p = _REENT->_atexit; p; p = p->_next)
+        for (n = p->_ind; --n >= 0;)
+            (*p->_fns[n])();
+
+    if (_REENT->__cleanup)
+        (*_REENT->__cleanup)(_REENT);
+    _exit(code);
+}

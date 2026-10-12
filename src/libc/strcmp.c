@@ -1,6 +1,31 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040B574-0x8040B61C (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/strcmp.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib libc/string/strcmp.c */
+#include "newlib_local.h"
+
+#define UNALIGNED(X, Y) (((long)X & (sizeof(long) - 1)) | ((long)Y & (sizeof(long) - 1)))
+
+/* Lexical comparison of two strings (negative / 0 / positive). */
+int strcmp(const char *s1, const char *s2)
+{
+    unsigned long *a1;
+    unsigned long *a2;
+
+    if (!UNALIGNED(s1, s2)) {
+        a1 = (unsigned long *)s1;
+        a2 = (unsigned long *)s2;
+        while (*a1 == *a2) {
+            if (DETECTNULL(*a1))
+                return 0;
+            a1++;
+            a2++;
+        }
+        s1 = (char *)a1;
+        s2 = (char *)a2;
+    }
+
+    while (*s1 != '\0' && *s1 == *s2) {
+        s1++;
+        s2++;
+    }
+    return (*(unsigned char *)s1) - (*(unsigned char *)s2);
+}

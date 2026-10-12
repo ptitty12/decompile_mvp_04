@@ -1,6 +1,21 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x804089B4-0x80408A8C (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from emoose/re4 @ feb6805b (src/game/sprintf.c). newlib 1.8.2 as built into SN ProDG's libc. */
+/* newlib 1.8.2 libc/stdio/sprintf.c */
+#include "newlib_stdio.h"
+
+/* Formats into `str` through a string FILE (no length limit). */
+int sprintf(char *str, const char *fmt, ...)
+{
+    int ret;
+    va_list ap;
+    FILE f;
+
+    f._flags = __SWR | __SSTR;
+    f._bf._base = f._p = (unsigned char *)str;
+    f._bf._size = f._w = INT_MAX;
+    f._data = _REENT;
+    va_start(ap, fmt);
+    ret = vfprintf(&f, fmt, ap);
+    va_end(ap);
+    *f._p = 0;
+    return (ret);
+}

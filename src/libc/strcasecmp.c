@@ -1,6 +1,17 @@
-/*
- * SN ProDG libc, newlib 1.8.2 (cflags_libc: -O2 -fno-common, default -G8),
- * .text 0x8040B3B4-0x8040B448 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* newlib 1.8.2 libc/string/strcasecmp.c, as built into SN ProDG's libc (MVP links it, re4 does not;
+ * written here in the form of the other newlib units). */
+#include "newlib_local.h"
+
+/* newlib's <ctype.h> tolower for GCC */
+#define tolower(c) __extension__({ int __x = (c); isupper(__x) ? (__x - 'A' + 'a') : __x; })
+
+/* Compares two strings ignoring ASCII case: <0, 0 or >0. */
+int strcasecmp(const char *s1, const char *s2)
+{
+    while (*s1 != '\0' && tolower(*s1) == tolower(*s2)) {
+        s1++;
+        s2++;
+    }
+
+    return tolower(*(unsigned char *)s1) - tolower(*(unsigned char *)s2);
+}

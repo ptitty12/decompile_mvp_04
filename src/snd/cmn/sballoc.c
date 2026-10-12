@@ -1,7 +1,24 @@
-/*
- * EA SND 9.02.04 / csis (cflags_snd: -O2 -G0 -fno-strength-reduce -fno-strict-aliasing
- * -ffast-math -mps-float, C++),
- * .text 0x803A8438-0x803A84BC (code-only unit, 2 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from dbalatoni13/nfsmw @ 9ca26bc1 (src/Speed/Indep/Libs/snd/9/source/library/cmn/sballoc.c). EA SND audio library (rwaudiocore), matched against NFS Most Wanted GC; CC0. */
+#include "./sndcmn.h"
+
+int SNDBANKI_alloc() {
+    int i;
+
+    for (i = 0; i < sndgs.sso.set.maxbanks; i++) {
+        if (sndgs.banklist[i].phdr == NULL) {
+            return i;
+        }
+    }
+
+    return -9;
+}
+
+TAGGEDPATCH *SNDBANKI_getppatch(BANKVER5 *pb, int patnum) {
+    if (patnum >= pb->numpatches) return NULL;
+
+    if (pb->patch[patnum] == NULL) {
+        return NULL;
+    }
+
+    return reinterpret_cast<TAGGEDPATCH *>((int)&pb->patch[patnum] + (int)pb->patch[patnum]);
+}
