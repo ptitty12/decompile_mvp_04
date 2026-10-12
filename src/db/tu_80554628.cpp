@@ -241,6 +241,27 @@ extern "C" DB_OVERLAY int fn_80555998(int a)
     return 5;
 }
 
+extern "C" DB_OVERLAY int fn_80555C44(Db8055638C_Idx* dst, int* outIdx, int a, int x)
+{
+    *outIdx = 0;
+    Db80555F80_Idx arr[12];
+    int i = 0;
+    int n = fn_805559D4(a, arr, 12, ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80078A38(x));
+    if (i < n) {
+        Db8055638C_Idx* p = arr;
+        do {
+            if (fn_805563C4(p) == x || fn_80556410(p) == x) {
+                *dst = *p;
+                *outIdx = i;
+                return 1;
+            }
+            i++;
+            p++;
+        } while (i < n);
+    }
+    return 0;
+}
+
 /* near-miss: n range test and the loop body match; retail pre-tests the loop (duplicated lwz/lwz/cmpw)
  * where ours branches into the bottom test (51 vs 57 insns). */
 extern "C" DB_OVERLAY int fn_80555D88(int k, int n)
