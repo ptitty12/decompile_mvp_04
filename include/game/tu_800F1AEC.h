@@ -1446,7 +1446,7 @@ void fn_801321D4(UiObj* o, UiObj* self, void (*cb)(int, UiV_144s*), int (*cb2)()
 void fn_8010A0A4(Ui9F58* self);
 
 void fn_800F1970(UiObj* self);
-void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
+int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_800ECF18(UiObj* self);
 void fn_80107C94(UiObj* self);
 void fn_800ED254(UiObj* self);

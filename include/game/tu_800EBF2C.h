@@ -350,7 +350,7 @@ struct UiScrRaw {
     int m1AC;
 };
 extern "C" UiScrRaw* fn_800EC648(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
+int fn_804D2AC0(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, const void* l);
 void fn_8035686C(UiScrRaw* self);
 void fn_8035686C(UiScrRaw* self, int a);
 UiScrRaw* fn_800CEEF0(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, float l);
