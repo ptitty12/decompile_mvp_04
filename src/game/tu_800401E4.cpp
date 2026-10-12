@@ -434,6 +434,53 @@ int fn_800414FC(Unk80040640* self, int a, int idx)
     return v;
 }
 
+struct Unk805A8680_Ent {
+    int m0;
+    void (*m4)(int, int*);
+    void (*m8)(int*, int);
+};
+extern Unk805A8680_Ent lbl_805A8680[];
+
+extern "C" void fn_80041778(Unk80040640* self, int id, int slot, int a, int b, int c, int d)
+{
+    int args[4];
+    int ok = 0;
+    if (self->m5C4 == 1)
+        ok = self->m5F4 >= 0;
+    if (ok == 1 && slot >= 0) {
+        args[0] = a;
+        args[1] = b;
+        args[2] = c;
+        args[3] = d;
+        Unk80040640_Tbl* t = lbl_806177D8;
+        int o = slot * 8;
+        if (*(int*)((char*)t + o) == id) {
+            char* bb = (char*)t + 4;
+            int p = *(int*)(bb + o);
+            if (p != 0)
+                lbl_805A8680[id].m4(p, args);
+        }
+    }
+}
+
+extern "C" void fn_8004181C(Unk80040640* self, int id, int slot, int a, int b, int c, int d)
+{
+    int ok = 0;
+    if (self->m5C4 == 1)
+        ok = self->m5F4 >= 0;
+    if (ok == 1 && slot >= 0) {
+        Unk80040640_Tbl* t = lbl_806177D8;
+        int o = slot * 8;
+        if (*(int*)((char*)t + o) == id) {
+            char* bb = (char*)t + 4;
+            if (*(int*)(bb + o) != 0) {
+                lbl_805A8680[id].m8((int*)((char*)t + o + 4), 1);
+                *(int*)(bb + o) = 0;
+            }
+        }
+    }
+}
+
 /* near-miss: 60/57 slots. Retail does not keep the "t < 0" compare in cr4
  * across the call (the second clamp re-tests); an inline Clamp() made it worse. */
 void fn_80042C78(Unk80040640* self, int a)
