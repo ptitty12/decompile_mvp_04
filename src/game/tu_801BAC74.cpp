@@ -9,6 +9,7 @@
 typedef Unk801B7FB0_P P;
 typedef Unk801B7FB0_B B;
 typedef Unk801B7FB0_Ai A;
+extern float lbl_805CFCA0;
 extern int lbl_8061CB78;
 extern int lbl_8061CB7C;
 struct Unk801BAC74_PV32 : public Unk801B7FB0_PBase {
@@ -181,12 +182,11 @@ extern "C" void fn_801BAFA4(A* a)
     Unk8006A138_It<3> it(0);
     int i = it.v;
     do {
-        char* q = (char*)(i * 12 + (int)a);
+        int q = i * 12 + (int)a;
         q += 0x38;
-        Unk801B7FB0_Slot* s = (Unk801B7FB0_Slot*)q;
-        s->m0 = 0;
-        s->m4 = -1;
-        s->m8 = 0.0f;
+        *(int*)q = 0;
+        *(int*)(q + 4) = -1;
+        *(float*)(q + 8) = lbl_805CFCA0;
         i = it.Next();
     } while (i <= 3);
     if (a->m14->m6F4 == 0) {
