@@ -87,6 +87,8 @@ FxZ fn_80327044(FxPtr* p, int kind, float t);
 int fn_803270C4(FxPtr* p, int kind, float t, int flag);
 void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c);
 void fn_8032713C(FxAI* self, int a, int b);
+void fn_80326C7C(FxRing* self, unsigned* pt, int* o1, int* o2);
+FxRingH* fn_803267C0(FxRing* self, int n, float t);
 // PROTOS-END
 }
 
@@ -601,6 +603,34 @@ extern "C" void fn_80326610(FxAI* self, char* name, int a, float c) {
     }
 }
 
+FxRingH* fn_803267C0(FxRing* self, int n, float t)
+{
+    float v = (float)n + t;
+    FxRingH* h = self->m0;
+    int a = h->m1C;
+    int b = h->m18;
+    if (h != 0 && (a != 0 || b != 0)) {
+        FxRingE* e1 = (FxRingE*)(a * 16 + (int)h->m0);
+        FxRingE* e2 = (FxRingE*)(b * 16 + (int)h->m0);
+        float lo = (float)e1->m4 + e1->m8;
+        float hi = (float)e2->m4 + e2->m8;
+        if (!(lo > v) && hi >= v)
+            return h;
+    }
+    h = self->m4;
+    a = h->m1C;
+    b = h->m18;
+    if (h != 0 && (a != 0 || b != 0)) {
+        FxRingE* e1 = (FxRingE*)(a * 16 + (int)h->m0);
+        FxRingE* e2 = (FxRingE*)(b * 16 + (int)h->m0);
+        float lo = (float)e1->m4 + e1->m8;
+        float hi = (float)e2->m4 + e2->m8;
+        if (!(lo > v) && hi >= v)
+            return h;
+    }
+    return 0;
+}
+
 int fn_80326C20(FxAI* a) {
     if (a->m0->m18 == 0) return 0;
     if (lbl_80620860 != 0) return 0;
@@ -612,6 +642,65 @@ int fn_80326C20(FxAI* a) {
         }
     }
     return r;
+}
+
+void fn_80326C7C(FxRing* self, unsigned* pt, int* o1, int* o2)
+{
+    *o1 = 0;
+    *o2 = 0;
+    unsigned a = 0;
+    unsigned b = 0;
+    unsigned c = 0;
+    unsigned d = 0;
+    FxRingH* h4 = self->m4;
+    if (h4) {
+        c = h4->m0[h4->m1C * 4 + 1];
+        d = h4->m0[h4->m18 * 4 + 1];
+    }
+    FxRingH* h0 = self->m0;
+    if (h0) {
+        if (h0->m0[h0->m1C * 4] != 0) {
+            a = h0->m0[h0->m1C * 4 + 1];
+            b = h0->m0[h0->m18 * 4 + 1];
+        } else {
+            a = c;
+            b = d;
+        }
+    }
+    unsigned t = *pt;
+    if (t >= a && t < b)
+        return;
+    if (t >= c && t < d)
+        return;
+    if (t < a && t < c) {
+        unsigned r = a;
+        *o1 = 1;
+        if (r > c)
+            r = c;
+        *pt = r;
+        return;
+    }
+    if (t >= b && t >= d) {
+        unsigned r = b;
+        *o2 = 1;
+        if (r < d)
+            r = d;
+        *pt = r;
+        return;
+    }
+    unsigned lo = b;
+    if (lo > c)
+        lo = c;
+    unsigned hi = b;
+    if (hi < c)
+        hi = c;
+    if ((int)(t - lo) < (int)(hi - t)) {
+        *o2 = 1;
+        *pt = lo;
+    } else {
+        *o1 = 1;
+        *pt = hi;
+    }
 }
 
 /* near-miss: register assignment (result kept in r10, v in r0) */
