@@ -941,7 +941,7 @@ class Cloner:
             tried_sigs.add(sig)
             inc_pos, ins_pos = self.positions(text, tg.addr, tgt.path)
             new_text, upto = self.compose(text, inc_pos, ins_pos, includes, decls, clone)
-            obj, err = self.compile(tgt.rel, new_text[:upto])
+            obj, err = self.compile(tgt.rel, new_text)
             if obj is None and os.environ.get("CLONE_DEBUG") == f"{tg.addr:08X}":
                 print("----- scratch tail -----\n" + new_text[:upto][-2500:] + "\n----- error -----\n" + err[:1500])
             if obj is None:
