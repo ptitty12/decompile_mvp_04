@@ -208,6 +208,83 @@ extern "C" Unk800D1614_Raw* fn_800C842C(Unk800D1614_Raw* self, int p1, int p2, i
     return self;
 }
 
+class Ue84B0_V {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual Ue84B0_V* s31(int a, int b);
+};
+extern "C" void fn_800C8FE8(void* unused, Unk800C7B40_Widget* w);
+extern const char lbl_805B9EB8[];
+extern const char lbl_805BC12C[];
+extern const char lbl_805BC130[];
+extern const char lbl_805BC134[];
+extern const char lbl_805BA68C[];
+
+extern "C" void fn_800C84B0(Unk800D1614_Obj* o)
+{
+    o->m44 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805B9EB8, 1));
+    o->m48 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC12C, 1));
+    o->m4C = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC130, 1));
+    o->m50 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BC134, 1));
+    o->m54 = (Unk800C7B40_Widget*)fn_800C8044(o->fn_vslot30(lbl_805BA68C, 1));
+    Ue84B0_V* r;
+    r = ((Ue84B0_V*)o->m44)->s31(2, 1);
+    if (r == 0)
+        o->m44 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m44);
+    r = ((Ue84B0_V*)o->m48)->s31(2, 1);
+    if (r == 0)
+        o->m48 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m48);
+    r = ((Ue84B0_V*)o->m4C)->s31(2, 1);
+    if (r == 0)
+        o->m4C = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m4C);
+    r = ((Ue84B0_V*)o->m50)->s31(2, 1);
+    if (r == 0)
+        o->m50 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m50);
+    r = ((Ue84B0_V*)o->m54)->s31(2, 1);
+    if (r == 0)
+        o->m54 = (Unk800C7B40_Widget*)r;
+    else
+        fn_800C8FE8(o, o->m54);
+}
+
 extern "C" void fn_800C8B9C(Unk800C7B40_Widget* w, int v)
 {
     if (w->b7)
