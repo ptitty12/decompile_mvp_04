@@ -157,6 +157,30 @@ extern "C" void fn_803E4818(float* m)
     }
 }
 
+struct Unk803E4844_Quat {
+    float x, y, z, w;
+};
+
+extern float lbl_8060CABC;
+extern float lbl_8060CAC0;
+extern "C" void fn_803E41F4(float* dst, Unk803E4844_Quat* q, float s, float x, float y, float z);
+
+extern "C" void fn_803E4844(float* dst, const float* axis, Unk803E4844_Quat* q)
+{
+    float one = lbl_8060CABC;
+    float ax = axis[0];
+    float ay = axis[1];
+    float az = axis[2];
+    Unk803E4844_Quat tmp = *q;
+    fn_803E41F4(dst, &tmp, one, ax, ay, az);
+    q->x = -q->x / lbl_8060CAC0;
+    q->y = -q->y / lbl_8060CAC0;
+    q->z = -q->z / lbl_8060CAC0;
+    q->w = -q->w / lbl_8060CAC0;
+    tmp = *q;
+    fn_803E41F4(dst, &tmp, one, -ax, -ay, -az);
+}
+
 extern "C" void fn_803E4964(Unk803E6660* o, int idx)
 {
     int base = idx * o->m24;
