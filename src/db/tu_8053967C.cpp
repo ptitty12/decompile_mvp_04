@@ -448,6 +448,64 @@ DB_OVERLAY void fn_8053B450(R* r, int id)
     }
 }
 
+struct Db8053967C_BL {
+    char* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    int m10;
+};
+struct Db8053967C_RecB {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    int pad10;
+    Db8053967C_BL bl[5];
+    char pad78[0xF0 - 0x78];
+    Db8053967C_Row r[4];
+};
+DB_OVERLAY void fn_8053B548(char* p, int v)
+{
+    Db8053967C_RecB* self = (Db8053967C_RecB*)p;
+    for (unsigned i = 0; i < 4; i++) {
+        for (int k = 0; k < 10; k++)
+            self->r[i].b[k] = 0xFF;
+        for (int k = 0; k < 9; k++)
+            self->r[i].s[k] = 10;
+    }
+    Db8053967C_BL* q;
+    for (unsigned k = 0; k < 5; k++) {
+        q = &self->bl[0];
+        if (k >= q->m4)
+            q->m4 = k + 1;
+        self->bl[0].m0[k] = -1;
+    }
+    q->mC = 0;
+    Db8053967C_BL* p1 = &self->bl[1];
+    Db8053967C_BL* p2 = &self->bl[2];
+    Db8053967C_BL* p3 = &self->bl[3];
+    Db8053967C_BL* p4 = &self->bl[4];
+    fn_8040074C(self->bl[1].m0, p1->m8);
+    p1->m4 = 0;
+    p1->mC = 0;
+    fn_8040074C(self->bl[2].m0, p2->m8);
+    p2->m4 = 0;
+    p2->mC = 0;
+    fn_8040074C(self->bl[3].m0, p3->m8);
+    p3->m4 = 0;
+    p3->mC = 0;
+    fn_8040074C(self->bl[4].m0, p4->m8);
+    p4->m4 = 0;
+    p4->mC = 0;
+    fn_8040074C(self->m0, self->m8 * 4);
+    self->m4 = 0;
+    self->mC = 0;
+    fn_8053B6A4((R*)self);
+    if (v == 0)
+        fn_8053BA94((R*)self);
+}
+
 DB_OVERLAY void fn_8053B6A4(R* r)
 {
     fn_8040074C(r->m1D0, 0xC);
