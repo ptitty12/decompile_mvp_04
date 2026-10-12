@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801CAFA0.h"
+#include "game/tu_801C6D2C.h"
 
 typedef Unk801B7FB0_P P;
 typedef Unk801C16B0_Z Z;
@@ -15,6 +16,22 @@ float fn_8024F20C(void* a, int b, P* c, int d, int e);
 float fn_8024F048(void* a, int b, P* c, int d, int e);
 float fn_80235DA8(void* p);
 int fn_80235E28(void* p);
+float fn_801D7818(int h, int k);
+float fn_801D7828(int h);
+float fn_801CCBE8(Z* z);
+int fn_801D7998(void* self, V2 v);
+int fn_801D7A3C(void* self, int k);
+struct Unk801CAFA0_R {
+    char pad0[0x30];
+    int m30;
+};
+Unk801CAFA0_R* fn_801A6DB8(P* p);
+float fn_801CCA40(Z* z);
+float fn_80235D80(void* p);
+int fn_8022F138(void* p);
+int fn_801C4128(Z* z);
+void fn_801D5A50(void* a, float* b, float* c);
+void fn_801C4B14(Z* z, float* b, float* c);
 float fn_80235DD0(void* p, int a, int b);
 P* fn_801C1638(P* c, int i);
 float fn_804028E4(float x);
@@ -38,6 +55,15 @@ float fn_801CC0CC(Z* z);
 
 struct Unk801CAFA0_G {
     float m0[6];
+    char pad18[0x78 - 0x18];
+    float m78;
+    float m7C;
+    int m80;
+    V2 m84;
+    char pad8C[0x390 - 0x8C];
+    float m390;
+    float m394;
+    float m398;
 };
 extern Unk801CAFA0_G lbl_8068C420;
 int fn_80289248(Unk80270BA0_X* x);
@@ -85,6 +111,17 @@ extern "C" float fn_801CBEBC(Z* z)
     return r;
 }
 
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" float fn_801CBF04(Z* z)
+{
+    float w = AbsF(fn_80235D80(z->m4->m3B0));
+    w = !(w > 1.0f) ? (w >? 0.0f) : 1.0f;
+    if (fn_8022F138(z->m4->m3B0))
+        w = LerpATB(0.8f, w, 1.0f);
+    return w;
+}
+
 extern "C" float fn_801CBFC8(Z* z)
 {
     float v = fn_80235DA8(z->m4->m3B0);
@@ -103,6 +140,54 @@ extern "C" float fn_801CC028(Z* z)
     return t;
 }
 
+extern "C" float fn_801CC218(Z* z)
+{
+    float r = 0.0f;
+    V2 v = fn_8022EA60(z->m4->m3B0);
+    int k = fn_801D7A3C(z->m8, fn_801D7998(z->m8, v));
+    if (fn_801A6DB8(z->m204)->m30)
+        k = 2;
+    switch (k) {
+    case -1:
+        r = 0.0f;
+        break;
+    case 0:
+        r = 0.333333f;
+        break;
+    case 1:
+        r = 0.666667f;
+        break;
+    case 2:
+        r = 1.0f;
+        break;
+    }
+    return r;
+}
+
+extern "C" float fn_801CC578(Z* z)
+{
+    float a = z->m1D4;
+    a = !(a > 1.0f) ? (a >? -1.0f) : 1.0f;
+    float b = z->m140;
+    b = !(b > 1.0f) ? (b >? -1.0f) : 1.0f;
+    float r = AbsF(b - a);
+    r = 2.0f - r;
+    r *= 0.5f;
+    return r;
+}
+
+extern "C" float fn_801CC648(Z* z)
+{
+    float a = z->m1D0;
+    a = !(a > 1.0f) ? (a >? -1.0f) : 1.0f;
+    float b = z->m140;
+    b = !(b > 1.0f) ? (b >? -1.0f) : 1.0f;
+    float r = AbsF(b - a);
+    r = 2.0f - r;
+    r *= 0.5f;
+    return r;
+}
+
 extern "C" void fn_801CC894(Z* z)
 {
     for (int i = 0; i < 6; i++)
@@ -118,6 +203,19 @@ extern "C" void fn_801CC894(Z* z)
     }
     for (int i = 0; i < 6; i++)
         lbl_8068C420.m0[i] = z->m1DC[i];
+}
+
+extern "C" void fn_801CC964(Z* z)
+{
+    z->m1D0 = fn_801CCBE8(z);
+    z->m1D4 = fn_801CCA40(z);
+    z->m1D8 = z->m1D0 * fn_801D7818(z->m11C, 1) + z->m1D4 * fn_801D7818(z->m11C, 0);
+    z->m1D8 = z->m1D8 / fn_801D7828(z->m11C);
+    lbl_8068C420.m390 = z->m1D0;
+    lbl_8068C420.m394 = z->m1D4;
+    lbl_8068C420.m398 = z->m1D8;
+    lbl_8068C420.m80 = fn_80235E28(z->m4->m3B0);
+    lbl_8068C420.m84 = fn_8022EA60(z->m4->m3B0);
 }
 
 /* near-miss: retail keeps the low bound in f31 across the call (33 vs 34 instructions here). */
@@ -177,6 +275,19 @@ extern "C" float fn_801CD3C0(Z* z)
     return fn_801A0AA8(p, fn_801CD068(z), 0.23f);
 }
 
+extern "C" float fn_801CD7F4(Z* z)
+{
+    const float lo = 6.0f;
+    const float hi = 84.0f;
+    float x = z->m13C;
+    P* p = fn_801A4B34(z->m204);
+    if (p && p->v4())
+        x = -x;
+    x = (x + 1.0f) * 0.5f;
+    x = !(x > 1.0f) ? (x >? 0.0f) : 1.0f;
+    return x * (hi - lo) + lo;
+}
+
 extern "C" float fn_801CD8D4(Z* z)
 {
     P* c = z->m204->m6CC;
@@ -214,6 +325,23 @@ extern "C" float fn_801CDA14(Z* z)
 extern "C" float fn_801CDA6C(void) { return -1.3f; }
 
 extern "C" float fn_801CDA78(void) { return 1.3f; }
+
+typedef V2 (*Unk801CAFA0_VaFn)(Z*, ...);
+
+extern "C" int fn_801CDA84(Z* z)
+{
+    if (z->m204->m6CC->m38C != 2)
+        return 0;
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    int bad = v.x >= fn_801CDA14(z);
+    if (!(v.x > fn_801CD9BC(z)))
+        bad = 1;
+    if (!(v.y >= ((float (*)(Z*))fn_801CDA6C)(z)))
+        bad = 1;
+    if (!(v.y <= ((float (*)(Z*))fn_801CDA78)(z)))
+        bad = 1;
+    return bad ^ 1;
+}
 
 extern "C" int fn_801CDB4C(Z* z)
 {
@@ -297,4 +425,16 @@ extern "C" float fn_801CEB34(Z* z)
         r = b - a;
     }
     return r;
+}
+
+extern "C" void fn_801CEE40(Z* z)
+{
+    if (fn_801C4128(z))
+        fn_801D5A50(z->m20C, &z->m13C, &z->m140);
+    else
+        fn_801C4B14(z, &z->m13C, &z->m140);
+    z->m13C = !(z->m13C > 1.0f) ? (z->m13C >? -1.0f) : 1.0f;
+    z->m140 = !(z->m140 > 1.0f) ? (z->m140 >? -1.0f) : 1.0f;
+    lbl_8068C420.m78 = z->m13C;
+    lbl_8068C420.m7C = z->m140;
 }
