@@ -9,11 +9,23 @@
  * (virtual page address per frame). The format string passed to sprintf in fn_8043E198 says
  * "Virtual address (%x) has not been allocated. Call VMAlloc ..." (strings: lbl_80649228),
  * so fn_8043E038 is VMAlloc. Names stay fn_ until symbols.txt is updated.
+ *
+ * The three small accessors (fn_8043DA04/DA0C/DA14) carry padding statements: in retail they are in another
+ * source file than their callers (calls stay bl); in this one unit the auto-inliner would expand them.
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
 #include <dolphin/tail10.h>
 #include <stdio.h>
+
+/* Compiled-out assertion statements of the original source. In the retail build these accessors live in
+ * another source file than their callers, so they are never expanded inline; here, in one unit, the
+ * padding keeps them above the auto-inline size limit. */
+#define PAD \
+    ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); \
+    ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); \
+    ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); \
+    ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, ""); ASSERTMSGLINE(0, 0, "");
 
 extern u32 lbl_806EF348;   /* ARAM base (second VMInit argument) */
 extern s32 lbl_806EF350;   /* round-robin sweep started flag */
@@ -100,16 +112,19 @@ void fn_8043D9FC(void (*cb)(u32, u32, u32, u32, u32))
 
 u32 fn_8043DA04(void)
 {
+    PAD
     return lbl_806EF92C;
 }
 
 u32 fn_8043DA0C(void)
 {
+    PAD
     return lbl_806EF928;
 }
 
 u32 fn_8043DA14(void)
 {
+    PAD
     return lbl_806EF348;
 }
 
@@ -210,6 +225,136 @@ u32 fn_8043DD24(void)
     return fn_8043DFCC();
 }
 
+u32 fn_8043DD68(void)
+{
+    u32 start = lbl_806EF940;
+    u32 result = 0;
+    s32 best1 = -1;
+    s32 best2 = -1;
+    s32 best3 = -1;
+    u32 page;
+    int a;
+    int b;
+
+    if (lbl_806EF350 == 0) {
+        while (1) {
+            page = fn_8043F388(lbl_806EF940);
+            if (page != 0 && fn_8043F244() != 0) {
+                a = fn_8043F26C(page);
+                b = fn_8043F294(page);
+                if (a == 0 && b == 0 && fn_8043F3A8(lbl_806EF940) == 0) {
+                    result = lbl_806EF940;
+                    break;
+                }
+                if (a == 0 && b != 0) {
+                    if (best1 < 0 && fn_8043F3A8(lbl_806EF940) == 0) {
+                        best1 = lbl_806EF940;
+                    }
+                } else if (a != 0 && b == 0) {
+                    if (best2 < 0 && fn_8043F3A8(lbl_806EF940) == 0) {
+                        best2 = lbl_806EF940;
+                    }
+                } else {
+                    if (best3 < 0 && fn_8043F3A8(lbl_806EF940) == 0) {
+                        best3 = lbl_806EF940;
+                    }
+                }
+                if (a != 0) {
+                    fn_8043F2BC(page, 0);
+                }
+                if (start == lbl_806EF940) {
+                    if (best1 >= 0) {
+                        result = best1;
+                    } else if (best2 >= 0) {
+                        result = best2;
+                    } else if (best3 >= 0) {
+                        result = best3;
+                    }
+                    break;
+                }
+                lbl_806EF940++;
+                if (lbl_806EF940 >= fn_8043DA04()) {
+                    lbl_806EF940 = 0;
+                }
+            } else {
+                result = lbl_806EF940;
+                break;
+            }
+        }
+    } else {
+        result = start;
+    }
+    lbl_806EF940++;
+    if (lbl_806EF940 >= fn_8043DA04()) {
+        lbl_806EF350 = 0;
+        lbl_806EF940 = 0;
+    }
+    return result;
+}
+
+u32 fn_8043DF38(void)
+{
+    u32 frame;
+
+    do {
+        if (lbl_806EF350 != 0) {
+            frame = lbl_806EF940++;
+            if (lbl_806EF940 >= fn_8043DA04()) {
+                lbl_806EF350 = 0;
+                lbl_806EF940 = 0;
+            }
+        } else {
+            frame = fn_80438640() % fn_8043DA04();
+        }
+    } while (fn_8043F3A8(frame) != 0);
+    return frame;
+}
+
+u32 fn_8043DFCC(void)
+{
+    u32 frame;
+
+    do {
+        frame = lbl_806EF940++;
+        if (lbl_806EF940 >= fn_8043DA04()) {
+            lbl_806EF350 = 0;
+            lbl_806EF940 = 0;
+        }
+    } while (fn_8043F3A8(frame) != 0);
+    return frame;
+}
+
+/* VMAlloc */
+int fn_8043E038(u32 vaddr, u32 size)
+{
+    u32 base;
+    u32 end;
+    u32 off;
+    u32 a;
+
+    base = fn_8043DA14() >> 12;
+    end = base + (fn_8043DA0C() >> 12);
+    if (lbl_806EF954 < base) {
+        lbl_806EF954 = base;
+    }
+    if (lbl_806EF950 + size > fn_8043DA0C()) {
+        return 0;
+    }
+    for (off = 0; off < size; off += 0x1000) {
+        a = vaddr + off;
+        do {
+            lbl_806EF954++;
+            if (lbl_806EF954 >= end) {
+                lbl_806EF954 = base;
+            }
+        } while (lbl_806EF948[lbl_806EF954] != 0);
+        lbl_806EF948[lbl_806EF954] = a;
+        lbl_806EF94C[(a >> 12) & 0x1FFF] = lbl_806EF954 << 12;
+        lbl_806EF950 += 0x1000;
+    }
+    return 1;
+}
+
 u32 fn_8043E138(u32 page)
 {
     u32 aram = lbl_806EF94C[(page >> 12) & 0x1FFF] & 0x7FFFFFFF;
@@ -244,12 +389,20 @@ int fn_8043E1E8(u32 page)
     return lbl_806EF94C[(page >> 12) & 0x1FFF] >> 31;
 }
 
+/* the arena-lo getter is a small inline here: its result copy is what makes retail keep the pointer in r4 */
+static inline void* GetLo(void)
+{
+    return fn_80432CBC();
+}
+
 void fn_8043E1FC(void)
 {
     u32 i;
+    u32* base;
 
-    lbl_806EF94C = (u32*)fn_80432CBC();
-    fn_80432CCC((void*)((u32)lbl_806EF94C + 0x8000));
+    base = (u32*)GetLo();
+    lbl_806EF94C = base;
+    fn_80432CCC(base + 0x2000);
     for (i = 0; i < 0x8000; i += 4) {
         *(u32*)((char*)lbl_806EF94C + i) = 0;
     }
