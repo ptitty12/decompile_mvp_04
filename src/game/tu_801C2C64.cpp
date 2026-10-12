@@ -362,6 +362,26 @@ struct Unk801C2C64_V2 {
     float y;
 };
 
+void fn_802D7B88(int a, int b, int c, float f);
+
+/* near-miss: first half matches; retail folds the final lerp to `u * 0.4 + 0.6` (pool 0.4 and 0.6) yet still
+ * stores 0.6 and 1.0 to frame slots 0x10/0x14 before the call, ours either keeps the (b - a) subtract or drops the
+ * two stores (tried LerpATB, const/plain float locals, other inline lerp shapes). */
+extern "C" void fn_801C39D8(Z* z, int i)
+{
+    float t = z->m1F8;
+    t = !(t > 0.99f) ? (t >? 0.37f) : 0.99f;
+    if (i != -1) {
+        float u = 0.0f;
+        if (!(t <= 0.8f))
+            u = (t - 0.8f) * 5.2631578f;
+        else
+            u = (0.8f - t) * 2.3255813f;
+        u = !(u > 1.0f) ? (u >? 0.0f) : 1.0f;
+        fn_802D7B88(i, 1, (int)(u * 10.0f) + 4, LerpATB(0.6f, u, 1.0f));
+    }
+}
+
 extern "C" void fn_801C3D44(Z* z, float* a, float* b)
 {
     Unk801C2C64_V2 p = *(Unk801C2C64_V2*)z->m150;
