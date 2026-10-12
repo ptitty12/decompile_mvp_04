@@ -108,8 +108,8 @@ extern "C" {
 void* fn_80308678(void* e, int a, int b, int c, int d, int f);
 void fn_80308414(void* e, int a, int b, int c, float f);
 void* fn_803774A8(int size, int heap);
-void fn_80308B5C(void* p, int v);
-void fn_80308E5C(void* p, int v);
+void fn_80308B5C(void* p);
+void fn_80308E5C(void* p);
 void fn_80377408(void* p);
 void fn_80308FF0();
 void fn_80328374(void* p, int c);
@@ -123,6 +123,73 @@ void fn_8030C11C(Unk80308874_At10* p);
 void fn_803DD73C(int h, int k);
 void fn_8037B424(void* p, int c);
 void* fn_8030BEB8(void* p);
+}
+
+struct Unk80308C74_R {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+};
+struct Unk80308C74_O {
+    Unk80308C74_R r[6];
+    char pad90[0x24];
+    int mB4;
+    int mB8;
+    int mBC;
+    int mC0;
+    int mC4;
+    int mC8;
+    int mCC;
+    const void* mD0;
+    Unk80308C74_O();
+};
+struct Unk80308874_Buf {
+    int m0;
+    int m4;
+    void* m8;
+    void* mC;
+    int m10;
+    int m14;
+    int m18;
+};
+extern void (*lbl_8062C66C)(void*, int);
+extern const float lbl_805E8898;
+extern "C" void fn_803D79A0(int h, int k);
+extern "C" void fn_80377488(void* p);
+inline void Unk80308874_FreeArr(void* p, int sz)
+{
+    int n = *(int*)((char*)p - 8);
+    lbl_8062C66C((char*)p - 8, n * sz | 8);
+}
+
+int fn_80308874(Unk80308874_Buf* p)
+{
+    if (p->m18 != 0) {
+        fn_803D79A0(p->m18, 3);
+        p->m18 = 0;
+    }
+    if (p->m4 != 0) {
+        fn_80377488((void*)p->m4);
+        p->m4 = 0;
+    }
+    if (p->m0 != 0) {
+        fn_80377488((void*)p->m0);
+        p->m0 = 0;
+    }
+    if (p->mC != 0) {
+        Unk80308874_FreeArr(p->mC, 16);
+        p->mC = 0;
+    }
+    if (p->m8 != 0) {
+        Unk80308874_FreeArr(p->m8, 16);
+        p->m8 = 0;
+    }
+    p->m14 = 0;
+    p->m10 = 0;
+    return 1;
 }
 
 int fn_80308960(Unk80308874_Mgr* m, int i, int a, int b, int c)
@@ -144,25 +211,47 @@ void fn_80308AD0(Unk80308874_Mgr* m, int a, int b, int c, int i, float f)
     fn_80308414(m->m100 + i, a, b, c, f);
 }
 
-/* near-miss: retail uses r8 for the +4 base and r11/r10 for index/pointer; ours differs in registers (n and p read once) */
 void fn_80308B04(Unk80308874_Slots* m, int v, int i)
 {
     int n = m->s[i].n;
-    int* q = m->s[i].p;
-    q[n] = v;
-    m->s[i].n = n + 1;
+    int q = (int)m->s[i].p;
+    *(int*)(q + n * 4) = v;
+    m->s[i].n = ++n;
 }
 
 /* near-miss: retail keeps this in r30 and the argument in r29 (callee-saved order swapped; pass-through of r4 tried) */
 void fn_80308B28(Unk80308874_At4* m, int v)
 {
-    fn_80308B5C(m, v);
+    fn_80308B5C(m);
     *(int*)((char*)m + 0x10C) = v;
 }
 
 extern "C" void fn_80308C60(Unk80308874_At20C* p, int i, int v)
 {
     SetD(p->m20C + 0xC0, i, v);
+}
+
+//@80308C74
+//@80308C74
+Unk80308C74_O::Unk80308C74_O()
+{
+    mD0 = lbl_80665950;
+    Unk80308C74_R* q = r;
+    for (int i = 0; i < 6; i++) {
+        r[i].mC = lbl_805E8898;
+        q->m8 = lbl_805E8898;
+        q->m4 = lbl_805E8898;
+        q->m0 = lbl_805E8898;
+        q++;
+    }
+    int z = 0;
+    mB4 = 4;
+    mB8 = 2;
+    mBC = 3;
+    mC0 = 1;
+    mC4 = z;
+    mC8 = 5;
+    mCC = 6;
 }
 
 void fn_80308CFC(Unk80308874_AtD0* p, int c)
@@ -183,7 +272,7 @@ void fn_80308DD8(Unk80308874_At18* p, int c)
 /* near-miss: same register order issue as fn_80308B28 */
 void fn_80308E28(Unk80308874_At4* p, int v)
 {
-    fn_80308E5C(p, v);
+    fn_80308E5C(p);
     p->m4 = v;
 }
 
@@ -259,6 +348,52 @@ void fn_8030ACCC(Unk80308874_List* p)
             lbl_806E0FA4[i] = 0x51;
     }
     p->m0 = 0;
+}
+
+void fn_8030AF34(void* pv, int k)
+{
+    Unk80308874_List* p = (Unk80308874_List*)pv;
+    if (p->m4 != 0) {
+        if (k != 0x51) {
+            do {
+                char* b = (char*)p + 8;
+                int o = k * 4;
+                Unk80308874_Hdr* h = *(Unk80308874_Hdr**)(b + o);
+                if (h)
+                    h->m2 = 1;
+                k = lbl_806E0FA4[k];
+            } while (k != 0x51);
+        }
+    } else {
+        int o = k * 4;
+        char* b = (char*)p + 8;
+        Unk80308874_Hdr* h = *(Unk80308874_Hdr**)(b + o);
+        if (h)
+            h->m2 = 1;
+    }
+}
+
+void fn_8030AF9C(void* pv, int k)
+{
+    Unk80308874_List* p = (Unk80308874_List*)pv;
+    if (p->m4 != 0) {
+        if (k != 0x51) {
+            do {
+                char* b = (char*)p + 8;
+                int o = k * 4;
+                Unk80308874_Hdr* h = *(Unk80308874_Hdr**)(b + o);
+                if (h)
+                    h->m2 = 0;
+                k = lbl_806E0FA4[k];
+            } while (k != 0x51);
+        }
+    } else {
+        int o = k * 4;
+        char* b = (char*)p + 8;
+        Unk80308874_Hdr* h = *(Unk80308874_Hdr**)(b + o);
+        if (h)
+            h->m2 = 0;
+    }
 }
 
 void* fn_8030B000(Unk80308874_B8* p, int a)
