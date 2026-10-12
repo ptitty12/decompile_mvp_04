@@ -127,7 +127,7 @@ public:
     virtual void v98();
     virtual void v99();
     virtual void v100();
-    virtual void v101();
+    virtual void v101(int a, int b);
     virtual void v102();
     virtual void v103();
     virtual void v104();
@@ -1481,7 +1481,7 @@ int fn_800ED2B0(int a, const char* s);
 int fn_800CFB38();
 int fn_800EC8B8(UiObj* self);
 
-void fn_800AB6B8(int a, int b);
+void fn_800AB6B8(int a);
 void fn_8035686C(UiScrRaw* self, int a);
 void fn_802D7ACC();
 void fn_801A3704(Ui8011AA24* a, int b);
