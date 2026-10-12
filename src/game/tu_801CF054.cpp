@@ -290,6 +290,67 @@ extern "C" float fn_801CF8CC(float x)
     return c;
 }
 
+inline Vec3 VNormalize(const Vec3& v, float len)
+{
+    Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline float LengthR(const Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+extern const Vec3 lbl_806055AC;
+struct Unk801CF054_PlE {
+    Unk801CF054_Q4 a;
+    Unk801CF054_V2 b;
+};
+inline Vec3 MakeV(float x, float y, float z)
+{
+    Vec3 r;
+    r.x = x;
+    r.y = y;
+    r.z = z;
+    return r;
+}
+inline Vec3 VUnit(const Vec3& v)
+{
+    float len = LengthR(v);
+    if (len != 0.0f) {
+        return VNormalize(v, len);
+    }
+    return lbl_806055AC;
+}
+extern "C" int fn_80190F14(P* p, Unk801CF054_Q4* a, Unk801CF054_Q4* b, void* c);
+extern "C" float fn_80379AF4(const Unk801CF054_Q4* a, const Unk801CF054_Q4* b);
+
+extern "C" int fn_801CF96C(Z* z, float f, float* out)
+{
+    P* c = z->m204->m6CC;
+    if (c->m38C == 2) {
+        Unk801CF054_Q4 q;
+        char t20[16];
+        char t30[16];
+        Unk801CF054_PlE pl;
+        Unk801CF054_Q4 p2;
+        fn_801CF588(z, &q, (Vec3*)t20, (int)t30, f);
+        int r = fn_80190F14(c, &q, &pl.a, &pl.b);
+        if (r != 0) {
+            Vec3 n = VUnit(MakeV(1.0f, 0.0f, 1.0f));
+            *(Vec3*)&p2 = n;
+            p2.w = 0.0f;
+            *out = fn_80379AF4(&pl.a, &p2);
+        }
+        return r;
+    }
+    return 0;
+}
+
 extern "C" void fn_801CFB28(Z* z, float a, float b, float c)
 {
     float oa, ob, oc;
