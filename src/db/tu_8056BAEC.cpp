@@ -284,10 +284,6 @@ struct Db8056CC8C {
 extern "C" void fn_8056D15C(Db8056CC8C* self, int a);
 extern "C" void fn_8056DBB8(Db8056CC8C* self);
 
-extern "C" void fn_8056BAEC(DbScr* self, int a, int b, int c);
-
-extern "C" void fn_8056E8B4(DbSel* self, int a, int flags);
-extern "C" void fn_8056EA58(DbSel* self, int a, int flags);
 extern "C" void fn_8056ED54(DbSel* self, int a);
 
 extern const float lbl_805FFB6C;
@@ -299,7 +295,38 @@ struct Db8056CCD0_T {
     char pad0[0x1B4];
     unsigned char m1B4[0x80];
 };
+
+extern const float lbl_805FFC64;
+extern const float lbl_805FFC68;
+
+extern const float lbl_805FFC6C;
+extern const float lbl_805FFC70;
+extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
+
+extern const float lbl_805FFC74;
+extern const float lbl_805FFC78;
+
+extern "C" int rand(void);
+extern const float lbl_805FFA04;
+extern const float lbl_805FFA08;
+extern const float lbl_805FFA0C;
+extern const float lbl_805FFA10;
+extern const float lbl_805FFA14;
+extern const float lbl_805FFA18;
+extern int lbl_806215D4;
+extern float lbl_8061D818;
+extern float lbl_8061D81C;
+extern int lbl_8061D9B0[];
+extern int lbl_8061DA78[];
+extern int lbl_8061D820[];
+extern int lbl_8061D8E8[];
+struct Db8056BAEC_T {
+    char pad0[0x234];
+    unsigned char m234;
+};
+
 /* forward declarations (definitions are in address order) */
+extern "C" void fn_8056BAEC(DbScr* self, int a, int b, int c);
 extern "C" void fn_8056BD50(void* self);
 extern "C" void fn_8056BDD0(void* self);
 extern "C" void fn_8056BE34(void* self);
@@ -333,7 +360,61 @@ extern "C" void fn_8056E02C(DbSel* self, int a, int flags);
 extern "C" void fn_8056E130(DbSel* p);
 extern "C" void fn_8056E13C(DbSel* self);
 extern "C" void fn_8056E630(DbSel* self);
+extern "C" void fn_8056E6E4(DbSel* self, int flags);
 extern "C" void fn_8056E858(DbSel* self, int flags);
+extern "C" void fn_8056E8B4(DbSel* self, int a, int flags);
+extern "C" void fn_8056EA58(DbSel* self, int a, int flags);
+
+extern "C" DB_OVERLAY void fn_8056BAEC(DbScr* self, int a, int b, int c)
+{
+    Db8056BAEC_T* t = (Db8056BAEC_T*)TeamAt(self->m14->m14, b);
+    if (t->m234 != 0 && self->m10 != 0) {
+        int side = 0;
+        if (self->m14->m14->m1CD0 != 0)
+            side = 1;
+        if (b == side && fn_800971C8(t, a) == 1)
+            return;
+        float f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)t + 0xC9C, 0x12, a);
+        f = lbl_805FFA04 - f;
+        if (!(f >= lbl_805FFA08))
+            f = lbl_805FFA08;
+        switch (c) {
+        case 0:
+            f = f * lbl_805FFA0C;
+            break;
+        case 1:
+            f = f * lbl_805FFA10;
+            break;
+        case 2:
+            f = f * lbl_805FFA14;
+            break;
+        }
+        float r = fn_8056FFB0();
+        if (lbl_806215D4 == 1)
+            r = lbl_805FFA18;
+        if (!(r >= f)) {
+            float g1 = lbl_8061D818 * lbl_805FFA08;
+            r = fn_8056FFB0();
+            int idx;
+            if (!(r >= g1))
+                idx = rand() % 24 + 25;
+            else
+                idx = rand() % 24 + 1;
+            float g2 = lbl_8061D81C * lbl_805FFA08;
+            r = fn_8056FFB0();
+            int x;
+            int y;
+            if (!(r >= g2)) {
+                x = lbl_8061D9B0[idx];
+                y = lbl_8061DA78[idx];
+            } else {
+                x = lbl_8061D820[idx];
+                y = lbl_8061D8E8[idx];
+            }
+            fn_8056BF80(self, a, idx, y, x, b);
+        }
+    }
+}
 
 extern "C" DB_OVERLAY void fn_8056BD50(void* self)
 {
@@ -759,10 +840,118 @@ extern "C" DB_OVERLAY void fn_8056E630(DbSel* self)
     fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
 }
 
+extern "C" DB_OVERLAY void fn_8056E6E4(DbSel* self, int flags)
+{
+    int side = 0;
+    DbG* g = self->m10;
+    if (g->m1CD0 != 0)
+        side = 1;
+    unsigned char c = self->m8->m0;
+    if (c != 0xFF) {
+        float f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)TeamAt(g, side) + 0xC9C, 0xD, c);
+        if (!(f <= lbl_805FFC64)) {
+            fn_8056C0A0(self->m18, c);
+            fn_8056BAEC(self->m18, c, side, 0);
+            fn_8056C610(self->m18, 2);
+            fn_80080B98__FP13Unk8007FF8C_Q(self->m8);
+        }
+    }
+    if (flags & 3) {
+        DbQ* q1 = self->m4;
+        if (q1->m0 != 0xFF) {
+            if (self->m8->m0 == 0xFF) {
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q1->m0, q1->m1, q1->m4);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+            }
+        }
+    }
+    if (flags & 6) {
+        DbQ* q0 = self->m0;
+        if (q0->m0 != 0xFF) {
+            if (self->m4->m0 == 0xFF) {
+                float f2 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)TeamAt(self->m10, side) + 0xC9C, 0xD, q0->m0);
+                if (!(f2 <= lbl_805FFC68)) {
+                    DbQ* q2 = self->m0;
+                    fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m4, q2->m0, q2->m1, q2->m4);
+                    fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
+                }
+            }
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_8056E858(DbSel* self, int flags)
 {
     unsigned char x = self->m8->m0;
     fn_8056C0A0(self->m18, x);
     fn_8056BAEC(self->m18, x, *self->m14, 0);
     fn_80080B98__FP13Unk8007FF8C_Q(self->m8);
+}
+
+extern "C" DB_OVERLAY void fn_8056E8B4(DbSel* self, int a, int flags)
+{
+    if (self->m4->m0 != 0xFF) {
+        if (fn_8006BE18__11Unk80069F0C(self->mC) == 1) {
+            DbQ* q = self->m4;
+            fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q->m0, q->m1, q->m4);
+            fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+        } else if (a > 0 || (a == 0 && self->m20 != 0 && (flags & 0x10))) {
+            fn_8056C0A0(self->m18, self->m4->m0);
+            fn_8056BAEC(self->m18, self->m4->m0, self->m14[0], 0);
+            fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+        } else {
+            float f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)TeamAt(self->m10, self->m14[0]) + 0xC9C, 0xD, self->m4->m0);
+            if (flags & 8) {
+                DbQ* q = self->m4;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q->m0, q->m1, q->m4);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+            } else if (!(f <= lbl_805FFC6C)) {
+                fn_8056C0A0(self->m18, self->m4->m0);
+                fn_8056BAEC(self->m18, self->m4->m0, self->m14[0], 1);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+            } else {
+                DbQ* q = self->m4;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q->m0, q->m1, q->m4);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+                if (!(fn_8056FFB0() >= f * lbl_805FFC70))
+                    fn_8056EC68(self, self->m8->m0, 1, self->m28, 2);
+            }
+        }
+    }
+}
+
+extern "C" DB_OVERLAY void fn_8056EA58(DbSel* self, int a, int flags)
+{
+    if (self->m0->m0 != 0xFF) {
+        if (fn_8006BE18__11Unk80069F0C(self->mC) == 1) {
+            DbQ* q = self->m0;
+            fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m4, q->m0, q->m1, q->m4);
+            fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
+        } else if (a > 1 || (a == 1 && self->m20 != 0)) {
+            fn_8056C0A0(self->m18, self->m0->m0);
+            fn_8056BAEC(self->m18, self->m0->m0, self->m14[0], 0);
+            fn_80081CCC__FP13Unk8007FF8C_Yi(self->m10, 0);
+        } else {
+            float f = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)TeamAt(self->m10, self->m14[0]) + 0xC9C, 0xD, self->m0->m0);
+            if (a == 0) {
+                DbQ* q = self->m0;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m4, q->m0, q->m1, q->m4);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
+                if ((self->m8->m0 == 0xFF && !(f <= lbl_805FFC74) && (flags & 0x10) && ((flags & 1) || flags != 0)) || (self->m20 == 1 && (flags & 0x10))) {
+                    DbQ* q2 = self->m4;
+                    fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q2->m0, q2->m1, q2->m4);
+                    fn_80080B98__FP13Unk8007FF8C_Q(self->m4);
+                }
+            } else if (a == 1) {
+                DbQ* q = self->m0;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(self->m8, q->m0, q->m1, q->m4);
+                fn_80080B98__FP13Unk8007FF8C_Q(self->m0);
+                if (!(f <= lbl_805FFC78)) {
+                    fn_8056C0A0(self->m18, self->m8->m0);
+                    fn_8056BAEC(self->m18, self->m8->m0, self->m14[0], 1);
+                    fn_80080B98__FP13Unk8007FF8C_Q(self->m8);
+                }
+            }
+        }
+    }
 }
