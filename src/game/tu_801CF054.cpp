@@ -657,6 +657,34 @@ extern "C" float fn_801D18C8(Y* y)
     return t;
 }
 
+struct Unk801CF054_Tbl12 {
+    float v[12][2];
+};
+extern Unk801CF054_Tbl12 lbl_805D27C4;
+extern "C" int fn_8017C954(void* p);
+#define UNK801CF054_CLAMP(x, lo, hi) (!((x) > (hi)) ? (!((x) < (lo)) ? (x) : (lo)) : (hi))
+
+extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v)
+{
+    Unk801CF054_Tbl12 t = lbl_805D27C4;
+    int r = fn_8017C954(y->m30->m700);
+    int i;
+    if (r <= 11) {
+        i = r;
+        if (i < 0)
+            i = 0;
+    } else {
+        i = 11;
+    }
+    float dx = UNK801CF054_CLAMP(AbsF(v->x) - 1.0f, 0.0f, 1.0f);
+    float dy = UNK801CF054_CLAMP(AbsF(v->y) - 1.0f, 0.0f, 1.0f);
+    float d = fn_804028E4(dx * dx + dy * dy);
+    float s = !(d * 1.3333334f > 1.0f) ? (d * 1.3333334f >? 0.0f) : 1.0f;
+    float a = t.v[i][0];
+    float b = t.v[i][1];
+    return LerpATB(a, 1.0f - s, b);
+}
+
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
 {
     int small = 0;
