@@ -63,6 +63,9 @@ extern const float lbl_805FFE28;
 extern "C" {
 float fn_80089E48__FP15Unk80089894_Objii(void* pt, unsigned i, int cur);
 }
+
+extern const float lbl_805FFE74;
+extern const float lbl_805FFE78;
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_805724AC(int unused, int a, int b, int c, int d, int e, float x);
 extern "C" int fn_805725E4(int unused, int k, float x);
@@ -71,6 +74,7 @@ extern "C" int fn_80573440(DbMgr* self, int side, int id, float thr);
 extern "C" int fn_80573548(DbMgr* self, int side);
 extern "C" int fn_805736CC(DbMgr* self, int side);
 extern "C" float fn_8057375C(DbMgr* self);
+extern "C" void fn_8057378C(DbMgr* self);
 extern "C" void fn_80573840(DbSub50* p);
 extern "C" void fn_805738F0(DbSub50* p, DbSelSrc* src);
 extern "C" float fn_80573D44(DbSub50* p, int i);
@@ -222,6 +226,20 @@ extern "C" DB_OVERLAY float fn_8057375C(DbMgr* self)
     DbSub50* p = &self->m50;
     float r = fn_80573D44(p, p->m4);
     return r;
+}
+
+extern "C" DB_OVERLAY void fn_8057378C(DbMgr* self)
+{
+    DbSub50* p = &self->m50;
+    int side = p->m4;
+    DbT* t = TeamAt(self->mC, side);
+    unsigned char cur = t->m17C;
+    float v = p->e[side].m4;
+    v = v - (fn_8056FFB0() + lbl_805FFE74);
+    if (!(v >= lbl_805FFE78))
+        v = lbl_805FFE78;
+    fn_80573D84(p, side, v);
+    fn_80089EE0__FP20Unk80089894_PackTabDUiUii((char*)t + 0xC74, 0x1B, cur, (int)v);
 }
 
 /* near-miss: 6 slots; retail forms the entry pointer with add + stwu (pre-update) and loads the constant after it */
