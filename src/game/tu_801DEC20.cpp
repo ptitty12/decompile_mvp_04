@@ -204,12 +204,11 @@ inline Vec3 Unk801DF134_Flat(const Vec3& p)
     r.y = lbl_805D3B48;
     return r;
 }
-inline float Unk801DF134_LenSq(Vec3 v)
+
+inline float Unk801DF134_LenSq(const Vec3& v)
 {
     return v.x * v.x + v.z * v.z;
 }
-
-/* near-miss 99.7%: second path reuses the first path's stack temp slot; retail keeps a distinct slot and the Put copy takes r10/r8 swapped */
 extern "C" void fn_801DF134(I* i, Rec* r, P* p)
 {
     Vec3 v = fn_801837F4(i->m9C->m0->m6B8, p->m708);
@@ -227,7 +226,7 @@ Z:
         ok = 0;
     }
     r->m4 = 0x26;
-    Put(&r->m28, v);
+    r->m28 = v;
     r->mC = ok;
 }
 
