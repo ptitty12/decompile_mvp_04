@@ -411,3 +411,125 @@ int fn_800E2E8C(void* t, int idx, int b, int c)
     fn_800E3D4C(t, r);
     return r;
 }
+
+class Ue31A8_P {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual int s30(const char* s, int a);
+};
+class Ue31A8_W {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44(int a, int b, char* c, int d);
+};
+extern "C" int fn_800968C0(int g, int b, int c);
+extern "C" float fn_80097B60(int g, int a, int t, int c, int d);
+extern "C" int fn_80097A9C(int g, int a, int t, int c, int d);
+extern "C" int fn_8009764C(int g, int a, int t, int c);
+extern "C" void fn_80099B7C(int g);
+extern "C" int fn_800DC580(UiS* w);
+extern char lbl_805BDDA8[];
+extern char lbl_805BC1A8[];
+extern char lbl_805BC180[];
+extern "C" int sprintf(char*, const char*, ...);
+
+extern "C" int fn_800E31A8(UiS* self, int g, int a2)
+{
+    char buf[0x68];
+    unsigned char t = fn_800968C0(g, a2, 1);
+    int v0 = (int)fn_80097B60(g, 0, t, 2, 0);
+    int v1 = fn_80097A9C(g, 2, t, 2, 0);
+    int v2 = fn_8009764C(g, 6, t, 0);
+    int v3 = fn_80097A9C(g, 7, t, 2, 0);
+    int v4 = fn_80097A9C(g, 0, t, 2, 0);
+    Ue31A8_W* w = (Ue31A8_W*)fn_800C8060(self->v32(lbl_805BDDA8, 1));
+    sprintf(buf, lbl_805BC1A8, v0);
+    w->s44(0, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v1);
+    w->s44(1, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v2);
+    w->s44(2, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v3);
+    w->s44(3, 1, buf, 4);
+    sprintf(buf, lbl_805BC1A8, v4);
+    w->s44(4, 1, buf, 4);
+    int r = ((Ue31A8_P*)self)->s30(lbl_805BC180, 1);
+    if (r != 0) {
+        UiS* x = fn_800C8044((UiS*)r);
+        fn_80099B7C(g);
+        r = fn_800DC580(x);
+    }
+    return r;
+}
