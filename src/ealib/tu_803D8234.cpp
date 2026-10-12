@@ -122,6 +122,8 @@ void fn_803D9774(Unk803D8234Rec* r, int a, int b);
 void fn_803D96CC(Unk803D8234Rec* r);
 void fn_803D9C34(void* o, int c);
 void fn_803D9AD0(struct Unk803D8234Sub* self, int c);
+void fn_803D95FC(int a, int b);
+int fn_803D98AC();
 }
 
 /* Light-like sub-object (vptr at +0x1C). */
@@ -193,7 +195,6 @@ extern int lbl_80627300;
 void fn_80364A50(void* p, int n);
 extern void (*lbl_8062C66C)(void* p, int size);
 
-
 extern "C" void fn_803D8234(Unk803D8234DevB* self, int c)
 {
     self->mC = lbl_80686740;
@@ -227,6 +228,102 @@ extern "C" void fn_803D8234(Unk803D8234DevB* self, int c)
         ((lbl_Owner*)self)->fn_803DA098(self->m8->mHead);
     if (c & 1)
         lbl_8062C66C(self, 0xF0);
+}
+
+/*
+ * Not matched yet: fn_803D83BC (161 instructions), fn_803D8640 (122), fn_803D8918 (510);
+ * fn_803D8828 and fn_803D9378 read the time base (mftb); fn_803D9528 ends in a trap word after the
+ * fatal-error call. The original code stays linked for these.
+ * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
+ */
+
+struct Unk803D8640Info {
+    char pad0[4];
+    unsigned short m4;
+    unsigned short m6;
+};
+struct Unk803D8640Ring {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+struct Unk803D8640Dev {
+    char pad0[0x54];
+    float m54;
+    float m58;
+    char pad5C[0xB8 - 0x5C];
+    int mB8;
+    int mBC;
+    char padC0[0xCC - 0xC0];
+    int mCC;
+    float mD0;
+    int mD4;
+    int mD8;
+    int mDC;
+};
+extern int lbl_806272D4;
+extern unsigned char lbl_80627308;
+extern int lbl_80627390[];
+extern "C" {
+void fn_803E2D18(void);
+void fn_803D83BC(void* sub);
+void fn_803D9E70(void* o, int a, int b, unsigned short c, unsigned short d, unsigned short e, unsigned short f, int g, int h);
+void fn_803D9ECC(void* o, int a, int b, int c, int d);
+void fn_803D8828(void);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042FE78(int a);
+void fn_8042C3B0(int a);
+int OSReceiveMessage(void* q, void* msg, int flags);
+void GXCopyDisp(int dest, int clear);
+}
+
+/* near-miss (96.6%): retail stores lbl_806272D4 = 0 and lbl_80627304 = 1 one after the other through r0; ours
+   hoists both constants above the first store. Tried one-int-struct globals and statement order. */
+extern "C" void fn_803D8640(Unk803D8640Dev* self)
+{
+    fn_803E2D18();
+    if (self->mCC != 0) {
+        if (self->mD0 > 0.0f) {
+            if (self->mD4 != 0)
+                fn_803D83BC((char*)self + 0x38);
+            char* sub = (char*)self + 0x10;
+            unsigned short w = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m4;
+            unsigned short h = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m6;
+            unsigned short fx = (int)self->m54;
+            unsigned short fy = (int)self->m58;
+            int flag = 0;
+            if (self->mD8 != 0)
+                flag = 1;
+            fn_803D9E70(sub, 0, 0, fx, fy, w, h, 4, flag);
+            fn_803D9ECC(sub, self->mCC, 0, 0, 0);
+            if (self->mBC == 0)
+                self->mD4 = 1;
+        } else {
+            self->mD4 = 0;
+        }
+    } else {
+        self->mD4 = 0;
+    }
+    int msg;
+    fn_8042FED0(1, 3, 1);
+    fn_8042FE78(1);
+    lbl_806272E8 = self->mDC;
+    OSReceiveMessage(lbl_80627390, &msg, 1);
+    lbl_80627304 = 1;
+    lbl_806272D4 = 0;
+    fn_8042C3B0(0x8000);
+    fn_803D95FC(0, (int)fn_803D8828);
+    GXCopyDisp(self->mB8, lbl_80627308);
+    fn_8042C020();
+    lbl_8062731C ^= 1;
+    Unk803D8640Ring* r = (Unk803D8640Ring*)fn_803D98AC();
+    int used = r->m4 - r->m0;
+    if (used > r->mC)
+        r->mC = used;
+    r->m4 = r->m0;
+    lbl_806272D0--;
+    lbl_806279B8++;
 }
 
 extern "C" void fn_803D9110(int a, int b)
@@ -594,10 +691,3 @@ extern "C" void* fn_803D9BE0(Unk803D8234Light* self, void* owner)
     self->m24 = 0;
     return self;
 }
-
-/*
- * Not matched yet: fn_803D83BC (161 instructions), fn_803D8640 (122), fn_803D8918 (510);
- * fn_803D8828 and fn_803D9378 read the time base (mftb); fn_803D9528 ends in a trap word after the
- * fatal-error call. The original code stays linked for these.
- * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
- */
