@@ -26,11 +26,18 @@ struct Db8053967C_Tab {
     char pad4[0xEC];
     Db8053967C_Row r[1];
 };
+
+struct Unk8007DB74_A;
+void fn_8007DEF8(Unk8007DB74_A* a, int id, int k, int m, int x);
+void fn_8007F2EC(Unk8007F198_A* a, int id, int b);
+
+int fn_800A2AE8(void* g);
 /* end Q18 types */
 
 extern "C" {
 /* Q18 protos */
 void fn_8053967C(L* self);
+void fn_8053971C(L* self);
 void fn_80539900(L* self, int a);
 int fn_805399BC(int k);
 int fn_80539A84(int k);
@@ -97,6 +104,52 @@ DB_OVERLAY void fn_8053967C(L* self)
         i++;
         off += 4;
     } while (i <= 29);
+    self->m14 = 1;
+}
+
+DB_OVERLAY void fn_8053971C(L* self)
+{
+    fn_8040074C(self->m0, self->m8 * 4);
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    self->m4 = 0;
+    self->mC = 0;
+    self->m14 = 0;
+    unsigned n = s->fn_8007B1EC();
+    unsigned i;
+    for (i = 1; i < n; i++) {
+        if (s->fn_8007A8DC(0xB, i) == 0) {
+            int v = s->fn_800728BC(i);
+            if (self->m4 < self->m8) {
+                self->m0[self->m4] = v;
+                self->m4++;
+            }
+        }
+    }
+    Db8053E240_Tmp t;
+    int buf[0x82];
+    Db8053E240_Tmp* q = &t;
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    fn_805371C4(q, 0x71FFFFFF);
+    unsigned j;
+    for (j = 0; j < q->m4; j++) {
+        int id = t.At(j);
+        fn_8007F2EC((Unk8007F198_A*)s, id, 0);
+        int k = 0;
+        do {
+            int m = 0;
+            do {
+                int x = m;
+                if (m == 0 && (k == 0 || k == 2))
+                    x = 9;
+                fn_8007DEF8((Unk8007DB74_A*)s, id, k, m, x);
+                m++;
+            } while (m <= 8);
+            k++;
+        } while (k <= 3);
+    }
+    t.vp = lbl_8064A550;
     self->m14 = 1;
 }
 
