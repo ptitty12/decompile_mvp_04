@@ -291,8 +291,15 @@ extern "C" FE_OVERLAY void fn_804AE37C(FeSc1* x, int a)
     p->v86();
 }
 
+#define FE_VP1S(n) virtual void v##n(char* a);
+class FeObjCP : public UiBase {
+public:
+    FE_LO(FE_VP1S) virtual FeObj* v32(const char* a, int b); FE_HI(FE_VP1S)
+};
+extern const char lbl_805F5324[];
 struct Unk80360AB4 {
     int m0, m4, m8, mC, m10;
+    Unk80360AB4() { fn_8052DD58(this); }
     Unk80360AB4(const Unk80360AB4& o);
     ~Unk80360AB4() {}
     virtual void vfn();
@@ -312,6 +319,43 @@ struct FeMsgB8 {
         m5C = i;
     }
 };
+inline void FeCp(Unk80360AB4& d, const Unk80360AB4& s)
+{
+    d = s;
+}
+extern "C" FE_OVERLAY void fn_804ACB4C(FeSc1* x)
+{
+    char b8[0x40];
+    int d[2];
+    fn_800ECF18(x);
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "NAVBAR");
+    FeP(x, 0x13C) = p;
+    fn_80124FA8(p, x);
+    ((FeFnOI)fn_80125154)(FeP(x, 0x13C), 0);
+    ((FeFnOIII)fn_801251CC)(FeP(x, 0x13C), 3, 0xF, 3);
+    fn_80329FA0(d, fn_800A2AE8(lbl_80619948));
+    fn_800DD44C(d, b8, 1);
+    ((FeObjCP*)fn_800C8040(x->v32(lbl_805F5324, 1)))->v28(b8);
+    if (fn_800B555C()->m0 == 0x56) {
+        Unk80360AB4 tmp;
+        FeMsgB8* b = (FeMsgB8*)((char*)fn_800B555C() + 8);
+        FeCp(tmp, b->m3C);
+        int k0 = b->m58;
+        FI(x, 0x140) = k0;
+        int k1 = b->m5C;
+        if (FI(x, 0x1C8) < 0) {
+            FI(x, 0x1C8) = k1;
+            if (k0 == 0)
+                FI(x, 0x1C8) = k1 - 1;
+        }
+    } else {
+        int t = FI(fn_800B555C(), 0x608);
+        FI(fn_800B555C(), 0x40) = t;
+    }
+    fn_804AC564(x);
+    fn_804ACA20(x);
+}
+
 extern "C" FE_OVERLAY void* fn_804ACD0C(FeSc1* x, int i)
 {
     FeLvlRec* rec = fn_8008007C((Unk8007FF8C_G*)lbl_8061930C, x->m144[i]);
