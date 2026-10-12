@@ -101,4 +101,135 @@ struct Unk8008CE64_Iter {
     }
 };
 
+/* Store-only variant of the counter above (fn_8008FBE8, fn_8008FC40): the
+ * slot is written, but the loop reads the value it passes in. */
+template <int N>
+struct Unk8008CE64_IterW {
+    int i;
+    Unk8008CE64_IterW() { i = 0; }
+    ~Unk8008CE64_IterW() {}
+    int Next(int c)
+    {
+        int n;
+        if (c > N)
+            n = c;
+        else
+            n = c + 1;
+        i = n;
+        return n;
+    }
+};
+
+/* 0x3C-byte packed record behind Unk8008CE64_K<Unk8008CE64_T3C>::m24, as read by
+ * fn_8008CFD8 (55 fields in the first eight words; widths from the shift/mask pairs). */
+struct Unk8008CE64_PackE {
+    unsigned short h0;
+    unsigned short h2;
+    unsigned f02 : 6;
+    unsigned f03 : 8;
+    unsigned f04 : 7;
+    unsigned f05 : 4;
+    unsigned f06 : 5;
+    unsigned f07 : 2;
+    unsigned f08 : 2;
+    unsigned f09 : 1;
+    unsigned f0A : 3;
+    unsigned f0B : 1;
+    unsigned f0C : 4;
+    unsigned f0D : 7;
+    unsigned f0E : 4;
+    unsigned f0F : 4;
+    unsigned f10 : 4;
+    unsigned pad0 : 2;
+    unsigned f11 : 4;
+    unsigned f12 : 4;
+    unsigned f13 : 4;
+    unsigned f14 : 4;
+    unsigned f15 : 4;
+    unsigned f16 : 3;
+    unsigned f17 : 1;
+    unsigned f18 : 8;
+    unsigned f19 : 3;
+    unsigned f1A : 2;
+    unsigned f1B : 2;
+    unsigned f1C : 8;
+    unsigned f1D : 7;
+    unsigned f1E : 7;
+    unsigned pad1 : 3;
+    unsigned f1F : 8;
+    unsigned f20 : 1;
+    unsigned f21 : 7;
+    unsigned f22 : 1;
+    unsigned f23 : 4;
+    unsigned f24 : 4;
+    unsigned f25 : 3;
+    unsigned f26 : 3;
+    unsigned pad2 : 1;
+    unsigned f27 : 3;
+    unsigned f28 : 3;
+    unsigned f29 : 2;
+    unsigned f2A : 2;
+    unsigned f2B : 3;
+    unsigned f2C : 10;
+    unsigned f2D : 1;
+    unsigned f2E : 2;
+    unsigned f2F : 2;
+    unsigned f30 : 1;
+    unsigned pad3 : 3;
+    unsigned f31 : 7;
+    unsigned f32 : 5;
+    unsigned f33 : 1;
+    unsigned f34 : 2;
+    unsigned f35 : 2;
+    unsigned f36 : 3;
+    unsigned pad4 : 12;
+    char pad20[0x1C];
+};
+
+struct Unk8008CE64_PackTabE {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk8008CE64_PackE* m24;
+};
+
+/* Packed 0x10-byte record behind K<..>::m24 as read by fn_8008ED04 (27 fields; widths from the shift/mask pairs). */
+struct Unk8008CE64_PackF {
+    unsigned f00 : 7;
+    unsigned f01 : 7;
+    unsigned f02 : 2;
+    unsigned f03 : 2;
+    unsigned f04 : 2;
+    unsigned f05 : 2;
+    unsigned f06 : 2;
+    unsigned f07 : 2;
+    unsigned f08 : 2;
+    unsigned f09 : 2;
+    unsigned f0A : 2;
+    unsigned f0B : 4;
+    unsigned f0C : 4;
+    unsigned f0D : 4;
+    unsigned f0E : 4;
+    unsigned f0F : 4;
+    unsigned f10 : 4;
+    unsigned f11 : 4;
+    unsigned f12 : 4;
+    unsigned f13 : 4;
+    unsigned f14 : 7;
+    unsigned f15 : 7;
+    unsigned f16 : 7;
+    unsigned f17 : 7;
+    unsigned f18 : 7;
+    unsigned f19 : 7;
+    unsigned f1A : 7;
+    unsigned pad0 : 11;
+};
+
+struct Unk8008CE64_PackTabF {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk8008CE64_PackF* m24;
+};
+
 #endif

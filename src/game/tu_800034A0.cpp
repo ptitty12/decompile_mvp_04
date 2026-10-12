@@ -7,3 +7,10 @@
  * Not split (declare extern if used): small-data (.sdata/.sbss) objects and
  * any second, non-contiguous range of a section.
  */
+
+extern "C" void fn_800034A0(int initialize, int priority);
+
+extern "C" void fn_80004284(void)
+{
+    fn_800034A0(1, 0xffff);
+}

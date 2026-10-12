@@ -238,7 +238,7 @@ int fn_800A89C4(UnkFEObj* self)
     return 1;
 }
 
-void fn_800A89DC(UnkFEObj* self)
+void fn_800A89DC(UnkFEObj* self, int* flag)
 {
     if (self->fn_vslot3()) {
         int v = self->m4;
@@ -272,7 +272,7 @@ void fn_800A8B30(void* self, Unk8037B3E8* o)
     o->fn_8037B728(lbl_805B7340, lbl_805B7358, self, lbl_80619970);
 }
 
-void fn_800A8B70(UnkFEObj* self)
+void fn_800A8B70(UnkFEObj* self, int* flag)
 {
     if (self->fn_vslot3()) {
         int v = self->m4;
@@ -297,7 +297,7 @@ int fn_800A8C30(UnkFEObj* self)
     return 1;
 }
 
-void fn_800A8C48(UnkFEObj* self)
+void fn_800A8C48(UnkFEObj* self, int* flag)
 {
     if (self->fn_vslot3()) {
         fn_800AA2FC(fn_800AA19C(), self->m8, self->m4, self->mC);
@@ -483,7 +483,7 @@ int fn_800A9310(UnkFEObj* self)
     return 1;
 }
 
-void fn_800A9328(UnkFEObj* self)
+void fn_800A9328(UnkFEObj* self, int* flag)
 {
     fn_800B555C()->m4 = self->m4;
 }
@@ -527,7 +527,7 @@ int fn_800A949C(UnkFEObj* self)
     return 1;
 }
 
-void fn_800A94B4(UnkFEObj* self)
+void fn_800A94B4(UnkFEObj* self, int* flag)
 {
     fn_800B555C()->m0 = self->m4;
 }

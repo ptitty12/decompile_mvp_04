@@ -64,4 +64,44 @@ struct Unk80084910_PObj {
 };
 typedef float (Unk80084910_PObj::*Unk80084910_Pmf)(int);
 
+/* Packed 0x30-byte record behind K<T30>::m24 as read by fn_80084C50 (22 fields in the first five words). */
+struct Unk80084910_PackA {
+    unsigned top0 : 8;
+    unsigned a00 : 16;
+    unsigned pad0 : 8;
+    unsigned a01 : 15;
+    unsigned a02 : 1;
+    unsigned a03 : 6;
+    unsigned a04 : 8;
+    unsigned pad1 : 2;
+    unsigned a05 : 7;
+    unsigned a06 : 10;
+    unsigned a07 : 1;
+    unsigned a08 : 7;
+    unsigned a09 : 4;
+    unsigned a0A : 2;
+    unsigned pad2 : 1;
+    unsigned a0B : 4;
+    unsigned a0C : 3;
+    unsigned a0D : 4;
+    unsigned a0E : 1;
+    unsigned a0F : 7;
+    unsigned a10 : 3;
+    unsigned a11 : 1;
+    unsigned a12 : 7;
+    unsigned pad3 : 2;
+    unsigned a13 : 7;
+    unsigned a14 : 7;
+    unsigned a15 : 7;
+    unsigned pad4 : 11;
+    char padw14[0x1C];
+};
+
+struct Unk80084910_PackTabA {
+    char pad0[0x1C];
+    unsigned m1C;
+    char pad20[4];
+    Unk80084910_PackA* m24;
+};
+
 #endif

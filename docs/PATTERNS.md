@@ -786,3 +786,142 @@ Still open (Opus queue)
   fn_80254964, fn_8025E5E0, fn_8025CDD8.
 - Loop test at the top with a back edge to it: fn_80255284, fn_80257DFC.
 - Dead `cmpwi` before a constant return (mechanism in Hard-case families 2).
+
+## Ranges 20-27 and second passes (2026-10-11, condensed)
+
+- mfcr/mtcrf in the prologue/epilogue is a CR save, and it is reproducible.
+  A flag compare that stays live across calls lands in cr2-cr4. Example:
+  `int own = out == 0;` with the write pointer declared inside the non-empty
+  branch (fn_8008399C, fn_80083AD4). Don't skip these as asm-only; only
+  mftb/mfspr-style instructions are.
+- Independent global stores: write them in source in the order of retail's
+  `lis` instructions (fn_803318CC: 8 stores, matched first try).
+- Packed-record getters/setters: the getter's shift/mask pairs give the bit
+  widths; an MSB-first bitfield struct with zero-width pads reproduces them.
+  Setters clamp `if (v <= MAX) { if (v < 0) v = 0; } else v = MAX;` (7-bit
+  percent fields clamp at 100). One generator pass per record type matched
+  functions of 234-912 instructions (tu_8008CE64, tu_80089894).
+- Store-only iterator slot:
+  `struct It { int i; ~It() {} int Next(int c) { n = c > N ? c : c + 1; i = n; return n; } };`
+  Write `k = it.Next(k)`, and declare `n` and `k` before `it`.
+- `int n = 12; ... if (i >= n) goto done;` keeps `cmpwi 12; bge` (not
+  `cmpwi 11; bgt`). A goto-shaped scan loop stops strength reduction.
+- Nested loops over the same count: write explicit pre-tests,
+  `while (1) { if (!(i < n)) break; ... }`. A plain `for` lets CSE merge the
+  inner and outer tests.
+- A function that falls off the end without `return` leaves the last call's
+  result in r3.
+- Member-array dtor loops: `X::~X() {}` with `Elem m[N]`, where
+  `struct Elem : ElemD { virtual ~Elem(); }`. This gives the guard, the
+  backward loop, the in-charge-0 vcall and the deleting tail. Nested arrays
+  use an inline `~Mid() {}` (range-27).
+- Ring step: `unsigned k = m4 - 1; mC = (mC + k) % m4;`. Without the named
+  temporary, fold reassociates it.
+- Hidden-pointer struct returns: a BLKmode local (e.g. `struct { char m0[6]; }`
+  or one with a dtor) gets a per-use `addi rX,r1,8`. An 8-byte DImode local
+  keeps its address in a saved register.
+- `new (heap) T[n]` for T with a ctor gives `__vn` plus the element ctor loop.
+  A function shaped `mr r9,r3; mr r11,r9` is often a real ctor.
+- Two bitfield read-modify-write groups: put a read of a global between
+  them, or the first store is merged away.
+- Global store with a branchy RHS: `int* q = &lbl_X; *q = ...;`.
+- Float exit tests `if (!(a <= b)) return X;` give `cror; bso` (retail
+  shape). `if (a > b)` gives a plain `ble`.
+- Open (Opus round 3):
+  - widget ctors keep the first of two vptr stores (about 25 functions);
+  - dead-cmpwi switch family (about 20; a hidden `default:` case shifts the
+    balance root);
+  - `li r5` before `mr r3` for 3-arg item ctor calls;
+  - sched1 constant hoisting.
+
+## Ranges 29, 36, 41, 42 and pass2-04 (2026-10-11, condensed)
+
+- Evaluation order: call arguments are evaluated left to right. Only binary
+  operator operands go right to left. `r = a; r -= b;` puts the first term
+  straight into r3.
+- Clone first. `scratchpad\R36\clone2.py --apply` clones every matched donor
+  into functions with the same relocation-masked shape. It gave range-36
+  about 90% of its matches. A donor inside `extern "C" {}` needs
+  `extern "C"` on the clone, or the clone compiles mangled.
+- Two-argument call to a one-argument mangled symbol (fn_80090880): declare
+  the true signature, then call through a cast:
+  `((char*(*)(Unk80090880*,int))fn_80090880)(tbl, id)`. This still emits a
+  direct `bl`.
+- Callee return type changes the caller's arg setup. Declaring fn_803FED48
+  `int` instead of `void` fixed `li r4; li r5; addi r3` in fn_800C1A24,
+  even though the result is unused.
+- Range tests:
+  - `k >= 1 && k <= 2` folds to `addi; cmplwi; bgt`.
+  - Retail's `cmpwi 1; blt; cmpwi 2; bgt` comes from locals:
+    `int lo = 1, hi = 2;`.
+- Switch layout: put an empty `case 0: case 1: case 2: break;` first, then
+  the real cases in retail layout order, to get `beq; ble; cmpwi 5; bgt`.
+- Null-check returns: `if (r == 0) return 0; return r;` keeps
+  `mr.; li; beq; mr`. `r ? r : 0` folds it away.
+- Single `li r3,0` with `beqlr`/`bnelr` exits: use one result variable,
+  `int r = 0; if (...) r = ...; return r;`, not several `return 0`.
+- Address arithmetic:
+  - `(Rec*)(i * 1040 + (int)m)` then `(char*)r + K` gives `add; stwu K(r)`.
+  - `&m->recs[i]` gives `stwx` instead.
+  - `(char*)(off + (int)ptr) + K` gives operand order `off, base`.
+  - `p + (i*0x118 + 0x168) + j*0x28`, parenthesised, keeps retail's add order.
+- Base-first `lwzx`: `int o = i*4; *(int*)((char*)base + o)`.
+- Loop forms:
+  - `for (; c; c = c->m4) { if (cond) break; }` gives the rotated loop with
+    hoisted loads.
+  - `while (i < f()) { ...; i++; }` gives the entry-jump loop.
+  - A peeled first iteration comes from the plain `for`. Don't
+    special-case `m == 0` by hand.
+- Register sharing:
+  - Reuse one counter variable across two sequential loops to fix swapped
+    r26/r27.
+  - Declare `unsigned i = 0;` before the zero stores
+    (`m4 = i; mC = i; ...`) to share the zero register with the counter.
+  - Put the counter init after the stores to get a separate `li r0,0`.
+- Pointer `==` and `!=` compile to `cmpw`. Only ordered pointer compares
+  give `cmplw`.
+- A cross-jumped `return 0` tail comes from sibling branches that each
+  `return p->b0;` inside `if (p)`. Jump2 merges the fall-through.
+- Macro-style singleton casts (`#define SCR ((T*)lbl_X)`) reload the global
+  at each use, as retail does. A pointer local does not.
+- Nested call `f(a, g(b))` where retail loads the global twice: split it
+  into two statements.
+- Destructors:
+  - Member-array dtors are real classes. A non-virtual class with
+    `O::~O() {}` and `E m[n]` still gets `(this, in_chrg)` and the
+    deleting tail.
+  - Polymorphic elements: `struct E { char pad[n-4]; virtual ~E(); }` with
+    the dtor declared only (no vtable emitted).
+  - Member B in a class: `li r4,2; bl B::~B`.
+  - Derived `D : B { ~D(){} }`: a pure r4 pass-through forwarder.
+  - Inlined member dtor: a separate class with the dtor defined in-class,
+    plus an out-of-line twin class for the standalone function.
+  - Implicit dtors of data-less classes derived from Unk8037B3E8 are
+    linkonce and unpairable (DECISIONS, linkonce).
+- Pointer-to-member loops: `(arr[i]->*f)()` with `f` declared
+  `void (Widget::*)()` gives the ptmf thunk, with the pmf copied to r30/r31
+  before the loop.
+- Bitfields: `f0 = 1; f1 = 0;` gives `oris` plus `rlwinm`. Read record
+  layout straight from the getter's extrwi operands.
+- A 64-byte member struct assignment gives the 24+24+16 copy loop.
+- An inline wrapper with default arguments, used by a member array in the
+  outer ctor, gives the do-while ctor loop.
+- Float parameters of inline functions get float-store stack slots. If
+  retail has no slot, read the member inside the inline instead of passing
+  it in.
+- `char buf[N] = ""` emits memset plus a .rodata string. The verifier
+  accepts it; check_literals lists memset as unresolved (retail calls
+  fn_8040B320).
+- Tooling:
+  - After rename.py, asm parsers must normalise mangled `.fn` names back to
+    addresses.
+  - The R29 tools (gen.py, stores.py, hill2.py), R42 permtest.py and R41
+    chklit_db.py are reusable.
+  - check_literals.py now covers `.dboverlay`.
+- Open:
+  - dead-compare switch family (db units, about 8);
+  - nonzero-frame-offset local kept in a callee-saved register instead of
+    `addi r4,r1,8` per call;
+  - callee-saved permutation cluster (80533120, 80536F28, 80537054,
+    8053923C);
+  - sibling-arm vcall tail sharing (fn_804D0860).

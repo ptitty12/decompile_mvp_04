@@ -65,7 +65,8 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
   dtor/ctor clones, from a script in your scratch folder.
 - Then do the rest smallest first.
 - Skip functions over ~0x400 bytes, and those that need inline-asm-only
-  instructions (mftb, mfcr/mtcrf).
+  instructions (mftb, mfspr). A prologue mfcr/mtcrf is a CR save and IS
+  reproducible (a flag compare live across calls); see PATTERNS.
 - New types go in `include/game/tu_<first unit addr>.h`.
 - Overlay units (`src/fe/`, `src/db/`): every function definition carries
   `FE_OVERLAY` / `DB_OVERLAY` from `include/game/overlay.h` (placement only;
@@ -103,6 +104,12 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
   `python tools/match/passthru.py .`: a callee that reads r4/r5 the caller
   never sets takes the caller's parameters, so pass them through.
 - Keep .text order with `python tools/match/sort_functions.py src/<UNIT>`.
+- Never write the word "asm" in source, not even in a comment: the verifier
+  greps for it and rejects the commit. Write "original code" instead.
+- Start a range by cloning: scratch tools from earlier workers
+  (`scratchpad\R36\clone2.py` loose-shape cloner, `R28\gen_all.py` shape
+  generator, `R42\permtest.py` statement permuter) match most boilerplate
+  in minutes. Adapt their paths to your worktree.
 
 ## Finish with a report (this is all the lead reads)
 
