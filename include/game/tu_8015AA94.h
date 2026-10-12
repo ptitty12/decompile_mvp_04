@@ -128,8 +128,10 @@ public:
     void fn_80163CC4(int id, struct Unk80163CC4_Evt* e);
     void fn_80164624(struct Unk80163CC4_Evt* e);
     void fn_801655F0(struct Unk80163CC4_Evt* e);
-    void fn_80165978(struct Unk80163CC4_Evt* e, float t);
+    void fn_80165978(struct Unk80165978_Evt* e, float t);
     void fn_80163748();
+    void fn_80164CEC();
+    void fn_80164DDC();
     void fn_8016482C();
     void fn_80164878();
     void fn_80164F48(struct Unk801654F0_Evt* e, float t);

@@ -142,6 +142,27 @@ inline Unk80326F44_Out Unk80163CC4_OutOf(const Unk80163CC4_Evt99* c)
     return c->mC;
 }
 
+struct Unk80165978_Obj {
+    char pad0[0x458];
+    int m458;
+};
+
+struct Unk80165978_Evt {          /* fn_80165978 */
+    int m0;
+    char pad4[4];
+    int m8;
+    Unk80165978_Obj* mC;
+    char pad10[0xC];
+    float m1C;
+    int m20;
+    int m24;
+    int m28;
+    char pad2C[0x3C - 0x2C];
+    int m3C;
+    char pad40[4];
+    int m44;
+};
+
 #define EVK(T, k) ((T*)(e ? ((k) == e->m0 ? e : 0) : 0))
 
 
@@ -264,7 +285,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         break;
     }
     case 0x58:
-        fn_80165978(EVK(Unk80163CC4_Evt, id), t);
+        fn_80165978(EVK(Unk80165978_Evt, id), t);
         break;
     case 0x73:
         fn_80165AF4(EVK(Unk80165AF4_Evt, id), t);
@@ -333,6 +354,77 @@ void Unk80159F28::fn_8016482C() /* 8016482C */
 
 void Unk80159F28::fn_80164878() /* 80164878 */
 {
+}
+
+extern int lbl_8061BE34[];
+extern int lbl_805C9758[];
+extern int lbl_8061C0EC[];
+
+void Unk80159F28::fn_80164CEC() /* 80164CEC */
+{
+    int c = m5F4.m10 + 1;
+    m5F4.m10 = c;
+    int k = m5F4.m4;
+    if (c >= lbl_8061BE34[k]) {
+        m5F4.m10 = 0;
+        int d = m5F4.m8 + 1;
+        m5F4.m8 = d;
+        if (!(d < lbl_805C9758[k])) {
+            m5F4.m8 = 0;
+            int flag = 0;
+            if (lbl_8061C0EC[k] != 0 && m5F4.mC == 0) {
+                m5F4.mC = 1;
+            } else {
+                flag = 1;
+            }
+            if (flag != 0) {
+                m5F4.mC = 0;
+                int i = m5F4.m4 + 1;
+                if (i <= 0xAE) {
+                    m5F4.m4 = i;
+                    if (!(lbl_8061BE34[i] > 0)) {
+                        do {
+                            i++;
+                            if (i > 0xAE) {
+                                break;
+                            }
+                            m5F4.m4 = i;
+                        } while (lbl_8061BE34[i] <= 0);
+                    }
+                }
+            }
+        }
+    }
+}
+
+extern "C" void fn_8016487C(Unk80159F28* self);
+extern "C" void fn_80162264(Unk80159F28* self);
+extern "C" void fn_801597F0(Unk80159F28* self);
+extern "C" void fn_8016645C(Unk80159F28* self, int a);
+inline float Secs(unsigned int n) { return (float)n * 0.016666668f; }
+
+void Unk80159F28::fn_80164DDC() /* 80164DDC */
+{
+    fn_8016487C(this);
+    if (!(m330 <= 0.0f)) {
+        if (!(Secs(*(unsigned int*)&mC->m4C) <= m330)) {
+            fn_80162264(this);
+        }
+    }
+    if (!(m334 <= 0.0f)) {
+        if (!(Secs(*(unsigned int*)&mC->m4C) <= m334)) {
+            fn_801597F0(this);
+        }
+    }
+    if (!(m338 <= 0.0f)) {
+        if (!(Secs(*(unsigned int*)&mC->m4C) <= m338)) {
+            int r = 0;
+            if (mC->m6F8->m14->m1CD0 != 0) {
+                r = 1;
+            }
+            fn_8016645C(this, r ^ 1);
+        }
+    }
 }
 
 void Unk80159F28::fn_80164F48(Unk801654F0_Evt* e, float t) /* 80164F48 */
@@ -468,6 +560,58 @@ void Unk80159F28::fn_80165908(Unk80165834_Evt* e, float t) /* 80165908 */
         x = -e->m18;
     }
     s->fn_80326EF4(t, x, 0x62, e->mC->m458, e->m8, 0);
+}
+
+void Unk80159F28::fn_80165978(Unk80165978_Evt* e, float t) /* 80165978 */
+{
+    int flags = 0;
+    Unk801527C8_Sub* s = &mC->m50;
+    int a = e->mC->m458;
+    int b = e->m44;
+    float kk = e->m1C;
+    int id;
+    if ((unsigned int)(a - 0xF) > 1) {
+        if (e->m20 != 0) {
+            if (e->m28 != 0) {
+                flags = 4;
+            }
+            id = 0xAD;
+        } else {
+            const float lim = 0.1f;
+            Unk80326F44_Out out = s->fn_80326F44(0x42, 1, -1.0f);
+            int v = 1;
+            if (out.m0 == 0xC7) {
+                v = 0;
+            }
+            if (v != 0 && e->mC->m458 == 1 && (t - out.m4) < lim) {
+                return;
+            }
+            id = 0xAE;
+        }
+        int m = e->m8;
+        if (m == 0xA) {
+            flags |= 1;
+        }
+        if (m == 6 || m == 8) {
+            flags |= 0x10;
+        }
+        if (m == 7) {
+            flags |= 0x80;
+        }
+        if (m == 5) {
+            flags |= 0x40;
+        }
+        if (m == 2 || m == 4) {
+            flags |= 0x20;
+        }
+        if (e->m24 != 0) {
+            flags |= 2;
+        }
+        if (e->m3C != 0) {
+            flags |= 0x100;
+        }
+        s->fn_80326EF4(t, kk, id, a, b, flags);
+    }
 }
 
 void Unk80159F28::fn_80165AF4(Unk80165AF4_Evt* e, float t) /* 80165AF4 */
