@@ -41,6 +41,13 @@ FE_OVERLAY int fn_8048E8EC(FeScrO* x)
     return x->m154;
 }
 
+FE_OVERLAY FeScrH* fn_8048E928(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_804D2AC0(self, a, b, c, d, e, f, g, h, 0, 0x3364, 0x12, lbl_806217F8);
+    self->SetVptr(lbl_80676060);
+    return self;
+}
+
 FE_OVERLAY void fn_8048E990(void* x)
 {
     fn_804D3164(x);
@@ -50,6 +57,22 @@ FE_OVERLAY void fn_8048E990(void* x)
 FE_OVERLAY void fn_8048EB38(FeScrD* x)
 {
     fn_800E49DC(x);
+}
+
+FE_OVERLAY void fn_8048EB58(void* x)
+{
+    int v = fn_804D2ED0(x, 0x4D)->x4();
+    if (v == 1 && FeI(x, 0x170) == 0) {
+        fn_8007295C__18Unk8007A4DC_Screen(lbl_8061930C);
+        FeI(x, 0x170) = v;
+    }
+}
+
+FE_OVERLAY void fn_8048EBC8(void)
+{
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    ((FeWQ*)w)->s85(0);
+    FeI(w, 0x314) = 1;
 }
 
 FE_OVERLAY void fn_8048EC48(FeW* x)
