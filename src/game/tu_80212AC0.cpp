@@ -27,7 +27,7 @@ void fn_80219EB0(Task* t);
 void fn_80213DF4(Task* t, int x);
 void fn_80213E30(Task* t, int x);
 void fn_80213E84(Task* t, int x);
-void fn_8026D8BC(void* o, int x);
+int fn_8026D8BC(void* o, int x);
 int fn_8026DB3C(void* o, int x);
 int fn_80217C04(Task* t, void* o, Player* p);
 }
