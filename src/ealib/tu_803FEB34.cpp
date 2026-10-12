@@ -73,6 +73,31 @@ struct FsReq {
     int h;
 };
 
+extern "C" {
+void fn_80432568(void* alarm);
+void fn_804001E4(void);
+int fn_80437A4C(void* thread, void* entry, int arg, int stackTop, int stackSize, int prio, int attr);
+void fn_80437ED4(void* thread);
+void OSInitMessageQueue(void* q, void* msgs, int n);
+int OSReceiveMessage(void* q, int* msg, int flags);
+void fn_804061F0(void);
+int fn_80406200(int h, int a, int b);
+int fn_804061F8(int h, int a);
+int fn_804002BC(const char* fmt, ...);
+int fn_803FF618();
+}
+extern unsigned char lbl_806EEAB1;
+extern char lbl_806B82E0[0x28];
+extern char lbl_806B5F20[0x318];
+extern char lbl_806B8258[0x88];
+extern int lbl_806EEAA8;
+extern int lbl_806EEAAC;
+extern int lbl_806EEAE0;
+extern volatile int lbl_806EEAE4;
+typedef void (*Fn0)(void);
+extern Fn0 lbl_8062EE40[8];
+extern char lbl_8060E7D4[];
+
 /* near-miss: 43 vs 42 slots; retail compares a reloaded r.len and stores fn after that load (volatile struct is the closest). */
 extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int, int, int, int, FsReq*))
 {
@@ -187,6 +212,14 @@ extern "C" int fn_803FEE14(int a, int b)
     return ok;
 }
 
+extern "C" void fn_803FEE70()
+{
+    fn_80437A4C(lbl_806B5F20, (void*)fn_803FF618, 0, lbl_806EEAAC + lbl_806EEAA8, lbl_806EEAA8, 2, 1);
+    OSInitMessageQueue(lbl_806B8238, lbl_806B8258, 0x20);
+    fn_80437ED4(lbl_806B5F20);
+    fn_804061F0();
+}
+
 extern "C" void fn_8040021C(int on);
 
 extern "C" void fn_803FEFC4(char* dst, const unsigned char* src)
@@ -299,4 +332,184 @@ extern "C" void fn_803FF850()
     }
 }
 
+extern "C" void fn_803FF994()
+{
+    if (lbl_806EEAB1) {
+        lbl_806EEAB1 = 0;
+        fn_80432568(lbl_806B82E0);
+        fn_804001E4();
+    }
+}
+
 extern "C" void fn_803FFA3C() { fn_8040021C(0); }
+
+extern "C" void fn_803FFA60(char* d, const char* s, int n)
+{
+    int diff = s - d;
+    if (n == 0)
+        return;
+    if (diff == 0)
+        return;
+    if (diff & 1) {
+        while (n > 3) {
+            char a = s[0];
+            char b = s[1];
+            char c = s[2];
+            char e = s[3];
+            n -= 4;
+            s += 4;
+            d[0] = a;
+            d[1] = b;
+            d[2] = c;
+            d[3] = e;
+            d += 4;
+        }
+        while (n > 0) {
+            *d++ = *s++;
+            n--;
+        }
+        return;
+    }
+    if (diff & 2) {
+        char* d2;
+        const char* s2;
+        s2 = s;
+        d2 = d;
+        if (((unsigned)s & 1) && n > 0) {
+            *d2 = *s2;
+            d2++;
+            s2++;
+            n--;
+        }
+        while (n > 7) {
+            int a = ((const short*)s2)[0];
+            int b = ((const short*)s2)[1];
+            int c = ((const short*)s2)[2];
+            int e = ((const short*)s2)[3];
+            n -= 8;
+            s2 += 8;
+            ((short*)d2)[0] = a;
+            ((short*)d2)[1] = b;
+            ((short*)d2)[2] = c;
+            ((short*)d2)[3] = e;
+            d2 += 8;
+        }
+        while (n > 1) {
+            *(unsigned short*)d2 = *(const unsigned short*)s2;
+            n -= 2;
+            s2 += 2;
+            d2 += 2;
+        }
+        if (n > 0)
+            *d2 = *s2;
+        return;
+    }
+    if (((unsigned)s & 1) && n > 0) {
+        *d++ = *s++;
+        n--;
+    }
+    if (((unsigned)s & 2) && n > 1) {
+        *(unsigned short*)d = *(const unsigned short*)s;
+        n -= 2;
+        s += 2;
+        d += 2;
+    }
+    while (n > 15) {
+        int a = ((const int*)s)[0];
+        int b = ((const int*)s)[1];
+        int c = ((const int*)s)[2];
+        int e = ((const int*)s)[3];
+        n -= 16;
+        s += 16;
+        ((int*)d)[0] = a;
+        ((int*)d)[1] = b;
+        ((int*)d)[2] = c;
+        ((int*)d)[3] = e;
+        d += 16;
+    }
+    while (n > 3) {
+        *(int*)d = *(const int*)s;
+        n -= 4;
+        s += 4;
+        d += 4;
+    }
+    if (n > 1) {
+        *(unsigned short*)d = *(const unsigned short*)s;
+        n -= 2;
+        s += 2;
+        d += 2;
+    }
+    if (n > 0)
+        *d = *s;
+}
+
+extern "C" void fn_803FFC58(char* p, int v, int n)
+{
+    if (n > 0 && ((unsigned)p & 1)) {
+        *p = v;
+        n -= 1;
+        p += 1;
+    }
+    if (n > 1 && ((unsigned)p & 2)) {
+        *(short*)p = v;
+        n -= 2;
+        p += 2;
+    }
+    if (n > 3 && ((unsigned)p & 4)) {
+        *(int*)p = v;
+        n -= 4;
+        p += 4;
+    }
+    if (n > 7 && ((unsigned)p & 8)) {
+        ((int*)p)[0] = v;
+        ((int*)p)[1] = v;
+        n -= 8;
+        p += 8;
+    }
+    if (n > 15 && ((unsigned)p & 16)) {
+        ((int*)p)[0] = v;
+        ((int*)p)[1] = v;
+        ((int*)p)[2] = v;
+        ((int*)p)[3] = v;
+        n -= 16;
+        p += 16;
+    }
+    while (n > 31) {
+        ((int*)p)[0] = v;
+        ((int*)p)[1] = v;
+        ((int*)p)[2] = v;
+        ((int*)p)[3] = v;
+        ((int*)p)[4] = v;
+        ((int*)p)[5] = v;
+        ((int*)p)[6] = v;
+        ((int*)p)[7] = v;
+        n -= 32;
+        p += 32;
+    }
+    if (n > 15) {
+        ((int*)p)[0] = v;
+        ((int*)p)[1] = v;
+        ((int*)p)[2] = v;
+        ((int*)p)[3] = v;
+        n -= 16;
+        p += 16;
+    }
+    if (n > 7) {
+        ((int*)p)[0] = v;
+        ((int*)p)[1] = v;
+        n -= 8;
+        p += 8;
+    }
+    if (n > 3) {
+        *(int*)p = v;
+        n -= 4;
+        p += 4;
+    }
+    if (n > 1) {
+        *(short*)p = v;
+        n -= 2;
+        p += 2;
+    }
+    if (n > 0)
+        *p = v;
+}

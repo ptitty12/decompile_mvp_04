@@ -113,6 +113,28 @@ extern "C" void fn_803FDDEC(int, int);
 extern "C" int fn_803FEBDC(int, int, int, int*);
 extern "C" int fn_803FEC74(int, int, int, int, int);
 
+/* One async transfer request (see tu_803FEB34: FsReq). Accessed through a volatile pointer in the completion callback. */
+struct FsReqC {
+    volatile int e;
+    volatile int a;
+    volatile int b;
+    volatile int d;
+    volatile int result;
+    volatile int len;
+    int c;
+    int (*fn)(int, int, int, int, int, FsReqC*);
+    int h;
+};
+extern "C" void fn_803FEA38(int h, int k, FsReqC* r);
+
+extern "C" char* strncpy(char*, const char*, unsigned);
+extern "C" void fn_803FD494(RcFile*, int);
+extern "C" RcNd* fn_803FCDCC(RcFile*);
+extern "C" void fn_803FCE50(RcFile*, RcNd*);
+#define RCI(p, off) (*(int*)((char*)(p) + (off)))
+
+extern "C" int fn_803FD010(RcFile*);
+
 extern "C" int fn_803FBF54(int n, RcCtx* ctx)
 {
     int out;
@@ -410,6 +432,35 @@ extern "C" void fn_803FD33C(int a, int b, RcFile* o)
         fn_803F96B0(h, fn_803FD2F4);
 }
 
+extern "C" void fn_803FD398(int, int, RcFile* f)
+{
+    RcNd* p = f->m6C;
+    int amt;
+    int flag;
+    int r;
+    if (RCI(p, 0x10) == 1) {
+        amt = f->m184;
+        flag = f->m17C + amt >= RCI(p, 0x118);
+    } else {
+        amt = fn_803F9A80(f->m180);
+        flag = amt < f->m184;
+    }
+    f->m17C += amt;
+    RCI(f, 0x64) += amt;
+    r = fn_803FD010(f);
+    if (p->m4 == 4) {
+        fn_803FD494(f, f->m4C);
+    } else if (flag != 0 || r != 0) {
+        fn_80400828(f->m4);
+        if (p->m4 != 4)
+            p->m4 = 3;
+        fn_8040084C(f->m4);
+        fn_803FD494(f, f->m4C);
+    } else {
+        fn_803FD5F8(f, f->m4C - 1);
+    }
+}
+
 extern "C" int fn_803FD944(int a, int b, int c)
 {
     int t1 = b * 0xc;
@@ -508,6 +559,35 @@ extern "C" char* fn_803FDE54(int h, int n)
     return o->m30 + (n * 16 - 16);
 }
 
+extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
+{
+    RcFile* o;
+    RcHnd* p;
+    int err = fn_803FCCCC(h, &o, &p);
+    if (err != 0)
+        return 0;
+    RcNd* n = fn_803FCDCC(o);
+    if (n == 0)
+        return 0;
+    RCI(n, 0x10) = err;
+    strncpy((char*)n + 0x14, name, 0xfe);
+    RCI(n, 0x118) = a;
+    RCI(n, 0x11c) = b;
+    fn_803FCE50(o, n);
+    fn_80400828(o->m4);
+    int was = o->m44;
+    if (was == 0)
+        o->m44 = 1;
+    fn_8040084C(o->m4);
+    if (was == 0) {
+        if (o->m54 != 0)
+            fn_803FD494(o, o->m4C);
+        else
+            fn_803FD494(o, o->m48);
+    }
+    return n->m0;
+}
+
 extern "C" int fn_803FE914(RcHnd* h)
 {
     RcFile* o;
@@ -551,4 +631,31 @@ extern "C" int fn_803FE9F0(RcHnd* h)
     if (fn_803FCCCC(h, &o, &p) != 0)
         return 0;
     return o->m40 - o->m38;
+}
+
+extern "C" void fn_803FEA38(int h, int k, FsReqC* r)
+{
+    int n = fn_803F9A80(h);
+    r->h = 0;
+    if (k == 1) {
+        r->b += n;
+        r->c += n;
+        r->result += n;
+        if (n < r->len)
+            r->d = 0;
+        else
+            r->d -= n;
+        if (r->d > 0) {
+            if (r->d > 0x100000)
+                r->len = 0x100000;
+            else
+                r->len = r->d;
+            r->h = r->fn(r->a, r->b, r->c, r->len, r->e, (FsReqC*)r);
+            if (r->h != 0)
+                fn_803F96B0(r->h, (void (*)(int, int, RcFile*))fn_803FEA38);
+            else
+                r->d = r->h;
+        }
+    } else
+        r->d = 0;
 }

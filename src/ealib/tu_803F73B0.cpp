@@ -34,7 +34,7 @@ extern "C" int fn_8041E4E0(int);
 extern "C" int fn_8041B964(int, int*, int*);
 extern "C" int fn_8042030C(int, int, int);
 extern "C" int fn_803F8CB4(void*, const char*, int*);
-extern "C" void fn_803F8A2C(void*);
+extern "C" int fn_803F8A2C(void*);
 extern "C" void* memset(void*, int, unsigned);
 extern "C" int strncmp(const char*, const char*, unsigned);
 extern "C" void fn_803F6FC4(void*, int);
@@ -57,6 +57,45 @@ extern "C" int CARDGetStatus(int, int, void*);
 extern "C" int CARDRead(void*, void*, int, int);
 extern "C" int CARDWrite(void*, void*, int, int);
 extern "C" int strcmp(const char*, const char*);
+
+extern "C" int fn_8041DC98(int);
+extern "C" int fn_8041D30C(int, int*, int*);
+extern "C" int fn_803F8434(void*, void*, void*, int, int);
+extern int lbl_806EEA84;
+extern int lbl_806EEA80;
+/* Card status buffer (lbl_806ADDE0): fn_803F8A2C copies the +0x20..+0x2C words into the open record. */
+struct CardStatV {
+    char pad[0x20];
+    int m20;
+    int m24;
+    int m28;
+    unsigned short m2C;
+};
+extern CardStatV lbl_806ADDE0;
+/* Directory-scan record (pointed to by object +4). */
+struct RcRecB {
+    unsigned short m0;
+    unsigned short m2;
+    CardStatV* m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    unsigned short m18;
+};
+
+extern "C" int CARDCreate(int, const char*, int, void*);
+extern "C" int fn_803F80EC(void*, void*);
+extern "C" int fn_803F8F80(void*, char*);
+
+extern "C" int fn_8041BAB4(int, int*);
+extern "C" int fn_803F78CC(void*, unsigned short*);
+
+extern "C" int fn_803F8D8C(int unused, void* f, int off, int whence);
+
+extern "C" int fn_8041DBB4(int, int, void (*)());
+extern "C" int fn_8041D1EC(int);
+extern "C" void fn_803F773C(void);
 
 extern "C" int fn_803F73B0(void* o, int k)
 {
@@ -113,6 +152,21 @@ extern "C" void* fn_803F74D8(void* a, void* b)
     return b;
 }
 
+extern "C" int fn_803F74E0(void* o, unsigned short* h)
+{
+    int a = 0;
+    int b = 0;
+    int r;
+    do {
+        r = fn_8041D30C(*h, &a, &b);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    int rc = fn_803F73B0(o, r);
+    if (rc == 0 && b != lbl_806EEA80)
+        rc = 2;
+    return rc;
+}
+
 extern "C" int fn_803F7584(void* o, int a, void* b, int* out)
 {
     int n = fn_803F7EB4(o, b) + 0x44;
@@ -131,6 +185,62 @@ extern "C" void fn_803F773C()
     lbl_806EEA88 = 0;
 }
 
+extern "C" int fn_803F7748(void* o, unsigned short* h)
+{
+    int a;
+    int b;
+    int r;
+    int rc;
+    lbl_806EEA84 = 0;
+    a = 0;
+    b = 0;
+    do {
+        r = fn_8041D30C(*h, &a, &b);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    rc = fn_803F73B0(o, r);
+    if (rc == 0) {
+        do {
+            r = fn_8041DBB4(*h, RCI(o, 0x2bc), (void (*)())fn_803F773C);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+        rc = fn_803F73B0(o, r);
+        if (rc == 0 || rc == 0xd || rc == 6) {
+            do {
+                r = fn_8041D1EC(*h);
+                lbl_806EEA34->v6(1);
+            } while (r == -1);
+            rc = fn_803F73B0(o, r);
+            switch (rc) {
+            case 0:
+            case 6:
+            case 0xd:
+                lbl_806EEA84 = 1;
+            }
+            if (rc != 3)
+                lbl_806EEA88 = 1;
+            if (lbl_806EEA84 != 0)
+                RCI(o, 0x2c4) = *(int*)h;
+        }
+    }
+    return rc;
+}
+
+extern "C" int fn_803F78CC(void* o, unsigned short* h)
+{
+    int r;
+    if (lbl_806EEA84 != 0) {
+        lbl_806EEA84 = 0;
+        lbl_806EEA88 = 0;
+        do {
+            r = fn_8041DC98(*h);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+        return fn_803F73B0(o, r);
+    }
+    return 0;
+}
+
 extern "C" int fn_803F7E98(void* a, void* b)
 {
     int* t = (int*)RCI(b, 0x20);
@@ -145,6 +255,57 @@ extern "C" int fn_803F7EB4(void* a, void* b)
     if (t[10] == 0)
         return t[0] << 11;
     return t[0] * 3 << 9;
+}
+
+extern "C" int fn_803F80EC(void* o, void* b)
+{
+    int r = 0;
+    char* f = (char*)fn_803F74D8(o, b);
+    if (RCI(f, 0xc8) > 0) {
+        char* card = f + 0x48;
+        if (RCI(f, 0xd0) + RCI(f, 0x10) <= RCI(f, 0xcc) - RCI(o, 0x2b4) + RCI(f, 0xc8)) {
+            RCI(f, 0xc8) = (unsigned)(RCI(f, 0xd0) + RCI(f, 0x10)) % (unsigned)RCI(o, 0x2b4);
+            if (RCI(f, 0xc8) < RCI(o, 0x2b4)) {
+                do {
+                    ((char*)RCI(o, 0x2c0))[RCI(f, 0xc8)] = 0;
+                    RCI(f, 0xc8)++;
+                } while (RCI(f, 0xc8) < RCI(o, 0x2b4));
+            }
+        }
+        int w;
+        do {
+            w = CARDWrite(card, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(f, 0xcc));
+            lbl_806EEA34->v6(1);
+        } while (w == -1);
+        r = fn_803F73B0(o, w);
+    }
+    RCI(f, 0xd4) = 0;
+    return r;
+}
+
+extern "C" int fn_803F8604(void* o, void* b)
+{
+    int rc = 0;
+    char* f = (char*)fn_803F74D8(o, b);
+    int r;
+    if (RCI(f, 0xe0) == 0) {
+        rc = fn_803F8F80(o, f);
+    } else if (RCI(f, 0x3c) & 0x200) {
+        if (fn_803F80EC(o, b) == 0xf)
+            rc = 0xf;
+        do {
+            r = CARDClose(f + 0x48);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+    } else {
+        do {
+            r = CARDClose(f + 0x48);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+        rc = fn_803F73B0(o, r);
+    }
+    RCI(f, 0x40) = 0;
+    return rc;
 }
 
 extern "C" int fn_803F870C(void* a, void* b)
@@ -229,6 +390,54 @@ extern "C" void fn_803F89B0(void* o, int* a, RcRecA* p)
     memset(p->m18, 0, 2);
     RCI(RCI(o, 4), 0) = a[0];
     fn_803F8A2C(o);
+}
+
+extern "C" int fn_803F8A2C(void* o)
+{
+    while (((RcRecB*)RCI(o, 4))->m10 <= 0x7e) {
+        int r;
+        do {
+            RcRecB* p = (RcRecB*)RCI(o, 4);
+            r = CARDGetStatus(p->m0, p->m10, &lbl_806ADDE0);
+            lbl_806EEA34->v6(1);
+        } while (r == -1);
+        ((RcRecB*)RCI(o, 4))->m10++;
+        if (fn_803F73B0(o, r) == 0) {
+            ((RcRecB*)RCI(o, 4))->m4 = &lbl_806ADDE0;
+            ((RcRecB*)RCI(o, 4))->m8 = lbl_806ADDE0.m20;
+            ((RcRecB*)RCI(o, 4))->m14 = lbl_806ADDE0.m28;
+            ((RcRecB*)RCI(o, 4))->m18 = lbl_806ADDE0.m2C;
+            ((RcRecB*)RCI(o, 4))->mC = lbl_806ADDE0.m24;
+            return 0;
+        }
+    }
+    return 4;
+}
+
+extern "C" int fn_803F8B24(void* o, void* b, int off, int whence)
+{
+    char* f = (char*)fn_803F74D8(o, b);
+    if (RCI(f, 0xe0) == 0)
+        return fn_803F8D8C((int)o, f, off, whence);
+    if (RCI(f, 0xd4) != 0)
+        fn_803F80EC(o, b);
+    switch (whence) {
+    case 0:
+        off += RCI(f, 0xd0);
+        break;
+    case 1:
+        off += RCI(f, 0xcc) - RCI(o, 0x2b4) + RCI(f, 0xc8);
+        break;
+    case 2:
+        off = RCI(f, 0x10) + RCI(f, 0xd0) - off;
+        break;
+    }
+    if (off < 0 || off >= RCI(f, 0x7c))
+        return 0xb;
+    RCI(f, 0xcc) = off / RCI(o, 0x2b4) * RCI(o, 0x2b4);
+    RCI(f, 0xc8) = off % RCI(o, 0x2b4);
+    RCI(f, 0xdc) = 1;
+    return 0;
 }
 
 extern "C" int fn_803F8C44(void* o, int* a, void* b, int c)
@@ -350,6 +559,34 @@ extern "C" int fn_803F8F80(void* o, char* p)
     int rc = fn_803F73B0(o, r);
     if (rc == 0)
         RCI(p, 0x40) = rc;
+    return rc;
+}
+
+extern "C" int fn_803F9114(void* o, void* f)
+{
+    int rc = 0xf;
+    int blk = lbl_806EEA80;
+    int sum = 0;
+    int remain = RCI(f, 0xd0) - 4;
+    while (remain > 0) {
+        if (remain < lbl_806EEA80)
+            blk = remain;
+        rc = fn_803F8434(o, f, 0, blk, 0);
+        if (rc != 0)
+            break;
+        remain -= blk;
+        for (int i = 0; i < blk; i++)
+            sum += ((signed char*)RCI(o, 0x2c0))[i];
+    }
+    if (rc == 0) {
+        int stored = 0;
+        rc = fn_803F8434(o, f, &stored, 4, 0);
+        if (rc == 0) {
+            rc = 6;
+            if (stored == sum)
+                rc = 0;
+        }
+    }
     return rc;
 }
 
