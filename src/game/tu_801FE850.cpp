@@ -67,6 +67,69 @@ extern float lbl_805D516C;
 extern float lbl_805D5170;
 extern float lbl_805D5174;
 extern float lbl_805D5178;
+extern const float lbl_805D517C;
+extern const float lbl_805D5180;
+
+struct Unk802017E0_Game {
+    char pad0[0x38C];
+    int m38C;
+};
+
+struct Unk802017E0_G {
+    char pad0[4];
+    Unk802017E0_Game* m4;
+};
+
+struct Unk802017E0_Scr {
+    char pad0[0x9C];
+    Unk802017E0_G* m9C;
+};
+
+struct Unk802027B0_J {
+    char pad0[0x3B4];
+    void* m3B4;
+};
+
+struct Unk802027B0_Own {
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x554 - 0x50];
+    void* m554;
+    char pad558[0x700 - 0x558];
+    Unk802027B0_J* m700;
+};
+
+struct Unk802027B0_G {
+    Unk802027B0_Own* m0;
+};
+
+struct Unk802027B0_Scr {
+    char pad0[0x9C];
+    Unk802027B0_G* m9C;
+};
+
+struct Unk802027B0_P {
+    char pad0[0x540];
+    float m540;
+};
+
+extern const char lbl_805D51F8[];
+extern const float lbl_805D5230;
+extern const float lbl_805D5240;
+extern const float lbl_805D5244;
+extern const float lbl_805D5248;
+extern const float lbl_805D524C;
+extern const float lbl_805D5250;
+extern "C" unsigned fn_8014D8AC(void* o, int max, const char* file, int line);
+extern "C" float fn_80259A74(void* list, int id, int k);
+
+struct Unk802017E0_Vec {
+    float x;
+    float y;
+    float z;
+};
+
+extern "C" float fn_804028E4(float x); /* square root */
 
 extern "C" {
 
@@ -1031,6 +1094,36 @@ void fn_80201764(Unk80201738_Roster* r)
         *(int*)((char*)r + i * 4 + 8) = fn_801A497C(r->m0, 4, i);
         fn_8014E108(ip);
     }
+}
+
+int fn_802017E0(Unk802017E0_Scr* p, int, Unk802017E0_Vec* v)
+{
+    int r;
+    if (p->m9C->m4->m38C == 1) {
+        float len = fn_804028E4(v->x * v->x + v->y * v->y + v->z * v->z) * lbl_805D517C;
+        float thr = lbl_805D5180;
+        r = len >= lbl_805D5180;
+    } else
+        r = 0;
+    return r;
+}
+
+inline float RandPct27B0(Unk802027B0_Own* o, const char* f, int line)
+{
+    float k = lbl_805D5230;
+    return (float)fn_8014D8AC(o->m554, 1000000, f, line) * k * lbl_805D5240;
+}
+
+/* near-miss (14 slots): frame (p at 8, RandPct k at 0x10, q at 0x18) and arithmetic match; retail schedules the constant loads in a
+   different order (5244 before 5240, k reload into f13) */
+float fn_802027B0(Unk802027B0_Scr* s, Unk802027B0_P* pl)
+{
+    float p = RandPct27B0(s->m9C->m0, lbl_805D51F8, 0x1A7) + lbl_805D5244;
+    p = p * (lbl_805D5248 - pl->m540);
+    p = p + lbl_805D524C;
+    float q = fn_80259A74(s->m9C->m0->m700->m3B4, 9, 0);
+    q = q * p;
+    return (float)s->m9C->m0->m4C * lbl_805D5250 + q;
 }
 
 }
