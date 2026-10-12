@@ -3,6 +3,65 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800F1AEC.h"
+struct Ui198Obj : UiObj {
+    char pad40[0x198 - 0x40];
+    int m198;
+};
+struct Ui10D8C0 : UiObj {
+    char pad40[0x138 - 0x40];
+    UiObj* m138;
+    Ui198Obj* m13C;
+    char pad140[0x144 - 0x140];
+    int m144;
+    UiObj* m148;
+    char pad14C[0x150 - 0x14C];
+    int m150;
+    char pad154[0x158 - 0x154];
+    int m158;
+    int m15C;
+    int m160;
+    int m164;
+    char pad168[0x16C - 0x168];
+    int a16C[25];
+    char pad1D0[0x238 - 0x1D0];
+    UiObj* m238;
+    UiObj* m23C;
+    UiObj* m240;
+    UiObj* m244;
+};
+extern char lbl_805BE1D8[];
+extern char lbl_805B96DC[];
+extern char lbl_805BE1E4[];
+extern char lbl_805BA6D0[];
+extern char lbl_805BAF40[];
+extern char lbl_805BFA48[];
+extern char lbl_805BDC84[];
+extern char lbl_805BDC38[];
+extern char lbl_805BDDB8[];
+extern char lbl_805BFA54[];
+void fn_8010F550(UiObj* a);
+void fn_8011820C(UiObj* a);
+void fn_8010F9CC(UiObj* a, int b);
+struct Ui10D33C : UiObj {
+    char pad40[0x138 - 0x40];
+    UiObj* m138;
+    char pad13C[0x140 - 0x13C];
+    int m140;
+    int m144;
+    UiObj* m148;
+    UiObj* m14C;
+    char pad150[0x154 - 0x150];
+    int m154;
+    int m158;
+    char pad15C[0x168 - 0x15C];
+    int m168;
+    int a16C[25];
+    int a1D0[25];
+};
+void fn_80125084(UiObj* o, int a);
+void fn_80125180(UiObj* o, int a, int id);
+void fn_80125300(UiObj* o, int a, int b, int c);
+int fn_8010EAF4(Ui10D33C* self);
 struct Ui10A3FC : UiObj {
     char pad40[0x134 - 0x40];
     UiObj* m134;
@@ -469,6 +528,77 @@ void fn_8010D258()
     fn_8010D33C(o, 0);
 }
 
+extern "C" void fn_8010D33C(UiObj* o, int flag)
+{
+    Ui10D33C* self = (Ui10D33C*)o;
+    if (flag != 0) {
+        fn_80125084(self->m138, 0);
+        fn_80125084(self->m138, 3);
+        fn_80125084(self->m138, 1);
+        fn_80125084(self->m138, 4);
+        switch (self->m140) {
+        case 0:
+            fn_80125180(self->m138, 3, 0x37A2);
+            break;
+        case 1:
+            fn_80125180(self->m138, 3, 0x37A2);
+            break;
+        case 2:
+            fn_80125180(self->m138, 3, 0x37A2);
+            break;
+        }
+        return;
+    }
+    int t;
+    if (fn_8010EAF4(self) != 0) {
+        switch (self->m140) {
+        case 0:
+            if (self->m154 == 0 || self->m144 == 4)
+                fn_80125180(self->m138, 0, 0x10);
+            else
+                goto off;
+            break;
+        case 1:
+        case 2: {
+            int id = 0x3B96;
+            if (self->m144 == 2)
+                id = 0x3B98;
+            fn_80125180(self->m138, 0, id);
+            break;
+        }
+        }
+    } else {
+        t = self->m144;
+        if (t == 4 || t == 1) {
+        off:
+            fn_80125084(self->m138, 0);
+        } else
+            fn_80125180(self->m138, 0, 0xCF7);
+    }
+    fn_80125180(self->m138, 3, 0x1A2F);
+    fn_80125180(self->m138, 1, 0x1A0B);
+    fn_80125300(self->m138, 1, 4, 0x38C8);
+    Ui8011AA24* g = fn_8011AA24(0);
+    int e = fn_800B555C()->m570;
+    int z = (e ^ UiIntAt((char*)g->m6F8->m10 + 0x6C, self->m168)) == 0;
+    if (self->m140 == 0) {
+        if (self->a16C[self->m148->v60()] == 0)
+            goto z3;
+    }
+    if (self->m140 != 1)
+        return;
+    if (self->a1D0[self->m14C->v60()] == 0) {
+    z3:
+        fn_80125084(self->m138, 3);
+    }
+    if (self->m140 != 1)
+        return;
+    if (z == 0)
+        return;
+    if ((self->a1D0[self->m14C->v60()] == 0 && self->m158 == 0) || self->m14C->v93(self->m14C->v60(), 1) == 0)
+        fn_80125084(self->m138, 0);
+}
+
 int fn_8010D618(Ui10D618* self, int a)
 {
     if (fn_800B555C()->m570 == a) {
@@ -512,6 +642,39 @@ int fn_8010D618(Ui10D618* self, int a)
 void fn_8010D8B4(void* self, char* out)
 {
     *out = 0;
+}
+
+void fn_8010D8C0(Ui10D8C0* self)
+{
+    fn_8010F550(self);
+    UiObj* d = fn_800C8040(fn_800C8044(self->v32((int)lbl_805BE1D8, 1))->v32((int)lbl_805B96DC, 1));
+    char* b;
+    d->v28((b = (char*)fn_8011AA24(0)->m6F8->m10, b + (fn_800B555C()->m570 * 0x22 + 0x88)));
+    UiObj* e = fn_800C8044(fn_800C8044(self->v32((int)lbl_805BE1D8, 1))->v32((int)lbl_805BE1E4, 1));
+    fn_8011820C(e);
+    self->m158 = 0;
+    self->m15C = 0;
+    self->m160 = 0;
+    self->m164 = 0;
+    UiObj* h = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    self->m138 = h;
+    fn_80124FA8(h, self);
+    fn_8010D33C(self, 0);
+    fn_800C80C0(self->m138, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
+    Ui198Obj* o = (Ui198Obj*)fn_800B7AB8(UiGetMsgMgr(), lbl_805BAF40);
+    self->m13C = o;
+    o->m198 = -0x63;
+    fn_800C80C0(self->m13C, fn_800B555C()->m570);
+    self->m13C->v84(2, 0);
+    UiObj* c = fn_800C8044(self->v32((int)lbl_805BFA48, 1));
+    self->m238 = fn_800C8040(c->v32((int)lbl_805BDC84, 1));
+    self->m23C = fn_800C8038(c->v32((int)lbl_805BDC38, 1));
+    self->m240 = fn_800C8044(c->v32((int)lbl_805BDDB8, 1));
+    self->m244 = fn_800C8038(self->v32((int)lbl_805BFA54, 1));
+    self->m244->v8((unsigned)(self->m144 - 2) <= 1);
+    if (self->m150 == 0)
+        fn_8010F9CC(self, self->a16C[self->m148->v60()]);
 }
 
 void fn_8010DC14(UiV_148i_14Ci_158i_15Ci_160i_164i* self)

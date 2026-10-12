@@ -119,7 +119,7 @@ public:
     virtual void v90();
     virtual void v91(int a, int b, int c);
     virtual void v92();
-    virtual void v93();
+    virtual int v93(int a, int b);
     virtual void v94();
     virtual void v95();
     virtual void v96();
@@ -1324,7 +1324,7 @@ int fn_80097380(char* e, int p);
 int fn_800973E8(char* e, int p);
 int fn_80097450(char* e, int p);
 int fn_800974B8(char* e, int p);
-void fn_8010D33C(UiObj* o, int a);
+extern "C" void fn_8010D33C(UiObj* o, int a);
 
 void fn_80131F34(UiObj* o, UiObj* self, void (*cb)(int, UiObj*), int (*cb2)(), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 int fn_8010671C();
