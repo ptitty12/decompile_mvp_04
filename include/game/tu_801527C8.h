@@ -169,7 +169,7 @@ struct Unk801527C8_Actor {
     void* m3C;
     void* m40;
     int m44;
-    char pad48[4];
+    int m48;
     float m4C;
     Unk801527C8_Sub m50;
     char pad90[0x554 - 0x90];

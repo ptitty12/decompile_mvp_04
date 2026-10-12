@@ -119,6 +119,14 @@ inline void SetM4C(Unk8061FEDC_Obj* o, float v)
     o->m40.mC = v;
 }
 
+extern const float lbl_805C8A00;
+extern const float lbl_805C8A04;
+extern const float lbl_805C8A08;
+extern const int lbl_8061BD88[];
+extern "C" void fn_80326ED4(Unk801527C8_Sub* s, Unk80156838_Entry** e, int* n);
+extern "C" Unk80326F44_Out* fn_8033ACE8();
+float fn_80323848(int p);
+int fn_80326E64(Unk801527C8_Sub* s, int a);
 int cWait::fn_801567CC(Unk80156838_Entry* e) /* 801567CC */
 {
     switch (e->m0) {
@@ -181,6 +189,70 @@ cWaitForAnimation::cWaitForAnimation() : Unk80359B48(0x3C5D0164u) /* 80156CBC */
 
 void cWaitForAnimation::fn_vslot2() /* 80156D00 */
 {
+}
+
+extern "C" int fn_8015697C(cWait* self, Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 8015697C */
+{
+    Unk801527C8_Actor* act = ctx->mA54;
+    Unk801527C8_Actor* ow = ctx->mA4C;
+    float t = (act->m44 != 0 || act->m48 == 0) ? act->m4C : fn_80323848(act->m48);
+    Unk801527C8_Sub* sub = &ow->m50;
+    Unk80156838_Entry* e;
+    int n;
+    fn_80326ED4(sub, &e, &n);
+    if (act->m44 != 0) {
+        int c = fn_80326E64(sub, 0) - 0x1E;
+        if ((int)(t * lbl_805C8A00) > c) {
+            return 1;
+        }
+    }
+    if (self->mC != 0) {
+        Unk801527C8_Actor* cur = ctx->mA54;
+        if (cur == fn_801A04A8(ctx->mA4C, 0)) {
+            return 0;
+        }
+        if (f3 - self->m8 <= lbl_805C8A04) {
+            return 0;
+        }
+        int x = self->fn_80156838(e, n, t);
+        int y = self->fn_80156904(e, n, t);
+        if (x != 0 || y != 0) {
+            return 0;
+        }
+        return 1;
+    }
+    Unk80326F44_Out out = lbl_805EBA10;
+    int key = lbl_8061BD88[self->m4];
+    char* d = (char*)act->m40;
+    Unk80326F44_Out* p7 = (Unk80326F44_Out*)(d + 0x3D48);
+    switch (key) {
+    case 0xC5:
+        out = *fn_8033ACE8();
+        break;
+    case 0xA7:
+        out = *p7;
+        break;
+    case 0xA8:
+        out = *(Unk80326F44_Out*)(d + 0x3D60);
+        break;
+    case 0xA9:
+        out = *(Unk80326F44_Out*)(d + 0x3D78);
+        break;
+    default:
+        out = sub->fn_80326FC4(key, 1, lbl_805C8A08);
+        break;
+    }
+    int ok = 1;
+    if (out.m0 == 0xC7) {
+        ok = 0;
+    }
+    if (ok != 0) {
+        float f = out.m4 + self->m8;
+        if (f > t) {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 extern "C" void* fn_801572FC(Unk80159F28* self, Unk801527C8_Ctx* ctx) /* 801572FC */
