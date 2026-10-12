@@ -68,6 +68,10 @@ extern McCfg2 lbl_8069B7B8;
 extern int lbl_8069B80C[];
 extern "C" int fn_803948C0(int);
 
+extern "C" unsigned fn_80394CE0();
+extern "C" int fn_80394E3C(int a, int n, int b);
+extern "C" void fn_80394EE4(int a, int b);
+
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
@@ -159,6 +163,38 @@ extern "C" void fn_80394F24(int seed)
     int n = 0x20 - (seed % 32);
     for (i = 0; i < n; i++)
         fn_80394FD4(10, -1);
+}
+
+extern "C" int fn_80394FD4(int a, int b)
+{
+    int cnt = 0;
+    int done = 0;
+    int n = a / 2;
+    int best = -1;
+    if (n > 10)
+        n = 10;
+    unsigned v = ((fn_80394CE0() >> 16) * a) >> 16;
+    unsigned pick = v;
+    if (b != -1) {
+        b = (unsigned short)b;
+        do {
+            int r = fn_80394E3C(v, n, b);
+            if (r == -1) {
+                pick = v;
+                done = 1;
+            } else if (r > best) {
+                best = r;
+                pick = v;
+            }
+            cnt++;
+            if (cnt > 0x1F)
+                done = 1;
+            if (done == 0)
+                v = ((fn_80394CE0() >> 16) * a) >> 16;
+        } while (done == 0);
+        fn_80394EE4(pick, b);
+    }
+    return v;
 }
 
 extern "C" int fn_80395250(int x, unsigned y)
