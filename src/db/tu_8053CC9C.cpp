@@ -17,7 +17,65 @@ extern DbPmf lbl_806015A8[];
 extern const float lbl_805FEDA0;
 extern Db8053CC9C_A5 lbl_805FEDA4;
 
+/* Q18 types */
+struct Db8053CC9C_R1C {
+    char pad0[0x1C];
+    unsigned m1C;
+};
+
+int fn_800849C0(int a);
+/* end Q18 types */
+
 extern "C" {
+/* Q18 protos */
+Unk80071604* fn_8053CC9C(Unk80071604* self, const char* name, Obj* type, unsigned count);
+void fn_8053CD18(Unk80071604* self, int chrg);
+void fn_8053CD74(Unk80071604* self, unsigned i);
+int fn_8053CDB0(void* l, int k);
+int fn_8053CE50(void* l, int k);
+int fn_8053CE9C(void* l, int k, unsigned c);
+char* fn_8053D090(void* l, int k, unsigned c, char* out);
+float fn_8053D110(void* o, int i, int a);
+void fn_8053D1A8(void* l, int k, unsigned c, int v);
+void fn_8053D580(Unk80071604* a, signed char k, unsigned c, const char* src, int n);
+float fn_8053D66C(G* self, int a);
+float fn_8053D6D8(G* self, int a);
+float fn_8053D744(G* self, int a);
+float fn_8053D7B4(G* self, int a);
+float fn_8053D830(G* self, int a);
+float fn_8053D8AC(G* self, int a);
+void fn_8053D900(Unk80071604* self, int a, VObj* obj);
+Unk80071604* fn_8053D95C(Unk80071604* self, const char* name, Obj* type, unsigned count);
+void fn_8053D9D8(Unk80071604* self, int chrg);
+void fn_8053DA34(Unk80071604* self, unsigned i);
+int fn_8053DA70(void* self);
+int fn_8053DA78(void* self);
+int fn_8053DA80(void* self);
+int fn_8053DA88(void* self, int a, int b, int c);
+float fn_8053DA90();
+void fn_8053DAAC();
+void fn_8053DAB0();
+void fn_8053DAB4(Unk80071604* self, int a, VObj* obj);
+Unk80084910_T8* fn_8053DB10(K8* self, int i);
+Unk80084910_T8* fn_8053DB20(K8* self, int i);
+R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src);
+void* fn_8053DD34(void* self, int a);
+Db8053CC9C_SrcBits* fn_8053DD68(Db8053CC9C_SrcBits* dst, Db8053CC9C_Src2* src);
+int fn_8053DDE8();
+int fn_8053DDF0(int i);
+int fn_8053DE38(void* c, int id, int k, float f);
+int fn_8053DF70(void* c, int id, int k, float f);
+/* end Q18 protos */
+
+/* Q18 decls */
+float fn_8053E0B4(void* c, int k);
+extern "C" float fn_8007BB28__18Unk8007B2B0_Screeniii(void* s, int a, int b, int c);
+extern "C" int fn_80539A84(int k);
+extern "C" float fn_800748D4(void* s, int a, int b, int c);
+extern "C" Db8053CC9C_R1C* fn_8007FE04__FP13Unk8007F198_D(void* g);
+extern "C" int fn_800A2E6C(void* g);
+extern "C" float fn_80541CDC(float a, float b, float c, float d, float e);
+/* end Q18 decls */
 
 DB_OVERLAY Unk80071604* fn_8053CC9C(Unk80071604* self, const char* name, Obj* type, unsigned count)
 {
@@ -412,7 +470,6 @@ DB_OVERLAY void fn_8053D1A8(void* l, int k, unsigned c, int v)
     }
 }
 
-
 DB_OVERLAY void fn_8053D580(Unk80071604* a, signed char k, unsigned c, const char* src, int n)
 {
     if (c < a->m1C) {
@@ -636,6 +693,42 @@ DB_OVERLAY int fn_8053DDF0(int i)
 {
     Db8053CC9C_A5 a = lbl_805FEDA4;
     return a.w[i];
+}
+
+DB_OVERLAY int fn_8053DE38(void* c, int id, int k, float f)
+{
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    int t = s->fn_8007A6A0(5, id);
+    if (t == 0 || t == 10) {
+        float a = fn_800748D4(s, 0, id, k);
+        float b = fn_8007FE04__FP13Unk8007F198_D(s)->m1C;
+        float d = fn_8053E0B4(c, k);
+        float thr = 0.0f;
+        if (!(d <= 0.0f)) {
+            if (t == 0)
+                thr = a * 9.0f;
+            else
+                thr = a * 27.0f;
+            if (thr >= f * d * b)
+                return 1;
+        }
+    }
+    return 0;
+}
+
+DB_OVERLAY int fn_8053DF70(void* c, int id, int k, float f)
+{
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    float b = fn_8007FE04__FP13Unk8007F198_D(s)->m1C;
+    float g = 0.0f;
+    float d = fn_8053E0B4(c, k);
+    if (!(d > 0.0f))
+        return 0;
+    if (fn_800A2E6C(lbl_80619948) != 0)
+        return 1;
+    g = fn_80541CDC(b, d, 3.1f, 2.0f, 1.0f);
+    float h = s->fn_800739E0(0xB, id, k, 2);
+    return h >= f * g;
 }
 
 }

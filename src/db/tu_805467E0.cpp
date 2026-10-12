@@ -26,7 +26,68 @@ static inline void IntSet(char* b, int off, int v)
     *(int*)(b + off) = v;
 }
 
+/* Q18 types */
+int fn_8008FED8(int a);
+
+int fn_8008FBE8(int a);
+int fn_8008FE14(int a);
+
+unsigned fn_8007F84C(Unk8007F198_B* g);
+
+struct Db805467E0_T3 {
+    float f;
+    int a;
+    int b;
+};
+/* end Q18 types */
+
 extern "C" {
+/* Q18 protos */
+int fn_80546A24(char* o, int id, int a, int b, float f);
+int fn_80546B18(char* o, int a, int b);
+int fn_80546BCC(char* o, int a, int b);
+int fn_80546C88(char* o, int i);
+int fn_80546CA8(char* o, int a, int b);
+void fn_80546D0C(char* o);
+void fn_80546D4C(char* o);
+void fn_80546D5C(char* o, int a);
+int fn_805474B8(char* o, int a);
+void fn_80547594(char* o, int a);
+void fn_805479F0(char* o, int kind, int x);
+void fn_80547B38(char* o, int kind, int x);
+void fn_80547C5C(char* o);
+int fn_80547E10(char* o, int a);
+int fn_80547FFC(char* o, int a, int id);
+void fn_805480E8(char* o);
+void fn_80548128(char* o, int a);
+int fn_805481D8(char* o);
+void fn_805482D4(char* o);
+void fn_805483C4(char* o);
+Ev* fn_80548858(Ev* e);
+void fn_80548894(Ev* e, int a, int b, int c, V* v);
+void fn_805488E0(Ev* e, int v);
+void fn_805488E8(Ev* e, V* v);
+void fn_80548908(Ev* e);
+Q* fn_80548934(Q* o);
+void fn_8054899C(Q* q);
+void fn_805489FC(Q* q, int i);
+void fn_80548B08(Q* q, int v);
+int fn_80548B6C(Ev* e, int id);
+int fn_80548BA0(Q* q, int a, int id, V* v, int c, int flag);
+void fn_80548C7C(Q* q, int a, int b);
+int fn_80548CFC(Ev* q, int id);
+int* fn_80548D2C(Q* q, int id);
+void* fn_80548D78(Q* q, int id);
+int fn_80548DC0(Q* q, int id);
+int fn_80548E0C(Q* q, int i);
+int fn_80548E1C(Q* q, int i);
+int* fn_80548E2C(Q* q, int i);
+Ev* fn_80548E3C(Q* q, int i);
+Db805467E0_W3* fn_80548E48(Q* q, int i);
+int* fn_80548E58(Q* q, int i);
+void fn_80548E68(Q* q, int n);
+void fn_805494DC(char* o, int id, int a, int b, int c, int flag, int d, float f);
+/* end Q18 protos */
 
 /* protos */
 int fn_80546B18(char* o, int a, int b);
@@ -62,6 +123,53 @@ Db805467E0_W3* fn_80548E48(Q* q, int i);
 int* fn_80548E58(Q* q, int i);
 void fn_80548E68(Q* q, int n);
 /* end protos */
+/* Q18 decls */
+extern "C" void fn_8053967C(void* l);
+extern "C" void fn_8053971C(void* l);
+extern "C" void fn_805362AC(char* o, int a);
+extern "C" int rand();
+extern "C" void fn_80535EAC(void* l);
+extern "C" void fn_80400CE4(int a);
+extern "C" void fn_800A1930(void* g, int id, int b, int d, float f);
+extern "C" int fn_80077BC4(void* s, int id);
+extern "C" void fn_800793E8(void* s, int id, void* p1, void* p2, void* p3);
+extern "C" int fn_80564ABC(int a, int b, int c, int d, float* e, int* f, int g);
+extern "C" void fn_80539DB4(void* l, int e);
+extern "C" void fn_8053A044(void* l, int a, int b);
+extern "C" void fn_80539EDC(void* l, int e);
+extern "C" void fn_80542580(void* o);
+/* end Q18 decls */
+
+/* near-miss: 96.7%; only the prologue order of the float-param spill and the r6 copy differs */
+DB_OVERLAY int fn_80546A24(char* o, int id, int a, int b, float f)
+{
+    unsigned n = *(unsigned*)(o + 4);
+    unsigned i = 0;
+    int idx;
+    for (; i < n; i++) {
+        if (*(int*)((char*)*(int**)o + i * 4) == id) {
+            idx = i;
+            goto found;
+        }
+    }
+    idx = -1;
+found:
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int off = idx * 16;
+    struct {
+        float f;
+        int a;
+        int c;
+    } st;
+    st.f = f;
+    int t = IntAt(o + 0x3CCC, off);
+    st.a = a;
+    st.c = ((Unk8007A4DC_Screen*)s)->fn_8007A270(id) != 0 ? 0xE : 0xB;
+    int r = s->fn_80079094(id, s->fn_80075948(t), (int)&st.f, (int)&st.f, (int)&st.f, b);
+    if (r == 0)
+        IntSet(o + 0x3CD4, off, 1);
+    return r;
+}
 
 DB_OVERLAY int fn_80546B18(char* o, int a, int b)
 {
@@ -105,15 +213,6 @@ DB_OVERLAY int fn_80546BCC(char* o, int a, int b)
         return 0;
     return s->fn_8007B320(k, h);
 }
-
-
-
-
-
-
-
-
-
 
 void fn_8036179C(void* p);
 
@@ -226,11 +325,282 @@ DB_OVERLAY void fn_80547594(char* o, int a)
     fn_805362AC(o, 1);
 }
 
+/* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */
+DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
+{
+    IntSet(o + 0x10000, 0x7F8, x);
+    IntSet(o + 0x10000, 0x7F0, 1);
+    char* l = o + 0x32E0;
+    fn_80546D0C(o);
+    unsigned i = 0;
+    fn_8053967C(l);
+    if (kind == 0) {
+    } else if (kind == 1) {
+        Db8053967C_List* ll = (Db8053967C_List*)l;
+        if (i < ll->m4) {
+            int off = 0;
+            do {
+                ll = (Db8053967C_List*)(o + 0x32E0);
+                unsigned r;
+                if (ll->m4 != i)
+                    r = rand() % (ll->m4 - i);
+                else
+                    r = 0;
+                unsigned j = r + i;
+                int jo = j * 4;
+                int* d = (int*)IntAt(o, 0x32E0);
+                int xv = *(int*)((char*)d + jo);
+                int yv = *(int*)((char*)d + off);
+                if (i >= ll->m4)
+                    ll->m4 = i + 1;
+                *(int*)(off + IntAt(o, 0x32E0)) = xv;
+                if (j >= ll->m4)
+                    ll->m4 = j + 1;
+                *(int*)(jo + IntAt(o, 0x32E0)) = yv;
+                i++;
+                off += 4;
+            } while (i < ll->m4);
+        }
+    } else if (kind == 2) {
+        fn_805482D4(o);
+    }
+    IntSet(o, 0x32EC, 0);
+    fn_8053971C(o);
+    IntSet(o + 0x10000, 0x7EC, *(int*)(o + 4));
+    fn_805362AC(o, 1);
+    fn_80542580(o + 0x10800);
+    fn_80400CE4(0);
+}
+
+/* near-miss: 95.9%; callee-saved registers permuted (retail reuses the list/kind registers inside the loop); instruction stream identical */
+DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
+{
+    IntSet(o + 0x10000, 0x7FC, x);
+    IntSet(o + 0x10000, 0x7F4, 1);
+    char* l = o + 0x3500;
+    fn_80546D4C(o);
+    unsigned i = 0;
+    fn_80535EAC(l);
+    if (kind == 0) {
+    } else if (kind == 1) {
+        Db8053967C_List* ll = (Db8053967C_List*)l;
+        if (i < ll->m4) {
+            int off = 0;
+            do {
+                ll = (Db8053967C_List*)(o + 0x3500);
+                unsigned r;
+                if (ll->m4 != i)
+                    r = rand() % (ll->m4 - i);
+                else
+                    r = 0;
+                unsigned j = r + i;
+                int jo = j * 4;
+                int* d = (int*)IntAt(o, 0x3500);
+                int xv = *(int*)((char*)d + jo);
+                int yv = *(int*)((char*)d + off);
+                if (i >= ll->m4)
+                    ll->m4 = i + 1;
+                *(int*)(off + IntAt(o, 0x3500)) = xv;
+                if (j >= ll->m4)
+                    ll->m4 = j + 1;
+                *(int*)(jo + IntAt(o, 0x3500)) = yv;
+                i++;
+                off += 4;
+            } while (i < ll->m4);
+        }
+    } else if (kind == 2) {
+        fn_805483C4(o);
+    }
+    IntSet(o, 0x350C, 0);
+    fn_80400CE4(0);
+}
+
+DB_OVERLAY void fn_80547C5C(char* o)
+{
+    unsigned n = *(unsigned*)(o + 0x3504);
+    Unk8006A138_It<4> it(0);
+    int e = 0;
+    do {
+        char* l = o + 0x35B8;
+        fn_80539EDC(l, e);
+        *(int*)(l + 0xC) = 0;
+        int j = 0;
+        int c = fn_8008FBE8(it.v);
+        if (j < c) {
+            do {
+                unsigned k = 0;
+                int id = fn_8008FE14(fn_8008FC40(it.v, j));
+                if (k < n) {
+                    do {
+                        fn_80547E10(o, id);
+                        k++;
+                    } while (k < n);
+                }
+                j++;
+            } while (j < c);
+        }
+        e = it.Next();
+    } while (e <= 4);
+}
+
+DB_OVERLAY int fn_80547E10(char* o, int a)
+{
+    char* l = o + 0x3500;
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int x = *(int*)(IntAt(o, 0x35C4) * 4 + IntAt(o, 0x35B8));
+    int h = s->fn_8007B380(a, *(int*)(IntAt(l, 0xC) * 4 + IntAt(l, 0)));
+    int r;
+    if (h == 0) {
+        r = fn_80547FFC(o, a, x);
+    } else {
+        fn_800905FC(fn_8008FD78(fn_8008FED8(a)), h, 3);
+        r = 0;
+    }
+    *(unsigned*)(l + 0xC) = (*(unsigned*)(l + 0xC) + 1) % *(unsigned*)(l + 4);
+    return r;
+}
+
+DB_OVERLAY int fn_80547FFC(char* o, int a, int id)
+{
+    if (IntAt(o + 0x10000, 0x7F4) == 1) {
+        Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+        char* l = o + 0x3500;
+        int u = fn_8008FED8(a);
+        struct { float f; int v; } p;
+        fn_80564ABC(lbl_80619948->m40, *(int*)(IntAt(l, 0xC) * 4 + IntAt(o, 0x3500)), id, u, &p.f, &p.v, 0);
+        int h = s->fn_80079ADC(p.f);
+        int w = fn_8008FD78(u);
+        fn_80090540(w, id, h);
+        fn_800905FC(w, id, p.v);
+        s->fn_8007B440(a, *(int*)(IntAt(l, 0xC) * 4 + IntAt(o, 0x3500)), id);
+    }
+    return 0;
+}
+
 DB_OVERLAY void fn_805480E8(char* o)
 {
     fn_80546D0C(o);
     fn_805484A0(o);
     *(int*)(o + 0x107EC) = *(int*)(o + 4);
+}
+
+DB_OVERLAY void fn_80548128(char* o, int a)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int h = fn_80083FC0(a);
+    Db8053967C_List* l = (Db8053967C_List*)(o + 0x32E0);
+    unsigned i = 0;
+    if (i < l->m4) {
+        int off = 0;
+        do {
+            int r = s->fn_8007B320(h, s->fn_80075948(*(int*)(IntAt(o, 0x32E0) + off)));
+            if (i >= l->m4)
+                l->m4 = i + 1;
+            i++;
+            *(int*)(off + IntAt(o, 0x32E0)) = r;
+            off += 4;
+        } while (i < l->m4);
+    }
+    fn_80542580(o + 0x10800);
+}
+
+DB_OVERLAY int fn_805481D8(char* o)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk8007F198_B* g = (Unk8007F198_B*)lbl_8061930C;
+    int e = *(int*)(IntAt(o, 0x32EC) * 4 + IntAt(o, 0x32E0));
+    int h = s->fn_80075948(e);
+    unsigned v = s->fn_80078A38(e);
+    if (IntAt(o + 0x10000, 0x7F0) == 1) {
+        switch (IntAt(o + 0x10000, 0x7F8)) {
+        case 1:
+            if (v != 0)
+                return 0;
+            break;
+        case 2:
+            if (v > 1)
+                return 0;
+            break;
+        case 3:
+            if (v > 2)
+                return 0;
+            break;
+        case 4:
+            break;
+        default:
+            return 0;
+        }
+    }
+    unsigned i;
+    for (i = 0; i < fn_8007F84C(g); i++) {
+        if (fn_8007F7D0(g, i) == h)
+            return 1;
+    }
+    return 0;
+}
+
+DB_OVERLAY void fn_805482D4(char* o)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk8007F198_B* g = (Unk8007F198_B*)lbl_8061930C;
+    unsigned i = 0;
+    int off = 0;
+    for (; i < fn_8007F84C(g); off += 4, i++) {
+        int id = fn_8007F7D0(g, i);
+        Db8053967C_List* l = (Db8053967C_List*)(o + 0x32E0);
+        unsigned j = i + 1;
+        if (j < l->m4) {
+            int joff = j * 4;
+            do {
+                if (s->fn_80075948(*(int*)(IntAt(o, 0x32E0) + joff)) == id) {
+                    int* d = (int*)IntAt(o, 0x32E0);
+                    int y = *(int*)((char*)d + off);
+                    int x = *(int*)((char*)d + joff);
+                    if (i >= l->m4)
+                        l->m4 = i + 1;
+                    *(int*)(off + IntAt(o, 0x32E0)) = x;
+                    if (j >= l->m4)
+                        l->m4 = j + 1;
+                    *(int*)(joff + IntAt(o, 0x32E0)) = y;
+                    break;
+                }
+                j++;
+                joff += 4;
+            } while (j < l->m4);
+        }
+    }
+}
+
+/* near-miss: 97.7%; the inner loop's back edge reloads the list count before the increments in retail, after them in ours */
+DB_OVERLAY void fn_805483C4(char* o)
+{
+    Unk8007F198_B* g = (Unk8007F198_B*)lbl_8061930C;
+    unsigned i = 0;
+    int off = 0;
+    for (; i < fn_8007F84C(g); i++, off += 4) {
+        int id = fn_8007F7D0(g, i);
+        Db8053967C_List* l = (Db8053967C_List*)(o + 0x3500);
+        unsigned j = i + 1;
+        if (j < l->m4) {
+            int joff = j * 4;
+            do {
+                int* d = (int*)IntAt(o, 0x3500);
+                int x = *(int*)((char*)d + joff);
+                if (x == id) {
+                    int y = *(int*)((char*)d + off);
+                    if (i >= l->m4)
+                        l->m4 = i + 1;
+                    *(int*)(off + IntAt(o, 0x3500)) = x;
+                    if (j >= l->m4)
+                        l->m4 = j + 1;
+                    *(int*)(joff + IntAt(o, 0x3500)) = y;
+                    break;
+                }
+                j++;
+                joff += 4;
+            } while (j < l->m4);
+        }
+    }
 }
 
 DB_OVERLAY Ev* fn_80548858(Ev* e)
@@ -299,6 +669,23 @@ DB_OVERLAY void fn_8054899C(Q* q)
     Db805467E0_S* s = &q->sCE8;
     s->m4 = 0;
     s->m8 = 0;
+}
+
+/* near-miss: 98.4%; retail stores the last copied m28 to an 8-byte frame slot after the loop (frame 24 vs ours 16); loop body matches */
+DB_OVERLAY void fn_805489FC(Q* q, int i)
+{
+    if ((unsigned)i < (unsigned)q->mCE4) {
+        int last = q->mCE4 - 1;
+        int j = i;
+        for (; j < last; j++) {
+            Ev* p = &q->ev[j];
+            const void* keep = p->m28;
+            *p = q->ev[j + 1];
+            p->m28 = keep;
+        }
+        fn_80548908(&q->ev[j]);
+        q->mCE4--;
+    }
 }
 
 DB_OVERLAY void fn_80548B08(Q* q, int v)
@@ -439,6 +826,32 @@ DB_OVERLAY void fn_80548E68(Q* q, int n)
     l->m4 = 0;
     l->mC = 0;
     l->m14 = 0;
+}
+
+DB_OVERLAY void fn_805494DC(char* o, int id, int a, int b, int c, int flag, int d, float f)
+{
+    Db805467E0_T3 v1;
+    Db805467E0_T3 v2;
+    Db805467E0_T3 v3;
+    v1.f = f;
+    v1.a = b;
+    v1.b = c;
+    v2.f = *(float*)(o + 4);
+    v2.a = *(int*)(o + 0xC);
+    v2.b = *(int*)(o + 0x1C);
+    v3.f = *(float*)(o + 8);
+    v3.a = *(int*)(o + 0x10);
+    v3.b = *(int*)(o + 0x18);
+    if (flag != 0) {
+        fn_800A1930(lbl_80619948, id, b, d, v1.f);
+    } else {
+        Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+        int h = s->fn_80075948(a);
+        if (fn_80077BC4(s, id) != 0)
+            fn_800793E8(s, id, &v1, &v2, &v3);
+        else
+            s->fn_80079094(id, h, (int)&v1, (int)&v2, (int)&v3, d);
+    }
 }
 
 }

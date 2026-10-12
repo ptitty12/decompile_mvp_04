@@ -38,6 +38,54 @@ extern "C" float fn_8052A3C0(Unk8052A220_PalData* self, float a, int b);
 extern "C" void fn_8052A220(Unk8052A220_PalData* p);
 extern "C" void* fn_803FFA60(void* d, const void* s, unsigned n);
 
+/* Q18 types */
+struct Db8052A220_S12 {
+    int w0;
+    int w1;
+    int w2;
+};
+/* end Q18 types */
+
+extern "C" {
+/* Q18 protos */
+void fn_8052A220(Unk8052A220_PalData* p);
+int fn_8052A35C(Unk8052A220_PalData* self, float a, float b);
+float fn_8052A3C0(Unk8052A220_PalData* self, float a, int b);
+void fn_8052A404(Unk8052A220_PalData* p, float v, unsigned idx);
+float fn_8052A894(Unk8052A220_PalData* p, unsigned idx);
+void fn_8052AD9C(Unk8052A220_Pal* self, int a, Unk80070DDC_Stream* io);
+void fn_8052ADDC(Unk8052A220_Pal* self);
+void fn_8052AE1C(Unk8052A220_Pal* self, int a, Unk80070DDC_Stream* io);
+void fn_8052B1DC(Unk8052B1DC_Sub* p);
+void fn_8052B204(Unk8052B1DC_Sub* self, int a, Unk80070DDC_Stream* io);
+Unk8052A220_PalData* fn_8052B568(Unk8052A220_PalData* self, const Unk8052A220_PalData* src);
+void fn_8052B59C(Unk8052B5C4_Ent* p);
+void fn_8052B5C4(Unk8052B5C4_Ent* e, int v);
+void fn_8052B5E8(Unk8052B5C4_Ent* e, int v);
+void fn_8052B624(Unk8052B5C4_Ent* e, int v);
+void fn_8052B644(Unk8052B5C4_Ent* self, int a, Unk80070DDC_Stream* io);
+Unk8052B978_Tbl* fn_8052B978(Unk8052B978_Tbl* self, int n);
+void fn_8052BA1C(Unk8052B978_Tbl* self, int chrg);
+void fn_8052BA70(Unk8052B978_Tbl* self);
+void fn_8052BAA8(Unk8052B978_Tbl* self, int idx);
+void fn_8052BAFC(Unk8052B978_Tbl* self, int idx);
+void fn_8052BB50(Unk8052B978_Tbl* self, int idx);
+void fn_8052BBA4(Unk8052B978_Tbl* self, int idx);
+void fn_8052BBF8(Unk8052B978_Tbl* self, int idx);
+void fn_8052BC4C(Unk8052B978_Tbl* self, int v);
+unsigned fn_8052BCC8(Unk8052B978_Tbl* self);
+int fn_8052BD40(Unk8052B978_Tbl* self);
+Db8052A220_S12 fn_8052BD58(Unk8052B978_Tbl* t);
+int fn_8052BE28(Unk8052B978_Tbl* self, int a, int b, int c, int d, int e);
+void fn_8052BED8(Unk8052B978_Tbl* self, int i);
+int fn_8052C390(Unk8052B978_Tbl* self, int key);
+void fn_8052C494(Unk8052B978_Tbl* self, int a, Unk80070DDC_Stream* io);
+void fn_8052C520(Unk8052B978_Tbl* self, char** pp, Unk80070DDC_Stream* io);
+void fn_8052C9B0(char** pp);
+void fn_8052CA10(char** pp);
+/* end Q18 protos */
+}
+
 extern "C" DB_OVERLAY void fn_8052A220(Unk8052A220_PalData* p)
 {
     int v = fn_8052A35C(p, lbl_805FDC3C, lbl_805FDC40);
@@ -578,6 +626,35 @@ extern "C" DB_OVERLAY int fn_8052BD40(Unk8052B978_Tbl* self)
     int r = -1;
     if (n != 0)
         r = n - 1;
+    return r;
+}
+
+/* near-miss: 99.96%; the two zero stores of the n == 0 path (frame +8 and +0xC) come out in the opposite order */
+extern "C" DB_OVERLAY Db8052A220_S12 fn_8052BD58(Unk8052B978_Tbl* t)
+{
+    Db8052A220_S12 r;
+    Db8052A220_S12* q = &r;
+    r.w0 = -1;
+    q->w1 = -1;
+    q->w2 = 1;
+    unsigned n = t->m4;
+    unsigned idx = fn_8052BCC8(t);
+    if (idx < n) {
+        r.w2 = 0;
+        Unk8052B5C4_Ent* e = (Unk8052B5C4_Ent*)(idx * 0x1C + (int)t->m8);
+        r.w0 = e->m0;
+        r.w1 = e->f2 + 0x21C;
+    } else {
+        r.w2 = 1;
+        if (n != 0) {
+            Unk8052B5C4_Ent* e = (Unk8052B5C4_Ent*)((n - 1) * 0x1C + (int)t->m8);
+            r.w0 = e->m0;
+            r.w1 = e->f2 + 0x21C;
+        } else {
+            r.w1 = n;
+            r.w0 = n;
+        }
+    }
     return r;
 }
 
