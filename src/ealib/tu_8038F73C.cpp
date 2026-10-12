@@ -516,6 +516,105 @@ extern "C" void fn_803908EC(unsigned char* src, int a, int b)
         lbl_8069ACB8[i] = fn_80401BBC((b * lbl_80607218[i]) << 13, lbl_806242E0[i]);
 }
 
+extern "C" int fn_80390D54();
+extern "C" void fn_80391194(int* dst, int stride);
+extern int lbl_8069ADB8[];
+extern int lbl_8069ADD8[];
+extern int lbl_8069AFB8[];
+extern int lbl_8069AFD8[];
+extern int lbl_8069B1B8[];
+extern int lbl_8069B2B8[];
+extern "C" void fn_803909C4(unsigned char* y, unsigned char* u, unsigned char* v, unsigned char* oy, unsigned char* ou, unsigned char* ov, int stride)
+{
+    int half = stride >> 1;
+    unsigned flags;
+    if (lbl_806EF398 == 0) {
+        flags = 0;
+    } else if (!(lbl_806EF38C & 0xC0000000)) {
+        flags = 0;
+        fn_80390504(2);
+    } else {
+        if ((int)lbl_806EF38C < 0) {
+            flags = 0x3FF;
+            fn_80390504(1);
+        } else {
+            flags = lbl_806EF38C >> 24;
+            fn_80390504(8);
+        }
+        int dx = fn_8039055C();
+        int dy = fn_8039055C();
+        y += dy * stride + dx;
+        dx >>= 1;
+        dy >>= 1;
+        int c = dy * half + dx;
+        u += c;
+        v += c;
+    }
+    if ((flags & 1) == 0) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069ADB8, 0x10);
+        } else {
+            fn_80391194(lbl_8069ADB8, 0x10);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_803905FC(y, stride, lbl_8069ADB8, bias);
+    }
+    if (!(flags & 2)) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069ADD8, 0x10);
+        } else {
+            fn_80391194(lbl_8069ADD8, 0x10);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_803905FC(y + 8, stride, lbl_8069ADD8, bias);
+    }
+    if (!(flags & 4)) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069AFB8, 0x10);
+        } else {
+            fn_80391194(lbl_8069AFB8, 0x10);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_803905FC(y + stride * 8, stride, lbl_8069AFB8, bias);
+    }
+    if (!(flags & 8)) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069AFD8, 0x10);
+        } else {
+            fn_80391194(lbl_8069AFD8, 0x10);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_803905FC(y + stride * 8 + 8, stride, lbl_8069AFD8, bias);
+    }
+    if (!(flags & 0x10)) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069B1B8, 8);
+        } else {
+            fn_80391194(lbl_8069B1B8, 8);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_80390694(u, half, lbl_8069B1B8, bias);
+    }
+    if (!(flags & 0x20)) {
+        if (fn_80390D54() == 1) {
+            fn_803905A0(lbl_8069B2B8, 8);
+        } else {
+            fn_80391194(lbl_8069B2B8, 8);
+        }
+    } else {
+        int bias = fn_8039055C() * 2 - 0x80;
+        fn_80390694(v, half, lbl_8069B2B8, bias);
+    }
+    fn_8039072C((short*)lbl_8069ADB8, oy, stride);
+    fn_8039084C((short*)lbl_8069B1B8, ou, half);
+    fn_8039084C((short*)lbl_8069B2B8, ov, half);
+}
+
 extern "C" void fn_80390CFC(int n)
 {
     unsigned buf = lbl_806EF38C << n;
