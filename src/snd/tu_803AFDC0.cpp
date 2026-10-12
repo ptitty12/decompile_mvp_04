@@ -50,6 +50,31 @@ extern "C" int fn_803B0360()
     return 0x25e4;
 }
 
+extern "C" int fn_803B270C(int voice, int ch, int v);
+extern "C" int fn_803B115C(int a, int p);
+
+struct Unk803B0714 {
+    char pad[0x259C];
+    int m259C[6];
+};
+
+struct Unk8069E200 {
+    char pad[0x1410];
+    Unk803B0714* mVoices[16];
+};
+extern Unk8069E200 lbl_8069E200;
+
+extern "C" int fn_803B0714(int idx)
+{
+    Unk803B0714* p = lbl_8069E200.mVoices[idx];
+    fn_803B115C(0, p->m259C[0]);
+    int i;
+    for (i = 0; i <= 5; i++)
+        p->m259C[i] = 0;
+    lbl_8069E200.mVoices[idx] = 0;
+    return 0;
+}
+
 extern "C" int fn_803B0798()
 {
     return -15;
@@ -60,6 +85,18 @@ void Snd::Hal::SetDry(int voice)
     CHANPUB* c = (CHANPUB*)((char*)sndgs.chan + voice * 0x90);
     if (*(unsigned int*)&c->rendermode & 0x2040000)
         SetVol(voice);
+}
+
+extern "C" int fn_803B1080(int voice, int v)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 4) {
+        int i;
+        for (i = 0; i < c->numchan; i++)
+            fn_803B270C(c->voices[i] - sndgs.sso.set.voicesdsp, i, v);
+        return 0;
+    }
+    return -7;
 }
 
 extern "C" void* fn_803B1118(int unused, int size)
@@ -129,6 +166,32 @@ extern "C" int fn_803B1364(int i)
     return lbl_806AA2C4[i];
 }
 
+extern "C" void fn_803B1B30();
+extern "C" void fn_803B1DF0();
+extern "C" void fn_803B2354();
+extern "C" void fn_803B1EF4();
+extern "C" void fn_803B2108();
+extern "C" void fn_803B21EC();
+extern "C" void fn_803B29F8();
+extern void* lbl_806AA4C8;
+extern void* lbl_806AA4CC;
+extern void* lbl_806AA4D0;
+extern void* lbl_806AA4D4;
+extern void* lbl_806AA4D8;
+extern void* lbl_806AA4DC;
+extern void* lbl_806AA4E0;
+
+extern "C" void fn_803B14D0()
+{
+    lbl_806AA4C8 = (void*)fn_803B1B30;
+    lbl_806AA4CC = (void*)fn_803B1DF0;
+    lbl_806AA4D0 = (void*)fn_803B2354;
+    lbl_806AA4D4 = (void*)fn_803B1EF4;
+    lbl_806AA4D8 = (void*)fn_803B2108;
+    lbl_806AA4DC = (void*)fn_803B21EC;
+    lbl_806AA4E0 = (void*)fn_803B29F8;
+}
+
 extern "C" void fn_803B18BC()
 {
 }
@@ -141,4 +204,23 @@ extern "C" void* fn_803B1AF0(int n)
 extern "C" void fn_803B1B10(void* p)
 {
     SNDMEMI_free(p);
+}
+
+extern "C" void fn_803B6AF8();
+extern "C" void fn_803B343C();
+
+struct Unk806AA2D4B {
+    char pad0[0xC];
+    short mC;
+    char padE[0x1D2];
+    void* m1E0;
+    void* m1E4;
+};
+extern Unk806AA2D4B lbl_806AA2D4;
+
+extern "C" void fn_803B1EC8()
+{
+    lbl_806AA2D4.m1E0 = (void*)fn_803B6AF8;
+    lbl_806AA2D4.m1E4 = (void*)fn_803B343C;
+    lbl_806AA2D4.mC = 0x140;
 }
