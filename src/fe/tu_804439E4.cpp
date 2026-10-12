@@ -5,6 +5,24 @@
 #include "game/tu_8043FDC0.h"
 
 
+struct FeCell2 {
+    char pad0[0x20];
+    virtual void s1();
+    virtual void s2(int a, int b);
+};
+extern const char lbl_805F4ED4[];
+extern const char lbl_805F4EE0[];
+extern const char lbl_805F4EE8[];
+extern const char lbl_805F4EF4[];
+extern const char lbl_805F4EFC[];
+extern const char lbl_805F4F0C[];
+extern const char lbl_805F4F14[];
+extern "C" {
+int fn_800C8034(void* p);
+void fn_800C2034(void* p, int a);
+}
+
+
 extern int lbl_80621638;
 extern "C" {
 int fn_80446430(FeScr2* self, int i);
@@ -130,6 +148,35 @@ extern "C" FE_OVERLAY FeScr2Raw* fn_80445104(FeScr2Raw* self, int a, int b, int 
     int one = 1;
     lbl_8061AC54 = one;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_80445190(FeScr2* x)
+{
+    fn_800ECE34(x);
+    FeObj* p = fn_800B7AB8(UiGetMsgMgr(), lbl_805F4ED4);
+    x->m134 = fn_800C805C(fn_800C8044(p->v32(lbl_805F4EE0, 1))->v32(lbl_805F4EE8, 1));
+    x->m138 = fn_800C8060(fn_800C8044(p->v32(lbl_805F4ED4, 1))->v32(lbl_805F4EF4, 1));
+    x->m13C = fn_800C8060(p->v32(lbl_805F4EFC, 1));
+    x->m140 = (int)fn_800B7AB8(UiGetMsgMgr(), lbl_805F4F0C);
+    if (fn_800A2E6C(lbl_80619948) != 0) {
+        fn_800C2034((char*)fn_800B555C() + 8, 0);
+    }
+    int i = 0;
+    do {
+        int j = 0;
+        do {
+            FeCell2* cell = (FeCell2*)((FeObjP2*)x)->v90(i, j);
+            cell->s2((int)((FeObjP2*)x->m138)->v73(i, j),
+                     fn_800C8034(((FeObj*)((FeObjP2*)x->m13C)->v73(i, j))->v32(lbl_805F4F14, 1)));
+            j++;
+        } while (j <= 6);
+        i++;
+    } while (i <= 4);
+    ((FeObj1*)x->m138)->v104(0);
+    x->m14C = fn_800C203C((char*)fn_800B555C() + 8);
+    x->m160 = fn_8057CE00(lbl_8061930C->fn_80078A38(x->m14C));
+    int z = 0;
+    lbl_80621638 = z;
 }
 
 extern "C" FE_OVERLAY void fn_80445454(void* self)
