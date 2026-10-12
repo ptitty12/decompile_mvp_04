@@ -3,6 +3,11 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8022FE34.h"
+#include "game/goals/tu_8027C728.h"
+
+struct Unk8028989C_Goal;
+int fn_8028B068(Unk8028989C_Goal* g, float* out);
+void fn_8027D368(Unk8027C728_Goal* g);
 
 extern const float lbl_80620754;
 extern const float lbl_8062074C;
@@ -88,11 +93,6 @@ void Unk8022FE34_U::fn_802350F8()
 
 void Unk8022FE34_U::fn_80235160() {}
 
-void Unk8022FE34_U::fn_80235220()
-{
-    char buf[0x80];
-}
-
 void Unk8022FE34_U::fn_80235164()
 {
     if (lbl_8061EDCC == 0 && m4->m18 != 0 && fn_8033E420((char*)fn_80235FA8() + 0x560) == 0) {
@@ -111,6 +111,11 @@ void Unk8022FE34_U::fn_80235164()
             break;
         }
     }
+}
+
+void Unk8022FE34_U::fn_80235220()
+{
+    char buf[0x80];
 }
 
 void Unk8022FE34_U::fn_8023522C(int a)
@@ -395,6 +400,23 @@ void Unk8022FE34_U::fn_80235EDC(float f)
     fn_802361F8(m4->m734, f);
 }
 
+int Unk8022FE34_U::fn_80235F0C(float* out)
+{
+    int r = 0;
+    Unk8027C728_Goal* g = m4->fn_80231E90();
+    if (g != 0) {
+        Unk8028989C_Goal* sub = 0;
+        if (g->m10 == 1) {
+            sub = (Unk8028989C_Goal*)g->m18;
+        }
+        if (sub != 0) {
+            r = fn_8028B068(sub, out);
+        }
+        fn_8027D368(g);
+    }
+    return r;
+}
+
 void Unk8022FE34_U::fn_80235F7C()
 {
     fn_80235780(5, 1, 1);
@@ -404,6 +426,8 @@ Unk8022FE34_Ctx* Unk8022FE34_U::fn_80235FA8()
 {
     return m4->m0;
 }
+
+void fn_802361F4() {}
 
 void Unk8022FE34_Z::fn_802361F8(float f, int a)
 {

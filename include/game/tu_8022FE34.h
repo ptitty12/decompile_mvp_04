@@ -283,6 +283,7 @@ struct Unk8022FE34_U {
     float fn_80235DD0(int a, int b);
     int fn_80235E44(int a, int key);
     int fn_80235E84(int a, int b);
+    int fn_80235F0C(float* out);
 };
 
 #endif
