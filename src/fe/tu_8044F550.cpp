@@ -4,6 +4,14 @@
  */
 #include "game/tu_8043FDC0.h"
 
+extern "C" void fn_800E4C1C(void* a, void* b);
+
+struct FeS6v { char pad0[0x140]; int m140; };
+struct FeSt4FC { char pad0[0x4FC]; int m4FC; };
+extern "C" void fn_804D11BC(void* self);
+extern "C" void* fn_800C8038(void* p);
+extern "C" void fn_800DD204(void* a, void* b);
+
 extern "C" FE_OVERLAY int fn_8044F550(FeScr6* self, FeObj* a, int b, int c)
 {
     if (a == self->m138) {
@@ -32,6 +40,26 @@ extern "C" FE_OVERLAY FeScrRaw* fn_8044F634(FeScrRaw* self, int a, int b, int c,
     self->m3C = lbl_8067C328;
     self->m130 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_8044F680(FeScr6* self)
+{
+    fn_800ECF18(self);
+    self->m134 = fn_800B7AB8(UiGetMsgMgr(), "NAVBAR");
+    fn_80124FA8(self->m134, self);
+    fn_80125154(self->m134, 4);
+    fn_801250D8(self->m134);
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), "FTOPBAR");
+    ((FeObj1*)p->v32("LEAGUESG", 1))->v8(0);
+    ((FeObj1*)p->v32("LEAGUESG", 1))->v16(0);
+    self->m138 = fn_800C8060(((FeObj*)self)->v32("CELL", 1));
+    ((FeObj1*)self->m138)->v105(1);
+    if (fn_800B555C()->m0 == 0x4E)
+        lbl_80621648 = (int)"CONTRACTS";
+    if (fn_800B555C()->m0 == 0xC)
+        lbl_80621648 = (int)"FREEAGENT";
+    Unk8007F198_B* t = fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+    fn_800E4C1C(t, fn_800C8044(((FeObj*)self)->v32("REQUIREMENTS", 1)));
 }
 
 extern "C" FE_OVERLAY void fn_8044F884(FeScr6* self, int k)
@@ -105,6 +133,38 @@ extern "C" FE_OVERLAY void fn_8044FBA4(FeScr6* self)
 {
     fn_804D10D8(self);
     self->m10F0 = fn_800B7AB8(UiGetMsgMgr(), "BATPITCHSTATS");
+}
+
+extern "C" FE_OVERLAY void fn_8044FC08(FeScr6* self)
+{
+    FeObj* tt;
+    fn_804D11BC(self);
+    if (fn_800B555C()->m0 == 0x2E) {
+        tt = fn_800C8040(((FeObj*)self)->v32("TITLETEXT", 1));
+        ((FeObj1*)tt)->v29(0x2653);
+    } else {
+        tt = fn_800C8040(((FeObj*)self)->v32("TITLETEXT", 1));
+        ((FeObj1*)tt)->v29(0x2652);
+    }
+    fn_800DD204(tt, fn_800C8038(((FeObj*)self)->v32("UNDERSCORE", 1)));
+    fn_8044FE0C(self);
+    if (((FeS6v*)self)->m140 > 0) {
+        if (fn_800B555C()->m4 & 1) {
+            ((FeObj2*)self->m134)->v67(0, 1);
+        } else {
+            int k = 0;
+            int sel = ((FeSt4FC*)fn_800B555C())->m4FC;
+            int n = ((FeObjI*)self->m134)->v59();
+            for (; k < n; k++) {
+                ((FeObj1*)self->m134)->v68(k);
+                if (fn_804D1278(self) == sel)
+                    break;
+            }
+            if (k >= n)
+                ((FeObj1*)self->m134)->v68(0);
+            ((FeObj2*)self->m134)->v67(0, 1);
+        }
+    }
 }
 
 /* near-miss: popup args built in r4 by retail, in r3 here (call result is saved and reloaded); 4 slots */
