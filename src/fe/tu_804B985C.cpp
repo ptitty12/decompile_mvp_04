@@ -80,5 +80,9 @@ extern "C" FE_OVERLAY int fn_804BB0DC(void)
     return 0xA;
 }
 
-
+extern "C" FE_OVERLAY void fn_804BAB14(int a, FeScr* x)
+{
+    if (a == 1)
+        ((FeObj2*)x)->v91(((FeObjI*)x->m134)->v60(), FI(x, 0x148));
+}
 
