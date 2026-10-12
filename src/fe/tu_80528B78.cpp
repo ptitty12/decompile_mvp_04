@@ -21,11 +21,31 @@ extern const char lbl_80674080[];
 extern const char lbl_806841F8[];
 extern const char lbl_80673DD8[];
 extern const char lbl_8064A550[];
+extern "C" void fn_80528B78(void* x);
+extern "C" void fn_80528C00(void* x);
+extern "C" void fn_80528C88(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528CBC(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528CF0(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528D24(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528D58(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528D8C(FeVptr<0x10>* self, int c);
+extern "C" int fn_80528DC0(void* x);
+extern "C" void fn_80528DC8(FeV10D* x, int a);
+extern "C" void fn_80528E00(FeV10* x);
+extern "C" void fn_80528E34(FeV10* x);
+extern "C" void fn_80528E68(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528E9C(FeVptr<0x10>* self, int c);
+extern "C" void fn_80528ED0(FeVptr<0x10>* self, int c);
+extern "C" int fn_80528F04(void* x);
+extern "C" void fn_80528F0C(FeV10D* x, int a);
+extern "C" void fn_80528F44(FeV10* x);
+extern "C" void fn_80528F78(FeV10* x);
 extern "C" int fn_80528FB4(void);
 extern "C" void fn_80528FC0(FeScrN* self);
 extern "C" void fn_80528FF0(FeScrN* self);
 extern "C" int fn_80529020(void);
 extern "C" void fn_8052902C(FeScrN* self);
+extern "C" int fn_805290A8(void);
 extern "C" void fn_805290B0(FeScrN* self);
 extern "C" int fn_805290E0(void);
 extern "C" void fn_805290E8(FeScrN* self);
@@ -34,45 +54,38 @@ extern "C" void fn_80529120(FeScrN* self);
 extern "C" int fn_80529150(void);
 extern "C" int fn_80529158(void);
 extern "C" void fn_80529160(FeScrN* self);
+extern "C" void fn_80529190(FeScrN* self);
+extern "C" void fn_805291CC(FeScrN* self);
 extern "C" void fn_80529204(FeScrN* self);
 extern "C" void fn_80529234(FeScrN* self);
 extern "C" void fn_80529264(FeScrN* self);
 extern "C" void fn_80529298(FeScrN* self);
 extern "C" void fn_805292C8(FeScrN* self);
-extern "C" void fn_80529334(FeScrN* self);
-extern "C" int fn_80528DC0(void* x);
-extern "C" int fn_80528F04(void* x);
-extern "C" int fn_805290A8(void);
 extern "C" int fn_805292F8(void);
-extern "C" void fn_80528C88(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528CBC(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528CF0(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528D24(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528D58(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528D8C(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528E68(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528E9C(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528ED0(FeVptr<0x10>* self, int c);
-extern "C" void fn_80528B78(void* x);
-extern "C" void fn_80528C00(void* x);
-extern "C" void fn_80528DC8(FeV10D* x, int a);
-extern "C" void fn_80528E00(FeV10* x);
-extern "C" void fn_80528E34(FeV10* x);
-extern "C" void fn_80528F0C(FeV10D* x, int a);
-extern "C" void fn_80528F44(FeV10* x);
-extern "C" void fn_80528F78(FeV10* x);
-extern "C" void fn_80529190(FeScrN* self);
-extern "C" void fn_805291CC(FeScrN* self);
 extern "C" void fn_80529300(FeScrN* x);
+extern "C" void fn_80529334(FeScrN* self);
+extern "C" void fn_80528BB4(void* x, int a);
+extern "C" void fn_80528C3C(void* x, int a);
+extern "C" void fn_8052905C(FeScrN* x, int a);
 
 extern "C" FE_OVERLAY void fn_80528B78(void* x)
 {
     FeSubOf(x)->s5();
 }
 
+extern "C" FE_OVERLAY void fn_80528BB4(void* x, int a)
+{
+    FeSubOf(x)->s6(a);
+}
+
 extern "C" FE_OVERLAY void fn_80528C00(void* x)
 {
     FeSubOf(x)->s11();
+}
+
+extern "C" FE_OVERLAY void fn_80528C3C(void* x, int a)
+{
+    FeSubOf(x)->s8(a);
 }
 
 extern "C" FE_OVERLAY void fn_80528C88(FeVptr<0x10>* self, int c)
@@ -223,6 +236,12 @@ extern "C" FE_OVERLAY void fn_8052902C(FeScrN* self)
 {
     self->SetVptr(lbl_80655808);
     fn_800EC1B8(self);
+}
+
+extern "C" FE_OVERLAY void fn_8052905C(FeScrN* x, int a)
+{
+    fn_800ED310(x, a);
+    x->fn_vslot8(a);
 }
 
 extern "C" FE_OVERLAY int fn_805290A8(void)
