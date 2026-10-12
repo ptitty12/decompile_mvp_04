@@ -49,3 +49,12 @@ int fn_800500A8(Unk800493D4_Sm* s, int i)
         n = 0x22;
     return n;
 }
+
+struct Unk80052794_Ctx;
+
+int fn_8005481C(Unk80052794_Ctx* ctx, int idx);
+
+extern "C" int fn_800507A8(Unk80052794_Ctx* ctx, int idx)
+{
+    return fn_8005481C(ctx, idx) <= 3;
+}
