@@ -22,6 +22,15 @@ struct Unk801A6DB8_R {
     int m18;
 };
 void fn_8025505C(Unk8024EF40_A* a, int v, int w);
+int fn_8018AD20(Unk8024EF40_P* p);
+int fn_8018AD2C(Unk8024EF40_P* p);
+void fn_80242E28(Unk8024EF40_P* p, float f);
+void fn_8025C9B8(void* f);
+void* fn_8035E604(void* p);
+int fn_80268684(void* m, Unk8024EF40_P* p);
+void fn_8025A6B4(void* o, Unk8024EF40_Q* q);
+void fn_8035E704(char* t, int i);
+extern float lbl_805DAC3C;
 void fn_8026B94C(Unk80256C80_Inner* i, int k);
 Unk801A6DB8_R* fn_801A6DB8(Unk8024EF40_Q* q);
 void fn_8025777C(Unk80256C80_M* self, Unk8024EF40_P* p, int a);
@@ -609,6 +618,39 @@ void fn_80258390(M* self)
         if (f == 0 || *((unsigned char*)fn_802570D4(self)->m6F8->m14 + 0x1CC9) == 2) {
             fn_8025D054(self->m4, 6);
             fn_8025ED44(self->m4);
+        }
+    }
+}
+
+/* near-miss: 103 vs 105 instructions; retail keeps the roster index in r27 with a separate byte offset r28, reloads self->m4 each iteration and reads m30 before the fn_8035E318 call. Tried for/while, m438[j], hit temp */
+void fn_80258444(M* self)
+{
+    if (fn_8018AD20(fn_802570D4(self)->m6CC) == 0)
+        fn_80269DE4((char*)self->m4 + 0x190);
+    fn_8025C9B8((char*)self->m4 + 0x9C);
+    if (fn_801A6DB8(fn_802570D4(self))->m14 != 0) {
+        if (fn_801A2034(fn_802570D4(self), 3) == -1)
+            fn_8035E604((char*)self->m4 + 0x1CC);
+        int j = 0;
+        void* g = (char*)self->m4 + 0x468;
+        fn_8025A6B4(g, fn_802570D4(self));
+        fn_80268144((char*)self->m4 + 0x124);
+        while (j < self->m4->m448) {
+            P* p = *(P**)((char*)self->m4 + 0x438 + j * 4);
+            if (p->m458 != 9) {
+                fn_80242E28(p, lbl_805DAC3C);
+                if (fn_80268684((char*)self->m4 + 0x124, p) != 0 || p->m58C.m30 > fn_8035E318(&p->m58C)) {
+                    if (fn_8035E8CC((char*)self->m4 + 0x204, (unsigned)p->m458) != 0)
+                        fn_8035E704((char*)self->m4 + 0x204, p->m458);
+                }
+            }
+            j++;
+        }
+        if (fn_8018AD2C(fn_802570D4(self)->m6CC) != 0) {
+            fn_8025D054(self->m4, 6);
+            fn_8025ED44(self->m4);
+        } else {
+            fn_8025D054(self->m4, 8);
         }
     }
 }
