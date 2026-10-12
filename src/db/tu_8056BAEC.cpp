@@ -294,6 +294,11 @@ extern const float lbl_805FFB6C;
 extern const float lbl_805FFB70;
 extern const float lbl_805FFB74;
 extern const float lbl_805FFB78;
+
+struct Db8056CCD0_T {
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+};
 /* forward declarations (definitions are in address order) */
 extern "C" void fn_8056BD50(void* self);
 extern "C" void fn_8056BDD0(void* self);
@@ -318,6 +323,7 @@ extern "C" void fn_8056CAC4(void* q, int a, int b, int c);
 extern "C" void fn_8056CB30(DbScr* self, int a);
 extern "C" void fn_8056CC50(DbF12* p);
 extern "C" void fn_8056CC8C(Db8056CC8C* self, int a, int b, int c, int d);
+extern "C" int fn_8056CCD0(void* unused, DbScrB* scr, int side);
 extern "C" void fn_8056DA98(DbF12* p);
 extern "C" void fn_8056DE14(DbF12* p);
 extern "C" void fn_8056DE4C(void* p);
@@ -581,6 +587,28 @@ extern "C" DB_OVERLAY void fn_8056CC8C(Db8056CC8C* self, int a, int b, int c, in
     self->m38 = c;
     fn_8056D15C(self, d);
     fn_8056DBB8(self);
+}
+
+extern "C" DB_OVERLAY int fn_8056CCD0(void* unused, DbScrB* scr, int side)
+{
+    DbG* g = scr->m14;
+    unsigned char q0 = fn_80081CF8__FP13Unk8007FF8C_Yi(g, 0)->m0;
+    unsigned char q1 = fn_80081CF8__FP13Unk8007FF8C_Yi(g, 1)->m0;
+    unsigned char q2 = fn_80081CF8__FP13Unk8007FF8C_Yi(g, 2)->m0;
+    Db8056CCD0_T* tb = (Db8056CCD0_T*)TeamAt(scr->m14, side == 0);
+    Db8056CCD0_T* ta = (Db8056CCD0_T*)TeamAt(scr->m14, side);
+    int sa = 0;
+    for (int i = 0; i < 0x80; i++)
+        sa += ta->m1B4[(unsigned char)i];
+    int sb = 0;
+    for (int i = 0; i < 0x80; i++)
+        sb += tb->m1B4[(unsigned char)i];
+    int d = sa - sb;
+    if (d < 0)
+        d = -d;
+    if (Round(g) <= 1 && q0 != 0xFF && (q1 == 0xFF || q2 == 0xFF) && d <= 2)
+        return 1;
+    return 0;
 }
 
 extern "C" DB_OVERLAY void fn_8056DA98(DbF12* p)
