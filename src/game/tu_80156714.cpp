@@ -2,8 +2,7 @@
  * Game code, .text 0x80156714-0x8015AA94 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
-#include "game/tu_8015AA94.h"
-#include "game/tu_80167DCC.h"
+#include "game/tu_8015F164.h"
 
 extern float lbl_805C8C1C;
 
@@ -94,6 +93,27 @@ int fn_800AC330();
 void fn_800AC36C();
 void fn_8031E1D4(Unk801527C8_Actor* a, const char* s);
 extern "C" int fn_80326C20(Unk801527C8_Sub* s);
+class Obj18_80159F28 {
+public:
+    char pad0[0x18];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual int v17();
+};
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
@@ -493,6 +513,40 @@ extern "C" void fn_80159E40(Unk80159F28* self, int* a, int* b) /* 80159E40 */
     case 6:
         *a = 0;
         break;
+    }
+}
+
+extern "C" void fn_80159F28(Unk80159F28* self, int a, int b) /* 80159F28 */
+{
+    Unk80189300* o = fn_801A4B34(self->mC);
+    Obj18_80159F28* g = (Obj18_80159F28*)lbl_80619D10;
+    if ((fn_800AB528((int)g) == 0 || (fn_800AB528((int)g), fn_800AC330() != 0)) && o != 0) {
+        int t = o->fn_v4() ^ 1;
+        RecObj8015F164 rec;
+        int id;
+        if (t != 0) {
+            if (a != 0) {
+                id = 0x56;
+                if (b != 0) {
+                    id = 0x57;
+                }
+            } else {
+                id = 0x55;
+            }
+        } else if (a != 0) {
+            id = 0x59;
+            if (b != 0) {
+                id = 0x5A;
+            }
+        } else {
+            id = 0x58;
+        }
+        self->fn_80157514(id, (int)&rec, 0, 0x1B, 0, lbl_8068B828);
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+        if (g->v17() != 0) {
+            fn_800AB528((int)g);
+            fn_800AC36C();
+        }
     }
 }
 
