@@ -3,20 +3,22 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80190A00.h"
+#include "game/tu_8026C414.h"
+int fn_8026CA8C(Unk8026C414_M* self, char** pp);
 //@BODY
 //@80190E40
-/* near-miss: 29 vs 28 insns, 7 slots differ: retail keeps the cursor arithmetic as r9 = p+4
- * and r11 = r9+8 (stw r3,4(r9)); every spelling tried (post-increment, q = p+1, char
- * offsets) folds to p+12. The early-return shape and the load order match. */
+inline void Put2(int*& p, int v) { *p++ = v; }
 extern "C" int fn_80190E40(Unk80190EB4_Obj* o, int** pp)
 {
     if (o->m264 != 0)
         return 0;
-    fn_8026CA8C(o);
+    fn_8026CA8C((Unk8026C414_M*)o, (char**)pp);
     int* p = *pp;
     int v = fn_80188EF4(o);
-    *p = o->m36C;
-    *pp = Unk80190E40_Put(p + 1, o->m4D4, v);
+    Put2(p, o->m36C);
+    Put2(p, o->m4D4);
+    Put2(p, v);
+    *pp = p;
     return 1;
 }
 
@@ -187,11 +189,6 @@ extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
 }
 
 //@80193750
-/* near-miss family (this, 0x801937B4, 0x80193828, 0x80193880): the searches over the
- * 0x18-byte entries match except for the loop variables: retail keeps the byte offset
- * i*0x18 as its own induction variable (add r3,r9,r10) where this compiles a pointer
- * variable (addi r3,r3,24). `a[i]`, `(char*)a + i*0x18`, `(int)a + i*0x18` and an explicit
- * `off += 0x18` were tried. */
 extern "C" void* fn_80193750(void* hv, float t)
 {
     Unk80193750_H* h = (Unk80193750_H*)hv;
@@ -199,10 +196,16 @@ extern "C" void* fn_80193750(void* hv, float t)
     if (a == 0)
         return 0;
     int n = h->m74;
-    for (int i = 0; i < n; i++) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + i * 0x18);
-        if (t <= e->m4)
-            return e;
+    int i = 0;
+    if (i < n) {
+        int off = 0;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (t <= e->m4)
+                return e;
+            i++;
+            off += 0x18;
+        } while (i < n);
     }
     return 0;
 }
@@ -215,12 +218,16 @@ extern "C" float fn_801937B4(void* hv, int k, float t)
     if (a == 0)
         return -1.0f;
     int n = h->m74;
-    int off = 0;
-    for (int i = 0; i < n; i++) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (!(t > e->m4) && e->m0 == k)
-            return e->m4;
-        off += 0x18;
+    int i = 0;
+    if (i < n) {
+        int off = 0;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (!(t > e->m4) && k == e->m0)
+                return e->m4;
+            i++;
+            off += 0x18;
+        } while (i < n);
     }
     return -1.0f;
 }
@@ -232,12 +239,16 @@ extern "C" void* fn_80193828(void* hv, float t)
     char* a = (char*)h->m78;
     if (a == 0)
         return 0;
-    int off = (h->m74 - 1) * 0x18;
-    for (int i = h->m74 - 1; i >= 0; i--) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (t > e->m4)
-            return e;
-        off -= 0x18;
+    int i = h->m74 - 1;
+    if (i >= 0) {
+        int off = i * 0x18;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (t > e->m4)
+                return e;
+            off -= 0x18;
+            i--;
+        } while (i >= 0);
     }
     return 0;
 }
@@ -248,12 +259,16 @@ extern "C" float fn_80193880(Unk80193750_H* h, int k, float t)
     char* a = (char*)h->m78;
     if (a == 0)
         return -1.0f;
-    int off = (h->m74 - 1) * 0x18;
-    for (int i = h->m74 - 1; i >= 0; i--) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (!(t <= e->m4) && e->m0 == k)
-            return e->m4;
-        off -= 0x18;
+    int i = h->m74 - 1;
+    if (i >= 0) {
+        int off = i * 0x18;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (!(t <= e->m4) && k == e->m0)
+                return e->m4;
+            off -= 0x18;
+            i--;
+        } while (i >= 0);
     }
     return -1.0f;
 }
