@@ -236,6 +236,34 @@ void Unk8019FFB0::fn_vslot5()
 
 void Unk8019FFB0::fn_vslot6() {}
 
+/* The first five states of the state list belong to the earlier unit (ctors take the owner as
+ * Unk8019E3C0_Own); only their sizes are needed here. */
+struct Unk8019E3C0_Own;
+class Unk8019F414 { public: Unk8019F414(Unk8019E3C0_Own* o); char pad0[0x1C]; };
+class Unk8019F48C { public: Unk8019F48C(Unk8019E3C0_Own* o); char pad0[0x20]; };
+class Unk8019F5EC { public: Unk8019F5EC(Unk8019E3C0_Own* o); char pad0[0x1C]; };
+class Unk8019F728 { public: Unk8019F728(Unk8019E3C0_Own* o); char pad0[0x1C]; };
+class Unk8019F81C { public: Unk8019F81C(Unk8019E3C0_Own* o); char pad0[0x1C]; };
+void fn_8033E464(void* list, void* obj);
+void* operator new(unsigned int size, int heap);
+
+void fn_801A0144(Unk8019F8C0_Owner* o)
+{
+    char* list = (char*)o + 0x560;
+    fn_8033E464(list, new (0) Unk8019F414((Unk8019E3C0_Own*)o));
+    fn_8033E464(list, new (0) Unk8019F48C((Unk8019E3C0_Own*)o));
+    fn_8033E464(list, new (0) Unk8019F5EC((Unk8019E3C0_Own*)o));
+    fn_8033E464(list, new (0) Unk8019F728((Unk8019E3C0_Own*)o));
+    fn_8033E464(list, new (0) Unk8019F81C((Unk8019E3C0_Own*)o));
+    fn_8033E464(list, new (0) Unk8019F930(o));
+    fn_8033E464(list, new (0) Unk8019FA50(o));
+    fn_8033E464(list, new (0) Unk8019FAF8(o));
+    fn_8033E464(list, new (0) Unk8019FBB4(o));
+    fn_8033E464(list, new (0) Unk8019FD50(o));
+    fn_8033E464(list, new (0) Unk8019FE5C(o));
+    fn_8033E464(list, new (0) Unk8019FFB0(o));
+}
+
 void fn_801A02F0(char* self)
 {
     fn_8033E5C4(self + 0x560, 1);
