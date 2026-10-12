@@ -352,11 +352,11 @@ int fn_8034406C(Unk8034406C* self, unsigned short idx)
     return r;
 }
 
-/* near-miss: instruction sequence and block layout are identical to retail (181 of 181 insns); only the
-   callee-saved register numbering differs (22 slots): retail has names r24, end r23, rows r22, x r26, buf r25;
-   here names r22, rows r23, end r24, x r25, buf r26. global-alloc priority of names vs end/rows/x/buf is off
-   (end has 5 refs here, 3 would put names above it); the same loader shape repeats at fn_8034243C,
-   fn_80342730, fn_80342A24, fn_80342D18 (other constants). Early returns, not gotos, give retail's layout. */
+/* near-miss: 14 slots. Instruction sequence and block layout are identical to retail (181 of 181 insns); only the
+   callee-saved register numbering of three values differs: retail names r24, end r23, rows r22; here end r24, rows r23,
+   names r22 (buf r25 and x r26 now match). One shared `done:` free block (a goto from the n == 0 test) keeps buf at 7
+   references (a second free site made it 8 and moved it above x). global-alloc priority of names (4 refs) stays below end
+   (5 refs, test copies counted) and rows. The same loader repeats at fn_8034243C, fn_80342730, fn_80342A24, fn_80342D18. */
 extern "C" void fn_80342148(Unk80342148* self, const char* text, const char** names)
 {
     unsigned n;
@@ -368,11 +368,9 @@ extern "C" void fn_80342148(Unk80342148* self, const char* text, const char** na
     if (fn_80342128((Unk80341FDC*)self) != 0)
         return;
     const char* buf = fn_802B9300(text, 0x500, 0xC, &n);
-    if (n == 0) {
-        fn_802B961C(buf, 0xC);
-        return;
-    }
-    const char* end = buf + n;
+    const char* end;
+    if (n == 0) goto done;
+    end = buf + n;
     cur = buf;
     rem = n;
     fn_803792AC(&cur, &rem);
@@ -386,10 +384,11 @@ extern "C" void fn_80342148(Unk80342148* self, const char* text, const char** na
         fn_803792AC(&cur, &rem);
         self->mC++;
     }
-    if (self->mC < self->m8) {
-        fn_802B961C(buf, 0xC);
-        return;
-    }
+    if (self->mC >= self->m8) goto alloc;
+done:
+    fn_802B961C(buf, 0xC);
+    return;
+alloc:
     self->m0 = (unsigned char*)fn_803774A8(self->mC, 0);
     fn_803EE7BC();
     self->m4 = (int*)fn_803774A8(self->mD * 4, 0);
