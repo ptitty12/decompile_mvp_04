@@ -27,6 +27,57 @@ int fn_802B96C4(const char* name, int a);
 int fn_802B98AC(const char* name, int a);
 int fn_802C2CCC(Unk802C2188* o, Unk802C2188_Pair* a);
 
+struct Unk802BF974_E {
+    int m0;
+    int m4;
+    ~Unk802BF974_E()
+    {
+        if (m4 != 0) {
+            delete[] (char*)m4;
+        }
+        m4 = 0;
+    }
+};
+
+struct Unk802BF974 {
+    ~Unk802BF974();
+    char pad0[0x18];
+    char* m18;
+    char* m1C;
+    char pad20[0x84 - 0x20];
+    char* m84;
+    int* m88;
+    Unk802BF974_E a[16];
+    Unk802BF974_E b[16];
+    char* c[3];
+};
+
+Unk802BF974::~Unk802BF974()
+{
+    if (m1C != 0) {
+        delete[] m1C;
+        m1C = 0;
+    }
+    if (m18 != 0) {
+        delete[] m18;
+        m18 = 0;
+    }
+    if (m84 != 0) {
+        delete[] m84;
+        m84 = 0;
+    }
+    for (int i = 0; i < 3; i++) {
+        if (c[i] != 0) {
+            delete[] c[i];
+            c[i] = 0;
+        }
+    }
+    if (m88 != 0) {
+        delete m88;
+        m88 = 0;
+    }
+}
+
 /* near-miss (73 vs 73 insns, schedule only): retail sets r3 = &sp8 last in each call; the pointer-local recipe made it worse. */
 int* fn_802C1288(const char* text)
 {
