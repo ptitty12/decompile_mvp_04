@@ -3,7 +3,6 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801EE438.h"
-#include "game/clampiter.h"
 
 typedef Unk801EE438_Scr Scr;
 
@@ -220,19 +219,22 @@ float fn_801F4844(int, int a1, int idx, Unk801EE438_Vec* v, Unk801EE438_Vec* out
 
 extern "C" Unk801EE438_Vec fn_801F4A10(Scr* s, int a, int b, Unk801EE438_Vec* pos, int c, float f);
 
-/* near-miss (8 slots): loop body and copies match; retail puts the counter at sp+0x30, above the call's return temp at
-   sp+0x20 (ours: counter 0x20, temp 0x28), and computes the compare before li r6,0 */
 Unk801EE438_Vec fn_801F492C(Scr* s, Unk801EE438_Vec* pos, int c, float f)
 {
     Unk801EE438_Vec cur = *pos;
-    Unk8006A138_It<3> it(0);
+    int cnt = 0;
     int e = 0;
     do {
-        int next = 0;
-        if (e != 3)
-            next = e + 1;
-        cur = fn_801F4A10(s, it.v, next, &cur, c, f);
-        e = it.Next();
+        int next = e != 3 ? e + 1 : 0;
+        cur = fn_801F4A10(s, *(volatile int*)&cnt, next, &cur, c, f);
+        int k = *(volatile int*)&cnt;
+        int t;
+        if (k > 3)
+            t = k;
+        else
+            t = k + 1;
+        *(volatile int*)&cnt = t;
+        e = t;
     } while (e <= 3);
     return cur;
 }
