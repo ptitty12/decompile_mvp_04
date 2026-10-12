@@ -86,6 +86,10 @@ inline int Chance2_801609EC(void* rng, float k)
     unsigned r = fn_8014D8AC(rng, 1000000, nm, 0xAC8);
     return (float)r * k * 0.000001f >= 0.85f;
 }
+struct Ev8015F348 { int m0; float m4; int m8; int mC; int m10; int m14; };
+inline int IsValidId(int id) { return id != 0xC7; }
+inline int Has8015F348(int v, int bit) { return (v & bit) != 0; }
+int fn_80324D74(void* e, int i);
 inline int Chance80162C28(void* rng, float k)
 {
     const char* nm = lbl_805C8C20;
@@ -172,6 +176,37 @@ Unk80326F44_Out Unk80159F28::fn_8015F1F4(Unk8015F164_Evt* e) /* 8015F1F4 */
         }
     }
     return lbl_805EBA10;
+}
+
+extern "C" int fn_8015F348(Unk80159F28* self, Ev8015F348* e) /* 8015F348 */
+{
+    if (IsValidId(e->m0)) {
+        int fl = e->m14;
+        if (Has8015F348(fl, 4) || Has8015F348(fl, 0x200) || Has8015F348(fl, 8) || Has8015F348(fl, 0x10) || Has8015F348(fl, 0x80)) {
+            return 1;
+        }
+        int v = 0;
+        {
+            Unk80326F44_Out a = self->fn_8015F1F4((Unk8015F164_Evt*)e);
+            if (IsValid(a) || self->fn_8015F164((Unk8015F164_Evt*)e) != 0) {
+                v = 1;
+            }
+        }
+        if (v != 0) {
+            return 1;
+        }
+        if (fn_80324D74(e, 0) != 0 || Has8015F348(e->m14, 0x200)) {
+            Unk801527C8_Sub* s = &self->mC->m50;
+            Unk80326F44_Out b = s->fn_80326F44(0xAD, 1, -1.0f);
+            if (!(e->m4 >= b.m4)) {
+                return 1;
+            }
+            if (Chk80161924(s, 0x7F, 1, e->m4) != 0) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 int Unk80159F28::fn_8015F744(Unk8015F744_Evt* e) /* 8015F744 */
