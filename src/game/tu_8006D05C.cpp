@@ -392,14 +392,14 @@ int fn_8006FB28(void* l, int k, int c)
     return r;
 }
 
-/* near-miss: 2 slots; case 0 loads m24 after the c*4 shift where retail loads it first. */
 void fn_8006FC40(void* l, int k, int c, int v)
 {
     Unk80071604* a = (Unk80071604*)l;
     if ((unsigned)c < a->m1C) {
         switch ((unsigned)k) {
         case 0: {
-            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            unsigned base = (unsigned)a->m24;
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + base);
             if (v <= 0xFF) {
                 if (v < 0)
                     v = 0;
@@ -813,7 +813,6 @@ float fn_80070810(void* self, int a)
     return r;
 }
 
-/* near-miss: 2 slots, same division/register difference as fn_80070BC8. */
 float fn_80070880(void* self, int a)
 {
     W* w = (W*)self;
@@ -822,14 +821,15 @@ float fn_80070880(void* self, int a)
     float z = (float)w->v28(0xA, a);
     float u = fn_800706C0(self, a);
     float v = (float)w->v28(8, a);
-    float r = lbl_805B3B88;
+    float r = 0.0f;
     float den = u + y + z + v;
-    if (!(den <= lbl_805B3B88)) {
+    if (!(den <= 0.0f)) {
         r = (x + y + z) / den;
-        int n = (int)(r * lbl_805B3B8C);
+        int n = (int)(r * 10000.0f);
         if (n % 10 > 4)
             n += 10;
-        r = (float)(n / 10) * lbl_805B3B90;
+        n = n / 10;
+        r = (float)n * 0.001f;
     }
     return r;
 }
@@ -844,19 +844,19 @@ float fn_80070A60(W* w, int a)
     return r;
 }
 
-/* near-miss: 2 slots; the (n / 10) division result lands in r0 instead of r10 (subf / xoris). */
 float fn_80070BC8(void* self, int a)
 {
     W* w = (W*)self;
     float hi = fn_80070A60(w, a);
     float lo = fn_800706C0(self, a);
-    float r = lbl_805B3BA8;
-    if (!(lo <= lbl_805B3BA8)) {
+    float r = 0.0f;
+    if (!(lo <= 0.0f)) {
         r = hi / lo;
-        int n = (int)(r * lbl_805B3BAC);
+        int n = (int)(r * 10000.0f);
         if (n % 10 > 4)
             n += 10;
-        r = (float)(n / 10) * lbl_805B3BB8;
+        n = n / 10;
+        r = (float)n * 0.001f;
     }
     return r;
 }
