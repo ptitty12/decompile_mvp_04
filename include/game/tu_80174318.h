@@ -117,13 +117,31 @@ void fn_80177BF4(Unk80177B74_T* p, void* a);
  * in_chrg 3 call. */
 class Unk8016FF40 {
 public:
+    Unk8016FF40();
     virtual ~Unk8016FF40();
-    char pad4[0x124];
+    char pad4[0x108];
+    Unk80174318_Pair* m108[4];
+    char pad118[0x124 - 0x118];
 };
 struct Unk80174438_T {
     char pad0[8];
     Unk8016FF40* m8[4];
 };
+/* Menu object of tu_80171A10.h (Unk80171A10_Menu): four info records at +8, the pair table at +0x1C,
+ * a flag at +0x5C and a name buffer at +0x88. */
+struct Unk80174348_T {
+    char pad0[8];
+    Unk8016FF40* m8[4];
+    int m18;
+    Unk80174318_Pair m1C[4];
+    char pad3C[0x5C - 0x3C];
+    int m5C;
+    char pad60[0x88 - 0x60];
+    char m88[1];
+};
+void* operator new(unsigned int size, int heap);              /* 0x80377428 */
+extern "C" void fn_8017008C(Unk8016FF40* info, const char* name);
+void fn_80174438(Unk80174438_T* p);
 /* State machine base (vptr at +0xD4, see tu_80170044.h): only slot 8 is used here. */
 class Unk80170518 {
 public:
