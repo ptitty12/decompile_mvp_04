@@ -637,6 +637,7 @@ int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
 
 extern "C" int fn_803270C4(Unk801527C8_Sub* s, int id, int n, float t);
 extern const float lbl_805C8E10;
+inline float Id8015A6A0(float v) { return v; }
 extern "C" int fn_801D0314(void* p);
 extern "C" void fn_80159E40(Unk80159F28* self, int* a, int* b);
 extern const char lbl_805C8DA0[];
@@ -646,7 +647,6 @@ extern const char lbl_805C8DE8[];
 extern const char lbl_805C8DFC[];
 struct Ent8015A6A0 { int m0, m4, m8, mC, m10, m14; };
 extern const float lbl_805C8E50;
-inline float Id8015A6A0(float v) { return v; }
 extern "C" unsigned int strlen(const char* s);
 inline int AllEmpty8015A6A0(RecObj8015F164* r)
 {
@@ -657,10 +657,6 @@ inline int AllEmpty8015A6A0(RecObj8015F164* r)
     }
     return 1;
 }
-/* near-miss (96.2%): the three by-value Blk temporaries all sit at r1+0x10 here; retail puts the
- * side_ball and top_hit copies at r1+0x8 (the float argument slot is a freed temp there) and merges the
- * tail of the top_ball/side_ball calls (2 slots). Tried: inline Chk with/without a float param, cast and
- * literal float arguments, per-use scopes, branch order, a named local Blk. */
 extern "C" void fn_801594A8(Unk80159F28* self) /* 801594A8 */
 {
     int flag = 0;
@@ -669,17 +665,13 @@ extern "C" void fn_801594A8(Unk80159F28* self) /* 801594A8 */
         Unk80156838_Entry* e;
         int n;
         fn_80326ED4(s, &e, &n);
-        float t = lbl_805C8E10;
-        int c1 = fn_803270C4(s, 0x10, 1, t) != 0;
+        int c1 = fn_803270C4(s, 0x10, 1, Id8015A6A0(lbl_805C8E10)) != 0;
         if (c1 && fn_801D0314((char*)self->mC->m700->m3A4 + 0x28C) != 2) {
-            t = lbl_805C8E10;
-            int c2 = fn_803270C4(s, 0x44, 1, t) != 0;
+            int c2 = fn_803270C4(s, 0x44, 1, Id8015A6A0(lbl_805C8E10)) != 0;
             if (!c2) {
-                t = lbl_805C8E10;
-                int z = fn_803270C4(s, 0x56, 1, t) != 0;
+                int z = fn_803270C4(s, 0x56, 1, Id8015A6A0(lbl_805C8E10)) != 0;
                 if (!z) {
-                    t = lbl_805C8E10;
-                    int c3 = fn_803270C4(s, 0x42, 1, t) != 0;
+                    int c3 = fn_803270C4(s, 0x42, 1, Id8015A6A0(lbl_805C8E10)) != 0;
                     if (!c3) {
                         flag = 1;
                     }
