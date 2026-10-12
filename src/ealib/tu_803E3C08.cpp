@@ -213,6 +213,7 @@ extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
 
 /* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
 struct Unk803E6950_Names {
+    char pad0[4];
     char** m4;
 };
 
@@ -229,14 +230,14 @@ struct Unk803E6950 {
     int m2C;
 };
 
-/* near-miss: retail keeps the entry-jump loop (test at the bottom, m10 reloaded after strcmp); ours is rotated with a
- * duplicated first test (2 slots longer). for/while/goto/accessor spellings tried. */
 extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
 {
     int found = -1;
     for (int i = 0; i < o->m10; i++) {
-        if (strcmp(name, o->m8->m0->m4[i]) == 0)
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
             found = i;
+            break;
+        }
     }
     o->m2C = found;
     return found != -1;
@@ -244,13 +245,14 @@ extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
 
 extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
 
-/* near-miss: same loop shape as fn_803E6950. */
 extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c)
 {
     int found = -1;
     for (int i = 0; i < o->m10; i++) {
-        if (strcmp(name, o->m8->m0->m4[i]) == 0)
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
             found = i;
+            break;
+        }
     }
     return fn_803E6A70(o, found, a, b, c);
 }
