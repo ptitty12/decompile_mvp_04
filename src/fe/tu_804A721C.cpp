@@ -120,6 +120,14 @@ FE_OVERLAY void fn_804A7760(FeW* x)
     }
 }
 
+FE_OVERLAY void fn_804A77AC(void* x, int a)
+{
+    ((FeSubB*)((char*)FeP(x, 0x134) + 0xDC))->s20(a, 0);
+    ((FeSubB*)((char*)FeP(x, 0x138) + 0xDC))->s20(a, 0);
+    ((FeSubB*)((char*)FeP(x, 0x13C) + 0x98))->s20(a, 0);
+    ((FeSub*)((char*)FeP(x, 0x148) + 0xDC))->s6(FeI(FeP(x, 0x134), 0xE8));
+}
+
 FE_OVERLAY void fn_804A7DD4(void* x)
 {
     fn_804A8750(x);
@@ -214,6 +222,27 @@ FE_OVERLAY void fn_804A8B9C(void* x)
     fn_804A8F98(x);
     fn_804A86BC(x);
     fn_804A83D0(x);
+}
+
+FE_OVERLAY void fn_804A8ED4(void* x)
+{
+    if (fn_804A80DC(x) == FeI(x, 0x140)) {
+        FeList* l = (FeList*)FeP(x, 0x138);
+        fn_80126CF4(l, l->m164, 0, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    } else {
+        FeList* l = (FeList*)FeP(x, 0x138);
+        fn_80126CF4(l, 0, FeI(l, 0x168), l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    }
+    fn_804A89D0(x);
+}
+
+FE_OVERLAY void fn_804A8F98(void* x)
+{
+    FeList* l = (FeList*)FeP(x, 0x138);
+    fn_80126CF4(l, l->m164, 0, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    l = (FeList*)FeP(x, 0x138);
+    fn_80126CF4(l, 0, FeI(l, 0x168), l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+    fn_804A89D0(x);
 }
 
 FE_OVERLAY void fn_804A91FC(int a, void* b)
