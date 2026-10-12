@@ -276,6 +276,73 @@ void fn_801A98A0(void* p)
     fn_801AA284(p, 1);
 }
 
+/* Iterator object of fn_801A98C4 (ctor 0x8014E09C, advance 0x8014E108); current index at +8. */
+struct Unk801A98C4_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk801A98C4_V3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk801A98C4_V4 : public Unk801A98C4_V3 {
+    int w;
+};
+struct Unk801A98C4_Col {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+struct Unk801A98C4_Rec {
+    Unk801A98C4_V3 m0;
+    int pad;
+    Unk801A98C4_Col m10;
+    float m20;
+    float m24;
+};
+struct Unk801A98C4_Sys {
+    int m0;
+    int m4;
+};
+struct Unk801A98C4_Cfg {
+    char pad0[0x3B8];
+    Unk801A98C4_Sys* m3B8;
+};
+struct Unk801A98C4_Obj {
+    int m0;
+    Unk801A98C4_Cfg* m4;
+    Unk8019F8C0_Owner* m8;
+};
+void fn_8014E09C(Unk801A98C4_It* it, Unk8019F8C0_Owner* o, int a);
+void fn_8014E108(Unk801A98C4_It* it);
+extern float lbl_805CEDD8;
+Unk801A98C4_Col* fn_8014DBA0(Unk801A98C4_Col* out, int r, int g, int b, int a);
+extern "C" Unk801A98C4_V4 fn_801E6E7C(int s, int idx, int k);
+
+void fn_801A98C4(void* p)
+{
+    Unk801A98C4_Obj* o = (Unk801A98C4_Obj*)p;
+    Unk801A98C4_It it;
+    int s = o->m4->m3B8->m4;
+    fn_8014E09C(&it, o->m8, 3);
+    Unk801A98C4_It* q = &it;
+    while (q->m8 != 10) {
+        Unk801A98C4_V4 v = fn_801E6E7C(s, q->m8, 1);
+        Unk801A98C4_Rec r;
+        r.m0 = v;
+        fn_8014DBA0(&r.m10, 255, 255, 255, 255);
+        r.m20 = lbl_805CEDD8;
+        r.m24 = lbl_805CEDD8;
+        fn_8014E108(q);
+    }
+}
+
 void fn_801A9980(void* p)
 {
     fn_801AA088(p);
