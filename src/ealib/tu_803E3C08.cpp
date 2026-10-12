@@ -401,9 +401,6 @@ inline int FindIdx(Unk803E6950* o, const char* name)
     return found;
 }
 
-/* near-miss (99.2%, 291 of 291 instructions): the whole body matches except the position of `li r0,0` for the
-   key switch: retail loads it before the first compare (case 0 stores r0 directly); ours rematerializes it in
-   the case 0 arm. Tried: ok as register/unsigned/hoisted, v-form switch, KeyInl returning ok, volatile re-read. */
 extern "C" int fn_803E4C30(Unk803E4A50* o)
 {
     int n1 = 0x900;
@@ -418,29 +415,28 @@ extern "C" int fn_803E4C30(Unk803E4A50* o)
     InitInl(&o->sub, (Unk803E6660_Holder*)&o->s4C);
     Unk803E68B0_Key* kk = (Unk803E68B0_Key*)&o->sub;
     int k = o->m48;
-    int ok = 0;
+    int v = 0;
     switch (k) {
     case -4:
     case 0x80:
     case 0x90:
     case 0xA8:
     case 0xB8:
-        kk->m30 = ok;
         break;
     case 0x98:
-        kk->m30 = 2;
+        v = 2;
         break;
     case 0xA0:
-        kk->m30 = -1;
+        v = -1;
         break;
     default:
-        kk->m30 = -1;
+        v = -1;
         break;
     }
+    *(volatile int*)&kk->m30 = v;
     int t = kk->m30;
     if (t != -1) {
         kk->m0 = k;
-        ok = 1;
         int hi = 0xFFFF - t;
         int lo = hi + t;
         kk->m24 = hi;
@@ -558,6 +554,71 @@ extern "C" void fn_803E57F0(Unk803E57F0* o, int chrg)
     SubDtor(&o->sub);
     if (chrg & 1)
         lbl_8062C66C(o, 0xDC);
+}
+
+extern char lbl_8060CBE0[];
+extern char lbl_8060CBFC[];
+extern char lbl_8060CC18[];
+extern char lbl_8060CC1C[];
+
+extern "C" int fn_803E5904(Unk803E56F8* o)
+{
+    int n1 = 0x900;
+    int n2 = 0x300;
+    int n3 = 0x600;
+    int* a = (int*)lbl_8062C668(n1 + 4, (int)lbl_8060CBE0);
+    *a = n1;
+    o->m0 = a + 1;
+    int* b = (int*)lbl_8062C668(n2 + 4, (int)lbl_8060CB90);
+    *b = n2;
+    o->m4 = b + 1;
+    int* c = (int*)lbl_8062C668(n3 + 4, (int)lbl_8060CBFC);
+    *c = n3;
+    o->m8 = c + 1;
+    fn_803DBDD8((char*)o + 0x90, o->m4C);
+    InitInl(&o->sub, (Unk803E6660_Holder*)&o->s50);
+    Unk803E68B0_Key* kk = (Unk803E68B0_Key*)&o->sub;
+    int k = o->m4C;
+    int v = 0;
+    switch (k) {
+    case -4:
+    case 0x80:
+    case 0x90:
+    case 0xA8:
+    case 0xB8:
+        break;
+    case 0x98:
+        v = 2;
+        break;
+    case 0xA0:
+        v = -1;
+        break;
+    default:
+        v = -1;
+        break;
+    }
+    *(volatile int*)&kk->m30 = v;
+    int t = kk->m30;
+    if (t != -1) {
+        kk->m0 = k;
+        int hi = 0xFFFF - t;
+        int lo = hi + t;
+        kk->m24 = hi;
+        kk->m20 = lo;
+        kk->m28 = lo;
+    }
+    Unk803E6950* s = (Unk803E6950*)&o->sub;
+    int found = FindIdx(s, lbl_8060CBAC);
+    s->m2C = found;
+    FindSet(s, lbl_8060CBB8, (int)o->m0, 0xC, -1);
+    FindSet(s, lbl_8060CBC4, (int)o->m4, 4, -1);
+    FindSet(s, lbl_8060CC18, (int)o->m8, 8, -1);
+    FindSet(s, lbl_8060CC1C, 0, 0, -1);
+    FindSet(s, lbl_8060CBAC, (int)o + 0xCC, 0, -1);
+    FindSet(s, lbl_8060CBCC, (int)o + 0x90, 0, -1);
+    FindSet(s, lbl_8060CBD4, (int)lbl_8062C294, 0, -1);
+    o->mC = 0;
+    return 1;
 }
 
 extern "C" void fn_803E6044(char* o)
