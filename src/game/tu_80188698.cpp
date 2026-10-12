@@ -151,12 +151,9 @@ extern "C" void fn_80189C38(Unk80188698* o)
 //@80189D60
 extern "C" float fn_80189D60(Unk80188698* o)
 {
-    float r;
-    if (o->mBFC)
-        r = *(float*)((char*)o->mBFC + 0xEE0) + o->m418;
-    else
-        r = lbl_805CDBDC.m0;
-    return r;
+    if (!o->mBFC)
+        return lbl_805CDBDC.m0;
+    return *(float*)((char*)o->mBFC + 0xEE0) + o->m418;
 }
 
 //@80189D88
@@ -245,9 +242,9 @@ extern "C" int fn_8018AD2C(Unk80188698* o)
     int a = o->m38C;
     if (a != 1 && (a != 4 || o->m390 != 1))
         return 1;
-    if (o->m44C->m6F4 == 0)
-        return (o->m4C4 ^ 1) == 0;
-    return 1;
+    if (o->m44C->m6F4 != 0)
+        return 1;
+    return o->m4C4 == 1;
 }
 
 //@8018B43C
