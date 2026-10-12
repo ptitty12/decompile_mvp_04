@@ -104,6 +104,33 @@ extern const char lbl_805BDD9C[];
 extern const char lbl_805BD934[];
 void fn_8011A518(int a, Wid* w, const char* name);
 
+struct Unk800ABDC4_R {
+    char pad0[8];
+    int m8;
+    char padC[4];
+    int m10;
+    int m14;
+};
+extern int lbl_80619D10;
+extern const char lbl_805BBE2C[];
+extern const char lbl_805BE3D0[];
+extern const char lbl_805BFC94[];
+extern const char lbl_805BFC9C[];
+extern const char lbl_805BFCA8[];
+extern const char lbl_805BFCB4[];
+extern const char lbl_805BDC84[];
+int fn_801C1638(UnkGame* g, int a);
+int fn_801A4B34(UnkGame* g);
+Unk800ABDC4_R* fn_800ABDC4(int a, UnkGame* g);
+int fn_800ABC58(int a, UnkGame* g);
+int fn_80144BF4(int a);
+
+extern const float lbl_805BFB08;
+
+extern const char lbl_805BF5CC[];
+float fn_80097F68(UnkPlayerRec* r, int a, unsigned char i, int b, int c);
+int fn_80097A70(UnkPlayerRec* r, int a, unsigned char i, int b);
+
 extern "C" {
 int fn_80116A64(Scr* self, int b);
 void fn_80117634(Scr* self);
@@ -198,6 +225,19 @@ void fn_801164AC(Scr* self)
     }
 }
 
+void fn_801167AC(Scr* self)
+{
+    Unk8001BC8C* g = fn_8001BC4C();
+    float t0 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(3, t0 * lbl_805BFB08, 1);
+    float t1 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(1, t1 * lbl_805BFB08, 1);
+    float t2 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(4, t2 * lbl_805BFB08, 1);
+    float t3 = (float)((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot5();
+    g->fn_8001C05C(2, t3 * lbl_805BFB08, 1);
+}
+
 int fn_80116A64(Scr* self, int b)
 {
     if (b <= 1) {
@@ -271,6 +311,23 @@ void fn_80116EE8(Scr* self)
     else
         v3 = fn_80086D34((Unk80084910_W*)self->m1A0, 3);
     ((UnkSub*)((char*)fn_800C8058(fn_800C805C(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BC19C, 1))->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6(v3);
+}
+
+void fn_80117288(Scr* self)
+{
+    UnkGameP6F8* p = fn_8011AA24(0)->m6F8;
+    int a0 = (int)((float)((unsigned char*)p->m10)[7] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(0, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a0 + 0.5f));
+    self->m188 = a0;
+    int a1 = (int)((float)((unsigned char*)p->m10)[5] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(1, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a1 + 0.5f));
+    self->m18C = a1;
+    int a2 = (int)((float)((unsigned char*)p->m10)[8] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(2, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a2 + 0.5f));
+    self->m190 = a2;
+    int a3 = (int)((float)((unsigned char*)p->m10)[6] * 0.003921569f * 5.0f);
+    ((UnkSub*)((char*)fn_800C8058(self->m198->fn_vslot73(3, 0)->fn_vslot32(lbl_805BF19C, 1)) + 0xDC))->fn_vslot6((int)((float)a3 + 0.5f));
+    self->m194 = a3;
 }
 
 void fn_80117634(Scr* self)
@@ -577,6 +634,30 @@ void fn_80118B2C(Scr* self)
             d->fn_vslot8(0);
             b->fn_vslot15(0);
         }
+    }
+}
+
+void fn_80119D44(UnkGame* g, Wid* w, int flag)
+{
+    int v;
+    if (g->m6F8->m10->m74 == 2)
+        v = fn_801C1638(g, 0);
+    else
+        v = fn_801A4B34(g);
+    fn_8011A14C(v, w, lbl_805BDC84, 0);
+    char buf[100] = "";
+    fn_804089B4(buf, lbl_805BBE2C, fn_8025416C((char*)v + 0x588, 7));
+    fn_800C8038(w->fn_vslot32(lbl_805BE3D0, 1))->fn_vslot8(0);
+    Unk800ABDC4_R* r = fn_800ABDC4(lbl_80619D10, g);
+    fn_8011A0A4(r->m10, w, lbl_805BFC9C);
+    fn_8011A0A4(r->m14, w, lbl_805BFCA8);
+    fn_8011A0A4(r->m8, w, lbl_805BFCB4);
+    if (flag != 0) {
+        fn_800C8058(w->fn_vslot32(lbl_805BFC94, 1))->fn_vslot8(1);
+        int gg = lbl_80619D10;
+        int a = fn_80144BF4(gg);
+        int c = (a ^ fn_800ABC58(gg, g)) == 0;
+        ((UnkSub*)((char*)fn_800C8058(w->fn_vslot32(lbl_805BFC94, 1)) + 0xDC))->fn_vslot6(c ^ 1);
     }
 }
 
