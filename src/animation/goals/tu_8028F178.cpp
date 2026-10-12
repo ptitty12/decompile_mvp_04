@@ -9,6 +9,13 @@
 #include "game/chooser.h"
 #include "game/goals/tu_8028F178.h"
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps them below preceding stores (retail's order). */
+template <class T> inline float Unk8028F178_Secs(T n)
+{
+    return (float)n * 0.016666668f;
+}
+
 float fn_804028E4(float x);               /* square root */
 float fn_8041171C(float x);
 float fn_80411554(float x);
@@ -759,15 +766,13 @@ int fn_80290D3C(Unk8028F178_Goal* g, Unk80270BA0_X* x)
     return res;
 }
 
-/* near-miss: 84 of 84 instructions, 5 differ in the order of the early loads of x->m724/m728 and the
- * constants (scheduling only). Tried: operand order of the average, statement permutations, a local for it. */
 void fn_80291378(Unk8028F178_Goal* g, Unk80270BA0_X* x)
 {
     if (!(g->m70 > 0.0f) && g->m70 == 0.0f) {
         if (fn_8026DAE8(x, 0) || fn_8026D7B4(x, 0) || fn_8026D838(x, 0)) {
             Unk8028F178_Ctx* ctx = (Unk8028F178_Ctx*)x->m44C;
             Unk8028F178_Player* px = (Unk8028F178_Player*)x;
-            float t = (float)ctx->m4C * 0.016666668f;
+            float t = Unk8028F178_Secs(ctx->m4C);
             float old = g->m78;
             g->m78 = (px->m728 + px->m724) * 0.5f;
             Unk80279BB8 req(x);
