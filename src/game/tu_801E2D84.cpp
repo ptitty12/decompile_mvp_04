@@ -150,6 +150,7 @@ public:
     void* fn_8027E070(int a);
     void* fn_8027DE3C(const Unk80273498_Vec3* a, const Unk80273498_Vec3* b);
     void* fn_8027DE88(const Unk80273498_Vec3* a, const Unk80273498_Vec3* b);
+    void* fn_8027DF08();
 };
 Unk8027D9A4* fn_8027DD54(Unk8027D9A4* d, float f);
 Unk8027C728_Base* fn_8027DAE8(Unk8027C728_Base* b, const Unk80273498_Vec3* v);
@@ -158,6 +159,47 @@ Unk8027C728_Base* fn_8027DAE8(Unk8027C728_Base* b, Unk80273498_Vec3 v);
 Unk8027D9A4* fn_8027DB38(Unk8027D9A4* d, Unk80273498_Vec3* p, Unk80273498_Vec3* q);
 Unk8027D9A4* fn_8027DE00(Unk8027D9A4* d, int v);
 Unk8027D9A4* fn_8027DE14(Unk8027D9A4* d, int v);
+
+extern "C" Unk8027C728_Goal* fn_801E2F80(void* self, Unk80270BA0_X* p, Unk801E3114_Src* x)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    const Unk80273498_Vec3* pp = &x->m34;
+    Unk80273498_Vec3 pos = Unk801E4E60_Pos(pp);
+    int flag = x->m88 == 7;
+    g->m10 = 6;
+    fn_8027C728(g);
+    Unk8027D9A4* d2 = fn_8027DD54((Unk8027D9A4*)g->m18, x->m70);
+    Unk8027D9A4* d3 = (Unk8027D9A4*)fn_8027DAE8(d2, &pos);
+    if (x->m7C == 1) {
+        const Unk80273498_Vec3* pa = &x->m64;
+        const Unk80273498_Vec3* pb = &x->m40;
+        Unk80273498_Vec3 a = Unk801E4E60_Pos(pa);
+        Unk80273498_Vec3 b = Unk801E4E60_Pos(pb);
+        fn_8027DB38(d3, &a, &b);
+    }
+    if (flag == 1)
+        ((Unk8027DE3C*)d3)->fn_8027DF08();
+    int a1 = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a1;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    g104->m38 = a1;
+    int b1 = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b1;
+    g104->m34 = b1;
+    int c1 = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c1;
+    g104->m40 = c1;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    Unk8027A84C* hb = (Unk8027A84C*)hs->fn_80287DB8(fn_801DCC1C(p, &lbl_806055DC));
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = Unk801E4E60_Pos(&x->m64);
+        hb->fn_8027A898(&w);
+    }
+    return g;
+}
 
 extern "C" Unk8027C728_Goal* fn_801E3114(void* self, Unk80270BA0_X* p, Unk801E3114_Src* x)
 {
