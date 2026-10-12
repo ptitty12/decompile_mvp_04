@@ -9,7 +9,6 @@ typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
 
 extern "C++" {
-/* near-miss: loop in the last block is laid out differently (2 instructions shorter here) */
 int fn_80254EA4(A* self, int a);
 int fn_8035E318(A* a);
 int fn_8014E374(int a);
@@ -193,7 +192,8 @@ int fn_80254EA4(A* self, int a)
         P* p = self->m0;
         if (p != 0 && (unsigned)(p->m458 - 9) <= 3) {
             int f = 0;
-            if (a != 0 || fn_801BBEFC(p->m44C->m700->m3BC) != 0 || fn_8017C94C(self->m0->m44C->m700) != 0)
+            int st = p->m44C->m700->m3BC;
+            if (a != 0 || fn_801BBEFC(st) != 0 || fn_8017C94C(self->m0->m44C->m700) != 0)
                 f = 1;
             if (f != 0) {
                 unsigned t = self->m34;
@@ -207,15 +207,13 @@ int fn_80254EA4(A* self, int a)
                         P* q = self->m0;
                         if (q->m458 != 9) {
                             void* list = q->m44C->m700->m3B4;
-                            for (;;) {
-                                P* nx = fn_80257BD0(list, q, 1);
-                                if (nx == 0 || nx->m58C.b2)
-                                    break;
+                            P* nx = fn_80257BD0(list, q, 1);
+                            while (nx != 0 && !nx->m58C.b2) {
                                 if (nx->m458 == 9) {
                                     r = n;
                                     break;
                                 }
-                                q = nx;
+                                nx = fn_80257BD0(list, nx, 1);
                             }
                         } else {
                             r = n;
