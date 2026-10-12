@@ -78,10 +78,41 @@ extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i);
 
 extern "C" int fn_80098C68(char* o, int a, int b, int c) { return fn_80097EA4(o, a, b, c, 0) + fn_80097EA4(o, a, b, c, 1); }
 
-/* near-miss: case order / jump layout of the switch differs */
-extern "C" int fn_8008AC94(void* p);
 
 extern "C" int fn_8009908C(Obj3* o, int kind, int p);
+
+int fn_80071170(void* self, int a, unsigned b);
+extern "C" float fn_80097F68(char* o, int a, int b, int c, int i);
+
+extern "C" int fn_8009908C(Obj3* o, int kind, int p)
+{
+    int base = fn_80071170((char*)o + 0xD1C, kind, p);
+    int r = 0;
+    switch (kind) {
+    case 0:
+        r = fn_80097620((char*)o, 0, p, 0);
+        break;
+    case 1:
+        r = (int)fn_80097F68((char*)o, 1, p, 2, 0);
+        break;
+    case 2:
+        r = (int)fn_80097F68((char*)o, 0, p, 2, 0);
+        break;
+    case 3:
+        r = fn_80097EA4((char*)o, 0, p, 2, 0);
+        break;
+    case 4:
+        r = fn_80097EA4((char*)o, 1, p, 2, 0);
+        break;
+    case 5:
+        r = fn_80097620((char*)o, 3, p, 0);
+        break;
+    case 6:
+        r = fn_80097620((char*)o, 1, p, 0);
+        break;
+    }
+    return base + r;
+}
 
 extern "C" float fn_800991AC(Obj3* o, int mode, int p)
 {
@@ -95,31 +126,16 @@ extern "C" float fn_800991AC(Obj3* o, int mode, int p)
     return r;
 }
 
+struct Unk80089894_PackTab;
+int fn_8008AC94(Unk80089894_PackTab* self, unsigned a, unsigned b);
+
 extern "C" int fn_80099278(Obj3* o, int k, int p)
 {
-    int base = fn_8008AC94((char*)o + 0xD44);
+    int base = fn_8008AC94((Unk80089894_PackTab*)((char*)o + 0xD44), k, p);
     int r = 0;
     switch (k) {
     case 0:
         r = fn_8009764C((char*)o, 0, p, 0);
-        break;
-    case 1:
-        r = fn_8009764C((char*)o, 6, p, 0);
-        break;
-    case 2:
-        r = fn_8009764C((char*)o, 4, p, 0);
-        break;
-    case 3:
-        r = fn_8009764C((char*)o, 3, p, 0);
-        break;
-    case 4:
-        r = fn_8009764C((char*)o, 7, p, 0);
-        break;
-    case 5:
-        r = fn_80097A9C((char*)o, 0, p, 2, 0);
-        break;
-    case 6:
-        r = fn_80097A9C((char*)o, 2, p, 2, 0);
         break;
     case 7:
         r = fn_8009764C((char*)o, 1, p, 0);
@@ -127,8 +143,38 @@ extern "C" int fn_80099278(Obj3* o, int k, int p)
     case 8:
         r = fn_8009764C((char*)o, 2, p, 0);
         break;
+    case 1:
+        r = fn_8009764C((char*)o, 6, p, 0);
+        break;
+    case 3:
+        r = fn_8009764C((char*)o, 3, p, 0);
+        break;
+    case 2:
+        r = fn_8009764C((char*)o, 4, p, 0);
+        break;
+    case 4:
+        r = fn_8009764C((char*)o, 7, p, 0);
+        break;
+    case 6:
+        r = fn_80097A9C((char*)o, 2, p, 2, 0);
+        break;
+    case 5:
+        r = fn_80097A9C((char*)o, 0, p, 2, 0);
+        break;
     }
     return base + r;
+}
+
+extern "C" float fn_800993C0(Obj3* o, int mode, int p)
+{
+    float r = 0.0f;
+    if (mode == 0) {
+        float a = (float)fn_80099278(o, 1, p);
+        float d = (float)fn_80099278(o, 7, p) + (float)fn_80099278(o, 8, p) * 0.33333334f;
+        if (!(d <= 0.0f))
+            r = a * 9.0f / d;
+    }
+    return r;
 }
 
 extern "C" void fn_800994D4(char* o, int x)
