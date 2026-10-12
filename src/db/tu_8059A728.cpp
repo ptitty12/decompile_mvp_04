@@ -913,7 +913,8 @@ struct Db8059D5C4_Obj {
     unsigned short m20;
     char pad22[0x3E];
     unsigned m60;
-    char pad64[8];
+    int m64;
+    char pad68[4];
     unsigned m6C;
 };
 
@@ -926,6 +927,185 @@ extern "C" DB_OVERLAY int fn_8059D5C4(Db8059D5C4_Obj* self, int k)
             self->m60 = f | 0x100;
     }
     return 1;
+}
+
+extern "C" int fn_8059FA44(void* self, int k);
+
+//@8059D5E8
+extern "C" DB_OVERLAY int fn_8059D5E8(Db8059D5C4_Obj* self, int k, int flag)
+{
+    int ret = 0;
+    unsigned v = 0;
+    if (flag == 0)
+        v = fn_8059FA44(self, k);
+    switch (k) {
+    case 0: {
+        unsigned f = self->m60;
+        if (!(f & 0x80)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x80;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 1: {
+        unsigned f = self->m60;
+        if (!(f & 0x40)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x40;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 2: {
+        unsigned f = self->m60;
+        if (!(f & 0x20)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x20;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 3: {
+        unsigned f = self->m60;
+        if (!(f & 0x10)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x10;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 4: {
+        unsigned f = self->m60;
+        if (!(f & 0x8)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x8;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 5: {
+        unsigned f = self->m60;
+        if (!(f & 0x4)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x4;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 6: {
+        unsigned f = self->m60;
+        if (!(f & 0x2)) {
+            if (!(v > self->m20 * 25)) {
+                self->m60 = f | 0x2;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 7: {
+        unsigned f = self->m60;
+        if (f & 0x1)
+            break;
+        if (!(v > self->m20 * 25)) {
+            self->m60 = f | 0x1;
+            fn_8059BDD0((Db8059A728_Obj*)self, v);
+            ret = 1;
+        }
+        break;
+    }
+    case 8: {
+        int f = self->m64;
+        if (!(f < 0)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x80000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 9: {
+        unsigned f = self->m64;
+        if (!(f & 0x40000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x40000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 10: {
+        unsigned f = self->m64;
+        if (!(f & 0x20000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x20000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 11: {
+        unsigned f = self->m64;
+        if (!(f & 0x10000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x10000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 12: {
+        unsigned f = self->m64;
+        if (!(f & 0x8000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x8000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 13: {
+        unsigned f = self->m64;
+        if (!(f & 0x4000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x4000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    case 14: {
+        unsigned f = self->m64;
+        if (!(f & 0x2000000)) {
+            if (!(v > self->m20 * 25)) {
+                self->m64 = f | 0x2000000;
+                fn_8059BDD0((Db8059A728_Obj*)self, v);
+                ret = 1;
+            }
+        }
+        break;
+    }
+    }
+    return ret;
 }
 
 extern "C" int fn_8059FC90(Db8059D5C4_Obj* self, int k);
