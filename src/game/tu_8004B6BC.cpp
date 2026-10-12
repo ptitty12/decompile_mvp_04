@@ -6,6 +6,12 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+int fn_802540E4(Unk8024EF40_W* w, int a, int b);
+int fn_80253F0C(Unk8024EF40_W* w, int a, int b, int c);
+void fn_800120AC(int a, int b, int c);
+int fn_80043004(unsigned a);
+int fn_80043024(int a);
+void fn_80013530(int a, int b, int c, int d);
 void fn_80012AAC();
 void fn_80012A40(int a, int b, int c);
 inline int Unk8004CE04_M4(Unk800493D4_Sm* s, int idx)
@@ -510,6 +516,25 @@ void fn_8004DC60(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     if (fn_8004FF78(s, s->m9D8, 3) >= 0) {
         fn_80054684((Unk80052794_Ctx*)s, idx, 0);
         fn_80054684((Unk80052794_Ctx*)s, idx, 1);
+    }
+}
+
+void fn_8004E010(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    int w28 = fn_80253F0C((Unk8024EF40_W*)((char*)a->m3B0 + 0x588), 0xA, 2, 0);
+    int w27 = 0;
+    fn_800B555C();
+    if (fn_800B57EC() == 1)
+        w27 = fn_802540E4((Unk8024EF40_W*)((char*)a->m3B0 + 0x588), 0xA, 2);
+    if (fn_8004FF78(s, s->m9D8, 0x47) == -1) {
+        if (fn_8004FF78(s, s->m9D8, 0x63) != 0) {
+            int sel = ((Unk8001CE80*)a)->fn_8001D5D8();
+            int p = sel == 2 ? fn_8001F904(a) : fn_8001F8B8(a);
+            fn_800120AC(sel, p, ((Unk8001CE80*)a)->fn_8001D62C());
+            int q = sel == 2 ? ((Unk8001CE80*)a)->fn_8001E2EC() : ((Unk8001CE80*)a)->fn_8001E31C();
+            int r = fn_80043004(w28);
+            fn_80013530(r, fn_80043024(w27), sel, q);
+        }
     }
 }
 
