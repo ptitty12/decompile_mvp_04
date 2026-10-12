@@ -956,6 +956,49 @@ extern "C" void fn_801BDB38(A* a, P* q)
     fn_801BFC1C(a->mC);
 }
 
+extern "C" int fn_80189698(P* p, float f);
+extern "C" Vec3 fn_80189618(P* p, float f);
+extern "C" float fn_804028E4(float x);
+double __builtin_fabs(double x);
+inline float Unk801BDB84_Abs(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+extern "C" void fn_801BDB84(B* b, P* q, int mode, int useV, const Vec3* v)
+{
+    if (b->m0 == -1) {
+        Vec3 pos = q->m60;
+        if (useV != 0)
+            pos = *v;
+        if (mode == 0) {
+            float half = 0.5f;
+            if (!(q->m3F4 <= 0.5f) && fn_80189698(q, 0.0f) != 3) {
+                if (fn_801BFAF8(&pos) == 1) {
+                    mode = 1;
+                } else {
+                    float lx = 1.7600001f;
+                    float ly = 1.7600001f;
+                    Vec3 w = fn_80189618(q, 0.0f);
+                    float d = fn_804028E4(w.x * w.x + w.z * w.z);
+                    float y = w.y;
+                    if (!(d >= 1.7600001f) && !(Unk801BDB84_Abs(y) >= 1.7600001f))
+                        mode = 1;
+                }
+            }
+        }
+        if (mode == 1) {
+            if (fn_801BFA20(&pos) == 0) {
+                fn_801BDDC8(b, q);
+                return;
+            }
+            if (b->m4->m6F4 != 3) {
+                fn_801BDE24(b, q);
+                fn_801BDE58(b, q, 0);
+            }
+        }
+    }
+}
+
 extern "C" int fn_801BDD18(A* a, P* q)
 {
     Vec3 v = q->m60;
