@@ -3,6 +3,10 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+struct FeS164 {
+    char pad0[0x164];
+    FeW* m164;
+};
 extern "C" {
 FeW* fn_800C8058(FeW* w);
 }
@@ -53,6 +57,29 @@ static inline FeW*& FeWpq(void* x, int off)
 }
 
 extern "C" {
+FE_OVERLAY void fn_80466BB4(void* p, int b)
+{
+    FeS164* x = (FeS164*)p;
+    int cur = ((FeSub*)((char*)x->m164 + 0xDC))->s5();
+    ((FeSub*)((char*)x->m164 + 0xDC))->s15();
+    ((FeWV*)x->m164)->s51(0x404D, 0);
+    ((FeWV*)x->m164)->s51(0x404E, 1);
+    if (b != 0) {
+        ((FeWV*)x->m164)->s51(0x404F, 2);
+        ((FeWV*)x->m164)->s51(0x4050, 3);
+        ((FeWV*)x->m164)->s51(0x4051, 4);
+        ((FeWV*)x->m164)->s51(0x4052, 5);
+        ((FeWV*)x->m164)->s51(0x4053, 6);
+        ((FeWV*)x->m164)->s51(0x5976, 7);
+        ((FeWV*)x->m164)->s51(0x5977, 8);
+        ((FeWV*)x->m164)->s51(0x5978, 9);
+    }
+    if (cur < ((FeSub*)((char*)x->m164 + 0xDC))->s13())
+        ((FeSub*)((char*)x->m164 + 0xDC))->s6(cur);
+    else
+        ((FeSub*)((char*)x->m164 + 0xDC))->s6(0);
+}
+
 FE_OVERLAY void fn_80466E08(void* x)
 {
     FeW* a = FeWpq(x, 0x15C);
