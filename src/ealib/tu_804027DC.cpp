@@ -200,6 +200,20 @@ extern "C" int fn_80402C24(unsigned short key, const unsigned char* t)
     return v;
 }
 
+extern "C" const unsigned char* fn_80402CAC(const unsigned char* t, int id)
+{
+    int k = id;
+    if (t[8] & 1)
+        k = fn_80402C24(k, t + ReadLE32(t + 4));
+    const unsigned char* sec = t + ReadLE32(t + 0x10 + ReadLE16(t + 0xE) * 4);
+    const unsigned char* r;
+    if (k >= 0 && (unsigned)k < ReadLE32(sec + 0xC))
+        r = sec + ReadLE32(sec + 0x10 + k * 4);
+    else
+        r = 0;
+    return r;
+}
+
 extern "C" void fn_80402DE4(unsigned char* t, int flag)
 {
     if (flag == 0)
