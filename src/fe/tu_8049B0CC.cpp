@@ -9,6 +9,58 @@ extern const char lbl_805F74C4[];
 extern "C" char* strncpy(char*, const char*, unsigned);
 extern "C" char fn_800B56C4(void* s);
 extern "C" void fn_8049D5C8(void* x);
+struct Fe9B90Arr {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A4C8[];
+extern const char lbl_805F5010[];
+extern const char lbl_805F4ECC[];
+extern void* lbl_8061977C;
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" void fn_8040074C(void* p, int n);
+extern "C" void fn_80538868(Fe9B90Arr* l, int a);
+extern "C" float fn_8007824C(int v, int a);
+extern "C" int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
+extern "C" int fn_800E5F38__Fi(int v);
+inline int IntAt9B90(char* b, int o) { return *(int*)(b + o); }
+extern const char lbl_805F4F8C[];
+extern const char lbl_805F54DC[];
+extern const char lbl_805F55BC[];
+extern const char lbl_805F55C8[];
+extern const char lbl_805F55D4[];
+extern const char lbl_805F55DC[];
+extern const char lbl_805F55E4[];
+extern const char lbl_805F55F0[];
+extern const char lbl_805F55F8[];
+extern const char lbl_805F5600[];
+extern const char lbl_805F74D0[];
+extern "C" int fn_800C203C(void* p);
+extern "C" FeW* fn_800C8038(FeW* w);
+
+struct Fe9B304Scr : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    char pad138[0x19C - 0x138];
+    FeW* m19C;
+    FeW* m1A0;
+    FeW* m1A4;
+    FeW* m1A8;
+    FeW* m1AC;
+    FeW* m1B0;
+    FeW* m1B4;
+    FeW* m1B8;
+    FeW* m1BC;
+    FeW* m1C0;
+    FeW* m1C4;
+};
 extern "C" {
 
 FE_OVERLAY void fn_8049B0CC(void* x)
@@ -78,6 +130,60 @@ FE_OVERLAY FeScrH* fn_8049B2B8(FeScrH* self, int a, int b, int c, int d, int e, 
 extern "C" void fn_8049B90C(FeScrB* x);
 extern "C" void fn_8049BB90(FeScrB* x);
 extern "C" void fn_8049C440(FeScrB* x);
+FE_OVERLAY void fn_8049B304(Fe9B304Scr* x)
+{
+    fn_800ECF18(x);
+    x->m1A0 = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    x->m1A4 = fn_800B7AB8(FeGetMgr(), lbl_805F4F8C);
+    fn_80126CF4((FeList*)x->m1A4, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0);
+    x->m19C = fn_800C8060(x->fn_vslot29(lbl_805F74D0));
+    x->m1A8 = fn_800C8044(x->fn_vslot32(lbl_805F55BC, 1));
+    x->m1AC = fn_800C8044(x->fn_vslot32(lbl_805F55C8, 1));
+    FeW* w30 = fn_800C8044(x->m1AC->fn_vslot32(lbl_805F55D4, 1));
+    x->m1B0 = fn_800C8038(x->m1A8->fn_vslot32(lbl_805F55DC, 1));
+    x->m1B4 = fn_800C8040(x->m1AC->fn_vslot32(lbl_805F55E4, 1));
+    x->m1B8 = fn_800C8040(x->m1AC->fn_vslot32(lbl_805F54DC, 1));
+    x->m1BC = fn_800C8040(w30->fn_vslot32(lbl_805F55F0, 1));
+    x->m1C0 = fn_800C8040(w30->fn_vslot32(lbl_805F55F8, 1));
+    x->m1C4 = fn_800C8040(w30->fn_vslot32(lbl_805F5600, 1));
+    x->m134 = fn_800C203C((char*)fn_800B555C() + 8);
+    fn_8049B90C((FeScrB*)x);
+    fn_8049BB90((FeScrB*)x);
+    fn_8049C440((FeScrB*)x);
+}
+
+FE_OVERLAY void fn_8049B5BC(void* x, int kind)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    switch (kind) {
+    case 0:
+        strncpy(mp->name, lbl_805F4450, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    case 1: {
+        int idx = FeMem(x, 0x19C)->fn_vslot60();
+        FeList* q = (FeList*)FeP(x, 0x1A4);
+        char* b = (char*)x + 0x138;
+        int off = idx * 4;
+        fn_80126CF4(q, q->m164, *(int*)(b + off), q->m134, q->m16C, q->m170, 0, q->m138, q->m13C, q->m148, q->m14C);
+        ((FeWR*)FeP(x, 0x1A4))->s84(1, 0);
+        ((FeWQ*)FeP(x, 0x1A4))->s8(1);
+        ((FeWQ*)FeP(x, 0x19C))->s16(0);
+        fn_8049C440((FeScrB*)x);
+        break;
+    }
+    case 2:
+        ((FeWR*)FeP(x, 0x1A4))->s84(2, 0);
+        ((FeWQ*)FeP(x, 0x1A4))->s8(0);
+        ((FeWQ*)FeP(x, 0x19C))->s16(1);
+        fn_8049C440((FeScrB*)x);
+        break;
+    }
+}
+
 FE_OVERLAY void fn_8049B7A8(FeScrB* x, int a, int b)
 {
     x->m134 = b;
@@ -114,6 +220,50 @@ FE_OVERLAY void fn_8049B8D8(FeScrB* x)
 {
     fn_8049BB90(x);
     fn_8049C440(x);
+}
+
+FE_OVERLAY void fn_8049B90C(FeScrB* x)
+{
+    Fe9B90Arr l1;
+    int b1[0x28];
+    char sbuf[0x68];
+    char wbuf[200];
+    Fe9B90Arr* s1 = &l1;
+    unsigned i;
+    s1->m10 = lbl_8064B298;
+    l1.m0 = (char*)b1;
+    s1->m8 = 0x28;
+    FeI(x, 0x138) = 0;
+    fn_8040074C(l1.m0, 0xA0);
+    s1->m4 = 0;
+    s1->mC = 0;
+    s1->m10 = lbl_8064A550;
+    fn_8040074C(l1.m0, s1->m8 * 4);
+    void* g = lbl_8061930C;
+    s1->m10 = lbl_8064A4C8;
+    s1->m4 = 0;
+    s1->mC = 0;
+    s1->m14 = 0;
+    fn_80538868(s1, FeI(x, 0x134));
+    FeMem(x, 0x19C)->fn_vslot79(s1->m4, 0);
+    FeMem(x, 0x19C)->fn_vslot3();
+    i = 0;
+    for (; i < (unsigned)s1->m4; i++) {
+        int off = i * 4;
+        int id = IntAt9B90(l1.m0, off);
+        char* b138 = (char*)x + 0x138;
+        *(int*)(b138 + off) = id;
+        FeMem(x, 0x19C)->fn_vslot44(i, 0, (char*)fn_800E5F38__Fi(fn_8007A6A0__18Unk8007A4DC_Screenii(g, 5, id)), 4);
+        fn_800DE440(wbuf, id, 3);
+        FeMem(x, 0x19C)->fn_vslot43(i, 1, wbuf, 4);
+        float f = fn_8007824C(id, 0);
+        sprintf(sbuf, lbl_805F5010, f);
+        FeMem(x, 0x19C)->fn_vslot44(i, 2, sbuf, 4);
+        sprintf(sbuf, lbl_805F4ECC, fn_8007A6A0__18Unk8007A4DC_Screenii(g, 0x1F, id));
+        FeMem(x, 0x19C)->fn_vslot44(i, 3, sbuf, 4);
+    }
+    FeMem(x, 0x19C)->fn_vslot14(1);
+    l1.m10 = lbl_8064A550;
 }
 
 FE_OVERLAY void fn_8049C440(FeScrB* x)
