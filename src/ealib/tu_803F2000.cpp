@@ -77,6 +77,62 @@ struct RcVO {
 extern "C" int fn_803F7584(void*, int, void*, int*);
 extern "C" int fn_803F6754(short**);
 
+struct RcEv;
+
+struct RcTgt0 {
+    char d[0x4c];
+};
+
+struct RcTgt : RcTgt0 {
+    virtual void v0(RcEv*);
+    virtual void v1(RcEv*);
+};
+
+struct RcEvBase {
+    RcTgt* m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+struct RcEv0 : RcEvBase {
+    virtual void s0();
+    virtual void s1();
+};
+
+struct RcEv : RcEv0 {
+    union {
+        short s;
+        int i;
+    } m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+};
+
+struct RcSys {
+    int m0, m4;
+    char pad8[0x2c];
+    int m34, m38, m3C;
+    char pad40[0x2c];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+};
+
+extern RcEv lbl_806AAF2C;
+extern RcEv lbl_806AB3AC;
+extern RcSys lbl_806AB4C8;
+extern int lbl_806AB3C4[3];
+extern int lbl_806AAF50[3];
+extern void* lbl_806EEA2C;
+extern "C" int fn_803F78CC(void*, void*);
+
 struct RcD {
     virtual RcD* v0();
     virtual void v1(int, int);
@@ -147,6 +203,65 @@ extern "C" char fn_803F2404(const char* wild, const char* str)
     while (*wild == '*')
         wild++;
     return *wild;
+}
+
+/* near-miss: 2 slots; the m14 / m34 stores of the 0x65 state are in the other order */
+enum RcFindState { RFS_INIT = 0, RFS_START = 0x65, RFS_WAIT = 0x69, RFS_DONE = 0x7c };
+
+extern "C" void fn_803F28A4()
+{
+    switch ((RcFindState)lbl_806AAF2C.m8) {
+    case RFS_INIT:
+        lbl_806AAF2C.m8 = 0x65;
+        lbl_806AAF2C.m24 = 0;
+        lbl_806AAF2C.mC = 0;
+    case RFS_START: {
+        RcEv* e = &lbl_806AB3AC;
+        lbl_806AAF2C.mC = 0;
+        e->m1C = 0;
+        lbl_806AAF2C.m8 = 0x69;
+        e->m14.s = 0;
+        e->m18 = -1;
+        e->m34 = lbl_806AAF2C.m4;
+        e->m14.i = lbl_806AAF2C.m14.i;
+        e->m30 = 0xf;
+        e->m8 = 0;
+        e->m2C = 0;
+        e->m38 = 0;
+        e->m3C = 0;
+        e->m0->v0(e);
+        break;
+    }
+    case RFS_WAIT:
+        if (lbl_806AB3C4[0] != 0 && lbl_806AB3C4[0] != 3)
+            lbl_806AAF2C.m24 = 0;
+        else
+            lbl_806AAF50[0] = 1;
+        lbl_806AAF2C.m18 = lbl_806AB3C4[0];
+        lbl_806AAF2C.m8 = 0x7c;
+        lbl_806AAF2C.mC = 0;
+    case RFS_DONE: {
+        RcEv* s = &lbl_806AAF2C;
+        if (s->m24 != 0) {
+            fn_803F78CC(lbl_806EEA2C, &s->m14);
+            s->m24 = 0;
+        }
+        RcSys* y = &lbl_806AB4C8;
+        y->m0 = 2;
+        y->m34 = s->m14.i;
+        y->m4 = s->m18;
+        y->m6C = 0;
+        y->m70 = 0;
+        y->m74 = 0;
+        y->m78 = 0;
+        y->m7C = 0;
+        y->m80 = 0;
+        y->m84 = 0;
+        y->m88 = 0;
+        s->m0->v1(s);
+        break;
+    }
+    }
 }
 
 extern "C" unsigned short* fn_803F644C(void* l, int k)
