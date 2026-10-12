@@ -4,6 +4,72 @@
  */
 #include "game/tu_8017D640.h"
 #include "game/clampiter.h"
+struct Unk8017FCE4_F {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+};
+struct Unk8017FCE4_D {
+    char pad0[4];
+    Unk8017FCE4_F f;
+    float m1C;
+    float m20;
+};
+struct Unk8017FB04_M8;
+struct Unk8017FCE4_T {
+    Unk8017B0A4_Ctx* m0;
+    char pad4[4];
+    Unk8017FB04_M8* m8;
+    Unk8017FCE4_D* mC;
+    char pad10[0x1FC - 0x10];
+    int m1FC;
+};
+int fn_8025416C(void* p, int a);
+void* fn_801A497C(void* c, int a, int b);
+struct Unk8017FB04_Sub {
+    char pad0[0x1C];
+    int m1C;
+};
+struct Unk8017FB04_M8 {
+    char pad0[0x10];
+    Unk8017FB04_Sub* m10;
+    Unk8017C954_Rec* m14;
+};
+struct Unk8017FB04_D {
+    char pad0[0x28];
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+};
+struct Unk8017FB04_F {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+};
+struct Unk8017FB04_T {
+    char pad0[8];
+    Unk8017FB04_M8* m8;
+    Unk8017FB04_D* mC;
+    char pad10[0x1EC - 0x10];
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+};
 struct Unk8017FF74_D {
     char pad0[0x68];
     unsigned int m68;
@@ -556,6 +622,93 @@ extern "C" float fn_8017FA08(Unk8017FA08_T* p)
         float* a = (float*)((char*)p->mC + 0x48);
         r = (float)p->m1E4 * a[4] + r;
         r = (float)p->m1E8 * a[5] + r;
+    }
+    return r;
+}
+
+float fn_8017FB04(Unk8017FB04_T* p)
+{
+    float r = 1.0f;
+    if (p->m1FC == 0) {
+        Unk8017C954_Rec* z = p->m8->m14;
+        int a = 0;
+        if (z->m1CD0 != 0) {
+            a = 1;
+        }
+        int y1 = (int)z + a * 0xE64;
+        int s1 = SumYBytes(y1);
+        Unk8017C954_Rec* z2 = p->m8->m14;
+        int b = z2->m1CD0 == 0;
+        int y2 = (int)z2 + b * 0xE64;
+        int s2 = SumYBytes(y2);
+        int d = s1 - s2;
+        unsigned int ad = d < 0 ? -d : d;
+        float q = (float)((p->m8->m14->m1CC8 + 1) / p->m8->m10->m1C);
+        if (!(q <= 1.0f)) {
+            q = 1.0f;
+        }
+        Unk8017FB04_F* f = (Unk8017FB04_F*)((char*)p->mC + 0x28);
+        r = q * f->m10 + 1.0f;
+        r = r * (ad <= 3 ? f->m14 : ad <= 5 ? f->m18 : f->m1C);
+        if (p->m1F8 != 0) {
+            r = r * p->mC->m2C;
+        } else if (p->m1F4 != 0) {
+            r = r * p->mC->m28;
+        } else if (p->m1EC != 0) {
+            r = r * p->mC->m30;
+        } else if (p->m1F0 != 0) {
+            r = r * p->mC->m34;
+        }
+    }
+    return r;
+}
+
+float fn_8017FCE4(Unk8017FCE4_T* p)
+{
+    float r = 0.0f;
+    if (p->m1FC == 0) {
+        if (fn_8025416C((char*)fn_801A4B34(p->m0) + 0x588, 0x16) == 4) {
+            r += p->mC->f.m0;
+        }
+        Unk8017B0A4_Ctx* c = p->m0;
+        if (fn_8025416C((char*)fn_801A497C(c, c->m6F8->m14->m1CD0 == 0, 0) + 0x588, 0x16) == 4) {
+            r += *(float*)((char*)p->mC + 8);
+        }
+        Unk8017C954_Rec* z = p->m8->m14;
+        Unk8017FCE4_F* f = (Unk8017FCE4_F*)((char*)p->mC + 4);
+        int n = 0;
+        int* fl = (int*)((char*)p->m0 + 0x65C);
+        r += (float)(int)z->m1CC9 * f->m8;
+        r += (float)(int)z->m1CCB * f->mC;
+        r += (float)(int)z->m1CCA * f->m10;
+        if (fl[10] != 0) {
+            n = 1;
+        }
+        if (fl[11] != 0) {
+            n += 1;
+        }
+        if (fl[12] != 0) {
+            n += 1;
+        }
+        r += (float)n * f->m14;
+        int a = 0;
+        if (z->m1CD0 != 0) {
+            a = 1;
+        }
+        int y1 = (int)z + a * 0xE64;
+        int s1 = SumYBytes(y1);
+        Unk8017C954_Rec* z2 = p->m8->m14;
+        int b = z2->m1CD0 == 0;
+        int y2 = (int)z2 + b * 0xE64;
+        int s2 = SumYBytes(y2);
+        if (s1 < s2) {
+            int t = s1 + n + 1;
+            if (t == s2) {
+                r += p->mC->m1C;
+            } else if (t > s2) {
+                r += p->mC->m20;
+            }
+        }
     }
     return r;
 }

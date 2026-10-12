@@ -13,7 +13,7 @@ struct Unk8017C954_Rec {
     int m10C;
     char pad110[0x1CC8 - 0x110];
     unsigned char m1CC8;
-    char pad1CC9[1];
+    unsigned char m1CC9;
     unsigned char m1CCA;
     unsigned char m1CCB;
     char pad1CCC[4];
