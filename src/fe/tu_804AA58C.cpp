@@ -108,6 +108,16 @@ FE_OVERLAY int fn_804AAE74(void* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_804AAEB0(void* x)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    fn_8040B830(mp->name, lbl_805F4450, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
+}
+
 FE_OVERLAY void fn_804AAF34(void* x)
 {
     FeMsg m;
