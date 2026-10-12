@@ -140,6 +140,35 @@ inline P* PlAt801EAAE0(void** a, int i)
     return *(P**)((char*)a + o);
 }
 
+struct Unk801EA880_Cx {
+    char pad0[0xBD4];
+    float mBD4;
+    char padBD8[4];
+    float mBDC;
+};
+float fn_80410CE8(float y, float x);
+float fn_804028E4(float x);
+float fn_8024902C();
+extern "C" float fn_8024796C(P* p, float f, int a, int b, int c, int d, float* e, float* g, int h);
+
+inline Unk801DB948_Vec3 FlatPos801EA880(const P* p)
+{
+    Unk801DB948_Vec3 t = p->m60;
+    t.y = 0.0f;
+    return t;
+}
+
+extern "C" void fn_801EA880(I* s, P* p)
+{
+    Unk801DB948_Vec3 a = FlatPos801EA880(p);
+    Unk801DB948_Vec3* q = &a;
+    float ang = fn_80410CE8(((Unk801EA880_Cx*)s->m9C)->mBD4 - a.x, ((Unk801EA880_Cx*)s->m9C)->mBDC - q->z);
+    float d = fn_804028E4((a.x - ((Unk801EA880_Cx*)s->m9C)->mBD4) * (a.x - ((Unk801EA880_Cx*)s->m9C)->mBD4) + (q->z - ((Unk801EA880_Cx*)s->m9C)->mBDC) * (q->z - ((Unk801EA880_Cx*)s->m9C)->mBDC));
+    d = d >? 0.0f;
+    float sp = ((float (*)(P*))fn_8024902C)(p);
+    fn_8024796C(p, d, 0, 3, 10, 1, &ang, &sp, 0);
+}
+
 /* near-miss (1 slot): retail starts the inner counter with mr r10,r8 (copy of the found flag) where ours has li r10,0 */
 extern "C" P* fn_801EAAE0(I* s, Unk801DB948_Vec3* pos, P** list, int n)
 {
