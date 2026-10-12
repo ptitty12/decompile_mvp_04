@@ -124,6 +124,16 @@ int fn_8024F5CC(int x)
     return lbl_8061D4DC[x];
 }
 
+extern "C" void* fn_8024F5FC(void* p);
+
+extern int lbl_806EF9B4;
+
+extern "C" void* fn_8024F69C()
+{
+    return fn_8024F5FC(operator new(0x4, lbl_806EF9B4));
+}
+
+
 void fn_8024F6CC()
 {
     fn_8033CD74(lbl_8068CD00);
