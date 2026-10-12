@@ -972,3 +972,110 @@ extern "C" Unk8027C728_Goal* fn_801E25E8(void* self, P* p)
     h104->m34 = one;
     return g;
 }
+
+struct Unk801E2A64_Pos {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+};
+struct Unk801E2A64_Self {
+    char pad0[0x6CC];
+    Unk801E2A64_Pos* m6CC;
+};
+inline Unk80273498_Vec3 Unk801E2A64_Sub(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+/* near-miss 97.5%: identical twin of fn_801E2BF4; callee-saved register numbering (x, &d, &w) differs */
+extern "C" Unk8027C728_Goal* fn_801E2A64(Unk801E2A64_Self* self, P* p, GSrc* x)
+{
+    const Unk80273498_Vec3* pp = (const Unk80273498_Vec3*)&p->m60;
+    Unk80273498_Vec3 d = Unk801E2A64_Sub(self->m6CC->m60, *pp);
+    const Unk80273498_Vec3* pv = &d;
+    int four = 4;
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 0xA;
+    fn_8027C728(g);
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)g->m18)->fn_8027A898(&w);
+    }
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    int c = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c;
+    g104->m40 = c;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    hs->fn_80287DB8(1);
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)hs)->fn_8027A898(&w);
+    }
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = four;
+    h104->m38 = four;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    int c2 = x->m18;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
+    h104->m40 = c2;
+    return g;
+}
+
+/* near-miss 97.5%: identical twin of fn_801E2A64; callee-saved register numbering (x, &d, &w) differs */
+extern "C" Unk8027C728_Goal* fn_801E2BF4(Unk801E2A64_Self* self, P* p, GSrc* x)
+{
+    const Unk80273498_Vec3* pp = (const Unk80273498_Vec3*)&p->m60;
+    Unk80273498_Vec3 d = Unk801E2A64_Sub(self->m6CC->m60, *pp);
+    const Unk80273498_Vec3* pv = &d;
+    int four = 4;
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 0xA;
+    fn_8027C728(g);
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)g->m18)->fn_8027A898(&w);
+    }
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    int c = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c;
+    g104->m40 = c;
+    Unk8027C728_Goal* h = g->m0;
+    h->m10 = 2;
+    fn_8027C728(h);
+    Unk80287D70* hs = (Unk80287D70*)h->m18;
+    hs->fn_80287DB8(1);
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    {
+        Unk80273498_Vec3 w = GPos(pv);
+        ((Unk8027A84C*)hs)->fn_8027A898(&w);
+    }
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = four;
+    h104->m38 = four;
+    int b2 = x->m8;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = b2;
+    h104->m34 = b2;
+    int c2 = x->m18;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m40 = c2;
+    h104->m40 = c2;
+    return g;
+}
