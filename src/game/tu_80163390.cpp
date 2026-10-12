@@ -132,18 +132,24 @@ int fn_801A7130(Unk8019F8C0_Owner* o, int i);
 void fn_802B2ED0(Unk802B0ACC_T* t, int i);
 extern char* lbl_8061E978;
 
-#define EVK(T, k) ((T*)(e ? (e->m0 == (k) ? e : 0) : 0))
+struct Unk80163CC4_Time {
+    char pad0[0x4C];
+    unsigned int m4C;
+};
 
-/* near-miss: 597/600 insns; the case tree, bodies and the null-then-kind cast shape match. Retail never
- * constant-propagates the case value into the kind checks (cmpw r31,r0 and mr r4,r31 in every body but
- * 0x98, so id stays live in r31, frame 0x50 with r27 = mC); ours folds id to the case constant
- * (cmpwi r0,K) and leaves id in r4. Tried: id as short/ushort/uchar/register, copy locals, inline helpers
- * (early-return and ternary), literal kinds, dtor guards, loop wrappers. */
+inline Unk80326F44_Out Unk80163CC4_OutOf(const Unk80163CC4_Evt99* c)
+{
+    return c->mC;
+}
+
+#define EVK(T, k) ((T*)(e ? ((k) == e->m0 ? e : 0) : 0))
+
+
 void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
 {
     Unk801527C8_Actor* a = mC;
     Unk801527C8_Sub* s = &a->m50;
-    float t = (float)*(unsigned int*)&a->m4C * 0.016666668f;
+    float t = (float)((Unk80163CC4_Time*)a)->m4C * 0.016666668f;
     switch (id) {
     case 3:
     case 4:
@@ -176,13 +182,11 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
     case 0x64:
         fn_80165738(EVK(Unk801654F0_Evt, id), t);
         break;
-    case 0x88: {
-        Unk80165790_Evt* c = EVK(Unk80165790_Evt, id);
-        s->fn_80326EF4(t, 0.0f, id, c->m8->m458, -1, 0);
+    case 0x88:
+        s->fn_80326EF4(t, 0.0f, id, EVK(Unk80165790_Evt, id)->m8->m458, -1, 0);
         break;
-    }
     case 0x46:
-        m334 = t + 1.0f;
+        m334 = (float)((Unk80163CC4_Time*)a)->m4C * 0.016666668f + 2.0f;
         break;
     case 0x59: {
         Unk801527C8_Actor* o = fn_801A04A8(a, 0);
@@ -234,7 +238,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         if (c->m8 == 1) {
             s->fn_80326EF4(t, 0.0f, 0xB1, -1, -1, 0);
             fn_802B2ED0((Unk802B0ACC_T*)(lbl_8061E978 + 0xAF4), 0);
-            m338 = (float)*(unsigned int*)&a->m4C * 0.016666668f + 1.0f;
+            m338 = (float)((Unk80163CC4_Time*)a)->m4C * 0.016666668f + 2.0f;
         }
         break;
     }
@@ -290,7 +294,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         break;
     }
     case 0x98: {
-        Unk80163CC4_Evt98* c = (Unk80163CC4_Evt98*)(e != 0 && e->m0 == 0x98 ? e : 0);
+        Unk80163CC4_Evt98* c = EVK(Unk80163CC4_Evt98, 0x98);
         m30 = 1;
         m38 = c->mC;
         m34 = c->m8;
@@ -300,7 +304,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         Unk80163CC4_Evt99* c = EVK(Unk80163CC4_Evt99, id);
         m3C = 1;
         m40 = c->m8;
-        Unk80326F44_Out o = c->mC;
+        Unk80326F44_Out o = Unk80163CC4_OutOf(c);
         m44 = o.mC;
         if (c->m24 != 0) {
             fn_80163748();
