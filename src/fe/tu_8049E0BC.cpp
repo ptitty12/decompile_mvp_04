@@ -51,6 +51,14 @@ extern const char lbl_805F7558[];
 extern const char lbl_805F6548[];
 extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
+extern "C" void fn_804A1724(int a, FeW* x);
+extern "C" int fn_80552D98(void);
+struct Unk8007B2B0_Screen {
+    void fn_8007B924(int a, int b, char* out);
+};
+extern "C" void fn_80402EF8(char* a, char* b);
+extern "C" void fn_804031F8(char* dst, const char* s, char* p);
+extern "C" void fn_801321D4(FeW* o, void* self, void (*cb)(int, void*), void (*cb2)(void), void* b, int c, int d, int e, const char* s1, const char* s2, const char* s3, int f, int g, int h);
 extern "C" void fn_8049E94C(void* x);
 extern "C" void fn_8049EDC8(void* x);
 extern "C" void fn_8049F088(void* x);
@@ -279,6 +287,39 @@ FE_OVERLAY void fn_8049F088(void* xx)
 FE_OVERLAY void fn_8049F2A8(void* x)
 {
     FeMem(x, 0x180)->fn_vslot8(0);
+}
+
+/* near-miss (136/138 ins): retail sets r6 (b408) before r3 for the fn_8007B924 call; tried local pointer copies, member call, int/pointer locals, 7 variants. */
+FE_OVERLAY void fn_8049F2E4(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    char b20[0x3E8];
+    char b408[0x68];
+    char b470[0xC8];
+    FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    int own = 0;
+    if (fn_80552D98() > 7 || FeI(fn_800B555C(), 0xC4) != 0)
+        own = 1;
+    void** pg = &lbl_8061930C;
+    fn_8007B4A8__18Unk8007B2B0_Screeniii(*pg, 0x22, fn_8007F7D0__FP13Unk8007F198_BUi(*pg, 0), 0);
+    ((Unk8007B2B0_Screen*)*pg)->fn_8007B924(1, FeI(fn_800B555C(), 0xC0), b408);
+    fn_80402EF8(b470, b408);
+    if (own == 0 && FeI(fn_800B555C(), 0xC4) == 0) {
+        fn_804031F8(b20, fn_80090880(lbl_8061977C, 0x1AF8), b470);
+    } else {
+        int m = FeI(x, 0x170);
+        if (fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(fn_800B555C(), 0xC0)) == m) {
+            fn_804031F8(b20, fn_80090880(lbl_8061977C, 0x4E37), b470);
+        } else {
+            fn_804031F8(b20, fn_80090880(lbl_8061977C, 0x1AF6), b470);
+        }
+    }
+    ((FeWQ*)p)->s84(0);
+    const char* s1 = fn_80090880(lbl_8061977C, 0x3587);
+    const char* s2 = fn_80090880(lbl_8061977C, 0x3588);
+    const char* s3 = fn_80090880(lbl_8061977C, 0x2390);
+    fn_801321D4(p, x, (void (*)(int, void*))fn_804A1724, fn_80529158, b20, own ? 3 : 1, -1, 1, s1, s2, s3, 0, 0, 0);
+    p->fn_vslot86();
 }
 
 FE_OVERLAY void fn_8049F50C(void* xx)
