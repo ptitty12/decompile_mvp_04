@@ -1,6 +1,7 @@
 """sa.py unit func [--pin-last N] [--iters N] [--seed N] [--start tgt|cur]: simulated annealing over statement order of body (one stmt per line). prints best text."""
+import os
 import sys, random, math
-sys.path.insert(0, 'C:/Users/PATRIC~1/AppData/Local/Temp/claude/C--Users-Patrick-Taylor-decompile-mvp-04/ddf206fc-e9e3-4b5f-93d0-98c4cc873084/scratchpad/T03')
+sys.path.insert(0, (os.environ.get('QDIR') or os.path.dirname(os.path.abspath(__file__))))
 from vtlib import *
 unit, func = sys.argv[1:3]
 def arg(n, d): return int(sys.argv[sys.argv.index(n)+1]) if n in sys.argv else d

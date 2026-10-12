@@ -5,6 +5,57 @@
 #include "game/tu_800BCD38.h"
 #include "game/tu_800BCD38_decls.h"
 
+/* fn_800C1C8C: the list at +0xC0 is the 0x18-byte array-with-buffer object (db_8053967C.h
+ * Unk80535650_Tmp family): vtables lbl_8064B298, lbl_8064A550, lbl_8065C1B0 go into the vptr
+ * slot in turn around the 0xFA-int buffer at +0xD8. */
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8065C1B0[];
+extern char lbl_806841F8[];
+extern "C" void fn_8040074C(void* p, unsigned n);
+extern "C" void fn_8052DD58(void* e);
+extern "C" void fn_80599B24(void* s);
+extern "C" void fn_800C1D6C(Unk800C1D6C_Obj* o);
+struct Unk800C1C8C_List {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+};
+struct Unk800C1C8C_Flags {
+    char m0;
+    char m1;
+    short m2;
+};
+extern "C" void fn_80599B54(void* s);
+extern "C" void fn_800C1FA0(Unk800C1D6C_Obj* o);
+extern "C" void fn_800C1FF4(Unk800C1D6C_Obj* o);
+extern "C" void fn_800C207C(Unk800C1D6C_Obj* o);
+extern "C" void fn_800C2100(Unk800C1D6C_Obj* o);
+extern "C" void fn_800C218C(Unk800C1D6C_Obj* o, const int* src, int n);
 extern "C" {
 int fn_8040B574(const char* a, const char* b);
 void* fn_803774A8(unsigned n, int heap);
@@ -187,6 +238,142 @@ extern "C" float fn_800C1BE4(void* unused, int a, int b)
         r = (float)a * 0.017453294f;
     }
     return r;
+}
+
+extern "C" Unk800C1D6C_Obj* fn_800C1C8C(Unk800C1D6C_Obj* o)
+{
+    o->mC = 0;
+    Unk800C1C8C_Flags* f = (Unk800C1C8C_Flags*)&o->mC;
+    f->m1 = 0;
+    f->m2 = 0;
+    Unk800C1C8C_List* l = (Unk800C1C8C_List*)((char*)o + 0xC0);
+    int zero = 0;
+    char* e = (char*)o + 0x3C;
+    *(const void**)(e + 0x14) = lbl_806841F8;
+    fn_8052DD58(e);
+    fn_80599B24((char*)o + 0x8C);
+    l->C1((int*)((char*)o + 0xD8), 0xFA);
+    l->C2();
+    l->C3(lbl_8065C1B0);
+    fn_800C1D6C(o);
+    *(int*)((char*)o + 0x568) = -1;
+    return o;
+}
+
+extern "C" void fn_800C1D6C(Unk800C1D6C_Obj* o)
+{
+#define F(off) (*(int*)((char*)o + (off)))
+    fn_800C1FA0(o);
+    fn_800C207C(o);
+    fn_800C1FF4(o);
+    fn_800C2100(o);
+    F(0x28) = 0;
+    F(0x38) = 0;
+    fn_8052DD58((char*)o + 0x3C);
+    F(0x54) = -1;
+    F(0x58) = 0;
+    F(0x5C) = 0;
+    F(0x60) = 0;
+    F(0x64) = 0;
+    F(0x68) = 0;
+    F(0x6C) = 0;
+    F(0x70) = 0;
+    F(0x74) = 0;
+    F(0x78) = 0;
+    F(0x7C) = 0;
+    F(0x80) = 0;
+    F(0x84) = 1;
+    F(0x88) = 0;
+    fn_80599B54((char*)o + 0x8C);
+    F(0xB8) = 0;
+    F(0xBC) = 0;
+    Unk800C1C8C_List* l = (Unk800C1C8C_List*)((char*)o + 0xC0);
+    fn_8040074C(l->m0, l->m8 << 2);
+    l->m4 = 0;
+    l->mC = 0;
+    l->m14 = 0;
+    F(0x508) = 3;
+    F(0x520) = 0xA2;
+    F(0x4C0) = 0;
+    F(0x4C4) = 6;
+    F(0x4C8) = 0;
+    F(0x4CC) = 0;
+    F(0x4D0) = 0;
+    F(0x4D4) = 6;
+    F(0x4D8) = 0;
+    F(0x4DC) = 0;
+    F(0x4E0) = 0;
+    F(0x4E4) = 0;
+    F(0x4E8) = 0;
+    F(0x4EC) = 0;
+    F(0x4F0) = 0;
+    F(0x4F4) = 0;
+    F(0x4F8) = -1;
+    F(0x4FC) = 0;
+    F(0x500) = 0;
+    F(0x504) = 0;
+    F(0x50C) = 0;
+    F(0x510) = 0;
+    F(0x514) = 0;
+    F(0x518) = 0;
+    F(0x51C) = 0;
+    F(0x524) = 0;
+    F(0x528) = 0;
+    F(0x52C) = 0;
+    F(0x530) = 0;
+    F(0x534) = 0;
+    F(0x538) = 0;
+    F(0x53C) = 0;
+    F(0x540) = 0;
+    F(0x544) = 0;
+    F(0x548) = 0;
+    F(0x54C) = 0;
+    F(0x550) = 0;
+    F(0x554) = 0;
+    F(0x558) = 0;
+    F(0x55C) = 0;
+    F(0x560) = 0;
+    F(0x564) = 0;
+    F(0x578) = 0;
+    F(0x57C) = 5;
+    F(0x580) = 0;
+    F(0x584) = 0;
+    F(0x588) = 0;
+    F(0x58C) = 0;
+    F(0x590) = 0;
+    F(0x594) = 0;
+    F(0x574) = 0xA;
+    fn_800C218C(o, 0, 0);
+    F(0x618) = 5;
+    F(0x630) = 1;
+    F(0x64C) = 6;
+    F(0x600) = 0;
+    F(0x604) = 0;
+    F(0x608) = -1;
+    F(0x60C) = 0;
+    F(0x610) = -1;
+    F(0x614) = 0;
+    F(0x61C) = 0;
+    F(0x620) = 0;
+    F(0x624) = 0;
+    F(0x628) = 0;
+    F(0x62C) = 0;
+    F(0x634) = 0;
+    F(0x638) = 0;
+    F(0x63C) = 0;
+    F(0x640) = 0;
+    F(0x644) = 0;
+    F(0x648) = 0;
+    F(0x650) = -1;
+    F(0x65C) = 0;
+    F(0x2C) = 0;
+    F(0x654) = -1;
+    F(0x658) = 0x18;
+    F(0x30) = 0;
+    F(0x664) = 4;
+    F(0x34) = 0;
+    F(0x668) = 4;
+#undef F
 }
 
 extern "C" void fn_800C1FA0(Unk800C1D6C_Obj* o)

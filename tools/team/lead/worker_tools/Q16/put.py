@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+import os
 r"""put.py <unit> <deffile> : insert/replace function definitions in src/<unit>.cpp (CRLF preserved).
 deffile (LF text): optional `//DECL` ... `//ENDDECL` section (top-level declaration chunks inserted after the last
 #include unless the exact chunk is already in the file; chunks inside `extern "C" {` stay C-linkage) followed by
 function definitions (top-level blocks ending at a '}' in col 0)."""
 import re, sys, subprocess
-ROOT = "C:/Users/Patrick Taylor/decompile_mvp_04-W5"
+ROOT = (os.environ.get('WT') or os.getcwd())
 unit, df = sys.argv[1], sys.argv[2]
 p = ROOT + "/src/" + unit + ".cpp"
 src = open(p, 'rb').read().decode()

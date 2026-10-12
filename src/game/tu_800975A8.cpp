@@ -30,9 +30,247 @@ extern "C" int fn_80080724(void* p);
 
 extern "C" int fn_80097A70(char* o, int a, int b, int i) { return fn_80080724((char*)(i * 0x128 + (int)o) + 0x95C); }
 
+extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i)
+{
+    int r;
+    if (c <= 1) {
+        char* base = o + 0x924;
+        int off = c * 4 + i * 0x128;
+        r = (*(Rec**)(base + off))->v5(a, b);
+    } else {
+        int off = i * 0x128;
+        char* base2 = o + 0x928;
+        int x = (*(Rec**)(base2 + off))->v5(a, b);
+        char* base = o + 0x924;
+        r = x + (*(Rec**)(base + off))->v5(a, b);
+    }
+    return r;
+}
+
+struct RecF80097B60 {
+    char pad[0x20];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual float v7(int a, int b);
+};
+
+inline RecF80097B60* At80097B60(char* b, int off) { return *(RecF80097B60**)(b + off); }
+
+extern "C" float fn_80097B60(char* o, int k, int p, int c, int i)
+{
+    float r = 0.0f;
+    if (c > 1) {
+        switch (k) {
+        case 3: {
+            float a = fn_80097B60(o, 0, p, c, i);
+            float b = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b <= 0.0f))
+                r = a / b;
+            break;
+        }
+        case 4: {
+            float b0 = fn_80097B60(o, 0, p, c, i);
+            float s0 = (float)fn_80097A9C(o, 0, p, c, i);
+            float s3 = (float)fn_80097A9C(o, 3, p, c, i);
+            float s8 = (float)fn_80097A9C(o, 8, p, c, i);
+            float b1 = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            float tot = b1 + s0 + s3 + s8;
+            if (!(tot <= 0.0f))
+                r = (b0 + s0 + s3) / tot;
+            break;
+        }
+        case 5: {
+            float a = fn_80097B60(o, 2, p, c, i);
+            float b = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b < 0.0f))
+                r = a / b;
+            break;
+        }
+        case 6: {
+            float a = fn_80097B60(o, 4, p, c, i);
+            float b = fn_80097B60(o, 5, p, c, i);
+            r = a + b;
+            break;
+        }
+        default: {
+            int off = i * 0x128;
+            r = At80097B60(o + 0x928, off)->v7(k, p) + At80097B60(o + 0x924, off)->v7(k, p);
+            break;
+        }
+        }
+    } else {
+        char* b = o + 0x924;
+        int off2 = c * 4 + i * 0x128;
+        r = At80097B60(b, off2)->v7(k, p);
+    }
+    return r;
+}
+
+extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i)
+{
+    int r;
+    if (c <= 1) {
+        char* base = o + 0x954;
+        int off = c * 4 + i * 0x128;
+        r = (*(Rec**)(base + off))->v5(a, b);
+    } else {
+        int off = i * 0x128;
+        char* base2 = o + 0x958;
+        int x = (*(Rec**)(base2 + off))->v5(a, b);
+        char* base = o + 0x954;
+        r = x + (*(Rec**)(base + off))->v5(a, b);
+    }
+    return r;
+}
+
+struct RecF80097F68 {
+    char pad[0x20];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual float v7(int a, int b);
+};
+inline RecF80097F68* At80097F68(char* b, int off) { return *(RecF80097F68**)(b + off); }
+
+extern "C" float fn_80097F68(char* o, int k, int p, int c, int i)
+{
+    float r = 0.0f;
+    if (c > 1) {
+        switch (k) {
+        case 2: {
+            float a = fn_80097F68(o, 0, p, c, i);
+            float b = fn_80097F68(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b <= 0.0f))
+                r = a / b;
+            break;
+        }
+        case 3: {
+            float b0 = fn_80097F68(o, 0, p, c, i);
+            float s0 = (float)fn_80097EA4(o, 6, p, c, i);
+            float s1 = (float)fn_80097EA4(o, 10, p, c, i);
+            float b1 = fn_80097F68(o, 1, p, c, i);
+            float s2 = (float)fn_80097EA4(o, 8, p, c, i);
+            r = 0.0f;
+            float tot = b1 + s0 + s1 + s2;
+            if (!(tot <= 0.0f)) {
+                r = (b0 + s0 + s1) / tot;
+                int v = (int)(r * 10000.0f);
+                if (v % 10 > 4)
+                    v += 10;
+                v = v / 10;
+                r = (float)v * 0.001f;
+            }
+            break;
+        }
+        case 5: {
+            float a = fn_80097F68(o, 4, p, c, i);
+            float b = fn_80097F68(o, 1, p, c, i);
+            if (!(b <= 0.0f)) {
+                r = a / b;
+                int v = (int)(r * 10000.0f);
+                if (v % 10 > 4)
+                    v += 10;
+                v = v / 10;
+                r = (float)v * 0.001f;
+            }
+            break;
+        }
+        case 6: {
+            float a = fn_80097F68(o, 3, p, c, i);
+            float b = fn_80097F68(o, 5, p, c, i);
+            r = a + b;
+            break;
+        }
+        default: {
+            int off = i * 0x128;
+            r = At80097F68(o + 0x958, off)->v7(k, p) + At80097F68(o + 0x954, off)->v7(k, p);
+            break;
+        }
+        }
+    } else {
+        char* b = o + 0x954;
+        int off2 = c * 4 + i * 0x128;
+        r = At80097F68(b, off2)->v7(k, p);
+    }
+    return r;
+}
+
 extern "C" int fn_800983C8(char* o, int a, int b) { return fn_80097620(o, a, b, 0) + fn_80097620(o, a, b, 1); }
 
 extern "C" int fn_8009841C(char* o, int a, int b) { return fn_8009764C(o, a, b, 0) + fn_8009764C(o, a, b, 1); }
+
+extern "C" float fn_80097678(char* o, int a, int b, int c);
+extern "C" int fn_8009896C(char* o, int a, int b, int c);
+extern "C" float fn_800989C8(char* o, int a, int b, int c);
+
+extern "C" float fn_80098470(char* o, int k, int p)
+{
+    float r = 0.0f;
+    switch (k) {
+    case 1: {
+        float a = (float)fn_8009841C(o, 6, p);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a * 9.0f / d;
+        break;
+    }
+    case 2:
+        r = fn_80097678(o, 2, p, 1);
+        break;
+    case 3: {
+        float s = (float)fn_8009896C(o, 0, p, 2);
+        float t = fn_800989C8(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = (s + t) / d;
+        break;
+    }
+    case 6: {
+        float a = (float)fn_8009896C(o, 2, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 5: {
+        float a = (float)fn_8009896C(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 7: {
+        float a = fn_800989C8(o, 0, p, 2);
+        float d = (float)fn_8009841C(o, 1, p) + (float)fn_8009841C(o, 2, p) * 0.33333334f;
+        r = 0.0f;
+        if (!(d <= 0.0f))
+            r = a / (d * 0.11111111f);
+        break;
+    }
+    case 4:
+        r = fn_80097678(o, 4, p, 1);
+        break;
+    default:
+        r = fn_80097678(o, k, p, 0) + fn_80097678(o, k, p, 1);
+        break;
+    }
+    return r;
+}
 
 extern "C" int fn_80098918(char* o, int a, int b) { return fn_80097A70(o, a, b, 0) + fn_80097A70(o, a, b, 1); }
 
@@ -42,36 +280,109 @@ extern "C" int fn_8009896C(char* o, int a, int b, int c) { return fn_80097A9C(o,
 
 extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i);
 
+extern "C" float fn_800989C8(char* o, int k, int p, int c)
+{
+    float r = 0.0f;
+    switch (k) {
+    case 3: {
+        float a = fn_800989C8(o, 0, p, c);
+        float b = fn_800989C8(o, 1, p, c);
+        r = a / b;
+        break;
+    }
+    case 4: {
+        float b0 = fn_800989C8(o, 0, p, c);
+        float s0 = (float)fn_8009896C(o, 0, p, c);
+        float s3 = (float)fn_8009896C(o, 3, p, c);
+        float s8 = (float)fn_8009896C(o, 8, p, c);
+        float b1 = fn_800989C8(o, 1, p, c);
+        r = 0.0f;
+        float tot = b1 + s0 + s3 + s8;
+        if (!(tot <= 0.0f))
+            r = (b0 + s0 + s3) / tot;
+        break;
+    }
+    case 5: {
+        float a = fn_800989C8(o, 2, p, c);
+        float b = fn_800989C8(o, 1, p, c);
+        r = 0.0f;
+        if (!(b <= 0.0f))
+            r = a / b;
+        break;
+    }
+    case 6: {
+        float a = fn_800989C8(o, 4, p, c);
+        float b = fn_800989C8(o, 5, p, c);
+        r = a + b;
+        break;
+    }
+    default:
+        r = fn_80097B60(o, k, p, c, 0) + fn_80097B60(o, k, p, c, 1);
+        break;
+    }
+    return r;
+}
+
 extern "C" int fn_80098C68(char* o, int a, int b, int c) { return fn_80097EA4(o, a, b, c, 0) + fn_80097EA4(o, a, b, c, 1); }
 
-/* near-miss: case order / jump layout of the switch differs */
-extern "C" int fn_8008AC94(void* p);
+
+extern "C" int fn_8009908C(Obj3* o, int kind, int p);
+
+int fn_80071170(void* self, int a, unsigned b);
+extern "C" float fn_80097F68(char* o, int a, int b, int c, int i);
+
+extern "C" int fn_8009908C(Obj3* o, int kind, int p)
+{
+    int base = fn_80071170((char*)o + 0xD1C, kind, p);
+    int r = 0;
+    switch (kind) {
+    case 0:
+        r = fn_80097620((char*)o, 0, p, 0);
+        break;
+    case 1:
+        r = (int)fn_80097F68((char*)o, 1, p, 2, 0);
+        break;
+    case 2:
+        r = (int)fn_80097F68((char*)o, 0, p, 2, 0);
+        break;
+    case 3:
+        r = fn_80097EA4((char*)o, 0, p, 2, 0);
+        break;
+    case 4:
+        r = fn_80097EA4((char*)o, 1, p, 2, 0);
+        break;
+    case 5:
+        r = fn_80097620((char*)o, 3, p, 0);
+        break;
+    case 6:
+        r = fn_80097620((char*)o, 1, p, 0);
+        break;
+    }
+    return base + r;
+}
+
+extern "C" float fn_800991AC(Obj3* o, int mode, int p)
+{
+    float r = 0.0f;
+    if (mode == 0) {
+        float x = (float)fn_8009908C(o, 2, p);
+        float y = (float)fn_8009908C(o, 1, p);
+        if (!(y <= 0.0f))
+            r = x / y;
+    }
+    return r;
+}
+
+struct Unk80089894_PackTab;
+int fn_8008AC94(Unk80089894_PackTab* self, unsigned a, unsigned b);
 
 extern "C" int fn_80099278(Obj3* o, int k, int p)
 {
-    int base = fn_8008AC94((char*)o + 0xD44);
+    int base = fn_8008AC94((Unk80089894_PackTab*)((char*)o + 0xD44), k, p);
     int r = 0;
     switch (k) {
     case 0:
         r = fn_8009764C((char*)o, 0, p, 0);
-        break;
-    case 1:
-        r = fn_8009764C((char*)o, 6, p, 0);
-        break;
-    case 2:
-        r = fn_8009764C((char*)o, 4, p, 0);
-        break;
-    case 3:
-        r = fn_8009764C((char*)o, 3, p, 0);
-        break;
-    case 4:
-        r = fn_8009764C((char*)o, 7, p, 0);
-        break;
-    case 5:
-        r = fn_80097A9C((char*)o, 0, p, 2, 0);
-        break;
-    case 6:
-        r = fn_80097A9C((char*)o, 2, p, 2, 0);
         break;
     case 7:
         r = fn_8009764C((char*)o, 1, p, 0);
@@ -79,8 +390,38 @@ extern "C" int fn_80099278(Obj3* o, int k, int p)
     case 8:
         r = fn_8009764C((char*)o, 2, p, 0);
         break;
+    case 1:
+        r = fn_8009764C((char*)o, 6, p, 0);
+        break;
+    case 3:
+        r = fn_8009764C((char*)o, 3, p, 0);
+        break;
+    case 2:
+        r = fn_8009764C((char*)o, 4, p, 0);
+        break;
+    case 4:
+        r = fn_8009764C((char*)o, 7, p, 0);
+        break;
+    case 6:
+        r = fn_80097A9C((char*)o, 2, p, 2, 0);
+        break;
+    case 5:
+        r = fn_80097A9C((char*)o, 0, p, 2, 0);
+        break;
     }
     return base + r;
+}
+
+extern "C" float fn_800993C0(Obj3* o, int mode, int p)
+{
+    float r = 0.0f;
+    if (mode == 0) {
+        float a = (float)fn_80099278(o, 1, p);
+        float d = (float)fn_80099278(o, 7, p) + (float)fn_80099278(o, 8, p) * 0.33333334f;
+        if (!(d <= 0.0f))
+            r = a * 9.0f / d;
+    }
+    return r;
 }
 
 extern "C" void fn_800994D4(char* o, int x)
@@ -96,7 +437,6 @@ extern "C" void fn_800994D4(char* o, int x)
     fn_800975A8(o, 1, x, b, 0);
 }
 
-/* near-miss: retail lays out the c <= 1 branch first */
 struct Unk80099570 {
     char pad0[0xCC4];
     Rec* mCC4;
@@ -105,11 +445,16 @@ struct Unk80099570 {
 
 extern "C" int fn_80099570(Unk80099570* o, int a, int b, int c)
 {
-    if (c <= 1)
-        return (&o->mCC4)[c]->v5(a, b);
-    Rec* x = o->mCC8;
-    int r = x->v5(a, b);
-    return r + o->mCC4->v5(a, b);
+    int r;
+    if (c <= 1) {
+        char* base = (char*)&o->mCC4;
+        r = (*(Rec**)(base + c * 4))->v5(a, b);
+    } else {
+        Rec* x = o->mCC8;
+        int y = x->v5(a, b);
+        r = y + o->mCC4->v5(a, b);
+    }
+    return r;
 }
 
 extern "C" int fn_800997DC(Obj3* o, ByteVec* v);
@@ -184,6 +529,63 @@ extern "C" void fn_80080828(void* p, int a, int k, int b);
 extern "C" int fn_80099620(Obj3* o);
 extern "C" void fn_80099A44(Obj3* o, int k, int slot);
 
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+extern "C" void fn_800999CC(Obj3* o, int k, int slot);
+extern "C" int fn_80099B50(Obj3* o, int i);
+
+struct Item8009984C {
+    int m0;
+    unsigned char m4;
+    unsigned char m5;
+    unsigned char m6;
+    unsigned char m7;
+};
+struct Obj8009984C {
+    char pad0[0x238];
+    Item8009984C items[16];
+};
+
+/* near-miss: retail forms the new item pointer with an update-form store (stwu) and keeps o in r31 */
+extern "C" void fn_8009984C(Obj3* o, int a1, int a2, int a3, int a4, int a5)
+{
+    Obj8009984C* w = (Obj8009984C*)o;
+    unsigned char id = fn_800968C0(o, a1, 1);
+    if (id != 0xFF) {
+        int s = fn_8008CFD8((char*)o + 0xC9C, 5, id);
+        if (s == 0 || s == 10) {
+            w->items[o->m235 - 1].m6 = a2 - a3;
+            w->items[o->m235 - 1].m5 = a4;
+            Item8009984C* it = (Item8009984C*)(o->m235 * 8 + (int)o + 0x238);
+            it->m0 = 0;
+            it->m7 = 0;
+            it->m4 = 0;
+            it->m5 = 0;
+            it->m6 = 0;
+            char* b = (char*)o + 0x238;
+            *(int*)(b + o->m235 * 8) = a1;
+            w->items[o->m235].m4 = a4;
+            w->items[o->m235].m7 = a5;
+            o->m235 = o->m235 + 1;
+        }
+        fn_800999CC(o, id, 0);
+    }
+    unsigned i;
+    for (i = 0; i < o->m74.m4; i++) {
+        if (fn_80099B50(o, i) == a1) {
+            ByteVec* v = &o->m74;
+            unsigned char j0 = (unsigned char)i;
+            if (j0 < v->m4) {
+                unsigned j = j0;
+                do {
+                    v->m0[j] = v->m0[j + 1];
+                    j++;
+                } while (j < v->m4);
+                v->m4 = v->m4 - 1;
+            }
+        }
+    }
+}
+
 extern "C" void fn_800999CC(Obj3* o, int k, int slot)
 {
     if (o->m17C[slot] != k) {
@@ -246,4 +648,114 @@ extern "C" int fn_80099B50(Obj3* o, int i)
     if (s <= 0x18)
         r = o->m3E8[s].m0;
     return r;
+}
+
+struct Unk80089894_PackTabD;
+int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
+
+extern "C" float fn_80099B7C(Obj3* o)
+{
+    unsigned char k = o->m17C[0];
+    Unk80089894_PackTabD* t = (Unk80089894_PackTabD*)((char*)o + 0xC74);
+    float a = (float)fn_80089AA0(t, 0, k);
+    float b = (float)fn_80089AA0(t, 0x1B, k);
+    float r = !(a <= 0.0f) ? b / a : 0.0f;
+    return r;
+}
+
+/* Container with its vptr at +0x10: count at +4, cursor at +0xC (the ByteVec of Obj3). */
+struct VecObj8009A4A4 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    virtual void v1();
+    virtual void v2();
+    virtual int v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+};
+
+extern "C" void fn_8009A4A4(Obj3* o, VecObj8009A4A4* v, int* out, int n)
+{
+    int cnt = v->m4;
+    if (cnt > n)
+        cnt = n;
+    v->v1();
+    if (cnt > 0) {
+        do {
+            *out = v->v3();
+            out++;
+            v->v10();
+        } while (--cnt != 0);
+    }
+    v->mC = 0;
+}
+
+extern "C" void* fn_800B555C();
+extern "C" int fn_800B57EC(void* p);
+
+extern "C" void fn_8009A548(Obj3* o, int n, int* arr, int slot, int off, int mode)
+{
+    signed char i = 0;
+    signed char r = -1;
+    if (i < n) {
+        char* b = (char*)o + 0x3E8;
+        int so = slot * 0x34;
+        if (*(volatile int*)(b + so) == arr[0]) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < n))
+                    break;
+            } while (*(volatile int*)(b + so) != arr[i]);
+            if (i < n)
+                r = i;
+        }
+    }
+    if (fn_800B57EC(fn_800B555C()) != 0 && mode == 1) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x40A;
+        p[off + so2] = r;
+    } else if (fn_800B57EC(fn_800B555C()) == 0 || mode == 0) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x412;
+        p[off + so2] = r;
+    }
+}
+
+extern "C" void fn_8009A620(Obj3* o, int n, int* arr, int slot, int off, int mode)
+{
+    unsigned char i = 0;
+    signed char r = -1;
+    if (i < n) {
+        char* b = (char*)o + 0x3E8;
+        int so = slot * 0x34;
+        if (*(volatile int*)(b + so) == arr[0]) {
+            r = 0;
+        } else {
+            do {
+                i++;
+                if (!(i < n))
+                    break;
+            } while (*(volatile int*)(b + so) != arr[i]);
+            if (i < n)
+                r = i;
+        }
+    }
+    if (fn_800B57EC(fn_800B555C()) != 0 && mode == 1) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x3FE;
+        p[off + so2] = r;
+    } else if (fn_800B57EC(fn_800B555C()) == 0 || mode == 0) {
+        int so2 = slot * 0x34;
+        char* p = (char*)o + 0x404;
+        p[off + so2] = r;
+    }
 }

@@ -3,7 +3,7 @@
 The block sits right after the last leading #include and is delimited by marker comments.
 If pre_<U>.txt exists next to the decl file, its text is inserted before the first #include."""
 import os, re, sys
-ROOT = "C:/Users/Patrick Taylor/decompile_mvp_04-W5"
+ROOT = (os.environ.get('WT') or os.getcwd())
 unit, df = sys.argv[1], sys.argv[2]
 p = ROOT + "/src/" + unit + ".cpp"
 src = open(p, 'rb').read().decode()

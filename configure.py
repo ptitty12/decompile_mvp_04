@@ -1057,7 +1057,7 @@ config.libs = [
             Object(NonMatching, "ealib/tu_8038F73C.cpp"),
             Object(NonMatching, "ealib/tu_803912F8.cpp", cflags=cflags_ealib_nsr),
             Object(NonMatching, "ealib/tu_803927E4.cpp", cflags=cflags_ealib_nsr),
-            Object(NonMatching, "ealib/tu_80394744.cpp"),
+            Object(NonMatching, "ealib/tu_80394744.cpp", cflags=cflags_ealib_sda_nsr),  # loops keep per-iteration index math; -G8 for fn_803959D8 (docs/DECISIONS.md 2026-10-12)
             Object(NonMatching, "ealib/tu_803959E0.cpp"),
             Object(NonMatching, "ealib/tu_80397CAC.cpp"),
             Object(NonMatching, "ealib/tu_8039B3E4.cpp"),
@@ -1278,6 +1278,7 @@ config.libs = [
             Object(NonMatching, "dolphin/dsp/dsp.c"),
             Object(NonMatching, "dolphin/dsp/dsp_debug.c"),
             Object(NonMatching, "dolphin/dsp/dsp_task.c"),
+            Object(NonMatching, "dolphin/gx/tu_80428C64.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),  # GXInit.c head (docs/DECISIONS.md 2026-10-12)
             Object(NonMatching, "dolphin/gx/tu_80428F14.c"),
             Object(NonMatching, "dolphin/gx/GXAttr.c"),
             Object(NonMatching, "dolphin/gx/tu_8042BF8C.c"),
@@ -1323,6 +1324,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "dolphin/exi/tu_80425E54.c", cflags=cflags_dolphin_sdk),  # dvdlow.c: -O4,p (docs/DECISIONS.md 2026-10-12)
             Object(NonMatching, "dolphin/exi/tu_80426CD0.c"),
+            Object(NonMatching, "dolphin/exi/tu_804286AC.c", cflags=cflags_dolphin_dvd),  # EXIUart.c: -O4,p, signed char (docs/DECISIONS.md 2026-10-12)
         ],
     },
     {

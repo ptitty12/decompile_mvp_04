@@ -2,7 +2,7 @@
 import sys,os,subprocess,re
 sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from ins import insert
-W='C:/Users/Patrick Taylor/decompile_mvp_04-W2'
+W=(os.environ.get('WT') or os.getcwd())
 SP=os.path.dirname(os.path.abspath(__file__)).replace(chr(92),'/')
 unit,fn,nf=sys.argv[1:4]
 show=None; pre=''; extra=[]

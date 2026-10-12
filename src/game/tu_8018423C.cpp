@@ -3,6 +3,93 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8018423C.h"
+
+extern "C" int strcmp(const char* a, const char* b);
+struct Unk80186EF4_R {
+    int m0;
+    char m4[16];
+};
+struct Unk80186EF4_L {
+    int m0;
+    Unk80186EF4_R* m4;
+    int* m8;
+};
+struct Unk80186EF4_M {
+    char pad0[0x37AC];
+    Unk80186EF4_L m37AC;
+};
+extern Unk80186EF4_M* lbl_8061E978;
+struct Unk803DF824_Mtx {
+    float m[16];
+};
+extern "C" void fn_803DF824(Unk803DF824_Mtx* m, float a, float b, float c, float d, float e, float f, float g, float h, float i);
+
+struct Unk8018514C_Y {
+    char pad0[0xC];
+    Unk8018423C_B* mC;
+};
+struct Unk8018514C_Ctx {
+    char pad0[0x6F8];
+    Unk8018514C_Y* m6F8;
+};
+struct Unk8018514C_O {
+    char pad0[0x1D40];
+    Unk8018514C_Ctx* m1D40;
+};
+extern "C" {
+int fn_8018469C(Unk80183918_Vec3* p, Unk80183918_Vec3* out, float* r);
+float fn_8037AC20(Unk80183918_Vec3* p, void* a, void* b, int c, int* hit);
+}
+extern char lbl_8061C910[];
+extern char lbl_8061C91C[];
+extern Unk80183918_Vec3 lbl_8061C928;
+extern float lbl_8061C934;
+extern Unk80183918_Vec3 lbl_806055C4;
+
+extern Unk80183918_Vec3 lbl_8068BD54;
+extern Unk80183918_Vec3 lbl_8068BD60;
+extern Unk80183918_Vec3 lbl_8068BD6C;
+class Unk80186FD4_V : public Unk80182E54_Base8 {
+public:
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6(void* m, int k);
+};
+extern "C" void* fn_80319330(void* p, int a);
+
+extern "C" float __builtin_fabsf(float x);
+inline float Unk801852A4_Abs(float v)
+{
+    return __builtin_fabsf(v);
+}
+inline Unk80183918_Vec3 Unk801852A4_Sub(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+inline Unk80183918_Vec3 Unk801852A4_Add(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m0 + b.m0;
+    r.m4 = a.m4 + b.m4;
+    r.m8 = a.m8 + b.m8;
+    return r;
+}
+inline Unk80183918_Vec3 Unk801852A4_Mul(Unk80183918_Vec3 v, float s)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+
 //@BODY
 //@8018423C
 extern "C" void fn_8018423C(Unk80181140* o, char* a, Unk8018423C_B* b)
@@ -62,6 +149,46 @@ extern "C" int fn_801850B4(Unk801850B4_Obj* o, float* v, int idx, float* out)
         return 0;
     if (fn_80184E5C(o, v, idx) != 0) {
         *out = GetF(o, idx);
+        return 1;
+    }
+    return 0;
+}
+
+//@8018514C
+extern "C" float fn_8018514C(Unk8018514C_O* o, Unk80183918_Vec3* p, Unk80183918_Vec3* out)
+{
+    float r = 0.0f;
+    if (fn_8018469C(p, out, &r) != 0)
+        return r;
+    int mode = o->m1D40->m6F8->mC->m24;
+    if (mode == 0x10 || mode == 0x36) {
+        float t = p->m8 * -1.0833334f - p->m0;
+        if (!(t >= -7411.0f)) {
+            int hit = 0;
+            t = fn_8037AC20(p, lbl_8061C910, lbl_8061C91C, 0, &hit);
+            if (hit != 0 && !(t >= 280.0f)) {
+                *out = lbl_8061C928;
+                t = t / lbl_8061C934;
+                return t;
+            }
+        }
+    }
+    *out = lbl_806055C4;
+    return 0.0f;
+}
+
+//@801852A4
+/* near-miss (99.6%): instructions identical, only stack offsets differ. Retail: Mul param copy 0x20, Sub local and
+ * the final return temp share 0x30, Mul result temp 0x40, Add local 0x68 (frame 0x78); here the return temp is
+ * allocated first (0x20) and the frame is 0x70. Tried named/nested Sub/Mul/Add results and by-ref/by-value params. */
+extern "C" int fn_801852A4(void* self, Unk80183918_Vec3* a, Unk80183918_Vec3* b, Unk80183918_Vec3* out, Unk80183918_Vec3* out2, float* t)
+{
+    if (!(a->m4 <= 0.0f) && !(b->m4 >= 0.0f)) {
+        float fa = Unk801852A4_Abs(a->m4 - b->m4);
+        float fb = Unk801852A4_Abs(a->m4);
+        *t = fb / fa;
+        *out = Unk801852A4_Add(*a, Unk801852A4_Mul(Unk801852A4_Sub(*b, *a), *t));
+        *out2 = lbl_806055C4;
         return 1;
     }
     return 0;
@@ -298,6 +425,70 @@ void Unk80185CD4::fn_80186890()
 {
     fn_80185E38(this);
     fn_80186738(m1C->m6F8->m14->m1CC8);
+}
+
+//@80186EF4
+extern "C" void fn_80186EF4(Unk80181140* o, const char* name, const Unk80183918_Vec3* pos)
+{
+    Unk80186EF4_L* l = &lbl_8061E978->m37AC;
+    if (l != 0) {
+        Unk80186EF4_R* d = l->m4;
+        if (d != 0) {
+            for (int i = 0; i < l->m0; i++) {
+                if (strcmp(name, d[i].m4) == 0) {
+                    Unk80181140_E* e = &o->m1160[i];
+                    *(Unk80183918_Vec3*)&e->m60 = *pos;
+                    fn_803DF824((Unk803DF824_Mtx*)&e->m20, 1.0f, 1.0f, 1.0f, pos->m0, pos->m4, pos->m8, e->m0.m0, e->m0.m4, e->m0.m8);
+                }
+            }
+        }
+    }
+}
+
+//@80186FD4
+/* near-miss (95.3%): same instruction count; strength reduction folds +0x6C into the loop pointers
+ * (retail keeps lwz 108(rX) on the element pointers), the idx lwzx operands swap, and the A.z/C.z
+ * stores swap. Explicit pointer loops share one o+0x1160 copy instead (tried 3 shapes). */
+extern "C" void fn_80186FD4(Unk80181140* o)
+{
+    Unk80186FD4_V* v = (Unk80186FD4_V*)fn_80319330((char*)o + 0x244, 0x16);
+    lbl_8068BD54.m0 = 0.0f;
+    lbl_8068BD54.m4 = lbl_8068BD54.m4 + 10.01f;
+    lbl_8068BD60.m0 = lbl_8068BD60.m0 + 10.0f;
+    lbl_8068BD6C.m0 = 0.0f;
+    lbl_8068BD6C.m4 = 0.01f;
+    lbl_8068BD6C.m8 = 0.0f;
+    Unk80186EF4_L* l = &lbl_8061E978->m37AC;
+    lbl_8068BD60.m4 = 0.0f;
+    lbl_8068BD60.m8 = 0.0f;
+    lbl_8068BD54.m8 = 0.0f;
+    fn_80186EF4(o, "FirstBase", &lbl_8068BD54);
+    fn_80186EF4(o, "SecondBase", &lbl_8068BD60);
+    fn_80186EF4(o, "ThirdBase", &lbl_8068BD6C);
+    fn_80186EF4(o, "HomeBase", &lbl_8068BD6C);
+    if (v) {
+        int off = 0;
+        for (int i = 0; i < o->m1144; i++, off += 4) {
+            Unk80181140_E* ei = &o->m1160[i];
+            int idx = 0;
+            if (l)
+                idx = *(int*)((char*)l->m8 + off);
+            for (int j = 0; j < o->m1144; j++) {
+                Unk80181140_E* ej = &o->m1160[j];
+                Unk80182E54_H* h;
+                int f;
+                if (i == j) {
+                    h = (Unk80182E54_H*)ei->m6C;
+                    f = 1;
+                } else {
+                    h = (Unk80182E54_H*)ej->m6C;
+                    f = 0;
+                }
+                h->h2 = f;
+            }
+            v->v6(&o->m1160[idx].m20, 0);
+        }
+    }
 }
 
 //@80187190

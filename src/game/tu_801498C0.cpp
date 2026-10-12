@@ -5,6 +5,41 @@
 #include "game/tu_80144CF0.h"
 
 #include "game/tu_8001FDA8.h"
+#include "game/tu_802ACD88.h"
+struct Unk80310934_P38;
+
+struct Unk8001C314 {
+    void fn_8001C89C(int);
+};
+struct Unk80149DD4_C { char pad0[0x28]; int m28; };
+struct Unk80149DD4_D { char pad0[0x74]; int m74; };
+struct Unk80149DD4_B { char pad0[0xC]; Unk80149DD4_C* mC; Unk80149DD4_D* m10; };
+extern "C" void* fn_800C33D0();
+extern "C" void fn_800C3A4C(void*);
+extern "C" int fn_80400DA4();
+extern "C" void fn_8037CDA4(void*);
+extern "C" void fn_80148394(void*);
+extern "C" void fn_80316614(int, int, float);
+extern "C" void fn_8031618C(int);
+extern "C" void fn_801498BC();
+void fn_80313BA4(Unk80310934_P38*);
+void fn_802AE5D8(Unk802ACD88_Mgr*);
+void fn_802AE42C(Unk802ACD88_Mgr*);
+void fn_802AE5A0(Unk802ACD88_Mgr*);
+void fn_802B865C(Unk802ACD88_Mgr*);
+void fn_802B8610(Unk802ACD88_Mgr*);
+void fn_802B8A90(Unk802ACD88_Mgr*);
+void fn_80317B30();
+void fn_80317AB0(int);
+extern int lbl_8061B934;
+extern int lbl_8061EE14;
+struct Unk80149F70_Ent { int m0; int m4; int m8; };
+int fn_802B9804(int, int);
+extern "C" int fn_803FC410(int, int, int, int, void*);
+extern "C" int fn_803FC4C0(int);
+extern "C" int fn_80401904(int);
+extern "C" void fn_80377488(void*);
+struct Unk8014A928_Obj { char pad0[0x18]; float m18; float m1C; float m20; float m24; float m28; float m2C; int m30; float m34; float m38; float m3C; float m40; float m44; float m48; float m4C; float m50; float m54; float m58; float m5C; float m60; float m64; float m68; };
 struct Unk8014A310_Obj { int m0; char pad4[4]; int m8; int mC; int m10; int m14; int m18; int m1C; int m20; int m24; };
 void* operator new(unsigned int size, int heap);
 struct Unk8014A390_Obj { char pad0[0xC]; int mC; char pad10[0xC]; int m1C; };
@@ -188,7 +223,86 @@ extern const char lbl_805C5260[];
 int fn_803ED9D4();
 void fn_803ED720(int, const char*, void*, int, int, int, int, int, int, int);
 
+void fn_80149DD4(void* a, Unk80149DD4_B* b)
+{
+    fn_800C3A4C(fn_800C33D0());
+    lbl_8061B934 = fn_80400DA4();
+    Unk802ACD88_Mgr* m = (Unk802ACD88_Mgr*)lbl_8061E978;
+    int kind = b->m10->m74;
+    fn_80313BA4((Unk80310934_P38*)lbl_8061FEDC);
+    fn_8037CDA4(fn_8037C7FC());
+    fn_802AE5D8(m);
+    fn_802AE42C(m);
+    fn_802AE5A0(m);
+    fn_802B865C(m);
+    fn_802B8610(m);
+    fn_802B8A90(m);
+    fn_80148394(a);
+    if (kind >= 1 && kind <= 3) {
+        ((Unk8001C314*)fn_8001C394())->fn_8001C89C(2);
+    } else if (kind == 5) {
+        fn_80316614(lbl_8061FEDC, 3, 0.095238097f);
+        fn_80316614(lbl_8061FEDC, 5, 0.088495575f);
+        ((Unk8001C314*)fn_8001C394())->fn_8001C89C(1);
+    } else if (kind == 6) {
+        ((Unk8001C314*)fn_8001C394())->fn_8001C89C(5);
+    } else if (kind == 7) {
+        ((Unk8001C314*)fn_8001C394())->fn_8001C89C(7);
+    } else if (kind == 0 || kind == 10) {
+        if (b->mC->m28 == 0x37)
+            ((Unk8001C314*)fn_8001C394())->fn_8001C89C(6);
+        else
+            ((Unk8001C314*)fn_8001C394())->fn_8001C89C(3);
+    }
+    fn_80317B30();
+    fn_80317AB0(1);
+    fn_8031618C(lbl_8061FEDC);
+    if (lbl_8061EE14 != 0)
+        lbl_8061EE14 = 0;
+    fn_801498BC();
+}
+
 void fn_80149F6C() {}
+
+void fn_80149F70(int list, int kind)
+{
+    int total = 0;
+    char pad[0x20];
+    Unk80149F70_Ent e;
+    e.m0 = 0;
+    switch (kind) {
+    case 0:
+        list = fn_802B9804(list, 0x100);
+    case 1:
+    case 2:
+    case 3:
+        e.m8 = 0;
+    }
+    for (int i = 0; i < fn_803FC4C0(list); i++) {
+        int r = fn_803FC410(list, 0, i, 0, &e);
+        e.m4 = i;
+        if (e.m8 != 0)
+            total += fn_80401904(r);
+        else
+            total += e.m0;
+    }
+    switch (kind) {
+    case 0:
+        lbl_8061B938 = total / 1024;
+        if (list != 0)
+            fn_80377488((void*)list);
+        break;
+    case 1:
+        lbl_8061B93C = total / 1024;
+        break;
+    case 3:
+        lbl_8061B944 = total / 1024;
+        break;
+    case 2:
+        lbl_8061B940 = total / 1024;
+        break;
+    }
+}
 
 void fn_8014A0EC()
 {
@@ -294,6 +408,32 @@ int fn_8014A740(Unk8014A740_Obj* p, int a, int b)
         return 1;
     }
     return 0;
+}
+
+void* fn_8014A928(void* self)
+{
+    Unk8014A928_Obj* p = (Unk8014A928_Obj*)self;
+    int n = 100;
+    p->m1C = 0.2f;
+    p->m18 = 0.4f;
+    p->m30 = n;
+    p->m20 = p->m1C / (float)n;
+    p->m24 = p->m18 * 0.16666667f;
+    p->m28 = 0.0f;
+    p->m38 = 0.3f;
+    p->m34 = 0.1f;
+    p->m40 = p->m38;
+    p->m48 = p->m38;
+    p->m5C = p->m34;
+    p->m3C = p->m34;
+    p->m4C = p->m34;
+    p->m58 = p->m50 = p->m38 + p->m1C;
+    p->m44 = p->m34 + p->m18;
+    p->m2C = p->m50;
+    p->m54 = p->m34 + p->m18;
+    p->m64 = p->m34 + p->m18;
+    p->m68 = p->m60 = p->m50 - p->m1C / (float)n * 60.0f;
+    return p;
 }
 
 void* fn_8014AA18() { if (!lbl_8061B980) lbl_8061B980 = fn_8014A928(operator new(0x6C, 0)); return lbl_8061B980; }

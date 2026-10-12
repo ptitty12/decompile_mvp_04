@@ -1,8 +1,9 @@
 """rmfn.py unit fn : remove the definition of fn (CRLF-preserving), saving it to Q12/parked_<fn>.txt"""
+import os
 import re, sys
 unit, fn = sys.argv[1:3]
-Q = 'C:/Users/PATRIC~1/AppData/Local/Temp/claude/C--Users-Patrick-Taylor-decompile-mvp-04/ddf206fc-e9e3-4b5f-93d0-98c4cc873084/scratchpad/Q12'
-p = f'C:/Users/Patrick Taylor/decompile_mvp_04-W12/src/{unit}.cpp'
+Q = (os.environ.get('QDIR') or os.path.dirname(os.path.abspath(__file__)))
+p = (os.environ.get('WT') or os.getcwd()) + f'/src/{unit}.cpp'
 raw = open(p, newline='').read()
 crlf = '\r\n' in raw
 s = raw.replace('\r\n', '\n')

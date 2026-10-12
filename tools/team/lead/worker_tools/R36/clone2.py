@@ -3,7 +3,7 @@ import sys, re, subprocess, os
 sys.path.insert(0, '.')
 from asmlib import *
 from rd import rd
-WT = 'C:/Users/Patrick Taylor/decompile_mvp_04-W9'
+WT = (os.environ.get('WT') or os.getcwd())
 DONORS = "80459228 8045B134 8045EDDC 80462504 80464090 804654A0 8046C6F8 8046F770".split() + UNITS
 
 def shape(body):

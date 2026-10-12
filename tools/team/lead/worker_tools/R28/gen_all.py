@@ -1,6 +1,6 @@
 import sys, re, os, glob, collections, subprocess
 
-S = "C:/Users/PATRIC~1/AppData/Local/Temp/claude/C--Users-Patrick-Taylor-decompile-mvp-04/ddf206fc-e9e3-4b5f-93d0-98c4cc873084/scratchpad/R28"
+S = (os.environ.get('QDIR') or os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, S)
 from shapes import funcs, units
 

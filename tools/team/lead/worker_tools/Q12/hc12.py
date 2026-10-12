@@ -6,7 +6,7 @@ unit, fn, spec = sys.argv[1:4]
 apply = '--apply' in sys.argv
 KICKS = 12
 random.seed(1)
-W = 'C:/Users/Patrick Taylor/decompile_mvp_04-W12'
+W = (os.environ.get('WT') or os.getcwd())
 path = f'{W}/src/fe/{unit}.cpp'
 text = open(path).read()
 if spec.startswith('@'):
@@ -20,7 +20,7 @@ else:
 block = '\n'.join(lines)
 assert block in text, 'block not found'
 n = len(lines)
-D = tempfile.mkdtemp(prefix='hc_', dir="C:/Users/PATRIC~1/AppData/Local/Temp/claude/C--Users-Patrick-Taylor-decompile-mvp-04/ddf206fc-e9e3-4b5f-93d0-98c4cc873084/scratchpad/Q12")
+D = tempfile.mkdtemp(prefix='hc_', dir=(os.environ.get('QDIR') or os.path.dirname(os.path.abspath(__file__))))
 def score_many(perms):
     for f in os.listdir(D):
         os.remove(f'{D}/{f}')

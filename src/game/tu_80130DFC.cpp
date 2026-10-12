@@ -5,6 +5,18 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+extern const char lbl_805C0B94[];
+extern const char lbl_805C0B9C[];
+extern const char lbl_805C0BA4[];
+extern int lbl_80619948;
+extern "C" void fn_80377408(void*);
+extern "C" int fn_800A2AE8(int);
+extern "C" void fn_80329FA0(void*, ...);
+extern "C" void fn_800DD44C(void*, void*, int);
+extern "C" void fn_8040316C(void*, const char*, int);
+extern "C" int fn_8040321C(void*, int, void*, void*);
+extern int lbl_8061A328;
+extern "C" void fn_800ECAA4(void*);
 
 /* Front-end screen class (sibling of the one in tu_8012C8CC.cpp: the same flag/state words,
  * shifted by one word after +0x18C). Vtable lbl_80659AD0, base dtor fn_800EC1B8. */
@@ -101,6 +113,7 @@ void fn_800EC84C(void* x);
 void fn_800ECF18(void* x);
 int fn_8013484C();
 }
+
 static inline Unk8061A32C* FE()
 {
     if (lbl_8061A32C == 0) {
@@ -108,6 +121,7 @@ static inline Unk8061A32C* FE()
     }
     return lbl_8061A32C;
 }
+
 extern const float lbl_805C0B78;
 extern const float lbl_805C0C84;
 extern const char lbl_805C0B7C[];
@@ -210,10 +224,12 @@ static inline void SetAt(char* b, int off, int v)
 {
     *(int*)(b + off) = v;
 }
+
 static inline int KeyAt(char* b, int off)
 {
     return *(int*)(b + off);
 }
+
 extern "C" {
 int fn_80403060(const char* s);
 void fn_80403144(char* dst, const char* src);
@@ -288,6 +304,7 @@ static inline int IsBusy(Scr* x)
     }
     return 0;
 }
+
 extern "C" void fn_80131040(Scr* x, int which)
 {
     int a = 0;
@@ -553,6 +570,86 @@ extern "C" int fn_80131BD0(Scr* x, Unk800C7B40_Widget* a, int b, int c)
     return 0;
 }
 
+extern "C" void fn_80131C48(Scr* x, int a, float f)
+{
+    x->m2F8 = a;
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        switch (x->m2F8) {
+        case 0:
+            x->fn_vslot32(lbl_805C0B94, 1)->fn_vslot8(1);
+            x->fn_vslot32(lbl_805C0B9C, 1)->fn_vslot8(0);
+            x->fn_vslot32(lbl_805C0BA4, 1)->fn_vslot8(x->m30C);
+            break;
+        case 1:
+            x->fn_vslot32(lbl_805C0B94, 1)->fn_vslot8(0);
+            x->fn_vslot32(lbl_805C0B9C, 1)->fn_vslot8(1);
+            x->fn_vslot32(lbl_805C0BA4, 1)->fn_vslot8(0);
+            break;
+        case 2:
+            x->fn_vslot32(lbl_805C0B94, 1)->fn_vslot8(1);
+            x->fn_vslot32(lbl_805C0B9C, 1)->fn_vslot8(0);
+            x->fn_vslot32(lbl_805C0BA4, 1)->fn_vslot8(f > 0.0f);
+            x->m308 = f >? 0.2f;
+            break;
+        }
+    }
+}
+
+extern "C" void fn_80131F34(Scr* x, int a1, int (*a2)(int, int), int (*a3)(), int a4, int a5, int a6, int a7, int s8, int sC, int s10, int s14, int s18, int s1C)
+{
+    fn_80134680(x);
+    x->m30C = s1C;
+    fn_80131C48(x, 0, 0.0f);
+    x->fn_vslot16(0);
+    x->fn_vslot8(0);
+    x->m2DC = a2;
+    fn_801345F8(x, a3);
+    x->fn_vslot88(a1);
+    Unk800C7B40_Widget* w = fn_800C8060(x->fn_vslot32(lbl_805C0B8C, 1));
+    w->fn_vslot79(a5, 0);
+    w->fn_vslot3();
+    x->m324 = a7;
+    x->m2FC = a5;
+    int v0;
+    if (a4 != 0) {
+        v0 = fn_80090880(lbl_8061977C, a4);
+    } else {
+        v0 = 0;
+    }
+    int v1;
+    if (s8 != 0) {
+        v1 = fn_80090880(lbl_8061977C, s8);
+    } else {
+        v1 = 0;
+    }
+    int v2;
+    if (sC != 0) {
+        v2 = fn_80090880(lbl_8061977C, sC);
+    } else {
+        v2 = 0;
+    }
+    int v3;
+    if (s10 != 0) {
+        v3 = fn_80090880(lbl_8061977C, s10);
+    } else {
+        v3 = 0;
+    }
+    int v4;
+    if (s14 != 0) {
+        v4 = fn_80090880(lbl_8061977C, s14);
+    } else {
+        v4 = 0;
+    }
+    fn_80132830(x, v0, a5, (char*)v1, (char*)v2, (char*)v3, (char*)v4, s18);
+    fn_80132A38(x);
+    if (x->fn_vslot30(lbl_805C0B7C, 1) != 0) {
+        fn_80132C00(x, 1, 0x19, 4, 0xC, 0xC, 0xC, a6);
+    } else {
+        fn_80132C00(x, 0, 0x19, 0xC, 0xC, 0xC, 0, a6);
+    }
+    fn_80134D74(x);
+}
+
 extern "C" void fn_801321D4(Scr* x, int a1, int (*a2)(int, int), int (*a3)(), int a4, int a5, int a6, int a7, char* s8, char* sC, char* s10, char* s14, int s18, int s1C)
 {
     fn_80134680(x);
@@ -646,6 +743,52 @@ extern "C" void fn_80132630(Scr* x, int a)
     delete c;
 }
 
+extern "C" void fn_80132830(Scr* x, int a, int b, char* c, char* d, char* e, char* f, int g)
+{
+    if (x->m328 != 0) {
+        fn_80377408(x->m328);
+        x->m328 = 0;
+    }
+    if (a != 0) {
+        if (g != 0) {
+            char buf[0x50];
+            int dd[2];
+            fn_80329FA0(dd, fn_800A2AE8(lbl_80619948));
+            fn_800DD44C(dd, buf, 0);
+            x->m328 = (char*)fn_803774A8((fn_80403060((char*)a) + fn_80403060(buf) + fn_80403060((char*)fn_80090880(lbl_8061977C, 0x2393)) + 2) * 2, 0x100);
+            char* t = (char*)fn_803774A8((fn_80403060((char*)a) + 1) * 2, 0x100);
+            fn_80403144(t, (char*)a);
+            fn_8040321C(x->m328, fn_80090880(lbl_8061977C, 0x2393), buf, t);
+            fn_80377408(t);
+        } else {
+            x->m328 = (char*)fn_803774A8((fn_80403060((char*)a) + 1) * 2, 0x100);
+            fn_80403144(x->m328, (char*)a);
+        }
+    } else {
+        x->m328 = (char*)a;
+    }
+    if (x->m2FC > 0) {
+        int nc = fn_80403060(c);
+        fn_8040316C((char*)x + 0x32C, c, nc);
+        *(short*)((char*)x + 0x3AC) = 0;
+        if (x->m2FC > 1) {
+            int nd = fn_80403060(d);
+            fn_8040316C((char*)x + 0x3AE, d, nd);
+            *(short*)((char*)x + 0x42E) = 0;
+            if (x->m2FC > 2) {
+                int ne = fn_80403060(e);
+                fn_8040316C((char*)x + 0x430, e, ne);
+                *(short*)((char*)x + 0x4B0) = 0;
+                if (x->m2FC > 3) {
+                    int nf = fn_80403060(f);
+                    fn_8040316C((char*)x + 0x4B2, f, nf);
+                    *(short*)((char*)x + 0x532) = 0;
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_80132A38(Scr* x)
 {
     Unk80132A38_W* w = fn_800C8040(x->fn_vslot32(lbl_805C0BC8, 1));
@@ -729,6 +872,33 @@ extern "C" void fn_80134680(Scr* x)
     x->m30C = 0;
     if (x->b1) {
         x->fn_vslot87();
+    }
+}
+
+extern "C" void fn_80134700(Scr* x)
+{
+    if (x->b1) {
+        fn_800ECAA4(x);
+        if (x->m2F8 == 2) {
+            if (!(x->m308 <= 0.0f)) {
+                if (x->m318 == 0)
+                    return;
+                if (!(x->m308 <= 0.0f) && x->m318 == 1 && x->m304 <= 0)
+                    x->m304 = lbl_8061A328 + (int)(x->m308 * 60.0f);
+            }
+            if (x->m314 == 1) {
+                if (lbl_8061A328 >= x->m304) {
+                    if (x->m2E4 != 0)
+                        ((void (*)(int))x->m2E4)(x->m148);
+                    fn_800EC278(x);
+                }
+            } else {
+                if (lbl_8061A328 >= x->m304 && x->m2EC != 0 && x->m318 == 1)
+                    ((void (*)(int))x->m2EC)(x->m148);
+                if (x->m2E8 != 0 && x->m318 == 1)
+                    ((void (*)(int))x->m2E8)(x->m148);
+            }
+        }
     }
 }
 

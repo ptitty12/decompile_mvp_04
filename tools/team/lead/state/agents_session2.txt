@@ -1,0 +1,16 @@
+# lead session 2 (started 2026-10-12 10:28 CDT) workers, launched 10:40
+# slot batch agentId
+W10 p4-00 a74816d07cd51bcc6
+W1 p4-01 a7b60a791815f1c83
+W2 p4-02 ae2e247e22c7d8157
+W3 p4-03 ac2329bbdb3868dd9
+W4 p4-04 a9cabf332587682b0
+W5 p4-05 ae991a69371b08dff
+W6 p4-06 a1fe0a38c7090dfed
+W7 p4-07 aaf4129bbc735608e
+W7s3 p4-08 abde745737886dbf7
+W8 p4-09 aa75c9d4557225c27
+W9 p4-10 a4e0818f3a2a514a0
+W11 p4-11 ac4d4cb424ab680eb
+W12 p4-12 a974d71837576e88c
+match opus-families-7 af2fcea58582a2c52 (Opus, launched 10:46)

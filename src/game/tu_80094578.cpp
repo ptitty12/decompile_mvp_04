@@ -478,7 +478,6 @@ extern "C" void fn_800961E0(Sub198* p)
         p->m1C[i] = 0;
 }
 
-/* near-miss: retail copies x through r0 before the call */
 extern int lbl_8061930C;
 struct Unk8007B2B0_Screen {
     int fn_80078A38(int a);
@@ -508,6 +507,34 @@ extern "C" void fn_80096AB4(Obj3* o);
 extern "C" void fn_80099C48(Obj3* o, int a);
 extern "C" unsigned fn_8007E0E4(int g, int a, int b);
 extern "C" int fn_8007DF5C(int g, int a, int b, int i);
+
+struct Info80096544 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+extern "C" void fn_80096AB4(Obj3* o);
+extern "C" void fn_80099C48(Obj3* o, int a);
+extern "C" void fn_8009C498(Obj3* o);
+extern "C" void fn_8009C6CC(Obj3* o);
+extern "C" void fn_8009C54C(Obj3* o, int a);
+extern "C" void fn_8009CB5C(Obj3* o, int a, int b);
+extern "C" void fn_8009BDBC(Obj3* o, float f);
+
+extern "C" void fn_80096544(Obj3* o, Info80096544* inf, int a, int flag, float f)
+{
+    if (flag == 0)
+        fn_80096AB4(o);
+    fn_80096204(&o->m198, inf->m0);
+    fn_8009C498(o);
+    fn_80099C48(o, a);
+    fn_8009C6CC(o);
+    fn_8009C54C(o, inf->m4);
+    if (flag == 0)
+        fn_8009CB5C(o, inf->m8, inf->mC);
+    fn_8009BDBC(o, f);
+}
 
 extern "C" void fn_800965E8(Obj3* o, int a, int b)
 {
@@ -586,19 +613,20 @@ extern "C" void fn_80099A44(Obj3* o, int a, int b);
 
 extern "C" void fn_80096830(Obj3* o, int a) { fn_80099A44(o, fn_800968C0(o, a, 1), 0); }
 
-/* near-miss: retail loads the two bytes in the opposite register order */
+inline void Set80096870(ByteVec* v, unsigned i, unsigned char c)
+{
+    if (i >= v->m4)
+        v->m4 = i + 1;
+    v->m0[i] = c;
+}
+
 extern "C" void fn_80096870(Obj3* o, unsigned a, unsigned b)
 {
     ByteVec* v = &o->m168;
-    unsigned char* p = v->m0;
-    unsigned char ta = p[a];
-    unsigned char tb = p[b];
-    if (a >= v->m4)
-        v->m4 = a + 1;
-    v->m0[a] = tb;
-    if (b >= v->m4)
-        v->m4 = b + 1;
-    v->m0[b] = ta;
+    unsigned ta = v->m0[a];
+    unsigned tb = v->m0[b];
+    Set80096870(v, a, tb);
+    Set80096870(v, b, ta);
 }
 
 extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
@@ -625,10 +653,14 @@ extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
     return r;
 }
 
-/* near-miss: retail re-reads the count in the loop instead of keeping it in a register */
+struct VolVec8009692C {
+    unsigned char* m0;
+    volatile unsigned m4;
+    unsigned m8;
+};
 extern "C" unsigned char fn_8009692C(Obj3* o, int key)
 {
-    ByteVec* v = &o->m168;
+    VolVec8009692C* v = (VolVec8009692C*)&o->m168;
     unsigned char i = 0;
     unsigned char r = 0xFF;
     if (i < v->m4) {
@@ -636,16 +668,137 @@ extern "C" unsigned char fn_8009692C(Obj3* o, int key)
         if (p[0] == key) {
             r = 0;
         } else {
-            do {
+            for (;;) {
                 i++;
                 if (!(i < v->m4))
                     break;
-            } while (p[i] != key);
-            if (i < v->m4)
-                r = i;
+                if (p[i] == key) {
+                    r = i;
+                    break;
+                }
+            }
         }
     }
     return r;
+}
+
+extern "C" void fn_80096CE4(Obj3* o);
+
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+extern "C" int fn_80097148(Obj3* o, unsigned i);
+extern "C" int fn_80097210(Obj3* o, int i);
+
+extern "C" int fn_80096988(Obj3* o, int flag, int* out)
+{
+    volatile int sp8;
+    if (out)
+        *out = 0;
+    int lim = 8;
+    if (flag)
+        lim = 9;
+    int i;
+    for (sp8 = 0, i = 0; i <= lim; ) {
+        int id = fn_80097210(o, i);
+        int kind = fn_80097148(o, fn_800968C0(o, id, 1));
+        if (kind == 3) {
+            if (out)
+                *out = id;
+            return sp8 == 0 ? 4 : 5;
+        }
+        if (kind == 1) {
+            if (out)
+                *out = id;
+            return sp8 == 0 ? 2 : 3;
+        }
+        int c = sp8;
+        int t;
+        if (c > 9)
+            t = c;
+        else
+            t = c + 1;
+        sp8 = t;
+        i = t;
+    }
+    int r = fn_8008CFD8((char*)o + 0xC9C, 5, o->m17C[0]);
+    if (r != 0 && r != 10)
+        return 1;
+    return 0;
+}
+
+struct Tail80096AB4 {
+    char pad[0xE48];
+    unsigned char mE48[25];
+};
+inline void ClrC80096AB4(ByteVec* v) { *(int*)v->padC = 0; }
+
+extern "C" void fn_80096AB4(Obj3* o)
+{
+    View80096C10* w = (View80096C10*)o;
+    int i;
+    for (i = 0; i < 25; i++)
+        ((Tail80096AB4*)o)->mE48[i] = 0;
+    w->saved.m0 = 4;
+    ByteVec* sv = &w->saved.v;
+    Snap80096C10* s = &w->saved;
+    fn_8040074C(w->saved.v.m0, sv->m8);
+    sv->m4 = 0;
+    *(int*)sv->padC = 0;
+    for (i = 0; i < 10; i++)
+        s->list[i] = 0xFF;
+    s->m24 = 0;
+    Snap80096C10* c = &w->cur;
+    ByteVec* cv = &w->cur.v;
+    fn_8009619C((Sub198*)((char*)o + 0xDAC));
+    ClrC80096AB4(&o->m0);
+    ClrC80096AB4(&o->m14);
+    ClrC80096AB4(&o->m28);
+    ClrC80096AB4(&o->m3C);
+    ClrC80096AB4(&o->m50);
+    w->cur.m0 = 4;
+    o->m3E4 = 0;
+    fn_8040074C(w->cur.v.m0, cv->m8);
+    cv->m4 = 0;
+    *(int*)cv->padC = 0;
+    for (i = 0; i < 10; i++)
+        c->list[i] = 0xFF;
+    c->m24 = 0;
+    fn_8009619C(&o->m198);
+    o->mD6C = 0;
+    *(int*)((char*)o + 0xD70) = 0;
+    *(int*)((char*)o + 0xD74) = 0;
+    for (i = 0; i < 25; i++) {
+        o->m3E8[i].m0 = 0;
+        o->m3E8[i].m4 = 2;
+    }
+    fn_80096CE4(o);
+}
+
+extern "C" void fn_80096C10(Obj3* o)
+{
+    View80096C10* w = (View80096C10*)o;
+    ByteVec* v = &o->m168;
+    fn_80096CE4(o);
+    Snap80096C10* dst = &w->cur;
+    Snap80096C10* src = &w->saved;
+    w->cur.m0 = w->saved.m0;
+    unsigned n = w->saved.v.m4;
+    fn_8040074C(o->m168.m0, v->m8);
+    v->m4 = 0;
+    *(int*)v->padC = 0;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        ByteVec* d = &dst->v;
+        unsigned char b = src->v.m0[i];
+        unsigned c = d->m4;
+        if (c < d->m8) {
+            dst->v.m0[c] = b;
+            d->m4 = d->m4 + 1;
+        }
+    }
+    for (i = 0; i < 10; i++)
+        dst->list[i] = src->list[i];
+    fn_80096244(&o->m198, (Sub198*)((char*)o + 0xDAC));
 }
 
 extern "C" int fn_80097148(Obj3* o, unsigned i)

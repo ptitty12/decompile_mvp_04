@@ -1,8 +1,9 @@
 """genv.py [--apply]: generate vcall-wrapper family functions in MINE units."""
+import os
 import sys,re
 sys.path.insert(0,'.')
 from asmlib import *
-WT='C:/Users/Patrick Taylor/decompile_mvp_04-W4'
+WT=(os.environ.get('WT') or os.getcwd())
 apply='--apply' in sys.argv
 written=set()
 for u in MINE:

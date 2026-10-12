@@ -4,6 +4,23 @@
  */
 #include "game/tu_8007A4DC.h"
 #include "game/clampiter.h"
+struct Unk800767DC_P {
+    char pad0[0x14];
+    void* m14;
+    char pad18[0xC - 4];
+    int m20;
+};
+struct Unk800767DC_State {
+    char pad0[0x660];
+    int m660;
+};
+struct Unk8007F198_B;
+Unk800767DC_State* fn_800B555C();
+int fn_80097210(void* p, int a);
+int fn_8008CFD8(void* p, int a, int b);
+int fn_800A65F4(void* g, int a, int b, int c, int d);
+int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
+extern "C" int fn_8007B8A0__18Unk8007B2B0_Screen(Unk8007B2B0_Screen* s, int a, int b, int c, int d, int e, int f);
 
 /* View of a widget whose slot 0x38 returns a float (fn_800745C4). */
 struct Unk800745C4_WBase {
@@ -721,6 +738,38 @@ void fn_80076758(Unk800766B8_Obj* self, Unk80076758_Ev* ev)
     fn_80590CA8(self->m30);
     if (fn_800A2EB4(*g) == 1 && k == 0)
         fn_8053FC0C((*g)->m5C);
+}
+
+/* near-miss (95%): 3 insns; retail keeps q in r9 and the table index byte in r9, ours q in r11 and the index in r0 */
+extern "C" void fn_800767DC(Unk8007B2B0_Screen* s, Unk800767DC_P* p)
+{
+    int a = 0;
+    int v;
+    int k;
+    switch (fn_800B555C()->m660) {
+    case 4: {
+        char* q = (char*)p->m14;
+        k = 7;
+        char* tb = q + 0x124C;
+        int off = (*(unsigned char*)(*(unsigned char**)(q + 0xFCC) + *(int*)(q + 0xFD8))) * 0x34;
+        v = *(int*)(tb + off);
+        a = fn_8008CFD8(q + 0xC9C, 9, *(unsigned char*)(q + 0x17C));
+        break;
+    }
+    case 5:
+        k = 8;
+        v = fn_80097210(p->m14, 0);
+        break;
+    default:
+        v = 0;
+        k = 0xD;
+        break;
+    }
+    if (v != 0 && k != 0xD) {
+        char* b = (char*)p + 0x14;
+        int c = fn_800A65F4(lbl_80619948, v, k, a, *(int*)(b + 0xC));
+        fn_8007B8A0__18Unk8007B2B0_Screen(s, fn_8007F7D0((Unk8007F198_B*)s, 0), v, k, *(int*)(b + 0xC), a, c);
+    }
 }
 
 /* near-miss (pass 2): same loop structure and iterator; retail keeps `total` in r31 and forms the

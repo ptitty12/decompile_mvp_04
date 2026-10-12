@@ -41,6 +41,7 @@ void fn_801B9838(B* u);
 void fn_801BA288(B* u, unsigned i);
 int fn_801C0478(A* a);
 void fn_801BAAC8(A* a);
+P* fn_801A4B34(P* p);
 }
 
 /* Goal storage at goal+0x18 (full layout in goals/tu_80287600.h, which declares the
@@ -495,6 +496,44 @@ extern "C" void fn_801B9E80(B* u)
     P* p = u->m4;
     u->m30 = 1;
     fn_8037893C(&p->m704, 0x3C, 0, 0, 0);
+}
+
+inline float Unk801B9EC0_Roll(B* u, const char* file, int line)
+{
+    float k = 1.0f;
+    unsigned n = u->m4->m554->fn_8014D8AC(1000000, file, line);
+    return (float)n * k * 1e-6f;
+}
+inline float Unk801B9EC0_Roll2(B* u, const char* file, int line)
+{
+    float k = 1.0f;
+    float pad0;
+    unsigned n = u->m4->m554->fn_8014D8AC(1000000, file, line);
+    return (float)n * k * 1e-6f;
+}
+extern "C" void fn_801B9EC0(B* u)
+{
+    if (u->m30 == 0)
+        fn_801B9E80(u);
+    fn_8037893C(&u->m4->m704, 0x7B, 0, 0, 0);
+    P* t = fn_801A4B34(u->m4);
+    if (t && t->mB6C == 0 && fn_801B9940(u, t))
+        fn_801BA0B8(u, t);
+    const char* file = lbl_805CFBAC;
+    if (!(Unk801B9EC0_Roll(u, file, 0x1FA) >= 0.2f)) {
+        float v = Unk801B9EC0_Roll2(u, file, 0x1FC);
+        P* c;
+        if (!(v >= 0.25f))
+            c = u->m4->m65C[2];
+        else if (!(v >= 0.5f))
+            c = u->m4->m65C[3];
+        else if (!(v >= 0.75f))
+            c = u->m4->m65C[5];
+        else
+            c = u->m4->m65C[4];
+        if (c && fn_801B9940(u, c))
+            fn_801BA0B8(u, c);
+    }
 }
 
 extern "C" void fn_801BA0B8(B* u, P* q)

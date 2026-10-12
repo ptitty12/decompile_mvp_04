@@ -1,7 +1,8 @@
 """applyv.py unit fn variant-name : apply a variant from Q12/v1.txt via ins.py"""
+import os
 import sys, re, subprocess
 unit, fn, name = sys.argv[1:4]
-Q = 'C:/Users/PATRIC~1/AppData/Local/Temp/claude/C--Users-Patrick-Taylor-decompile-mvp-04/ddf206fc-e9e3-4b5f-93d0-98c4cc873084/scratchpad/Q12'
+Q = (os.environ.get('QDIR') or os.path.dirname(os.path.abspath(__file__)))
 blocks = re.split(r'^//// *(.*)$', open(Q + '/v1.txt').read(), flags=re.M)
 for i in range(1, len(blocks), 2):
     if blocks[i].strip() == name:

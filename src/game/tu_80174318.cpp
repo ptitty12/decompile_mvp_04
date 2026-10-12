@@ -21,6 +21,20 @@ void fn_80174318(Unk80174318_T* p, int state, Unk80174318_Fn f)
     p->m74 = g;
 }
 
+void fn_80174348(Unk80174348_T* p)
+{
+    fn_80174438((Unk80174438_T*)p);
+    p->m5C = 0;
+    for (unsigned int i = 0; i <= 3; i++) {
+        p->m8[i] = new (0x100) Unk8016FF40;
+        fn_8017008C(p->m8[i], p->m88);
+        for (int j = 1; j < 4; j++) {
+            Unk80174318_Pair* v = &p->m1C[j];
+            p->m8[i]->m108[j] = v;
+        }
+    }
+}
+
 /* near-miss: retail copies the loaded value into r3 separately (mr r3,r0; 22 instrs); the copy is
  * coalesced here (21). */
 int fn_801743E0(int* arr)

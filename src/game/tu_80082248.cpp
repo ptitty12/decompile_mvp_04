@@ -236,6 +236,40 @@ void fn_80082510(Tree* self)
     self->m4 = &lbl_8061932C;
 }
 
+typedef Node** (*Acc82588)(void*);
+
+/* near-miss: register numbers only (retail keeps the rotation-direction pair in r26/r27 and the copy of its function pointer in r25) */
+void fn_80082588(Node** root, Node* x, P8* A, P8* B)
+{
+    P8 pa = *A;
+    P8 pb = *B;
+    int dB = pb.a >> 16;
+    Acc82588 fb = (Acc82588)pb.b;
+    int dA = pa.a >> 16;
+    Acc82588 fa = (Acc82588)pa.b;
+    char* xb = (char*)x + dB;
+    Node* y = *fb(xb);
+    char* ya = (char*)y + dA;
+    *fb(xb) = *fa(ya);
+    if (*fa(ya) != &lbl_8061932C)
+        (*fa(ya))->m0 = x;
+    if (y != &lbl_8061932C)
+        y->m0 = x->m0;
+    Node* p = x->m0;
+    if (p != &lbl_8061932C) {
+        Node** r;
+        if (x == *fa((char*)p + dA))
+            r = fa((char*)x->m0 + dA);
+        else
+            r = fb((char*)x->m0 + dB);
+        *r = y;
+    } else
+        *root = y;
+    *((Acc82588)pa.b)((char*)y + (pa.a >> 16)) = x;
+    if (x != &lbl_8061932C)
+        x->m0 = y;
+}
+
 void fn_80082840(Node** root, Node** cur)
 {
     P8 a;
@@ -255,6 +289,69 @@ void fn_80082840(Node** root, Node** cur)
     (*root)->mC = (*root)->mC & 1;
 }
 
+struct Unk80082248_Y;
+void fn_80082108(Unk80082248_Y* y, Rec* r);
+
+struct NodeBits80082944 {
+    Node* m0;
+    Node* m4;
+    Node* m8;
+    unsigned hi : 31;
+    unsigned lo : 1;
+    int m10;
+    void* m14;
+};
+
+void fn_80082944(void* self, int a, Key* k)
+{
+    Tree* t = (Tree*)self;
+    Node* cur = t->m4;
+    Node* parent = &lbl_8061932C;
+    Node* x = t->m0;
+    Node* result = &lbl_8061932C;
+    if (cur->m10 == a) {
+        x = cur;
+        result = x;
+    } else {
+        while (x != &lbl_8061932C) {
+            if (a == x->m10) {
+                result = x;
+                break;
+            }
+            parent = x;
+            Node* nx;
+            if (a < parent->m10)
+                nx = parent->m4;
+            else
+                nx = parent->m8;
+            x = nx;
+        }
+        if (result == &lbl_8061932C) {
+            Node* r = result;
+            result = fn_8008241C(t);
+            Node* n = result;
+            n->m14 = 0;
+            n->m4 = r;
+            n->m8 = r;
+            ((NodeBits80082944*)n)->hi = 1;
+            n->m10 = a;
+            n->m0 = parent;
+        }
+    }
+    fn_80082108((Unk80082248_Y*)result, (Rec*)k);
+    if (result != x) {
+        if (parent != &lbl_8061932C) {
+            Node** s = &parent->m8;
+            if (a < parent->m10)
+                s = &parent->m4;
+            *s = result;
+        } else
+            t->m0 = result;
+        fn_80082840((Node**)t, &result);
+    }
+    t->m4 = result;
+}
+
 void fn_80082CB0(Node** root, Node** cur)
 {
     P8 a;
@@ -272,6 +369,54 @@ void fn_80082CB0(Node** root, Node** cur)
         }
     }
     (*cur)->mC = (*cur)->mC & 1;
+}
+
+struct Unk80082248_Y;
+void fn_80082108(Unk80082248_Y* y, Rec* r);
+
+void fn_80082DA8(Tree* t)
+{
+    Node* z = ((Node* (*)(Tree*))fn_80082F4C)(t);
+    if (z != &lbl_8061932C) {
+        Node* y;
+        if (z->m4 == &lbl_8061932C || z->m8 == &lbl_8061932C)
+            y = z;
+        else {
+            y = z->m8;
+            while (y->m4 != &lbl_8061932C)
+                y = y->m4;
+        }
+        Node* x = y->m4 != &lbl_8061932C ? y->m4 : y->m8;
+        x->m0 = y->m0;
+        Node* p = y->m0;
+        if (p != &lbl_8061932C) {
+            Node** slot = &p->m8;
+            if (y == p->m4)
+                slot = &p->m4;
+            *slot = x;
+        } else
+            t->m0 = x;
+        if (y != z) {
+            z->m10 = y->m10;
+            fn_80082200(z);
+            Rec* l = (Rec*)y->m14;
+            if (l != 0) {
+                do {
+                    Rec* r = fn_80082248();
+                    *r = *l;
+                    r->m0 = 0;
+                    fn_80082108((Unk80082248_Y*)z, r);
+                    l = (Rec*)l->m0;
+                } while (l != 0);
+            }
+        }
+        if (!(y->mC & ~1))
+            fn_80082CB0((Node**)t, &x);
+        if (y == t->m4)
+            t->m4 = &lbl_8061932C;
+        if (y != &lbl_8061932C)
+            fn_800824D4(t, y);
+    }
 }
 
 Node* fn_80082F4C(Tree* t, int key)
