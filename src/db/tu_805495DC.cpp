@@ -68,7 +68,53 @@ static inline float FloatAt(char* b, int off)
     return *(float*)(b + off);
 }
 
+/* Q18 types */
+struct Db805495DC_WE {
+    float w;
+    int flag;
+};
+
+extern "C" int rand();
+/* end Q18 types */
+
 extern "C" {
+/* Q18 protos */
+int fn_805495DC(int a, int k);
+char* fn_80549F54(char* o);
+int fn_8054B9D4(int x, int a, int b, int c);
+int fn_8054BA5C(int x, int y, int k, int z);
+int fn_8054BAE0(int x, int y, int k, int z);
+float fn_8054BB48(char* o);
+int fn_8054BBA0(char* b, int kind, int a);
+H* fn_8054BDDC(H* o, Unk8007F198_C* s);
+void fn_8054BE40(int* p, int mode);
+void fn_8054BEA4(int* p, int mode);
+void fn_8054BF08(int* p, int mode);
+void fn_8054BF6C(int* p, int mode);
+void fn_8054BFD0(int* p, int mode);
+void fn_8054C034(int* p, R8* r);
+void fn_8054C0AC(int* p, R8* r);
+void fn_8054C124(int* p, R8* r);
+void fn_8054C19C(int* p, R8* r);
+void fn_8054C214(int* p, R8* r);
+void fn_8054C28C(int* p, R8* r);
+void fn_8054C2B8(int* p, R8* r);
+void fn_8054C2E0(int* p, R8* r);
+void fn_8054C310(int* p, R8* r);
+void fn_8054C340(int* p, R8* r);
+void fn_8054C358(int* p, signed char* buf, int n);
+int fn_8054C4AC(int* p, R8* r);
+int fn_8054C4FC(int* p, R8* r);
+int fn_8054C550(int* p, R8* r);
+int fn_8054C5B4(int* p, R8* r);
+int fn_8054C618(int* p, R8* r);
+int fn_8054C648(int* p, int v, int lo, int hi);
+H* fn_8054C6E4(H* o);
+void fn_8054C75C(H* o, int chrg);
+void fn_8054C7D0(H* o);
+int fn_8054C940(H* o);
+int fn_8054C94C(H* o);
+/* end Q18 protos */
 
 /* protos */
 int fn_8054B9D4(int x, int a, int b, int c);
@@ -108,9 +154,6 @@ char* fn_80549F54(char* o);
 
 char* fn_805496F4(char* o);
 
-
-
-
 void fn_8054C034(int* p, R8* r);
 void fn_8054C0AC(int* p, R8* r);
 void fn_8054C124(int* p, R8* r);
@@ -122,7 +165,7 @@ void fn_8054C2E0(int* p, R8* r);
 void fn_8054C310(int* p, R8* r);
 void fn_8054C340(int* p, R8* r);
 void fn_8054C358(int* p, signed char* buf, int n);
-signed char fn_8054C3F4(int* p, int lo, int hi);
+int fn_8054C3F4(int* p, int lo, int hi);
 int fn_8054C4AC(int* p, R8* r);
 int fn_8054C4FC(int* p, R8* r);
 int fn_8054C550(int* p, R8* r);
@@ -137,6 +180,11 @@ void fn_8057DF60(void* p);
 void fn_8055A360(void* p);
 void fn_80377408(void* p);
 int fn_8040ABA0();
+/* Q18 decls */
+extern "C" int fn_80534078(char* o, int a, float f);
+extern "C" int fn_80534304(char* o, float f);
+extern const float lbl_805FF230;
+/* end Q18 decls */
 
 DB_OVERLAY int fn_805495DC(int a, int k)
 {
@@ -258,6 +306,46 @@ DB_OVERLAY float fn_8054BB48(char* o)
         off += 8;
     }
     return f;
+}
+
+DB_OVERLAY int fn_8054BBA0(char* b, int kind, int a)
+{
+    float f = fn_8056FFB0();
+    int v = fn_80534078(b + 0x14AB8, a, f);
+    switch (kind) {
+    case 1:
+    case 2: {
+        int r = rand();
+        int t = v - 10;
+        v = t - r % 7;
+        break;
+    }
+    case 3:
+        v = fn_80534304(b + 0x14C00, f);
+        break;
+    case 4:
+    case 6:
+    case 7: {
+        int r = rand();
+        int t = v - 7;
+        v = t - r % 3;
+        break;
+    }
+    case 5:
+    case 9: {
+        int r = rand();
+        int t = v - 5;
+        v = t - r % 3;
+        break;
+    }
+    case 8: {
+        int r = rand();
+        int t = v - 3;
+        v = t - r % 3;
+        break;
+    }
+    }
+    return v;
 }
 
 /* near-miss: retail reads the 4-byte fn_80329FA0 buffer straight from the frame (addi r3,r1,8); ours keeps &buf in a saved register */
@@ -431,6 +519,15 @@ DB_OVERLAY void fn_8054C340(int* p, R8* r)
     W0V* a = (W0V*)&r->w0;
     a->fl = 1;
     a->h = 0x44;
+}
+
+DB_OVERLAY void fn_8054C358(int* p, signed char* buf, int n)
+{
+    for (int i = 0; i < n; i++) {
+        float r = fn_8056FFB0();
+        *buf = (unsigned char)(unsigned)(r * 256.0f);
+        buf++;
+    }
 }
 
 DB_OVERLAY int fn_8054C4AC(int* p, R8* r)
