@@ -4,6 +4,31 @@
  */
 #include "game/tu_80070DDC.h"
 #include "game/tu_8007FF8C.h"
+extern const char lbl_805B2CB0[];
+void fn_80080BFC(Unk8007FF8C_Y* y);
+extern "C" void fn_800962B4(void* p);
+extern "C" void* fn_8008F840__FPt13Unk8008CE64_K1Z15Unk8008CE64_T1C(void* self, const char* name, int a, int count);
+struct Unk8006F4D0_Side {
+    char pad0[0xE64];
+    Unk8006F4D0_Side() { fn_800962B4(this); }
+};
+struct Unk80353930 {
+    char pad0[0x3C];
+    Unk80353930();
+};
+struct Unk8006F4D0_K {
+    char pad0[0x28];
+    Unk8006F4D0_K(int c) { fn_8008F840__FPt13Unk8008CE64_K1Z15Unk8008CE64_T1C(this, lbl_805B2CB0, 0, c); }
+};
+struct Unk8006F4D0_Y {
+    Unk8006F4D0_Side s[2];
+    Unk80353930 z0;
+    Unk80353930 z1;
+    char pad1D40[0x14];
+    Unk8006F4D0_K k0;
+    Unk8006F4D0_K k1;
+    Unk8006F4D0_Y() : k0(0x10), k1(0xD) { fn_80080BFC((Unk8007FF8C_Y*)this); }
+};
 struct Unk8006F784_C {
     char pad0[0x24];
     int m24;
@@ -427,6 +452,19 @@ struct Unk8006F594_Obj {
     char mA0[0x560];
     int m600;
 };
+
+Unk8006902C_Handle* fn_8006F4D0(Unk8006902C_Handle* h)
+{
+    h->m0 = 0;
+    h->m4 = 0;
+    h->m8 = 0;
+    Unk8006F4D0_Y* y = new (0) Unk8006F4D0_Y;
+    h->m4 = 0;
+    h->m8 = 0;
+    h->mC = 0;
+    h->m0 = (Unk8006902C_Players*)y;
+    return h;
+}
 
 Unk8006902C_Ctx* fn_8006F594(void* p)
 {
