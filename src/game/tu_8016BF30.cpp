@@ -898,6 +898,31 @@ int Unk8016D9A0::fn_8016DBF0() /* 8016DBF0 */
     return 0;
 }
 
+void Unk8016D9A0::fn_8016DFD0() /* 8016DFD0 */
+{
+    int p = (int)this;
+    int end = p + 0x1900;
+    do {
+        Unk8016D128_Elem* e = (Unk8016D128_Elem*)p;
+        for (int j = 0; j < 8; j++, e++) {
+            e->name[0] = 0;
+            e->m3C = 0;
+            e->m40 = 0;
+            e->m44 = 0;
+            e->m48 = 0;
+            e->m4C = 0;
+            e->m50 = lbl_805EBA10;
+            e->m68 = lbl_805EBA10;
+            e->m80 = lbl_805EBA10;
+            e->m98 = 0;
+            e->m9C = 0xAE;
+        }
+        p += 0x500;
+    } while (p <= end);
+    m1E00 = 0;
+    fn_8016E18C();
+}
+
 /* near-miss: retail keeps a separate copy of the previous offset (r29 = r27) for the loop update; 4 loop forms tried */
 void Unk8016D9A0::fn_8016E0E8(const char* rec) /* 8016E0E8 */
 {
