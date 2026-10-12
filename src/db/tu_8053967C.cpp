@@ -9,7 +9,76 @@ typedef Db8053967C_Rost R;
 typedef Db8053967C_Idx X;
 typedef Db8053967C_Obj58 O58;
 
+/* Q18 types */
+struct Db8053967C_ElemVT {
+    char pad0[0x10];
+    short delta;
+    short padA;
+    void (*pfn)(void* self, int a, void* s);
+};
+
+struct Db8053967C_Row {
+    unsigned char b[12];
+    int s[9];
+};
+struct Db8053967C_Tab {
+    int* m0;
+    char pad4[0xEC];
+    Db8053967C_Row r[1];
+};
+/* end Q18 types */
+
 extern "C" {
+/* Q18 protos */
+void fn_8053967C(L* self);
+void fn_80539900(L* self, int a);
+int fn_805399BC(int k);
+int fn_80539A84(int k);
+void fn_80539AE8(L* self, int a);
+void fn_80539B84(L* self);
+void fn_80539C44(L* self, int a);
+void fn_80539EDC(L* self, int a);
+void fn_80539FC0(L* self);
+void fn_8053A190();
+void fn_8053A1B0();
+void fn_8053ACB8(X* x, int v);
+void fn_8053AF9C(X* x, int a, int b, int c);
+unsigned char fn_8053B210(R* r, int id);
+void fn_8053B450(R* r, int id);
+void fn_8053B6A4(R* r);
+unsigned fn_8053B6CC(R* r, int id);
+void fn_8053B720(R* self, int mode, Unk80084910_VObj* strm);
+int fn_8053B824(R* r, int v);
+void fn_8053B85C(R* r, int id);
+int fn_8053B8C0(R* r);
+int fn_8053B900(R* r, int id);
+int fn_8053B934(R* r, int h, int id, int val);
+void fn_8053B980(R* r, int h, int id);
+int fn_8053BA1C(R* r, int h);
+void fn_8053BA64(R* r, int h);
+void fn_8053BA94(R* r);
+int fn_8053BAD0(R* r, int h, int id, int now);
+void fn_8053BE58(O58* o);
+char* fn_8053C40C(O58* o, int id);
+void fn_8053C4B0(O58* self, int mode, Unk80084910_VObj* strm);
+int fn_8053CA58(X* x);
+int fn_8053CA8C(X* x, int i);
+unsigned char fn_8053CAD4(X* x, int i);
+int fn_8053CAE0(X* x);
+void fn_8053CB1C(X* x, int id);
+void fn_8053CB94(X* x, int on, unsigned k);
+void fn_8053CBF8(X* x);
+void fn_8053CC1C(X* x);
+/* end Q18 protos */
+
+/* Q18 decls */
+void fn_8053A1D0(R* r, int mode, Unk80084910_VObj* strm);
+extern const char lbl_805FEC48[];
+extern const char lbl_805FEC50[];
+extern const char lbl_805FEC5C[];
+extern const char lbl_805FEC64[];
+void fn_8053B258(R* r, int id);
+/* end Q18 decls */
 
 DB_OVERLAY void fn_8053967C(L* self)
 {
@@ -124,6 +193,41 @@ DB_OVERLAY void fn_80539B84(L* self)
     }
 }
 
+DB_OVERLAY void fn_80539C44(L* self, int a)
+{
+    fn_8040074C(self->m0, self->m8 * 4);
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    self->m4 = 0;
+    self->mC = 0;
+    self->m14 = 0;
+    int p0 = 0;
+    int p1 = 0;
+    unsigned n = s->fn_8007BD94(a);
+    unsigned h1 = fn_8007366C(lbl_805FEC48, lbl_805FEC50);
+    unsigned h2 = fn_8007366C(lbl_805FEC5C, lbl_805FEC64);
+    int idx = s->fn_8007DA28();
+    if (idx != -1) {
+        p0 = s->fn_8007D4AC(idx, 0) == 1;
+        p1 = s->fn_8007D4AC(idx, 1) == 1;
+    }
+    unsigned i = fn_8008FCC8(a) == 1;
+    for (; i < n; i++) {
+        int v = s->fn_8007BE10(a, i);
+        if (v == h1) {
+            if (p0 != 1)
+                continue;
+        } else if (v == h2) {
+            if (p1 != 1)
+                continue;
+        }
+        if (self->m4 < self->m8) {
+            self->m0[self->m4] = v;
+            self->m4++;
+        }
+    }
+    self->m14 = 1;
+}
+
 DB_OVERLAY void fn_80539EDC(L* self, int a)
 {
     fn_8040074C(self->m0, self->m8 * 4);
@@ -183,6 +287,33 @@ DB_OVERLAY void fn_8053ACB8(X* x, int v)
     }
 }
 
+/* near-miss: 99.9%; only the loop exit compare differs (retail cmpwi r11,10 / blt, ours folds it to cmpwi 9 / ble) */
+DB_OVERLAY void fn_8053AF9C(X* x, int a, int b, int c)
+{
+    Db8053967C_Tab* tb = (Db8053967C_Tab*)x;
+    Unk8006A138_It<9> it(0);
+    int idx = 0;
+    do {
+        int v;
+        if (idx == 0) {
+            v = fn_8053CAE0(x);
+        } else {
+            unsigned char t = tb->r[a].b[idx];
+            if (t != 0xFF) {
+                int o = t * 4;
+                v = *(int*)((char*)tb->m0 + o);
+            } else {
+                v = 0;
+            }
+        }
+        if (c == v) {
+            tb->r[a].s[b] = it.v;
+            return;
+        }
+        idx = it.Next();
+    } while (idx <= 9);
+}
+
 DB_OVERLAY unsigned char fn_8053B210(R* r, int id)
 {
     unsigned char i = 0;
@@ -191,6 +322,33 @@ DB_OVERLAY unsigned char fn_8053B210(R* r, int id)
             return i;
     }
     return 0xFF;
+}
+
+DB_OVERLAY void fn_8053B450(R* r, int id)
+{
+    unsigned i;
+    for (i = 0; i < r->m4; i++) {
+        int o = i * 4;
+        if (*(int*)((char*)r->m0 + o) == id) {
+            fn_8053B258(r, id);
+            break;
+        }
+    }
+    for (i = 0; i <= 1; i++) {
+        unsigned j;
+        for (j = 0; j <= 1; j++) {
+            if (r->m1B0[i][j].id == id) {
+                fn_8053B980(r, i, id);
+                break;
+            }
+        }
+    }
+    for (i = 0; i <= 2; i++) {
+        if (r->m1D0[i] == id) {
+            fn_8053B85C(r, id);
+            break;
+        }
+    }
 }
 
 DB_OVERLAY void fn_8053B6A4(R* r)
@@ -211,6 +369,33 @@ DB_OVERLAY unsigned fn_8053B6CC(R* r, int id)
         }
     }
     return res;
+}
+
+DB_OVERLAY void fn_8053B720(R* self, int mode, Unk80084910_VObj* strm)
+{
+    Unk80084910_VT* vt = strm->m4;
+    unsigned i = 0;
+    char* p = (char*)self + 0x1D0;
+    vt->pfn((char*)strm + vt->delta, mode, (char*)self + 0xF0, 0xC0);
+    fn_8053A1D0(self, mode, strm);
+    do {
+        vt = strm->m4;
+        i++;
+        vt->pfn((char*)strm + vt->delta, mode, p, 4);
+        p += 4;
+    } while (i <= 2);
+    i = 0;
+    char* w = (char*)self + 0x1C0;
+    char* q = (char*)self + 0x1B0;
+    do {
+        vt = strm->m4;
+        i++;
+        vt->pfn((char*)strm + vt->delta, mode, q, 8);
+        q += 8;
+        vt = strm->m4;
+        vt->pfn((char*)strm + vt->delta, mode, w, 8);
+        w += 8;
+    } while (i <= 1);
 }
 
 DB_OVERLAY int fn_8053B824(R* r, int v)
@@ -367,6 +552,23 @@ DB_OVERLAY char* fn_8053C40C(O58* o, int id)
         r = o->m10 + t * 0x1E0;
     }
     return r;
+}
+
+DB_OVERLAY void fn_8053C4B0(O58* self, int mode, Unk80084910_VObj* strm)
+{
+    Unk80084910_VT* vt = strm->m4;
+    unsigned i = 0;
+    vt->pfn((char*)strm + vt->delta, mode, &self->mC, 4);
+    if (i < self->m8) {
+        int off = 0;
+        do {
+            char* rec = (char*)(off + (int)self->m10);
+            i++;
+            Db8053967C_ElemVT* ev = *(Db8053967C_ElemVT**)(rec + 0x1DC);
+            off += 0x1E0;
+            ev->pfn(rec + ev->delta, mode, strm);
+        } while (i < self->m8);
+    }
 }
 
 DB_OVERLAY int fn_8053CA58(X* x)
