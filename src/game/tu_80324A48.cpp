@@ -4,6 +4,7 @@
  */
 #include "game/tu_80317B88.h"
 
+typedef int (*FxPredT)(FxZ*, FxZT*);
 extern const float lbl_805EBA30;
 extern const float lbl_805EBA34;
 extern const float lbl_805EBA44;
@@ -20,15 +21,17 @@ extern FxGlobal* lbl_8061B8C0;
 
 extern "C" {
 void fn_80325080(FxZT* self, int a, int b, int c, int d, float x, float y);
-int fn_803256C8(FxZT* self, int kind, int flag, float t);
+int fn_803256C8(FxZT* self, int kind, float t, int flag);
 void fn_80327274(FxAI* self);
-FxZ fn_80325158(FxZT* tab, int kind, float t);
-FxZ fn_80325410(FxZT* tab, int kind, float t);
-FxZ fn_80325848(FxZT* tab, int kind, float t);
+FxZ fn_80325158(FxZT* tab, int kind, float t, int flag);
+FxZ fn_80325848(FxZT* tab, int kind, float t, int flag);
+FxZ fn_80325E38(FxZT* self, int kind, float t);
+FxZ fn_80325F5C(FxZT* self, int kind, float t);
+FxZ fn_80325410(FxZT* tab, int kind, float t, int flag);
 FxZ fn_80326080(FxZT* self);
-FxZ fn_80325AB0(FxZT* tab, int kind, float t);
+FxZ fn_80325AB0(FxZT* tab, int kind, float t, int flag);
 void fn_80326300(FxZT* t, int a, int b, int c, float f1, float f2);
-void fn_80326610(FxAI* self, int a, int b, float c);
+void fn_80326610(FxAI* self, char* name, int a, float c);
 int fn_80324A24(FxZ* a);
 int fn_803249D4(FxY* a, FxY* b);
 int fn_80324C6C(FxZ* a, FxZT* tab);
@@ -53,6 +56,7 @@ int fn_80324E38(FxZ* a);
 int fn_80324E54(FxZ* a);
 int fn_80324E6C(FxZ* a);
 int fn_80324E84(short* p);
+void fn_803FFA60(unsigned dst, char* src, int n);
 char* fn_80324EC8(char* a);
 void fn_80324ED0(short* p, int v);
 FxZT* fn_80324EF0(FxZT* self, int a, int b, int c);
@@ -80,7 +84,7 @@ int fn_80326F30(int a);
 FxZ fn_80326F44(FxPtr* p, int kind, float t);
 FxZ fn_80326FC4(FxPtr* p, int kind, float t);
 FxZ fn_80327044(FxPtr* p, int kind, float t);
-int fn_803270C4(FxPtr* p, int kind, int flag, float t);
+int fn_803270C4(FxPtr* p, int kind, float t, int flag);
 void fn_80327100(FxPtr* p, float f1, float f2, int a, int b, int c);
 void fn_8032713C(FxAI* self, int a, int b);
 // PROTOS-END
@@ -153,9 +157,9 @@ extern "C" int fn_80324C6C(FxZ* a, FxZT* tab) {
         if (a->m10 <= 0.25f) return 1;
         if (a->m0 == 0x62) {
             const float c = 0.5f;
-            FxZ z = ((FxZ(*)(FxZT*, int, int, float))fn_80325158)(tab, 0xBA, 0, a->m4);
+            FxZ z = fn_80325158(tab, 0xBA, a->m4, 0);
             if (z.mC == a->mC && !(z.m4 - a->m4 >= c)) return 1;
-            FxZ z2 = ((FxZ(*)(FxZT*, int, int, float))fn_80325410)(tab, 0xBA, 0, a->m4);
+            FxZ z2 = fn_80325410(tab, 0xBA, a->m4, 0);
             if (z2.mC == a->mC && a->m4 - z2.m4 < 0.5f) return 1;
         }
     }
@@ -281,10 +285,80 @@ float fn_80325128(FxZT* self, int flag, float a) {
     return a;
 }
 
-typedef int (*FxPredT)(FxZ*, FxZT*);
+inline int FxValid(const FxZ& z) {
+    int r = 1;
+    if (z.m0 == 0xC7) r = 0;
+    return r;
+}
+extern "C" FxZ fn_80325158(FxZT* self, int kind, float t, int flag) {
+    FxZ best;
+    if (fn_80326F30(kind)) {
+        FxPredT pred = (FxPredT)fn_80325D18(self, kind);
+        if (pred) {
+            best = lbl_805EBA10;
+            t = fn_803250F8(self, flag, t);
+            for (int i = 0; i < self->m8; i++) {
+                if (pred((FxZ*)(self->m4 + i * 0x18), self)) {
+                    FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+                    if (!(e->m4 <= t)) {
+                        if (!FxValid(best) || !(e->m4 >= best.m4)) best = *e;
+                    }
+                }
+            }
+        } else {
+            return ((FxZ(*)(FxZT*, int, float, int))fn_80325E38)(self, kind, t, flag);
+        }
+    } else {
+        best = lbl_805EBA10;
+        t = fn_803250F8(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+            if (e->m0 == kind) {
+                if (!(e->m4 <= t)) {
+                    if (!FxValid(best) || !(e->m4 >= best.m4)) best = *e;
+                }
+            }
+        }
+    }
+    return best;
+}
+
+extern "C" FxZ fn_80325410(FxZT* self, int kind, float t, int flag) {
+    FxZ best;
+    if (fn_80326F30(kind)) {
+        FxPredT pred = (FxPredT)fn_80325D18(self, kind);
+        if (pred) {
+            best = lbl_805EBA10;
+            t = fn_80325128(self, flag, t);
+            for (int i = 0; i < self->m8; i++) {
+                if (pred((FxZ*)(self->m4 + i * 0x18), self)) {
+                    FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+                    if (!(e->m4 >= t)) {
+                        if (!FxValid(best) || !(e->m4 <= best.m4)) best = *e;
+                    }
+                }
+            }
+        } else {
+            return ((FxZ(*)(FxZT*, int, float, int))fn_80325F5C)(self, kind, t, flag);
+        }
+    } else {
+        best = lbl_805EBA10;
+        t = fn_80325128(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+            if (e->m0 == kind) {
+                if (!(e->m4 >= t)) {
+                    if (!FxValid(best) || !(e->m4 <= best.m4)) best = *e;
+                }
+            }
+        }
+    }
+    return best;
+}
+
 /* near-miss: 2 slots. Retail spills the float parameter (stfs f1,8(r1)) before the copy of the int parameter
    flag (mr r29,r5); here the copy comes first. Everything else, including layout and registers, is identical. */
-int fn_803256C8(FxZT* self, int kind, int flag, float t) {
+int fn_803256C8(FxZT* self, int kind, float t, int flag) {
     int cnt = 0;
     if (fn_80326F30(kind)) {
         FxPredT pred = (FxPredT)fn_80325D18(self, kind);
@@ -296,7 +370,7 @@ int fn_803256C8(FxZT* self, int kind, int flag, float t) {
                 }
             }
         } else {
-            FxZ z = ((FxZ(*)(FxZT*, int, int, float))fn_80325158)(self, kind, 0, 0.0f);
+            FxZ z = fn_80325158(self, kind, 0.0f, 0);
             int ok = 1;
             if (z.m0 == 0xC7) ok = 0;
             if (ok) cnt = 1;
@@ -310,6 +384,64 @@ int fn_803256C8(FxZT* self, int kind, int flag, float t) {
         }
     }
     return cnt;
+}
+
+extern "C" FxZ fn_80325848(FxZT* self, int kind, float t, int flag) {
+    if (fn_80326F30(kind)) {
+        FxPredT pred = (FxPredT)fn_80325D18(self, kind);
+        FxZ best = lbl_805EBA10;
+        t = fn_803250F8(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            if (pred((FxZ*)(self->m4 + i * 0x18), self)) {
+                FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+                if (!(e->m4 <= t)) {
+                    if (!(e->m10 >= best.m10)) best = *e;
+                }
+            }
+        }
+        return best;
+    } else {
+        FxZ best = lbl_805EBA10;
+        t = fn_803250F8(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+            if (e->m0 == kind) {
+                if (!(e->m4 <= t)) {
+                    if (!(e->m10 >= best.m10)) best = *e;
+                }
+            }
+        }
+        return best;
+    }
+}
+
+extern "C" FxZ fn_80325AB0(FxZT* self, int kind, float t, int flag) {
+    if (fn_80326F30(kind)) {
+        FxPredT pred = (FxPredT)fn_80325D18(self, kind);
+        FxZ best = lbl_805EBA10;
+        t = fn_80325128(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            if (pred((FxZ*)(self->m4 + i * 0x18), self)) {
+                FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+                if (!(e->m4 >= t)) {
+                    if (!(e->m10 >= best.m10)) best = *e;
+                }
+            }
+        }
+        return best;
+    } else {
+        FxZ best = lbl_805EBA10;
+        t = fn_80325128(self, flag, t);
+        for (int i = 0; i < self->m8; i++) {
+            FxZ* e = (FxZ*)(i * 0x18 + (int)self->m4);
+            if (e->m0 == kind) {
+                if (!(e->m4 >= t)) {
+                    if (!(e->m10 >= best.m10)) best = *e;
+                }
+            }
+        }
+        return best;
+    }
 }
 
 FxPred fn_80325D18(void* self, int kind) {
@@ -337,11 +469,11 @@ extern "C" FxZ fn_80325E38(FxZT* self, int kind, float t) {
     case 0xB3:
         return fn_80326080(self);
     case 0xB4:
-        return fn_80325848(self, 0xAE, t);
+        return ((FxZ(*)(FxZT*, int, float))fn_80325848)(self, 0xAE, t);
     case 0xB8:
-        return fn_80325848(self, 0xB6, t);
+        return ((FxZ(*)(FxZT*, int, float))fn_80325848)(self, 0xB6, t);
     case 0xB5: {
-        FxZ z = fn_80325158(self, 0xAD, 0.0f);
+        FxZ z = ((FxZ(*)(FxZT*, int, float))fn_80325158)(self, 0xAD, 0.0f);
         if (!(z.m4 <= t)) return z;
         break;
     }
@@ -354,11 +486,11 @@ extern "C" FxZ fn_80325F5C(FxZT* self, int kind, float t) {
     case 0xB3:
         return fn_80326080(self);
     case 0xB4:
-        return fn_80325AB0(self, 0xAE, t);
+        return ((FxZ(*)(FxZT*, int, float))fn_80325AB0)(self, 0xAE, t);
     case 0xB8:
-        return fn_80325AB0(self, 0xB6, t);
+        return ((FxZ(*)(FxZT*, int, float))fn_80325AB0)(self, 0xB6, t);
     case 0xB5: {
-        FxZ z = fn_80325158(self, 0xAD, 0.0f);
+        FxZ z = ((FxZ(*)(FxZT*, int, float))fn_80325158)(self, 0xAD, 0.0f);
         if (!(z.m4 >= t)) return z;
         break;
     }
@@ -435,6 +567,40 @@ FxShorts* fn_803265F0() {
     return p;
 }
 
+extern "C" void fn_80326610(FxAI* self, char* name, int a, float c) {
+    int len = fn_80324E84((short*)name);
+    FxRingH* r = ((FxRingH**)&self->m0)[self->m4B8];
+    unsigned pos = r->m14;
+    unsigned used = (pos - r->mC) + 1;
+    if ((unsigned)(r->m10 - used) <= 0x1387) pos = r->mC;
+    unsigned end = pos + len;
+    unsigned last = end - 1;
+    int removed;
+    do {
+        removed = 0;
+        unsigned v = ((FxRingE*)(r->m1C * 16 + (int)r->m0))->m0;
+        if (v != 0 && v >= pos && v <= last) {
+            ((FxRingE*)(r->m1C * 16 + (int)r->m0))->m0 = removed;
+            ((FxRingE*)(r->m1C * 16 + (int)r->m0))->mC = removed;
+            removed = 1;
+            r->m1C = (r->m1C + 1) % r->m24;
+        }
+    } while (removed != 0);
+    fn_803FFA60(pos, name, len);
+    ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m0 = pos;
+    ((FxRingE*)(r->m20 * 16 + (int)r->m0))->mC = len;
+    ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m4 = a;
+    ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m8 = c;
+    r->m14 = end;
+    r->m18 = r->m20;
+    r->m20 = (r->m20 + 1) % r->m24;
+    if (r->m20 == r->m1C) {
+        ((FxRingE*)(r->m20 * 16 + (int)r->m0))->m0 = removed;
+        ((FxRingE*)(r->m1C * 16 + (int)r->m0))->mC = removed;
+        r->m1C = (r->m1C + 1) % r->m24;
+    }
+}
+
 int fn_80326C20(FxAI* a) {
     if (a->m0->m18 == 0) return 0;
     if (lbl_80620860 != 0) return 0;
@@ -494,26 +660,26 @@ int fn_80326F30(int a) { return (unsigned)(a - 0xB3) <= 0x12; }
 /* near-miss: default-struct return; retail loads the 6-word default through different registers (word copy batching) */
 FxZ fn_80326F44(FxPtr* p, int kind, float t) {
     FxZT* tab = p->m0;
-    if (tab) return fn_80325158(tab, kind, t);
+    if (tab) return ((FxZ(*)(FxZT*, int, float))fn_80325158)(tab, kind, t);
     return lbl_805EBA10;
 }
 
 /* near-miss: same as the neighbouring function */
 FxZ fn_80326FC4(FxPtr* p, int kind, float t) {
     FxZT* tab = p->m0;
-    if (tab) return fn_80325410(tab, kind, t);
+    if (tab) return ((FxZ(*)(FxZT*, int, float))fn_80325410)(tab, kind, t);
     return lbl_805EBA10;
 }
 
 /* near-miss: default-struct return; retail loads the 6-word default through different registers (word copy batching) */
 FxZ fn_80327044(FxPtr* p, int kind, float t) {
     FxZT* tab = p->m0;
-    if (tab) return fn_80325848(tab, kind, t);
+    if (tab) return ((FxZ(*)(FxZT*, int, float))fn_80325848)(tab, kind, t);
     return lbl_805EBA10;
 }
 
-int fn_803270C4(FxPtr* p, int kind, int flag, float t) {
-    if (p->m0 != 0) return fn_803256C8(p->m0, kind, flag, t);
+int fn_803270C4(FxPtr* p, int kind, float t, int flag) {
+    if (p->m0 != 0) return fn_803256C8(p->m0, kind, t, flag);
     return 0;
 }
 
@@ -539,7 +705,7 @@ void fn_8032713C(FxAI* self, int a, int b) {
             do {
                 int off = i * 16;
                 FxEnt16* p = (FxEnt16*)(off + (int)z->m0);
-                fn_80326610(self, p->m0, p->m4, p->m8);
+                fn_80326610(self, (char*)p->m0, p->m4, p->m8);
                 i = (i + 1) % z->m24;
             } while (--n);
         }
