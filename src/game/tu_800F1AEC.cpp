@@ -84,6 +84,15 @@ struct UiV21D4 : UiObj {
 };
 int fn_800968C0(UiP16C* p, int a, int b);
 int fn_8009692C(UiP16C* p, int a);
+struct UiV2298 : UiObj {
+    char pad40[0x194 - 0x40];
+    int m194;
+    int m198;
+    char pad19C[0x1B0 - 0x19C];
+    int m1B0;
+    int m1B4;
+};
+int fn_800F2148(UiV2298* self);
 int fn_800F21D4(UiV21D4* self, int idx, UiP16C* p)
 {
     unsigned char x = fn_8009692C(p, fn_800968C0(p, self->m1C4, 1));
@@ -103,13 +112,8 @@ int fn_800F21D4(UiV21D4* self, int idx, UiP16C* p)
 }
 
 
-struct UiV2298 : UiObj {
-    char pad40[0x194 - 0x40];
-    int m194;
-};
 extern int lbl_805C3D24[];
 int fn_800F1DF4(UiV2298* self, int a, int b, int c, int d);
-int fn_800F2148(UiV2298* self);
 int fn_800F2298(UiV2298* self, int a, int b, int c)
 {
     int ok = 1;
@@ -368,6 +372,65 @@ void fn_800F4078(Ui4078* self)
         fn_8012E1C4(self->m138, 1, 0x245E);
 }
 
+struct UiS;
+void fn_800EB704(UiS* self);
+void fn_800DD204(UiS* a, UiS* b);
+void* fn_800B8144();
+void fn_800B83F8(void* self, int a, int b);
+void fn_80125128(UiObj* o, int a);
+void fn_80125154(UiObj* o, int a);
+void fn_804D28B4(void* p);
+extern char lbl_805BAFF0[];
+extern char lbl_805BE43C[];
+class UiX94v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+  virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39(); virtual void v40();
+  virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44(); virtual void v45();
+  virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49(); virtual void v50();
+  virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55();
+  virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60();
+  virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64(); virtual void v65();
+  virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69(); virtual void v70();
+  virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74(); virtual void v75();
+  virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79(); virtual void v80();
+  virtual void v81(); virtual void v82(); virtual void v83(); virtual void v84(); virtual void v85();
+  virtual void v86(); virtual void v87(); virtual void v88(); virtual void v89(); virtual void v90();
+  virtual void v91(); virtual void v92(); virtual void v93(); virtual void v94(int a);
+};
+extern char lbl_805BA6D0[];
+/* near-miss: three arg-setup pairs (li r4 before mr r3) are ordered the other way round */
+void fn_800F4158(UiObj* self)
+{
+    fn_800EB704((UiS*)self);
+    fn_800B83F8(fn_800B8144(), 1, 1);
+    UiObj* w = (UiObj*)fn_800B7AB8(UiGetMsgMgr(), lbl_805BA6D0);
+    fn_80124FA8(w, self);
+    fn_80125128(w, -1);
+    fn_80125154(w, -2);
+    fn_801251CC(w, 3, 0x3BEE, -4);
+    UiObj* o = fn_800C8044(self->v32((int)lbl_805BAFF0, 1));
+    UiObj* p = fn_800C8040(o->v32((int)lbl_805BAFF0, 1));
+    UiObj* q = fn_800C8038(o->v32((int)lbl_805BE43C, 1));
+    if (fn_800B555C()->m0 == 0x42)
+        p->v29(0x110);
+    else if (fn_800B555C()->m0 == 0x43)
+        p->v29(0x111);
+    else if (fn_800B555C()->m0 == 0x44)
+        p->v29(0x119);
+    if (fn_800B57EC(fn_800B555C()) == 0)
+        fn_801251CC(w, 2, 0x3CA5, 0);
+    fn_800DD204((UiS*)p, (UiS*)q);
+    ((UiX94v*)self)->v94(1);
+    fn_804D28B4((char*)self + 0x144);
+}
+
 void fn_800F49FC(UiObj* self)
 {
     fn_800EBEA8(self);
@@ -375,6 +438,80 @@ void fn_800F49FC(UiObj* self)
 }
 
 extern char lbl_805BAF10[];
+class UiX84v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+  virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39(); virtual void v40();
+  virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44(); virtual void v45();
+  virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49(); virtual void v50();
+  virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55();
+  virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60();
+  virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64(); virtual void v65();
+  virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69(); virtual void v70();
+  virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74(); virtual void v75();
+  virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79(); virtual void v80();
+  virtual void v81(); virtual void v82(); virtual void v83(); virtual void v84(int a, int b);
+};
+class UiScrH : public UiX84v {
+public:
+    char pad40[0x134 - 0x40];
+    int m134;
+    int m138;
+    int m13C;
+    char pad140[0x148 - 0x140];
+    int m148;
+    int m14C;
+    char pad150[0x164 - 0x150];
+    int m164;
+    char pad168[0x16C - 0x168];
+    int m16C;
+    int m170;
+};
+struct UiSub144 {
+    char pad0[0x34];
+    int m34;
+    int m38;
+};
+class UiS4A30 : public UiObj {
+public:
+    char pad40[0x138 - 0x40];
+    UiScrH* m138;
+    char pad13C[0x144 - 0x13C];
+    UiSub144 m144;
+    char pad180[0x7E0 - 0x180];
+    int* m7E0;
+};
+inline int UiIntAtF(char* b, int i)
+{
+    int o = i * 4;
+    return *(int*)(b + o);
+}
+int fn_804D24B0(UiSub144* s);
+int fn_80126CF4(UiScrH* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern char lbl_805BE454[];
+/* near-miss: arg setup of the first fn_80126CF4 call (mr r3 / li r9) is ordered the other way round */
+extern "C" void fn_800F4A30(UiS4A30* self)
+{
+    UiSub144* s = &self->m144;
+    if (fn_804D24B0(s) == 0) {
+        int p = s->m34 != -1;
+        if (!p && s->m38 != -1) {
+            UiObj* o = (UiObj*)fn_800C8060(self->v32((int)lbl_805BE454, 1));
+            UiScrH* h = self->m138;
+            fn_80126CF4(h, h->m164, UiIntAtF((char*)self->m7E0, o->v60() - 1), h->m134, h->m16C, h->m170, 0, h->m138, h->m13C, h->m148, h->m14C);
+            self->m138->v84(1, 0);
+            return;
+        }
+    }
+    fn_80126CF4(self->m138, self->m138->m164, 0, self->m138->m134, self->m138->m16C, self->m138->m170, 0, self->m138->m138, self->m138->m13C, self->m138->m148, self->m138->m14C);
+}
+
 void fn_800F4EA8(UiObj* self)
 {
     UiObj* o = fn_800B7AB8(UiGetMsgMgr(), lbl_805BAF10);
