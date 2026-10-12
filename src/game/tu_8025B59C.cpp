@@ -12,6 +12,41 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+/* Command record (same layout as the one fn_8035E410 initialises, see tu_8035DA48.cpp). */
+extern char lbl_805DABF0[];
+struct Unk8035E410_V3 {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Unk8035E410 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    int m24;
+    Unk8035E410_V3 m28;
+    int m34;
+    Unk8035E410(int a = 0, const char* b = lbl_805DABF0, int c = 0x2A);
+};
+void fn_8035E410(Unk8035E410* self, int a, const char* b, int c);
+inline Unk8035E410::Unk8035E410(int a, const char* b, int c) { fn_8035E410(this, a, b, c); }
+struct Unk8025E924_Ctx {
+    char pad0[0x418];
+    int m418;
+};
+extern Unk80273498_Vec3 lbl_805DBA04[];
+
+inline float Unk8025E924_D2(const Unk80273498_Vec3* e, P* p)
+{
+    return (e->x - p->m60) * (e->x - p->m60) + (e->z - p->m68) * (e->z - p->m68);
+}
+
 /* Object at ctx+0x3C0 read by fn_8025DF8C: signed state word at +0x14 (-1 = none, bit 0 / bit 1 = slot flags). */
 struct Unk8025DF8C_O {
     char pad0[0x14];
@@ -757,6 +792,42 @@ extern "C" void fn_8025E804(F* f)
                 fn_8025E924(self, p, fl);
             }
         }
+    }
+}
+
+extern int fn_8014E310(int a);
+extern int fn_8018AD20(P* p);
+extern int fn_8018AD2C(P* p);
+extern float fn_804028E4(float x);
+extern void fn_8026BD5C(I* self, Unk8035E410* cmd, P* p);
+extern void fn_802659EC(I* self, void* ev, P* p);
+void fn_8025E924(I* self, P* p, int flag)
+{
+    int k = fn_8014E310(p->m458);
+    int j;
+    if (k <= 2) {
+        j = k;
+        if (j < 0)
+            j = 0;
+    } else
+        j = 2;
+    ((Unk80270BA0_XVirt*)p)->fn_vslot8(0);
+    A* ca = &p->m58C;
+    ca->b1 = 0;
+    int r = 0;
+    if (flag != 0)
+        r = 1;
+    Q* q = self->m1EC;
+    if (((Unk8025E924_Ctx*)q->m700)->m418 != 0 || fn_8018AD20(q->m6CC) != 0)
+        r = 1;
+    if (p->m264 != 0 || p->m618->m838 == 0 || !(fn_804028E4(Unk8025E924_D2(&lbl_805DBA04[j], p)) <= 360.0f))
+        r = 1;
+    if (fn_8018AD2C(self->m1EC->m6CC) == 0)
+        r = 0;
+    if (r != 0) {
+        Unk8035E410 o;
+        fn_8026BD5C(self, &o, p);
+        fn_802659EC(self, &o, p);
     }
 }
 
