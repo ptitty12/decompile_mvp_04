@@ -222,9 +222,9 @@ public:
     virtual void v56();
     virtual void v57();
     virtual void v58();
-    virtual void v59();
+    virtual int v59();
     virtual int v60();
-    virtual void v61();
+    virtual int v61();
     virtual void v62();
     virtual void v63();
     virtual void v64();
@@ -263,6 +263,7 @@ extern "C" {
 void fn_804E3174(void* self, int a);
 void fn_804E3EF8(void* self);
 void fn_804E46B8(void* self);
+void fn_804E6A58(void* self);
 void* fn_800C33D0();
 void fn_800C3AB4(void* p, int v);
 void fn_800C3BE0();
@@ -442,6 +443,65 @@ public:
     virtual void v55();
     virtual void v56();
 };
+
+void fn_800E25E0(int a, int b);
+extern "C" void fn_8035686C(void* self, int chrg);
+struct FeS4 : FeObj {
+    char pad40[0x13C - 0x40];
+    FeObj* m13C;
+    char pad140[0x154 - 0x140];
+    int m154;
+};
+struct FeS5 : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObj* m138;
+    int m13C;
+};
+
+struct FeS6 : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObj* m134;
+    FeObj* m138;
+    FeObj* m13C;
+    FeObj* m140;
+    FeObj* m144;
+    FeObj* m148;
+    FeObj* m14C;
+};
+
+/* Profile-list screens (units 804E750C..): widgets at +0x134/+0x138/+0x140, FeHolder pairs at +0x148..0x15C. */
+struct FeS7 : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObj* m134;
+    FeObj* m138;
+    int m13C;
+    FeObj* m140;
+};
+struct FeS8 : FeObj {
+    char pad40[0x144 - 0x40];
+    int m144;
+    FeHolder* m148;
+    char pad14C[0x158 - 0x14C];
+    FeHolder* m158;
+    FeHolder* m15C;
+};
+struct FeS9 : FeObj {
+    char pad40[0x13C - 0x40];
+    FeObj* m13C;
+};
+extern "C" {
+void fn_804E7D44(FeS7* self, int a);
+void fn_804E8644(void* self);
+void fn_800E26B4(int a, int b);
+}
+
+struct FeS11 : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObj* m138;
+    char pad13C[0x164 - 0x13C];
+    FeObj* m164;
+};
+extern "C" void fn_80125084(FeObj* o, int a);
 
 /* BEGIN-VWRAP */
 /* Screens whose only data is one widget pointer at the given offset (one-call button handlers). */
