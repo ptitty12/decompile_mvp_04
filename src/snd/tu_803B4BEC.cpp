@@ -44,7 +44,6 @@ extern float lbl_80609BA0;
 extern float lbl_80609BF4;
 extern int lbl_806AA2D4[];
 
-
 struct Unk806AA88C_Entry {
     unsigned int m0;
     unsigned int m4;
@@ -76,6 +75,63 @@ extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
 extern "C" int fn_803B0360();
 extern "C" void fn_803B0714(int h);
+
+extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out);
+
+struct Unk803B5E2C {
+    void* m0;
+    int m4;
+};
+
+extern "C" void fn_803B6454(float* st, int n, float* in, float* out);
+
+struct Unk803B5EC4 {
+    void* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    char pad18[3];
+    char m1B;
+    float m1C[8];
+};
+
+struct Unk803B66CC {
+    char pad[0x1C];
+    int m1C;
+};
+
+struct Unk803B69AC {
+    void* m0;
+    int m4;
+    char pad8[0x18];
+    int m20;
+    void* m24;
+    short m28;
+    short m2A;
+    float m2C[4];
+};
+
+extern "C" int fn_803AB480(int shandle);
+extern "C" void fn_803B57A4();
+
+extern "C" void fn_803A975C();
+extern "C" void fn_803A979C();
+extern "C" int fn_803B0368(int slot, void* pmem);
+extern "C" int fn_803B0360();
+extern "C" int fn_803B042C(int h, int voice, int timemult, int lowpass, int highpass, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa);
+extern "C" int fn_803B58E8(int* prenderindex, SNDIPATCHHEADER* pph);
+extern "C" void fn_803AFD44(int rendermode, int* pmin, int* pmax);
+extern "C" void fn_803B3E18(CHANPUB* pvoice);
+
+/* SNDPKTPLAY_create (source structure from the ported spktplay.c reference). */
+
+/* SNDPKTPLAY_submit */
+
+/* SNDPKTPLAYI_get */
+
+/* SNDPKTPLAY_start */
 
 extern "C" int fn_803B4BEC(int voice)
 {
@@ -114,6 +170,217 @@ extern "C" int fn_803B4CD4(int n)
     return a + fn_803B0360();
 }
 
+/* near-miss: 61 vs 58 insns (SNDPKTPLAY_create, structure from the nfsmw spktplay.c reference): retail recomputes the ppc table address (lis/addi + addi 0x304) for the final store after the call and uses a one-step lbl_806AA804 base in the search loop; ours keeps the loop base in a saved register (r26) and reuses it for the store */
+extern "C" int fn_803B4D08(void (*preleasefunc)(void*, void*), void (*pframesfunc)(int, int, void*), void* pclientdata, void* pmem, int memsize)
+{
+    SNDPACKETCHAN* ppchan;
+    int packetinstancehandle;
+    void* pplatformmem;
+    int i;
+
+    fn_803A975C();
+
+    for (i = 0; i < sndgs.sso.set.maxstreams; i++) {
+        if (lbl_806AA500.ppc[i] == 0) {
+            goto allocated;
+        }
+    }
+
+    fn_803A979C();
+    return -9;
+
+allocated:
+    packetinstancehandle = fn_803B0368(i, pmem);
+    if (packetinstancehandle < 0) {
+        fn_803A979C();
+        return -6;
+    }
+
+    pplatformmem = pmem;
+    pmem = (void*)((int)pmem + fn_803B0360());
+    ppchan = (SNDPACKETCHAN*)pmem;
+    memsize -= fn_803B0360();
+
+    ppchan->maxpackets = (memsize - 0x9C) / sizeof(SNDPACKETENTRY);
+    ppchan->pplatformmem = pplatformmem;
+    ppchan->preleasefunc = preleasefunc;
+    ppchan->pframesfunc = pframesfunc;
+    ppchan->pclientdata = pclientdata;
+    ppchan->shandle = -1;
+    *(SNDPACKETCHAN**)((char*)&lbl_806AA500 + 0x304 + i * 4) = ppchan;
+
+    fn_803A979C();
+    return i;
+}
+
+extern "C" int fn_803B4DFC(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDPLAYOPTS* pspo)
+{
+    SNDIPATCHHEADER ph;
+    SNDPACKETCHAN* ppchan;
+    int minvoicerange;
+    int maxvoicerange;
+    int rendermodeindex = 0;
+    int rendermode;
+    int shandle;
+    int voice;
+    int ret;
+    int voicesneeded;
+    int i;
+    int done = 0;
+
+    SNDI_checkplayopts(pspo);
+
+    voicesneeded = pssf->channels;
+    ph.numchan = pssf->channels;
+    ph.rendermode = pssa->rendermode;
+    rendermodeindex = 0;
+
+    ppchan = lbl_806AA500.ppc[packetinstancehandle];
+    ppchan->sampleformat = *pssf;
+    ppchan->lastpackethandle = 0;
+    ppchan->outstandingframes = 0;
+    ppchan->outstandingplatformframes = 0;
+    ppchan->masterCurrentPacket = 0;
+    ppchan->masterReleasePacket = 0;
+    ppchan->submitpacket = 0;
+    ppchan->releasepacket = 0;
+
+    for (i = 0; i < ppchan->sampleformat.channels; i++) {
+        ppchan->numPacketsProcessed[i] = 0;
+        ppchan->outstandingpackets[i] = 0;
+        ppchan->playpacket[i] = 0;
+        ppchan->ptsdata[i] = pssa->ptsdata[i];
+    }
+
+    while (!done && (rendermode = fn_803B58E8(&rendermodeindex, &ph))) {
+        CHANPUB* pVoice;
+        fn_803AFD44(rendermode, &minvoicerange, &maxvoicerange);
+
+        voice = SNDVOICEI_alloc(voicesneeded, 0x65, &shandle, minvoicerange, maxvoicerange);
+        if (voice < 0) {
+            ppchan->shandle = -9;
+            continue;
+        }
+        ppchan->shandle = shandle;
+
+        ppchan->masterpacketchan = fn_803B4C74(voice, pssf->channels);
+
+        pVoice = &sndgs.chan[voice];
+        pVoice->sustainend = -1;
+        pVoice->frames = 0;
+        pVoice->samplerate = pssf->samplerate;
+        pVoice->samplerep = pssf->samplerep;
+        pVoice->numchan = pssf->channels;
+
+        if (pssf->channels == 1) {
+            pVoice->azimuth = pspo->azimuth;
+        } else {
+            fn_803B3E18(pVoice);
+        }
+
+        pVoice->bhandle = -1;
+        pVoice->builtinazimuth = 0;
+        pVoice->initialdetune = pssa->detune;
+        pVoice->progpitch = pspo->pitchmult;
+        pVoice->pitchbend = pspo->bend;
+        pVoice->progfxlevel = pspo->fxlevel0;
+        pVoice->pFxVolume->fxLevel = pspo->fxlevel0 * (1.0f / 127.0f);
+        pVoice->bendrange = pssa->bendrange * 100;
+        pVoice->patchkey = 0;
+        pVoice->ismaster = 0;
+        pVoice->pbendtable = 0;
+        pVoice->ppitchlfo = 0;
+        pVoice->programmedVol = pspo->vol * (1.0f / 127.0f);
+
+        for (i = 0; i < pssf->channels; i++) {
+            pVoice->azimuthOffsets[i] = pssa->azimuth[i] - sndgs.srcchancfg3d[pssf->channels - 1][i];
+
+            CHANPUB* pSourceVoice = &sndgs.chan[pVoice->voices[i]];
+            pSourceVoice->rendermode = rendermode;
+            pSourceVoice->drylevel = pspo->drylevel;
+            pSourceVoice->builtinvol = pssa->vol;
+            pSourceVoice->programmedVol = pVoice->programmedVol;
+            pSourceVoice->pvoltable = 0;
+            pSourceVoice->numenvelopes = 1;
+            pSourceVoice->releaseenvelope = 0;
+            pSourceVoice->curenvelope = 0;
+            pSourceVoice->fadePer100Hz = 0.0f;
+            pSourceVoice->envvol = 0x7F0000;
+            pSourceVoice->envduration = 0x7FFFFFFF;
+            pSourceVoice->envpertick = 0;
+            pSourceVoice->paenvelope = 0;
+            pSourceVoice->pvollfo = 0;
+            Snd::Util::FastVol(pSourceVoice);
+
+            if (i == 5) {
+                pSourceVoice->isLfe = 1;
+            } else {
+                pSourceVoice->isLfe = 0;
+            }
+            pSourceVoice->elevation = 0;
+        }
+
+        if (pssf->channels == 1) {
+            pVoice->elevation = pspo->elevation;
+        }
+
+        for (i = 0; i < pssf->channels; i++) {
+            CHANPUB* pSourceVoice = &sndgs.chan[pVoice->voices[i]];
+            pSourceVoice->azimuth += pVoice->azimuthOffsets[i];
+        }
+        pVoice->detunepitch = 0;
+
+        iSNDcalcpitch(voice);
+        ret = fn_803B042C(packetinstancehandle, voice, pspo->timemult, pspo->lowpasscutoff, pspo->highpasscutoff, pssf, pssa);
+        if (ret >= 0) {
+            break;
+        }
+
+        for (i = 0; i < voicesneeded; i++) {
+            SNDVOICEI_free(sndgs.chan[voice].voices[i]);
+        }
+
+        ppchan->shandle = ret;
+    }
+
+    return ppchan->shandle;
+}
+
+extern "C" int fn_803B5254(int packetinstancehandle, SNDPACKET* psp)
+{
+    SNDPACKETCHAN* ppchan = lbl_806AA500.ppc[packetinstancehandle];
+    SNDPACKETENTRY* pentry;
+    int packethandle;
+    int i;
+
+    for (i = 0; i < ppchan->sampleformat.channels; i++) {
+        if (ppchan->outstandingpackets[i] >= ppchan->maxpackets - 1) {
+            return -13;
+        }
+    }
+
+    pentry = &ppchan->pe[ppchan->submitpacket];
+    pentry->numframes = psp->numframes;
+    pentry->continuation = psp->continuation;
+    pentry->handle = ppchan->lastpackethandle;
+
+    for (i = 0; i < ppchan->sampleformat.channels; i++) {
+        pentry->psamples[i] = psp->psamples[i];
+        ppchan->outstandingpackets[i]++;
+    }
+
+    ppchan->outstandingframes += psp->numframes;
+    packethandle = ppchan->lastpackethandle;
+    ppchan->lastpackethandle++;
+    ppchan->submitpacket++;
+
+    if (ppchan->submitpacket >= ppchan->maxpackets) {
+        ppchan->submitpacket = 0;
+    }
+
+    return packethandle;
+}
+
 extern "C" int fn_803B537C(int h)
 {
     SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
@@ -132,9 +399,24 @@ extern "C" unsigned int fn_803B53DC(int h)
     return p->outstandingframes + p->outstandingplatformframes;
 }
 
-extern "C" int fn_803B5400()
+extern "C" int fn_803B5400(int, int, int)
 {
     return -15;
+}
+
+extern "C" int fn_803B5408(int h)
+{
+    SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
+    int i = 0;
+    fn_803AB480(p->shandle);
+    fn_803B57A4();
+    fn_803B5400(h, 0, 0x7fffffff);
+    p->shandle = -1;
+    for (i = 0; i < p->sampleformat.channels; i++) {
+        if (p->ptsdata[i] != 0)
+            SNDMEMI_free(p->ptsdata[i]);
+    }
+    return 0;
 }
 
 extern "C" int fn_803B54A8(int h)
@@ -144,6 +426,76 @@ extern "C" int fn_803B54A8(int h)
     lbl_806AA500.ppc[h] = 0;
     fn_803A979C();
     return 0;
+}
+
+extern "C" void* fn_803B54FC(int packetinstancehandle, int chan, int* pframes, int* pcontinuation)
+{
+    SNDPACKETCHAN* ppchan = lbl_806AA500.ppc[packetinstancehandle];
+    SNDPACKETENTRY* pentry;
+    SNDPACKETENTRY* pspe;
+    int i;
+    int releaseFlag = 1;
+    int increaseMaster = 1;
+
+    for (i = 0; i < ppchan->sampleformat.channels; i++) {
+        if (ppchan->numPacketsProcessed[i] <= ppchan->masterReleasePacket) {
+            releaseFlag = 0;
+        }
+    }
+
+    if (releaseFlag != 0) {
+        pspe = &ppchan->pe[ppchan->releasepacket];
+        if (ppchan->preleasefunc != 0) {
+            SNDIPACKETCALLBACK* pspcb = &lbl_806AA500.spcb[lbl_806AA500.callbackindex];
+            pspcb->type = 1;
+            pspcb->chan = packetinstancehandle;
+            pspcb->u.psamples = pspe->psamples[0];
+            lbl_806AA500.callbackindex++;
+        }
+
+        ppchan->releasepacket++;
+        ppchan->masterReleasePacket++;
+
+        if (ppchan->releasepacket >= ppchan->maxpackets) {
+            ppchan->releasepacket = 0;
+        }
+    }
+
+    if (ppchan->outstandingpackets[chan] == 0) {
+        return 0;
+    }
+
+    pentry = &ppchan->pe[ppchan->playpacket[chan]];
+
+    *pframes = pentry->numframes;
+    *pcontinuation = pentry->continuation;
+    ppchan->playpacket[chan]++;
+    ppchan->numPacketsProcessed[chan]++;
+
+    i = 0;
+    do {
+        if (ppchan->numPacketsProcessed[i] <= ppchan->masterCurrentPacket) {
+            increaseMaster = 0;
+        }
+        i++;
+    } while (increaseMaster == 1 && i < ppchan->sampleformat.channels);
+
+    if (increaseMaster != 0) {
+        ppchan->masterCurrentPacket++;
+        ppchan->outstandingframes -= pentry->numframes;
+        ppchan->outstandingplatformframes += pentry->numframes;
+    }
+
+    if (ppchan->playpacket[chan] >= ppchan->maxpackets) {
+        ppchan->playpacket[chan] = 0;
+    }
+
+    ppchan->outstandingpackets[chan]--;
+    if (pentry->psamples[chan] == 0) {
+        return (void*)-1;
+    }
+
+    return pentry->psamples[chan];
 }
 
 extern "C" void fn_803B5738(int h, int chan, int frames)
@@ -159,6 +511,20 @@ extern "C" void fn_803B5738(int h, int chan, int frames)
     e->chan = h;
     e->u.frames = frames;
     lbl_806AA500.callbackindex++;
+}
+
+extern "C" void fn_803B57A4()
+{
+    int i;
+    for (i = 0; i < lbl_806AA500.callbackindex; i++) {
+        SNDIPACKETCALLBACK* e = &lbl_806AA500.spcb[i];
+        SNDPACKETCHAN* p = lbl_806AA500.ppc[e->chan];
+        if (e->type == 0)
+            p->pframesfunc(e->chan, e->u.frames, p->pclientdata);
+        else
+            p->preleasefunc(e->u.psamples, p->pclientdata);
+    }
+    lbl_806AA500.callbackindex = 0;
 }
 
 void Snd::Util::ReallocBuf(void** buffer, int* curSize, int newMinSize, int sizeofDataType)
@@ -267,8 +633,6 @@ extern "C" void fn_803B5D30(unsigned int addr)
     }
 }
 
-extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out);
-
 extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out)
 {
     int i;
@@ -286,18 +650,11 @@ extern "C" int fn_803B5DCC(int unused, int n, float* in, int* out)
     return n;
 }
 
-struct Unk803B5E2C {
-    void* m0;
-    int m4;
-};
-
 extern "C" void fn_803B5E2C(Unk803B5E2C* o)
 {
     o->m4 = 0;
     o->m0 = (void*)fn_803B5DCC;
 }
-
-extern "C" void fn_803B6454(float* st, int n, float* in, float* out);
 
 extern "C" int fn_803B5E44(Unk803B5E44* o, int a, float* in, float* out)
 {
@@ -313,18 +670,6 @@ extern "C" int fn_803B5E44(Unk803B5E44* o, int a, float* in, float* out)
     fn_803B6454(o->m1C, n, in, out);
     return n;
 }
-
-struct Unk803B5EC4 {
-    void* m0;
-    int m4;
-    int m8;
-    int mC;
-    int m10;
-    int m14;
-    char pad18[3];
-    char m1B;
-    float m1C[8];
-};
 
 extern "C" int fn_803B5EC4(Unk803B5EC4* o)
 {
@@ -360,6 +705,7 @@ extern "C" void fn_803B5F9C(Unk803B5F9C** head, Unk803B5F9C* n)
     n->m10 = prev;
 }
 
+/* near-miss: 24 vs 31 insns: retail keeps two dead null/equality checks after the search loop and copies the load through r9; the plain while/if forms fold them away */
 extern "C" void fn_803B6004(Unk803B5F9C** head, Unk803B5F9C* n)
 {
     Unk803B5F9C* p = *head;
@@ -396,6 +742,26 @@ extern "C" void fn_803B6428(float* p)
     p[7] = z;
 }
 
+extern "C" void fn_803B6454(float* st, int n, float* in, float* out)
+{
+    int i;
+    for (i = 0; i < n; i++) {
+        float t7 = in[i] + st[7];
+        float t0 = st[0] + st[6];
+        float t1 = st[1] + st[5];
+        float t2 = st[2] + st[4];
+        out[i] = st[12] * st[3] + (st[11] * t2 + (st[10] * t1 + (st[8] * t7 + st[9] * t0)));
+        st[7] = st[6];
+        st[6] = st[5];
+        st[5] = st[4];
+        st[4] = st[3];
+        st[3] = st[2];
+        st[2] = st[1];
+        st[1] = st[0];
+        st[0] = in[i];
+    }
+}
+
 extern "C" int fn_803B6514(Unk803B5E44* o, int n, float* in, float* out)
 {
     Unk803B5E44_Sub* s = o->m8;
@@ -413,6 +779,7 @@ extern "C" int fn_803B6514(Unk803B5E44* o, int n, float* in, float* out)
     return n;
 }
 
+/* near-miss: 13-14/16 after 1800 annealed statement orders: retail stores m1B (stb) last, the scheduler hoists it first */
 extern "C" int fn_803B65BC(Unk803B5EC4* o)
 {
     o->m1C[0] = lbl_80609BA0;
@@ -426,26 +793,10 @@ extern "C" int fn_803B65BC(Unk803B5EC4* o)
     return 0;
 }
 
-struct Unk803B66CC {
-    char pad[0x1C];
-    int m1C;
-};
-
 extern "C" void fn_803B66CC(Unk803B66CC* p, int v)
 {
     p->m1C = v;
 }
-
-struct Unk803B69AC {
-    void* m0;
-    int m4;
-    char pad8[0x18];
-    int m20;
-    void* m24;
-    short m28;
-    short m2A;
-    float m2C[4];
-};
 
 extern "C" void fn_803B69AC(Unk803B69AC* o, int a, int flag)
 {
