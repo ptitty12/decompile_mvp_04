@@ -255,20 +255,16 @@ void Unk80185CD4::fn_80186704(int a)
 }
 
 //@80186738
-/* near-miss: 20/20 insns, 8 slots differ: retail lays the `t = 1` arm right after the
- * `a <= 3` test (bgt over it, then b END); every spelling tried hoists li 1 above the
- * branch or puts the a > 3 arm first. ~6 forms tried. */
 void Unk80185CD4::fn_80186738(int a)
 {
     int t = 0;
     if (a > 1) {
         if (a <= 3)
             t = 1;
-        else {
+        else if (a <= 5)
+            t = 2;
+        else
             t = 3;
-            if (a <= 5)
-                t = 2;
-        }
     }
     fn_80186704(t);
 }
