@@ -315,7 +315,6 @@ void fn_8005A2E4(Unk8005BA1C_Voice* v, int k)
     }
 }
 
-/* near-miss (2 slots): the ch * 0x1C product lands in r11 instead of r0. Same in fn_8005A4F8. */
 int fn_8005A3E8(Unk8005BA1C_Voice* v, int ch, int x)
 {
     int r = -1;
@@ -325,7 +324,9 @@ int fn_8005A3E8(Unk8005BA1C_Voice* v, int ch, int x)
         }
         r = fn_803AAA18(v->m0, lbl_805B09F4[ch].mC8, (int)lbl_805B09F4[ch].m7E, x);
         v->m18 = 1;
-        fn_8005A674(v, fn_800475EC()->e[ch].m0, 0);
+        char* eb = (char*)fn_800475EC() + 0x18;
+        int eo = ch * 28;
+        fn_8005A674(v, *(int*)(eb + eo), 0);
         if (r < 0) {
             return r;
         }
@@ -350,7 +351,9 @@ int fn_8005A4F8(Unk8005BA1C_Voice* v, int ch, int a, int b)
         }
         r = fn_803AAA18(v->m0, lbl_805B09F4[ch].mC8, a, b);
         v->m18 = 1;
-        fn_8005A674(v, fn_800475EC()->e[ch].m0, 0);
+        char* eb = (char*)fn_800475EC() + 0x18;
+        int eo = ch * 28;
+        fn_8005A674(v, *(int*)(eb + eo), 0);
         if (r < 0) {
             return r;
         }
@@ -556,8 +559,6 @@ Unk8005ADD0_Obj::Unk8005ADD0_Obj()
     mA8 = m80[mA4];
 }
 
-/* near-miss (3 slots): retail also stores the base class vtable (lbl_80649DB8) into
- * the vptr before calling the base destructor fn_80378620; this build omits that store. */
 Unk8005ADD0_Obj::~Unk8005ADD0_Obj()
 {
 }

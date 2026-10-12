@@ -969,13 +969,19 @@ public:
     Unk803785E4_Base();
     virtual ~Unk803785E4_Base();
 };
+/* Mid-level class between Unk803785E4_Base and Unk8005ADD0_Obj: its inline dtor stores its own vtable (lbl_80649DB8) before calling fn_80378620 (evidence: the Unk8005ADD0_Obj dtor stores lbl_80649DB8 between the member dtor and fn_80378620; the ctor at 0x800234D8 stores it after fn_803785E4). */
+class Unk803785E4_Mid : public Unk803785E4_Base {
+public:
+    Unk803785E4_Mid() {}
+    virtual ~Unk803785E4_Mid() {}
+};
 class Unk800401E4_Sub {
 public:
     char pad0[0x3C];
     Unk800401E4_Sub();
     ~Unk800401E4_Sub();
 };
-class Unk8005ADD0_Obj : public Unk803785E4_Base {
+class Unk8005ADD0_Obj : public Unk803785E4_Mid {
 public:
     Unk8005ADD0_Chan mC[9];
     int m78;
