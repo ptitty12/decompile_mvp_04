@@ -88,6 +88,9 @@ int fn_80199418(Unk80199928_O* o, int a);
 void fn_80199AF8(Unk80199928_O* o, int a, int b, int c, int d, int e, int f, float x, float y);
 }
 
+extern Unk80183918_Vec3 lbl_806055B8;
+extern Unk80183918_Vec3 lbl_806055F8;
+
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -262,6 +265,27 @@ inline Unk80183918_Vec3 Unk8019A4F4_Cross(const Unk80183918_Vec3& a, const Unk80
     r.m8 = a.m0 * b.m4 - b.m0 * a.m4;
     r.m4 = b.m0 * a.m8 - a.m0 * b.m8;
     return r;
+}
+
+inline void Unk8019A44C_Cp(Unk80183918_Vec3* d, const Unk80183918_Vec3* s)
+{
+    *d = *s;
+}
+
+//@8019A44C
+extern "C" void fn_8019A44C(void* o, void* x)
+{
+    Unk80198CC0_Vec4 t;
+    Unk80183918_Vec3 b;
+    fn_804023C4(&lbl_806055F8, (Unk8018A254_Ret*)o, &t);
+    Unk80198CC0_Vec4* tp = &t;
+    Unk80198CC0_Vec4 q;
+    q.m[0] = tp->m[0];
+    q.m[1] = tp->m[1];
+    q.m[2] = tp->m[2];
+    Unk8019A44C_Cp(&b, (Unk80183918_Vec3*)&q);
+    fn_8019A4F4(&q, &lbl_806055B8, &b);
+    *(Unk80198CC0_Vec4*)x = q;
 }
 
 //@8019A4F4
