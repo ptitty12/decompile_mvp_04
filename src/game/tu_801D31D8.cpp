@@ -263,6 +263,56 @@ struct Unk801D31D8_G6V {
     Unk801D31D8_GMV* mC;
 };
 
+static inline int OkM(int f, int m)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & m) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+extern "C" int fn_801D112C(B* s);
+extern "C" int fn_801D1198(B* s);
+extern "C" void fn_801D2A40(B* s);
+extern "C" void fn_801D2C74(B* s);
+
+extern "C" void fn_801D386C(B* s)
+{
+    Unk801D31D8_X3C0* x = s->m30->m700->m3C0;
+    if (OkM(x->m14, 8) != 0) {
+        if (fn_801D3798(s) != 0) {
+            fn_801D34E4(s);
+            return;
+        }
+        fn_801D35AC(s);
+        return;
+    }
+    if (fn_801D112C(s) != 0)
+        fn_801D2A40(s);
+    else if (fn_801D1198(s) != 0)
+        fn_801D2C74(s);
+    else
+        fn_801D31D8(s);
+    if (OkM(x->m14, 4) != 0) {
+        s->m44.m10 = LerpATB(-1.0f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5BC), -0.2f);
+        return;
+    }
+    if (OkM(x->m14, 0x10) != 0) {
+        s->m44.m10 = LerpATB(0.75f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5C1), 1.0f);
+        return;
+    }
+    if (OkM(x->m14, 0x20) != 0) {
+        float v = LerpATB(0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5C6), 1.0f);
+        if (((Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30))->v4() != 0)
+            v = -v;
+        s->m44.mC = v;
+        s->m44.m10 = LerpATB(-0.5f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x5CE), 0.2f);
+    }
+}
+
 extern "C" float fn_801D40AC(B* s)
 {
     float r = 0.0f;
