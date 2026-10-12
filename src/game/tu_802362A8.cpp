@@ -117,7 +117,41 @@ void fn_802366B0()
     fn_8037C7FC()->fn_8037CE98(0x1011A855, lbl_8068CA8C, 0);
 }
 
-void fn_80236B8C() {}
+/*
+ * Unk80236ABC_Quad: four corners built from two opposite corners (fn_80236ABC).
+ * Evidence: offsets 0x0/0x4/0x2C ints, V2 corners at 0xC/0x14/0x1C/0x24.
+ */
+struct Unk80236ABC_Quad {
+    int m0;
+    int m4;
+    int m8;
+    Unk8022FE34_V2 mC;
+    Unk8022FE34_V2 m14;
+    Unk8022FE34_V2 m1C;
+    Unk8022FE34_V2 m24;
+    int m2C;
+    void fn_80236B8C();
+};
+inline Unk8022FE34_V2 Unk80236ABC_Mk(float x, float y)
+{
+    Unk8022FE34_V2 r;
+    r.a = x;
+    r.b = y;
+    return r;
+}
+void fn_80236ABC(Unk80236ABC_Quad* self, Unk8022FE34_V2 a, Unk8022FE34_V2 b, int p3, int p4, int p5)
+{
+    self->mC = a;
+    self->m14 = Unk80236ABC_Mk(a.a, b.b);
+    self->m1C = b;
+    self->m24 = Unk80236ABC_Mk(b.a, a.b);
+    self->m0 = p4;
+    self->m4 = p3;
+    self->m2C = p5;
+    self->fn_80236B8C();
+}
+
+void Unk80236ABC_Quad::fn_80236B8C() {}
 
 char* Unk802362A8_Slots::fn_80236B90()
 {
