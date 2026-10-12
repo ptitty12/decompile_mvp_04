@@ -28,7 +28,12 @@ our C++ game units as they are.
 | fn_803302D4 | game/tu_8032ECD8.cpp | 44/44, 2 differ | widget with a 10-int ring at +0x48: retail stores the vptr (lbl_80666A68) before m5C; every order of the tail stores puts m5C first or swaps the ring/vtable registers r28/r29. The ring vptr lbl_8064B298 is stored twice (via r28 in the ring init, via self at +0x58), which suggests the ring is a base or member whose vtable g++ re-stores | 24+720 tail orders, FxRingInit inline vs open-coded (Opus 3) |
 | fn_8033C490 | game/tu_80338ECC.cpp | 179/179, 6 differ | loop giv order only: retail initialises/increments the item pointer second (o-name, item, o+0x14, offset); ours puts it last | k/nm temporaries, index forms (Opus 3) |
 | fn_8032FD58 | game/tu_8032ECD8.cpp | not written | widget ctor with a 126-int ring at +0x48 (same family as fn_803302D4) plus a fill loop from a singleton (fn_800B64BC); FxWidInit + FxRingInit cover the head | none (Opus 3) |
-| fn_80533120 (+ fn_80536F28, fn_80537054, fn_8053923C) | db/tu_80531A20.cpp, db/tu_80535360.cpp | 35/35, callee-saved regs permuted | retail sets the counter by copying the result's zero (`li r30,0` ... `mr r31,r30`), so the result gets a 4th ref and outranks col/self in global-alloc; CSE turns every source copy back into `li` | `i = r`, `r = i`, `r = i = 0`, int/unsigned mixes, while form (Opus 4, scratch only: busy units) |
+| fn_80536F28, fn_80537054, fn_8053923C | db/tu_80535360.cpp | 75/75, callee-saved regs permuted | the &bufB address pseudo (4 refs over 13 insns) outranks self (11 refs over 66) in global-alloc; retail has self in r31, bufB r30, y r28 (fn_80533120's copy recipe does not apply) | `i = r` copies, int/unsigned mixes (Opus 4); yp/y declaration and loop forms, a bufB pointer local, store order (Opus 5) |
+| fn_8056A908, fn_8056B658 | db/tu_8056A248.cpp | 39 vs 41 insns | retail neither strength-reduces i*28 nor hoists the table load, but weights refs like a real loop; its first KeyAt reuses the table pointer (r11) so jump2 does not cross-jump it with the loop's copy | cached table local, for(;;)/while/goto loops, -fno-strength-reduce as a diagnostic (Opus 5) |
+| fn_80555D88 | db/tu_80554628.cpp | 90% | same family as fn_8056A908 (rotated loop vs entry jump) | not attempted (Opus 5) |
+| fn_8052849C, fn_80528588, fn_80528648 | fe/tu_805283C4.cpp | 99%, 3-4 slots | member-vptr dtor: retail's self copy is r8 because some pseudo held r9 and vanished later | all six store orders, inline member-dtor helpers (Opus 5) |
+| fn_8052390C (+4 siblings) | fe/tu_80520BE0.cpp | 21/21, 1 slot | combine merges the call-result copy into the compare (`mr.`); retail has `cmpwi r3,0` and returns r3 untouched on the false path. Dropping the copy gives cmpwi but CSE turns the false return into `li r3,0` | ternary, switch, inline, unsigned, assignment-in-condition, early return (Opus 5) |
+| fn_80104798 (game/tu_80101254), fn_800D649C (game/tu_800D4D0C), fn_800E25E0 (game/tu_800E0164) | busy units | match in scratch | callee return types: fn_80403DE4 void in tu_800F1AEC.h; fn_800D0D9C returns UiScrRaw2*; fn_801254EC int + fn_8007CF44 void in tu_800E0164.h (PATTERNS, Hard-case families 5) | patches in scratchpad/W8o5/busy_*.patch |
 | fn_8053DB30 | db/tu_8053CC9C.cpp | 129 vs 131 insns | the by-value Date copy (8) and the date buffer (12) sit at swapped frame offsets; fn_8053DD68's recipe (unit-local buffer type with a trivial dtor) fixes the per-call `addi r3,r1,N` but allocates the buffer at declaration, before the copy temp | inline wrapper, BLKmode buffer (Opus 4) |
 | fn_800B08B0 | game/tu_800AF248.cpp | 4/4, 2 slots | `int r = 0; switch (p->m10) { case 0..3: r = 0; }` gives `lwz; cmpwi; li; blr`, retail has the `li r3,0` before the dead `cmpwi` | case ranges 0..5, int/unsigned, if forms (Opus 4) |
 | fn_803F73B0 | ealib/tu_803F73B0.cpp | not written; best 60 slots | error-code table: cases -128 and -14..0 (value = -k, -128 -> 15), default 16; case set and values right, tree layout differs | `r = v` / `return v` forms, -14/-15 lower bound (Opus 4b) |
@@ -64,3 +69,11 @@ fn_80084B24, fn_80084BDC, fn_800898D0, fn_80089A0C, fn_8008AC18, fn_8008AC68,
 fn_8008B368, fn_8008B3E8, fn_8008BEF0, fn_8008BF24, fn_8008CC0C, fn_8008CE64,
 fn_8008EB90, fn_8008EC78, fn_804CF304, fn_804CF368, fn_80084728, fn_804F9C64,
 fn_8056A1DC, fn_803EB83C, fn_803F644C, fn_80166440, fn_8010F4D4, fn_80134F48.
+
+Matched by Opus hard-case families 5 (2026-10-12; PATTERNS.md, "Hard-case families 5"):
+fn_80586560, fn_8058BF68, fn_8058C020, fn_8058E180, fn_80593F30, fn_8059403C, fn_804ACA20,
+fn_800D26C8, fn_805881E4, fn_805898A4, fn_804933D4, fn_8049364C, fn_801399A8, fn_8003C804,
+fn_80132630, fn_80110DDC, fn_800DE1C4, fn_800DE274, fn_800DE440, fn_8010AE78, fn_800E4FE4,
+fn_800E1A1C, fn_80096244, fn_80085F2C, fn_802B8548, fn_802B8B34, fn_802B8BFC, fn_8029C914,
+fn_8007A2B4, fn_8007C328, fn_8006B880, fn_805A0000, fn_80533120, fn_804E2014, fn_8025F7F0,
+fn_802AF624, fn_80255284, fn_80254EA4, fn_802AE474, fn_802AE4C0, fn_8058FDCC.
