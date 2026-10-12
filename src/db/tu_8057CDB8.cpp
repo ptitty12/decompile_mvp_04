@@ -39,24 +39,6 @@ public:
     int m4;
     virtual ~DbV8();
 };
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_8057CDB8(DbIdList* self, int k);
-extern "C" int fn_8057CE00(int a);
-extern "C" int fn_8057CED4(int a, int b);
-extern "C" void fn_8057CF60(int a, int b);
-extern "C" int fn_8057D084(int a);
-extern "C" int fn_8057D0F0(int a);
-extern "C" float fn_8057D4EC(void* self, int mode);
-extern "C" char* fn_8057DDB4(char* p, int i);
-extern "C" int fn_8057DE6C(int k);
-extern "C" void fn_8057DF2C(int* p);
-extern "C" void fn_8057DF38(void* p, int c);
-extern "C" void fn_8057DF60(void);
-extern "C" void fn_8057E03C(void* self, int c);
-extern "C" int fn_80581368(int a, int b);
-extern "C" int fn_80581374(unsigned i);
-extern "C" int fn_80581398(unsigned i);
-extern "C" void fn_805814EC(DbV8** list);
 
 extern "C" void fn_8057D20C(char* self, int id, int a, int b);
 
@@ -88,75 +70,6 @@ struct DbTop4 {
     char pad24[0x2C - 0x24];
     DbTop4Slot e[4];
 };
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_8057CDB8(DbIdList* self, int k);
-extern "C" int fn_8057CE00(int a);
-extern "C" int fn_8057CED4(int a, int b);
-extern "C" void fn_8057CF60(int a, int b);
-extern "C" int fn_8057D084(int a);
-extern "C" int fn_8057D0F0(int a);
-extern "C" float fn_8057D4EC(void* self, int mode);
-extern "C" char* fn_8057DDB4(char* p, int i);
-extern "C" int fn_8057DE6C(int k);
-extern "C" void fn_8057DF2C(int* p);
-extern "C" void fn_8057DF38(void* p, int c);
-extern "C" void fn_8057DF60(void);
-extern "C" void fn_8057E03C(void* self, int c);
-extern "C" int fn_80581368(int a, int b);
-extern "C" int fn_80581374(unsigned i);
-extern "C" int fn_80581398(unsigned i);
-extern "C" void fn_805814EC(DbV8** list);
-extern "C" char* fn_8057DDC4(char* self, int id);
-extern "C" int fn_8057D15C(int a);
-extern "C" int fn_8057DF80(int* out);
-extern "C" void fn_8057D550(DbTop4* self);
-extern "C" void fn_8057CFA8(int a, int b);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_8057CDB8(DbIdList* self, int k);
-extern "C" int fn_8057CE00(int a);
-extern "C" int fn_8057CED4(int a, int b);
-extern "C" void fn_8057CF60(int a, int b);
-extern "C" void fn_8057CFA8(int a, int b);
-extern "C" int fn_8057D084(int a);
-extern "C" int fn_8057D0F0(int a);
-extern "C" int fn_8057D15C(int a);
-extern "C" float fn_8057D4EC(void* self, int mode);
-extern "C" void fn_8057D550(DbTop4* self);
-extern "C" char* fn_8057DDB4(char* p, int i);
-extern "C" char* fn_8057DDC4(char* self, int id);
-extern "C" int fn_8057DE6C(int k);
-extern "C" void fn_8057DF2C(int* p);
-extern "C" void fn_8057DF38(void* p, int c);
-extern "C" void fn_8057DF60(void);
-extern "C" int fn_8057DF80(int* out);
-extern "C" void fn_8057E03C(void* self, int c);
-extern "C" int fn_80581368(int a, int b);
-extern "C" int fn_80581374(unsigned i);
-extern "C" int fn_80581398(unsigned i);
-extern "C" void fn_805814EC(DbV8** list);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_8057CDB8(DbIdList* self, int k);
-extern "C" int fn_8057CE00(int a);
-extern "C" int fn_8057CED4(int a, int b);
-extern "C" void fn_8057CF60(int a, int b);
-extern "C" void fn_8057CFA8(int a, int b);
-extern "C" int fn_8057D084(int a);
-extern "C" int fn_8057D0F0(int a);
-extern "C" int fn_8057D15C(int a);
-extern "C" float fn_8057D4EC(void* self, int mode);
-extern "C" void fn_8057D550(DbTop4* self);
-extern "C" char* fn_8057DDB4(char* p, int i);
-extern "C" char* fn_8057DDC4(char* self, int id);
-extern "C" int fn_8057DE6C(int k);
-extern "C" void fn_8057DF2C(int* p);
-extern "C" void fn_8057DF38(void* p, int c);
-extern "C" void fn_8057DF60(void);
-extern "C" int fn_8057DF80(int* out);
-extern "C" void fn_8057E03C(void* self, int c);
-extern "C" int fn_80581368(int a, int b);
-extern "C" int fn_80581374(unsigned i);
-extern "C" int fn_80581398(unsigned i);
-extern "C" void fn_805814EC(DbV8** list);
 
 struct DbHdr {
     void* m0;
@@ -236,12 +149,12 @@ extern "C" void fn_8057DF38(void* p, int c);
 extern "C" void fn_8057DF60(void);
 extern "C" int fn_8057DF80(int* out);
 extern "C" void fn_8057E03C(void* self, int c);
+extern "C" int fn_8057ECE4(DbOwner* self);
 extern "C" int fn_80581368(int a, int b);
 extern "C" int fn_80581374(unsigned i);
 extern "C" int fn_80581398(unsigned i);
-extern "C" void fn_805814EC(DbV8** list);
 extern "C" int fn_805813C0(DbItemV** list);
-extern "C" int fn_8057ECE4(DbOwner* self);
+extern "C" void fn_805814EC(DbV8** list);
 
 extern "C" DB_OVERLAY int fn_8057CDB8(DbIdList* self, int k)
 {
@@ -482,6 +395,33 @@ extern "C" DB_OVERLAY void fn_8057E03C(void* self, int c)
         fn_80377408(self);
 }
 
+/* near-miss: ~8 slots; retail copies the new object pointer into a second register for list[0] and sets list[1] from the same zero register */
+extern "C" DB_OVERLAY int fn_8057ECE4(DbOwner* self)
+{
+    int total = 0;
+    DbTeamSrc* e = (DbTeamSrc*)((char*)self + 8);
+    unsigned i = 0;
+    unsigned n = *(unsigned char*)(e->m4 + 0x3E4);
+    for (; i < n; i++) {
+        unsigned char idx = i;
+        int ok = 0;
+        if (fn_80097620(e->m4, 0, idx, 0) > 0)
+            ok = 1;
+        int go = 0;
+        if (ok != 0 && self->m30 != 0)
+            go = 1;
+        if (go != 0) {
+            DbItemObj* it = new (0x100) DbItemObj(self, idx);
+            DbItemV* list[2];
+            list[0] = (DbItemV*)it;
+            list[1] = 0;
+            total += fn_805813C0(list);
+            fn_805814EC((DbV8**)list);
+        }
+    }
+    return total;
+}
+
 extern "C" DB_OVERLAY int fn_80581368(int a, int b)
 {
     return a * (b + 1);
@@ -495,17 +435,6 @@ extern "C" DB_OVERLAY int fn_80581374(unsigned i)
 extern "C" DB_OVERLAY int fn_80581398(unsigned i)
 {
     return i <= 0x67 ? lbl_806000A0[i] ^ 1 : 0;
-}
-
-extern "C" DB_OVERLAY void fn_805814EC(DbV8** list)
-{
-    if (*list) {
-        DbV8** q = list;
-        do {
-            delete *q;
-            q++;
-        } while (*q);
-    }
 }
 
 extern "C" DB_OVERLAY int fn_805813C0(DbItemV** list)
@@ -537,29 +466,13 @@ extern "C" DB_OVERLAY int fn_805813C0(DbItemV** list)
     return n;
 }
 
-/* near-miss: ~8 slots; retail copies the new object pointer into a second register for list[0] and sets list[1] from the same zero register */
-extern "C" DB_OVERLAY int fn_8057ECE4(DbOwner* self)
+extern "C" DB_OVERLAY void fn_805814EC(DbV8** list)
 {
-    int total = 0;
-    DbTeamSrc* e = (DbTeamSrc*)((char*)self + 8);
-    unsigned i = 0;
-    unsigned n = *(unsigned char*)(e->m4 + 0x3E4);
-    for (; i < n; i++) {
-        unsigned char idx = i;
-        int ok = 0;
-        if (fn_80097620(e->m4, 0, idx, 0) > 0)
-            ok = 1;
-        int go = 0;
-        if (ok != 0 && self->m30 != 0)
-            go = 1;
-        if (go != 0) {
-            DbItemObj* it = new (0x100) DbItemObj(self, idx);
-            DbItemV* list[2];
-            list[0] = (DbItemV*)it;
-            list[1] = 0;
-            total += fn_805813C0(list);
-            fn_805814EC((DbV8**)list);
-        }
+    if (*list) {
+        DbV8** q = list;
+        do {
+            delete *q;
+            q++;
+        } while (*q);
     }
-    return total;
 }
