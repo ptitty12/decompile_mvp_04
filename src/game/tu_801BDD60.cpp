@@ -71,7 +71,7 @@ const char* fn_801C160C(void);
 inline Unk801B7FB0_Slot* At(Unk801B7FB0_Slot* a, int i) { return &a[i]; }
 extern "C" {
 int fn_80254EA4(void* p, int k);
-void fn_80327100(void* p, int a, int b, int c, float f1, float f2);
+void fn_80327100(void* p, float f1, float f2, int a, int b, int c);
 }
 
 extern "C" void fn_801BDD60(B* b, P* p)
@@ -135,6 +135,77 @@ extern "C" void fn_801BF6D4(A* a, P* p, int idx)
         *(void**)q = p;
         *(float*)(q + 8) = t;
         *(int*)(q + 4) = k;
+    }
+}
+
+extern float lbl_805CFE64;
+
+extern "C" void fn_801BF778(A* a, P* x, int idx)
+{
+    if (idx != -1) {
+        int ok = 1;
+        int* p4 = &a->m38[idx].m4;
+        if (*p4 == -1)
+            ok = 0;
+        if (ok) {
+            int st = a->m38[idx].m4;
+            if (st == 0 && a->m38[idx].m0 == x) {
+                fn_80327100((char*)a->m14 + 0x50, a->m38[idx].m8,
+                            (float)a->m14->m4C * 0.016666668f - a->m38[idx].m8, 0x39, x->m458, idx);
+                int q = idx * 12 + (int)a;
+                q += 0x38;
+                *(int*)q = 0;
+                *(int*)(q + 4) = -1;
+                *(float*)(q + 8) = lbl_805CFE64;
+            }
+        }
+    }
+}
+
+extern float lbl_805CFE74;
+
+extern "C" void fn_801BF85C(A* a, P* x, int idx)
+{
+    if (idx != -1) {
+        int ok = 1;
+        int* p4 = &a->m38[idx].m4;
+        if (*p4 == -1)
+            ok = 0;
+        if (ok) {
+            int st = a->m38[idx].m4;
+            if (st != 0 && a->m38[idx].m0 == x) {
+                fn_80327100((char*)a->m14 + 0x50, a->m38[idx].m8,
+                            (float)a->m14->m4C * 0.016666668f - a->m38[idx].m8, 0x62, x->m458, idx);
+                int q = idx * 12 + (int)a;
+                q += 0x38;
+                *(int*)q = 0;
+                *(int*)(q + 4) = -1;
+                *(float*)(q + 8) = lbl_805CFE74;
+            }
+        }
+    }
+}
+
+extern float lbl_805CFE84;
+
+extern "C" void fn_801BF944(A* a, int idx)
+{
+    if (idx != -1) {
+        int ok = 1;
+        int* p4 = &a->m38[idx].m4;
+        if (*p4 == -1)
+            ok = 0;
+        if (ok) {
+            if (a->m38[idx].m4 == 1) {
+                fn_80327100((char*)a->m14 + 0x50, a->m38[idx].m8,
+                            (float)a->m14->m4C * 0.016666668f - a->m38[idx].m8, 0x62, ((P*)a->m38[idx].m0)->m458, idx);
+                int q = idx * 12 + (int)a;
+                q += 0x38;
+                *(int*)q = 0;
+                *(int*)(q + 4) = -1;
+                *(float*)(q + 8) = lbl_805CFE84;
+            }
+        }
     }
 }
 
