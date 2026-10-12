@@ -868,6 +868,54 @@ void fn_8016D458(Unk8016D778_S* self) /* 8016D458 */
     }
 }
 
+int fn_8016D580(Unk8016D778_S* self) /* 8016D580 */
+{
+    if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AF4C() != 0) {
+        return 0;
+    }
+    int flag = 0;
+    int c;
+    int d;
+    int a = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 4);
+    int b = fn_801A2034((Unk8019F8C0_Owner*)self->m24, 3);
+    if (lbl_806192E0->m4->m10->m120 == 1) {
+        if (*(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) != -1.0f) {
+            *(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) -= 1.0f;
+            flag = *(float*)fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1) < 0.0f;
+        }
+    }
+    if (a == -1 && b == -1) {
+        int i;
+        for (i = 0; i <= 3; i++) {
+            if (fn_802D7DB4(i, 0x5A) != 0 || fn_802D7DB4(i, 0xB8) != 0) {
+                flag = 1;
+                break;
+            }
+        }
+    } else {
+        c = 0;
+        d = 0;
+        if (a != -1) {
+            if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AD7C(4) != 0) {
+                c = 1;
+            }
+        }
+        if (b != -1) {
+            if (fn_801A6D84((Unk8019F8C0_Owner*)self->m24, 1)->fn_8016AD7C(3) != 0) {
+                d = 1;
+            }
+        }
+        if (c != 0 && (fn_802D7DB4(a, 0x5A) != 0 || fn_802D7DB4(a, 0xB8) != 0)) {
+            flag = 1;
+        }
+        if (d != 0 && (fn_802D7DB4(b, 0x5A) != 0 || fn_802D7DB4(b, 0xB8) != 0)) {
+yes:
+            flag = 1;
+        }
+    }
+    return flag;
+}
+
 /* near-miss: frame layout only (8 slots): retail has the two ids at sp+8/0xC and the clamp iterator at sp+0x10;
  * here the iterator (dtor object) gets sp+8 and the ids sp+0x10. Declaration order, scopes, volatile counter and
  * dtor-bearing id struct tried. */
