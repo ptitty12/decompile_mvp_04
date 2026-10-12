@@ -21,6 +21,7 @@ void fn_8023A7F4(Unk8022FE34_W* w);
 void fn_802361F8(void* p, float f);
 void fn_802361F4();
 Unk8022FE34_V3 fn_80233F08(Unk8022FE34_Ent* e, int a, ...);
+extern "C" int fn_801C3E68(void* p);
 void fn_8025191C(Unk8022FE34_Pl* pl, int a, float f);
 float fn_8025356C(Unk8022FE34_Obj480* o);
 void fn_802516CC(Unk8022FE34_Pl* pl);
@@ -59,6 +60,19 @@ inline void Set728b(Unk8022FE34_Owner* t, float v)
 inline void Set728a(Unk8022FE34_Owner* t, float v)
 {
     Set728b(t, v);
+}
+
+int Unk8022FE34_U::fn_80234D5C()
+{
+    const float c = 4.0f;
+    int r = fn_801C3E68(m8->m3A4);
+    float t = (float)fn_80235FA8()->m4C * 0.016666668f;
+    if (r == 0) {
+        if (!(t - m6C <= c)) {
+            r = 1;
+        }
+    }
+    return r;
 }
 
 void Unk8022FE34_U::fn_80234E0C(float f)
