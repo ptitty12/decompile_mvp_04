@@ -179,3 +179,24 @@ extern "C" DB_OVERLAY int fn_80568464(Db80565CDC_S* s, int a, int b, int k)
     }
     return 0;
 }
+
+extern "C" DB_OVERLAY int fn_8056A1DC(void* l, int k)
+{
+    int r = 1;
+    switch (k) {
+    case 0:
+        r = 1;
+        break;
+    case 1:
+        r = 3;
+        break;
+    case 2:
+    case 3:
+        r = 5;
+        break;
+    case 4:
+        r = 7;
+        break;
+    }
+    return r;
+}
