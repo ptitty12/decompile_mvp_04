@@ -418,6 +418,722 @@ struct FeSubV8 : FeSubData {
     virtual void s8(int a);
 };
 
+/* Widget view whose slot 29 takes (int a). */
+struct FeWV29 : Unk800C7B40_Data {
+    virtual ~FeWV29();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29(int a);
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+
+/* Widget view whose slot 93 takes (int a, int b). */
+struct FeWV93 : Unk800C7B40_Data {
+    virtual ~FeWV93();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual int s93(int a, int b);
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+
+/* Widget view whose slot 30 takes (char* a). */
+struct FeWV30 : Unk800C7B40_Data {
+    virtual ~FeWV30();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30(char* a);
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+/* Sub-object view (vptr at +0x24 of the sub-object): slot 20 takes (int a, int b). */
+struct FeSubV20 : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+struct FeScrArr2 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[0x370 - 0x134];
+    int m370;
+    int m374;
+    int m378;
+    int m37C;
+    int m380;
+    int m384;
+    int m388;
+    int m38C;
+    int m390;
+    int m394;
+    int m398;
+    int m39C;
+    char pad3A0[0xD78 - 0x3A0];
+    FeArr mD78;
+    char mD90[1];
+};
+
+/* Widget view whose slot 51 takes (int a, int b). */
+struct FeWV51 : Unk800C7B40_Data {
+    virtual ~FeWV51();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51(int a, int b);
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+
+/* Widget view whose slot 28 takes (void* a). */
+struct FeWV28 : Unk800C7B40_Data {
+    virtual ~FeWV28();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28(void* a);
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90();
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+/* Sub-object view (vptr at +0x24 of the sub-object): slot 15 takes (). */
+struct FeSubV15 : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+};
+
 /* BEGIN-HAND */
 extern const char lbl_805F619C[];
 extern const char lbl_80677818[];
@@ -428,7 +1144,6 @@ void fn_80476A84(FeScrD* x);
 void fn_8047C47C(void* p);
 }
 extern "C" void fn_80125BC0(void*);
-extern "C" int fn_80476134(void*);
 extern "C" int fn_80476C44(void*);
 extern "C" void fn_80477608(void*, void*, const char*);
 extern "C" void fn_804834AC(void*, int);
@@ -448,7 +1163,7 @@ extern "C" void fn_8007B780__18Unk8007B2B0_Screen(void*, void*, int);
 extern "C" void fn_8055EAFC(void*);
 extern "C" void fn_8047B15C(void*);
 extern "C" void fn_8048BCE4(void*);
-extern "C" int fn_8007A270__18Unk8007A4DC_Screeni(void*, int, int);
+extern "C" int fn_8007A270__18Unk8007A4DC_Screeni(void*, int);
 extern int lbl_805FD54C[];
 extern int lbl_805FD4FC[];
 extern "C" void* fn_8007F9B4__FP13Unk8007F198_C(void*);
@@ -475,7 +1190,6 @@ extern "C" int fn_8007B3E0__18Unk8007B2B0_Screenii(void*, int, void*);
 extern "C" void* fn_8007B320__18Unk8007B2B0_Screenii(void*, int, void*);
 extern "C" int fn_8007B8C4__18Unk8007B2B0_Screenii(void*, int, void*);
 extern "C" void fn_805819A4(void*, void*, int);
-extern "C" void fn_8047C900(void*);
 extern "C" void fn_804757EC(void*);
 extern "C" void fn_80475EF0(void*);
 extern "C" void fn_8040074C(void*, int);
@@ -497,6 +1211,17 @@ extern "C" int fn_800A3270(void*, int*, int*);
 extern "C" void fn_80482DBC(void*);
 extern "C" void fn_80122D40(void*, int, int, int, int, int, void*);
 extern "C" void* fn_800C8054();
+extern "C" void fn_80475FFC(void*);
+extern "C" void fn_80086EC0(void*, int, int);
+extern "C" int fn_8059897C();
+extern "C" void fn_80487D44(void*, int, int);
+extern "C" void* fn_800C8040();
+extern "C" void fn_80472724(void*);
+extern "C" void fn_80486800(void*);
+extern "C" int fn_8007FB98__FP13Unk8007F198_Ciii(void*, int, int, int);
+extern "C" void fn_8049A1F0(void*, int, int, int, int, int, int, int, int);
+extern "C" void fn_80329FA0(void*, ...);
+extern "C" void fn_800DD44C(void*, void*, int);
 
 /* END-HAND */
 /* auto: callees */
@@ -572,7 +1297,6 @@ void fn_8007F114__FP13Unk8007DB74_AiiPi(int, int*, int, int*);
 unsigned fn_8007F198__FP13Unk8007F198_A(int, int);
 unsigned fn_8007FB2C__FP13Unk8007F198_Ci(int, int);
 unsigned fn_8007FB40__FP13Unk8007F198_Ci(int, int);
-int fn_8007FB98__FP13Unk8007F198_Ciii(int, void*, int, int);
 int fn_8007FBC0__FP13Unk8007F198_Cii(int, unsigned, int);
 unsigned fn_8007FBDC__FP13Unk8007F198_Cii(int, unsigned, int);
 int fn_8007FD2C__FP13Unk8007F198_Ciii(int, int, int, int);
@@ -584,7 +1308,6 @@ int fn_80084014__Fii(int, int);
 int fn_80084114__Fi(int);
 int fn_80084408();
 int fn_80084728(int);
-void fn_80086EC0(int, int, int);
 int fn_80089AA0(void*, int, unsigned char);
 int fn_8008CFD8(void*, int, int);
 int fn_80090880__FP11Unk80090880(int, int);
@@ -627,7 +1350,6 @@ void fn_800B82D0(int, int);
 void fn_800B83F8(int, int);
 int fn_800C203C(int);
 void fn_800C3ED4(int, void*, int);
-void* fn_800C8040(int);
 void* fn_800C8048();
 void fn_800D6FA0__Fv();
 float fn_800D7008__FP15Unk800D7008_Obji(void*);
@@ -636,7 +1358,6 @@ void fn_800DC50C(float, float);
 void fn_800DC580(float);
 void fn_800DD204(void*, int);
 void fn_800DD344(void*, void*);
-void fn_800DD44C(void*, void*, int);
 void fn_800DD800(void*, void*, int, int);
 void fn_800DE440(void*, int, int);
 char fn_800DEDC0__Fii(int, int);
@@ -670,7 +1391,6 @@ void fn_80125AAC(int);
 void fn_8012E1C4(int, int, int);
 void fn_801321D4(void*, void*, void*, void*, void*, float*, int, int, int);
 void fn_8014DBA0(void*, int, int, int, int);
-void fn_80329FA0(void*, int);
 void fn_8032A0C0(void*, unsigned);
 void fn_80402EF8(float*, void*);
 void fn_80403144(void*, int);
@@ -684,7 +1404,6 @@ void fn_804707B8(void*, int);
 void* fn_8048E76C(void*);
 void* fn_8048E7A8(void*);
 void* fn_8048E8EC(void*);
-void fn_8049A1F0();
 void fn_8049A988(int);
 void fn_804A763C(void*, int);
 void fn_804A768C();
@@ -725,7 +1444,6 @@ int* fn_8057CFA8(int);
 void fn_80590CA8(int);
 float fn_80592288(void*, int);
 float fn_805922EC(void*, int);
-int fn_8059897C();
 }
 /* auto: data */
 extern char lbl_805F37A4[];
@@ -1007,6 +1725,9 @@ extern char lbl_80678AB0[];
 extern char lbl_80682508[];
 
 /* BEGIN-PROTOS (functions defined in the units) */
+#ifndef NOPROTO_fn_80471EBC
+extern "C" FeScrH* fn_80471EBC(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
 #ifndef NOPROTO_fn_804726A0
 extern "C" void fn_804726A0(void* x);
 #endif
@@ -1024,6 +1745,9 @@ extern "C" int fn_80472C70(void* x);
 #endif
 #ifndef NOPROTO_fn_80472CAC
 extern "C" int fn_80472CAC(FeW* x, FeW* w, int b, int c);
+#endif
+#ifndef NOPROTO_fn_80472D24
+extern "C" void fn_80472D24(void* x, int w);
 #endif
 #ifndef NOPROTO_fn_80472E04
 extern "C" FeScrH* fn_80472E04(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -1067,8 +1791,14 @@ extern "C" void fn_80473630(FeScrD* x);
 #ifndef NOPROTO_fn_80473650
 extern "C" void fn_80473650(int a, void* b);
 #endif
+#ifndef NOPROTO_fn_80473684
+extern "C" void fn_80473684(int a, FeW* x);
+#endif
 #ifndef NOPROTO_fn_80473718
 extern "C" int fn_80473718(void* x);
+#endif
+#ifndef NOPROTO_fn_804739BC
+extern "C" void fn_804739BC(FeW* x);
 #endif
 #ifndef NOPROTO_fn_80473A98
 extern "C" void fn_80473A98(void* x, int a);
@@ -1178,6 +1908,9 @@ extern "C" void fn_804756F0(void* x);
 #ifndef NOPROTO_fn_80475774
 extern "C" int fn_80475774(int a, int b, int c);
 #endif
+#ifndef NOPROTO_fn_80476134
+extern "C" int fn_80476134(int x, int b);
+#endif
 #ifndef NOPROTO_fn_80476178
 extern "C" int fn_80476178(int x, int b);
 #endif
@@ -1185,13 +1918,22 @@ extern "C" int fn_80476178(int x, int b);
 extern "C" int fn_804761D0(int x, int b);
 #endif
 #ifndef NOPROTO_fn_80476220
-extern "C" int fn_80476220(void* x);
+extern "C" int fn_80476220(int x, int b);
+#endif
+#ifndef NOPROTO_fn_804766FC
+extern "C" void fn_804766FC(void* x);
+#endif
+#ifndef NOPROTO_fn_80476A28
+extern "C" void fn_80476A28(int a, void* x);
 #endif
 #ifndef NOPROTO_fn_80476C24
 extern "C" void fn_80476C24(FeScrD* x);
 #endif
 #ifndef NOPROTO_fn_80476DB4
 extern "C" int fn_80476DB4(void* x);
+#endif
+#ifndef NOPROTO_fn_80476DEC
+extern "C" void fn_80476DEC(void* x, int a);
 #endif
 #ifndef NOPROTO_fn_80476E50
 extern "C" int fn_80476E50(FeW* x, int a);
@@ -1201,6 +1943,9 @@ extern "C" FeScrH* fn_80477000(FeScrH* self, int a, int b, int c, int d, int e, 
 #endif
 #ifndef NOPROTO_fn_80477068
 extern "C" void fn_80477068(FeScrD* x);
+#endif
+#ifndef NOPROTO_fn_80477418
+extern "C" void fn_80477418(void* x);
 #endif
 #ifndef NOPROTO_fn_80477498
 extern "C" void fn_80477498(FeW* x);
@@ -1250,6 +1995,9 @@ extern "C" void fn_80479378(int a, FeW* x);
 #ifndef NOPROTO_fn_80479480
 extern "C" void fn_80479480(void* x);
 #endif
+#ifndef NOPROTO_fn_804795D0
+extern "C" int fn_804795D0(char* x);
+#endif
 #ifndef NOPROTO_fn_80479614
 extern "C" void fn_80479614(void* x, int a);
 #endif
@@ -1259,14 +2007,29 @@ extern "C" int fn_804799E8(char* x);
 #ifndef NOPROTO_fn_80479A28
 extern "C" void fn_80479A28(int a);
 #endif
+#ifndef NOPROTO_fn_8047A384
+extern "C" void fn_8047A384(FeW* x);
+#endif
 #ifndef NOPROTO_fn_8047AA20
 extern "C" void fn_8047AA20(char* x);
+#endif
+#ifndef NOPROTO_fn_8047AD30
+extern "C" void fn_8047AD30(int u, FeW* x, int b, int c, int d);
 #endif
 #ifndef NOPROTO_fn_8047AE14
 extern "C" void fn_8047AE14(void* x, int v);
 #endif
 #ifndef NOPROTO_fn_8047AE1C
 extern "C" int fn_8047AE1C(void* x);
+#endif
+#ifndef NOPROTO_fn_8047AE9C
+extern "C" int fn_8047AE9C(void* x);
+#endif
+#ifndef NOPROTO_fn_8047AF1C
+extern "C" int fn_8047AF1C(void* x);
+#endif
+#ifndef NOPROTO_fn_8047AF9C
+extern "C" int fn_8047AF9C(void* x);
 #endif
 #ifndef NOPROTO_fn_8047B01C
 extern "C" void fn_8047B01C(void* x);
@@ -1286,8 +2049,14 @@ extern "C" int fn_8047BA94(void* x);
 #ifndef NOPROTO_fn_8047BB10
 extern "C" int fn_8047BB10(void* x);
 #endif
+#ifndef NOPROTO_fn_8047BB8C
+extern "C" FeScrArr2* fn_8047BB8C(FeScrArr2* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
 #ifndef NOPROTO_fn_8047BF48
 extern "C" void fn_8047BF48(FeScrD* x);
+#endif
+#ifndef NOPROTO_fn_8047BF70
+extern "C" int fn_8047BF70(void* x);
 #endif
 #ifndef NOPROTO_fn_8047C004
 extern "C" void fn_8047C004(void* x, int sel);
@@ -1316,8 +2085,14 @@ extern "C" int fn_8047C268(void* x);
 #ifndef NOPROTO_fn_8047C2A4
 extern "C" int fn_8047C2A4(void* x);
 #endif
+#ifndef NOPROTO_fn_8047C2E0
+extern "C" int fn_8047C2E0(void* x, FeW* w, int b, int c, int d);
+#endif
 #ifndef NOPROTO_fn_8047C444
 extern "C" int fn_8047C444(char* x, int key);
+#endif
+#ifndef NOPROTO_fn_8047C900
+extern "C" void fn_8047C900(void* x);
 #endif
 #ifndef NOPROTO_fn_8047C958
 extern "C" void fn_8047C958(char* buf, int v);
@@ -1357,6 +2132,9 @@ extern "C" FeScrH* fn_8047D3D0(FeScrH* self, int a, int b, int c, int d, int e, 
 #endif
 #ifndef NOPROTO_fn_8047DC70
 extern "C" int fn_8047DC70(void* x);
+#endif
+#ifndef NOPROTO_fn_8047DD0C
+extern "C" int fn_8047DD0C(void* x);
 #endif
 #ifndef NOPROTO_fn_8047E028
 extern "C" int fn_8047E028(void* x);
@@ -1433,6 +2211,9 @@ extern "C" int fn_8047F450(void* x);
 #ifndef NOPROTO_fn_8047F4CC
 extern "C" int fn_8047F4CC(void* x);
 #endif
+#ifndef NOPROTO_fn_8047F508
+extern "C" FeScrH* fn_8047F508(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
 #ifndef NOPROTO_fn_8047FD94
 extern "C" int fn_8047FD94(void* x);
 #endif
@@ -1490,6 +2271,9 @@ extern "C" int fn_804806D4(void* x, int a, int b, int c);
 #ifndef NOPROTO_fn_80480784
 extern "C" int fn_80480784(FeW* x, FeW* w, int b, int c);
 #endif
+#ifndef NOPROTO_fn_8048087C
+extern "C" void fn_8048087C(void* x, int a);
+#endif
 #ifndef NOPROTO_fn_80480960
 extern "C" void fn_80480960(void* x, int wi);
 #endif
@@ -1513,6 +2297,9 @@ extern "C" int fn_804815F8(void* x);
 #endif
 #ifndef NOPROTO_fn_80481634
 extern "C" FeScrH* fn_80481634(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
+#ifndef NOPROTO_fn_80482348
+extern "C" int fn_80482348(void* x);
 #endif
 #ifndef NOPROTO_fn_804828CC
 extern "C" int fn_804828CC(void* x);
@@ -1553,6 +2340,9 @@ extern "C" int fn_80482BFC(void* x);
 #ifndef NOPROTO_fn_80482C58
 extern "C" int fn_80482C58(void* x);
 #endif
+#ifndef NOPROTO_fn_80482CC0
+extern "C" int fn_80482CC0(void* x);
+#endif
 #ifndef NOPROTO_fn_80482D1C
 extern "C" void fn_80482D1C(void* x);
 #endif
@@ -1589,6 +2379,9 @@ extern "C" void fn_80484B18(void* x, int a);
 #ifndef NOPROTO_fn_80485008
 extern "C" void fn_80485008(int a, void* x);
 #endif
+#ifndef NOPROTO_fn_8048511C
+extern "C" FeScrH* fn_8048511C(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
 #ifndef NOPROTO_fn_804851B0
 extern "C" void fn_804851B0(FeScrB* self);
 #endif
@@ -1600,6 +2393,9 @@ extern "C" int fn_80485C28(void* x);
 #endif
 #ifndef NOPROTO_fn_80485CC4
 extern "C" int fn_80485CC4(void* x);
+#endif
+#ifndef NOPROTO_fn_80486018
+extern "C" void fn_80486018(void* x, int w, int dir);
 #endif
 #ifndef NOPROTO_fn_804860F8
 extern "C" int fn_804860F8(void* x, int a, int b, int c);
@@ -1658,6 +2454,9 @@ extern "C" int fn_804880D8(void* x);
 #ifndef NOPROTO_fn_80488178
 extern "C" int fn_80488178(void* x);
 #endif
+#ifndef NOPROTO_fn_804884C0
+extern "C" void fn_804884C0(int a, void* x);
+#endif
 #ifndef NOPROTO_fn_8048884C
 extern "C" void fn_8048884C(int a, void* x);
 #endif
@@ -1684,6 +2483,9 @@ extern "C" int fn_804897F4(void* x);
 #endif
 #ifndef NOPROTO_fn_80489830
 extern "C" int fn_80489830(void* x);
+#endif
+#ifndef NOPROTO_fn_8048986C
+extern "C" int fn_8048986C(FeW* x, int w);
 #endif
 #ifndef NOPROTO_fn_8048A2AC
 extern "C" FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -1748,11 +2550,17 @@ extern "C" void fn_8048BBF4(void* x, int v);
 #ifndef NOPROTO_fn_8048BC18
 extern "C" void fn_8048BC18(void* x);
 #endif
+#ifndef NOPROTO_fn_8048E3BC
+extern "C" void fn_8048E3BC(FeW* x);
+#endif
 #ifndef NOPROTO_fn_8048E450
 extern "C" int fn_8048E450(void* x);
 #endif
+#ifndef NOPROTO_fn_8048E480
+extern "C" int fn_8048E480(void* x);
+#endif
 #ifndef NOPROTO_fn_8048E4D8
-extern "C" void fn_8048E4D8(void);
+extern "C" int fn_8048E4D8(void* x);
 #endif
 /* END-PROTOS */
 #endif
