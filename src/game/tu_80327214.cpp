@@ -118,14 +118,14 @@ inline int AtD(int* p, int i) { int off = i * 4; return *(int*)((char*)p + off);
 
 // FUNCS-BEGIN
 
-/* near-miss: retail indexes the table with a zero register (lwzx r3,r31,r0) */
+/* The zero index is a register in retail (lwzx r3,r31,r0): `(old != 0) - 1` is 0 here, but cse leaves it as a register. */
 void fn_80327214(FxAI* self) {
     fn_803272F0(self);
     int old = self->m4B8;
     if (old) {
-        int idx = 0;
-        self->m4B8 = idx;
+        int idx = (old != 0) - 1;
         FxZT* t = (&self->m0)[idx];
+        self->m4B8 = idx;
         if (t) fn_80325000(t);
         fn_8032713C(self, old, self->m4B8);
     }
@@ -196,7 +196,6 @@ void fn_80328374(FxBase* self, int a) {
     if (a & 1) fn_80377408(self);
 }
 
-/* near-miss: retail keeps two copies of the fail block */
 int fn_803283D8(int a, int b, int* idx, int* out) {
     int i = *idx;
     if (i <= 0) {
@@ -209,12 +208,12 @@ int fn_803283D8(int a, int b, int* idx, int* out) {
             return 0;
         }
     }
-    if (*idx > 0) {
-        *out = lbl_806E2274[*idx].m0;
-        return 1;
+    if (*idx <= 0) {
+        *out = 0;
+        return 0;
     }
-    *out = 0;
-    return 0;
+    *out = lbl_806E2274[*idx].m0;
+    return 1;
 }
 
 void fn_8032847C(int p) {
@@ -274,19 +273,25 @@ int fn_80328648(int n) {
     return -1;
 }
 
-/* near-miss: retail keeps two separate -1 constants (list tail index in r29, search cursor stored to sp+8); ours merges them */
+/* near-miss: 5 slots. Layout now matches (exit code inside the loop, body last). Retail materialises the cursor's -1 (li r0,-1)
+   after the fn_80328648 call and keeps the list-tail -1 in r29; here cur is initialised first and cse shares one constant. */
 void fn_80328690(FxBase* self, int a) {
     self->m20 = a;
+    int cur = -1;
     int last = -1;
     int row = fn_80328648(self->m1C);
-    int cur = -1;
     int tmp;
-    while (fn_803283D8(row, a, &cur, &tmp)) last = cur;
-    cur = fn_803296E8(self);
-    if (last > 0) lbl_806E2274[last].m4 = cur;
-    else lbl_806E2184[row][a] = cur;
-    lbl_806E2274[cur].m4 = 0;
-    lbl_806E2274[cur].m0 = (int)self;
+    for (;;) {
+        if (!fn_803283D8(row, a, &cur, &tmp)) {
+            cur = fn_803296E8(self);
+            if (last <= 0) lbl_806E2184[row][a] = cur;
+            else lbl_806E2274[last].m4 = cur;
+            lbl_806E2274[cur].m0 = (int)self;
+            lbl_806E2274[cur].m4 = 0;
+            return;
+        }
+        last = cur;
+    }
 }
 
 /* near-miss: loop shape matches (goto form keeps it unrotated); retail shares one lis for the slot table across the unlink stores, ours emits it twice */
