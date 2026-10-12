@@ -3,6 +3,68 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8017A930.h"
+extern char lbl_80660368[];
+extern char lbl_80649DA0[];
+struct Unk8017B6C0_Pair {
+    int a;
+    int b;
+};
+struct Unk8017B6C0_Msg {
+    int m0;
+    const void* vptr;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived()
+    {
+        vptr = lbl_80660368;
+        m20 = 0;
+        m10 = 0;
+    }
+    void Fill(int a18, int a1C, int a8, int aC, int a10, int a14, int a20)
+    {
+        m18 = a18;
+        m1C = a1C;
+        m8 = a8;
+        mC = aC;
+        m10 = a10;
+        m14 = a14;
+        m20 = a20;
+    }
+    void End() { vptr = lbl_80649DA0; }
+};
+struct Unk8017B6C0_A {
+    char pad0[0x38];
+    int m38;
+};
+struct Unk8017B6C0_B {
+    char pad0[0x24];
+    int m24;
+};
+struct Unk8017B6C0_P {
+    char pad0[0x704];
+    int m704;
+};
+extern "C" Unk8017B6C0_Pair fn_8022EA60(...);
+inline Unk8017B6C0_Pair Unk8017B6C0_Now()
+{
+    return fn_8022EA60();
+}
+void fn_801BB544(void* p, int a, int b);
+void fn_801DBC00(void* p, int a, int b);
+void fn_80258194(void* p, int a, int b);
+void fn_802358D0(void* p, int a, int b);
+void fn_801C2B84(void* p, int a, int b);
+void fn_801BBB34(void* p);
 extern int lbl_80620864;
 struct Unk8017B238_O {
     char pad0[0x2C];
@@ -25,7 +87,6 @@ void fn_80258E70(void* p, int q);
 void fn_801DBC24(void* p, int a);
 void fn_801C2A18(void* p, int a);
 void fn_8024F930(void* p, int a, int b);
-extern char lbl_80649DA0[];
 extern char lbl_8065F9C8[];
 struct Unk8017BCB4_R {
     char pad0[0x1C];
@@ -299,6 +360,38 @@ void fn_8017B658(Unk8017A930_T* p, int a)
     if (a == 0) {
         p->m410 = 1;
     }
+}
+
+/* near-miss: 96.5%; extra callee-saved register: ours keeps &pr (the 8-byte struct fn_8022EA60 returns through r3) in
+ * r30 across the call, retail addresses it off r1 and has no frame word for it. Fill() gives the this-relative
+ * (r31) msg stores. fn_8022EA60 is called with an empty ellipsis (crclr). */
+extern "C" void fn_8017B6C0(void* self, int a, int b)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    if (b == 1) {
+        fn_8037893C((char*)p->m4 + 0x704, 0x30, 0, 0, 0);
+    }
+    fn_801BB544(p->m3BC, a, b);
+    fn_801DBC00(p->m3B8, a, b);
+    fn_80258194(p->m3B4, a, b);
+    fn_802358D0(p->m3B0, a, b);
+    fn_801C2B84(p->m3A4, a, b);
+    if (b == 1) {
+        fn_801BBB34(p->m3BC);
+    }
+    Unk8017B6C0_Msg m;
+    m.Base(0x3A);
+    m.Derived();
+    int flag = 0;
+    if (((Unk8017B6C0_A*)p->m3B0)->m38 != 0 || b != 0) {
+        flag = 1;
+    }
+    Unk8017B6C0_P* x = *(Unk8017B6C0_P**)((char*)p->m4 + 0x65C);
+    Unk8017B6C0_P* y = *(Unk8017B6C0_P**)((char*)p->m4 + 0x680);
+    Unk8017B6C0_Pair pr = Unk8017B6C0_Now();
+    m.Fill(pr.a, pr.b, y->m704, x->m704, flag, a, ((Unk8017B6C0_B*)p->m3BC)->m24);
+    fn_8037893C((char*)p->m4 + 0x704, m.m0, (int)&m, 0, 0);
+    m.End();
 }
 
 struct Unk8017B83C_S {
