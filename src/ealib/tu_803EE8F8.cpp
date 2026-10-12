@@ -154,6 +154,65 @@ extern "C" RcIfC* fn_803EE8F8(int* p)
     return lbl_806EEA60;
 }
 
+struct RcGetA {
+    virtual RcV12* g0();
+};
+struct RcGetB {
+    virtual RcIfA* g0();
+};
+struct RcIfAx {
+    virtual void v0();
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(int);
+    virtual void v4(void*);
+    virtual void v5();
+    virtual void v6();
+    virtual void v7(int);
+};
+extern char lbl_806EE950[];
+extern int lbl_806AADA8[4];
+extern int lbl_806EEA20;
+extern int lbl_806EEA24;
+extern char lbl_806AADFC[];
+extern "C" void* fn_803F684C(void*, int*);
+extern "C" RcIfB* fn_803F713C(void*, void*);
+extern "C" void fn_803F7048(void*, RcIfB*, int);
+extern "C" int fn_803EEC20();
+
+extern "C" RcIfC* fn_803EE978(void* self, int* p)
+{
+    fn_803F684C(self, p);
+    *(void**)self = lbl_8060E120;
+    memset(lbl_806EE950, 0, 0x60);
+    lbl_806AADA8[0] = 3;
+    lbl_806EEA2C = 0;
+    lbl_806EEA30 = 0;
+    lbl_806EEA3C = 0;
+    lbl_806EEA20 = 0;
+    lbl_806EEA24 = 0;
+    fn_803EFE60(&lbl_806AB4C8);
+    memset(lbl_806AADFC, 0, 0xb4);
+    fn_803EFE60((RcSys*)lbl_806AADFC);
+    void* o = fn_803F6F50(0, 0x2d0, 0, 0, 0);
+    RcIfB* t = fn_803F713C(o, (char*)self + 4);
+    RcGetA* ga = *(RcGetA**)((char*)self + 0x18);
+    lbl_806EEA2C = t;
+    RcV12* r38 = ga->g0();
+    RcGetB* gb = *(RcGetB**)((char*)self + 8);
+    lbl_806EEA38 = r38;
+    lbl_806EEA34 = gb->g0();
+    ((RcIfAx*)lbl_806EEA34)->v3(0x4000);
+    ((RcIfAx*)lbl_806EEA34)->v4((void*)fn_803EEC20);
+    ((RcIfAx*)lbl_806EEA34)->v7(-2);
+    RcIfB* h = lbl_806EEA2C;
+    short sp8[2];
+    sp8[0] = 0;
+    sp8[1] = 0;
+    fn_803F7048(lbl_806AAD84, h, ((int (*)(RcIfB*, short*))fn_803F7604)(h, sp8));
+    return (RcIfC*)self;
+}
+
 extern "C" void fn_803EEB08(const void** self, int c)
 {
     RcIfA* a = (RcIfA*)lbl_806EEA38;
