@@ -47,6 +47,72 @@ extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i)
     return r;
 }
 
+struct RecF80097B60 {
+    char pad[0x20];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual float v7(int a, int b);
+};
+
+inline RecF80097B60* At80097B60(char* b, int off) { return *(RecF80097B60**)(b + off); }
+
+extern "C" float fn_80097B60(char* o, int k, int p, int c, int i)
+{
+    float r = 0.0f;
+    if (c > 1) {
+        switch (k) {
+        case 3: {
+            float a = fn_80097B60(o, 0, p, c, i);
+            float b = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b <= 0.0f))
+                r = a / b;
+            break;
+        }
+        case 4: {
+            float b0 = fn_80097B60(o, 0, p, c, i);
+            float s0 = (float)fn_80097A9C(o, 0, p, c, i);
+            float s3 = (float)fn_80097A9C(o, 3, p, c, i);
+            float s8 = (float)fn_80097A9C(o, 8, p, c, i);
+            float b1 = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            float tot = b1 + s0 + s3 + s8;
+            if (!(tot <= 0.0f))
+                r = (b0 + s0 + s3) / tot;
+            break;
+        }
+        case 5: {
+            float a = fn_80097B60(o, 2, p, c, i);
+            float b = fn_80097B60(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b < 0.0f))
+                r = a / b;
+            break;
+        }
+        case 6: {
+            float a = fn_80097B60(o, 4, p, c, i);
+            float b = fn_80097B60(o, 5, p, c, i);
+            r = a + b;
+            break;
+        }
+        default: {
+            int off = i * 0x128;
+            r = At80097B60(o + 0x928, off)->v7(k, p) + At80097B60(o + 0x924, off)->v7(k, p);
+            break;
+        }
+        }
+    } else {
+        char* b = o + 0x924;
+        int off2 = c * 4 + i * 0x128;
+        r = At80097B60(b, off2)->v7(k, p);
+    }
+    return r;
+}
+
 extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i)
 {
     int r;
@@ -60,6 +126,82 @@ extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i)
         int x = (*(Rec**)(base2 + off))->v5(a, b);
         char* base = o + 0x954;
         r = x + (*(Rec**)(base + off))->v5(a, b);
+    }
+    return r;
+}
+
+struct RecF80097F68 {
+    char pad[0x20];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual float v7(int a, int b);
+};
+inline RecF80097F68* At80097F68(char* b, int off) { return *(RecF80097F68**)(b + off); }
+
+extern "C" float fn_80097F68(char* o, int k, int p, int c, int i)
+{
+    float r = 0.0f;
+    if (c > 1) {
+        switch (k) {
+        case 2: {
+            float a = fn_80097F68(o, 0, p, c, i);
+            float b = fn_80097F68(o, 1, p, c, i);
+            r = 0.0f;
+            if (!(b <= 0.0f))
+                r = a / b;
+            break;
+        }
+        case 3: {
+            float b0 = fn_80097F68(o, 0, p, c, i);
+            float s0 = (float)fn_80097EA4(o, 6, p, c, i);
+            float s1 = (float)fn_80097EA4(o, 10, p, c, i);
+            float b1 = fn_80097F68(o, 1, p, c, i);
+            float s2 = (float)fn_80097EA4(o, 8, p, c, i);
+            r = 0.0f;
+            float tot = b1 + s0 + s1 + s2;
+            if (!(tot <= 0.0f)) {
+                r = (b0 + s0 + s1) / tot;
+                int v = (int)(r * 10000.0f);
+                if (v % 10 > 4)
+                    v += 10;
+                v = v / 10;
+                r = (float)v * 0.001f;
+            }
+            break;
+        }
+        case 5: {
+            float a = fn_80097F68(o, 4, p, c, i);
+            float b = fn_80097F68(o, 1, p, c, i);
+            if (!(b <= 0.0f)) {
+                r = a / b;
+                int v = (int)(r * 10000.0f);
+                if (v % 10 > 4)
+                    v += 10;
+                v = v / 10;
+                r = (float)v * 0.001f;
+            }
+            break;
+        }
+        case 6: {
+            float a = fn_80097F68(o, 3, p, c, i);
+            float b = fn_80097F68(o, 5, p, c, i);
+            r = a + b;
+            break;
+        }
+        default: {
+            int off = i * 0x128;
+            r = At80097F68(o + 0x958, off)->v7(k, p) + At80097F68(o + 0x954, off)->v7(k, p);
+            break;
+        }
+        }
+    } else {
+        char* b = o + 0x954;
+        int off2 = c * 4 + i * 0x128;
+        r = At80097F68(b, off2)->v7(k, p);
     }
     return r;
 }
