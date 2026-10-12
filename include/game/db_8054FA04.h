@@ -9,6 +9,7 @@
 #define GAME_DB_8054FA04_H
 
 #include "game/tu_8052A220.h"
+#include "game/tu_8007F198.h"
 #include "game/overlay.h"
 
 #endif
