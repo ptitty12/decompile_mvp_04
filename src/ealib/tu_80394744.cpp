@@ -57,17 +57,19 @@ extern "C" int fn_80392B80(int);
 extern "C" int fn_803920BC(int*);
 extern "C" void fn_80392BC0(int);
 
-/* near-miss: 15 vs 16 instructions (retail branches on cmpwi 1 / cmpwi 2 through a shared tail). */
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
     unsigned t = (v >> (idx * 2)) & 3;
-    if (t == 1) {
+    switch (t) {
+    case 1:
         if (a != 0)
             r = 1;
-    } else if (t == 2) {
+        break;
+    case 2:
         if (a != -1)
             r = 1;
+        break;
     }
     return r;
 }
