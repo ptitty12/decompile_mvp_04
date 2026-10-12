@@ -258,6 +258,99 @@ void fn_800ECFD4(UiS* t)
     }
 }
 
+class UiV23 : public UiS0 {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual int v23(int a);
+};
+extern void* lbl_8061ABE4;
+class UiV22 : public UiS0 {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual int v22(int a);
+};
+extern "C" int fn_800ED00C(UiS* self, int a)
+{
+    if (self->m24 >= 0)
+        return 0;
+    if (!(self->m24 & 0x40000000))
+        return 0;
+    UiS* n = self->m4;
+    lbl_8061ABE4 = self;
+    int found = 0;
+    unsigned key = 0;
+    if (n != 0) {
+        if (n->m24 >= 0 || !(n->m24 & 0x40000000)) {
+            key = n->m20;
+            found = 1;
+        }
+    }
+    if (n != 0) {
+        do {
+            if (found == 0 && ((UiV22*)n)->v22(a) != 0) {
+                lbl_8061ABE4 = 0;
+                return 1;
+            }
+            n = n->m4;
+            if (n != 0) {
+                if (found != 0) {
+                    if (n->m24 < 0 && (n->m24 & 0x40000000) && (unsigned)n->m20 <= key)
+                        found = 0;
+                } else {
+                    if (n->m24 >= 0 || !(n->m24 & 0x40000000))
+                        found = 1;
+                    if (found != 0)
+                        key = n->m20;
+                }
+            }
+        } while (n != 0);
+    }
+    lbl_8061ABE4 = 0;
+    return 0;
+}
+
+int fn_800ED144(UiS* self, int a)
+{
+    if (self->m24 >= 0)
+        return 0;
+    UiS* n = self->m4;
+    lbl_8061ABE4 = self;
+    int found = 0;
+    unsigned key = 0;
+    if (n != 0) {
+        if (n->m24 >= 0) {
+            key = n->m20;
+            found = 1;
+        }
+        do {
+            if (found == 0 && ((UiV23*)n)->v23(a) != 0) {
+                lbl_8061ABE4 = 0;
+                return 1;
+            }
+            n = n->m4;
+            if (n != 0) {
+                if (found != 0) {
+                    if (n->m24 < 0 && (unsigned)n->m20 <= key)
+                        found = 0;
+                } else {
+                    found = (unsigned)n->m24 >> 31;
+                    found ^= 1;
+                    if (found != 0)
+                        key = n->m20;
+                }
+            }
+        } while (n != 0);
+    }
+    lbl_8061ABE4 = 0;
+    return 0;
+}
+
 extern "C" void fn_800ED254(UiS* self)
 {
     if ((int)self->m48 < 0) {
