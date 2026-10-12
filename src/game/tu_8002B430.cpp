@@ -17,6 +17,48 @@ extern const float lbl_805A6468;
 extern const float lbl_805A64B0;
 extern const float lbl_805A64C0;
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk8002B430_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
+void fn_8014E388(Unk801A4B34_Vec3* out);
+
+static inline Unk801A4B34_Vec3 Unk8002B850_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
+{
+    Unk801A4B34_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+static inline float Unk8002B430_Len3(const Unk801A4B34_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+/* near-miss: 3 slots differ (retail loads r->m30 into r0 and x->m1D8 into r4 for the cmpw; here r9/r0) */
+extern "C" void fn_8002B430(Unk80023AC4_Obj* x)
+{
+    Unk801A4B34_Rec58C* r = &((Unk801A4B34_Pos*)x->m1D0[0].m0)->m58C;
+    if ((r->m4 & 0x20000000) == 0 && x->m1D0[0].m8 < r->m30) {
+        Unk801A4B34_Vec3 v;
+        fn_8014E388(&v);
+        Unk801A4B34_Pos* p = (Unk801A4B34_Pos*)x->m1D0[0].m0;
+        float len = Unk8002B430_Len3(Unk8002B850_Sub(p->m60, v));
+        float scaled = len * 0.0009259259f;
+        if (!(scaled >= 0.5f) && x->m100 == 0 && x->m10C == 0 && x->m6E8 == 0
+            && (x->m634 <= 1 || (x->m634 == 2 && x->m6AC == 0))) {
+            x->m12C = x->m1D0[0].m8;
+            fn_8002A244(x, 0x34, Unk8002B430_Secs(x->m80[0]->m48));
+        }
+    }
+}
+
 extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
 {
     int v = x->m160.m48;
@@ -31,15 +73,6 @@ extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
 extern Unk801A4B34_Vec3 lbl_805B1A00;
 extern "C" int fn_80022708(int unused, int idx);
 void fn_80035420(int a, int b, int c, int d);
-
-static inline Unk801A4B34_Vec3 Unk8002B850_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
-{
-    Unk801A4B34_Vec3 r;
-    r.x = a.x - b.x;
-    r.y = a.y - b.y;
-    r.z = a.z - b.z;
-    return r;
-}
 
 extern "C" void fn_8002B850(Unk80023AC4_Obj* x)
 {
@@ -89,14 +122,6 @@ extern "C" int fn_8002BAD8(Unk80023AC4_Obj* x, int a, int b)
         }
     }
     return r;
-}
-
-/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
- * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
- * are hoisted above them (retail's lis cluster). */
-inline float Unk8002B430_Secs(unsigned n)
-{
-    return (float)n * 0.016666668f;
 }
 
 extern "C" void fn_8002BB3C(Unk80023AC4_Obj* x)
