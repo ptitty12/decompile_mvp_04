@@ -284,6 +284,23 @@ void fn_80255314(A* self, int a, int b)
     }
 }
 
+extern const char lbl_805D9D4C[];
+extern void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
+void fn_802553BC(A* self, int on)
+{
+    if (on != 0) {
+        if (self->m8 == 0.0f && self->mC == 0.0f) {
+            self->m8 = Secs(self->m0->m44C);
+            if (self->m14 != 0.0f)
+                fn_80303CA0(lbl_805D9D4C, 4.0f, 0.1f, 0.8f);
+            if (self->m18 != 0.0f)
+                fn_801BCF88(self->m0->m44C->m700->m3BC, self->m1C, self->m20);
+        }
+    } else {
+        self->m8 = 0.0f;
+    }
+}
+
 void fn_802554BC(A* self, int a, int b)
 {
     if (a != 0) {
