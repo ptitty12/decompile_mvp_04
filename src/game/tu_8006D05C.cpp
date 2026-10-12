@@ -573,7 +573,6 @@ void fn_8006F74C(Unk8006902C_Ctx* c)
     c->m20 = 0;
 }
 
-/* near-miss (99%): one lwzx has its base and index registers swapped (retail lwzx r0,r27,r29) */
 extern "C" void fn_8006F784(Unk8006902C_Ctx* c, int v)
 {
     Unk8006F784_C* cv = (Unk8006F784_C*)c;
@@ -597,19 +596,17 @@ extern "C" void fn_8006F784(Unk8006902C_Ctx* c, int v)
             for (int j = 0; j < 13; j++)
                 seen[j] = 0;
             i = 0;
-            int off = 0;
             do {
                 int b = 0;
                 do {
-                    if (fn_80593E7C(lbl_8061930C->m30->m4, b) > 0 && fn_805948D0(lbl_8061930C->m30->m4, i, b) > 0 && *(int*)(off + (char*)seen) == 0) {
-                        *(int*)((char*)seen + off) = 1;
+                    if (fn_80593E7C(lbl_8061930C->m30->m4, b) > 0 && fn_805948D0(lbl_8061930C->m30->m4, i, b) > 0 && seen[i] == 0) {
+                        seen[i] = 1;
                         cv->m44[cv->m40] = i;
                         cv->m40++;
                     }
                     b++;
                 } while (b <= 8);
                 i++;
-                off += 4;
             } while (i <= 0xC);
         }
     } else {
