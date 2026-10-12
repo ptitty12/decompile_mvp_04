@@ -39,7 +39,7 @@ struct RcHeap {
 extern RcHeap* lbl_806AABF4[64];
 
 extern "C" int fn_804007FC(void*);
-extern "C" int fn_803FFC58(void*, int, int);
+extern "C" void fn_803FFC58(void*, int, int);
 extern "C" int fn_803EDA0C(void*);
 extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
@@ -47,6 +47,12 @@ extern "C" void fn_803EE878();
 extern "C" int fn_803EDF10(const char* fmt, ...);
 extern "C" int fn_803EE238();
 extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
+extern "C" void fn_803EDE64(RcHeap*, RcBlk*);
+extern "C" void fn_804007D4(void*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" int sprintf(char*, const char*, ...);
+extern char lbl_8060DF50[];
+extern char lbl_8060DF58[];
 extern "C" int fn_803EDC98(void*, int);
 extern "C" int fn_803EDC04(int);
 extern "C" int fn_80400690(int (*)(void));
@@ -101,6 +107,52 @@ extern "C" int fn_803ED700(RcBlk* b, int a, int size, int c, int tag, int flags,
     b->m8 = e;
     b->m4 = size;
     return size + 0x10;
+}
+
+extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, int align, int hdr, int fa, int fb, int fc)
+{
+    const char* name = (const char*)nm;
+    RcBlk* base = (RcBlk*)bs;
+    char buf[0x100];
+    int flags = idx;
+    if (fa != 0)
+        flags |= 0x2000;
+    if (fb != 0)
+        flags |= 0x1000;
+    int t1 = hdr + 0x6c;
+    int t2 = align + 0x2f;
+    int t3 = hdr + 0x30;
+    int e = ((int)base + t1 + t2) & -align;
+    RcBlk* end = (RcBlk*)((int)base + size - t3);
+    RcBlk* mid = (RcBlk*)(e - 0x10);
+    sprintf(buf, lbl_8060DF50, name);
+    RcHeap* h = (RcHeap*)((char*)base + 0x10);
+    fn_803ED700(base, (int)buf, 0x5c, hdr, 0x4253, flags | 0x8000, 0, mid);
+    fn_803ED700(mid, 0, (int)end - (int)mid - 0x10, hdr, 0x4246, flags, base, end);
+    sprintf(buf, lbl_8060DF58, name);
+    fn_803ED700(end, (int)buf, 0, hdr, 0x4253, flags | 0x8100, mid, 0);
+    lbl_806AABF4[idx & 0x3f] = h;
+    fn_803FFC58(h, 0, 0x5c);
+    strcpy((char*)h, name);
+    h->mC = (int)end;
+    h->m8 = base;
+    base->m0 = 0x4253;
+    ((RcBlk*)h->mC)->m0 = 0x4253;
+    h->head.m10 = &h->head;
+    h->m28 = a4;
+    h->m2C = align;
+    h->m30 = hdr;
+    h->m34 = flags;
+    h->head.m0 = 0x4253;
+    h->head.m14 = &h->head;
+    h->head.m4 = 0x7fffffff;
+    h->m38 = 0;
+    fn_803EDE64(h, mid);
+    if (fc != 0) {
+        fn_804007D4((char*)base + 0x4c);
+        h->m38 = 1;
+    }
+    return mid->m4;
 }
 
 extern "C" int fn_803ED8EC(int idx)
