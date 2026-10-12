@@ -260,6 +260,54 @@ extern "C" DB_OVERLAY void fn_80535F84(Unk805352B0_List* self, int a, int p, int
     self->m14 = 1;
 }
 
+extern "C" void fn_805385B8(Unk805352B0_List* self, int x);
+extern "C" DB_OVERLAY void fn_805360BC(Unk805352B0_List* self, int x)
+{
+    fn_8040074C(self->m0, self->m8 << 2);
+    Unk80535650_Tmp a;
+    int bufa[0x78];
+    Unk80535650_Tmp* qa = &a;
+    self->m4 = 0;
+    self->mC = 0;
+    self->m14 = 0;
+    unsigned i = 0;
+    qa->C1(bufa, 0x78);
+    qa->C2();
+    qa->C3(lbl_8064A440);
+    Unk80535650_Tmp b;
+    int bufb[0x28];
+    Unk80535650_Tmp* qb = &b;
+    b.m0 = bufb;
+    b.vp = lbl_8064B298;
+    qb->m8 = 0x28;
+    fn_8040074C(b.m0, b.m8 << 2);
+    qb->m4 = 0;
+    qb->mC = 0;
+    b.vp = lbl_8064A550;
+    fn_8040074C(b.m0, b.m8 << 2);
+    qb->m4 = 0;
+    qb->mC = 0;
+    qb->m14 = 0;
+    b.vp = lbl_8064A4C8;
+    fn_80535650((Unk805352B0_List*)qa, x);
+    fn_805385B8((Unk805352B0_List*)qb, x);
+    for (; i < a.Count(); i++) {
+        unsigned j = 0;
+        int found = 0;
+        for (; j < b.Count(); j++) {
+            if (b.At(j) == a.At(i)) {
+                found = 1;
+                break;
+            }
+        }
+        if (found == 0)
+            self->Push(a.At(i));
+    }
+    self->m14 = 1;
+    b.D();
+    a.D();
+}
+
 extern "C" DB_OVERLAY void fn_805362AC(Unk805352B0_List* self, int mode)
 {
     float keys[3250];
