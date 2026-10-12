@@ -788,11 +788,11 @@ public:
     char pad0[0x10];
     virtual ~FxEmb();
     virtual void s2();
-    virtual void s3();
-    virtual void s4();
+    virtual int s3();
+    virtual int s4();
     virtual void s5();
     virtual void s6();
-    virtual void s7();
+    virtual int s7();
 };
 class FxStackObj {
 public:
