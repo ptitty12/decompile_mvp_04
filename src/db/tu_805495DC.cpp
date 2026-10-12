@@ -530,6 +530,30 @@ DB_OVERLAY void fn_8054C358(int* p, signed char* buf, int n)
     }
 }
 
+struct Db8054C3F4_Out {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned short m2;
+};
+typedef Db8054C3F4_Out (*Db8054C3F4_Fn)(int, ...);
+DB_OVERLAY int fn_8054C3F4(int* p, int lo, int hi)
+{
+    float f = fn_8056FFB0();
+    int base = lo + (int)(f * (float)(hi - lo));
+    int t = p[1];
+    t -= base;
+    t -= ((Db8054C3F4_Fn)fn_80329FA0)(1).m2;
+    int c;
+    if (t <= 0xFF) {
+        c = t;
+        if (c < 0)
+            c = 0;
+    } else {
+        c = 0xFF;
+    }
+    return c;
+}
+
 DB_OVERLAY int fn_8054C4AC(int* p, R8* r)
 {
     return fn_8054C648(p, (((r->w0 >> 3) & 0x7F) + ((r->w4 >> 23) & 0x7F) + ((r->w4 >> 12) & 0x7F) + ((r->w4 >> 3) & 0x7F)) >> 2, 1, 0x14);
