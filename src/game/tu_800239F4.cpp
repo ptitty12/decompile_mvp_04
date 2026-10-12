@@ -45,6 +45,15 @@ extern const float lbl_805A6154;
 
 
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk800239F4_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
+extern "C" float fn_80410CE8(float y, float x);
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x);
 extern "C" void fn_80023F98(Unk80023AC4_Obj* x);
 
@@ -105,6 +114,66 @@ extern "C" void fn_80023AC4(Unk80023AC4_Obj* x)
     }
 }
 
+inline float Unk80023B94_Abs(float v) { return (float)__builtin_fabs(v); }
+extern "C" void fn_80022124(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p, int a, int n);
+
+/* Character fields read by fn_80023B94 (through casts of the Unk801A4B34_Pos pointer). */
+struct Unk80023B94_P {
+    char pad0[0x388];
+    int m388;
+    int m38C;
+    char pad390[0x4];
+    int m394;
+    char pad398[0x3F8 - 0x398];
+    float m3F8;
+    char pad3FC[0x438 - 0x3FC];
+    float m438;
+    float m43C;
+};
+
+/* near-miss: 3 slots differ (retail loads x->m80[0] into r4 before the lbl_805A6070 / m3F8 float loads of the last call) */
+extern "C" void fn_80023B94(Unk80023AC4_Obj* x)
+{
+    Unk80023B94_P* p = (Unk80023B94_P*)x->m80[0]->m6CC;
+    x->m3D8 = x->m3D8 + 1;
+    if (fn_8022EECC(x->m80[0]->m700->m3B0) != 0) {
+        char* b = (char*)x + 0x468;
+        int o = x->m514 == 0 ? 4 : 0;
+        *(int*)(b + o) = *(int*)(b + o) + 1;
+    }
+    x->m3D4 = (x->m3D4 + 1) & 7;
+    x->m294[x->m3D4].m0 = *(int*)((char*)x->m80[0]->m700->m3B0 + 0x38);
+    if (x->m714 == 1 && x->m294[x->m3D4].m0 == 0)
+        x->m714 = x->m294[x->m3D4].m0;
+    x->m294[x->m3D4].m4 = 0;
+    x->m294[x->m3D4].m8 = 0;
+    Unk80023F98_Vec2 v = fn_80235BE0(x->m80[0]->m700->m3B0);
+    v.x = Unk80023B94_Abs(v.x * p->m438) - p->m438;
+    v.y = Unk80023B94_Abs(v.y * (p->m43C * fn_801C17EC((Unk801A4B34_Pos*)p))) - p->m43C * fn_801C17EC((Unk801A4B34_Pos*)p);
+    if (v.x >= 9.0f || !(v.y < 9.0f))
+        x->m294[x->m3D4].m8 = 1;
+    x->m294[x->m3D4].mC = 0;
+    x->m294[x->m3D4].m20 = p->m394;
+    x->m294[x->m3D4].m24 = 0;
+    if (x->m3E4 > 0 && (x->m3D8 & 3) == 0)
+        x->m3E4 = x->m3E4 - 1;
+    fn_8001CCE0(&x->m160, (Unk801A4B34_Pos*)p);
+    x->mFC = 1;
+    x->m51C = 0;
+    x->m524 = 0;
+    x->m56C = 0;
+    x->m574 = 0;
+    x->m570 = 0;
+    x->m70C = 0;
+    fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 1, (int)(p->m3F8 * 0.056818180f));
+    int c1 = p->m38C;
+    x->m6B8->m0 = c1;
+    int c2 = p->m388;
+    x->m6B8->m4 = c2;
+    x->fn_800233B4(0x15, 5, 0);
+    fn_8003DD5C(x->m6C8);
+}
+
 extern "C" void fn_80023E18(Unk80023AC4_Obj* x)
 {
     Unk801A4B34_Pos* p = x->m80[0]->m6CC;
@@ -141,6 +210,57 @@ extern "C" void fn_80023F98(Unk80023AC4_Obj* x)
     }
 }
 
+extern "C" int fn_80022730(int unused, int b, int c);
+void fn_80035628(int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_8003C388(int a, int b, int c, int d, int e);
+
+extern "C" void fn_80024060(Unk80023AC4_Obj* x)
+{
+    x->m3DC = x->m3DC + 1;
+    if (x->m530 == 2)
+        x->m534 = x->m534 + 1;
+    if (x->fn_80023430(0, 0, 0) == 1) {
+        x->fn_800233B4(0x2F, 1, 0);
+        return;
+    }
+    if (x->m6DC == 0 && x->mE0 == 0) {
+        x->mE0 = 1;
+        if (x->m548 != 0 && x->m5A8 == 0) {
+            int dd = x->mD0;
+            int c = x->m514;
+            int k = fn_80022730((int)x, x->m5AC, x->m558);
+            int m6 = x->m6AC;
+            int m5 = x->m5A0;
+            fn_80035628(dd, c, 0, k, 1, m6, m5, fn_8002A2D4(x));
+        }
+        if (x->m53C != 0) {
+            int dd = x->mD0;
+            if (dd != 0) {
+                int c = x->m514;
+                int e = x->m5A8;
+                int k = fn_80022730((int)x, x->m5AC, x->m558);
+                int m3 = x->m53C;
+                int m6 = x->m6AC;
+                int m5 = x->m5A0;
+                fn_80035628(dd, c, e, k, m3, m6, m5, fn_8002A2D4(x));
+            }
+        }
+        if (x->m5A8 == 0)
+            x->fn_800233B4(0x30, 0x14, 0);
+        else
+            fn_8002A244(x, 0x10, Unk800239F4_Secs(x->m80[0]->m48));
+        int p = 0;
+        if (!(x->m588 >= 0.0f) && !(x->m590 >= 0.0f) && x->m5AC > 1)
+            p = x->m6AC == 0;
+        int q = 0;
+        if ((x->m588 < 0.0f || !(x->m590 >= 0.0f)) && x->m5AC > 1 && x->m6AC == 0 && x->m558 == 1)
+            q = 1;
+        float v = fn_80410CE8(x->m588, x->m590) * 57.295773f;
+        if (v < -30.0f || !(v <= 120.0f))
+            fn_8003C388(x->m6C8, x->m6AC, p, x->m5A0, q);
+    }
+}
+
 extern "C" void fn_80024320(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x10, (float)x->m80[0]->m48 * lbl_805A60B8);
@@ -153,14 +273,6 @@ extern "C" void fn_80024378()
 extern "C" void fn_8002437C(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 4, (float)x->m80[0]->m48 * lbl_805A60C8);
-}
-
-/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
- * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
- * are hoisted above them (retail's lis cluster). */
-inline float Unk800239F4_Secs(unsigned n)
-{
-    return (float)n * 0.016666668f;
 }
 
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x)
@@ -359,9 +471,101 @@ extern "C" void fn_800265B0()
 {
 }
 
+/* Message record of type 0x57 behind Unk80023AC4_Obj::m6BC (fn_800265B4). */
+struct Unk800265B4_Msg {
+    int m0;
+    int m4;
+    Unk801A4B34_Pos* m8;
+    int mC;
+    int m10;
+    struct Unk800265B4_Pos* m14;
+    int m18;
+    int m1C;
+};
+struct Unk800265B4_Pos {
+    char pad0[0x388];
+    int m388;
+    int m38C;
+    char pad390[0x60];
+    float m3F0;
+    float m3F4;
+    float m3F8;
+};
+extern const float lbl_805A61A4;
+extern const float lbl_805A61A8;
+extern "C" void fn_80022124(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p, int a, int n);
+
+extern "C" void fn_800265B4(Unk80023AC4_Obj* x)
+{
+    x->m720 = 0;
+    Unk800265B4_Msg* m = (Unk800265B4_Msg*)Unk8002569C_Cast(x->m6BC, 0x57);
+    Unk800265B4_Pos* p = m->m14;
+    x->m1BC = (int)(p->m3F8 * lbl_805A61A4);
+    Unk801A4B34_Pos* a = m->m8;
+    if ((Unk801A4B34_Pos*)p == x->m80[0]->m6CC) {
+        fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 0, x->m1BC);
+        x->m5A0 = (unsigned)((p->m3F0 - p->m3F4) * lbl_805A61A8);
+        x->m7C0 = (int)a;
+        x->m160.m58 = x->m160.m58 + 1;
+        x->m7C4 = m->mC;
+        x->m6B8->m0 = p->m38C;
+        x->m6B8->m4 = p->m388;
+        if (m->m1C != 0)
+            x->m114 = 1;
+        x->fn_800233B4(0xF, 1, 0);
+    } else {
+        int flag = 0;
+        if (x->m80[0]->m780 != 0 || x->m80[0]->m784 != 0)
+            flag = 1;
+        if ((flag != 0 || (x->m80[0]->fn_801A6D84(1), fn_8016ADC4() != 0))
+            && fn_80026330(x, x->m80[0], (Unk801A4B34_Pos*)p, a) != 0)
+            fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 0, x->m1BC);
+    }
+    x->m6BC = 0;
+}
+
 extern "C" void fn_80026784(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x82, (float)x->m80[0]->m48 * lbl_805A61C0);
+}
+
+struct Unk8017A930_T;
+int fn_80247858(Unk801A4B34_Pos* p, int a);
+int fn_8017C94C(Unk8017A930_T* t);
+
+extern "C" void fn_800267DC(Unk80023AC4_Obj* x)
+{
+    if ((x->m100 == 0 && x->fn_80023430(0xA, 0, 0) == 0 && x->fn_80023430(7, 0, 0) == 0) || x->m6D4 == 1) {
+        if (x->m710 == 1) {
+            int v = x->m5A0 >> 2;
+            if (v > 0x3C)
+                v = 0x3C;
+            x->fn_800233B4(0x10, v, 0);
+        }
+        if (x->m6D0 == 0) {
+            x->m134 = x->m1BC;
+            x->m12C = x->m7C0;
+            x->m130.i = x->m7C4;
+            if (x->m6D4 != 0) {
+                x->m138 = 1;
+                if (x->m270[fn_80247858((Unk801A4B34_Pos*)x->m7C4, 0)].m0 != 0)
+                    fn_8002A244(x, 0xD, Unk800239F4_Secs(x->m80[0]->m48));
+            } else {
+                int r = fn_8017C94C((Unk8017A930_T*)x->m80[0]->m700);
+                if (r != 0)
+                    x->m138 = 1;
+                else
+                    x->m138 = r;
+            }
+            fn_8002A244(x, 0xA, Unk800239F4_Secs(x->m80[0]->m48));
+            if (x->m114 != 0) {
+                x->m12C = ((Unk801A4B34_Pos*)x->m7C4)->m460;
+                fn_8002A244(x, 0x2C, Unk800239F4_Secs(x->m80[0]->m48));
+                x->m114 = 0;
+            }
+        }
+    }
+    x->m6D0 = 0;
 }
 
 extern "C" void fn_800269E0(Unk80023AC4_Obj* x)

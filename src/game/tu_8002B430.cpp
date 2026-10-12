@@ -17,6 +17,48 @@ extern const float lbl_805A6468;
 extern const float lbl_805A64B0;
 extern const float lbl_805A64C0;
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk8002B430_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
+void fn_8014E388(Unk801A4B34_Vec3* out);
+
+static inline Unk801A4B34_Vec3 Unk8002B850_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
+{
+    Unk801A4B34_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+static inline float Unk8002B430_Len3(const Unk801A4B34_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+/* near-miss: 3 slots differ (retail loads r->m30 into r0 and x->m1D8 into r4 for the cmpw; here r9/r0) */
+extern "C" void fn_8002B430(Unk80023AC4_Obj* x)
+{
+    Unk801A4B34_Rec58C* r = &((Unk801A4B34_Pos*)x->m1D0[0].m0)->m58C;
+    if ((r->m4 & 0x20000000) == 0 && x->m1D0[0].m8 < r->m30) {
+        Unk801A4B34_Vec3 v;
+        fn_8014E388(&v);
+        Unk801A4B34_Pos* p = (Unk801A4B34_Pos*)x->m1D0[0].m0;
+        float len = Unk8002B430_Len3(Unk8002B850_Sub(p->m60, v));
+        float scaled = len * 0.0009259259f;
+        if (!(scaled >= 0.5f) && x->m100 == 0 && x->m10C == 0 && x->m6E8 == 0
+            && (x->m634 <= 1 || (x->m634 == 2 && x->m6AC == 0))) {
+            x->m12C = x->m1D0[0].m8;
+            fn_8002A244(x, 0x34, Unk8002B430_Secs(x->m80[0]->m48));
+        }
+    }
+}
+
 extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
 {
     int v = x->m160.m48;
@@ -31,15 +73,6 @@ extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
 extern Unk801A4B34_Vec3 lbl_805B1A00;
 extern "C" int fn_80022708(int unused, int idx);
 void fn_80035420(int a, int b, int c, int d);
-
-static inline Unk801A4B34_Vec3 Unk8002B850_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
-{
-    Unk801A4B34_Vec3 r;
-    r.x = a.x - b.x;
-    r.y = a.y - b.y;
-    r.z = a.z - b.z;
-    return r;
-}
 
 extern "C" void fn_8002B850(Unk80023AC4_Obj* x)
 {
@@ -89,14 +122,6 @@ extern "C" int fn_8002BAD8(Unk80023AC4_Obj* x, int a, int b)
         }
     }
     return r;
-}
-
-/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
- * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
- * are hoisted above them (retail's lis cluster). */
-inline float Unk8002B430_Secs(unsigned n)
-{
-    return (float)n * 0.016666668f;
 }
 
 extern "C" void fn_8002BB3C(Unk80023AC4_Obj* x)
@@ -202,6 +227,49 @@ extern "C" void fn_8002BF20(Unk80023AC4_Obj* x)
     x->m6BC = 0;
 }
 
+/* Message record of type 0x88 behind Unk80023AC4_Obj::m6BC (fn_8002BFF8). */
+struct Unk8002BFF8_Msg {
+    int m0;
+    int m4;
+    Unk801A4B34_Pos* m8;
+    float mC;
+    int m10;
+    int m14;
+};
+void fn_8003C988(int a);
+
+extern "C" void fn_8002BFF8(Unk80023AC4_Obj* x)
+{
+    Unk8002BFF8_Msg* m = (Unk8002BFF8_Msg*)Unk8002569C_Cast(x->m6BC, 0x88);
+    Unk801A4B34_Pos* t = m->m8;
+    if ((int)t != x->m720) {
+        x->m720 = (int)t;
+        Unk801A4B34_Pos* o = (Unk801A4B34_Pos*)x->m510;
+        x->m12C = (int)m->m8;
+        x->m130.f = m->mC;
+        x->m134 = m->m10;
+        x->m138 = m->m14;
+        if (t == o && x->m548 == 0) {
+            fn_8002A244(x, 0x48, Unk8002B430_Secs(x->m80[0]->m48));
+        } else if (((Unk801A4B34_Pos*)x->m720)->m708 == o->m708) {
+            fn_8002A244(x, 0x48, Unk8002B430_Secs(x->m80[0]->m48));
+        } else {
+            Unk8001F2C4_World* w = x->m80[0];
+            if (w->m6CC->m388 == 3 && ((Unk801A4B34_Pos*)x->m12C)->m460 == 1 && x->m548 == 0) {
+                fn_8002A244(x, 0x48, Unk8002B430_Secs(w->m48));
+            } else if (!(x->m130.f * 0.056818180f < 70.0f)) {
+                fn_8002A244(x, 0x48, Unk8002B430_Secs(w->m48) + 0.4f);
+                if (x->m514 == 0 && x->m6B8->m0 == 1 && m->m8->m460 == 0)
+                    fn_8003C988(x->m6C8);
+            } else if (m->m8->m458 == 0) {
+                fn_8002A244(x, 0x48, Unk8002B430_Secs(w->m48) + 0.4f);
+            }
+        }
+    }
+    x->mF8 = 0;
+    x->m6BC = 0;
+}
+
 extern "C" void fn_8002C274(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x43, (float)x->m80[0]->m48 * lbl_805A6468);
@@ -209,6 +277,57 @@ extern "C" void fn_8002C274(Unk80023AC4_Obj* x)
 
 extern "C" void fn_8002C2CC()
 {
+}
+
+void fn_800359BC(int a, int b, int c, int d);
+void fn_800354B8(int a, int b, int c, int d, int e);
+void fn_8003E960(int a);
+extern "C" int fn_80022730(int unused, int b, int c);
+
+extern "C" void fn_8002C2D0(Unk80023AC4_Obj* x)
+{
+    Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x49);
+    int k = m->m8;
+    x->m6E8 = 1;
+    switch (k) {
+    case 3:
+        break;
+    case 1: {
+        int dd = x->mD0;
+        if (dd != 0) {
+            int n = x->m264 + 1;
+            int c = x->m514;
+            fn_800359BC(dd, c, n, fn_8002A2D4(x));
+        }
+        x->m12C = x->m264;
+        fn_8002A244(x, 3, Unk8002B430_Secs(x->m80[0]->m48));
+        fn_8002F850(x);
+        x->m160.m8 = x->m160.m8 + 1;
+        fn_8003E960(x->m6C8);
+        if (x->m514 == 0)
+            x->fn_800233B4(0x23, 0x1E, 0);
+        x->fn_800233B4(0x13, 0x50, 0);
+        x->fn_800233B4(0x14, 0x12C, 0);
+        x->m10C = k;
+        break;
+    }
+    case 2:
+        x->m12C = m->mC;
+        fn_8002A244(x, 6, Unk8002B430_Secs(x->m80[0]->m48));
+        break;
+    case 4:
+        fn_8002A244(x, 0x1F, Unk8002B430_Secs(x->m80[0]->m48));
+        if (x->m53C == 0) {
+            int dd = x->mD0;
+            if (dd != 0) {
+                int c = x->m514;
+                int e = x->m5A8;
+                fn_800354B8(dd, c, e, fn_80022730((int)x, x->m5AC, x->m558), x->m53C);
+            }
+        }
+        break;
+    }
+    x->m6BC = 0;
 }
 
 extern "C" void fn_8002C51C(Unk80023AC4_Obj* x)

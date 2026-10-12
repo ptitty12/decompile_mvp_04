@@ -19,7 +19,10 @@ struct Unk800493D4_Sm {
     int m9D8;
     int m9DC;
     int m9E0;
-    char pad9E4[0x20];
+    char pad9E4[0x9F0 - 0x9E4];
+    float m9F0;
+    int m9F4;
+    char pad9F8[0xA04 - 0x9F8];
     int mA04;
     int mA08;
     int mA0C[2];
@@ -66,6 +69,7 @@ struct Unk80256C80_M;
 class Unk80069F0C {
 public:
     int fn_8006BE18();
+    int fn_8006A238(int a);
 };
 
 /* Placeholder view of the game object's methods (Unk80044C10_A is the same object); fn_8001D6CC returns the value
@@ -92,6 +96,12 @@ public:
     int fn_8001D70C();
     int fn_8001DA28();
     int fn_8001DB70();
+    int fn_8001DA4C();
+    int fn_8001D7D0();
+    int fn_8001D454();
+    int fn_8001D42C();
+    int fn_8001D780();
+    int fn_8001DA7C();
     void fn_8001CEA8(float* b, float* a);
 };
 
@@ -203,5 +213,74 @@ int fn_8001F3FC(Unk80044C10_A* a, int k);
 int fn_8001F45C(Unk80044C10_A* a, int k);
 int fn_8001D8DC(Unk80044C10_A* a);
 void fn_800119F8(int a, int b, int c);
+int fn_8001EDE4(Unk80044C10_A* a);
+void fn_800110EC(int a, int b, int c, int d);
+int fn_8001F614(Unk80044C10_A* a);
+int fn_8001F2A0(Unk80044C10_A* a);
+int fn_8009E1D4(void* p, int a, int b);
+void fn_800134B4(int a, int b, int c, int d, int e);
+void fn_80051370();
+int fn_8001DEC0(Unk80044C10_A* a);
+void fn_800105AC(int a, int b, int c, int d, int e, int f);
+void fn_8001582C();
+void fn_80010E38();
+struct Unk8024EF40_W;
+struct Unk80270BA0_X;
+int fn_8024D41C(Unk80270BA0_X* p);
+void fn_80015880(int a, int b);
+void fn_80018694();
+void fn_80018384(int a, int b);
+void fn_800183E8(int a);
+void fn_80010BC0(int a, int b, int c, int d);
+void fn_80010B54(int a, int b, int c);
+void fn_8000FC58();
+void fn_800B555C();
+int fn_800B57EC();
+void fn_8001A3EC(int a, int b);
+void fn_80010E8C();
+int fn_80253E7C(Unk8024EF40_W* w, int a, int b, int c);
+int fn_80046734(int a);
+int fn_80045774(unsigned a);
+void fn_80011DD8(int a, int b);
+void fn_80015B88();
+void fn_80011B80(int a, int b);
+void fn_800199E4(int a, int b, int c, int d);
+void fn_80011A64(int a);
+void fn_80019950(int a, int b, int c, int d, int e, int f, int g, int h);
+/* Game object compared by fn_8004A950: state word at +0x460. */
+struct Unk8004A950_Obj {
+    char pad0[0x460];
+    int m460;
+};
+int fn_80247858(Unk8004A950_Obj* o, int b);
+int fn_80044240(int a);
+void fn_8001101C(int a, int b, int c, int d);
+void fn_800170DC();
+/* View of the Unk80044C10_Obj590 record used by fn_8004B5C0 (fields at +0x44C, +0x588, +0x590, +0x708, +0xA04, +0xA0C). */
+struct Unk8004B5C0_Obj {
+    char pad0[0x44C];
+    int m44C;
+    char pad450[0x138];
+    char m588[8];
+    unsigned m590;
+    char pad594[0x174];
+    int m708;
+    char pad70C[0x2F8];
+    int mA04;
+    char padA08[0x4];
+    char mA0C[1];
+};
+void fn_8004CB40();
+void fn_8004D738(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a);
+void fn_80014628();
+/* Object at (game object + 0x6CC): a position vector at +0x60 (fn_80049670). */
+struct Unk80049670_P {
+    char pad0[0x60];
+    Unk80044C10_Vec3 m60;
+};
+extern Unk80044C10_Vec3 lbl_805AE414;
+float fn_80253F54(Unk8024EF40_W* w, int a, int b, int c);
+extern "C" float fn_8024F20C(void* p, int a, int b, int c, int d);
+extern "C" float fn_8024F048(void* p, int a, int b, int c, int d);
 
 #endif

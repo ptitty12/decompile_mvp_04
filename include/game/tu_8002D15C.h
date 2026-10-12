@@ -153,7 +153,9 @@ struct Unk8002D15C_Owner {
 struct Unk8002D15C_Cc {
     char pad0[0x60];
     Unk8002D15C_Vec3 m60;
-    char pad6C[0x388 - 0x6C];
+    char pad6C[0x374 - 0x6C];
+    struct Unk8002D15C_Cc* m374;
+    char pad378[0x388 - 0x378];
     int m388;
     int m38C;
     char pad390[0x3F4 - 0x390];
@@ -307,7 +309,9 @@ struct Unk8002D15C : public Unk80030C90_Base {
     char pad528[0x52C - 0x528];
     int m52C;
     int m530;
-    char pad534[0x57C - 0x534];
+    char pad534[0x560 - 0x534];
+    int m560;
+    char pad564[0x57C - 0x564];
     int m57C;
     char pad580[0x5A8 - 0x580];
     int m5A8;

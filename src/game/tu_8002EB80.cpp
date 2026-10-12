@@ -473,3 +473,48 @@ extern "C" void fn_8003049C(Unk8002D15C* self, int id, int newv, int oldv)
             self->m1D0[k].m0 = newv;
     }
 }
+
+struct Unk8017A930_T;
+int fn_8017C94C(Unk8017A930_T* t);
+extern Unk8002D15C_Vec3 lbl_805AE3E4[];
+
+static inline Unk8002D15C_Vec3 SubV(const Unk8002D15C_Vec3& a, const Unk8002D15C_Vec3& b)
+{
+    Unk8002D15C_Vec3 r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+
+static inline float Len2(const Unk8002D15C_Vec3& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m8 * v.m8);
+}
+
+extern "C" int fn_800305A8(Unk8002D15C* self, Unk8002D15C_Player* pl, int idx)
+{
+    const float thr = 10.0f;
+    int r = 0;
+    Unk8002D15C_Cc* c = self->m80->m6CC;
+    float len;
+    if ((unsigned)(c->m388 - 3) <= 2) {
+        if (c->m38C == 3) {
+            Unk8002D15C_Cc* q = c->m374;
+            if (q != 0) {
+                Unk8002D15C_Vec3 d = SubV(q->m60, lbl_805AE3E4[idx]);
+                len = Len2(d) * (1.0f / 12.0f);
+                int f = len <= thr;
+                r = f;
+            }
+        }
+    } else if (c->m388 == 1) {
+        Unk8002D15C_Vec3 d = SubV(c->m60, lbl_805AE3E4[idx]);
+        len = Len2(d) * (1.0f / 12.0f);
+        if (!(len > thr) && self->m560 == 0)
+            r = 1;
+    }
+    if (self->m510 == pl && fn_8017C94C((Unk8017A930_T*)self->m80->m700) != 0)
+        r = 1;
+    return r;
+}
