@@ -356,6 +356,50 @@ struct Gl8035Vec3 {
     float x, y, z;
 };
 extern Gl8035Vec3 lbl_806055AC;
+extern Gl8035Vec3 lbl_80695940;
+struct E9BD_Mat {
+    float m[16];
+};
+struct E9BD_Obj {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual int v10();
+    virtual int v11();
+    virtual Gl8035Vec3* v12();
+    virtual void v13();
+    virtual Gl8035Vec3* v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual E9BD_Mat* v21();
+};
+struct E9BD_Owner {
+    char pad0[0x14];
+    int m14;
+    E9BD_Obj* m18;
+    char pad1C[0x28C - 0x1C];
+    int m28C;
+    int m290;
+};
+extern "C" {
+void fn_803BB02C(int a, int b, void* c, int d);
+void fn_803DF824(void* p, float a, float b, float c, float d, float e, float f, float g, float h, float i);
+void fn_803DF6AC(void* p, float a, float b, float c, float d);
+void fn_803DFEE0(void* p, float a, float b, float c, float d);
+void fn_803E02E4(void* p, void* q);
+}
+extern char lbl_8068F200[];
+extern int lbl_806242A0;
 
 struct Unk80379324 {
     Unk80379324();
@@ -480,6 +524,43 @@ extern "C" int fn_80389B34(void* x, int a, GlV3* p1, GlV3* p2, int p3, int flags
     return 1;
 }
 
+extern "C" void fn_80389BD8(void* ov, int idx, void* matv, int flags)
+{
+    E9BD_Owner* o = (E9BD_Owner*)ov;
+    E9BD_Mat* mat = (E9BD_Mat*)matv;
+    E9BD_Obj* p = o->m18;
+    char* tbl = lbl_8068F200;
+    int hit;
+    if (flags & 2) {
+        fn_803BB02C(o->m14, o->m28C, tbl, 0);
+        hit = p->v10();
+    } else {
+        hit = p->v11();
+        fn_803BB02C(o->m14, o->m290, tbl, 0);
+    }
+    if (flags & 1) {
+        if (flags & 2) {
+            Gl8035Vec3 a = lbl_806055AC;
+            Gl8035Vec3 b = *p->v12();
+            if (lbl_806242A0 == 0) {
+                a = *p->v14();
+                fn_803DF824(mat, b.x, b.y, b.z, 0.0f, 0.0f, 0.0f, a.x, a.y, a.z);
+            } else {
+                a = lbl_80695940;
+                fn_803DF824(mat, b.x, b.y, b.z, 0.0f, 0.0f, 0.0f, a.x, a.y, a.z);
+            }
+        } else {
+            *mat = *p->v21();
+        }
+    } else {
+        Gl8035Vec3 a = *p->v12();
+        fn_803DF6AC(mat, a.x, a.y, a.z, 1.0f);
+    }
+    if (hit != 0)
+        fn_803DFEE0(mat, -1.0f, 1.0f, 1.0f, 1.0f);
+    fn_803E02E4(mat, tbl + (idx << 6));
+}
+
 extern "C" void fn_80389EBC(GlPool* self)
 {
     int off = 0;
@@ -568,7 +649,6 @@ extern int lbl_80695964;
 extern int lbl_80695968;
 extern int lbl_80699B0C;
 extern int lbl_80699B10;
-extern Gl8035Vec3 lbl_80695940;
 extern char lbl_80695950[];
 struct Gl12Elem {
     short m0;
