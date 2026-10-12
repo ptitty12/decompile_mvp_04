@@ -373,9 +373,83 @@ struct FEOb74 {
     char pad6C[0x74 - 0x6C];
     int m74;
 };
+
 inline float FMax2(float a, float b)
 {
     return b >? a;
+}
+
+class FEV3Cx {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual FEV3Cz* s29(const char* a);
+    virtual void s30();
+    virtual void s31();
+    virtual FEV3Cz* s32(const char* a, int b);
+};
+struct FEObjAF248 {
+    int m0;
+    char pad4[0x2C - 4];
+    int* m2C;
+    int* m30;
+    char pad34[4];
+    FEV3Cz* m38;
+    FEV3Cz* m3C;
+    FEV3Cz* m40;
+};
+extern "C" void fn_802D7ACC();
+extern "C" int* fn_800ED2B0(FEV3Cz* o, const char* name);
+
+/* near-miss (98.9%): scratch registers of the last three stores are permuted */
+extern "C" void fn_800AF248(void* q)
+{
+    FEObjAF248* self = (FEObjAF248*)q;
+    if (self->m0 == 0) {
+        self->m2C = fn_800ED2B0(self->m38, "P1DISTSET");
+        self->m30 = fn_800ED2B0(self->m38, "P1DISTANIM");
+        self->m3C = fn_800C8044(self->m38->s32("P1DISTANCE", 1));
+        self->m40 = fn_800C8044(fn_800C8044(fn_800C8044(fn_800C8044(self->m38->s32("HRGAMEPLAY", 1))->s32("PLAYER1", 1))->s32("SCORE", 1))->s32("TOTALDISTANCE", 1));
+        ((FEV3Cx*)self->m38)->s29("HRGAMEPLAY/PLAYER1/SCORE/P1DISTANCE")->s8(0);
+    } else {
+        self->m2C = fn_800ED2B0(self->m38, "P2DISTSET");
+        self->m30 = fn_800ED2B0(self->m38, "P2DISTANIM");
+        self->m3C = fn_800C8044(self->m38->s32("P2DISTANCE", 1));
+        self->m40 = fn_800C8044(fn_800C8044(fn_800C8044(fn_800C8044(self->m38->s32("HRGAMEPLAY", 1))->s32("PLAYER2", 1))->s32("SCORE", 1))->s32("TOTALDISTANCE", 1));
+        ((FEV3Cx*)self->m38)->s29("HRGAMEPLAY/PLAYER2/SCORE/P2DISTANCE")->s8(0);
+    }
+    self->m3C->s8(0);
+    *self->m2C = 0;
+    lbl_8061B8C0->m24 = 0;
+    *self->m30 = 0;
+    fn_802D7ACC();
 }
 
 struct FEObj14 {
@@ -551,6 +625,81 @@ extern "C" void fn_800AFAE4(FEObj44* self)
     self->m44 = 0;
 }
 
+struct FEBaseAFB18 {
+    int m0;
+    int m4;
+};
+class FEMidAFB18 : public FEBaseAFB18 {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(void* a);
+};
+class FEObjAFB18 : public FEMidAFB18 {
+public:
+    char padC[0x38 - 0xC];
+    FEV3Cz* m38;
+    char pad3C[0x48 - 0x3C];
+    int* m48;
+    int* m4C;
+    int* m50;
+    int* m54;
+    int* m58;
+};
+extern "C" int* fn_800ED2B0(FEV3Cz* o, const char* name);
+extern "C" void fn_800AF248(void* p);
+
+inline FEMgrB8* FEGetMgrA()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+    }
+    return lbl_8061A32C;
+}
+
+extern "C" void fn_800AFB18(FEObjAFB18* self)
+{
+    self->s20(fn_800B7AB8(FEGetMgrA(), "INGAMEHRD"));
+    fn_800AF248(self);
+    if (self->m0 == 0) {
+        self->m48 = fn_800ED2B0(self->m38, "P1HRANIM");
+        self->m4C = fn_800ED2B0(self->m38, "P1STRIKEANIM");
+        self->m50 = fn_800ED2B0(self->m38, "P1MONEYBALLON");
+        self->m54 = fn_800ED2B0(self->m38, "P1MONEYBALLOFF");
+        self->m58 = fn_800ED2B0(self->m38, "P1MONEYBALLWIN");
+        self->m38->s32("P1MONEYBALL", 1)->s8(0);
+    } else {
+        self->m48 = fn_800ED2B0(self->m38, "P2HRANIM");
+        self->m4C = fn_800ED2B0(self->m38, "P2STRIKEANIM");
+        self->m50 = fn_800ED2B0(self->m38, "P2MONEYBALLON");
+        self->m54 = fn_800ED2B0(self->m38, "P2MONEYBALLOFF");
+        self->m58 = fn_800ED2B0(self->m38, "P2MONEYBALLWIN");
+        self->m38->s32("P2MONEYBALL", 1)->s8(0);
+    }
+    *self->m48 = 0;
+    *self->m4C = 0;
+    *self->m50 = 0;
+    *self->m54 = 0;
+    *self->m58 = 0;
+}
+
 extern "C" void fn_800AFD2C(FEObj58* self)
 {
     fn_800AF544((UnkAt2C*)self);
@@ -562,6 +711,7 @@ extern "C" void fn_800AFD2C(FEObj58* self)
 }
 
 inline int At4(char* b, int i) { int o = i * 4; return *(int*)(b + o); }
+
 extern "C" void fn_800AFD70(FEObAF* self)
 {
     int v = At4((char*)self->m4->m6F8->m10 + 0x154, self->m0);
@@ -584,6 +734,124 @@ extern "C" void fn_800AFD70(FEObAF* self)
         break;
     }
     self->mC = r;
+}
+
+class FEG18 {
+public:
+    char pad0[0x18];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24(int a);
+    virtual int s25();
+};
+class FEW3Ca {
+public:
+    char pad0[0x24];
+    int m24;
+    char pad28[0x3C - 0x28];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void* s32(const char* s, int a);
+};
+class FEW3Cb {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15(int a);
+};
+struct FEArg4DC {
+    char pad0[0x4DC];
+    int m4DC;
+};
+extern "C" int fn_804089B4(char* dst, const char* fmt, ...);
+extern "C" void fn_8011A9B8(const char* a, void* b, const char* c);
+extern "C" void* fn_800C8048(void* p);
+extern const char lbl_805B96DC[];
+
+extern "C" void fn_800AFDDC(void* unused, FEW3Ca* self, FEArg4DC* arg)
+{
+    if (((FEG18*)lbl_80619D10)->s25() != 0) {
+        self->s8(0);
+        return;
+    }
+    if (self->m24 < 0) {
+        int v = 0;
+        if (arg) {
+            v = arg->m4DC;
+        }
+        if (v < 0) {
+            char buf[16];
+            fn_804089B4(buf, "FOUL %d", v);
+            fn_8011A9B8(buf, self, lbl_805B96DC);
+            ((FEW3Cb*)fn_800C8048(self->s32(lbl_805B96DC, 1)))->s15(1);
+        } else {
+            fn_8011A0A4((void*)v, self, lbl_805B96DC);
+            ((FEW3Cb*)fn_800C8048(self->s32(lbl_805B96DC, 1)))->s15(0);
+        }
+    }
 }
 
 extern "C" void fn_800AFF34(FEObFF* self)
@@ -706,6 +974,167 @@ extern "C" void fn_800B0884(UnkAt10P* p)
     if (p->m10) {
         fn_800FC6B4(p->m10);
     }
+}
+
+extern "C" int fn_800B08B0(UnkAt10* p)
+{
+    if (p->m10) {
+        return 0;
+    }
+    return 0;
+}
+
+class FEV3Cs {
+public:
+    char pad0[0x2A];
+    short m2A;
+    short m2C;
+    char pad2E[0x3C - 0x2E];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9(int a);
+    virtual void v10(int a);
+};
+struct FEPair2 {
+    float x;
+    float y;
+};
+inline void FEEnsureMgr()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+    }
+}
+
+inline int FEScrW()
+{
+    FEEnsureMgr();
+    return 0x280;
+}
+
+inline int FEScrH()
+{
+    FEEnsureMgr();
+    return 0x1E0;
+}
+
+class FEWb {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(float f);
+};
+struct FEOwn19AC {
+    char pad0[0x1A8];
+    FEV3Cz* m1A8;
+    char pad1AC[0x1CC - 0x1AC];
+    FEWb* m1CC;
+    FEWb* m1D0;
+    char pad1D4[0x244 - 0x1D4];
+    FEWb* m244;
+    FEWb* m248;
+};
+struct FEObj19AC {
+    char pad0[0x10];
+    FEOwn19AC* m10;
+};
+extern "C" void fn_800FCA30(FEOwn19AC* o, int a);
+extern "C" void fn_800FCAA0(FEOwn19AC* o);
+
+extern float lbl_80619D20;
+
+class FEV3Cs;
+struct FEPair2;
+extern "C" void fn_800B1B34(void* unused, FEV3Cs* w, FEPair2* pos);
+
+extern "C" int fn_800B19AC(FEObj19AC* self, int kind, int arg, FEPair2* pos)
+{
+    FEOwn19AC* o = self->m10;
+    if (o == 0) {
+        return 1;
+    }
+    int r = 0;
+    FEWb* w;
+    switch (kind) {
+    case 0:
+        w = o->m244;
+        if (w == 0) {
+            break;
+        }
+        if (arg != 0 && pos != 0) {
+            fn_800B1B34(self, (FEV3Cs*)w, pos);
+            w->s20(lbl_80619D20);
+        }
+        w->s8(arg);
+        break;
+    case 1:
+        w = o->m248;
+        goto common;
+    case 2: {
+        FEWb* x = o->m1D0;
+        if (x == 0) {
+            break;
+        }
+        x->s8(arg);
+        break;
+    }
+    case 3:
+        w = o->m1CC;
+    common:
+        if (w == 0) {
+            break;
+        }
+        if (arg != 0 && pos != 0) {
+            fn_800B1B34(self, (FEV3Cs*)w, pos);
+        }
+        w->s8(arg);
+        break;
+    case 4:
+        fn_800C8044(o->m1A8)->s8(arg);
+        break;
+    case 5:
+        fn_800FCA30(o, arg);
+        break;
+    case 6:
+        fn_800FCAA0(o);
+        break;
+    default:
+        r = 1;
+        break;
+    }
+    return r;
+}
+
+extern "C" void fn_800B1B34(void* unused, FEV3Cs* w, FEPair2* pos)
+{
+    int x = (int)(pos->x * (float)FEScrW());
+    int y = (int)(pos->y * (float)FEScrH()) - w->m2C / 2;
+    w->v9(x - w->m2A / 2);
+    w->v10(y);
 }
 
 extern "C" void fn_800B1C7C(FEObR* self)
@@ -1050,6 +1479,71 @@ extern "C" void fn_800B26CC(FEOb26* self)
         } else {
             self->m6C = self->m6C - lbl_805B9BA4;
             fn_800412AC(fn_8004072C(), 0x31, 0, 0, 0, 0);
+        }
+    }
+}
+
+struct FEOb2784 {
+    char pad0[0x68];
+    float m68;
+    char pad6C[0xD8 - 0x6C];
+    int mD8;
+    void* mDC;
+    int mE0[12];
+    char pad110x[0x110 - 0x110];
+    int m110;
+    int m114;
+    char pad118[0x140 - 0x118];
+    int m140;
+    char pad144[4];
+    int m148;
+    int m14C;
+};
+extern int lbl_80620730;
+extern int lbl_8061A330;
+extern "C" int fn_800B57EC(Unk800B555C* p);
+extern "C" void fn_800B3198(void* self, int a);
+extern "C" void fn_8011B3E8(int a, int* b, int* c);
+extern "C" void fn_800B2FCC(void* self);
+
+extern "C" void fn_800B2784(FEOb2784* self)
+{
+    if (((FEG18*)lbl_80619D10)->s25() == 0 && lbl_8061B8C0->m24 == 0) {
+        if (lbl_80620730 != 0) {
+            self->m110 = lbl_80620730;
+            lbl_80620730 = 0;
+        }
+        lbl_8061A330 = 1;
+        fn_8011B3E8(self->m140, &self->m148, &self->m14C);
+        if (fn_800B214C((FEOb214*)self) != 0) {
+            if (self->mDC) {
+                fn_80120144(self->mDC, self->m68);
+            }
+            fn_800B232C((FEOb232C*)self);
+            int i = self->m114;
+            if (i > 11) {
+                i = 11;
+            }
+            self->mE0[i] = self->m110;
+            if (fn_800B205C((FEOb210*)self) != 0) {
+                ((FEG18*)lbl_80619D10)->s24(0);
+                fn_800B2DD4(self, 4);
+                if (lbl_8061A32C == 0) {
+                    lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+                }
+                if (*(int*)((char*)lbl_8061A32C + 0xBC) == 0 && fn_800B57EC(fn_800B555C()) == 0 && *(int*)(lbl_806192E0->m4->mC + 0x600) == 0) {
+                    fn_800B3198(self, fn_800B1FCC((FEOb210*)self));
+                }
+            } else {
+                fn_800B2DD4(self, 3);
+            }
+        } else {
+            if (self->mD8 == 1) {
+                fn_800B2544(self);
+            } else {
+                fn_800B243C(self);
+            }
+            fn_800B2FCC(self);
         }
     }
 }

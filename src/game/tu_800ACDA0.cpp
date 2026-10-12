@@ -53,19 +53,23 @@ struct FEBar {
     float m20;
     float m24;
 };
+
 inline float Clamp01(float r)
 {
     return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
 }
+
 /* reading the divisor through an inline puts the m24 load before the m20 load, as in retail */
 inline float Dur(FEBar* s)
 {
     return s->m24;
 }
+
 inline float Lerp(float a, float t, float b)
 {
     return a + t * (b - a);
 }
+
 /* ratio u/d written to o->m10, 0.0f when d is not positive (inline body shared with tu_800AB0E8) */
 inline void Ratio(FEBarO* o, float d, float u)
 {
@@ -75,6 +79,7 @@ inline void Ratio(FEBarO* o, float d, float u)
         o->m10 = u / d;
     }
 }
+
 struct UnkAt1C20 {
     char pad0[0x1C];
     void* m1C;
@@ -219,8 +224,9 @@ inline void FESub10Init(FESub10* s)
     s->m0 = 0;
     s->m4 = 0;
 }
+
 extern "C" {
-void fn_800ACFEC(void* p, int a);
+void* fn_800ACFEC(void* p, int a);
 void fn_800B1C7C(void* p);
 void fn_800B2C6C(void* p);
 }
@@ -341,6 +347,38 @@ extern "C" void fn_800ACFE8()
 {
 }
 
+extern "C" void* fn_800AC6D8(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC744(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC7B0(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC81C(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC888(void* mem, int owner, void* parent, int k, float f);
+extern "C" void* fn_800AC8F4(void* mem, int owner, void* parent, int k, float f);
+extern "C" void fn_8014D9C4(void* p);
+extern "C" void fn_8033E464(void* parent, void* child);
+
+extern "C" void* fn_800ACFEC(void* p, int owner)
+{
+    char* self = (char*)p;
+    *(int*)(self + 0) = 0;
+    *(int*)(self + 4) = 0;
+    *(const void**)(self + 0xC) = lbl_8065B268;
+    char* q = self + 0xA14;
+    int n = 4;
+    do {
+        fn_8014D9C4(q);
+        q += 0x10;
+    } while (n-- != 0);
+    *(int*)(self + 0xA84) = owner;
+    fn_8033E464(self, fn_800AC6D8(operator new(0x28, 0), owner, self, 0, -1.0f));
+    fn_8033E464(self, fn_800AC744(operator new(0x28, 0), owner, self, 1, 0.15f));
+    fn_8033E464(self, fn_800AC7B0(operator new(0x28, 0), owner, self, 2, 0.15f));
+    fn_8033E464(self, fn_800AC81C(operator new(0x28, 0), owner, self, 3, 0.1f));
+    fn_8033E464(self, fn_800AC888(operator new(0x28, 0), owner, self, 4, 0.2f));
+    fn_8033E464(self, fn_800AC8F4(operator new(0x28, 0), owner, self, 5, 0.5f));
+    fn_800AD1D4(self);
+    return self;
+}
+
 extern "C" void fn_800AD17C(char* self, int c)
 {
     *(const void**)(self + 0xC) = lbl_8065B268;
@@ -349,6 +387,66 @@ extern "C" void fn_800AD17C(char* self, int c)
     if (c & 1) {
         fn_80377408(self);
     }
+}
+
+struct FEVec2 {
+    float x;
+    float y;
+};
+inline FEVec2 operator-(const FEVec2& a, const FEVec2& b)
+{
+    FEVec2 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    return r;
+}
+
+inline FEVec2 operator*(const FEVec2& a, float s)
+{
+    FEVec2 r;
+    r.x = a.x * s;
+    r.y = a.y * s;
+    return r;
+}
+
+struct FECell {
+    int m0;
+    FEVec2 p0;
+    FEVec2 p1;
+    FEVec2 out;
+};
+struct FERow {
+    FECell c[8];
+};
+struct FERowsObj {
+    char pad0[0x314];
+    FERow rows[8];
+    char pad[0xAA4 - 0x314 - 0x700];
+    int mAA4;
+};
+
+inline FEVec2 operator+(const FEVec2& a, const FEVec2& b)
+{
+    FEVec2 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+
+#define FECELL(s, i, j) (((FERowsObj*)(s))->rows[i].c[j])
+extern "C" void fn_800AD58C(char* self, int i, int j)
+{
+    FEVec2 P = *(FEVec2*)(self + 0xA74);
+    FEVec2* st = (FEVec2*)(self + 0xA68);
+    P.x = P.x - st->x * (float)i;
+    P.y = P.y - st->y * (float)j;
+    FEVec2 Q = P;
+    Q.x = Q.x - st->x;
+    Q.y = Q.y - st->y;
+    FEVec2 R = Q + P;
+    FEVec2 S = R * 0.5f;
+    FECELL(self, i, j).m0 = 0;
+    FECELL(self, i, j).p1 = FECELL(self, i, j).out = FECELL(self, i, j).p0 = S;
 }
 
 /* near-miss (retail reloads the count before the inner loop pre-test and keeps self in r31; ours reuses r0 and swaps r30/r31): 4 loop forms tried */
@@ -402,6 +500,29 @@ extern "C" void fn_800AD78C(void* p)
     }
 }
 
+extern "C" void fn_800AD838(void* p, float s)
+{
+    FERowsObj* self = (FERowsObj*)p;
+    int i = 0;
+    while (1) {
+        if (!(i < self->mAA4)) {
+            break;
+        }
+        int j = self->mAA4 - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
+            FECell* e = &self->rows[i].c[j];
+            if (e && e->m0) {
+                e->out = e->p1 - (e->p1 - e->p0) * s;
+            }
+            j--;
+        }
+        i++;
+    }
+}
+
 extern "C" void fn_800AD948(char* self, int key, float v)
 {
     int i = 0;
@@ -419,6 +540,44 @@ extern "C" void fn_800AD948(char* self, int key, float v)
             if (*(int*)(b1 + off) == key) {
                 char* b2 = self + 0x1C;
                 *(float*)(b2 + off) = v;
+            }
+            j--;
+        }
+        i++;
+    }
+}
+
+inline float FEMin(float a, float b)
+{
+    return a <? b;
+}
+
+extern "C" void fn_800AD9C0(void* p, int id)
+{
+    char* self = (char*)p;
+    const float a = 0.02f;
+    const float b = 0.2f;
+    const float c = 0.025f;
+    float st = FEMin(b, (float)*(int*)(self + 0xA88) * c + a);
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = *(int*)(self + 0xAA4) - 1;
+        while (1) {
+            if (!(j >= 0)) {
+                break;
+            }
+            int off = j * 0xC + i * 0x60;
+            char* b2 = self + 0x14;
+            FECell* e = &((FERowsObj*)self)->rows[i].c[j];
+            if (*(int*)(b2 + off) == id) {
+                if (!(e->out.x >= e->p0.x)) {
+                    e->out.x = e->p0.x + st;
+                } else {
+                    e->out.x = e->p0.x - st;
+                }
             }
             j--;
         }
@@ -449,6 +608,40 @@ extern "C" void fn_800ADAD8(char* self)
 extern "C" UnkFEPair fn_800ADB34(char* base, int a, int b)
 {
     return *(UnkFEPair*)(base + a * 0xe0 + b * 0x1c + 0x328);
+}
+
+extern "C" int fn_800ADB5C(char* self, FEVec2* pt, int* oi, int* oj)
+{
+    FEVec2 pv = *pt;
+    *oi = -1;
+    *oj = -1;
+    int i = 0;
+    while (1) {
+        if (!(i < *(int*)(self + 0xAA4))) {
+            break;
+        }
+        int j = 0;
+        while (1) {
+            if (!(j < *(int*)(self + 0xAA4))) {
+                break;
+            }
+            FEVec2 P = *(FEVec2*)(self + 0xA74);
+            FEVec2* st = (FEVec2*)(self + 0xA68);
+            P.x = P.x - st->x * (float)i;
+            P.y = P.y - st->y * (float)j;
+            FEVec2 Q = P;
+            Q.x = Q.x - st->x;
+            Q.y = Q.y - st->y;
+            if (!(pv.x <= P.x || pv.x >= Q.x || pv.y >= P.y || pv.y <= Q.y)) {
+                *oi = i;
+                *oj = j;
+                return 1;
+            }
+            j++;
+        }
+        i++;
+    }
+    return 0;
 }
 
 extern "C" void fn_800ADE10(void* p)
@@ -782,6 +975,66 @@ extern "C" int fn_800AEE44(void* self)
         r = fn_80356C98((char*)o + 0x60);
     }
     return r;
+}
+
+struct FEMgrX {
+    char pad0[0xD8];
+};
+extern FEMgrX* lbl_8061A32C;
+extern const char lbl_805B955C[];
+extern const char lbl_805B9468[];
+extern const char lbl_805B9474[];
+extern const char lbl_805B9480[];
+extern const char lbl_805B9490[];
+extern const char lbl_805B949C[];
+extern const char lbl_805B94AC[];
+extern const char lbl_805B94BC[];
+extern const char lbl_805B94C8[];
+extern const char lbl_805B94D8[];
+extern const char lbl_805B94E0[];
+extern const char lbl_805B94EC[];
+extern const char lbl_805B94F8[];
+extern "C" FEMgrX* fn_800B64BC(FEMgrX* p);
+extern "C" void fn_800B7B4C(FEMgrX* mgr, UiMsgBuf* m, void* ctx);
+extern "C" void fn_8035682C(UiMsgBuf* m);
+extern "C" char* fn_8040B830(char* dst, const char* src, int n);
+extern "C" int fn_8040B6A0(const char* s);
+inline FEMgrX* FEGetMgrX()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrX*)operator new(0xD8, 0));
+    }
+    return lbl_8061A32C;
+}
+
+/* near-miss (98.6%): callee-saved registers of the message pointer, mgr hi and name offset are permuted */
+extern "C" void fn_800AEE7C(char* self, int k)
+{
+    *(int*)(self + 0x444) = k;
+    const char* t[21] = {lbl_805B9468, lbl_805B9474, lbl_805B9474, lbl_805B6F58, lbl_805B6F58, lbl_805B9480,
+                         lbl_805B9490, lbl_805B949C, lbl_805B94AC, lbl_805B94BC, lbl_805B94BC, lbl_805B94C8,
+                         lbl_805B94D8, lbl_805B94E0, lbl_805B94EC, lbl_805B6F58, lbl_805B6F58, lbl_805B94F8,
+                         lbl_805B94F8, lbl_805B94F8};
+    if ((unsigned)(k - 1) <= 0x13) {
+        if (fn_8040B6A0(t[k]) != 0) {
+            UiMsgBuf m;
+            UiMsgBuf* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, t[k], 0xF);
+            p->name[15] = 0;
+            fn_800B7B4C(FEGetMgrX(), p, 0);
+        }
+    } else if (k == 0) {
+        int z = *(int*)(self + 0x2C);
+        if (z == 0) {
+            UiMsgBuf m;
+            UiMsgBuf* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, lbl_805B955C, 0xF);
+            p->name[15] = z;
+            fn_800B7B4C(FEGetMgrX(), p, 0);
+        }
+    }
 }
 
 extern "C" FEOb12* fn_800AEFF4(FEOb12* self, int a, int b)

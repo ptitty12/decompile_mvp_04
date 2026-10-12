@@ -621,6 +621,133 @@ extern "C" void fn_800B7700(FEMgr* self)
     fn_800B7618(self, self->mA4->m20);
 }
 
+class FEO7784 {
+public:
+    char pad0[8];
+    virtual void s1();
+    virtual void s2(int a);
+};
+typedef void (FEO7784::*FEPmf7784)(int);
+struct FEEnt7784 {
+    int key;
+    FEPmf7784 fn;
+};
+struct FEObj7784 {
+    char pad0[0xA0];
+    FEO7784* mA0;
+    char padA4[0xB0 - 0xA4];
+    int mB0;
+    char padB4[0xBC - 0xB4];
+    int mBC;
+};
+extern FEEnt7784 lbl_8061A33C[];
+extern int lbl_8061A338;
+
+extern "C" void fn_800B7784(FEObj7784* self)
+{
+    int j;
+    if (self->mBC == 0 || lbl_8061A338 == 1) {
+        int i = 0;
+        if (self->mB0 == 0) {
+            do {
+                j = 0;
+                do {
+                    if (fn_800B7CDC(self, j, lbl_8061A33C[i].key) != 0) {
+                        (self->mA0->*lbl_8061A33C[i].fn)(j);
+                        if (self->mB0 != 0) {
+                            break;
+                        }
+                    }
+                    j++;
+                } while (j <= 3);
+                i++;
+            } while (i <= 0x18 && self->mB0 == 0);
+        }
+    } else {
+        j = 0;
+        do {
+            if (fn_800B7CDC(self, j, 5) != 0) {
+                fn_800B7FC4((FEMgr*)self);
+            }
+            j++;
+        } while (j <= 3);
+    }
+}
+
+class FER8 {
+public:
+    char pad0[8];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual int v9();
+};
+struct FEObj780 {
+    char pad0[0x780];
+    int m780;
+    int m784;
+};
+struct FEB8C0v {
+    char pad0[8];
+    FEObj780* m8;
+};
+struct FEFF44 {
+    char pad0[0x2C];
+    int m2C;
+};
+extern FEPair lbl_805B98F0;
+extern int lbl_8061A494;
+extern int lbl_8061A498;
+extern FEFF44* lbl_8061FF44;
+extern "C" FER8* fn_801A4CE8(FEObj780* o, int a);
+extern "C" void fn_803188FC(FEFF44* o, int a);
+
+/* near-miss (99.8%): the two flag locals take r28/r29 swapped */
+extern "C" void fn_800B78D8(FEMgr* self)
+{
+    if (self->mCC != 0) {
+        lbl_8061A494 = 1;
+    }
+    int f2 = 0;
+    int f1 = 0;
+    if (self->mB8 != 0) {
+        FEObj780* o = ((FEB8C0v*)lbl_8061B8C0)->m8;
+        if (o != 0) {
+            if (fn_801A4CE8(o, 1)->v9() != 0) {
+                f1 = 1;
+            }
+            if (o->m784 == 0) {
+                int t = 0;
+                if (o->m780 != 0) {
+                    t = 1;
+                }
+                if (t != 0) {
+                    f2 = 1;
+                }
+            } else {
+                f2 = 1;
+            }
+        }
+    }
+    if (lbl_8061A498 != 0 || f1 == 0 || lbl_8061A330 != 0 || self->mCC != 0 || lbl_8061A494 > 0 || lbl_8061B8C0->m24 != 0 || f2 != 0) {
+        fn_803188FC(lbl_8061FF44, 0);
+        lbl_8061FF44->m2C = 0;
+        if (self->mA0 != 0) {
+            fn_800B8494(fn_800B8144());
+            ((FEV1C8*)self->mA0)->s4(lbl_805B98F0);
+        }
+        if (self->mCC == 0 && lbl_8061A494 > 0) {
+            lbl_8061A494 = lbl_8061A494 - 1;
+        }
+    }
+    lbl_8061A330 = 0;
+}
+
 extern "C" void fn_800B7A94(FEMgr* p, const char* s)
 {
     p->mA0->fn_800C68D0(s);
@@ -732,11 +859,6 @@ FEObj20::FEObj20()
     m10 = -1;
 }
 
-FEObj20::~FEObj20()
-{
-    fn_800B82D0(this, -1, 1);
-}
-
 extern "C" void fn_800B8268(float a, float b, float c, float d)
 {
     fn_8031D494(fn_8031CECC(), a, b, c, d);
@@ -745,6 +867,11 @@ extern "C" void fn_800B8268(float a, float b, float c, float d)
 extern "C" void fn_800B82AC()
 {
     fn_8031D54C(fn_8031CECC());
+}
+
+FEObj20::~FEObj20()
+{
+    fn_800B82D0(this, -1, 1);
 }
 
 /* near-miss (73 vs 74 insns): retail keeps two separate -1 constants (r28, r29) set before the first call; ours merges them */

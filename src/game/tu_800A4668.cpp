@@ -43,6 +43,108 @@ extern "C" void fn_80400560(void* p, int n);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
 
+struct Unk800A4CBC {
+    char pad0[0x48];
+    int m48;
+    char pad4C[0x74 - 0x4C];
+    int m74;
+    int m78;
+    int m7C;
+    char pad80[0x90 - 0x80];
+    int m90;
+    int m94;
+};
+extern "C" int fn_8007FB40(int g, int a);
+extern "C" unsigned fn_8007FB2C(int g, int a);
+extern "C" int fn_8007FB98(int g, int a, int b, int c);
+extern "C" int fn_8007FBC0(int g, int a, int b);
+extern "C" int fn_8007FBDC(int g, int a, int b);
+extern "C" void fn_8056808C(int a);
+extern "C" void fn_8007F950(int g, int a, int b);
+extern "C" int fn_800A4668(void* o, int a, int b, int c);
+extern "C" int fn_800A4558(void* o, int e);
+extern "C" void fn_800A4180(void* o);
+
+extern "C" void fn_800A4CBC(Unk800A4CBC* p)
+{
+    unsigned best = 0;
+    int g = lbl_8061930C;
+    volatile int sp8 = 0;
+    int bestE = 4;
+    int bestA = -1;
+    int bestB = -1;
+    int e = 0;
+    do {
+        unsigned idx = fn_8007FB40(g, e);
+        if (idx < fn_8007FB2C(g, sp8)) {
+            int a = fn_8007FBC0(g, idx, sp8);
+            int b = fn_8007FBDC(g, idx, sp8);
+            if ((bestA == -1 || a <= bestA) && (bestB == -1 || b <= bestB || a < bestA)) {
+                bestE = sp8;
+                best = idx;
+                bestA = a;
+                bestB = b;
+            }
+        }
+        int c = sp8;
+        int t;
+        if (c > 3) {
+            t = c;
+        } else {
+            t = c + 1;
+        }
+        sp8 = t;
+        e = t;
+    } while (e <= 3);
+    int flag = 0;
+    if (bestE <= 3) {
+        int cur = p->m90;
+        if (cur != -1) {
+            if (bestA <= cur) {
+                if (bestA >= cur) {
+                    if (bestA == cur && bestB <= p->m94) {
+                    } else {
+                        goto set;
+                    }
+                }
+            } else {
+                goto set;
+            }
+        } else if (fn_800A4558(p, bestE) == 1) {
+            goto set;
+        }
+    } else {
+    set:
+        flag = 1;
+    }
+    if (flag == 1) {
+        fn_800A4180(p);
+    } else {
+        fn_8056808C(p->m48);
+        int x = fn_8007FB98(g, best, 0, bestE);
+        int y = fn_8007FB98(g, best, 1, bestE);
+        if (x == 0 || y == 0) {
+            fn_8007F950(g, bestE, best);
+            int old = p->m78;
+            p->m78 = 0;
+            p->m7C = old;
+        } else {
+            int w = fn_800A4668(p, bestE, 1, 1);
+            if (w == 1) {
+                w = p->m74;
+                if (w == 2) {
+                    w = 0;
+                } else {
+                    w = 3;
+                }
+            } else {
+                w = 0;
+            }
+            p->m78 = w;
+        }
+    }
+}
+
 extern "C" int fn_800A4EA4()
 {
     unsigned char b;
@@ -65,6 +167,11 @@ struct Unk800A6114_C {
     char pad1C[0x84 - 0x1C];
     int m84;
     int m88;
+    char pad8C[4];
+    float m90;
+    float m94;
+    float m98;
+    float m9C;
 };
 
 struct Unk800A641C_Q {
@@ -110,6 +217,111 @@ extern "C" void fn_800A4EE4(Unk800A4EE4* p)
     }
 }
 
+struct Unk800A4F54_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+};
+struct Unk800A4F54 {
+    char pad0[0x28 + 0x2C];
+    char pad54[0x70 - 0x54];
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    float mA0;
+    int mA4;
+    char padA8[0xDC - 0xA8];
+    int mDC;
+    int mE0;
+    int mE4;
+    char padE8[4];
+    Unk800A4F54_Rec mEC;
+};
+extern "C" int fn_8007290C(int g, int a);
+extern "C" void fn_80086278(int a, void* b);
+extern "C" void fn_8006A004(Unk800A641C_Q* q);
+extern "C" float fn_80574750(int a, int b);
+extern "C" float fn_80574798(int a, int b);
+extern "C" float fn_805747E4(int a, int b);
+extern "C" float fn_80574830(int a, int b);
+extern "C" int fn_800A2AE8(void* p);
+inline void FEPut90(Unk800A6114_C* c, float v) { c->m90 = v; }
+
+inline void FEPut94(Unk800A6114_C* c, float v) { c->m94 = v; }
+
+inline void FEPut98(Unk800A6114_C* c, float v) { c->m98 = v; }
+
+inline void FEPut9C(Unk800A6114_C* c, float v) { c->m9C = v; }
+
+inline void FEPutQ90(Unk800A641C_Q* q, float v) { FEPut90(q->mC, v); }
+
+inline void FEPutQ94(Unk800A641C_Q* q, float v) { FEPut94(q->mC, v); }
+
+inline void FEPutQ98(Unk800A641C_Q* q, float v) { FEPut98(q->mC, v); }
+
+inline void FEPutQ9C(Unk800A641C_Q* q, float v) { FEPut9C(q->mC, v); }
+
+inline void FERecInit(Unk800A4F54_Rec* r)
+{
+    r->m8 = 4;
+    r->m4 = -1;
+    r->mC = -1;
+    r->m10 = -1;
+    r->m14 = 0;
+    r->m18 = 0;
+}
+
+extern "C" void fn_800A4F54(Unk800A4F54* p)
+{
+    char* sub = (char*)p + 0x2C;
+    int g = lbl_8061930C;
+    int h = fn_8007290C(g, 0);
+    Unk800A641C_Q* q = lbl_806192E0->m4;
+    int own = *(int*)((char*)q + 0x10);
+    fn_80086278(own, fn_8007FE04(lbl_8061930C));
+    fn_8006A004(q);
+    float a = fn_80574750(*(int*)(sub + 0x28), h);
+    float b = fn_80574798(*(int*)(sub + 0x28), h);
+    float c = fn_805747E4(*(int*)(sub + 0x28), h);
+    float d = fn_80574830(*(int*)(sub + 0x28), h);
+    FEPutQ90(q, a);
+    FEPutQ94(q, b);
+    FEPutQ98(q, c);
+    FEPutQ9C(q, d);
+    p->m70 = 0;
+    p->m74 = 0;
+    p->m78 = 0;
+    p->m7C = 0;
+    p->m80 = 0;
+    p->m84 = ((int (*)(void*))fn_800A2AE8)(p);
+    p->mA0 = 0.0f;
+    p->mEC.m0 = -1;
+    p->m88 = -1;
+    p->m98 = 0;
+    p->m8C = -1;
+    p->m90 = -1;
+    p->m94 = -1;
+    p->m9C = 0;
+    p->mA4 = 0;
+    p->mDC = 0;
+    p->mE0 = 0;
+    p->mE4 = 0;
+    FERecInit(&p->mEC);
+}
+
 extern "C" void fn_800A50F0(void* self, int (*arr)[2])
 {
     int g = lbl_8061930C;
@@ -142,6 +354,61 @@ extern "C" void fn_800A50F0(void* self, int (*arr)[2])
         sp8 = t;
         e1 = t;
     } while (e1 <= 1);
+}
+
+extern "C" int fn_8007F3A0(int g);
+extern "C" void fn_80078AE0(int g, int a, int* b, int* c, int* d, int* e);
+extern "C" int fn_8007FDF8(int g);
+extern "C" float fn_80079EFC(int g, int a);
+
+/* near-miss (99.5%): lim and idx take r30/r29 swapped */
+extern "C" int fn_800A588C(void* self, int idx)
+{
+    int g = lbl_8061930C;
+    int r = fn_8007F3A0(g);
+    if (r != 0) {
+        return r;
+    }
+    int h = fn_80075948(g, idx);
+    if (h != 0) {
+        int k = fn_80078A38(g, idx);
+        int lim = 0;
+        switch (k) {
+        case 0:
+            lim = 0x19;
+            break;
+        case 1:
+            lim = 0x14;
+            break;
+        case 2:
+            lim = 0x14;
+            break;
+        case 3:
+            lim = 0x14;
+            break;
+        }
+        if ((int)fn_8007F198(g, idx) < lim) {
+            return 5;
+        }
+    }
+    int a;
+    int b;
+    int c;
+    int d;
+    fn_80078AE0(g, idx, &a, &b, &c, &d);
+    if (d <= 9) {
+        return 3;
+    }
+    if (fn_8007FDF8(g) == 0xC || fn_8007FDF8(g) == 0xD) {
+        int one = *(int*)((char*)fn_8007FE04(g) + 0x1E0) == 1;
+        if (h != 0 && one) {
+            float s = fn_80079EFC(g, h);
+            if (s < 0.0f) {
+                return 7;
+            }
+        }
+    }
+    return 0;
 }
 
 struct Unk800A59F0 {
@@ -289,6 +556,28 @@ extern "C" void fn_800A625C(char* o)
     *(int*)((char*)q->m14 + 0x1BD4) = b;
 }
 
+extern "C" int fn_8007FB40(int g, int a);
+extern "C" unsigned fn_8007FB2C(int g, int a);
+extern "C" int fn_8007FB98(int g, int a, int b, int c);
+extern "C" int fn_8007B8C4(int g, int a, int b);
+extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+struct Unk800A6340 {
+    char pad0[0x28];
+    int m28;
+};
+
+extern "C" void fn_800A6340(Unk800A6340* o)
+{
+    int g = lbl_8061930C;
+    Unk800A641C_Q* q = lbl_806192E0->m4;
+    int h = q->mC->m84;
+    int pl = q->m14->m198;
+    int r = fn_8056A2F8(o->m28, fn_8007FB40(g, h) + 1, 0, 1, h, pl, 0, 0, 0, 0x1A);
+    if (r != -1 && (unsigned)r < fn_8007FB2C(g, h)) {
+        *(int*)((char*)q->m14 + 0x1D50) = fn_8007B8C4(g, 2, fn_8007FB98(g, r, 1, h));
+    }
+}
+
 extern "C" void fn_800A641C()
 {
     int g = lbl_8061930C;
@@ -299,6 +588,83 @@ extern "C" void fn_800A641C()
     p1->mD74 = fn_800768E0(g, z[1].m198);
     Unk800A641C_Pl* z0 = q->m14;
     z0->mD74 = fn_800768E0(g, a);
+}
+
+extern "C" void fn_8040074C(void* p, int n);
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A2A8[];
+struct FeAr {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* vp;
+    int m14;
+};
+
+inline void FeArBase(FeAr* a, int* buf, int cap)
+{
+    a->vp = lbl_8064B298;
+    a->m0 = buf;
+    a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+
+inline void FeArMid(FeAr* a)
+{
+    a->m4 = 0;
+    a->mC = 0;
+    a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
+
+inline void FeArD3(FeAr* a)
+{
+    a->vp = lbl_8064A2A8;
+    a->m4 = 0;
+    a->mC = 0;
+    a->m14 = 0;
+}
+
+inline void FeArDtor(FeAr* a)
+{
+    a->vp = lbl_8064A550;
+}
+
+extern "C" void fn_805371C4(FeAr* a, int mask);
+extern "C" int fn_8007B3E0(int g, int a, int b);
+extern "C" void fn_8007B4A8(int g, int a, int b, int c);
+
+inline unsigned FeArCount(FeAr* a)
+{
+    return a->m4;
+}
+
+inline int FeArGet(FeAr* a, int i)
+{
+    char* b = (char*)a->m0;
+    int off = i * 4;
+    return *(int*)(b + off);
+}
+
+extern "C" void fn_800A6484()
+{
+    int g = lbl_8061930C;
+    FeAr a;
+    int buf[0x82];
+    FeArBase(&a, buf, 0x82);
+    FeArMid(&a);
+    FeArD3(&a);
+    fn_805371C4(&a, 0x7000003F);
+    for (unsigned i = 0; i < FeArCount(&a); i++) {
+        int h = fn_80075948(g, FeArGet(&a, i));
+        fn_8007B4A8(g, 0x16, h, fn_8007B3E0(g, 0x17, h));
+        fn_8007B4A8(g, 0x17, h, fn_8007B3E0(g, 0x18, h));
+        fn_8007B4A8(g, 0x18, h, fn_8007B3E0(g, 0x19, h));
+        fn_8007B4A8(g, 0x19, h, 0);
+    }
+    FeArDtor(&a);
 }
 
 struct Unk800A65F4 {
@@ -350,6 +716,42 @@ extern "C" void fn_800A724C(char* o, int a, Unk800A724C_Stream* s)
     s->v1(a, o, 0xF0);
     s->v1(a, o + 0xF0, 0x438);
     s->v1(a, o + 0x528, 0xC);
+}
+
+struct A240x {
+    int w[60];
+};
+struct A1080x {
+    int w[270];
+};
+struct R12x {
+    int a;
+    int b;
+    int c;
+};
+struct R20x {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+};
+struct Unk800A72E4 {
+    A240x a;
+    A1080x b;
+    R12x c;
+    int d;
+    R20x e;
+};
+
+extern "C" void fn_800A72E4(Unk800A72E4* dst, Unk800A72E4* src)
+{
+    fn_800A6D60(dst);
+    dst->a = src->a;
+    dst->b = src->b;
+    dst->c = src->c;
+    dst->e = src->e;
+    dst->d = src->d;
 }
 
 /* near-miss (7 of 43 slots): address-arithmetic operand order in the index expressions */
