@@ -307,6 +307,28 @@ extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
         lbl_8062C66C(o, 0x3C);
 }
 
+/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
+struct Unk803E6950_Names {
+    char pad0[4];
+    char** m4;
+};
+
+struct Unk803E6950_Tbl {
+    Unk803E6950_Names* m0;
+    char pad4[4];
+    Unk803E6660_Ent e[1];
+};
+
+struct Unk803E6950 {
+    int m0;
+    int m4;
+    Unk803E6950_Tbl* m8;
+    Unk803E6660_Rec* mC;
+    int m10;
+    char pad14[0x2C - 0x14];
+    int m2C;
+};
+
 extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
 {
     int ok = 0;
@@ -341,25 +363,6 @@ extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
     return ok;
 }
 
-/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
-struct Unk803E6950_Names {
-    char pad0[4];
-    char** m4;
-};
-
-struct Unk803E6950_Tbl {
-    Unk803E6950_Names* m0;
-};
-
-struct Unk803E6950 {
-    char pad0[8];
-    Unk803E6950_Tbl* m8;
-    char padC[4];
-    int m10;
-    char pad14[0x2C - 0x14];
-    int m2C;
-};
-
 extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
 {
     int found = -1;
@@ -385,6 +388,30 @@ extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c
         }
     }
     return fn_803E6A70(o, found, a, b, c);
+}
+
+extern char lbl_8060CB34[];
+extern "C" int fn_803E7320(int level, const char* fmt, ...);
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int idx, int val, int flag, int extra)
+{
+    int r = 0;
+    if (idx != -1) {
+        if (val & 3)
+            fn_803E7320(0, lbl_8060CB34, o->m8->m0->m4[idx], 4);
+        o->mC[idx].m0 = (void*)val;
+        o->mC[idx].m4 = flag;
+        Unk803E6950_Tbl* h = o->m8;
+        Unk803E6660_Ent* e = &h->e[idx];
+        if (flag == 0) {
+            e->m4 = (int)o->mC[idx].m0;
+            e->m0 = 1;
+        } else {
+            o->mC[idx].m8 = extra;
+        }
+        r = 1;
+    }
+    return r;
 }
 
 extern "C" int fn_803E6B3C(Unk803E6660* o)
