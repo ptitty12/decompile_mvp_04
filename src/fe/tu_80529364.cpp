@@ -5,6 +5,21 @@
 
 #include "game/fe_80516990.h"
 
+extern "C" void fn_80134EC8(void* self);
+extern "C" void fn_800EC1B8(void* self);
+extern "C" void fn_804BB988(float a, float b);
+extern "C" void fn_80525670(int a, int b);
+extern const float lbl_805FC4DC;
+extern const float lbl_805FC4E0;
+extern const char lbl_80667638[];
+extern const char lbl_80667650[];
+extern const char lbl_80668BB8[];
+extern const char lbl_80669498[];
+extern const char lbl_806694B0[];
+extern const char lbl_8066CA20[];
+extern const char lbl_8066CA38[];
+extern const char lbl_8066E250[];
+extern const char lbl_8066E268[];
 extern "C" void fn_804BB17C(FeScrD* x);
 extern const char lbl_80670C10[];
 extern const char lbl_8066FE18[];
@@ -30,8 +45,27 @@ extern const char lbl_80667920[];
 extern const char lbl_80672168[];
 extern "C" void fn_80377408(void* p);
 extern const char lbl_80671D28[];
+extern "C" void fn_804BFE54(void* x, int k, int a);
+extern const char lbl_80666EC0[];
+extern const char lbl_806672D8[];
+extern "C" void fn_80330870(void* self, int c);
+extern const char lbl_80667288[];
+extern const char lbl_80667238[];
+extern const char lbl_806671E8[];
+extern const char lbl_80667198[];
+extern "C" void fn_80529364(FeVptr<0xCC0>* self, int c);
+extern "C" void fn_80529398(void* x, int a);
+extern "C" int fn_805293A0(void* x);
+extern "C" int fn_805293A8(void* x);
+extern "C" void fn_805293C0(void* x, int a);
+extern "C" int fn_805293C8(void* x);
+extern "C" void fn_805293D0(FeScrN* x, int a);
+extern "C" void fn_8052941C(FeVptr<0xCC0>* self, int c);
 extern "C" void fn_80529450(FeScrD* x);
+extern "C" void fn_80529520(FeScrN* self);
+extern "C" void fn_80529558(FeScrN* self);
 extern "C" int fn_80529590(void);
+extern "C" void fn_80529598(FeScrN* self);
 extern "C" void fn_805295D0(FeScrN* self);
 extern "C" void fn_8052967C(FeScrN* self);
 extern "C" int fn_805296B4(void);
@@ -48,6 +82,12 @@ extern "C" void fn_805298E0(FeScrN* self);
 extern "C" void fn_80529910(FeScrN* self);
 extern "C" void fn_805299A8(FeScrN* self);
 extern "C" void fn_805299D8(FeScrN* self);
+extern "C" int fn_80529A08(void);
+extern "C" int fn_80529A10(void);
+extern "C" int fn_80529A18(void);
+extern "C" int fn_80529A20(void);
+extern "C" void fn_80529A28(void* x, int a);
+extern "C" int fn_80529A30(void* x);
 extern "C" void fn_80529AAC(FeScrN* self);
 extern "C" void fn_80529ADC(FeScrN* self);
 extern "C" void fn_80529C74(FeScrN* self);
@@ -55,23 +95,25 @@ extern "C" void fn_80529CA4(FeScrN* self);
 extern "C" void fn_80529CD4(FeScrN* self);
 extern "C" void fn_80529D04(FeScrN* self);
 extern "C" int fn_80529D9C(void);
-extern "C" void fn_80529398(void* x, int a);
-extern "C" int fn_805293A0(void* x);
-extern "C" int fn_805293A8(void* x);
-extern "C" void fn_805293C0(void* x, int a);
-extern "C" int fn_805293C8(void* x);
-extern "C" int fn_80529A08(void);
-extern "C" int fn_80529A10(void);
-extern "C" int fn_80529A18(void);
-extern "C" int fn_80529A20(void);
-extern "C" void fn_80529A28(void* x, int a);
-extern "C" int fn_80529A30(void* x);
-extern "C" void fn_80529364(FeVptr<0xCC0>* self, int c);
-extern "C" void fn_805293D0(FeScrN* x, int a);
-extern "C" void fn_8052941C(FeVptr<0xCC0>* self, int c);
-extern "C" void fn_80529520(FeScrN* self);
-extern "C" void fn_80529558(FeScrN* self);
-extern "C" void fn_80529598(FeScrN* self);
+extern "C" void fn_80529600(void* x, int a);
+extern "C" void fn_8052962C(void* x, int a);
+extern "C" void fn_80529654(void* x, int a);
+extern "C" void fn_80529DA4(FeScrN* self, int c);
+extern "C" void fn_80529DE4(FeScrN* self, int c);
+extern "C" void fn_80529E4C(FeScrN* self, int c);
+extern "C" void fn_80529E90(FeScrN* self, int c);
+extern "C" void fn_80529ED0(FeScrN* self, int c);
+extern "C" int fn_805293B0(void* x, int i);
+extern "C" int fn_80529408(void* x);
+extern "C" void fn_80529470(FeVCC0* x, float a, float b, float c, float d);
+extern "C" void fn_805294BC(float a, float b);
+extern "C" void fn_805294F0(float a);
+extern "C" void fn_805296F0(FeScrN* self, int c);
+extern "C" void fn_8052978C(FeScrN* self, int c);
+extern "C" void fn_80529940(FeScrN* self, int c);
+extern "C" void fn_80529D34(FeScrN* self, int c);
+extern "C" void fn_80529A38(FeScrN* self, int c);
+extern "C" void fn_8052A1DC(void);
 
 extern "C" FE_OVERLAY void fn_80529364(FeVptr<0xCC0>* self, int c)
 {
@@ -96,6 +138,11 @@ extern "C" FE_OVERLAY int fn_805293A8(void* x)
     return FeI(x, 0xcb4);
 }
 
+extern "C" FE_OVERLAY int fn_805293B0(void* x, int i)
+{
+    return FeKeyAt((char*)x + 0x344, i * 0x324);
+}
+
 extern "C" FE_OVERLAY void fn_805293C0(void* x, int a)
 {
     FeI(x, 0x20) = a;
@@ -111,6 +158,11 @@ extern "C" FE_OVERLAY void fn_805293D0(FeScrN* x, int a)
     ((FeW*)FeI(x, 0xCBC))->fn_vslot8(a);
 }
 
+extern "C" FE_OVERLAY int fn_80529408(void* x)
+{
+    return FeP(x, 0xCBC)->b0;
+}
+
 extern "C" FE_OVERLAY void fn_80529418(void) {}
 
 extern "C" FE_OVERLAY void fn_8052941C(FeVptr<0xCC0>* self, int c)
@@ -124,6 +176,21 @@ extern "C" FE_OVERLAY void fn_8052941C(FeVptr<0xCC0>* self, int c)
 extern "C" FE_OVERLAY void fn_80529450(FeScrD* x)
 {
     fn_804BB17C(x);
+}
+
+extern "C" FE_OVERLAY void fn_80529470(FeVCC0* x, float a, float b, float c, float d)
+{
+    x->s27(b, d);
+}
+
+extern "C" FE_OVERLAY void fn_805294BC(float a, float b)
+{
+    fn_804BB988(lbl_805FC4DC, b);
+}
+
+extern "C" FE_OVERLAY void fn_805294F0(float a)
+{
+    fn_804BB988(lbl_805FC4E0, a);
 }
 
 extern "C" FE_OVERLAY void fn_80529520(FeScrN* self)
@@ -158,7 +225,22 @@ extern "C" FE_OVERLAY void fn_805295D0(FeScrN* self)
     fn_8035686C(self);
 }
 
+extern "C" FE_OVERLAY void fn_80529600(void* x, int a)
+{
+    fn_804BFE54(x, 0, a);
+}
+
 extern "C" FE_OVERLAY void fn_80529628(void) {}
+
+extern "C" FE_OVERLAY void fn_8052962C(void* x, int a)
+{
+    fn_804BFE54(x, 0, a);
+}
+
+extern "C" FE_OVERLAY void fn_80529654(void* x, int a)
+{
+    fn_804BFE54(x, 1, a);
+}
 
 extern "C" FE_OVERLAY void fn_8052967C(FeScrN* self)
 {
@@ -183,6 +265,14 @@ extern "C" FE_OVERLAY void fn_805296C0(FeScrN* self)
     fn_8035686C(self);
 }
 
+extern "C" FE_OVERLAY void fn_805296F0(FeScrN* self, int c)
+{
+    FeI(self, 0x1BC) = (int)lbl_8066E250;
+    self->SetVptr(lbl_8066E268);
+    ((FeDtorFn)fn_80134EC8)((char*)self + 0x174, 0);
+    ((FeDtorFn)fn_804D2BCC)(self, c);
+}
+
 extern "C" FE_OVERLAY void fn_8052974C(FeScrN* self)
 {
     self->SetVptr(lbl_8066DFA8);
@@ -197,6 +287,14 @@ extern "C" FE_OVERLAY int fn_8052977C(void)
 extern "C" FE_OVERLAY int fn_80529784(void)
 {
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8052978C(FeScrN* self, int c)
+{
+    FeI(self, 0x17C) = (int)lbl_8066CA20;
+    self->SetVptr(lbl_8066CA38);
+    ((FeDtorFn)fn_80134EC8)((char*)self + 0x134, 0);
+    ((FeDtorFn)fn_8035686C)(self, c);
 }
 
 extern "C" FE_OVERLAY void fn_805297E8(FeScrN* self)
@@ -245,6 +343,15 @@ extern "C" FE_OVERLAY void fn_80529910(FeScrN* self)
     fn_804D2BCC(self);
 }
 
+extern "C" FE_OVERLAY void fn_80529940(FeScrN* self, int c)
+{
+    FeI(self, 0x1C4) = (int)lbl_80669498;
+    self->SetVptr(lbl_806694B0);
+    ((FeDtorFn)fn_80134EC8)((char*)self + 0x17C, 0);
+    self->SetVptr(lbl_80669780);
+    ((FeDtorFn)fn_804D2BCC)(self, c);
+}
+
 extern "C" FE_OVERLAY void fn_805299A8(FeScrN* self)
 {
     self->SetVptr(lbl_806691F0);
@@ -287,6 +394,18 @@ extern "C" FE_OVERLAY int fn_80529A30(void* x)
     return FeI(x, 0x160);
 }
 
+extern "C" FE_OVERLAY void fn_80529A38(FeScrN* self, int c)
+{
+    self->SetVptr(lbl_80668BB8);
+    FeW* a = (FeW*)((char*)self + 0x440);
+    a->SetVptr(lbl_80668EA0);
+    ((FeDtorFn)fn_800EC5F4__FP8UiScrRaw)(a, 2);
+    FeW* b = (FeW*)((char*)self + 0x2DC);
+    b->SetVptr(lbl_80668EA0);
+    ((FeDtorFn)fn_800EC5F4__FP8UiScrRaw)(b, 2);
+    ((FeDtorFn)fn_800EC1B8)(self, c);
+}
+
 extern "C" FE_OVERLAY void fn_80529AAC(FeScrN* self)
 {
     self->SetVptr(lbl_80668910);
@@ -325,7 +444,89 @@ extern "C" FE_OVERLAY void fn_80529D04(FeScrN* self)
     fn_8035686C(self);
 }
 
+extern "C" FE_OVERLAY void fn_80529D34(FeScrN* self, int c)
+{
+    FeI(self, 0x1C4) = (int)lbl_80667638;
+    self->SetVptr(lbl_80667650);
+    ((FeDtorFn)fn_80134EC8)((char*)self + 0x17C, 0);
+    self->SetVptr(lbl_80669780);
+    ((FeDtorFn)fn_804D2BCC)(self, c);
+}
+
 extern "C" FE_OVERLAY int fn_80529D9C(void)
 {
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_80529DA4(FeScrN* self, int c)
+{
+    FeI(self, 0x2DC) = (int)lbl_806672D8;
+    FeI(self, 0x33C) = (int)lbl_80666EC0;
+    FeI(self, 0x2E8) = (int)lbl_80666EC0;
+    fn_80330870(self, c);
+}
+
+extern "C" FE_OVERLAY void fn_80529DE4(FeScrN* self, int c)
+{
+    FeI(self, 0x2DC) = (int)lbl_80667288;
+    FeI(self, 0x6D4) = (int)lbl_80666EC0;
+    FeI(self, 0x66C) = (int)lbl_80666EC0;
+    FeI(self, 0x608) = (int)lbl_80666EC0;
+    FeI(self, 0x5A4) = (int)lbl_80666EC0;
+    FeI(self, 0x540) = (int)lbl_80666EC0;
+    FeI(self, 0x4DC) = (int)lbl_80666EC0;
+    FeI(self, 0x47C) = (int)lbl_80666EC0;
+    FeI(self, 0x418) = (int)lbl_80666EC0;
+    FeI(self, 0x3CC) = (int)lbl_80666EC0;
+    FeI(self, 0x380) = (int)lbl_80666EC0;
+    FeI(self, 0x334) = (int)lbl_80666EC0;
+    FeI(self, 0x2E8) = (int)lbl_80666EC0;
+    fn_80330870(self, c);
+}
+
+extern "C" FE_OVERLAY void fn_80529E4C(FeScrN* self, int c)
+{
+    FeI(self, 0x2DC) = (int)lbl_80667238;
+    FeI(self, 0x39C) = (int)lbl_80666EC0;
+    FeI(self, 0x334) = (int)lbl_80666EC0;
+    FeI(self, 0x2E8) = (int)lbl_80666EC0;
+    fn_80330870(self, c);
+}
+
+extern "C" FE_OVERLAY void fn_80529E90(FeScrN* self, int c)
+{
+    FeI(self, 0x2DC) = (int)lbl_806671E8;
+    FeI(self, 0x334) = (int)lbl_80666EC0;
+    FeI(self, 0x2E8) = (int)lbl_80666EC0;
+    fn_80330870(self, c);
+}
+
+extern "C" FE_OVERLAY void fn_80529ED0(FeScrN* self, int c)
+{
+    FeI(self, 0x2DC) = (int)lbl_80667198;
+    FeI(self, 0x984) = (int)lbl_80666EC0;
+    FeI(self, 0x930) = (int)lbl_80666EC0;
+    FeI(self, 0x8CC) = (int)lbl_80666EC0;
+    FeI(self, 0x878) = (int)lbl_80666EC0;
+    FeI(self, 0x810) = (int)lbl_80666EC0;
+    FeI(self, 0x7BC) = (int)lbl_80666EC0;
+    FeI(self, 0x758) = (int)lbl_80666EC0;
+    FeI(self, 0x6F4) = (int)lbl_80666EC0;
+    FeI(self, 0x6A0) = (int)lbl_80666EC0;
+    FeI(self, 0x63C) = (int)lbl_80666EC0;
+    FeI(self, 0x5D8) = (int)lbl_80666EC0;
+    FeI(self, 0x574) = (int)lbl_80666EC0;
+    FeI(self, 0x510) = (int)lbl_80666EC0;
+    FeI(self, 0x4AC) = (int)lbl_80666EC0;
+    FeI(self, 0x458) = (int)lbl_80666EC0;
+    FeI(self, 0x3F4) = (int)lbl_80666EC0;
+    FeI(self, 0x390) = (int)lbl_80666EC0;
+    FeI(self, 0x33C) = (int)lbl_80666EC0;
+    FeI(self, 0x2E8) = (int)lbl_80666EC0;
+    fn_80330870(self, c);
+}
+
+extern "C" FE_OVERLAY void fn_8052A1DC(void)
+{
+    fn_80525670(1, 0xFFFF);
 }
