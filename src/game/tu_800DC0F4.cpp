@@ -438,6 +438,51 @@ void fn_800DF064(void* d, int n)
     }
 }
 
+void fn_800DF1EC(int n, int* a, int* b);
+
+extern "C" int fn_800DF0DC(int v, int digits)
+{
+    int cnt;
+    int p;
+    int r = v < 0 ? -v : v;
+    int rem = r;
+    fn_800DF1EC(r, &cnt, &p);
+    if (cnt > digits) {
+        int i = 0;
+        if (i < digits) {
+            int q = p / 10;
+            rem = r % p;
+            p = q;
+            if (q > 0) {
+                int t = q;
+                do {
+                    i++;
+                    if (i < digits) {
+                        int tmp = (rem / t) * t;
+                        t /= 10;
+                        rem -= tmp;
+                    } else
+                        break;
+                } while (t > 0);
+                p = t;
+                goto round;
+            }
+        } else {
+        round:
+            if (p > 0) {
+                rem = rem / p;
+                if (rem > 4)
+                    r += p * 10;
+                int t10 = p * 10;
+                r = (r / t10) * t10;
+            }
+        }
+    }
+    if (v < 0)
+        r = -r;
+    return r;
+}
+
 void fn_800DF1EC(int n, int* a, int* b)
 {
     *a = 1;
