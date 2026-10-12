@@ -65,37 +65,31 @@ float fn_8005D404(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
     return v;
 }
 
-/* near-miss: same compares and constants as retail, but the two int-to-float
- * conversions come out in the opposite order (about 25 slots differ). */
 float fn_8005D438(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
 {
-    if (!((float)obj->m0 <= (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD28) && !((float)obj->m0 <= (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD30)) {
+    if (!((float)(int)obj->m0 <= (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD28) && !((float)(int)obj->m0 <= (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD30)) {
         return lbl_805ADD34;
     }
     return lbl_805ADD2C;
 }
 
-/* near-miss: same compares and constants as retail, but the two int-to-float
- * conversions come out in the opposite order (about 25 slots differ). */
 float fn_8005D4E4(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
 {
-    if (!((float)obj->m0 < (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD48) && !((float)obj->m0 > (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD4C)) {
+    if (!((float)(int)obj->m0 < (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD48) && !((float)(int)obj->m0 > (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD4C)) {
         return lbl_805ADD50;
     }
     return lbl_805ADD54;
 }
 
-/* near-miss: same compares and constants as retail, but the two int-to-float
- * conversions come out in the opposite order (about 25 slots differ). */
 float fn_8005D588(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)
 {
-    if (!((float)obj->m0 < (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD68)) {
+    if (!((float)(int)obj->m0 < (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD68)) {
         return lbl_805ADD6C;
     }
-    if (!((float)obj->m0 >= (float)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD70)) {
-        return lbl_805ADD78;
+    if ((float)(int)obj->m0 >= (float)(unsigned)obj->m130->m44C->m6F8->m10->m1C * lbl_805ADD70) {
+        return lbl_805ADD74;
     }
-    return lbl_805ADD74;
+    return lbl_805ADD78;
 }
 
 float fn_8005D63C(Unk80057204_Mgr* self, int a, int b, Unk80052794_Obj* obj)

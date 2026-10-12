@@ -27,7 +27,6 @@ int fn_8053AD1C(Rec* r, int a);
 void fn_8053CC1C(Rec* r);
 
 int fn_8007DDC8(A* self, int a, int group, int idx);
-int fn_8007DDC8(A* self, int a, int group);
 int fn_8007DEAC(A* self, int a, int group);
 int fn_8007DF5C(A* self, int a, int group, int idx);
 int fn_8007E0E4(A* self, int a, int group);
@@ -65,13 +64,11 @@ int fn_8007DBBC(A* self, int idx)
     return 0;
 }
 
-/* near-miss: two slots (the loaded i is compared from r0 here, r6 in retail).
- * Retail calls fn_8007DDC8 with only three arguments (r6 is left stale). */
 int fn_8007DC08(A* self, int a, int target, int c, int* out)
 {
     Unk8007DB74_Iter<9> it;
     while (it.i < fn_8007DEAC(self, a, c)) {
-        if (fn_8007DDC8(self, a, c) == target) {
+        if (fn_8007DDC8(self, a, c, it.i) == target) {
             *out = it.i;
             return 1;
         }
@@ -101,19 +98,20 @@ void fn_8007DD38(A* self, int a, int b, int c, int d)
         fn_805A1958(r, b, c, 0xFF);
 }
 
-/* near-miss: only the register choice of the loaded byte and the offset/base
- * temporaries differ. */
 int fn_8007DDC8(A* self, int a, int group, int idx)
 {
     Tbl* t = self->m58;
     int i = fn_805A19C8(t);
-    Rec* r = (Rec*)(i * 0x1E0 + (int)t->m10);
+    int rb = i * 0x1E0 + (int)t->m10;
     if (idx == 0)
-        return fn_8053CAE0(r);
-    unsigned char v = r->mF0[group].b[idx];
-    if (v != 0xFF)
-        return r->m0[v];
-    return 0;
+        return fn_8053CAE0((Rec*)rb);
+    int ba = rb + 0xF0;
+    int bo = idx + group * 0x30;
+    unsigned char v = *(unsigned char*)(ba + bo);
+    if (v == 0xFF)
+        return 0;
+    int vo = v * 4;
+    return *(int*)((char*)((Rec*)rb)->m0 + vo);
 }
 
 unsigned char fn_8007DE50(A* self, int a, int group, int idx)
@@ -146,22 +144,36 @@ int fn_8007DF5C(A* self, int a, int group, int idx)
 {
     Tbl* t = self->m58;
     int i = fn_805A19C8(t);
-    Rec* r = (Rec*)(i * 0x1E0 + (int)t->m10);
-    int w = r->mF0[group].w[idx];
+    int rb = i * 0x1E0 + (int)t->m10;
+    int go = group * 0x30;
+    int io = idx * 4;
+    int wa = rb + 0xFC;
+    int wo = io + go;
+    int w = *(int*)(wa + wo);
     if (w == 0)
-        return fn_8053CAE0(r);
-    unsigned char v = r->mF0[group].b[w];
-    if (v != 0xFF)
-        return r->m0[v];
-    return 0;
+        return fn_8053CAE0((Rec*)rb);
+    int ba = rb + 0xF0;
+    int bo = w + go;
+    unsigned char v = *(unsigned char*)(ba + bo);
+    if (v == 0xFF)
+        return 0;
+    int vo = v * 4;
+    return *(int*)((char*)((Rec*)rb)->m0 + vo);
 }
 
 unsigned char fn_8007DFF4(A* self, int a, int group, int idx)
 {
     Tbl* t = self->m58;
     int i = fn_805A19C8(t);
-    Rec* r = (Rec*)(i * 0x1E0 + (int)t->m10);
-    return r->mF0[group].b[r->mF0[group].w[idx]];
+    int rb = i * 0x1E0 + (int)t->m10;
+    int go = group * 0x30;
+    int io = idx * 4;
+    int wa = rb + 0xFC;
+    int wo = io + go;
+    int w = *(int*)(wa + wo);
+    int ba = rb + 0xF0;
+    int bo = w + go;
+    return *(unsigned char*)(ba + bo);
 }
 
 int fn_8007E060(A* self, int a, int group, int idx)

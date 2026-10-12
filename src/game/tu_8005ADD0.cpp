@@ -109,6 +109,37 @@ void fn_8005B06C(Unk8005ADD0_Obj* o)
     }
 }
 
+extern const char lbl_805B07A1[];
+extern char lbl_80687628[];
+extern "C" void fn_803A9204(void* p);
+extern "C" int fn_803A85B0(int h, int a, void* b);
+
+/* near-miss (2 slots): retail loads o->m78 (r4) before the handle (r3) for the fn_803ADA2C call. */
+void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
+{
+    o->mC[ch].mHandle = -1;
+    Unk800401E4* s = &o->mAC;
+    if (s->m8 == 0)
+        s->fn_8004028C(lbl_805B07A1 + ch * 0x42, 0, 0, 0);
+    if (s->m8 == 1) {
+        int h = s->m4;
+        fn_803A9204(lbl_80687628);
+        char* b = lbl_80687628;
+        lbl_80687628[0] = 0;
+        fn_803A975C();
+        o->mC[ch].mHandle = fn_803A85B0(h, 0, b);
+        fn_803A979C();
+        if (o->mC[ch].mHandle >= 0) {
+            fn_803A975C();
+            fn_803ADA2C(o->mC[ch].mHandle, o->m78);
+            fn_803A979C();
+            o->mC[ch].mState = 3;
+            return;
+        }
+    }
+    o->mC[ch].mState = 5;
+}
+
 void fn_8005B414(Unk8005ADD0_Obj* o)
 {
     int ok = 0;
@@ -176,7 +207,6 @@ void fn_8005B58C(Unk8005ADD0_Obj* o, int a)
     }
 }
 
-/* near-miss (1 slot): retail reloads o->mA4 for the final return; this reuses cur. */
 int fn_8005B6E4(Unk8005ADD0_Obj* o)
 {
     int cur = o->mA4;
@@ -190,7 +220,7 @@ int fn_8005B6E4(Unk8005ADD0_Obj* o)
             return i;
         }
     }
-    return o->mA4;
+    return *(volatile int*)&o->mA4;
 }
 
 void fn_8005B76C(Unk8005ADD0_Obj* o, int vol)
@@ -350,8 +380,6 @@ void fn_8005BE30(Unk8005BA1C_Obj* o)
     }
 }
 
-/* near-miss (121 vs 119 instructions): retail branches on 'any == 0' where this build emits an
- * xori, and the callee-saved registers are numbered one lower. */
 int fn_8005BEE4(Unk8005BA1C_Obj* o, int ch)
 {
     int r = 0;
@@ -375,13 +403,13 @@ int fn_8005BEE4(Unk8005BA1C_Obj* o, int ch)
                 }
             }
         }
-        int v = 0;
         if (r == 0 && any == 1) {
-            v = -2;
+            o->mC[ch] = -2;
         } else if (any == 0) {
-            v = 1;
+            o->mC[ch] = 1;
+        } else {
+            o->mC[ch] = 0;
         }
-        o->mC[ch] = v;
         o->m2C = -1;
         for (int j = 0; j < 8; j++) {
             if (o->mC[j] >= 0) {
@@ -399,26 +427,28 @@ int fn_8005BEE4(Unk8005BA1C_Obj* o, int ch)
         return 0;
     case 1:
         return 1;
+    case -2:
+        return -2;
     default:
         return -2;
     }
 }
 
-/* near-miss (98 vs 96 instructions): retail materialises the constant 0 once in r8 and copies it
- * into the outer loop counter (mr r24,r8); this build emits a separate li. */
 void fn_8005C0C8(Unk8005BA1C_Obj* o, int ch)
 {
+    int i = 0;
+    int j = 0;
     int r = 0;
     if (o->m0 == 1) {
         if (o->mC[ch] >= 0) {
             o->mC[ch] = -1;
             o->m2C = -1;
-            for (int i = 0; i < 4; i++) {
+            for (i = 0; i < 4; i++) {
                 if (o->m30[i].m0 != 0) {
                     if (lbl_805B10B4[ch].mA0[i] == 1) {
                         fn_8005A19C(o->m30[i].m0);
                     }
-                    for (int j = 0; j < 8; j++) {
+                    for (j = 0; j < 8; j++) {
                         if (o->mC[j] >= 0 && lbl_805B10B4[j].mA0[i] == 1) {
                             int k = lbl_805AE420[ch].e[i].m24;
                             if (k == 0) {
@@ -431,7 +461,7 @@ void fn_8005C0C8(Unk8005BA1C_Obj* o, int ch)
                     }
                 }
             }
-            for (int j = 0; j < 8; j++) {
+            for (j = 0; j < 8; j++) {
                 if (o->mC[j] >= 0) {
                     o->m2C = o->mC[j];
                     break;

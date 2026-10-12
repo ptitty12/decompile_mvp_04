@@ -99,6 +99,34 @@ int Unk8007A4DC_Screen::fn_80077404(int a, int b)
     return total;
 }
 
+float Unk8007A4DC_Screen::fn_800774E8(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned t0 = 0;
+    unsigned t1 = 0;
+    unsigned t2 = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1) {
+            t0 += fn_8007455C(0, id, b);
+            t1 += fn_8007455C(1, id, b);
+            t2 += fn_8007455C(2, id, b);
+        }
+    }
+    float tot = ((float)t0 + (float)t2) + (float)t1;
+    float res = 0.0f;
+    if (!(tot <= 0.0f))
+        res = ((float)t0 + (float)t2) / tot;
+    return res;
+}
+
 int Unk8007A4DC_Screen::fn_80077684(int a, int b)
 {
     Unk805A19C8_Roster* r = m58;
@@ -173,6 +201,63 @@ int Unk8007A4DC_Screen::fn_80077934(int a, int b)
             total += fn_80074754(11, id, b);
     }
     return total;
+}
+
+float Unk8007A4DC_Screen::fn_80077A18(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned t0 = 0;
+    unsigned t1 = 0;
+    unsigned t2 = 0;
+    unsigned i = 0;
+    unsigned char cnt = r->m10[fn_805A19C8(r, a)].m7;
+    for (; i < cnt; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m1C0), &x, id) != 0;
+        if (f == 1) {
+            t0 += fn_80074754(1, id, b);
+            t1 += fn_80074754(2, id, b);
+            t2 += fn_80074754(6, id, b);
+        }
+    }
+    float den = (float)t0 + (float)t1 * 0.33333334f;
+    float res = 0.0f;
+    if (t0 != 0 || t1 != 0)
+        res = (float)t2 * 9.0f / den;
+    return res;
+}
+
+static inline unsigned Cnt4C(Handle* h)
+{
+    return fn_800A883C(h) ? fn_800A883C(h)->m4 : 0;
+}
+
+extern "C" int fn_80077BC4(Unk8007A4DC_Screen* self, int key)
+{
+    unsigned n = Cnt4C(&self->m4C);
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        int id = self->C2()->fn_8007290C(i);
+        if (self->C2()->fn_800757B8(id) == 1) {
+            unsigned c = self->fn_8007F198(id);
+            for (unsigned j = 0; j < c; j++) {
+                if (self->fn_8007F24C(id, (unsigned char)j) == key)
+                    return id;
+            }
+            for (unsigned k = 0; k <= 1; k++) {
+                unsigned m = self->fn_8007F674(id, k);
+                for (unsigned j = 0; j < m; j++) {
+                    if (self->fn_8007F6C4(id, k, j) == key)
+                        return id;
+                }
+            }
+        }
+    }
+    return 0;
 }
 
 void Unk8007A4DC_Screen::fn_80077CF8()
@@ -251,20 +336,17 @@ void Unk8007A4DC_Screen::fn_80078AE0(int a, int* o1, int* o2, int* o3, int* o4)
     }
 }
 
-/* near-miss (5 slots): same code, but retail stores the four sums' temporaries (t[0..3]) after
- * `*o4 = 0` and the iterator, we store them before `*o4`. The array keeps the temporaries in
- * frame order (8..0x14, iterator at 0x18) as retail has them. */
 void Unk8007A4DC_Screen::fn_80078C04(int a, int* o1, int* o2, int* o3, int* o4)
 {
+    int t[4];
     *o1 = 0;
     *o2 = 0;
     *o3 = 0;
-    int t[4];
+    *o4 = 0;
     t[0] = 0;
     t[1] = 0;
     t[2] = 0;
     t[3] = 0;
-    *o4 = 0;
     Unk8006A138_It<3> it(0);
     int j = 0;
     while (j <= 3) {
@@ -551,6 +633,7 @@ int Unk8007A4DC_Screen::fn_8007A270(int a)
     return x;
 }
 
+/* Retail treats the vcall thunk as returning nothing (sched2 argument-move order); the member declares int. */
 void Unk8007A4DC_Screen::fn_8007A2B4(int flags)
 {
     unsigned i = 0;
