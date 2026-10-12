@@ -14,20 +14,16 @@ struct Db80594A10_P : Db805942E0_P { int m18; };
 
 struct Db805951B8_T { char pad[0x1C]; const void* m1C; int a[6][14]; };
 
-extern "C" void fn_80595378(Db80593CD0_Data* self);
 unsigned fn_8007FBC0(Unk8007F198_C* self, int a, int c);
 extern "C" void fn_805942A8(Db80593CD0_Data* self);
 extern const char lbl_806845F8[];
-extern "C" void fn_80594428(Db805942E0_Data* self, int i, float f);
 extern "C" int fn_80593E7C(Db80593CD0_Data* self, int i);
 extern "C" int fn_8059377C(Db805937A4_Mgr* m, int id);
 extern "C" int fn_8059394C(Db805937A4_Mgr* m, int id);
 extern "C" Db80593CD0_Ent* fn_80594240(Db80593CD0_Data* self, int i);
 extern Unk8007A4DC_Screen* lbl_8061930C;
-extern "C" int fn_80596C7C(DbQuadTab* self, int a, int b);
 extern "C" void fn_80594148(Db80593CD0_Data* self, int a, Unk80070DDC_Stream* io);
 extern "C" void fn_80593F30(Db80593CD0_Data* self, int i, int n, float f0, float f1);
-extern "C" Db805942E0_Ent* fn_805944C0(Db805942E0_Data* self, int i);
 extern "C" unsigned char fn_80593880(Db805937A4_Mgr* m, int id);
 extern "C" int fn_800A3C98(void* o, int a, int b);
 int fn_8007F7D0(Unk8007F198_B* self, unsigned i);
@@ -40,18 +36,77 @@ extern "C" int fn_8056AC44(void* o, int a, int b);
 extern "C" int fn_8056A5F4(void* o, int a, int b, int c);
 extern "C" float fn_800A5A1C(void* o, int x);
 extern const char lbl_80682830[];
-extern "C" Db805942E0_P* fn_805942E0(Db805942E0_P* self, Db805937A4_Mgr* m, int n, int x);
-extern "C" void fn_805944D0(Db805942E0_Data* self, int i, int a, float f0, float f1, float f2, float f3);
-extern "C" void fn_80594538(Db805942E0_V* self);
-extern "C" void fn_80595044(Db805942E0_Data* self);
 extern const char lbl_80682CC8[];
 extern const char lbl_806845B0[];
 extern const char lbl_806828C8[];
 extern const char lbl_80682C50[];
 extern "C" Db80593CD0_P* fn_80593CD0(Db80593CD0_P* self, Db805937A4_Mgr* m, int b, int n, int c, float f);
 extern "C" void fn_80594250(Db80593CD0_Data* self, int i, int a, int b, int c, float f0, float f1);
-extern "C" void fn_805962F4(Db8058F924_L* self);
 extern const char lbl_80682878[];
+
+extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int fn_8007FB98__FP13Unk8007F198_Ciii(void* p, int a, int b, int c);
+
+extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int fn_8007FB98__FP13Unk8007F198_Ciii(void* p, int a, int b, int c);
+
+struct Db805945A4_Obj : Db80593CD0_P {
+    int w[9][13];
+};
+extern const float lbl_80600CA4;
+extern const float lbl_80600CA8;
+extern const float lbl_80600CAC;
+extern const float lbl_80600CB0;
+extern const float lbl_80600CB4;
+extern const float lbl_80600CB8;
+extern float lbl_80600CBC;
+extern float lbl_80600CC0;
+extern float lbl_80600CC4;
+extern char lbl_80682910[];
+/* forward declarations (definitions are in address order) */
+extern "C" Db805942E0_P* fn_805942E0(Db805942E0_P* self, Db805937A4_Mgr* m, int n, int x);
+extern "C" void fn_805943A0(Db805942E0_P* self, int chrg);
+extern "C" float fn_80594418(Db805942E0_Data* self, int i);
+extern "C" void fn_80594428(Db805942E0_Data* self, int i, float f);
+extern "C" void fn_80594448(Db805942E0_Data* self, int a, Unk80070DDC_Stream* io);
+extern "C" Db805942E0_Ent* fn_805944C0(Db805942E0_Data* self, int i);
+extern "C" void fn_805944D0(Db805942E0_Data* self, int i, int a, float f0, float f1, float f2, float f3);
+extern "C" void fn_80594538(Db805942E0_V* self);
+extern "C" Db805945A4_Obj* fn_805945A4(Db805945A4_Obj* self, Db805937A4_Mgr* m, int c, float f);
+extern "C" void fn_805947F0(Db80593CD0_Data* self);
+extern "C" int fn_80594810(Db80593CD0_Data* self, int k);
+extern "C" int fn_80594880(Db80593CD0_Data* self, int k, int r);
+extern "C" int fn_805948D0(char* self, int k, int r);
+extern "C" float fn_805948E8(Db80593CD0_Data* self);
+extern "C" Db80594A10_P* fn_80594A10(Db80594A10_P* self, int a, Db805937A4_Mgr* m, int x);
+extern "C" void fn_80594FC4(Db805942E0_Data* self, int i);
+extern "C" void fn_80595044(Db805942E0_Data* self);
+extern "C" void fn_805950A0(Db805942E0_Data* self, int key);
+extern "C" Db805951B8_T* fn_805951B8(Db805951B8_T* self, Db805937A4_Mgr* m, int x, float f);
+extern "C" void fn_80595378(Db80593CD0_Data* self);
+extern "C" int fn_80595398(Db805951B8_T* self, int idx);
+extern "C" int fn_80595408(Db80593CD0_Data* self, int k, int r);
+extern "C" int fn_80595458(char* self, int k, int r);
+extern "C" float fn_80595470(Db80593CD0_Data* self);
+extern "C" Db80594A10_P* fn_80595598(Db80594A10_P* self, int a, Db805937A4_Mgr* m, int x);
+extern "C" Db805942E0_P* fn_80595B64(Db805942E0_P* self, Db805937A4_Mgr* m, int x);
+extern "C" int fn_80595EEC(Db805942E0_V* self, int i);
+extern "C" Db805942E0_P* fn_80595F8C(Db805942E0_P* self, Db805937A4_Mgr* m, int x);
+extern "C" void fn_8059603C();
+extern "C" DbQuadTab* fn_80596040(DbQuadTab* self, Db805937A4_Mgr* m, int x);
+extern "C" void fn_805962F4(Db8058F924_L* self);
+extern "C" void fn_8059633C(DbQuadTab* self);
+extern "C" float fn_80596388(Db805937A4_Mgr** self, int id);
+extern "C" int fn_80596460(Db805937A4_Mgr** self, int id);
+extern "C" void fn_805964B4(Db805937A4_Mgr** self, int id);
+extern "C" int fn_80596538(DbQuadTab* self, int a);
+extern "C" DbQuad* fn_805965DC(DbQuadTab* self, int a);
+extern "C" void fn_80596688(DbQuadTab* self, int a, int b, int c);
+extern "C" void fn_80596748(float a, float b);
+extern "C" void fn_8059675C();
+extern "C" void fn_80596760(char* self, int a, Unk80070DDC_Stream* io);
+extern "C" int fn_80596BAC(DbQuadTab* self, int a, int b);
+extern "C" int fn_80596C7C(DbQuadTab* self, int a, int b);
 
 extern "C" DB_OVERLAY Db805942E0_P* fn_805942E0(Db805942E0_P* self, Db805937A4_Mgr* m, int n, int x)
 {
@@ -121,6 +176,47 @@ extern "C" DB_OVERLAY void fn_80594538(Db805942E0_V* self)
         i++;
         fn_80594428(self, k, p->m0);
     }
+}
+
+/* near-miss (95.2%): the 19 constant stores; retail loads the 11 distinct constants in the order 9100, 13000, 46000, 9600, 13200,
+   32000, ... and so reuses different registers. An 18-minute hill climb over the store order did not reach 0 differences. */
+extern "C" DB_OVERLAY Db805945A4_Obj* fn_805945A4(Db805945A4_Obj* self, Db805937A4_Mgr* m, int c, float f)
+{
+    fn_80593CD0(self, m, 10, 9, c, f);
+    self->m1C = lbl_80682910;
+    for (int r = 0; r < 9; r++)
+        for (int j = 0; j < 13; j++)
+            self->w[r][j] = 0;
+    self->w[8][12] = 0xB3B0;
+    self->w[3][5] = 0x238C;
+    self->w[4][2] = 0x32C8;
+    self->w[7][2] = 0x32C8;
+    self->w[6][4] = 0x238C;
+    self->w[5][9] = 0x32C8;
+    self->w[5][5] = 0x238C;
+    self->w[2][4] = 0x238C;
+    self->w[8][7] = 0x3390;
+    self->w[7][8] = 0x7D00;
+    self->w[8][11] = 0x2580;
+    self->w[8][3] = 0x1964;
+    self->w[6][10] = 0x4E20;
+    self->w[1][1] = 0xFA0;
+    self->w[7][11] = 0x2580;
+    self->w[5][0] = 0x3E80;
+    self->w[0][6] = 0xA28;
+    self->w[6][0] = 0x3E80;
+    self->w[5][6] = 0xA28;
+    fn_805947F0(self);
+    fn_80594250(self, 0, 0x5778, 4, 1, lbl_80600CA4, lbl_80600CA4);
+    fn_80594250(self, 1, 0x5779, 4, 1, lbl_80600CA8, lbl_80600CAC);
+    fn_80594250(self, 3, 0x5776, 4, 1, lbl_80600CB0, lbl_80600CB0);
+    fn_80594250(self, 2, 0x5775, 4, 1, lbl_80600CB4, lbl_80600CB4);
+    fn_80594250(self, 4, 0x5777, 4, 1, lbl_80600CB8, lbl_80600CB8);
+    fn_80594250(self, 5, 0x5773, 1, 1, lbl_80600CBC, lbl_80600CC0);
+    fn_80594250(self, 6, 0x5772, 1, 1, lbl_80600CBC, lbl_80600CC0);
+    fn_80594250(self, 7, 0x5770, 1, 1, lbl_80600CC4, lbl_80600CC0);
+    fn_80594250(self, 8, 0x5771, 1, 1, lbl_80600CC4, lbl_80600CC4);
+    return self;
 }
 
 extern "C" DB_OVERLAY void fn_805947F0(Db80593CD0_Data* self)
@@ -276,6 +372,15 @@ extern "C" DB_OVERLAY Db805951B8_T* fn_805951B8(Db805951B8_T* self, Db805937A4_M
 extern "C" DB_OVERLAY void fn_80595378(Db80593CD0_Data* self)
 {
     fn_805942A8(self);
+}
+
+extern "C" DB_OVERLAY int fn_80595398(Db805951B8_T* self, int idx)
+{
+    int s = 0;
+    int r = 0;
+    for (r = s; r <= 5; r++)
+        s += fn_80593E7C((Db80593CD0_Data*)self, r) * self->a[r][idx];
+    return s;
 }
 
 extern "C" DB_OVERLAY int fn_80595408(Db80593CD0_Data* self, int k, int r)
@@ -536,4 +641,22 @@ extern "C" DB_OVERLAY int fn_80596BAC(DbQuadTab* self, int a, int b)
         } while (i >= 0);
     }
     return cnt;
+}
+
+extern "C" DB_OVERLAY int fn_80596C7C(DbQuadTab* self, int a, int b)
+{
+    Unk8007F198_C* scr = (Unk8007F198_C*)lbl_8061930C;
+    int m28 = (int)((Db80619948_O*)lbl_80619948)->m28;
+    int hi = 0;
+    int t = fn_8007FB98__FP13Unk8007F198_Ciii(scr, a, 0, 0);
+    int lo = 0;
+    int r0 = fn_8056A2F8(m28, a, 0, 2, 0, t, 0, 2, 0, 0x1A);
+    int r1 = fn_8056A2F8(m28, a, 1, 2, 0, t, 0, 2, 0, 0x1A);
+    if (r1 != -1)
+        lo = fn_8007FBC0(scr, r1, 0);
+    if (r0 != -1)
+        hi = fn_8007FBC0(scr, r0, 0);
+    if (b == lo && b == hi)
+        return 0;
+    return 1;
 }
