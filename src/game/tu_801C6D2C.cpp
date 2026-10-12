@@ -62,6 +62,24 @@ extern "C" float fn_801C6D2C(Z* z, float f)
         fn_801C6A34(z, f);
 }
 
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" float fn_801C6FD8(Z* z)
+{
+    float r = 0.0f;
+    const float u = -3.0f;
+    float c = 31.0f;
+    float d = 31.0f;
+    float e = 31.0f;
+    if (!(AbsF(z->m140) >= 0.28f))
+        r = 11.0f;
+    else if (!(z->m140 >= 0.0f))
+        r = AbsF(z->m140) * u;
+    else
+        r = z->m140 * e;
+    return r;
+}
+
 extern "C" void fn_801C7F38(Z* z, float f)
 {
     f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
@@ -130,9 +148,55 @@ extern "C" int fn_801C8974(Z* z)
 
 extern "C" float fn_801C8A04(Z* z)
 {
-    float lo = 44.0f;
-    float hi = 52.0f;
-    return Lerp(lo, hi, RandF(z->m204->m554, 1.0f, 0x1060));
+    const float hi = 52.0f;
+    const float lo = 44.0f;
+    return LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1060), hi);
+}
+
+extern "C" float fn_801C8AC0(Z* z)
+{
+    const float hi = 65.0f;
+    const float lo = 50.0f;
+    return LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1067), hi);
+}
+
+extern "C" float fn_801C8B7C(Z* z)
+{
+    const float hi = 85.0f;
+    const float lo = 45.0f;
+    return LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x106E), hi);
+}
+
+extern "C" float fn_801C8C38(Z* z)
+{
+    const float hi = 77.5f;
+    const float lo = 65.0f;
+    return LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1075), hi);
+}
+
+extern "C" float fn_801C8CF4(Z* z)
+{
+    const float hi = 45.0f;
+    const float lo = 35.0f;
+    return -LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x107C), hi);
+}
+
+/* near-miss: same code, but retail keeps z in r28 and the 0x4330 constant in r29 (ours swapped). */
+extern "C" float fn_801C8DB0(Z* z)
+{
+    const float hi = 85.0f;
+    const float lo = 88.0f;
+    float v = LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1083), hi);
+    if (!(RandF(z->m204->m554, 1.0f, 0x1085) >= 0.5f))
+        v = -v;
+    return v;
+}
+
+extern "C" float fn_801C8EFC(Z* z)
+{
+    const float hi = 75.5f;
+    const float lo = 45.0f;
+    return -LerpATB(lo, RandF(z->m204->m554, 1.0f, 0x1092), hi);
 }
 
 extern "C" float fn_801C8FB8(Z* z)

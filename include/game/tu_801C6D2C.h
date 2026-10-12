@@ -23,4 +23,10 @@ inline float Lerp(float a, float b, float t)
     return a + t * (b - a);
 }
 
+/* Same lerp with the parameters in (a, t, b) order: the retail frame slots are a, t, b. */
+inline float LerpATB(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
 #endif
