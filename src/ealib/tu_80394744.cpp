@@ -68,6 +68,65 @@ extern McCfg2 lbl_8069B7B8;
 extern int lbl_8069B80C[];
 extern "C" int fn_803948C0(int);
 
+extern "C" unsigned fn_80394CE0();
+extern "C" int fn_80394E3C(int a, int n, int b);
+extern "C" void fn_80394EE4(int a, int b);
+
+/* Record of fn_803958FC: +4 offset of a table of 32-byte entries, +8/+9 tag bytes, +0xB "built" flag, +0x10 entry
+ * count, +0x18 halfword indices. */
+struct McRecD {
+    char pad0[4];
+    int m4;
+    unsigned char m8;
+    unsigned char m9;
+    char padA;
+    unsigned char mB;
+    char padC[4];
+    unsigned short m10;
+    char pad12[6];
+    unsigned short m18[1];
+};
+
+struct McEntD {
+    int m0;
+    int m4;
+    char m8[8];
+    char m10[8];
+    void* m18;
+    unsigned m1C;
+};
+
+extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short c);
+extern "C" void fn_803B9858(void* a, void* b);
+extern "C" void fn_803BA118(void* a, void* b);
+extern "C" void fn_80395870(void* src, int key);
+
+struct McEntH {
+    char pad0[8];
+    void* m8;
+    unsigned mC;
+};
+
+/* Record behind the lbl_8069B7CC slots (see tu_803912F8.cpp McRec/McSlot): +8/+9 tag bytes, +0x10 halfword,
+ * +0x12 byte count, byte ring after the header. */
+struct McHdrB {
+    char pad0[8];
+    unsigned char m8;
+    unsigned char m9;
+    char padA[6];
+    unsigned short m10;
+    unsigned char m12;
+};
+
+struct McSlotB {
+    McHdrB* m0;
+    int m4;
+};
+
+extern McSlotB lbl_8069B7CC[];
+extern "C" void fn_80392E3C(int x, int* a, int* b);
+extern "C" void fn_803950B4(int key);
+
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
@@ -146,6 +205,80 @@ extern "C" void fn_80394EE4(int a, int b)
     lbl_8069BEC0[lbl_80624450[0]].b = b;
 }
 
+extern "C" void fn_80394F24(int seed)
+{
+    int i;
+    for (i = 0; i < 32; i++) {
+        lbl_8069BEC0[i].a = -1;
+        lbl_8069BEC0[i].b = -1;
+    }
+    seed = seed + (seed << 16);
+    lbl_80624450[0] = 0;
+    fn_80394DE8(seed);
+    int n = 0x20 - (seed % 32);
+    for (i = 0; i < n; i++)
+        fn_80394FD4(10, -1);
+}
+
+extern "C" int fn_80394FD4(int a, int b)
+{
+    int cnt = 0;
+    int done = 0;
+    int n = a / 2;
+    int best = -1;
+    if (n > 10)
+        n = 10;
+    unsigned v = ((fn_80394CE0() >> 16) * a) >> 16;
+    unsigned pick = v;
+    if (b != -1) {
+        b = (unsigned short)b;
+        do {
+            int r = fn_80394E3C(v, n, b);
+            if (r == -1) {
+                pick = v;
+                done = 1;
+            } else if (r > best) {
+                best = r;
+                pick = v;
+            }
+            cnt++;
+            if (cnt > 0x1F)
+                done = 1;
+            if (done == 0)
+                v = ((fn_80394CE0() >> 16) * a) >> 16;
+        } while (done == 0);
+        fn_80394EE4(pick, b);
+    }
+    return v;
+}
+
+extern "C" int fn_80395150(int x, unsigned y)
+{
+    int r = 0;
+    if ((*(int*)x & 0xFFFF0000) == 0x03120000) {
+        int a;
+        int b;
+        fn_80392E3C(x, &a, &b);
+        int i;
+        for (i = 0; i <= 7; i++) {
+            McHdrB* s = lbl_8069B7CC[i].m0;
+            if (s != 0 && s->m9 == b && s->m8 == a)
+                goto out;
+        }
+        for (i = 0; i <= 7; i++) {
+            if (lbl_8069B7CC[i].m0 == 0) {
+                lbl_8069B7CC[i].m0 = (McHdrB*)x;
+                r = 1;
+                lbl_8069B7CC[i].m4 = y;
+                break;
+            }
+        }
+        fn_803950B4(y);
+    }
+out:
+    return r;
+}
+
 extern "C" int fn_80395250(int x, unsigned y)
 {
     int r = 0;
@@ -201,6 +334,29 @@ extern "C" void fn_80395870(void* src, int key)
             if (fn_803920BC(buf) == 0)
                 fn_80392BC0((int)buf);
         }
+    }
+}
+
+extern "C" void fn_803958FC(int x)
+{
+    McRecD* r = (McRecD*)x;
+    if (r != 0 && r->m4 != 0 && r->mB == 0) {
+        McEntD* base = (McEntD*)((char*)r + r->m4);
+        McEntD* end = base + r->m10;
+        int i;
+        for (i = 0; i < r->m10; i++) {
+            int off = i << 5;
+            McEntD* e = (McEntD*)(off + (int)base);
+            e->m0 = (int)end + e->m0;
+            fn_803B9858(e->m8, e);
+            McEntH* e2 = (McEntH*)((char*)e + 0x10);
+            e2->m8 = (void*)fn_80395870;
+            int ioff = i * 2;
+int tb = (int)r->m18;
+            e2->mC = fn_80391C04(r->m8, r->m9, *(unsigned short*)((char*)r + *(unsigned short*)(ioff + tb) * 4));
+            fn_803BA118(e->m8, e2);
+        }
+        r->mB = 1;
     }
 }
 
