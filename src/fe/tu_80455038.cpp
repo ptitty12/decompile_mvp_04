@@ -5,6 +5,31 @@
 #include "game/tu_8043FDC0.h"
 
 extern char lbl_8067B860[];
+extern "C" void fn_80360B80(void* p);
+struct FePr {
+    int a;
+    int b;
+    FePr() { fn_80360B80(this); }
+};
+struct FeSelT {
+    int m0;
+    FePr m4[9][10];
+    FePr m2D4[116];
+    int m674;
+};
+struct FeCurT { int m0, m4, m8, mC, m10; };
+struct FeScrAr {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    char pad134[0x14C - 0x134];
+    int m14C, m150, m154, m158, m15C;
+    int m160;
+    char pad164[0x7D4 - 0x164];
+};
+extern char lbl_8067B5B8[];
+
 extern "C" FE_OVERLAY FeScr8Raw* fn_80455038(FeScr8Raw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     int i;
@@ -191,6 +216,40 @@ extern "C" FE_OVERLAY int fn_80458200(int a, int b)
  * Front-end overlay code, .frontend_codeoverlay 0x80455038-0x80459228 (code-only unit;
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
+
+extern "C" FE_OVERLAY FeScrAr* fn_804582C4(FeScrAr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    FeSelT* t = (FeSelT*)&self->m160;
+    fn_800EC648((FeScrRaw*)self, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_8067B5B8;
+    self->m130 = 0;
+    FeCurT* cu = (FeCurT*)&self->m14C;
+    cu->m0 = 1;
+    cu->m10 = 1;
+    cu->m8 = -1;
+    cu->mC = -1;
+    cu->m4 = 0;
+    t->m0 = 0;
+    FePr (*r)[10] = t->m4;
+    int i = 8;
+    do {
+        FePr* p = *r;
+        int j = 9;
+        do {
+            fn_80360B80(p);
+            p++;
+        } while (j-- != 0);
+        r++;
+    } while (i-- != 0);
+    FePr* q = t->m2D4;
+    int j = 0x73;
+    do {
+        fn_80360B80(q);
+        q++;
+    } while (j-- != 0);
+    t->m674 = 0;
+    return self;
+}
 
 extern "C" void fn_800ECAA4(void* self);
 extern "C" FE_OVERLAY void fn_8045899C(void* self)
