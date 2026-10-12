@@ -365,14 +365,16 @@ public:
 };
 
 /* Four-player table (stride 0x4F4; +4 is the "slot in use" word) and the game record's pointer to it. */
-struct FeP4Ent {
+struct FeP4Rec {
     int m0;
     int m4;
     int m8;
-    char padC[0x4F4 - 0xC];
+    char padC[0x4F0 - 0xC];
+    int m4F0;
 };
 struct FeP4Tab {
-    FeP4Ent e[4];
+    int m0;
+    FeP4Rec e[4];
 };
 struct FeGameB {
     char pad0[0x64];
@@ -502,6 +504,129 @@ struct FeS11 : FeObj {
     FeObj* m164;
 };
 extern "C" void fn_80125084(FeObj* o, int a);
+
+struct FeS12 : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObj* m138;
+    FeObj* m13C;
+};
+struct FeMsgMgrB {
+    char pad0[0xC0];
+    int mC0;
+};
+struct FeS13 : FeObj {
+    char pad40[0x1D8 - 0x40];
+    int m1D8;
+    int m1DC;
+    int m1E0;
+    int m1E4;
+    char pad1E8[0x1FC - 0x1E8];
+    int m1FC;
+    int m200;
+};
+struct FeRaw1D8 {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x17C - 0x40];
+    const void* m17C;
+    char pad180[0x1D8 - 0x180];
+    int m1D8;
+    int m1DC;
+    int m1E0;
+    int m1E4;
+    int m1E8;
+    int m1EC;
+    int m1F0;
+    char pad1F4[0x1FC - 0x1F4];
+    int m1FC;
+    int m200;
+};
+extern void* lbl_8061FEDC;
+extern int lbl_8061A328;
+extern "C" {
+void fn_804EA6D0(void* self);
+void fn_804EB2C8(void* self);
+void fn_80313634(void* p);
+void fn_803136A0(void* p);
+}
+inline void FeSetAt(char* base, int off, int v)
+{
+    *(int*)(base + off) = v;
+}
+
+struct FeS14b {
+    char pad0[0xB90];
+    int mB90;
+};
+class FeDB94 {
+public:
+    char pad0[0xB94];
+    virtual ~FeDB94();
+};
+struct FeS14 : FeObj {
+    char pad40[0x134 - 0x40];
+    FeS14b* m134;
+    char pad138[0x158 - 0x138];
+    int m158;
+    int m15C;
+};
+struct FeRaw14 {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130, m134, m138, m13C, m140, m144, m148, m14C, m150, m154, m158, m15C, m160, m164, m168, m16C, m170, m174, m178;
+};
+struct FeRawD {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x134 - 0x40];
+    FeDB94* m134;
+};
+struct FeS15 : FeObj {
+    char pad40[0x160 - 0x40];
+    int m160;
+    int m164;
+    int m168;
+    int m16C;
+    char pad170[0x178 - 0x170];
+    int m178;
+    int m17C[25];
+    int m1E0[25];
+};
+extern "C" {
+void* fn_803773D8(unsigned n);
+void* fn_800B5E68(void* p, int a);
+void fn_80125180(FeObj* o, int a, int b);
+}
+void fn_800E2BCC();
+extern int lbl_806221E4;
+
+class FeD64 {
+public:
+    char pad0[0x64];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+};
+struct FeS16;
+extern "C" void fn_804EBCB4(FeS16* self);
+extern "C" void fn_804EC68C(FeS16* self, FeD64* o);
+struct FeS16 : FeObj {
+    char pad40[0x140 - 0x40];
+    FeObj* m140;
+    FeObj* m144;
+    char pad148[0x158 - 0x148];
+    int m158;
+};
+extern "C" {
+FeD64* fn_80528400(void* self, int a);
+void fn_804EBD68(void* self, FeD64* o);
+void fn_804EBF7C(void* self, FeD64* o);
+void fn_804EC294(void* self, FeD64* o);
+void fn_800B82AC(FeB8144* b);
+}
 
 /* BEGIN-VWRAP */
 /* Screens whose only data is one widget pointer at the given offset (one-call button handlers). */
