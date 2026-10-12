@@ -1115,3 +1115,41 @@ int fn_802C72F4(int a, int b, int c)
     fn_802C6BA4(r, n);
     return r;
 }
+
+struct Unk802BB948;
+void fn_802BB948(Unk802BB948* o);
+struct Unk802C7B54;
+void fn_802C7B54(Unk802C7B54* o);
+extern const void* lbl_80664220[];
+void fn_80377408(void* p);
+
+struct Unk802C75D0_E12 {
+    char d[12];
+    ~Unk802C75D0_E12() { fn_802BB948((Unk802BB948*)this); }
+};
+struct Unk802C75D0_Poly {
+    char pad0[0x164];
+    virtual ~Unk802C75D0_Poly();
+};
+struct Unk802C75D0_Own {
+    Unk802C75D0_E12 a0[4];
+    Unk802C75D0_E12 a30[2];
+    Unk802C75D0_E12 a48[4];
+    Unk802C75D0_E12 a78[4];
+    Unk802C75D0_E12 aA8[6];
+    Unk802C75D0_Poly aF0[2];
+    char pad3C0[0x18];
+    const void* vp;
+    ~Unk802C75D0_Own()
+    {
+        vp = lbl_80664220;
+        fn_802C7B54((Unk802C7B54*)this);
+    }
+};
+
+void fn_802C75D0(Unk802C75D0_Own* p, int c)
+{
+    p->~Unk802C75D0_Own();
+    if (c & 1)
+        fn_80377408(p);
+}
