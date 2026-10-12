@@ -28,6 +28,10 @@ extern "C" int fn_804BB0DC(void);
 extern "C" FeRaw* fn_804B7C98(FeRaw* self, int i, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" FeRaw* fn_804B46CC(FeRaw* self, int i, int a, int b, int c, int d, int e, int f, int g, int h);
 extern char lbl_80671A08[];
+extern char lbl_806716E8[];
+extern int lbl_806218EC;
+extern "C" int fn_804B9E6C(void);
+extern "C" int fn_804B7948(FeRaw* x);
 extern "C" FE_OVERLAY FeRaw* fn_804B985C(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_804B46CC(self, FI(((FeMgr30*)lbl_8061930C)->m30, 0x14), a, b, c, d, e, f, g, h);
@@ -87,6 +91,26 @@ extern "C" FE_OVERLAY void fn_804B9C28(FeScr* x)
         ((FeObj2*)x->m134)->v101(i, fn_80590188(FI(x, 0xE1C), i) > 0 ? 1 : 0);
     }
     ((FeObj1*)x->m134)->v14(1);
+}
+
+extern "C" FE_OVERLAY FeRaw* fn_804B9CD0(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_804B46CC(self, 0, a, b, c, d, e, f, g, h);
+    self->m3C = lbl_806716E8;
+    if (((int (*)(FeRaw*))fn_804B9E6C)(self) == 2) {
+        FI(self, 0xE14) = ((FeMgr30*)lbl_8061930C)->m30->m1C;
+    } else {
+        FI(self, 0xE14) = ((FeMgr30*)lbl_8061930C)->m30->m18;
+        int ids[30] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 29, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28 };
+        int vals[30] = { 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50 };
+        for (int i = 0; i <= 29; i++) {
+            if (fn_800B5520(fn_804B7948(self)) == ids[i]) {
+                lbl_806218EC = vals[i];
+                break;
+            }
+        }
+    }
+    return self;
 }
 
 extern "C" FE_OVERLAY int fn_804B9E6C(void)
