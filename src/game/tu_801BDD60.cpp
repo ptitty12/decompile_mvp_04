@@ -120,17 +120,21 @@ extern "C" void fn_801BF66C(A* a, void* x, int idx)
     }
 }
 
+/* near-miss: same code and length now (int-typed slot pointer, k after the call); the pool-constant lis/lwz
+ * temporaries are numbered differently and `mulli` sits earlier than in retail. */
 extern "C" void fn_801BF6D4(A* a, P* p, int idx)
 {
     if (idx != -1) {
+        int r = fn_80254EA4(&p->m58C, 0);
         int k = 2;
-        if (fn_80254EA4(&p->m58C, 0) == idx)
+        if (r == idx)
             k = 1;
         float t = (float)a->m14->m4C * 0.016666668f;
-        Unk801B7FB0_Slot* s = At(a->m38, idx);
-        s->m0 = p;
-        s->m4 = k;
-        s->m8 = t;
+        int q = idx * 12 + (int)a;
+        q += 0x38;
+        *(void**)q = p;
+        *(float*)(q + 8) = t;
+        *(int*)(q + 4) = k;
     }
 }
 
