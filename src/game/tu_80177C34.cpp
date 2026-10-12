@@ -7,6 +7,11 @@
 #include "game/goals/tu_8027A84C.h"
 #include "game/tu_8017A930.h"
 #include "game/tu_801A57C8.h"
+struct Unk80177C74_T {
+    int m0;
+    float m4;
+    Unk8014D8AC_Ctx* m8;
+};
 class Unk8017F628 {
 public:
     virtual ~Unk8017F628();
@@ -137,6 +142,11 @@ inline Unk80273498_Vec3 operator*(const Unk80273498_Vec3& v, float s)
     return r;
 }
 
+inline float Unk80177C74_Rand(Unk8014D8AC* r, float s)
+{
+    return (float)(unsigned)r->fn_8014D8AC(1000000, "C:/mvp2004/source/common/ai/bullpen/bullpenai.cpp", 0x34C) * s * 0.000001f;
+}
+
 extern "C" {
 void fn_80244A64(void* o, int a, int b);
 void fn_8037EBE8(void* p);
@@ -162,6 +172,41 @@ void fn_80177C34(Unk80177C34_X* p, void* a)
     if (a != p->m40) {
         fn_80177900(p, p->m40);
         p->m40 = a;
+    }
+}
+
+/* near-miss: 99.4%; the switch tree needs `case 1:` in the default group (a node that jumps to the default label
+ * is balanced but emits no test). Only the first float loads differ (lo/s swap f0/f13, lis order). */
+void fn_80177C74(void* self, int a)
+{
+    Unk80177C74_T* p = (Unk80177C74_T*)self;
+    p->m0 = a;
+    switch (a) {
+    case 1:
+    case 0:
+        p->m4 = -1.0f;
+        break;
+    case 2: {
+        float lo = 0.5f;
+        float x;
+        float hi;
+        x = Unk80177C74_Rand(p->m8->m554, 1.0f);
+        hi = 2.5f;
+        p->m4 = x * (hi - lo) + lo;
+        break;
+    }
+    case 3:
+        p->m4 = (float)p->m8->m4C * 0.016666668f + 8.0f;
+        break;
+    case 4:
+        p->m4 = -1.0f;
+        break;
+    case 5:
+        p->m4 = (float)p->m8->m4C * 0.016666668f + 8.0f;
+        break;
+    default:
+        p->m4 = -1.0f;
+        break;
     }
 }
 
