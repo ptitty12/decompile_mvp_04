@@ -281,7 +281,7 @@ void fn_800488C4(Unk8004763C* t, int id, float f, int* a, void* b, void* w)
         flag = (unsigned)~v >> 31;
     }
     if (flag == 1)
-        fn_80048E50(&t->mFC, id, f, a, b, w);
+        fn_80048E50(&t->mFC, id, a, b, w, f);
 }
 
 void fn_80048914(Unk8004763C* t, int a)
@@ -463,8 +463,7 @@ void fn_80048DA4(Unk80048A10_Sub* s)
     }
 }
 
-/* near-miss: 4 slots differ (stfs f1 placement after the increment; `add r3,r3,r31` operand order) */
-int fn_80048E50(Unk80048A10_Sub* s, unsigned id, float f, int* a, void* b, void* w)
+int fn_80048E50(Unk80048A10_Sub* s, unsigned id, int* a, void* b, void* w, float f)
 {
     int n = s->m9E0;
     n++;
@@ -473,7 +472,7 @@ int fn_80048E50(Unk80048A10_Sub* s, unsigned id, float f, int* a, void* b, void*
     s->m9E0 = n;
     if (id <= 0x88) {
         s->mEnt[n].m0 = id;
-        fn_8040B320(&s->mEnt[s->m9E0].m4, 0, 0x34);
+        fn_8040B320((void*)(s->m9E0 * 0x48 + (int)s + 4), 0, 0x34);
         s->mEnt[s->m9E0].m4 = *(Unk80048A10_Blk*)a;
         s->mEnt[s->m9E0].m38 = (int)b;
         s->mEnt[s->m9E0].m3C = (int)w;
