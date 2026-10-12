@@ -214,6 +214,11 @@ extern "C" void fn_8037B92C(Unk8037B3E8* self, const char* name)
     }
 }
 
+Unk8037B3E8::Unk8037B3E8(const char* name)
+{
+    fn_8037B92C(this, name);
+}
+
 extern "C" void fn_8037B9D4(Unk8037B3E8* self, int hash)
 {
     if (lbl_80624250 == 0) {
@@ -228,6 +233,11 @@ extern "C" void fn_8037B9D4(Unk8037B3E8* self, int hash)
             lbl_80624250++;
         }
     }
+}
+
+Unk8037B3E8::Unk8037B3E8(unsigned int hash)
+{
+    fn_8037B9D4(this, hash);
 }
 
 extern "C" int fn_8037BA74(int hash)
