@@ -2016,12 +2016,321 @@ ealib/tu_80400DA4.cpp:
 ealib/tu_804027DC.cpp:
 	.text       start:0x804027DC end:0x80403E80
 
+libsn/tu_80403E80.c:
+	.text       start:0x80403E80 end:0x80406DCC
+
+libsn/FSasync.c:
+	.text       start:0x80406DCC end:0x80407604
+
+libsn/tu_80407604.c:
+	.text       start:0x80407604 end:0x80407C64
+
+libc/fclose.c:
+	.text       start:0x80407C64 end:0x80407D1C
+
+libc/fflush.c:
+	.text       start:0x80407D1C end:0x80407E10
+
+libc/fopen.c:
+	.text       start:0x80407E10 end:0x804081A4
+
+libc/fprintf.c:
+	.text       start:0x804081A4 end:0x80408238
+
+libc/fseek.c:
+	.text       start:0x80408238 end:0x8040861C
+
+libc/fwalk.c:
+	.text       start:0x8040861C end:0x8040869C
+
+libc/makebuf.c:
+	.text       start:0x8040869C end:0x80408774
+
+libc/printf.c:
+	.text       start:0x80408774 end:0x80408820
+
+libc/refill.c:
+	.text       start:0x80408820 end:0x804089B4
+
+libc/sprintf.c:
+	.text       start:0x804089B4 end:0x80408A8C
+
+libc/sscanf.c:
+	.text       start:0x80408A8C end:0x80408B84
+
+libc/stdio.c:
+	.text       start:0x80408B84 end:0x80408CE4
+
+libc/vfscanf.c:
+	.text       start:0x80408CE4 end:0x80409BBC
+
+libc/vprintf.c:
+	.text       start:0x80409BBC end:0x80409BF0
+
+libc/vsprintf.c:
+	.text       start:0x80409BF0 end:0x80409CC0
+
+libc/assert.c:
+	.text       start:0x80409CC0 end:0x80409CF0
+
+libc/atexit.c:
+	.text       start:0x80409CF0 end:0x80409D88
+
+libc/atof.c:
+	.text       start:0x80409D88 end:0x80409DAC
+
+libc/atoi.c:
+	.text       start:0x80409DAC end:0x80409DD4
+
+libc/bsearch.c:
+	.text       start:0x80409DD4 end:0x80409E6C
+
+libc/exit.c:
+	.text       start:0x80409E6C end:0x80409EEC
+
+libc/mbtowc_r.c:
+	.text       start:0x80409EEC end:0x8040A208
+
+libc/qsort.c:
+	.text       start:0x8040A208 end:0x8040AB94
+
+libc/rand.c:
+	.text       start:0x8040AB94 end:0x8040ABC4
+
+libc/tu_8040ABC4.c:
+	.text       start:0x8040ABC4 end:0x8040AC00
+
+libc/strtod2.c:
+	.text       start:0x8040AC00 end:0x8040AF30
+
+libc/strtoul.c:
+	.text       start:0x8040AF30 end:0x8040B100
+
+libc/memcmp.c:
+	.text       start:0x8040B100 end:0x8040B190
+
+libc/memcpy.c:
+	.text       start:0x8040B190 end:0x8040B234
+
+libc/memmove.c:
+	.text       start:0x8040B234 end:0x8040B320
+
+libc/memset.c:
+	.text       start:0x8040B320 end:0x8040B3B4
+
+libc/strcasecmp.c:
+	.text       start:0x8040B3B4 end:0x8040B448
+
+libc/strcat.c:
+	.text       start:0x8040B448 end:0x8040B4D8
+
+libc/strchr.c:
+	.text       start:0x8040B4D8 end:0x8040B574
+
+libc/strcmp.c:
+	.text       start:0x8040B574 end:0x8040B61C
+
+libc/strcpy.c:
+	.text       start:0x8040B61C end:0x8040B6A0
+
+libc/strlen.c:
+	.text       start:0x8040B6A0 end:0x8040B70C
+
+libc/strlwr.c:
+	.text       start:0x8040B70C end:0x8040B750
+
+libc/strncmp.c:
+	.text       start:0x8040B750 end:0x8040B830
+
+libc/strncpy.c:
+	.text       start:0x8040B830 end:0x8040B8FC
+
+libc/strrchr.c:
+	.text       start:0x8040B8FC end:0x8040B948
+
+libc/strstr.c:
+	.text       start:0x8040B948 end:0x8040B9B0
+
+libc/strtok.c:
+	.text       start:0x8040B9B0 end:0x8040B9D8
+
+libc/strtok_r.c:
+	.text       start:0x8040B9D8 end:0x8040BAA0
+
+libc/vfprintf.c:
+	.text       start:0x8040BAA0 end:0x8040D69C
+
+libc/vfiprintf.c:
+	.text       start:0x8040D69C end:0x8040EAA0
+
+libc/strtol.c:
+	.text       start:0x8040EAA0 end:0x8040EC88
+
+libc/isdigit.c:
+	.text       start:0x8040EC88 end:0x8040EC9C
+
+libc/isspace.c:
+	.text       start:0x8040EC9C end:0x8040ECB0
+
+libc/errno.c:
+	.text       start:0x8040ECB0 end:0x8040ECB8
+
+libc/locale.c:
+	.text       start:0x8040ECB8 end:0x8040ECE8
+
+libc/math_support.c:
+	.text       start:0x8040ECE8 end:0x8040F5FC
+
+libc/closer.c:
+	.text       start:0x8040F5FC end:0x8040F64C
+
+libc/fstatr.c:
+	.text       start:0x8040F64C end:0x8040F6A4
+
+libc/lseekr.c:
+	.text       start:0x8040F6A4 end:0x8040F6FC
+
+libc/openr.c:
+	.text       start:0x8040F6FC end:0x8040F758
+
+libc/readr.c:
+	.text       start:0x8040F758 end:0x8040F7B0
+
+libc/writer.c:
+	.text       start:0x8040F7B0 end:0x8040F808
+
+libc/fiprintf.c:
+	.text       start:0x8040F808 end:0x8040F89C
+
+libc/flags.c:
+	.text       start:0x8040F89C end:0x8040F938
+
+libc/fread.c:
+	.text       start:0x8040F938 end:0x8040FA44
+
+libc/ungetc.c:
+	.text       start:0x8040FA44 end:0x8040FBC8
+
+libc/abort.c:
+	.text       start:0x8040FBC8 end:0x8040FBE0
+
+libc/memchr.c:
+	.text       start:0x8040FBE0 end:0x8040FCA0
+
+libm/e_exp.c:
+	.text       start:0x8040FCA0 end:0x8040FF1C
+
+libm/e_log.cpp:
+	.text       start:0x8040FF1C end:0x804101AC
+
+libm/e_sqrt.cpp:
+	.text       start:0x804101AC end:0x804103C0
+
+libm/s_ceil.c:
+	.text       start:0x804103C0 end:0x80410518
+
+libm/s_cos.cpp:
+	.text       start:0x80410518 end:0x804105F8
+
+libm/s_fabs.cpp:
+	.text       start:0x804105F8 end:0x80410634
+
+libm/s_floor.cpp:
+	.text       start:0x80410634 end:0x80410790
+
+libm/s_sin.c:
+	.text       start:0x80410790 end:0x80410870
+
+libm/ef_acos.cpp:
+	.text       start:0x80410870 end:0x80410ABC
+
+libm/ef_asin.cpp:
+	.text       start:0x80410ABC end:0x80410CE8
+
+libm/ef_atan2.cpp:
+	.text       start:0x80410CE8 end:0x80410F08
+
+libm/ef_log.c:
+	.text       start:0x80410F08 end:0x80411188
+
+libm/ef_sqrt.cpp:
+	.text       start:0x80411188 end:0x80411280
+
+libm/sf_atan.cpp:
+	.text       start:0x80411280 end:0x80411490
+
+libm/sf_ceil.c:
+	.text       start:0x80411490 end:0x80411554
+
+libm/sf_cos.cpp:
+	.text       start:0x80411554 end:0x80411630
+
+libm/sf_fabs.cpp:
+	.text       start:0x80411630 end:0x80411654
+
+libm/sf_floor.cpp:
+	.text       start:0x80411654 end:0x8041171C
+
+libm/sf_sin.cpp:
+	.text       start:0x8041171C end:0x804117F8
+
+libm/sf_tan.cpp:
+	.text       start:0x804117F8 end:0x80411878
+
+libm/k_cos.cpp:
+	.text       start:0x80411878 end:0x8041196C
+
+libm/k_sin.cpp:
+	.text       start:0x8041196C end:0x80411A18
+
+libm/e_rem_pio2.cpp:
+	.text       start:0x80411A18 end:0x80411D7C
+
+libm/kf_cos.cpp:
+	.text       start:0x80411D7C end:0x80411E68
+
+libm/kf_sin.cpp:
+	.text       start:0x80411E68 end:0x80411F14
+
+libm/kf_tan.cpp:
+	.text       start:0x80411F14 end:0x80412128
+
+libm/ef_rem_pio2.cpp:
+	.text       start:0x80412128 end:0x80412478
+
+libm/k_rem_pio2.cpp:
+	.text       start:0x80412478 end:0x80412D00
+
+libm/kf_rem_pio2.cpp:
+	.text       start:0x80412D00 end:0x80413584
+
+libm/s_scalbn.cpp:
+	.text       start:0x80413584 end:0x804136D8
+
+libm/sf_scalbn.cpp:
+	.text       start:0x804136D8 end:0x804137F4
+
+libm/s_copysign.cpp:
+	.text       start:0x804137F4 end:0x80413844
+
+libm/sf_copysign.cpp:
+	.text       start:0x80413844 end:0x80413878
+
 libgcc/_main.c:
 	.text       start:0x80413878 end:0x80413940
 	.bss        start:0x806C37F0 end:0x806C37F4
+
+libgcc/tu_80413940.c:
+	.text       start:0x80413940 end:0x80414F30
 
 dolphin/ai/AI.c:
 	.text       start:0x80414F30 end:0x80415814
 
 dolphin/os/OS.c:
 	.text       start:0x804321A0 end:0x804321CC
+
+libsn/dummy.c:
+	.text       start:0x8043EDC4 end:0x8043EFA4
+
+libc/tolower.c:
+	.text       start:0x8043EFA4 end:0x8043EFC0
