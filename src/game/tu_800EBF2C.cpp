@@ -48,6 +48,94 @@ extern "C" void fn_800EC278(UiS* self)
     self->v89(1);
 }
 
+struct UiMgrA0 {
+    char pad0[0xA0];
+    UiS* mA0;
+    char padA4[0xB8 - 0xA4];
+    int mB8;
+};
+struct UiObj18 {
+    char pad0[0x18];
+    int m18;
+};
+struct UiList1C4 {
+    char pad0[0x34];
+    UiS* a34[1];
+};
+UiS* fn_80142410();
+extern char lbl_805BAA20[];
+inline UiS* PtrAtB(char* b, int off)
+{
+    return *(UiS**)(b + off);
+}
+inline void SetPtrAtB(char* b, int off, UiS* v)
+{
+    *(UiS**)(b + off) = v;
+}
+/* near-miss: retail compares r4 directly and keeps li 0 in a fresh register (185 insns); ours reuses the saved copy of the flag as zero (184) */
+void fn_800EC2B0(UiS* self, int on)
+{
+    if (on != 0) {
+        int off = 0;
+        for (int k = 0; k < self->m134; k++) {
+            UiS* c = PtrAtB((char*)self + 0x14C, off);
+            off += 4;
+            c->v16(1);
+        }
+        self->m134 = 0;
+        UiS* m = fn_800B7A94(UiGetMsgMgr(), lbl_805BAA20);
+        if (m != 0) {
+            int t = self->m13C;
+            if (t != 0)
+                self->m13C = 0;
+            else
+                m->m138 = t;
+        }
+        if (self->m138 != 0)
+            self->m138 = 0;
+        else
+            fn_800B83F8(fn_800B8144(), 0, 0);
+        self->v16(0);
+        self->v8(0);
+        return;
+    }
+    UiS* list = ((UiMgrA0*)UiGetMsgMgr())->mA0;
+    int cnt = *(int*)((char*)list + 0x1C4);
+    self->m134 = 0;
+    if (cnt > 0) {
+        int n = cnt;
+        int off = 0;
+        do {
+            UiS* c = PtrAtB((char*)list + 0x34, off);
+            if (c != self && (c->m24 & 0x40000000)) {
+                if (((UiMgrA0*)UiGetMsgMgr())->mB8 != 0 || c != fn_80142410()) {
+                    SetPtrAtB((char*)self + 0x14C, self->m134 * 4, c);
+                    self->m134 = self->m134 + 1;
+                    c->v16(0);
+                }
+            }
+            off += 4;
+            n--;
+        } while (n != 0);
+    }
+    UiS* m2 = fn_800B7A94(UiGetMsgMgr(), lbl_805BAA20);
+    if (m2 != 0) {
+        int t = m2->m138;
+        if (t != 0) {
+            self->m13C = 1;
+        } else {
+            self->m13C = t;
+            m2->m138 = 1;
+        }
+    }
+    if (((UiObj18*)fn_800B8144())->m18 != 0)
+        self->m138 = 1;
+    else
+        fn_800B83F8(fn_800B8144(), 1, 1);
+    self->v16(1);
+    self->v8(1);
+}
+
 UiScrRaw* fn_800EC594(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
