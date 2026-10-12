@@ -57,7 +57,6 @@ extern float lbl_805D26F0;
 extern "C" {
 void fn_801D04C0(Y* y);
 int fn_801A2034(Unk801B7FB0_P* p, int k);
-void fn_80303CA0(const char* fmt, ...);
 void fn_8035B1C8(void* p);
 void fn_801D6FE4(void* p);
 void fn_801D5CF0(Y* y);
@@ -109,6 +108,8 @@ inline float RandF2(Unk8014D8AC* r, float scale, const char* file, int line)
 {
     return (float)(unsigned)r->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
 }
+
+void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
 
 inline void SetMode(Unk801C16B0_Mode* m, int v)
 {
