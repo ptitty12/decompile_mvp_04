@@ -6,6 +6,12 @@
 #include "game/chooser.h"
 #include "game/tu_8024EF40.h"
 
+extern const float lbl_805D9680;
+extern const float lbl_805D9684;
+extern const float lbl_805D9690;
+extern int lbl_8061D4D0;
+extern int lbl_8061D4D4;
+
 int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* out, int c);
 extern const float lbl_805D967C;
 
@@ -547,6 +553,65 @@ int fn_8024D9A0(Unk80270BA0_X* x, int* out)
 }
 
 void fn_8024DB54() {}
+
+/* near-miss (97.6%): 15 slots differ: the switch tree pivot (retail roots at 2, ours at 1), the order of the e[1]/e[2] loads
+   and the f0/f13 numbering in the last compare. Tried switch/if forms, local declaration orders and t[] store orders */
+void fn_8024DB58(Unk80270BA0_X* x, int k, float* e)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    float hi = lbl_805D9680;
+    float lo = lbl_805D9680;
+    if (k == 13) {
+        hi = e[2];
+        lo = e[1];
+    } else if (k == 14) {
+        hi = e[2];
+        lo = e[1];
+    }
+    if (!(lo < lbl_805D9684)) {
+        float t[4];
+        float frac;
+        float w;
+        float r;
+        volatile int pad;
+        float s;
+        int i = (int)lo;
+        frac = lo - (float)i;
+        t[0] = v->m720;
+        t[1] = v->m724;
+        t[2] = v->m728;
+        t[3] = v->m72C;
+        w = lbl_805D9684 - frac;
+        r = lbl_805D9680;
+        switch (i) {
+        case 0:
+            break;
+        case 1:
+            r = w * t[0] + frac * t[1];
+            break;
+        case 2:
+            r = w * t[1] + frac * t[2];
+            break;
+        case 3:
+            r = w * t[2] + frac * t[3];
+            break;
+        default:
+            r = t[3];
+            break;
+        }
+        s = r;
+        v->m8D4 = 0;
+        v->m8D8 = lbl_8061D4D0;
+        v->m8D0 = s;
+    }
+    if (hi > lbl_805D9690 || !(hi >= lbl_805D9690)) {
+        float r2 = hi * lbl_805D9690;
+        float s2 = r2;
+        v->m8E4 = lbl_8061D4D4;
+        v->m8E0 = 0;
+        v->m8DC = s2;
+    }
+}
 
 int fn_8024DCFC(int k)
 {
