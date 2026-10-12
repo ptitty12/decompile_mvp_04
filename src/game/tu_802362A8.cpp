@@ -46,9 +46,6 @@ extern const char lbl_805D7698[];
 extern int lbl_8068CA8C;
 extern const float lbl_805D7C18;
 extern const char lbl_805D7978[];
-extern const float lbl_805D7C8C;
-extern const float lbl_805D7C90;
-extern const float lbl_805D7C94;
 extern float lbl_8061D220;
 extern const float lbl_805D7B1C;
 extern const float lbl_805D7A94;
@@ -241,13 +238,11 @@ int Unk802362A8_Cpu::fn_80239448()
     return (unsigned)(b - 5) > 1;
 }
 
-/* near-miss: 35/35 insns, 6 slots; retail loads lbl_8061D220 (f2) before lbl_805D7C8C (f1) for the fn_801A0AA8 call,
-   ours the reverse. Tried const/non-const globals, declaration order, a local for the second argument */
 void Unk802362A8_Cpu::fn_8023A13C()
 {
     char* p = (char*)m2E0 + 0xC;
-    float t = fn_801A0AA8(m2E4, lbl_805D7C8C, lbl_8061D220);
-    t = Lerp(lbl_805D7C90, t, lbl_805D7C94);
-    *(float*)(p + 0x14) = lbl_805D7C94;
+    float t = fn_801A0AA8(m2E4, 0.5f, lbl_8061D220);
+    t = Lerp(-1.0f, t, 1.0f);
     *(float*)(p + 0x18) = t;
+    *(float*)(p + 0x14) = 1.0f;
 }
