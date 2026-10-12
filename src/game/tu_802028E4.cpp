@@ -55,6 +55,48 @@ extern "C" float fn_802028E4(Scr* s, Unk801EE438_Player* pl, Unk801EE438_Vec* po
     return r;
 }
 
+extern "C" int fn_801EA458(Scr* p);
+extern "C" void fn_80204610(Scr* p, int a1, int a2, int a3);
+extern "C" int fn_80210FC4(Unk801EE438_G** g, int a, int b, int c);
+inline int SlotAt44A4(int* base, int i)
+{
+    int o = i * 4;
+    return *(int*)((char*)base + o);
+}
+
+extern "C" void fn_802044A4(Scr* p, int a, Unk801EE438_Vec* v, float f)
+{
+    if (p->m9C->m30 == 1) {
+        int k = fn_80211BB0(&p->m9C->mC0, a);
+        if (k != -1 && SlotAt44A4(&p->m9C->mD4.m0, k) == -1) {
+            int own = fn_801EA458(p);
+            int ok = 0;
+            if (fn_80210FC4(&p->m9C, 3, k, 0) == 1 || (own == 1 && fn_80210FC4(&p->m9C, 6, k, 0) == 1))
+                ok = 1;
+            if (ok == 1) {
+                int sel = 0;
+                if (k == 0) {
+                    if (own == 0) {
+                        const float z = 360000.0f;
+                        float d = v->m0 * v->m0 + v->m8 * v->m8;
+                        if (!(d >= z) && fn_80211BB0(&p->m9C->mC0, 3) == -1)
+                            sel = 3;
+                    }
+                } else {
+                    if (k == 1) {
+                        if (a == 3)
+                            sel = 5;
+                        else
+                            sel = 3;
+                    } else if (k == 2)
+                        sel = 5;
+                }
+                ((void (*)(Scr*, int, int, int, Unk801EE438_Vec*))fn_80204610)(p, sel, k, a, v);
+            }
+        }
+    }
+}
+
 extern "C" void fn_80204610(Scr* p, int a1, int a2, int a3)
 {
     int x;
