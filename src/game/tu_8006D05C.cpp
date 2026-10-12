@@ -6,6 +6,7 @@
 #include "game/tu_8007FF8C.h"
 
 void* operator new[](unsigned int size, int heap);
+void* operator new(unsigned int size, int heap);
 extern char lbl_80649DB8[];
 extern char lbl_8064B0C8[];
 extern char lbl_8064B058[];
@@ -265,6 +266,75 @@ void Unk80069F0C::fn_8006E6A4()
     fn_800975A8(s, 0xD, c, fn_8009764C(s, 0xD, c, 0) + 1, 0);
 }
 
+struct Unk80087A58_O;
+Unk80087A58_O* fn_80087FC0(Unk80087A58_O* o);
+void fn_8006F6C0(Unk8006902C_Ctx* c);
+extern "C" void fn_803785E4(void* sub);
+extern "C" void fn_800A6D30(void* p);
+extern char lbl_8064A1E0[];
+struct Unk8006F594_Obj {
+    char pad0[8];
+    void* m8;
+    Unk80087A58_O* mC;
+    float m10;
+    int m14;
+    float m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    char pad3C[0x40];
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    float m90;
+    float m94;
+    float m98;
+    float m9C;
+    char mA0[0x560];
+    int m600;
+};
+
+Unk8006902C_Ctx* fn_8006F594(void* p)
+{
+    Unk8006F594_Obj* self = (Unk8006F594_Obj*)p;
+    fn_803785E4(self);
+    self->m8 = lbl_8064A1E0;
+    self->mC = 0;
+    self->m10 = 1.0f;
+    self->m14 = 0;
+    self->m18 = 0.0f;
+    self->m1C = 2;
+    self->m20 = 0;
+    self->m24 = 0x57;
+    self->m28 = 0x38;
+    self->m2C = 4;
+    self->m30 = 0x1F;
+    self->m34 = 0x10;
+    self->m38 = 0;
+    self->m7C = *(int*)&lbl_806877AC;
+    self->m80 = 0;
+    self->m84 = 4;
+    self->m88 = -1;
+    self->m8C = 0;
+    self->m90 = 0.0f;
+    self->m94 = 0.0f;
+    self->m98 = 0.0f;
+    self->m9C = 0.0f;
+    fn_800A6D30(self->mA0);
+    self->m600 = 0;
+    if (self->mC == 0)
+        self->mC = fn_80087FC0((Unk80087A58_O*)operator new(0x1754, 0));
+    fn_8006F6C0((Unk8006902C_Ctx*)self);
+    return (Unk8006902C_Ctx*)self;
+}
+
 void fn_8006F690(Unk8006F690_Obj* self, int chrg)
 {
     self->m8 = lbl_80649DB8;
@@ -389,6 +459,15 @@ int fn_8006FB28(void* l, int k, int c)
             break;
         }
     }
+    return r;
+}
+
+typedef float (W::*Unk8006FBAC_Pmf)(int);
+extern Unk8006FBAC_Pmf lbl_805B63D8[];
+
+float fn_8006FBAC(W* o, int i, int a)
+{
+    float r = (o->*(lbl_805B63D8 + i)[0])(a);
     return r;
 }
 
