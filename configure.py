@@ -436,7 +436,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(Matching, "libgcc/_main.c"),
-            Object(NonMatching, "libgcc/tu_80413940.c"),
+            Object(NonMatching, "libgcc/tu_80413940.c", cflags=["-O2", "-G 1024"]),
         ],
     },
     {

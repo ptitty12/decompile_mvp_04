@@ -41,3 +41,4 @@ fn_803AB480	SNDstop
 fn_80432FD4	DCFlushRange
 fn_803BA80C	SetFast__Q24Csis14GlobalVariablePQ24Csis20GlobalVariableHandlePv
 fn_803A8648	SNDbankremove
+fn_80406CCC	__shr2i

@@ -112,6 +112,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 - 2026-10-12 | **Flags: dolphin/os/tu_80431828.c (OS.c range) = cflags_dolphin_sdk + `-opt nopeephole`** *[lead, owner authority]*. This is like the existing dolphin/os/OS.c (cflags_dolphin_os). OSGetConsoleType keeps the `b` to blr and the bne-over-lis shape only with peephole off. Objdiff goes from 0/12 to 5/12 matched. | tail-10 worker evidence, lead rebuild | report.json |
 - 2026-10-12 | **Note (no action): SDK OS files switch peephole per function.** Functions after the first hand-written (original-code) function in OSAlarm, OSCache, OSContext, OSInterrupt, OSReset and OS.c need `-opt nopeephole`; the ones before it don't. OSResetSystem also needs `-inline noauto`. The original sources likely use `#pragma peephole off` / `#pragma inline` there. Our verifier forbids pragmas (see the open pragma-allowlist question), so those functions stay unmatched for now. Splitting units at those points to emulate a pragma was considered and not done. | tail-10 worker | per-function probes |
 
+- 2026-10-12 | **Flags: libgcc/tu_80413940.c = ProDG -O2 -G 1024** *[lead, owner authority]*. __divdi3, __moddi3, __udivdi3 and __umoddi3 each read a private 256-byte __clz_tab copy in .sdata2 via sda21, which needs a small-data limit of at least 256. The unit goes from 5/11 to 9/11 matched; the eh_context pair matches either way. Also renamed fn_80406CCC to `__shr2i`: it is the MWCC 64-bit shift helper that `s64 >> 16` emits (`b __lshrdi3`-style stub). | tail-08 worker evidence, lead rebuild | report.json |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
