@@ -289,6 +289,56 @@ void Unk8007A4DC_Screen::fn_80077DAC()
     fn_800915F0(&m4C);
 }
 
+extern "C" int fn_800787E8(Unk8007B2B0_Screen* g, int kind, int p)
+{
+    int r = 0;
+    switch (kind) {
+    case 0: {
+        r = g->fn_8007C514(0x12, p);
+        r += g->fn_8007C514(0x13, p);
+        r += g->fn_8007C514(0x14, p);
+        r += g->fn_8007C514(0x15, p);
+        r = r / 4;
+        break;
+    }
+    case 1: {
+        r = g->fn_8007C770(0xD, p);
+        r += g->fn_8007C770(0xE, p);
+        r += g->fn_8007C770(0xF, p);
+        r += g->fn_8007C770(0x10, p);
+        r = r / 4;
+        break;
+    }
+    case 2: {
+        r = g->fn_8007C994(0xD, p);
+        r += g->fn_8007C994(0xE, p);
+        r += g->fn_8007C994(0xF, p);
+        r += g->fn_8007C994(0x10, p);
+        r += g->fn_8007C994(0x11, p);
+        r = r / 5;
+        break;
+    }
+    case 3: {
+        r = g->fn_8007CBB8(0xA, p);
+        r += g->fn_8007CBB8(0xB, p);
+        r += g->fn_8007CBB8(0xC, p);
+        r += g->fn_8007CBB8(0xD, p);
+        r += g->fn_8007CBB8(0xE, p);
+        r = r / 5;
+        break;
+    }
+    case 4: {
+        r = g->fn_8007CDDC(0xA, p);
+        r += g->fn_8007CDDC(0xB, p);
+        r += g->fn_8007CDDC(0xC, p);
+        r += g->fn_8007CDDC(0xD, p);
+        r = r / 4;
+        break;
+    }
+    }
+    return r;
+}
+
 int Unk8007B2B0_Screen::fn_80078A38(int a)
 {
     fn_8007B8C4(0, a);
