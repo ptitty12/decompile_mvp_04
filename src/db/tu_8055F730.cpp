@@ -211,6 +211,43 @@ extern "C" DB_OVERLAY int fn_8055F9B0(Db8055F7B8_List* l, int x)
     return 0;
 }
 
+extern "C" DB_OVERLAY int fn_8055FB50(Db8055F7B8_List* l, int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int e;
+    if (x == 2) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            int e2 = l->At(i);
+            int v5 = sc->fn_8007A6A0(5, e2);
+            int v6 = sc->fn_8007A6A0(6, e2);
+            if ((unsigned)(v5 - 6) <= 2 || v6 == 6 || v6 == 7 || v6 == 8)
+                return e2;
+        }
+    } else if (x == 3 || x == 5 || x == 4 || x == 1) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            e = l->At(i);
+            if (sc->fn_8007A6A0(9, e) == 0)
+                goto found;
+        }
+    } else if (x == 6 || x == 8) {
+        return *l->m0;
+    } else if (x == 7) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            e = l->At(i);
+            if (sc->fn_8007A6A0(6, e) == 13)
+                goto found;
+        }
+    }
+    goto out;
+found:
+    return e;
+out:
+    return 0;
+}
+
 extern "C" DB_OVERLAY int fn_8055FCF4(Db8055FCF4_S* s)
 {
     return *s->m0;
