@@ -1098,6 +1098,7 @@ void fn_80529784();
 void fn_804DE138(FeS804DDDA8* x);
 void fn_804DE13C(FeS804DDDA8* x);
 void fn_804DE55C(int a, void* x);
+void fn_804DE558(void* x);
 }
 
 #endif

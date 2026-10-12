@@ -238,7 +238,22 @@ FE_OVERLAY int fn_804DE4A4(FeS804DDDA8* x)
 
 FE_OVERLAY void fn_804DE554(void) {}
 
-FE_OVERLAY void fn_804DE558(void) {}
+FE_OVERLAY void fn_804DE558(void* x) {}
+
+FE_OVERLAY void fn_804DE55C(int a, void* x)
+{
+    if (a != 0) {
+        if (a == 1) {
+            fn_804DE558(x);
+            FeMsg m;
+            FeMsg* mp = &m;
+            fn_8035682C(mp);
+            fn_8040B830(mp->name, lbl_805F4450, 15);
+            mp->name[15] = 0;
+            fn_800B7B4C(FeGetMgr(), mp, x);
+        }
+    }
+}
 
 /* near-miss: frame 56 vs 40 (-ffloat-store spill of the u8 -> float product) */
 FE_OVERLAY FeS804DE5F8* fn_804DE5F8(FeS804DE5F8* self, int a, int b, int c, int d, int e, int f, int g, int h)
