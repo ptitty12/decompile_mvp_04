@@ -1,7 +1,22 @@
-/*
- * EA SND 9.02.04 / csis (cflags_snd: -O2 -G0 -fno-strength-reduce -fno-strict-aliasing
- * -ffast-math -mps-float, C++),
- * .text 0x803B4B40-0x803B4BEC (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from dbalatoni13/nfsmw @ 9ca26bc1 (src/Speed/Indep/Libs/snd/9/source/library/cmn/spatkey.c). EA SND audio library (rwaudiocore), matched against NFS Most Wanted GC; CC0. */
+#include "./sndcmn.h"
+
+int iSNDpatchkey(int chan, int *psetchan) {
+    CHANPUB *pchan = &sndgs.chan[chan];
+    int patchkey = pchan->patchkey;
+    if (patchkey != 0) {
+        (*psetchan)++;
+        for (; *psetchan < sndgs.voicestotal; (*psetchan)++) {
+            pchan = &sndgs.chan[*psetchan];
+            if (pchan->patchkey == patchkey && pchan->status == 1 && pchan->handle >= 0) {
+                return 1;
+            }
+        }
+    } else if (*psetchan < 0) {
+        *psetchan = chan;
+        return 1;
+    }
+
+    return 0;
+
+}

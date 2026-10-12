@@ -1106,7 +1106,7 @@ config.libs = [
             Object(NonMatching, "snd/tu_803B3E18.cpp"),
             Object(NonMatching, "snd/cmn/sgetpvol.c"),
             Object(NonMatching, "snd/tu_803B4074.cpp"),
-            Object(NonMatching, "snd/cmn/spatkey.c"),
+            Object(Matching, "snd/cmn/spatkey.c"),
             Object(NonMatching, "snd/tu_803B4BEC.cpp"),
             Object(NonMatching, "snd/tu_803B6AF8.cpp"),
             Object(NonMatching, "snd/cmn/sattrdef.c"),
