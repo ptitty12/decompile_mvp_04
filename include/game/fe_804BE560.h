@@ -68,7 +68,7 @@ public:
     virtual int s48(int a);
     virtual int s49(int a);
     virtual int s50(int a);
-    virtual int s51(int a);
+    virtual int s51(int a, int b);
     virtual int s52(int a);
     virtual int s53(int a);
     virtual int s54(int a);

@@ -5,6 +5,10 @@
 
 #include "game/fe_804BE560.h"
 
+extern "C" void fn_804CB51C(FeScrN* x, int a);
+extern "C" FeW* fn_800C8060(FeW* w);
+extern const char lbl_805F4450[];
+
 struct FeCnt {
     int m0;
     int m4;
@@ -44,6 +48,18 @@ extern "C" int fn_804CE0C8(int k);
 extern "C" void fn_804CE004(FePair* p);
 extern "C" int fn_804CCF20(void* x, int a);
 extern "C" void fn_804CD530(FeScrE0C* x);
+
+extern "C" FE_OVERLAY void fn_804CB430(FeScrN* x)
+{
+    fn_800ECF18(x);
+    x->m138 = fn_800B7AB8(FeGetMgr(), "NAVBAR");
+    fn_80124FA8(x->m138, x);
+    fn_801251CC(x->m138, 1, 0x1A0C, 0);
+    fn_801251CC(x->m138, 3, 0x57FD, 1);
+    x->m134 = fn_800C8060(x->fn_vslot32("GRID", 1));
+    x->m134->fn_vslot105(1);
+    fn_804CB51C(x, 0);
+}
 
 extern "C" FE_OVERLAY int fn_804CCF20(void* x, int a)
 {
@@ -101,6 +117,36 @@ extern "C" FE_OVERLAY void fn_804CD530(FeScrE0C* x)
             return;
         }
         fn_801251CC(x->mE14, 3, 0x5CC6, 1);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804CD590(FeScrE0C* x)
+{
+    ((FeSub*)((char*)x->mE10 + 0xDC))->s15();
+    ((FeVQ*)x->mE10)->s51(0x58B9, 0);
+    ((FeVQ*)x->mE10)->s51(0x57FF, 1);
+    ((FeVQ*)x->mE10)->s51(0x5801, 2);
+    ((FeVQ*)x->mE10)->s51(0x5803, 3);
+    ((FeSub*)((char*)x->mE10 + 0xDC))->s6(0);
+}
+
+extern "C" FE_OVERLAY void fn_804CD68C(FeScrE0C* x, int sel)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    switch (sel) {
+    case 0:
+        fn_8040B830(mp->name, lbl_805F4450, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    case 1:
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        *(int*)&x->m13C ^= 1;
+        if (x->m164 != 0)
+            fn_804CD878(x);
+        break;
     }
 }
 
