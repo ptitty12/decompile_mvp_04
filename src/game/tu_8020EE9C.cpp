@@ -197,6 +197,153 @@ int fn_80211648(CmpPos* a, CmpPos* b)
     return e > 0.0f;
 }
 
+struct U;
+void fn_8035B7D4(U* self);
+void fn_8035B7B0(U* self);
+
+struct Unk802116B4_El {
+    int m0;
+    float m4;
+    float m8;
+    Unk802116B4_El() { fn_8035B7B0((U*)this); }
+};
+
+inline void* operator new(unsigned, void* p) { return p; }
+
+extern const char lbl_80660A78[];
+extern const float lbl_805D5C50;
+extern "C" void fn_8014E09C(IterObj* it, CtxOwner* c, int x);
+extern "C" void fn_8014E108(IterObj* it);
+
+struct Unk802116B4 {
+    TaskInner* m0;
+    int m4;
+    const void* m8;
+    Unk802116B4_El mC[9];
+    Unk802116B4(TaskInner* a) : m0(a), m4(0), m8(lbl_80660A78)
+    {
+        IterObj it;
+        fn_8014E09C(&it, m0->m0, 1);
+        IterObj* p = &it;
+        while (p->m8 != 10) {
+            ((Unk802116B4_El*)((char*)this + p->m8 * 12 + 0xC))->m0 = p->m8;
+            Unk802116B4_El* e = (Unk802116B4_El*)((char*)(p->m8 * 12 + (int)this) + 0xC);
+            e->m4 = lbl_805D5C50;
+            e->m8 = lbl_805D5C50;
+            fn_8014E108(p);
+        }
+    }
+};
+
+extern "C" Unk802116B4* fn_802116B4(Unk802116B4* self, TaskInner* a)
+{
+    new (self) Unk802116B4(a);
+    return self;
+}
+
+extern const float lbl_805D5C58;
+extern "C" float fn_804028E4(float x); /* square root */
+extern "C" void fn_8040A208(void* base, int n, int size, int (*cmp)(CmpPos*, CmpPos*));
+
+inline Vec3f Flat183C(PosObj* o)
+{
+    Vec3f v = o->m60;
+    v.y = lbl_805D5C58;
+    return v;
+}
+
+extern "C" void fn_8021183C(Unk802116B4* o, Vec3f* pos, int flag)
+{
+    IterObj it;
+    fn_8014E09C(&it, o->m0->m0, 1);
+    IterObj* p = &it;
+    while (p->m8 != 10) {
+        int i = p->m8;
+        Vec3f w = Flat183C((PosObj*)ObjAt(o->m0->m8, i));
+        *(float*)((char*)o + 0x14 + i * 12) = fn_804028E4((w.x - pos->x) * (w.x - pos->x) + (w.z - pos->z) * (w.z - pos->z));
+        fn_8014E108(p);
+    }
+    if (flag)
+        fn_8040A208(o->mC, 9, 12, fn_802115B8);
+    else
+        fn_8040A208(o->mC, 9, 12, fn_80211624);
+    o->m4 = 1;
+}
+
+struct Unk8021195C_El {
+    int m0;
+    float m4;
+    float m8;
+    Unk8021195C_El() { fn_8035B7D4((U*)this); }
+};
+
+extern const char lbl_80660A60[];
+extern const float lbl_805D5C5C;
+
+struct Unk8021195C {
+    int m0;
+    int m4;
+    const void* m8;
+    Unk8021195C_El mC[4];
+    Unk8021195C(int a) : m0(a), m4(0), m8(lbl_80660A60)
+    {
+        volatile int sp8 = 0;
+        int e = 0;
+        do {
+            mC[e].m0 = e;
+            int c = sp8;
+            mC[c].m4 = lbl_805D5C5C;
+            mC[c].m8 = lbl_805D5C5C;
+            int t;
+            if (c > 3)
+                t = c;
+            else
+                t = c + 1;
+            sp8 = t;
+            e = t;
+        } while (e <= 3);
+    }
+};
+
+extern "C" Unk8021195C* fn_8021195C(Unk8021195C* self, int a)
+{
+    new (self) Unk8021195C(a);
+    return self;
+}
+
+extern const Vec3f lbl_805D6760[];
+extern const float lbl_805D5C60;
+
+inline Vec3f Flat1A18(PosObj* o)
+{
+    Vec3f v = o->m60;
+    v.y = lbl_805D5C60;
+    return v;
+}
+
+/* near-miss: 20 slots: arithmetic and the Vec3 copy chain match; retail puts the operator- result temp at sp+0x28 and the
+   volatile counter above it at sp+0x38 (frame 0x48), ours has the counter at 0x28 and the temp at 0x30 (frame 0x50) */
+extern "C" void fn_80211A18(Unk802116B4* o, int idx)
+{
+    Vec3f a = Flat1A18((PosObj*)ObjAt(o->m0->m8, idx));
+    volatile int sp38 = 0;
+    int e = 0;
+    do {
+        Vec3f d = lbl_805D6760[e] - a;
+        int c;
+        *(float*)((char*)o + 0x14 + (c = sp38) * 12) = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+        int t;
+        if (c > 3)
+            t = c;
+        else
+            t = c + 1;
+        sp38 = t;
+        e = t;
+    } while (e <= 3);
+    fn_8040A208(o->mC, 4, 12, fn_80211648);
+    o->m4 = 1;
+}
+
 void fn_80211B58(Slots4* s)
 {
     volatile int sp8 = 0;
@@ -440,6 +587,68 @@ void fn_80211FE4(Rec40* r)
     r->m2C = -99.0f;
     r->m24 = 0;
     r->m30 = lbl_806055DC;
+}
+
+struct Unk80212054_Obj {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    Rec34 m1C[4];
+    Rec1C mEC[4];
+    Rec14 m15C[4];
+    char pad1AC[0x2AC - 0x1AC];
+    int m2AC;
+    int m2B0;
+    Rec2C m2B4[4];
+};
+
+inline Rec2C* RecA2054(Unk80212054_Obj* o, int i)
+{
+    if ((unsigned)(i - 9) > 3)
+        return 0;
+    return (Rec2C*)((char*)o + (i * 0x2C + 0x128));
+}
+
+inline Rec40* RecB2054(Unk80212054_Obj* o, int i)
+{
+    if ((unsigned)(i - 9) > 3)
+        return 0;
+    return (Rec40*)((char*)o + (i * 0x40 - 0x94));
+}
+
+void fn_80212054(Unk80212054_Obj* o)
+{
+    for (int i = 0; i < 4; i++) {
+        fn_80211EF8(&o->m2B4[i]);
+        fn_80211F3C(&o->m1C[i]);
+        fn_80211F7C(&o->mEC[i]);
+        fn_80211FC0(&o->m15C[i]);
+    }
+    volatile int sp8 = 9;
+    int e = 9;
+    do {
+        fn_80211EF8(RecA2054(o, e));
+        fn_80211FE4(RecB2054(o, sp8));
+        int c = sp8;
+        int t;
+        if (c > 0x15)
+            t = c;
+        else
+            t = c + 1;
+        sp8 = t;
+        e = t;
+    } while (e <= 12);
+    o->m4 = 0;
+    o->m8 = 0;
+    o->m10 = -1;
+    o->mC = -1;
+    o->m14 = 0;
+    o->m18 = 0;
+    fn_8035B940(&o->m2AC, -1);
 }
 
 void fn_80212170(Pair2* p, int i, int v)
