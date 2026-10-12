@@ -274,6 +274,54 @@ void fn_80082CB0(Node** root, Node** cur)
     (*cur)->mC = (*cur)->mC & 1;
 }
 
+struct Unk80082248_Y;
+void fn_80082108(Unk80082248_Y* y, Rec* r);
+
+void fn_80082DA8(Tree* t)
+{
+    Node* z = ((Node* (*)(Tree*))fn_80082F4C)(t);
+    if (z != &lbl_8061932C) {
+        Node* y;
+        if (z->m4 == &lbl_8061932C || z->m8 == &lbl_8061932C)
+            y = z;
+        else {
+            y = z->m8;
+            while (y->m4 != &lbl_8061932C)
+                y = y->m4;
+        }
+        Node* x = y->m4 != &lbl_8061932C ? y->m4 : y->m8;
+        x->m0 = y->m0;
+        Node* p = y->m0;
+        if (p != &lbl_8061932C) {
+            Node** slot = &p->m8;
+            if (y == p->m4)
+                slot = &p->m4;
+            *slot = x;
+        } else
+            t->m0 = x;
+        if (y != z) {
+            z->m10 = y->m10;
+            fn_80082200(z);
+            Rec* l = (Rec*)y->m14;
+            if (l != 0) {
+                do {
+                    Rec* r = fn_80082248();
+                    *r = *l;
+                    r->m0 = 0;
+                    fn_80082108((Unk80082248_Y*)z, r);
+                    l = (Rec*)l->m0;
+                } while (l != 0);
+            }
+        }
+        if (!(y->mC & ~1))
+            fn_80082CB0((Node**)t, &x);
+        if (y == t->m4)
+            t->m4 = &lbl_8061932C;
+        if (y != &lbl_8061932C)
+            fn_800824D4(t, y);
+    }
+}
+
 Node* fn_80082F4C(Tree* t, int key)
 {
     if (key == t->m4->m10)
