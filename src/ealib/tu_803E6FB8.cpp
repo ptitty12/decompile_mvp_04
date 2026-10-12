@@ -135,6 +135,78 @@ extern "C" void fn_803E73F4(int v)
     lbl_8062C674 = v;
 }
 
+struct Unk803E945C_Ent {
+    int m0;
+    int m4;
+    short m8;
+    short mA;
+    short mC;
+    unsigned short mE;
+};
+
+struct Unk803E945C_Rec {
+    char pad0[0x10];
+    int m10;
+    char pad14[0x28 - 0x14];
+};
+
+struct Unk803E945C_Aux {
+    char pad0[0x30];
+    unsigned short m30;
+};
+
+struct Unk803E945C_T {
+    char pad0[8];
+    char* m8;
+    char padC[4];
+    unsigned int m10;
+    Unk803E945C_Ent* m14;
+    Unk803E945C_Rec* m18;
+    Unk803E945C_Aux* m1C;
+    int m20[256];
+    int* m420;
+    int* m424;
+};
+
+extern char lbl_8060D8BC[];
+extern "C" int fn_803E7320(int level, const char* fmt, ...);
+
+/* near-miss: 3 slots; the bound t->m10 is loaded into r6 (ours r0) and the entry address is ents + i*16 in the other operand order */
+extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
+{
+    const char* p = name;
+    Unk803E945C_Ent* ents = t->m14;
+    unsigned int h = 0;
+    if (*p != 0) {
+        do {
+            int c = *p;
+            p++;
+            h = (h << 4) + c;
+            unsigned int g = h & 0xf0000000;
+            if (g != 0)
+                h ^= g >> 24;
+            h &= ~g;
+        } while (*p != 0);
+    }
+    unsigned int i = t->m20[h & 0xff];
+    if (i != 0xffffffff) {
+        do {
+            if (i > t->m10)
+                fn_803E7320(0, lbl_8060D8BC, i);
+            if (t->m424[i] != 0) {
+                Unk803E945C_Ent* e = &ents[i];
+                if (strcmp(name, t->m8 + e->m0) == 0) {
+                    int k = e->mE;
+                    if (k > 0 && k < t->m1C->m30)
+                        return t->m18[k].m10 + e->m4;
+                }
+            }
+            i = t->m420[i];
+        } while (i != 0xffffffff);
+    }
+    return 0;
+}
+
 /* Static initializer / destructor for lbl_806AAB6C, lbl_806AAB80 and lbl_806AABA8 (single element, two pairs). */
 extern Unk803E7008_Pair lbl_806AAB80;
 extern Unk803E7008_Pair lbl_806AABA8;
@@ -215,7 +287,7 @@ extern "C" int fn_803E973C(void* o)
 }
 
 extern "C" void fn_803E97C4(Unk803E9640* o);
-extern "C" void fn_803E98A0(void* o);
+extern "C" void fn_803E98A0(Unk803E9640* o);
 
 extern "C" void fn_803E9744(Unk803E9640* o, int chrg)
 {
@@ -227,7 +299,6 @@ extern "C" void fn_803E9744(Unk803E9640* o, int chrg)
     if (chrg & 1)
         lbl_8062C66C(o, 0x30);
 }
-
 
 /* 0x430-byte block of an intrusive doubly-linked list (next at +0, previous-link at +4) headed by lbl_8062C67C;
  * m420 / m424 are two arrays of m10 words. */
@@ -268,12 +339,117 @@ extern "C" void fn_803E97C4(Unk803E9640* o)
     o->m2C = 0;
 }
 
+struct Unk803E98A0_Ent {
+    void (*fn)(int);
+    int arg;
+};
+
+struct Unk803E98A0_Node {
+    void (*fn)(int, int);
+    int a;
+    int b;
+    Unk803E98A0_Node* next;
+};
+
+extern "C" void fn_803E98A0(Unk803E9640* o)
+{
+    if (o->m8 != 0) {
+        int i;
+        for (i = o->m4 - 1; i >= 0; i--) {
+            int off = i * 8;
+            int base = o->m8;
+            void (*f)(int) = *(void (**)(int))(off + base);
+            Unk803E98A0_Ent* e = (Unk803E98A0_Ent*)(off + base);
+            f(e->arg);
+        }
+        lbl_8062C66C((void*)o->m8, o->m4 * 8);
+        o->m8 = 0;
+    }
+    Unk803E98A0_Node* n = (Unk803E98A0_Node*)o->mC;
+    if (n != 0) {
+        do {
+            Unk803E98A0_Node* nx = n->next;
+            n->fn(n->a, n->b);
+            lbl_8062C66C(n, 0x10);
+            n = nx;
+        } while (n != 0);
+    }
+    o->mC = 0;
+}
+
 extern "C" int fn_803E9978(Unk803E7008_Ent** pp)
 {
     Unk803E7008_Ent* e = *pp;
     if (!e)
         return 0;
     return e->m10;
+}
+
+struct Unk803E9994_Ent {
+    int m0;
+    const char* m4;
+    int m8;
+    int mC;
+    Unk803E9994_Ent()
+    {
+        m0 = 0;
+        m8 = 0;
+    }
+};
+
+struct Unk803E9994_Hdr {
+    char pad0[0x10];
+    int m10;
+};
+
+extern "C" Unk803E9994_Ent fn_803E92E8(Unk803E9994_Hdr** c, int i);
+extern "C" int strcmp(const char* a, const char* b);
+
+inline int Unk803E9994_Count(Unk803E9994_Hdr** c)
+{
+    Unk803E9994_Hdr* h = *c;
+    int n = 0;
+    if (h != 0)
+        n = h->m10;
+    return n;
+}
+
+inline int Unk803E9994_Find(Unk803E9994_Hdr** c, const char* key, int* idx, Unk803E9994_Ent* out)
+{
+    while (*idx < Unk803E9994_Count(c)) {
+        Unk803E9994_Ent e = fn_803E92E8(c, *idx);
+        if (strcmp(key, e.m4) == 0) {
+            *out = e;
+            (*idx)++;
+            return 1;
+        }
+        (*idx)++;
+    }
+    return 0;
+}
+
+extern "C" int fn_803E9994(Unk803E9994_Hdr** c, const char* key, int* idx, Unk803E9994_Ent* out)
+{
+    while (*idx < Unk803E9994_Count(c)) {
+        Unk803E9994_Ent e = fn_803E92E8(c, *idx);
+        if (strcmp(key, e.m4) == 0) {
+            *out = e;
+            (*idx)++;
+            return 1;
+        }
+        (*idx)++;
+    }
+    return 0;
+}
+
+extern "C" int fn_803E9A54(Unk803E9994_Hdr** c, const char* key, int* idx, int* out)
+{
+    Unk803E9994_Ent loc;
+    if (Unk803E9994_Find(c, key, idx, &loc)) {
+        *out = loc.m8;
+        return 1;
+    }
+    return 0;
 }
 
 extern "C" void fn_803E9B3C(int a, int b)
