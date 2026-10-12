@@ -3,6 +3,18 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+extern "C" {
+FeW* fn_800C8058(FeW* w);
+}
+extern "C" {
+void fn_80465FB4(FeScrI* x, int sel);
+void fn_80466F94(FeScrI* x);
+void fn_804673EC(FeScrI* x);
+void fn_80469274(FeScrI* x);
+void fn_80469C8C(FeScrI* x);
+void fn_8046A558(FeScrI* x);
+void fn_8046B390(FeScrI* x);
+}
 extern "C" int fn_80468D44(FeW* w, int v);
 extern "C" {
 FeW* fn_800C8060(FeW* w);
@@ -142,6 +154,58 @@ FE_OVERLAY void fn_80468628(void* x)
         FeWpq(x, 0x184)->fn_vslot8(0);
         w->fn_vslot8(1);
         w->fn_vslot16(1);
+    }
+}
+
+FE_OVERLAY void fn_8046B980(FeScrI* x, FeW* w)
+{
+    int sel = ((FeSub*)((char*)fn_800C8058(fn_800C805C(x->m138->fn_vslot33(0xB, 1))->fn_vslot33(0xA, 1)) + 0xDC))->s5();
+    if (sel != x->m208) {
+        fn_80465FB4(x, sel);
+        return;
+    }
+    switch (sel) {
+    case 0:
+        if (w == fn_800C805C(FeWpq(x, 0x13C)->fn_vslot32(lbl_805F59C4, 1))) {
+            fn_80466F94(x);
+        } else if (w == x->m158) {
+            fn_80466E08(x);
+        }
+        break;
+    case 1:
+        if (w == fn_800C805C(FeWpq(x, 0x13C)->fn_vslot32(lbl_805F59C4, 1))) {
+            fn_80468490(x);
+        } else if (w == x->m158) {
+            fn_80466E08(x);
+        }
+        break;
+    case 2:
+        if (w == fn_800C805C(FeWpq(x, 0x13C)->fn_vslot32(lbl_805F59C4, 1))) {
+            fn_80468628(x);
+        } else if (w == x->m158) {
+            fn_80466E08(x);
+        }
+        break;
+    case 3:
+        if (w == FeWpq(x, 0x160))
+            fn_804673EC(x);
+        break;
+    case 4:
+        if (w == FeWpq(x, 0x160))
+            fn_80469274(x);
+        break;
+    case 5:
+        if (w == FeWpq(x, 0x160))
+            fn_80469C8C(x);
+        break;
+    case 6:
+        fn_8046A558(x);
+        break;
+    case 7:
+    case 8:
+        if (w == FeWpq(x, 0x160))
+            fn_8046B390(x);
+        break;
     }
 }
 
