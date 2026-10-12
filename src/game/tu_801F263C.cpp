@@ -385,6 +385,101 @@ int fn_801F5394()
     return 0;
 }
 
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+struct Unk80256C80_M;
+extern "C++" {
+int fn_8026D7B4(Unk8026C414_O* self, Unk8026C414_X* ctx);
+int fn_8026D8BC(Unk8026C414_O* self, Unk8026C414_X* ctx);
+void fn_802595B8(Unk80256C80_M* m, int o);
+}
+int fn_80250724(void* p);
+int fn_801F3B7C(Scr* p, void* pl);
+extern const Unk801EE438_Vec lbl_805D676C;
+
+struct Unk801F5C00_Nd {
+    Unk801F5C00_Nd* m0;
+    char pad4[0xC];
+    int m10;
+};
+struct Unk801F5C00_Sb {
+    char pad0[8];
+    float m8;
+    char padC[0x28 - 0xC];
+    int m28;
+};
+struct Unk801F5C00_Ob {
+    char pad0[0x58C];
+    Unk801F5C00_Sb m58C;
+    char pad5B8[0x934 - 0x58C - sizeof(Unk801F5C00_Sb)];
+    Unk801F5C00_Nd* m934;
+};
+struct Unk801F5C00_Rs {
+    char pad0[0x24];
+    int m24;
+    Unk801F5C00_Ob* m28;
+};
+struct Unk801F5C00_Ow {
+    char pad0[0x65C];
+    Unk801F5C00_Rs m65C;
+};
+struct Unk801F5C00_Pl {
+    char pad0[0x60];
+    Unk801EE438_Vec m60;
+    char pad6C[0x44C - 0x6C];
+    Unk801F5C00_Ow* m44C;
+    char pad450[0x4D8 - 0x450];
+    char m4D8[0x140];
+    Unk801F3DB4_Cfg* m618;
+};
+
+int fn_801F5C00(Scr* s, Unk801F5C00_Pl* pl)
+{
+    int r = 0;
+    Unk801F5C00_Rs* rs = &pl->m44C->m65C;
+    int m24 = rs->m24;
+    Unk801F5C00_Ob* o = rs->m28;
+    if (m24 != 0 && o != 0) {
+        Unk801F5C00_Sb* sm = &o->m58C;
+        if (sm->m8 == 0.0f) {
+            float d2 = (lbl_805D676C.m0 - pl->m60.m0) * (lbl_805D676C.m0 - pl->m60.m0) +
+                       (lbl_805D676C.m8 - pl->m60.m8) * (lbl_805D676C.m8 - pl->m60.m8);
+            const float lim = 5184.0f;
+            int flag = 0;
+            if (pl->m618->m838 == 0xCA50EF74)
+                flag = fn_8026D7B4((Unk8026C414_O*)pl, 0) == 1;
+            if (!((fn_8026D8BC((Unk8026C414_O*)pl, 0) != 0 || flag != 0) && d2 <= lim))
+                return 0;
+            Unk801F5C00_Nd* n = o->m934;
+            int kind = 0;
+            while (n != 0) {
+                if (n->m10 == 0xA) {
+                    kind = sm->m28;
+                    break;
+                }
+                n = n->m0;
+            }
+            if ((unsigned)(kind - 0xB) <= 5) {
+                int ph = fn_80250724(pl->m4D8);
+                if (ph == 1 || (ph == 3 && (kind == 0xC || kind == 0xE)) || (ph == 2 && (kind == 0xD || kind == 0xF))) {
+                    {
+                        char* b = (char*)s->m9C + 0x9FC;
+                        int o = s->m9C->m3A5C * 16;
+                        *(int*)(b + o) = 0;
+                    }
+                    if (fn_801F3B7C(s, pl) == 1) {
+                        r = 2;
+                        fn_802595B8((Unk80256C80_M*)s->m9C->m0->m700->m3B4, (int)o);
+                    } else {
+                        r = 1;
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
 int fn_801F5DD8(Scr* unused, int a)
 {
     if (a == 0x11 || a == 0x13 || a == 0x12 || a == 0x14 || a == 0x16 || a == 0x15)
