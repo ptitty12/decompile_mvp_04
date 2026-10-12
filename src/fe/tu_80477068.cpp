@@ -3,6 +3,11 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" void fn_800DD344__FP8Udd344_TPv(void* a, void* b);
+extern "C" {
+void fn_8047A46C(char* x);
+void fn_8047ABBC(char* x, FeW* w, int a, int b);
+}
 
 extern "C" FE_OVERLAY void fn_80477068(FeScrD* x)
 {
@@ -150,6 +155,32 @@ extern "C" FE_OVERLAY void fn_80479480(void* x)
     fn_80125BC0(FeWp(x, 0x1C8));
 }
 
+extern "C" FE_OVERLAY void fn_804794A4(char* x)
+{
+    int i = FeWp(x, 0x1C0)->fn_vslot60();
+    fn_80124FA8(FeVp(x, 0x1C8), x);
+    fn_80125154(FeVp(x, 0x1C8), 0);
+    fn_801251CC(FeVp(x, 0x1C8), 0, 0x10, 2);
+    int o = i * 12;
+    char* b = x + 0x154;
+    int k = *(int*)(b + o);
+    if (k == 1) {
+        fn_801251CC(FeVp(x, 0x1C8), 0, 0x10, 2);
+        fn_80125084(FeVp(x, 0x1C8), 3);
+    } else if (k == 2) {
+        fn_80125084(FeVp(x, 0x1C8), 0);
+        fn_801251CC(FeVp(x, 0x1C8), 3, 0x27D7, 3);
+    } else if (k == -1) {
+        fn_80125084(FeVp(x, 0x1C8), 0);
+        fn_80125084(FeVp(x, 0x1C8), 3);
+    }
+    if (fn_804795D0(x) != 0) {
+        fn_80125084(FeVp(x, 0x1C8), 1);
+        fn_80125084(FeVp(x, 0x1C8), 4);
+        fn_80125128(FeVp(x, 0x1C8), 1);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_804795D0(char* x)
 {
     int i;
@@ -251,6 +282,43 @@ extern "C" FE_OVERLAY void fn_8047AA20(char* x)
         FeSet(x + 0x154, o, 0);
     }
     FeI(x, 0x134) = 0;
+}
+
+extern "C" FE_OVERLAY void fn_8047AA5C(char* x)
+{
+    int i = 0;
+    fn_8047A46C(x);
+    FeWp(x, 0x1C0)->fn_vslot67(0, 0);
+    FeWp(x, 0x1C0)->fn_vslot79(FeI(x, 0x134), 0);
+    FeWp(x, 0x1C0)->fn_vslot14(1);
+    for (; i < FeI(x, 0x134); i++) {
+        int o = i * 12;
+        char* a = x + 0x14C;
+        if (*(int*)(a + o) != -1) {
+            FeWp(x, 0x1C0)->fn_vslot73(i, 0);
+            fn_8047ABBC(x, fn_800C8044(), *(int*)(a + o), FePick(x + 0x150, o));
+        }
+    }
+    if (FeI(x, 0x134) <= 3) {
+        FeWp(x, 0x1C0)->fn_vslot32("VSCROLL", 1);
+        fn_800C8044()->fn_vslot8(0);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_8047ABBC(char* x, FeW* w, int a, int b)
+{
+    char sp8[0x18];
+    char sp20[8];
+    w->fn_vslot32("AWAY", 1);
+    fn_8047AD30((int)x, fn_800C8044(), 1, a, b);
+    w->fn_vslot32("HOME", 1);
+    fn_8047AD30((int)x, fn_800C8044(), 0, a, b);
+    ((void (*)(void*, ...))fn_8032A0C0)(sp20, fn_8007FBDC__FP13Unk8007F198_Cii((int)lbl_8061930C, a, b));
+    fn_800DD344__FP8Udd344_TPv(sp20, sp8);
+    w->fn_vslot32("TIME", 1);
+    ((FeWV*)fn_800C8040())->s28(sp8);
+    w->fn_vslot32("LEAGUELOGO", 1);
+    ((FeSub*)((char*)fn_800C8054() + 0x98))->s6(b);
 }
 
 extern "C" FE_OVERLAY void fn_8047AD30(int u, FeW* x, int b, int c, int d)
