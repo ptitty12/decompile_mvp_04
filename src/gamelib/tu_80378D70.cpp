@@ -86,6 +86,22 @@ extern Unk80379324 lbl_806055E8;
 extern Unk80379324_Vec3 lbl_806055AC;
 extern "C" Unk803793D4_Vec4 fn_803793D4(float w, const Unk80379324_Vec3* v);
 
+extern "C" float fn_80402A90(const Unk80379324_Vec3* v);
+extern "C" float acosf(float x);
+
+extern "C" float asinf(float x);
+
+extern "C" float fn_804028E4(float x);
+
+inline Unk80379324_Vec3 Unk80379F1C_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 extern "C" void fn_80378FB0(const char** pp, unsigned len, int ch)
 {
     unsigned i = 0;
@@ -257,6 +273,30 @@ extern "C" float fn_80379AF4(const Unk80379324* a, const Unk80379324* b)
     return r;
 }
 
+extern "C" float fn_80379F1C(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* c, Unk80379324_Vec3* out)
+{
+    Unk80379324_Vec3 ab = Unk80379F1C_Sub(*b, *a);
+    float t = (ab.x * c->x - ab.x * a->x) + (ab.y * c->y - ab.y * a->y) + (ab.z * c->z - ab.z * a->z);
+    t = t / (ab.x * ab.x + ab.y * ab.y + ab.z * ab.z);
+    out->x = t * (b->x - a->x) + a->x;
+    out->y = t * (b->y - a->y) + a->y;
+    out->z = t * (b->z - a->z) + a->z;
+    Unk80379324_Vec3 d = Unk80379F1C_Sub(*c, *out);
+    return fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+}
+
+extern "C" float fn_8037A9AC(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b)
+{
+    float la = fn_80402A90(a);
+    float lb = fn_80402A90(b);
+    if (la <= 0.000001f || lb <= 0.000001f)
+        return 0.0f;
+    float c = (a->x * b->x + a->y * b->y + a->z * b->z) / (la * lb);
+    if (!(c <= 0.9999 || c >= 1.0001))
+        return 0.0f;
+    return acosf(c);
+}
+
 extern "C" float fn_8037AA84(const Unk80379324* q)
 {
     float ww = q->w * q->w;
@@ -264,6 +304,19 @@ extern "C" float fn_8037AA84(const Unk80379324* q)
     float yy = q->y * q->y;
     float zz = q->z * q->z;
     float r = fn_80410CE8(xx + yy - zz - ww, (q->y * q->z + q->x * q->w) + (q->y * q->z + q->x * q->w));
+    return r;
+}
+
+extern "C" Unk80379324_Vec3 fn_8037AB04(const Unk80379324* q)
+{
+    Unk80379324_Vec3 r;
+    float ww = q->w * q->w;
+    float xx = q->x * q->x;
+    float yy = q->y * q->y;
+    float zz = q->z * q->z;
+    r.x = fn_80410CE8((q->x * q->y + q->z * q->w) + (q->x * q->y + q->z * q->w), xx - yy - zz + ww);
+    r.y = fn_80410CE8((q->y * q->z + q->x * q->w) + (q->y * q->z + q->x * q->w), -xx - yy + zz + ww);
+    r.z = asinf((q->x * q->z - q->y * q->w) * -2.0f);
     return r;
 }
 
