@@ -563,6 +563,76 @@ extern "C" float fn_800B3890(GObj* self)
     return t <? lbl_805B9D38;
 }
 
+class FE98 {
+public:
+    char pad0[0x98];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual int s4();
+};
+struct FEQ6CC {
+    char pad0[0x448];
+    int m448;
+};
+struct FEP4 {
+    char pad0[0x6CC];
+    FEQ6CC* m6CC;
+};
+struct FEObj3EF0 {
+    char pad0[4];
+    FEP4* m4;
+    char pad8[0x90 - 8];
+    int m90;
+};
+struct FEZ3EF0 {
+    char pad0[0xC];
+    unsigned mC;
+    char pad10[0x18 - 0x10];
+    unsigned m18;
+    char pad1C[0x24 - 0x1C];
+    unsigned m24;
+};
+extern FEZ3EF0* lbl_8061EAE4;
+extern "C" FE98* fn_801A4B34(FEP4* p);
+extern "C" void fn_80195928(int a, int b);
+
+extern "C" void fn_800B3EF0(FEObj3EF0* self)
+{
+    int kind = self->m90;
+    int r = fn_801A4B34(self->m4)->s4();
+    int sel = 3;
+    if (lbl_8061EAE4) {
+        lbl_8061EAE4->mC &= ~3;
+        lbl_8061EAE4->m24 &= ~3;
+        lbl_8061EAE4->m18 &= ~3;
+        if (kind == 1 || kind == 4 || kind == 5 || kind == 10) {
+            if (r != 0) {
+                sel = 2;
+                lbl_8061EAE4->m18 |= 3;
+            } else {
+                sel = 0;
+                lbl_8061EAE4->mC |= 3;
+            }
+        } else if (kind == 2 || kind == 6 || kind == 7) {
+            sel = 1;
+            lbl_8061EAE4->m24 |= 3;
+        } else if (kind == 3 || kind == 8 || kind == 9 || kind == 11) {
+            if (r == 0) {
+                sel = 2;
+                lbl_8061EAE4->m18 |= 3;
+            } else {
+                sel = 0;
+                lbl_8061EAE4->mC |= 3;
+            }
+        }
+    }
+    if (sel == 3) {
+        sel = 0;
+    }
+    fn_80195928(self->m4->m6CC->m448, sel);
+}
+
 extern "C" int fn_800B4B28(GObj5C* self, int k)
 {
     int r = 0;
