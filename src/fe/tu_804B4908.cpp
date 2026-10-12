@@ -5,6 +5,15 @@
 
 #include "game/fe_804ABCBC.h"
 
+extern "C" void fn_804BB17C(FeCam* c, FeObj* w, int n);
+extern "C" void fn_804BC414(FeCam* c, float a);
+extern "C" void fn_804BC2B0(FeCam* c, float a, float b);
+extern "C" int fn_804BB8B4(FeCam* c, int a);
+extern "C" void fn_804BB780(FeCam* c, const char* s, int n);
+extern "C" void fn_804BB58C(FeCam* c, char* s, int n);
+extern "C" void fn_804BC42C(FeCam* c, int a, int b);
+struct FeSt3 { int m0; int m4; int m8; };
+extern "C" FeSt3* fn_805932E4(int a, int b, int c, int d);
 extern "C" int fn_800B57EC();
 extern "C" int fn_8056A5F4(int a, int b, int c, int d);
 extern "C" int fn_8056A2F8(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
@@ -29,6 +38,24 @@ extern "C" FE_OVERLAY void fn_804B530C(FeScr* x)
     ((FeObj1*)fn_800C8040(((FeObj*)x->m140)->v32("BANK", 1)))->v28((int)buf);
     fn_800E5380(x->m140);
     ((FeObj*)x)->v88();
+}
+
+extern "C" FE_OVERLAY void fn_804B5FC4(FeScr* x)
+{
+    char buf[8];
+    char* p = buf;
+    FeCam* c = (FeCam*)((char*)x + 0x14C);
+    fn_804BB17C(c, fn_800C8044(x->m138->v32("BARGRAPH", 1)), 0x4B);
+    fn_804BC414(c, 0.5f);
+    fn_804BC2B0(c, 0.0f, 100.0f);
+    fn_804BB780(c, "Item", fn_804BB8B4(c, 4));
+    fn_804BB780(c, "Avg.", fn_804BB8B4(c, 4));
+    fn_804031BC(p, "");
+    fn_804BB58C(c, p, (int)fn_80090880(lbl_8061977C, 0x57FA));
+    fn_804BC42C(c, 0x1A4B, 0);
+    fn_804BC42C(c, 0x1A4B, 1);
+    fn_804BC42C(c, 0x1A4B, 2);
+    fn_804BC42C(c, 0x1A4B, 3);
 }
 
 extern "C" FE_OVERLAY void fn_804B65D0(FeScr* x, int a)
@@ -192,4 +219,13 @@ extern "C" FE_OVERLAY int fn_804B79FC(FeScr* x)
     if (r != 0)
         return fn_800B5520(r);
     return 0x7C;
+}
+
+extern "C" FE_OVERLAY int fn_804B7A30(FeScr* x, int a, int b)
+{
+    if (fn_805932E4(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, b)->m4 > 0) {
+        FeSt3* p = fn_805932E4(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, b);
+        return p->m8 * 100 / fn_805932E4(FI(x, 0xE18), ((FeObjI*)x)->v98(), a, b)->m4;
+    }
+    return 0;
 }
