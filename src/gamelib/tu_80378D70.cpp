@@ -102,6 +102,86 @@ inline Unk80379324_Vec3 Unk80379F1C_Sub(const Unk80379324_Vec3& a, const Unk8037
     return r;
 }
 
+extern "C" void fn_80378D70(const char* s, int a, char* dst, int max, int ch, int* len)
+{
+    if (a != 0 && max != 0) {
+        int full = 0;
+        const char* p = s;
+        *len = 0;
+        int c = *p;
+        if (c != 0 && c != ch) {
+            do {
+                p++;
+                if (++*len == max)
+                    full = 1;
+                c = *p;
+                if (c == 0)
+                    break;
+                if (full)
+                    break;
+            } while (c != ch);
+        }
+        if (full)
+            (*len)--;
+        if (*len != 0)
+            memcpy(dst, s, *len);
+        dst[*len] = 0;
+    }
+}
+
+/* near-miss (97.4%): token scan; same instructions except the closing `(*pp)++`, which retail reloads *pp for (the join before it has a second predecessor in retail), ours reuses the compared pointer (one lwz less). */
+extern "C" void fn_80378E48(const char** pp, int* rem, int ch, const char** tok, int* tokLen)
+{
+    *tokLen = 0;
+    *tok = *pp;
+    if (*rem != 0) {
+        const char* p = *pp;
+        int c = *p;
+        if (c != 0 && c != ch) {
+            do {
+                *pp = p + 1;
+                (*tokLen)++;
+                if (--*rem == 0)
+                    break;
+                p = *pp;
+                c = *p;
+                if (c == 0)
+                    break;
+            } while (c != ch);
+        }
+    } else {
+        *tok = 0;
+    }
+    if (**pp == ch) {
+        if (ch != 0)
+            (*pp)++;
+    }
+}
+
+extern "C" void fn_80378EF8(const unsigned char* s, int a, char* dst, int max, int* len)
+{
+    if (a != 0 && max != 0) {
+        int full = 0;
+        *len = 0;
+        unsigned c = s[*len];
+        if (c - 0x21 <= 0x5C) {
+            do {
+                (*len)++;
+                if (*len == max)
+                    full = 1;
+                if (full)
+                    break;
+                c = s[*len];
+            } while (c - 0x21 <= 0x5C);
+        }
+        if (full)
+            (*len)--;
+        if (*len != 0)
+            memcpy(dst, s, *len);
+        dst[*len] = 0;
+    }
+}
+
 extern "C" void fn_80378FB0(const char** pp, unsigned len, int ch)
 {
     unsigned i = 0;
