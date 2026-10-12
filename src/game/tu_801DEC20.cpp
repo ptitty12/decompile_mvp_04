@@ -373,6 +373,37 @@ D:
     return r;
 }
 
+struct Unk801E1518_P {
+    char pad0[0x44C];
+    Unk801DB948_Game* m44C;
+    char pad450[0x540 - 0x450];
+    float m540;
+};
+extern const char lbl_805D3A40[];
+
+extern "C" int fn_801E1518(I* i, P* p, int flag, float fv)
+{
+    float v1 = 60.0f;
+    float v2 = 20.0f;
+    float v3 = 40.0f;
+    float v4 = 10.0f;
+    float v5 = 60.0f;
+    float v6 = 30.0f;
+    float v7 = 0.0f;
+    if (flag != 0) {
+        if (!(fv >= 1296.0f))
+            v7 = ((Unk801E1518_P*)p)->m540 * 40.0f + 20.0f;
+        else
+            v7 = ((Unk801E1518_P*)p)->m540 * 30.0f + 10.0f;
+    } else {
+        v7 = ((Unk801E1518_P*)p)->m540 * 30.0f + 30.0f;
+    }
+    float v8 = 100.0f;
+    const char* file = lbl_805D3A40;
+    unsigned rn = ((Unk801E1518_P*)p)->m44C->m554->fn_8014D8AC(1000000, file, 0xA8E);
+    return (float)rn * v8 * 0.000001f < v7;
+}
+
 extern "C" void fn_801E1638(I* i)
 {
     Unk801DB948_It it;
