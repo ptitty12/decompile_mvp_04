@@ -9,6 +9,11 @@ typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
 typedef Unk8024EF40_W W;
 
+inline float Unk80251000_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
 /* Views for fn_8024FE4C: the world's context at +0x700 (table object at +0x3A4) and the player's +0x56C id. */
 struct Unk8024FE4C_Ctx {
     char pad0[0x3A4];
@@ -599,6 +604,21 @@ int fn_80250AC4(P* x)
     return 0;
 }
 
+extern float fn_8024D0F8(P* x, int k);
+float fn_80251000(P* x, int k)
+{
+    float s = fn_8024D0F8(x, k);
+    s = s * s;
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    s = s * 4.0f;
+    float w = fn_8025454C(&x->m588, 0x12);
+    w = !(w > 1.0f) ? (w >? 0.0f) : 1.0f;
+    w = Unk80251000_Lerp(0.70710677f, 1.0f - w, 1.4142135f);
+    w = w * w;
+    s = s * w;
+    return s;
+}
+
 void fn_80251124(P* x)
 {
     if (fn_80250AC4(x) != 0 && fn_80250A90(x, 0) != 0) {
@@ -620,6 +640,18 @@ void fn_8025124C(P* x)
             p = 0.0f;
         if (!(p >= t))
             fn_80250B28(x, 1);
+    }
+}
+
+void fn_80251374(P* x)
+{
+    if (fn_80250AC4(x) != 0 && fn_80250A90(x, 2) != 0) {
+        float t = 20.0f;
+        float p = RandPct(x, lbl_805D990C, 0x457);
+        if (lbl_8061DC54 != 0 || lbl_80691CB4 != 0)
+            p = 0.0f;
+        if (!(p >= 20.0f))
+            fn_80250B28(x, 2);
     }
 }
 
