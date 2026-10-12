@@ -41,7 +41,6 @@ extern const char lbl_805F6AB8[];
 extern "C" void fn_8009E93C(char* p, int a, int b, char* out);
 extern "C" {
 
-//// a
 inline void Fe2FB4Get(char* rec, char* nm)
 {
     fn_8009E93C(rec + 0x8C, 3, 0, nm);
