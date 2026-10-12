@@ -3,9 +3,12 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8022BB90.h"
+#include "game/goals/tu_8027C728.h"
 
 void* operator new(unsigned int size, int heap);
+
 inline void* operator new(unsigned int, void* p) { return p; }
+
 struct Unk8022FE34_Ctx;
 struct Unk8022FE34_Z {
     Unk8022FE34_Ctx* m0;
@@ -73,6 +76,45 @@ void fn_8022BB90(void* a, void* b, RecQueue* q)
 }
 
 void fn_8022BBD8() {}
+
+struct Unk80270BA0_X;
+Unk8027C728_Goal* fn_80244C84(Unk80270BA0_X* x);
+extern "C" Vec3f fn_8018959C(Obj4_36C* c, float t);
+
+extern float lbl_805D6730[1];
+
+/* Unsigned-to-float in an inline: its constant-pool read stays below the int stores. */
+inline float UF(unsigned v)
+{
+    return (float)v;
+}
+
+struct GoalSub54 {
+    char pad0[0x54];
+    float m54;
+};
+
+/* near-miss: 69/69 insns, 2 slots: retail loads the 0.0 constant before reloading f from its stack slot (same as fn_8022EC1C) */
+void fn_8022D5F4(Task* t, int a)
+{
+    Unk8027C728_Goal* g = fn_80244C84((Unk80270BA0_X*)ObjAt(t->m9C->m8, a));
+    GoalSub54* s;
+    if (g != 0) {
+        s = 0;
+        if (g->m10 == 14) {
+            s = (GoalSub54*)g->m18;
+        }
+    } else {
+        s = 0;
+    }
+    float f = s != 0 ? s->m54 : -1.0f;
+    if (!(f <= 0.0f)) {
+        t->m9C->mA4 = a;
+        t->m9C->mA8 = f;
+        TaskInner* in = t->m9C;
+        in->mAC = fn_8018959C(in->m4, in->mA8 - UF(in->m0->m4C) * lbl_805D6730[0]);
+    }
+}
 
 int fn_8022E5AC() { return fn_8022E5D8(); }
 
@@ -218,6 +260,7 @@ inline float AbsF(float v)
 {
     return fabsf(v);
 }
+
 int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
 {
     Pair8 v;
