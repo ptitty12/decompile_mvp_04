@@ -16,7 +16,7 @@ extern const float lbl_805D93EC;
 extern const float lbl_805D93F0;
 extern const float lbl_805D93F4;
 extern const float lbl_805D9484;
-float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, int a, int b, int c, int d);
+float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e);
 void fn_80254784(void* p);
 
 extern const float lbl_805D93AC;
@@ -37,9 +37,24 @@ void fn_80247858(Unk80270BA0_X* x)
     fn_8014E498(x->m60);
 }
 
+float fn_804028E4(float x);
+float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
+float atan2f(float y, float x);
+/* near-miss (99.5%, 6 slots): retail keeps x in r29 and e in r28; ours has them swapped (callee-saved allocation of two
+   equal-priority parameters); tried single-call, result-variable and else forms */
+float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
+{
+    float len = fn_804028E4((p->x - q->x) * (p->x - q->x) + (p->z - q->z) * (p->z - q->z));
+    if (len > 24.0f) {
+        float ang = atan2f(q->x - p->x, q->z - p->z);
+        return fn_8024796C(x, 0, c, d, e, &ang, 0, q, len);
+    }
+    return fn_8024796C(x, 0, c, d, e, 0, 0, q, len);
+}
+
 extern "C" float fn_80248450(Unk80270BA0_X* x, int a, int b, int c)
 {
-    return fn_80248370(x, &x->m60, a, b, c, 0);
+    return fn_80248370(x, &x->m60, (Unk80273498_Vec3*)a, b, c, 0);
 }
 
 float fn_80248F70(Unk80270BA0_X* x, float f)
@@ -150,6 +165,45 @@ float fn_80249298(Unk80270BA0_X* x, int a, int b)
     if (b != 0)
         return r * r;
     return r;
+}
+
+struct Unk802495CC_C {
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x738 - 0x50];
+    int m738;
+};
+struct Unk802495CC_X {
+    char pad0[0x44C];
+    Unk802495CC_C* m44C;
+    char pad450[0xAC4 - 0x450];
+    int mAC4;
+    float mAC8;
+    float mACC;
+    float mAD0;
+};
+extern float lbl_8061D4C4;
+void fn_802494C4(Unk80270BA0_X* x, int a, float f);
+void fn_802495CC(Unk802495CC_X* x)
+{
+    Unk802495CC_C* c = x->m44C;
+    if (c->m738 != 0) {
+        float s = (float)c->m4C * 0.016666668f;
+        if (x->mAC4 == 0) {
+            if (!(x->mAC8 <= 0.0f) && !(s < x->mAC8))
+                fn_802494C4((Unk80270BA0_X*)x, 1, s);
+        } else {
+            if (!(s <= x->mAD0 + lbl_8061D4C4)) {
+                if (!(s >= x->mACC)) {
+                    fn_802494C4((Unk80270BA0_X*)x, 0, s);
+                } else {
+                    x->mAC4 = 0;
+                    x->mAC8 = -1.0f;
+                    x->mACC = -1.0f;
+                }
+            }
+        }
+    }
 }
 
 /* near-miss: only the order of 'stw r4,0xae0' vs 'lwz r8,0x44c' differs (3 source orderings tried) */

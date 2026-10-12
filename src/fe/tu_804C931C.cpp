@@ -5,6 +5,12 @@
 
 #include "game/fe_804BE560.h"
 
+extern const char lbl_805F8108[];
+struct Unk8007F198_B;
+int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
+extern const char lbl_805F3CA8[];
+extern "C" void fn_8013013C(void* w, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l);
+
 extern const char lbl_8066F0D0[];
 extern const char lbl_8066EE28[];
 extern const char lbl_80671198[];
@@ -34,6 +40,35 @@ extern "C" FeScrN* fn_804CB3DC(FeScrN* self, int a, int b, int c, int d, int e, 
 extern "C" int fn_804CA2F0(void* x);
 extern "C" void fn_804CA328(FeScrN* x, int a);
 extern "C" int fn_804CA38C(FeScrN* x, int a);
+
+extern "C" void fn_804C9A40(void* x);
+
+extern "C" void fn_804C9AC4(void*);
+
+extern "C" void fn_804C9D58(void*);
+
+extern "C" FE_OVERLAY void fn_804C9738(FeW* x, int sel, int c)
+{
+    switch (sel) {
+    case 0:
+        fn_804C9A40(x);
+        break;
+    case 1:
+        fn_804C9AC4(x);
+        break;
+    case 2:
+        fn_804C9D58(x);
+        break;
+    case 3: {
+        int r = fn_804CA1E8(x);
+        if (r == 4)
+            x->fn_vslot67(1, c);
+        else if (r == 5)
+            x->fn_vslot67(2, c);
+        break;
+    }
+    }
+}
 
 extern "C" FE_OVERLAY int fn_804C9810(FeScrN* x)
 {
@@ -83,7 +118,52 @@ extern "C" FE_OVERLAY int fn_804C99B4(FeScrN* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_804C99F0(FeScrN* x, int a)
+{
+    fn_800ED310(x, a);
+    x->m150->fn_vslot14(a);
+}
+
+extern const char lbl_805F4450[];
+
+extern "C" FE_OVERLAY void fn_804C9A40(void* x)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    fn_8040B830(mp->name, lbl_805F4450, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
+}
+
 extern "C" FE_OVERLAY void fn_804CA0A8(void) {}
+
+extern "C" FE_OVERLAY void fn_804CA0AC(int a, FeScrN* x)
+{
+    if (x != 0) {
+        int s = fn_800B555C()->m38;
+        int t = fn_800B555C()->m34;
+        fn_8013013C(x->m158, 0, s, t, fn_800B555C()->m38, 0, 1, 0, 0, 0, 0, 0);
+        fn_804C9A40(x);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804CA12C(int a)
+{
+    if (a != 0) {
+        if (a == 1) {
+            Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+            int st = fn_800B555C()->m34;
+            s->fn_8007C328(st, fn_8007F7D0((Unk8007F198_B*)s, 0));
+            FeMsg m;
+            FeMsg* mp = &m;
+            fn_8035682C(mp);
+            fn_8040B830(mp->name, lbl_805F8108, 15);
+            mp->name[15] = 0;
+            fn_800B7B4C(FeGetMgr(), mp, 0);
+        }
+    }
+}
 
 /* near-miss: 2 slots (retail compares `cmpwi r3,4; bge`, we emit `cmpwi r3,3; bgt`). The
  * comma form below is the closest of ~14 spellings of `n >= 4 && n <= 5`. */
@@ -198,6 +278,19 @@ extern "C" FE_OVERLAY int fn_804CB308(FeScrN* x)
 {
     x->m134->fn_vslot53();
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_804CB344(void* x, int b)
+{
+    if (b == 0) {
+        fn_800A2030(lbl_80619948, 0);
+        FeMsg m;
+        FeMsg* mp = &m;
+        fn_8035682C(mp);
+        fn_8040B830(mp->name, lbl_805F3CA8, 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(FeGetMgr(), mp, x);
+    }
 }
 
 extern "C" FE_OVERLAY FeScrN* fn_804CB3DC(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)

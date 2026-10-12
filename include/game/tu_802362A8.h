@@ -109,6 +109,16 @@ struct Unk802362A8_Cpu {
     int fn_80238110();
     int fn_802394CC();
     void fn_8023A1C8(int a);
+    void fn_8023A9A0(int* out);
+    int fn_8023AAD0(float* out);
+    int fn_802382F4(Unk802362A8_Req* p);
+    int fn_802386A8(float* out);
+    void fn_80238934(float* p);
+    int fn_80238ECC(float* out, int* res);
+    float fn_80239DFC(int a);
+    int fn_802378E0(Unk802362A8_Req* p);
+    int fn_80237C24(Unk802362A8_Req* p);
+    int fn_80237E9C(Unk802362A8_Req* p);
 };
 
 #endif

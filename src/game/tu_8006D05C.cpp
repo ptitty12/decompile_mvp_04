@@ -6,6 +6,7 @@
 #include "game/tu_8007FF8C.h"
 
 void* operator new[](unsigned int size, int heap);
+void* operator new(unsigned int size, int heap);
 extern char lbl_80649DB8[];
 extern char lbl_8064B0C8[];
 extern char lbl_8064B058[];
@@ -95,6 +96,38 @@ void fn_8008B690(void* l, int k, int c, int v);
 int fn_80099620(Unk8006902C_Side* s);
 int fn_8009764C(Unk8006902C_Side* s, int a, int b, int c);
 void fn_800975A8(Unk8006902C_Side* s, int a, int b, int c, int d);
+
+unsigned char* fn_80081CF8(Unk8007FF8C_Y* y, int i);
+void fn_8009984C(Unk8006902C_Side* s, int a, int b, int c, int d, int e);
+
+inline int SumRowI(Unk8006902C_Side* s)
+{
+    int t = 0;
+    int i;
+    for (i = 0; i < 0x80; i++)
+        t += s->m1B4[(unsigned char)i];
+    return t;
+}
+
+void Unk80069F0C::fn_8006D410()
+{
+    Unk8006902C_Players* p = m14.m0;
+    int side = 0;
+    if (p->m1CD0 != 0)
+        side = 1;
+    Unk8006902C_Side* me = &p->s[side];
+    Unk8006902C_Side* other = &p->s[side ^ 1];
+    int cnt = 0;
+    unsigned k;
+    for (k = 0; k <= 2; k++) {
+        if (*fn_80081CF8((Unk8007FF8C_Y*)p, k) != 0xFF)
+            cnt++;
+    }
+    int x = fn_80097210(other, 0);
+    int s0 = SumRowI(other);
+    int s1 = SumRowI(me);
+    fn_8009984C(other, x, s0, s1, m14.m0->m1CC8, cnt);
+}
 
 void Unk80069F0C::fn_8006D508()
 {
@@ -265,6 +298,75 @@ void Unk80069F0C::fn_8006E6A4()
     fn_800975A8(s, 0xD, c, fn_8009764C(s, 0xD, c, 0) + 1, 0);
 }
 
+struct Unk80087A58_O;
+Unk80087A58_O* fn_80087FC0(Unk80087A58_O* o);
+void fn_8006F6C0(Unk8006902C_Ctx* c);
+extern "C" void fn_803785E4(void* sub);
+extern "C" void fn_800A6D30(void* p);
+extern char lbl_8064A1E0[];
+struct Unk8006F594_Obj {
+    char pad0[8];
+    void* m8;
+    Unk80087A58_O* mC;
+    float m10;
+    int m14;
+    float m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    char pad3C[0x40];
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    float m90;
+    float m94;
+    float m98;
+    float m9C;
+    char mA0[0x560];
+    int m600;
+};
+
+Unk8006902C_Ctx* fn_8006F594(void* p)
+{
+    Unk8006F594_Obj* self = (Unk8006F594_Obj*)p;
+    fn_803785E4(self);
+    self->m8 = lbl_8064A1E0;
+    self->mC = 0;
+    self->m10 = 1.0f;
+    self->m14 = 0;
+    self->m18 = 0.0f;
+    self->m1C = 2;
+    self->m20 = 0;
+    self->m24 = 0x57;
+    self->m28 = 0x38;
+    self->m2C = 4;
+    self->m30 = 0x1F;
+    self->m34 = 0x10;
+    self->m38 = 0;
+    self->m7C = *(int*)&lbl_806877AC;
+    self->m80 = 0;
+    self->m84 = 4;
+    self->m88 = -1;
+    self->m8C = 0;
+    self->m90 = 0.0f;
+    self->m94 = 0.0f;
+    self->m98 = 0.0f;
+    self->m9C = 0.0f;
+    fn_800A6D30(self->mA0);
+    self->m600 = 0;
+    if (self->mC == 0)
+        self->mC = fn_80087FC0((Unk80087A58_O*)operator new(0x1754, 0));
+    fn_8006F6C0((Unk8006902C_Ctx*)self);
+    return (Unk8006902C_Ctx*)self;
+}
+
 void fn_8006F690(Unk8006F690_Obj* self, int chrg)
 {
     self->m8 = lbl_80649DB8;
@@ -392,14 +494,23 @@ int fn_8006FB28(void* l, int k, int c)
     return r;
 }
 
-/* near-miss: 2 slots; case 0 loads m24 after the c*4 shift where retail loads it first. */
+typedef float (W::*Unk8006FBAC_Pmf)(int);
+extern Unk8006FBAC_Pmf lbl_805B63D8[];
+
+float fn_8006FBAC(W* o, int i, int a)
+{
+    float r = (o->*(lbl_805B63D8 + i)[0])(a);
+    return r;
+}
+
 void fn_8006FC40(void* l, int k, int c, int v)
 {
     Unk80071604* a = (Unk80071604*)l;
     if ((unsigned)c < a->m1C) {
         switch ((unsigned)k) {
         case 0: {
-            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + (unsigned)a->m24);
+            unsigned base = (unsigned)a->m24;
+            Unk8006FB28_Rec* r = (Unk8006FB28_Rec*)((unsigned)c * 4 + base);
             if (v <= 0xFF) {
                 if (v < 0)
                     v = 0;
@@ -813,7 +924,6 @@ float fn_80070810(void* self, int a)
     return r;
 }
 
-/* near-miss: 2 slots, same division/register difference as fn_80070BC8. */
 float fn_80070880(void* self, int a)
 {
     W* w = (W*)self;
@@ -822,14 +932,15 @@ float fn_80070880(void* self, int a)
     float z = (float)w->v28(0xA, a);
     float u = fn_800706C0(self, a);
     float v = (float)w->v28(8, a);
-    float r = lbl_805B3B88;
+    float r = 0.0f;
     float den = u + y + z + v;
-    if (!(den <= lbl_805B3B88)) {
+    if (!(den <= 0.0f)) {
         r = (x + y + z) / den;
-        int n = (int)(r * lbl_805B3B8C);
+        int n = (int)(r * 10000.0f);
         if (n % 10 > 4)
             n += 10;
-        r = (float)(n / 10) * lbl_805B3B90;
+        n = n / 10;
+        r = (float)n * 0.001f;
     }
     return r;
 }
@@ -844,19 +955,19 @@ float fn_80070A60(W* w, int a)
     return r;
 }
 
-/* near-miss: 2 slots; the (n / 10) division result lands in r0 instead of r10 (subf / xoris). */
 float fn_80070BC8(void* self, int a)
 {
     W* w = (W*)self;
     float hi = fn_80070A60(w, a);
     float lo = fn_800706C0(self, a);
-    float r = lbl_805B3BA8;
-    if (!(lo <= lbl_805B3BA8)) {
+    float r = 0.0f;
+    if (!(lo <= 0.0f)) {
         r = hi / lo;
-        int n = (int)(r * lbl_805B3BAC);
+        int n = (int)(r * 10000.0f);
         if (n % 10 > 4)
             n += 10;
-        r = (float)(n / 10) * lbl_805B3BB8;
+        n = n / 10;
+        r = (float)n * 0.001f;
     }
     return r;
 }

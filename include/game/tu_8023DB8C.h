@@ -75,9 +75,15 @@ struct Unk8023DB8C_P {
     int m6A4[6];
     int m6BC;
     int m6C0;
-    char pad6C4[0x708 - 0x6C4];
+    int m6C4[6];
+    char pad6DC[0x708 - 0x6DC];
     int m708;
-    char pad70C[0xB54 - 0x70C];
+    char pad70C[0x9FC - 0x70C];
+    int m9FC;
+    int mA00;
+    char padA04[4];
+    int mA08;
+    char padA0C[0xB54 - 0xA0C];
     int mB54;
     int mB58;
     int mB5C;

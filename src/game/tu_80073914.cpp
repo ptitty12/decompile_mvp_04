@@ -39,6 +39,7 @@ int fn_80329FA0(int* out, int c, ...);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_80075A44(Unk8007B2B0_Screen* s, int a, int i);
 int fn_80075808(int id);
+int fn_80377E04(Obj* o, int* out, int id);
 int fn_80075D48(int i);
 int fn_80075D64(int i);
 int fn_80075CC0(int y);
@@ -73,6 +74,57 @@ void Unk8007A4DC_Screen::fn_80073994(int a, int b, int i, int c)
 {
     if (i <= 1)
         m190[i].m0->v40(a, b, c);
+}
+
+struct Unk739E0_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008395C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int fn_800801DC(Unk8007A4DC_Screen* s);
+/* near-miss (pass 2, ~60 slots): same structure and 137 vs 140 instructions; retail moves d into r4, keeps
+ * the m190 base in a callee-saved register across the two vcalls of the d > 1 arm and holds the first result in r26. */
+int Unk8007A4DC_Screen::fn_800739E0(int a, int id, int c, int d)
+{
+    if (c <= 1) {
+        if (d <= 1) {
+            W* w = m190[c].m4[d];
+            return w->v28(a, fn_80071814(w, id));
+        }
+        W* w1 = m190[c].m4[0];
+        int r1 = w1->v28(a, fn_80071814(w1, id));
+        W* w2 = m190[c].m4[1];
+        return r1 + w2->v28(a, fn_80071814(w2, id));
+    }
+    if (fn_800801DC(this) == 1) {
+        Unk8007A4DC_Obj1E8* o = m1E8;
+        int p = fn_80080198();
+        Unk739E0_Out sp;
+        fn_8008395C(o, id, p, fn_800849C0(c), &sp.a);
+        switch (a) {
+        case 0:
+            return sp.b & 0x7F;
+        case 1:
+            return (sp.b >> 15) & 0xFF;
+        case 2:
+            return (sp.b >> 23) - (sp.b & 0x7F);
+        case 5:
+            return (sp.c >> 15) & 0xFF;
+        case 6:
+            return (sp.c >> 7) & 0xFF;
+        case 7:
+            break;
+        case 8:
+            return sp.c & 0x7F;
+        case 10:
+            break;
+        case 11:
+            return (sp.a >> 22) + ((sp.c >> 7) & 0xFF) + (sp.c & 0x7F);
+        }
+    }
+    return 0;
 }
 
 void Unk8007A4DC_Screen::fn_800743A0(int a, int b, int i, int j, int c)
@@ -138,6 +190,47 @@ void Unk8007A4DC_Screen::fn_80074708(int a, int b, int i, int c)
         m1A8[i]->v40(a, b, c);
 }
 
+struct Unk74754_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008397C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int Unk8007A4DC_Screen::fn_80074754(int a, int x, int i)
+{
+    if (i <= 1) {
+        W* w = m1CC[i].m0;
+        return w->v28(a, fn_80071814(w, x));
+    }
+    Unk8007A4DC_Obj1E8* o = m1E8;
+    int p = fn_80080198();
+    Unk74754_Out sp;
+    fn_8008397C(o, x, p, fn_800849C0(i), &sp.a);
+    switch (a) {
+    case 0:
+        return sp.a & 0x7F;
+    case 1:
+        return sp.b >> 23;
+    case 2:
+        return (sp.b >> 21) & 3;
+    case 3:
+        return (sp.b >> 15) & 0x3F;
+    case 4:
+        return (sp.b >> 9) & 0x3F;
+    case 6:
+        return sp.a >> 24;
+    case 7:
+        return sp.c >> 25;
+    case 8:
+        return (sp.c >> 19) & 0x3F;
+    case 9:
+        return (sp.c >> 7) & 0x3F;
+    default:
+        return 0;
+    }
+}
+
 void Unk8007A4DC_Screen::fn_80074F50(int a, int b, int i, int c)
 {
     if (i <= 1) {
@@ -160,6 +253,47 @@ void Unk8007A4DC_Screen::fn_80075048(int a, int b, int i, int c)
 {
     if (i <= 1)
         m1CC[i].m0->v40(a, b, c);
+}
+
+struct Unk75094_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008397C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int fn_800801DC(Unk8007A4DC_Screen* s);
+/* near-miss (pass 2): same shape as fn_800739E0; retail moves d into r4 at entry and indexes the
+ * second slot as (c * 12 + 4) from a callee-saved base. */
+int Unk8007A4DC_Screen::fn_80075094(int a, int id, int c, int d)
+{
+    if (c <= 1) {
+        if (d <= 1) {
+            W* w = m1CC[c].m4[d];
+            return w->v28(a, fn_80071814(w, id));
+        }
+        char* b = (char*)this + 0x1D0;
+        int o = c * 12;
+        W* w1 = *(W**)(b + (o + 4));
+        int r1 = w1->v28(a, fn_80071814(w1, id));
+        W* w2 = *(W**)(b + o);
+        return r1 + w2->v28(a, fn_80071814(w2, id));
+    }
+    if (fn_800801DC(this) == 1) {
+        Unk8007A4DC_Obj1E8* o = m1E8;
+        int p = fn_80080198();
+        Unk75094_Out sp;
+        fn_8008397C(o, id, p, fn_800849C0(c), &sp.a);
+        switch (a) {
+        case 0:
+            return (sp.a >> 16) & 0xFF;
+        case 2:
+            return (sp.a >> 7) & 0x1FF;
+        case 7:
+            return (sp.c >> 13) & 0x3F;
+        }
+    }
+    return 0;
 }
 
 void Unk8007A4DC_Screen::fn_800755FC(int a, int b, int i, int j, int c)
@@ -376,7 +510,6 @@ int fn_80075F1C(int id, int a, int b)
     return 0;
 }
 
-/* near-miss: 6 slots; retail loads the last table entry into r0 and copies it to r3 (mr r3,r0). */
 int fn_80076058(int i, int kind)
 {
     int v = -1;
@@ -391,11 +524,18 @@ int fn_80076058(int i, int kind)
         v = lbl_805B6A48[i];
         break;
     }
-    int t;
-    int u;
-    if (v >= 0 || ((t = lbl_805B6968[i]) == -1 && (t = lbl_805B6A48[i]) == -1 && (u = lbl_805B6888[i], t = u, u == -1)))
+    if (v >= 0)
         return v;
-    return t;
+    int a = lbl_805B6968[i];
+    if (a != -1)
+        return a;
+    int b = lbl_805B6A48[i];
+    if (b != -1)
+        return b;
+    int c = lbl_805B6888[i];
+    if (c != -1)
+        return c;
+    return v;
 }
 
 int fn_80076104(int id, int a, int b)
@@ -509,4 +649,142 @@ int fn_8007668C(int a, int b)
     if (a <= 9)
         return (lbl_805B6B28[a] >> b) & 1;
     return 0;
+}
+
+/* Four-slot view of the db widget table object used by fn_800766B8 / fn_80076758. */
+struct Unk800766B8_Obj {
+    char pad0[0xC];
+    void* mC;
+    void* m10;
+    void* m14;
+    void* m18;
+    char pad1C[0x14];
+    void* m30;
+};
+struct Unk80076758_Ev {
+    char pad0[0xC];
+    struct Unk80076758_Ev0* mC;
+};
+struct Unk80076758_Ev0 {
+    char pad0[0x84];
+    int m84;
+    int m88;
+};
+struct Unk80076758_G {
+    char pad0[0x5C];
+    void* m5C;
+};
+void fn_802B8D74();
+void fn_802B8DDC();
+extern "C" void fn_8052BAA8(void* p, int a);
+extern "C" void fn_8052BAFC(void* p, int a);
+extern "C" void fn_8052BB50(void* p, int a);
+extern "C" void fn_8052BBA4(void* p, int a);
+extern "C" void fn_8052BF14(void* p, int a, void* ev);
+extern "C" void fn_8006A860(void* ev);
+extern "C" void fn_80590CA8(void* p);
+extern "C" int fn_800A2EB4(void* g);
+extern "C" void fn_8053FC0C(void* p);
+extern Unk80076758_G* lbl_80619948;
+
+extern "C" void fn_800766B8(Unk800766B8_Obj* self, int k)
+{
+    fn_802B8D74();
+    switch (k) {
+    case 0:
+        {
+            char* b = (char*)self + 0xC;
+            fn_8052BAA8(*(void**)(b + k), 0);
+        }
+        break;
+    case 1:
+        fn_8052BAFC(self->m10, 0);
+        break;
+    case 2:
+        fn_8052BB50(self->m14, 0);
+        break;
+    case 3:
+        fn_8052BBA4(self->m18, 0);
+        break;
+    }
+    fn_802B8DDC();
+}
+
+void fn_80076758(Unk800766B8_Obj* self, Unk80076758_Ev* ev)
+{
+    Unk80076758_G** g = &lbl_80619948;
+    int k = ev->mC->m84;
+    char* tb = (char*)self + 0xC;
+    int to = k * 4;
+    fn_8052BF14(*(void**)(tb + to), ev->mC->m88, ev);
+    fn_8006A860(ev);
+    fn_80590CA8(self->m30);
+    if (fn_800A2EB4(*g) == 1 && k == 0)
+        fn_8053FC0C((*g)->m5C);
+}
+
+/* near-miss (pass 2): same loop structure and iterator; retail keeps `total` in r31 and forms the
+ * record address as (i*0x1C + base) with a byte offset j*12+4, ours folds the offsets differently. */
+int Unk8007B2B0_Screen::fn_80076A24(int id)
+{
+    int idx = fn_80078A38(id);
+    int total = 0;
+    unsigned n = mC[idx]->m4;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        Unk8006A138_It<1> it(0);
+        int j = 0;
+        while (j <= 1) {
+            Unk80076A24_Rec* r = &mC[idx]->m8[i];
+            if (r->m4[j].m0 == id)
+                total += r->m4[j].m4;
+            j = it.Next();
+        }
+    }
+    return total;
+}
+
+/* near-miss (pass 2): as fn_80076A24; the key is read from the other entry ((j == 0) as subfic/adde in retail). */
+int Unk8007B2B0_Screen::fn_80076AE4(int id)
+{
+    int idx = fn_80078A38(id);
+    int total = 0;
+    unsigned n = mC[idx]->m4;
+    unsigned i;
+    for (i = 0; i < n; i++) {
+        Unk8006A138_It<1> it(0);
+        int j = 0;
+        while (j <= 1) {
+            Unk80076A24_Rec* r = &mC[idx]->m8[i];
+            if (r->m4[j == 0].m0 == id)
+                total += r->m4[j].m4;
+            j = it.Next();
+        }
+    }
+    return total;
+}
+
+float Unk8007A4DC_Screen::fn_80076BAC(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned cnt = 0;
+    unsigned i = 0;
+    unsigned char n = r->m10[fn_805A19C8(r, a)].m7;
+    float tot = 0.0f;
+    for (; i < n; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1) {
+            tot += fn_80073C10(0, id, b, 2);
+            cnt += (int)fn_80073C10(1, id, b, 2);
+        }
+    }
+    float res = 0.0f;
+    if (cnt != 0)
+        res = tot / (float)cnt;
+    return res;
 }

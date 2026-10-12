@@ -13,6 +13,32 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+/* Request record of fn_8025AC0C: +0xC sel, +0x28 target position, +0x34 state. */
+struct Unk8025AC0C_E {
+    char pad0[0xC];
+    int mC;
+    char pad10[0x28 - 0x10];
+    Unk80273498_Vec3 m28;
+    int m34;
+};
+inline Unk80273498_Vec3 Unk8025AC0C_Pos34(Unk8027C728_Goal* g)
+{
+    return *(Unk80273498_Vec3*)((char*)g + 0x34);
+}
+inline Unk80273498_Vec3 Unk8025AC0C_Pos28(Unk8025AC0C_E* e)
+{
+    return e->m28;
+}
+
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
 extern "C++" {
 Q* fn_802570D4(M* self);
 P* fn_80257B40(M* self);
@@ -382,6 +408,40 @@ int fn_80259434(M* self)
     return self->m4->m1FC;
 }
 
+/* near-miss: 75 vs 75 insns, 3 differ: retail loads the +0x6CC player into r3 (lwz r3,0x6cc(r3)), ours uses r9. Tried a Q* temporary, split ifs, a constant temporary */
+extern const char lbl_805DACC4[];
+extern float lbl_8061E4D4;
+extern int fn_801DC67C(int a);
+extern int fn_8018B648();
+extern int fn_8024D41C(int x);
+extern float fn_80259A74(M* self, int a, int b);
+extern float fn_80266D70(void* t, int k);
+extern int fn_802679D4(void* t, int a, int b);
+extern void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
+extern void* fn_801A4B34(void* w);
+int fn_80259440(M* self)
+{
+    int r = 0;
+    if (fn_801DC67C(((Unk8024EF40_Ctx*)self->m10)->m3B8) != 0) {
+        P* c = (P*)fn_801A4B34(fn_802570D4(self));
+        if (c != 0 && c->m58C.m38 == -1) {
+            P* t = fn_802570D4(self)->m6CC;
+            if (t != 0 && t->m38C == 1 && fn_8018B648() == 0) {
+                int o = fn_802679D4((char*)self->m4 + 0x48, 0, 0);
+                if (o != 0 && fn_8024D41C(o) != 0) {
+                    float a = fn_80259A74(self, 9, 0);
+                    float b = fn_80266D70((char*)self->m4 + 0x48, 0);
+                    if (!(a + lbl_8061E4D4 <= b)) {
+                        r = 1;
+                        fn_80303CA0(lbl_805DACC4, 8.0f, 0.4f, 0.05f);
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
 void fn_8025956C(M* self, P* p)
 {
     if (p->m458 == 9 && p->m618->m838 != 0x1463E9BA)
@@ -407,6 +467,27 @@ void fn_80259918(void* self, P* p, int* out, int* idx)
         *idx = 3;
 }
 
+extern Unk80273498_Vec3 fn_8014E388(int idx);
+extern float fn_804028E4(float x);
+extern "C" int fn_8025995C(M* self, unsigned t, float* out, int* a, int* b)
+{
+    P* p = fn_8026B8C0(self->m4, t);
+    if (p == 0 || p->m58C.b2) {
+        *out = 0.0f;
+        *a = -1;
+        *b = -1;
+        return 0;
+    }
+    float len;
+    fn_80259918(self, p, a, b);
+    const Unk80273498_Vec3& pos = ((Unk80273498_Pos*)p)->m60;
+    Unk80273498_Vec3 d = pos - fn_8014E388(*a);
+    len = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+    const float k = 0.00092592591f;
+    *out = len * k;
+    return 1;
+}
+
 void fn_80259C00(M* self, int a)
 {
     fn_8026A0F4((char*)self->m4 + 0x190, a);
@@ -420,6 +501,42 @@ void fn_80259C28(M* self, int a)
 void fn_80259C50(M* self, int a)
 {
     fn_802686E4((char*)self->m4 + 0x124, a);
+}
+
+extern Unk80273498_Vec3 lbl_805DBA04[];
+extern "C" P* fn_80259C78(M* self, int sel)
+{
+    P* best = 0;
+    float bestLen = 12000.0f;
+    float len;
+    int i = 9;
+    do {
+        P* p = fn_8026B8C0(self->m4, i);
+        if (p != 0) {
+            A* a = &p->m58C;
+            if (a->m30 == sel) {
+                int better = 0;
+                Unk80273498_Vec3 d = ((Unk80273498_Pos*)p)->m60 - lbl_805DBA04[sel];
+                len = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+                if (best != 0) {
+                    int x = a->m38;
+                    int y = best->m58C.m38;
+                    if (x == y) {
+                        if (!(len >= bestLen))
+                            better = 1;
+                    } else if (x < y)
+                        better = 1;
+                } else
+                    better = 1;
+                if (better) {
+                    best = p;
+                    bestLen = len;
+                }
+            }
+        }
+        i++;
+    } while (i <= 12);
+    return best;
 }
 
 float fn_80259DB4(M* self, int a)
@@ -613,6 +730,45 @@ void fn_8025AB00(Unk8027A84C* g, P* p)
 int fn_8025AC04()
 {
     return 0;
+}
+
+/* near-miss: 106 vs 106 insns, 4 differ: the vector copy in the no-goal-data arm sits at sp+8 in ours, sp+0x30 in retail (all three copies share one frame slot there). Tried function-level temporaries */
+extern float atan2f(float y, float x);
+extern void fn_801C33B0(char* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c);
+extern void fn_80299B98(P* p, const Unk80273498_Vec3& pos, float* ang);
+Unk8027C728_Goal* fn_8025AC0C(Q* self, P* p, Unk8025AC0C_E* e)
+{
+    p->m58C.m30 = e->mC;
+    Unk8027C728_Goal* g = fn_802448F4(p, 1);
+    if (p->m458 == 9 && e->mC == -1) {
+        Unk8027A84C* gd = (Unk8027A84C*)g->m18;
+        Unk80273498_Vec3 v1;
+        Unk80273498_Vec3 v2;
+        fn_801C33B0(*(char**)((char*)self->m700 + 0x3A4), &v1, &v2);
+        float ang = atan2f(v2.x, v2.z);
+        fn_80299B98(p, v1, &ang);
+        g->m10 = 2;
+        fn_8027C728(g);
+        Unk80273498_Vec3 w = v2;
+        gd->fn_8027A898(&w);
+        ((Unk80287D70*)gd)->fn_80287DB8(9);
+    } else {
+        g->m10 = 2;
+        Unk8027A84C* gd = (Unk8027A84C*)g->m18;
+        fn_8027C728(g);
+        fn_8025AA28(gd, p, e->mC);
+        if (gd->m2C != 0) {
+            Unk80273498_Vec3 t = Unk8025AC0C_Pos34(g);
+            float ang = atan2f(t.x, t.z);
+            Unk80273498_Vec3 w = Unk8025AC0C_Pos28(e);
+            fn_80299B98(p, w, &ang);
+        } else {
+            Unk80273498_Vec3 w = Unk8025AC0C_Pos28(e);
+            fn_80299B98(p, w, 0);
+        }
+    }
+    e->m34 = 0;
+    return g;
 }
 
 Unk8027C728_Goal* fn_8025ADB4(void* o, void* p, A* a)

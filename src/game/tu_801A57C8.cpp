@@ -302,6 +302,36 @@ void fn_801A58FC(Unk8019F8C0_Owner* o, int a)
     }
 }
 
+extern char lbl_805CE8A4[];
+extern char lbl_805CE8C0[];
+extern char lbl_805CE8CC[];
+void fn_801A656C(Unk8019F8C0_Owner* o, Unk801A5A9C_Obj* x, int k);
+
+void fn_801A594C(Unk8019F8C0_Owner* o, int team)
+{
+    fn_8033E958(lbl_805CE8A4);
+    Unk8019F8C0_Inner* t = o->m6F8->m14 + team;
+    unsigned n = t->m3E4;
+    unsigned off = team != 0 ? o->m6F8->m14->m3E4 : 0;
+    for (unsigned i = 0; i < n; i++) {
+        int pos = i * 4 + team * 100;
+        char* sl = (char*)o->m594;
+        *(int*)(sl + pos) = 0;
+        char* base = (char*)t + 0x3E8;
+        int eo = (unsigned char)i * 0x34;
+        int v = *(int*)(base + eo);
+        if (v != 0) {
+            *(int*)(sl + pos) = (int)fn_802AE610(lbl_8061E978, o, v, o, team, i);
+            char buf[16];
+            fn_804089B4(buf, lbl_805CE8C0, i + off);
+            ((Unk802AE610_Sub*)((char*)*(int*)(sl + pos) + 0xA0))->fn_vslot4(buf);
+            ((Unk801A5A9C_Obj*)*(int*)(sl + pos))->m708 = team;
+            fn_801A656C(o, (Unk801A5A9C_Obj*)*(int*)(sl + pos), 0xD);
+            ((Unk801A5A9C_V*)*(int*)(sl + pos))->fn_vslot8(1);
+        }
+    }
+    fn_8033E958(lbl_805CE8CC);
+}
 void fn_801A5A9C(Unk8019F8C0_Owner* o)
 {
     fn_801A5394(o);
@@ -578,6 +608,71 @@ Unk8019F8C0_Ref* fn_801A6D84(Unk8019F8C0_Owner* o, int i)
     return 0;
 }
 
+struct Unk801A6DB8_T {
+    char pad0[0x88];
+};
+struct Unk801A6DB8_O {
+    char pad0[0x6F0];
+    Unk801A6DB8_T* m6F0;
+    int m6F4;
+};
+extern Unk801A6DB8_T lbl_805D0614;
+extern Unk801A6DB8_T lbl_805D069C;
+extern Unk801A6DB8_T lbl_805D0724;
+extern Unk801A6DB8_T lbl_805D07AC;
+extern Unk801A6DB8_T lbl_805D0834;
+extern Unk801A6DB8_T lbl_805D08BC;
+extern Unk801A6DB8_T lbl_805D0944;
+extern Unk801A6DB8_T lbl_805D09CC;
+extern Unk801A6DB8_T lbl_805D0A54;
+extern Unk801A6DB8_T lbl_805D0ADC;
+extern Unk801A6DB8_T lbl_805D0B64;
+
+extern "C" Unk801A6DB8_T* fn_801A6DB8(Unk801A6DB8_O* o)
+{
+    if (o->m6F0 == 0) {
+        switch (o->m6F4) {
+        case 1:
+            o->m6F0 = &lbl_805D0614;
+            break;
+        case 0:
+            o->m6F0 = &lbl_805D0614;
+            break;
+        case 2:
+            o->m6F0 = &lbl_805D069C;
+            break;
+        case 3:
+            o->m6F0 = &lbl_805D0724;
+            break;
+        case 4:
+            o->m6F0 = &lbl_805D07AC;
+            break;
+        case 5:
+            o->m6F0 = &lbl_805D0834;
+            break;
+        case 8:
+            o->m6F0 = &lbl_805D0944;
+            break;
+        case 9:
+            o->m6F0 = &lbl_805D09CC;
+            break;
+        case 7:
+            o->m6F0 = &lbl_805D08BC;
+            break;
+        case 10:
+            o->m6F0 = &lbl_805D0A54;
+            break;
+        case 11:
+            o->m6F0 = &lbl_805D0ADC;
+            break;
+        case 12:
+            o->m6F0 = &lbl_805D0B64;
+            break;
+        }
+    }
+    return o->m6F0;
+}
+
 void fn_801A6ED8(Unk8019F8C0_Owner* o)
 {
     int a = fn_801A2034(o, o->m6F8->m14[2].m8 == 0);
@@ -852,9 +947,63 @@ int fn_801A7B20(Unk8019F8C0_Owner** a, int* b)
     return 0;
 }
 
+struct Unk801A7B5C_S {
+    Unk8019F8C0_Owner* m0;
+    char pad4[0x18 - 0x4];
+    int m18;
+    int m1C;
+    char pad20[0x28 - 0x20];
+    int m28;
+};
+float fn_801A0744(Unk8019F8C0_Owner* o);
+void fn_801A8224(Unk801A57C8_Ob* o, int x);
+extern "C" void fn_801A7D3C(Unk801A7B5C_S* s, int x);
+void fn_801A7CBC(Unk801A7B5C_S* s);
+extern int lbl_80620414;
+extern int lbl_80620418;
+
+void fn_801A7B5C(Unk801A7B5C_S* s)
+{
+    int sp8;
+    int c = lbl_80620414;
+    if (c == 0) {
+        sp8 = fn_800B555C()->m570;
+        if (sp8 == -1) {
+            sp8 = lbl_80620418;
+        }
+        if (s->m0->m6F4 == 0xC) {
+            sp8 = 0;
+        }
+        if (s->m28 != 0) {
+            fn_80107F74(s->m28, 0xA, 0);
+            fn_80107F74(s->m28, 9, 0);
+            fn_80107F74(s->m28, 8, 0);
+            fn_80107F74(s->m28, 7, 0);
+        }
+        do {
+            fn_801A7D3C(s, sp8);
+            fn_801A8224((Unk801A57C8_Ob*)s, sp8);
+            if (s->m1C != 0) {
+                if (!(fn_801A0744(s->m0) <= fn_801A745C((Unk801A745C_T*)s) - 0.1f)) {
+                    fn_801A7CBC(s);
+                }
+            }
+            if (s->m18 != 0) {
+                int r = 0;
+                if (fn_802D7DB4(sp8, 0x76) != 0) {
+                    r = 1;
+                }
+                if (r != 0) {
+                    fn_801A7CBC(s);
+                }
+            }
+        } while (fn_801A7B20((Unk8019F8C0_Owner**)s, &sp8) != 0);
+    }
+}
+
 /* near-miss: 32/32 insns; retail keeps the buffer pointer in r31 and the queue global's address in r30
  * (mine swaps them), 9 slots differ. */
-void fn_801A7CBC()
+void fn_801A7CBC(Unk801A7B5C_S* o)
 {
     Unk8035682C buf;
     Unk8035682C* s = &buf;

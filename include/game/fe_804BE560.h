@@ -13,6 +13,123 @@
 #include "game/fe_80459228.h"
 #include "game/tu_8007A4DC.h"
 
+/* Widget view with every slot returning int (vptr at +0x3C, slot N at vtable +8N): reached by a cast when a
+ * call site uses the value of a slot FeW declares void; same shape as the game-code VT3C of tu_80144CF0.h. */
+class FeVQ {
+public:
+    char pad0[0x3C];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual int s18();
+    virtual int s19();
+    virtual int s20(float a);
+    virtual int s21();
+    virtual int s22();
+    virtual int s23();
+    virtual int s24();
+    virtual int s25();
+    virtual int s26();
+    virtual int s27();
+    virtual int s28();
+    virtual int s29();
+    virtual int s30();
+    virtual int s31();
+    virtual int s32();
+    virtual int s33();
+    virtual int s34();
+    virtual int s35();
+    virtual int s36();
+    virtual int s37();
+    virtual int s38();
+    virtual int s39();
+    virtual int s40();
+    virtual int s41();
+    virtual int s42();
+    virtual int s43();
+    virtual int s44();
+    virtual int s45();
+    virtual int s46(int a);
+    virtual int s47(int a);
+    virtual int s48(int a);
+    virtual int s49(int a);
+    virtual int s50(int a);
+    virtual int s51(int a);
+    virtual int s52(int a);
+    virtual int s53(int a);
+    virtual int s54(int a);
+    virtual int s55(int a);
+    virtual int s56(int a);
+    virtual int s57(int a);
+    virtual int s58(int a);
+    virtual int s59(int a);
+    virtual int s60(int a);
+    virtual int s61(int a);
+    virtual int s62();
+    virtual int s63();
+    virtual int s64();
+    virtual int s65();
+    virtual int s66(int a);
+    virtual int s67(int a, int b);
+    virtual int s68();
+    virtual int s69();
+    virtual int s70();
+    virtual int s71();
+    virtual int s72();
+    virtual int s73();
+    virtual int s74();
+    virtual int s75();
+    virtual int s76();
+    virtual int s77();
+    virtual int s78();
+    virtual int s79();
+    virtual int s80();
+    virtual int s81();
+    virtual int s82();
+    virtual int s83();
+    virtual FeVQ* s84(int a);
+    virtual int s85();
+    virtual int s86();
+    virtual int s87();
+    virtual int s88();
+    virtual int s89();
+    virtual int s90();
+    virtual int s91();
+    virtual int s92();
+    virtual int s93();
+    virtual int s94();
+    virtual int s95();
+    virtual int s96();
+    virtual int s97();
+    virtual int s98();
+    virtual int s99();
+    virtual int s100();
+    virtual int s101();
+    virtual int s102();
+    virtual int s103();
+    virtual int s104();
+    virtual int s105();
+    virtual int s106();
+    virtual int s107();
+    virtual int s108();
+    virtual int s109();
+    virtual int s110();
+    virtual int s111(int a, int b);
+};
 /* Generic screen: widget pointers from +0x134 (button handlers fn_804BF148 etc. forward
  * to the widget at m134/m138/m14C/m150/m154 through its virtuals; the widget kind is not
  * identified). */
@@ -173,6 +290,13 @@ struct UiS;
 UiScrRaw* fn_800EB2F4(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h);
 void fn_800EB41C(UiS* self);
 
+/* One 0x60-byte row of the table at +0x3E8 of the screen of fn_804CE408 (fn_804CEBAC compares its
+ * id at +0x4C with m97C[i]). */
+struct FeRow60 {
+    char pad0[0x4C];
+    int m4C;
+    char pad50[0x10];
+};
 struct FeScrM : FeW {
     char pad40[0xF0];
     int m130;
@@ -184,9 +308,17 @@ struct FeScrM : FeW {
     FeW* m1CC;
     FeW* m1D0;
     int m1D4;
-    char pad1D8[0x998 - 0x1D8];
+    char pad1D8[0x3E8 - 0x1D8];
+    FeRow60 m3E8[7];
+    char pad688[0x97C - 0x688];
+    int m97C[7];
     void* m998;
     int m99C;
+    int m9A0;
+    int m9A4;
+    int m9A8;
+    int m9AC;
+    char m9B0[1];
 };
 
 extern "C" {

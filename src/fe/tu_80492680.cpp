@@ -5,6 +5,12 @@
 
 #include "game/fe_8048E6A0.h"
 
+extern const char lbl_805F6BC4[];
+extern const char lbl_805F4ECC[];
+extern const char lbl_805F7060[];
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int fn_80097210(void* team, int a);
+extern "C" void fn_80529150(void);
 extern "C" {
 
 FE_OVERLAY void fn_804933A0(void* x)
@@ -33,6 +39,27 @@ FE_OVERLAY void fn_8049364C(void* x, int a)
     fn_800DE440(n, a, 1);
     fn_80403DE4(out, fmt, n);
     fn_80492BA8(x, out);
+}
+
+FE_OVERLAY void fn_804937C8(void* x, int a, int b)
+{
+    char n1[0x40];
+    char n2[0x40];
+    char fmt[0x80];
+    char out[0x100];
+    fn_800DE440(n1, a, 1);
+    fn_800DE440(n2, b, 1);
+    fn_804031BC(fmt, lbl_805F6BC4);
+    ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, n2, n1);
+    fn_80492BA8(x, out);
+}
+
+FE_OVERLAY void fn_8049535C(void* x)
+{
+    char buf[8];
+    char* p = buf;
+    sprintf(p, lbl_805F4ECC, *(unsigned char*)((char*)FeP(x, 0x1A4) + 0x1CC9));
+    ((FeWQ*)fn_800C8040(FeMem(x, 0x1F0)->fn_vslot32(lbl_805F7060, 1)))->s30((int)p);
 }
 
 FE_OVERLAY void fn_80496560(void* x)
@@ -114,6 +141,15 @@ FE_OVERLAY void fn_80497C48(void* x)
     fn_8040B830(p->name, lbl_805F7114, 15);
     p->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), p, x);
+}
+
+FE_OVERLAY void fn_804982C0(void* x)
+{
+    FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    char* st = (char*)fn_800B555C() + 8;
+    FeI(st, 0x620) = fn_80097210((void*)((FeScrB*)x)->m1A8[FeI(x, 0x184)], 0);
+    fn_80131F34(p, x, (void (*)(int, void*))fn_804987C0, (int)fn_80529150, 0x37A1, 1, -1, 1, 0x26DE, 0, 0, 0, 0, 0);
+    p->fn_vslot86();
 }
 
 FE_OVERLAY void fn_804983A8(void) {}
