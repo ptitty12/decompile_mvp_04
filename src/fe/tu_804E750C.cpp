@@ -5,6 +5,8 @@
 
 #define FE_SCREEN_CF44_VOID
 
+#define FE_SCREEN_D004_VOID
+
 #include "game/fe_804E02E0.h"
 
 /* Q16-DECL-BEGIN */
@@ -90,6 +92,37 @@ struct FeSt8x {
     char pad0[0x610];
     int m610;
 };
+class FeSubI21 {
+public:
+    char pad0[0x24];
+    virtual int s1(); virtual int s2(); virtual int s3(); virtual int s4(); virtual int s5(); virtual int s6(); virtual int s7();
+    virtual int s8(); virtual int s9(); virtual int s10(); virtual int s11(); virtual int s12(); virtual int s13(); virtual int s14();
+    virtual int s15(); virtual int s16(); virtual int s17(); virtual int s18(); virtual int s19(); virtual int s20(); virtual int s21();
+};
+struct FeS7f : FeObj {
+    char pad40[0x134 - 0x40];
+    int m134;
+    char pad138[0x13C - 0x138];
+    FeObjR31* m13C;
+    char pad140[0x154 - 0x140];
+    int m154;
+    FeObj* m158;
+    char pad15C[0x168 - 0x15C];
+    int m168;
+};
+int fn_8007DB8C(Unk8007DB74_A* a, int b, int c);
+extern "C" void fn_804E8E54(FeS7f* self, int a);
+extern "C" void fn_804E9220(FeS7* self);
+struct FeS7g : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObjK* m138;
+    FeObjR31* m13C;
+    char pad140[0x14C - 0x140];
+    FeObj* m14C;
+    char pad150[0x160 - 0x150];
+    int m160;
+};
+extern "C" void fn_8013D4CC(FeObj* w, void* cb1, void* cb2, const void* s, int a, int b, int c, int d);
 /* Q16-DECL-END */
 
 extern "C" FE_OVERLAY void fn_804E7860(void* self, int a)
@@ -330,6 +363,32 @@ extern "C" FE_OVERLAY void fn_804E8D00(int a, FeObj* self)
     fn_800B7B4C(UiGetMsgMgr(), &m, self);
 }
 
+extern "C" FE_OVERLAY void fn_804E90A4(int kind)
+{
+    FeS7f* p = (FeS7f*)fn_800B7A94(UiGetMsgMgr(), lbl_805FA7B4);
+    if (p->m154 == 1) {
+        Unk8007B2B0_Screen* sc = lbl_8061930C;
+        int idx = p->m134;
+        sc->fn_8007D004(idx, 0, ((FeSubI21*)((char*)p->m158 + 0xDC))->s21());
+        Unk8007B2B0_Screen* sc2 = lbl_8061930C;
+        sc2->fn_8007CF90(p->m134, (int)p->m13C->v31());
+    } else {
+        Unk8007DB74_A* sc = (Unk8007DB74_A*)lbl_8061930C;
+        int s = (int)p->m13C->v31();
+        p->m134 = fn_8007DB8C(sc, s, ((FeSubI21*)((char*)p->m158 + 0xDC))->s21());
+    }
+    switch (kind) {
+    case 0:
+        p->m168 = 1;
+        fn_804E9220((FeS7*)p);
+        break;
+    case 1:
+        p->m168 = 0;
+        break;
+    }
+    fn_804E8E54(p, 0);
+}
+
 extern "C" FE_OVERLAY void fn_804E9220(FeS7* self)
 {
     fn_800E29CC((int)self->m134);
@@ -412,6 +471,31 @@ extern "C" FE_OVERLAY void fn_804E95D8(FeS8* self, int a)
     if (a == self->m144) {
         fn_800D0074(&self->m158->mDC, ((FeSub*)&self->m148->mDC)->s11(), 0);
         fn_800D0074(&self->m15C->m98, ((FeSub*)&self->m148->mDC)->s11(), 0);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804E967C(FeS7g* self, int kind, int x)
+{
+    switch (kind) {
+    case 0:
+        if (self->m138->v60() == 0) {
+            ((FeObj1*)self)->v16(0);
+            fn_8013D4CC(self->m14C, (void*)fn_804E8B44, (void*)fn_804E8C20, self->m13C->v31(), 8, 3, 1, 0);
+        } else if (self->m138->v60() == 3) {
+            self->m160 = x;
+            if (fn_804E8A30((FeS7b*)self, (unsigned short*)self->m13C->v31()) == 0)
+                fn_804E8E54((FeS7f*)self, 1);
+        }
+        break;
+    case 1: {
+        UiMsg m;
+        UiMsg* mp = &m;
+        fn_8035682C(mp);
+        fn_8040B830(mp->name, "BACK", 15);
+        mp->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        break;
+    }
     }
 }
 

@@ -530,7 +530,11 @@ struct Unk8007B2B0_Screen {
 #endif
     int fn_8007CF90(unsigned i, int a);
     Entry* fn_8007CFDC(unsigned i);
+#ifdef FE_SCREEN_D004_VOID /* same as FE_SCREEN_CF44_VOID: callers scheduled as for a void call */
+    void fn_8007D004(unsigned i, int a, int b);
+#else
     int fn_8007D004(unsigned i, int a, int b);
+#endif
     int fn_8007D050(unsigned i, int a);
     int fn_8007D098(unsigned i, int a);
     int fn_8007D0E0(unsigned i, int a, int b);
