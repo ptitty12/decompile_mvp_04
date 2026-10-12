@@ -947,9 +947,63 @@ int fn_801A7B20(Unk8019F8C0_Owner** a, int* b)
     return 0;
 }
 
+struct Unk801A7B5C_S {
+    Unk8019F8C0_Owner* m0;
+    char pad4[0x18 - 0x4];
+    int m18;
+    int m1C;
+    char pad20[0x28 - 0x20];
+    int m28;
+};
+float fn_801A0744(Unk8019F8C0_Owner* o);
+void fn_801A8224(Unk801A57C8_Ob* o, int x);
+extern "C" void fn_801A7D3C(Unk801A7B5C_S* s, int x);
+void fn_801A7CBC(Unk801A7B5C_S* s);
+extern int lbl_80620414;
+extern int lbl_80620418;
+
+void fn_801A7B5C(Unk801A7B5C_S* s)
+{
+    int sp8;
+    int c = lbl_80620414;
+    if (c == 0) {
+        sp8 = fn_800B555C()->m570;
+        if (sp8 == -1) {
+            sp8 = lbl_80620418;
+        }
+        if (s->m0->m6F4 == 0xC) {
+            sp8 = 0;
+        }
+        if (s->m28 != 0) {
+            fn_80107F74(s->m28, 0xA, 0);
+            fn_80107F74(s->m28, 9, 0);
+            fn_80107F74(s->m28, 8, 0);
+            fn_80107F74(s->m28, 7, 0);
+        }
+        do {
+            fn_801A7D3C(s, sp8);
+            fn_801A8224((Unk801A57C8_Ob*)s, sp8);
+            if (s->m1C != 0) {
+                if (!(fn_801A0744(s->m0) <= fn_801A745C((Unk801A745C_T*)s) - 0.1f)) {
+                    fn_801A7CBC(s);
+                }
+            }
+            if (s->m18 != 0) {
+                int r = 0;
+                if (fn_802D7DB4(sp8, 0x76) != 0) {
+                    r = 1;
+                }
+                if (r != 0) {
+                    fn_801A7CBC(s);
+                }
+            }
+        } while (fn_801A7B20((Unk8019F8C0_Owner**)s, &sp8) != 0);
+    }
+}
+
 /* near-miss: 32/32 insns; retail keeps the buffer pointer in r31 and the queue global's address in r30
  * (mine swaps them), 9 slots differ. */
-void fn_801A7CBC()
+void fn_801A7CBC(Unk801A7B5C_S* o)
 {
     Unk8035682C buf;
     Unk8035682C* s = &buf;
