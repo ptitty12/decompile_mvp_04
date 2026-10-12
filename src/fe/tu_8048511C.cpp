@@ -4,6 +4,30 @@
  */
 #include "game/fe_80471EBC.h"
 
+extern "C" FE_OVERLAY FeScrH* fn_8048511C(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80676880);
+    self->m130 = 0;
+    FeI(self, 0x134) = 0;
+    FeI(self, 0x138) = 0;
+    FeI(self, 0x13C) = 0;
+    FeI(self, 0x140) = 0;
+    FeI(self, 0x144) = 0;
+    FeI(self, 0x148) = 0;
+    FeI(self, 0x14C) = 0;
+    FeI(self, 0x150) = 0;
+    FeI(self, 0x154) = -1;
+    FeI(self, 0x158) = -1;
+    FeI(self, 0x15C) = 0;
+    FeI(self, 0x160) = 0;
+    FeI(self, 0x254) = 0;
+    FeI(self, 0x258) = 0;
+    FeI(self, 0x25C) = 0;
+    FeI(self, 0x260) = 1;
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804851B0(FeScrB* self)
 {
     fn_800ECE34(self);
@@ -46,6 +70,32 @@ extern "C" FE_OVERLAY int fn_80485CC4(void* x)
     }
     fn_800B7B4C(FeGetMgr(), &m, x);
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_80486018(void* x, int w, int dir)
+{
+    if (w == FeI(x, 0x14C)) {
+        if (dir == 0) {
+            int t = FeI(x, 0x250) - 1;
+            if (t >= 0)
+                FeI(x, 0x250) = t;
+            else
+                FeI(x, 0x250) = 5;
+        } else {
+            int t = FeI(x, 0x250) + 1;
+            if (t <= 5)
+                FeI(x, 0x250) = t;
+            else
+                FeI(x, 0x250) = 0;
+        }
+    } else if (w == FeI(x, 0x244)) {
+        FeW* a = FeWp(x, 0x24C);
+        void* g = lbl_8061930C;
+        FeI(x, 0x254) = fn_80075948__18Unk8007B2B0_Screeni(g, fn_800B548C(((FeSubB*)((char*)a + 0x98))->s5()));
+    }
+    fn_80486800(x);
+    fn_80486D7C(x);
+    fn_804873B4(x);
 }
 
 extern "C" FE_OVERLAY int fn_804860F8(void* x, int a, int b, int c)
@@ -202,6 +252,19 @@ extern "C" FE_OVERLAY int fn_80488178(void* x)
     if (FeWp(x, 0x138)->fn_vslot86() != 0 || FeWp(x, 0x138)->fn_vslot87() != 0)
         r = 1;
     return r;
+}
+
+extern "C" FE_OVERLAY void fn_804884C0(int a, void* x)
+{
+    FeWp(x, 0x13C)->fn_vslot16(1);
+    FeWp(x, 0x140)->fn_vslot16(1);
+    if (a == 0) {
+        fn_80487D44(x, FeI(x, 0x154), FeI(x, 0x158));
+    } else if (FeI(x, 0x150) == FeI(x, 0x13C)) {
+        FeI(x, 0x154) = -1;
+    } else {
+        FeI(x, 0x158) = -1;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_8048884C(int a, void* x)
