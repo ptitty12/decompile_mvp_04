@@ -159,6 +159,69 @@ void fn_801AB6E0(Unk801AB63C_P* p, Unk801AB63C_Q* q)
     }
 }
 
+int fn_801B5EDC(Unk801AB63C_P* p, int i, int c);
+int fn_801B62E4(Unk801AB63C_P* p, int i);
+int fn_801B5F4C(Unk801AB63C_P* p);
+int fn_801B5F70(Unk801AB63C_P* p);
+int fn_801B38A8(Unk801AB63C_P* p, int i, int c);
+int fn_801C184C(void* a, int b, int c);
+int fn_801C192C(void* a, int b);
+struct Unk801AB748_H {
+    char pad0[0x4C8];
+    int m4C8;
+};
+
+/* near-miss: same code; q/side swap r28/r29 and the case-1/case-0 tail layout of the final branch differs. */
+void fn_801AB748(Unk801AB63C_P* p, Unk801AB63C_Q* q)
+{
+    if (q != 0) {
+        char* sub = (char*)q + 0x480;
+        Unk801AD044_Rec rec = fn_801B3094(p, q, 0, 3, 0, 0);
+        int lim = 3;
+        Unk801AB748_H* h = (Unk801AB748_H*)fn_801A497C(q->m44C, q->m708, 0);
+        int side = q->m708;
+        int y = fn_801B5EDC(p, side, 0);
+        int z = fn_801B5F4C(p);
+        int x = fn_801B5FC4(p, side);
+        int w = fn_801B62E4(p, side);
+        w = w + fn_801B38A8(p, side, 1);
+        if (*(int*)(sub + 0x50) != 0 && fn_801ADDFC(p, q, 0) == 0) {
+            fn_8017DF2C(p->m4, q);
+        }
+        if (fn_801C184C(p, y, 0) != 0 || w < x) {
+            if (h != 0 && h->m4C8 == 0x13) {
+                lim = 2;
+            }
+            if (rec.m0 >= lim) {
+                if (q->m44C->m6F8->m14[2].m0 - *(int*)(sub + 0x3C) > 2) {
+                    {
+                    fn_801AB6E0(p, q);
+                    return;
+                }
+                }
+            } else {
+                {
+                    fn_801AB6E0(p, q);
+                    return;
+                }
+            }
+        } else if (fn_801C1870(p, z, 1) != 0 && fn_801C192C(p, x) != 0) {
+            switch (q->m708) {
+            case 1:
+                {
+                    fn_801AB6E0(p, q);
+                    return;
+                }
+            case 0:
+                if (fn_801B5F70(p) != 0) {
+                    fn_801AB6E0(p, q);
+                }
+                break;
+            }
+        }
+    }
+}
+
 void fn_801AB914(Unk801AB63C_P* p, int x)
 {
     int a;
@@ -453,6 +516,51 @@ int fn_801AD470(Unk801AB63C_P* p, Unk801AB63C_Q* q, int c)
             if (fn_801C18A4(p, 1, 3, a) != 0 || (c2 != 0 && idx == 0)
                 || (fn_801C18D8(p, 1, a) != 0 && b > 0 && a - b <= 3)) {
                 r = 1;
+            }
+        }
+    }
+    return r;
+}
+
+int fn_801B5FA0(Unk801AB63C_P* p, int i);
+int fn_801B5F70(Unk801AB63C_P* p);
+int fn_801B62E4(Unk801AB63C_P* p, int i);
+int fn_801C18EC(void* a, int b);
+int fn_801B2AD4(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+
+/* near-miss: same code; p and the result swap r30/r31 (as in fn_801AD744). */
+int fn_801AD558(Unk801AB63C_P* p, Unk801AB63C_Q* q)
+{
+    int r = fn_801AD31C(p, q, 1);
+    if (r != 0) {
+        r = 0;
+        int t = fn_801B5F4C(p);
+        if ((q->m708 == 0 && fn_801B5F70(p) != 0 && t == 1) || fn_801C1880(p, t, 0) != 0) {
+            r = 1;
+        }
+        if (r != 0) {
+            int side = q->m708;
+            int k;
+            if (side > 2) {
+                int u;
+                if (side == 3) {
+                    u = 4;
+                } else {
+                    u = 3;
+                }
+                k = u;
+            } else {
+                k = side == 0;
+            }
+            r = 0;
+            int x = fn_801B5FC4(p, side);
+            int b = fn_801B5FA0(p, k);
+            int y = fn_801B5EDC(p, q->m708, 0);
+            if (fn_801C18A4(p, 1, 3, x) != 0 || (fn_801C18EC(p, x) != 0 && fn_801C1870(p, y, 1) != 0 && side == 0) || (fn_801C18A4(p, 4, 6, x) != 0 && b + fn_801B62E4(p, side) > 1)) {
+                r = 1;
+            }
+            if (r != 0 && fn_801B2AD4(p, (Unk801B23A8_Q*)q) != 0) {
+                r = 0;
             }
         }
     }
