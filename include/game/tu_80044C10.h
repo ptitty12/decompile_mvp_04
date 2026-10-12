@@ -153,7 +153,7 @@ public:
     char pad288[0x128];
     Unk80044C10_Obj590* m3B0;
     int m3B4;
-    char pad3B8[0x4];
+    int m3B8;
     int m3BC;
     char pad3C0[0xC];
     int m3CC;

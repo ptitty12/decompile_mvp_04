@@ -56,6 +56,7 @@ struct Unk80256C80_M;
 class Unk80069F0C {
 public:
     int fn_8006BE18();
+    int fn_8006A238(int a);
 };
 
 /* Placeholder view of the game object's methods (Unk80044C10_A is the same object); fn_8001D6CC returns the value
@@ -205,6 +206,16 @@ int fn_8001DEC0(Unk80044C10_A* a);
 void fn_800105AC(int a, int b, int c, int d, int e, int f);
 void fn_8001582C();
 void fn_80010E38();
+struct Unk8024EF40_W;
+void fn_8000FC58();
+void fn_800B555C();
+int fn_800B57EC();
+void fn_8001A3EC(int a, int b);
+void fn_80010E8C();
+int fn_80253E7C(Unk8024EF40_W* w, int a, int b, int c);
+int fn_80046734(int a);
+int fn_80045774(unsigned a);
+void fn_80011DD8(int a, int b);
 void fn_80015B88();
 void fn_80011B80(int a, int b);
 void fn_800199E4(int a, int b, int c, int d);
@@ -242,7 +253,6 @@ struct Unk80049670_P {
     Unk80044C10_Vec3 m60;
 };
 extern Unk80044C10_Vec3 lbl_805AE414;
-struct Unk8024EF40_W;
 float fn_80253F54(Unk8024EF40_W* w, int a, int b, int c);
 extern "C" float fn_8024F20C(void* p, int a, int b, int c, int d);
 extern "C" float fn_8024F048(void* p, int a, int b, int c, int d);
