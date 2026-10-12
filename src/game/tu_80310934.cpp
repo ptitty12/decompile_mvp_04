@@ -33,6 +33,11 @@ struct Unk80310934_V3 {
     int b;
     int c;
 };
+struct Unk80310934_F3 {
+    float x;
+    float y;
+    float z;
+};
 struct Unk80310934_Cp {
     char pad0[0x20];
     Unk80310934_V3 m20;
@@ -188,6 +193,13 @@ Unk80310934_O1C* fn_80311F2C();
 void* fn_80310934()
 {
     return fn_8030FECC(operator new(0x115C, lbl_806EF9B4));
+}
+
+void fn_80310964(Unk80310934_F3* out, Unk80310934_V3* in, float* s)
+{
+    out->x = (float)in->a * *s;
+    out->y = (float)in->b * *s;
+    out->z = (float)in->c * *s;
 }
 
 void fn_80311464(void* p, int a, int b)

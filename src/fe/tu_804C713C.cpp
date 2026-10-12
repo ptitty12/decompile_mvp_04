@@ -5,6 +5,22 @@
 
 #include "game/fe_804BE560.h"
 
+struct Unk8007F198_B;
+int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
+int fn_8009047C(int a, int b);
+extern "C" void fn_80125154(void* w, int a);
+extern "C" int fn_804C7F30(FeScrN* x);
+class FeVt18 {
+public:
+    char pad0[0x18];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+};
+extern "C" void fn_800A2F9C(FeGlobal80619948* g, int a);
+
 extern "C" void fn_804C81A0(FeScrN* x);
 extern const char lbl_805F8060[];
 extern const char lbl_805F806C[];
@@ -151,11 +167,60 @@ extern "C" FE_OVERLAY void fn_804C7990(FeScrJ* x, int a)
     x->m138->fn_vslot14(a);
 }
 
+extern "C" FE_OVERLAY int fn_804C7F30(FeScrN* x)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int h = fn_8007F7D0((Unk8007F198_B*)s, 0);
+    volatile int sp8 = 0;
+    int i = 0;
+    do {
+        int a = fn_8008FE14(i);
+        int b = fn_8008FD78(*(int*)&sp8);
+        int r = s->fn_8007B380(a, h);
+        if (r != 0 && fn_8009047C(b, r) == 0)
+            return 1;
+        int c = sp8;
+        int t;
+        if (c > 9)
+            t = c;
+        else
+            t = c + 1;
+        sp8 = t;
+        i = t;
+    } while (i <= 9);
+    return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804C81A0(FeScrN* x)
+{
+    if (fn_804C7F30(x) != 0)
+        fn_80125084(x->m140, 1);
+    else
+        fn_80125154(x->m140, 0);
+    if (fn_800B555C()->m0 == 0x13) {
+        fn_801251CC(x->m140, 2, 0x4DA2, 2);
+        return;
+    }
+    fn_801251CC(x->m140, 0, 0x5B06, 1);
+}
+
 extern "C" FE_OVERLAY void fn_804C8314(FeScrN* x, int a)
 {
     if (a == (int)x->m160) {
         fn_804C7ACC(x);
         fn_804C7FE4(x);
+    }
+}
+
+extern "C" FE_OVERLAY void fn_804C8544(int a, void* x)
+{
+    if (a != 0) {
+        if (a == 1) {
+            fn_800A2F9C(lbl_80619948, 1);
+            ((FeVt18*)lbl_80619948)->s5();
+            fn_800B555C()->m3C = 0;
+            ((void (*)(void*))fn_804C85BC)(x);
+        }
     }
 }
 
@@ -176,6 +241,18 @@ extern "C" FE_OVERLAY void fn_804C8634()
     fn_8040B830(mp->name, lbl_805F806C, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, p);
+}
+
+extern const char lbl_805F5B3C[];
+
+extern "C" FE_OVERLAY void fn_804C87F0(void* x)
+{
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    fn_8040B830(mp->name, lbl_805F5B3C, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
 }
 
 extern "C" FE_OVERLAY void fn_804C92B0(FeScrN* x)

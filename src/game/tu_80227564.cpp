@@ -278,6 +278,40 @@ int fn_80229E50(Task* t, int a, int b, int c, int d)
     return f <= 0.85f;
 }
 
+inline void SetSlot(Slots4* s, int x, int v)
+{
+    s->m[x] = v;
+}
+extern "C" Vec3f fn_801E73B8(Obj3A64* self, int k);
+void fn_8022A438(Task* t, int a, int b)
+{
+    RecQueue* q = t->m9C->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 0x2C;
+    e->m0 = 0x2E;
+    e->m9C = 1;
+    e->m38 = fn_801E73B8(t->m9C->m3A64, a);
+    e->m10 = 6;
+    e->m28 = (Player*)b;
+    e->m80 = -1.0f;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m1C = a;
+    TaskInner* in = t->m9C;
+    if (GetSlot(&in->mC0, a) == -1)
+        SetSlot(&t->m9C->mC0, a, t->m9C->m3A5C);
+}
+
 void fn_8022AB04(Task* t)
 {
     t->m9C->m30 = 6;

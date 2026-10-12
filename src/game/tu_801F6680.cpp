@@ -230,6 +230,40 @@ inline void SetT8D34(Menu* m, float v)
     m->m4 = v;
 }
 
+struct Unk801F83F0_E {
+    char pad0[0x38];
+    Unk801EE438_Vec m38;
+    char pad44[0x5C - 0x44];
+};
+struct Unk801F83F0_G {
+    char pad0[0x6B8];
+    Unk801F83F0_E m6B8[10];
+};
+extern const Unk801EE438_Vec lbl_805D4F5C;
+float fn_804028E4(float x);
+extern "C" void fn_801F803C(Menu* m, int idx);
+inline float Len801F83F0(const Unk801EE438_Vec& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+inline float Pick801F83F0(Unk801EE438_Vec c, Unk801EE438_Vec d)
+{
+    return !(c.m0 * d.m8 - c.m8 * d.m0 >= 0.0f) ? 20736.0f : 9216.0f;
+}
+
+/* near-miss: retail stores the unused sign copy (stfs 0x50) before the final float compare; ours schedules it after (4 slots) */
+extern "C" void fn_801F83F0(Menu* m, int idx)
+{
+    Unk801EE438_Vec a = ((Unk801F83F0_G*)m->m0)->m6B8[idx].m38;
+    Unk801EE438_Vec b = lbl_805D4F5C;
+    float len = Len801F83F0(a);
+    float s = 0.0f;
+    s = Pick801F83F0(b, a);
+    float t = s;
+    if (!(len >= s))
+        fn_801F803C(m, idx);
+}
+
 extern "C" void fn_801F8D34(Menu* m)
 {
     Unk801EE438_G* g = m->m0;

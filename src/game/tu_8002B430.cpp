@@ -28,6 +28,39 @@ extern "C" int fn_8002B82C(Unk80023AC4_Obj* x)
     return r;
 }
 
+extern Unk801A4B34_Vec3 lbl_805B1A00;
+extern "C" int fn_80022708(int unused, int idx);
+void fn_80035420(int a, int b, int c, int d);
+
+static inline Unk801A4B34_Vec3 Unk8002B850_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
+{
+    Unk801A4B34_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" void fn_8002B850(Unk80023AC4_Obj* x)
+{
+    Unk801A4B34_Pos* p = x->m80[0]->m6CC;
+    Unk801A4B34_Vec3 pos = p->m60;
+    if (p->m38C == 1 && x->mF0 == 0 && p->m388 != 1 && x->mF8 == 0) {
+        float len;
+        Unk801A4B34_Vec3 d = Unk8002B850_Sub(lbl_805B1A00, pos);
+        len = fn_804028E4(d.x * d.x + d.z * d.z) * 0.083333336f;
+        if (!(pos.x <= 0.0f) && !(pos.z <= 0.0f) && !(len <= x->m8C->m1C)) {
+            int dd = x->mD0;
+            if (dd != 0) {
+                int c = x->m514;
+                int v = fn_80022708((int)x, 1);
+                fn_80035420(dd, c, v, fn_8002A2D4(x));
+            }
+            fn_8002A244(x, 0x49, (float)x->m80[0]->m48 * 0.016666668f);
+        }
+    }
+}
+
 extern "C" void fn_8002BA00(Unk80023AC4_Obj* x)
 {
     x->m160.m4C = 0;

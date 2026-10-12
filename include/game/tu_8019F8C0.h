@@ -260,7 +260,7 @@ struct Unk8019F8C0_Owner {
     int m54C;
     int m550;
     void* m554;
-    char pad558[0x4];
+    int m558;
     int m55C;
     char m560[0x28];
     void* m588;

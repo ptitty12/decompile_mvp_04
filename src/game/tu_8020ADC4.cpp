@@ -3,8 +3,45 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801EE438.h"
+#include "game/goals/tu_8027C728.h"
 
 typedef Unk801EE438_Scr Scr;
+
+struct Unk801E7448_G {
+    char pad0[8];
+    Unk80270BA0_X* m8;
+    char pad0C[0x3A64 - 0xC];
+    void* m3A64;
+};
+class Unk80299920_Goal {
+public:
+    Unk80299920_Goal* fn_80299F0C(Unk80273498_Vec3* v);
+    void fn_80299F64(int v);
+    float fn_8029A948();
+};
+class Unk8027A84C {
+public:
+    int m0;
+    Unk8027A84C* m4;
+    void* m8;
+    int mC;
+    char pad10[0x34 - 0x10];
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+};
+class Unk8027A84C_Owner {
+public:
+    Unk8027A84C* fn_8027C67C();
+};
+extern "C" Unk80273498_Vec3 fn_801E7448(void* o, int k);
+extern "C" Unk8027C728_Goal* fn_802448F4(Unk80270BA0_X* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, float* d);
+void fn_8027D368(Unk8027C728_Goal* g);
+extern "C" int fn_80205684(void* g);
+extern "C" void fn_8033E958(const char* fmt, ...);
 
 struct Unk8020C5FC_Tbl {
     int m[4];
@@ -279,6 +316,42 @@ extern "C" void fn_8020DFE4(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, i
     fn_8020E074(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6), a7, a8);
 }
 
+extern "C" float fn_8020E074(Scr* p, int a1, int a2, const Unk801EE438_Vec& v, int t, int a7, int a8)
+{
+    if (t == 1) {
+        fn_8033E958("BUG_HUNT! throw_style = ANIM_THROW_UNKNOWN\n");
+        *(int*)5 = 6;
+    }
+    if (t == 0) {
+        fn_8033E958("BUG_HUNT! throw_style = ANIM_THROW_NONE\n");
+        *(int*)7 = 8;
+    }
+    float r = 0.0f;
+    int ten = 0xA;
+    Unk8027C728_Goal* g = fn_802448F4((Unk80270BA0_X*)a2, 1);
+    g->m10 = 5;
+    fn_8027C728(g);
+    Unk80299920_Goal* sub = (Unk80299920_Goal*)g->m18;
+    Unk80273498_Vec3 pos = *(Unk80273498_Vec3*)&v;
+    sub->fn_80299F0C(&pos);
+    sub->fn_80299F64(t);
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+    ((Unk8027A84C*)g->m104)->m40 = ten;
+    float tf = 0.0f;
+    int res = fn_8027D390(g, &tf, (Unk80273498_Vec3*)a7, 0, 0);
+    if (a8 != 0)
+        *(float*)a8 = sub->fn_8029A948();
+    if (res == 1) {
+        if (a7 != 0 && ((Unk80273498_Vec3*)a7)->y == -1000.0f)
+            *(Unk80273498_Vec3*)a7 = *(Unk80273498_Vec3*)(a1 + 0x60);
+    } else {
+        fn_80205684(p->m9C);
+    }
+    fn_8027D368(g);
+    r = tf;
+    return r;
+}
+
 extern "C" void fn_8020E20C(Scr* p, int a1, int a2, int a3, Unk801EE438_Vec v, int a5, int a6, int a7, int a8)
 {
     fn_8020E2A0(p, a1, a2, v, fn_80216590(p, a2, v, a3, a5, a6), a7, a8, 0);
@@ -338,6 +411,47 @@ extern const float lbl_805D5B5C;
 extern const float lbl_805D5B60;
 extern const float lbl_805D5B64;
 extern const float lbl_805D5B68;
+
+
+extern "C" float fn_8020EC50(Scr* p, int k)
+{
+    float f = 0.0f;
+    Unk80273498_Vec3 pos = fn_801E7448(((Unk801E7448_G*)p->m9C)->m3A64, k);
+    int type = 0x11;
+    switch (k) {
+    case 0:
+        break;
+    case 1:
+        type = 0x13;
+        break;
+    case 2:
+        type = 0x12;
+        break;
+    default:
+        type = 0x11;
+        break;
+    }
+    int two = 2;
+    if (((Unk801E7448_G*)p->m9C)->m8->m458 == 0) {
+        int ten = 0xA;
+        Unk8027C728_Goal* g = fn_802448F4(((Unk801E7448_G*)p->m9C)->m8, 1);
+        Unk80273498_Vec3 v = pos;
+        Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+        g->m10 = 5;
+        fn_8027C728(g);
+        ((Unk80299920_Goal*)g->m18)->fn_80299F0C(&v)->fn_80299F64(type);
+        ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = two;
+        g104->m38 = two;
+        ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = two;
+        g104->m34 = two;
+        ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = ten;
+        g104->m40 = ten;
+        if (fn_8027D390(g, &f, 0, 0, 0) == 0)
+            fn_80205684(p->m9C);
+        fn_8027D368(g);
+    }
+    return f;
+}
 
 extern "C" float fn_8020EDA8(Scr*, int, int, Unk801EE438_Vec* a, Unk801EE438_Vec* b, float* out)
 {
