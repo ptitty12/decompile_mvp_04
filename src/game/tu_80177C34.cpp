@@ -5,6 +5,46 @@
 #include "game/tu_80177C34.h"
 #include "game/goals/tu_8027C728.h"
 #include "game/goals/tu_8027A84C.h"
+#include "game/tu_8017A930.h"
+#include "game/tu_801A57C8.h"
+class Unk8017F628 {
+public:
+    virtual ~Unk8017F628();
+};
+void fn_8017EF78(void* p, void* ctx);
+extern "C" void fn_80377408(void* p);
+extern int lbl_8061C68C, lbl_8061C690;
+extern int lbl_8061D3F8, lbl_8061D3FC, lbl_8061D400, lbl_8061D404, lbl_8061D408, lbl_8061D40C;
+extern int lbl_8061D410, lbl_8061D414, lbl_8061D418, lbl_8061D41C;
+void fn_80303E38(const char* fmt, float a, float b, ...);
+
+inline void* operator new(unsigned int, void* p) { return p; }
+
+void* operator new(unsigned int size, int heap);
+struct Unk8017EE58_Ctx;
+class Unk8017EDF0 {
+public:
+    Unk8017EDF0(Unk8017EE58_Ctx* ctx, int b);
+    virtual ~Unk8017EDF0();
+};
+extern char lbl_806601F8[];
+struct Unk801B7FB0_P;
+class Unk801BA9CC {
+public:
+    Unk801BA9CC(int a, Unk801B7FB0_P* b);
+};
+extern "C" {
+void* fn_8017F428(void* self, void* ctx);
+void fn_8017EE7C(void* p);
+void* fn_801C1B24(void* self, void* a, void* b);
+void* fn_80176654(void* self, void* a, void* b);
+void* fn_8022E680(void* self, void* a, void* b);
+void* fn_8025700C(void* self, void* a, void* b);
+void* fn_801DB974(void* self, void* a, void* b);
+void* fn_801B659C();
+}
+void* fn_80178A98(void* self, void* a, void* b);
+void fn_8017A880(void* p);
 struct Unk801797C4_L {
     int m0;
     int m4;
@@ -686,6 +726,127 @@ void fn_80179CD0(void* self)
         fn_80198DD8(o, 0);
         o->fn_vslot8(1);
         p->m0 = 0;
+    }
+}
+
+void fn_8017A1FC(Unk8017B0A4_Ctx* p)
+{
+    if (lbl_8061C690 == 0) {
+        lbl_8061C690 = 1;
+    }
+    if (lbl_8061C68C == 1) {
+        float x = 0.75f;
+        float y = 0.3f;
+        const float dy = 0.05f;
+        fn_80303E38("Bobbled = %d\n", x, y, lbl_8061D404);
+        y = y + dy;
+        fn_80303E38("Dropped = %d\n", x, y, lbl_8061D408);
+        y = y + dy;
+        fn_80303E38("Intent. Tip = %d\n", x, y, lbl_8061D400);
+        y = y + dy;
+        fn_80303E38("Intent. Miss = %d\n", x, y, lbl_8061D3FC);
+        y = y + dy;
+        fn_80303E38("Unintent. M. = %d\n", x, y, lbl_8061D3F8);
+        y = 0.3f;
+        x = 0.58f;
+        fn_80303E38("Rout. = %d\n", x, y, lbl_8061D40C);
+        y = y + dy;
+        fn_80303E38("Easy = %d\n", x, y, lbl_8061D410);
+        y = y + dy;
+        fn_80303E38("Med. = %d\n", x, y, lbl_8061D414);
+        y = y + dy;
+        fn_80303E38("Hard = %d\n", x, y, lbl_8061D418);
+        y = y + dy;
+        fn_80303E38("Extr. = %d\n", x, y, lbl_8061D41C);
+        y = y + dy;
+    }
+}
+
+Unk8017A930_T* fn_8017A430(Unk8017A930_T* self, Unk8017B0A4_Ctx* ctx)
+{
+    fn_8035AB00(self);
+    self->m4 = ctx;
+    *(const void**)self = lbl_806601F8;
+    new ((char*)self + 8) Unk8017EDF0((Unk8017EE58_Ctx*)ctx, (int)self);
+    fn_8017F428((char*)self + 0x24, ctx);
+    fn_8017EE7C((char*)self + 0x228);
+    self->m3A4 = 0;
+    self->m3A8 = 0;
+    self->m3AC = 0;
+    self->m3B0 = 0;
+    self->m3B4 = 0;
+    self->m3B8 = 0;
+    self->m3BC = 0;
+    self->m3C0 = 0;
+    fn_8017A880(self);
+    self->m3A4 = fn_801C1B24(operator new(0x2E4, 0x400), self, ctx);
+    self->m3A8 = (char*)fn_80176654(operator new(0x178, 0x400), self, ctx);
+    self->m3AC = fn_80178A98(operator new(0x150, 0x400), self, ctx);
+    self->m3B0 = fn_8022E680(operator new(0x84, 0x400), self, ctx);
+    self->m3B4 = fn_8025700C(operator new(0x24, 0x400), self, ctx);
+    self->m3B8 = fn_801DB974(operator new(8, 0x400), self, ctx);
+    self->m3BC = new (operator new(0x6C, 0x400)) Unk801BA9CC((int)self, (Unk801B7FB0_P*)ctx);
+    self->m3C0 = new (operator new(0x48, 0x400)) Unk801AE5C0((int)self, (int)ctx);
+    self->m3C4 = new (operator new(0x80, 0x400)) Unk801A9610((int)self, (int)ctx);
+    self->m3C8 = new (operator new(0x88, 0x400)) Unk801AB59C((int)self, (int)ctx);
+    self->m3CC = new (operator new(0x64, 0x400)) Unk801B10C8((int)self, (int)ctx);
+    *(void**)((char*)self + 0x404) = fn_801B659C();
+    return self;
+}
+
+void fn_8017A600(Unk8017A930_T* self, int flag)
+{
+    *(const void**)self = lbl_806601F8;
+    fn_8017A880(self);
+    fn_8017EF78((char*)self + 0x228, self->m4);
+    if (self->m3A4) {
+        delete (Unk801B5A44*)self->m3A4;
+        self->m3A4 = 0;
+    }
+    if (self->m3A8) {
+        delete (Unk801B5A44*)self->m3A8;
+        self->m3A8 = 0;
+    }
+    if (self->m3AC) {
+        delete (Unk801B5A44*)self->m3AC;
+        self->m3AC = 0;
+    }
+    if (self->m3B0) {
+        delete (Unk801B5A44*)self->m3B0;
+        self->m3B0 = 0;
+    }
+    if (self->m3B4) {
+        delete (Unk801B5A44*)self->m3B4;
+        self->m3B4 = 0;
+    }
+    if (self->m3B8) {
+        delete (Unk801B5A44*)self->m3B8;
+        self->m3B8 = 0;
+    }
+    if (self->m3BC) {
+        delete (Unk801B5A44*)self->m3BC;
+        self->m3BC = 0;
+    }
+    if (self->m3C0) {
+        delete (Unk801B5A44*)self->m3C0;
+        self->m3C0 = 0;
+    }
+    if (self->m3C4) {
+        delete (Unk801B5A44*)self->m3C4;
+        self->m3C4 = 0;
+    }
+    if (self->m3C8) {
+        delete (Unk801B5A44*)self->m3C8;
+        self->m3C8 = 0;
+    }
+    if (self->m3CC) {
+        delete (Unk801B5A44*)self->m3CC;
+        self->m3CC = 0;
+    }
+    ((Unk8017F628*)((char*)self + 0x24))->Unk8017F628::~Unk8017F628();
+    ((Unk8017EDF0*)((char*)self + 8))->Unk8017EDF0::~Unk8017EDF0();
+    if (flag & 1) {
+        fn_80377408(self);
     }
 }
 
