@@ -471,3 +471,91 @@ int fn_8022F2C0(Fe8022* a, Fe8022* b)
 }
 
 }
+
+struct Unk8024EF40_P;
+struct Unk8022F328_G1 {
+    char pad0[0xC];
+    char* mC;
+};
+struct Unk8022F328_G0 {
+    char pad0[0xC];
+    Unk8022F328_G1* mC;
+};
+struct Unk8022F328_Ctx {
+    char pad0[0x6F8];
+    Unk8022F328_G0* m6F8;
+};
+struct Unk8022F328_Owner {
+    Unk8022F328_Ctx* m0;
+};
+struct Unk80344538;
+void fn_80344538(Unk80344538* self);
+/* 0x2C-byte element of the 5-entry array at +4 (see Unk8022FE34_Ent); ctor fn_80344538. */
+struct Unk80344538 {
+    int m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    float m20;
+    float m24;
+    int m28;
+    Unk80344538() { fn_80344538(this); }
+};
+struct Unk8022F328_Row {
+    float a;
+    float b;
+    float c;
+    int d;
+};
+struct Unk8022F328_Sub {
+    Unk8022F328_Owner* m0;
+    Unk80344538 m4[5];
+};
+extern float lbl_805D6EC4;
+int fn_802536D0(Unk8024EF40_P* p);
+inline void Unk8022F328_Init(Unk8022F328_Row* r)
+{
+    r->a = r->b = r->c = lbl_805D6EC4;
+    r->d = 0;
+}
+
+extern "C" {
+Unk8024EF40_P* fn_801A4B34(Unk8022F328_Ctx* c);
+float fn_8008942C(char* a, int b, int c, float* d, float* e, float f);
+void fn_8022F4D4(Unk8022F328_Sub* self);
+void fn_80230B4C__Fv(Unk8022F328_Sub* self);
+
+void fn_8022F328(Unk8022F328_Sub* self, int arg1)
+{
+    Unk8022F328_Row q[5];
+    char* w = self->m0->m0->m6F8->mC->mC + 0xC;
+    Unk80344538 tmp;
+    int cnt;
+    Unk8024EF40_P* p = fn_801A4B34(self->m0->m0);
+    if (p != 0)
+        cnt = fn_802536D0(p);
+    else
+        cnt = 1;
+    for (int i = 0; i < 5; i++) {
+        Unk8022F328_Init(&q[i]);
+        Unk80344538* ent = &self->m4[i];
+        tmp = *ent;
+        tmp.m28 = cnt;
+        q[i].d = tmp.m0;
+        if (tmp.m0 != 0) {
+            if (fn_802536D0(fn_801A4B34(self->m0->m0)) == 0)
+                q[i].a = ent->m20;
+            else
+                q[i].a = fn_8008942C(w, arg1, tmp.m0, &q[i].b, &q[i].c, ent->m20);
+            float t = q[i].a;
+            ent->m24 = t;
+        }
+    }
+    fn_8022F4D4(self);
+    fn_80230B4C__Fv(self);
+}
+}
