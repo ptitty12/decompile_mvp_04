@@ -151,6 +151,68 @@ int fn_80254B60(A* self)
     return 0;
 }
 
+struct Unk80256C80_M;
+struct Unk80270BA0_X;
+extern "C" {
+int fn_80247858__FP13Unk80270BA0_X(void* x, float* out);
+int fn_8026D75C__FP13Unk8026C414_OP13Unk8026C414_X(void* o, void* x);
+Unk8024EF40_P* fn_80257B40__FP13Unk80256C80_M(void* list);
+void* fn_80257BD0(void* list, void* p, int a);
+}
+struct Unk80254BEC_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk80254BEC_Pt {
+    float x;
+    float y;
+    float z;
+};
+extern Unk80254BEC_Pt lbl_805D9E14[];
+extern float lbl_805D9D18;
+extern float lbl_805D9D20;
+
+
+inline float Unk80254BEC_D2(P* pl, Unk80254BEC_Pt* t)
+{
+    return (pl->m60 - t->x) * (pl->m60 - t->x) + (pl->m68 - t->z) * (pl->m68 - t->z);
+}
+
+extern "C" int fn_80254BEC(A* self)
+{
+    if (fn_80254B60(self) != 0) {
+        float x = lbl_805D9D18;
+        const float k = 14400.0f;
+        float z = lbl_805D9D20;
+        int s = self->m30;
+        int idx = fn_80247858__FP13Unk80270BA0_X(self->m0, &z);
+        float d1 = Unk80254BEC_D2(self->m0->m44C->m6CC, &lbl_805D9E14[idx]);
+        float d2 = Unk80254BEC_D2(self->m0, &lbl_805D9E14[idx]);
+        if (s != idx && z > k)
+            return 1;
+        if (z > 57600.0f)
+            return 1;
+        if (d1 < d2)
+            return 1;
+        if (fn_8026D75C__FP13Unk8026C414_OP13Unk8026C414_X(self->m0, 0) == 1)
+            return 1;
+        void* list = self->m0->m44C->m700->m3B4;
+        void* p2 = fn_80257B40__FP13Unk80256C80_M(list);
+        while (p2 != 0) {
+            A* a2 = &((P*)p2)->m58C;
+            if (a2 != self) {
+                int s2 = a2->m30;
+                float f = lbl_805D9D20;
+                if (fn_80247858__FP13Unk80270BA0_X(p2, &z) == idx && s2 == idx && f < lbl_805D9D18)
+                    return 1;
+            }
+            p2 = fn_80257BD0(list, p2, 0);
+        }
+    }
+    return 0;
+}
+
 void fn_80254DA4(A* self, int a)
 {
     P* p = self->m0;
