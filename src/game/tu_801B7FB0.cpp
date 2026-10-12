@@ -38,6 +38,7 @@ int fn_801B9CC0(B* u);
 void fn_801B9E80(B* u);
 void fn_801BA0B8(B* u, P* a);
 void fn_801B9838(B* u);
+void fn_801BA288(B* u, unsigned i);
 int fn_801C0478(A* a);
 void fn_801BAAC8(A* a);
 }
@@ -455,6 +456,54 @@ extern "C" void fn_801BA0B8(B* u, P* q)
     fn_8037893C(&u->m4->m704, m.m0, &m, 0, 0);
     m.End();
 }
+
+extern "C" float fn_801A0AA8(P* p, float a, float b);
+float fn_8017CC70(void* pl, int team);
+
+/* near-miss: same code; the event id is loaded into r5 (tied to the pointer parameter) instead of r0. */
+inline void Unk801BA130_Set(Unk801B7FB0_Team* t, float v)
+{
+    t->m104 = v;
+}
+
+extern "C" int fn_801BA130(B* u, int team, int* ev, float amt)
+{
+    Unk801B7FB0_Team* t = &u->m4->m6F8->m14->t[team];
+    t->m10C = 1;
+    t->m110 = 1;
+    float cur = t->m104;
+    int e = *ev;
+    int ok = 1;
+    if (e == 0xC7) {
+        ok = 0;
+    }
+    if (ok == 0 || e == 0x48 || e == 0x41) {
+        cur = 0.0f;
+    } else {
+        float v = fn_8017CC70(u->m4->m700, team);
+        const float k1 = 0.6f;
+        if (!(v <= k1)) {
+            v = k1;
+        }
+        float w = amt + (amt - v);
+        const float k3 = 0.2f;
+        w = fn_801A0AA8(u->m4, w, k3);
+        const float k4 = 0.25f;
+        if (!(w >= k4)) {
+            w = k4;
+        }
+        cur = cur - w;
+    }
+    int r = 0;
+    Unk801BA130_Set(t, cur);
+    if (!(cur > 0.0f)) {
+        fn_801BA288(u, team);
+        r = 1;
+    }
+    return r;
+}
+
+
 
 extern "C" void fn_801BA288(B* u, unsigned i)
 {
