@@ -38,13 +38,13 @@ extern "C" {
 void fn_80035E38(Unk80034E14* self);
 void fn_80035D94(Unk80034E14* self);
 void fn_80378D70(const char* src, unsigned int len, char* dst, int cap, int delim, unsigned int* outn);
-void fn_80379094(char* s, unsigned int n, int a);
+int fn_80379094(char* s, unsigned int n, int a);
 int fn_80409DAC(const char* s);
 char* fn_8040B948(const char* hay, const char* needle);
 void fn_80329AEC(const char** pp, const char** out, unsigned int* pn, int delim);
 void fn_80329C4C(const char** pp, unsigned int* pn, int* out, int lo, int hi, int delim);
 void fn_800370B8(char* buf, unsigned char* out, const char* text, int lo3, int hi3, int lo5, int hi5);
-void fn_80329D1C(const char** pp, unsigned int* pn, int* out, int lo, int hi, int delim);
+int fn_80329D1C(const char** pp, unsigned int* pn, int* out, int lo, int hi, int delim);
 const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
 void fn_802B961C(const char* p, int a);
 void fn_803792AC(const char** pp, unsigned int* pn);

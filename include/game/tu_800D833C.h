@@ -138,7 +138,7 @@ int fn_800B59DC(Unk800DB5F4_S* p);
 int fn_800B5A70(Unk800DB5F4_S* p);
 int fn_800B5B40(Unk800DB5F4_S* p);
 int fn_804089B4(char* dst, const char* fmt, ...);
-void fn_803FEBDC(char* s, int a, int b, int* c);
+int fn_803FEBDC(char* s, int a, int b, int* c);
 void fn_803FEC9C(int a, int b);
 extern char lbl_805BD4B4[];
 extern char lbl_805BD4B8[];

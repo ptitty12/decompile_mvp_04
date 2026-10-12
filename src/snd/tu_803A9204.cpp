@@ -22,7 +22,7 @@ extern "C" void fn_803AF9C0();
 extern "C" void fn_803AB480(int handle);
 extern "C" void fn_803B41C8(int voice);
 extern "C" int fn_803AD2F0(void** pptp, SNDIPATCHHEADER* pph);
-extern "C" void fn_803AFD88(SNDIPATCHHEADER* pph, int a, int b);
+extern "C" int fn_803AFD88(SNDIPATCHHEADER* pph, int a, int b);
 extern "C" void fn_803A81E0(SNDIPATCHHEADER* pph, int a);
 extern "C" void fn_803B12D0(void* s, int chrg);
 extern "C" void fn_803B12F8(void* s, int chrg);

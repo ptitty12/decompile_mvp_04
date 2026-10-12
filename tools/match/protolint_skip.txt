@@ -1,0 +1,39 @@
+# Declarations protolint classifies with certainty but that cannot (or must not) change.
+# Format: fn_<addr> <reason>.  protolint skips them; use --no-skip to list them again.
+
+# Passed as a `void (*)()` callback: a value-returning function stored in a void-callback
+# slot fails to compile when its declaration changes.
+fn_8000446C callback
+fn_80146560 callback
+fn_80147CF4 callback
+fn_8022F2C0 callback
+fn_80312700 callback
+fn_8039F94C callback
+
+# Declaring these int lowers a matched caller (struct-return / out-pointer functions whose
+# real type is a struct by value, or whose callers cast).
+fn_80189618 fn_802A1790 99.58 -> 99.53
+fn_803D6528 fn_803D74A0 99.68 -> 82.32
+fn_803D7378 fn_802BADC0 98.33 -> 98.14
+fn_803D775C fn_802BADC0 98.33 -> 98.14
+fn_8018959C fn_8002559C 100 -> 96.88
+fn_802872AC fn_80287250 100 -> 98.7
+fn_80329FA0 fn_8053DB30 / fn_8053DD68 lose 1-4 points
+
+# Float results whose change needs a coherent change of the callers or of a virtual slot.
+fn_8007824C fn_800DC178 100 -> 81
+fn_8007A768 own wrapper definition 100 -> 62.25
+fn_8007AF1C own wrapper definition 100 -> 62.25
+fn_8007B0B4 own wrapper definition 100 -> 62.25
+fn_8007BB28 own definition tail-calls virtual slot v38 of class W, which must return float first (fixing it gains fn_8054EED4)
+fn_802540A0 fn_8001FD74, fn_8001FDA8 100 -> 76.62
+fn_800989C8 fn_802540A0 100 -> 82.12
+fn_802AE9C8 float -> int: fn_802CB6C8 100 -> 0
+
+# memset-like: returns its first argument (r3 passes through), callers rely on it being int.
+fn_8040B320 returns dest
+fn_8040B830 returns dest
+
+# Weak tier names with experimental proof against the flip.
+fn_80402DE4 returns its first argument: int makes fn_801747AC match
+fn_8028F45C returns this (verified by the owner of tu_8028C6B8)

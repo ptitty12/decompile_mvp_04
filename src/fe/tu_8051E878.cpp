@@ -31,7 +31,7 @@ extern const char lbl_805F5648[];
 extern const char lbl_805F7944[];
 extern const char lbl_805FBB40[];
 extern "C" void fn_8052007C(FeV10* x);
-extern "C" void fn_804DC75C(void* p, int a, int b, int c, int d);
+extern "C" int fn_804DC75C(void* p, int a, int b, int c, int d);
 extern const char lbl_8067A5E8[];
 extern const char lbl_8067A2E0[];
 extern "C" void fn_8051E878(void* x, int a);

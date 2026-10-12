@@ -246,7 +246,7 @@ void fn_80090814(Unk8008CE64_Own* self, int a, int b);
 extern const char* lbl_80619764[];
 extern "C" void fn_80534F64(void* obj, int a, int b, int c, int d, int e, int f);
 extern "C" const char* fn_802B9300(const char* s, int a, int b, unsigned int* outn);
-extern "C" void fn_80402DE4(const void* p, int n);
+extern "C" int fn_80402DE4(const void* p, int n);
 
 
 

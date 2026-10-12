@@ -474,6 +474,10 @@ int fn_800475A4(int a)
     return r;
 }
 
+/* fn_8004763C (0x8004763C, 84 insns, the Unk8004763C constructor) is left as the original object code: its seed
+ * code reads the time base with `mftb r9,268` (inline OSGetTick, twice), an instruction C cannot emit. Everything
+ * else in it (field inits, the two 8-entry init loops, rand() & 0x3FFFFFFF, the +/- (tick*12 % 1000) jitter) is
+ * plain C. */
 Unk8004763C* fn_800475EC()
 {
     if (lbl_80617800 == 0) {
