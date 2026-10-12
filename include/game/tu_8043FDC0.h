@@ -272,6 +272,11 @@ struct FePopup : FeObj {
     char pad168[4];
     int m16C;
     int m170;
+    char pad174[0x2F0 - 0x174];
+    void* m2F0;
+    char pad2F4[0x30C - 0x2F4];
+    void* m30C;
+    void* m310;
 };
 
 /* Screen with ctor fn_80447264 (fields as the functions prove). */
@@ -519,7 +524,8 @@ struct FeScr2 : FeObj {
     int m154, m158, m15C;
     int m160;
     FeObj* m164;
-    char pad168[0x170 - 0x168];
+    FeObj* m168;
+    FeObj* m16C;
     FeObj* m170;
     char pad174[0x6EC - 0x174];
     FeObj* m6EC;
