@@ -252,19 +252,21 @@ void fn_8025505C(A* self, int a, int b)
     fn_8017BA50(p->m44C->m700, p, a, 7);
 }
 
-/* near-miss: retail has the p = n / q reload at the loop top and the call as loop test; ours rotates the test (34 vs 36 instructions) */
+/* The search call is written twice (before the loop and at its end): jump2 cross-jumps the two copies'
+ * common tail, which gives retail's entry jump into the middle of the argument setup. */
 int fn_80255284(A* self, int a)
 {
     int r = 0;
     P* p = self->m0;
-    P* n;
-    while ((n = fn_80257DFC(self->m0->m44C->m700->m3B4, p, 0)) != 0) {
+    P* n = fn_80257DFC(self->m0->m44C->m700->m3B4, p, 0);
+    while (n != 0) {
         A* na = &n->m58C;
         if (fn_80254984(na) && na->m3C == a) {
             r = 1;
             break;
         }
         p = n;
+        n = fn_80257DFC(self->m0->m44C->m700->m3B4, p, 0);
     }
     return r;
 }
