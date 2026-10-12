@@ -1195,7 +1195,7 @@ config.libs = [
             Object(Matching, "libc/fread.c"),
             Object(NonMatching, "libc/ungetc.c"),
             Object(NonMatching, "libc/abort.c"),
-            Object(NonMatching, "libc/memchr.c"),
+            Object(Matching, "libc/memchr.c"),
             Object(NonMatching, "libc/tolower.c"),
         ],
     },
