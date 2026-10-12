@@ -201,6 +201,13 @@ extern const float lbl_805D9C24;
 extern const float lbl_805D9C28;
 
 float fn_80253434(C* self);
+extern "C" float fn_8025356C(void* p);
+extern const float lbl_805D9B94;
+extern const float lbl_805D9BA4;
+extern const float lbl_805D9BA8;
+extern const float lbl_805D9BAC;
+extern char lbl_805D9B60[];
+
 extern const float lbl_805D9C10;
 extern const float lbl_805D9C14;
 extern const int lbl_805D9E94[5];
@@ -212,6 +219,7 @@ public:
 struct Unk80089894_PackTabD;
 void fn_80089EE0(Unk80089894_PackTabD* self, unsigned t, unsigned i, int v);
 int fn_802530E8(C* self);
+void fn_80252C1C(C* self);
 extern float lbl_805D9BB4;
 extern float lbl_805D9BB8;
 struct Unk80253678_S {
@@ -257,6 +265,17 @@ int fn_80253100(C* self, int a);
 
 /* near-miss: 71 vs 71 instructions, ~40 slots differ in register choice. Retail sums with `addi r11,ea,0x1B4` inside the bdnz loop and lbzx on the masked index;
    ours folds the 0x1B4 into the lbz displacement. unsigned char counter gives andi./no bdnz. Tried int counter with unsigned char k, separate k++, int-cast address forms */
+
+inline float RandUnit_2A94(Unk8024EF40_Q* q, const char* f, int line)
+{
+    float k = lbl_805D9B94;
+    return (float)fn_8014D8AC(q->m554, 1000000, f, line) * k * 0.000001f;
+}
+
+inline float Lerp_2A94(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
 
 inline float Clamp01_356C(float x)
 {
@@ -344,6 +363,27 @@ void fn_802529F0(C* self)
 
 void fn_80252A90()
 {
+}
+
+/* near-miss: 97 vs 98 instructions; retail loads the two float constants (1.0, 0.3) once into f30/f31 and reuses them across the calls, ours reloads lbl_805D9B94 after the second call. Tried const float locals and a k parameter */
+void fn_80252A94(C* self, int a)
+{
+    self->f0 = a;
+    fn_80252A90();
+    fn_80252C1C(self);
+    Unk8024EF40_Q* q = self->m4->m44C;
+    if (q->m6F4 != 8) {
+        float roll = RandUnit_2A94(q, lbl_805D9B60, 0xC4);
+        float lo = Lerp_2A94(lbl_805D9BA4, fn_8025356C((char*)self->m4 + 0x480), lbl_805D9BA8);
+        float hi = Lerp_2A94(lbl_805D9BAC, fn_8025356C((char*)self->m4 + 0x480), lbl_805D9BA4);
+        self->m0 = 1;
+        if (a != 0) {
+            if (!(roll >= lo))
+                self->m0 = 0;
+            else if (!(roll <= lbl_805D9B94 - hi))
+                self->m0 = 2;
+        }
+    }
 }
 
 void fn_80252C1C(C* self)
