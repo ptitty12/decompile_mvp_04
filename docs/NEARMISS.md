@@ -29,8 +29,10 @@ our C++ game units as they are.
 | fn_8033C490 | game/tu_80338ECC.cpp | 179/179, 6 differ | loop giv order only: retail initialises/increments the item pointer second (o-name, item, o+0x14, offset); ours puts it last | k/nm temporaries, index forms (Opus 3) |
 | fn_8032FD58 | game/tu_8032ECD8.cpp | not written | widget ctor with a 126-int ring at +0x48 (same family as fn_803302D4) plus a fill loop from a singleton (fn_800B64BC); FxWidInit + FxRingInit cover the head | none (Opus 3) |
 | fn_80533120 (+ fn_80536F28, fn_80537054, fn_8053923C) | db/tu_80531A20.cpp, db/tu_80535360.cpp | 35/35, callee-saved regs permuted | retail sets the counter by copying the result's zero (`li r30,0` ... `mr r31,r30`), so the result gets a 4th ref and outranks col/self in global-alloc; CSE turns every source copy back into `li` | `i = r`, `r = i`, `r = i = 0`, int/unsigned mixes, while form (Opus 4, scratch only: busy units) |
-| fn_8053DB30, fn_8053DD68 | db/tu_8053CC9C.cpp | DD68: 32/32, 1 differs with the Buf3 recipe | a trivial dtor on the 4-byte buffer (`~T() {}`, BLKmode) fixes the per-call `addi r3,r1,N` (PATTERNS, Hard-case families 4); DD68 then only narrows one subtraction to a byte load; DB30 still has the by-value Date copy and the buffer at swapped frame offsets | inline wrapper, BLKmode buffer (Opus 4, scratch only: busy unit) |
+| fn_8053DB30 | db/tu_8053CC9C.cpp | 129 vs 131 insns | the by-value Date copy (8) and the date buffer (12) sit at swapped frame offsets; fn_8053DD68's recipe (unit-local buffer type with a trivial dtor) fixes the per-call `addi r3,r1,N` but allocates the buffer at declaration, before the copy temp | inline wrapper, BLKmode buffer (Opus 4) |
 | fn_800B08B0 | game/tu_800AF248.cpp | 4/4, 2 slots | `int r = 0; switch (p->m10) { case 0..3: r = 0; }` gives `lwz; cmpwi; li; blr`, retail has the `li r3,0` before the dead `cmpwi` | case ranges 0..5, int/unsigned, if forms (Opus 4) |
+| fn_803F73B0 | ealib/tu_803F73B0.cpp | not written; best 60 slots | error-code table: cases -128 and -14..0 (value = -k, -128 -> 15), default 16; case set and values right, tree layout differs | `r = v` / `return v` forms, -14/-15 lower bound (Opus 4b) |
+| fn_803ABCB4, fn_803ABDD0, fn_803AC164 | snd/tu_803AB310.cpp | not written | dead `cmpwi -18/-10/-7` trees after calls: an error-code switch with empty arms (PATTERNS, Hard-case families 4); the port/mvp2005 reference source should give the rest | none (Opus 4b) |
 
 Matched by the near-miss sweep (W4, 2026-10-11; recipes in PATTERNS.md,
 "Near-miss sweep"): cTimeWarp::cTimeWarp, fn_8027F504, fn_8027FC80,
@@ -54,3 +56,11 @@ families 4"): fn_8006FB10, fn_8006FB1C, fn_8006FF9C, fn_8006FFD0, fn_80071138,
 fn_80071154, fn_8009FDC8, fn_8009FDD4, fn_8009DDE4, fn_8009E060, fn_80055D84,
 v8__11Tbl80094800, v8__11Tbl800956D8, fn_800E9074, fn_80598AB4, fn_80598B3C,
 fn_8059B280, fn_8059F680, fn_8059FADC.
+
+Matched by Opus hard-case families 4b (2026-10-11; PATTERNS.md, "Hard-case families 4",
+second pass): fn_8052CB74, fn_8052CC18, fn_8052E754, fn_8052E8D8, fn_8052F554,
+fn_8052F590, fn_80530024, fn_805300D0, fn_8053CDB0, fn_8053CE50, fn_8053DD68,
+fn_80084B24, fn_80084BDC, fn_800898D0, fn_80089A0C, fn_8008AC18, fn_8008AC68,
+fn_8008B368, fn_8008B3E8, fn_8008BEF0, fn_8008BF24, fn_8008CC0C, fn_8008CE64,
+fn_8008EB90, fn_8008EC78, fn_804CF304, fn_804CF368, fn_80084728, fn_804F9C64,
+fn_8056A1DC, fn_803EB83C, fn_803F644C, fn_80166440, fn_8010F4D4, fn_80134F48.
