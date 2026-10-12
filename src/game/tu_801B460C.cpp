@@ -1031,6 +1031,129 @@ void fn_801B6778(void* p)
     self->mB84 = lbl_805CF8E8;
 }
 
+struct Unk801B6830_P {
+    char pad0[0x384];
+    unsigned m384;
+    char pad388[0x398 - 0x388];
+    unsigned m398;
+    unsigned m39C;
+    int m3A0;
+    int m3A4;
+    int m3A8;
+    int m3AC;
+    int m3B0;
+    int m3B4;
+    int m3B8;
+    int m3BC;
+    int m3C0;
+    int m3C4;
+    int m3C8;
+    char pad3CC[0x458 - 0x3CC];
+    int m458;
+    char pad45C[0x708 - 0x45C];
+    int m708;
+};
+struct Unk801B6830_R {
+    char m0[0x20];
+    unsigned m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    int mA0;
+    int mA4;
+    int mA8;
+    int mAC;
+    int mB0;
+    int mB4;
+    int mB8;
+};
+extern int lbl_8061D460;
+extern int lbl_8061D468;
+extern int lbl_8061B9BC;
+int fn_80337830(int i);
+int fn_80337844(int i);
+int fn_8023EB80(void* p, int i);
+void fn_801B6830(Unk801B6830_P* p, Unk801B6830_R* r, int slot)
+{
+    r->m0[0] = 0;
+    r->m20 = fn_80378568(r->m0, 0);
+    r->m58 = 0;
+    r->m24 = p->m384 >> 25;
+    r->m2C = 0x385;
+    if (lbl_8061D460 != 0)
+        r->m2C = lbl_8061D468;
+    r->m30 = (p->m39C >> 21) & 1;
+    r->m28 = 0;
+    if (lbl_8061D460 != 0)
+        r->m28 = 1;
+    r->m34 = (p->m398 >> 20) & 7;
+    r->m38 = 0;
+    r->m3C = 2;
+    if (lbl_8061B9BC != 0 && lbl_8061D460 != 0) {
+        r->m60 = fn_80337830(lbl_8061D468);
+        r->m30 = (fn_80337844(lbl_8061D468) ^ 1) == 0;
+    } else {
+        r->m60 = fn_8023EB80(p, r->m2C - 0x385);
+    }
+    r->m48 = 0;
+    r->m4C = 0;
+    r->m50 = 0;
+    r->m54 = 1;
+    r->m5C = 0;
+    r->m64 = p->m708;
+    int s = slot;
+    if (s == -1)
+        s = p->m458;
+    r->m68 = s;
+    r->m6C = 0;
+    r->m8C = p->m3A0 ^ 1;
+    r->m90 = p->m3A4 ^ 1;
+    r->m94 = p->m3B8 ^ 1;
+    r->m98 = p->m3B0 ^ 1;
+    r->m9C = p->m3B4 ^ 1;
+    r->mA0 = p->m3A8 ^ 1;
+    r->mA4 = p->m3AC ^ 1;
+    r->mA8 = p->m3BC ^ 1;
+    r->mAC = p->m3C0 ^ 1;
+    r->mB0 = p->m3C4 ^ 1;
+    r->mB4 = p->m3C8 ^ 1;
+    r->m74 = 1;
+    r->mB8 = 0;
+    r->m70 = 0;
+    r->m84 = 0;
+    r->m80 = 0;
+    r->m40 = 0;
+    r->m44 = 0;
+}
+
 Unk8037B3E8* Unk801B64B0::fn_vslot5()
 {
     return new (lbl_806EF9B4) Unk801B64B0;
