@@ -120,6 +120,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-12 | **Flags: ealib/tu_803EB2AC = ProDG -O2 (default -G8) -fno-strength-reduce** (`cflags_ealib_sda_nsr`) *[lead, owner authority]*. RealCore code here keeps per-iteration index math but uses small data. fn_803EBC70, fn_803EB5E4 and fn_803EB61C are exact only with -fno-strength-reduce. Objdiff goes 25 -> 28 of 29 matched, losing nothing. Other RealCore units were unchanged by the flag in the p3-24 worker's probe, so they stay on `ealib_sda`. | p3-24 worker probe, lead rebuild | report.json |
 
+- 2026-10-12 | **Split: dolphin/exi/tu_80426CD0.c at 0x804286AC and 0x80428C64; EXIUart.c = cflags_dolphin_dvd (-O4,p, signed char), GXInit.c head = cflags_dolphin_sdk + `-opt nopeephole`** *[lead, owner authority]*. The last seven functions of the EXIBios.c unit were 0 % and are not EXIBios: 0x804286AC..0x80428C64 is EXIUart.c (probe, barnacle/UART init, write loop) and 0x80428C64..0x80428F14 is the head of GXInit.c (default texture/TLUT region callbacks, __GXShutdown), by shape against the reference SDK sources. New units `dolphin/exi/tu_804286AC.c` (4/4 at -O4,p signed char; nopeephole makes all four worse) and `dolphin/gx/tu_80428C64.c` (3/3 at -O4,p -opt nopeephole). EXIBios keeps its name, cflags and 23/23. Only 0 % functions moved, so verify accepts it (as with dvdlow). | p4-31 worker drafts, lead rebuild | commit setup(dolphin/exi/tu_804286AC.c, dolphin/gx/tu_80428C64.c)
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
