@@ -402,31 +402,31 @@ extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst)
     float* sp10 = src;
     char* spC = (char*)dst;
     int total = fn_803B2EAC(o, &sp8, &spC);
-    if (sp8 != 0) {
-        int last = 0;
-        while (sp8 > 0 && A30(o) >= o->m2C) {
-            if (o->m30 < o->m2C * 2)
-                last = 0;
-            else
-                last = fn_803B2C0C(o->m2C, &o->m1C, &o->m28, o->m24);
-            fn_803B2D58(o, &sp10, last);
-            total += fn_803B2EAC(o, &sp8, &spC);
-        }
-        if (last > 0) {
-            Snd::Util::MemCpy((char*)o + 0x40, sp10, o->m2C * 4);
-            o->m34 = o->m2C;
-            sp10 += o->m2C;
-        }
-        if (sp8 > 0) {
-            int n;
-            if (sp8 > o->m30)
-                n = o->m30;
-            else
-                n = sp8;
-            total += n;
-            Snd::Util::MemCpy(spC, sp10, n * 4);
-            o->m30 -= n;
-        }
+    if (sp8 == 0)
+        return total;
+    int last = 0;
+    while (sp8 > 0 && A30(o) >= o->m2C) {
+        if (o->m30 < o->m2C * 2)
+            last = 0;
+        else
+            last = fn_803B2C0C(o->m2C, &o->m1C, &o->m28, o->m24);
+        fn_803B2D58(o, &sp10, last);
+        total += fn_803B2EAC(o, &sp8, &spC);
+    }
+    if (last > 0) {
+        Snd::Util::MemCpy((char*)o + 0x40, sp10, o->m2C * 4);
+        o->m34 = o->m2C;
+        sp10 += o->m2C;
+    }
+    if (sp8 > 0) {
+        int n;
+        if (sp8 > o->m30)
+            n = o->m30;
+        else
+            n = sp8;
+        total += n;
+        Snd::Util::MemCpy(spC, sp10, n * 4);
+        o->m30 -= n;
     }
     return total;
 }
