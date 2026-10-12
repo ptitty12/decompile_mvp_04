@@ -653,10 +653,14 @@ extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag)
     return r;
 }
 
-/* near-miss: retail re-reads the count in the loop instead of keeping it in a register */
+struct VolVec8009692C {
+    unsigned char* m0;
+    volatile unsigned m4;
+    unsigned m8;
+};
 extern "C" unsigned char fn_8009692C(Obj3* o, int key)
 {
-    ByteVec* v = &o->m168;
+    VolVec8009692C* v = (VolVec8009692C*)&o->m168;
     unsigned char i = 0;
     unsigned char r = 0xFF;
     if (i < v->m4) {
@@ -664,13 +668,15 @@ extern "C" unsigned char fn_8009692C(Obj3* o, int key)
         if (p[0] == key) {
             r = 0;
         } else {
-            do {
+            for (;;) {
                 i++;
                 if (!(i < v->m4))
                     break;
-            } while (p[i] != key);
-            if (i < v->m4)
-                r = i;
+                if (p[i] == key) {
+                    r = i;
+                    break;
+                }
+            }
         }
     }
     return r;
