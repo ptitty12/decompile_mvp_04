@@ -9,6 +9,19 @@ typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
 typedef Unk8024EF40_W W;
 
+inline Unk8024EF40_P* Unk8024F810_At(Unk8024EF40_Q* q, unsigned t)
+{
+    return t <= 12 ? q->m65C[t] : 0;
+}
+
+/* Object of fn_8024EF40: float at +0x98, owner player at +0xA0. */
+struct Unk8024EF40_Obj {
+    char pad0[0x98];
+    float m98;
+    char pad9C[4];
+    P* mA0;
+};
+
 inline float Unk80251000_Lerp(float a, float t, float b)
 {
     return a + t * (b - a);
@@ -189,6 +202,29 @@ extern "C" void fn_8037B7E4(Unk8037B3E8* self, const char* name);
 }
 inline void* operator new(unsigned int, void* p) { return p; }
 
+extern int lbl_80620308;
+extern float lbl_80620314;
+extern int fn_801A2034(Unk8024EF40_Q* q, int k);
+extern float fn_8024D0F8(P* x, int k);
+extern "C" float fn_8024EF40(Unk8024EF40_Obj* self, Unk8024EF40_Q* q, int k)
+{
+    float s = 0.0f;
+    if (lbl_80620308 != 0) {
+        s = lbl_80620314;
+    } else {
+        s = self->m98;
+        float w;
+        if (fn_801A2034(q, k) == -1)
+            w = fn_8024D0F8(self->mA0, 0xE);
+        else
+            w = fn_8024D0F8(self->mA0, 0xD);
+        w = Unk80251000_Lerp(0.8f, w, 1.2f);
+        s = s * w;
+    }
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    return s;
+}
+
 int fn_8024F40C(Unk8024F40C_Mgr* self, int a, Unk8024EF40_Q* q, int k)
 {
     Unk8024F40C_Mid* m = ((Unk8024F40C_Sub*)q->m6F8)->mC;
@@ -328,6 +364,36 @@ void fn_8024F7C8(Unk80250244_S* self)
         fn_8024FD00(&self->m8[i]);
 }
 
+extern void fn_801D865C(char* a);
+extern void fn_8024FAE0(Unk80250244_S* self, int arg);
+extern void fn_8024FD1C(Unk8024FD00_S* self, int a, int b);
+extern int fn_8035E318(A* a);
+void fn_8024F810(Unk80250244_S* self, int arg, int unused, int slot, int mode)
+{
+    if (self->m4 == 0) {
+        fn_801D865C(((Unk8024FE4C_Ctx*)((P*)self->m0)->m44C->m700)->m3A4 + 0xE0);
+        if (*(int*)(((Unk8024FE4C_Ctx*)((P*)self->m0)->m44C->m700)->m3A4 + 0xF8) != 0) {
+            fn_8024FAE0(self, arg);
+            return;
+        }
+        int i = 0;
+        do {
+            if (i + 9 == slot) {
+                P* p = Unk8024F810_At(((P*)self->m0)->m44C, slot);
+                if (mode == 1)
+                    fn_8024FD1C(&self->m8[i], (int)p, fn_8035E318(&p->m58C));
+                else
+                    fn_8024FD1C(&self->m8[i], (int)p, p->m58C.m38);
+                self->m4 = arg;
+            } else {
+                fn_8024FD00(&self->m8[i]);
+            }
+            i++;
+        } while (i <= 3);
+    }
+}
+
+extern int fn_80255028(A* a);
 extern "C" void fn_8024FBEC(Unk80250244_S* self, int k)
 {
     int f = 0;
@@ -384,7 +450,6 @@ extern void fn_8024FE3C(Unk8024FD00_S* self, int a);
 extern int fn_8026DAE8(P* x, int a);
 extern int fn_8026DD60(P* x, int a);
 extern int fn_80254EA4(A* a, int b);
-extern int fn_80255028(A* a);
 extern int fn_80247858(P* x, int a);
 int fn_8024FD38(Unk8024FD00_S* e, int k)
 {
@@ -604,7 +669,6 @@ int fn_80250AC4(P* x)
     return 0;
 }
 
-extern float fn_8024D0F8(P* x, int k);
 float fn_80251000(P* x, int k)
 {
     float s = fn_8024D0F8(x, k);
@@ -712,6 +776,23 @@ void fn_80251D58(P* x)
             p = 0.0f;
         if (!(p >= t))
             fn_80250B28(x, 0xD);
+    }
+}
+
+extern float lbl_8061DC38;
+extern int lbl_80691CEC;
+extern int fn_8026D8E8(P* x, int a);
+extern int fn_8026D914(P* x, int a);
+inline float G_8061DC38(void* p) { return lbl_8061DC38; }
+void fn_80251E80(P* x)
+{
+    if ((fn_8026D8E8(x, 0) != 0 || fn_8026D914(x, 0) != 0) && fn_80250AC4(x) != 0 && fn_80250A90(x, 0x10) != 0) {
+        float p = RandPct(x, lbl_805D990C, 0x56D);
+        float t = fn_80251000(x, 0x2C) * G_8061DC38(fn_8023CB44(x));
+        if (lbl_8061DC54 != 0 || lbl_80691CEC != 0)
+            p = 0.0f;
+        if (!(p >= t))
+            fn_80250B28(x, 0x10);
     }
 }
 
