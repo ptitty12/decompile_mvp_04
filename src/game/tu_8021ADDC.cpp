@@ -38,6 +38,8 @@ extern float lbl_805D6148[1];
 struct Unk8026C414_O;
 struct Unk8026C414_X;
 int fn_8026D730(Unk8026C414_O* o, Unk8026C414_X* x);
+struct Unk80069F0C;
+int fn_8006BE18(Unk80069F0C* o);
 extern "C" {
 
 void fn_801EDE78(Task* t, int x);
@@ -107,6 +109,63 @@ void fn_8021C424(Task* t, int a)
     e->m80 = -1.0f;
     e->mD4 = a;
 }
+
+void fn_801837F4(Vec3f* out, int a, int b);
+struct Unk8021C4E0_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x708 - 0x6C];
+    int m708;
+};
+inline Vec3f Unk8021C4E0_Flat(Unk8021C4E0_Obj* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+inline float Unk8021C4E0_Len2(Vec3f v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+void fn_8021C4E0(Task* t)
+{
+    Unk8021C4E0_Obj* cur = (Unk8021C4E0_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    Obj4_36C* o = t->m9C->m0->m6CC;
+    if (o != 0 && (Obj36C*)cur == o->m36C)
+        fn_8021CE28(t, 3.0f);
+    Vec3f pos;
+    fn_801837F4(&pos, *(int*)((char*)t->m9C->m0 + 0x6B8), cur->m708);
+    RecQueue* q = t->m9C->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 0x26;
+    e->m0 = 0x1E;
+    e->m9C = 1;
+    e->m38 = pos;
+    e->m88 = -1.0f;
+    e->m80 = -1.0f;
+    {
+        const Vec3f* pc = &cur->m60;
+        Vec3f d = pos - *pc;
+        e->m50 = d;
+    }
+    e->m94 = 1;
+    e->m8 = 1;
+    if (fn_8006BE18((Unk80069F0C*)t->m9C->m0->m6F8) != 1 && !(Unk8021C4E0_Len2(Unk8021C4E0_Flat(cur)) <= 2822400.0f))
+        e->mC = 1;
+    else
+        e->mC = 0;
+}
+
 
 struct Unk8021C6FC_Obj {
     char pad0[0x60];
