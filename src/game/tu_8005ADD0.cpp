@@ -6,6 +6,17 @@
  * .text 0x8005ADD0-0x8005C514 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_80052794.h"
+int fn_8005C828(Unk8005BA1C_Obj* o, int ch);
+int fn_8005B6E4(Unk8005ADD0_Obj* o);
+struct Unk8005B0EC_Ev {
+    int m0;
+    const void* vt;
+    int m8;
+};
+extern char lbl_80649DA0[];
+extern char lbl_80649BE0[];
+int fn_8005C6E0(Unk8005BA1C_Obj* o, int ch);
+void fn_8037893C(void* self, int id, Unk8005B0EC_Ev* e, int a, int b);
 
 int fn_8005ADD0(Unk8005ADD0_Obj* o, int ch)
 {
@@ -109,6 +120,37 @@ void fn_8005B06C(Unk8005ADD0_Obj* o)
     }
 }
 
+void fn_8005B0EC(Unk8005ADD0_Obj* o, int ch)
+{
+    switch (fn_8005C7E8(fn_8005BA9C(), 1)) {
+    case 0: {
+        fn_8005C654(fn_8005BA9C(), 1, o->m78, 0);
+        int r = fn_8005C6E0(fn_8005BA9C(), ch);
+        o->mC[ch].mHandle = r;
+        if (r > -1) {
+            o->mC[ch].mState = 3;
+            Unk8005B0EC_Ev e;
+            Unk8005B0EC_Ev* p = &e;
+            const void* base = lbl_80649DA0;
+            p->vt = base;
+            e.m0 = 0xA3;
+            p->m8 = lbl_805B1DC0[ch];
+            p->vt = lbl_80649BE0;
+            fn_8037893C(o, e.m0, p, 0, 0);
+            p->vt = base;
+        } else {
+            o->mC[ch].mState = 5;
+        }
+        break;
+    }
+    case 1:
+        fn_8005C75C(fn_8005BA9C(), 1, 0x3E8);
+        break;
+    case 2:
+        break;
+    }
+}
+
 extern const char lbl_805B07A1[];
 extern char lbl_80687628[];
 extern "C" void fn_803A9204(void* p);
@@ -138,6 +180,32 @@ void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
         }
     }
     o->mC[ch].mState = 5;
+}
+
+void fn_8005B2D8(Unk8005ADD0_Obj* o)
+{
+    int mode = o->mC[o->mA8].mMode;
+    if (mode == 0 && (!(fn_8005C828(fn_8005BA9C(), 1) > 0) || fn_8005C7E8(fn_8005BA9C(), 1) == 0)) {
+        int r = fn_8005B6E4(o);
+        o->mC[o->mA8].mState = 5;
+        o->mA4 = r;
+        int ch = o->m80[r];
+        o->mA8 = ch;
+        o->mC[ch].mState = 3;
+        Unk8005B0EC_Ev e;
+        Unk8005B0EC_Ev* p = &e;
+        const void* base = lbl_80649DA0;
+        p->vt = base;
+        e.m0 = 0xA3;
+        p->m8 = lbl_805B1DC0[o->mA8];
+        p->vt = lbl_80649BE0;
+        fn_8037893C(o, e.m0, p, 0, 0);
+        o->mC[o->mA8].mMode = mode;
+        o->mC[o->mA8].mHandle = fn_8005C6E0(fn_8005BA9C(), o->mA8);
+        if (o->mC[o->mA8].mHandle <= -1)
+            o->mC[o->mA8].mState = 5;
+        p->vt = base;
+    }
 }
 
 void fn_8005B414(Unk8005ADD0_Obj* o)
