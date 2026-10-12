@@ -85,6 +85,7 @@ public:
     int fn_8001D62C();
     int fn_8001E2EC();
     int fn_8001E31C();
+    int fn_8001D7F8();
     int fn_8001DCCC();
     int fn_8001D70C();
     int fn_8001DA28();
