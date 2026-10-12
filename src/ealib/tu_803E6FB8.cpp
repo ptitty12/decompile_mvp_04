@@ -151,6 +151,36 @@ extern "C" void fn_803E72EC(Unk803E7008_Pair* p)
     fn_803EA08C(p->m14);
 }
 
+struct va_list_tag {
+    char gpr;
+    char fpr;
+    char* overflow_arg_area;
+    char* reg_save_area;
+};
+typedef va_list_tag va_list[1];
+#define va_start(AP, LASTARG) (__builtin_next_arg(LASTARG), *(AP) = *(va_list_tag*)__builtin_saveregs())
+struct Unk803E7320_Reent {
+    int m0, m4;
+    void* m8;
+};
+extern Unk803E7320_Reent* _impure_ptr __attribute__((section(".sdata")));
+extern int (*lbl_8062C670)(const char*, va_list);
+extern "C" int vfprintf(void*, const char*, va_list);
+
+extern "C" int fn_803E7320(int level, const char* fmt, ...)
+{
+    va_list ap;
+    int r = 0;
+    if (level <= lbl_8062C674) {
+        va_start(ap, fmt);
+        if (lbl_8062C670)
+            r = lbl_8062C670(fmt, ap);
+        else
+            r = vfprintf(_impure_ptr->m8, fmt, ap);
+    }
+    return r;
+}
+
 extern "C" void fn_803E73F4(int v)
 {
     lbl_8062C674 = v;
