@@ -107,6 +107,38 @@ int fn_801A37D8(Unk8019F8C0_Owner* o);
 extern "C" int fn_801D5A64(void* s, int* o1, int* o2, int* o3);
 extern "C" int fn_801C4A54(Z* z, int* a, int* b);
 extern "C" void fn_801CF430(Z* z);
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" float fn_801CAFA0(Z* z, float f)
+{
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    P* p = fn_801A4B34(z->m204);
+    int k = p->v4();
+    float rem = 1.0f - f;
+    int r = 1;
+    if (AbsF(z->m144) <= 0.65f || !(AbsF(v.x) < 0.4f)) {
+        if (k != 0) {
+            if (!(v.x >= 0.0f))
+                r = 0;
+        } else {
+            if (!(v.x <= 0.0f))
+                r = 0;
+        }
+    } else {
+        r = 0;
+    }
+    if (r) {
+        float a = 0.37f;
+        if (z->m128 == 5)
+            a = 0.55f;
+        return 0.8f - ((0.8f - a) * rem);
+    }
+    float a = 0.99f;
+    if (z->m128 == 5)
+        a = 0.99f;
+    return (a - 0.8f) * rem + 0.8f;
+}
 
 extern "C" void fn_801CB324(Z* z) { fn_801CB360(z); }
 
@@ -134,8 +166,6 @@ extern "C" float fn_801CBEBC(Z* z)
     float r = fn_8024F048(p->mA0C, p->mA04, p->m44C, p->m708, 0);
     return r;
 }
-
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
 
 extern "C" float fn_801CBF04(Z* z)
 {
