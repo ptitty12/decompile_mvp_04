@@ -274,7 +274,6 @@ extern "C" float fn_801CCA40(Z* z)
     return r;
 }
 
-/* near-miss: retail keeps the low bound in f31 across the call (33 vs 34 instructions here). */
 extern "C" float fn_801CD068(Z* z)
 {
     float r = 0.0f;
@@ -286,8 +285,6 @@ extern "C" float fn_801CD068(Z* z)
     return r;
 }
 
-/* near-miss: same code; retail schedules the RandF scale slot stores after the file-pointer moves and
- * ends with `li 2; cror; bso; li 1` (ours bns/li 2). */
 extern "C" void fn_801CD0F0(Z* z)
 {
     if (z->m204->m6F4 == 2) {
@@ -295,18 +292,18 @@ extern "C" void fn_801CD0F0(Z* z)
     } else {
         float x = fn_801CD068(z);
         x = !(x > 1.0f) ? (x >? 0.2f) : 1.0f;
-        if (!(x <= RandF(z->m204->m554, 1.0f, 0x1713))) {
+        if (!(x <= RandFP(z->m204, 1.0f, 0x1713))) {
             z->m130 = 5;
         } else if (fn_801C8974(z)) {
-            if (RandF(z->m204->m554, 1.0f, 0x1720) < 0.5f)
+            if (RandFP(z->m204, 1.0f, 0x1720) < 0.5f)
                 z->m130 = 3;
             else
                 z->m130 = 0;
         } else {
-            if (RandF(z->m204->m554, 1.0f, 0x172B) >= 0.5f)
-                z->m130 = 2;
-            else
+            if (!(RandFP(z->m204, 1.0f, 0x172B) >= 0.5f))
                 z->m130 = 1;
+            else
+                z->m130 = 2;
         }
     }
 }
