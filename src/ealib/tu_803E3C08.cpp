@@ -157,6 +157,30 @@ extern "C" void fn_803E4818(float* m)
     }
 }
 
+struct Unk803E4844_Quat {
+    float x, y, z, w;
+};
+
+extern float lbl_8060CABC;
+extern float lbl_8060CAC0;
+extern "C" void fn_803E41F4(float* dst, Unk803E4844_Quat* q, float s, float x, float y, float z);
+
+extern "C" void fn_803E4844(float* dst, const float* axis, Unk803E4844_Quat* q)
+{
+    float one = lbl_8060CABC;
+    float ax = axis[0];
+    float ay = axis[1];
+    float az = axis[2];
+    Unk803E4844_Quat tmp = *q;
+    fn_803E41F4(dst, &tmp, one, ax, ay, az);
+    q->x = -q->x / lbl_8060CAC0;
+    q->y = -q->y / lbl_8060CAC0;
+    q->z = -q->z / lbl_8060CAC0;
+    q->w = -q->w / lbl_8060CAC0;
+    tmp = *q;
+    fn_803E41F4(dst, &tmp, one, -ax, -ay, -az);
+}
+
 extern "C" void fn_803E4964(Unk803E6660* o, int idx)
 {
     int base = idx * o->m24;
@@ -241,6 +265,63 @@ extern "C" void fn_803E4B40(Unk803E4B40* o, int chrg)
         lbl_8062C66C(o, 0xC8);
 }
 
+inline int BuildInl(Unk803E6660* o, int total)
+{
+    int ok = 0;
+    if (o->m18 == 0) {
+        o->m1C = total;
+        int* hdr = o->m38;
+        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
+        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
+            lbl_8062C660 = hdr;
+            lbl_8062C664 = 0x104;
+        }
+        for (int i = 0; i < o->m14; i++) {
+            fn_803E4964(o, i);
+            fn_803D71F0(o->m4);
+        }
+        lbl_8062C660 = 0;
+        lbl_8062C664 = 0;
+        ok = 1;
+    }
+    return ok;
+}
+
+inline int FlushInl(Unk803E6660* o)
+{
+    if (o->m18) {
+        for (int i = 0; i < o->m10; i++) {
+            int off = i * 12;
+            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
+            if (r->m4 && r->m8 > 0)
+                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
+        }
+        GXInvalidateVtxCache();
+        fn_8041A5DC();
+    }
+    o->m18 = 0;
+    return 1;
+}
+
+extern "C" void fn_803E5270(char* o)
+{
+    Unk803E6660* s = (Unk803E6660*)(o + 0xc);
+    FlushInl(s);
+    int st = *(int*)(o + 8);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0xc), st);
+        *(int*)(o + 8) = 0;
+    }
+    int k = *(int*)(o + 0x48);
+    if (k == 0x98 || k == 0xb0) {
+        int st2 = *(int*)(o + 8);
+        if (st2 != 0) {
+            BuildInl((Unk803E6660*)(o + 0xc), st2);
+            *(int*)(o + 8) = 0;
+        }
+    }
+}
+
 struct Unk803E56F8 {
     int* m0;
     int* m4;
@@ -286,6 +367,73 @@ extern "C" void fn_803E57F0(Unk803E57F0* o, int chrg)
     SubDtor(&o->sub);
     if (chrg & 1)
         lbl_8062C66C(o, 0xDC);
+}
+
+/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
+struct Unk803E6950_Names {
+    char pad0[4];
+    char** m4;
+};
+
+struct Unk803E6950_Tbl {
+    Unk803E6950_Names* m0;
+    char pad4[4];
+    Unk803E6660_Ent e[1];
+};
+
+struct Unk803E6950 {
+    int m0;
+    int m4;
+    Unk803E6950_Tbl* m8;
+    Unk803E6660_Rec* mC;
+    int m10;
+    char pad14[0x2C - 0x14];
+    int m2C;
+};
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
+
+inline int FindSet(Unk803E6950* o, const char* name, int a, int b, int c)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
+            found = i;
+            break;
+        }
+    }
+    return fn_803E6A70(o, found, a, b, c);
+}
+
+extern "C" void fn_803E6044(char* o)
+{
+    Unk803E6660* s = (Unk803E6660*)(o + 0x10);
+    FlushInl(s);
+    int st = *(int*)(o + 0xc);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0x10), st);
+        *(int*)(o + 0xc) = 0;
+    }
+    int k = *(int*)(o + 0x4c);
+    if (k == 0x98 || k == 0xb0) {
+        int st2 = *(int*)(o + 0xc);
+        if (st2 != 0) {
+            BuildInl((Unk803E6660*)(o + 0x10), st2);
+            *(int*)(o + 0xc) = 0;
+        }
+    }
+}
+
+extern char lbl_8060CC1C[];
+
+extern "C" void fn_803E6508(char* o, int arg)
+{
+    int st = *(int*)(o + 0xc);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0x10), st);
+        *(int*)(o + 0xc) = 0;
+    }
+    FindSet((Unk803E6950*)(o + 0x10), lbl_8060CC1C, arg, 0, -1);
 }
 
 extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
@@ -341,25 +489,6 @@ extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
     return ok;
 }
 
-/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
-struct Unk803E6950_Names {
-    char pad0[4];
-    char** m4;
-};
-
-struct Unk803E6950_Tbl {
-    Unk803E6950_Names* m0;
-};
-
-struct Unk803E6950 {
-    char pad0[8];
-    Unk803E6950_Tbl* m8;
-    char padC[4];
-    int m10;
-    char pad14[0x2C - 0x14];
-    int m2C;
-};
-
 extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
 {
     int found = -1;
@@ -373,18 +502,33 @@ extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
     return found != -1;
 }
 
-extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
-
 extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c)
 {
-    int found = -1;
-    for (int i = 0; i < o->m10; i++) {
-        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
-            found = i;
-            break;
+    return FindSet(o, name, a, b, c);
+}
+
+extern char lbl_8060CB34[];
+extern "C" int fn_803E7320(int level, const char* fmt, ...);
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int idx, int val, int flag, int extra)
+{
+    int r = 0;
+    if (idx != -1) {
+        if (val & 3)
+            fn_803E7320(0, lbl_8060CB34, o->m8->m0->m4[idx], 4);
+        o->mC[idx].m0 = (void*)val;
+        o->mC[idx].m4 = flag;
+        Unk803E6950_Tbl* h = o->m8;
+        Unk803E6660_Ent* e = &h->e[idx];
+        if (flag == 0) {
+            e->m4 = (int)o->mC[idx].m0;
+            e->m0 = 1;
+        } else {
+            o->mC[idx].m8 = extra;
         }
+        r = 1;
     }
-    return fn_803E6A70(o, found, a, b, c);
+    return r;
 }
 
 extern "C" int fn_803E6B3C(Unk803E6660* o)
@@ -396,40 +540,7 @@ extern "C" int fn_803E6B3C(Unk803E6660* o)
 
 extern "C" int fn_803E6B74(Unk803E6660* o)
 {
-    if (o->m18) {
-        for (int i = 0; i < o->m10; i++) {
-            int off = i * 12;
-            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
-            if (r->m4 && r->m8 > 0)
-                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
-        }
-        GXInvalidateVtxCache();
-        fn_8041A5DC();
-    }
-    o->m18 = 0;
-    return 1;
-}
-
-inline int BuildInl(Unk803E6660* o, int total)
-{
-    int ok = 0;
-    if (o->m18 == 0) {
-        o->m1C = total;
-        int* hdr = o->m38;
-        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
-        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
-            lbl_8062C660 = hdr;
-            lbl_8062C664 = 0x104;
-        }
-        for (int i = 0; i < o->m14; i++) {
-            fn_803E4964(o, i);
-            fn_803D71F0(o->m4);
-        }
-        lbl_8062C660 = 0;
-        lbl_8062C664 = 0;
-        ok = 1;
-    }
-    return ok;
+    return FlushInl(o);
 }
 
 extern "C" int fn_803E6C28(Unk803E6660* o, int total)

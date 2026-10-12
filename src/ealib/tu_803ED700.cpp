@@ -39,14 +39,68 @@ struct RcHeap {
 extern RcHeap* lbl_806AABF4[64];
 
 extern "C" int fn_804007FC(void*);
-extern "C" int fn_803FFC58(void*, int, int);
+extern "C" void fn_803FFC58(void*, int, int);
 extern "C" int fn_803EDA0C(void*);
-extern "C" int fn_803EE020(int, const void*, int (*)(void));
+extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
 extern "C" void fn_803EE878();
-extern "C" int fn_803EDF10();
+extern "C" int fn_803EDF10(const char* fmt, ...);
 extern "C" int fn_803EE238();
 extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
+extern "C" int fn_803EE318(char* p);
+extern "C" int fn_803EE320(char* p);
+extern "C" int fn_803EE4B8(RcBlk*);
+extern "C" int fn_80400520(const void* p, int n, int seed);
+extern char lbl_8060DF90[];
+extern char lbl_8060DFE8[];
+extern char lbl_8060E040[];
+extern char lbl_8060E054[];
+extern char lbl_8060E058[];
+extern char lbl_8060E064[];
+extern char lbl_8060E068[];
+extern int lbl_8060E098[];
+extern "C" int fn_803ED170(int a);
+extern "C" void fn_803EDEE8(RcBlk* b);
+
+struct RcInfo {
+    int m0, m4, m8, mC, m10, m14, m18, m1C;
+    RcInfo(int v0, int v8, int v14, int v1C, int v4, int v18)
+    {
+        m0 = v0;
+        mC = 0;
+        m10 = 0;
+        m8 = v8;
+        m14 = v14;
+        m1C = v1C;
+        m4 = v4;
+        m18 = v18;
+    }
+    RcInfo(int v18)
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0;
+        mC = 0;
+        m10 = 0;
+        m14 = 0;
+        m1C = 0;
+        m18 = v18;
+    }
+};
+
+struct RcCb {
+    int m0, m4;
+    void (*m8)(RcInfo*);
+    void (*mC)(RcInfo*);
+};
+
+extern RcCb lbl_806AABE4;
+extern "C" void fn_803EDE64(RcHeap*, RcBlk*);
+extern "C" void fn_804007D4(void*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" int sprintf(char*, const char*, ...);
+extern char lbl_8060DF50[];
+extern char lbl_8060DF58[];
 extern "C" int fn_803EDC98(void*, int);
 extern "C" int fn_803EDC04(int);
 extern "C" int fn_80400690(int (*)(void));
@@ -75,6 +129,19 @@ extern "C" int fn_803EE5A0(RcBlk*);
 extern "C" int fn_803EE688(RcBlk*);
 extern "C" int fn_803EE708(int);
 
+/* SysV varargs record, same as include/game/tu_8000C2C4.h */
+struct va_list_tag {
+    char gpr;
+    char fpr;
+    char* overflow_arg_area;
+    char* reg_save_area;
+};
+typedef va_list_tag va_list[1];
+#define va_start(AP, LASTARG) (__builtin_next_arg(LASTARG), *(AP) = *(va_list_tag*)__builtin_saveregs())
+
+extern "C" int vsprintf(char* buf, const char* fmt, va_list ap);
+extern "C" int fn_80400ADC(int level, const char* s, ...);
+
 inline unsigned RcRdBE(const unsigned char* b)
 {
     return (b[0] << 24) | (b[1] << 16) | (b[2] << 8) | b[3];
@@ -88,6 +155,52 @@ extern "C" int fn_803ED700(RcBlk* b, int a, int size, int c, int tag, int flags,
     b->m8 = e;
     b->m4 = size;
     return size + 0x10;
+}
+
+extern "C" int fn_803ED720(int idx, const void* nm, int bs, int size, int a4, int align, int hdr, int fa, int fb, int fc)
+{
+    const char* name = (const char*)nm;
+    RcBlk* base = (RcBlk*)bs;
+    char buf[0x100];
+    int flags = idx;
+    if (fa != 0)
+        flags |= 0x2000;
+    if (fb != 0)
+        flags |= 0x1000;
+    int t1 = hdr + 0x6c;
+    int t2 = align + 0x2f;
+    int t3 = hdr + 0x30;
+    int e = ((int)base + t1 + t2) & -align;
+    RcBlk* end = (RcBlk*)((int)base + size - t3);
+    RcBlk* mid = (RcBlk*)(e - 0x10);
+    sprintf(buf, lbl_8060DF50, name);
+    RcHeap* h = (RcHeap*)((char*)base + 0x10);
+    fn_803ED700(base, (int)buf, 0x5c, hdr, 0x4253, flags | 0x8000, 0, mid);
+    fn_803ED700(mid, 0, (int)end - (int)mid - 0x10, hdr, 0x4246, flags, base, end);
+    sprintf(buf, lbl_8060DF58, name);
+    fn_803ED700(end, (int)buf, 0, hdr, 0x4253, flags | 0x8100, mid, 0);
+    lbl_806AABF4[idx & 0x3f] = h;
+    fn_803FFC58(h, 0, 0x5c);
+    strcpy((char*)h, name);
+    h->mC = (int)end;
+    h->m8 = base;
+    base->m0 = 0x4253;
+    ((RcBlk*)h->mC)->m0 = 0x4253;
+    h->head.m10 = &h->head;
+    h->m28 = a4;
+    h->m2C = align;
+    h->m30 = hdr;
+    h->m34 = flags;
+    h->head.m0 = 0x4253;
+    h->head.m14 = &h->head;
+    h->head.m4 = 0x7fffffff;
+    h->m38 = 0;
+    fn_803EDE64(h, mid);
+    if (fc != 0) {
+        fn_804007D4((char*)base + 0x4c);
+        h->m38 = 1;
+    }
+    return mid->m4;
 }
 
 extern "C" int fn_803ED8EC(int idx)
@@ -133,6 +246,69 @@ extern "C" int fn_803ED9D4()
         }
     }
     return i;
+}
+
+/* near-miss: 2 slots; retail loads the neighbour flags halfword into r4 instead of r0 */
+extern "C" int fn_803EDA0C(void* pp)
+{
+    char* p = (char*)pp;
+    if (p == 0)
+        return 1;
+    RcBlk* b = (RcBlk*)(p - 0x10);
+    RcHeap* h = lbl_806AABF4[b->m2 & 0x3f];
+    if (h == 0)
+        return 0;
+    if (h->m38 != 0)
+        fn_80400828(h->m3C);
+    RcInfo* info = 0;
+    if (lbl_806AABE4.m8 != 0) {
+        int d = (int)b->m8 - (int)b;
+        RcInfo i(fn_803EE318(p), d, b->m2, b->m4, (int)b, (int)p);
+        info = &i;
+        lbl_806AABE4.m8(info);
+    }
+    RcBlk* nx = b->mC;
+    RcBlk* pv = b->m8;
+    if (nx->m2 & 0x4000) {
+        ((RcBlk* (*)(RcBlk*))fn_803EDEE8)(nx);
+        b = nx;
+        nx = b->mC;
+        b->m8 = pv;
+        nx->m8 = b;
+        pv->mC = b;
+    }
+    if (pv->m2 & 0x4000) {
+        ((RcBlk* (*)(RcBlk*))fn_803EDEE8)(pv);
+        pv = pv->m8;
+        b->mC = nx;
+        b->m8 = pv;
+        pv->mC = b;
+    }
+    if ((nx->m2 & 0xc000) == 0) {
+        int sz = nx->m4 + fn_803ED170(0);
+        sz = sz > 8 ? sz : 8;
+        RcBlk* nb = (RcBlk*)((char*)nx + ((sz + 0x13) & ~3));
+        if (b != nb) {
+            unsigned short f = b->m2;
+            nb->m2 = f;
+            b = nb;
+            b->m8 = pv;
+            b->mC = nx;
+            nx->m8 = b;
+            pv->mC = b;
+        }
+    }
+    fn_803EDE64(h, b);
+    if (lbl_806AABE4.mC != 0) {
+        if (info == 0) {
+            RcInfo i2((int)p);
+            info = &i2;
+        }
+        lbl_806AABE4.mC(info);
+    }
+    if (h->m38 != 0)
+        fn_8040084C(h->m3C);
+    return 1;
 }
 
 extern "C" int fn_803EDC04(int a)
@@ -267,6 +443,16 @@ extern "C" void fn_803EDEE8(RcBlk* b)
     b->m2 &= 0xbfff;
 }
 
+extern "C" int fn_803EDF10(const char* fmt, ...)
+{
+    va_list ap;
+    char buf[0x200];
+    char* p = buf;
+    va_start(ap, fmt);
+    vsprintf(p, fmt, ap);
+    return fn_80400ADC(2, p);
+}
+
 extern "C" int fn_803EDFCC(int a)
 {
     return fn_803EE020(a, lbl_8060DF64, fn_803EDF10);
@@ -277,12 +463,56 @@ extern "C" int fn_803EDFFC()
     return fn_803EDFCC(lbl_806EE9F0);
 }
 
+/* near-miss: 2 slots; mtlr and addi of the lbl_8060E068 argument are swapped before the total printf */
+extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...))
+{
+    int total = 0;
+    int crc = 0;
+    pr(lbl_8060DF90);
+    pr(lbl_8060DFE8);
+    RcHeap* h = lbl_806AABF4[idx & 0x3f];
+    int r;
+    if (h == 0) {
+        r = pr(lbl_8060E040);
+    } else {
+    RcBlk* b = h->m8;
+    if (b != 0) {
+        do {
+            char* data = (char*)b + 0x10;
+            const char* nm = (const char*)fn_803EE318(data);
+            if (nm == 0)
+                nm = lbl_8060E054;
+            const char* nm2 = (const char*)fn_803EE320(data);
+            if (nm2 == 0)
+                nm2 = lbl_8060E054;
+            if (b->m2 & 0x4000) {
+                int sz = b->m4;
+                if (sz > 0x10 && !(b->m2 & 0x8000))
+                    crc = fn_80400520((char*)b + 0x18, sz - 0x18, 0xfbea);
+                total += sz;
+                pr((const char*)out, lbl_8060E058, data, sz, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], lbl_8060E054);
+            } else {
+                crc = 0;
+                if (b->m4 != 0 && !(b->m2 & 0x8000))
+                    crc = fn_80400520(data, b->m4, 0xfbea);
+                pr((const char*)out, nm, data, b->m4, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], nm2);
+            }
+            pr(lbl_8060E064);
+            b = b->m8;
+        } while (b != 0);
+    }
+    pr(lbl_8060E068, total, total);
+        r = pr(lbl_8060DFE8);
+    }
+    return r;
+}
+
 extern "C" int fn_803EE310(char* p)
 {
     return *(int*)(p - 0xc);
 }
 
-extern "C" int fn_803EE318()
+extern "C" int fn_803EE318(char* p)
 {
     return 0;
 }
