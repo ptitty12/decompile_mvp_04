@@ -63,6 +63,7 @@ extern "C" int fn_80566570(void* a);
 extern "C" int fn_80566674(void* a);
 extern "C" int fn_8007FB2C(int g, int a);
 extern "C" int fn_8007FDA8(int g, int a, int b);
+extern "C" int fn_80078A38(int g, int a);
 
 /* state object of the game flow (fields seen in the unit: +0x70..+0x98) */
 struct Unk800A2688 {
@@ -258,6 +259,34 @@ struct Unk800A2B10 {
 };
 
 extern "C" void fn_800A2B10(Unk800A2B10* p) { p->m74 = 0; }
+
+struct Unk800A2B1C_Obj {
+    int* m0;
+    unsigned m4;
+    char pad8[0x13D2C - 8];
+    virtual ~Unk800A2B1C_Obj();
+};
+extern "C" char* fn_80546600(char* o);
+extern "C" void fn_80547594(char* o, int a);
+extern "C" void fn_80547610(char* o, int a, int b);
+extern "C" int fn_8007A808(int g, int a, int b, int c);
+
+extern "C" void fn_800A2B1C()
+{
+    int g = lbl_8061930C;
+    unsigned i = 0;
+    Unk800A2B1C_Obj* o = (Unk800A2B1C_Obj*)fn_80546600((char*)operator new(0x13D30, 0x100));
+    fn_80547594((char*)o, 1);
+    fn_80547610((char*)o, 1, 1);
+    for (; i < o->m4; i++) {
+        char* b = (char*)o->m0;
+        int off = i * 4;
+        fn_8007A808(g, 0xB, *(int*)(b + off), 0);
+    }
+    if (o) {
+        delete o;
+    }
+}
 
 extern "C" void fn_800A2DCC()
 {
@@ -688,6 +717,19 @@ extern "C" Unk800A3AB0_Q* fn_800A3B7C(Unk800A3AB0* p)
     return q;
 }
 
+extern "C" int fn_800A3BC0(Unk800A2EB4* p, int a, int b)
+{
+    if (fn_800A2EB4(p) == 1) {
+        return 2;
+    }
+    int g = lbl_8061930C;
+    float r = (float)a / (float)(unsigned)fn_8007FB2C(g, fn_80078A38(g, b));
+    if (r <= 0.85f) {
+        return r > 0.6f;
+    }
+    return 2;
+}
+
 extern "C" void fn_800A3DF4() {}
 
 struct Unk800A3E6C {
@@ -796,4 +838,25 @@ extern "C" int fn_800A449C()
         e = t;
     } while (e <= 3);
     return ok;
+}
+
+extern "C" unsigned fn_8007FB40(int g, int a);
+extern "C" int fn_8007FB98(int g, int a, int b, int c);
+extern "C" int fn_80075808(int a);
+
+extern "C" int fn_800A4558(void* self, int e)
+{
+    int g = lbl_8061930C;
+    for (unsigned i = 0; i < fn_8007F84C(g); i++) {
+        int t = fn_8007B320(g, fn_80083FC0(e), fn_8007F7D0(g, i));
+        unsigned j = fn_8007FB40(g, e);
+        if (j < fn_8007FB2C(g, e)) {
+            int a = fn_8007FB98(g, j, 0, e);
+            int b = fn_8007FB98(g, j, 1, e);
+            if (a != b && (a == t || b == t || fn_80075808(a) == 1 || fn_80075808(b) == 1)) {
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
