@@ -476,6 +476,75 @@ int fn_801B51E4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 }
 
 int fn_801B5F8C(Unk801AB63C_P* p);
+struct Unk801B5298_T3 {
+    int v[3];
+};
+extern Unk801B5298_T3 lbl_805CF7F0;
+unsigned fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+int fn_801B5DE8(void* a, void* q, int c);
+int fn_801C1638(Unk8019F8C0_Owner* o, int i);
+int fn_801B5298(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    int v = 0;
+    unsigned sc = 0;
+    int t = fn_801B5EDC(p, q->m708, 0);
+    if (fn_801B5DE8(p, q, 0) == 1)
+        sc = fn_801B2834(p, q);
+    if (sc > 0x6D) {
+        v = 0x5A;
+    } else if (sc > 0x59) {
+        v = 0x41;
+    } else if (fn_801C1870(p, t, 4) != 0) {
+        int x = sc;
+        if (x > 0x41)
+            x = 0x41;
+        v = x;
+    }
+    int d = fn_801B5FC4(p, q->m708);
+    if (d <= -4)
+        v += 0x1E;
+    else if (d <= -1)
+        v += 0x14;
+    else if (d <= 0)
+        v += 0xA;
+    else if (d > 3)
+        v -= 0xA;
+    int idx = fn_801B5F8C(p);
+    Unk801B5298_T3 tbl = lbl_805CF7F0;
+    int off = idx * 4;
+    char* tb = (char*)&tbl;
+    v += *(int*)(tb + off);
+    int ok = fn_801C1638(p->m8, 0xA);
+    int f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 5;
+    ok = fn_801C1638(p->m8, 0xB);
+    f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 0xA;
+    ok = fn_801C1638(p->m8, 0xC);
+    f = 1;
+    if (ok == 0)
+        f = 0;
+    if (f)
+        v += 0x14;
+    if (t <= 0)
+        v += 0x32;
+    else if (t == 1)
+        v += 0x28;
+    else if (t == 2)
+        v += 0x1E;
+    else if (t == 3)
+        v += 0xA;
+    else if (t > 5)
+        v -= 0xA;
+    return v;
+}
+int fn_801B5F8C(Unk801AB63C_P* p);
 Unk801B6438_Obj* fn_801B6438(Unk801AB63C_P* p, int id);
 int fn_801B5EDC(Unk801AB63C_P* p, int b, int c);
 /* near-miss: same code (99.4%); retail keeps p in r31 and the first out pointer in r30 (mine swaps them, 13 slots).
