@@ -282,6 +282,62 @@ void fn_80120730(Scr* self, Wid* a)
         fn_8012075C(self);
 }
 
+void fn_8012075C(Scr* self)
+{
+    int i = 0;
+    int a = 1;
+    char* base = (char*)lbl_806192E0->m4->mC + 0xA0;
+    switch (((UnkSub*)((char*)self->m13C + 0xDC))->fn_vslot5()) {
+    case 1:
+        break;
+    case 0:
+        a = 0;
+        break;
+    case 2:
+        a = 2;
+        break;
+    case 3:
+        a = 3;
+        break;
+    }
+    int b = 0;
+    switch (fn_8011AA4C()) {
+    case 5:
+        break;
+    case 6:
+        b = 2;
+        if (fn_800AEC80(fn_800AB5C8(lbl_80619D10))->mD8 == 1)
+            b = 1;
+        break;
+    }
+    int n = 8;
+    do {
+        char out[0x18];
+        char buf[0x18];
+        UnkLabel* l;
+        Wid* c;
+        int n;
+        fn_800A7404(base, b, a, i, out, &n);
+        fn_804089B4(buf, lbl_805C0288, i);
+        c = fn_800C8044(self->fn_vslot29(buf));
+        l = fn_800C8040(c->fn_vslot29(lbl_805BE224));
+        if (n == -1)
+            l->fn_vslot30(lbl_805B6F58);
+        else
+            l->fn_vslot28(out);
+        fn_804089B4(buf, lbl_805C029C, i);
+        c = fn_800C8044(self->fn_vslot29(buf));
+        l = fn_800C8040(c->fn_vslot29(lbl_805B9718));
+        if (n == -1) {
+            l->fn_vslot30(lbl_805B6F58);
+        } else {
+            fn_804089B4(buf, lbl_805BC1A8, n);
+            l->fn_vslot30(buf);
+        }
+        i++;
+    } while (--n != 0);
+}
+
 void fn_801209E0(Scr* self, int mode, int x)
 {
     if (fn_80120AE8(self, x) != 0) {
