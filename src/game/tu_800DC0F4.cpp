@@ -245,7 +245,6 @@ void* fn_800DE160(int x)
     return fn_80090880(lbl_8061977C, id);
 }
 
-/* near-miss: 2 slots, `mr r3,r27` / `mr r7,r30` argument move order */
 char* fn_800DE1C4(char* dst, int x)
 {
     int a = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(8, x);
@@ -258,7 +257,6 @@ char* fn_800DE1C4(char* dst, int x)
     return dst;
 }
 
-/* near-miss: argument setup order only (2-4 slots) */
 extern "C" void fn_800DE274(int a0, UdE274_T* x, int a2)
 {
     char* sub = (char*)x + 0x588;
@@ -300,7 +298,6 @@ void fn_800DE354(int a0, UdE354_T* o, int idx, int b, int fl)
     fn_800DE6A8(a0, b20, b8, fl, v, b38);
 }
 
-/* near-miss: the two reloads of sp58/sp5C swap order (4 slots) */
 extern "C" void fn_800DE440(int a0, int a1, int a2)
 {
     Unk800DB840_Slot* o = 0;

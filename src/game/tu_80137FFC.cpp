@@ -244,7 +244,7 @@ extern const char lbl_805BDD9C[];
 extern "C" {
 void* fn_8007DF5C(void* g, int a, int b, int c);
 void fn_800E0C38(Unk800C7B40_Widget* w, void* o, int a, int b);
-void fn_800DE440(char* buf, void* o, int a);
+int fn_800DE440(char* buf, void* o, int a); /* tail-returns fn_800DE6A8 */
 int fn_80139AD4(int i);
 }
 extern "C" Unk800C7B40_Widget* fn_800C8044(Unk800C7B40_Widget* p);
@@ -805,7 +805,6 @@ extern "C" void fn_80139760(Scr* x)
     fn_801399A8(x);
 }
 
-/* near-miss: 75/75 insns, one swap: retail emits mr r4,r28 before addi r3,r1,8 for fn_800DE440(buf, o, 1) */
 extern "C" void fn_801399A8(Scr* x)
 {
     void* g = lbl_8061930C;

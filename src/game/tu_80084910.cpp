@@ -313,7 +313,7 @@ struct Unk80084910_Rec {
     unsigned f2 : 3;
     unsigned rest : 15;
 };
-int fn_80329FA0(int* out, int c, ...);
+void fn_80329FA0(int* out, int c, ...); /* void: retail's schedule of fn_80085F2C needs a call that only clobbers r3 */
 
 
 int fn_80084910(void* self, int a, int b, int c)
@@ -972,7 +972,6 @@ void* fn_80085EF8(void* self, int a)
     return self;
 }
 
-/* near-miss (2 slots): retail emits addi r3,r1,8 before li r4,1 for the first fn_80329FA0 call. */
 struct S4D {
     unsigned short a;
     unsigned short b;

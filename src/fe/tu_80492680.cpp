@@ -15,7 +15,6 @@ FE_OVERLAY void fn_804933A0(void* x)
 
 FE_OVERLAY void fn_804933D4(void* x, int a)
 {
-    /* near-miss (3 slots): retail sets r4, r5 and then r3 (addi r3,r1,8) for the name call. */
     char n[200];
     char fmt[0x68];
     char out[400];
@@ -27,7 +26,6 @@ FE_OVERLAY void fn_804933D4(void* x, int a)
 
 FE_OVERLAY void fn_8049364C(void* x, int a)
 {
-    /* near-miss (3 slots): retail sets r4, r5 and then r3 (addi r3,r1,8) for the name call. */
     char n[200];
     char fmt[0x68];
     char out[400];

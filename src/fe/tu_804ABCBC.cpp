@@ -227,7 +227,7 @@ extern "C" FE_OVERLAY void fn_804AE920(FeSc1* x)
     p->v86();
 }
 
-/* near-miss: retail moves r3 (out) before r4/r5 in the fn_80403DE4 call; 3 slots differ */
+/* void call: a call that only clobbers r3 leaves the later `addi r3,r1,8` output-dependent on the `mr r3` argument move, which then wins the sched2 tie */
 extern "C" FE_OVERLAY void fn_804ACA20(FeSc1* x)
 {
     char buf[0x100];
@@ -239,7 +239,7 @@ extern "C" FE_OVERLAY void fn_804ACA20(FeSc1* x)
         fn_80403144(buf, fn_80090880(lbl_8061977C, fn_804ACAFC(x, i)));
         if (p != 0) {
             fn_804031BC(fmt, "(%d)");
-            fn_80403DE4(out, fmt, p);
+            ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, p);
             fn_800DFF0C(buf, out);
         }
         ((FeObjS43*)x->m138)->v43(0, i, buf, 5);

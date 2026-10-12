@@ -281,7 +281,6 @@ int Unk8007B2B0_Screen::fn_8007C288(int a, int b, Unk8007B2B0_Pair* c, int d, in
     return 0;
 }
 
-/* near-miss (2 slots): `mr r3,r31` (this) comes before `li r6,0` for the fn_8007B440 call in retail. */
 void Unk8007B2B0_Screen::fn_8007C328(int a, int b)
 {
     int found = 0;

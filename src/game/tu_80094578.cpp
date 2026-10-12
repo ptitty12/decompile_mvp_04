@@ -490,7 +490,7 @@ extern "C" void fn_80096204(Sub198* p, int x)
     p->m4 = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80078A38(x);
 }
 
-extern "C" void* fn_803FFA60(void* dst, const void* src, unsigned n); /* memcpy */
+extern "C" void fn_803FFA60(void* dst, const void* src, unsigned n); /* memcpy; r3 is advanced, no result */
 
 extern "C" Sub198* fn_80096244(Sub198* d, Sub198* s)
 {

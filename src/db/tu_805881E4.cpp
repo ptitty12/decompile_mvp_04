@@ -39,14 +39,12 @@ extern "C" int fn_8055AE1C(void* o, int a);
 extern "C" int fn_8055AE68(void* o, int a);
 extern "C" int fn_8055AEB4(void* o, int a);
 
-/* near-miss (4 slots): retail copies the call result to r0 first (mr r0,r3), compares r0 and builds the result in r3. */
 extern "C" DB_OVERLAY int fn_805881E4(void* self)
 {
     int r = fn_805826AC(self);
-    int k = 5;
-    if (r != 1)
-        k = r;
-    return k;
+    if (r == 1)
+        return 5;
+    return r;
 }
 
 extern "C" DB_OVERLAY int fn_80588218()
@@ -112,6 +110,14 @@ extern "C" DB_OVERLAY void fn_80588E34(char* self, int a, Unk80070DDC_Stream* io
 {
     fn_80582C54(self, a, io);
     io->v08(a, self + 0xB8, 0x10);
+}
+
+extern "C" DB_OVERLAY int fn_805898A4(void* self)
+{
+    int r = fn_805826AC(self);
+    if (r == 1)
+        return 3;
+    return r;
 }
 
 extern "C" DB_OVERLAY int fn_80589F84()

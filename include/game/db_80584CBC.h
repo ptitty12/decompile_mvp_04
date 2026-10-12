@@ -44,7 +44,7 @@ void fn_80119F48(char* buf, float f);
 int fn_804089B4(char* dst, const char* fmt, ...); /* sprintf */
 }
 int fn_800E6058(int x);
-void fn_800DE538(int out, int a, int b, int c);
+int fn_800DE538(int out, int a, int b, int c); /* returns fn_800DE6A8's result (r3 live at its blr) */
 
 /* Stack record built by fn_8052E408 and destroyed by fn_80360AF0 (in_chrg 2). */
 struct Db80586420_Ent;

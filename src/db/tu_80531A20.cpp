@@ -653,14 +653,14 @@ extern "C" DB_OVERLAY float fn_80533108(Unk80531A20_Tbl<10, 4>* self, int i, int
     return self->m8[i][j];
 }
 
-/* near-miss: loop and exits match; the callee-saved registers are permuted (retail r28 self, r29 col,
- * r30 result, r31 i; ours result r28). Tried int/unsigned i, i = r copies, inline wrappers. */
+/* `unsigned i = 0;` and then `for (i = r; ...)`: CSE keeps the copy because i already holds r's value
+ * (0), flow deletes the dead first zero, and the extra use of r gives it r30 (retail `mr r31,r30`). */
 extern "C" DB_OVERLAY int fn_80533120(Unk80531A20_Tbl<10, 4>* self, int col, float x)
 {
     int r = 0;
+    unsigned i = 0;
     float acc = lbl_805FEAAC;
-    unsigned i;
-    for (i = 0; i <= 9; i++) {
+    for (i = r; i <= 9; i++) {
         acc = acc + fn_80533108(self, i, col);
         if (!(x >= acc)) {
             r = i;

@@ -137,7 +137,6 @@ int fn_800E19CC(int x)
     return r;
 }
 
-/* near-miss: 2 slots, `addi r3,r1,8` / `mr r5,r29` argument setup order */
 void fn_800E1A1C(int a, unsigned short* dst)
 {
     int base = lbl_8061977C;

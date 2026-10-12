@@ -177,7 +177,6 @@ int Unk80069F0C::fn_8006A238(int idx)
     return total;
 }
 
-/* near-miss: 3 slots; the order of the argument moves for the two fn_8007A94C calls differs. */
 void Unk80069F0C::fn_8006B880()
 {
     Unk8007A4DC_Screen* o = lbl_8061930C;

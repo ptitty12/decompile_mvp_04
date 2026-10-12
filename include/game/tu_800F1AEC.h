@@ -1176,7 +1176,7 @@ struct Ui8010B1E0 {
     int m708;
 };
 int fn_8025416C(char* p, int a);
-void fn_800DE274(short* p, int a, int b);
+int fn_800DE274(short* p, int a, int b); /* tail-returns fn_800DE6A8 */
 int fn_800E5F38(int a);
 int fn_800E5E4C(int a);
 int fn_80097288(int a, int b);

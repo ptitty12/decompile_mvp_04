@@ -92,9 +92,9 @@ int Unk8007A4DC_Screen::fn_8007A914(int a, int b, char* c)
     return m184->v30(a, b, c);
 }
 
-int Unk8007A4DC_Screen::fn_8007A94C(int a, int b, int c)
+void Unk8007A4DC_Screen::fn_8007A94C(int a, int b, int c)
 {
-    return m184->v40(a, b, c);
+    m184->v40(a, b, c);
 }
 
 int Unk8007A4DC_Screen::fn_8007A984(int a)
@@ -291,9 +291,9 @@ int Unk8007B2B0_Screen::fn_8007B3E0(int a, int b)
     return m40->v28(a, fn_80071814(m40, b));
 }
 
-int Unk8007B2B0_Screen::fn_8007B440(int a, int b, int c)
+void Unk8007B2B0_Screen::fn_8007B440(int a, int b, int c)
 {
-    return m40->v40(a, fn_80071814(m40, b), c);
+    m40->v40(a, fn_80071814(m40, b), c);
 }
 
 int Unk8007B2B0_Screen::fn_8007B4A8(int a, int b, int c)
