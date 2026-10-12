@@ -7,12 +7,16 @@
 extern const float lbl_805D6ED0;
 extern const float lbl_805D6ED4;
 extern const float lbl_805D6ED8;
+extern const float lbl_805D6F68;
+extern const float lbl_805D6F6C;
+extern "C" float fn_8023A888(Unk8022FE34_Ent* e);
 void fn_80230B50(Unk8022FE34_Sub* s);
 void fn_8022F4D4(Unk8022FE34_Sub* s);
 void fn_8022F328(Unk8022FE34_Sub* s, int i);
 
 /* near-miss: right length and structure; retail hoists all the table addresses and keeps
    the 1.0 load after the -1.0 stores (7 saved regs r25-r31 vs our 5). Tried 40+ store orders. */
+
 void Unk8022FE34_Sub::fn_8022FE34(Unk8022FE34_Owner* o)
 {
     m0 = o;
@@ -69,6 +73,7 @@ int Unk8022FE34_Pai::fn_80230024(int i)
 }
 
 void fn_80230B4C() {}
+
 void fn_80230B50(Unk8022FE34_Sub* s) {}
 
 void Unk8022FE34_Pai::fn_80230B54(int i)
@@ -86,12 +91,33 @@ void Unk8022FE34_Pai::fn_80230BBC(int i)
     fn_8022F328(&m4[i], i);
 }
 
+/* near-miss: 52/53 insns; retail keeps the 0.1 constant in f31 across the fn_8023A888 call (stfd f31 in the
+   prologue), ours spills and reloads it. Tried const/non-const locals at loop and function scope, a split
+   difference local, r <= c */
+void Unk8022FE34_Sub::fn_80230BF4()
+{
+    m1DC = 0;
+    float f = fn_8023A888(m4);
+    m1EC = lbl_805D6F68;
+    m1DC = 0;
+    for (int i = 0; i < m1D0; i++) {
+        if (m4[i].m0 != 3) {
+            float c = lbl_805D6F6C;
+            if (!(f - fn_8023A888(&m4[i]) > c)) {
+                m194[m1DC].m0 = i;
+                m1DC++;
+            }
+        }
+    }
+}
+
 void Unk8022FE34_Sub::fn_80230CC8(const Unk8022FE34_Ent* e)
 {
     m4[m1D0] = *e;
     m1D0++;
 }
 
+struct Unk8017A930_T;
 extern const Unk8022FE34_V3 lbl_8068C8D4;
 Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
 int fn_801A2034(Unk8022FE34_Ctx* c, int i);
@@ -132,6 +158,39 @@ static inline int Pick(Unk8022FE34_Ctx* c, int i)
         i = g;
     }
     return i;
+}
+
+extern const float lbl_805D6F8C;
+extern const float lbl_805D6F90;
+extern const float lbl_805D6F94;
+extern float lbl_8061D158;
+extern float lbl_8061D15C;
+
+inline float Norm(float lo, float x, float hi)
+{
+    float d = hi - lo;
+    if (!(d <= lbl_805D6F8C)) {
+        return (x - lo) / d;
+    }
+    return lbl_805D6F8C;
+}
+
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+/* near-miss: 64/64 insns, 6 slots; retail holds lo in f12 and the 0.0 constant in f11 inside Norm, ours swaps them.
+   Tried ?:, if/else, !(d <= z) forms, const/non-const globals, Norm arithmetic order */
+float fn_8023125C(float x)
+{
+    if ((int)x == 0) {
+        return lbl_805D6F8C;
+    }
+    float t = Norm(lbl_805D6F90, x, lbl_805D6F94);
+    t = !(t > lbl_805D6F90) ? (t >? lbl_805D6F8C) : lbl_805D6F90;
+    float r = Lerp(lbl_8061D158, t, lbl_8061D15C);
+    return r;
 }
 
 void Unk8022FE34_Owner::fn_80231D0C(int i)
@@ -180,6 +239,24 @@ void Unk8022FE34_Owner::fn_80231FC0()
         fn_8023A6C8(&m440, mC);
         m440.m0 = 1;
     }
+}
+
+extern "C" void fn_80190F04(int a, int b);
+void fn_8027D33C(Unk8027C728_Goal* g);
+extern "C" void fn_8037893C(char* queue, int id, void* ev, int a, int b);
+void fn_8017B4F8(Unk8017A930_T* p);
+
+void Unk8022FE34_Owner::fn_802321BC()
+{
+    if (mC == 0) {
+        fn_80231FC0();
+    }
+    Unk8022FE34_Pl* pl = fn_801A497C(m0, 4, 0);
+    fn_80190F04(fn_802324E0(), mC);
+    fn_8027D33C(fn_80231E90());
+    pl->m8F0 = 1;
+    fn_8037893C(m0->m704, 0x5A, 0, 0, 0);
+    fn_8017B4F8((Unk8017A930_T*)m4->m8);
 }
 
 void Unk8022FE34_Owner::fn_8023246C()

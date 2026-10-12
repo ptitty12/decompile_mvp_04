@@ -117,13 +117,14 @@ struct Unk8022FE34_Sub {
     int m1E0;
     int m1E4;
     int m1E8;
-    int m1EC;
+    float m1EC;
     int m1F0;
     int m1F4;
     Unk8022FE34_Sub() { fn_8022FE34(0); }
     void fn_8022FE34(Unk8022FE34_Owner* o);
     void fn_80230CC8(const Unk8022FE34_Ent* e);
     void fn_80231018();
+    void fn_80230BF4();
 };
 
 struct Unk8022FE34_Pai {
@@ -163,6 +164,7 @@ struct Unk8022FE34_Z {
     void fn_80236240(float f);
 };
 
+struct Unk8027C728_Goal;
 struct Unk8022FE34_Owner {
     Unk8022FE34_Ctx* m0;
     Unk8022FE34_U* m4;
@@ -189,6 +191,7 @@ struct Unk8022FE34_Owner {
     Unk8022FE34_V3 fn_80231E4C();
     void fn_80231FC0();
     void fn_802321BC();
+    Unk8027C728_Goal* fn_80231E90();
     void fn_8023246C();
     int fn_802324E0();
     int fn_802324EC();
