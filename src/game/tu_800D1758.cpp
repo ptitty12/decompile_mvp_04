@@ -46,6 +46,49 @@ extern "C" void fn_800D1A24(Unk800D2338_Obj* o)
     c->a = !(a > lbl_805BC848) ? (a >? lbl_805BC84C) : lbl_805BC848;
 }
 
+struct Unk802ACD88_Mgr;
+void fn_802B0444(Unk802ACD88_Mgr* m, int a, int b);
+extern "C" char* strncpy(char* d, const char* s, unsigned n);
+extern "C" char* strcpy(char* d, const char* s);
+extern "C" char* strcat(char* d, const char* s);
+extern "C" int sprintf(char*, const char*, ...);
+extern const char lbl_805BC850[];
+
+extern "C" void fn_800D1B14(Unk800D2338_Obj* o)
+{
+    if (o->b68_2 && o->m64 != 0)
+        fn_802B0444((Unk802ACD88_Mgr*)lbl_8061E978, o->m7C, lbl_8061A328);
+    fn_800C7EE8(o);
+    if (o->b68_0) {
+        char fmt[0x10];
+        char na[4];
+        char nb[4];
+        int f = (*(unsigned*)((char*)o + 0x68) >> 30) & 1;
+        if (f) {
+            char* p = o->m4A;
+            int v = (lbl_8061A328 / o->m50) % o->m58 + o->m54;
+            strncpy(p, o->m40, o->m60);
+            p[o->m60] = 0;
+            sprintf(fmt, lbl_805BC850, 4 - o->m60);
+            sprintf(na, fmt, v);
+            strcat(p, na);
+            fn_800D24A4(o);
+        } else if (lbl_8061A328 < o->m5C + o->m58 * o->m50) {
+            char* p = o->m4A;
+            int v = ((lbl_8061A328 - o->m5C) / o->m50) % o->m58 + o->m54;
+            strncpy(p, o->m40, o->m60);
+            p[o->m60] = 0;
+            sprintf(fmt, lbl_805BC850, 4 - o->m60);
+            sprintf(nb, fmt, v);
+            strcat(p, nb);
+            fn_800D24A4(o);
+        } else {
+            strcpy(o->m4A, o->m45);
+            fn_800D24A4(o);
+        }
+    }
+}
+
 /* near-miss: 7 slots (retail returns 1 inline after bne and keeps the end pointer in r30 = p + 76) */
 extern "C" int fn_800D1CA4(const char* name)
 {
