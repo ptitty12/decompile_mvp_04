@@ -228,6 +228,22 @@ char* fn_800DD6D4(int n)
     return lbl_806E02B8;
 }
 
+extern char lbl_805B7FE4[];
+extern char lbl_805B7FF0[];
+extern char lbl_805BD93C[];
+extern char lbl_805BD948[];
+extern char lbl_805BD950[];
+extern char lbl_805BD934[];
+
+void fn_800DDF2C(UiS* self)
+{
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805B7FE4, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805B7FF0, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD93C, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD948, 1))->v32(lbl_805BD934, 1)))->v29(0x3EC);
+    ((UiS*)fn_800C8040(fn_800C8044(self->v32(lbl_805BD950, 1))->v32(lbl_805BD934, 1)))->v29(0x4D9D);
+}
+
 void* fn_800DE160(int x)
 {
     int id = 0;
