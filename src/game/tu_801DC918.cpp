@@ -39,7 +39,7 @@ int fn_80221E1C(I* i);
 Unk80270BA0_X* fn_801A497C(Unk801DB948_Game* g, int a, int b);
 void fn_801EABCC(I* i, int id, Vec3* v, float* f);
 void fn_80222084(I* i);
-void fn_8020E82C(I* i, int a, int b, int c, int d, int e, int f, int g);
+float fn_8020E82C(I* i, int a, int b, int c, int d, int e, int f, int g);
 void fn_801F316C(I* i);
 void fn_802055F4(Unk801DD660_Ctx* c);
 void fn_80205644(Unk801DD660_Ctx* c);
