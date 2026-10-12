@@ -3,6 +3,53 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8017A930.h"
+void fn_80258E70(void* p, int q);
+void fn_801DBC24(void* p, int a);
+void fn_801C2A18(void* p, int a);
+void fn_8024F930(void* p, int a, int b);
+extern char lbl_80649DA0[];
+extern char lbl_8065F9C8[];
+struct Unk8017BCB4_R {
+    char pad0[0x1C];
+    int m1C;
+};
+struct Unk8017BCB4_Msg {
+    int m0;
+    const void* vptr;
+    void* m8;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived() { vptr = lbl_8065F9C8; }
+    void Set(void* a) { m8 = a; }
+    void End() { vptr = lbl_80649DA0; }
+};
+extern "C" {
+void fn_801BAF08(void* p);
+void fn_801DBD5C(void* p);
+Unk8017BCB4_R* fn_801A6DB8(void* o);
+void fn_80198DD8(void* o, int a);
+void fn_80189300(void* o, int a);
+}
+void fn_80235A28(void* p);
+void fn_80257258(void* p);
+void fn_801A987C(void* p);
+void fn_801B131C(void* p);
+extern int lbl_80620860;
+extern int lbl_80620870;
+extern float lbl_8062086C;
+void fn_801A0790(Unk8017B0A4_Ctx* o, float v);
+void fn_8017EE54();
+void fn_801A9700(void* p);
+void fn_801AB63C(void* p);
+void fn_801DBB08(void* p);
+void fn_80235300(void* p);
+void fn_801C2120(void* p);
+void fn_80176884(void* p);
+void fn_80178BBC(void* p);
+
 inline float Unk8017D0F4_Clamp(float lo, float v, float hi)
 {
     return !(v > hi) ? (v >? lo) : hi;
@@ -41,6 +88,34 @@ void fn_8017AF30(Unk8017A930_T* p)
 void fn_8017AF7C(Unk8017A930_T* p)
 {
     fn_80176B90(p->m3A8);
+}
+
+extern "C" void fn_8017AFA0(void* self)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    if (lbl_80620860 != 0) {
+        int t = lbl_80620870;
+        if (t == 1) {
+            Unk8017B0A4_Ctx* o = p->m4;
+            lbl_80620860 = 0;
+            lbl_8062086C = (float)o->m4C * 0.016666668f - 0.033333335f;
+            fn_801A0790(o, lbl_8062086C);
+            lbl_80620860 = t;
+        }
+    }
+    ((void (*)(void*))fn_8017EE54)((char*)p + 8);
+    fn_801A9700(p->m3C4);
+    fn_801AB63C(p->m3C8);
+    fn_801DBB08(p->m3B8);
+    fn_80235300(p->m3B0);
+    fn_801C2120(p->m3A4);
+    if (p->m4->m6F4 == 0) {
+        fn_80176884(p->m3A8);
+    }
+    fn_80178BBC(p->m3AC);
+    p->m3D8 = -1;
+    fn_8017E264(p);
+    fn_803295F0();
 }
 
 void fn_8017B0A4(Unk8017A930_T* p)
@@ -158,6 +233,48 @@ void fn_8017B658(Unk8017A930_T* p, int a)
     }
 }
 
+struct Unk8017B83C_S {
+    char pad0[0xC];
+    int mC;
+    int m10;
+};
+void fn_8017B83C(Unk8017A930_T* p, int a)
+{
+    Unk8017B83C_S* s = (Unk8017B83C_S*)((char*)p + 8);
+    s->mC = 1;
+    s->m10 = 0;
+    *(int*)((char*)p + 0x41C) = a;
+    fn_80258E70(p->m3B4, a);
+    fn_801DBC24(p->m3B8, a);
+    fn_801C2A18(p->m3A4, a);
+    switch (a) {
+    case 0xC:
+        fn_8024F930((char*)p->m4->m660 + 0x4D8, 3, 0);
+        break;
+    case 0xF:
+    case 0x10:
+        fn_8024F930((char*)fn_801C1638(p->m4, 0) + 0x4D8, 2, 0);
+        break;
+    }
+    switch (a) {
+    case 0xC:
+        fn_8037893C((char*)p->m4 + 0x704, 0x4C, 0, 0, 0);
+        break;
+    case 0xF:
+        fn_8037893C((char*)p->m4 + 0x704, 0x4F, 0, 0, 0);
+        break;
+    case 0x10:
+        fn_8037893C((char*)p->m4 + 0x704, 0x4B, 0, 0, 0);
+        break;
+    case 0xE:
+        fn_8037893C((char*)p->m4 + 0x704, 0x4E, 0, 0, 0);
+        break;
+    case 0x11:
+        fn_8037893C((char*)p->m4 + 0x704, 0x4D, 0, 0, 0);
+        break;
+    }
+}
+
 void fn_8017B994(Unk8017A930_T* p)
 {
     p->m414 = 1;
@@ -236,6 +353,30 @@ void fn_8017BBF4(Unk8017A930_T* p)
     fn_8037893C((char*)p->m4 + 0x704, 0x33, 0, 0, 0);
     fn_801A1EDC(p->m4);
     fn_803295F0();
+}
+
+void fn_8017BCB4(void* self)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    fn_801BAF08(p->m3BC);
+    fn_80235A28(p->m3B0);
+    fn_801DBD5C(p->m3B8);
+    fn_80257258(p->m3B4);
+    fn_801A987C(p->m3C4);
+    fn_801B131C(p->m3CC);
+    if (fn_801A6DB8(p->m4)->m1C != 0) {
+        fn_80198DD8(p->m4->m6E4, 0);
+        p->m4->m6E4->fn_vslot8(1);
+        fn_80189300(p->m4->m6CC, 0);
+        p->m4->m6CC->fn_vslot8(1);
+    }
+    Unk8017BCB4_Msg m;
+    m.Base(0x34);
+    m.Derived();
+    m.Set((char*)p->m4 + 0x704);
+    fn_8037893C((char*)p->m4 + 0x704, m.m0, (int)&m, 0, 0);
+    fn_803295F0();
+    m.End();
 }
 
 void fn_8017BDD4(Unk8017A930_T* p)
