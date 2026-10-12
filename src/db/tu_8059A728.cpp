@@ -693,6 +693,37 @@ extern "C" DB_OVERLAY int fn_8059B47C(Db8059A728_Obj* self, int k, int a)
     return *(int*)((char*)self + ((s + a) * 12 + 0x174));
 }
 
+extern "C" DB_OVERLAY void fn_8059B524(Db8059B524_Self* s, int kind, int start, int cap, int n, int year, int a, int id)
+{
+    int pos = start + n - 1;
+    int i;
+    switch (kind) {
+    case 1:
+        if (n != 0) {
+            if (n > cap) {
+                for (i = 0; i < cap - 1; i++)
+                    s->ents[i] = s->ents[i + 1];
+                pos = start + cap - 1;
+            }
+            fn_8059A7E4((Db8059A728_Rec*)&s->ents[pos], year, a, id);
+        }
+        break;
+    case 2:
+        if (n != 0) {
+            if (n > cap) {
+                for (i = 0; i < cap - 1; i++)
+                    s->items[i] = s->items[i + 1];
+                pos = start + cap - 1;
+            }
+            int it = pos * 12 + (int)s;
+            it += 0x170;
+            *(short*)it = year;
+            *(int*)(it + 4) = a;
+        }
+        break;
+    }
+}
+
 //@8059B6AC
 extern "C" DB_OVERLAY int fn_8059B6AC(Db8059B6AC_Obj* self, int k)
 {
