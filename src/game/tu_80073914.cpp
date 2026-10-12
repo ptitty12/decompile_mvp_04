@@ -39,6 +39,7 @@ int fn_80329FA0(int* out, int c, ...);
 int fn_804089B4(char* buf, const char* fmt, ...);
 void fn_80075A44(Unk8007B2B0_Screen* s, int a, int i);
 int fn_80075808(int id);
+int fn_80377E04(Obj* o, int* out, int id);
 int fn_80075D48(int i);
 int fn_80075D64(int i);
 int fn_80075CC0(int y);
@@ -628,4 +629,29 @@ int Unk8007B2B0_Screen::fn_80076AE4(int id)
         }
     }
     return total;
+}
+
+float Unk8007A4DC_Screen::fn_80076BAC(int a, int b)
+{
+    Unk805A19C8_Roster* r = m58;
+    unsigned cnt = 0;
+    unsigned i = 0;
+    unsigned char n = r->m10[fn_805A19C8(r, a)].m7;
+    float tot = 0.0f;
+    for (; i < n; i++) {
+        unsigned char j = i;
+        int k = fn_805A19C8(r, a);
+        int o = j * 4;
+        int id = *(int*)((char*)r->m10[k].m0 + o);
+        int x;
+        int f = fn_80377E04(fn_800A883C(&m17C), &x, id) != 0;
+        if (f == 1) {
+            tot += fn_80073C10(0, id, b, 2);
+            cnt += (int)fn_80073C10(1, id, b, 2);
+        }
+    }
+    float res = 0.0f;
+    if (cnt != 0)
+        res = tot / (float)cnt;
+    return res;
 }
