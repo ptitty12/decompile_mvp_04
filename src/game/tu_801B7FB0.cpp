@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801B7FB0.h"
+#include "game/tu_801A57C8.h"
 #include "game/goals/tu_8027A84C.h"
 #include "game/goals/tu_8027C728.h"
 
@@ -396,7 +397,11 @@ extern "C" int fn_801B9C5C(B* u)
     return r;
 }
 
-extern "C" int fn_801B9CC0(B* u) { return u->m4->m6F8->m14->m1CCA == 1; }
+extern "C" int fn_801B9CC0(B* u)
+{
+    int one = 1;
+    return u->m4->m6F8->m14->m1CCA > one;
+}
 
 extern "C" void fn_801B9E04(B* u, P* q)
 {
@@ -450,6 +455,46 @@ extern "C" int fn_801BA974(B* u)
 extern "C" int fn_801BA9A4(B* u) { return u->m28 == 4; }
 
 extern "C" int fn_801BA9B8(B* u) { return u->m28 == 2; }
+
+/* AI wrapper object (vtable 0x8065F9F8, ctor 0x801BA9CC, dtor 0x801BAA58): root base 0x8035AB00,
+ * owns the 0x34-byte state made by fn_801B9800 (m8) and the two-word context made by fn_801BFB44 (mC). */
+struct Unk801BA9CC_Ctx {
+    P* m0;
+    A* m4;
+};
+extern "C" B* fn_801B9800(B* u, P* p, A* q);
+extern "C" Unk801BA9CC_Ctx* fn_801BFB44(Unk801BA9CC_Ctx* o, P* p, A* a);
+extern "C" void fn_801BFB54(void* p, int f);
+class Unk801BA9CC : public Unk8035AB00 {
+public:
+    Unk801BA9CC(int a, P* b);
+    virtual void fn_vslot1();
+    virtual ~Unk801BA9CC();
+    int m4;
+    B* m8;
+    Unk801BA9CC_Ctx* mC;
+    int m10;
+    P* m14;
+};
+
+Unk801BA9CC::Unk801BA9CC(int a, P* b)
+{
+    m10 = a;
+    m14 = b;
+    m8 = fn_801B9800(new (0) B, b, (A*)this);
+    mC = fn_801BFB44(new (0) Unk801BA9CC_Ctx, b, (A*)this);
+    fn_801BAAC8((A*)this);
+}
+
+Unk801BA9CC::~Unk801BA9CC()
+{
+    fn_80377408(m8);
+    m8 = 0;
+    if (mC) {
+        fn_801BFB54(mC, 3);
+    }
+    mC = 0;
+}
 
 extern "C" void fn_801BAAC8(A* a)
 {
