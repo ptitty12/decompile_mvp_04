@@ -35,7 +35,20 @@ extern void (*lbl_806EF410)(Vp6Tbl*, int);
 extern const double lbl_80607418[];
 extern const double lbl_80607420[];
 
+extern const char lbl_80608490[];
+extern const char lbl_806084A0[];
+extern const char lbl_806084A4[];
+extern int lbl_806EE9C8;
+
 extern "C" {
+void* fopen(const char* path, const char* mode);
+int fprintf(void* f, const char* fmt, ...);
+int fclose(void* f);
+void fn_8039E914(Vp6BitReader* br, const unsigned char* buf);
+int fn_8039EF48(Vp6Ctx* c);
+void fn_80398634(Vp6Rc* rc, const unsigned char* buf);
+void fn_8039C63C(Vp6Ctx* c);
+void fn_8039868C(Vp6Buf* b, unsigned char* base);
 void fn_80395A94(Vp6Ctx* c);
 int fn_80395B38(Vp6Ctx* c);
 void fn_80395E18(int* a, int* b, int* c, unsigned d);
@@ -124,7 +137,6 @@ int fn_80395B38(Vp6Ctx* c)
     return 0;
 }
 
-
 void fn_80395C08(Vp6Ctx** h)
 {
     if (*h) {
@@ -205,7 +217,6 @@ void fn_80395E18(int* a, int* b, int* c, unsigned d)
     }
     fn_80398324(d);
 }
-
 
 void fn_80395F00(Vp6Buf* b)
 {
@@ -327,7 +338,6 @@ void fn_803962CC(Vp6Buf* b, int v)
     b->mC4 = v;
 }
 
-
 void fn_803962D4(Vp6Mb* m)
 {
     int v = m->mC;
@@ -345,7 +355,6 @@ double fn_80396328(double a, double b, double c)
     double e = fn_8040FCA0(-d * d / (a * 2.0 * a));
     return lbl_80607420[0] / (a * fn_804101AC(lbl_80607418[0])) * e;
 }
-
 
 void fn_80396ADC(Vp6Tbl* t)
 {
@@ -431,7 +440,6 @@ Vp6Tbl* fn_80396DF0()
     return t;
 }
 
-
 int fn_80397270(Vp6Ctx** out, int w, int h)
 {
     *out = fn_80395C68();
@@ -488,6 +496,46 @@ void fn_8039733C(Vp6Ctx* c, unsigned kind, int val)
     }
 }
 
+/* near-miss: 10 slots, register choice for the m6A0 value (r0 in the original code). */
+int fn_803977FC(Vp6Ctx* c, const unsigned char* buf, int size)
+{
+    c->m1E8 = size;
+    fn_8039E914(&c->m450C, buf);
+    if (!fn_8039EF48(c)) {
+        return -1;
+    }
+    if (c->m944 != 0 || c->m19D == 0) {
+        if (c->m4520 != 0) {
+            c->m190 = 0;
+            c->m194 = 0;
+            c->m198 = buf + c->m451C;
+        } else {
+            fn_80398634(&c->m170, buf + c->m451C);
+        }
+    }
+    fn_8039C63C(c);
+    int t = c->m244;
+    c->m244 = c->m254;
+    c->m254 = t;
+    fn_8039868C(c->m298, (unsigned char*)t);
+    if (c->m1AC == 0 || c->m698 != 0) {
+        MEMCPY_V((void*)c->m24C, (void*)c->m254, c->m208 + c->m20C * 2);
+    }
+    unsigned v;
+    if (c->m1AC == 0) {
+        v = c->m13C->m0;
+    } else {
+        v = ((unsigned)c->m6A0 * 3 + (c->m13C->m0 + 2)) >> 2;
+    }
+    c->m6A0 = v;
+    if (c->m150.m10 > (unsigned)c->m1E8) {
+        void* f = fopen(lbl_80608490, lbl_806084A0);
+        fprintf(f, lbl_806084A4, lbl_806EE9C8, c->m150.m10, c->m1E8);
+        fclose(f);
+    }
+    lbl_806EE9C8++;
+    return 0;
+}
 
 int fn_80397A4C(Vp6Ctx** h)
 {
