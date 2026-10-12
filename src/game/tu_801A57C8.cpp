@@ -586,6 +586,55 @@ void fn_801A6820(Unk8019F8C0_Owner* o)
     }
 }
 
+struct Unk801A6874_T {
+    char pad0[0x20];
+    int m20;
+    float m24;
+    char pad28[4];
+    int m2C;
+};
+extern int lbl_80620298;
+void fn_801A06A8(Unk8019F8C0_Owner* o);
+float fn_80323848(int p);
+float fn_8032388C(int p);
+inline float Unk801A6874_G4C(Unk8019F8C0_Sub* c)
+{
+    int t;
+    if (c->m44 != 0 || (t = c->m48) == 0)
+        return c->m4C;
+    return fn_80323848(t);
+}
+inline float Unk801A6874_G50(Unk8019F8C0_Sub* c)
+{
+    int t;
+    if (c->m44 != 0 || (t = c->m48) == 0)
+        return c->m50;
+    return fn_8032388C(t);
+}
+void fn_801A6874(Unk8019F8C0_Owner* o)
+{
+    Unk801A6874_T* t = (Unk801A6874_T*)o->m744;
+    if (t->m20 == 0) {
+        fn_801A06A8(o);
+        return;
+    }
+    if (lbl_80620298 != 0) {
+        Unk8019F8C0_Sub* s = fn_801A04A8(o, 1);
+        if (s != 0) {
+            Unk801A6874_T* t2 = (Unk801A6874_T*)o->m744;
+            float m = 1.0f;
+            if (t2->m2C == 0)
+                m = t2->m24;
+            float c = Unk801A6874_G4C(s);
+            c += Unk801A6874_G50(s) * m;
+            float lo = (float)fn_80326DF0((char*)o + 0x50, 0) * 0.016666668f;
+            float hi = fn_801A745C((Unk801A745C_T*)o->m744) - 0.016666668f;
+            c = !(c > hi) ? (c >? lo) : hi;
+            s->SetM4C(c);
+        }
+    }
+}
+
 void fn_801A69EC(Unk8019F8C0_Owner* o)
 {
     Unk8019F8C0_Inner* t = &o->m6F8->m14[1];
