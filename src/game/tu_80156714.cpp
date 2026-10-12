@@ -254,6 +254,56 @@ extern "C" void fn_801574E0(Vt8_801574E0* self) /* 801574E0 */
     self->s4();
 }
 
+struct Node80157514 { float* m0; };
+extern const int lbl_805C9758[];
+extern const char lbl_805C8C20[];
+extern const float lbl_805C8C50;
+extern "C" unsigned fn_8014D8AC(void* rng, int max, const char* file, int line);
+extern "C" void fn_80169C90(int rec, int id, int n, int c, int d, int e, Unk8015AB2C_Blk blk, int z);
+inline float RandF80157514(void* r, float scale, int line)
+{
+    const char* f = lbl_805C8C20;
+    return (float)fn_8014D8AC(r, 1000000, f, line) * scale * 1e-6f;
+}
+extern "C" void fn_80157514(Unk80159F28* self, int a, int b, int c, int d, int e, Unk8015AB2C_Blk blk) /* 80157514 */
+{
+    int off = a * 4;
+    char* base = (char*)self + 0x33C;
+    int cnt = lbl_805C9758[a];
+    int idx = -1;
+    if (*(Node80157514**)(base + off) != 0) {
+        if (cnt <= 0) {
+            return;
+        }
+        float tot = RandF80157514(self->mC->m554, lbl_805C8C50, 0x135);
+        float acc = 0.0f;
+        for (int i = 0; i < cnt - 1; i++) {
+            if (acc >= tot) {
+                continue;
+            }
+            if (!((*(Node80157514**)(base + off))->m0[i] + acc <= tot)) {
+                idx = i;
+            }
+            acc = (*(Node80157514**)(base + off))->m0[i] + acc;
+        }
+    } else {
+        idx = fn_8014D8AC(self->mC->m554, cnt, lbl_805C8C20, 0x14D);
+    }
+    if (idx == -1) {
+        idx = cnt - 1;
+    }
+    int k;
+    if (idx > cnt - 1) {
+        k = cnt - 1;
+    } else {
+        k = idx;
+        if (k < 0) {
+            k = 0;
+        }
+    }
+    fn_80169C90(b, a, k + 1, c, d, e, blk, 0);
+}
+
 int fn_80157708(void* self, int v) /* 80157708 */
 {
     if ((unsigned int)(v - 0x18) <= 1 || v == 0xA || v == 0x27) {
