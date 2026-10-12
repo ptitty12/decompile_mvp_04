@@ -128,6 +128,115 @@ extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn
     n->m134 = fn_8041171C(1.5707964f - a3);
 }
 
+union PPCWGPipe {
+    unsigned char u8;
+    unsigned short u16;
+    unsigned int u32;
+    float f32;
+};
+extern volatile PPCWGPipe GXWGFifo;
+extern "C" {
+int fn_803D9E3C();
+void GXSetCopyClear(void* clr, unsigned int z);
+void fn_8042DC44(int a);
+void GXSetTevOrder(int a, int b, int c, int d);
+void GXSetTevOp(int a, int b);
+void fn_803DB9C0(int a, int b);
+void fn_803DBF78(int a, int b, int c, int d, int e);
+void GXSetCullMode(int a);
+void GXSetNumTexGens(int a);
+void GXSetNumTevStages(int a);
+void fn_80430364(int a);
+void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void fn_8042FE24(int a, int b, int c, int d);
+void GXSetAlphaCompare(int a, int b, int c, int d, int e);
+void fn_8042FF04(int a);
+void fn_8042FE78(int a);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042C8B0(int prim, int fmt, unsigned short n);
+}
+extern Unk803E1F98_Node* lbl_8062C2B4;
+extern int lbl_8062C2BC;
+extern int lbl_80627A78;
+
+extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
+{
+    char col[6];
+    float m[16];
+    if (n->mC.m190 && lbl_8062C2B4 == n && (flags & 3) == 3 && fn_803D9E3C()) {
+        int c = n->mC.m8;
+        if (c == lbl_8062C2BC)
+            return;
+        lbl_8062C2BC = c;
+        *(int*)col = c;
+        GXSetCopyClear(col, 0xFFFFFF);
+    }
+    fn_8042DC44(1);
+    GXSetTevOrder(0, 0xFF, 0xFF, 4);
+    GXSetTevOp(0, 4);
+    fn_803DB9C0(0x1200, 1);
+    fn_803DBF78(5, 9, 1, 4, 0);
+    fn_803DBF78(5, 0xB, 1, 5, 0);
+    GXSetCullMode(0);
+    float y = n->mC.mD0;
+    float x = n->mC.mCC;
+    fn_80431564(m, y, y + n->mC.mD8, x, x + n->mC.mD4, 0.0f, -1.0f);
+    fn_80430194(m, 1);
+    fn_80430364(0x3C);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevOp(0, 4);
+    fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
+    fn_8042FE24(0, 1, 0, 3);
+    GXSetAlphaCompare(7, 0, 1, 7, 0);
+    fn_8042FF04(0);
+    if ((flags ^ 1) & 1)
+        fn_8042FE78(0);
+    if (flags & 2)
+        fn_8042FED0(1, 7, 1);
+    else
+        fn_8042FED0(0, 7, 0);
+    fn_8042C8B0(0x80, 5, 4);
+    {
+        float x = n->mC.mCC;
+        float y = n->mC.mD0;
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = 0.99999988f;
+        GXWGFifo.u32 = n->mC.m8;
+    }
+    {
+        float x = n->mC.mCC + n->mC.mD4;
+        float y = n->mC.mD0;
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = 0.99999988f;
+        GXWGFifo.u32 = n->mC.m8;
+    }
+    {
+        float x = n->mC.mCC + n->mC.mD4;
+        float y = n->mC.mD0 + n->mC.mD8;
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = 0.99999988f;
+        GXWGFifo.u32 = n->mC.m8;
+    }
+    {
+        float x = n->mC.mCC;
+        float y = n->mC.mD0 + n->mC.mD8;
+        GXWGFifo.f32 = x;
+        GXWGFifo.f32 = y;
+        GXWGFifo.f32 = 0.99999988f;
+        GXWGFifo.u32 = n->mC.m8;
+    }
+    fn_8042FE78(1);
+    if (n->mC.m4 == 0)
+        fn_80430194(n->mC.m14C, 0);
+    else
+        fn_80430194(n->mC.m14C, 1);
+    lbl_80627A78 = 0;
+}
+
 extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* node)
 {
     v->m4 = 1;

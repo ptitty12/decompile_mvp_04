@@ -44,7 +44,7 @@ struct Unk803E198C_View {
     char padF4[0x14C - 0xF4];
     float m14C[16]; /* 4x4 identity */
     int m18C;
-    char pad190[4];
+    int m190;
     int m194;
     int m198;
     Unk803E1F98_Node* m19C;
