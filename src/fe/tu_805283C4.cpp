@@ -123,6 +123,7 @@ extern "C" FE_OVERLAY void fn_8052846C(FeScrN* self)
     fn_800EC5F4__FP8UiScrRaw(self);
 }
 
+/* near-miss: member-vptr dtor: all 6 store orders give mr r9,r3 where retail has mr r8,r3 (a fourth pseudo holds r9) */
 extern "C" FE_OVERLAY void fn_8052849C(FeScrN* self)
 {
     FeI(self, 0x1C8) = (int)lbl_80655E98;
@@ -165,6 +166,7 @@ extern "C" FE_OVERLAY void fn_80528558(FeScrN* self)
     fn_800EC5F4__FP8UiScrRaw(self);
 }
 
+/* near-miss: same member-vptr dtor pattern as fn_8052849C, plus lis order of the two vptr constants */
 extern "C" FE_OVERLAY void fn_80528588(FeScrN* self, int c)
 {
     self->SetVptr(lbl_8067E5A0);
@@ -186,6 +188,7 @@ extern "C" FE_OVERLAY void fn_80528618(FeScrN* self)
     fn_800EC5F4__FP8UiScrRaw(self);
 }
 
+/* near-miss: same as fn_80528588 */
 extern "C" FE_OVERLAY void fn_80528648(FeScrN* self, int c)
 {
     self->SetVptr(lbl_8067DF58);
