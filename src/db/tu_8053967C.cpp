@@ -785,6 +785,75 @@ DB_OVERLAY void fn_8053C4B0(O58* self, int mode, Unk80084910_VObj* strm)
     }
 }
 
+DB_OVERLAY int fn_8053C550(const char* s)
+{
+    int r = 0x14;
+    switch (s[0]) {
+    case 0x41: break;
+    case 'C':
+        if (s[1] == 'F')
+            r = 7;
+        else if (s[1] == 'P')
+            r = 0x13;
+        else
+            r = 1;
+        break;
+    case '1':
+        r = 2;
+        break;
+    case '2':
+        r = 3;
+        break;
+    case '3':
+        r = 4;
+        break;
+    case 'R':
+        if (s[1] == 'F')
+            r = 8;
+        else if (s[1] == 'P')
+            r = 0x11;
+        break;
+    case 'L':
+        if (s[1] == 'F')
+            r = 6;
+        else if (s[1] == 'R')
+            r = 0x11;
+        break;
+    case 'S':
+        if (s[1] == 'S') {
+            r = 5;
+        } else if (s[1] == 'P') {
+            switch (s[2]) {
+            case '1':
+                r = 10;
+                break;
+            case '2':
+                r = 11;
+                break;
+            case '3':
+                r = 12;
+                break;
+            case '4':
+                r = 13;
+                break;
+            case '5':
+                r = 14;
+                break;
+            }
+        } else if (s[1] == 'U') {
+            r = 0x12;
+        }
+        break;
+    case 'D':
+        r = 9;
+        break;
+    case 'M':
+        r = 0x10;
+        break;
+    }
+    return r;
+}
+
 DB_OVERLAY int fn_8053CA58(X* x)
 {
     int n = 0;
