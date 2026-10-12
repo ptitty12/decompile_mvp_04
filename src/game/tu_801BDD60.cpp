@@ -342,6 +342,27 @@ extern "C" P* fn_801C1638(P* p, unsigned i)
     return 0;
 }
 
+struct Unk80308874_B8 {
+    char pad0[0x98];
+    const void* m98;
+    char pad9C[0xB8 - 0x9C];
+    const void* mB8;
+};
+
+extern char lbl_8065FF08[];
+
+extern char lbl_8065FF98[];
+
+extern "C" void fn_8026C864(void* p, int c);
+
+extern "C" void fn_801C1658(Unk80308874_B8* p, int c)
+{
+    p->mB8 = lbl_8065FF08;
+    p->m98 = lbl_8065FF98;
+    fn_8026C864(p, c);
+}
+
+
 extern "C" int fn_801C1690(void) { return 0; }
 
 extern "C" void fn_801C1698(float f) {}

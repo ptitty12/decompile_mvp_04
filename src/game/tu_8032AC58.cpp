@@ -3,6 +3,9 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80317B88.h"
+class FxSldW;
+class FxPairW;
+class FxTripW;
 
 extern const float lbl_805ECD2C;
 extern const float lbl_805ECD30;
@@ -67,7 +70,84 @@ void fn_8032E088(FxCmd* self, FxInt2* v);
 void fn_8032E2FC(FxF3* out, FxCmd* src);
 void fn_8032E344(FxCmd* self, FxInt3* v);
 void fn_8032E968(FxSldF* self);
+FxIntD* fn_8032EB84(FxIntD* self, int name, int* a, int b, int c, int d, int e);
+FxIntD* fn_8032EC38(FxIntD* self, int name, int a, int b, int c, int d);
+FxSldW* fn_8032E70C(FxSldW* self, int name, float a, float b, float c, float d);
+FxSldW* fn_8032E7C0(FxSldW* self, int name, float* p, float* q, float a, float b, float c);
+FxSldW* fn_8032E894(FxSldW* self, int name, float* p, float a, float b, float c, float d);
+FxPairW* fn_8032DC2C(FxPairW* self, int name, FxInt2* a, int b, float* c, FxInt2 d, FxInt2 e, FxInt2 f);
+FxPairW* fn_8032DD00(FxPairW* self, int name, int a, FxInt2 d, FxInt2 e, FxInt2 f, float g);
+FxTripW* fn_8032E0B4(FxTripW* self, int name, FxInt3* a, int b, float* c, int d, FxInt3 e, FxInt3 f, FxInt3 g);
+FxTripW* fn_8032E1DC(FxTripW* self, int name, int a, int b, FxInt3 e, FxInt3 f, FxInt3 g, float h);
 // PROTOS-END
+}
+
+extern const void* const lbl_80666C90[];
+extern const void* const lbl_80666CE0[];
+extern const void* const lbl_80666D80[];
+extern const void* const lbl_80666D30[];
+/* Int-triple widget (vtable lbl_80666D30; ctors fn_8032E0B4, fn_8032E1DC). */
+class FxTripW : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    FxInt3* m48;
+    FxInt3 m4C;
+    float* m58;
+    float m5C;
+    FxInt3 m60;
+    FxInt3 m6C;
+    FxInt3 m78;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+};
+inline void FxTripSet(FxTripW* self) {
+    FxInt3 v = self->m60;
+    fn_8032E344((FxCmd*)self, &v);
+}
+/* Int-pair widget (vtable lbl_80666D80; ctors fn_8032DC2C, fn_8032DD00). */
+class FxPairW;
+class FxTripW;
+inline void FxPairSet(FxPairW* self, FxInt2 v) { fn_8032E088((FxCmd*)self, &v); }
+class FxPairW : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    FxInt2* m48;
+    FxInt2 m4C;
+    float* m54;
+    float m58;
+    FxInt2 m5C;
+    FxInt2 m64;
+    FxInt2 m6C;
+    int m74;
+    int m78;
+};
+/* Float-entry widget (vtable lbl_80666CE0; ctors fn_8032E70C, fn_8032E7C0, fn_8032E894). */
+class FxSldW : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    float* m48;
+    float m4C;
+    int m50;
+    float m54;
+    float m58;
+    float m5C;
+    float m60;
+};
+inline void FxSldSet(FxSldW* self, float v) {
+    if (self->m48 == 0) self->m4C = v;
+    else *self->m48 = v;
+}
+/* Inlined mid-level widget ctor (vtable lbl_80666E70): root, mC = 0, set the name. */
+inline void FxWidInit(FxListD* self, int name) {
+    FxRootInit(self);
+    *(const void**)((char*)self + 8) = lbl_80666E70;
+    self->mC = 0;
+    fn_8032D868((FxCmd*)self, name);
 }
 
 // FUNCS-BEGIN
@@ -235,6 +315,36 @@ int fn_8032DBD4(FxCmd* self, int b) {
     return r;
 }
 
+FxPairW* fn_8032DC2C(FxPairW* self, int name, FxInt2* a, int b, float* c, FxInt2 d, FxInt2 e, FxInt2 f) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666D80;
+    self->m48 = a;
+    self->m54 = c;
+    self->m58 = *c;
+    self->m5C = d;
+    self->m64 = e;
+    self->m6C = f;
+    self->m74 = b;
+    self->m78 = 0;
+    FxPairSet(self, self->m5C);
+    return self;
+}
+
+FxPairW* fn_8032DD00(FxPairW* self, int name, int a, FxInt2 d, FxInt2 e, FxInt2 f, float g) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666D80;
+    self->m48 = 0;
+    self->m54 = 0;
+    self->m58 = g;
+    self->m5C = d;
+    self->m64 = e;
+    self->m6C = f;
+    self->m74 = a;
+    self->m78 = 0;
+    FxPairSet(self, self->m5C);
+    return self;
+}
+
 void fn_8032E054(FxInt2* out, FxCmd* src) {
     FxInt2* p = (FxInt2*)src->m48;
     if (p) {
@@ -252,6 +362,40 @@ void fn_8032E088(FxCmd* self, FxInt2* v) {
 }
 
 /* near-miss: order of the three loads/stores in the struct copy */
+FxTripW* fn_8032E0B4(FxTripW* self, int name, FxInt3* a, int b, float* c, int d, FxInt3 e, FxInt3 f, FxInt3 g) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666D30;
+    self->m48 = a;
+    self->m58 = c;
+    self->m5C = *c;
+    self->m60 = e;
+    self->m6C = f;
+    self->m78 = g;
+    self->m84 = b;
+    self->m88 = 0;
+    self->m8C = 3;
+    self->m90 = d;
+    FxTripSet(self);
+    return self;
+}
+
+FxTripW* fn_8032E1DC(FxTripW* self, int name, int a, int b, FxInt3 e, FxInt3 f, FxInt3 g, float h) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666D30;
+    self->m48 = 0;
+    self->m58 = 0;
+    self->m5C = h;
+    self->m60 = e;
+    self->m6C = f;
+    self->m78 = g;
+    self->m84 = a;
+    self->m88 = 0;
+    self->m8C = 3;
+    self->m90 = b;
+    FxTripSet(self);
+    return self;
+}
+
 void fn_8032E2FC(FxF3* out, FxCmd* src) {
     FxF3* p = (FxF3*)src->m48;
     if (p) {
@@ -270,10 +414,80 @@ void fn_8032E344(FxCmd* self, FxInt3* v) {
     }
 }
 
+FxSldW* fn_8032E70C(FxSldW* self, int name, float a, float b, float c, float d) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666CE0;
+    self->m48 = 0;
+    self->m50 = 0;
+    self->m54 = b;
+    self->m58 = a;
+    self->m5C = c;
+    self->m60 = d;
+    FxSldSet(self, self->m58);
+    return self;
+}
+
+FxSldW* fn_8032E7C0(FxSldW* self, int name, float* p, float* q, float a, float b, float c) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666CE0;
+    self->m48 = p;
+    self->m4C = *p;
+    self->m50 = (int)q;
+    self->m54 = *q;
+    self->m58 = a;
+    self->m5C = b;
+    self->m60 = c;
+    FxSldSet(self, self->m58);
+    return self;
+}
+
+FxSldW* fn_8032E894(FxSldW* self, int name, float* p, float a, float b, float c, float d) {
+    FxWidInit((FxListD*)self, name);
+    *(const void**)((char*)self + 8) = lbl_80666CE0;
+    self->m48 = p;
+    self->m4C = *p;
+    self->m50 = 0;
+    self->m54 = b;
+    self->m58 = a;
+    self->m5C = c;
+    self->m60 = d;
+    FxSldSet(self, self->m58);
+    return self;
+}
+
 void fn_8032E968(FxSldF* self) {
     char buf[0x30];
     fn_804089B4(buf, lbl_805ED994, self->m48 == 0 ? self->m4C : *self->m48);
     float w = lbl_805ED99C - fn_80313F28(lbl_8061FEDC, buf);
     fn_8032D8D0(self);
     fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
+FxIntD* fn_8032EB84(FxIntD* self, int name, int* a, int b, int c, int d, int e) {
+    FxWidInit((FxListD*)self, name);
+    self->m50 = c;
+    *(const void**)((char*)self + 8) = lbl_80666C90;
+    self->m58 = d;
+    self->m5C = e;
+    self->m48 = (int)a;
+    self->m54 = b;
+    self->m60 = 1;
+    self->m64 = 0;
+    if (a) *a = b;
+    else self->m4C = b;
+    return self;
+}
+
+FxIntD* fn_8032EC38(FxIntD* self, int name, int a, int b, int c, int d) {
+    FxWidInit((FxListD*)self, name);
+    self->m50 = b;
+    *(const void**)((char*)self + 8) = lbl_80666C90;
+    self->m58 = c;
+    self->m5C = d;
+    self->m48 = 0;
+    self->m54 = a;
+    self->m60 = 1;
+    self->m64 = 0;
+    self->m4C = a;
+    return self;
 }

@@ -104,6 +104,12 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
   `python tools/match/passthru.py .`: a callee that reads r4/r5 the caller
   never sets takes the caller's parameters, so pass them through.
 - Keep .text order with `python tools/match/sort_functions.py src/<UNIT>`.
+- Never write the word "asm" in source, not even in a comment: the verifier
+  greps for it and rejects the commit. Write "original code" instead.
+- Start a range by cloning: scratch tools from earlier workers
+  (`scratchpad\R36\clone2.py` loose-shape cloner, `R28\gen_all.py` shape
+  generator, `R42\permtest.py` statement permuter) match most boilerplate
+  in minutes. Adapt their paths to your worktree.
 
 ## Finish with a report (this is all the lead reads)
 

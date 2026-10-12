@@ -397,20 +397,22 @@ void fn_8010F494(Scr* self, int a)
         fn_8001BC4C()->fn_8001BDAC(a);
 }
 
-/* near-miss: the case 6/7 tails and the compare chain order differ from retail (switch layout). */
-
+/* Cases 1, 2 and 3 keep their own bodies (only 4/5 share a label), so the tree is
+   0, 1, 2, 3, [4,5], 6, 7 rooted at 3 as in retail. */
 int fn_8010F4D4(int a, int b)
 {
     switch (b) {
     case 0:
         return 0x2441;
     case 1:
+        return 0x3A65;
+    case 2:
+        return 0xC82;
+    case 3:
+        return 0xC82;
     case 4:
     case 5:
         return 0x3A65;
-    case 2:
-    case 3:
-        return 0xC82;
     case 6:
         return a == 1 ? 0x3A65 : 0xC82;
     case 7:

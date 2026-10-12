@@ -174,7 +174,8 @@ int fn_800E8C3C(UiS* self, int a)
     }
 }
 
-/* near-miss: 118 vs 117 insns. Retail keeps the id (0x4556 / 0x4D50 / 0x4D52) in r4 and sets it right before the cmpw / after the fn_800A2E6C call; sched1 hoists the `li` of id above the fn_800A2AE8 call here, so id lands in callee-saved r29 (extra `mr r4,r29`). if/else, ternary, early-call-result and hoisted-q forms all tried. */
+/* Bound computed into q before `id = 0x4556`, inner test as if/else: each id `li` then
+   follows the last call on its path and id stays in r4 (no saved register). */
 void fn_800E9074(UiS* x)
 {
     Ui80619948* g = lbl_80619948;
@@ -192,11 +193,13 @@ void fn_800E9074(UiS* x)
         fn_80403DE4(bufE8, (const char*)fn_80090880(lbl_8061977C, 0x4647), buf20, c);
     } else {
         int p = fn_800A2AE8(g);
+        int q = fn_8056B7D0(lbl_80619948->m28) - p;
         int id = 0x4556;
-        if (c >= fn_8056B7D0(lbl_80619948->m28) - p) {
-            id = 0x4D50;
+        if (c >= q) {
             if (fn_800A2E6C(g) != 0)
                 id = 0x4D52;
+            else
+                id = 0x4D50;
         }
         const char* f = (const char*)fn_80090880(lbl_8061977C, id);
         fn_80403DE4(bufE8, f, buf20, fn_80090880(lbl_8061977C, fn_800E6058(b)), c);

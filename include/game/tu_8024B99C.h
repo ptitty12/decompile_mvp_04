@@ -28,11 +28,21 @@ struct Unk8024B99C_Flags {
 };
 
 struct Unk8024B99C_V {
-    char pad0[0x44C];
+    char pad0[0x448];
+    int m448;
     Unk8022FE34_Ctx* m44C;
-    char pad450[0x458 - 0x450];
+    int m450;
+    int m454;
     int m458;
-    char pad45C[0x5F4 - 0x45C];
+    int m45C;
+    int m460;
+    char pad464[0x4A0 - 0x464];
+    float m4A0;
+    char pad4A4[0x538 - 0x4A4];
+    float m538;
+    char pad53C[0x540 - 0x53C];
+    float m540;
+    char pad544[0x5F4 - 0x544];
     float m5F4;
     int m5F8;
     int m5FC;

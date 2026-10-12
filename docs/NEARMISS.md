@@ -23,10 +23,16 @@ our C++ game units as they are.
 | fn_8001ADF4, fn_8001AE3C, fn_8001AE84 + 14 in tu_8001B190 (trace wrappers, family B, K != 0, N == 0) | game/tu_8001A6B8.cpp, game/tu_8001B190.cpp | same insns, 2 slots differ | retail emits `li r5` before `li r3` (sched1 order). These `li`s are ready at block start, so adjust_priority never boosts r5. A later r5 reference (any third argument to lbl_80624408) gives retail's order but costs a visible move (PATTERNS, "Hard-case families") | earlier sweep list, then tag-as-id forms, unused/this params, struct return, uninitialised arg, -O2, no sched1 (Opus) |
 | fn_802735F4 (cLinearChooser slot 17, 0x2930) | animation/choosers/tu_80272B20.cpp | not attempted | 10.5 KB, float-heavy switch; notes in the worker report: sets helper+0x10, calls fn_80272E28 with a [0,1]-clamped value, fn_8027342C, fn_80273498, fn_8026D504 | none (tier C) |
 | fn_8028F178 | animation/goals/tu_8028F178.cpp | 32/32, 2 differ (with a `*(char**)` read of m44->m14) | the float parameter's stfs must sit between `lwz r11,0x44(r3)` and `lwz r0,0x14(r11)`; see PATTERNS, "Hard-case families 2" | alias-type casts of the m14 read, sched dumps (Opus 2) |
-| fn_8006FB10, fn_8006FB1C, fn_8006FF9C, fn_8006FFD0, fn_80071138, fn_80071154 | game/tu_8006D05C.cpp, game/tu_80070DDC.cpp | not written; best 5 of 13 slots differ (fn_8006FF9C, unsigned switch) | dead compares survive only when the jumps become redundant after reload (jump2 cross-jumping); ours merges the `return 0` bodies before flow | if/switch/ternary forms, signed/unsigned index, default forms (Opus 2) |
-| v8__11Tbl80094800, v8__11Tbl800956D8 | game/tu_80094578.cpp | 77 vs 78, 64 vs 65 insns | &buf (char[0x14] at frame offset 16) is a force_operand pseudo that CSE keeps in r28; retail rematerialises `addi r3,r1,24` per call (and saves r29-r31 with r31 unused) | struct/array/&buf[0] forms (Opus 2) |
 | fn_80097318 (+ clones 97380, 973E8, 97450, 974B8) | game/tu_80094578.cpp | 22 vs 26 insns | retail's loop re-reads +0, +4, +0x3E8 every pass and keeps the index as an int with clrlwi per use; ours hoists and rotates the loop differently | read only (Opus 2) |
 | fn_80079F54 | game/tu_80077238.cpp | 15/15, 3 differ | fmadds operand/register order: retail loads m204 before the int->float conversion and m1F4 after it | operand orders, float temp (Opus 2) |
+| fn_803302D4 | game/tu_8032ECD8.cpp | 44/44, 2 differ | widget with a 10-int ring at +0x48: retail stores the vptr (lbl_80666A68) before m5C; every order of the tail stores puts m5C first or swaps the ring/vtable registers r28/r29. The ring vptr lbl_8064B298 is stored twice (via r28 in the ring init, via self at +0x58), which suggests the ring is a base or member whose vtable g++ re-stores | 24+720 tail orders, FxRingInit inline vs open-coded (Opus 3) |
+| fn_8033C490 | game/tu_80338ECC.cpp | 179/179, 6 differ | loop giv order only: retail initialises/increments the item pointer second (o-name, item, o+0x14, offset); ours puts it last | k/nm temporaries, index forms (Opus 3) |
+| fn_8032FD58 | game/tu_8032ECD8.cpp | not written | widget ctor with a 126-int ring at +0x48 (same family as fn_803302D4) plus a fill loop from a singleton (fn_800B64BC); FxWidInit + FxRingInit cover the head | none (Opus 3) |
+| fn_80533120 (+ fn_80536F28, fn_80537054, fn_8053923C) | db/tu_80531A20.cpp, db/tu_80535360.cpp | 35/35, callee-saved regs permuted | retail sets the counter by copying the result's zero (`li r30,0` ... `mr r31,r30`), so the result gets a 4th ref and outranks col/self in global-alloc; CSE turns every source copy back into `li` | `i = r`, `r = i`, `r = i = 0`, int/unsigned mixes, while form (Opus 4, scratch only: busy units) |
+| fn_8053DB30 | db/tu_8053CC9C.cpp | 129 vs 131 insns | the by-value Date copy (8) and the date buffer (12) sit at swapped frame offsets; fn_8053DD68's recipe (unit-local buffer type with a trivial dtor) fixes the per-call `addi r3,r1,N` but allocates the buffer at declaration, before the copy temp | inline wrapper, BLKmode buffer (Opus 4) |
+| fn_800B08B0 | game/tu_800AF248.cpp | 4/4, 2 slots | `int r = 0; switch (p->m10) { case 0..3: r = 0; }` gives `lwz; cmpwi; li; blr`, retail has the `li r3,0` before the dead `cmpwi` | case ranges 0..5, int/unsigned, if forms (Opus 4) |
+| fn_803F73B0 | ealib/tu_803F73B0.cpp | not written; best 60 slots | error-code table: cases -128 and -14..0 (value = -k, -128 -> 15), default 16; case set and values right, tree layout differs | `r = v` / `return v` forms, -14/-15 lower bound (Opus 4b) |
+| fn_803ABCB4, fn_803ABDD0, fn_803AC164 | snd/tu_803AB310.cpp | not written | dead `cmpwi -18/-10/-7` trees after calls: an error-code switch with empty arms (PATTERNS, Hard-case families 4); the port/mvp2005 reference source should give the rest | none (Opus 4b) |
 
 Matched by the near-miss sweep (W4, 2026-10-11; recipes in PATTERNS.md,
 "Near-miss sweep"): cTimeWarp::cTimeWarp, fn_8027F504, fn_8027FC80,
@@ -38,3 +44,23 @@ Matched by Opus hard-case families 2 (2026-10-11; recipes in PATTERNS.md, "Hard-
 families 2"): fn_8004961C, fn_8004A8F8, fn_8004B538, fn_800488C4, fn_80051E68,
 fn_80051014, fn_8006473C, fn_80088EFC, fn_80077238, fn_80077320, fn_80077404,
 fn_80077684, fn_8007776C, fn_80077850, fn_80077934, fn_80078D00, fn_800A3DF8.
+
+Matched by Opus hard-case families 3 (2026-10-11; recipes in PATTERNS.md, "Hard-case
+families 3"): fn_8032ECD8, fn_8032F120, fn_8032F19C, fn_8032F38C, fn_8032F428,
+fn_8032F4CC, fn_8032DC2C, fn_8032DD00, fn_8032E0B4, fn_8032E1DC, fn_8032E70C,
+fn_8032E7C0, fn_8032E894, fn_8032EB84, fn_8032EC38, fn_800AEA68, __5FxRec, __3FxSi,
+__3FxU, fn_80331DB8, fn_80332978, fn_80332DBC, fn_80333A70.
+
+Matched by Opus hard-case families 4 (2026-10-11; recipes in PATTERNS.md, "Hard-case
+families 4"): fn_8006FB10, fn_8006FB1C, fn_8006FF9C, fn_8006FFD0, fn_80071138,
+fn_80071154, fn_8009FDC8, fn_8009FDD4, fn_8009DDE4, fn_8009E060, fn_80055D84,
+v8__11Tbl80094800, v8__11Tbl800956D8, fn_800E9074, fn_80598AB4, fn_80598B3C,
+fn_8059B280, fn_8059F680, fn_8059FADC.
+
+Matched by Opus hard-case families 4b (2026-10-11; PATTERNS.md, "Hard-case families 4",
+second pass): fn_8052CB74, fn_8052CC18, fn_8052E754, fn_8052E8D8, fn_8052F554,
+fn_8052F590, fn_80530024, fn_805300D0, fn_8053CDB0, fn_8053CE50, fn_8053DD68,
+fn_80084B24, fn_80084BDC, fn_800898D0, fn_80089A0C, fn_8008AC18, fn_8008AC68,
+fn_8008B368, fn_8008B3E8, fn_8008BEF0, fn_8008BF24, fn_8008CC0C, fn_8008CE64,
+fn_8008EB90, fn_8008EC78, fn_804CF304, fn_804CF368, fn_80084728, fn_804F9C64,
+fn_8056A1DC, fn_803EB83C, fn_803F644C, fn_80166440, fn_8010F4D4, fn_80134F48.

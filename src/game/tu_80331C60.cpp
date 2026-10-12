@@ -50,7 +50,7 @@ extern int lbl_8061D3A0, lbl_8068CD0C, lbl_8068B5D0, lbl_80691DE0, lbl_80691DE4;
 extern float lbl_806203BC, lbl_806203C0, lbl_806203C4;
 
 extern "C" {
-void fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
+void* fn_8032FAB0(void* item, const char* name, int* val, const void* tbl, int n, int cur);
 void fn_8032D880(void* item, const char* s);
 int fn_80148404(UnkGm* g);
 UnkOpt* fn_801A4CE8(UnkMgr8* m, int k);
@@ -122,8 +122,8 @@ extern const char lbl_80666E70[], lbl_80666DD0[], lbl_80666E20[], lbl_80666138[]
 extern const char lbl_805EDE40[], lbl_805EDE5C[], lbl_805EDE78[], lbl_805EDE94[], lbl_805EDEAC[], lbl_805EDEC4[], lbl_805EDEDC[], lbl_805EDEF0[], lbl_805EDF08[];
 extern int lbl_80620530[];
 extern "C" {
-void fn_8032F120(void* item, const char* name, int v);
-void fn_8032F428(void* item, const char* name, const void* tbl, int n, int cur);
+void* fn_8032F120(void* item, const char* name, int v);
+void* fn_8032F428(void* item, const char* name, const void* tbl, int n, int cur);
 void fn_8033FBD8(void* item, void* cb);
 void fn_80332930();
 void fn_80332954();
@@ -480,46 +480,36 @@ void fn_80332930() { fn_8033280C(1); }
 
 void fn_80332954() { fn_8033280C(0); }
 
-/* near-miss (parked, 150 vs 152 instructions): the three inline button-item ctors are right in
- * shape (vptr EC0, floats m0/m4, vptr E70, mC, name, vptr DD0, callback), but retail keeps one
- * more callee-saved register live (r15..r30: the callback address of the first button is
- * hoisted into r29) and so allocates every item pointer one register lower. */
+/* Button and sub-menu item ctors, inlined into fn_80332978. The callback and the
+ * sub-menu pointer are inline arguments, so they are evaluated before the item body
+ * and live in callee-saved registers across fn_8032D868, as in retail. */
+inline void ButtonInit(ItemB* it, const char* name, void* cb)
+{
+    LabelInit(it, name);
+    it->m8 = lbl_80666DD0;
+    fn_8033FBD8(it, cb);
+}
+inline void SubInit(ItemB* it, const char* name, Menu* sub, Menu* p)
+{
+    LabelInit(it, name);
+    it->m48 = (char*)sub;
+    it->m8 = lbl_80666E20;
+    fn_80333848(sub, (int)p);
+}
 Menu* fn_80332978(Menu* p, int a)
 {
     MenuInit(p, a);
     p->m2DC = lbl_80666138;
     fn_8032F120((char*)p + 0x2E0, lbl_805EDE40, 0);
     ItemB* bA = (ItemB*)((char*)p + 0x334);
-    bA->m8 = lbl_80666EC0;
-    bA->m0 = 0.0f;
-    bA->m4 = 0.0f;
-    bA->m8 = lbl_80666E70;
-    bA->mC = 0;
-    fn_8032D868(bA, lbl_805EDE5C);
-    bA->m8 = lbl_80666DD0;
-    fn_8033FBD8(bA, (void*)fn_80332930);
+    ButtonInit(bA, lbl_805EDE5C, (void*)fn_80332930);
     ItemB* bB = (ItemB*)((char*)p + 0x380);
-    bB->m8 = lbl_80666EC0;
-    bB->m0 = 0.0f;
-    bB->m4 = 0.0f;
-    bB->m8 = lbl_80666E70;
-    bB->mC = 0;
-    fn_8032D868(bB, lbl_805EDE78);
-    bB->m8 = lbl_80666DD0;
-    fn_8033FBD8(bB, (void*)fn_80332954);
+    ButtonInit(bB, lbl_805EDE78, (void*)fn_80332954);
     fn_8032F120((char*)p + 0x3CC, lbl_805EDE94, 0);
     fn_8032F428((char*)p + 0x420, lbl_805EDEAC, lbl_80620530, 4, 0);
     fn_8032F120((char*)p + 0x480, lbl_805EDEC4, 0);
     ItemB* bC = (ItemB*)((char*)p + 0x4D4);
-    bC->m8 = lbl_80666EC0;
-    bC->m0 = 0.0f;
-    bC->m4 = 0.0f;
-    bC->m8 = lbl_80666E70;
-    bC->mC = 0;
-    fn_8032D868(bC, lbl_805EDEDC);
-    bC->m48 = (char*)p + 0x520;
-    bC->m8 = lbl_80666E20;
-    fn_80333848((Menu*)((char*)p + 0x520), (int)p);
+    SubInit(bC, lbl_805EDEDC, (Menu*)((char*)p + 0x520), p);
     fn_8032F120((char*)p + 0x9F4, lbl_805EDEF0, 0);
     fn_8032F120((char*)p + 0xA48, lbl_805EDF08, 0);
     fn_80330ACC(p, (MItem*)((char*)p + 0x2E0));

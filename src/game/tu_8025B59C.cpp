@@ -153,3 +153,10 @@ void fn_8025E654(I* self)
     for (int i = 0; i < 4; i++)
         self->m438[i] = 0;
 }
+
+extern "C" void fn_8025E804(F* self);
+
+extern "C" void fn_8025E7E4(F* self)
+{
+    fn_8025E804(self);
+}

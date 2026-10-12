@@ -970,14 +970,139 @@ void fn_80055204(Unk80052794_Rec* r, Unk80052794_Obj* obj)
     }
 }
 
-/* near-miss (38 vs 101 instructions): the case set (33 values, from the compares in retail)
- * compiles to a pruned tree here; retail keeps a bare cmpwi (then 'b end') for every empty
- * case and its tree is balanced as if the case list were 2 nodes longer than the 33 visible
- * ones (root 0xF4, not 0xFB). Tried: unused 'q = &r->mC' in the empty cases (as fn_80055204),
- * an explicit 'default: break;'. Not matched. */
+/* Same 95 kinds as fn_80055204. The 31 kinds that reset `kind` keep their compares
+   (the dead store lives until flow, so the case jumps are only removed by jump2);
+   the 62 empty kinds merge into the end before then and leave no code. */
 void fn_80055D84(Unk80052794_Rec* r)
 {
-    switch (r->m4) {
+    int kind = r->m4;
+    switch (kind) {
+    case 0x2:
+        break;
+    case 0x3:
+        break;
+    case 0x5:
+        kind = 0;
+        break;
+    case 0x6:
+        break;
+    case 0x7:
+        break;
+    case 0x8:
+        kind = 0;
+        break;
+    case 0xA:
+        break;
+    case 0xB:
+        break;
+    case 0xC:
+        kind = 0;
+        break;
+    case 0xD:
+        break;
+    case 0xE:
+        break;
+    case 0xF:
+        kind = 0;
+        break;
+    case 0x11:
+        break;
+    case 0x12:
+        break;
+    case 0x32:
+        kind = 0;
+        break;
+    case 0x33:
+        break;
+    case 0x38:
+        break;
+    case 0x41:
+        kind = 0;
+        break;
+    case 0x4B:
+        break;
+    case 0x52:
+        break;
+    case 0x53:
+        kind = 0;
+        break;
+    case 0x56:
+        break;
+    case 0x57:
+        break;
+    case 0x59:
+        kind = 0;
+        break;
+    case 0x5C:
+        break;
+    case 0x5D:
+        break;
+    case 0x74:
+        kind = 0;
+        break;
+    case 0x77:
+        break;
+    case 0x8D:
+        break;
+    case 0x9D:
+        kind = 0;
+        break;
+    case 0x9E:
+        break;
+    case 0x9F:
+        break;
+    case 0xA0:
+        kind = 0;
+        break;
+    case 0xA8:
+        break;
+    case 0xB9:
+        break;
+    case 0xC5:
+        kind = 0;
+        break;
+    case 0xC6:
+        break;
+    case 0xE4:
+        break;
+    case 0xE5:
+        kind = 0;
+        break;
+    case 0xE6:
+        break;
+    case 0xE7:
+        break;
+    case 0xE8:
+        kind = 0;
+        break;
+    case 0xE9:
+        break;
+    case 0xEA:
+        break;
+    case 0xED:
+        kind = 0;
+        break;
+    case 0xF2:
+        break;
+    case 0xF3:
+        break;
+    case 0xF4:
+        kind = 0;
+        break;
+    case 0xF5:
+        break;
+    case 0xFA:
+        break;
+    case 0xFB:
+        kind = 0;
+        break;
+    case 0xFD:
+        break;
+    case 0x107:
+        break;
+    case 0x108:
+        kind = 0;
+        break;
     case 0x10B:
         fn_80046750(&r->m10);
         fn_80046760(&r->m14);
@@ -985,67 +1110,96 @@ void fn_80055D84(Unk80052794_Rec* r)
     case 0x10C:
         fn_80046770(&r->m10);
         break;
-    case 0x5:
-        break;
-    case 0x8:
-        break;
-    case 0xC:
-        break;
-    case 0xF:
-        break;
-    case 0x32:
-        break;
-    case 0x41:
-        break;
-    case 0x53:
-        break;
-    case 0x59:
-        break;
-    case 0x74:
-        break;
-    case 0x9D:
-        break;
-    case 0xA0:
-        break;
-    case 0xC5:
-        break;
-    case 0xE5:
-        break;
-    case 0xE8:
-        break;
-    case 0xED:
-        break;
-    case 0xF4:
-        break;
-    case 0xFB:
-        break;
-    case 0x108:
-        break;
     case 0x10D:
+        kind = 0;
+        break;
+    case 0x10E:
+        break;
+    case 0x10F:
         break;
     case 0x112:
+        kind = 0;
+        break;
+    case 0x113:
+        break;
+    case 0x114:
         break;
     case 0x115:
+        kind = 0;
+        break;
+    case 0x116:
+        break;
+    case 0x119:
         break;
     case 0x11B:
+        kind = 0;
+        break;
+    case 0x11F:
+        break;
+    case 0x120:
         break;
     case 0x12A:
+        kind = 0;
+        break;
+    case 0x149:
+        break;
+    case 0x150:
         break;
     case 0x151:
+        kind = 0;
+        break;
+    case 0x178:
+        break;
+    case 0x179:
         break;
     case 0x17D:
+        kind = 0;
+        break;
+    case 0x17E:
+        break;
+    case 0x17F:
         break;
     case 0x180:
+        kind = 0;
+        break;
+    case 0x181:
+        break;
+    case 0x182:
         break;
     case 0x185:
+        kind = 0;
+        break;
+    case 0x186:
+        break;
+    case 0x187:
         break;
     case 0x188:
+        kind = 0;
+        break;
+    case 0x189:
+        break;
+    case 0x18D:
         break;
     case 0x18E:
+        kind = 0;
+        break;
+    case 0x18F:
+        break;
+    case 0x19A:
         break;
     case 0x19B:
+        kind = 0;
+        break;
+    case 0x19C:
+        break;
+    case 0x1A7:
         break;
     case 0x1B3:
+        kind = 0;
+        break;
+    case 0x1B4:
+        break;
+    case 0x1C1:
         break;
     }
 }

@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80070DDC.h"
+#include "game/tu_8007FF8C.h"
 
 void* operator new[](unsigned int size, int heap);
 extern char lbl_80649DB8[];
@@ -326,6 +327,48 @@ void fn_8006FAD4(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 4, 4);
 }
 
+/* Every column yields 0; the original keeps the case tree as dead compares
+   (PATTERNS, "Hard-case families 4"). */
+int fn_8006FB10(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+int fn_8006FB1C(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 int fn_8006FB28(void* l, int k, int c)
 {
     Unk80071604* a = (Unk80071604*)l;
@@ -448,6 +491,96 @@ void fn_8006FF60(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 12, 12);
 }
 
+/* Every column yields 0; the original keeps the case tree as dead compares
+   (PATTERNS, "Hard-case families 4"). */
+int fn_8006FF9C(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+int fn_8006FFD0(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 unsigned fn_80070004(void* l, int k, unsigned c)
 {
     Unk80071604* a = (Unk80071604*)l;
@@ -494,6 +627,15 @@ unsigned fn_80070004(void* l, int k, unsigned c)
     }
     return r;
 }
+
+extern Unk8007FF8C_Pmf lbl_805B63E0[];
+
+extern "C" float fn_800701B0(Unk8007FF8C_PObj* o, int i, int a)
+{
+    float r = (o->*lbl_805B63E0[i])(a);
+    return r;
+}
+
 
 void fn_80070248(void* l, int k, unsigned c, int v)
 {
