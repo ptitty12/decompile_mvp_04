@@ -20,6 +20,25 @@ extern int lbl_806EEAF0;
 extern int lbl_806EEAF4;
 extern char lbl_8060E8E8[];
 
+extern int lbl_806EEB08;
+extern int lbl_806EEB10;
+extern "C" int fn_80401044(int a, int v, unsigned char* buf, int b, int c);
+
+struct Unk80402288_V3 {
+    float x, y, z;
+};
+
+struct Unk80402288_Mtx {
+    float m00, m01, m02, m03;
+    float m10, m11, m12, m13;
+    float m20, m21, m22, m23;
+    float m30, m31, m32, m33;
+};
+
+struct Unk804020F0_V4 {
+    float x, y, z, w;
+};
+
 extern "C" int fn_80400DA4()
 {
     return lbl_806EEAE0;
@@ -116,11 +135,85 @@ extern "C" unsigned fn_80401010(const unsigned char* a, const unsigned char* b, 
     return i;
 }
 
-extern "C" int fn_80401548(int a, int v, unsigned char* buf);
+extern "C" int fn_80401548(int a, int v, char* buf)
+{
+    int g1 = lbl_806EEB08;
+    int g2 = lbl_806EEB10;
+    int n;
+    if (v > 0xFFFFFF) {
+        if (buf != 0) {
+            buf[0] = 0x90;
+            buf[1] = 0xFB;
+            char* q = buf + 2;
+            q[0] = (unsigned)v >> 24;
+            q[1] = (unsigned)v >> 16;
+            q[2] = (unsigned)v >> 8;
+            q[3] = v;
+        }
+        n = 6;
+    } else {
+        if (buf != 0) {
+            buf[0] = 0x10;
+            buf[1] = 0xFB;
+            char* q = buf + 2;
+            q[0] = (unsigned)v >> 16;
+            q[1] = (unsigned)v >> 8;
+            q[2] = v;
+        }
+        n = 5;
+    }
+    return n + fn_80401044(a, v, (unsigned char*)(buf != 0 ? buf + n : 0), g1, g2);
+}
 
-extern "C" int fn_80401610(int a, int v, unsigned char* buf, int flag)
+extern "C" int fn_80401610(int a, int v, char* buf, int flag)
 {
     return fn_80401548(a, v, flag ? buf : 0);
+}
+
+/* near-miss (97.3%): same instructions except the first flag test: retail keeps `slwi; andi.` on (p[0] << 8) & 0x100 and the constant addi; ours folds them into rlwinm and addi p+5. */
+extern "C" int fn_80401644(const unsigned char* p, int* outLen)
+{
+    int v = 0;
+    if (p != 0) {
+        const unsigned char* q = p + 2;
+        int t = p[0] << 8;
+        if ((t & 0x100) != 0)
+            q += 3;
+        v = *q;
+        v = (v << 8) + *++q;
+        v = (v << 8) + *++q;
+        q++;
+        if (outLen != 0) {
+            for (;;) {
+                unsigned char b = *q++;
+                if ((b & 0x80) == 0) {
+                    q += 1;
+                    q += b & 3;
+                    continue;
+                }
+                if ((b & 0x40) == 0) {
+                    unsigned k = *q;
+                    q += 2;
+                    q += k >> 6;
+                    continue;
+                }
+                if ((b & 0x20) == 0) {
+                    q += 3;
+                    q += b & 3;
+                    continue;
+                }
+                unsigned n = ((b & 0x1F) << 2) + 4;
+                if (n <= 0x70) {
+                    q += n;
+                    continue;
+                }
+                q += b & 3;
+                *outLen = q - p;
+                break;
+            }
+        }
+    }
+    return v;
 }
 
 extern "C" int fn_80401924(int a, const unsigned char* p, int b);
@@ -176,6 +269,55 @@ extern "C" int fn_80401904(const unsigned char* p)
 extern "C" int fn_80401BBC(int a, int b)
 {
     return (int)(((long long)a * b + 0x8000) >> 16);
+}
+
+extern "C" void fn_804020F0(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
+{
+    if (in == out) {
+        Unk804020F0_V4 t;
+        t.x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + m->m30;
+        t.y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + m->m31;
+        t.z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + m->m32;
+        t.w = in->x * m->m03 + in->y * m->m13 + in->z * m->m23 + m->m33;
+        *out = t;
+    } else {
+        out->x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + m->m30;
+        out->y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + m->m31;
+        out->z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + m->m32;
+        out->w = in->x * m->m03 + in->y * m->m13 + in->z * m->m23 + m->m33;
+    }
+}
+
+extern "C" void fn_80402288(const Unk80402288_V3* in, const Unk80402288_Mtx* m, Unk80402288_V3* out)
+{
+    if (in == out) {
+        Unk80402288_V3 t;
+        t.x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + m->m30;
+        t.y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + m->m31;
+        t.z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + m->m32;
+        *out = t;
+    } else {
+        out->x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + m->m30;
+        out->y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + m->m31;
+        out->z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + m->m32;
+    }
+}
+
+extern "C" void fn_804023C4(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
+{
+    if (in == out) {
+        Unk804020F0_V4 t;
+        t.x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + in->w * m->m30;
+        t.y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + in->w * m->m31;
+        t.z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + in->w * m->m32;
+        t.w = in->x * m->m03 + in->y * m->m13 + in->z * m->m23 + in->w * m->m33;
+        *out = t;
+    } else {
+        out->x = in->x * m->m00 + in->y * m->m10 + in->z * m->m20 + in->w * m->m30;
+        out->y = in->x * m->m01 + in->y * m->m11 + in->z * m->m21 + in->w * m->m31;
+        out->z = in->x * m->m02 + in->y * m->m12 + in->z * m->m22 + in->w * m->m32;
+        out->w = in->x * m->m03 + in->y * m->m13 + in->z * m->m23 + in->w * m->m33;
+    }
 }
 
 extern "C" void fn_80402570(int a, int b);
