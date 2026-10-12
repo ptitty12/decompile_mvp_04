@@ -6,6 +6,9 @@
 #include "game/chooser.h"
 #include "game/tu_8024EF40.h"
 
+int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int a, int b, float* out, int c);
+extern const float lbl_805D967C;
+
 extern const Unk8024B99C_V3 lbl_806055DC;
 int fn_8025416C(Unk8024EF40_W* self, int a);
 float fn_801A20F8(Unk8022FE34_Ctx* c, int a, float f1, float f2);
@@ -446,6 +449,37 @@ int fn_8024D708(Unk80270BA0_X* x)
     chance = !(chance > 100.0f) ? (chance >? z) : 100.0f;
     float r = RandPct((Unk8024EF40_P*)x, lbl_805D9188, 0x3271);
     return r <= chance;
+}
+
+int fn_8024D8A0(Unk80270BA0_X* x, int* outA, float* outB)
+{
+    Unk8027C728_Goal* g = ((Unk8024B99C_V*)x)->m934;
+    int r = 0;
+    if (outA)
+        *outA = 0;
+    if (outB)
+        *outB = lbl_805D967C;
+    if (g) {
+        char* p = 0;
+        if (g->m10 == 0x11)
+            p = g->m18;
+        if (p) {
+            int k = *(int*)(p + 0x48);
+            if ((unsigned)(k - 1) <= 1 && *(int*)(p + 0x4C) != 0) {
+                r = 1;
+                if (outB) {
+                    Unk80279BB8 q(x);
+                    float f;
+                    Unk80271DBC_Link* l = x->m618;
+                    if (fn_80386110(l, &q, l->m838, 0xA0756559, &f, 0) & 0x10000)
+                        *outB = f;
+                }
+                if (k == 1 && outA)
+                    *outA = k;
+            }
+        }
+    }
+    return r;
 }
 
 int fn_8024D9A0(Unk80270BA0_X* x, int* out)
