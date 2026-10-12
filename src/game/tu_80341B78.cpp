@@ -243,7 +243,30 @@ unsigned short fn_80341FF4(Unk80341FF4* self)
 }
 
 void* fn_803774A8(int size, int heap);
-void fn_803EE7BC();
+int fn_803EE7BC();
+
+struct Unk803416F4 {
+    void* m0;
+    void* m4;
+    int m8;
+};
+void fn_8034170C(Unk803416F4* self);
+extern "C" {
+const char* fn_802B9300(const char* s, int a, int b, unsigned* outn);
+void fn_802B961C(const char* p, int a);
+void fn_803792AC(const char** pp, unsigned* pn);
+void fn_80329D1C(const char** pp, unsigned* pn, unsigned* out, int lo, int hi, int delim);
+void fn_80329AEC(const char** pp, const char** out, unsigned* pn, int delim);
+int strcmp(const char* a, const char* b);
+}
+/* Row loader object: m0 flag bytes, m4 index table, m8 expected row count, mC rows read, mD id bound. */
+struct Unk80342148 {
+    unsigned char* m0;
+    int* m4;
+    int m8;
+    unsigned char mC;
+    unsigned char mD;
+};
 
 struct Unk80341FFC {
     unsigned short* m0;
@@ -327,6 +350,84 @@ int fn_8034406C(Unk8034406C* self, unsigned short idx)
             r = 1;
     }
     return r;
+}
+
+/* near-miss: instruction sequence and block layout are identical to retail (181 of 181 insns); only the
+   callee-saved register numbering differs (22 slots): retail has names r24, end r23, rows r22, x r26, buf r25;
+   here names r22, rows r23, end r24, x r25, buf r26. global-alloc priority of names vs end/rows/x/buf is off
+   (end has 5 refs here, 3 would put names above it); the same loader shape repeats at fn_8034243C,
+   fn_80342730, fn_80342A24, fn_80342D18 (other constants). Early returns, not gotos, give retail's layout. */
+extern "C" void fn_80342148(Unk80342148* self, const char* text, const char** names)
+{
+    unsigned n;
+    const char* cur;
+    unsigned rem;
+    unsigned id1;
+    unsigned id2;
+    const char* tok;
+    if (fn_80342128((Unk80341FDC*)self) != 0)
+        return;
+    const char* buf = fn_802B9300(text, 0x500, 0xC, &n);
+    if (n == 0) {
+        fn_802B961C(buf, 0xC);
+        return;
+    }
+    const char* end = buf + n;
+    cur = buf;
+    rem = n;
+    fn_803792AC(&cur, &rem);
+    self->mC = 0;
+    self->mD = 0;
+    while (cur != end && rem > 1) {
+        id1 = 0;
+        fn_80329D1C(&cur, &rem, &id1, 1, 1000000, 0x2C);
+        if (!(self->mD > id1))
+            self->mD = (unsigned char)id1 + 1;
+        fn_803792AC(&cur, &rem);
+        self->mC++;
+    }
+    if (self->mC < self->m8) {
+        fn_802B961C(buf, 0xC);
+        return;
+    }
+    self->m0 = (unsigned char*)fn_803774A8(self->mC, 0);
+    fn_803EE7BC();
+    self->m4 = (int*)fn_803774A8(self->mD * 4, 0);
+    fn_803EE7BC();
+    int k;
+    for (k = 0; k < self->mD; k++)
+        self->m4[k] = fn_80342140((Unk80341FDC*)self);
+    unsigned prev = 0;
+    int j = 0;
+    int rows = 0;
+    int x = self->m8;
+    cur = buf;
+    rem = n;
+    fn_803792AC(&cur, &rem);
+    while (cur != end && rem > 1) {
+        fn_80329D1C(&cur, &rem, &id2, 1, 1000000, 0x2C);
+        if (rows != 0 && !(prev < id2)) {
+            fn_802B961C(buf, 0xC);
+            fn_8034170C((Unk803416F4*)self);
+            return;
+        }
+        fn_80329AEC(&cur, &tok, &rem, 0xD);
+        if (j < self->m8 && strcmp(tok, *names) == 0) {
+            self->m0[j] = (unsigned char)id2;
+            self->m4[id2] = j;
+            names++;
+            j++;
+        } else {
+            self->m0[x] = (unsigned char)id2;
+            self->m4[id2] = x;
+            x++;
+        }
+        rows++;
+        prev = id2;
+    }
+    for (; j != self->m8; j++) {
+    }
+    fn_802B961C(buf, 0xC);
 }
 
 struct Unk803440D0 {
