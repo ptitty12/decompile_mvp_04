@@ -608,7 +608,7 @@ void fn_80418BD4(void)
         DSPInit();
     }
     DSPAddTask(&o->task);
-    while (lbl_806EF59C == 0)
+    while (*(volatile s32*)&lbl_806EF59C == 0)
         ;
 }
 
