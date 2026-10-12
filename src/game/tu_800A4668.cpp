@@ -323,6 +323,81 @@ extern "C" void fn_800A641C()
     z0->mD74 = fn_800768E0(g, a);
 }
 
+extern "C" void fn_8040074C(void* p, int n);
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A2A8[];
+struct FeAr {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* vp;
+    int m14;
+};
+
+inline void FeArBase(FeAr* a, int* buf, int cap)
+{
+    a->vp = lbl_8064B298;
+    a->m0 = buf;
+    a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+
+inline void FeArMid(FeAr* a)
+{
+    a->m4 = 0;
+    a->mC = 0;
+    a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
+
+inline void FeArD3(FeAr* a)
+{
+    a->vp = lbl_8064A2A8;
+    a->m4 = 0;
+    a->mC = 0;
+    a->m14 = 0;
+}
+
+inline void FeArDtor(FeAr* a)
+{
+    a->vp = lbl_8064A550;
+}
+
+extern "C" void fn_805371C4(FeAr* a, int mask);
+extern "C" int fn_8007B3E0(int g, int a, int b);
+extern "C" void fn_8007B4A8(int g, int a, int b, int c);
+
+inline unsigned FeArCount(FeAr* a)
+{
+    return a->m4;
+}
+inline int FeArGet(FeAr* a, int i)
+{
+    char* b = (char*)a->m0;
+    int off = i * 4;
+    return *(int*)(b + off);
+}
+extern "C" void fn_800A6484()
+{
+    int g = lbl_8061930C;
+    FeAr a;
+    int buf[0x82];
+    FeArBase(&a, buf, 0x82);
+    FeArMid(&a);
+    FeArD3(&a);
+    fn_805371C4(&a, 0x7000003F);
+    for (unsigned i = 0; i < FeArCount(&a); i++) {
+        int h = fn_80075948(g, FeArGet(&a, i));
+        fn_8007B4A8(g, 0x16, h, fn_8007B3E0(g, 0x17, h));
+        fn_8007B4A8(g, 0x17, h, fn_8007B3E0(g, 0x18, h));
+        fn_8007B4A8(g, 0x18, h, fn_8007B3E0(g, 0x19, h));
+        fn_8007B4A8(g, 0x19, h, 0);
+    }
+    FeArDtor(&a);
+}
+
 struct Unk800A65F4 {
     char pad0[0x24];
     void* m24;
