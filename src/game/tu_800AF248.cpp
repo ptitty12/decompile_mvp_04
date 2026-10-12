@@ -561,12 +561,10 @@ extern "C" void fn_800AFD2C(FEObj58* self)
     self->m58 = 0;
 }
 
-/* near-miss (3 slots): retail loads the switch index into r11 (not r0) before the table add; forms with a local index, byte offset or int* base tried */
+inline int At4(char* b, int i) { int o = i * 4; return *(int*)(b + o); }
 extern "C" void fn_800AFD70(FEObAF* self)
 {
-    char* t = (char*)self->m4->m6F8->m10 + 0x154;
-    int o = self->m0 * 4;
-    int v = *(int*)(t + o);
+    int v = At4((char*)self->m4->m6F8->m10 + 0x154, self->m0);
     int r;
     switch (v) {
     case 0:
