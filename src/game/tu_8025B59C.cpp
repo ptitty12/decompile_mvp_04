@@ -159,6 +159,7 @@ int fn_80269E84(void* g, P* p, int k);
 struct Unk80270BA0_X;
 float fn_8024D050(Unk80270BA0_X* x, int a, int b, float c, float d);
 int fn_8026DAE8(P* p, int k);
+int fn_8026D788(P* p, int k);
 char* fn_8035E8CC(char* p, unsigned i);
 void* fn_8035E604(void* p);
 void fn_8035E704(char* t, int i);
@@ -832,6 +833,33 @@ int fn_8025DC40(I* self, int* a, int* b, int* c, int* d)
         r = 1;
     }
     return r;
+}
+
+void fn_8025DD20(I* self, P* p)
+{
+    if (p != 0) {
+        int owner = fn_801A2034(self->m1EC, 3);
+        int s0, s1, s2, s3;
+        if (fn_8026D788(p, 0) == 0 && p->m618->m838 == 0x8BE34829 && fn_802D7DB4(owner, 0xB5) == 0
+            && fn_802D7DB4(owner, 0xB6) == 0 && fn_8025DC40(self, &s0, &s1, &s2, &s3) != 0
+            && (s0 != 0 || s1 != 0 || s2 != 0 || s3 != 0)) {
+            P* t = fn_80257B40((M*)self->m1F0);
+            if (t != 0) {
+                do {
+                    if (fn_8026DAE8(t, 0) != 0) {
+                        int r = 0;
+                        if (s2 != 0 || (s0 != 0 && t == p))
+                            r = fn_80269F88((char*)self + 0x190, t, 7);
+                        else if (s3 != 0 || (s1 != 0 && t == p))
+                            r = fn_80269F88((char*)self + 0x190, t, 8);
+                        if (r != 0 && p != 0)
+                            fn_8035E704((char*)self + 0x204, p->m458);
+                    }
+                    t = fn_80257BD0((M*)self->m1F0, t, 0);
+                } while (t != 0);
+            }
+        }
+    }
 }
 
 void fn_8025DED4(I* self)
