@@ -8,6 +8,7 @@
 typedef Unk801B7FB0_P P;
 typedef Unk801C16B0_Z Z;
 typedef Unk801CAFA0_V2 V2;
+typedef V2 (*Unk801CAFA0_VaFn)(Z*, ...);
 
 extern "C" {
 void fn_801CB360(Z* z);
@@ -49,6 +50,7 @@ float fn_8024EF40(void* a, P* b, int c);
 V2 fn_8022EA60(void* a, ...);
 float fn_801CD8D4(Z* z);
 void fn_801CC964(Z* z);
+V2 fn_801CD94C(Z* z);
 float fn_801CC218(Z* z);
 float fn_801CC30C(Z* z);
 float fn_801CC648(Z* z);
@@ -247,6 +249,30 @@ extern "C" void fn_801CC964(Z* z)
     lbl_8068C420.m84 = fn_8022EA60(z->m4->m3B0);
 }
 
+extern "C" float fn_801CCA40(Z* z)
+{
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    float r = 0.0f;
+    if (!(v.y >= 0.0f)) {
+        const float lo = 0.5f;
+        float t = AbsF(v.y);
+        t = !(t > 1.3f) ? (t >? lo) : 1.3f;
+        t = t - lo;
+        t = t * 1.2500001f;
+        t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+        r = -t;
+    } else {
+        const float lo = 0.5f;
+        float t;
+        t = !(v.y > 1.3f) ? (v.y >? lo) : 1.3f;
+        t = t - lo;
+        t = t * 1.2500001f;
+        t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+        r = t;
+    }
+    return r;
+}
+
 /* near-miss: retail keeps the low bound in f31 across the call (33 vs 34 instructions here). */
 extern "C" float fn_801CD068(Z* z)
 {
@@ -354,8 +380,6 @@ extern "C" float fn_801CDA14(Z* z)
 extern "C" float fn_801CDA6C(void) { return -1.3f; }
 
 extern "C" float fn_801CDA78(void) { return 1.3f; }
-
-typedef V2 (*Unk801CAFA0_VaFn)(Z*, ...);
 
 extern "C" int fn_801CDA84(Z* z)
 {
