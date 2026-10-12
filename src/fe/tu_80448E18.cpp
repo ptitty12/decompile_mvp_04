@@ -394,10 +394,9 @@ extern "C" FE_OVERLAY int fn_8044A544(FeScr_8044974C* self)
     return 1;
 }
 
-/* near-miss (99.7%): retail keeps the m140 slot value in r30 and the base/offset in r29/r28 (one more callee-saved
- * register, stmw r28); ours uses r0 for the value and r30/r29 for base/offset (6 attempts: base/offset locals, value re-read) */
 extern "C" FE_OVERLAY int fn_8044A5F0(FeScr_8044974C* self)
 {
+    int v;
     if (fn_8044C3EC(self) == 1) {
         fn_8001BC4C()->fn_8001BDAC(0xA3);
         FeObj* p = self->m168;
@@ -411,7 +410,8 @@ extern "C" FE_OVERLAY int fn_8044A5F0(FeScr_8044974C* self)
     } else {
         int idx = ((FeObjI*)self->m168)->v60();
         if (self->m168 == self->m13C) {
-            int v = IntAt((char*)self + 0x178, idx * 4);
+            char* bs = (char*)self + 0x178;
+            v = IntAt(bs, idx * 4);
             if (v != 0) {
                 fn_8001BC4C()->fn_8001BDAC(0xA3);
                 FeLV* L = (FeLV*)self->m160;
@@ -419,7 +419,7 @@ extern "C" FE_OVERLAY int fn_8044A5F0(FeScr_8044974C* self)
                 ((FeObj2*)self->m160)->v88(0, ((FeObjI*)self->m168)->v59() > 1);
             }
         } else if (self->m168 == self->m140) {
-            int v = IntAt((char*)self + 0x1DC, idx * 4);
+            v = IntAt((char*)self + 0x1DC, idx * 4);
             if (v != 0) {
                 fn_8001BC4C()->fn_8001BDAC(0xA3);
                 FeLV* L = (FeLV*)self->m160;
