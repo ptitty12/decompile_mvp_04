@@ -7,6 +7,7 @@
 #include "game/tu_8024EF40.h"
 
 extern const Unk8024B99C_V3 lbl_806055DC;
+int fn_8025416C(Unk8024EF40_W* self, int a);
 float fn_801A20F8(Unk8022FE34_Ctx* c, int a, float f1, float f2);
 float fn_801A2158(Unk8022FE34_Ctx* c, int a);
 float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
@@ -414,6 +415,78 @@ int fn_8024D4C0(Unk80270BA0_X* x)
     if (v <= hi && v >= lo)
         return 1;
     return 0;
+}
+
+class Unk8024D9A0_VT {
+public:
+    char pad0[0x98];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual int v4();
+};
+int fn_8024D9A0(Unk80270BA0_X* x, int* out)
+{
+    int r = 0;
+    Unk8024EF40_W* w = (Unk8024EF40_W*)((char*)x + 0x588);
+    int a = fn_8025416C(w, 0x21);
+    int b = fn_8025416C(w, 0);
+    if (((Unk8024D9A0_VT*)x)->v4()) {
+        if (a == 37 && b == 461) {
+            r = 1;
+            *out = 2;
+        }
+        else if (a == 17 && b == 333) {
+            r = 1;
+            *out = 3;
+        }
+        else if (a == 15 && b == 302) {
+            r = 1;
+            *out = 4;
+        }
+        else if (a == 26 && b == 660) {
+            r = 1;
+            *out = 13;
+        }
+        else if (a == 0 && b == 240) {
+            r = 1;
+            *out = 14;
+        }
+    } else {
+        if (a == 35 && b == 830) {
+            r = 1;
+            *out = 5;
+        }
+        else if (a == 9 && b == 832) {
+            r = 1;
+            *out = 6;
+        }
+        else if (a == 36 && b == 96) {
+            r = 1;
+            *out = 7;
+        }
+        else if (a == 52 && b == 1239) {
+            r = 1;
+            *out = 8;
+        }
+        else if (a == 21 && b == 757) {
+            r = 1;
+            *out = 9;
+        }
+        else if (a == 12 && b == 339) {
+            r = 1;
+            *out = 10;
+        }
+        else if (a == 19 && b == 808) {
+            r = 1;
+            *out = 11;
+        }
+        else if (a == 8 && b == 724) {
+            r = 1;
+            *out = 12;
+        }
+    }
+    return r;
 }
 
 void fn_8024DB54() {}
