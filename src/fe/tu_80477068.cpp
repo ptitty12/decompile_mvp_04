@@ -191,6 +191,29 @@ extern "C" FE_OVERLAY void fn_80479A28(int a)
         fn_8047AE14(fn_800B7A94(FeGetMgr(), "FPLAYORSIMMULTI"), 6);
 }
 
+extern "C" FE_OVERLAY void fn_80479BFC(char* x)
+{
+    void* s = lbl_8061930C;
+    int i = 0;
+    int o = 0;
+    char* a;
+    char* b;
+    goto test;
+inc:
+    o += 12;
+    i++;
+test:
+    if (i < *(int*)(x + 0x134)) {
+        a = x + 0x14C;
+        b = x + 0x150;
+        if (fn_8007FDA8__FP13Unk8007F198_Cii(s, *(int*)(a + o), *(int*)(b + o)) == 1) {
+            fn_80479C9C(x, i);
+            goto inc;
+        }
+        FeWp(x, 0x1C0)->fn_vslot68(i);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_8047A384(FeW* x)
 {
     char sp8[0x40];
@@ -203,6 +226,19 @@ extern "C" FE_OVERLAY void fn_8047A384(FeW* x)
     fn_800DD44C(sp48, sp8, 1);
     ((FeWV28*)a)->s28(sp8);
     ((FeWV28*)b)->s28(sp8);
+}
+
+extern "C" FE_OVERLAY int fn_8047A9DC(char* x)
+{
+    int i;
+    int c = 0;
+    for (i = 0; i < *(int*)(x + 0x134); i++) {
+        int o = i * 12;
+        char* b = x + 0x154;
+        if (*(int*)(b + o) == 1)
+            c++;
+    }
+    return c;
 }
 
 extern "C" FE_OVERLAY void fn_8047AA20(char* x)
