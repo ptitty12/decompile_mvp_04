@@ -604,16 +604,24 @@ DB_OVERLAY void* fn_8053DD34(void* self, int a)
     return self;
 }
 
-/* near-miss: same stack-buffer addressing as fn_8053DB30 (retail: addi r3,r1,8 / addi r3,r1,12
- * per call, halfwords read from the frame); ours also narrows the subtraction to bytes. */
+/* Same layout as Db8053CC9C_Buf3, but with a trivial destructor: that makes it BLKmode and
+   addressable from its declaration, so each `&b` is rebuilt (`addi r3,r1,N`) and the fields
+   are read straight from the frame. */
+struct Db8053DD68_Buf {
+    unsigned short a;
+    unsigned short b;
+    ~Db8053DD68_Buf() {}
+};
+
 DB_OVERLAY Db8053CC9C_SrcBits* fn_8053DD68(Db8053CC9C_SrcBits* dst, Db8053CC9C_Src2* src)
 {
-    Db8053CC9C_Buf3 b1;
-    Db8053CC9C_Buf3 b2;
+    Db8053DD68_Buf b1;
+    Db8053DD68_Buf b2;
     fn_80329FA0(&b1, 1);
     unsigned short y1 = b1.b;
     fn_80329FA0(&b2, src->f0);
-    dst->yr = b2.b - y1;
+    unsigned short y2 = b2.b;
+    dst->yr = y2 - y1;
     dst->g1 = src->f9;
     dst->g2 = src->f5;
     return dst;
