@@ -236,6 +236,40 @@ void fn_80082510(Tree* self)
     self->m4 = &lbl_8061932C;
 }
 
+typedef Node** (*Acc82588)(void*);
+
+/* near-miss: register numbers only (retail keeps the rotation-direction pair in r26/r27 and the copy of its function pointer in r25) */
+void fn_80082588(Node** root, Node* x, P8* A, P8* B)
+{
+    P8 pa = *A;
+    P8 pb = *B;
+    int dB = pb.a >> 16;
+    Acc82588 fb = (Acc82588)pb.b;
+    int dA = pa.a >> 16;
+    Acc82588 fa = (Acc82588)pa.b;
+    char* xb = (char*)x + dB;
+    Node* y = *fb(xb);
+    char* ya = (char*)y + dA;
+    *fb(xb) = *fa(ya);
+    if (*fa(ya) != &lbl_8061932C)
+        (*fa(ya))->m0 = x;
+    if (y != &lbl_8061932C)
+        y->m0 = x->m0;
+    Node* p = x->m0;
+    if (p != &lbl_8061932C) {
+        Node** r;
+        if (x == *fa((char*)p + dA))
+            r = fa((char*)x->m0 + dA);
+        else
+            r = fb((char*)x->m0 + dB);
+        *r = y;
+    } else
+        *root = y;
+    *((Acc82588)pa.b)((char*)y + (pa.a >> 16)) = x;
+    if (x != &lbl_8061932C)
+        x->m0 = y;
+}
+
 void fn_80082840(Node** root, Node** cur)
 {
     P8 a;
