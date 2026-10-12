@@ -4,6 +4,15 @@
  */
 #include "game/tu_8034B370.h"
 
+struct Unk803622F0_Data {
+    int m0;
+};
+
+struct Unk803622F0 : Unk803622F0_Data {
+    virtual void v1(char** cur, void* buf, int n);
+    virtual int v2();
+};
+
 struct Unk803548BC { char pad0[0x14]; Unk80353E68 m14; };
 extern char lbl_8064B5D8[];
 struct DtorAt10 { char pad[0x10]; const void* m; };
@@ -39,6 +48,43 @@ int fn_80354504(Unk803541D4* s, const Unk803541D4_E* key)
     return -1;
 }
 
+extern "C" void fn_803545BC(Unk803541D4* self, char** cursor, Unk803622F0* st)
+{
+    Unk803541D4_E tmp;
+    unsigned cnt;
+    unsigned cur;
+    if (st->v2() == 1) {
+        unsigned i = 0;
+        fn_8040B190(*cursor, &self->m4, 4);
+        *cursor += 4;
+        fn_8040B190(*cursor, &self->mC, 4);
+        *cursor += 4;
+        for (; i < self->m4; i++) {
+            int o = i * 0x24;
+            tmp = *(Unk803541D4_E*)((char*)self->m0 + o);
+            st->v1(cursor, &tmp, 0x24);
+        }
+    } else {
+        unsigned j;
+        fn_8040B190(&cnt, *cursor, 4);
+        *cursor += 4;
+        fn_8040B190(&cur, *cursor, 4);
+        *cursor += 4;
+        if (st->m0 == 0) {
+            self->m4 = cnt;
+            self->mC = cur;
+            self->Clear();
+        }
+        for (j = 0; j < cnt; j++) {
+            st->v1(cursor, &tmp, 0x24);
+            if (st->m0 == 0)
+                self->Add(tmp);
+        }
+        if (st->m0 == 0)
+            self->mC = cur;
+    }
+}
+
 void fn_803548BC(Unk803548BC* s)
 {
     s->m14.Clear();
@@ -69,6 +115,19 @@ int fn_803549B8(Unk803549B8* s)
     return s->m18;
 }
 
+inline unsigned Cnt803549C0(Unk80353E68* p) { return p->m4; }
+int fn_803549C0(Unk80354940* s, int idx)
+{
+    Unk803541D4_E* e = &s->m0[idx];
+    unsigned i;
+    for (i = 0; i < Cnt803549C0(&s->m14); i++) {
+        int o = i * 4;
+        if (e->m0 == *(int*)((char*)s->m14.m0 + o))
+            return 0;
+    }
+    return 1;
+}
+
 int fn_80354A1C(Unk80354940* s)
 {
     int n = 0;
@@ -89,6 +148,23 @@ Unk803541D4_E* fn_80354A94(Unk80354940* s, unsigned n)
         }
     }
     return s->m0;
+}
+
+void fn_80354B30(Unk80354940* s, unsigned n, const Unk803541D4_E* src)
+{
+    unsigned i = 0;
+    unsigned cnt = 0;
+    for (; i < s->m4; i++) {
+        if (s->v19(i) == 1) {
+            if (cnt++ >= n) {
+                Unk803541D4_E tmp = *src;
+                if (i >= s->m4)
+                    s->m4 = i + 1;
+                s->m0[i] = tmp;
+                return;
+            }
+        }
+    }
 }
 
 int fn_80354CA8(Unk80353E68* s)
@@ -140,15 +216,6 @@ void fn_80354DEC(Unk80353E68* s, int v)
 {
     s->mC = v;
 }
-
-struct Unk803622F0_Data {
-    int m0;
-};
-
-struct Unk803622F0 : Unk803622F0_Data {
-    virtual void v1(char** cur, void* buf, int n);
-    virtual int v2();
-};
 
 extern "C" void fn_80354DF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
 {
@@ -238,6 +305,42 @@ void fn_803550A8(Unk80353ECC* s)
 int fn_803550DC(Unk80353ECC* s, int a)
 {
     return s->v3() == a;
+}
+
+extern "C" void fn_80355128(Unk80353234* self, char** cursor, Unk803622F0* st)
+{
+    unsigned char tmp;
+    unsigned cnt;
+    unsigned cur;
+    if (st->v2() == 1) {
+        unsigned i = 0;
+        fn_8040B190(*cursor, &self->m4, 4);
+        *cursor += 4;
+        fn_8040B190(*cursor, &self->mC, 4);
+        *cursor += 4;
+        for (; i < self->m4; i++) {
+            tmp = self->m0[i];
+            st->v1(cursor, &tmp, 1);
+        }
+    } else {
+        unsigned j;
+        fn_8040B190(&cnt, *cursor, 4);
+        *cursor += 4;
+        fn_8040B190(&cur, *cursor, 4);
+        *cursor += 4;
+        if (st->m0 == 0) {
+            self->m4 = cnt;
+            self->mC = cur;
+            self->Clear();
+        }
+        for (j = 0; j < cnt; j++) {
+            st->v1(cursor, &tmp, 1);
+            if (st->m0 == 0)
+                self->Add(tmp);
+        }
+        if (st->m0 == 0)
+            self->mC = cur;
+    }
 }
 
 struct Unk803552F8 {
@@ -359,6 +462,43 @@ int fn_803556AC(Unk80355414* s, const Unk80355414_E* key)
             return i;
     }
     return -1;
+}
+
+extern "C" void fn_80355734(Unk80355414* self, char** cursor, Unk803622F0* st)
+{
+    Unk80355414_E tmp;
+    unsigned cnt;
+    unsigned cur;
+    if (st->v2() == 1) {
+        unsigned i = 0;
+        fn_8040B190(*cursor, &self->m4, 4);
+        *cursor += 4;
+        fn_8040B190(*cursor, &self->mC, 4);
+        *cursor += 4;
+        for (; i < self->m4; i++) {
+            int o = i * 0x1C;
+            tmp = *(Unk80355414_E*)((char*)self->m0 + o);
+            st->v1(cursor, &tmp, 0x1C);
+        }
+    } else {
+        unsigned j;
+        fn_8040B190(&cnt, *cursor, 4);
+        *cursor += 4;
+        fn_8040B190(&cur, *cursor, 4);
+        *cursor += 4;
+        if (st->m0 == 0) {
+            self->m4 = cnt;
+            self->mC = cur;
+            self->Clear();
+        }
+        for (j = 0; j < cnt; j++) {
+            st->v1(cursor, &tmp, 0x1C);
+            if (st->m0 == 0)
+                self->Add(tmp);
+        }
+        if (st->m0 == 0)
+            self->mC = cur;
+    }
 }
 
 void fn_803559C0(Unk803548BC* s)
