@@ -678,7 +678,7 @@ Matched 17 functions in 7 units with these recipes. Each recipe is one source ch
   recomputed at each call.
 - fn_800A3DF8's local is a polymorphic 8-byte object. Its out-of-line ctor
   fn_80353218 stores m0 = 0 and the vptr at +4.
-- Still open: locals at a nonzero frame offset. expand_expr(ADDR_EXPR) runs
+- Solved in Hard-case families 4 (inline-argument recipe): locals at a nonzero frame offset. expand_expr(ADDR_EXPR) runs
   force_operand, which makes a pseudo, and CSE keeps it. That covers the v8
   name-swap methods in tu_80094578 (char[0x14] at sp+0x18).
 
@@ -696,7 +696,7 @@ Matched 17 functions in 7 units with these recipes. Each recipe is one source ch
   fuzzy regressions, so when you park a function, keep the higher-scoring form.
 
 ### Still open (mechanism known)
-- Dead `cmpwi`/`cmplwi` before `li r3,0; blr` (fn_8006FB10, FB1C, FF9C,
+- Solved in Hard-case families 4: dead `cmpwi`/`cmplwi` before `li r3,0; blr` (fn_8006FB10, FB1C, FF9C,
   FFD0, fn_80071138, fn_80071154):
   - After reload with sched2 on, delete_computation deletes only the jump.
     The compare stays ("REG_DEAD notes not accurate").
@@ -798,6 +798,130 @@ source change.
   hoisting in fn_800E9074: not attempted. The mechanism notes in Hard-case
   families 2 still stand.
 
+## Hard-case families 4 (Opus, 2026-10-11)
+
+Matched 19 functions in 9 units. The dead-compare switches and the per-call frame
+address both have a general recipe now. Scratch tools are in `scratchpad/W8o4/`.
+
+### Dead-compare switches (16 functions)
+- Where the dead compares come from:
+  - With sched2 on, jump2's delete_computation deletes only the jump and never
+    the compare.
+  - A compare survives exactly when its jump first became redundant in jump2.
+  - A jump that dies earlier (in jump1, or in the jump passes after CSE and CSE2)
+    loses its compare too, because CSE or flow deletes the dead compare.
+- So the case *bodies* decide which compares are left. The tree itself is plain
+  balance_case_nodes output: this build never makes a jump table, nodes are
+  balanced by count, and ranges count twice.
+
+  | Case body | Removed by | What is left |
+  |---|---|---|
+  | `break;` (empty) | expand / jump1 | nothing, but the node still counts in the balance |
+  | `r = 0;` after `int r = 0;` | CSE (redundant set); the jump passes after CSE and CSE2 peel two layers | interior nodes keep `cmpwi X; beq; cmplwi X; bgt`, chains and leaves vanish |
+  | a dead store that CSE keeps (`kind = 0;` on the switch variable) | flow | every compare; jump2 kills the jumps |
+  | distinct `return <v>;` per case | jump2 cross-jumping | every compare, `beq` into the shared returns |
+
+- Recipes, by retail shape:
+  - **All-zero column stubs** (only `cmpwi/cmplwi` pairs, then `li r3,0; blr`):
+    `int r = 0; switch ((unsigned)k) { case 0: r = 0; break; ... case N-1: r = 0; break; } return r;`.
+    N is the column count of the table's getter. 4 for fn_8006FB28 gives a lone
+    `cmpwi r4,1`; then 7, 12, 14 and 56. Matched fn_8006FB10, FB1C, FF9C, FFD0,
+    fn_80071138, fn_80071154, fn_8009FDC8, fn_8009FDD4, fn_8009E060 and fn_80598B3C.
+  - **Mixed tables with `li r3,0` at the top and `beqlr`**: the same form with
+    `r = <v>;` per case, values read from the tree. fn_80598AB4 returns 100 for
+    columns 10..13.
+  - **Constant tables without the top `li r3,0`**: one `return <v>;` per case and
+    `return 0;` after the switch. The index is signed, so `cmpwi X; beq; bgt`
+    share one compare. Matched fn_8059F680 (119 cases) and fn_8059FADC (63).
+  - **Result in a stack slot** (`stw r0,8(r1)` ... `lwz r3,8(r1)`): use a union or
+    struct local, e.g. `union { int i; float f; } v; v.i = 0; ... return v.i;`.
+    The leaf cases keep their own `li r0,0; b` blocks, which jump2 cannot
+    cross-jump. Matched fn_8009DDE4.
+  - **Void switch with bare `cmpwi X; b end` compares** (fn_80055D84):
+    - List every kind of the sibling switch (fn_80055204, 95 kinds).
+    - Kinds that leave no compare in retail are plain `break;`. They still weight
+      the tree; they were the "two nodes longer" root shift.
+    - Kinds with a bare compare do `kind = 0;`, where `kind` is the switch
+      variable. That store survives CSE, and flow deletes it.
+  - **Slot index form** (fn_8059B280): every case assigns, zero arms included
+    (`s = 0;`), with no `default`. Range-46 needed the opposite (`default: s = 0;`)
+    on other functions, so try both forms.
+- Signedness: a `cmplwi` after each `cmpwi` means an unsigned index
+  (`switch ((unsigned)k)`). One `cmpwi` shared by `beq` and `bgt` means signed.
+- Tools in `scratchpad/W8o4/` (copy a unit to scratch before compiling it):
+  - `deadcmp.py <repo> [busy]` lists unmatched functions with a compare whose
+    result is never read.
+  - `solve.py <repo> <unit> <fn>` tries the all-zero stub over 0..N
+    (`BMAX` env), with int and unsigned index.
+  - `treeval.py <repo> <unit> <fn> lo hi` prints the value the tree returns for
+    each index.
+  - `mixsolve.py <repo> <unit> <fn> [maxN]` takes that table and tries the
+    `r = v` and `return v` forms. A run takes seconds.
+  - `cmp.py <repo> <unit> <fn> file.cpp` scores every function in a scratch file
+    against one target.
+- Solved in scratch but not committed (busy units). The owners can paste these:
+  - db/tu_8052CA60: fn_8052CC18 is all-zero 0..16; fn_8052CB74 is `r = v` 0..16.
+  - db/tu_8052E4C0: fn_8052E8D8 is all-zero 0..34; fn_8052E754 is `r = v` 0..34;
+    fn_8052F554 and fn_8052F590 are all-zero 0..12.
+  - db/tu_8052FF10: fn_805300D0 is all-zero 0..17; fn_80530024 is `r = v` 0..17.
+  - db/tu_8053CC9C: fn_8053CE50 is all-zero 0..14; fn_8053CDB0 is `r = v` 0..14.
+  - game/tu_80089894 (all-zero): fn_8008AC68 0..8, fn_8008B3E8 0..13,
+    fn_8008BEF0 and fn_8008BF24 0..11, fn_80089A0C 0..27.
+  - game/tu_8008CE64: fn_8008EC78 is all-zero 0..26. fn_8008CE64 itself is not
+    this shape.
+  - game/tu_80084910: fn_80084BDC is all-zero 0..21.
+  - Every index above is `(unsigned)`.
+
+### Frame addresses rebuilt at every call (2 functions; 2 busy-unit cases in scratch)
+- Mechanism: `&local` goes through expand_expr(ADDR_EXPR) and force_operand.
+  - At a nonzero frame offset that makes a pseudo per use. CSE merges them into
+    the first one, which then lives in a saved register.
+  - At offset 0 the address is `virtual-stack-vars` itself, so no pseudo is made.
+- Recipe 1, a buffer at a nonzero offset used by several calls: call through an
+  inline wrapper, `inline void StrCpy(char* d, const char* s) { fn_8040B61C(d, s); }`.
+  - Inline arguments are expanded with EXPAND_SUM.
+  - A frame address is substituted into the inline body at each use, so every
+    call gets its own `addi r3,r1,N`.
+  - Matched v8__11Tbl80094800 and v8__11Tbl800956D8.
+  - Check the frame size. Their buffer is char[0x10]: BLKmode sizes round up to
+    8, so char[0x14] gave a frame 8 bytes too big.
+- Recipe 2, a struct stored to 8(r1) before each call (fe fn_804CF304, fn_804CF368):
+  - The callee takes the struct *by value*. SysV passes an aggregate as a pointer
+    to a caller temp, and the temp is freed after each call, so both calls use
+    8(r1) and rebuild `addi r4,r1,8`.
+  - When the extern "C" prototype in the header takes a pointer, call through a cast:
+    `((void (*)(FeSlot44*, FePair))fn_804D21B8)(&x->m188, lbl_805F84B8);`.
+  - fn_804CF304 matches in scratch (fe/tu_804CE408 is busy).
+- Recipe 3, a 4-byte record whose address is passed once: a 4-byte struct is
+  SImode and goes through ADDRESSOF.
+  - Give it a trivial destructor (`~T() {}`). It becomes BLKmode and addressable
+    from its declaration, so `&b` is rebuilt per use and fields are read straight
+    from the frame.
+  - In scratch, db fn_8053DD68 is then left with one difference: a subtraction
+    narrowed to a byte load.
+  - fn_8053DB30 still differs in frame layout: retail has the by-value Date copy
+    at 8 and the buffer at 12.
+
+### A constant kept out of the saved registers (fn_800E9074)
+- The id `li` was hoisted by sched1 above the fn_800A2AE8 call, so id lived in r29.
+- Compute the bound first (`int q = fn_8056B7D0(...) - p;`), then
+  `int id = 0x4556; if (c >= q) { if (fn_800A2E6C(g) != 0) id = 0x4D52; else id = 0x4D50; }`.
+  Every id `li` then comes after the last call on its path, and id gets r4.
+
+### Still open
+- The callee-saved permutation cluster (db fn_80533120; fn_80536F28,
+  fn_80537054, fn_8053923C).
+  - In fn_80533120, retail sets the loop counter by copying the result's zero
+    (`li r30,0` ... `mr r31,r30`). That gives the result a fourth reference and a
+    global-alloc priority above col and self (r30, not r28).
+  - CSE turns every source copy tried back into `li`: `i = r`, `r = i`,
+    `r = i = 0`, and the int/unsigned mixes.
+- The FeArr m4/mC store swap (fe fn_8047BB8C, fn_8048A2AC): not attempted (busy units).
+- fn_800B08B0 (`lwz r0,16(r3); li r3,0; cmpwi r0,0; blr`):
+  `int r = 0; switch (p->m10) { case 0..3: r = 0; break; } return r;` gives the
+  right instructions, but the `li` lands after the compare instead of before it.
+- fn_8006A1F4 (0xA8 frame, `cmpwi 0x25; beq; cmpwi 0x26`): not attempted.
+
 ## Ranges 10-19 recipes (2026-10-11, condensed from worker reports)
 
 Literals and constants
@@ -865,7 +989,7 @@ Still open (Opus queue)
 - `t == 1 || t == 2` kept as two compares in retail (fold_range_test):
   fn_80254964, fn_8025E5E0, fn_8025CDD8.
 - Loop test at the top with a back edge to it: fn_80255284, fn_80257DFC.
-- Dead `cmpwi` before a constant return (mechanism in Hard-case families 2).
+- Dead `cmpwi` before a constant return: solved, see Hard-case families 4.
 
 ## Ranges 20-27 and second passes (2026-10-11, condensed)
 
@@ -999,8 +1123,8 @@ Still open (Opus queue)
     chklit_db.py are reusable.
   - check_literals.py now covers `.dboverlay`.
 - Open:
-  - dead-compare switch family (db units, about 8);
-  - nonzero-frame-offset local kept in a callee-saved register instead of
+  - dead-compare switch family (db units, about 8): solved, Hard-case families 4;
+  - (solved, Hard-case families 4) nonzero-frame-offset local kept in a callee-saved register instead of
     `addi r4,r1,8` per call;
   - callee-saved permutation cluster (80533120, 80536F28, 80537054,
     8053923C);
