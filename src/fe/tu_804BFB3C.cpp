@@ -4,6 +4,7 @@
  */
 
 #include "game/fe_804BE560.h"
+extern "C" int fn_80078A38__18Unk8007B2B0_Screeni(void* g, int a);
 extern "C" void fn_805296AC(int a, void* x);
 typedef void (*FeCbF)(int, void*);
 extern "C" void fn_801321D4(FeW* o, void* self, FeCbF cb, int a, void* b, int c, int d, int e, const char* s1, const char* s2,
@@ -467,6 +468,44 @@ extern "C" FE_OVERLAY void fn_804BFE54(FeObjR* o, int f, int id)
         a->fn_vslot8(f != 0 || fn_8007FDA8__FP13Unk8007F198_Cii(lbl_8061930C, id, 0) != 0);
     }
     o->m24->fn_vslot8(fn_80596538(lbl_8062196C, id));
+}
+
+extern "C" FE_OVERLAY int fn_804C004C(FeRecB* o, int i)
+{
+    int s = o->m8;
+    if (s == 2) {
+        o->m10 = -1;
+        o->m14 = -1;
+        o->m18 = -1;
+        return 3;
+    } else if (s == 0) {
+        int a = ((Fe19948X*)lbl_80619948)->m28;
+        int g = lbl_8062163C;
+        void* sc = lbl_8061930C;
+        int h = fn_800B5520(g);
+        int k = fn_80078A38__18Unk8007B2B0_Screeni(sc, lbl_8062163C);
+        int r = fn_80075CF0__Fii(h, fn_8007FBC0__FP13Unk8007F198_Cii(sc, i, k));
+        if (fn_8056A5B0(a, k, i, lbl_8062163C) == 1) {
+            o->m10 = -1;
+            o->m14 = -1;
+            o->m18 = -1;
+            return 3;
+        }
+        if (fn_8056AC44(a, i, k) != 0 && r == 0) {
+            o->m10 = -1;
+            o->m14 = -1;
+            o->m18 = -1;
+            return 3;
+        }
+    } else if (s == 4) {
+        if (fn_80075CF0__Fii(fn_800B5520(lbl_8062163C), ((FeGlobal80619948*)lbl_80619948)->m84) == 0) {
+            o->m10 = -1;
+            o->m14 = -1;
+            o->m18 = -1;
+            return 3;
+        }
+    }
+    return o->m8;
 }
 
 extern "C" FE_OVERLAY void fn_804C0164(FeVt20* x)

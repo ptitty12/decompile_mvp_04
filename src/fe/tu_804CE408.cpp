@@ -13,7 +13,6 @@ inline int FeFl9A8(FeScrM* x)
     return f;
 }
 
-
 extern "C" int fn_802D7CE0(int id, int a);
 extern "C" void fn_804D27B4(FeSlot44* p, int a);
 extern "C" void fn_804D233C(FeSlot44* p);
@@ -101,6 +100,50 @@ extern "C" FE_OVERLAY void fn_804CE714(FeScrM* x, int c)
     *(const void**)((char*)x + 0x39C) = lbl_80666EC0;
     *(const void**)((char*)x + 0x334) = lbl_80666EC0;
     fn_80330870(x, c);
+}
+
+extern "C" FE_OVERLAY void fn_804CE7F0(FeScrM* x, int k)
+{
+    int id = ((int*)x->m998)[x->m9A0];
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    if (k == 0 || k == 7) {
+        x->m97C[0] = x->m3E8[0].m4C;
+        x->m960[0] = s->fn_8007AEBC(x->m97C[0], id);
+    }
+    if (k == 1 || k == 7) {
+        x->m97C[1] = x->m3E8[1].m4C;
+        x->m960[1] = s->fn_800739E0(x->m97C[1], id, 1, FeFl9A8(x));
+    }
+    if (k == 2 || k == 7) {
+        x->m97C[2] = x->m3E8[2].m4C;
+        x->m960[2] = s->fn_80073710(x->m97C[2], id, 1);
+    }
+    if (k == 3 || k == 7) {
+        x->m97C[3] = x->m3E8[3].m4C;
+        x->m960[3] = s->fn_8007455C(x->m97C[3], id, 1);
+    }
+    int r = s->fn_8007A270(id);
+    if (r != 0) {
+        if (k == 4 || k == 7) {
+            x->m97C[4] = x->m3E8[4].m4C;
+            x->m960[4] = s->fn_8007B054(x->m97C[4], id);
+        }
+        if (k == 5 || k == 7) {
+            x->m97C[5] = x->m3E8[5].m4C;
+            x->m960[5] = s->fn_80075094(x->m97C[5], id, 1, FeFl9A8(x));
+        }
+        if (k == 6 || k == 7) {
+            x->m97C[6] = x->m3E8[6].m4C;
+            x->m960[6] = s->fn_80074754(x->m97C[6], id, 1);
+        }
+    } else {
+        x->m97C[4] = x->m3E8[4].m4C;
+        x->m97C[5] = x->m3E8[5].m4C;
+        x->m97C[6] = x->m3E8[6].m4C;
+        x->m960[4] = r;
+        x->m960[5] = r;
+        x->m960[6] = r;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804CE9D0(FeScrM* x)

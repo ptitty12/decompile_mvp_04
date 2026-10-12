@@ -4,6 +4,34 @@
  */
 
 #include "game/fe_804D08D0.h"
+class FeSub24 {
+public:
+    char pad0[0x24];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+extern "C" void fn_804CF304(FeS804DC128* x);
+extern "C" void fn_804D28B4(FeNav* n);
+extern "C" void fn_804CF6A4(FeS804DC128* x);
+extern "C" void fn_80125084(void* w, int a);
 
 extern "C" unsigned fn_8007DBB0__FP13Unk8007DB74_A(void* g);
 extern "C" void fn_8007CF44__18Unk8007B2B0_ScreenUiii(void* g, unsigned i, char* out, int a);
@@ -234,6 +262,85 @@ FE_OVERLAY void fn_804DCFC8(FeS804DC128* x)
     x->m694 = fn_800C8054(a->fn_vslot29(lbl_805F97EC));
     x->m68C = fn_800C8054(b->fn_vslot29(lbl_805F97D8));
     x->m690 = fn_800C8054(b->fn_vslot29(lbl_805F97EC));
+}
+
+extern "C" FE_OVERLAY void fn_804DD170(FeS804DC128* x)
+{
+    fn_804CF304(x);
+    void* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    FeNav* a = (FeNav*)((char*)x + 0x144);
+    FeNav* b = (FeNav*)((char*)x + 0x188);
+    fn_80124FA8(p, x);
+    ((int (*)(void*, int))fn_80125154)(p, -2);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 2, 0x3BED, 1);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x3BEC, 0);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 3, 0x1A2F, -5);
+    fn_804D28B4(a);
+    fn_804D28B4(b);
+    if (a->m38 == -1) {
+        fn_804D2118(a, 0);
+        x->m698->fn_vslot8(0);
+        x->m698->fn_vslot14(0);
+    } else if (b->m38 == -1) {
+        fn_804D2118(b, 0);
+        x->m69C->fn_vslot8(0);
+        x->m69C->fn_vslot14(0);
+    }
+    fn_8012E1C4((void*)x->m138, 1, 0x245F);
+    fn_8012E1C4((void*)x->m138, 0, 0x245F);
+    FeTeamRec* tr = lbl_806192E0->m4->m14;
+    int s1 = ((FeTeamRec*)((char*)tr + 0xE64))->m198;
+    int s0 = tr->m198;
+    ((FeSub24*)((char*)x->m688 + 0x98))->s20(s1, 0);
+    ((FeSub24*)((char*)x->m694 + 0x98))->s20(s1, 0);
+    ((FeSub24*)((char*)x->m68C + 0x98))->s20(s0, 0);
+    ((FeSub24*)((char*)x->m690 + 0x98))->s20(s0, 0);
+}
+
+extern "C" FE_OVERLAY void fn_804DD3C8(FeS804DC128* x)
+{
+    fn_804CF6A4(x);
+    void* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    FeG10* g = lbl_806192E0->m4->m10;
+    int a = g->m70;
+    int b = g->m6C;
+    if (a != -1) {
+        if (b != -1) {
+            if ((FeW24(x->m698) & 0x10000000) && (FeW24(x->m69C) & 0x10000000)) {
+                ((int (*)(void*, int))fn_80125084)(p, 2);
+                ((int (*)(void*, int))fn_80125084)(p, 3);
+                ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x1A0D, 0);
+                return;
+            }
+            ((int (*)(void*, int, int, int))fn_801251CC)(p, 2, 0x3BED, 1);
+            ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x3BEC, 0);
+            ((int (*)(void*, int, int, int))fn_801251CC)(p, 3, 0x1A2F, -5);
+            return;
+        }
+        int r1 = FeW24(x->m698);
+        if (r1 & 0x10000000) {
+            if (r1 & 0x40000000) {
+                ((int (*)(void*, int))fn_80125084)(p, 2);
+                ((int (*)(void*, int))fn_80125084)(p, 3);
+                ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x1A0D, 0);
+                return;
+            }
+        }
+    }
+    if (b != -1) {
+        int r2 = FeW24(x->m69C);
+        if (r2 & 0x10000000) {
+            if (r2 & 0x40000000) {
+                ((int (*)(void*, int))fn_80125084)(p, 2);
+                ((int (*)(void*, int))fn_80125084)(p, 3);
+                ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x1A0D, 0);
+                return;
+            }
+        }
+    }
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 2, 0x3BED, 1);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 0, 0x3BEC, 0);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 3, 0x1A2F, -5);
 }
 
 FE_OVERLAY void fn_804DD55C(FeS804DC128* x)
