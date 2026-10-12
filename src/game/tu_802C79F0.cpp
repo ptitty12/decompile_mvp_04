@@ -299,6 +299,73 @@ void fn_802C920C(char* buf, Unk802C920C_Req* req)
     fn_804089B4(buf, lbl_805E1918, c, n);
 }
 
+struct Unk802C94A0_List {
+    int w[0x52];
+};
+extern const char lbl_806604E0[];
+void* fn_8030AC4C(Unk802C94A0_List* p);
+
+struct Unk802C94A0_SlotD {
+    int m0;
+    Unk802C94A0_List m4;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+};
+
+class Unk802C94A0_Slot : public Unk802C94A0_SlotD {
+public:
+    Unk802C94A0_Slot()
+    {
+        m0 = 0;
+        fn_8030AC4C(&m4);
+        m14C = 0;
+        m150 = 0;
+        m154 = 0;
+        m158 = 0;
+        m15C = 0;
+        m160 = 0;
+    }
+    virtual ~Unk802C94A0_Slot();
+};
+
+struct Unk802C94A0 {
+    Unk802C94A0();
+    Unk802C94A0_Slot a;
+    Unk802C94A0_Slot b;
+    Unk802C94A0_Slot c;
+    Unk802C94A0_Slot* m438;
+    int m43C;
+    int m440;
+    int m444;
+    int m448[6];
+    int m460;
+    int m464;
+    int m468;
+    int m46C;
+    char pad470[0x4B0 - 0x470];
+    int m4B0;
+};
+
+/* near-miss (63 vs 64 insns): retail forms only the second slot's pointer (r28 = this + 0x168, shared with the +0x438 store) and addresses the other slots' fields off this; ours keeps pointers for both later slots. */
+Unk802C94A0::Unk802C94A0()
+{
+    m438 = &b;
+    m460 = 4;
+    m43C = 0;
+    m440 = 0;
+    m444 = 0;
+    for (int i = 0; i < 6; i++)
+        m448[i] = 0;
+    m464 = 0;
+    m468 = 0;
+    m46C = 0;
+    m4B0 = 0;
+}
+
 void fn_802C959C(Unk802C95F8* o, int v)
 {
     if (v != o->m4B0) {
@@ -349,10 +416,28 @@ void fn_802C9EA4(Unk802C9618* o, int a)
     o->m4908 = spC;
 }
 
+extern const char lbl_8060D1C4[];
+char* fn_8040B448(char* d, const char* s);
+void fn_803E910C(int a, const char* b, char* c, int** d);
+
+int fn_802CA518(int a, const char* b, int c)
+{
+    char buf[14] = "FBXdummyNode.";
+    char pad[0x70];
+    int* r;
+    fn_8040B448(buf, b);
+    fn_803E910C(c, lbl_8060D1C4, buf, &r);
+    int ret = -1;
+    if (r != 0)
+        ret = *r;
+    return ret;
+}
+
 Unk802CA5A0_Elem* fn_802CA5A0(Unk802CA5A0_Elem* t, int i)
 {
     return &t[i];
 }
+
 
 float fn_802CB67C(Unk802AEB4C* o, int id)
 {
