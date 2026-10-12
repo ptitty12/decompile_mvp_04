@@ -398,6 +398,24 @@ inline float Unk80238A40_LerpATB(float a, float t, float b)
 {
     return a + t * (b - a);
 }
+int Unk802362A8_Cpu::fn_802386A8(float* out)
+{
+    if (m2EC == 0) {
+        m2EC = 1;
+        out[1] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(this, 1.0f, 0x41D), 1.0f);
+        float r = Unk80238A40_RandC(this, 1.0f, 0x41F);
+        if (!(r >= 0.33f)) {
+            out[0] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(this, 1.0f, 0x423), -0.4f);
+        } else if (!(r >= 0.67f)) {
+            out[0] = Unk80238A40_LerpATB(-0.4f, Unk80238A40_RandC(this, 1.0f, 0x427), 0.4f);
+        } else {
+            out[0] = Unk80238A40_LerpATB(0.4f, Unk80238A40_RandC(this, 1.0f, 0x42B), 1.0f);
+        }
+        fn_80238934(out);
+    }
+    return 1;
+}
+
 int fn_80238A40(Unk802362A8_Cpu* c, float* out)
 {
     out[0] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(c, 1.0f, 0x461), 1.0f);
