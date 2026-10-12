@@ -25,7 +25,7 @@ extern char lbl_8060DAA8[];
 extern "C" int strlen(const char* s);
 extern "C" int strcmp(const char* a, const char* b);
 extern "C" char* strcpy(char* d, const char* s);
-extern "C" void fn_803EA1E0(void* p);
+extern "C" void fn_803EA1E0(Unk803EA068* o);
 extern "C" void fn_803E9C20(void* o, const char* s, void* v);
 extern "C" void fn_803EABA8();
 extern "C" void* fn_803DA440(void* self, void (*fn)(), void* a, void* b, void* c);
@@ -143,6 +143,31 @@ extern "C" char* fn_803EA160(void* o, const char* s, int v)
     strcpy(name, s);
     fn_803E9C20(o, s, p);
     return name;
+}
+
+extern "C" void fn_803EA1E0(Unk803EA068* o)
+{
+    if (o->m8 != 0) {
+        unsigned int i = 0;
+        if (i < (unsigned int)o->m4) {
+            do {
+                char* e = ((char**)o->m8)[i];
+                if (e != 0)
+                    lbl_8062C66C(e, strlen(e + 4) + 5);
+                ((int*)o->m8)[i] = 0;
+                i++;
+            } while (i < (unsigned int)o->m4);
+        }
+    }
+    o->m0 = 0;
+    if (o->m10 != 0) {
+        do {
+            int* n = (int*)o->m10;
+            o->m10 = n[2];
+            lbl_8062C66C(n, 0xc);
+        } while (o->m10 != 0);
+    }
+    o->m10 = 0;
 }
 
 extern "C" int fn_803EA2C4(unsigned char* t, int bit)
