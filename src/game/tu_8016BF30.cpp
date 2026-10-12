@@ -174,6 +174,82 @@ inline int CurId(Unk8016C1C4_List* l)
     return 0;
 }
 
+extern "C" char* fn_801519D8(int id);
+extern "C" int fn_80151A18(char* h, int j);
+extern "C" int fn_80151A28(char* h, int j);
+extern "C" int fn_80151A38(char* h, int j);
+extern "C" void fn_803295F0();
+extern "C" void fn_803296AC();
+struct Unk8016C004_X {
+    char pad0[0x120];
+    int m120;
+};
+struct Unk8016C004_W {
+    char pad0[0x10];
+    Unk8016C004_X* m10;
+};
+struct Unk8016C004_G {
+    char pad0[4];
+    Unk8016C004_W* m4;
+};
+extern Unk8016C004_G* lbl_806192E0;
+
+/* near-miss (99.9%): only the registers of the two strided list pointers in the last loop are swapped
+ * (retail r27 = +0x15C, r28 = +0x158; here the other way round). The CR0 save (mfcr/mtcrf) comes from the
+ * redundant second test of h. */
+void Unk8016C1C4_List::fn_8016C004(int a, int b) /* 8016C004 */
+{
+    char* h = fn_801519D8(a);
+    if (h == 0) {
+        ((Unk8016ACAC_Slot*)this)->fn_8016C6DC();
+        return;
+    }
+    if (b != 0) {
+        int p = (int)this;
+        int end = p + 0x968;
+        do {
+            fn_80359948((Unk8016C1C4_List*)p, 0);
+            ((Unk8016C1C4_List*)p)->mCur = 0;
+            p += 0xAC;
+        } while (p <= end);
+    }
+    for (int j = 0; j <= 0xC; j++) {
+        ((Unk801527C8_Ctx*)this)->fn_8016CE5C(j + 2);
+    }
+    fn_803295F0();
+    fn_803296AC();
+    if (h != 0) {
+        int one = 1;
+        if (mCur >= 0) {
+            m4[mCur].m0 = one;
+        }
+        fn_8016C620(0, (int)h + 4);
+        Unk8016C1C4_List* l1 = this + 1;
+        if (l1->mCur >= 0) {
+            l1->m4[l1->mCur].m0 = one;
+        }
+        fn_8016C620(1, (int)h + 0x14);
+        for (int j = 0; j <= 0xC; j++) {
+            if (fn_80151A28(h, j) != 0) {
+                char* pe = (char*)this + 0x15C + j * 0xAC;
+                int* pc = (int*)((char*)this + 0x158 + j * 0xAC);
+                int c = *pc;
+                int w = 1;
+                if (c >= 0) {
+                    *(int*)(pe + c * 0x14) = w;
+                }
+                int n = j + 2;
+                ((Unk801527C8_Ctx*)this)->fn_8016D038(n, fn_80151A38(h, j));
+                fn_8016C620(n, fn_80151A18(h, j));
+            }
+        }
+    }
+    ((Unk8016ACAC_Slot*)this)->mA20 = a;
+    if (lbl_806192E0->m4->m10->m120 == 1) {
+        *(float*)fn_801A6D84(((Unk801527C8_Ctx*)this)->mA4C, 1) = -1.0f;
+    }
+}
+
 int Unk8016C1C4_List::fn_8016C1C4(int idx) /* 8016C1C4 */
 {
     return CurId(this + idx);
