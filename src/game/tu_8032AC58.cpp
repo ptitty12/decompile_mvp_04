@@ -24,6 +24,15 @@ extern int lbl_806203FC;
 
 extern const char lbl_805ED994[];
 extern const float lbl_805ED99C;
+extern const char lbl_805ED8D4[];
+extern const char lbl_805ED8E4[];
+extern const char lbl_805ED8F4[];
+extern const float lbl_805ED904;
+extern const char lbl_805ED918[];
+extern const char lbl_805ED934[];
+extern const char lbl_805ED950[];
+extern const char lbl_805ED96C[];
+extern const float lbl_805ED980;
 extern "C" {
 void fn_801A750C(void* v, int a);
 float fn_801C3370(void* p);
@@ -37,7 +46,7 @@ void fn_801828AC(FxViewD* d);
 int fn_8040B6A0(const char* s);
 void fn_8033E958(const char* fmt, ...);
 void* fn_8040B830(void* dst, const void* src, int n);
-void fn_8032D8F8(float f);
+void fn_8032D8F8(void* self, float f);
 void fn_80313E94(FxCtx* c, int v);
 float fn_80313F28(FxCtx* c, const void* s);
 void fn_80330B48(void* p);
@@ -79,6 +88,9 @@ FxPairW* fn_8032DC2C(FxPairW* self, int name, FxInt2* a, int b, float* c, FxInt2
 FxPairW* fn_8032DD00(FxPairW* self, int name, int a, FxInt2 d, FxInt2 e, FxInt2 f, float g);
 FxTripW* fn_8032E0B4(FxTripW* self, int name, FxInt3* a, int b, float* c, int d, FxInt3 e, FxInt3 f, FxInt3 g);
 FxTripW* fn_8032E1DC(FxTripW* self, int name, int a, int b, FxInt3 e, FxInt3 f, FxInt3 g, float h);
+void fn_8032DDD0(FxPairW* self);
+void fn_803145D8(FxCtx* c, const void* s, int color, float x, float y, int b);
+void fn_8032E38C(FxTripW* self);
 // PROTOS-END
 }
 
@@ -271,7 +283,20 @@ void fn_8032D880(FxCmd* self, const void* src) {
 
 int fn_8032D8C8() { return 0; }
 
-void fn_8032D8D0(void* unused) { fn_8032D8F8(lbl_805ED8BC); }
+void fn_8032D8D0(void* unused) { fn_8032D8F8(unused, lbl_805ED8BC); }
+
+/* near-miss (99.86%): only the lis/ori pair building the color constant 0x80606060 differs; the split object has a
+ * synthesized reloc to lbl_80606060 (a string that happens to sit at that address), a plain constant cannot reproduce it */
+void fn_8032D8F8(void* p, float maxw) {
+    FxLabelD* self = (FxLabelD*)p;
+    FxCtx** pc = &lbl_8061FEDC;
+    float w = fn_80313F28(*pc, (const void*)self->s6());
+    if (!(self->m0 + w <= maxw)) {
+        ((void (*)(FxCtx*, float, float, const void*, int, int))fn_803145D8)(*pc, self->m0, self->m4, (const void*)self->s6(), self->mC != 0 ? 0x80A0A0A0 : 0x80606060, 0x16);
+    } else {
+        ((void (*)(FxCtx*, float, float, const void*, int, int))fn_803144A0)(*pc, self->m0, self->m4, (const void*)self->s6(), self->mC, 0x16);
+    }
+}
 
 void fn_8032DA14(FxLabelD* self) {
     FxCtx* c = lbl_8061FEDC;
@@ -345,6 +370,22 @@ FxPairW* fn_8032DD00(FxPairW* self, int name, int a, FxInt2 d, FxInt2 e, FxInt2 
     return self;
 }
 
+void fn_8032DDD0(FxPairW* self) {
+    char buf[0x30];
+    FxV2f v = ((FxV2f (*)(FxCmd*))fn_8032E054)((FxCmd*)self);
+    if (self->m74 == 0) {
+        if (self->m78 == 0)
+            fn_804089B4(buf, lbl_805ED8D4, v.x, v.y);
+        else
+            fn_804089B4(buf, lbl_805ED8E4, v.x, v.y);
+    } else {
+        fn_804089B4(buf, lbl_805ED8F4, v.x, v.y);
+    }
+    float w = lbl_805ED904 - fn_80313F28(lbl_8061FEDC, buf);
+    fn_8032D8F8(self, w);
+    fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
 void fn_8032E054(FxInt2* out, FxCmd* src) {
     FxInt2* p = (FxInt2*)src->m48;
     if (p) {
@@ -412,6 +453,32 @@ void fn_8032E344(FxCmd* self, FxInt3* v) {
     } else {
         *(FxInt3*)&self->m4C = *v;
     }
+}
+
+void fn_8032E38C(FxTripW* self) {
+    FxF3 v = ((FxF3 (*)(FxCmd*))fn_8032E2FC)((FxCmd*)self);
+    char buf[0x30];
+    char fmt[0x30];
+    if (self->m84 == 0) {
+        switch (self->m88) {
+        case 0:
+            fn_804089B4(fmt, lbl_805ED918, self->m90, self->m90, self->m90);
+            break;
+        case 1:
+            fn_804089B4(fmt, lbl_805ED934, self->m90, self->m90, self->m90);
+            break;
+        case 2:
+            fn_804089B4(fmt, lbl_805ED950, self->m90, self->m90, self->m90);
+            break;
+        }
+        fn_804089B4(buf, fmt, v.x, v.y, v.z);
+    } else {
+        fn_804089B4(buf, lbl_805ED96C, v.x, v.y, v.z);
+    }
+    char* p = buf;
+    float w = lbl_805ED980 - fn_80313F28(lbl_8061FEDC, p);
+    fn_8032D8F8(self, w);
+    fn_803144A0(lbl_8061FEDC, p, w, self->m4, self->mC, 0x16);
 }
 
 FxSldW* fn_8032E70C(FxSldW* self, int name, float a, float b, float c, float d) {
