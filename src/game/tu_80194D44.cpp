@@ -156,6 +156,25 @@ extern "C" {
 void fn_80195A9C(Unk80195A9C_O* o);
 }
 
+extern "C" {
+float fn_8037A9AC(const Unk80183918_Vec3* a, const Unk80183918_Vec3* b);
+void fn_80402B48(const Unk80183918_Vec3* v, Unk80183918_Vec3* out);
+}
+inline Unk80183918_Vec3 Unk801984FC_Cross(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m4 * b.m8 - b.m4 * a.m8;
+    r.m8 = a.m0 * b.m4 - b.m0 * a.m4;
+    r.m4 = b.m0 * a.m8 - a.m0 * b.m8;
+    return r;
+}
+inline void Unk801984FC_Scale(Unk80183918_Vec3* v, float s)
+{
+    v->m0 *= s;
+    v->m4 *= s;
+    v->m8 *= s;
+}
+
 //@BODY
 //@80194D44
 extern "C" int fn_80194D44(Unk80194D44_O* o)
@@ -427,6 +446,22 @@ extern "C" int fn_80198188(Unk80198188_Ring* r)
     if (*(int*)(r->m4 + next * 128 + 0x60) != 0)
         return next;
     return 0;
+}
+
+//@801984FC
+extern "C" Unk80183918_Vec3 fn_801984FC(const Unk80183918_Vec3* a, const Unk80183918_Vec3* b, float t)
+{
+    Unk80183918_Vec3 axis;
+    float ang = fn_8037A9AC(a, b);
+    if (!(ang >= 1e-6) && !(ang <= -1e-6)) {
+        axis = lbl_806055AC;
+    } else {
+        axis = Unk801984FC_Cross(*a, *b);
+        fn_80402B48(&axis, &axis);
+        Unk801984FC_Scale(&axis, ang);
+        Unk801984FC_Scale(&axis, t);
+    }
+    return axis;
 }
 
 //@80198C18
