@@ -16,7 +16,7 @@ extern const float lbl_805FF260;
 
 char* fn_800D7898(int a);
 int fn_800D7C10(char* p, int a, int b);
-int fn_800D7FB4(char* p, int a, float f);
+float fn_800D7FB4(char* p, int a, float f);
 int fn_800D8304(void* p, int a);
 int fn_800D833C(void* p, int a);
 int fn_800D8358(void* p, int a);
@@ -24,7 +24,51 @@ int fn_800D8320(void* p, int a);
 int fn_80084014(int a, int b);
 int fn_80083FC0(int a);
 
+/* Q18 types */
+int fn_800D8390(char* p, int a);
+extern int (*lbl_80622BF8[])(int, int, int);
+
+int fn_800D8390(char* p, int a);
+extern int (*lbl_80622BF8[])(int, int, int);
+/* end Q18 types */
+
 extern "C" {
+/* Q18 protos */
+O* fn_8054CBBC(O* o, int a, Unk8007B2B0_Screen* b);
+void fn_8054CBD8(O* o, int a);
+void fn_8054CC48(O* o, int i);
+void fn_8054CCAC(O* o, int i, int v);
+int fn_8054CCF0(O* o, int i, int k);
+int fn_8054CDC4(O* o, int v);
+int fn_8054CE20(O* o, int a);
+int fn_8054CE90(O* o, int a, int c);
+void fn_8054CF38(O* o, int a);
+int fn_8054E314(O* o, int i);
+void fn_8054EE44(O* o);
+void fn_8054EED4(O* o);
+void fn_8054EFB0(O* o);
+void fn_8054F064(O* o, int a);
+void fn_8054F104(O* o);
+void fn_8054F194(O* o);
+void fn_8054F224(O* o);
+void fn_8054F2C4(O* o);
+void fn_8054F3CC(O* o);
+void fn_8054F46C(O* o);
+void fn_8054F4F8(O* o);
+int fn_8054F5B4(int u, unsigned x, int f);
+int fn_8054F5E4(int u, unsigned x, int f);
+int fn_8054F614(int u, int x, int f);
+int fn_8054F630(int u, int x);
+int fn_8054F640(int u, int x);
+int fn_8054F650(int u, int x);
+int fn_8054F658(O* o, int a);
+int fn_8054F6C8(O* o, int a);
+int fn_8054F734(int u, int x);
+int fn_8054F748(O* o, int want);
+int fn_8054F8D4(O* o);
+void fn_8054F900(O* o, int a, int c);
+void fn_8054F970(O* o, int a, int c);
+/* end Q18 protos */
 
 /* protos */
 O* fn_8054CBBC(O* o, int a, Unk8007B2B0_Screen* b);
@@ -64,11 +108,6 @@ float fn_8054CF78(O* o, int i, int k);
 int fn_8054E314(O* o, int i);
 int fn_8054F658(O* o, int a);
 
-
-
-
-
-
 int fn_800A2E6C(void* g);
 int fn_800A2EFC(void* g);
 int fn_800A2E90(void* g);
@@ -79,6 +118,11 @@ int fn_800D8108(char* p, int a, int b, int c, float f);
 int fn_8057C3F8();
 int fn_8057C21C();
 int fn_8057C270();
+/* Q18 decls */
+extern "C" int fn_80071EFC__Fv(int a);
+extern const float lbl_805FF28C;
+int fn_800D8374(void* p, int a);
+/* end Q18 decls */
 
 DB_OVERLAY O* fn_8054CBBC(O* o, int a, Unk8007B2B0_Screen* b)
 {
@@ -171,6 +215,19 @@ DB_OVERLAY void fn_8054CF38(O* o, int a)
 {
     int c = fn_80083FC0(fn_8054F658(o, a));
     o->m4->fn_8007B320(c, o->m0);
+}
+
+DB_OVERLAY int fn_8054E314(O* o, int i)
+{
+    char* t = fn_800D7898(fn_8054F8D4(o));
+    int k = fn_8054F748(o, i);
+    int r;
+    if (t != 0) {
+        r = fn_800D7FB4(t, k, fn_8054CF78(o, i, k)) >= lbl_805FF28C;
+    } else {
+        r = 0;
+    }
+    return r;
 }
 
 DB_OVERLAY void fn_8054EE44(O* o)
@@ -298,6 +355,30 @@ DB_OVERLAY void fn_8054F3CC(O* o)
     }
 }
 
+DB_OVERLAY void fn_8054F46C(O* o)
+{
+    int i = 0;
+    do {
+        char* t = fn_800D7898(fn_8054F8D4(o));
+        if (t != 0 && fn_800D8358(t, fn_8054F748(o, i)) != 0 && fn_8054E314(o, i) != 0)
+            fn_8054CC48(o, i);
+        i++;
+    } while (i <= 7);
+}
+
+DB_OVERLAY void fn_8054F4F8(O* o)
+{
+    int i = 0;
+    do {
+        char* t = fn_800D7898(fn_8054F8D4(o));
+        int k = fn_8054F748(o, i);
+        if (t != 0 && fn_800D8374(t, k) != 0) {
+            fn_8054CCAC(o, i, (int)fn_8054CF78(o, i, k) + fn_8054CCF0(o, i, k));
+        }
+        i++;
+    } while (i <= 7);
+}
+
 DB_OVERLAY int fn_8054F5B4(int u, unsigned x, int f)
 {
     int a = 0xF;
@@ -365,6 +446,48 @@ DB_OVERLAY int fn_8054F6C8(O* o, int a)
 DB_OVERLAY int fn_8054F734(int u, int x)
 {
     return x <= 2;
+}
+
+/* near-miss: 2 slots; the li r24/li r25 initialisers of the two counters come in swapped order (register assignment is otherwise identical) */
+DB_OVERLAY int fn_8054F748(O* o, int want)
+{
+    int picked[8];
+    int off = 0;
+    unsigned tries = 0;
+    int u = fn_8054F8D4(o);
+    int cnt = o->m4->fn_8007B3E0(0xF, o->m0);
+    int i = 0;
+    int seed = fn_80071EFC__Fv(o->m0) * 0xFEEDBEEF;
+    char* t = fn_800D7898(u);
+    do {
+        int x;
+        if (i <= 2)
+            x = seed * ((cnt + 3) / 3 * 3 + 1);
+        else
+            x = seed * (cnt + 1);
+        int j = i + 1;
+        int v = lbl_80622BF8[i](u, (x >> j) + off, fn_8054F734((int)o, i));
+        if (tries > 0x32)
+            return v;
+        int k = i - 1;
+        while (k >= 0) {
+            if (picked[k] == v)
+                break;
+            k--;
+        }
+        if (k < 0) {
+            if (i == want) {
+                if (fn_8054F6C8(o, i) != 0 || t == 0 || fn_800D8390(t, v) != 0)
+                    return v;
+            } else {
+                picked[i] = v;
+                i = j;
+            }
+        }
+        tries++;
+        off++;
+    } while (i <= 7);
+    return -1;
 }
 
 DB_OVERLAY int fn_8054F8D4(O* o)
