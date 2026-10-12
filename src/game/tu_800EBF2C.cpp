@@ -10,6 +10,50 @@ void fn_800EBF2C(UiS* self)
     self->v94(0);
 }
 
+class UiV28r : public UiS0 {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual UiS* v28(const char* s); virtual int v29(int a);
+};
+UiS* fn_804D2310(char* p);
+extern char lbl_805BE140[];
+extern char lbl_805BE154[];
+void fn_800EBF84(UiS* self, int flag)
+{
+    char* sub = (char*)self + 0x144;
+    UiS* o = (UiS*)fn_800C8040((void*)((UiV28r*)self)->v29((int)lbl_805BE140));
+    UiS* w = ((UiV28r*)self)->v28(lbl_805BE154);
+    int id = lbl_8061930C->fn_8007DA34(*(int*)(sub + 0x38));
+    if (id != -1) {
+        char buf[0x18];
+        lbl_8061930C->fn_8007CF44(id, (int)buf, 0);
+        o->v28(buf);
+        if (w != 0) {
+            if (lbl_8061930C->fn_8007DADC(id) != 0) {
+                if (w->m24 >= 0)
+                    w->v8(1);
+            } else {
+                w->v8(0);
+            }
+        }
+        if (flag != 0) {
+            if (fn_800B57EC(fn_800B555C()) == 0) {
+                int r = lbl_8061930C->fn_8007D098(id, 0);
+                fn_804D2310(sub)->m144 = r;
+                fn_804D2310(sub)->v87();
+            }
+        }
+    } else {
+        ((UiV28r*)o)->v29(0xBBC);
+        if (w != 0)
+            w->v8(0);
+    }
+}
+
 extern "C" UiScrRaw* fn_800EC150(UiScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
