@@ -4,6 +4,7 @@
  */
 #include "game/tu_8024EF40.h"
 #include "game/goals/tu_8027C728.h"
+#include "game/goals/tu_8027A84C.h"
 
 typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
@@ -180,6 +181,46 @@ extern float lbl_805DB214;
 }
 extern "C" Unk8027C728_Goal* fn_802448F4(void* p, int k);
 
+/* Request record of the goal setters at 0x8025BEC0 / 0x8025C18C / 0x8025C288: +8 id, +0x18 float, +0x28 target position, +0x34 state. */
+struct Unk8025BEC0_E {
+    char pad0[8];
+    int m8;
+    char padC[0x18 - 0xC];
+    float m18;
+    char pad1C[0x28 - 0x1C];
+    Unk80273498_Vec3 m28;
+    int m34;
+};
+struct Unk8025C18C_Ctx {
+    char pad0[0x3B0];
+    void* m3B0;
+};
+struct Unk8025C18C_Q {
+    char pad0[0x700];
+    Unk8025C18C_Ctx* m700;
+};
+struct Unk8028989C_Goal;
+extern const float lbl_805DAE20;
+extern const float lbl_805DAE34;
+extern const float lbl_805DAE38;
+extern "C++" {
+void fn_80235AE4(void* self);
+Unk8027A84C* fn_80289B14(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p);
+Unk8027A84C* fn_80289AB0(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p);
+Unk8027A84C* fn_802899E8(Unk8028989C_Goal* g, float f, const Unk80273498_Vec3* p);
+void fn_802898FC(Unk8027A84C* g, float f);
+}
+
+/* By-value getters: the vector copy goes through a stack temporary, as in retail. */
+inline Unk80273498_Vec3 Unk8025BEC0_Pos34(Unk8027C728_Goal* g)
+{
+    return *(Unk80273498_Vec3*)((char*)g + 0x34);
+}
+inline Unk80273498_Vec3 Unk8025BEC0_Pos28(Unk8025BEC0_E* e)
+{
+    return e->m28;
+}
+
 struct Unk8025D054_I {
     char pad0[0x1FC];
     int m1FC;
@@ -201,6 +242,75 @@ Unk8027C728_Goal* fn_8025BA38(void* self, P* p, int* z)
     fn_8027C728(g);
     fn_8025AB00(g->m18, p);
     z[0xD] = two;
+    return g;
+}
+
+Unk8027C728_Goal* fn_8025BEC0(void* self, P* p, Unk8025BEC0_E* e)
+{
+    int two = 2;
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    g->m10 = 0xC;
+    fn_8027C728(g);
+    Unk8027A84C* x;
+    {
+        Unk80273498_Vec3 v = Unk8025BEC0_Pos28(e);
+        x = fn_80289B14((Unk8028989C_Goal*)g->m18, lbl_805DAE20, &v);
+    }
+    x->m38 = 1;
+    Unk8027C728_Goal* g2 = g->m0;
+    g2->m10 = two;
+    fn_8027C728(g2);
+    fn_8025AB00(g2->m18, p);
+    Unk80273498_Vec3 t = Unk8025BEC0_Pos34(g2);
+    Unk80273498_Vec3 w = t;
+    x->fn_8027A898(&w);
+    e->m34 = two;
+    return g;
+}
+
+Unk8027C728_Goal* fn_8025C18C(Unk8025C18C_Q* self, P* p, Unk8025BEC0_E* e)
+{
+    int two = 2;
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk80273498_Vec3 v = Unk8025BEC0_Pos28(e);
+    g->m10 = 0xC;
+    fn_8027C728(g);
+    Unk8027A84C* x = fn_802899E8((Unk8028989C_Goal*)g->m18, lbl_805DAE34, &v);
+    fn_802898FC(x, e->m18);
+    x->m38 = e->m8;
+    Unk8027C728_Goal* g2 = g->m0;
+    g2->m10 = two;
+    char* gd = g2->m18;
+    fn_8027C728(g2);
+    fn_8025AB00(gd, p);
+    if (*(int*)(gd + 0x2C) != 0) {
+        Unk80273498_Vec3 w = Unk8025BEC0_Pos34(g2);
+        x->fn_8027A898(&w);
+    }
+    e->m34 = two;
+    fn_80235AE4(self->m700->m3B0);
+    return g;
+}
+
+Unk8027C728_Goal* fn_8025C288(void* self, P* p, Unk8025BEC0_E* e)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 2);
+    Unk80273498_Vec3 v = Unk8025BEC0_Pos28(e);
+    g->m10 = 0xC;
+    fn_8027C728(g);
+    Unk8027A84C* x = fn_80289AB0((Unk8028989C_Goal*)g->m18, lbl_805DAE38, &v);
+    fn_802898FC(x, e->m18);
+    x->m38 = e->m8;
+    Unk8027C728_Goal* g2 = g->m0;
+    g2->m10 = 2;
+    fn_8027C728(g2);
+    char* gd = g2->m18;
+    fn_8025AB00(gd, p);
+    if (*(int*)(gd + 0x2C) != 0) {
+        Unk80273498_Vec3 w = Unk8025BEC0_Pos34(g2);
+        x->fn_8027A898(&w);
+    }
+    e->m34 = 0;
     return g;
 }
 
