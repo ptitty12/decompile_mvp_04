@@ -393,6 +393,53 @@ int Unk802362A8_Cpu::fn_80238088(Unk802362A8_Req* p)
     return r;
 }
 
+struct Unk8019F8C0_Owner;
+extern "C" void* fn_801A4B34(Unk8022FE34_Ctx* c);
+void* fn_801A4B7C(Unk8019F8C0_Owner* o, int a, int b);
+extern int* lbl_8061B9C4;
+inline int RB80238110(const unsigned char* p, int off)
+{
+    return p[off];
+}
+int Unk802362A8_Cpu::fn_80238110()
+{
+    int r = 0;
+    char* a = (char*)fn_801A4B34(m2E4);
+    char* b = (char*)fn_801A4B7C((Unk8019F8C0_Owner*)m2E4, 1, 1);
+    Unk8022FE34_Ctx* c = m2E4;
+    Unk8022FE34_Game* gm = c->m6F8;
+    if (b != 0 && a != 0 && gm != 0 && *(int*)(b + 0x460) != 0) {
+        unsigned char* row = (unsigned char*)gm->m14;
+        if (RB80238110(row, 0x1CCA) < *lbl_8061B9C4 - 1 && RB80238110(row, 0x1CC9) > 0 && RB80238110(row, 0x1CC8) > 5) {
+            int s1 = 0;
+            for (int n = 0; n < 128; n++)
+                s1 += RB80238110(row + 0x1B4, (unsigned char)n);
+            unsigned char* row2 = row + 0xE64;
+            int s2 = 0;
+            for (int n = 0; n < 128; n++)
+                s2 += RB80238110(row2 + 0x1B4, (unsigned char)n);
+            int d = s1 - s2;
+            int ad = d < 0 ? -d : d;
+            if (ad <= 3) {
+                int x1 = fn_801C1638(c, 0xA) != 0;
+                int x2 = fn_801C1638(c, 0xB) != 0;
+                int x3 = fn_801C1638(c, 0xC) != 0;
+                if ((x2 != 0 || x3 != 0) && x1 == 0) {
+                    int a3 = *(int*)(a + 0x708);
+                    int a1 = *(int*)(a + 0xA04);
+                    int a2 = *(int*)(a + 0x44C);
+                    const float k = 0.75f;
+                    if (!(fn_8024F048(a + 0xA0C, a1, a2, a3, 1) < k)) {
+                        if (!(fn_8024F048(b + 0xA0C, *(int*)(b + 0xA04), *(int*)(b + 0x44C), *(int*)(b + 0x708), 1) >= k))
+                            r = 1;
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
 struct Unk8017A930_T;
 int fn_8017C954(Unk8017A930_T* p);
 int Unk802362A8_Cpu::fn_802382F4(Unk802362A8_Req* p)

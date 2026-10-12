@@ -306,6 +306,66 @@ void fn_80229948(Task* t, int a)
     }
 }
 
+struct Unk80229CB4_S {
+    int m0;
+    int m4;
+    float m8;
+    int mC;
+    float m10;
+    float m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+inline void Unk80229CB4_SetM8(Unk80229CB4_S* s, float v)
+{
+    s->m8 = v;
+}
+inline void Unk80229CB4_SetM10(Unk80229CB4_S* s, float v)
+{
+    s->m10 = v;
+}
+inline void Unk80229CB4_SetM14(Unk80229CB4_S* s, float v)
+{
+    s->m14 = v;
+}
+float fn_8020EE9C(Task* t, int a, Vec3f v, int b);
+int fn_801F5DD8(Task* t, int b);
+float fn_8020E074(Task* t, int a1, int a2, const Vec3f& v, int b, int c, int d);
+float fn_802F9DD0(int p);
+int* fn_8023CB08__Fv(int a);
+void fn_8035D1D8__FP1Uf(Unk80229CB4_S* s, int a, float f);
+extern float lbl_8061D600;
+extern float lbl_8061D604;
+void fn_80229CB4(Task* t, int a, int b, Vec3f* v)
+{
+    Unk80229CB4_S* s = (Unk80229CB4_S*)((char*)t + 0xC4);
+    float ratio = fn_8020EE9C(t, a, *v, b);
+    float val = 0.0f;
+    int r = fn_801F5DD8(t, b);
+    if (r == 1) {
+        s->m20 = a;
+        s->m4 = r;
+        Unk80229CB4_SetM8(s, 0.0f);
+        fn_8035D1D8__FP1Uf(s, a, 0.0f);
+        val = 1.0f - fn_802F9DD0(*(int*)((char*)t->m9C->m0 + 0x720));
+    } else {
+        s->m20 = a;
+        s->m4 = 1;
+        Unk80229CB4_SetM8(s, 0.0f);
+        fn_8035D1D8__FP1Uf(s, a, 0.0f);
+        Unk80229CB4_SetM8(s, 0.01f);
+        fn_8023CB08__Fv(a);
+        float lo = lbl_8061D600;
+        fn_8023CB08__Fv(a);
+        float hi = lbl_8061D604;
+        val = (hi - lo) * ratio + lo;
+    }
+    Unk80229CB4_SetM10(s, val);
+    float d = fn_8020E074(t, (int)t->m9C->m0->m6CC, a, *v, b, 0, 0);
+    Unk80229CB4_SetM14(s, d);
+}
+
 int fn_80229E50(Task* t, int a, int b, int c, int d)
 {
     void* x = ObjAt(t->m9C->m8, a);
@@ -353,6 +413,93 @@ void fn_8022A438(Task* t, int a, int b)
     TaskInner* in = t->m9C;
     if (GetSlot(&in->mC0, a) == -1)
         SetSlot(&t->m9C->mC0, a, t->m9C->m3A5C);
+}
+
+void fn_801E8428(Obj3A64* p, int k, Vec3f* pos, float* ang);
+struct Unk8022A580_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x928 - 0x6C];
+    Player* m928;
+};
+void fn_8022A580(Task* t, int ai)
+{
+    Unk8022A580_Obj* a = (Unk8022A580_Obj*)ai;
+    RecQueue* q = t->m9C->m3A60;
+    Unk8022A580_Obj* cur = (Unk8022A580_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    cur->m928 = (Player*)a;
+    Vec3f pos;
+    float ang;
+    fn_801E8428(t->m9C->m3A64, t->m9C->m3A5C, &pos, &ang);
+    e->m4 = 0x2D;
+    e->m0 = 0x2F;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m80 = -1.0f;
+    e->m9C = 1;
+    e->m28 = (Player*)a;
+    e->m38 = pos;
+    e->m8C = ang;
+    const Vec3f* pa = &a->m60;
+    const Vec3f* pc = &cur->m60;
+    Vec3f d = *pa - *pc;
+    e->m50 = d;
+    e->m94 = 1;
+    t->m9C->m60 = 0;
+}
+
+void fn_801E8250(Obj3A64* p, int a);
+inline float Unk8022A934_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+struct Unk8022A934_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+void fn_8022A934(Task* t, Vec3f* v, int a, int b)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8022A934_Obj* cur = (Unk8022A934_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    *(int*)((char*)t->m9C + 0xA0) = 1;
+    v->y = 0.0f;
+    e->m4 = 0x2A;
+    e->m0 = 0x31;
+    e->mC = b;
+    e->m8 = a;
+    e->m9C = 1;
+    const Vec3f* pc = &cur->m60;
+    e->m38 = *v;
+    e->m8C = 1.0f;
+    e->m88 = -1.0f;
+    e->m80 = -1.0f;
+    e->m84 = Unk8022A934_Secs(t->m9C->m0->m4C);
+    e->m94 = 1;
+    Vec3f d = *v - *pc;
+    e->m50 = d;
+    fn_801E8250(t->m9C->m3A64, t->m9C->m3A5C);
 }
 
 void fn_8022AB04(Task* t)
