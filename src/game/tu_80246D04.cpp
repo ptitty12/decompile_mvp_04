@@ -167,6 +167,45 @@ float fn_80249298(Unk80270BA0_X* x, int a, int b)
     return r;
 }
 
+struct Unk802495CC_C {
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x738 - 0x50];
+    int m738;
+};
+struct Unk802495CC_X {
+    char pad0[0x44C];
+    Unk802495CC_C* m44C;
+    char pad450[0xAC4 - 0x450];
+    int mAC4;
+    float mAC8;
+    float mACC;
+    float mAD0;
+};
+extern float lbl_8061D4C4;
+void fn_802494C4(Unk80270BA0_X* x, int a, float f);
+void fn_802495CC(Unk802495CC_X* x)
+{
+    Unk802495CC_C* c = x->m44C;
+    if (c->m738 != 0) {
+        float s = (float)c->m4C * 0.016666668f;
+        if (x->mAC4 == 0) {
+            if (!(x->mAC8 <= 0.0f) && !(s < x->mAC8))
+                fn_802494C4((Unk80270BA0_X*)x, 1, s);
+        } else {
+            if (!(s <= x->mAD0 + lbl_8061D4C4)) {
+                if (!(s >= x->mACC)) {
+                    fn_802494C4((Unk80270BA0_X*)x, 0, s);
+                } else {
+                    x->mAC4 = 0;
+                    x->mAC8 = -1.0f;
+                    x->mACC = -1.0f;
+                }
+            }
+        }
+    }
+}
+
 /* near-miss: only the order of 'stw r4,0xae0' vs 'lwz r8,0x44c' differs (3 source orderings tried) */
 void fn_802496BC(Unk80270BA0_X* x, int a)
 {
