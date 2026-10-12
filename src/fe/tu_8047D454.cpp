@@ -17,6 +17,13 @@ extern "C" FE_OVERLAY int fn_8047DC70(void* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_8047DD0C(void* x)
+{
+    if (FeI(x, 0x228) == 0 || FeI(x, 0x22C) == 0)
+        fn_800B7ADC(FeGetMgr(), x);
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_8047E028(void* x)
 {
     FeAt(x, 0x14C)->fn_vslot50();
@@ -270,6 +277,26 @@ extern "C" FE_OVERLAY int fn_8047F4CC(void* x)
     return 0;
 }
 
+extern "C" FE_OVERLAY FeScrH* fn_8047F508(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80677D68);
+    self->m130 = 0;
+    FeI(self, 0x134) = 0;
+    FeI(self, 0x138) = 0;
+    FeI(self, 0x13C) = 0;
+    FeI(self, 0x140) = 0;
+    FeI(self, 0x144) = 0;
+    FeI(self, 0x150) = 0;
+    FeI(self, 0x154) = 0;
+    FeI(self, 0x158) = 0;
+    FeI(self, 0x15C) = 0;
+    FeI(self, 0x160) = -1;
+    FeI(self, 0x164) = -1;
+    FeI(self, 0x230) = 0;
+    return self;
+}
+
 extern "C" FE_OVERLAY int fn_8047FD94(void* x)
 {
     if (fn_8048157C(x) != 0 || FeI(x, 0x230) != 0)
@@ -424,6 +451,19 @@ extern "C" FE_OVERLAY int fn_80480784(FeW* x, FeW* w, int b, int c)
     }
     fn_804805B4(x);
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8048087C(void* x, int a)
+{
+    FeI(x, 0x134) = a;
+    FeW* w = FeWp(x, 0x148);
+    ((FeSubV20*)((char*)w + 0x98))->s20(a, 0);
+    FeW* v = FeWp(x, 0x14C);
+    ((FeSubV20*)((char*)v + 0xDC))->s20(a, 0);
+    fn_80480A58(x);
+    FeWp(x, 0x15C)->fn_vslot68(0);
+    FeWp(x, 0x138)->fn_vslot14(0);
+    FeWp(x, 0x13C)->fn_vslot14(0);
 }
 
 extern "C" FE_OVERLAY void fn_80480960(void* x, int wi)
