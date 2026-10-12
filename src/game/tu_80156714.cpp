@@ -53,6 +53,36 @@ extern "C" int fn_80162C28(Unk80159F28* self);
 extern "C" int fn_80161FBC(Unk80159F28* self);
 extern "C" void fn_801599DC(Unk80159F28* self);
 
+extern const char lbl_8065E9E0[];
+extern const char lbl_80649DB8[];
+void fn_80359ACC(Unk80359ACC* p);
+struct Node8015737C { void* m0; };
+inline void SetW8015737C(char* base, int off, int v) { *(int*)(base + off) = v; }
+extern "C" {
+void fn_803785E4(void* self);
+void fn_80378A34(void* self, int v);
+void fn_80378620(void* self, int chrg);
+void fn_80377408(void* p);
+void fn_80377488(void* p);
+}
+class Vt8_801574E0 {
+public:
+    char pad0[8];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+};
+extern "C" {
+void fn_801597F0(Unk80159F28* self);
+int fn_8015A6A0(Unk80159F28* self);
+void fn_80161004(Unk80159F28* self);
+void fn_801609EC(Unk80159F28* self);
+void fn_80161924(Unk80159F28* self);
+int fn_8017CF14(void* p, int i);
+void fn_8017CD04(void* p, int i, int j);
+}
+int fn_801A2034(Unk801527C8_Actor* a, int i);
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
@@ -122,6 +152,42 @@ void cWaitForAnimation::fn_vslot2() /* 80156D00 */
 {
 }
 
+extern "C" void* fn_801572FC(Unk80159F28* self, Unk801527C8_Ctx* ctx) /* 801572FC */
+{
+    fn_803785E4(self);
+    self->mC = (Unk801527C8_Actor*)ctx;
+    *(const void**)((char*)self + 8) = lbl_8065E9E0;
+    fn_80359ACC(&self->m5F4);
+    int off = 0;
+    for (int k = 0; k < 0xAE; k++) {
+        SetW8015737C((char*)self + 0x33C, off, 0);
+        off += 4;
+    }
+    self->fn_80157410();
+    fn_80378A34(self, (int)ctx + 0x704);
+    return self;
+}
+
+extern "C" void fn_8015737C(Unk80159F28* self, int chrg) /* 8015737C */
+{
+    *(const void**)((char*)self + 8) = lbl_8065E9E0;
+    int off = 0;
+    for (int k = 0; k < 0xAE; k++) {
+        Node8015737C** arr = (Node8015737C**)((char*)self + 0x33C);
+        Node8015737C* p = *(Node8015737C**)((char*)arr + off);
+        if (p != 0) {
+            if (p->m0 != 0) {
+                fn_80377488(p->m0);
+            }
+            fn_80377408(p);
+            *(Node8015737C**)((char*)arr + off) = 0;
+        }
+        off += 4;
+    }
+    *(const void**)((char*)self + 8) = lbl_80649DB8;
+    fn_80378620(self, chrg);
+}
+
 void Unk80159F28::fn_80157410() /* 80157410 */
 {
     m34 = 2;
@@ -150,6 +216,11 @@ void Unk80159F28::fn_80157410() /* 80157410 */
             *fn_80161A5C(i, j) = 0;
         }
     }
+}
+
+extern "C" void fn_801574E0(Vt8_801574E0* self) /* 801574E0 */
+{
+    self->s4();
 }
 
 int fn_80157708(void* self, int v) /* 80157708 */
@@ -356,4 +427,36 @@ void cScriptParticleEffect::fn_vslot2() /* 80156EB4 */
 
 int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
 {
+}
+
+extern "C" void fn_8015A5A4(Unk80159F28* self) /* 8015A5A4 */
+{
+    if (!(self->m334 <= 0.0f)) {
+        fn_801597F0(self);
+    }
+    int r = fn_801A6D84(self->mC, 5)->m3D90;
+    if (r == 0) {
+        if (fn_8015A6A0(self) == 0) {
+            self->fn_8015AA94();
+            fn_80161004(self);
+        }
+        self->fn_8015F87C();
+        volatile int sp8 = r;
+        int e = 0;
+        do {
+            if (fn_801A2034(self->mC, e) == -1 && fn_8017CF14(self->mC->m700, sp8) != 0) {
+                fn_8017CD04(self->mC->m700, sp8, 0);
+            }
+            int c = sp8;
+            int t;
+            if (c > 1)
+                t = c;
+            else
+                t = c + 1;
+            sp8 = t;
+            e = t;
+        } while (e <= 1);
+        fn_801609EC(self);
+        fn_80161924(self);
+    }
 }
