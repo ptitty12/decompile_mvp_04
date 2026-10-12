@@ -50,6 +50,37 @@ Unk80171760* fn_80171A8C(Unk80171A10_Holder* h, const unsigned short* s)
     return h->m4;
 }
 
+Unk80171760* fn_80171AF8(Unk80171A10_Holder* h, const unsigned short* s, const unsigned short* a, const unsigned short* b, const unsigned short* c, const unsigned short* d) /* 80171AF8 */
+{
+    Unk801714E0* n = 0;
+    fn_80171FE8(h);
+    int flag = 0;
+    for (int i = 0; i <= 5; i++) {
+        int k = i + 0xA;
+        if (a != 0 && k == 0xA) {
+            n = fn_80172058(h, a, 0xA);
+        } else if (b != 0 && k == 0xB) {
+            n = fn_80172058(h, b, 0xB);
+        } else if (c != 0 && k == 0xC) {
+            n = fn_80172058(h, c, 0xC);
+        } else if (d != 0 && k == 0xD) {
+            n = fn_80172058(h, d, 0xD);
+        }
+    }
+    if (n == 0) {
+        unsigned short z = 0;
+        flag = 1;
+        n = fn_80172058(h, &z, 4);
+        if (n == 0) {
+            goto done;
+        }
+    }
+    fn_801720A8(h, n, s, 1);
+done:
+    h->m4->m8 = flag;
+    return h->m4;
+}
+
 /* near-miss: retail keeps the zero for m8/m0 in r30 across the calls (3 saved registers, the CE4 result
  * reuses r30); here the zero is rematerialized (r11). 4 variants tried. */
 Unk80171760* fn_80171C20(Unk80171A10_Holder* h, int a)
@@ -235,6 +266,41 @@ Unk80171760* fn_801723B8(Unk80171A10_Menu* p)
     return ((Unk80171A10_Holder*)(void*)p->m3C)->m4;
 }
 
+extern const Unk80171A10_Fn lbl_805CB124;
+void fn_8001BC58();
+
+int fn_801723F8(Unk80171A10_Menu* p, int a) /* 801723F8 */
+{
+    if (p->m60 == 1) {
+        p->m114 = a;
+        return 1;
+    }
+    if (p->m60 == 3) {
+        p->m60 = 0;
+        switch (a) {
+        case 4:
+        case 0:
+            break;
+        case 2:
+            fn_80174318(p, 0xE, lbl_805CB124);
+            break;
+        case 3:
+        case 1:
+            fn_80174318(p, 1, lbl_805CB11C);
+            break;
+        case 5:
+            fn_8001BC58();
+            ((Unk80170518*)fn_80173274((Unk80173274_T*)p))->fn_80005A50();
+            break;
+        }
+        return 1;
+    }
+    if (((Unk80170518*)fn_80173274((Unk80173274_T*)p))->mBC != 0) {
+        ((Unk80170518*)fn_80173274((Unk80173274_T*)p))->fn_80170A54(a);
+    }
+    return 0;
+}
+
 int fn_80172514(Unk80171A10_Menu* p)
 {
     if (p->m70 <= 0xA) {
@@ -310,6 +376,87 @@ void fn_80172D00(Unk80171A10_Menu* p)
         p->m4 = 0;
     }
     fn_801728A0(p, 0, 4);
+}
+
+extern "C" int fn_804030F0(const unsigned short* a, const unsigned short* b, int n);
+int fn_801730E8(Unk80171A10_Menu* p, unsigned short* s, int* out);
+
+int fn_80172EA4(Unk80171A10_Menu* p) /* 80172EA4 */
+{
+    unsigned int sel = -1;
+    int t;
+    if (p->m44 != 0) {
+        for (unsigned int i = 0; i <= 3; i++) {
+            if (p->m54 != 0) {
+                int n = fn_80403060(p->mA4);
+                if (fn_804030F0(p->mA4, ((Unk8016FF40*)p->m8[i])->m78, n) == 0) {
+                    sel = i;
+                    break;
+                }
+            } else if (((Unk8016FF40*)p->m8[i])->fn_80170044(p->m64) != 0) {
+                sel = i;
+                break;
+            }
+        }
+    } else if (p->m54 != 0) {
+        fn_801730E8(p, p->mA4, (int*)&sel);
+        if (sel == -1) {
+            t = p->m114;
+            if (t != -1) {
+                goto setsel;
+            }
+            goto set60;
+        }
+    } else {
+        t = p->m114;
+        if (t != -1) {
+setsel:
+            sel = t;
+        } else {
+set60:
+            p->m60 = 1;
+        }
+    }
+    if (sel <= 4) {
+        p->m18 = sel;
+        return 1;
+    }
+    return 0;
+}
+
+extern const char lbl_805CB12C[];
+extern "C" int fn_804030C8(const unsigned short* a, const unsigned short* b);
+extern "C" unsigned short* fn_804031BC(unsigned short* dst, const char* src);
+
+int fn_80172FCC(Unk80171A10_Menu* p, unsigned short* dst, int n) /* 80172FCC */
+{
+    unsigned short fmt[0x1C];
+    unsigned short name[0x1C];
+    unsigned int idx = p->m18;
+    if (idx <= 3) {
+        unsigned short* cur = ((Unk8016FF40*)p->m8[idx])->m78;
+        if (fn_804030C8(cur, (const unsigned short*)fn_80090880(lbl_8061977C, 0x650)) != 0) {
+            fn_8040316C(dst, ((Unk8016FF40*)p->m8[p->m18])->m78, n);
+            return 1;
+        }
+    }
+    Unk80171A10_Holder* h = (Unk80171A10_Holder*)(void*)p->m3C;
+    unsigned short* s = (unsigned short*)h->m0->fn_80170C30(2);
+    if (fn_80403060(s) > 4) {
+        fn_80403144(name, s);
+        name[4] = 0;
+    }
+    fn_804031BC(fmt, lbl_805CB12C);
+    unsigned int k = 1;
+    do {
+        fn_80403DE4(dst, (int)fmt, name, k);
+        k++;
+        int r = fn_801730E8(p, dst, 0);
+        if (k > 0x62 || r == 0) {
+            break;
+        }
+    } while (1);
+    return 0;
 }
 
 /* near-miss: retail sets i (li r29,0) before the first call's argument moves and the scaled index (li r28,0)
