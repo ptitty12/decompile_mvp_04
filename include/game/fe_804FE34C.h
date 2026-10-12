@@ -71,9 +71,9 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s52();
     virtual void s53();
     virtual void s54();
-    virtual void s55();
+    virtual void s55(int a);
     virtual void s56();
-    virtual void s57();
+    virtual void s57(int a);
     virtual void s58();
     virtual void s59();
     virtual void s60();
@@ -100,7 +100,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s81();
     virtual void s82();
     virtual void s83();
-    virtual void s84();
+    virtual int s84();
     virtual void s85(int a);
     virtual void s86();
     virtual void s87();
@@ -120,7 +120,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s101(int a, int b);
     virtual void s102();
     virtual void s103();
-    virtual void s104();
+    virtual void s104(int a);
     virtual void s105();
     virtual void s106();
     virtual void s107();
@@ -157,6 +157,8 @@ struct FeS1EC : FeW {
  * argument; callers here pass the rest through). */
 typedef void (*FeCbF)(int, void*);
 extern void* lbl_8061977C;
+extern const char lbl_805F4450[];
+extern const char lbl_805F4EF4[];
 extern "C" {
 const char* fn_80090880__FP11Unk80090880(void* t, int id);
 void fn_800E4234__FiiPUs(int a, int b, char* out);
@@ -307,6 +309,32 @@ struct FeScrIdx : FeW {
     int* m134;
     char pad138[8];
     int m140;
+};
+
+/* Screen with a list of up to 12 0x28-byte records at +0x14C, count at +0x148 (fn_8050C42C, ctor fn_8050AB58). */
+struct FeRec28 {
+    int m0;
+    char pad4[0x24];
+};
+struct FeRecList : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[0x148 - 0x134];
+    int m148;
+    FeRec28 m14C[12];
+};
+
+/* Id list object at +0x2A8 of the screen of fn_80516474: ids from +4, count at +0x84, a widget at +0x94. */
+struct FeIdList {
+    int m0;
+    int m4[32];
+    int m84;
+    char pad88[0xC];
+    FeW* m94;
+};
+struct FeP2A8 {
+    char pad[0x2A8];
+    FeIdList* m2A8;
 };
 
 /* Roster-main screen (ctor fn_804FE8AC, vtable lbl_80680960). m138 is a name buffer
