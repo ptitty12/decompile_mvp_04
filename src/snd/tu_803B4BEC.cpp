@@ -114,7 +114,6 @@ struct Unk803B69AC {
 };
 
 extern "C" int fn_803AB480(int shandle);
-extern "C" void fn_803B57A4();
 
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
@@ -144,7 +143,7 @@ extern "C" int fn_803B4BEC(int voice)
     return -1;
 }
 
-extern "C" int fn_803B4C74(int chan, int n)
+int SNDPKTPLAYI_gethighchannel(int chan, int n)
 {
     int i;
     int best = -1;
@@ -159,19 +158,19 @@ extern "C" int fn_803B4C74(int chan, int n)
     return idx;
 }
 
-extern "C" int fn_803B4CC8(int n)
+int SNDPKTPLAYI_overhead(int n)
 {
     return (n << 5) + 0x9c;
 }
 
-extern "C" int fn_803B4CD4(int n)
+extern "C" int SNDPKTPLAY_overhead(int n)
 {
-    int a = fn_803B4CC8(n);
+    int a = SNDPKTPLAYI_overhead(n);
     return a + fn_803B0360();
 }
 
 /* near-miss: 61 vs 58 insns (SNDPKTPLAY_create, structure from the nfsmw spktplay.c reference): retail recomputes the ppc table address (lis/addi + addi 0x304) for the final store after the call and uses a one-step lbl_806AA804 base in the search loop; ours keeps the loop base in a saved register (r26) and reuses it for the store */
-extern "C" int fn_803B4D08(void (*preleasefunc)(void*, void*), void (*pframesfunc)(int, int, void*), void* pclientdata, void* pmem, int memsize)
+extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pframesfunc)(int, int, void*), void* pclientdata, void* pmem, int memsize)
 {
     SNDPACKETCHAN* ppchan;
     int packetinstancehandle;
@@ -213,7 +212,7 @@ allocated:
     return i;
 }
 
-extern "C" int fn_803B4DFC(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDPLAYOPTS* pspo)
+extern "C" int SNDPKTPLAY_start(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDPLAYOPTS* pspo)
 {
     SNDIPATCHHEADER ph;
     SNDPACKETCHAN* ppchan;
@@ -263,7 +262,7 @@ extern "C" int fn_803B4DFC(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDS
         }
         ppchan->shandle = shandle;
 
-        ppchan->masterpacketchan = fn_803B4C74(voice, pssf->channels);
+        ppchan->masterpacketchan = SNDPKTPLAYI_gethighchannel(voice, pssf->channels);
 
         pVoice = &sndgs.chan[voice];
         pVoice->sustainend = -1;
@@ -346,7 +345,7 @@ extern "C" int fn_803B4DFC(int packetinstancehandle, SNDSAMPLEFORMAT* pssf, SNDS
     return ppchan->shandle;
 }
 
-extern "C" int fn_803B5254(int packetinstancehandle, SNDPACKET* psp)
+extern "C" int SNDPKTPLAY_submit(int packetinstancehandle, SNDPACKET* psp)
 {
     SNDPACKETCHAN* ppchan = lbl_806AA500.ppc[packetinstancehandle];
     SNDPACKETENTRY* pentry;
@@ -381,7 +380,7 @@ extern "C" int fn_803B5254(int packetinstancehandle, SNDPACKET* psp)
     return packethandle;
 }
 
-extern "C" int fn_803B537C(int h)
+extern "C" int SNDPKTPLAY_submitspace(int h)
 {
     SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
     int max = 0;
@@ -393,24 +392,24 @@ extern "C" int fn_803B537C(int h)
     return p->maxpackets - max - 1;
 }
 
-extern "C" unsigned int fn_803B53DC(int h)
+extern "C" int SNDPKTPLAY_framesoutstanding(int h)
 {
     SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
     return p->outstandingframes + p->outstandingplatformframes;
 }
 
-extern "C" int fn_803B5400(int, int, int)
+extern "C" int SNDPKTPLAY_purge(int, int, int)
 {
     return -15;
 }
 
-extern "C" int fn_803B5408(int h)
+extern "C" int SNDPKTPLAY_stop(int h)
 {
     SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
     int i = 0;
     fn_803AB480(p->shandle);
-    fn_803B57A4();
-    fn_803B5400(h, 0, 0x7fffffff);
+    SNDPKTPLAYI_flushcallbackdata();
+    SNDPKTPLAY_purge(h, 0, 0x7fffffff);
     p->shandle = -1;
     for (i = 0; i < p->sampleformat.channels; i++) {
         if (p->ptsdata[i] != 0)
@@ -419,7 +418,7 @@ extern "C" int fn_803B5408(int h)
     return 0;
 }
 
-extern "C" int fn_803B54A8(int h)
+extern "C" int SNDPKTPLAY_destroy(int h)
 {
     fn_803A975C();
     fn_803B0714(h);
@@ -428,7 +427,7 @@ extern "C" int fn_803B54A8(int h)
     return 0;
 }
 
-extern "C" void* fn_803B54FC(int packetinstancehandle, int chan, int* pframes, int* pcontinuation)
+void* SNDPKTPLAYI_get(int packetinstancehandle, int chan, int* pframes, int* pcontinuation)
 {
     SNDPACKETCHAN* ppchan = lbl_806AA500.ppc[packetinstancehandle];
     SNDPACKETENTRY* pentry;
@@ -498,7 +497,7 @@ extern "C" void* fn_803B54FC(int packetinstancehandle, int chan, int* pframes, i
     return pentry->psamples[chan];
 }
 
-extern "C" void fn_803B5738(int h, int chan, int frames)
+void SNDPKTPLAYI_freeframes(int h, int chan, int frames)
 {
     SNDPACKETCHAN* p = lbl_806AA500.ppc[h];
     if (chan != p->masterpacketchan)
@@ -513,7 +512,7 @@ extern "C" void fn_803B5738(int h, int chan, int frames)
     lbl_806AA500.callbackindex++;
 }
 
-extern "C" void fn_803B57A4()
+void SNDPKTPLAYI_flushcallbackdata()
 {
     int i;
     for (i = 0; i < lbl_806AA500.callbackindex; i++) {

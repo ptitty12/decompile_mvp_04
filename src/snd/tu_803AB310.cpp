@@ -13,10 +13,8 @@ extern "C" void fn_803A979C();
 extern "C" void fn_803B4160(int shandle, int cutoff);
 extern "C" void fn_803B445C(int shandle, int cutoff);
 extern "C" void fn_803B0F24(int voice);
-extern "C" int fn_803B4CD4(int n);
 extern "C" int fn_803FD944(int a, int b, int c);
 extern "C" void fn_803AA810(int h, int a, void* b, int c, int d);
-extern "C" unsigned int fn_803B53DC(int h);
 extern "C" int fn_803FE914(int h);
 extern "C" void fn_803FDD78(int h, int v);
 extern "C" void fn_803AD258(int shandle, int v);
@@ -121,7 +119,7 @@ extern "C" int fn_803AB4E0(int maxrequests, int maxchunks)
     int n = lbl_80625448 * 4;
     n += 0x214;
     n += maxrequests * 0x28;
-    return n + fn_803B4CD4(maxchunks);
+    return n + SNDPKTPLAY_overhead(maxchunks);
 }
 
 extern "C" int fn_803AB528(int a, int b)
@@ -215,7 +213,7 @@ extern "C" int fn_803AB8A4(int h, SNDSTREAMSTATUS* s)
         Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)pssc->allocatedrequests.phead;
         s->currentrequest = r->sndrequesthandle;
         if (pssc->cursf.samplerate != 0) {
-            s->timebuffered = fn_803B53DC(pssc->packetinstancehandle) * 1000 / pssc->cursf.samplerate;
+            s->timebuffered = (unsigned int)SNDPKTPLAY_framesoutstanding(pssc->packetinstancehandle) * 1000 / pssc->cursf.samplerate;
             if (s->timebuffered == 0) {
                 r = fn_803AB310(s->currentrequest);
                 if (r->avgdatarate != 0) {

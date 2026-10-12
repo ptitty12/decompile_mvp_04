@@ -31,8 +31,6 @@ extern "C" void fn_803A979C();
 extern "C" int fn_803AA468();
 extern "C" int fn_803AAA3C(int h);
 extern "C" void fn_803AA2E8();
-extern "C" void fn_803B54A8(int h);
-extern "C" void fn_803B5408(int h);
 extern "C" void fn_803FDC80(int h);
 extern "C" void fn_803FE418(int h);
 extern "C" void fn_803FE660(int h);
@@ -248,7 +246,7 @@ extern "C" int fn_803AA95C(int h)
         iSNDserverremoveclient(fn_803AA2E8);
         lbl_8069CA44 = 0;
     }
-    fn_803B54A8(pssc->packetinstancehandle);
+    SNDPKTPLAY_destroy(pssc->packetinstancehandle);
     int sh = pssc->streamhandle;
     int tap = pssc->fromtap;
     lbl_8069CADC.pssc[h] = 0;
@@ -272,7 +270,7 @@ extern "C" int fn_803AAA3C(int h)
         return -8;
     }
     if (pssc->shandle >= 0)
-        fn_803B5408(pssc->packetinstancehandle);
+        SNDPKTPLAY_stop(pssc->packetinstancehandle);
     pssc->shandle = -1;
     if (pssc->fromtap == 0) {
         fn_803FE418(pssc->streamhandle);
