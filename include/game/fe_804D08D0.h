@@ -34,7 +34,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s14();
     virtual void s15();
     virtual void s16();
-    virtual void s17();
+    virtual void s17(int a);
     virtual void s18();
     virtual void s19();
     virtual void s20();
@@ -508,10 +508,12 @@ struct FeG10 {
     int m6C;
     int m70;
 };
+struct FeTeamRec;
 struct FeG2 {
     char padC[0xC];
     FeG3* mC;
     FeG10* m10;
+    FeTeamRec* m14;
 };
 struct FeG1 {
     char pad0[4];
@@ -862,6 +864,93 @@ extern int lbl_80621AF4;
 extern "C" {
 void fn_80125128(void* w, int a);
 void fn_800C4720(void* a, FeW* w);
+}
+
+
+/* ---- unit 804DA10C ------------------------------------------------------------------ */
+
+/* A team record (0xE64 bytes each, two of them at FeG2::m14). */
+struct FeTeamRec {
+    char pad0[0x164];
+    int m164;
+    char pad168[0x198 - 0x168];
+    int m198;
+    char pad19C[0xE64 - 0x19C];
+};
+
+/* Roster screen (methods start unit 804DA10C): m13C = home flag, m158 the SPGRID list, m160 the
+ * team record shown; m168 holds the id of each list row. Twin of FeS804DB050. */
+struct FeS804DA10C : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[8];
+    int m13C;
+    FeW* m140;
+    int m144;
+    int m148;
+    int m14C;
+    char pad150[4];
+    FeW* m154;
+    FeW* m158;
+    FeW* m15C;
+    FeTeamRec* m160;
+    int m164;
+    int m168[8];
+    FeW* m188;
+};
+/* Twin screen (methods from 804DB050): m168/m16C are widgets, m18C the row ids. */
+struct FeS804DB050 : FeW {
+    char pad40[0xF0];
+    int m130;
+    char pad134[4];
+    int m138;
+    int m13C;
+    char pad140[8];
+    int m148;
+    int m14C;
+    char pad150[8];
+    FeW* m158;
+    FeW* m15C;
+    char pad160[8];
+    FeW* m168;
+    FeW* m16C;
+    FeTeamRec* m170;
+    char pad174[4];
+    int m178;
+    char pad17C[8];
+    int m184;
+    char pad188[4];
+    int m18C[9];
+};
+extern const char lbl_805F9720[];
+extern const char lbl_805F972C[];
+extern const char lbl_805F9738[];
+extern const char lbl_805F5828[];
+extern const char lbl_805F9740[];
+extern const char lbl_805F55DC[];
+extern "C" {
+int fn_800E18D4__Fi(int a);
+int fn_80097148(FeTeamRec* t);
+int fn_80097210(FeTeamRec* t, int a);
+void fn_80096830(FeTeamRec* t, int a);
+void fn_80125084(void* w, int a);
+void fn_804DA6D8(FeS804DA10C* x);
+void fn_804DA74C(FeS804DA10C* x);
+void fn_804DB4E0(FeS804DB050* x, int a);
+void fn_804DB444(FeS804DB050* x);
+int fn_804DBC40(FeS804DB050* x);
+}
+
+extern int lbl_8061B2B8;
+extern "C" {
+void fn_800E1388(FeW* w, int a, int b, int c);
+void fn_800E0C38(FeW* w, int a, int b, int c);
+}
+
+extern const char lbl_805F9770[];
+extern "C" {
+int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
+void fn_8009C54C(FeTeamRec* t, int a);
 }
 
 #endif
