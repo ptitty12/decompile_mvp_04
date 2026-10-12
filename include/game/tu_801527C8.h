@@ -56,7 +56,9 @@ public:
 
 /* Deeper objects of the script run context (only the fields the commands read). */
 struct Unk801527C8_Team {
-    char pad0[0x1B4];
+    char pad0[0x198];
+    int m198;
+    char pad19C[0x1B4 - 0x19C];
     unsigned char m1B4[0x80];
     char pad234[0xD70 - 0x234];
     int mD70;
@@ -66,7 +68,8 @@ struct Unk801527C8_Team {
 struct Unk801527C8_Teams {
     Unk801527C8_Team m0[2];
     unsigned char m1CC8;
-    char pad1CC9[7];
+    unsigned char m1CC9;
+    char pad1CCA[6];
     int m1CD0;
 };
 
@@ -82,6 +85,7 @@ struct Unk801527C8_Ent0C {
 
 struct Unk801527C8_Mgr {
     int fn_8006BE18();
+    int fn_8006BF10();
     char pad0[0xC];
     Unk801527C8_Ent0C* mC;
     Unk801527C8_Ent10* m10;
@@ -96,12 +100,14 @@ struct Unk801527C8_Ent3BC {
 struct Unk801527C8_Obj3A4 {
     char pad0[0x180];
     float m180;
+    char pad184[0x200 - 0x184];
+    int m200;
 };
 
 struct Unk801527C8_Slots {
     char pad0[0x3A4];
     Unk801527C8_Obj3A4* m3A4;
-    char pad3A8[4];
+    void* m3A8;
     void* m3AC;
     void* m3B0;
     void* m3B4;
@@ -124,6 +130,7 @@ struct Unk80326F44_Out {
 struct Unk801527C8_Sub {
     void fn_80326EF4(float t, float k, int id, int a, int b, int flags);
     Unk80326F44_Out fn_80326F44(int id, int flag, float t);
+    Unk80326F44_Out fn_80326FC4(int id, int flag, float t);
     char pad0[0x40];
 };
 
@@ -162,7 +169,7 @@ struct Unk801527C8_Actor {
     void* m3C;
     void* m40;
     int m44;
-    char pad48[4];
+    int m48;
     float m4C;
     Unk801527C8_Sub m50;
     char pad90[0x554 - 0x90];
