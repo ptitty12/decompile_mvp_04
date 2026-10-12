@@ -312,25 +312,6 @@ extern "C" void fn_803E57F0(Unk803E57F0* o, int chrg)
         lbl_8062C66C(o, 0xDC);
 }
 
-extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
-{
-    SubCtor(o);
-    return o;
-}
-
-extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
-{
-    if (o->mC) {
-        int* base = (int*)o->mC - 1;
-        lbl_8062C66C(base, *base + 4);
-    }
-    if (o->m4)
-        fn_803D7600(o->m4, 3);
-    lbl_8062C66C(o->m38, 0x104);
-    if (chrg & 1)
-        lbl_8062C66C(o, 0x3C);
-}
-
 /* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
 struct Unk803E6950_Names {
     char pad0[4];
@@ -352,6 +333,74 @@ struct Unk803E6950 {
     char pad14[0x2C - 0x14];
     int m2C;
 };
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
+
+inline int FindSet(Unk803E6950* o, const char* name, int a, int b, int c)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
+            found = i;
+            break;
+        }
+    }
+    return fn_803E6A70(o, found, a, b, c);
+}
+
+inline int BuildInl(Unk803E6660* o, int total)
+{
+    int ok = 0;
+    if (o->m18 == 0) {
+        o->m1C = total;
+        int* hdr = o->m38;
+        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
+        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
+            lbl_8062C660 = hdr;
+            lbl_8062C664 = 0x104;
+        }
+        for (int i = 0; i < o->m14; i++) {
+            fn_803E4964(o, i);
+            fn_803D71F0(o->m4);
+        }
+        lbl_8062C660 = 0;
+        lbl_8062C664 = 0;
+        ok = 1;
+    }
+    return ok;
+}
+
+extern char lbl_8060CC1C[];
+
+extern "C" void fn_803E6508(char* o, int arg)
+{
+    int st = *(int*)(o + 0xc);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0x10), st);
+        *(int*)(o + 0xc) = 0;
+    }
+    FindSet((Unk803E6950*)(o + 0x10), lbl_8060CC1C, arg, 0, -1);
+}
+
+extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
+{
+    SubCtor(o);
+    return o;
+}
+
+extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
+{
+    if (o->mC) {
+        int* base = (int*)o->mC - 1;
+        lbl_8062C66C(base, *base + 4);
+    }
+    if (o->m4)
+        fn_803D7600(o->m4, 3);
+    lbl_8062C66C(o->m38, 0x104);
+    if (chrg & 1)
+        lbl_8062C66C(o, 0x3C);
+}
+
 
 extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
 {
@@ -400,18 +449,11 @@ extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
     return found != -1;
 }
 
-extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
+
 
 extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c)
 {
-    int found = -1;
-    for (int i = 0; i < o->m10; i++) {
-        if (strcmp(name, o->m8->m0->m4[i]) == 0) {
-            found = i;
-            break;
-        }
-    }
-    return fn_803E6A70(o, found, a, b, c);
+    return FindSet(o, name, a, b, c);
 }
 
 extern char lbl_8060CB34[];
@@ -461,27 +503,6 @@ extern "C" int fn_803E6B74(Unk803E6660* o)
     return 1;
 }
 
-inline int BuildInl(Unk803E6660* o, int total)
-{
-    int ok = 0;
-    if (o->m18 == 0) {
-        o->m1C = total;
-        int* hdr = o->m38;
-        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
-        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
-            lbl_8062C660 = hdr;
-            lbl_8062C664 = 0x104;
-        }
-        for (int i = 0; i < o->m14; i++) {
-            fn_803E4964(o, i);
-            fn_803D71F0(o->m4);
-        }
-        lbl_8062C660 = 0;
-        lbl_8062C664 = 0;
-        ok = 1;
-    }
-    return ok;
-}
 
 extern "C" int fn_803E6C28(Unk803E6660* o, int total)
 {
