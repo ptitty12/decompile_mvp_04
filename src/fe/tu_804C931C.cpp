@@ -3,7 +3,96 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 
+/* tu_8007A4DC.h declares fn_80402EF8 with C++ linkage; the symbol is plain. */
+#define fn_80402EF8 fe_fn_80402EF8_cxx
 #include "game/fe_804BE560.h"
+#undef fn_80402EF8
+struct FeG40 {
+    char pad0[0x40];
+    int m40;
+};
+class FeWF : public Unk800C7B40_Data {
+public:
+    virtual ~FeWF();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59(float a);
+    virtual void s60();
+    virtual float s61();
+};
+extern "C" void fn_80564ABC(int h, int s, int a, int c, void* d, void* e, int f);
+extern "C" void fn_80402EF8(char* dst, const char* src);
+extern "C" void fn_80403DE4(char* dst, const char* fmt, ...);
+extern const char lbl_805F80F4[];
+extern "C" int fn_80125154(void* w, int a);
+extern "C" FeW* fn_800C8060(FeW* w);
+struct FeCfg430 {
+    char pad0[0x430];
+    int m430;
+};
+struct FeMgr34 {
+    char pad0[0x34];
+    FeCfg430* m34;
+};
+extern const char lbl_805F8118[];
+extern const char lbl_805F8134[];
+extern const char lbl_805F4EF4[];
+extern "C" int fn_80125128(void* w, int a);
 
 extern void* lbl_8061977C;
 extern "C" const char* fn_80090880__FP11Unk80090880(void* t, int id);
@@ -158,6 +247,28 @@ extern "C" FE_OVERLAY void fn_804C9D58(FeScrN* x)
     x->m154->fn_vslot86();
 }
 
+/* near-miss: 3 of 102 slots. Retail forms the first fn_800DF254 buffer argument with its own `addi r3,r1,16` and orders
+ * the argument moves r3, r5, r4; ours copies the saved pointer (`mr r3,r30`). Pointer-local spellings, an inline
+ * wrapper and return-type flips of the callees were tried. */
+extern "C" FE_OVERLAY void fn_804C9E44(FeScrN* x)
+{
+    float sp8;
+    char b10[0xC8];
+    char bD8[0x20];
+    float t;
+    float pad;
+    unsigned sp100;
+    fn_80564ABC(((FeG40*)lbl_80619948)->m40, fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0), (int)x->m138, (int)x->m13C, &sp8, &sp100, 0);
+    t = sp8;
+    fn_800DF254(b10, 0, 3, t);
+    ((FeWV*)x->m15C)->s28(b10);
+    fn_80402EF8(bD8, lbl_805F80F4);
+    fn_80403DE4(b10, bD8, sp100);
+    ((FeWV*)x->m160)->s28(b10);
+    ((FeWF*)x->m148)->s59(!(((FeWF*)x->m148)->s61() >= sp8) ? ((FeWF*)x->m148)->s61() : sp8);
+    ((FeWF*)x->m14C)->s59((float)sp100);
+}
+
 extern "C" FE_OVERLAY void fn_804C9FDC(FeScrN* x)
 {
     char buf[0x80];
@@ -256,6 +367,24 @@ extern "C" FE_OVERLAY FeScrN* fn_804CA3F8(FeScrN* self, int a, int b, int c, int
 extern "C" FE_OVERLAY void fn_804CA448(FeScrN* x)
 {
     fn_800ECAA4(x);
+}
+
+extern "C" FE_OVERLAY void fn_804CA468(FeScrN* x)
+{
+    fn_800ECF18(x);
+    FePopup* p = (FePopup*)fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(p, x);
+    fn_80125154(p, 0);
+    fn_80125128(p, 1);
+    x->m134 = fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1));
+    if (((FeMgr34*)lbl_8061930C)->m34->m430 != 0) {
+        x->fn_vslot29(lbl_805F8118)->fn_vslot8(1);
+        x->fn_vslot29(lbl_805F8134)->fn_vslot8(0);
+    } else {
+        x->m134->fn_vslot79(((FeVQ*)x->m134)->s62() - 1, 0);
+        x->fn_vslot29(lbl_805F8118)->fn_vslot8(0);
+        x->fn_vslot29(lbl_805F8134)->fn_vslot8(1);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804CA664(FeScrN* x, int sel)
