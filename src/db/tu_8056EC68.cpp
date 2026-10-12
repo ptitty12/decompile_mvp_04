@@ -42,23 +42,6 @@ struct DbDownIt {
 };
 
 extern "C" void fn_8056EEA8(DbSel* self, int idx, int flag);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_8056F6C8(void);
-extern "C" void fn_8056FF68(DbMgr* self, int c);
-extern "C" float fn_8056FFB0(void);
-extern "C" void fn_8057001C(DbMgr* self, DbSelSrc* src);
-extern "C" void fn_805700C0(DbMgr* self, DbSelSrc* src);
-extern "C" void fn_80570138(DbMgr* self);
-extern "C" void fn_80570170(DbMgr* self);
-extern "C" void fn_80570C14(DbMgr* self);
-extern "C" void fn_805715D8(DbMgr* self);
-extern "C" void fn_805718E8(DbMgr* self);
-extern "C" void fn_80571A94(DbMgr* self);
-extern "C" void fn_8056F640(DbSel* self);
-extern "C" void fn_80570630(DbMgr* self);
-extern "C" void fn_80571AF8(DbMgr* self);
-extern "C" void fn_80571EA0(DbMgr* self);
-extern "C" void fn_8056F494(DbSel* self);
 
 extern "C" void fn_8056E1D8(DbSel* s);
 
@@ -69,7 +52,9 @@ void fn_8056C3AC(void* q, int x);
 
 extern "C" void fn_8056C7A0(void* q, int a1, int a2, int a3, int a4, int a5);
 /* forward declarations (definitions are in address order) */
+extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
 extern "C" void fn_8056F494(DbSel* self);
+extern "C" int fn_8056F51C(DbSel* self, int idx, void* p3);
 extern "C" void fn_8056F640(DbSel* self);
 extern "C" int fn_8056F6C8(void);
 extern "C" void fn_8056FF68(DbMgr* self, int c);
@@ -80,34 +65,36 @@ extern "C" void fn_80570138(DbMgr* self);
 extern "C" void fn_80570170(DbMgr* self);
 extern "C" void fn_80570630(DbMgr* self);
 extern "C" void fn_80570C14(DbMgr* self);
+extern "C" void fn_805714C0(DbMgr* self);
 extern "C" void fn_805715D8(DbMgr* self);
 extern "C" void fn_805718E8(DbMgr* self);
 extern "C" void fn_80571A94(DbMgr* self);
 extern "C" void fn_80571AF8(DbMgr* self);
 extern "C" void fn_80571EA0(DbMgr* self);
-extern "C" void fn_805714C0(DbMgr* self);
-extern "C" int fn_8056F51C(DbSel* self, int idx, void* p3);
-extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
-/* forward declarations (definitions are in address order) */
-extern "C" void fn_8056F494(DbSel* self);
-extern "C" void fn_8056F640(DbSel* self);
-extern "C" int fn_8056F6C8(void);
-extern "C" void fn_8056FF68(DbMgr* self, int c);
-extern "C" float fn_8056FFB0(void);
-extern "C" void fn_8057001C(DbMgr* self, DbSelSrc* src);
-extern "C" void fn_805700C0(DbMgr* self, DbSelSrc* src);
-extern "C" void fn_80570138(DbMgr* self);
-extern "C" void fn_80570170(DbMgr* self);
-extern "C" void fn_80570630(DbMgr* self);
-extern "C" void fn_80570C14(DbMgr* self);
-extern "C" void fn_805715D8(DbMgr* self);
-extern "C" void fn_805718E8(DbMgr* self);
-extern "C" void fn_80571A94(DbMgr* self);
-extern "C" void fn_80571AF8(DbMgr* self);
-extern "C" void fn_80571EA0(DbMgr* self);
-extern "C" void fn_805714C0(DbMgr* self);
-extern "C" int fn_8056F51C(DbSel* self, int idx, void* p3);
-extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
+
+/* near-miss: 2 slots (addi r26,r27,1 lands after the call); CR4 flag form reproduced */
+extern "C" DB_OVERLAY int fn_8056EC68(DbSel* self, int a, int b, int c, int d)
+{
+    int next = d + 1;
+    int r = fn_8056F51C(self, b, (void*)b);
+    if (r == 0) {
+        int* sub = self->m14;
+        DbT* t = TeamAt(self->m10, sub[1]);
+        int side = sub[1];
+        fn_8056BAEC(self->m18, a, sub[0], 0);
+        unsigned char* row = (unsigned char*)t + 0x17C;
+        fn_8056BAEC(self->m18, row[b], side, 0);
+        int v = next;
+        if (b == 1)
+            v = 3;
+        fn_8056C7A0(self->m18, v, a, b, c, 4);
+        if (d >= 0)
+            fn_80081CCC__FP13Unk8007FF8C_Yi(self->m10, d);
+    } else {
+        fn_8056F640(self);
+    }
+    return r == 0;
+}
 
 /* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
 extern "C" DB_OVERLAY void fn_8056F494(DbSel* self)
@@ -122,6 +109,38 @@ extern "C" DB_OVERLAY void fn_8056F494(DbSel* self)
             i = it.Next();
         } while (i >= 0);
     }
+}
+
+extern "C" DB_OVERLAY int fn_8056F51C(DbSel* self, int idx, void* p3)
+{
+    if (self->m24 == 0)
+        return 0;
+    int side = self->m14[1];
+    float a = fn_8056CDDC(self->m1C, idx, p3);
+    float b = 2.0f * fn_8056FFB0();
+    int r = 0;
+    if (!(b >= a)) {
+        fn_8056C3AC(self->m18, idx);
+        unsigned char* row = (unsigned char*)TeamAt(self->m10, side) + 0x17C;
+        fn_8056BAEC(self->m18, row[idx], side, 0);
+        if (Round(self->m10) > 1) {
+            unsigned char x1 = self->m4->m0;
+            DbQ* q0 = self->m0;
+            unsigned char x2 = self->m8->m0;
+            if (q0->m0 != 0xFF)
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(q0, q0->m0, q0->m1, 0);
+            if (x1 != 0xFF) {
+                DbQ* q1 = self->m4;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(q1, x1, q1->m1, 0);
+            }
+            if (x2 != 0xFF) {
+                DbQ* q2 = self->m8;
+                fn_80080BB4__FP13Unk8007FF8C_Qiii(q2, x2, q2->m1, 0);
+            }
+        }
+        r = 1;
+    }
+    return r;
 }
 
 extern "C" DB_OVERLAY void fn_8056F640(DbSel* self)
@@ -233,6 +252,61 @@ extern "C" DB_OVERLAY void fn_80570C14(DbMgr* self)
     fn_8056F228(&self->mCC);
 }
 
+extern "C" DB_OVERLAY void fn_805714C0(DbMgr* self)
+{
+    DbSel* s = &self->mCC;
+    fn_8056E1D8(s);
+    int v;
+    if (s->m2C == 1) {
+        switch (s->m28) {
+        case 2:
+            v = 0x1E;
+            break;
+        case 3:
+            v = 0x1F;
+            break;
+        case 4:
+            v = 0x20;
+            break;
+        case 5:
+            v = 0x21;
+            break;
+        case 1:
+            v = 0x22;
+            break;
+        case 0:
+            v = 0x23;
+            break;
+        default:
+            return;
+        }
+    } else {
+        switch (s->m28) {
+        case 2:
+            v = 0x18;
+            break;
+        case 3:
+            v = 0x19;
+            break;
+        case 4:
+            v = 0x1A;
+            break;
+        case 5:
+            v = 0x1B;
+            break;
+        case 1:
+            v = 0x1C;
+            break;
+        case 0:
+            v = 0x1D;
+            break;
+        default:
+            return;
+        }
+    }
+    self->m118 = v;
+}
+
 extern "C" DB_OVERLAY void fn_805715D8(DbMgr* self)
 {
     self->m118 = 13;
@@ -295,115 +369,4 @@ extern "C" DB_OVERLAY void fn_80571EA0(DbMgr* self)
         fn_8056BAEC(s, cur, side, 0);
         fn_8056C0A0(s, cur);
     }
-}
-
-extern "C" DB_OVERLAY void fn_805714C0(DbMgr* self)
-{
-    DbSel* s = &self->mCC;
-    fn_8056E1D8(s);
-    int v;
-    if (s->m2C == 1) {
-        switch (s->m28) {
-        case 2:
-            v = 0x1E;
-            break;
-        case 3:
-            v = 0x1F;
-            break;
-        case 4:
-            v = 0x20;
-            break;
-        case 5:
-            v = 0x21;
-            break;
-        case 1:
-            v = 0x22;
-            break;
-        case 0:
-            v = 0x23;
-            break;
-        default:
-            return;
-        }
-    } else {
-        switch (s->m28) {
-        case 2:
-            v = 0x18;
-            break;
-        case 3:
-            v = 0x19;
-            break;
-        case 4:
-            v = 0x1A;
-            break;
-        case 5:
-            v = 0x1B;
-            break;
-        case 1:
-            v = 0x1C;
-            break;
-        case 0:
-            v = 0x1D;
-            break;
-        default:
-            return;
-        }
-    }
-    self->m118 = v;
-}
-
-extern "C" DB_OVERLAY int fn_8056F51C(DbSel* self, int idx, void* p3)
-{
-    if (self->m24 == 0)
-        return 0;
-    int side = self->m14[1];
-    float a = fn_8056CDDC(self->m1C, idx, p3);
-    float b = 2.0f * fn_8056FFB0();
-    int r = 0;
-    if (!(b >= a)) {
-        fn_8056C3AC(self->m18, idx);
-        unsigned char* row = (unsigned char*)TeamAt(self->m10, side) + 0x17C;
-        fn_8056BAEC(self->m18, row[idx], side, 0);
-        if (Round(self->m10) > 1) {
-            unsigned char x1 = self->m4->m0;
-            DbQ* q0 = self->m0;
-            unsigned char x2 = self->m8->m0;
-            if (q0->m0 != 0xFF)
-                fn_80080BB4__FP13Unk8007FF8C_Qiii(q0, q0->m0, q0->m1, 0);
-            if (x1 != 0xFF) {
-                DbQ* q1 = self->m4;
-                fn_80080BB4__FP13Unk8007FF8C_Qiii(q1, x1, q1->m1, 0);
-            }
-            if (x2 != 0xFF) {
-                DbQ* q2 = self->m8;
-                fn_80080BB4__FP13Unk8007FF8C_Qiii(q2, x2, q2->m1, 0);
-            }
-        }
-        r = 1;
-    }
-    return r;
-}
-
-/* near-miss: 2 slots (addi r26,r27,1 lands after the call); CR4 flag form reproduced */
-extern "C" DB_OVERLAY int fn_8056EC68(DbSel* self, int a, int b, int c, int d)
-{
-    int next = d + 1;
-    int r = fn_8056F51C(self, b, (void*)b);
-    if (r == 0) {
-        int* sub = self->m14;
-        DbT* t = TeamAt(self->m10, sub[1]);
-        int side = sub[1];
-        fn_8056BAEC(self->m18, a, sub[0], 0);
-        unsigned char* row = (unsigned char*)t + 0x17C;
-        fn_8056BAEC(self->m18, row[b], side, 0);
-        int v = next;
-        if (b == 1)
-            v = 3;
-        fn_8056C7A0(self->m18, v, a, b, c, 4);
-        if (d >= 0)
-            fn_80081CCC__FP13Unk8007FF8C_Yi(self->m10, d);
-    } else {
-        fn_8056F640(self);
-    }
-    return r == 0;
 }
