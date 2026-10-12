@@ -503,6 +503,42 @@ void fn_80259C50(M* self, int a)
     fn_802686E4((char*)self->m4 + 0x124, a);
 }
 
+extern Unk80273498_Vec3 lbl_805DBA04[];
+extern "C" P* fn_80259C78(M* self, int sel)
+{
+    P* best = 0;
+    float bestLen = 12000.0f;
+    float len;
+    int i = 9;
+    do {
+        P* p = fn_8026B8C0(self->m4, i);
+        if (p != 0) {
+            A* a = &p->m58C;
+            if (a->m30 == sel) {
+                int better = 0;
+                Unk80273498_Vec3 d = ((Unk80273498_Pos*)p)->m60 - lbl_805DBA04[sel];
+                len = fn_804028E4(d.x * d.x + d.y * d.y + d.z * d.z);
+                if (best != 0) {
+                    int x = a->m38;
+                    int y = best->m58C.m38;
+                    if (x == y) {
+                        if (!(len >= bestLen))
+                            better = 1;
+                    } else if (x < y)
+                        better = 1;
+                } else
+                    better = 1;
+                if (better) {
+                    best = p;
+                    bestLen = len;
+                }
+            }
+        }
+        i++;
+    } while (i <= 12);
+    return best;
+}
+
 float fn_80259DB4(M* self, int a)
 {
     float t = fn_80259EE8((char*)self->m4 + 0x468, 0, a, -1);
