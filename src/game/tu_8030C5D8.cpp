@@ -93,6 +93,12 @@ struct Unk8030C5D8_Cur {
     int* p;
 };
 extern float lbl_806E10E4[];
+extern void (*lbl_8062C66C)(void* p, int n);
+struct Unk8030C5D8_Dl {
+    char pad0[0xB8];
+    void* mB8;
+    void* mBC;
+};
 struct Unk8030C5D8_Em {
     char pad0[0x64];
     float m64;
@@ -451,6 +457,19 @@ void fn_8030E72C(Unk8030C5D8_At18* p, int c)
     fn_803DBD84((char*)p + 0x150, 2);
     fn_803E6708((char*)p + 0x114, 2);
     fn_80328374(p, c);
+}
+
+extern "C" void fn_8030EB38(void* pp)
+{
+    Unk8030C5D8_Dl* p = (Unk8030C5D8_Dl*)pp;
+    if (p->mB8 != 0) {
+        lbl_8062C66C((char*)p->mB8 - 8, ((int*)p->mB8)[-2] * 12 + 8);
+        p->mB8 = 0;
+    }
+    if (p->mBC != 0) {
+        lbl_8062C66C((char*)p->mBC - 8, ((int*)p->mBC)[-2] * 4 + 8);
+        p->mBC = 0;
+    }
 }
 
 void fn_8030F9DC(Unk8030C5D8_Em2* p)
