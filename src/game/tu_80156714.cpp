@@ -83,6 +83,9 @@ int fn_8017CF14(void* p, int i);
 void fn_8017CD04(void* p, int i, int j);
 }
 int fn_801A2034(Unk801527C8_Actor* a, int i);
+struct V2_80159E40 { float x; float y; };
+V2_80159E40 fn_8022EA60(void* a, ...);
+inline float AbsF80159E40(float v) { return (float)__builtin_fabs(v); }
 inline void SetM4C(Unk8061FEDC_Obj* o, float v)
 {
     o->m40.mC = v;
@@ -427,6 +430,34 @@ void cScriptParticleEffect::fn_vslot2() /* 80156EB4 */
 
 int cScriptParticleEffect::fn_cslot8() /* 80156F14 */
 {
+}
+
+extern "C" void fn_80159E40(Unk80159F28* self, int* a, int* b) /* 80159E40 */
+{
+    int k = self->mC->m700->m3A4->m200;
+    switch (k) {
+    case 0:
+    case 3:
+        *a = 1;
+        *b = 1;
+        break;
+    case 1: {
+        *a = k;
+        V2_80159E40 v = fn_8022EA60(self->mC->m700->m3B0);
+        if (!(AbsF80159E40(v.x) <= AbsF80159E40(v.y))) {
+            *b = k;
+        } else {
+            *b = 0;
+        }
+        break;
+    }
+    case 2:
+    case 4:
+    case 5:
+    case 6:
+        *a = 0;
+        break;
+    }
 }
 
 extern "C" void fn_8015A5A4(Unk80159F28* self) /* 8015A5A4 */
