@@ -119,6 +119,84 @@ int fn_801F316C(Scr* p)
     return r;
 }
 
+struct Unk801F3244_Pl {
+    char pad0[0x460];
+    int m460;
+    char pad464[0x4D8 - 0x464];
+    char m4D8[0x94];
+    int m56C;
+};
+struct Unk801F3244_Ob {
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
+};
+struct Unk801F3244_O7 {
+    char pad0[0x3B4];
+    int m3B4;
+    char pad3B8[4];
+    int m3BC;
+};
+struct Unk801F3244_Ow {
+    char pad0[0x700];
+    Unk801F3244_O7* m700;
+};
+struct Unk801F3244_G {
+    Unk801F3244_Ow* m0;
+    char pad4[0x48 - 4];
+    int m48;
+    int m4C;
+    char pad50[0xE8 - 0x50];
+    int mE8;
+};
+int fn_801BBC78(int a);
+void fn_8024FAE0(void* sub, int a);
+void fn_8024F930(void* sub, int a, int b);
+Unk801EE438_Player* fn_801A497C(Unk801F3244_Ow* o, int k);
+void fn_80211CAC(void* l);
+int fn_80211D78(void* l);
+float fn_80211DE0(void* l);
+void fn_802099F8(void* p, int a);
+void fn_80205784(void* p, int a, int b);
+int fn_80259330(int a);
+
+/* near-miss (7 slots, registers only): retail keeps the slot value in r5, the flag in r0 and the sub-object pointer in r9 */
+void fn_801F3244(Scr* s, Unk801F3244_Pl* pl, Unk801F3244_Ob* ob)
+{
+    Unk801F3244_G* g = (Unk801F3244_G*)s->m9C;
+    if (g->m48 != 1) {
+        if ((ob->m38C == 1 || fn_801BBC78(g->m0->m700->m3BC) == 1) && pl->m460 == 1) {
+            const float k = 0.2f;
+            if (ob->m3F4 < k)
+                return;
+        }
+        int* sub = (int*)pl->m4D8;
+        int v = sub[0x94 / 4];
+        int c = 1;
+        if (v == -1)
+            c = 0;
+        if (c == 1) {
+            if (((Unk801F3244_G*)s->m9C)->m4C == 1) {
+                fn_8024FAE0(sub, 1);
+                return;
+            }
+            if (v != -1)
+                pl = (Unk801F3244_Pl*)fn_801A497C(((Unk801F3244_G*)s->m9C)->m0, 4);
+        }
+        void* sub2 = (char*)s + 0xA8;
+        fn_80211CAC(&((Unk801F3244_G*)s->m9C)->mE8);
+        fn_802099F8(sub2, 1);
+        fn_80205784(sub2, 1, 1);
+        if (fn_80259330(((Unk801F3244_G*)s->m9C)->m0->m700->m3B4) == 0 && fn_80211D78(&((Unk801F3244_G*)s->m9C)->mE8) != -1 &&
+            !(fn_80211DE0(&((Unk801F3244_G*)s->m9C)->mE8) <= 0.2f)) {
+            fn_8024F930(pl->m4D8, 1, 0);
+            return;
+        }
+        fn_8024FAE0(pl->m4D8, 1);
+    }
+}
+
 int fn_801F3B54(Scr* p)
 {
     Unk801EE438_G* g = p->m9C;
@@ -272,10 +350,134 @@ int fn_801F5214(float* a, float* b)
     return *a > *b;
 }
 
+struct Unk801F522C_Ow {
+    char pad0[0x6BC];
+    void** m6BC;
+};
+extern const Unk801EE438_Vec lbl_806055AC;
+int fn_8019BA30(void** o, Unk801EE438_Vec* a, Unk801EE438_Vec* b, float* t, Unk801EE438_Vec* v, Unk801EE438_Vec* out, int* i, double* e, float f);
+
+/* near-miss (4 slots): retail puts the 8-byte scratch at sp+0x20 and the first vector copy at sp+0x28; ours swaps them */
+int fn_801F522C(Scr* p, const Unk801EE438_Vec* a, const Unk801EE438_Vec* b, Unk801EE438_Vec* out, Unk801EE438_Vec* out2, float f)
+{
+    void** o = ((Unk801F522C_Ow*)p->m9C->m0)->m6BC;
+    if (o == 0) {
+        *out = lbl_806055AC;
+        return 0;
+    }
+    float x = 0.0f;
+    Unk801EE438_Vec v = lbl_806055AC;
+    int iv = 0;
+    Unk801EE438_Vec a2 = *a;
+    a2.m4 = a->m4 >? 6.0f;
+    double e;
+    Unk801EE438_Vec b2 = *b;
+    b2.m4 = b->m4 >? 6.0f;
+    int r = fn_8019BA30(o, &a2, &b2, &x, &v, out, &iv, &e, f) == -1 ? 0 : 1;
+    if (out2 != 0)
+        *out2 = v;
+    return r;
+}
+
 int fn_801F5394()
 {
     char buf[0xB8];
     return 0;
+}
+
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+struct Unk80256C80_M;
+extern "C++" {
+int fn_8026D7B4(Unk8026C414_O* self, Unk8026C414_X* ctx);
+int fn_8026D8BC(Unk8026C414_O* self, Unk8026C414_X* ctx);
+void fn_802595B8(Unk80256C80_M* m, int o);
+}
+int fn_80250724(void* p);
+int fn_801F3B7C(Scr* p, void* pl);
+extern const Unk801EE438_Vec lbl_805D676C;
+
+struct Unk801F5C00_Nd {
+    Unk801F5C00_Nd* m0;
+    char pad4[0xC];
+    int m10;
+};
+struct Unk801F5C00_Sb {
+    char pad0[8];
+    float m8;
+    char padC[0x28 - 0xC];
+    int m28;
+};
+struct Unk801F5C00_Ob {
+    char pad0[0x58C];
+    Unk801F5C00_Sb m58C;
+    char pad5B8[0x934 - 0x58C - sizeof(Unk801F5C00_Sb)];
+    Unk801F5C00_Nd* m934;
+};
+struct Unk801F5C00_Rs {
+    char pad0[0x24];
+    int m24;
+    Unk801F5C00_Ob* m28;
+};
+struct Unk801F5C00_Ow {
+    char pad0[0x65C];
+    Unk801F5C00_Rs m65C;
+};
+struct Unk801F5C00_Pl {
+    char pad0[0x60];
+    Unk801EE438_Vec m60;
+    char pad6C[0x44C - 0x6C];
+    Unk801F5C00_Ow* m44C;
+    char pad450[0x4D8 - 0x450];
+    char m4D8[0x140];
+    Unk801F3DB4_Cfg* m618;
+};
+
+int fn_801F5C00(Scr* s, Unk801F5C00_Pl* pl)
+{
+    int r = 0;
+    Unk801F5C00_Rs* rs = &pl->m44C->m65C;
+    int m24 = rs->m24;
+    Unk801F5C00_Ob* o = rs->m28;
+    if (m24 != 0 && o != 0) {
+        Unk801F5C00_Sb* sm = &o->m58C;
+        if (sm->m8 == 0.0f) {
+            float d2 = (lbl_805D676C.m0 - pl->m60.m0) * (lbl_805D676C.m0 - pl->m60.m0) +
+                       (lbl_805D676C.m8 - pl->m60.m8) * (lbl_805D676C.m8 - pl->m60.m8);
+            const float lim = 5184.0f;
+            int flag = 0;
+            if (pl->m618->m838 == 0xCA50EF74)
+                flag = fn_8026D7B4((Unk8026C414_O*)pl, 0) == 1;
+            if (!((fn_8026D8BC((Unk8026C414_O*)pl, 0) != 0 || flag != 0) && d2 <= lim))
+                return 0;
+            Unk801F5C00_Nd* n = o->m934;
+            int kind = 0;
+            while (n != 0) {
+                if (n->m10 == 0xA) {
+                    kind = sm->m28;
+                    break;
+                }
+                n = n->m0;
+            }
+            if ((unsigned)(kind - 0xB) <= 5) {
+                int ph = fn_80250724(pl->m4D8);
+                if (ph == 1 || (ph == 3 && (kind == 0xC || kind == 0xE)) || (ph == 2 && (kind == 0xD || kind == 0xF))) {
+                    {
+                        char* b = (char*)s->m9C + 0x9FC;
+                        int o = s->m9C->m3A5C * 16;
+                        *(int*)(b + o) = 0;
+                    }
+                    if (fn_801F3B7C(s, pl) == 1) {
+                        r = 2;
+                        fn_802595B8((Unk80256C80_M*)s->m9C->m0->m700->m3B4, (int)o);
+                    } else {
+                        r = 1;
+                    }
+                }
+            }
+        }
+    }
+    return r;
 }
 
 int fn_801F5DD8(Scr* unused, int a)
