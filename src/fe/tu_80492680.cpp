@@ -39,6 +39,91 @@ extern "C" void fn_80496EE4(void* x, int a, int b, int c, int d, void* w, int e,
 extern const char lbl_805F6AA8[];
 extern const char lbl_805F6AB8[];
 extern "C" void fn_8009E93C(char* p, int a, int b, char* out);
+extern "C" int fn_80403088(const unsigned short* s, int ch);
+extern "C" void fn_8040316C(unsigned short* dst, const unsigned short* src, int n);
+extern "C" void fn_800DFF0C(unsigned short* dst, unsigned short* src);
+extern const char lbl_805F7010[];
+extern const char lbl_805F7030[];
+struct Fe5080Rec {
+    char pad0[0x1B4];
+    unsigned char a[0x80];
+    char pad234[0x3E4 - 0x234];
+    unsigned char m3E4;
+};
+extern "C" int fn_80097A70(void* r, int a, int i, int b);
+extern "C" float fn_80097F68(void* r, int a, int i, int b, int c);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+extern "C" int fn_80353870__FP11Unk80353870(void* t);
+extern "C" int fn_80097148(void* team, int a);
+extern "C" void fn_80497E00(void* x, int i);
+extern "C" void fn_804980E4(void* x, int i);
+struct Fe8620St {
+    char pad0[0x628];
+    int m628;
+    char pad62C[8];
+    int m634;
+};
+extern const char lbl_805F4F0C[];
+extern const char lbl_805F59CC[];
+extern void* lbl_8061977C;
+extern "C" const char* fn_80090880__FP11Unk80090880(void* t, int id);
+extern "C" void fn_804031F8(char* out, const char* a, const char* b);
+extern "C" void fn_800DFEAC(char* a, const char* b);
+extern "C" void fn_800C80C0(void* p, int v);
+extern "C" void fn_80498620(int mode, void* x);
+extern "C" void fn_801321D4(FeW* o, void* self, void (*cb)(int, void*), int a, void* b, int c, int d, int e, const char* s1, const char* s2, const char* s3, int f, int g, int h);
+struct Fe498478Sec {
+    unsigned char* p;
+    int n;
+    int u[3];
+};
+struct Fe498478Rec {
+    Fe498478Sec s[5];
+    char pad64[0x3E8 - 0x64];
+    struct {
+        int m0;
+        char p[0x30];
+    } e[1];
+};
+extern "C" int fn_800968C0(void* t, int a, int b);
+extern "C" int fn_80097520(void* t, int a);
+extern "C" int fn_80097238(void* t, int a);
+extern "C" void fn_80571F4C(int a, int b, int c);
+extern "C" void fn_80572710(int a);
+extern "C" void fn_80572CB0(int a);
+extern "C" void fn_80492680(void* x, int a, int b, int c);
+extern const char lbl_805F69BC[];
+extern "C" char* strncpy(char*, const char*, unsigned);
+struct Fe3F20Sub {
+    char pad0[0x4C];
+    int m4C;
+    int m50;
+};
+struct Fe3F20 {
+    char pad0[0x184];
+    int m184;
+    int m188;
+    int m18C;
+    int m190;
+    char pad194[0x19C - 0x194];
+    Fe3F20Sub* m19C;
+    char pad1A0[4];
+    void* m1A4;
+    char pad1A8[0x338 - 0x1A8];
+    int m338;
+    unsigned char m33C;
+    int m340;
+    int m344;
+    unsigned char m348;
+    int m34C;
+    int m350;
+    unsigned char m354;
+    int m358;
+};
+extern "C" unsigned char* fn_80081CF8__FP13Unk8007FF8C_Yi(void* p, int k);
+extern "C" int fn_80097620(void* rec, int a, int b, int c);
+extern const char lbl_805F69E4[];
+extern "C" FeW* fn_800C8060();
 extern "C" {
 
 inline void Fe2FB4Get(char* rec, char* nm)
@@ -49,12 +134,6 @@ inline char* FeIdc(char* p)
 {
     return p;
 }
-extern "C" int fn_80403088(const unsigned short* s, int ch);
-extern "C" void fn_8040316C(unsigned short* dst, const unsigned short* src, int n);
-extern "C" void fn_800DFF0C(unsigned short* dst, unsigned short* src);
-extern "C" int fn_80403088(const unsigned short* s, int ch);
-extern "C" void fn_8040316C(unsigned short* dst, const unsigned short* src, int n);
-extern "C" void fn_800DFF0C(unsigned short* dst, unsigned short* src);
 FE_OVERLAY void fn_80492E94(void* x)
 {
     unsigned short buf[200];
@@ -254,14 +333,53 @@ FE_OVERLAY void fn_804937C8(void* x, int a, int b)
     fn_80492BA8(x, out);
 }
 
-extern const char lbl_805F7010[];
-extern const char lbl_805F7030[];
-extern const char lbl_805F7010[];
-extern const char lbl_805F7030[];
-extern const char lbl_805F7010[];
-extern const char lbl_805F7030[];
-extern const char lbl_805F7010[];
-extern const char lbl_805F7030[];
+/* near-miss: 99.1%, only one slot differs: retail re-extends the m348 byte (clrlwi r0,r9,24) before the last cmpwi 0xFF, ours reuses r9 */
+FE_OVERLAY void fn_80493F20(Fe3F20* x)
+{
+    if (x->m19C->m50 == 1) {
+        unsigned char a = *fn_80081CF8__FP13Unk8007FF8C_Yi(x->m1A4, 1);
+        char* bb = (char*)x + 0x1A8;
+        int off = x->m184 * 4;
+        int s = fn_80097620(*(void**)(bb + off), 3, x->m33C, 0);
+        if (a == x->m33C || *fn_80081CF8__FP13Unk8007FF8C_Yi(x->m1A4, 2) == x->m33C || (s > x->m340 && x->m33C != 0xFF)) {
+            fn_80493544(x, x->m338, 2);
+        } else if (a == 0xFF) {
+            fn_804936C0(x, x->m338, 2);
+        }
+    }
+    if (x->m19C->m4C == 1) {
+        unsigned char b = *fn_80081CF8__FP13Unk8007FF8C_Yi(x->m1A4, 2);
+        char* bb = (char*)x + 0x1A8;
+        int off = x->m184 * 4;
+        int s = fn_80097620(*(void**)(bb + off), 3, x->m348, 0);
+        int t2 = x->m348;
+        if (b == t2 || (b != 0xFF && b == x->m33C) || (s > x->m34C && (unsigned char)t2 != 0xFF)) {
+            fn_80493544(x, x->m344, 3);
+        } else if (b == 0xFF) {
+            fn_804936C0(x, x->m344, 3);
+        }
+    }
+    if ((unsigned)(x->m190 - 2) <= 1) {
+        unsigned char t = x->m354;
+        int v;
+        if (t != 0xFF) {
+            char* bb = (char*)x + 0x1A8;
+            int off = x->m184 * 4;
+            int s = fn_80097620(*(void**)(bb + off), 3, t, 0);
+            if (s <= x->m358) {
+                fn_804936C0(x, x->m350, 4);
+                v = 2;
+            } else {
+                fn_80493544(x, x->m350, 4);
+                v = 0;
+            }
+        } else {
+            v = 0;
+        }
+        x->m190 = v;
+    }
+}
+
 /* near-miss: 99.6%, retail clrlwi r11,r5,24 then slwi r6 then mulli r11 (r11 not r0, mulli after slwi) */
 FE_OVERLAY void fn_80494108(void* x, int k, int a, int b)
 {
@@ -302,14 +420,6 @@ FE_OVERLAY void fn_80494F94(Fe4F94* x)
     }
 }
 
-struct Fe5080Rec {
-    char pad0[0x1B4];
-    unsigned char a[0x80];
-    char pad234[0x3E4 - 0x234];
-    unsigned char m3E4;
-};
-extern "C" int fn_80097A70(void* r, int a, int i, int b);
-extern "C" float fn_80097F68(void* r, int a, int i, int b, int c);
 static inline int SumB5080(Fe5080Rec* r)
 {
     int s = 0;
@@ -371,6 +481,31 @@ FE_OVERLAY void fn_8049535C(void* x)
     ((FeWQ*)fn_800C8040(FeMem(x, 0x1F0)->fn_vslot32(lbl_805F7060, 1)))->s30((int)p);
 }
 
+FE_OVERLAY void fn_80495AB4(void* x)
+{
+    FeWV* w = (FeWV*)fn_800C8060(FeMem(x, 0x1E0)->fn_vslot32(lbl_805F69E4, 1));
+    if (FeI(x, 0x338) != 0 && FeI(x, 0x344) == 0) {
+        w->s101(0, 1);
+    } else {
+        w->s101(0, 0);
+    }
+    if (FeI(x, 0x344) != 0 && FeI(x, 0x350) == 0) {
+        w->s101(1, 1);
+    } else {
+        w->s101(1, 0);
+    }
+    if (FeI(x, 0x350) != 0 && FeI(x, 0x35C) == 0) {
+        w->s101(2, 1);
+    } else {
+        w->s101(2, 0);
+    }
+    if ((FeI(x, 0x338) != 0 && FeI(x, 0x344) != 0) || (FeI(x, 0x344) != 0 && FeI(x, 0x350) != 0) || (FeI(x, 0x338) != 0 && FeI(x, 0x350) != 0)) {
+        w->s101(3, 1);
+    } else {
+        w->s101(3, 0);
+    }
+}
+
 FE_OVERLAY void fn_80496560(void* x)
 {
     int k = FeI(x, 0x184);
@@ -389,6 +524,43 @@ FE_OVERLAY void fn_8049693C(char* x)
         int id = *(int*)(b + o);
         if (fn_80096988((void*)id, (int)fn_80081B60__FP13Unk8007FF8C_Y(FeP(x, 0x1A4)), 0) == 1) {
             fn_804982C0(x);
+        }
+    }
+}
+
+/* near-miss: 99.x%, the first mulli index (fn_80353870 result * 0x34) lands in r0 where retail has r9 */
+FE_OVERLAY void fn_804969A8(void* x)
+{
+    char big[1000];
+    char small1[200];
+    char small2[200];
+    if (FeI(x, 0x13C) != 1) {
+        int cur = FeI(x, 0x184);
+        if (cur != FeI(x, 0x188)) {
+            char* bb = (char*)x + 0x1A8;
+            char* rec = *(char**)(bb + cur * 4);
+            unsigned char c = *(unsigned char*)(rec + 0x17C);
+            unsigned char d = *(unsigned char*)(*(char**)(rec + 0x168) + *(int*)(rec + 0x174));
+            int r = fn_8008CFD8(rec + 0xC9C, 5, c);
+            if (d == c && (r == 0 || r == 10)) {
+                fn_80572710(*(int*)((char*)lbl_80619948 + 0x4C));
+                char* rec2 = *(char**)(bb + FeI(x, 0x184) * 4);
+                if (d != *(unsigned char*)(*(char**)(rec2 + 0x168) + *(int*)(rec2 + 0x174))) {
+                    FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+                    char* r3 = *(char**)(bb + FeI(x, 0x184) * 4);
+                    int t = fn_80353870__FP11Unk80353870(r3);
+                    int o1 = t * 0x34;
+                    char* tb = r3 + 0x3E8;
+                    fn_800DE440(small1, *(int*)(tb + o1), 0);
+                    int o2 = d * 0x34;
+                    char* r4 = *(char**)(bb + FeI(x, 0x184) * 4);
+                    char* tb2 = r4 + 0x3E8;
+                    fn_800DE440(small2, *(int*)(tb2 + o2), 0);
+                    ((void (*)(char*, const char*, ...))fn_80403DE4)(big, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x4F9F), small1, small2);
+                    fn_801321D4(p, x, (void (*)(int, void*))fn_804987E8, (int)fn_80529150, big, 1, -1, 1, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 0, 0);
+                    p->fn_vslot86();
+                }
+            }
         }
     }
 }
@@ -452,18 +624,6 @@ FE_OVERLAY void fn_80497C48(void* x)
     fn_800B7B4C(FeGetMgr(), p, x);
 }
 
-extern "C" int fn_80097148(void* team, int a);
-extern "C" void fn_80497E00(void* x, int i);
-extern "C" void fn_804980E4(void* x, int i);
-extern "C" int fn_80097148(void* team, int a);
-extern "C" void fn_80497E00(void* x, int i);
-extern "C" void fn_804980E4(void* x, int i);
-extern "C" int fn_80097148(void* team, int a);
-extern "C" void fn_80497E00(void* x, int i);
-extern "C" void fn_804980E4(void* x, int i);
-extern "C" int fn_80097148(void* team, int a);
-extern "C" void fn_80497E00(void* x, int i);
-extern "C" void fn_804980E4(void* x, int i);
 FE_OVERLAY void fn_80497CD0(void* x, int a)
 {
     volatile int sp8 = 0;
@@ -510,6 +670,36 @@ FE_OVERLAY void fn_80497CD0(void* x, int a)
     } while (e <= 1);
 }
 
+FE_OVERLAY void fn_804980E4(void* x, int a)
+{
+    char big[1000];
+    char small[200];
+    FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    int o2 = (unsigned char)a * 0x34;
+    char* bb = (char*)x + 0x1A8;
+    int off = FeI(x, 0x188) * 4;
+    char* rec = *(char**)(bb + off);
+    char* tb = rec + 0x3E8;
+    int v = *(int*)(tb + o2);
+    fn_800DE440(small, v, 0);
+    fn_804031F8(big, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x414A), small);
+    fn_800DFEAC(big, lbl_805F59CC);
+    fn_800DFF0C((unsigned short*)big, (unsigned short*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x345D));
+    ((Fe8620St*)fn_800B555C())->m628 = v;
+    int cnt = *(int*)(rec + 0x108);
+    if (cnt != 0) {
+        const char* s1 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3398);
+        fn_801321D4(p, x, fn_80498620, (int)fn_80529150, big, 1, -1, 1, s1, 0, 0, 0, 0, 0);
+    } else {
+        const char* s1 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3398);
+        const char* s2 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3396);
+        fn_801321D4(p, x, fn_80498620, (int)fn_80529150, big, 2, -1, 1, s1, s2, 0, 0, 0, 0);
+    }
+    *(int*)((char*)p + 0x2F0) = -0x63;
+    fn_800C80C0(p, fn_800B555C()->m570);
+    p->fn_vslot86();
+}
+
 FE_OVERLAY void fn_804982C0(void* x)
 {
     FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
@@ -541,19 +731,6 @@ FE_OVERLAY void fn_80498438(char* x)
     }
 }
 
-struct Fe498478Sec {
-    unsigned char* p;
-    int n;
-    int u[3];
-};
-struct Fe498478Rec {
-    Fe498478Sec s[5];
-    char pad64[0x3E8 - 0x64];
-    struct {
-        int m0;
-        char p[0x30];
-    } e[1];
-};
 FE_OVERLAY int fn_80498478(void* x)
 {
     unsigned char v = 0;
@@ -604,21 +781,6 @@ FE_OVERLAY void fn_80498590(int a, void* x)
     }
 }
 
-extern "C" int fn_800968C0(void* t, int a, int b);
-extern "C" int fn_80097520(void* t, int a);
-extern "C" int fn_80097238(void* t, int a);
-extern "C" void fn_80571F4C(int a, int b, int c);
-extern "C" void fn_80572710(int a);
-extern "C" void fn_80572CB0(int a);
-extern "C" void fn_80492680(void* x, int a, int b, int c);
-extern const char lbl_805F69BC[];
-struct Fe8620St {
-    char pad0[0x628];
-    int m628;
-    char pad62C[8];
-    int m634;
-};
-extern "C" char* strncpy(char*, const char*, unsigned);
 FE_OVERLAY void fn_80498620(int mode, void* x)
 {
     int cur = ((Fe8620St*)fn_800B555C())->m628;
