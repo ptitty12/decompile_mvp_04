@@ -14,6 +14,23 @@ struct DbFlagRec {
     unsigned mC;
 };
 
+/* 0x18-byte record with the vptr at +0x14 (set by the constructor fn_8052E444, destroyed by
+ * fn_80360AF0). The implicit assignment copies the whole record and restores the vptr. */
+class DbEnt {
+public:
+    int m0;
+    int m4;
+    int m8;
+    unsigned mC;
+    unsigned short m10;
+    unsigned short m12;
+    virtual void vfn();
+};
+struct DbItemE {
+    int m0;
+    int m4;
+    DbEnt e;
+};
 extern "C" {
 void* fn_8052E408(void* obj, void* a);
 int fn_80587728(void* obj);
@@ -377,6 +394,25 @@ extern "C" DB_OVERLAY void fn_80582C54(DbSubX* self, int a, DbStream* io)
     io->v08(a, self, 4);
     for (int i = 0; i < self->v10(); i++)
         fn_80582238((int*)self->v13(i), a, io);
+}
+
+extern "C" DB_OVERLAY int fn_80582CF8(DbSubX* self, void* obj, int a, int b, int c)
+{
+    DbEnt* o = (DbEnt*)obj;
+    if (a == 0)
+        a = fn_8007F9B4__FP13Unk8007F198_C(lbl_8061930C);
+    o->m10 = a;
+    if (b != 0) {
+        o->mC |= 0x40000000;
+        DbItemE* it = (DbItemE*)self->v13(c);
+        it->e = *o;
+        DbEnt* e = &it->e;
+        e->mC |= 0x40000000;
+        it->m4 = 1;
+    }
+    if (self->m0 == 0 || b != 0)
+        ((int (*)(void*, void*))fn_80080028__FP13Unk8007FF8C_G)(lbl_8061930C, o);
+    return 1;
 }
 
 extern "C" DB_OVERLAY int fn_80582DF4(int unused, int k, int* arr)
