@@ -167,6 +167,9 @@ int fn_800ABB94(void* self, int k);
 void fn_800ADFC4(void* p);
 void fn_800AD948(void* p, int a, float f);
 void fn_800AD468(void* p);
+void fn_800AD838(void* p, float f);
+void fn_800AD9C0(void* p, int a);
+void fn_8033E5C4(void* o, int a);
 void fn_803785E4(void* p);
 void fn_800B07A0(void* o);
 void fn_800B0570(void* o, int a);
@@ -783,18 +786,20 @@ extern "C" UnkFEObj8* fn_800AC8F4(UnkFEObj8* self, int a, int b, int c, float f)
     return self;
 }
 
-/* near-miss (6 slots): retail loads the lbl_805B9568 constant into f12 (reusing the spilled d register) and stores u after the compare */
-extern "C" void fn_800AC960(UnkFE20* self)
+/* inline body shared by the progress-bar updates: ratio u/d written to o->m10, 0.0f when d is not positive */
+inline void Ratio(UnkFE10* o, float d, float u)
 {
-    UnkFE10* o = self->m1C;
-    self->m20 = self->m20 + lbl_805B9564;
-    float d = self->m24;
-    float u = self->m20;
-    if (!(d >= lbl_805B9568)) {
-        o->m10 = lbl_805B9568;
+    if (!(d >= 0.0f)) {
+        o->m10 = 0.0f;
     } else {
         o->m10 = u / d;
     }
+}
+
+extern "C" void fn_800AC960(UnkFE20* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
 }
 
 extern "C" void fn_800AC9C0(UnkFE20* self)
@@ -805,6 +810,18 @@ extern "C" void fn_800AC9C0(UnkFE20* self)
 
 extern "C" void fn_800ACA08()
 {
+}
+
+extern "C" void fn_800ACA0C(UnkFE20* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    float t = 1.0f;
+    fn_800AD948(self->m1C, 1, t);
+    fn_800AD9C0(self->m1C, 1);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 2);
+    }
 }
 
 extern "C" void fn_800ACAD0(UnkFE20* self)
@@ -818,6 +835,23 @@ extern "C" void fn_800ACB0C(UnkAt1C* p)
     fn_800ADAD8(p->m1C);
 }
 
+inline float Clamp01(float r)
+{
+    return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+}
+
+/* near-miss (2 slots): retail loads m24 before m20 for the m20 / m24 division (lfs f13,36; lfs f0,32); ours loads m20 first. Only the load order differs; many spellings tried */
+extern "C" void fn_800ACB30(UnkFE20* self)
+{
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    float t = 1.0f - Clamp01(self->m20 / self->m24);
+    fn_800AD948(self->m1C, 1, t);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 3);
+    }
+}
+
 extern "C" void fn_800ACC34(UnkAt20F* p)
 {
     p->m20 = lbl_805B9590;
@@ -825,6 +859,18 @@ extern "C" void fn_800ACC34(UnkAt20F* p)
 
 extern "C" void fn_800ACC44()
 {
+}
+
+/* near-miss (2 slots): same m24-before-m20 load order as fn_800ACB30 */
+extern "C" void fn_800ACC48(UnkFE20* self)
+{
+    float t = 1.0f - Clamp01(self->m20 / self->m24);
+    self->m20 = self->m20 + 0.016666668f;
+    Ratio(self->m1C, self->m24, self->m20);
+    fn_800AD838(self->m1C, t);
+    if (!(self->m20 <= self->m24)) {
+        fn_8033E5C4(self->m1C, 4);
+    }
 }
 
 extern "C" void fn_800ACD48(UnkFE20* self)
