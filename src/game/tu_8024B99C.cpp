@@ -6,6 +6,20 @@
 #include "game/chooser.h"
 #include "game/tu_8024EF40.h"
 
+struct Unk8023DA90_O;
+inline unsigned& Fl4C08(Unk8024B99C_V* v)
+{
+    return *(unsigned*)&v->mB3C;
+}
+void fn_8023DA90(Unk8023DA90_O* o, float f);
+int fn_802542E8(Unk8024EF40_W* self, int a, int b);
+int fn_8040B3B4(const char* a, const char* b);
+extern const float lbl_805D9618;
+extern const float lbl_805D961C;
+extern const float lbl_805D9620;
+extern const float lbl_805D9624;
+extern const float lbl_805D9628;
+
 extern const float lbl_805D9680;
 extern const float lbl_805D9684;
 extern const float lbl_805D9690;
@@ -244,6 +258,47 @@ void fn_8024C0D0(int v)
     fn_802526D8(p + 0x480);
     fn_8024FF48(p + 0x4D8);
     fn_8024EB7C((Unk8024EA50_T*)(p + 0xA0C));
+}
+
+void fn_8024CC08(Unk80270BA0_X* x)
+{
+    char a[0x40] = "";
+    char b[0x40] = "";
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    if (v->m708 != 2) {
+        Unk8024EF40_W* w = (Unk8024EF40_W*)((char*)x + 0x588);
+        fn_802542E8(w, 1, (int)a);
+        fn_802542E8(w, 0, (int)b);
+        Fl4C08(v) &= 0xF0FFFFFF;
+        if (fn_8040B3B4(a, "paterson") == 0) {
+            if (fn_8040B3B4(b, "keegan") == 0) {
+                Fl4C08(v) |= 0x03000000;
+                fn_8023DA90((Unk8023DA90_O*)x, lbl_805D9618);
+            }
+            if (fn_8040B3B4(b, "jacob") == 0) {
+                Fl4C08(v) |= 0x03000000;
+                fn_8023DA90((Unk8023DA90_O*)x, lbl_805D961C);
+            }
+            if (fn_8040B3B4(b, "isaiah") == 0) {
+                Fl4C08(v) |= 0x03000000;
+                fn_8023DA90((Unk8023DA90_O*)x, lbl_805D9620);
+            }
+            if (fn_8040B3B4(b, "sean") == 0) {
+                Fl4C08(v) |= 0x03000000;
+                fn_8023DA90((Unk8023DA90_O*)x, lbl_805D9624);
+            }
+        }
+        if (fn_8040B3B4(a, "curran") == 0 && fn_8040B3B4(b, "mark") == 0)
+            Fl4C08(v) |= 0x08000000;
+        if (fn_8040B3B4(a, "kram") == 0 && fn_8040B3B4(b, "les") == 0)
+            Fl4C08(v) |= 0x08000000;
+        if (fn_8040B3B4(a, "clark") == 0 && fn_8040B3B4(b, "g") == 0)
+            Fl4C08(v) |= 0x08000000;
+        if (fn_8040B3B4(a, "larmour") == 0 && fn_8040B3B4(b, "avery") == 0) {
+            Fl4C08(v) |= 0x05000000;
+            fn_8023DA90((Unk8023DA90_O*)x, lbl_805D9628);
+        }
+    }
 }
 
 float fn_8024D050(Unk80270BA0_X* x, int a, int b, float f1, float f2)
