@@ -418,25 +418,25 @@ extern "C" void fn_803AEF88()
 
 extern "C" int fn_803AF374()
 {
-    sndgs.sso.cap.voicesdspmax = 0x30;
-    sndgs.sso.cap.outputchannelsmax = 4;
-    sndgs.sso.set.initaram = 1;
-    sndgs.sso.set.outputrate = 0x7d00;
-    sndgs.sso.set.outputchannels = 2;
-    sndgs.sso.cap.outputratemin = 0x7d00;
     sndgs.sso.cap.voicesmaincpumax = 0x20;
+    sndgs.sso.cap.voicesdspmax = 0x30;
+    sndgs.sso.cap.outputratemax = 0x7d00;
     sndgs.sso.cap.outputchannelsmin = 1;
+    sndgs.sso.set.outputspdifmode = 1;
+    sndgs.sso.cap.outputratemin = 0x7d00;
+    sndgs.sso.cap.numrendermodes = 2;
     sndgs.sso.cap.rendermode[0] = 0x220;
-    sndgs.sso.set.rendermode[0] = 0x220;
     sndgs.sso.cap.rendermode[1] = 0x24;
-    sndgs.sso.set.numrendermodes = 2;
-    sndgs.sso.set.voicesmaincpu = 8;
+    sndgs.sso.set.rendermode[0] = 0x220;
+    sndgs.sso.cap.outputchannelsmax = 4;
     sndgs.sso.set.rendermode[1] = 0x24;
     sndgs.sso.set.voicesdsp = 0x30;
+    sndgs.sso.set.numrendermodes = 2;
+    sndgs.sso.set.voicesmaincpu = 8;
     sndgs.sso.set.maxstreams = 8;
-    sndgs.sso.cap.numrendermodes = 2;
-    sndgs.sso.cap.outputratemax = 0x7d00;
-    sndgs.sso.set.outputspdifmode = 1;
+    sndgs.sso.set.outputrate = 0x7d00;
+    sndgs.sso.set.outputchannels = 2;
+    sndgs.sso.set.initaram = 1;
     int a = fn_80415A70() + 0x100;
     sndgs.sso.set.arampooladdr = a;
     sndgs.sso.set.arampoolsize = 0x800000 - a;
