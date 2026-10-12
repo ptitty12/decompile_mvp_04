@@ -47,5 +47,16 @@ struct RecObj8015F164 {
     RecObj8015F164() { fn_803597C4((Unk803597C4*)this); }
 };
 Unk8016ACAC* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
+/* Same 0xA0 element seen as plain fields (the explicit re-initialisation loops). */
+struct ElemView8015F164 {
+    char name[0x3C];
+    int m3C, m40, m44, m48, m4C;
+    Unk80326F44_Out m50;
+    Unk80326F44_Out m68;
+    Unk80326F44_Out m80;
+    int m98;
+    int m9C;
+};
+extern "C" void fn_80169BF8(Unk8016D9A0_Rec* rec, const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
 
 #endif

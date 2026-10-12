@@ -15,17 +15,7 @@ extern "C" Unk8015ABB8_Rec fn_8015AE08(Unk80159F28* self, int a);
 extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Rec* rec);
 int fn_80166440(void* self, int v);
 extern "C" void fn_8015F918(Unk80159F28* self, int a);
-struct ElemView8015F164 {
-    char name[0x3C];
-    int m3C, m40, m44, m48, m4C;
-    Unk80326F44_Out m50;
-    Unk80326F44_Out m68;
-    Unk80326F44_Out m80;
-    int m98;
-    int m9C;
-};
 int fn_801A4F40(Unk8019F8C0_Owner* o);
-extern "C" void fn_80169BF8(Unk8016D9A0_Rec* rec, const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
 int fn_803EE348(int a);
 extern "C" int fn_80166BD0(Unk80159F28* self);
 void fn_80303CA0(const char* s, float a, float b, float c, ...);
