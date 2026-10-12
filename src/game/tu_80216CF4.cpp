@@ -8,6 +8,9 @@ extern const char lbl_80660C90[];
 extern const char lbl_80660CA8[];
 extern const char lbl_80660CC0[];
 extern const float lbl_805D5FF4;
+extern const float lbl_805D5FF8;
+extern const float lbl_805D5FFC;
+extern const float lbl_805D6000;
 extern const Vec3f lbl_805D6760[];
 extern const Vec3f lbl_805D676C;
 
@@ -16,6 +19,8 @@ float fn_80248450(void* p, const Vec3f* v, int a, int b);
 void fn_8021A53C(Task* t, Vec3f* a, Vec3f* b);
 int fn_801A9D9C(void* o, int i);
 void fn_80205450(TaskInner* in, int x);
+int fn_80204F8C(Rec* r);
+int fn_80204F30(Rec* r);
 void fn_802123D4(Task* t, int kind, int x);
 void fn_80218294(Task* t, int a, int b, int c, int d);
 void fn_8021D4A4(Task* t);
@@ -25,6 +30,7 @@ void fn_8021CE28(Task* t, float f);
 }
 
 inline int GetB(Ctx6F8Inner* c) { return c->m1CC9; }
+
 struct Unk8017A930_T;
 void fn_8017B4A0(Unk8017A930_T* p, int a);
 
@@ -97,6 +103,16 @@ void fn_80218A30(Task* t, int, int b, int idx)
     e->m28 = (Player*)t->m9C->m8[idx];
     e->m1C = b;
     e->m9C = 1;
+}
+
+struct Obj71C {
+    char pad0[0x71C];
+    unsigned m71C;
+};
+
+inline RecQueue* RqAt(RecQueue* b, int k)
+{
+    return b + k;
 }
 
 class Ev72 : public EvBase {
@@ -196,7 +212,8 @@ void fn_802197A0(Task* t, int a)
     fn_8021D4A4(t);
 }
 
-/* near-miss: 14 stores plus two Vec3 copies; best hill-climb order is 111 slots off */
+/* near-miss: 77/77 insns, 2 slots (the m8 and m28 stores are swapped). Statement order = retail's store order; the three
+   floats are read through extern lbl_ globals (literals would be hoisted into callee-saved registers). */
 void fn_802198AC(Task* t, Player* x)
 {
     RecQueue* q = t->m9C->m3A60;
@@ -211,20 +228,61 @@ void fn_802198AC(Task* t, Player* x)
     fn_80204CCC(&q->e[q->count]);
     Rec* e = &q->e[q->count];
     q->count++;
-    e->m0 = 8;
     e->m4 = 0x19;
-    e->m8 = 2;
-    e->mC = 2;
+    e->m0 = 8;
+    e->m9C = 1;
     e->m10 = 0xA;
-    e->m14 = 0x1D;
-    e->m20 = 4;
     e->m28 = x;
+    e->m14 = 0x1D;
+    e->mC = 2;
+    e->m84 = lbl_805D5FF8;
+    e->m80 = lbl_805D5FFC;
+    e->m8 = 2;
     e->m44 = lbl_806055AC;
     e->m50 = lbl_806055AC;
-    e->m80 = -1.0f;
-    e->m84 = 0.0f;
-    e->m90 = 0.16666667f;
-    e->m9C = 1;
+    e->m20 = 4;
+    e->m90 = lbl_805D6000;
+}
+
+/* near-miss: 61/61 insns, 4 slots: retail keeps the running element pointer in r3 (recomputed as cur + 1 after the call)
+   and copies it into the callee-saved cur each iteration; ours increments the saved register in place. Tried NextRec(),
+   for/while forms. The two flag tests are separate nested ifs (a combined mask is merged into 0x6000). */
+int fn_8021A194(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj71C* obj = (Obj71C*)ObjAt(in->m8, a);
+    RecQueue* q = RqAt(in->mCA8, a);
+    if (obj == 0 || q == 0) {
+        return 0;
+    }
+    int s = fn_80211BB0(&in->mC0, a);
+    int r = 0;
+    Rec* e = q->e;
+    Rec* cur = e;
+    int i = 0;
+    while (i < q->count) {
+        cur = e;
+        if (fn_80204F8C(cur) != 1) {
+            break;
+        }
+        e = cur + 1;
+        i++;
+    }
+    if (i < q->count) {
+        if (fn_80204F30(cur) == 0 && t->m9C->mA4 != a) {
+            unsigned f = obj->m71C;
+            if ((f & 0x4000) == 0) {
+                if ((f & 0x2000) == 0) {
+                    if (s == -1) {
+                        r = 1;
+                    }
+                }
+            }
+        }
+    } else {
+        r = 1;
+    }
+    return r;
 }
 
 void fn_8021A4A0(Task* t, int i)
