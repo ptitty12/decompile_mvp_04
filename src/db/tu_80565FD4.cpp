@@ -21,16 +21,11 @@ extern "C" int fn_80568524(Db80565CDC_S* s, int a, int b);
 extern "C" int fn_80568748(Db80565CDC_S* s, int a, int b);
 extern "C" int fn_80568940(Db80565CDC_S* s, int a, int b);
 extern "C" int fn_80568B40(Db80565CDC_S* s, int a, int b);
-extern "C" int fn_80566674(Db80565CDC_S* s);
-extern "C" int fn_805668F0(Db80565CDC_S* s, int y);
-extern "C" int fn_805668A4(Db80565CDC_S* s, int y);
 extern "C" void fn_80569228(Db80565CDC_S* s, int v);
 extern "C" void fn_80569634(Db80565CDC_S* s, int v);
 extern "C" void fn_805697A0(Db80565CDC_S* s, int v);
 extern "C" void fn_80569984(Db80565CDC_S* s, int v);
 extern "C" void fn_8056792C(int a, int b, int c);
-extern "C" void fn_80567AF4(int a, int b, int c);
-extern "C" void fn_80567AD4(int a, int b, int c);
 
 inline int KeyAt(Unk8052B978_Tbl* t, int i)
 {
@@ -39,6 +34,46 @@ inline int KeyAt(Unk8052B978_Tbl* t, int i)
 
 extern unsigned char lbl_80692EF4[];
 extern unsigned char lbl_80692EF8[];
+
+struct Db805683AC_S : Db80565CDC_S {
+    int m18_;
+    int m1C_;
+    int m20_;
+};
+
+#include "game/clampiter.h"
+extern Unk80538DD8_G* lbl_80619948;
+extern "C" int fn_800A3AF4(Unk80538DD8_G* g);
+extern "C" int fn_800A3B38(Unk80538DD8_G* g);
+extern "C" int fn_800A3B7C(Unk80538DD8_G* g);
+extern "C" int fn_805656A0(Db80565CDC_S* s, int a);
+extern "C" int fn_805658F8(Db80565CDC_S* s, int a);
+extern "C" int fn_80565A50(Db80565CDC_S* s, int a);
+extern "C" void fn_8056746C(int a, int b, int k);
+extern "C" void fn_80567600(int a, int b, int c);
+extern "C" void fn_80567B14(int a, int b, int k);
+extern "C" void fn_80567D20(int a, int b, int c);
+
+extern "C" int fn_800A3AB0(Unk80538DD8_G* g);
+extern "C" int fn_80565448(Db80565CDC_S* s, int a);
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_80566520(Db80565CDC_S* s);
+extern "C" int fn_80566674(Db80565CDC_S* s);
+extern "C" int fn_8056681C(Db80565CDC_S* s, int v);
+extern "C" int fn_805668A4(Db80565CDC_S* s, int y);
+extern "C" int fn_805668F0(Db80565CDC_S* s, int y);
+extern "C" void fn_80567338(Db80565CDC_S* s, int k, int v);
+extern "C" void fn_805678D8(int a, int b, int k);
+extern "C" void fn_80567AD4(int a, int b, int c);
+extern "C" void fn_80567AF4(int a, int b, int c);
+extern "C" void fn_80567B14(int a, int b, int c);
+extern "C" int fn_805683AC(Db805683AC_S* s, int a, int k);
+extern "C" int fn_80568464(Db80565CDC_S* s, int a, int b, int k);
+extern "C" int fn_80568EA8(Db80565CDC_S* self);
+extern "C" int fn_80568F5C(Db80565CDC_S* self);
+extern "C" int fn_80569000(Db80565CDC_S* self);
+extern "C" int fn_80569094(Db80565CDC_S* self);
+extern "C" int fn_8056A1DC(void* l, int k);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -135,11 +170,11 @@ extern "C" DB_OVERLAY void fn_80567AF4(int a, int b, int c)
     fn_80567B58(a, b, c);
 }
 
-struct Db805683AC_S : Db80565CDC_S {
-    int m18_;
-    int m1C_;
-    int m20_;
-};
+extern "C" DB_OVERLAY void fn_80567B14(int a, int b, int c)
+{
+    fn_80567B58(a, b, c);
+    fn_80567D20(a, b, c);
+}
 
 extern "C" DB_OVERLAY int fn_805683AC(Db805683AC_S* s, int a, int k)
 {
@@ -178,6 +213,65 @@ extern "C" DB_OVERLAY int fn_80568464(Db80565CDC_S* s, int a, int b, int k)
         }
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY int fn_80568EA8(Db80565CDC_S* self)
+{
+    int g = fn_800A3AB0(lbl_80619948);
+    if (fn_80565448(self, g) == 1)
+        return 0;
+    Unk8006A138_It<25> it(0);
+    int k = 0;
+    do {
+        fn_8056746C((int)self, g, k);
+        k = it.Next();
+    } while (k <= 5);
+    fn_80567600((int)self, g, 0);
+    fn_80567600((int)self, g, 1);
+    return 1;
+}
+
+extern "C" DB_OVERLAY int fn_80568F5C(Db80565CDC_S* self)
+{
+    int g = fn_800A3AF4(lbl_80619948);
+    if (fn_805656A0(self, g) == 1)
+        return 0;
+    Unk8006A138_It<25> it(6);
+    int k = 6;
+    do {
+        fn_8056746C((int)self, g, k);
+        k = it.Next();
+    } while (k <= 12);
+    fn_80567600((int)self, g, 2);
+    return 1;
+}
+
+extern "C" DB_OVERLAY int fn_80569000(Db80565CDC_S* self)
+{
+    int g = fn_800A3B38(lbl_80619948);
+    if (fn_805658F8(self, g) == 1)
+        return 0;
+    Unk8006A138_It<25> it(13);
+    int k = 13;
+    do {
+        fn_805678D8((int)self, g, k);
+        k = it.Next();
+    } while (k <= 18);
+    return 1;
+}
+
+extern "C" DB_OVERLAY int fn_80569094(Db80565CDC_S* self)
+{
+    int g = fn_800A3B7C(lbl_80619948);
+    if (fn_80565A50(self, g) == 1)
+        return 0;
+    Unk8006A138_It<25> it(19);
+    int k = 19;
+    do {
+        fn_80567B14((int)self, g, k);
+        k = it.Next();
+    } while (k <= 24);
+    return 1;
 }
 
 extern "C" DB_OVERLAY int fn_8056A1DC(void* l, int k)
