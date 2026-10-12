@@ -503,6 +503,32 @@ int fn_801B5880(Unk801B460C_Tbl* t)
     return t->m0C[fn_8014D8AC(t->m0->m8->m554, t->m8, lbl_805CF800, 0x945)].a;
 }
 
+/* near-miss: same code; only the order of the two arg-address loads (lis r4/r5) before fn_8014D8AC differs. */
+int fn_801B58D4(Unk801B460C_Tbl* t)
+{
+    float w[25];
+    float total = 0.0f;
+    float x;
+    int i;
+    for (i = 0; i < t->m8; i++) {
+        w[i] = t->m0C[i].b * t->m0C[i].b;
+        total += w[i];
+    }
+    float s = total;
+    x = (float)(unsigned)fn_8014D8AC(t->m0->m8->m554, 1000000, lbl_805CF800, 0x960) * s * 1e-6f;
+    volatile float pad;
+    float acc = 0.0f;
+    int res = 0;
+    for (i = 0; i < t->m8; i++) {
+        acc += w[i];
+        if (!(x > acc)) {
+            res = t->m0C[i].a;
+            break;
+        }
+    }
+    return res;
+}
+
 Unk801B5A44::Unk801B5A44(int a, int b)
 {
     m4 = a;
@@ -651,6 +677,48 @@ int fn_801B608C(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 }
 
 /* near-miss: 29 vs 28 insns; the three flag tests (q[10..12] != 0) are laid out differently. */
+struct Unk8024EF40_W;
+float fn_80253EC4(Unk8024EF40_W* w, int a, int b, int c);
+float fn_80097F68(Unk8019F8C0_Inner* t, int a, int b, int c, int d);
+inline int Unk801B616C_B(unsigned char* b, int i) { return b[i]; }
+
+/* near-miss: same code; in the 128-byte sum loop retail keeps the counter in r11 with the index in r0 (here r10/r9). */
+unsigned fn_801B616C(Unk801AB63C_P* p, Unk801B23A8_Q* q)
+{
+    unsigned r = (unsigned)fn_80253EC4((Unk8024EF40_W*)q->m588, 2, 2, 0);
+    Unk8019F8C0_Mgr10* m = p->m8->m6F8->m10;
+    if (m != 0 && m->m22C == 0xB && (int)q->m4C4 < 0 && r == 0) {
+        int t = q->m708;
+        int k;
+        if (t > 2) {
+            int u = 3;
+            if (t == 3) {
+                u = 4;
+            }
+            k = u;
+        } else {
+            k = t == 0;
+        }
+        Unk8019F8C0_Inner* e = &p->m8->m6F8->m14[k];
+        if (e != 0) {
+            int sum = 0;
+            for (int i = 0; i < 128; i++) {
+                sum += Unk801B616C_B(e->m1B4, (unsigned char)i);
+            }
+            int cnt = 0;
+            unsigned char j = 0;
+            while (j < e->m3E4) {
+                cnt += (int)fn_80097F68(e, 0, j, 2, 0);
+                j++;
+            }
+            r = sum * 3 + cnt;
+        } else {
+            r = 0;
+        }
+    }
+    return r;
+}
+
 int fn_801B62E4(Unk801AB63C_P* p, int i)
 {
     Unk8019F8C0_Owner* o = p->m8;
