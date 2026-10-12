@@ -27,7 +27,7 @@ extern "C" void fn_80582314(void* self);
 extern "C" void fn_8040B320(void* dst, int c, unsigned n);
 extern "C" void fn_80582C54(char* self, int a, Unk80070DDC_Stream* io);
 extern "C" Db8052E198_E* fn_8052E198(Db8052E198_E* self, int a, int b, int c, int d, int e, char f, int g, int h, int i);
-extern "C" void fn_80582CF8(Db805822D0_V* self, Db8052E198_E* e, int a, int b, int c);
+extern "C" int fn_80582CF8(Db805822D0_V* self, Db8052E198_E* e, int a, int b, int c); /* ends li r3,1 */
 extern "C" int fn_8040ABA0();
 extern const Db8058C9B8_P lbl_8060095C;
 extern const Db8058C9B8_P lbl_80600964;
@@ -40,7 +40,6 @@ extern "C" DB_OVERLAY Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self)
     return self;
 }
 
-/* near-miss (2 slots): retail sets r4 (addi) before r3 (mr) in the fn_80582CF8 call. */
 extern "C" DB_OVERLAY void fn_8058BF68(Db805822D0_V* self)
 {
     int z = self->m0;
