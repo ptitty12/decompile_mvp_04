@@ -12,6 +12,27 @@ typedef Unk8024EF40_Q Q;
 typedef Unk80256C80_M M;
 typedef Unk80256C80_Inner I;
 
+/* Object at ctx+0x3C0 read by fn_8025DF8C: signed state word at +0x14 (-1 = none, bit 0 / bit 1 = slot flags). */
+struct Unk8025DF8C_O {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk8025DF8C_Ctx {
+    char pad0[0x3C0];
+    Unk8025DF8C_O* m3C0;
+};
+inline int Unk8025DF8C_Bit(Unk8025DF8C_O* o, int m)
+{
+    int r;
+    if ((unsigned)(o->m14 + 1) > 1) {
+        r = 1;
+        if (!(o->m14 & m))
+            r = 0;
+    } else
+        r = 0;
+    return r;
+}
+
 extern "C++" {
 extern char lbl_806617E8[];
 extern char lbl_80661800[];
@@ -566,6 +587,25 @@ void fn_8025DED4(I* self)
         x = (int)fn_802FDA84(o, 2);
     if (x != 0)
         self->m434 = (P*)x;
+}
+
+/* near-miss: 58 vs 61 insns: retail leaves a dead range compare (addi/cmplwi) after the second flag test. Tried empty else bodies, redundant-set else bodies */
+extern void fn_8025DAC0(I* self);
+extern void fn_8035E6B0(int* t, int i, int v);
+void fn_8025DF8C(I* self)
+{
+    Q* q = self->m1EC;
+    P** r = q->m65C;
+    Unk8025DF8C_O* o = ((Unk8025DF8C_Ctx*)q->m700)->m3C0;
+    int a = r[10] != 0;
+    int b = r[11] != 0;
+    if (Unk8025DF8C_Bit(o, 1) && a)
+        fn_8035E6B0((int*)((char*)self + 0x1CC), 10, 1);
+    if (Unk8025DF8C_Bit(o, 2)) {
+        if (b)
+            fn_8035E6B0((int*)((char*)self + 0x1CC), 11, 2);
+    }
+    fn_8025DAC0(self);
 }
 
 void fn_8025E4B4(I* self)
