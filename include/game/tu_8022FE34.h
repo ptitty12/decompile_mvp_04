@@ -198,6 +198,7 @@ struct Unk8022FE34_Owner {
     float m728;
     char pad72C[0x734 - 0x72C];
     char m734[4];
+    float* m738;
     void fn_80231D0C(int i);
     int fn_80231DDC();
     Unk8022FE34_V3 fn_80231E4C();
@@ -237,7 +238,13 @@ struct Unk8022FE34_U {
     int m0;
     Unk8022FE34_Owner* m4;
     Unk8022FE34_U8* m8;
-    char padC[0x44 - 0xC];
+    int mC;
+    char pad10[0x2C - 0x10];
+    int m2C;
+    char pad30[0x38 - 0x30];
+    int m38;
+    int m3C;
+    char pad40[0x44 - 0x40];
     int m44;
     int m48;
     int m4C[5];
@@ -295,6 +302,9 @@ struct Unk8022FE34_U {
     int fn_80235E84(int a, int b);
     int fn_80235F0C(float* out);
     int fn_80234D5C();
+    int fn_802348F4();
+    void fn_80235FB4();
+    void fn_80235AE4();
 };
 
 #endif
