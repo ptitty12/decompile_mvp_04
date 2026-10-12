@@ -552,6 +552,80 @@ extern "C" void fn_800AFAE4(FEObj44* self)
     self->m44 = 0;
 }
 
+struct FEBaseAFB18 {
+    int m0;
+    int m4;
+};
+class FEMidAFB18 : public FEBaseAFB18 {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(void* a);
+};
+class FEObjAFB18 : public FEMidAFB18 {
+public:
+    char padC[0x38 - 0xC];
+    FEV3Cz* m38;
+    char pad3C[0x48 - 0x3C];
+    int* m48;
+    int* m4C;
+    int* m50;
+    int* m54;
+    int* m58;
+};
+extern "C" int* fn_800ED2B0(FEV3Cz* o, const char* name);
+extern "C" void fn_800AF248(void* p);
+
+inline FEMgrB8* FEGetMgrA()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrB8*)operator new(0xD8, 0));
+    }
+    return lbl_8061A32C;
+}
+extern "C" void fn_800AFB18(FEObjAFB18* self)
+{
+    self->s20(fn_800B7AB8(FEGetMgrA(), "INGAMEHRD"));
+    fn_800AF248(self);
+    if (self->m0 == 0) {
+        self->m48 = fn_800ED2B0(self->m38, "P1HRANIM");
+        self->m4C = fn_800ED2B0(self->m38, "P1STRIKEANIM");
+        self->m50 = fn_800ED2B0(self->m38, "P1MONEYBALLON");
+        self->m54 = fn_800ED2B0(self->m38, "P1MONEYBALLOFF");
+        self->m58 = fn_800ED2B0(self->m38, "P1MONEYBALLWIN");
+        self->m38->s32("P1MONEYBALL", 1)->s8(0);
+    } else {
+        self->m48 = fn_800ED2B0(self->m38, "P2HRANIM");
+        self->m4C = fn_800ED2B0(self->m38, "P2STRIKEANIM");
+        self->m50 = fn_800ED2B0(self->m38, "P2MONEYBALLON");
+        self->m54 = fn_800ED2B0(self->m38, "P2MONEYBALLOFF");
+        self->m58 = fn_800ED2B0(self->m38, "P2MONEYBALLWIN");
+        self->m38->s32("P2MONEYBALL", 1)->s8(0);
+    }
+    *self->m48 = 0;
+    *self->m4C = 0;
+    *self->m50 = 0;
+    *self->m54 = 0;
+    *self->m58 = 0;
+}
+
 extern "C" void fn_800AFD2C(FEObj58* self)
 {
     fn_800AF544((UnkAt2C*)self);
