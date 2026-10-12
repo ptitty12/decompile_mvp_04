@@ -68,14 +68,18 @@ extern "C" unsigned int OSDisableInterrupts();
 extern "C" void OSRestoreInterrupts(unsigned int);
 extern "C" void fn_80417B10(void* p);
 extern "C" void fn_804176B0(void* p);
-extern "C" void fn_803AEB50(int a, int b, int c, int d, int e);
+/* near-miss: 70 vs 72 insns: retail keeps the table slot in r5 (the fn_803AEA78 result, or the idx argument copied there) and the aligned size in r8/r11 across both arms; ours keeps the argument registers in different saved registers (stmw r25 vs r26); slot-variable and record-pointer forms tried */
+extern "C" int fn_803AEB50(int a, int b, int c, int d, int e);
 
 struct Unk8069E200_RecA {
-    char pad0[0x1F];
+    char pad0[0x18];
+    int m18;
+    char pad1C[3];
     unsigned char m1F;
     char pad20[4];
     unsigned char m24;
-    char pad25[0x17];
+    unsigned char m25;
+    char pad26[0x16];
     void* m3C;
 };
 
@@ -87,7 +91,8 @@ struct Unk8069E200_RecB {
     int m28;
     int m2C;
     int m30;
-    char pad34[0xC];
+    unsigned int m34;
+    char pad38[8];
 };
 
 struct Unk8069E200 {
@@ -96,7 +101,8 @@ struct Unk8069E200 {
     void* mVoices[16];
     char pad1450[0x9DE8 - 0x1450];
     int m9DE8;
-    char pad9DEC[0x9E30 - 0x9DEC];
+    int m9DEC;
+    char pad9DF0[0x9E30 - 0x9DF0];
     Unk8069E200_RecB recB[64];
     char padAE30[0xC048 - 0xAE30];
     unsigned char mC048;
@@ -136,6 +142,10 @@ struct Unk803AE618 {
     char pad0[0x14];
     int m14;
 };
+
+extern "C" void fn_803AE0E0(Unk803AE0E0* p);
+
+extern "C" void fn_80417554(void* p, int t, int z, int a, int b, int c, int aligned, void (*cb)(Unk8069E200_RecB*));
 
 extern "C" void fn_803AC88C()
 {
@@ -345,6 +355,36 @@ extern "C" void fn_803AE618(Unk803AE618* o)
     }
 }
 
+extern "C" void fn_803AE964(int v, int mode)
+{
+    Unk8069E200_RecA* r = &lbl_8069E200.recA[v];
+    CHANPUB* c = &sndgs.chan[v];
+    void* p = r->m3C;
+    fn_803AE0E0((Unk803AE0E0*)p);
+    r->m18 = -1;
+    if (c->status != 0)
+        SNDVOICEI_free(v);
+    if (mode == 0) {
+        if (p != 0) {
+            fn_80417B10(p);
+            r->m3C = 0;
+        }
+    } else if (mode == 2) {
+        if (r->m25 == 0 && p != 0) {
+            r->m1F = 1;
+            lbl_8069E200.mC049++;
+        }
+    } else if (mode == 1) {
+        if (r->m1F == 1) {
+            r->m1F = 0;
+            lbl_8069E200.mC049--;
+        }
+        r->m3C = 0;
+    }
+    if (r->m25 == 0)
+        r->m25 = 1;
+}
+
 extern "C" int fn_803AEA78(int v)
 {
     int i = 0;
@@ -366,6 +406,31 @@ extern "C" void fn_803AEB04(Unk8069E200_RecB* r)
             return;
         }
     }
+}
+
+extern "C" int fn_803AEB50(int a, int b, int c, int d, int idx)
+{
+    unsigned int en = OSDisableInterrupts();
+    int t;
+    int aligned;
+    int slot;
+    if (idx == -1) {
+        slot = fn_803AEA78(lbl_8069E200.m9DEC);
+        t = lbl_8069E200.m9DEC;
+        lbl_8069E200.recB[slot].m24 = a;
+        lbl_8069E200.recB[slot].m28 = b;
+        lbl_8069E200.recB[slot].m2C = c;
+        aligned = d + 0x1f;
+        lbl_8069E200.recB[slot].m30 = aligned & ~0x1f;
+        lbl_8069E200.recB[slot].m34 = sndgs.audiotick;
+    } else {
+        slot = idx;
+        aligned = d + 0x1f;
+        t = lbl_8069E200.recB[slot].m0;
+    }
+    fn_80417554(&lbl_8069E200.recB[slot].m4, t, 0, a, b, c, aligned & ~0x1f, fn_803AEB04);
+    OSRestoreInterrupts(en);
+    return lbl_8069E200.m9DEC++;
 }
 
 extern "C" void fn_803AEC70(int id)
