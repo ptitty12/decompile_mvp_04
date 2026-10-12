@@ -57,6 +57,17 @@ extern "C" int fn_80392B80(int);
 extern "C" int fn_803920BC(int*);
 extern "C" void fn_80392BC0(int);
 
+struct McCfg2 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+extern McCfg2 lbl_8069B7B8;
+extern int lbl_8069B80C[];
+extern "C" int fn_803948C0(int);
+
 extern "C" int fn_80394744(unsigned v, int a, int idx)
 {
     int r = 0;
@@ -77,6 +88,31 @@ extern "C" int fn_80394744(unsigned v, int a, int idx)
 extern "C" int fn_8039487C(McRec1* p)
 {
     return fn_80394FD4(100, -1) < p->m1;
+}
+
+extern "C" int fn_80394C0C(int idx)
+{
+    int r = 0;
+    char* t = (char*)lbl_8069B80C;
+    int* pc = (int*)(t + 0x4c);
+    int off = idx * 16;
+    int v = *(int*)((char*)pc + off);
+    if (v != 0) {
+        r = fn_803948C0(v);
+        if (r == 0 && lbl_8069B7B8.m10 != 0) {
+            int k = 0;
+            int q;
+            do {
+                q = ((int (*)(int, int))lbl_8069B7B8.m10)(k, v);
+                if (q >= 0)
+                    r = fn_803948C0(v);
+                k++;
+            } while (r == 0 && q > 0);
+        }
+        if (r < 0)
+            r = 0;
+    }
+    return r;
 }
 
 extern "C" void fn_80394CD4(int x)
