@@ -331,6 +331,45 @@ Unk8019F8C0_Sub* fn_801A04A8(Unk8019F8C0_Owner* o, int i)
     return o->m30[i];
 }
 
+extern int lbl_80620418;
+extern float lbl_8061CA1C;
+extern float lbl_8061CA20;
+float fn_802D7E2C(int a, int b);
+extern "C" int fn_80326DF0(void* p, int a);
+inline float Unk801A04B8_Lerp(float a, float t, float b)
+{
+    return t * (b - a) + a;
+}
+inline float Unk801A04B8_Val(Unk8019F8C0_Sub* s)
+{
+    int t;
+    if (s->m44 != 0 || (t = s->m48) == 0)
+        return s->m4C;
+    return fn_80323848(t);
+}
+
+float fn_801A04B8(Unk8019F8C0_Owner* o, Unk8019F8C0_Sub* s)
+{
+    float a = 2.0f;
+    float r = Unk801A04B8_Val(s);
+    int p = lbl_80620418;
+    if (p != -1) {
+        float b = 0.0f;
+        float x = fn_802D7E2C(p, 0x2E);
+        float y = fn_802D7E2C(p, 0x2F);
+        x = Unk801A04B8_Lerp(lbl_8061CA1C, !(x > lbl_8061CA20) ? (x >? lbl_8061CA1C) : lbl_8061CA20, lbl_8061CA20);
+        y = Unk801A04B8_Lerp(lbl_8061CA1C, !(y > lbl_8061CA20) ? (y >? lbl_8061CA1C) : lbl_8061CA20, lbl_8061CA20);
+        x = x * x;
+        y = y * y;
+        b = 2.0f * (y - x);
+        r += b * 0.016666668f;
+        float u = (float)fn_80326DF0((char*)o + 0x50, 1) * 0.016666668f;
+        if (!(r >= u))
+            r = u;
+    }
+    return r;
+}
+
 void fn_801A06A8(Unk8019F8C0_Owner* o)
 {
     int i = 0;
