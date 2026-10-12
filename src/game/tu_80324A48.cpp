@@ -271,9 +271,6 @@ FxPred fn_80325D18(void* self, int kind) {
     switch (kind) {
     case 0xB6: return (FxPred)fn_80324C48;
     case 0xB7: return (FxPred)fn_80324C6C;
-    case 0xB9: return (FxPred)fn_80324E54;
-    case 0xBA: return (FxPred)fn_80324E6C;
-    case 0xBB: return (FxPred)fn_80324DCC;
     case 0xBC: return (FxPred)fn_80324A48;
     case 0xBD: return (FxPred)fn_80324A70;
     case 0xBE: return (FxPred)fn_80324A98;
@@ -283,6 +280,9 @@ FxPred fn_80325D18(void* self, int kind) {
     case 0xC2: return (FxPred)fn_80324BA8;
     case 0xC3: return (FxPred)fn_80324BF8;
     case 0xC4: return (FxPred)fn_80324A24;
+    case 0xBB: return (FxPred)fn_80324DCC;
+    case 0xB9: return (FxPred)fn_80324E54;
+    case 0xBA: return (FxPred)fn_80324E6C;
     }
     return 0;
 }
