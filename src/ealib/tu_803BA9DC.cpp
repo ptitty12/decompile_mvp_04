@@ -4,7 +4,270 @@
  * Every data object is extern by its lbl_ name.
  */
 
+struct EAGLHeapY {
+    virtual void v1();
+    virtual void v2(int);
+    virtual void v3();
+    virtual int v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+};
+
+struct EAGLSlot {
+    void* m0;
+    int m4;
+    int m8;
+};
+
+struct DtorAt0 { const void* m; };
+
+extern EAGLHeapY* lbl_80626DD0;
+extern void (*lbl_8062C66C)(void*, int);
+extern EAGLSlot lbl_806AA8BC[];
+extern char lbl_80685268[];
+
+struct EAGLNameEnt {
+    const char* name;
+    int val;
+};
+
+struct EAGLNameTab {
+    short pad0;
+    unsigned short m2;
+    EAGLNameEnt* m4;
+    void* m8;
+    int mC;
+};
+
+struct EAGLDelObj {
+    virtual void v1(int);
+};
+
+extern "C" int strcmp(const char*, const char*);
+
+extern EAGLDelObj* lbl_80626DCC;
+extern void* lbl_80627284;
+extern void* (*lbl_8062C668)(int, const char*);
+extern char lbl_806AAB80[];
+extern char lbl_8060D1B4[];
+extern char lbl_80685688[];
+
+extern "C" int strlen(const char*);
+extern "C" void fn_803E7074(void* a, void* b);
+extern "C" void fn_803E70B0(void* a, void* b, void (*c)(void*), void (*d)());
+extern "C" void fn_803BD8BC();
+extern "C" void fn_803BE744(void*);
+extern "C" void fn_803BE7B0();
+
+inline int EAGLTestBit(unsigned* bits, int idx)
+{
+    unsigned* q = &bits[idx >> 5];
+    return (*q & (1 << (idx & 31))) != 0 ? 1 : 0;
+}
+
+struct EAGLSk {
+    char pad0[8];
+    int m8;
+};
+
+extern void (*lbl_80626DC8)(void*, void*, void*);
+extern "C" void fn_803DFB48(void*);
+extern "C" void fn_803BB02C(EAGLSk* sk, char* a, char* out, unsigned* mask);
+
+extern "C" void fn_803DF66C(void* a, void* b);
+extern "C" void fn_803BCE38(void* p, int n);
 extern "C" void fn_803BD800(int a, int b);
+
+extern "C" void fn_803BB21C(EAGLSk* sk, char* a, char* out, unsigned* mask)
+{
+    if (mask != 0) {
+        int n = sk->m8;
+        int i;
+        fn_803BB02C(sk, a, out, 0);
+        for (i = 0; i < n; i++) {
+            if (EAGLTestBit(mask, i)) {
+                lbl_80626DC8(out + i * 0x40, out + i * 0x40, (char*)sk + 0x40 + i * 0x70);
+                fn_803DFB48(out + i * 0x40);
+            }
+        }
+    } else {
+        int n = sk->m8;
+        int i;
+        fn_803BB02C(sk, a, out, 0);
+        for (i = 0; i < n; i++) {
+            lbl_80626DC8(out + i * 0x40, out + i * 0x40, (char*)sk + 0x40 + i * 0x70);
+            fn_803DFB48(out + i * 0x40);
+        }
+    }
+}
+
+extern "C" void fn_803BB600(EAGLSk* sk, char* a, char* out, unsigned* mask)
+{
+    int n = sk->m8;
+    if (mask != 0) {
+        int i;
+        for (i = 0; i < n; i++) {
+            if (EAGLTestBit(mask, i)) {
+                lbl_80626DC8(out + i * 0x40, a + i * 0x40, (char*)sk + 0x40 + i * 0x70);
+                fn_803DFB48(out + i * 0x40);
+            }
+        }
+    } else {
+        int i;
+        for (i = 0; i < n; i++) {
+            lbl_80626DC8(out + i * 0x40, a + i * 0x40, (char*)sk + 0x40 + i * 0x70);
+            fn_803DFB48(out + i * 0x40);
+        }
+    }
+}
+
+extern "C" void fn_803BB708(char* base, int idx, float* out)
+{
+    int off = idx * 0x70 + 0x10;
+    float* m = (float*)(base + off);
+    out[0] = m[0];
+    out[1] = m[1];
+    out[2] = m[2];
+    out[3] = 1.0f;
+    out[4] = m[4];
+    out[5] = m[5];
+    out[6] = m[6];
+    out[7] = m[7];
+    out[8] = m[8];
+    out[9] = m[9];
+    out[10] = m[10];
+    out[11] = 1.0f;
+}
+
+extern "C" void fn_803BB778(char* base, int idx, void* b)
+{
+    fn_803DF66C((char*)(idx * 0x70 + (int)base) + 0x40, b);
+}
+
+extern "C" void fn_803BCE00(DtorAt0* s, int chrg)
+{
+    s->m = lbl_80685268;
+    if (chrg & 1)
+        fn_803BCE38(s, 0xa0);
+}
+
+extern "C" void fn_803BCE38(void* p, int n)
+{
+    lbl_8062C66C(p, n);
+}
+
+extern "C" void fn_803BD1F4(EAGLNameTab* t)
+{
+    if (t->m4 != 0) {
+        int i;
+        for (i = t->m2 - 1; i >= 0; i--) {
+            const char* nm = t->m4[i].name;
+            if (nm != 0)
+                lbl_8062C66C((void*)nm, strlen(nm) + 1);
+        }
+        lbl_8062C66C(t->m4, t->mC * 8);
+    }
+    if (t->m8 != 0)
+        lbl_8062C66C(t->m8, t->mC * 4);
+}
+
+extern "C" int fn_803BD2B4(EAGLNameTab* t, const char* name, int* ins)
+{
+    *ins = 0;
+    int hi = t->m2 - 1;
+    while (*ins <= hi) {
+        int mid = (*ins + hi) >> 1;
+        int c = strcmp(name, t->m4[mid].name);
+        if (c > 0)
+            *ins = mid + 1;
+        else if (c < 0)
+            hi = mid - 1;
+        else
+            return t->m4[mid].val;
+    }
+    return -1;
+}
+
+extern "C" void fn_803BD61C(int arg)
+{
+    void* (**al)(int, const char*) = &lbl_8062C668;
+    EAGLDelObj** pcc = &lbl_80626DCC;
+    DtorAt0* o = (DtorAt0*)(*al)(4, 0);
+    o->m = lbl_80685688;
+    *pcc = (EAGLDelObj*)o;
+    if (lbl_80626DD0 == 0)
+        lbl_80626DD0 = (EAGLHeapY*)o;
+    lbl_80626DD0->v2(arg);
+    void** p84 = &lbl_80627284;
+    *p84 = (*al)(1, 0);
+    fn_803E70B0(lbl_806AAB80, lbl_8060D1B4, fn_803BE744, fn_803BE7B0);
+}
+
+extern "C" int fn_803BD6E4()
+{
+    return lbl_80626DD0->v4();
+}
+
+extern "C" void fn_803BD720()
+{
+    lbl_80626DD0->v14();
+}
+
+extern "C" void fn_803BD75C()
+{
+    fn_803E7074(lbl_806AAB80, lbl_8060D1B4);
+    fn_803BD8BC();
+    if (lbl_80627284 != 0)
+        lbl_8062C66C(lbl_80627284, 1);
+    lbl_80626DD0->v3();
+    if (lbl_80626DCC != 0)
+        lbl_80626DCC->v1(3);
+}
+
+extern "C" void fn_803BD800(int a, int b)
+{
+    if (b != 0xFFFF)
+        return;
+    if (a == 0)
+        return;
+    int i;
+    for (i = 0; i < 3; i++) {
+        lbl_806AA8BC[i].m0 = 0;
+        lbl_806AA8BC[i].m4 = 0;
+        lbl_806AA8BC[i].m8 = 0;
+    }
+}
+
+extern "C" void fn_803BD844(EAGLSlot* e)
+{
+    e->m8--;
+    if (e->m0 != 0 && e->m8 <= 0) {
+        lbl_8062C66C(e->m0, e->m4);
+        e->m0 = 0;
+    }
+}
+
+extern "C" EAGLSlot* fn_803BD8A8(int i)
+{
+    return &lbl_806AA8BC[i];
+}
+
+extern "C" void fn_803BD8BC()
+{
+    int i;
+    for (i = 0; i < 3; i++) {
+        if (lbl_806AA8BC[i].m0 != 0)
+            lbl_8062C66C(lbl_806AA8BC[i].m0, lbl_806AA8BC[i].m4);
+    }
+}
 
 extern "C" void fn_803BD918()
 {
