@@ -562,6 +562,31 @@ extern "C" int fn_803F8F80(void* o, char* p)
     return rc;
 }
 
+extern "C" int fn_803F8FF8(void* o, char* f)
+{
+    int r;
+    do {
+        r = CARDCreate(*(unsigned short*)(f + 8), (const char*)RCI(f, 0xc), RCI(f, 0x10), f + 0x48);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    switch (r) {
+    case 0:
+        RCI(f, 0xe0) = 0;
+        RCI(f, 0xd8) = 0;
+        break;
+    case -128: RCI(f, 0xd8) = -1; break;
+    case -3: RCI(f, 0xd8) = -2; break;
+    case -1: RCI(f, 0xd8) = -3; break;
+    case -7: RCI(f, 0xd8) = -4; break;
+    case -8: RCI(f, 0xd8) = -5; break;
+    case -9: RCI(f, 0xd8) = -6; break;
+    case -12: RCI(f, 0xd8) = -7; break;
+    case -5: RCI(f, 0xd8) = -8; break;
+    default: RCI(f, 0xd8) = -10; break;
+    }
+    return r;
+}
+
 extern "C" int fn_803F9114(void* o, void* f)
 {
     int rc = 0xf;
