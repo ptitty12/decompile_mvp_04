@@ -16,7 +16,7 @@ extern const float lbl_805D93EC;
 extern const float lbl_805D93F0;
 extern const float lbl_805D93F4;
 extern const float lbl_805D9484;
-void fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, int a, int b, int c, int d);
+float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, int a, int b, int c, int d);
 void fn_80254784(void* p);
 
 extern const float lbl_805D93AC;
@@ -35,6 +35,11 @@ float fn_8023C868(Unk80270BA0_X* x);
 void fn_80247858(Unk80270BA0_X* x)
 {
     fn_8014E498(x->m60);
+}
+
+extern "C" float fn_80248450(Unk80270BA0_X* x, int a, int b, int c)
+{
+    return fn_80248370(x, &x->m60, a, b, c, 0);
 }
 
 float fn_80248F70(Unk80270BA0_X* x, float f)
@@ -236,9 +241,3 @@ void fn_8024A584(Unk80270BA0_X* x, float f)
 }
 
 void fn_8024A674() {}
-
-
-void fn_80248450(Unk80270BA0_X* x, int a, int b, int c)
-{
-    fn_80248370(x, &x->m60, a, b, c, 0);
-}
