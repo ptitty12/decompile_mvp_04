@@ -5,6 +5,8 @@
 #include "game/tu_80171A10.h"
 #include "game/tu_80170044.h"
 
+extern "C" Unk80170518* fn_80005840(int mode);
+
 /* Popup holder (see Unk80171940 in tu_80170044.h): the dialog at +0 and the current popup at +4. */
 struct Unk80171A10_Holder {
     Unk80170B44* m0;
@@ -212,6 +214,20 @@ int fn_801725C4(Unk80171A10_Menu* p, const unsigned short* s)
         p->mA4[0] = -1;
     }
     return 0;
+}
+
+void fn_80172624(Unk80171A10_Menu* self) /* 80172624 */
+{
+    int i = 0;
+    Unk80170518** p = (Unk80170518**)self;
+    fn_80172678(self);
+    do {
+        Unk80170518* o = fn_80005840(i);
+        *p = o;
+        i++;
+        p++;
+        o->m64 = (Unk80170518_Svc*)self->m6C;
+    } while (i == 0);
 }
 
 void fn_80172678(Unk80171A10_Menu* p)
