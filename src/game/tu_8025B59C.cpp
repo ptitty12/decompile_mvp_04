@@ -57,6 +57,25 @@ void fn_802609E8(I* i, P* p, int k, float* a, float* b);
 void fn_80260D80(I* i, P* p, int k, float* a, float* b, float* c, int z);
 int fn_801D0314(void* p);
 void fn_8025D0B0(I* self, int a, int b);
+int fn_8025CD18(F* self, P* p);
+int fn_8025CC54(F* self, P* p);
+struct Unk8025CB28_I {
+    char pad0[0x1F0];
+    M* m1F0;
+    char pad1F4[4];
+    int m1F8;
+};
+int fn_801DC67C(int a, int b);
+P* fn_80257B40(M* self);
+P* fn_80257BD0(M* self, P* p, int a);
+float fn_802D7E2C(int a, int b);
+float fn_802D7E88(int a, int b);
+int fn_802D804C(float a, float b);
+extern const float lbl_805DB1A8;
+extern const float lbl_805E50BC;
+extern const float lbl_805E50AC;
+extern const float lbl_805E50B4;
+extern const float lbl_805E50C4;
 struct Unk8025CD18_C {
     char pad0[0x3A4];
     char* m3A4;
@@ -131,6 +150,25 @@ void fn_8025CAF0(F* self)
     self->m0 = -1.0f;
     for (int i = 0; i < 4; i++)
         self->m4[i] = -1;
+}
+
+void fn_8025CB28(F* self)
+{
+    if (self->m1C == 0) {
+        Unk8025CB28_I* in = (Unk8025CB28_I*)self->m18;
+        if (fn_801DC67C(in->m1F8, self->m18) != 0) {
+            M* m = ((Unk8025CB28_I*)self->m18)->m1F0;
+            P* p = fn_80257B40(m);
+            while (p != 0 && p->m458 != 9) {
+                int idx = p->m458 - 9;
+                int k = fn_802548BC(&p->m58C, 1);
+                if (fn_8025CD18(self, p) != 0 || fn_8025CC54(self, p) != 0)
+                    self->m4[idx] = k;
+                p = fn_80257BD0(m, p, 0);
+            }
+            self->m1C = 1;
+        }
+    }
 }
 
 /* near-miss: self/p callee-saved registers swapped (retail self r31, p r30; no mr before the call) */
@@ -234,6 +272,26 @@ void fn_8025DA78(I* self, P* p)
     char* g = (char*)self + 0x190;
     fn_80269F88(g, p, 3);
     fn_80269E84(g, p, 1);
+}
+
+int fn_8025DC40(I* self, int* a, int* b, int* c, int* d)
+{
+    *a = 0;
+    *b = 0;
+    *c = 0;
+    *d = 0;
+    int k = fn_801A2034(self->m1EC, 3);
+    float t = fn_802D7E2C(k, 0xCA);
+    int r = 0;
+    if (!(t < lbl_805DB1A8)) {
+        float f = fn_802D7E88(k, 0xCA);
+        *a = fn_802D804C(f, lbl_805E50BC);
+        *b = fn_802D804C(f, lbl_805E50AC);
+        *c = fn_802D804C(f, lbl_805E50B4);
+        *d = fn_802D804C(f, lbl_805E50C4);
+        r = 1;
+    }
+    return r;
 }
 
 void fn_8025DED4(I* self)
