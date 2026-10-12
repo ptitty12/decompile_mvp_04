@@ -47,6 +47,48 @@ extern "C" void fn_8009FD8C(Unk8009FC5C* p, unsigned i)
         fn_8040074C(&p->m24[i], 4);
 }
 
+/* Every column yields 0; the original keeps the case tree as dead compares
+   (PATTERNS, "Hard-case families 4"). */
+extern "C" int fn_8009FDC8(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+extern "C" int fn_8009FDD4(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 struct Unk8009FDE0 {
     char pad0[0x1C];
     unsigned m1C;
