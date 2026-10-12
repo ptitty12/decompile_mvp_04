@@ -3,6 +3,38 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8018C9C8.h"
+
+struct Unk80190768_V4 {
+    float x, y, z, w;
+};
+struct Unk80190768_M {
+    float m[16];
+};
+extern "C" {
+void fn_80305AAC(void* a, Unk80190768_M* m, void* b, float k);
+void fn_804020F0(const void* in, const Unk80190768_M* m, Unk80190768_V4* out);
+float fn_8018514C(void* o, Unk80183918_Vec3 v, Unk80183918_Vec3* out);
+}
+
+struct Unk80190894_P {
+    char pad0[0x60];
+    Unk80183918_Vec3 m60;
+};
+struct Unk80190894_X {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk80190894_C {
+    char pad0[0x6CC];
+    Unk80190894_P* m6CC;
+    char pad6D0[0x744 - 0x6D0];
+    Unk80190894_X* m744;
+};
+struct Unk80190894_O {
+    char pad0[0x44C];
+    Unk80190894_C* m44C;
+};
+
 //@BODY
 //@8018C9C8
 extern "C" void fn_8018C9C8(Unk80188698* o, int a, int b, int c)
@@ -386,3 +418,63 @@ extern "C" int fn_8019019C(Unk80188698* o)
     return 1;
 }
 
+inline float Unk80190768_Height(void* o, Unk80183918_Vec3 v)
+{
+    Unk80183918_Vec3 tmp;
+    return fn_8018514C(o, v, &tmp);
+}
+
+//@80190768
+extern "C" void fn_80190768(Unk80188698* o, void* a, void* b, Unk80183918_Vec3* out)
+{
+    const float k = 0.5f;
+    Unk80190768_M m;
+    Unk80190768_V4 v;
+    fn_80305AAC(a, &m, b, -1.0f);
+    fn_804020F0(b, &m, &v);
+    float s = 1.0f;
+    if (v.w != 0.0f) {
+        s = 1.0f / v.w;
+        v.x *= s;
+        v.y *= s;
+        v.z *= s;
+    }
+    out->m0 = v.x;
+    out->m4 = v.y;
+    out->m8 = v.z;
+    void* ho = *(void**)((char*)o->m44C + 0x6B8);
+    float h = Unk80190768_Height(ho, *out);
+    out->m4 = h + k;
+}
+
+//@80190894
+extern "C" void fn_80190894(Unk80190894_O* o, const Unk80183918_Vec3* c, Unk80183918_Vec3* p1, Unk80183918_Vec3* p2, Unk80183918_Vec3* p3, Unk80183918_Vec3* p4, float t)
+{
+    Unk80190894_C* cx = o->m44C;
+    float lo = 5.0f;
+    float hi = 2.4f;
+    float w = t * 0.028571429f;
+    if (cx->m744->m20 == 0) {
+        Unk80183918_Vec3 p = cx->m6CC->m60;
+        if (!(p.m4 <= 6.0f))
+            w = w * 1.7f;
+        else
+            w = 4.0f;
+    }
+    if (!(w <= 5.0f))
+        w = 5.0f;
+    if (!(w >= 2.4f))
+        w = 2.4f;
+    p1->m0 = c->m0 + w;
+    p1->m4 = c->m4;
+    p1->m8 = c->m8 + w;
+    p2->m0 = c->m0 + w;
+    p2->m4 = c->m4;
+    p2->m8 = c->m8 - w;
+    p3->m0 = c->m0 - w;
+    p3->m4 = c->m4;
+    p3->m8 = c->m8 + w;
+    p4->m0 = c->m0 - w;
+    p4->m4 = c->m4;
+    p4->m8 = c->m8 - w;
+}
