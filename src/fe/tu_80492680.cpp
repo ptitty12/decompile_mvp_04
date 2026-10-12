@@ -49,6 +49,45 @@ inline char* FeIdc(char* p)
 {
     return p;
 }
+extern "C" int fn_80403088(const unsigned short* s, int ch);
+extern "C" void fn_8040316C(unsigned short* dst, const unsigned short* src, int n);
+extern "C" void fn_800DFF0C(unsigned short* dst, unsigned short* src);
+extern "C" int fn_80403088(const unsigned short* s, int ch);
+extern "C" void fn_8040316C(unsigned short* dst, const unsigned short* src, int n);
+extern "C" void fn_800DFF0C(unsigned short* dst, unsigned short* src);
+FE_OVERLAY void fn_80492E94(void* x)
+{
+    unsigned short buf[200];
+    unsigned short out[1000];
+    int n = 0;
+    int cnt = (int)FeMem(x, 0x248)->fn_vslot34();
+    const unsigned short* p = (const unsigned short*)FeI(x, 0x32C);
+    int i;
+    while (n < cnt) {
+        i = fn_80403088(p, 10);
+        if (i == 0xFFFF) {
+            break;
+        }
+        n++;
+        p += i + 1;
+    }
+    int k = 0;
+    out[0] = 0;
+    while (k <= 9) {
+        i = fn_80403088(p, 10);
+        if (i == 0xFFFF) {
+            break;
+        }
+        int m = i + 1;
+        fn_8040316C(buf, p, m);
+        k++;
+        buf[m] = 0;
+        fn_800DFF0C(out, buf);
+        p += i + 1;
+    }
+    ((FeWV*)FeMem(x, 0x1CC))->s28(out);
+}
+
 /* near-miss (97.5%): the second range bound compiles to cmpwi 10 / ble where retail has cmpwi 11 / blt */
 FE_OVERLAY void fn_80492FB4(void* x)
 {
@@ -215,6 +254,39 @@ FE_OVERLAY void fn_804937C8(void* x, int a, int b)
     fn_80492BA8(x, out);
 }
 
+extern const char lbl_805F7010[];
+extern const char lbl_805F7030[];
+extern const char lbl_805F7010[];
+extern const char lbl_805F7030[];
+extern const char lbl_805F7010[];
+extern const char lbl_805F7030[];
+extern const char lbl_805F7010[];
+extern const char lbl_805F7030[];
+/* near-miss: 99.6%, retail clrlwi r11,r5,24 then slwi r6 then mulli r11 (r11 not r0, mulli after slwi) */
+FE_OVERLAY void fn_80494108(void* x, int k, int a, int b)
+{
+    char fmt[0x68];
+    char n[200];
+    char out[304];
+    char* bb = (char*)x + 0x1A8;
+    int off = b * 4;
+    int o2 = (unsigned char)a * 0x34;
+    char* r = *(char**)(bb + off);
+    char* t = r + 0x3E8;
+    fn_800DE440(n, *(int*)(t + o2), 1);
+    switch (k) {
+    case 1:
+        fn_804031BC(fmt, lbl_805F7010);
+        fn_80403DE4(out, fmt, n);
+        break;
+    case 3:
+        fn_804031BC(fmt, lbl_805F7030);
+        fn_80403DE4(out, fmt, n);
+        break;
+    }
+    fn_80492BA8(x, out);
+}
+
 FE_OVERLAY void fn_80494F94(Fe4F94* x)
 {
     for (int i = 0; i < 4; i++) {
@@ -348,6 +420,49 @@ FE_OVERLAY void fn_80498438(char* x)
         fn_80377488(*(void**)(x + 0x32C));
         *(int*)(x + 0x32C) = 0;
     }
+}
+
+struct Fe498478Sec {
+    unsigned char* p;
+    int n;
+    int u[3];
+};
+struct Fe498478Rec {
+    Fe498478Sec s[5];
+    char pad64[0x3E8 - 0x64];
+    struct {
+        int m0;
+        char p[0x30];
+    } e[1];
+};
+FE_OVERLAY int fn_80498478(void* x)
+{
+    unsigned char v = 0;
+    char* bb = (char*)x + 0x1A8;
+    int off = FeI(x, 0x188) * 4;
+    Fe498478Rec* r = *(Fe498478Rec**)(bb + off);
+    int n0 = r->s[0].n;
+    int n1 = r->s[1].n;
+    int n2 = r->s[2].n;
+    int n3 = r->s[3].n;
+    int n4 = r->s[4].n;
+    int c1 = n0 + n1;
+    int c2 = c1 + n2;
+    int c3 = c2 + n3;
+    int c4 = c3 + n4;
+    int i = FeMem(x, 0x21C)->fn_vslot60() - 1;
+    if (i < n0) {
+        v = r->s[0].p[(unsigned char)i];
+    } else if (i < c1) {
+        v = r->s[1].p[(unsigned char)(i - n0)];
+    } else if (i < c2) {
+        v = r->s[2].p[(unsigned char)(i - n0 - n1)];
+    } else if (i < c3) {
+        v = r->s[3].p[(unsigned char)(i - n0 - n1 - n2)];
+    } else if (i < c4) {
+        v = r->s[4].p[(unsigned char)(i - n0 - n1 - n2 - n3)];
+    }
+    return r->e[v].m0;
 }
 
 FE_OVERLAY void fn_80498580(void) {}
