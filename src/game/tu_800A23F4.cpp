@@ -88,6 +88,54 @@ struct Unk800A2598_Sub {
 
 extern "C" void fn_800A6618(Unk800A2688* p, int a);
 
+struct FEO54 {
+    int m0;
+    int m4;
+    const void* m8;
+};
+extern const char lbl_80649EC0[];
+extern "C" void fn_8007B87C(int g, int a);
+extern "C" int fn_8007B8C4(int g, int a, int b);
+extern "C" int fn_8007B3E0(int g, int a, int b);
+extern "C" void fn_8007B4A8(int g, int a, int b, int c);
+extern "C" void fn_8056503C(int a);
+extern "C" void fn_80590910(int a);
+extern "C" int fn_8007B2FC(int g, int i);
+extern "C" FEO54* fn_8054CBBC(FEO54* o, int a, int g);
+extern "C" void fn_8054CBD8(FEO54* o, int a);
+
+extern "C" void fn_800A23F4(Unk800A2688* p)
+{
+    int g = lbl_8061930C;
+    fn_80077DAC(g);
+    fn_8007B87C(g, fn_8007F7D0(g, 0));
+    fn_8056503C(*(int*)((char*)p + 0x48));
+    fn_80590910(*(int*)(g + 0x30));
+    p->m70 = 4;
+    p->m84 = fn_8007F9B4(g);
+    int old = p->m78;
+    p->m7C = old;
+    p->m78 = 0;
+    p->m74 = 2;
+    p->m80 = 10;
+    int e = fn_8007F7D0(g, 0);
+    int n = fn_8007B2B0(g);
+    int v = fn_8007B3E0(g, 0xF, e);
+    if (v == v / 3 * 3) {
+        fn_8007B4A8(g, 0x22, e, 0);
+        for (int i = 0; i < n; i++) {
+            if (fn_8007B648(g, 0xE, i) != 0) {
+                int h = fn_8007B2FC(g, i);
+                fn_8007B4A8(g, 0x10, h, fn_8007B8C4(g, 0x36, fn_8007B320(g, 0, h)));
+            }
+        }
+    }
+    FEO54 o;
+    fn_8054CBBC(&o, fn_8007F7D0(lbl_8061930C, 0), lbl_8061930C);
+    fn_8054CBD8(&o, 1);
+    o.m8 = lbl_80649EC0;
+}
+
 extern "C" void fn_800A2598(Unk800A2688* p, int a)
 {
     Unk800A2598_Sub* sub = (Unk800A2598_Sub*)((char*)p + 0x2C);
