@@ -221,6 +221,13 @@ extern "C" int fn_803933E8(McCtxA*, McHdr5*, McRec12*, McSrc*, unsigned*);
 
 extern "C" int fn_80391914(McB*, int);
 
+struct McHdr16 {
+    char pad0[6];
+    unsigned char m6;
+    char pad7[5];
+    unsigned short mC[1];
+};
+
 extern "C" void fn_803927E4(unsigned n)
 {
     if (n <= 15) {
@@ -509,11 +516,11 @@ extern "C" void fn_80393154(McHdr6* p, int n)
     b[j] = b[j] & m;
 }
 
-/* near-miss: retail masks the shifted bit with clrlwi 24 before the and; ours folds it away. */
 extern "C" int fn_803931B4(unsigned char* bits, int n)
 {
     int i = n / 8;
-    return bits[i] & (unsigned char)(1 << (n - i * 8));
+    unsigned char m = 1 << (n - i * 8);
+    return bits[i] & m;
 }
 
 extern "C" int fn_803931EC(McA6* a, McB* b, int x)
@@ -662,6 +669,52 @@ extern int lbl_80624418[];
 extern "C" int fn_80393640(unsigned x)
 {
     return (x & 0x1F) * lbl_80624418[(x >> 5) & 7];
+}
+
+/* near-miss: 2 slots, the index/base operand order of the first lhzx (idx,base in the original code). */
+extern "C" void fn_8039365C(McHdr16* p, unsigned char* out)
+{
+    int w[256];
+
+    int n = p->m6;
+    if (n > 0xff)
+        n = 0xff;
+    int i = 0;
+    int total = 0;
+    if (i < n) {
+        do {
+            unsigned short* mc = p->mC;
+            unsigned idx = mc[i] * 4;
+            w[i] = fn_80393640(((unsigned char*)p)[idx]);
+            i++;
+            total += fn_80393640(((unsigned char*)p)[idx]);
+        } while (i < n);
+    }
+    int pos = 0;
+    while (total > 0) {
+        int r = fn_80394FD4(total, -1);
+        i = 0;
+        while (i < n) {
+            r -= w[i];
+            if (r < 0)
+                break;
+            i++;
+        }
+        out[pos] = i;
+        pos++;
+        int v = w[i];
+        w[i] = 0;
+        total -= v;
+    }
+    i = 0;
+    while (i < n) {
+        unsigned short* mc = p->mC;
+        if (fn_80393640(((unsigned char*)p)[mc[i] * 4]) == 0) {
+            out[pos] = i;
+            pos++;
+        }
+        i++;
+    }
 }
 
 struct McSlotP {
