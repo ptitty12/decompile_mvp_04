@@ -6,6 +6,7 @@
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
 #include "snd/cmn/sndcmn.h"
+#include <string.h>
 
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
@@ -22,6 +23,7 @@ extern "C" void fn_803AD258(int shandle, int v);
 
 extern unsigned char lbl_8069C9E4[7];
 extern int lbl_8062543C;
+/* near-miss: all 62 insns; retail uses r30 for both the sndgs base and (after the last base use) the SNDMEMI_restore result (stb installed, then mr r30,r3); ours keeps the base in r31 and the result in r30 */
 extern "C" int fn_803AC5CC();
 
 extern const signed char lbl_80609630[6][6];
@@ -50,6 +52,11 @@ struct Unk8069CB9C {
 };
 extern Unk8069CB9C lbl_8069CB9C;
 extern int lbl_80625440;
+
+extern "C" int fn_803AF934(int a);
+extern "C" void fn_803B39A4();
+extern "C" void fn_803B12CC();
+extern "C" int SNDMEMI_restore();
 
 extern "C" Snd::SNDSTREAMREQUEST* fn_803AB310(int h)
 {
@@ -147,6 +154,41 @@ extern "C" int fn_803AB5F4(int h, int v)
         return -8;
     pssc->po.drylevel = v;
     SNDCTRL_drylevel(pssc->shandle, v);
+    return 0;
+}
+
+extern "C" int fn_803AB644(int h, SNDREQUESTSTATUS* s)
+{
+    s->state = 0;
+    s->currenttime = 0;
+    s->timetoend = 0;
+    s->timebuffered = 0;
+    if (h < 0)
+        return -8;
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr((unsigned char)h);
+    if (pssc == 0)
+        return -8;
+    Snd::SNDSTREAMREQUEST* r = fn_803AB310(h);
+    if (r != 0) {
+        if (r->continuation != 0) {
+            int rate;
+            if (pssc->allocatedrequests.phead == (SNDLINKNODE*)r) {
+                s->state = 2;
+                rate = pssc->cursf.samplerate;
+            } else {
+                s->state = 1;
+                rate = pssc->newsf.samplerate;
+            }
+            float f = 1000.0f / rate;
+            s->currenttime = SNDI_ftoiround((float)(unsigned int)r->currentframe * f);
+            s->timetoend = SNDI_ftoiround((float)(unsigned int)(r->totalframes - r->currentframe) * f);
+            s->timebuffered = SNDI_ftoiround((float)(unsigned int)r->outstandingframes * f);
+        } else {
+            s->state = 0;
+        }
+    } else {
+        s->state = 3;
+    }
     return 0;
 }
 
@@ -420,6 +462,55 @@ extern "C" int fn_803AC164(int k, int a, int b)
     }
     default:
         return -5;
+    }
+    return 0;
+}
+
+extern "C" int fn_803AC5CC()
+{
+    if (fn_803AC11C() == 0)
+        return -14;
+    if (sndgs.aemsrestore != 0)
+        sndgs.aemsrestore();
+    if (sndgs.aemsstreamrestore != 0)
+        sndgs.aemsstreamrestore();
+    if (sndgs.eventrestore != 0)
+        sndgs.eventrestore();
+    if (sndgs.streamrestore != 0)
+        sndgs.streamrestore();
+    if (sndgs.midirestore != 0)
+        sndgs.midirestore();
+    fn_803B39A4();
+    if (sndgs.bankremove != 0)
+        sndgs.bankremove(-1);
+    fn_803AF934(0);
+    fn_803A975C();
+    SNDMEMI_free(sndgs.chan);
+    SNDMEMI_free(sndgs.banklist);
+    fn_803A979C();
+    int r = SNDMEMI_restore();
+    sndgs.installed = 0;
+    fn_803B12CC();
+    return r;
+}
+
+extern "C" int fn_803AC6C4()
+{
+    int n = lbl_80625448;
+    int nv = sndgs.voicestotal;
+    int a = nv * 4;
+    n = n * a;
+    int size = nv * 0x90 + n;
+    sndgs.chan = (CHANPUB*)SNDMEMI_allocz(size);
+    memset(sndgs.chan, 0, size);
+    int i;
+    char* fx = (char*)(sndgs.chan + sndgs.voicestotal);
+    for (i = 0; i < sndgs.voicestotal; i++) {
+        sndgs.chan[i].pFxVolume = (FXVOLUME*)fx;
+        int j;
+        for (j = 0; j < lbl_80625448; j++)
+            sndgs.chan[i].pFxVolume[j].fxLevel = 1.0f;
+        fx += lbl_80625448 * 4;
     }
     return 0;
 }
