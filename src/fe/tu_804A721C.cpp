@@ -20,23 +20,6 @@ extern "C" void fn_804A9228(void* x);
 extern "C" void fn_804A8CE8(void* x);
 extern "C" void fn_804A89D0(void* x);
 extern "C" int fn_804A9048(int x, int v);
-#define FEW3_(n) virtual void s##n(int a, int b, int c);
-struct FeW3 : Unk800C7B40_Data {
-    virtual ~FeW3();
-    FEW3_(2) FEW3_(3) FEW3_(4) FEW3_(5) FEW3_(6) FEW3_(7) FEW3_(8) FEW3_(9) FEW3_(10) FEW3_(11)
-    FEW3_(12) FEW3_(13) FEW3_(14) FEW3_(15) FEW3_(16) FEW3_(17) FEW3_(18) FEW3_(19) FEW3_(20)
-    FEW3_(21) FEW3_(22) FEW3_(23) FEW3_(24) FEW3_(25) FEW3_(26) FEW3_(27) FEW3_(28) FEW3_(29)
-    FEW3_(30) FEW3_(31) FEW3_(32) FEW3_(33) FEW3_(34) FEW3_(35) FEW3_(36) FEW3_(37) FEW3_(38)
-    FEW3_(39) FEW3_(40) FEW3_(41) FEW3_(42) FEW3_(43) FEW3_(44) FEW3_(45) FEW3_(46) FEW3_(47)
-    FEW3_(48) FEW3_(49) FEW3_(50) FEW3_(51) FEW3_(52) FEW3_(53) FEW3_(54) FEW3_(55) FEW3_(56)
-    FEW3_(57) FEW3_(58) FEW3_(59) FEW3_(60) FEW3_(61) FEW3_(62) FEW3_(63) FEW3_(64) FEW3_(65)
-    FEW3_(66) FEW3_(67) FEW3_(68) FEW3_(69) FEW3_(70) FEW3_(71) FEW3_(72) FEW3_(73) FEW3_(74)
-    FEW3_(75) FEW3_(76) FEW3_(77) FEW3_(78) FEW3_(79) FEW3_(80) FEW3_(81) FEW3_(82) FEW3_(83)
-    FEW3_(84) FEW3_(85) FEW3_(86) FEW3_(87) FEW3_(88) FEW3_(89) FEW3_(90) FEW3_(91) FEW3_(92)
-    FEW3_(93) FEW3_(94) FEW3_(95) FEW3_(96) FEW3_(97) FEW3_(98) FEW3_(99) FEW3_(100)
-};
-
-
 extern "C" int fn_8007F488__FP13Unk8007F198_A(void* g, int a);
 extern "C" int fn_8007F4D0__FP13Unk8007F198_Aii(void* g, int a, int b);
 extern "C" {
