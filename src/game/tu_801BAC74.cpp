@@ -833,6 +833,55 @@ extern "C" int fn_801BC660(A* a, P* q, P* p3, int mode, int flag)
     return r;
 }
 
+int fn_801BCA0C(A* a, P* q);
+void fn_801BFCEC(void* o, P* p);
+float fn_8018CBA4(P* p);
+extern "C" void fn_801BCF88(A* a);
+struct Unk80256C80_M;
+void fn_80257F3C(Unk80256C80_M* m, int i);
+extern "C" int fn_801BCD3C(A* a, P* p, P* q, int* out)
+{
+    int go = 0;
+    int dbg = 0;
+    if (p != a->m14->m6CC)
+        return 0;
+    if (p->m38C == 1) {
+        if (p->m388 == 3) {
+            if (q->m458 == 1 && fn_801BFA20(&p->m60) != 0 && !(fn_8018CBA4(p) >= 72.0f)) {
+                fn_801BDE24(a->m8, p);
+                fn_801BDE58(a->m8, p, 1);
+            } else {
+                go = 1;
+            }
+        } else {
+            Vec3 v = lbl_806055AC;
+            fn_801BDB84(a->m8, p, 1, 0, &v);
+        }
+    }
+    int r = 0;
+    if (go != 0) {
+        fn_801BDDC8(a->m8, p);
+        if (fn_801BC660(a, fn_801A4B34(a->m14), q, 5, 1) != 0) {
+            r = 1;
+            Unk802A9C34 m;
+            fn_802A9C34__11Unk802A9C34ifcicc(&m, 5, 0.0f, *(unsigned char*)((char*)fn_801A4B34(a->m14) + 0x70C), -1, *(unsigned char*)((char*)q + 0x70C), 0xFF);
+            fn_8037893C(&a->m14->m704, m.m0, &m, 0, 0);
+        }
+        fn_80257F3C((Unk80256C80_M*)((Unk801C16B0_M4*)a->m10)->m3B4, 0);
+        if (r == 1)
+            fn_801BFCEC(a->mC, p);
+    } else if (dbg != 0) {
+        fn_801BDDC8(a->m8, p);
+        fn_801BD878(a, p);
+    }
+    int s = fn_801BCA0C(a, q);
+    if (out)
+        *out = s;
+    if (s != -1)
+        ((void (*)(A*, int, P*))fn_801BCF88)(a, s, q);
+    return r;
+}
+
 extern "C" void fn_801BCF88(A* a) { fn_801BCFA8(a); }
 
 extern "C" void fn_801BD80C(A* a, P* q)
