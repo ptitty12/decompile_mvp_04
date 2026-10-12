@@ -10,7 +10,7 @@
  * the compiler flags a function needs; untagged functions match with the configured flags.
  * Not matched yet: LockSram/LockSramEx and the functions that inline them, UnlockSram, __OSInitSram
  * (the original keeps the static SramControl base in a callee-saved register, which an extern cannot reproduce),
- * fn_80436530 (OSGetResetButtonState) and fn_804372DC (__OSThreadInit) were not attempted.
+ * fn_80436530 (OSGetResetButtonState) and fn_804372DC (__OSThreadInit) are done (see below).
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -216,7 +216,11 @@ extern void fn_804330E4(void);                         /* LCDisable */
 extern void fn_804330C0(void);                         /* ICFlashInvalidate */
 extern BOOL __PADDisableRecalibration(BOOL disable);
 extern void fn_80437D18(OSThread* thread);             /* OSCancelThread */
-extern void fn_80435F34(u32 resetCode, u32 bootDol);   /* __OSReboot */
+void fn_80435F34(u32 resetCode, u32 bootDol);          /* __OSReboot */
+void fn_80435FA4(void** start, void** end);            /* OSGetSaveRegion */
+extern void fn_80434AD8(u32 bootDol, u32 resetCode, u32* arg);
+extern void* lbl_806EF828;                             /* SaveStart */
+extern void* lbl_806EF82C;                             /* SaveEnd */
 
 void OSRegisterResetFunction(OSResetFunctionInfo* func);
 BOOL fn_8043603C(BOOL final);
@@ -224,6 +228,38 @@ void fn_80436154(void);
 void fn_804361BC(u32 resetCode);
 void fn_80436204(int reset, u32 resetCode, BOOL forceMenu);
 u32 fn_80436404(void);
+
+/* __OSReboot */
+void fn_80435F34(u32 resetCode, u32 bootDol)
+{
+    OSContext exceptionContext;
+    u32 unk;
+
+    /* compiled-out assertions of the original source: with fewer than 8 of them the call in
+     * fn_80436204 is expanded inline, which the original (a separate source file) never did */
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    ASSERTMSGLINE(0, 0, "");
+    OSDisableInterrupts();
+    fn_80432CCC((void*)0x81280000);
+    fn_80432CC4((void*)0x812F0000);
+    fn_80433814(&exceptionContext);
+    fn_8043364C(&exceptionContext);
+    unk = 0;
+    fn_80434AD8(bootDol, resetCode | 0x80000000, &unk);
+}
+
+/* OSGetSaveRegion */
+void fn_80435FA4(void** start, void** end)
+{
+    *start = lbl_806EF828;
+    *end = lbl_806EF82C;
+}
 
 /* OSRegisterResetFunction */
 void OSRegisterResetFunction(OSResetFunctionInfo* func)
@@ -378,7 +414,10 @@ u32 fn_80436404(void)
     return (__PIRegs[9] & ~7) >> 3;
 }
 
-extern OSTime lbl_806EF858;           /* HoldUp-time */
+extern OSTime lbl_806EF858;           /* DownTime */
+extern OSTime lbl_806EF850;           /* HoldUp */
+extern OSTime lbl_806EF7D0;           /* __OSStartTime */
+extern s64 fn_80406CC0(s64 a, u32 bhi, u32 blo); /* 64-bit divide helper (divisor passed as hi, lo words) */
 extern s32 lbl_806EF844;              /* Down */
 extern s32 lbl_806EF848;              /* LastState */
 extern void (*lbl_806EF840)(void);    /* ResetCallback */
@@ -405,6 +444,59 @@ void fn_8043643C(s16 interrupt, OSContext* context)
         }
     }
     __PIRegs[0] = 2;
+}
+
+/* OSGetResetButtonState */
+BOOL fn_80436530(void)
+{
+    BOOL enabled;
+    BOOL state;
+    u32 reg;
+    OSTime now;
+
+    enabled = OSDisableInterrupts();
+    now = __OSGetSystemTime();
+    reg = __PIRegs[0];
+    if (!(reg & 0x00010000)) {
+        if (!lbl_806EF844) {
+            lbl_806EF844 = TRUE;
+            state = lbl_806EF850 ? TRUE : FALSE;
+            lbl_806EF858 = now;
+        } else {
+            state = (lbl_806EF850 || (OSMicrosecondsToTicks(100) < now - lbl_806EF858)) ? TRUE : FALSE;
+        }
+    } else if (lbl_806EF844) {
+        lbl_806EF844 = FALSE;
+        state = lbl_806EF848;
+        if (state) {
+            lbl_806EF850 = now;
+        } else {
+            lbl_806EF850 = 0;
+        }
+    } else if (lbl_806EF850 && (now - lbl_806EF850 < OSMillisecondsToTicks(40))) {
+        state = TRUE;
+    } else {
+        state = FALSE;
+        lbl_806EF850 = 0;
+    }
+    lbl_806EF848 = state;
+    if (__gUnknown800030E3 & 0x1F) {
+        OSTime fire = (__gUnknown800030E3 & 0x1F) * 60;
+
+        fire = OSSecondsToTicks(fire) + lbl_806EF7D0;
+        if (fire < now) {
+            now -= fire;
+            now = fn_80406CC0(now, 0, OS_TIMER_CLOCK);
+            now = fn_80406CC0(now, 0, 2);
+            if ((now & 1) == 0) {
+                state = TRUE;
+            } else {
+                state = FALSE;
+            }
+        }
+    }
+    OSRestoreInterrupts(enabled);
+    return state;
 }
 
 /* OSGetResetSwitchState */
@@ -677,4 +769,80 @@ void fn_8043719C(u16 gbs)
     }
     sram->gbs = gbs;
     fn_80436B54(TRUE, sizeof(OSSram));
+}
+
+/* ==== OSThread (head) ==== */
+
+/* OSThread.c statics: one .bss block (the compiler addresses them off a shared base) */
+static OSThreadQueue RunQueue[OS_PRIORITY_MAX + 1];
+static OSThread IdleThread;
+static OSThread DefaultThread;
+static OSContext IdleContext;
+
+extern void (*lbl_806EF2F8)(OSThread* from, OSThread* to);   /* SwitchThreadCallback */
+extern volatile u32 lbl_806EF860;                      /* RunQueueBits */
+extern volatile s32 lbl_806EF864;                      /* RunQueueHint */
+extern volatile s32 lbl_806EF868;                      /* Reschedule */
+extern void fn_8043857C(u8 val);                       /* OSClearStack */
+extern u8 lbl_80701020[] AT_ADDRESS(0x80701020);       /* _stack_addr */
+extern u8 lbl_806F1020[] AT_ADDRESS(0x806F1020);       /* _stack_end */
+void fn_804372D8(void);
+void fn_804372DC(void);
+void fn_80437434(OSThreadQueue* queue);
+
+/* empty stub */
+void fn_804372D8(void)
+{
+}
+
+/* __OSThreadInit */
+void fn_804372DC(void)
+{
+    OSThread* thread = &DefaultThread;
+    int prio;
+
+    thread->state = OS_THREAD_STATE_RUNNING;
+    thread->attr = OS_THREAD_ATTR_DETACH;
+    thread->priority = thread->base = 16;
+    thread->suspend = 0;
+    thread->val = (void*)-1;
+    thread->mutex = NULL;
+    fn_80437434(&thread->queueJoin);
+    thread->queueMutex.head = thread->queueMutex.tail = NULL;
+    __gUnkThread1 = thread;
+    fn_80433814(&thread->context);
+    fn_8043364C(&thread->context);
+    thread->stackBase = lbl_80701020;
+    thread->stackEnd = (u32*)lbl_806F1020;
+    *thread->stackEnd = OS_THREAD_STACK_MAGIC;
+    lbl_806EF2F8(__OSCurrentThread, thread);
+    __OSCurrentThread = thread;
+    fn_8043857C(0);
+    lbl_806EF860 = 0;
+    lbl_806EF864 = FALSE;
+    for (prio = OS_PRIORITY_MIN; prio <= OS_PRIORITY_MAX; ++prio) {
+        fn_80437434(&RunQueue[prio]);
+    }
+    fn_80437434(&__OSActiveThreadQueue);
+    {
+        OSThread* prev;
+
+        prev = __OSActiveThreadQueue.tail;
+        if (prev == NULL) {
+            __OSActiveThreadQueue.head = thread;
+        } else {
+            prev->linkActive.next = thread;
+        }
+        thread->linkActive.prev = prev;
+        thread->linkActive.next = NULL;
+        __OSActiveThreadQueue.tail = thread;
+    }
+    fn_80433814(&IdleContext);
+    lbl_806EF868 = 0;
+}
+
+/* OSInitThreadQueue */
+void fn_80437434(OSThreadQueue* queue)
+{
+    queue->head = queue->tail = NULL;
 }
