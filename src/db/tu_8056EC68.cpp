@@ -41,7 +41,6 @@ struct DbDownIt {
     }
 };
 
-extern "C" void fn_8056EEA8(DbSel* self, int idx, int flag);
 
 extern "C" void fn_8056E1D8(DbSel* s);
 
@@ -146,17 +145,35 @@ struct Db80570828_F {
 };
 extern "C" void fn_8056DE4C(void* p);
 extern "C" void fn_8056E13C(DbSel* self);
-extern "C" void fn_80571D04(DbMgr* self);
 
 extern const float lbl_805FFD8C;
 extern const float lbl_805FFD90;
 
 extern const float lbl_805FFD94;
 extern "C" void fn_8056CB30(DbScr* self, int a);
+
+extern const float lbl_805FFCB0;
+extern const float lbl_805FFCB4;
+
+extern const float lbl_805FFC80;
+extern const float lbl_805FFC84;
+extern const float lbl_805FFC88;
+extern const float lbl_805FFC8C;
+extern const float lbl_805FFC90;
+extern const float lbl_805FFC94;
+extern const float lbl_805FFC98;
+extern const float lbl_805FFC9C;
+extern const float lbl_805FFCA0;
+extern const float lbl_805FFCA4;
+extern "C" void fn_8056CA20(void* q, int a);
+extern "C" void fn_8056C8E4(void* q, int a);
+extern "C" void fn_8056C988(void* q, int a, int b);
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_8056EC68(DbSel* self, int a, int b, int c, int d);
 extern "C" void fn_8056ED54(DbSel* self, int idx);
+extern "C" int fn_8056EEA8(DbSel* self, int idx, int mode);
 extern "C" void fn_8056F10C(DbSel* self);
+extern "C" void fn_8056F228(DbSel* self, int a, int b);
 extern "C" void fn_8056F494(DbSel* self);
 extern "C" int fn_8056F51C(DbSel* self, int idx, void* p3);
 extern "C" void fn_8056F640(DbSel* self);
@@ -175,7 +192,7 @@ extern "C" void fn_805702CC(DbMgr* self, int a, int b, int c);
 extern "C" void fn_805704CC(DbMgr* self);
 extern "C" void fn_80570630(DbMgr* self);
 extern "C" void fn_80570828(DbMgr* self);
-extern "C" void fn_80570C14(DbMgr* self);
+extern "C" void fn_80570C14(DbMgr* self, int a, int b);
 extern "C" void fn_80570C38(DbMgr* self, int a, int b);
 extern "C" void fn_80570D4C(DbMgr* self);
 extern "C" void fn_80570E80(DbMgr* self);
@@ -188,6 +205,7 @@ extern "C" void fn_80571928(DbMgr* self, int mode);
 extern "C" void fn_80571A94(DbMgr* self);
 extern "C" void fn_80571AF8(DbMgr* self);
 extern "C" void fn_80571BD0(DbMgr* self);
+extern "C" void fn_80571D04(DbMgr* self);
 extern "C" void fn_80571EA0(DbMgr* self);
 
 /* near-miss: 2 slots (addi r26,r27,1 lands after the call); CR4 flag form reproduced */
@@ -245,6 +263,54 @@ extern "C" DB_OVERLAY void fn_8056ED54(DbSel* self, int idx)
     }
 }
 
+/* near-miss: 2 slots; retail moves the stat-id argument (mr r5) ahead of the pointer argument (addi r3) in the third rating call */
+extern "C" DB_OVERLAY int fn_8056EEA8(DbSel* self, int idx, int mode)
+{
+    if (idx == 0)
+        *(int*)((char*)self->mC + 0x50) = 1;
+    else if (idx == 1)
+        *(int*)((char*)self->mC + 0x4C) = idx;
+    int* sub = self->m14;
+    DbT* tb = TeamAt(self->m10, sub[1]);
+    unsigned char c1 = tb->m17D;
+    char* pt = (char*)tb + 0xC9C;
+    unsigned char c0 = tb->m17C;
+    DbT* ta = TeamAt(self->m10, sub[0]);
+    unsigned char q = fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, idx)->m0;
+    char* pa = (char*)ta + 0xC9C;
+    float f1 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(pa, 0xD, q);
+    float f2 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(pa, 0x15, q);
+    float f3 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)((char*)tb + 0xC74, 1, c0);
+    float f4 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(pt, 0xE, c1);
+    float f5 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(pt, 0xF, c1);
+    float f6 = ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(pt, 0x10, c1);
+    float s = (f4 + f4 + f5 + f6) * lbl_805FFC80;
+    float v = f2 * lbl_805FFC8C + (f1 * lbl_805FFC84 + lbl_805FFC88) - s * lbl_805FFC90 - f3 * lbl_805FFC94;
+    float prob = v * lbl_805FFC98 + lbl_805FFC9C;
+    if (idx == 2)
+        prob = lbl_805FFCA0;
+    float rr = fn_8056FFB0();
+    int res = 1;
+    if (mode == 2) {
+    } else if (mode == 1) {
+        res = 0;
+    } else {
+        res = rr < prob;
+    }
+    if (res == 1) {
+        int n = idx + 1;
+        fn_8056C988(self->m18, q, n);
+        fn_80081D18__FP13Unk8007FF8C_Yii(self->m10, idx, n);
+    } else {
+        if (!(fn_8056FFB0() >= lbl_805FFCA4))
+            fn_8056CA20(self->m18, q);
+        else
+            fn_8056C8E4(self->m18, q);
+        fn_80081CCC__FP13Unk8007FF8C_Yi(self->m10, idx);
+    }
+    return res;
+}
+
 extern "C" DB_OVERLAY void fn_8056F10C(DbSel* self)
 {
     float f;
@@ -272,6 +338,60 @@ extern "C" DB_OVERLAY void fn_8056F10C(DbSel* self)
     }
     if (did == 0)
         self->m20 = 1;
+}
+
+extern "C" DB_OVERLAY void fn_8056F228(DbSel* self, int a, int b)
+{
+    if (a == 5) {
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 1)->m0 == 0xFF) {
+            if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 0)->m0 != 0xFF)
+                fn_8056EEA8(self, 0, 0);
+        }
+    } else if (a == 6) {
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 == 0xFF) {
+            if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 1)->m0 != 0xFF)
+                fn_8056EEA8(self, 1, 0);
+        }
+    } else if (a == 7) {
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 != 0xFF)
+            fn_8056EEA8(self, 2, 0);
+    } else if (a == 8) {
+        int k = 1;
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 != 0xFF) {
+            fn_8056EEA8(self, 2, 1);
+            k = 2;
+        }
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 1)->m0 != 0xFF && fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 == 0xFF && Round(self->m10) <= 2) {
+            fn_8056EEA8(self, 1, k);
+            k = 2;
+        }
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 0)->m0 != 0xFF && fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 1)->m0 == 0xFF && Round(self->m10) <= 2)
+            fn_8056EEA8(self, 0, k);
+    }
+    if (Round(self->m10) <= 2) {
+        switch (b) {
+        case 0:
+            if (!(fn_8056FFB0() >= lbl_805FFCB0))
+                self->m10->m1CCB = 1;
+            else
+                self->m10->m1CCA = 1;
+            break;
+        case 1:
+            if (!(fn_8056FFB0() >= lbl_805FFCB4))
+                self->m10->m1CCB = b;
+            else
+                self->m10->m1CCA = b;
+            break;
+        case 2:
+            self->m10->m1CCB = 1;
+            break;
+        case 3:
+            self->m10->m1CCB = 1;
+            break;
+        default:
+            self->m10->m1CCA = 1;
+        }
+    }
 }
 
 /* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
@@ -496,7 +616,7 @@ extern "C" DB_OVERLAY void fn_805702CC(DbMgr* self, int a, int b, int c)
     fn_80573918(sub, self->m8);
     fn_8056BEC8(&self->mFC);
     if ((unsigned)(a - 5) <= 3) {
-        ((void (*)(DbMgr*, int, int))fn_80570C14)(self, a, b);
+        fn_80570C14(self, a, b);
         fn_80570630(self);
         if (fn_8006BE18__11Unk80069F0C(self->m8) != 0)
             fn_8056BE98(&self->mFC);
@@ -618,9 +738,9 @@ extern "C" DB_OVERLAY void fn_80570828(DbMgr* self)
     }
 }
 
-extern "C" DB_OVERLAY void fn_80570C14(DbMgr* self)
+extern "C" DB_OVERLAY void fn_80570C14(DbMgr* self, int a, int b)
 {
-    fn_8056F228(&self->mCC);
+    fn_8056F228(&self->mCC, a, b);
 }
 
 extern "C" DB_OVERLAY void fn_80570C38(DbMgr* self, int a, int b)
@@ -1008,6 +1128,48 @@ extern "C" DB_OVERLAY void fn_80571BD0(DbMgr* self)
         if (fn_80081CF8__FP13Unk8007FF8C_Yi(g, 1)->m0 == 0xFF) {
             fn_8056C1C4(&self->mFC, 2);
             fn_8056BAEC(&self->mFC, p, sa, 0);
+            fn_80081C94__FP13Unk8007FF8C_Yiiii(g, 1, p, cur, 1);
+        } else {
+            self->m4 = 1;
+            unsigned m = self->m0;
+            if (m & 4)
+                self->m118 = 2;
+            else if (m & 2)
+                self->m118 = 1;
+            else
+                self->m118 = 0;
+            fn_8056C1C4(&self->mFC, 1);
+            fn_80081C94__FP13Unk8007FF8C_Yiiii(g, 0, p, cur, 1);
+        }
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80571D04(DbMgr* self)
+{
+    fn_805706B8(self, self->m4);
+    self->m118 = fn_8056FDC8(self->m4, self->m0);
+    DbG* g = self->m8->m14;
+    fn_8056E02C(&self->mCC, 2, self->m0);
+    if (Round(g) <= 2) {
+        int sa = self->m50.m0;
+        int sb = self->m50.m4;
+        DbT* ta = TeamAt(g, sa);
+        unsigned char p = ta->m168[ta->m174];
+        unsigned char cur = TeamAt(g, sb)->m17C;
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(g, 2)->m0 == 0xFF) {
+            fn_8056C1C4(&self->mFC, 3);
+            fn_8056BAEC(&self->mFC, p, sa, 0);
+            fn_80081C94__FP13Unk8007FF8C_Yiiii(g, 2, p, cur, 1);
+        } else if (fn_80081CF8__FP13Unk8007FF8C_Yi(g, 1)->m0 == 0xFF) {
+            self->m4 = 2;
+            unsigned m = self->m0;
+            if (m & 4)
+                self->m118 = 5;
+            else if (m & 2)
+                self->m118 = 4;
+            else
+                self->m118 = 3;
+            fn_8056C1C4(&self->mFC, 2);
             fn_80081C94__FP13Unk8007FF8C_Yiiii(g, 1, p, cur, 1);
         } else {
             self->m4 = 1;

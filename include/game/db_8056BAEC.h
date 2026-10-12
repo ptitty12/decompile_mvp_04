@@ -182,7 +182,8 @@ struct DbG {
     DbT t[2];
     unsigned char m1CC8;
     unsigned char m1CC9;
-    char pad1CCA[2];
+    unsigned char m1CCA;
+    unsigned char m1CCB;
     int m1CCC;
     int m1CD0;
 };
@@ -312,7 +313,7 @@ void fn_8056BA80(DbScr* scr, DbSelSrc* src, int flag);
 void fn_8056BACC(DbScr* p);
 void fn_80573840(DbSub50* p);
 void fn_80573918(DbSub50* p, DbSelSrc* src);
-void fn_8056F228(DbSel* s);
+void fn_8056F228(DbSel* s, int a, int b); /* a, b are passed through from fn_80570C14 */
 void fn_8056C2B4(DbScr* p);
 void fn_8056C520(DbScr* p);
 void fn_8056C6BC(DbScr* p);
