@@ -5,6 +5,16 @@
 #include "game/tu_802DE2C8.h"
 #include "game/tu_802E22EC.h"
 
+inline int Ov2(Unk802E0914_Box* a, Unk802E0914_Box* b)
+{
+    int r = 0;
+    if (!(a->mx >= b->Mx || a->Mx <= b->mx || a->my >= b->My || a->My <= b->my || a->mz >= b->Mz))
+        r = a->Mz > b->mz;
+    return r;
+}
+inline Unk802E0914_Obj* ChildAt(Unk802E0914_Obj** arr, int off) { return *(Unk802E0914_Obj**)((char*)arr + off); }
+inline Unk802E0914_Obj* ChildAt8(Unk802E0914_Ent* arr, int off) { return *(Unk802E0914_Obj**)((char*)arr + off); }
+
 void Unk803414A4::vslot46()
 {
     vslot41();
@@ -100,15 +110,46 @@ void Unk802DE2C8_List::fn_802E056C()
     }
 }
 
-/* near-miss: box test and calls match; retail keeps the child index as a strength-reduced
-   offset register (slwi r28,r29,2 / subi 4) and computes the last compare as a value (mfcr). */
+int fn_802E0658(Unk802E0914_Obj* a, Unk802E0914_Obj* b, Unk802E0914_Out* c)
+{
+    lbl_8061F68C->s2(b->m0 == 10, "/mvp2004/source/common/geomlib/findintersection.cpp", 0x2C);
+    int saved = c->m8;
+    for (int i = b->m60 - 1; i >= 0; i--) {
+        int o = i * 4;
+        Unk802E0914_Obj* it = ChildAt(b->m64, o);
+        if (Ov2(&it->m30, &a->m30)) {
+            if (it->m3 == 0) {
+                it->s1();
+            }
+            if (a->m3 == 0) {
+                a->s1();
+            }
+            ((void (*)(Unk802E0914_Obj*, Unk802E0914_Obj*, Unk802E0914_Out*))lbl_806E0554[it->m0][a->m0])(it, a, c);
+        }
+        it = ChildAt(b->m64, o);
+        if (Ov2(&a->m30, &it->m30)) {
+            if (a->m3 == 0) {
+                a->s1();
+            }
+            if (it->m3 == 0) {
+                it->s1();
+            }
+            ((void (*)(Unk802E0914_Obj*, Unk802E0914_Obj*, Unk802E0914_Out*))lbl_806E0554[a->m0][it->m0])(a, it, c);
+        }
+    }
+    if (saved != c->m8)
+        return c->m0;
+    return 0;
+}
+
 int fn_802E0914(Unk802E0914_Obj* a, Unk802E0914_Obj* b, Unk802E0914_Out* c)
 {
     lbl_8061F68C->s2(a->m0 == 10, "/mvp2004/source/common/geomlib/findintersection.cpp", 0x47);
     int saved = c->m8;
     for (int i = a->m60 - 1; i >= 0; i--) {
-        Unk802E0914_Obj* it = a->m64[i];
-        if (Unk802E0914_Overlap(&it->m30, &b->m30)) {
+        int o = i * 4;
+        Unk802E0914_Obj* it = ChildAt(a->m64, o);
+        if (Ov2(&it->m30, &b->m30)) {
             if (it->m3 == 0) {
                 it->s1();
             }
@@ -118,11 +159,53 @@ int fn_802E0914(Unk802E0914_Obj* a, Unk802E0914_Obj* b, Unk802E0914_Out* c)
             ((void (*)(Unk802E0914_Obj*, Unk802E0914_Obj*, Unk802E0914_Out*))lbl_806E0554[it->m0][b->m0])(it, b, c);
         }
     }
-    int r = 0;
-    if (saved != c->m8) {
-        r = c->m0;
+    if (saved != c->m8)
+        return c->m0;
+    return 0;
+}
+
+int fn_802E0AC4(Unk802E0914_Obj* a, Unk802E0914_Obj8* b, Unk802E0914_Out* c)
+{
+    lbl_8061F68C->s2(b->m0 == 11, "/mvp2004/source/common/geomlib/findintersection.cpp", 0x62);
+    int saved = c->m8;
+    for (int i = b->m60 - 1; i >= 0; i--) {
+        int o = i * 8;
+        Unk802E0914_Obj* it = ChildAt8(b->m64, o);
+        if (Ov2(&a->m30, &it->m30)) {
+            if (a->m3 == 0) {
+                a->s1();
+            }
+            if (it->m3 == 0) {
+                it->s1();
+            }
+            ((void (*)(Unk802E0914_Obj*, Unk802E0914_Obj*, Unk802E0914_Out*))lbl_806E0554[a->m0][it->m0])(a, it, c);
+        }
     }
-    return r;
+    if (saved != c->m8)
+        return c->m0;
+    return 0;
+}
+
+int fn_802E0C74(Unk802E0914_Obj8* a, Unk802E0914_Obj* b, Unk802E0914_Out* c)
+{
+    lbl_8061F68C->s2(a->m0 == 11, "/mvp2004/source/common/geomlib/findintersection.cpp", 0x7C);
+    int saved = c->m8;
+    for (int i = a->m60 - 1; i >= 0; i--) {
+        int o = i * 8;
+        Unk802E0914_Obj* it = ChildAt8(a->m64, o);
+        if (Ov2(&it->m30, &b->m30)) {
+            if (it->m3 == 0) {
+                it->s1();
+            }
+            if (b->m3 == 0) {
+                b->s1();
+            }
+            ((void (*)(Unk802E0914_Obj*, Unk802E0914_Obj*, Unk802E0914_Out*))lbl_806E0554[it->m0][b->m0])(it, b, c);
+        }
+    }
+    if (saved != c->m8)
+        return c->m0;
+    return 0;
 }
 
 void fn_802E0E24(void* a, void* b, void* c)

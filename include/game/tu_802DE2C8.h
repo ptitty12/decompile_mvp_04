@@ -100,6 +100,17 @@ inline int Unk802E0914_Overlap(Unk802E0914_Box* a, Unk802E0914_Box* b)
 {
     return !(a->mx >= b->Mx || a->Mx <= b->mx || a->my >= b->My || a->My <= b->my || a->mz >= b->Mz) && a->Mz > b->mz;
 }
+/* Container of type 11 (fn_802E0AC4, fn_802E0C74): same layout, but the child array at +0x64
+ * has 8-byte entries (object pointer first). */
+struct Unk802E0914_Ent {
+    Unk802E0914_Obj* p;
+    int m4;
+};
+class Unk802E0914_Obj8 : public Unk802E0914_ObjV {
+public:
+    int m60;
+    Unk802E0914_Ent* m64;
+};
 struct Unk802E0914_Out {
     int m0;
     int m4;
