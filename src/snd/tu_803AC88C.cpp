@@ -335,6 +335,102 @@ extern "C" void fn_803ADE98(int v)
     lbl_8069E1C4 = v;
 }
 
+struct Unk803ADEEC_Vpb {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    char pad20[0x124];
+    short m144;
+    char pad146[4];
+    unsigned short m14A;
+    short m14C;
+    unsigned short m14E;
+    short m150;
+    unsigned short m152;
+    short m154;
+    unsigned short m156;
+    short m158;
+    unsigned short m15A;
+    short m15C;
+    unsigned short m15E;
+    short m160;
+    unsigned short m162;
+    short m164;
+    unsigned short m166;
+    short m168;
+    unsigned short m16A;
+    short m16C;
+    char pad16E[0x2E];
+    short m19C;
+    short m19E;
+};
+
+extern "C" void fn_803ADEEC(Unk803ADEEC_Vpb* vpb, int flags, int a2, short a3, int a4, float* a5, unsigned int a6, int a7)
+{
+    Unk803ADD08* e = &lbl_8069CBC4[vpb->m18];
+    e->m0 = (int)vpb;
+    e->m4 = flags & 4;
+    int mask;
+    mask = 0;
+    e->m8 = a2;
+    fn_803ADE24((Unk803AE0E0*)vpb, a3, 1);
+    e->m40 = e->m42;
+    e->m44 = e->m46;
+    e->m48 = e->m4A;
+    fn_803ADD4C((Unk803AE0E0*)vpb, a5, a6, a7);
+    e->m34 = e->m36;
+    e->m38 = e->m3A;
+    e->m4C = e->m4E;
+    e->m50 = e->m52;
+    if (e->m4 & 4)
+        e->m30 = 0;
+    else
+        e->m30 = a2;
+    unsigned int en = OSDisableInterrupts();
+    unsigned short t;
+    vpb->m19C = e->m30;
+    vpb->m19E = 0;
+    vpb->m14A = e->m34;
+    if (vpb->m14A != 0)
+        mask |= 1;
+    vpb->m14C = 0;
+    vpb->m14E = e->m38;
+    if (vpb->m14E != 0)
+        mask |= 2;
+    vpb->m150 = 0;
+    vpb->m152 = e->m40;
+    if (vpb->m152 != 0)
+        mask |= 0x10;
+    vpb->m154 = 0;
+    vpb->m156 = e->m44;
+    if (vpb->m156 != 0)
+        mask |= 0x20;
+    vpb->m158 = 0;
+    vpb->m15A = e->m4C;
+    if (vpb->m15A != 0)
+        mask |= 0x200;
+    vpb->m15C = 0;
+    vpb->m15E = e->m50;
+    if (vpb->m15E != 0)
+        mask |= 0x400;
+    vpb->m160 = 0;
+    vpb->m162 = e->m54;
+    if (vpb->m162 != 0)
+        mask |= 0x1000;
+    vpb->m164 = 0;
+    vpb->m166 = e->m3C;
+    if (vpb->m166 != 0)
+        mask |= 4;
+    vpb->m168 = 0;
+    vpb->m16A = e->m48;
+    if (vpb->m16A != 0)
+        mask |= 0x80;
+    vpb->m144 = mask;
+    vpb->m16C = 0;
+    vpb->m1C = vpb->m1C | 0x212;
+    OSRestoreInterrupts(en);
+}
+
 extern "C" void fn_803AE0E0(Unk803AE0E0* p)
 {
     lbl_8069CBC4[p->m18].m0 = 0;
