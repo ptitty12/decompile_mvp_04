@@ -443,6 +443,76 @@ extern int lbl_8069593C;
 extern "C" void fn_8037B424(void* p, int c);
 extern "C" void fn_80378620(void*, int);
 
+extern "C" void fn_80383394(void* buf);
+extern "C" void* fn_803BE684(void* self, int flag);
+extern const char lbl_80605A18[];
+extern const char lbl_80605A24[];
+extern const char lbl_80605A30[];
+extern const char lbl_80605A3C[];
+extern const char lbl_80605A48[];
+extern const char lbl_80605A50[];
+extern const char* lbl_806242A8;
+extern int lbl_8069594C;
+extern int lbl_8069595C;
+extern int lbl_80695960;
+extern int lbl_80695964;
+extern int lbl_80695968;
+extern int lbl_80699B0C;
+extern int lbl_80699B10;
+extern Gl8035Vec3 lbl_80695940;
+extern char lbl_80695950[];
+struct Gl12Elem {
+    short m0;
+    char pad2[2];
+    char m4;
+    char pad5[7];
+};
+extern Gl12Elem lbl_8069596C[];
+
+/* Static initializer of the globals at 0x8069593C..0x80699B14 (init flag, priority 0xFFFF), written by hand:
+ * the unit split puts its _GLOBAL_ wrappers in another object, so a compiler-generated copy
+ * would be a global with a different symbol name.
+ * near-miss: 2 of 109 slots differ (struct copy: retail emits the base addi before the first lwz). */
+extern "C" void fn_8038B630(int init, int prio)
+{
+    if (prio == 0xFFFF) {
+        if (init != 0) {
+            { int h = fn_80378568(lbl_806059C0, 0); lbl_8069593C = h; }
+            lbl_80695940 = lbl_806055AC;
+            lbl_8069594C = fn_80378568(lbl_806242A8, 0);
+            fn_80383394(lbl_80695950);
+            { int h = fn_80378568(lbl_80605A18, 0); lbl_8069595C = h; }
+            { int h = fn_80378568(lbl_80605A24, 0); lbl_80695960 = h; }
+            { int h = fn_80378568(lbl_80605A30, 0); lbl_80695964 = h; }
+            { int h = fn_80378568(lbl_80605A3C, 0); lbl_80695968 = h; }
+            Gl12Elem* e = lbl_8069596C;
+            for (int i = 0; i < 0x578; i++) {
+                e->m0 = 0;
+                e->m4 = -1;
+                e++;
+            }
+            int k = 3;
+            { int h = fn_80378568(lbl_80605A48, 0); lbl_80699B0C = h; }
+            { int h = fn_80378568(lbl_80605A50, 0); lbl_80699B10 = h; }
+            char* p = lbl_80699B14;
+            do {
+                fn_803BE684(p, 0);
+                p += 0x20;
+            } while (k-- != 0);
+        } else {
+            Gl12Elem* a = lbl_8069596C;
+            if (a != 0) {
+                Gl12Elem* q = a + 0x578;
+                if (q != lbl_8069596C) {
+                    do {
+                        q--;
+                    } while (q != lbl_8069596C);
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_8038B7E4(void* self, int c)
 {
     PUT(0x0, lbl_806850A0);
