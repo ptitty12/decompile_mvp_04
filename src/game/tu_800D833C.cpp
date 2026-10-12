@@ -259,6 +259,48 @@ int fn_800D9CA8(Unk800D876C_A* t)
 extern "C" int rand();
 extern "C" int fn_8055B000(void* t, int key, unsigned col);
 
+extern const float lbl_805BD798;
+extern "C" int rand();
+
+int fn_800D9D44(int a, int b)
+{
+    int r;
+    if (b == 0) {
+        int ok;
+        do {
+            r = rand() % 124;
+            switch (r) {
+            case 0 ... 25:
+            case 27 ... 28:
+                ok = 1;
+                break;
+            case 32:
+            case 35:
+            case 38:
+            case 41:
+            case 51:
+            case 54 ... 56:
+            case 59:
+            case 61:
+            case 63:
+            case 65:
+            case 71:
+            case 73:
+            case 80 ... 84:
+            case 88:
+                ok = fn_800D86E8(lbl_805BD798);
+                break;
+            default:
+                ok = 0;
+                break;
+            }
+        } while (ok == 0);
+    } else {
+        r = rand() % 124;
+    }
+    return fn_800B548C(r);
+}
+
 int fn_800D9EBC(int a, int mode)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
