@@ -219,6 +219,92 @@ struct Db8053E240_Ctx {
     char padC[0x24];
 };
 
+/*
+ * Stack list built by fn_8053F100 / fn_8053F1B4 / fn_8053F268 (same layout and constructors as
+ * Unk80535650_Tmp in tu_8052A220.h, which this header can't include): data pointer, count,
+ * capacity, cursor, vptr at +0x10, done flag at +0x14.
+ */
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A2A8[];
+extern "C" void fn_805371C4(void* l, unsigned f);
+struct Db8053E240_Tmp {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    unsigned Count() { return m4; }
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void D() { vp = lbl_8064A550; }
+    void Z()
+    {
+        fn_8040074C(m0, m8 << 2);
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void C3z(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+        fn_8040074C(m0, m8 << 2);
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+};
+
+/* Game state behind lbl_806192E0: +4 -> world, +0x14 -> two 0xE64-byte sides (fn_8053ED0C, fn_8053F268
+ * sum the first 0x80 flag bytes of each side at +0x1B4 and read the id at +0x198 of the larger one). */
+struct Db8053E240_Side {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0x18];
+    unsigned char b1B4[0x80];
+    char pad234[0xE64 - 0x234];
+};
+struct Db8053E240_Sides {
+    Db8053E240_Side s[2];
+};
+struct Db8053E240_W {
+    char pad0[0x14];
+    Db8053E240_Sides* m14;
+};
+struct Db8053E240_Gm {
+    int m0;
+    Db8053E240_W* m4;
+};
+extern Db8053E240_Gm* lbl_806192E0;
+
 /* ---- unit 80541F40 ---- */
 /* Object whose +0x44 field is passed to the fn_8057Dxxx helpers (fn_80543A68). */
 struct Db80541F40_Obj {
