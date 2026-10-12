@@ -86,8 +86,8 @@ extern "C" const char* fn_8038B998(DtorAt0*, int)
 extern "C" void fn_8038B9A4(void* self, int c)
 {
     PUT(0x0, lbl_80684D90);
-    ((Unk80384F28*)((char*)self + 0x14))->~Unk80384F28();
-    ((Unk80384F28*)((char*)self + 0x4))->~Unk80384F28();
+    ((Unk80384F28*)((char*)self + 0x14))->Unk80384F28::~Unk80384F28();
+    ((Unk80384F28*)((char*)self + 0x4))->Unk80384F28::~Unk80384F28();
     PUT(0x0, lbl_806626C0);
     fn_8037B424(self, c);
 }

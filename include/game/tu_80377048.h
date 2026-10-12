@@ -36,4 +36,71 @@ struct SortArrV {
     virtual void v4(int a, void* b);
 };
 
+/*
+ * Lookup-result plumbing shared by the gamelib registry classes (tu_80382BB8.cpp,
+ * tu_80383E00.cpp). ResBig is the 0x5C-byte result record the lookup vcalls fill
+ * (type in the top nibble of word 0, id at +4; the 3 words at +0x24 are zeroed by the
+ * inline ctor); VCls / VCls2 are views of the looked-up objects with the virtual
+ * slots those callers use (11..14 here; evidence: vcalls at vtable offsets
+ * 0x58/0x60/0x68/0x70 in fn_80383A44 and fn_80385470).
+ */
+struct Zero3 {
+    int m0;
+    int m4;
+    int m8;
+    Zero3()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0;
+    }
+};
+
+/* Result record of the lookups behind the chooser tables (type in the top nibble). */
+struct ResBig {
+    unsigned type : 4;
+    unsigned pad0 : 28;
+    int id;
+    char pad8[0x24 - 8];
+    Zero3 z24;
+    char pad30[0x5C - 0x30];
+    ResBig() : type(0) {}
+};
+
+struct Tgt38 {
+    char pad0[0x38];
+    int m38;
+};
+
+struct VCls2 {
+    virtual ~VCls2();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual Tgt38* s11();
+};
+
+struct VCls {
+    virtual ~VCls();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual int s11(ResBig* out, int b, int c, int d);
+    virtual int s12(ResBig* out, int b, int c);
+    virtual int s13(ResBig* out, int b);
+    virtual int s14(ResBig* out, int b);
+};
+
 #endif /* GAME_TU_80377048_H */
