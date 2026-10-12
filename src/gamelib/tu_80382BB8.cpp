@@ -127,7 +127,13 @@ public:
     Unk80384F28 m4;
     int m14;
     int m18;
-    unsigned m1C;
+    union {
+        unsigned m1C;
+        struct {
+            unsigned short m1C_hi;
+            volatile unsigned short m1E;
+        };
+    };
 };
 
 extern "C" {
@@ -260,6 +266,31 @@ extern "C" void fn_803834AC(Unk803833B4* t, int key)
         if (t[i].key == key)
             t[i].key = 0;
     }
+}
+
+extern "C" int fn_803834D8(Unk803833B4* t, int v)
+{
+    int i = 0;
+    int off = 0;
+    for (; i <= 0; i++) {
+        if (*(volatile int*)(off + (int)t) != 0) {
+            char* c = (char*)t + 8;
+            int j = 0;
+            if (j < *(volatile int*)(c + off)) {
+                int o = 0;
+                do {
+                    int k = o + off;
+                    char* b = (char*)t + 4;
+                    if (*(volatile int*)(k + b) == v)
+                        return *(volatile int*)(off + (int)t);
+                    j++;
+                    o += 4;
+                } while (j < *(volatile int*)(c + off));
+            }
+        }
+        off += 12;
+    }
+    return 0;
 }
 
 /* 80383548 */
@@ -446,6 +477,14 @@ extern "C" void fn_80383C78(Unk80383C78* o, float* a, float* b, int* c, int* d)
     *b = o->m10;
     *c = o->m14;
     *d = o->m18;
+}
+
+Unk80383C9C::Unk80383C9C() : Unk8037B3E8(lbl_80695968)
+{
+    m1E = -1;
+    m14 = 0;
+    m18 = 0;
+    m1C = m1E;
 }
 
 /* 80383D04 */
