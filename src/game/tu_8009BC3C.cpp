@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80090880.h"
+#include "game/tu_80094578.h"
 
 extern const char lbl_805B3B4C[];
 
@@ -10,6 +11,72 @@ extern const char lbl_805B3B4C[];
 extern "C" void fn_8009CBC8(void* o, int x);
 extern "C" void fn_8009CF6C(void* o, int x);
 extern "C" void fn_8009D0D4(void* o);
+
+extern int lbl_8061930C;
+struct Unk8007F198_A;
+struct Unk8007A4DC_Screen {
+    int fn_8007A6A0(int a, int b);
+};
+unsigned char fn_8007F198(Unk8007F198_A* self);
+int fn_8007F24C(Unk8007F198_A* self, int a, int x);
+
+struct Unk80089894_PackTabD;
+int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
+struct TailE48_8009C398 {
+    char pad[0xE48];
+    unsigned char mE48[25];
+};
+extern "C" Sub198* fn_80096244(Sub198* d, Sub198* s);
+
+extern "C" void fn_8009C398(Obj3* o)
+{
+    View80096C10* w = (View80096C10*)o;
+    unsigned i;
+    for (i = 0; i < o->m3E4; i++)
+        ((TailE48_8009C398*)o)->mE48[i] = fn_80089AA0((Unk80089894_PackTabD*)((char*)o + 0xC74), 0, (unsigned char)i);
+    ByteVec* v = &w->saved.v;
+    Snap80096C10* dst = &w->saved;
+    Snap80096C10* src = &w->cur;
+    w->saved.m0 = w->cur.m0;
+    unsigned n = w->cur.v.m4;
+    fn_8040074C(w->saved.v.m0, v->m8);
+    v->m4 = 0;
+    *(int*)v->padC = 0;
+    unsigned j;
+    for (j = 0; j < n; j++) {
+        ByteVec* d = &dst->v;
+        unsigned char b = src->v.m0[j];
+        unsigned c = d->m4;
+        if (c < d->m8) {
+            dst->v.m0[c] = b;
+            d->m4 = d->m4 + 1;
+        }
+    }
+    for (j = 0; j < 10; j++)
+        dst->list[j] = src->list[j];
+    fn_80096244((Sub198*)((char*)o + 0xDAC), &o->m198);
+}
+
+extern "C" void fn_8009C498(Obj3* o)
+{
+    int g = lbl_8061930C;
+    int a = o->m198.m0;
+    o->m3E4 = ((unsigned char (*)(Unk8007F198_A*, int))fn_8007F198)((Unk8007F198_A*)g, a);
+    for (unsigned char i = 0; i < o->m3E4; i++) {
+        int off = i * 0x34;
+        int v = fn_8007F24C((Unk8007F198_A*)g, a, i);
+        char* b = (char*)o + 0x3E8;
+        *(int*)(b + off) = v;
+        int r = ((Unk8007A4DC_Screen*)g)->fn_8007A6A0(0x1E, v);
+        if (r == 0) {
+            char* b2 = (char*)o + 0x3EC;
+            *(int*)(b2 + off) = r;
+        } else {
+            char* b2 = (char*)o + 0x3EC;
+            *(int*)(b2 + off) = 1;
+        }
+    }
+}
 
 extern "C" void fn_8009CB5C(void* o, int kind, int x)
 {
@@ -47,6 +114,89 @@ extern "C" int fn_8009CDC8(void* self, int* arr)
         i = t;
     } while (i <= 9);
     return idx;
+}
+
+extern "C" int rand(void);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
+struct Unk80089894_PackTabD;
+int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
+extern "C" void fn_80096830(Obj3* o, int a);
+
+extern int lbl_8061930C;
+extern "C" unsigned fn_8007F84C__FP13Unk8007F198_B(int g);
+extern "C" int fn_80075948__18Unk8007B2B0_Screeni(int g, int x);
+extern "C" int fn_8007F7D0__FP13Unk8007F198_BUi(int g, unsigned i);
+extern "C" int fn_8007B6F0__18Unk8007B2B0_Screen(int g, int a, int b, int c);
+extern "C" unsigned char fn_800968C0(Obj3* o, int key, int flag);
+
+extern "C" void fn_8009D8A8(Obj3* o, int a, ByteVec* v)
+{
+    int g = lbl_8061930C;
+    unsigned i;
+    unsigned n = fn_8007F84C__FP13Unk8007F198_B(g);
+    int id = fn_80075948__18Unk8007B2B0_Screeni(g, o->m198.m0);
+    fn_8040074C(v->m0, v->m8);
+    v->m4 = 0;
+    *(int*)v->padC = 0;
+    for (i = 0; i < n; i++) {
+        if (fn_8007F7D0__FP13Unk8007F198_BUi(g, i) == id) {
+            unsigned char j;
+            for (j = 0; j <= 9; j++) {
+                int r = fn_8007B6F0__18Unk8007B2B0_Screen(g, id, a, j);
+                if (r != 0) {
+                    unsigned char k = fn_800968C0(o, r, 0);
+                    if (k != 0xFF) {
+                        unsigned c = v->m4;
+                        if (c < v->m8) {
+                            v->m0[c] = k;
+                            v->m4 = v->m4 + 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+extern "C" void fn_8009D9AC(Obj3* o)
+{
+    unsigned n = o->m14.m4;
+    if (n != 0) {
+        unsigned char k = o->m14.m0[(unsigned char)(rand() % n)];
+        Unk80089894_PackTabD* t = (Unk80089894_PackTabD*)((char*)o + 0xC74);
+        int s = fn_8008CFD8((char*)o + 0xC9C, 0x1E, k);
+        int a = fn_80089AA0(t, 0x1B, k);
+        int b = fn_80089AA0(t, 0, k);
+        if (s == 0 && a >= b)
+            fn_80096830(o, o->m3E8[k].m0);
+    }
+}
+
+extern "C" int fn_8009DA60(Obj3* o, int x);
+extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i);
+extern "C" int fn_80097A70(char* o, int a, int b, int i);
+
+extern "C" int fn_8009DB0C(Obj3* o, int x)
+{
+    int a = 0;
+    if (fn_8009DA60(o, x))
+        a = 1;
+    int b = 0;
+    if (a)
+        b = fn_80097A9C((char*)o, 3, x, 2, 0) == 0;
+    int c = 0;
+    if (b)
+        c = fn_80097A9C((char*)o, 0, x, 2, 0) == 0;
+    int d = 0;
+    if (c) {
+        int sum = 0;
+        unsigned char i;
+        for (i = 0; i < o->m3E4; i++)
+            sum += fn_80097A70((char*)o, 1, i, 0);
+        if (sum == 0)
+            d = 1;
+    }
+    return d;
 }
 
 /* near-miss (9 slots): the first arm matches; retail keeps the two arms' identical
@@ -526,6 +676,77 @@ extern "C" float fn_8009F6CC(void* o, int a);
 extern "C" float fn_8009F870(void* o, int a);
 extern "C" float fn_8009F98C(void* o, int a);
 extern "C" float fn_8009FAA8(void* o, int a);
+
+extern int lbl_8061930C;
+struct NameSrc8009F870 {
+    char pad[0x20];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual const char* v6(int a, int b, char* buf);
+};
+extern "C" unsigned fn_8007F198__FP13Unk8007F198_A(int g, int id);
+extern "C" int fn_8007F24C__FP13Unk8007F198_Aii(int g, int id, int i);
+extern "C" float fn_8007A3FC__18Unk8007A4DC_Screenii(int g, int a, int b);
+
+extern "C" float fn_8009F870(void* o, int x)
+{
+    NameSrc8009F870* s = (NameSrc8009F870*)o;
+    char buf[24];
+    unsigned i = 0;
+    int g = lbl_8061930C;
+    int id = fn_800736EC(s->v6(0, x, buf));
+    float t = 0.0f;
+    unsigned lim;
+    unsigned n = lim = fn_8007F198__FP13Unk8007F198_A(g, id);
+    for (; i < lim; ) {
+        int k = fn_8007F24C__FP13Unk8007F198_Aii(g, id, (unsigned char)i);
+        i++;
+        t += fn_8007A3FC__18Unk8007A4DC_Screenii(g, 0x10, k);
+    }
+    t /= (float)n;
+    return !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+}
+
+extern "C" float fn_8009F98C(void* o, int x)
+{
+    NameSrc8009F870* s = (NameSrc8009F870*)o;
+    char buf[24];
+    unsigned i = 0;
+    int g = lbl_8061930C;
+    int id = fn_800736EC(s->v6(0, x, buf));
+    float t = 0.0f;
+    unsigned lim;
+    unsigned n = lim = fn_8007F198__FP13Unk8007F198_A(g, id);
+    for (; i < lim; ) {
+        int k = fn_8007F24C__FP13Unk8007F198_Aii(g, id, (unsigned char)i);
+        i++;
+        t += fn_8007A3FC__18Unk8007A4DC_Screenii(g, 0x10, k);
+    }
+    t /= (float)n;
+    return !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+}
+
+extern "C" float fn_8009FAA8(void* o, int x)
+{
+    NameSrc8009F870* s = (NameSrc8009F870*)o;
+    char buf[24];
+    unsigned i = 0;
+    int g = lbl_8061930C;
+    int id = fn_800736EC(s->v6(0, x, buf));
+    float t = 0.0f;
+    unsigned lim;
+    unsigned n = lim = fn_8007F198__FP13Unk8007F198_A(g, id);
+    for (; i < lim; ) {
+        int k = fn_8007F24C__FP13Unk8007F198_Aii(g, id, (unsigned char)i);
+        i++;
+        t += fn_8007A3FC__18Unk8007A4DC_Screenii(g, 0x15, k);
+    }
+    t /= (float)n;
+    return !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+}
 
 extern "C" float fn_8009FBC4(void* o, int a)
 {
