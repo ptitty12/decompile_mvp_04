@@ -43,6 +43,108 @@ extern "C" void fn_80400560(void* p, int n);
 extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern const char* lbl_80619308;
 
+struct Unk800A4CBC {
+    char pad0[0x48];
+    int m48;
+    char pad4C[0x74 - 0x4C];
+    int m74;
+    int m78;
+    int m7C;
+    char pad80[0x90 - 0x80];
+    int m90;
+    int m94;
+};
+extern "C" int fn_8007FB40(int g, int a);
+extern "C" unsigned fn_8007FB2C(int g, int a);
+extern "C" int fn_8007FB98(int g, int a, int b, int c);
+extern "C" int fn_8007FBC0(int g, int a, int b);
+extern "C" int fn_8007FBDC(int g, int a, int b);
+extern "C" void fn_8056808C(int a);
+extern "C" void fn_8007F950(int g, int a, int b);
+extern "C" int fn_800A4668(void* o, int a, int b, int c);
+extern "C" int fn_800A4558(void* o, int e);
+extern "C" void fn_800A4180(void* o);
+
+extern "C" void fn_800A4CBC(Unk800A4CBC* p)
+{
+    unsigned best = 0;
+    int g = lbl_8061930C;
+    volatile int sp8 = 0;
+    int bestE = 4;
+    int bestA = -1;
+    int bestB = -1;
+    int e = 0;
+    do {
+        unsigned idx = fn_8007FB40(g, e);
+        if (idx < fn_8007FB2C(g, sp8)) {
+            int a = fn_8007FBC0(g, idx, sp8);
+            int b = fn_8007FBDC(g, idx, sp8);
+            if ((bestA == -1 || a <= bestA) && (bestB == -1 || b <= bestB || a < bestA)) {
+                bestE = sp8;
+                best = idx;
+                bestA = a;
+                bestB = b;
+            }
+        }
+        int c = sp8;
+        int t;
+        if (c > 3) {
+            t = c;
+        } else {
+            t = c + 1;
+        }
+        sp8 = t;
+        e = t;
+    } while (e <= 3);
+    int flag = 0;
+    if (bestE <= 3) {
+        int cur = p->m90;
+        if (cur != -1) {
+            if (bestA <= cur) {
+                if (bestA >= cur) {
+                    if (bestA == cur && bestB <= p->m94) {
+                    } else {
+                        goto set;
+                    }
+                }
+            } else {
+                goto set;
+            }
+        } else if (fn_800A4558(p, bestE) == 1) {
+            goto set;
+        }
+    } else {
+    set:
+        flag = 1;
+    }
+    if (flag == 1) {
+        fn_800A4180(p);
+    } else {
+        fn_8056808C(p->m48);
+        int x = fn_8007FB98(g, best, 0, bestE);
+        int y = fn_8007FB98(g, best, 1, bestE);
+        if (x == 0 || y == 0) {
+            fn_8007F950(g, bestE, best);
+            int old = p->m78;
+            p->m78 = 0;
+            p->m7C = old;
+        } else {
+            int w = fn_800A4668(p, bestE, 1, 1);
+            if (w == 1) {
+                w = p->m74;
+                if (w == 2) {
+                    w = 0;
+                } else {
+                    w = 3;
+                }
+            } else {
+                w = 0;
+            }
+            p->m78 = w;
+        }
+    }
+}
+
 extern "C" int fn_800A4EA4()
 {
     unsigned char b;
