@@ -660,6 +660,50 @@ const char* fn_800EAE8C(int a)
     return lbl_805B6F58;
 }
 
+int fn_80591378(int a, int b);
+int fn_800DF254(char* buf, int a, int b, float f);
+void fn_804031F8(char* dst, int a, int b);
+void fn_800EB0F4(int a, UiS* x);
+void fn_800EB248(int a, UiS* x);
+void fn_800EAEE4(UiS* x)
+{
+    char buf20[0x190];
+    char bufB0[0x18];
+    int id = fn_80591378(*(int*)((char*)lbl_8061930C + 0x30), 1);
+    float f = 0.0f;
+    switch (id) {
+    case 0x594B:
+    case 0x594C:
+        f = -5000000.0f;
+        break;
+    case 0x594D:
+    case 0x594E:
+        f = -10000000.0f;
+        break;
+    }
+    int s = (int)fn_80090880(lbl_8061977C, id);
+    fn_804031F8(buf20, s, fn_800DF254(bufB0, 0, 3, f));
+    int m = x->m2DC;
+    if (m == 0) {
+        UiS* d = x->p2E0;
+        int s1 = (int)fn_80090880(lbl_8061977C, 0x63C);
+        int s2 = (int)fn_80090880(lbl_8061977C, 0x59F9);
+        fn_801321D4(d, x, (void (*)(void*, UiS*))fn_800EB248, 0, (int)buf20, 2, -1, 1, s1, s2, 0, 0, 0, 0);
+    } else if (id == 0x59FA) {
+        UiS* d = x->p2E0;
+        int s1 = (int)fn_80090880(lbl_8061977C, 0x63C);
+        int s2 = (int)fn_80090880(lbl_8061977C, 0x59F9);
+        fn_801321D4(d, x, (void (*)(void*, UiS*))fn_800EB248, 0, (int)buf20, 2, -1, 1, s1, s2, 0, 0, 0, 0);
+    } else {
+        UiS* d = x->p2E0;
+        int s1 = (int)fn_80090880(lbl_8061977C, 0x1A81);
+        int s2 = (int)fn_80090880(lbl_8061977C, 0x1A80);
+        int s3 = (int)fn_80090880(lbl_8061977C, 0x59F9);
+        fn_801321D4(d, x, (void (*)(void*, UiS*))fn_800EB0F4, 0, (int)buf20, 3, -1, 1, s1, s2, s3, 0, 0, 0);
+    }
+    x->p2E0->v86();
+}
+
 void fn_800EB0F4(int a, UiS* x)
 {
     UiMsg m;
