@@ -27,6 +27,17 @@ extern "C" void fn_804CF81C(FeScrM* x);
 extern "C" int fn_804CF8AC(FeScrM* x);
 extern "C" int fn_804D0860(FeScrM* x, int a);
 
+struct FeGame;
+
+extern "C" void fn_804CE9D0(FeGame* g);
+
+extern FeGame* lbl_80621AB0;
+
+extern "C" FE_OVERLAY void fn_804CEB84(void)
+{
+    fn_804CE9D0(lbl_80621AB0);
+}
+
 extern "C" FE_OVERLAY void fn_804CEC64(FeScrM* x)
 {
     int sp8;
