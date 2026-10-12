@@ -735,6 +735,21 @@ void fn_80120144(Scr* self, float f)
     ((UnkLabel*)self->m1B4)->fn_vslot30(buf);
 }
 
+extern "C" void fn_801201B4(float f, Scr* self, int a)
+{
+    Wid* w = fn_800C8044(self->m1A4);
+    if (!(f <= 0.0f || f >= 100.0f)) {
+        w->fn_vslot10(self->m1E0 + self->m1DC - (int)((float)self->m1DC * f));
+        w->fn_vslot8(1);
+        char buf[0x10];
+        buf[0] = 0;
+        fn_804089B4(buf, lbl_805BC1A8, a);
+        fn_800C8040(w->fn_vslot33(4, 1))->fn_vslot30(buf);
+    } else {
+        w->fn_vslot8(0);
+    }
+}
+
 void fn_8012031C(Unk80117D20_Scr* self)
 {
     if (fn_800AEC80(fn_800AB5C8(lbl_80619D10))->mD8 == 0)

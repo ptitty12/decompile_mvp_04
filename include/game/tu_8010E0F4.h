@@ -70,7 +70,7 @@ struct Unk800C7B40_Widget : Unk800C7B40_Data {
     virtual void fn_vslot7();
     virtual void fn_vslot8(int a);
     virtual void fn_vslot9(int a);
-    virtual void fn_vslot10();
+    virtual void fn_vslot10(int a);
     virtual void fn_vslot11();
     virtual void fn_vslot12(int a);
     virtual void fn_vslot13();
