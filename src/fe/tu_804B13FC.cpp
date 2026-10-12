@@ -156,6 +156,8 @@ class FeObjI2 : public UiBase { public: FE_LO(FE_VI2) virtual FeObj* v32(const c
 extern "C" void fn_804B330C(FeScr* x);
 extern "C" void fn_804B3424(FeScr* x);
 extern const char lbl_805F4450[];
+extern const char lbl_805F7B30[];
+extern "C" void fn_800C49C4(void* m, FeObj* a, int b, int c);
 extern "C" void fn_804B2E18(FeScr* x, int k);
 extern "C" void fn_804B34B8(FeScr* x);
 extern "C" void fn_8058F09C(int a);
@@ -242,6 +244,36 @@ extern "C" FE_OVERLAY void fn_804B1DA0(FeScr* x, int a)
     ((FeObj1*)x->m13C)->v8(a);
     FeObj* r = (FeObj*)((FeObjP2*)x->m140)->v73(0, 0);
     ((FeObj1*)((FeObj*)r)->v32("BUTTON", 1))->v8(a);
+}
+
+extern "C" FE_OVERLAY void fn_804B1E70(FeScr* x, int i)
+{
+    int o = i * 12;
+    char* wb = (char*)x + 0x15C;
+    FeHolder* h = *(FeHolder**)(wb + o);
+    int t = ((FeSub*)&h->mDC)->s5();
+    fn_800C49C4(fn_800C33D0(), x->m134, i, t);
+    if (i != 0) {
+        FeObj* r = (FeObj*)((FeObjP2*)x->m140)->v73(0, 0);
+        ((FeObj1*)r->v32(lbl_805F7B30, 1))->v8(0);
+    } else {
+        FeHolder* h2 = *(FeHolder**)(wb + o);
+        if (((FeSub*)&h2->mDC)->s5() == 0) {
+            ((FeObj1*)x->m138)->v28(((FeObjI*)x->m13C)->v31());
+            ((FeFnOIII)fn_801251CC)(x->m148, 2, 0x3FD9, 3);
+            fn_804B1DA0(x, 1);
+            return;
+        }
+        FeHolder* h3 = *(FeHolder**)(wb + o);
+        ((FeObj1*)x->m138)->v28(((FeObjI1*)h3)->v55(((FeSub*)&h3->mDC)->s5()));
+        fn_80125084(x->m148, 2);
+        if (x->m13C->m24 < 0)
+            fn_804B1DA0(x, 0);
+        return;
+    }
+    char* sb = (char*)x + 0x154;
+    ((FeObj1*)x->m138)->v29(**(int**)(sb + o));
+    fn_80125084(x->m148, 2);
 }
 
 extern "C" FE_OVERLAY void fn_804B20A8(FeScr* x)
