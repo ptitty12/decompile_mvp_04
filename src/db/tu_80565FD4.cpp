@@ -95,6 +95,11 @@ inline int EntUsedP(Unk8052B5C4_Ent* e)
 }
 
 extern "C" void fn_80567F8C(Db80565CDC_S* s, int kind);
+extern "C" void fn_8052BA70(Unk8052B978_Tbl* self);
+void fn_80083E84(int t, int* a, int* b);
+int fn_80084070(int t);
+extern "C" void fn_80566F40(Db80565CDC_S* s, int a, int b);
+extern "C" void fn_80567174(Db80565CDC_S* s, int a, int b);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -208,6 +213,35 @@ extern "C" DB_OVERLAY int fn_805668F0(Db80565CDC_S* s, int y)
     d.m2 = y;
     d.m1 = lbl_80692EF8[1];
     return fn_8032A394(fn_80329E74(d), 0);
+}
+
+inline void Db80566E78_Step(int& v)
+{
+    int t;
+    if (v > 10)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+extern "C" DB_OVERLAY void fn_80566E78(Db80565CDC_S* s, int kind, int c)
+{
+    char* b = (char*)s + 0x28;
+    int off = kind * 4;
+    fn_8052BA70(*(Unk8052B978_Tbl**)(b + off));
+    int lo = 11;
+    int hi = 11;
+    fn_80083E84(kind, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_80084070(kind) == 1)
+                fn_80566F40(s, i, c);
+            else
+                fn_80567174(s, i, c);
+            Db80566E78_Step(i);
+        } while (i <= hi);
+    }
 }
 
 extern "C" DB_OVERLAY void fn_80567338(Db80565CDC_S* s, int k, int v)
