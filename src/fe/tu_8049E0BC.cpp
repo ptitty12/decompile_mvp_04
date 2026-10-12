@@ -74,6 +74,8 @@ struct FeTrk {
 };
 extern "C" FeTrk* fn_8054CBBC(FeTrk* o, int a, void* b);
 extern "C" void fn_8054F2C4(FeTrk* o);
+extern "C" void fn_8054F46C(FeTrk* o);
+int fn_800E1990(int i); /* C++ symbol fn_800E1990__Fi */
 extern "C" int fn_800A2E90(void* g);
 
 extern "C" {
@@ -320,6 +322,41 @@ FE_OVERLAY void fn_8049F80C(void* xx)
     FeP(x, 0x224) = w;
     ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(FeI(x, 0x178)), 0);
     fn_8049FC58(x, 4);
+}
+
+FE_OVERLAY void fn_8049F98C(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    void** pg = &lbl_8061930C;
+    void* g = *pg;
+    FeI(x, 0x134) = 0;
+    FeI(x, 0x164) = 0;
+    FeI(x, 0x13C) = 0;
+    FeI(x, 0x140) = 0;
+    FeI(x, 0x14C) = 0;
+    FeI(x, 0x154) = 0;
+    FeI(x, 0x15C) = 0;
+    FeI(x, 0x138) = 1;
+    FeI(x, 0x144) = 1;
+    FeI(x, 0x150) = 1;
+    FeI(x, 0x158) = 1;
+    FeI(x, 0x160) = 1;
+    FeI(x, 0x178) = fn_800B5520(fn_8007B320__18Unk8007B2B0_Screenii(g, 0, (int)fn_8007F7D0__FP13Unk8007F198_BUi(g, 0)));
+    char* b8 = (char*)fn_800B555C() + 8;
+    fn_800C2034(b8, fn_800E1990__Fi(FeI(x, 0x178)));
+    if (FeI(fn_800B555C(), 0x674) == 0) {
+        FeTrk t;
+        fn_8054CBBC(&t, (int)fn_8007F7D0__FP13Unk8007F198_BUi(*pg, 0), *pg);
+        fn_8054F46C(&t);
+    }
+    fn_804A15FC((char*)x);
+    FeW* a = fn_800C8044(x->fn_vslot32(lbl_805F7594, 1));
+    FeP(x, 0x180) = a;
+    a->fn_vslot8(1);
+    FeW* w = fn_800C8054(FeMem(x, 0x180)->fn_vslot32(lbl_805F4F48, 1));
+    FeP(x, 0x224) = w;
+    ((FeSubB*)((char*)w + 0x98))->s20(fn_800B548C(FeI(x, 0x178)), 0);
+    fn_8049FC58(x, 5);
 }
 
 FE_OVERLAY void fn_8049FB38(FeW* x)
