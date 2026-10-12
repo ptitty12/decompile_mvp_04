@@ -109,6 +109,9 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-11 | **Flags: ealib/tu_803912F8 and tu_803927E4 = ProDG -O2 -G0 -fno-strength-reduce** (`cflags_ealib_nsr`) *[lead, owner authority]*. These units use no r13 small data (every global via lis/lwz) and keep `slwi`/`mulli` index math per iteration. Rebuilt under the new flags, objdiff matches go 8 -> 11 and 11 -> 13 with no regressions. The flags match cflags_snd's codegen here (same counts). tu_80394744 has the same shape but ends in fn_803959D8, which really uses small data; it stays on `ealib_sda` (6 vs 7 matched) until its boundary is re-split at 0x803959D8. | tail-01 worker evidence plus lead rebuild | report.json counts before/after |
 
+- 2026-10-12 | **Flags: dolphin/os/tu_80431828.c (OS.c range) = cflags_dolphin_sdk + `-opt nopeephole`** *[lead, owner authority]*. This is like the existing dolphin/os/OS.c (cflags_dolphin_os). OSGetConsoleType keeps the `b` to blr and the bne-over-lis shape only with peephole off. Objdiff goes from 0/12 to 5/12 matched. | tail-10 worker evidence, lead rebuild | report.json |
+- 2026-10-12 | **Note (no action): SDK OS files switch peephole per function.** Functions after the first hand-written (original-code) function in OSAlarm, OSCache, OSContext, OSInterrupt, OSReset and OS.c need `-opt nopeephole`; the ones before it don't. OSResetSystem also needs `-inline noauto`. The original sources likely use `#pragma peephole off` / `#pragma inline` there. Our verifier forbids pragmas (see the open pragma-allowlist question), so those functions stay unmatched for now. Splitting units at those points to emulate a pragma was considered and not done. | tail-10 worker | per-function probes |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
