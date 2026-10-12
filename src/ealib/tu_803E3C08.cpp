@@ -144,6 +144,19 @@ extern "C" void fn_803E4164(float* dst, const float* src)
 extern "C" void fn_803E4818(float* m);
 extern "C" void fn_803D71F0(void* p);
 
+extern "C" void fn_803E4450(float* dst, float* src, unsigned int* color, float scale)
+{
+    unsigned int c = *color;
+    for (int i = 0; i < 10; i++) {
+        dst[0] += src[0] * scale * (float)(unsigned char)(c >> 16) / 255.0f;
+        dst[1] += src[1] * scale * (float)(unsigned char)(c >> 8) / 255.0f;
+        dst[2] += src[2] * scale * (float)(unsigned char)c / 255.0f;
+        dst[3] += src[3] * scale * (float)(c >> 24) / 255.0f;
+        src += 4;
+        dst += 4;
+    }
+}
+
 extern "C" float* fn_803E47E8(float* m)
 {
     fn_803E4818(m);
