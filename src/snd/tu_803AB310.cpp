@@ -29,9 +29,13 @@ extern int lbl_80625448;
 
 /* SNDSTRM_setvol: reference structure from the ported sstvol.c; MVP's build differs in detail. */
 
+extern int lbl_8062544C;
+extern int lbl_80625450;
+extern "C" int fn_803AF374();
 extern "C" int fn_803AC214(SNDSYSOPTS* sso);
 
 static inline void ErrNop(int) { }
+
 static inline int ErrCode(int e) { switch (e) { case -18: case -10: case -7: break; } return 0; }
 
 struct Unk8069CB5C {
@@ -461,6 +465,33 @@ extern "C" int fn_803AC164(int k, int a, int b)
     default:
         return -5;
     }
+    return 0;
+}
+
+extern "C" int fn_803AC214(SNDSYSOPTS* sso)
+{
+    if (lbl_8062544C == 0) {
+        sndgs.sso.set.maxbanks = 0x10;
+        sndgs.sso.set.sndheapthreshold = 0x5A;
+        sndgs.sso.set.stealequalpriorityvoices = 1;
+        sndgs.sso.set.compatibility = 0;
+        sndgs.sso.set.updateperiod = -1.0f;
+        sndgs.prevset = sndgs.sso.set;
+        lbl_80625450 = fn_803AF374();
+        lbl_8062544C = 1;
+    }
+    *sso = sndgs.sso;
+    return lbl_80625450;
+}
+
+extern "C" void fn_803AF42C();
+
+extern "C" int fn_803AC368(SNDSYSOPTS* sso)
+{
+    sndgs.sso.set = sso->set;
+    sndgs.sso.vec = sso->vec;
+    fn_803AF42C();
+    sndgs.prevset = sndgs.sso.set;
     return 0;
 }
 
