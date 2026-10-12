@@ -99,13 +99,14 @@ int fn_802548F0(A* self)
     return r;
 }
 
-/* near-miss: retail compares 1 then 2 with two branches (no range-test fold); every ||/switch/if spelling tried folds into a range test or reorders */
 int fn_80254964(A* self)
 {
+    int r = 0;
     int t = self->m44;
-    if (t == 1 || t == 2)
-        return 1;
-    return 0;
+    int lo = 1, hi = 2;
+    if (t == lo || t == hi)
+        r = 1;
+    return r;
 }
 
 int fn_80254984(A* self)
