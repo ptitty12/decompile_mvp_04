@@ -110,8 +110,12 @@ void fn_802CC53C(Unk802CBD04* o)
     }
 }
 
-/* near-miss (2 slots): retail loads o->mD8 (lwz r3,0xd8(r31)) before the cmplwi idx,12 test; ours loads it after (in the taken arm). Local d before/after the
-   branch, ternary and early-return forms tried. */
+inline int Unk802CC580_Get(Unk802CC580_Data* d, unsigned idx)
+{
+    if (idx <= 0xC)
+        return d->m65C[idx];
+    return 0;
+}
 int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
 {
     Unk802CC580_T* t = fn_801A04A8(o->mD8, k);
@@ -120,11 +124,7 @@ int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
     }
     int r;
     if (t->m44 == 0) {
-        if (idx <= 0xC) {
-            r = o->mD8->m65C[idx];
-        } else {
-            r = 0;
-        }
+        r = Unk802CC580_Get(o->mD8, idx);
     } else {
         r = fn_803272D0(o->mD8->m50, idx);
     }
