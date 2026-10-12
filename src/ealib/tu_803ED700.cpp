@@ -464,12 +464,12 @@ extern "C" int fn_803EDFFC()
 }
 
 /* near-miss: 2 slots; mtlr and addi of the lbl_8060E068 argument are swapped before the total printf */
-extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...))
-{
-    int total = 0;
-    int crc = 0;
-    pr(lbl_8060DF90);
-    pr(lbl_8060DFE8);
+extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...))
+{
+    int total = 0;
+    int crc = 0;
+    pr(lbl_8060DF90);
+    pr(lbl_8060DFE8);
     RcHeap* h = lbl_806AABF4[idx & 0x3f];
     int r;
     if (h == 0) {
