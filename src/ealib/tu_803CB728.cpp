@@ -229,6 +229,25 @@ extern void (*lbl_8062C66C)(void*, int);
 
 extern "C" void fn_803CEBF8(void* p, int n);
 
+struct EAGLBlendChild {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4(int, float, float);
+};
+
+struct EAGLBlend {
+    char pad0[0xC];
+    EAGLBlendChild* mC;
+    EAGLBlendChild* m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    int m24;
+    int m28;
+};
+
 extern "C" void fn_803CB728(EAGLSetC* s, int v)
 {
     s->mC = v;
@@ -369,6 +388,32 @@ extern "C" int fn_803CD700(EAGLSelfE* s, unsigned* bits, int* cnt, int* lo, int*
     return 1;
 }
 
+inline int EAGLCnt(EAGLCount* c) { return c->m0; }
+
+extern "C" int fn_803CD7F0(EAGLSelfE* s, unsigned* bits, int* cnt, int* lo, int* hi)
+{
+    EAGLRecE* r = s->mC;
+    int n = r->m4->m0;
+    int i;
+    for (i = n / 4 - 1; i >= 0; i--) {
+        int b = (unsigned)r->mA[i] / 12;
+        if (!EAGLTestBit(bits, b)) {
+            if (*cnt == 0) {
+                *lo = b;
+                *hi = b;
+            } else {
+                if (b < *lo)
+                    *lo = b;
+                if (b > *hi)
+                    *hi = b;
+            }
+            *cnt += 1;
+            fn_803BE6F4(bits, b, 1);
+        }
+    }
+    return 1;
+}
+
 extern "C" void fn_803CD8E4(EAGLObjD* s, int chrg)
 {
     s->m0 = lbl_80685EE8;
@@ -421,12 +466,58 @@ extern "C" void fn_803CDB24(Unk803D2B20* self, int a, float x, float y)
     self->v7(a, y, 0);
 }
 
+extern "C" int fn_803CDB60(EAGLSelfF* s, unsigned* bits, int* cnt, int* lo, int* hi)
+{
+    EAGLRecF* r = s->mC;
+    int n = r->m4->m0;
+    int i;
+    for (i = n / 4 - 1; i >= 0; i--) {
+        int b = (unsigned)r->mE[i] / 12;
+        if (!EAGLTestBit(bits, b)) {
+            if (*cnt == 0) {
+                *lo = b;
+                *hi = b;
+            } else {
+                if (b < *lo)
+                    *lo = b;
+                if (b > *hi)
+                    *hi = b;
+            }
+            *cnt += 1;
+            fn_803BE6F4(bits, b, 1);
+        }
+    }
+    return 1;
+}
+
 extern "C" void fn_803CEA5C(char* p)
 {
     EAGLTmp t;
     fn_803D5098(&t);
     *(void**)(p - 0x10) = t.m0;
     fn_803BE90C(&t, 0);
+}
+
+extern "C" void fn_803CEAA0(EAGLBlend* s, float x, float y, int a)
+{
+    if (y <= s->m1C) {
+        s->mC->v4(a, x - s->m14, y - s->m14);
+    } else if (y >= s->m20) {
+        s->m10->v4(a, x - s->m18, y - s->m18);
+    } else {
+        switch (s->m28) {
+        case 0:
+            s->mC->v4(a, x - s->m14, y - s->m14);
+            break;
+        case 1:
+            s->m10->v4(a, x - s->m18, y - s->m18);
+            break;
+        default:
+            s->mC->v4(a, x - s->m14, y - s->m14);
+            s->m10->v4(a, x - s->m18, y - s->m18);
+            break;
+        }
+    }
 }
 
 extern "C" void fn_803CEBC0(DtorAt0* s, int chrg)

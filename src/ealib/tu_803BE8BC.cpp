@@ -701,6 +701,40 @@ extern "C" void fn_803BF9F0(EAGLSelfD* s)
         lbl_80626DD0->v13((void*)s->mC[i]);
 }
 
+struct EAGLKey {
+    unsigned short m0;
+    EAGLKey(int v) { m0 = v; }
+    EAGLKey(const EAGLKey& o) { m0 = o.m0; }
+};
+
+struct EAGLSelfScale {
+    const void* m0;
+    int m4;
+    int m8;
+    void* mC;
+    int m10;
+    int m14;
+    unsigned char m18;
+};
+
+extern "C" int fn_803D2D74(void* table, EAGLKey* key, unsigned char* out);
+
+extern "C" void fn_803BFA5C(EAGLSelfScale* s, int on)
+{
+    s->m14 = on;
+    if (s->m18 == 0 && on != 0) {
+        EAGLKey key(1);
+        void* tbl = ((Unk803D2B20*)s)->v16();
+        if (tbl) {
+            EAGLKey k2(key);
+            EAGLKey k3(k2);
+            unsigned char res;
+            if (fn_803D2D74(tbl, &k3, &res))
+                s->m18 = res;
+        }
+    }
+}
+
 extern "C" int fn_803BFAEC(Unk803D2B20* self, int a, int* b, int* c, int* d)
 {
     fn_803BE6B4(a, 0);

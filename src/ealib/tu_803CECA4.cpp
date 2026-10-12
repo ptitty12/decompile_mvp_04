@@ -416,6 +416,43 @@ extern "C" void fn_803D17A8(Unk803CECA4Vt* self, int a, float x, float y)
     self->v7(a, y, 0);
 }
 
+extern "C" float fn_803D17E4(float x, float lo, float hi)
+{
+    float range = hi - lo;
+    float t;
+    int k;
+    if (x < lo) {
+        t = lo - x;
+        float m;
+        k = (int)(t / range);
+        m = t - (float)k * range;
+        return hi - m;
+    }
+    if (x >= hi) {
+        t = x - hi;
+        float m;
+        k = (int)(t / range);
+        m = t - (float)k * range;
+        return lo + m;
+    }
+    return x;
+}
+
+extern "C" int fn_803D189C(float x, float lo, float hi)
+{
+    float range = hi - lo;
+    float t;
+    if (x < lo) {
+        t = lo - x;
+        return (int)(t / range);
+    }
+    if (x >= hi) {
+        t = x - hi;
+        return (int)(t / range) + 1;
+    }
+    return 0;
+}
+
 extern "C" int fn_803D18F8()
 {
     return 0;
@@ -513,8 +550,7 @@ extern "C" void fn_803D2A78(Unk803D2A14Obj* self, int c)
 }
 
 /*
- * Not matched yet: fn_803D17E4 and fn_803D189C (range wrap; float to int and back, retail keeps t live so the
- * offset lands in f11, ours reuses f1), fn_803D1A30 (retail passes the 5th argument register on as the 4th
+ * Not matched yet: fn_803D1A30 (retail passes the 5th argument register on as the 4th
  * argument of fn_803D14E8 without setting the 3rd), fn_803CED44, fn_803CEECC, fn_803CF14C, fn_803CF3C0,
  * fn_803CF5F4, fn_803CF77C, fn_803CF968, fn_803CFE8C, fn_803D00DC, fn_803D062C, fn_803D0944, fn_803D0C0C,
  * fn_803D1184, fn_803D14E8, fn_803D1AB8, fn_803D1C78, fn_803D1E54, fn_803D2170, fn_803D2524, fn_803D279C.
