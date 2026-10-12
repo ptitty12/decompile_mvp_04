@@ -103,6 +103,22 @@ void* fn_80150F90() { return fn_80150E1C(operator new(0x14, lbl_806EF9B4)); }
 
 void fn_80150FC0(void* p) { fn_8037CE98(fn_8037C7FC(), 0x149EF3D8, p, 0x0); }
 
+struct KnotBuf { const void* m0; void* m4; int m8; };
+
+extern "C" void fn_80356798(void* p);
+
+extern const char lbl_8065EB20[];
+
+extern "C" KnotBuf* fn_80151000(KnotBuf* p)
+{
+    fn_80356798(p);
+    p->m4 = 0;
+    p->m0 = lbl_8065EB20;
+    p->m8 = 0;
+    return p;
+}
+
+
 void fn_801519A4() {}
 
 void* fn_801519A8() { return fn_80151684(operator new(0x160, lbl_806EF9B4)); }
