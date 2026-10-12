@@ -171,6 +171,21 @@ extern const char lbl_8065B690[];
 extern const char lbl_8065B280[];
 extern const char lbl_8065B2D8[];
 extern const char lbl_8065B298[];
+/* Sub-object at +0x10 of FEOb150 (vptr at +0xC). Its inlined ctor keeps its own
+ * base register (o + 0x10), so flow does not see through the stores and keeps
+ * the earlier mC store (PATTERNS.md, "Hard-case families 3"). */
+struct FESub10 {
+    int m0;
+    int m4;
+    int m8;
+    const void* mC;
+};
+inline void FESub10Init(FESub10* s)
+{
+    s->mC = lbl_8065B690;
+    s->m0 = 0;
+    s->m4 = 0;
+}
 extern "C" {
 void fn_800ACFEC(void* p, int a);
 void fn_800B1C7C(void* p);
@@ -602,27 +617,20 @@ extern "C" void fn_800AEA64()
 {
 }
 
-/* near-miss (64 vs 72 insns): retail keeps both the first-level ctor stores (mC = lbl_8065B9C0, sub-object vptr, zeros) and the derived overwrites; ours lets CSE drop the dead earlier mC store */
 extern "C" FEIT* fn_800AEA68(FEIT* self, int* src, int n)
 {
     fn_800AB1CC(self, src, n);
-    int i = 0;
     self->m18 = lbl_8065B010;
     fn_800ACFEC((char*)self + 0x448, src[0]);
     *(int*)((char*)self + 0xEF4) = 0;
-    int* q = src;
-    for (; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         FEOb150* o = (FEOb150*)operator new(0x150, 0x400);
-        fn_800AEFF4((FEOb12*)o, i, *q);
-        q++;
+        fn_800AEFF4((FEOb12*)o, i, src[i]);
         o->mC = lbl_8065B9C0;
-        char* sub = (char*)o + 0x10;
-        *(const void**)(sub + 0xC) = lbl_8065B690;
-        o->m10 = 0;
-        o->m14 = 0;
+        FESub10Init((FESub10*)((char*)o + 0x10));
+        o->mC = lbl_8065B298;
         o->m1C = lbl_8065B280;
         o->m8 = lbl_8065B2D8;
-        o->mC = lbl_8065B298;
         o->mDC = 0;
         fn_800B1C7C(o);
         fn_800B2C6C(o);
