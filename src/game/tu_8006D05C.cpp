@@ -97,6 +97,38 @@ int fn_80099620(Unk8006902C_Side* s);
 int fn_8009764C(Unk8006902C_Side* s, int a, int b, int c);
 void fn_800975A8(Unk8006902C_Side* s, int a, int b, int c, int d);
 
+unsigned char* fn_80081CF8(Unk8007FF8C_Y* y, int i);
+void fn_8009984C(Unk8006902C_Side* s, int a, int b, int c, int d, int e);
+
+inline int SumRowI(Unk8006902C_Side* s)
+{
+    int t = 0;
+    int i;
+    for (i = 0; i < 0x80; i++)
+        t += s->m1B4[(unsigned char)i];
+    return t;
+}
+
+void Unk80069F0C::fn_8006D410()
+{
+    Unk8006902C_Players* p = m14.m0;
+    int side = 0;
+    if (p->m1CD0 != 0)
+        side = 1;
+    Unk8006902C_Side* me = &p->s[side];
+    Unk8006902C_Side* other = &p->s[side ^ 1];
+    int cnt = 0;
+    unsigned k;
+    for (k = 0; k <= 2; k++) {
+        if (*fn_80081CF8((Unk8007FF8C_Y*)p, k) != 0xFF)
+            cnt++;
+    }
+    int x = fn_80097210(other, 0);
+    int s0 = SumRowI(other);
+    int s1 = SumRowI(me);
+    fn_8009984C(other, x, s0, s1, m14.m0->m1CC8, cnt);
+}
+
 void Unk80069F0C::fn_8006D508()
 {
     m44 = 0;

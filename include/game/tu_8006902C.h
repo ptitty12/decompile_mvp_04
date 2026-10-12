@@ -210,6 +210,7 @@ struct Unk80069F0C {
     Unk8006902C_Side* SideAt(int off) { return (Unk8006902C_Side*)((char*)m14.m0 + off); }
     void fn_8006CFA4(Unk8006902C_EvCFA4* ev);
     void fn_8006EC94(unsigned char c, int k);
+    void fn_8006D410();
     void fn_8006D508();
     void fn_8006DD64(int a);
     void fn_8006DDF4();
