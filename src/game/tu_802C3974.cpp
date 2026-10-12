@@ -959,6 +959,77 @@ unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b)
     return (r << 16) | 0xFF000000 | (g << 8) | b;
 }
 
+struct Unk802C6BA4_Tex {
+    char pad0[4];
+    short m4;
+    short m6;
+    char pad8[4];
+    unsigned int mC;
+    int m10;
+};
+unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
+Unk802C6BA4_Tex* fn_803EBF90(void* tex);
+int fn_803EC6F8(void* tex);
+
+/* near-miss (129/129 insns, 125 words equal): in the format-8 index search retail keeps p in r11, idx in r10 and the byte offset in r9 (formed after p); ours r9/r11/r11 */
+void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
+{
+    int w = tex->m4;
+    int h = tex->m6;
+    switch (fmt) {
+    case 0xDE3: {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                *(short*)fn_803EC1C0(tex, x, y, 0) = 0;
+            }
+        }
+        break;
+    }
+    case 8: {
+        int y = 0;
+        Unk802C6BA4_Tex* t = fn_803EBF90(tex);
+        int idx = -1;
+        for (; y < t->m4; y++) {
+            int o = y * 2;
+            char* p;
+            if (t->mC & 0x10000000)
+                p = (char*)t + t->m10;
+            else
+                p = (char*)t + 0x10;
+            if ((*(unsigned short*)(p + o) & 0xF000) == 0) {
+                idx = y;
+                break;
+            }
+        }
+        unsigned char v = idx;
+        for (y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                *fn_803EC1C0(tex, x, y, 0) = v;
+            }
+        }
+        fn_80433004((int)tex, fn_803EC6F8(tex));
+        break;
+    }
+    case 0xF:
+    case 0x10: {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                *(short*)fn_803EC1C0(tex, x, y, 0) = 0;
+            }
+        }
+        break;
+    }
+    case 0x20: {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                *(int*)fn_803EC1C0(tex, x, y, 0) = 0;
+            }
+        }
+        break;
+    }
+    }
+}
+
 struct Unk802C72F4_Tex {
     char pad0[0xC];
     unsigned int mC;
