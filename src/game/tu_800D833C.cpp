@@ -256,6 +256,29 @@ int fn_800D9CA8(Unk800D876C_A* t)
     return fn_800D9A64((int)t);
 }
 
+extern "C" int rand();
+extern "C" int fn_8055B000(void* t, int key, unsigned col);
+
+int fn_800D9EBC(int a, int mode)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int g = s->fn_8007D098(s->fn_8007DA28(), 0);
+    int r = fn_800B5520(g);
+    if (mode == 1) {
+        if (s->fn_80078A38(g) == 0) {
+            int q = (rand() % 900) / 300;
+            r = fn_800B5520(fn_8055B000(*(void**)((char*)s + 0x68), g, q));
+        } else {
+            int cur = s->fn_8007B8C4(1, g);
+            do {
+                r = rand() % 124;
+                g = fn_800B548C(r);
+            } while (cur != s->fn_8007B8C4(1, g));
+        }
+    }
+    return fn_800B548C(r);
+}
+
 int fn_800D9FF0(int a, int b)
 {
     return fn_800B548C(fn_8040ABA0() % 0x7C);
