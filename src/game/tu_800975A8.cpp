@@ -30,6 +30,40 @@ extern "C" int fn_80080724(void* p);
 
 extern "C" int fn_80097A70(char* o, int a, int b, int i) { return fn_80080724((char*)(i * 0x128 + (int)o) + 0x95C); }
 
+extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i)
+{
+    int r;
+    if (c <= 1) {
+        char* base = o + 0x924;
+        int off = c * 4 + i * 0x128;
+        r = (*(Rec**)(base + off))->v5(a, b);
+    } else {
+        int off = i * 0x128;
+        char* base2 = o + 0x928;
+        int x = (*(Rec**)(base2 + off))->v5(a, b);
+        char* base = o + 0x924;
+        r = x + (*(Rec**)(base + off))->v5(a, b);
+    }
+    return r;
+}
+
+extern "C" int fn_80097EA4(char* o, int a, int b, int c, int i)
+{
+    int r;
+    if (c <= 1) {
+        char* base = o + 0x954;
+        int off = c * 4 + i * 0x128;
+        r = (*(Rec**)(base + off))->v5(a, b);
+    } else {
+        int off = i * 0x128;
+        char* base2 = o + 0x958;
+        int x = (*(Rec**)(base2 + off))->v5(a, b);
+        char* base = o + 0x954;
+        r = x + (*(Rec**)(base + off))->v5(a, b);
+    }
+    return r;
+}
+
 extern "C" int fn_800983C8(char* o, int a, int b) { return fn_80097620(o, a, b, 0) + fn_80097620(o, a, b, 1); }
 
 extern "C" int fn_8009841C(char* o, int a, int b) { return fn_8009764C(o, a, b, 0) + fn_8009764C(o, a, b, 1); }
