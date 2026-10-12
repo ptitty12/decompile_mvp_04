@@ -177,6 +177,7 @@ struct Unk8006902C_Handle {
     int mC;
 };
 
+struct Unk8006902C_EvBase;
 struct Unk80069F0C {
     char pad0[8];
     void* m8;
@@ -231,6 +232,7 @@ struct Unk80069F0C {
     void fn_8006A22C();
     int fn_8006A214();
     void fn_8006A1F4();
+    void fn_8006A2C4(int kind, Unk8006902C_EvBase* ev);
     void fn_8006C02C();
     void fn_8006C064();
     void fn_8006C038(void* a);

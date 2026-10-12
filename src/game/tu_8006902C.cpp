@@ -195,6 +195,203 @@ int Unk80069F0C::fn_8006A238(int idx)
     return total;
 }
 
+struct Unk8006902C_EvBase {
+    int m0;
+};
+template <class T>
+inline T* EvAs(Unk8006902C_EvBase* ev, int kind)
+{
+    T* r;
+    if (ev != 0) {
+        r = 0;
+        if (kind == ev->m0)
+            r = (T*)ev;
+    } else {
+        r = 0;
+    }
+    return r;
+}
+extern "C" void fn_8006DD60(Unk80069F0C* self);
+extern "C" void fn_8006DAD0(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006C218(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006D508__11Unk80069F0C(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006D410__11Unk80069F0C(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006D05C(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006D594(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006E3E0(Unk80069F0C* self, Unk8006902C_EvBase* e);
+extern "C" void fn_8006C974(Unk80069F0C* self);
+extern "C" void fn_8006C7E8__11Unk80069F0Ci(Unk80069F0C* self);
+extern "C" void fn_8006E710(Unk80069F0C* self);
+
+void Unk80069F0C::fn_8006A2C4(int kind, Unk8006902C_EvBase* ev)
+{
+    switch (kind) {
+    case 61:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006DD64((int)e);
+        break;
+    }
+    case 65:
+        fn_8006DF00();
+        break;
+    case 72:
+    {
+        Unk8006902C_EvDE84* e = EvAs<Unk8006902C_EvDE84>(ev, kind);
+        fn_8006DE84(e);
+        break;
+    }
+    case 69:
+        fn_8006DDF4();
+        break;
+    case 66:
+        fn_8006DD60(this);
+        break;
+    case 58:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006DAD0(this, e);
+        break;
+    }
+    case 57:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006C218(this, e);
+        break;
+    }
+    case 91:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006D508__11Unk80069F0C(this, e);
+        break;
+    }
+    case 92:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006D410__11Unk80069F0C(this, e);
+        break;
+    }
+    case 95:
+    {
+        Unk8006902C_EvCFA4* e = EvAs<Unk8006902C_EvCFA4>(ev, kind);
+        fn_8006CFA4(e);
+        break;
+    }
+    case 97:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006D05C(this, e);
+        break;
+    }
+    case 107:
+    {
+        Unk8006902C_EvE36C* e = EvAs<Unk8006902C_EvE36C>(ev, kind);
+        fn_8006E36C(e);
+        break;
+    }
+    case 118:
+    {
+        Unk8006902C_EvC088* e = EvAs<Unk8006902C_EvC088>(ev, kind);
+        fn_8006C088(e);
+        break;
+    }
+    case 121:
+    {
+        Unk8006902C_EvC17C* e = EvAs<Unk8006902C_EvC17C>(ev, kind);
+        fn_8006C17C(e);
+        break;
+    }
+    case 125:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006D594(this, e);
+        break;
+    }
+    case 126:
+    {
+        Unk8006902C_EvBase* e = EvAs<Unk8006902C_EvBase>(ev, kind);
+        fn_8006E3E0(this, e);
+        break;
+    }
+    case 131:
+    {
+        Unk8006902C_EvC17C* e = EvAs<Unk8006902C_EvC17C>(ev, kind);
+        fn_8006E0F8(e);
+        break;
+    }
+    case 132:
+    {
+        Unk8006902C_EvC17C* e;
+        if (ev != 0) {
+            e = 0;
+            if (ev->m0 == 0x84)
+                e = (Unk8006902C_EvC17C*)ev;
+        } else {
+            e = 0;
+        }
+        fn_8006E168(e);
+        break;
+    }
+    case 133:
+    {
+        Unk8006902C_EvC17C* e = EvAs<Unk8006902C_EvC17C>(ev, kind);
+        fn_8006E1FC(e);
+        break;
+    }
+    case 134:
+    {
+        Unk8006902C_EvE280* e = EvAs<Unk8006902C_EvE280>(ev, kind);
+        fn_8006E280(e);
+        break;
+    }
+    case 42:
+        fn_8006C698();
+        break;
+    case 45:
+    {
+        Unk8006902C_Ev75C* e = EvAs<Unk8006902C_Ev75C>(ev, kind);
+        fn_8006C75C(e);
+        break;
+    }
+    case 50:
+        fn_8006C7E8__11Unk80069F0Ci(this);
+        break;
+    case 52:
+    {
+        Unk8006902C_Ev75C* e = EvAs<Unk8006902C_Ev75C>(ev, kind);
+        fn_8006C810(e);
+        break;
+    }
+    case 53:
+        fn_8006C930();
+        break;
+    case 54:
+        fn_8006C974(this);
+        break;
+    case 85:
+        fn_8006E710(this);
+        break;
+    case 83:
+        fn_8006E6A4();
+        break;
+    case 84:
+        fn_8006E6A4();
+        break;
+    case 147:
+    {
+        Unk8006902C_EvE5FC* e = EvAs<Unk8006902C_EvE5FC>(ev, kind);
+        fn_8006E5FC(e);
+        break;
+    }
+    case 148:
+    {
+        Unk8006902C_EvE650* e = EvAs<Unk8006902C_EvE650>(ev, kind);
+        fn_8006E650(e);
+        break;
+    }
+    }
+}
+
 void Unk80069F0C::fn_8006B880()
 {
     Unk8007A4DC_Screen* o = lbl_8061930C;
