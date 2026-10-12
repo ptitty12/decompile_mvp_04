@@ -55,6 +55,132 @@ extern "C" DB_OVERLAY void fn_8052FFE8(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x2C, 0x2C);
 }
 
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+extern "C" DB_OVERLAY int fn_80530024(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 100;
+        break;
+    case 14:
+        r = 100;
+        break;
+    case 15:
+        r = 100;
+        break;
+    case 16:
+        r = 100;
+        break;
+    case 17:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+extern "C" DB_OVERLAY int fn_805300D0(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 extern "C" DB_OVERLAY unsigned fn_80530134(Unk80071604* self, unsigned kind, unsigned i)
 {
     unsigned r = 0;

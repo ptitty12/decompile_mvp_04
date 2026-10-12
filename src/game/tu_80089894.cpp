@@ -232,6 +232,192 @@ void fn_80089894(Unk80089894_K<Unk80089894_T14>* self, unsigned i)
         fn_8040074C(&self->m24[i], 0x14);
 }
 
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+int fn_800898D0(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 100;
+        break;
+    case 1:
+        r = 15;
+        break;
+    case 2:
+        r = 15;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 100;
+        break;
+    case 5:
+        r = 101;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 15;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 100;
+        break;
+    case 10:
+        r = 100;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 15;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 100;
+        break;
+    case 15:
+        r = 100;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 15;
+        break;
+    case 18:
+        r = 0;
+        break;
+    case 19:
+        r = 100;
+        break;
+    case 20:
+        r = 100;
+        break;
+    case 21:
+        r = 0;
+        break;
+    case 22:
+        r = 15;
+        break;
+    case 23:
+        r = 0;
+        break;
+    case 24:
+        r = 100;
+        break;
+    case 25:
+        r = 100;
+        break;
+    case 26:
+        r = 0;
+        break;
+    case 27:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+int fn_80089A0C(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    case 18:
+        r = 0;
+        break;
+    case 19:
+        r = 0;
+        break;
+    case 20:
+        r = 0;
+        break;
+    case 21:
+        r = 0;
+        break;
+    case 22:
+        r = 0;
+        break;
+    case 23:
+        r = 0;
+        break;
+    case 24:
+        r = 0;
+        break;
+    case 25:
+        r = 0;
+        break;
+    case 26:
+        r = 0;
+        break;
+    case 27:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 unsigned fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i)
 {
     unsigned r = 0;
@@ -680,6 +866,76 @@ void fn_8008ABDC(Unk80089894_K<Unk80089894_TC>* self, unsigned i)
         fn_8040074C(&self->m24[i], 0xC);
 }
 
+int fn_8008AC18(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 2;
+        break;
+    }
+    return r;
+}
+
+int fn_8008AC68(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 unsigned fn_8008AC94(Unk80089894_PackTab* self, unsigned t, unsigned i)
 {
     unsigned r = 0;
@@ -847,6 +1103,106 @@ void fn_8008B32C(Unk80089894_K<Unk80089894_TC>* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(&self->m24[i], 0xC);
+}
+
+int fn_8008B368(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 2;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+int fn_8008B3E8(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    }
+    return r;
 }
 
 extern "C" unsigned fn_8008B42C(Unk80089894_PackTabC* self, unsigned t, unsigned i)
@@ -1125,19 +1481,86 @@ void fn_8008BEB4(Unk80089894_K<Unk80089894_TC>* self, unsigned i)
         fn_8040074C(&self->m24[i], 0xC);
 }
 
-/* near-miss (5 slots): retail keeps the dead cmplwi compares and merges all
- * `li r3,0; blr` tails; see PATTERNS (dead cmpwi before li r3,0 family). */
-int fn_8008BEF0(void* self, int k)
+int fn_8008BEF0(void* l, int k)
 {
+    int r = 0;
     switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
     case 2:
-        return 0;
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
     case 5:
-        return 0;
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
     case 8:
-        return 0;
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
     }
-    return 0;
+    return r;
+}
+
+int fn_8008BF24(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    }
+    return r;
 }
 
 unsigned fn_8008BF58(Unk80089894_PackTabB* self, unsigned t, unsigned i)
@@ -1396,4 +1819,177 @@ void fn_8008CBD0(Unk80089894_K<Unk80089894_T3C>* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(&self->m24[i], 0x3C);
+}
+
+int fn_8008CC0C(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 15;
+        break;
+    case 13:
+        r = 100;
+        break;
+    case 14:
+        r = 15;
+        break;
+    case 15:
+        r = 15;
+        break;
+    case 16:
+        r = 15;
+        break;
+    case 17:
+        r = 15;
+        break;
+    case 18:
+        r = 15;
+        break;
+    case 19:
+        r = 15;
+        break;
+    case 20:
+        r = 15;
+        break;
+    case 21:
+        r = 15;
+        break;
+    case 22:
+        r = 0;
+        break;
+    case 23:
+        r = 0;
+        break;
+    case 24:
+        r = 255;
+        break;
+    case 25:
+        r = 0;
+        break;
+    case 26:
+        r = 0;
+        break;
+    case 27:
+        r = 0;
+        break;
+    case 28:
+        r = 0;
+        break;
+    case 29:
+        r = 100;
+        break;
+    case 30:
+        r = 0;
+        break;
+    case 31:
+        r = 0;
+        break;
+    case 32:
+        r = 0;
+        break;
+    case 33:
+        r = 0;
+        break;
+    case 34:
+        r = 0;
+        break;
+    case 35:
+        r = 0;
+        break;
+    case 36:
+        r = 0;
+        break;
+    case 37:
+        r = 0;
+        break;
+    case 38:
+        r = 0;
+        break;
+    case 39:
+        r = 0;
+        break;
+    case 40:
+        r = 0;
+        break;
+    case 41:
+        r = 0;
+        break;
+    case 42:
+        r = 0;
+        break;
+    case 43:
+        r = 0;
+        break;
+    case 44:
+        r = 0;
+        break;
+    case 45:
+        r = 0;
+        break;
+    case 46:
+        r = 0;
+        break;
+    case 47:
+        r = 0;
+        break;
+    case 48:
+        r = 0;
+        break;
+    case 49:
+        r = 0;
+        break;
+    case 50:
+        r = 0;
+        break;
+    case 51:
+        r = 0;
+        break;
+    case 52:
+        r = 0;
+        break;
+    case 53:
+        r = 0;
+        break;
+    case 54:
+        r = 0;
+        break;
+    }
+    return r;
 }

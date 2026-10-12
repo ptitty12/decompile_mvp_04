@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8024EF40.h"
+#include "game/chooser.h"
 
 typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
@@ -32,14 +33,23 @@ extern int lbl_80691CE0;
 extern float lbl_8061DC3C;
 extern int lbl_80691CF0;
 extern int lbl_8061DC54;
+
 inline float G_8061DC08(void* p) { return lbl_8061DC08; }
+
 inline float G_8061DC0C(void* p) { return lbl_8061DC0C; }
+
 inline float G_8061DC10(void* p) { return lbl_8061DC10; }
+
 inline float G_8061DC14(void* p) { return lbl_8061DC14; }
+
 inline float G_8061DC18(void* p) { return lbl_8061DC18; }
+
 inline float G_8061DC1C(void* p) { return lbl_8061DC1C; }
+
 inline float G_8061DC2C(void* p) { return lbl_8061DC2C; }
+
 inline float G_8061DC3C(void* p) { return lbl_8061DC3C; }
+
 extern int lbl_8061D51C[];
 extern int lbl_8061D4DC[];
 extern char lbl_8068CD00[];
@@ -76,7 +86,7 @@ struct Unk80250244_S {
     int m0;
     int m4;
     Unk8024FD00_S m8[4];
-    char pad58[4];
+    const void* m58;
     float m5C;
     float m60;
     float m64;
@@ -100,6 +110,61 @@ struct Unk80250244_S {
 float fn_8025454C(void* p, int idx);
 int fn_801BA4AC(int a);
 void fn_8024FD00(Unk8024FD00_S* self);
+float fn_802503E8(Unk80250244_S* self, float a, float b, float c);
+void fn_8023CB08(P* x);
+int fn_8024FD38(Unk8024FD00_S* e, int k);
+void fn_8024FE4C(Unk8024FD00_S* e, int k);
+void fn_8024FCF8(void** self, void* a);
+void fn_8024F7C8(Unk80250244_S* self);
+void fn_80250244(Unk80250244_S* self);
+void fn_8025068C(Unk80250244_S* self, int a);
+void fn_802456C8(P* x, int a, int b, float f);
+int fn_8026D6D8(P* x, int a);
+extern const char lbl_805D97F4[];
+extern const char lbl_805D97F8[];
+extern const char lbl_805D9804[];
+extern const char lbl_805D9814[];
+extern char lbl_80660F68[];
+extern char lbl_806614E0[];
+extern int lbl_8068CB64;
+extern float lbl_8068CB60;
+extern float lbl_8061D630;
+extern float lbl_8061DC50;
+extern "C" void fn_8037B7E4(Unk8037B3E8* self, const char* name);
+}
+inline void* operator new(unsigned int, void* p) { return p; }
+
+int fn_8024F54C(int k)
+{
+    int r = 0;
+    switch (k) {
+    case 1:
+    case 2:
+    case 3:
+        r = 2;
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        r = 1;
+        break;
+    case 8:
+    case 9:
+        r = 0;
+        break;
+    case 10:
+    case 11:
+    case 12:
+    case 13:
+    case 14:
+        r = 2;
+        break;
+    case 15:
+        r = 0;
+        break;
+    }
+    return r;
 }
 
 int fn_8024F59C(int x)
@@ -122,6 +187,28 @@ int fn_8024F5CC(int x)
         x = 15;
     }
     return lbl_8061D4DC[x];
+}
+
+extern "C" void* fn_8024F5FC(void* p)
+{
+    new (p) Unk8037B3E8(0x4DACE415U);
+    *(const void**)p = lbl_80660F68;
+    return p;
+}
+
+void fn_8024F640(Unk8037B3E8* self)
+{
+    fn_8037B7E4(self, lbl_805D97F4);
+    self->fn_8037B728(lbl_805D97F8, lbl_805D9804, lbl_8068CD00, (int)lbl_805D9814);
+}
+
+extern "C" void* fn_8024F5FC(void* p);
+
+extern int lbl_806EF9B4;
+
+extern "C" void* fn_8024F69C()
+{
+    return fn_8024F5FC(operator new(0x4, lbl_806EF9B4));
 }
 
 void fn_8024F6CC()
@@ -149,6 +236,22 @@ Unk8024F730_C::Unk8024F730_C()
     m0 = lbl_80660F08;
 }
 
+Unk80250244_S* fn_8024F744(Unk80250244_S* self, int a)
+{
+    self->m0 = a;
+    self->m58 = lbl_806614E0;
+    Unk8024FD00_S* e = self->m8;
+    int k = 3;
+    do {
+        fn_8024FD00(e);
+        e++;
+    } while (k-- != 0);
+    for (int j = 0; j < 4; j++)
+        fn_8024FCF8((void**)&self->m8[j], self);
+    fn_8024F7C8(self);
+    return self;
+}
+
 void fn_8024F7C8(Unk80250244_S* self)
 {
     self->m4 = 0;
@@ -156,9 +259,34 @@ void fn_8024F7C8(Unk80250244_S* self)
         fn_8024FD00(&self->m8[i]);
 }
 
+extern "C" void fn_8024FBEC(Unk80250244_S* self, int k)
+{
+    int f = 0;
+    for (int i = 0; i < 4; i++) {
+        int r = fn_8024FD38(&self->m8[i], k);
+        f = (f | (r != 0)) != 0;
+    }
+    if (f == 0)
+        self->m4 = f;
+}
+
 void fn_8024FC74(Unk80250244_S* self)
 {
     fn_8024F7C8(self);
+}
+
+/* near-miss: loop shape matches; retail keeps the cursor in r3 and the copy in r9 (ours the reverse), 6 slots */
+extern "C" void fn_8024FC94(Unk80250244_S* self)
+{
+    Unk8024FD00_S* e = self->m8;
+    for (int i = 0; i <= 3; i++) {
+        Unk8024FD00_S* c = e++;
+        if (c->m4 == 2) {
+            fn_8024FE4C(c, self->m4);
+            fn_8024F7C8(self);
+            break;
+        }
+    }
 }
 
 void fn_8024FCF8(void** self, void* a)
@@ -197,6 +325,40 @@ void fn_8024FF48(Unk80250244_S* self)
     self->m6C = fn_8025454C(&self->mA4->m588, 0x11);
 }
 
+void fn_8024FFC0(Unk80250244_S* self)
+{
+    fn_8024F7C8(self);
+    self->m5C = 0.0f;
+    self->m60 = 0.0f;
+    self->m68 = 0.0f;
+    self->m6C = 0.0f;
+    self->mA0 = 0.0f;
+    self->m64 = 0.0f;
+    self->m80 = 0.0f;
+    SetF(&self->m74, 0.0f);
+    self->m9C = -1;
+    self->m94 = -1;
+    self->m70 = 0;
+    self->m78 = 0;
+    self->m7C = 0;
+    fn_80250244(self);
+    self->m8C = 0.0f;
+}
+
+extern "C" void fn_8025004C(Unk80250244_S* self)
+{
+    int m1 = -1;
+    fn_80250244(self);
+    self->m94 = m1;
+    fn_8024F7C8(self);
+    self->m78 = 0;
+    self->m70 = 0;
+    SetF(&self->m74, 0.0f);
+    fn_802456C8(self->mA4, 0, 0, 0.0f);
+    fn_8025068C(self, 4);
+    self->mA4->m730 = m1;
+}
+
 void fn_80250180(Unk80250244_S* self, int a)
 {
     const float k = 0.2f;
@@ -218,6 +380,38 @@ void fn_80250244(Unk80250244_S* self)
     self->m84 = -1;
     self->m88 = 0;
     self->m80 = 0.0f;
+}
+
+int fn_80250264(Unk80250244_S* self)
+{
+    int r = -1;
+    if (!(Secs(self->mA4->m44C) >= self->m80)) {
+        if (self->m84 != -1)
+            return self->m84;
+    }
+    return r;
+}
+
+int fn_802502D0(Unk80250244_S* self)
+{
+    if (!(Secs(self->mA4->m44C) >= self->m80) && self->m88 == 1)
+        return 1;
+    return 0;
+}
+
+extern "C" float fn_80250338(Unk80250244_S* self, float a, float b)
+{
+    if (lbl_8068CB64 == 0) {
+        fn_8023CB08(self->mA4);
+        lbl_8068CB60 = lbl_8061D630;
+        lbl_8068CB64 = 1;
+    }
+    return fn_802503E8(self, lbl_8068CB60, a, b);
+}
+
+float fn_802503B0(Unk80250244_S* self, float a, float b)
+{
+    return fn_802503E8(self, lbl_8061DC50, a, b);
 }
 
 void fn_8025068C(Unk80250244_S* self, int a)

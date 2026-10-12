@@ -67,6 +67,41 @@ FE_OVERLAY int fn_804A2F74(FeScrB* x)
     return 1;
 }
 
+struct FeScrN : FeW {
+    char pad40[0xF0];
+    int m130;
+    FeW* m134;
+    FeW* m138;
+    FeW* m13C;
+    FeW* m140;
+    FeW* m144;
+    FeW* m148;
+    FeW* m14C;
+    FeW* m150;
+    FeW* m154;
+    FeW* m158;
+    FeW* m15C;
+    FeW* m160;
+    FeW* m164;
+    FeW* m168;
+    FeW* m16C;
+    FeW* m170;
+    FeW* m174;
+    FeW* m178;
+    FeW* m17C;
+    FeW* m180;
+    FeW* m184;
+    FeW* m188;
+    FeW* m18C;
+    FeW* m190;
+};
+
+extern "C" FE_OVERLAY void fn_804A2FD0(FeScrN* x, char* dst)
+{
+    fn_8040B830(dst, x->m134->fn_vslot70()->fn_vslot33(5, 1)->mC, 16);
+}
+
+
 extern const char lbl_80674878[];
 FE_OVERLAY FeScrH* fn_804A3044(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {

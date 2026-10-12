@@ -917,6 +917,63 @@ int fn_80084660(int t)
     return r;
 }
 
+int fn_80084728(int k)
+{
+    switch (k) {
+    case 0:
+        return 12012;
+    case 1:
+        return 12011;
+    case 2:
+        return 12010;
+    case 3:
+        return 12015;
+    case 4:
+        return 12014;
+    case 5:
+        return 12013;
+    case 6:
+        return 16420;
+    case 7:
+        return 16421;
+    case 8:
+        return 16422;
+    case 9:
+        return 16423;
+    case 10:
+        return 16424;
+    case 11:
+        return 16425;
+    case 12:
+        return 16426;
+    case 13:
+        return 16427;
+    case 14:
+        return 16428;
+    case 15:
+        return 16429;
+    case 16:
+        return 16430;
+    case 17:
+        return 16431;
+    case 18:
+        return 16432;
+    case 19:
+        return 23108;
+    case 20:
+        return 23109;
+    case 21:
+        return 23110;
+    case 22:
+        return 23111;
+    case 23:
+        return 23113;
+    case 24:
+        return 23112;
+    }
+    return 0;
+}
+
 int fn_800848EC(int t)
 {
     return fn_800844A8(fn_80084660(t));

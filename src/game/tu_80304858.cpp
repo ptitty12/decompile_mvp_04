@@ -148,6 +148,12 @@ void fn_803063C4()
     }
 }
 
+extern "C" void fn_803063E8()
+{
+    lbl_8061F96C = 0;
+}
+
+
 int fn_803063F8()
 {
     if (lbl_8061F970 != 0) {

@@ -225,6 +225,11 @@ void fn_8035EA74() {}
 
 int fn_8035EA78() { return 0; }
 
+extern "C" void fn_8037B424(void*, int);
+
+extern "C" void fn_8035EAE8(void* a, int b) { fn_8037B424(a, b); }
+
+
 void fn_8035EB08() {}
 
 void fn_8035EB0C() {}

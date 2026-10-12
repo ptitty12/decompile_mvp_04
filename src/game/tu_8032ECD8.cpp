@@ -5,7 +5,10 @@
 #include "game/tu_80317B88.h"
 
 extern const char lbl_805ED9C0[];
-extern const float lbl_805ED9E0;
+extern const char lbl_805ED9AC[];
+extern const char lbl_805EDA04[];
+extern const void* const lbl_80666C90[];
+extern const void* const lbl_80666BD8[];
 extern const char lbl_805ED9E8[];
 extern const char lbl_805ED9F0[];
 extern const char lbl_805ED9F4[];
@@ -13,8 +16,6 @@ extern const float lbl_805ED9F8;
 extern const float lbl_805EDAAC;
 extern const float lbl_805EDAB0;
 extern const float lbl_805EDAB4;
-extern const void* const lbl_80666EC0[];
-extern const void* const lbl_80666E70[];
 extern const void* const lbl_80666C40[];
 extern const void* const lbl_80666B70[];
 extern const void* const lbl_80666A18[];
@@ -48,6 +49,45 @@ extern int lbl_8061C8F8;
 extern int lbl_80620134;
 extern int lbl_8061B898;
 
+extern "C" void fn_8032D868(void* self, int a);
+/* Inlined mid-level widget ctor (vtable lbl_80666E70): root, mC = 0, set the name. */
+inline void FxWidInit(FxListD* self, int name) {
+    FxRootInit(self);
+    *(const void**)((char*)self + 8) = lbl_80666E70;
+    self->mC = 0;
+    fn_8032D868(self, name);
+}
+/* Polymorphic int ring (vptr lbl_8064B298 at +0x10; see Unk80353E68 in tu_8034B370.h). */
+struct FxRingI {
+    int* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+    const void* m10;
+};
+extern "C" void fn_8040074C(void* p, unsigned n); /* bzero */
+extern const void* const lbl_8064B298[];
+extern const void* const lbl_80666A68[];
+inline void FxRingInit(FxRingI* r, int* buf, int n) {
+    r->m10 = lbl_8064B298;
+    r->m0 = buf;
+    r->m8 = n;
+    fn_8040074C(r->m0, r->m8 << 2);
+    r->m4 = 0;
+    r->mC = 0;
+}
+/* Widget with a 10-entry ring at +0x48 (inline buffer at +0x64; vtable lbl_80666A68,
+ * ctor fn_803302D4). */
+class FxRingW : public FxListV {
+public:
+    int mC;
+    char pad10[0x38];
+    FxRingI m48;
+    int m5C;
+    int m60;
+    int m64[10];
+};
+
 struct FxViewB { int pad[3]; int mC; int m10; char pad14[0x60]; FxWid3* m74; };
 
 extern "C" {
@@ -77,6 +117,10 @@ FxViewB* fn_801A4CE8(FxView* v, int a);
 void fn_802CBDBC(void* w, void* b, int a, int c);
 int fn_8040B574(const char* a, const char* b);
 // PROTOS-BEGIN
+FxRingW* fn_803302D4(FxRingW* self, int a, int b);
+FxIntD* fn_8032ECD8(FxIntD* self, int a, int b, int c, int d);
+FxListD* fn_8032F19C(FxListD* self, int a, int* b, int c);
+FxListD* fn_8032F4CC(FxListD* self, int a, int b, int c);
 void fn_8032ED80(FxListD* self);
 FxListD* fn_8032F120(FxListD* self, int a, int b);
 void fn_8032F22C(FxListD* self);
@@ -118,6 +162,20 @@ void fn_80331B48();
 
 // FUNCS-BEGIN
 
+FxIntD* fn_8032ECD8(FxIntD* self, int a, int b, int c, int d) {
+    FxWidInit((FxListD*)self, (int)lbl_805ED9AC);
+    self->m50 = b;
+    *(const void**)((char*)self + 8) = lbl_80666C90;
+    self->m58 = c;
+    self->m5C = d;
+    self->m48 = 0;
+    self->m54 = a;
+    self->m60 = 1;
+    self->m64 = 0;
+    self->m4C = a;
+    return self;
+}
+
 /* near-miss: argument evaluation order and frame size */
 void fn_8032ED80(FxListD* self) {
     char buf[0x30];
@@ -126,17 +184,25 @@ void fn_8032ED80(FxListD* self) {
     fn_80313F28(lbl_8061FEDC, buf);
 }
 
-/* near-miss: retail keeps the first of the two vptr stores; ours drops it */
 FxListD* fn_8032F120(FxListD* self, int a, int b) {
-    *(const void**)((char*)self + 8) = lbl_80666EC0;
-    self->mC = 0;
+    FxRootInit(self);
     *(const void**)((char*)self + 8) = lbl_80666E70;
-    self->m4 = self->m0 = lbl_805ED9E0;
+    self->mC = 0;
     fn_8032D868(self, a);
     self->m48 = 0;
-    self->m4C = b;
-    *(const void**)((char*)self + 8) = lbl_80666C40;
     self->m50 = b;
+    *(const void**)((char*)self + 8) = lbl_80666C40;
+    self->m4C = b;
+    return self;
+}
+
+FxListD* fn_8032F19C(FxListD* self, int a, int* b, int c) {
+    FxWidInit(self, a);
+    self->m48 = b;
+    self->m50 = c;
+    *(const void**)((char*)self + 8) = lbl_80666C40;
+    if (b) *b = c;
+    else self->m4C = c;
     return self;
 }
 
@@ -147,6 +213,43 @@ void fn_8032F22C(FxListD* self) {
     float w = lbl_805ED9F8 - fn_80313F28(lbl_8061FEDC, buf);
     fn_8032D8D0(self);
     fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
+FxListD* fn_8032F38C(FxListD* self, int a, int b, int c, int d, int e) {
+    FxWidInit(self, a);
+    self->m48 = (int*)b;
+    self->m50 = c;
+    self->m54 = d;
+    self->m58 = 0;
+    self->m5C = e;
+    *(const void**)((char*)self + 8) = lbl_80666BD8;
+    fn_8032F574(self, e);
+    return self;
+}
+
+FxListD* fn_8032F428(FxListD* self, int a, int b, int c, int d) {
+    FxWidInit(self, a);
+    self->m48 = 0;
+    self->m4C = 0;
+    self->m50 = b;
+    self->m54 = c;
+    self->m58 = 0;
+    self->m5C = d;
+    *(const void**)((char*)self + 8) = lbl_80666BD8;
+    if (c > 0) fn_8032F574(self, d);
+    return self;
+}
+
+FxListD* fn_8032F4CC(FxListD* self, int a, int b, int c) {
+    FxWidInit(self, (int)lbl_805EDA04);
+    self->m48 = 0;
+    self->m50 = a;
+    self->m54 = b;
+    self->m58 = 0;
+    self->m5C = c;
+    *(const void**)((char*)self + 8) = lbl_80666BD8;
+    if (b > 0) fn_8032F574(self, c);
+    return self;
 }
 
 void fn_8032F574(FxListD* self, int a) {
@@ -263,6 +366,18 @@ int fn_80330018(FxCmd* self, int k) {
         }
     }
     return r;
+}
+
+/* near-miss (2 slots): retail stores the vptr before m5C; every order of the tail
+ * stores gives m5C first or swaps the ring/vtable registers (r28/r29) */
+FxRingW* fn_803302D4(FxRingW* self, int a, int b) {
+    FxWidInit((FxListD*)self, a);
+    FxRingInit(&self->m48, self->m64, 10);
+    self->m48.m10 = lbl_8064B298;
+    self->m5C = 0;
+    *(const void**)((char*)self + 8) = lbl_80666A68;
+    self->m60 = b;
+    return self;
 }
 
 void fn_80330778(FxStackG* self, int a) {

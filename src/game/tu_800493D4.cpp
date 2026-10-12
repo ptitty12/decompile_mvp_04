@@ -32,6 +32,14 @@ void fn_800497F0(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     }
 }
 
+extern "C" void fn_80049C0C();
+
+extern "C" void fn_80049BEC()
+{
+    fn_80049C0C();
+}
+
+
 void fn_8004A864(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (a->m3DC == 0) {

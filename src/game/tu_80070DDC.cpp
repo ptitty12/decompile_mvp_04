@@ -222,6 +222,66 @@ void fn_800710FC(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + (i << 4), 16);
 }
 
+/* Every column yields 0; the original keeps the case tree as dead compares
+   (PATTERNS, "Hard-case families 4"). */
+int fn_80071138(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+int fn_80071154(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 unsigned fn_80071170(void* l, int k, unsigned c)
 {
     Unk80071604* a = (Unk80071604*)l;

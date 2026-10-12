@@ -120,9 +120,7 @@ void fn_80321A78(int unused, int a, int b, int c, int d, int e, int f, int g) {
 }
 
 // fn_803220E0
-FxU::FxU() {
-    m4 = -1;
-    m0 = -1;
+FxU::FxU() : m0(-1), m4(-1) {
 }
 
 void fn_803220F4(FxU* a, char* b, int c, char* d, int e) {

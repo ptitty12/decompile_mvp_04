@@ -1,0 +1,43 @@
+# old placeholder name<TAB>current symbols.txt name. Lets tools/match/check_literals.py
+# resolve references in sources written before a symbol got its real name.
+fn_803A6644	SNDAEMS_removemodulebank
+fn_803A84BC	SNDbankheadercopy
+fn_803A8530	SNDbankheadersize
+fn_803A85B0	SNDBANK_play
+fn_803AB278	SNDSTRM_getprogvol
+fn_804089B4	sprintf
+fn_80408A94	sscanf
+fn_80409BF0	vsprintf
+fn_80409C4C	vsnprintf
+fn_80409CC0	__assert
+fn_80409CF0	atexit
+fn_80409D88	atof
+fn_80409DAC	atoi
+fn_8040A208	qsort
+fn_8040ABA0	rand
+fn_8040B100	memcmp
+fn_8040B190	memcpy
+fn_8040B320	memset
+fn_8040B3B4	strcasecmp
+fn_8040B448	strcat
+fn_8040B4D8	strchr
+fn_8040B574	strcmp
+fn_8040B61C	strcpy
+fn_8040B6A0	strlen
+fn_8040B70C	strlwr
+fn_8040B750	strncmp
+fn_8040B830	strncpy
+fn_8040B8FC	strrchr
+fn_8040B948	strstr
+fn_8040B9B0	strtok
+# symbols NOT renamed in symbols.txt because game code still uses the placeholder (the ported SND sources use the name on the right):
+fn_803BA44C	GetRefCount__Q24Csis5ClassPi
+fn_803BA378	Release__Q24Csis5Class
+fn_803A979C	SNDSYS_leavecritical
+fn_803A975C	SNDSYS_entercritical
+fn_803A9204	SNDplaysetdef
+fn_803ADA2C	SNDvol
+fn_803AB480	SNDstop
+fn_80432FD4	DCFlushRange
+fn_803BA80C	SetFast__Q24Csis14GlobalVariablePQ24Csis20GlobalVariableHandlePv
+fn_803A8648	SNDbankremove

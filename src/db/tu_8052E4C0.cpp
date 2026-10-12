@@ -91,6 +91,234 @@ extern "C" DB_OVERLAY void fn_8052E718(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x54, 0x54);
 }
 
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+extern "C" DB_OVERLAY int fn_8052E754(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = -1;
+        break;
+    case 1:
+        r = -1;
+        break;
+    case 2:
+        r = -1;
+        break;
+    case 3:
+        r = -1;
+        break;
+    case 4:
+        r = -1;
+        break;
+    case 5:
+        r = -1;
+        break;
+    case 6:
+        r = -1;
+        break;
+    case 7:
+        r = -1;
+        break;
+    case 8:
+        r = -1;
+        break;
+    case 9:
+        r = -1;
+        break;
+    case 10:
+        r = -1;
+        break;
+    case 11:
+        r = -1;
+        break;
+    case 12:
+        r = -1;
+        break;
+    case 13:
+        r = -1;
+        break;
+    case 14:
+        r = 1;
+        break;
+    case 15:
+        r = 31;
+        break;
+    case 16:
+        r = 7;
+        break;
+    case 17:
+        r = 1;
+        break;
+    case 18:
+        r = 3;
+        break;
+    case 19:
+        r = 0;
+        break;
+    case 20:
+        r = 0;
+        break;
+    case 21:
+        r = 65535;
+        break;
+    case 22:
+        r = 65535;
+        break;
+    case 23:
+        r = 65535;
+        break;
+    case 24:
+        r = 65535;
+        break;
+    case 25:
+        r = 65535;
+        break;
+    case 26:
+        r = 65535;
+        break;
+    case 27:
+        r = 65535;
+        break;
+    case 28:
+        r = 65535;
+        break;
+    case 29:
+        r = 65535;
+        break;
+    case 30:
+        r = 65535;
+        break;
+    case 31:
+        r = 65535;
+        break;
+    case 32:
+        r = 65535;
+        break;
+    case 33:
+        r = 65535;
+        break;
+    case 34:
+        r = 3;
+        break;
+    }
+    return r;
+}
+
+extern "C" DB_OVERLAY int fn_8052E8D8(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    case 18:
+        r = 0;
+        break;
+    case 19:
+        r = 0;
+        break;
+    case 20:
+        r = 0;
+        break;
+    case 21:
+        r = 0;
+        break;
+    case 22:
+        r = 0;
+        break;
+    case 23:
+        r = 0;
+        break;
+    case 24:
+        r = 0;
+        break;
+    case 25:
+        r = 0;
+        break;
+    case 26:
+        r = 0;
+        break;
+    case 27:
+        r = 0;
+        break;
+    case 28:
+        r = 0;
+        break;
+    case 29:
+        r = 0;
+        break;
+    case 30:
+        r = 0;
+        break;
+    case 31:
+        r = 0;
+        break;
+    case 32:
+        r = 0;
+        break;
+    case 33:
+        r = 0;
+        break;
+    case 34:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 extern "C" DB_OVERLAY unsigned fn_8052E9C4(Unk80071604* self, unsigned kind, unsigned i)
 {
     unsigned r = 0;
@@ -466,6 +694,100 @@ extern "C" DB_OVERLAY void fn_8052F518(Unk80071604* self, unsigned i)
 {
     if (i < self->m1C)
         fn_8040074C(self->m24 + (i << 4), 0x10);
+}
+
+extern "C" DB_OVERLAY int fn_8052F554(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
+extern "C" DB_OVERLAY int fn_8052F590(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    }
+    return r;
 }
 
 extern "C" DB_OVERLAY unsigned fn_8052F5CC(Unk80071604* self, unsigned kind, unsigned i)
