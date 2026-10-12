@@ -35,6 +35,93 @@ int fn_800F1DD4(int a, int b, int c)
     return b + c - a;
 }
 
+struct UiColor4 {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+class UiX35v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35(UiColor4 c);
+};
+class UiX35 : public UiX35v {
+public:
+    char pad40[0x8C - 0x40];
+    UiColor4 m8C;
+    UiColor4 m9C;
+};
+UiColor4* fn_8014DBA0(UiColor4* out, int r, int g, int b, int a);
+void fn_800F2068(int unused, UiX35* self, int on)
+{
+    UiColor4 c;
+    if (on)
+        fn_8014DBA0(&c, 0xE0, 0xE0, 0xE0, 0xFF);
+    else
+        fn_8014DBA0(&c, 0xDA, 0x1E, 0x22, 0xFF);
+    self->v35(c);
+    self->m8C = c;
+    self->m9C = c;
+}
+
+struct UiP16C {
+    char pad0[0x16C];
+    int m16C;
+};
+struct UiV21D4 : UiObj {
+    char pad40[0x194 - 0x40];
+    int m194;
+    char pad198[0x1B0 - 0x198];
+    int a1B0[2];
+    char pad1B8[0x1C4 - 0x1B8];
+    int m1C4;
+};
+int fn_800968C0(UiP16C* p, int a, int b);
+int fn_8009692C(UiP16C* p, int a);
+int fn_800F21D4(UiV21D4* self, int idx, UiP16C* p)
+{
+    unsigned char x = fn_8009692C(p, fn_800968C0(p, self->m1C4, 1));
+    unsigned y = fn_800F1DD4(x, (self->a1B0[idx] + 6) % p->m16C, p->m16C);
+    switch (self->m194) {
+    case 1:
+        if (idx == 0)
+            return x == 0;
+        return y <= 3;
+    case 2:
+        if (idx == 0)
+            return y <= 3;
+        return 1;
+    default:
+        return 1;
+    }
+}
+
+
+struct UiV2298 : UiObj {
+    char pad40[0x194 - 0x40];
+    int m194;
+};
+extern int lbl_805C3D24[];
+int fn_800F1DF4(UiV2298* self, int a, int b, int c, int d);
+int fn_800F2148(UiV2298* self);
+int fn_800F2298(UiV2298* self, int a, int b, int c)
+{
+    int ok = 1;
+    for (int i = 0; i <= 3; i++) {
+        char* base = (char*)self + 0x1B8;
+        int o = lbl_805C3D24[i] * 4;
+        ok = (ok != 0) & (fn_800F1DF4(self, a, b, *(int*)(base + o), i) != 0);
+    }
+    ok = (ok & (fn_800F2148(self) ^ 1)) != 0;
+    return (ok != 0) & (fn_800F21D4((UiV21D4*)self, a == 0, (UiP16C*)c) != 0);
+}
+
 void fn_800F26A0(UiScr168* self, int a)
 {
     UiRing* r = (UiRing*)&self->m168;
@@ -148,6 +235,58 @@ int fn_800F371C(UiObj* self)
 {
     self->v67(1, 0);
     return 1;
+}
+
+class UiX79v : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+  virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34(); virtual void v35();
+  virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39(); virtual void v40();
+  virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44(); virtual void v45();
+  virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49(); virtual void v50();
+  virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55();
+  virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60();
+  virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64(); virtual void v65();
+  virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69(); virtual void v70();
+  virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74(); virtual void v75();
+  virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79(UiMsg* m);
+};
+class UiX79 : public UiX79v {
+public:
+    char pad40[0x138 - 0x40];
+    int m138;
+};
+extern char lbl_805BE414[];
+extern char lbl_805BE138[];
+void fn_800F375C(UiX79* self, int kind, int a)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    switch (kind) {
+    case 0:
+        if (fn_800B57EC(fn_800B555C()) != 0) {
+            fn_8040B830(p->name, lbl_805BE414, 15);
+            p->name[15] = 0;
+        } else {
+            fn_8040B830(p->name, lbl_805BE138, 15);
+            p->name[15] = 0;
+        }
+        fn_800B7B4C(UiGetMsgMgr(), &m, (UiObj*)self);
+        break;
+    case 1:
+        if (self->m138 == 0) {
+            fn_800B555C()->m570 = a;
+            self->v79(p);
+            fn_800B7B4C(UiGetMsgMgr(), p, (UiObj*)self);
+        }
+        break;
+    }
 }
 
 void fn_800F388C(UiV_134* self, char* out)
