@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801CF054.h"
+#include "game/tu_801C6D2C.h"
 #include "game/goals/tu_8027A84C.h"
 #include "game/goals/tu_8027C728.h"
 
@@ -20,13 +21,16 @@ struct Unk801CF054_T {
     Unk801B7FB0_P* m8[3];
 };
 extern Unk801CF054_T* lbl_8068B618;
+
 inline Unk801B7FB0_P* GetP(Unk801B7FB0_P** a, unsigned i)
 {
     if (i <= 2)
         return a[i];
     return 0;
 }
+
 inline int GetJ(Unk801B7FB0_Arr* a, int i) { return a->m14[i]; }
+
 typedef Unk801C16B0_Z Z;
 
 /* Goal storage at goal+0x18 (full layout in goals/tu_80287600.h, which also declares
@@ -38,6 +42,8 @@ public:
 extern "C" Unk8027C728_Goal* fn_802448F4(Unk801B7FB0_P* p, int k);
 void fn_8027C728(Unk8027C728_Goal* g);
 void fn_8027D33C(Unk8027C728_Goal* g);
+void fn_8027D368(Unk8027C728_Goal* g);
+int fn_8027D3E8(Unk8027C728_Goal* g, int a, float* outF, Vec3* pos6, Vec3* pos7, float* out8);
 extern "C" Vec3* fn_801C342C(Vec3* out, Z* z);
 extern "C" void fn_80187D20(Unk801B7FB0_P* c, int k, float a, float b, float c2);
 extern "C" Unk801B7FB0_P* fn_801A4B34(Unk801B7FB0_P* ctx);
@@ -56,6 +62,37 @@ void fn_8035B1C8(void* p);
 void fn_801D6FE4(void* p);
 void fn_801D5CF0(Y* y);
 int fn_8022F138(void* p);
+}
+
+struct Unk801CF054_V2 {
+    float x;
+    float y;
+};
+extern "C" void fn_8022EA60(Unk801CF054_V2* out, void* a, ...);
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" float fn_80235DA8(void* p);
+extern "C" int fn_801D7998(void* self, Unk801CF054_V2 v);
+extern "C" int fn_801D7A3C(void* self, int k);
+struct Unk801CF054_R {
+    char pad0[0x30];
+    int m30;
+};
+extern "C" Unk801CF054_R* fn_801A6DB8(P* p);
+struct Unk801CF054_F4 {
+    float v[4];
+};
+extern Unk801CF054_F4 lbl_805D2788;
+extern "C" float fn_801D1994(Y* y);
+extern "C" float fn_801D15C0(Y* y);
+extern "C" float fn_8024D0F8(P* p, int k);
+extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v);
+extern "C" void fn_801D0C38(Y* y, Unk801CF054_V2 in, Unk801CF054_V2* out);
+extern Unk801CF054_V2 lbl_8060558C;
+extern const char lbl_805D25E0[];
+inline float RandF2(Unk8014D8AC* r, float scale, const char* file, int line)
+{
+    return (float)(unsigned)r->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
 }
 
 inline void SetMode(Unk801C16B0_Mode* m, int v)
@@ -126,6 +163,19 @@ extern "C" void fn_801CFB28(Z* z, float a, float b, float c)
     int r3 = fn_801CF96C(z, c, &oc);
     if (r1 && r2 && r3)
         fn_80187D20(z->m204->m6CC, 1, oa, ob, oc);
+}
+
+extern "C" void fn_801CFBC4(Y* y, P* p, float* a, float* b, float* c, float* d, float* e)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 1);
+    g->m10 = 0;
+    fn_8027C728(g);
+    fn_8027D3E8(g, 8, a, 0, 0, 0);
+    fn_8027D3E8(g, 9, b, 0, 0, 0);
+    fn_8027D3E8(g, 10, c, 0, 0, 0);
+    fn_8027D3E8(g, 11, d, 0, 0, 0);
+    fn_8027D3E8(g, 12, e, 0, 0, 0);
+    fn_8027D368(g);
 }
 
 extern "C" void fn_801D0288(Y* y) { y->m1F4 = 1; }
@@ -269,18 +319,74 @@ extern "C" int fn_801D112C(Y* y)
 
 extern "C" int fn_801D1198(Y* y) { return fn_8022F138(((Unk801C16B0_M4*)y->m34)->m3B0) != 0; }
 
+/* near-miss: same code; the frame slots differ (retail: lim 8, abs 0x10, f 0x18, by-value temp 0x20, b 0x28). */
+extern "C" int fn_801D14A0(Y* y)
+{
+    Unk801CF054_V2 b = lbl_8060558C;
+    float f;
+    fn_801D0C38(y, lbl_8060558C, &b);
+    const float lim = 2.0f;
+    if (AbsF(b.x) > lim)
+        return 0;
+    if (AbsF(b.y) > lim)
+        return 0;
+    f = fn_801D21F4(y, &b);
+    return RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x283) <= f;
+}
+
+extern "C" float fn_801D17D0(Y* y, Unk801CF054_V2* pos)
+{
+    float r = 0.0f;
+    char* self = (char*)y->m2C + 8;
+    int k = fn_801D7A3C(self, fn_801D7998(self, *pos));
+    if (fn_801A6DB8(y->m30)->m30)
+        k = 2;
+    switch (k) {
+    case -1:
+        r = 0.0f;
+        break;
+    case 0:
+        r = 0.333333f;
+        break;
+    case 1:
+        r = 0.666667f;
+        break;
+    case 2:
+        r = 1.0f;
+        break;
+    }
+    return r;
+}
+
 extern "C" float fn_801D18B4(void)
 {
     char buf[16];
     return 0.0f;
 }
 
-struct Unk801CF054_V2 {
-    float x;
-    float y;
-};
-extern "C" void fn_8022EA60(Unk801CF054_V2* out, void* a, ...);
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+extern "C" float fn_801D18C8(Y* y)
+{
+    float t = 1.0f - fn_80235DA8(((Unk801C16B0_M4*)y->m34)->m3B0);
+    Unk801CF054_F4 tbl = lbl_805D2788;
+    t = t * tbl.v[fn_801D0BB0(y)];
+    t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+    return t;
+}
+
+extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
+{
+    int small = 0;
+    if (!(AbsF(v->x) > 1.0f))
+        small = AbsF(v->y) <= 1.0f;
+    float t = 0.0f;
+    if (small)
+        t = fn_801D1994(y);
+    else
+        t = fn_801D15C0(y);
+    P* q = fn_801A4B34(y->m30);
+    t = t + LerpATB(-0.25f, fn_8024D0F8(q, 0x11), 0.25f);
+    return t;
+}
 
 extern "C" int fn_801D251C(Y* y)
 {
