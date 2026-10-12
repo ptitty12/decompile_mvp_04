@@ -394,6 +394,23 @@ extern "C" void fn_803FAA38(void* p)
     fn_80435DFC(lbl_806ADE74);
 }
 
+extern "C" int fn_803FAA84(RcJob*)
+{
+    int i = 0;
+    fn_80435D20(lbl_806ADE74);
+    for (; i < lbl_806ADE4C.m4; i++) {
+        if (*((unsigned char*)lbl_806ADE4C.m1C + i * 0x144 + 4) == 0) {
+            *((unsigned char*)lbl_806ADE4C.m1C + i * 0x144 + 4) = 1;
+            break;
+        }
+    }
+    fn_80435DFC(lbl_806ADE74);
+    if (i == lbl_806ADE4C.m4)
+        for (;;)
+            ;
+    return (int)(lbl_806ADE68[0] + i * 0x144);
+}
+
 extern "C" void fn_803FAB1C(void* p)
 {
     fn_80435D20(lbl_806ADE74);
