@@ -515,7 +515,6 @@ struct VY884 {
 extern int lbl_8062427C;
 extern int lbl_806242B4;
 
-
 extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 {
     for (int i = 0; i < o->m4; i++) {
@@ -631,6 +630,27 @@ extern "C" void fn_8037EA7C(Unk8037E9D0* o, int v)
         o->mC->v7(0);
     }
     o->m854 = v;
+}
+
+extern "C" void fn_8037EB3C(Unk8037E9D0* o, int v)
+{
+    if (v == 0)
+        goto t74;
+    if (o->m858 != 0)
+        goto t74;
+    if (o->m862 == 0)
+        goto done;
+t74:
+    if (o->m862 != 0)
+        goto done;
+    if (v != 0)
+        goto done;
+    if (o->m858 == 0)
+        goto done;
+    o->mC->v6(8);
+    o->mC->v7(8);
+done:
+    o->m858 = v;
 }
 
 extern "C" void fn_8037EBE8(Unk8037E9D0* o)
