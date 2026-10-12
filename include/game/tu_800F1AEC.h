@@ -110,7 +110,7 @@ public:
     virtual void v81();
     virtual void v82();
     virtual void v83();
-    virtual void v84();
+    virtual void v84(int a, int b);
     virtual void v85();
     virtual void v86();
     virtual void v87();
@@ -879,7 +879,9 @@ struct Ui800B555C {
     unsigned int m4;
     char pad8[0x570 - 8];
     int m570;
-    char pad574[0x624 - 0x574];
+    int m574;
+    int m578;
+    char pad57C[0x624 - 0x57C];
     int m624;
     char pad628[0x664 - 0x628];
     int m664;
@@ -1515,5 +1517,26 @@ void fn_800F84F4(UiObj* self);
 void fn_8010D258();
 void fn_801083AC(UiObj* self);
 void fn_8010A0A4(UiObj* self);
+
+/* Sub-objects of a screen item, reached through fn_800C8058 (+0xDC) / fn_800C8054 (+0x98): a 0x24-byte
+ * data pad, then the vptr. Evidence: fn_801018F4, fn_80102FA8, fn_80103BA4. */
+struct UiSubPad24 {
+    char pad0[0x24];
+};
+class UiSubAt98 : public UiSubPad24 {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
+    virtual void v20(int a, int b);
+};
+class UiSubAtDC : public UiSubPad24 {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual int v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20(int a, int b);
+};
 
 #endif

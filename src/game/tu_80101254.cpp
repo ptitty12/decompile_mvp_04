@@ -4,9 +4,8 @@
  */
 #include "game/tu_800F1AEC.h"
 
-struct UiSubBase18F4 {
-    char pad0[0x24];
-};
+extern "C" void* fn_800C8058(int);
+
 #include "game/tu_8001B190.h"
 extern char lbl_805BF3D4[];
 extern char lbl_805BF468[];
@@ -64,14 +63,6 @@ void fn_80118770(UiObj* a);
 void fn_8011A0A4(int a, UiObj* b, char* c);
 extern char lbl_805BF240[];
 extern char lbl_805BE5A4[];
-class UiSub98 : public UiSubBase18F4 {
-public:
-    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
-    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
-    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
-    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
-    virtual void v20(int a, int b);
-};
 Unk8001BC8C* fn_8001BC4C();
 void fn_801006D4(UiV_20i_24i_28i_2Ci* self, int idx);
 void fn_801015EC(void* self, UiObj* obj, int idx);
@@ -92,14 +83,6 @@ struct UiScr2B4 : UiScr2A8 {
     Ui2B4Obj* m2B4;
 };
 extern char lbl_805BF19C[];
-extern "C" void* fn_800C8058(int);
-class UiSubDC : public UiSubBase18F4 {
-public:
-    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
-    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
-    virtual int v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
-    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20(int a, int b);
-};
 
 extern char lbl_806592A0[];
 extern char lbl_806597A0[];
@@ -178,7 +161,7 @@ void fn_801016A0(UiScr2A8* self)
     for (int i = 0; i < 10; i++)
         self->m244[i]->w10(0);
     UiObj* o = (UiObj*)fn_800C8058(self->m2A8->v32((int)lbl_805BF19C, 1));
-    ((UiSubDC*)((char*)o + 0xDC))->v15();
+    ((UiSubAtDC*)((char*)o + 0xDC))->v15();
     if (fn_80101344((UiV_2ACi*)self) != 0) {
         fn_801015EC(self, o, 0);
         fn_801015EC(self, o, 1);
@@ -209,7 +192,7 @@ void fn_801018F4(UiScr2A8* self)
 {
     if (self->m26C != 10)
         self->m244[self->m26C]->w10(0);
-    self->m26C = ((UiSubDC*)((char*)fn_800C8058(self->m2A8->v32((int)lbl_805BF19C, 1)) + 0xDC))->v11();
+    self->m26C = ((UiSubAtDC*)((char*)fn_800C8058(self->m2A8->v32((int)lbl_805BF19C, 1)) + 0xDC))->v11();
     self->m244[self->m26C]->w3();
     self->m244[self->m26C]->w10(1);
     fn_80101A64(self);
@@ -511,7 +494,7 @@ void fn_80102FA8(UiObj* self)
         o->v29(0x4062);
         break;
     }
-    ((UiSub98*)((char*)fn_800C8054(self->v32((int)lbl_805BE5A4, 1)) + 0x98))->v20(e->m198, 0);
+    ((UiSubAt98*)((char*)fn_800C8054(self->v32((int)lbl_805BE5A4, 1)) + 0x98))->v20(e->m198, 0);
 }
 
 extern char lbl_80652B78[];
@@ -630,8 +613,8 @@ void fn_80103BA4(UiObj* self)
     UiP54* p = (UiP54*)fn_8011AA24(0)->m6F8;
     UiQ1CC8* q = p->m14;
     UiObj* a = (UiObj*)fn_800C8060(self->v32((int)lbl_805BF3A8, 1));
-    ((UiSubDC*)((char*)fn_800C8058(a->v73(1, 0)->v32((int)lbl_805BEAB8, 1)) + 0xDC))->v20(q->mFFC, 0);
-    ((UiSubDC*)((char*)fn_800C8058(a->v73(2, 0)->v32((int)lbl_805BEAC0, 1)) + 0xDC))->v20(q->m198, 0);
+    ((UiSubAtDC*)((char*)fn_800C8058(a->v73(1, 0)->v32((int)lbl_805BEAB8, 1)) + 0xDC))->v20(q->mFFC, 0);
+    ((UiSubAtDC*)((char*)fn_800C8058(a->v73(2, 0)->v32((int)lbl_805BEAC0, 1)) + 0xDC))->v20(q->m198, 0);
     fn_80118770(a);
     int var;
     if (p->m54 != 0 && p->m14->m1CD0 != 0)
