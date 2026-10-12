@@ -19,6 +19,7 @@ You are a matching worker on a private matching decompilation of MVP Baseball 20
 - Make a worklist from build/GV4E69/report.json: functions in your units with fuzzy_match_percent == 0 and size <= 0x400, sorted by size. Write each from its m2c draft, typed with the unit's existing structs.
 - Give each function at most about 20 minutes. If it is not 100% by then, keep it only if it is at least 95% and builds (with a /* near-miss */ note); otherwise drop it and move on. Do NOT re-try existing near-misses.
 - Identical masked instruction words do NOT mean a match: branch destinations count.
+- Never write a symbol's address as an integer literal (in code or in a local table initializer): name the symbol (`extern char lbl_X[];` and use `lbl_X`). check_literals resolves pointers to externs (since 2026-10-12), so the symbolic form checks clean.
 - Functions appended after a unit's `extern "C" {}` block need their own `extern "C" { }`.
 - Recipes:
   - switch kind-checks written index-first keep the case value live;
@@ -41,6 +42,8 @@ You are a matching worker on a private matching decompilation of MVP Baseball 20
   - `Q22/hill.py`;
   - variant scoring `Q27/rv.py`;
   - flag probe `TAIL/probe.py`.
+- Installing code: `Q12/ins.py <unit> <fn> <file> --auto` inserts without re-sorting; `Q16/put.py` and plain ins.py re-sort via sort_functions, which can move a `static inline` helper below its users and break the build.
+- A function with an unmangled symbol that another unit references can't be renamed by rename.py: define it `extern "C"`. A callee called with more arguments than its definition needs an `extern "C"` declaration under its exact mangled symbol name.
 - Write Python helpers with the Write tool, not heredocs. Preserve line endings (never `sed -i` on sources: it strips CRLF). Never write the word "asm" in source, even in comments.
 
 Before each commit:

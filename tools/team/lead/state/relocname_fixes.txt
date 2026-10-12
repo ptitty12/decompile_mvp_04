@@ -1,4 +1,3 @@
-# RESOLVED 2026-10-12 (lead session 2): all 19 functions below score 100 % on origin/main ed050c58.
 # Functions whose masked code equals retail but objdiff scores <100% (relocation symbol-name differences).
 # Fix by making the referenced symbol name match the target's (symbols.txt name vs source name), e.g.
 # sndgs vs lbl_8069CA48, __8UiMsgMgr vs fn_800B64BC, __builtin_vec_delete vs fn_80377488 (spell out delete[]).
