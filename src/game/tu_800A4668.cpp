@@ -718,6 +718,42 @@ extern "C" void fn_800A724C(char* o, int a, Unk800A724C_Stream* s)
     s->v1(a, o + 0x528, 0xC);
 }
 
+struct A240x {
+    int w[60];
+};
+struct A1080x {
+    int w[270];
+};
+struct R12x {
+    int a;
+    int b;
+    int c;
+};
+struct R20x {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+};
+struct Unk800A72E4 {
+    A240x a;
+    A1080x b;
+    R12x c;
+    int d;
+    R20x e;
+};
+
+extern "C" void fn_800A72E4(Unk800A72E4* dst, Unk800A72E4* src)
+{
+    fn_800A6D60(dst);
+    dst->a = src->a;
+    dst->b = src->b;
+    dst->c = src->c;
+    dst->e = src->e;
+    dst->d = src->d;
+}
+
 /* near-miss (7 of 43 slots): address-arithmetic operand order in the index expressions */
 
 extern "C" void fn_800A7404(char* o, int i, int kind, int j, void* out, int* res)
