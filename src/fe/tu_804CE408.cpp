@@ -68,25 +68,24 @@ extern "C" FE_OVERLAY FeScrM* fn_804CEF34(FeScrM* self, int a, int b, int c, int
     return self;
 }
 
-/* near-miss: retail recomputes `addi r4,r1,8` before each call; we keep &p in a callee-saved
- * register (open: locals at a nonzero frame offset, see PATTERNS). */
+/* fn_804D21B8 takes an 8-byte pointer-to-member by value (its definition in tu_804D08D0):
+   SysV passes it as a pointer to a caller temp at 8(r1), rebuilt for each call. The header
+   prototype takes FePair*, so call through the by-value type. */
+typedef void (*FeSetPairFn)(FeSlot44*, FePair);
+#define FeSetPair(s, v) ((FeSetPairFn)fn_804D21B8)((s), (v))
+
 extern "C" FE_OVERLAY void fn_804CF304(FeScrM* x)
 {
     fn_800EB41C((UiS*)x);
-    FePair p = lbl_805F84B8;
-    fn_804D21B8(&x->m188, &p);
-    p = lbl_805F84B8;
-    fn_804D21B8(&x->m144, &p);
+    FeSetPair(&x->m188, lbl_805F84B8);
+    FeSetPair(&x->m144, lbl_805F84B8);
 }
 
-/* near-miss: same as fn_804CF304. */
 extern "C" FE_OVERLAY void fn_804CF368(FeScrM* x)
 {
     fn_800ED254(x);
-    FePair p = lbl_805F84C0;
-    fn_804D21B8(&x->m188, &p);
-    p = lbl_805F84C0;
-    fn_804D21B8(&x->m144, &p);
+    FeSetPair(&x->m188, lbl_805F84C0);
+    FeSetPair(&x->m144, lbl_805F84C0);
 }
 
 extern "C" FE_OVERLAY void fn_804CF7B4(FeScrM* x)
