@@ -209,7 +209,8 @@ struct IterObj {
 struct Ent5C {
     float m0;
     int m4;
-    char pad8[0x34 - 8];
+    char pad8[0x30 - 8];
+    int m30;
     int m34;
     char pad38[0x5C - 0x38];
 };
@@ -249,7 +250,9 @@ struct TaskInner {
     int m1F4;
     char pad1F8[0x20C - 0x1F8];
     int m20C;
-    char pad210[0x6D0 - 0x210];
+    char pad210[0x6A8 - 0x210];
+    int m6A8;
+    char pad6AC[0x6D0 - 0x6AC];
     Ent5C m6D0[8]; /* nine entries are indexed (k <= 8); the ninth reaches 0xA0C and overlaps m9FC in the declaration */
     char pad9B0[0x9FC - 0x9B0];
     Rec16 m9FC[8];

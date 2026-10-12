@@ -16,17 +16,64 @@ void fn_801F0174(Task* t, int a, int b);
 int fn_801E817C(Obj3A64* p, int x);
 void fn_802278F4(Task* t);
 void fn_801F0EA8(Task* t, int a);
-void fn_801EE6F4(Task* t, int a);
+int fn_801EE6F4(Task* t, int a);
 void fn_80213988(Task* t, int a, int b);
 void fn_8021D4A4(Task* t);
 int fn_801F0F30(Task* t);
 void fn_8022A71C(Task* t, int a, int b);
 int fn_802055F4(TaskInner* in);
+void fn_802044A4(Task* t, int a, void* p, float f);
+int fn_80205664(TaskInner* in);
+void fn_801E8A3C(Obj3A64* p, int a, int b);
+void fn_8021CE28(Task* t, float f);
+int fn_80210C98(Sub* t, int kind);
+void fn_8021354C(Task* t, int a, int b);
+void fn_8021B6EC(Task* t, int a, int b);
+void fn_80214F1C(Task* t, float f, int a, int b);
 }
 
 extern "C" {
 
 extern Vec3f lbl_805D63F4;
+extern float lbl_805D63EC[1];
+
+void fn_8022309C(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Obj4_36C* o = t->m9C->m4;
+    if (e->mA4 == 1) {
+        fn_802044A4(t, a, (char*)q + 0x48, e->m84);
+        e->mA4 = 0;
+    }
+    if (fn_80205664(t->m9C) == 1) {
+        fn_801E8A3C(t->m9C->m3A64, a, -1);
+    }
+    if (o->m36C != 0) {
+        t->m9C->mA4 = -1;
+        t->m9C->m30 = 4;
+        if (o->m36C->m460 != a) {
+            e->mA4 = 1;
+            e->m80 = lbl_805D63EC[0];
+            e->m9C = 0;
+            e->mAC = 0;
+        } else {
+            int r;
+            if (t->m9C->m6A8 == 1 && fn_80210C98((Sub*)&t->m9C, 3) == 0 && (r = fn_802055F4(t->m9C)) == 0) {
+                fn_80205450(t->m9C, a);
+                fn_801EE6F4(t, a);
+                fn_801F0EA8(t, a);
+                fn_802123D4(t, 1, 1);
+                fn_8021CE28(t, 0.8333334f);
+                t->m9C->m6A8 = r;
+            } else {
+                fn_801EE6F4(t, a);
+                fn_801F0EA8(t, a);
+                fn_801F0174(t, a, 0);
+            }
+        }
+    }
+}
+
 void fn_8022321C(Task* t, int idx, RecQueue* q)
 {
     Rec* e = &q->e[0];
@@ -54,6 +101,38 @@ void fn_8022359C(Task* t, int a, RecQueue* q)
 inline RecQueue* RqAt(RecQueue* b, int k)
 {
     return b + k;
+}
+
+void fn_80223780(Task* t, int a)
+{
+    fn_80205450(t->m9C, a);
+    int k = fn_80211BB0(&t->m9C->mC0, a);
+    if (k != -1) {
+        fn_80211BA0(&t->m9C->mC0, k);
+        fn_802123D4(t, 0, 0);
+        fn_80213988(t, k, 1);
+    } else {
+        k = fn_80211BB0(&t->m9C->mD4, a);
+        if (k != -1) {
+            fn_80211BA0(&t->m9C->mD4, k);
+            fn_802123D4(t, 0, 0);
+            fn_80213B80(t, k, 2, 3);
+        } else {
+            TaskInner* in = t->m9C;
+            int f = 0;
+            if ((unsigned)(in->m30 - 1) <= 1 && in->mA4 != -1 && in->m0->m6CC->m36C == 0) {
+                f = in->m6D0[a].m30 <= 1;
+            }
+            if (f == 1) {
+                fn_802123D4(t, 1, 1);
+                fn_8021354C(t, 3, 4);
+            } else {
+                fn_802123D4(t, 1, 1);
+                fn_8021B6EC(t, 1, 1);
+                fn_80214F1C(t, -1.0f, 1, 2);
+            }
+        }
+    }
 }
 
 void fn_80223910(Task* t, int a)
