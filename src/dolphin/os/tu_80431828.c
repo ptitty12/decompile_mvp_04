@@ -5,8 +5,9 @@
  * This file needs -opt nopeephole (OS.c compiles with it, like dolphin/os/OS.c).
  *
  * Original-code functions are not reproduced: fn_80431FEC, fn_80432010, fn_80432044 (OSExceptionVector),
- * fn_804320E0, fn_80432138 (__OSPSInit, GQR clears); fn_80431D6C (OSExceptionInit) refers to labels inside
- * those and is not attempted. fn_80432014 / fn_80432030 / fn_8043218C are the tiny accessors below.
+ * fn_804320E0, fn_80432138 (__OSPSInit, GQR clears). fn_80431D6C (OSExceptionInit) refers to labels inside
+ * them: the labels inside fn_80432044 have no symbols.txt entry, so they are lbl_ placeholders (see below).
+ * fn_80432014 / fn_80432030 / fn_8043218C are the tiny accessors below.
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -31,6 +32,9 @@ extern BOOL lbl_806EF7AC;
 extern OSTime lbl_806EF7D0;                 /* __OSStartTime */
 extern void** lbl_806EF7C4;                 /* exception handler table */
 extern const char* lbl_806EF2B8;            /* __OSVersion */
+/* The string __OSVersion points to is the first object of OS.c .data; the later string offsets (relative to the
+ * pool base register) only come out right when it precedes them. The pointer itself is extern above. */
+static char __OSVersionString[] = "<< Dolphin SDK - OS\trelease build: May 21 2004 09:28:09 (0x2301) >>";
 extern u8 lbl_80701020[] AT_ADDRESS(0x80701020);
 
 extern void fn_80403FF8(void);              /* EnableMetroTRKInterrupts */
@@ -225,6 +229,86 @@ void fn_8043188C(void)
             }
         }
     }
+}
+
+extern u8 fn_80431FEC[];   /* __OSDBINTSTART (original code, OSDBIntegrator) */
+extern u8 fn_80432010[];   /* __OSDBINTEND, __OSDBJUMPSTART (original code, OSDBJump) */
+extern u8 fn_80432044[];   /* __OSEVStart: OSExceptionVector (original code) */
+/* Labels inside OSExceptionVector (original code). symbols.txt has no entry for them, so they are
+ * placeholders here: lbl_8043209C = fn_80432044+0x58 (__DBVECTOR), lbl_804320AC = fn_80432044+0x68
+ * (__OSEVSetNumber), lbl_804320DC = fn_80432044+0x98 (__OSEVEnd). */
+extern u8 lbl_8043209C[];
+extern u8 lbl_804320AC[];
+extern u8 lbl_804320DC[];
+extern void fn_804320E0(void);   /* OSDefaultExceptionHandler (original code) */
+void fn_80421C20(char* str, ...);               /* DBPrintf */
+BOOL fn_80421C04(__OSException exception);      /* __DBIsExceptionMarked */
+
+static u32 __OSExceptionLocations[] = {
+    0x00000100, 0x00000200, 0x00000300, 0x00000400, 0x00000500, 0x00000600, 0x00000700, 0x00000800,
+    0x00000900, 0x00000C00, 0x00000D00, 0x00000F00, 0x00001300, 0x00001400, 0x00001700,
+};
+
+/* flags: matches only with -opt nopeephole */
+/* OSExceptionInit */
+void fn_80431D6C(void)
+{
+    __OSException exception;
+    void* destAddr;
+    u32* opCodeAddr;
+    u32 oldOpCode;
+    u8* handlerStart;
+    u32 handlerSize;
+
+    opCodeAddr = (u32*)lbl_804320AC;
+    oldOpCode = *opCodeAddr;
+    handlerStart = (u8*)fn_80432044;
+    handlerSize = (u32)lbl_804320DC - (u32)fn_80432044;
+
+    destAddr = (void*)OSPhysicalToCached(0x60);
+    if (*(u32*)destAddr == 0) {
+        fn_80421C20("Installing OSDBIntegrator\n");
+        memcpy(destAddr, (void*)fn_80431FEC, (u32)fn_80432010 - (u32)fn_80431FEC);
+        fn_80433034(destAddr, (u32)fn_80432010 - (u32)fn_80431FEC);
+        __sync();
+        ICInvalidateRange(destAddr, (u32)fn_80432010 - (u32)fn_80431FEC);
+    }
+
+    for (exception = 0; exception < 15; exception++) {
+        if (lbl_806EF7A4 && (*lbl_806EF7A4 >= 2) && fn_80421C04(exception)) {
+            fn_80421C20(">>> OSINIT: exception %d commandeered by TRK\n", exception);
+            continue;
+        }
+
+        *opCodeAddr = oldOpCode | exception;
+
+        if (fn_80421C04(exception)) {
+            fn_80421C20(">>> OSINIT: exception %d vectored to debugger\n", exception);
+            memcpy((void*)lbl_8043209C, (void*)fn_80432010, (u32)fn_80432014 - (u32)fn_80432010);
+        } else {
+            u32* ops = (u32*)lbl_8043209C;
+            int cb;
+
+            for (cb = 0; cb < (u32)fn_80432014 - (u32)fn_80432010; cb += sizeof(u32)) {
+                *ops++ = 0x60000000;
+            }
+        }
+
+        destAddr = (void*)OSPhysicalToCached(__OSExceptionLocations[(u32)exception]);
+        memcpy(destAddr, handlerStart, handlerSize);
+        fn_80433034(destAddr, handlerSize);
+        __sync();
+        ICInvalidateRange(destAddr, handlerSize);
+    }
+    lbl_806EF7C4 = (void**)OSPhysicalToCached(0x3000);
+
+    for (exception = 0; exception < 15; exception++) {
+        fn_80432014(exception, (void*)fn_804320E0);
+    }
+
+    *opCodeAddr = oldOpCode;
+
+    fn_80421C20("Exceptions initialized...\n");
 }
 
 /* flags: matches only with -opt nopeephole */
