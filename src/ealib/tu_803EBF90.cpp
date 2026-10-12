@@ -32,6 +32,37 @@ inline RcNode* RcNext(RcNode* n)
 
 extern "C" int fn_803ED188(int, int, int, int, int, int);
 
+struct RcBlk {
+    unsigned char tag;
+    char pad1[3];
+    union {
+        int i;
+        struct {
+            short s4;
+            short s6;
+        } s;
+        struct {
+            unsigned short us4;
+            unsigned short us6;
+        } u;
+    } m4;
+    int m8;
+    unsigned mC;
+    int m10;
+};
+
+extern "C" int fn_803EC084(RcBlk*, int, int, int);
+extern "C" unsigned char* fn_803EC1C0(RcBlk*, int, int, int);
+extern "C" int fn_803EC83C(RcBlk*, RcBlk*);
+extern "C" int fn_803ECE48(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int fn_803ECE88(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int fn_803ECEC8(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int fn_803ECF08(unsigned char*, volatile unsigned char*, int, int);
+extern "C" int strlen(const char* s);
+extern "C" int fn_80401644(void*, int*);
+extern "C" int fn_803EC568(unsigned char, short, short, int, int);
+extern "C" RcBlk* fn_803EBF2C(RcBlk*);
+
 extern "C" RcNode* fn_803EBF90(RcNode* n)
 {
     if (n != 0) {
@@ -115,6 +146,38 @@ extern "C" char* fn_803EC3D4(RcNode* n)
     return 0;
 }
 
+extern "C" int fn_803EC6F8(RcBlk* n)
+{
+    int r = 0;
+    switch ((unsigned)n->tag) {
+    case 0x70:
+        return strlen((char*)n + 4) + 5;
+    case 0x6f:
+        return n->m4.i + 8;
+    case 0x7c:
+        return n->m4.i * 8 + 8;
+    case 0x69:
+        if (n->m4.u.us6 & 0x10)
+            return n->m4.u.us4 + 0x10;
+        return 0x10;
+    default: {
+        if (n->tag & 0x80) {
+            int sp8 = 0;
+            char* p;
+            if (n->mC & 0x10000000)
+                p = (char*)n + n->m10;
+            else
+                p = (char*)n + 0x10;
+            if (fn_80401644(p, &sp8) != 0)
+                r = sp8 + 0x10;
+        } else {
+            r = fn_803EC568(n->tag, n->m4.s.s4, n->m4.s.s6, (n->mC >> 12) & 0xf, (n->mC >> 29) & 1);
+        }
+    }
+    }
+    return r;
+}
+
 struct RcArr {
     int m0, m4, m8, mC;
 };
@@ -126,6 +189,121 @@ extern "C" int* fn_803EC814(RcArr* a, int i, int* out)
         v = *(int*)((char*)a + i * 8 + 0x10);
     *out = v;
     return out;
+}
+
+extern "C" int fn_803EC83C(RcBlk* dst, RcBlk* src)
+{
+    int i = 0;
+    int ok = 1;
+    int w = src->m4.s.s4;
+    int h = src->m4.s.s6;
+    int n = ((src->mC >> 12) & 0xf) + 1;
+    while (i < n && ok != 0) {
+        unsigned char* a = fn_803EC1C0(src, 0, 0, i);
+        unsigned char* b = fn_803EC1C0(dst, 0, 0, i);
+        switch (fn_803EC03C((RcNode*)src)) {
+        case 4:
+            fn_803ECF08(b, a, w, h);
+            break;
+        case 8:
+            fn_803ECEC8(b, a, w, h);
+            break;
+        case 0xf:
+        case 0x10:
+            fn_803ECE88(b, a, w, h);
+            break;
+        case 0x20:
+            fn_803ECE48(b, a, w, h);
+            break;
+        default:
+            ok = 0;
+            break;
+        }
+        i++;
+        w >>= 1;
+        h >>= 1;
+    }
+    dst->mC |= 0x20000000;
+    return ok;
+}
+
+extern "C" RcBlk* fn_803EC984(RcBlk* x)
+{
+    RcBlk* p = fn_803EBF2C(x);
+    if (p != 0 && (p->mC & 0x20000000) == 0)
+        fn_803EC83C(p, x);
+    return p;
+}
+
+extern "C" int fn_803EC9D4(int c)
+{
+    int r = 0;
+    switch (c) {
+    case 4:
+        r = 0x18;
+        break;
+    case 8:
+        r = 0x19;
+        break;
+    case 0x10:
+    case 0x235:
+        r = 0x14;
+        break;
+    case 0xf:
+    case 0x22b:
+    case 0x613:
+    case 0xde3:
+        r = 0x15;
+        break;
+    case 0x20:
+    case 0x22b8:
+        r = 0x16;
+        break;
+    }
+    return r;
+}
+
+extern "C" void fn_803ECA70(RcBlk* t, int x, int y, int lvl, unsigned val)
+{
+    if (x < 0 || x >= t->m4.s.s4 || y < 0 || y >= t->m4.s.s6 || lvl < 0 || lvl > (int)((t->mC >> 12) & 0xf))
+        return;
+    int off = fn_803EC084(t, x, y, lvl);
+    unsigned char* b;
+    if (t->mC & 0x10000000)
+        b = (unsigned char*)t + t->m10;
+    else
+        b = (unsigned char*)t + 0x10;
+    int idx = off >> 3;
+    unsigned char* p = b + idx;
+    switch (fn_803EC03C((RcNode*)t)) {
+    case 4:
+        if (off & 4)
+            b[idx] = (b[idx] & 0xf0) | val;
+        else
+            b[idx] = (b[idx] & 0x0f) | (val << 4);
+        break;
+    case 8:
+        b[idx] = val;
+        break;
+    case 0xf:
+        *(short*)(b + idx) = val;
+        break;
+    case 0x10:
+        *(short*)(b + idx) = val;
+        break;
+    case 0x18:
+        b[idx] = val >> 16;
+        p[1] = val >> 8;
+        p[2] = val;
+        break;
+    case 0x20:
+        if (t->mC & 0x20000000) {
+            *(short*)(b + idx) = val >> 16;
+            *(short*)(p + 0x20) = val;
+        } else
+            *(int*)(b + idx) = val;
+        break;
+    }
 }
 
 extern "C" void fn_803ECBD0(volatile unsigned char* src, int w, int h, int pitch, unsigned char* dst)
