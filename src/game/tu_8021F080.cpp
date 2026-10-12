@@ -43,7 +43,32 @@ extern "C" {
 float fn_802478A0(void* o, void* p, int a, int b);
 float fn_8018D2EC(Obj4_36C* o, int a);
 
+float fn_80259A74(void* list, int a, int b);
+int fn_80210FC4(Sub* t, int kind, int x, Player** out);
+
 extern Vec3f lbl_805D6244;
+
+int fn_8021F490(Task* t)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    if (in->m2CC == 1 || in->mC0.m[3] != o->m374->m460) {
+        return 0;
+    }
+    Player* out = 0;
+    if (fn_80210FC4((Sub*)&t->m9C, 2, 3, &out) == 0) {
+        return 1;
+    }
+    float a = fn_80259A74(t->m9C->m0->m700->m3B4, out->m458, 3);
+    float b = o->m37C - o->m3F4;
+    float c = 0.0f;
+    if (t->m9C->m98 == 3) {
+        c = 0.2f;
+    } else {
+        c = 0.0f;
+    }
+    return b >= a + c;
+}
 
 void fn_8021FFD4(Task* t, int, RecQueue* q)
 {

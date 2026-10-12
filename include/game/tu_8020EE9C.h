@@ -152,7 +152,8 @@ struct Obj4_36C {
     char pad370[4];
     Obj36C* m374;
     int m378;
-    char pad37C[0x38C - 0x37C];
+    float m37C;
+    char pad380[0x38C - 0x380];
     int m38C;
     char pad390[0x3F4 - 0x390];
     float m3F4;
@@ -236,7 +237,9 @@ struct TaskInner {
     int m74;
     char pad78[0x80 - 0x78];
     int m80;
-    char pad84[0xA4 - 0x84];
+    char pad84[0x98 - 0x84];
+    int m98;
+    char pad9C[0xA4 - 0x9C];
     int mA4;
     float mA8;
     Vec3f mAC;
@@ -254,7 +257,9 @@ struct TaskInner {
     int m1F4;
     char pad1F8[0x20C - 0x1F8];
     int m20C;
-    char pad210[0x6A8 - 0x210];
+    char pad210[0x2CC - 0x210];
+    int m2CC;
+    char pad2D0[0x6A8 - 0x2D0];
     int m6A8;
     char pad6AC[0x6D0 - 0x6AC];
     Ent5C m6D0[8]; /* nine entries are indexed (k <= 8); the ninth reaches 0xA0C and overlaps m9FC in the declaration */
