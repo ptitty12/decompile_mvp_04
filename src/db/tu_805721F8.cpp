@@ -66,6 +66,35 @@ float fn_80089E48__FP15Unk80089894_Objii(void* pt, unsigned i, int cur);
 
 extern const float lbl_805FFE74;
 extern const float lbl_805FFE78;
+
+extern const float lbl_805FFEB4;
+extern const float lbl_805FFEB8;
+extern const float lbl_805FFEBC;
+extern const float lbl_805FFEC0;
+extern const float lbl_805FFEC4;
+struct Db80573E10_S {
+    char pad0[0x58];
+    float m58;
+    float m5C;
+    float m60;
+};
+inline float Db80573E10_R(void* p, int id, int who)
+{
+    return ((float (*)(void*, int, int))fn_8007189C__FP1Wii)(p, id, who);
+}
+
+extern const float lbl_805FFEC8;
+extern const float lbl_805FFECC;
+extern const float lbl_805FFED0;
+struct Db80573FB8_S {
+    char pad0[0x4C];
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
+    float m5C;
+    float m60;
+};
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_805724AC(int unused, int a, int b, int c, int d, int e, float x);
 extern "C" int fn_805725E4(int unused, int k, float x);
@@ -79,6 +108,8 @@ extern "C" void fn_80573840(DbSub50* p);
 extern "C" void fn_805738F0(DbSub50* p, DbSelSrc* src);
 extern "C" float fn_80573D44(DbSub50* p, int i);
 extern "C" void fn_80573D84(DbSub50* p, int i, float v);
+extern "C" float fn_80573E10(Db80573E10_S* self, DbT* t);
+extern "C" float fn_80573FB8(Db80573FB8_S* self, DbT* t);
 extern "C" float fn_805742B0(void* unused, DbT* t);
 extern "C" float fn_8057437C(void* unused, DbT* t);
 extern "C" int fn_80574420(DbSub50* p, DbT* t);
@@ -300,6 +331,46 @@ extern "C" DB_OVERLAY void fn_80573D84(DbSub50* p, int i, float v)
     float u = 2.0f * t - lbl_805FFEA4;
     float w = (u * u * u + lbl_805FFEA8) * lbl_805FFEAC;
     p->m70 = w >? lbl_805FFEB0;
+}
+
+extern "C" DB_OVERLAY float fn_80573E10(Db80573E10_S* self, DbT* t)
+{
+    float a;
+    float b;
+    float c;
+    float d;
+    float e;
+    float f;
+    float r;
+    char* pt = (char*)t + 0xC9C;
+    unsigned char* pb = &t->m17C;
+    a = Db80573E10_R(pt, 0x10, t->m17C);
+    b = Db80573E10_R(pt, 0x10, pb[2]);
+    c = Db80573E10_R(pt, 0x10, pb[1]);
+    unsigned char u3 = pb[3];
+    d = Db80573E10_R(pt, 0x10, u3) * lbl_805FFEB4 + Db80573E10_R(pt, 0xF, u3) * lbl_805FFEB8;
+    unsigned char u5 = pb[5];
+    e = Db80573E10_R(pt, 0x10, u5) * lbl_805FFEB4 + Db80573E10_R(pt, 0xF, u5) * lbl_805FFEB8;
+    unsigned char u4 = pb[4];
+    f = Db80573E10_R(pt, 0x10, u4) * lbl_805FFEB4 + Db80573E10_R(pt, 0xF, u4) * lbl_805FFEB8;
+    r = ((self->m60 * (b * lbl_805FFEBC + d * lbl_805FFEBC) + self->m5C * (d * lbl_805FFEBC + e * lbl_805FFEBC)) + self->m58 * (f * lbl_805FFEBC + e * lbl_805FFEBC)) * lbl_805FFEC0 + (c * lbl_805FFEBC + a * lbl_805FFEBC) * lbl_805FFEC4;
+    return r;
+}
+
+/* near-miss: 2 slots; retail loads +0x58 before +0x4C in the closing sum */
+extern "C" DB_OVERLAY float fn_80573FB8(Db80573FB8_S* self, DbT* t)
+{
+    float r;
+    unsigned char* pb = &t->m17C;
+    char* pt = (char*)t + 0xC9C;
+    unsigned char w = pb[7];
+    self->m50 = Db80573E10_R(pt, 0xD, w) * lbl_805FFEC8 + Db80573E10_R(pt, 0x10, w) * lbl_805FFECC + Db80573E10_R(pt, 0xF, w) * lbl_805FFED0 + Db80573E10_R(pt, 0xE, w) * lbl_805FFED0 + Db80573E10_R(pt, 0x11, w) * lbl_805FFED0;
+    unsigned char w2 = pb[6];
+    self->m4C = Db80573E10_R(pt, 0xD, w2) * lbl_805FFEC8 + Db80573E10_R(pt, 0x10, w2) * lbl_805FFECC + Db80573E10_R(pt, 0xF, w2) * lbl_805FFED0 + Db80573E10_R(pt, 0xE, w2) * lbl_805FFED0 + Db80573E10_R(pt, 0x11, w2) * lbl_805FFED0;
+    unsigned char w3 = pb[8];
+    self->m54 = Db80573E10_R(pt, 0xD, w3) * lbl_805FFEC8 + Db80573E10_R(pt, 0x10, w3) * lbl_805FFECC + Db80573E10_R(pt, 0xF, w3) * lbl_805FFED0 + Db80573E10_R(pt, 0xE, w3) * lbl_805FFED0 + Db80573E10_R(pt, 0x11, w3) * lbl_805FFED0;
+    r = self->m60 * self->m54 + (self->m5C * self->m50 + self->m58 * self->m4C);
+    return r;
 }
 
 /* near-miss: ~10 slots; retail passes the byte `cur` through clrlwi once and keeps `i*5+6` as an explicit step variable */
