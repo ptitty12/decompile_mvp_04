@@ -74,6 +74,8 @@ int fn_8040B6A0(const char* s);
 void fn_802B1E38(T* t, const char* s, int v);
 void fn_802B1FC0(T* t);
 void* fn_8040B320(void* p, int v, int n);
+void fn_802B2268(void* self, void* a, void* b);
+void fn_803DD73C(void* a, int b);
 }
 
 /* near-miss (parked, 58 vs 59 insns): retail joins the default and found paths before one 16-byte copy whose first word is loaded in each path */
@@ -164,6 +166,20 @@ struct Unk802B3130_Out {
 struct Unk802B2518_W {
     char pad0[8];
     int m8;
+    char padC[0x240 - 0xC];
+    void* m240;
+};
+
+/* Heap object at lbl_8061EA74 (fn_802B23F0 builds it): vptr at +0x18, handle at +0x24. */
+struct Unk802B2BD0_B {
+    char pad0[0x18];
+};
+struct Unk802B2BD0_V : Unk802B2BD0_B {
+    virtual ~Unk802B2BD0_V();
+};
+struct Unk802B2BD0_D : Unk802B2BD0_V {
+    char pad1C[8];
+    void* m24;
 };
 
 struct Unk802B2518_S {
@@ -339,6 +355,15 @@ int fn_802B1EE8(T* self, const char* name)
     return 5;
 }
 
+void fn_802B1F88(void* self)
+{
+    Unk802B2518_W* w = lbl_8061E978;
+    void* a = w->m240;
+    char* b = (char*)w + 0x370C;
+    if (a != 0)
+        fn_802B2268(self, a, b);
+}
+
 /* near-miss (unmatched, 48 vs 52 insns): retail keeps two offset registers (i*8, i*8+4) with the base re-formed in the loop and a cr7 compare for the pad count */
 void fn_802B1FC0(T* self)
 {
@@ -370,6 +395,8 @@ void fn_802B1FC0(T* self)
         }
     }
 }
+
+void fn_802B23EC() {}
 
 Unk802B2518_S* fn_802B23F0(Unk802B2518_S* self, int a)
 {
@@ -424,6 +451,18 @@ void fn_802B2B8C(void* arg)
 {
     void** g = &lbl_8061EA74;
     *g = fn_802B23F0(operator new(0x1C4C, 0x400), arg);
+}
+
+void fn_802B2BD0()
+{
+    if (lbl_8061EA74 != 0 && ((Unk802B2BD0_D*)lbl_8061EA74)->m24 != 0) {
+        fn_803DD73C(((Unk802B2BD0_D*)lbl_8061EA74)->m24, 3);
+        ((Unk802B2BD0_D*)lbl_8061EA74)->m24 = 0;
+    }
+    if (lbl_8061EA74 != 0) {
+        delete (Unk802B2BD0_V*)lbl_8061EA74;
+        lbl_8061EA74 = 0;
+    }
 }
 
 void fn_802B2ED0(T* self, int a)
