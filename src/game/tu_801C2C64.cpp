@@ -557,12 +557,11 @@ extern "C" void fn_801C53D8(void) {}
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
 
-extern Vec3 lbl_806055AC;
+extern const Vec3 lbl_806055AC;
 extern int lbl_806242A0;
 extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
 extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
 
-/* near-miss: one slot differs (retail stores word 0 of the Vec3 copy before loading words 2 and 1). */
 extern "C" int fn_801C5AE0(Z* z, void* b, int c, int d, int e, int f, int g, float t)
 {
     lbl_806242A0 = 1;
