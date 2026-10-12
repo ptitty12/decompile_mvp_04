@@ -30,6 +30,40 @@ inline unsigned ReadLE16(const unsigned char* p)
     return (p[1] << 8) | p[0];
 }
 
+/* 192-bit additive generator state (six words, w5 least significant); lbl_8062EEC0. */
+struct Gen6 {
+    unsigned w0, w1, w2, w3, w4, w5;
+};
+extern Gen6 lbl_8062EEC0;
+
+extern "C" unsigned fn_804027DC()
+{
+    unsigned c = 0;
+    unsigned x = lbl_8062EEC0.w5 + lbl_8062EEC0.w4;
+    if (x < lbl_8062EEC0.w5 || x < lbl_8062EEC0.w4)
+        c = 1;
+    unsigned o0 = lbl_8062EEC0.w0;
+    unsigned o3 = lbl_8062EEC0.w3;
+    unsigned o2 = lbl_8062EEC0.w2;
+    unsigned o1 = lbl_8062EEC0.w1;
+    lbl_8062EEC0.w4 = x;
+    x = x + o3 + c;
+    ((volatile Gen6*)&lbl_8062EEC0)->w3 = x;
+    x = x + o2 + (x < o3);
+    ((volatile Gen6*)&lbl_8062EEC0)->w2 = x;
+    x = x + o1 + (x < o2);
+    ((volatile Gen6*)&lbl_8062EEC0)->w1 = x;
+    x = x + o0 + (x < o1);
+    lbl_8062EEC0.w0 = x;
+    if (++lbl_8062EEC0.w5 == 0)
+        if (++lbl_8062EEC0.w4 == 0)
+            if (++lbl_8062EEC0.w3 == 0)
+                if (++lbl_8062EEC0.w2 == 0)
+                    if (++lbl_8062EEC0.w1 == 0)
+                        x = ++lbl_8062EEC0.w0;
+    return x;
+}
+
 extern "C" float fn_804028E4(double x)
 {
     return (float)sqrt(x);
@@ -150,6 +184,21 @@ extern "C" int fn_80402C08(const unsigned short* a, const unsigned char* b)
 }
 
 extern "C" int fn_80402C24(unsigned short key, const unsigned char* t);
+
+extern "C" void* bsearch(const void* key, const void* base, unsigned n, unsigned sz, int (*cmp)(const void*, const void*));
+
+extern "C" int fn_80402C24(unsigned short key, const unsigned char* t)
+{
+    unsigned short k = key;
+    const unsigned char* r = (const unsigned char*)bsearch(&k, t + 0x10, ReadLE32(t + 8), 4, (int (*)(const void*, const void*))fn_80402C08);
+    int v;
+    if (r != 0) {
+        r += 2;
+        v = ReadLE16(r);
+    } else
+        v = -1;
+    return v;
+}
 
 extern "C" void fn_80402DE4(unsigned char* t, int flag)
 {
