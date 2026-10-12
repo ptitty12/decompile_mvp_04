@@ -19,7 +19,7 @@ extern int lbl_80620388;
 extern unsigned lbl_80620394[];
 int fn_801A96A8(int x);
 extern "C" int fn_801A9D9C(Unk801A96E0_Init* o, int i);
-int fn_801A9E98(Unk801A96E0_Init* o);
+extern "C" int fn_801A9E98(Unk801A96E0_Init* o);
 int fn_801B5F8C(Unk801AB63C_P* p);
 int fn_801AB0D8(Unk801AB63C_P* p);
 int fn_801AAC4C(Unk801AB63C_P* p);
@@ -544,6 +544,54 @@ int fn_801A9E0C(Unk801A96E0_Init* o, int i)
         break;
     }
     return r;
+}
+
+struct Unk801A9E98_W {
+    char pad0[0x388];
+    int m388;
+};
+extern "C" Unk801A9E98_W* fn_801A4B34(Unk8019F8C0_Owner* o);
+extern "C" Unk801A98C4_V3 fn_8014E388(int idx);
+double __builtin_fabs(double x);
+inline Unk801A98C4_V3 Unk801A9E98_Sub(const Unk801A98C4_V3& a, const Unk801A98C4_V3& b)
+{
+    Unk801A98C4_V3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk801A9E98_Abs(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+inline float Unk801A9E98_Len2(const Unk801A98C4_V3& v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+
+extern "C" int fn_801A9E98(Unk801A96E0_Init* o)
+{
+    int s = ((Unk801A98C4_Obj*)o)->m4->m3B8->m4;
+    Unk801A98C4_V4 a = fn_801E6E7C(s, 3, 0);
+    Unk801A98C4_V4 b = fn_801E6E7C(s, 5, 0);
+    float da;
+    {
+        Unk801A98C4_V3 d = Unk801A9E98_Sub(fn_8014E388(1), a);
+        da = Unk801A9E98_Len2(d);
+    }
+    float db;
+    {
+        Unk801A98C4_V3 d = Unk801A9E98_Sub(fn_8014E388(1), b);
+        db = Unk801A9E98_Len2(d);
+    }
+    Unk801A9E98_W* w = fn_801A4B34(o->m8);
+    if (w) {
+        if (!(Unk801A9E98_Abs(da - db) >= 57600.0f)) {
+            return w->m388 == 1 ? 5 : 3;
+        }
+    }
+    return !(da > db) ? 3 : 5;
 }
 
 void fn_801AA038(void* p)
