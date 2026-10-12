@@ -913,6 +913,72 @@ extern "C" void fn_8039437C(McTable* p)
     }
 }
 
+extern "C" void fn_803943A8(unsigned n)
+{
+    char* t = (char*)lbl_8069B9C0;
+    int off = n * 160;
+    int* c12 = (int*)(t + 0xc);
+    int v = *(int*)((char*)c12 + off);
+    if (v != 0) {
+        fn_80392BC0(v);
+        *(int*)((char*)c12 + off) = 0;
+    }
+    int* c4 = (int*)(t + 4);
+    *(int*)((char*)c4 + off) = 0;
+    unsigned char* row = (unsigned char*)(t + off);
+    *(int*)(t + off) = 0;
+    row[8] = 0;
+    row[9] = 0;
+    row[10] = 0;
+    row[11] = 0;
+    *(int*)((char*)c12 + off) = 0;
+    int j = 0;
+    do {
+        char* tt = (char*)lbl_8069B9C0;
+        int o = j * 12 + n * 160;
+        int* c10 = (int*)(tt + 0x10);
+        *(int*)((char*)c10 + o) = -1;
+        unsigned char* q = (unsigned char*)(tt + o);
+        *(short*)(q + 0x14) = -1;
+        *(short*)(q + 0x16) = -1;
+        *(short*)(q + 0x18) = 0;
+        j++;
+    } while (j <= 11);
+}
+
+extern "C" void fn_8039445C()
+{
+    int i = 0;
+    do {
+        int next = i + 1;
+        char* t = (char*)lbl_8069B9C0;
+        int off = i * 160;
+        *(int*)(t + off) = 0;
+        int* c4 = (int*)(t + 4);
+        *(int*)((char*)c4 + off) = 0;
+        unsigned char* row = (unsigned char*)(t + off);
+        row[8] = 0;
+        row[9] = 0;
+        row[10] = 0;
+        row[11] = 0;
+        int* c12 = (int*)(t + 12);
+        *(int*)((char*)c12 + off) = 0;
+        int j = 0;
+        do {
+            char* tt = (char*)lbl_8069B9C0;
+            int o = j * 12 + i * 160;
+            int* c10 = (int*)(tt + 0x10);
+            *(int*)((char*)c10 + o) = -1;
+            unsigned char* q = (unsigned char*)(tt + o);
+            *(short*)(q + 0x14) = -1;
+            *(short*)(q + 0x16) = -1;
+            *(short*)(q + 0x18) = 0;
+            j++;
+        } while (j <= 11);
+        i = next;
+    } while (i <= 7);
+}
+
 extern "C" int fn_80394638(int i)
 {
     McRow160* r = (McRow160*)(i * 0xA0 + (int)lbl_8069B9C0);
