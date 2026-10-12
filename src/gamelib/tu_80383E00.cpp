@@ -212,6 +212,32 @@ inline float MaxF(float x, float y)
     return y >? x;
 }
 
+struct V3F {
+    float x;
+    float y;
+    float z;
+};
+inline V3F ScaleV(const V3F& v, float s)
+{
+    V3F r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+struct Unk80385B94 {
+    int m0;
+    int m4;
+    int m8;
+    V3F mC;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+};
+
 extern "C" void fn_80383E00(Assign32* src, Assign32* dst)
 {
     *dst = *src;
@@ -555,6 +581,30 @@ extern "C" float fn_80385ABC(float a, float b, float c, float d, float e)
         return x;
     }
     return 1.0f;
+}
+
+extern "C" void fn_80385B94(Unk80385B94* o, float a, float b, V3F* out1, float* out2)
+{
+    float sum = a + b;
+    if (o->m0 != 0 && !(sum <= o->m18)) {
+        float t = 0.0f;
+        if (!(a >= o->m1C)) {
+            float hi = MinF(sum, o->m1C);
+            float lo = MaxF(a, o->m18);
+            t = (hi - lo) / (o->m1C - o->m18);
+        }
+        V3F v = ScaleV(o->mC, t);
+        *out1 = v;
+    }
+    if (o->m4 != 0 && !(sum <= o->m24)) {
+        float t2 = 0.0f;
+        if (!(a >= o->m28)) {
+            float hi = MinF(sum, o->m28);
+            float lo = MaxF(a, o->m24);
+            t2 = (hi - lo) / (o->m28 - o->m24);
+        }
+        *out2 = t2 * o->m20;
+    }
 }
 
 extern "C" int fn_80386110(void* link, void* q, int a, int b, float* out, int flags)
