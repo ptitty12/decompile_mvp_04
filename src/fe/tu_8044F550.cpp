@@ -181,6 +181,13 @@ extern "C" FE_OVERLAY void fn_8045055C(void* self)
 }
 
 extern char lbl_8067BDB0[];
+extern "C" FE_OVERLAY void fn_804505E0(void* self)
+{
+    FeObj* w = fn_800B7A94(UiGetMsgMgr(), "POPUP");
+    fn_80132438(w, self, 0, (FeCb)fn_8045055C, (FeCb)fn_804504DC, 0x3A61, -1, 1, 1.0f);
+    w->v86();
+}
+
 extern "C" FE_OVERLAY FeScr6Raw* fn_80450688(FeScr6Raw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648((FeScrRaw*)self, a, b, c, d, e, f, g, h);
