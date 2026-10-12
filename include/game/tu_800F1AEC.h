@@ -99,7 +99,7 @@ public:
     virtual UiObj* v70();
     virtual void v71();
     virtual void v72();
-    virtual void v73();
+    virtual UiObj* v73(int a, int b);
     virtual void v74();
     virtual void v75();
     virtual void v76();
@@ -196,7 +196,7 @@ public:
     virtual void v34();
     virtual void v35();
     virtual void v36();
-    virtual void v37();
+    virtual void v37(int a);
     virtual void v38(int a);
     virtual void v39();
     virtual void v40(int a);
@@ -467,7 +467,7 @@ public:
     virtual void w4();
     virtual void w5();
     virtual void w6(Ui8011AA24* a, int b);
-    virtual void w7();
+    virtual void w7(int* a, int* b);
     virtual void w8();
     virtual void w9();
     virtual void w10(int a);
@@ -879,7 +879,9 @@ struct Ui800B555C {
     unsigned int m4;
     char pad8[0x570 - 8];
     int m570;
-    char pad574[0x664 - 0x574];
+    char pad574[0x624 - 0x574];
+    int m624;
+    char pad628[0x664 - 0x628];
     int m664;
     int m668;
 };
