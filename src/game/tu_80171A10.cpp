@@ -6,6 +6,7 @@
 #include "game/tu_80170044.h"
 
 extern "C" Unk80170518* fn_80005840(int mode);
+extern "C" int fn_804030C8(const unsigned short* a, const unsigned short* b);
 
 /* Popup holder (see Unk80171940 in tu_80170044.h): the dialog at +0 and the current popup at +4. */
 struct Unk80171A10_Holder {
@@ -118,6 +119,51 @@ Unk80171760* fn_80171CC0(Unk80171A10_Holder* h, int a, int rev)
     } while (i <= 5);
     if (n != 0) {
         fn_801720A8(h, n, (const unsigned short*)h->m0->fn_80170CA8(a), 1);
+    }
+    return h->m4;
+}
+
+Unk80171760* fn_80171D98(Unk80171A10_Holder* h, Unk8016FF40** infos, int count, int a3, const unsigned short* a4, int a5, int a6, int a7) /* 80171D98 */
+{
+    Unk801714E0* n = 0;
+    int found = 0;
+    const unsigned short* tmpl = (const unsigned short*)fn_80090880(lbl_8061977C, 0x650);
+    int i = 0;
+    unsigned short buf[0x100];
+    fn_80171FE8(h);
+    if (count > 0) {
+        int off = 0;
+        do {
+            if ((*(Unk8016FF40**)(off + (int)infos))->fn_80170044(a3) != 0
+                || (*(Unk8016FF40**)(off + (int)infos))->fn_80170248() != 0) {
+                Unk8016FF40* info = *(Unk8016FF40**)(off + (int)infos);
+                found = 1;
+                unsigned short* nm = info->m78;
+                char* q = (char*)info + 0x50;
+                if (fn_804030C8(nm, tmpl) == 0 || (*(Unk8016FF40**)(off + (int)infos))->fn_80170248() != 0) {
+                    fn_80403144(buf, tmpl);
+                } else {
+                    h->m0->fn_80170EC4(info->m8E);
+                    h->m0->fn_80170EF8(nm);
+                    h->m0->fn_80170F2C(0, *(int*)(q + 0x20), 0);
+                    fn_80403144(buf, (const unsigned short*)h->m0->fn_80170C30(4));
+                }
+                n = fn_80172058(h, buf, i);
+            }
+            i++;
+            off += 4;
+        } while (i < count);
+    }
+    if (a6 > 0 && (a7 == 0 || found == 0)) {
+        h->m0->fn_80170F2C(0, a6, 0);
+        h->m0->fn_80170EC4(a4);
+        fn_80403144(buf, (const unsigned short*)h->m0->fn_80170CE4(0xC));
+        n = fn_80172058(h, buf, 4);
+    }
+    if (n != 0) {
+        fn_801720A8(h, n, (const unsigned short*)h->m0->fn_80170CE4(a5), 4);
+    } else {
+        fn_80171C20(h, 0xB);
     }
     return h->m4;
 }
@@ -501,18 +547,19 @@ int fn_80172FCC(Unk80171A10_Menu* p, unsigned short* dst, int n) /* 80172FCC */
     return 0;
 }
 
-/* near-miss: retail sets i (li r29,0) before the first call's argument moves and the scaled index (li r28,0)
- * right before that call; here both come after the argument moves (6 slots, 95.6%). */
+
 int fn_801730E8(Unk80171A10_Menu* p, unsigned short* s, int* out)
 {
     Unk8016FF40 info;
     unsigned int i = 0;
+    int off = 0;
     fn_801701B4(&info, p->mDA, p->m64);
     fn_80170158(&info, s);
     fn_8017008C(&info, p->m88);
     ((Unk80170518*)fn_80173274((Unk80173274_T*)p))->fn_80005A7C(&info);
-    for (i = 0; i <= 3; i++) {
-        if (((Unk8016FF40*)p->m8[i])->fn_80170218(&info) != 0 && i != p->m18) {
+    for (; i <= 3; i++, off += 4) {
+        char* bb = (char*)p + 8;
+        if ((*(Unk8016FF40**)(bb + off))->fn_80170218(&info) != 0 && i != p->m18) {
             if (out != 0) {
                 *out = i;
             }
