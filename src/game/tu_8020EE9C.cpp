@@ -840,6 +840,157 @@ void fn_80212180(Pair2* p)
     p->m0 = 0;
 }
 
+struct Unk802121D0_R {
+    int m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
+};
+struct Unk802121D0_F {
+    float v;
+};
+extern Unk802121D0_F lbl_805D5C94;
+struct Unk802121D0_P {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+};
+struct Unk802121D0_Ent {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+    float m10;
+    void* m14;
+};
+struct Unk802121D0_T {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    float m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    float m78;
+    Vec3f m7C;
+    int m88;
+    float m8C;
+    char pad90[0x188 - 0x90];
+    int m188;
+    int m18C;
+    char pad190[0x19C - 0x190];
+    int m19C;
+    char pad1A0[0x1A8 - 0x1A0];
+    int m1A8;
+    Unk802121D0_Ent m1AC[9];
+    char pad284[0x654 - 0x1AC - 9 * 0x18];
+};
+extern const char lbl_806609D0[];
+
+extern "C" void fn_802121D0(int* s)
+{
+    Unk802121D0_T* t = (Unk802121D0_T*)s;
+    t->mC = -1;
+    t->m74 = -1;
+    t->m54 = 0.016666668f;
+    t->m78 = -1.0f;
+    t->m68 = 1;
+    t->m0 = 0;
+    t->m4 = 0;
+    t->m8 = 0;
+    t->m10 = 0;
+    t->m14 = 0;
+    t->m18 = 0;
+    t->m1C = 0;
+    t->m34 = 0;
+    t->m38 = 0;
+    t->m3C = 0;
+    t->m40 = 0;
+    t->m48 = 0;
+    t->m20 = 0;
+    t->m24 = 0;
+    t->m28 = 0;
+    t->m2C = 0;
+    t->m30 = 0;
+    t->m4C = 0;
+    t->m50 = 0;
+    t->m58 = 0;
+    t->m5C = 0;
+    t->m60 = 0;
+    t->m64 = 0;
+    t->m6C = 0;
+    t->m70 = 0;
+    t->m7C = lbl_806055AC;
+    t->m88 = -1;
+    t->m8C = -1.0f;
+    fn_80211B58((Slots4*)((char*)t + 0x90));
+    fn_80211B58((Slots4*)((char*)t + 0xA4));
+    int i = 0;
+    int* n = &t->m1A8;
+    if (i < *n) {
+        Unk802121D0_Ent* e = t->m1AC;
+        do {
+            i++;
+            e->m14 = (void*)lbl_806609D0;
+            e++;
+        } while (i < *n);
+    }
+    *n = 0;
+    t->m188 = -1;
+    fn_80212054((Unk80212054_Obj*)((char*)t + 0x284));
+    fn_80212180((Pair2*)((char*)t + 0x5EC));
+    Unk802121D0_P* a = (Unk802121D0_P*)((char*)t + 0x654);
+    Unk802121D0_P* b = (Unk802121D0_P*)((char*)t + 0x660);
+    a->m0 = -1;
+    a->m4 = -1;
+    a->m8 = -1;
+    b->m0 = -1;
+    b->m4 = -1;
+    b->m8 = -1;
+    a->m18 = 0;
+    t->m44 = 0;
+    fn_80211C64((EntList*)((char*)t + 0xB8));
+    Unk802121D0_R* base = (Unk802121D0_R*)((char*)t + 0x5FC);
+    Unk802121D0_R* r = base;
+    for (int j = 0; j < 4; j++, r++) {
+        r->m0 = 0;
+        r->m8 = r->m4 = lbl_805D5C94.v;
+        r->mC = 0;
+    }
+    fn_8035BED0(base, 0);
+    t->m19C = -1;
+    t->m188 = -1;
+    t->m18C = -1;
+}
+
 void fn_8021239C(Obj74* o, int a, float f, Vec3f* v)
 {
     o->m74 = a;

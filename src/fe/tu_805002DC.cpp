@@ -433,6 +433,8 @@ extern "C" FE_OVERLAY int fn_80505400(int a, int b)
         case 3:
             return 0;
         }
+    } else {
+        return 1;
     }
     return 1;
 }

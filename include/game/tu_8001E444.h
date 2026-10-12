@@ -32,7 +32,8 @@ struct Unk8001E444_Char {
 
 /* Entity record, stride 0xE64 (fn_8001F5CC, fn_8001E4F4). */
 struct Unk8001F5CC_Ent {
-    char pad0[0x19C];
+    char pad0[0x198];
+    int m198;
     int m19C;
     char pad1A0[0x1B4 - 0x1A0];
     unsigned char m1B4[0x80];

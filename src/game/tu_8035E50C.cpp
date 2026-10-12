@@ -25,6 +25,7 @@ extern char lbl_80664008[];
 void fn_8014D9C4(void* p);
 int fn_8035E654(int* a, int i);
 int fn_8035E6B0(int* a, int i, int v);
+char* fn_8035E8CC(char* p, unsigned i);
 struct Unk8035E568_S {
     int m0;
     int m4;
@@ -60,6 +61,67 @@ class Unk802A6334 {
 public:
     virtual ~Unk802A6334();
 };
+class Unk8035EA80 {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+};
+struct Unk8035E704_V {
+    float x;
+    float y;
+    float z;
+};
+extern const Unk8035E704_V lbl_806055AC;
+extern float lbl_805DB9F4[1];
+struct Unk8035E704_E {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    int m24;
+    Unk8035E704_V m28;
+    int m34;
+};
+struct Unk8035E78C_Q {
+    char pad0[0x4C];
+    unsigned m4C;
+};
+struct Unk8035E78C_El {
+    char pad0[0x458];
+    unsigned m458;
+    char pad45C[0x5D4 - 0x45C];
+    float m5D4;
+};
+struct Unk8035E78C_P {
+    char pad0[0x1EC];
+    Unk8035E78C_Q* m1EC;
+    char pad1F0[0x438 - 0x1F0];
+    Unk8035E78C_El* m438[4];
+    int m448;
+};
+struct Unk8035E78C {
+    Unk8035E78C_P* m0;
+};
+extern "C" int fn_8026A75C(Unk8035E704_E* a, Unk8035E704_E* b);
 void fn_8037B16C(void* p, float v);
 void fn_8037D768(void* p);
 struct Unk8035EB7C_M {
@@ -164,13 +226,63 @@ int fn_8035E69C(char* p, int i)
     return *(int*)(b + o);
 }
 
-/* near-miss: 7 slots; retail is mr r9,r3 / addi r0,r4,-9 / cmplwi / li r3,0 / bgtlr / mulli r3 / subi / add (result built in r3 after an early return of 0). */
+int fn_8035E6B0(int* a, int i, int v)
+{
+    int k = i - 9;
+    int z = 0;
+    char* b = (char*)a + 0x10;
+    int o = k * 4;
+    *(int*)(b + o) = z;
+    *(int*)((char*)a + o) = v;
+    for (int j = 0; j < k; j++) {
+        if (a[j] > *(int*)((char*)a + o) && z != 0)
+            a[j] = *(int*)((char*)a + o);
+    }
+}
+
+void fn_8035E704(char* p, unsigned i)
+{
+    Unk8035E704_E* e = (Unk8035E704_E*)fn_8035E8CC(p, i);
+    e->m8 = 4;
+    e->mC = -1;
+    e->m4 = 0;
+    e->m14 = 0;
+    e->m1C = e->m18 = lbl_805DB9F4[0];
+    e->m20 = 6;
+    e->m24 = 0;
+    e->m28 = lbl_806055AC;
+    e->m10 = 0;
+    e->m0 = 0;
+    e->m34 = 0;
+}
+
+void fn_8035E78C(Unk8035E78C* self, char* other)
+{
+    for (int i = 0; i < self->m0->m448; i++) {
+        Unk8035E78C_El* el = self->m0->m438[i];
+        unsigned idx = el->m458;
+        Unk8035E704_E* a = (Unk8035E704_E*)fn_8035E8CC((char*)self, idx);
+        Unk8035E704_E* b = (Unk8035E704_E*)fn_8035E8CC(other, idx);
+        if (el->m5D4 > (float)self->m0->m1EC->m4C * 0.016666668f)
+            continue;
+        if (fn_8026A75C(a, b) == 0) {
+            *a = *b;
+            a->m14 = 0;
+        }
+    }
+}
+
+/* near-miss: 5 slots. The result is accumulated in one int (r = i * 0x38; r -= 0x1F4; r += p), which puts the temporaries in r3 and
+   p in r9 as retail does; left: sched order of the first four insns (retail addi r0,r4,-9 first) and the final add operand order. */
 char* fn_8035E8CC(char* p, unsigned i)
 {
-    char* r = 0;
-    if (i - 9 <= 3)
-        r = p + (i * 0x38 - 0x1F4);
-    return r;
+    int r = 0;
+    if (i - 9 <= 3) {
+        r = i * 0x38;
+        r -= 0x1F4;
+        r += (int)p;
+    }
+    return (char*)r;
 }
 
 void fn_8035E8F0(U* self, int chrg)
@@ -224,6 +336,10 @@ Unk8038B7E4::~Unk8038B7E4() {}
 void fn_8035EA74() {}
 
 int fn_8035EA78() { return 0; }
+
+void fn_8035EA80(Unk8035EA80* p) { p->s14(); }
+
+void fn_8035EAB4(Unk8035EA80* p) { p->s16(); }
 
 extern "C" void fn_8037B424(void*, int);
 

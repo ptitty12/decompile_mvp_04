@@ -3,8 +3,12 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+extern "C" {
+void fn_800DC50C__FP3UiSff(int a, float b, float c);
+}
 
 extern "C" {
+
 FE_OVERLAY FeScrK* fn_8046F770(FeScrK* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -30,7 +34,9 @@ FE_OVERLAY void fn_8046FAE8(FeScrK* x)
 }
 
 FE_OVERLAY void fn_8046FB08(void) {}
+
 FE_OVERLAY void fn_8046FB0C(void) {}
+
 FE_OVERLAY void fn_8046FB10(void) {}
 
 FE_OVERLAY int fn_8046FB14(FeScrK* x)
@@ -190,6 +196,34 @@ FE_OVERLAY void fn_804707B8(FeScrL* x, int a)
     x->m330 = 4;
     x->fn_vslot89(0);
     x->fn_vslot8(0);
+}
+
+FE_OVERLAY void fn_8047083C(FeScrL* x)
+{
+    switch (x->m314) {
+    case 0:
+    case 1:
+    case 4:
+        fn_800A29C4(lbl_80619948, x->m318);
+        break;
+    case 5:
+        fn_800A29C4(lbl_80619948, x->m318);
+        x->m330 = 1;
+        break;
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        break;
+    case 3:
+        ((void (*)(FeGlobal80619948*))fn_800A2948)(lbl_80619948);
+        break;
+    case 13:
+        x->fn_vslot8(0);
+        fn_800A29C4(lbl_80619948, x->m318);
+        break;
+    }
 }
 
 /* near-miss: store/load order of the m338/m328/m324 group differs */

@@ -182,6 +182,7 @@ struct Unk80198AA0 {
 };
 Unk80198AA0* fn_80198AA0(Unk80198AA0* mem, Unk8019F8C0_Owner* o);
 void* operator new(unsigned int size, int heap);
+void* operator new[](unsigned int size, int heap);
 extern float lbl_805CE804;
 extern char lbl_805CE818[];
 extern char lbl_805CE81C[];
@@ -565,6 +566,96 @@ void fn_801A4674(Unk8019F8C0_Owner* o)
 }
 
 /* near-miss: same code; retail shares r0 between the byte offset and the loaded value (4 slots differ). */
+class Unk801A4710_VB {
+public:
+    char pad0[0x98];
+};
+class Unk801A4710_V : public Unk801A4710_VB {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+};
+
+/* near-miss: written from the asm. */
+inline int* Unk801A4710_Row(int* a, int r)
+{
+    return a + r * 25;
+}
+
+void fn_801A4710(Unk8019F8C0_Owner* o)
+{
+    volatile int c = 0;
+    int t = 0;
+    do {
+        unsigned k = 0;
+        unsigned n = fn_801A48F8(o, t);
+        if (k < n) {
+            int j = 0;
+            do {
+                char* b = (char*)o->m594;
+                int o2 = j + c * 100;
+                int v = *(int*)(b + o2);
+                k++;
+                j += 4;
+                if (v != 0) {
+                    ((Unk801A4710_V*)v)->fn_vslot25();
+                }
+            } while (k < n);
+        }
+        unsigned k2 = 0;
+        do {
+            int v = o->m6A0[c][k2];
+            k2++;
+            if (v != 0) {
+                ((Unk801A4710_V*)v)->fn_vslot25();
+            }
+        } while (k2 <= 1);
+        int v = o->m6B0[c];
+        if (v != 0) {
+            ((Unk801A4710_V*)v)->fn_vslot25();
+        }
+        int w = c;
+        int r;
+        if (w > 1) {
+            r = w;
+        } else {
+            r = w + 1;
+        }
+        c = r;
+        t = r;
+    } while (t <= 1);
+    unsigned k = 0;
+    do {
+        int v = o->m690[k];
+        k++;
+        if (v != 0) {
+            ((Unk801A4710_V*)v)->fn_vslot25();
+        }
+    } while (k <= 3);
+}
 void fn_801A4884(Unk8019F8C0_Owner* o)
 {
     int row = 0;

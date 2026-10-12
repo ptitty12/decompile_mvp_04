@@ -141,9 +141,9 @@ extern "C" FE_OVERLAY void fn_804502F4(int a, FeScr6* b)
         s->fn_8007A808(0xB, fn_804D1278(b), 1);
         if (b->m13C->m24 < 0)
             ((FeObj2*)b)->v67(2, 0);
+        fn_8044FE0C(b);
+        fn_80450388(b);
     }
-    fn_8044FE0C(b);
-    fn_80450388(b);
 }
 
 extern "C" FE_OVERLAY void fn_80450388(FeScr6* self)

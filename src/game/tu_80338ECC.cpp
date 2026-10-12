@@ -598,13 +598,13 @@ extern "C" float fn_8033CDC4(CCurve* o, float x)
             return o->m4[o->m8 - 1].m4;
         do {
             i++;
-            if (i >= o->m8)
-                break;
-            if (!(o->m4[i].m0 <= x)) {
-                found = 1;
-                i--;
-            } else if (o->m4[i].m0 == x) {
-                found = 1;
+            if (i < o->m8) {
+                if (!(o->m4[i].m0 <= x)) {
+                    found = 1;
+                    i--;
+                } else if (o->m4[i].m0 == x) {
+                    found = 1;
+                }
             }
         } while (!found);
         if (i != -1 && i != o->m8) {

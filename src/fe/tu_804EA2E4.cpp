@@ -177,11 +177,12 @@ extern "C" FE_OVERLAY void fn_804EB078(FeS13* self)
     self->m1E4 = 0;
     ((FeObj1*)self->v32("LOADING", 1))->v8(0);
     self->m1DC = lbl_8061A328;
-    if (self->m1E4 != 0)
+    if (self->m1E4 != 0) {
         self->m1D8 = 8;
-    else
+    } else {
         self->m1D8 = self->m1E4;
-    fn_804EB2C8(self);
+        fn_804EB2C8(self);
+    }
     ((FeObj1*)self->v32("LEGAL", 1))->v8(0);
 }
 

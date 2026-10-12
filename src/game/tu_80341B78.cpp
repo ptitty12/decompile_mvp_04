@@ -243,7 +243,30 @@ unsigned short fn_80341FF4(Unk80341FF4* self)
 }
 
 void* fn_803774A8(int size, int heap);
-void fn_803EE7BC();
+int fn_803EE7BC();
+
+struct Unk803416F4 {
+    void* m0;
+    void* m4;
+    int m8;
+};
+void fn_8034170C(Unk803416F4* self);
+extern "C" {
+const char* fn_802B9300(const char* s, int a, int b, unsigned* outn);
+void fn_802B961C(const char* p, int a);
+void fn_803792AC(const char** pp, unsigned* pn);
+void fn_80329D1C(const char** pp, unsigned* pn, unsigned* out, int lo, int hi, int delim);
+void fn_80329AEC(const char** pp, const char** out, unsigned* pn, int delim);
+int strcmp(const char* a, const char* b);
+}
+/* Row loader object: m0 flag bytes, m4 index table, m8 expected row count, mC rows read, mD id bound. */
+struct Unk80342148 {
+    unsigned char* m0;
+    int* m4;
+    int m8;
+    unsigned char mC;
+    unsigned char mD;
+};
 
 struct Unk80341FFC {
     unsigned short* m0;
@@ -308,6 +331,17 @@ int fn_80343B1C(Unk80342FEC* self) { return self->m8 == 0 ? 0 : 1; }
 int fn_80343B34(Unk80342FEC* self, int i) { return self->m4[i]; }
 int fn_80343DCC(Unk80342FEC* self) { return self->m8 == 0 ? 0 : 1; }
 
+/* Loader object of the 168-instruction family (fn_80343024): m0/m4 are the two tables read through
+   fn_80343004/fn_80343014, m8 an array of {first, last} halfword pairs per entry, mC the entry count. */
+struct Unk80343024_P { unsigned short a; unsigned short b; };
+struct Unk80343024 {
+    Unk80341FDC* m0;
+    Unk80341FDC* m4;
+    Unk80343024_P* m8;
+    unsigned char mC;
+    int* m10;
+    unsigned short m14;
+};
 struct Unk8034406C {
     int m0;
     int* m4;
@@ -327,6 +361,155 @@ int fn_8034406C(Unk8034406C* self, unsigned short idx)
             r = 1;
     }
     return r;
+}
+
+/* near-miss: 16 slots, instruction count and layout identical (168 of 168). Only the two callee-saved address registers of the
+   second loop are swapped: retail &cur r28, &rem r29; here &cur r29 (equal priority, lower pseudo number allocated first).
+   Same shape at fn_803432EC, fn_803435B4, fn_8034387C. */
+extern "C" void fn_80343024(Unk80343024* self, const char* text)
+{
+    unsigned n;
+    const char* cur;
+    unsigned rem;
+    unsigned tok;
+    unsigned id;
+    unsigned id2;
+    if (fn_80342FEC((Unk80342FEC*)self) != 0)
+        return;
+    if (fn_80342128(self->m0) == 0)
+        return;
+    if (fn_80341FDC(self->m4) == 0)
+        return;
+    const char* buf = fn_802B9300(text, 0x500, 0xC, &n);
+    self->m14 = 0;
+    const char* end = buf + n;
+    cur = buf;
+    rem = n;
+    fn_803792AC(&cur, &rem);
+    while (cur != end && rem > 1) {
+        fn_803792AC(&cur, &rem);
+        self->m14++;
+    }
+    self->mC = self->m0->mC;
+    self->m8 = (Unk80343024_P*)fn_803774A8(self->mC * 4, 0);
+    fn_803EE7BC();
+    self->m10 = (int*)fn_803774A8(self->m14 * 4, 0);
+    fn_803EE7BC();
+    int i;
+    for (i = 0; i < self->mC; i++) {
+        char* p = (char*)self->m8;
+        int off = i * 4;
+        char* q = (char*)(off + (int)p);
+        *(unsigned short*)q = 1;
+        *(unsigned short*)(q + 2) = 0;
+    }
+    cur = buf;
+    rem = n;
+    int j = 0;
+    fn_803792AC(&cur, &rem);
+    int prev = 0;
+    int i2 = 0;
+    while (cur != end && rem > 1) {
+        fn_80329AEC(&cur, (const char**)&tok, &rem, 0x2C);
+        fn_80329D1C(&cur, &rem, &id, 1, 1000000, 0x2C);
+        int k = fn_80343004((Unk80342FEC*)self->m0, (unsigned char)id);
+        if (j != 0) {
+            if (prev == k)
+                goto next;
+            self->m8[prev].b = j;
+        }
+        prev = k;
+        if (self->m8[k].a < self->m8[k].b) {
+            fn_802B961C(buf, 0xC);
+            fn_80341B78((Unk80341B5C*)self);
+            return;
+        }
+        self->m8[k].a = j;
+    next:
+        fn_80329D1C(&cur, &rem, &id2, 1, 1000000, 0xD);
+        j++;
+        self->m10[i2] = fn_80343014((Unk80342FEC*)self->m4, (unsigned short)id2);
+        i2++;
+    }
+    self->m8[prev].b = j;
+    fn_802B961C(buf, 0xC);
+}
+
+/* near-miss: 14 slots. Instruction sequence and block layout are identical to retail (181 of 181 insns); only the
+   callee-saved register numbering of three values differs: retail names r24, end r23, rows r22; here end r24, rows r23,
+   names r22 (buf r25 and x r26 now match). One shared `done:` free block (a goto from the n == 0 test) keeps buf at 7
+   references (a second free site made it 8 and moved it above x). global-alloc priority of names (4 refs) stays below end
+   (5 refs, test copies counted) and rows. The same loader repeats at fn_8034243C, fn_80342730, fn_80342A24, fn_80342D18. */
+extern "C" void fn_80342148(Unk80342148* self, const char* text, const char** names)
+{
+    unsigned n;
+    const char* cur;
+    unsigned rem;
+    unsigned id1;
+    unsigned id2;
+    const char* tok;
+    if (fn_80342128((Unk80341FDC*)self) != 0)
+        return;
+    const char* buf = fn_802B9300(text, 0x500, 0xC, &n);
+    const char* end;
+    if (n == 0) goto done;
+    end = buf + n;
+    cur = buf;
+    rem = n;
+    fn_803792AC(&cur, &rem);
+    self->mC = 0;
+    self->mD = 0;
+    while (cur != end && rem > 1) {
+        id1 = 0;
+        fn_80329D1C(&cur, &rem, &id1, 1, 1000000, 0x2C);
+        if (!(self->mD > id1))
+            self->mD = (unsigned char)id1 + 1;
+        fn_803792AC(&cur, &rem);
+        self->mC++;
+    }
+    if (self->mC >= self->m8) goto alloc;
+done:
+    fn_802B961C(buf, 0xC);
+    return;
+alloc:
+    self->m0 = (unsigned char*)fn_803774A8(self->mC, 0);
+    fn_803EE7BC();
+    self->m4 = (int*)fn_803774A8(self->mD * 4, 0);
+    fn_803EE7BC();
+    int k;
+    for (k = 0; k < self->mD; k++)
+        self->m4[k] = fn_80342140((Unk80341FDC*)self);
+    unsigned prev = 0;
+    int j = 0;
+    int rows = 0;
+    int x = self->m8;
+    cur = buf;
+    rem = n;
+    fn_803792AC(&cur, &rem);
+    while (cur != end && rem > 1) {
+        fn_80329D1C(&cur, &rem, &id2, 1, 1000000, 0x2C);
+        if (rows != 0 && !(prev < id2)) {
+            fn_802B961C(buf, 0xC);
+            fn_8034170C((Unk803416F4*)self);
+            return;
+        }
+        fn_80329AEC(&cur, &tok, &rem, 0xD);
+        if (j < self->m8 && strcmp(tok, *names) == 0) {
+            self->m0[j] = (unsigned char)id2;
+            self->m4[id2] = j;
+            names++;
+            j++;
+        } else {
+            self->m0[x] = (unsigned char)id2;
+            self->m4[id2] = x;
+            x++;
+        }
+        rows++;
+        prev = id2;
+    }
+    for (; j != self->m8; j++) {
+    }
+    fn_802B961C(buf, 0xC);
 }
 
 struct Unk803440D0 {

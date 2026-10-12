@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8026C414.h"
+#include "game/chooser.h"
 
 typedef Unk8026C414_O O;
 typedef Unk8026C414_X X;
@@ -11,6 +12,21 @@ typedef Unk8026C414_W W;
 typedef Unk8026C414_M M;
 typedef Unk8026C414_E E;
 typedef Unk8026C414_V3 V3;
+
+/* View of the mover for fn_8026CCF8: three V3 slots (+0x8C source, +0x200 current, +0x22C saved) and the
+   stream cursor object at +0x1A0 (its first word is cleared). */
+struct Unk8026CCF8_M {
+    char pad0[0x8C];
+    Unk8026C414_V3 m8C;
+    char pad98[0x1A0 - 0x98];
+    int m1A0;
+    char pad1A4[0x200 - 0x1A4];
+    Unk8026C414_V3 m200;
+    char pad20C[0x22C - 0x20C];
+    Unk8026C414_V3 m22C;
+    char pad238[0x240 - 0x238];
+    int m240;
+};
 
 extern "C++" {
 int fn_8026D55C(O* self, X* ctx);
@@ -92,6 +108,31 @@ void fn_8026CB9C(M* self, int i)
     *d = *s;
 }
 
+extern void fn_8037DB54(void* obj, int* a, int* b, int bitA, int bitB, float f);
+void fn_8026CCF8(M* self, int i, int* a, int* b)
+{
+    Unk8026CCF8_M* m = (Unk8026CCF8_M*)self;
+    E* e = &self->e[i];
+    int* c = &m->m1A0;
+    *a = e->m18;
+    *b = e->m1C;
+    m->m240 = (unsigned)*(int*)((char*)e + 0xC) >> 31;
+    m->m1A0 = 0;
+    m->m22C = m->m8C;
+    m->m1A0 = 0;
+    m->m200 = e->pos;
+    float f = e->m10;
+    if (*(int*)((char*)e + 0xC) >= 0) {
+        int pa = *a;
+        int wa = *(int*)pa;
+        *a = pa + 0x10;
+        int pb = *b;
+        int wb = *(int*)pb;
+        *b = pb + 0x10;
+        fn_8037DB54(c, a, b, (wa >> 9) & 1, (wb >> 9) & 1, f);
+    }
+}
+
 void fn_8026CDE4(M* self, int i)
 {
     int a = 0;
@@ -103,6 +144,25 @@ void fn_8026CE18(M* self, int i)
 {
     fn_8026CB30(self, i);
     ((Unk8026C414_VT98*)self)->s9(1);
+}
+
+extern Unk80273498_Vec3 fn_8014E388(int idx);
+int fn_8026CE60(int a, float* v)
+{
+    Unk80273498_Vec3 p;
+    switch (a) {
+    case 3:
+        return v[0] > v[2];
+    case 1:
+        return v[0] < v[2];
+    case 0:
+        p = fn_8014E388(0);
+        return v[0] < p.z - v[2];
+    case 2:
+        p = fn_8014E388(2);
+        return p.x - v[0] < v[2];
+    }
+    return 1;
 }
 
 int fn_8026CF70(O* self, Unk8026CF70_P* p, int* out1, int* out2, float* fp)

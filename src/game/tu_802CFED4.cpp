@@ -91,6 +91,18 @@ void fn_802D0B94(Unk802D0B94_Self* self, Unk8037B3E8* reg)
     r->fn_8037B830(lbl_805E3BA4);
 }
 
+struct Unk802CF894_Self;
+class Unk802CF894_Reg;
+void fn_802CF894(Unk802CF894_Self* s, Unk802CF894_Reg* r);
+void fn_802CF368(Unk802CF368_Self* o);
+
+void fn_802D1128(Unk802CF368_Self* self)
+{
+    fn_802CF368(self);
+    fn_802D0B94((Unk802D0B94_Self*)((char*)self + 0xD4), self);
+    fn_802CF894((Unk802CF894_Self*)((char*)self + 0x20), (Unk802CF894_Reg*)self);
+}
+
 void fn_802D116C(Unk802D116C* p, int c)
 {
     p->vptr = lbl_806646F0;
@@ -151,8 +163,91 @@ void fn_802D1244(char* o, float a, float b)
     fn_802D095C(o + 0x20, a, b);
 }
 
+extern const void* lbl_806645C0[];
+extern const char lbl_805E26EC[];
+extern unsigned int lbl_8061EDB8;
+const char* fn_802D7288();
+unsigned int fn_80378568(const char* token, int len);
+
+struct Unk802D1278_F {
+    const void* vptr;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    Unk802D0B4C_Vec3 m20;
+    Unk802D0B4C_Vec3 m2C;
+    float m38;
+    int m3C;
+    int m40;
+};
+
+Unk802D1278::Unk802D1278()
+{
+    Unk802D1278_F* f = (Unk802D1278_F*)this;
+    new (f) Unk8037B3E8(lbl_805E26EC);
+    f->vptr = lbl_806645C0;
+    f->m4 = 0;
+    f->m8 = 0;
+    f->mC = 0;
+    f->m10 = 0;
+    f->m14 = 1;
+    f->m1C = 1;
+    f->m18 = 0;
+    if (lbl_8061EDB8 == 0)
+        lbl_8061EDB8 = fn_80378568(fn_802D7288(), 0);
+    f->m2C = lbl_806055AC;
+    f->m20 = f->m2C;
+    f->m38 = 600.0f;
+    f->m3C = 0;
+    f->m40 = 0;
+}
+
 void fn_802D134C()
 {
+}
+
+class Unk802D1350_V {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual int s4();
+};
+class Unk802D1350_Cam : public Unk802D1350_V {
+public:
+    char pad4[0x20 - 0x4];
+    Unk802D0B4C_Vec3 m20;
+    Unk802D0B4C_Vec3 m2C;
+};
+
+void fn_802D1350(Unk802D1350_Cam* self, Unk802D1350_Cam* other)
+{
+    if (other != 0) {
+        if (self->s4() == other->s4()) {
+            other->m20 = self->m20;
+            other->m2C = self->m2C;
+        }
+    }
+}
+
+float fn_802D7E2C(int h, int k);
+float fn_802CBD90(Unk802CBD04* o);
+
+float fn_802D18C4(int unused, Unk802CBD04* cam)
+{
+    float s = 0.33333334f;
+    int h = lbl_80620418;
+    if (h == -1)
+        return fn_802CBD90(cam);
+    s = s * (1.0f - fn_802D7E2C(h, 0x49));
+    float a = s * fn_802D7E2C(h, 0x47);
+    float b = s * fn_802D7E2C(h, 0x46);
+    float r = (fn_802CBD90(cam) + a) - b;
+    return !(r > 72.0f) ? (r >? 0.1f) : 72.0f;
 }
 
 /* near-miss (5 slots): retail shares one stw r0,0(r31) between the two arms (r0 = 1/3 from the ternary or (v+1)&3); ours stores in each arm. */
@@ -276,6 +371,77 @@ public:
     int m130;
 };
 
+extern const void* lbl_80664528[];
+extern const char lbl_805E2700[];
+void fn_8033CCE0(void* p);
+
+struct Unk802D1EA4_F {
+    const void* vptr;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    float m28;
+    char pad2C[0x38 - 0x2C];
+    Unk802D0B4C_Vec3 m38;
+    float m44;
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
+    float m5C;
+    int m60;
+    float m64;
+    float m68;
+    float m6C;
+    float m70;
+    float m74;
+    char pad78[0x12C - 0x78];
+    int m12C;
+    int m130;
+};
+
+Unk802D1EA4::Unk802D1EA4()
+{
+    Unk802D1EA4_F* f = (Unk802D1EA4_F*)this;
+    new (f) Unk8037B3E8(lbl_805E2700);
+    f->m4 = 0;
+    f->m8 = 0;
+    f->mC = 0;
+    f->m10 = 0;
+    f->m14 = 1;
+    f->m18 = 0;
+    f->m1C = 1;
+    f->vptr = lbl_80664528;
+    fn_8033CCE0((char*)f + 0x2C);
+    fn_802CF7A8((char*)f + 0x78);
+    f->m20 = 0;
+    f->m24 = 0;
+    f->m38 = lbl_806055AC;
+    f->m58 = 0.0f;
+    f->m5C = 10.0f;
+    f->m60 = 0;
+    f->m64 = 10.0f;
+    f->m68 = 20.0f;
+    f->m6C = 10.0f;
+    f->m28 = 1.0f;
+    f->m70 = 0.0f;
+    f->m74 = 0.0f;
+    f->m44 = 0.0f;
+    f->m48 = 0.0f;
+    f->m4C = 0.0f;
+    f->m50 = 0.0f;
+    f->m54 = 0.0f;
+    f->m12C = 0;
+    f->m130 = 1;
+}
+
 void fn_802D1FA8(Unk802D1FA8_Self* r)
 {
     r->fn_8037B7E4(lbl_805E3D40);
@@ -339,6 +505,27 @@ void fn_802D3210(char* o)
 void fn_802D3234(char* o, float a, float b)
 {
     fn_802D095C(o + 0x78, a, b);
+}
+
+extern const void* lbl_80664490[];
+extern const char lbl_805E270C[];
+
+Unk802D3268::Unk802D3268()
+{
+    void* p = this;
+    new (p) Unk8037B3E8(lbl_805E270C);
+    *(const void***)p = lbl_80664490;
+    int* q = (int*)p;
+    q[1] = 0;
+    q[2] = 0;
+    q[3] = 0;
+    q[4] = 0;
+    q[5] = 1;
+    q[6] = 0;
+    q[7] = 1;
+    *(Unk802D0B4C_Vec3*)((char*)p + 0x20) = lbl_806055AC;
+    *(Unk802D0B4C_Vec3*)((char*)p + 0x30) = lbl_806055AC;
+    *(float*)((char*)p + 0x3C) = 30.0f;
 }
 
 void fn_802D331C()
@@ -405,6 +592,62 @@ void fn_802D3364(Unk802D3364_Self* r)
 Unk802D3268* fn_802D34EC()
 {
     return new (lbl_806EF9B4) Unk802D3268;
+}
+
+struct Unk802D360C_Self {
+    char pad0[0x2C];
+    float m2C;
+};
+inline Unk802D0B4C_Vec3 Unk802D360C_Sub(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D360C_Mul(const Unk802D0B4C_Vec3& v, float k)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+
+struct Unk8026C414_M;
+Unk802D0B4C_Vec3 fn_8026CB70(Unk8026C414_M* m, int i);
+int fn_802CBDB4(Unk802CBD04* o);
+
+struct Unk802D351C_Self {
+    char pad0[0x20];
+    Unk802D0B4C_Vec3 m20;
+};
+inline Unk802D0B4C_Vec3 Unk802D351C_Add(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+void fn_802D351C(Unk802D351C_Self* self, int unused, Unk802D0B4C_Vec3* out, Unk802CBD04* cam)
+{
+    Unk8026C414_M* m = (Unk8026C414_M*)fn_802CBDB4(cam);
+    Unk802D0B4C_Vec3 v = lbl_806055AC;
+    if (m != 0)
+        v = fn_8026CB70(m, 1);
+    *out = Unk802D351C_Add(v, self->m20);
+}
+
+void fn_802D360C(Unk802D360C_Self* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t)
+{
+    Unk802D0B4C_Vec3 d = Unk802D360C_Sub(*b, *a);
+    Unk802D0B4C_Vec3 s = Unk802D360C_Mul(d, self->m2C);
+    b->x = b->x + s.x;
+    b->y = b->y + s.y;
+    b->z = b->z + s.z;
 }
 
 void fn_802D36D0(Unk802D36D0* o, int, Unk802D0B4C_Vec3* a, float* b)
@@ -515,6 +758,70 @@ struct Unk802D3B40_Self {
 extern const void* lbl_80664430[];
 extern const void* lbl_80649DB8[];
 void fn_80378620(void* self, int chrg);
+
+struct Unk802D39EC_V {
+    char pad0[0xC];
+    void* mC;
+};
+struct Unk802D39EC_S {
+    char pad0[8];
+    const void* m8;
+    char padC[0x44 - 0xC];
+    Unk802CF484 m44;
+    int m60;
+    Unk802D39EC_V* m64;
+    void* m68;
+    void* m6C;
+    void* m70;
+    void* m74;
+    void* m78;
+    char pad7C[0xC4 - 0x7C];
+    int mC4;
+    char padC8[0x160 - 0xC8];
+    void* m160;
+};
+extern const void* lbl_80664430[];
+extern const char lbl_805E3FF4[];
+void fn_803785E4(void* p);
+void fn_80378A34(void* p, int q);
+void* fn_802CB924(void* mem, int a);
+void fn_802D3C80(void* p);
+void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
+void* fn_802CF168(void* name);
+
+extern "C" void* fn_802D39EC(void* mem, int a, void* owner, int b)
+{
+    Unk802D39EC_S* self = (Unk802D39EC_S*)mem;
+    fn_803785E4(self);
+    self->m8 = lbl_80664430;
+    new (&self->m44) Unk802CF484;
+    self->m60 = a;
+    self->m64 = (Unk802D39EC_V*)owner;
+    self->mC4 = b;
+    self->m68 = 0;
+    self->m6C = 0;
+    self->m70 = 0;
+    self->m74 = 0;
+    self->m78 = 0;
+    self->m160 = fn_802CF168((void*)lbl_805E3FF4);
+    fn_80378A34(self, a + 0x704);
+    if (b != 0) {
+        self->m70 = fn_802CB924(operator new(0x1E0, 0), a);
+        ((Unk802D39EC_V*)owner)->mC = self->m70;
+    } else {
+        self->m68 = new (0) Unk802D1278;
+        self->m74 = fn_802CB924(operator new(0x1E0, 0), a);
+        if (self->m74 != 0)
+            fn_802CBDBC((Unk802CBD04*)self->m74, (int)self->m68, 1, 0);
+        self->m6C = fn_802CB924(operator new(0x1E0, 0), a);
+        void* r = fn_802CB924(operator new(0x1E0, 0), a);
+        self->m70 = r;
+        ((Unk802D39EC_V*)owner)->mC = r;
+        self->m78 = fn_802CB924(operator new(0x1E0, 0), a);
+    }
+    fn_802D3C80(self);
+    return self;
+}
 
 /* near-miss (80/81 insns, 78 words equal): retail keeps the zero of the m78 store in r30 across the m6C delete and reuses it for m6C; ours loads a second zero (li r0,0) for m6C */
 void fn_802D3B40(Unk802D3B40_Self* s, int chrg)
