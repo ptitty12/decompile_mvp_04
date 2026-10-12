@@ -254,6 +254,40 @@ extern "C" void fn_803B2AF0(float* a, float* b, float* out, int n, int shift)
     }
 }
 
+extern "C" void fn_803B2D58(Unk803B3334* o, float** pp, int shift)
+{
+    float* a;
+    float* b;
+    if (o->m34 > 0) {
+        a = (float*)((char*)o + 0x40);
+        b = *pp;
+    } else {
+        a = *pp;
+        b = a + o->m2C;
+    }
+    if (shift == 0) {
+        Snd::Util::MemCpy((char*)o + 0x838, a, o->m2C * 4);
+        o->m30 = o->m30 - o->m2C;
+        o->m38 = o->m2C;
+        *pp = b;
+    } else if (shift > 0) {
+        int n = shift * 4;
+        Snd::Util::MemCpy((char*)o + 0x838, a, n);
+        fn_803B2AF0(a, b, (float*)((char*)o + (n + 0x838)), o->m2C, shift);
+        o->m30 = o->m30 - o->m2C;
+        o->m38 = o->m2C + shift;
+        *pp = b;
+    } else {
+        fn_803B2AF0(a, b, (float*)((char*)o + 0x838), o->m2C, shift);
+        Snd::Util::MemCpy((char*)o + (o->m2C * 4 + 0x838), b - shift, (o->m2C + shift) * 4);
+        o->m30 = o->m30 - o->m2C * 2;
+        o->m38 = o->m2C * 2 + shift;
+        *pp = b + o->m2C;
+    }
+    o->m34 = 0;
+    o->m3C = 0;
+}
+
 /* near-miss: 38 vs 39 insns: retail keeps o in r31 and n in r29 (loads m3C, m38, *count up front, then n = m38 / *count); ours swaps those two saved registers and orders the loads differently; local-variable and load-order variants tried */
 extern "C" int fn_803B2EAC(Unk803B3334* o, int* pcount, char** pdst)
 {
