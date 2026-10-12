@@ -368,10 +368,19 @@ extern "C" void fn_801D0440(Y* y)
     }
 }
 
+inline P* GetPB(P** a, unsigned i)
+{
+    if (i <= 2) {
+        int o = i * 4;
+        return *(P**)((char*)a + o);
+    }
+    return 0;
+}
+
 extern "C" int fn_801D0B48(Y* y)
 {
     Unk801CF054_T* t = lbl_8068B618;
-    P* p = GetP(t->m8, t->m8[0] == y->m30);
+    P* p = GetPB(t->m8, t->m8[0] == y->m30);
     int k = 0;
     if (p->m6F8->m14->m1CD0 != 0)
         k = 1;
@@ -466,6 +475,15 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     P* q = fn_801A4B34(y->m30);
     t = t + LerpATB(-0.25f, fn_8024D0F8(q, 0x11), 0.25f);
     return t;
+}
+
+/* near-miss: same code; retail keeps 1e-6 in f29 and 1.0 in f30 (ours swapped) and stores the scale slot after the lwz. */
+extern "C" void fn_801D28E4(Y* y)
+{
+    y->m54 = 0.75f + RandF2(y->m30->m554, 0.25f, lbl_805D25E0, 0x46C);
+    y->m50 = RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x46F);
+    if (!(RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x471) >= 0.33f))
+        y->m50 = -y->m50;
 }
 
 extern "C" int fn_801D251C(Y* y)

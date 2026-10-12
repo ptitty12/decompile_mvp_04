@@ -19,7 +19,10 @@ struct Unk801CF054_Y {
     void* m34;
     int m38;
     char pad3C[8];
-    char m44[0x28];
+    char m44[0xC];
+    float m50;
+    float m54;
+    char pad58[0x6C - 0x58];
     char m6C[4];
     char pad70[0x1F4 - 0x70];
     int m1F4;
