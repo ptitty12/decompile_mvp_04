@@ -276,6 +276,51 @@ inline Vec3 Unk801E0A6C_Sub(const Vec3& a, const Vec3& b)
     return r;
 }
 
+struct Unk801E08E0_G {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk801E08E0_P {
+    char pad0[0x934];
+    Unk801E08E0_G* m934;
+};
+extern "C" int fn_801DBF30(W* self);
+inline Vec3 Unk801E08E0_Flat(const Vec3& p)
+{
+    Vec3 r = p;
+    r.y = 0.0f;
+    return r;
+}
+inline Vec3 Unk801E08E0_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk801E08E0_Len2(Vec3 v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+
+extern "C" int fn_801E08E0(I* i, P* p, Unk801DB948_Vec4* v)
+{
+    const Vec3* pv = &p->m60;
+    float d2 = Unk801E08E0_Len2(Unk801E08E0_Sub(Unk801E08E0_Flat(*pv), *v));
+    if (p->m460 == 0)
+        return d2 < 144.0f;
+    if (fn_8026DAE8(p, 0) == 0)
+        return d2 < 576.0f;
+    if (fn_801DBF30(i->m9C->m0->m700->m3B8) == 2 && !(d2 < 2304.0f)) {
+        Unk801DB948_Q* q = fn_80244C84(p);
+        Unk801E08E0_G* g = ((Unk801E08E0_P*)p)->m934;
+        if (q != 0 && g != 0 && g->m14 != 0 && q->m10 == 2)
+            return 1;
+    }
+    return d2 < 2304.0f;
+}
+
 extern "C" Vec3 fn_801E0A6C(I* i, P* p, const void* v, int w)
 {
     Vec3 r = lbl_806055DC;
