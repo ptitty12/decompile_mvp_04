@@ -244,6 +244,29 @@ extern "C" int fn_803B0798()
     return -15;
 }
 
+extern "C" void fn_803AE0FC(void* h, int v);
+void Snd::Hal::SetVol(int voice)
+{
+    CHANPUB* c = (CHANPUB*)((char*)sndgs.chan + voice * 0x90);
+    Unk8069E200_Rec* r = &lbl_8069E200.rec[voice];
+    float vol;
+    if (c->rendermode & 0x200) {
+        vol = c->finalvol * (float)c->drylevel;
+        fn_803AE0FC(lbl_8069E200.rec[voice].m3C, (int)(vol * 258.0f));
+        return;
+    }
+    vol = c->finalvol * (float)c->drylevel * 0.007874016f;
+    unsigned char ch = sndgs.sso.set.outputchannels;
+    unsigned char n;
+    if (ch == 1)
+        n = 2;
+    else
+        n = ch;
+    int i;
+    for (i = 0; i < n; i++)
+        fn_803B22EC(voice - sndgs.sso.set.voicesdsp, i, vol * r->mVol[i]);
+}
+
 void Snd::Hal::SetDry(int voice)
 {
     CHANPUB* c = (CHANPUB*)((char*)sndgs.chan + voice * 0x90);
