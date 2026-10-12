@@ -4,6 +4,85 @@
  */
 #include "game/tu_8017D640.h"
 #include "game/clampiter.h"
+struct Unk8017FF74_D {
+    char pad0[0x68];
+    unsigned int m68;
+    unsigned int m6C;
+};
+float fn_8017FCE4(Unk8017F744_T* p);
+float fn_8017FB04(Unk8017F744_T* p);
+float fn_8017F7F0(Unk8017F744_T* p, unsigned n);
+void fn_8017F8A0(Unk8017F8A0_T* p);
+void fn_80034C68(void* p, float f);
+struct Unk8017DF2C_A {
+    unsigned char* m0;
+    unsigned int m4;
+};
+extern char lbl_80649DA0[];
+extern char lbl_8065FC30[];
+struct Unk8017DE28_Msg {
+    int m0;
+    const void* vptr;
+    int m8;
+    void* mC;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived() { vptr = lbl_8065FC30; }
+    void Set(int a, void* b)
+    {
+        m8 = a;
+        mC = b;
+    }
+};
+struct Unk8017DE28_Obj {
+    char pad0[0x480];
+    char m480[1];
+    char pad481[0x704 - 0x481];
+    int m704;
+    int m708;
+};
+void fn_801AE17C(void* p, int a);
+void fn_80099AA0(void* p, int a);
+void fn_80252DD8(void* p, int a);
+void fn_802531FC(void* p);
+void fn_8023276C(void* p, int a);
+void fn_8035AE58(void* p, int a);
+void fn_801A6820(void* p);
+struct Unk8017FA08_D {
+    char pad0[0x48];
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
+    float m5C;
+};
+struct Unk8017FA08_T {
+    char pad0[0xC];
+    Unk8017FA08_D* mC;
+    char pad10[0x1E4 - 0x10];
+    unsigned int m1E4;
+    unsigned int m1E8;
+    int m1EC;
+    int m1F0;
+    int m1F4;
+    int m1F8;
+    int m1FC;
+};
+class Unk8017F67C_C {
+public:
+    virtual ~Unk8017F67C_C();
+    void m();
+};
+struct Unk8017F67C_Ent {
+    int key;
+    void (Unk8017F67C_C::*fn)();
+};
+extern Unk8017F67C_Ent lbl_8061C698[10];
+extern "C" void fn_80034C1C(void* p);
 struct Unk8017E1E0_Vec {
     float x;
     float y;
@@ -79,6 +158,64 @@ void fn_8017DD80(Unk8017DD64_T* p, int idx, int* out0, int* out1)
         int h = fn_80099B50(it, 1);
         *out1 = fn_801A49F0(p->m4, idx, h);
     }
+}
+
+void fn_8017DE28(Unk8017A930_T* p, Unk8017DE28_Obj* o)
+{
+    if (o != 0) {
+        fn_801AE17C(p->m3C8, o->m708);
+        char* it = (char*)p->m4->m6F8->m14 + o->m708 * 0xE64;
+        int n = *(int*)(it + 0x78);
+        if (fn_8017DCCC((Unk8017DD64_T*)p, (Unk8017DCCC_Obj*)o) == 0 && n <= 1) {
+            char* sub = o->m480;
+            fn_80099AA0(it, o->m704);
+            fn_80252DD8(sub, 0);
+            fn_802531FC(sub);
+            Unk8017DE28_Msg m;
+            m.Base(0x97);
+            m.Derived();
+            m.Set(1, o);
+            fn_8037893C((char*)p->m4 + 0x704, m.m0, (int)&m, 0, 0);
+            fn_8023276C(p->m3B0, o->m708);
+            fn_8035AE58(&m, 2);
+        }
+    }
+    fn_801A6820(p->m4);
+}
+
+extern "C" void fn_8017DF2C(Unk8017A930_T* p, Unk8017DE28_Obj* o)
+{
+    if (o != 0) {
+        char* it = (char*)p->m4->m6F8->m14 + o->m708 * 0xE64;
+        Unk8017DF2C_A* a = (Unk8017DF2C_A*)(it + 0x74);
+        int n = a->m4;
+        if (n > 0) {
+            int v = o->m704;
+            if (v == fn_80099B50(it, 0)) {
+                if (a->m4 != 0) {
+                    unsigned i = 0;
+                    do {
+                        a->m0[i] = a->m0[i + 1];
+                        i++;
+                    } while (i < a->m4);
+                    a->m4 = a->m4 - 1;
+                }
+            } else if (n > 1) {
+                int v2 = o->m704;
+                if (v2 == fn_80099B50(it, 1)) {
+                    if (a->m4 > 1) {
+                        unsigned i = 1;
+                        do {
+                            a->m0[i] = a->m0[i + 1];
+                            i++;
+                        } while (i < a->m4);
+                        a->m4 = a->m4 - 1;
+                    }
+                }
+            }
+        }
+    }
+    fn_801A6820(p->m4);
 }
 
 int fn_8017E030(Unk8017DD64_T* p, int a, int b)
@@ -283,6 +420,17 @@ void fn_8017F424() {}
 
 Unk8017F628::~Unk8017F628() {}
 
+void fn_8017F67C(Unk8017F67C_C* self, int key)
+{
+    fn_80034C1C((char*)self + 0x10);
+    for (int i = 0; i < 10; i++) {
+        if (lbl_8061C698[i].key == key) {
+            (self->*lbl_8061C698[i].fn)();
+            break;
+        }
+    }
+}
+
 void fn_8017F744(Unk8017F744_T* p)
 {
     Unk8017F744_Ctx* c = p->m0;
@@ -388,6 +536,44 @@ void fn_8017F9F4(Unk8017F8A0_T* p)
 {
     p->m28 = p->m30;
     p->m2C = p->m28;
+}
+
+extern "C" float fn_8017FA08(Unk8017FA08_T* p)
+{
+    float r = 0.0f;
+    if (p->m1FC != 0) {
+        r = 0.25f;
+    } else {
+        if (p->m1F8 != 0) {
+            r = p->mC->m4C;
+        } else if (p->m1F4 != 0) {
+            r = p->mC->m48;
+        } else if (p->m1EC != 0) {
+            r = p->mC->m50;
+        } else if (p->m1F0 != 0) {
+            r = p->mC->m54;
+        }
+        float* a = (float*)((char*)p->mC + 0x48);
+        r = (float)p->m1E4 * a[4] + r;
+        r = (float)p->m1E8 * a[5] + r;
+    }
+    return r;
+}
+
+void fn_8017FF74(Unk8017F744_T* p)
+{
+    p->m1DC = p->m1DC + 1;
+    if (p->m1DC > 99) {
+        p->m1DC = 0;
+    }
+    int off = p->m1DC * 4 + 0x4C;
+    *(float*)((char*)p + off) = fn_8017FCE4(p) * fn_8017FB04(p) + p->m20;
+    p->m24 = fn_8017F7F0(p, ((Unk8017FF74_D*)p->mC)->m68);
+    p->m24 = !(p->m24 > 1.0f) ? (p->m24 >? 0.0f) : 1.0f;
+    p->m30 = fn_8017F7F0(p, ((Unk8017FF74_D*)p->mC)->m6C);
+    p->m30 = !(p->m30 > 1.0f) ? (p->m30 >? 0.0f) : 1.0f;
+    fn_8017F8A0((Unk8017F8A0_T*)p);
+    fn_80034C68(p->m10, p->m30);
 }
 
 void* fn_80180088(void* p)

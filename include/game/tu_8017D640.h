@@ -121,7 +121,7 @@ struct Unk8017F744_T {
     Unk8017F744_Ctx* m0;
     int m4;
     int m8;
-    char padC[4];
+    void* mC;
     char m10[0x10];
     float m20;
     float m24;
