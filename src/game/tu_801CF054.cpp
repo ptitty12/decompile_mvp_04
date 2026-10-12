@@ -723,6 +723,60 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     return t;
 }
 
+static inline int OkM(int f, int m)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & m) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+extern "C" float fn_8024F048(void* a, int b, void* c, int d, int e);
+extern "C" int fn_801D3798(Y* y);
+extern "C" int fn_801D25AC(Y* y);
+extern "C" int fn_801D2748(Y* y);
+extern "C" int fn_801D11D0(Y* y);
+extern "C" int fn_801D251C(Y* y);
+
+extern "C" int fn_801D22DC(Y* y)
+{
+    Unk801CF054_X3C0* x = ((Unk801CF054_X700*)y->m30->m700)->m3C0;
+    unsigned char b29 = y->m30->m6F8->m14->m1CCB;
+    unsigned char b30 = y->m30->m6F8->m14->m1CCA;
+    P* p = fn_801A4B34(y->m30);
+    if (p != 0 && !(fn_8024F048(p->mA0C, p->mA04, p->m44C, p->m708, 1) >= 0.7f) && b29 == 3 && b30 == 0)
+        return 0;
+    if (b30 != 2 && b29 != 3) {
+        if (OkM(x->m14, 2) != 0)
+            return 0;
+        if (OkM(x->m14, 1) != 0)
+            return 0;
+    }
+    if (OkM(x->m14, 4) != 0)
+        return 1;
+    float t;
+    float tt;
+    float t2;
+    Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
+    t = !(v.x <= 2.0f) ? 1.0f : 0.0f;
+    if ((float)__builtin_fabs(t) == 0.0f) {
+        t2 = !(v.y <= 2.0f) ? 1.0f : 0.0f;
+    }
+    if (OkM(x->m14, 8) != 0) {
+        if (fn_801D3798(y) != 0)
+            return fn_801D25AC(y);
+        return fn_801D2748(y);
+    }
+    if (fn_801D112C(y) != 0)
+        return fn_801D251C(y);
+    if (fn_801D1198(y) != 0)
+        return fn_801D11D0(y);
+    return fn_801D14A0(y);
+}
+
 extern "C" int fn_801D25AC(Y* y)
 {
     Unk801CF054_V2 v;
