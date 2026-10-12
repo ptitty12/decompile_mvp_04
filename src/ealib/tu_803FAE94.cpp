@@ -60,6 +60,14 @@ extern "C" int fn_803FBC94(int, RcReq*);
 extern "C" int fn_803FBDC4(int, RcReq*);
 extern "C" int fn_803FEC4C(int, int, int, int, int);
 extern "C" void fn_803F9884(int);
+extern "C" void fn_803F99E8(int);
+extern "C" int fn_803FC300(void*);
+extern "C" int fn_803FC360(void*);
+extern "C" void fn_803FFA60(void*, void*, int);
+struct RcBuf14 {
+    int m0, m4, m8, mC, m10;
+};
+extern RcBuf14 lbl_806ADE8C;
 extern "C" void fn_804007D4(void*);
 extern "C" int fn_803FB888(int);
 extern "C" void fn_804007FC(void*);
@@ -299,6 +307,40 @@ extern "C" int fn_803FB6FC(int id)
         r = ((int*)e)[7] == 0;
     fn_8040084C(lbl_806ADEA0);
     return r;
+}
+
+extern "C" int fn_803FB764(int id, int* p1, int* p2)
+{
+    int a = 0;
+    fn_80400828(lbl_806ADEA0);
+    RcLNode* n = (RcLNode*)fn_803FAF8C(id);
+    if (n != 0) {
+        a = n->m10;
+        if (a == 0)
+            n->mC = 1;
+    }
+    fn_8040084C(lbl_806ADEA0);
+    if (n == 0 || a != 0)
+        return -1;
+    if (n->m1C != 0) {
+        do {
+            fn_803F99E8(n->m1C);
+        } while (n->m1C != 0);
+    }
+    if (n->m10 != 0) {
+        if (p1 != 0)
+            *p1 = 0;
+        if (p2 != 0)
+            *p2 = 0;
+        fn_803FAFD4(n);
+        return -1;
+    }
+    if (p1 != 0)
+        *p1 = n->m2C - n->m8;
+    if (p2 != 0)
+        *p2 = n->m8;
+    fn_803FAFD4(n);
+    return 1;
 }
 
 extern "C" int fn_803FB888(int id)
