@@ -5,6 +5,8 @@
 
 #include "game/fe_804D08D0.h"
 
+extern "C" FeW* fn_800C8048(FeW* w);
+
 extern "C" {
 
 FE_OVERLAY FeS804DC128* fn_804DC128(FeS804DC128* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -106,6 +108,15 @@ FE_OVERLAY void fn_804DC73C(FeS804DC128* x)
 }
 
 FE_OVERLAY int fn_804DC75C(void) { return 0; }
+
+FE_OVERLAY void fn_804DC764(FeS804DC128* x)
+{
+    if (x->m158->fn_vslot60() != 0) {
+        ((FeWV*)x->m15C)->s28((void*)fn_800C8048(x->m158->fn_vslot70()->fn_vslot33(5, 1))->fn_vslot31());
+    } else {
+        ((FeWX*)x->m15C)->s29(0xBBC);
+    }
+}
 
 FE_OVERLAY void fn_804DC854(FeS804DC128* x)
 {
