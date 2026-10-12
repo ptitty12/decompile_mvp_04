@@ -48,6 +48,27 @@ extern "C" DB_OVERLAY void fn_8059A79C(Db8059A728_Rec* self)
     fn_8040074C(&self->m20, 4);
 }
 
+extern "C" void fn_8059A8E4(Db8059A728_Rec* self, short* dst, int unused);
+
+extern const char lbl_806012B0[];
+extern "C" void fn_8040321C(short* dst, const short* fmt, const short* a, const short* b);
+
+//@8059A8E4
+extern "C" DB_OVERLAY void fn_8059A8E4(Db8059A728_Rec* self, short* dst, int unused)
+{
+    short pair[2];
+    short* p = pair;
+    pair[0] = self->m0;
+    p[1] = 0;
+    if (fn_80403060(p)) {
+        short fmt[32];
+        fn_80402EF8((char*)fmt, lbl_806012B0);
+        fn_8040321C(dst, fmt, p, (short*)&self->m2);
+    } else {
+        fn_80403144(dst, &self->m2);
+    }
+}
+
 //@8059A968
 extern "C" DB_OVERLAY int fn_8059A968(Db8059A728_Rec* self, int k)
 {
@@ -263,7 +284,7 @@ extern "C" DB_OVERLAY void fn_8059ADF8(Db8059A728_Obj* self, const short* b, int
 
 extern "C" {
 int fn_8059B988(Db8059A728_Obj* self, int k);
-void fn_8059BABC(Db8059A728_Obj* self, int k, int v);
+void fn_8059BABC(Db8059A728_Obj* self, int k, unsigned v);
 }
 
 //@8059AE4C
@@ -281,6 +302,377 @@ extern "C" DB_OVERLAY void fn_8059AE4C(Db8059A728_Obj* self, int both, int b, in
         fn_8059BABC(self, 6, fn_8059B988(self, 6) + 1);
         if (both)
             fn_8059BABC(self, 7, fn_8059B988(self, 7) + 1);
+    }
+}
+
+//@8059B158
+extern "C" DB_OVERLAY int fn_8059B158(void* self, int k)
+{
+    switch (k) {
+    case 0:
+        return 3;
+    case 1:
+        return 3;
+    case 2:
+        return 1;
+    case 3:
+        return 1;
+    case 4:
+        return 1;
+    case 5:
+        return 1;
+    case 6:
+        return 0;
+    case 7:
+        return 0;
+    case 8:
+        return 0;
+    case 9:
+        return 0;
+    case 10:
+        return 0;
+    default:
+        return 0;
+    }
+}
+
+//@8059B1EC
+extern "C" DB_OVERLAY int fn_8059B1EC(void* self, int k)
+{
+    switch (k) {
+    case 0:
+        return 2;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 1;
+    case 4:
+        return 1;
+    case 5:
+        return 1;
+    case 6:
+        return 0;
+    case 7:
+        return 0;
+    case 8:
+        return 0;
+    case 9:
+        return 0;
+    case 10:
+        return 0;
+    default:
+        return 0;
+    }
+}
+
+extern "C" {
+}
+
+/* near-miss: retail's tree keeps only the dead 'cmpwi r4,8' of the zero cases (34 vs 36 insns) */
+//@8059B280
+extern "C" DB_OVERLAY void fn_8059B280(Db8059A728_Obj* self, int k, int a, short* b, int c)
+{
+    int s = 0;
+    switch (k) {
+    case 0:
+        break;
+    case 1:
+        break;
+    case 2:
+        s = 3;
+        break;
+    case 3:
+        s = 3;
+        break;
+    case 4:
+        s = 4;
+        break;
+    case 5:
+        s = 5;
+        break;
+    case 6:
+        break;
+    case 7:
+        break;
+    case 8:
+        break;
+    case 9:
+        break;
+    case 10:
+        break;
+    default:
+        s = 0;
+        break;
+    }
+    fn_8059A8E4(&self->m80[s + a], b, c);
+}
+
+//@8059B308
+extern "C" DB_OVERLAY int fn_8059B308(Db8059A728_Obj* self, int k, int a, int b)
+{
+    int s = 0;
+    switch (k) {
+    case 0:
+        s = 0;
+        break;
+    case 1:
+        s = 0;
+        break;
+    case 2:
+        s = 3;
+        break;
+    case 3:
+        s = 3;
+        break;
+    case 4:
+        s = 4;
+        break;
+    case 5:
+        s = 5;
+        break;
+    case 6:
+        s = 0;
+        break;
+    case 7:
+        s = 0;
+        break;
+    case 8:
+        s = 0;
+        break;
+    case 9:
+        s = 0;
+        break;
+    case 10:
+        s = 0;
+        break;
+    default:
+        s = 0;
+        break;
+    }
+    return fn_8059A968(&self->m80[s + a], b);
+}
+
+//@8059B3D4
+extern "C" DB_OVERLAY int fn_8059B3D4(Db8059A728_Obj* self, int k, int a)
+{
+    int s = 0;
+    switch (k) {
+    case 0:
+        s = 0;
+        break;
+    case 1:
+        s = 0;
+        break;
+    case 2:
+        s = 3;
+        break;
+    case 3:
+        s = 3;
+        break;
+    case 4:
+        s = 4;
+        break;
+    case 5:
+        s = 5;
+        break;
+    case 6:
+        s = 0;
+        break;
+    case 7:
+        s = 0;
+        break;
+    case 8:
+        s = 0;
+        break;
+    case 9:
+        s = 0;
+        break;
+    case 10:
+        s = 0;
+        break;
+    default:
+        s = 0;
+        break;
+    }
+    return *(unsigned short*)((char*)self + ((s + a) * 12 + 0x170));
+}
+
+//@8059B47C
+extern "C" DB_OVERLAY int fn_8059B47C(Db8059A728_Obj* self, int k, int a)
+{
+    int s = 0;
+    switch (k) {
+    case 0:
+        s = 0;
+        break;
+    case 1:
+        s = 0;
+        break;
+    case 2:
+        s = 3;
+        break;
+    case 3:
+        s = 3;
+        break;
+    case 4:
+        s = 4;
+        break;
+    case 5:
+        s = 5;
+        break;
+    case 6:
+        s = 0;
+        break;
+    case 7:
+        s = 0;
+        break;
+    case 8:
+        s = 0;
+        break;
+    case 9:
+        s = 0;
+        break;
+    case 10:
+        s = 0;
+        break;
+    default:
+        s = 0;
+        break;
+    }
+    return *(int*)((char*)self + ((s + a) * 12 + 0x174));
+}
+
+struct Db8059B6AC_Obj {
+    char pad0[0x38];
+    unsigned m38;
+    unsigned short s[11];
+};
+
+//@8059B6AC
+extern "C" DB_OVERLAY int fn_8059B6AC(Db8059B6AC_Obj* self, int k)
+{
+    switch (k) {
+    case 0:
+        return self->s[0];
+    case 1:
+        return self->s[1];
+    case 2:
+        return self->s[2];
+    case 3:
+        return self->s[3];
+    case 4:
+        return self->s[4];
+    case 5:
+        return self->s[5];
+    case 6:
+        return self->s[6];
+    case 7:
+        return self->s[7];
+    case 8:
+        return self->s[8];
+    case 9:
+        return self->s[9];
+    case 10:
+        return self->s[10];
+    default:
+        return 0;
+    }
+}
+
+//@8059B780
+extern "C" DB_OVERLAY void fn_8059B780(Db8059B6AC_Obj* self, int k, unsigned v)
+{
+    switch (k) {
+    case 0: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[0] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 1: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[1] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 2: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[2] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 3: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[3] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 4: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[4] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 5: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[5] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 6: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[6] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 7: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[7] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 8: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[8] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 9: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[9] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 10: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->s[10] = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
     }
 }
 
@@ -347,6 +739,112 @@ extern "C" DB_OVERLAY int fn_8059BAA4(Db8059A728_Obj* self, int k)
     return r;
 }
 
+//@8059BABC
+extern "C" DB_OVERLAY void fn_8059BABC(Db8059A728_Obj* self, int k, unsigned v)
+{
+    int lo = 8, hi = 9;
+    if (k <= hi && k >= lo)
+        v = v / 25;
+    switch (k) {
+    case 0: {
+        unsigned t = v;
+        if (t > 7)
+            t = 7;
+        self->a0 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 1: {
+        int t = 1;
+        if (v == 0)
+            t = 0;
+        self->a1 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 2: {
+        unsigned t = v;
+        if (t > 0x3FF)
+            t = 0x3FF;
+        self->a2 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 3: {
+        unsigned t = v;
+        if (t > 0x3FFF)
+            t = 0x3FFF;
+        self->a3 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 4: {
+        unsigned t = v;
+        if (t > 0x3FFF)
+            t = 0x3FFF;
+        self->b0 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 5: {
+        unsigned t = v;
+        if (t > 0x3FFF)
+            t = 0x3FFF;
+        self->b1 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 6: {
+        unsigned t = v;
+        if (t > 0x7FFF)
+            t = 0x7FFF;
+        self->c0 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 7: {
+        unsigned t = v;
+        if (t > 0xFFF)
+            t = 0xFFF;
+        self->c1 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 8: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->m20 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 9: {
+        unsigned t = v;
+        if (t > 0xFFFF)
+            t = 0xFFFF;
+        self->m22 = t;
+        self->m38 |= 0x80000000;
+        break;
+    }
+    case 10:
+        self->m24 = v;
+        self->m38 |= 0x80000000;
+        break;
+    case 11:
+        self->m28 = v;
+        self->m38 |= 0x80000000;
+        break;
+    case 12:
+        self->m2C = v;
+        self->m38 |= 0x80000000;
+        break;
+    case 13:
+        self->m30 = v;
+        self->m38 |= 0x80000000;
+        break;
+    }
+}
+
 //@8059BCD4
 extern "C" DB_OVERLAY void fn_8059BCD4(Db8059A728_Obj* self, int k, int v)
 {
@@ -368,6 +866,7 @@ extern "C" DB_OVERLAY void fn_8059BCF0(Db8059A728_Obj* self, int k, unsigned v)
     }
 }
 
+/* near-miss: retail keeps both sums in r0 (add r0,r3,r30; mr r5,r0); ours folds them into r3/r5 */
 //@8059BD58
 extern "C" DB_OVERLAY void fn_8059BD58(Db8059A728_Obj* self, unsigned d)
 {
