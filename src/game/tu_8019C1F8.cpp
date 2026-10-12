@@ -3,6 +3,44 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8019C1F8.h"
+extern char lbl_80649DA0[];
+extern char lbl_8065F9E0[];
+struct Unk8019F644_Base {
+    int m0;
+    const void* m4;
+    Unk8019F644_Base(int id)
+    {
+        m4 = lbl_80649DA0;
+        m0 = id;
+    }
+};
+struct Unk8019F644_Msg : public Unk8019F644_Base {
+    void* m8;
+    Unk8019F644_Msg(int id, void* p) : Unk8019F644_Base(id)
+    {
+        m4 = lbl_8065F9E0;
+        m8 = p;
+    }
+    ~Unk8019F644_Msg() { m4 = lbl_80649DA0; }
+};
+class Unk8019F36C_E {
+public:
+    char pad0[0x18];
+    virtual ~Unk8019F36C_E();
+};
+struct Unk8019F36C_S {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[0x30 - 0x1C];
+    const void* m30;
+    char pad34[4];
+    Unk8019F36C_E* m38[2];
+};
+extern char lbl_80660140[];
+extern char lbl_80660158[];
+extern "C" void fn_803BD720();
+void fn_8035A5C4(void* p, int c);
+extern "C" void fn_80328374(void* p, int c);
 //@BODY
 //@8019C41C
 extern "C" float fn_8019C41C(float x)
@@ -271,6 +309,20 @@ extern "C" void fn_8019F32C(char* m)
     fn_8033E5C4(list, 0xC);
 }
 
+//@8019F36C
+extern "C" void fn_8019F36C(Unk8019F36C_S* self, int c)
+{
+    self->m30 = lbl_80660140;
+    self->m18 = lbl_80660158;
+    for (int i = 0; i < 2; i++) {
+        delete self->m38[i];
+        self->m38[i] = 0;
+    }
+    fn_803BD720();
+    fn_8035A5C4((char*)self + 0x24, 0);
+    fn_80328374(self, c);
+}
+
 //@8019F414
 Unk8019F414::Unk8019F414(Unk8019E3C0_Own* owner)
     : Unk8019E3C0_Base(0, owner)
@@ -322,6 +374,15 @@ void Unk8019F48C::v6()
 Unk8019F5EC::Unk8019F5EC(Unk8019E3C0_Own* owner)
     : Unk8019E3C0_Base(10, owner)
 {
+}
+
+//@8019F644
+void Unk8019F5EC::v4()
+{
+    fn_8017AFA0(m18->m700);
+    Unk8019F644_Msg m(0x2D, (char*)m18 + 0x704);
+    fn_8037893C((char*)m18 + 0x704, m.m0, (int)&m, 0, 0);
+    fn_8037893C((char*)m18 + 0x704, 0x2E, 0, 0, 0);
 }
 
 //@8019F6DC

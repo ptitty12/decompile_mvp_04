@@ -4,6 +4,11 @@
  */
 #include "game/tu_80177C34.h"
 
+struct Unk8027C728_Goal;
+extern "C" Unk8027C728_Goal* fn_802448F4(void* o, int a);
+void fn_8027D33C(Unk8027C728_Goal* g);
+void fn_80177DF0(void* self, Unk8027C728_Goal* g);
+
 extern char lbl_8065FBC8[];
 
 void fn_80177C34(Unk80177C34_X* p, void* a)
@@ -12,6 +17,13 @@ void fn_80177C34(Unk80177C34_X* p, void* a)
         fn_80177900(p, p->m40);
         p->m40 = a;
     }
+}
+
+void fn_80177EE0(void* self) /* 80177EE0 */
+{
+    Unk8027C728_Goal* g = fn_802448F4(*(void**)((char*)self + 0xC), 2);
+    fn_80177DF0(self, g);
+    fn_8027D33C(g);
 }
 
 class Unk80178A64 {

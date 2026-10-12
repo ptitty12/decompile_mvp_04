@@ -4,6 +4,9 @@
  */
 #include "game/tu_80174318.h"
 
+extern const float lbl_805CBCFC;
+extern "C" void* fn_8035AB00(void* self);
+
 extern const Unk80174318_Fn lbl_805CB1CC;
 extern int lbl_8061C668;
 extern const Unk80174318_Fn lbl_805CB1D4;
@@ -153,6 +156,32 @@ void fn_801757E4()
 void fn_801765F4()
 {
     fn_80175810(1, 0xFFFF);
+}
+
+/* near-miss: 6 slots, all in the first entry-init loop. Retail emits m0 first (before the -1.0f load), then
+ * m44, the float at +4, m8, mC, m40; the best of all 720 store orders (and the literal / extern float spellings)
+ * gives m44, f4, m0 in the middle. Second loop and ctor frame match. */
+Unk80176C0C_T* fn_80176654(Unk80176C0C_T* self, int a, Unk80176C0C_Ctx* ctx) /* 80176654 */
+{
+    fn_8035AB00(self);
+    *(const void**)self = lbl_8065FCF0;
+    for (int i = 0; i < 5; i++) {
+        Unk80176C0C_Entry* e = &self->mC[i];
+        e->m0 = 0;
+        *(float*)&e->m4 = -1.0f;
+        e->m8 = 0;
+        e->mC = 0;
+        *(int*)((char*)e + 0x40) = 0;
+        e->m44 = 0;
+    }
+    *(int*)((char*)self + 4) = a;
+    self->m8 = ctx;
+    Unk80176C0C_Entry* q = self->mC;
+    for (int j = 0; j < 5; j++, q++) {
+        q->m8 = (int)ctx;
+    }
+    fn_80176C0C(self);
+    return self;
 }
 
 class Unk80176620 {

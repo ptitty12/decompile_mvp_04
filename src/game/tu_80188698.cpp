@@ -151,12 +151,9 @@ extern "C" void fn_80189C38(Unk80188698* o)
 //@80189D60
 extern "C" float fn_80189D60(Unk80188698* o)
 {
-    float r;
-    if (o->mBFC)
-        r = *(float*)((char*)o->mBFC + 0xEE0) + o->m418;
-    else
-        r = lbl_805CDBDC.m0;
-    return r;
+    if (!o->mBFC)
+        return lbl_805CDBDC.m0;
+    return *(float*)((char*)o->mBFC + 0xEE0) + o->m418;
 }
 
 //@80189D88
@@ -165,6 +162,10 @@ inline void Unk80189D88_Fwd(Unk80188698* x, float f, int a, int b, int c)
     fn_8019E114(*(void**)((char*)x->m44C + 0x6C8), x, a, b, c, f);
 }
 
+/* near-miss: 21/21 insns, ~10 slots differ: retail issues `lwz r9,1096(r3)` (o->m448) before
+ * the float-parameter spill `stfs f1,8(r1)` and the callee-argument moves; ours spills first.
+ * Tried: pre-loading x into a local, argument order of the inline, const float& parameter,
+ * byte-offset field access. */
 extern "C" void fn_80189D88(Unk80188698* o, float f, int a, int b, int c)
 {
     Unk80189D88_Fwd(*(Unk80188698**)o->m448, f, a, b, c);
@@ -183,22 +184,20 @@ extern "C" void fn_80189E20(Unk80188698* o, int a, int b)
 }
 
 //@8018A194
-/* near-miss: 32/32 insns, 5 slots differ (store order of the nine trailing field resets;
- * 1500 of 362880 orders sampled; the f31 zero register and the mask match). */
 extern "C" void fn_8018A194(Unk80188698* o)
 {
     o->m3F4 = 0.0f;
     fn_80189300(o, 0);
-    o->m4A4 &= 0xC9FFFFFF;
-    o->m3F8 = 0.0f;
+    o->m4D4 = 0;
     o->m384 = 0.0f;
     o->m374 = 0;
-    o->m4D4 = 0;
     o->m378 = 0;
+    o->m37C = 0.0f;
     o->m380 = 0;
+    o->m3F8 = 0.0f;
     o->m4DC = 0;
     o->m4E0 = 0;
-    o->m37C = 0.0f;
+    o->m4A4 &= 0xC9FFFFFF;
 }
 
 //@8018A214
@@ -245,9 +244,9 @@ extern "C" int fn_8018AD2C(Unk80188698* o)
     int a = o->m38C;
     if (a != 1 && (a != 4 || o->m390 != 1))
         return 1;
-    if (o->m44C->m6F4 == 0)
-        return (o->m4C4 ^ 1) == 0;
-    return 1;
+    if (o->m44C->m6F4 != 0)
+        return 1;
+    return o->m4C4 == 1;
 }
 
 //@8018B43C
@@ -257,7 +256,7 @@ extern "C" int fn_8018B43C(Unk80188698* o, int a, Unk80183918_Vec3* p, float rr)
     if (q != 0) {
         float d2 = (p->m0 - *(float*)((char*)q + 0x60)) * (p->m0 - *(float*)((char*)q + 0x60))
             + (p->m8 - *(float*)((char*)q + 0x68)) * (p->m8 - *(float*)((char*)q + 0x68));
-        if (!(d2 > rr * (rr * lbl_805CDCA4.m0)))
+        if (d2 <= rr * (rr * lbl_805CDCA4.m0))
             return 1;
     }
     return 0;

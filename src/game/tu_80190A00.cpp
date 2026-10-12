@@ -3,20 +3,42 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80190A00.h"
+#include "game/tu_8026C414.h"
+int fn_8026CA8C(Unk8026C414_M* self, char** pp);
+
+struct Unk80193A4C_Q {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+struct Unk80193A4C_S {
+    char pad0[0x10];
+    Unk80193A4C_Q m10;
+};
+
+inline void Unk80193A4C_Make(Unk80193750_Ent* e, int id, float t, Unk80193A4C_S* s)
+{
+    e->m0 = id;
+    e->m4 = t;
+    *(Unk80193A4C_Q*)e->pad8 = s->m10;
+}
+
 //@BODY
 //@80190E40
-/* near-miss: 29 vs 28 insns, 7 slots differ: retail keeps the cursor arithmetic as r9 = p+4
- * and r11 = r9+8 (stw r3,4(r9)); every spelling tried (post-increment, q = p+1, char
- * offsets) folds to p+12. The early-return shape and the load order match. */
+inline void Put2(int*& p, int v) { *p++ = v; }
+
 extern "C" int fn_80190E40(Unk80190EB4_Obj* o, int** pp)
 {
     if (o->m264 != 0)
         return 0;
-    fn_8026CA8C(o);
+    fn_8026CA8C((Unk8026C414_M*)o, (char**)pp);
     int* p = *pp;
     int v = fn_80188EF4(o);
-    *p = o->m36C;
-    *pp = Unk80190E40_Put(p + 1, o->m4D4, v);
+    Put2(p, o->m36C);
+    Put2(p, o->m4D4);
+    Put2(p, v);
+    *pp = p;
     return 1;
 }
 
@@ -58,15 +80,6 @@ Unk80191720::Unk80191720()
 {
 }
 
-//@80191764
-void Unk80191720::fn_vslot2()
-{
-    fn_8037B7E4(lbl_805CE008);
-    fn_8037B50C(lbl_805CE00C, &m4, lbl_805CE014, lbl_805CE020);
-    fn_8037B50C(lbl_805CE024, &mC, lbl_805CE030, lbl_805CE03C);
-    fn_8037B50C(lbl_805CE040, &m8, lbl_805CE030, lbl_805CE04C);
-}
-
 //@80191800
 extern "C" void* fn_80191800(Unk80191720* self)
 {
@@ -85,26 +98,6 @@ Unk8019186C::Unk8019186C()
 {
 }
 
-//@801918B0
-void Unk8019186C::fn_vslot2()
-{
-    fn_8037B7E4(lbl_805CE050);
-    fn_8037B50C(lbl_805CE054, &m4, lbl_805CE030, 0);
-    fn_8037B50C(lbl_805CE05C, &m8, lbl_805CE068, 0);
-    fn_8037B494(lbl_805CE074, &m10, 0, 0);
-    fn_8037B50C(lbl_805CE084, &mC, lbl_805CE090, 0);
-    fn_8037B50C(lbl_805CE09C, &m14, lbl_805CE090, 0);
-    fn_8037B50C(lbl_805CE0B4, &m18, lbl_805CE090, 0);
-    fn_8037B50C(lbl_805CE0C8, &m1C, lbl_805CE0D8, 0);
-    fn_8037B7E8(lbl_805CE0E4);
-    fn_8037B458(lbl_805CE0F0, &m20, 0, 0);
-    fn_8037B50C(lbl_805CE0FC, &m30, lbl_805CE100, 0);
-    fn_8037B50C(lbl_805CB6EC, &m24, lbl_805CE108, 0);
-    fn_8037B50C(lbl_805CE114, &m28, lbl_805CE108, 0);
-    fn_8037B50C(lbl_805CE118, &m2C, lbl_805CE108, 0);
-    fn_8037B830(lbl_805CE0E4);
-}
-
 //@80191A68
 extern "C" void* fn_80191A68(void* self)
 {
@@ -118,17 +111,11 @@ Unk8037B3E8* Unk8019186C::fn_vslot5()
 }
 
 //@80191AD8
-/* near-miss: 38/38 insns, ~12 slots differ: the mode 1/2/3 bodies match (sub-object pointer
- * for the +4 record, Vec3 copies, store order) but retail shares the `m4 = -1.0f` tail of
- * modes 1 and 2 as one block at the end (beq from both tests); here it is laid out first. */
 extern "C" void fn_80191AD8(Unk80191AD8_S* s, int mode)
 {
     s->m0 = mode;
-    if (mode == 2) {
-        s->m4 = -1.0f;
-    } else if (mode > 2) {
-        if (mode != 3)
-            return;
+    switch (mode) {
+    case 3: {
         Unk80191AD8_Q* q = (Unk80191AD8_Q*)&s->m4;
         q->m0 = -1.0f;
         q->m4 = lbl_806055AC;
@@ -136,8 +123,14 @@ extern "C" void fn_80191AD8(Unk80191AD8_S* s, int mode)
         s->m18 = lbl_806055AC;
         q->m20 = -1.0f;
         q->m24 = 0;
-    } else if (mode == 1) {
+        break;
+    }
+    case 1:
         s->m4 = -1.0f;
+        break;
+    case 2:
+        s->m4 = -1.0f;
+        break;
     }
 }
 
@@ -164,8 +157,6 @@ extern "C" Unk80191B70_S* fn_80191BE0(Unk80191B70_S* s, void* owner)
 }
 
 //@80191C5C
-/* near-miss: 54/54 insns, 2 slots differ: the m70 and m0 stores swap places (400 orders of the
- * last eight stores sampled). */
 extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
 {
     s->m24 = 0;
@@ -180,18 +171,13 @@ extern "C" void fn_80191C5C(Unk80191C5C_S* s, void* owner)
     s->m68 = 0;
     s->m6C = 0;
     s->m60 = 0.0f;
-    s->m78 = (char*)owner + 0xD4;
     s->m74 = 0;
     s->m0 = owner;
+    s->m78 = (char*)owner + 0xD4;
     s->m70 = 0;
 }
 
 //@80193750
-/* near-miss family (this, 0x801937B4, 0x80193828, 0x80193880): the searches over the
- * 0x18-byte entries match except for the loop variables: retail keeps the byte offset
- * i*0x18 as its own induction variable (add r3,r9,r10) where this compiles a pointer
- * variable (addi r3,r3,24). `a[i]`, `(char*)a + i*0x18`, `(int)a + i*0x18` and an explicit
- * `off += 0x18` were tried. */
 extern "C" void* fn_80193750(void* hv, float t)
 {
     Unk80193750_H* h = (Unk80193750_H*)hv;
@@ -199,10 +185,16 @@ extern "C" void* fn_80193750(void* hv, float t)
     if (a == 0)
         return 0;
     int n = h->m74;
-    for (int i = 0; i < n; i++) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + i * 0x18);
-        if (t <= e->m4)
-            return e;
+    int i = 0;
+    if (i < n) {
+        int off = 0;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (t <= e->m4)
+                return e;
+            i++;
+            off += 0x18;
+        } while (i < n);
     }
     return 0;
 }
@@ -215,12 +207,16 @@ extern "C" float fn_801937B4(void* hv, int k, float t)
     if (a == 0)
         return -1.0f;
     int n = h->m74;
-    int off = 0;
-    for (int i = 0; i < n; i++) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (!(t > e->m4) && e->m0 == k)
-            return e->m4;
-        off += 0x18;
+    int i = 0;
+    if (i < n) {
+        int off = 0;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (!(t > e->m4) && k == e->m0)
+                return e->m4;
+            i++;
+            off += 0x18;
+        } while (i < n);
     }
     return -1.0f;
 }
@@ -232,12 +228,16 @@ extern "C" void* fn_80193828(void* hv, float t)
     char* a = (char*)h->m78;
     if (a == 0)
         return 0;
-    int off = (h->m74 - 1) * 0x18;
-    for (int i = h->m74 - 1; i >= 0; i--) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (t > e->m4)
-            return e;
-        off -= 0x18;
+    int i = h->m74 - 1;
+    if (i >= 0) {
+        int off = i * 0x18;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (t > e->m4)
+                return e;
+            off -= 0x18;
+            i--;
+        } while (i >= 0);
     }
     return 0;
 }
@@ -248,13 +248,86 @@ extern "C" float fn_80193880(Unk80193750_H* h, int k, float t)
     char* a = (char*)h->m78;
     if (a == 0)
         return -1.0f;
-    int off = (h->m74 - 1) * 0x18;
-    for (int i = h->m74 - 1; i >= 0; i--) {
-        Unk80193750_Ent* e = (Unk80193750_Ent*)(a + off);
-        if (!(t <= e->m4) && e->m0 == k)
-            return e->m4;
-        off -= 0x18;
+    int i = h->m74 - 1;
+    if (i >= 0) {
+        int off = i * 0x18;
+        do {
+            Unk80193750_Ent* e = (Unk80193750_Ent*)(off + (int)a);
+            if (!(t <= e->m4) && k == e->m0)
+                return e->m4;
+            off -= 0x18;
+            i--;
+        } while (i >= 0);
     }
     return -1.0f;
 }
 
+//@801938F0
+extern "C" void fn_801938F0(Unk80193750_H* h, Unk80193750_Ent* rec)
+{
+    if (h->m78 != 0) {
+        int n = h->m74;
+        float t = rec->m4;
+        if (n <= 99) {
+            int pos = -1;
+            if (n == 0 || !(t < h->m78[n - 1].m4)) {
+                pos = n;
+            } else {
+                for (int i = 0; i < n; i++) {
+                    if (!(t >= h->m78[i].m4)) {
+                        pos = i;
+                        break;
+                    }
+                }
+            }
+            if (pos != -1) {
+                for (int j = h->m74; j > pos; j--)
+                    h->m78[j] = h->m78[j - 1];
+                h->m78[pos] = *rec;
+                h->m74 = h->m74 + 1;
+            }
+        }
+    }
+}
+
+//@80193A4C
+/* near-miss: 24 vs 25 insns: retail copies the source pointer first (`mr r9,r4`, then
+ * `addi r11,r9,16` for the 16-byte record) and reads the outer words off r9 and the middle
+ * words off r11; ours forms one pointer (addi r9,r4,16). Frame layout, the float slot at
+ * 0x28 and the stores already match. ~12 spellings of the inline (param copies, local
+ * pointers, byte-wise copies) tried. */
+extern "C" void fn_80193A4C(Unk80193750_H* h, Unk80193A4C_S* s, int id, float t)
+{
+    Unk80193750_Ent e;
+    Unk80193A4C_Make(&e, id, t, s);
+    fn_801938F0(h, &e);
+}
+
+//@80191764
+void Unk80191720::fn_vslot2()
+{
+    fn_8037B7E4(lbl_805CE008);
+    fn_8037B50C(lbl_805CE00C, &m4, lbl_805CE014, lbl_805CE020);
+    fn_8037B50C(lbl_805CE024, &mC, lbl_805CE030, lbl_805CE03C);
+    fn_8037B50C(lbl_805CE040, &m8, lbl_805CE030, lbl_805CE04C);
+}
+
+//@801918B0
+void Unk8019186C::fn_vslot2()
+{
+    fn_8037B7E4(lbl_805CE050);
+    fn_8037B50C(lbl_805CE054, &m4, lbl_805CE030, 0);
+    fn_8037B50C(lbl_805CE05C, &m8, lbl_805CE068, 0);
+    fn_8037B494(lbl_805CE074, &m10, 0, 0);
+    fn_8037B50C(lbl_805CE084, &mC, lbl_805CE090, 0);
+    fn_8037B50C(lbl_805CE09C, &m14, lbl_805CE090, 0);
+    fn_8037B50C(lbl_805CE0B4, &m18, lbl_805CE090, 0);
+    fn_8037B50C(lbl_805CE0C8, &m1C, lbl_805CE0D8, 0);
+    fn_8037B7E8(lbl_805CE0E4);
+    fn_8037B458(lbl_805CE0F0, &m20, 0, 0);
+    fn_8037B50C(lbl_805CE0FC, &m30, lbl_805CE100, 0);
+    fn_8037B50C(lbl_805CB6EC, &m24, lbl_805CE108, 0);
+    fn_8037B50C(lbl_805CE114, &m28, lbl_805CE108, 0);
+    fn_8037B50C(lbl_805CE118, &m2C, lbl_805CE108, 0);
+    fn_8037B830(lbl_805CE0E4);
+}
