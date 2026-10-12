@@ -4,6 +4,7 @@
  */
 #include "game/tu_801BAC74.h"
 #include "game/tu_801C16B0.h"
+#include "game/clampiter.h"
 
 typedef Unk801B7FB0_P P;
 typedef Unk801B7FB0_B B;
@@ -35,6 +36,8 @@ void fn_801B9E04(B* b, P* p);
 void fn_8017B6C0(int a, int b, int c);
 void fn_8037893C(void* mgr, int type, void* ev, int a, void* t);
 void fn_801BFC1C(void* o);
+P* fn_80259C78(int h, int k);
+void fn_801B7D1C(P* p);
 int fn_801BFA20(const Vec3* v);
 void fn_801BFC8C(void* o);
 void fn_801BFBEC(void* o);
@@ -215,6 +218,29 @@ extern "C" void fn_801BBB34(A* a)
     }
 }
 
+/* Stack object whose vptr is stored on entry and again at each scope exit. */
+extern char lbl_8065F9B0[];
+struct Unk801BAC74_G {
+    const void* vptr;
+    Unk801BAC74_G() { vptr = lbl_8065F9B0; }
+    ~Unk801BAC74_G() { vptr = lbl_8065F9B0; }
+};
+
+extern "C" void fn_801BBB74(A* a)
+{
+    Unk801BAC74_G g;
+    if (a->m4 != 0) {
+        P* p = fn_80259C78(((Unk801C16B0_M4*)a->m10)->m3B4, 1);
+        if (p != 0 && p->m5C4 != 0) {
+            a->m4 = 0;
+            return;
+        }
+        P* q = fn_801A4C74(a->m14, 2);
+        if (q)
+            fn_801B7D1C(q);
+    }
+}
+
 extern "C" int fn_801BBC0C(A* a) { return fn_801BA958(a->m8); }
 
 extern "C" int fn_801BBC30(A* a) { return fn_801BA974(a->m8); }
@@ -267,20 +293,42 @@ extern "C" void fn_801BBFAC(A* a, P* q)
         fn_801B7FF8(p);
 }
 
-/* near-miss: retail keeps the iterator in a stack slot (stw 8(r1)) but compares the
- * freshly computed register value; `volatile` gives the right length but reloads. */
 extern "C" void fn_801BC364(A* a)
 {
-    volatile int i = 9;
-    for (; i <= 0xC;) {
+    Unk8006A138_It<0x15> it(9);
+    int i = it.v;
+    while (i <= 0xC) {
         P* p = Get(a->m14, i);
         if (p)
             p->m5CC = 3;
-        int x = i;
-        int n = x + 1;
-        if (x > 0x15)
-            n = x;
-        i = n;
+        i = it.Next();
+    }
+}
+
+enum Unk801BAC74_E { E_Neg = -1, E_Lo = 9, E_Hi = 12 };
+
+extern "C" void fn_801BC3D0(A* a)
+{
+    Unk8006A138_It<0x15> it(9);
+    int i = it.v;
+    while (i <= 0xC) {
+        int v = -1;
+        switch ((Unk801BAC74_E)i) {
+        case 9:
+            v = 1;
+            break;
+        case 10:
+            v = 2;
+            break;
+        case 11:
+        case 12:
+            v = 3;
+            break;
+        }
+        P* p = Get(a->m14, it.v);
+        if (p)
+            p->m5CC = v;
+        i = it.Next();
     }
 }
 

@@ -181,7 +181,8 @@ struct Unk801B7FB0_P : public Unk801B7FB0_PV {
     int m588;
     Unk801B7FB0_Sub58C m58C;
     float m5A0;
-    char pad5A4[0x24];
+    char pad5A4[0x20];
+    int m5C4;
     int m5C8;
     int m5CC;
     char pad5D0[0x48];
@@ -230,7 +231,7 @@ struct Unk801B7FB0_Slot {
 
 struct Unk801B7FB0_Ai {
     void* m0;
-    char pad4[0x4];
+    int m4;
     Unk801B7FB0_B* m8;
     void* mC;
     int m10;
