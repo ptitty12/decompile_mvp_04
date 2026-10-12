@@ -1,7 +1,15 @@
-/*
- * EA SND 9.02.04 / csis (cflags_snd: -O2 -G0 -fno-strength-reduce -fno-strict-aliasing
- * -ffast-math -mps-float, C++),
- * .text 0x803B3FE0-0x803B4074 (code-only unit, 1 functions; original file name from the reference split).
- * Every data object is extern by its lbl_ name.
- * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
- */
+/* Imported from dbalatoni13/nfsmw @ 9ca26bc1 (src/Speed/Indep/Libs/snd/9/source/library/cmn/sgetpvol.c). EA SND audio library (rwaudiocore), matched against NFS Most Wanted GC; CC0. */
+#include "sndcmn.h"
+
+int SNDCTRL_getprogvol(int shandle) {
+    int voice = SNDVOICEI_get(shandle);
+    int vol;
+
+    if (voice < 0)
+        return -8;
+
+    // MVP's SND returns the volume on the 0..127 scale; nfsmw's returns the raw 0..1 float.
+    vol = SNDI_ftoifast(sndgs.chan[voice].programmedVol * 127.0f);
+
+    return vol;
+}
