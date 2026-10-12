@@ -48,6 +48,17 @@ extern "C" int fn_803EDF10(const char* fmt, ...);
 extern "C" int fn_803EE238();
 extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
 extern "C" int fn_803EE318(char* p);
+extern "C" int fn_803EE320(char* p);
+extern "C" int fn_803EE4B8(RcBlk*);
+extern "C" int fn_80400520(const void* p, int n, int seed);
+extern char lbl_8060DF90[];
+extern char lbl_8060DFE8[];
+extern char lbl_8060E040[];
+extern char lbl_8060E054[];
+extern char lbl_8060E058[];
+extern char lbl_8060E064[];
+extern char lbl_8060E068[];
+extern int lbl_8060E098[];
 extern "C" int fn_803ED170(int a);
 extern "C" void fn_803EDEE8(RcBlk* b);
 
@@ -450,6 +461,50 @@ extern "C" int fn_803EDFCC(int a)
 extern "C" int fn_803EDFFC()
 {
     return fn_803EDFCC(lbl_806EE9F0);
+}
+
+/* near-miss: 2 slots; mtlr and addi of the lbl_8060E068 argument are swapped before the total printf */
+extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...))
+{
+    int total = 0;
+    int crc = 0;
+    pr(lbl_8060DF90);
+    pr(lbl_8060DFE8);
+    RcHeap* h = lbl_806AABF4[idx & 0x3f];
+    int r;
+    if (h == 0) {
+        r = pr(lbl_8060E040);
+    } else {
+    RcBlk* b = h->m8;
+    if (b != 0) {
+        do {
+            char* data = (char*)b + 0x10;
+            const char* nm = (const char*)fn_803EE318(data);
+            if (nm == 0)
+                nm = lbl_8060E054;
+            const char* nm2 = (const char*)fn_803EE320(data);
+            if (nm2 == 0)
+                nm2 = lbl_8060E054;
+            if (b->m2 & 0x4000) {
+                int sz = b->m4;
+                if (sz > 0x10 && !(b->m2 & 0x8000))
+                    crc = fn_80400520((char*)b + 0x18, sz - 0x18, 0xfbea);
+                total += sz;
+                pr((const char*)out, lbl_8060E058, data, sz, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], lbl_8060E054);
+            } else {
+                crc = 0;
+                if (b->m4 != 0 && !(b->m2 & 0x8000))
+                    crc = fn_80400520(data, b->m4, 0xfbea);
+                pr((const char*)out, nm, data, b->m4, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], nm2);
+            }
+            pr(lbl_8060E064);
+            b = b->m8;
+        } while (b != 0);
+    }
+    pr(lbl_8060E068, total, total);
+        r = pr(lbl_8060DFE8);
+    }
+    return r;
 }
 
 extern "C" int fn_803EE310(char* p)
