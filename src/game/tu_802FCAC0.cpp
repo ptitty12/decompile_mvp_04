@@ -119,6 +119,40 @@ struct Unk802FDE1C_G {
 extern Unk802FDE1C_G* lbl_8061FF44;
 extern "C" {
 void fn_803188FC(void* p, int a);
+struct Unk8019F8C0_Owner;
+int fn_801A37D8(Unk8019F8C0_Owner* o);
+struct Unk802FDCD8_A {
+    char pad0[0x20];
+    int m20;
+};
+struct Unk802FDCD8_S {
+    char pad0[0x744];
+    Unk802FDCD8_A* m744;
+};
+struct Unk802FDCD8_O {
+    char pad0[0x24];
+    Unk8019F8C0_Owner* m24;
+    char pad28[0x40 - 0x28];
+    int m40[3];
+};
+struct Unk802FDCD8_M {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Unk802FDCD8_G {
+    char pad0[0x20];
+    int m20;
+    int m24;
+};
+extern Unk802FDCD8_G* lbl_8061B8C0;
+extern int lbl_8061FE9C;
+extern "C" {
+void fn_800ABA88(void* mgr, int a, int b, int c);
+void fn_800AB528(void* mgr);
+int fn_800AC398();
+int fn_802FD4F8(void* p);
+}
+
 int fn_802FDCD8(void* p);
 void fn_802FDEC4(void* p);
 void fn_802FDFE8(void* p);
@@ -146,6 +180,45 @@ void fn_802FF688(Unk802FCAC0_Obj* p, int a);
 void* fn_802FCAC0()
 {
     return fn_802FBC38(operator new(0x64, lbl_806EF9B4));
+}
+
+struct Unk802FCAF0_C {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+};
+struct Unk802FCAF0_O {
+    char pad0[0x14];
+    Unk802FCAF0_C m14[5];
+};
+extern "C" void fn_8014D9EC(Unk802FCAF0_C* c, float a, float b, float d, float e, float f);
+extern Unk802FCAF0_C lbl_8068E0B0;
+extern Unk802FCAF0_C lbl_8068E0C0;
+extern Unk802FCAF0_C lbl_8068E0D0;
+extern Unk802FCAF0_C lbl_8068E114;
+extern Unk802FCAF0_C lbl_8068E124;
+extern float lbl_8061F6E0;
+
+void fn_802FCAF0(Unk802FCAF0_O* o)
+{
+    Unk802FCAF0_C* g0 = &lbl_8068E0B0;
+    Unk802FCAF0_C* g1 = &lbl_8068E0C0;
+    Unk802FCAF0_C* g2 = &lbl_8068E0D0;
+    Unk802FCAF0_C* g3 = &lbl_8068E124;
+    Unk802FCAF0_C* g4 = &lbl_8068E114;
+    Unk802FCAF0_C c;
+    fn_8014D9EC(&c, o->m14[0].m0, o->m14[0].m4, o->m14[0].m8, o->m14[0].mC, 255.0f);
+    *g0 = c;
+    fn_8014D9EC(&c, o->m14[1].m0, o->m14[1].m4, o->m14[1].m8, o->m14[1].mC, 255.0f);
+    *g1 = c;
+    fn_8014D9EC(&c, o->m14[2].m0, o->m14[2].m4, o->m14[2].m8, o->m14[2].mC, 255.0f);
+    *g2 = c;
+    fn_8014D9EC(&c, o->m14[3].m0, o->m14[3].m4, o->m14[3].m8, o->m14[3].mC, 255.0f);
+    *g3 = c;
+    fn_8014D9EC(&c, o->m14[4].m0, o->m14[4].m4, o->m14[4].m8, o->m14[4].mC, 255.0f);
+    *g4 = c;
+    lbl_8061F6E0 *= 12.0f;
 }
 
 void* fn_802FCC8C(void* p)
@@ -316,6 +389,36 @@ void fn_802FDC34(Unk802FD1D4_O* p)
     fn_802FF688((Unk802FCAC0_Obj*)p, r);
 }
 
+int fn_802FDCD8(void* p)
+{
+    Unk802FDCD8_O* o = (Unk802FDCD8_O*)p;
+    if (((Unk802FDCD8_S*)o->m24)->m744->m20 != 0 || fn_801A37D8(o->m24) != 0) {
+        fn_802FF688((Unk802FCAC0_Obj*)o, 0);
+        return 0;
+    }
+    if (((Unk802FDCD8_M*)lbl_80619D10)->m2C == 0)
+        return 0;
+    if (((int (*)(void*))fn_802FDAB4)(o) == 0) {
+        fn_800ABA88(lbl_80619D10, 4, 0, 0);
+        return 0;
+    }
+    int found = 0;
+    for (int i = 0; i < 3; i++) {
+        if (o->m40[i] != 0) {
+            found = 1;
+            break;
+        }
+    }
+    if (!found || lbl_8061B8C0->m24 != 0)
+        return 0;
+    fn_800AB528(lbl_80619D10);
+    if (fn_800AC398() != 0 || lbl_8061B8C0->m20 == 1 || lbl_8061FE9C == 0)
+        return 0;
+    int t = fn_802FD4F8(o);
+    fn_800ABA88(lbl_80619D10, 4, t, 0);
+    return 1;
+}
+
 void fn_802FDE1C(Unk802FDE1C_O* o)
 {
     Unk802FDE1C_G** g = &lbl_8061FF44;
@@ -348,6 +451,50 @@ int fn_802FF3A0(void* a, Unk802FCAC0_S5C4* b)
 }
 
 inline Unk802F8324_V2 EntPos(Unk802FCAC0_Obj* o, int i) { return o->m28[i]->m24; }
+
+struct Unk80256C80_M;
+struct Unk8024EF40_P;
+int fn_80257CC0(Unk80256C80_M* m, Unk8024EF40_P* p);
+int fn_80257D68(Unk80256C80_M* m, Unk8024EF40_P* p);
+struct Unk802FF4DC_T {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk802FF4DC_U {
+    char pad0[0x3B4];
+    Unk80256C80_M* m3B4;
+};
+struct Unk802FF4DC_S {
+    char pad0[0x564];
+    Unk802FF4DC_T* m564;
+    char pad568[0x700 - 0x568];
+    Unk802FF4DC_U* m700;
+};
+struct Unk802FF4DC_O {
+    char pad0[0x24];
+    Unk802FF4DC_S* m24;
+};
+extern Unk802FCAF0_C lbl_8068B588;
+
+/* near-miss: 80 of 82 instructions identical; the first-call `addi r3,r1,8` is scheduled before
+   `lwz r29,948(r9)` (retail has the lwz first). Local order, inline accessor, split chains and a
+   non-void fn_8014D9EC did not change it. */
+Unk802FCAF0_C fn_802FF4DC(Unk802FF4DC_O* o, Unk8024EF40_P* p)
+{
+    Unk80256C80_M* m = o->m24->m700->m3B4;
+    Unk802FCAF0_C a;
+    Unk802FCAF0_C b;
+    fn_8014D9EC(&a, 0.7f, 0.7f, 0.7f, 1.0f, 1.0f);
+    fn_8014D9EC(&b, 1.0f, 0.5f, 0.5f, 1.0f, 1.0f);
+    int r = fn_80257CC0(m, p);
+    int r2 = fn_80257D68(m, p);
+    int gt = o->m24->m564->m14 > 4;
+    if (r2 == 1 && gt)
+        a = lbl_8068B588;
+    if (r)
+        a = b;
+    return a;
+}
 
 Unk802F8324_V2 fn_802FF624(Unk802FCAC0_Obj* o, int i)
 {
@@ -417,6 +564,49 @@ void fn_802FF864()
 void fn_802FF868()
 {
     fn_800AB9A8(lbl_80619D10, 3);
+}
+
+struct Unk802FFA20_It {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk802FFA20_M {
+    char pad0[0x3B8];
+    int m3B8;
+};
+struct Unk802FFA20_S {
+    char pad0[0x700];
+    Unk802FFA20_M* m700;
+};
+struct Unk802FFA20_A {
+    int w[10];
+};
+extern "C" {
+int fn_8011AA4C();
+void fn_8014E09C(Unk802FFA20_It* it, void* o, int k);
+void fn_8014E108(Unk802FFA20_It* it);
+int fn_801A497C(void* o, int a, int b);
+}
+
+void fn_802FFA20(Unk802FFA20_A* a, Unk802FFA20_S* s)
+{
+    if (fn_8011AA4C() != 10) {
+        a->w[9] = s->m700->m3B8;
+        Unk802FFA20_It it;
+        Unk802FFA20_It* p;
+        fn_8014E09C(&it, s, 1);
+        p = &it;
+        while (p->m8 != 10) {
+            int k = p->m8;
+            int r = fn_801A497C(s, 4, k);
+            *(int*)((char*)(k * 4) + (int)a) = r;
+            fn_8014E108(p);
+        }
+    }
 }
 
 void fn_802FFAAC(float v)
