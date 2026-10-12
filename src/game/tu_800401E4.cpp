@@ -275,6 +275,106 @@ void fn_800408A0(Unk80040640* self)
     }
 }
 
+struct Unk806192E0_C {
+    char pad0[0x10];
+    float m10;
+    char pad14[0x28];
+    int m3C;
+};
+struct Unk806192E0_B {
+    char pad0[0xC];
+    Unk806192E0_C* mC;
+};
+struct Unk806192E0 {
+    int m0;
+    Unk806192E0_B* m4;
+};
+extern Unk806192E0* lbl_806192E0;
+void fn_80040BE8(Unk80040640* self, int a);
+int fn_80040CC8(Unk80040640* self, int a);
+
+int fn_80040958(Unk80040640* self, int a)
+{
+    if (self->m5C4 == 0) {
+        self->m5D4[a] = -3;
+    } else if (self->m5D4[a] < 0) {
+        if (self->m5D0 == 0)
+            fn_800418C4(self);
+        fn_80040BE8(self, a);
+        Unk806192E0_B* o = lbl_806192E0->m4;
+        if (a == 0) {
+            lbl_806177DC = a;
+        } else if (o != 0) {
+            int* g = &lbl_806177DC;
+            Unk806192E0_C* c = o->mC;
+            float x = c->m10;
+            float nf = (float)c->m3C;
+            float y = x * nf;
+            int code = -1;
+            if (!(y < 0.0f)) {
+                if (!(y >= 12000.0f)) {
+                    code = 3;
+                } else if (!(y >= 24000.0f)) {
+                    code = 2;
+                } else {
+                    int f = y < 36000.0f;
+                    code = f;
+                }
+            }
+            *g = code;
+        }
+        int v;
+        switch (fn_80040CC8(self, a)) {
+        case -3:
+            v = -3;
+            break;
+        case 0:
+            v = 0;
+            break;
+        case 1:
+            v = 1;
+            break;
+        case -1:
+            v = -1;
+            break;
+        case -2:
+            v = -2;
+            break;
+        default:
+            v = -2;
+            break;
+        }
+        self->m5D4[a] = v;
+        int j;
+        for (j = 0; j <= 7; j++) {
+            if (j != a && self->m5D4[j] >= 0)
+                fn_80040CC8(self, j);
+        }
+        self->m5F4 = -1;
+        int k;
+        for (k = 0; k < 8; k++) {
+            if (self->m5D4[k] >= 0) {
+                self->m5F4 = self->m5D4[k];
+                break;
+            }
+        }
+    }
+    switch (self->m5D4[a]) {
+    case -3:
+        return -3;
+    case -1:
+        return -1;
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case -2:
+        return -2;
+    default:
+        return -2;
+    }
+}
+
 void fn_80040BE8(Unk80040640* self, int a)
 {
     int i;
