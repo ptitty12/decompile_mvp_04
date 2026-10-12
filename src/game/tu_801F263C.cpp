@@ -119,6 +119,84 @@ int fn_801F316C(Scr* p)
     return r;
 }
 
+struct Unk801F3244_Pl {
+    char pad0[0x460];
+    int m460;
+    char pad464[0x4D8 - 0x464];
+    char m4D8[0x94];
+    int m56C;
+};
+struct Unk801F3244_Ob {
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
+};
+struct Unk801F3244_O7 {
+    char pad0[0x3B4];
+    int m3B4;
+    char pad3B8[4];
+    int m3BC;
+};
+struct Unk801F3244_Ow {
+    char pad0[0x700];
+    Unk801F3244_O7* m700;
+};
+struct Unk801F3244_G {
+    Unk801F3244_Ow* m0;
+    char pad4[0x48 - 4];
+    int m48;
+    int m4C;
+    char pad50[0xE8 - 0x50];
+    int mE8;
+};
+int fn_801BBC78(int a);
+void fn_8024FAE0(void* sub, int a);
+void fn_8024F930(void* sub, int a, int b);
+Unk801EE438_Player* fn_801A497C(Unk801F3244_Ow* o, int k);
+void fn_80211CAC(void* l);
+int fn_80211D78(void* l);
+float fn_80211DE0(void* l);
+void fn_802099F8(void* p, int a);
+void fn_80205784(void* p, int a, int b);
+int fn_80259330(int a);
+
+/* near-miss (7 slots, registers only): retail keeps the slot value in r5, the flag in r0 and the sub-object pointer in r9 */
+void fn_801F3244(Scr* s, Unk801F3244_Pl* pl, Unk801F3244_Ob* ob)
+{
+    Unk801F3244_G* g = (Unk801F3244_G*)s->m9C;
+    if (g->m48 != 1) {
+        if ((ob->m38C == 1 || fn_801BBC78(g->m0->m700->m3BC) == 1) && pl->m460 == 1) {
+            const float k = 0.2f;
+            if (ob->m3F4 < k)
+                return;
+        }
+        int* sub = (int*)pl->m4D8;
+        int v = sub[0x94 / 4];
+        int c = 1;
+        if (v == -1)
+            c = 0;
+        if (c == 1) {
+            if (((Unk801F3244_G*)s->m9C)->m4C == 1) {
+                fn_8024FAE0(sub, 1);
+                return;
+            }
+            if (v != -1)
+                pl = (Unk801F3244_Pl*)fn_801A497C(((Unk801F3244_G*)s->m9C)->m0, 4);
+        }
+        void* sub2 = (char*)s + 0xA8;
+        fn_80211CAC(&((Unk801F3244_G*)s->m9C)->mE8);
+        fn_802099F8(sub2, 1);
+        fn_80205784(sub2, 1, 1);
+        if (fn_80259330(((Unk801F3244_G*)s->m9C)->m0->m700->m3B4) == 0 && fn_80211D78(&((Unk801F3244_G*)s->m9C)->mE8) != -1 &&
+            !(fn_80211DE0(&((Unk801F3244_G*)s->m9C)->mE8) <= 0.2f)) {
+            fn_8024F930(pl->m4D8, 1, 0);
+            return;
+        }
+        fn_8024FAE0(pl->m4D8, 1);
+    }
+}
+
 int fn_801F3B54(Scr* p)
 {
     Unk801EE438_G* g = p->m9C;
