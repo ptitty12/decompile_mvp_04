@@ -5,6 +5,15 @@
 #include "game/tu_8012C8CC.h"
 
 #include "game/tu_8001B190.h"
+extern const char lbl_805C02E0[];
+extern const char lbl_805BE138[];
+extern const char lbl_805C1B34[];
+extern const char lbl_805BE2A0[];
+extern const char lbl_805BE294[];
+extern const char lbl_805C1B28[];
+extern const char lbl_805C1B3C[];
+extern int lbl_8061977C;
+extern "C" int fn_80090880(int, int);
 
 /* Object with its vptr at +0x3C whose slots 28 and 30 take just a name. */
 struct Unk8013C7C0_Data {
@@ -168,6 +177,7 @@ void fn_8013D200(Scr* x);
 }
 extern const char lbl_8064B798[];
 extern "C" void fn_8013C7C0(Scr* x);
+
 static inline Unk8061A32C* FE()
 {
     if (lbl_8061A32C == 0) {
@@ -175,6 +185,7 @@ static inline Unk8061A32C* FE()
     }
     return lbl_8061A32C;
 }
+
 extern const char lbl_805C1B04[];
 extern const char lbl_805C1B10[];
 extern const char lbl_805C1B1C[];
@@ -187,6 +198,8 @@ struct Unk8013CF6C_Msg {
     unsigned short m0;
     char m1;
 };
+extern "C" void fn_8013CF6C(Scr* x, Unk8013CF6C_Msg* m);
+extern "C" int fn_8040B574(const char* a, const char* b);
 extern const char lbl_805BA6D0[];
 extern "C" {
 int fn_8013D534(Scr* x, int c);
@@ -523,6 +536,69 @@ extern "C" void fn_8013CB70(Scr* x, int dir)
     }
     fn_8001BC4C()->fn_8001BDAC(0x99);
     x->m3A8->fn_vslot67(r, c);
+}
+
+extern "C" void fn_8013CD30(Scr* x, Unk800C7B40_Widget* w)
+{
+    const char* nm = (const char*)w + 0xC;
+    const char* v = ((Unk8013C7C0_W*)fn_800C8048(w))->fn_vslot31();
+    if (fn_8040B574(lbl_805C02E0, nm) == 0) {
+        fn_8001BC4C()->fn_8001BDAC(0x99);
+        x->fn_vslot92();
+        return;
+    }
+    if (fn_8040B574(lbl_805BE138, nm) == 0) {
+        x->m3E0 = 0;
+        x->m3E4 = 0;
+        fn_8001BC4C()->fn_8001BDAC(0x99);
+        fn_8013C5C8(x);
+        return;
+    }
+    if (fn_8040B574(lbl_805C1B34, nm) == 0) {
+        fn_8013C8E4(x, 1);
+        x->m3E0 = 1;
+        x->m3E4 = 0;
+        fn_8001BC4C()->fn_8001BDAC(0x99);
+        fn_8013C7C0(x);
+        return;
+    }
+    if (fn_8040B574(lbl_805BE2A0, nm) == 0) {
+        x->m3E0 = 0;
+        x->m3E4 = 0;
+        fn_8013C81C(x);
+        return;
+    }
+    if (fn_8040B574(lbl_805BE294, nm) == 0) {
+        x->m3E0 = 0;
+        x->m3E4 = 0;
+        fn_8013C870(x);
+        return;
+    }
+    if (fn_8040B574(lbl_805C1B28, nm) == 0) {
+        x->m3E0 = 0;
+        x->m3E4 = 0;
+        fn_8013CF6C(x, (Unk8013CF6C_Msg*)fn_80090880(lbl_8061977C, 0xBBC));
+        return;
+    }
+    if (fn_8040B574(lbl_805C1B3C, nm) == 0) {
+        x->m3E0 = 0;
+        x->m3E4 = 0;
+        fn_8001BC4C()->fn_8001BDAC(0x99);
+        fn_8013C8E4(x, x->m3BC ^ 1);
+        return;
+    }
+    if (x->m3E4 != 0) {
+        x->m3E4 = 0;
+        fn_8013C7C0(x);
+    }
+    fn_8013CF6C(x, (Unk8013CF6C_Msg*)v);
+    if (x->m3E0 != 0) {
+        int t = x->m3BC;
+        if (t != 0) {
+            fn_8013C8E4(x, t ^ 1);
+            x->m3E0 = 0;
+        }
+    }
 }
 
 extern "C" void fn_8013CF6C(Scr* x, Unk8013CF6C_Msg* m)
