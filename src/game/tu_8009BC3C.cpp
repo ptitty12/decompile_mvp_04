@@ -7,7 +7,6 @@
 
 extern const char lbl_805B3B4C[];
 
-/* near-miss (18 of 27 slots): retail jumps to the shared fn_8009D0D4 tail differently */
 extern "C" void fn_8009CBC8(void* o, int x);
 extern "C" void fn_8009CF6C(void* o, int x);
 extern "C" void fn_8009D0D4(void* o);
@@ -82,6 +81,8 @@ extern "C" void fn_8009CB5C(void* o, int kind, int x)
 {
     if (kind != 0) {
         switch (kind) {
+        case 0:
+            break;
         case 1:
             fn_8009CBC8(o, x);
             break;
@@ -199,8 +200,6 @@ extern "C" int fn_8009DB0C(Obj3* o, int x)
     return d;
 }
 
-/* near-miss (9 slots): the first arm matches; retail keeps the two arms' identical
-   tails unmerged (separate lbzx/extsb/blr), here jump2 cross-jumps them */
 extern "C" int fn_8009DC00(char* o, int slot, int base, int kind)
 {
     if (kind == 1) {
@@ -208,11 +207,12 @@ extern "C" int fn_8009DC00(char* o, int slot, int base, int kind)
         int off = base + slot * 0x34;
         return (signed char)b[off];
     }
-    if (kind != 0)
-        return -1;
-    char* b = o + 0x412;
-    int off = base + slot * 0x34;
-    return (signed char)b[off];
+    if (kind == 0) {
+        char* b = o + 0x412;
+        int off = base + slot * 0x34;
+        return (signed char)b[off];
+    }
+    return -1;
 }
 
 struct Unk8009DC48 {
@@ -630,7 +630,6 @@ extern "C" int fn_8009E060(void* l, int k)
     return r;
 }
 
-/* near-miss (39 of 50 slots): retail tests kind linearly (1, <1, 2, 3), the switch makes a binary tree */
 struct Unk8009E93C {
     char pad0[0x1C];
     unsigned m1C;
@@ -643,8 +642,8 @@ extern "C" char* fn_8040B61C(char* dst, const char* src);
 extern "C" char* fn_8009E93C(Unk8009E93C* p, int kind, unsigned idx, char* out)
 {
     if (idx < p->m1C) {
-        switch (kind) {
-        default:
+        switch ((unsigned)kind) {
+        case 0:
             fn_8040B61C(out, p->m24 + idx * 0x3C + 0x10);
             break;
         case 1:
@@ -690,6 +689,74 @@ struct NameSrc8009F870 {
 extern "C" unsigned fn_8007F198__FP13Unk8007F198_A(int g, int id);
 extern "C" int fn_8007F24C__FP13Unk8007F198_Aii(int g, int id, int i);
 extern "C" float fn_8007A3FC__18Unk8007A4DC_Screenii(int g, int a, int b);
+
+extern "C" float fn_8007A48C__18Unk8007A4DC_Screeniii(int g, int a, int b, int c);
+
+extern "C" unsigned strlen(const char* s);
+extern "C" char* strncpy(char* d, const char* s, unsigned n);
+extern int lbl_805B6DC8[];
+
+extern "C" void fn_8009F574(Unk8009E93C* p, int kind, unsigned idx, const char* s, int len)
+{
+    if (idx < p->m1C) {
+        if (len <= 0)
+            len = strlen(s);
+        int cap = lbl_805B6DC8[kind];
+        if (len > cap)
+            len = cap - 1;
+        switch ((unsigned)kind) {
+        case 0: {
+            int t = idx * 0x3C;
+            strncpy(p->m24 + t + 0x10, s, len);
+            char* q = (char*)(t + (int)p->m24 + 0x10);
+            q[len] = 0;
+            break;
+        }
+        case 1: {
+            int t = idx * 0x3C;
+            strncpy(p->m24 + t + 0x14, s, len);
+            char* q = (char*)(t + (int)p->m24 + 0x14);
+            q[len] = 0;
+            break;
+        }
+        case 2: {
+            int t = idx * 0x3C;
+            strncpy(p->m24 + t + 0x28, s, len);
+            char* q = (char*)(t + (int)p->m24 + 0x28);
+            q[len] = 0;
+            break;
+        }
+        case 3: {
+            int t = idx * 0x3C;
+            strncpy(p->m24 + t + 0x2C, s, len);
+            char* q = (char*)(t + (int)p->m24 + 0x2C);
+            q[len] = 0;
+            break;
+        }
+        }
+    }
+}
+
+extern "C" float fn_8009F6CC(void* o, int x)
+{
+    NameSrc8009F870* s = (NameSrc8009F870*)o;
+    char buf[24];
+    unsigned i = 0;
+    int g = lbl_8061930C;
+    int id = fn_800736EC(s->v6(0, x, buf));
+    float t = 0.0f;
+    unsigned lim;
+    unsigned n = lim = fn_8007F198__FP13Unk8007F198_A(g, id);
+    for (; i < lim; ) {
+        int k = fn_8007F24C__FP13Unk8007F198_Aii(g, id, (unsigned char)i);
+        i++;
+        float a = (fn_8007A48C__18Unk8007A4DC_Screeniii(g, 0, k, 0) + fn_8007A48C__18Unk8007A4DC_Screeniii(g, 0, k, 1)) * 0.5f;
+        float b = (fn_8007A48C__18Unk8007A4DC_Screeniii(g, 1, k, 0) + fn_8007A48C__18Unk8007A4DC_Screeniii(g, 1, k, 1)) * 0.5f;
+        t += b * 0.5f + a;
+    }
+    t /= (float)n;
+    return !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+}
 
 extern "C" float fn_8009F870(void* o, int x)
 {
