@@ -226,7 +226,6 @@ extern "C" void fn_803DE51C(Mtx4* m, float* q, float* trans)
     trans[3] = m->m[15];
 }
 
-
 extern "C" void fn_803DED40(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
 {
     if (in != out) {
@@ -628,6 +627,78 @@ extern "C" void fn_803E032C(Unk803E032CObj* self)
     }
 }
 
+struct Unk803E0458Info {
+    char pad0[4];
+    unsigned short m4;
+    unsigned short m6;
+    char pad8[4];
+    unsigned int mC;
+    int m10;
+};
+struct Unk803E0458Obj {
+    char pad0[0x54];
+    Unk803E0458Info** m54;
+};
+extern "C" {
+void GXSetTexCopySrc(unsigned short l, unsigned short t, unsigned short w, unsigned short h);
+void GXSetTexCopyDst(unsigned short w, unsigned short h, int fmt, int mipmap);
+void GXSetCopyFilter(unsigned char aa, unsigned char* pattern, unsigned char vf, unsigned char* vfilter);
+void GXCopyTex(void* dest, int clear);
+void fn_803D9E00(void* a, int* b, unsigned char** c);
+void fn_803D9268(void* p);
+void fn_8042FF38(int fmt, int z);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042FE78(int a);
+}
+
+extern "C" void fn_803E0458(Unk803E0458Obj* self)
+{
+    Unk803E032CSub* sub = (Unk803E032CSub*)((char*)self + 0x3C);
+    fn_803D81B4(fn_803D81FC() + 4, 0);
+    fn_8042FED0(1, 3, 1);
+    fn_8042FE78(1);
+    unsigned short w = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m4;
+    unsigned short h = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m6;
+    float a = 640.0f;
+    float b = 480.0f;
+    float c;
+    float d;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&a, &b);
+    sub->m14->v3(&c, &d);
+    float r;
+    if (a + c <= 640.0f)
+        r = a;
+    else
+        r = 0.0f;
+    GXSetTexCopySrc((unsigned short)(int)r, 0, w, h);
+    GXSetTexCopyDst(w, h, ((int*)self->m54)[3], 0);
+    int x;
+    unsigned char* y;
+    fn_803D81FC();
+    fn_803D9E00((char*)fn_803D817C() + 0x10, &x, &y);
+    GXSetCopyFilter(y[0x19], y + 0x1A, 0, y + 0x32);
+    Unk803E0458Info* t = (Unk803E0458Info*)fn_803DD7C0(self->m54);
+    void* dst;
+    if (t->mC & 0x10000000)
+        dst = (char*)t + t->m10;
+    else
+        dst = (char*)t + 0x10;
+    GXCopyTex(dst, 1);
+    GXSetCopyFilter(y[0x19], y + 0x1A, 1, y + 0x32);
+    int r2 = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
+    if (r2 != lbl_80627324) {
+        if (lbl_80627324 != 0)
+            fn_8042FF38(1, 0);
+        else
+            fn_8042FF38(0, 0);
+    }
+    fn_803D81FC();
+    fn_803D9268((char*)fn_803D817C() + 0x38);
+}
+
 extern "C" void fn_803E0658(int a, int b)
 {
     if (b == 0xFFFF && a != 0) {
@@ -725,6 +796,6 @@ extern "C" void fn_803E0950()
 /*
  * Not matched yet: fn_803DE414 (quaternion to 3x3 temporary to matrix, stack slot and loads right, float
  * schedule 49 slots off), fn_803E00EC (scaled quaternion to matrix, needs a fourth saved float register),
- * fn_803DE7D0, fn_803DF4E4 (axis-angle to matrix), fn_803DF824 (euler angles to matrix), fn_803E0458.
+ * fn_803DE7D0, fn_803DF4E4 (axis-angle to matrix), fn_803DF824 (euler angles to matrix).
  * The original code stays linked for these.
  */
