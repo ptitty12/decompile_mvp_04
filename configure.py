@@ -376,6 +376,8 @@ cflags_ealib_sda = ["-O2", "-fno-rtti", "-fno-exceptions"]
 # Part of the codec range (0x803912F8..0x803959D8) uses no small data and keeps
 # per-iteration index math (no strength reduction); see docs/DECISIONS.md.
 cflags_ealib_nsr = ["-O2", "-G0", "-fno-rtti", "-fno-exceptions", "-fno-strength-reduce"]
+# RealCore units that keep per-iteration index math but use small data (default -G8).
+cflags_ealib_sda_nsr = ["-O2", "-fno-rtti", "-fno-exceptions", "-fno-strength-reduce"]
 
 # EA SND 9.02.04 + csis (0x803A4214..0x803BA9DC), compiled as C++. Flags from mitsevox/mvp2005
 # (port/mvp2005 branch); saems.c 74/74, smemman.c 5/5, salloc.c 4/4 at 100% with them.
@@ -1060,7 +1062,7 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80397CAC.cpp"),
             Object(NonMatching, "ealib/tu_8039B3E4.cpp"),
             Object(NonMatching, "ealib/tu_803A0310.cpp"),
-            Object(NonMatching, "ealib/tu_803EB2AC.cpp"),
+            Object(NonMatching, "ealib/tu_803EB2AC.cpp", cflags=cflags_ealib_sda_nsr),
             Object(NonMatching, "ealib/tu_803EBF90.cpp"),
             Object(NonMatching, "ealib/tu_803ED700.cpp"),
             Object(NonMatching, "ealib/tu_803EE8F8.cpp"),

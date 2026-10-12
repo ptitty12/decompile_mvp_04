@@ -118,6 +118,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-12 | **Flags: dolphin/dvd/tu_80425954.c (dvderror.c) = cflags_dolphin_dvd with `-inline noauto`** *[lead, owner authority]*. fn_80425A70 (__DVDStoreErrorCode) is byte-identical with `-inline noauto` or `-inline off` and not at `-inline auto`, where the compiler inlines the table scan fn_80425954 (ErrorCode2Num) into it (retail calls it). fn_80425954 matches both ways. The same flag set is NOT usable for the whole of dolphin/card/tu_8041C2D8 (tried: 11/18 instead of 17/18, so retail relies on auto-inlining in CARDCheck), so only this unit gets it. Counts: dvd/tu_80425954 1/2 -> 2/2. | probe (tail-09 worker) | commit setup(dolphin/dvd/tu_80425954.c)
 
+- 2026-10-12 | **Flags: ealib/tu_803EB2AC = ProDG -O2 (default -G8) -fno-strength-reduce** (`cflags_ealib_sda_nsr`) *[lead, owner authority]*. RealCore code here keeps per-iteration index math but uses small data. fn_803EBC70, fn_803EB5E4 and fn_803EB61C are exact only with -fno-strength-reduce. Objdiff goes 25 -> 28 of 29 matched, losing nothing. Other RealCore units were unchanged by the flag in the p3-24 worker's probe, so they stay on `ealib_sda`. | p3-24 worker probe, lead rebuild | report.json |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 
