@@ -217,6 +217,7 @@ struct Unk80069F0C {
     void fn_8006DDF4();
     void fn_8006DE84(Unk8006902C_EvDE84* ev);
     void fn_8006DF00();
+    void fn_8006DF80();
     void fn_8006E0F8(Unk8006902C_EvC17C* ev);
     void fn_8006E168(Unk8006902C_EvC17C* ev);
     void fn_8006E1FC(Unk8006902C_EvC17C* ev);
