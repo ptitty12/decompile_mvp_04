@@ -28,8 +28,8 @@ int fn_801EE6F4(Scr* p, int a)
     return r;
 }
 
-/* near-miss (9 slots): accessor + strength-reduced loop match; retail keeps slot in r31 and p in r30 (ours
- * the reverse) and lays out the final "return 1" block before "return 0". */
+/* near-miss (3 slots): the pass-through slot argument of fn_801E817C fixed the register split; retail still lays out the
+ * final "return 1" block before "return 0" (ternary and early-return spellings tried). */
 inline Unk801EE438_Slot* SlotAtE77C(Unk801EE438_Slot* a, int i)
 {
     Unk801EE438_Slot* q = a + i;
@@ -40,7 +40,7 @@ int fn_801EE77C(Scr* p, int slot, int k)
 {
     Unk801EE438_Slot* s = SlotAtE77C(p->m9C->mCA8, slot);
     if (s->m0 > 0) {
-        if (fn_801E817C(p->m9C->m3A64) != 1 && fn_801E82DC(p->m9C->m3A64, slot) != 1) {
+        if (((int (*)(int, int))fn_801E817C)(p->m9C->m3A64, slot) != 1 && fn_801E82DC(p->m9C->m3A64, slot) != 1) {
             int i;
             Unk801EE438_Ent* e = 0;
             for (i = 0; i < s->m0; i++) {
@@ -239,6 +239,79 @@ int fn_801F18A0(Scr* p)
 
 void fn_801F1CA0()
 {
+}
+
+extern const float lbl_805D4CDC;
+extern const Unk801EE438_Vec lbl_805D6760[];
+
+extern const float lbl_805D4CE0;
+extern "C" float fn_804028E4(float x); /* square root */
+
+inline Unk801EE438_Vec VecSub1DB4(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+
+int fn_801F1CA4(Scr*, Unk801EE438_Vec* pos, float* out)
+{
+    float bestD = lbl_805D4CDC;
+    int best = -1;
+    int cnt = 0;
+    int e = 0;
+    do {
+        float d2;
+        Unk801EE438_Vec d = VecSub1DB4(*pos, lbl_805D6760[e]);
+        d2 = d.m0 * d.m0 + d.m8 * d.m8;
+        if (best == -1 || !(d2 >= bestD)) {
+            best = *(volatile int*)&cnt;
+            bestD = d2;
+        }
+        int c = *(volatile int*)&cnt;
+        int t;
+        if (c > 3)
+            t = c;
+        else
+            t = c + 1;
+        *(volatile int*)&cnt = t;
+        e = t;
+    } while (e <= 3);
+    if (out != 0)
+        *out = fn_804028E4(bestD);
+    return best;
+}
+
+inline Unk801EE438_Player* PlayerAt1DB4(Unk801EE438_Player** a, int i)
+{
+    int o = i * 4;
+    return *(Unk801EE438_Player**)((char*)a + o);
+}
+
+int fn_801F1DB4(Scr* p, Unk801EE438_Vec* pos, float* out)
+{
+    float bestD = lbl_805D4CE0;
+    int best = -1;
+    Unk801EE438_It it;
+    Unk801EE438_It* ip = &it;
+    fn_8014E09C(ip, p->m9C->m0, 1);
+    while (it.m8 != 10) {
+        int i = it.m8;
+        Unk801EE438_Player* pl = PlayerAt1DB4(p->m9C->m8, i);
+        float d2;
+        Unk801EE438_Vec d = VecSub1DB4(*pos, *(Unk801EE438_Vec*)&pl->m60);
+        d2 = d.m0 * d.m0 + d.m8 * d.m8;
+        if (best == -1 || !(d2 >= bestD)) {
+            best = i;
+            bestD = d2;
+        }
+        fn_8014E108(ip);
+    }
+    if (out != 0)
+        *out = fn_804028E4(bestD);
+    return best;
 }
 
 }
