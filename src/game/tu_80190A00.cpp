@@ -38,6 +38,10 @@ struct Unk80191458_O {
 };
 
 extern "C" float fn_804028E4(float x);
+
+extern int lbl_8061C954;
+
+
 //@BODY
 //@80190E40
 inline void Put2(int*& p, int v) { *p++ = v; }
@@ -136,6 +140,47 @@ extern "C" void fn_80191458(Unk80191458_O* o, const Unk80183918_Vec3* p1, float 
         o->m4F0[idx].m20 = a;
         o->mBF8 = idx + 1;
     }
+}
+
+//@8019155C
+extern "C" int fn_8019155C(Unk80191458_O* o, int* a1, int* a2, int* a3, float* a4, float* a5, float t)
+{
+    if (lbl_8061C954 != 0) {
+        int k = 0;
+        *a1 = -1;
+        *a2 = -1;
+        if (k < o->mBF8) {
+            do {
+                float et = o->m4F0[k].m0;
+                if (!(et >= t)) {
+                    *a2 = k;
+                    if (o->m4F0[k].m20 != 0)
+                        *a1 = k;
+                    if (et < t)
+                        goto next;
+                }
+                if (*a1 >= 0 && k > 0 && o->m4F0[k].m20 != 0) {
+                    *a3 = k;
+                    *a4 = (t - o->m4F0[*a1].m0) / (et - o->m4F0[*a1].m0);
+                    *a4 = !(*a4 > 1.0f) ? (*a4 >? 0.0f) : 1.0f;
+                    if (*a2 == *a3 - 1) {
+                        *a5 = (t - o->m4F0[*a2].m0) / (et - o->m4F0[*a2].m0);
+                        *a5 = !(*a5 > 1.0f) ? (*a5 >? 0.0f) : 1.0f;
+                    } else
+                        *a5 = 0.0f;
+                    return 1;
+                }
+            next:
+                k++;
+            } while (k < o->mBF8);
+        }
+    }
+    *a1 = 0;
+    *a2 = 0;
+    *a3 = 0;
+    *a4 = 0.0f;
+    *a5 = 0.0f;
+    return 0;
 }
 
 //@80191720
