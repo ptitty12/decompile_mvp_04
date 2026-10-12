@@ -4,6 +4,7 @@
  */
 #include "game/tu_801C2C64.h"
 #include "game/goals/tu_8027C728.h"
+#include "game/goals/tu_8027A84C.h"
 #include "game/tu_801C6D2C.h"
 
 typedef Unk801B7FB0_P P;
@@ -645,6 +646,93 @@ extern "C" void fn_801C4D04(void)
         fn_80303BC4(lbl_805D1384, lbl_805D1398, lbl_805D13A0, lbl_8068C420.mC);
         fn_80303BC4(lbl_805D1390, lbl_805D1398, lbl_805D13A4, lbl_8068C420.m60);
     }
+}
+
+class Unk80287D70 {
+public:
+    void fn_80287D50(int v);
+    Unk80287D70* fn_80287DB8(int kind);
+};
+struct Unk802A2DA4_Goal;
+Unk802A2DA4_Goal* fn_802A2DC0(Unk802A2DA4_Goal* g, float f);
+static inline void SetAngleF8(Unk802726BC_Angles* p, float v)
+{
+    if (p->m190 == 1) {
+        p->m8[0] = v;
+    }
+    int off = p->m190 * 4 + 8;
+    *(float*)((char*)p + off) = v;
+}
+
+/* near-miss (98.3%): registers and code match; retail puts the Vec3 v on top of the freed float slots at
+ * frame 0x8 (frame 0x30), ours allocates v at 0x8 and the float slots at 0x18/0x20 (frame 0x40). */
+extern "C" void fn_801C4DA4(Z* z, int k)
+{
+    Vec3 v;
+    int sel = 0;
+    Unk8027C728_Goal* g;
+    P* p = fn_801A4B34(z->m204);
+    switch (k) {
+    case 3:
+        sel = 1;
+        break;
+    case 4:
+        sel = 1;
+        break;
+    case 7:
+        sel = 1;
+        break;
+    }
+    if (sel != 0) {
+        int mode = z->m204->m6F4;
+        if (mode == 3) {
+            g = fn_802448F4(p, 4);
+            g->m10 = 0x10;
+            fn_8027C728(g);
+            float f = 59.055118f;
+            *(int*)((char*)g + 0x60) = k;
+            Unk8027C728_Goal* g0 = g->m0;
+            SetAngleF8((Unk802726BC_Angles*)((char*)p + 0x734), f);
+            g0->m10 = 0xB;
+            fn_8027C728(g0);
+            ((Unk80287D70*)g0->m18)->fn_80287D50(0x2D9F492A);
+            Unk8027C728_Goal* g1 = g0->m0;
+            g1->m10 = 9;
+            fn_8027C728(g1);
+            fn_802A2DC0((Unk802A2DA4_Goal*)g1->m18, 1.0f);
+            Unk8027C728_Goal* g2 = g1->m0;
+            g2->m10 = mode;
+            fn_8027C728(g2);
+            *(int*)((char*)g2 + 0x60) = 1;
+            fn_8027D33C(g);
+            return;
+        }
+        if (fn_8017C94C(z->m4) == 0)
+            sel = 0;
+        if (sel != 0) {
+            g = fn_802448F4(p, 2);
+            g->m10 = 0x10;
+            fn_8027C728(g);
+            Unk8027C728_Goal* g2 = g->m0;
+            *(int*)((char*)g + 0x60) = k;
+            g2->m10 = 3;
+            fn_8027C728(g2);
+            *(int*)((char*)g2 + 0x60) = 1;
+            fn_8027D33C(g);
+            return;
+        }
+    }
+    g = fn_802448F4(p, 2);
+    g->m10 = 0x10;
+    fn_8027C728(g);
+    Unk8027C728_Goal* g0 = g->m0;
+    *(int*)((char*)g + 0x60) = k;
+    g0->m10 = 2;
+    fn_8027C728(g0);
+    fn_801C342C(&v, z);
+    ((Unk8027A84C*)g0->m18)->fn_8027A898(&v);
+    ((Unk80287D70*)g0->m18)->fn_80287DB8(9);
+    fn_8027D33C(g);
 }
 
 extern "C" void fn_801C53D8(void) {}
