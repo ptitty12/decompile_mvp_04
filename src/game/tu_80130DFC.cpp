@@ -204,7 +204,7 @@ struct Unk80132630_Cfg {
     int m22C;
     float m230;
 };
-extern "C" void fn_80134A60(Scr* x, Unk80132630_Cfg* c, int a);
+extern "C" int fn_80134A60(Scr* x, Unk80132630_Cfg* c, int a);
 /* Indexed access through a base pointer passed as an inline parameter (keeps `base` in a register). */
 static inline void SetAt(char* b, int off, int v)
 {
@@ -615,7 +615,7 @@ extern "C" void fn_80132438(Scr* x, int a1, int a2, int a3, int a4, int a5, int 
     fn_80134D74(x);
 }
 
-/* near-miss: 128/128 insns, one swap: retail moves r4 (the config object) before r3 (this) for the call to fn_80134A60, i.e. it is a method call (the callee is the unit-3 screen class method at 0x80134A60); as a free function the order is r3, r4 */
+/* fn_80134A60 returns int (ends li r3,0): with a void declaration the r3 argument move won the sched2 tie */
 extern "C" void fn_80132630(Scr* x, int a)
 {
     fn_80134680(x);
