@@ -869,10 +869,96 @@ extern "C" void fn_801E695C(char* s)
     fn_8037B830(s, lbl_805D3F2C);
 }
 
+extern "C" unsigned fn_801E6B84(int x);
+struct Unk801E6AA0_Vec2 {
+    float x;
+    float y;
+};
+struct Unk801E6AA0_Ent {
+    Unk801E61C0_Vec3 v;
+    int k0;
+    int k1;
+};
+struct Unk801E6AA0_O {
+    char pad0[4];
+    Unk801E6AA0_Vec2 m4[3];
+    Unk801E6AA0_Ent m1C[3];
+};
+extern "C" Unk801E61C0_Vec3 fn_801E6B9C(Unk801E6AA0_O* o, int a, Unk801E6AA0_Vec2 v, int mode);
+
+extern "C" Unk801E61C0_Vec3 fn_801E6AA0(Unk801E6AA0_O* o, int a, int k, int b)
+{
+    int i = fn_801E6B84(k);
+    if (o->m1C[i].k0 != a || o->m1C[i].k1 != b) {
+        Unk801E6AA0_Vec2 s = o->m4[i];
+        o->m1C[i].v = fn_801E6B9C(o, a, s, b);
+        o->m1C[i].k0 = a;
+        o->m1C[i].k1 = b;
+    }
+    return o->m1C[i].v;
+}
+
 extern "C" unsigned fn_801E6B84(int x)
 {
     unsigned d = x - 6;
     if (d <= 2)
         return d;
     return 1;
+}
+
+struct Unk801E6B9C_Obj {
+    char pad0[0x6BC];
+    int m6BC;
+};
+extern "C" {
+void fn_8019BA30(int h, Unk801E61C0_Vec3* a, Unk801E61C0_Vec3* b, float* c, Unk801E61C0_Vec3* d, Unk801E61C0_Vec3* e, float* f, float* g, float z);
+}
+float fn_8041171C(float x);
+float fn_80411554(float x);
+
+/* near-miss (95.7%): store/addi scheduling around the fn_8019BA30 argument setup; the lwz of arg 1 lands last instead of first */
+extern "C" Unk801E61C0_Vec3 fn_801E6B9C(Unk801E6AA0_O* o, int a, Unk801E6AA0_Vec2 v, int mode)
+{
+    Unk801E61C0_Vec3 va;
+    Unk801E61C0_Vec3 vc;
+    Unk801E61C0_Vec3 vb;
+    Unk801E61C0_Vec3 vp;
+    Unk801E61C0_Vec3 vo;
+    Unk801E61C0_Vec3 ve;
+    float sn;
+    float cs;
+    float dist;
+    float t74;
+    float t78;
+    float o7C;
+    float o80;
+    float y84;
+    float o88;
+    Unk801E6AA0_Vec2 s = v;
+    va.x = 6000.0f;
+    va.y = 1800.0f;
+    va.z = 144.0f;
+    sn = fn_8041171C(s.y * 0.017453294f);
+    cs = fn_80411554(s.y * 0.017453294f);
+    vb.x = cs * 6000.0f;
+    vc.y = 6.0f;
+    vb.y = 6.0f;
+    vb.z = sn * 6000.0f;
+    vc.x = 0.0f;
+    vc.z = 0.0f;
+    int h = ((Unk801E6B9C_Obj*)a)->m6BC;
+    fn_8019BA30(h, &vc, &vb, &o7C, &vp, &ve, &o88, &o80, 0.0f);
+    dist = vp.x * vp.x + vp.z * vp.z;
+    dist = fn_804028E4(dist);
+    y84 = s.x;
+    t74 = dist - 144.0f - 1800.0f;
+    if (mode == 3)
+        y84 = y84 + 10.0f;
+    else if (mode == 4)
+        y84 = y84 - 10.0f;
+    t78 = t74 * y84 * 0.01f + 1800.0f;
+    vo.y = 0.0f;
+    vo.x = cs * t78;
+    vo.z = sn * t78;
+    return vo;
 }
