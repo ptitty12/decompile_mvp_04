@@ -440,6 +440,7 @@ struct FeScrE : FeW {
     int m154;
     char pad158[0x2C8 - 0x158];
     int m2C8;
+    int m2CC;
 };
 extern "C" {
 int fn_800C8070(void* x);
