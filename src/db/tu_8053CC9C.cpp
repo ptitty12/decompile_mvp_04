@@ -46,27 +46,110 @@ DB_OVERLAY void fn_8053CD74(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x2C, 0x2C);
 }
 
-/* near-miss: retail loads r3 = 0 first and compares cases 0..14 linearly (beqlr); the
- * switch below scores 13 slots out of range */
-DB_OVERLAY int fn_8053CDB0(void* self, int k)
+/* Column table: one assignment per case; the dead compares are left by jump2
+   (PATTERNS, "Hard-case families 4"). */
+DB_OVERLAY int fn_8053CDB0(void* l, int k)
 {
     int r = 0;
-    switch (k) {
-    case 0: r = 0; break;
-    case 1: break;
-    case 2: r = 0; break;
-    case 3: break;
-    case 4: r = 0; break;
-    case 5: break;
-    case 6: r = 0; break;
-    case 7: break;
-    case 8: r = 0; break;
-    case 9: break;
-    case 10: r = 0x64; break;
-    case 11: r = 0x64; break;
-    case 12: r = 0x64; break;
-    case 13: r = 0x64; break;
-    case 14: r = 0x64; break;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 100;
+        break;
+    case 11:
+        r = 100;
+        break;
+    case 12:
+        r = 100;
+        break;
+    case 13:
+        r = 100;
+        break;
+    case 14:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+DB_OVERLAY int fn_8053CE50(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
     }
     return r;
 }
