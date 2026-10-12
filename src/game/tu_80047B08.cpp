@@ -7,6 +7,53 @@
  */
 #include "game/tu_80047B08.h"
 
+int fn_80047B08(Unk8004763C* t)
+{
+    int* a = &lbl_80617804;
+    Unk800642F0** b = &lbl_80618FBC;
+    Unk80047B08_Cb* cb = fn_80395864();
+    cb->m0 = fn_80047B04;
+    cb->m4 = fn_80377814;
+    cb->m8 = fn_80400DA4;
+    fn_80392B6C(fn_8001B950, fn_8001B9C0);
+    int ok = 1;
+    int h = fn_80392C28(0x5622, 0x10, 1);
+    t->mE0 = h;
+    fn_80392D08(fn_80044C98, t->mC04, h);
+    fn_80392C94(fn_8004483C, fn_80044B94);
+    fn_80392CE4(fn_80044C10);
+    fn_80392708();
+    *a = fn_800480FC(t);
+    Unk800642F0* m = new Unk800642F0;
+    *b = m;
+    *a = *a + m->fn_800644CC() + 1;
+    t->mF0 = (int)operator new[](*a * 8, 0x400);
+    fn_803EE7BC();
+    if (t->mF0 != 0) {
+        int n = fn_803913F4(*a);
+        t->mEC = n;
+        t->mE4 = (int)operator new[](n, 0x400);
+        fn_803EE7BC();
+        int p = t->mE4;
+        if (p != 0) {
+            fn_803913FC(*a, p);
+        } else {
+            if (t->mF0 != 0)
+                fn_80377488((void*)t->mF0);
+            t->mF0 = p;
+            *a = p;
+            lbl_80617808 = p;
+            ok = 0;
+            fn_80047CA4(t);
+        }
+    } else {
+        lbl_80617808 = *a = t->mF0;
+        fn_80047CA4(t);
+        ok = 0;
+    }
+    return ok;
+}
+
 void fn_80047CA4(Unk8004763C* t)
 {
     int i = 0;
@@ -88,6 +135,51 @@ void fn_8004801C(Unk8004763C* t, int idx)
         } while (i <= 7);
         fn_80048DA4(&t->mFC);
     }
+}
+
+int fn_800480FC(Unk8004763C* t)
+{
+    int total = 0;
+    int i;
+    for (i = 0; i < 8; i++) {
+        int found = 0;
+        int k;
+        for (k = 0; k < 8; k++) {
+            if (lbl_805B10B4[k].m80[i] == 1) {
+                found = 1;
+                break;
+            }
+        }
+        if (found == 1) {
+            const char* name = lbl_805B0A09 + i * 0xD8;
+            int ok = fn_802B96C4(name, 0);
+            if (ok == 0) {
+                t->mSlots[i].m0 = ok;
+                t->mSlots[i].m10 = -1;
+            } else {
+                const char* buf = 0;
+                const char* cur = 0;
+                unsigned len = 0;
+                int dummy;
+                int n = 0;
+                if (fn_80329DF0(name, &buf, &len) != 0) {
+                    if (len != 0) {
+                        cur = buf;
+                        do {
+                            n++;
+                            fn_80329C4C(&cur, &len, &dummy, 0, 1000000000, 0x2C);
+                            fn_80329C4C(&cur, &len, &dummy, 0, 1000000000, 0x2C);
+                        } while (len != 0);
+                        fn_80329E50(buf);
+                    }
+                    t->mSlots[i].m10 = n - 1;
+                    t->mSlots[i].m14 = total;
+                    total += t->mSlots[i].m10;
+                }
+            }
+        }
+    }
+    return total;
 }
 
 /* near-miss: 8 slots differ (fail/i callee-saved registers swapped: retail fail=r27, i=r26; tail layout) */

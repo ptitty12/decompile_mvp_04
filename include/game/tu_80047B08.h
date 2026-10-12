@@ -59,6 +59,41 @@ void fn_8005C384(Unk8005BA1C_Obj* o, int i);
 int fn_802B96C4(const char* name, int a);
 int fn_802B9300(const char* name, int a, int b, int* out);
 int fn_80395250(int buf, int x);
+extern char lbl_805B0A09[];
+/* Callback record returned by fn_80395864 (three function pointers; fn_80047B08 fills them). */
+struct Unk80047B08_Cb {
+    void (*m0)();
+    void (*m4)();
+    void (*m8)();
+};
+extern "C" Unk80047B08_Cb* fn_80395864();
+extern "C" void fn_80377814();
+extern "C" void fn_80400DA4();
+void fn_80047B04();
+void fn_8001B950(unsigned a);
+void fn_8001B9C0(void* p);
+void fn_80044C98(Unk80044C98_Arg* a);
+void fn_8004483C(int a, int b, int c);
+void fn_80044B94(int a, int b, int c);
+void fn_80044C10();
+extern "C" void fn_80392B6C(void (*a)(unsigned), void (*b)(void*));
+extern "C" int fn_80392C28(int a, int b, int c);
+extern "C" void fn_80392D08(void (*a)(Unk80044C98_Arg*), int b, int c);
+extern "C" void fn_80392C94(void (*a)(int, int, int), void (*b)(int, int, int));
+extern "C" void fn_80392CE4(void (*a)());
+extern "C" int fn_803913F4(int a);
+extern "C" void fn_803913FC(int a, int b);
+void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
+struct Unk800642F0 {
+    Unk800642F0();
+    int fn_800644CC();
+    char pad0[0x40];
+};
+extern Unk800642F0* lbl_80618FBC;
+int fn_800480FC(Unk8004763C* t);
+extern "C" int fn_80329C4C(const char** pp, unsigned* pn, int* out, int lo, int hi, int delim);
+extern "C" int fn_80329DF0(const char* name, const char** pbuf, unsigned* plen);
+extern "C" void fn_80329E50(const char* buf);
 struct Unk800652F4 {
     Unk800652F4();
     void fn_80065338();
