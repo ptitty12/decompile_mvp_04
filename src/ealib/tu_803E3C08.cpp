@@ -370,6 +370,41 @@ inline int BuildInl(Unk803E6660* o, int total)
     return ok;
 }
 
+inline int FlushInl(Unk803E6660* o)
+{
+    if (o->m18) {
+        for (int i = 0; i < o->m10; i++) {
+            int off = i * 12;
+            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
+            if (r->m4 && r->m8 > 0)
+                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
+        }
+        GXInvalidateVtxCache();
+        fn_8041A5DC();
+    }
+    o->m18 = 0;
+    return 1;
+}
+
+extern "C" void fn_803E6044(char* o)
+{
+    Unk803E6660* s = (Unk803E6660*)(o + 0x10);
+    FlushInl(s);
+    int st = *(int*)(o + 0xc);
+    if (st != 0) {
+        BuildInl((Unk803E6660*)(o + 0x10), st);
+        *(int*)(o + 0xc) = 0;
+    }
+    int k = *(int*)(o + 0x4c);
+    if (k == 0x98 || k == 0xb0) {
+        int st2 = *(int*)(o + 0xc);
+        if (st2 != 0) {
+            BuildInl((Unk803E6660*)(o + 0x10), st2);
+            *(int*)(o + 0xc) = 0;
+        }
+    }
+}
+
 extern char lbl_8060CC1C[];
 
 extern "C" void fn_803E6508(char* o, int arg)
@@ -400,7 +435,6 @@ extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
     if (chrg & 1)
         lbl_8062C66C(o, 0x3C);
 }
-
 
 extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
 {
@@ -449,8 +483,6 @@ extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
     return found != -1;
 }
 
-
-
 extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c)
 {
     return FindSet(o, name, a, b, c);
@@ -489,20 +521,8 @@ extern "C" int fn_803E6B3C(Unk803E6660* o)
 
 extern "C" int fn_803E6B74(Unk803E6660* o)
 {
-    if (o->m18) {
-        for (int i = 0; i < o->m10; i++) {
-            int off = i * 12;
-            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
-            if (r->m4 && r->m8 > 0)
-                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
-        }
-        GXInvalidateVtxCache();
-        fn_8041A5DC();
-    }
-    o->m18 = 0;
-    return 1;
+    return FlushInl(o);
 }
-
 
 extern "C" int fn_803E6C28(Unk803E6660* o, int total)
 {
