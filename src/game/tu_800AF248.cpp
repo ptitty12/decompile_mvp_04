@@ -379,6 +379,79 @@ inline float FMax2(float a, float b)
     return b >? a;
 }
 
+class FEV3Cx {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual FEV3Cz* s29(const char* a);
+    virtual void s30();
+    virtual void s31();
+    virtual FEV3Cz* s32(const char* a, int b);
+};
+struct FEObjAF248 {
+    int m0;
+    char pad4[0x2C - 4];
+    int* m2C;
+    int* m30;
+    char pad34[4];
+    FEV3Cz* m38;
+    FEV3Cz* m3C;
+    FEV3Cz* m40;
+};
+extern "C" void fn_802D7ACC();
+extern "C" int* fn_800ED2B0(FEV3Cz* o, const char* name);
+
+/* near-miss (98.9%): scratch registers of the last three stores are permuted */
+extern "C" void fn_800AF248(void* q)
+{
+    FEObjAF248* self = (FEObjAF248*)q;
+    if (self->m0 == 0) {
+        self->m2C = fn_800ED2B0(self->m38, "P1DISTSET");
+        self->m30 = fn_800ED2B0(self->m38, "P1DISTANIM");
+        self->m3C = fn_800C8044(self->m38->s32("P1DISTANCE", 1));
+        self->m40 = fn_800C8044(fn_800C8044(fn_800C8044(fn_800C8044(self->m38->s32("HRGAMEPLAY", 1))->s32("PLAYER1", 1))->s32("SCORE", 1))->s32("TOTALDISTANCE", 1));
+        ((FEV3Cx*)self->m38)->s29("HRGAMEPLAY/PLAYER1/SCORE/P1DISTANCE")->s8(0);
+    } else {
+        self->m2C = fn_800ED2B0(self->m38, "P2DISTSET");
+        self->m30 = fn_800ED2B0(self->m38, "P2DISTANIM");
+        self->m3C = fn_800C8044(self->m38->s32("P2DISTANCE", 1));
+        self->m40 = fn_800C8044(fn_800C8044(fn_800C8044(fn_800C8044(self->m38->s32("HRGAMEPLAY", 1))->s32("PLAYER2", 1))->s32("SCORE", 1))->s32("TOTALDISTANCE", 1));
+        ((FEV3Cx*)self->m38)->s29("HRGAMEPLAY/PLAYER2/SCORE/P2DISTANCE")->s8(0);
+    }
+    self->m3C->s8(0);
+    *self->m2C = 0;
+    lbl_8061B8C0->m24 = 0;
+    *self->m30 = 0;
+    fn_802D7ACC();
+}
+
 struct FEObj14 {
     char pad0[0x14];
     void* m14;
@@ -600,6 +673,7 @@ inline FEMgrB8* FEGetMgrA()
     }
     return lbl_8061A32C;
 }
+
 extern "C" void fn_800AFB18(FEObjAFB18* self)
 {
     self->s20(fn_800B7AB8(FEGetMgrA(), "INGAMEHRD"));
