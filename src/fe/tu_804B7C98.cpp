@@ -5,6 +5,7 @@
 
 #include "game/fe_804ABCBC.h"
 
+extern const char lbl_805F4450[];
 extern char lbl_80672830[];
 extern char lbl_80672830[];
 
@@ -45,12 +46,45 @@ extern "C" FE_OVERLAY void fn_804B7FE4(FeScr* x)
     x->m134->v3();
 }
 
+extern "C" FE_OVERLAY void fn_804B8288(FeScr* x)
+{
+    ((FeFnOI)fn_80125154)(x->m13C, 0);
+    if (fn_80593E8C(x->m140, ((FeObjI*)x->m134)->v60()) > 0 && fn_80593EB0(x->m140, ((FeObjI*)x->m134)->v60(), 1) != 0)
+        fn_801251CC(x->m13C, 0, 0xEA7, 1);
+    else
+        fn_80125084(x->m13C, 0);
+    if (fn_80593E7C(x->m140, ((FeObjI*)x->m134)->v60()) > 0)
+        fn_801251CC(x->m13C, 3, 0xEA6, 2);
+    else
+        fn_80125084(x->m13C, 3);
+}
+
 extern "C" FE_OVERLAY void fn_804B83A4(FeScr* x)
 {
     char buf[0x400];
     fn_800DF254(buf, 0, 0, *(float*)((char*)FI(x, 0x144) + 0x12B78));
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("BANK", 1)))->v28((int)buf);
     fn_800E5380(x->m138);
+}
+
+extern "C" FE_OVERLAY void fn_804B8438(FeScr* x, int k)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    switch (k) {
+    case 0:
+        fn_8040B830(p->name, lbl_805F4450, 15);
+        p->name[15] = k;
+        fn_800B7B4C(UiGetMsgMgr(), p, x);
+        break;
+    case 2:
+        ((FeObj2*)x)->v91(((FeObjI*)x->m134)->v60(), 1);
+        break;
+    case 1:
+        ((FeObj2*)x)->v91(((FeObjI*)x->m134)->v60(), 0);
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804B8570(FeScr* x, int a, int b)
@@ -308,6 +342,26 @@ extern "C" FE_OVERLAY void fn_804B933C(FeScr* x)
     FeObj* l = x->m140;
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("NAME", 1)))->v29(FI(fn_80594240(x->m140, ((FeObjI*)x->m134)->v60()), 0x10));
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("PROS", 1)))->v29(FI(fn_80593B68(l, ((FeObjI*)x->m134)->v60()), 0));
+}
+
+extern "C" FE_OVERLAY void fn_804B9464(FeScr* x, int k)
+{
+    UiMsg m;
+    UiMsg* p = &m;
+    fn_8035682C(p);
+    switch (k) {
+    case 0:
+        fn_8040B830(p->name, lbl_805F4450, 15);
+        p->name[15] = k;
+        fn_800B7B4C(UiGetMsgMgr(), p, x);
+        break;
+    case 2:
+        ((FeObj2*)x)->v92(1, ((FeObjI*)x->m134)->v60());
+        break;
+    case 1:
+        ((FeObj2*)x)->v92(0, ((FeObjI*)x->m134)->v60());
+        break;
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804B9740(int a, FeObj* w)
