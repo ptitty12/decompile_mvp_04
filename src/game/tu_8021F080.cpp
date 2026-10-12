@@ -385,3 +385,72 @@ void fn_80222AE0(Task* t, int a, RecQueue* q)
 }
 
 }
+
+extern "C" {
+float fn_8018A214(Obj4_36C* o);
+void fn_801E8A3C(Obj3A64* p, int a, int b);
+void fn_801EC5F8(Task* t, int a);
+void fn_8021CE28(Task* t, float f);
+int fn_801EE6F4(Task* t, int a);
+void fn_80205450(TaskInner* g, int i);
+void fn_802123D4(Task* t, int a, int b);
+int fn_80205664(TaskInner* in);
+
+inline void SetM4(void* s, float x)
+{
+    ((float*)s)[1] = x;
+}
+struct Unk80222B54_S {
+    TaskInner* m0;
+    float m4;
+};
+
+/* near-miss (7 slots): the constant-zero register and store order in the early-return block (retail stores mA4, mAC, m80, m9C with one li r0,0) */
+void fn_80222B54(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Obj4_36C* o = t->m9C->m4;
+    if (e->mA4 == 1) {
+        fn_802044A4(t, a, (char*)q + 0x48, e->m84);
+        e->mA4 = 0;
+    }
+    if (fn_80205664(t->m9C) == 1)
+        fn_801E8A3C(t->m9C->m3A64, a, -1);
+    Unk80222B54_S* sub = (Unk80222B54_S*)((char*)t + 0xA0);
+    if (!(e->m84 < sub->m4)) {
+        float v = (float)t->m9C->m0->m4C * 0.016666668f + fn_8018A214(o);
+        if (!(v < e->m84)) {
+            SetM4(sub, v);
+            fn_80205450(t->m9C, a);
+            fn_802123D4(t, 1, 1);
+            fn_801EC5F8(t, a);
+        }
+    }
+    if (o->m36C != 0) {
+        t->m9C->mA4 = -1;
+        t->m9C->m30 = 4;
+        if (o->m36C->m460 != a) {
+            e->mA4 = 1;
+            e->mAC = 0;
+            e->m80 = 0.0f;
+            e->m9C = 0;
+            return;
+        }
+        if (t->m9C->m6A8 == 1 && fn_80210C98((Sub*)&t->m9C, 3) == 0) {
+            int r = fn_802055F4(t->m9C);
+            if (r == 0) {
+                fn_801EE6F4(t, a);
+                fn_801F0EA8(t, a);
+                fn_80205450(t->m9C, a);
+                fn_802123D4(t, 1, 1);
+                fn_8021CE28(t, 0.8333334f);
+                t->m9C->m6A8 = r;
+                return;
+            }
+        }
+        fn_801EE6F4(t, a);
+        fn_801F0EA8(t, a);
+        fn_801F0174(t, a, 0);
+    }
+}
+}
