@@ -96,9 +96,7 @@ extern "C" void fn_801D34E4(B* s)
     s->m44.mC = t * (hi - lo) + lo;
 }
 
-static inline int Ok(int f) { if (f == -1 || f == 0) return 0; if ((f & 8) == 0) return 0; return 1; }
-/* near-miss: 2 slots: retail sets li r0,1 before the andi. test of the flag word (andi. goes to r11); ours schedules andi. first.
- * Tried Ok() as && chain, early-return chains, nested if, unsigned range test, r=1 then clear. */
+static inline int Ok(int f) { int ok; if ((unsigned)(f + 1) > 1) { ok = 1; if ((f & 8) == 0) ok = 0; } else ok = 0; return ok; }
 extern "C" int fn_801D3798(B* s)
 {
     Unk801D31D8_Game* g = s->m30;
