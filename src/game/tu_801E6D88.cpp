@@ -51,6 +51,7 @@ int fn_802055F4(Unk801DD660_Ctx* c);
 int fn_801E923C(I* i, int v);
 int fn_801E9280(I* i, int v);
 void fn_801E8328(I* i, int b, float f);
+void fn_801E8640(Unk801E6D88_F160* s, float v);
 int fn_801A2034(Unk801DB948_Game* g, int a);
 int fn_801A700C(Unk801DB948_Game* g, int a, int b);
 int fn_802D7DB4(int a, int b);
@@ -76,6 +77,34 @@ struct Unk801EA03C_Obj {
     char m580[1];
 };
 
+struct Unk801E6D88_Obj {
+    int m0;
+    int m4[17];
+    int m48[6];
+    int m60[14];
+    const void* m98;
+};
+extern const int lbl_8061CA70[];
+extern const int lbl_8061CAB4[];
+extern const int lbl_8061CADC[];
+extern "C" int fn_801E5F3C(int h);
+extern "C" int fn_801E63B0(int h);
+extern "C" int fn_801E6920(int h);
+
+extern "C" Unk801E6D88_Obj* fn_801E6D88(Unk801E6D88_Obj* s, int a)
+{
+    s->m0 = a;
+    s->m98 = lbl_80660AC0;
+    int i;
+    for (i = 0; i < 17; i++)
+        s->m4[i] = fn_801E5F3C(lbl_8061CA70[i]);
+    for (i = 0; i < 6; i++)
+        s->m48[i] = fn_801E63B0(lbl_8061CAB4[i]);
+    for (i = 0; i < 14; i++)
+        s->m60[i] = fn_801E6920(lbl_8061CADC[i]);
+    return s;
+}
+
 extern "C" void fn_801E6E48(I* s, int chrg)
 {
     *(const void**)((char*)s + 0x98) = lbl_80660AC0;
@@ -98,6 +127,23 @@ extern "C" Vec3 fn_801E73E8(void* self, int k, int sel)
 extern "C" Vec3 fn_801E7448(void* self, int k)
 {
     return lbl_805D40D0[k];
+}
+
+struct Unk801A96E0_Init;
+int fn_801A9E0C(Unk801A96E0_Init* o, int i);
+extern "C" Vec3 fn_801DC890(Unk801DB948* w, Unk801DB948_Obj* o, P* p, int a, int b, int c);
+extern const Vec3 lbl_805D3F68[];
+
+extern "C" Vec3 fn_801E7D1C(Unk801DD660_Ctx* self, int k, int sel)
+{
+    if (sel == 2)
+        return lbl_805D3F68[k];
+    Unk801DB948_Game* g = self->m0;
+    Unk801DB948_J* j = g->m700;
+    Unk801DB948_Obj* o = g->m6CC;
+    Unk801DB948* w = j->m3B8;
+    P* p = fn_801A497C(g, 4, k);
+    return fn_801DC890(w, o, p, fn_801A9E0C((Unk801A96E0_Init*)j->m3C4, k), 4, 10);
 }
 
 extern "C" Vec3 fn_801E7DD0(void* self, int k)
@@ -210,6 +256,19 @@ extern "C" int fn_801E82DC(I* s, int a)
 extern "C" int fn_801E85D0()
 {
     return 1;
+}
+
+struct Unk8019F8C0_Owner;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+float fn_802D7E2C(int a, int b);
+extern const float lbl_805D4228;
+
+extern "C" int fn_801E85D8(I* s)
+{
+    float f = fn_802D7E2C(fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4), 0xBD);
+    fn_801E8640((Unk801E6D88_F160*)s, f);
+    int r = f > lbl_805D4228;
+    return r;
 }
 
 extern "C" void fn_801E8640(Unk801E6D88_F160* s, float v)
@@ -433,4 +492,35 @@ extern "C" void fn_801EA03C(I* s, Unk801EA03C_A* a, P* p, int k)
     }
     if (a->m5B8 != -1)
         fn_801F5FD4(s, a);
+}
+
+extern "C" {
+void fn_80205450(Unk801DD660_Ctx* c, int v);
+void fn_802123D4(I* s, int a, int b);
+void fn_8021D4A4(I* s);
+void fn_802296D0(I* s, int a);
+}
+extern const float lbl_805D4A2C;
+
+extern "C" int fn_801EA118(I* s, int a, P* p)
+{
+    if (fn_802055F4(s->m9C) != 0) {
+        int z = p->m460;
+        if (z == 0 && (s->m9C->mA4 == 3 || s->m9C->mA4 == 5)) {
+            fn_80205450(s->m9C, s->m9C->mA4);
+            fn_802123D4(s, 0, 0);
+            fn_8021D4A4(s);
+            fn_801E81C8(s->m9C->m3A64);
+            fn_801E8068(s->m9C->m3A64);
+            fn_801E8250(s->m9C->m3A64, 0);
+            s->m9C->mA4 = z;
+            fn_80205450(s->m9C, 0);
+            fn_802123D4(s, 0, 0);
+            fn_802296D0(s, 0);
+            float v = lbl_805D4A2C;
+            s->mE8 = v;
+            return 1;
+        }
+    }
+    return 0;
 }

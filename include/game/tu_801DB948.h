@@ -236,7 +236,8 @@ struct Unk801DD660_Ctx {
     Unk801DD660_Tbl m2B4;
     char pad2B4b[0x6D8 - 0x2B4 - sizeof(Unk801DD660_Tbl)];
     Unk801DD660_Ent m6D8[1];
-    char pad734[0x3A68 - 0x6D8 - sizeof(Unk801DD660_Ent)];
+    char pad734[0x3A64 - 0x6D8 - sizeof(Unk801DD660_Ent)];
+    Unk801DD660* m3A64;
     int m3A68;
     int m3A6C;
 };
