@@ -477,6 +477,110 @@ extern "C" DB_OVERLAY void fn_80598A78(Unk80071604* self, unsigned i)
         fn_8040074C(self->m24 + i * 0x28, 0x28);
 }
 
+/* One assignment per column (14 columns) and no default: the zero arms that CSE
+   proves redundant leave dead compares behind (PATTERNS, "Hard-case families 4"). */
+//@80598AB4
+extern "C" DB_OVERLAY int fn_80598AB4(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 100;
+        break;
+    case 11:
+        r = 100;
+        break;
+    case 12:
+        r = 100;
+        break;
+    case 13:
+        r = 100;
+        break;
+    }
+    return r;
+}
+
+//@80598B3C
+extern "C" DB_OVERLAY int fn_80598B3C(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 //@80598D5C
 extern "C" DB_OVERLAY char* fn_80598D5C(Unk80071604* self, int which, unsigned idx, char* out)
 {

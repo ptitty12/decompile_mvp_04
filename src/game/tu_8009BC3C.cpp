@@ -112,6 +112,368 @@ extern "C" void fn_8009DDA8(Unk8009DDA8* p, unsigned i)
         fn_8040074C(&p->m24[i], 0x3C);
 }
 
+union Unk8009DDE4_Val {
+    int i;
+    float f;
+};
+
+/* Column default: 5 for columns 54 and 55, 0 otherwise. The value lives in a
+   union, so it stays in its stack slot. */
+extern "C" int fn_8009DDE4(void* l, int k)
+{
+    Unk8009DDE4_Val v;
+    v.i = 0;
+    switch ((unsigned)k) {
+    case 0:
+        v.i = 0;
+        break;
+    case 1:
+        v.i = 0;
+        break;
+    case 2:
+        v.i = 0;
+        break;
+    case 3:
+        v.i = 0;
+        break;
+    case 4:
+        v.i = 0;
+        break;
+    case 5:
+        v.i = 0;
+        break;
+    case 6:
+        v.i = 0;
+        break;
+    case 7:
+        v.i = 0;
+        break;
+    case 8:
+        v.i = 0;
+        break;
+    case 9:
+        v.i = 0;
+        break;
+    case 10:
+        v.i = 0;
+        break;
+    case 11:
+        v.i = 0;
+        break;
+    case 12:
+        v.i = 0;
+        break;
+    case 13:
+        v.i = 0;
+        break;
+    case 14:
+        v.i = 0;
+        break;
+    case 15:
+        v.i = 0;
+        break;
+    case 16:
+        v.i = 0;
+        break;
+    case 17:
+        v.i = 0;
+        break;
+    case 18:
+        v.i = 0;
+        break;
+    case 19:
+        v.i = 0;
+        break;
+    case 20:
+        v.i = 0;
+        break;
+    case 21:
+        v.i = 0;
+        break;
+    case 22:
+        v.i = 0;
+        break;
+    case 23:
+        v.i = 0;
+        break;
+    case 24:
+        v.i = 0;
+        break;
+    case 25:
+        v.i = 0;
+        break;
+    case 26:
+        v.i = 0;
+        break;
+    case 27:
+        v.i = 0;
+        break;
+    case 28:
+        v.i = 0;
+        break;
+    case 29:
+        v.i = 0;
+        break;
+    case 30:
+        v.i = 0;
+        break;
+    case 31:
+        v.i = 0;
+        break;
+    case 32:
+        v.i = 0;
+        break;
+    case 33:
+        v.i = 0;
+        break;
+    case 34:
+        v.i = 0;
+        break;
+    case 35:
+        v.i = 0;
+        break;
+    case 36:
+        v.i = 0;
+        break;
+    case 37:
+        v.i = 0;
+        break;
+    case 38:
+        v.i = 0;
+        break;
+    case 39:
+        v.i = 0;
+        break;
+    case 40:
+        v.i = 0;
+        break;
+    case 41:
+        v.i = 0;
+        break;
+    case 42:
+        v.i = 0;
+        break;
+    case 43:
+        v.i = 0;
+        break;
+    case 44:
+        v.i = 0;
+        break;
+    case 45:
+        v.i = 0;
+        break;
+    case 46:
+        v.i = 0;
+        break;
+    case 47:
+        v.i = 0;
+        break;
+    case 48:
+        v.i = 0;
+        break;
+    case 49:
+        v.i = 0;
+        break;
+    case 50:
+        v.i = 0;
+        break;
+    case 51:
+        v.i = 0;
+        break;
+    case 52:
+        v.i = 0;
+        break;
+    case 53:
+        v.i = 0;
+        break;
+    case 54:
+        v.i = 5;
+        break;
+    case 55:
+        v.i = 5;
+        break;
+    }
+    return v.i;
+}
+
+/* Every column yields 0; the original keeps the case tree as dead compares
+   (PATTERNS, "Hard-case families 4"). */
+extern "C" int fn_8009E060(void* l, int k)
+{
+    int r = 0;
+    switch ((unsigned)k) {
+    case 0:
+        r = 0;
+        break;
+    case 1:
+        r = 0;
+        break;
+    case 2:
+        r = 0;
+        break;
+    case 3:
+        r = 0;
+        break;
+    case 4:
+        r = 0;
+        break;
+    case 5:
+        r = 0;
+        break;
+    case 6:
+        r = 0;
+        break;
+    case 7:
+        r = 0;
+        break;
+    case 8:
+        r = 0;
+        break;
+    case 9:
+        r = 0;
+        break;
+    case 10:
+        r = 0;
+        break;
+    case 11:
+        r = 0;
+        break;
+    case 12:
+        r = 0;
+        break;
+    case 13:
+        r = 0;
+        break;
+    case 14:
+        r = 0;
+        break;
+    case 15:
+        r = 0;
+        break;
+    case 16:
+        r = 0;
+        break;
+    case 17:
+        r = 0;
+        break;
+    case 18:
+        r = 0;
+        break;
+    case 19:
+        r = 0;
+        break;
+    case 20:
+        r = 0;
+        break;
+    case 21:
+        r = 0;
+        break;
+    case 22:
+        r = 0;
+        break;
+    case 23:
+        r = 0;
+        break;
+    case 24:
+        r = 0;
+        break;
+    case 25:
+        r = 0;
+        break;
+    case 26:
+        r = 0;
+        break;
+    case 27:
+        r = 0;
+        break;
+    case 28:
+        r = 0;
+        break;
+    case 29:
+        r = 0;
+        break;
+    case 30:
+        r = 0;
+        break;
+    case 31:
+        r = 0;
+        break;
+    case 32:
+        r = 0;
+        break;
+    case 33:
+        r = 0;
+        break;
+    case 34:
+        r = 0;
+        break;
+    case 35:
+        r = 0;
+        break;
+    case 36:
+        r = 0;
+        break;
+    case 37:
+        r = 0;
+        break;
+    case 38:
+        r = 0;
+        break;
+    case 39:
+        r = 0;
+        break;
+    case 40:
+        r = 0;
+        break;
+    case 41:
+        r = 0;
+        break;
+    case 42:
+        r = 0;
+        break;
+    case 43:
+        r = 0;
+        break;
+    case 44:
+        r = 0;
+        break;
+    case 45:
+        r = 0;
+        break;
+    case 46:
+        r = 0;
+        break;
+    case 47:
+        r = 0;
+        break;
+    case 48:
+        r = 0;
+        break;
+    case 49:
+        r = 0;
+        break;
+    case 50:
+        r = 0;
+        break;
+    case 51:
+        r = 0;
+        break;
+    case 52:
+        r = 0;
+        break;
+    case 53:
+        r = 0;
+        break;
+    case 54:
+        r = 0;
+        break;
+    case 55:
+        r = 0;
+        break;
+    }
+    return r;
+}
+
 /* near-miss (39 of 50 slots): retail tests kind linearly (1, <1, 2, 3), the switch makes a binary tree */
 struct Unk8009E93C {
     char pad0[0x1C];

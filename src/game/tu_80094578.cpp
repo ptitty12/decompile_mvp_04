@@ -24,6 +24,11 @@ extern const char lbl_805B5840[];
 extern const char lbl_805B5850[];
 extern const char lbl_805B5860[];
 
+/* strcpy through an inline wrapper: an inline argument is expanded as an address sum, so
+   &buf (frame offset 16) is rebuilt with `addi r3,r1,24` at every call instead of being
+   CSE'd into a callee-saved register. */
+inline void StrCpy(char* d, const char* src) { fn_8040B61C(d, src); }
+
 void Tbl8009433C::v6()
 {
     if (m0) {
@@ -237,20 +242,20 @@ void Tbl80094800::v8()
     Rec* u = m2C[0];
     m2C[0] = m2C[1];
     m2C[1] = u;
-    char buf[0x14];
-    fn_8040B61C(buf, (char*)m14[0].a);
-    fn_8040B61C((char*)m14[1].a, buf);
+    char buf[0x10];
+    StrCpy(buf, (char*)m14[0].a);
+    StrCpy((char*)m14[1].a, buf);
     const char* e = lbl_805B2CB0;
-    fn_8040B61C((char*)m14[0].a, e);
-    fn_8040B61C(buf, (char*)m14[0].b[1]);
-    fn_8040B61C((char*)m14[1].b[1], buf);
-    fn_8040B61C((char*)m14[0].b[1], e);
-    fn_8040B61C(buf, (char*)m14[0].b[0]);
-    fn_8040B61C((char*)m14[1].b[0], buf);
-    fn_8040B61C((char*)m14[0].b[0], e);
-    fn_8040B61C(buf, (char*)m2C[0]);
-    fn_8040B61C((char*)m2C[1], buf);
-    fn_8040B61C((char*)m2C[0], e);
+    StrCpy((char*)m14[0].a, e);
+    StrCpy(buf, (char*)m14[0].b[1]);
+    StrCpy((char*)m14[1].b[1], buf);
+    StrCpy((char*)m14[0].b[1], e);
+    StrCpy(buf, (char*)m14[0].b[0]);
+    StrCpy((char*)m14[1].b[0], buf);
+    StrCpy((char*)m14[0].b[0], e);
+    StrCpy(buf, (char*)m2C[0]);
+    StrCpy((char*)m2C[1], buf);
+    StrCpy((char*)m2C[0], e);
     v9();
 }
 
@@ -417,17 +422,17 @@ void Tbl800956D8::v8()
     Grp3 t = mC[0];
     mC[0] = mC[1];
     mC[1] = t;
-    char buf[0x14];
-    fn_8040B61C(buf, (char*)mC[0].a);
-    fn_8040B61C((char*)mC[1].a, buf);
+    char buf[0x10];
+    StrCpy(buf, (char*)mC[0].a);
+    StrCpy((char*)mC[1].a, buf);
     const char* e = lbl_805B2CB0;
-    fn_8040B61C((char*)mC[0].a, e);
-    fn_8040B61C(buf, (char*)mC[0].b[1]);
-    fn_8040B61C((char*)mC[1].b[1], buf);
-    fn_8040B61C((char*)mC[0].b[1], e);
-    fn_8040B61C(buf, (char*)mC[0].b[0]);
-    fn_8040B61C((char*)mC[1].b[0], buf);
-    fn_8040B61C((char*)mC[0].b[0], e);
+    StrCpy((char*)mC[0].a, e);
+    StrCpy(buf, (char*)mC[0].b[1]);
+    StrCpy((char*)mC[1].b[1], buf);
+    StrCpy((char*)mC[0].b[1], e);
+    StrCpy(buf, (char*)mC[0].b[0]);
+    StrCpy((char*)mC[1].b[0], buf);
+    StrCpy((char*)mC[0].b[0], e);
     v9();
 }
 
