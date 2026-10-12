@@ -85,7 +85,8 @@ struct Unk8024EF40_A {
     unsigned b0 : 1;
     unsigned b1 : 1;
     unsigned b2 : 1;
-    unsigned b3 : 29;
+    unsigned b3 : 1;
+    unsigned b4 : 28;
     float m8;
     float mC;
     int m10;
@@ -103,7 +104,7 @@ struct Unk8024EF40_A {
     int m40;
     int m44;
     float m48;
-    char pad4C[4];
+    float m4C;
     struct Unk8024EF40_Ref* m50;
 };
 
@@ -121,7 +122,10 @@ struct Unk8024EF40_P {
     int m264;
     char pad268[0x36C - 0x268];
     int m36C;
-    char pad370[0x44C - 0x370];
+    char pad370[0x388 - 0x370];
+    int m388;
+    int m38C;
+    char pad390[0x44C - 0x390];
     Unk8024EF40_Q* m44C;
     char pad450[8];
     int m458;
@@ -220,7 +224,9 @@ struct Unk80256C80_Inner {
     Unk8024EF40_Q* m1EC;
     char pad1F0[0x1FC - 0x1F0];
     int m1FC;
-    char pad200[0x434 - 0x200];
+    char pad200[0x420 - 0x200];
+    int m420;
+    char pad424[0x434 - 0x424];
     Unk8024EF40_P* m434;
     Unk8024EF40_P* m438[4];
     int m448;

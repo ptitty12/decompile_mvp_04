@@ -3,6 +3,9 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8024EF40.h"
+#include "game/goals/tu_8027C728.h"
+#include "game/goals/tu_8027A84C.h"
+#include "game/goals/tu_80287600.h"
 
 typedef Unk8024EF40_A A;
 typedef Unk8024EF40_P P;
@@ -31,6 +34,107 @@ float fn_80259EE8(void* p, int a, int b, int c);
 void fn_80268DB0(void* p);
 void fn_80265D24(I* i, int a);
 void fn_80377408(void* p);
+}
+
+struct Unk80259E3C_F {
+    float a[4];
+    float b[4][4];
+};
+extern "C" Unk8027C728_Goal* fn_802448F4(void* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+struct Unk8025A1A0_O {
+    char pad0[0x50];
+    Q* m50;
+};
+void fn_8025A1A0(Unk8025A1A0_O* o, float v);
+void fn_8025A3DC(Unk8025A1A0_O* o, float v);
+extern float lbl_805DADBC;
+extern float lbl_805DADC0;
+extern float lbl_805DAD00;
+extern float lbl_805DACFC;
+extern float lbl_805DADD4;
+extern float lbl_805DACF8;
+extern float lbl_805DADC4;
+extern float lbl_805DADD0;
+
+extern "C++" {
+float fn_8025A780(float* self, int b);
+float fn_80259FFC(void* p, int idx);
+float fn_80259FB8(void* p, P* idx, int c);
+int fn_8025D9E0(I* i);
+int fn_8025A664(void* self, P* p);
+void fn_801DC8E8(int a);
+}
+extern int lbl_8061B9C8;
+extern const Unk80273498_Vec3 lbl_8068CE14;
+extern const Unk80273498_Vec3 lbl_8068CDD8;
+extern const Unk80273498_Vec3 lbl_8068CDC0;
+extern const Unk80273498_Vec3 lbl_8068CDF0;
+extern const Unk80273498_Vec3 lbl_8068CDCC;
+extern const Unk80273498_Vec3 lbl_8068CDB4;
+extern float lbl_805DACC0;
+char* fn_8035E8CC(char* p, unsigned i);
+
+inline P* Roster(Q* q, unsigned i) { if (i <= 0xC) return q->m65C[i]; return 0; }
+
+int fn_801BBF24(int a);
+int fn_8035E318(A* a);
+void fn_80255314(A* a, int b, int c);
+void fn_80266420(void* l, P* p);
+void fn_8026647C(void* l);
+int fn_8014E310(int a);
+int fn_801C1950(int a);
+int fn_8014E2B4(int a);
+P* fn_8026B8C0(I* i, unsigned k);
+void fn_8025888C(M* self, P* p, int a, int b);
+void fn_8025D054(I* i, int a);
+void* fn_8035E604(void* p);
+int fn_8035E630(void* p, int a);
+int fn_80254984(A* a);
+int fn_80254EA4(A* a, int b);
+int fn_802576E4(M* self, P* p, int k);
+void fn_802574DC(M* self, P* p, int k);
+Unk8027C728_Goal* fn_80244C84(Unk80270BA0_X* x);
+int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_Vec3* c, float* d);
+float fn_80266D70(void* o, int k);
+extern float lbl_805DACB8;
+extern float lbl_805DACBC;
+struct Unk80258BA8_E {
+    char pad0[8];
+    int m8;
+};
+struct Unk8025933C_E {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    int m24;
+    Unk80273498_Vec3 m28;
+    int m34;
+};
+
+void fn_80258BA8(M* self, Unk80258BA8_E* e)
+{
+    if (fn_801C1950(((Unk8024EF40_Ctx*)self->m10)->m3BC) == 1) {
+        self->m4->m420 = e->m8;
+        int h = fn_8014E2B4(self->m4->m420);
+        P* p = fn_8026B8C0(self->m4, h);
+        if (p == 0 || self->m4->m194 > 1) {
+            if (p != 0)
+                fn_8025888C(self, p, 1, 0);
+            fn_8025D054(self->m4, 3);
+            fn_8035E604((char*)self->m4 + 0x1CC);
+        } else {
+            int r = fn_8035E630((char*)self->m4 + 0x1CC, (int)p);
+            fn_8025888C(self, p, 0, r > fn_8035E318(&p->m58C));
+            self->m4->m434 = p;
+        }
+    }
 }
 
 int fn_80258C90(M* self)
@@ -123,8 +227,47 @@ void fn_80258E98(M* self)
     self->m18 = 0;
 }
 
+void fn_802590E0(M* self)
+{
+    P* p = fn_802570D4(self)->m65C[10];
+    if (p != 0) {
+        A* a = &p->m58C;
+        if (fn_80254984(a) != 0) {
+            int k = 1;
+            if (fn_80254EA4(a, 0) == 1)
+                k = 4;
+            if (fn_802576E4(self, p, k) != 0) {
+                float f8 = lbl_805DACB8;
+                fn_8027D390(fn_80244C84((Unk80270BA0_X*)p), &f8, 0, 0, 0);
+                float fc = fn_80266D70((char*)self->m4 + 0x48, 1);
+                if (!(f8 + lbl_805DACBC <= fc))
+                    fn_802574DC(self, p, k);
+            }
+        }
+    }
+}
+
 void fn_802591CC()
 {
+}
+
+void fn_802591D0(M* self)
+{
+    if (self->m4->m1FC != 8)
+        fn_8025D054(self->m4, 9);
+    for (int i = 12; i > 8; i--) {
+        P* p = Roster(fn_802570D4(self), i);
+        if (p != 0) {
+            if (fn_801BBF24(((Unk8024EF40_Ctx*)self->m10)->m3BC) == 5) {
+                A* a = &p->m58C;
+                fn_80255314(a, fn_8035E318(a), 0);
+            }
+            int t = p->m58C.m38;
+            if (t > fn_8014E310(p->m458) + 1)
+                fn_80266420((char*)self->m4 + 4, p);
+        }
+    }
+    fn_8026647C((char*)self->m4 + 4);
 }
 
 void fn_802592B4(M* self)
@@ -145,6 +288,35 @@ int fn_80259330(M* self)
     return self->m4->m128;
 }
 
+inline float NegOne() { return -1.0f; }
+
+void fn_8025933C(char* self, int a)
+{
+    *(int*)self = a;
+    for (int i = 9; i <= 12; i++) {
+        Unk8025933C_E* e = (Unk8025933C_E*)fn_8035E8CC(self, i);
+        e->m8 = 4;
+        e->mC = -1;
+        e->m4 = 0;
+        e->m14 = 0;
+        e->m18 = NegOne();
+        e->m20 = 6;
+        e->m1C = NegOne();
+        e->m24 = 0;
+        e->m28 = lbl_806055AC;
+        e->m10 = 0;
+        e->m0 = 0;
+        e->m34 = 0;
+    }
+}
+
+void fn_802593EC(M* self, int b, int c)
+{
+    fn_8025D9E0(self->m4);
+    if (c != 0)
+        fn_801DC8E8(((Unk8024EF40_Ctx*)self->m10)->m3B8);
+}
+
 int fn_80259434(M* self)
 {
     return self->m4->m1FC;
@@ -159,6 +331,20 @@ void fn_8025956C(M* self, P* p)
 void fn_802595B8(M* self, int a)
 {
     fn_80266464((char*)self->m4 + 4, a);
+}
+
+void fn_80259918(void* self, P* p, int* out, int* idx)
+{
+    int t = p->m58C.m38;
+    *out = t;
+    if (t == -1) {
+        *out = 3;
+        *idx = 0;
+    } else {
+        *idx = t + 1;
+    }
+    if (*idx > 2)
+        *idx = 3;
 }
 
 void fn_80259C00(M* self, int a)
@@ -192,6 +378,16 @@ void fn_80259E18(M* self, int a)
     fn_80265D24(self->m4, a);
 }
 
+void fn_80259E3C(void* x)
+{
+    Unk80259E3C_F* f = (Unk80259E3C_F*)x;
+    for (int i = 0; i <= 3; i++) {
+        f->a[i] = lbl_805DACF8;
+        for (int j = 0; j < 4; j++)
+            f->b[i][j] = lbl_805DACF8;
+    }
+}
+
 void* fn_80259E90(void* x)
 {
     fn_80259E3C(x);
@@ -204,12 +400,148 @@ void fn_80259EC0(void* x, int a)
         fn_80377408(x);
 }
 
+float fn_80259EE8(void* p, int sel, int idx, int c)
+{
+    float r = lbl_805DACFC;
+    switch (sel) {
+    case 0:
+        r = fn_8025A780((float*)p, idx);
+        break;
+    case 1:
+        r = fn_80259FFC(p, idx);
+        break;
+    case 2:
+        r = fn_80259FB8(p, (P*)idx, c);
+        break;
+    }
+    return r;
+}
+
+int fn_80259F60(void* self, float* arr, int n, float v)
+{
+    float s = lbl_805DAD00;
+    int i = 0;
+    for (; i < n; i++) {
+        if (v < arr[i] + s)
+            return i;
+        s = arr[i] + s;
+    }
+    return 0;
+}
+
+float fn_80259FB8(void* self, P* p, int c)
+{
+    Unk80259E3C_F* f = (Unk80259E3C_F*)self;
+    return f->b[fn_8025A664(self, p)][c];
+}
+
+int fn_8025A3A4(float* p)
+{
+    for (int i = 0; i < 4; i++) {
+        if (!(p[i] <= 0.0f))
+            return 1;
+    }
+    return 0;
+}
+
 int fn_8025A664(void* self, P* p)
 {
     return p->m458 - 9;
 }
 
+void fn_8025A670(Unk8025A1A0_O* o, Q* q)
+{
+    o->m50 = q;
+    fn_8025A3DC(o, lbl_805DADBC);
+    fn_8025A1A0(o, lbl_805DADBC);
+}
+
+void fn_8025A6B4(Unk8025A1A0_O* o, Q* q)
+{
+    o->m50 = q;
+    fn_8025A3DC(o, lbl_805DADC0);
+    fn_8025A1A0(o, lbl_805DADC0);
+}
+
+void fn_8025A6F8(float* arr)
+{
+    for (int i = 0; i < 4; i++) {
+        if (!(arr[i] <= lbl_805DADC4))
+            arr[i] = (arr[i] - (float)lbl_8061B9C8 * lbl_805DADD0) >? lbl_805DADC4;
+    }
+}
+
+inline float AtF(float* base, int i)
+{
+    int o = i * 4;
+    return *(float*)((char*)base + o);
+}
+
+float fn_8025A780(float* self, int b)
+{
+    if (b == 0)
+        return lbl_805DADD4;
+    return AtF(self, fn_8025A664(self, (P*)b));
+}
+
+void fn_8025AA28(Unk8027A84C* g, P* p, int sel)
+{
+    Unk80273498_Vec3 v;
+    int s = sel;
+    if (s == -1)
+        s = p->m58C.m38;
+    switch (s) {
+    case 0:
+        v = lbl_8068CDCC;
+        break;
+    case 1:
+        v = lbl_8068CDB4;
+        break;
+    case 2:
+        v = lbl_8068CDF0;
+        break;
+    default:
+        v = lbl_8068CDF0;
+        break;
+    }
+    Unk80273498_Vec3 w = v;
+    g->fn_8027A898(&w);
+    ((Unk80287D70*)g)->fn_80287DB8(10);
+}
+
+void fn_8025AB00(Unk8027A84C* g, P* p)
+{
+    Unk80273498_Vec3 v = lbl_806055AC;
+    switch (p->m58C.m38) {
+    case 0:
+        v = lbl_8068CE14;
+        break;
+    case 1:
+        v = lbl_8068CDD8;
+        break;
+    case 2:
+        v = lbl_8068CDC0;
+        break;
+    default:
+        v = lbl_8068CDF0;
+        break;
+    }
+    ((Unk80287D70*)g)->fn_80287DB8(11)->m38 = 3;
+    Unk80273498_Vec3 w = v;
+    g->fn_8027A898(&w);
+}
+
 int fn_8025AC04()
 {
     return 0;
+}
+
+Unk8027C728_Goal* fn_8025ADB4(void* o, void* p, A* a)
+{
+    Unk8027C728_Goal* g = fn_802448F4(p, 1);
+    g->m10 = 2;
+    fn_8027C728(g);
+    ((Unk80287D70*)g->m18)->fn_80287DB8(10);
+    a->m34 = 0;
+    return g;
 }
