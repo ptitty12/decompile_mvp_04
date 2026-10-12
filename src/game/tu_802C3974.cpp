@@ -291,6 +291,55 @@ void fn_802C3D2C(Unk802C3B60* o, int n)
     }
 }
 
+void fn_803EC054(int h);
+void fn_80377488(void* p);
+
+void fn_802C3EC0(Unk802C3B60* o)
+{
+    int i = 0;
+    if (o->m24C != 0) {
+        for (i = 0; i < o->m250 + 3; i++) {
+            Unk802C3D2C_Elem* e = (Unk802C3D2C_Elem*)(o->m24C + i * 0x30);
+            if (i == 0) {
+                ((Unk802C3D2C_Elem*)o->m24C)[1].m4 = i;
+                ((Unk802C3D2C_Elem*)o->m24C)[2].m4 = i;
+            }
+            e->m8 = 0;
+            if (e->m18 != 0)
+                fn_803EC054(e->m18);
+            if (i == 0 || i > 2) {
+                if (e->mC != 0)
+                    fn_803EC054(e->mC);
+                if (e->m10 != 0)
+                    fn_803EC054(e->m10);
+                if (e->m14 != 0)
+                    fn_803EC054(e->m14);
+                if (e->m4 != 0) {
+                    fn_803EDA0C(e->m4);
+                    e->m4 = 0;
+                }
+            }
+            e->m0 = 0;
+            fn_802C40A0(o, (Unk802C40A0_Elem*)e);
+        }
+        if (o->m24C != 0) {
+            delete[] (char*)o->m24C;
+            o->m24C = 0;
+        }
+    }
+    fn_802C2254(&o->s0);
+    fn_802C2254(&o->s1);
+    fn_802C2254(&o->s2);
+    if (o->m234 != 0) {
+        fn_802C2254(o->m234);
+        if (o->m234 != 0) {
+            fn_802C2214(o->m234, 3);
+            o->m234 = 0;
+        }
+    }
+    o->m250 = 0;
+}
+
 void fn_802C4030(Unk802C3B60* o)
 {
     if (o->m24C != 0) {
