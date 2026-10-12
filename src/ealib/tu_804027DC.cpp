@@ -5,11 +5,54 @@
  * Every data object is extern by its lbl_ name.
  */
 
+#include "../../include/game/tu_8000C2C4.h"
+
 extern "C" double sqrt(double x);
 
 struct V3 {
     float x, y, z;
 };
+
+extern "C" void fn_80402ACC(const V3* a, const V3* b, V3* out);
+extern "C" void fn_80402B48(const V3* v, V3* out);
+
+extern "C" int sprintf(char*, const char*, ...);
+extern const char lbl_8060E9A0[];
+
+/* Little-endian field readers of the locale string table. */
+inline unsigned ReadLE32(const unsigned char* p)
+{
+    return (p[3] << 24) | (p[2] << 16) | (p[1] << 8) | p[0];
+}
+
+inline unsigned ReadLE16(const unsigned char* p)
+{
+    return (p[1] << 8) | p[0];
+}
+
+extern "C" float fn_804028E4(double x)
+{
+    return (float)sqrt(x);
+}
+
+extern "C" double sin(double x);
+extern "C" double cos(double x);
+
+extern "C" float fn_80402908(float x)
+{
+    return (float)sin((double)x * 6.2831855f);
+}
+
+extern "C" float fn_8040293C(float x)
+{
+    return (float)cos((double)x * 6.2831855f);
+}
+
+extern "C" void fn_80402970(const float* a, float* s, float* c)
+{
+    *s = fn_80402908(*a);
+    *c = fn_8040293C(*a);
+}
 
 /* Vec3 array helpers of the EA math library */
 extern "C" void fn_804029B8(int n, const V3* a, const V3* b, V3* out)
@@ -65,6 +108,13 @@ extern "C" void fn_80402ACC(const V3* a, const V3* b, V3* out)
     out->x = ay * bz - az * by;
 }
 
+extern "C" void fn_80402B0C(const V3* a, const V3* b, V3* out)
+{
+    V3 t;
+    fn_80402ACC(a, b, &t);
+    fn_80402B48(&t, out);
+}
+
 extern "C" void fn_80402B48(const V3* v, V3* out)
 {
     float s = 1.0f / fn_80402A90(v);
@@ -78,4 +128,185 @@ extern "C" void fn_80402BA8(int n, const V3* a, const V3* b, float* out)
     int i;
     for (i = 0; i < n; i++)
         out[i] = a[i].x * b->x + a[i].y * b->y + a[i].z * b->z;
+}
+
+struct Rec0E {
+    char pad[0xe];
+    unsigned char b[2];
+};
+
+extern "C" void fn_80402BEC(Rec0E* r, int z, unsigned short v)
+{
+    if (z == 0) {
+        *(unsigned short*)r->b = v;
+        r->b[0] = v;
+        r->b[1] = v >> 8;
+    }
+}
+
+extern "C" int fn_80402C08(const unsigned short* a, const unsigned char* b)
+{
+    return *a - ((b[1] << 8) | b[0]);
+}
+
+extern "C" int fn_80402C24(unsigned short key, const unsigned char* t);
+
+extern "C" void fn_80402DE4(unsigned char* t, int flag)
+{
+    if (flag == 0)
+        return;
+    int count = ReadLE16(t + 0xC);
+    for (int i = 0; i < count; i++) {
+        unsigned char* sec = t + ReadLE32(t + 0x10 + i * 4);
+        int n = ReadLE32(sec + 0xC);
+        for (int j = 0; j < n; j++) {
+            unsigned short* s = (unsigned short*)(sec + ReadLE32(sec + 0x10 + j * 4));
+            if (*s != 0) {
+                do {
+                    *s = ReadLE16((unsigned char*)s);
+                    s++;
+                } while (*s != 0);
+            }
+        }
+    }
+}
+
+extern "C" int fn_80402C08(const unsigned short* a, const unsigned char* b);
+
+extern "C" void fn_80402FCC(char* out, const unsigned short* in)
+{
+    while (*in != 0) {
+        if (*in > 0xFF || (*in == 0x5C && in[1] == 0x78)) {
+            sprintf(out, lbl_8060E9A0, *in);
+            out += 6;
+        } else {
+            *out++ = (char)*in;
+        }
+        in++;
+    }
+    *out = 0;
+}
+
+extern "C" int fn_80403060(const unsigned short* s)
+{
+    int n = 0;
+    while (*s) {
+        s++;
+        n++;
+    }
+    return n;
+}
+
+extern "C" int fn_80403088(const unsigned short* s, int ch)
+{
+    int i = 0;
+    while (s[i] != 0) {
+        if (s[i] == ch)
+            return i;
+        i++;
+    }
+    return 0xFFFF;
+}
+
+extern "C" int fn_804030F0(const unsigned short* a, const unsigned short* b, int n);
+
+extern "C" int fn_804030C8(const unsigned short* a, const unsigned short* b)
+{
+    return fn_804030F0(a, b, 0x7FFFFFFF);
+}
+
+extern "C" int fn_804030F0(const unsigned short* a, const unsigned short* b, int n)
+{
+    int d = 0;
+    int i;
+    for (i = 0; i < n && d == 0; i++) {
+        d = a[i] - b[i];
+        if (a[i] == 0)
+            break;
+    }
+    return d;
+}
+
+extern "C" void fn_8040316C(unsigned short* d, const unsigned short* s, int n);
+
+extern "C" void fn_80403144(unsigned short* d, const unsigned short* s)
+{
+    fn_8040316C(d, s, 0x7FFFFFFF);
+}
+
+extern "C" void fn_8040316C(unsigned short* d, const unsigned short* s, int n)
+{
+    int i = 0;
+    while (i < n && s[i] != 0) {
+        d[i] = s[i];
+        i++;
+    }
+    d[i] = 0;
+}
+
+extern "C" void fn_804031BC(unsigned short* d, const unsigned char* s)
+{
+    int i = 0;
+    while (s[i] != 0) {
+        d[i] = s[i];
+        i++;
+    }
+    d[i] = 0;
+}
+
+extern "C" void fn_8040321C(unsigned short*, const unsigned short*, const unsigned short*, const unsigned short*);
+extern "C" void fn_80403144(unsigned short* d, const unsigned short* s);
+extern "C" int fn_80403060(const unsigned short* s);
+
+extern "C" void fn_804031F8(unsigned short* a, const unsigned short* b, const unsigned short* c)
+{
+    fn_8040321C(a, b, c, 0);
+}
+
+extern "C" void fn_8040321C(unsigned short* out, const unsigned short* fmt, const unsigned short* a, const unsigned short* b)
+{
+    while (*fmt != 0) {
+        if (*fmt == '%' && fmt[1] == '1') {
+            fn_80403144(out, a);
+            fmt += 2;
+            out += fn_80403060(a);
+        } else if (*fmt == '%' && fmt[1] == '2') {
+            fn_80403144(out, b);
+            fmt += 2;
+            out += fn_80403060(b);
+        } else {
+            *out++ = *fmt++;
+        }
+    }
+    *out = 0;
+}
+
+extern "C" unsigned short* fn_804032D8(unsigned short* end, unsigned v, unsigned base, const unsigned short* digits)
+{
+    if (v == 0) {
+        *--end = digits[0];
+        return end;
+    }
+    do {
+        unsigned q = v / base;
+        *--end = digits[v - q * base];
+        v = q;
+    } while (v != 0);
+    return end;
+}
+
+extern "C" unsigned short* fn_80403310(unsigned short* end, int v, unsigned base, const unsigned short* digits)
+{
+    if (v < 0)
+        v = -v;
+    return fn_804032D8(end, v, base, digits);
+}
+
+extern "C" void fn_80403534(unsigned short* dst, const unsigned short* fmt, va_list ap);
+
+extern "C" void fn_80403DE4(unsigned short* dst, const unsigned short* fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    fn_80403534(dst, fmt, ap);
 }
