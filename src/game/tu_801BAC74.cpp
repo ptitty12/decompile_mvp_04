@@ -12,6 +12,7 @@ typedef Unk801B7FB0_Ai A;
 extern float lbl_805CFCA0;
 extern int lbl_8061CB78;
 extern int lbl_8061CB7C;
+extern const char lbl_805CFBAC[];
 struct Unk801BAC74_PV32 : public Unk801B7FB0_PBase {
     virtual void v1();
     virtual void v2();
@@ -137,6 +138,30 @@ inline void NextR(int& r)
 }
 
 extern "C" int fn_801BAC74(A* a, unsigned i, int* p, float f) { return fn_801BA130(a->m8, i, p, f); }
+
+inline float Unk801BACA0_Roll(A* a, const char* file, int line, float k)
+{
+    unsigned n = a->m14->m554->fn_8014D8AC(1000000, file, line);
+    return (float)n * k * 1e-6f;
+}
+
+extern "C" void fn_801BACA0(A* a)
+{
+    if (a->m14->m6F4 == 0) {
+        for (int i = 0; i <= 3; i++) {
+            P* p = fn_801A4C74(a->m14, i);
+            if (p)
+                p->v30();
+        }
+    }
+    a->m8->m30 = 0;
+    a->m24 = 0;
+    const char* file = lbl_805CFBAC;
+    a->m28 = Unk801BACA0_Roll(a, file, 0x443, 0.22999996f) + 0.92f;
+    a->m2C = -(Unk801BACA0_Roll(a, file, 0x444, 0.22999996f) + 0.92f);
+    a->m34 = Unk801BACA0_Roll(a, file, 0x445, 0.30000007f) + 0.9f;
+    a->m30 = -(Unk801BACA0_Roll(a, file, 0x446, 0.30000007f) + 0.9f);
+}
 
 extern "C" void fn_801BAE90(A* a)
 {
