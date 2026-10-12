@@ -101,6 +101,31 @@ void fn_802D119C()
 {
 }
 
+extern const void* lbl_80664658[];
+extern const char lbl_805E26DC[];
+extern const char lbl_805E3CA0[];
+void fn_802CF7A8(void* o);
+inline void* operator new(unsigned int, void* p) { return p; }
+
+/* near-miss (33/34 insns): retail stores the base fields m18, m1C first, then the vptr, then m4..m14 (mid-class constructor inlined); the 8 stores here are the best order found by search */
+Unk802D10A0::Unk802D10A0()
+{
+    void* p = this;
+    new (p) Unk8037B3E8(lbl_805E26DC);
+    int* q = (int*)p;
+    q[1] = 0;
+    q[5] = 1;
+    q[2] = 0;
+    q[3] = 0;
+    q[4] = 0;
+    q[6] = 0;
+    q[7] = 1;
+    *(const void***)p = lbl_80664658;
+    fn_802CF7A8((char*)p + 0x20);
+    new ((char*)p + 0xD4) Unk802D0B4C;
+    ((Unk8037B3E8*)p)->fn_8037B7E4(lbl_805E3CA0);
+}
+
 Unk802D10A0* fn_802D11A0()
 {
     return new (lbl_806EF9B4) Unk802D10A0;
