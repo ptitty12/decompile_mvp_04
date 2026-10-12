@@ -5,6 +5,12 @@
 
 #include "game/fe_804BE560.h"
 
+extern const char lbl_805F8074[];
+
+extern "C" char* fn_800DF254(char* out, int a, int b, float f);
+extern "C" void fn_804C8544(int a, void* x);
+extern const char lbl_8066F620[];
+
 struct Unk8007F198_B;
 int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
 int fn_8009047C(int a, int b);
@@ -28,7 +34,7 @@ extern const char lbl_8066F378[];
 extern "C" void fn_804C7ACC(FeScrN* x);
 extern "C" void fn_804C7FE4(FeScrN* x);
 extern "C" void fn_804C8354(void* x);
-extern "C" void fn_804C86E8(void* x);
+extern "C" void fn_804C86E8(FeScrN* x);
 extern "C" void fn_804C87F0(void* x);
 extern "C" void fn_804C7724(FeScrN* x);
 extern "C" void fn_804C7744(FeScrN* x);
@@ -62,6 +68,46 @@ extern "C" FE_OVERLAY int fn_804C713C(FeScrN* x, int a)
     return 0;
 }
 
+extern "C" FE_OVERLAY FeScrN* fn_804C71AC(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_8066F620);
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 0;
+    self->m144 = 0;
+    self->m148 = 0;
+    self->m14C = 0;
+    self->m150 = 0;
+    self->m154 = 0;
+    self->m158 = 0;
+    self->m15C = 0;
+    self->m160 = 0;
+    self->m164 = 0;
+    self->m168 = 0;
+    self->m16C = 0;
+    self->m170 = 0;
+    self->m174 = 0;
+    volatile int sp10 = 0;
+    int i = 0;
+    do {
+        int q = i << 2;
+        char* p = (char*)self + 0x178;
+        *(int*)(p + q) = 0;
+        int c2 = sp10;
+        int t;
+        if (c2 > 9)
+            t = c2;
+        else
+            t = c2 + 1;
+        sp10 = t;
+        i = t;
+    } while (i <= 9);
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_804C7724(FeScrN* x)
 {
     fn_800ECAA4(x);
@@ -81,7 +127,7 @@ extern "C" FE_OVERLAY void fn_804C776C(void* x, int a)
         fn_804C8354(x);
         break;
     case 1:
-        fn_804C86E8(x);
+        fn_804C86E8((FeScrN*)x);
         break;
     case 2:
         fn_804C87F0(x);
@@ -167,6 +213,34 @@ extern "C" FE_OVERLAY void fn_804C7990(FeScrJ* x, int a)
     x->m138->fn_vslot14(a);
 }
 
+extern "C" FE_OVERLAY int fn_804C79E0(FeScrN* x)
+{
+    switch (x->m138->fn_vslot60()) {
+    case 0:
+        return 0;
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+    case 4:
+        return 4;
+    case 5:
+        return 5;
+    case 6:
+        return 6;
+    case 7:
+        return 7;
+    case 8:
+        return 8;
+    case 9:
+        return 9;
+    default:
+        return 9;
+    }
+}
+
 extern "C" FE_OVERLAY int fn_804C7F30(FeScrN* x)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
@@ -204,12 +278,33 @@ extern "C" FE_OVERLAY void fn_804C81A0(FeScrN* x)
     fn_801251CC(x->m140, 0, 0x5B06, 1);
 }
 
+extern "C" FE_OVERLAY void fn_804C822C(FeScrN* x)
+{
+    char buf[0x100];
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    float v = s->fn_80079E74(fn_8007F7D0((Unk8007F198_B*)s, 0));
+    fn_800DF254(buf, 0, 3, v);
+    ((FeWV*)x->m144)->s28(buf);
+    float w = *(float*)((char*)*(void**)s->m30 + 0x12B78);
+    fn_800DF254(buf, 0, 3, w);
+    ((FeWV*)x->m148)->s28(buf);
+    x->m170->fn_vslot8(1);
+}
+
 extern "C" FE_OVERLAY void fn_804C8314(FeScrN* x, int a)
 {
     if (a == (int)x->m160) {
         fn_804C7ACC(x);
         fn_804C7FE4(x);
     }
+}
+
+extern "C" FE_OVERLAY void fn_804C846C(FeScrN* x)
+{
+    FePopup* p = fn_800B7AB8(FeGetMgr(), "POPUP");
+    int t = fn_804C7F30(x) != 0 ? 0x5CA9 : 0x5D85;
+    fn_80131F34(p, x, (void (*)(int, void*))fn_804C8544, 0, t, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+    p->fn_vslot86();
 }
 
 extern "C" FE_OVERLAY void fn_804C8544(int a, void* x)
@@ -241,6 +336,23 @@ extern "C" FE_OVERLAY void fn_804C8634()
     fn_8040B830(mp->name, lbl_805F806C, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, p);
+}
+
+extern "C" FE_OVERLAY void fn_804C86E8(FeScrN* x)
+{
+    int h = fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+    int id = fn_8008FE14(x->m138->fn_vslot60());
+    int r = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(id, h);
+    fn_800B555C()->m34 = r;
+    char* t = (char*)fn_800B555C() + 8;
+    *(int*)(t + 0x30) = x->m138->fn_vslot60();
+    fn_800B555C()->m3C = 1;
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    fn_8040B830(mp->name, lbl_805F8074, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
 }
 
 extern const char lbl_805F5B3C[];
