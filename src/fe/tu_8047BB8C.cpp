@@ -102,6 +102,16 @@ extern "C" FE_OVERLAY void fn_8047C958(char* buf, int v)
         fn_804089B4(buf, "%d", v);
 }
 
+extern "C" FE_OVERLAY void fn_8047CDC0(void* x)
+{
+    int v = FePick((char*)FeVp(x, 0xD78), FeWp(x, 0x38C)->fn_vslot60() * 4);
+    char* s = (char*)FeVp(x, 0x370);
+    fn_80126CF4((FeList*)s, FeI(s, 0x164), v, FeI(s, 0x134), FeI(s, 0x16C), FeI(s, 0x170), 0, FeI(s, 0x138), FeI(s, 0x13C), FeI(s, 0x148), FeI(s, 0x14C));
+    FeWp(x, 0x370)->fn_vslot8(1);
+    fn_8047C900(x);
+    FeWp(x, 0x38C)->fn_vslot16(0);
+}
+
 extern "C" FE_OVERLAY void fn_8047CE94(void* x, FeW* w, int b, int c)
 {
     if (w == FeWp(x, 0x38C)) {
@@ -112,6 +122,16 @@ extern "C" FE_OVERLAY void fn_8047CE94(void* x, FeW* w, int b, int c)
         }
         fn_8047C9A0(x, v);
     }
+}
+
+extern "C" FE_OVERLAY void fn_8047CF5C(void* x)
+{
+    char* s = (char*)FeVp(x, 0x370);
+    fn_80126CF4((FeList*)s, FeI(s, 0x164), 0, FeI(s, 0x134), FeI(s, 0x16C), FeI(s, 0x170), 0, FeI(s, 0x138), FeI(s, 0x13C), FeI(s, 0x148), FeI(s, 0x14C));
+    FeWp(x, 0x370)->fn_vslot8(0);
+    fn_8047C900(x);
+    FeWp(x, 0x38C)->fn_vslot16(1);
+    FeWp(x, 0x38C)->fn_vslot14(1);
 }
 
 extern "C" FE_OVERLAY void fn_8047D150()
