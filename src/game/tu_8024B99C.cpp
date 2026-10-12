@@ -20,6 +20,7 @@ char* fn_8024D2E8(Unk80270BA0_X* x);
 char* fn_8024D330(Unk80270BA0_X* x);
 char* fn_8024D378(Unk80270BA0_X* x);
 int fn_8023CB14(Unk80270BA0_X* x);
+int fn_8024E3D8(Unk80270BA0_X* x, float f);
 
 inline float FAt(const float* a, int i)
 {
@@ -425,6 +426,28 @@ public:
     virtual void v3();
     virtual int v4();
 };
+extern const float lbl_8061D780[];
+extern const char lbl_805D9188[];
+extern int lbl_8061D3C4;
+int fn_802536D0(Unk8024EF40_P* p);
+int fn_8024D708(Unk80270BA0_X* x)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    if (lbl_8061D3C4 != 0)
+        return 1;
+    float t = v->m540;
+    int k = fn_8024E3D8(x, t);
+    fn_8023CB20(x);
+    float chance = lbl_8061D780[k];
+    const float z = 0.0f;
+    float arr[4] = { 2.0f, 2.4f, 2.6f, 2.8f };
+    float m = fn_8024D0C4(x, 0x1F, z, arr[fn_802536D0((Unk8024EF40_P*)x)]);
+    chance = chance * m;
+    chance = !(chance > 100.0f) ? (chance >? z) : 100.0f;
+    float r = RandPct((Unk8024EF40_P*)x, lbl_805D9188, 0x3271);
+    return r <= chance;
+}
+
 int fn_8024D9A0(Unk80270BA0_X* x, int* out)
 {
     int r = 0;
@@ -522,6 +545,25 @@ void fn_8024DD80(Unk80270BA0_X* x)
     v->m460 = -1;
 }
 
+extern const float lbl_8061D634[];
+extern const float lbl_8061D634[];
+int fn_8024DEC4(Unk80270BA0_X* x, int idx)
+{
+    float prev = 0.0f;
+    float sum = 0.0f;
+    float r = RandPct((Unk8024EF40_P*)x, lbl_805D9694, 0x6F);
+    fn_8023CB14(x);
+    const float* p = lbl_8061D634 + idx * 4;
+    for (int i = 0; i < 4; i++) {
+        float w = *p++;
+        sum += w;
+        if (!(r < prev) && r < sum)
+            return i;
+        prev = sum;
+    }
+    return 3;
+}
+
 int fn_8024DFD4(Unk80270BA0_X* x, float f)
 {
     for (int i = 0; i < 3; i++) {
@@ -583,6 +625,67 @@ int fn_8024E3D8(Unk80270BA0_X* x, float f)
             return i;
     }
     return 3;
+}
+
+inline float Unk8024E468_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+inline float Unk8024E468_Rand(Unk8024EF40_P* x, const char* f, int line)
+{
+    float k = 1.0f;
+    return (float)fn_8014D8AC(x->m44C->m554, 1000000, f, line) * k * 0.000001f;
+}
+int fn_8024E468(Unk80270BA0_X* x)
+{
+    const float lo = 0.5f;
+    const float hi = 0.95f;
+    float t = 1.0f - ((Unk8024B99C_V*)x)->m540;
+    float p = Unk8024E468_Lerp(lo, t, hi);
+    return Unk8024E468_Rand((Unk8024EF40_P*)x, lbl_805D9694, 0x139) < p;
+}
+
+struct Unk8024E540_E {
+    float a;
+    float b;
+};
+extern const Unk8024E540_E lbl_8061D760[];
+int fn_8024E540(Unk80270BA0_X* x)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    Unk8022FE34_Ctx* c = v->m44C;
+    if (c == 0)
+        return 0;
+    char* g = c->m6F8->m10;
+    if (g != 0 && *(int*)(g + 0x28) == 0)
+        return 0;
+    float t = v->m540;
+    int k = fn_8024E3D8(x, t);
+    fn_8023CB20(x);
+    float chance = lbl_8061D760[k].b;
+    float m = fn_8024D050(x, 0x1D, 0x1C, 0.0f, 2.0f);
+    chance = chance * m;
+    chance = !(chance > 100.0f) ? (chance >? 0.0f) : 100.0f;
+    return RandPct((Unk8024EF40_P*)x, lbl_805D9694, 0x15C) < chance;
+}
+
+int fn_8024E6A4(Unk80270BA0_X* x)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    Unk8022FE34_Ctx* c = v->m44C;
+    if (c == 0)
+        return 0;
+    char* g = c->m6F8->m10;
+    if (g != 0 && *(int*)(g + 0x28) == 0)
+        return 0;
+    float t = v->m540;
+    int k = fn_8024E3D8(x, t);
+    fn_8023CB20(x);
+    float chance = lbl_8061D760[k].a;
+    float m = fn_8024D050(x, 0x1D, 0x1C, 0.0f, 2.0f);
+    chance = chance * m;
+    chance = !(chance > 100.0f) ? (chance >? 0.0f) : 100.0f;
+    return RandPct((Unk8024EF40_P*)x, lbl_805D9694, 0x17F) < chance;
 }
 
 float fn_8024E804(Unk80270BA0_X* x)
