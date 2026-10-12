@@ -70,6 +70,49 @@ extern unsigned lbl_80626940[];
 extern void* (*lbl_806AA884)();
 extern void (*lbl_806AA888)();
 
+/* ADPCM-style block decoder state: m0 samples left, m4/m8 history, mC byte cursor, m10 output (history at m10[-2], m10[-1]). */
+struct SndRdU16 {
+    int m0;
+    float m4;
+    float m8;
+    unsigned char* mC;
+    float* m10;
+};
+
+extern float lbl_80626520[8];
+extern float lbl_80626540[256];
+extern "C" void fn_803B7FA8(SndRdU16* a);
+
+extern "C" void fn_803B80C4(SndRdU16* s)
+{
+    unsigned char* p = s->mC;
+    s->m10[-2] = s->m8;
+    s->m10[-1] = s->m4;
+    for (; s->m0 > 0; p = s->mC) {
+        if (*p == 0xEE) {
+            fn_803B7FA8(s);
+            s->m0 -= 0x1C;
+        } else {
+            int i;
+            char* tb = (char*)lbl_80626540;
+            int k = (*s->mC >> 2) & 0x3C;
+            s->m0 -= 0x1C;
+            float c0 = *(float*)((char*)lbl_80626520 + k);
+            float c1 = *(float*)((char*)lbl_80626520 + 0x10 + k);
+            int row = (*s->mC++ << 6) & 0x3C0;
+            for (i = 0; i < 14; i++) {
+                unsigned char b = s->mC[i];
+                s->m10[0] = s->m10[-2] * c1 + (s->m10[-1] * c0 + *(float*)(tb + (((b >> 2) & 0x3C) + row)));
+                s->m10[1] = s->m10[-1] * c1 + (s->m10[0] * c0 + *(float*)(tb + (((b << 2) & 0x3C) + row)));
+                s->m10 += 2;
+            }
+            s->mC += 14;
+            s->m8 = s->m10[-2];
+            s->m4 = s->m10[-1];
+        }
+    }
+}
+
 extern "C" void* fn_803B8214()
 {
     return lbl_806AA884();
