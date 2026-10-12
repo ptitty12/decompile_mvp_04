@@ -366,6 +366,66 @@ void fn_801A5D3C(Unk8019F8C0_Owner* o)
     } while (idx <= 1);
 }
 
+struct Unk801A5E50_Obj {
+    char pad0[0x618];
+    int m618;
+};
+int fn_80381E9C(int obj, unsigned hash, int a, int b);
+void fn_803814A4(int obj, int a, int b, float f);
+extern char lbl_805CE9AC[];
+extern char lbl_805CE9D4[];
+extern float lbl_805CEA00;
+
+void fn_801A5E50(Unk8019F8C0_Owner* o)
+{
+    fn_8033E958(lbl_805CE9AC);
+    Unk801A5E50_Obj* p = (Unk801A5E50_Obj*)o->m594[0];
+    if (p) {
+        int t = p->m618;
+        if (t != 0) {
+            fn_80381E9C(t, 0xDB7AB022u, 0, 0);
+            fn_80381E9C(t, 0x0E246B08u, 0, 0);
+            fn_80381E9C(t, 0x7BF65171u, 0, 0);
+            fn_80381E9C(t, 0xF4318E1Du, 0, 0);
+            fn_80381E9C(t, 0x4C226115u, 0, 0);
+            fn_80381E9C(t, 0x512ADB3Cu, 0, 0);
+            fn_80381E9C(t, 0xEE1B6C46u, 0, 0);
+            fn_80381E9C(t, 0x8CFB37B7u, 0, 0);
+            fn_80381E9C(t, 0x1F8D6080u, 0, 0);
+            fn_80381E9C(t, 0x9D44D7EEu, 0, 0);
+            fn_80381E9C(t, 0x5C53C627u, 0, 0);
+            fn_80381E9C(t, 0xC0F46231u, 0, 0);
+            fn_80381E9C(t, 0xE14981C4u, 0, 0);
+            fn_80381E9C(t, 0x9D803AF7u, 0, 0);
+            fn_80381E9C(t, 0xD484ACC6u, 0, 0);
+            fn_80381E9C(t, 0x8249F53Cu, 0, 0);
+            fn_80381E9C(t, 0xE433AA50u, 0, 0);
+            fn_80381E9C(t, 0x9CEA8000u, 0, 0);
+            fn_80381E9C(t, 0x8C1988B6u, 0, 0);
+            fn_80381E9C(t, 0xFA01EA4Au, 0, 0);
+            fn_80381E9C(t, 0x34CFAED1u, 0, 0);
+            fn_80381E9C(t, 0xA68012D3u, 0, 0);
+            fn_80381E9C(t, 0x0C0032D1u, 0, 0);
+            fn_80381E9C(t, 0x1407B459u, 0, 0);
+            fn_80381E9C(t, 0x07CBFA4Bu, 0, 0);
+            fn_80381E9C(t, 0x36E74862u, 0, 0);
+            fn_80381E9C(t, 0xE9868307u, 0, 0);
+            fn_80381E9C(t, 0x8CFF6EBEu, 0, 0);
+            fn_80381E9C(t, 0xC7BBCB74u, 0, 0);
+            fn_80381E9C(t, 0x7455EBC7u, 0, 0);
+            fn_80381E9C(t, 0x2F83EEFCu, 0, 0);
+            fn_80381E9C(t, 0x7BEFBEB9u, 0, 0);
+            fn_80381E9C(t, 0x9EF2CB16u, 0, 0);
+            fn_80381E9C(t, 0x15EA1EBDu, 0, 0);
+            fn_80381E9C(t, 0xA87C30D2u, 0, 0);
+            fn_80381E9C(t, 0x4F7CB175u, 0, 0);
+            fn_80381E9C(t, 0x9EF2CB16u, 0, 0);
+            fn_803814A4(t, 0, 0, lbl_805CEA00);
+        }
+    }
+    fn_8033E958(lbl_805CE9D4);
+}
+
 void fn_801A6240(Unk8019F8C0_Owner* o)
 {
     void* t = (void*)o->m594[0];
