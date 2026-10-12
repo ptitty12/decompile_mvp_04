@@ -195,7 +195,6 @@ extern "C" void fn_801C7F38(Z* z, float f)
     z->m1B0 = fn_801CE6E4(z, b, a, c);
 }
 
-/* near-miss (81 vs 80 instructions): retail keeps p in r3 and the flag in r0. */
 extern "C" void fn_801C8014(Z* z, float f)
 {
     f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
@@ -216,8 +215,8 @@ extern "C" void fn_801C8014(Z* z, float f)
         }
     }
     lbl_8068C420.m380 = a;
-    lbl_8068C420.m38C = c;
     lbl_8068C420.m384 = b;
+    lbl_8068C420.m38C = c;
     z->m1B0 = fn_801CE6E4(z, b, a, c);
 }
 
