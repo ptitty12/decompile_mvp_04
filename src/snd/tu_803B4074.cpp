@@ -130,3 +130,9 @@ extern "C" unsigned int fn_803B4610(int i)
 {
     return lbl_80626418[i];
 }
+
+int SNDMEM_gethighwater()
+{
+    SNDMEMSTATE* mm = sndgs.mm;
+    return (mm->heapsize - mm->lowmark) * 100 / mm->heapsize;
+}
