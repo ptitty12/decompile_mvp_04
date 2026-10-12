@@ -7,6 +7,8 @@
 
 struct FeSub134 { int m0; int m4; int m8; int mC; };
 
+extern float lbl_805FB59C;
+extern "C" void fn_80132438(FePopup* p, void* self, int a, void* cb1, void* cb2, int b, int c, int d, float f);
 extern const char lbl_80668910[];
 extern "C" void fn_8007B924__18Unk8007B2B0_ScreeniiPc(void* g, int a, int b, char* out);
 extern "C" int fn_800736EC__FPCc(const char* s);
@@ -38,6 +40,7 @@ extern "C" int fn_804FFDF8(FeScrF* x);
 extern "C" int fn_804FFE34(FeScrF* x);
 extern "C" int fn_804FFE70(FeScrF* x);
 extern "C" int fn_804FFEAC(FeScrN* x);
+extern "C" void fn_804FFEEC(FeScrN* x);
 extern "C" void fn_804FFFB0();
 extern "C" void fn_80500030(void* x);
 extern "C" FeScrQ* fn_80500210(FeScrQ* self, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -160,6 +163,14 @@ extern "C" FE_OVERLAY int fn_804FFEAC(FeScrN* x)
 {
     x->fn_vslot67(1, 0);
     return 1;
+}
+
+extern "C" FE_OVERLAY void fn_804FFEEC(FeScrN* x)
+{
+    FePopup* p = (FePopup*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+    fn_80132438(p, x, 0, (void*)fn_80500030, (void*)fn_804FFFB0, 0x3A61, -1, 1, lbl_805FB59C);
+    ((FeWY*)p)->s84(0);
+    p->fn_vslot86();
 }
 
 extern "C" FE_OVERLAY void fn_804FFFB0()
