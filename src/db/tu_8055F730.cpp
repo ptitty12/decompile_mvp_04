@@ -71,6 +71,7 @@ extern "C" void fn_8055FF28(int a, Db8055FF28_Obj* self, int b);
 extern "C" void fn_80560010(int x, int k);
 extern "C" int fn_805600F8(int s, int id);
 extern "C" int fn_8056087C(void* self);
+extern "C" void fn_80560314(int a, int b, int c);
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -335,6 +336,40 @@ extern "C" DB_OVERLAY int fn_805600F8(int s, int id)
     return r;
 }
 
+extern "C" DB_OVERLAY void fn_805601F0(int x, int k)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk8006A138_It<3> it(k);
+    int cur = k;
+    if (cur <= 3) {
+        do {
+            int h = 0;
+            int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(cur), x);
+            int found;
+            do {
+                do {
+                    found = 0;
+                    unsigned n = fn_8007F674((Unk8007F198_A*)sc, g, h);
+                    unsigned i = 0;
+                    if (i < n) {
+                        do {
+                            int v = fn_8007F6C4((Unk8007F198_A*)sc, g, h, i);
+                            if (fn_8007F724((Unk8007F198_A*)sc, g, h, v, fn_800A2AE8(lbl_80619948)) <= 0) {
+                                fn_80560314(g, h, i);
+                                found = 1;
+                                break;
+                            }
+                            i++;
+                        } while (i < n);
+                    }
+                } while (found);
+                h++;
+            } while (h <= 1);
+            cur = it.Next();
+        } while (cur <= 3);
+    }
+}
+
 /* near-miss: 6 slots (retail copies the index zero into the counter: li r30,0 / mr r31,r30; ours uses two li) */
 extern "C" DB_OVERLAY int fn_8056087C(void* self)
 {
@@ -401,6 +436,38 @@ extern "C" DB_OVERLAY void fn_80560A24(int x)
         } while (k != 0);
     }
     t.vp = lbl_8064A550;
+}
+
+extern "C" DB_OVERLAY void fn_8056350C(int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk8006A138_It<3> it(0);
+    int cur = 0;
+    do {
+        int h = 0;
+        int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(cur), x);
+        int found;
+        do {
+            do {
+                found = 0;
+                unsigned n = fn_8007F674((Unk8007F198_A*)sc, g, h);
+                unsigned i = 0;
+                if (i < n) {
+                    do {
+                        int v = fn_8007F6C4((Unk8007F198_A*)sc, g, h, i);
+                        if (fn_8007F724((Unk8007F198_A*)sc, g, h, v, fn_800A2AE8(lbl_80619948)) <= 0) {
+                            fn_80563628(g, h, i);
+                            found = 1;
+                            break;
+                        }
+                        i++;
+                    } while (i < n);
+                }
+            } while (found);
+            h++;
+        } while (h <= 1);
+        cur = it.Next();
+    } while (cur <= 3);
 }
 
 extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
