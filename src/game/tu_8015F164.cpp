@@ -71,12 +71,55 @@ extern "C" int fn_8017706C__FP13Unk8017706C_Ti(void* t, int i);
 extern "C" int fn_8025416C__FP13Unk8024EF40_Wi(void* w, int i);
 extern "C" unsigned fn_8014D8AC(void* rng, int max, const char* file, int line);
 extern const char lbl_805C8C20[];
+inline int Pick80162FE4(int f)
+{
+    int t = 0x29;
+    if (f != 0) {
+        t = 0;
+    }
+    return t;
+}
 inline int Chance80162C28(void* rng, float k)
 {
     const char* nm = lbl_805C8C20;
     unsigned r = fn_8014D8AC(rng, 1000000, nm, 0xDF9);
     return (float)r * k * 0.000001f < 0.7f;
 }
+struct Obj3AC8015F164 { char pad0[0x14C]; int m14C; };
+struct Obj6B8Owner8015F164 { char pad0[0x6B8]; void* m6B8; };
+class Obj708Base8015F164 {
+public:
+    char pad0[0x98];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual int s22();
+};
+class Obj708_8015F164 : public Obj708Base8015F164 {
+public:
+    char pad9C[0x708 - 0x9C];
+    int m708;
+};
+extern "C" Obj708_8015F164* fn_801C1638(Unk801527C8_Actor* a, int i);
+int fn_8018240C(void* a, int b);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -477,6 +520,47 @@ extern "C" int fn_80162C28(Unk80159F28* self) /* 80162C28 */
     } else {
         self->fn_80157514(0x4A, (int)&rec, 1, 1, 0, lbl_8068B828);
     }
+    fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    return 1;
+}
+
+extern "C" int fn_80162FE4(Unk80159F28* self) /* 80162FE4 */
+{
+    if (self->m14 == 0) {
+        return 0;
+    }
+    RecObj8015F164 rec;
+    ElemView8015F164* e = (ElemView8015F164*)&rec;
+    for (int j = 0; j < 8; j++, e++) {
+        e->name[0] = 0;
+        e->m3C = 0;
+        e->m40 = 0;
+        e->m44 = 0;
+        e->m48 = 0;
+        e->m4C = 0;
+        e->m50 = lbl_805EBA10;
+        e->m68 = lbl_805EBA10;
+        e->m80 = lbl_805EBA10;
+        e->m98 = 0;
+        e->m9C = 0xAE;
+    }
+    int f = 0;
+    if (((Obj3AC8015F164*)self->mC->m700->m3AC)->m14C != 0 && self->m18 != 0) {
+        f = 1;
+    }
+    if (f != 0) {
+        Obj708_8015F164* o = fn_801C1638(self->mC, 0);
+        int v = o->m708;
+        int w = o->s22();
+        int id;
+        if (fn_8018240C(((Obj6B8Owner8015F164*)self->mC)->m6B8, v) != 0) {
+            id = w != 0 ? 0x69 : 0x6A;
+        } else {
+            id = w != 0 ? 0x67 : 0x68;
+        }
+        self->fn_80157514(id, (int)&rec, 1, 0x29, v, lbl_8068B828);
+    }
+    self->fn_80157514(0x66, (int)&rec, 1, Pick80162FE4(f), 0, lbl_8068B828);
     fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
     return 1;
 }
