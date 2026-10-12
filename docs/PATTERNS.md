@@ -1347,3 +1347,101 @@ Matched 41 functions in 30 units. Three more are solved in scratch for units tha
   the false path. Forms that drop the copy (`if (r != 0) {...; return 1;} return r;`) get
   `cmpwi`, but CSE then turns the false-path return into `li r3,0`. Ternary, switch,
   inline, unsigned and assignment-in-condition forms all keep the `mr.`.
+
+## Hard-case families 6 (Opus, 2026-10-12)
+
+Matched 20 functions in 10 units. Scratch tools are in `scratchpad/W8o6/`.
+
+### The case value kept live in the case bodies (family 1, 3 functions)
+- Tell: retail compares the switch index against a field with `cmpw rId,r0` (and passes
+  it with `mr r4,rId`) inside a case body. Ours folds the known case value (`cmpwi r0,K`,
+  `li r4,K`), and the index dies early, so the frame and the callee-saved registers
+  differ.
+- Mechanism (CSE, `-fcse-follow-jumps`):
+  - The bodies are reached along a CSE path: the `beq` into a single-use case label that
+    follows a barrier is followed, and record_jump_equiv puts the index and K in one class.
+  - fold_rtx then puts K into the compare, but only as its second operand: the `cmpsi`
+    pattern needs a register first, and COMPARE is not commutative.
+  - Paths are at most 9 branches deep (PATHLENGTH 10). Bodies deeper in the tree are
+    processed on their own, without the equivalence. That is why retail's `id` argument
+    in case 0x88 of fn_80163CC4 is a plain `mr r4,r31`.
+- Recipe: write the kind check with the index first,
+  `#define EVK(T, k) ((T*)(e ? ((k) == e->m0 ? e : 0) : 0))`, or `if (id == m->m0)` in
+  the cast inline. Matched fn_80163CC4 (600 insns) and fn_80143134.
+- More recipes found on fn_80163CC4:
+  - A value the entry block computed is reused in a body (`fadds f0,f13,f0`) only when
+    the body repeats the expression and its loads survive the -ffloat-store spill. Read
+    the field through an in-struct view (`((View*)a)->m4C`, unsigned). A cast pointer
+    (`*(unsigned*)&a->m4C`) is not in-struct, so the spill of `t` may alias it and the
+    load is redone.
+  - A cast written inside the argument list (`f(t, 0.0f, id, EVK(T, id)->m8->m458, ...)`)
+    loads `t` before the null check. A cast in a local before the call loads it after.
+  - A by-value struct copy whose stores retail makes r1-based goes through an inline
+    (`inline Out OutOf(const Ev* c) { return c->mC; }`), as in "Vec3 copy destination
+    addressing".
+- fn_80143134 also needed the flag store written as `lbl_80687CC8.m4 = 1` (the same
+  address as lbl_80687CCC). An in-struct store may alias the `m8` load, so the load
+  stays after it.
+- fn_8002395C (`if (idx == 0) {...}`) is the same CSE equivalence the other way round.
+  The `= 0` stores take idx's register: CSE gives the zero temporary idx's quantity,
+  which is retail's `stw r31`. Retail addresses the slot as `lwzx r29,r31` (base + idx,
+  unscaled). A scaled `arr[idx]` folds to `lwz 128(x)`.
+  `*(T**)((char*)arr + idx)` (equal to arr[0] in that branch) reproduces it. Through an
+  inline parameter it folds again.
+- Scanner: `fam1scan.py <repo>` lists unmatched functions where retail has more
+  register-register `cmpw` and ours more `cmpwi`.
+
+### A field loaded before a spilled float in a compare (family 2, 3 functions)
+- Tell: retail does `lfs fA,k(rObj)` then `lfs fB,n(r1)` then `fcmpu fB,fA`. Ours loads the
+  stack float first. Swapping the C operands gives the right load order, but the fcmpu
+  operands come out swapped.
+- Mechanism: expand_expr returns both operands as MEMs. The compare loads them into
+  registers in operand order (op0 first). An operand whose expansion emits insns, such as
+  an inline call, is loaded while it is expanded, so before op0.
+- Recipe: read the field through an inline accessor,
+  `inline float M5C(const Data* m) { return m->m5C; }`, then `if (a <= M5C(x->m8C))`.
+  Matched fn_80022780 (m4C, m40), fn_80022A28 (m5C) and fn_80022BE0 (m20).
+- fn_80022BE0 also needed:
+  - `case 1:` and `case 3:` written as two bodies, not `case 1: case 3:`. A label with two
+    uses is not followed by CSE, so x->m8C was reloaded. jump2 merges the two copies.
+  - `int r = 3; if (!(len2 > thr)) r = 2;` instead of the ternary.
+- Scanner: `fam2scan.py <repo>`. Its other hits (fn_802142C8, goal functions) are
+  different problems.
+
+### lis cluster above a store (family 3, 14 functions)
+- Tell: before a `(float)n * (1/60)` argument, retail hoists the `lis 0x4330` and both
+  constant `lis @ha` above a preceding field store or counter increment, but keeps the
+  `lfd`/`lfs` below it. Ours moves the loads above the store, or reuses one `lis`
+  register for both constants.
+- Mechanism: constant-pool loads are unchanging MEMs, which sched1 may move above any
+  store. A constant-pool MEM copied by the inliner loses the flag (Hard-case families
+  3, recipe A), so it must stay below stores that may alias it. Its `lis` (HIGH) has no
+  memory dependence and still moves up.
+- Recipe: write the frames-to-seconds conversion as an inline,
+  `inline float Secs(unsigned n) { return (float)n * 0.016666668f; }` (the template
+  form `template <class T> inline float Secs(T n)` also works), and call it in place of
+  the expression. Matched:
+  - tu_80029000: fn_800292EC, and the new fn_800297D4 and fn_80029FE4.
+  - tu_8002B430: fn_8002BB3C (also needs m130 stored before m12C), fn_8002BE10,
+    fn_8002BF20, fn_8002C540.
+  - tu_800239F4: fn_800243D4, fn_800263D4, fn_800264F4 (also needs m710 stored before
+    m6BC).
+  - Others: fn_80291378, fn_8029D094, fn_802456C8, fn_802496BC (these take the actor's
+    m4C).
+- Apply it per function, gated on the score. It made fn_8002BB3C (alone) and
+  fn_8003DC00 worse. `fam3gen.py <unit>` tries the template form on every non-matching
+  function that has the conversion, and `fam3gapply.py <unit> fn...` writes it.
+- fn_80029FE4 also needed the fn_80253E7C result in a local before
+  `fn_8003C270(x->m6C8, k)`, so the call comes before the m6C8 load.
+
+### Still open
+- fn_80022DF8 (tu_80021BE8, 99 of 100): retail reloads `b` (`lfs f13,8(r1)`) in the
+  block before the cross-jumped tail. Ours keeps it in f13 (GCSE). The goto
+  reconstruction probably differs from the original if/else.
+- fn_80027CF0 (tu_80026A48) and fn_8002B430 (tu_8002B430) are not written. They are
+  family 3 (use the Secs inline). fn_80027CF0 also has a volatile saturating loop over
+  m270[0..2] (copy fn_8003049C in tu_8002EB80) and the fields m740, m798, m7C8 and m7CC,
+  which the header does not declare yet.
+- Families 4 to 9 of the round-6 list were not reached: the row parser's `mr r3,r31`,
+  scan-loop pointer copies, the duplicated goal pointer, the ealib switch subtree, the
+  separate zero registers, and the round-5 leftovers.

@@ -91,20 +91,26 @@ extern "C" int fn_8002BAD8(Unk80023AC4_Obj* x, int a, int b)
     return r;
 }
 
-/* near-miss: 68/68 insns, ~10 slots differ (scheduling of the m130/m12C stores around the
- * duration conversion; same family as fn_800264F4 in tu_800239F4.cpp). */
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk8002B430_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
 extern "C" void fn_8002BB3C(Unk80023AC4_Obj* x)
 {
     Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x80);
     int id = m->mC;
     if (x->m71C == id) {
         x->m12C = id;
-        fn_8002A244(x, 0x59, (float)x->m80[0]->m48 * lbl_805A6400);
+        fn_8002A244(x, 0x59, Unk8002B430_Secs(x->m80[0]->m48));
     }
     if (fn_8002BAD8(x, id, m->m8) != 0) {
-        x->m12C = id;
         x->m130.i = m->m8;
-        fn_8002A244(x, 0x51, (float)x->m80[0]->m48 * lbl_805A6400);
+        x->m12C = id;
+        fn_8002A244(x, 0x51, Unk8002B430_Secs(x->m80[0]->m48));
     }
     x->m6BC = 0;
 }
@@ -165,7 +171,6 @@ extern "C" void fn_8002BDC8(Unk80023AC4_Obj* x)
     x->m6BC = 0;
 }
 
-/* near-miss: 68/68 insns, ~10 slots differ (same scheduling difference as fn_8002BB3C). */
 extern "C" void fn_8002BE10(Unk80023AC4_Obj* x)
 {
     Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x73);
@@ -174,17 +179,16 @@ extern "C" void fn_8002BE10(Unk80023AC4_Obj* x)
         if (w->m6CC->m38C == 1) {
             x->m12C = m->m8;
             x->m130.i = m->m14;
-            fn_8002A244(x, 0x2E, (float)w->m48 * lbl_805A6420);
+            fn_8002A244(x, 0x2E, Unk8002B430_Secs(w->m48));
         }
     } else {
         Unk8001F2C4_World* w = x->m80[0];
         x->m12C = m->m8;
-        fn_8002A244(x, 0x2D, (float)w->m48 * lbl_805A6420);
+        fn_8002A244(x, 0x2D, Unk8002B430_Secs(w->m48));
     }
     x->mF8 = 0;
 }
 
-/* near-miss: 54/54 insns, ~16 slots differ (message pointer in r6 vs r7; same family). */
 extern "C" void fn_8002BF20(Unk80023AC4_Obj* x)
 {
     if (x->m514 == 0)
@@ -192,7 +196,7 @@ extern "C" void fn_8002BF20(Unk80023AC4_Obj* x)
     Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x8C);
     x->m12C = m->m8;
     x->m130.i = m->mC;
-    fn_8002A244(x, 0x45, (float)x->m80[0]->m48 * lbl_805A6440);
+    fn_8002A244(x, 0x45, Unk8002B430_Secs(x->m80[0]->m48));
     x->m724 = (Unk801A4B34_Pos*)x->m12C;
     x->fn_800233B4(0x33, 0x1E, 0);
     x->m6BC = 0;
@@ -212,8 +216,6 @@ extern "C" void fn_8002C51C(Unk80023AC4_Obj* x)
     fn_8003E8E4(x->m6C8);
 }
 
-/* near-miss: 75/75 insns, 14 slots differ (placement of the conversion constant loads
- * relative to the m160.m20[] increment; same family as fn_800243D4). */
 extern "C" void fn_8002C540(Unk80023AC4_Obj* x)
 {
     Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x84);
@@ -224,7 +226,7 @@ extern "C" void fn_8002C540(Unk80023AC4_Obj* x)
     Unk801A4B34_Pos* p = fn_801A497C(w, base->m1CD0 == 0, id);
     x->m12C = (int)p;
     x->m160.m20[p->m708] = x->m160.m20[p->m708] + 1;
-    fn_8002A244(x, 0x38, (float)x->m80[0]->m48 * lbl_805A6488);
+    fn_8002A244(x, 0x38, Unk8002B430_Secs(x->m80[0]->m48));
     fn_8003CC54(x->m6C8, id);
     int v = fn_80097A70(&x->m80[0]->m6F8->m14->e[p->m708], 1, p->m70C, 0);
     fn_8003CA24(x->m6C8, v);

@@ -733,19 +733,18 @@ extern int lbl_80687CCC;
 static inline Unk80143134_Msg* Cast(int id, Unk80143134_Msg* m)
 {
     if (m != 0) {
-        if (m->m0 == id) {
+        if (id == m->m0) {
             return m;
         }
         return 0;
     }
     return 0;
 }
-/* near-miss: 23/23 insns, 7 differ: retail compares the message id in r4 against m->m0 (cmpw r4,r0); here the known id 0xA3 is folded into cmpwi r0,163 */
 extern "C" void fn_80143134(Unk801418B4* self, int msg, Unk80143134_Msg* m)
 {
     if (msg == 0xA3) {
         Unk80143134_Msg* mm = Cast(msg, m);
-        lbl_80687CCC = 1;
+        lbl_80687CC8.m4 = 1;
         fn_80143190(self, mm->m8);
     }
 }

@@ -83,6 +83,15 @@ extern "C" void fn_80029074(Unk80023AC4_Obj* x)
 
 /* near-miss: 101/101 insns, 2 slots swapped: retail issues `stw r0,0x12c(r31)` before the
  * `lwz r9,0x80(r31)` that loads the context for the duration conversion (store/load order). */
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so they stay below the preceding field stores (m12C, the m190 counter) while
+ * their lis halves are hoisted above them (retail's lis cluster). Written in place, the
+ * lfd/lfs move above the stores too. */
+inline float Unk80029000_Secs(Unk8001F2C4_World* w)
+{
+    return (float)w->m48 * 0.016666668f;
+}
+
 extern "C" void fn_800292EC(Unk80023AC4_Obj* x)
 {
     int v = fn_80253F0C((char*)x->m510 + 0x588, 5, 2, 0);
@@ -103,7 +112,7 @@ extern "C" void fn_800292EC(Unk80023AC4_Obj* x)
     int f = 0;
     x->m12C = x->m79C;
     x->m130.i = x->m56C;
-    fn_8002A244(x, 8, (float)x->m80[0]->m48 * lbl_805A62E0);
+    fn_8002A244(x, 8, Unk80029000_Secs(x->m80[0]));
     int pl = x->m80[0]->m700->m3B0;
     Unk80023F98_Vec2 sp = fn_80235BE0(pl);
     if (fn_8022EA7C(pl, &sp, lbl_805A62E4) == 0 && x->m570 != 0)
@@ -171,6 +180,45 @@ extern "C" void fn_80029480(Unk80023AC4_Obj* x)
             x->fn_800233B4(5, 0xA, 0);
     }
     fn_80023F98(x);
+}
+
+
+void fn_8003514C(int d, int a, int b, int c, int e);
+void fn_80034FE4(int d, int a, int b, int c, int e);
+void fn_8003B914(int m, int a, int b, int c, int d);
+extern const float lbl_805A6304;
+
+extern "C" void fn_800297D4(Unk80023AC4_Obj* x)
+{
+    int n = x->m530;
+    if (*lbl_8061B9C4 > n) {
+        int d = x->mD0;
+        if (d != 0) {
+            if (x->m160.m50 == 0) {
+                if (x->m56C != 0) {
+                    int a = x->m514;
+                    int b = x->m52C;
+                    fn_8003514C(d, a, b, n, fn_8002A2D4(x));
+                } else {
+                    int a = x->m514;
+                    int b = x->m52C;
+                    fn_80034FE4(d, a, b, n, fn_8002A2D4(x));
+                }
+            }
+            fn_8002F038(x);
+        }
+        int f = 0;
+        x->m12C = x->m56C;
+        fn_8002A244(x, 7, Unk80029000_Secs(x->m80[0]));
+        int pl = x->m80[0]->m700->m3B0;
+        Unk80023F98_Vec2 sp = fn_80235BE0(pl);
+        if (fn_8022EA7C(pl, &sp, lbl_805A6304) == 0 && x->m570 != 0)
+            f = 1;
+        int m6 = x->m6C8;
+        int a = x->m530;
+        int b = x->m56C;
+        fn_8003B914(m6, a, b, f, fn_8018B654(x->m80[0]->m6CC));
+    }
 }
 
 struct Unk8001CE80 {
@@ -314,6 +362,53 @@ extern "C" void fn_80029DB8(Unk80023AC4_Obj* x)
         x->fn_800233B4(0xB, 0x3C, 0);
     x->m6BC = 0;
     fn_80023F98(x);
+}
+
+void fn_80034EA8(int d, int a, unsigned b, int c);
+void fn_80036064(int a, int b, int c, int d);
+void fn_8003C270(int m, int r);
+void fn_8003C188(int m);
+void fn_8003BFE0(int m, int r, int s, int t);
+
+extern "C" void fn_80029FE4(Unk80023AC4_Obj* x)
+{
+    int r = fn_80253E7C((char*)x->m290 + 0x588, 0, 2, 0);
+    if (x->m6DC == 0) {
+        int d = x->mD0;
+        if (d != 0) {
+            int a = x->m514;
+            unsigned b = fn_8002A4C0(x, x->m80[0]);
+            fn_80034EA8(d, a, b, fn_8002A2D4(x));
+        }
+        if (x->m6D4 == 1) {
+            fn_8002A244(x, 0x2F, Unk80029000_Secs(x->m80[0]));
+        } else {
+            int t = x->m514 == 0;
+            char* b190 = (char*)x + 0x190;
+            int o4 = t * 4;
+            *(int*)(b190 + o4) = *(int*)(b190 + o4) + 1;
+            fn_8002A244(x, 0xF, Unk80029000_Secs(x->m80[0]));
+        }
+    } else {
+        int d = x->mD0;
+        if (d != 0) {
+            int a = x->m514;
+            fn_80036064(d, a, 1, fn_8002A2D4(x));
+        }
+        x->m12C = *(int*)((char*)fn_801A4B34(x->m80[0]) + 0x92C);
+        fn_8002A244(x, 0x1A, Unk80029000_Secs(x->m80[0]));
+    }
+    if (x->m6DC == 1) {
+        int k = fn_80253E7C((char*)x->m290 + 0x588, 3, 2, 0);
+        fn_8003C270(x->m6C8, k);
+    } else if (x->m6D4 == 1) {
+        fn_8003C188(x->m6C8);
+    } else {
+        int m6 = x->m6C8;
+        int s = x->m570;
+        fn_8003BFE0(m6, r, s, fn_8018B654(x->m80[0]->m6CC));
+    }
+    x->fn_800233B4(0xC, 0xA, 0);
 }
 
 extern "C" void fn_8002A218(Unk80023AC4_Obj* x)
