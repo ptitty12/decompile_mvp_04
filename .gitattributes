@@ -24,3 +24,5 @@ docs/PATTERNS.md  merge=union
 
 # Patches must keep their exact bytes (a CRLF checkout breaks git apply)
 *.patch -text
+docs/DECISIONS.md merge=union
+PROGRESS.md merge=union
