@@ -295,4 +295,28 @@ struct FeRecC {
     FeRecC(int a, int b, int c, int d, int e);
 };
 
+/* Singleton at lbl_8062264C (0xBC bytes, ctor fn_80521144): 42 words, three more words, then the vptr
+ * at +0xB8 (stored by hand; the vtable is a .data object). FeSingleV is the same object seen through
+ * its virtual destructor (slot 1). */
+struct FeSingle {
+    int m0[42];
+    int mA8;
+    int mAC;
+    int mB0;
+    int mB4;
+    const void* mB8;
+    FeSingle();
+};
+class FeSingleV {
+public:
+    char pad0[0xB8];
+    virtual ~FeSingleV();
+};
+class FeSingleW {
+public:
+    char pad0[0xB8];
+    virtual void s1(int c);
+};
+extern FeSingle* lbl_8062264C;
+
 #endif
