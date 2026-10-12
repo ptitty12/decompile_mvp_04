@@ -6,6 +6,7 @@
  * .text 0x80029000-0x8002B430 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_800239F4.h"
+#include "game/clampiter.h"
 
 extern const float lbl_805A62E0;
 extern const float lbl_805A62E4;
@@ -14,6 +15,7 @@ extern const float lbl_805A6350;
 extern const float lbl_805A6368;
 extern const float lbl_805A6378;
 extern const float lbl_805A6388;
+extern "C" void fn_8002F038(Unk80023AC4_Obj* x);
 
 extern "C" void fn_80029000(Unk80023AC4_Obj* x)
 {
@@ -103,6 +105,45 @@ extern "C" void fn_800292EC(Unk80023AC4_Obj* x)
     int m6 = x->m6C8;
     int s = x->m56C;
     fn_8003BB78(m6, s, v, f, fn_8018B654(x->m80[0]->m6CC));
+}
+
+void fn_80034F3C(int a, int b, int c, int d, int e);
+void fn_8003BDE8(int a, int b, int c);
+void fn_8003B6D0(int a, int b, int c, int d, int e);
+struct Unk8022FE34_U {
+    int fn_80234E44();
+};
+
+extern "C" void fn_80029C38(Unk80023AC4_Obj* x)
+{
+    if (x->m6DC == 0) {
+        int r = fn_80253E7C((char*)x->m290 + 0x588, 0, 2, 0);
+        int mode = x->m52C;
+        if (mode != 4) {
+            int d = x->mD0;
+            if (d != 0) {
+                if (x->m160.m50 == 0) {
+                    int a = x->m514;
+                    int b = x->m530;
+                    fn_80034F3C(d, a, mode, b, fn_8002A2D4(x));
+                }
+                fn_8002F038(x);
+            }
+            int pl = x->m80[0]->m700->m3B0;
+            if (x->m6D4 == 0 && ((Unk8022FE34_U*)pl)->fn_80234E44() == 0)
+                fn_8002A244(x, 9, (float)x->m80[0]->m48 * 0.016666668f);
+            if (fn_8022EC70(pl) != 0 && x->m52C == 3) {
+                int m6 = x->m6C8;
+                int s = x->m570;
+                fn_8003BDE8(m6, s, fn_8018B654(x->m80[0]->m6CC));
+                return;
+            }
+            int m6 = x->m6C8;
+            int md = x->m52C;
+            int s = x->m570;
+            fn_8003B6D0(m6, r, md, s, fn_8018B654(x->m80[0]->m6CC));
+        }
+    }
 }
 
 extern "C" void fn_8002A218(Unk80023AC4_Obj* x)
@@ -207,6 +248,47 @@ extern "C" int fn_8002A544(Unk80023AC4_Obj* x, Unk8001F2C4_World* y)
     return y->m68C;
 }
 
+struct Unk8002A54C_Outer {
+    char pad0[0x3B8];
+    int m3B8;
+};
+extern "C" Unk801A4B34_Pos* fn_801DC570(int id);
+extern "C" void fn_8002A68C(Unk80023AC4_Obj* x, Unk801A4B34_Pos* p, float a, float b);
+
+extern "C" void fn_8002A54C(Unk80023AC4_Obj* x, float a, float b)
+{
+    Unk801A4B34_Pos* p = 0;
+    int i;
+    Unk801A4B34_Pos* q = fn_801DC570(((Unk8002A54C_Outer*)x->m80[0]->m700)->m3B8);
+    x->m5C0 = q;
+    x->m718 = 0;
+    x->m6AC = 0;
+    if (q != 0) {
+        fn_8002A68C(x, q, a, b);
+    }
+    if (x->m6AC == 0) {
+        int t = x->m5A8;
+        if (t == 2 || (t == 1 && !(a <= x->m8C->mA4))) {
+            for (i = 6; i <= 8; i++) {
+                p = fn_801A497C(x->m80[0], 4, i);
+                fn_8002A68C(x, p, a, b);
+                if (x->m6AC == 1) {
+                    break;
+                }
+            }
+        }
+        if (x->m6AC == 0) {
+            for (i = 0; i <= 5; i++) {
+                p = fn_801A497C(x->m80[0], 4, i);
+                fn_8002A68C(x, p, a, b);
+                if (x->m6AC == 1) {
+                    break;
+                }
+            }
+        }
+    }
+}
+
 extern "C" void fn_8002A920(Unk80023AC4_Obj* x)
 {
     if (x->mD4 == 1) {
@@ -229,6 +311,40 @@ extern "C" void fn_8002A920(Unk80023AC4_Obj* x)
         fn_800307B4(x);
         ((Unk8002A920_Vt*)x->m6C8)->fn_vslot11();
     }
+}
+
+void fn_80039A3C(int a, int b, int c);
+
+extern "C" void fn_8002AA5C(Unk80023AC4_Obj* x)
+{
+    Unk8002569C_Msg* m = Unk8002569C_Cast(x->m6BC, 0x5E);
+    int id = m->m8;
+    int r6 = m->mC;
+    int j = 0;
+    Unk8006A138_It<3> it(j);
+    for (; j <= 1; j = it.Next()) {
+        if (x->m270[j].m0 == id) {
+            r6 = j + 1;
+            break;
+        }
+    }
+    for (int i = 0; i < x->m260; i++) {
+        if (x->m1D0[i].m0 == id) {
+            x->m1D0[i].m14 = r6;
+            x->m1D0[i].m20 = 0;
+        }
+    }
+    x->m160.m50 = x->m160.m50 + 1;
+    x->m6BC = 0;
+    for (int k = 0; k <= 2; k++) {
+        if (x->m77C[k] == 0) {
+            x->m77C[k] = id;
+            x->m788[k] = r6;
+            break;
+        }
+    }
+    x->fn_800233B4(0x1A, 0x1E, 0);
+    fn_80039A3C(0xA, 1, 0x122);
 }
 
 extern "C" void fn_8002ABC4(Unk80023AC4_Obj* x)
