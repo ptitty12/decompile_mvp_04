@@ -7,10 +7,15 @@
  */
 
 #include "snd/cmn/sndcmn.h"
+#include <string.h>
 
 extern unsigned short lbl_80625214[258];
 extern float lbl_806095A0;
 extern SNDSTREAMSTATE lbl_8069CADC;
+extern const signed char lbl_80609630[6][6];
+extern const float lbl_806095D8;
+extern int lbl_80625448;
+extern "C" int fn_803AB9F0(int h, int ch, float vol);
 
 extern "C" void* fn_803AB310();
 extern "C" void fn_803B43FC(SNDLINKLIST* list, void* node);
@@ -32,9 +37,14 @@ extern "C" void fn_803B5408(int h);
 extern "C" void fn_803FDC80(int h);
 extern "C" void fn_803FE418(int h);
 extern "C" void fn_803FE660(int h);
-extern "C" void fn_803AA4B0(void* a, int b, void* c, void* d, int e, int f, int g);
+extern "C" int fn_803AA4B0(void* a, int b, void* c, void* d, int e, int f, int g);
 extern void* lbl_8069CA44;
-extern "C" void fn_803AA810(void* a, int b, void* c, void* d, int e);
+extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type);
+extern "C" int fn_803FDEC0(int sh, void* a, void* b, int tag);
+extern "C" int fn_803FDFB4(int sh, void* a, int b, int tag);
+extern "C" void fn_803B4380(SNDLINKLIST* list, void* node);
+extern "C" void* fn_803B43BC(SNDLINKLIST* list);
+extern "C" void fn_803B3EA8(int shandle, int ch, int level);
 
 int iSNDsin(int angle)
 {
@@ -190,6 +200,36 @@ extern "C" int fn_803AA468()
     return n;
 }
 
+extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type)
+{
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
+    if (pssc == 0)
+        return -8;
+    if (pssc->freerequests.items == 0)
+        return -13;
+    fn_803A975C();
+    if (type == 0)
+        b = (void*)fn_803FDEC0(pssc->streamhandle, a, b, 0x6c454353);
+    else if (type == 1)
+        b = (void*)fn_803FDFB4(pssc->streamhandle, a, 0, 0x6c454353);
+    if (b == 0) {
+        fn_803A979C();
+        return -1;
+    }
+    Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)fn_803B43BC(&pssc->freerequests);
+    memset(r, 0, 0x28);
+    fn_803B4380(&pssc->allocatedrequests, r);
+    r->streamrequestid = (int)b;
+    pssc->lastsndrequesthandle += 0x100;
+    if (pssc->lastsndrequesthandle < 0)
+        pssc->lastsndrequesthandle = 0;
+    r->sndrequesthandle = pssc->lastsndrequesthandle | h;
+    r->holdtime = holdtime;
+    int ret = r->sndrequesthandle;
+    fn_803A979C();
+    return ret;
+}
+
 extern "C" void fn_803AA934(void* a, int b, void* c, void* d, int e)
 {
     fn_803AA4B0(a, b, c, d, e, 0, 0);
@@ -219,7 +259,129 @@ extern "C" int fn_803AA95C(int h)
     return 0;
 }
 
-extern "C" void fn_803AAA18(void* a, int b, void* c, void* d)
+extern "C" void fn_803AAA18(int a, int b, void* c, void* d)
 {
     fn_803AA810(a, b, c, d, 0);
+}
+
+extern "C" int fn_803AAA3C(int h)
+{
+    fn_803A975C();
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
+    if (pssc == 0) {
+        fn_803A979C();
+        return -8;
+    }
+    if (pssc->shandle >= 0)
+        fn_803B5408(pssc->packetinstancehandle);
+    pssc->shandle = -1;
+    if (pssc->fromtap == 0) {
+        fn_803FE418(pssc->streamhandle);
+        fn_803FE660(pssc->streamhandle);
+    }
+    if (pssc->newsa.ptsdata[0] != 0) {
+        int i;
+        for (i = 0; i < pssc->newsf.channels; i++)
+            SNDMEMI_free(pssc->newsa.ptsdata[i]);
+    }
+    void* node;
+again:
+    node = fn_803B43BC(&pssc->allocatedrequests);
+    if (node != 0) {
+        fn_803B4344(&pssc->freerequests, node);
+        goto again;
+    }
+    pssc->parsingrequest = 0;
+    pssc->state = 0;
+    memset(&pssc->cursf, 0, 4);
+    memset(&pssc->newsf, 0, 4);
+    memset(&pssc->cursa, 0, 0x68);
+    memset(&pssc->newsa, 0, 0x68);
+    fn_803A979C();
+    return 0;
+}
+
+extern "C" void fn_803AAE30(void* data)
+{
+    Snd::StreamSourceChannelState* s = (Snd::StreamSourceChannelState*)data;
+    s->vol += s->fader.incrementPerUpdate;
+    if (s->fader.incrementPerUpdate < lbl_806095D8) {
+        if (!(s->vol > s->fader.targetVol)) {
+            s->vol = s->fader.targetVol;
+            s->fader.incrementPerUpdate = lbl_806095D8;
+        }
+    } else {
+        if (!(s->vol < s->fader.targetVol)) {
+            s->vol = s->fader.targetVol;
+            s->fader.incrementPerUpdate = lbl_806095D8;
+        }
+    }
+    SNDSTREAMCHANNEL* pssc = (SNDSTREAMCHANNEL*)((char*)s - (0x13c + s->sourceChannel * 0x24));
+    int voice = SNDVOICEI_get(pssc->shandle);
+    if (voice >= 0) {
+        CHANPUB* c = &sndgs.chan[voice];
+        int idx = lbl_80609630[c->numchan - 1][s->sourceChannel];
+        if (idx != -128) {
+            int vv = c->voices[idx];
+            CHANPUB* d = &sndgs.chan[vv];
+            float v = s->vol;
+            d->programmedVol = v;
+            d->finalvol = v * Snd::gMasterVol;
+            Snd::Hal::SetVol(vv);
+            int i;
+            for (i = 0; i < lbl_80625448; i++)
+                SNDPLATFORM_setfxlevel(voice, i);
+        }
+    }
+    if (s->fader.incrementPerUpdate == lbl_806095D8)
+        Snd::Util::RemoveVariableTimerClient(&s->fader.variableTimerClient);
+}
+
+extern "C" int fn_803AAFB8(int h, int time, int targetVol)
+{
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
+    if (pssc == 0)
+        return -8;
+    float target = targetVol / 127.0f;
+    if (time <= 0)
+        return fn_803AB9F0(h, -1, target);
+    int i;
+    for (i = 0; i <= 5; i++) {
+        Snd::StreamSourceChannelState* s = &pssc->sourceChannelState[i];
+        if (s->fader.incrementPerUpdate != 0.0f)
+            Snd::Util::RemoveVariableTimerClient(&s->fader.variableTimerClient);
+        s->fader.targetVol = target;
+        s->fader.incrementPerUpdate = (target - s->vol) * Snd::gVariableTimerPeriod / time;
+        if (s->fader.incrementPerUpdate != 0.0f) {
+            s->fader.variableTimerClient.pClientFunc = fn_803AAE30;
+            s->fader.variableTimerClient.pClientData = s;
+            Snd::Util::AddVariableTimerClient(&s->fader.variableTimerClient);
+        }
+    }
+    return 0;
+}
+
+extern "C" void fn_803AB13C(int a, void* b, int c, void* d, void* e, int f)
+{
+    fn_803AA4B0(b, c, d, e, f, a, 1);
+}
+
+extern "C" void fn_803AAE30(void* data);
+
+extern "C" int fn_803AB17C(int h, int ch, int level)
+{
+    SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
+    if (pssc == 0)
+        return -8;
+    pssc->pFxVolume[ch].fxLevel = level / 127.0f;
+    int voice = SNDVOICEI_get(pssc->shandle);
+    if (voice >= 0) {
+        int i;
+        for (i = 0; i < pssc->cursf.channels; i++) {
+            CHANPUB* c = &sndgs.chan[sndgs.chan[voice].voices[i]];
+            c->pFxVolume[ch].fxLevel = pssc->pFxVolume[ch].fxLevel;
+        }
+        fn_803B3EA8(pssc->shandle, ch, level);
+    }
+    return 0;
 }
