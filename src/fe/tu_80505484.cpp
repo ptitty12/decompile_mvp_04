@@ -75,6 +75,28 @@ struct FeWQ7 : Unk800C7B40_Data {
     virtual void s121(); virtual void s122(); virtual void s123(); virtual void s124(); virtual void s125();
     virtual void s126(); virtual void s127();
 };
+struct FeLstQ {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+struct FeBigQ {
+    char pad0[0x30F60];
+    FeLstQ src;
+    char pad30F78[0x31018 - 0x30F78];
+    FeLstQ d1;
+    char pad31030[0x310D0 - 0x31030];
+    FeLstQ d2;
+    char pad310E8[0x31188 - 0x310E8];
+    FeLstQ d3;
+};
+extern "C" void fn_8040074C(void* p, int n);
+extern "C" void fn_805371C4(FeLstQ* l, unsigned f);
+extern "C" void fn_80537054(FeLstQ* l, int mode);
+extern "C" void fn_80539AE8(FeLstQ* l, int k);
 /* Q16-DECL-END */
 
 extern "C" FeW* fn_800C8058(FeW* w);
@@ -554,6 +576,39 @@ extern "C" FE_OVERLAY int fn_80507FF4(void* self, int k)
         return 9;
     }
     return 0;
+}
+
+#define FE_FILLQ(SRCINIT, D, K, DINIT)                              \
+    do {                                                            \
+        DINIT;                                                      \
+        fn_8040074C(self->D.m0, d_->m8 * 4);                        \
+        SRCINIT;                                                    \
+        d_->m4 = 0;                                                 \
+        d_->mC = 0;                                                 \
+        d_->m14 = 0;                                                \
+        for (unsigned i = 0; i < sp->m4; i++) {                     \
+            char* bb = (char*)sp->m0;                               \
+            int off = i * 4;                                        \
+            int val = *(int*)(bb + off);                            \
+            if (d_->m4 < d_->m8) {                                  \
+                d_->m0[d_->m4] = val;                               \
+                d_->m4++;                                           \
+            }                                                       \
+        }                                                           \
+        d_->m14 = 1;                                                \
+        fn_80539AE8(&self->D, K);                                   \
+    } while (0)
+
+/* near-miss: 96.6%; retail moves the r4 argument (li r4,K) before the r3 argument in the three fn_80539AE8 calls and in fn_80537054; return-type toggles of all callees did not change it */
+extern "C" FE_OVERLAY void fn_805080B8(FeBigQ* self)
+{
+    FeLstQ* s = &self->src;
+    FeLstQ* d1 = &self->d1;
+    fn_805371C4(s, 0x2000003F);
+    fn_80537054(s, 0);
+    FE_FILLQ(FeLstQ* sp = s, d1, 1, FeLstQ* d_ = d1);
+    FE_FILLQ(FeLstQ* sp = &self->src, d2, 2, FeLstQ* d_ = &self->d2);
+    FE_FILLQ(FeLstQ* sp = &self->src, d3, 3, FeLstQ* d_ = &self->d3);
 }
 
 extern "C" FE_OVERLAY int fn_805082B8(int c)
