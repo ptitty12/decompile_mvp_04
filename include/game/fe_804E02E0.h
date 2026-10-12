@@ -740,6 +740,8 @@ struct FeS23 : FeObj {
     int m870;
 };
 
+void fn_800E29CC(int a);
+
 /* BEGIN-VWRAP */
 /* Screens whose only data is one widget pointer at the given offset (one-call button handlers). */
 struct FeWf134 : FeObj { char pad40[0x134 - 0x40]; FeObj* m134; };

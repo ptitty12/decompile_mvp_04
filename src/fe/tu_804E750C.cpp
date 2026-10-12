@@ -83,6 +83,11 @@ extern "C" FE_OVERLAY int fn_804E7B94(FeWf134* self)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_804E7BD0(void)
+{
+    return 0;
+}
+
 extern char lbl_8066BA30[];
 extern "C" FE_OVERLAY FeScrRaw* fn_804E80FC(FeScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -124,6 +129,11 @@ extern "C" FE_OVERLAY void fn_804E8CB4(FeS9* self)
 {
     self->m13C->v28();
     fn_804E8644(self);
+}
+
+extern "C" FE_OVERLAY void fn_804E9220(FeS7* self)
+{
+    fn_800E29CC((int)self->m134);
 }
 
 extern "C" FE_OVERLAY void fn_804E9244(FeS7* self, int a)
@@ -191,6 +201,11 @@ extern "C" FE_OVERLAY int fn_804E9594(FeWf138* self)
 {
     self->m138->v55();
     return 1;
+}
+
+extern "C" FE_OVERLAY int fn_804E95D0(void)
+{
+    return 0;
 }
 
 extern "C" FE_OVERLAY void fn_804E95D8(FeS8* self, int a)
@@ -263,4 +278,9 @@ extern "C" FE_OVERLAY int fn_804EA12C(FeScr_80447264* self)
 {
     self->m134->v53();
     return 1;
+}
+
+extern "C" FE_OVERLAY int fn_804EA168(void)
+{
+    return 0;
 }
