@@ -89,9 +89,14 @@ struct Unk80136C3C {
 };
 struct Unk8061930C_Obj {};
 
-struct Unk803567AC_V {
+/* Same class as in include/game/tu_80355A6C.h (that header conflicts with this unit's
+   declarations): 8 bytes, out-of-line ctor __11Unk803567AC. The trivial destructor makes
+   the local BLKmode, so its address is rebuilt (`addi rN,r1,8`) at each call. */
+struct Unk803567AC {
     int m0;
-    int m4;
+    const void* m4;
+    Unk803567AC();
+    ~Unk803567AC() {}
 };
 struct Unk80134F48 {
     char pad0[0x28];
@@ -162,8 +167,7 @@ void fn_80136250(Scr* x, int a, int b, int c);
 Unk801361EC_W* fn_800C8040(Unk800C7B40_Widget* p);
 void fn_801361EC(Scr* x, Unk801361EC_Arg* a, Unk801361EC_W* w);
 UnkFEState* fn_800B555C();
-void fn_803567AC(Unk803567AC_V* v);
-void fn_80072E90(Scr* g, int a, int b, int c, int d, Unk803567AC_V* v);
+void fn_80072E90(Scr* g, int a, int b, int c, int d, Unk803567AC* v);
 void fn_801354D4(Scr* g);
 void fn_801723F8(int a, int b);
 void fn_80135200(Scr* x, int chrg);
@@ -386,8 +390,7 @@ extern "C" void fn_80134EC8(Unk80134E38* s, int chrg)
 /* near-miss: 21/20 insns: retail keeps no register for &v (addi r3,r1,8 and addi r8,r1,8 after the call, frame 0x18); here the 8-byte local lives in r29. Tried inline wrappers, int[2], struct return. */
 extern "C" void fn_80134F48(Unk80134F48* x)
 {
-    Unk803567AC_V v;
-    fn_803567AC(&v);
+    Unk803567AC v;
     fn_80072E90(lbl_8061930C, x->m40, x->m44, x->m28, x->m2C, &v);
 }
 
