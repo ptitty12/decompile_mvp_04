@@ -103,6 +103,7 @@ extern const float lbl_806008B8;
 extern const float lbl_806008BC;
 extern const float lbl_806008C0;
 extern "C" int rand(void);
+extern const float lbl_806008D0;
 extern "C" int fn_8056A2F8(void* o, int cur, int mode, int a, int b, int who, int p6, int p7, int s8, int sC);
 extern "C" int fn_8058AE54(void* self, int id);
 extern "C" int fn_8058B048(void* self, int id, int flag, int x);
@@ -836,6 +837,91 @@ extern "C" DB_OVERLAY int fn_8058B938(void* self, int id, int flag, int x)
     int c = s->fn_80077320(id, w);
     fn_8052E2C4(&e, 0xB, id, (short)b, (short)a, sc, (short)c, 6, (char)flag, 0);
     fn_80582CF8(self, &e, 0, 0, 0);
+    fn_80360AF0((Db80586420_Ent*)&e, 2);
+    return 1;
+}
+
+extern "C" DB_OVERLAY int fn_8058BA94(void* self, int k, int b, int a)
+{
+    int out = 0;
+    int tm = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80078A38(k);
+    int lvl = 0;
+    int sc = 0;
+    char o[0x460];
+    fn_8055AC44(o, tm);
+    int bonus = 0;
+    if (fn_800B5758(fn_800B555C())) {
+        if (tm == 0)
+            sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(6), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        else
+            sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(7), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        if (sc != 0) {
+            int q = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007CBB8(0xE, sc);
+            bonus = (fn_8009005C__Fif(q, (float)(rand() % 10000) * lbl_806008D0) - 2) * -5;
+        } else
+            bonus = 0;
+    }
+    switch (rand() % 4) {
+    case 0: {
+        int v = fn_8055AE1C(o, k) + bonus;
+        if (v <= 10) {
+            lvl = 0;
+            out = 0;
+        } else if (v > 20) {
+            lvl = 2;
+            out = 2;
+        } else {
+            lvl = 1;
+            out = 1;
+        }
+        break;
+    }
+    case 1: {
+        int v = fn_8055ADD4(o, k) + bonus;
+        if (v <= 10) {
+            lvl = 0;
+            out = 3;
+        } else if (v > 20) {
+            lvl = 2;
+            out = 5;
+        } else {
+            lvl = 1;
+            out = 4;
+        }
+        break;
+    }
+    case 2: {
+        int v = fn_8055AEB4(o, k) + bonus;
+        if (v <= 10) {
+            lvl = 0;
+            out = 6;
+        } else if (v > 20) {
+            lvl = 2;
+            out = 8;
+        } else {
+            lvl = 1;
+            out = 7;
+        }
+        break;
+    }
+    case 3: {
+        int v = fn_8055AE68(o, k) + bonus;
+        if (v <= 10) {
+            lvl = 0;
+            out = 9;
+        } else if (v > 20) {
+            lvl = 2;
+            out = 11;
+        } else {
+            lvl = 1;
+            out = 10;
+        }
+        break;
+    }
+    }
+    Db8058B628_E e;
+    fn_8052E198(&e, 0xB, k, 0, sc, lvl, out, 7, (char)a, 0);
+    fn_80582CF8(self, &e, 0, b, a);
     fn_80360AF0((Db80586420_Ent*)&e, 2);
     return 1;
 }
