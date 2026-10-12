@@ -3,6 +3,18 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8017A930.h"
+inline float Unk8017D0F4_Clamp(float lo, float v, float hi)
+{
+    return !(v > hi) ? (v >? lo) : hi;
+}
+
+struct Unk8017CC70_Ev {
+    int m0;
+    char pad4[0xC];
+    float m10;
+};
+extern float lbl_805EBA04;
+extern float lbl_805EBA08;
 
 void fn_8017AC0C(Unk8017A930_T* p)
 {
@@ -395,6 +407,23 @@ int fn_8017CA14(Unk8017A930_T* p, int idx)
     return 0;
 }
 
+float fn_8017CC70(void* pl, int team, Unk8017CC70_Ev* ev)
+{
+    float v = ev->m10;
+    float w = 0.0f;
+    if (ev->m0 == 0x48 || ev->m0 == 0x41) {
+        w = lbl_805EBA04;
+    } else {
+        w = lbl_805EBA08;
+    }
+    float t = (w - v) / w;
+    t = t * 0.5f;
+    if (!(t <= 1.0f)) {
+        t = 1.0f;
+    }
+    return t;
+}
+
 void fn_8017CF00(Unk8017A930_T* p)
 {
     int old = p->m3DC;
@@ -402,15 +431,27 @@ void fn_8017CF00(Unk8017A930_T* p)
     p->m3E0 = old;
 }
 
-/* near-miss: sub-then-clamp of m3E4 (g++ >? form, see PATTERNS). Retail spills four float parameters
- * (k, lo, v, hi) in inline frames and compares in place; this spelling is one instruction short and
- * the inline-frame spellings (4 tried) are 21+ slots off. */
+void fn_8017D0F4(Unk8017A930_T* p)
+{
+    const float step = 0.01f;
+    p->m3E4 = p->m3E4 + step;
+    p->m3E4 = Unk8017D0F4_Clamp(0.0f, p->m3E4, 1.0f);
+    fn_8037893C((char*)p->m4 + 0x704, 0x9A, 0, 0, 0);
+}
+
+void fn_8017D190(Unk8017A930_T* p)
+{
+    const float step = 0.07f;
+    p->m3E4 = p->m3E4 + step;
+    p->m3E4 = Unk8017D0F4_Clamp(0.0f, p->m3E4, 1.0f);
+    fn_8037893C((char*)p->m4 + 0x704, 0x9A, 0, 0, 0);
+}
+
 void fn_8017D22C(Unk8017A930_T* p)
 {
-    p->m3E4 = p->m3E4 - lbl_805CC8AC;
-    float t = p->m3E4;
-    t = !(t > lbl_805CC8B4) ? (t >? lbl_805CC8B0) : lbl_805CC8B4;
-    p->m3E4 = t;
+    const float k = 0.006f;
+    p->m3E4 = p->m3E4 - k;
+    p->m3E4 = Unk8017D0F4_Clamp(0.0f, p->m3E4, 1.0f);
 }
 
 int fn_8017D5F8(Unk8017A930_T* p)
