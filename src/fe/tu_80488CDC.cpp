@@ -50,6 +50,33 @@ extern "C" FE_OVERLAY int fn_80489830(void* x)
     return 1;
 }
 
+/* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
+extern "C" FE_OVERLAY FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->SetVptr(lbl_80676330);
+    self->m144 = 2;
+    self->m130 = 0;
+    self->m134 = 0;
+    self->m138 = 0;
+    self->m13C = 0;
+    self->m140 = 0;
+    FeArr* s = &self->m148;
+    s->m10 = lbl_8064B298;
+    s->m0 = self->m160;
+    s->m8 = 0xCB2;
+    fn_8040074C(s->m0, 0x32C8);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    s->mC = 0;
+    s->m10 = lbl_8064A3B8;
+    s->m4 = 0;
+    s->m14 = 0;
+    return self;
+}
+
 extern "C" FE_OVERLAY void fn_8048A378(FeScrCell* x)
 {
     fn_800ECE34(x);
@@ -63,6 +90,19 @@ extern "C" FE_OVERLAY void fn_8048AB24(void* x)
 {
     fn_800ED254(x);
     FeI(fn_800B555C(), 0x640) = 0;
+}
+
+extern "C" FE_OVERLAY void fn_8048AB50(void* x)
+{
+    if (FeWp(x, 0x134)->fn_vslot59() > 0) {
+        int a = FeWp(x, 0x138)->fn_vslot87();
+        int v = FePick((char*)FeVp(x, 0x148), FeWp(x, 0x134)->fn_vslot60() * 4);
+        if (a != 0 && a != v) {
+            char* s = (char*)FeVp(x, 0x138);
+            fn_80126CF4((FeList*)s, FeI(s, 0x164), v, FeI(s, 0x134), FeI(s, 0x16C), FeI(s, 0x170), 0, FeI(s, 0x138), FeI(s, 0x13C), FeI(s, 0x148), FeI(s, 0x14C));
+        }
+        fn_80123858(FeVp(x, 0x13C), v, 1);
+    }
 }
 
 extern "C" FE_OVERLAY int fn_8048AC44(void* x)
