@@ -338,7 +338,6 @@ extern "C" void fn_801D7FCC(Unk801D771C_G* s)
     s->m34 = 0;
 }
 
-/* near-miss: store order of m2C/m30/m38 differs (2 slots); statement orders searched */
 extern "C" void fn_801D7FD8(Unk801D771C_G* s)
 {
     s->m4 = 6;
@@ -352,8 +351,8 @@ extern "C" void fn_801D7FD8(Unk801D771C_G* s)
     s->m20 = -1;
     s->m24 = -1;
     s->m28 = -1;
-    s->m2C = -1;
     s->m30 = -1;
+    s->m2C = -1;
 }
 
 extern "C" void fn_801D801C(int* s, int v)
