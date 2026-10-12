@@ -317,6 +317,30 @@ FE_OVERLAY void fn_8049FF38(FeW* x, FeW* y)
     }
 }
 
+FE_OVERLAY int fn_8049FFF4(FeW* x)
+{
+    if (FeI(x, 0x140) == 1) {
+        if (fn_800B555C()->m0 == 0x11) {
+            FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+            fn_80132438(p, x, 0, fn_804A29F4, fn_804A2964, 0x3A61, -1, 1, 0.5f);
+            p->fn_vslot86();
+        } else {
+            FeMsg m;
+            FeMsg* mp = &m;
+            fn_8035682C(mp);
+            if (fn_800B5758(fn_800B555C()) == 1 && fn_800B555C()->m0 == 0x11) {
+                strncpy(mp->name, lbl_805F75B8, 15);
+                mp->name[15] = 0;
+            } else {
+                strncpy(mp->name, lbl_805F4450, 15);
+                mp->name[15] = 0;
+            }
+            fn_800B7B4C(FeGetMgr(), &m, x);
+        }
+    }
+    return 1;
+}
+
 FE_OVERLAY int fn_804A0470(void) { return 0; }
 
 FE_OVERLAY int fn_804A0478(void) { return 0; }
