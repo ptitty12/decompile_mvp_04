@@ -580,6 +580,66 @@ int fn_801AABC4(Unk801AB63C_P* p);
 int fn_801AACE4(Unk801AB63C_P* p);
 int fn_801AAD40(Unk801AB63C_P* p);
 
+inline const char* Unk801AA598_Pick(const char** t, int i)
+{
+    int o = i * 4;
+    return *(const char**)((char*)t + o);
+}
+
+extern const char lbl_805CEE50[];
+extern const char lbl_805CEE68[];
+extern const char lbl_805CEE80[];
+extern const char lbl_805CEE9C[];
+extern const char* lbl_8061CA70[];
+extern const char* lbl_8061CAB4[];
+extern const char* lbl_8061CADC[];
+extern const char* lbl_8061CCD0[];
+extern int lbl_8061B9BC;
+extern int lbl_8061CA6C;
+int fn_804089B4(char* dst, const char* fmt, ...);
+void fn_80303CA0(const char* s, float a, float b, float c, ...);
+void fn_801AB1A8(Unk801A96E0_Init* o);
+int fn_801AA9B0(Unk801AB63C_P* p);
+int fn_801AAA34(Unk801AB63C_P* p);
+int fn_801AAB68(Unk801AB63C_P* p);
+int fn_801AA800(Unk801AB63C_P* p);
+
+/* near-miss: same code; the z increment before the last fn_80303CA0 call goes straight into f3 (retail: f0, then fmr f3,f0). */
+void fn_801AA598(void* p)
+{
+    Unk801A96E0_Init* o = (Unk801A96E0_Init*)p;
+    Unk801AB63C_P* pl = (Unk801AB63C_P*)p;
+    if (fn_801B63A0(pl, 2) != 0) {
+        o->mC = fn_801AA800(pl);
+        int t = fn_801AA9B0(pl);
+        o->m10 = t;
+        if (o->mC == 0xE && t == 3) {
+            o->m10 = 1;
+        }
+        o->m24 = fn_801AAA34(pl);
+        o->m28 = fn_801AAB68(pl);
+        fn_801AB1A8(o);
+    }
+    if (lbl_8061B9BC != 0 && lbl_8061CA6C != 0) {
+        const float x = 5.0f;
+        char buf[0x100];
+        const float y = 0.3f;
+        float z = 0.7f;
+        int a = fn_801A99B4(o);
+        fn_804089B4(buf, lbl_805CEE50, a, Unk801AA598_Pick(lbl_8061CA70, fn_801A99B4(o)));
+        fn_80303CA0(buf, x, y, z);
+        int b = fn_801A9A20(o);
+        fn_804089B4(buf, lbl_805CEE68, b, Unk801AA598_Pick(lbl_8061CAB4, fn_801A9A20(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+        int c = fn_801A9A8C(o);
+        fn_804089B4(buf, lbl_805CEE80, c, Unk801AA598_Pick(lbl_8061CADC, fn_801A9A8C(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+        int d = fn_801A9AF8(o);
+        fn_804089B4(buf, lbl_805CEE9C, d, Unk801AA598_Pick(lbl_8061CCD0, fn_801A9AF8(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+    }
+}
+
 int fn_801AA800(Unk801AB63C_P* p)
 {
     int r = 0;
