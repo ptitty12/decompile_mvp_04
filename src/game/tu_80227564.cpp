@@ -306,6 +306,66 @@ void fn_80229948(Task* t, int a)
     }
 }
 
+struct Unk80229CB4_S {
+    int m0;
+    int m4;
+    float m8;
+    int mC;
+    float m10;
+    float m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+inline void Unk80229CB4_SetM8(Unk80229CB4_S* s, float v)
+{
+    s->m8 = v;
+}
+inline void Unk80229CB4_SetM10(Unk80229CB4_S* s, float v)
+{
+    s->m10 = v;
+}
+inline void Unk80229CB4_SetM14(Unk80229CB4_S* s, float v)
+{
+    s->m14 = v;
+}
+float fn_8020EE9C(Task* t, int a, Vec3f v, int b);
+int fn_801F5DD8(Task* t, int b);
+float fn_8020E074(Task* t, int a1, int a2, const Vec3f& v, int b, int c, int d);
+float fn_802F9DD0(int p);
+int* fn_8023CB08__Fv(int a);
+void fn_8035D1D8__FP1Uf(Unk80229CB4_S* s, int a, float f);
+extern float lbl_8061D600;
+extern float lbl_8061D604;
+void fn_80229CB4(Task* t, int a, int b, Vec3f* v)
+{
+    Unk80229CB4_S* s = (Unk80229CB4_S*)((char*)t + 0xC4);
+    float ratio = fn_8020EE9C(t, a, *v, b);
+    float val = 0.0f;
+    int r = fn_801F5DD8(t, b);
+    if (r == 1) {
+        s->m20 = a;
+        s->m4 = r;
+        Unk80229CB4_SetM8(s, 0.0f);
+        fn_8035D1D8__FP1Uf(s, a, 0.0f);
+        val = 1.0f - fn_802F9DD0(*(int*)((char*)t->m9C->m0 + 0x720));
+    } else {
+        s->m20 = a;
+        s->m4 = 1;
+        Unk80229CB4_SetM8(s, 0.0f);
+        fn_8035D1D8__FP1Uf(s, a, 0.0f);
+        Unk80229CB4_SetM8(s, 0.01f);
+        fn_8023CB08__Fv(a);
+        float lo = lbl_8061D600;
+        fn_8023CB08__Fv(a);
+        float hi = lbl_8061D604;
+        val = (hi - lo) * ratio + lo;
+    }
+    Unk80229CB4_SetM10(s, val);
+    float d = fn_8020E074(t, (int)t->m9C->m0->m6CC, a, *v, b, 0, 0);
+    Unk80229CB4_SetM14(s, d);
+}
+
 int fn_80229E50(Task* t, int a, int b, int c, int d)
 {
     void* x = ObjAt(t->m9C->m8, a);
