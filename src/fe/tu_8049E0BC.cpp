@@ -53,6 +53,7 @@ extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
 extern "C" void fn_804A0E40(void* x);
 extern "C" int fn_800DF254(char*, int, int, float);
+extern "C" int fn_800B5CBC(void);
 extern "C" void fn_804A1078(char* x);
 extern "C" void fn_804A1A18(char* x);
 extern "C" void fn_804A1C98(char* x);
@@ -267,6 +268,49 @@ FE_OVERLAY void fn_8049ED34(void* a, void* cb)
     } else {
         fn_80125084(w, 2);
     }
+}
+
+FE_OVERLAY void fn_8049EDC8(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    FeI(x, 0x134) = 1;
+    FeI(x, 0x138) = 1;
+    FeI(x, 0x164) = 1;
+    FeI(x, 0x148) = 1;
+    FeI(x, 0x13C) = 0;
+    FeI(x, 0x150) = 0;
+    FeI(x, 0x154) = 0;
+    FeI(x, 0x158) = 0;
+    FeI(x, 0x15C) = 0;
+    FeI(x, 0x160) = 0;
+    fn_804A15FC((char*)x);
+    if (FeI(x, 0x174) == 0) {
+        int v;
+        if (fn_800B555C()->m0 == 0x13) {
+            void* t = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+            v = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 0, (int)t);
+        } else {
+            int c = fn_800B5CBC();
+            int k = fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, c);
+            v = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 0, k);
+        }
+        FeI(x, 0x178) = fn_800B5520(v);
+    }
+    Unk8006A138_It<3> it(0);
+    int i = 0;
+    do {
+        Fe0948Rec* r = (Fe0948Rec*)((char*)x + 0x184 + i * 0x28);
+        r->m10 = fn_800C8054(((FeW*)r->m8)->fn_vslot32(lbl_805F4F48, 1));
+        r->m20 = fn_800C8054(((FeW*)r->m8)->fn_vslot32(lbl_805F754C, 1));
+        r->m24 = fn_800C8054(fn_800C8044(((FeW*)r->m8)->fn_vslot32(lbl_805F7558, 1))->fn_vslot32(lbl_805F6548, 1));
+        ((FeW*)r->m8)->fn_vslot8(1);
+        i = it.Next();
+    } while (i <= 3);
+    if (fn_800B5758(fn_800B555C()) == 0)
+        fn_8049ED34(x, (void*)fn_80090880(lbl_8061977C, 0x1AE0));
+    else if (fn_800B555C()->m0 == 0x13)
+        fn_8049ED34(x, (void*)fn_80090880(lbl_8061977C, 0x5B12));
+    fn_8049FC58(x, 1);
 }
 
 FE_OVERLAY void fn_8049F00C(char* x)
