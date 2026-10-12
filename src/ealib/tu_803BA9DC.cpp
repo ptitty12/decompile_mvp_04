@@ -81,10 +81,50 @@ struct EAGLSk {
 extern void (*lbl_80626DC8)(void*, void*, void*);
 extern "C" void fn_803DFB48(void*);
 extern "C" void fn_803BB02C(EAGLSk* sk, char* a, char* out, unsigned* mask);
+extern "C" void fn_803E00EC(void* p, float a, float b, float c, float d, float e, float f, float g, float h, float i, float j);
 
 extern "C" void fn_803DF66C(void* a, void* b);
 extern "C" void fn_803BCE38(void* p, int n);
 extern "C" void fn_803BD800(int a, int b);
+
+extern "C" void fn_803BB02C(EAGLSk* sk, char* a, char* out, unsigned* mask)
+{
+    if (mask != 0) {
+        int n = sk->m8;
+        int i;
+        float* m = (float*)a;
+        for (i = 0; i < n; i++) {
+            if (EAGLTestBit(mask, i)) {
+                float* o = (float*)(out + i * 0x40);
+                int* pp = (int*)((char*)sk + 0x1C + i * 0x70);
+                fn_803E00EC(o, m[0], m[1], m[2], m[4], m[5], m[6], m[7], m[8], m[9], m[10]);
+                o[0] = o[0] * m[3];
+                o[4] = o[4] * m[3];
+                o[8] = o[8] * m[3];
+                int par = *pp;
+                if (par >= 0)
+                    lbl_80626DC8(o, out + (par << 6), o);
+            }
+            m += 12;
+        }
+    } else {
+        int n = sk->m8;
+        int i;
+        float* m = (float*)a;
+        for (i = 0; i < n; i++) {
+            float* o = (float*)(out + i * 0x40);
+            int* pp = (int*)((char*)sk + 0x1C + i * 0x70);
+            fn_803E00EC(o, m[0], m[1], m[2], m[4], m[5], m[6], m[7], m[8], m[9], m[10]);
+            o[0] = o[0] * m[3];
+            o[4] = o[4] * m[3];
+            o[8] = o[8] * m[3];
+            int par = *pp;
+            if (par >= 0)
+                lbl_80626DC8(o, out + (par << 6), o);
+            m += 12;
+        }
+    }
+}
 
 extern "C" void fn_803BB21C(EAGLSk* sk, char* a, char* out, unsigned* mask)
 {
