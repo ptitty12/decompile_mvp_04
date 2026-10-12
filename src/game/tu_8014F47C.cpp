@@ -28,6 +28,7 @@ public:
     void fn_8037B548(const char* name, int a);
     void fn_8037B548(const char* name, const char* def);
     void fn_8037B7E4(const char* group);
+    void fn_8037B6B0(const char* name, int* field, const char* typeList);
     void fn_8037B7E8(const char* group);
     void fn_8037B830(const char* group);
 };
@@ -113,14 +114,18 @@ public:
     virtual void s8();
     virtual void s9();
     virtual void s10();
-    virtual void s11();
-    virtual void s12();
+    virtual void s11(int a, int b, float x, float y, float z);
+    virtual int s12(int a, int b, float x, float y, float z);
     virtual float s13(float t);
 };
 struct Ent801510A8 {
-    char pad0[0x10];
+    void* m0;
+    int m4;
+    float m8;
+    float mC;
     Obj801510A8* m10;
 };
+typedef void* (*Create801513C4_t)(void*, void*, int, int);
 struct Self801510A8 {
     int m0;
     int m4;
@@ -184,6 +189,23 @@ struct Unk801522E4_Obj { const void* m0; char m4; };
 struct UnkAt13B { char pad0[0x13]; char m13; };
 struct Unk8015242C_Obj { int m0; int m4; float m8; float mC; int m10; float m14; float m18; };
 
+extern const char lbl_805C75C0[];
+extern const char lbl_805C75C4[];
+extern const char lbl_805C75D0[];
+extern const char lbl_805C75E4[];
+extern const char lbl_805C75EC[];
+extern const char lbl_805C7620[];
+extern const char lbl_805C7634[];
+extern const char lbl_805C7640[];
+extern const char lbl_805C764C[];
+extern const char lbl_805C76F8[];
+extern const char lbl_805C7728[];
+extern const char lbl_805C7864[];
+extern const char lbl_805C786C[];
+extern const char lbl_805C7878[];
+extern const char lbl_805C7884[];
+extern const char* lbl_8061BD80;
+int sprintf(char* buf, const char* fmt, ...);
 extern "C" {
 unsigned fn_8014D8AC(void* rng, int max, const char* file, int line);
 void fn_802D5A64(Unk802D5618* o, int a, int b, int c, void* d, int e, float f1, float f2, float f3, float f4, float f5, float f6);
@@ -419,6 +441,32 @@ float fn_801510A8(Self801510A8* self, int start, float t)
     return lbl_805C75B8;
 }
 
+int fn_801513C4(Self801510A8* self, int a, int b, float t, int idx, int flag)
+{
+    if (self->m4 == 0) {
+        return 3;
+    }
+    int i;
+    for (i = 0; i < self->m4; i++) {
+        if (self->m8[i].m10 == 0) {
+            void* mgr = fn_8037C7FC();
+            self->m8[i].m10 = (Obj801510A8*)((Create801513C4_t)fn_8037CE98)(mgr, self->m8[i].m0, self->m8[i].m4, 0);
+        }
+    }
+    if (idx >= 0 && idx < self->m4) {
+        float x = self->m8[idx].m8;
+        float y = self->m8[idx].mC;
+        if (flag != 0) {
+            self->m8[idx].m10->s11(a, b, x, y, t);
+        }
+        if (self->m8[idx].m10->s12(a, b, x, y, t) != 0) {
+            return 1;
+        }
+        return 0;
+    }
+    return 2;
+}
+
 void fn_8015152C(Unk8027C728_Player* p, int a)
 {
     Unk8027C728_Goal* g = p->m934;
@@ -497,6 +545,57 @@ void* fn_80151684(void* self)
         e++;
     } while (k-- != 0);
     return p;
+}
+
+void fn_8015171C(Unk80359B48* self)
+{
+    char buf[100];
+    self->fn_8037B7E4(lbl_805C75C0);
+    self->fn_8037B7E8(lbl_805C75C4);
+    ((Unk8037B3E8*)self)->fn_8037B728(lbl_805C75D0, lbl_805C75E4, (char*)self + 0x24, (int)lbl_805C75EC);
+    self->fn_8037B830(lbl_805C75C4);
+    self->fn_8037B7E8(lbl_805C7620);
+    int i = 0;
+    ((Unk8037B3E8*)self)->fn_8037B728(lbl_805C7634, lbl_805C7640, (char*)self + 4, (int)lbl_805C764C);
+    self->fn_8037B830(lbl_805C7620);
+    self->fn_8037B7E8(lbl_805C76F8);
+    ((Unk8037B3E8*)self)->fn_8037B728(lbl_805C770C, lbl_805C771C, (char*)self + 0x14, (int)lbl_805C7728);
+    self->fn_8037B830(lbl_805C76F8);
+    do {
+        int n = i + 1;
+        sprintf(buf, lbl_805C7864, n);
+        self->fn_8037B7E8(buf);
+        sprintf(buf, lbl_805C786C, n);
+        char* e = (char*)self + (i * 0x18 + 0x28);
+        self->fn_8037B458(buf, (int*)e, lbl_805C60F8, lbl_805C6240);
+        sprintf(buf, lbl_805C7878, n);
+        self->fn_8037B6B0(buf, (int*)(e + 4), lbl_8061BD80);
+        sprintf(buf, lbl_805C7884, n);
+        ((Unk8037B3E8*)self)->fn_8037B728(lbl_805C770C, buf, e + 8, (int)lbl_805C7890);
+        sprintf(buf, lbl_805C7864, n);
+        self->fn_8037B830(buf);
+        i = n;
+    } while (i <= 12);
+}
+
+void fn_80151910(void* sv, int c)
+{
+    Unk80151684_Obj* self = (Unk80151684_Obj*)sv;
+    Unk80151684_Ent* begin = self->m28;
+    self->m0 = lbl_8065EAA0;
+    if (begin != 0) {
+        Unk80151684_Ent* end = begin + 13;
+        if (begin != end) {
+            do {
+                end--;
+                fn_803599F8(end, 0);
+            } while (begin != end);
+        }
+    }
+    self->m24 = lbl_8065EB00;
+    fn_80151048(&self->m14, 2);
+    fn_80151048(&self->m4, 2);
+    fn_8037B424(self, c);
 }
 
 void fn_801519A4() {}
