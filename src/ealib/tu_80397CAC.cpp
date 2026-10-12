@@ -454,7 +454,7 @@ int* fn_80398B40(Vp6Dq* d, int n)
     int* base = d->m3C + 0x100;
     MEMSET_V(d->m3C, 0, 0x800);
     for (int i = 0; i < n; i++) {
-        base[-n - i] = i - n;
+        base[-(n + i)] = -n + i;
         base[-i] = -i;
         base[i] = i;
         base[n + i] = n - i;
