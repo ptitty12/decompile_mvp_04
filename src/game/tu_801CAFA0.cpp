@@ -399,6 +399,36 @@ extern "C" float fn_801CCA40(Z* z)
     return r;
 }
 
+struct Unk801CAFA0_Tbl16 {
+    float v[16][2];
+};
+extern Unk801CAFA0_Tbl16 lbl_805D1B60;
+extern float lbl_8068C7C4;
+
+extern "C" float fn_801CCBE8(Z* z)
+{
+    float lo = 18.0f;
+    float hi = -18.0f;
+    if (z->m204->m6CC->m38C != 2)
+        return 0.0f;
+    float av = AbsF(fn_80235DA8(z->m4->m3B0));
+    Unk801CAFA0_Tbl16 t = lbl_805D1B60;
+    int idx = fn_80235E28(z->m4->m3B0);
+    float a = t.v[idx][0];
+    float b = t.v[idx][1];
+    float mix = av;
+    if (idx == 3)
+        mix = RandFP(z->m204, 1.0f, 0x1682);
+    float r = mix * a + (1.0f - mix) * b;
+    float res = 0.0f;
+    lbl_8068C7C4 = r;
+    if (!(r >= 0.0f))
+        res = !(r * 0.055555556f > 0.0f) ? (r * 0.055555556f >? -1.0f) : 0.0f;
+    else
+        res = !(r * 0.055555556f > 1.0f) ? (r * 0.055555556f >? 0.0f) : 1.0f;
+    return res;
+}
+
 extern "C" float fn_801CD068(Z* z)
 {
     float r = 0.0f;
