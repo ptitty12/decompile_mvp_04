@@ -148,6 +148,50 @@ extern Vec3 lbl_805D30D4;
 
 inline int Byte1CC9(unsigned char c) { return c; }
 
+extern "C" void fn_801C39D8(Z* z, int i);
+extern "C" int fn_801C38F0(Z* z, float f);
+extern "C" P* fn_801C1638(P* c, int i);
+extern "C" int fn_8018AD20(P* p);
+extern "C" int fn_8018AD2C(P* p);
+extern "C" void fn_801D8788(void* p, P* q, int k);
+struct Unk801C2C64_ZW {
+    char pad0[0xE8];
+    int mE8;
+};
+
+extern "C" void fn_801C2C64(Z* z)
+{
+    int flag = 0;
+    if (z->m204->m6F8->m14->m1CD0 != 0)
+        flag = 1;
+    fn_801C39D8(z, fn_801A2034(z->m204, flag));
+    z->m28C.m0 = 0;
+    int k2 = 2;
+    int k3 = 3;
+    int k4 = 4;
+    int mode = z->m204->m6F4;
+    if (mode != k2 && mode != k3 && mode != k4) {
+        int go = 1;
+        if (z->m128 != 5 && fn_8018AD20(z->m204->m6CC) != 0 && fn_8018AD2C(z->m204->m6CC) != 0)
+            go = fn_801C38F0(z, 0.0f) ^ 1;
+        if (go != 0)
+            fn_801C34AC(z, 9);
+        if (z->m124 == 2 && Byte1CC9(z->m204->m6F8->m14->m1CC9) <= 1) {
+            int a = 1;
+            if (fn_801C1638(z->m204, 0xA) == 0)
+                a = 0;
+            int b = 1;
+            if (fn_801C1638(z->m204, 0xB) == 0)
+                b = 0;
+            int c = fn_801C1638(z->m204, 0xC) != 0;
+            if (a != 0 || b != 0 || c != 0)
+                ((Unk801C2C64_ZW*)z)->mE8 = 1;
+        }
+        P* q = fn_801A4B34(z->m204);
+        fn_801D8788(z->mE0, q, 0);
+    }
+}
+
 extern "C" void fn_801C2DEC(Z* z, int force)
 {
     P* c = z->m204->m6CC;
