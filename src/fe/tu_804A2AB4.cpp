@@ -13,6 +13,16 @@ extern const char lbl_805F77C4[];
 extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
+extern const char lbl_805F7818[];
+extern const char lbl_805F7824[];
+extern const char lbl_805F5364[];
+struct UiS;
+struct Unk800D7008_Obj;
+Unk800D7008_Obj* fn_800D6FA0(void);
+float fn_800D7008(Unk800D7008_Obj*, int);
+void fn_800DC580(UiS*, float);
+extern "C" void fn_8055AC44(void*, int);
+extern "C" void fn_800DD800(void*, void*, int, int);
 extern "C" int fn_800D83C8(int* p);
 struct FeSubM6 : FeSubBD {
     virtual void s1();
@@ -508,6 +518,28 @@ FE_OVERLAY int fn_804A554C(void* x)
         }
     }
     return 0;
+}
+
+
+FE_OVERLAY void fn_804A5E8C(FeW* x)
+{
+    fn_800C8044(x->fn_vslot32(lbl_805F7818, 1))->fn_vslot8(1);
+    if (FeI(x, 0x218) == 1) {
+        float f = fn_800D7008(fn_800D6FA0(), FeI(x, 0x13C));
+        fn_800DC580((UiS*)fn_800C8044(fn_800C8044(x->fn_vslot32(lbl_805F7818, 1))->fn_vslot32(lbl_805F5364, 1)), f);
+    } else {
+        x->fn_vslot32(lbl_805F7818, 1)->fn_vslot8(0);
+    }
+    FeW* w = fn_800C8044(x->fn_vslot32(lbl_805F7824, 1));
+    if (FeI(x, 0x218) == 1) {
+        char sp10[0x460];
+        char* p = sp10;
+        fn_8055AC44(p, fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(x, 0x13C)));
+        fn_800DD800(w, p, FeI(x, 0x13C), 0);
+        w->fn_vslot8(1);
+    } else {
+        w->fn_vslot8(0);
+    }
 }
 
 }
