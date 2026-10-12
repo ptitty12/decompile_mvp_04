@@ -68,10 +68,15 @@ struct Unk806AA2D4B {
     short mC;
     char padE[6];
     float* m14;
-    char pad18[0xD0];
+    char pad18[0x90];
+    void* mA8[2];
+    char padB0[8];
+    void* mB8[8];
+    char padD8[0x10];
     float mE8[6];
     float* m100;
-    char pad104[0xDC];
+    char pad104[0xD8];
+    void* m1DC;
     void* m1E0;
     void* m1E4;
 };
@@ -110,6 +115,10 @@ struct Unk803B21EC_L {
 };
 extern Unk803B21EC_L* lbl_806AA4B0;
 extern float lbl_8060984C;
+
+extern float lbl_80609848;
+extern "C" void fn_803A975C();
+extern "C" void fn_803A979C();
 
 extern "C" int fn_803B02CC(int v)
 {
@@ -326,7 +335,7 @@ extern "C" void fn_803B14D0()
     lbl_806AA4E0 = (void*)fn_803B29F8;
 }
 
-extern "C" void fn_803B18BC()
+extern "C" void fn_803B18BC(float)
 {
 }
 
@@ -338,6 +347,31 @@ extern "C" void* fn_803B1AF0(int n)
 extern "C" void fn_803B1B10(void* p)
 {
     SNDMEMI_free(p);
+}
+
+extern "C" void fn_803B1DF0()
+{
+    int i;
+    fn_803A975C();
+    fn_803B141C();
+    if (lbl_806AA2D4.m1DC != 0) {
+        SNDMEMI_free(lbl_806AA2D4.m1DC);
+        lbl_806AA2D4.m1DC = 0;
+    }
+    for (i = 0; i <= 1; i++) {
+        if (lbl_806AA2D4.mA8[i] != 0) {
+            SNDMEMI_free(lbl_806AA2D4.mA8[i]);
+            lbl_806AA2D4.mA8[i] = 0;
+        }
+    }
+    for (i = 0; i < lbl_806AA2D4.m9; i++) {
+        if (lbl_806AA2D4.mB8[i] != 0) {
+            SNDMEMI_free(lbl_806AA2D4.mB8[i]);
+            lbl_806AA2D4.mB8[i] = 0;
+        }
+    }
+    fn_803B18BC(lbl_80609848);
+    fn_803A979C();
 }
 
 extern "C" void fn_803B1EC8()
