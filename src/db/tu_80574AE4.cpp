@@ -36,6 +36,92 @@ int fn_8056A838(void* o, int cur, int who);
 void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
 }
 
+extern "C" void fn_8057C2C4(void* self, int* a, int* b, int* c);
+extern "C" void fn_80377408(void* p);
+extern char lbl_8064A550[];
+
+extern "C" {
+void fn_8055AC44(void* obj, int a);
+int fn_8055AF00(void* obj, int id);
+}
+/* forward declarations (definitions are in address order) */
+extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
+extern "C" int fn_8057C21C(int id);
+extern "C" int fn_8057C270(int id);
+extern "C" int fn_8057C3F8(void* self);
+extern "C" void fn_8057C99C(void* self, int chrg);
+extern "C" void fn_8057C9D0(DbSL* self, int flag);
+extern "C" void fn_8057CA60(DbSL* self, int flag);
+extern "C" void fn_8057CAF8(DbSL* self);
+extern "C" void fn_8057CBA4(DbSL* self);
+extern "C" unsigned fn_8057CC30(DbSL* self, int id);
+extern "C" int fn_8057CCA4(DbSL* self, int id);
+
+extern "C" {
+int fn_80084954__FPv(int a);
+void fn_80578C80(DbHost* self, int a, int b, int c, int d);
+void fn_80574AE4(DbHost* self, int a, int b);
+int fn_8057493C(DbHost* self, int a, int b);
+}
+/* forward declarations (definitions are in address order) */
+extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
+extern "C" int fn_8057C21C(int id);
+extern "C" int fn_8057C270(int id);
+extern "C" int fn_8057C3F8(void* self);
+extern "C" void fn_8057C99C(void* self, int chrg);
+extern "C" void fn_8057C9D0(DbSL* self, int flag);
+extern "C" void fn_8057CA60(DbSL* self, int flag);
+extern "C" void fn_8057CAF8(DbSL* self);
+extern "C" void fn_8057CBA4(DbSL* self);
+extern "C" unsigned fn_8057CC30(DbSL* self, int id);
+extern "C" int fn_8057CCA4(DbSL* self, int id);
+extern "C" void fn_80578A60(DbHost* self, int a, int b);
+extern "C" void fn_80578AE8(DbHost* self, int a, int b);
+extern "C" int fn_80578974(DbHost* self, int a, int b);
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_80578974(DbHost* self, int a, int b);
+extern "C" void fn_80578A60(DbHost* self, int a, int b);
+extern "C" void fn_80578AE8(DbHost* self, int a, int b);
+extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
+extern "C" int fn_8057C21C(int id);
+extern "C" int fn_8057C270(int id);
+extern "C" int fn_8057C3F8(void* self);
+extern "C" void fn_8057C99C(void* self, int chrg);
+extern "C" void fn_8057C9D0(DbSL* self, int flag);
+extern "C" void fn_8057CA60(DbSL* self, int flag);
+extern "C" void fn_8057CAF8(DbSL* self);
+extern "C" void fn_8057CBA4(DbSL* self);
+extern "C" unsigned fn_8057CC30(DbSL* self, int id);
+extern "C" int fn_8057CCA4(DbSL* self, int id);
+
+extern "C" DB_OVERLAY int fn_80578974(DbHost* self, int a, int b)
+{
+    if (fn_80084954__FPv(a) == 1) {
+        int idx = FindRow(self->v9(a), b);
+        if (idx != -1) {
+            DbRow24* r = self->v9(a)->m0 + idx;
+            return r->m20;
+        }
+        return 0;
+    }
+    return fn_8057493C(self, a, b);
+}
+
+extern "C" DB_OVERLAY void fn_80578A60(DbHost* self, int a, int b)
+{
+    self->v11(a, b);
+    self->v12(a, b);
+    self->v14(a, b);
+}
+
+extern "C" DB_OVERLAY void fn_80578AE8(DbHost* self, int a, int b)
+{
+    if (fn_80084954__FPv(b) == 1)
+        fn_80578C80(self, a, b, 0, self->v8(b));
+    else
+        fn_80574AE4(self, a, b);
+}
+
 /* near-miss: 9 slots; same instructions, retail interleaves the parameter copies and stack-argument loads differently */
 extern "C" DB_OVERLAY void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left)
 {
@@ -81,10 +167,6 @@ extern "C" DB_OVERLAY int fn_8057C270(int id)
     return a;
 }
 
-extern "C" void fn_8057C2C4(void* self, int* a, int* b, int* c);
-extern "C" void fn_80377408(void* p);
-extern char lbl_8064A550[];
-
 extern "C" DB_OVERLAY int fn_8057C3F8(void* self)
 {
     int a, b, c;
@@ -126,11 +208,6 @@ extern "C" DB_OVERLAY void fn_8057CA60(DbSL* self, int flag)
         self->m220[i] = v;
     }
     fn_8057CCE8(self);
-}
-
-extern "C" {
-void fn_8055AC44(void* obj, int a);
-int fn_8055AF00(void* obj, int id);
 }
 
 extern "C" DB_OVERLAY void fn_8057CAF8(DbSL* self)
