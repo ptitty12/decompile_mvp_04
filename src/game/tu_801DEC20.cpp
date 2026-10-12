@@ -558,6 +558,49 @@ inline Unk80273498_Vec3 GPos(const Unk80273498_Vec3* p)
     return *p;
 }
 
+extern "C" float atan2f(float y, float x);
+void fn_80299B98(P* x, const Unk80273498_Vec3& pos, float* ang);
+
+extern "C" Unk8027C728_Goal* fn_801E1A0C(void* self, P* p, GSrc* x)
+{
+    if (x->m7C == 1) {
+        float ang;
+        {
+            const Unk80273498_Vec3* pv = &x->m64;
+            Unk80273498_Vec3 t = GPos(pv);
+            ang = atan2f(t.x, t.z);
+        }
+        Unk80273498_Vec3 w = GPos(&x->m28);
+        fn_80299B98(p, w, &ang);
+    } else {
+        Unk80273498_Vec3 w = GPos(&x->m28);
+        fn_80299B98(p, w, 0);
+    }
+    Unk8027C728_Goal* g = fn_802448F4(p, 1);
+    g->m10 = 2;
+    fn_8027C728(g);
+    Unk80287D70* gs = (Unk80287D70*)g->m18;
+    {
+        Unk80273498_Vec3 v = GPos(&x->m28);
+        gs->fn_80287DB8(fn_801DCC1C(p, (const Vec3*)&v));
+    }
+    if (x->m7C == 1) {
+        Unk80273498_Vec3 w = GPos(&x->m64);
+        ((Unk8027A84C*)gs)->fn_8027A898(&w);
+    }
+    int a = x->mC;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m38 = a;
+    Unk8027A84C* g104 = (Unk8027A84C*)g->m104;
+    g104->m38 = a;
+    int b = x->m8;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m34 = b;
+    g104->m34 = b;
+    int c = x->m18;
+    ((Unk8027A84C_Owner*)g)->fn_8027C67C()->m40 = c;
+    g104->m40 = c;
+    return g;
+}
+
 extern "C" Unk8027C728_Goal* fn_801E1B9C(void* self, P* p, GSrc* x)
 {
     Unk8027C728_Goal* g = fn_802448F4(p, 1);
