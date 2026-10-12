@@ -35,7 +35,7 @@ typedef Unk8027C728_Goal Goal;
 typedef Unk8027C728_Player Player;
 typedef Unk80273498_Vec3 Vec3;
 void fn_80244A60(Player* player, Goal* g);
-void fn_80244A64(Player* player, Goal* g, int flag);
+extern "C" void fn_80244A64(Player* player, Goal* g, int flag);
 void fn_80382BC0(Unk80271DBC_Link* l, float f);
 int fn_8037EDFC(Unk80271DBC_Link* l, int a, int b, int c, int d, float f1, float f2);
 double fn_80410634(double x);
