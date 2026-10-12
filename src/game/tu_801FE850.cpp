@@ -67,6 +67,31 @@ extern float lbl_805D516C;
 extern float lbl_805D5170;
 extern float lbl_805D5174;
 extern float lbl_805D5178;
+extern const float lbl_805D517C;
+extern const float lbl_805D5180;
+
+struct Unk802017E0_Game {
+    char pad0[0x38C];
+    int m38C;
+};
+
+struct Unk802017E0_G {
+    char pad0[4];
+    Unk802017E0_Game* m4;
+};
+
+struct Unk802017E0_Scr {
+    char pad0[0x9C];
+    Unk802017E0_G* m9C;
+};
+
+struct Unk802017E0_Vec {
+    float x;
+    float y;
+    float z;
+};
+
+extern "C" float fn_804028E4(float x); /* square root */
 
 extern "C" {
 
@@ -1031,6 +1056,18 @@ void fn_80201764(Unk80201738_Roster* r)
         *(int*)((char*)r + i * 4 + 8) = fn_801A497C(r->m0, 4, i);
         fn_8014E108(ip);
     }
+}
+
+int fn_802017E0(Unk802017E0_Scr* p, int, Unk802017E0_Vec* v)
+{
+    int r;
+    if (p->m9C->m4->m38C == 1) {
+        float len = fn_804028E4(v->x * v->x + v->y * v->y + v->z * v->z) * lbl_805D517C;
+        float thr = lbl_805D5180;
+        r = len >= lbl_805D5180;
+    } else
+        r = 0;
+    return r;
 }
 
 }
