@@ -6,6 +6,9 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+void fn_800113D4(int a);
+void fn_80010990(int a, int b);
+void fn_800114E0();
 int fn_802540E4(Unk8024EF40_W* w, int a, int b);
 int fn_80253F0C(Unk8024EF40_W* w, int a, int b, int c);
 void fn_800120AC(int a, int b, int c);
@@ -385,6 +388,69 @@ void fn_8004C4D0(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
                 }
                 fn_8004FCDC(s, idx, a);
             }
+        }
+    }
+}
+
+/* near-miss (95%): the two s+4 table reads at the end fold to add+lwz 4(rX); retail forms a fresh addi base and uses lwzx */
+void fn_8004C660(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    int o = idx * 0x48;
+    char* b4 = (char*)s + 4;
+    int k = *(int*)(b4 + o);
+    if (k < a->m4D4) {
+        int off = k * 0x18 + 0x48C;
+        char* rec = (char*)a + off;
+        if (*(int*)(rec + 4) != 0) {
+            int m = a->m4D8;
+            if (m == 2 && s->mA5C == 0 && a->m104 == 1) {
+                fn_8004E954(s, idx, a);
+                return;
+            }
+            if (m == 3 && s->mA60 == 0) {
+                fn_8004EAD4(s, idx, a);
+                return;
+            }
+            int t = fn_8005000C(s, idx, 0x59);
+            if (t != -1 && *(int*)(b4 + t * 0x48) == *(int*)(rec + 4))
+                fn_800109F4();
+            char* b8 = (char*)s + 8;
+            if (*(int*)(b8 + o) != 0) {
+                if (fn_800507D8(s, idx, a) != 0 || *(int*)(rec + 0xC) == 3) {
+                    fn_800113D4(fn_80044D3C(*(int*)(rec + 0xC)));
+                } else {
+                    int x = fn_80044D3C(*(int*)(rec + 0xC));
+                    fn_80010990(x, ((Unk8001CE80*)a)->fn_8001DE9C());
+                }
+            } else {
+                int v = *(int*)(rec + 0xC);
+                if (*(int*)(rec + 4) == (int)a->m3B0)
+                    v = -1;
+                if (fn_800507D8(s, idx, a) != 0 || v == 3) {
+                    fn_80011378(fn_80044D3C(*(int*)(rec + 0xC)));
+                } else {
+                    int x = fn_80044D3C(v);
+                    int y = ((Unk8001CE80*)a)->fn_8001DE9C();
+                    fn_800108C8(x, y, fn_8001F45C(a, *(int*)(rec + 8)));
+                }
+            }
+            if (*(int*)(rec + 0x10) != 0) {
+                fn_80011534();
+            } else if (*(int*)(rec + 0x14) != 0) {
+                int f = 1;
+                if (*(int*)(b8 + o) == 0) {
+                    int t2 = fn_8004FF78(s, idx, 0x45);
+                    if (t2 != -1 && *(int*)((char*)s + 4 + t2 * 0x48) == *(int*)(rec + 4))
+                        f = 0;
+                    int o2 = s->m9E0 * 0x48;
+                    if (*(int*)((char*)s + o2) == 0x45 && *(int*)((char*)s + 4 + o2) == *(int*)(rec + 4))
+                        f = 0;
+                }
+                if (f == 1)
+                    fn_800114E0();
+            }
+            fn_8004FCDC(s, idx, a);
+            fn_8004B910(s, idx, a);
         }
     }
 }
