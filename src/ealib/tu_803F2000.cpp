@@ -125,6 +125,27 @@ struct RcSys {
     int m6C, m70, m74, m78, m7C, m80, m84, m88;
 };
 
+struct RcTri {
+    int a, b, c;
+};
+
+struct RcEvT : RcEv0 {
+    union {
+        short s;
+        int i;
+    } m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    RcTri m2C;
+};
+
+extern RcEvT lbl_806AAF58;
+extern int lbl_806AAF6C[16];
+extern int lbl_806AAF70[3];
+extern "C" int fn_803F8730(void*, void*, int*, int*);
 extern RcEv lbl_806AAF2C;
 extern RcEv lbl_806AB3AC;
 extern RcSys lbl_806AB4C8;
@@ -259,6 +280,74 @@ extern "C" void fn_803F28A4()
         y->m84 = 0;
         y->m88 = 0;
         s->m0->v1(s);
+        break;
+    }
+    }
+}
+
+/* near-miss: 2 slots; same m14 / m34 store order issue as fn_803F28A4 */
+extern "C" void fn_803F2A70()
+{
+    switch (lbl_806AAF58.m8) {
+    case 0:
+        lbl_806AAF58.m8 = 0x65;
+        lbl_806AAF58.m24 = 0;
+        lbl_806AAF58.mC = 0;
+    case 0x65: {
+        RcEv* e = &lbl_806AB3AC;
+        lbl_806AAF58.mC = 0;
+        e->m1C = 0;
+        lbl_806AAF58.m8 = 0x69;
+        e->m14.s = 0;
+        e->m18 = -1;
+        e->m34 = lbl_806AAF58.m4;
+        e->m14.i = lbl_806AAF58.m14.i;
+        e->m30 = 0xf;
+        e->m8 = 0;
+        e->m2C = 0;
+        e->m38 = 0;
+        e->m3C = 0;
+        e->m0->v0(e);
+        break;
+    }
+    case 0x69:
+        if (lbl_806AB3C4[0] != 0 && lbl_806AB3C4[0] != 3) {
+            lbl_806AAF58.m18 = lbl_806AB3C4[0];
+            lbl_806AAF58.m8 = 0x7c;
+            lbl_806AAF58.m24 = 0;
+            lbl_806AAF58.mC = 0;
+            break;
+        }
+        lbl_806AAF58.m24 = 1;
+        lbl_806AAF58.m18 = lbl_806AB3C4[0];
+        lbl_806AAF58.m8 = 0x17;
+        lbl_806AAF58.mC = 0;
+    case 0x17: {
+        int r = fn_803F8730(lbl_806EEA2C, lbl_806AAF6C, &lbl_806AAF6C[7], &lbl_806AAF6C[8]);
+        if (r == 0)
+            lbl_806AAF70[0] = r;
+        lbl_806AAF58.m8 = 0x7c;
+        lbl_806AAF58.mC = 0;
+    }
+    case 0x7c: {
+        RcEvT* s = &lbl_806AAF58;
+        if (s->m24 != 0) {
+            fn_803F78CC(lbl_806EEA2C, &s->m14);
+            s->m24 = 0;
+        }
+        RcSys* y = &lbl_806AB4C8;
+        y->m0 = 3;
+        y->m6C = 0;
+        y->m70 = 0;
+        y->m74 = 0;
+        y->m78 = 0;
+        y->m7C = 0;
+        y->m80 = 0;
+        y->m84 = 0;
+        y->m88 = 0;
+        y->m4 = s->m18;
+        *(RcTri*)&y->m34 = s->m2C;
+        s->m0->v1((RcEv*)s);
         break;
     }
     }
