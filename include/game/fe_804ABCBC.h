@@ -718,7 +718,7 @@ extern "C" {
 void* fn_800E4874(int i);
 int fn_804ACAFC(FeSc1* x, int k);
 void fn_800DE440(char* out, int a, int b);
-void fn_804ACD0C(FeSc1* x, int i);
+void* fn_804ACD0C(FeSc1* x, int i);
 }
 
 extern "C" void fn_804031BC(char* dst, const char* src);

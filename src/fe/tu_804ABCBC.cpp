@@ -291,6 +291,37 @@ extern "C" FE_OVERLAY void fn_804AE37C(FeSc1* x, int a)
     p->v86();
 }
 
+struct Unk80360AB4 {
+    int m0, m4, m8, mC, m10;
+    Unk80360AB4(const Unk80360AB4& o);
+    ~Unk80360AB4() {}
+    virtual void vfn();
+};
+struct FeMsgB8 {
+    char pad0[0x3C];
+    Unk80360AB4 m3C;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    void Set(Unk80360AB4 s, int id, int h, int i)
+    {
+        m3C = s;
+        m54 = id;
+        m58 = h;
+        m5C = i;
+    }
+};
+extern "C" FE_OVERLAY void* fn_804ACD0C(FeSc1* x, int i)
+{
+    FeLvlRec* rec = fn_8008007C((Unk8007FF8C_G*)lbl_8061930C, x->m144[i]);
+    FeMsgB8* b = (FeMsgB8*)((char*)fn_800B555C() + 8);
+    b->Set(*(Unk80360AB4*)rec, x->m144[i], x->m140, i);
+    FeMsgB8* c = (FeMsgB8*)((char*)fn_800B555C() + 8);
+    c->m60 = 0;
+    return c;
+}
+
 extern "C" FE_OVERLAY int fn_804ACDDC(FeSc1* x)
 {
     int idx = ((FeObjI*)x->m134)->v60();
