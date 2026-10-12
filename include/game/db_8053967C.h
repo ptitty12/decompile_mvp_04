@@ -257,4 +257,40 @@ unsigned fn_8007FE60(Unk8007F198_E* e, unsigned a, int b);
 int fn_8007FE84(Unk8007F198_E* e, unsigned a, int b, unsigned char c);
 int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
 
+/* ---- unit 805467E0 ---- */
+/* 0x2C-byte queued event (fn_80548894 sets it from a Vec3-like value). */
+struct Db805467E0_V {
+    float m0;
+    int m4;
+    int m8;
+};
+struct Db805467E0_W3 {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Db805467E0_Ev {
+    float m0;
+    int m4;
+    int m8;
+    Db805467E0_W3 vC;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    const void* m28;
+};
+struct Db805467E0_S {
+    int m0;
+    int m4;
+    int m8;
+};
+/* Queue of 75 events; count at +0xCE4, a state word at +0xCE8 and an int list at +0xCF4. */
+struct Db805467E0_Q {
+    Db805467E0_Ev ev[75];
+    int mCE4;
+    Db805467E0_S sCE8;
+    Db8053967C_List mCF4;
+};
+
 #endif
