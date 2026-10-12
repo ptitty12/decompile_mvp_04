@@ -5,3 +5,62 @@
  * Every data object is extern by its lbl_ name.
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
+#include "snd/sndo.h"
+#include "snd/cmn/sndcmn.h"
+
+extern "C" {
+
+void fn_803A975C();
+void fn_803A979C();
+void fn_803AB480(int shandle);
+int fn_803AD2F0(void* ppatch, void* attr);
+void fn_803A81E0(void* attr, int type);
+void fn_803B115C(int a, void* p);
+
+/* near-miss: 3 slots (the original code copies the patch pointer into r9 for the null test). */
+int fn_803A8648(int bhandle)
+{
+    int i;
+    if (bhandle == -1) {
+        for (i = 0; i < sndgs.sso.set.maxbanks; i++) {
+            fn_803A8648(i);
+        }
+        return 0;
+    }
+    if (SNDBANKI_valid(bhandle) != 0) {
+        return -8;
+    }
+    fn_803A975C();
+    BANKVER5* phdr = sndgs.banklist[bhandle].phdr;
+    for (i = 0; i < sndgs.voicestotal; i++) {
+        int o = i * 0x90;
+        if (reinterpret_cast<CHANPUB*>(reinterpret_cast<char*>(sndgs.chan) + o)->bhandle == bhandle) {
+            fn_803AB480(*reinterpret_cast<int*>(reinterpret_cast<char*>(sndgs.chan) + o));
+        }
+    }
+    int patnum;
+    TAGGEDPATCH* ppatch;
+    void* cursor;
+    for (patnum = 0; patnum < phdr->numpatches; patnum++) {
+        char attr[0x100];
+        ppatch = SNDBANKI_getppatch(phdr, patnum);
+        cursor = ppatch;
+        if (ppatch != NULL) {
+            int more;
+            cursor = reinterpret_cast<char*>(ppatch) + 4;
+            do {
+                more = fn_803AD2F0(&cursor, attr);
+                fn_803A81E0(attr, 2);
+            } while (more != 0);
+        }
+    }
+    if (sndgs.banklist[bhandle].pspuram != NULL) {
+        fn_803B115C(8, sndgs.banklist[bhandle].pspuram);
+    }
+    sndgs.banklist[bhandle].phdr = NULL;
+    sndgs.banklist[bhandle].locked = 0;
+    fn_803A979C();
+    return 0;
+}
+
+}
