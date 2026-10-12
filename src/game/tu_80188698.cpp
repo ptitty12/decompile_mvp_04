@@ -5,6 +5,8 @@
 #include "game/tu_80188698.h"
 #include "game/tu_8018C9C8.h"
 
+extern "C" float fn_8018CDB8(Unk80188698* o, int k, float t);
+extern float lbl_805CDCA8;
 
 //@BODY
 //@80188698
@@ -282,6 +284,36 @@ extern "C" int fn_8018B43C(Unk80188698* o, int a, Unk80183918_Vec3* p, float rr)
             return 1;
     }
     return 0;
+}
+
+//@8018B4D0
+extern "C" int fn_8018B4D0(Unk80188698* o)
+{
+    int r = 0;
+    if (o->m38C == 1) {
+        if (fn_8018AD20(o) != 0)
+            return 0;
+        float a = fn_8018CDB8(o, 3, 0.0f);
+        float b = o->m3F4;
+        if (a != -1.0f) {
+            float x = -1.0f;
+            float lo = fn_8018CDB8(o, 0xA, 0.0f);
+            float hi = fn_8018CDB8(o, 0xB, 0.0f);
+            Unk80183918_Vec3 v = fn_8018959C(o, a);
+            if (!(lo >= 0.0f))
+                x = hi;
+            else if (!(hi < 0.0f))
+                x = lo <? hi;
+            else
+                x = lo;
+            if ((!(x <= lbl_805CDCA8) && x < a) || v.m0 < 0.0f || !(v.m8 >= 0.0f)) {
+                r = 0;
+            } else if (b > a || !(*(float*)((char*)o->m448 + 0xAF4) <= 180.0f)) {
+                r = 1;
+            }
+        }
+    }
+    return r;
 }
 
 //@8018B648
