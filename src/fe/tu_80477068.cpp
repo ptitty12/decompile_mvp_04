@@ -113,6 +113,25 @@ extern "C" FE_OVERLAY FeScrH* fn_8047809C(FeScrH* self, int a, int b, int c, int
     return self;
 }
 
+extern "C" FE_OVERLAY void fn_80479378(int a, FeW* x)
+{
+    x->fn_vslot32("GAMEGRID", 1);
+    fn_800C8060()->fn_vslot70()->fn_vslot32("CELL", 1);
+    int r = fn_800C8060()->fn_vslot61();
+    switch (a) {
+    case 0:
+        fn_800C2034((char*)fn_800B555C() + 8, FeI(x, 0x1D0));
+        break;
+    case 1:
+        FeI(x, 0x13C) = FeI(x, 0x148) - FeI(x, 0x144);
+        if (r == 0)
+            fn_8047AE14(x, 2);
+        else
+            fn_8047AE14(x, 4);
+        break;
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80479480(void* x)
 {
     fn_80125BC0(FeWp(x, 0x1C8));
@@ -163,9 +182,35 @@ extern "C" FE_OVERLAY void fn_8047AE14(void* x, int v)
     FeI(x, 0x1AC) = v;
 }
 
+extern "C" FE_OVERLAY int fn_8047AE1C(void* x)
+{
+    FeWp(x, 0x1C0)->fn_vslot70();
+    fn_800C8044()->fn_vslot32("CELL", 1);
+    fn_800C8060()->fn_vslot56();
+    return 1;
+}
+
 extern "C" FE_OVERLAY void fn_8047B01C(void* x)
 {
     FeI(x, 0x1B8) = FeWp(x, 0x1C0)->fn_vslot60();
+}
+
+extern "C" FE_OVERLAY int fn_8047B064(FeW* x, int a)
+{
+    int idx = FeWp(x, 0x1C0)->fn_vslot60();
+    FeWp(x, 0x1C0)->fn_vslot70();
+    fn_800C8044()->fn_vslot32("CELL", 1);
+    if (a != (int)fn_800C8060()) {
+        fn_8047B15C(x);
+        return 0;
+    }
+    int o = idx * 12;
+    char* b = (char*)x + 0x154;
+    if (*(int*)(b + o) == 1 && FeI(x, 0x1B8) == idx) {
+        x->fn_vslot67(2, 0);
+        fn_8047B15C(x);
+    }
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_8047B9AC(void* x)
