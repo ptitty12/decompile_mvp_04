@@ -410,11 +410,12 @@ extern "C" FE_OVERLAY void fn_8044E398(int a, FeObj* o)
         ((FeObj2*)o)->v67(0, 0);
 }
 
-/* near-miss (97.6%): retail keeps the all-ready flag in r11 (a copy of the call-surviving temp), schedules `li r0,1` ahead of the lis for lbl_80621638 and copies the popup pointer into r11 before the m30C store */
+/* near-miss (99.2%): retail keeps the all-ready flag in r11 (a copy of the call-surviving temp) and copies the popup pointer into r11 before the m30C store; `int one = 1; lbl = one;` gives its li-before-lis order */
 extern "C" FE_OVERLAY void fn_8044E3E0(int a, char b)
 {
     FeObj* pop = fn_800B7A94(UiGetMsgMgr(), lbl_805F5160);
-    lbl_80621638 = 1;
+    int one = 1;
+    lbl_80621638 = one;
     fn_800B7A94(UiGetMsgMgr(), lbl_805F4F20);
     fn_804A7760();
     fn_800C21D0((char*)fn_800B555C() + 8);
