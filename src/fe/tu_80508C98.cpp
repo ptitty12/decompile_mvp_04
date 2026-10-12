@@ -123,6 +123,11 @@ struct FeWQ11 : Unk800C7B40_Data {
     virtual void s126(); virtual void s127();
 };
 extern "C" int fn_800B57EC(FeState* s);
+extern const char lbl_805FB75C[];
+extern const char lbl_805F522C[];
+extern "C" void fn_800C2008(void* st, int a, int b, int c);
+extern "C" void fn_8049A4DC();
+extern "C" void fn_8050C298();
 /* Q16-DECL-END */
 
 extern const char lbl_80668118[];
@@ -600,4 +605,50 @@ extern "C" FE_OVERLAY void fn_8050C68C(FeScrQ* x, int id)
     int t = fn_8057CE00(id) > 2 ? 2 : fn_8057CE00(id);
     x->m134 = t;
     fn_8050AE0C(x, t, 0, a);
+}
+
+/* near-miss: 99.4%; retail copies the popup pointer into r11 (mr r11,r3) before the m30C store in case 2; local-pointer, alias and setter-inline variants tried (same as the fn_8044C508 near-miss) */
+extern "C" FE_OVERLAY void fn_8050C724(FeScrQ* x, int kind)
+{
+    switch (kind) {
+    case 0:
+        if (fn_800B555C()->m0 != 0x1B) {
+            FeMsg m;
+            FeMsg* mp = &m;
+            fn_8035682C(mp);
+            fn_8040B830(mp->name, lbl_805F4450, 15);
+            mp->name[15] = kind;
+            fn_800B7B4C(FeGetMgr(), mp, x);
+        }
+        break;
+    case 1: {
+        FeMsg m;
+        FeMsg* mp = &m;
+        fn_8035682C(mp);
+        fn_8040B830(mp->name, lbl_805FB75C, 15);
+        mp->name[15] = 0;
+        int a = ((FeSubI8*)((char*)x->m138 + 0xDC))->s11();
+        FeW* w = fn_8050C408((FeScrN*)x);
+        int v = w->fn_vslot61() * w->fn_vslot59() + w->fn_vslot60();
+        void* st = (char*)fn_800B555C() + 8;
+        fn_800C2008(st, a, v, ((FeSubI8*)((char*)x->m140 + 0xDC))->s11());
+        fn_800B7B4C(FeGetMgr(), mp, x);
+        break;
+    }
+    case 2: {
+        FePopup* p = (FePopup*)fn_800B7A94(FeGetMgr(), lbl_805F522C);
+        p->m30C = (void*)fn_8050C298;
+        fn_8049A4DC();
+        break;
+    }
+    case 3: {
+        fn_8001BC4C()->fn_8001BDAC(0xA3);
+        ((FeSubI8*)((char*)x->m138 + 0xDC))->s1();
+        int b = ((FeSubI8*)((char*)x->m140 + 0xDC))->s11();
+        int r = ((FeSubI8*)((char*)x->m138 + 0xDC))->s11();
+        x->m134 = r;
+        fn_8050B220((FeScrN*)x, r, 0, b);
+        break;
+    }
+    }
 }
