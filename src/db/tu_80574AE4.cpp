@@ -202,6 +202,28 @@ extern "C" unsigned fn_8057CC30(DbSL* self, int id);
 extern "C" int fn_8057CCA4(DbSL* self, int id);
 extern "C" void fn_8057CCE8(DbSL* self);
 
+struct Db8057713C_R {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    float m10;
+};
+extern const float lbl_805FFF48;
+extern const float lbl_805FFF4C;
+extern "C" DB_OVERLAY int fn_8057713C(void* unused, Db8057713C_R* a, Db8057713C_R* b, int p6, int p7, int p8)
+{
+    float la = (float)(a->m4 - (a->m8 + a->mC));
+    float lb = (float)(b->m4 - (b->m8 + b->mC));
+    float m = (la + lb) * lbl_805FFF48;
+    float d = b->m10 - a->m10;
+    if (d > m)
+        return 0;
+    if (d > m - lbl_805FFF4C)
+        return 1;
+    return 2;
+}
+
 extern "C" DB_OVERLAY int fn_80577508(Db80577508_S* self, int* a, int* b)
 {
     int s = fn_80078A38__18Unk8007B2B0_Screeni(self->m4, *a);
