@@ -375,7 +375,6 @@ extern "C" void fn_800AD78C(void* p)
     }
 }
 
-/* near-miss (2 slots): add/addi order of the cell address; nested loops need the explicit `while (1) { if (!c) break; ... }` pre-test or CSE merges the count load */
 extern "C" void fn_800AD948(char* self, int key, float v)
 {
     int i = 0;
@@ -388,8 +387,8 @@ extern "C" void fn_800AD948(char* self, int key, float v)
             if (!(j >= 0)) {
                 break;
             }
-            char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
+            char* b1 = self + 0x14;
             if (*(int*)(b1 + off) == key) {
                 char* b2 = self + 0x1C;
                 *(float*)(b2 + off) = v;
@@ -489,7 +488,6 @@ extern "C" float fn_800ADF6C(char* self, int a, int b)
     return r;
 }
 
-/* near-miss (2 slots): add/addi order of the cell address */
 extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
 {
     int i = 0;
@@ -502,8 +500,8 @@ extern "C" int fn_800AE150(char* self, int* oi, int* oj, int key)
             if (!(j >= 0)) {
                 break;
             }
-            char* b1 = self + 0x14;
             int off = j * 0xC + i * 0x60;
+            char* b1 = self + 0x14;
             if (*(int*)(b1 + off) == key) {
                 *oi = i;
                 *oj = j;
