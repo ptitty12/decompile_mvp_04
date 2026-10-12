@@ -67,6 +67,15 @@ struct Db8055547C_S {
     int m4;
     void* m8;
 };
+inline void Db805559D4_Step(int& v)
+{
+    int t;
+    if (v > 10)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
 
 extern "C" DB_OVERLAY int fn_8055645C(Db8055638C_Idx* self, int* out);
 
@@ -239,6 +248,74 @@ extern "C" DB_OVERLAY int fn_80555998(int a)
         return 1;
     }
     return 5;
+}
+
+/* near-miss: 96.1%; the record pointer of the fill loop is formed before the per > 0 test (retail: mulli after it,
+ * and add r9,r0,r25 operand order). Tried index and pointer forms, if-wrapped do-while. */
+extern "C" DB_OVERLAY int fn_805559D4(int kind, void* recs0, int cnt, int n)
+{
+    Db8055638C_Idx* recs = (Db8055638C_Idx*)recs0;
+    Unk8007F198_C* sc = (Unk8007F198_C*)lbl_8061930C;
+    int total = fn_80555EB0(kind, n);
+    int a = 0;
+    int b = 0;
+    int i;
+    for (i = 0; i < cnt; i++)
+        fn_8055638C(&recs[i]);
+    switch (kind) {
+    case 0:
+        a = fn_80555D88(0, n);
+        b = 0;
+        break;
+    case 1:
+        b = fn_80555D88(0, n);
+        a = b + fn_80555D88(1, n);
+        break;
+    case 2:
+        b = fn_80555D88(0, n);
+        b = b + fn_80555D88(1, n);
+        a = fn_8007FB2C(sc, n);
+        break;
+    }
+    int arr[12];
+    int lo = 0;
+    int hi = 1;
+    fn_80083E84(n, &lo, &hi);
+    int per = fn_80555E6C(kind);
+    if (n == 0 && per > 1)
+        per = per / 2;
+    int pos = 0;
+    if (pos < total) {
+        do {
+            int c;
+            Db8055638C_Idx* r = &recs[pos];
+            for (c = 0; c < per; c++) {
+                r->m4 = kind;
+                r->m0 = lo;
+                r++;
+            }
+            pos += per;
+            Db805559D4_Step(lo);
+        } while (pos < total);
+    }
+    int idx = b;
+    for (i = 0; i < total; i++) {
+        fn_8055669C(&recs[i], idx);
+        idx++;
+        arr[i] = fn_805563C4(&recs[i]);
+    }
+    while (idx < a) {
+        int x = fn_8007FB98(sc, idx, 0, n);
+        int y = fn_8007FB98(sc, idx, 1, n);
+        for (i = 0; i < total; i++) {
+            if (x == arr[i] || y == arr[i]) {
+                fn_8055669C(&recs[i], idx);
+                break;
+            }
+        }
+        idx++;
+    }
+    return total;
 }
 
 extern "C" DB_OVERLAY int fn_80555C44(Db8055638C_Idx* dst, int* outIdx, int a, int x)
