@@ -70,7 +70,7 @@ struct Unk8024EF40_W;
 char* fn_802542E8(Unk8024EF40_W* sub, int a, int out);
 int fn_8040B320(char* dst, int a, int n, ...);
 char* fn_8040B61C(char* dst, const char* src);
-void fn_8008D738(char* p, int a, unsigned r, char* out);
+char* fn_8008D738(char* p, int a, unsigned r, char* out);
 struct UdE274_T {
     char pad0[0x384];
     unsigned m384;

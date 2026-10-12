@@ -278,7 +278,10 @@ extern "C" void fn_800DE274(int a0, UdE274_T* x, int a2)
     fn_800DE6A8(a0, b20, b8, a2, x->m384 >> 25, b38);
 }
 
-/* near-miss: retail caches the other output buffer address in a callee-saved register */
+inline void W354b(char* sub, int a, int r, char* out)
+{
+    fn_8008D738(sub, a, r, out);
+}
 void fn_800DE354(int a0, UdE354_T* o, int idx, int b, int fl)
 {
     char* e = o->m14 + idx * 0xE64;
@@ -287,8 +290,8 @@ void fn_800DE354(int a0, UdE354_T* o, int idx, int b, int fl)
     char b8[0x18];
     char b20[0x18];
     char b38[0x20];
-    fn_8008D738(sub, 0, r, b20);
-    fn_8008D738(sub, 1, r, b8);
+    W354b(sub, 0, r, b20);
+    W354b(sub, 1, r, b8);
     int v = fn_8008CFD8(sub, 4, r);
     fn_8040B320(b38, 0, 0x20);
     if (fl & 0x10) {
