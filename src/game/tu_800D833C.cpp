@@ -114,6 +114,59 @@ int fn_800D8820(Unk800D876C_A* t)
     return r;
 }
 
+extern int lbl_8061B88C;
+extern int lbl_8061ADF0;
+extern float lbl_8061ADF4;
+extern float lbl_8061ADF8;
+extern char lbl_805BD4C8[];
+extern const float lbl_805BD4E8;
+void fn_80303BC4(const char* fmt, float a, float b, ...);
+void fn_800D92D8(void* t);
+void fn_800D8B24(void* t);
+
+extern "C" int fn_800D8938(Unk800D876C_A* t)
+{
+    int e = t->m4;
+    int secs;
+    if (e != -1)
+        secs = (lbl_8061A328 - e) / 60;
+    else
+        secs = 0;
+    int f = 0;
+    int h = secs / 3600;
+    int rem = secs - h * 3600;
+    int m = rem / 60;
+    secs = rem - m * 60;
+    if (fn_800B59DC(fn_800B555C()) != 0 || fn_800B5A70(fn_800B555C()) != 0 || fn_800B5B40(fn_800B555C()) != 0)
+        f = 1;
+    int v = 0x3C;
+    if (f != 0)
+        v = 0xA;
+    int q = v / 60;
+    int rr = v % 60;
+    if (lbl_8061B88C != 0)
+        fn_80303BC4(lbl_805BD4C8, lbl_8061ADF4, lbl_8061ADF8, h, m, secs, q, rr);
+    int r;
+    if (t->m0 != -1 || (r = 0, t->m4 != -1)) {
+        if (fn_800D87C4(t) != 0) {
+            lbl_8061ADE4 = 0;
+            lbl_8061ADE8 = 0;
+            if (fn_800D86E8(lbl_805BD4E8) != 0)
+                fn_800D92D8(t);
+            else
+                fn_800D8B24(t);
+            lbl_8061ADF0++;
+            r = 1;
+        } else {
+            int c = fn_800D8820(t);
+            r = 1;
+            if (c == 0)
+                r = 0;
+        }
+    }
+    return r;
+}
+
 void fn_800D92D8(void* t)
 {
     int r = fn_8040ABA0() % 3;
