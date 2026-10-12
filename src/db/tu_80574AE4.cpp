@@ -14,8 +14,6 @@ struct DbSL {
     float m220[1];
 };
 
-extern "C" void fn_8057CCE8(DbSL* self);
-
 /* Base-first indexed word load. */
 inline int IdAt(int* a, int i)
 {
@@ -44,18 +42,6 @@ extern "C" {
 void fn_8055AC44(void* obj, int a);
 int fn_8055AF00(void* obj, int id);
 }
-/* forward declarations (definitions are in address order) */
-extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
-extern "C" int fn_8057C21C(int id);
-extern "C" int fn_8057C270(int id);
-extern "C" int fn_8057C3F8(void* self);
-extern "C" void fn_8057C99C(void* self, int chrg);
-extern "C" void fn_8057C9D0(DbSL* self, int flag);
-extern "C" void fn_8057CA60(DbSL* self, int flag);
-extern "C" void fn_8057CAF8(DbSL* self);
-extern "C" void fn_8057CBA4(DbSL* self);
-extern "C" unsigned fn_8057CC30(DbSL* self, int id);
-extern "C" int fn_8057CCA4(DbSL* self, int id);
 
 extern "C" {
 int fn_80084954__FPv(int a);
@@ -63,11 +49,35 @@ void fn_80578C80(DbHost* self, int a, int b, int c, int d);
 void fn_80574AE4(DbHost* self, int a, int b);
 int fn_8057493C(DbHost* self, int a, int b);
 }
+
+extern char lbl_8064B298[];
+extern char lbl_8064A2A8[];
+extern "C" void fn_805371C4(void* self, unsigned flags);
+
+/* Fixed-capacity id list object (0x82 words embedded at +0x18, vptr at +0x10). */
+struct DbFixList {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+
+inline void GrowTo(DbSL* l, unsigned idx)
+{
+    if (idx >= (unsigned)l->m4)
+        l->m4 = idx + 1;
+}
 /* forward declarations (definitions are in address order) */
+extern "C" int fn_80578974(DbHost* self, int a, int b);
+extern "C" void fn_80578A60(DbHost* self, int a, int b);
+extern "C" void fn_80578AE8(DbHost* self, int a, int b);
 extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
 extern "C" int fn_8057C21C(int id);
 extern "C" int fn_8057C270(int id);
 extern "C" int fn_8057C3F8(void* self);
+extern "C" DbFixList* fn_8057C8F8(DbFixList* self, unsigned flags);
 extern "C" void fn_8057C99C(void* self, int chrg);
 extern "C" void fn_8057C9D0(DbSL* self, int flag);
 extern "C" void fn_8057CA60(DbSL* self, int flag);
@@ -75,24 +85,7 @@ extern "C" void fn_8057CAF8(DbSL* self);
 extern "C" void fn_8057CBA4(DbSL* self);
 extern "C" unsigned fn_8057CC30(DbSL* self, int id);
 extern "C" int fn_8057CCA4(DbSL* self, int id);
-extern "C" void fn_80578A60(DbHost* self, int a, int b);
-extern "C" void fn_80578AE8(DbHost* self, int a, int b);
-extern "C" int fn_80578974(DbHost* self, int a, int b);
-/* forward declarations (definitions are in address order) */
-extern "C" int fn_80578974(DbHost* self, int a, int b);
-extern "C" void fn_80578A60(DbHost* self, int a, int b);
-extern "C" void fn_80578AE8(DbHost* self, int a, int b);
-extern "C" void fn_8057C0B8(int* nA, int* nB, float* ratio, int cur, int mode, int who, int p6, int p7, int s8, int sC, int left);
-extern "C" int fn_8057C21C(int id);
-extern "C" int fn_8057C270(int id);
-extern "C" int fn_8057C3F8(void* self);
-extern "C" void fn_8057C99C(void* self, int chrg);
-extern "C" void fn_8057C9D0(DbSL* self, int flag);
-extern "C" void fn_8057CA60(DbSL* self, int flag);
-extern "C" void fn_8057CAF8(DbSL* self);
-extern "C" void fn_8057CBA4(DbSL* self);
-extern "C" unsigned fn_8057CC30(DbSL* self, int id);
-extern "C" int fn_8057CCA4(DbSL* self, int id);
+extern "C" void fn_8057CCE8(DbSL* self);
 
 extern "C" DB_OVERLAY int fn_80578974(DbHost* self, int a, int b)
 {
@@ -174,6 +167,25 @@ extern "C" DB_OVERLAY int fn_8057C3F8(void* self)
     return b;
 }
 
+extern "C" DB_OVERLAY DbFixList* fn_8057C8F8(DbFixList* self, unsigned flags)
+{
+    int* data = (int*)((char*)self + 0x18);
+    self->m8 = 0x82;
+    self->m0 = data;
+    self->m10 = lbl_8064B298;
+    fn_8040074C(data, 0x208);
+    self->m4 = 0;
+    self->mC = 0;
+    self->m10 = lbl_8064A550;
+    fn_8040074C(self->m0, self->m8 * 4);
+    self->m4 = 0;
+    self->mC = 0;
+    self->m14 = 0;
+    self->m10 = lbl_8064A2A8;
+    fn_805371C4(self, flags | 0x70000000);
+    return self;
+}
+
 extern "C" DB_OVERLAY void fn_8057C99C(void* self, int chrg)
 {
     *(const void**)((char*)self + 0x10) = lbl_8064A550;
@@ -252,4 +264,24 @@ extern "C" DB_OVERLAY int fn_8057CCA4(DbSL* self, int id)
 {
     int d = self->m4 / 6;
     return (int)fn_8057CC30(self, id) / d;
+}
+
+/* near-miss: ~10 slots; same loop nest, retail reloads m4 before the inner loop and keeps the bound in r9 */
+extern "C" DB_OVERLAY void fn_8057CCE8(DbSL* self)
+{
+    for (int i = 0; i < self->m4 - 1; i++) {
+        for (int j = i + 1; j < self->m4; j++) {
+            if (self->m220[j] <= self->m220[i])
+                continue;
+            int idi = IdAt(self->m0, i);
+            float fi = self->m220[i];
+            int idj = IdAt(self->m0, j);
+            GrowTo(self, i);
+            self->m0[i] = idj;
+            self->m220[i] = self->m220[j];
+            GrowTo(self, j);
+            self->m0[j] = idi;
+            self->m220[j] = fi;
+        }
+    }
 }
