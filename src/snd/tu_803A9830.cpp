@@ -30,7 +30,6 @@ extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
 extern "C" int fn_803AA468();
 extern "C" int fn_803AAA3C(int h);
-extern "C" void fn_803AC7F0(void (*fn)());
 extern "C" void fn_803AA2E8();
 extern "C" void fn_803B54A8(int h);
 extern "C" void fn_803B5408(int h);
@@ -246,7 +245,7 @@ extern "C" int fn_803AA95C(int h)
     fn_803AAA3C(h);
     fn_803A98B0(pssc);
     if (fn_803AA468() == 1) {
-        fn_803AC7F0(fn_803AA2E8);
+        iSNDserverremoveclient(fn_803AA2E8);
         lbl_8069CA44 = 0;
     }
     fn_803B54A8(pssc->packetinstancehandle);
