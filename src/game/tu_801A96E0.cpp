@@ -796,19 +796,19 @@ void fn_801AB470(Unk801A96E0_Late* p)
     p->m6C = -1;
 }
 
-/* near-miss: same code; retail loads m74 before storing m68 (2 slots swapped). */
 void fn_801AB49C(Unk801A96E0_Late* p)
 {
-    float lo = lbl_805CEEFC;
-    float k = (float)(unsigned)p->m8->m4C * lbl_805CEF08;
+    float lo = 0.2f;
+    float k = (float)(unsigned)p->m8->m4C * 0.016666668f;
     int s = p->m70;
     int t;
     if (s == 1) {
-        t = p->m74;
+        int w = p->m74;
         p->m68 = s;
+        t = w;
     } else {
         if (p->m68 != p->m78) {
-            if (!(k <= p->m7C + lbl_805CEEFC)) {
+            if (!(k <= p->m7C + 0.2f)) {
                 p->m68 = p->m78;
             }
         }
