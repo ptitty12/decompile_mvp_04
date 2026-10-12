@@ -98,6 +98,65 @@ extern "C" FE_OVERLAY void fn_804490BC(FeMeter* self)
     ((FeObj1*)bar)->v12(0);
 }
 
+extern "C" FE_OVERLAY void fn_80449168(FeMeter* m, int a, int b, void (*cb)(int))
+{
+    int cur;
+    m->m30C = b;
+    m->m308 = cb;
+    m->m2F4 = a;
+    m->m300 = lbl_80619948;
+    m->m2FC = 1;
+    cur = lbl_80619948->m80;
+    m->m2F8 = 0;
+    if (cur != a) {
+        switch (a) {
+        case 0xF:
+            if (cur != 0xE)
+                m->m2F8 = 1;
+            break;
+        case 0x10:
+            if ((unsigned)(cur - 0xE) > 1)
+                m->m2F8 = 1;
+            break;
+        case 0x11:
+            if ((unsigned)(cur - 0xE) > 2)
+                m->m2F8 = 1;
+            break;
+        case 0x12:
+            if (cur == 0x13 || cur == 0xA || cur == 0x14)
+                m->m2F8 = 1;
+            break;
+        case 0x13:
+            if (cur == 0xA || cur == 0x14)
+                m->m2F8 = 1;
+            break;
+        case 0x14:
+            if (cur == 0xA)
+                m->m2F8 = 1;
+            break;
+        case 0xA:
+            if (cur == 0xB)
+                m->m2F8 = 1;
+            break;
+        case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9:
+        case 0xB: case 0xC: case 0xD: case 0xE:
+        case 0x15:
+            m->m2F8 = 1;
+            break;
+        }
+    }
+    if (m->m2F8 != 0 || cur == 0) {
+        m->m2F4 = 0;
+        fn_80449300(m);
+        return;
+    }
+    if (cur == m->m2F4)
+        m->m2F8 = 1;
+    ((FeObj*)m)->v86();
+    fn_80449530(m);
+    fn_800A2F9C(m->m300, 1);
+}
+
 extern "C" FE_OVERLAY void fn_80449300(FeMeter* self)
 {
     ((FeObj*)self)->v87();
