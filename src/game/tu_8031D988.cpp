@@ -59,7 +59,85 @@ extern const void* const lbl_806650F8[];
 struct FxEngine { char pad0[0x3654]; int m3654; };
 extern FxEngine* lbl_8061E978;
 
+inline int At(char* base, int off) { return *(int*)(base + off); }
+
 extern FxF3 lbl_806E20E4;
+struct Unk80178BBC_T;
+struct FxM700 {
+    char pad0[0x3AC];
+    Unk80178BBC_T* m3AC;
+};
+struct FxWld {
+    char pad0[0x700];
+    FxM700* m700;
+};
+int fn_80179058(Unk80178BBC_T* p);
+struct FxSlotP {
+    int m0;
+    int m4;
+};
+struct FxKR {
+    int m0;
+    char pad4[0x1C];
+};
+struct FxObjX {
+    char pad0[0xD8];
+    FxKR k[7];
+    char pad1B8[0xAC0 - 0x1B8];
+    float mAC0;
+};
+struct FxHit {
+    FxObjX* m0;
+    float m4;
+    int m8;
+    int mC;
+    float m10;
+    int m14;
+};
+extern int lbl_806E2184[][20];
+extern FxSlotP lbl_806E2274[];
+extern int lbl_806201B8[];
+extern float lbl_806201D8[1];
+struct FxLst {
+    char pad0[0x58];
+    int m58;
+    int m5C;
+    int m60;
+    int a64[1];
+};
+class FxVT8s {
+public:
+    char pad0[8];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+};
+struct FxP10 {
+    char pad0[0x14];
+    int m14;
+};
+struct FxC744 {
+    char pad0[0x20];
+    int m20;
+};
+struct FxC1C {
+    char pad0[0x744];
+    FxC744* m744;
+};
+struct FxCtxP {
+    char pad0[0x6F4];
+    int m6F4;
+};
+struct Unk802CBD04;
+float fn_802CBD90(Unk802CBD04* p);
+float fn_802D38E8();
+
 extern "C" {
 void fn_8037B7E4(void* self, const char* name);
 void fn_8037B50C(void* self, const char* name, void* field, const char* list, int flags);
@@ -85,7 +163,6 @@ int fn_8014DDAC(void* p);
 void fn_8031E2EC(FxL* self);
 void fn_803E0ACC(void* p, float a, float b, float c, float d, float e, float f);
 void fn_8031E9E4(FxL* self, float* a, float* b, float* c, float* d, float* e);
-float fn_802CBD90(void* p);
 void fn_803E1CDC(void* p, float a, float b, float c);
 void fn_803DF74C(void* p);
 void fn_803E1C44(void* p, void* q);
@@ -96,6 +173,12 @@ void fn_8031E23C(FxL* self);
 void fn_803E1DB0(void* p, float a, float b);
 void fn_80314768(FxCtx* c, void* p);
 void fn_8031E23C(FxL* self);
+float fn_8031E75C(FxL* self);
+void* fn_801A4CE8(void* c, int a);
+void fn_8031E458(FxL* self, float* a, float* b, float* c, float* d);
+int fn_803285A0(int n);
+void fn_803E0DD0(void* p, float a, float b, float c, float d);
+void fn_8031E878(FxL* self);
 // PROTOS-BEGIN
 FxK* fn_8031D988(FxK* self);
 void fn_8031D9FC(FxK* self);
@@ -119,7 +202,7 @@ void fn_8031E23C(FxL* self);
 int fn_8031E2C8(FxL* self);
 void fn_8031E404(FxL* self, float a, float b, float c, float d);
 float fn_8031E6E4(FxL* self);
-float fn_8031E86C();
+float fn_8031E86C(FxL* self);
 void fn_8031E960(FxL* self);
 void fn_8031ED80(FxL* self);
 void fn_8031F04C(FxL* self, int v);
@@ -164,15 +247,13 @@ int fn_8031DB3C(const char* s) { return fn_8037CE98(fn_8037C7FC(), 0xE33E6A08, s
 
 FxK* fn_8031DB7C() { return fn_8031D988((FxK*)operator new(0x20, lbl_806EF9B4)); }
 
-/* near-miss: retail reloads the clamp constants (lis) for every field; ours CSEs them */
 void fn_8031DBAC(FxK* self) {
-    self->m4 = self->m4 > lbl_805EA720 ? lbl_805EA720 : (self->m4 >? lbl_805EA724);
-    self->m8 = self->m8 > lbl_805EA720 ? lbl_805EA720 : (self->m8 >? lbl_805EA724);
-    self->mC = self->mC > lbl_805EA720 ? lbl_805EA720 : (self->mC >? lbl_805EA724);
-    self->m10 = self->m10 > lbl_805EA720 ? lbl_805EA720 : (self->m10 >? lbl_805EA724);
+    self->m4 = !(self->m4 > 1.0f) ? (self->m4 >? 0.0f) : 1.0f;
+    self->m8 = !(self->m8 > 1.0f) ? (self->m8 >? 0.0f) : 1.0f;
+    self->mC = !(self->mC > 1.0f) ? (self->mC >? 0.0f) : 1.0f;
+    self->m10 = !(self->m10 > 1.0f) ? (self->m10 >? 0.0f) : 1.0f;
 }
 
-/* near-miss: clamp of a float parameter: retail compares in f0/f13 the other way round */
 void fn_8031DC94(FxK* self, FxK* other, float* o1, float* o2, float* o3, float* o4, float t) {
     if (other == 0) {
         *o1 = self->m4;
@@ -180,7 +261,7 @@ void fn_8031DC94(FxK* self, FxK* other, float* o1, float* o2, float* o3, float* 
         *o3 = self->mC;
         *o4 = self->m10;
     } else {
-        t = t > lbl_805EA728 ? lbl_805EA728 : (t >? lbl_805EA72C);
+        t = t > 1.0f ? 1.0f : (t >? 0.0f);
         *o1 = self->m4 + (other->m4 - self->m4) * t;
         *o2 = self->m8 + (other->m8 - self->m8) * t;
         *o4 = self->m10 + (other->m10 - self->m10) * t;
@@ -284,12 +365,14 @@ void fn_8031E1D4(FxL* self, const char* a) {
     }
 }
 
-/* near-miss: stack layout: retail has the packed int at sp+8 and the color at sp+16; fmr chain */
+/* near-miss: retail has the packed int at sp+8 and the color at sp+16 (kept in a saved register); literals give the fmr chain */
 void fn_8031E23C(FxL* self) {
-    if (self->m8 == 0) self->m8 = fn_80314740(lbl_8061FEDC);
+    int packed;
     FxColor col;
-    fn_8014D9EC(&col, lbl_805EA75C, lbl_805EA75C, lbl_805EA75C, lbl_805EA760, lbl_805EA760);
-    int packed = fn_8014DDAC(&col);
+    FxCtx* ctx = lbl_8061FEDC;
+    if (self->m8 == 0) self->m8 = fn_80314740(ctx);
+    fn_8014D9EC(&col, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f);
+    packed = fn_8014DDAC(&col);
     fn_803E2208(self->m8, &packed);
     fn_8031E2EC(self);
 }
@@ -303,6 +386,27 @@ int fn_8031E2C8(FxL* self) {
     return 0;
 }
 
+void fn_8031E2EC(FxL* self) {
+    FxCtx* c = lbl_8061FEDC;
+    int a;
+    int b;
+    float v0;
+    float v1;
+    float v2;
+    float v3;
+    if (self->m54 != 3) {
+        int off = self->m54 * 0x28;
+        char* t = (char*)c->m38;
+        a = At(t + 0x2C, off);
+        b = At(t + 0x30, off);
+    } else {
+        a = c->m28 != 0 ? c->m2C : c->m14;
+        b = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+    }
+    fn_8031E458(self, &v0, &v1, &v2, &v3);
+    fn_8031E404(self, v0 * (float)a, v1 * (float)b, (v2 - v0) * (float)a, (v3 - v1) * (float)b);
+}
+
 void fn_8031E404(FxL* self, float a, float b, float c, float d) {
     fn_803E0ACC(self->m8, a, b, c, d, lbl_805EA770, lbl_805EA774);
 }
@@ -314,16 +418,44 @@ float fn_8031E6E4(FxL* self) {
     return a;
 }
 
-float fn_8031E86C() { return lbl_805EA7B0; }
+float fn_8031E75C(FxL* self) {
+    if (((FxP10*)self->m10)->m14 == 0) {
+        FxC1C* c = (FxC1C*)self->m1C;
+        if (c->m744->m20 != 0) return 20.0f;
+        if (((FxVT8s*)fn_801A4CE8(c, 1))->s9() != 0) return 20.0f;
+        if (self->mC != 0) {
+            if (!(fn_802CBD90((Unk802CBD04*)self->mC) >= 28.0f)) {
+                if (((FxVT8s*)fn_801A4CE8(self->m1C, 1))->s9() == 0) {
+                    float t = fn_802CBD90((Unk802CBD04*)self->mC);
+                    return 360.0f / (t * 0.5f) + 30.0f;
+                }
+            }
+        }
+    }
+    return 48.0f;
+}
 
-/* near-miss: retail loads lbl_805EA7C8 before lbl_805EA7CC */
+float fn_8031E86C(FxL* self) { return lbl_805EA7B0; }
+
+void fn_8031E878(FxL* self) {
+    float a = fn_8031E6E4(self);
+    float b = 45.0f;
+    if (self->mC) b = fn_802CBD90((Unk802CBD04*)self->mC);
+    float c = 0.9f;
+    if (((FxCtxP*)self->m1C)->m6F4 == 1) c = 1.0f;
+    b = b * c;
+    b = b * fn_802D38E8();
+    fn_803E0DD0(self->m8, b, a, fn_8031E75C(self), fn_8031E86C(self));
+}
+
+/* near-miss: 2 slots: retail loads the 250000.0f constant before 1.0f */
 void fn_8031E960(FxL* self) {
     fn_8031E6E4(self);
-    float v = lbl_805EA7C0;
-    if (self->mC) v = fn_802CBD90(self->mC);
+    float v = 45.0f;
+    if (self->mC) v = fn_802CBD90((Unk802CBD04*)self->mC);
     FxMat mat;
     FxMat* p = &mat;
-    fn_803E1CDC(self->m8, lbl_805EA7CC, lbl_805EA7C4, lbl_805EA7C8);
+    fn_803E1CDC(self->m8, 1.0f, 48.0f, 250000.0f);
     fn_803DF74C(p);
     fn_803E1C44(self->m8, p);
 }
@@ -381,6 +513,140 @@ int fn_8031F170(FxR* a, FxR* b) {
     if (a->m8 > b->m8) return 1;
     if (a->m10 < b->m10) return -1;
     return a->m10 > b->m10;
+}
+
+void fn_8031F89C(void* unused, int unused1, FxHit* out, int* pcount, FxLst* list, int kind)
+{
+    if (list->m58 == 0)
+        return;
+    int* arr = list->a64;
+    int n = list->m5C;
+    for (int i = list->m60; i < n; i++) {
+        int x = arr[i];
+        FxObjX* o = 0;
+        if (x != 0)
+            o = (FxObjX*)(x - 0xA0);
+        int k;
+        if (kind <= 6) {
+            k = kind;
+            if (kind < 0)
+                k = 0;
+        } else
+            k = 6;
+        int f = *(int*)((char*)(k * 32 + (int)o) + 0xD8);
+        if (f != 0xE) {
+            FxHit* r = &out[*pcount];
+            r->m0 = o;
+            r->m4 = o->mAC0;
+            r->m8 = 3;
+            r->mC = kind;
+            r->m10 = lbl_806201D8[0] + 10000.0f;
+            r->m14 = 1;
+            *pcount = *pcount + 1;
+        }
+    }
+}
+
+void fn_8031F97C(void* unused, int team, FxHit* out, int* pcount, int unused2, int kind)
+{
+    int* row = lbl_806E2184[team];
+    for (int i = 0; i < 1; i++) {
+        int n = row[lbl_806201B8[i]];
+        while (n > 0) {
+            FxSlotP* pr = &lbl_806E2274[n];
+            int next = 0;
+            if (pr->m0 != 0) {
+                FxObjX* o = (FxObjX*)(pr->m0 - 0xA0);
+                int k;
+                if (kind <= 6) {
+                    k = kind;
+                    if (kind < 0)
+                        k = 0;
+                } else
+                    k = 6;
+                int t = 4;
+                int f = *(int*)((char*)(k * 32 + (int)o) + 0xD8);
+                if (f == 0xF)
+                    t = 1;
+                else if (f == 0x10)
+                    t = 2;
+                if (t != 4) {
+                    FxHit* r = &out[*pcount];
+                    r->m0 = o;
+                    r->m4 = o->mAC0;
+                    r->m8 = t;
+                    r->mC = kind;
+                    r->m10 = 0.0f;
+                    r->m14 = 1;
+                    *pcount = *pcount + 1;
+                }
+                next = pr->m4;
+            }
+            n = next;
+        }
+    }
+}
+
+void fn_8031FA84(void* unused, int team, FxHit* out, int* pcount, int unused2, int kind)
+{
+    int* row = lbl_806E2184[team];
+    for (int i = 0; i < 1; i++) {
+        int n = row[lbl_806201B8[i]];
+        while (n > 0) {
+            FxSlotP* pr = &lbl_806E2274[n];
+            int next = 0;
+            if (pr->m0 != 0) {
+                FxObjX* o = (FxObjX*)(pr->m0 - 0xA0);
+                int k;
+                if (kind <= 6) {
+                    k = kind;
+                    if (kind < 0)
+                        k = 0;
+                } else
+                    k = 6;
+                int f = *(int*)((char*)(k * 32 + (int)o) + 0xD8);
+                if (f == 0x11) {
+                    FxHit* r = &out[*pcount];
+                    r->m0 = o;
+                    r->m4 = o->mAC0;
+                    r->m8 = 0;
+                    r->mC = kind;
+                    r->m10 = 0.0f;
+                    r->m14 = 1;
+                    *pcount = *pcount + 1;
+                }
+                next = pr->m4;
+            }
+            n = next;
+        }
+    }
+}
+
+void fn_8031FB80(void* unused, int team, FxHit* out, int* pcount, int unused2, int kind)
+{
+    int target = fn_80179058(((FxWld*)fn_803285A0(team))->m700->m3AC);
+    int* row = lbl_806E2184[team];
+    for (int i = 0; i < 1; i++) {
+        int n = row[lbl_806201B8[i]];
+        while (n > 0) {
+            FxSlotP* pr = &lbl_806E2274[n];
+            int next = 0;
+            if (pr->m0 != 0) {
+                if (target == pr->m0 - 0xA0) {
+                    FxHit* r = &out[*pcount];
+                    r->m0 = (FxObjX*)target;
+                    r->m4 = ((FxObjX*)target)->mAC0;
+                    r->m8 = 0;
+                    r->mC = kind;
+                    r->m10 = 0.0f;
+                    r->m14 = 1;
+                    *pcount = *pcount + 1;
+                }
+                next = pr->m4;
+            }
+            n = next;
+        }
+    }
 }
 
 void fn_80320878(void* unused, FxVT8* o, int arg) {
