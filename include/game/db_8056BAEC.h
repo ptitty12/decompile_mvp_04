@@ -353,8 +353,8 @@ public:
     virtual void v3();
     virtual DbRows* v4(int a);
     virtual int v5(int a);
-    virtual void v6();
-    virtual void v7();
+    virtual void v6(void* list, int id);
+    virtual void v7(int a);
     virtual int v8(int a);
     virtual DbRows* v9(int a);
     virtual int v10(int a);
