@@ -486,6 +486,50 @@ int fn_801AEBB0(void* a, void* q)
     return res;
 }
 
+struct Unk801AF10C_Rng {
+    float a;
+    float b;
+};
+void* fn_801A497C(Unk8019F8C0_Owner* o, int a, int b);
+inline float Unk801AF10C_Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+inline float Unk801AF10C_Roll(Unk8019F8C0_Owner* o, const char* file, int line)
+{
+    float k = 1.0f;
+    unsigned n = fn_8014D8AC(o->m554, 1000000, file, line);
+    return (float)n * k * 1e-6f;
+}
+int fn_801AF10C(Unk801AB63C_P* p)
+{
+    int res = 1;
+    Unk8019F8C0_Owner* o = p->m8;
+    int* arr = o->m65C;
+    void* a = (void*)arr[9];
+    void* b = (void*)arr[10];
+    void* w = fn_801A497C(o, 4, 0);
+    if (w == 0 || a == 0 || b == 0)
+        return 1;
+    float d0 = 0.5f;
+    float d1 = 0.1f;
+    float d2 = 0.5f;
+    float d3 = 1.5f;
+    float d4 = -0.25f;
+    float d5 = 0.25f;
+    int tt = fn_80253678((Unk80253678_S*)((char*)w + 0x480));
+    float x = fn_80254474((Unk8024EF40_W*)((char*)a + 0x588), 0, tt);
+    float y = fn_8025454C((Unk8024EF40_W*)((char*)b + 0x588), 0xD);
+    float l1 = Unk801AF10C_Lerp(0.5f, y, 0.1f);
+    float l2 = Unk801AF10C_Lerp(0.5f, x, 1.5f);
+    float f4 = fn_8024D0C4((Unk80270BA0_X*)a, 0x40, -0.25f, 0.25f);
+    float prod = l1 * l2 + f4;
+    float roll = Unk801AF10C_Roll(p->m8, lbl_805CF058, 0x1F5);
+    if (!(roll >= prod))
+        res = 4;
+    return res;
+}
+
 void fn_801B032C() {}
 
 void fn_801B0330() {}
