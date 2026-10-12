@@ -298,6 +298,70 @@ extern "C" void fn_801D043C(void* p);
 extern "C" void fn_801C2284(Z* z);
 extern "C" void fn_801D7AC4(void* p, P* q);
 
+inline Vec3 Scale(const Vec3* v, float s)
+{
+    Vec3 r;
+    r.x = v->x * s;
+    r.y = v->y * s;
+    r.z = v->z * s;
+    return r;
+}
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+inline Vec3 VNormalize(const Vec3& v, float len)
+{
+    Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+inline float LengthR(const Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+extern const Vec3 lbl_806055AC;
+inline Vec3 VUnit(const Vec3& v)
+{
+    float len = LengthR(v);
+    if (len != 0.0f) {
+        return VNormalize(v, len);
+    }
+    return lbl_806055AC;
+}
+extern "C" Vec3 fn_801C36EC(Z* z);
+struct Unk801C16B0_ZW {
+    char pad0[0x298];
+    int m298;
+};
+
+extern "C" void fn_801C2284(Z* z)
+{
+    Vec3 p = fn_801C36EC(z);
+    Vec3 dir = VUnit(Scale(&p, -1.0f));
+    z->m29C[0].a = p - Scale(&dir, 3.0f);
+    z->m29C[1].a = p;
+    z->m29C[2].a = p + Scale(&dir, 3.0f);
+    for (int i = 0; i < 3; i++)
+        z->m29C[i].b = z->m29C[i].a;
+    ((Unk801C16B0_ZW*)z)->m298 = 0;
+}
+
 extern "C" void fn_801C2544(Z* z)
 {
     fn_801C2284(z);
