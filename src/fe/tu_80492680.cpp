@@ -11,6 +11,31 @@ extern const char lbl_805F7060[];
 extern "C" int sprintf(char*, const char*, ...);
 extern "C" int fn_80097210(void* team, int a);
 extern "C" void fn_80529150(void);
+extern const char lbl_805F6AAC[];
+extern const char lbl_805F6AB0[];
+extern const char lbl_805F6AB4[];
+extern const char lbl_805F6B2C[];
+extern const char lbl_805F6B48[];
+extern const char lbl_805F6B60[];
+extern const char lbl_805F6B84[];
+extern const char lbl_805F6BA4[];
+extern const char lbl_805F7090[];
+struct Fe4F94A {
+    int m0;
+    unsigned char m4;
+    int m8;
+};
+struct Fe4F94B {
+    int a;
+    int b;
+};
+struct Fe4F94 {
+    char pad0[0x338];
+    Fe4F94A e[4];
+    char pad368[0x368 - 0x338 - 48];
+    Fe4F94B p[4];
+};
+extern "C" void fn_80496EE4(void* x, int a, int b, int c, int d, void* w, int e, int f, int g);
 extern "C" {
 
 FE_OVERLAY void fn_804933A0(void* x)
@@ -30,6 +55,63 @@ FE_OVERLAY void fn_804933D4(void* x, int a)
     fn_80492BA8(x, out);
 }
 
+FE_OVERLAY void fn_80493448(void* x, int a, int u, int b)
+{
+    char n[200];
+    char fmt[0x68];
+    char out[400];
+    char suf[24];
+    switch (b % 10) {
+    case 1:
+        fn_804031BC(suf, lbl_805F6AAC);
+        break;
+    case 2:
+        fn_804031BC(suf, lbl_805F6AB0);
+        break;
+    case 3:
+        fn_804031BC(suf, lbl_805F6AB4);
+        break;
+    }
+    fn_804031BC(fmt, lbl_805F6B2C);
+    fn_800DE440(n, a, 1);
+    ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, n, b, suf);
+    fn_80492BA8(x, out);
+}
+
+FE_OVERLAY void fn_80493544(void* x, int a, int b)
+{
+    char n[200];
+    char fmt[0x68];
+    char out[400];
+    char suf[24];
+    fn_800DE440(n, a, 1);
+    switch (b % 10) {
+    case 2: {
+        char* sp = suf;
+        fn_804031BC(sp, lbl_805F6AB0);
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6B48);
+        fn_80403DE4(out, fp, n, b, sp);
+        break;
+    }
+    case 3: {
+        char* sp = suf;
+        fn_804031BC(sp, lbl_805F6AB4);
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6B48);
+        fn_80403DE4(out, fp, n, b, sp);
+        break;
+    }
+    case 4: {
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6B60);
+        fn_80403DE4(out, fp, n);
+        break;
+    }
+    }
+    fn_80492BA8(x, out);
+}
+
 FE_OVERLAY void fn_8049364C(void* x, int a)
 {
     char n[200];
@@ -38,6 +120,40 @@ FE_OVERLAY void fn_8049364C(void* x, int a)
     fn_804031BC(fmt, lbl_805F6B74);
     fn_800DE440(n, a, 1);
     fn_80403DE4(out, fmt, n);
+    fn_80492BA8(x, out);
+}
+
+FE_OVERLAY void fn_804936C0(void* x, int a, int b)
+{
+    char n[200];
+    char fmt[0x68];
+    char out[400];
+    char suf[24];
+    fn_800DE440(n, a, 1);
+    switch (b % 10) {
+    case 2: {
+        char* sp = suf;
+        fn_804031BC(sp, lbl_805F6AB0);
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6B84);
+        fn_80403DE4(out, fp, n, b, sp);
+        break;
+    }
+    case 3: {
+        char* sp = suf;
+        fn_804031BC(sp, lbl_805F6AB4);
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6B84);
+        fn_80403DE4(out, fp, n, b, sp);
+        break;
+    }
+    case 4: {
+        char* fp = fmt;
+        fn_804031BC(fp, lbl_805F6BA4);
+        fn_80403DE4(out, fp, n);
+        break;
+    }
+    }
     fn_80492BA8(x, out);
 }
 
@@ -52,6 +168,22 @@ FE_OVERLAY void fn_804937C8(void* x, int a, int b)
     fn_804031BC(fmt, lbl_805F6BC4);
     ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, n2, n1);
     fn_80492BA8(x, out);
+}
+
+//// a
+FE_OVERLAY void fn_80494F94(Fe4F94* x)
+{
+    for (int i = 0; i < 4; i++) {
+        if (x->e[i].m0 != 0) {
+            char buf[0x68];
+            sprintf(buf, lbl_805F7090, i);
+            FeW* w = fn_800C8044(FeMem(x, 0x1EC)->fn_vslot32(buf, 1));
+            fn_80496EE4(x, x->p[i].a, x->p[i].b, x->p[i].a, x->p[i].b, w, 1, 1, -1);
+        }
+        x->e[i].m0 = 0;
+        x->e[i].m4 = 0xFF;
+        x->e[i].m8 = 0;
+    }
 }
 
 FE_OVERLAY void fn_8049535C(void* x)
