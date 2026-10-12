@@ -840,12 +840,17 @@ inline float Clamp01(float r)
     return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
 }
 
-/* near-miss (2 slots): retail loads m24 before m20 for the m20 / m24 division (lfs f13,36; lfs f0,32); ours loads m20 first. Only the load order differs; many spellings tried */
+/* reading the divisor through an inline puts the m24 load before the m20 load, as in retail */
+inline float Dur(UnkFE20* s)
+{
+    return s->m24;
+}
+
 extern "C" void fn_800ACB30(UnkFE20* self)
 {
     self->m20 = self->m20 + 0.016666668f;
     Ratio(self->m1C, self->m24, self->m20);
-    float t = 1.0f - Clamp01(self->m20 / self->m24);
+    float t = 1.0f - Clamp01(self->m20 / Dur(self));
     fn_800AD948(self->m1C, 1, t);
     if (!(self->m20 <= self->m24)) {
         fn_8033E5C4(self->m1C, 3);
@@ -861,10 +866,9 @@ extern "C" void fn_800ACC44()
 {
 }
 
-/* near-miss (2 slots): same m24-before-m20 load order as fn_800ACB30 */
 extern "C" void fn_800ACC48(UnkFE20* self)
 {
-    float t = 1.0f - Clamp01(self->m20 / self->m24);
+    float t = 1.0f - Clamp01(self->m20 / Dur(self));
     self->m20 = self->m20 + 0.016666668f;
     Ratio(self->m1C, self->m24, self->m20);
     fn_800AD838(self->m1C, t);
