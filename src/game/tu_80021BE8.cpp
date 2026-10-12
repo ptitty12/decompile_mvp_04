@@ -398,6 +398,73 @@ end2:
     return r;
 }
 
+extern float lbl_805A6018;
+extern Unk801A4B34_Vec3 lbl_805A600C;
+
+inline float Unk80022F88_M18(const Unk8002118C* m) { return m->m18; }
+extern "C" int fn_80022F88(Unk80021A60_Data* x, int a, Unk801A4B34_Vec3* pos, int mode, int kind, float f,
+                           Unk8001F2C4_World* w)
+{
+    int fl = 0;
+    if (!(pos->x < 0.0f))
+        fl = pos->z >= 0.0f;
+    float ang = fn_80410CE8(pos->x, pos->z) * 57.295773f;
+    float len = Unk80022BE0_Len(Unk80022BE0_Sub(lbl_80686DA8, *pos));
+    Unk801A4B34_Pos* c = w->m6CC;
+    float p3 = fn_8018CDB8(c, 3, 0.0f);
+    float pA = fn_8018CDB8(c, 0xA, 0.0f);
+    float pB = fn_8018CDB8(c, 0xB, 0.0f);
+    Unk801A4B34_Vec3 e = lbl_805A600C;
+    if (kind == 3) {
+        if (!(p3 <= 0.0f) && p3 < pB) {
+            Unk801A4B34_Vec3 t;
+            fn_8018959C(&t, c, p3 - c->m3F4);
+            e = t;
+        } else if (!(pA <= lbl_805A6018) && !(pA >= pB)) {
+            Unk801A4B34_Vec3 t;
+            fn_8018959C(&t, c, pA - c->m3F4);
+            e = t;
+        }
+    }
+    switch (mode) {
+    case 0:
+        if (fl == 1) {
+            if (!(pos->x > x->m8C->m14) && !(ang > Unk80022F88_M18(x->m8C)))
+                return 2;
+            int r = 3;
+            if (!(len <= x->m8C->m20) && !(ang < x->mAC))
+                r = 4;
+            return r;
+        }
+        return a == 0;
+    case 1:
+        return 5;
+    case 2:
+        if (fl == 1) {
+            if (!(pos->z > x->m8C->m14) && !(ang < 90.0f - x->m8C->m18))
+                return 8;
+            int r = 7;
+            if (!(len <= x->m8C->m20) && !(ang > x->mB0))
+                r = 6;
+            return r;
+        }
+        {
+            int r = 9;
+            if (a != 0)
+                r = 0xA;
+            return r;
+        }
+    case 3: {
+        int r = 0xB;
+        if (a != 0)
+            r = 0xC;
+        return r;
+    }
+    default:
+        return -1;
+    }
+}
+
 int Unk80021A60::fn_800232A0(int kind, int v)
 {
     int r = 1;
