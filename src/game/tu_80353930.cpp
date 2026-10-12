@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8034B370.h"
+#include "game/tu_803606B0.h"
 
 extern char lbl_8064A208[];
 struct DtorAt7E0 { char pad[0x7e0]; const void* m; };
@@ -134,6 +135,39 @@ void fn_80353C60(Unk80087A58_O* o, int a)
         o->mF5C[o->m8].b10.b = a;
 }
 
+struct Unk80353CB4_B { char pad0[0x1CD0]; int m1CD0; };
+struct Unk80353CB4_A { char pad0[0x14]; Unk80353CB4_B* m14; };
+struct Unk80087A58_V2 { float x; float y; };
+extern float lbl_805B6288;
+void fn_80087F7C(Unk80087A58_H* h, int v);
+int fn_80088FFC(Unk80087A58_O* o, int i);
+Unk80087A58_Pair* fn_8008903C(Unk80087A58_Pair* out, Unk80087A58_O* o, int i);
+void fn_800896AC(char* base, int a, int b, int c, Unk80087A58_V2* v);
+inline Unk80087A58_V2 MakeV2(float x, float y)
+{
+    Unk80087A58_V2 r;
+    r.x = x;
+    r.y = y;
+    return r;
+}
+void fn_80353CB4(Unk80087A58_O* o, int a)
+{
+    if (fn_80087B14() != 0) {
+        fn_80087F7C(&o->mF60, a);
+        int r28 = 0;
+        int z = ((Unk80353CB4_A*)o->m0)->m14->m1CD0 == 0;
+        Unk80087A58_V2 p = MakeV2(lbl_805B6288, lbl_805B6288);
+        if (o->m4 != 0) {
+            r28 = fn_80088FFC(o, -1);
+            Unk80087A58_Pair t;
+            /* every caller of fn_8008903C sets cr1 for varargs (crclr), so call it as variadic */
+            ((Unk80087A58_Pair* (*)(Unk80087A58_Pair*, Unk80087A58_O*, ...))fn_8008903C)(&t, o, -1);
+            p = *(Unk80087A58_V2*)&t;
+        }
+        ((void (*)(char*, int, int, int, Unk80087A58_V2))fn_800896AC)(o->padC, z, r28, a, p);
+    }
+}
+
 int fn_80353D90(Unk80353E68* s)
 {
     return s->m4 - 1;
@@ -245,6 +279,43 @@ int fn_80353FB4(Unk80353E68* s, int v)
             return i;
     }
     return -1;
+}
+
+void fn_80353FF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
+{
+    int tmp;
+    unsigned cnt;
+    unsigned cur;
+    if (st->v2() == 1) {
+        unsigned i = 0;
+        fn_8040B190(*cursor, &self->m4, 4);
+        *cursor += 4;
+        fn_8040B190(*cursor, &self->mC, 4);
+        *cursor += 4;
+        for (; i < self->m4; i++) {
+            int o = i * 4;
+            tmp = *(int*)((char*)self->m0 + o);
+            st->v1(cursor, &tmp, 4);
+        }
+    } else {
+        unsigned j;
+        fn_8040B190(&cnt, *cursor, 4);
+        *cursor += 4;
+        fn_8040B190(&cur, *cursor, 4);
+        *cursor += 4;
+        if (st->m0 == 0) {
+            self->m4 = cnt;
+            self->mC = cur;
+            self->Clear();
+        }
+        for (j = 0; j < cnt; j++) {
+            st->v1(cursor, &tmp, 4);
+            if (st->m0 == 0)
+                self->Add(tmp);
+        }
+        if (st->m0 == 0)
+            self->mC = cur;
+    }
 }
 
 Unk803541D4_E fn_803541D4(Unk803541D4* s)

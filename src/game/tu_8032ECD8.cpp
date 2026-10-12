@@ -90,6 +90,37 @@ public:
 
 struct FxViewB { int pad[3]; int mC; int m10; char pad14[0x60]; FxWid3* m74; };
 
+class FxElemV { public: virtual void s1(int); };
+class FxListE : public FxListD {
+public:
+    FxElemV* m64[2];
+    unsigned m6C;
+};
+class FxItemV {
+public:
+    char pad0[8];
+    virtual ~FxItemV();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+};
+struct FxStackH {
+    FxItemV* a0[93];
+    int m174;
+    int m178;
+};
+struct Unk802CBD04;
+struct FxBlk48 { FxBlk44 b; float m44; };
+float fn_802CBD90(Unk802CBD04* o);
+struct FxSaved { int v; ~FxSaved() {} };
+extern const char lbl_805EDA10[];
+extern const char lbl_805EDA14[];
+extern const char lbl_805EDA18[];
+extern const char lbl_805EDA1C[];
+extern const char lbl_805EDA24[];
+extern const char lbl_805EDA30[];
+extern const float lbl_805EDA38;
+extern const float lbl_805EDA3C;
 extern "C" {
 float fn_80313F28(FxCtx* c, const void* s);
 void fn_803144A0(FxCtx* c, const char* s, float x, float y, int a, int b);
@@ -157,6 +188,17 @@ void fn_803318CC();
 void fn_80331918();
 void fn_80331A30();
 void fn_80331B48();
+void fn_8032FCC0(FxListE* self);
+int fn_8032F2E0(FxListD* self, int k);
+int fn_80330384(FxCmd* self, int k);
+void fn_80330BC8(FxStackH* self, int d);
+void fn_803315E8();
+void fn_803316DC();
+void fn_803317D4();
+int fn_8032F71C(FxListD* self, int k);
+void fn_8032F8A4(FxListD* self);
+void fn_8032D8F8(void* self, float w);
+char* fn_8040B830(char* dst, const char* src, int n);
 // PROTOS-END
 }
 
@@ -213,6 +255,29 @@ void fn_8032F22C(FxListD* self) {
     float w = lbl_805ED9F8 - fn_80313F28(lbl_8061FEDC, buf);
     fn_8032D8D0(self);
     fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
+int fn_8032F2E0(FxListD* self, int k) {
+    int r = fn_8032D8C8();
+    if (r == 0) {
+        int* p = self->m48;
+        int v = p ? *p : self->m4C;
+        switch (k) {
+        case 3:
+        case 4:
+            v ^= 1;
+            if (self->m48) *self->m48 = v;
+            else self->m4C = v;
+            return 1;
+        case 7:
+            v = self->m50;
+            if (self->m48) *self->m48 = v;
+            else self->m4C = v;
+            return r;
+        }
+        r = 0;
+    }
+    return r;
 }
 
 FxListD* fn_8032F38C(FxListD* self, int a, int b, int c, int d, int e) {
@@ -290,6 +355,87 @@ int fn_8032F684(FxListD* self, int a, int b) {
     return !fn_8040B750(((char**)self->m50)[a], ((char**)self->m50)[b], n);
 }
 
+int fn_8032F71C(FxListD* self, int k) {
+    int r = fn_8032D8C8();
+    int cur = self->m4C;
+    if (r == 0) {
+        r = 1;
+        switch (k) {
+        case 3:
+            if (cur > 0) {
+                int n = cur - 1;
+                if (fn_8032F684(self, cur, n) != 0) cur = n;
+            }
+            break;
+        case 4:
+            if (cur < self->m54 - 1) {
+                int n = cur + 1;
+                if (fn_8032F684(self, cur, n) != 0) cur = n;
+            }
+            break;
+        case 6:
+            cur = fn_8032F620(self, cur);
+            break;
+        case 9:
+            cur = fn_8032F620(self, cur);
+            if (cur < self->m54 - 1) cur++;
+            break;
+        case 8:
+            cur = fn_8032F5C4(self, cur);
+            if (cur > 0) cur--;
+        case 5:
+            cur = fn_8032F5C4(self, cur);
+            break;
+        case 13:
+            if (self->m58 > 0) self->m58 = self->m58 - 1;
+            break;
+        case 14:
+            self->m58 = self->m58 + 1;
+            break;
+        case 7:
+            cur = self->m5C;
+            break;
+        default:
+            r = 0;
+        }
+        fn_8032F574(self, cur);
+    }
+    return r;
+}
+
+void fn_8032F8A4(FxListD* self) {
+    char buf[0x40];
+    char a[0x38];
+    char b[0x38];
+    int cur = self->m4C;
+    const char* post = lbl_805EDA10;
+    const char* pre = post;
+    if (cur > 0) pre = lbl_805EDA14;
+    if (cur < self->m54 - 1) post = lbl_805EDA18;
+    int names = self->m50;
+    if (names) {
+        char* s = *(char**)(names + cur * 4);
+        if (self->m58 > 0) {
+            int rest = fn_8040B6A0(s) - self->m58;
+            if (rest < 0) {
+                fn_804089B4(buf, lbl_805EDA1C, pre, s, post);
+            } else {
+                fn_8040B830(a, s, self->m58);
+                a[self->m58] = 0;
+                fn_8040B830(b, s + self->m58, rest);
+                b[rest] = 0;
+                fn_804089B4(buf, lbl_805EDA24, pre, a, b, post);
+            }
+        } else {
+            fn_804089B4(buf, lbl_805EDA30, pre, s, post);
+        }
+    }
+    float w = lbl_805EDA38 - fn_80313F28(lbl_8061FEDC, buf);
+    if (!(w >= lbl_805EDA3C)) w = lbl_805EDA3C;
+    fn_8032D8F8(self, w);
+    fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
 FxListD* fn_8032FA3C(FxListD* self, int a, int b, int c, int* p, int d, int n) {
     fn_8032F38C(self, a, b, c, d, 0);
     self->m60 = p;
@@ -333,6 +479,14 @@ void fn_8032FC0C(int a, char** names, int n) {
     fn_8035F8CC(idx, a, n);
     fn_8035F95C(idx, names, n);
     if (idx) fn_80377488(idx);
+}
+
+void fn_8032FCC0(FxListE* self) {
+    unsigned i = 0;
+    fn_8032FB24(self);
+    for (; i < self->m6C; i++) {
+        self->m64[i]->s1(self->s9());
+    }
 }
 
 /* near-miss: body matches but the register pair is swapped (retail self=r31, embedded pointer=r30); tried keeping the pointer lazy, member access (turns the calls static), and bound/operand order */
@@ -380,6 +534,29 @@ FxRingW* fn_803302D4(FxRingW* self, int a, int b) {
     return self;
 }
 
+int fn_80330384(FxCmd* self, int k) {
+    int r = ((int (*)(FxCmd*, int))fn_8032D8C8)(self, k);
+    if (r == 0) {
+        r = 1;
+        switch (k) {
+        case 3:
+            if (((FxEmb*)((char*)self + 0x48))->s4())
+                ((FxEmb*)((char*)self + 0x48))->s2();
+            else
+                ((FxEmb*)((char*)self + 0x48))->s7();
+            break;
+        case 4:
+            ((FxEmb*)((char*)self + 0x48))->s6();
+            break;
+        case 7:
+            break;
+        default:
+            r = 0;
+        }
+    }
+    return r;
+}
+
 void fn_80330778(FxStackG* self, int a) {
     int i;
     *(const void**)((char*)self + 0x2DC) = lbl_806669C8;
@@ -422,6 +599,22 @@ void fn_80330B48(FxModal* self) {
     if (cur != 0 && lbl_80620414 != 0) cur->s3();
     lbl_80620410 = self;
     self->s2();
+}
+
+void fn_80330BC8(FxStackH* self, int d) {
+    int lo = 1, hi = 2;
+    if (d <= hi && d >= lo) {
+        int old = self->m174;
+        if (d == 1) self->m174 = old - 1;
+        else self->m174 = old + 1;
+        int v = self->m174;
+        if (v < 0) self->m174 = 0;
+        else if (v >= self->m178) self->m174 = self->m178 - 1;
+        self->a0[old]->s3();
+        self->a0[self->m174]->s2();
+    } else {
+        self->a0[self->m174]->s4();
+    }
 }
 
 void fn_80331234(FxModal* self) {
@@ -499,6 +692,48 @@ void fn_80331568() {
     fn_801A4CE8(v, 1)->m10 = 0;
     fn_801A4CE8(v, 1)->mC = t;
     fn_80331508();
+}
+
+void fn_803315E8() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w) {
+        FxBlk44* b = w->mA0;
+        FxSaved s;
+        s.v = lbl_80691B14.m0;
+        lbl_80691B14 = *b;
+        lbl_80691B14.m0 = s.v;
+        ((FxBlk48*)&lbl_80691B14)->m44 = fn_802CBD90((Unk802CBD04*)w);
+        lbl_806204F4 = 1;
+        lbl_80620500 = 1;
+    }
+}
+
+void fn_803316DC() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w) {
+        FxBlk44* b = w->mA0;
+        FxSaved s;
+        s.v = lbl_80691B5C.m0;
+        lbl_80691B5C = *b;
+        lbl_80691B5C.m0 = s.v;
+        ((FxBlk48*)&lbl_80691B5C)->m44 = fn_802CBD90((Unk802CBD04*)w);
+        lbl_806204F8 = 1;
+        lbl_80620500 = 2;
+    }
+}
+
+void fn_803317D4() {
+    FxWid3* w = fn_801A4CE8(lbl_8061B8C0->m8, 1)->m74;
+    if (w) {
+        FxBlk44* b = w->mA0;
+        FxSaved s;
+        s.v = lbl_80691BA4.m0;
+        lbl_80691BA4 = *b;
+        lbl_80691BA4.m0 = s.v;
+        ((FxBlk48*)&lbl_80691BA4)->m44 = fn_802CBD90((Unk802CBD04*)w);
+        lbl_806204FC = 1;
+        lbl_80620500 = 3;
+    }
 }
 
 void fn_803318CC() {
