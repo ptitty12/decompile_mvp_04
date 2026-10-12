@@ -569,6 +569,55 @@ extern "C" int fn_801D112C(Y* y)
 
 extern "C" int fn_801D1198(Y* y) { return fn_8022F138(((Unk801C16B0_M4*)y->m34)->m3B0) != 0; }
 
+extern Unk801CF054_F4 lbl_805D26F4;
+extern Unk801CF054_F4 lbl_805D2704;
+
+/* near-miss (95.4%): only the schedule of the two 16-byte table copies differs (retail forms both lis @ha first, then
+ * the sp8 destination address); the gotos reproduce the shared return-1 and return-0 blocks. */
+extern "C" int fn_801D11D0(Y* y)
+{
+    int a = 0;
+    unsigned char b27 = y->m30->m6F8->m14->m1CCA;
+    unsigned char b26 = y->m30->m6F8->m14->m1CCB;
+    Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
+    if (!(AbsF(v.x) >= 1.0f))
+        a = AbsF(v.y) < 1.0f;
+    int c = 0;
+    if (!(AbsF(v.x) >= 1.1f))
+        c = AbsF(v.y) < 1.1f;
+    int d = 0;
+    if (!(AbsF(v.x) >= 0.6f))
+        d = AbsF(v.y) < 0.6f;
+    Unk801CF054_F4 t1;
+    Unk801CF054_F4 t2;
+    int i;
+    float u;
+    float w;
+    if ((b27 == 2 && a != 0) || d != 0)
+        goto ret1;
+    t1 = lbl_805D26F4;
+    t2 = lbl_805D2704;
+    i = fn_801D0BB0(y);
+    u = t1.v[i];
+    w = t2.v[i];
+    if (b26 == 3 && b27 == 0) {
+        u *= 0.5f;
+        w *= 0.5f;
+    }
+    if (a != 0) {
+        if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x23D) >= u)
+            goto ret0;
+    ret1:
+        return 1;
+    }
+    if (c == 0)
+        goto ret0;
+    if (RandF4(y->m30, 1.0f, lbl_805D25E0, 0x244) < w)
+        return 1;
+ret0:
+    return 0;
+}
+
 /* near-miss: same code; the frame slots differ (retail: lim 8, abs 0x10, f 0x18, by-value temp 0x20, b 0x28). */
 extern "C" int fn_801D14A0(Y* y)
 {
