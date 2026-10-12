@@ -108,7 +108,11 @@ struct Unk801EE438_Rec14 {         /* stride 0x14, G+0x62C (4 entries) */
 };
 
 struct Unk801EE438_Rec5C {         /* stride 0x5C, G+0x6B8 (10 entries) */
-    char pad0[0x50];
+    int m0;
+    char pad4[4];
+    Unk801EE438_Vec m8;
+    float m14;
+    char pad18[0x50 - 0x18];
     float m50;
     char pad54[0x5C - 0x54];
 };

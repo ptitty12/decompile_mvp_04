@@ -54,6 +54,44 @@ struct Unk8020DF6C_Buf {
     int m4;
 };
 
+extern "C" float fn_804028E4(float x);
+extern const float lbl_805D59FC;
+extern const float lbl_805D5A00;
+extern const float lbl_805D5A04;
+extern const Unk801EE438_Vec lbl_806055AC;
+inline Unk801EE438_Vec Sub8DD9C(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+inline float Len8DD9C(const Unk801EE438_Vec& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+inline Unk801EE438_Vec Scale8DD9C(const Unk801EE438_Vec& v, float len)
+{
+    Unk801EE438_Vec r;
+    float s = lbl_805D5A00 / len;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec Norm8DD9C(const Unk801EE438_Vec& v)
+{
+    float len = Len8DD9C(v);
+    if (len != lbl_805D59FC) {
+        return Scale8DD9C(v, len);
+    }
+    return lbl_806055AC;
+}
+inline float Dot8DD9C(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    return a.m0 * b.m0 + a.m4 * b.m4 + a.m8 * b.m8;
+}
 extern "C" {
 void fn_80377488(void* p);
 int fn_8020B944(Scr* p);
@@ -295,6 +333,20 @@ extern "C" int fn_8020CFA8(Scr*, Unk801EE438_Vec* a)
 {
     Unk801EE438_Vec d = VecSub(*a, lbl_805D6790);
     return d.m0 * d.m0 + d.m8 * d.m8 < lbl_805D59AC;
+}
+
+extern "C" int fn_8020DD9C(void* self, Unk801EE438_Vec* a, Unk801EE438_Vec* n, Unk801EE438_Vec* b, float* outLen, float* outDot)
+{
+    Unk801EE438_Vec d = Sub8DD9C(*b, *a);
+    d.m4 = lbl_805D59FC;
+    if (outLen)
+        *outLen = Len8DD9C(d);
+    d = Norm8DD9C(d);
+    float dot = Dot8DD9C(*n, d);
+    if (outDot)
+        *outDot = dot;
+    float thr = lbl_805D5A04;
+    return dot > lbl_805D5A04;
 }
 
 extern "C" void fn_8020DF6C(Unk8020DF6C_Buf* b)

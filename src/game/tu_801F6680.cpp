@@ -28,6 +28,39 @@ struct Unk801F6680_Cmd {
 
 extern const float lbl_805D4F98;
 
+extern "C" float fn_804028E4(float x);
+struct Unk805D4F74_F {
+    float v;
+};
+extern Unk805D4F74_F lbl_805D4F74;
+struct Unk801F8530_List {
+    int count;
+    Unk801EE438_Ent18 e[9];
+};
+inline Unk801EE438_Vec VecSub8530(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+inline float Len8530(const Unk801EE438_Vec& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+inline Unk801EE438_Player* PlayerAt8530(Unk801EE438_Player** a, int i)
+{
+    char* b = (char*)a;
+    int off = i * 4;
+    return *(Unk801EE438_Player**)(b + off);
+}
+inline void InitEnt8530(Unk801EE438_Ent18* e)
+{
+    e->m0 = -1;
+    e->m4 = 0;
+    e->m10 = e->mC = e->m8 = lbl_805D4F74.v;
+}
 extern "C" {
 void fn_801F8E50(Menu* m);
 void fn_801F91AC(Menu* m);
@@ -262,6 +295,37 @@ extern "C" void fn_801F83F0(Menu* m, int idx)
     float t = s;
     if (!(len >= s))
         fn_801F803C(m, idx);
+}
+
+extern "C" void fn_801F8530(Menu* m, int idx)
+{
+    Unk801EE438_G* g = m->m0;
+    Unk801EE438_Player* pl = PlayerAt8530(g->m8, idx);
+    Unk801EE438_Rec5C* rec = &g->m6B8[idx];
+    if (rec->m0 == 1) {
+        Unk801F8530_List* q = (Unk801F8530_List*)&g->m1D8;
+        if (q->count > 8) {
+            for (int i = 0; i < q->count; i++) {
+            }
+            int j = 0;
+            if (j < q->count) {
+                Unk801EE438_Ent18* e = q->e;
+                do {
+                    j++;
+                    e->m14 = &lbl_806609D0;
+                    e++;
+                } while (j < q->count);
+            }
+            q->count = 0;
+        }
+        InitEnt8530(&q->e[q->count]);
+        Unk801EE438_Ent18* f = &q->e[q->count++];
+        f->m0 = idx;
+        f->m4 = 1;
+        f->m8 = rec->m14;
+        Unk801EE438_Vec d = VecSub8530(*(Unk801EE438_Vec*)&pl->m60, rec->m8);
+        f->m10 = Len8530(d);
+    }
 }
 
 extern "C" void fn_801F8D34(Menu* m)

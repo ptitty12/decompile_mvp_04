@@ -27,6 +27,41 @@ inline Unk801EE438_Sub2B4* Sub2B4Of(Scr* p)
 
 extern float lbl_805D5840;
 
+extern "C" void fn_8020D5D4(void* p);
+extern "C" int fn_802054E0(Unk801EE438_G* g, float f);
+extern const float lbl_805D57D4;
+extern const float lbl_805D57D8;
+extern const float lbl_805D57DC;
+
+struct Unk80208B90_Rec {
+    char pad0[0xC];
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+
+extern "C" void fn_80208B90(Scr* p, int a, int b, int c, Unk80208B90_Rec* r)
+{
+    r->m20 = 0;
+    fn_8020D5D4((char*)p->m0 + 0x2C);
+    if (r->m14 != 0) {
+        r->m20 = fn_802054E0(p->m0, r->mC);
+        if (r->m20 == 0) {
+            r->m1C = 0;
+            float t = r->mC - lbl_805D57D4;
+            t = t >? lbl_805D57D8;
+            if (fn_802054E0(p->m0, t) != 0)
+                r->m1C = 1;
+        }
+    }
+    r->m18 = 0;
+    if (!(r->m10 >= lbl_805D57D8 || r->m10 <= lbl_805D57DC))
+        r->m18 = 1;
+}
+
 extern "C" void fn_802099F8(Scr* p, int a)
 {
     Unk801EE438_G* g = p->m0;
