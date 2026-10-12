@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_801DB948.h"
+#include "game/clampiter.h"
 
 typedef Unk801DD660 I;
 typedef Unk801DB948_Vec3 Vec3;
@@ -50,7 +51,7 @@ extern "C" {
 int fn_802055F4(Unk801DD660_Ctx* c);
 int fn_801E923C(I* i, int v);
 int fn_801E9280(I* i, int v);
-void fn_801E8328(I* i, int b, float f);
+int fn_801E8328(I* i, Vec3* out, float f);
 void fn_801E8640(Unk801E6D88_F160* s, float v);
 int fn_801A2034(Unk801DB948_Game* g, int a);
 int fn_801A700C(Unk801DB948_Game* g, int a, int b);
@@ -67,6 +68,10 @@ void fn_80253950(void* o, void* a);
 void fn_80253A30(void* o, void* a, void* b);
 void fn_801F5FD4(I* s, void* a);
 }
+
+struct Unk8019F8C0_Owner;
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+float fn_802D7E2C(int a, int b);
 
 struct Unk801EA03C_A {
     char pad0[0x5B8];
@@ -253,14 +258,46 @@ extern "C" int fn_801E82DC(I* s, int a)
     return fn_801E9280(s, a);
 }
 
+extern "C" {
+int fn_80188EF4(Unk801DB948_Obj* o);
+int fn_801DE314(I* i, P* o, int k);
+}
+extern const float lbl_805D422C;
+
+float fn_802D7F40(int k);
+float fn_802D7E88(int k, int h);
+float fn_802D7E2C(int k, int h);
+extern "C" float fn_80411554(float x);
+extern "C" float fn_8041171C(float x);
+extern const float lbl_805D4208;
+extern const float lbl_805D420C;
+extern const Vec3 lbl_806055AC;
+
+extern "C" int fn_801E8328(I* s, Vec3* out, float f)
+{
+    int r = 0;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    float a = fn_802D7F40(k);
+    float b = fn_802D7E88(k, 0xBC);
+    float c = fn_802D7E2C(k, 0xBC);
+    if (!(c <= f)) {
+        r = 1;
+        a = -a;
+        b = b - lbl_805D4208;
+        out->x = fn_80411554(a + b);
+        out->y = lbl_805D420C;
+        out->z = fn_8041171C(a + b);
+    } else {
+        *out = lbl_806055AC;
+    }
+    return r;
+}
+
 extern "C" int fn_801E85D0()
 {
     return 1;
 }
 
-struct Unk8019F8C0_Owner;
-int fn_801A2034(Unk8019F8C0_Owner* o, int k);
-float fn_802D7E2C(int a, int b);
 extern const float lbl_805D4228;
 
 extern "C" int fn_801E85D8(I* s)
@@ -281,6 +318,40 @@ extern "C" float fn_801E8658(Unk801E6D88_F160* s)
     return s->m160;
 }
 
+extern "C" int fn_801E8660(I* s, int a, int* out, float* outf)
+{
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    int r;
+    if (fn_802D7DB4(k, 0xC0) != 0)
+        r = 0;
+    else if (fn_802D7DB4(k, 0xC1) != 0)
+        r = 1;
+    else if (fn_802D7DB4(k, 0xC2) != 0)
+        r = 2;
+    else if (fn_802D7DB4(k, 0xC3) != 0)
+        r = 3;
+    else
+        r = -1;
+    *out = r;
+    if (fn_80188EF4(s->m9C->m0->m6CC) == 1)
+        *out = -1;
+    Unk801E6D88_W* w = (Unk801E6D88_W*)s->mC4;
+    if (w->m1C == *out)
+        return 0;
+    if (*out != -1) {
+        P* p = fn_801A497C(s->m9C->m0, 4, a);
+        if (p != 0 && fn_801DE314(s, p, *out) == 1)
+            *out = -1;
+    }
+    *outf = lbl_805D422C;
+    if (*out != -1)
+        w->m1C = *out;
+    int ret = 1;
+    if (*out == -1)
+        ret = 0;
+    return ret;
+}
+
 extern "C" int fn_801E87C4(I* s, int a, int* out1, int b, int* out2)
 {
     Unk801E6D88_S* sub = (Unk801E6D88_S*)((char*)s->m9C->m0->m700->m3B0 + 0xC);
@@ -292,9 +363,43 @@ extern "C" int fn_801E87C4(I* s, int a, int* out1, int b, int* out2)
     return 0;
 }
 
-static inline void CallF(I* s, int b, float f)
+struct Unk80250244_S;
+void fn_80250180(Unk80250244_S* o, int k);
+void fn_802501E0(Unk80250244_S* o);
+extern "C" int fn_801E90F4(I* s);
+struct Unk801E8A3C_Tbl {
+    int a[4];
+};
+extern const Unk801E8A3C_Tbl lbl_805D4244;
+
+extern "C" int fn_801E8A3C(I* s, int a, int skip)
 {
-    fn_801E8328(s, b, f);
+    int found = 0;
+    int idx = -1;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    Unk801E8A3C_Tbl tbl = lbl_805D4244;
+    int* t = tbl.a;
+    for (Unk8006A138_It<3> it(0); it.v <= 3; it.Next()) {
+        if (fn_802D7DB4(k, t[it.v]) == 1 && skip != it.v) {
+            idx = it.v;
+            found = 1;
+            break;
+        }
+    }
+    if (((Unk801E6D88_W*)s->mC4)->m1C == idx)
+        return 0;
+    if (found == 0 && fn_801E90F4(s) == 1) {
+        found = 1;
+        idx = -1;
+    }
+    if (found == 1) {
+        P* p = fn_801A497C(s->m9C->m0, 4, a);
+        if (idx == -1)
+            fn_802501E0((Unk80250244_S*)((char*)p + 0x4D8));
+        else
+            fn_80250180((Unk80250244_S*)((char*)p + 0x4D8), idx);
+    }
+    return found;
 }
 
 /* near-miss: retail returns via cmpwi r3,1; li r3,1; beq; li r3,0 instead of the xori/subfic/adde bool (10 slots) */
@@ -306,10 +411,10 @@ extern "C" int fn_801E8B80(I* s)
     return fn_801A700C(s->m9C->m0, k, 0xC4) == 1;
 }
 
-/* near-miss: retail emits fmr f1,f0 before the stfs of the inline's float parameter (2 slots) */
-extern "C" void fn_801E8BEC(I* s, int b)
+extern "C" void fn_801E8BEC(I* s, Vec3* b)
 {
-    CallF(s, b, lbl_805D4254);
+    float v;
+    fn_801E8328(s, b, v = lbl_805D4254);
 }
 
 extern "C" int fn_801E90F4(I* s)
