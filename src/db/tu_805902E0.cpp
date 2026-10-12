@@ -38,31 +38,168 @@ struct Db80590A4C_S {
 };
 
 extern "C" void fn_80591DEC(Db805919E8_M* m);
-extern "C" float fn_805922D4(Db805919E8_M* m, int x, int i);
-extern "C" float fn_80592288(Db805919E8_M* m, int x);
 extern "C" Db800B555C_Obj* fn_800B555C();
 extern "C" int fn_800B5758(Db800B555C_Obj* o);
 extern "C" int fn_800A2E90(void* p);
-extern "C" void fn_805921E4(Db805919E8_M* m);
 extern Unk8007A4DC_Screen* lbl_8061930C;
 int fn_8007F7D0(Unk8007F198_B* self, unsigned i);
-extern "C" void fn_80591B40(Db805919E8_M* m, int x);
-extern "C" void fn_805919E8(Db805919E8_M* m, int x, int i, int k, float f);
 extern "C" float fn_80079CF8(Unk8007B2B0_Screen* s, int a);
 extern "C" int fn_805560A8(int a, int b);
-extern "C" void fn_805920BC(Db805919E8_M* m);
 unsigned fn_8007FBC0(Unk8007F198_C* self, int a, int c);
 int fn_8007FB2C(Unk8007F198_C* self, int idx);
 extern "C" void fn_80596E3C(void* p);
 extern "C" void fn_80596FCC(void* p);
-extern "C" void fn_8059209C(Db805919E8_M* m, float f);
-extern "C" void fn_80591D3C(Db805919E8_M* m);
 extern "C" void fn_80596E00(void* p);
-extern "C" void fn_80591FC8(Db805919E8_M* m);
 extern "C" void fn_805913C0(Db80590A4C_S* s, int a);
-extern "C" void fn_805907B8(Db80590A4C_S* s, int a);
 extern "C" void fn_80590BA0(Db80590EB4_S2* s);
 extern "C" void fn_80590C24(Db80590EB4_S2* s);
+
+struct Db805934C0_G {
+    char pad0[0x28];
+    int m28;
+};
+extern "C" int fn_8056A5F4(int a, int b, int c, int d);
+extern "C" int fn_8007FB98__FP13Unk8007F198_Ciii(void* p, int a, int b, int c);
+
+inline float Db80591270_Min(float a, float b)
+{
+    return a <? b;
+}
+inline float Db80591270_Max(float a, float b)
+{
+    return b >? a;
+}
+struct Db80591270_Scr {
+    char pad0[0x34];
+    void* m34;
+};
+extern float lbl_806E03A0[];
+extern "C" float fn_805948E8(void* p);
+extern "C" float fn_80593BD4(void* p);
+extern "C" float fn_80595470(void* p);
+extern "C" float fn_8058F420(void* p);
+
+extern "C" int fn_8056B840(int a, int b);
+extern "C" float fn_80593370(Db805919E8_M* m, int g);
+
+struct Db805907B8_Rec {
+    char pad0[0x1E4];
+    int m1E4;
+};
+extern "C" Db805907B8_Rec* fn_8007FE04__FP13Unk8007F198_D(void* p);
+
+struct Db805935B8_Inner {
+    char pad0[0x14];
+    int m14;
+    float m18;
+};
+struct Db805935B8_Obj {
+    char pad0[0xC];
+    Db805935B8_Inner* mC;
+};
+struct Db805935B8_Mgr {
+    char pad0[4];
+    Db805935B8_Obj* m4;
+};
+struct Db805935B8_Sums {
+    int m0;
+    int m4[5];
+};
+struct Db805935B8_Rec30 {
+    char pad0[0x2C];
+    Db805935B8_Sums* m2C;
+};
+struct Db805935B8_Scr {
+    char pad0[0x30];
+    Db805935B8_Rec30* m30;
+};
+extern Db805935B8_Mgr* lbl_806192E0;
+
+extern char lbl_80684640[];
+extern "C" Db805919E8_M* fn_805917F4(Db805919E8_M* m);
+/* forward declarations (definitions are in address order) */
+extern "C" void fn_805907B8(Db80590A4C_S* s, int a);
+extern "C" void fn_80590910(Db80590A4C_S* s);
+extern "C" void fn_805909D4(Db805909D4_S* self);
+extern "C" void fn_80590A48();
+extern "C" void fn_80590A4C(Db80590A4C_S* s);
+extern "C" void fn_80590BA0(Db80590EB4_S2* self);
+extern "C" void fn_80590C24(Db80590EB4_S2* self);
+extern "C" void fn_80590EB4(Db80590EB4_S* self);
+extern "C" void fn_8059124C(Db8059124C_S* self);
+extern "C" float fn_80591270(Db80590A4C_S* s);
+extern "C" void fn_80591378(Db8059124C_S* self);
+extern "C" float fn_8059139C(Db805909D4_S* self, int id);
+extern "C" void fn_805919E8(Db805919E8_M* m, int x, int i, int k, float f);
+extern "C" int fn_80591A50(Db805919E8_M* m);
+extern "C" int fn_80591AA0(Db805919E8_M* m);
+extern "C" void fn_80591AF4(Db805919E8_M* m, int x, int i, int k, float f);
+extern "C" void fn_80591B40(Db805919E8_M* m, int x);
+extern "C" void fn_80591B6C(Db805919E8_M* m, int x, int i);
+extern "C" void fn_80591B8C(Db805919E8_M* m, int x, int j, int a3, int a4, int flag, float f);
+extern "C" void fn_80591D3C(Db805919E8_M* m);
+extern "C" void fn_80591FC8(Db805919E8_M* m);
+extern "C" void fn_8059209C(Db805919E8_M* m, float f);
+extern "C" void fn_805920BC(Db805919E8_M* m);
+extern "C" void fn_805921E4(Db805919E8_M* m);
+extern "C" float fn_80592288(Db805919E8_M* m, int x);
+extern "C" float fn_805922D4(Db805919E8_M* m, int x, int i);
+extern "C" float fn_805922EC(Db805919E8_M* m, int x);
+extern "C" float fn_80592474(Db805919E8_M* m, int x, int j);
+extern "C" float fn_805925D0(Db805919E8_M* m, int x);
+extern "C" float fn_805926B8(Db805919E8_M* m, int x, int i);
+extern "C" float fn_80592780(Db805919E8_M* m, int x);
+extern "C" float fn_805928E0(Db805919E8_M* m, int x, int i);
+extern "C" float fn_805929F0(Db805919E8_M* m, int x);
+extern "C" float fn_80592A68(Db805919E8_M* m, int x, int i);
+extern "C" float fn_80592ABC(Db805919E8_M* m, int x);
+extern "C" float fn_80592B38(Db805919E8_M* m, int x, int i);
+extern "C" int fn_80592E04(Db805937A4_Mgr* m, int i);
+extern "C" float fn_80592E98(Db805919E8_M* m, int x, int i);
+extern "C" float fn_80592F94(Db805919E8_M* m, int x, int i, int n);
+extern "C" int fn_80593088(Db805919E8_M* m, int x, int i);
+extern "C" int fn_805931BC(Db805919E8_M* m, int x, int i, int n);
+extern "C" char* fn_805932E4(char* m, int a, int b, int c);
+extern "C" int fn_805934C0(Db805919E8_M* m, int key, int start, int flag);
+extern "C" void fn_805935B8(Db805919E8_M* m, int id);
+
+extern "C" DB_OVERLAY void fn_805907B8(Db80590A4C_S* s, int a)
+{
+    if (fn_800B5758(fn_800B555C()) == 1 && s->mC0 == 0) {
+        Unk8007B2B0_Screen* scr = (Unk8007B2B0_Screen*)lbl_8061930C;
+        float sp = scr->fn_80079E74(fn_8007F7D0((Unk8007F198_B*)scr, 0));
+        float v = 0.0f;
+        switch (fn_8007FE04__FP13Unk8007F198_D(scr)->m1E4) {
+        case 0:
+            v = 0.0f;
+            break;
+        case 1:
+            v = 2000000.0f;
+            break;
+        case 2:
+            v = 5000000.0f;
+            break;
+        default:
+            v = sp * 0.03f;
+            break;
+        }
+        fn_8059209C(s->m0, v);
+        s->mC0 = 1;
+        s->mB4 = 0;
+        int lo = fn_8007FBC0((Unk8007F198_C*)scr, 0, 0);
+        fn_8007FB2C((Unk8007F198_C*)scr, 0);
+        int j = 0;
+        do {
+            if (fn_8007FB2C((Unk8007F198_C*)scr, j) > 0) {
+                int t = fn_8007FBC0((Unk8007F198_C*)scr, 0, j);
+                if (t < lo)
+                    lo = t;
+            }
+            j++;
+        } while (j <= 3);
+        s->m24 = lo;
+    }
+}
 
 extern "C" DB_OVERLAY void fn_80590910(Db80590A4C_S* s)
 {
@@ -158,6 +295,15 @@ extern "C" DB_OVERLAY void fn_80590EB4(Db80590EB4_S* self)
 extern "C" DB_OVERLAY void fn_8059124C(Db8059124C_S* self)
 {
     fn_80596E3C(self->m28);
+}
+
+extern "C" DB_OVERLAY float fn_80591270(Db80590A4C_S* s)
+{
+    float r = 0.0f;
+    Db80591270_Scr* scr = (Db80591270_Scr*)lbl_8061930C;
+    r = lbl_806E03A0[0] * fn_805948E8(s->m4) + lbl_806E03A0[1] * fn_80593BD4(s->m8) + lbl_806E03A0[2] * fn_80595470(s->mC) + lbl_806E03A0[3] * fn_8058F420(scr->m34);
+    r = Db80591270_Max(Db80591270_Min(r, 1.0f), 0.0f);
+    return r;
 }
 
 extern "C" DB_OVERLAY void fn_80591378(Db8059124C_S* self)
@@ -348,33 +494,44 @@ extern "C" DB_OVERLAY float fn_805922D4(Db805919E8_M* m, int x, int i)
     return m->t2[x][i];
 }
 
+extern "C" DB_OVERLAY float fn_805922EC(Db805919E8_M* m, int x)
+{
+    float s = 0.0f;
+    int k;
+    int j;
+    for (k = 0; k <= m->m12B70; k++) {
+        for (j = 0; j < 16; j++) {
+            Db805922EC_Cell* c = &m->a[k].c[x][j];
+            s += c->m0 * (float)c->m8;
+        }
+    }
+    for (j = 0; j < 16; j++)
+        s += m->t3[x][j];
+    if (fn_800A2EB4(lbl_80619948) != 0) {
+        for (k = 0; k <= m->m12B74; k++) {
+            for (j = 0; j < 16; j++) {
+                Db805922EC_Cell* c = &m->b[k].c[x][j];
+                s += c->m0 * (float)c->m8;
+            }
+        }
+    }
+    return s;
+}
+
 /* near-miss (85 slots): retail walks the group pointers by +0x300 per step, as here, but keeps m in r31 with addis r28,r31,1 for the counters. */
 extern "C" DB_OVERLAY float fn_80592474(Db805919E8_M* m, int x, int j)
 {
     float r = 0.0f;
-    int k = 0;
-    int n = m->m12B70;
-    if (n >= 0) {
-        Db805922EC_Grp* g = m->a;
-        do {
-            k++;
-            Db805922EC_Cell* c = &g->c[x][j];
-            g++;
-            r += c->m0 * (float)c->m8;
-        } while (k <= n);
+    int k;
+    for (k = 0; k <= m->m12B70; k++) {
+        Db805922EC_Cell* c = &m->a[k].c[x][j];
+        r += c->m0 * (float)c->m8;
     }
     r += m->t3[x][j];
     if (fn_800A2EB4(lbl_80619948) != 0) {
-        int n2 = m->m12B74;
-        k = 0;
-        if (n2 >= 0) {
-            Db805922EC_Grp* g = m->b;
-            do {
-                k++;
-                Db805922EC_Cell* c = &g->c[x][j];
-                g++;
-                r += c->m0 * (float)c->m8;
-            } while (k <= n2);
+        for (k = 0; k <= m->m12B74; k++) {
+            Db805922EC_Cell* c = &m->b[k].c[x][j];
+            r += c->m0 * (float)c->m8;
         }
     }
     return r;
@@ -402,6 +559,33 @@ extern "C" DB_OVERLAY float fn_805926B8(Db805919E8_M* m, int x, int i)
     return r;
 }
 
+extern "C" DB_OVERLAY float fn_80592780(Db805919E8_M* m, int x)
+{
+    float sa = 0.0f;
+    float sb = 0.0f;
+    int j = 0;
+    float r = fn_805922EC(m, x);
+    if (fn_800A2EB4(lbl_80619948) == 0) {
+        for (; j < 16; j++) {
+            sa += fn_80592E98(m, x, j);
+            sb += m->t1[x][j] / (float)m->m12B80;
+        }
+        int d = fn_8056B840(((Db805934C0_G*)lbl_80619948)->m28, 0) - fn_80591AA0(m);
+        r = (sa * (float)d + r) + sb * (float)(m->m12B80 - m->m12B84);
+    }
+    return r;
+}
+
+extern "C" DB_OVERLAY float fn_805928E0(Db805919E8_M* m, int x, int i)
+{
+    float r = fn_80592474(m, x, i);
+    if (fn_800A2EB4(lbl_80619948) == 0) {
+        int a = fn_8056B840(((Db805934C0_G*)lbl_80619948)->m28, 0) - fn_80591AA0(m);
+        r = (fn_80592E98(m, x, i) * (float)a + r) + m->t1[x][i] / (float)m->m12B80 * (float)(m->m12B80 - m->m12B84);
+    }
+    return r;
+}
+
 extern "C" DB_OVERLAY float fn_805929F0(Db805919E8_M* m, int x)
 {
     float s = 0.0f;
@@ -414,6 +598,14 @@ extern "C" DB_OVERLAY float fn_80592A68(Db805919E8_M* m, int x, int i)
 {
     float r = m->t0[x][i] / (float)m->m12B80;
     return r;
+}
+
+extern "C" DB_OVERLAY float fn_80592ABC(Db805919E8_M* m, int x)
+{
+    float s = 0.0f;
+    for (int j = 0; j < 16; j++)
+        s += m->t1[x][j] / (float)m->m12B80;
+    return s;
 }
 
 extern "C" DB_OVERLAY float fn_80592B38(Db805919E8_M* m, int x, int i)
@@ -436,9 +628,153 @@ extern "C" DB_OVERLAY int fn_80592E04(Db805937A4_Mgr* m, int i)
     return -1;
 }
 
+extern "C" DB_OVERLAY float fn_80592E98(Db805919E8_M* m, int x, int i)
+{
+    float s = 0.0f;
+    int k;
+    for (k = 0; k <= m->m12B70; k++) {
+        Db805922EC_Cell c = m->a[k].c[x][i];
+        s += c.m0 * (float)c.m8;
+    }
+    if (m->m12B70 >= 0)
+        s = s / (float)(m->m12B70 + 1);
+    return s;
+}
+
+extern "C" DB_OVERLAY float fn_80592F94(Db805919E8_M* m, int x, int i, int n)
+{
+    float s = 0.0f;
+    for (int k = 0; k < n; k++) {
+        Db805922EC_Cell c = m->a[m->m12B70 - k].c[x][i];
+        s += c.m0 * (float)c.m8;
+    }
+    s = s / (float)n;
+    return s;
+}
+
+extern "C" DB_OVERLAY int fn_80593088(Db805919E8_M* m, int x, int i)
+{
+    float s = 0.0f;
+    int skipped = 0;
+    int k = 0;
+    for (k = skipped; k <= m->m12B70; k++) {
+        Db805922EC_Cell c = m->a[k].c[x][i];
+        if (c.m4 > 0)
+            s += (float)(c.m8 * 100 / c.m4);
+        else
+            skipped++;
+    }
+    int cnt = m->m12B70 - skipped;
+    if (cnt >= 0)
+        s = s / (float)(cnt + 1);
+    else
+        s = 0.0f;
+    return (int)s;
+}
+
+extern "C" DB_OVERLAY int fn_805931BC(Db805919E8_M* m, int x, int i, int n)
+{
+    float s = 0.0f;
+    int skipped = 0;
+    int k = 0;
+    for (k = skipped; k < n; k++) {
+        Db805922EC_Cell c = m->a[m->m12B70 - k].c[x][i];
+        if (c.m4 > 0)
+            s += (float)(c.m8 * 100 / c.m4);
+        else
+            skipped++;
+    }
+    if (n - skipped > 0)
+        s = s / (float)n;
+    else
+        s = 0.0f;
+    return (int)s;
+}
+
 extern "C" DB_OVERLAY char* fn_805932E4(char* m, int a, int b, int c)
 {
     if (fn_800A2EB4(lbl_80619948) == 0)
         return m + (c * 0x300 + 0x880) + a * 0xC0 + b * 0xC;
     return m + (c * 0x300 + 0x109C0) + a * 0xC0 + b * 0xC;
+}
+
+extern "C" DB_OVERLAY int fn_805934C0(Db805919E8_M* m, int key, int start, int flag)
+{
+    void* scr = lbl_8061930C;
+    int m28 = ((Db805934C0_G*)lbl_80619948)->m28;
+    int i = start;
+    if (flag != 0)
+        i--;
+    int done = 0;
+    while (i >= 0) {
+        int r;
+        if (fn_800A2EB4(lbl_80619948) == 0) {
+            int t = fn_8007FB98__FP13Unk8007F198_Ciii(scr, m->ra[i].m0, 0, 0);
+            r = fn_8056A5F4(m28, 0, m->ra[i].m0, t);
+        } else {
+            int t = fn_8007FB98__FP13Unk8007F198_Ciii(scr, m->rb[i].m0, 0, 0);
+            r = fn_8056A5F4(m28, 0, m->rb[i].m0, t);
+        }
+        if (r == key)
+            break;
+        i--;
+        if (done != 0)
+            break;
+    }
+    return i;
+}
+
+/* near-miss (98.2%): the call to fn_800A2E90 reads lbl_80619948 through a hoisted `lis` above the m4 store; retail keeps it below. */
+extern "C" DB_OVERLAY void fn_805935B8(Db805919E8_M* m, int id)
+{
+    Db805935B8_Obj* o = lbl_806192E0->m4;
+    Db805935B8_Sums* sums = ((Db805935B8_Scr*)lbl_8061930C)->m30->m2C;
+    int total = 0;
+    for (int k = 0; k < 5; k++)
+        total += sums->m4[k];
+    char* mc = (char*)m;
+    int* ids;
+    int* vals;
+    float* fs;
+    int idx;
+    if (fn_800A2EB4(lbl_80619948) == 0) {
+        ids = (int*)(mc + 0x10480);
+        vals = (int*)(mc + 0x10484);
+        fs = (float*)(mc + 0x10488);
+        m->m12B70++;
+        ids[m->m12B70 * 4] = id;
+        {
+            int t = o->mC->m14;
+            { char* p = mc + m->m12B70 * 16; *(p + 0x1048C) = t; }
+        }
+        fs[m->m12B70 * 4] = o->mC->m18;
+        idx = m->m12B70;
+    } else {
+        ids = (int*)(mc + 0x12AC0);
+        vals = (int*)(mc + 0x12AC4);
+        fs = (float*)(mc + 0x12AC8);
+        m->m12B74++;
+        ids[m->m12B74 * 4] = id;
+        {
+            int t = o->mC->m14;
+            { char* p = mc + m->m12B74 * 16; *(p + 0x12ACC) = t; }
+        }
+        fs[m->m12B74 * 4] = o->mC->m18;
+        idx = m->m12B74;
+    }
+    vals[idx * 4] = total;
+    void** gp = &lbl_80619948;
+    if (fn_800A2E90(*gp) != 0) {
+        int n = m->m12B70;
+        if (n <= 0)
+            m->m12B88 = total;
+        else
+            m->m12B88 = (m->m12B88 * n + total) / (n + 1);
+    } else if (fn_800A2EB4(lbl_80619948) != 0) {
+        int n = m->m12B74;
+        if (n <= 0)
+            m->m12B8C = total;
+        else
+            m->m12B8C = (m->m12B8C * n + total) / (n + 1);
+    }
 }
