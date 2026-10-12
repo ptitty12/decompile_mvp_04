@@ -72,6 +72,18 @@ extern "C" void fn_80560010(int x, int k);
 extern "C" int fn_805600F8(int s, int id);
 extern "C" int fn_8056087C(void* self);
 extern "C" void fn_80560314(int a, int b, int c);
+extern "C" void fn_80539020(Unk805352B0_List* self, int x);
+inline void Db805625F8_Append(Unk805352B0_List* dst, Unk80535650_Tmp* src)
+{
+    unsigned i;
+    for (i = 0; i < src->Count(); i++)
+        dst->Push(src->At(i));
+    dst->m14 = 1;
+}
+extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
+extern "C" void fn_80538EC4(Unk805352B0_List* self, int x, int y);
+extern "C" void fn_80539128(Unk805352B0_List* self, Unk805352B0_List* out);
+extern "C" int fn_80077BC4(void* g, int a);
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -473,6 +485,98 @@ extern "C" DB_OVERLAY void fn_80560A24(int x)
         } while (k != 0);
     }
     t.vp = lbl_8064A550;
+}
+
+extern "C" DB_OVERLAY void fn_805625F8(int x, Unk805352B0_List* self, int kind)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0x28];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0x28);
+    q->C2();
+    q->C3(lbl_8064A4C8);
+    if (kind == 0) {
+        fn_80539020(self, x);
+    } else if (kind == 1) {
+        int s = sc->fn_80078A38(x);
+        int h = sc->fn_80075948(x);
+        int g1 = sc->fn_8007B320(1, h);
+        int g2 = sc->fn_8007B320(2, h);
+        int g3 = sc->fn_8007B320(3, h);
+        fn_8040074C(self->m0, self->m8 << 2);
+        self->m4 = 0;
+        self->mC = 0;
+        self->m14 = 0;
+        if (s <= 0) {
+            fn_80539020((Unk805352B0_List*)&t, g1);
+            Db805625F8_Append(self, &t);
+        }
+        if (s <= 1) {
+            fn_80539020((Unk805352B0_List*)&t, g2);
+            Db805625F8_Append(self, &t);
+        }
+        if (s <= 2) {
+            fn_80539020((Unk805352B0_List*)&t, g3);
+            Db805625F8_Append(self, &t);
+        }
+    }
+    t.D();
+}
+
+/* near-miss: one store differs (the final vptr store of the found branch: retail writes it frame-relative, 24(r1); ours 16(r29));
+ * tried t.D()/q->D()/references/explicit stores. */
+extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int r = 0;
+    int kind;
+    for (kind = 0; kind <= 1; kind++) {
+        Unk80535650_Tmp t;
+        int buf[0x28];
+        Unk80535650_Tmp* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        fn_805625F8(x, (Unk805352B0_List*)q, kind);
+        fn_80539128((Unk805352B0_List*)q, 0);
+        if (q->Count() == 0) {
+            q->D();
+            continue;
+        }
+        fn_805362AC((Unk805352B0_List*)q, 1);
+        unsigned i;
+        for (i = 0; i < q->Count(); i++) {
+            if (y == (sc->fn_8007A6A0(5, t.At(i)) == 0)) {
+                r = t.At(i);
+                break;
+            }
+        }
+        if (r == 0)
+            r = *t.m0;
+        t.D();
+        break;
+    }
+    if (r != 0) {
+        int g = fn_80077BC4(sc, r);
+        fn_8007F29C((Unk8007F198_A*)sc, g, r);
+        if (g != x && fn_8007F198((Unk8007F198_A*)sc, x) > 0x18) {
+            Unk80535650_Tmp t2;
+            int buf2[0x28];
+            Unk80535650_Tmp* q2 = &t2;
+            q2->C1(buf2, 0x28);
+            q2->C2();
+            q2->C3(lbl_8064A4C8);
+            fn_80538EC4((Unk805352B0_List*)q2, x, 0);
+            fn_805362AC((Unk805352B0_List*)q2, 0);
+            int e = *t2.m0;
+            fn_8007F29C((Unk8007F198_A*)sc, x, e);
+            fn_8007F330((Unk8007F198_A*)sc, g, e);
+            q2->D();
+        }
+        fn_8007F330((Unk8007F198_A*)sc, x, r);
+    }
+    return r;
 }
 
 extern "C" DB_OVERLAY void fn_8056350C(int x)
