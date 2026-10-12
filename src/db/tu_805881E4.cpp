@@ -96,6 +96,8 @@ struct Db8058B628_E {
 };
 extern "C" Db8058B628_E* fn_8052E198(Db8058B628_E* self, int a, int b, int c, int d, int e, char f, int g, int h, int i);
 extern "C" int fn_80582CF8(void* self, void* e, int a, int b, int c);
+extern "C" int fn_80084014__Fii(int a, int b);
+extern "C" void* fn_8052E2C4(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i);
 extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* s, int id);
 extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* s, int id, int i);
 /* forward declarations (definitions are in address order) */
@@ -619,6 +621,30 @@ extern "C" DB_OVERLAY int fn_8058B628(void* self, int unused, int id)
     char c = ((Unk8007B2B0_Screen*)s)->fn_8007A0D0(id);
     Db8058B628_E e;
     fn_8052E198(&e, 0xB, base, found, sc, 0, c, 4, 0, 0);
+    fn_80582CF8(self, &e, 0, 0, 0);
+    fn_80360AF0((Db80586420_Ent*)&e, 2);
+    return 1;
+}
+
+extern "C" DB_OVERLAY int fn_8058B938(void* self, int id, int flag, int x)
+{
+    Db8058B628_E e;
+    Db80329FA0_Out o = fn_80329FA0(x);
+    if (o.m0 - 1 <= 3)
+        return 0;
+    int sc = 0;
+    if (fn_800B5758(fn_800B555C())) {
+        if (flag == 0)
+            sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(2), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        else
+            sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(3), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+    }
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int w = fn_80084014__Fii(flag, 1);
+    int a = ((Unk8007B2B0_Screen*)s)->fn_80076A24(id);
+    int b = s->fn_80077238(id, w);
+    int c = s->fn_80077320(id, w);
+    fn_8052E2C4(&e, 0xB, id, (short)b, (short)a, sc, (short)c, 6, (char)flag, 0);
     fn_80582CF8(self, &e, 0, 0, 0);
     fn_80360AF0((Db80586420_Ent*)&e, 2);
     return 1;
