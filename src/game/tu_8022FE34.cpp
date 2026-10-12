@@ -140,6 +140,48 @@ void Unk8022FE34_Pai::fn_8023003C(int i, int idx, Unk8022FE34_Ent* out, int flag
     }
 }
 
+extern "C" Unk8022FE34_X6D* fn_801A6DB8(Unk8022FE34_Ctx* c);
+inline int Unk80230268_Pick(Unk8022FE34_Ctx* c, int i)
+{
+    if (i > 2) {
+        int f = 0;
+        if (c->m6F8->m14[2].m8 != 0)
+            f = 1;
+        int g;
+        if (i != 3)
+            g = f ^ 1;
+        else
+            g = f;
+        i = g;
+    }
+    return i;
+}
+void Unk8022FE34_Pai::fn_80230268(int a, int b, Unk8022FE34_Ent* out)
+{
+    if (fn_801A6DB8(m3F4)->m3C != 0) {
+        Unk8022FE34_Ent* tbl = lbl_8068C978;
+        Unk8022FE34_VObj22* o = (Unk8022FE34_VObj22*)m3F4->m65C;
+        if (o != 0) {
+            if (o->s22() == 1)
+                tbl = lbl_8068C9FC;
+        }
+        *out = tbl[0];
+        for (int k = 0; k < 3; k++) {
+            if (tbl[k].m0 == b) {
+                *out = tbl[k];
+                return;
+            }
+        }
+        return;
+    }
+    a = Unk80230268_Pick(m3F4, a);
+    for (int k = 0; k < fn_80230024(a); k++) {
+        *out = m4[a].m4[k];
+        if (out->m0 == b)
+            return;
+    }
+}
+
 void Unk8022FE34_Pai::fn_80230500(int i, Unk8022FE34_Ent* out)
 {
     float r = RandF((Unk8014D8AC*)m3F4->m554, lbl_805D6EDC, 1.0f, 0x3A1);
