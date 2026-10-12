@@ -127,7 +127,7 @@ public:
     virtual void v98();
     virtual void v99();
     virtual void v100();
-    virtual void v101();
+    virtual void v101(int a, int b);
     virtual void v102();
     virtual void v103();
     virtual void v104();
