@@ -710,3 +710,48 @@ int SNDPLATFORM_setpitch(int voice)
         return 0;
     }
 }
+
+extern CHANPUB* lbl_8069CA48; /* sndgs.chan, named by its own symbols.txt entry */
+extern unsigned char lbl_8069CBBC;
+extern int lbl_8069CBC0;
+extern unsigned char lbl_8069C8BB;
+extern unsigned short lbl_80625468[][4];
+extern "C" void fn_803B3908(unsigned short az, Unk8069E200_Rec* r);
+extern "C" void fn_803ADD4C(void* o, Unk8069E200_Rec* r, unsigned short az, int lfe);
+
+void Snd::Hal::SetPan(int voice)
+{
+    Unk8069E200_Rec* r = &lbl_8069E200.rec[voice];
+    CHANPUB* c = &lbl_8069CA48[voice];
+    int i;
+    if (c->isLfe != 0) {
+        for (i = 0; i < lbl_8069CBBC; i++)
+            r->mVol[i] = 0.0f;
+    } else if (lbl_8069CBC0 == 0) {
+        r->mVol[0] = 0.7071068f;
+        r->mVol[1] = 0.7071068f;
+        r->mVol[2] = 0.0f;
+        r->mVol[3] = 0.0f;
+        r->mVol[4] = 0.0f;
+        r->mVol[5] = 0.0f;
+    } else {
+        fn_803B3908(c->azimuth, r);
+    }
+    if ((c->rendermode & 4) && lbl_8069C8BB > 2 && c->isLfe == 0) {
+        int o = (c->azimuth >> 5) & 0x7F8;
+        char* tb = (char*)lbl_80625468;
+        char* t2 = tb + 2;
+        char* t6 = tb + 6;
+        char* t4 = tb + 4;
+        r->mVol[0] = (float)*(unsigned short*)(t2 + o) * 3.051851e-05f;
+        r->mVol[1] = (float)*(unsigned short*)(t6 + o) * 3.051851e-05f;
+        r->mVol[2] = (float)*(unsigned short*)(t4 + o) * 3.051851e-05f;
+        r->mVol[5] = 0.0f;
+        r->mVol[3] = (float)*(unsigned short*)(tb + o) * 3.051851e-05f;
+
+    }
+    if (c->rendermode & 0x200)
+        fn_803ADD4C(r->m3C, r, c->azimuth, c->isLfe);
+    else
+        Snd::Hal::SetVol(voice);
+}
