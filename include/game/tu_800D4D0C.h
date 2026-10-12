@@ -253,10 +253,11 @@ struct Unk800D697C_Obj {
     int mCC;
     float mD0;
 };
+struct UiScrRaw2;
 struct UiScrRaw2 {
     char pad0[0x3C];
     const void* m3C;
-    void fn_800D0D9C(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l);
+    UiScrRaw2* fn_800D0D9C(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k, int l);
 };
 extern const char lbl_805BC1A8[];
 extern const char lbl_805BC9DC[];
