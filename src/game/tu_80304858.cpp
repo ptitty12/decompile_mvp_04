@@ -96,6 +96,8 @@ struct Unk80304858_Sx {
     int m194;
 };
 extern int lbl_8061F94C;
+extern int lbl_8061F960;
+extern int lbl_8061F964;
 struct Unk8030741C_E {
     char pad0[4];
     float m4;
@@ -147,6 +149,7 @@ void fn_803DFE28(Unk80304858_M44* dst, Unk80304858_M44* other);
 void fn_803D68AC(int h, void* mtx);
 void fn_8037D768(void* p);
 void fn_803DFEE0(Unk80304858_M44* dst, float x, float y, float z, float w);
+void fn_80328234(void* p, int a, int b);
 }
 
 struct Unk8030665C_E {
@@ -218,6 +221,23 @@ struct Unk80305C88_P {
 };
 extern "C" int fn_803D77EC(void* p);
 
+void fn_80304A8C(Unk80304858_Sx* p)
+{
+    if (p->m194 != 0) {
+        Unk80304858_Rec* r = (Unk80304858_Rec*)p->m18C->s6();
+        if (r->m0 == 0)
+            fn_8037D768(r);
+        r->m0 = 1;
+        Unk80304858_M44 work = *(Unk80304858_M44*)((char*)r + 0x20);
+        if (p->m1C != 0) {
+            if (p->m18C->s5(1) != 0 && lbl_8061F94C == 0)
+                fn_803DFEE0(&work, -1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        if (p->m24 != 0)
+            fn_803D68AC(p->m24, &work);
+    }
+}
+
 int fn_80304BDC(Unk80304858_At24* p)
 {
     return p->m24;
@@ -227,6 +247,30 @@ void fn_80304BE4(Unk80304858_Sx* p, Unk80304858_M44* src)
 {
     if (p->m194 != 0) {
         Unk80304858_M44 work = *src;
+        if (p->m1C != 0) {
+            if (p->m18C->s5(1) != 0 && lbl_8061F94C == 0)
+                fn_803DFEE0(&work, -1.0f, 1.0f, 1.0f, 1.0f);
+        }
+        if (p->m24 != 0)
+            fn_803D68AC(p->m24, &work);
+    }
+}
+
+void fn_80304CF8(Unk80304858_Sx* p)
+{
+    if (p->m194 != 0) {
+        Unk80304858_Rec* r = (Unk80304858_Rec*)p->m18C->s6();
+        if (r->m0 == 0)
+            fn_8037D768(r);
+        r->m0 = 1;
+        Unk80304858_M44 work = *(Unk80304858_M44*)((char*)r + 0x20);
+        lbl_8061F960 = lbl_8061F960 + 1;
+        if (lbl_8061F960 == 0xB) {
+            lbl_8061F960 = 0;
+            lbl_8061F964 = lbl_8061F964 + 1;
+        }
+        if (lbl_8061F964 > 0x59)
+            lbl_8061F964 = 0;
         if (p->m1C != 0) {
             if (p->m18C->s5(1) != 0 && lbl_8061F94C == 0)
                 fn_803DFEE0(&work, -1.0f, 1.0f, 1.0f, 1.0f);
