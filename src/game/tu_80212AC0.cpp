@@ -819,8 +819,6 @@ int fn_8024D434(Unk80270BA0_X* x);
 extern "C" int fn_80254EA4(PlayerSub* p, int a);
 extern "C" void fn_801F0F30(Task* t);
 
-/* near-miss: 37 slots, 4 insns out of place: everything but the first block matches; retail keeps "li r3,8; b" inside
-   the bne-skipped block, ours hoists the li above the branch (tried if/else, goto, result var, ternary, operand swap) */
 extern "C" int fn_8021646C(void* self, Unk8021646C_Obj* o, int a, int b, int c)
 {
     int t[3][3][2] = {
@@ -937,6 +935,8 @@ int fn_80216590(Task* t, Unk80216590_P* pl, Vec3f v, int a, int b, int c)
     return r;
 }
 
+/* near-miss: 37 slots, 4 insns out of place: everything but the first block matches; retail keeps "li r3,8; b" inside
+   the bne-skipped block, ours hoists the li above the branch (tried if/else, goto, result var, ternary, operand swap) */
 int fn_8021693C(Task* t, Player* o, int x, Player* pl, int mode, float f1, float f2)
 {
     if (x == -1) {
@@ -973,3 +973,4 @@ void fn_802168B4(Task* t, PosObj* a, Vec3f* pos, int* out)
 }
 
 }
+
