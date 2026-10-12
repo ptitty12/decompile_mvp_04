@@ -82,6 +82,57 @@ static inline int FlagNZ(B* s)
     return t;
 }
 
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
+{
+    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+struct Unk801D31D8_V2 {
+    float x;
+    float y;
+};
+struct Unk801D31D8_M34 {
+    char pad0[0x3A4];
+    void* m3A4;
+};
+typedef Unk801D31D8_V2 (*Unk801D31D8_VaFn)(void*, ...);
+extern "C" Unk801D31D8_V2 fn_801CD94C(void* p);
+struct Unk801D31D8_W {
+    char pad0[0x34];
+    Unk801D31D8_M34* m34;
+};
+inline float LerpATB(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+extern "C" float fn_801D2E0C(B* s);
+
+extern "C" void fn_801D31D8(B* s)
+{
+    int h = ((Unk801B7FB0_P*)fn_801A4B34((Unk801808A4_Ctx*)s->m30))->v24();
+    Unk801D31D8_V2 v = ((Unk801D31D8_VaFn)fn_801CD94C)(((Unk801D31D8_W*)s)->m34->m3A4);
+    float t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
+    float u = fn_801D2E0C(s);
+    float w = LerpATB(0.0f, 1.0f - u, 1.7f);
+    if (!(t <= 0.0f))
+        s->m44.mC = t - w;
+    else
+        s->m44.mC = t + w;
+    if (h != 0)
+        s->m44.mC = -s->m44.mC;
+    s->m44.mC = !(s->m44.mC > 1.0f) ? (s->m44.mC >? -1.0f) : 1.0f;
+    float r = RandG(s->m30, 1.0f, lbl_805D25E0, 0x535);
+    if (!(r >= 0.3f))
+        s->m44.m10 = LerpATB(-1.0f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x539), 0.3f);
+    else if (!(r >= 0.6f))
+        s->m44.m10 = LerpATB(0.3f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x53E), 0.6f);
+    else if (!(r >= 0.8f))
+        s->m44.m10 = LerpATB(0.6f, RandG(s->m30, 1.0f, lbl_805D25E0, 0x543), 1.0f);
+    else
+        s->m44.m10 = 1.0f;
+}
+
 extern "C" void fn_801D34E4(B* s)
 {
     float lo = lbl_805D29D8;
@@ -99,11 +150,6 @@ extern "C" void fn_801D34E4(B* s)
 
 static inline int Ok(int f) { int ok; if ((unsigned)(f + 1) > 1) { ok = 1; if ((f & 8) == 0) ok = 0; } else ok = 0; return ok; }
 
-inline float AbsF(float v) { return (float)__builtin_fabs(v); }
-inline float RandG(Unk801D31D8_Game* g, float scale, const char* file, int line)
-{
-    return (float)(unsigned)g->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
-}
 struct Unk801D31D8_Q66 {
     char pad0[0x60];
     Vec3 m60;
@@ -201,10 +247,6 @@ struct Unk801D31D8_Z2C {
     float m1FC;
 };
 extern "C" int fn_801D0BB0(B* s);
-inline float LerpATB(float a, float t, float b)
-{
-    return a + t * (b - a);
-}
 
 extern "C" void fn_801D5158(B* s)
 {
@@ -263,25 +305,11 @@ extern "C" void fn_801D5650(B* s)
     s->m44.m4 = b * (t * (hi - lo) + lo) + a;
 }
 
-struct Unk801D31D8_V2 {
-    float x;
-    float y;
-};
-struct Unk801D31D8_M34 {
-    char pad0[0x3A4];
-    void* m3A4;
-};
-typedef Unk801D31D8_V2 (*Unk801D31D8_VaFn)(void*, ...);
-extern "C" Unk801D31D8_V2 fn_801CD94C(void* p);
 extern "C" int fn_801D112C(B* s);
 extern "C" int fn_801D1198(B* s);
 extern "C" void fn_801D49CC(B* s);
 extern "C" void fn_801D5158(B* s);
 extern "C" void fn_801D53D4(B* s);
-struct Unk801D31D8_W {
-    char pad0[0x34];
-    Unk801D31D8_M34* m34;
-};
 
 extern "C" void fn_801D573C(B* s)
 {
