@@ -84,6 +84,20 @@ public:
     virtual void v16();
     virtual int v17(int a, int b);
 };
+
+struct Db8058B628_E {
+    int m0;
+    int m4;
+    int m8;
+    unsigned mC;
+    unsigned short m10;
+    unsigned short m12;
+    const void* m14;
+};
+extern "C" Db8058B628_E* fn_8052E198(Db8058B628_E* self, int a, int b, int c, int d, int e, char f, int g, int h, int i);
+extern "C" int fn_80582CF8(void* self, void* e, int a, int b, int c);
+extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* s, int id);
+extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* s, int id, int i);
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_805881E4(void* self);
 extern "C" int fn_80588218();
@@ -113,6 +127,7 @@ extern "C" int fn_8058AADC(void* self, int a, int b);
 extern "C" int fn_8058AB84(Db8058AB84_C* self, int k, void* rec);
 extern "C" char* fn_8058ADAC(char* p, int k);
 extern "C" char* fn_8058AE00(char* p, int k);
+extern "C" int fn_8058B628(void* self, int unused, int id);
 extern "C" int fn_8058BD8C(void* self, int a, int b, int* out);
 extern "C" int fn_8058BE5C(void* self, int a, int b, int* out);
 
@@ -582,6 +597,31 @@ extern "C" DB_OVERLAY char* fn_8058AE00(char* p, int k)
         return p + 0x8C;
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8058B628(void* self, int unused, int id)
+{
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int base = fn_8007E1F8__FP13Unk8007DB74_A(s, id);
+    int sc = 0;
+    if (fn_800B5758(fn_800B555C())) {
+        sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(6), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+    }
+    int found = 0;
+    for (int i = 0; i <= 4; i++) {
+        if (base == fn_8007E154__FP13Unk8007DB74_Aii(s, id, i)) {
+            found = fn_8007E154__FP13Unk8007DB74_Aii(s, id, (i + 1) % 5);
+            break;
+        }
+    }
+    if (found == 0)
+        return 0;
+    char c = ((Unk8007B2B0_Screen*)s)->fn_8007A0D0(id);
+    Db8058B628_E e;
+    fn_8052E198(&e, 0xB, base, found, sc, 0, c, 4, 0, 0);
+    fn_80582CF8(self, &e, 0, 0, 0);
+    fn_80360AF0((Db80586420_Ent*)&e, 2);
+    return 1;
 }
 
 extern "C" DB_OVERLAY int fn_8058BD8C(void* self, int a, int b, int* out)
