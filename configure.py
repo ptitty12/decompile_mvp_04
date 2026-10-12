@@ -366,6 +366,60 @@ cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 # Dolphin SDK AI library (built Apr 5 2004). Flags TBD; start from the OS ones.
 cflags_dolphin_ai = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
+# EA gamelib (C:/mvp2004/libraries/gamelib: memory, datafile, animlib; 0x80377048..0x8038BC58):
+# built with the game flags. See docs/DECISIONS.md (tail split).
+cflags_gamelib = cflags_game
+
+# EA libraries that use small data (r13): VP6/MAD codecs + SPCH (0x8038EC58..0x803A4214) and
+# RealCore (0x803EB2AC..0x80403E80). Same as cflags_ealib but with the default -G8.
+cflags_ealib_sda = ["-O2", "-fno-rtti", "-fno-exceptions"]
+
+# EA SND 9.02.04 + csis (0x803A4214..0x803BA9DC), compiled as C++. Flags from mitsevox/mvp2005
+# (port/mvp2005 branch); saems.c 74/74, smemman.c 5/5, salloc.c 4/4 at 100% with them.
+cflags_snd = [
+    "-O2",
+    "-G0",
+    "-fno-strength-reduce",
+    "-fno-strict-aliasing",
+    "-ffast-math",
+    "-mps-float",
+    "-x c++",
+    "-Iinclude",
+    "-DEA_PLATFORM_GAMECUBE",
+    "-DGEKKO",
+]
+
+# SN ProDG runtime libraries (flags from mitsevox/mvp2005 via port/mvp2005, re-measured).
+cflags_libsn = ["-O2", "-G0", "-fno-common"]
+cflags_libc = ["-O2", "-fno-common"]
+cflags_libm = ["-O2", "-mfast-cast", "-msafe-sda", "-G 1024", "-fno-builtin", "-mstrict-align"]
+
+# Dolphin SDK libraries other than the existing OS/AI units: dolsdk2004 release flags (as used by
+# mitsevox/mvp2005 and W2). CARDBlock.c, GXTev.c, dvdqueue.c and OSMessage.c match 100% with them.
+cflags_dolphin_sdk = [
+    "-nodefaults",
+    "-proc gekko",
+    "-fp hard",
+    "-Cpp_exceptions off",
+    "-enum int",
+    "-char unsigned",
+    "-warn pragmas",
+    "-requireprotos",
+    '-pragma "cats off"',
+    "-O4,p",
+    "-inline auto",
+    "-I-",
+    "-i include",
+    "-D__GEKKO__",
+    "-DSDK_REVISION=1",
+    "-DNDEBUG=1",
+]
+# Per-library deviations reported by mitsevox/mvp2005 (unverified here).
+cflags_dolphin_dvd = [f if f != "-char unsigned" else "-char signed" for f in cflags_dolphin_sdk]
+cflags_dolphin_mtx = cflags_dolphin_dvd
+cflags_dolphin_exi = [f if f != "-O4,p" else "-O3,p" for f in cflags_dolphin_sdk]
+
+
 # Units not listed here are linked from the dtk split (assembly).
 config.libs = [
     {
@@ -926,6 +980,33 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80375038.cpp"),
             Object(NonMatching, "ealib/tu_80375AE8.cpp"),
             Object(NonMatching, "ealib/tu_80376598.cpp"),
+            Object(NonMatching, "ealib/tu_8036F44C.cpp"),
+            Object(NonMatching, "ealib/tu_8038BC58.cpp"),
+            Object(NonMatching, "ealib/tu_803BA9DC.cpp"),
+            Object(NonMatching, "ealib/tu_803BD944.cpp"),
+            Object(NonMatching, "ealib/tu_803BE8BC.cpp"),
+            Object(NonMatching, "ealib/tu_803C1DD0.cpp"),
+            Object(NonMatching, "ealib/tu_803CB728.cpp"),
+            Object(NonMatching, "ealib/tu_803CECA4.cpp"),
+            Object(NonMatching, "ealib/tu_803D2B20.cpp"),
+            Object(NonMatching, "ealib/tu_803D50E4.cpp"),
+            Object(NonMatching, "ealib/tu_803D7830.cpp"),
+            Object(NonMatching, "ealib/tu_803D8234.cpp"),
+            Object(NonMatching, "ealib/tu_803D9C34.cpp"),
+            Object(NonMatching, "ealib/tu_803DA188.cpp"),
+            Object(NonMatching, "ealib/tu_803DA4EC.cpp"),
+            Object(NonMatching, "ealib/tu_803DBFF4.cpp"),
+            Object(NonMatching, "ealib/tu_803DDCD4.cpp"),
+            Object(NonMatching, "ealib/tu_803DE414.cpp"),
+            Object(NonMatching, "ealib/tu_803E097C.cpp"),
+            Object(NonMatching, "ealib/tu_803E0ACC.cpp"),
+            Object(NonMatching, "ealib/tu_803E1F98.cpp"),
+            Object(NonMatching, "ealib/tu_803E2248.cpp"),
+            Object(NonMatching, "ealib/tu_803E3280.cpp"),
+            Object(NonMatching, "ealib/tu_803E3C08.cpp"),
+            Object(NonMatching, "ealib/tu_803E6FB8.cpp"),
+            Object(NonMatching, "ealib/tu_803E9C20.cpp"),
+            Object(NonMatching, "ealib/tu_803EAF50.cpp"),
         ],
     },
     {
@@ -936,6 +1017,170 @@ config.libs = [
         "objects": [
             Object(NonMatching, "ealibs/tu_803D7ED4.cpp"),
             Object(NonMatching, "ealibs/tu_803D9FE8.cpp"),
+        ],
+    },
+    {
+        "lib": "gamelib",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_gamelib,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "gamelib/tu_80377048.cpp"),
+            Object(NonMatching, "gamelib/tu_80377CD4.cpp"),
+            Object(NonMatching, "gamelib/tu_80378D70.cpp"),
+            Object(NonMatching, "gamelib/tu_8037B3AC.cpp"),
+            Object(NonMatching, "gamelib/tu_8037C764.cpp"),
+            Object(NonMatching, "gamelib/tu_8037E64C.cpp"),
+            Object(NonMatching, "gamelib/tu_80382BB8.cpp"),
+            Object(NonMatching, "gamelib/tu_80383E00.cpp"),
+            Object(NonMatching, "gamelib/tu_80387E28.cpp"),
+            Object(NonMatching, "gamelib/tu_8038B938.cpp"),
+        ],
+    },
+    {
+        "lib": "ealib_sda",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_ealib_sda,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "ealib/tu_8038EC58.cpp"),
+            Object(NonMatching, "ealib/tu_8038F73C.cpp"),
+            Object(NonMatching, "ealib/tu_803912F8.cpp"),
+            Object(NonMatching, "ealib/tu_803927E4.cpp"),
+            Object(NonMatching, "ealib/tu_80394744.cpp"),
+            Object(NonMatching, "ealib/tu_803959E0.cpp"),
+            Object(NonMatching, "ealib/tu_80397CAC.cpp"),
+            Object(NonMatching, "ealib/tu_8039B3E4.cpp"),
+            Object(NonMatching, "ealib/tu_803A0310.cpp"),
+            Object(NonMatching, "ealib/tu_803EB2AC.cpp"),
+            Object(NonMatching, "ealib/tu_803EBF90.cpp"),
+            Object(NonMatching, "ealib/tu_803ED700.cpp"),
+            Object(NonMatching, "ealib/tu_803EE8F8.cpp"),
+            Object(NonMatching, "ealib/tu_803F00FC.cpp"),
+            Object(NonMatching, "ealib/tu_803F2000.cpp"),
+            Object(NonMatching, "ealib/tu_803F73B0.cpp"),
+            Object(NonMatching, "ealib/tu_803F9350.cpp"),
+            Object(NonMatching, "ealib/tu_803FAE94.cpp"),
+            Object(NonMatching, "ealib/tu_803FBF54.cpp"),
+            Object(NonMatching, "ealib/tu_803FEB34.cpp"),
+            Object(NonMatching, "ealib/tu_803FFD9C.cpp"),
+            Object(NonMatching, "ealib/tu_80400DA4.cpp"),
+            Object(NonMatching, "ealib/tu_804027DC.cpp"),
+        ],
+    },
+    {
+        "lib": "snd",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_snd,
+        "progress_category": "game",
+        "objects": [
+            Object(NonMatching, "snd/cmn/saems.c"),
+            Object(NonMatching, "snd/tu_803A6B64.cpp"),
+            Object(NonMatching, "snd/tu_803A6D80.cpp"),
+            Object(NonMatching, "snd/cmn/salloc.c"),
+            Object(NonMatching, "snd/tu_803A81E0.cpp"),
+            Object(NonMatching, "snd/cmn/sballoc.c"),
+            Object(NonMatching, "snd/cmn/sbhdrcpy.c"),
+            Object(NonMatching, "snd/cmn/sbhdrsze.c"),
+            Object(NonMatching, "snd/tu_803A8548.cpp"),
+            Object(NonMatching, "snd/cmn/sbplay.c"),
+            Object(NonMatching, "snd/tu_803A8648.cpp"),
+            Object(NonMatching, "snd/cmn/sbvalid.c"),
+            Object(NonMatching, "snd/cmn/scheckpo.c"),
+            Object(NonMatching, "snd/tu_803A8860.cpp"),
+            Object(NonMatching, "snd/cmn/smemcpy.c"),
+            Object(NonMatching, "snd/cmn/smemman.c"),
+            Object(NonMatching, "snd/tu_803A914C.cpp"),
+            Object(NonMatching, "snd/cmn/spitch.c"),
+            Object(NonMatching, "snd/tu_803A9204.cpp"),
+            Object(NonMatching, "snd/tu_803A9830.cpp"),
+            Object(NonMatching, "snd/cmn/sstgetpv.c"),
+            Object(NonMatching, "snd/tu_803AB310.cpp"),
+            Object(NonMatching, "snd/tu_803AC88C.cpp"),
+            Object(NonMatching, "snd/tu_803AFDC0.cpp"),
+            Object(NonMatching, "snd/tu_803B21AC.cpp"),
+            Object(NonMatching, "snd/cmn/sctrldry.cpp"),
+            Object(NonMatching, "snd/tu_803B3E18.cpp"),
+            Object(NonMatching, "snd/cmn/sgetpvol.c"),
+            Object(NonMatching, "snd/tu_803B4074.cpp"),
+            Object(NonMatching, "snd/cmn/spatkey.c"),
+            Object(NonMatching, "snd/tu_803B4BEC.cpp"),
+            Object(NonMatching, "snd/tu_803B6AF8.cpp"),
+            Object(NonMatching, "snd/cmn/sattrdef.c"),
+            Object(NonMatching, "snd/tu_803B7DA0.cpp"),
+            Object(NonMatching, "snd/tu_803B998C.cpp"),
+        ],
+    },
+    {
+        "lib": "libsn",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_libsn,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "libc",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_libc,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "libm",
+        "mw_version": "ProDG/3.9.3",
+        "cflags": cflags_libm,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_sdk",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_sdk,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_dvd",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_dvd,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_exi",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_exi,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_mtx",
+        "mw_version": "GC/1.2.5n",
+        "cflags": cflags_dolphin_mtx,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_vm",
+        "mw_version": "GC/2.0",
+        "cflags": cflags_dolphin_sdk,
+        "progress_category": "sdk",
+        "objects": [
+        ],
+    },
+    {
+        "lib": "dolphin_dbg",
+        "mw_version": "GC/2.0",
+        "cflags": cflags_dolphin_sdk,
+        "progress_category": "sdk",
+        "objects": [
         ],
     },
 ]
