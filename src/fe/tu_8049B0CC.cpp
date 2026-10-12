@@ -8,6 +8,7 @@
 extern const char lbl_805F74C4[];
 extern "C" char* strncpy(char*, const char*, unsigned);
 extern "C" char fn_800B56C4(void* s);
+extern "C" void fn_8049D5C8(void* x);
 extern "C" {
 
 FE_OVERLAY void fn_8049B0CC(void* x)
@@ -223,6 +224,30 @@ FE_OVERLAY void fn_8049D430(char* x)
     }
 }
 
+FE_OVERLAY void fn_8049D454(void* x, FeW* w)
+{
+    if (w == FeMem(x, 0x154)) {
+        int k = FeI(x, 0x334);
+        if (k == 0) {
+            char* b = (char*)fn_800B555C() + 8;
+            FeI(b, 0x664) = ((FeSubI*)((char*)FeP(x, 0x158) + 0xDC))->s5();
+        } else if (k == 2) {
+            char* b = (char*)fn_800B555C() + 8;
+            FeI(b, 0x668) = ((FeSubI*)((char*)FeP(x, 0x158) + 0xDC))->s5();
+        }
+        int v = ((FeWI*)FeMem(x, 0x138))->s61();
+        fn_8049D5C8(x);
+        fn_8049CBD4(x);
+        if (FeI(x, 0x15C) == 1) {
+            ((FeWT*)FeMem(x, 0x138))->s86(2, FeI(x, 0x160) ^ 1, (char*)x + 0x164);
+        }
+        ((FeWT*)FeMem(x, 0x138))->s86(FeI(x, 0x15C), FeI(x, 0x160), (char*)x + 0x164);
+        FeMem(x, 0x138)->fn_vslot68(0);
+        ((FeWQ*)FeMem(x, 0x138))->s69(v);
+    }
+}
+
+//// a
 FE_OVERLAY void fn_8049DE70(char* x)
 {
     int idx = FeMem(x, 0x138)->fn_vslot60();
