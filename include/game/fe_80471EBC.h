@@ -220,18 +220,214 @@ inline void FeSet(char* b, int o, int v)
 {
     *(int*)(b + o) = v;
 }
+/* Fixed-size buffer object embedded at +0x148 of the screen of lbl_80676330 (vptr slot m10 swapped
+ * through three tables by its inline ctor/reset code). */
+struct FeArr {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+    void Reset()
+    {
+        m4 = 0;
+        mC = 0;
+    }
+    void Reset2()
+    {
+        mC = 0;
+        m4 = 0;
+    }
+};
+struct FeScrArr : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    int m144;
+    FeArr m148;
+    char m160[1];
+};
+
+/* Widget view whose slot 90 takes (int a, int b, int c). */
+struct FeWV90 : Unk800C7B40_Data {
+    virtual ~FeWV90();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89();
+    virtual void s90(int a, int b, int c);
+    virtual void s91();
+    virtual void s92();
+    virtual void s93();
+    virtual void s94();
+    virtual void s95();
+    virtual void s96();
+    virtual void s97();
+    virtual void s98();
+    virtual void s99();
+    virtual void s100();
+    virtual void s101();
+    virtual void s102();
+    virtual void s103();
+    virtual void s104();
+    virtual void s105();
+    virtual void s106();
+    virtual void s107();
+    virtual void s108();
+    virtual void s109();
+    virtual void s110();
+    virtual void s111();
+    virtual void s112();
+    virtual void s113();
+    virtual void s114();
+    virtual void s115();
+    virtual void s116();
+    virtual void s117();
+    virtual void s118();
+    virtual void s119();
+    virtual void s120();
+    virtual void s121();
+    virtual void s122();
+    virtual void s123();
+    virtual void s124();
+    virtual void s125();
+    virtual void s126();
+    virtual void s127();
+};
+/* FeSub (fe_80459228.h) with 21 slots (slot 21 returns int). */
+struct FeSubC : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual int s21();
+};
+/* Sub-object view (vptr at +0x24 of the sub-object): slot 8 takes (int a). */
+struct FeSubV8 : FeSubData {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+};
 
 /* BEGIN-HAND */
 extern const char lbl_805F619C[];
 extern const char lbl_80677818[];
 extern "C" {
-void fn_800B5758();
+int fn_800B5758();
 void fn_80473560(FeScrD* x);
 void fn_80476A84(FeScrD* x);
 void fn_8047C47C(void* p);
 }
 extern "C" void fn_80125BC0(void*);
-extern "C" void fn_80473440(void*);
 extern "C" int fn_80476134(void*);
 extern "C" int fn_80476C44(void*);
 extern "C" void fn_80477608(void*, void*, const char*);
@@ -241,23 +437,15 @@ extern int lbl_806217E8[];
 extern "C" void fn_8048E7E4(void*);
 extern "C" void fn_8048E6A0(void*);
 extern "C" void fn_804089B4(char*, const char*, ...);
-extern "C" void fn_8047E490(void*);
-extern "C" void fn_804805B4(void*);
 extern "C" void fn_804873B4(void*);
 extern "C" void fn_8055AC44(void*, int);
 extern int lbl_806217D8[];
 extern int lbl_806217C4[];
-extern "C" void fn_8047CDC0(void*);
-extern "C" void fn_8047CF5C(void*);
 extern "C" void fn_8047D02C(void*);
-extern "C" void fn_80487FE0(void*, int);
 extern "C" FeW* fn_800C8060();
 extern "C" void* fn_8007F7D0__FP13Unk8007F198_BUi(void*, int);
 extern "C" void fn_8007B780__18Unk8007B2B0_Screen(void*, void*, int);
 extern "C" void fn_8055EAFC(void*);
-extern "C" void fn_8047E7E8(void*, int);
-extern "C" void fn_80480960(void*, int);
-extern "C" void fn_80482D1C(void*);
 extern "C" void fn_8047B15C(void*);
 extern "C" void fn_8048BCE4(void*);
 extern "C" int fn_8007A270__18Unk8007A4DC_Screeni(void*, int, int);
@@ -269,13 +457,6 @@ extern "C" void fn_80560B44(void*, void*, int);
 extern "C" void fn_8047E8E0(void*);
 extern "C" void* fn_80548E1C(int, int);
 extern "C" void fn_804A96A4(void*, void*, int, int, int, int, int, int);
-extern "C" int fn_8047F450(void*);
-extern "C" void fn_8047F0A4(void*, int);
-extern "C" void fn_8047F1C0(void*, int);
-extern "C" int fn_8048157C(void*);
-extern "C" void fn_80481200(void*, int);
-extern "C" void fn_8048131C(void*, int);
-extern "C" int fn_80488178(void*);
 extern "C" void fn_80487A64(void*, int);
 extern "C" void fn_80487BD4(void*, int);
 extern "C" void fn_80479C9C(void*, int);
@@ -288,9 +469,34 @@ extern "C" void* fn_800C8058();
 extern "C" void fn_80483A9C(void*);
 extern "C" FeW* fn_8048E8B0(void*);
 extern "C" void fn_80484178(void*, int);
-extern "C" void fn_80483708(void*, int);
 extern "C" void fn_8048432C(void*, int);
 extern "C" void fn_8047C9A0(void*, int);
+extern "C" int fn_8007B3E0__18Unk8007B2B0_Screenii(void*, int, void*);
+extern "C" void* fn_8007B320__18Unk8007B2B0_Screenii(void*, int, void*);
+extern "C" int fn_8007B8C4__18Unk8007B2B0_Screenii(void*, int, void*);
+extern "C" void fn_805819A4(void*, void*, int);
+extern "C" void fn_8047C900(void*);
+extern "C" void fn_804757EC(void*);
+extern "C" void fn_80475EF0(void*);
+extern "C" void fn_8040074C(void*, int);
+extern "C" void fn_8007F29C__FP13Unk8007F198_Aii(void*, int, int);
+extern "C" void fn_8007F330__FP13Unk8007F198_Aii(void*, int, int);
+extern "C" void fn_80486D7C(void*);
+extern "C" void fn_800D0074(void*, int, int);
+extern "C" void fn_80123858(void*, int, int);
+extern "C" void fn_8047E244(void*);
+extern "C" void fn_80480380(void*);
+extern "C" void fn_80480380(void*);
+extern "C" void fn_80486650(void*);
+extern "C" void fn_80486650(void*);
+extern "C" void fn_800C2034(void*, int);
+extern "C" int fn_80075948__18Unk8007B2B0_Screeni(void*, int);
+extern "C" void fn_8055F5A0(int);
+extern "C" void fn_80562E34(int);
+extern "C" int fn_800A3270(void*, int*, int*);
+extern "C" void fn_80482DBC(void*);
+extern "C" void fn_80122D40(void*, int, int, int, int, int, void*);
+extern "C" void* fn_800C8054();
 
 /* END-HAND */
 /* auto: callees */
@@ -305,7 +511,6 @@ void* fn_80074754(int, int, int, int);
 float fn_800748D4(int, int, int, int);
 int fn_80075094(int, int, int, int, int);
 int fn_80075808__Fi(int);
-int fn_80075948__18Unk8007B2B0_Screeni(void*, int, void**);
 int fn_80075CF0__Fii(int, int);
 void fn_8007824C(int, int);
 void fn_80079564(void*, int, int, void**);
@@ -325,10 +530,7 @@ char fn_8007AA84__18Unk8007A4DC_Screeniii(int, int, int, int);
 char fn_8007AB9C__18Unk8007A4DC_Screenii(int, int, int);
 int fn_8007B2B0__18Unk8007B2B0_Screen(void*);
 void* fn_8007B2FC__18Unk8007B2B0_Screeni(void*, int);
-int fn_8007B320__18Unk8007B2B0_Screenii(int, int, int, int*);
-int fn_8007B3E0__18Unk8007B2B0_Screenii(void*, int, void*);
 void fn_8007B4A8__18Unk8007B2B0_Screeniii(void*, int, void*, int);
-int fn_8007B8C4__18Unk8007B2B0_Screenii(void*, int, int);
 void fn_8007B924__18Unk8007B2B0_ScreeniiPc(void*, int, int, void*);
 void fn_8007B9F4__18Unk8007B2B0_ScreeniiPc(void*, int, void*, void*);
 void fn_8007DD38__FP13Unk8007DB74_Aiiii(int, int*, int, int, int);
@@ -368,8 +570,6 @@ int fn_8007F0A8__FP13Unk8007DB74_Ai(int, int*);
 int fn_8007F0F0__FP13Unk8007DB74_Aii(int, int*, int);
 void fn_8007F114__FP13Unk8007DB74_AiiPi(int, int*, int, int*);
 unsigned fn_8007F198__FP13Unk8007F198_A(int, int);
-void fn_8007F29C__FP13Unk8007F198_Aii(int, int, int, int*);
-void fn_8007F330__FP13Unk8007F198_Aii(int, int, int);
 unsigned fn_8007FB2C__FP13Unk8007F198_Ci(int, int);
 unsigned fn_8007FB40__FP13Unk8007F198_Ci(int, int);
 int fn_8007FB98__FP13Unk8007F198_Ciii(int, void*, int, int);
@@ -408,7 +608,6 @@ int fn_800A2E6C(void*);
 int fn_800A2EB4(void*);
 int fn_800A2EFC(int, int*);
 void fn_800A2F9C(void*, int, void**);
-int fn_800A3270(int, int*, int*);
 void fn_800A3490(void*, int, int, int);
 void fn_800A3578(void*);
 int fn_800A35A8(void*);
@@ -426,13 +625,10 @@ int* fn_800B5CBC();
 void fn_800B8144();
 void fn_800B82D0(int, int);
 void fn_800B83F8(int, int);
-void fn_800C2034(int, int);
 int fn_800C203C(int);
 void fn_800C3ED4(int, void*, int);
 void* fn_800C8040(int);
 void* fn_800C8048();
-int fn_800C8054();
-void fn_800D0074(void*, int, int);
 void fn_800D6FA0__Fv();
 float fn_800D7008__FP15Unk800D7008_Obji(void*);
 void fn_800DB7DC__Fv();
@@ -467,8 +663,6 @@ int fn_800E5F38(int);
 int fn_800E60E0__Fi();
 void fn_80119F48(void*, float);
 void fn_80119FF0(void*, float);
-void fn_80122D40(void*, int, int, int, int, int, void*);
-void fn_80123858(int, int, int);
 void fn_80124B40(void*, void*, int, int, void*);
 void fn_80125128(void*, int);
 void fn_80125154(void*, int);
@@ -478,7 +672,6 @@ void fn_801321D4(void*, void*, void*, void*, void*, float*, int, int, int);
 void fn_8014DBA0(void*, int, int, int, int);
 void fn_80329FA0(void*, int);
 void fn_8032A0C0(void*, unsigned);
-void fn_8040074C(void*, int, int);
 void fn_80402EF8(float*, void*);
 void fn_80403144(void*, int);
 void fn_804031BC(void*, void*, void**);
@@ -515,8 +708,6 @@ int fn_805559D4(int, void*, int, int);
 void fn_80556348(void*);
 int fn_805563C4(void*);
 int fn_80556410(void*);
-void fn_8055F5A0(int*);
-void fn_80562E34(int*);
 void fn_80563F3C(int, int, int, float*, float**, int*, int, int);
 int fn_8056469C(int, int, int, int, int, float, float);
 int fn_8056A2F8(int, int, int, int, int, void*, int, int);
@@ -531,7 +722,6 @@ int fn_8056B658(int, int, void*);
 int fn_8057CE00(int);
 int fn_8057CF60(int);
 int* fn_8057CFA8(int);
-void fn_805819A4(int, int, int);
 void fn_80590CA8(int);
 float fn_80592288(void*, int);
 float fn_805922EC(void*, int);
@@ -838,6 +1028,9 @@ extern "C" int fn_80472CAC(FeW* x, FeW* w, int b, int c);
 #ifndef NOPROTO_fn_80472E04
 extern "C" FeScrH* fn_80472E04(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
 #endif
+#ifndef NOPROTO_fn_804730A4
+extern "C" void fn_804730A4(void* x);
+#endif
 #ifndef NOPROTO_fn_804731C4
 extern "C" void fn_804731C4(FeScrD* x);
 #endif
@@ -862,6 +1055,12 @@ extern "C" int fn_8047336C(FeW* x, int a, int b, int c);
 #ifndef NOPROTO_fn_804733C4
 extern "C" void fn_804733C4(void* x, char* buf);
 #endif
+#ifndef NOPROTO_fn_80473440
+extern "C" void fn_80473440(void* x);
+#endif
+#ifndef NOPROTO_fn_80473560
+extern "C" void fn_80473560(FeScrD* x);
+#endif
 #ifndef NOPROTO_fn_80473630
 extern "C" void fn_80473630(FeScrD* x);
 #endif
@@ -876,6 +1075,9 @@ extern "C" void fn_80473A98(void* x, int a);
 #endif
 #ifndef NOPROTO_fn_80473AE8
 extern "C" FeScrH* fn_80473AE8(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
+#ifndef NOPROTO_fn_80473D44
+extern "C" int fn_80473D44(void* x);
 #endif
 #ifndef NOPROTO_fn_80473E48
 extern "C" int fn_80473E48(FeScrK* x);
@@ -892,11 +1094,17 @@ extern "C" int fn_80473F2C(void* x);
 #ifndef NOPROTO_fn_80473F68
 extern "C" int fn_80473F68(void* x);
 #endif
+#ifndef NOPROTO_fn_80473FA4
+extern "C" int fn_80473FA4(void* x);
+#endif
 #ifndef NOPROTO_fn_804740A8
 extern "C" FeScrH* fn_804740A8(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
 #endif
 #ifndef NOPROTO_fn_80474660
 extern "C" int fn_80474660(FeScrK* x);
+#endif
+#ifndef NOPROTO_fn_804746CC
+extern "C" int fn_804746CC(FeW* x);
 #endif
 #ifndef NOPROTO_fn_804747E8
 extern "C" int fn_804747E8(void* x);
@@ -933,6 +1141,9 @@ extern "C" void fn_80474BB8(int a);
 #endif
 #ifndef NOPROTO_fn_80474C44
 extern "C" FeScrH* fn_80474C44(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
+#ifndef NOPROTO_fn_804753E8
+extern "C" void fn_804753E8(FeW* x, int sel, int c);
 #endif
 #ifndef NOPROTO_fn_804754C0
 extern "C" int fn_804754C0(void* x);
@@ -1033,6 +1244,9 @@ extern "C" int fn_80478064(FeW* x, int a);
 #ifndef NOPROTO_fn_8047809C
 extern "C" FeScrH* fn_8047809C(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
 #endif
+#ifndef NOPROTO_fn_80479378
+extern "C" void fn_80479378(int a, FeW* x);
+#endif
 #ifndef NOPROTO_fn_80479480
 extern "C" void fn_80479480(void* x);
 #endif
@@ -1051,8 +1265,14 @@ extern "C" void fn_8047AA20(char* x);
 #ifndef NOPROTO_fn_8047AE14
 extern "C" void fn_8047AE14(void* x, int v);
 #endif
+#ifndef NOPROTO_fn_8047AE1C
+extern "C" int fn_8047AE1C(void* x);
+#endif
 #ifndef NOPROTO_fn_8047B01C
 extern "C" void fn_8047B01C(void* x);
+#endif
+#ifndef NOPROTO_fn_8047B064
+extern "C" int fn_8047B064(FeW* x, int a);
 #endif
 #ifndef NOPROTO_fn_8047B9AC
 extern "C" int fn_8047B9AC(void* x);
@@ -1102,8 +1322,14 @@ extern "C" int fn_8047C444(char* x, int key);
 #ifndef NOPROTO_fn_8047C958
 extern "C" void fn_8047C958(char* buf, int v);
 #endif
+#ifndef NOPROTO_fn_8047CDC0
+extern "C" void fn_8047CDC0(void* x);
+#endif
 #ifndef NOPROTO_fn_8047CE94
 extern "C" void fn_8047CE94(void* x, FeW* w, int b, int c);
+#endif
+#ifndef NOPROTO_fn_8047CF5C
+extern "C" void fn_8047CF5C(void* x);
 #endif
 #ifndef NOPROTO_fn_8047D150
 extern "C" void fn_8047D150();
@@ -1144,6 +1370,9 @@ extern "C" int fn_8047E0B4(void* x);
 #ifndef NOPROTO_fn_8047E104
 extern "C" int fn_8047E104(void* x);
 #endif
+#ifndef NOPROTO_fn_8047E140
+extern "C" int fn_8047E140(void* x);
+#endif
 #ifndef NOPROTO_fn_8047E19C
 extern "C" int fn_8047E19C(void* x);
 #endif
@@ -1171,14 +1400,35 @@ extern "C" int fn_8047E234(void);
 #ifndef NOPROTO_fn_8047E23C
 extern "C" int fn_8047E23C(void);
 #endif
+#ifndef NOPROTO_fn_8047E490
+extern "C" void fn_8047E490(void* x);
+#endif
 #ifndef NOPROTO_fn_8047E5B0
 extern "C" int fn_8047E5B0(void* x, int a, int b, int c);
+#endif
+#ifndef NOPROTO_fn_8047E660
+extern "C" int fn_8047E660(FeW* x, FeW* w, int b, int c);
 #endif
 #ifndef NOPROTO_fn_8047E758
 extern "C" void fn_8047E758(void* x, int a);
 #endif
+#ifndef NOPROTO_fn_8047E7E8
+extern "C" void fn_8047E7E8(void* x, int wi);
+#endif
+#ifndef NOPROTO_fn_8047F0A4
+extern "C" void fn_8047F0A4(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_8047F1C0
+extern "C" void fn_8047F1C0(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_8047F2DC
+extern "C" void fn_8047F2DC(char* x, int a, int b);
+#endif
 #ifndef NOPROTO_fn_8047F3B0
 extern "C" int fn_8047F3B0(void* x);
+#endif
+#ifndef NOPROTO_fn_8047F450
+extern "C" int fn_8047F450(void* x);
 #endif
 #ifndef NOPROTO_fn_8047F4CC
 extern "C" int fn_8047F4CC(void* x);
@@ -1200,6 +1450,9 @@ extern "C" int fn_804801F0(void* x);
 #endif
 #ifndef NOPROTO_fn_80480240
 extern "C" int fn_80480240(void* x);
+#endif
+#ifndef NOPROTO_fn_8048027C
+extern "C" int fn_8048027C(void* x);
 #endif
 #ifndef NOPROTO_fn_804802D8
 extern "C" int fn_804802D8(void* x);
@@ -1228,14 +1481,32 @@ extern "C" int fn_80480370(void);
 #ifndef NOPROTO_fn_80480378
 extern "C" int fn_80480378(void);
 #endif
+#ifndef NOPROTO_fn_804805B4
+extern "C" void fn_804805B4(void* x);
+#endif
 #ifndef NOPROTO_fn_804806D4
 extern "C" int fn_804806D4(void* x, int a, int b, int c);
+#endif
+#ifndef NOPROTO_fn_80480784
+extern "C" int fn_80480784(FeW* x, FeW* w, int b, int c);
+#endif
+#ifndef NOPROTO_fn_80480960
+extern "C" void fn_80480960(void* x, int wi);
+#endif
+#ifndef NOPROTO_fn_80481200
+extern "C" void fn_80481200(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_8048131C
+extern "C" void fn_8048131C(void* x, int a);
 #endif
 #ifndef NOPROTO_fn_80481438
 extern "C" void fn_80481438(char* x, int a, int b);
 #endif
 #ifndef NOPROTO_fn_804814DC
 extern "C" int fn_804814DC(void* x);
+#endif
+#ifndef NOPROTO_fn_8048157C
+extern "C" int fn_8048157C(void* x);
 #endif
 #ifndef NOPROTO_fn_804815F8
 extern "C" int fn_804815F8(void* x);
@@ -1255,6 +1526,12 @@ extern "C" int fn_80482958(void* x);
 #ifndef NOPROTO_fn_804829A8
 extern "C" int fn_804829A8(void* x);
 #endif
+#ifndef NOPROTO_fn_804829E4
+extern "C" int fn_804829E4(void* x);
+#endif
+#ifndef NOPROTO_fn_80482A40
+extern "C" int fn_80482A40(void* x);
+#endif
 #ifndef NOPROTO_fn_80482A9C
 extern "C" int fn_80482A9C(void* x);
 #endif
@@ -1270,8 +1547,17 @@ extern "C" int fn_80482B58(void* x);
 #ifndef NOPROTO_fn_80482B94
 extern "C" int fn_80482B94(void* x);
 #endif
+#ifndef NOPROTO_fn_80482BFC
+extern "C" int fn_80482BFC(void* x);
+#endif
 #ifndef NOPROTO_fn_80482C58
 extern "C" int fn_80482C58(void* x);
+#endif
+#ifndef NOPROTO_fn_80482D1C
+extern "C" void fn_80482D1C(void* x);
+#endif
+#ifndef NOPROTO_fn_804831CC
+extern "C" void fn_804831CC(void* x, FeW* w);
 #endif
 #ifndef NOPROTO_fn_804832BC
 extern "C" void fn_804832BC(void* x, int a, int b);
@@ -1279,14 +1565,29 @@ extern "C" void fn_804832BC(void* x, int a, int b);
 #ifndef NOPROTO_fn_804832F4
 extern "C" int fn_804832F4(void* x, int a, int b, int c);
 #endif
+#ifndef NOPROTO_fn_804833B4
+extern "C" int fn_804833B4(FeW* x, FeW* w, int b, int c);
+#endif
 #ifndef NOPROTO_fn_80483654
 extern "C" void fn_80483654(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_80483708
+extern "C" void fn_80483708(void* x, int wi);
 #endif
 #ifndef NOPROTO_fn_8048495C
 extern "C" int fn_8048495C(void* x);
 #endif
+#ifndef NOPROTO_fn_804849FC
+extern "C" int fn_804849FC(void* x);
+#endif
 #ifndef NOPROTO_fn_80484A78
 extern "C" void fn_80484A78(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_80484B18
+extern "C" void fn_80484B18(void* x, int a);
+#endif
+#ifndef NOPROTO_fn_80485008
+extern "C" void fn_80485008(int a, void* x);
 #endif
 #ifndef NOPROTO_fn_804851B0
 extern "C" void fn_804851B0(FeScrB* self);
@@ -1302,6 +1603,9 @@ extern "C" int fn_80485CC4(void* x);
 #endif
 #ifndef NOPROTO_fn_804860F8
 extern "C" int fn_804860F8(void* x, int a, int b, int c);
+#endif
+#ifndef NOPROTO_fn_804861A8
+extern "C" int fn_804861A8(FeW* x, FeW* w, int b, int c);
 #endif
 #ifndef NOPROTO_fn_804862A0
 extern "C" int fn_804862A0(void* x);
@@ -1345,8 +1649,20 @@ extern "C" int fn_804865D4(void* x);
 #ifndef NOPROTO_fn_80486614
 extern "C" int fn_80486614(void* x);
 #endif
+#ifndef NOPROTO_fn_80487FE0
+extern "C" void fn_80487FE0(void* x, int wi);
+#endif
 #ifndef NOPROTO_fn_804880D8
 extern "C" int fn_804880D8(void* x);
+#endif
+#ifndef NOPROTO_fn_80488178
+extern "C" int fn_80488178(void* x);
+#endif
+#ifndef NOPROTO_fn_8048884C
+extern "C" void fn_8048884C(int a, void* x);
+#endif
+#ifndef NOPROTO_fn_80488930
+extern "C" void fn_80488930(int a, void* x);
 #endif
 #ifndef NOPROTO_fn_80488CDC
 extern "C" FeScrH* fn_80488CDC(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -1369,11 +1685,17 @@ extern "C" int fn_804897F4(void* x);
 #ifndef NOPROTO_fn_80489830
 extern "C" int fn_80489830(void* x);
 #endif
+#ifndef NOPROTO_fn_8048A2AC
+extern "C" FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c, int d, int e, int f, int g, int h);
+#endif
 #ifndef NOPROTO_fn_8048A378
 extern "C" void fn_8048A378(FeScrCell* x);
 #endif
 #ifndef NOPROTO_fn_8048AB24
 extern "C" void fn_8048AB24(void* x);
+#endif
+#ifndef NOPROTO_fn_8048AB50
+extern "C" void fn_8048AB50(void* x);
 #endif
 #ifndef NOPROTO_fn_8048AC44
 extern "C" int fn_8048AC44(void* x);
