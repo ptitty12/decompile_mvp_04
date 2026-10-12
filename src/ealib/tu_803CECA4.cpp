@@ -560,6 +560,55 @@ extern "C" void fn_803D1A04(Unk803D1A30Obj* self, float* out)
     ((void (*)(Unk803D1A30Obj*, float*, float, float))fn_803D14E8)(self, out, 0.0f, 0.0f);
 }
 
+struct Unk803D1E54Obj {
+    char pad0[0x10];
+    void* m10;
+    char pad14[0x14];
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+};
+
+extern "C" {
+int printf(const char* fmt, ...);
+int fn_803D2B64(Unk803D1E54Obj* s, float t, float lo, float hi);
+float fn_803D2CBC(Unk803D1E54Obj* s, float t, float lo, float hi);
+void fn_803D1C78(Unk803D1E54Obj* s, float t);
+void fn_803D2170(Unk803D1E54Obj* s, int n);
+int fn_803D1FE8(Unk803D1FE8Obj* self, Unk803D0FFCVec2* out, float t0, float t1);
+void fn_803D240C(Unk803D240CSelf* self, float* v2);
+}
+
+/* near-miss (99.4%, 7 slots): retail multiplies m38*m28 before m38*m2C (f13/f0/f12 swapped); the scheduler here
+   issues the m2C product first. t, c1 and the x/y results are updated in place (two callee-saved floats). */
+extern "C" int fn_803D1E54(Unk803D1E54Obj* s, Unk803D0FFCVec2* out, float t)
+{
+    s->m3C = t;
+    if (s->m10 == 0)
+        fn_803D1C78(s, 0.0f);
+    t += s->m40;
+    int n = fn_803D2B64(s, t, 0.0f, 2.0f / s->m38);
+    printf("currTime: %g  offset: %g   cycle: %g\n", t, s->m40, 1.0f / s->m38);
+    printf("offset0: %g  offset1: %g\n", s->m30, s->m34);
+    printf("cycle0: %g  cycle1: %g\n", s->m28, s->m2C);
+    float c1 = s->m38 * s->m2C * t;
+    t = s->m38 * s->m28 * t;
+    printf("before offset t0: %g  t1: %g
+", t, c1);
+    t = fn_803D2CBC(s, t, 0.0f, 2.0f * s->m28) - s->m30;
+    c1 = fn_803D2CBC(s, c1, 0.0f, 2.0f * s->m2C) - s->m34;
+    if (fn_803D1FE8((Unk803D1FE8Obj*)s, out, t, c1)) {
+        fn_803D2170(s, n);
+        fn_803D240C((Unk803D240CSelf*)s, (float*)out);
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" int fn_803D1FE8(Unk803D1FE8Obj* self, Unk803D0FFCVec2* out, float t0, float t1)
 {
     Unk803D0FFCVec2 a;
