@@ -22,6 +22,11 @@ extern int* lbl_806AA2C4;
 static inline CHANPUB* ChanAt(CHANPUB* a, int i) { return &a[i]; }
 
 extern "C" int fn_803B270C(int voice, int ch, int v);
+extern "C" int fn_803B2794(int idx);
+extern "C" void fn_803B27DC(int idx, int n);
+extern "C" void fn_803B28AC(int idx, float v);
+extern "C" void fn_803B22EC(int idx, int ch, float v);
+extern "C" void fn_803B2AB4(int idx, int v);
 extern "C" int fn_803B115C(int a, int p);
 
 struct Unk803B0714 {
@@ -32,8 +37,26 @@ struct Unk803B0714 {
     int m259C[6];
 };
 
+struct Unk803B0E74_Pos {
+    char pad0[0x1B2];
+    unsigned short m1B2;
+    unsigned short m1B4;
+};
+
+/* 0x40-byte per-voice record at lbl_8069E200 + voice * 0x40 (0x50 of them), then the voice table. */
+struct Unk8069E200_Rec {
+    float mVol[6];
+    int m18;
+    signed char m1C;
+    char pad1D[7];
+    unsigned char m24;
+    char pad25[0x17];
+    Unk803B0E74_Pos* m3C;
+};
+
 struct Unk8069E200 {
-    char pad[0x1410];
+    Unk8069E200_Rec rec[0x50];
+    char pad1400[0x10];
     Unk803B0714* mVoices[16];
 };
 extern Unk8069E200 lbl_8069E200;
@@ -45,7 +68,10 @@ extern "C" void fn_80435DFC(void* p);
 extern "C" void fn_803B1B30();
 extern "C" void fn_803B1DF0();
 extern "C" void fn_803B2354();
-extern "C" void fn_803B1EF4();
+extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13);
+extern "C" void fn_803B5F9C(void* head, void* node);
+extern "C" int fn_803B3378(void* obj, int a, int b);
+extern unsigned char lbl_8069C9EB;
 /* near-miss: 41 insns, identical except scratch register choice for the early li 0 / lis constants (retail: li r11,0 right after the lwz; ours li r0,0 after the lfs); statement-order variants tried */
 extern "C" void fn_803B2108();
 extern "C" void fn_803B21EC();
@@ -61,6 +87,11 @@ extern void* lbl_806AA4E0;
 extern "C" void fn_803B6AF8();
 extern "C" void fn_803B343C();
 
+struct Unk803B18C0_B4 {
+    char pad0[0x3C];
+    float m3C;
+};
+
 struct Unk806AA2D4B {
     char pad0[9];
     unsigned char m9;
@@ -68,11 +99,13 @@ struct Unk806AA2D4B {
     short mC;
     char padE[6];
     float* m14;
-    char pad18[0x90];
+    void* m18[6][3];
+    int m60[6][3];
     void* mA8[2];
-    char padB0[8];
-    void* mB8[8];
-    char padD8[0x10];
+    void* mB0;
+    struct Unk803B18C0_B4* mB4;
+    void* mB8[6];
+    float* mD0[6];
     float mE8[6];
     float* m100;
     char pad104[0xD8];
@@ -111,7 +144,36 @@ struct Unk803B21EC_L {
     float* m34;
     float* m38;
     float m3C;
-    char pad40[0x1C];
+    struct Unk803B1EF4_Node* m40;
+    int m44;
+    struct Unk803B1EF4_Node* m48;
+    struct Unk803B1EF4_Node* m4C;
+    int m50;
+    int m54;
+    int m58;
+};
+
+/* Mixer node: first word is the process callback. */
+struct Unk803B1EF4_Node {
+    void* m0;
+    int m4;
+    char pad8[0x10];
+    short m18;
+    char m1A;
+};
+
+struct Unk803B1EF4_Args {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
 };
 extern Unk803B21EC_L* lbl_806AA4B0;
 extern float lbl_8060984C;
@@ -187,6 +249,40 @@ void Snd::Hal::SetDry(int voice)
     CHANPUB* c = (CHANPUB*)((char*)sndgs.chan + voice * 0x90);
     if (*(unsigned int*)&c->rendermode & 0x2040000)
         SetVol(voice);
+}
+
+extern "C" void fn_803AE0FC(void* h, int v);
+extern "C" void fn_803AE964(int v, int k);
+extern "C" void fn_8041A248(int h, int v);
+
+
+extern "C" int fn_803B0F24(int voice)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    Unk8069E200_Rec* r = &lbl_8069E200.rec[voice];
+    int i;
+    if (c->rendermode & 0x200) {
+        if (r->m1C >= 0) {
+            lbl_8069E200.mVoices[r->m1C]->m2598 = -1;
+            r->m1C = -1;
+        }
+        for (i = 0; i < c->numchan; i++) {
+            void* h = lbl_8069E200.rec[c->voices[i]].m3C;
+            if (h == 0)
+                return -8;
+            fn_8041A248((int)h, 0);
+            if (lbl_8069E200.rec[c->voices[i]].m24 != 0) {
+                fn_803AE964(c->voices[i], 0);
+                lbl_8069E200.rec[c->voices[i]].m24 = 0;
+            }
+        }
+    } else {
+        for (i = 0; i < c->numchan; i++) {
+            ((void (*)(int))lbl_806AA4DC)(c->voices[i] - sndgs.sso.set.voicesdsp);
+            SNDVOICEI_free(c->voices[i]);
+        }
+    }
+    return 0;
 }
 
 extern "C" int fn_803B1080(int voice, int v)
@@ -335,8 +431,86 @@ extern "C" void fn_803B14D0()
     lbl_806AA4E0 = (void*)fn_803B29F8;
 }
 
+extern "C" void fn_803B1554(float* p, float* q)
+{
+    q[0] = *p * (16.0f / 17.0f) + q[0];
+    q[1] = *p * (15.0f / 17.0f) + q[1];
+    q[2] = *p * (14.0f / 17.0f) + q[2];
+    q[3] = *p * (13.0f / 17.0f) + q[3];
+    q[4] = *p * (12.0f / 17.0f) + q[4];
+    q[5] = *p * (11.0f / 17.0f) + q[5];
+    q[6] = *p * (10.0f / 17.0f) + q[6];
+    q[7] = *p * (9.0f / 17.0f) + q[7];
+    q[8] = *p * (8.0f / 17.0f) + q[8];
+    q[9] = *p * (7.0f / 17.0f) + q[9];
+    q[10] = *p * (6.0f / 17.0f) + q[10];
+    q[11] = *p * (5.0f / 17.0f) + q[11];
+    q[12] = *p * (4.0f / 17.0f) + q[12];
+    q[13] = *p * (3.0f / 17.0f) + q[13];
+    q[14] = *p * (2.0f / 17.0f) + q[14];
+    q[15] = *p * (1.0f / 17.0f) + q[15];
+    *p = 0.0f;
+}
+
+extern "C" void fn_803B16F4(float* a, float* b, float lo, float hi)
+{
+    float s = (hi - lo) * (1.0f / 17.0f);
+    b[0] = a[0] * (lo + s) + b[0];
+    b[1] = a[1] * (lo + 2.0f * s) + b[1];
+    b[2] = a[2] * (s * 3.0f + lo) + b[2];
+    b[3] = a[3] * (s * 4.0f + lo) + b[3];
+    b[4] = a[4] * (s * 5.0f + lo) + b[4];
+    b[5] = a[5] * (s * 6.0f + lo) + b[5];
+    b[6] = a[6] * (s * 7.0f + lo) + b[6];
+    b[7] = a[7] * (s * 8.0f + lo) + b[7];
+    b[8] = a[8] * (s * 9.0f + lo) + b[8];
+    b[9] = a[9] * (s * 10.0f + lo) + b[9];
+    b[10] = a[10] * (s * 11.0f + lo) + b[10];
+    b[11] = a[11] * (s * 12.0f + lo) + b[11];
+    b[12] = a[12] * (s * 13.0f + lo) + b[12];
+    b[13] = a[13] * (s * 14.0f + lo) + b[13];
+    b[14] = a[14] * (s * 15.0f + lo) + b[14];
+    b[15] = a[15] * (s * 16.0f + lo) + b[15];
+}
+
 extern "C" void fn_803B18BC(float)
 {
+}
+
+extern "C" int fn_803B18C0(Unk803B21EC_L* l)
+{
+    int i;
+    if (((int (*)(void*, int, void*, void*, int))l->m40->m0)(l->m40, 0x10, lbl_806AA2D4.mB0, lbl_806AA2D4.mB4, 0) <= 0) {
+        for (i = 0; i < lbl_80625448; i++)
+            l->m34[i] = l->m38[i];
+        for (i = 0; i < lbl_806AA2D4.m9; i++)
+            l->m4[i] = l->m1C[i];
+        return 0;
+    }
+    l->m3C = lbl_806AA2D4.mB4->m3C;
+    for (i = 0; i < lbl_80625448; i++) {
+        if (((int*)lbl_806AA2D4.m14)[i] != 0) {
+            float a = l->m34[i];
+            float b = l->m38[i];
+            if (a != b) {
+                fn_803B16F4((float*)lbl_806AA2D4.mB4, ((float**)lbl_806AA2C4)[i], a, b);
+                l->m34[i] = l->m38[i];
+            } else if (b != 0.0f) {
+                ((void (*)(int, void*, void*, float))lbl_806AA2D4.m1E0)(0x10, lbl_806AA2D4.mB4, ((void**)lbl_806AA2C4)[i], b);
+            }
+        }
+    }
+    for (i = 0; i < lbl_806AA2D4.m9; i++) {
+        float a = l->m4[i];
+        float b = l->m1C[i];
+        if (a != b) {
+            fn_803B16F4((float*)lbl_806AA2D4.mB4, (float*)lbl_806AA2D4.mD0[i], a, b);
+            l->m4[i] = l->m1C[i];
+        } else if (b != 0.0f) {
+            ((void (*)(int, void*, void*, float))lbl_806AA2D4.m1E0)(0x10, lbl_806AA2D4.mB4, lbl_806AA2D4.mD0[i], b);
+        }
+    }
+    return 0x10;
 }
 
 extern "C" void* fn_803B1AF0(int n)
@@ -381,6 +555,70 @@ extern "C" void fn_803B1EC8()
     lbl_806AA2D4.mC = 0x140;
 }
 
+extern "C" void fn_803B1EF4(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13)
+{
+    Unk803B21EC_L* e = &lbl_806AA4B0[slot];
+    Unk803B1EF4_Args args;
+    int idx = 0;
+    int k;
+    e->m40 = 0;
+    e->m48 = 0;
+    e->m50 = 0;
+    e->m54 = 0;
+    e->m58 = 0;
+    e->m4C = 0;
+    args.m18 = 1;
+    k = -1;
+    args.m28 = 0;
+    if (kind == 7)
+        k = 0;
+    else if (kind == 10)
+        k = 1;
+    else if (kind == 4)
+        k = 2;
+    else if (kind == 22)
+        k = 3;
+    else if (kind == 16)
+        k = 4;
+    else if (kind == 23)
+        k = 5;
+    if (mode == 1) {
+        if (p9 > 0)
+            idx = 1;
+    } else if (mode == 0) {
+        idx = 2;
+    }
+    if (lbl_806AA2D4.m18[k][idx] != 0) {
+        e->m48 = (Unk803B1EF4_Node*)SNDMEMI_allocz(lbl_806AA2D4.m60[k][idx]);
+        args.m0 = a3;
+        args.m4 = a4;
+        args.m8 = a6;
+        args.m24 = p12;
+        args.mC = a7;
+        args.m10 = p8;
+        args.m14 = p9;
+        args.m20 = lbl_8069C9EB;
+        args.m1C = slot;
+        e->m48->m4 = 0;
+        e->m48->m18 = 0xF0;
+        e->m48->m1A = p13;
+        ((void (*)(void*, void*))lbl_806AA2D4.m18[k][idx])(e->m48, &args);
+        e->m44 = args.m28;
+        fn_803B5F9C(&e->m40, e->m48);
+    }
+    if (a5 != 0) {
+        if (mode != 0)
+            slot = -1;
+        e->m4C = (Unk803B1EF4_Node*)SNDMEMI_allocz(0x1834);
+        e->m4C->m4 = 0;
+        e->m4C->m18 = 0xC8;
+        e->m4C->m1A = p13;
+        fn_803B3378(e->m4C, a5, slot);
+        fn_803B5F9C(&e->m40, e->m4C);
+    }
+    e->m0 = 1;
+}
+
 extern "C" void fn_803B2108(int idx)
 {
     Unk803B21EC_L* e = &lbl_806AA4B0[idx];
@@ -393,4 +631,82 @@ extern "C" void fn_803B2108(int idx)
     for (i = 0; i < lbl_806AA2D4.m9; i++)
         e->m4[i] = e->m1C[i];
     e->m0 = 2;
+}
+
+int SNDPLATFORM_timemult(int voice, int timemult)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 4) {
+        int i;
+        for (i = 0; i < c->numchan; i++)
+            fn_803B2AB4(c->voices[i] - sndgs.sso.set.voicesdsp, timemult);
+    }
+    return 0;
+}
+
+void SNDPLATFORM_lowpass(int voice, int cutofffreq)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 4) {
+        float f = (float)cutofffreq * (1.0f / ((float)(unsigned)sndgs.sso.set.outputrate * 0.5f));
+        int i;
+        for (i = 0; i < c->numchan; i++)
+            fn_803B28AC(c->voices[i] - sndgs.sso.set.voicesdsp, f);
+    }
+}
+
+void SNDPLATFORM_highpass(int voice, int cutofffreq)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 4) {
+        int i;
+        for (i = 0; i < c->numchan; i++)
+            fn_803B27DC(c->voices[i] - sndgs.sso.set.voicesdsp, cutofffreq);
+    }
+}
+
+int SNDPLATFORM_getcurframe(int voice)
+{
+    Unk8069E200_Rec* r = &lbl_8069E200.rec[voice];
+    CHANPUB* c = &sndgs.chan[voice];
+    if (c->rendermode & 0x200) {
+        Unk803B0E74_Pos* p = r->m3C;
+        if (p == 0)
+            return -8;
+        int pos = (p->m1B2 << 16) + p->m1B4;
+        if (c->samplerep == 0x12) {
+            int d = pos - r->m18;
+            return (d * 7) >> 3;
+        }
+        return pos - r->m18;
+    }
+    return fn_803B2794(voice - sndgs.sso.set.voicesdsp);
+}
+
+extern "C" void fn_8041A458(int h, float pitch);
+extern char lbl_8069E23C[];
+
+int SNDPLATFORM_setpitch(int voice)
+{
+    CHANPUB* c = &sndgs.chan[voice];
+    unsigned q;
+    int i;
+    if (c->rendermode & 0x200) {
+        q = (c->samplerate << 12) / sndgs.sso.set.outputrate;
+        q = (q * c->finalpitch) >> 12;
+        float f = (float)q * 0.000244140625f;
+        for (i = 0; i < c->numchan; i++) {
+            int h = *(int*)(lbl_8069E23C + (c->voices[i] << 6));
+            if (h == 0)
+                return -8;
+            fn_8041A458(h, f);
+        }
+        return 0;
+    } else {
+        q = (c->samplerate << 15) / sndgs.sso.set.outputrate;
+        q = (q * c->finalpitch) >> 11;
+        for (i = 0; i < c->numchan; i++)
+            ((void (*)(int, unsigned))lbl_806AA4E0)(c->voices[i] - sndgs.sso.set.voicesdsp, q);
+        return 0;
+    }
 }
