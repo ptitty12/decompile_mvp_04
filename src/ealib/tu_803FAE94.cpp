@@ -17,7 +17,11 @@ struct RcLNode {
     int m10;
     int m14;
     void (*m18)(int);
-    int m1C;
+    volatile int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
 };
 
 struct RcLHead {
@@ -54,6 +58,10 @@ extern "C" int fn_803FBA28(int, RcReq*);
 extern "C" int fn_803FBB48(int, RcReq*);
 extern "C" int fn_803FBC94(int, RcReq*);
 extern "C" int fn_803FBDC4(int, RcReq*);
+extern "C" int fn_803FEC4C(int, int, int, int, int);
+extern "C" void fn_803F96B0(int, void (*)(int, int, int));
+extern "C" int fn_803F9C58(int, int, int, RcLNode*);
+extern "C" void fn_803FB2D4(int, int, RcLNode*);
 
 extern "C" void fn_803FAE94(RcLHead* l, RcLNode* n)
 {
@@ -131,6 +139,48 @@ extern "C" void fn_803FB0C0(int a, int b, RcLNode* n)
 {
     fn_803F9A80(n->m1C);
     fn_803FB040(n);
+}
+
+extern "C" int fn_803FB59C(int a, int b)
+{
+    RcLNode* n = fn_803FAF00(&lbl_806EF46C);
+    if (n == 0)
+        return 0;
+    fn_803FAF5C(n);
+    n->m14 = 1;
+    n->m8 = 0;
+    n->mC = 0;
+    n->m10 = 0;
+    n->m18 = 0;
+    n->m24 = 0;
+    n->m2C = 0;
+    n->m28 = b;
+    n->m1C = fn_803F9C58(a, 1, 0x64, n);
+    if (n->m1C == 0)
+        return 0;
+    fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
+    return n->m0;
+}
+
+extern "C" int fn_803FB64C(int a, int b, int c)
+{
+    RcLNode* n = fn_803FAF00(&lbl_806EF46C);
+    if (n == 0)
+        return 0;
+    fn_803FAF5C(n);
+    n->m8 = 0;
+    n->mC = 0;
+    n->m10 = 0;
+    n->m14 = 0;
+    n->m18 = 0;
+    n->m24 = 0;
+    n->m28 = c;
+    n->m2C = b;
+    n->m1C = fn_803F9C58(a, 1, 0x64, n);
+    if (n->m1C == 0)
+        return 0;
+    fn_803F96B0(n->m1C, (void (*)(int, int, int))fn_803FB2D4);
+    return n->m0;
 }
 
 extern "C" int fn_803FB6FC(int id)
