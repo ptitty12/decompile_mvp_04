@@ -5,6 +5,9 @@
 
 #include "game/fe_804D08D0.h"
 
+extern "C" void fn_804D98E8(FeS804D7FE0* x, FeTmp18* t);
+extern "C" void fn_804D9638(FeS804D7FE0* x, FeTmp18* t);
+
 extern "C" {
 
 FE_OVERLAY void fn_804D6180(void) {}
@@ -305,10 +308,46 @@ FE_OVERLAY void fn_804D95A4(FeS804D7FE0* x, int a)
     }
 }
 
+FE_OVERLAY int fn_804D9C50(FeS804D7FE0* x)
+{
+    if (((FeStateB*)fn_800B555C())->m0 == 0x42) {
+        FeTmp18 t;
+        int buf[0x28];
+        FeTmp18* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        fn_800C805C(x->m154->fn_vslot29(lbl_805F96D8))->fn_vslot40(1);
+        x->m16C ^= 1;
+        fn_804D98E8(x, q);
+        fn_804D9638(x, q);
+        t.D();
+    }
+    return 1;
+}
+
 FE_OVERLAY int fn_804D9D64(FeS804D7FE0* x)
 {
     if (((FeStateB*)fn_800B555C())->m0 == 0x42) {
         ((FeWX*)fn_800C805C(x->m154->fn_vslot29(lbl_805F96D8)))->s41();
+    }
+    return 1;
+}
+
+FE_OVERLAY int fn_804D9DE0(FeS804D7FE0* x)
+{
+    if (((FeStateB*)fn_800B555C())->m0 == 0x42) {
+        FeTmp18 t;
+        int buf[0x28];
+        FeTmp18* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        fn_800C805C(x->m154->fn_vslot29(lbl_805F96D8))->fn_vslot38(1);
+        x->m16C ^= 1;
+        fn_804D98E8(x, q);
+        fn_804D9638(x, q);
+        t.D();
     }
     return 1;
 }
