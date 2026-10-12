@@ -1154,7 +1154,7 @@ config.libs = [
             Object(Matching, "libc/bsearch.c"),
             Object(NonMatching, "libc/exit.c"),
             Object(NonMatching, "libc/mbtowc_r.c"),
-            Object(NonMatching, "libc/qsort.c"),
+            Object(Matching, "libc/qsort.c"),
             Object(NonMatching, "libc/rand.c"),
             Object(NonMatching, "libc/tu_8040ABC4.c"),
             Object(NonMatching, "libc/strtod2.c"),
