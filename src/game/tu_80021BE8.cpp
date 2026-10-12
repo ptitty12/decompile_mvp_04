@@ -162,6 +162,74 @@ extern "C" int fn_80022730(int unused, int b, int c)
     return r;
 }
 
+extern const float lbl_805A5FD8;
+extern const float lbl_805A5FDC;
+extern const float lbl_805A5FE0;
+extern const float lbl_805A5FE4;
+extern const float lbl_805A5FE8;
+extern const float lbl_805A5FEC;
+extern const float lbl_805A5FF0;
+extern "C" float fn_80410CE8(float y, float x);
+
+/* near-miss (170/170 insns, two load pairs swapped): retail loads the m8C field (m4C, m40) before the spilled
+ * local `c` in the second and third compare blocks and compares fcmpu c,field; here `c` is loaded first, and
+ * the swapped spelling (field < c) gives the right load order but fcmpu field,c. Same cause as fn_80022A28.
+ * The mode chain, the cr7 compare sharing and the 8-byte fabs temp (inline Abs) all match. */
+inline float Unk80022780_Abs(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" int fn_80022780(Unk80021A60_Data* x, Unk801A4B34_Vec3* pos, int mode, float a, float b, float c, float d, int side, int cnt)
+{
+    int r = -1;
+    float len = fn_804028E4(pos->x * pos->x + pos->z * pos->z);
+    if (!(a >= lbl_805A5FD8) && !(a <= lbl_805A5FDC) && !(b <= lbl_805A5FE0) && !(b >= lbl_805A5FE4)) {
+        r = 0x10;
+    } else if (mode == 1) {
+        r = 7;
+        if (cnt == 0)
+            r = 8;
+        if (cnt > 0) {
+            float ang = fn_80410CE8(pos->x, pos->z) * lbl_805A5FE8;
+            float ad = Unk80022780_Abs(ang - a);
+            if (!(ad < x->m8C->m4)) {
+                if ((!(ang <= a) && side == 1) || (!(ang >= a) && side == 0))
+                    r = 9;
+                else
+                    r = 10;
+            }
+        }
+    } else if (mode == 2) {
+        Unk8002118C* m = x->m8C;
+        r = 0xB;
+        if (!(d < m->m6C)) {
+            r = 0xD;
+        } else if (cnt == 1) {
+            if (!(d <= lbl_805A5FEC)) {
+                float q = len / d;
+                if (!(q < m->m64) && !(q > m->m68))
+                    r = 0xC;
+            }
+        }
+    } else if (mode == 0) {
+        r = 0;
+        if (!(b >= lbl_805A5FF0) && !(len > x->m8C->m38) && !(d < x->m8C->m3C)) {
+            r = 1;
+        } else {
+            Unk8002118C* m = x->m8C;
+            if (!(len > m->m50) && !(c > m->m4C))
+                r = 3;
+            else if (!(c > m->m40))
+                r = 6;
+            else if (!(c > m->m44) && !(len > m->m48))
+                r = 2;
+        }
+    } else if (mode == 4) {
+        r = 0xF;
+    } else if (mode == 3) {
+        r = 0xE;
+    }
+    return r;
+}
+
 extern Unk801A4B34_Vec3 lbl_80686DA8;
 
 static inline Unk801A4B34_Vec3 Unk80022BE0_Sub(const Unk801A4B34_Vec3& a, const Unk801A4B34_Vec3& b)
