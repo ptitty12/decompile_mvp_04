@@ -6,6 +6,31 @@
  * .text 0x8004B6BC-0x8004E364 only: every data object is extern by its lbl_ name.
  */
 #include "game/tu_8004B6BC.h"
+struct Unk8004D56C_Slot {
+    int m0;
+    int m4;
+    int m8;
+    char padC[0x18];
+};
+struct Unk8004D56C_AV {
+    char pad0[0x38];
+    int m38;
+    char pad3C[0x48 - 0x3C];
+    int m48;
+    char pad4C[0x70 - 0x4C];
+    Unk8004D56C_Slot m70[4];
+    int m100;
+    int m104;
+    char pad108[0x274 - 0x108];
+    int m274;
+};
+void fn_80014B00();
+void fn_80016F84();
+void fn_8001702C(int a);
+inline int Unk8004D56C_At(char* b, int o)
+{
+    return *(int*)(b + o);
+}
 void fn_800109F4();
 void fn_80011378(int a);
 void fn_80011534();
@@ -288,6 +313,48 @@ void fn_8004CAEC(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
     fn_8004EB58(s, idx, a);
     fn_8004FA94(s, idx, a);
     fn_8004D56C(s, idx, a);
+}
+
+void fn_8004D56C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
+{
+    Unk8004D56C_AV* v = (Unk8004D56C_AV*)a;
+    if (v->m38 > 0 && a->m4D4 <= 2 && fn_8004FF78(s, s->m9D8, 3) == -1) {
+        int f = 1;
+        int t = fn_8004FF78(s, s->m9D8, 0x2A);
+        if (t >= 0 && fn_8004FF78(s, t, 0x21) >= 0 && fn_8004FF78(s, s->m9D8, 0x38) == -1)
+            f = 0;
+        if (f != 0) {
+            if (Unk8004D56C_At((char*)a + 0x13C, v->m274 * 0x28) != 0 && Unk8004D56C_At((char*)a + 0x134, v->m274 * 0x28) == 0) {
+                if (a->m3D0 == 3) {
+                    int i = 0;
+                    Unk8004D56C_Slot* p = v->m70;
+                    for (; i < v->m100; p++, i++) {
+                        if (p->m0 != 0 && p->m8 == 0 && p->m4 == -1) {
+                            fn_80014B00();
+                            break;
+                        }
+                    }
+                }
+                if (v->m48 == 0) {
+                    int n = v->m104;
+                    if (n == 1 && v->m38 == 1) {
+                        Unk8004D56C_Slot* q = v->m70;
+                        if (q->m8 == q->m4 + 1)
+                            fn_80016F84();
+                    } else if (v->m104 > 1 && v->m38 == v->m104 && a->m4D8 == 0) {
+                        int i = 0;
+                        Unk8004D56C_Slot* q = v->m70;
+                        for (; i < v->m104; q++, i++) {
+                            if (q->m8 == q->m4 + 1) {
+                                fn_8001702C(((Unk8001CE80*)a)->fn_8001DB4C());
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 void fn_8004DC18(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
