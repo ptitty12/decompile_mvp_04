@@ -94,6 +94,9 @@ struct Unk802362A8_Cpu {
     void fn_8023A7F4();
     void fn_8023A6C8(int a);
     void fn_8023A13C();
+    int fn_80239448();
+    int fn_80238110();
+    int fn_802394CC();
     void fn_8023A1C8(int a);
 };
 

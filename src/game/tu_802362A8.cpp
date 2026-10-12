@@ -183,6 +183,25 @@ void Unk802362A8_Slots::fn_80237114()
     m8C = 0;
 }
 
+int Unk802362A8_Cpu::fn_80239448()
+{
+    int b = m2E4->m6F8->m14[2].m0;
+    int a = fn_80238110();
+    int c = fn_802394CC();
+    if (a != 0) {
+        if (c == 0) {
+            return 0;
+        }
+    } else {
+        int r = 0;
+        if (c != 0) {
+            r = 1;
+        }
+        return r;
+    }
+    return (unsigned)(b - 5) > 1;
+}
+
 /* near-miss: 35/35 insns, 6 slots; retail loads lbl_8061D220 (f2) before lbl_805D7C8C (f1) for the fn_801A0AA8 call,
    ours the reverse. Tried const/non-const globals, declaration order, a local for the second argument */
 void Unk802362A8_Cpu::fn_8023A13C()

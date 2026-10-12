@@ -18,7 +18,8 @@
  * the stride 0x1F8 in fn_8022FF2C), then a copy of the owner's first word at +0x3F4.
  */
 struct Unk8022FE34_Row {
-    char pad0[0x8];
+    unsigned char m0;
+    char pad9[0x7];
     int m8;
     char pad1[0x78 - 0xC];
     int m78;
