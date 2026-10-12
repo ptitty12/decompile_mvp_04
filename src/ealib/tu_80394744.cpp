@@ -62,6 +62,23 @@ extern "C" void fn_80394CD4(int x)
     lbl_8069B9B4[0] = x;
 }
 
+extern int lbl_80624438[];
+
+extern "C" void fn_80394DE8(int x)
+{
+    int a = x + 0xF22D0E56;
+    lbl_80624438[0] = a;
+    int b = a + 0x96041893;
+    lbl_80624438[1] = b;
+    int c = b + 0x3DF3B646;
+    lbl_80624438[2] = c;
+    int d = c + 0x40DDE76D;
+    lbl_80624438[3] = d;
+    int e = d + 0x97327AE1;
+    lbl_80624438[4] = e;
+    lbl_80624438[5] = e + 0xD1A9FBE7;
+}
+
 extern "C" void fn_80394EE4(int a, int b)
 {
     lbl_80624450[0] = lbl_80624450[0] + 1;
