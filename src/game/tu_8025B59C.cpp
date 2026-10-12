@@ -116,6 +116,33 @@ struct Unk8025C8A0_Ev {
 extern int lbl_8061E54C;
 extern int (*lbl_8068CD54[18])(void*);
 extern Unk8025C8A0_Pair lbl_805DAE50[18];
+int fn_80266784(void* p);
+int fn_80267B74(void* p);
+void* fn_801A4B34(void* w);
+extern const float lbl_805DB11C;
+extern const float lbl_805DB120;
+int fn_8018AD20(P* p);
+void fn_802491D8(P* p);
+void fn_8035E704(char* t, int i);
+void fn_80242E28(P* p, float f);
+extern float lbl_805DB200;
+struct Unk8025E680_I {
+    char pad0[0x1EC];
+    Q* m1EC;
+    char pad1F0[4];
+    Unk8024EF40_Ctx* m1F4;
+    char pad1F8[4];
+    int m1FC;
+    int m200;
+    char pad204[0x438 - 0x204];
+    P* m438[4];
+    int m448;
+};
+int fn_801BBEFC(int a);
+int fn_801BBF04(int a);
+void fn_8025E654(I* i);
+void fn_8026AA04(char* r, int v, const char* file, int line);
+extern float lbl_805DB1C8;
 struct Unk8025CB28_I {
     char pad0[0x1F0];
     M* m1F0;
@@ -222,6 +249,24 @@ void fn_8025C998(F* self)
 void fn_8025C9B8(F* self)
 {
     self->m0 = Secs(self->m14) ;
+}
+
+/* near-miss: 63 vs 61 instructions; retail stores the float constant k to its slot but keeps using the register, and merges the early `return 0` exits. Tried const/plain k, nested ifs, inline add/compare */
+int fn_8025C9FC(F* self, P* p)
+{
+    if (self->m0 < lbl_805DB11C)
+        return 0;
+    if (self->m1C == 0)
+        return 0;
+    if (fn_80266784((char*)self->m18 + 0x48) != 0 && fn_80267B74((char*)self->m18 + 0x48) != 0)
+        return 0;
+    P* pl = (P*)fn_801A4B34(((I*)self->m18)->m1EC);
+    if (pl->m58C.b2)
+        return 0;
+    const float k = lbl_805DB120;
+    float a = self->m0 + k;
+    float s = Secs(self->m14);
+    return a > s;
 }
 
 void fn_8025CAF0(F* self)
@@ -464,6 +509,34 @@ void fn_8025E654(I* self)
         self->m438[i] = 0;
 }
 
+void fn_8025E680(I* in)
+{
+    Unk8025E680_I* self = (Unk8025E680_I*)in;
+    int start = 10;
+    fn_8025E654(in);
+    if ((self->m1F4 != 0 && fn_801BBEFC(self->m1F4->m3BC) != 0) || fn_801BBF04(self->m1F4->m3BC) != 0)
+        start = 9;
+    for (int i = start; i <= 12; i++) {
+        P* p = Roster(self->m1EC, i);
+        if (p != 0) {
+            A* pa = &p->m58C;
+            pa->b3 = 0;
+            fn_80242E28(p, lbl_805DB1C8);
+            self->m438[self->m448] = p;
+            self->m448 = self->m448 + 1;
+        }
+    }
+    if (self->m1FC == 1 && self->m200 == 8) {
+        for (int j = 0; j < self->m448; j++) {
+            P* q = self->m438[j];
+            fn_80269F88((char*)self + 0x190, q, 3);
+            char* e = fn_8035E8CC((char*)self + 0x204, q->m458);
+            if (e != 0)
+                fn_8026AA04(e, 3, lbl_805DB170, 0x51B);
+        }
+    }
+}
+
 extern "C" void fn_8025E7E4(F* self)
 {
     fn_8025E804(self);
@@ -500,6 +573,33 @@ extern "C" void fn_8025E804(F* f)
                 fn_8025E924(self, p, fl);
             }
         }
+    }
+}
+
+void fn_8025ED44(I* self)
+{
+    P* top = (P*)fn_801A4B34(self->m1EC);
+    fn_802491D8(top);
+    if ((self->m448 == 0 || self->m438[0] != top) && fn_8018AD20(self->m1EC->m6CC) == 0) {
+        char* t = (char*)self + 0x204;
+        if (fn_8035E8CC(t, 9) != 0)
+            fn_8035E704(t, top->m458);
+        fn_80242E28(top, lbl_805DB200);
+        int j = self->m448;
+        if (j > 0) {
+            do {
+                int k = j - 1;
+                P** arr = (P**)((char*)self + 0x438);
+                P* x = arr[k];
+                int o = j * 4;
+                *(P**)((char*)arr + o) = x;
+                if (x != 0)
+                    fn_80242E28(x, lbl_805DB200);
+                j = k;
+            } while (j > 0);
+        }
+        self->m438[0] = top;
+        self->m448 = self->m448 + 1;
     }
 }
 
