@@ -4,6 +4,33 @@
  */
 
 #include "game/fe_80516990.h"
+/* Widget view whose vtable slot 19 (+0x98) returns a float (fn_80525390 compares it with lbl_805FC4BC). */
+class FeVF19 {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual float s19();
+};
+extern "C" void fn_80525498(FeScrN* x, int mode);
+extern float lbl_805FC4BC;
+extern "C" void fn_800ECAA4(void* self);
 struct FeScr2DC : FeScrN {
     char pad194[0x2DC - 0x194];
     int m2DC;
@@ -543,6 +570,38 @@ extern "C" FE_OVERLAY void fn_8052531C(void* x, int a)
     if (t != 0) {
         FeI(x, 0x154) = FeI(x, 0x154) + (lbl_8061A328 - t);
         FeI(x, 0x158) = 0;
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80525390(FeScrN* self)
+{
+    if (FeW24(self) & 0x40000000) {
+        fn_800ECAA4(self);
+        switch (FeI(self, 0x168)) {
+        case 0:
+            if (!(((FeVF19*)self->m140)->s19() < lbl_805FC4BC)) {
+                if (self->m15C == 0)
+                    fn_80525498(self, 3);
+                else
+                    fn_80525498(self, 2);
+            }
+            break;
+        case 1:
+            if (FeI(self, 0x150) != 0) {
+                if (FeI(self->m15C, 0) == 0)
+                    goto L2;
+            } else {
+                if (FeI(self->m160, 0) == 0) {
+        L2:
+                    fn_80525498(self, 2);
+                }
+            }
+            break;
+        case 2:
+            if (FeI(self, 0x154) < lbl_8061A328)
+                fn_80525498(self, 1);
+            break;
+        }
     }
 }
 
