@@ -49,14 +49,20 @@ extern "C" int fn_8009CDC8(void* self, int* arr)
     return idx;
 }
 
-/* near-miss: retail indexes (o + 0x40A)[base + slot * 0x34] and returns -1 first */
+/* near-miss (9 slots): the first arm matches; retail keeps the two arms' identical
+   tails unmerged (separate lbzx/extsb/blr), here jump2 cross-jumps them */
 extern "C" int fn_8009DC00(char* o, int slot, int base, int kind)
 {
-    if (kind == 1)
-        return ((signed char*)(o + 0x40A))[base + slot * 0x34];
+    if (kind == 1) {
+        char* b = o + 0x40A;
+        int off = base + slot * 0x34;
+        return (signed char)b[off];
+    }
     if (kind != 0)
         return -1;
-    return ((signed char*)(o + 0x412))[base + slot * 0x34];
+    char* b = o + 0x412;
+    int off = base + slot * 0x34;
+    return (signed char)b[off];
 }
 
 struct Unk8009DC48 {
@@ -503,4 +509,26 @@ extern "C" char* fn_8009E93C(Unk8009E93C* p, int kind, unsigned idx, char* out)
         }
     }
     return out;
+}
+
+struct Unk8009EA04_Obj {
+    virtual float M(int a);
+};
+typedef float (Unk8009EA04_Obj::*Unk8009EA04_Pmf)(int);
+extern Unk8009EA04_Pmf lbl_805B6DA0[];
+
+extern "C" float fn_8009EA04(Unk8009EA04_Obj* o, int i, int a)
+{
+    return (o->*lbl_805B6DA0[i])(a);
+}
+
+extern "C" float fn_8009F6CC(void* o, int a);
+extern "C" float fn_8009F870(void* o, int a);
+extern "C" float fn_8009F98C(void* o, int a);
+extern "C" float fn_8009FAA8(void* o, int a);
+
+extern "C" float fn_8009FBC4(void* o, int a)
+{
+    float r = (fn_8009F6CC(o, a) + fn_8009F870(o, a) + fn_8009F98C(o, a) + fn_8009FAA8(o, a)) * 0.25f;
+    return r;
 }
