@@ -208,6 +208,18 @@ extern const float lbl_805D9BA8;
 extern const float lbl_805D9BAC;
 extern char lbl_805D9B60[];
 
+struct Unk80253C74_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+struct Unk80253C74_Tbl {
+    Unk80253C74_Rec r[5];
+};
+extern Unk80253C74_Tbl lbl_805D9C7C;
 extern const float lbl_805D9C10;
 extern const float lbl_805D9C14;
 extern const int lbl_805D9E94[5];
@@ -653,6 +665,30 @@ void fn_80253BFC(W* self)
 void fn_80253C38(W* self)
 {
     fn_8037893C(self->m0->m44C->m704, 0x54, 0, 0, 0);
+}
+
+int fn_80253C74(W* w, int* sel, int* key, Unk80253C74_Rec* out)
+{
+    Unk80253C74_Tbl tbl = lbl_805D9C7C;
+    int found = 0;
+    if (sel != 0) {
+        found = 1;
+        *out = tbl.r[*sel];
+    } else if (key != 0) {
+        for (int i = 0; i <= 4; i++) {
+            int v;
+            if (i == 0)
+                v = 15;
+            else
+                v = fn_80254374(w, tbl.r[i].m0);
+            if (v == *key) {
+                found = 1;
+                *out = tbl.r[i];
+                break;
+            }
+        }
+    }
+    return found;
 }
 
 int fn_80253DB0(Unk8024EF40_W* self, int a, int b)
