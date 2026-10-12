@@ -80,6 +80,13 @@ void fn_803A0884(Vp6BufView* b, unsigned char* base, Vp6Out* r, int a, int c);
 int fn_803A0EBC(Vp6Rc* rc);
 int fn_803A0E18(Vp6Rc* rc, unsigned prob);
 
+extern const int lbl_8062501C[];
+extern const int lbl_80624F9C[];
+void fn_803A3D84(const unsigned char* src, short* dst, int stride, int rows, const int* taps);
+void fn_803A3E08(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
+void fn_80397CD0(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void fn_80397F98(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
+
 /* near-miss: same weights as fn_803A00DC; load and multiply scheduling differ (72 vs 62 insns). */
 void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
 {
@@ -413,6 +420,43 @@ void fn_803A3D0C(const short* a, const short* b, short* out)
         o[3] = packed;
         out += 8;
     }
+}
+
+void fn_803A3F0C(const unsigned char* a, const unsigned char* b, short* dst, int stride, int i, int j, int flag)
+{
+    int d = b - a;
+    if (d < 0) {
+        const unsigned char* t = a;
+        a = b;
+        d = t - a;
+    }
+    if (flag == 0) {
+        if (d == 1) {
+            fn_803A3D84(a, dst, stride, 1, lbl_8062501C + i * 2);
+            return;
+        }
+        if (d == stride) {
+            fn_803A3D84(a, dst, stride, stride, lbl_8062501C + j * 2);
+            return;
+        }
+        if (d == stride - 1)
+            fn_803A3E08(a - 1, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
+        else
+            fn_803A3E08(a, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
+        return;
+    }
+    if (d == 1) {
+        fn_80397CD0(a, dst, stride, 1, 8, 8, lbl_80624F9C + i * 4);
+        return;
+    }
+    if (d == stride) {
+        fn_80397CD0(a, dst, stride, stride, 8, 8, lbl_80624F9C + j * 4);
+        return;
+    }
+    if (d == stride - 1)
+        fn_80397F98(a - 1, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
+    else
+        fn_80397F98(a, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
 }
 
 unsigned fn_803A4094(const unsigned char* p, int stride)
