@@ -92,6 +92,16 @@ extern const char lbl_805BEA94[];
 extern const char lbl_805BAA20[];
 extern const char lbl_805C0418[];
 
+inline int GetW(char* b, int off)
+{
+    return *(int*)(b + off);
+}
+
+inline void PutW(char* b, int off, int v)
+{
+    *(int*)(b + off) = v;
+}
+
 // PROTOS-BEGIN
 extern "C" {
 int fn_80124738(void* a);
@@ -527,8 +537,6 @@ int fn_80125890(Scr* self, int i)
     return 1;
 }
 
-/* near-miss: retail keeps `a` in r30 and `self` in r31 (swapped here). */
-
 void fn_80125940(Scr* self, int a, int i)
 {
     int x = self->m14C[i];
@@ -546,7 +554,7 @@ void fn_80125940(Scr* self, int a, int i)
 
 void fn_80125A20(Scr* self, int a)
 {
-    fn_800ED310(self);
+    ((void (*)(Scr*, int))fn_800ED310)(self, a);
     if (a != 0) {
         if (self->m138)
             self->m138->fn_vslot8(0);
@@ -565,23 +573,20 @@ void fn_80125AAC(Scr* self)
     int n = 4;
     self->m19C = self->m134;
     do {
-        char* b = (char*)self + 0x13C;
-        int t = (*(Wid**)(b + o4))->b1;
-        *(int*)((char*)self + 0x1A0 + o4) = t;
+        char* b13C = (char*)self + 0x13C;
+        int t = (*(Wid**)(b13C + o4))->b1;
+        PutW((char*)self + 0x1A0, o4, t);
         if (t != 0) {
-            int v = fn_800C8040(fn_800C8044(*(Wid**)(b + o4))->fn_vslot32(lbl_805BF5CC, 1))->fn_vslot31();
-            *(int*)((char*)self + 0x1C0 + o4) = v;
-            char* p14C = (char*)self + 0x14C;
-            *(int*)((char*)self + 0x1B0 + o4) = *(int*)(p14C + o4);
-            char* p15C = (char*)self + 0x15C;
-            *(int*)((char*)self + 0x1D0 + o8) = *(int*)(p15C + o8);
-            char* p160 = (char*)self + 0x160;
-            *(int*)((char*)self + 0x1D4 + o8) = *(int*)(p160 + o8);
+            int v = fn_800C8040(fn_800C8044(*(Wid**)(b13C + o4))->fn_vslot32(lbl_805BF5CC, 1))->fn_vslot31();
+            PutW((char*)self + 0x1C0, o4, v);
+            PutW((char*)self + 0x1B0, o4, GetW((char*)self + 0x14C, o4));
+            PutW((char*)self + 0x1D0, o8, GetW((char*)self + 0x15C, o8));
+            PutW((char*)self + 0x1D4, o8, GetW((char*)self + 0x160, o8));
         } else {
-            *(int*)((char*)self + 0x1C0 + o4) = t;
-            *(int*)((char*)self + 0x1B0 + o4) = -1;
-            *(int*)((char*)self + 0x1D0 + o8) = t;
-            *(int*)((char*)self + 0x1D4 + o8) = t;
+            PutW((char*)self + 0x1C0, o4, t);
+            PutW((char*)self + 0x1B0, o4, -1);
+            PutW((char*)self + 0x1D0, o8, t);
+            PutW((char*)self + 0x1D4, o8, t);
         }
         o8 += 8;
         o4 += 4;
