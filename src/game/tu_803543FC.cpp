@@ -141,6 +141,53 @@ void fn_80354DEC(Unk80353E68* s, int v)
     s->mC = v;
 }
 
+struct Unk803622F0_Data {
+    int m0;
+};
+
+struct Unk803622F0 : Unk803622F0_Data {
+    virtual void v1(char** cur, void* buf, int n);
+    virtual int v2();
+};
+
+extern "C" void fn_80354DF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
+{
+    int tmp;
+    unsigned cnt;
+    unsigned cur;
+    if (st->v2() == 1) {
+        unsigned i = 0;
+        fn_8040B190(*cursor, &self->m4, 4);
+        *cursor += 4;
+        fn_8040B190(*cursor, &self->mC, 4);
+        *cursor += 4;
+        for (; i < self->m4; i++) {
+            int o = i * 4;
+            tmp = *(int*)((char*)self->m0 + o);
+            st->v1(cursor, &tmp, 4);
+        }
+    } else {
+        unsigned j;
+        fn_8040B190(&cnt, *cursor, 4);
+        *cursor += 4;
+        fn_8040B190(&cur, *cursor, 4);
+        *cursor += 4;
+        if (st->m0 == 0) {
+            self->m4 = cnt;
+            self->mC = cur;
+            self->Clear();
+        }
+        for (j = 0; j < cnt; j++) {
+            st->v1(cursor, &tmp, 4);
+            if (st->m0 == 0)
+                self->Add(tmp);
+        }
+        if (st->m0 == 0)
+            self->mC = cur;
+    }
+}
+
+
 int fn_80354FD4(Unk80353234* s)
 {
     unsigned i = 0;
