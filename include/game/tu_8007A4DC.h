@@ -102,7 +102,7 @@ struct Owner {
 struct Unk8007A4DC_Screen;
 struct Unk8007B2B0_Screen;
 void fn_80377E90(Obj* list, int* a, int* b, int idx);
-char* fn_80402EF8(char* dst, const char* src);
+void fn_80402EF8(char* dst, const char* src);
 int fn_800803F0(Unk8007A4DC_Screen* s, int a, int b);
 int fn_80080464(Unk8007A4DC_Screen* s, int a, int b);
 

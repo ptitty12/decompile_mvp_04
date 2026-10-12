@@ -108,7 +108,6 @@ extern const char lbl_806012B8[];
 extern const char lbl_805FEC2C[];
 extern "C" int fn_805A00BC(Db805A0000_Holder* self, char* b, int c);
 
-/* near-miss: retail emits addi r3,r1,8 before the stw of m4 (3 slots reordered) */
 //@805A0000
 extern "C" DB_OVERLAY void fn_805A0000(Db805A0000_Holder* self)
 {
