@@ -286,7 +286,6 @@ extern "C" void fn_8056DBB8(Db8056CC8C* self);
 
 extern "C" void fn_8056BAEC(DbScr* self, int a, int b, int c);
 
-extern "C" void fn_8056E858(DbSel* self, int flags);
 extern "C" void fn_8056E8B4(DbSel* self, int a, int flags);
 extern "C" void fn_8056EA58(DbSel* self, int a, int flags);
 extern "C" void fn_8056ED54(DbSel* self, int a);
@@ -319,16 +318,16 @@ extern "C" void fn_8056CAC4(void* q, int a, int b, int c);
 extern "C" void fn_8056CB30(DbScr* self, int a);
 extern "C" void fn_8056CC50(DbF12* p);
 extern "C" void fn_8056CC8C(Db8056CC8C* self, int a, int b, int c, int d);
+extern "C" void fn_8056DA98(DbF12* p);
+extern "C" void fn_8056DE14(DbF12* p);
+extern "C" void fn_8056DE4C(void* p);
 extern "C" void fn_8056DE50(DbSel* self, DbSelSrc* src, DbScr* scr, int* sidep, void* x);
 extern "C" void fn_8056DEF4(DbSel* self);
 extern "C" void fn_8056E02C(DbSel* self, int a, int flags);
+extern "C" void fn_8056E130(DbSel* p);
 extern "C" void fn_8056E13C(DbSel* self);
 extern "C" void fn_8056E630(DbSel* self);
 extern "C" void fn_8056E858(DbSel* self, int flags);
-extern "C" void fn_8056DE4C(void* p);
-extern "C" void fn_8056E130(DbSel* p);
-extern "C" void fn_8056DE14(DbF12* p);
-extern "C" void fn_8056DA98(DbF12* p);
 
 extern "C" DB_OVERLAY void fn_8056BD50(void* self)
 {
