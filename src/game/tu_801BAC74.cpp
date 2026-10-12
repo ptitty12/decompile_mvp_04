@@ -321,6 +321,8 @@ extern "C" {
 void fn_801BBC9C(A* a, int* out);
 void fn_801BB338(A* a, int x, int y);
 int fn_801D0294(void* p);
+void fn_801BFC4C(void* o, int a);
+void fn_801BFBAC(void* o, int a);
 void* fn_801C1638(P* p, unsigned i);
 void fn_801BD878(A* a, P* q);
 void fn_801BDA38(A* a, P* q);
@@ -840,6 +842,43 @@ extern "C" void fn_801BD80C(A* a, P* q)
         fn_802520F8(q);
         fn_801B9E04(a->m8, q);
         fn_8017B6C0(a->m10, 1, 0);
+    }
+}
+
+class Unk801BD878_Ev : public Unk801BB668_Ev {
+public:
+    Unk801BD878_Ev() : Unk801BB668_Ev(0x40) { m8 = 0; }
+    void Set(int x) { m8 = x; }
+    virtual ~Unk801BD878_Ev() {}
+    int m8;
+};
+extern "C" void fn_801BD878(A* a, P* q)
+{
+    if (fn_801A6DB8(a->m14)->m2C == 1) {
+        int ok = 0;
+        fn_801BDDC8(a->m8, q);
+        fn_8037893C(&a->m14->m704, 0x41, 0, 0, 0);
+        if (Unk801BAC74_Byte(a->m14->m6F8->m14->m1CCA) >= *lbl_8061B9C4) {
+            P* t = fn_801A4B34(a->m14);
+            P* t2 = a->m14->m65C[0];
+            Unk801BD878_Ev ev;
+            ev.Set(a->m24);
+            fn_8037893C(&a->m14->m704, ev.m0, &ev, 0, 0);
+            if (fn_801BC660(a, t, t2, 6, 1) == 1) {
+                ok = 1;
+                Unk802A9C34 m;
+                fn_802A9C34__11Unk802A9C34ifcicc(&m, 6, 0.0f, *(unsigned char*)((char*)t + 0x70C), -1, *(unsigned char*)((char*)t2 + 0x70C), 0xFF);
+                fn_8037893C(&a->m14->m704, m.m0, &m, 0, 0);
+            }
+        }
+        int c = fn_801D0294((char*)((Unk801C16B0_M4*)a->m14->m700)->m3A4 + 0x28C);
+        int f = 0;
+        if (c != 0)
+            f = 1;
+        if (ok == 1)
+            fn_801BFC4C(a->mC, f);
+        else
+            fn_801BFBAC(a->mC, f);
     }
 }
 
