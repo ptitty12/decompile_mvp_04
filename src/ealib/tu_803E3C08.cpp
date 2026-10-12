@@ -3,3 +3,374 @@
  * .text 0x803E3C08-0x803E6FB8 (code-only unit, 39 functions; TU boundaries approximate, placeholder).
  * Every data object is extern by its lbl_ name.
  */
+
+#include "../../include/game/tu_803E097C.h"
+
+/* Vertex-array object (alloc 0x3C bytes): ctor fn_803E6660, deleting dtor fn_803E6708. */
+struct Unk803E6660_Rec {
+    void* m0;
+    int m4;
+    int m8;
+};
+
+struct Unk803E6660_Src {
+    int* m0;
+};
+
+struct Unk803E6660_Hdr {
+    char pad0[8];
+    int* m8;
+};
+
+struct Unk803E6660_Ent {
+    int m0;
+    int m4;
+};
+
+struct Unk803E6660_Holder {
+    Unk803E6660_Hdr* m0;
+    char pad4[4];
+    Unk803E6660_Ent e[1];
+};
+
+struct Unk803E6660 {
+    int m0;
+    void* m4;
+    Unk803E6660_Holder* m8;
+    Unk803E6660_Rec* mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    char pad34[4];
+    int* m38;
+};
+
+extern void (*lbl_8062C66C)(void* p, int size);
+extern void* (*lbl_8062C668)(int size, int heap);
+struct Unk803E4964_Glob {
+    int v;
+};
+extern Unk803E4964_Glob lbl_806AAB5C;
+extern int* lbl_8062C660;
+extern int lbl_8062C664;
+
+extern "C" void* fn_803D700C(void* mem);
+extern "C" void fn_803D7600(void* p, int chrg);
+extern "C" int fn_803D76F4(int a, int b, int c);
+extern "C" void fn_80433060(void* p, int n);
+extern "C" void GXInvalidateVtxCache();
+extern "C" void fn_8041A5DC();
+extern "C" int strcmp(const char* a, const char* b);
+extern "C" void fn_803D987C(void* p);
+struct Unk803E68B0_Key {
+    int m0;
+    char pad4[0x1C];
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+};
+
+extern "C" void fn_803E4164(float* dst, const float* src)
+{
+    float* d = dst;
+    for (int i = 0; i < 3; i++) {
+        d[0] = src[0];
+        d[4] = src[3];
+        d[8] = -src[3];
+        d[12] = src[6];
+        d[16] = src[9];
+        d[20] = src[12];
+        d[24] = src[15];
+        d[28] = src[18];
+        d[32] = src[21];
+        d[36] = src[24];
+        src++;
+        d++;
+    }
+    float* p = dst + 39;
+    for (int j = 0; j < 10; j++) {
+        *p = 0.0f;
+        p -= 4;
+    }
+}
+
+extern "C" void fn_803E4818(float* m);
+extern "C" void fn_803D71F0(void* p);
+
+extern "C" float* fn_803E47E8(float* m)
+{
+    fn_803E4818(m);
+    return m;
+}
+
+extern "C" void fn_803E4818(float* m)
+{
+    for (int i = 0; i < 10; i++) {
+        m[0] = m[1] = m[2] = m[3] = 0.0f;
+        m += 4;
+    }
+}
+
+extern "C" void fn_803E4964(Unk803E6660* o, int idx)
+{
+    int base = idx * o->m24;
+    lbl_806AAB5C.v = o->m1C - base;
+    if (lbl_806AAB5C.v > o->m20)
+        lbl_806AAB5C.v = o->m20;
+    Unk803E6660_Ent* e = o->m8->e;
+    for (int i = 0; i < o->m10; i++) {
+        int off = i * 12;
+        int n = *(int*)(off + (int)o->mC + 4);
+        if (n != 0) {
+            e[i].m4 = *(int*)(off + (int)o->mC) + base * n;
+            int v = *(int*)(off + (int)o->mC + 8);
+            if (v == -1)
+                e[i].m0 = lbl_806AAB5C.v;
+            else
+                e[i].m0 = v;
+        }
+    }
+    if (o->m2C != -1) {
+        e[o->m2C].m4 = (int)&lbl_806AAB5C;
+        e[o->m2C].m0 = 1;
+    }
+}
+
+extern "C" Unk803E6660* fn_803E6660(Unk803E6660* o)
+{
+    o->m2C = -1;
+    o->m0 = 0xB8;
+    o->m8 = 0;
+    o->mC = 0;
+    o->m10 = 0;
+    o->m14 = 0;
+    o->m18 = 0;
+    o->m1C = 0;
+    o->m20 = 0;
+    o->m24 = 0;
+    o->m28 = 0;
+    o->m30 = 0;
+    o->m4 = fn_803D700C(lbl_8062C668(0x58, 0));
+    o->m38 = (int*)lbl_8062C668(0x104, 0);
+    *o->m38 = -1;
+    return o;
+}
+
+extern "C" void fn_803E6708(Unk803E6660* o, int chrg)
+{
+    if (o->mC) {
+        int* base = (int*)o->mC - 1;
+        lbl_8062C66C(base, *base + 4);
+    }
+    if (o->m4)
+        fn_803D7600(o->m4, 3);
+    lbl_8062C66C(o->m38, 0x104);
+    if (chrg & 1)
+        lbl_8062C66C(o, 0x3C);
+}
+
+extern "C" int fn_803E68B0(Unk803E68B0_Key* o, int k)
+{
+    int ok = 0;
+    switch (k) {
+    case -4:
+    case 0x80:
+    case 0x90:
+    case 0xA8:
+    case 0xB8:
+        o->m30 = ok;
+        break;
+    case 0x98:
+        o->m30 = 2;
+        break;
+    case 0xA0:
+        o->m30 = -1;
+        break;
+    default:
+        o->m30 = -1;
+        break;
+    }
+    int t = o->m30;
+    if (t != -1) {
+        o->m0 = k;
+        ok = 1;
+        int hi = 0xFFFF - t;
+        int lo = hi + t;
+        o->m24 = hi;
+        o->m20 = lo;
+        o->m28 = lo;
+    }
+    return ok;
+}
+
+/* name table lookup: index of the entry equal to `name`, or -1 (stored in m2C) */
+struct Unk803E6950_Names {
+    char** m4;
+};
+
+struct Unk803E6950_Tbl {
+    Unk803E6950_Names* m0;
+};
+
+struct Unk803E6950 {
+    char pad0[8];
+    Unk803E6950_Tbl* m8;
+    char padC[4];
+    int m10;
+    char pad14[0x2C - 0x14];
+    int m2C;
+};
+
+/* near-miss: retail keeps the entry-jump loop (test at the bottom, m10 reloaded after strcmp); ours is rotated with a
+ * duplicated first test (2 slots longer). for/while/goto/accessor spellings tried. */
+extern "C" int fn_803E6950(Unk803E6950* o, const char* name)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0)
+            found = i;
+    }
+    o->m2C = found;
+    return found != -1;
+}
+
+extern "C" int fn_803E6A70(Unk803E6950* o, int index, int a, int b, int c);
+
+/* near-miss: same loop shape as fn_803E6950. */
+extern "C" int fn_803E69D8(Unk803E6950* o, const char* name, int a, int b, int c)
+{
+    int found = -1;
+    for (int i = 0; i < o->m10; i++) {
+        if (strcmp(name, o->m8->m0->m4[i]) == 0)
+            found = i;
+    }
+    return fn_803E6A70(o, found, a, b, c);
+}
+
+extern "C" int fn_803E6B3C(Unk803E6660* o)
+{
+    fn_803D987C(o);
+    o->m18 = 1;
+    return 1;
+}
+
+extern "C" int fn_803E6B74(Unk803E6660* o)
+{
+    if (o->m18) {
+        for (int i = 0; i < o->m10; i++) {
+            int off = i * 12;
+            Unk803E6660_Rec* r = (Unk803E6660_Rec*)(off + (int)o->mC);
+            if (r->m4 && r->m8 > 0)
+                fn_80433060(*(void**)(off + (int)o->mC), o->m8->m0->m8[i] * r->m8);
+        }
+        GXInvalidateVtxCache();
+        fn_8041A5DC();
+    }
+    o->m18 = 0;
+    return 1;
+}
+
+inline int BuildInl(Unk803E6660* o, int total)
+{
+    int ok = 0;
+    if (o->m18 == 0) {
+        o->m1C = total;
+        int* hdr = o->m38;
+        o->m14 = (total - o->m30 - 1) / o->m24 + 1;
+        if (*hdr == -1 || *(unsigned char*)hdr == ((unsigned char*)o)[3]) {
+            lbl_8062C660 = hdr;
+            lbl_8062C664 = 0x104;
+        }
+        for (int i = 0; i < o->m14; i++) {
+            fn_803E4964(o, i);
+            fn_803D71F0(o->m4);
+        }
+        lbl_8062C660 = 0;
+        lbl_8062C664 = 0;
+        ok = 1;
+    }
+    return ok;
+}
+
+extern "C" int fn_803E6C28(Unk803E6660* o, int total)
+{
+    return BuildInl(o, total);
+}
+
+extern "C" int fn_803E6D00(Unk803E6660* o, int a, int b)
+{
+    fn_803D76F4((int)o->m4, a, b);
+    return 1;
+}
+
+struct Unk803E6D28 {
+    char pad0[8];
+    int m8;
+    Unk803E6660 sub;
+};
+
+extern "C" void fn_803E6D28(Unk803E6D28* s)
+{
+    int total = s->m8;
+    if (total) {
+        BuildInl(&s->sub, total);
+        s->m8 = 0;
+    }
+}
+
+extern "C" void fn_803DBDD8(void* m, int a);
+
+struct Unk803E6E10_Blk60 {
+    float w[15];
+};
+
+struct Unk803E6E10 {
+    char pad0[0x48];
+    int m48;
+    char pad4C[0x7C - 0x4C];
+    Unk803E6E10_Blk60 m7C;
+};
+
+extern "C" void fn_803E6E10(Unk803E6E10* o, const Unk803E6E10_Blk60* src)
+{
+    o->m7C = *src;
+    fn_803DBDD8(&o->m7C, o->m48);
+}
+
+extern "C" char* fn_803E6E9C(char* o)
+{
+    return o + 0x7C;
+}
+
+extern "C" int fn_803E6EA4(Unk803E6660* o, int a, int b)
+{
+    return fn_803D76F4(o->m10, a, b);
+}
+
+struct Unk803E6EC8 {
+    char pad0[0xC];
+    int mC;
+    Unk803E6660 sub;
+};
+
+extern "C" void fn_803E6EC8(Unk803E6EC8* s)
+{
+    int total = s->mC;
+    if (total) {
+        BuildInl(&s->sub, total);
+        s->mC = 0;
+    }
+}
+
+extern "C" char* fn_803E6FB0(char* o)
+{
+    return o + 0x90;
+}
