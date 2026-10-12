@@ -192,3 +192,22 @@ extern "C" int fn_803AC134()
     lbl_8062543C = 0;
     return 0;
 }
+
+void iSNDserveraddclient(void (*pfunc)(void))
+{
+    sndgs.serverclient[sndgs.numserverclients] = pfunc;
+    sndgs.numserverclients++;
+}
+
+void iSNDserverremoveclient(void (*pfunc)(void))
+{
+    int i;
+    for (i = 0; i < sndgs.numserverclients; i++) {
+        if (sndgs.serverclient[i] == pfunc) {
+            sndgs.numserverclients--;
+            for (; i < sndgs.numserverclients; i++)
+                sndgs.serverclient[i] = sndgs.serverclient[i + 1];
+            return;
+        }
+    }
+}
