@@ -3,6 +3,7 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" char* strncpy(char*, const char*, unsigned);
 extern "C" {
 void fn_80476258(void* x);
 void fn_80476584(void* x);
@@ -310,9 +311,50 @@ extern "C" FE_OVERLAY void fn_80476A28(int a, void* x)
         fn_80475FFC(x);
 }
 
-extern "C" FE_OVERLAY void fn_80476C24(FeScrD* x)
+extern "C" FE_OVERLAY void fn_80476A84(int a, FeScrD* x)
 {
-    fn_80476A84(x);
+    int c = 0;
+    if (FeI(x, 0x140) == 0 && FeI(x, 0x13C) == 0) {
+        FeArr arr;
+        char buf[1000];
+        FeArr* s = &arr;
+        int cnt = 0;
+        int i;
+        s->m10 = lbl_8064B298;
+        s->m0 = buf;
+        s->m8 = 0xFA;
+        fn_8040074C(s->m0, 0x3E8);
+        s->m4 = 0;
+        s->mC = 0;
+        s->m10 = lbl_8064A550;
+        fn_8040074C(s->m0, s->m8 * 4);
+        s->m10 = lbl_8065C1B0;
+        s->m4 = 0;
+        s->mC = 0;
+        s->m14 = 0;
+        fn_80535360((void**)s, fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(x, 0x134)));
+        int n = s->m4;
+        for (i = 0; i < n; i++) {
+            if (((int (*)(void*, int, int))fn_8007A6A0__18Unk8007A4DC_Screenii)(lbl_8061930C, 0x19, FePick(arr.m0, i * 4)) == 0)
+                cnt++;
+        }
+        c = cnt == 0;
+        s->m10 = lbl_8064A550;
+    }
+    const char* str = "BACK";
+    if (c != 0 && (FeI(fn_800B555C(), 4) & 0x1000) != 0)
+        str = "EMPTY";
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    strncpy(mp->name, str, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
+}
+
+extern "C" FE_OVERLAY void fn_80476C24(int a, FeScrD* x)
+{
+    fn_80476A84(a, x);
 }
 
 extern "C" FE_OVERLAY int fn_80476C44(void* x)

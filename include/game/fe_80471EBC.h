@@ -1140,7 +1140,7 @@ extern const char lbl_80677818[];
 extern "C" {
 int fn_800B5758();
 void fn_80473560(FeScrD* x);
-void fn_80476A84(FeScrD* x);
+void fn_80476A84(int a, FeScrD* x);
 void fn_8047C47C(void* p);
 }
 extern "C" void fn_80125BC0(void*);
@@ -1927,7 +1927,7 @@ extern "C" void fn_804766FC(void* x);
 extern "C" void fn_80476A28(int a, void* x);
 #endif
 #ifndef NOPROTO_fn_80476C24
-extern "C" void fn_80476C24(FeScrD* x);
+extern "C" void fn_80476C24(int a, FeScrD* x);
 #endif
 #ifndef NOPROTO_fn_80476DB4
 extern "C" int fn_80476DB4(void* x);
