@@ -10,6 +10,13 @@
 #include "game/chooser.h"
 #include "game/goals/tu_8029B70C.h"
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps them below preceding stores (retail's order). */
+template <class T> inline float Unk8029B70C_Secs(T n)
+{
+    return (float)n * 0.016666668f;
+}
+
 float lbl_8061E80C = 0.9f;
 float lbl_8061E810 = 0.4f;
 
@@ -282,9 +289,6 @@ int fn_8029CFDC(Unk8029B70C_Goal* g, const Unk80273498_Vec3* a, const Unk8027349
     return 0;
 }
 
-/* near-miss: 60 of 60 instructions, 4 slots differ (retail loads the 0.0166
- * constant before the third word of the pos copy). Tried: field-wise copy,
- * statement orders of the copy, `now` and the flag, a reference to m9C. */
 void fn_8029D094(Unk8029B70C_Goal* g, Unk8014D8AC_Ctx* ctx)
 {
     if (!g->mD0.f11) {
@@ -292,7 +296,7 @@ void fn_8029D094(Unk8029B70C_Goal* g, Unk8014D8AC_Ctx* ctx)
         Unk80273498_Vec3 pos = lbl_806055AC;
         float t = 0.0f;
         if (fn_801DC658(id, &pos, &t)) {
-            float now = (float)ctx->m4C * 0.016666668f;
+            float now = Unk8029B70C_Secs(ctx->m4C);
             g->m9C = pos;
             g->mA8 = now + t;
             g->mD0.f11 = 1;
