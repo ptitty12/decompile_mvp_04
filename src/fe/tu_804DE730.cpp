@@ -5,6 +5,8 @@
 
 #include "game/fe_804D08D0.h"
 
+extern "C" void fn_80535650(FeTmp18* t, int v);
+
 extern "C" {
 
 FE_OVERLAY void fn_804DE9B8(void)
@@ -23,6 +25,25 @@ FE_OVERLAY unsigned fn_804DE9EC(unsigned n)
 FE_OVERLAY unsigned fn_804DEA24(void)
 {
     return fn_804DE9EC(0x57);
+}
+
+FE_OVERLAY int fn_804DEA48(void)
+{
+    int v = fn_800B548C(fn_804DE9EC(0x79));
+    FeTmp18 t;
+    int buf[0x28];
+    FeTmp18* q = &t;
+    q->C1(buf, 0x28);
+    q->C2();
+    q->C3(lbl_8064A4C8);
+    fn_8040074C(q->m0, q->m8 << 2);
+    q->m4 = 0;
+    q->mC = 0;
+    q->m14 = 0;
+    fn_80535650(q, v);
+    int r = q->At(fn_804DE9EC(q->Count()));
+    t.D();
+    return r;
 }
 
 FE_OVERLAY void fn_804DEEF4(FeS804DE5F8* x)
