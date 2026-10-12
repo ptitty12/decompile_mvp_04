@@ -192,6 +192,16 @@ struct Unk80253678_V : Unk80256A90_Data {
     virtual int v22();
 };
 void fn_80252EB8(C* self, float v);
+extern const float lbl_805D9C10;
+extern const float lbl_805D9C14;
+extern const int lbl_805D9E94[5];
+
+class Unk8023BE30 {
+public:
+    int fn_8023C0DC(int a, int b, int c);
+};
+struct Unk80089894_PackTabD;
+void fn_80089EE0(Unk80089894_PackTabD* self, unsigned t, unsigned i, int v);
 int fn_802530E8(C* self);
 extern float lbl_805D9BB4;
 extern float lbl_805D9BB8;
@@ -236,6 +246,14 @@ float fn_80254618(W* self, int a);
 int fn_80253100(C* self, int a);
 }
 
+/* near-miss: 71 vs 71 instructions, ~40 slots differ in register choice. Retail sums with `addi r11,ea,0x1B4` inside the bdnz loop and lbzx on the masked index;
+   ours folds the 0x1B4 into the lbz displacement. unsigned char counter gives andi./no bdnz. Tried int counter with unsigned char k, separate k++, int-cast address forms */
+
+inline float Clamp01_3434(float x)
+{
+    return !(x > lbl_805D9C14) ? (x >? lbl_805D9C10) : lbl_805D9C14;
+}
+
 void fn_80252460(P* x)
 {
     if (fn_80250AC4(x) != 0 && fn_80250A90(x, 0xC) != 0) {
@@ -268,6 +286,17 @@ void fn_802526D8(C* self)
     fn_80252964(self);
 }
 
+void fn_8025283C(C* self)
+{
+    float a = (float)fn_80254374(&self->m4->m588, 0);
+    float b = (float)fn_80254374(&self->m4->m588, 0x1B);
+    if (!(b <= a)) {
+        int c = ((Unk8023BE30*)lbl_8068CCA8)->fn_8023C0DC(0x1B, 0, 0);
+        P* p = self->m4;
+        fn_80089EE0((Unk80089894_PackTabD*)((char*)EntOf(p) + 0xC74), 0x1B, p->m70C, (int)((b - (float)c) + 0.5f));
+    }
+}
+
 void fn_80252964(C* self)
 {
     float v = (float)fn_80254374(&self->m4->m588, 0);
@@ -291,8 +320,6 @@ void fn_80252A90()
 {
 }
 
-/* near-miss: 71 vs 71 instructions, ~40 slots differ in register choice. Retail sums with `addi r11,ea,0x1B4` inside the bdnz loop and lbzx on the masked index;
-   ours folds the 0x1B4 into the lbz displacement. unsigned char counter gives andi./no bdnz. Tried int counter with unsigned char k, separate k++, int-cast address forms */
 void fn_80252C1C(C* self)
 {
     self->m40 = 0;
@@ -418,6 +445,25 @@ void fn_80253220(C* self)
     self->m38 = self->m38 + 1;
     if (self->f1)
         self->f1 = 0;
+}
+
+/* near-miss: same 78 instructions, register choice differs (retail n in r10 with m38/m30 loaded into r9/r10; ours r0/r11). Tried operand order, temps, table pointer */
+float fn_80253434(C* self)
+{
+    if (fn_802530E8(self) == 0)
+        return lbl_805D9C10;
+    int n = self->m30 + self->m38 * 5;
+    if (n < 0)
+        n = 0;
+    unsigned idx = 0;
+    unsigned t = self->m48 - 0xF;
+    if (t <= 4)
+        idx = t;
+    int lim = lbl_805D9E94[idx];
+    if (*(int*)((char*)self->m4 + 0x4C4) < 0 || self->f2 || n >= lim)
+        return lbl_805D9C14;
+    float x = (float)n / (float)lim;
+    return Clamp01_3434(x);
 }
 
 int fn_80253678(Unk80253678_S* self)
