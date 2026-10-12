@@ -5,6 +5,8 @@
 #include "game/goals/tu_80287600.h"
 #include "game/goals/tu_8027C728.h"
 
+inline void* operator new(unsigned int, void* p) { return p; }
+
 extern int lbl_806EF9B4;
 extern const Unk80273498_Vec3 lbl_806055DC;
 extern "C" int fn_801DCC1C(Unk80270BA0_X* p, const Unk80273498_Vec3* v);
@@ -92,6 +94,31 @@ void* fn_801E67C8(void* mem);
 
 
 void fn_8037CF5C(Unk8037C7FC* reg, unsigned hash, void* s);
+}
+
+extern const float lbl_805D3C8C;
+struct Unk801E5E44_V3 {
+    float x;
+    float y;
+    float z;
+};
+class Unk801E5E44_Obj : public Unk8037B3E8 {
+public:
+    virtual const char* fn_vslot3();
+    Unk801E5E44_Obj() : Unk8037B3E8(0xDA07F2A0u)
+    {
+        for (int i = 0; i < 6; i++) {
+            m4[i].x = lbl_805D3C8C;
+            m4[i].y = lbl_805D3C8C;
+            m4[i].z = lbl_805D3C8C;
+        }
+    }
+    Unk801E5E44_V3 m4[6];
+};
+
+extern "C" void* fn_801E5E44(void* mem)
+{
+    return new (mem) Unk801E5E44_Obj;
 }
 
 extern const char lbl_80660B98[];
@@ -244,6 +271,28 @@ extern "C" int fn_801E6290(unsigned x)
     return 0;
 }
 
+extern const float lbl_805D3DF0;
+class Unk801E62A4_Obj : public Unk8037B3E8 {
+public:
+    virtual const char* fn_vslot3();
+    Unk801E62A4_Obj() : Unk8037B3E8(0xEC1BCE8Du)
+    {
+        for (int i = 0; i < 6; i++) {
+            m4[i].x = lbl_805D3DF0;
+            m4[i].y = lbl_805D3DF0;
+            m4[i].z = lbl_805D3DF0;
+            m4C[i] = 1;
+        }
+    }
+    Unk801E5E44_V3 m4[6];
+    int m4C[6];
+};
+
+extern "C" void* fn_801E62A4(void* mem)
+{
+    return new (mem) Unk801E62A4_Obj;
+}
+
 extern "C" void fn_801E6330(Unk801E5EBC* s)
 {
     s->m0 = lbl_80660B38;
@@ -322,6 +371,42 @@ extern "C" int fn_801E67B4(unsigned x)
     if (x <= 5)
         return x;
     return 0;
+}
+
+extern const float lbl_805D3EB8;
+struct Unk801E67C8_F2 {
+    float x;
+    float y;
+};
+struct Unk801E67C8_E {
+    float x;
+    float y;
+    float z;
+    int w;
+    int v;
+};
+class Unk801E67C8_Obj : public Unk8037B3E8 {
+public:
+    virtual const char* fn_vslot3();
+    Unk801E67C8_Obj() : Unk8037B3E8(0xEAB27FC1u)
+    {
+        for (int i = 0; i < 3; i++) {
+            m4[i].x = lbl_805D3EB8;
+            m4[i].y = lbl_805D3EB8;
+            m1C[i].x = lbl_805D3EB8;
+            m1C[i].y = lbl_805D3EB8;
+            m1C[i].z = lbl_805D3EB8;
+            m1C[i].w = 0;
+            m1C[i].v = 2;
+        }
+    }
+    Unk801E67C8_F2 m4[3];
+    Unk801E67C8_E m1C[3];
+};
+
+extern "C" void* fn_801E67C8(void* mem)
+{
+    return new (mem) Unk801E67C8_Obj;
 }
 
 extern "C" void fn_801E6870(Unk801E5EBC* s)
