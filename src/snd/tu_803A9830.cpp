@@ -22,6 +22,7 @@ extern "C" void fn_803B43FC(SNDLINKLIST* list, void* node);
 extern "C" void fn_803B4344(SNDLINKLIST* list, void* node);
 extern "C" void fn_803FE7E0(int handle, void* p);
 extern "C" int fn_803AA95C(int h);
+/* near-miss: 60 vs 70 insns: retail keeps both arms of the `if (req->isgeneric)` tests (numframes load and the psamples loop) as separate code with different temporaries, presumably an endian-conversion macro that expands to the same value in both arms; ours merges the arms. temp-variable variants tried */
 extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr);
 extern "C" void fn_803A9E40(int h, int* hdr);
 extern "C" int fn_803FE914(int handle);
@@ -42,6 +43,10 @@ extern "C" int fn_803FDFB4(int sh, void* a, int b, int tag);
 extern "C" void fn_803B4380(SNDLINKLIST* list, void* node);
 extern "C" void* fn_803B43BC(SNDLINKLIST* list);
 extern "C" void fn_803B3EA8(int shandle, int ch, int level);
+
+/* Average data rate of a sample format (bytes per second). */
+
+extern "C" void fn_803AAE30(void* data);
 
 int iSNDsin(int angle)
 {
@@ -66,7 +71,6 @@ extern "C" void fn_803A98B0(SNDSTREAMCHANNEL* pssc)
     }
 }
 
-/* Average data rate of a sample format (bytes per second). */
 /* near-miss: instruction set matches; callee-saved/scratch registers are permuted (retail: rep r0, chans r9, rate r3, mult r11); declaration-order permutations tried */
 extern "C" int fn_803A9BEC(SNDSAMPLEFORMAT* ssf)
 {
@@ -142,6 +146,40 @@ extern "C" void fn_803A9D98(int unused, unsigned int frames, SNDSTREAMCHANNEL* p
             return;
         frames = leftover;
         leftover = 0;
+    }
+}
+
+extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr)
+{
+    SNDPACKET psp;
+    Snd::SNDSTREAMREQUEST* req = (Snd::SNDSTREAMREQUEST*)pssc->parsingrequest;
+    int* in = hdr;
+    if (req->isgeneric != 0) {
+        int t = in[2];
+        psp.numframes = t;
+    } else {
+        psp.numframes = in[2];
+    }
+    int* data = in + 3;
+    int* end = data + pssc->cursf.channels;
+    int i;
+    for (i = 0; i < pssc->cursf.channels; i++) {
+        if (req->isgeneric != 0) {
+            int t = data[i];
+            psp.psamples[i] = (char*)end + t;
+        } else {
+            psp.psamples[i] = (char*)end + data[i];
+        }
+    }
+    if (psp.numframes == 0) {
+        fn_803FE7E0(pssc->streamhandle, in);
+    } else {
+        ((int*)psp.psamples[0])[-1] = (int)in;
+        in[0] = req->sndrequesthandle;
+        req->outstandingframes += psp.numframes;
+        psp.continuation = req->continuation;
+        SNDPKTPLAY_submit(pssc->packetinstancehandle, &psp);
+        req->continuation = 1;
     }
 }
 
@@ -362,8 +400,6 @@ extern "C" void fn_803AB13C(int a, void* b, int c, void* d, void* e, int f)
 {
     fn_803AA4B0(b, c, d, e, f, a, 1);
 }
-
-extern "C" void fn_803AAE30(void* data);
 
 extern "C" int fn_803AB17C(int h, int ch, int level)
 {
