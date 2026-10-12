@@ -35,6 +35,12 @@ struct Unk80216590_P : Unk8021646C_Obj {
     char pad45C[0x618 - 0x45C];
     Unk80216590_O838* m618;
 };
+extern const Vec3f lbl_805D6790;
+int fn_8026D9D0(Unk8026C414_O* self, Unk8026C414_X* ctx);
+inline float Secs80214F1C(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
 extern "C" {
 void fn_80213988(Task* t, int x, int y);
 void fn_80213B80(Task* t, int a, int b, int c);
@@ -408,6 +414,48 @@ void fn_80214CE8(Task* t, int sel, Vec3f* pos, int a, int b, float f)
 
 extern const float lbl_805D5E00;
 extern const Vec3f lbl_8068C7F0;
+
+void fn_80214F1C(Task* t, int a, int b, float f)
+{
+    TaskInner* in = t->m9C;
+    RecQueue* q = in->m3A60;
+    Obj4_36C* g = in->m4;
+    Player* pl = (Player*)ObjAt(in->m8, in->m3A5C);
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 3;
+    e->m0 = 0x17;
+    e->m9C = 1;
+    if (!(f <= 0.0f))
+        e->m80 = Secs80214F1C(t->m9C->m0->m4C) + f;
+    else
+        e->m80 = -1.0f;
+    e->mC = b;
+    e->m8 = a;
+    e->m94 = 1;
+    Obj36C* o = g->m36C;
+    if ((Player*)o == pl) {
+        e->m50 = lbl_806055AC - lbl_805D6790;
+    } else if (o != 0) {
+        if (fn_8026D9D0((Unk8026C414_O*)o, 0) == 1) {
+            Obj36C* o2 = *(Obj36C**)((char*)o + 0x918);
+            if (o2 != 0)
+                e->m50 = o2->m60 - ((PosObj*)pl)->m60;
+        }
+    } else {
+        e->m50 = ((PosObj*)g)->m60 - ((PosObj*)pl)->m60;
+    }
+    e->m50.y = 0.0f;
+}
 
 void fn_802151D0(Task* t)
 {
