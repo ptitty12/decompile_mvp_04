@@ -190,6 +190,47 @@ extern "C" void fn_801DF08C(I* i, Rec* r, P* p)
     fn_8035B710(r, 1);
 }
 
+extern const float lbl_805D3B48;
+extern const float lbl_805D3B4C;
+extern float lbl_8068C894;
+class Unk80069F0C {
+public:
+    int fn_8006BE18();
+};
+extern "C" Vec3 fn_801837F4(void* obj, int a);
+inline Vec3 Unk801DF134_Flat(const Vec3& p)
+{
+    Vec3 r = p;
+    r.y = lbl_805D3B48;
+    return r;
+}
+inline float Unk801DF134_LenSq(Vec3 v)
+{
+    return v.x * v.x + v.z * v.z;
+}
+
+/* near-miss 99.7%: second path reuses the first path's stack temp slot; retail keeps a distinct slot and the Put copy takes r10/r8 swapped */
+extern "C" void fn_801DF134(I* i, Rec* r, P* p)
+{
+    Vec3 v = fn_801837F4(i->m9C->m0->m6B8, p->m708);
+    int ok = 1;
+    if (((Unk80069F0C*)i->m9C->m0->m6F8)->fn_8006BE18() != 1) {
+        const Vec3* pv = &p->m60;
+        if (!(Unk801DF134_LenSq(Unk801DF134_Flat(*pv)) <= lbl_805D3B4C)) {
+            ok = 2;
+        } else if (p->m460 == 0) {
+            if (!(Unk801DF134_LenSq(Unk801DF134_Flat(*pv)) >= lbl_8068C894 * lbl_8068C894))
+                goto Z;
+        }
+    } else {
+Z:
+        ok = 0;
+    }
+    r->m4 = 0x26;
+    Put(&r->m28, v);
+    r->mC = ok;
+}
+
 extern "C" void fn_801DFF5C(I* i, Rec* r, P* p)
 {
     r->m4 = 4;
