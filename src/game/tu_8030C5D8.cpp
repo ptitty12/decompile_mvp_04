@@ -208,6 +208,45 @@ extern char lbl_80693CFC[];
 extern const char lbl_805E79A4[];
 
 
+struct Unk8030C654_V3 {
+    int a;
+    int b;
+    int c;
+};
+struct Unk8030C654_E {
+    int m0;
+    int m4;
+    float m8;
+    Unk8030C654_V3 mC;
+    char m18[0x40];
+};
+struct Unk8030C654_P {
+    const void* m0;
+    int m4;
+    int m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    int m1C;
+    Unk8030C654_E e[5];
+    float m1D8;
+};
+extern char lbl_80665398[];
+extern const Unk8030C654_V3 lbl_806055AC;
+struct Unk8030FC1C_V3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk8030FC1C_Src {
+    char pad0[0x1D44];
+    Unk8030FC1C_V3 v;
+};
+struct Unk8030FC1C_P {
+    char pad0[0x104];
+    Unk8030FC1C_V3 m104;
+};
 extern "C" {
 char* fn_8040B61C(char* d, const char* s);
 void fn_80328234(void* p, int a, int b);
@@ -237,6 +276,8 @@ void fn_8037B424(void* p);
 void fn_803E6660(void* p);
 void fn_803DBD54(void* p);
 int fn_803E9B98(const void* a, void* b);
+void* fn_8030BDE8(void* p);
+void fn_80402B48(const Unk8030FC1C_V3* v, Unk8030FC1C_V3* out);
 }
 
 int fn_8030C5D8(int p)
@@ -247,6 +288,37 @@ int fn_8030C5D8(int p)
 float fn_8030C618(void* a, const Unk8030C5D8_V2* v, int k)
 {
     return v->y * fn_80323AC0(a, k) + v->x;
+}
+
+static inline void Unk8030C654_Init(Unk8030C654_E* e)
+{
+    e->m0 = 0;
+    e->m4 = 0;
+    e->m8 = 0.0f;
+    e->mC = lbl_806055AC;
+}
+
+extern "C" void* fn_8030C654(void* vp)
+{
+    Unk8030C654_P* p = (Unk8030C654_P*)vp;
+    new (p) Unk8037B3E8(0x77F3B9ABu);
+    p->m0 = lbl_80665398;
+    p->m4 = 0;
+    p->m8 = 0;
+    p->mC = 0.0f;
+    p->m10 = 0.0f;
+    p->m14 = 0.0f;
+    p->m18 = 0.0f;
+    p->m1C = 0;
+    Unk8030C654_E* e = p->e;
+    int k = 4;
+    do {
+        Unk8030C654_Init(e);
+        fn_8030BDE8(e->m18);
+        e++;
+    } while (k-- != 0);
+    p->m1D8 = 1.0f;
+    return p;
 }
 
 extern "C" void fn_8030C728(Unk8030C728_Obj* p)
@@ -600,3 +672,4 @@ void fn_8030FB5C(Unk8030C5D8_Em* p)
         p->mE4[i] = p->m74 * v + p->m70 * (1.0f - v);
     }
 }
+
