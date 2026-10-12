@@ -5,6 +5,12 @@
 #include "game/overlay.h"
 #include "game/db_80596D88.h"
 
+struct Db8059F18C_Obj {
+    char pad0[0x64];
+    int m64;
+    int m68;
+    unsigned m6C;
+};
 extern "C" {
 int fn_80403060(const short* s);
 void fn_80403144(void* dst, const void* src);
@@ -1343,6 +1349,140 @@ extern "C" DB_OVERLAY int fn_8059F05C(Db8059F05C_Obj* self, int k)
         return self->g5;
     case 14:
         return self->g6;
+    }
+    return 0;
+}
+
+extern "C" DB_OVERLAY int fn_8059F18C(Db8059D5C4_Obj* obj, int k)
+{
+    Db8059F18C_Obj* self = (Db8059F18C_Obj*)obj;
+    switch (k) {
+    case 0:
+        return *(unsigned char*)&self->m64 & 1;
+    case 1:
+        return ((unsigned)self->m64 >> 23) & 1;
+    case 2:
+        return ((unsigned)self->m64 >> 22) & 1;
+    case 3:
+        return ((unsigned)self->m64 >> 21) & 1;
+    case 4:
+        return ((unsigned)self->m64 >> 20) & 1;
+    case 5:
+        return ((unsigned)self->m64 >> 19) & 1;
+    case 6:
+        return ((unsigned)self->m64 >> 18) & 1;
+    case 7:
+        return ((unsigned)self->m64 >> 17) & 1;
+    case 8:
+        return *(unsigned short*)&self->m64 & 1;
+    case 9:
+        return ((unsigned)self->m64 >> 15) & 1;
+    case 10:
+        return ((unsigned)self->m64 >> 14) & 1;
+    case 11:
+        return ((unsigned)self->m64 >> 13) & 1;
+    case 12:
+        return ((unsigned)self->m64 >> 12) & 1;
+    case 13:
+        return ((unsigned)self->m64 >> 11) & 1;
+    case 14:
+        return ((unsigned)self->m64 >> 10) & 1;
+    case 15:
+        return ((unsigned)self->m64 >> 9) & 1;
+    case 16:
+        return ((unsigned)self->m64 >> 8) & 1;
+    case 17:
+        return ((unsigned)self->m64 >> 7) & 1;
+    case 18:
+        return ((unsigned)self->m64 >> 6) & 1;
+    case 19:
+        return ((unsigned)self->m64 >> 5) & 1;
+    case 20:
+        return ((unsigned)self->m64 >> 4) & 1;
+    case 21:
+        return ((unsigned)self->m64 >> 3) & 1;
+    case 22:
+        return ((unsigned)self->m64 >> 2) & 1;
+    case 23:
+        return ((unsigned)self->m64 >> 1) & 1;
+    case 24:
+        return self->m64 & 1;
+    case 25:
+        return (unsigned)self->m68 >> 31;
+    case 26:
+        return ((unsigned)self->m68 >> 30) & 1;
+    case 27:
+        return ((unsigned)self->m68 >> 29) & 1;
+    case 28:
+        return ((unsigned)self->m68 >> 28) & 1;
+    case 29:
+        return ((unsigned)self->m68 >> 27) & 1;
+    case 30:
+        return ((unsigned)self->m68 >> 26) & 1;
+    case 31:
+        return ((unsigned)self->m68 >> 25) & 1;
+    case 32:
+        return *(unsigned char*)&self->m68 & 1;
+    case 33:
+        return ((unsigned)self->m68 >> 23) & 1;
+    case 34:
+        return ((unsigned)self->m68 >> 22) & 1;
+    case 35:
+        return ((unsigned)self->m68 >> 21) & 1;
+    case 36:
+        return ((unsigned)self->m68 >> 20) & 1;
+    case 37:
+        return ((unsigned)self->m68 >> 19) & 1;
+    case 38:
+        return ((unsigned)self->m68 >> 18) & 1;
+    case 39:
+        return ((unsigned)self->m68 >> 17) & 1;
+    case 40:
+        return *(unsigned short*)&self->m68 & 1;
+    case 41:
+        return ((unsigned)self->m68 >> 15) & 1;
+    case 42:
+        return ((unsigned)self->m68 >> 14) & 1;
+    case 43:
+        return ((unsigned)self->m68 >> 13) & 1;
+    case 44:
+        return ((unsigned)self->m68 >> 12) & 1;
+    case 45:
+        return ((unsigned)self->m68 >> 11) & 1;
+    case 46:
+        return ((unsigned)self->m68 >> 10) & 1;
+    case 47:
+        return ((unsigned)self->m68 >> 9) & 1;
+    case 48:
+        return ((unsigned)self->m68 >> 8) & 1;
+    case 49:
+        return ((unsigned)self->m68 >> 7) & 1;
+    case 50:
+        return ((unsigned)self->m68 >> 6) & 1;
+    case 51:
+        return ((unsigned)self->m68 >> 5) & 1;
+    case 52:
+        return ((unsigned)self->m68 >> 4) & 1;
+    case 53:
+        return ((unsigned)self->m68 >> 3) & 1;
+    case 54:
+        return ((unsigned)self->m68 >> 2) & 1;
+    case 55:
+        return ((unsigned)self->m68 >> 1) & 1;
+    case 56:
+        return self->m68 & 1;
+    case 57:
+        return (unsigned)self->m6C >> 31;
+    case 58:
+        return ((unsigned)self->m6C >> 30) & 1;
+    case 59:
+        return ((unsigned)self->m6C >> 29) & 1;
+    case 60:
+        return ((unsigned)self->m6C >> 28) & 1;
+    case 61:
+        return ((unsigned)self->m6C >> 27) & 1;
+    case 62:
+        return ((unsigned)self->m6C >> 26) & 1;
     }
     return 0;
 }
