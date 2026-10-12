@@ -4,6 +4,7 @@
  */
 #include "game/overlay.h"
 #include "game/tu_8008CE64.h"
+#include "game/db_80596D88.h"
 
 struct U {
     char pad0[0x4000];
@@ -12,10 +13,47 @@ struct U {
 #define PUT(o, v) (*(const void**)((char*)self + (o)) = (v))
 
 extern char lbl_80682D30[];
+extern "C" void fn_8040074C(void* p, unsigned n);
 
 extern "C" void fn_80377408(void* p);
 
 extern char lbl_80682EB0[];
+
+struct Db80596D88_Obj {
+    int m0;
+    short m4;
+    char pad6[2];
+    int m8;
+    short mC;
+    char padE[2];
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    const void* m34;
+};
+
+/* near-miss: retail gives the halfword at +4 its own zero register (li r10/r9) and keeps the vptr store first */
+//@80596D88
+extern "C" DB_OVERLAY void fn_80596D88(Db80596D88_Obj* self)
+{
+    self->m34 = lbl_80682EB0;
+    self->m4 = 0;
+    self->m30 = 0;
+    self->m8 = 0;
+    self->mC = 0;
+    self->m10 = 0;
+    self->m1C = 0;
+    self->m20 = 0;
+    self->m24 = 0;
+    self->m28 = 0;
+    self->m2C = 0;
+}
 
 extern "C" DB_OVERLAY void fn_80596DCC(void* self, int c)
 {
@@ -24,11 +62,186 @@ extern "C" DB_OVERLAY void fn_80596DCC(void* self, int c)
         fn_80377408(self);
 }
 
+/* near-miss: same own-zero-register halfword at +4 as fn_80596D88 */
+//@80596E00
+extern "C" DB_OVERLAY void fn_80596E00(Db80596D88_Obj* self)
+{
+    self->m30 = 0;
+    self->m4 = 0;
+    self->m8 = 0;
+    self->mC = 0;
+    self->m10 = 0;
+    self->m14 = 0;
+    self->m18 = 0;
+    self->m1C = 0;
+    self->m20 = 0;
+    self->m24 = 0;
+    self->m28 = 0;
+    self->m2C = 0;
+}
+
+//@80596FCC
+extern "C" DB_OVERLAY int fn_80596FCC(Db80596D88_Obj* self, int k)
+{
+    switch (*(int*)self) {
+    case 1:
+        self->m0 = 0;
+        if (k)
+            return 0x594B;
+        return 0x594C;
+    case 2:
+        self->m0 = 0;
+        if (k)
+            return 0x594D;
+        return 0x594E;
+    case 3:
+        self->m0 = 0;
+        return 0x59FA;
+    case 0:
+        return 0;
+    default:
+        return 0;
+    }
+}
+
+inline void* operator new(unsigned, void* p)
+{
+    return p;
+}
+
+struct Db80597A5C_X {
+    char pad[0x18];
+    const void* m18;
+    Db80597A5C_X() { m18 = lbl_80682D30; }
+    void Init() { m18 = lbl_80682D30; }
+};
+
+/* near-miss: retail copies r3 (mr r11,r3) before the vptr store */
+//@80597A5C
+extern "C" DB_OVERLAY void fn_80597A5C(U* self)
+{
+    PUT(0x18, lbl_80682D30);
+}
+
 extern "C" DB_OVERLAY void fn_80597A70(U* self, int chrg)
 {
     PUT(0x18, lbl_80682D30);
     if (chrg & 1)
         fn_80377408(self);
+}
+
+extern const float lbl_806E02FC;
+extern const float lbl_806E0300;
+extern const float lbl_806E0304;
+extern const float lbl_806E0308;
+extern const float lbl_806E030C;
+extern const float lbl_806E0310;
+
+//@80597FE4
+extern "C" DB_OVERLAY float fn_80597FE4(void* self, int k)
+{
+    if (k <= 2)
+        return lbl_806E02FC;
+    if (k <= 4)
+        return lbl_806E0300;
+    if (k == 5)
+        return lbl_806E0304;
+    if (k <= 8)
+        return lbl_806E0308;
+    if (k <= 10)
+        return lbl_806E030C;
+    return lbl_806E0310;
+}
+
+extern const float lbl_806010C4;
+extern const float lbl_806010C8;
+extern const float lbl_806010CC;
+extern const float lbl_806010D0;
+extern const float lbl_806E0314;
+extern const float lbl_806E0318;
+extern const float lbl_806E031C;
+extern const float lbl_806E0320;
+extern const float lbl_806E0324;
+
+//@80598054
+extern "C" DB_OVERLAY float fn_80598054(float x)
+{
+    if (!(x > lbl_806010C4))
+        return lbl_806E0314;
+    if (!(x > lbl_806010C8))
+        return lbl_806E0318;
+    if (!(x > lbl_806010CC))
+        return lbl_806E031C;
+    if (x <= lbl_806010D0)
+        return lbl_806E0320;
+    return lbl_806E0324;
+}
+
+extern char lbl_806842A0[];
+extern const char lbl_805FE19C[];
+
+//@805980E4
+extern "C" DB_OVERLAY void fn_805980E4(void* self, int a, Unk80070DDC_Stream* io)
+{
+    io->v08(a, self, 4);
+    io->v08(a, (char*)self + 4, 0x14);
+}
+
+extern const float lbl_806010D4;
+extern const float lbl_806010D8;
+extern const float lbl_806010DC;
+extern const float lbl_806010E0;
+extern "C" int fn_800A2EB4(void* p);
+extern "C" int fn_8057CE00(int a);
+
+//@80598158
+extern "C" DB_OVERLAY float fn_80598158()
+{
+    float r = lbl_806010D4;
+    if (fn_800A2EB4(lbl_80619948)) {
+        int m = fn_8057CE00(0);
+        if (m == 0)
+            r += lbl_806010D8;
+        else if (m == 1)
+            r += lbl_806010DC;
+        else if (m == 2)
+            r += lbl_806010E0;
+    }
+    return r;
+}
+
+extern "C" int fn_8059841C(void* self);
+
+//@805986F8
+extern "C" DB_OVERLAY int fn_805986F8(void* self)
+{
+    int base = fn_8059841C(self);
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int d = sc->fn_8007B8C4(0x36, (int)self) - base;
+    if (d == 0)
+        return 4;
+    int r = d + 4;
+    if (r < 0)
+        r = 0;
+    if (r > 10)
+        r = 10;
+    return r;
+}
+
+extern const float lbl_80601164;
+extern const float lbl_80601168;
+extern const float lbl_8060116C;
+extern const float lbl_80601170;
+extern const float lbl_80601174;
+
+//@80598924
+extern "C" DB_OVERLAY float fn_80598924(float x)
+{
+    if (!(x > lbl_80601164))
+        return lbl_80601168;
+    if (x < lbl_8060116C)
+        return x * lbl_80601170;
+    return lbl_80601174;
 }
 
 struct Unk800C7B40_Data {
@@ -232,24 +445,20 @@ extern "C" DB_OVERLAY void fn_8059897C(FeScrM* x, int a)
     fn_80553248(fn_805981EC(x, a));
 }
 
-struct Obj {
-    char* m0;
-    int m4;
-};
-
-struct Unk80071604 {
-    char m0[16];
-    Obj* m10;
-    int m14;
-    int m18;
-    unsigned m1C;
-    void* m20;
-    char* m24;
-};
+//@805989A0
+extern "C" DB_OVERLAY Unk80071604* fn_805989A0(Unk80071604* self, const char* name, Obj* type, unsigned count)
+{
+    fn_80071604(self, name, type, count);
+    self->m20 = lbl_806842A0;
+    self->m24 = 0;
+    self->m24 = (char*)operator new[](self->m1C * 0x28, 0);
+    fn_8040074C(self->m24, self->m1C * 0x28);
+    self->m14 = fn_8007366C(lbl_805FE19C, lbl_805FE19C);
+    return self;
+}
 
 extern char lbl_806842A0[];
 
-void fn_80071688(Unk80071604* self, int chrg);
 
 extern "C" DB_OVERLAY void fn_80598A1C(Unk80071604* self, int chrg)
 {
@@ -261,6 +470,29 @@ extern "C" DB_OVERLAY void fn_80598A1C(Unk80071604* self, int chrg)
     fn_80071688(self, chrg);
 }
 
+//@80598A78
+extern "C" DB_OVERLAY void fn_80598A78(Unk80071604* self, unsigned i)
+{
+    if (i < self->m1C)
+        fn_8040074C(self->m24 + i * 0x28, 0x28);
+}
+
+//@80598D5C
+extern "C" DB_OVERLAY char* fn_80598D5C(Unk80071604* self, int which, unsigned idx, char* out)
+{
+    if (idx < self->m1C) {
+        switch (which) {
+        case 0:
+            fn_8040B61C(out, self->m24 + idx * 0x28 + 0xC);
+            break;
+        case 1:
+            fn_8040B61C(out, self->m24 + idx * 0x28 + 0x18);
+            break;
+        }
+    }
+    return out;
+}
+
 extern Unk8008CE64_Pmf lbl_80602274[];
 
 extern "C" DB_OVERLAY float fn_80598DDC(Unk8008CE64_Obj* o, int i, int a)
@@ -268,18 +500,6 @@ extern "C" DB_OVERLAY float fn_80598DDC(Unk8008CE64_Obj* o, int i, int a)
     float r = (o->*lbl_80602274[i])(a);
     return r;
 }
-
-struct Unk80084910_VT2 {
-    char pad0[0x28];
-    short delta;
-    short pad2A;
-    int (*pfn)(void* self, int k, int a);
-};
-
-struct Unk80084910_G {
-    char pad0[0x20];
-    Unk80084910_VT2* m20;
-};
 
 typedef Unk80084910_G G;
 
@@ -295,19 +515,12 @@ extern "C" DB_OVERLAY float fn_8059936C(G* self, int a)
     return r;
 }
 
-extern "C" void fn_80329FA0(void* out, int v, ...);
-
 extern "C" DB_OVERLAY float fn_805993D8(G* self, int a)
 {
     unsigned char buf;
     fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
     return (float)buf;
 }
-
-struct Db8053CC9C_Buf3 {
-    unsigned short a;
-    unsigned short b;
-};
 
 extern "C" DB_OVERLAY float fn_80599448(G* self, int a)
 {
@@ -316,15 +529,29 @@ extern "C" DB_OVERLAY float fn_80599448(G* self, int a)
     return (float)buf.b;
 }
 
-struct Db8053CC9C_Buf2 {
-    unsigned char a;
-    unsigned char b;
-    unsigned short pad;
-};
-
 extern "C" DB_OVERLAY float fn_805994C4(G* self, int a)
 {
     Db8053CC9C_Buf2 buf;
     fn_80329FA0(&buf, self->m20->pfn((char*)self + self->m20->delta, 0, a));
     return (float)buf.b;
+}
+
+//@80599540
+struct Db80599540_D {
+    char pad[0x20];
+};
+struct Db80599540_Obj : Db80599540_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual int v5(int a, int b);
+};
+
+//@80599540
+extern "C" DB_OVERLAY float fn_80599540(Db80599540_Obj* self, int a)
+{
+    int v = self->v5(8, a);
+    float r = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_80079A90(v);
+    return r;
 }

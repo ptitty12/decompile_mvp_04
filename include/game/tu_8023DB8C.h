@@ -32,25 +32,52 @@ struct Unk8023DB8C_Outer {
     int m3AC;
 };
 struct Unk8023DB8C_Ctx {
-    char pad0[0x700];
+    char pad0[0x6F4];
+    int m6F4;
+    struct Unk8023DDD0_S* m6F8;
+    char pad6FC[4];
     Unk8023DB8C_Outer* m700;
+};
+struct Unk8023DDD0_E {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+struct Unk8023DDD0_S {
+    char pad0[0x14];
+    Unk8023DDD0_E* m14;
+};
+/* Sub-object at P+0xA0 (vptr at +0xB8): only virtual 5 is called (fn_8023DE48 family). */
+class Unk8023DE48_Q {
+public:
+    char pad0[0x18];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
 };
 
 struct Unk8023DB8C_P {
     char pad0[0x244];
     char m244[4];
-    char pad248[0x39C - 0x248];
+    char pad248[0x264 - 0x248];
+    int m264;
+    char pad268[0x39C - 0x268];
     unsigned m39C;
     char pad3A0[0x44C - 0x3A0];
     Unk8023DB8C_Ctx* m44C;
-    char pad450[0x58C - 0x450];
+    char pad450[8];
+    int m458;
+    char pad45C[0x58C - 0x45C];
     char m58C[4];
     char pad590[0x628 - 0x590];
     Unk8023DB8C_Slot* m628[31];
     int m6A4[6];
     int m6BC;
     int m6C0;
-    char pad6C4[0xB54 - 0x6C4];
+    char pad6C4[0x708 - 0x6C4];
+    int m708;
+    char pad70C[0xB54 - 0x70C];
     int mB54;
     int mB58;
     int mB5C;
