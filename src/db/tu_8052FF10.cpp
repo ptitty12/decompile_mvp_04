@@ -527,6 +527,57 @@ extern "C" DB_OVERLAY char* fn_80530EFC(Unk80071604* self, int i)
     return self->m24 + (i << 3);
 }
 
+struct Db8052FF10_Src {
+    unsigned w0;
+    unsigned w4;
+};
+struct Db8052FF10_Buf3 {
+    unsigned short a;
+    unsigned short b;
+};
+struct Db8052FF10_Date {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned short m2;
+    Db8052FF10_Date() {}
+};
+extern "C" void fn_800901C0(char* a, int b, unsigned c, char* d, int e, unsigned f);
+extern "C" int fn_80090244(unsigned v);
+extern "C" unsigned fn_8032A2CC(unsigned m, unsigned short y);
+extern "C" int fn_80329E74(Db8052FF10_Date d);
+/* near-miss: 99.3%; retail stores d.m1/d.m2 straight into the frame, ours goes through an address register (one extra insn) */
+extern "C" DB_OVERLAY Unk8052FF10_Rec* fn_80530F0C(Unk8052FF10_Rec* dst, Db8052FF10_Src* src)
+{
+    fn_8040074C(dst, 0x2C);
+    fn_800901C0(dst->m0F, lbl_80601374[0], (src->w4 >> 19) & 0x3FF, dst->m1B, lbl_80601374[1],
+                (src->w4 >> 8) & 0x3FF);
+    int t = fn_80329FA0(1).m2;
+    unsigned short yr = *(unsigned char*)src + t;
+    unsigned mon = ((src->w0 >> 10) & 0xF) % 12;
+    unsigned dim = fn_8032A2CC(mon, yr);
+    Db8052FF10_Date d;
+    d.m0 = mon + 1;
+    d.m2 = yr;
+    d.m1 = ((src->w0 >> 4) & 0x1F) % dim + 1;
+    dst->f0 = fn_80329E74(d);
+    dst->f1 = (src->w0 >> 14) & 1;
+    dst->f11 = (src->w0 >> 18) & 0x3F;
+    dst->f12 = (src->w0 >> 15) & 7;
+    dst->f2 = (src->w0 & 7) + 0x15;
+    dst->f3 = (src->w4 >> 29) * 5 + 0x50;
+    dst->f4 = (src->w4 & 0x7F) % 100;
+    dst->f5 = ((src->w0 >> 8) & 0x3F) % 15 + 0x385;
+    dst->f6 = ((src->w4 >> 20) & 0xF) % 10;
+    dst->f7 = ((src->w4 >> 15) & 7) % 7;
+    dst->f8 = (src->w4 >> 8) & 7;
+    dst->f13 = fn_80090244((src->w0 >> 3) & 0x7F);
+    dst->f14 = fn_80090244(src->w4 >> 25);
+    dst->f15 = fn_80090244((src->w4 >> 17) & 0x7F);
+    dst->f16 = fn_80090244((src->w4 >> 9) & 0x7F);
+    dst->f17 = fn_80090244((src->w4 >> 1) & 0x7F);
+    return dst;
+}
+
 extern "C" DB_OVERLAY void* fn_805311A4(void* self, const void* src)
 {
     fn_803FFA60(self, src, 8);
