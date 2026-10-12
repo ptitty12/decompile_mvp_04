@@ -5,6 +5,27 @@
 #include "game/fe_80459228.h"
 
 
+
+struct FeArrL {
+    char* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* m10;
+    int m14;
+};
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A440[];
+extern "C" {
+void fn_8040074C(void* p, int n);
+void fn_80535360(FeArrL* l, int a);
+void fn_80539380(FeArrL* l);
+void fn_805362AC(FeArrL* l, int a);
+int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
+}
+
+
 extern const char lbl_805F5548[];
 extern const char lbl_805F55A0[];
 extern "C" {
@@ -289,6 +310,62 @@ FE_OVERLAY int fn_80459FA4(FeScrA* x)
         }
     }
     return r;
+}
+
+FE_OVERLAY void fn_8045A638(FeScrA* x)
+{
+    FeArrL arr;
+    char buf[480];
+    FeArrL* s = &arr;
+    s->m10 = lbl_8064B298;
+    s->m0 = buf;
+    s->m8 = 0x78;
+    fn_8040074C(s->m0, 0x1E0);
+    s->m4 = 0;
+    s->mC = 0;
+    s->m10 = lbl_8064A550;
+    fn_8040074C(s->m0, s->m8 * 4);
+    void* g = lbl_8061930C;
+    s->m10 = lbl_8064A440;
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    fn_80535360(s, (int)x->m160);
+    fn_80539380(s);
+    fn_805362AC(s, 1);
+    int n = s->m4;
+    s->mC = 0;
+    x->m7D4 = n;
+    if (x->m150 == 0) {
+        int cnt = 0;
+        int i;
+        for (i = 0; i < x->m7D4; i++) {
+            int o = s->mC * 4;
+            if (x->m15C == fn_8007A6A0__18Unk8007A4DC_Screenii(g, 5, *(int*)(o + (int)arr.m0))) {
+                int o2 = s->mC * 4;
+                int v = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, fn_80077BC4(g, *(int*)(o2 + (int)arr.m0)));
+                x->m434[cnt].b = v;
+                int o3 = s->mC * 4;
+                x->m434[cnt].a = *(int*)(o3 + (int)arr.m0);
+                cnt++;
+            }
+            unsigned k = s->mC + 1;
+            s->mC = k % (unsigned)s->m4;
+        }
+        x->m7D4 = cnt;
+    } else {
+        int cnt;
+        for (cnt = 0; cnt < x->m7D4; cnt++) {
+            int o2 = s->mC * 4;
+            int v = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, fn_80077BC4(g, *(int*)(o2 + (int)arr.m0)));
+            x->m434[cnt].b = v;
+            int o3 = s->mC * 4;
+            x->m434[cnt].a = *(int*)(o3 + (int)arr.m0);
+            unsigned k = s->mC + 1;
+            s->mC = k % (unsigned)s->m4;
+        }
+    }
+    arr.m10 = lbl_8064A550;
 }
 
 FE_OVERLAY void fn_8045A85C(FeScrA* x)
