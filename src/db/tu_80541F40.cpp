@@ -560,6 +560,35 @@ DB_OVERLAY int fn_80545110(Db80541F40_Obj* o, int mode, int* best)
     return 1;
 }
 
+struct Db80541F40_Screen : Unk8007A4DC_Screen {
+    float fn_8007A768(int a, int b);
+};
+extern "C" float fn_8057D62C(void* o, int i);
+int fn_8007F1E0(Unk8007F198_A* self, int x, int y);
+DB_OVERLAY int fn_805452FC(void* o, int idx, float a, float b, float c, float d)
+{
+    Unk8007B2B0_Screen* g = (Unk8007B2B0_Screen*)lbl_8061930C;
+    float cur = fn_8057D62C(o, idx);
+    char* bs = (char*)o + 0x50;
+    int off = idx * 0x34;
+    int id = *(int*)(bs + off);
+    if (fn_8007F1E0((Unk8007F198_A*)g, id, *(int*)o) != 0) {
+        Db8053CC9C_Buf3 buf;
+        fn_80329FA0(&buf, fn_8007FBC0((Unk8007F198_C*)g, 0, 0));
+        unsigned short yr = buf.b;
+        unsigned short age = (int)((Db80541F40_Screen*)g)->fn_8007A768(3, id);
+        int diff = yr - age;
+        if ((!(d >= 0.5f) && diff <= 0x18) || (!(d <= 0.5) && diff > 0x22)) {
+            return 0;
+        }
+        if (!(cur - b >= a)) {
+            if (cur + c > a)
+                return 1;
+        }
+    }
+    return 0;
+}
+
 DB_OVERLAY int fn_8054593C(int u)
 {
     Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
