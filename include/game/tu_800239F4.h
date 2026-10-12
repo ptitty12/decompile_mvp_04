@@ -256,7 +256,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m114;
     unsigned m118;
     int m11C;
-    char pad120[0x4];
+    int m120;
     int m124;
     unsigned m128;
     int m12C;
