@@ -248,6 +248,47 @@ struct Unk801D31D8_Z2C {
 };
 extern "C" int fn_801D0BB0(B* s);
 
+extern Unk801D31D8_Tbl4 lbl_805D296C;
+extern "C" float fn_80235DA8(void* p);
+extern "C" float fn_801A0AA8(Unk801B7FB0_P* p, float a, float b);
+extern "C" float fn_801D18C8(B* s);
+struct Unk80087A58_O;
+float fn_80088E74(Unk80087A58_O* o);
+struct Unk801D31D8_GMV {
+    char pad0[0xC];
+    Unk80087A58_O* mC;
+};
+struct Unk801D31D8_G6V {
+    char pad0[0xC];
+    Unk801D31D8_GMV* mC;
+};
+
+extern "C" float fn_801D40AC(B* s)
+{
+    float r = 0.0f;
+    int flag = 0;
+    if (!(fn_80235DA8(((Unk801D31D8_Wb*)s)->m34->m3B0) <= 0.75f))
+        flag = RandG(s->m30, 1.0f, lbl_805D25E0, 0x626) < 0.25f;
+    if (flag != 0) {
+        r = RandG(s->m30, 0.3f, lbl_805D25E0, 0x62E);
+    } else {
+        Unk801D31D8_Tbl4 t = lbl_805D296C;
+        r = t.v[fn_801D0BB0(s)];
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float x = ((Unk801D31D8_Z2C*)s->m2C)->m1FC;
+        x = !(x > 1.0f) ? (x >? 0.0f) : 1.0f;
+        r *= LerpATB(0.8f, x, 1.2f);
+        r = fn_801A0AA8((Unk801B7FB0_P*)s->m30, r, 0.25f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float y = fn_801D18C8(s);
+        y = !(y > 1.0f) ? (y >? 0.0f) : 1.0f;
+        r *= LerpATB(1.0f, y, 1.25f);
+        r *= LerpATB(1.0f, fn_80088E74(((Unk801D31D8_G6V*)s->m30->m6F8)->mC->mC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
+}
+
 extern "C" void fn_801D5158(B* s)
 {
     Unk801D31D8_Tbl4 t = lbl_805D2B7C;
