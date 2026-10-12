@@ -262,6 +262,59 @@ int fn_80157708(void* self, int v) /* 80157708 */
     return 1;
 }
 
+extern "C" void fn_80158994(Unk80159F28* self) /* 80158994 */
+{
+    int f = lbl_8061D460 == 0;
+    if (self->mC->m6F8->fn_8006BF10() == 1) {
+        f = 0;
+    }
+    if (f != 0) {
+        RecObj8015F164 rec;
+        ElemView8015F164* e = (ElemView8015F164*)&rec;
+        for (int j = 0; j < 8; j++, e++) {
+            e->name[0] = 0;
+            e->m3C = 0;
+            e->m40 = 0;
+            e->m44 = 0;
+            e->m48 = 0;
+            e->m4C = 0;
+            e->m50 = lbl_805EBA10;
+            e->m68 = lbl_805EBA10;
+            e->m80 = lbl_805EBA10;
+            e->m98 = 0;
+            e->m9C = 0xAE;
+        }
+        fn_80169BF8((Unk8016D9A0_Rec*)&rec, "start_game_spawn", 1, 1, 2, 0, lbl_8068B828, 0);
+        self->fn_80157514(0x48, (int)&rec, 0, 0, 0, lbl_8068B828);
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    }
+}
+
+extern "C" void fn_80158CB8(Unk80159F28* self) /* 80158CB8 */
+{
+    if (self->mC->m6F8->m14->m1CC8 == 0) {
+        RecObj8015F164 rec;
+        ElemView8015F164* e = (ElemView8015F164*)&rec;
+        for (int j = 0; j < 8; j++, e++) {
+            e->name[0] = 0;
+            e->m3C = 0;
+            e->m40 = 0;
+            e->m44 = 0;
+            e->m48 = 0;
+            e->m4C = 0;
+            e->m50 = lbl_805EBA10;
+            e->m68 = lbl_805EBA10;
+            e->m80 = lbl_805EBA10;
+            e->m98 = 0;
+            e->m9C = 0xAE;
+        }
+        fn_80169BF8((Unk8016D9A0_Rec*)&rec, "startinning_bot1st_spawn", 1, 1, 0, 0, lbl_8068B828, 0);
+        self->fn_80157514(0x49, (int)&rec, 0, 0, 0, lbl_8068B828);
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    }
+    self->fn_80161A34();
+}
+
 void Unk80159F28::fn_801593D8() /* 801593D8 */
 {
     fn_8015A1D4();

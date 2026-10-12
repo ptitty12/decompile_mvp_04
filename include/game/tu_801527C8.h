@@ -85,6 +85,7 @@ struct Unk801527C8_Ent0C {
 
 struct Unk801527C8_Mgr {
     int fn_8006BE18();
+    int fn_8006BF10();
     char pad0[0xC];
     Unk801527C8_Ent0C* mC;
     Unk801527C8_Ent10* m10;
