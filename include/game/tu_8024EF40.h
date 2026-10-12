@@ -129,7 +129,9 @@ struct Unk8024EF40_P {
     Unk8024EF40_Q* m44C;
     char pad450[8];
     int m458;
-    char pad45C[0x588 - 0x45C];
+    char pad45C[4];
+    int m460;
+    char pad464[0x588 - 0x464];
     Unk8024EF40_W m588;
     Unk8024EF40_A m58C;
     char pad5E0[0x618 - 0x5E0];
