@@ -28,7 +28,8 @@ struct Unk801C16B0_M4 {
     char pad18[0x3B0 - 0x18];
     void* m3B0;
     int m3B4;
-    char pad3B8[0x418 - 0x3B8];
+    int m3B8;
+    char pad3BC[0x418 - 0x3BC];
     int m418;
 };
 

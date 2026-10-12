@@ -83,6 +83,10 @@ void fn_801BFC8C(void* o);
 void fn_801BFBEC(void* o);
 void fn_801BDDC8(B* b, P* p);
 int fn_801C1950(A* a);
+int fn_801DBF68(int h);
+int fn_80254984(void* s);
+int fn_802548F0(void* s);
+int fn_80247858(P* p, float* t);
 P* fn_801A4B34(P* ctx);
 int fn_8014E310(int x);
 P* fn_80257DFC(int h, P* q, int dir);
@@ -447,6 +451,44 @@ extern "C" void fn_801BC3D0(A* a)
             p->m5CC = v;
         i = it.Next();
     }
+}
+
+/* near-miss: same code; retail keeps the player in r30 and its +0x58C sub-object in r31 (ours swapped). */
+extern "C" void fn_801BC478(A* a)
+{
+    float t;
+    int own = fn_801DBF68(((Unk801C16B0_M4*)a->m10)->m3B8);
+    Unk8006A138_It<0x15> it(9);
+    int i = it.v;
+    do {
+        P* p = Get(a->m14, i);
+        if (p) {
+            Unk801B7FB0_Sub58C* s = &p->m58C;
+            if (fn_80254984(s) == 1 || *(int*)((char*)s + 0x44) == 1) {
+                int k = fn_802548F0(s);
+                int cnt;
+                if (own != 0 || k != 0)
+                    cnt = 1;
+                else
+                    cnt = 2;
+                int base = *(int*)((char*)s + 0x38);
+                if (p->m458 == 9) {
+                    int w = fn_80247858(p, &t);
+                    if (!(t >= 0.0f)) {
+                        if (*(int*)((char*)s + 0x38) == w && w == 0)
+                            cnt = 1;
+                    }
+                }
+                int v = base + cnt;
+                if (v <= 0)
+                    v = 1;
+                if (v > 3)
+                    v = 3;
+                *(int*)((char*)s + 0x40) = v;
+            }
+        }
+        i = it.Next();
+    } while (i <= 0xC);
 }
 
 extern "C" void fn_801BC5B4(A* a, P* p, int x, Vec3* v)
