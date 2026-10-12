@@ -272,13 +272,17 @@ void fn_8035E78C(Unk8035E78C* self, char* other)
     }
 }
 
-/* near-miss: 7 slots; retail is mr r9,r3 / addi r0,r4,-9 / cmplwi / li r3,0 / bgtlr / mulli r3 / subi / add (result built in r3 after an early return of 0). */
+/* near-miss: 5 slots. The result is accumulated in one int (r = i * 0x38; r -= 0x1F4; r += p), which puts the temporaries in r3 and
+   p in r9 as retail does; left: sched order of the first four insns (retail addi r0,r4,-9 first) and the final add operand order. */
 char* fn_8035E8CC(char* p, unsigned i)
 {
-    char* r = 0;
-    if (i - 9 <= 3)
-        r = p + (i * 0x38 - 0x1F4);
-    return r;
+    int r = 0;
+    if (i - 9 <= 3) {
+        r = i * 0x38;
+        r -= 0x1F4;
+        r += (int)p;
+    }
+    return (char*)r;
 }
 
 void fn_8035E8F0(U* self, int chrg)
