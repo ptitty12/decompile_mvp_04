@@ -240,17 +240,18 @@ void fn_802FCCD0(Unk8037B3E8* o)
     do {
         int n = i + 1;
         fn_804089B4(a, lbl_805E7310, n);
+        int off = i * 12;
         o->fn_8037B7E8(a);
         o->fn_8037B7E8(lbl_805E7318);
-        i = n;
         fn_804089B4(b, lbl_805E7324, n);
-        o->fn_8037B674(b, &lbl_8068E178[i - 1].m0, lbl_805E7334, 0);
+        o->fn_8037B674(b, (int*)((char*)lbl_8068E178 + off), lbl_805E7334, 0);
         o->fn_8037B830(lbl_805E7318);
         fn_804089B4(b, lbl_805E73C0, n);
-        o->fn_8037B50C(b, &lbl_8068E178[i - 1].m4, lbl_805E72AC, 0);
+        o->fn_8037B50C(b, (float*)((char*)lbl_8068E178 + off + 4), lbl_805E72AC, 0);
         fn_804089B4(b, lbl_805E73CC, n);
-        o->fn_8037B50C(b, &lbl_8068E178[i - 1].m8, lbl_805E72AC, 0);
+        o->fn_8037B50C(b, (float*)((char*)lbl_8068E178 + off + 4 + 4), lbl_805E72AC, 0);
         o->fn_8037B830(a);
+        i = n;
     } while (i <= 3);
     o->fn_8037B830(lbl_805E7294);
 }
