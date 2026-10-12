@@ -29,6 +29,27 @@ struct Unk8014AD2C_Rect {
 extern "C" Unk8014AD2C_Col* fn_8014DBA0(Unk8014AD2C_Col*, int, int, int, int);
 extern "C" void fn_80314034(int, Unk8014AD2C_V2*, Unk8014AD2C_V2*, Unk8014AD2C_Col*);
 extern float lbl_8068B4CC[];
+struct Unk8014AAA8_Tri {
+    Unk8014AD2C_V2 a;
+    Unk8014AD2C_V2 b;
+    Unk8014AD2C_V2 c;
+};
+struct Unk8014AAA8_Obj {
+    char pad0[0x18];
+    float m18;
+    char pad1C[0x10];
+    float m2C;
+    char pad30[4];
+    float m34;
+    char pad38[4];
+    Unk8014AD2C_V2 p3C;
+    Unk8014AD2C_V2 p44;
+    Unk8014AD2C_V2 p4C;
+    Unk8014AD2C_V2 p54;
+    Unk8014AD2C_V2 p5C;
+    Unk8014AD2C_V2 p64;
+};
+extern "C" void fn_803141AC(int, Unk8014AD2C_V2*, Unk8014AD2C_V2*, Unk8014AD2C_V2*, Unk8014AD2C_Col*);
 struct Unk8014BC64_Va {
     virtual void fn_vslot1();
     virtual void fn_vslot2(int a);
@@ -203,7 +224,8 @@ extern void* lbl_8061B97C;
 extern void* lbl_8061B980;
 void* fn_8014A928(void*);
 extern int lbl_80620298;
-void fn_8014AAA8();
+struct Unk8014AAA8_Obj;
+void fn_8014AAA8(Unk8014AAA8_Obj*);
 void fn_8014AD2C(int);
 extern const char lbl_806557A8[];
 extern const void* lbl_80687CE4;
@@ -516,10 +538,49 @@ void* fn_8014AA18() { if (!lbl_8061B980) lbl_8061B980 = fn_8014A928(operator new
 
 void fn_8014AA64(int a)
 {
-    fn_8014AAA8();
+    fn_8014AAA8((Unk8014AAA8_Obj*)a);
     if (lbl_80620298 == 0) {
         fn_8014AD2C(a);
     }
+}
+
+void fn_8014AAA8(Unk8014AAA8_Obj* p)
+{
+    Unk8014AAA8_Tri v;
+    v.a = p->p3C;
+    v.b = p->p54;
+    v.c = p->p4C;
+    Unk8014AD2C_Col col;
+    fn_8014DBA0(&col, 0, 0, 0, 100);
+    fn_803141AC(lbl_8061FEDC, &v.a, &v.b, &v.c, &col);
+    v.c = p->p3C;
+    v.b = p->p54;
+    v.a = p->p44;
+    fn_8014DBA0(&col, 0, 0, 0, 100);
+    fn_803141AC(lbl_8061FEDC, &v.c, &v.b, &v.a, &col);
+    v.c = p->p4C;
+    v.b = p->p3C;
+    fn_8014DBA0(&col, 255, 0, 0, 255);
+    fn_80314034(lbl_8061FEDC, &v.c, &v.b, &col);
+    v.c = p->p4C;
+    v.b = p->p54;
+    fn_8014DBA0(&col, 255, 0, 0, 255);
+    fn_80314034(lbl_8061FEDC, &v.c, &v.b, &col);
+    v.c = p->p5C;
+    v.b = p->p64;
+    fn_8014DBA0(&col, 0, 255, 0, 255);
+    fn_80314034(lbl_8061FEDC, &v.c, &v.b, &col);
+    float t = p->m18 * 0.5f + p->m34;
+    Unk8014AD2C_V2 lo = { 0.0f, 0.0f };
+    lo.x = t - 0.01f;
+    lo.y = p->m2C;
+    Unk8014AD2C_V2 hi = { 0.0f, 0.0f };
+    hi.x = t + 0.01f;
+    hi.y = p->m2C;
+    v.b = hi;
+    v.c = lo;
+    fn_8014DBA0(&col, 255, 0, 255, 255);
+    fn_80314034(lbl_8061FEDC, &v.c, &v.b, &col);
 }
 
 void fn_8014AD2C(int self)
