@@ -5,6 +5,19 @@
 #include "game/db_80584CBC.h"
 
 struct Db805822D0_V;
+
+struct Db805822D0_D { int m0; };
+
+struct Db8052E198_E { int m0; int m4; int m8; unsigned mC; unsigned short m10; unsigned short m12; const void* m14; };
+
+struct Db805822D0_V : Db805822D0_D {
+    virtual int v08();
+    virtual int v10();
+    virtual int v18();
+};
+
+struct Db8058C9B8_P { int a; int b; };
+
 extern "C" Db805822D0_Base* fn_805822D0(Db805822D0_Base* self);
 extern const char lbl_806834C0[];
 extern const char lbl_806835F0[];
@@ -13,17 +26,12 @@ extern const char lbl_80682E18[];
 extern "C" void fn_80582314(void* self);
 extern "C" void fn_8040B320(void* dst, int c, unsigned n);
 extern "C" void fn_80582C54(char* self, int a, Unk80070DDC_Stream* io);
-struct Db805822D0_D { int m0; };
-struct Db8052E198_E { int m0; int m4; int m8; unsigned mC; unsigned short m10; unsigned short m12; const void* m14; };
 extern "C" Db8052E198_E* fn_8052E198(Db8052E198_E* self, int a, int b, int c, int d, int e, char f, int g, int h, int i);
 extern "C" void fn_80582CF8(Db805822D0_V* self, Db8052E198_E* e, int a, int b, int c);
 extern "C" int fn_8040ABA0();
-
-struct Db805822D0_V : Db805822D0_D {
-    virtual int v08();
-    virtual int v10();
-    virtual int v18();
-};
+extern const Db8058C9B8_P lbl_8060095C;
+extern const Db8058C9B8_P lbl_80600964;
+extern const Db8058C9B8_P lbl_8060096C;
 
 extern "C" DB_OVERLAY Db805822D0_Base* fn_8058BF2C(Db805822D0_Base* self)
 {
@@ -67,6 +75,45 @@ extern "C" DB_OVERLAY void fn_8058C388(char* self)
     fn_8040B320(self + 8, 0, 0x12);
 }
 
+extern "C" DB_OVERLAY void fn_8058C9B8(Db8058C9B8_P* out, int unused, int k)
+{
+    switch (k) {
+    case 0:
+        *out = lbl_8060095C;
+        break;
+    case 1:
+        *out = lbl_8060095C;
+        break;
+    case 2:
+        *out = lbl_8060095C;
+        break;
+    case 3:
+        *out = lbl_8060095C;
+        break;
+    case 4:
+        *out = lbl_8060095C;
+        break;
+    case 5:
+        *out = lbl_8060095C;
+        break;
+    case 6:
+        *out = lbl_80600964;
+        break;
+    case 7:
+        *out = lbl_8060096C;
+        break;
+    case 8:
+        *out = lbl_8060096C;
+        break;
+    default:
+        {
+            Db8058C9B8_P z = { 0, 0 };
+            *out = z;
+        }
+        break;
+    }
+}
+
 extern "C" DB_OVERLAY int fn_8058CE38(void* self, unsigned short* rec)
 {
     int r = 2;
@@ -107,6 +154,26 @@ extern "C" DB_OVERLAY Db805822D0_Base* fn_8058E144(Db805822D0_Base* self)
     fn_805822D0(self);
     self->m4 = lbl_80682E18;
     return self;
+}
+
+extern "C" DB_OVERLAY int fn_8058E470()
+{
+    Db80586420_Ent e;
+    Db80586420_Ent* pe = &e;
+    int t = pe->mC.g;
+    switch (t) {
+    case 5:
+        return 8;
+    case 6:
+        return 9;
+    case 7:
+        return 0xA;
+    case 8:
+        return 0xB;
+    case 9:
+        return 0xC;
+    }
+    return -1;
 }
 
 extern "C" DB_OVERLAY int fn_8058E550()
