@@ -578,6 +578,71 @@ Unk8019F8C0_Ref* fn_801A6D84(Unk8019F8C0_Owner* o, int i)
     return 0;
 }
 
+struct Unk801A6DB8_T {
+    char pad0[0x88];
+};
+struct Unk801A6DB8_O {
+    char pad0[0x6F0];
+    Unk801A6DB8_T* m6F0;
+    int m6F4;
+};
+extern Unk801A6DB8_T lbl_805D0614;
+extern Unk801A6DB8_T lbl_805D069C;
+extern Unk801A6DB8_T lbl_805D0724;
+extern Unk801A6DB8_T lbl_805D07AC;
+extern Unk801A6DB8_T lbl_805D0834;
+extern Unk801A6DB8_T lbl_805D08BC;
+extern Unk801A6DB8_T lbl_805D0944;
+extern Unk801A6DB8_T lbl_805D09CC;
+extern Unk801A6DB8_T lbl_805D0A54;
+extern Unk801A6DB8_T lbl_805D0ADC;
+extern Unk801A6DB8_T lbl_805D0B64;
+
+extern "C" Unk801A6DB8_T* fn_801A6DB8(Unk801A6DB8_O* o)
+{
+    if (o->m6F0 == 0) {
+        switch (o->m6F4) {
+        case 1:
+            o->m6F0 = &lbl_805D0614;
+            break;
+        case 0:
+            o->m6F0 = &lbl_805D0614;
+            break;
+        case 2:
+            o->m6F0 = &lbl_805D069C;
+            break;
+        case 3:
+            o->m6F0 = &lbl_805D0724;
+            break;
+        case 4:
+            o->m6F0 = &lbl_805D07AC;
+            break;
+        case 5:
+            o->m6F0 = &lbl_805D0834;
+            break;
+        case 8:
+            o->m6F0 = &lbl_805D0944;
+            break;
+        case 9:
+            o->m6F0 = &lbl_805D09CC;
+            break;
+        case 7:
+            o->m6F0 = &lbl_805D08BC;
+            break;
+        case 10:
+            o->m6F0 = &lbl_805D0A54;
+            break;
+        case 11:
+            o->m6F0 = &lbl_805D0ADC;
+            break;
+        case 12:
+            o->m6F0 = &lbl_805D0B64;
+            break;
+        }
+    }
+    return o->m6F0;
+}
+
 void fn_801A6ED8(Unk8019F8C0_Owner* o)
 {
     int a = fn_801A2034(o, o->m6F8->m14[2].m8 == 0);
