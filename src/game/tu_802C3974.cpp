@@ -915,6 +915,80 @@ void fn_802C56F8(Unk802C56F8_Regs* out, Unk802C56F8_Cfg* c)
     out->b.g2 = c->m3C;
 }
 
+struct Unk802C57B0_Slot;
+class Unk802C57B0_V {
+public:
+    char pad0[0x98];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16(Unk802C57B0_Slot* s);
+};
+struct Unk802C57B0_Slot {
+    int m0;
+    char pad4[4];
+    int m8;
+    char padC[0x10];
+    Unk802C57B0_V* m1C;
+};
+struct Unk802C57B0_Cfg {
+    unsigned char m0;
+    char pad1[0x27];
+    int m28;
+    char pad2C[0x3C];
+    int m68;
+};
+void fn_802C58E0(int h, Unk802C58E0_Slot* o, Unk802C59D0_Req* req);
+void fn_802C5A08(int h, Unk802C58E0_Slot* o, Unk802C59D0_Req* req);
+
+void fn_802C57B0(Unk802C3B60* o, Unk802C57B0_Slot* slot, Unk802C57B0_Cfg* cfg)
+{
+    Unk802C56F8_Regs regs;
+    int flag = 0;
+    fn_802C56F8(&regs, (Unk802C56F8_Cfg*)cfg);
+    int go;
+    if (cfg->m68 == 0xE || cfg->m68 == 0x10) {
+        if (slot->m8 == 0) {
+            go = 1;
+            flag = 1;
+        } else {
+            go = 0;
+        }
+    } else {
+        go = 1;
+    }
+    if (go != 0) {
+        Unk802C57B0_V* v = slot->m1C;
+        if (v != 0)
+            v->s16(slot);
+        if (cfg->m28 != 0)
+            fn_802C58E0((int)o, (Unk802C58E0_Slot*)slot, (Unk802C59D0_Req*)cfg);
+        else
+            fn_802C5A08((int)o, (Unk802C58E0_Slot*)slot, (Unk802C59D0_Req*)cfg);
+        slot->m8 = 1;
+        if (flag != 0 && cfg->m0 == 0) {
+            ((Unk802C3D2C_Elem*)o->m24C)[0].m8 = 1;
+            ((Unk802C3D2C_Elem*)o->m24C)[0].m0 = slot->m0;
+            ((Unk802C3D2C_Elem*)o->m24C)[1].m8 = 1;
+            ((Unk802C3D2C_Elem*)o->m24C)[1].m0 = slot->m0;
+            ((Unk802C3D2C_Elem*)o->m24C)[2].m8 = 1;
+            ((Unk802C3D2C_Elem*)o->m24C)[2].m0 = slot->m0;
+        }
+    }
+}
+
 void fn_802C58E0(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
 {
     char buf[0x40] = "";
@@ -970,6 +1044,74 @@ Unk802C2188* fn_802C610C(Unk802C3B60* o, Unk802C610C_Cfg* c, int flag)
         return &o->s1;
     }
     return (Unk802C2188*)o;
+}
+
+struct Unk802C6BA4_Tex;
+extern Unk802C60A4_Rgb lbl_8061EC28;
+extern Unk802C60A4_Rgb lbl_8061EC2B;
+extern Unk802C60A4_Rgb lbl_8061EC2E;
+extern Unk802C60A4_Rgb lbl_8061EC37;
+extern Unk802C60A4_Rgb lbl_8061EC3A[];
+extern int lbl_8061D39C;
+void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt);
+void fn_802C60A4(int, Unk802C60A4_Key* k, Unk802C60A4_Rgb* out);
+void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int w, int hh);
+
+struct Unk802C61A8_Slot {
+    char pad0[0x18];
+    Unk802C6BA4_Tex* m18;
+};
+struct Unk802C61A8_Cfg {
+    char pad0[0x48];
+    int m48;
+    char pad4C[0xC];
+    int m58;
+    char pad5C[4];
+    int m60;
+    char pad64[4];
+    int m68;
+};
+
+void fn_802C61A8(Unk802C3B60* o, Unk802C61A8_Slot* s, Unk802C61A8_Cfg* c)
+{
+    fn_802C6BA4(s->m18, 0x10);
+    Unk802C2188* t = fn_802C610C(o, (Unk802C610C_Cfg*)c, 1);
+    int h = (int)s->m18;
+    Unk802C60A4_Rgb col;
+    if (c->m48 != 0) {
+        Unk802C60A4_Key k = *(Unk802C60A4_Key*)&t->mA4;
+        fn_802C60A4((int)o, &k, &col);
+    } else {
+        col = lbl_8061EC3A[c->m60];
+    }
+    fn_802C7138(col.r, col.g, col.b, h, 0, 0, 8, 8);
+    Unk802C60A4_Rgb col2 = lbl_8061EC3A[c->m60];
+    fn_802C7138(col2.r, col2.g, col2.b, h, 0, 8, 8, 8);
+    int sel = 0x76C;
+    if (lbl_8061D39C == 0)
+        sel = t->mB0;
+    Unk802C60A4_Rgb col3;
+    if (sel <= 0x795) {
+        col3 = lbl_8061EC37;
+    } else if (c->m68 == 1) {
+        switch (c->m58 - 1) {
+        case 0:
+            col3 = lbl_8061EC28;
+            break;
+        case 1:
+        case 4:
+            col3 = lbl_8061EC2B;
+            break;
+        case 2:
+        case 3:
+        default:
+            col3 = lbl_8061EC2E;
+            break;
+        }
+    } else {
+        col3 = (&lbl_8061EC28 - 1)[c->m58];
+    }
+    fn_802C7138(col3.r, col3.g, col3.b, h, 8, 0, 8, 8);
 }
 
 void fn_802C63B4(const char* name, const char* b, int* out1, int* out2)
@@ -1090,6 +1232,46 @@ Unk802C72F4_Tex* fn_803EBF90();
 int fn_803EC984(int h);
 void fn_803EC054(int h);
 void fn_802C6BA4(int a, int b);
+
+unsigned fn_802C6B74(unsigned r, unsigned g, unsigned b);
+unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b);
+unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
+int fn_803EC6F8(void* tex);
+int fn_803EC03C(int h);
+int fn_803EC9D4();
+int fn_8014DD68(unsigned a, unsigned b, unsigned c, int d);
+
+void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int w, int hh)
+{
+    int kind = fn_803EC03C(h);
+    if (fn_803EC9D4() == 0x15)
+        kind = 0xDE3;
+    unsigned s = fn_802C6B74(a, b, c);
+    unsigned i = fn_802C6B8C(a, b, c);
+    int v = fn_8014DD68(a, b, c, 0xFF);
+    switch (kind) {
+    case 0xF:
+    case 0x10:
+        for (int y = 0; y < hh; y++) {
+            for (int x = 0; x < w; x++)
+                *(short*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = s;
+        }
+        break;
+    case 0x20:
+        for (int y = 0; y < hh; y++) {
+            for (int x = 0; x < w; x++)
+                *(int*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = i;
+        }
+        break;
+    case 0xDE3:
+        for (int y = 0; y < hh; y++) {
+            for (int x = 0; x < w; x++)
+                *(int*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = v;
+        }
+        fn_80433004(h, fn_803EC6F8((void*)h));
+        break;
+    }
+}
 
 /* near-miss (51 vs 52 insns): retail copies the fn_803EC984 result into a second callee-saved register after fn_803EC054 (mr r31,r30) and returns that copy */
 int fn_802C72F4(int a, int b, int c)
