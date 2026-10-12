@@ -406,6 +406,112 @@ extern "C" void fn_800A0AF4(void* p, int c)
         fn_80377408(p);
 }
 
+class FEVd1164 {
+public:
+    char pad0[0xDBC];
+    virtual ~FEVd1164();
+};
+class FEVe1164 {
+public:
+    char pad0[0x3FD4];
+    virtual ~FEVe1164();
+};
+class FEVf1164 {
+public:
+    char pad0[0x30];
+    virtual ~FEVf1164();
+};
+struct Unk800A1164 {
+    FEVd1164* m0;
+    FEVd1164* m4;
+    FEVd1164* m8;
+    FEVd1164* mC;
+    int* m10;
+    int* m14;
+    int* m18;
+    void* m1C;
+    void* m20;
+    void* m24;
+    int* m28;
+    FEVe1164* m2C;
+    FEVf1164* m30;
+    void* m34;
+    int* m38;
+};
+extern "C" void fn_80570138(void* p);
+extern "C" void fn_80541F98(void* p, int c);
+extern "C" void fn_8054C75C(void* p, int c);
+extern "C" void fn_8056FF68(void* p, int c);
+extern "C" void fn_80564E28(void* p, int c);
+
+extern "C" void fn_800A1164(void* q)
+{
+    Unk800A1164* p = (Unk800A1164*)q;
+    if (p->m20) {
+        fn_80570138(p->m20);
+    }
+    if (p->m34) {
+        fn_80541F98(p->m34, 3);
+        p->m34 = 0;
+    }
+    if (p->m14) {
+        delete p->m14;
+        p->m14 = 0;
+    }
+    if (p->m10) {
+        delete p->m10;
+        p->m10 = 0;
+    }
+    if (p->m30) {
+        delete p->m30;
+        p->m30 = 0;
+    }
+    if (p->m2C) {
+        delete p->m2C;
+        p->m2C = 0;
+    }
+    if (p->m28) {
+        delete p->m28;
+        p->m28 = 0;
+    }
+    if (p->m24) {
+        fn_8054C75C(p->m24, 3);
+        p->m24 = 0;
+    }
+    if (p->m20) {
+        fn_8056FF68(p->m20, 3);
+        p->m20 = 0;
+    }
+    if (p->m1C) {
+        fn_80564E28(p->m1C, 3);
+        p->m1C = 0;
+    }
+    if (p->m18) {
+        delete p->m18;
+        p->m18 = 0;
+    }
+    if (p->mC) {
+        delete p->mC;
+        p->mC = 0;
+    }
+    if (p->m8) {
+        delete p->m8;
+        p->m8 = 0;
+    }
+    if (p->m4) {
+        delete p->m4;
+        p->m4 = 0;
+    }
+    if (p->m0) {
+        delete p->m0;
+        p->m0 = 0;
+    }
+    if (p->m38) {
+        delete p->m38;
+        p->m38 = 0;
+    }
+}
+
 struct Unk800A13A4 {
     char pad0[0x18];
     const void* m18;
