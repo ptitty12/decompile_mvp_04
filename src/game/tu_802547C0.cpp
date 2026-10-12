@@ -45,9 +45,11 @@ struct Unk8025480C_Msg {
         vptr = lbl_80649DA0;
         m0 = id;
     }
-    void Derived()
+    void Derived(int a, P* b)
     {
         vptr = lbl_80660EC0;
+        m8 = a;
+        mC = b;
     }
 };
 
@@ -57,7 +59,6 @@ void fn_802547C0(A* self, int a)
     self->b2 = a;
 }
 
-/* near-miss: same instructions, store/schedule order of the message object differs (retail stores vptr, id, then fields after the lwz of m0) */
 void fn_8025480C(A* self, int a)
 {
     if (a == -1) {
@@ -67,9 +68,7 @@ void fn_8025480C(A* self, int a)
                 if (!self->b2) {
                     Unk8025480C_Msg m;
                     m.Base(0x63);
-                    m.Derived();
-                    m.m8 = t;
-                    m.mC = self->m0;
+                    m.Derived(t, self->m0);
                     fn_8037893C(self->m0->m44C->m704, m.m0, &m, 0, 0);
                     fn_8035E214(&m, 2);
                 }
