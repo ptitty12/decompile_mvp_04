@@ -4,6 +4,10 @@
  */
 #include "game/fe_80471EBC.h"
 extern "C" {
+void fn_80476258(void* x);
+void fn_80476584(void* x);
+}
+extern "C" {
 int fn_800E5D74__Fi(int v);
 int fn_8013484C();
 }
@@ -238,6 +242,20 @@ extern "C" FE_OVERLAY void fn_80475EF0(void* x)
     FeWp(x, 0x168)->fn_vslot86();
 }
 
+extern "C" FE_OVERLAY void fn_80475FFC(void* x)
+{
+    ((void (*)(void*, int, int))fn_80079564)(lbl_8061930C, FeI(x, 0x138), 0);
+    fn_80131F34(FeWp(x, 0x168), x, (FeCbT)fn_80476C24, (int)fn_8013484C, 0x1C5C, 1, -1, 1, 0x26DE, 0, 0, 0, 0, 0);
+    fn_804766FC(x);
+    fn_80476258(x);
+    fn_80476584(x);
+    ((FeWV*)FeWp(x, 0x168))->s84(0);
+    FeWp(x, 0x168)->fn_vslot86();
+    FeWp(x, 0x164)->fn_vslot14(0);
+    ((FeW*)x)->fn_vslot16(0);
+    FeWp(x, 0x16C)->fn_vslot16(0);
+}
+
 extern "C" FE_OVERLAY int fn_80476134(int x, int b)
 {
     if (b != 0)
@@ -295,6 +313,23 @@ extern "C" FE_OVERLAY void fn_80476A28(int a, void* x)
 extern "C" FE_OVERLAY void fn_80476C24(FeScrD* x)
 {
     fn_80476A84(x);
+}
+
+extern "C" FE_OVERLAY int fn_80476C44(void* x)
+{
+    FeW* w = FeWp(x, 0x164)->fn_vslot70();
+    if (w->fn_vslot30("SALARY", 1) != 0)
+        return 0;
+    if (w->fn_vslot30("TERM", 1) != 0)
+        return 1;
+    if (w->fn_vslot30("STATUS", 1) != 0)
+        return 2;
+    if (w->fn_vslot30("LEVEL", 1) != 0)
+        return 3;
+    if (w->fn_vslot30("RESIGNPLAYERST", 1) != 0)
+        return 4;
+    w->fn_vslot30("RELEASEPLAYERST", 1);
+    return 5;
 }
 
 extern "C" FE_OVERLAY int fn_80476DB4(void* x)
