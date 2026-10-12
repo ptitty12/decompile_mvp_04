@@ -499,3 +499,51 @@ extern "C" void fn_801C9D28(Z* z)
     z->m1B0 = fn_801CE6E4(z, k, ang, w);
     fn_801CA654(z);
 }
+
+struct Unk801C6D2C_Tbl10 {
+    float v[10];
+};
+extern Unk801C6D2C_Tbl10 lbl_805D198C;
+
+extern "C" float fn_801C9EEC(Z* z, float f)
+{
+    float r = 0.0f;
+    f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
+    Unk801C6D2C_Tbl10 t = lbl_805D198C;
+    if (!(f > 0.1f)) {
+        r = t.v[0];
+    } else if (!(f < 1.0f)) {
+        r = t.v[9];
+    } else {
+        float x = f * 10.0f - 1.0f;
+        int i = (int)(float)fn_80410634(x);
+        int k;
+        if (i <= 8) {
+            k = i;
+            if (k < 0)
+                k = 0;
+        } else {
+            k = 8;
+        }
+        int k1 = k + 1;
+        float fr = x - (float)fn_80410634(x);
+        fr = !(fr > 1.0f) ? (fr >? 0.0f) : 1.0f;
+        r = t.v[k] * (1.0f - fr) + t.v[k1] * fr;
+    }
+    P* p = fn_801A4B34(z->m204);
+    if (p) {
+        float s = p->mAB4;
+        if (!(s <= 0.1f))
+            r *= s;
+        if (*(unsigned*)&p->mB3C & 0x01000000) {
+            r = 2.0f * r;
+        } else {
+            int v = p->mB3C.f;
+            if (lbl_80620378 != 0)
+                v = 1;
+            if (v != 0)
+                r = r * 0.5f;
+        }
+    }
+    return r;
+}
