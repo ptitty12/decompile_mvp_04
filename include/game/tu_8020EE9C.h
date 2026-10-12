@@ -103,7 +103,10 @@ struct RecQueue {
 
 /* Sub-object at +0x58C of a player (fn_80254984 .. fn_80255028). */
 struct PlayerSub {
-    char pad0[8];
+    char pad0[4];
+    unsigned m4a : 3;
+    unsigned m4b : 1;
+    unsigned m4c : 28;
     float m8;
     char padC[0x30 - 0xC];
     int m30;
@@ -134,6 +137,8 @@ struct CtxOuter700 {
     void* m3B4; /* list head for fn_80257B40 */
     char pad3B8[0x3C4 - 0x3B8];
     void* m3C4;
+    char pad3C8[0x41C - 0x3C8];
+    int m41C;
 };
 struct Obj36C {
     char pad0[0x60];
@@ -147,8 +152,11 @@ struct Obj4_36C {
     char pad370[4];
     Obj36C* m374;
     int m378;
-    char pad37C[0x38C - 0x37C];
+    float m37C;
+    char pad380[0x38C - 0x380];
     int m38C;
+    char pad390[0x3F4 - 0x390];
+    float m3F4;
 };
 /* Block reached through CtxOwner::m6F8 -> +0x14 (byte at +0x1CC9). */
 struct Ctx6F8Inner {
@@ -160,7 +168,9 @@ struct Ctx6F8 {
     Ctx6F8Inner* m14;
 };
 struct CtxOwner {
-    char pad0[0x680];
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x680 - 0x50];
     int m680;
     Player* m684;
     char pad688[0x6CC - 0x688];
@@ -169,6 +179,7 @@ struct CtxOwner {
     Ctx6F8* m6F8;
     char pad6FC[4];
     CtxOuter700* m700;
+    char m704[0x1C]; /* event queue sub-object (fn_8037893C first argument) */
 };
 
 /* 16-byte records at TaskInner+0x9FC, indexed by m3A5C. */
@@ -179,8 +190,11 @@ struct Rec16 {
     int mC;
 };
 
+struct TaskInner;
 struct Obj3A64 {
-    char pad0[0x794];
+    char pad0[0x9C];
+    TaskInner* m9C;
+    char padA0[0x794 - 0xA0];
     int m794;
     int m798;
 };
@@ -192,6 +206,16 @@ struct IterObj {
     char padC[0x18 - 0xC];
 };
 
+/* 0x5C-byte entries of the table at TaskInner+0x6D0 (fn_80221D0C). */
+struct Ent5C {
+    float m0;
+    int m4;
+    char pad8[0x30 - 8];
+    int m30;
+    int m34;
+    char pad38[0x5C - 0x38];
+};
+
 /* Block at Task+0x9C: object table at +8 (indexed by m3A5C), two Slots4 at
  * +0xC0 and +0xD4, the record queue at +0x3A60. */
 struct TaskInner {
@@ -199,27 +223,51 @@ struct TaskInner {
     Obj4_36C* m4;
     void* m8[10];
     int m30;
-    char pad34[0x40 - 0x34];
+    char pad34[0x3C - 0x34];
+    int m3C;
     int m40;
-    char pad44[0x80 - 0x44];
+    char pad44[0x48 - 0x44];
+    int m48;
+    char pad4C[0x5C - 0x4C];
+    int m5C;
+    int m60;
+    char pad64[0x6C - 0x64];
+    int m6C;
+    int m70;
+    int m74;
+    char pad78[0x80 - 0x78];
     int m80;
-    char pad84[0xA4 - 0x84];
+    char pad84[0x98 - 0x84];
+    int m98;
+    char pad9C[0xA4 - 0x9C];
     int mA4;
-    char padA8[0xC0 - 0xA8];
+    float mA8;
+    Vec3f mAC;
+    char padB8[0xC0 - 0xB8];
     Slots4 mC0;
     char padD0[0xD4 - 0xD0];
     Slots4 mD4;
     char padE4[0x19C - 0xE4];
     int m19C;
-    char pad1A0[0x1D8 - 0x1A0];
+    char pad1A0[0x1C4 - 0x1A0];
+    int m1C4;
+    char pad1C8[0x1D8 - 0x1C8];
     int m1D8;
     char pad1DC[0x1F4 - 0x1DC];
     int m1F4;
     char pad1F8[0x20C - 0x1F8];
     int m20C;
-    char pad210[0x9FC - 0x210];
+    char pad210[0x2CC - 0x210];
+    int m2CC;
+    char pad2D0[0x6A8 - 0x2D0];
+    int m6A8;
+    char pad6AC[0x6D0 - 0x6AC];
+    Ent5C m6D0[8]; /* nine entries are indexed (k <= 8); the ninth reaches 0xA0C and overlaps m9FC in the declaration */
+    char pad9B0[0x9FC - 0x9B0];
     Rec16 m9FC[8];
-    char padA7C[0xCA8 - 0xA7C];
+    char padA7C[0xC90 - 0xA7C];
+    int mC90;
+    char padC94[0xCA8 - 0xC94];
     RecQueue mCA8[4];
     char pad20F8[0x3A5C - 0x20F8];
     int m3A5C;
@@ -242,6 +290,11 @@ struct Task : Sub {
     float mE8;
     char padEC[0xF8 - 0xEC];
     float mF8;
+    char padFC[4];
+    float m100;
+    float m104;
+    char pad108[0x118 - 0x108];
+    int m118;
 };
 
 /* Objects compared in fn_8021157C .. fn_80211648 (floats at +4, +8). */
@@ -371,6 +424,21 @@ struct Obj74 {
 };
 
 extern "C" void fn_80204CCC(Rec* r);
+
+/* Stack event objects (id at +0, vptr at +4, base vtable lbl_80649DA0) posted with
+ * fn_8037893C; the derived setter methods live in animation/tu_802A9A04.cpp (names only).
+ * The inline ctor/dtor reproduce retail's root-vptr / id / derived-vptr store sequence. */
+extern char lbl_80649DA0[];
+extern "C" void fn_8037893C(char* queue, int id, void* ev, int a, int b);
+struct EvBase {
+    int m0;
+    const void* m4;
+    EvBase(int id)
+    {
+        m4 = lbl_80649DA0;
+        m0 = id;
+    }
+};
 
 /* Object-table lookup with the byte offset in a local: gives retail's
  * 'lwzx rD,rBase,rIdx' operand order (fn_8021DB40, fn_8022321C). */

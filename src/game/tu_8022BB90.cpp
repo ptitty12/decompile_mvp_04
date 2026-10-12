@@ -3,8 +3,17 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8022BB90.h"
+#include "game/goals/tu_8027C728.h"
 
 void* operator new(unsigned int size, int heap);
+
+inline void* operator new(unsigned int, void* p) { return p; }
+
+struct Unk8022FE34_Ctx;
+struct Unk8022FE34_Z {
+    Unk8022FE34_Ctx* m0;
+    Unk8022FE34_Z(Unk8022FE34_Ctx* c);
+};
 extern int lbl_806EF9B4;
 extern char lbl_80660D80[];
 extern int lbl_8061CCC4;
@@ -21,7 +30,6 @@ int fn_8022E610();
 int fn_8022E648();
 void fn_8022D708(int a, int b);
 void fn_8035AB00(void* p);
-/* near-miss: 2 slots: retail emits mr r4,r30 before addi r3,r30,0x440 for the fn_802376A0 call */
 Fe73C* fn_8022F17C(Fe73C* d, Fe8022* owner, int b);
 void fn_8022E748(Fe8022* c);
 void fn_8035DC4C(void* p, int x);
@@ -37,8 +45,7 @@ FeObj84* fn_801A6DB8(FeOther* o);
 Player* fn_80257B40(void* list);
 void fn_8022FF2C(Sub38* p, Fe73C* d);
 void fn_8035DA48(void* p);
-void fn_802376A0(Sub440* p, Fe73C* d, Fe8022* owner, int b);
-void fn_802361C0(void* p, int b);
+Sub440* fn_802376A0(Sub440* p, Fe73C* d, Fe8022* owner, int b);
 int fn_802366B0();
 FeOther* fn_80235FA8(Fe8022* c);
 Pair8 fn_80235BE0(Fe8022* c, ...);
@@ -69,6 +76,52 @@ void fn_8022BB90(void* a, void* b, RecQueue* q)
 }
 
 void fn_8022BBD8() {}
+
+struct Unk80270BA0_X;
+Unk8027C728_Goal* fn_80244C84(Unk80270BA0_X* x);
+extern "C" Vec3f fn_8018959C(Obj4_36C* c, float t);
+
+extern float lbl_805D6730[1];
+
+/* Unsigned-to-float in an inline: its constant-pool read stays below the int stores. */
+inline float UF(unsigned v)
+{
+    return (float)v;
+}
+
+struct GoalSub54 {
+    char pad0[0x54];
+    float m54;
+};
+
+inline float SubF(GoalSub54* s)
+{
+    if (s != 0) {
+        return s->m54;
+    }
+    return -1.0f;
+}
+
+void fn_8022D5F4(Task* t, int a)
+{
+    Unk8027C728_Goal* g = fn_80244C84((Unk80270BA0_X*)ObjAt(t->m9C->m8, a));
+    GoalSub54* s;
+    if (g != 0) {
+        s = 0;
+        if (g->m10 == 14) {
+            s = (GoalSub54*)g->m18;
+        }
+    } else {
+        s = 0;
+    }
+    float f = SubF(s);
+    if (!(f <= 0.0f)) {
+        t->m9C->mA4 = a;
+        t->m9C->mA8 = f;
+        TaskInner* in = t->m9C;
+        in->mAC = fn_8018959C(in->m4, in->mA8 - UF(in->m0->m4C) * lbl_805D6730[0]);
+    }
+}
 
 int fn_8022E5AC() { return fn_8022E5D8(); }
 
@@ -136,7 +189,8 @@ void fn_8022E7D0(Fe8022* c)
     fn_8022E748(c);
 }
 
-/* near-miss: retail reads th into f31 before the fn_80235FA8 call (arguments evaluated last-to-first here); 42 slots off */
+/* near-miss: retail reads th into f31 before the fn_80235FA8 call (arguments evaluated last-to-first here); 42 slots off.
+   Tried th as the first parameter (63 insns, worse). */
 float fn_8022E7F0(Fe8022* c, int k)
 {
     float th = 80.0f;
@@ -210,7 +264,11 @@ Pair8 fn_8022EA60(Fe8022* c)
     return c->m4->m28;
 }
 
-/* near-miss: frame is 8 bytes larger in retail (extra Pair8 temp); 25 slots off */
+inline float AbsF(float v)
+{
+    return fabsf(v);
+}
+
 int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
 {
     Pair8 v;
@@ -219,12 +277,11 @@ int fn_8022EA7C(Fe8022* c, Pair8* p, float eps)
     } else {
         v = c->m4->m28;
     }
-    float x = v.x;
-    if (fabsf(x) > eps) {
-        return 0;
+    int r = 0;
+    if (!(AbsF(v.x) > eps)) {
+        r = AbsF(v.y) <= eps;
     }
-    float y = v.y;
-    return fabsf(y) <= eps;
+    return r;
 }
 
 int fn_8022EAF4(Fe8022* c, Pair8* p)
@@ -248,16 +305,17 @@ int fn_8022EB74(Fe8022* c, Pair8* a, Pair8* b)
     return d <= th;
 }
 
-/* near-miss: 2 slots: retail loads the 0.75 constant before reloading v from its stack slot */
+inline float Pick(Fe73C* d)
+{
+    if (lbl_80620750) {
+        return lbl_80620754;
+    }
+    return d->m14;
+}
+
 int fn_8022EC1C(Fe8022* c)
 {
-    Fe73C* d = c->m4;
-    float v;
-    if (lbl_80620750) {
-        v = lbl_80620754;
-    } else {
-        v = d->m14;
-    }
+    float v = Pick(c->m4);
     return fabsf(v) >= 0.75f;
 }
 
@@ -369,7 +427,7 @@ Fe73C* fn_8022F17C(Fe73C* d, Fe8022* owner, int b)
     fn_8022FF2C(&d->m38, d);
     fn_8035DA48(&d->m438);
     fn_802376A0(&d->m440, d, owner, b);
-    fn_802361C0(&d->m734, b);
+    new (&d->m734) Unk8022FE34_Z((Unk8022FE34_Ctx*)b);
     d->m738 = 0;
     d->m738 = fn_802366B0();
     fn_8022F264(d);

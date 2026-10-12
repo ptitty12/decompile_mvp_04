@@ -13,11 +13,28 @@ void fn_8021D5D4(Task* t);
 int fn_802055F4(TaskInner* in);
 void fn_801E8A3C(Obj3A64* p, int a, int b);
 void fn_8021C24C(Task* t, Player* p);
-void fn_801EE6F4(Task* t, int a);
+int fn_801EE6F4(Task* t, int a);
 void fn_8021B430(Task* t, int a, int b, int c, int d, float f);
 void fn_801F0174(Task* t, int a, int b);
+void fn_801F0EA8(Task* t, int a);
+void fn_801F0F48(Task* t, int a);
+void fn_8022A71C(Task* t, int a, int b);
+void fn_8021A288(Task* t, int a, int b);
+void fn_8021CE28(Task* t, float f);
+int fn_80225614(Task* t, int a);
+int fn_801F41A4(Task* t);
+int fn_80219B8C(Task* t, int a);
+void fn_80213988(Task* t, int a, int b);
+int fn_801F1CA4(Task* t, void* p, float* out);
 }
 
+/* Unsigned-to-float in an inline: its constant-pool read stays below the int stores. */
+inline float UF(unsigned v)
+{
+    return (float)v;
+}
+
+extern float lbl_805D6148[1];
 extern "C" {
 
 void fn_8021C424(Task* t, int a)
@@ -40,6 +57,20 @@ void fn_8021C424(Task* t, int a)
     e->m9C = 0;
     e->m80 = -1.0f;
     e->mD4 = a;
+}
+
+void fn_8021D0C8(Task* t, float f)
+{
+    RecQueue* q = t->m9C->m3A60;
+    if (q->count == 0) {
+        fn_80204CCC(&q->e[0]);
+        Rec* e = &q->e[q->count];
+        q->count++;
+        e->m4 = 0;
+        e->m0 = 0x26;
+        e->m9C = 0;
+        e->m80 = UF(t->m9C->m0->m4C) * lbl_805D6148[0] + f;
+    }
 }
 
 void fn_8021D4A4(Task* t)
@@ -134,7 +165,32 @@ void fn_8021DC7C(Task* t, int idx, RecQueue* q)
 
 extern Vec3f lbl_805D6198;
 inline int Is3(Obj4_36C* o) { return o->m38C == 3; }
-/* near-miss: 2 slots: retail emits mr r4,r30 before mr r3,r31 for the first fn_801EE6F4 call of the else-if arm */
+
+void fn_8021DCD4(Task* t, int a)
+{
+    Obj4_36C* o = t->m9C->m4;
+    if (o->m36C != 0) {
+        fn_80205450(t->m9C, a);
+        fn_801F0EA8(t, a);
+        fn_802123D4(t, 0, 1);
+        if (a == o->m36C->m460) {
+            t->m9C->mA4 = -1;
+            t->m9C->m30 = 4;
+            t->m9C->m5C = 0;
+            fn_801F0174(t, a, 0);
+        } else {
+            fn_8021D4A4(t);
+        }
+    } else if (fn_802055F4(t->m9C->m3A64->m9C) == 1) {
+        float f = 0.0f;
+        int r = fn_801F1CA4(t, (char*)t->m9C + 0xAC, &f);
+        if (!(f <= 144.0f)) {
+            r = -1;
+        }
+        fn_801E8A3C(t->m9C->m3A64, a, r);
+    }
+}
+
 void fn_8021DFF4(Task* t, int idx, RecQueue* q)
 {
     TaskInner* in = t->m9C;
@@ -153,6 +209,84 @@ void fn_8021DFF4(Task* t, int idx, RecQueue* q)
     } else if ((void*)o->m36C == cur) {
         fn_801EE6F4(t, idx);
         fn_801F0174(t, idx, 0);
+    }
+}
+
+void fn_8021E0D8(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    void* cur = ObjAt(in->m8, a);
+    if (o->m36C != 0 || o->m378 != 0) {
+        if (o->m36C == cur) {
+            fn_801F0EA8(t, a);
+            fn_801F0174(t, a, 0);
+        } else if (fn_80225614(t, a) == 0 && o->m36C == 0) {
+            fn_801F0EA8(t, a);
+            fn_802123D4(t, 0, 1);
+            fn_8021CE28(t, 1.0f);
+            fn_8021D4A4(t);
+        }
+    } else {
+        int p = in->m1C4;
+        int slot = in->m3A5C;
+        fn_80205450(in, a);
+        if (p != -1) {
+            int q = fn_801F41A4(t);
+            if (q == -1) {
+                fn_801F0EA8(t, a);
+                fn_802123D4(t, 0, 1);
+                fn_8021CE28(t, 1.0f);
+                fn_8021D4A4(t);
+            } else if (q != p) {
+                fn_802123D4(t, 0, 0);
+                if (fn_80219B8C(t, q)) {
+                    t->m9C->m1C4 = q;
+                }
+            }
+        }
+        fn_80205450(t->m9C, slot);
+    }
+}
+
+/* near-miss: 93/94 insns, 7 aligned slots: retail tests o->m36C == 0 twice with cr0 (cmpwi r9,0 again after the cmpw against cur);
+   ours keeps one cr7 compare and reuses it. Tried a local for m36C and nested ifs. */
+void fn_8021E258(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    void* cur = ObjAt(in->m8, a);
+    if (o->m36C == 0 && o->m378 == 0) {
+        return;
+    }
+    if (o->m36C == cur) {
+        fn_801F0F48(t, a);
+        fn_801F0174(t, a, 0);
+        return;
+    }
+    if (o->m36C == 0 && o->m374 != 0) {
+        fn_80205450(in, a);
+        in = t->m9C;
+        int x = in->mC0.m[3];
+        if (x == o->m374->m460) {
+            if (fn_802055F4(in) == 1 && o->m374->m460 == 1) {
+                fn_802123D4(t, 0, 0);
+                fn_8022A71C(t, 3, o->m378);
+            } else {
+                fn_802123D4(t, 0, 1);
+                fn_8021A288(t, 3, o->m378);
+            }
+            fn_8021D4A4(t);
+        } else {
+            fn_801F0F48(t, a);
+            fn_802123D4(t, 0, 0);
+            fn_8021CE28(t, 1.0f);
+            if (t->m9C->mC0.m[0] == -1) {
+                fn_80213988(t, 0, 1);
+            } else {
+                fn_8021D4A4(t);
+            }
+        }
     }
 }
 

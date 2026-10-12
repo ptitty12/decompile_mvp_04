@@ -3,6 +3,11 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8022FE34.h"
+#include "game/goals/tu_8027C728.h"
+
+struct Unk8028989C_Goal;
+int fn_8028B068(Unk8028989C_Goal* g, float* out);
+void fn_8027D368(Unk8027C728_Goal* g);
 
 extern const float lbl_80620754;
 extern const float lbl_8062074C;
@@ -16,15 +21,61 @@ void fn_8023A7F4(Unk8022FE34_W* w);
 void fn_802361F8(void* p, float f);
 void fn_802361F4();
 Unk8022FE34_V3 fn_80233F08(Unk8022FE34_Ent* e, int a, ...);
+extern "C" int fn_801C3E68(void* p);
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8026D5FC(Unk8026C414_O* o, Unk8026C414_X* x);
+
+struct V3f {
+    float x;
+    float y;
+    float z;
+};
+extern const V3f lbl_805D7DCC;
+extern const float lbl_805D7288;
+extern const float lbl_805D728C;
+
+inline V3f operator-(const V3f& a, const V3f& b)
+{
+    V3f r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline V3f FlatPos(const V3f& p)
+{
+    V3f r = p;
+    r.y = lbl_805D7288;
+    return r;
+}
+
 void fn_8025191C(Unk8022FE34_Pl* pl, int a, float f);
 float fn_8025356C(Unk8022FE34_Obj480* o);
 void fn_802516CC(Unk8022FE34_Pl* pl);
 void fn_802517F4(Unk8022FE34_Pl* pl);
 Unk8022FE34_Pl* fn_801A497C(Unk8022FE34_Ctx* c, int i, int j);
 int fn_8033E420(void* p);
+int fn_801A2034(Unk8022FE34_Ctx* c, int i);
+struct Unk8024EF40_P;
+int fn_802536D0(Unk8024EF40_P* p);
+extern "C" void fn_80252DF4(char* p, float f);
+extern "C" int fn_8018AD2C(int o);
+extern "C" float* fn_80191800(int id);
+extern int lbl_8061C958[];
+struct Unk8024EF40_W;
+float fn_80254618(Unk8024EF40_W* w, int i);
+extern "C" void fn_80252EB8(char* p, float f);
+
+inline float Lerp(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+
+extern "C" void fn_80189300(int a, void* b);
 void fn_80234B18(Unk8022FE34_U* u);
 void fn_80234E4C(Unk8022FE34_U* u);
-void fn_80235FB4(Unk8022FE34_U* u);
 
 void fn_802349E8(Unk8022FE34_Owner* t);
 void fn_80233444(Unk8022FE34_Owner* t);
@@ -35,12 +86,15 @@ int fn_801A48F8(Unk8022FE34_Ctx* c, int i);
 Unk8022FE34_Pl* fn_801A4910(Unk8022FE34_Ctx* c, int i, int k);
 void fn_80253244(Unk8022FE34_Obj480* o, int a, int b);
 extern const float lbl_805D730C;
-extern float lbl_805D7310;
+extern float lbl_805D7328[1];
+/* Declared as an array so that loads of it count as in-struct memory and stay below the int stores
+   (a scalar global is hoisted above them by the scheduler). */
+extern float lbl_805D7310[1];
 extern const float lbl_805D7314;
 extern const float lbl_805D7318;
 extern const float lbl_805D731C;
-extern float lbl_805D7320;
-extern float lbl_805D7324;
+extern float lbl_805D7320[1];
+extern float lbl_805D7324[1];
 extern int lbl_8061D150[];
 int fn_80088234(void* o, int i);
 
@@ -52,6 +106,58 @@ inline void Set728b(Unk8022FE34_Owner* t, float v)
 inline void Set728a(Unk8022FE34_Owner* t, float v)
 {
     Set728b(t, v);
+}
+
+int Unk8022FE34_U::fn_802348F4()
+{
+    Unk8022FE34_Pl* pl = fn_801A497C((Unk8022FE34_Ctx*)m0, 4, 0);
+    V3f p = FlatPos(*(V3f*)((char*)pl + 0x60));
+    V3f d = p - lbl_805D7DCC;
+    if (!(d.x * d.x + d.z * d.z >= lbl_805D728C)) {
+        if (fn_8026D5FC((Unk8026C414_O*)pl, 0) != 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void fn_802349E8(Unk8022FE34_Owner* t)
+{
+    if (fn_801A6DB8(t->m0)->m48 != 0) {
+        Unk8022FE34_Pl* pl = fn_801A497C(t->m0, 4, 0);
+        float* o = fn_80191800(lbl_8061C958[t->mC]);
+        if (o != 0) {
+            float* tb = t->m738;
+            float c;
+            float a;
+            float b;
+            a = 100.0f / tb[0x1C / 4];
+            b = 36.0f / tb[0x20 / 4];
+            c = o[1];
+            float d = fn_80254618((Unk8024EF40_W*)((char*)pl + 0x588), 0);
+            float r = Lerp(b, d, a);
+            if (fn_801A6DB8(t->m0)->m48 != 0) {
+                if (*(int*)((char*)pl + 0x480) == 0) {
+                    const float k = 1.1f;
+                    c = c * k;
+                }
+            }
+            fn_80252EB8((char*)pl + 0x480, c * r);
+        }
+    }
+}
+
+int Unk8022FE34_U::fn_80234D5C()
+{
+    const float c = 4.0f;
+    int r = fn_801C3E68(m8->m3A4);
+    float t = (float)fn_80235FA8()->m4C * 0.016666668f;
+    if (r == 0) {
+        if (!(t - m6C <= c)) {
+            r = 1;
+        }
+    }
+    return r;
 }
 
 void Unk8022FE34_U::fn_80234E0C(float f)
@@ -72,7 +178,7 @@ int Unk8022FE34_U::fn_80234E44()
 inline void ArmA(Unk8022FE34_Owner* t, float f)
 {
     t->m438.a = 1;
-    t->m438.b = (int)(f * lbl_805D7310);
+    t->m438.b = (int)(f * lbl_805D7310[0]);
 }
 
 void Unk8022FE34_U::fn_802350F8()
@@ -87,11 +193,6 @@ void Unk8022FE34_U::fn_802350F8()
 }
 
 void Unk8022FE34_U::fn_80235160() {}
-
-void Unk8022FE34_U::fn_80235220()
-{
-    char buf[0x80];
-}
 
 void Unk8022FE34_U::fn_80235164()
 {
@@ -109,8 +210,15 @@ void Unk8022FE34_U::fn_80235164()
         case 3:
             fn_80235160();
             break;
+        case 4: /* no code in retail; the extra node moves the switch tree's root from case 1 to case 2 */
+            break;
         }
     }
+}
+
+void Unk8022FE34_U::fn_80235220()
+{
+    char buf[0x80];
 }
 
 void Unk8022FE34_U::fn_8023522C(int a)
@@ -138,7 +246,7 @@ void Unk8022FE34_U::fn_80235294()
 void Unk8022FE34_U::fn_80235300()
 {
     fn_8022F2B8(m4, 0);
-    fn_80235FB4(this);
+    fn_80235FB4();
 }
 
 void Unk8022FE34_U::fn_8023533C()
@@ -151,7 +259,38 @@ void Unk8022FE34_U::fn_80235364()
     fn_8022F2B8(m4, 0);
 }
 
-/* near-miss: retail loads the float constant after the m438 store (our scheduler hoists it) */
+void Unk8022FE34_U::fn_8023538C()
+{
+    fn_80235FB4();
+    int a = fn_80235FA8()->m6CC;
+    void* b = fn_80235FA8()->m65C;
+    if (a != 0 && b != 0) {
+        if (fn_8018AD2C(a) == 1) {
+            fn_80189300(a, b);
+        }
+    }
+    if (fn_80235FA8()->m6F4 == 3) {
+        Unk8022FE34_Pl* pl = fn_801A497C(fn_80235FA8(), 0, 0);
+        float f = 1.0f;
+        switch (fn_802536D0((Unk8024EF40_P*)pl)) {
+        case 0:
+            f = 0.85f;
+            break;
+        case 1:
+            f = 0.55f;
+            break;
+        case 2:
+            f = 0.35f;
+            break;
+        case 3:
+            f = 0.15f;
+            break;
+        }
+        fn_80252DF4((char*)pl + 0x480, f);
+    }
+    m4->m72C = 0;
+}
+
 void Unk8022FE34_U::fn_80235618()
 {
     if (m4->m8 == 2)
@@ -159,9 +298,9 @@ void Unk8022FE34_U::fn_80235618()
     if (m80 == 0)
         m6C = lbl_805D730C;
     fn_8022F2B8(m4, 0);
-    m44 = 0;
     m78 = 0;
     m64 = 0;
+    m44 = 0;
     float f = fn_802354AC();
     ArmA(m4, f);
     fn_802398C8(&m4->m440);
@@ -234,7 +373,6 @@ void Unk8022FE34_U::fn_8023590C()
     fn_80188698(fn_80235FA8()->m6CC, lbl_805D7318);
 }
 
-/* near-miss: same constant-load placement as fn_80235618; m4 is loaded once into a pointer first in retail */
 void Unk8022FE34_U::fn_8023596C()
 {
     fn_8022F174(this, 0);
@@ -242,7 +380,7 @@ void Unk8022FE34_U::fn_8023596C()
     Unk8022FE34_Owner* t = m4;
     float f = lbl_805D731C;
     t->m438.a = 1;
-    t->m438.b = (int)(f * lbl_805D7320);
+    t->m438.b = (int)(f * lbl_805D7320[0]);
     Unk8022FE34_VObj* o = fn_801C1638(fn_80235FA8(), 0);
     if (o != 0) {
         int k = *(int*)((char*)o + 0x708);
@@ -256,17 +394,19 @@ void Unk8022FE34_U::fn_80235A28()
     m4->m18 = 0;
 }
 
-/* near-miss: retail forms &m438 in place in r30 (addi r30,r30,0x438) after the first store */
+inline void ArmP(Unk8022FE34_Pair* p, float f)
+{
+    p->a = 1;
+    p->b = (int)(f * lbl_805D7324[0]);
+}
+
 void Unk8022FE34_U::fn_80235A40()
 {
     int k = fn_80235C68();
     if (k <= 1) {
         if (k >= 0) {
             Unk8022FE34_Owner* t = m4;
-            float f = fn_802354AC();
-            t->m438.a = 1;
-            Unk8022FE34_Pair* p = &t->m438;
-            p->b = (int)(f * lbl_805D7324);
+            ArmP(&t->m438, fn_802354AC());
         }
     }
 }
@@ -286,9 +426,44 @@ void Unk8022FE34_U::fn_80235AD4()
     m4->m18 = 0;
 }
 
-Unk8022FE34_V2 Unk8022FE34_U::fn_80235BE0()
+inline float FAt(char* b, int i)
 {
-    return m4->m28;
+    int o = i * 4;
+    return *(float*)(b + o);
+}
+
+/* near-miss: 63/63 insns, ~9 slots: retail keeps the table index in r0 (slwi r0,r0,2 / lfsx base,r0), ours in r9 */
+void Unk8022FE34_U::fn_80235AE4()
+{
+    if (m64 == 0) {
+        if (mC == 0 && m2C == 0 && m38 == 0 && m3C == 0) {
+            float* tbl = m4->m738;
+            int a = fn_801A2034(fn_80235FA8(), 4);
+            int b = fn_801A2034(fn_80235FA8(), 3);
+            int idx;
+            if (a == -1) {
+                idx = 1;
+                if (b == -1) {
+                    idx = 0;
+                }
+            } else {
+                idx = 3;
+                if (b == -1) {
+                    idx = 2;
+                }
+            }
+            float f = FAt((char*)tbl + 0x68, idx);
+            Unk8022FE34_Owner* t = m4;
+            t->m438.a = 1;
+            t->m438.b = (int)(f * lbl_805D7328[0]);
+        }
+        m64 = 1;
+    }
+}
+
+extern "C" Unk8022FE34_V2 fn_80235BE0(Unk8022FE34_U* u)
+{
+    return u->m4->m28;
 }
 
 Unk8022FE34_V2 Unk8022FE34_U::fn_80235BFC()
@@ -296,9 +471,9 @@ Unk8022FE34_V2 Unk8022FE34_U::fn_80235BFC()
     return m4->m20;
 }
 
-Unk8022FE34_V2 Unk8022FE34_U::fn_80235C18()
+extern "C" Unk8022FE34_V2 fn_80235C18(Unk8022FE34_U* u)
 {
-    return m4->m30;
+    return u->m4->m30;
 }
 
 Unk8022FE34_V3 Unk8022FE34_U::fn_80235C34()
@@ -311,24 +486,26 @@ int Unk8022FE34_U::fn_80235C68()
     return m4->m8;
 }
 
-/* near-miss: register numbers swap (this/flag in r31/r29 vs ours r29/r31); instruction order is identical */
-float Unk8022FE34_U::fn_80235C74(int a)
+inline int Flag(Unk8022FE34_Ctx* c)
 {
     int f = 0;
-    if (fn_80235FA8()->m6F8->m14[2].m8 != 0)
+    if (c->m6F8->m14[2].m8 != 0)
         f = 1;
+    return f;
+}
+
+float Unk8022FE34_U::fn_80235C74(int a)
+{
+    int f = Flag(fn_80235FA8());
     f = f ^ 1;
     Unk8022FE34_Ent e;
     m4->m38.fn_80230268(f, a, &e);
     return e.m8;
 }
 
-/* near-miss: same register swap as fn_80235C74 */
 Unk8022FE34_V3 Unk8022FE34_U::fn_80235CEC(int a)
 {
-    int f = 0;
-    if (fn_80235FA8()->m6F8->m14[2].m8 != 0)
-        f = 1;
+    int f = Flag(fn_80235FA8());
     f = f ^ 1;
     Unk8022FE34_Ent e;
     m4->m38.fn_80230268(f, a, &e);
@@ -395,6 +572,23 @@ void Unk8022FE34_U::fn_80235EDC(float f)
     fn_802361F8(m4->m734, f);
 }
 
+int Unk8022FE34_U::fn_80235F0C(float* out)
+{
+    int r = 0;
+    Unk8027C728_Goal* g = m4->fn_80231E90();
+    if (g != 0) {
+        Unk8028989C_Goal* sub = 0;
+        if (g->m10 == 1) {
+            sub = (Unk8028989C_Goal*)g->m18;
+        }
+        if (sub != 0) {
+            r = fn_8028B068(sub, out);
+        }
+        fn_8027D368(g);
+    }
+    return r;
+}
+
 void Unk8022FE34_U::fn_80235F7C()
 {
     fn_80235780(5, 1, 1);
@@ -404,6 +598,52 @@ Unk8022FE34_Ctx* Unk8022FE34_U::fn_80235FA8()
 {
     return m4->m0;
 }
+
+extern "C" void fn_80236090(Unk8022FE34_U* u, int* dst, int* src);
+
+void Unk8022FE34_U::fn_80235FB4()
+{
+    int side = Flag(fn_80235FA8());
+    side = side ^ 1;
+    m48 = m4->m38.fn_80230024(side);
+    int arr[5];
+    for (int i = 0; i <= 4; i++) {
+        if (i < m48) {
+            Unk8022FE34_Ent e;
+            m4->m38.fn_8023003C(side, i, &e, 0);
+            arr[i] = e.m0;
+        } else {
+            arr[i] = 0;
+        }
+    }
+    fn_80236090(this, m4C, arr);
+}
+
+extern "C" void fn_80236090(Unk8022FE34_U* u, int* dst, int* src)
+{
+    int order[16] = { 15, 8, 9, 2, 6, 1, 5, 7, 3, 4, 10, 11, 12, 13, 14, 0 };
+    int mark[16];
+    for (int k = 0; k < 16; k++) {
+        mark[k] = 0;
+    }
+    for (int k = 0; k < 5; k++) {
+        mark[src[k]] = 1;
+    }
+    int k = 0;
+    int n = 0;
+    for (; k < 16 && n <= 4; k++) {
+        int v = order[k];
+        if (mark[v] != 0) {
+            dst[n] = v;
+            n++;
+        }
+    }
+    for (; n <= 4; n++) {
+        dst[n] = 0;
+    }
+}
+
+void fn_802361F4() {}
 
 void Unk8022FE34_Z::fn_802361F8(float f, int a)
 {

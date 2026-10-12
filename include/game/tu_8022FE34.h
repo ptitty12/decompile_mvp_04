@@ -18,7 +18,10 @@
  * the stride 0x1F8 in fn_8022FF2C), then a copy of the owner's first word at +0x3F4.
  */
 struct Unk8022FE34_Row {
-    char pad0[0x8];
+    unsigned char m0;
+    char pad1b[2];
+    unsigned char m3;
+    char pad9[0x4];
     int m8;
     char pad1[0x78 - 0xC];
     int m78;
@@ -33,15 +36,21 @@ struct Unk8022FE34_GameC {
 struct Unk8022FE34_Game {
     char pad0[0xC];
     Unk8022FE34_GameC* mC;
-    char pad10[4];
+    char* m10;
     Unk8022FE34_Row* m14;
 };
 struct Unk8022FE34_Ctx {
-    char pad0[0x554];
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x554 - 0x50];
     void* m554;
     char pad1[0x65C - 0x558];
     void* m65C;
-    char pad2[0x6CC - 0x660];
+    char pad2[0x680 - 0x660];
+    char* m680;
+    char pad684[0x68C - 0x684];
+    void* m68C;
+    char pad690[0x6CC - 0x690];
     int m6CC;
     char pad3[0x6F4 - 0x6D0];
     int m6F4;
@@ -115,15 +124,18 @@ struct Unk8022FE34_Sub {
     int m1D8;
     int m1DC;
     int m1E0;
-    int m1E4;
-    int m1E8;
-    int m1EC;
+    float m1E4;
+    float m1E8;
+    float m1EC;
     int m1F0;
     int m1F4;
     Unk8022FE34_Sub() { fn_8022FE34(0); }
     void fn_8022FE34(Unk8022FE34_Owner* o);
     void fn_80230CC8(const Unk8022FE34_Ent* e);
     void fn_80231018();
+    void fn_80230BF4();
+    void fn_80230D54();
+    void fn_80230EB4();
 };
 
 struct Unk8022FE34_Pai {
@@ -137,6 +149,11 @@ struct Unk8022FE34_Pai {
     void fn_80230B88(int i);
     void fn_80230BBC(int i);
     void fn_80230268(int a, int b, Unk8022FE34_Ent* out);
+    void fn_8023003C(int i, int a, Unk8022FE34_Ent* out, int b);
+    void fn_80230500(int i, Unk8022FE34_Ent* out);
+    void fn_802306CC(int i, Unk8022FE34_Ent* out);
+    void fn_8023084C(int i, Unk8022FE34_Ent* out);
+    void fn_802309CC(int i, Unk8022FE34_Ent* out);
 };
 
 struct Unk8022FE34_VBase {
@@ -163,6 +180,7 @@ struct Unk8022FE34_Z {
     void fn_80236240(float f);
 };
 
+struct Unk8027C728_Goal;
 struct Unk8022FE34_Owner {
     Unk8022FE34_Ctx* m0;
     Unk8022FE34_U* m4;
@@ -182,16 +200,20 @@ struct Unk8022FE34_Owner {
     Unk8022FE34_W m440;
     char pad444[0x728 - 0x444];
     float m728;
-    char pad72C[0x734 - 0x72C];
+    int m72C;
+    char pad730[0x734 - 0x730];
     char m734[4];
+    float* m738;
     void fn_80231D0C(int i);
     int fn_80231DDC();
     Unk8022FE34_V3 fn_80231E4C();
     void fn_80231FC0();
     void fn_802321BC();
+    Unk8027C728_Goal* fn_80231E90();
     void fn_8023246C();
     int fn_802324E0();
     int fn_802324EC();
+    int fn_80232084();
     void fn_8023262C(int i, Unk8022FE34_Pl* pl, Unk8022FE34_Row* r);
     void fn_802326C4(int i, int j);
 };
@@ -216,13 +238,20 @@ struct Unk8022FE34_X6D {
     int m3C;
     int m40;
     int m44;
+    int m48;
 };
 
 struct Unk8022FE34_U {
     int m0;
     Unk8022FE34_Owner* m4;
     Unk8022FE34_U8* m8;
-    char padC[0x44 - 0xC];
+    int mC;
+    char pad10[0x2C - 0x10];
+    int m2C;
+    char pad30[0x38 - 0x30];
+    int m38;
+    int m3C;
+    char pad40[0x44 - 0x40];
     int m44;
     int m48;
     int m4C[5];
@@ -247,9 +276,7 @@ struct Unk8022FE34_U {
     int fn_80235AB8();
     void fn_80235AC4();
     void fn_80235AD4();
-    Unk8022FE34_V2 fn_80235BE0();
     Unk8022FE34_V2 fn_80235BFC();
-    Unk8022FE34_V2 fn_80235C18();
     int fn_80235C68();
     float fn_80235D80();
     float fn_80235DA8();
@@ -280,6 +307,12 @@ struct Unk8022FE34_U {
     float fn_80235DD0(int a, int b);
     int fn_80235E44(int a, int key);
     int fn_80235E84(int a, int b);
+    int fn_80235F0C(float* out);
+    int fn_80234D5C();
+    int fn_802348F4();
+    void fn_80235FB4();
+    void fn_80235AE4();
+    void fn_8023538C();
 };
 
 #endif

@@ -17,9 +17,59 @@ void fn_802044A4(Task* t, int a, void* p, float f);
 void fn_801F0EA8(Task* t, int a);
 }
 
+extern char lbl_80660C48[];
+
+class Unk802A9B9C : public EvBase {
+public:
+    int m8;
+    int mC;
+    Unk802A9B9C(int id) : EvBase(id)
+    {
+        m4 = lbl_80660C48;
+        mC = 0;
+        m8 = 0;
+    }
+    ~Unk802A9B9C() { m4 = lbl_80649DA0; }
+    void fn_802A9B9C(int a);
+    void fn_802A9BA4(int a);
+};
+
+extern const float lbl_805D6320;
+extern const float lbl_805D6330;
+extern const float lbl_805D6334;
+
 extern "C" {
 
+float fn_802478A0(void* o, void* p, int a, int b);
+float fn_8018D2EC(Obj4_36C* o, int a);
+
+float fn_80259A74(void* list, int a, int b);
+int fn_80210FC4(Sub* t, int kind, int x, Player** out);
+
 extern Vec3f lbl_805D6244;
+
+int fn_8021F490(Task* t)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    if (in->m2CC == 1 || in->mC0.m[3] != o->m374->m460) {
+        return 0;
+    }
+    Player* out = 0;
+    if (fn_80210FC4((Sub*)&t->m9C, 2, 3, &out) == 0) {
+        return 1;
+    }
+    float a = fn_80259A74(t->m9C->m0->m700->m3B4, out->m458, 3);
+    float b = o->m37C - o->m3F4;
+    float c = 0.0f;
+    if (t->m9C->m98 == 3) {
+        c = 0.2f;
+    } else {
+        c = 0.0f;
+    }
+    return b >= a + c;
+}
+
 void fn_8021FFD4(Task* t, int, RecQueue* q)
 {
     Rec* e = &q->e[0];
@@ -41,6 +91,34 @@ void fn_8021FFD4(Task* t, int, RecQueue* q)
     e->m80 = lbl_805D6244.x;
     e->m9C = 0;
     e->mAC = 0;
+}
+
+void fn_80220E48(Task* t, int a, Player* p)
+{
+    TaskInner* in = t->m9C;
+    int z = in->m74;
+    if (z == 0 && in->m70 == 1) {
+        int f = p->m58C.m4b;
+        if (f == 1) {
+            Unk802A9B9C e(0x6E);
+            e.fn_802A9B9C((int)p);
+            e.fn_802A9BA4(a);
+            fn_8037893C(t->m9C->m0->m704, e.m0, &e, 0, 0);
+            t->m9C->m74 = f;
+        }
+    }
+}
+
+void fn_802217E0(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    void* x = ObjAt(t->m9C->m8, a);
+    if (e->mA4 == 1) {
+        if (!(e->m80 >= lbl_805D6320)) {
+            e->m80 = (float)t->m9C->m0->m4C * lbl_805D6330 + fn_802478A0(x, (char*)q + 0x3C, e->mC, e->m10) + lbl_805D6334;
+        }
+        e->mA4 = 0;
+    }
 }
 
 extern Vec3f lbl_805D6338;
@@ -82,15 +160,35 @@ int fn_80221974(Task* t)
 int fn_802219EC(Task* t)
 {
     IterObj it;
+    fn_8014E09C(&it, t->m9C->m0, 1);
     IterObj* p = &it;
-    fn_8014E09C(p, t->m9C->m0, 1);
     while (p->m8 != 10) {
-        if (fn_8026D940(t->m9C->m8[p->m8], 0) != 0) {
+        int i = p->m8;
+        if (fn_8026D940(ObjAt(t->m9C->m8, i), 0) != 0) {
             return 1;
         }
         fn_8014E108(p);
     }
     return 0;
+}
+
+int fn_80221D0C(Task* t, int k)
+{
+    int r = 0;
+    if (k <= 8) {
+        TaskInner* in = t->m9C;
+        if ((!(in->m6D0[k].m0 < 0.0f) && in->m6D0[k].m4 >= 0) || in->m6D0[k].m34 != 0) {
+            r = 1;
+        }
+    }
+    const float c = 0.25f;
+    float d = t->m9C->m6D0[k].m0 - (float)t->m9C->m0->m4C * 0.016666668f;
+    Obj4_36C* o = t->m9C->m0->m6CC;
+    float e = fn_8018D2EC(o, 0) - o->m3F4;
+    if (!(d - c <= e)) {
+        r = 0;
+    }
+    return r;
 }
 
 void fn_80222AE0(Task* t, int a, RecQueue* q)
