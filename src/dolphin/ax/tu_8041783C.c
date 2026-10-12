@@ -491,7 +491,8 @@ extern void fn_80432FD4(void* addr, u32 nBytes); /* DCFlushRange */
 extern void fn_80419CB4(u32 lessDspCycles);    /* __AXSyncPBs */
 extern void fn_804190A4(void);
 extern u32 fn_80419560(void);                  /* __AXGetNumVoices */
-extern AXPROFILE* fn_8041A55C(void);           /* __AXGetCurrentProfile */
+extern AXPROFILE* fn_8041A55C(void);           /* __AXGetCurrentProfile
+ * near-miss (98.6%): same instructions, retail keeps the index in r3 and the base in r6. */
 extern void fn_804181DC(void* sbuffer, void* buffer); /* __AXNextFrame */
 extern void fn_80418A88(void);
 extern void fn_80418BD4(void);
@@ -664,4 +665,313 @@ void fn_80419040(void)
     fn_804382CC(&lbl_806EF5A8);
     AIStopDMA();
     OSRestoreInterrupts(old);
+}
+
+/* AXSPB.c: the studio (depop) state. lbl_806CB6E0 = __AXStudio; the nine host-side depop sums are adjacent statics
+ * (sums L, R, S, AL, AR, AS, BL, BR, BS). */
+extern AXSPB lbl_806CB6E0;
+extern s32 lbl_806EF5B8;
+extern s32 lbl_806EF5BC;
+extern s32 lbl_806EF5C0;
+extern s32 lbl_806EF5C4;
+extern s32 lbl_806EF5C8;
+extern s32 lbl_806EF5CC;
+extern s32 lbl_806EF5D0;
+extern s32 lbl_806EF5D4;
+extern s32 lbl_806EF5D8;
+
+/* __AXGetStudio */
+u32 fn_80419098(void)
+{
+    return (u32)&lbl_806CB6E0;
+}
+
+/* __AXDepopFade (static, inlined into the studio update) */
+static void __AXDepopFade(s32* hostSum, s32* dspVolume, s16* dspDelta)
+{
+    s32 volume;
+
+    volume = *hostSum / 160;
+    if (volume != 0) {
+        if (volume > 20) {
+            volume = 20;
+        }
+        if (volume < -20) {
+            volume = -20;
+        }
+        *dspVolume = *hostSum;
+        *hostSum -= volume * 160;
+        *dspDelta = -volume;
+    } else {
+        *hostSum = 0;
+        *dspVolume = 0;
+        *dspDelta = 0;
+    }
+}
+
+/* __AXPrintStudio (the studio depop update; flushes the studio to memory)
+ * near-miss (98.5%): one extra copy of the studio pointer in the first block (255 vs 254 instructions); retail keeps
+ * the pointer in r3 for the whole function. A local pointer, a call to __AXGetStudio, a register local and u16-offset
+ * spellings all give the same copy. */
+void fn_804190A4(void)
+{
+    AXSPB* studio = &lbl_806CB6E0;
+
+    __AXDepopFade(&lbl_806EF5B8, (s32*)&studio->dpopLHi, &studio->dpopLDelta);
+    __AXDepopFade(&lbl_806EF5BC, (s32*)&studio->dpopRHi, &studio->dpopRDelta);
+    __AXDepopFade(&lbl_806EF5C0, (s32*)&studio->dpopSHi, &studio->dpopSDelta);
+    __AXDepopFade(&lbl_806EF5C4, (s32*)&studio->dpopALHi, &studio->dpopALDelta);
+    __AXDepopFade(&lbl_806EF5C8, (s32*)&studio->dpopARHi, &studio->dpopARDelta);
+    __AXDepopFade(&lbl_806EF5CC, (s32*)&studio->dpopASHi, &studio->dpopASDelta);
+    __AXDepopFade(&lbl_806EF5D0, (s32*)&studio->dpopBLHi, &studio->dpopBLDelta);
+    __AXDepopFade(&lbl_806EF5D4, (s32*)&studio->dpopBRHi, &studio->dpopBRDelta);
+    __AXDepopFade(&lbl_806EF5D8, (s32*)&studio->dpopBSHi, &studio->dpopBSDelta);
+    fn_80432FD4(studio, 0x36);
+}
+
+/* __AXSPBInit */
+void fn_8041949C(void)
+{
+    lbl_806EF5B8 = 0;
+    lbl_806EF5BC = 0;
+    lbl_806EF5C0 = 0;
+    lbl_806EF5C4 = 0;
+    lbl_806EF5C8 = 0;
+    lbl_806EF5CC = 0;
+    lbl_806EF5D0 = 0;
+    lbl_806EF5D4 = 0;
+    lbl_806EF5D8 = 0;
+}
+
+/* __AXSPBQuit */
+void fn_804194C8(void)
+{
+}
+
+/* __AXDepopVoice */
+void fn_804194CC(AXPB* p)
+{
+    lbl_806EF5B8 += p->dpop.aL;
+    lbl_806EF5C4 += p->dpop.aAuxAL;
+    lbl_806EF5D0 += p->dpop.aAuxBL;
+    lbl_806EF5BC += p->dpop.aR;
+    lbl_806EF5C8 += p->dpop.aAuxAR;
+    lbl_806EF5D4 += p->dpop.aAuxBR;
+    lbl_806EF5C0 += p->dpop.aS;
+    lbl_806EF5CC += p->dpop.aAuxAS;
+    lbl_806EF5D8 += p->dpop.aAuxBS;
+}
+
+/* AXVPB.c */
+extern u32 lbl_806EF5E8; /* __AXMaxVoices */
+
+/* __AXGetNumVoices */
+u32 fn_80419560(void)
+{
+    return lbl_806EF5E8;
+}
+
+extern AXPB lbl_806CB720[AX_MAX_VOICES]; /* __AXPB */
+
+/* __AXGetPBs */
+AXPB* fn_80419F2C(void)
+{
+    return lbl_806CB720;
+}
+
+/* __AXSetPBDefault */
+void fn_80419F38(AXVPB* p)
+{
+    p->pb.state = 0;
+    p->pb.itd.flag = 0;
+    p->sync = 0x2000A4;
+    p->updateCounter = 0;
+    p->updateMS = 0;
+    p->updateWrite = p->updateData;
+    p->pb.update.updNum[4] = 0;
+    p->pb.update.updNum[3] = 0;
+    p->pb.update.updNum[2] = 0;
+    p->pb.update.updNum[1] = 0;
+    p->pb.update.updNum[0] = 0;
+    p->pb.lpf.on = 0;
+}
+
+/* __AXVPBQuit */
+void fn_8041A180(void)
+{
+}
+
+/* AXSetVoiceSrcType */
+void fn_8041A184(AXVPB* p, u32 type)
+{
+    BOOL old;
+    AXPB* pb;
+
+    old = OSDisableInterrupts();
+    pb = &p->pb;
+    switch (type) {
+    case 0:
+        pb->srcSelect = 2;
+        break;
+    case 1:
+        pb->srcSelect = 1;
+        break;
+    case 2:
+        pb->srcSelect = 0;
+        pb->coefSelect = 0;
+        break;
+    case 3:
+        pb->srcSelect = 0;
+        pb->coefSelect = 1;
+        break;
+    case 4:
+        pb->srcSelect = 0;
+        pb->coefSelect = 2;
+        break;
+    }
+    p->sync |= AX_SYNC_FLAG_COPYSELECT;
+    OSRestoreInterrupts(old);
+}
+
+/* AXSetVoiceState */
+void fn_8041A248(AXVPB* p, u16 state)
+{
+    BOOL old;
+
+    old = OSDisableInterrupts();
+    p->pb.state = state;
+    p->sync |= AX_SYNC_FLAG_COPYSTATE;
+    if (state == 0) {
+        p->depop = 1;
+    }
+    OSRestoreInterrupts(old);
+}
+
+/* AXSetVoiceAddr */
+void fn_8041A2A4(AXVPB* p, AXPBADDR* addr)
+{
+    BOOL old;
+    u32* pDst;
+    u32* pSrc;
+
+    pDst = (u32*)&p->pb.addr;
+    pSrc = (u32*)addr;
+    old = OSDisableInterrupts();
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+    pDst[3] = pSrc[3];
+    switch (addr->format) {
+    case 0:
+        break;
+    case 10:
+        pDst[4] = 0;
+        pDst[5] = 0;
+        pDst[6] = 0;
+        pDst[7] = 0;
+        pDst[8] = 0;
+        pDst[9] = 0;
+        pDst[10] = 0;
+        pDst[11] = 0;
+        pDst[12] = 0x08000000;
+        pDst[13] = 0;
+        break;
+    case 25:
+        pDst[4] = 0;
+        pDst[5] = 0;
+        pDst[6] = 0;
+        pDst[7] = 0;
+        pDst[8] = 0;
+        pDst[9] = 0;
+        pDst[10] = 0;
+        pDst[11] = 0;
+        pDst[12] = 0x01000000;
+        pDst[13] = 0;
+        break;
+    }
+    p->sync &= ~(AX_SYNC_FLAG_COPYCURADDR | AX_SYNC_FLAG_COPYENDADDR | AX_SYNC_FLAG_COPYLOOPADDR | AX_SYNC_FLAG_COPYLOOP);
+    p->sync |= AX_SYNC_FLAG_COPYADPCM | AX_SYNC_FLAG_COPYADDR;
+    OSRestoreInterrupts(old);
+}
+
+/* AXSetVoiceAdpcm */
+void fn_8041A3B4(AXVPB* p, AXPBADPCM* adpcm)
+{
+    BOOL old;
+    u32* pDst;
+    u32* pSrc;
+
+    pDst = (u32*)&p->pb.adpcm;
+    pSrc = (u32*)adpcm;
+    old = OSDisableInterrupts();
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+    pDst[3] = pSrc[3];
+    pDst[4] = pSrc[4];
+    pDst[5] = pSrc[5];
+    pDst[6] = pSrc[6];
+    pDst[7] = pSrc[7];
+    pDst[8] = pSrc[8];
+    pDst[9] = pSrc[9];
+    p->sync |= AX_SYNC_FLAG_COPYADPCM;
+    OSRestoreInterrupts(old);
+}
+
+u32 fn_80406C74(double x); /* __cvt_fp2unsigned */
+
+/* AXSetVoiceSrcRatio */
+void fn_8041A458(AXVPB* p, f32 ratio)
+{
+    u32 r;
+    BOOL old;
+    f32 f;
+
+    old = OSDisableInterrupts();
+    f = 65536.0f * ratio;
+    r = fn_80406C74(f);
+    if (fn_80406C74(f) > 0x40000) {
+        r = 0x40000;
+    }
+    p->pb.src.ratioHi = (u16)(r >> 16);
+    p->pb.src.ratioLo = (u16)r;
+    p->sync |= AX_SYNC_FLAG_COPYRATIO;
+    OSRestoreInterrupts(old);
+}
+
+/* AXSetVoiceAdpcmLoop */
+void fn_8041A4F0(AXVPB* p, AXPBADPCMLOOP* adpcmloop)
+{
+    BOOL old;
+    u16* pDst;
+    u16* pSrc;
+
+    pDst = (u16*)&p->pb.adpcmLoop;
+    pSrc = (u16*)adpcmloop;
+    old = OSDisableInterrupts();
+    pDst[0] = pSrc[0];
+    pDst[1] = pSrc[1];
+    pDst[2] = pSrc[2];
+    p->sync |= AX_SYNC_FLAG_COPYADPCMLOOP;
+    OSRestoreInterrupts(old);
+}
+
+/* AXProf.c: the profile ring (extern statics) */
+extern AXPROFILE* lbl_806EF5F0; /* __AXProfile */
+extern u32 lbl_806EF5F4;        /* __AXMaxProfiles */
+extern u32 lbl_806EF5F8;        /* __AXCurrentProfile */
+extern u32 lbl_806EF5FC;        /* profiling enabled */
+
+/* __AXGetCurrentProfile
+ * near-miss (98.6%): same instructions, retail keeps the index in r3 and the base in r6. */
+AXPROFILE* fn_8041A55C(void)
+{
+    u32 profile;
+
+    if (lbl_806EF5FC) {
+        profile = lbl_806EF5F8++;
+        lbl_806EF5F8 %= lbl_806EF5F4;
+        return &lbl_806EF5F0[profile];
+    }
+    return NULL;
 }
