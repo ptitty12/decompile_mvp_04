@@ -276,13 +276,11 @@ extern "C" float fn_801CCA40(Z* z)
 /* near-miss: retail keeps the low bound in f31 across the call (33 vs 34 instructions here). */
 extern "C" float fn_801CD068(Z* z)
 {
-    float r;
-    const float lo = lbl_805D1C18;
-    r = lo;
+    float r = 0.0f;
     P* p = fn_801A4B34(z->m204);
     if (p) {
         float v = fn_8024EF40(p->mA0C, p->m44C, p->m708);
-        r = !(v > 1.0f) ? (v >? lo) : 1.0f;
+        r = !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
     }
     return r;
 }
