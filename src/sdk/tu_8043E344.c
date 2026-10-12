@@ -9,7 +9,7 @@
 #include <dolphin/hw_regs.h>
 
 extern void (*lbl_806EF958)(s32 chan);        /* callback given to the init routine */
-extern void (*lbl_806EF95C)(s16 interrupt);   /* handler callback */
+extern void (*lbl_806EF95C)(s32 interrupt, OSContext* context);   /* handler callback */
 extern u32 lbl_806EF960;                      /* status word of the last mailbox read */
 extern s32 lbl_806EF964;                      /* bytes waiting */
 extern u32 lbl_806EF968;                      /* address of the input-pending flag */
@@ -44,6 +44,19 @@ void fn_8043E348(void)
 {
 }
 
+/* EXI2_ReadN */
+int fn_8043E5AC(void* bytes, u32 length)
+{
+    BOOL enabled;
+
+    enabled = OSDisableInterrupts();
+    fn_8043E9A4(((lbl_806EF960 & 0x10000) ? 0x1000 : 0) + 0x1E000, bytes, (length + 3) & ~3);
+    lbl_806EF964 = 0;
+    lbl_806EF96C = 0;
+    OSRestoreInterrupts(enabled);
+    return 0;
+}
+
 /* EXI2_Poll */
 int fn_8043E638(void)
 {
@@ -73,7 +86,7 @@ void fn_8043E6D4(void)
 {
     fn_80435350(0x18000);
     fn_80435350(0x40);
-    lbl_806EF95C = (void (*)(s16))fn_8043E7E0;
+    lbl_806EF95C = (void (*)(s32, OSContext*))fn_8043E7E0;
     __OSSetInterruptHandler(0x19, fn_8043E7A0);
     __OSUnmaskInterrupts(0x40);
 }
@@ -90,6 +103,14 @@ void fn_8043E728(volatile u8** inputPendingPtrRef, void (*monitorCallback)(s32))
     fn_80435350(0x18000);
     EXI2_CSR = 0;
     OSRestoreInterrupts(enabled);
+}
+
+void fn_8043E7A0(s16 interrupt, OSContext* context)
+{
+    __PIRegs[0] = 0x1000;
+    if (lbl_806EF95C) {
+        lbl_806EF95C(interrupt, context);
+    }
 }
 
 void fn_8043E7E0(s16 interrupt, OSContext* context)
