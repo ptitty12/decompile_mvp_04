@@ -114,6 +114,11 @@ inline float RandF2(Unk8014D8AC* r, float scale, const char* file, int line)
 
 void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
 
+inline float RandF4(P* p, float scale, const char* file, int line)
+{
+    return (float)(unsigned)p->m554->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+
 inline void SetMode(Unk801C16B0_Mode* m, int v)
 {
     if (m->m0 != 0)
@@ -424,7 +429,7 @@ extern "C" int fn_801D14A0(Y* y)
     if (AbsF(b.y) > lim)
         return 0;
     f = fn_801D21F4(y, &b);
-    return RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x283) <= f;
+    return RandF4(y->m30, 1.0f, lbl_805D25E0, 0x283) <= f;
 }
 
 extern "C" float fn_801D17D0(Y* y, Unk801CF054_V2* pos)
@@ -481,31 +486,28 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
     return t;
 }
 
-/* near-miss: same code; retail keeps 1e-6 in f29 and 1.0 in f30 (ours swapped) and stores the scale slot after the lwz. */
 extern "C" void fn_801D28E4(Y* y)
 {
-    y->m54 = 0.75f + RandF2(y->m30->m554, 0.25f, lbl_805D25E0, 0x46C);
-    y->m50 = RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x46F);
-    if (!(RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x471) >= 0.33f))
+    y->m54 = 0.75f + RandF4(y->m30, 0.25f, lbl_805D25E0, 0x46C);
+    y->m50 = RandF4(y->m30, 1.0f, lbl_805D25E0, 0x46F);
+    if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x471) >= 0.33f))
         y->m50 = -y->m50;
 }
 
-/* near-miss: same code; retail stores the second RandF scale slot before loading the RNG pointer. */
 extern "C" void fn_801D2A40(Y* y)
 {
     Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
     float t;
     t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
-    y->m50 = t + LerpATB(-0.1f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x487), 0.1f);
+    y->m50 = t + LerpATB(-0.1f, RandF4(y->m30, 1.0f, lbl_805D25E0, 0x487), 0.1f);
     if (fn_801A4B34(y->m30)->v4())
         y->m50 = -y->m50;
-    if (!(RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x48F) >= 0.25f))
+    if (!(RandF4(y->m30, 1.0f, lbl_805D25E0, 0x48F) >= 0.25f))
         y->m54 = 1.0f;
     else
-        y->m54 = LerpATB(-1.0f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x495), 1.0f);
+        y->m54 = LerpATB(-1.0f, RandF4(y->m30, 1.0f, lbl_805D25E0, 0x495), 1.0f);
 }
 
-/* near-miss: same code; the integer temporaries of the last statement are numbered r11/r10 where retail has r10/r11. */
 extern "C" void fn_801D2C74(Y* y)
 {
     Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
@@ -517,7 +519,7 @@ extern "C" void fn_801D2C74(Y* y)
         y->m50 = -y->m50;
     if (fn_801A4B34(y->m30)->v4())
         y->m50 = -y->m50;
-    y->m54 = LerpATB(-0.8f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4B7), 1.0f);
+    y->m54 = LerpATB(-0.8f, RandF4(y->m30, 1.0f, lbl_805D25E0, 0x4B7), 1.0f);
 }
 
 extern "C" int fn_801D251C(Y* y)
