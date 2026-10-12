@@ -12,7 +12,7 @@ int fn_801B5298(void* a, void* b);
 int fn_8025416C(void* a, int b);
 unsigned char fn_801B38A8(Unk801AB63C_P* a, int i, int flag);
 int fn_801B608C(Unk801AB63C_P* a, Unk801B23A8_Q* q);
-int fn_801B5F8C(Unk801AB63C_P* a, Unk801B23A8_Q* q);
+int fn_801B5F8C(Unk801AB63C_P* a);
 int fn_801B62E4(Unk801AB63C_P* a, int i);
 int fn_801B3B90(void* a, void* b);
 int fn_801B3A34(void* a, void* b);
@@ -676,7 +676,7 @@ unsigned char fn_801B38A8(Unk801AB63C_P* p, int i, int flag)
 int fn_801B38FC(Unk801AB63C_P* a, Unk801B23A8_Q* q)
 {
     int i = q->m708;
-    int r = 2 - fn_801B5F8C(a, q);
+    int r = 2 - fn_801B5F8C(a);
     r += fn_801B62E4(a, i);
     r += fn_801B38A8(a, i, 1);
     return r;
