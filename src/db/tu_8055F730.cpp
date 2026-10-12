@@ -21,13 +21,46 @@ struct Db8055F7B8_List {
 };
 
 extern Unk8007A4DC_Screen* lbl_8061930C;
-extern "C" int fn_8055FD00(int x);
+extern "C" int fn_8055FB50(Db8055F7B8_List* l, int x);
+
+#include "game/clampiter.h"
+extern Unk80538DD8_G* lbl_80619948;
+extern float lbl_805FF7C4;
+extern float lbl_805FF7D8;
+extern float lbl_805FF7DC;
+extern "C" int fn_80546B18(void* self, int a, int b);
+extern "C" int fn_80546CA8(void* self, int a, int b);
+extern "C" void fn_80546A24(void* self, int a, float f, int b, int c);
+extern "C" void fn_80563F3C(void* m3c, int a, int b, float* f, int* z, int* o, int x, int y);
+extern "C" float fn_80560630(void* self, int i);
+void fn_8007F29C(Unk8007F198_A* self, int a, int b);
+int fn_8007F5BC(Unk8007F198_A* self, int a, int b, int c, int d);
+unsigned fn_8007F198(Unk8007F198_A* self, int x);
+int fn_8007F24C(Unk8007F198_A* self, int a, int x);
+int fn_8007F674(Unk8007F198_A* self, int a, int x);
+int fn_80083FC0(int a);
+extern "C" int fn_800A2AE8(Unk80538DD8_G* g);
+struct Db8055FF28_Obj {
+    char pad0[0x107E8];
+    unsigned m107E8;
+};
+struct Db8055FF28_G {
+    char pad0[0x3C];
+    void* m3C;
+};
+/* forward declarations (definitions are in address order) */
+extern "C" int fn_8055F730(Db8055F7B8_List* l, int x, int kind);
 extern "C" int fn_8055F7B8(Db8055F7B8_List* l, int x);
 extern "C" int fn_8055F848(Db8055F7B8_List* l, int x);
 extern "C" int fn_8055F8D8(Db8055F7B8_List* l, int x);
 extern "C" int fn_8055F9B0(Db8055F7B8_List* l, int x);
-extern "C" int fn_8055FB50(Db8055F7B8_List* l, int x);
 extern "C" int fn_8055FCF4(Db8055FCF4_S* s);
+extern "C" int fn_8055FD00(int x);
+extern "C" int fn_8055FD8C(int unused, Db8055F7B8_List* l);
+extern "C" void fn_8055FF28(int a, Db8055FF28_Obj* self, int b);
+extern "C" void fn_80560010(int x, int k);
+extern "C" int fn_805600F8(int s, int id);
+extern "C" int fn_8056087C(void* self);
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -205,4 +238,87 @@ extern "C" DB_OVERLAY int fn_8055FD8C(int unused, Db8055F7B8_List* l)
             return e;
     }
     return 0;
+}
+
+extern "C" DB_OVERLAY void fn_8055FF28(int a, Db8055FF28_Obj* self, int b)
+{
+    Db8055FF28_G* g = (Db8055FF28_G*)lbl_80619948;
+    unsigned n = self->m107E8;
+    void* m3c = g->m3C;
+    unsigned i = 0;
+    for (; i < n; i++) {
+        int p = fn_80546B18(self, b, i);
+        int q = fn_80546CA8(self, b, i);
+        if (q == 0) {
+            float f = lbl_805FF7C4;
+            int z = q;
+            int o;
+            int w = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B320(0, a);
+            fn_80563F3C(m3c, w, p, &f, &z, &o, 1, 0);
+            fn_80546A24(self, p, f, z, 2);
+        }
+    }
+}
+
+/* near-miss: callee-saved r30/r31 swapped (s and id) */
+extern "C" DB_OVERLAY void fn_80560010(int x, int k)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk8006A138_It<3> it(k);
+    int cur = k;
+    if (cur <= 3) {
+        do {
+            unsigned j = 0;
+            int id0 = fn_80083FC0(cur);
+            int s = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(id0, x);
+            while (j < fn_8007F198((Unk8007F198_A*)sc, s)) {
+                int id = fn_8007F24C((Unk8007F198_A*)sc, s, (unsigned char)j);
+                int v = sc->fn_8007A6A0(0x1E, id);
+                if (v == 0 || v == 0x31 || fn_805600F8(s, id) == 0)
+                    j++;
+            }
+            cur = it.Next();
+        } while (cur <= 3);
+    }
+}
+
+extern "C" DB_OVERLAY int fn_805600F8(int s, int id)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int r = 0;
+    int w = fn_800A2AE8(lbl_80619948);
+    int v = sc->fn_8007A6A0(0x1F, id);
+    if (v > 14) {
+        if (v <= 0x27) {
+            if ((unsigned)fn_8007F674((Unk8007F198_A*)sc, s, 0) <= 1) {
+                r = 1;
+                fn_8007F29C((Unk8007F198_A*)sc, s, id);
+                fn_8007F5BC((Unk8007F198_A*)sc, s, 0, id, w);
+            }
+        } else {
+            if ((unsigned)fn_8007F674((Unk8007F198_A*)sc, s, 1) <= 1) {
+                r = 1;
+                fn_8007F29C((Unk8007F198_A*)sc, s, id);
+                fn_8007F5BC((Unk8007F198_A*)sc, s, 1, id, w);
+            }
+        }
+    }
+    return r;
+}
+
+/* near-miss: 6 slots (retail copies the index zero into the counter: li r30,0 / mr r31,r30; ours uses two li) */
+extern "C" DB_OVERLAY int fn_8056087C(void* self)
+{
+    float a = lbl_805FF7D8;
+    float best = lbl_805FF7DC;
+    int idx = 0;
+    unsigned i = 0;
+    for (; i <= 8; i++) {
+        a = fn_80560630(self, i);
+        if (!(best <= a)) {
+            best = a;
+            idx = i;
+        }
+    }
+    return idx;
 }

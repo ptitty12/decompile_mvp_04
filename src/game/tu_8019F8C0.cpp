@@ -52,6 +52,17 @@ void fn_8035AF30(void* p, int inchrg);
 extern "C" Unk8019F8C0_M2* fn_801A4CE8(Unk8019F8C0_Owner* o, int i);
 extern char lbl_80649DA0[];
 extern char lbl_8065FAA8[];
+extern char lbl_80649DB8[];
+extern char lbl_80660520[];
+extern char lbl_80660548[];
+void fn_80328234(void* p, int a, int b);
+void fn_803785E4(void* p);
+void* fn_803263C4(void* p, void* o);
+void fn_8032850C(void* p);
+void fn_80326410(void* p, int a);
+void fn_80378620(void* p, int c);
+void fn_80328374(void* p, int c);
+void fn_801A0488(Unk8019F8C0_Owner* o);
 
 /* Message object built on the stack (vptr at +4; base vtable lbl_80649DA0, derived lbl_8065FAA8).
  * Destroyed by calling the base destructor 0x8035AF30 with in-charge 2. */
@@ -269,6 +280,36 @@ void fn_801A02F0(char* self)
     fn_8033E5C4(self + 0x560, 1);
 }
 
+Unk8019F8C0_Owner* fn_801A0318(Unk8019F8C0_Owner* self)
+{
+    fn_80328234(self, 0, 0);
+    char* sub = (char*)self + 0x24;
+    fn_803785E4(sub);
+    *(const void**)(sub + 8) = lbl_80649DB8;
+    *(const void**)((char*)self + 0x2C) = lbl_80660520;
+    *(const void**)((char*)self + 0x18) = lbl_80660548;
+    fn_803263C4((char*)self + 0x50, self);
+    self->m554 = 0;
+    self->m558 = 0;
+    for (int i = 0; i < 6; i++) {
+        self->m30[i] = 0;
+    }
+    fn_801A0488(self);
+    return self;
+}
+
+void fn_801A03C0(Unk8019F8C0_Owner* self, int c)
+{
+    *(const void**)((char*)self + 0x2C) = lbl_80660520;
+    *(const void**)((char*)self + 0x18) = lbl_80660548;
+    fn_8032850C(self);
+    fn_80326410((char*)self + 0x50, 2);
+    char* sub = (char*)self + 0x24;
+    *(const void**)(sub + 8) = lbl_80649DB8;
+    fn_80378620(sub, 0);
+    fn_80328374(self, c);
+}
+
 void fn_801A043C(Unk8019F8C0_Owner* o)
 {
     ((Unk8019F8C0_OV*)o)->fn_vslot17();
@@ -361,6 +402,34 @@ void fn_801A08D8(Unk8019F8C0_Owner* o)
     lbl_8068B4CC = lbl_8068B4CC;
 }
 
+class Unk8014D8AC {
+public:
+    int fn_8014D8AC(int max, const char* file, int line);
+};
+extern const char lbl_805CB8F0[];
+extern "C" float logf(float x);
+extern "C" float fn_804028E4(float x);
+
+float fn_801A0958(Unk8019F8C0_Owner* o, float mean, float sd)
+{
+    Unk8014D8AC* rng = (Unk8014D8AC*)o->m554;
+    float a;
+    float b;
+    float x;
+    float y;
+    float s;
+    do {
+        x = 2.0f * ((float)(unsigned)rng->fn_8014D8AC(10000, lbl_805CB8F0, 0x1CF) * 0.0001f) - 1.0f;
+        y = 2.0f * ((float)(unsigned)rng->fn_8014D8AC(10000, lbl_805CB8F0, 0x1CF) * 0.0001f) - 1.0f;
+        s = x * x + y * y;
+    } while (s >= 1.0f);
+    s = fn_804028E4(logf(s) * -2.0f / s);
+    a = x * s;
+    b = y * s;
+    volatile float pad;
+    float r = sd * a + mean;
+    return r;
+}
 void fn_801A15A0(Unk8019F8C0_Owner* o)
 {
     fn_801A0488(o);
@@ -398,6 +467,44 @@ void fn_801A1E90(Unk8019F8C0_Owner* o)
     }
 }
 
+struct Unk801A1EDC_R {
+    char pad0[0x6C];
+    int m6C;
+};
+extern "C" Unk801A1EDC_R* fn_801A6DB8(Unk8019F8C0_Owner* o);
+extern "C" Unk8019F8C0_Owner* fn_801A4910(Unk8019F8C0_Owner* o, int a, int b);
+extern "C" void fn_803BD720();
+
+inline Unk8019F8C0_Inner* Unk801A1EDC_At(Unk8019F8C0_Inner* a, int i)
+{
+    return &a[i];
+}
+
+void fn_801A1EDC(Unk8019F8C0_Owner* o)
+{
+    unsigned j;
+    if (fn_801A6DB8(o)->m6C == 0) {
+        if (o->m6F4 != 1) {
+            for (int t = 0; t <= 1; t++) {
+                for (j = 0; j < Unk801A1EDC_At(o->m6F8->m14, t)->m3E4; ) {
+                    fn_801A1E90(fn_801A4910(o, t, j++));
+                }
+                fn_801A1E90((Unk8019F8C0_Owner*)o->m6B0[t]);
+                for (j = 0; j <= 1; j++) {
+                    fn_801A1E90((Unk8019F8C0_Owner*)o->m6A0[t][j]);
+                }
+            }
+        } else if (o->m594[0] != 0) {
+            fn_801A1E90((Unk8019F8C0_Owner*)o->m594[0]);
+        }
+        for (j = 0; j <= 3; j++) {
+            if (o->m690[j] != 0) {
+                fn_801A1E90((Unk8019F8C0_Owner*)o->m690[j]);
+            }
+        }
+        fn_803BD720();
+    }
+}
 int fn_801A1FFC(Unk8019F8C0_Owner* o, int a, int b)
 {
     return fn_801A2034(o, a) == b;

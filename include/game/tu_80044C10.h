@@ -21,6 +21,7 @@ struct Unk80044C10_Side;
 struct Unk80044C10_E;
 struct Unk80044C10_D;
 struct Unk80044C10_C;
+struct Unk80044C10_G;
 struct Unk80044C10_B;
 class Unk80044C10_A;
 struct Unk80048A10_Ent;
@@ -32,6 +33,9 @@ struct Unk80044C98_Arg;
 struct Unk80044C10_Obj590 {
     char pad0[0x590];
     unsigned m590;
+    char pad594[0x170];
+    int m704;
+    int m708;
 };
 
 struct Unk80044C10_Entry {
@@ -62,23 +66,50 @@ struct Unk80044C10_D {
     int m1C;
 };
 
+struct Unk80044C10_G {
+    char pad0[0xC];
+    int mC;
+    char pad10[0x14];
+    int m24;
+    char pad28[0x50];
+    int m78;
+};
+
 struct Unk80044C10_C {
-    char pad0[0x10];
+    char pad0[0xC];
+    Unk80044C10_G* mC;
     Unk80044C10_D* m10;
     Unk80044C10_E* m14;
 };
 
+struct Unk80044C10_F;
+
 struct Unk80044C10_B {
     char pad0[0x6F8];
     Unk80044C10_C* m6F8;
+    char pad6FC[0x4];
+    Unk80044C10_F* m700;
+};
+
+struct Unk80044C10_Vec3 {
+    float x;
+    float y;
+    float z;
 };
 
 struct Unk80044C10_A_Base {
     unsigned char m0;
     unsigned char m1;
-    char pad2[0x4E];
+    char pad2[0x2];
+    int m4;
+    char pad8[0x4];
+    int mC;
+    char pad10[0x40];
     int m50;
-    char pad54[0x44];
+    int m54;
+    char pad58[0x8];
+    Unk80044C10_Vec3 m60;
+    char pad6C[0x2C];
 };
 
 class Unk80044C10_A_Vt : public Unk80044C10_A_Base {
@@ -111,28 +142,48 @@ public:
 
 class Unk80044C10_A : public Unk80044C10_A_Vt {
 public:
-    char pad9C[0x94];
+    char pad9C[0x68];
+    int m104;
+    char pad108[0x28];
     Unk80044C10_A* m130;
-    char pad134[0x27C];
+    char pad134[0x150];
+    int m284;
+    char pad288[0x128];
     Unk80044C10_Obj590* m3B0;
     int m3B4;
-    char pad3B8[0x14];
+    char pad3B8[0x4];
+    int m3BC;
+    char pad3C0[0xC];
     int m3CC;
     int m3D0;
     char pad3D4[0x8];
     int m3DC;
-    char pad3E0[0x68];
+    char pad3E0[0x8];
+    int m3E8;
+    char pad3EC[0x10];
+    int m3FC;
+    char pad400[0xC];
+    int m40C;
+    char pad410[0x18];
+    float m428;
+    char pad42C[0x4];
+    float m430;
+    char pad434[0x14];
     int m448;
     Unk80044C10_B* m44C;
-    char pad450[0x8];
+    char pad450[0x4];
+    int m454;
     int m458;
     char pad45C[0x4];
     int m460;
     char pad464[0x70];
     int m4D4;
-    char pad4D8[0xB0];
+    int m4D8;
+    char pad4DC[0xAC];
     char m588[1];
-    char pad589[0x143];
+    char pad589[0x7];
+    unsigned m590;
+    char pad594[0x138];
     void* m6CC;
     char pad6D0[0x34];
     int m704;
@@ -150,7 +201,9 @@ struct Unk80048A10_Sub {
     Unk80048A10_Ent mEnt[35];
     char pad9D8[0xC4];
     void* mA9C;
-    char padAA0[0x44];
+    char padAA0[0x3C];
+    struct Unk80048B2C_Obj* mADC;
+    const void* mAE0;
 };
 
 struct Unk8004763C_Slot {

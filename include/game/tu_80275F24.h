@@ -62,6 +62,7 @@ public:
     virtual ~Unk80276DB8();
     virtual void fn_vslot2();
     virtual Unk8037B3E8* fn_vslot5();
+    virtual int fn_vslot17(Unk80270BA0_Result* out, Unk80270BA0_Obj* obj, int c, int d, int e, int f);
 
     Unk80275F24 m4;
     int m18;

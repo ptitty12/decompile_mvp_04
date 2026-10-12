@@ -31,11 +31,35 @@ struct Unk8001D62C_Rec {
 struct Unk8001E0C8_Rec {
     char pad0[0x24];
     int m24;
-    char pad28[0x80 - 0x28];
+    char pad28[4];
+    int m2C;
+    char pad30[0x7C - 0x30];
+    int m7C;
     int m80;
     char pad84[4];
     int m88;
 };
+
+/* Entity table row (stride 0xE64); the 128 bytes at +0x1B4 are summed (fn_8001DDFC). */
+struct Unk8001D47C_Row {
+    char pad0[0x1B4];
+    unsigned char m1B4[0x80];
+    char pad234[0xE64 - 0x234];
+};
+
+/* Sum of the 128 bytes at Row+0x1B4. Taking the row pointer as a parameter gives retail's
+ * `addi r11,row,0x1b4; lbzx` pair inside the loop (a plain byte pointer gave `add` + `lbz 436(r9)`).
+ * Callers that index a row by k * 0xE64 must compute the product in its own statement
+ * (`int o = k * 0xE64; SumRow((Row*)(t + o))`): inline in the argument, the product is built
+ * in place in the parameter register (`mulli r10; add r10,r10,t`), retail has `mulli r0; add r10,t,r0`. */
+inline int Unk8001D47C_SumRow(Unk8001D47C_Row* r)
+{
+    int s = 0;
+    for (int i = 0; i < 0x80; i++) {
+        s += r->m1B4[(unsigned char)i];
+    }
+    return s;
+}
 
 struct Unk8001D47C_Level {
     char pad0[0xC];
@@ -44,9 +68,28 @@ struct Unk8001D47C_Level {
     unsigned char* m14;
 };
 
+/* +0x700 target (fn_8001D8DC): +0x3A4 leads to a record with a word at +0x108, +0x3B8 is an id. */
+struct Unk8001D8DC_Inner {
+    char pad0[0x108];
+    int m108;
+};
+
+struct Unk8001D8DC_Outer {
+    char pad0[0x3A4];
+    Unk8001D8DC_Inner* m3A4;
+    char pad3A8[8];
+    int m3B0;
+    char pad3B4[4];
+    int m3B8;
+};
+
 struct Unk8001D47C_Mid {
-    char pad0[0x6F8];
+    char pad0[0x6CC];
+    void* m6CC;
+    char pad6D0[0x6F8 - 0x6D0];
     Unk8001D47C_Level* m6F8;
+    char pad6FC[4];
+    Unk8001D8DC_Outer* m700;
 };
 
 struct Unk8001D62C_Mid {
@@ -65,6 +108,45 @@ struct Unk8001CE80_Entry {
 struct Unk8001CE80_Sub {
     char pad0[0x98];
     int m98;
+};
+
+/* vptr at +0x98 of the object at Unk8001CE80+0x3B0 (fn_8001D780 calls slot 24, vtable +0xC0) */
+class Unk8001D780_VT {
+public:
+    char pad0[0x98];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3();
+    virtual int s4();
+    virtual int s5();
+    virtual int s6();
+    virtual int s7();
+    virtual int s8();
+    virtual int s9();
+    virtual int s10();
+    virtual int s11();
+    virtual int s12();
+    virtual int s13();
+    virtual int s14();
+    virtual int s15();
+    virtual int s16();
+    virtual int s17();
+    virtual int s18();
+    virtual int s19();
+    virtual int s20();
+    virtual int s21();
+    virtual int s22();
+    virtual int s23();
+    virtual int s24();
+};
+
+/* 0x24-byte records at Unk8001CE80+0x70 (four of them, count at +0x100); fn_8001D974 searches for m0 == m3B0. */
+struct Unk8001D974_Ent {
+    Unk8001CE80_Sub* m0;
+    char pad4[8];
+    int mC;
+    int m10;
+    char pad14[0x24 - 0x14];
 };
 
 class Unk8001CE80 {
@@ -89,26 +171,36 @@ public:
     void fn_8001D6CC();
     void fn_8001D70C();
     void fn_8001D75C();
+    void fn_8001D780();
     void fn_8001D7D0();
     void fn_8001DA28();
     void fn_8001DA4C();
     void fn_8001DB4C();
     void fn_8001DB70();
     void fn_8001DBA0();
+    void fn_8001DBE0();
     void fn_8001DC58();
     void fn_8001DC88();
     void fn_8001DCCC();
+    void fn_8001DCF8();
     void fn_8001DDD8();
+    void fn_8001DDFC();
     void fn_8001DE9C();
     void fn_8001E054();
     int fn_8001E084();
     int fn_8001D7F8();
     int fn_8001D850();
+    int fn_8001D8DC();
+    int fn_8001D974();
     void fn_8001DA7C();
+    int fn_8001DA9C();
     void fn_8001E0C8();
+    int fn_8001E134();
     void fn_8001E294();
     void fn_8001E2EC();
     void fn_8001E31C();
+    void fn_8001E34C();
+    void fn_8001E3C8();
 
     unsigned char m0;
     unsigned char m1;
@@ -116,7 +208,9 @@ public:
     int m3C;
     char pad40[0x8];
     int m48;
-    char pad4C[0xB8];
+    char pad4C[0x24];
+    Unk8001D974_Ent m70[4];
+    int m100;
     int m104;
     char pad108[0x8];
     int m110;
@@ -149,7 +243,8 @@ public:
     char pad3FC[0x8];
     int m404;
     int m408;
-    char pad40C[0x38];
+    int m40C;
+    char pad410[0x34];
     int m444;
     int m448;
     int m44C;

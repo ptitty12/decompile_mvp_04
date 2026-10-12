@@ -16,6 +16,14 @@ UnkC128* fn_803349B8(Menu* p);
 }
 
 struct V2F { float x; float y; };
+struct P3 { const char* a[3]; };
+extern const P3 lbl_805EED20;
+extern const char lbl_805EED2C[];
+void* fn_802BB19C();
+int fn_802BB4C0(char* o, int i);
+int fn_802BB4D0(char* o, int i);
+extern "C" int sprintf(char* buf, const char* fmt, ...);
+extern "C" void fn_8032D880(void* cmd, char* text);
 /* Menu object whose vptr (+0x2DC) is dispatched virtually: slot 6 is the key handler
  * (fn_80330BC8 in the base vtable lbl_80666A18). */
 class MenuVT {
@@ -162,6 +170,33 @@ Menu* fn_80334BC0(Menu* p, int a)
     fn_80330ACC(p, (MItem*)i1);
     fn_80330ACC(p, (MItem*)i2);
     return p;
+}
+
+/* near-miss: 2 slots. Retail loads items[0] with `lwzx r11,r31,r30` (r30 = the shared zero register, no constant fold) before
+   the m174 store; here the index folds to `lwz r11,0(r31)` after it. Same unfolded-zero-index shape as fn_80327214. */
+extern "C" void fn_80334CDC(Menu* self) {
+    char* h = (char*)fn_802BB19C();
+    P3 nm = lbl_805EED20;
+    float a, b, c;
+    char buf[0x68];
+    void* items[2];
+    items[0] = (char*)self + 0x2E0;
+    items[1] = (char*)self + 0x328;
+    int i = 0;
+    do {
+        a = (float)fn_802BB4C0(h, i) * 0.001f;
+        b = (float)fn_802BB4D0(h, i) * 0.001f;
+        c = (1.0f - b / a) * 100.0f;
+        sprintf(buf, lbl_805EED2C, nm.a[i], (int)a, (int)b, (int)c);
+        fn_8032D880(items[i], buf);
+        i++;
+    } while (i <= 1);
+    self->m204 = 0;
+    self->m208 = 0;
+    self->items[self->m174]->s3();
+    MItem* it0 = self->items[0];
+    self->m174 = 0;
+    it0->s2();
 }
 
 void fn_80334EB0() {}

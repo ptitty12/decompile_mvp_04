@@ -159,6 +159,15 @@ void fn_80131F34(Wid* w, void* self, void (*cb)(int, Wid*), void (*cb2)(), int a
 void fn_801229F8(int a, Wid* w);
 void fn_8012289C(int a, Wid* w);
 void fn_800B7ADC(UnkFEMgr* m, void* obj);
+extern const char lbl_805C02E0[];
+extern const char lbl_805B97B4[];
+extern const char lbl_805BE628[];
+extern const char lbl_805BDDD4[];
+extern const char lbl_805C0320[];
+extern const char lbl_805BDDB0[];
+extern const char lbl_805C0328[];
+extern const char lbl_805C0334[];
+extern const char lbl_805C0340[];
 }
 
 extern "C" {
@@ -175,6 +184,36 @@ void fn_80120730(Scr* self, Wid* a)
 {
     if (a == self->m138)
         fn_8012075C(self);
+}
+
+void fn_801209E0(Scr* self, int mode, int x)
+{
+    if (fn_80120AE8(self, x) != 0) {
+        switch (mode) {
+        case 0: {
+            char name[16];
+            char* np = name;
+            fn_8035682C(np);
+            fn_8040B830(np, lbl_805B97B4, 0xF);
+            np[15] = mode;
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, np, self);
+            break;
+        }
+        case 1: {
+            char name[16];
+            char* np = name;
+            fn_8035682C(np);
+            fn_8040B830(np, lbl_805BE628, 0xF);
+            np[15] = 0;
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, np, self);
+            break;
+        }
+        }
+    }
 }
 
 int fn_80120AE8(Scr* self, int a)
@@ -295,6 +334,22 @@ void fn_80121BD0()
     }
 }
 
+void fn_80121C0C(Unk80121CCC_Scr* self, int flag, Wid* x)
+{
+    if (x == self->m134 || x == self->m138 || fn_8011AA24(0)->m6F8->m10->m120 == 1) {
+        if (flag == 0) {
+            char name[16];
+            char* np = name;
+            fn_8035682C(np);
+            fn_8040B830(np, lbl_805C02E0, 0xF);
+            np[15] = flag;
+            if (lbl_8061A32C == 0)
+                lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
+            fn_800B7B4C(lbl_8061A32C, np, self);
+        }
+    }
+}
+
 void* fn_80121CCC(Unk80121CCC_Scr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -357,24 +412,29 @@ int fn_80122534(Unk80121CCC_Scr* self)
     return 1;
 }
 
+/* near-miss: 1 slot (retail compares the first strcmp as `mr. r29,r3`, ours `cmpwi r3,0`; store orders solved by permutation). */
 void fn_80122570(Unk80121CCC_Scr* self, char* out)
 {
     char* name = (char*)self->m134->fn_vslot70()->fn_vslot33(5, 1) + 0xC;
     int r = fn_8040B574(name, lbl_805C0300);
     if (r == 0) {
         UnkFESub* q = &fn_800B555C()->m8;
-        q->m4D0 = self->m148;
-        q->m4C4 = self->m140;
-        q->m4C8 = self->m144;
-        q->m4CC = r;
+        int b = self->m140;
+        int c = self->m144;
+        int a = self->m148;
+        q->m4C4 = b;
+        q->m4C8 = c;
+        q->m4D0 = a;
     } else {
         r = fn_8040B574(name, lbl_805C030C);
         if (r == 0) {
             UnkFESub* q = &fn_800B555C()->m8;
-            q->m4D0 = self->m148;
+            int c = self->m144;
+            int a = self->m148;
             q->m4C4 = 2;
-            q->m4C8 = self->m144;
+            q->m4C8 = c;
             q->m4CC = r;
+            q->m4D0 = a;
         }
     }
     fn_8040B830(out, name, 0x10);
@@ -496,6 +556,19 @@ void* fn_80123648(Unk80123648_Scr* self, int a, int b, int c, int d, int e, int 
     self->m14C = 0;
     fn_801240C0(self);
     return self;
+}
+
+void fn_801236B8(Unk80123648_Scr* self)
+{
+    fn_800ECE34((Scr*)self);
+    self->m144 = (int)fn_800C8044(self->fn_vslot32(lbl_805C0320, 1));
+    self->m148 = (int)fn_800C8044(self->fn_vslot32(lbl_805BDDB0, 1));
+    self->m134 = (int)fn_800C8040(self->fn_vslot29(lbl_805C0328));
+    self->m138 = (int)fn_800C8038(self->fn_vslot29(lbl_805C0334));
+    self->m13C = (int)fn_800C8060(((Wid*)self->m148)->fn_vslot32(lbl_805BDDD4, 1));
+    self->m140 = (int)fn_800C8060(((Wid*)self->m144)->fn_vslot32(lbl_805BDDD4, 1));
+    self->m14C = (int)fn_800C8054(self->fn_vslot29(lbl_805C0340));
+    ((Wid*)self->m138)->fn_vslot8(0);
 }
 
 void fn_80123830(int a, int b, int c, int d, int e, int f)

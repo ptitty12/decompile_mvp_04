@@ -16,6 +16,47 @@ struct U {
     char pad0[0x4000];
 };
 void fn_80377408(void* p);
+extern "C" void fn_8033CD28(void* p, int in_chrg);
+extern "C" void fn_8037B424(void* p, int in_chrg);
+struct Unk8035D710_V {
+    float x;
+    float y;
+    float z;
+};
+extern const Unk8035D710_V lbl_806055AC;
+struct Unk8035D710 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    Unk8035D710_V m28;
+    Unk8035D710_V m34;
+    Unk8035D710_V m40;
+    Unk8035D710_V m4C;
+    Unk8035D710_V m58;
+    Unk8035D710_V m64;
+    float m70;
+    float m74;
+    float m78;
+    int m7C;
+    int m80;
+    int m84;
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+    int m98;
+    int m9C;
+    int mA0;
+    int mA4;
+    int mA8;
+};
 extern char lbl_80660850[];
 extern const float lbl_805D675C;
 void fn_801DD420(void* p, int chrg);
@@ -162,3 +203,45 @@ Unk8035D908::~Unk8035D908() {}
 Unk8035D96C::~Unk8035D96C() {}
 
 Unk8035D9B0::~Unk8035D9B0() {}
+
+extern "C" void fn_8035D710(Unk8035D710* s)
+{
+    s->m4 = 0;
+    s->m8 = 2;
+    s->mC = 2;
+    s->m1C = 0;
+    s->m20 = 0;
+    s->m10 = -1;
+    s->m28 = lbl_806055AC;
+    s->m18 = 5;
+    s->m14 = 0;
+    s->m0 = 0;
+    s->m70 = 0.0f;
+    s->m34 = lbl_806055AC;
+    s->m40 = lbl_806055AC;
+    s->m64 = lbl_806055AC;
+    s->m4C = lbl_806055AC;
+    s->m58 = lbl_806055AC;
+    s->m74 = -1.0f;
+    s->m78 = 0.0f;
+    s->m9C = 0x11;
+    s->mA0 = -1;
+    s->m7C = 0;
+    s->m80 = 0;
+    s->m84 = 0;
+    s->m88 = 0;
+    s->m24 = 0;
+    s->m8C = 0;
+    s->m90 = 0;
+    s->m94 = 0;
+    s->m98 = 0;
+    s->mA4 = 0;
+    s->mA8 = 0;
+}
+
+extern "C" void fn_8035D9F8(U* self, int chrg)
+{
+    fn_8033CD28((char*)self + 0x10, 2);
+    fn_8033CD28((char*)self + 4, 2);
+    fn_8037B424(self, chrg);
+}

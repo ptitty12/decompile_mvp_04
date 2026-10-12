@@ -197,6 +197,70 @@ void fn_801A9700(void* p)
     fn_801AA038(p, 0);
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_8065FC90[];
+int fn_801A9AF8(Unk801A96E0_Init* o);
+void fn_801AA598(void* p);
+void fn_8037893C(void* a, int b, void* c, void* d, int e);
+void fn_8035AD88(void* self, int c);
+/* Stack message (id at +0, vptr at +4: root vtable, then the derived one); four before/after pairs. */
+struct Unk801A9724_Base {
+    int m0;
+    const void* m4;
+    Unk801A9724_Base(int id)
+    {
+        m4 = lbl_80649DA0;
+        m0 = id;
+    }
+};
+struct Unk801A9724_Msg : public Unk801A9724_Base {
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    Unk801A9724_Msg(int a0, int a1, int a2, int a3, int b0, int b1, int b2, int b3) : Unk801A9724_Base(0x92)
+    {
+        m4 = lbl_8065FC90;
+        m8 = 0;
+        mC = a0;
+        m14 = a1;
+        m1C = a2;
+        m24 = a3;
+        m10 = b0;
+        m18 = b1;
+        m20 = b2;
+        m28 = b3;
+    }
+};
+
+void fn_801A9724(Unk801A96E0_Init* o)
+{
+    int a0 = fn_801A99B4(o);
+    int a1 = fn_801A9A20(o);
+    int a2 = fn_801A9A8C(o);
+    int a3 = fn_801A9AF8(o);
+    fn_801AA598(o);
+    int b0 = fn_801A99B4(o);
+    int b1 = fn_801A9A20(o);
+    int b2 = fn_801A9A8C(o);
+    int b3 = fn_801A9AF8(o);
+    if (a0 != b0 || a1 != b1 || a2 != b2 || a3 != b3) {
+        Unk801A9724_Msg msg(a0, a1, a2, a3, b0, b1, b2, b3);
+        fn_8037893C((char*)o->m8 + 0x704, msg.m0, &msg, 0, 0);
+        fn_8035AD88(&msg, 2);
+    }
+    o->m58 = b0;
+    o->m5C = b1;
+    o->m60 = b2;
+    o->m64 = b3;
+    fn_801AB470((Unk801A96E0_Late*)o);
+}
+
 void fn_801A985C(void* p)
 {
     fn_801AB470(p);
@@ -424,6 +488,72 @@ void fn_801AA038(void* p)
     fn_801AB470(p);
 }
 
+struct Unk8017A930_T;
+void fn_8017B434(Unk8017A930_T* t);
+struct Unk801AA088_Msg : public Unk801A9724_Base {
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    Unk801AA088_Msg(Unk801A96E0_Init* o, int b0, int b1, int b2, int b3) : Unk801A9724_Base(0x92)
+    {
+        int v58 = o->m58;
+        int v64 = o->m64;
+        int v5C = o->m5C;
+        int v60 = o->m60;
+        m4 = lbl_8065FC90;
+        m8 = 1;
+        m10 = b0;
+        m14 = v5C;
+        m18 = b1;
+        m1C = v60;
+        m20 = b2;
+        m24 = v64;
+        m28 = b3;
+        mC = v58;
+    }
+};
+
+void fn_801AA088(void* p)
+{
+    Unk801A96E0_Init* o = (Unk801A96E0_Init*)p;
+    int f0 = 0;
+    int f1 = 0;
+    int f2 = 0;
+    int f3 = 0;
+    int b0 = fn_801A99B4(o);
+    int b1 = fn_801A9A20(o);
+    int b2 = fn_801A9A8C(o);
+    int b3 = fn_801A9AF8(o);
+    if (b0 != o->m58 && b0 != 0 && o->m58 != 0) {
+        f0 = 1;
+    }
+    if (b1 != o->m5C && b1 != 0 && o->m5C != 0) {
+        f1 = 1;
+    }
+    if (b2 != o->m60 && b2 != 0 && o->m60 != 0) {
+        f2 = 1;
+    }
+    if (b3 != o->m64 && b3 != 0 && o->m64 != 0) {
+        f3 = 1;
+    }
+    if (f0 == 1 || f1 == 1 || f2 == 1 || f3 == 1) {
+        fn_8017B434(*(Unk8017A930_T**)((char*)o + 4));
+        Unk801AA088_Msg msg(o, b0, b1, b2, b3);
+        fn_8037893C((char*)o->m8 + 0x704, msg.m0, &msg, 0, 0);
+        fn_8035AD88(&msg, 2);
+    }
+    o->m58 = fn_801A99B4(o);
+    o->m5C = fn_801A9A20(o);
+    o->m60 = fn_801A9A8C(o);
+    o->m64 = fn_801A9AF8(o);
+}
+
 void fn_801AA248(Unk801A96E0_Init* p)
 {
     for (int i = 0; i < 2; i++) {
@@ -444,6 +574,138 @@ void fn_801AA570(Unk801A96E0_Init* p)
     p->m5C = 0;
     p->m60 = 0;
     p->m64 = 0;
+}
+
+int fn_801AABC4(Unk801AB63C_P* p);
+int fn_801AACE4(Unk801AB63C_P* p);
+int fn_801AAD40(Unk801AB63C_P* p);
+
+inline const char* Unk801AA598_Pick(const char** t, int i)
+{
+    int o = i * 4;
+    return *(const char**)((char*)t + o);
+}
+
+extern const char lbl_805CEE50[];
+extern const char lbl_805CEE68[];
+extern const char lbl_805CEE80[];
+extern const char lbl_805CEE9C[];
+extern const char* lbl_8061CA70[];
+extern const char* lbl_8061CAB4[];
+extern const char* lbl_8061CADC[];
+extern const char* lbl_8061CCD0[];
+extern int lbl_8061B9BC;
+extern int lbl_8061CA6C;
+int fn_804089B4(char* dst, const char* fmt, ...);
+void fn_80303CA0(const char* s, float a, float b, float c, ...);
+void fn_801AB1A8(Unk801A96E0_Init* o);
+int fn_801AA9B0(Unk801AB63C_P* p);
+int fn_801AAA34(Unk801AB63C_P* p);
+int fn_801AAB68(Unk801AB63C_P* p);
+int fn_801AA800(Unk801AB63C_P* p);
+
+/* near-miss: same code; the z increment before the last fn_80303CA0 call goes straight into f3 (retail: f0, then fmr f3,f0). */
+void fn_801AA598(void* p)
+{
+    Unk801A96E0_Init* o = (Unk801A96E0_Init*)p;
+    Unk801AB63C_P* pl = (Unk801AB63C_P*)p;
+    if (fn_801B63A0(pl, 2) != 0) {
+        o->mC = fn_801AA800(pl);
+        int t = fn_801AA9B0(pl);
+        o->m10 = t;
+        if (o->mC == 0xE && t == 3) {
+            o->m10 = 1;
+        }
+        o->m24 = fn_801AAA34(pl);
+        o->m28 = fn_801AAB68(pl);
+        fn_801AB1A8(o);
+    }
+    if (lbl_8061B9BC != 0 && lbl_8061CA6C != 0) {
+        const float x = 5.0f;
+        char buf[0x100];
+        const float y = 0.3f;
+        float z = 0.7f;
+        int a = fn_801A99B4(o);
+        fn_804089B4(buf, lbl_805CEE50, a, Unk801AA598_Pick(lbl_8061CA70, fn_801A99B4(o)));
+        fn_80303CA0(buf, x, y, z);
+        int b = fn_801A9A20(o);
+        fn_804089B4(buf, lbl_805CEE68, b, Unk801AA598_Pick(lbl_8061CAB4, fn_801A9A20(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+        int c = fn_801A9A8C(o);
+        fn_804089B4(buf, lbl_805CEE80, c, Unk801AA598_Pick(lbl_8061CADC, fn_801A9A8C(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+        int d = fn_801A9AF8(o);
+        fn_804089B4(buf, lbl_805CEE9C, d, Unk801AA598_Pick(lbl_8061CCD0, fn_801A9AF8(o)));
+        fn_80303CA0(buf, x, y, z = z + 0.04f);
+    }
+}
+
+int fn_801AA800(Unk801AB63C_P* p)
+{
+    int r = 0;
+    if (fn_801AABC4(p) == 1) {
+        r = 9;
+    }
+    if (r == 0) {
+        if (fn_801AAD40(p) != 0) {
+            int t = fn_801C1638(p->m8, 0xB);
+            int c = 1;
+            if (t == 0) {
+                c = 0;
+            }
+            if (c != 0) {
+                r = 0xE;
+            } else if (fn_801B5AD0(p, 2) == 1) {
+                r = 0xD;
+            } else {
+                r = 0xC;
+            }
+        }
+        if (r == 0) {
+            if (fn_801AACE4(p) == 1) {
+                r = 0xA;
+                if (fn_801B5AD0(p, 2) == 1) {
+                    r = 0xB;
+                }
+            }
+            if (r == 0) {
+                if (fn_801AAE10(p) == 1) {
+                    r = 0xF;
+                    if (fn_801B5AD0(p, 2) == 1) {
+                        r = 0x10;
+                    }
+                }
+                if (r == 0) {
+                    if (fn_801AAE18(p) == 1) {
+                        r = 8;
+                    }
+                    if (r == 0) {
+                        if (fn_801AAE20(p) == 1) {
+                            r = 6;
+                            if (fn_801B5AD0(p, 2) == 1) {
+                                r = 7;
+                            }
+                        }
+                        if (r == 0) {
+                            if (fn_801AAE28(p) == 1) {
+                                r = 4;
+                                if (fn_801B5AD0(p, 2) == 1) {
+                                    r = 5;
+                                }
+                            }
+                            if (r == 0) {
+                                r = 2;
+                                if (fn_801B5AD0(p, 2) == 1) {
+                                    r = 3;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return r;
 }
 
 int fn_801AA9B0(Unk801AB63C_P* p)

@@ -6,9 +6,16 @@
  */
 #include "game/tu_802CFED4.h"
 
-extern "C" Unk802D3268* fn_80384A88()
+/* The object fn_80384A88 builds: 0x40 bytes, ctor at 0x80384858. */
+class Unk80384858 {
+public:
+    Unk80384858();
+    char data[0x40];
+};
+
+extern "C" Unk80384858* fn_80384A88()
 {
-    return new (lbl_806EF9B4) Unk802D3268;
+    return new (lbl_806EF9B4) Unk80384858;
 }
 
 struct Unk80384B3C {

@@ -129,6 +129,7 @@ extern "C" void fn_801CF054(Z* z, float* a, float* b)
 {
     if (fn_801C4128(z)) {
         *a = 0.0f;
+        *b = 0.0f;
         return;
     }
     int k = fn_801A2034(z->m204, 3);

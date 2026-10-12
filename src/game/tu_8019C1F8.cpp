@@ -221,12 +221,17 @@ Unk8019EF70::Unk8019EF70(Unk8019E3C0_Own* owner)
 //@8019EFC8
 void Unk8019EF70::v4()
 {
-    if (m18->m6F4 != 7 && m18->m6F4 != 9) {
+    switch (m18->m6F4) {
+    case 7:
+    case 9:
+        break;
+    default: {
         Unk8019E3C0_Own* c = m18;
         void* old = c->m6CC;
         fn_801A505C(c);
         if (m18->m6CC == old)
             fn_801A505C(m18);
+    }
     }
     if (m18->m6F4 != 9)
         fn_8017BB60(m18->m700);

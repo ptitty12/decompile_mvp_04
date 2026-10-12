@@ -17,9 +17,6 @@ int fn_8007FB98(Unk8007F198_C* s, int a, int b, int c);
 int fn_8007FDA8(Unk8007F198_C* s, int a, int b);
 int fn_8007FD2C(Unk8007F198_C* s, int a, int b, int c);
 void fn_80083E84(int t, int* a, int* b);
-extern "C" int fn_80555EB0(int k, int i);
-extern "C" int fn_80555F18(int k, int i);
-extern "C" int fn_80555E6C(int a);
 extern "C" int fn_8057CE00(int a);
 extern "C" void fn_8007A380__18Unk8007A4DC_Screen(Unk8007A4DC_Screen* s, int a);
 int fn_8007F674(Unk8007F198_A* self, int a, int x);
@@ -39,14 +36,96 @@ struct Db8055638C_Idx {
     int m8;
     int mC[7];
 };
-extern "C" void fn_8055638C(Db8055638C_Idx* self);
-extern "C" Db8055638C_Idx* fn_80556348(Db8055638C_Idx* self);
-extern "C" void fn_8055655C(Db8055638C_Idx* self, int* a, int* b);
 struct Db8055547C_S {
     int m0;
     int m4;
     void* m8;
 };
+
+extern "C" DB_OVERLAY int fn_8055645C(Db8055638C_Idx* self, int* out);
+
+extern float lbl_805FF59C;
+extern float lbl_805FF5A0;
+extern float lbl_805FF5A4;
+
+struct Db80556E0C_S {
+    char* m0;
+    char* m4;
+};
+
+extern char lbl_80622D44[];
+
+struct Db8055A360_S {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+};
+
+extern "C" void fn_80400CE4(int a);
+extern "C" void fn_805371C4(Unk805352B0_List* self, unsigned f);
+extern char lbl_8064A2A8[];
+void fn_8007F524(Unk8007F198_A* g, int a);
+
+int fn_8009047C(int a, int b);
+/* forward declarations (definitions are in address order) */
+extern "C" void fn_80555144();
+extern "C" void fn_80555270();
+extern "C" void fn_805552D4();
+extern "C" void fn_805553C0();
+extern "C" void fn_8055547C(Db8055547C_S* self);
+extern "C" int fn_805558C0(int self, int a, int b);
+extern "C" int fn_80555998(int a);
+extern "C" int fn_80555D88(int k, int n);
+extern "C" int fn_80555E6C(int a);
+extern "C" int fn_80555EB0(int k, int i);
+extern "C" int fn_80555F18(int k, int i);
+extern "C" int fn_805562B8(int a);
+extern "C" Db8055638C_Idx* fn_80556348(Db8055638C_Idx* self);
+extern "C" void fn_8055638C(Db8055638C_Idx* self);
+extern "C" int fn_805563C4(Db8055638C_Idx* self);
+extern "C" int fn_80556410(Db8055638C_Idx* self);
+extern "C" int fn_8055645C(Db8055638C_Idx* self, int* out);
+extern "C" int fn_805564DC(Db8055638C_Idx* self);
+extern "C" void fn_8055655C(Db8055638C_Idx* self, int* a, int* b);
+extern "C" void fn_8055669C(Db8055638C_Idx* self, int v);
+extern "C" char* fn_8055696C(char* base, int a, int mode, float f);
+extern "C" void fn_80556E0C(Db80556E0C_S* self, int chrg);
+extern "C" void fn_80556E78(Unk8007A4DC_Screen* sc, int x, int y, int z, int w);
+extern "C" void fn_8055A32C(int* self);
+extern "C" void fn_8055A338(void* self, int chrg);
+extern "C" void fn_8055A360(Db8055A360_S* self);
+
+/* near-miss: retail has two extra copies (li r9,0 / mr r30,r9 for the first counter, mr r3,r0 for the saturating counter) */
+extern "C" DB_OVERLAY void fn_80555144()
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    unsigned n = sc->fn_8007B1EC();
+    unsigned i = 0;
+    for (; i < n; i++) {
+        if ((unsigned char)i == 0)
+            fn_80400CE4(0);
+        int v = sc->fn_8007A8DC(0x19, i);
+        int r = 0;
+        if (v > 1)
+            r = v - 1;
+        sc->fn_8007A94C(0x19, i, r);
+    }
+    int g = fn_8007F7D0((Unk8007F198_B*)sc, 0);
+    Unk8006A138_It<9> it(0);
+    int k;
+    do {
+        int a = fn_8008FE14(0);
+        int b = fn_8008FD78(it.v);
+        int v = ((Unk8007B2B0_Screen*)sc)->fn_8007B380(a, g);
+        if (v != 0) {
+            int c = fn_8009047C(b, v);
+            if (c > 0)
+                fn_800905FC(b, v, c - 1);
+        }
+        k = it.Next();
+    } while (k <= 9);
+}
 
 extern "C" DB_OVERLAY void fn_80555270()
 {
@@ -55,6 +134,25 @@ extern "C" DB_OVERLAY void fn_80555270()
     unsigned n = sc->fn_8007B1EC();
     for (; i < n; i++)
         sc->fn_8007A94C(0x1A, i, 0);
+}
+
+extern "C" DB_OVERLAY void fn_805552D4()
+{
+    Unk80535650_Tmp t;
+    int buf[0x82];
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    fn_805371C4((Unk805352B0_List*)q, 0x71FFFFFF);
+    int n = q->m4;
+    int i;
+    for (i = 0; i < n; i++) {
+        fn_80400CE4(0);
+        fn_8007F524((Unk8007F198_A*)sc, t.At(i));
+    }
+    q->D();
 }
 
 extern "C" DB_OVERLAY void fn_805553C0()
@@ -180,8 +278,6 @@ extern "C" DB_OVERLAY int fn_80555F18(int k, int i)
     return 0;
 }
 
-extern "C" DB_OVERLAY int fn_8055645C(Db8055638C_Idx* self, int* out);
-
 extern "C" DB_OVERLAY int fn_805562B8(int a)
 {
     if (fn_8057CE00(0) == 3) {
@@ -296,10 +392,6 @@ extern "C" DB_OVERLAY void fn_8055669C(Db8055638C_Idx* self, int v)
     self->m8 = self->m8 + 1;
 }
 
-extern float lbl_805FF59C;
-extern float lbl_805FF5A0;
-extern float lbl_805FF5A4;
-
 extern "C" DB_OVERLAY char* fn_8055696C(char* base, int a, int mode, float f)
 {
     int k;
@@ -319,11 +411,6 @@ extern "C" DB_OVERLAY char* fn_8055696C(char* base, int a, int mode, float f)
     }
 }
 
-struct Db80556E0C_S {
-    char* m0;
-    char* m4;
-};
-
 extern "C" DB_OVERLAY void fn_80556E0C(Db80556E0C_S* self, int chrg)
 {
     if (self->m0) {
@@ -337,8 +424,6 @@ extern "C" DB_OVERLAY void fn_80556E0C(Db80556E0C_S* self, int chrg)
     if (chrg & 1)
         delete self;
 }
-
-extern char lbl_80622D44[];
 
 extern "C" DB_OVERLAY void fn_80556E78(Unk8007A4DC_Screen* sc, int x, int y, int z, int w)
 {
@@ -372,13 +457,6 @@ extern "C" DB_OVERLAY void fn_8055A338(void* self, int chrg)
     if (chrg & 1)
         delete (char*)self;
 }
-
-struct Db8055A360_S {
-    int m0;
-    int m4;
-    int m8;
-    int mC;
-};
 
 extern "C" DB_OVERLAY void fn_8055A360(Db8055A360_S* self)
 {

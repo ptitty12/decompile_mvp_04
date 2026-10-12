@@ -36,6 +36,13 @@ def main() -> None:
     unit, fn, extra = sys.argv[1], sys.argv[2], sys.argv[3:]
     m2c_py = os.environ.get("M2C_PY", DEFAULT_M2C_PY)
     asm = find_asm(unit, fn)
+    text = asm.read_text(errors="replace")
+    if ".feoverlay" in text or ".dboverlay" in text:
+        # m2c only reads code from .text: present the overlay section as .text.
+        import tempfile
+        tmp = Path(tempfile.gettempdir()) / f"m2c_{asm.stem}.s"
+        tmp.write_text(text.replace(".feoverlay", ".text").replace(".dboverlay", ".text"))
+        asm = tmp
     cmd = [m2c_py, "-I", "-m", "m2c.main", "--target", "ppc-gcc-c++", str(asm), "--function", fn, *extra]
     sys.exit(subprocess.call(cmd))
 

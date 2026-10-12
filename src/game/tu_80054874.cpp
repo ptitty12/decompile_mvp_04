@@ -1204,10 +1204,499 @@ void fn_80055D84(Unk80052794_Rec* r)
     }
 }
 
-/* parked, not started (785 instructions): fn_80055F18 takes the 0x48-byte Rec by value (24-byte
- * copy loop), calls fn_80055D84 on the copy, then runs the same 95-kind switch as fn_80055204
- * (root 0xF4, one compare per kind) to call per-kind handlers with the copy's payload words.
- * Use the fn_80055204 notes (own local per case, no shared labels for consecutive kinds). */
+/* Per-kind handler dispatch on a by-value copy of the record (kind r->m4, 95 kinds): the handlers take the
+ * record's payload words (m10..m38) as plain int arguments. Generated from the compare tree. */
+struct Unk80055F18_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    char pad3C[0x10];
+};
+
+void fn_80055F18(Unk80055F18_Rec* r)
+{
+    Unk80055F18_Rec c = *r;
+    fn_80055D84((Unk80052794_Rec*)&c);
+    switch (r->m4) {
+    case 0x5C:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016728(q->m4);
+        break;
+    }
+    case 0x115:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800167E8(q->m4);
+        break;
+    }
+    case 0x74:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016784(q->m4, q->m8);
+        break;
+    }
+    case 0x19A:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016844(q->m4, q->m8);
+        break;
+    }
+    case 0x19B:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800168A8(q->m4, q->m8);
+        break;
+    }
+    case 0x19C:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001690C(q->m4, q->m8);
+        break;
+    }
+    case 0x38:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016668(q->m4, q->m8);
+        break;
+    }
+    case 0x113:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015DFC(q->m4);
+        break;
+    }
+    case 0x112:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015E58(q->m4);
+        break;
+    }
+    case 0x114:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015FD0(q->m4, q->m8);
+        break;
+    }
+    case 0x10B:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800161E4(q->m4, q->m8, q->mC);
+        break;
+    }
+    case 0x10D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016250(q->m4);
+        break;
+    }
+    case 0x108:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800162AC(q->m4);
+        break;
+    }
+    case 0x10C:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016308(q->m4);
+        break;
+    }
+    case 0x77:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015D44(q->m4);
+        break;
+    }
+    case 0x107:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015DA0(q->m4);
+        break;
+    }
+    case 0x12A:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015EB4(q->m4);
+        break;
+    }
+    case 0x11B:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015F10(q->m4);
+        break;
+    }
+    case 0x10F:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016034(q->m4);
+        break;
+    }
+    case 0x10E:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80015F6C(q->m4, q->m8);
+        break;
+    }
+    case 0xED:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016E78(q->m4);
+        break;
+    }
+    case 0x1A7:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016E1C(q->m4);
+        break;
+    }
+    case 0x9D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016DC0(q->m4);
+        break;
+    }
+    case 0xB:
+        fn_8001A398();
+        break;
+    case 0xA:
+        fn_8001A050();
+        break;
+    case 0xD:
+        fn_8001A0A4();
+        break;
+    case 0xC:
+        fn_8001A14C();
+        break;
+    case 0xF:
+        fn_8001A0F8();
+        break;
+    case 0xE:
+        fn_8001A1A0();
+        break;
+    case 0x6:
+        fn_8001A29C();
+        break;
+    case 0x5:
+        fn_8001A248();
+        break;
+    case 0x8:
+        fn_8001A2F0();
+        break;
+    case 0x7:
+        fn_8001A344();
+        break;
+    case 0x11:
+        fn_80019400();
+        break;
+    case 0x12:
+        fn_80019454();
+        break;
+    case 0x149:
+        fn_800174EC();
+        break;
+    case 0xF4:
+        fn_80017540();
+        break;
+    case 0x119:
+        fn_80017340();
+        break;
+    case 0xF2:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80017904(q->m4, q->m8, q->mC, q->m10);
+        break;
+    }
+    case 0xE7:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80014A7C(q->m4, q->m8, q->mC, q->m10, q->m14, q->m18);
+        break;
+    }
+    case 0xE4:
+        fn_80014E80();
+        break;
+    case 0x1B3:
+        fn_80017298();
+        break;
+    case 0x1B4:
+        fn_80017244();
+        break;
+    case 0xF3:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800147D8(q->m4);
+        break;
+    }
+    case 0xE8:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001817C(q->m4, q->m8, q->mC, q->m10, q->m14);
+        break;
+    }
+    case 0xE9:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80018044(q->m4, q->m8, q->mC, q->m10, q->m14, q->m18, q->m1C);
+        break;
+    }
+    case 0xEA:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        ((void (*)(int, int, int, int, int, int, int, int, int, int, int))fn_800180D0)(q->m4, q->m8, q->mC, q->m10, q->m14, q->m18, q->m1C, q->m20, q->m24, q->m28, q->m2C);
+        break;
+    }
+    case 0x4B:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800145CC(q->m4);
+        break;
+    }
+    case 0xA8:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800179E4(q->m4, q->m8, q->mC);
+        break;
+    }
+    case 0x180:
+        fn_80017748();
+        break;
+    case 0x32:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80016ED4(q->m4);
+        break;
+    }
+    case 0x17D:
+        fn_800175F8();
+        break;
+    case 0x8D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013938(q->m4);
+        break;
+    }
+    case 0x150:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013C88(q->m4);
+        break;
+    }
+    case 0xC5:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013F1C(q->m4, q->m8);
+        break;
+    }
+    case 0xC6:
+        fn_800141D8();
+        break;
+    case 0xE5:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80017FC8(q->m4, q->m8, q->mC, q->m10, q->m14);
+        break;
+    }
+    case 0xE6:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80017F34(q->m4, q->m8, q->mC, q->m10, q->m14, q->m18, q->m1C, q->m20);
+        break;
+    }
+    case 0xB9:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013A84(q->m4, q->m8);
+        break;
+    }
+    case 0xFB:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80014030(q->m4, q->m8, q->mC, q->m10);
+        break;
+    }
+    case 0x181:
+        fn_80012CA0(1);
+        break;
+    case 0x18D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80010338(q->m4, q->m8, q->mC, q->m10, q->m14, q->m18);
+        break;
+    }
+    case 0x18E:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001022C(q->m4, q->m8);
+        break;
+    }
+    case 0x187:
+        fn_800142D4();
+        break;
+    case 0x182:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80011B14(q->m4, q->m8, q->mC);
+        break;
+    }
+    case 0x188:
+        fn_80012DF4();
+        break;
+    case 0x189:
+        fn_80012DA0();
+        break;
+    case 0x17E:
+        fn_80012FC8(2);
+        break;
+    case 0x179:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800193A4(q->m4);
+        break;
+    }
+    case 0x17F:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001531C(q->m4, q->m8, q->mC);
+        break;
+    }
+    case 0x178:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80014A20(q->m4);
+        break;
+    }
+    case 0x1C1:
+        fn_80018C10();
+        break;
+    case 0x186:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80012E48(q->m4, 2);
+        break;
+    }
+    case 0x185:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800111BC(q->m4);
+        break;
+    }
+    case 0x56:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013D48(q->m4, q->m8);
+        break;
+    }
+    case 0x59:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001502C(q->m4, q->m8);
+        break;
+    }
+    case 0x52:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80018C64(q->m4);
+        break;
+    }
+    case 0x57:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013EC0(q->m4);
+        break;
+    }
+    case 0x53:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80012118(q->m4, q->m8);
+        break;
+    }
+    case 0x5D:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80018BA4(q->m4, 2, q->m8);
+        break;
+    }
+    case 0xFA:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800133DC(q->m4, q->m8, q->mC, 1);
+        break;
+    }
+    case 0x3:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80010D58(q->m4, q->m8, q->mC);
+        break;
+    }
+    case 0x2:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80010DC4(q->m4, q->m8, q->mC, q->m10);
+        break;
+    }
+    case 0xF5:
+        fn_80010D04();
+        break;
+    case 0x41:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_800190A4(q->m4, q->m8);
+        break;
+    }
+    case 0x151:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80013B3C(q->m4, q->m8, q->mC, q->m10, q->m14);
+        break;
+    }
+    case 0x18F:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_80018A80(q->m4);
+        break;
+    }
+    case 0x9E:
+        fn_80011AC0();
+        break;
+    case 0xA0:
+        fn_80017444();
+        break;
+    case 0x9F:
+        fn_80017498();
+        break;
+    case 0x33:
+        fn_800176F4();
+        break;
+    case 0x116:
+    {
+        Unk80052794_Payload* q = (Unk80052794_Payload*)&c.mC;
+        fn_8001A594(q->m4);
+        break;
+    }
+    case 0xFD:
+        fn_8001A540();
+        break;
+    case 0x120:
+        fn_800153DC();
+        break;
+    case 0x11F:
+        fn_80015430();
+        break;
+    }
+}
 
 void fn_8005695C(void)
 {

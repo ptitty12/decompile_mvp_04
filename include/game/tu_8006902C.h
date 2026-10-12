@@ -167,6 +167,7 @@ struct Unk8006902C_Players {
     int GetC9() { return m1CC9; }
     int GetCA() { return m1CCA; }
     int GetCB() { return m1CCB; }
+    int GetD0() { return m1CD0; }
 };
 
 struct Unk8006902C_Handle {
@@ -176,6 +177,7 @@ struct Unk8006902C_Handle {
     int mC;
 };
 
+struct Unk8006902C_EvBase;
 struct Unk80069F0C {
     char pad0[8];
     void* m8;
@@ -209,6 +211,7 @@ struct Unk80069F0C {
     Unk8006902C_Side* SideAt(int off) { return (Unk8006902C_Side*)((char*)m14.m0 + off); }
     void fn_8006CFA4(Unk8006902C_EvCFA4* ev);
     void fn_8006EC94(unsigned char c, int k);
+    void fn_8006D410();
     void fn_8006D508();
     void fn_8006DD64(int a);
     void fn_8006DDF4();
@@ -228,6 +231,8 @@ struct Unk80069F0C {
     void fn_8006C17C(Unk8006902C_EvC17C* ev);
     void fn_8006A22C();
     int fn_8006A214();
+    void fn_8006A1F4();
+    void fn_8006A2C4(int kind, Unk8006902C_EvBase* ev);
     void fn_8006C02C();
     void fn_8006C064();
     void fn_8006C038(void* a);

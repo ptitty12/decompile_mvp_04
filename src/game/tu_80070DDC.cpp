@@ -314,16 +314,108 @@ unsigned fn_80071170(void* l, int k, unsigned c)
     return r;
 }
 
-/* near-miss: 7 slots; the two float registers (x / zero) come out swapped in the fcmpu/fdivs. */
+typedef float (W::*Unk80071260_Pmf)(int);
+extern Unk80071260_Pmf lbl_805B6420[];
+
+float fn_80071260(W* o, int i, int a)
+{
+    float r = (o->*(lbl_805B6420 + i)[0])(a);
+    return r;
+}
+
+void fn_800712F4(void* l, int k, unsigned c, int v)
+{
+    Unk80071604* a = (Unk80071604*)l;
+    if (c < a->m1C) {
+        switch ((unsigned)k) {
+        case 0: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0xFFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFFF;
+            }
+            r->f0 = v;
+            return;
+        }
+        case 1: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0x3FFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x3FFF;
+            }
+            r->f1 = v;
+            return;
+        }
+        case 2: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0x1FFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x1FFF;
+            }
+            r->f2 = v;
+            return;
+        }
+        case 3: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0x3FF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0x3FF;
+            }
+            r->f3 = v;
+            return;
+        }
+        case 4: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0xFFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFFF;
+            }
+            r->f4 = v;
+            return;
+        }
+        case 5: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            if (v <= 0xFFF) {
+                if (v < 0)
+                    v = 0;
+            } else {
+                v = 0xFFF;
+            }
+            r->f5 = v;
+            return;
+        }
+        case 6: {
+            Unk80071170_Rec* r = (Unk80071170_Rec*)(c * 16 + (unsigned)a->m24);
+            int t;
+            if (v <= 0x7FF) {
+                t = v;
+                if (t < 0)
+                    t = 0;
+            } else {
+                t = 0x7FF;
+            }
+            r->f6 = t;
+            return;
+        }
+        }
+    }
+}
+
 float fn_800714C4(W* w, int a)
 {
     float x = (float)w->v28(1, a);
     float y = (float)w->v28(2, a);
-    float r;
-    if (x != lbl_805B3C68)
-        r = y / x;
-    else
-        r = lbl_805B3C68;
+    float r = x != 0.0f ? y / x : 0.0f;
     return r;
 }
 
@@ -372,16 +464,17 @@ int fn_80071718(W* w, int x)
     return r;
 }
 
-/* near-miss: 12 slots; register allocation of the loop variables differs (retail:
- * this=r31, i=r30 copied from res=r28, off=r29, cnt=r27). */
+/* near-miss: 8 slots (was 12); i is declared as 'int i = 0' next to res so it is copied from
+ * res's zero (mr r30,r28) as in retail; remaining: store order of the a/b/id setup, the
+ * i++/off += 12 step order and the lwzx operand order. */
 int fn_80071784(W* w, int id)
 {
     int res = 0;
+    int i = 0;
     int off = 0;
     int a = -1;
     int cnt = w->m10->m4;
     int b = -1;
-    int i;
     for (i = 0; i < cnt; i++, off += 12) {
         fn_80377DBC(w->m10, &a, &b, i);
         if (a == id) {
@@ -697,12 +790,9 @@ int fn_80073610(void* self, int* out, int b)
     return r;
 }
 
-/* near-miss: 2 slots (li r5,127 / addi r3 order in the memset call setup). */
 unsigned fn_8007366C(const char* a, const char* b)
 {
-    char buf[0x80];
-    buf[0] = lbl_805B3CDC[0];
-    fn_8040B320(buf + 1, 0, 0x7F);
+    char buf[0x80] = "";
     fn_8040B61C(buf, b);
     fn_8040B448(buf, lbl_805B3CE0);
     fn_8040B448(buf, a);
@@ -714,8 +804,8 @@ unsigned fn_800736EC(const char* s)
     return fn_80071ED4(s, 0);
 }
 
-/* near-miss: 12 slots; retail keeps buf[1] in the frame (lwz 12(r1)) where we keep it in a
- * register, and uses one more callee-saved register for the out pointer. */
+/* Three-word out record of fn_8008395C (only the first two words are read here). */
+struct Unk73710_Out { unsigned a; unsigned b; unsigned c; };
 int Unk8007A4DC_Screen::fn_80073710(int a, int x, int i)
 {
     if (i <= 1) {
@@ -724,17 +814,17 @@ int Unk8007A4DC_Screen::fn_80073710(int a, int x, int i)
     }
     Unk8007A4DC_Obj1E8* o = m1E8;
     int p = fn_80080198();
-    unsigned sp8, spC;
-    fn_8008395C(o, x, p, fn_800849C0(i), &sp8);
+    Unk73710_Out sp;
+    fn_8008395C(o, x, p, fn_800849C0(i), &sp.a);
     switch (a) {
     case 0:
-        return (unsigned char)(sp8 >> 14);
+        return (unsigned char)(sp.a >> 14);
     case 1:
-        return (sp8 >> 7) & 0x7F;
+        return (sp.a >> 7) & 0x7F;
     case 2:
-        return sp8 & 0x7F;
+        return sp.a & 0x7F;
     case 3:
-        return (unsigned char)(spC >> 7);
+        return (unsigned char)(sp.b >> 7);
     default:
         return 0;
     }

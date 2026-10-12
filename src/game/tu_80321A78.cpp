@@ -29,7 +29,48 @@ extern const char lbl_805E8A24[];
 extern const char lbl_805E8A38[];
 extern const void* const lbl_80665248[];
 extern const void* const lbl_80665558[];
-extern const float lbl_806E10E4[];
+extern float lbl_806E10E4[];
+
+/* Layouts seen through fn_80321AC4 (the first argument of fn_801A04A8 is the state owner, Unk8019F8C0_Owner). */
+struct Unk8019F8C0_Owner;
+struct Unk80321AC4_R { char pad0[0x3D90]; int m3D90; };
+struct Unk80321AC4_S { char pad0[0x40]; Unk80321AC4_R* m40; int m44; };
+struct Unk80321AC4_X { char pad0[0x14]; int m14; };
+struct Unk80321AC4_Y { char pad0[0x20]; int m20; };
+struct Unk80321AC4_V { float x; float y; float z; };
+struct Unk80321AC4_P { char pad0[0x60]; Unk80321AC4_V m60; };
+struct Unk80321AC4_Ctx {
+    char pad0[0x564];
+    Unk80321AC4_X* m564;
+    char pad568[0x6CC - 0x568];
+    Unk80321AC4_P* m6CC;
+    char pad6D0[0x6F4 - 0x6D0];
+    int m6F4;
+    char pad6F8[0x744 - 0x6F8];
+    Unk80321AC4_Y* m744;
+    char pad748[0x780 - 0x748];
+    int m780;
+    int m784;
+};
+Unk80321AC4_S* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
+extern int lbl_806201C8;
+struct Unk80321BD4_D { int m0; int m4; };
+class Unk80321BD4_V : public Unk80321BD4_D {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual int s10();
+};
+struct Unk80321BD4_O { char pad0[0x3C]; Unk80321BD4_V* m3C; };
+extern int lbl_806201BC;
+extern int lbl_806201C0;
 
 extern "C" {
 void fn_8033E958(const char* fmt, ...);
@@ -119,6 +160,60 @@ void fn_80321A78(int unused, int a, int b, int c, int d, int e, int f, int g) {
     lbl_80620288 = g;
 }
 
+extern "C" void fn_80321AC4(int unused, Unk80321AC4_Ctx* ctx) {
+    lbl_806201C8 = 0;
+    if (ctx->m6F4 != 1) {
+        Unk80321AC4_S* s = fn_801A04A8((Unk8019F8C0_Owner*)ctx, 1);
+        if (ctx->m564->m14 != 4 && ctx->m744->m20 == 0 && s->m44 == 0) {
+            int busy = 0;
+            if (ctx->m780 != 0 || ctx->m784 != 0) busy = 1;
+            if (busy == 0 && s->m40->m3D90 == 0) {
+                Unk80321AC4_P* p = ctx->m6CC;
+                if (p != 0) {
+                    Unk80321AC4_V v = p->m60;
+                    if (!(v.x >= 600.0f) && !(v.z >= 600.0f)) lbl_806201C8 = 1;
+                }
+            }
+        }
+    }
+}
+
+extern "C" void fn_80321BD4(int arg0, Unk80321BD4_O* o, int kind, int f1, int f2, int f3) {
+    if (o != 0) {
+        Unk80321BD4_V* v = o->m3C;
+        if (v != 0) {
+            int x = lbl_806201C0;
+            switch (kind) {
+            case 0:
+                fn_80321A78(arg0, 0, 0, 1, 1, 1, 0, 0);
+                break;
+            case 1:
+                if (f1 != 0) {
+                    int r = v->s10();
+                    lbl_806201BC = 0;
+                    fn_80321A78(arg0, 0, 0, r, r, r ^ 1, 0, 1);
+                } else if (f2 != 0) {
+                    lbl_806201BC = kind;
+                    fn_80321A78(arg0, 0, 1, 0, 0, 1, 0, 1);
+                } else if (f3 != 0) {
+                    fn_80321A78(arg0, 0, x ^ 1, x, 0, 1, 1, 1);
+                } else {
+                    fn_80321A78(arg0, 1, x ^ 1, x, 0, 1, 1, x ^ 1);
+                }
+                break;
+            case 5:
+                fn_80321A78(arg0, 1, 1, 0, 0, 1, 0, 1);
+                break;
+            case 2:
+            case 3:
+            case 4:
+                fn_80321A78(arg0, 0, 0, 1, 1, 0, 0, 0);
+                break;
+            }
+        }
+    }
+}
+
 // fn_803220E0
 FxU::FxU() : m0(-1), m4(-1) {
 }
@@ -162,7 +257,6 @@ int fn_80322290(FxU* self) {
     return self->m0;
 }
 
-/* near-miss: retail keeps (base + 1) separate; g++ reassociates it */
 int fn_8032234C(FxU* self) {
     int v = self->m4;
     if (v == -1) {
@@ -170,7 +264,9 @@ int fn_8032234C(FxU* self) {
         int r;
         if (fn_80322434(self) - fn_8032242C(self) + 1 > 0) {
             int rnd = fn_8040ABA0();
-            r = base + 1 + rnd % (fn_80322434(self) - fn_8032242C(self) + 1);
+            int rem = rnd % (fn_80322434(self) - fn_8032242C(self) + 1);
+            int b1 = base + 1;
+            r = b1 + rem;
         } else {
             r = base + 1;
         }
@@ -218,16 +314,18 @@ int fn_80323830() { return lbl_8062014C; }
 
 int fn_8032383C() { return 0xE33E6A08; }
 
-/* near-miss: retail has a frame and a call (17 insns); this leaf version is shorter and only approximates the control flow */
+/* The recursive call goes through an inline wrapper: a direct `return f(...)` is turned into a jump by g++'s
+   tail-recursion pass, retail keeps the call and the frame. */
+inline float Rec80323848(FxV* v) { return fn_80323848(v); }
 float fn_80323848(FxV* self) {
-    if (self->m44 == 0 && self->m48 != 0) return fn_80323848(self->m48);
-    return self->m4C;
+    if (self->m44 != 0 || self->m48 == 0) return self->m4C;
+    return Rec80323848(self->m48);
 }
 
-/* near-miss: same as the neighbouring function */
+inline float Rec8032388C(FxV* v) { return fn_8032388C(v); }
 float fn_8032388C(FxV* self) {
-    if (self->m44 == 0 && self->m48 != 0) return fn_8032388C(self->m48);
-    return self->m50;
+    if (self->m44 != 0 || self->m48 == 0) return self->m50;
+    return Rec8032388C(self->m48);
 }
 
 void fn_803238D0(FxX* self, float a, float b) { fn_803E1DB0(self->m8, a, b); }
@@ -283,7 +381,6 @@ const char* fn_80323AA8() { return lbl_805E8A38; }
 
 int fn_80323AB4() { return 0x77F3B9AB; }
 
-/* near-miss: retail loads before the index increment */
 float fn_80323AC0(void* unused, int* idx) {
     return lbl_806E10E4[(*idx)++ & 0x3FF];
 }

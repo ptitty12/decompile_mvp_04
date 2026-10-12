@@ -79,10 +79,7 @@ void fn_8025480C(A* self, int a)
 
 void fn_802548BC(A* self, int a)
 {
-    if (a != 0)
-        fn_8035E318(self);
-    else
-        fn_8014E374(self->m38);
+    fn_8014E374(a != 0 ? fn_8035E318(self) : self->m38);
 }
 
 int fn_802548F0(A* self)

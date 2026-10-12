@@ -591,6 +591,61 @@ void fn_802D5970(Unk802D58E8* o)
     }
 }
 
+struct Unk802D5A64_V {
+    char pad0[0x14];
+    int m14;
+    char pad18[4];
+    int m1C;
+    int m20;
+    float m24;
+    int m28;
+    char pad2C[4];
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+    Unk802CF484 m44;
+    char pad60[0x148 - 0x60];
+    int m148;
+};
+
+extern "C" void fn_802D5A64(Unk802D5618* o, int a, int b, int c, void* v, int d, float f0, float f1, float f2, float f3, float f4, float f5);
+
+void fn_802D59C0(void* o, int a, int b)
+{
+    if (a != 0 && *(int*)((char*)o + 0x14) == 0)
+        fn_802D5970((Unk802D58E8*)o);
+    Unk802CF484 v;
+    fn_802D5A64((Unk802D5618*)o, 0, 0, 0, &v, 1, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+    *(int*)((char*)o + 0x14) = a;
+    if (a != 0)
+        *(int*)((char*)o + 0x1C) = b;
+}
+
+/* near-miss (99.4%, 6 slots): retail reloads the m24 float last (f0 after f13..f9); ours loads it first */
+extern "C" void fn_802D5A64(Unk802D5618* o, int a, int b, int c, void* v, int d, float f0, float f1, float f2, float f3, float f4, float f5)
+{
+    Unk802D5A64_V* s = (Unk802D5A64_V*)o;
+    s->m44 = *(Unk802CF484*)v;
+    if (a != 0) {
+        if (s->m14 == 0)
+            fn_802D5970((Unk802D58E8*)o);
+        if (d != 0 && s->m28 == 0)
+            s->m148 = 1;
+    }
+    s->m24 = f0;
+    s->m30 = f1;
+    s->m34 = f2;
+    s->m38 = f3;
+    s->m3C = f4;
+    s->m40 = f5;
+    s->m1C = b;
+    s->m20 = c;
+    s->m14 = a;
+    s->m28 = a;
+}
+
 void fn_802D5B64(Unk802D58E8* o, int k)
 {
     o->m18 = 1;
@@ -738,6 +793,59 @@ void fn_802D6008(Unk802D58E8* o, int k, int a, int b)
 void fn_802D61AC(Unk802D58E8* o, int k, int a)
 {
     fn_802D6008(o, k, fn_801A4B34(o->m60)->m390, a);
+}
+
+struct Unk802D61F8_S {
+    char pad0[8];
+    const void* m8;
+    int mC;
+    int m10;
+    char pad14[0x44 - 0x14];
+    Unk802CF484 m44;
+    char pad60[4];
+    void* m64;
+    int m68;
+    int m6C;
+    int m70;
+    int m74;
+    void* m78;
+    char pad7C[0x160 - 0x7C];
+    void* m160;
+};
+struct Unk802D61F8_C {
+    char pad0[0xC];
+    void* mC;
+};
+extern const void* lbl_80664430[];
+extern const char lbl_805E3FF4[];
+extern const void* lbl_806643D0[];
+void fn_803785E4(void* p);
+void* fn_802CB924(void* mem, int a);
+void fn_802D6300();
+void* operator new(unsigned int n, int heap);
+inline void* operator new(unsigned int, void* p) { return p; }
+
+extern "C" void* fn_802D61F8(void* mem, int a, void* owner)
+{
+    Unk802D61F8_S* self = (Unk802D61F8_S*)mem;
+    Unk802D61F8_C* c = (Unk802D61F8_C*)owner;
+    fn_803785E4(self);
+    self->m8 = lbl_80664430;
+    new (&self->m44) Unk802CF484;
+    self->m8 = lbl_806643D0;
+    self->m160 = fn_802CF168((void*)lbl_805E3FF4);
+    self->m64 = c;
+    self->m68 = 0;
+    self->m74 = 0;
+    self->m6C = 0;
+    self->m70 = 0;
+    void* r = fn_802CB924(operator new(0x1E0, 0), a);
+    self->m78 = r;
+    c->mC = r;
+    ((void (*)(void*))fn_802D6300)(self);
+    self->mC = 0;
+    self->m10 = 0;
+    return self;
 }
 
 void fn_802D62A8(Unk802D62A8* p, int c)

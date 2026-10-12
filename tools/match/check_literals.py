@@ -144,7 +144,7 @@ def main():
                     if sym[0] not in addr_of:
                         # A C++ declaration of a placeholder (fn_<addr>__Fi...)
                         # names its address in the mangled name.
-                        pm = re.match(r"^fn_([0-9A-Fa-f]{8})__", sym[0])
+                        pm = re.match(r"^fn_([0-9A-Fa-f]{8})(?:__|$)", sym[0])
                         if pm:
                             addr_of[sym[0]] = int(pm.group(1), 16)
                     if sym[0] not in addr_of:

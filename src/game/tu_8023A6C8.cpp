@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8023A6C8.h"
+#include "game/goals/tu_8027A84C.h"
 
 extern const int lbl_805D9E50[];
 
@@ -89,6 +90,101 @@ void Unk802362A8_Cpu::fn_8023A7F4()
                 m2DC->m38.fn_80230BBC(*(int*)((char*)o + 0x708));
         }
     }
+}
+
+struct Unk8023A888_O {
+    char pad0[0x14];
+    int m14;
+    char pad18[8];
+    float m20;
+    float m24;
+    int m28;
+};
+extern int lbl_8061D150[];
+inline float Unk8023A888_Dot(Unk8023A888_O* o, float x, float y)
+{
+    return o->m20 * x + o->m24 * y;
+}
+extern int lbl_8061D150[];
+inline float Unk8023A888_Dot(Unk8022FE34_Ent* o, float x, float y)
+{
+    return o->m20 * x + o->m24 * y;
+}
+extern "C" float fn_8023A888(Unk8022FE34_Ent* o)
+{
+    float tbl[4] = { 0.0f, 0.2f, 0.3f, 0.4f };
+    float a = tbl[o->m28];
+    float c = 1.0f - a;
+    float b = 0.0f;
+    if (o->m14 <= 1) {
+        int v = lbl_8061D150[o->m14];
+        int t = 0;
+        if (v > 5)
+            t = v - 5;
+        b = (float)t * 0.028571429f;
+    }
+    float x = (c + (a - a * b)) >? 0.01f;
+    float y = a * b;
+    return o->m20 * x + o->m24 * y;
+}
+
+extern const char lbl_805D7978[];
+/* near-miss (99.9%, 2 slots): retail scales the table index in place (slwi r30,r30,2 / lwzx r30,r9,r30), ours
+   uses r0 for the scaled index; tried s*=4, s<<=2, char* base + byte offset, separate switch variable */
+void Unk802362A8_Cpu::fn_8023A9A0(int* out)
+{
+    static const int t0[3] = { 0x50, 0, 0x65 };
+    static const int t1[3] = { 0x50, 0x57, 0x65 };
+    static const int t2[3] = { 0x4B, 0x57, 0x65 };
+    static const int t3[3] = { 0x46, 0x55, 0x65 };
+    int v = *(int*)((char*)m2E4->m6F8->m14 + 0x1CD0);
+    int f = 0;
+    if (v != 0)
+        f = 1;
+    int a = f ^ 1;
+    int s = 0;
+    if (v != 0)
+        s = 1;
+    int r = ((Unk8014D8AC*)m2E4->m554)->fn_8014D8AC(100, lbl_805D7978, 0x8DA);
+    const int* t = t0;
+    int* tb = (int*)(m2E4->m6F8->m10 + 0x14);
+    s = tb[s];
+    switch (s) {
+    case 0:
+        break;
+    case 1:
+        t = t1;
+        break;
+    case 2:
+        t = t2;
+        break;
+    case 3:
+        t = t3;
+        break;
+    }
+    int k = 0;
+    for (k = 0; k < 3; k++) {
+        if (r < t[k])
+            break;
+    }
+    Unk8022FE34_Ent e;
+    m2DC->m38.fn_8023003C(a, k, &e, 1);
+    *out = e.m0;
+}
+
+inline float Unk8023AAD0_Rand(Unk8014D8AC_Ctx* c, float scale, const char* file, int line)
+{
+    return (float)(unsigned)((Unk8014D8AC*)c->m554)->fn_8014D8AC(1000000, file, line) * scale * 1e-6f;
+}
+int Unk802362A8_Cpu::fn_8023AAD0(float* out)
+{
+    const float one = 0.5f;
+    out[0] = Unk8023AAD0_Rand((Unk8014D8AC_Ctx*)m2E4, one, lbl_805D7978, 0x93B) - 0.25f;
+    out[0] = !(out[0] > 1.0f) ? (out[0] >? -1.0f) : 1.0f;
+    out[1] = Unk8023AAD0_Rand((Unk8014D8AC_Ctx*)m2E4, 0.5f, lbl_805D7978, 0x93E) - 0.25f;
+    out[1] = !(out[1] > 1.0f) ? (out[1] >? -1.0f) : 1.0f;
+    m0 = 1;
+    return 1;
 }
 
 int fn_8023BD44()
@@ -340,6 +436,66 @@ Unk8023C744::Unk8023C744()
 
 /* near-miss: result accumulator shape. Retail puts li r3,15 out of line after the main path and shares li r3,0 with
    the else-branch clamp; our all-return and result-variable forms (9 variants) put the li before the branch */
+struct Unk8023C514_R {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk8023C514_C {
+    char pad0[0x6F8];
+    Unk8023C514_R* m6F8;
+};
+struct Unk8023C514_O {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    char* m10;
+    char* m14;
+    char* m18;
+    char* m1C;
+};
+extern char lbl_8061D228[];
+extern char lbl_8061D264[];
+int fn_8009E1D4(void* p, int a, int b);
+int fn_80084114(int a);
+void fn_8023C514(Unk8023C514_O* o, Unk8023C514_C* c)
+{
+    o->m10 = lbl_8061D228;
+    o->m14 = lbl_8061D264;
+    o->m18 = lbl_8061D264;
+    o->m1C = lbl_8061D264;
+    char* r = c->m6F8->m14;
+    int a = fn_8009E1D4(r + 0x8C, 0, 0);
+    int b = fn_8009E1D4(r + 0xEF0, 0, 0);
+    if (a == 10)
+        a = 0;
+    if (b == 10)
+        b = 0;
+    int x = fn_80084114(a);
+    int y = fn_80084114(b);
+    int cx;
+    if (x <= 3) {
+        if (x >= 0)
+            cx = x;
+        else
+            cx = 0;
+    } else
+        cx = 3;
+    int cy;
+    if (y <= 3) {
+        if (y >= 0)
+            cy = y;
+        else
+            cy = 0;
+    } else
+        cy = 3;
+    int m = cx;
+    if (m > cy)
+        m = cy;
+    o->mC = m;
+    o->m8 = (unsigned)(m - 1) <= 2;
+}
+
 int Unk8023C744::fn_8023C620(int i, int d)
 {
     int v = ((int*)fn_8023C730())[i];
@@ -440,4 +596,99 @@ int* fn_8023CB38()
 int* fn_8023CB44()
 {
     return &lbl_8068CCFC;
+}
+
+void fn_8023CD70(void* p);
+
+class Unk8023DB44_Q {
+public:
+    char pad0[0x18];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+};
+
+struct Unk8023D9C4_N {
+    Unk8023D9C4_N* m0;
+    Unk8023D9C4_N* m4;
+    char pad8[4];
+    int mC;
+};
+extern char* lbl_8061D378;
+extern Unk8023D9C4_N* lbl_8061D37C;
+extern "C" void* fn_803774A8(unsigned int size, int heap);
+inline void* operator new(unsigned int, void* p) { return p; }
+
+void fn_8023D9C4()
+{
+    char** q = &lbl_8061D378;
+    if (lbl_8061D378 == 0) {
+        char* arr = (char*)fn_803774A8(0x102C8, 0) + 8;
+        *(int*)(arr - 8) = 0x50;
+        int k = 0x4F;
+        char* e = arr;
+        do {
+            new (e) Unk8027C654;
+            e += 0x33C;
+        } while (k-- != 0);
+        *q = arr;
+        ((Unk8023D9C4_N*)lbl_8061D378)->m4 = 0;
+        int off = 0;
+        int i = 0x4F;
+        char* base;
+        do {
+            base = lbl_8061D378;
+            Unk8023D9C4_N* g = (Unk8023D9C4_N*)(off + (int)base);
+            Unk8023D9C4_N* nx = (Unk8023D9C4_N*)((char*)g + 0x33C);
+            *(Unk8023D9C4_N**)(off + (int)base) = nx;
+            nx->m4 = g;
+            off += 0x33C;
+            g->mC = 0;
+        } while (--i != 0);
+        *(Unk8023D9C4_N**)(base + 0xFF84) = 0;
+        lbl_8061D37C = (Unk8023D9C4_N*)base;
+    }
+}
+
+struct Unk8023DA90_O {
+    int m0;
+    char pad4[0x8C - 4];
+    float m8C;
+    float m90;
+    float m94;
+    char pad98[0x390 - 0x98];
+    unsigned m390;
+    char pad394[0xAB4 - 0x394];
+    float mAB4;
+};
+extern float lbl_8061D5F8;
+inline void Unk8023DA90_Set(Unk8023DA90_O* d, float a, float b, float c)
+{
+    d->m8C = a;
+    d->m90 = b;
+    d->m94 = c;
+}
+void fn_8023DA90(Unk8023DA90_O* o, float f)
+{
+    o->m390 = (int)f;
+    fn_8023CAFC();
+    o->m0 = 0;
+    o->mAB4 = (float)o->m390 / (lbl_8061D5F8 * 12.0f);
+    Unk8023DA90_Set(o, o->mAB4, o->mAB4, o->mAB4);
+}
+
+void fn_8023DB44(void* p)
+{
+    fn_8023CD70(p);
+    ((Unk8023DB44_Q*)((char*)p + 0xA0))->v13();
 }

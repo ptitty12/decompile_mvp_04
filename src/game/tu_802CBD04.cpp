@@ -40,6 +40,23 @@ void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
 void fn_802CC748(int e, int a, int b, Unk802CBD04_Vec3* v);
 extern "C" void* fn_8037CF5C(Unk8037C7FC* c, unsigned int hash, void* obj);
 
+class Unk802CBD04_Iface : public Unk802CC53C_Target {
+public:
+    virtual void s17(float f, int a, Unk802CBD04* o, int b, int c);
+};
+
+extern "C" void fn_802CBD04(Unk802CBD04* o, int x)
+{
+    Unk802CBD04_Iface* t = (Unk802CBD04_Iface*)o->mA0;
+    if (t != 0) {
+        if (o->mE0 != 0 || o->mDC != 0 || *(int*)((char*)t + 0x18) == 0) {
+            t->s17(0.016666668f, x, o, o->mDC, o->mE0);
+        }
+        o->mDC = 0;
+        o->mE0 = 0;
+    }
+}
+
 float fn_802CBD90(Unk802CBD04* o)
 {
     return (o->mA4 / (1.0f - o->mA8)) * o->mAC;
@@ -330,6 +347,90 @@ struct Unk802CF894_Self {
     float m90;
     float m94;
 };
+
+/* near-miss (3 slots): retail stores m78 first, then m34, with m74 late; ours hoists m74 above m78 and moves m34 after m38's group */
+inline void* operator new(unsigned int, void* p) { return p; }
+
+struct Unk802CF7A8_F {
+    float m0;
+    float m4;
+    float m8;
+    int mC;
+    float m10;
+    int m14;
+    float m18;
+    float m1C;
+    int m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    int m34;
+    int m38;
+    int m3C;
+    char pad40[0xc];
+    int m4C;
+    int m50;
+    float m54;
+    int m58;
+    float m5C;
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    int m70;
+    float m74;
+    float m78;
+    float m7C;
+    float m80;
+    int m84;
+    int m88;
+    int m8C;
+    float m90;
+    float m94;
+};
+
+void* fn_802CF7A8(void* o)
+{
+    Unk802CF7A8_F* f = (Unk802CF7A8_F*)o;
+    new ((char*)o + 0x98) Unk802CF484;
+    f->m78 = 0.0f;
+    f->m18 = 1.0f;
+    f->m1C = 88.0f;
+    f->m38 = 0;
+    f->m4C = 0;
+    f->m50 = 0;
+    f->m54 = 0.0f;
+    f->m0 = 0.0f;
+    f->m4 = 0.0f;
+    f->m8 = 0.0f;
+    f->m10 = 0.0f;
+    f->m14 = 0;
+    f->m28 = 0.0f;
+    f->m2C = 0.0f;
+    f->m24 = 0.0f;
+    f->m30 = 0.0f;
+    f->m3C = 0;
+    f->mC = 0;
+    f->m20 = 0;
+    f->m58 = 0;
+    f->m5C = 0.0f;
+    f->m60 = 0.0f;
+    f->m64 = 0.0f;
+    f->m68 = 0.5f;
+    f->m6C = 0;
+    f->m70 = 0;
+    f->m34 = 0;
+    f->m74 = 0.0f;
+    f->m7C = 20.0f;
+    f->m80 = 20.0f;
+    f->m84 = 0;
+    f->m88 = 0;
+    f->m8C = 0;
+    f->m90 = 0.5f;
+    f->m94 = 0.5f;
+    return o;
+}
 
 void fn_802CF894(Unk802CF894_Self* s, Unk802CF894_Reg* r)
 {
