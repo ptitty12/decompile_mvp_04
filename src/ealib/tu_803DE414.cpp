@@ -48,6 +48,44 @@ struct Unk803DE414Obj {
     int m34;
 };
 
+/* Screen-size source: three data words, then the vptr at +0xC; slot 3 returns width and height. */
+struct Unk803E0690SrcData {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Unk803E0690Src : Unk803E0690SrcData {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3(float* w, float* h);
+};
+struct Unk803E0690Obj {
+    char pad0[0x14];
+    Unk803E0690Src* m14;
+};
+int fn_803D81FC();
+int fn_803D817C();
+
+struct Unk803E032CSub {
+    char pad0[0x14];
+    Unk803E0690Src* m14;
+};
+struct Unk803E032CObj {
+    char pad0[0x68];
+    int m68;
+    int m6C;
+    int m70;
+};
+extern int lbl_80627A80;
+void fn_803D81B4(int unused, int v);
+extern "C" {
+int fn_803E0898(Unk803DE414Light* self);
+void GXInvalidateVtxCache(void);
+void GXInvalidateTexAll(void);
+void fn_8042FF38(int fmt, int z);
+void fn_8043000C(int dither);
+}
+
 extern "C" {
 void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out);
 void fn_803FFA60(void* dst, const void* src, int n);
@@ -340,6 +378,25 @@ extern "C" void fn_803DFF50(Mtx4* dst, Mtx4* other)
     fn_803E02E4(dst, &c);
 }
 
+struct Unk803DFFE0Vec3 {
+    float x, y, z;
+};
+
+extern "C" void fn_803DFFE0(Mtx4* m, Unk803DFFE0Vec3* in, Unk803DFFE0Vec3* out)
+{
+    if (in != out) {
+        out->x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8];
+        out->y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9];
+        out->z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10];
+    } else {
+        Unk803DFFE0Vec3 t;
+        t.x = in->x * m->m[0] + in->y * m->m[4] + in->z * m->m[8];
+        t.y = in->x * m->m[1] + in->y * m->m[5] + in->z * m->m[9];
+        t.z = in->x * m->m[2] + in->y * m->m[6] + in->z * m->m[10];
+        *in = t;
+    }
+}
+
 /* near-miss (2 instructions longer): quaternion plus translation to matrix; ours needs a second
    callee-saved float register. */
 extern "C" void fn_803E01F4(Mtx4* out, float x, float y, float z, float w, float tx, float ty, float tz)
@@ -386,6 +443,39 @@ extern "C" void fn_803E02E4(Mtx4* dst, Mtx4* other)
     fn_803FFA60(dst, &t, 0x40);
 }
 
+extern "C" void fn_803E032C(Unk803E032CObj* self)
+{
+    Unk803E032CSub* sub = (Unk803E032CSub*)((char*)self + 0x3C);
+    float w = 640.0f;
+    float h = 480.0f;
+    float w2;
+    float h2;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&w, &h);
+    sub->m14->v3(&w2, &h2);
+    fn_803D81B4(fn_803D81FC() + 4, (int)self);
+    GXInvalidateVtxCache();
+    GXInvalidateTexAll();
+    lbl_80627A80 = self->m68;
+    lbl_80627A84 = self->m6C;
+    fn_803DB4CC();
+    int r = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
+    if (r != lbl_80627324) {
+        if (r != 0)
+            fn_8042FF38(1, 0);
+        else
+            fn_8042FF38(0, 0);
+    }
+    if (r != 0) {
+        int d = 0;
+        if (self->m70 != 0)
+            d = 1;
+        fn_8043000C(d);
+    }
+}
+
 extern "C" void fn_803E0658(int a, int b)
 {
     if (b == 0xFFFF && a != 0) {
@@ -393,6 +483,23 @@ extern "C" void fn_803E0658(int a, int b)
         lbl_8062C270[1] = 4;
         lbl_8062C270[2] = 1;
     }
+}
+
+extern "C" float fn_803E0690(Unk803E0690Obj* self)
+{
+    float w = 640.0f;
+    float h = 480.0f;
+    float w2;
+    float h2;
+    fn_803D81FC();
+    Unk803E0690Src* p = (Unk803E0690Src*)fn_803D817C();
+    if (p)
+        p->v3(&w, &h);
+    self->m14->v3(&w2, &h2);
+    float r = w;
+    if (!(w + w2 <= 640.0f))
+        r = 0.0f;
+    return r;
 }
 
 extern "C" void fn_803E074C(Unk803DE414Tex* self, float* w, float* h)
@@ -464,9 +571,8 @@ extern "C" void fn_803E0950()
 }
 
 /*
- * Not attempted: fn_803DE414 (quaternion to matrix through a 3x3 temporary, 66 instructions),
- * fn_803DE51C (matrix to quaternion, 173), fn_803DE7D0 (348), fn_803DED40 (79), fn_803DEE7C (107),
- * fn_803DF028 (94), fn_803DF1A0 (209, the 4x4 multiply), fn_803DF4E4 (98), fn_803DF824 (105),
- * fn_803DFFE0 (67), fn_803E00EC (66), fn_803E032C (75), fn_803E0458 (128), fn_803E0690 (47).
- * The original code stays linked for these.
+ * Not matched yet: fn_803DE414 (quaternion to 3x3 temporary to matrix, stack slot and loads right, float
+ * schedule 49 slots off), fn_803E00EC (scaled quaternion to matrix, needs a fourth saved float register),
+ * fn_803DE51C, fn_803DE7D0, fn_803DED40, fn_803DEE7C, fn_803DF028, fn_803DF1A0, fn_803DF4E4, fn_803DF824,
+ * fn_803E0458. The original code stays linked for these.
  */
