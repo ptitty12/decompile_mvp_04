@@ -81,7 +81,24 @@ inline Vec4f8014DAFC Copy8014DF5C(const Vec4f8014DAFC* p) { return *p; }
 
 struct PackBits8014E01C { unsigned a : 8; unsigned b : 8; unsigned c : 8; unsigned d : 8; };
 union Pack8014E01C { PackBits8014E01C p; unsigned u; };
+struct Ctx8014ECA8 {
+    int r[32];
+    int cr;
+    int lr;
+    char pad88[0x198 - 0x88];
+    int srr0;
+    int srr1;
+};
+struct Frame8014EF0C { Frame8014EF0C* next; int lr; };
+struct Unk8014E15C_Y { char pad0[0x14]; void* m14; };
+struct Unk8014E15C_Ctx { char pad0[0x6F4]; int m6F4; Unk8014E15C_Y* m6F8; };
+struct Unk8014E15C_Obj { Unk8014E15C_Ctx* m0; int m4; int m8; int* mC; int* m10; int* m14; };
+extern "C" int fn_80081B60__FP13Unk8007FF8C_Y(void* y);
 extern "C" {
+int sprintf(char* buf, const char* fmt, ...);
+void fn_8014F4B4(int a, char* s);
+void fn_8014F738(int a);
+void OSReport(const char* msg, ...);
 void fn_80422EE4(void* blk, void* buf, int len, int off, void* cb, int prio);
 int fn_80425064(void* blk);
 void fn_80437A10();
@@ -158,7 +175,7 @@ unsigned fn_8014DDAC();
 extern Unk2C lbl_8061BAD4[];
 extern char lbl_8061B9CC[];
 extern char lbl_8061BA7C[];
-void fn_8014E15C(Unk8014E09C_Obj*, int, int);
+void fn_8014E15C(Unk8014E15C_Obj*);
 void fn_803579D4(void*);
 extern V3i lbl_805C5F54[];
 extern V3i lbl_805C5F78;
@@ -360,7 +377,7 @@ Unk8014E09C_Obj* fn_8014E09C(Unk8014E09C_Obj* p, int a, int b)
     p->m10 = lbl_8061BA7C;
     p->m14 = t;
     p->m4 = b;
-    fn_8014E15C(p, a, b);
+    fn_8014E15C((Unk8014E15C_Obj*)p);
     return p;
 }
 
@@ -378,6 +395,50 @@ void* fn_8014E108(Unk8014E108_Obj* p)
         fn_803579D4(p);
     }
     return p;
+}
+
+void fn_8014E15C(Unk8014E15C_Obj* p)
+{
+    int type;
+    Unk8014E15C_Ctx* c = p->m0;
+    switch (c->m6F4) {
+    case 0:
+    case 12:
+        type = 0;
+        break;
+    case 2:
+    case 5:
+        type = 1;
+        break;
+    case 3:
+    case 4:
+    case 6:
+    case 7:
+    case 8:
+        type = 2;
+        break;
+    case 9:
+        type = 3;
+        break;
+    default:
+        type = 1;
+        break;
+    }
+    int k = fn_80081B60__FP13Unk8007FF8C_Y(c->m6F8->m14) == 1 ? 0 : 1;
+    int idx = p->m8;
+    p->mC = (int*)&((Unk2C*)lbl_8061B9CC)[type];
+    p->m10 = (int*)&((Unk2C*)lbl_8061BA7C)[k];
+    p->m14 = (int*)&lbl_8061BAD4[p->m4];
+    while (*(int*)((char*)p->mC + (idx << 2)) == 0 || *(int*)((char*)p->m10 + (idx << 2)) == 0 || *(int*)((char*)p->m14 + (idx << 2)) == 0) {
+        int v;
+        if (idx > 9) {
+            v = idx;
+        } else {
+            v = idx + 1;
+        }
+        p->m8 = v;
+        idx = v;
+    }
 }
 
 int fn_8014E2B4(int a)
@@ -600,6 +661,38 @@ void fn_8014EC24(UnkAt2BCS* p, const char* s) { p->m2BC[0] = 0; if (s) fn_8040B8
 void fn_8014EC5C(UnkAt2CCS* p, const char* s) { p->m2CC[0] = 0; if (s) fn_8040B830(p->m2CC, s, 0x10); }
 
 int fn_8014EC94(int a, unsigned b, unsigned c) { return (b & (c - 1)) == 0; }
+
+/* near-miss (3 slots): retail schedules li r29,0 (loop counter) before the first OSReport call, ours after it */
+void fn_8014ECA8(int unused, Ctx8014ECA8* c, int dsisr, int dar)
+{
+    int i;
+    for (i = 0, OSReport("Registers\n"); i < 16; i++) {
+        OSReport("r%-2d  = 0x%08x (%14d)  r%-2d  = 0x%08x (%14d)\n", i, c->r[i], c->r[i], i + 16, c->r[i + 16], c->r[i + 16]);
+    }
+    OSReport("LR   = 0x%08x                   CR   = 0x%08x\n", c->lr, c->cr);
+    OSReport("SRR0 = 0x%08x                   SRR1 = 0x%08x\n", c->srr0, c->srr1);
+    OSReport("DSISR= 0x%08x                   DAR  = 0x%08x\n", dsisr, dar);
+    OSReport("\n");
+}
+
+void fn_8014EF0C(int a, int unused, Frame8014EF0C* sp0)
+{
+    OSReport("\nAddress:      Back Chain    LR Save\n");
+    Frame8014EF0C* sp = sp0;
+    unsigned i = 0;
+    while (sp != 0 && sp != (Frame8014EF0C*)-1 && i++ <= 31) {
+        if (sp->lr != 0) {
+            char buf[16] = "";
+            OSReport("  0x%08x:   0x%08x    0x%08x\n", sp, sp->next, sp->lr);
+            sprintf(buf, "%08x", sp->lr);
+            fn_8014F4B4(a, buf);
+        } else {
+            OSReport("--------");
+        }
+        sp = sp->next;
+    }
+    fn_8014F738(a);
+}
 
 void* fn_8014F008(int a, int b, int c, int d)
 {
