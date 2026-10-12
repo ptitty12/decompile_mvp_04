@@ -353,6 +353,39 @@ extern "C" float fn_80379AF4(const Unk80379324* a, const Unk80379324* b)
     return r;
 }
 
+struct fn_80379C80_Plane {
+    float x, y, z, w;
+};
+
+extern "C" void fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n);
+
+inline Unk80379324_Vec3 fn_80379C80_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_80379C80_Cross(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.y * b.z - b.y * a.z;
+    r.y = b.x * a.z - a.x * b.z;
+    r.z = a.x * b.y - b.x * a.y;
+    return r;
+}
+
+extern "C" fn_80379C80_Plane* fn_80379C80(fn_80379C80_Plane* out, const Unk80379324_Vec3* p0, const Unk80379324_Vec3* p1, const Unk80379324_Vec3* p2)
+{
+    Unk80379324_Vec3 a = fn_80379C80_Sub(*p1, *p0);
+    Unk80379324_Vec3 b = fn_80379C80_Sub(*p2, *p0);
+    Unk80379324_Vec3 c = fn_80379C80_Cross(a, b);
+    fn_80379B34(out, p0, &c);
+    return out;
+}
+
 extern "C" float fn_80379F1C(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* c, Unk80379324_Vec3* out)
 {
     Unk80379324_Vec3 ab = Unk80379F1C_Sub(*b, *a);
