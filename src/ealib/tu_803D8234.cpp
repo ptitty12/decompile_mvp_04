@@ -124,6 +124,15 @@ void fn_803D9C34(void* o, int c);
 void fn_803D9AD0(struct Unk803D8234Sub* self, int c);
 void fn_803D95FC(int a, int b);
 int fn_803D98AC();
+void fn_803E2D18(void);
+void fn_803D9E70(void* o, int a, int b, unsigned short c, unsigned short d, unsigned short e, unsigned short f, int g, int h);
+void fn_803D9ECC(void* o, int a, int b, int c, int d);
+void fn_803D8828(void);
+void fn_8042FED0(int a, int b, int c);
+void fn_8042FE78(int a);
+void fn_8042C3B0(int a);
+int OSReceiveMessage(void* q, void* msg, int flags);
+void GXCopyDisp(int dest, int clear);
 }
 
 /* Light-like sub-object (vptr at +0x1C). */
@@ -230,12 +239,104 @@ extern "C" void fn_803D8234(Unk803D8234DevB* self, int c)
         lbl_8062C66C(self, 0xF0);
 }
 
-/*
- * Not matched yet: fn_803D83BC (161 instructions), fn_803D8640 (122), fn_803D8918 (510);
- * fn_803D8828 and fn_803D9378 read the time base (mftb); fn_803D9528 ends in a trap word after the
- * fatal-error call. The original code stays linked for these.
- * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
- */
+struct Unk803D83BCObj {
+    char pad0[0x1C];
+    float m1C;
+    float m20;
+    char pad24[0x94 - 0x24];
+    int m94;
+    float m98;
+};
+extern int lbl_80627A78;
+extern "C" {
+void fn_803DE3B4(int* a, int* b);
+void fn_803DE374(int a, int b);
+void fn_803DD794(int a);
+void fn_803DE1BC(float* m);
+void fn_803DE300(float* m, int a);
+void fn_803DE3D0(int a);
+void fn_803DDCD4();
+void fn_8042DC44(int a);
+void GXSetNumTexGens(int n);
+void GXSetNumTevStages(int n);
+void fn_803DB9C0(int a, int b);
+void fn_803DBF78(int a, int b, int c, int d, int e);
+void GXSetCullMode(int m);
+void fn_80431564(float* m, float t, float b, float l, float r, float n, float f);
+void fn_80430194(float* m, int type);
+void fn_80430364(int idx);
+void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void fn_8042FE24(int a, int b, int c, int d);
+void GXSetAlphaCompare(int a, int b, int c, int d, int e);
+void fn_8042FF04(int a);
+void fn_8042C8B0(int a, int b, int c);
+}
+
+/* near-miss (96.9%): fullscreen alpha quad (unsigned conversion of the fade value, ortho setup, four GX vertices).
+   Retail keeps 0.0 in f0 and loads self->m1C/m20 into f13/f12 around the volatile FIFO stores; ours picks other
+   float registers. Tried const float locals for 0.0/1.0 and the colour in place or in a new variable. */
+extern "C" void fn_803D83BC(Unk803D83BCObj* self)
+{
+    unsigned a = (unsigned)(self->m98 * 224.0f);
+    if (a != 0) {
+        float m1[16];
+        char pad[0x28];
+        float m2[16];
+        int s0;
+        int s1;
+        a |= 0xFFFFFF00;
+        fn_803DE3B4(&s0, &s1);
+        fn_803DE374(0, 0);
+        fn_803DD794(self->m94);
+        fn_803DE1BC(m1);
+        fn_803DE300(m1, 0);
+        fn_803DE3D0(1);
+        fn_803DDCD4();
+        fn_8042DC44(1);
+        GXSetNumTexGens(1);
+        GXSetNumTevStages(1);
+        fn_803DB9C0(0x5200, 1);
+        fn_803DBF78(5, 9, 1, 4, 0);
+        fn_803DBF78(5, 0xB, 1, 5, 0);
+        fn_803DBF78(5, 0xD, 1, 4, 0);
+        GXSetCullMode(0);
+        fn_80431564(m2, 0.0f, self->m20, 0.0f, self->m1C, 0.0f, -1.0f);
+        fn_80430194(m2, 1);
+        fn_80430364(0x3C);
+        fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
+        fn_8042FE24(1, 4, 5, 3);
+        GXSetAlphaCompare(7, 0, 1, 7, 0);
+        fn_8042FF04(0);
+        fn_8042FED0(0, 7, 0);
+        fn_8042C8B0(0x80, 5, 4);
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m1C;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m1C;
+        GXWGFifo.f32 = self->m20;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 1.0f;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = self->m20;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.u32 = a;
+        GXWGFifo.f32 = 0.0f;
+        GXWGFifo.f32 = 1.0f;
+        fn_803DE374(s0, s1);
+        lbl_80627A78 = 0;
+    }
+}
 
 struct Unk803D8640Info {
     char pad0[4];
@@ -265,19 +366,6 @@ struct Unk803D8640Dev {
 extern int lbl_806272D4;
 extern unsigned char lbl_80627308;
 extern int lbl_80627390[];
-extern "C" {
-void fn_803E2D18(void);
-void fn_803D83BC(void* sub);
-void fn_803D9E70(void* o, int a, int b, unsigned short c, unsigned short d, unsigned short e, unsigned short f, int g, int h);
-void fn_803D9ECC(void* o, int a, int b, int c, int d);
-void fn_803D8828(void);
-void fn_8042FED0(int a, int b, int c);
-void fn_8042FE78(int a);
-void fn_8042C3B0(int a);
-int OSReceiveMessage(void* q, void* msg, int flags);
-void GXCopyDisp(int dest, int clear);
-}
-
 /* near-miss (96.6%): retail stores lbl_806272D4 = 0 and lbl_80627304 = 1 one after the other through r0; ours
    hoists both constants above the first store. Tried one-int-struct globals and statement order. */
 extern "C" void fn_803D8640(Unk803D8640Dev* self)
@@ -286,7 +374,7 @@ extern "C" void fn_803D8640(Unk803D8640Dev* self)
     if (self->mCC != 0) {
         if (self->mD0 > 0.0f) {
             if (self->mD4 != 0)
-                fn_803D83BC((char*)self + 0x38);
+                fn_803D83BC((Unk803D83BCObj*)((char*)self + 0x38));
             char* sub = (char*)self + 0x10;
             unsigned short w = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m4;
             unsigned short h = ((Unk803D8640Info*)fn_803DD7C0((void*)self->mCC))->m6;
@@ -691,3 +779,9 @@ extern "C" void* fn_803D9BE0(Unk803D8234Light* self, void* owner)
     self->m24 = 0;
     return self;
 }
+
+/*
+ * Not matched yet: fn_803D8918 (510 instructions); fn_803D8828 and fn_803D9378 read the time base (mftb);
+ * fn_803D9528 ends in a trap word after the fatal-error call. The original code stays linked for these.
+ * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
+ */
