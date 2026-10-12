@@ -50,6 +50,12 @@ extern const float lbl_805D7C8C;
 extern const float lbl_805D7C90;
 extern const float lbl_805D7C94;
 extern float lbl_8061D220;
+extern const float lbl_805D7B1C;
+extern const float lbl_805D7A94;
+extern const float lbl_805D7A98;
+struct Unk80270BA0_X;
+float fn_8024D0C4(Unk80270BA0_X* x, int a, float f1, float f2);
+extern "C" float fn_8024F048(char* a, int b, int c, int d, int e);
 extern "C" float fn_801A0AA8(Unk8022FE34_Ctx* c, float a, float b);
 
 inline float Lerp(float a, float t, float b)
@@ -181,6 +187,39 @@ void Unk802362A8_Slots::fn_80237114()
     m84 = 0;
     m88 = 0;
     m8C = 0;
+}
+
+/* Array element read with the byte offset in a local: base-first lwzx (PATTERNS, indexing). */
+inline int At(char* base, int i)
+{
+    int o = i * 4;
+    return *(int*)(base + o);
+}
+
+void Unk802362A8_Cpu::fn_80237B60(float* out)
+{
+    float tbl[4] = { -0.6f, -0.5f, -0.3f, -0.2f };
+    Unk8022FE34_Game* g = m2E4->m6F8;
+    int idx = g->m14[2].m8 == 0;
+    int pl = At(g->m10 + 0x14, idx);
+    float f = fn_8024D0C4((Unk80270BA0_X*)fn_801C1638(m2E4, 0), 2, lbl_805D7A94, lbl_805D7A98);
+    f = f + tbl[pl];
+    *out = *out * f;
+}
+
+int Unk802362A8_Cpu::fn_80238088(Unk802362A8_Req* p)
+{
+    if (fn_80238B84()) {
+        return 9;
+    }
+    char* g = m2E4->m680;
+    int r;
+    if (!(fn_8024F048(g + 0xA0C, *(int*)(g + 0xA04), *(int*)(g + 0x44C), *(int*)(g + 0x708), 1) >= lbl_805D7B1C) && p->m14 == 0) {
+        r = 0;
+    } else {
+        r = 1;
+    }
+    return r;
 }
 
 int Unk802362A8_Cpu::fn_80239448()

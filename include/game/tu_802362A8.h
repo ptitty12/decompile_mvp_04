@@ -81,6 +81,10 @@ struct Unk802362A8_Slots {
  * three pointers: m2DC (the T owner, fn_8023A7F4 reaches m38 through it), m2E0
  * (a U) and m2E4 (the Ctx, ctx->m6F4 compared with 3 in fn_8023A7C4).
  */
+struct Unk802362A8_Req {
+    char pad0[0x14];
+    int m14;
+};
 struct Unk802362A8_Cpu {
     int m0;
     Unk802362A8_Slots m4;
@@ -95,6 +99,9 @@ struct Unk802362A8_Cpu {
     void fn_8023A6C8(int a);
     void fn_8023A13C();
     int fn_80239448();
+    int fn_80238088(Unk802362A8_Req* p);
+    int fn_80238B84();
+    void fn_80237B60(float* out);
     int fn_80238110();
     int fn_802394CC();
     void fn_8023A1C8(int a);

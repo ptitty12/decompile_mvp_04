@@ -34,7 +34,7 @@ struct Unk8022FE34_GameC {
 struct Unk8022FE34_Game {
     char pad0[0xC];
     Unk8022FE34_GameC* mC;
-    char pad10[4];
+    char* m10;
     Unk8022FE34_Row* m14;
 };
 struct Unk8022FE34_Ctx {
@@ -42,7 +42,9 @@ struct Unk8022FE34_Ctx {
     void* m554;
     char pad1[0x65C - 0x558];
     void* m65C;
-    char pad2[0x6CC - 0x660];
+    char pad2[0x680 - 0x660];
+    char* m680;
+    char pad684[0x6CC - 0x684];
     int m6CC;
     char pad3[0x6F4 - 0x6D0];
     int m6F4;
