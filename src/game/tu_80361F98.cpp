@@ -6,21 +6,6 @@
 
 extern char lbl_80684820[];
 struct DtorAt8 { char pad[0x8]; const void* m; };
-extern char lbl_8064A030[];
-struct DtorAt10 { char pad[0x10]; const void* m; };
-extern char lbl_8064B5D8[];
-extern char lbl_8064A550[];
-extern char lbl_806848C8[];
-struct DtorAt1C { char pad[0x1c]; const void* m; };
-
-void fn_80361F98(DtorAt8* self, int chrg)
-{
-    self->m = lbl_80684820;
-    if (chrg & 1)
-        fn_80377408(self);
-}
-
-//HOISTBLOCK
 struct Unk80361FCC_Y {
     char pad0[0x1B4];
     unsigned char m1B4[128];
@@ -40,7 +25,38 @@ inline int Unk80361FCC_At(char* b, int off)
 {
     return *(unsigned char*)(b + off);
 }
-//ENDHOIST
+struct Unk80362080 {
+    char pad0[0xC];
+    unsigned mC;
+    unsigned m10;
+};
+struct Unk803620CC {
+    char pad0[0xC];
+    int mC;
+    int m10;
+    int m14;
+};
+extern float lbl_80602EC8;
+extern char lbl_8064A030[];
+struct DtorAt10 { char pad[0x10]; const void* m; };
+extern char lbl_8064B5D8[];
+extern char lbl_8064A550[];
+extern char lbl_806848C8[];
+struct DtorAt1C { char pad[0x1c]; const void* m; };
+extern "C" void fn_8037704C(void* heap, const char* name, int a, int b, int c);
+extern void* lbl_80624234;
+extern char lbl_80605478[];
+struct Unk803629CC {
+    int m0;
+};
+
+void fn_80361F98(DtorAt8* self, int chrg)
+{
+    self->m = lbl_80684820;
+    if (chrg & 1)
+        fn_80377408(self);
+}
+
 /* near-miss (14 of 32 slots): retail holds the byte index in r9 and the element
  * address (row + 0x1B4) in r11; here the index lands in r11 and the address in
  * r9. Same open SumRow family as fn_8001F788 / fn_8002A2D4. */
@@ -68,19 +84,6 @@ void fn_8036204C(DtorAt8* self, int chrg)
         fn_80377408(self);
 }
 
-//HOISTBLOCK
-struct Unk80362080 {
-    char pad0[0xC];
-    unsigned mC;
-    unsigned m10;
-};
-struct Unk803620CC {
-    char pad0[0xC];
-    int mC;
-    int m10;
-    int m14;
-};
-//ENDHOIST
 int fn_80362080(Unk80362080* s)
 {
     return s->mC >= s->m10;
@@ -342,9 +345,6 @@ void fn_803626B8(Unk803624D0* self, char** cursor, Unk803622F0* st)
     }
 }
 
-//HOISTBLOCK
-extern float lbl_80602EC8;
-//ENDHOIST
 void fn_803628A0(Unk803628A0* s)
 {
     s->m0 = 0;
@@ -388,14 +388,6 @@ void fn_80362998(DtorAt1C* self, int chrg)
         fn_80377408(self);
 }
 
-//HOISTBLOCK
-extern "C" void fn_8037704C(void* heap, const char* name, int a, int b, int c);
-extern void* lbl_80624234;
-extern char lbl_80605478[];
-struct Unk803629CC {
-    int m0;
-};
-//ENDHOIST
 void fn_803629CC(Unk803629CC* s, int a)
 {
     fn_8037704C(lbl_80624234, lbl_80605478, a, s->m0, 0);
