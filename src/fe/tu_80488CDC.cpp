@@ -50,6 +50,13 @@ extern "C" FE_OVERLAY int fn_80489830(void* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_8048986C(FeW* x, int w)
+{
+    if (w == FeI(x, 0x154))
+        x->fn_vslot41(fn_800C8070(x));
+    return 1;
+}
+
 /* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
 extern "C" FE_OVERLAY FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -229,13 +236,30 @@ extern "C" FE_OVERLAY void fn_8048BC18(void* x)
     FeF(x, 0x13C) = (float)fn_800C8044()->fn_vslot32("METERBAR", 1)->m2A;
 }
 
+extern "C" FE_OVERLAY void fn_8048E3BC(FeW* x)
+{
+    void* t = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+    fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 0, t);
+    int v = fn_8059897C();
+    x->fn_vslot32("OWNERRATINGVAL", 1);
+    ((FeWV29*)fn_800C8040())->s29(v);
+}
+
 extern "C" FE_OVERLAY int fn_8048E450(void* x)
 {
     return fn_8057CE00(0) == -1;
 }
 
-extern "C" FE_OVERLAY void fn_8048E4D8(void)
+extern "C" FE_OVERLAY int fn_8048E480(void* x)
+{
+    int r = 0;
+    if (fn_8007FE04((Unk8007F198_D*)lbl_8061930C)->m1E0 == 1)
+        r = fn_8048E4D8(x) == 0;
+    return r;
+}
+
+extern "C" FE_OVERLAY int fn_8048E4D8(void* x)
 {
     fn_800B555C();
-    fn_800B5758();
+    return fn_800B5758();
 }
