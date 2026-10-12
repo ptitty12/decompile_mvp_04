@@ -215,6 +215,18 @@ extern "C" void fn_80571BD0(DbMgr* self);
 extern "C" void fn_80571D04(DbMgr* self);
 extern "C" void fn_80571EA0(DbMgr* self);
 
+struct Db80570AB0_T {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0x1B4 - 0x19C];
+    unsigned char m1B4[0x80];
+    char pad234[0xE64 - 0x234];
+};
+struct Db80570AB0_G {
+    Db80570AB0_T t[2];
+};
+extern const char lbl_805FEC2C[];
+extern const char lbl_805FEC30[];
 /* near-miss: 2 slots (addi r26,r27,1 lands after the call); CR4 flag form reproduced */
 extern "C" DB_OVERLAY int fn_8056EC68(DbSel* self, int a, int b, int c, int d)
 {
@@ -778,6 +790,52 @@ extern "C" DB_OVERLAY void fn_80570828(DbMgr* self)
             fn_8057121C(self);
         }
     }
+}
+
+extern "C" DB_OVERLAY int fn_80570AB0(DbMgr* self)
+{
+    if (self->m8->mC->m8C == 1) {
+        int s1 = fn_800736EC__FPCc(lbl_805FEC30);
+        int s2 = fn_800736EC__FPCc(lbl_805FEC2C);
+        Db80570AB0_T* a = 0;
+        Db80570AB0_T* b = 0;
+        int flag = 0;
+        int side = self->m50.m4;
+        DbG* g = self->m8->m14;
+        Db80570AB0_T* t0 = (Db80570AB0_T*)TeamAt(g, 0);
+        Db80570AB0_T* t1 = (Db80570AB0_T*)TeamAt(g, 1);
+        if (s1 == t0->m198)
+            a = t0;
+        else if (s1 == ((Db80570AB0_G*)g)->t[1].m198)
+            a = t1;
+        if (s2 == t0->m198) {
+            b = t0;
+            if (side == 0)
+                flag = 1;
+        } else if (s2 == t1->m198) {
+            b = t1;
+            if (side == 1)
+                flag = 1;
+        }
+        if (a != 0 && b != 0) {
+            int sa = 0;
+            for (int i = 0; i < 0x80; i++)
+                sa += a->m1B4[(unsigned char)i];
+            int sb = 0;
+            for (int i = 0; i < 0x80; i++)
+                sb += b->m1B4[(unsigned char)i];
+            if (sa > sb) {
+                if (flag != 0) {
+                    fn_80571A94(self);
+                } else {
+                    self->m4 = 4;
+                    fn_80571EA0(self);
+                }
+                return 1;
+            }
+        }
+    }
+    return 0;
 }
 
 extern "C" DB_OVERLAY void fn_80570C14(DbMgr* self, int a, int b)
