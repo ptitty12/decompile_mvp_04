@@ -5,6 +5,12 @@
 #include "game/tu_8022BB90.h"
 
 void* operator new(unsigned int size, int heap);
+inline void* operator new(unsigned int, void* p) { return p; }
+struct Unk8022FE34_Ctx;
+struct Unk8022FE34_Z {
+    Unk8022FE34_Ctx* m0;
+    Unk8022FE34_Z(Unk8022FE34_Ctx* c);
+};
 extern int lbl_806EF9B4;
 extern char lbl_80660D80[];
 extern int lbl_8061CCC4;
@@ -37,7 +43,6 @@ Player* fn_80257B40(void* list);
 void fn_8022FF2C(Sub38* p, Fe73C* d);
 void fn_8035DA48(void* p);
 Sub440* fn_802376A0(Sub440* p, Fe73C* d, Fe8022* owner, int b);
-void fn_802361C0(void* p, int b);
 int fn_802366B0();
 FeOther* fn_80235FA8(Fe8022* c);
 Pair8 fn_80235BE0(Fe8022* c, ...);
@@ -368,7 +373,7 @@ Fe73C* fn_8022F17C(Fe73C* d, Fe8022* owner, int b)
     fn_8022FF2C(&d->m38, d);
     fn_8035DA48(&d->m438);
     fn_802376A0(&d->m440, d, owner, b);
-    fn_802361C0(&d->m734, b);
+    new (&d->m734) Unk8022FE34_Z((Unk8022FE34_Ctx*)b);
     d->m738 = 0;
     d->m738 = fn_802366B0();
     fn_8022F264(d);
