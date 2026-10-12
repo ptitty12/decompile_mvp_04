@@ -99,6 +99,16 @@ int fn_8027D390(Unk8027C728_Goal* g, float* a, Unk80273498_Vec3* b, Unk80273498_
 float fn_80266D70(void* o, int k);
 extern float lbl_805DACB8;
 extern float lbl_805DACBC;
+struct Unk8025877C_Ctx {
+    char pad0[0x3C0];
+    struct Unk8025877C_Sub* m3C0;
+};
+struct Unk8025877C_Sub {
+    char pad0[0x14];
+    int m14;
+};
+extern char lbl_805DAC40[];
+int fn_801A2034(Q* q, int k);
 struct Unk80258BA8_E {
     char pad0[8];
     int m8;
@@ -117,6 +127,37 @@ struct Unk8025933C_E {
     Unk80273498_Vec3 m28;
     int m34;
 };
+
+inline float NegOne() { return -1.0f; }
+
+/* near-miss: 66 vs 68 instructions; retail lays out the c == 0 call first and shares its `addi r3,r3,0x1CC; bl` tail with the rnd > 25 arm, with p in r29 and the result in r28. Tried early return, if/else swaps */
+int fn_8025877C(M* self, P* p, int c)
+{
+    int r = 0;
+    if (c == 0) {
+        fn_8035E604((char*)self->m4 + 0x1CC);
+    } else {
+        int rnd = fn_8014D8AC(fn_802570D4(self)->m554, 100, lbl_805DAC40, 0x44D);
+        if (fn_801A2034(fn_802570D4(self), 3) == -1) {
+            if (rnd > 1) {
+                fn_8035E604((char*)self->m4 + 0x1CC);
+                ((Unk8025877C_Ctx*)self->m10)->m3C0->m14 = r;
+            } else {
+                r = 1;
+            }
+        } else if (rnd > 0x19) {
+            fn_8035E604((char*)self->m4 + 0x1CC);
+        } else {
+            r = 1;
+            int n = p->m458 + 1;
+            if (n <= 12) {
+                if (Roster(fn_802570D4(self), n) != 0)
+                    fn_8035E604((char*)self->m4 + 0x1CC);
+            }
+        }
+    }
+    return r;
+}
 
 void fn_80258BA8(M* self, Unk80258BA8_E* e)
 {
@@ -287,8 +328,6 @@ int fn_80259330(M* self)
 {
     return self->m4->m128;
 }
-
-inline float NegOne() { return -1.0f; }
 
 void fn_8025933C(char* self, int a)
 {
