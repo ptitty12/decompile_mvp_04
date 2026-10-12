@@ -200,6 +200,12 @@ struct Unk80266568_T {
 };
 typedef Unk80266568_T T;
 
+/* Per-player record behind Q->m6F8->m14: flag word at +0x1CD0 (fn_802677A4). */
+struct Unk802677A4_Ent {
+    char pad0[0x1CD0];
+    int m1CD0;
+};
+
 /* Goal-object record read by fn_80266E20 (flag word at +0xE8, bit 0x1000). */
 struct Unk80266E20_G {
     char pad0[0xE8];
@@ -635,6 +641,43 @@ int fn_802676C0(Unk80268190_M* self)
 int fn_8026774C(void* self, Unk8026774C_V* pos, float t)
 {
     return (pos->x - lbl_805DBA34.x) * (pos->x - lbl_805DBA34.x) + (pos->z - lbl_805DBA34.z) * (pos->z - lbl_805DBA34.z) < t * (t * 144.0f);
+}
+
+extern P* fn_801A497C(Q* q, int k, int i);
+extern int fn_801A2034(Q* q, int k);
+P* fn_802677A4(T* self)
+{
+    P* best = (P*)fn_802679D4(self, 0, 0);
+    if (fn_801A2034(self->m0, 4) != -1) {
+        const float t = 120.0f;
+        Unk80273498_Vec3 c = ((Unk80273498_Pos*)self->m0->m6CC)->m60;
+        int ok;
+        {
+            Unk80273498_Vec3 c2 = c;
+            ok = fn_8026774C(self, (Unk8026774C_V*)&c2, t);
+        }
+        if (ok != 0) {
+            int q = ((Unk802677A4_Ent*)self->m0->m6F8->m14)->m1CD0 == 0;
+            float bestD;
+            if (best != 0) {
+                Unk80273498_Vec3 d = ((Unk80273498_Pos*)best)->m60 - c;
+                bestD = d.x * d.x + d.z * d.z;
+            } else
+                bestD = 23040000.0f;
+            for (int i = 0; i <= 8; i++) {
+                P* tt = fn_801A497C(self->m0, q, i);
+                if (tt != 0) {
+                    Unk80273498_Vec3 d = ((Unk80273498_Pos*)tt)->m60 - c;
+                    float s = d.x * d.x + d.z * d.z;
+                    if (!(s >= bestD)) {
+                        bestD = s;
+                        best = tt;
+                    }
+                }
+            }
+        }
+    }
+    return best;
 }
 
 extern float fn_80249070(P* x);
