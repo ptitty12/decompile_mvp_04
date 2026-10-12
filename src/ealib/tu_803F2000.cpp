@@ -14,3 +14,23 @@ extern "C" unsigned short* fn_803F644C(void* l, int k)
         return lbl_806EEA5C;
     return lbl_806EEA58;
 }
+
+extern char lbl_8060E4F8[];
+
+extern "C" void fn_80377408(void*);
+
+extern "C" void fn_803F6AA4(void** self, int c)
+{
+    *self = lbl_8060E4F8;
+    if (c & 1)
+        fn_80377408(self);
+}
+
+extern char lbl_8060E358[];
+
+extern "C" void fn_803F7100(void** self, int c)
+{
+    *self = lbl_8060E358;
+    if (c & 1)
+        fn_80377408(self);
+}
