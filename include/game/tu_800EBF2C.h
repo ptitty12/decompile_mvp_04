@@ -551,4 +551,21 @@ struct UiRec12 {
     float m8;
 };
 extern "C" void fn_800ECC9C(UiS* self, UiS* node, UiRec12* arr, int n);
+
+/* fn_800ED590: container with up to 100 children at +0x34 (count at +0x1C4); flag bit 0x40000000 at +0x24
+ * of a child enables the pointer-to-member callback. */
+struct Unk800ED590_B {
+    char m0[0x24];
+    unsigned int m24;
+};
+struct Unk800ED590_W : Unk800ED590_B {
+    virtual int f(int a);
+};
+typedef int (Unk800ED590_W::*Unk800ED590_Fn)(int);
+struct Unk800ED590_C {
+    char m0[0x34];
+    Unk800ED590_W* m34[100];
+    int m1C4;
+};
+void fn_800ED590(Unk800ED590_C* self, int a, Unk800ED590_Fn f);
 #endif
