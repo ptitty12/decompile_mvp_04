@@ -42,8 +42,20 @@ struct RcRef {
 };
 
 struct RcAllocIf {
-    virtual void v0();
+    virtual void* v0(int, void*);
     virtual void v1(int, int);
+};
+
+struct RcReq {
+    int kind;
+    int val;
+    RcReq* next;
+    RcReq(int k, int v)
+    {
+        kind = k;
+        val = v;
+        next = 0;
+    }
 };
 
 struct RcRefObj : RcRef {
@@ -63,12 +75,124 @@ struct RcVO {
 };
 
 extern "C" int fn_803F7584(void*, int, void*, int*);
+extern "C" int fn_803F6754(short**);
+
+struct RcD {
+    virtual RcD* v0();
+    virtual void v1(int, int);
+    virtual void v2();
+    virtual void v3();
+};
+
+struct RcE {
+    virtual RcD* v0();
+    virtual void v1();
+    virtual void v2();
+};
+
+struct RcPack {
+    RcD* a;
+    RcD* b;
+    RcD* c;
+    short* (*d)(int);
+};
+
+struct RcDt1 {
+    void* vp;
+    RcPack p;
+    int m14;
+    RcD* m18;
+};
+
+struct RcDt2 {
+    void* vp;
+    char pad4[0x2b4];
+    RcD* m2B8;
+    int m2BC;
+    int m2C0;
+};
+
+extern char lbl_8060E3F8[];
+extern char lbl_8060E4F8[];
+extern char lbl_8060E690[];
+extern char lbl_8060E6E8[];
+extern "C" void fn_803F6FC4(int a, int b);
+extern "C" void fn_803F6AD8(int a);
+extern short* (*lbl_806EEA68)(int);
+
+extern "C" char fn_803F2404(const char* wild, const char* str)
+{
+    const char* cp = 0;
+    const char* mp = 0;
+    while (*str != 0 && *wild != '*') {
+        if (*wild != *str && *wild != '?')
+            return 1;
+        str++;
+        wild++;
+    }
+    while (*str != 0) {
+        if (*wild == '*') {
+            if (*++wild == 0)
+                return 0;
+            mp = wild;
+            cp = str + 1;
+        } else if (*wild == *str || *wild == '?') {
+            wild++;
+            str++;
+        } else {
+            wild = mp;
+            str = cp++;
+        }
+    }
+    while (*wild == '*')
+        wild++;
+    return *wild;
+}
 
 extern "C" unsigned short* fn_803F644C(void* l, int k)
 {
     if (k == 1)
         return lbl_806EEA5C;
     return lbl_806EEA58;
+}
+
+extern "C" void fn_803F67C8()
+{
+    short* a = lbl_806EEA68(1);
+    short* b = lbl_806EEA68(2);
+    fn_803F6754(&a);
+    fn_803F6754(&a);
+    fn_803F6754(&a);
+    fn_803F6754(&b);
+    fn_803F6754(&b);
+    fn_803F6754(&b);
+}
+
+extern "C" RcDt1* fn_803F684C(RcDt1* self, RcPack* src)
+{
+    self->vp = lbl_8060E3F8;
+    self->p = *src;
+    self->m14 = 1;
+    self->m18 = 0;
+    ((RcE*)self->p.a)->v2();
+    ((RcE*)self->p.c)->v1();
+    ((RcE*)self->p.b)->v1();
+    lbl_806EEA68 = self->p.d;
+    fn_803F6AD8((int)self->p.d);
+    self->m18 = ((RcE*)self->p.c)->v0();
+    return self;
+}
+
+extern "C" void fn_803F693C(RcDt1* self, int c)
+{
+    self->vp = lbl_8060E3F8;
+    self->m18->v2();
+    self->p.b->v2();
+    self->p.c->v2();
+    self->p.a->v3();
+    self->vp = lbl_8060E4F8;
+    if (c & 1)
+        fn_803F6FC4((int)self, 0x1c);
 }
 
 extern char lbl_8060E4F8[];
@@ -170,4 +294,14 @@ extern "C" void fn_803F7100(void** self, int c)
 extern "C" int fn_803F7134(int* o)
 {
     return o[2];
+}
+
+extern "C" void fn_803F7310(RcDt2* self, int c)
+{
+    self->vp = lbl_8060E690;
+    self->m2B8->v1(self->m2BC, 0);
+    self->m2B8->v1(self->m2C0, 0);
+    self->vp = lbl_8060E6E8;
+    if (c & 1)
+        fn_803F6FC4((int)self, 0x2d0);
 }
