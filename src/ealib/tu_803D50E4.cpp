@@ -77,6 +77,7 @@ void fn_803D7830(void);
 void fn_803D6528(void* out, Unk803D50E4Obj* self, int a);
 void fn_803D675C(Unk803D50E4Obj* self, void* t, int b);
 void fn_803D7414(int a, int b);
+void fn_803D7600(struct Unk803D7600Obj* self, int c);
 }
 
 /* Source of the constructor below: three data words, then the vptr at +0xC; slot 3 returns two floats (width, height). */
@@ -176,6 +177,96 @@ extern "C" int fn_803D50F4(int unused, float* out)
     int z = 0;
     *out = (float)z;
     return 1;
+}
+
+struct Unk803D7ED4Item;
+class Unk803D7ED4Pool {
+public:
+    void fn_803D803C(Unk803D7ED4Item* item);
+};
+int fn_803D81FC();
+
+struct Unk803D5130Geo {
+    char pad0[0x24];
+    void* m24;
+    char pad28[4];
+    void* m2C;
+};
+struct Unk803D5130Obj {
+    char pad0[4];
+    Unk803D7ED4Item* m4;
+    void* m8;
+    void* mC;
+    Unk803D5130Geo* m10;
+    int m14;
+    char pad18[0x24 - 0x18];
+    void* m24;
+    void* m28;
+    char pad2C[4];
+    void* m30;
+    char pad34[4];
+    int m38;
+    char pad3C[0x58 - 0x3C];
+    void* m58;
+    void* m5C;
+};
+extern "C" {
+void* fn_803DD7C0(void* o);
+void fn_803EDA0C(void* o);
+void fn_803DD73C(void* o, int c);
+void fn_803E9744(void* o, int c);
+void fn_803DBD84(void* o, int c);
+}
+
+extern "C" void fn_803D5130(Unk803D5130Obj* self, int c)
+{
+    if (fn_803D81FC() != 0) {
+        if (self->m4 != 0) {
+            ((Unk803D7ED4Pool*)fn_803D81FC())->fn_803D803C(self->m4);
+            self->m4 = 0;
+            if (self->m8 != 0) {
+                lbl_8062C66C(self->m8, self->m38 * 4);
+                self->m8 = 0;
+            }
+        }
+        self->m4 = 0;
+    }
+    if (self->mC != 0) {
+        fn_803EDA0C(fn_803DD7C0(self->mC));
+        if (self->mC != 0)
+            fn_803DD73C(self->mC, 3);
+        self->mC = 0;
+    }
+    if (self->m30 != 0) {
+        fn_803E9744(self->m30, 3);
+        self->m30 = 0;
+    }
+    if (self->m5C != 0) {
+        lbl_8062C66C(self->m5C, self->m38 * 4);
+        self->m5C = 0;
+    }
+    if (self->m10 != 0) {
+        if (self->m10->m24 != 0)
+            lbl_8062C66C(self->m10->m24, self->m14 * 12);
+        if (self->m10->m2C != 0)
+            lbl_8062C66C(self->m10->m2C, self->m14 * 16);
+        if (self->m24 != 0) {
+            fn_803DBD84(self->m24, 3);
+            self->m24 = 0;
+        }
+        if (self->m58 != 0) {
+            lbl_8062C66C(self->m58, 0xA0);
+            self->m58 = 0;
+        }
+        lbl_8062C66C(self->m10, 0x38);
+        self->m10 = 0;
+    }
+    if (self->m28 != 0) {
+        fn_803D7600((Unk803D7600Obj*)self->m28, 3);
+        self->m28 = 0;
+    }
+    if (c & 1)
+        lbl_8062C66C(self, 0x68);
 }
 
 extern "C" int fn_803D5D34(Unk803D5D34Obj* self)
@@ -317,7 +408,6 @@ extern "C" Unk803D50E4Mat* fn_803D700C(Unk803D50E4Mat* self)
     self->m3C = 1.0f;
     return self;
 }
-
 
 struct Unk803D707CObj {
     char pad0[0x44];
@@ -538,6 +628,6 @@ extern "C" void fn_803D7804()
 }
 
 /*
- * Not matched yet: fn_803D5130, fn_803D5328, fn_803D5694, fn_803D6144, fn_803D6528, fn_803D675C (iterator
+ * Not matched yet: fn_803D5328, fn_803D5694, fn_803D6144, fn_803D6528, fn_803D675C (iterator
  * compare loop), fn_803D68AC, fn_803D6C84. The original code stays linked for these.
  */
