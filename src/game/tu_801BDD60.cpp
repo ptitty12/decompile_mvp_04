@@ -35,7 +35,12 @@ void fn_801B8874(P* p);
 void fn_801B82AC(P* p, const Vec3* a, P* q, int flag);
 void fn_801B838C(P* p, const Vec3* a, P* q, int flag);
 int fn_801BBC54(A* a);
+float fn_8014E40C(P* q, int idx);
+Vec3 fn_8014E388(int idx);
 }
+void fn_80303CA0(const char* fmt, float a, float b, float c, ...);
+extern const char lbl_805CF95C[];
+extern const char lbl_805CFD34[];
 struct Unk801BDD60_Sim {
     char pad0[0x3BC];
     A* m3BC;
@@ -223,6 +228,31 @@ extern "C" void fn_801BFCEC(O* o, P* q)
     if (p) {
         v = *pos;
         fn_801B8248(p, &v);
+    }
+}
+
+extern "C" void fn_801BFD64(O* o, P* q, int idx, int mode)
+{
+    int flag;
+    if (mode == 1)
+        flag = fn_8014E40C(q, idx) < 14400.0f;
+    else
+        flag = 1;
+    P* p = fn_801C01E4(o, idx);
+    if (p) {
+        if (mode == 1) {
+            Vec3 v = fn_8014E388(idx);
+            fn_801B82AC(p, &v, q, flag);
+            Unk801B7FB0_Sub58C* s = &q->m58C;
+            if (s->mC != 0.0f)
+                fn_80303CA0(lbl_805CF95C, 4.0f, 0.1f, 0.8f, s->m10 + 1);
+        } else {
+            Vec3 v = fn_8014E388(idx);
+            fn_801B838C(p, &v, q, flag);
+            Unk801B7FB0_Sub58C* s = &q->m58C;
+            if (*(float*)((char*)s + 0x18) != 0.0f)
+                fn_80303CA0(lbl_805CFD34, 4.0f, 0.1f, 0.8f, *(int*)((char*)s + 0x1C) + 1);
+        }
     }
 }
 
