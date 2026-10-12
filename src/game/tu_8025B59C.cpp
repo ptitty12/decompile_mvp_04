@@ -59,6 +59,50 @@ int fn_801D0314(void* p);
 void fn_8025D0B0(I* self, int a, int b);
 int fn_8025CD18(F* self, P* p);
 int fn_8025CC54(F* self, P* p);
+struct Unk8025CF64_Pair {
+    int m0;
+    int m4;
+    void Clear()
+    {
+        m4 = 0;
+        m0 = 0;
+    }
+};
+struct Unk8025CF64_I {
+    char pad0[0x1FC];
+    int m1FC;
+    int m200;
+    char pad204[0x41C - 0x204];
+    int m41C;
+    int m420;
+    Unk8025CF64_Pair m424;
+    Unk8025CF64_Pair m42C;
+    P* m434;
+    int m438[4];
+    int m448;
+    unsigned m44C;
+    int m450[4];
+    char pad460[4];
+    int m464;
+    char pad468[0x4BC - 0x468];
+    int m4BC;
+    float m4C0;
+};
+void fn_802663B8(void* p);
+int fn_8025933C(char* p, int a);
+void fn_80268998(void* p, int a);
+void fn_8025F878(I* i);
+void fn_80268144(void* p);
+void fn_80269DE4(void* p);
+extern const float lbl_805DB13C;
+int fn_8014E310(int a);
+unsigned char* fn_80081CF8(Unk8024EF40_Ent* e, int i);
+P* fn_801A4910(Q* q, int f);
+void fn_801A656C(Q* q, P* p);
+void fn_802547C0(A* a, int v);
+void fn_802553BC(A* a, int v);
+void fn_8025505C(A* a, int v, int w);
+void fn_8025E924(I* i, P* p, int f);
 struct Unk8025CB28_I {
     char pad0[0x1F0];
     M* m1F0;
@@ -95,6 +139,14 @@ extern float lbl_805DB210;
 extern float lbl_805DB214;
 }
 extern "C" Unk8027C728_Goal* fn_802448F4(void* p, int k);
+
+struct Unk8025D054_I {
+    char pad0[0x1FC];
+    int m1FC;
+    int m200;
+};
+
+extern "C" void fn_8025E804(F* self);
 
 inline float Lerp3(float a, float b, float t)
 {
@@ -229,11 +281,35 @@ void fn_8025CF04(Unk8025CF04_I* self, int a)
         fn_80377408(self);
 }
 
-struct Unk8025D054_I {
-    char pad0[0x1FC];
-    int m1FC;
-    int m200;
-};
+void fn_8025CF64(I* in)
+{
+    Unk8025CF64_I* self = (Unk8025CF64_I*)in;
+    fn_802663B8((char*)self + 4);
+    fn_8025C998((F*)((char*)self + 0x9C));
+    fn_8025933C((char*)self + 0x204, (int)self);
+    fn_8035E604((char*)self + 0x1CC);
+    fn_80269DE4((char*)self + 0x190);
+    fn_80268998((char*)self + 0xBC, -1);
+    self->m420 = -1;
+    self->m44C = self->m44C & 0x07FFFFFF;
+    self->m4C0 = lbl_805DB13C;
+    self->m200 = 0;
+    self->m1FC = 0;
+    self->m41C = 0;
+    self->m434 = 0;
+    self->m464 = 0;
+    self->m4BC = 0;
+    self->m448 = 0;
+    for (int i = 0; i < 4; i++) {
+        self->m438[i] = 0;
+        self->m450[i] = 0;
+    }
+    fn_8025F878(in);
+    self->m42C.Clear();
+    self->m424.Clear();
+    fn_80268144((char*)self + 0x124);
+}
+
 void fn_8025D054(Unk8025D054_I* self, int a)
 {
     int t = self->m1FC;
@@ -360,11 +436,43 @@ void fn_8025E654(I* self)
         self->m438[i] = 0;
 }
 
-extern "C" void fn_8025E804(F* self);
-
 extern "C" void fn_8025E7E4(F* self)
 {
     fn_8025E804(self);
+}
+
+/* near-miss: 71 vs 72 instructions; retail copies the clamped fn_8014E310 result (r3) into the saved register after the clamp and keeps the byte test in r5. Tried inline clamp, byte local, i + 10 temp */
+extern "C" void fn_8025E804(F* f)
+{
+    I* self = (I*)f;
+    for (int i = 0; i <= 2; i++) {
+        if (*fn_80081CF8(self->m1EC->m6F8->m14, i) != 0xFF) {
+            int f = 0;
+            if (*(int*)((char*)self->m1EC->m6F8->m14 + 0x1CD0) != 0)
+                f = 1;
+            P* p = fn_801A4910(self->m1EC, f);
+            if (p != 0) {
+                int fl = 1;
+                if (p->m458 == i + 10)
+                    fl = 0;
+                fn_801A656C(self->m1EC, p);
+                int k = fn_8014E310(p->m458);
+                if (k <= 2) {
+                    if (k < 0)
+                        k = 0;
+                } else {
+                    k = 2;
+                }
+                A* a = &p->m58C;
+                fn_802547C0(a, 0);
+                fn_802553BC(a, 0);
+                a->m30 = k;
+                a->b3 = 0;
+                fn_8025505C(a, k, 0);
+                fn_8025E924(self, p, fl);
+            }
+        }
+    }
 }
 
 /* near-miss: 36 vs 31 instructions; retail passes the two float locals to fn_8024D050 straight from the registers they were loaded into (f1/f2) while the stores to the frame stay; ours reloads them from the slots. Tried const locals, inline pick(b, a, c), ternary */
