@@ -7,6 +7,325 @@
  */
 #include "game/tu_80052794.h"
 
+struct Unk8005DF2C_A;
+struct Unk8005DF2C_Ctx;
+struct Unk80060250_O {
+    char pad0[8];
+    int m8;
+};
+void fn_80060FF4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80060F34(void*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80060F94(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061054(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061124(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800611C0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061184(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800611FC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_8006125C(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800612BC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_8006135C(void);
+void fn_800613B8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_8006140C(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061360(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800618F4(void);
+void fn_8006143C(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061698(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800618F8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061924(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800619B4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800619E0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061A24(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061A88(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061AB4(void);
+void fn_80061AD8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061B34(void);
+void fn_80061B38(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061950(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061FFC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062028(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061BEC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061C3C(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061C68(void);
+void fn_80061C6C(void);
+void fn_80061DA0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061E68(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061F30(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061F70(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061FD4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062128(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062050(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800621E0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062208(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062258(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062370(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800624A8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800625A0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062688(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062810(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062938(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062A60(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062C90(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062B88(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062DB8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80062F10(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800630B8(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063290(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800634A4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800635AC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800636E4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063728(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063AD0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063BAC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063C90(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063EA0(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063F14(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80061C70(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063F74(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063FA4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063648(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80063FD4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_8006403C(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800640A4(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80064114(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_80064178(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+void fn_800641DC(Unk8005DF2C_A*, Unk80060250_O*, Unk8005DF2C_Ctx*);
+
+/* Dispatch on the event kind (0..75) to the per-kind handlers; every handler takes the caller's
+ * (a, ev, ctx) unchanged (six of them are declared without parameters). */
+void fn_800596D4(Unk8005DF2C_A* a, Unk80060250_O* ev, Unk8005DF2C_Ctx* ctx)
+{
+    switch (ev->m8) {
+    case 0:
+        fn_80060FF4(a, ev, ctx);
+        break;
+    case 1:
+        fn_80060F34((void*)a, ev, ctx);
+        break;
+    case 2:
+        fn_80060F94(a, ev, ctx);
+        break;
+    case 3:
+        fn_80061054(a, ev, ctx);
+        break;
+    case 4:
+        fn_80061124(a, ev, ctx);
+        break;
+    case 5:
+        fn_800611C0(a, ev, ctx);
+        break;
+    case 6:
+        fn_80061184(a, ev, ctx);
+        break;
+    case 7:
+        fn_800611FC(a, ev, ctx);
+        break;
+    case 8:
+        fn_8006125C(a, ev, ctx);
+        break;
+    case 9:
+        fn_800612BC(a, ev, ctx);
+        break;
+    case 10:
+        fn_8006135C();
+        break;
+    case 11:
+        fn_800613B8(a, ev, ctx);
+        break;
+    case 12:
+        fn_8006140C(a, ev, ctx);
+        break;
+    case 13:
+        fn_80061360(a, ev, ctx);
+        break;
+    case 14:
+        fn_800618F4();
+        break;
+    case 15:
+        fn_8006143C(a, ev, ctx);
+        break;
+    case 16:
+        fn_80061698(a, ev, ctx);
+        break;
+    case 17:
+        fn_800618F8(a, ev, ctx);
+        break;
+    case 18:
+        fn_80061924(a, ev, ctx);
+        break;
+    case 19:
+        fn_800619B4(a, ev, ctx);
+        break;
+    case 20:
+        fn_800619E0(a, ev, ctx);
+        break;
+    case 21:
+        fn_80061A24(a, ev, ctx);
+        break;
+    case 22:
+        fn_80061A88(a, ev, ctx);
+        break;
+    case 23:
+        fn_80061AB4();
+        break;
+    case 24:
+        fn_80061AD8(a, ev, ctx);
+        break;
+    case 25:
+        fn_80061B34();
+        break;
+    case 26:
+        fn_80061B38(a, ev, ctx);
+        break;
+    case 27:
+        fn_80061950(a, ev, ctx);
+        break;
+    case 28:
+        fn_80061FFC(a, ev, ctx);
+        break;
+    case 29:
+        fn_80062028(a, ev, ctx);
+        break;
+    case 30:
+        fn_80061BEC(a, ev, ctx);
+        break;
+    case 31:
+        fn_80061C3C(a, ev, ctx);
+        break;
+    case 32:
+        fn_80061C68();
+        break;
+    case 33:
+        fn_80061C6C();
+        break;
+    case 34:
+        fn_80061DA0(a, ev, ctx);
+        break;
+    case 35:
+        fn_80061E68(a, ev, ctx);
+        break;
+    case 36:
+        fn_80061F30(a, ev, ctx);
+        break;
+    case 37:
+        fn_80061F70(a, ev, ctx);
+        break;
+    case 38:
+        fn_80061FD4(a, ev, ctx);
+        break;
+    case 39:
+        fn_80062128(a, ev, ctx);
+        break;
+    case 40:
+        fn_80062050(a, ev, ctx);
+        break;
+    case 41:
+        fn_800621E0(a, ev, ctx);
+        break;
+    case 42:
+        fn_80062208(a, ev, ctx);
+        break;
+    case 43:
+        fn_80062258(a, ev, ctx);
+        break;
+    case 44:
+        fn_80062370(a, ev, ctx);
+        break;
+    case 45:
+        fn_800624A8(a, ev, ctx);
+        break;
+    case 46:
+        fn_800625A0(a, ev, ctx);
+        break;
+    case 47:
+        fn_80062688(a, ev, ctx);
+        break;
+    case 48:
+        fn_80062810(a, ev, ctx);
+        break;
+    case 49:
+        fn_80062938(a, ev, ctx);
+        break;
+    case 50:
+        fn_80062A60(a, ev, ctx);
+        break;
+    case 51:
+        fn_80062C90(a, ev, ctx);
+        break;
+    case 52:
+        fn_80062B88(a, ev, ctx);
+        break;
+    case 53:
+        fn_80062DB8(a, ev, ctx);
+        break;
+    case 54:
+        fn_80062F10(a, ev, ctx);
+        break;
+    case 55:
+        fn_800630B8(a, ev, ctx);
+        break;
+    case 56:
+        fn_80063290(a, ev, ctx);
+        break;
+    case 57:
+        fn_800634A4(a, ev, ctx);
+        break;
+    case 58:
+        fn_800635AC(a, ev, ctx);
+        break;
+    case 59:
+        fn_800636E4(a, ev, ctx);
+        break;
+    case 60:
+        fn_80063728(a, ev, ctx);
+        break;
+    case 61:
+        fn_80063AD0(a, ev, ctx);
+        break;
+    case 62:
+        fn_80063BAC(a, ev, ctx);
+        break;
+    case 63:
+        fn_80063C90(a, ev, ctx);
+        break;
+    case 64:
+        fn_80063EA0(a, ev, ctx);
+        break;
+    case 65:
+        fn_80063F14(a, ev, ctx);
+        break;
+    case 66:
+        fn_80061C70(a, ev, ctx);
+        break;
+    case 67:
+        fn_80063F74(a, ev, ctx);
+        break;
+    case 68:
+        fn_80063FA4(a, ev, ctx);
+        break;
+    case 69:
+        fn_80063648(a, ev, ctx);
+        break;
+    case 70:
+        fn_80063FD4(a, ev, ctx);
+        break;
+    case 71:
+        fn_8006403C(a, ev, ctx);
+        break;
+    case 72:
+        fn_800640A4(a, ev, ctx);
+        break;
+    case 73:
+        fn_80064114(a, ev, ctx);
+        break;
+    case 74:
+        fn_80064178(a, ev, ctx);
+        break;
+    case 75:
+        fn_800641DC(a, ev, ctx);
+        break;
+    }
+}
+
 void fn_80059BDC(int h, int kind, Unk80052794_Obj* obj)
 {
     int v = 0x40;
