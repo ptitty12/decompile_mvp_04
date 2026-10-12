@@ -6,6 +6,7 @@
 #include "game/tu_801A57C8.h"
 #include "game/goals/tu_8027A84C.h"
 #include "game/goals/tu_8027C728.h"
+#include "game/clampiter.h"
 
 typedef Unk801B7FB0_P P;
 typedef Unk801B7FB0_Ump U;
@@ -26,7 +27,6 @@ void fn_80377408(void* p);
 int fn_801C1638(P* p, int k);
 Vec3 fn_80189618(P* p, float f);
 void fn_8037893C(void* mgr, int type, void* ev, int a, void* t);
-int fn_802BB920(int a);
 void fn_80099620(void* t);
 void fn_80099704(void* t);
 void fn_80099670(void* t);
@@ -58,6 +58,8 @@ inline Vec3 operator-(const Vec3& a, const Vec3& b)
     return r;
 }
 
+int fn_802BB920(int a);
+extern const char lbl_805CFBAC[];
 extern "C" Unk8027C728_Goal* fn_802448F4(P* p, int k);
 void fn_80299B98(P* p, const Vec3* pos, float* ang);
 float fn_80410CE8(float y, float x);
@@ -402,6 +404,31 @@ extern "C" int fn_801B9CC0(B* u)
     return u->m4->m6F8->m14->m1CCA > one;
 }
 
+extern "C" void fn_801B9CE0(B* u, P* a, P* b)
+{
+    if (u->m30 != 0 && fn_801B9940(u, a) != 0 && fn_801B9CC0(u) == 0) {
+        int r = 0;
+        if (fn_801B9C5C(u) != 0) {
+            r = 1;
+        } else {
+            int c = fn_802BB920(b->m92C);
+            float p = 0.75f;
+            if (c != 0) {
+                p += 0.2f;
+            }
+            volatile float pad;
+            float k = 1.0f;
+            const char* file = lbl_805CFBAC;
+            unsigned n = u->m4->m554->fn_8014D8AC(1000000, file, 0x1AD);
+            if (!((float)n * k * 1e-6f >= p)) {
+                r = 1;
+            }
+        }
+        if (r != 0) {
+            fn_801BA0B8(u, a);
+        }
+    }
+}
 extern "C" void fn_801B9E04(B* u, P* q)
 {
     P* t = u->m4->m65C[0];
@@ -512,3 +539,75 @@ extern "C" void fn_801BAAC8(A* a)
 }
 
 extern "C" void fn_801BAB3C(A* a) { fn_801BAAC8(a); }
+
+extern "C" {
+void fn_801BE6BC(A* a, P* p);
+void fn_801BE494(A* a);
+void fn_801BE0A4(B* b);
+void fn_801BDD60(B* b, P* p);
+void fn_801BE430(B* b);
+void fn_801BA2B0(B* b);
+void fn_801BA4B0(B* b);
+int fn_801C1950(A* a);
+void fn_801BBA6C(A* a);
+void fn_801BBAD4(A* a);
+void fn_801BBB74(A* a);
+void fn_801BBA0C(A* a);
+}
+
+inline P* Unk801BAB5C_At(P** arr, unsigned i)
+{
+    return arr[i];
+}
+
+inline P* Unk801BAB5C_Pl(A* a, unsigned i)
+{
+    P* base = a->m14;
+    P* r;
+    if (i <= 0xC) {
+        r = Unk801BAB5C_At(base->m65C, i);
+    } else {
+        r = 0;
+    }
+    return r;
+}
+
+/* near-miss: same code; the loop counter and the m14 base pointer swap r9/r11 (priority tie in global-alloc). */
+extern "C" void fn_801BAB5C(A* a)
+{
+    P* m = a->m14;
+    if (m->m6F4 != 3) {
+        P* saved = m->m6CC;
+        volatile int sp8 = 9;
+        int i = 9;
+        do {
+            fn_801BE6BC(a, Unk801BAB5C_Pl(a, i));
+            int c = sp8;
+            int t;
+            if (c > 0x15) {
+                t = c;
+            } else {
+                t = c + 1;
+            }
+            sp8 = t;
+            i = t;
+        } while (i <= 0xC);
+        fn_801BE494(a);
+        fn_801BE0A4(a->m8);
+        if (fn_801C1950(a) != 0) {
+            fn_801BDD60(a->m8, saved);
+            fn_801BE430(a->m8);
+            fn_801BA2B0(a->m8);
+        }
+        fn_801BBA6C(a);
+        fn_801BBAD4(a);
+        if (fn_801C1950(a) != 0) {
+            if (a->m4 != 0) {
+                fn_801BBB74(a);
+            } else {
+                fn_801BBA0C(a);
+            }
+        }
+    }
+    fn_801BA4B0(a->m8);
+}
