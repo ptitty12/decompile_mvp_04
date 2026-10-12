@@ -24,6 +24,17 @@ extern const float lbl_805D5E08;
 extern const float lbl_805D5E0C;
 extern const float lbl_805D5E10;
 extern float lbl_8061D560;
+struct Unk80256C80_M;
+Player* fn_80257B40(Unk80256C80_M* list);
+extern "C" int fn_802055F4(TaskInner* in);
+struct Unk80216590_O838 {
+    char pad0[0x838];
+    int m838;
+};
+struct Unk80216590_P : Unk8021646C_Obj {
+    char pad45C[0x618 - 0x45C];
+    Unk80216590_O838* m618;
+};
 extern "C" {
 void fn_80213988(Task* t, int x, int y);
 void fn_80213B80(Task* t, int a, int b, int c);
@@ -800,6 +811,81 @@ extern "C" int fn_8021646C(void* self, Unk8021646C_Obj* o, int a, int b, int c)
         r = 7;
     if (k == 1 && r == 8)
         r = 9;
+    return r;
+}
+
+int fn_80216590(Task* t, Unk80216590_P* pl, Vec3f v, int a, int b, int c)
+{
+    int sp18 = 0;
+    int r = 1;
+    if ((unsigned)(c - 10) <= 1) {
+        int f = c == 11;
+        Player* o = fn_80257B40((Unk80256C80_M*)t->m9C->m0->m700->m3B4);
+        if (o == 0 || ((Unk8021646C_Obj*)o)->m458 == 9) {
+            r = 9;
+        } else if (a == 0) {
+            r = 0x11;
+            if (f == 1)
+                r = 0x14;
+        } else if (a == 1) {
+            r = 0x13;
+            if (f == 1)
+                r = 0x16;
+        } else {
+            r = 0x12;
+            if (f == 1)
+                r = 0x15;
+        }
+    } else {
+        if (c == 5) {
+            r = 9;
+            if (pl->m458 == 1 && pl->m618->m838 == -0x3C0481DF)
+                r = 0x1B;
+        } else if (c == 6) {
+            r = 0x1E;
+        } else if (c == 3) {
+            r = 0x1C;
+        } else if (c == 4) {
+            r = 0x1D;
+        }
+    }
+    if (r == 1) {
+        int e = fn_802055F4(t->m9C) == 1;
+        Vec3f w = v;
+        int x = fn_80215D28(t, (PosObj*)pl, &w);
+        int y = fn_80215E6C(t, (Unk8026C414_O*)pl);
+        w = v;
+        if (fn_80216014(t, (PosObj*)pl, &w, x, e, b, y) == 1)
+            return 0xC;
+        w = v;
+        if (fn_80215E94(t, (PosObj*)pl, &w, y) == 1) {
+            r = 0xA;
+            if (y == 1)
+                r = 0xB;
+            return r;
+        }
+        if (fn_80215F40(t, pl, e, b, c, &sp18) == 1) {
+            if (sp18 == 1)
+                return 0x17;
+            r = 0x18;
+            if (sp18 == 4)
+                r = 0x1A;
+            return r;
+        }
+        w = v;
+        r = 0xD;
+        if (((int (*)(Task*, Own6134*, Vec3f*, int, int, int, int))fn_80216134)(t, (Own6134*)pl, &w, x, e, b, y) == 1)
+            return r;
+        if (fn_802162F0(t, (Player*)pl, y) == 1) {
+            r = 9;
+            if (b == 0)
+                r = 8;
+            return r;
+        }
+        if (e == 1)
+            return fn_8021638C(t, pl, b, x, y);
+        return fn_8021646C(t, pl, b, x, y);
+    }
     return r;
 }
 
