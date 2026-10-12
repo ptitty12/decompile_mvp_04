@@ -126,10 +126,8 @@ void fn_8014D63C(int a, int b);
 void fn_8014D81C(int* p);
 void fn_8014D860(Unk8014D860_Obj* p, int a);
 Unk8014D9C4_Obj* fn_8014D9C4(Unk8014D9C4_Obj* p);
-void fn_8014DD30();
+void fn_8014DD30(Vec4f8014DAFC* v);
 int fn_8014DD68(int a0, int a1, unsigned a2, unsigned a3);
-/* near-miss (27 vs 30 insns): all 720 store orders tried; retail computes the element pointer with mulli/add
-   before the vptr-like stores and keeps the three symbol addresses in distinct registers */
 Unk8014E09C_Obj* fn_8014E09C(Unk8014E09C_Obj* p, int a, int b);
 void* fn_8014E108(Unk8014E108_Obj* p);
 int fn_8014E2B4(int a);
@@ -171,7 +169,7 @@ extern const char lbl_805C5F90[];
 void fn_803FFA60(void*, const char*, int);
 extern const float lbl_805C58AC;
 extern const float lbl_805C58B0;
-unsigned fn_8014DDAC();
+unsigned fn_8014DDAC(Vec4f8014DAFC* v);
 extern Unk2C lbl_8061BAD4[];
 extern char lbl_8061B9CC[];
 extern char lbl_8061BA7C[];
@@ -320,15 +318,33 @@ Unk8014D9C4_Obj* fn_8014D9C4(Unk8014D9C4_Obj* p)
     return p;
 }
 
+void fn_8014D9EC(Vec4f8014DAFC* out, float x, float y, float z, float w, float m)
+{
+    float inv = 1.0f / m;
+    out->x = inv * (!(x > m) ? (x >? 0.0f) : m);
+    out->y = inv * (!(y > m) ? (y >? 0.0f) : m);
+    out->z = inv * (!(z > m) ? (z >? 0.0f) : m);
+    out->w = inv * (!(w > m) ? (w >? 0.0f) : m);
+}
+
 Vec4f8014DAFC fn_8014DAFC(Vec4f8014DAFC v, float s)
 {
     Vec4f8014DAFC t = Div8014DAFC(v, s);
     return t;
 }
 
-void fn_8014DD30()
+void fn_8014DBA0(Vec4f8014DAFC* out, int r, int g, int b, int a)
 {
-    unsigned c = fn_8014DDAC();
+    float k = 0.003921569f;
+    out->x = r > 255 ? 1.0f : ((float)r >? 0.0f) * 0.003921569f;
+    out->y = g > 255 ? 1.0f : ((float)g >? 0.0f) * 0.003921569f;
+    out->z = b > 255 ? 1.0f : ((float)b >? 0.0f) * 0.003921569f;
+    out->w = a > 255 ? 1.0f : ((float)a >? 0.0f) * 0.003921569f;
+}
+
+void fn_8014DD30(Vec4f8014DAFC* v)
+{
+    unsigned c = fn_8014DDAC(v);
     fn_8014DD68(c >> 24, (c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF);
 }
 
@@ -343,8 +359,6 @@ int fn_8014DD68(int a0, int a1, unsigned a2, unsigned a3)
     return r;
 }
 
-/* near-miss (27 vs 30 insns): all 720 store orders tried; retail computes the element pointer with mulli/add
-   before the vptr-like stores and keeps the three symbol addresses in distinct registers */
 void fn_8014DF5C(Vec4f8014DAFC* out, Vec4f8014DAFC* pa, Vec4f8014DAFC* pb, float t)
 {
     Vec4f8014DAFC a = Copy8014DF5C(pa);
@@ -367,7 +381,6 @@ unsigned fn_8014E01C(Vec4f8014DAFC* v)
     return c.u;
 }
 
-/* near-miss (29 vs 27 insns): retail keeps a, b in r4, r5 for the pass-through call; ours copies them to r6, r7 first */
 Unk8014E09C_Obj* fn_8014E09C(Unk8014E09C_Obj* p, int a, int b)
 {
     Unk2C* t = &lbl_8061BAD4[b];
@@ -588,6 +601,34 @@ char fn_8014E614(Self8014E588* s)
     int i = s->m2000;
     s->m2000 = i + 1;
     return ((char*)s)[i];
+}
+
+int fn_8014E6E0(void* sv, char* buf, int n)
+{
+    Self8014E588* s = (Self8014E588*)sv;
+    if (s->m200C != 0 || s->m2014 == 0) {
+        *buf = 0;
+        return 0;
+    }
+    int i = 0;
+    char c = fn_8014E614(s);
+    while (c != 10 && c != 0 && i < n) {
+        buf[i] = c;
+        i++;
+        c = fn_8014E614(s);
+    }
+    if (i < n) {
+        if (i > 0 && c == 10 && buf[i - 1] == 13) {
+            i--;
+        }
+        buf[i] = 0;
+    } else {
+        buf[n - 1] = 0;
+        while (c != 10 && c != 0) {
+            c = fn_8014E614(s);
+        }
+    }
+    return s->m200C ^ 1;
 }
 
 void fn_8014E7EC(void* self, const char* target)
