@@ -469,6 +469,36 @@ extern "C" int fn_801C415C(Z* z)
     return fn_801D5974(z->m20C);
 }
 
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+struct Unk80270BA0_X;
+int fn_80244E3C(Unk80270BA0_X* x, Vec3* out);
+struct Unk801C2C64_ZV {
+    char pad0[0x298];
+    int m298;
+};
+
+extern "C" void fn_801C41C0(Z* z, P* p)
+{
+    if (((Unk801C2C64_ZV*)z)->m298 == 0 && p != 0) {
+        Vec3 v;
+        if (fn_80244E3C((Unk80270BA0_X*)p, &v)) {
+            Vec3 d = z->m29C[1].a - z->m29C[2].a;
+            z->m29C[0].b = v + d;
+            z->m29C[1].b = v;
+            z->m29C[2].b = v - d;
+            ((Unk801C2C64_ZV*)z)->m298 = 1;
+        }
+    }
+}
+
 extern "C" int fn_801C4334(Z* z)
 {
     P* p = fn_801A4B34(z->m204);
