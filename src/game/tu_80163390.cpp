@@ -163,6 +163,20 @@ struct Unk80165978_Evt {          /* fn_80165978 */
     int m44;
 };
 
+struct Unk801655F0_Obj {
+    char pad0[0x458];
+    int m458;
+    char pad45C[0x4C4 - 0x45C];
+    unsigned int m4C4;
+};
+
+struct Unk801655F0_Evt {          /* fn_801655F0 */
+    int m0;
+    char pad4[0xC];
+    Unk801655F0_Obj* m10;
+    int m14;
+};
+
 #define EVK(T, k) ((T*)(e ? ((k) == e->m0 ? e : 0) : 0))
 
 
@@ -277,7 +291,7 @@ void Unk80159F28::fn_80163CC4(int id, Unk80163CC4_Evt* e) /* 80163CC4 */
         fn_80161A74();
         break;
     case 0x93:
-        fn_801655F0(EVK(Unk80163CC4_Evt, id));
+        fn_801655F0(EVK(Unk801655F0_Evt, id));
         break;
     case 0x42: {
         float u = a->m700->m3A4->m180 - 0.016666668f;
@@ -503,6 +517,86 @@ void Unk80159F28::fn_80165578(Unk80165578_Evt* e, float t) /* 80165578 */
     Unk80165578_Obj* o = (Unk80165578_Obj*)fn_801A49F0(mC, e->mC, e->m8);
     if (o != 0 && o->m458 == 0) {
         mC->m50.fn_80326EF4(t, 0.0f, 0x79, 0, -1, 0);
+    }
+}
+
+class Unk80069F0C {
+public:
+    int fn_8006BDCC();
+};
+struct Unk801655F0_Rec {
+    char pad0[0x1CC8];
+    unsigned char m1CC8;
+    char pad1CC9;
+    unsigned char m1CCA;
+    unsigned char m1CCB;
+};
+struct Unk801655F0_Mgr {
+    char pad0[0x14];
+    Unk801655F0_Rec* m14;
+};
+struct Unk801655F0_Ent564 {
+    char pad0[0x14];
+    int m14;
+};
+struct Unk801655F0_Ent3C8 {
+    char pad0[0x5C];
+    int m5C;
+};
+struct Unk801655F0_Slots {
+    char pad0[0x3C8];
+    Unk801655F0_Ent3C8* m3C8;
+};
+struct Unk801655F0_Act {
+    char pad0[0x564];
+    Unk801655F0_Ent564* m564;
+    char pad568[0x6F8 - 0x568];
+    Unk801655F0_Mgr* m6F8;
+    char pad6FC[4];
+    Unk801655F0_Slots* m700;
+};
+
+void Unk80159F28::fn_801655F0(Unk801655F0_Evt* e) /* 801655F0 */
+{
+    Unk801655F0_Act* a = (Unk801655F0_Act*)mC;
+    int flag = 0;
+    int state = a->m564->m14;
+    if (state == 9 || ((Unk80069F0C*)a->m6F8)->fn_8006BDCC() != 0) {
+        flag = 1;
+    }
+    if (state == 10 && ((Unk801655F0_Act*)mC)->m6F8->m14->m1CC8 == 0) {
+        flag = 1;
+    }
+    if (flag == 0) {
+        int k = e->m10->m458;
+        if (k == 0) {
+            m14 = 1;
+            m18 = 1;
+            if (e->m14 != 0) {
+                m18 = k;
+            }
+            if (e->m10->m4C4 & 0x20000000) {
+                m18 = k;
+            }
+            if (state == 10) {
+                m18 = k;
+            }
+            Unk801655F0_Act* b = (Unk801655F0_Act*)mC;
+            Unk801655F0_Rec* r = b->m6F8->m14;
+            int sum = r->m1CCB + r->m1CCA;
+            if (sum == 0 && b->m700->m3C8->m5C <= 1) {
+                m18 = sum;
+            }
+        }
+        if (e->m10->m458 == 0xA) {
+            m1C = 1;
+        }
+        if (e->m10->m458 == 0xB) {
+            m20 = 1;
+        }
+        if (e->m10->m458 == 0xC) {
+            m24 = 1;
+        }
     }
 }
 
