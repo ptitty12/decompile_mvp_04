@@ -49,6 +49,10 @@ struct RecObj8015F164 {
     RecObj8015F164() { fn_803597C4((Unk803597C4*)this); }
 };
 Unk8016ACAC* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
+extern "C" Unk8015ABB8_Rec fn_8015AE08(Unk80159F28* self, int a);
+extern "C" void fn_8015FC00(Unk80159F28* self, Unk8015ABB8_Rec r, Unk8016D9A0_Rec* rec);
+int fn_80166440(void* self, int v);
+extern "C" void fn_8015F918(Unk80159F28* self, int a);
 inline int IsValid(const Unk80326F44_Out& o)
 {
     return o.m0 != 0xC7;
@@ -146,7 +150,17 @@ void Unk80159F28::fn_8015F87C() /* 8015F87C */
         if (m->fn_8006BE18() != 0 && r != 0) {
             r = 4;
         }
-        fn_8015F918(r);
+        ::fn_8015F918(this, r);
+    }
+}
+
+extern "C" void fn_8015F918(Unk80159F28* self, int a) /* 8015F918 */
+{
+    Unk8015ABB8_Rec r = fn_8015AE08(self, a);
+    if (r.w[0] != 0 && fn_80166440(self, r.w[0]) == 0) {
+        RecObj8015F164 rec;
+        fn_8015FC00(self, r, (Unk8016D9A0_Rec*)&rec);
+        fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
     }
 }
 
@@ -243,6 +257,29 @@ void Unk80159F28::fn_80161A34() /* 80161A34 */
 int* Unk80159F28::fn_80161A5C(int a, int b) /* 80161A5C */
 {
     return (int*)((char*)this + 0x50 + a * 0x64 + b * 4);
+}
+
+extern "C" int fn_80161FBC(Unk80159F28* self) /* 80161FBC */
+{
+    if (self->m10 != 0 || self->m4C == -1) {
+        return 0;
+    }
+    Unk801527C8_Actor* ac = self->mC;
+    if (ac->m6F8->fn_8006BE18() != 0) {
+        return 0;
+    }
+    Unk801527C8_Sub* s = &self->mC->m50;
+    V2s80161924 v;
+    fn_80326ED4(s, &v.x, &v.y);
+    int ok = Chk80161924(s, 0x42, 1, -1.0f);
+    if (ok == 0) {
+        return 0;
+    }
+    RecObj8015F164 rec;
+    int tbl[7] = { 13, 14, 15, 16, 17, 18, 19 };
+    self->fn_80157514(0xF, (int)&rec, 0, tbl[self->m4C], 0, lbl_8068B828);
+    fn_801A6D84((Unk8019F8C0_Owner*)self->mC, 1)->fn_8016A7A8((Unk8016D9A0_Rec*)&rec);
+    return 1;
 }
 
 int Unk80159F28::fn_80162534() /* 80162534 */
