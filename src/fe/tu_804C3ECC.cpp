@@ -4,6 +4,92 @@
  */
 
 #include "game/fe_804BE560.h"
+extern "C" int fn_8007B320__18Unk8007B2B0_Screenii(void* g, int a, int b);
+extern "C" void fn_804C6AEC(FeScrN* x);
+struct FeWV35 : Unk800C7B40_Data {
+    virtual ~FeWV35();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35(int a);
+};
+struct FeScrR : FeW {
+    char pad40[0xF0];
+    int m130;
+    int m134;
+    int m138;
+    int m13C;
+    int m140;
+    int m144;
+    int m148;
+    FeW* m14C;
+    FeW* m150;
+    FeW* m154;
+    FeW* m158;
+    FeW* m15C;
+    FeW* m160;
+    FeW* m164;
+    FeW* m168;
+    FeW* m16C;
+    FeW* m170;
+    FeW* m174;
+    FeW* m178;
+    FeW* m17C;
+    FeW* m180;
+    FeW* m184;
+    FeW* m188;
+};
+extern char lbl_805F4F20[];
+extern char lbl_805F5664[];
+extern char lbl_805F535C[];
+extern char lbl_805F5574[];
+extern char lbl_805F5670[];
+extern char lbl_805F7F40[];
+extern char lbl_805F7F58[];
+extern char lbl_805F7F70[];
+extern char lbl_805F7F88[];
+extern char lbl_805F7F9C[];
+extern char lbl_805F7FB4[];
+extern char lbl_805F5854[];
+extern char lbl_805F4F48[];
+extern char lbl_805F57D0[];
+extern "C" void fn_804A763C(void* w, int a);
+extern "C" void fn_804A7760(void* w);
+extern "C" FeW* fn_800C8038(FeW* w);
+extern "C" FeW* fn_800C8040(FeW* w);
+extern "C" FeW* fn_800C8054(FeW* w);
+extern "C" FeW* fn_800C8058(FeW* w);
+extern "C" void fn_800DD204__FP3UiST0(void* a, void* b);
 struct FeScrQ : FeW {
     char pad40[0xF0];
     int m130;
@@ -305,6 +391,68 @@ extern "C" void fn_804C68B4(FeScrN* x, int v);
 extern "C" int fn_804C60A4(FeScrN* x);
 extern "C" void fn_804C4B5C(int a, FeScrN* x);
 extern "C" void fn_804C61B4(FeScrN* x, FeW* w);
+
+extern "C" FE_OVERLAY void fn_804C3ECC(FeScrN* v)
+{
+    FeScrR* x = (FeScrR*)v;
+    fn_800ECF18(x);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    x->m134 = 0;
+    x->m13C = 0;
+    x->m138 = fn_800B555C()->m0 == 0x30;
+    x->m140 = 0;
+    x->m148 = 0;
+    x->m168 = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F20);
+    x->m168->fn_vslot8(x->m138);
+    fn_804A763C(x->m168, 1);
+    x->m14C = fn_800C8060(x->fn_vslot32(lbl_805F5664, 1));
+    x->m150 = fn_800C8060(x->fn_vslot32(lbl_805F535C, 1));
+    x->m154 = x->m14C;
+    x->m14C->fn_vslot105(1);
+    x->m150->fn_vslot105(1);
+    x->m158 = fn_800C805C(x->fn_vslot32(lbl_805F5574, 1));
+    x->m15C = fn_800C8058(x->fn_vslot32(lbl_805F5670, 1));
+    x->m160 = fn_800B7AB8(FeGetMgr(), lbl_805F4F0C);
+    x->m164 = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    x->m174 = fn_800C8044(x->fn_vslot29(lbl_805F7F40));
+    x->m178 = fn_800C8044(x->fn_vslot29(lbl_805F7F58));
+    x->m17C = fn_800C8044(x->fn_vslot29(lbl_805F7F70));
+    x->m180 = fn_800C8044(x->fn_vslot29(lbl_805F7F88));
+    x->m184 = fn_800C8044(x->fn_vslot29(lbl_805F7F9C));
+    x->m16C = fn_800C8040(x->fn_vslot32(lbl_805F7FB4, 1));
+    x->m170 = fn_800C8040(x->fn_vslot32(lbl_805F5854, 1));
+    fn_800C8044(x->fn_vslot32(lbl_805F7FC0, 1))->fn_vslot8(x->m138 ^ 1);
+    x->m188 = fn_800C8054(x->fn_vslot32(lbl_805F4F48, 1));
+    if (x->m138 != 0) {
+        x->m144 = FeAt((char*)fn_800A1960(lbl_80619948)->m3500, x->m140);
+    } else {
+        void* g = lbl_8061930C;
+        x->m144 = fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_8007F7D0__FP13Unk8007F198_BUi(g, 0));
+    }
+    fn_804C686C(v, x->m144);
+    fn_804C6AEC(v);
+    fn_80124FA8(x->m164, x);
+    fn_804A7760(x->m168);
+    FeW* w1 = fn_800C8044(x->fn_vslot32(lbl_805F57D0, 1));
+    FeW* w2 = fn_800C8040(w1->fn_vslot33(4, 1));
+    w2->fn_vslot29((const char*)(x->m138 != 0 ? 0x5C66 : 0x58BD));
+    fn_800DD204__FP3UiST0(w2, fn_800C8038(w1->fn_vslot33(2, 1)));
+    ((FeWV35*)x->m14C)->s35(0x19);
+    x->m14C->fn_vslot79(0x1BE, 0);
+    x->m14C->fn_vslot3();
+    x->m150->fn_vslot79(1, 0);
+    x->m150->fn_vslot3();
+    fn_804C4E30(v);
+    fn_804C4FA8(v);
+    fn_804C6AA4(v);
+    x->m14C->fn_vslot14(0);
+    x->m150->fn_vslot14(0);
+    fn_804C61B4(v, x->m154);
+    fn_804C5D5C(v);
+    x->m158->fn_vslot16(1);
+    x->m14C->fn_vslot16(1);
+    x->m150->fn_vslot16(1);
+}
 
 extern "C" FE_OVERLAY void fn_804C4520(FeScrN* x)
 {
