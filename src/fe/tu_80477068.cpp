@@ -3,6 +3,29 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80471EBC.h"
+extern "C" {
+int fn_80084408__Fi(int v);
+int strcmp(const char* a, const char* b);
+char* strncpy(char* a, const char* b, unsigned n);
+}
+struct FeS1C0 {
+    char pad0[0x1C0];
+    int m1C0;
+    int m1C4;
+    int m1C8;
+    int m1CC;
+};
+struct FePop310 {
+    char pad0[0x30C];
+    void* m30C;
+    void* m310;
+};
+extern "C" {
+void fn_804782DC();
+void fn_80479BFC(char* x);
+void fn_8047AA5C(char* x);
+void fn_804794A4(char* x);
+}
 extern "C" void fn_800DD344__FP8Udd344_TPv(void* a, void* b);
 extern "C" {
 void fn_8047A46C(char* x);
@@ -68,6 +91,44 @@ extern "C" FE_OVERLAY int fn_80477C54(void)
     return 1;
 }
 
+extern "C" FE_OVERLAY int fn_80477C5C(FeW* x, int b)
+{
+    x->fn_vslot32(lbl_805F4EF4, 1);
+    FeW* w = fn_800C8060();
+    char* name = (char*)w->fn_vslot70()->fn_vslot33(5, 1) + 0xC;
+    if (strcmp(name, "MANAGE") == 0) {
+        void* g = lbl_8061930C;
+        void* id = fn_8007F7D0__FP13Unk8007F198_BUi(g, 0);
+        FeNode4* n = lbl_806192E0->m4;
+        int cur = FeI(n->m14, 0x198);
+        if (fn_8006A1B4__11Unk80069F0C(n) == 1) {
+            if (fn_80084408__Fi(fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, id))) == cur) {
+                fn_80086EC0(n->m10, 0, b);
+                fn_80086EC0(n->m10, 1, -1);
+            } else {
+                fn_80086EC0(n->m10, 0, -1);
+                fn_80086EC0(n->m10, 1, b);
+            }
+        } else {
+            if (fn_80075948__18Unk8007B2B0_Screeni(g, cur) == (int)id) {
+                fn_80086EC0(n->m10, 0, b);
+                fn_80086EC0(n->m10, 1, -1);
+            } else {
+                fn_80086EC0(n->m10, 0, -1);
+                fn_80086EC0(n->m10, 1, b);
+            }
+        }
+    }
+    FeI(x, 0x144) = b;
+    FeMsg m;
+    FeMsg* mp = &m;
+    fn_8035682C(mp);
+    strncpy(mp->name, name, 15);
+    mp->name[15] = 0;
+    fn_800B7B4C(FeGetMgr(), mp, x);
+    return 1;
+}
+
 extern "C" FE_OVERLAY int fn_80477E48(FeW* x, char* y)
 {
     char* s = y + 0xC;
@@ -129,6 +190,30 @@ extern "C" FE_OVERLAY FeScrH* fn_8047809C(FeScrH* self, int a, int b, int c, int
     FeI(self, 0x1C4) = 0;
     FeI(self, 0x1C8) = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_80478118(void* p)
+{
+    FeS1C0* x = (FeS1C0*)p;
+    fn_800ECF18(x);
+    FePopup* a = fn_800B7AB8(FeGetMgr(), "FTOPBAR");
+    a->fn_vslot8(0);
+    a->fn_vslot16(0);
+    x->m1C8 = (int)fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    FePop310* b = (FePop310*)fn_800B7A94(FeGetMgr(), "NOTIFIEDSIMPROG");
+    x->m1C4 = (int)b;
+    b->m30C = (void*)fn_80479A28;
+    ((FePop310*)x->m1C4)->m310 = (void*)fn_804782DC;
+    x->m1CC = (int)fn_800B7AB8(FeGetMgr(), lbl_805F4F0C);
+    ((FeW*)x)->fn_vslot32("GAMEGRID", 1);
+    x->m1C0 = (int)fn_800C8060();
+    fn_8047A384((FeW*)x);
+    fn_8047AA5C((char*)x);
+    fn_80479BFC((char*)x);
+    fn_8047B15C(x);
+    fn_804794A4((char*)x);
+    if (lbl_80619948->m74 == 2)
+        ((void (*)(void*, int))fn_800A2F9C)(lbl_80619948, 1);
 }
 
 extern "C" FE_OVERLAY void fn_80479378(int a, FeW* x)
