@@ -383,7 +383,7 @@ extern "C" void fn_801C9184(Z* z)
 {
     float a = RandF(z->m204->m554, 0.499f, 0x10D9);
     Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
-    if (!(v.x >= (double)1.775f) && !(v.x <= (double)-1.775f))
+    if (!(v.x >= 0.6) && !(v.x <= -0.6))
         a = a + 0.5f;
     fn_801CB8B0(z, a);
     float b = fn_801C8FB8(z);
@@ -395,7 +395,7 @@ extern "C" void fn_801C92A0(Z* z)
 {
     float a = RandF(z->m204->m554, 0.499f, 0x10F4);
     Unk801C6D2C_V2 v = ((Unk801C6D2C_VaFn)fn_801CD94C)(z);
-    if (!(v.x >= (double)1.775f) && !(v.x <= (double)-1.775f))
+    if (!(v.x >= 0.6) && !(v.x <= -0.6))
         a = a + 0.5f;
     fn_801CB8B0(z, a);
     float b = fn_801C8FB8(z);
