@@ -74,4 +74,134 @@ void fn_8058233C(void* self);
 int fn_80582DF4(int a, int b, Db80586420_Tri t);
 }
 
+
+/* Unit 0x8058E5B8: screen-like object; fn_8058F08C / fn_8058F114 touch m42C and m434. */
+struct Db8058F08C_S {
+    char pad0[0x42C];
+    int m42C;
+    int m430;
+    int m434;
+};
+/* Serialized stack-list record: m38 count, m3C current index, items from +0x20 (fn_8058FA5C/7C/AC8/AD0). */
+struct Db8058FA5C_L {
+    char pad0[0x20];
+    int m20[4];
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+};
+
+
+/*
+ * List classes of unit 0x8058E5B8: three data words, the vptr at +0xC (virtual
+ * count at vtable +0x10, virtual +0x38 clears), then the payload. Db8058F62C_P is
+ * the plain mirror the constructors write through (they store lbl_ vtables
+ * themselves); Db8058F62C_V / Db8058F840_V carry the virtual calls.
+ */
+struct Db8058F62C_Data {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Db8058F62C_V : Db8058F62C_Data {
+    virtual int v08();
+    virtual int v10();
+    virtual int v18();
+    virtual int v20();
+    virtual int v28();
+    virtual int v30();
+    virtual int v38(int a);
+};
+struct Db8058F62C_L : Db8058F62C_V {
+    unsigned short m10[0x13];
+    unsigned short m36;
+    unsigned short m38;
+    int m3C[17];
+};
+struct Db8058F62C_P : Db8058F62C_Data {
+    const void* mC;
+    unsigned short m10[0x13];
+    unsigned short m36;
+    unsigned short m38;
+    int m3C[17];
+};
+struct Db8058F840_V : Db8058F62C_Data {
+    virtual int v08();
+    virtual int v10();
+};
+struct Db8058F840_L : Db8058F840_V {
+    int m10;
+    int m14[4];
+};
+struct Db8058F840_P : Db8058F62C_Data {
+    const void* mC;
+    int m10;
+    int m14[4];
+};
+
+
+/*
+ * Unit 0x8059377C: a global manager (lbl_80619948) with two 0x10-stride row tables
+ * selected by fn_800A2EB4 (fn_805937A4 searches them for an id). Rows: id at +0,
+ * a word at +4, a float at +8, a byte at +0xC (fn_80593880/E8/4C read them).
+ */
+struct Db805937A4_Row {
+    int m0;
+    int m4;
+    float m8;
+    unsigned char mC;
+    char pad[3];
+};
+struct Db805937A4_Mgr {
+    char pad0[0x10480];
+    Db805937A4_Row a[612];
+    Db805937A4_Row b[11];
+    int m12B70;
+    int m12B74;
+    float m12B78;
+    char pad12B7C[0xC];
+    int m12B88;
+    int m12B8C;
+};
+extern "C" int fn_800A2EB4(void* p);
+extern void* lbl_80619948;
+
+/*
+ * Gauge-like table (ctor fn_80593CD0): manager pointer m0, slot count m14, 0x14-byte
+ * entries behind m10, a per-slot counter array m18, vptr at +0x1C.
+ */
+struct Db80593CD0_Ent {
+    float m0;
+    float m4;
+    int m8;
+    int mC;
+    int m10;
+    Db80593CD0_Ent() { m4 = m0 = 0.0f; m8 = 0; mC = 0; m10 = 0; }
+};
+struct Db80593CD0_Data {
+    Db805937A4_Mgr* m0;
+    int m4;
+    float m8;
+    int mC;
+    Db80593CD0_Ent* m10;
+    int m14;
+    int* m18;
+    void Clear()
+    {
+        int i = 0;
+        if (i < m14) {
+            int off = 0;
+            do {
+                *(int*)(off + (int)m18) = 0;
+                i++;
+                off += 4;
+            } while (i < m14);
+        }
+    }
+};
+struct Db80593CD0_P : Db80593CD0_Data {
+    const void* m1C;
+};
+
 #endif
