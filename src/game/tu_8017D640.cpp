@@ -375,11 +375,10 @@ int fn_8017E030(Unk8017DD64_T* p, int a, int b)
     return r;
 }
 
-/* near-miss (18 of 33 slots differ): the clamp-iterator step, the loop counter copy and the
- * hoisted p->m4 + 0x65C match. Retail returns the call result in r3 with no saved copy
- * (`mr r3,r0` is the argument move before `cmpwi r0,0`) and computes slwi before the cmplwi;
- * ours keeps r in r30 (stmw). Tried: r = x / x = f(x) / shared x, Slot as inline with byte
- * offset (kept), plain volatile counter. */
+/* near-miss (84% fuzzy; kept because dropping it would regress the baseline's 77%): the clamp-iterator step,
+ * the loop counter copy and the hoisted p->m4 + 0x65C match. Retail compares x with `cmpwi r0,0` next to a
+ * separate `mr r3,r0` (ours fuses them into `mr.`) and computes slwi before the cmplwi. Tried: r = x /
+ * x = f(x) / shared x, r declared in the loop, Slot spelled seven ways, const x. */
 inline int Slot(Unk8017DD64_T* p, int i)
 {
     int* t = p->m4->m65C;
@@ -420,21 +419,20 @@ int fn_8017E264(Unk8017DD64_T* p)
     int i = 0;
     int r;
     do {
-    int r;
-    int x = Slot(p, i);
-    r = x;
-    if (x)
-        r = fn_802491D8(x);
+        int x = Slot(p, i);
+        r = x;
+        if (x)
+            r = fn_802491D8(x);
         i = it.Next();
     } while (i <= 12);
     return r;
 }
 
-/* near-miss: the arguments are copied to r28..r31 before the first load in retail; 3 slots differ. */
+/* The first callee is passed (a, b, c) unchanged: its r4..r6 are left as received, so the argument copies
+ * into r29..r31 are all scheduled ahead of the load. */
 void fn_8017E2E8(Unk8017E2E8_T* p, int a, int b, int c)
 {
-    void* x = p->m3B0;
-    fn_8023522C(x);
+    fn_8023522C(p->m3B0, a, b, c);
     fn_801DBE30(p->m3B8, a, b, c);
     fn_8017F67C(p->m24, a, b, c);
     switch (a) {

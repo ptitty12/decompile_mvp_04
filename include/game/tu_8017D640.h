@@ -164,7 +164,7 @@ struct Unk8017E2E8_T {
     char pad3BC[0x3C8 - 0x3BC];
     void* m3C8;
 };
-void fn_8023522C(void* p);
+void fn_8023522C(void* p, int a, int b, int c);
 void fn_801DBE30(void* p, int a, int b, int c);
 void fn_8017F67C(char* p, int a, int b, int c);
 void fn_801ABC14(void* p);
