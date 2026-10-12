@@ -77,12 +77,31 @@ struct Unk8035FC78 : Unk80330870 {
 };
 void fn_80359604(void* p, int chrg);
 
+extern "C" void fn_8037B424(void*, int);
+
+extern "C" void fn_8035F63C(void* a, int b) { fn_8037B424(a, b); }
+
+extern "C" void fn_8035F65C(void* a, int b) { fn_8037B424(a, b); }
+
+extern "C" void fn_8035F67C(void* a, int b) { fn_8037B424(a, b); }
+
+
+
 void fn_8035F69C(Unk8035F69C* s)
 {
     s->m24 = 0;
     for (int i = 0; i < 9; i++)
         s->m0[i] = 0;
 }
+
+extern "C" void fn_8035F6C0(void* a, int b) { fn_8037B424(a, b); }
+
+extern "C" void fn_8035F6E0(void* a, int b) { fn_8037B424(a, b); }
+
+extern "C" void fn_8035F700(void* a, int b) { fn_8037B424(a, b); }
+
+
+
 
 struct Unk8035F720 {
     char pad0[0x400];
