@@ -255,6 +255,47 @@ void Unk8007A4DC_Screen::fn_80075048(int a, int b, int i, int c)
         m1CC[i].m0->v40(a, b, c);
 }
 
+struct Unk75094_Out {
+    unsigned a;
+    unsigned b;
+    unsigned c;
+};
+void fn_8008397C(Unk8007A4DC_Obj1E8* o, int x, int p, int q, unsigned* out);
+int fn_800849C0(int i);
+int fn_800801DC(Unk8007A4DC_Screen* s);
+/* near-miss (pass 2): same shape as fn_800739E0; retail moves d into r4 at entry and indexes the
+ * second slot as (c * 12 + 4) from a callee-saved base. */
+int Unk8007A4DC_Screen::fn_80075094(int a, int id, int c, int d)
+{
+    if (c <= 1) {
+        if (d <= 1) {
+            W* w = m1CC[c].m4[d];
+            return w->v28(a, fn_80071814(w, id));
+        }
+        char* b = (char*)this + 0x1D0;
+        int o = c * 12;
+        W* w1 = *(W**)(b + (o + 4));
+        int r1 = w1->v28(a, fn_80071814(w1, id));
+        W* w2 = *(W**)(b + o);
+        return r1 + w2->v28(a, fn_80071814(w2, id));
+    }
+    if (fn_800801DC(this) == 1) {
+        Unk8007A4DC_Obj1E8* o = m1E8;
+        int p = fn_80080198();
+        Unk75094_Out sp;
+        fn_8008397C(o, id, p, fn_800849C0(c), &sp.a);
+        switch (a) {
+        case 0:
+            return (sp.a >> 16) & 0xFF;
+        case 2:
+            return (sp.a >> 7) & 0x1FF;
+        case 7:
+            return (sp.c >> 13) & 0x3F;
+        }
+    }
+    return 0;
+}
+
 void Unk8007A4DC_Screen::fn_800755FC(int a, int b, int i, int j, int c)
 {
     if (i <= 1 && j <= 1) {

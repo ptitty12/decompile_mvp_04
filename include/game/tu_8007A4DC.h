@@ -158,8 +158,8 @@ struct Unk8007A4DC_Screen {
     int fn_80074754(int a, int x, int i);
     void fn_80074F50(int a, int b, int i, int c);
     int fn_80074FC8(int a, int b, int i);
-    void fn_80075048(int a, int b, int i, int c);
     int fn_80075094(int a, int id, int c, int d);
+    void fn_80075048(int a, int b, int i, int c);
     int fn_80075684(int a, int b, int c, int d);
     void fn_800755FC(int a, int b, int i, int j, int c);
     void fn_8007575C(int a, int b, int i, int j, int c);
