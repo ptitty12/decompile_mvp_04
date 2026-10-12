@@ -86,6 +86,29 @@ extern "C" float fn_801C6D2C(Z* z, float f)
 
 inline float AbsF(float v) { return (float)__builtin_fabs(v); }
 
+
+/* near-miss (98.4%): code identical; the inline frame slots differ. Retail puts the second AbsF parameter at
+ * 0x30 after the LerpATB slots (0x18..0x20) in the x < 0 arm and the LerpATB slots at 0x20 in the other; ours
+ * allocates them 0x20/0x28 apart. */
+extern "C" float fn_801C6D88(Z* z)
+{
+    const float lo1 = 55.0f;
+    const float hi1 = 100.0f;
+    const float lo2 = 5.0f;
+    const float hi2 = 50.0f;
+    if (!(AbsF(z->m1D8) <= 0.35f)) {
+        if (!(z->m1D8 < 0.0f))
+            return LerpATB(lo1, z->m1D8, hi1);
+        return -LerpATB(lo2, AbsF(z->m1D8), hi2);
+    }
+    float r;
+    if (!(RandFP(z->m204, 1.0f, 0xCA9) < 0.4f))
+        r = -LerpATB(lo2, RandFP(z->m204, 1.0f, 0xCB1), hi2);
+    else
+        r = LerpATB(lo1, RandFP(z->m204, 1.0f, 0xCAC), hi1);
+    return r;
+}
+
 extern "C" float fn_801C6FD8(Z* z)
 {
     float r = 0.0f;
