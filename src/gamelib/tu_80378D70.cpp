@@ -281,10 +281,6 @@ Unk80379324::Unk80379324(const Unk80379324& o)
     *this = o;
 }
 
-/* fn_8037936C (0x28 bytes) is a second, identical Vec4 copy ctor of another class;
- * it stays unmatched here: other units reference its fn_ name, so a real ctor
- * (which the "mr r9,r3" copy needs) would have to rename it. */
-
 Unk80379324::Unk80379324(float a, float b, float c, float d)
 {
     x = a;
@@ -344,6 +340,16 @@ extern "C" void fn_803792AC(unsigned char** pp, unsigned* len)
         *len -= n;
     } else
         *len = 0;
+}
+
+struct Unk8037936C_Quat {
+    float x, y, z, w;
+};
+
+extern "C" Unk8037936C_Quat* fn_8037936C(Unk8037936C_Quat* self, const Unk8037936C_Quat* o)
+{
+    *self = *o;
+    return self;
 }
 
 extern "C" Unk803793D4_Vec4 fn_803793D4(float w, const Unk80379324_Vec3* v)
