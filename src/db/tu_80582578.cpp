@@ -53,7 +53,7 @@ public:
     virtual int* v11(int idx);
     virtual void v12();
     virtual DbItem* v13(int idx);
-    virtual void v14();
+    virtual int v14(int a, int b);
     virtual void v15(int idx, int q);
 };
 
@@ -176,11 +176,29 @@ struct DbRecObj {
     unsigned mC;
     char pad10[8];
 };
+
+extern "C" int rand(void);
+struct Db8058313C_L {
+    int* m0;
+    unsigned m4;
+};
+
+struct Unk80360B24 {
+    int m0;
+    int m4;
+    int m8;
+    unsigned mC;
+    unsigned short m10;
+    unsigned short m12;
+    const void* m14;
+    Unk80360B24(const Unk80360B24&);
+};
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_80582578(DbSubX* self, int a);
 extern "C" int fn_805825BC(DbSubX* self, int a, int* o1, int* o2);
 extern "C" int fn_805826AC(DbSubX* self, DbRec12* rec);
 extern "C" void fn_8058284C(DbSubX* self, int idx, int p, int q);
+extern "C" void fn_80582928(DbSubX* self, int x);
 extern "C" void fn_80582AA0(DbSubX* self);
 extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
 extern "C" int fn_80582DF4(int unused, int k, int* arr);
@@ -188,6 +206,7 @@ extern "C" int fn_80582E38(int unused, int a, int b);
 extern "C" int fn_80582EE4(int unused, int a);
 extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
 extern "C" int fn_80583000(int unused, int a);
+extern "C" int fn_8058313C(int a, Db8058313C_L* l, int c);
 extern "C" int fn_8058320C(void* unused, int id, int k);
 extern "C" int fn_80583324(int unused, int b);
 extern "C" int fn_80583354(int unused, int x, int c);
@@ -276,6 +295,27 @@ extern "C" DB_OVERLAY void fn_8058284C(DbSubX* self, int idx, int p, int q)
                 self->v15(idx, q);
             self->v13(idx)->m0 = p;
         }
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80582928(DbSubX* self, int x)
+{
+    int i = 0;
+    while (i < self->v10()) {
+        int f = self->v13(i)->m0 != 0;
+        if (f) {
+            if (self->v13(i)->m4 != 0) {
+                Unk80360B24 tmp(*(Unk80360B24*)((char*)self->v13(i) + 8));
+                Unk80360B24* p = &tmp;
+                fn_80582CF8(self, p, p->m10, 1, i);
+                self->v13(i)->m0 = 0;
+                fn_80360AF0(p, 2);
+            } else {
+                if (self->v14(i, x) != 0)
+                    self->v13(i)->m0 = 0;
+            }
+        }
+        i += 1;
     }
 }
 
@@ -381,6 +421,32 @@ extern "C" DB_OVERLAY int fn_80583000(int unused, int a)
     default:
         return 2;
     }
+}
+
+extern "C" DB_OVERLAY int fn_8058313C(int a, Db8058313C_L* l, int c)
+{
+    if (l->m4 != 0) {
+        int found = 0;
+        int pick;
+        do {
+            unsigned i = (unsigned)rand() % l->m4;
+            int off = i * 4;
+            pick = *(int*)((char*)l->m0 + off);
+            if (i < l->m4) {
+                do {
+                    i += 1;
+                    *(int*)(off + (int)l->m0) = *(int*)(off + (int)l->m0 + 4);
+                    off += 4;
+                } while (i < l->m4);
+                l->m4 = l->m4 - 1;
+            }
+            if (fn_80582E38(a, pick, c) == 0)
+                found = 1;
+        } while (!found && l->m4 != 0);
+        if (found)
+            return pick;
+    }
+    return 0;
 }
 
 /* near-miss: ~14 slots; same structure, retail reads t.m0 and the final vptr store directly off sp and orders the C3 stores m4, mC, m14 */
