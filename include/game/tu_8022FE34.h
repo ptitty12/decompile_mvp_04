@@ -253,9 +253,7 @@ struct Unk8022FE34_U {
     int fn_80235AB8();
     void fn_80235AC4();
     void fn_80235AD4();
-    Unk8022FE34_V2 fn_80235BE0();
     Unk8022FE34_V2 fn_80235BFC();
-    Unk8022FE34_V2 fn_80235C18();
     int fn_80235C68();
     float fn_80235D80();
     float fn_80235DA8();

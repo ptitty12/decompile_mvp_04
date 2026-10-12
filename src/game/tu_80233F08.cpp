@@ -295,9 +295,9 @@ void Unk8022FE34_U::fn_80235AD4()
     m4->m18 = 0;
 }
 
-Unk8022FE34_V2 Unk8022FE34_U::fn_80235BE0()
+extern "C" Unk8022FE34_V2 fn_80235BE0(Unk8022FE34_U* u)
 {
-    return m4->m28;
+    return u->m4->m28;
 }
 
 Unk8022FE34_V2 Unk8022FE34_U::fn_80235BFC()
@@ -305,9 +305,9 @@ Unk8022FE34_V2 Unk8022FE34_U::fn_80235BFC()
     return m4->m20;
 }
 
-Unk8022FE34_V2 Unk8022FE34_U::fn_80235C18()
+extern "C" Unk8022FE34_V2 fn_80235C18(Unk8022FE34_U* u)
 {
-    return m4->m30;
+    return u->m4->m30;
 }
 
 Unk8022FE34_V3 Unk8022FE34_U::fn_80235C34()
