@@ -3,7 +3,7 @@
 import os, re, shutil, subprocess, sys
 unit, fn, vf = sys.argv[1:4]
 top = int(sys.argv[4]) if len(sys.argv) > 4 else 6
-W = 'C:/Users/Patrick Taylor/decompile_mvp_04-W5'
+W = (os.environ.get('WT') or os.getcwd())
 src = open(f'{W}/src/{unit}.cpp', 'rb').read().decode().replace('\r\n', '\n')
 PAT = r'^(?![ \t}/#])(?:[^\n;]*[ *&])?' + re.escape(fn) + r'\([^\n;]*\)[^\n;]*\n\{\n.*?^\}\n'
 m = re.search(PAT, src, re.S | re.M)

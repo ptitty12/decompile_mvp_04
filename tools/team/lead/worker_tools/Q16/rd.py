@@ -1,5 +1,6 @@
+import os
 import struct,sys
-d=open('C:/Users/Patrick Taylor/decompile_mvp_04-W5/build/GV4E69/main.dol','rb').read()
+d=open((os.environ.get('WT') or os.getcwd()) + '/build/GV4E69/main.dol','rb').read()
 off=struct.unpack_from('>18I',d,0); addr=struct.unpack_from('>18I',d,0x48); size=struct.unpack_from('>18I',d,0x90)
 def rd(a,n):
     for o,ad,sz in zip(off,addr,size):

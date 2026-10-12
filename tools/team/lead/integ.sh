@@ -8,7 +8,8 @@ for i in 1 2 3; do
   git checkout -q -f integrate/auto
   out=$(python tools/team/integrate.py "$b" --allow config/GV4E69/symbols.txt "$@" --push 2>&1)
   echo "$out" | grep -E "REFUSED|regressions|VERIFY|-> main|failed|mismatch|hunk" | tail -4
-  echo "$out" | grep -q -- "-> main" && exit 0
+  # success only on a real ref update ("abc..def  HEAD -> main"), not "[remote rejected] HEAD -> main"
+  echo "$out" | grep -qE "^ +[0-9a-f]+\.\.[0-9a-f]+ +HEAD -> main" && exit 0
   echo "$out" | grep -q "REFUSED\|mismatch\|regressions: [1-9]\|build check failed" && exit 1
   echo "(retry $i)"
 done

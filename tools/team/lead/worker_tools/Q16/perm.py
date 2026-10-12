@@ -6,7 +6,7 @@ blocks = []
 a = sys.argv[4:]
 while a:
     blocks.append((a[0], int(a[1]))); a = a[2:]
-W = "C:/Users/Patrick Taylor/decompile_mvp_04-W5"
+W = (os.environ.get('WT') or os.getcwd())
 R = os.path.dirname(os.path.abspath(__file__))
 lines = open(src, encoding='utf-8').read().split('\n')
 # find function start

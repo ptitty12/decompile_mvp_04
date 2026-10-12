@@ -3,7 +3,7 @@ variants.txt: blocks separated by lines '//// name'. Each block replaces the def
 import sys, re, os, subprocess, tempfile, shutil
 unit, fn, vf = sys.argv[1:4]
 show = '--show' in sys.argv
-W = 'C:/Users/Patrick Taylor/decompile_mvp_04-W5'
+W = (os.environ.get('WT') or os.getcwd())
 src = open(f'{W}/src/{unit}.cpp', 'rb').read().decode().replace('\r\n', '\n')
 PAT = r'^(?![ \t}/#])(?:[^\n;]*[ *&])?' + re.escape(fn) + r'\([^\n;]*\)[^\n;]*\n\{\n.*?^\}\n'
 m = re.search(PAT, src, re.S | re.M)

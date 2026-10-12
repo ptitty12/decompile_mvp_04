@@ -3,7 +3,7 @@ Hill-climb the order of the lines between (and including) the two marker lines i
 Each line must be a self-contained statement (one line). Scores with score_variants (smaller is better)."""
 import sys, os, re, random, subprocess
 
-W = 'C:/Users/Patrick Taylor/decompile_mvp_04-W2'
+W = (os.environ.get('WT') or os.getcwd())
 SP = os.path.dirname(os.path.abspath(__file__)).replace(chr(92), '/')
 unit, fn, first, last = sys.argv[1:5]
 rounds = int(sys.argv[5]) if len(sys.argv) > 5 else 10

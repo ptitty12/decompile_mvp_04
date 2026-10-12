@@ -1,7 +1,7 @@
 """var.py db/tu_X fn variants.txt [--show]
 blocks separated by '//// name'; each block replaces the definition of fn (may include helpers before it)."""
 import sys, re, os, subprocess, tempfile, shutil
-WT = 'C:/Users/Patrick Taylor/decompile_mvp_04-W9'
+WT = (os.environ.get('WT') or os.getcwd())
 os.chdir(WT)
 unit, fn, vf = sys.argv[1:4]
 show = '--show' in sys.argv

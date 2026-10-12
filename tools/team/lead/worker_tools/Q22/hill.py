@@ -2,7 +2,7 @@
 Lines of stmts_file are statements; lines starting with '@pre ' / '@post ' are fixed prefix/suffix lines.
 Moves: all pairwise swaps and all single-element moves."""
 import sys, re, os, random, subprocess, itertools
-WT='C:/Users/Patrick Taylor/decompile_mvp_04-W6'
+WT=(os.environ.get('WT') or os.getcwd())
 HERE=os.path.dirname(os.path.abspath(__file__))
 unit,sym,header,stmts_file=sys.argv[1:5]
 restarts=int(sys.argv[5]) if len(sys.argv)>5 else 3
