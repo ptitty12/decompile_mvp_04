@@ -293,6 +293,32 @@ Unk80379324::Unk80379324(float a, float b, float c, float d)
     w = d;
 }
 
+extern "C" int fn_803791BC(const char* s, int max)
+{
+    int v = 0;
+    const char* end = s + 0x1E;
+    int c = *s;
+    if (max != 0)
+        end = s + max;
+    while ((unsigned)(c - '0') > 9 && (unsigned)(c - 'A') > 5 && (unsigned)(c - 'a') > 5 && c != 0 && s < end)
+        c = *++s;
+    int seen = 0;
+    while (s < end) {
+        if ((unsigned)(c - '0') <= 9)
+            { v *= 16; v += c - 0x30; }
+        else if ((unsigned)(c - 'a') <= 5)
+            { v *= 16; v += c - 0x57; }
+        else if ((unsigned)(c - 'A') <= 5)
+            { v *= 16; v += c - 0x37; }
+        else if (c == 'x' && v == 0 && seen == 0)
+            seen = 1;
+        else
+            break;
+        c = *++s;
+    }
+    return v;
+}
+
 extern "C" void fn_803792AC(unsigned char** pp, unsigned* len)
 {
     unsigned char* p = *pp;
