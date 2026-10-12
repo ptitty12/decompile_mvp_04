@@ -18,7 +18,11 @@ void fn_8022A580(Task* t, int a);
 void fn_80229948(Task* t, int a);
 void fn_8022AB14(Task* t, int a, RecQueue* q);
 float fn_80218DCC(Task* t, void* x, void* y, int d);
-int fn_802280E0(Task* t);
+int fn_802280E0(Task* t, int a);
+void* fn_802CB924(void* mem, CtxOwner* a);
+char* fn_801A4CE8(CtxOwner* o, int k);
+void fn_802CBD04(void* o, int x);
+void fn_8022870C(Task* t, void* arr, int* n, void* obj);
 int fn_802281D0(Task* t, int a, int b, int c);
 int fn_801E816C(Obj3A64* p, int a);
 int fn_801E82CC(Obj3A64* p, int a);
@@ -41,6 +45,22 @@ void fn_802296D0(Task* t, int a);
 void fn_801EE6F4_(Task* t, int a);
 int fn_8024D41C(void* x);
 }
+
+struct U;
+struct Unk802CBD04;
+void* fn_802CF168(void* o);
+void fn_802CBDBC(Unk802CBD04* o, int a, int b, int kind);
+void fn_8035EFD4(U* self, int chrg);
+
+/* Entry table filled by fn_8022870C: 8-byte pairs, the pointer at +4 (an object whose id sits at +0x460). */
+struct Unk802280E0_Ent {
+    char pad0[0x460];
+    int m460;
+};
+struct Unk802280E0_Pair {
+    int a;
+    Unk802280E0_Ent* p;
+};
 
 inline void SetE8(Task* t, float v)
 {
@@ -201,11 +221,34 @@ int fn_80227A38(Task* t, int a)
     return r;
 }
 
+int fn_802280E0(Task* t, int a)
+{
+    char obj[0x1E0];
+    Unk802280E0_Pair arr[25];
+    int n;
+    fn_802CB924(obj, t->m9C->m0);
+    char* c = fn_801A4CE8(t->m9C->m0, 1) + 0x128;
+    if (c != 0) {
+        fn_802CBDBC((Unk802CBD04*)obj, (int)fn_802CF168(c), 1, 0);
+    }
+    fn_802CBD04(obj, 1);
+    n = 0;
+    fn_8022870C(t, arr, &n, obj);
+    for (int i = 0; i < n; i++) {
+        if (arr[i].p->m460 == a) {
+            fn_8035EFD4((U*)obj, 2);
+            return 1;
+        }
+    }
+    fn_8035EFD4((U*)obj, 2);
+    return 0;
+}
+
 int fn_8022921C(Task* t, int a)
 {
     int r = -1;
     if (t->mF8 == 0.0f) {
-        if (fn_802280E0(t) == 0) {
+        if (fn_802280E0(t, a) == 0) {
             TaskInner* in = t->m9C;
             int v = in->m1D8;
             if (v > 1) {
