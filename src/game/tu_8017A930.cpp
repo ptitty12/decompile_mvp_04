@@ -142,6 +142,147 @@ struct Unk8017CC70_Ev {
 extern float lbl_805EBA04;
 extern float lbl_805EBA08;
 
+extern int lbl_8061F92C, lbl_8061C688, lbl_806204F0;
+extern char lbl_8068BE40[];
+inline int Byte1CC9(unsigned char c) { return c; }
+inline int Unk8017A930_At(int* t, int i) { int o = i << 2; return *(int*)((char*)t + o); }
+struct Unk8017A930_S {
+    char pad0[0x6C];
+    int m6C;
+    int m70;
+    char pad74[0x22C - 0x74];
+    int m22C;
+};
+struct Unk8017A930_Mid {
+    char pad0[0x10];
+    Unk8017A930_S* m10;
+    Unk8017C954_Rec* m14;
+};
+struct Unk8017A930_Ctx {
+    char pad0[0x4C];
+    unsigned int m4C;
+    char pad50[0x6F4 - 0x50];
+    int m6F4;
+    Unk8017A930_Mid* m6F8;
+};
+struct Unk8017A930_V {
+    char pad0[0x3E0];
+    int m3E0;
+    float m3E4;
+    char pad3E8[0x400 - 0x3E8];
+    float m400;
+    char pad404[0x40C - 0x404];
+    int m40C;
+    char pad410[0x420 - 0x410];
+    int m420;
+    int m424;
+};
+struct Unk8017A930_O {
+    char pad0[0x458];
+    int m458;
+};
+struct Unk8017A930_E {
+    char pad0[0x378];
+    void* m378;
+};
+void fn_801A0790(Unk8017B0A4_Ctx* o, float v);
+void fn_8017C068(void* p);
+void fn_8017D22C(Unk8017A930_T* p);
+void fn_8017D190(Unk8017A930_T* p);
+void fn_80176F4C(void* p);
+void fn_80259DF0(void* p);
+void fn_801BAB5C(void* p);
+void fn_801AE760(void* p);
+void fn_801A9980(void* p);
+void fn_80257104(void* p);
+void* fn_80257B40(void* p);
+void* fn_80257BD0(void* p, void* o, int a);
+void fn_8025777C(void* p, void* o, int a);
+void fn_801DBDD0(void* p);
+void fn_801B25BC(void* p);
+void fn_80339F60(int a);
+int fn_8033E420(void* p);
+void fn_80178CF4();
+
+void fn_8017A930(void* self)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    Unk8017A930_V* v = (Unk8017A930_V*)self;
+    if (lbl_8061F92C == 0) {
+        if (lbl_80620860 != 0) {
+            Unk8017B0A4_Ctx* o = p->m4;
+            float t = (float)o->m4C * 0.016666668f;
+            const float k = 0.8f;
+            if (!(t <= lbl_8062086C + k)) {
+                lbl_80620860 = 0;
+                lbl_8062086C = (float)o->m4C * 0.016666668f + 4500.0f;
+                fn_801A0790(o, lbl_8062086C);
+                lbl_80620860 = 1;
+            }
+        }
+        Unk8017A930_S* s = ((Unk8017A930_Ctx*)p->m4)->m6F8->m10;
+        int* a = &s->m6C;
+        int a1;
+        if (v->m420 != s->m6C || (a1 = a[1], v->m424 != a1)) {
+            fn_8017E264(p);
+            v->m420 = s->m6C;
+            v->m424 = a[1];
+        }
+        if (v->m40C == 0) {
+            if (s->m22C == 0xB) {
+                fn_8017C068(p);
+                fn_8017C5F0(p, 0);
+            } else if (lbl_8061C688 != 0) {
+                fn_8018019C(lbl_8068BE40);
+            } else {
+                fn_80339F60(lbl_806204F0);
+            }
+            v->m40C = 1;
+        }
+        if (p->m4->m6F4 == 0) {
+            fn_80176F4C(p->m3A8);
+        }
+        if (fn_8033E420((char*)p->m4 + 0x560) == 0) {
+            if (p->m4->m6F4 == 0) {
+                fn_80259DF0(p->m3B4);
+            }
+            fn_801BAB5C(p->m3BC);
+            ((void (*)(void*))fn_80178CF4)(p->m3AC);
+            if (p->m4->m6F4 == 0) {
+                if (Byte1CC9(p->m4->m6F8->m14->m1CC9) <= 2) {
+                    fn_801AE760(p->m3C0);
+                    fn_801A9980(p->m3C4);
+                    fn_80257104(p->m3B4);
+                } else {
+                    Unk8017A930_O* o = (Unk8017A930_O*)fn_80257B40(p->m3B4);
+                    while (o != 0) {
+                        int fl = 1;
+                        if (o->m458 == 9 && ((Unk8017A930_E*)p->m4->m6E4)->m378 == o) {
+                            fl = 0;
+                        }
+                        if (fl) {
+                            fn_8025777C(p->m3B4, o, 0);
+                        }
+                        o = (Unk8017A930_O*)fn_80257BD0(p->m3B4, o, 0);
+                    }
+                }
+            }
+            fn_801DBDD0(p->m3B8);
+            fn_801B25BC(p->m3C8);
+            fn_801B25BC(p->m3CC);
+        }
+        int st = v->m3E0;
+        if (st != 2) {
+            fn_8017D22C(p);
+            if (Unk8017A930_At(&((Unk8017A930_Ctx*)p->m4)->m6F8->m10->m6C, st) == -1) {
+                if (!(v->m3E4 >= v->m400)) {
+                    fn_8017D190(p);
+                }
+            }
+        }
+    }
+}
+
 void fn_8017AC0C(Unk8017A930_T* p)
 {
     fn_80235220(p->m3B0);
