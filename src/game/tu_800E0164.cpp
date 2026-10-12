@@ -505,6 +505,40 @@ extern char lbl_805BC1A8[];
 extern char lbl_805BC180[];
 extern "C" int sprintf(char*, const char*, ...);
 
+extern "C" int fn_800C33D0();
+void fn_800DE440(char* out, int a, int b);
+extern "C" void fn_800C3ED4(int h, int a, int b);
+extern "C" int fn_80097318(int a, int b);
+extern "C" int fn_80097380(int a, int b);
+extern "C" int fn_800973E8(int a, int b);
+extern "C" int fn_80097450(int a, int b);
+extern "C" int fn_800974B8(int a, int b);
+extern char lbl_805BDC38[];
+extern char lbl_805BDC40[];
+extern char lbl_805BDD9C[];
+
+extern "C" void fn_800E2F24(UiS* self, int a1, int a2)
+{
+    char buf[200];
+    int h = fn_800C33D0();
+    fn_800C3ED4(h, (int)fn_800C8038((UiS*)self->v32(lbl_805BDC38, 1)), a2);
+    fn_800DE440(buf, a2, 3);
+    ((UiS*)fn_800C8040(self->v32(lbl_805BDD9C, 1)))->v28(buf);
+    if (fn_80097318(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE80);
+    } else if (fn_80097380(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE83);
+    } else if (fn_800973E8(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE84);
+    } else if (fn_80097450(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE85);
+    } else if (fn_800974B8(a1, a2) == 1) {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE7F);
+    } else {
+        ((UiS*)fn_800C8040(self->v32(lbl_805BDC40, 1)))->v29(0xE88);
+    }
+}
+
 extern "C" int fn_800E31A8(UiS* self, int g, int a2)
 {
     char buf[0x68];
