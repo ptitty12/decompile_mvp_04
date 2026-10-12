@@ -121,6 +121,7 @@ public:
     char pad0[0x8];
     void* m8;
     void fn_803DA098(lbl_Node* node);
+    lbl_Node* fn_803DA038();
 };
 struct Unk803D7ED4Item;
 class Unk803D7ED4Pool {
@@ -128,6 +129,7 @@ public:
     char pad0[0xC];
     Unk803D7ED4Item* mC;
     void fn_803D803C(Unk803D7ED4Item* item);
+    lbl_Owner* fn_803D7F74();
 };
 struct Unk80310934_Sd {
     lbl_Node* m0;
@@ -150,6 +152,58 @@ struct Unk80310934_Mx {
 };
 extern "C" double atof(const char* s);
 
+extern const char lbl_805E9498[];
+extern const char lbl_805E949C[];
+extern const char lbl_805E94A0[];
+extern const char lbl_805E94AC[];
+extern const char lbl_805E94B4[];
+extern const char lbl_805E94C0[];
+extern const char lbl_805E94CC[];
+extern const char lbl_805E94D0[];
+extern const char lbl_805E94D8[];
+extern const char lbl_805E94E4[];
+extern const char lbl_805E94E8[];
+extern const char lbl_805E94F4[];
+extern const char lbl_805E9500[];
+extern const char lbl_805E950C[];
+extern const char lbl_805E9518[];
+extern const char lbl_805E9530[];
+extern const char lbl_805E9540[];
+extern const char lbl_805E7AD0[];
+struct Unk80310934_S134 {
+    char pad0[0x14];
+    int m14;
+    int m18;
+    int m1C;
+    char pad20[0x38 - 0x20];
+    Unk80310934_Hd* m38;
+};
+class Unk80310934_V0C {
+public:
+    char pad0[0xC];
+    virtual int s1();
+    virtual int s2();
+    virtual int s3(float* a, float* b);
+};
+extern int lbl_8061FEAC;
+struct Unk80310934_Tx {
+    char m0;
+    char pad1[0xB];
+    unsigned mC;
+};
+struct Unk80310934_Sd2 {
+    lbl_Node* m0;
+    lbl_Owner* m4;
+    Unk80310934_Tx* m8;
+    Unk80310934_Tx* mC;
+    void* m10;
+    void* m14;
+    int m18;
+    unsigned m1C;
+    unsigned m20;
+    int m24;
+};
+extern void* (*lbl_8062C668)(int, int);
 extern "C" {
 void VISetBlack(int b);
 void VIFlush(void);
@@ -181,9 +235,23 @@ int fn_803EE310(int a);
 void fn_803EDA0C(int a);
 int fn_803DBD84(void* p, int k);
 void fn_803198B8(void* p, int k);
-void fn_803120CC(void* p, int a, int b, int c, int d, int e);
+int fn_803120CC(void* p, int a, int b, int c, int d, int e);
 void fn_803DD7C8(void* p, int k);
 void fn_802B0C44(void* p, int k);
+void fn_803D9804(int h, float x, float y);
+void fn_803D9E54(int h, int v);
+void fn_803D9DF0(int v);
+void fn_803D982C(int h, int v);
+int fn_803D9824(int h);
+int fn_80436404();
+int fn_80436EE8();
+int VIGetDTVStatus();
+Unk80310934_Tx* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
+void* fn_803DD628(void* a, void* b);
+void fn_803DD7C8(void* h, int v);
+void fn_803E0810(lbl_Owner* o, void* a, int b);
+void fn_803E0ACC(lbl_Node* n, float a, float b, float c, float d, float e, float f);
+void fn_803E2208(lbl_Node* n, int* p);
 }
 
 void* fn_80311A28(void* p);
@@ -308,6 +376,26 @@ extern "C" void fn_80311D08(Unk80310934_At0* p, int c)
     fn_8037B424(p, c);
 }
 
+void fn_80311D38(Unk8037B3E8* p)
+{
+    p->fn_8037B7E4(lbl_805E9498);
+    p->fn_8037B7E8(lbl_805E949C);
+    p->fn_8037B458(lbl_805E94A0, (int*)((char*)p + 0x1C), 0, (const char*)0);
+    p->fn_8037B6EC(lbl_805E94AC, (int*)((char*)p + 0x3C));
+    p->fn_8037B50C(lbl_805E94B4, (float*)((char*)p + 0x2C), lbl_805E94C0, lbl_805E94CC);
+    p->fn_8037B50C(lbl_805E94D0, (float*)((char*)p + 0x30), lbl_805E94C0, lbl_805E94CC);
+    p->fn_8037B50C(lbl_805E94D8, (float*)((char*)p + 0x34), (const char*)0, (const char*)0);
+    p->fn_8037B830(lbl_805E949C);
+    p->fn_8037B7E8(lbl_805E94E4);
+    p->fn_8037B458(lbl_805E94E8, (int*)((char*)p + 0x4), 0, (const char*)0);
+    p->fn_8037B50C(lbl_805E94F4, (float*)((char*)p + 0x8), lbl_805E9500, (const char*)0);
+    p->fn_8037B50C(lbl_805E950C, (float*)((char*)p + 0xC), lbl_805E9500, (const char*)0);
+    p->fn_8037B458(lbl_805E9518, (int*)((char*)p + 0x10), 0, lbl_805E7AD0);
+    p->fn_8037B50C(lbl_805E9530, (float*)((char*)p + 0x14), lbl_805E9500, (const char*)0);
+    p->fn_8037B50C(lbl_805E9540, (float*)((char*)p + 0x18), lbl_805E9500, (const char*)0);
+    p->fn_8037B830(lbl_805E94E4);
+}
+
 void* fn_80311EE0()
 {
     return fn_80311CA0((Unk80310934_At1C*)operator new(0x48, lbl_806EF9B4));
@@ -379,6 +467,35 @@ void fn_8031208C(void* p, int c)
     fn_8031228C(p);
     if (c & 1)
         fn_80377408(p);
+}
+
+int fn_803120CC(void* p, int a, int b, int d, int e, int f)
+{
+    Unk80310934_Sd2* self = (Unk80310934_Sd2*)p;
+    unsigned w = a;
+    unsigned h = b;
+    fn_8031228C(self);
+    self->m1C = w;
+    self->m20 = h;
+    self->m24 = d;
+    self->m8 = fn_803EBBA4(w, h, d, 0, 0, 0, 0, 0);
+    self->m8->mC |= 0x20000000;
+    self->m8->m0 = 0x16;
+    self->m14 = fn_803DD628(lbl_8062C668(0x58, 0), self->m8);
+    fn_803DD7C8(self->m14, 0);
+    self->mC = fn_803EBBA4(w, h, d, 0, 0, 0, 0, 0);
+    self->mC->m0 = 0x16;
+    self->mC->mC |= 0x20000000;
+    self->m10 = fn_803DD628(lbl_8062C668(0x58, 0), self->mC);
+    fn_803DD7C8(self->m10, 0);
+    self->m18 = 0;
+    self->m4 = ((Unk803D7ED4Pool*)fn_803D81FC())->fn_803D7F74();
+    fn_803E0810(self->m4, self->m14, self->m18);
+    self->m0 = self->m4->fn_803DA038();
+    fn_803E0ACC(self->m0, 0.0f, 0.0f, (float)w, (float)h, 0.0f, 1.0f);
+    int sp8 = 0;
+    fn_803E2208(self->m0, &sp8);
+    return 1;
 }
 
 extern "C" int fn_8031228C(void* q)
@@ -489,6 +606,28 @@ void fn_80312DA8()
 
 void fn_80312DAC()
 {
+}
+
+void fn_803134A0(Unk80310934_S134* self, int x, int y, int a3, int a4, int c, int d)
+{
+    fn_803D9804(self->m38->m4, (float)x, (float)y);
+    fn_803D9E54(self->m38->m4 + 0x10, 0x20000);
+    fn_803D9DF0(0);
+    if (lbl_8061FEAC != 0)
+        fn_803D982C(self->m38->m4, 0);
+    else
+        fn_803D982C(self->m38->m4, c);
+    ((void (*)(void*))fn_80312DA8)(self);
+    if (fn_80436404() < 0 && fn_80436EE8() != 0 && VIGetDTVStatus() == 1)
+        fn_803D9DDC(lbl_8061FEDC->m38->m4 + 0x10, lbl_80634B54, 0x10);
+    fn_803D8918(self->m38->m4);
+    float sp8;
+    float spC;
+    ((Unk80310934_V0C*)self->m38->m4)->s3(&sp8, &spC);
+    self->m14 = (int)sp8;
+    self->m18 = (int)spC;
+    self->m1C = fn_803D9824(self->m38->m4);
+    ((void (*)(void*, int))fn_80312DAC)(self, 1);
 }
 
 extern "C" void fn_80313634(void* p)

@@ -269,6 +269,27 @@ extern float lbl_8061FBC0[];
 extern float lbl_8061FBCC;
 extern int lbl_8061B9C8;
 
+struct Unk8030B45C_Obj {
+    void* m0;
+    void* m4;
+    void* m8;
+    char padC[0x4C - 0xC];
+    int m4C;
+    char pad50[4];
+    char m54[0x90 - 0x54];
+    void* m90;
+    char m94[4];
+};
+void fn_8030B5F4(void* p);
+void fn_8030B618(void* p);
+extern const char lbl_805E89D4[];
+extern const char lbl_805E89E0[];
+extern const char lbl_805E89EC[];
+extern const char lbl_805E89F0[];
+extern const char lbl_805E89F8[];
+extern const char lbl_805E8A00[];
+extern char lbl_8061FBDC[];
+extern void* lbl_8062C290;
 extern "C" {
 void* fn_80308678(void* e, int a, int b, int c, int d, int f);
 void fn_80308414(void* e, int a, int b, int c, float f);
@@ -311,6 +332,15 @@ void fn_803E6708(void* p, int k);
 void fn_803DBE2C(void* p, int k);
 void fn_803DBE38(void* p, int k);
 void fn_803DBF00(void* p, int k);
+void fn_803E67A0(void* h, void* p);
+int fn_803E6950(void* h, const char* s);
+void fn_803E68B0(void* h, int k);
+int fn_803DBDD8(void* p, int k);
+int fn_803DBE18(void* p, int k);
+int fn_803DBE20(void* p, int k);
+int fn_803DBE68(void* p, int k);
+int fn_803DBE78(void* p, int k);
+int fn_803DBE44(void* p, int k);
 }
 
 struct Unk80308C74_R {
@@ -810,6 +840,34 @@ extern "C" void fn_8030B358(Unk8030B358_Obj* p, int c)
     fn_803DBD84(p->m54, 2);
     if (c & 1)
         fn_80377408(p);
+}
+
+extern "C" void fn_8030B45C(void* pp, int xi)
+{
+    Unk8030B45C_Obj* p = (Unk8030B45C_Obj*)pp;
+    void* x = (void*)xi;
+    char* h = p->m94;
+    fn_803E67A0(h, (char*)p + 0xC);
+    char* s = p->m54;
+    fn_8030B5F4(p);
+    fn_803E6950(h, lbl_805E89D4);
+    fn_803E69D8(h, lbl_805E89D4, lbl_8061FBDC, 4, 1);
+    fn_803E69D8(h, lbl_805E89E0, p->m0, 0xC, p->m4C * 6);
+    fn_803E69D8(h, lbl_805E89EC, p->m4, 8, p->m4C * 6);
+    fn_803E69D8(h, lbl_805E89F0, p->m8, 4, p->m4C * 6);
+    fn_803DBDD8(s, 0x90);
+    fn_803DBE18(s, 1);
+    fn_803DBE20(s, 0);
+    fn_803DBE68(s, 1);
+    fn_803DBE78(s, 1);
+    ((int (*)(void*, int))fn_803DBE38)(s, 1);
+    fn_803DBE44(s, 0);
+    fn_803E69D8(h, lbl_805E89F8, s, 0, -1);
+    fn_803E69D8(h, lbl_805E8A00, lbl_8062C290, 0x40, 1);
+    fn_803E68B0(h, 0x90);
+    fn_803E69D8(h, lbl_805E8A0C, x, 0, -1);
+    p->m90 = x;
+    fn_8030B618(p);
 }
 
 void fn_8030B5F4(void* p)

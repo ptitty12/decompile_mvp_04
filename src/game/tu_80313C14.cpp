@@ -190,6 +190,12 @@ struct Unk80313C14_Col {
     float m8;
     float mC;
 };
+extern const char lbl_805E9AFC[];
+extern const char lbl_805E9B24[];
+extern int lbl_8061FF38;
+extern int lbl_8061FF3C;
+
+
 extern "C" {
 void fn_803EB454(Unk80313C14_Slot* s, char* str, ...);
 void fn_803EB3CC(Unk80313C14_Slot* s, int x, float a, float b);
@@ -236,6 +242,20 @@ void* fn_800057E4();
 void fn_8014D9EC(Unk80313C14_Col* c, float a, float b, float d, float e, float f);
 int fn_8014DDAC(Unk80313C14_Col* c);
 void fn_803EB3F0(Unk80313C14_Slot* s, unsigned short* str, float a, float b);
+void fn_80322164(void* s, char* a, int n, char* b, int m);
+int fn_802B9300(char* name, int a, int b, int* c);
+void fn_802B961C(int h, int k);
+int fn_803FC480(int h, char* s);
+int fn_804017D0();
+void* fn_803ED604(const char* name, int sz, int k);
+void fn_80401710(int h, void* b);
+void fn_80433004(void* a, int n);
+int fn_80400DA4();
+void* fn_803DD628(void* a, void* b);
+void fn_803155B4(void* self, int tex, int a, int b, float f1, float f2, float f3, float f4);
+void fn_803EDA0C(void* b);
+void fn_803220F4(void* s, char* a, int n, char* b, int m);
+void fn_803221D4(void* s, char* a, int n, char* b, int m);
 }
 
 struct Unk80313C14_Z {
@@ -518,6 +538,83 @@ void fn_80315C20(float* p, float* v, float a, float b, float c)
         *v = -*v;
         *p = c;
     }
+}
+
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+void fn_80315FFC(char* self)
+{
+    char a[256];
+    char b[256];
+    fn_80322164(self + 0x1F0, a, 0x100, b, 0x100);
+    int h1 = fn_802B9300(a, 0x500, 0xE, 0);
+    int h2 = fn_803FC480(h1, b);
+    int sz = fn_804017D0();
+    char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
+    fn_80401710(h2, buf);
+    fn_802B961C(h1, 0xE);
+    fn_80433004(buf, sz);
+    fn_803D9E1C(0);
+    lbl_8061FF38 = fn_80400DA4();
+    int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80313D9C(lbl_8061FEDC, 3);
+    fn_80313E00(lbl_8061FEDC, 3);
+    if (tex != 0)
+        fn_803DD73C((void*)tex, 3);
+    fn_803EDA0C(buf);
+}
+
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+extern "C" void fn_8031618C(char* self)
+{
+    char a[256];
+    char b[256];
+    fn_803220F4(self + 0x1F0, a, 0x100, b, 0x100);
+    int h1 = fn_802B9300(a, 0x500, 0xE, 0);
+    int h2 = fn_803FC480(h1, b);
+    int sz = fn_804017D0();
+    char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
+    fn_80401710(h2, buf);
+    fn_802B961C(h1, 0xE);
+    fn_80433004(buf, sz);
+    fn_803D9E1C(0);
+    int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80313D9C(lbl_8061FEDC, 3);
+    fn_80313E00(lbl_8061FEDC, 3);
+    if (tex != 0)
+        fn_803DD73C((void*)tex, 3);
+    fn_803EDA0C(buf);
+}
+
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+void fn_80316310(char* self)
+{
+    char a[256];
+    char b[256];
+    fn_803221D4(self + 0x1F0, a, 0x100, b, 0x100);
+    int h1 = fn_802B9300(a, 0x500, 0xE, 0);
+    int h2 = fn_803FC480(h1, b);
+    int sz = fn_804017D0();
+    char* buf = (char*)fn_803ED604(lbl_805E9B24, sz, 0x500);
+    fn_80401710(h2, buf);
+    fn_802B961C(h1, 0xE);
+    fn_80433004(buf, sz);
+    fn_803D9E1C(0);
+    int tex = (int)fn_803DD628(lbl_8062C668(0x58, 0), buf + *(int*)(buf + 0x14));
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_803155B4(lbl_8061FEDC, tex, 1, 1, 0.0f, 0.0f, 1.0f, 1.0f);
+    fn_80313D9C(lbl_8061FEDC, 3);
+    fn_80313E00(lbl_8061FEDC, 3);
+    if (tex != 0)
+        fn_803DD73C((void*)tex, 3);
+    fn_803EDA0C(buf);
+    lbl_8061FF3C = fn_80400DA4();
 }
 
 int fn_803164A0()
