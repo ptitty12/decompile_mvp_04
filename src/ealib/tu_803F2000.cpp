@@ -62,6 +62,8 @@ struct RcVO {
     virtual void v0();
 };
 
+extern "C" int fn_803F7584(void*, int, void*, int*);
+
 extern "C" unsigned short* fn_803F644C(void* l, int k)
 {
     if (k == 1)
@@ -148,6 +150,14 @@ extern "C" void fn_803F7098(int* o)
     o[2] = 0;
     o[3] = 0;
     o[5] = 0;
+}
+
+extern "C" void fn_803F70AC(RcRefObj* x, int a, void* b)
+{
+    int r = fn_803F7584((void*)x->m4, a, b, 0);
+    x->m8 += r;
+    x->mC += 1;
+    x->m14 = 1;
 }
 
 extern "C" void fn_803F7100(void** self, int c)
