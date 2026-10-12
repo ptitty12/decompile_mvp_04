@@ -7,6 +7,8 @@
  */
 #include "game/tu_80052794.h"
 
+void fn_80057B10(void);
+
 Unk80056A08_Ring::~Unk80056A08_Ring()
 {
     if (mC != 0) {
@@ -247,6 +249,217 @@ void* fn_800571A0(Unk80057204_Mgr* m, int k)
     return r;
 }
 
+struct Unk803442CC;
+struct Unk803416C4;
+struct Unk8034468C;
+Unk803442CC* fn_80344640(Unk803442CC* self);
+void fn_803416C4(Unk803416C4* s);
+void fn_803416D0(Unk803416C4* s);
+void fn_803416DC(Unk803416C4* s);
+void fn_803416E8(Unk803416C4* s);
+Unk8034468C* fn_8034468C(Unk8034468C* self);
+Unk8034468C* fn_803446C8(Unk8034468C* self);
+Unk8034468C* fn_8034470C(Unk8034468C* self);
+extern char lbl_80649718[];
+extern char lbl_806496E0[];
+extern char lbl_806496A8[];
+extern char lbl_80649670[];
+
+Unk80058060_Node* fn_80057204(int id)
+{
+    Unk80058060_Node* r;
+    switch (id) {
+    case 0: {
+        Unk803442CC* p = (Unk803442CC*)operator new(8, 0);
+        fn_80344640(p);
+        *(const void**)p = lbl_80649718;
+        fn_803416C4((Unk803416C4*)p);
+        r = (Unk80058060_Node*)p;
+        fn_803EE7BC();
+        return r;
+    }
+    case 1: {
+        Unk803442CC* p = (Unk803442CC*)operator new(8, 0);
+        fn_80344640(p);
+        *(const void**)p = lbl_806496E0;
+        fn_803416D0((Unk803416C4*)p);
+        r = (Unk80058060_Node*)p;
+        fn_803EE7BC();
+        return r;
+    }
+    case 2:
+        r = (Unk80058060_Node*)fn_8034470C((Unk8034468C*)operator new(0x100, 0));
+        fn_803EE7BC();
+        return r;
+    case 3:
+        r = (Unk80058060_Node*)fn_803446C8((Unk8034468C*)operator new(0x9C, 0));
+        fn_803EE7BC();
+        return r;
+    case 4: {
+        Unk803442CC* p = (Unk803442CC*)operator new(8, 0);
+        fn_80344640(p);
+        *(const void**)p = lbl_806496A8;
+        fn_803416DC((Unk803416C4*)p);
+        r = (Unk80058060_Node*)p;
+        fn_803EE7BC();
+        return r;
+    }
+    case 5: {
+        Unk803442CC* p = (Unk803442CC*)operator new(8, 0);
+        fn_80344640(p);
+        *(const void**)p = lbl_80649670;
+        fn_803416E8((Unk803416C4*)p);
+        r = (Unk80058060_Node*)p;
+        fn_803EE7BC();
+        return r;
+    }
+    case 6:
+        r = (Unk80058060_Node*)fn_8034468C((Unk8034468C*)operator new(0xC, 0));
+        fn_803EE7BC();
+        return r;
+    default:
+        return 0;
+    }
+}
+
+
+struct Unk80341FFC;
+void fn_80341FFC(Unk80341FFC* p, unsigned short* t);
+void fn_802B912C(const char* s);
+void fn_802B9180(void);
+extern "C" {
+void fn_80342148(void* p, const char* name, const void* tbl);
+void fn_8034243C(void* p, const char* name, const void* tbl);
+void fn_80342730(void* p, const char* name, const void* tbl);
+void fn_80342A24(void* p, const char* name, const void* tbl);
+void fn_80342D18(void* p, const char* name, const void* tbl);
+void fn_80343024(void* p, const char* name);
+void fn_803432EC(void* p, const char* name);
+void fn_803435B4(void* p, const char* name);
+void fn_8034387C(void* p, const char* name);
+void fn_80343B44(void* p, const char* name);
+void fn_80343DE4(void* p, const char* name);
+}
+Unk80058060_Node* fn_80057204(int id);
+extern unsigned short lbl_806186D0[];
+extern const char* lbl_806186CC;
+extern const char lbl_805ADAB0[];
+extern const char lbl_805ADAC8[];
+extern const char lbl_805ADADC[];
+extern const char lbl_805ADAFC[];
+extern const char lbl_805ADB18[];
+extern const char lbl_805ADB2C[];
+extern const char lbl_805ADB50[];
+extern const char lbl_805ADB6C[];
+extern const char lbl_805ADB94[];
+extern const char lbl_805ADBC0[];
+extern const char lbl_805ADBE4[];
+extern char lbl_80618BB0[];
+extern char lbl_80618D00[];
+extern char lbl_80618A80[];
+
+struct Unk80341F1C;
+struct Unk80341E5C;
+struct Unk80341D9C;
+struct Unk80341CDC;
+struct Unk80341C1C;
+struct Unk80341B5C;
+struct Unk80341AA0;
+struct Unk803419E4;
+struct Unk80341928;
+struct Unk8034186C;
+struct Unk803417B0;
+struct Unk803416F4;
+void fn_80341F90(Unk80341F1C* p, int c);
+void fn_80341ED0(Unk80341E5C* p, int c);
+void fn_80341E10(Unk80341D9C* p, int c);
+void fn_80341D50(Unk80341CDC* p, int c);
+void fn_80341C90(Unk80341C1C* p, int c);
+void fn_80341BD0(Unk80341B5C* p, int c);
+void fn_80341B10(Unk80341AA0* p, int c);
+void fn_80341A54(Unk803419E4* p, int c);
+void fn_80341998(Unk80341928* p, int c);
+void fn_803418DC(Unk8034186C* p, int c);
+void fn_80341820(Unk803417B0* p, int c);
+void fn_80341764(Unk803416F4* p, int c);
+void fn_80377408(void* p);
+struct Unk800575E4_E1 {
+    char pad0[0xC];
+    virtual ~Unk800575E4_E1();
+};
+struct Unk800575E4_E2 {
+    char pad0[0x10];
+    virtual ~Unk800575E4_E2();
+};
+struct Unk800575E4_M {
+    char pad0[0xF8];
+    Unk800575E4_E1* mF8;
+    Unk800575E4_E2* mFC;
+};
+
+void fn_800575E4(Unk800575E4_M* m, int c)
+{
+    if (m->mF8 != 0) {
+        delete m->mF8;
+        m->mF8 = 0;
+    }
+    if (m->mFC != 0) {
+        delete m->mFC;
+        m->mFC = 0;
+    }
+    if (lbl_80687600 != 0) {
+        delete (Unk80056A08_Ring*)lbl_80687600;
+        lbl_80687600 = 0;
+    }
+    if (lbl_80687604 != 0) {
+        delete (Unk80056A08_Ring*)lbl_80687604;
+        lbl_80687604 = 0;
+    }
+    char* b = (char*)m;
+    fn_80341F90((Unk80341F1C*)(b + 0xDC), 2);
+    fn_80341ED0((Unk80341E5C*)(b + 0xC4), 2);
+    fn_80341E10((Unk80341D9C*)(b + 0xAC), 2);
+    fn_80341D50((Unk80341CDC*)(b + 0x94), 2);
+    fn_80341C90((Unk80341C1C*)(b + 0x7C), 2);
+    fn_80341BD0((Unk80341B5C*)(b + 0x64), 2);
+    fn_80341B10((Unk80341AA0*)(b + 0x54), 2);
+    fn_80341A54((Unk803419E4*)(b + 0x44), 2);
+    fn_80341998((Unk80341928*)(b + 0x34), 2);
+    fn_803418DC((Unk8034186C*)(b + 0x24), 2);
+    fn_80341820((Unk803417B0*)(b + 0x14), 2);
+    fn_80341764((Unk803416F4*)(b + 0x4), 2);
+    if (c & 1) {
+        fn_80377408(m);
+    }
+}
+
+void fn_80057778(void* p)
+{
+    Unk80057204_Mgr* m = (Unk80057204_Mgr*)p;
+    char* b = (char*)m;
+    fn_80341FFC((Unk80341FFC*)(b + 0x54), lbl_806186D0);
+    unsigned i = 0;
+    fn_802B912C(lbl_806186CC);
+    fn_80342148(b + 0x4, lbl_805ADAB0, lbl_80618BB0);
+    fn_8034243C(b + 0x14, lbl_805ADAC8, lbl_80618CB0);
+    fn_80342730(b + 0x24, lbl_805ADADC, lbl_80618D00);
+    fn_80342A24(b + 0x34, lbl_805ADAFC, &lbl_80618F6C);
+    fn_80342D18(b + 0x44, lbl_805ADB18, lbl_80618A80);
+    fn_80343024(b + 0x64, lbl_805ADB2C);
+    fn_803432EC(b + 0x7C, lbl_805ADB50);
+    fn_803435B4(b + 0x94, lbl_805ADB6C);
+    fn_8034387C(b + 0xAC, lbl_805ADB94);
+    fn_80343B44(b + 0xC4, lbl_805ADBC0);
+    fn_80343DE4(b + 0xDC, lbl_805ADBE4);
+    fn_802B9180();
+    unsigned n = m->mC0;
+    m->mF4 = new (0) Unk80058060_Node*[n];
+    fn_803EE7BC();
+    for (; i < n; i++) {
+        m->mF4[i] = fn_80057204(m->mBC[i]);
+    }
+}
+
 void* fn_800578E4(Unk80057204_Mgr* m, int a, int b)
 {
     unsigned t = m->mB4[a];
@@ -266,6 +479,76 @@ int fn_80057938(Unk80057204_Mgr* m)
         return 1;
     }
     return 0;
+}
+
+struct Unk80057950_E {
+    virtual ~Unk80057950_E();
+};
+struct Unk803416F4;
+struct Unk803417B0;
+struct Unk8034186C;
+struct Unk80341928;
+struct Unk803419E4;
+struct Unk80341AA0;
+struct Unk80341B5C;
+struct Unk80341C1C;
+struct Unk80341CDC;
+struct Unk80341D9C;
+struct Unk80341E5C;
+struct Unk80341F1C;
+void fn_8034170C(Unk803416F4* p);
+void fn_803417C8(Unk803417B0* p);
+void fn_80341884(Unk8034186C* p);
+void fn_80341940(Unk80341928* p);
+void fn_803419FC(Unk803419E4* p);
+void fn_80341AB8(Unk80341AA0* p);
+void fn_80341B78(Unk80341B5C* p);
+void fn_80341C38(Unk80341C1C* p);
+void fn_80341CF8(Unk80341CDC* p);
+void fn_80341DB8(Unk80341D9C* p);
+void fn_80341E78(Unk80341E5C* p);
+void fn_80341F38(Unk80341F1C* p);
+
+void fn_80057950(Unk80057204_Mgr* m)
+{
+    unsigned i = 0;
+    unsigned n = m->mC0;
+    for (; i < n; i++) {
+        Unk80057950_E* e = (Unk80057950_E*)m->mF4[i];
+        if (e != 0) {
+            delete e;
+            m->mF4[i] = 0;
+        }
+    }
+    if (m->mF4 != 0) {
+        delete[] m->mF4;
+        m->mF4 = 0;
+    }
+    char* b = (char*)m;
+    fn_8034170C((Unk803416F4*)(b + 0x4));
+    fn_803417C8((Unk803417B0*)(b + 0x14));
+    fn_80341884((Unk8034186C*)(b + 0x24));
+    fn_80341940((Unk80341928*)(b + 0x34));
+    fn_803419FC((Unk803419E4*)(b + 0x44));
+    fn_80341AB8((Unk80341AA0*)(b + 0x54));
+    fn_80341B78((Unk80341B5C*)(b + 0x64));
+    fn_80341C38((Unk80341C1C*)(b + 0x7C));
+    fn_80341CF8((Unk80341CDC*)(b + 0x94));
+    fn_80341DB8((Unk80341D9C*)(b + 0xAC));
+    fn_80341E78((Unk80341E5C*)(b + 0xC4));
+    fn_80341F38((Unk80341F1C*)(b + 0xDC));
+}
+
+void fn_80057A4C(Unk80057204_Mgr* m)
+{
+    if (fn_80057938(m)) {
+        unsigned n = m->mC0;
+        for (unsigned i = 0; i < n; i++) {
+            m->mF4[i]->v2();
+        }
+        m->m100 = 0;
+        ((void (*)(Unk80057204_Mgr*))fn_80057B10)(m);
+    }
 }
 
 void fn_80057AD4(void* self, Unk80052794_Rec* rec, Unk80052794_Obj* obj)

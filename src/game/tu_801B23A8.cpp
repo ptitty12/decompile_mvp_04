@@ -346,6 +346,54 @@ int fn_801B28F8(void* a, void* b)
 }
 
 /* near-miss: 2 slots differ (retail sets the return register to 0 before testing q). */
+struct Unk8017DD64_T;
+struct Unk8017DCCC_Obj;
+int fn_801B454C(Unk801B23A8_V* p, Unk801B23A8_Q* q);
+int fn_8017DCCC(Unk8017DD64_T* t, Unk8017DCCC_Obj* o);
+
+/* near-miss: same code; callee-saved roles differ (retail: p r31, obj r29, i r27, b r28, and &tbl kept in r30 for the first call). */
+Unk801B23A8_Q* fn_801B2944(void* a, Unk801B23A8_Q* q, int b, int c, int d, int e, int f, int g)
+{
+    Unk801AB63C_P* p = (Unk801AB63C_P*)a;
+    int side = q->m708;
+    Unk8019F8C0_Inner* t = p->m8->m6F8->m14 + side;
+    unsigned n = t->m3E4;
+    unsigned i = 0;
+    Unk801B460C_Tbl tbl;
+    Unk801B460C_Tbl* tp = &tbl;
+    tp->m0 = p;
+    tp->m4 = 0;
+    fn_801B564C(tp);
+    for (; i < n; i++) {
+        if (fn_80097148(t, (unsigned char)i) == 0) {
+            Unk801B23A8_Q* o = (Unk801B23A8_Q*)fn_801A4910(p->m8, side, i);
+            if ((e == 0 || fn_8017DCCC((Unk8017DD64_T*)p->m4, (Unk8017DCCC_Obj*)o) == 0) && o->m460 == -1) {
+                int st = fn_801B454C((Unk801B23A8_V*)p, o);
+                int ok = 1;
+                if (st == 0xFF) {
+                    ok = 0;
+                }
+                if (ok == 0) {
+                    int v;
+                    if (c == 7) {
+                        int w = fn_801B5DE8(p, o, 0);
+                        int z = b == 0;
+                        w = w ^ z;
+                        v = w == 0;
+                    } else {
+                        v = fn_801B5DE8(p, o, b);
+                    }
+                    if (v == 1) {
+                        Unk801B2FB0_Rec rec = fn_801B3094(p, o, b, c, f, g);
+                        fn_801B5688(&tbl, (int)o, rec.m0, rec.m4);
+                    }
+                }
+            }
+        }
+    }
+    return (Unk801B23A8_Q*)fn_801B5700(&tbl, d);
+}
+
 int fn_801B2AD4(Unk801AB63C_P* p, Unk801B23A8_Q* q)
 {
     int r = 0;
@@ -818,6 +866,46 @@ int fn_801B3FD8(Unk801AB63C_P* p, Unk801B23A8_Q* q)
             }
             r = k >= sum;
         }
+    }
+    return r;
+}
+
+int fn_801B3E48(Unk801AB63C_P* p, Unk801B23A8_Q* q, int c)
+{
+    int side = q->m708;
+    int x = fn_801B5FC4(p, side);
+    int y = fn_801B5EDC(p, q->m708, 0);
+    if (fn_801B3DF0(p, q) != 0) {
+        return 1;
+    }
+    int a = ((int (*)(void*, Unk801B23A8_Q*))fn_801B37A0)(p, q);
+    if (!(a > fn_801B608C(p, q))) {
+        return 0;
+    }
+    if ((p->m8->m6F8->m14[2].m8 == 0) != side) {
+        if (fn_801B3CD8(p, q, c) == 0) {
+            return 0;
+        }
+        if (c != 0) {
+            return 1;
+        }
+    }
+    int r = 1;
+    int k = 3;
+    if (fn_8025416C(q->m588, 0x16) > 2) {
+        k = 2;
+    }
+    if (fn_801C1870(p, y, k) != 0) {
+        return 0;
+    }
+    int s = fn_801B37C0(p, q);
+    int t = fn_801B380C(p, q);
+    int u = fn_801B38FC(p, q);
+    if (x < -t) {
+        r = 0;
+    }
+    if (q->m708 == (p->m8->m6F8->m14[2].m8 == 0) && u > s) {
+        r = 0;
     }
     return r;
 }
