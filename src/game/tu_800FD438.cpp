@@ -170,6 +170,76 @@ UiColor fn_800FD4FC(int idx)
     return c;
 }
 
+struct UiG10 {
+    char pad0[0x184];
+    int m184;
+};
+struct UiG6F8 {
+    char pad0[0x10];
+    UiG10* m10;
+};
+struct UiSub0C {
+    char pad0[0x3C];
+    int m3C;
+    int a40[5];
+};
+struct Ui700D {
+    char pad0[0x3A4];
+    int m3A4;
+    char pad3A8[8];
+    char* m3B0;
+};
+struct UiG64C {
+    char pad0[0x6F8];
+    UiG6F8* m6F8;
+    char pad6FC[4];
+    Ui700D* m700;
+};
+class UiXDv : public UiBase {
+public:
+  virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+  virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+  virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+  virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+  virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+  virtual void v26(); virtual void v27(); virtual void v28(); virtual int v29(int a); virtual void v30();
+  virtual void v31(); virtual int v32(int a, int b);
+};
+class UiS64C : public UiObj {
+public:
+    char pad40[0x1AC - 0x40];
+    int m1AC;
+};
+struct UiTbl5b {
+    int m[5];
+};
+extern UiTbl5b lbl_805BED90;
+extern char lbl_805BEB70[];
+extern char lbl_805B6F58[];
+int fn_801C4128(int a);
+void fn_801195C8(int a, UiObj* b);
+void fn_800FD64C(UiS64C* self, UiG64C* g)
+{
+    if (g->m6F8->m10->m184 == 0 || fn_801C4128(g->m700->m3A4) != 0) {
+        fn_800C8044(((UiXDv*)fn_800C8044(self->m1AC))->v29((int)lbl_805BEB70))->v8(0);
+        return;
+    }
+    UiSub0C* s = (UiSub0C*)(g->m700->m3B0 + 0xC);
+    int n = 0;
+    UiTbl5b t = lbl_805BED90;
+    for (int k = 0; k < s->m3C; k++) {
+        if (n <= 4) {
+            int v = s->a40[k];
+            fn_801195C8(v, fn_800C8040(((UiXDv*)fn_800C8044(self->m1AC))->v32(t.m[n], 1)));
+            n++;
+        }
+    }
+    if (n <= 4) {
+        for (int i = n; i <= 4; i++)
+            fn_800C8040(((UiXDv*)fn_800C8044(self->m1AC))->v32(t.m[i], 1))->v30((int)lbl_805B6F58);
+    }
+}
+
 void fn_800FE23C(UiV_1C4i* self, int a)
 {
     fn_800C8044(self->m1C4)->v8(a);
