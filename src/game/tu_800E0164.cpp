@@ -4,14 +4,13 @@
  */
 #include "game/tu_800E0164.h"
 
-/* near-miss: float constants and value use f13/f0 in the opposite assignment (compare operands swapped), clamp structure matches */
 float fn_800E0164(float f)
 {
     float r = fn_8033CDC4(lbl_8068B4C0, f);
-    if (r > lbl_805BDBB0)
-        r = lbl_805BDBB0;
-    else if (!(r >= lbl_805BDBB4))
-        r = lbl_805BDBB4;
+    if (r > 1.0f)
+        r = 1.0f;
+    else if (!(r >= 0.0f))
+        r = 0.0f;
     return r;
 }
 

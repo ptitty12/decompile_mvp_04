@@ -65,7 +65,7 @@ void fn_800E3D4C(void* t, int r);
 int fn_80097210(char* e, int a);
 extern int lbl_8061977C;
 int fn_80403144(unsigned short* dst, const unsigned short* src);
-int fn_8040321C(unsigned short* dst, unsigned short* fmt, unsigned short* a, unsigned short* b);
+void fn_8040321C(unsigned short* dst, unsigned short* fmt, unsigned short* a, unsigned short* b);
 unsigned short* fn_80090880(int obj, int id);
 int fn_802B9804(int a, int b);
 int fn_803FC4C0();
