@@ -42,6 +42,92 @@ extern "C" void fn_8042F93C(int type, Unk803E1A38Col color, float startz, float 
 extern "C" void fn_8042FB50(unsigned short* table, unsigned short width, float* projmtx);
 extern "C" void fn_8042FD00(int enable, unsigned short center, unsigned short* table);
 
+/* Node viewed with absolute offsets (View sits at Node+0xC, so Node+0x158 is View.m14C). */
+struct Unk803E0DD0Obj {
+    char pad0[0x10];
+    int m10;
+    char pad14[4];
+    float m18;
+    char pad1C[0x2C - 0x1C];
+    float m2C;
+    char pad30[8];
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    char pad58[0xF0 - 0x58];
+    float mF0;
+    float mF4;
+    float mF8;
+    float mFC;
+    char pad100[0x118 - 0x100];
+    float m118;
+    float m11C;
+    float m120;
+    float m124;
+    float m128;
+    float m12C;
+    float m130;
+    float m134;
+    float m138;
+    float m13C;
+    float m140;
+    float m144;
+    char pad148[0x158 - 0x148];
+    float m158[16];
+};
+extern "C" {
+float tanf(float x);
+float atanf(float x);
+float fn_8041171C(float x);
+void fn_80431494(float* m, float fovy, float aspect, float n, float f);
+void fn_80430194(float* m, int type);
+}
+
+/* near-miss (96.3%): perspective setup (fn_80431494 takes fov, aspect 1.0, near, far). Retail emits the
+   n->m10 = 0 store before the two pool loads for the tanf argument; ours interleaves them. Store orders
+   permuted, constant folding forms tried. */
+extern "C" void fn_803E0DD0(Unk803E0DD0Obj* n, float fov, float aspect, float zn, float zf)
+{
+    n->mF0 = fov;
+    n->mF4 = aspect;
+    n->mF8 = zn;
+    n->mFC = zf;
+    fn_80431494(n->m158, fov, 1.0f, zn, zf);
+    float m5 = n->m158[5] * aspect;
+    n->m18 = n->m158[0];
+    n->m38 = n->m158[2];
+    n->m3C = n->m158[6];
+    n->m40 = n->m158[10];
+    n->m44 = -1.0f;
+    n->m50 = n->m158[11];
+    n->m48 = 0.0f;
+    n->m4C = 0.0f;
+    n->m54 = 0.0f;
+    n->m158[5] = m5;
+    n->m2C = m5;
+    fn_80430194(n->m158, 0);
+    n->m10 = 0;
+    float t = tanf(fov * 0.5f * 0.017453292f);
+    float nt = -t;
+    float a0 = atanf(nt * n->m138);
+    float a1 = atanf(t * n->m13C);
+    float a2 = atanf((t * n->m140) / aspect);
+    float a3 = atanf((nt * n->m144) / aspect);
+    n->m118 = tanf(a0);
+    n->m11C = fn_8041171C(1.5707964f - a0);
+    n->m120 = tanf(a1);
+    n->m124 = fn_8041171C(1.5707964f - a1);
+    n->m128 = tanf(a2);
+    n->m12C = fn_8041171C(1.5707964f - a2);
+    n->m130 = tanf(a3);
+    n->m134 = fn_8041171C(1.5707964f - a3);
+}
+
 extern "C" Unk803E198C_View* fn_803E198C(Unk803E198C_View* v, Unk803E1F98_Node* node)
 {
     v->m4 = 1;
@@ -214,6 +300,6 @@ extern "C" void fn_803E1F6C()
 }
 
 /*
- * Not matched yet: fn_803E0ACC, fn_803E0DD0, fn_803E0F9C, fn_803E1578, fn_803E1850 (collision test through
- * fn_803DED40). The original code stays linked for these.
+ * Not matched yet: fn_803E0ACC, fn_803E0F9C, fn_803E1578, fn_803E1850 (collision test through fn_803DED40).
+ * The original code stays linked for these.
  */
