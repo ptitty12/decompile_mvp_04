@@ -685,6 +685,29 @@ extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v)
     return LerpATB(a, 1.0f - s, b);
 }
 
+extern Unk801CF054_Tbl12 lbl_805D2830;
+
+extern "C" float fn_801D1F58(Y* y, Unk801CF054_V2* v)
+{
+    Unk801CF054_Tbl12 t = lbl_805D2830;
+    int i = fn_8017C954(y->m30->m700);
+    if (i <= 11) {
+        if (i < 0)
+            i = 0;
+    } else {
+        i = 11;
+    }
+    float a = t.v[i][0];
+    float b = t.v[i][1];
+    float dx = UNK801CF054_CLAMP(AbsF(v->x), 0.0f, 1.0f);
+    dx = !(dx - 0.3f > 0.7f) ? ((dx - 0.3f) >? 0.0f) * 1.4285715f : 1.0f;
+    float dy = UNK801CF054_CLAMP(AbsF(v->y), 0.0f, 1.0f);
+    dy = !(dy - 0.3f > 0.7f) ? ((dy - 0.3f) >? 0.0f) * 1.4285715f : 1.0f;
+    float l1 = LerpATB(a, 1.0f - dx, b);
+    float l2 = LerpATB(a, 1.0f - dy, b);
+    return (l1 + l2) * 0.5f;
+}
+
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
 {
     int small = 0;
