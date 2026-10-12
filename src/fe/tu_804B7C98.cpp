@@ -293,3 +293,13 @@ extern "C" FE_OVERLAY void fn_804B83A4(FeScr* x)
     ((FeObj1*)fn_800C8040(((FeObj*)x->m138)->v32("BANK", 1)))->v28((int)buf);
     fn_800E5380(x->m138);
 }
+
+extern "C" FE_OVERLAY void fn_804B7D2C(FeScr* x)
+{
+    fn_800ECE34(x);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    x->m134 = (FeObj*)fn_800C8060(((FeObj*)fn_800C8044(((FeObj*)x)->v32("BUYSELLGRID", 1)))->v32("GRID", 1));
+    x->m138 = (FeObj*)fn_800C8044(((FeObj*)x)->v32("INFO", 1));
+    ((FeObj1*)x->m134)->v105(1);
+    ((FeObj1*)x->m134)->v88(0);
+}
