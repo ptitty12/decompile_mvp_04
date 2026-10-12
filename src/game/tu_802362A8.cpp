@@ -389,6 +389,53 @@ int Unk802362A8_Cpu::fn_802382F4(Unk802362A8_Req* p)
     return 5;
 }
 
+inline float Unk80238A40_RandC(Unk802362A8_Cpu* c, float scale, int line)
+{
+    const char* f = lbl_805D7978;
+    return (float)(unsigned)((Unk8014D8AC*)c->m2E4->m554)->fn_8014D8AC(1000000, f, line) * scale * 0.000001f;
+}
+inline float Unk80238A40_LerpATB(float a, float t, float b)
+{
+    return a + t * (b - a);
+}
+int fn_80238A40(Unk802362A8_Cpu* c, float* out)
+{
+    out[0] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(c, 1.0f, 0x461), 1.0f);
+    out[1] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(c, 1.0f, 0x462), 1.0f);
+    return 1;
+}
+
+struct Unk80238ECC_V {
+    float x;
+    float y;
+};
+extern "C" void* fn_800AB5C8(void* self);
+extern "C" char* fn_800AEC78(void* self, void* ctx);
+extern "C" void fn_800ADB5C(char* self, Unk80238ECC_V* v, int* a, int* b);
+extern "C" int fn_800ADF28(char* self, int a, int b);
+extern void* lbl_80619D10;
+inline float Unk80238ECC_Rand(Unk802362A8_Cpu* c, float scale, int line)
+{
+    const char* f = lbl_805D7978;
+    return (float)(unsigned)((Unk8014D8AC*)c->m2E4->m554)->fn_8014D8AC(1000000, f, line) * scale * 0.000001f;
+}
+int Unk802362A8_Cpu::fn_80238ECC(float* out, int* res)
+{
+    char* p = fn_800AEC78(fn_800AB5C8(lbl_80619D10), m2E4);
+    if (p != 0) {
+        float h = *(float*)(p + 0xA64) - 0.1f;
+        out[0] = Unk80238ECC_Rand(this, h + h, 0x4BE) - h;
+        out[1] = Unk80238ECC_Rand(this, h + h, 0x4BF) - h;
+        Unk80238ECC_V v = *(Unk80238ECC_V*)out;
+        int a;
+        int b;
+        fn_800ADB5C(p, &v, &a, &b);
+        int k = fn_800ADF28(p, a, b);
+        *res = m2E0->fn_80235E34(4, k);
+    }
+    return 1;
+}
+
 int Unk802362A8_Cpu::fn_80239448()
 {
     int b = m2E4->m6F8->m14[2].m0;
@@ -411,6 +458,29 @@ int Unk802362A8_Cpu::fn_80239448()
 float fn_802398C8(Unk8022FE34_W* w)
 {
     return lbl_805D7C18;
+}
+
+inline float Unk80239DFC_AbsF(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+int fn_8018AA98(int a);
+float Unk802362A8_Cpu::fn_80239DFC(int a)
+{
+    float u0 = 0.05f;
+    float u1 = 0.35f;
+    Unk8022FE34_V2 d = m2E0->fn_80235BFC();
+    float y = 0.4f;
+    if (Unk80239DFC_AbsF(d.a) > 1.0f || !(Unk80239DFC_AbsF(d.b) <= 1.0f)) {
+        if (fn_8018AA98(a) != 0)
+            y = 0.15f;
+    }
+    float r = 0.0f;
+    float t = Unk80238A40_RandC(this, y, 0x78B);
+    r = t + -0.05f;
+    if (m2E4->m6F4 == 8)
+        r = 1.0f;
+    return r;
 }
 
 void Unk802362A8_Cpu::fn_8023A13C()
