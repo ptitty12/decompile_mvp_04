@@ -112,6 +112,38 @@ int* fn_802C1288(const char* text)
     return blk;
 }
 
+int fn_802C13AC(float* p0, float* p1, float* p2, float* p3, float* out)
+{
+    float m1, b1, m2, b2, dx1, dx2, inv;
+    dx1 = p1[0] - p0[0];
+    dx2 = p3[0] - p2[0];
+    if (dx1 == 0.0f) {
+        if (dx2 != 0.0f) {
+            m2 = (p3[2] - p2[2]) / dx2;
+            out[0] = p0[0];
+            out[2] = p0[0] * m2 + p1[2];
+            return 1;
+        }
+    } else if (dx2 == 0.0f) {
+        m1 = (p1[2] - p0[2]) / dx1;
+        out[0] = p2[0];
+        out[2] = p2[0] * m1 + p3[2];
+        return 1;
+    } else {
+        m1 = (p1[2] - p0[2]) / dx1;
+        m2 = (p3[2] - p2[2]) / dx2;
+        if (m1 != m2) {
+            b2 = p3[2] - m2 * p3[0];
+            inv = 1.0f / (m2 - m1);
+            b1 = p1[2] - m1 * p1[0];
+            out[0] = (b1 - b2) * inv;
+            out[2] = (m2 * b1 - m1 * b2) * inv;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void fn_802C212C(int* o, int v)
 {
     *o = v;
