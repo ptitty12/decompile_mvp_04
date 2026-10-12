@@ -45,6 +45,15 @@ extern const float lbl_805A6154;
 
 
 
+/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
+ * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
+ * are hoisted above them (retail's lis cluster). */
+inline float Unk800239F4_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+
+extern "C" float fn_80410CE8(float y, float x);
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x);
 extern "C" void fn_80023F98(Unk80023AC4_Obj* x);
 
@@ -105,6 +114,66 @@ extern "C" void fn_80023AC4(Unk80023AC4_Obj* x)
     }
 }
 
+inline float Unk80023B94_Abs(float v) { return (float)__builtin_fabs(v); }
+extern "C" void fn_80022124(Unk80023AC4_Obj* x, Unk8001F2C4_World* ctx, Unk801A4B34_Pos* p, int a, int n);
+
+/* Character fields read by fn_80023B94 (through casts of the Unk801A4B34_Pos pointer). */
+struct Unk80023B94_P {
+    char pad0[0x388];
+    int m388;
+    int m38C;
+    char pad390[0x4];
+    int m394;
+    char pad398[0x3F8 - 0x398];
+    float m3F8;
+    char pad3FC[0x438 - 0x3FC];
+    float m438;
+    float m43C;
+};
+
+/* near-miss: 3 slots differ (retail loads x->m80[0] into r4 before the lbl_805A6070 / m3F8 float loads of the last call) */
+extern "C" void fn_80023B94(Unk80023AC4_Obj* x)
+{
+    Unk80023B94_P* p = (Unk80023B94_P*)x->m80[0]->m6CC;
+    x->m3D8 = x->m3D8 + 1;
+    if (fn_8022EECC(x->m80[0]->m700->m3B0) != 0) {
+        char* b = (char*)x + 0x468;
+        int o = x->m514 == 0 ? 4 : 0;
+        *(int*)(b + o) = *(int*)(b + o) + 1;
+    }
+    x->m3D4 = (x->m3D4 + 1) & 7;
+    x->m294[x->m3D4].m0 = *(int*)((char*)x->m80[0]->m700->m3B0 + 0x38);
+    if (x->m714 == 1 && x->m294[x->m3D4].m0 == 0)
+        x->m714 = x->m294[x->m3D4].m0;
+    x->m294[x->m3D4].m4 = 0;
+    x->m294[x->m3D4].m8 = 0;
+    Unk80023F98_Vec2 v = fn_80235BE0(x->m80[0]->m700->m3B0);
+    v.x = Unk80023B94_Abs(v.x * p->m438) - p->m438;
+    v.y = Unk80023B94_Abs(v.y * (p->m43C * fn_801C17EC((Unk801A4B34_Pos*)p))) - p->m43C * fn_801C17EC((Unk801A4B34_Pos*)p);
+    if (v.x >= 9.0f || !(v.y < 9.0f))
+        x->m294[x->m3D4].m8 = 1;
+    x->m294[x->m3D4].mC = 0;
+    x->m294[x->m3D4].m20 = p->m394;
+    x->m294[x->m3D4].m24 = 0;
+    if (x->m3E4 > 0 && (x->m3D8 & 3) == 0)
+        x->m3E4 = x->m3E4 - 1;
+    fn_8001CCE0(&x->m160, (Unk801A4B34_Pos*)p);
+    x->mFC = 1;
+    x->m51C = 0;
+    x->m524 = 0;
+    x->m56C = 0;
+    x->m574 = 0;
+    x->m570 = 0;
+    x->m70C = 0;
+    fn_80022124(x, x->m80[0], (Unk801A4B34_Pos*)p, 1, (int)(p->m3F8 * 0.056818180f));
+    int c1 = p->m38C;
+    x->m6B8->m0 = c1;
+    int c2 = p->m388;
+    x->m6B8->m4 = c2;
+    x->fn_800233B4(0x15, 5, 0);
+    fn_8003DD5C(x->m6C8);
+}
+
 extern "C" void fn_80023E18(Unk80023AC4_Obj* x)
 {
     Unk801A4B34_Pos* p = x->m80[0]->m6CC;
@@ -141,6 +210,57 @@ extern "C" void fn_80023F98(Unk80023AC4_Obj* x)
     }
 }
 
+extern "C" int fn_80022730(int unused, int b, int c);
+void fn_80035628(int a, int b, int c, int d, int e, int f, int g, int h);
+void fn_8003C388(int a, int b, int c, int d, int e);
+
+extern "C" void fn_80024060(Unk80023AC4_Obj* x)
+{
+    x->m3DC = x->m3DC + 1;
+    if (x->m530 == 2)
+        x->m534 = x->m534 + 1;
+    if (x->fn_80023430(0, 0, 0) == 1) {
+        x->fn_800233B4(0x2F, 1, 0);
+        return;
+    }
+    if (x->m6DC == 0 && x->mE0 == 0) {
+        x->mE0 = 1;
+        if (x->m548 != 0 && x->m5A8 == 0) {
+            int dd = x->mD0;
+            int c = x->m514;
+            int k = fn_80022730((int)x, x->m5AC, x->m558);
+            int m6 = x->m6AC;
+            int m5 = x->m5A0;
+            fn_80035628(dd, c, 0, k, 1, m6, m5, fn_8002A2D4(x));
+        }
+        if (x->m53C != 0) {
+            int dd = x->mD0;
+            if (dd != 0) {
+                int c = x->m514;
+                int e = x->m5A8;
+                int k = fn_80022730((int)x, x->m5AC, x->m558);
+                int m3 = x->m53C;
+                int m6 = x->m6AC;
+                int m5 = x->m5A0;
+                fn_80035628(dd, c, e, k, m3, m6, m5, fn_8002A2D4(x));
+            }
+        }
+        if (x->m5A8 == 0)
+            x->fn_800233B4(0x30, 0x14, 0);
+        else
+            fn_8002A244(x, 0x10, Unk800239F4_Secs(x->m80[0]->m48));
+        int p = 0;
+        if (!(x->m588 >= 0.0f) && !(x->m590 >= 0.0f) && x->m5AC > 1)
+            p = x->m6AC == 0;
+        int q = 0;
+        if ((x->m588 < 0.0f || !(x->m590 >= 0.0f)) && x->m5AC > 1 && x->m6AC == 0 && x->m558 == 1)
+            q = 1;
+        float v = fn_80410CE8(x->m588, x->m590) * 57.295773f;
+        if (v < -30.0f || !(v <= 120.0f))
+            fn_8003C388(x->m6C8, x->m6AC, p, x->m5A0, q);
+    }
+}
+
 extern "C" void fn_80024320(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x10, (float)x->m80[0]->m48 * lbl_805A60B8);
@@ -153,14 +273,6 @@ extern "C" void fn_80024378()
 extern "C" void fn_8002437C(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 4, (float)x->m80[0]->m48 * lbl_805A60C8);
-}
-
-/* Frames to seconds through an inline: the constant-pool loads the inliner copies are not
- * unchanging, so sched1 keeps the lfd/lfs below the preceding stores while their lis halves
- * are hoisted above them (retail's lis cluster). */
-inline float Unk800239F4_Secs(unsigned n)
-{
-    return (float)n * 0.016666668f;
 }
 
 extern "C" void fn_800243D4(Unk80023AC4_Obj* x)
