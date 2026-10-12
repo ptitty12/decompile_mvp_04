@@ -302,6 +302,36 @@ void fn_801A58FC(Unk8019F8C0_Owner* o, int a)
     }
 }
 
+extern char lbl_805CE8A4[];
+extern char lbl_805CE8C0[];
+extern char lbl_805CE8CC[];
+void fn_801A656C(Unk8019F8C0_Owner* o, Unk801A5A9C_Obj* x, int k);
+
+void fn_801A594C(Unk8019F8C0_Owner* o, int team)
+{
+    fn_8033E958(lbl_805CE8A4);
+    Unk8019F8C0_Inner* t = o->m6F8->m14 + team;
+    unsigned n = t->m3E4;
+    unsigned off = team != 0 ? o->m6F8->m14->m3E4 : 0;
+    for (unsigned i = 0; i < n; i++) {
+        int pos = i * 4 + team * 100;
+        char* sl = (char*)o->m594;
+        *(int*)(sl + pos) = 0;
+        char* base = (char*)t + 0x3E8;
+        int eo = (unsigned char)i * 0x34;
+        int v = *(int*)(base + eo);
+        if (v != 0) {
+            *(int*)(sl + pos) = (int)fn_802AE610(lbl_8061E978, o, v, o, team, i);
+            char buf[16];
+            fn_804089B4(buf, lbl_805CE8C0, i + off);
+            ((Unk802AE610_Sub*)((char*)*(int*)(sl + pos) + 0xA0))->fn_vslot4(buf);
+            ((Unk801A5A9C_Obj*)*(int*)(sl + pos))->m708 = team;
+            fn_801A656C(o, (Unk801A5A9C_Obj*)*(int*)(sl + pos), 0xD);
+            ((Unk801A5A9C_V*)*(int*)(sl + pos))->fn_vslot8(1);
+        }
+    }
+    fn_8033E958(lbl_805CE8CC);
+}
 void fn_801A5A9C(Unk8019F8C0_Owner* o)
 {
     fn_801A5394(o);
