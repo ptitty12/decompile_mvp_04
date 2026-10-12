@@ -103,6 +103,18 @@ extern const float lbl_806008B8;
 extern const float lbl_806008BC;
 extern const float lbl_806008C0;
 extern "C" int rand(void);
+extern "C" int fn_8056A2F8(void* o, int cur, int mode, int a, int b, int who, int p6, int p7, int s8, int sC);
+extern "C" int fn_8058AE54(void* self, int id);
+extern "C" int fn_8058B048(void* self, int id, int flag, int x);
+extern "C" int fn_8058B288(void* self, int a, int b, int flag, int x);
+extern "C" int fn_8058B628(void* self, int unused, int id);
+extern "C" int fn_8058B788(void* self, int id, int flag, int x);
+extern "C" int fn_8058B938(void* self, int id, int flag, int x);
+extern "C" int fn_80077BC4(void* g, int a);
+extern "C" int fn_800E4584__Fiii(int a, int b, int c);
+extern "C" int fn_80552BE0(int a, int b, int* out);
+extern "C" int fn_8058320C(void* self, int id, int k);
+extern "C" void fn_80582B7C(void* self);
 extern "C" int fn_8009005C__Fif(int a, float b);
 extern const float lbl_80600890;
 extern "C" void* fn_8052E2C4(void* self, int a, int b, int c, int d, int e, int f, int g, int h, int i);
@@ -228,6 +240,49 @@ extern "C" DB_OVERLAY int fn_80588800(int a, int b, void* rec)
     }
     }
     return fn_80582DF4(a, b, t);
+}
+
+/* near-miss: same instructions; callee-saved registers permuted (retail id=r31, s=r30; ours s=r31, id=r29): global-alloc priority of s (9 refs/81 insns) just beats id (11/102) */
+extern "C" DB_OVERLAY int fn_80588A3C(void* self, int slot)
+{
+    Db8058B628_E e;
+    char* tab = (char*)self + 0xB8;
+    int off = slot * 4;
+    int id = *(int*)(tab + off);
+    if (id == 0)
+        return 0;
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int kind = 1;
+    int team = fn_8007F7D0((Unk8007F198_B*)s, 0);
+    int ev = fn_80077BC4(s, id);
+    int w = 3;
+    if (ev == 0 || fn_8058320C(self, id, team) == 0) {
+        kind = 0;
+    } else {
+        int p = s->fn_80078A64(ev, 0, id);
+        int q = s->fn_80078A64(ev, 1, id);
+        int pb = p != 0;
+        int qb = q != 0;
+        int pq = pb | qb;
+        int fl = 0;
+        if (s->fn_8007A6A0(0x1F, id) != 0 || s->fn_8007A6A0(0x33, id) != 0)
+            fl = 1;
+        int r = fn_80552BE0(id, s->fn_8007A6A0(0x1B, id), &w);
+        if (pq != 0 && r != 0)
+            kind = 3;
+        else if (fl != 0) {
+            if (r != 0)
+                kind = 2;
+        } else if (r != 0)
+            kind = 4;
+    }
+    int c = ((Unk8007B2B0_Screen*)s)->fn_80078A38(ev);
+    int x = fn_800E4584__Fiii(team, 0, c);
+    fn_8052E198(&e, 4, id, ev, x, (char)w, (char)c, (char)slot, kind, 0);
+    fn_80582CF8(self, &e, 0, 1, slot);
+    fn_80582B7C(self);
+    fn_80360AF0((Db80586420_Ent*)&e, 2);
+    return 1;
 }
 
 extern "C" DB_OVERLAY int fn_80588C44(Db80588C44_C* self, int k, void* rec)
@@ -486,6 +541,56 @@ extern "C" DB_OVERLAY int fn_8058A3B8(void* self, void* rec)
     if ((unsigned)(t - 1) <= 6)
         return t;
     return 1;
+}
+
+extern "C" DB_OVERLAY void fn_8058A420(int* self, int a, int b, int flag)
+{
+    if (flag == 0 && fn_800A2EB4(lbl_80619948) == 0 && *self == 0) {
+        void* o = ((Db80619948_O*)lbl_80619948)->m28;
+        if (fn_8056B628(o, a, b) == 1) {
+            int t = fn_8056B658(o, a, b);
+            int s = fn_8056A5F4(o, 0, t, b);
+            int r = fn_8056A2F8(o, t, 1, 0, 0, b, 0, 2, flag, 0x1A);
+            if (r != -1) {
+                int u = fn_8056A5F4(o, 0, r, b);
+                if (s != u && u != b) {
+                    int res = 0;
+                    int n = 0;
+                    do {
+                        int m = rand() % 7;
+                        switch (m) {
+                        case 0:
+                            res = fn_8058AE54(self, s);
+                            break;
+                        case 1:
+                            res = fn_8058B048(self, s, flag, a);
+                            break;
+                        case 2:
+                            res = fn_8058B288(self, t, b, flag, a);
+                            break;
+                        case 3:
+                            res = fn_8058B628(self, t, s);
+                            break;
+                        case 4:
+                            res = fn_8058B788(self, s, flag, a);
+                            break;
+                        case 5:
+                            res = fn_8058B938(self, s, flag, a);
+                            break;
+                        case 6:
+                            res = fn_8058BA94(self, s, 0, 0);
+                            break;
+                        }
+                        n += 1;
+                        if (res != 0)
+                            return;
+                    } while (n <= 6);
+                    fn_8058BA94(self, s, 0, 0);
+                }
+            } else
+                fn_8058BA94(self, s, 0, 0);
+        }
+    }
 }
 
 extern "C" DB_OVERLAY int fn_8058A884(void* self, void* rec)
