@@ -76,9 +76,8 @@ extern "C" FE_OVERLAY int fn_804E1F4C(FeMask* self)
 
 extern "C" FE_OVERLAY void fn_804E2014(FeMask* self)
 {
-    Unk8005ADD0_Obj* o = fn_8005ACE4();
     for (unsigned i = 0; i <= 8; i++)
-        fn_8005B87C(o, i, fn_804E2274(self, self->m18A, i));
+        fn_8005B87C(fn_8005ACE4(), i, fn_804E2274(self, self->m18A, i));
 }
 
 extern "C" FE_OVERLAY void fn_804E2074(int a, FeMask* self)
