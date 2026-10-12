@@ -22,7 +22,9 @@ extern "C" int fn_8050A6CC(FeScrN* x);
 extern "C" int fn_8050A72C(FeScrN* x);
 extern "C" int fn_8050A78C(FeScrN* x);
 extern "C" int fn_8050A7EC(FeScrN* x);
+extern "C" void fn_8050A8DC();
 extern "C" int fn_8050A8E0(void);
+extern "C" void fn_8050A8E8();
 extern "C" void fn_8050A8EC(void* x);
 extern "C" void fn_8050BED4(FeScrD* x);
 extern "C" int fn_8050BFC0(FeScrN* x);
@@ -116,9 +118,17 @@ extern "C" FE_OVERLAY int fn_8050A7EC(FeScrN* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_8050A8DC()
+{
+}
+
 extern "C" FE_OVERLAY int fn_8050A8E0(void)
 {
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_8050A8E8()
+{
 }
 
 extern "C" FE_OVERLAY void fn_8050A8EC(void* x)
