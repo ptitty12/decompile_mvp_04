@@ -42,6 +42,8 @@ struct Unk8016ACAC_Slot {
 /* Record of the script queue (0x500 bytes): eight 0xA0-byte elements, each a name
  * string with a hash/id word at +0x44. */
 struct Unk8016D9A0_Rec {
+    void fn_8016994C(const char* name, int id, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
+    void fn_80169BF8(const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e);
     char m[0x500];
 };
 

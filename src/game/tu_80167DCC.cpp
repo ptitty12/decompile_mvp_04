@@ -178,6 +178,11 @@ Unk8037B3E8* cScriptLoadAnimations::fn_vslot5() /* 80169878 */
     return new (lbl_806EF9B4) cScriptLoadAnimations;
 }
 
+void Unk8016D9A0_Rec::fn_80169BF8(const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e) /* 80169BF8 */
+{
+    fn_8016994C(name, 0xAE, a, b, c, d, blk, e);
+}
+
 int fn_80169DC4(char* base) /* 80169DC4 */
 {
     int p = (int)base;
@@ -214,6 +219,24 @@ void Unk8016ACAC_Slot::fn_8016A6AC() /* 8016A6AC */
     mA20 = 0;
     ((Unk801527C8_Ctx*)this)->fn_8016AC3C();
     mLists[0].fn_8016D258();
+}
+
+void fn_803296AC();
+
+/* near-miss (99.25%): same code, but the scratch registers and the this/actor callee-saved pair are swapped
+ * (retail this=r30, actor=r31; here this=r31, actor=r30). */
+void Unk8016ACAC::fn_8016A708() /* 8016A708 */
+{
+    Unk801527C8_Actor* a = m4294;
+    if (a->m44 != 0) {
+        fn_803296AC();
+        a->m44 = 0;
+        unsigned int n = *(unsigned int*)&m3D3C->m4C;
+        float t = (float)n * 0.016666668f;
+        m4294->m4C = t;
+    }
+    float k = 0.016666668f;
+    *(float*)&m4294->m50 = k;
 }
 
 void Unk8016ACAC::fn_8016A7A8(Unk8016D9A0_Rec* rec) /* 8016A7A8 */
