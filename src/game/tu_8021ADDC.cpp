@@ -17,6 +17,14 @@ int fn_801EE6F4(Task* t, int a);
 void fn_8021B430(Task* t, int a, int b, int c, int d, float f);
 void fn_801F0174(Task* t, int a, int b);
 void fn_801F0EA8(Task* t, int a);
+void fn_801F0F48(Task* t, int a);
+void fn_8022A71C(Task* t, int a, int b);
+void fn_8021A288(Task* t, int a, int b);
+void fn_8021CE28(Task* t, float f);
+int fn_80225614(Task* t, int a);
+int fn_801F41A4(Task* t);
+int fn_80219B8C(Task* t, int a);
+void fn_80213988(Task* t, int a, int b);
 int fn_801F1CA4(Task* t, void* p, float* out);
 }
 
@@ -201,6 +209,84 @@ void fn_8021DFF4(Task* t, int idx, RecQueue* q)
     } else if ((void*)o->m36C == cur) {
         fn_801EE6F4(t, idx);
         fn_801F0174(t, idx, 0);
+    }
+}
+
+void fn_8021E0D8(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    void* cur = ObjAt(in->m8, a);
+    if (o->m36C != 0 || o->m378 != 0) {
+        if (o->m36C == cur) {
+            fn_801F0EA8(t, a);
+            fn_801F0174(t, a, 0);
+        } else if (fn_80225614(t, a) == 0 && o->m36C == 0) {
+            fn_801F0EA8(t, a);
+            fn_802123D4(t, 0, 1);
+            fn_8021CE28(t, 1.0f);
+            fn_8021D4A4(t);
+        }
+    } else {
+        int p = in->m1C4;
+        int slot = in->m3A5C;
+        fn_80205450(in, a);
+        if (p != -1) {
+            int q = fn_801F41A4(t);
+            if (q == -1) {
+                fn_801F0EA8(t, a);
+                fn_802123D4(t, 0, 1);
+                fn_8021CE28(t, 1.0f);
+                fn_8021D4A4(t);
+            } else if (q != p) {
+                fn_802123D4(t, 0, 0);
+                if (fn_80219B8C(t, q)) {
+                    t->m9C->m1C4 = q;
+                }
+            }
+        }
+        fn_80205450(t->m9C, slot);
+    }
+}
+
+/* near-miss: 93/94 insns, 7 aligned slots: retail tests o->m36C == 0 twice with cr0 (cmpwi r9,0 again after the cmpw against cur);
+   ours keeps one cr7 compare and reuses it. Tried a local for m36C and nested ifs. */
+void fn_8021E258(Task* t, int a)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* o = in->m4;
+    void* cur = ObjAt(in->m8, a);
+    if (o->m36C == 0 && o->m378 == 0) {
+        return;
+    }
+    if (o->m36C == cur) {
+        fn_801F0F48(t, a);
+        fn_801F0174(t, a, 0);
+        return;
+    }
+    if (o->m36C == 0 && o->m374 != 0) {
+        fn_80205450(in, a);
+        in = t->m9C;
+        int x = in->mC0.m[3];
+        if (x == o->m374->m460) {
+            if (fn_802055F4(in) == 1 && o->m374->m460 == 1) {
+                fn_802123D4(t, 0, 0);
+                fn_8022A71C(t, 3, o->m378);
+            } else {
+                fn_802123D4(t, 0, 1);
+                fn_8021A288(t, 3, o->m378);
+            }
+            fn_8021D4A4(t);
+        } else {
+            fn_801F0F48(t, a);
+            fn_802123D4(t, 0, 0);
+            fn_8021CE28(t, 1.0f);
+            if (t->m9C->mC0.m[0] == -1) {
+                fn_80213988(t, 0, 1);
+            } else {
+                fn_8021D4A4(t);
+            }
+        }
     }
 }
 

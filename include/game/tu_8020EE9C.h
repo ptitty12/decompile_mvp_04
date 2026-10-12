@@ -241,7 +241,9 @@ struct TaskInner {
     Slots4 mD4;
     char padE4[0x19C - 0xE4];
     int m19C;
-    char pad1A0[0x1D8 - 0x1A0];
+    char pad1A0[0x1C4 - 0x1A0];
+    int m1C4;
+    char pad1C8[0x1D8 - 0x1C8];
     int m1D8;
     char pad1DC[0x1F4 - 0x1DC];
     int m1F4;
