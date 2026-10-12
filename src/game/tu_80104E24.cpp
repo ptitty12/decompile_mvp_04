@@ -3,6 +3,26 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800F1AEC.h"
+struct Ui1062D0 : UiObj {
+    char pad40[0x134 - 0x40];
+    UiObj* m134;
+    UiObj* m138;
+    Ui2F0Obj* m13C;
+    int m140;
+    int m144;
+};
+extern char lbl_805BE22C[];
+extern char lbl_805BA6D0[];
+extern char lbl_805BE1D8[];
+extern char lbl_805B96DC[];
+extern char lbl_805BE1E4[];
+void fn_8011AF34(UiObj* a);
+void fn_80125300(UiObj* o, int a, int b, int c);
+void fn_80125180(UiObj* o, int a, int id);
+void fn_8011820C(UiObj* a);
+void fn_80118B2C(UiObj* a);
+void fn_80106A14(UiObj* a);
+void fn_80106EAC(UiV_144i* a);
 struct Ui105F1C : UiObj {
     char pad40[0x140 - 0x40];
     UiObj* m140;
@@ -393,6 +413,38 @@ UiScrRaw* fn_80106278(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
     self->m138 = 0;
     self->m140 = 0;
     return self;
+}
+
+void fn_801062D0(Ui1062D0* self)
+{
+    self->m144 = fn_800B555C()->m668;
+    fn_80106EAC((UiV_144i*)self);
+    int w = fn_8011AA24(0)->m6F8->m10->m74;
+    if (w != 0)
+        fn_8011AF34(fn_800C8040(self->v32((int)lbl_805BE22C, 1)));
+    self->m140 = 0;
+    Ui2F0Obj* o = (Ui2F0Obj*)fn_800B7AB8(UiGetMsgMgr(), lbl_805BA6D8);
+    self->m13C = o;
+    o->m2F0 = -0x63;
+    self->m134 = (UiObj*)fn_800C8060((int)self->v33(8, 1));
+    self->m134->v8(1);
+    UiObj* h = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    self->m138 = h;
+    fn_80124FA8(h, self);
+    fn_80125300(self->m138, 1, 4, 0x38C8);
+    fn_800C80C0(self->m138, fn_800B555C()->m570);
+    fn_800C80C0(self, fn_800B555C()->m570);
+    fn_80125180(self->m138, 1, 0x26DF);
+    fn_80125180(self->m138, 0, 0x1A0A);
+    if (w == 0) {
+        UiObj* d = fn_800C8040(fn_800C8044(self->v32((int)lbl_805BE1D8, 1))->v32((int)lbl_805B96DC, 1));
+        char* b;
+        d->v28((b = (char*)fn_8011AA24(0)->m6F8->m10, b + (fn_800B555C()->m570 * 0x22 + 0x88)));
+        UiObj* e = fn_800C8044(fn_800C8044(self->v32((int)lbl_805BE1D8, 1))->v32((int)lbl_805BE1E4, 1));
+        fn_8011820C(e);
+        fn_80118B2C(e);
+    }
+    fn_80106A14(self);
 }
 
 void fn_80106580()
