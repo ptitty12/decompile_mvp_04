@@ -3,6 +3,18 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_800F1AEC.h"
+struct Ui105F1C : UiObj {
+    char pad40[0x140 - 0x40];
+    UiObj* m140;
+    char pad144[0x148 - 0x144];
+    int m148;
+};
+int fn_801060EC(UiObj* self, int a);
+void fn_800C80C8(UiObj* a);
+void fn_80105CA8(UiObj* a);
+void fn_80105A40(UiV_144i* self);
+extern char lbl_8065B888[];
+extern char lbl_80649DA0[];
 extern char lbl_805BF58C[];
 extern char lbl_805BE37C[];
 extern char lbl_805BF5B8[];
@@ -291,6 +303,44 @@ char* fn_80105E94(UiV_140* self)
     return s;
 }
 
+void fn_80105F1C(Ui105F1C* self, int kind, int x)
+{
+    if (fn_801060EC(self, x) != 0) {
+        switch (kind) {
+        case 0: {
+            struct { UiMsg m; UiEvtRaw e; } s;
+            UiMsg* p = &s.m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, lbl_805BADC8, 15);
+            p->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), p, self);
+            fn_800B555C()->m570 = -1;
+            fn_800C80C8(self);
+            const void* base = lbl_80649DA0;
+            s.e.id = 0x9E;
+            s.e.vt = lbl_8065B888;
+            fn_8037893C(fn_8011AA24(0)->m704, s.e.id, &s.e, 0, 0);
+            s.e.vt = base;
+            break;
+        }
+        case 1:
+            switch (self->m140->v60()) {
+            case 7:
+                fn_80105A40((UiV_144i*)self);
+                break;
+            case 6:
+                if (self->m148 != 0)
+                    fn_80105AE8(self, 0x514, 0);
+                break;
+            default:
+                fn_80105CA8(self);
+                break;
+            }
+            break;
+        }
+    }
+}
+
 int fn_8010607C(UiV_140i* self, int a)
 {
     if (a == self->m140) {
@@ -348,6 +398,25 @@ UiScrRaw* fn_80106278(UiScrRaw* self, int a, int b, int c, int d, int e, int f, 
 void fn_80106580()
 {
     fn_8017E264(fn_8011AA24(0)->m700);
+}
+
+int fn_801065AC(UiObj* self, int a)
+{
+    if (fn_800B555C()->m570 == a) {
+        fn_80106890(self);
+        struct { UiMsg m; UiEvtRaw e; } s;
+        UiMsg* p = &s.m;
+        fn_8035682C(p);
+        fn_8040B830(p->name, lbl_805BADC8, 15);
+        p->name[15] = 0;
+        fn_800B7B4C(UiGetMsgMgr(), p, self);
+        const void* base = lbl_80649DA0;
+        s.e.id = 0x9E;
+        s.e.vt = lbl_8065B888;
+        fn_8037893C(fn_8011AA24(0)->m704, s.e.id, &s.e, 0, 0);
+        s.e.vt = base;
+    }
+    return 1;
 }
 
 extern char lbl_805BE138[];
