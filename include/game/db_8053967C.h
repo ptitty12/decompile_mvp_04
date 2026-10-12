@@ -219,4 +219,42 @@ struct Db8053E240_Ctx {
     char padC[0x24];
 };
 
+/* ---- unit 80541F40 ---- */
+/* Object whose +0x44 field is passed to the fn_8057Dxxx helpers (fn_80543A68). */
+struct Db80541F40_Obj {
+    char pad0[0x40];
+    int m40;
+    int m44;
+};
+extern Db80541F40_Obj* lbl_80619948;
+/* 0x6C-byte slot of the table at +0 (id, count, 25 words); the count of slots is at +0x3528. */
+struct Db80541F40_Slot {
+    int m0;
+    int m4;
+    int m8[25];
+};
+struct Db80541F40_Slots {
+    Db80541F40_Slot s[1];
+};
+/* Int list as returned by fn_800A199C: data pointer and count. */
+struct Db80541F40_IL {
+    int* m0;
+    unsigned m4;
+};
+extern int lbl_80622BE8;
+/* Front-end state object: int array at +0x32E0 and its current index at +0x32EC. */
+struct Db80541F40_Cur {
+    char pad0[0x32E0];
+    int* m32E0;
+    char pad32E4[8];
+    int m32EC;
+};
+extern int lbl_80602DC0[][11];
+extern unsigned char lbl_8060E9F1[];
+int fn_80378568(const char* s, int n);
+unsigned fn_8007FE0C(Unk8007F198_E* e);
+unsigned fn_8007FE60(Unk8007F198_E* e, unsigned a, int b);
+int fn_8007FE84(Unk8007F198_E* e, unsigned a, int b, unsigned char c);
+int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
+
 #endif
