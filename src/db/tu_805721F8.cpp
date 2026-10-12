@@ -36,6 +36,9 @@ extern const float lbl_805FFEE8;
 extern "C" void fn_805744D4(DbTbl16* t);
 
 extern const float lbl_805FFE7C;
+extern const float lbl_805FFE68;
+extern const float lbl_805FFE6C;
+extern const float lbl_805FFE70;
 extern const float lbl_805FFEA0;
 extern const float lbl_805FFEA4;
 extern const float lbl_805FFEA8;
@@ -43,6 +46,76 @@ extern const float lbl_805FFEAC;
 extern const float lbl_805FFEB0;
 
 extern "C" float fn_80573D44(DbSub50* p, int i);
+/* forward declarations (definitions are in address order) */
+extern "C" float fn_8057375C(DbMgr* self);
+extern "C" void fn_80573840(DbSub50* p);
+extern "C" void fn_805738F0(DbSub50* p, DbSelSrc* src);
+extern "C" float fn_80573D44(DbSub50* p, int i);
+extern "C" void fn_80573D84(DbSub50* p, int i, float v);
+extern "C" int fn_80574420(DbSub50* p, DbT* t);
+extern "C" DbTbl16* fn_80574478(DbTbl16* t);
+extern "C" unsigned fn_80574728(DbTbl16* t, int idx);
+extern "C" float fn_80574750(DbTbl16* t, int idx);
+extern "C" float fn_80574798(DbTbl16* t, int idx);
+extern "C" float fn_805747E4(DbTbl16* t, int idx);
+extern "C" float fn_80574830(DbTbl16* t, int idx);
+extern "C" void fn_8057487C(char* p);
+extern "C" int fn_80573440(DbMgr* self, int side, int id, float thr);
+extern "C" int fn_805736CC(DbMgr* self, int side);
+extern "C" int fn_80573548(DbMgr* self, int side);
+
+/* near-miss: 5 slots; same code, float registers f12/f13 swapped in the select */
+extern "C" DB_OVERLAY int fn_80573440(DbMgr* self, int side, int id, float thr)
+{
+    DbT* t = TeamAt(self->m8->m14, side);
+    if (fn_80097148(t, id) == 0) {
+        char* tt = (char*)t + 0xC74;
+        float cnt = fn_80089AA0__FP20Unk80089894_PackTabDUiUi(tt, 0, id);
+        float tot = fn_80089AA0__FP20Unk80089894_PackTabDUiUi(tt, 0x1B, id);
+        float v = !(cnt <= lbl_805FFE68) ? tot / cnt : lbl_805FFE68;
+        return v < thr;
+    }
+    return 2;
+}
+
+extern "C" DB_OVERLAY int fn_80573548(DbMgr* self, int side)
+{
+    int n = 0;
+    DbT* t = TeamAt(self->m8->m14, side);
+    DbBL* b1 = &t->l[1];
+    for (unsigned i = 0; i < b1->m4; i++) {
+        if (fn_80573440(self, side, t->l[1].m0[(unsigned char)i], lbl_805FFE6C) == 0)
+            n += 1;
+    }
+    DbBL* b2 = &t->l[2];
+    for (unsigned i = 0; i < b2->m4; i++) {
+        if (fn_80573440(self, side, t->l[2].m0[(unsigned char)i], lbl_805FFE6C) == 0)
+            n += 1;
+    }
+    DbBL* b3 = &t->l[3];
+    for (unsigned i = 0; i < b3->m4; i++) {
+        if (fn_80573440(self, side, t->l[3].m0[(unsigned char)i], lbl_805FFE6C) == 0)
+            n += 1;
+    }
+    DbBL* b4 = &t->l[4];
+    for (unsigned i = 0; i < b4->m4; i++) {
+        if (fn_80573440(self, side, t->l[4].m0[(unsigned char)i], lbl_805FFE6C) == 0)
+            n += 1;
+    }
+    return n;
+}
+
+extern "C" DB_OVERLAY int fn_805736CC(DbMgr* self, int side)
+{
+    int n = 0;
+    unsigned i = 0;
+    DbT* t = TeamAt(self->m8->m14, side);
+    for (; i < t->l[0].m4; i++) {
+        if (fn_80573440(self, side, t->l[0].m0[(unsigned char)i], lbl_805FFE70) == 2)
+            n += 1;
+    }
+    return n;
+}
 
 extern "C" DB_OVERLAY float fn_8057375C(DbMgr* self)
 {
@@ -119,7 +192,6 @@ extern "C" DB_OVERLAY int fn_80574420(DbSub50* p, DbT* t)
     return r;
 }
 
-
 extern "C" DB_OVERLAY DbTbl16* fn_80574478(DbTbl16* t)
 {
     for (int i = 0; i < 0x7E; i++) {
@@ -129,8 +201,6 @@ extern "C" DB_OVERLAY DbTbl16* fn_80574478(DbTbl16* t)
     fn_805744D4(t);
     return t;
 }
-
-
 
 extern "C" DB_OVERLAY unsigned fn_80574728(DbTbl16* t, int idx)
 {
@@ -168,7 +238,6 @@ extern "C" DB_OVERLAY float fn_80574830(DbTbl16* t, int idx)
         return t->r[i].mC;
     return lbl_805FFF04;
 }
-
 
 extern "C" DB_OVERLAY void fn_8057487C(char* p)
 {
