@@ -588,6 +588,51 @@ extern "C" void fn_801D5CF0(B* s)
     s->m40 = 0;
 }
 
+extern "C" void fn_80088664(void* o, int a, int* out, float* val);
+struct Unk801D31D8_GM2 {
+    char pad0[0xC];
+    void* mC;
+};
+struct Unk801D31D8_G6W {
+    char pad0[0xC];
+    Unk801D31D8_GM2* mC;
+    char pad10[4];
+    Unk801D31D8_T2* m14;
+};
+
+extern "C" void fn_801D5D00(B* s)
+{
+    if (s->m30->m6F4 == 0) {
+        Unk801D31D8_G6W* g = (Unk801D31D8_G6W*)s->m30->m6F8;
+        int out = 0;
+        float val = 0.0f;
+        fn_80088664(g->mC->mC, g->m14->m1CD0 == 0, &out, &val);
+        float tgt = 0.0f;
+        float lo = 0.01f;
+        float hi = 0.2f;
+        float c2 = 0.5f;
+        float c1 = 1.0f;
+        int flag = 0;
+        if (out <= 9 || (!(val <= -0.5f) && !(val >= 0.5f)))
+            flag = 1;
+        if (flag != 0) {
+            tgt = 0.01f;
+        } else {
+            float a = AbsF(val);
+            float b = 2.0f * (a - 0.5f);
+            b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+            tgt = LerpATB(0.01f, b, 0.2f);
+        }
+        if (!(RandG(s->m30, 1.0f, lbl_805D25E0, 0x995) >= tgt)) {
+            s->m3C = 1;
+            if (val > 0.0f)
+                s->m40 = 1;
+            else
+                s->m40 = 0;
+        }
+    }
+}
+
 extern "C" void fn_801D5F2C(B* s)
 {
     if (s->m30->m6F4 == 0)
