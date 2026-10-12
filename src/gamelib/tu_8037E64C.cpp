@@ -459,6 +459,26 @@ struct SegBase {
 extern GObj1* lbl_80624278;
 extern int lbl_806242B0;
 
+struct VM848 {
+    virtual ~VM848();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual int s15();
+};
+extern "C" float fn_80381650(VX13** objs, int n, SegList* p, int key, int* out1, Obj14** out2, float a, float b);
+extern "C" int fn_80381BCC(Unk8037E9D0* o, int a);
+
 extern "C" int fn_8037E64C(Unk8037E64C* o, int key)
 {
     for (int i = 0; i < o->m4; i++) {
@@ -845,6 +865,56 @@ extern "C" void fn_80381B38(Unk8037E9D0* o)
         }
         o->m850 = 1;
     }
+}
+
+extern "C" int fn_80381BCC(Unk8037E9D0* o, int a)
+{
+    int ret = 1;
+    Unk80362DFC snap;
+    fn_80381198(o, &snap);
+    fn_8037EA7C(o, 1);
+    o->m848 = 0;
+    if (a != 0) {
+        o->m844 = a;
+    } else {
+        int objs[4];
+        Ent68* e = (Ent68*)((char*)o + 0x1AC) + o->m860;
+        int n = fn_80384B70(o->m834, o->m83C, objs, 4);
+        if (!(e->m14 > e->m10)) {
+            fn_80381650((VX13**)objs, n, (SegList*)e->m4, e->m0, &o->m844, (Obj14**)&o->m84C, e->m14, e->m10);
+        } else {
+            if (!(e->m14 >= 1.0f))
+                fn_80381650((VX13**)objs, n, (SegList*)e->m4, e->m0, &o->m844, (Obj14**)&o->m84C, e->m14, 1.0f);
+            if (o->m84C == 0)
+                fn_80381650((VX13**)objs, n, (SegList*)e->m4, e->m0, &o->m844, (Obj14**)&o->m84C, 0.0f, e->m10);
+        }
+    }
+    if (o->m844 != 0) {
+        VOut* v = (VOut*)o->m844;
+        int h = v->s11(o->m83C, o->m884);
+        if (fn_80380BB0((char*)o, h) == 0) {
+            ret = 0;
+        } else {
+            fn_80381A5C(o);
+            if (o->m850 == 0) {
+                if (((VM848*)o->m848)->s15() != 0) {
+                    Ent68* e = (Ent68*)((char*)o + 0x1AC) + o->m860;
+                    o->m84C = fn_803818BC(o->m848, e->m4, e->m0, e->m14, e->m10);
+                    if (o->m84C != 0)
+                        o->m850 = 1;
+                }
+            }
+        }
+    } else {
+        ret = fn_80380BB0((char*)o, o->m83C);
+        if (ret != 0) {
+            if (((Obj14*)o->m834)->m14 != 0 || fn_80381E08(o, o->m834, o->m838) != 0)
+                o->m850 = 1;
+        }
+    }
+    if (ret == 0)
+        fn_80381330(o, &snap);
+    return ret;
 }
 
 extern "C" VOut* fn_80381E08(Unk8037E9D0* o, int a, int b)
