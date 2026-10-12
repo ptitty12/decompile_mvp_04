@@ -84,6 +84,9 @@ extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
 extern "C" void fn_80538EC4(Unk805352B0_List* self, int x, int y);
 extern "C" void fn_80539128(Unk805352B0_List* self, Unk805352B0_List* out);
 extern "C" int fn_80077BC4(void* g, int a);
+extern "C" void fn_80536C5C(Unk805352B0_List* self, int x);
+extern "C" void fn_80539380(Unk805352B0_List* self);
+extern "C" void fn_80535764(Unk805352B0_List* self, int x);
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -629,4 +632,57 @@ extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
     fn_80563740(a, sc->fn_8007A270(r));
     fn_8007F330((Unk8007F198_A*)sc, a, r);
     fn_80563140(a, r);
+}
+
+extern "C" DB_OVERLAY void fn_80563740(int x, int k)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int o0 = 0;
+    int o1 = 0;
+    int o2 = 0;
+    int o3 = 0;
+    sc->fn_80078AE0(x, &o0, &o1, &o2, &o3);
+    if ((int)fn_8007F198((Unk8007F198_A*)sc, x) > 0x18) {
+        Unk80535650_Tmp t;
+        int buf[0x28];
+        Unk80535650_Tmp* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        if (k != 0) {
+            fn_80536C5C((Unk805352B0_List*)q, x);
+        } else {
+            fn_80538EC4((Unk805352B0_List*)q, x, 0);
+            fn_80539380((Unk805352B0_List*)q);
+            if (q->Count() == 0) {
+                fn_80535764((Unk805352B0_List*)q, x);
+                fn_80539380((Unk805352B0_List*)q);
+            }
+        }
+        fn_805362AC((Unk805352B0_List*)&t, 0);
+        int e = *t.m0;
+        int s = ((Unk8007B2B0_Screen*)sc)->fn_80078A38(x);
+        if (s == 3) {
+            fn_80079564(sc, e, 0);
+        } else {
+            int h = ((Unk8007B2B0_Screen*)sc)->fn_80075948(x);
+            int g = 0;
+            switch (s) {
+            case 0:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(1, h);
+                break;
+            case 1:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(2, h);
+                break;
+            case 2:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(3, h);
+                break;
+            }
+            fn_80563740(g, k);
+            fn_8007F29C((Unk8007F198_A*)sc, x, e);
+            fn_8007F330((Unk8007F198_A*)sc, g, e);
+            fn_80563140(g, e);
+        }
+        q->D();
+    }
 }
