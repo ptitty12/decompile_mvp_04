@@ -151,6 +151,38 @@ extern "C" float fn_801C71EC(Z* z)
     return r;
 }
 
+/* near-miss: same code; only the temporaries (f0/f13, r10/r11) of the second RandF/Lerp setup are numbered differently. */
+extern "C" float fn_801C7BF0(Z* z, float f)
+{
+    float a = 0.0f;
+    float b = 0.0f;
+    if (!(RandF(z->m204->m554, 1.0f, 0xE34) >= 0.5f)) {
+        const float c = 30.0f;
+        b = a - (1.0f - f) * c;
+    } else {
+        const float c = 18.0f;
+        b = (1.0f - f) * c + a;
+    }
+    b = b * LerpATB(0.8f, RandF(z->m204->m554, 1.0f, 0xE46), 1.2f);
+    return b;
+}
+
+/* near-miss: same code as fn_801C7BF0 (sum instead of product); register numbering of the setup temporaries differs. */
+extern "C" float fn_801C7D90(Z* z, float f)
+{
+    float a = 30.0f;
+    float b = 0.0f;
+    if (!(RandF(z->m204->m554, 1.0f, 0xE56) >= 0.5f)) {
+        const float c = 15.0f;
+        b = a - (1.0f - f) * c;
+    } else {
+        const float c = 15.0f;
+        b = (1.0f - f) * c + a;
+    }
+    b = b + LerpATB(-6.0f, RandF(z->m204->m554, 1.0f, 0xE66), 6.0f);
+    return b;
+}
+
 extern "C" void fn_801C7F38(Z* z, float f)
 {
     f = !(f > 1.0f) ? (f >? 0.0f) : 1.0f;
