@@ -219,4 +219,126 @@ struct Db8053E240_Ctx {
     char padC[0x24];
 };
 
+/* ---- unit 80541F40 ---- */
+/* Object whose +0x44 field is passed to the fn_8057Dxxx helpers (fn_80543A68). */
+struct Db80541F40_Obj {
+    char pad0[0x40];
+    int m40;
+    int m44;
+};
+extern Db80541F40_Obj* lbl_80619948;
+/* 0x6C-byte slot of the table at +0 (id, count, 25 words); the count of slots is at +0x3528. */
+struct Db80541F40_Slot {
+    int m0;
+    int m4;
+    int m8[25];
+};
+struct Db80541F40_Slots {
+    Db80541F40_Slot s[1];
+};
+/* Int list as returned by fn_800A199C: data pointer and count. */
+struct Db80541F40_IL {
+    int* m0;
+    unsigned m4;
+};
+extern int lbl_80622BE8;
+/* Front-end state object: int array at +0x32E0 and its current index at +0x32EC. */
+struct Db80541F40_Cur {
+    char pad0[0x32E0];
+    int* m32E0;
+    char pad32E4[8];
+    int m32EC;
+};
+extern int lbl_80602DC0[][11];
+extern unsigned char lbl_8060E9F1[];
+int fn_80378568(const char* s, int n);
+unsigned fn_8007FE0C(Unk8007F198_E* e);
+unsigned fn_8007FE60(Unk8007F198_E* e, unsigned a, int b);
+int fn_8007FE84(Unk8007F198_E* e, unsigned a, int b, unsigned char c);
+int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
+
+/* ---- unit 805467E0 ---- */
+/* 0x2C-byte queued event (fn_80548894 sets it from a Vec3-like value). */
+struct Db805467E0_V {
+    float m0;
+    int m4;
+    int m8;
+};
+struct Db805467E0_W3 {
+    int m0;
+    int m4;
+    int m8;
+};
+struct Db805467E0_Ev {
+    float m0;
+    int m4;
+    int m8;
+    Db805467E0_W3 vC;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    const void* m28;
+};
+struct Db805467E0_S {
+    int m0;
+    int m4;
+    int m8;
+};
+/* Queue of 75 events; count at +0xCE4, a state word at +0xCE8 and an int list at +0xCF4. */
+struct Db805467E0_Q {
+    Db805467E0_Ev ev[75];
+    int mCE4;
+    Db805467E0_S sCE8;
+    Db8053967C_List mCF4;
+};
+
+/* ---- unit 805495DC ---- */
+/* 8-byte rating roll record built by the fn_8054Cxxx generators. */
+struct Db805495DC_Rec8 {
+    unsigned w0;
+    unsigned w4;
+};
+/* Bit view of the first word (fn_8054C034 family writes a, f1 and clears f2/fl). */
+struct Db805495DC_Bits {
+    unsigned a : 8;
+    unsigned f1 : 6;
+    unsigned f2 : 3;
+    unsigned fl : 1;
+    unsigned rest : 14;
+    unsigned w4;
+};
+struct Db805495DC_Sub {
+    char pad0[0x10];
+    int m10;
+    char pad14[8];
+    int m1C;
+};
+/* Holder with two sub-objects (+0x14, +0x18) built by fn_8054C6E4. */
+struct Db805495DC_Hold {
+    int m0;
+    int m4;
+    char pad8[0xC];
+    void* m14;
+    Db805495DC_Sub* m18;
+};
+extern const float lbl_805FF228;
+extern const float lbl_805FF22C;
+extern unsigned char lbl_806015E0[];
+extern "C" {
+float fn_8056FFB0();
+int fn_805320B0(int c, int a, int b, float f);
+}
+int fn_8007FBC0(Unk8007F198_C* s, int a, int b);
+void* operator new(unsigned int size, int heap); /* 0x80377428 */
+
+/* ---- unit 8054CBBC ---- */
+/* Entry tracker: id, a Screen pointer and (at +8) a vptr slot (ctor fn_8054CBBC). */
+struct Db8054CBBC_O {
+    int m0;
+    Unk8007B2B0_Screen* m4;
+    const void* m8;
+};
+extern int lbl_806025EC[];
+
 #endif
