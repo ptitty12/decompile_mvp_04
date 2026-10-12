@@ -25,6 +25,28 @@ extern "C" FE_OVERLAY void fn_804726A0(void* x)
     }
 }
 
+extern "C" FE_OVERLAY void fn_80472724(void* x)
+{
+    char* g = (char*)lbl_80619948->m58;
+    fn_80124FA8(FeVp(x, 0x13C), x);
+    fn_80125154(FeVp(x, 0x13C), 0);
+    if (FeI(g, 0xCE4) != 0 && FeWp(x, 0x138) != 0) {
+        if (FeWp(x, 0x138)->fn_vslot86() == 0)
+            fn_801251CC(FeVp(x, 0x13C), 3, 0x1A2F, 1);
+        else
+            fn_801251CC(FeVp(x, 0x13C), 3, 0x37A2, 2);
+    } else {
+        fn_80125084(FeVp(x, 0x13C), 3);
+    }
+    if (FeWp(x, 0x140) != 0 && FeWp(x, 0x140)->fn_vslot59() > 0 && *fn_80548E2C(g, FeWp(x, 0x140)->fn_vslot60()) == 0) {
+        fn_801251CC(FeVp(x, 0x13C), 0, 0x1C58, 4);
+        fn_801251CC(FeVp(x, 0x13C), 2, 0x416D, 3);
+    } else {
+        fn_80125084(FeVp(x, 0x13C), 2);
+        fn_80125084(FeVp(x, 0x13C), 0);
+    }
+}
+
 extern "C" FE_OVERLAY int fn_80472BBC(void* x)
 {
     FeAt(x, 0x140)->fn_vslot50();
