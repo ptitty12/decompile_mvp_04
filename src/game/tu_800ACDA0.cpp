@@ -977,6 +977,66 @@ extern "C" int fn_800AEE44(void* self)
     return r;
 }
 
+struct FEMgrX {
+    char pad0[0xD8];
+};
+extern FEMgrX* lbl_8061A32C;
+extern const char lbl_805B955C[];
+extern const char lbl_805B9468[];
+extern const char lbl_805B9474[];
+extern const char lbl_805B9480[];
+extern const char lbl_805B9490[];
+extern const char lbl_805B949C[];
+extern const char lbl_805B94AC[];
+extern const char lbl_805B94BC[];
+extern const char lbl_805B94C8[];
+extern const char lbl_805B94D8[];
+extern const char lbl_805B94E0[];
+extern const char lbl_805B94EC[];
+extern const char lbl_805B94F8[];
+extern "C" FEMgrX* fn_800B64BC(FEMgrX* p);
+extern "C" void fn_800B7B4C(FEMgrX* mgr, UiMsgBuf* m, void* ctx);
+extern "C" void fn_8035682C(UiMsgBuf* m);
+extern "C" char* fn_8040B830(char* dst, const char* src, int n);
+extern "C" int fn_8040B6A0(const char* s);
+inline FEMgrX* FEGetMgrX()
+{
+    if (lbl_8061A32C == 0) {
+        lbl_8061A32C = fn_800B64BC((FEMgrX*)operator new(0xD8, 0));
+    }
+    return lbl_8061A32C;
+}
+
+/* near-miss (98.6%): callee-saved registers of the message pointer, mgr hi and name offset are permuted */
+extern "C" void fn_800AEE7C(char* self, int k)
+{
+    *(int*)(self + 0x444) = k;
+    const char* t[21] = {lbl_805B9468, lbl_805B9474, lbl_805B9474, lbl_805B6F58, lbl_805B6F58, lbl_805B9480,
+                         lbl_805B9490, lbl_805B949C, lbl_805B94AC, lbl_805B94BC, lbl_805B94BC, lbl_805B94C8,
+                         lbl_805B94D8, lbl_805B94E0, lbl_805B94EC, lbl_805B6F58, lbl_805B6F58, lbl_805B94F8,
+                         lbl_805B94F8, lbl_805B94F8};
+    if ((unsigned)(k - 1) <= 0x13) {
+        if (fn_8040B6A0(t[k]) != 0) {
+            UiMsgBuf m;
+            UiMsgBuf* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, t[k], 0xF);
+            p->name[15] = 0;
+            fn_800B7B4C(FEGetMgrX(), p, 0);
+        }
+    } else if (k == 0) {
+        int z = *(int*)(self + 0x2C);
+        if (z == 0) {
+            UiMsgBuf m;
+            UiMsgBuf* p = &m;
+            fn_8035682C(p);
+            fn_8040B830(p->name, lbl_805B955C, 0xF);
+            p->name[15] = z;
+            fn_800B7B4C(FEGetMgrX(), p, 0);
+        }
+    }
+}
+
 extern "C" FEOb12* fn_800AEFF4(FEOb12* self, int a, int b)
 {
     self->m0 = a;
