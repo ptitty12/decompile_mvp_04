@@ -140,6 +140,60 @@ extern "C" float fn_801CAFA0(Z* z, float f)
     return (a - 0.8f) * rem + 0.8f;
 }
 
+inline Vec3 Scale(const Vec3* v, float s)
+{
+    Vec3 r;
+    r.x = v->x * s;
+    r.y = v->y * s;
+    r.z = v->z * s;
+    return r;
+}
+inline Vec3 operator-(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Vec3 operator+(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+struct Unk801CAFA0_ZW {
+    char pad0[0x168];
+    Vec3 m168;
+    Vec3 m174;
+    float m180;
+    Vec3 m184;
+};
+struct Unk801CAFA0_V4 {
+    Vec3 v;
+    float w;
+};
+extern "C" int fn_801CF588(Z* z, void* out, Vec3* in, Vec3* b, float f);
+
+extern "C" void fn_801CB148(Z* z)
+{
+    V2 v = ((Unk801CAFA0_VaFn)fn_801CD94C)(z);
+    *(V2*)z->m150 = v;
+    z->m1F8 = 0.8f;
+    float t = ((Unk801CAFA0_ZW*)z)->m180 - (float)z->m204->m4C * 0.016666668f;
+    Unk801CAFA0_V4 a;
+    Unk801CAFA0_V4 b;
+    Unk801CAFA0_V4 q;
+    if (fn_801CF588(z, &q, &a.v, &b.v, t)) {
+        Vec3 d = b.v - a.v;
+        ((Unk801CAFA0_ZW*)z)->m184 = a.v + Scale(&d, z->m1F8);
+        ((Unk801CAFA0_ZW*)z)->m174 = b.v;
+        ((Unk801CAFA0_ZW*)z)->m168 = a.v;
+    }
+}
+
 extern "C" void fn_801CB324(Z* z) { fn_801CB360(z); }
 
 extern "C" void fn_801CB344(Z* z) { *(V2*)z->m150 = lbl_8060558C; }
