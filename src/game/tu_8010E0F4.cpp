@@ -88,6 +88,14 @@ extern "C" void fn_801114CC(Scr* self);
 extern "C" void fn_80111E50(Scr* self);
 extern "C" void fn_801120EC(Scr* self);
 
+extern "C" void fn_8010EE30(Scr* self, UnkPly* a, UnkPly* b);
+UnkPly* fn_801A49F0(UnkGame* g, int idx, int v);
+void fn_8017D640(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, int d);
+void fn_8017D984(UnkGameP700* p, int a, UnkPly* b, UnkPly* c);
+void fn_8017D6B8(UnkGameP700* p, int a, UnkPly* b, UnkPly* c, UnkPly* d, UnkPly* e);
+void fn_8017DF2C(UnkGameP700* p, UnkPly* a);
+void fn_8017DE28(UnkGameP700* p, UnkPly* a);
+
 extern "C" {
 void fn_8010F1E4(Scr* self);
 void fn_8010D33C(Scr* self, int a);
@@ -364,6 +372,60 @@ int fn_8010EAF4(Scr* self)
     if (c != 0 && (r27 != 0 || f != 0))
         r = 1;
     return r;
+}
+
+void fn_8010EBD8(Scr* self)
+{
+    switch (self->m144) {
+    case 0:
+    case 1:
+    case 5: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pa, pb);
+        fn_8017D640(g->m700, self->m168, pb, pa, 0);
+        fn_8010EF84(self);
+        break;
+    }
+    case 2: {
+        UnkGame* g = fn_8011AA24(0);
+        if (self->m158 != 0)
+            fn_8017DF2C(g->m700, fn_801A49F0(g, self->m168, self->m158));
+        if (self->m15C != 0)
+            fn_8017DE28(g->m700, fn_801A49F0(g, self->m168, self->m15C));
+        break;
+    }
+    case 3: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8017D640(g->m700, self->m168, pb, pa, 0);
+        break;
+    }
+    case 4: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pa, pb);
+        fn_8017D984(g->m700, pb->m708, pb, pa);
+        fn_8010EF84(self);
+        break;
+    }
+    case 6:
+        break;
+    case 7: {
+        UnkGame* g = fn_8011AA24(0);
+        UnkPly* pa = fn_801A49F0(g, self->m168, self->m158);
+        UnkPly* pb = fn_801A49F0(g, self->m168, self->m164);
+        UnkPly* pc = fn_801A49F0(g, self->m168, self->m160);
+        UnkPly* pd = fn_801A49F0(g, self->m168, self->m15C);
+        fn_8010EE30(self, pc, pd);
+        fn_8017D6B8(g->m700, self->m168, pb, pa, pd, pc);
+        fn_8010EF84(self);
+        break;
+    }
+    }
 }
 
 void fn_8010EF84(Scr* self)
