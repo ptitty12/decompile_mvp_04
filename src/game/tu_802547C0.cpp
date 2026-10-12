@@ -45,9 +45,11 @@ struct Unk8025480C_Msg {
         vptr = lbl_80649DA0;
         m0 = id;
     }
-    void Derived()
+    void Derived(int a, P* b)
     {
         vptr = lbl_80660EC0;
+        m8 = a;
+        mC = b;
     }
 };
 
@@ -57,7 +59,6 @@ void fn_802547C0(A* self, int a)
     self->b2 = a;
 }
 
-/* near-miss: same instructions, store/schedule order of the message object differs (retail stores vptr, id, then fields after the lwz of m0) */
 void fn_8025480C(A* self, int a)
 {
     if (a == -1) {
@@ -67,9 +68,7 @@ void fn_8025480C(A* self, int a)
                 if (!self->b2) {
                     Unk8025480C_Msg m;
                     m.Base(0x63);
-                    m.Derived();
-                    m.m8 = t;
-                    m.mC = self->m0;
+                    m.Derived(t, self->m0);
                     fn_8037893C(self->m0->m44C->m704, m.m0, &m, 0, 0);
                     fn_8035E214(&m, 2);
                 }
@@ -99,13 +98,14 @@ int fn_802548F0(A* self)
     return r;
 }
 
-/* near-miss: retail compares 1 then 2 with two branches (no range-test fold); every ||/switch/if spelling tried folds into a range test or reorders */
 int fn_80254964(A* self)
 {
+    int r = 0;
     int t = self->m44;
-    if (t == 1 || t == 2)
-        return 1;
-    return 0;
+    int lo = 1, hi = 2;
+    if (t == lo || t == hi)
+        r = 1;
+    return r;
 }
 
 int fn_80254984(A* self)
@@ -134,14 +134,13 @@ int fn_80254A34(A* self)
     return r;
 }
 
-/* near-miss: one instruction too many; float constant/compare placement differs */
 int fn_80254A90(A* self)
 {
     if ((fn_80254A34(self) == 1 || fn_80254964(self) != 0) && !self->b2) {
         float t = self->m8;
         if (!(t > 0.0f))
             return 1;
-        float lo = 0.4f;
+        const float lo = 0.4f;
         float d = Secs(self->m0->m44C) - t;
         if (d < lo)
             return 1;
