@@ -71,6 +71,9 @@ extern "C" void fn_8022EA60(Unk801CF054_V2* out, void* a, ...);
 inline float AbsF(float v) { return (float)__builtin_fabs(v); }
 
 extern "C" float fn_80235DA8(void* p);
+extern "C" float fn_801A0AA8(P* p, float f1, float f2);
+typedef Unk801CF054_V2 (*Unk801CF054_VaFn)(void*, ...);
+extern "C" Unk801CF054_V2 fn_801CD94C(void* z);
 struct Unk801CF054_Q4 {
     float x;
     float y;
@@ -485,6 +488,36 @@ extern "C" void fn_801D28E4(Y* y)
     y->m50 = RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x46F);
     if (!(RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x471) >= 0.33f))
         y->m50 = -y->m50;
+}
+
+/* near-miss: same code; retail stores the second RandF scale slot before loading the RNG pointer. */
+extern "C" void fn_801D2A40(Y* y)
+{
+    Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
+    float t;
+    t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
+    y->m50 = t + LerpATB(-0.1f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x487), 0.1f);
+    if (fn_801A4B34(y->m30)->v4())
+        y->m50 = -y->m50;
+    if (!(RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x48F) >= 0.25f))
+        y->m54 = 1.0f;
+    else
+        y->m54 = LerpATB(-1.0f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x495), 1.0f);
+}
+
+/* near-miss: same code; the integer temporaries of the last statement are numbered r11/r10 where retail has r10/r11. */
+extern "C" void fn_801D2C74(Y* y)
+{
+    Unk801CF054_V2 v = ((Unk801CF054_VaFn)fn_801CD94C)(((Unk801C16B0_M4*)y->m34)->m3A4);
+    float t;
+    t = !(v.x > 1.0f) ? -(v.x >? -1.0f) : -1.0f;
+    float u = AbsF(t);
+    y->m50 = fn_801A0AA8(y->m30, u, 0.35f);
+    if (!(t >= 0.0f))
+        y->m50 = -y->m50;
+    if (fn_801A4B34(y->m30)->v4())
+        y->m50 = -y->m50;
+    y->m54 = LerpATB(-0.8f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4B7), 1.0f);
 }
 
 extern "C" int fn_801D251C(Y* y)

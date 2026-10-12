@@ -25,7 +25,9 @@ struct Unk801C16B0_Sub8 {
 struct Unk801C16B0_M4 {
     char pad0[8];
     Unk801C16B0_Sub8 s8;
-    char pad18[0x3B0 - 0x18];
+    char pad18[0x3A4 - 0x18];
+    void* m3A4;
+    char pad3A8[0x3B0 - 0x3A8];
     void* m3B0;
     int m3B4;
     int m3B8;
