@@ -75,3 +75,4 @@
   - fn_803567AC: tu_80134A60 declares it as a free function; it is now `__11Unk803567AC`.
   - fn_8037B424, now `_._11Unk8037B3E8`.
   - fn_80090880: callers pass 2 arguments; use the cast recipe.
+- 2026-10-11 | Claude Opus 5.5 (tail-setup delegate, work/tail-setup) | main .text tail 0x8036F44C..0x8043FDB8 | setup only: 254 code-only units (95 EA-lib, 103 runtime, 56 SDK), 0 functions matched; tu_80362FB4/tu_80365C10 moved to cflags_ealib (fn_8036344C exact there) | none | Flags per library in DECISIONS (tail entry); unconfirmed: AV, libgcc DI helpers, sdk/ pieces, dvd/mtx/exi deviations. 503 functions are port jobs from port/mvp2005 and match/W2-pad.
