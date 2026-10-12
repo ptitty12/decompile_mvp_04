@@ -22,13 +22,14 @@ struct Unk800493D4_Sm {
     char pad9E4[0x20];
     int mA04;
     int mA08;
-    char padA0C[0x8];
+    int mA0C[2];
     int mA14[3];
     int mA20;
     int mA24;
     char padA28[0xC];
     int mA34;
-    char padA38[0x14];
+    char padA38[0x10];
+    int mA48;
     int mA4C;
     int mA50;
     int mA54;
@@ -72,6 +73,7 @@ public:
 class Unk8001CE80 {
 public:
     int fn_8001D6CC();
+    int fn_8001D694();
     int fn_8001D5D8();
     int fn_8001E054();
     int fn_8001DB4C();
@@ -79,6 +81,13 @@ public:
     int fn_8001D204(int v);
     int fn_8001D538();
     int fn_8001DC88();
+    int fn_8001DC58();
+    int fn_8001D62C();
+    int fn_8001D974();
+    int fn_8001DA9C();
+    int fn_8001E2EC();
+    int fn_8001E31C();
+    int fn_8001D7F8();
     int fn_8001DCCC();
     int fn_8001D70C();
     int fn_8001DA28();

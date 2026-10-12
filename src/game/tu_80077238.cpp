@@ -289,6 +289,56 @@ void Unk8007A4DC_Screen::fn_80077DAC()
     fn_800915F0(&m4C);
 }
 
+extern "C" int fn_800787E8(Unk8007B2B0_Screen* g, int kind, int p)
+{
+    int r = 0;
+    switch (kind) {
+    case 0: {
+        r = g->fn_8007C514(0x12, p);
+        r += g->fn_8007C514(0x13, p);
+        r += g->fn_8007C514(0x14, p);
+        r += g->fn_8007C514(0x15, p);
+        r = r / 4;
+        break;
+    }
+    case 1: {
+        r = g->fn_8007C770(0xD, p);
+        r += g->fn_8007C770(0xE, p);
+        r += g->fn_8007C770(0xF, p);
+        r += g->fn_8007C770(0x10, p);
+        r = r / 4;
+        break;
+    }
+    case 2: {
+        r = g->fn_8007C994(0xD, p);
+        r += g->fn_8007C994(0xE, p);
+        r += g->fn_8007C994(0xF, p);
+        r += g->fn_8007C994(0x10, p);
+        r += g->fn_8007C994(0x11, p);
+        r = r / 5;
+        break;
+    }
+    case 3: {
+        r = g->fn_8007CBB8(0xA, p);
+        r += g->fn_8007CBB8(0xB, p);
+        r += g->fn_8007CBB8(0xC, p);
+        r += g->fn_8007CBB8(0xD, p);
+        r += g->fn_8007CBB8(0xE, p);
+        r = r / 5;
+        break;
+    }
+    case 4: {
+        r = g->fn_8007CDDC(0xA, p);
+        r += g->fn_8007CDDC(0xB, p);
+        r += g->fn_8007CDDC(0xC, p);
+        r += g->fn_8007CDDC(0xD, p);
+        r = r / 4;
+        break;
+    }
+    }
+    return r;
+}
+
 int Unk8007B2B0_Screen::fn_80078A38(int a)
 {
     fn_8007B8C4(0, a);
@@ -447,6 +497,26 @@ int Unk8007B2B0_Screen::fn_80079094(int a, int b, int c, int d, int e, int kind)
 void fn_80079240(Unk80079240_Obj* o)
 {
     fn_8059A3CC(o->m1C);
+}
+
+void Unk8007B2B0_Screen::fn_800798BC(int id, Unk800798BC_P* a, Unk800798BC_P* b, Unk800798BC_P* c)
+{
+    C1()->fn_8007A808(0x35, id, (a->m4 >= b->m4) * 2);
+    int v = 1;
+    if (!(a->m0 < b->m0))
+        v = 2;
+    else if (!(a->m0 > c->m0))
+        v = 0;
+    C1()->fn_8007A808(0x34, id, v);
+    int d = c->m8 - a->m8;
+    int lo = -2;
+    if (lo < d)
+        lo = d;
+    int hi = lo;
+    if (hi > 2)
+        hi = 2;
+    int t[5] = { 0, 1, 2, 3, 4 };
+    C1()->fn_8007A808(0x36, id, t[hi + 2]);
 }
 
 float Unk8007B2B0_Screen::fn_800799D0(int n)

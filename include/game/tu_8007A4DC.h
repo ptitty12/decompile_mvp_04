@@ -343,6 +343,13 @@ struct Unk80076A24_Grp {
     unsigned m4;
     Unk80076A24_Rec* m8;
 };
+/* Three-word position record passed by fn_800798BC: a float, an unsigned and an int. */
+struct Unk800798BC_P {
+    float m0;
+    unsigned m4;
+    int m8;
+};
+
 struct Unk8007B2B0_Screen {
     char pad0[0x8];
     EntryTable* m8;
@@ -420,6 +427,7 @@ struct Unk8007B2B0_Screen {
     int fn_80076AE4(int id);
     int fn_80079094(int a, int b, int c, int d, int e, int kind);
     int fn_80079264(int a, int b, int c, int d, int e);
+    void fn_800798BC(int id, Unk800798BC_P* a, Unk800798BC_P* b, Unk800798BC_P* c);
     float fn_800799D0(int n);
     float fn_80079A1C();
     int fn_80079A58(float f);
