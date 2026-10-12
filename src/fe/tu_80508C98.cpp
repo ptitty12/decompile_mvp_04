@@ -64,6 +64,23 @@ extern "C" {
 int fn_805563C4(void* p);
 int fn_80556410(void* p);
 }
+extern const char lbl_805F5068[];
+extern const char lbl_805FA764[];
+extern const char lbl_805FB670[];
+extern const char lbl_805F4F84[];
+extern "C" FeW* fn_800C805C(FeW* w);
+extern "C" FeW* fn_800C8058(FeW* w);
+extern "C" void fn_80124FA8(void* o, void* s);
+struct FeStQ {
+    int m0;
+    int m4;
+    char pad8[0x608 - 8];
+    int m608;
+};
+int fn_80084114(int v);
+extern "C" void fn_800C2018(void* o, int* a, int* b, int* c);
+extern "C" void fn_800ECF18(void* x);
+int fn_80083FC0(int a);
 /* Q16-DECL-END */
 
 extern const char lbl_80668118[];
@@ -294,6 +311,39 @@ extern "C" FE_OVERLAY FeRecList* fn_8050AB58(FeRecList* self, int a, int b, int 
     int one = 1;
     lbl_8061AC54 = one;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_8050ABE8(FeScrQ* x)
+{
+    fn_800ECF18(x);
+    x->m13C = (int)fn_800C805C(x->fn_vslot32(lbl_805F5068, 1));
+    x->m140 = (int)fn_800C8058(((FeW*)x->m13C)->fn_vslot32(lbl_805FA764, 1));
+    x->m138 = (int)fn_800C8058(x->fn_vslot32(lbl_805FB670, 1));
+    x->m144 = (int)fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    ((FeW*)x->m138)->fn_vslot8(0);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    fn_80124FA8((void*)x->m144, x);
+    if (fn_800B555C()->m0 == 0x1B)
+        fn_80125128((void*)x->m144, 2);
+    else
+        fn_80125154((void*)x->m144, 0);
+    int idx = ((FeStQ*)fn_800B555C())->m608;
+    int a = 0;
+    int b = 0;
+    fn_80083E84__FiPiT1(idx, &a, &b);
+    int c = 0;
+    x->m134 = fn_8057CE00(idx);
+    if (((FeStQ*)fn_800B555C())->m4 & 1) {
+        Unk8007B2B0_Screen* g = (Unk8007B2B0_Screen*)lbl_8061930C;
+        int t = fn_80083FC0(idx);
+        a = g->fn_8007B8C4(0, g->fn_8007B320(t, fn_8007F7D0((Unk8007F198_B*)g, 0)));
+    } else {
+        fn_800C2018((char*)fn_800B555C() + 8, &x->m134, &c, &a);
+        fn_80084114(a);
+    }
+    if (x->m134 == 3)
+        x->m134 = 2;
+    fn_8050AE0C(x, x->m134, c, a);
 }
 
 extern "C" FE_OVERLAY void fn_8050B12C(FeScrN* x, int a, int b, int c)
