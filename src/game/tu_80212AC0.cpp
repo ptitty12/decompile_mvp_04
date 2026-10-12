@@ -338,6 +338,82 @@ void fn_802151D0(Task* t)
     e->m50 = lbl_8068C7F0;
 }
 
+extern const float lbl_805D5E28;
+extern const float lbl_805D5E2C;
+
+void fn_80215540(Task* t, Vec3f* pos, int a, int b, int c)
+{
+    TaskInner* in = t->m9C;
+    RecQueue* q = in->m3A60;
+    PosObj* pl = (PosObj*)in->m8[in->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m0 = 0x23;
+    e->m80 = lbl_805D5E28;
+    e->m4 = 0xC;
+    e->mC = c;
+    e->m8 = b;
+    e->m1C = a;
+    e->m9C = 1;
+    e->m8C = lbl_805D5E2C;
+    e->m24 = 1;
+    e->m38 = *pos;
+    e->m38.y = lbl_805D5E2C;
+    e->m44 = *pos;
+    e->m94 = 1;
+    Vec3f d = *pos - pl->m60;
+    e->m50 = d;
+    e->m50.y = lbl_805D5E2C;
+    e->m90 = lbl_805D5E2C;
+}
+
+extern const float lbl_805D5E30;
+extern const float lbl_805D5E34;
+
+void fn_802156DC(Task* t, Vec3f* pos, int a, int b, int c)
+{
+    TaskInner* in = t->m9C;
+    RecQueue* q = in->m3A60;
+    PosObj* pl = (PosObj*)in->m8[in->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m0 = 0x24;
+    e->m80 = lbl_805D5E30;
+    e->m4 = 0xD;
+    e->mC = c;
+    e->m8 = b;
+    e->m1C = a;
+    e->m9C = 1;
+    e->m8C = lbl_805D5E34;
+    e->m24 = 1;
+    e->m38 = *pos;
+    e->m38.y = lbl_805D5E34;
+    e->m44 = *pos;
+    e->m94 = 1;
+    Vec3f d = *pos - pl->m60;
+    e->m50 = d;
+    e->m50.y = lbl_805D5E34;
+    e->m90 = lbl_805D5E34;
+}
+
 int fn_80215E6C(void*, Unk8026C414_O* o)
 {
     return fn_8026DC5C(o, 0);
