@@ -141,6 +141,95 @@ struct Unk803D2A14Obj {
     void* m58;
 };
 
+struct Unk803D1900Quat {
+    float x, y, z, w;
+};
+
+struct Unk803D1900Self {
+    char pad0[0x58];
+    Unk803D1900Quat q;
+};
+
+struct Unk803D1900Other {
+    char pad0[0x10];
+    Unk803D1900Quat q;
+};
+
+inline void QMul(Unk803D1900Quat* t, Unk803D1900Quat* a, Unk803D1900Quat* b)
+{
+    t->x = b->w * a->x + (b->z * a->y + (b->x * a->w - b->y * a->z));
+    t->y = b->w * a->y + ((b->x * a->z + b->y * a->w) - b->z * a->x);
+    t->z = b->w * a->z + (b->z * a->w + (-b->x * a->y + b->y * a->x));
+    t->w = ((-b->x * a->x - b->y * a->y) - b->z * a->z) + b->w * a->w;
+}
+
+struct Unk803D0EE4Vec4 {
+    float x, y, z, w;
+};
+
+struct Unk803D0EE4Self {
+    char pad0[0x58];
+    Unk803D1900Quat q;
+};
+
+struct Unk803D240CSelf {
+    char pad0[0x48];
+    Unk803D1900Quat q;
+};
+
+inline void RotVec(Unk803D0EE4Vec4* out, Unk803D0EE4Vec4* v, Unk803D1900Quat* q)
+{
+    float y2 = q->y + q->y;
+    float z2 = q->z + q->z;
+    float xy = q->x * y2;
+    float zz = q->z * z2;
+    float xz = q->x * z2;
+    float wy = q->w * y2;
+    float x2 = q->x + q->x;
+    float wz = q->w * z2;
+    float yz = q->y * z2;
+    float wx = q->w * x2;
+    float xx = q->x * x2;
+    float yy = q->y * y2;
+    out->x = v->z * (xz + wy) + (v->x * (1.0f - (yy + zz)) + v->y * (xy - wz));
+    out->y = v->z * (yz - wx) + (v->x * (xy + wz) + v->y * (1.0f - (xx + zz)));
+    out->z = (v->x * (xz - wy) + v->y * (yz + wx)) + v->z * (1.0f - (xx + yy));
+    out->w = 1.0f;
+}
+
+struct Unk803D0FFCVec2 {
+    float x, y;
+};
+
+class Unk803D0FFCChan {
+public:
+    virtual ~Unk803D0FFCChan();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual int v9(Unk803D0FFCVec2* out, float t);
+};
+
+struct Unk803D0FFCObj {
+    char pad0[0x20];
+    Unk803D0FFCChan* m20;
+    Unk803D0FFCChan* m24;
+    float m28;
+};
+
+struct Unk803D1FE8Obj {
+    char pad0[0x10];
+    Unk803D0FFCChan* m10;
+    Unk803D0FFCChan* m14;
+    float m18;
+};
+
+extern "C" float sqrtf(float x);
+
 extern const void* lbl_80686478[];
 extern const void* lbl_806863D8[];
 extern const void* lbl_80685268[];
@@ -257,6 +346,47 @@ extern "C" void fn_803CFCAC(Unk803D1730Obj* self, int c)
         lbl_8062C66C(self, 0x80);
 }
 
+extern "C" void fn_803D0EE4(Unk803D0EE4Self* self, float* v2)
+{
+    Unk803D0EE4Vec4 in;
+    in.z = v2[1];
+    in.y = 0.0f;
+    in.x = v2[0];
+    in.w = 1.0f;
+    Unk803D0EE4Vec4 out;
+    RotVec(&out, &in, &self->q);
+    v2[0] = out.x;
+    v2[1] = out.z;
+}
+
+extern "C" int fn_803D0FFC(Unk803D0FFCObj* self, Unk803D0FFCVec2* out, float t0, float t1)
+{
+    Unk803D0FFCVec2 a;
+    Unk803D0FFCVec2 b;
+    if (!self->m20->v9(&a, t0))
+        return 0;
+    const float zero = 0.0f;
+    if (self->m28 != zero) {
+        if (!self->m24->v9(&b, t1))
+            return 0;
+        float s = 1.0f - self->m28;
+        out->x = self->m28 * b.x + s * a.x;
+        out->y = self->m28 * b.y + s * a.y;
+        float len = sqrtf(out->x * out->x + out->y * out->y);
+        if (len != zero) {
+            float lb = sqrtf(b.x * b.x + b.y * b.y);
+            float la = sqrtf(a.x * a.x + a.y * a.y);
+            float k = (self->m28 * lb + s * la) / len;
+            out->x = out->x * k;
+            out->y = out->y * k;
+        }
+    } else {
+        out->y = a.y;
+        out->x = a.x;
+    }
+    return 1;
+}
+
 extern "C" Unk803D1730Obj* fn_803D1730(Unk803D1730Obj* self)
 {
     self->m0 = lbl_806863D8;
@@ -291,6 +421,13 @@ extern "C" int fn_803D18F8()
     return 0;
 }
 
+extern "C" void fn_803D1900(Unk803D1900Self* self, Unk803D1900Other* other)
+{
+    Unk803D1900Quat t;
+    QMul(&t, &self->q, &other->q);
+    other->q = t;
+}
+
 extern "C" float fn_803D19FC(char* self)
 {
     return *(float*)(self + 0x48);
@@ -299,6 +436,47 @@ extern "C" float fn_803D19FC(char* self)
 extern "C" void fn_803D1A04(Unk803D1A30Obj* self, float* out)
 {
     ((void (*)(Unk803D1A30Obj*, float*, float, float))fn_803D14E8)(self, out, 0.0f, 0.0f);
+}
+
+extern "C" int fn_803D1FE8(Unk803D1FE8Obj* self, Unk803D0FFCVec2* out, float t0, float t1)
+{
+    Unk803D0FFCVec2 a;
+    Unk803D0FFCVec2 b;
+    if (!self->m10->v9(&a, t0))
+        return 0;
+    const float zero = 0.0f;
+    if (self->m18 != zero) {
+        if (!self->m14->v9(&b, t1))
+            return 0;
+        float s = 1.0f - self->m18;
+        out->x = self->m18 * b.x + s * a.x;
+        out->y = self->m18 * b.y + s * a.y;
+        float len = sqrtf(out->x * out->x + out->y * out->y);
+        if (len != zero) {
+            float lb = sqrtf(b.x * b.x + b.y * b.y);
+            float la = sqrtf(a.x * a.x + a.y * a.y);
+            float k = (self->m18 * lb + s * la) / len;
+            out->x = out->x * k;
+            out->y = out->y * k;
+        }
+    } else {
+        out->y = a.y;
+        out->x = a.x;
+    }
+    return 1;
+}
+
+extern "C" void fn_803D240C(Unk803D240CSelf* self, float* v2)
+{
+    Unk803D0EE4Vec4 in;
+    in.z = v2[1];
+    in.y = 0.0f;
+    in.x = v2[0];
+    in.w = 1.0f;
+    Unk803D0EE4Vec4 out;
+    RotVec(&out, &in, &self->q);
+    v2[0] = out.x;
+    v2[1] = out.z;
 }
 
 extern "C" Unk803D2A14Obj* fn_803D2A14(Unk803D2A14Obj* self)
@@ -333,3 +511,12 @@ extern "C" void fn_803D2A78(Unk803D2A14Obj* self, int c)
     if (c & 1)
         lbl_8062C66C(self, 0x5c);
 }
+
+/*
+ * Not matched yet: fn_803D17E4 and fn_803D189C (range wrap; float to int and back, retail keeps t live so the
+ * offset lands in f11, ours reuses f1), fn_803D1A30 (retail passes the 5th argument register on as the 4th
+ * argument of fn_803D14E8 without setting the 3rd), fn_803CED44, fn_803CEECC, fn_803CF14C, fn_803CF3C0,
+ * fn_803CF5F4, fn_803CF77C, fn_803CF968, fn_803CFE8C, fn_803D00DC, fn_803D062C, fn_803D0944, fn_803D0C0C,
+ * fn_803D1184, fn_803D14E8, fn_803D1AB8, fn_803D1C78, fn_803D1E54, fn_803D2170, fn_803D2524, fn_803D279C.
+ * The original code stays linked for these.
+ */
