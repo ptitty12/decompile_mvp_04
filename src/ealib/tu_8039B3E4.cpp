@@ -6,14 +6,6 @@
  */
 #include "../../include/game/tu_803959E0.h"
 
-/* Bit reader over a big-endian byte buffer (fn_8039E914 initialises it). */
-struct Vp6BitReader {
-    const unsigned char* m0;
-    unsigned m4;
-    unsigned m8;
-    unsigned mC;
-};
-
 /* List entry of fn_8039F5CC: next index, sort key, unused. */
 /* Four 16-byte entries at +0xCC: m4 = -1 and m8 = 4 after clearing. */
 struct Vp6Ent16 {
@@ -36,6 +28,12 @@ struct Vp6ScanView {
     char pad19D[0x5BC - 0x19D];
     unsigned char m5BC[0x40];
     unsigned char m5FC[0x40];
+};
+
+/* Context view for fn_8039F94C: the limit table pointer sits at +0x34. */
+struct Vp6LimView {
+    char pad0[0x34];
+    int* m34;
 };
 
 struct Vp6Link {
@@ -422,6 +420,19 @@ void fn_8039F5CC(Vp6Link* t, int idx, int* head)
         t[prev].next = idx;
         t[idx].next = cur;
     }
+}
+
+int* fn_8039F94C(Vp6LimView* d, int n)
+{
+    int* base = d->m34 + 0x100;
+    MEMSET_V(d->m34, 0, 0x800);
+    for (int i = 0; i < n; i++) {
+        base[-(n + i)] = -n + i;
+        base[-i] = -i;
+        base[i] = i;
+        base[n + i] = n - i;
+    }
+    return base;
 }
 
 /* near-miss: same operations; the original code keeps the clip table address in r3 and picks other scratch registers. */

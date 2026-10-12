@@ -17,6 +17,14 @@ struct Vp6Allocator {
     virtual void Free(void* p, int flags);
 };
 
+/* Bit reader over a big-endian byte buffer (fn_8039E914 initialises it). */
+struct Vp6BitReader {
+    const unsigned char* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+};
+
 /* Probability pair table: two 10-entry rows per entry (fn_8039CD38). */
 struct Vp6Tab {
     unsigned char a[10];
@@ -144,13 +152,22 @@ struct Vp6Ctx {
     int m148;
     void* m14C;
     Vp6Rc m150;
-    char pad168[0x38];
+    char pad168[0x8];
+    Vp6Rc m170;
+    char pad188[0x8];
+    int m190;
+    int m194;
+    const unsigned char* m198;
+    char pad19C[0x1];
+    unsigned char m19D;
+    char pad19E[0x2];
     int m1A0;
     int m1A4;
     int m1A8;
-    char pad1AC[0x4];
+    unsigned char m1AC;
+    char pad1AD[0x3];
     Vp6Params m1B0;
-    char pad1E8[0x4];
+    int m1E8;
     int m1EC;
     int m1F0;
     int m1F4;
@@ -195,7 +212,11 @@ struct Vp6Ctx {
     int m290;
     void* m294;
     Vp6Buf* m298;
-    char pad29C[0x40C];
+    char pad29C[0x3FC];
+    int m698;
+    char pad69C[0x4];
+    int m6A0;
+    char pad6A4[0x4];
     int m6A8[12];
     char pad6D8[0x14];
     int m6EC;
@@ -206,7 +227,13 @@ struct Vp6Ctx {
     void* m700;
     char pad704[0x28];
     Vp6Tab m72C[3];
-    char pad768[0x41D4];
+    char pad768[0x1DC];
+    int m944;
+    char pad948[0x3BC4];
+    Vp6BitReader m450C;
+    int m451C;
+    int m4520;
+    char pad4524[0x418];
     int m493C;
     int m4940;
     int m4944;
