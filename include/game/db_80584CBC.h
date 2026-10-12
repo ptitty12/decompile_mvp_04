@@ -7,7 +7,10 @@
 #define GAME_DB_80584CBC_H
 
 #include "game/overlay.h"
+/* tu_8052A220.h declares fn_80329FA0 with a 4-byte result; the real frame slot is bigger (BLKmode). */
+#define fn_80329FA0 db_fn_80329FA0_hdr
 #include "game/tu_8052A220.h"
+#undef fn_80329FA0
 /* tu_8007A4DC.h declares fn_80402EF8 with C++ linkage; the symbol is plain. */
 #define fn_80402EF8 db_fn_80402EF8_cxx
 #include "game/tu_8007A4DC.h"
@@ -15,6 +18,14 @@
 #include "game/tu_8007F198.h"
 #include "game/clampiter.h"
 
+
+struct Db80329FA0_Out {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned short m2;
+    unsigned short m4;
+};
+extern "C" Db80329FA0_Out fn_80329FA0(int v, ...);
 
 /* Text helpers shared by the overlay formatter slots (wide strings are unsigned short). */
 struct Unk80090880;
@@ -274,6 +285,38 @@ struct Db805942E0_V : Db805942E0_Data {
     virtual void v20();
     virtual void v28();
     virtual Db805942E0_Ent* v30(int i);
+};
+
+
+/*
+ * Unit 0x805902E0: the manager at lbl_80619948's save block, seen from its float tables.
+ * Three 16-float-per-row tables at +0, +0x340 and +0x440 (row stride 0x40, indexed
+ * (row << 6) + slot * 4), then the row arrays of Db805937A4_Mgr at 0x10480 and the
+ * counters at 0x12B70... (fn_805919E8 / fn_80591AF4 add to and subtract from them).
+ */
+struct Db805922EC_Cell {
+    float m0;
+    int m4;
+    int m8;
+};
+struct Db805922EC_Grp {
+    Db805922EC_Cell c[4][16];
+};
+struct Db805919E8_M {
+    float t0[13][16];
+    float t1[4][16];
+    float t2[13][16];
+    float t3[4][16];
+    Db805922EC_Grp a[85];
+    char pad10780[0x109C0 - 0x10780];
+    Db805922EC_Grp b[11];
+    char pad12AC0[0x12B70 - 0x12AC0];
+    int m12B70;
+    int m12B74;
+    float m12B78;
+    float m12B7C;
+    int m12B80;
+    int m12B84;
 };
 
 #endif
