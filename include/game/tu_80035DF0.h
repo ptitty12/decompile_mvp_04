@@ -38,7 +38,7 @@ extern "C" {
 void fn_80035E38(Unk80034E14* self);
 void fn_80035D94(Unk80034E14* self);
 void fn_80378D70(const char* src, unsigned int len, char* dst, int cap, int delim, unsigned int* outn);
-void fn_80379094(char* s, unsigned int n, int a);
+int fn_80379094(char* s, unsigned int n, int a);
 int fn_80409DAC(const char* s);
 char* fn_8040B948(const char* hay, const char* needle);
 void fn_80329AEC(const char** pp, const char** out, unsigned int* pn, int delim);
