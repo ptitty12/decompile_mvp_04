@@ -144,6 +144,60 @@ int fn_802C13AC(float* p0, float* p1, float* p2, float* p3, float* out)
     return 0;
 }
 
+struct Unk802C1F7C_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk802C1F7C_Tri {
+    Unk802C1F7C_V a;
+    int pad0;
+    Unk802C1F7C_V b;
+    int pad1;
+    Unk802C1F7C_V c;
+    int pad2;
+};
+struct Unk802C1F7C_Set {
+    int count;
+    Unk802C1F7C_Tri t[1];
+};
+struct Unk802C1F7C_Obj {
+    Unk802C1F7C_Set* m0;
+};
+int fn_802C1D90(Unk802C1F7C_Obj* o, float* p, Unk802C1F7C_Tri* t);
+void fn_802C1500(float* p, Unk802C1F7C_Tri* t, int k);
+inline Unk802C1F7C_V GetA(const Unk802C1F7C_Tri* t) { return t->a; }
+inline Unk802C1F7C_V GetB(const Unk802C1F7C_Tri* t) { return t->b; }
+inline Unk802C1F7C_V GetC(const Unk802C1F7C_Tri* t) { return t->c; }
+
+
+int fn_802C1F7C(Unk802C1F7C_Obj* o, float* p, int k)
+{
+    int i = 0;
+    Unk802C1F7C_Tri* t = o->m0->t;
+    for (; i < o->m0->count; i++, t++) {
+        Unk802C1F7C_V a = GetA(t);
+        Unk802C1F7C_V b = GetB(t);
+        Unk802C1F7C_V c = GetC(t);
+        int out;
+        if ((!(p[0] >= a.x) && !(p[0] >= b.x) && p[0] < c.x) || (!(p[0] <= a.x) && !(p[0] <= b.x) && p[0] > c.x)
+            || (!(p[2] >= a.z) && !(p[2] >= b.z) && !(p[2] >= c.z)))
+            out = 1;
+        else {
+            out = 0;
+            if (!(p[2] <= a.z)) {
+                if (!(p[2] <= b.z))
+                    out = p[2] > c.z;
+            }
+        }
+        if (!out && fn_802C1D90(o, p, t) != 0) {
+            fn_802C1500(p, t, k);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 void fn_802C212C(int* o, int v)
 {
     *o = v;
