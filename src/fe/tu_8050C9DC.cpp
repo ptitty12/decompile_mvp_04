@@ -5,6 +5,8 @@
 
 #include "game/fe_804FE34C.h"
 
+extern const char lbl_805FB7B4[];
+extern "C" void fn_80086EC0(void* o, int a, int b);
 extern const char lbl_80667BC8[];
 extern const char lbl_805FB764[];
 extern "C" void fn_8051095C(FeScrQ* x);
@@ -25,6 +27,7 @@ extern "C" void fn_8050DAEC(FeScrM* x);
 extern "C" void fn_8050DFC8(FeScrD* x);
 extern "C" void fn_8050E574();
 extern "C" void fn_8050E888(FeScrM* x);
+extern "C" void fn_8050FB34(FeScrN* x);
 extern "C" void fn_80510020(FeScrD* x);
 extern "C" FeScrQ* fn_80510048(FeScrQ* self, int a, int b, int c, int d, int e, int f, int g, int h);
 extern "C" void fn_80510500(FeScrQ* x, int a);
@@ -123,6 +126,20 @@ extern "C" FE_OVERLAY void fn_8050E888(FeScrM* x)
     fn_804CEF98(x);
     fn_804D292C(&x->m144, -1);
     fn_804D292C(&x->m188, 0);
+}
+
+/* near-miss: first s88 vcall loads lwz r0/lha in the other order (4 lines); 4 variants tried */
+extern "C" FE_OVERLAY void fn_8050FB34(FeScrN* x)
+{
+    FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805FB7B4);
+    if (p != 0) {
+        FeLink10* o = lbl_806192E0->m4->m10;
+        int a = ((FeWX*)p)->s88(1);
+        fn_80086EC0(o, 1, a);
+        int b = ((FeWX*)p)->s88(0);
+        fn_80086EC0(o, 0, b);
+    }
+    ((FeWX*)x)->s89();
 }
 
 extern "C" FE_OVERLAY void fn_80510020(FeScrD* x)
