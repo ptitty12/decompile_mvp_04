@@ -184,6 +184,8 @@ void fn_80265878()
 {
 }
 
+void fn_8026587C() {}
+
 void fn_80265DDC(I* self)
 {
     unsigned t = self->m44C;
@@ -374,6 +376,8 @@ void fn_80266CC0(T* self)
         self->s[3].v = 100.0f;
     }
 }
+
+void fn_80266D6C() {}
 
 /* near-miss (parked, 44 vs 44 insns): retail forms the slot address (addi r9,self,0x18) after the >? diamond, ours hoists it above the compare */
 float fn_80266D70(T* self, int k)
