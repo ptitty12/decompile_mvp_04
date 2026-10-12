@@ -399,22 +399,21 @@ int fn_802576E4(M* self, P* p, int c)
     return r;
 }
 
-/* near-miss: retail loads each roster slot into r0 and copies it to r3 (3 extra mr); ours loads straight into r3 */
 P* fn_80257B40(M* self)
 {
-    P* r = fn_802570D4(self)->m65C[12];
-    if (r == 0) {
-        r = fn_802570D4(self)->m65C[11];
-        if (r == 0) {
-            r = fn_802570D4(self)->m65C[10];
-            if (r == 0) {
-                r = (P*)fn_801A4B34(fn_802570D4(self));
-                if (r == 0 || r->m458 != 9)
-                    r = 0;
-            }
-        }
-    }
-    return r;
+    P* a = fn_802570D4(self)->m65C[12];
+    if (a != 0)
+        return a;
+    P* b = fn_802570D4(self)->m65C[11];
+    if (b != 0)
+        return b;
+    P* c = fn_802570D4(self)->m65C[10];
+    if (c != 0)
+        return c;
+    P* d = (P*)fn_801A4B34(fn_802570D4(self));
+    if (d != 0 && d->m458 == 9)
+        return d;
+    return 0;
 }
 
 int fn_80257CC0(M* self, P* p)
@@ -471,21 +470,12 @@ P* fn_80257DFC(M* self, P* p, int a)
 
 P* fn_80257EA8(M* self, int a)
 {
-    if (a >= 0) {
-        unsigned i = 9;
-        int o = 0x24;
-        for (;;) {
-            Q* q = fn_802570D4(self);
-            P* r = 0;
-            if (i <= 0xC)
-                r = *(P**)((char*)q + 0x65C + o);
-            if (r != 0 && fn_80254EA4(&r->m58C, 0) == a)
-                return r;
-            i += 1;
-            o += 4;
-            if ((int)i > 0xC)
-                break;
-        }
+    if (a < 0)
+        return 0;
+    for (int i = 9; i <= 12; i++) {
+        P* p = Roster(fn_802570D4(self), i);
+        if (p != 0 && fn_80254EA4(&p->m58C, 0) == a)
+            return p;
     }
     return 0;
 }
