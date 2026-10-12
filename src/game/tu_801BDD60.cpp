@@ -33,6 +33,9 @@ void fn_801B8514(P* p);
 }
 
 extern Vec3 lbl_806055AC;
+extern Vec3 lbl_805D0058;
+extern float lbl_8061CBB8;
+extern "C" float fn_804028E4(float x);
 extern const char lbl_805CF874[];
 extern const char lbl_805CFECC[];
 extern const char lbl_805CFED8[];
@@ -123,6 +126,14 @@ extern "C" int fn_801BFA20(const Vec3* v)
     if (v->x < 0.0f || !(v->z >= 0.0f))
         r = 1;
     return r;
+}
+
+inline float Len3(const Vec3& v) { return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z); }
+
+extern "C" int fn_801BFA54(const Vec3* v)
+{
+    Vec3 d = *v - lbl_805D0058;
+    return Len3(d) <= lbl_8061CBB8;
 }
 
 extern "C" int fn_801BFAF8(const Vec3* v)
