@@ -425,6 +425,84 @@ Unk8022FE34_V3 Unk8022FE34_Owner::fn_80231E4C()
     return v;
 }
 
+/* Goal-builder family (see tu_801DEC20.cpp): minimal local views of the goal classes. */
+struct Unk80273498_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk8027C728_Goal {
+    Unk8027C728_Goal* m0;
+    Unk8027C728_Goal* m4;
+    char pad8[4];
+    void* mC;
+    int m10;
+    int m14;
+    char m18[0xEC];
+    char m104[0x190];
+    char m294[0x20];
+};
+class Unk80287D70 {
+public:
+    Unk80287D70* fn_80287DB8(int kind);
+};
+class Unk8027A84C {
+public:
+    int m0;
+    Unk8027A84C* m4;
+    void* m8;
+    int mC;
+    char pad10[0x34 - 0x10];
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    void fn_8027A898(const Unk80273498_Vec3* v);
+};
+class Unk8027A84C_Owner {
+public:
+    Unk8027A84C* fn_8027C67C();
+};
+class Unk8028C6B8_Goal;
+class Unk8028C6B8_Goal {
+public:
+    Unk8028C6B8_Goal* fn_8028ED30(Unk80273498_Vec3 v);
+    Unk8028C6B8_Goal* fn_8028EF14(Unk80273498_Vec3 v);
+};
+extern "C" Unk8027C728_Goal* fn_802448F4(void* p, int k);
+void fn_8027C728(Unk8027C728_Goal* g);
+void fn_8027D33C(Unk8027C728_Goal* g);
+extern const Unk80273498_Vec3 lbl_805D7DCC;
+
+inline Unk8028C6B8_Goal* Unk80231E90_Init(Unk8027C728_Goal* h)
+{
+    h->m10 = 4;
+    fn_8027C728(h);
+    return (Unk8028C6B8_Goal*)h->m18;
+}
+Unk8027C728_Goal* Unk8022FE34_Owner::fn_80231E90()
+{
+    int one = 1;
+    Unk8022FE34_V3 t = fn_80231E4C();
+    Unk8027C728_Goal* g = fn_802448F4(fn_801A497C(m0, 4, 0), 3);
+    g->m10 = one;
+    fn_8027C728(g);
+    Unk8027C728_Goal* h = g->m0;
+    Unk80231E90_Init(h)->fn_8028ED30(lbl_805D7DCC)->fn_8028EF14(*(Unk80273498_Vec3*)&t);
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m38 = one;
+    Unk8027A84C* h104 = (Unk8027A84C*)h->m104;
+    h104->m38 = one;
+    ((Unk8027A84C_Owner*)h)->fn_8027C67C()->m34 = one;
+    h104->m34 = one;
+    Unk8027C728_Goal* k = h->m0;
+    k->m10 = 2;
+    fn_8027C728(k);
+    Unk8027A84C* kb = (Unk8027A84C*)((Unk80287D70*)k->m18)->fn_80287DB8(8);
+    Unk80273498_Vec3 w = *(Unk80273498_Vec3*)&t;
+    kb->fn_8027A898(&w);
+    return g;
+}
+
 void Unk8022FE34_Owner::fn_80231FC0()
 {
     if (fn_801A2034(m0, 4) == -1 && m430 == 0 && m434 == 0 && m440.m0 == 0) {
