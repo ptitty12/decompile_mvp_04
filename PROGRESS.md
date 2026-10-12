@@ -76,3 +76,13 @@
   - fn_8037B424, now `_._11Unk8037B3E8`.
   - fn_80090880: callers pass 2 arguments; use the cast recipe.
 - 2026-10-11 | Claude Opus 5.5 (tail-setup delegate, work/tail-setup) | main .text tail 0x8036F44C..0x8043FDB8 | setup only: 254 code-only units (95 EA-lib, 103 runtime, 56 SDK), 0 functions matched; tu_80362FB4/tu_80365C10 moved to cflags_ealib (fn_8036344C exact there) | none | Flags per library in DECISIONS (tail entry); unconfirmed: AV, libgcc DI helpers, sdk/ pieces, dvd/mtx/exi deviations. 503 functions are port jobs from port/mvp2005 and match/W2-pad.
+- 2026-10-12 | Claude Opus 5.5 (scheduled audit) | audit of origin/main `a45298cc` | read-only. **19,329 / 24,158 functions at 100%**: 80.0% of functions, 39.83% of code bytes. `verify.py --baseline-ref 5cb09b2b` gave VERIFY PASS. Full report: `docs/audits/2026-10-12.md`.
+  - Clean: no cheating hits, no verifier or settings changes since the owner's installs, no game data in git history.
+  - Checks passed: 10/10 random matched functions byte-identical with relocations masked; 25/25 commit `[N/M]` claims equal objdiff; `check_literals.py` found 0 mismatches over 69,494 references (1,348 unresolved names).
+  - Issues:
+    - Only 64/786 units are linked, and the verifier's score ignores relocations.
+    - 3 owner-only verifier questions are pending.
+    - 39 match commits mix units.
+    - The PROGRESS snapshot above is stale.
+    - The main checkout's `main` has diverged, with 2 unpushed progress-bot commits.
+  - Progress bot: healthy since 2026-10-11 12:20 (7 checkout failures before that); history.csv is current.
