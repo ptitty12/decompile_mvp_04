@@ -97,6 +97,7 @@ struct FxPairFQ {
     int m74;
     int m78;
 };
+extern const float lbl_805ED9A0;
 extern "C" {
 void fn_801A750C(void* v, int a);
 float fn_801C3370(void* p);
@@ -162,6 +163,7 @@ void fn_80330ACC(FxStack* self, int v);
 void* fn_803E4A50(void* p);
 int fn_8032E4D4(FxTripW* p, int k);
 int fn_8032DEBC(FxPairW* p, int k);
+int fn_8032EA00(FxSldW* self, int k);
 // PROTOS-END
 }
 
@@ -735,6 +737,44 @@ void fn_8032E968(FxSldF* self) {
     float w = lbl_805ED99C - fn_80313F28(lbl_8061FEDC, buf);
     fn_8032D8D0(self);
     fn_803144A0(lbl_8061FEDC, buf, w, self->m4, self->mC, 0x16);
+}
+
+int fn_8032EA00(FxSldW* self, int k) {
+    int r = fn_8032D8C8();
+    float v = self->m48 == 0 ? self->m4C : *self->m48;
+    float step = self->m50 == 0 ? self->m54 : *(float*)self->m50;
+    if (r == 0) {
+        r = 1;
+        switch (k) {
+        case 3:
+            v -= step;
+            break;
+        case 4:
+            v += step;
+            break;
+        case 6:
+            v = self->m60;
+            break;
+        case 5:
+            v = self->m5C;
+            break;
+        case 8:
+            v -= step * lbl_805ED9A0;
+            break;
+        case 9:
+            v += step * lbl_805ED9A0;
+            break;
+        case 7:
+            v = self->m58;
+            break;
+        default:
+            r = 0;
+        }
+    }
+    float c = (v > self->m60) ? self->m60 : (v >? self->m5C);
+    if (self->m48 == 0) self->m4C = c;
+    else *self->m48 = c;
+    return r;
 }
 
 FxIntD* fn_8032EB84(FxIntD* self, int name, int* a, int b, int c, int d, int e) {
