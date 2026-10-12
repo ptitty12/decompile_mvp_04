@@ -46,6 +46,32 @@ extern "C" void fn_80402FCC(char* dst, const void* src);
 void fn_800E633C(char* s);
 void fn_800E6158();
 void fn_800E6258(int a, int b);
+class FeVt9 {
+public:
+    char pad0[8];
+    virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5();
+    virtual void s6(); virtual void s7(); virtual void s8(); virtual void s9();
+};
+struct FeM618 {
+    char pad0[0xC];
+    FeVt9* mC;
+};
+struct FeOwn618 {
+    char pad0[0x618];
+    FeM618* m618;
+};
+class FeVt18 {
+public:
+    char pad0[0x18];
+    virtual void s1(int a);
+};
+FeOwn618* fn_801A4C20(Unk8019F8C0_Owner* o);
+extern "C" void fn_80244A64(FeOwn618* o, int a, int b);
+extern "C" void fn_803814A4(FeM618* p, int a, int b, float f);
+extern "C" void fn_8037EB3C(FeM618* p, int a);
+extern "C" void fn_804F8A58(void* self);
+void fn_802B8CC8();
+void fn_802AE5A0(Unk802ACD88_Mgr* m);
 extern "C" {
 void fn_8037C7FC();
 void fn_8037CCE0();
@@ -247,6 +273,25 @@ extern "C" FE_OVERLAY FeCapC* fn_804ECF34(FeCapC* self, int a, int b, int c, int
     self->m860 = 0;
     self->m618 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804ED114(FeCapC* self, int chrg)
+{
+    self->m3C = lbl_806816F0;
+    FeOwn618* o = fn_801A4C20((Unk8019F8C0_Owner*)self->m594);
+    fn_80244A64(o, 0, 0);
+    fn_803814A4(o->m618, 0, 0, 0.0f);
+    fn_8037EB3C(o->m618, 0);
+    o->m618->mC->s9();
+    fn_804F8A58(self);
+    fn_802B8CC8();
+    fn_802AE5A0((Unk802ACD88_Mgr*)lbl_8061E978);
+    FeVt18* p = (FeVt18*)self->m594;
+    if (p)
+        p->s1(3);
+    fn_800E2BCC();
+    self->ar.vp = lbl_8064A550;
+    fn_8035686C(self, chrg);
 }
 
 extern "C" FE_OVERLAY void fn_804EEEFC(FeNm* self)
