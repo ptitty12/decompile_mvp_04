@@ -6,6 +6,59 @@
 
 #include "game/tu_8001FDA8.h"
 #include "game/tu_802ACD88.h"
+struct Unk8014BC64_Va {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2(int a);
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19(int a);
+};
+struct Unk8014BC64_VbD {
+    char pad0[0x4];
+};
+struct Unk8014BC64_Vb : Unk8014BC64_VbD {
+    virtual void fn_vslot1(int a);
+};
+struct Unk8014BC64_VcD {
+    char pad0[0x18];
+};
+struct Unk8014BC64_Vc : Unk8014BC64_VcD {
+    virtual void fn_vslot1(int a);
+};
+struct Unk800642F0 {
+    ~Unk800642F0();
+};
+struct Unk802BB4FC;
+extern void* lbl_8068F1F8;
+extern void* lbl_80618FBC;
+extern void* lbl_80619948;
+void fn_802B8698(Unk802ACD88_Mgr*);
+void fn_802B832C(Unk802ACD88_Mgr*);
+void fn_802BB518(Unk802BB4FC*, int);
+void fn_8001BC58();
+void fn_800AA144();
+void fn_802B1D04();
+void fn_80312544();
+void fn_80070E80();
+void fn_80090700();
+void fn_80071F48();
+extern "C" void fn_800B8150();
+extern "C" void fn_805210EC();
+extern "C" void fn_803224C8();
 struct Unk80310934_P38;
 
 struct Unk8001C314 {
@@ -552,6 +605,52 @@ void fn_8014BB70()
     *d = fn_8031C62C(operator new(0x90, 0));
     *e = fn_8031CD88(operator new(0x28, 0));
     fn_80322450();
+}
+
+void fn_8014BC64()
+{
+    fn_802B8698((Unk802ACD88_Mgr*)lbl_8061E978);
+    fn_802B832C((Unk802ACD88_Mgr*)lbl_8061E978);
+    if (lbl_8061E978 != 0) {
+        ((Unk8014BC64_Va*)lbl_8061E978)->fn_vslot19(3);
+        lbl_8061E978 = 0;
+    }
+    if (lbl_8068F1F8 != 0) {
+        ((Unk8014BC64_Vb*)lbl_8068F1F8)->fn_vslot1(3);
+        lbl_8068F1F8 = 0;
+    }
+    if (lbl_8068DA4C != 0) {
+        fn_802BB518((Unk802BB4FC*)lbl_8068DA4C, 3);
+        lbl_8068DA4C = 0;
+    }
+    if (lbl_80618FBC != 0)
+        delete (Unk800642F0*)lbl_80618FBC;
+    lbl_80618FBC = 0;
+    fn_800B8150();
+    fn_8001BC58();
+    fn_800AA144();
+    fn_805210EC();
+    fn_803224C8();
+    fn_802B1D04();
+    if (lbl_8062013C != 0) {
+        ((Unk8014BC64_Vc*)lbl_8062013C)->fn_vslot1(3);
+        lbl_8062013C = 0;
+    }
+    if (lbl_80620140 != 0) {
+        ((Unk8014BC64_Vc*)lbl_80620140)->fn_vslot1(3);
+        lbl_80620140 = 0;
+    }
+    fn_80312544();
+    if (lbl_80619948 != 0)
+        ((Unk8014BC64_Vc*)lbl_80619948)->fn_vslot1(3);
+    lbl_80619948 = 0;
+    fn_80070E80();
+    fn_80090700();
+    fn_80071F48();
+    if (lbl_8068B618 != 0) {
+        ((Unk8014BC64_Va*)lbl_8068B618)->fn_vslot2(3);
+        lbl_8068B618 = 0;
+    }
 }
 
 void fn_8014BE28()
