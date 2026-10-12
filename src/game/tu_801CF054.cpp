@@ -274,3 +274,23 @@ extern "C" float fn_801D18B4(void)
     char buf[16];
     return 0.0f;
 }
+
+struct Unk801CF054_V2 {
+    float x;
+    float y;
+};
+extern "C" void fn_8022EA60(Unk801CF054_V2* out, void* a, ...);
+inline float AbsF(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" int fn_801D251C(Y* y)
+{
+    Unk801CF054_V2 v;
+    fn_8022EA60(&v, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    float ax = AbsF(v.x);
+    float ay = AbsF(v.y);
+    if (!(ax >= 1.0f)) {
+        if (ay < 1.0f)
+            return 1;
+    }
+    return 0;
+}
