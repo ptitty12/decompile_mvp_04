@@ -449,6 +449,26 @@ void fn_80079240(Unk80079240_Obj* o)
     fn_8059A3CC(o->m1C);
 }
 
+void Unk8007B2B0_Screen::fn_800798BC(int id, Unk800798BC_P* a, Unk800798BC_P* b, Unk800798BC_P* c)
+{
+    C1()->fn_8007A808(0x35, id, (a->m4 >= b->m4) * 2);
+    int v = 1;
+    if (!(a->m0 < b->m0))
+        v = 2;
+    else if (!(a->m0 > c->m0))
+        v = 0;
+    C1()->fn_8007A808(0x34, id, v);
+    int d = c->m8 - a->m8;
+    int lo = -2;
+    if (lo < d)
+        lo = d;
+    int hi = lo;
+    if (hi > 2)
+        hi = 2;
+    int t[5] = { 0, 1, 2, 3, 4 };
+    C1()->fn_8007A808(0x36, id, t[hi + 2]);
+}
+
 float Unk8007B2B0_Screen::fn_800799D0(int n)
 {
     float v = m1F4;
