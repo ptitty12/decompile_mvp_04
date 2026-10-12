@@ -214,7 +214,7 @@ extern "C" int fn_803E973C(void* o)
     return 1;
 }
 
-extern "C" void fn_803E97C4(void* o);
+extern "C" void fn_803E97C4(Unk803E9640* o);
 extern "C" void fn_803E98A0(void* o);
 
 extern "C" void fn_803E9744(Unk803E9640* o, int chrg)
@@ -226,6 +226,46 @@ extern "C" void fn_803E9744(Unk803E9640* o, int chrg)
     o->m28 = 0;
     if (chrg & 1)
         lbl_8062C66C(o, 0x30);
+}
+
+
+/* 0x430-byte block of an intrusive doubly-linked list (next at +0, previous-link at +4) headed by lbl_8062C67C;
+ * m420 / m424 are two arrays of m10 words. */
+struct Unk803E97C4_Blk {
+    Unk803E97C4_Blk* m0;
+    Unk803E97C4_Blk** m4;
+    char pad8[8];
+    int m10;
+    char pad14[0x420 - 0x14];
+    void* m420;
+    void* m424;
+};
+
+extern Unk803E97C4_Blk* lbl_8062C67C;
+
+/* near-miss: instruction-for-instruction identical except that the block pointer and the object swap r30/r31
+ * (retail keeps the object in r31). */
+extern "C" void fn_803E97C4(Unk803E9640* o)
+{
+    Unk803E97C4_Blk* b = (Unk803E97C4_Blk*)o->m0;
+    if (b) {
+        Unk803E97C4_Blk** link = b->m4;
+        if (link)
+            *link = b->m0;
+        else
+            lbl_8062C67C = b->m0;
+        Unk803E97C4_Blk* next = b->m0;
+        if (next)
+            next->m4 = b->m4;
+        if (b->m420)
+            lbl_8062C66C(b->m420, b->m10 << 2);
+        if (b->m424)
+            lbl_8062C66C(b->m424, b->m10 << 2);
+        lbl_8062C66C(b, 0x430);
+        b = 0;
+        o->m0 = (int)b;
+    }
+    o->m2C = 0;
 }
 
 extern "C" int fn_803E9978(Unk803E7008_Ent** pp)
