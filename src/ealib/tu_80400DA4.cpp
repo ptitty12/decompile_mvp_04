@@ -216,8 +216,6 @@ extern "C" int fn_80401644(const unsigned char* p, int* outLen)
     return v;
 }
 
-extern "C" int fn_80401924(int a, const unsigned char* p, int b);
-
 extern "C" int fn_80401710(const unsigned char* p, int a);
 
 extern "C" int fn_804017B0(const unsigned char* p, int a)
@@ -269,6 +267,30 @@ extern "C" int fn_80401904(const unsigned char* p)
 extern "C" int fn_80401BBC(int a, int b)
 {
     return (int)(((long long)a * b + 0x8000) >> 16);
+}
+
+extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
+{
+    Unk80402288_Mtx tmp;
+    Unk80402288_Mtx* d = (out == a || out == b) ? &tmp : out;
+    d->m00 = a->m00 * b->m00 + a->m01 * b->m10 + a->m02 * b->m20 + a->m03 * b->m30;
+    d->m01 = a->m00 * b->m01 + a->m01 * b->m11 + a->m02 * b->m21 + a->m03 * b->m31;
+    d->m02 = a->m00 * b->m02 + a->m01 * b->m12 + a->m02 * b->m22 + a->m03 * b->m32;
+    d->m03 = a->m00 * b->m03 + a->m01 * b->m13 + a->m02 * b->m23 + a->m03 * b->m33;
+    d->m10 = a->m10 * b->m00 + a->m11 * b->m10 + a->m12 * b->m20 + a->m13 * b->m30;
+    d->m11 = a->m10 * b->m01 + a->m11 * b->m11 + a->m12 * b->m21 + a->m13 * b->m31;
+    d->m12 = a->m10 * b->m02 + a->m11 * b->m12 + a->m12 * b->m22 + a->m13 * b->m32;
+    d->m13 = a->m10 * b->m03 + a->m11 * b->m13 + a->m12 * b->m23 + a->m13 * b->m33;
+    d->m20 = a->m20 * b->m00 + a->m21 * b->m10 + a->m22 * b->m20 + a->m23 * b->m30;
+    d->m21 = a->m20 * b->m01 + a->m21 * b->m11 + a->m22 * b->m21 + a->m23 * b->m31;
+    d->m22 = a->m20 * b->m02 + a->m21 * b->m12 + a->m22 * b->m22 + a->m23 * b->m32;
+    d->m23 = a->m20 * b->m03 + a->m21 * b->m13 + a->m22 * b->m23 + a->m23 * b->m33;
+    d->m30 = a->m30 * b->m00 + a->m31 * b->m10 + a->m32 * b->m20 + a->m33 * b->m30;
+    d->m31 = a->m30 * b->m01 + a->m31 * b->m11 + a->m32 * b->m21 + a->m33 * b->m31;
+    d->m32 = a->m30 * b->m02 + a->m31 * b->m12 + a->m32 * b->m22 + a->m33 * b->m32;
+    d->m33 = a->m30 * b->m03 + a->m31 * b->m13 + a->m32 * b->m23 + a->m33 * b->m33;
+    if (d == &tmp)
+        *out = tmp;
 }
 
 extern "C" void fn_804020F0(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
