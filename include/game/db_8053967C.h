@@ -293,4 +293,43 @@ struct Db805467E0_Q {
     Db8053967C_List mCF4;
 };
 
+/* ---- unit 805495DC ---- */
+/* 8-byte rating roll record built by the fn_8054Cxxx generators. */
+struct Db805495DC_Rec8 {
+    unsigned w0;
+    unsigned w4;
+};
+/* Bit view of the first word (fn_8054C034 family writes a, f1 and clears f2/fl). */
+struct Db805495DC_Bits {
+    unsigned a : 8;
+    unsigned f1 : 6;
+    unsigned f2 : 3;
+    unsigned fl : 1;
+    unsigned rest : 14;
+    unsigned w4;
+};
+struct Db805495DC_Sub {
+    char pad0[0x10];
+    int m10;
+    char pad14[8];
+    int m1C;
+};
+/* Holder with two sub-objects (+0x14, +0x18) built by fn_8054C6E4. */
+struct Db805495DC_Hold {
+    int m0;
+    int m4;
+    char pad8[0xC];
+    void* m14;
+    Db805495DC_Sub* m18;
+};
+extern const float lbl_805FF228;
+extern const float lbl_805FF22C;
+extern unsigned char lbl_806015E0[];
+extern "C" {
+float fn_8056FFB0();
+int fn_805320B0(int c, int a, int b, float f);
+}
+int fn_8007FBC0(Unk8007F198_C* s, int a, int b);
+void* operator new(unsigned int size, int heap); /* 0x80377428 */
+
 #endif
