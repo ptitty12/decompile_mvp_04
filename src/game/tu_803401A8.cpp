@@ -167,6 +167,53 @@ void fn_80340BE4(Unk803401A8* self, int chrg)
     fn_80330778(self, chrg);
 }
 
+struct Item64 {
+    char pad0[0x64];
+};
+extern char lbl_80666E70[];
+struct Lbl48 {
+    float m0;
+    float m4;
+    const void* m8;
+    int mC;
+    char pad10[0x48 - 0x10];
+};
+extern const float lbl_805F3288;
+extern float lbl_805F328C;
+extern float lbl_805F3290;
+extern char lbl_805EC2E0[];
+extern char lbl_805EC2FC[], lbl_805EC308[], lbl_805EC310[], lbl_805EC318[], lbl_805EC324[], lbl_805EC32C[], lbl_805EC334[], lbl_805EC340[], lbl_805EC350[], lbl_805EC35C[], lbl_805EC36C[], lbl_805EC378[], lbl_805EC388[], lbl_805EC394[], lbl_805EC39C[];
+extern float lbl_80620578, lbl_8062057C, lbl_80620580, lbl_80620584, lbl_80620588, lbl_8062058C, lbl_80620590, lbl_80620594, lbl_80620598, lbl_8062059C, lbl_806205A0, lbl_806205A4, lbl_806205A8, lbl_806205AC, lbl_806205B0;
+void* operator new(unsigned int size, int heap);
+extern "C" void fn_8032D868(void*, const char*);
+extern "C" void fn_80330ACC(void*, void*);
+extern "C" void* fn_8032E894(void* mem, const char* name, float* p, float a, float b, float c, float d);
+extern "C" void fn_80340C14(void* menu)
+{
+    Lbl48* l = new (0) Lbl48;
+    l->m8 = lbl_80666E70;
+    l->mC = 0;
+    l->m0 = lbl_805F3288;
+    l->m4 = lbl_805F3288;
+    fn_8032D868(l, lbl_805EC2E0);
+    fn_80330ACC(menu, l);
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC2FC, &lbl_80620578, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC308, &lbl_8062057C, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC310, &lbl_80620580, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC318, &lbl_80620584, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC324, &lbl_80620588, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC32C, &lbl_8062058C, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC334, &lbl_80620590, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC340, &lbl_80620594, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC350, &lbl_80620598, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC35C, &lbl_8062059C, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC36C, &lbl_806205A0, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC378, &lbl_806205A4, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC388, &lbl_806205A8, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC394, &lbl_806205AC, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+    fn_80330ACC(menu, fn_8032E894(new (0) Item64, lbl_805EC39C, &lbl_806205B0, lbl_805F328C, lbl_805F3290, lbl_805F3288, lbl_805F328C));
+}
+
 void fn_8034101C() {}
 void fn_80341020() {}
 
