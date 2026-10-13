@@ -510,12 +510,14 @@ extern "C" void fn_803F113C(RcSysX* s, int* a, int x, const char* str)
 
 extern "C" void fn_803F1204(RcSysX* s, int* a, int x, const char* str, int w)
 {
+    int active;
     s->m18->v3();
     int v = a[0];
     RcEvS* e = &lbl_806AB31C;
     e->m14.s = 0;
-    e->m18 = -1;
-    e->m1C = 1;
+    active = 1;
+    e->m18 = -active;
+    e->m1C = active;
     e->m8 = 0;
     e->m14.i = v;
     strncpy(e->m20, str, 0x24);
