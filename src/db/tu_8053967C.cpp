@@ -948,9 +948,11 @@ DB_OVERLAY char* fn_8053C40C(O58* o, int id)
 {
     int sp8 = -1;
     int spC = -1;
+    int found = fn_80377E90(o->m4, &sp8, &spC, id);
+    int slot = sp8;
     char* r;
-    if (fn_80377E90(o->m4, &sp8, &spC, id) == 1) {
-        r = o->m10 + sp8 * 0x1E0;
+    if (found == 1) {
+        r = o->m10 + slot * 0x1E0;
     } else {
         int c = o->mC;
         fn_80377CD8(o->m4, c, c, id);

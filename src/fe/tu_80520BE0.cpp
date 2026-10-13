@@ -293,8 +293,8 @@ extern "C" FE_OVERLAY void fn_805210EC(void)
 {
     if (lbl_8062264C != 0) {
         delete (FeSingleV*)lbl_8062264C;
-        lbl_8062264C = 0;
     }
+    lbl_8062264C = 0;
 }
 
 //@80521144
