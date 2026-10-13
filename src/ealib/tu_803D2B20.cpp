@@ -419,7 +419,9 @@ extern "C" Unk803D2B20Obj* fn_803D5098(Unk803D2B20Obj* self)
 }
 
 /*
- * Not matched yet: fn_803D2CBC (range wrap, same float/int conversion shape as fn_803D17E4 in tu_803CECA4),
- * fn_803D2DFC, fn_803D33C4, fn_803D3AC8, fn_803D408C, fn_803D44A8, fn_803D4B60 (uses sqrtf).
- * The original code stays linked for these.
+ * Not matched yet: fn_803D2DFC, fn_803D33C4, fn_803D3AC8, fn_803D408C, fn_803D44A8, fn_803D4B60 (uses sqrtf).
+ * fn_803D33C4 (p5-20 notes): packed-half reads are ((h & 0x8000) << 16) | ((h & 0x7FFF) << 15) stored to a stack word
+ * and reloaded as a float; eight distinct slots come from one unsigned w[8]; the walk is lhzu through *++p; stores use
+ * out[k], out[++k] with k = bone * 12; section 3 re-reads rec->m16. That form gives 225 of 225 instructions, but retail
+ * keeps n in r31 (cur takes r3), ours puts n in r3. The original code stays linked for these.
  */
