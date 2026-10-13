@@ -182,12 +182,11 @@ int fn_800480FC(Unk8004763C* t)
     return total;
 }
 
-/* near-miss: 8 slots differ (fail/i callee-saved registers swapped: retail fail=r27, i=r26; tail layout) */
 int fn_80048294(Unk8004763C* t, int idx)
 {
     int any = 0;
-    int i = 0;
     int fail = 0;
+    int i = 0;
     do {
         if (lbl_805B10B4[idx].m80[i] == 1) {
             int s0 = t->mSlots[i].m0;
@@ -208,9 +207,15 @@ int fn_80048294(Unk8004763C* t, int idx)
         }
         i++;
     } while (i <= 7);
-    int r = -2;
-    if (any != 0 || fail != 1)
+    int r;
+    if (any == 0) {
+        if (fail != 1)
+            r = fail ^ 1;
+        else
+            r = -2;
+    } else {
         r = fail ^ 1;
+    }
     return r;
 }
 
