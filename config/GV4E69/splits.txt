@@ -1587,6 +1587,7 @@ ealib/tu_8036AEE4.cpp:
 ealib/tu_8036BECC.cpp:
 	.text       start:0x8036BECC end:0x8036CC08
 	.ctors      start:0x805A2C6C end:0x805A2C70
+	.rodata     start:0x80603C78 end:0x80603C8C align:4
 	.bss        start:0x80693D4C end:0x80693D60
 
 ealib/tu_8036CC08.cpp:
