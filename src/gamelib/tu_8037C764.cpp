@@ -572,6 +572,26 @@ extern "C" void fn_8037D1A0(Unk8037D0E8* o, int chrg)
         fn_80377408(o);
 }
 
+struct Ld2B0 {
+    SortArr* m0;
+    char* m4;
+    int* m8;
+};
+struct Ld2B0View;
+extern "C" {
+int atoi(const char* s);
+int fn_803791BC(const char* s, int n);
+void* fn_8037BDA8(int hash, int a, void* c);
+int fn_8037BEE4(int hash, const char* name);
+void fn_8037C3F8(int hash, int a, int flag, void* obj);
+void fn_80377FCC(SortArr* a, int v1, int v2, int key);
+void fn_803780D0(SortArr* a, int v1, int v2, int key);
+void fn_80378184(SortArr* a);
+void fn_80378D70(const char* s, int a, char* dst, int max, int ch, int* len);
+void fn_8037BFCC(int hash, int idx, const char* s);
+}
+extern int lbl_80624264;
+extern const char* lbl_806EFC18;
 struct DtorAt0 { const void* m; };
 
 extern "C" void fn_8037BF88(DtorAt0* s, int chrg);
@@ -579,6 +599,92 @@ extern "C" void fn_8037BF88(DtorAt0* s, int chrg);
 extern "C" void fn_8037D290(DtorAt0* s, int chrg)
 {
     fn_8037BF88(s, chrg);
+}
+
+extern "C" void fn_8037D2B0(void* ov, void* datav, int size)
+{
+    Ld2B0* o = (Ld2B0*)ov;
+    const char* data = (const char*)datav;
+    if (data != 0 && size != 0) {
+        char* tmp = (char*)fn_803774A8(0x7530, 0x100);
+        const char* cur = data;
+        int used = 0;
+        while (data[size - 1] == '\n' || data[size - 1] == '\r')
+            size--;
+        int maxn = 0;
+        int remain = size;
+        char* tok;
+        int tokLen;
+        if ((unsigned)(cur - data) < (unsigned)size) {
+            do {
+                fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                int h = fn_803791BC(tok, 0);
+                fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                int n = atoi(tok);
+                if (n > maxn)
+                    maxn = n;
+                fn_80378E48((char**)&cur, &remain, ';', &tok, &tokLen);
+                int m = atoi(tok);
+                if (n > 0) {
+                    int off = 0;
+                    int i = n;
+                    do {
+                        fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                        int id = atoi(tok);
+                        fn_80378D70(cur, size, o->m4 + id * 0x38, 0x32, ';', &used);
+                        cur += used + 1;
+                        *(int*)(off + (int)o->m8) = id;
+                        off += 4;
+                    } while (--i != 0);
+                }
+                lbl_80624264++;
+                for (int j = 0; j < m; j++) {
+                    int ok = 1;
+                    fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                    int key = fn_803791BC(tok, 0);
+                    void* ent = fn_8037BDA8(h, key, o);
+                    if (ent == 0)
+                        ok = 0;
+                    if (ok != 0) {
+                        if (j == 0 && j < n) {
+                            int off = 0;
+                            int i = n;
+                            do {
+                                int id = *(int*)(off + (int)o->m8);
+                                off += 4;
+                                int rec = id * 0x38;
+                                *(int*)(rec + (int)o->m4 + 0x34) = fn_8037BEE4(h, o->m4 + rec);
+                            } while (--i != 0);
+                        }
+                    }
+                    if (ok != 0) {
+                        if (fn_8037D680((Unk8037D0E8_P*)o, h, key) != 0)
+                            fn_80377FCC(o->m0, (int)ent, h, key);
+                        else
+                            fn_803780D0(o->m0, (int)ent, h, key);
+                    }
+                    lbl_806EFC18 = cur;
+                    fn_80378E48((char**)&cur, &remain, ';', &tok, &tokLen);
+                    int cnt = atoi(tok);
+                    if (cnt > 0) {
+                        int c = cnt;
+                        do {
+                            fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                            int idx = atoi(tok);
+                            fn_80378D70(cur, size, tmp, 0x7530, ';', &used);
+                            cur += used + 1;
+                            if (ok != 0)
+                                fn_8037BFCC(h, *(int*)(o->m4 + idx * 0x38 + 0x34), tmp);
+                        } while (--c != 0);
+                    }
+                    if (ok != 0)
+                        fn_8037C3F8(h, key, 1, ent);
+                }
+            } while ((unsigned)(cur - data) < (unsigned)size);
+        }
+        fn_80378184(o->m0);
+        fn_80377408(tmp);
+    }
 }
 
 extern "C" int fn_8037D680(Unk8037D0E8_P* o, int x, int y)
