@@ -492,7 +492,7 @@ extern "C" void fn_803F108C(RcSysX* s, int v)
     s->m18->v4();
 }
 
-/* near-miss: 2 slots; retail emits li 1 before li -1 (r11/r9) yet stores m18 first, every store order tried */
+/* One initialized state value preserves retail scheduling of the paired 1/-1 stores. */
 extern "C" void fn_803F113C(RcSysX* s, int* a, int x, const char* str)
 {
     int active;
@@ -528,15 +528,17 @@ extern "C" void fn_803F1204(RcSysX* s, int* a, int x, const char* str, int w)
     s->m18->v4();
 }
 
-/* near-miss: same as fn_803F113C (2 slots) */
+/* The paired state stores use the same initialized value as fn_803F113C. */
 extern "C" void fn_803F12D4(RcSysX* s, int* a, int x, const char* str)
 {
+    int active;
     s->m18->v3();
     int v = a[0];
     RcEvS* e = &lbl_806AB364;
+    active = 1;
     e->m14.s = 0;
-    e->m1C = 1;
-    e->m18 = -1;
+    e->m18 = -active;
+    e->m1C = active;
     e->m14.i = v;
     e->m8 = 0;
     strncpy(e->m20, str, 0x24);
