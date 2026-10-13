@@ -2,6 +2,9 @@
  * Game code, .text 0x800E4234-0x800E8890 (code-only unit; original file and TU
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
+/* newlib ctype table: byte zero is the EOF sentinel. */
+extern "C" const char _ctype_[];
+
 #include "game/tu_800E4234.h"
 
 void fn_800E4234(int a0, int mode, unsigned short* out)
@@ -580,7 +583,7 @@ void fn_800E633C(char* s)
     for (int i = 0; i < n; i++) {
         int c = s[i];
         int o = c;
-        if (*(unsigned char*)((char*)lbl_8060E9F1 + o) & 1)
+        if (*(unsigned char*)((char*)((const unsigned char*)_ctype_ + 1) + o) & 1)
             c += 0x20;
         s[i] = c;
     }
