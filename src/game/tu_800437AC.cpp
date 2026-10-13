@@ -454,6 +454,71 @@ int fn_80044240(int a)
     return 2;
 }
 
+struct Unk80044270_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+extern "C" float fn_804028E4(float x);
+extern const Unk80044270_Vec3 lbl_80687554;
+extern const Unk80044270_Vec3 lbl_80687560;
+extern const Unk80044270_Vec3 lbl_8068756C;
+extern const Unk80044270_Vec3 lbl_80687578;
+extern const Unk80044270_Vec3 lbl_80687584;
+extern const float lbl_805B1D60;
+extern const float lbl_806875A0;
+extern const float lbl_806875AC;
+extern const float lbl_80687594;
+extern const float lbl_805A8E48;
+
+inline Unk80044270_Vec3 Unk80044270_Sub(const Unk80044270_Vec3& a, const Unk80044270_Vec3& b)
+{
+    Unk80044270_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Unk80044270_Len(const Unk80044270_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+extern "C" int fn_80044270(Unk80044270_Vec3* p)
+{
+    int r = 0;
+    float d = Unk80044270_Len(*p);
+    if (!(d > lbl_805B1D60)) {
+        if (!(p->z <= -lbl_806875A0) && !(p->x <= -lbl_806875A0)) {
+            Unk80044270_Vec3 a = Unk80044270_Sub(*p, lbl_80687554);
+            if (!(Unk80044270_Len(a) > lbl_806875A0)) {
+                r = 1;
+            } else {
+                Unk80044270_Vec3 b = Unk80044270_Sub(*p, lbl_8068756C);
+                if (!(Unk80044270_Len(b) > lbl_806875A0)) {
+                    r = 4;
+                } else {
+                    Unk80044270_Vec3 c = Unk80044270_Sub(*p, lbl_80687560);
+                    if (!(Unk80044270_Len(c) > lbl_806875AC)) {
+                        r = 2;
+                    } else {
+                        Unk80044270_Vec3 e = Unk80044270_Sub(*p, lbl_80687578);
+                        if (!(Unk80044270_Len(e) > lbl_80687594)) {
+                            r = 0x20;
+                        } else {
+                            Unk80044270_Vec3 f = Unk80044270_Sub(*p, lbl_80687584);
+                            if (!(Unk80044270_Len(f) > lbl_805A8E48))
+                                r = 8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return r;
+}
+
 int fn_80044580(int a, int b, int c)
 {
     int r = 0;
