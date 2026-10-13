@@ -56,6 +56,40 @@ inline UiMsgMgr* UiMgrB()
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     return lbl_8061A32C;
 }
+class FeVS30 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14();
+    virtual void v15(); virtual void v16(); virtual void v17(); virtual void v18();
+    virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22();
+    virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26();
+    virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30(char* a);
+};
+class FeSubC {
+public:
+    char pad0[0x24];
+    virtual int s1(); virtual int s2(); virtual int s3(); virtual int s4(); virtual int s5(); virtual int s6();
+    virtual int s7(); virtual int s8(); virtual int s9(); virtual int s10(); virtual int s11();
+    virtual void s12(int a);
+    virtual int s13(); virtual int s14(); virtual int s15();
+};
+struct FeHolderC {
+    char pad0[0xDC];
+    FeSubC mDC;
+};
+struct FeS3b : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObj* m134;
+    FeObj* m138;
+    FeObj* m13C;
+    FeObj* m140;
+    int m144;
+    int m148;
+};
+extern "C" int fn_8007DA28__18Unk8007B2B0_Screen(void* g);
+extern "C" void fn_8007CF44__18Unk8007B2B0_ScreenUiii(void* g, unsigned h, char* buf, int b);
+extern "C" int fn_8007D050__18Unk8007B2B0_ScreenUii(void* g, unsigned h, int a);
 
 struct Unk8007F198_D;
 struct FeRetA {
@@ -370,6 +404,37 @@ extern "C" FE_OVERLAY FeScrRaw* fn_804E378C(FeScrRaw* self, int a, int b, int c,
     self->m14C = 0;
     self->m150 = -1;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804E37FC(FeS3b* self)
+{
+    fn_800ECF18(self);
+    Unk8007B2B0_Screen* g = lbl_8061930C;
+    FeObj* h = fn_800B7A94(UiMgrB(), "NAVBAR");
+    fn_80124FA8(h, self);
+    fn_80125100(h);
+    self->m134 = fn_800C8044(self->v32("USER", 1));
+    self->m138 = fn_800C8040(self->v32("SCREENTITLE", 1));
+    self->m13C = fn_800C8060(self->v32("CELL", 1));
+    self->m140 = fn_800C805C(self->v32("SG1", 1));
+    char sp8[0x18];
+    char sp20[0x190];
+    int sc = fn_8007DA28__18Unk8007B2B0_Screen(g);
+    self->m144 = sc;
+    fn_8007CF44__18Unk8007B2B0_ScreenUiii(g, sc, sp8, 9);
+    ((FeVS28*)fn_800C8040(self->m134->v32("USERNAME", 1)))->v28(sp8);
+    sprintf(sp20, "%d", fn_8007D050__18Unk8007B2B0_ScreenUii(g, self->m144, 8));
+    ((FeVS30*)fn_800C8040(self->m134->v32("CREDITS", 1)))->v30(sp20);
+    self->m148 = 0;
+    FeObj* c = fn_800C8058(self->m140->v32("CATEGORY", 1));
+    ((FeSubC*)&((FeHolderC*)c)->mDC)->s15();
+    ((FeObj2*)c)->v51(0x4178, 0);
+    ((FeObj2*)c)->v51(0x4179, 1);
+    ((FeObj2*)c)->v51(0x5C49, 2);
+    ((FeObj2*)c)->v51(0x417E, 3);
+    ((FeSubC*)&((FeHolderC*)c)->mDC)->s12(self->m148);
+    fn_804E3EF8(self);
+    fn_804E46B8(self);
 }
 
 extern "C" FE_OVERLAY void fn_804E3B08(FeS3* self)
