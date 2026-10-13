@@ -197,6 +197,105 @@ extern char lbl_8060D220[];
 extern void* (*lbl_8062C668)(int size, const char* tag);
 extern "C" int fn_803E9978(Unk803E7008_Ent** pp);
 
+struct Unk803E7A60_Arg {
+    const char* m0;
+    int m4;
+    char** m8;
+};
+extern char lbl_8060CC24[];
+extern char lbl_8060CC2C[];
+extern char lbl_8060D04C[];
+extern char lbl_8060D060[];
+extern char lbl_8060D06C[];
+extern char lbl_8060D07C[];
+extern char lbl_8060D090[];
+extern char lbl_8060D0A4[];
+extern char lbl_8060D0B8[];
+extern char lbl_8060D0D0[];
+extern char lbl_8060D0E0[];
+extern char lbl_8060D0F4[];
+extern char lbl_8060D108[];
+extern char lbl_8060D120[];
+extern "C" void fn_803DBDD8(int, int);
+extern "C" void fn_803DBE18(int, int);
+extern "C" void fn_803DBE20(int, int);
+extern "C" void fn_803DBE2C(int, int);
+extern "C" void fn_803DBE38(int, int);
+extern "C" void fn_803DBE44(int, int);
+extern "C" void fn_803DBE50(int, int);
+extern "C" void fn_803DBE5C(int, int);
+extern "C" void fn_803DBE68(int, int);
+extern "C" void fn_803DBE70(int, int);
+extern "C" void fn_803DBE78(int, int);
+extern "C" void fn_803DBE84(int, int*);
+extern "C" int fn_803E7400(const char*);
+extern "C" int atoi(const char*);
+extern "C" int sscanf(const char*, const char*, ...);
+inline int Unk803E7A60_Is(Unk803E7A60_Arg* a, const char* name)
+{
+    int r;
+    if (a->m4 == 1)
+        r = strcmp(name, a->m0) == 0;
+    else
+        r = 0;
+    return r;
+}
+
+/* near-miss: 99.98%; the two address-taken ints of the sscanf case are in the other stack order (retail: v at +0xC, w at +0x8) */
+extern "C" void fn_803E7A60(int h, Unk803E7A60_Arg* a)
+{
+    if (Unk803E7A60_Is(a, lbl_8060D04C)) {
+        fn_803DBDD8(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D060)) {
+        fn_803DBE18(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D06C)) {
+        fn_803DBE20(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D07C)) {
+        fn_803DBE68(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D090)) {
+        fn_803DBE70(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0A4)) {
+        fn_803DBE2C(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0B8)) {
+        fn_803DBE78(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0D0)) {
+        int v;
+        sscanf(*a->m8, lbl_8060CC2C, &v);
+        int w = v;
+        fn_803DBE84(h, &w);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0E0)) {
+        fn_803DBE38(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0F4)) {
+        fn_803DBE44(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D108)) {
+        fn_803DBE50(h, atoi(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D120)) {
+        fn_803DBE5C(h, fn_803E7400(*a->m8));
+    }
+}
+
 extern "C" void fn_803E7E88(Unk803E7E88_Obj* c)
 {
     int cnt = 0;
