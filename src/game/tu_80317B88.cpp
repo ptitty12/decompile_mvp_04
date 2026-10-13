@@ -34,6 +34,28 @@ extern int lbl_8061FF54[];
 extern int lbl_8061FF64;
 extern int lbl_8061FF6C;
 extern int lbl_8061FF74;
+extern FxCtx* lbl_8061FEDC;
+struct FxV2b {
+    float x;
+    float y;
+};
+struct FxVx {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+/* 0x98-byte particle record seen from fn_803185A0: two vertex arrays at 0x8 and 0x48. */
+struct FxQb {
+    int m0;
+    int m4;
+    FxVx a8[4];
+    FxVx a48[4];
+    int m88;
+    int m8C;
+    int m90;
+    int m94;
+};
 extern int lbl_8061FF78[];
 extern int lbl_8062C290;
 extern const float lbl_805EA540;
@@ -54,15 +76,15 @@ void fn_80328374(void* p, int a);
 void fn_803E6B3C(void* p);
 void fn_803E6B74(void* p);
 void fn_803E6C28(void* p, int n);
-void fn_803E69D8(void* p, const char* name, void* data, int size, int count);
-void fn_803E6950(void* p, const char* name);
+int fn_803E69D8(void* p, const char* name, void* data, int size, int count);
+int fn_803E6950(void* p, const char* name);
 void fn_803E67A0(void* p, void* q);
-void fn_803E68B0(void* p, int n);
-void fn_803DBDD8(void* p, int n);
-void fn_803DBE18(void* p, int n);
-void fn_803DBE38(void* p, int n);
-void fn_803DBE20(void* p, int n);
-void fn_803DBE68(void* p, int n);
+int fn_803E68B0(void* p, int n);
+int fn_803DBDD8(void* p, int n);
+int fn_803DBE18(void* p, int n);
+int fn_803DBE38(void* p, int n);
+int fn_803DBE20(void* p, int n);
+int fn_803DBE68(void* p, int n);
 void fn_803DBE78(void* p, int n);
 void fn_803DBD54(void* p);
 void fn_803E6660(void* p);
@@ -129,9 +151,14 @@ void fn_8031B228(FxC* self, int i);
 void fn_8031B250(FxC* self, int i, int a, float f, FxSrc* b);
 void fn_8031B27C(FxC* self, int i);
 void fn_8031B2A8(FxC* self, int i);
+void fn_8031A3D0(FxB* self, int arg);
+/* near-miss 95.6%: 103/103 insns, 34 slots differ: retail keeps the frame 8 bytes larger (hole at 0x10) and one more callee-saved register; vertex loop address registers differ */
+void fn_803185A0(Fx* self, int tex, FxV2b* pos, FxV2b* uv, int a7, void* col, int p9, int p10);
+/* near-miss 97.6%: 145/145 insns; retail keeps the record pointer in r31 and &sp14 in r30 (ours the other way round), and stores sp10 before sp8 */
+void fn_8031A948(const char* text, unsigned len, FxRec* arr, int* count);
 // PROTOS-END
 void fn_80319D78(FxB* self);
-void fn_80319938(void* cfg, int on);
+void fn_80319938(FxCfg7* cfg, int on);
 }
 
 // FUNCS-BEGIN
@@ -191,6 +218,37 @@ void fn_80318090(void* self, FxQuad* obj, float a) {
 
 void fn_80318140(int a, int b, int c, float x1, float x2, float x3, float x4, int d, void* e, int f, float x5, int g, int h, int s0, int s1) {
     fn_803181E4(a, b, c, x1, x2, x3, x4, d, fn_8014DDAC(e), f, x5, g, h, s0, s1);
+}
+
+extern "C" void fn_80317240(float* x, float* y, int a, int b);
+void fn_803185A0(Fx* self, int tex, FxV2b* pos, FxV2b* uv, int a7, void* col, int p9, int p10)
+{
+    if (self->m118 < self->mF4) {
+        FxQb* q = (FxQb*)&self->m13C[self->m118];
+        q->m90 = self->m2C;
+        self->m118 = self->m118 + 1;
+        int w = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14;
+        int h = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+        q->m94 = 0;
+        q->m4 = fn_8014DDAC(col);
+        q->m0 = tex;
+        q->m8C = lbl_8061FF50;
+        q->m88 = a7;
+        lbl_8061FF50 = lbl_8061FF50 + 1;
+        FxVx* d8 = q->a8;
+        FxVx* d48 = q->a48;
+        for (int i = 0; i < 4; i++) {
+            float x = pos[i].x;
+            float y = pos[i].y;
+            fn_80317240(&x, &y, p9, p10);
+            d8->x = x * (float)w;
+            d8->y = y * (float)h;
+            d8++;
+            d48->x = uv[i].x;
+            d48->y = uv[i].y;
+            d48++;
+        }
+    }
 }
 
 void fn_8031883C(Fx* self) {
@@ -363,6 +421,27 @@ void fn_803198B8(FxCfg7* c, int on) {
     lbl_8061FF6C = on;
 }
 
+extern "C" {
+void fn_803D9C68(int o, int v);
+void fn_803D9C8C(int o, int v);
+void fn_803D9CB0(int o, float v);
+void fn_803D9CD4(int o, float v);
+void fn_803D9CF8(int o, int* c);
+void fn_803D9D24(int o, int v);
+}
+void fn_80319938(FxCfg7* c, int on)
+{
+    float k = lbl_805E9FA4;
+    fn_803D9C68(lbl_8061FEDC->m38->m4 + 0x10, on ? 1 : 0);
+    fn_803D9C8C(lbl_8061FEDC->m38->m4 + 0x10, on ? 5 : 0);
+    fn_803D9CB0(lbl_8061FEDC->m38->m4 + 0x10, *(float*)&c->mC * k);
+    fn_803D9CD4(lbl_8061FEDC->m38->m4 + 0x10, *(float*)&c->m10 * k);
+    struct { int v; } col;
+    col.v = (c->m0 << 24) | ((c->m4 << 16) & 0xFF0000) | ((c->m8 << 8) & 0xFF00);
+    fn_803D9CF8(lbl_8061FEDC->m38->m4 + 0x10, &col.v);
+    fn_803D9D24(lbl_8061FEDC->m38->m4 + 0x10, 1);
+}
+
 FxB* fn_80319A58(FxB* self, int n) {
     char* sub = (char*)self + 0x38;
     int k = n - 1;
@@ -437,6 +516,137 @@ void fn_80319D20() {
     }
 }
 
+extern int lbl_8061FE90;
+extern "C" {
+int fn_80328648(int a);
+void fn_8031259C(FxCtx* c);
+void fn_803125D0(FxCtx* c);
+void fn_8031A4F0(FxB* self, FxPart* p);
+}
+void fn_80319D78(FxB* self)
+{
+    char* h = self->mB4;
+    char* m = self->m78;
+    fn_803E67A0(h, (char*)self + 0x38);
+    fn_803E6B3C(h);
+    fn_803E6950(h, lbl_805E89D4);
+    fn_803E69D8(h, lbl_805E89D4, lbl_8061FF78, 4, 1);
+    fn_803E69D8(h, lbl_805E89E0, self->m2C, 0xC, 0x4B0);
+    fn_803E69D8(h, lbl_805E89EC, self->m30, 8, 0x4B0);
+    fn_803E69D8(h, lbl_805E89F0, self->m34, 4, 0x4B0);
+    fn_803DBDD8(m, 0x90);
+    fn_803DBE18(m, 1);
+    fn_803DBE38(m, 1);
+    fn_803DBE20(m, 0);
+    fn_803DBE68(m, 1);
+    fn_803DBE78(m, 1);
+    fn_803E69D8(h, lbl_805E89F8, m, 0x3C, 1);
+    fn_803E69D8(h, lbl_805E8A00, (void*)lbl_8062C290, 0x40, 1);
+    fn_803E68B0(h, 0x90);
+    fn_803E6B74(h);
+    for (int i = 0; i < self->mF0; i++) {
+        int off = i * 0x98;
+        for (int k = 0; k < 4; k++) {
+            int o = k * 16;
+            char* b0 = (char*)(off + (int)self->mF8) + 0x10;
+            *(float*)(b0 + o) = lbl_805E9FA8;
+            char* b1 = (char*)(off + (int)self->mF8) + 0x14;
+            *(float*)(b1 + o) = lbl_805E9FAC;
+            char* b2 = (char*)(off + (int)self->mF8) + 0x50;
+            *(float*)(b2 + o) = lbl_805E9FAC;
+            char* b3 = (char*)(off + (int)self->mF8) + 0x54;
+            *(float*)(b3 + o) = lbl_805E9FAC;
+        }
+    }
+    self->mF4 = 0;
+}
+
+void fn_8031A3D0(FxB* self, int arg)
+{
+    if (lbl_8061FE90 != 0) {
+        self->mF4 = 0;
+        return;
+    }
+    int lo = 0;
+    int hi = 4;
+    int tex = 0;
+    if (fn_80328648(arg) - 1 > 0) {
+        lo = 5;
+        hi = 9;
+        tex = 5;
+    }
+    FxCtx* ctx = lbl_8061FEDC;
+    fn_8031259C(ctx);
+    int n = self->mF4;
+    FxPart* p = self->mF8;
+    int key = p->m0;
+    while (n > 0) {
+        while (n > 0 && key == p->m0) {
+            if (p->m90 >= lo && p->m90 <= hi) {
+                fn_8031A4F0(self, p);
+                self->m24 = self->m24 + 1;
+            }
+            p++;
+            n--;
+        }
+        if (self->m24 != 0) {
+            fn_8031A760(self, key);
+            self->m24 = 0;
+        }
+        if (n > 0)
+            key = p->m0;
+    }
+    fn_803125D0(ctx);
+    fn_80319C2C((FxB*)lbl_8061FF74, tex);
+}
+
+void fn_8031A4F0(FxB* self, FxPart* pp)
+{
+    FxQb* p = (FxQb*)pp;
+    int i = self->m24 * 6;
+    ((FxV3*)self->m2C)[i].x = p->a8[0].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[0].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[0].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[0].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[0].y;
+    ((int*)self->m34)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m2C)[i].x = p->a8[1].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[1].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[1].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[1].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[1].y;
+    ((int*)self->m34)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m2C)[i].x = p->a8[3].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[3].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[3].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[3].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[3].y;
+    ((int*)self->m34)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m2C)[i].x = p->a8[0].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[0].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[0].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[0].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[0].y;
+    ((int*)self->m34)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m2C)[i].x = p->a8[3].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[3].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[3].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[3].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[3].y;
+    ((int*)self->m34)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m2C)[i].x = p->a8[2].x;
+    ((FxV3*)self->m2C)[i].y = p->a8[2].y;
+    ((FxV3*)self->m2C)[i].z = p->a8[2].z;
+    ((FxV2b*)self->m30)[i].x = p->a48[2].x;
+    ((FxV2b*)self->m30)[i].y = p->a48[2].y;
+    ((int*)self->m34)[i] = p->m4;
+}
+
 void fn_8031A760(FxB* self, int tex) {
     char* r = self->mB4;
     fn_803E6B3C(r);
@@ -481,6 +691,68 @@ int fn_8031A8E0(const char* name) {
         if (fn_8040B574(name, lbl_8061FF8C[i]) == 0) return i;
     }
     return -1;
+}
+
+extern "C" {
+void fn_80329AEC(const char** pp, const char** out, unsigned* pn, int delim);
+void fn_80329C4C(const char** pp, unsigned* pn, int* out, int lo, int hi, int delim);
+int fn_80329B98(const char** pp, unsigned* pn, float* out, int delim);
+}
+extern "C" char* strcpy(char* d, const char* s);
+void fn_8031A948(const char* text, unsigned len, FxRec* arr, int* count)
+{
+    const char* sp8;
+    const char* spC;
+    unsigned sp10;
+    sp10 = len;
+    sp8 = text;
+    spC = 0;
+    const char* sp14;
+    int sp18;
+    int k = 7;
+    do {
+        fn_80329AEC(&sp8, &spC, &sp10, 0x2C);
+    } while (--k != 0);
+    fn_80329AEC(&sp8, &spC, &sp10, 0xA);
+    int i = 0;
+    fn_80329C4C(&sp8, &sp10, count, 0, 0x50, 0xA);
+    if (i < *count) {
+        do {
+            fn_80329AEC(&sp8, &sp14, &sp10, 0x2C);
+            strcpy(arr[i].name, sp14);
+            fn_80329C4C(&sp8, &sp10, &sp18, 0, 1, 0x2C);
+            int v = 1;
+            if (sp18 == 0)
+                v = 0;
+            arr[i].m20 = v;
+            fn_80329AEC(&sp8, &sp14, &sp10, 0x2C);
+            arr[i].m24 = fn_8031A8E0(sp14);
+            fn_80329C4C(&sp8, &sp10, &arr[i].m28, 0, 1000000, 0x2C);
+            if (arr[i].m28 == 0)
+                arr[i].m28 = 1;
+            fn_80329C4C(&sp8, &sp10, &arr[i].m2C, 0, 1000000, 0x2C);
+            if (arr[i].m2C == 0)
+                arr[i].m2C = 1;
+            fn_80329B98(&sp8, &sp10, &arr[i].m30, 0x2C);
+            fn_80329B98(&sp8, &sp10, &arr[i].m34, 0x2C);
+            fn_80329AEC(&sp8, &sp14, &sp10, 0xA);
+            int kind;
+            switch (*sp14) {
+            case 'l':
+                kind = 0;
+                break;
+            case 'p':
+                kind = 1;
+                break;
+            default:
+            case 'o':
+                kind = 2;
+                break;
+            }
+            arr[i].m38 = kind;
+            i++;
+        } while (i < *count);
+    }
 }
 
 /* near-miss: retail loads both float temps before the first store */
