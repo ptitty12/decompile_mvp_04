@@ -367,6 +367,48 @@ float Unk802362A8_Cpu::fn_802377F4(Unk802362A8_Pg* p)
     return r;
 }
 
+inline float Unk802378E0_Rand(Unk802362A8_Cpu* c, float scale, int line)
+{
+    const char* f = lbl_805D7978;
+    return (float)(unsigned)((Unk8014D8AC*)c->m2E4->m554)->fn_8014D8AC(1000000, f, line) * scale * 0.000001f;
+}
+struct Unk801AB63C_P;
+struct Unk801B23A8_Q;
+int fn_801B38A8(Unk801AB63C_P* p, int i, int c);
+int fn_801AD3C4(Unk801AB63C_P* p, int x);
+int fn_801B2834(Unk801AB63C_P* p, Unk801B23A8_Q* q);
+extern "C" float fn_80088518(void* a, int idx, int* out, int k);
+extern int lbl_805D7DD8[];
+inline Unk801AB63C_P* Unk802378E0_P3C8(Unk8022FE34_Ctx* c)
+{
+    return *(Unk801AB63C_P**)(*(char**)((char*)c + 0x700) + 0x3C8);
+}
+
+int Unk802362A8_Cpu::fn_802378E0(Unk802362A8_Req* p)
+{
+    float tbl[16] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.37f, 0.34f, 0.3f, 0.0f, 0.5f, 0.43f, 0.35f, 0.0f, 0.52f, 0.45f, 0.37f, 0.0f };
+    int o = *(int*)((char*)p + 0x10) * 4;
+    Unk8022FE34_Game* gm = m2E4->m6F8;
+    int idx = gm->m14[2].m8 == 0;
+    int pl = At(gm->m10 + 0x14, idx);
+    o += pl * 16;
+    float sp48 = *(float*)((char*)tbl + o);
+    int sp68 = 0;
+    float sp4C = fn_80088518(gm->mC->mC, idx, &sp68, lbl_805D7DD8[pl]);
+    float v2[4] = { 0.0f, 0.1f, 0.15f, 0.25f };
+    Unk801AB63C_P* q = Unk802378E0_P3C8(m2E4);
+    sp48 = v2[pl] * sp4C + sp48;
+    int n = fn_801B38A8(q, idx, 1);
+    if (n > 0 && fn_801AD3C4(Unk802378E0_P3C8(m2E4), idx) != 0
+        && fn_801B2834(q, (Unk801B23A8_Q*)fn_801C1638(m2E4, 0)) > 0x78)
+        sp48 = (float)n * 0.2f + sp48;
+    sp48 = sp48 + fn_802377F4((Unk802362A8_Pg*)p);
+    fn_80237B60(&sp48);
+    if (Unk802378E0_Rand(this, 1.0f, 0x275) >= sp48)
+        return 1;
+    return 9;
+}
+
 void Unk802362A8_Cpu::fn_80237B60(float* out)
 {
     float tbl[4] = { -0.6f, -0.5f, -0.3f, -0.2f };
