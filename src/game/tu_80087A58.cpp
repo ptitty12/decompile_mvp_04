@@ -12,6 +12,7 @@ extern int lbl_8068B618;
 extern char lbl_8064A208[];
 extern float lbl_805B4640;
 extern double lbl_805B4638;
+extern float lbl_805B47D4;
 
 
 
@@ -557,6 +558,27 @@ E* fn_80087E5C(H* h, int a, int b, int k)
     return 0;
 }
 
+void fn_80087EBC(H* h, unsigned t)
+{
+    unsigned n = 0;
+    unsigned i = 0;
+    for (; i < h->m7D0; i++) {
+        if ((unsigned)h->e[i].m8 < t) {
+            n = i;
+            continue;
+        }
+        n++;
+        break;
+    }
+    if (n <= 99) {
+        for (unsigned k = n; k < 100; k++) {
+            h->e[k - n] = h->e[k];
+            h->e[k - n].m8 -= 30;
+        }
+    }
+    h->m7D0 -= n;
+}
+
 void fn_80087F7C(H* h, int v)
 {
     h->e[h->m7D0 - 1].m10 = v;
@@ -666,6 +688,36 @@ int fn_8008838C(O* o, int a, int b)
             n++;
     }
     return n;
+}
+
+extern "C" float fn_80088518(O* o, int flag, int* out, int lim)
+{
+    if (o->m4 != 0) {
+        if (lim < 0)
+            lim = o->m4;
+        unsigned cnt = 0;
+        unsigned i = 0;
+        *out = 0;
+        if (i < o->m4) {
+            int off = 0;
+            do {
+                E* e = (E*)(off + (int)o->mF5C);
+                if ((int)e->b10.hi == flag && !e->b10.c) {
+                    cnt++;
+                    if (fn_80087BE8(e->b10.b, 0) != 0) {
+                        ++*out;
+                        if (*out >= lim)
+                            break;
+                    }
+                }
+                i++;
+                off += 0x14;
+            } while (i < o->m4);
+        }
+        if (cnt != 0)
+            return (float)*out / (float)cnt;
+    }
+    return lbl_805B47D4;
 }
 
 int fn_80088640(O* o, int a, int b)
