@@ -178,9 +178,74 @@ Unk8037B3E8* cScriptLoadAnimations::fn_vslot5() /* 80169878 */
     return new (lbl_806EF9B4) cScriptLoadAnimations;
 }
 
+extern const int lbl_805C9758[];
+extern const int lbl_8061C3B0[];
+extern const char lbl_805CACB4[];
+extern const char lbl_805CACBC[];
+extern "C" int sprintf(char* dst, const char* fmt, ...);
+inline int ClampIdx(int idx)
+{
+    int i;
+    if (idx <= 0xAD) {
+        if (idx >= 0) {
+            i = idx;
+        } else {
+            i = 0;
+        }
+    } else {
+        i = 0xAD;
+    }
+    return i;
+}
+/* near-miss 97.3%: retail keeps the table value in r0 and copies it to r6 before the compare (mr r6,r0 /
+ * cmpw r5,r0); here the load goes straight into r6 (40 instrs vs 41). */
+void fn_801698A8(char* buf, int idx, int n) /* 801698A8 */
+{
+    int i = ClampIdx(idx);
+    int cnt = lbl_805C9758[i];
+    int r = cnt;
+    if (n <= cnt) {
+        r = n;
+        if (r <= 0) {
+            r = 1;
+        }
+    }
+    if (i == 0) {
+        sprintf(buf, lbl_805CACB4, r);
+    } else {
+        sprintf(buf, lbl_805CACBC, lbl_8061C3B0[i], r);
+    }
+}
+
 void Unk8016D9A0_Rec::fn_80169BF8(const char* name, int a, int b, int c, int d, Unk8015AB2C_Blk blk, int e) /* 80169BF8 */
 {
     fn_8016994C(name, 0xAE, a, b, c, d, blk, e);
+}
+
+extern const int lbl_805C94A0[];
+extern const int lbl_805CA9FC[];
+extern "C" void fn_80169C90(Unk8016D9A0_Rec* rec, int id, int n, int c, int d, int e, Unk8015AB2C_Blk blk, int z) /* 80169C90 */
+{
+    int cnt = lbl_805C94A0[id];
+    int i = 0;
+    int* q = blk.w;
+    while (i <= 2) {
+        int ok = 1;
+        if (*q == 0xC7) {
+            ok = 0;
+        }
+        if (ok == 0) {
+            break;
+        }
+        q += 6;
+        i++;
+    }
+    if (i >= cnt) {
+        char name[0x48];
+        int k = ClampIdx(id);
+        fn_801698A8(name, k, n);
+        rec->fn_8016994C(name, k, c, lbl_805CA9FC[k], d, e, blk, z);
+    }
 }
 
 int fn_80169DC4(char* base) /* 80169DC4 */
