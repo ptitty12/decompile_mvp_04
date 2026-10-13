@@ -237,6 +237,81 @@ extern "C" char* strcpy(char*, const char*);
 extern "C" void* memset(void*, int, unsigned);
 extern "C" char fn_803F2404(const char* wild, const char* str);
 
+extern "C" RcFeE* fn_803F2240(int, const char*, int);
+
+struct RcEvM : RcEv {
+    int m40;
+    int m44;
+};
+struct RcSysC {
+    int m0, m4;
+    int w[33];
+    const void* vp;
+};
+extern RcEvM lbl_806AB364;
+extern char lbl_806AB378[];
+extern const void* lbl_806AB554[3];
+
+extern "C" void fn_803F2000()
+{
+    switch (lbl_806AB364.m8) {
+    case 0:
+        lbl_806AB364.mC = lbl_806AB364.m8;
+        lbl_806AB364.m8 = 0xC;
+    case 0xC: {
+        RcFeE* r = fn_803F2240((int)lbl_806AB378, lbl_806AB378 + 0xC, 1);
+        if (r->m4 == 0xB) {
+            lbl_806AB364.m8 = 0x7B;
+            lbl_806AB364.mC = 0;
+        } else {
+            lbl_806AB364.m44++;
+            if (lbl_806AB364.m1C != 0) {
+                RcSysC* y = (RcSysC*)&lbl_806AB4C8;
+                const void* volatile sv = y->vp;
+                *y = *(RcSysC*)r;
+                lbl_806AB554[0] = sv;
+            }
+            lbl_806AB364.m8 = 0xD;
+            lbl_806AB364.mC = 0;
+        }
+        break;
+    }
+    case 0xD: {
+        RcFeE* r = fn_803F2240((int)&lbl_806AB364.m14, (const char*)&lbl_806AB364 + 0x20, 0);
+        if (r->m4 == 0xB) {
+            lbl_806AB364.m8 = 0x7B;
+            lbl_806AB364.mC = 0;
+            break;
+        }
+        lbl_806AB364.m44++;
+        if (lbl_806AB364.m1C != 0) {
+            RcSysC* y = (RcSysC*)&lbl_806AB4C8;
+            const void* volatile sv = y->vp;
+            *y = *(RcSysC*)r;
+            lbl_806AB554[0] = sv;
+        }
+        break;
+    }
+    case 0x7B: {
+        lbl_806AB364.m0->v1(&lbl_806AB364);
+        if (lbl_806AB364.m1C != 0) {
+            RcSys* y = &lbl_806AB4C8;
+            y->m6C = 0;
+            y->m70 = 0;
+            y->m74 = 0;
+            y->m78 = 0;
+            y->m7C = 0;
+            y->m80 = 0;
+            y->m84 = 0;
+            y->m88 = 0;
+            y->m0 = 0xc;
+            y->m4 = 0;
+        }
+        break;
+    }
+    }
+}
+
 extern "C" RcFeE* fn_803F2240(int a0, const char* pat, int a2)
 {
     RcFeInit(&lbl_806AADFC, 0, 0);
