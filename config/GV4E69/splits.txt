@@ -2546,6 +2546,8 @@ dolphin/os/tu_80437444.c:
 
 dolphin/pad/Padclamp.c:
 	.text       start:0x80438778 end:0x80438A2C
+	.rodata     start:0x8060F100 end:0x8060F10A
+	.sdata2     start:0x806F0FD8 end:0x806F0FF8
 
 dolphin/pad/Pad.c:
 	.text       start:0x80438A2C end:0x8043A374

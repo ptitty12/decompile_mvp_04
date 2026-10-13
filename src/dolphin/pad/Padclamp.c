@@ -60,7 +60,7 @@ static void ClampCircle(s8* px, s8* py, s8 radius, s8 min) {
     *py = y;
 }
 
-static void ClampTrigger(u8* trigger, u8 min, u8 max) {
+static inline void ClampTrigger(u8* trigger, u8 min, u8 max) {
     if (*trigger <= min) {
         *trigger = 0;
     } else {
@@ -82,3 +82,4 @@ void PADClampCircle(PADStatus* status) {
         }
     }
 }
+
