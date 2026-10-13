@@ -1,30 +1,38 @@
 #!/usr/bin/env python3
-"""Run decomp-permuter on one near-miss function of a C unit, unattended.
+"""Run decomp-permuter on one near-miss function, unattended (C and C++ units).
 
-Usage (from a worktree root, after `python configure.py && ninja` once):
+Usage (from a worktree root, after `python configure.py && ninja` and `ninja build/binutils`):
   python tools/match/permute.py <unit> <function> [--minutes 20] [-j 4]
-        [--source FILE.c] [--dir DIR] [--setup-only] [--show-errors]
+        [--source FILE] [--dir DIR] [--setup-only] [--show-errors] [--force]
 
   <unit>      unit path under src/ without extension, e.g. dolphin/os/tu_804321CC
-  <function>  the function's name in that unit (as in dtk's split asm)
-  --source    a C file to start from instead of src/<unit>.c. decomp-permuter parses
-              C only, so a C++ unit needs a C extraction of the function and what it uses.
+  <function>  the function's name in dtk's split asm (mangled if the symbol is)
+  --source    start from this file instead of src/<unit>.c / .cpp
 
 What it sets up in DIR (default build/permute/<function>, gitignored):
   target.o     the retail function alone: its `.fn` block from dtk's split asm
                (build/GV4E69/asm/<unit>.s), assembled with build/binutils/powerpc-eabi-as.
-  base.c       the unit (or --source) preprocessed by the unit's own compiler and cflags
-               from build.ninja (MWCC for the Dolphin SDK, ProDG ngccc otherwise), cut down
-               the way the permuter will cut it: the target and `inline` functions keep
-               their bodies, the rest become prototypes. Helpers the compiler inlined on
-               its own (found from full.c's code: called in the source, no `bl`) are
-               marked `inline` so they survive, and setup warns if base.c then compiles the
-               function differently from the full unit (full.c). Compiler extensions
-               pycparser can't read (__declspec, __attribute__, asm functions) are removed
-               from the other declarations.
-  compile.sh   compiles a candidate the same way.
+  base.c       C for the permuter to parse and mutate.
+               C unit: the unit preprocessed by its own compiler and cflags (MWCC for
+               the Dolphin SDK, ProDG ngccc otherwise), cut down the way the permuter cuts
+               it: the target and `inline` functions keep their bodies, the rest become
+               prototypes. Helpers the compiler inlined on its own (found from full.c's
+               code: called in the source, no `bl`) are marked `inline` so they survive.
+               C++ unit: the function plus only the declarations it uses, flattened to C
+               by cxx2c.py (records keep their data members, references become pointers,
+               ...); declarations pycparser still rejects are dropped one by one.
+               Either way, compiler extensions pycparser can't read (__declspec,
+               __attribute__, asm functions) are removed from the other declarations.
+  compile.sh   C unit: the unit's compiler and cflags on the candidate.
+               C++ unit: `permute.py --splice` puts the candidate's function body back
+               into the original preprocessed unit (orig.cpp) and compiles that with g++,
+               so codegen and (mangled) symbol names are exactly the real build's.
   settings.toml  names the function and an objdump that disassembles only that
-               function (--disassemble=<function>), so the rest of base.c is not scored.
+               function (--disassemble=<function>), so the rest of the object is not scored.
+Setup compiles base.c through compile.sh and compares the function with the real unit's
+code. A C++ unit is refused when they differ (--force overrides); a C unit gets a warning.
+Refusals name the reason: methods and g++ named return values (`) return r`) have no
+plain definition to splice, and some bodies use C++ the C parser cannot read.
 Then it runs the permuter for --minutes, stops it, and lists the best candidates
 (DIR/output-<score>-<n>/source.c; lower is better, 0 is a match).
 
@@ -36,9 +44,12 @@ The permuter itself is not vendored. It lives in its own clone and venv:
                 (github.com/simonlindholm/decomp-permuter)
   PERMUTER_PY   default C:\\Users\\Patrick Taylor\\tools-ext\\permuter-venv\\Scripts\\python.exe
                 (pip install toml Levenshtein)
-Its `cpp` step uses ProDG's CPP.exe; it needs Git for Windows' bash on PATH.
+Its `cpp` step uses ProDG's CPP.exe; it needs Git for Windows' bash on PATH. About 5% of
+its mutations fail on C99 `for (int i ...)` declarations (a permuter limitation); it skips
+those and goes on.
 """
 import argparse
+import json
 import os
 import re
 import shlex
@@ -51,6 +62,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from score_variants import EXE, ROOT, VERSION, ninja_vars  # noqa: E402
+from cxx2c import base_name, cxx_to_c, definition_body, is_definition_of, needed_only, segments  # noqa: E402
 
 PERMUTER_DIR = Path(os.environ.get("PERMUTER_DIR", r"C:\Users\Patrick Taylor\tools-ext\permuter"))
 PERMUTER_PY = Path(os.environ.get("PERMUTER_PY", r"C:\Users\Patrick Taylor\tools-ext\permuter-venv\Scripts\python.exe"))
@@ -186,6 +198,11 @@ def compile_fn(cc, cflags, env, src, obj, fn):
                        text=True, encoding="utf-8", errors="replace")
     if r.returncode:
         sys.exit(f"compiling {src} failed:\n{(r.stdout + r.stderr)[-2000:]}")
+    return disasm(obj, fn)
+
+
+def disasm(obj, fn):
+    """(rows of fn as (bytes, mnemonic), names it calls with bl) from an object."""
     out = subprocess.run([str(BINUTILS / f"powerpc-eabi-objdump{EXE}"), "-dr", f"--disassemble={fn}", str(obj)],
                          capture_output=True, text=True).stdout
     rows, calls = [], set()
@@ -218,10 +235,12 @@ def prune(text, fn, keep_inline):
 def setup(a):
     unit = a.unit.replace("\\", "/").removeprefix("src/").removesuffix(".cpp").removesuffix(".c")
     src = Path(a.source).resolve() if a.source else ROOT / "src" / f"{unit}.c"
+    if not a.source and not src.exists() and (ROOT / "src" / f"{unit}.cpp").exists():
+        src = ROOT / "src" / f"{unit}.cpp"
     if not src.exists():
-        cpp = ROOT / "src" / f"{unit}.cpp"
-        sys.exit(f"{src} does not exist" + (f"; {cpp.name} is C++, which the permuter cannot parse: "
-                                             "pass --source with a C extraction" if cpp.exists() else ""))
+        sys.exit(f"{src} does not exist")
+    cxx = src.suffix == ".cpp"
+    cname = base_name(a.function) if cxx else a.function  # the function's name in the C
     for p in (PERMUTER_DIR / "permuter.py", PERMUTER_PY, PRODG / f"CPP{EXE}", BINUTILS / f"powerpc-eabi-as{EXE}"):
         if not p.exists():
             sys.exit(f"missing {p}" + (" (run `ninja build/binutils`)" if "binutils" in str(p) else ""))
@@ -231,7 +250,7 @@ def setup(a):
     v = ninja_vars(unit)
     cc, env = compiler(v)
     cflags = shlex.split(v["cflags"])
-    d = Path(a.dir).resolve() if a.dir else ROOT / "build" / "permute" / a.function
+    d = Path(a.dir).resolve() if a.dir else ROOT / "build" / "permute" / cname
     if d.exists():
         shutil.rmtree(d)
     d.mkdir(parents=True)
@@ -246,15 +265,41 @@ def setup(a):
                        encoding="utf-8", errors="replace")
     if r.returncode or not r.stdout.strip():
         sys.exit(f"preprocessing {src} failed:\n{r.stderr[-2000:]}")
-    base = re.sub(r"^\s*#\s*(line\s+)?\d+.*$", "", r.stdout, flags=re.M)  # line markers
-    full = for_pycparser(base, a.function)
+    pre = re.sub(r"^\s*#\s*(line\s+)?\d+.*$", "", r.stdout, flags=re.M)  # line markers
+    if cxx and definition_body(pre, a.function):
+        cname = a.function  # the source spells the (mangled) name out itself
+    if cxx:
+        want = setup_cxx(a, d, cc, cflags, env, pre, cname)
+    else:
+        want = setup_c(a, d, cc, cflags, env, v, pre)
+    got, _ = disasm(d / "base.o", a.function)
+    diff = sum(x != y for x, y in zip(want, got)) + abs(len(want) - len(got))
+    if diff and cxx and not a.force:
+        sys.exit(f"REFUSED: base.c compiles {a.function} differently from the C++ unit ({diff} instruction "
+                 f"slots), so the permuter would chase the wrong code. Compare {d / 'base.c'} with the "
+                 "source, or pass --force to run anyway.")
+    if diff:
+        print(f"WARNING: base.c compiles {a.function} differently from the real unit "
+              f"({diff} instruction slots); scores are offset from the real build")
+    kind = "gcc" if "SN_NGC_PATH" in env else "mwcc"
+    objdump = (BINUTILS / f"powerpc-eabi-objdump{EXE}").as_posix()
+    (d / "settings.toml").write_text(
+        f'func_name = "{cname}"\ncompiler_type = "{kind}"\n'
+        f"objdump_command = '\"{objdump}\" -dr --disassemble={a.function} -EB -mpowerpc -M broadway'\n",
+        encoding="utf-8")
+    return d
+
+
+def setup_c(a, d, cc, cflags, env, v, pre):
+    """C unit: base.c is the unit itself, trimmed; compile.sh runs the unit's compiler on it."""
+    full = for_pycparser(pre, a.function)
     defs = definitions(full)
     if a.function not in defs:
-        sys.exit(f"{a.function} has no body in {src}")
+        sys.exit(f"{a.function} has no body in the unit")
     # The permuter keeps only the target's body and `inline` ones. Helpers the compiler
     # inlined on its own (MWCC -inline auto, static functions) must stay inline, or the
     # target compiles to calls: find them from the full unit's code (called in the source,
-    # but no `bl` to them), mark them inline, and check the result compiles the same.
+    # but no `bl` to them), mark them inline; setup() then checks base.c compiles the same.
     (d / "full.c").write_text(full, encoding="utf-8")
     want, calls = compile_fn(cc, cflags, env, d / "full.c", d / "full.o", a.function)
     inline, todo = set(), [a.function]
@@ -263,15 +308,8 @@ def setup(a):
         for name in called(full[b:e]) & defs.keys() - calls - inline - {a.function}:
             inline.add(name)
             todo.append(name)
-    base = prune(full, a.function, inline)
-    (d / "base.c").write_text(base, encoding="utf-8")
-    got, _ = compile_fn(cc, cflags, env, d / "base.c", d / "base.o", a.function)
-    diff = sum(x != y for x, y in zip(want, got)) + abs(len(want) - len(got))
     print(f"inlined helpers kept: {', '.join(sorted(inline)) or 'none'}")
-    if diff:
-        print(f"WARNING: pruned base.c compiles {a.function} differently from the full unit "
-              f"({diff} instruction slots); scores are offset from the real build")
-
+    (d / "base.c").write_text(prune(full, a.function, inline), encoding="utf-8")
     # compile.sh runs under Git Bash: $1 = candidate .c, $3 = output .o.
     sn = f"export SN_NGC_PATH={shlex.quote(env['SN_NGC_PATH'])}\n" if "SN_NGC_PATH" in env else ""
     (d / "compile.sh").write_text(
@@ -281,13 +319,88 @@ def setup(a):
         f"cd {shlex.quote(ROOT.as_posix())}\n"
         f"exec {shlex.quote(Path(cc[0]).as_posix())} {v['cflags']} -c \"$1\" -o \"$3\"\n",
         encoding="utf-8", newline="\n")
-    kind = "gcc" if "SN_NGC_PATH" in env else "mwcc"
-    objdump = (BINUTILS / f"powerpc-eabi-objdump{EXE}").as_posix()
-    (d / "settings.toml").write_text(
-        f'func_name = "{a.function}"\ncompiler_type = "{kind}"\n'
-        f"objdump_command = '\"{objdump}\" -dr --disassemble={a.function} -EB -mpowerpc -M broadway'\n",
-        encoding="utf-8")
-    return d
+    compile_fn(cc, cflags, env, d / "base.c", d / "base.o", a.function)
+    return want
+
+
+def setup_cxx(a, d, cc, cflags, env, pre, cname):
+    """C++ unit: base.c is a C rendering of the function and what it uses, for the permuter
+    to parse and mutate. compile.sh splices the candidate's body back into the original
+    preprocessed unit (orig.cpp) and compiles that with g++, so codegen and symbol names
+    are exactly the real build's."""
+    if definition_body(pre, cname) is None:
+        sys.exit(f"REFUSED: no plain `{cname}(...) {{` definition in the unit "
+                 "(a method, or a g++ named return value `) return r`?)")
+    (d / "orig.cpp").write_text(pre, encoding="utf-8")
+    want, _ = compile_fn(cc, cflags, env, d / "orig.cpp", d / "orig.o", a.function)
+    if not want:
+        sys.exit(f"{a.function} is not in the unit's object")
+    base = needed_only(for_pycparser(cxx_to_c(pre), cname), cname)
+    if base is None:
+        sys.exit(f"REFUSED: {cname}'s definition did not survive the C rewrite")
+    base = parse_clean(base, cname, d)
+    (d / "base.c").write_text(base, encoding="utf-8")
+    (d / "splice.json").write_text(json.dumps({"cc": cc, "cflags": cflags, "env": {
+        k: env[k] for k in ("SN_NGC_PATH",) if k in env}, "fn": cname}), encoding="utf-8")
+    (d / "compile.sh").write_text(
+        "#!/bin/bash\n"
+        "# Written by tools/match/permute.py: splice the candidate's body into orig.cpp, compile with g++.\n"
+        f"exec {shlex.quote(Path(sys.executable).as_posix())} {shlex.quote(Path(__file__).resolve().as_posix())} "
+        f"--splice {shlex.quote(d.as_posix())} \"$1\" \"$3\"\n",
+        encoding="utf-8", newline="\n")
+    r = subprocess.run(["bash", str(d / "compile.sh"), str(d / "base.c"), "-o", str(d / "base.o")],
+                       capture_output=True, text=True)
+    if r.returncode:
+        sys.exit(f"REFUSED: base.c's body does not compile inside the unit:\n{(r.stdout + r.stderr)[-1500:]}")
+    print(f"base.c: {base.count(chr(10))} lines of C (the function and what it uses)")
+    return want
+
+
+def parse_clean(base, fn, d, tries=200):
+    """Drop declarations the permuter's pycparser rejects, until base.c parses; never fn."""
+    check = d / "parse_check.py"
+    check.write_text(
+        "import re, sys\n"
+        f"sys.path.insert(0, {str(PERMUTER_DIR)!r})\n"
+        "from src.ast_util import parse_c\n"
+        "try:\n"
+        "    parse_c(open(sys.argv[1], encoding='utf-8').read())\n"
+        "    print('OK')\n"
+        "except Exception as e:\n"
+        "    m = re.search(r'line (\\d+)', str(e))\n"
+        "    print('ERR', m.group(1) if m else 0, ' '.join(str(e).split())[:300])\n", encoding="utf-8")
+    tmp = d / "parse_tmp.c"
+    for _ in range(tries):
+        tmp.write_text(base, encoding="utf-8")
+        out = subprocess.run([str(PERMUTER_PY), str(check), str(tmp)], capture_output=True, text=True).stdout.strip()
+        if out == "OK":
+            return base
+        _, line, msg = (out.split(" ", 2) + ["", ""])[:3]
+        off = sum(len(x) + 1 for x in base.split("\n")[:max(0, int(line) - 1)])
+        seg = next(((s, e) for s, e in segments(base) if s <= off < e), None)
+        if seg is None or is_definition_of(base[seg[0]:seg[1]], fn):
+            sys.exit(f"REFUSED: the permuter's C parser rejects {fn} itself: {msg}")
+        base = base[:seg[0]] + base[seg[1]:]
+    sys.exit("REFUSED: base.c still does not parse after dropping declarations")
+
+
+def splice_compile(d, cand, out):
+    """compile.sh for C++ units: candidate body -> orig.cpp -> g++ -> out."""
+    d = Path(d)
+    cfg = json.loads((d / "splice.json").read_text(encoding="utf-8"))
+    orig = (d / "orig.cpp").read_text(encoding="utf-8")
+    c = Path(cand).read_text(encoding="utf-8")
+    ob, cb = definition_body(orig, cfg["fn"]), definition_body(c, cfg["fn"])
+    if not ob or not cb:
+        return 1
+    cpp = Path(out + ".cpp")
+    cpp.write_text(orig[:ob[0]] + c[cb[0]:cb[1]] + orig[ob[1]:], encoding="utf-8")
+    try:
+        r = subprocess.run([*cfg["cc"], *cfg["cflags"], "-c", str(cpp), "-o", out], cwd=ROOT,
+                           env=dict(os.environ, **cfg["env"]))
+    finally:
+        cpp.unlink(missing_ok=True)
+    return r.returncode
 
 
 def run(d, a):
@@ -321,6 +434,8 @@ def run(d, a):
 
 
 def main():
+    if sys.argv[1:2] == ["--splice"]:  # called by a C++ unit's compile.sh: DIR CAND.c -o OUT.o
+        sys.exit(splice_compile(sys.argv[2], sys.argv[3], sys.argv[4]))
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("unit")
     ap.add_argument("function")
@@ -330,6 +445,7 @@ def main():
     ap.add_argument("--dir", help="scratch directory (default build/permute/<function>)")
     ap.add_argument("--setup-only", action="store_true", help="write the directory, don't run")
     ap.add_argument("--show-errors", action="store_true", help="pass --show-errors to the permuter")
+    ap.add_argument("--force", action="store_true", help="run even if a C++ unit's C rewrite compiles differently")
     a = ap.parse_args()
     t = time.time()
     d = setup(a)
