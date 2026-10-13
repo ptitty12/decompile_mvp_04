@@ -2255,6 +2255,7 @@ libm/s_floor.cpp:
 
 libm/s_sin.c:
 	.text       start:0x80410790 end:0x80410870
+	.sdata      start:0x806EED88 end:0x806EED90
 
 libm/ef_acos.cpp:
 	.text       start:0x80410870 end:0x80410ABC
