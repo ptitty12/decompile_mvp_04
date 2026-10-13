@@ -225,7 +225,6 @@ DB_OVERLAY int fn_8053F268(C30* c)
 }
 
 C30* fn_8053EA68(C30* c, int k, int a, int b, float* f);
-/* near-miss: 98.7%; instructions identical, only the callee-saved register numbers differ (retail: c=r31, &t=r27, k=r29; ours c=r27, &t=r31) */
 DB_OVERLAY void fn_8053F79C(C30* c)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
@@ -280,7 +279,7 @@ DB_OVERLAY void fn_8053F79C(C30* c)
     }
     fn_8053FCC4(c, 3, fn_8053E9E8(c, (int)&t, 1, 0));
     fn_8053FCC4(c, 0, fn_8053E96C(c, (int)&t, 1, 0));
-    t.vp = lbl_8064A550;
+    q->vp = lbl_8064A550;
 }
 
 DB_OVERLAY void fn_8053FAD4(C30* c)
