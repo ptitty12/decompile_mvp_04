@@ -214,7 +214,6 @@ int fn_80048294(Unk8004763C* t, int idx)
     return r;
 }
 
-/* near-miss: 1 slot differs (lwzx r4,r9,r27 vs r4,r27,r9 operand order for the lbl_805B0A95+0x23 word) */
 int fn_8004838C(Unk8004763C* t, int idx)
 {
     int sp8 = 0;
@@ -229,12 +228,15 @@ int fn_8004838C(Unk8004763C* t, int idx)
         if (sp8 <= 0 || buf == 0) {
             t->mSlots[idx].m0 = 0;
             t->mSlots[idx].mC = 0;
-        } else if (fn_80395250(buf, *(int*)(lbl_805B0A95 + 0x23 + off)) <= 0) {
-            t->mSlots[idx].m0 = 0;
-            fn_803EDA0C((void*)t->mSlots[idx].mC);
-            t->mSlots[idx].mC = 0;
         } else {
-            r = 1;
+            char* q = lbl_805B0A95 + 0x23;
+            if (fn_80395250(buf, *(int*)(q + off)) <= 0) {
+                t->mSlots[idx].m0 = 0;
+                fn_803EDA0C((void*)t->mSlots[idx].mC);
+                t->mSlots[idx].mC = 0;
+            } else {
+                r = 1;
+            }
         }
     }
     return r;
