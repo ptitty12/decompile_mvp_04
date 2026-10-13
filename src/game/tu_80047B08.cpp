@@ -78,20 +78,17 @@ void fn_80047CA4(Unk8004763C* t)
     t->mF8 = 0;
 }
 
-/* near-miss: same loop shape as fn_80047958 (li r9,0 / addi r11 order) */
 void fn_80047D40(Unk8004763C* t, int idx)
 {
     if (t->mF4 == 1) {
-        int* a = t->mBE0;
-        int off = idx * 4;
-        if (*(int*)((char*)a + off) >= 0) {
+        if (t->mBE0[idx] >= 0) {
             fn_80392708();
-            *(int*)((char*)a + off) = -1;
+            t->mBE0[idx] = -1;
             t->mC00 = -1;
             int k;
             for (k = 0; k < 8; k++) {
-                if (a[k] >= 0) {
-                    t->mC00 = a[k];
+                if (t->mBE0[k] >= 0) {
+                    t->mC00 = t->mBE0[k];
                     break;
                 }
             }
