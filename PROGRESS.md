@@ -145,4 +145,16 @@
   - Functions per hour fell, because the remaining functions average about 860 B against about 140 B for matched ones.
   - The near-miss share of commits rose from about 4% at 18:00 to 40-60% after 21:00.
 - Owner question added to DECISIONS: the GitHub repo is public.
+- Later the same evening (owner approved tool downloads; lead request):
+  - Added `tools/match/permute.py` and `tools/match/cxx2c.py`, which run decomp-permuter on one near-miss.
+    - decomp-permuter lives at github.com/simonlindholm/decomp-permuter @8556c81, cloned in tools-ext. Its venv has toml and Levenshtein.
+    - C units run on the trimmed unit.
+    - C++ units run on a C rendering. Each candidate's body is spliced back into the original unit and compiled with g++.
+    - Setup refuses any function whose base does not compile to the unit's own code.
+  - Coverage: 51 of 60 random C++ near-misses at >= 95% set up. The refusals were constructors, static initializers and bodies the C parser can't read.
+  - The lead runs a near-miss batch (queue nm_00) with it.
+  - Verify: PASS at e2f3bda2 and 7dce9440.
+  - Owner decisions passed on, not decided here:
+    - extra usage (a cost decision);
+    - a verify rule that keys regressions by address (behind the verifier lock).
 
