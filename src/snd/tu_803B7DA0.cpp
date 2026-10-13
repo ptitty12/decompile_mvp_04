@@ -7,6 +7,7 @@
  */
 #include "csis/csis_internal.h"
 #include <cstring>
+#include "snd/sndo.h"
 
 using namespace Csis;
 
@@ -34,10 +35,13 @@ struct SndStream {
     int m4;
     int m8;
     int mC;
-    char pad10[0x88];
+    float* m10;
+    char pad14[0x80];
+    int m94;
     float m98;
     float m9C;
     void* mA0;
+    float* mA4;
 };
 
 /* 0xD68-byte decoder object (fn_803B9448 initialises it). The first 0xC bytes are the bit
@@ -70,6 +74,114 @@ extern unsigned lbl_80626940[];
 extern void* (*lbl_806AA884)();
 extern void (*lbl_806AA888)();
 
+/* ADPCM-style block decoder state: m0 samples left, m4/m8 history, mC byte cursor, m10 output (history at m10[-2], m10[-1]). */
+struct SndRdU16 {
+    int m0;
+    float m4;
+    float m8;
+    unsigned char* mC;
+    float* m10;
+};
+
+extern float lbl_80626520[8];
+extern float lbl_80626540[256];
+extern "C" void fn_803B7FA8(SndRdU16* a);
+
+struct Unk803B7DA0_Parser {
+    unsigned char* m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+};
+
+extern "C" int fn_803B4074(Unk803B7DA0_Parser* s);
+extern unsigned short lbl_8069CA54[6][6];
+
+/* Reads the tagged header of a sample stream: ids 0..0x2A and 0x80..0xAD fill two int tables each, id 0x14 collects user-data blobs, 0xFE ends. The break is written as "if (id != 0xFE) continue; break;" to get retail's bne-over-b pair. */
+extern "C" void fn_803B7DA0(int unused, unsigned char* pdata, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa, SNDSAMPLEDESC* pssd)
+{
+    int hdrA[0x2B];
+    int hdrB[0x2B];
+    int hdrC[0x2E];
+    int hdrD[0x2E];
+    Unk803B7DA0_Parser p;
+    int nuser = 0;
+    int i;
+    memset(pssf, 0, 4);
+    memset(pssa, 0, 0x68);
+    memset(pssd, 0, 0x1C);
+    SND_attrsetdef(pssa);
+    p.m0 = pdata + 8;
+    for (i = 0; i <= 0x2A; i++)
+        hdrB[i] = 0;
+    for (i = 0; i <= 0x2D; i++)
+        hdrD[i] = 0;
+    hdrC[2] = 1;
+    hdrC[4] = 0xBB80;
+    hdrC[5] = 0;
+    hdrC[0x20] = 10;
+    while (fn_803B4074(&p)) {
+        if (p.m4 <= 0x2A) {
+            hdrA[p.m4] = p.m8;
+            hdrB[p.m4] = p.mC;
+            if (p.m4 == 0x14) {
+                pssa->puserdata[nuser] = (void*)p.mC;
+                pssa->userdatasize[nuser] = p.m10;
+                nuser++;
+            }
+        } else {
+            unsigned k = p.m4 - 0x80;
+            if (k > 0x2D) {
+                if (p.m4 != 0xFE)
+                    continue;
+                break;
+            } else {
+                hdrC[k] = p.m8;
+                hdrD[p.m4 - 0x80] = p.mC;
+            }
+        }
+    }
+    pssf->channels = hdrC[2];
+    pssf->samplerep = hdrC[0x20];
+    pssf->samplerate = hdrC[4];
+    pssd->totalframes = hdrC[5];
+    pssa->rendermode = 4;
+    pssa->platformver = 3;
+    for (i = 0; i < pssf->channels; i++)
+        pssa->azimuth[i] = lbl_8069CA54[pssf->channels - 1][i];
+}
+
+extern "C" void fn_803B80C4(SndRdU16* s)
+{
+    unsigned char* p = s->mC;
+    s->m10[-2] = s->m8;
+    s->m10[-1] = s->m4;
+    for (; s->m0 > 0; p = s->mC) {
+        if (*p == 0xEE) {
+            fn_803B7FA8(s);
+            s->m0 -= 0x1C;
+        } else {
+            int i;
+            char* tb = (char*)lbl_80626540;
+            int k = (*s->mC >> 2) & 0x3C;
+            s->m0 -= 0x1C;
+            float c0 = *(float*)((char*)lbl_80626520 + k);
+            float c1 = *(float*)((char*)lbl_80626520 + 0x10 + k);
+            int row = (*s->mC++ << 6) & 0x3C0;
+            for (i = 0; i < 14; i++) {
+                unsigned char b = s->mC[i];
+                s->m10[0] = s->m10[-2] * c1 + (s->m10[-1] * c0 + *(float*)(tb + (((b >> 2) & 0x3C) + row)));
+                s->m10[1] = s->m10[-1] * c1 + (s->m10[0] * c0 + *(float*)(tb + (((b << 2) & 0x3C) + row)));
+                s->m10 += 2;
+            }
+            s->mC += 14;
+            s->m8 = s->m10[-2];
+            s->m4 = s->m10[-1];
+        }
+    }
+}
+
 extern "C" void* fn_803B8214()
 {
     return lbl_806AA884();
@@ -100,6 +212,59 @@ extern "C" int fn_803B8294(SndStream* o, void* data, int bytes, int cnt)
     o->mC = bytes;
     o->mA0 = data;
     return 0;
+}
+
+extern "C" int fn_803B82D0(SndStream* o, float** pout, int want)
+{
+    int total = 0;
+    int j;
+    o->mA4 = *pout;
+    if (o->m8 == 0)
+        return 0;
+    int n = o->m8;
+    if (n > want)
+        n = want;
+    if (o->m4 != 0) {
+        int k;
+        if (o->m4 <= n)
+            k = o->m4;
+        else
+            k = n;
+        for (j = 0; j < k; j++) {
+            *o->mA4 = *o->m10;
+            o->mA4++;
+            o->m10++;
+        }
+        n -= k;
+        o->m8 -= k;
+        o->m4 -= k;
+        total = k;
+    }
+    int blocks = n / 28 * 28;
+    int rem = n - blocks;
+    o->m94 = blocks;
+    if (blocks > 0) {
+        total += blocks;
+        fn_803B80C4((SndRdU16*)&o->m94);
+        o->m8 -= blocks;
+    }
+    if (rem > 0) {
+        float* dst = o->mA4;
+        o->m94 = rem;
+        o->mA4 = (float*)((char*)o + 0x24);
+        j = 0;
+        fn_803B80C4((SndRdU16*)&o->m94);
+        o->m8 -= rem;
+        o->m10 = o->mA4 + o->m94;
+        o->m4 = -o->m94;
+        o->mA4 = o->mA4 - 28;
+        for (; j < rem; j++)
+            dst[j] = o->mA4[j];
+        total += rem;
+    }
+    if (o->m8 <= 0)
+        o->m4 = 0;
+    return total;
 }
 
 extern "C" SndPair fn_803B8488(SndStream* o)

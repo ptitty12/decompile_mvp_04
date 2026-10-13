@@ -98,9 +98,13 @@ struct Unk8069E200_RecB {
 
 struct Unk8069E200 {
     Unk8069E200_RecA recA[0x30];
-    char padC00[0x1410 - 0xC00];
+    char padC00[0x1400 - 0xC00];
+    float m1400;
+    char pad1404[0xC];
     void* mVoices[16];
-    char pad1450[0x9DE8 - 0x1450];
+    char pad1450[0x1AC0 - 0x1450];
+    int m1AC0;
+    char pad1AC4[0x9DE8 - 0x1AC4];
     int m9DE8;
     int m9DEC;
     char pad9DF0[0x9E30 - 0x9DF0];
@@ -659,6 +663,114 @@ extern "C" void fn_803AEF88()
         SNDMEMI_free(lbl_8069E200.mBufs[i]);
     fn_803A979C();
     lbl_806AA4CC();
+}
+
+extern "C" void fn_803A94BC();
+extern "C" void fn_803A9450();
+extern "C" void fn_804382CC(void* p);
+extern void (*lbl_806AA4D0)(void*, int);
+extern char lbl_806AA268[];
+extern float lbl_80625C6C;
+extern int lbl_8069CAD4;
+
+/* Packet-fed voice: per-channel packet pointers (m25C4), 0x600-byte DMA buffers (mBuf), counters. */
+struct Unk803AF014_Voice {
+    char pad0[0x2580];
+    int mBuf[6];
+    signed char m2598;
+    unsigned char m2599;
+    char pad259A[2];
+    int m259C[6];
+    char pad25B4[4];
+    unsigned short m25B8[6];
+    int m25C4[6];
+    int m25DC;
+    int m25E0;
+};
+
+struct Unk803AF014_Chan {
+    char pad0[0x23];
+    unsigned char numchan;
+};
+
+extern "C" void fn_80432FD4(int a, int b);
+
+extern "C" void fn_803AF014(int h, Unk803AF014_Voice* s, Unk803AF014_Chan* c)
+{
+    int sp8[6];
+    int sp20, sp24;
+    int remaining = 0x600;
+    int i;
+    do {
+        int n, next;
+        if (s->m25C4[0] == 0) {
+            for (i = 0; i < c->numchan; i++)
+                s->m25C4[i] = (int)SNDPKTPLAYI_get(h, i, &sp20, &sp24);
+            s->m25E0 = 0;
+            s->m25DC = sp20 << 1;
+        }
+        n = remaining;
+        if (s->m25C4[0] != 0) {
+            int avail = s->m25DC - s->m25E0;
+            if (avail <= 0) {
+                s->m25C4[0] = 0;
+                continue;
+            }
+            if (remaining > avail)
+                n = avail;
+            next = remaining - n;
+            s->m25B8[s->m2599] += n >> 1;
+            for (i = 0; i < c->numchan; i++)
+                sp8[i] = s->m25C4[i] + s->m25E0;
+            s->m25E0 += n;
+        } else {
+            next = 0;
+            for (i = 0; i < c->numchan; i++)
+                sp8[i] = lbl_8069E200.m1AC0;
+        }
+        for (i = 0; i < c->numchan; i++) {
+            char* bp = (char*)s->mBuf[i] + 0x600;
+            Snd::Util::MemCpy(bp - remaining, (void*)sp8[i], n);
+        }
+        remaining = next;
+    } while (remaining > 0);
+    for (i = 0; i < c->numchan; i++) {
+        fn_80432FD4(s->mBuf[i], 0x600);
+        fn_803AEB50(1, s->mBuf[i], s->m259C[i] + s->m2599 * 3 * 0x200, 0x600, -1);
+    }
+}
+
+/* SND server loop; the lbl_8069CAD4 store goes through a local pointer, as in retail. */
+extern "C" void fn_803AF238()
+{
+    for (;;) {
+        ((void (*)())lbl_8062520C)();
+        if (sndgs.profileenter != 0)
+            sndgs.profileenter();
+        if (lbl_8069E200.mC048 != 0) {
+            lbl_806AA4D0(lbl_806AA268, 0xA0);
+            SNDPKTPLAYI_flushcallbackdata();
+        }
+        if (lbl_80625C68 & 1) {
+            fn_803A94BC();
+            int* pq = &lbl_8069CAD4;
+            lbl_80625C6C = lbl_80625C6C + lbl_8069E200.m1400;
+            float t = lbl_80625C6C;
+            int iv;
+            if (!(t < 0.0f))
+                iv = (int)(t + 0.5f);
+            else
+                iv = (int)(t - 0.5f);
+            *pq = iv;
+            if (!(lbl_80625C6C <= 30.0f))
+                lbl_80625C6C -= 30.0f;
+            fn_803A9450();
+        }
+        if (sndgs.profileleave != 0)
+            sndgs.profileleave();
+        ((void (*)())lbl_80625210)();
+        fn_804382CC(lbl_8069FFE0);
+    }
 }
 
 extern "C" int fn_803AF374()

@@ -618,6 +618,58 @@ extern "C" void fn_803B5B1C(unsigned int* a, unsigned int* b)
         *b = lbl_806AA88C.m8 - *a;
 }
 
+/* near-miss (99.3%): 113 insns, same flow, only the loop-body temporaries differ (retail off=r8 arr=r10, ours off=r7 arr=r8); address-form, declaration-order and pointer-vs-indexed variants tried */
+extern "C" int fn_803B5B6C(int size)
+{
+    int sp8, spC;
+    int i = 0;
+    if (!(lbl_806AA88C.m0 < lbl_806AA88C.m2))
+        return 0;
+    size += 0x1F;
+    size >>= 5;
+    if (lbl_806AA88C.m0 == 0) {
+        sp8 = lbl_806AA88C.m4;
+        spC = lbl_806AA88C.m8 - lbl_806AA88C.m4;
+        fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+        if (size > spC)
+            return 0;
+        goto insert;
+    }
+    for (; i < lbl_806AA88C.m0; i++) {
+        int off = i << 3;
+        char* a = (char*)lbl_806AA88C.mC;
+        if (i == 0) {
+            sp8 = lbl_806AA88C.m4;
+            spC = *(int*)(a + off) - sp8;
+        } else {
+            int po = off - 8;
+            sp8 = *(int*)(a + po) + *(int*)(a + po + 4);
+            spC = *(int*)(a + off) - sp8;
+        }
+        fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+        if (size <= spC) {
+            int k;
+            for (k = lbl_806AA88C.m0; k > i; k--)
+                lbl_806AA88C.mC[k] = lbl_806AA88C.mC[k - 1];
+            goto insert;
+        }
+    }
+    {
+        Unk806AA88C_Entry* e = &lbl_806AA88C.mC[i - 1];
+        sp8 = e->m0 + e->m4;
+        spC = lbl_806AA88C.m8 - sp8;
+    }
+    fn_803B5B1C((unsigned int*)&sp8, (unsigned int*)&spC);
+    if (size > spC)
+        return 0;
+insert:
+    Unk806AA88C_Entry* e = &lbl_806AA88C.mC[i];
+    e->m0 = sp8;
+    e->m4 = size;
+    lbl_806AA88C.m0++;
+    return sp8 << 5;
+}
+
 extern "C" void fn_803B5D30(unsigned int addr)
 {
     unsigned int key = addr >> 5;

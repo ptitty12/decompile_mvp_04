@@ -394,6 +394,43 @@ extern "C" int fn_803B2F48(Unk803B3334* o, int count)
     return 0;
 }
 
+/* the loop test reads m30 through an accessor (retail copies the loaded value) */
+static inline int A30(Unk803B3334* o) { return o->m30; }
+extern "C" int fn_803B306C(Unk803B3334* o, int count, float* src, float* dst)
+{
+    int sp8 = count;
+    float* sp10 = src;
+    char* spC = (char*)dst;
+    int total = fn_803B2EAC(o, &sp8, &spC);
+    if (sp8 == 0)
+        return total;
+    int last = 0;
+    while (sp8 > 0 && A30(o) >= o->m2C) {
+        if (o->m30 < o->m2C * 2)
+            last = 0;
+        else
+            last = fn_803B2C0C(o->m2C, &o->m1C, &o->m28, o->m24);
+        fn_803B2D58(o, &sp10, last);
+        total += fn_803B2EAC(o, &sp8, &spC);
+    }
+    if (last > 0) {
+        Snd::Util::MemCpy((char*)o + 0x40, sp10, o->m2C * 4);
+        o->m34 = o->m2C;
+        sp10 += o->m2C;
+    }
+    if (sp8 > 0) {
+        int n;
+        if (sp8 > o->m30)
+            n = o->m30;
+        else
+            n = sp8;
+        total += n;
+        Snd::Util::MemCpy(spC, sp10, n * 4);
+        o->m30 -= n;
+    }
+    return total;
+}
+
 extern "C" void fn_803B31B4(Unk803B31B4* o, int v)
 {
     o->m24 = v * 0.000244140625f;
@@ -492,6 +529,59 @@ extern "C" void fn_803B39A4()
     if (lbl_806AA4E8 != 0)
         SNDMEMI_free(lbl_806AA4E4);
     fn_803A979C();
+}
+
+extern unsigned char lbl_8069CBBC;
+extern float lbl_8069CBA8[5];
+/* 3D speaker angles per output layout (lbl_8069CBA8) and the source-channel angle table (srcchancfg3d). The stereo pair is stored in both arms, so jump2 merges the identical stores into the shared tail. */
+extern "C" void fn_803B39E4()
+{
+    if (lbl_8069CBBC == 1) {
+        lbl_8069CBC0 = 0;
+        lbl_8069CBA8[0] = 0.0f;
+    } else if (lbl_8069CBBC == 2) {
+        lbl_8069CBC0 = 1;
+        lbl_8069CBA8[0] = 90.0f;
+        lbl_8069CBA8[1] = 270.0f;
+    } else if (lbl_8069CBBC == 4) {
+        lbl_8069CBC0 = 2;
+        lbl_8069CBA8[0] = 45.0f;
+        lbl_8069CBA8[1] = 135.0f;
+        lbl_8069CBA8[2] = 225.0f;
+        lbl_8069CBA8[3] = 315.0f;
+    } else if (lbl_8069CBBC == 6) {
+        lbl_8069CBC0 = 3;
+        lbl_8069CBA8[0] = 0.0f;
+        lbl_8069CBA8[1] = 45.0f;
+        lbl_8069CBA8[2] = 135.0f;
+        lbl_8069CBA8[3] = 225.0f;
+        lbl_8069CBA8[4] = 315.0f;
+    }
+    if (sndgs.sso.set.outputchannels == 2) {
+        sndgs.srcchancfg3d[1][0] = -0x4000;
+        sndgs.srcchancfg3d[1][1] = 0x4000;
+    } else {
+        sndgs.srcchancfg3d[1][0] = -0x2000;
+        sndgs.srcchancfg3d[1][1] = 0x2000;
+    }
+    sndgs.srcchancfg3d[3][0] = -0x2000;
+    sndgs.srcchancfg3d[3][1] = 0x2000;
+    sndgs.srcchancfg3d[3][2] = -0x6000;
+    sndgs.srcchancfg3d[3][3] = 0x6000;
+    sndgs.srcchancfg3d[4][0] = -0x2000;
+    sndgs.srcchancfg3d[4][1] = 0;
+    sndgs.srcchancfg3d[4][2] = 0x2000;
+    sndgs.srcchancfg3d[4][3] = -0x6000;
+    sndgs.srcchancfg3d[4][4] = 0x6000;
+    sndgs.srcchancfg3d[5][1] = 0;
+    sndgs.srcchancfg3d[2][0] = sndgs.sso.set.virtualspkrcfg3d[2][2];
+    sndgs.srcchancfg3d[2][1] = sndgs.sso.set.virtualspkrcfg3d[2][0];
+    sndgs.srcchancfg3d[2][2] = sndgs.sso.set.virtualspkrcfg3d[2][1];
+    sndgs.srcchancfg3d[5][0] = -0x2000;
+    sndgs.srcchancfg3d[5][2] = 0x2000;
+    sndgs.srcchancfg3d[5][3] = -0x6000;
+    sndgs.srcchancfg3d[5][4] = 0x6000;
+    sndgs.srcchancfg3d[5][5] = 0;
 }
 
 extern "C" int fn_803B3B98(int a)
