@@ -572,15 +572,13 @@ extern int lbl_80624410[];
 extern "C" int fn_80394FD4(int a, int b);
 extern "C" int fn_8039582C();
 extern "C" int fn_80391F70(unsigned x, int y);
-extern "C" void fn_80392988();
+extern "C" void fn_80392988(int slot);
 
 inline unsigned char Lo8(int* p)
 {
     return *((unsigned char*)p + 3);
 }
 
-/* near-miss 99.9%: same code; retail loads the slot index (lwz 12(r1)) into r3 and shifts it into r11, ours loads it
- * straight into r11. */
 extern "C" int fn_803920BC(int* arg0)
 {
     int r = 0;
@@ -615,7 +613,7 @@ extern "C" int fn_803920BC(int* arg0)
                         p->m46 = 1;
                         lbl_8069B80C.pos[spC] = ch;
                         if (o->mA & 0x20)
-                            fn_80392988();
+                            fn_80392988(spC);
                         r = 1;
                     }
                 }
