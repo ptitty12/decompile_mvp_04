@@ -439,6 +439,22 @@ extern "C" int fn_803FAD60(int* p)
     return 1;
 }
 
+/* near-miss: 99.1%; retail loads lbl_806EEAAC into r11 and lbl_806EEAA8 into r0, ours swap those temporaries */
+extern "C" void fn_803FADD0(int a, int b)
+{
+    if (b == 0xffff && a != 0) {
+        RcBuf14 s;
+        RcBuf14* sp = &s;
+        memset(sp, 0, 0x14);
+        int x = lbl_806EEAAC;
+        int y = lbl_806EEAA8;
+        s.mC = x;
+        s.m10 = y;
+        s.m0 = 0x14;
+        lbl_806ADE8C = s;
+    }
+}
+
 extern "C" void fn_803FAE68()
 {
     fn_803FADD0(1, 0xffff);
