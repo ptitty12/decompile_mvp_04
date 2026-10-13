@@ -199,3 +199,24 @@ Six imports remain: __builtin_vec_delete, __vn__FUii, fn_80071604__FPv, fn_80071
   startup helper fn_80525670(1,-1) in the preceding split. Source has no global
   object/dynamic initializer that naturally emits that entry. No dummy global,
   constructor attribute, manual section pointer or other hook was introduced.
+
+
+### Continuation source-form sweep (2026-10-13)
+
+- fn_803E910C: root and a worker accidentally overlapped index-expression
+  trials. None removed the r0/r9 scaled-index register difference. Seven root
+  plus eight worker forms are parked; no more source spelling permutations.
+- fn_803E7A60: four older plus four new output-variable/scope/array forms retain
+  four stack-offset differences. sscanf outputs and the following copy/callee
+  addresses match the recorded retail order; build/agent-803e7a60.
+- fn_8053AF9C: seven equivalent loop/control forms retain two compare/backedge
+  differences; fn_80531D84: three counter/index forms; fn_8057D62C: three float
+  evaluation/declaration forms. No exact candidate. build/agent-db.
+- fn_80479A90: declaration/assignment/lifetime forms retain the two global-load
+  slots or worsen registers; fn_804969A8: scaled-index forms retain the mulli/lwzx
+  pair, with later variants exceeding the intended cap. Both parked.
+- fn_80492FB4 already had eight earlier variants; it was not retried.
+- fn_801790BC, fn_80244DC4 and Unk800085B0::vslot22: four small float/spill forms
+  per target, with mangled-symbol/provider types checked; no exact match.
+- fn_8041A55C (Dolphin AX): seven pointer/index/base-expression and lifetime
+  forms retain the five register differences. build/clone-snapshot/build/probe-8041a55c*.
