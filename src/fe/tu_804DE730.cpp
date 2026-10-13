@@ -282,27 +282,27 @@ FE_OVERLAY void fn_804DF460(FeS804DE5F8* x, int a)
 }
 
 /* near-miss: registers/branch layout only (switch and if-else forms tried) */
+extern "C" char* strncpy(char*, const char*, unsigned);
 FE_OVERLAY void fn_804DF4D4(FeS804DE5F8* x, signed char a)
 {
     FeMsg m;
-    FeMsg* mp = &m;
-    switch (a) {
-    case 0:
+    if (a == 0) {
+        FeMsg* mp = &m;
         fn_800D878C__FP13Unk800D876C_A(x->m138);
         fn_8035682C(mp);
-        fn_8040B830(mp->name, lbl_805F5B98, 15);
+        strncpy(mp->name, lbl_805F5B98, 15);
         mp->name[15] = a;
         fn_800B7B4C(FeGetMgr(), mp, x);
         return;
-    case 1:
+    }
+    if (a == 1) {
+        FeMsg* mp = &m;
         fn_8035682C(mp);
-        fn_8040B830(mp->name, lbl_805F98D4, 15);
+        strncpy(mp->name, lbl_805F98D4, 15);
         mp->name[15] = 0;
         fn_800B7B4C(FeGetMgr(), mp, x);
-        return;
     }
 }
-
 FE_OVERLAY void fn_804DF5CC(FeS804DE5F8* x)
 {
     fn_800D878C__FP13Unk800D876C_A(x->m138);
