@@ -334,7 +334,7 @@ extern "C" DB_OVERLAY void fn_80578A60(DbHost* self, int a, int b)
 extern "C" DB_OVERLAY void fn_80578AE8(DbHost* self, int a, int b)
 {
     if (fn_80084954__FPv(b) == 1)
-        fn_80578C80(self, a, b, 0, self->v8(b));
+        fn_80578C80(self, a, b, 0, (int)self->v8(b));
     else
         fn_80574AE4(self, a, b);
 }
