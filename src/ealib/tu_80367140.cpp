@@ -5,13 +5,11 @@
  * node into a global list. The 0x60 + 0x2c pair at the end is the GCC
  * __static_initialization_and_destruction_0 / _GLOBAL_.I wrapper.
  *
- * GXWGFifo (0xCC008000) is an extern symbol: retail has lis 0xcc01 /
- * -0x8000(rX) for it, which gcc 2.95 only produces for a symbol reference (a
- * literal address gives lis/ori and different loop hoisting).
+ * FIFO accesses use the typed page-relative volatile view in ealib/gx_fifo.h.
  */
 
 struct Unk803DA440 {
-    Unk803DA440(void (*fn)(), const void* a, const void* b, const void* c); /* 0x803DA440 */
+    Unk803DA440(void (*fn)(), void* a, void* b, void* c); /* 0x803DA440 */
     char pad[0x14];
 };
 
@@ -21,7 +19,7 @@ union PPCWGPipe {
     unsigned int u32;
     float f32;
 };
-extern volatile PPCWGPipe GXWGFifo;
+#include "../../include/ealib/gx_fifo.h"
 
 struct GXColor {
     unsigned char r, g, b, a;
@@ -136,9 +134,9 @@ extern "C" void fn_80367140(Unk803E3C08* a, Unk8062300C* b)
     void* dl = a->m28;
     int dlsz = a->m2C;
     if (a->mB8) {
-        GXWGFifo.u8 = 0x40;
-        GXWGFifo.u32 = (unsigned int)dl;
-        GXWGFifo.u32 = dlsz;
+        EALIB_GX_FIFO(PPCWGPipe).u8 = 0x40;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
     } else {
         fn_80430124(dl, dlsz);
     }
@@ -211,4 +209,4 @@ extern "C" void fn_803672A0(void* x)
     }
 }
 
-Unk803DA440 lbl_80693CC0((void (*)())fn_803672A0, lbl_80622FB0, lbl_80622FD8, lbl_806032DC);
+Unk803DA440 lbl_80693CC0((void (*)())fn_803672A0, (void*)lbl_80622FB0, (void*)lbl_80622FD8, (void*)lbl_806032DC);
