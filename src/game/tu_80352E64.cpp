@@ -3,6 +3,13 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8034B370.h"
+extern "C" void* memset(void*, int, unsigned int);
+struct Unk80082248_Holder;
+struct Unk80082248_V3;
+void fn_80083838(Unk80082248_Holder*, int, int, int, Unk80082248_V3*);
+void fn_8008388C(Unk80082248_Holder*, int, int, int, Unk80082248_V3*);
+int fn_800838E0(Unk80082248_Holder*, int, int, int, int*);
+
 
 struct DtorAt0 { const void* m; };
 extern char lbl_80649E88[];
@@ -130,14 +137,14 @@ void fn_80353000(Unk8034151C* t)
 bool fn_8035300C(int a, int b, int c, int d, Unk8035300C_V3* out)
 {
     int list[128];
-    fn_8040B320(out, 0, 12);
+    memset(out, 0, 12);
     bool got = false;
-    int n = fn_800838E0(a, b, c, d, list);
+    int n = fn_800838E0((Unk80082248_Holder*)a, b, c, d, list);
     for (int i = 0; i < n; i++) {
         Unk8035300C_V3 tmp;
-        fn_8040B320(&tmp, 0, 12);
+        memset(&tmp, 0, 12);
         if (list[i] != 0) {
-            fn_80083838(a, b, c, list[i], &tmp);
+            fn_80083838((Unk80082248_Holder*)a, b, c, list[i], (Unk80082248_V3*)&tmp);
             out->Add(tmp);
             got |= 1;
         }
@@ -148,14 +155,14 @@ bool fn_8035300C(int a, int b, int c, int d, Unk8035300C_V3* out)
 bool fn_80353110(int a, int b, int c, int d, Unk8035300C_V3* out)
 {
     int list[128];
-    fn_8040B320(out, 0, 12);
+    memset(out, 0, 12);
     bool got = false;
-    int n = fn_800838E0(a, b, c, d, list);
+    int n = fn_800838E0((Unk80082248_Holder*)a, b, c, d, list);
     for (int i = 0; i < n; i++) {
         Unk8035300C_V3 tmp;
-        fn_8040B320(&tmp, 0, 12);
+        memset(&tmp, 0, 12);
         if (list[i] != 0) {
-            fn_8008388C(a, b, c, list[i], &tmp);
+            fn_8008388C((Unk80082248_Holder*)a, b, c, list[i], (Unk80082248_V3*)&tmp);
             out->Add(tmp);
             got |= 1;
         }
@@ -200,6 +207,7 @@ struct Unk80353280_E : Unk80353280_ED { virtual ~Unk80353280_E(); };
 struct Unk80353280 {
     int m0;
     Unk80353280_E m4[16];
+    static void operator delete(void* p) { fn_80377408(p); }
     ~Unk80353280();
 };
 Unk80353280::~Unk80353280()
@@ -251,6 +259,7 @@ struct Unk803533A8_Mid {
 struct Unk803533A8 {
     char pad0[0x18];
     Unk803533A8_Mid m18[4];
+    static void operator delete(void* p) { fn_80377408(p); }
     ~Unk803533A8();
 };
 Unk803533A8::~Unk803533A8()
@@ -262,6 +271,7 @@ struct Unk80353478_E : Unk80353478_ED { virtual ~Unk80353478_E(); };
 struct Unk80353478 {
     int m0;
     Unk80353478_E m4[32];
+    static void operator delete(void* p) { fn_80377408(p); }
     ~Unk80353478();
 };
 Unk80353478::~Unk80353478()
@@ -272,6 +282,7 @@ struct Unk803534F0_ED { char pad[0x1c]; };
 struct Unk803534F0_E : Unk803534F0_ED { virtual ~Unk803534F0_E(); };
 struct Unk803534F0 {
     Unk803534F0_E m0[25];
+    static void operator delete(void* p) { fn_80377408(p); }
     ~Unk803534F0();
 };
 Unk803534F0::~Unk803534F0()
