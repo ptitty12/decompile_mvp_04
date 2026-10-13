@@ -752,7 +752,7 @@ inline float Ratio81(int n, int d)
     return d > 0 ? (float)n / (float)d : 0.0f;
 }
 
-/* near-miss: all insns match except that retail allocates r0 (not r9) for the four lwz temps feeding the fn_8007BB28 sums. */
+/* The second count of each pair is a named local (c1, c2): an inline `h + (int)f()` temp gets r9, the named local r0. */
 extern "C" void fn_80081D88(Y* self)
 {
     Unk8007B2B0_Screen* sc = lbl_8061930C;
@@ -764,14 +764,18 @@ extern "C" void fn_80081D88(Y* self)
     float res = 1.0f;
     if (eq) {
         int h1 = (int)sc->fn_8007BB28(0, id1, 1);
-        int t1 = h1 + (int)sc->fn_8007BB28(1, id1, 1);
+        int c1 = (int)sc->fn_8007BB28(1, id1, 1);
+        int t1 = h1 + c1;
         int h2 = (int)sc->fn_8007BB28(0, id2, 1);
-        int t2 = h2 + (int)sc->fn_8007BB28(1, id2, 1);
+        int c2 = (int)sc->fn_8007BB28(1, id2, 1);
+        int t2 = h2 + c2;
         if (t1 <= 9 || t2 <= 9) {
             h1 = (int)sc->fn_8007BB28(0, id1, 0);
-            t1 = h1 + (int)sc->fn_8007BB28(1, id1, 0);
+            c1 = (int)sc->fn_8007BB28(1, id1, 0);
+            t1 = h1 + c1;
             h2 = (int)sc->fn_8007BB28(0, id2, 0);
-            t2 = h2 + (int)sc->fn_8007BB28(1, id2, 0);
+            c2 = (int)sc->fn_8007BB28(1, id2, 0);
+            t2 = h2 + c2;
         }
         float x = Ratio81(h1, t1);
         float y = Ratio81(h2, t2);

@@ -1061,13 +1061,12 @@ int fn_80086D34(Unk80084910_W* self, int i)
     return self->m58[i];
 }
 
-/* near-miss (3 slots, register only): retail holds the stored value in r9, here r0. */
+/* The channel bytes are unsigned: a char store folds the 255 arm to -1 (li -1), and a named int local takes r0. */
 void fn_80086D44(char* base, int idx, float f)
 {
     float t = (float)fn_804103C0(f * 255.0f);
-    char* p = base + 4;
-    int v = !(t > 255.0f) ? (int)(t >? 0.0f) : 255;
-    p[idx] = v;
+    unsigned char* p = (unsigned char*)base + 4;
+    p[idx] = !(t > 255.0f) ? (int)(t >? 0.0f) : 255;
 }
 
 int fn_80086DD8(void* self, unsigned i)

@@ -222,7 +222,7 @@ int fn_8007F980(C* self, int idx)
 }
 
 /* fn_8007FA1C (0x8007FA1C): a loop over the four fn_8052BD58 results that keeps
- * the greatest 12-byte value by a three-word compare; defined below, still a near-miss. */
+ * the greatest 12-byte value by a three-word compare; defined below. */
 int fn_8007F9B4(C* self)
 {
     int a = 0;
@@ -237,14 +237,25 @@ int fn_8007F9E8(C* self)
     return a;
 }
 
-/* near-miss (7 slots): retail puts the iterator slot at sp+0x28 above the 12-byte temp at sp+0x18;
- * here the iterator is at sp+0x18 and the temp at sp+0x20. */
+/* The saturating iterator (Unk8006A138_It<3> semantics) is an int stepped through a pointer
+ * parameter: an address-taken scalar gets its frame slot late, after the 12-byte result temp.
+ * The class form put it at the declaration, before the temp. */
 inline void InitS12(S12* p, int a, int b, int c) { p->w0 = a; p->w1 = b; p->w2 = c; }
+inline int StepP(int* p)
+{
+    int t;
+    if (*p > 3)
+        t = *p;
+    else
+        t = *p + 1;
+    *p = t;
+    return t;
+}
 int fn_8007FA1C(C* self, int* o1, int* o2)
 {
     S12 best;
     InitS12(&best, -1, -1, 1);
-    Unk8006A138_It<3> it(0);
+    int v = 0;
     int k = 0;
     do {
         S12 cur = fn_8052BD58(self->mC[k]);
@@ -256,7 +267,7 @@ int fn_8007FA1C(C* self, int* o1, int* o2)
                 best = cur;
         } else if (cur.w2 == 0)
             best = cur;
-        k = it.Next();
+        k = StepP(&v);
     } while (k <= 3);
     if (o1)
         *o1 = best.w0;
