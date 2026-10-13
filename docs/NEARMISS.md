@@ -306,3 +306,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `fn_805483C4`: one explicit loop-bound capture removes retail's required reload (54/55 instructions); baseline 97.69% bound/increment scheduling remains parked. Scratch SW02/build/swarm16.
 - `fn_80553CA8`: two temporary/arithmetic forms retain the base/triple register allocation differences (62/62 instructions; baseline 99.19%). Scratch SW02/build/swarm16.
 - `fn_80551A80`: two named-call/inline-getter forms retain the five r30/r31 swap words or worsen float spills (best 106/106; baseline 99.76%). Scratch SW02/build/swarm16.
+- `ealib/tu_803CECA4::fn_803D1E54`: four product-temporary forms; best101/101words retains seven float-load/product scheduling words (99.4% inherited). Restored; batch17.
+- `fe/tu_80520BE0::fn_80523960`: two early-return forms23vs21words; inherited21/21word form retains `mr.` versus retail `cmpwi` (96.9%). Restored; batch17.
