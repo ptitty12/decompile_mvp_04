@@ -334,7 +334,7 @@ struct Unk80045388_V {
 };
 extern "C" void fn_8018CA5C(Unk80045388_Pos* p, float* a, float* b, float* c);
 extern "C" float fn_8018CAF0(Unk80045388_Pos* p);
-extern "C" float fn_80410CE8(float y, float x);
+extern "C" float atan2f(float y, float x);
 extern "C" int fn_801DC1CC(int h, int* out, float* in);
 extern "C" float fn_80248450(int h, int* out, int a, int b);
 extern const float lbl_805A8E88;
@@ -344,10 +344,8 @@ extern const float lbl_806177F4;
 extern const float lbl_806177F8;
 extern const float lbl_806177FC;
 
-/* near-miss (98.6%, 225 insns, same instruction sequence): only callee-saved register numbers differ
- * (retail: b in r26 shared with the flag, result in r29, f/g/h in r28/r27/r23; here b in r29, result in
- * r28, f/g in r27/r26). Hill climbing the declaration order of the locals did not change the allocation.
- * Parameters: the third int (r5) is unused; the caller declares them as (a, b, c, d, e, f, g, h, i). */
+/* The third int (r5) is unused; the caller declares the parameters as (a, b, c, d, e, f, g, h, i).
+ * atan2f is retail's name for 0x80410CE8. `r = r | (flag | 2)` keeps r above d in the register allocation. */
 extern "C" int fn_80045388(int a, int b, int unused, int c, int d, Unk80045388_Mid* e, Unk80045388_V* f, Unk80045388_V* g, Unk80045388_V* h)
 {
     int r = 0;
@@ -385,9 +383,9 @@ extern "C" int fn_80045388(int a, int b, int unused, int c, int d, Unk80045388_M
         }
     } else if ((c == 2 && b > 1) || (c == 1 && a > 0)) {
         int flag = 0;
-        float a1 = fn_80410CE8(f->x, f->z) * lbl_805A8E88;
-        float a2 = fn_80410CE8(g->x, g->z) * lbl_805A8E88;
-        float a3 = fn_80410CE8(h->x, h->z) * lbl_805A8E88;
+        float a1 = atan2f(f->x, f->z) * lbl_805A8E88;
+        float a2 = atan2f(g->x, g->z) * lbl_805A8E88;
+        float a3 = atan2f(h->x, h->z) * lbl_805A8E88;
         float th;
         if (!(a1 < s0) && !(s0 < a2)) {
             th = (a1 - a2) * lbl_805A8E8C;
@@ -407,7 +405,7 @@ extern "C" int fn_80045388(int a, int b, int unused, int c, int d, Unk80045388_M
         if (flag != 0 && hnd != 0) {
             float q = fn_80248450(hnd, buf, 3, 9);
             if (!(q <= base - pos->m3F4)) {
-                r = r | 2 | flag;
+                r = r | (flag | 2);
                 if (a == 3) {
                     r |= 1;
                     if (r & 0x80)
