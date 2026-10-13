@@ -51,6 +51,19 @@ extern const char lbl_805F7558[];
 extern const char lbl_805F6548[];
 extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
+struct Fe1A18Date {
+    unsigned char a;
+    unsigned char b;
+    unsigned short c;
+};
+extern "C" float fn_800A39C4(void* g, int a);
+extern "C" void fn_8056AF84(int a, int b, int c, int* d, int* e);
+extern "C" float fn_8007BB28__18Unk8007B2B0_Screeniii(void* g, int a, int b, int c);
+extern "C" int fn_8055AF00(void* a, int b);
+int fn_800DD6D4(int a);
+extern "C" int fn_80329FA0(void*, ...);
+extern "C" void fn_804A217C(char* x);
+void fn_800DC580(UiS*, float);
 extern "C" void fn_804A0E40(void* x);
 extern "C" int fn_800DF254(char*, int, int, float);
 extern "C" int fn_800B5CBC(void);
@@ -959,6 +972,39 @@ FE_OVERLAY void fn_804A193C(int a, FeW* x)
         break;
     }
     x->fn_vslot16(0);
+}
+
+FE_OVERLAY void fn_804A1A18(char* x)
+{
+    char buf[0x190];
+    float f;
+    int arr[4];
+    Fe1A18Date d;
+    int ra, rb;
+    int id = fn_800B548C(FeI(x, 0x178));
+    ((int (*)(Fe1A18Date*, ...))fn_80329FA0)(&d, fn_800A2AE8(lbl_80619948));
+    int dm = d.a - 2;
+    FeW* w = FeMem(x, 0x180);
+    int g28 = FeI(lbl_80619948, 0x28);
+    fn_804A217C(x);
+    sprintf(buf, lbl_805F4ECC, d.c);
+    ((FeWQ*)fn_800C8040(((FeW29*)w)->s29("MEDIUM/YEAR")))->s30((int)buf);
+    f = fn_800A39C4(lbl_80619948, id);
+    fn_800DC580((UiS*)fn_800C8044(w->fn_vslot32("CHEMISTRY", 1)), f);
+    if (fn_800B555C()->m0 != 0x10) {
+        fn_8056AF84(g28, id, dm, &ra, &rb);
+    } else {
+        ra = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 0, id, 1);
+        rb = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 1, id, 1);
+    }
+    sprintf(buf, "%d-%d", ra, rb);
+    ((FeWQ*)fn_800C8040(w->fn_vslot32("WLVAL", 1)))->s30((int)buf);
+    arr[0] = (int)(x + 0x230);
+    arr[1] = (int)(x + 0x690);
+    arr[2] = (int)(x + 0xAF0);
+    arr[3] = (int)(x + 0xF50);
+    int v = fn_8055AF00((void*)arr[fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, id)], id);
+    ((FeWQ*)fn_800C8040(w->fn_vslot32("RATING", 1)))->s28(fn_800DD6D4(v));
 }
 
 FE_OVERLAY void fn_804A256C(void* a, FeW* x)
