@@ -31,12 +31,12 @@ int fn_8007F1E0(Unk8007F198_A* a, int b, int c);
 extern "C" {
 /* Q18 protos */
 int fn_8053E240(C30* c, int k, int a, int b, int n, float* f);
-void fn_8053E8B8(C30* c, int a, int b, float* f);
+int fn_8053E8B8(C30* c, int a, int b, float* f);
 void fn_8053E8F0(C30* c, int a, int b, int n, C30* c2, float f);
-void fn_8053E934(C30* c, int a, int b, float* f);
-void fn_8053E96C(C30* c, int a, int b, float* f);
+int fn_8053E934(C30* c, int a, int b, float* f);
+int fn_8053E96C(C30* c, int a, int b, float* f);
 void fn_8053E9A4(C30* c, int a, int b, int n, C30* c2, float f);
-void fn_8053E9E8(C30* c, int a, int b, float* f);
+int fn_8053E9E8(C30* c, int a, int b, float* f);
 C30* fn_8053EA20(C30* c, int k, int a, int b, float* f);
 int fn_8053EB90(C30* c, int k);
 int fn_8053EBFC(C30* c, int k);
@@ -93,9 +93,9 @@ DB_OVERLAY int fn_8053E240(C30* c, int k, int a, int b, int n, float* f)
     return c->m0;
 }
 
-DB_OVERLAY void fn_8053E8B8(C30* c, int a, int b, float* f)
+DB_OVERLAY int fn_8053E8B8(C30* c, int a, int b, float* f)
 {
-    fn_8053E240(c, 1, a, b, 1, f);
+    return fn_8053E240(c, 1, a, b, 1, f);
 }
 
 DB_OVERLAY void fn_8053E8F0(C30* c, int a, int b, int n, C30* c2, float f)
@@ -103,14 +103,14 @@ DB_OVERLAY void fn_8053E8F0(C30* c, int a, int b, int n, C30* c2, float f)
     fn_8053E2E8(c, 1, a, b, n, c2, f);
 }
 
-DB_OVERLAY void fn_8053E934(C30* c, int a, int b, float* f)
+DB_OVERLAY int fn_8053E934(C30* c, int a, int b, float* f)
 {
-    fn_8053E240(c, 2, a, b, 1, f);
+    return fn_8053E240(c, 2, a, b, 1, f);
 }
 
-DB_OVERLAY void fn_8053E96C(C30* c, int a, int b, float* f)
+DB_OVERLAY int fn_8053E96C(C30* c, int a, int b, float* f)
 {
-    fn_8053E240(c, 0, a, b, 1, f);
+    return fn_8053E240(c, 0, a, b, 1, f);
 }
 
 DB_OVERLAY void fn_8053E9A4(C30* c, int a, int b, int n, C30* c2, float f)
@@ -118,9 +118,9 @@ DB_OVERLAY void fn_8053E9A4(C30* c, int a, int b, int n, C30* c2, float f)
     fn_8053E2E8(c, 0, a, b, n, c2, f);
 }
 
-DB_OVERLAY void fn_8053E9E8(C30* c, int a, int b, float* f)
+DB_OVERLAY int fn_8053E9E8(C30* c, int a, int b, float* f)
 {
-    fn_8053E240(c, 3, a, b, 1, f);
+    return fn_8053E240(c, 3, a, b, 1, f);
 }
 
 DB_OVERLAY C30* fn_8053EA20(C30* c, int k, int a, int b, float* f)
@@ -324,6 +324,65 @@ DB_OVERLAY void fn_8053FE0C(C30* c, int mode, int id)
             s->fn_8007D724(idx, k, y, id, 0);
         }
     }
+}
+
+C30* fn_8053EA68(C30* c, int k, int a, int b, float* f);
+struct Db8053E240_TmpD : Db8053E240_Tmp {
+    ~Db8053E240_TmpD() { vp = lbl_8064A550; }
+};
+DB_OVERLAY int fn_8053FED8(C30* c, int kind, int flag, int idx)
+{
+    int m = 0x38;
+    if (flag == 0)
+        m = 7;
+    Db8053E240_TmpD t;
+    int buf[0x82];
+    Db8053E240_TmpD* q = &t;
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    switch (kind) {
+    case 4:
+        return fn_8053EBFC(c, 4);
+    case 7:
+        return fn_8053F268(c);
+    case 0:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053E96C(c, (int)q, 1, 0);
+    case 1:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053E8B8(c, (int)q, 1, 0);
+    case 3:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053E9E8(c, (int)q, 1, 0);
+    case 2:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053E934(c, (int)q, 1, 0);
+    case 0xF:
+    case 0x10:
+    case 0x11:
+    case 0x12:
+    case 0x13:
+    case 0x14:
+    case 0x15:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053EA68(c, kind, (int)q, 1, 0)->m0;
+    case 0x16:
+        fn_805371C4(q, m | 0x70000000);
+        return ((int*)fn_8053EA68(c, 0x16, (int)q, 1, 0))[idx * 3];
+    case 8:
+    case 9:
+    case 0xA:
+    case 0xB:
+    case 0xC:
+    case 0xD:
+        fn_805371C4(q, m | 0x70000000);
+        return fn_8053EA20(c, kind, (int)q, 1, 0)->m0;
+    case 0xE:
+        fn_805371C4(q, m | 0x70000000);
+        return ((int*)fn_8053EA20(c, 0xE, (int)q, 1, 0))[idx * 3];
+    }
+    return 0;
 }
 
 DB_OVERLAY int fn_8054016C(int p0, int p1, int p2, int p3, int p4, int p5, int p6, int p7, float f)
