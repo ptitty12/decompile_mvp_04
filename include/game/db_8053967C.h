@@ -311,6 +311,8 @@ struct Db80541F40_Obj {
     char pad0[0x40];
     int m40;
     int m44;
+    char pad48[0x3C];
+    int m84;
 };
 extern Db80541F40_Obj* lbl_80619948;
 /* 0x6C-byte slot of the table at +0 (id, count, 25 words); the count of slots is at +0x3528. */

@@ -731,4 +731,33 @@ DB_OVERLAY int fn_8053DF70(void* c, int id, int k, float f)
     return h >= f * g;
 }
 
+DB_OVERLAY float fn_8053E0B4(void* c, int k)
+{
+    Db8053E240_Tmp t;
+    int buf[0x82];
+    Db8053E240_Tmp* q = &t;
+    void* s = lbl_8061930C;
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    int best = 0;
+    int w = 1;
+    int h = fn_800849C0(k);
+    if (k == 0)
+        w = 0;
+    int m = fn_80539A84(h);
+    q->Z();
+    fn_805371C4(q, m);
+    unsigned n = q->m4;
+    q->mC = 0;
+    for (unsigned i = 0; i < n; i++) {
+        int v = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(s, 2, *(int*)((char*)t.m0 + q->mC * 4), w);
+        if (v > best)
+            best = v;
+        q->mC = (q->mC + 1) % q->m4;
+    }
+    t.vp = lbl_8064A550;
+    return best;
+}
+
 }
