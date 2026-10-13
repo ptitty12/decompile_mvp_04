@@ -275,6 +275,81 @@ void fn_802C86B8(Unk802C7B54* o)
     }
 }
 
+/* Packed register words of a texture-object-like record (fn_802C9054): bit fields from the most significant bit. */
+struct Unk802C9054_W0 {
+    unsigned f31 : 1, f30 : 1, f28 : 2, f27 : 1, f24 : 3, f21 : 3, f20 : 1, f16 : 4, f9 : 7, f8 : 1, f6 : 2, f0 : 6;
+};
+struct Unk802C9054_W1 {
+    unsigned f19 : 13, f17 : 2, f15 : 2, f14 : 1, f9 : 5, f0 : 9;
+};
+struct Unk802C9054_W2 {
+    unsigned f22 : 10, f0 : 22;
+};
+struct Unk802C9054_Dst {
+    Unk802C9054_W0 w0;
+    Unk802C9054_W1 w1;
+    Unk802C9054_W2 w2;
+    unsigned mC;
+};
+struct Unk802C9054_Src {
+    char pad0[0x20];
+    unsigned m20;
+    int m24;
+    char pad28[4];
+    int m2C;
+    char pad30[0x10];
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    char pad5C[4];
+    int m60;
+    int m64;
+    int m68;
+    char pad6C[4];
+    int m70;
+    int m74;
+    char pad78[0x10];
+    int m88[13];
+};
+
+/* near-miss (98/98 insns, 97.5%): retail keeps the zero in r8 with the 0x80000000 base (lis r9) hoisted above the zero stores, and the +4 stores come as 8, 4;
+ * ours uses r9 for the zero and schedules the base later (register naming only). The second field (m4C) is written as a plain or-merge, as in retail. */
+void fn_802C9054(Unk802C9054_Dst* d, Unk802C9054_Src* s)
+{
+    *(unsigned*)&d->w0 = 0x80000000;
+    *(unsigned*)&d->w2 = 0;
+    *(unsigned*)&d->w1 = 0;
+    d->w0.f30 = s->m48;
+    *(unsigned*)&d->w0 = ((s->m4C << 28) & 0x30000000) | *(unsigned*)&d->w0;
+    if (s->m50 != 0)
+        d->w0.f27 = 1;
+    d->w0.f24 = s->m54 & 7;
+    d->w0.f21 = s->m58 & 7;
+    int f = 0;
+    if (s->m68 == 1 || s->m68 == 0x10)
+        f = 1;
+    d->w0.f20 = f;
+    d->w0.f16 = s->m60 & 0xF;
+    d->w0.f9 = s->m24 & 0x7F;
+    d->w0.f8 = s->m64;
+    d->w0.f6 = s->m74 & 3;
+    for (int i = 0; i < 13; i++) {
+        if (s->m88[i] != 0)
+            d->w1.f19 = d->w1.f19 | (1 << i);
+    }
+    d->w1.f17 = s->m40 & 3;
+    d->w1.f15 = s->m44 & 3;
+    if (s->m70 != 0)
+        d->w1.f14 = s->m70;
+    d->mC = s->m20;
+    d->w1.f9 = s->m68 & 0x1F;
+    d->w2.f22 = s->m2C & 0x1FF;
+}
+
 int fn_802C91DC(int v)
 {
     int r = 0;
@@ -829,4 +904,33 @@ void fn_802CB7B0()
 void fn_802CB7DC()
 {
     fn_802CA5AC(0, 0xFFFF);
+}
+
+extern "C" float atan2f(float y, float x);
+float fn_804028E4(float x);
+extern const Unk8000E618_Vec3 lbl_806055AC;
+
+inline Unk8000E618_Vec3 Sub(const Unk8000E618_Vec3& a, const Unk8000E618_Vec3& b)
+{
+    Unk8000E618_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Len(const Unk8000E618_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+Unk8000E618_Vec3 fn_802CB808(Unk8000E618_Vec3 a, Unk8000E618_Vec3 b)
+{
+    Unk8000E618_Vec3 r = lbl_806055AC;
+    Unk8000E618_Vec3 d = Sub(b, a);
+    Unk8000E618_Vec3 e = d;
+    e.y = 0.0f;
+    r.y = atan2f(d.x, d.z);
+    r.x = atan2f(d.y, Len(e));
+    return r;
 }

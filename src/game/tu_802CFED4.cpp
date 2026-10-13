@@ -57,9 +57,10 @@ void* operator new(unsigned int n, int heap);
 void fn_802CFED4(void* o);
 extern int lbl_80620418;
 float fn_802D7E2C(int h);
-void fn_802D095C(void* o, float a, float b);
+struct Unk802D095C_Self;
+extern "C" void fn_802D095C(Unk802D095C_Self* o, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float* c, float t, float u);
 void fn_802D0D30(void* o);
-void fn_802D0F74(void* o, float t);
+extern "C" void fn_802D0F74(Unk802D0B4C* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t);
 
 Unk802D0B4C::Unk802D0B4C()
 {
@@ -68,6 +69,46 @@ Unk802D0B4C::Unk802D0B4C()
     m0 = 0;
     m4 = 0;
     m8 = 0;
+}
+
+/* Blend weights of the camera follower (fn_802D095C): +0x24/+0x28/+0x2C per-axis, +0x30 for the scalar, +0x8C flag with the
+ * alternative weights +0x90/+0x94. */
+struct Unk802D095C_Self {
+    char pad0[0x24];
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    char pad34[0x8C - 0x34];
+    int m8C;
+    float m90;
+    float m94;
+};
+double fn_80410634(double x);
+inline float Unk802D095C_Diff(float a, float b)
+{
+    float d = a - b;
+    d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+    return d;
+}
+
+extern "C" void fn_802D095C(Unk802D095C_Self* o, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float* c, float t, float u)
+{
+    float dx, dy, dz;
+    float unused;
+    float w0 = o->m30;
+    float w1 = o->m24;
+    if (o->m8C != 0 && !(*c <= t)) {
+        w0 = o->m90;
+        w1 = o->m94;
+    }
+    dx = Unk802D095C_Diff(b->x, a->x);
+    dy = Unk802D095C_Diff(b->y, a->y);
+    dz = Unk802D095C_Diff(b->z, a->z);
+    b->x = dx * (1.0f - w1) + a->x;
+    b->y = dy * (1.0f - o->m28) + a->y;
+    b->z = dz * (1.0f - o->m2C) + a->z;
+    *c = (*c - t) * (1.0f - w0) + t;
 }
 
 void fn_802D0B94(Unk802D0B94_Self* self, Unk8037B3E8* reg)
@@ -95,6 +136,36 @@ struct Unk802CF894_Self;
 class Unk802CF894_Reg;
 void fn_802CF894(Unk802CF894_Self* s, Unk802CF894_Reg* r);
 void fn_802CF368(Unk802CF368_Self* o);
+
+inline Unk802D0B4C_Vec3 Unk802D0F74_Sub(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D0F74_Mul(const Unk802D0B4C_Vec3& v, float k)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D0F74_Add(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+extern "C" void fn_802D0F74(Unk802D0B4C* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t)
+{
+    *b = Unk802D0F74_Add(*a, Unk802D0F74_Mul(Unk802D0F74_Sub(*b, *a), !((1.0f - self->m18) > 1.0f) ? ((1.0f - self->m18) >? 0.0f) : 1.0f));
+}
 
 void fn_802D1128(Unk802CF368_Self* self)
 {
@@ -150,7 +221,7 @@ void fn_802D11D0(char* o)
 
 void fn_802D11F4(char* o, float t)
 {
-    fn_802D0F74(o + 0xD4, t);
+    ((void (*)(char*, float))fn_802D0F74)(o + 0xD4, t);
 }
 
 void fn_802D1220(char* o)
@@ -160,7 +231,7 @@ void fn_802D1220(char* o)
 
 void fn_802D1244(char* o, float a, float b)
 {
-    fn_802D095C(o + 0x20, a, b);
+    ((void (*)(char*, float, float))fn_802D095C)(o + 0x20, a, b);
 }
 
 extern const void* lbl_806645C0[];
@@ -497,6 +568,38 @@ void fn_802D23B8()
 {
 }
 
+extern float lbl_8061EDBC;
+inline Unk802D0B4C_Vec3 Unk802D30CC_Sub(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D30CC_Mul(const Unk802D0B4C_Vec3& v, float k)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D30CC_Add(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+void fn_802D30CC(void* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t)
+{
+    float k = 1.0f - lbl_8061EDBC;
+    *b = Unk802D30CC_Add(*a, Unk802D30CC_Mul(Unk802D30CC_Sub(*b, *a), !(k > 1.0f) ? (k >? 0.0f) : 1.0f));
+}
+
 void fn_802D3210(char* o)
 {
     fn_802CFED4(o + 0x78);
@@ -504,7 +607,7 @@ void fn_802D3210(char* o)
 
 void fn_802D3234(char* o, float a, float b)
 {
-    fn_802D095C(o + 0x78, a, b);
+    ((void (*)(char*, float, float))fn_802D095C)(o + 0x78, a, b);
 }
 
 extern const void* lbl_80664490[];

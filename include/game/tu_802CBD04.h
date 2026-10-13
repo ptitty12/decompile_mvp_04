@@ -116,10 +116,14 @@ struct Unk802CC580_Data {
     char pad0[0x50];
     char m50[0x65C - 0x50];
     int m65C[13];
+    char pad690[0x6B8 - 0x690];
+    int m6B8;
 };
 struct Unk802CC580_T {
     char pad0[0x44];
     int m44;
+    int m48;
+    float m4C;
 };
 
 #include "game/chooser.h"

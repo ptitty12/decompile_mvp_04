@@ -37,7 +37,8 @@ void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
 void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk802CBD04_Vec3* c);
 void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
 void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
-void fn_802CC748(int e, int a, int b, Unk802CBD04_Vec3* v);
+class Unk802CC608_Obj;
+void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p);
 extern "C" void* fn_8037CF5C(Unk8037C7FC* c, unsigned int hash, void* obj);
 
 class Unk802CBD04_Iface : public Unk802CC53C_Target {
@@ -148,6 +149,70 @@ int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
     return r;
 }
 
+/* Object with its vptr at +0x98 (slot 6 returns the object whose +0x60 position is used while lbl_806202F8 is 0). */
+class Unk802CC608_Obj {
+public:
+    char pad0[0x60];
+    Unk802CBD04_Vec3 m60;
+    char pad6C[0x98 - 0x6C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual Unk802CC608_Obj* s6();
+};
+extern int lbl_806202F8;
+float fn_804028E4(float x);
+inline Unk802CBD04_Vec3 Unk802CC608_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
+{
+    Unk802CBD04_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk802CC608_Len(const Unk802CBD04_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+void fn_802CC608(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p)
+{
+    if (o != 0) {
+        float d = 0.0f;
+        if (lbl_806202F8 == 0) {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->s6()->m60, *p);
+            d = Unk802CC608_Len(v);
+        } else {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->m60, *p);
+            d = Unk802CC608_Len(v);
+        }
+        if (!(d <= *bestD)) {
+            *best = o;
+            *bestD = d;
+        }
+    }
+}
+
+void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p)
+{
+    if (o != 0) {
+        float d = 0.0f;
+        if (lbl_806202F8 == 0) {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->s6()->m60, *p);
+            d = Unk802CC608_Len(v);
+        } else {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->m60, *p);
+            d = Unk802CC608_Len(v);
+        }
+        if (!(d >= *bestD)) {
+            *best = o;
+            *bestD = d;
+        }
+    }
+}
+
 void fn_802CC888(Unk802CBD04* o, int idx, int a, int b, Unk802CBD04_Vec3* v)
 {
     int e;
@@ -157,7 +222,7 @@ void fn_802CC888(Unk802CBD04* o, int idx, int a, int b, Unk802CBD04_Vec3* v)
         e = 0;
     }
     Unk802CBD04_Vec3 t = *v;
-    fn_802CC748(e, a, b, &t);
+    fn_802CC748((Unk802CC608_Obj*)e, (Unk802CC608_Obj**)a, (float*)b, &t);
 }
 
 int fn_802CC8EC(Unk802CBD04* o)
@@ -171,6 +236,47 @@ int fn_802CC8EC(Unk802CBD04* o)
     return r;
 }
 
+struct Unk8019F8C0_Owner;
+struct Unk802CE2C4_Obj {
+    char pad0[0x3D44];
+    int m3D44;
+};
+Unk802CE2C4_Obj* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
+extern "C" Unk802CBD04_Vec3 fn_80183918(int a, int b, int c);
+extern "C" void fn_80402B48(const Unk802CBD04_Vec3* v, Unk802CBD04_Vec3* out);
+extern Unk802CBD04_Vec3 lbl_806055AC;
+inline Unk802CBD04_Vec3 Unk802CE2C4_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
+{
+    Unk802CBD04_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+void fn_802CE2C4(Unk802CBD04* o, int k, int kind, Unk802CBD04_Vec3* out)
+{
+    *out = lbl_806055AC;
+    if (o->mD8 != 0) {
+        if (kind == 0x2F) {
+            Unk802CE2C4_Obj* ow = fn_801A6D84((Unk8019F8C0_Owner*)o->mD8, k);
+            int h = 0;
+            if (ow != 0)
+                h = ow->m3D44;
+            if (o->mD8->m6B8 != 0) {
+                Unk802CBD04_Vec3 b;
+                Unk802CBD04_Vec3 a;
+                a = fn_80183918(o->mD8->m6B8, h, 0);
+                b = fn_80183918(o->mD8->m6B8, h, 2);
+                *out = Unk802CE2C4_Sub(b, a);
+                fn_80402B48(out, out);
+            }
+        } else {
+            *out = lbl_806055AC;
+        }
+    }
+}
+
 void* fn_802CF168(void* o)
 {
     return fn_8037CF5C(fn_8037C7FC(), 0xB38E54D3, o);
@@ -179,6 +285,84 @@ void* fn_802CF168(void* o)
 void fn_802CF1A4(void* o)
 {
     fn_8037C7FC()->fn_8037CE98(0xB38E54D3, (int)o, 0);
+}
+
+/* Camera rig as seen by fn_802CF1E4: vptr at +0x98 (slot 3 takes a position), data at +0, +0x60, +0x6C, +0x70, +0xA4. */
+class Unk802CF1E4_CamB {
+public:
+    int m0;
+    char pad4[0x60 - 4];
+    Unk802CBD04_Vec3 m60;
+    int m6C;
+    Unk802CBD04_Vec3 m70;
+    char pad7C[0x98 - 0x7C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(Unk802CBD04_Vec3* v);
+};
+class Unk802CF1E4_Cam : public Unk802CF1E4_CamB {
+public:
+    int m9C;
+    int mA0;
+    float mA4;
+};
+/* Camera controller: vptr at +0, slots 12..15 (+0x60, +0x68, +0x70, +0x78) are the follow steps. */
+class Unk802CF1E4_Vb {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12(int a, Unk802CBD04_Vec3* v, Unk802CF1E4_Cam* c, int k);
+    virtual void s13(Unk802CBD04_Vec3* p, Unk802CBD04_Vec3* v, float t);
+    virtual void s14(int a, Unk802CBD04_Vec3* v, float* f, Unk802CF1E4_Cam* c, int k);
+    virtual void s15(Unk802CBD04_Vec3* p, Unk802CBD04_Vec3* v, float* f, float x, float t);
+};
+class Unk802CF1E4_Self : public Unk802CF1E4_Vb {
+public:
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+inline void Unk802CF1E4_SetA4(Unk802CF1E4_Cam* c, float v)
+{
+    c->mA4 = v;
+}
+inline void Unk802CF1E4_SetP70(Unk802CF1E4_Cam* c, const Unk802CBD04_Vec3& v)
+{
+    c->m70 = v;
+}
+
+void fn_802CF1E4(Unk802CF1E4_Self* self, int a, Unk802CF1E4_Cam* cam, int k, int flag, float t)
+{
+    Unk802CBD04_Vec3 v1;
+    Unk802CBD04_Vec3 v2;
+    float f3;
+    int var = k;
+    if (flag != 0 && self->m14 != 0)
+        var = 1;
+    self->s12(a, &v1, cam, var);
+    if (var == 0)
+        self->s13(&cam->m60, &v1, t);
+    cam->s3(&v1);
+    self->s14(a, &v2, &f3, cam, var);
+    if (var == 0)
+        self->s15(&cam->m70, &v2, &f3, fn_802CBD90((Unk802CBD04*)cam), t);
+    cam->m0 = 0;
+    cam->m6C = 0;
+    Unk802CF1E4_SetP70(cam, v2);
+    fn_802CC038((Unk802CBD04*)cam);
+    Unk802CF1E4_SetA4(cam, f3);
 }
 
 void fn_802CF368(Unk802CF368_Self* o)
@@ -216,6 +400,24 @@ void fn_802CF4B4(Unk802CF4B4_Self* self, Unk8037B3E8* reg)
     reg->fn_8037B50C(lbl_805E33E4, &self->m14, lbl_805E3384, 0);
     reg->fn_8037B50C(lbl_805E33FC, &self->m18, lbl_805E33C0, 0);
     reg->fn_8037B830(lbl_805E3358);
+}
+
+float fn_80323848(int p);
+double fn_80410634(double x);
+float fn_8041171C(float x);
+extern "C" int rand();
+
+float fn_802CF5CC(int a, int b, float x, float y, float z)
+{
+    Unk802CC580_T* t = fn_801A04A8(((Unk802CBD04*)a)->mD8, b);
+    float ph = (t->m44 != 0 || t->m48 == 0) ? t->m4C : fn_80323848(t->m48);
+    float w = ph - (float)fn_80410634(ph * 0.15915494f) * 6.2831855f;
+    float s = x * fn_8041171C(y * w);
+    float lo = -1.0f;
+    float r = (float)(rand() % 10000) * 0.0001f;
+    float hi = 1.0f;
+    s += z * (r * (hi - lo) + lo);
+    return s;
 }
 
 void fn_802CF70C(Unk802CF70C_In* a, Unk802CF70C_Out* o, int p, int q)
