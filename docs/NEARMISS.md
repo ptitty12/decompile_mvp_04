@@ -292,3 +292,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `fn_80553CA8`: two temporary/arithmetic forms retain the base/triple register allocation differences (62/62 instructions; baseline 99.19%). Scratch SW02/build/swarm16.
 - `fn_80551A80`: two named-call/inline-getter forms retain the five r30/r31 swap words or worsen float spills (best 106/106; baseline 99.76%). Scratch SW02/build/swarm16.
+
+- `fn_8056EC68`: explicit boolean-result form loses the retail CR4 lifetime; baseline 96.61% retains the two next-index/call scheduling slots. Scratch SW02/build/swarm22.
+- `fn_805706B8`: existing source casts the shared int-declared fn_8007189C to a float provider; canonical return-type repair is required before further matching. Baseline 99.54%; no new casts or aliases added.

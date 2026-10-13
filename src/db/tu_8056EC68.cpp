@@ -31,13 +31,11 @@ struct DbDownIt {
     ~DbDownIt() {}
     int Next()
     {
-        int t;
-        if (v > -1)
-            t = v - 1;
-        else
-            t = v;
-        v = t;
-        return t;
+        int old=v;
+        int value=old-1;
+        if (old<=-1) value=old;
+        v=value;
+        return value;
     }
 };
 
@@ -413,19 +411,15 @@ extern "C" DB_OVERLAY void fn_8056F228(DbSel* self, int a, int b)
     }
 }
 
-/* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
 extern "C" DB_OVERLAY void fn_8056F494(DbSel* self)
 {
     DbDownIt it(2);
-    if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 != 0xFF) {
-        int i;
-        do {
-            if (Round(self->m10) > 2)
-                break;
-            fn_8056EEA8(self, it.v, 0);
-            i = it.Next();
-        } while (i >= 0);
-    }
+    int i=2;
+    do {
+        if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10,i)->m0!=0xFF && Round(self->m10)<=2)
+            fn_8056EEA8(self,it.v,0);
+        i=it.Next();
+    } while(i>=0);
 }
 
 extern "C" DB_OVERLAY int fn_8056F51C(DbSel* self, int idx, void* p3)
@@ -1180,14 +1174,11 @@ extern "C" DB_OVERLAY void fn_80571928(DbMgr* self, int mode)
     }
 }
 
-/* near-miss: 5 slots; retail places li r0,0x11 between fcmpu and cror */
 extern "C" DB_OVERLAY void fn_80571A94(DbMgr* self)
 {
     float r = fn_8056FFB0();
-    int v = 0x11;
-    if (!(r >= lbl_805FFDF8))
-        v = 0x10;
-    self->m118 = v;
+    if (!(r>=lbl_805FFDF8)) self->m118=0x10;
+    else self->m118=0x11;
     fn_8056C6BC(&self->mFC);
     fn_8056E130(&self->mCC);
 }
