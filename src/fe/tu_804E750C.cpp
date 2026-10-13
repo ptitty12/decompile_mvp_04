@@ -123,7 +123,87 @@ struct FeS7g : FeObj {
     int m160;
 };
 extern "C" void fn_8013D4CC(FeObj* w, void* cb1, void* cb2, const void* s, int a, int b, int c, int d);
+class FeObjQ15 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(int a); virtual void v9();
+    virtual void v10(); virtual void v11(); virtual void v12(); virtual void v13();
+    virtual void v14(int a); virtual void v15(); virtual void v16(); virtual void v17();
+    virtual void v18(); virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22();
+    virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26(); virtual void v27();
+    virtual void v28(); virtual void v29(); virtual void v30(); virtual void v31();
+    virtual FeObjQ15* v32(const char* a, int b); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(int a, int b); virtual void v68();
+    virtual void v69(); virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73();
+    virtual void v74(); virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+    virtual void v79(); virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83();
+    virtual void v84(); virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88();
+    virtual void v89(); virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93();
+    virtual void v94(); virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98();
+    virtual void v99(); virtual void v100(); virtual void v101(); virtual void v102();
+    virtual void v103(); virtual void v104(); virtual void v105(); virtual void v106();
+    virtual void v107(); virtual void v108(); virtual void v109(); virtual void v110();
+    virtual void v111(); virtual void v112(); virtual void v113(); virtual void v114();
+    virtual void v115(); virtual void v116(); virtual void v117(); virtual void v118();
+    virtual void v119(); virtual void v120(); virtual void v121(); virtual void v122();
+    virtual void v123(); virtual void v124(); virtual void v125(); virtual void v126();
+    virtual void v127();
+};
+class FeSubQ15 {
+public:
+    char pad0[0x24];
+    virtual int s1(); virtual int s2(); virtual int s3(); virtual int s4(); virtual int s5(); virtual int s6();
+    virtual int s7(); virtual int s8(); virtual int s9(); virtual int s10(); virtual int s11(); virtual int s12();
+    virtual int s13(); virtual int s14(); virtual int s15(); virtual int s16(); virtual int s17(); virtual int s18();
+    virtual int s19(); virtual void s20(int a, int b);
+};
+struct FeS7z : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObjQ15* m134;
+    char pad138[0x13C - 0x138];
+    FeObj* m13C;
+};
+extern const char lbl_805F7B50[];
+extern const char lbl_805FA710[];
+extern const char lbl_805F6548[];
+extern const char lbl_805FA71C[];
+extern const char lbl_805FA72C[];
 /* Q16-DECL-END */
+
+extern "C" FE_OVERLAY void fn_804E750C(FeS7z* self)
+{
+    fn_800ECF18(self);
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), lbl_805F4F84);
+    fn_80124FA8(p, self);
+    ((int (*)(FeObj*, int))fn_80125154)(p, 1);
+    fn_801251CC(p, 0, 0x10, 0);
+    int sel = lbl_8061930C->fn_8007DA28();
+    fn_800E26B4(sel, (int)fn_800C8044(((FeObjQ15*)self)->v32(lbl_805F7B50, 1)));
+    self->m134->v67(0, 0);
+    self->m134->v14(1);
+    if (sel != -1) {
+        int w = lbl_8061930C->fn_8007D098(sel, 0);
+        FeObj* a = fn_800C8044(((FeObjQ15*)self)->v32(lbl_805FA710, 1));
+        self->m13C = fn_800C8054(((FeObjQ15*)a)->v32(lbl_805F6548, 1));
+        ((FeSubQ15*)((char*)self->m13C + 0x98))->s20(w, 0);
+        ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA710, 1))->v8(1);
+    } else {
+        ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA710, 1))->v8(0);
+    }
+    if (lbl_8061930C->fn_8007DA28() != -1 && lbl_8061930C->fn_8007DADC(sel) != 0) {
+        ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA71C, 1))->v8(1);
+        ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA72C, 1))->v8(1);
+        return;
+    }
+    ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA71C, 1))->v8(0);
+    ((FeObjQ15*)((FeObjQ15*)self)->v32(lbl_805FA72C, 1))->v8(0);
+}
 
 extern "C" FE_OVERLAY void fn_804E7860(void* self, int a)
 {
