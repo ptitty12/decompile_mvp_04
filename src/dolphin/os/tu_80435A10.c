@@ -635,6 +635,9 @@ OSSramEx* fn_80436AF8(void)
 }
 
 /* flags: not matched (near-miss) */
+/* near-miss 93.9%: the checksum loop is not unrolled here (retail unrolls it 8x; `u16 v = *p` unrolls it but scores lower, 83%),
+ * retail saves r27..r31 (stmw) and reaches scb->offset through a pointer (addi r30,r31,64). The unsigned compares (u32 casts)
+ * and the single gbs load are retail's. */
 /* UnlockSram */
 BOOL fn_80436B54(BOOL commit, u32 offset)
 {
@@ -645,7 +648,7 @@ BOOL fn_80436B54(BOOL commit, u32 offset)
         if (offset == 0) {
             OSSram* sram = (OSSram*)scb->sram;
 
-            if (2 < (sram->flags & 3)) {
+            if (2 < (u32)(sram->flags & 3)) {
                 sram->flags &= ~3;
             }
             sram->checkSum = sram->checkSumInv = 0;
@@ -659,8 +662,9 @@ BOOL fn_80436B54(BOOL commit, u32 offset)
         }
         if (scb->offset <= 0x14) {
             OSSramEx* sramex = (OSSramEx*)(scb->sram + sizeof(OSSram));
+            u32 gbs = sramex->gbs;
 
-            if ((sramex->gbs & 0x7C00) == 0x5000 || (sramex->gbs & 0xC0) == 0xC0) {
+            if ((gbs & 0x7C00) == 0x5000 || (gbs & 0xC0) == 0xC0) {
                 sramex->gbs = 0;
             }
         }
