@@ -1343,7 +1343,7 @@ config.libs = [
         "cflags": cflags_dolphin_sdk,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "dolphin/vm/tu_8043D960.c"),
+            Object(Matching, "dolphin/vm/tu_8043D960.c"),
         ],
     },
     {

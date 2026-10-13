@@ -42,7 +42,7 @@ extern u32* lbl_806EF94C;  /* page table */
 extern u32 lbl_806EF950;   /* ARAM bytes handed out */
 extern u32 lbl_806EF954;   /* ARAM allocation cursor */
 
-extern u64 fn_80406CC0(u64 a, u64 b);   /* __div2u */
+extern s64 __div2i(s64 a, s64 b);   /* Signed DI division thunk to fn_804139C0. */
 extern u32 fn_80415880(void);
 extern void fn_804158BC(u32 type, void* mram, u32 aram, u32 len);
 extern void fn_80415AF0(void);
@@ -83,7 +83,7 @@ int fn_8043E1E8(u32 page);
 void fn_8043E1FC(void);
 void fn_8043E2A4(void);
 
-#define TICKS_TO_US(t) fn_80406CC0((u64)(t) * 8, (u64)(OS_TIMER_CLOCK / 125000))
+#define TICKS_TO_US(t) __div2i((s64)(t) * 8, (s64)(OS_TIMER_CLOCK / 125000))
 
 /* VMInit */
 void fn_8043D960(u32 memSize, u32 aramBase, u32 aramSize)
