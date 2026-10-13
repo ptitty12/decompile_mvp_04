@@ -343,3 +343,8 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - ealib/tu_803E9C20::fn_803E9E30: eight forms yield scratch 72/72 words and local edges exact, but runtime free override GAME8031268C is one-argument while callback contract is (void*, int); retain build/root-803E9E30/v7-integer-address.cpp pending coherent GAME-owned callback repair, no body promoted.
 
 - `db/tu_80574AE4` `fn_8057AF3C`: 99.02778%, 216/216 instructions; one argument move crosses four setup instructions after twenty bounded forms; canonical round queries and the observed nine-word record swap preserved in scratch only.
+- db/tu_805467E0::fn_80546A24 (96.72%): eight ordinary aggregate/lifetime forms retain two scheduled prologue words; scratch build/root26/46A24, source restored.
+- db/tu_805467E0::fn_805489FC (98.42%): eight record/cursor/copy forms retain missing post-loop spill and frame-size difference; scratch build/root26/489FC, source restored.
+- db/tu_805467E0::fn_80547B38 (95.93%): four getter/index forms retain address CSE and register differences; scratch build/root26/47B38, source restored.
+- db/tu_805467E0::fn_80547EC0: eight ordinary missing-body forms reach 77/79 strict words (97.47%), two memory-load scheduling slots remain; scratch build/root26/47EC0, no source promoted.
+- db/tu_805467E0::fn_805479F0 (96.34% inherited): eight ordinary list/counter/lifetime forms retain register and block differences (best81/82 words); scratch build/root35/479F0, source restored.
