@@ -15,13 +15,16 @@ extern "C" void fn_803AC134(DtorAt0* s, int chrg);
 extern unsigned char lbl_8060990A[];
 extern int lbl_8069CBC0;
 
-/* near-miss: 28 insns, same shape; retail keeps numchan in r0 and computes (table + g*0x24) before + numchan*6, so the add operand order and the lha/mulli registers differ; declaration-order and expression-order variants tried */
+/* The per-layout table row is formed first, then offset by numchan*6; a channel pointer local keeps base + voice*0x90 in retail order. */
 extern "C" void fn_803B3E18(CHANPUB* c)
 {
-    const unsigned char* t = lbl_8060990A + c->numchan * 6 + lbl_8069CBC0 * 0x24;
+    const unsigned char* tab = lbl_8060990A + lbl_8069CBC0 * 0x24;
+    const unsigned char* t = tab + c->numchan * 6;
     int i;
-    for (i = 0; i < c->numchan; i++)
-        sndgs.chan[c->voices[i]].azimuth = t[i] << 8;
+    for (i = 0; i < c->numchan; i++) {
+        CHANPUB* ch = &sndgs.chan[c->voices[i]];
+        ch->azimuth = t[i] << 8;
+    }
 }
 
 extern "C" void fn_803B3E88(DtorAt0* s, int chrg)
