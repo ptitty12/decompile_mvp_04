@@ -2221,6 +2221,7 @@ libc/fread.c:
 
 libc/ungetc.c:
 	.text       start:0x8040FA44 end:0x8040FBC8
+	.rodata     start:0x8060F018 end:0x8060F05C align:4
 
 libc/abort.c:
 	.text       start:0x8040FBC8 end:0x8040FBE0

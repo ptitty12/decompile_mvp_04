@@ -1201,7 +1201,7 @@ config.libs = [
             Object(Matching, "libc/fiprintf.c"),
             Object(Matching, "libc/flags.c"),
             Object(Matching, "libc/fread.c"),
-            Object(NonMatching, "libc/ungetc.c"),
+            Object(Matching, "libc/ungetc.c"),
             Object(Matching, "libc/abort.c"),
             Object(Matching, "libc/memchr.c"),
             Object(Matching, "libc/tolower.c"),
