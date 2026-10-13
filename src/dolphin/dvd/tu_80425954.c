@@ -7,7 +7,7 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-#include "__os.h"
+#include <dolphin/os/OSRtc.h>
 
 OSSramEx* fn_80436AF8(void); /* likely __OSLockSramEx */
 int fn_80436EB4(BOOL commit); /* likely __OSUnlockSramEx */
