@@ -36,68 +36,14 @@ struct lconv {
 extern int strcmp(const char *, const char *);
 extern size_t strlen(const char *);
 
-int __mb_cur_max = 1;
+extern int __mb_cur_max;
 
-static const struct lconv lconv = {
-    ".", "", "", "", "", "", "", "", "", "",
-    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
-    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
-};
-
-/* Reentrant setlocale: only "C" and the "C-*" multibyte variants are accepted for LC_ALL/LC_CTYPE; returns the current name (dead-stripped). */
-char *_setlocale_r(struct _reent *p, int category, const char *locale)
-{
-    static char lc_ctype[8] = "C";
-    static char last_lc_ctype[8] = "C";
-
-    if (locale) {
-        if (category != LC_CTYPE) {
-            if (strcmp(locale, "C") && strcmp(locale, ""))
-                return 0;
-            if (category == LC_ALL) {
-                strcpy(last_lc_ctype, lc_ctype);
-                strcpy(lc_ctype, locale);
-                __mb_cur_max = 1;
-            }
-        } else {
-            if (strcmp(locale, "C") && strcmp(locale, "") &&
-                strcmp(locale, "C") && strcmp(locale, "C-JIS") &&
-                strcmp(locale, "C-EUCJP") && strcmp(locale, "C-SJIS"))
-                return 0;
-
-            strcpy(last_lc_ctype, lc_ctype);
-            strcpy(lc_ctype, locale);
-
-            if (!strcmp(locale, "C-JIS"))
-                __mb_cur_max = 8;
-            else if (strlen(locale) > 1)
-                __mb_cur_max = 2;
-            else
-                __mb_cur_max = 1;
-        }
-        p->_current_category = category;
-        p->_current_locale = locale;
-
-        if (category == LC_CTYPE)
-            return last_lc_ctype;
-    } else {
-        if (category == LC_CTYPE)
-            return lc_ctype;
-    }
-
-    return "C";
-}
+extern struct lconv lbl_8060EEE4;
 
 /* The fixed "C" numeric/monetary formatting table. */
 struct lconv *_localeconv_r(struct _reent *data)
 {
-    return (struct lconv *)&lconv;
-}
-
-/* setlocale on the global reent (dead-stripped). */
-char *setlocale(int category, const char *locale)
-{
-    return _setlocale_r(_REENT, category, locale);
+    return &lbl_8060EEE4;
 }
 
 struct lconv *localeconv(void)

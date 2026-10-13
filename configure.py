@@ -1190,7 +1190,7 @@ config.libs = [
             Object(Matching, "libc/isdigit.c"),
             Object(Matching, "libc/isspace.c"),
             Object(Matching, "libc/errno.c"),
-            Object(NonMatching, "libc/locale.c"),
+            Object(Matching, "libc/locale.c"),
             Object(Matching, "libc/math_support.c"),
             Object(Matching, "libc/closer.c"),
             Object(Matching, "libc/fstatr.c"),
