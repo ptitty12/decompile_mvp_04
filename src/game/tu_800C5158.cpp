@@ -387,6 +387,48 @@ Unk800C5E74_Obj::~Unk800C5E74_Obj()
 
 extern "C" void fn_800C4EEC(Unk800C341C_Mgr* m, const char* name);
 
+extern "C" void fn_800C5F40(Unk800C5E74_Obj* o)
+{
+    if (o->m2C != 0 && o->m28 != 0) {
+        int st = 5;
+        if (o->m10 != -1)
+            st = fn_800C512C(fn_800C33D0(), o->m10);
+        if (st == 5) {
+            ((Unk800C7B40_Widget*)o->m14)->fn_vslot8(0);
+            ((Unk800C1BE4_Widget*)o->m14)->fn_vslot28(&lbl_805B6F58, 0);
+            if (o->m2C != 0)
+                fn_800C4F64(fn_800C33D0(), &o->m18);
+            else
+                fn_800C4FA8(fn_800C33D0(), &o->m18);
+            char z = lbl_805B6F58;
+            o->m28 = 0;
+            o->m18 = z;
+        }
+    }
+    if (o->m30 != 0) {
+        o->m10 = fn_800C510C(fn_800C33D0(), &o->m4);
+        o->m24 = fn_800C510C(fn_800C33D0(), &o->m18);
+        if (o->m10 != -1 && o->m24 != -1) {
+            int a = fn_800C512C(fn_800C33D0(), o->m10);
+            int b = fn_800C512C(fn_800C33D0(), o->m24);
+            if (a == 5 && b == 5 && o->m38 != 0) {
+                float f = ((Unk800C7B40_Widget*)o->m0)->fn_vslot19();
+                f += o->m34;
+                if (f > 1.0f || !(f >= 0.0f)) {
+                    o->m38 = 0;
+                    o->m3C = 1;
+                }
+                if (!(f <= 1.0f))
+                    f = 1.0f;
+                if (!(f >= 0.0f))
+                    f = 0.0f;
+                ((Unk800C7B40_Widget*)o->m0)->fn_vslot20(f);
+                ((Unk800C7B40_Widget*)o->m14)->fn_vslot20(1.0f - f);
+            }
+        }
+    }
+}
+
 extern "C" void fn_800C618C(Unk800C5E74_Obj* o)
 {
     if (o->m10 != -1)
