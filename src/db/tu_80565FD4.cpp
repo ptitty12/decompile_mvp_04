@@ -309,6 +309,23 @@ extern "C" DB_OVERLAY void fn_80566B38(Db80565CDC_S* s, Db80566B38_H* h)
     fn_80569E60(s, a, b, c, h->v5(1)->m0->m0);
 }
 
+extern "C" DB_OVERLAY void fn_80566CB4(Db80565CDC_S* s, Db80566B38_H* h)
+{
+    fn_8052BA70(s->m2C);
+    int a = h->v4(6)->m0->m0;
+    int b = h->v4(8)->m0->m0;
+    int c = h->v4(7)->m0->m0;
+    int d = h->v5(2)->m0->m0;
+    fn_8056A058((int)s, 1, 3, a, b, 0);
+    fn_8056A058((int)s, 1, 3, c, d, 0);
+    int e = h->v4(9)->m0->m0;
+    int f = h->v4(10)->m0->m0;
+    int g = h->v4(11)->m0->m0;
+    int i = h->v4(12)->m0->m0;
+    fn_8056A058((int)s, 1, 2, e, f, 0);
+    fn_8056A058((int)s, 1, 2, g, i, 0);
+}
+
 extern "C" DB_OVERLAY void fn_80566E78(Db80565CDC_S* s, int kind, int c)
 {
     char* b = (char*)s + 0x28;
