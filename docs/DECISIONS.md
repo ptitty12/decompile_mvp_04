@@ -143,6 +143,8 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
 - 2026-10-13 | **Return-buffer and void-wrapper ABI repairs**. Actual callee definitions establish two eight-byte pair results (fn_80235C18, fn_8022EA60); retail fn_803D6528 copies five words into its hidden result. Replacing the oversized reconstructed caller buffers yields three exact functions without padding tricks. The real database setters behind game/tu_8007CAC4 return void: CF44, CF90, D004, D0E0, D12C, D180, D724, D8EC and D998. Corrected both existing shared declaration views and rebuilt all users; fn_800E25E0 additionally becomes exact, with no regressions. D1C8 remains int because fn_8059BE14 returns status in r3. All changes retain retail hash and pass literal checks plus unmodified verification. | Source commits and build/*-verify.log / tu_8007CAC4-data-link.log |
 
+- 2026-10-13 | **Restore fn_802B96A4's actual forwarded ABI before source linking its caller**. Retail wrapper passes incoming r3/r4/r5 to fn_803FB64C and returns its node ID in r3. The real provider implementation is C int(int,int,int). Corrected the wrapper's reconstructed void() source to int(int,int,int), with a same-address/size Fv -> Fiii metadata rename. No source-linked consumer used the old name, so the provider commit passes before game/tu_800C2F90 is migrated. The caller uses explicit 32-bit pointer-to-integer boundary casts and a direct typed call. All wrapper instructions and sixty caller functions retain their exact bytes and branch destinations. No mismatched function-pointer call or extra alias remains. | build/agent-imports/800C2F90 proofs and per-unit full verification logs |
+
 ## Open questions for owner
 <!-- YYYY-MM-DD | question | context | options -->
 

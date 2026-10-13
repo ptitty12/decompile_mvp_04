@@ -1691,3 +1691,20 @@ functions (612 B). It does not fix every related initializer: fn_803F0FCC still
 has three differing words, and the short-zero variants fn_803F0D94/108C remain
 parked. Keep successful rewrites function-local and recheck branches, literal
 targets and the retail hash; do not apply the recipe unit-wide.
+
+
+### Writable constants versus duplicate pools (2026-10-13)
+
+The double/float ceil references use a const-qualified private huge value. ProDG
+C keeps that definition in read-only small data while substituting another copy
+in writable small data for each function's arithmetic. The retail code references
+the writable block, but the redundant pool has no unique placement evidence.
+Making just huge mutable produces the actual 16/8-byte writable blocks without
+the duplicate. Changing huge+x to x+huge restores the exact target fadd operand
+ordering (including the machine's NaN behavior). Both units then pass the retail
+hash and verifier. This is a source constness finding, not permission to drop
+arbitrary unreferenced constants. Check exact words and all data bytes per unit.
+
+An unresolved vector-deallocation builtin may also hide a simple null guard:
+in fn_800C334C, guarded fn_80377488(pointer) reproduces all 33 instructions;
+an unguarded call had only 31. Check the actual provider and local branch targets.
