@@ -104,6 +104,12 @@ def target_asm(unit, fn):
     for i, line in enumerate(lines):
         if SECTION.match(line):
             section = line.strip()
+            # The full split file declares these flags before switching back with
+            # a bare .section. A standalone function must carry that declaration
+            # too, or objdump -d sees an empty target and scores every instruction
+            # as an insertion. This changes only the scratch object's metadata.
+            if section in (".section .feoverlay", ".section .dboverlay"):
+                section += ', "ax"'
         if re.match(rf"\.fn {re.escape(fn)}\b", line.strip()):
             end = next((j for j in range(i, len(lines)) if re.match(rf"\.endfn {re.escape(fn)}\b", lines[j].strip())), None)
             if end is None:
@@ -216,8 +222,11 @@ def compile_fn(cc, cflags, env, src, obj, fn):
 
 def disasm(obj, fn):
     """(rows of fn as (bytes, mnemonic), names it calls with bl) from an object."""
-    out = subprocess.run([str(BINUTILS / f"powerpc-eabi-objdump{EXE}"), "-dr", f"--disassemble={fn}", str(obj)],
-                         capture_output=True, text=True).stdout
+    result = subprocess.run([str(BINUTILS / f"powerpc-eabi-objdump{EXE}"), "-dr", f"--disassemble={fn}", str(obj)],
+                            capture_output=True, text=True)
+    if result.returncode:
+        raise RuntimeError(f"objdump failed for {obj}: {result.stderr.strip()}")
+    out = result.stdout
     rows, calls = [], set()
     for line in out.splitlines():
         m = re.match(r"^\s+[0-9a-f]+:\s+((?:[0-9a-f]{2} ){4})\s*(\S+)", line)
@@ -227,6 +236,15 @@ def disasm(obj, fn):
         if m:
             calls.add(m.group(1))
     return rows, calls
+
+
+def require_target(obj, fn):
+    """Reject missing/non-executable targets before spending time on mutations."""
+    rows, _ = disasm(obj, fn)
+    if not rows:
+        sys.exit(f"REFUSED: {fn} has no disassembled target instructions in {obj}; "
+                 "check its symbol and executable section flags")
+    return rows
 
 
 def prune(text, fn, keep_inline):
@@ -273,6 +291,7 @@ def setup(a):
                         "-o", str(d / "target.o"), str(d / "target.s")], capture_output=True, text=True)
     if r.returncode:
         sys.exit(f"assembling the target failed:\n{r.stdout}{r.stderr}")
+    require_target(d / "target.o", a.function)
 
     r = subprocess.run([*cc, *cflags, "-E", str(src)], cwd=ROOT, env=env, capture_output=True, text=True,
                        encoding="utf-8", errors="replace")
