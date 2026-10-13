@@ -255,10 +255,9 @@ static Cell* DLExtract(Cell* list, Cell* cell)
         cell->next->prev = cell->prev;
     }
     if (cell->prev == NULL) {
-        list = cell->next;
-    } else {
-        cell->prev->next = cell->next;
+        return cell->next;
     }
+    cell->prev->next = cell->next;
     return list;
 }
 
@@ -379,12 +378,15 @@ long fn_80432BC8(long heap)
 }
 
 /* OSInitAlloc */
-/* near-miss: callee-saved/volatile register numbers and the order of the last stores differ */
+/* near-miss 98.9%: arraySize hoisted before the loop and the last stores in retail order fix the structure; 5 slots differ only in the
+ * volatile register numbers of the final base load (r5 here, r3 in retail) */
 void* fn_80432BD8(void* arenaStart, void* arenaEnd, int maxHeaps)
 {
+    u32 arraySize;
     long i;
     HeapDesc* hd;
 
+    arraySize = maxHeaps * sizeof(HeapDesc);
     lbl_806EF7E0 = (HeapDesc*)arenaStart;
     lbl_806EF7E4 = maxHeaps;
     for (i = 0; i < lbl_806EF7E4; i++) {
@@ -392,9 +394,9 @@ void* fn_80432BD8(void* arenaStart, void* arenaEnd, int maxHeaps)
         hd->size = -1;
         hd->free = hd->allocated = NULL;
     }
-    lbl_806EF2C8 = -1;
-    arenaStart = (void*)((u32)lbl_806EF7E0 + maxHeaps * sizeof(HeapDesc));
+    arenaStart = (void*)((u32)lbl_806EF7E0 + arraySize);
     arenaStart = (void*)(((u32)arenaStart + 31) & ~31);
+    lbl_806EF2C8 = -1;
     lbl_806EF7E8 = arenaStart;
     lbl_806EF7EC = (void*)((u32)arenaEnd & ~31);
     return arenaStart;

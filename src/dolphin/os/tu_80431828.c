@@ -90,7 +90,9 @@ void fn_80431850(s32 result, DVDCommandBlock* block)
 
 /* flags: not matched (near-miss) */
 /* OSInit */
-/* near-miss: bss base and string-pool base callee-saved registers are swapped (r31/r30) and the output is 3 instructions short */
+/* near-miss 96.5%: bss base and string-pool base callee-saved registers are swapped (r31/r30), 3 instructions short; the
+ * ClearArena `reset` flag is `(x & 0x80000000) ? 1 : 0` (retail cmplwi/beq/li/li, not neg/addic/subfe); the `&bss->params.regionStart/
+ * regionEnd` addresses are separate addi's in retail (pointer locals tried, no change) */
 void fn_8043188C(void)
 {
     OsBss* bss = &lbl_806DF020;
@@ -196,7 +198,7 @@ void fn_8043188C(void)
 
         /* ClearArena */
         {
-            BOOL reset = (fn_80436404() & 0x80000000) != 0;
+            BOOL reset = (fn_80436404() & 0x80000000) ? 1 : 0;
             u32* saveStart = (u32*)&bss->params.regionStart;
 
             if (!reset) {

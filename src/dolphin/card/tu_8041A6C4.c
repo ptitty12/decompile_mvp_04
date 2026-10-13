@@ -461,9 +461,7 @@ s32 fn_8041B3DC(s32 chan, CARDCallback callback)
     return result;
 }
 
-/* __CARDWritePage
- * near-miss: same length; the `addi r5,r4,0` (exiCallback argument) is scheduled first instead of after `addi r3,r30,0`;
- * all 6 orders of the last three stores tried. */
+/* __CARDWritePage (the explicit & 0xFF on cmd[2] fixes the scheduling of the argument copies) */
 s32 fn_8041B510(s32 chan, CARDCallback callback)
 {
     CARDControl* card;
@@ -476,7 +474,7 @@ s32 fn_8041B510(s32 chan, CARDCallback callback)
     } else {
         card->cmd[1] = (u8)((card->addr >> 17) & 0x7F);
     }
-    card->cmd[2] = (u8)(card->addr >> 9);
+    card->cmd[2] = (u8)((card->addr >> 9) & 0xFF);
     card->cmd[3] = (u8)((card->addr >> 7) & 3);
     card->cmd[4] = (u8)(card->addr & 0x7F);
     card->cmdlen = 5;
@@ -501,8 +499,7 @@ s32 fn_8041B510(s32 chan, CARDCallback callback)
     return result;
 }
 
-/* __CARDEraseSector
- * near-miss: same length; the cmd[2] byte temp lands in r0 instead of r3 (all 120 orders of the five stores tried). */
+/* __CARDEraseSector (the explicit & 0xFF on cmd[2] fixes the byte temp's register) */
 s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 {
     CARDControl* card;
@@ -519,7 +516,7 @@ s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 
     card->cmd[0] = 0xF1;
     card->cmd[1] = (u8)((addr >> 17) & 0x7F);
-    card->cmd[2] = (u8)(addr >> 9);
+    card->cmd[2] = (u8)((addr >> 9) & 0xFF);
     card->cmdlen = 3;
     card->mode = 0xFFFFFFFF;
     card->retry = 3;
@@ -543,13 +540,16 @@ s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 }
 
 /* CARDInit
- * near-miss: 45 vs 43; retail keeps &__CARDBlock in the callee-saved loop pointer (r30) from the diskID tests on, ours
- * re-forms it after them (early-return, local-pointer and if-body spellings tried). */
+ * near-miss 97.4%: one extra instruction (44 vs 43): retail reads the first diskID through the callee-saved block pointer
+ * (lwz r0,268(r30)); ours reads it through the full address in r3 and copies it into r30 afterwards. The pointer is now the
+ * loop variable from the start, which fixes the register assignment (early-return, local-pointer, cast and pointer-arithmetic
+ * spellings of the test all give the same copy). */
 void fn_8041B75C(void)
 {
+    CARDControl* card = &lbl_806DCF20.block[0];
     s32 chan;
 
-    if (lbl_806DCF20.block[0].diskID && lbl_806DCF20.block[1].diskID) {
+    if (card[0].diskID && card[1].diskID) {
         return;
     }
 
@@ -557,8 +557,7 @@ void fn_8041B75C(void)
     OSRegisterVersion(lbl_806EF170);
     DSPInit();
     fn_804321CC();
-    for (chan = 0; chan < 2; ++chan) {
-        CARDControl* card = &lbl_806DCF20.block[chan];
+    for (chan = 0; chan < 2; ++chan, ++card) {
         card->result = CARD_RESULT_NOCARD;
         fn_80437434(&card->threadQueue);
         fn_80432224(&card->alarm);
@@ -625,13 +624,13 @@ s32 fn_8041B900(CARDControl* card, s32 result)
     return result;
 }
 
-/* CARDFreeBlocks
- * near-miss: instruction-identical but the retail frame is 8 bytes bigger (two more 4-byte stack locals around `card`). */
+/* CARDFreeBlocks */
 s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
 {
     CARDControl* card;
     u16* fat;
     CARDDir* dir;
+    CARDDir* ent;
     s32 result;
     u16 fileNo;
 
@@ -653,7 +652,8 @@ s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
     if (filesNotUsed) {
         *filesNotUsed = 0;
         for (fileNo = 0; fileNo < 127; fileNo++) {
-            if (dir[fileNo].fileName[0] == 0xFF) {
+            ent = &dir[fileNo];
+            if (ent->fileName[0] == 0xFF) {
                 (*filesNotUsed)++;
             }
         }

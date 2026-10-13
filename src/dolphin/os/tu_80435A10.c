@@ -568,29 +568,30 @@ BOOL fn_80436848(void* buffer, u32 offset, u32 size)
 }
 
 /* flags: not matched (near-miss) */
+/* near-miss 97.8%: err/ok share one variable and the stores are locked-then-enabled (matches the retail order); still differs in
+ * `bne L; b END` vs `beq END` after the first EXILock test and `addi r3,r30,0` vs `mr r3,r30` (peephole-off shapes; the unit is
+ * built with peephole on) */
 /* __OSInitSram */
 void fn_80436960(void)
 {
     SramControl* scb = &lbl_806DF3C0;
-    BOOL err;
     u32 cmd;
-    BOOL ok;
+    BOOL ok = FALSE;
 
-    scb->enabled = scb->locked = FALSE;
+    scb->locked = scb->enabled = FALSE;
     fn_80432FA8(&lbl_806DF3C0, 64);
-    ok = FALSE;
     if (fn_804280EC(0, 1, 0)) {
         if (!fn_8042792C(0, 1, 3)) {
             fn_804281E0(0);
         } else {
             cmd = 0x20000100;
-            err = !fn_80426DC4(0, &cmd, 4, 1, 0);
-            err |= !fn_804271AC(0);
-            err |= !fn_804270C0(0, &lbl_806DF3C0, 64, 0, 0);
-            err |= !fn_804271AC(0);
-            err |= !fn_80427A58(0);
+            ok = !fn_80426DC4(0, &cmd, 4, 1, 0);
+            ok |= !fn_804271AC(0);
+            ok |= !fn_804270C0(0, &lbl_806DF3C0, 64, 0, 0);
+            ok |= !fn_804271AC(0);
+            ok |= !fn_80427A58(0);
             fn_804281E0(0);
-            ok = !err;
+            ok = !ok;
         }
     }
     scb->sync = ok;
@@ -604,13 +605,15 @@ OSSram* fn_80436A9C(void)
 {
     SramControl* scb = &lbl_806DF3C0;
     BOOL enabled = OSDisableInterrupts();
+    BOOL* lockp = &scb->locked;
 
-    if (scb->locked) {
+    if (*lockp) {
         OSRestoreInterrupts(enabled);
-        return NULL;
+        scb = NULL;
+    } else {
+        scb->enabled = enabled;
+        *lockp = TRUE;
     }
-    scb->enabled = enabled;
-    scb->locked = TRUE;
     return (OSSram*)scb;
 }
 
@@ -620,17 +623,21 @@ OSSramEx* fn_80436AF8(void)
 {
     SramControl* scb = &lbl_806DF3C0;
     BOOL enabled = OSDisableInterrupts();
+    BOOL* lockp = &scb->locked;
 
-    if (scb->locked) {
+    if (*lockp) {
         OSRestoreInterrupts(enabled);
         return NULL;
     }
     scb->enabled = enabled;
-    scb->locked = TRUE;
+    *lockp = TRUE;
     return (OSSramEx*)(scb->sram + sizeof(OSSram));
 }
 
 /* flags: not matched (near-miss) */
+/* near-miss 93.9%: the checksum loop is not unrolled here (retail unrolls it 8x; `u16 v = *p` unrolls it but scores lower, 83%),
+ * retail saves r27..r31 (stmw) and reaches scb->offset through a pointer (addi r30,r31,64). The unsigned compares (u32 casts)
+ * and the single gbs load are retail's. */
 /* UnlockSram */
 BOOL fn_80436B54(BOOL commit, u32 offset)
 {
@@ -641,7 +648,7 @@ BOOL fn_80436B54(BOOL commit, u32 offset)
         if (offset == 0) {
             OSSram* sram = (OSSram*)scb->sram;
 
-            if (2 < (sram->flags & 3)) {
+            if (2 < (u32)(sram->flags & 3)) {
                 sram->flags &= ~3;
             }
             sram->checkSum = sram->checkSumInv = 0;
@@ -655,8 +662,9 @@ BOOL fn_80436B54(BOOL commit, u32 offset)
         }
         if (scb->offset <= 0x14) {
             OSSramEx* sramex = (OSSramEx*)(scb->sram + sizeof(OSSram));
+            u32 gbs = sramex->gbs;
 
-            if ((sramex->gbs & 0x7C00) == 0x5000 || (sramex->gbs & 0xC0) == 0xC0) {
+            if ((gbs & 0x7C00) == 0x5000 || (gbs & 0xC0) == 0xC0) {
                 sramex->gbs = 0;
             }
         }
@@ -693,7 +701,7 @@ BOOL fn_80436ED8(void)
 u32 fn_80436EE8(void)
 {
     OSSram* sram = fn_80436A9C();
-    u32 mode = (sram->flags & 0x80) ? OS_SOUND_MODE_STEREO : OS_SOUND_MODE_MONO;
+    u32 mode = (sram->flags >> 7) & 1;
 
     fn_80436B54(FALSE, 0);
     return mode;
@@ -704,17 +712,18 @@ u32 fn_80436EE8(void)
 void fn_80436F58(u32 mode)
 {
     OSSram* sram;
+    BOOL r;
 
     mode <<= 7;
     mode &= 0x80;
     sram = fn_80436A9C();
     if (mode == (sram->flags & 0x80)) {
-        fn_80436B54(FALSE, 0);
+        r = fn_80436B54(FALSE, 0);
         return;
     }
     sram->flags &= ~0x80;
     sram->flags |= mode;
-    fn_80436B54(TRUE, 0);
+    r = fn_80436B54(TRUE, 0);
 }
 
 /* flags: not matched (near-miss) */
@@ -723,8 +732,9 @@ u16 fn_80436FFC(s32 chan)
 {
     OSSramEx* sram = fn_80436AF8();
     u16 id = sram->wirelessPadID[chan];
+    BOOL r;
 
-    fn_80436B54(FALSE, sizeof(OSSram));
+    r = fn_80436B54(FALSE, sizeof(OSSram));
     return id;
 }
 

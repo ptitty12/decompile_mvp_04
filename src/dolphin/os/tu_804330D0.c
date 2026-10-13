@@ -815,35 +815,35 @@ u32 fn_80434590(void);
 
 /* PackArgs */
 /* flags: not matched (near-miss) */
-/* near-miss: ptr/argv callee-saved registers swapped (r30/r29) */
+/* near-miss 96.1%: ptr/argv callee-saved registers swapped (r30/r29); one return TRUE at the end (retail has a single exit), the
+ * rest is instruction scheduling (addi n+1 / clrrwi order) and one extra addi copy */
 BOOL fn_80434314(void* ptr, int argc, char* argv[])
 {
     int n;
-    u32 j;
     char* p;
     char** newArgv;
+    u32 j;
 
     memset(ptr, 0, 0x2000);
     if (argc == 0) {
         *((u32*)ptr + 2) = 0;
-        return TRUE;
-    }
+    } else {
+        n = argc;
+        p = (char*)ptr + 0x2000;
+        while (--argc >= 0) {
+            p -= strlen(argv[argc]) + 1;
+            strcpy(p, argv[argc]);
+            argv[argc] = (char*)(p - (char*)ptr);
+        }
 
-    n = argc;
-    p = (char*)ptr + 0x2000;
-    while (--argc >= 0) {
-        p -= strlen(argv[argc]) + 1;
-        strcpy(p, argv[argc]);
-        argv[argc] = (char*)(p - (char*)ptr);
+        p = (char*)ptr + (((u32)(p - (char*)ptr)) & ~3);
+        newArgv = (char**)p - (n + 1);
+        for (j = 0; j < n + 1; j++) {
+            newArgv[j] = argv[j];
+        }
+        *((u32*)newArgv - 1) = n;
+        *((u32*)ptr + 2) = (u32)((u8*)(newArgv - 1) - (u8*)ptr);
     }
-
-    p = (char*)ptr + (((u32)(p - (char*)ptr)) & ~3);
-    newArgv = (char**)p - (n + 1);
-    for (j = 0; j < n + 1; j++) {
-        newArgv[j] = argv[j];
-    }
-    *((u32*)newArgv - 1) = n;
-    *((u32*)ptr + 2) = (u32)((u8*)(newArgv - 1) - (u8*)ptr);
     return TRUE;
 }
 
@@ -946,8 +946,7 @@ u32 fn_80434C74(u16 encode, u16 code)
     return 0;
 }
 
-/* flags: not matched (near-miss) */
-/* OSGetFontEncode */
+/* OSGetFontEncode (VI_PAL..VI_EURGB60 are empty cases that fall into default) */
 u16 fn_80434DE8(void)
 {
     if (lbl_806EF2F0 != 0xFFFF) {
@@ -957,6 +956,11 @@ u16 fn_80434DE8(void)
     case 0:
         lbl_806EF2F0 = (__VIRegs[55] & 2) ? 1 : 0;
         break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
     default:
         lbl_806EF2F0 = 0;
         break;
