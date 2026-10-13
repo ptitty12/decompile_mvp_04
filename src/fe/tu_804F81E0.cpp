@@ -1229,17 +1229,17 @@ extern "C" FE_OVERLAY void fn_804FB29C(FeCap* self_, int mode)
     }
 }
 
-/* near-miss: retail tests r == 10 with cmpwi/bne; ours folds to xori/subfic/adde (3 slots differ) */
+/* Retail accepts both zero and ten, joining their shared true return. */
 extern "C" FE_OVERLAY int fn_804FB7F4(FeS19* s)
 {
-    if (s->m630 != 0)
-        return 0;
-    int r = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(5, s->m86C);
-    if (r == 0)
-        return 0;
-    if (r != 10)
-        return 0;
-    return 1;
+    if(s->m630==0){
+        int r=((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(5,s->m86C);
+        if(r==0)goto yes;
+        if(r!=10)goto no;
+        yes:return 1;
+        no:return 0;
+    }
+    return 0;
 }
 
 /* near-miss: retail tests r == 10 with cmpwi/bne; ours folds to xori/subfic/adde (3 slots differ) */
