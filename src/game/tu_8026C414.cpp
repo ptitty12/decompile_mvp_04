@@ -293,6 +293,92 @@ int fn_8026CFF8(int sel, float* p, int flag, Unk80273498_Vec3* out)
     return r;
 }
 
+float fn_802D7E88(int a, int b);
+
+int fn_8026D184(int a, int flag)
+{
+    float t = fn_802D7E88(a, 0xBD);
+    float u = t;
+    if (flag != 0) {
+        float w = fn_802D7E88(a, 0xBC);
+        float unused;
+        float p = t;
+        float q = w;
+        float d = p - q;
+        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        u = d;
+    } else {
+        u = t + 1.5707964f;
+        if (!(u <= 3.1415927f))
+            u = u - 6.2831855f;
+    }
+    int r;
+    if (!(u <= -0.3926991f)) {
+        if (!(u <= 1.1780972f)) {
+            if (!(u <= 1.9634955f)) {
+                r = 3;
+                if (!(u <= 2.7488937f))
+                    r = 4;
+            } else {
+                r = 2;
+            }
+        } else {
+            r = u > 0.3926991f;
+        }
+    } else if (!(u <= -1.9634955f)) {
+        r = 6;
+        if (!(u <= -1.1780972f))
+            r = 7;
+    } else {
+        r = 4;
+        if (!(u <= -2.7488937f))
+            r = 5;
+    }
+    return r;
+}
+
+int fn_8026D344(int a, int flag)
+{
+    float t = fn_802D7E88(a, 0xBC);
+    float u = t;
+    if (flag != 0) {
+        float w = fn_802D7E88(a, 0xBD);
+        float unused;
+        float p = t;
+        float q = w;
+        float d = p - q;
+        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        u = d;
+    } else {
+        u = t + 1.5707964f;
+        if (!(u <= 3.1415927f))
+            u = u - 6.2831855f;
+    }
+    int r;
+    if (!(u <= -0.3926991f)) {
+        if (!(u <= 1.1780972f)) {
+            if (!(u <= 1.9634955f)) {
+                r = 3;
+                if (!(u <= 2.7488937f))
+                    r = 4;
+            } else {
+                r = 2;
+            }
+        } else {
+            r = u > 0.3926991f;
+        }
+    } else if (!(u <= -1.9634955f)) {
+        r = 6;
+        if (!(u <= -1.1780972f))
+            r = 7;
+    } else {
+        r = 4;
+        if (!(u <= -2.7488937f))
+            r = 5;
+    }
+    return r;
+}
+
 float fn_8026D504(O* self, X* ctx)
 {
     float r = 0.0f;
