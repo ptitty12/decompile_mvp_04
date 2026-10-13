@@ -16,6 +16,9 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+extern "C" void fn_804A63E0(void* x);
+extern "C" void fn_804A6050(FeW* x);
+extern "C" void fn_804A6EE8(FeW* x, int arg);
 extern "C" int fn_8056A8E0(int a, int b, int c);
 extern "C" int fn_8056AD54(int a, int b);
 extern "C" int fn_8056B628(int a, int b, int c);
@@ -787,6 +790,83 @@ FE_OVERLAY void fn_804A560C(void* xx)
         ((FeSubB*)((char*)w4 + 0x98))->s20(FeI(x, 0x13C), 0);
         fn_800DD344((Udd344_T*)b70, b8);
         ((FeWQ*)fn_800C8040(p->fn_vslot32(lbl_805F5348, 1)))->s28((int)b8);
+    }
+}
+
+FE_OVERLAY void fn_804A5854(void* xx, int k)
+{
+    Fe4558* x = (Fe4558*)xx;
+    if (x->m218 != 0) {
+        FeW* m = fn_800C8044(x->fn_vslot32("MAIN", 1));
+        FeW* r31 = fn_800C8044(m->fn_vslot32("INFOGROUP", 1));
+        FeW* r25 = fn_800C8044(m->fn_vslot32("STARTER", 1));
+        FeW* r27 = fn_800C8044(m->fn_vslot32("TEAMMATCHUP", 1));
+        FeW* r28 = fn_800C8044(m->fn_vslot32("LINEUP", 1));
+        m->fn_vslot8(1);
+        r31->fn_vslot8(0);
+        r25->fn_vslot8(0);
+        r27->fn_vslot8(0);
+        r28->fn_vslot8(0);
+        FeMem(x, 0x23C)->fn_vslot8(0);
+        void* nav = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+        if ((unsigned)(FeI(x, 0x210) - 1) <= 4U)
+            fn_80125084(nav, 3);
+        FeI(x, 0x210) = k;
+        switch (k) {
+        case 0:
+            fn_804A63E0(x);
+            r27->fn_vslot8(1);
+            if (x->m218 == 2) {
+                FeMem(x, 0x244)->fn_vslot8(0);
+                x->fn_vslot32("ALLSTARGAME", 1)->fn_vslot8(1);
+            } else {
+                FeMem(x, 0x244)->fn_vslot8(1);
+                x->fn_vslot32("ALLSTARGAME", 1)->fn_vslot8(0);
+            }
+            break;
+        case 1:
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            fn_804A6050(x);
+            r25->fn_vslot8(1);
+            r31->fn_vslot32("PITCHERINFOGRID", 1)->fn_vslot8(1);
+            r31->fn_vslot32("BATTERINFOGRID", 1)->fn_vslot8(0);
+            r31->fn_vslot8(1);
+            x->fn_vslot32("ALLSTARGAME", 1)->fn_vslot8(0);
+            break;
+        case 2:
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            fn_804A6EE8(x, 0);
+            r28->fn_vslot8(1);
+            r31->fn_vslot32("PITCHERINFOGRID", 1)->fn_vslot8(0);
+            r31->fn_vslot32("BATTERINFOGRID", 1)->fn_vslot8(1);
+            r31->fn_vslot8(1);
+            break;
+        case 3:
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            fn_804A6EE8(x, 1);
+            r28->fn_vslot8(1);
+            r31->fn_vslot32("PITCHERINFOGRID", 1)->fn_vslot8(0);
+            r31->fn_vslot32("BATTERINFOGRID", 1)->fn_vslot8(1);
+            r31->fn_vslot8(1);
+            break;
+        case 4:
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            fn_804A6EE8(x, 2);
+            r28->fn_vslot8(1);
+            r31->fn_vslot32("PITCHERINFOGRID", 1)->fn_vslot8(0);
+            r31->fn_vslot32("BATTERINFOGRID", 1)->fn_vslot8(1);
+            r31->fn_vslot8(1);
+            break;
+        case 5:
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            fn_804A6EE8(x, 3);
+            r28->fn_vslot8(1);
+            r31->fn_vslot32("PITCHERINFOGRID", 1)->fn_vslot8(0);
+            r31->fn_vslot32("BATTERINFOGRID", 1)->fn_vslot8(1);
+            r31->fn_vslot8(1);
+            x->fn_vslot32("ALLSTARGAME", 1)->fn_vslot8(0);
+            break;
+        }
     }
 }
 
