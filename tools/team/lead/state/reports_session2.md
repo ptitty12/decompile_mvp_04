@@ -219,3 +219,18 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
 ## W4 p6-19 (21:5x, 9 new + 4 near-miss)
 - game/tu_80087A58 46->49 (fn_80088024 98.3, fn_800888F4 99.8); tu_8009BC3C 23->27 (fn_8009CF6C 96.9, fn_8009DA60 95.3); tu_800975A8 35->37; tu_80094578 fn_80097318 family (4 siblings): ~200 loop variants, retail's peeled first iteration is not constant-folded (lbzx with zero reg) - unsolved.
 - Patterns: stack ByteVec stores via `q = &v`; `*(int*)&sp` plain read of a volatile counter as call arg; 8-byte Pair struct copied whole lives in a register pair; extern "C" under the mangled name of a same-unit C++ function -> ICE 378 (use fnptr cast); `if (i != 9 || f != 0) k = call(); else k = 0xFF;` keeps call arm first; `int a; if (c) a = X; else a = 0;` vs `int a = 0; if (c) a = X;` before a call.
+
+## W2 p6-12 (22:2x, 8 new + 1 near-miss)
+- game/tu_80300848 30->36 (fn_80301E44 99.69 struct copy word order); tu_80304858 37->39; tu_802FCAC0 46 (V2 copy temps).
+- Patterns: clamp `v = v > p->hi ? p->hi : (v >? p->lo);`; nested min/max via `!(x >= lim)` / `!(x <= a+k)`; first declared local gets lower slot; array ctor loop `do { new (e) Cls(); e++; } while (i-- != 0);`; group independent init stores ascending before hill-climb; struct copy inside an inline from const-ref -> direct stack word copies; 0x4330 magic -> unsigned source; pool floats readable from build/GV4E69/asm/*rodata*.s.
+
+## W1 p6-36 (22:3x, 2 new + 2 near-miss)
+- ealib/tu_8039B3E4 18->19 (Huffman table builder; fn_8039FC88 xor temp r0 vs r9 wall like fn_8039FB00/FBB0); tu_803A0310 14->15 (fn_803A2A44 99.1, fn_803A2244 96.5; 12 paired-single functions skipped as original code).
+- Patterns: bitfield write of top bits into uninitialised word -> clrlwi on garbage; strength-reduced loops with no running locals; `if (!ok) return ok;` -> mr r3,r14; Rd(c, K, idx) inline for addi+lbzx base-first; `&c->m150` inline at each call for duplicate pseudos.
+- Tool: rmfn.py without QDIR writes into shared Q12 folder (fixing); ins.py --proto can land inside a function body.
+
+## 22:30 lead notes
+- Enablers session (owner-approved tool downloads, relayed 22:10) put tools/match/permute.py (decomp-permuter wrapper, C units) on main at e2f3bda2; --from-cpp extraction in progress. New near-miss batch type: queue/nm_00.txt (12 dolphin units, 38 fns at 90-99.99%), template worker_prompt_nm.md, prep.sh W<n> nm 00.
+- rmfn.py now parks into $QDIR or a temp dir (never the shared tools folder).
+- All slots idle 22:30; main 20,740. Restart cron 22:56.
+- 22:35 permute.py handles C++ (7dce9440; ~85% of near-misses set up, refuses ctors/methods/named-return). gen_nm.py wrote nm_01..nm_39 (580 fns >= 95%, closest-first in queue/nm_order.txt). Machine: 28 logical CPUs, 64 GB -> plan 7 nm workers (one permuter at -j 3 each) + 6 p6 workers at the 22:56 restart.

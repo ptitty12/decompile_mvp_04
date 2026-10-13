@@ -67,3 +67,19 @@ W1 p6-35 ab04472693c116658  (20:46, END 22:20)
 W2 p6-40 a78cf0002af899fed  (20:46, END 22:20)
 W3 p6-09 ac7378c1a7941ec1d  (20:46, END 22:20)
 W4 p6-19 ab009adc839beccd3  (20:59, END 22:20)
+W1 p6-36 af7e874889e93db50  (21:45, END 22:35)
+W2 p6-12 adede00cd0a8bdd77  (21:45, END 22:35)
+# fleet restart 2026-10-12 22:55 after window reset (7 near-miss permuter + 6 p6; END 00:50)
+W1 nm-00 aa2713d240e3504a9
+W2 nm-01 a2f6b5fe13590876e
+W3 nm-02 a84112017b7b68fa2
+W4 nm-03 a0565ab245807ff84
+W5 nm-04 affc1d427afdba197
+W6 nm-05 add0f6bf5cafd8050
+W7 nm-06 a613ae861c3a8c0c3
+W7s3 p6-14 ab35c827b17a2f37a
+W8 p6-10 ab519d2985fef7501
+W9 p6-26 a266d4c968722a36f
+W10 p6-28 ab6a32a7948829d81
+W11 p6-07 a20eb6b68905799ce
+W12 p6-13 a95b570b56481112d

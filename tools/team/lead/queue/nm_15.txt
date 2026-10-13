@@ -1,0 +1,1 @@
+animation/goals/tu_8029EE50 db/tu_80535360 ealib/tu_803F00FC game/tu_80087A58 game/tu_801A22F4

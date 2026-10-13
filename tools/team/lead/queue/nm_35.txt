@@ -1,0 +1,1 @@
+gamelib/tu_8037B3AC gamelib/tu_80387E28 snd/tu_803AC88C animation/goals/tu_80287600 animation/goals/tu_8028989C animation/goals/tu_802914C8 animation/goals/tu_80296C78 animation/goals/tu_80299920

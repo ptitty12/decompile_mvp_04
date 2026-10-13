@@ -38,6 +38,7 @@ You are a matching worker on a private matching decompilation of MVP Baseball 20
   - `Q22/hill.py`;
   - variant scoring `Q27/rv.py`;
   - flag probe `TAIL/probe.py`.
+  - decomp-permuter, standard for any near-miss (C and C++ units): `python tools/match/permute.py <unit> <fn> --setup-only` (1-3 s) tells whether the function is usable (it refuses ctors, methods, named-return functions); then `python tools/match/permute.py <unit> <fn> --minutes 15 -j 2` in the background. Port a 0-score candidate (build/permute/<fn>/output-0-*/source.c) into the source by hand and verify as usual. At most one permuter run at a time; the machine is shared.
 - Installing code: `Q12/ins.py <unit> <fn> <file> --auto` inserts without re-sorting; `Q16/put.py` and plain ins.py re-sort via sort_functions, which can move a `static inline` helper below its users and break the build.
 - A function with an unmangled symbol that another unit references can't be renamed by rename.py: define it `extern "C"`. A callee called with more arguments than its definition needs an `extern "C"` declaration under its exact mangled symbol name.
 - Write Python helpers with the Write tool, not heredocs. Preserve line endings (never `sed -i` on sources: it strips CRLF). Never write the word "asm" in source, even in comments.
