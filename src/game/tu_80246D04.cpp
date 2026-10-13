@@ -99,7 +99,7 @@ extern float lbl_8061D4B4;
 void fn_8014E498(Unk80273498_Vec3 v);
 float fn_80249070(Unk80270BA0_X* x);
 void fn_80249750(Unk80270BA0_X* x);
-void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
+extern "C" void fn_80249B40(Unk80270BA0_X* x, Unk80273498_Pos* p, int a, int b, float f);
 void fn_80249D64(Unk80270BA0_X* x, int a);
 float fn_8023C868(Unk80270BA0_X* x);
 
@@ -152,7 +152,7 @@ void fn_80247858(Unk80270BA0_X* x)
 
 float fn_804028E4(float x);
 float fn_8024796C(Unk80270BA0_X* x, int b, int c, int d, int e, float* f, int g, Unk80273498_Vec3* h, float dist);
-float atan2f(float y, float x);
+extern "C" float atan2f(float y, float x);
 extern "C" float fn_802478A0(void* o, void* p, int a, int b)
 {
     float f;
@@ -167,6 +167,37 @@ extern "C" float fn_802478A0(void* o, void* p, int a, int b)
         f = lbl_805D9278;
     fn_8027D368(g);
     return f;
+}
+
+inline Unk80273498_Vec3 Unk8024820C_Pos(int h)
+{
+    return fn_8037B128((const Unk8037B128_Mtx*)h);
+}
+inline Unk80273498_Vec3 Unk8024820C_Id(Unk80273498_Vec3 v)
+{
+    return v;
+}
+inline float Unk8024820C_D2(const Unk80273498_Vec3& a, const Unk80273498_Vec3* b)
+{
+    return (a.x - b->x) * (a.x - b->x) + (a.z - b->z) * (a.z - b->z);
+}
+inline float Unk8024820C_Ang(const Unk80273498_Vec3& a, const Unk80273498_Vec3* b)
+{
+    return atan2f(b->x - a.x, b->z - a.z);
+}
+float fn_8024820C(Unk80270BA0_X* x, int h, Unk80273498_Vec3* q, int c, int d, int e)
+{
+    Unk80273498_Vec3 p = lbl_806055AC;
+    if (h != 0)
+        p = Unk8024820C_Id(Unk8024820C_Pos(h));
+    else
+        p = x->m60;
+    float len = fn_804028E4(Unk8024820C_D2(p, q));
+    if (len > 24.0f) {
+        float ang = Unk8024820C_Ang(p, q);
+        return fn_8024796C(x, h, c, d, e, &ang, 0, q, len);
+    }
+    return fn_8024796C(x, h, c, d, e, 0, 0, q, len);
 }
 
 float fn_80248370(Unk80270BA0_X* x, Unk80273498_Vec3* p, Unk80273498_Vec3* q, int c, int d, int e)
@@ -564,6 +595,75 @@ void fn_80249958(Unk80270BA0_X* xx, Unk80273498_Vec3* p, int flag, float f)
 void fn_80249B08(Unk80270BA0_X* x, int a, float f)
 {
     fn_80249B40(x, x->m44C->m6CC, a, 1, f);
+}
+
+inline float Unk80249B40_Clamp(float lo, float t, float hi)
+{
+    return !(t > hi) ? (t >? lo) : hi;
+}
+struct Unk80249B40_X {
+    char pad0[0x71C];
+    Unk80249958_G m71C;
+    char pad720[0xAEC - 0x720];
+    Unk80273498_Vec3 mAEC;
+    Unk80273498_Vec3 mAF8;
+    Unk80273498_Pos* mB04;
+    int mB08;
+    int mB0C;
+    float mB10;
+    float mB14;
+    float mB18;
+    int mB1C;
+    char padB20[0xB3C - 0xB20];
+    Unk80249958_F mB3C;
+};
+/* near-miss (98.4%, 129 insns): retail schedules mr. r4,r4 after the stfs of mB18 (and keeps the B3C word in r11,
+   the zero in r0); ours puts it first. All orders of the three leading stores, Pos q = p, if (p) forms tried; the
+   permuter can't parse the target's bso. */
+extern "C" void fn_80249B40(Unk80270BA0_X* xx, Unk80273498_Pos* p, int flag, int b, float f)
+{
+    Unk80249B40_X* x = (Unk80249B40_X*)xx;
+    x->mB18 = -1.0f;
+    x->mB1C = 0;
+    x->mB3C.f2 = flag;
+    if (p != 0) {
+        int st = x->mB0C;
+        if (st == 0 || st == 6 || st == 8) {
+            x->mAF8 = lbl_806055AC;
+            x->m71C.f21 = 0;
+        } else {
+            if (x->mB08 == 2 && p == x->mB04) {
+                fn_8024A550(xx, f);
+                return;
+            }
+            if (st != 7) {
+                x->mAF8 = x->mAEC;
+                x->m71C.f21 = 1;
+            }
+        }
+        x->mB0C = 1;
+        x->mB10 = 0.0f;
+        x->mB14 = f;
+        x->mB04 = p;
+        x->mAEC = p->m60;
+        x->mB08 = 2;
+        x->mB3C.f0 = b;
+        return;
+    }
+    int st = x->mB0C;
+    if (st != 8) {
+        if (st == 0 || st == 6) {
+            x->mB08 = (int)p;
+            x->mB10 = 0.0f;
+            x->mB3C.f0 = 0;
+        } else if (f != 0.0f) {
+            float t = x->mB10 / x->mB14;
+            t = Unk80249B40_Clamp(0.0f, t, 1.0f);
+            x->mB14 = f;
+            x->mB10 = t * x->mB14;
+        }
+        x->mB0C = 7;
+    }
 }
 
 /* near-miss: retail compares s < 1 (cmpwi 1; bltlr); g++ folds s >= 1 into s > 0 (4 forms tried) */
