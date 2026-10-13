@@ -255,3 +255,5 @@
 
 - 2026-10-13 | Codex integration | rebased continuation over the concurrent six-function / 1,088-byte swarm pass, preserving both source changes and both bounded-attempt logs. Fresh full build retains retail SHA1; combined snapshot 20,915 exact functions and 3,003,604 matched code bytes. | none
 - 2026-10-13 | Codex persistent swarm16 | ealib/tu_803FFD9C | fn_80400690 exact (+108 B;38/41 funcs), conventional duplicate-check then first-empty callback insertion.27/27instructions,126 reference checks0mismatch/unresolved,full retail hash and unmodified baseline verifierPASS vs9a1bb0c5. Four bounded forms; first matched. Work continues by owner instruction; no batch stop condition.
+
+- 2026-10-13 | Codex persistent swarm16 | ealib/tu_803FFD9C | fn_803FFEB8 exact (+84B;39/41funcs). Retail at803FFECC forwards incoming h in r3 tofn804000C8; prior source passed0 and emitted an extra li. Provider and caller evidence confirm handle normalization.21/21instructions,128referencechecks0mismatch/unresolved,fullhash+unmodified verifierPASSvs9a1bb0c5. Work continues.

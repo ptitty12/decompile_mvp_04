@@ -159,11 +159,11 @@ extern "C" int fn_803FFE3C(int a, int b, int c, int d, int e, int f)
     return ok;
 }
 
-/* near-miss: 22 vs 21 slots. */
+/* The retail call forwards h in r3 to fn_804000C8. */
 extern "C" void fn_803FFEB8(int h)
 {
     int t;
-    if (fn_804000C8(0) == 0) {
+    if (fn_804000C8(h) == 0) {
         if (h == -1)
             t = fn_80437444();
         else
