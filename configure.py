@@ -1177,7 +1177,7 @@ config.libs = [
             Object(Matching, "libc/strcmp.c"),
             Object(Matching, "libc/strcpy.c"),
             Object(Matching, "libc/strlen.c"),
-            Object(NonMatching, "libc/strlwr.c"),
+            Object(Matching, "libc/strlwr.c"),
             Object(Matching, "libc/strncmp.c"),
             Object(Matching, "libc/strncpy.c"),
             Object(Matching, "libc/strrchr.c"),
