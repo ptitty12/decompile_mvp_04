@@ -84,6 +84,7 @@ extern "C" char* strncpy(char*, const char*, unsigned);
 extern const char lbl_805F4450[];
 extern const char lbl_805F3CA8[];
 extern const char lbl_805FB7B4[];
+extern "C" void fn_8050E394(void* a0, FeAB* y);
 extern "C" void fn_80086EC0(void* o, int a, int b);
 extern const char lbl_80667BC8[];
 extern const char lbl_805FB764[];
@@ -225,6 +226,24 @@ extern const char lbl_805F4EF4[];
 extern const char lbl_805FB8A0[];
 extern const char lbl_805FB8AC[];
 extern const char lbl_805F4F20[];
+
+struct FeP4 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+extern "C" int fn_800B5634(void* s);
+extern "C" int fn_800B5948(void* s);
+extern "C" int fn_800B5C68(void* s);
+extern "C" void fn_800E63A4__FP6Ue63A4(void* p);
+extern "C" void fn_8006C698__11Unk80069F0C(void* p);
+extern "C" void fn_800DB66C(int a, int b, int c, int d);
+extern "C" void fn_80078E10(void* g, int a, int b, int c, int* d, int* e);
+extern "C" void fn_80080EC4__FP13Unk8007FF8C_Yiiiif(void* o, FeP4* a, FeP4* b, int c, int d, float e);
+extern "C" void fn_80080E84__FP13Unk8007FF8C_Yii(void* o, int a, int b);
+extern float lbl_805FB7C0;
+extern const char lbl_805FB7B4[];
 
 extern "C" FE_OVERLAY FeScrN* fn_8050C9DC(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
@@ -399,6 +418,61 @@ extern "C" FE_OVERLAY int fn_8050DB28(FeScrQ* x)
         r = fn_800CFB38();
     }
     return r;
+}
+
+/* near-miss: 95.9%; only the order of the last p2 stores (retail writes p2.b straight to the frame) and the float load vs the p1.c/p1.d stores differ; struct accessed via pointers r1/r2 (a plain local struct costs 2 insns), g0 local before the m74 store */
+extern "C" FE_OVERLAY void fn_8050DD7C(FeScrQ* x)
+{
+    int a = FeI(x, 0x4D4);
+    FeLink4* lk = lbl_806192E0->m4;
+    int b = FeI(x, 0x324);
+    FeLink10* t = lk->m10;
+    if (fn_800B5BD4(fn_800B555C()) == 1) {
+        FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805FB7B4);
+        int s0 = ((FeWX*)p)->s88(0);
+        int s1 = ((FeWX*)p)->s88(1);
+        FeI(fn_800B555C(), 0x558) = a;
+        FeI(fn_800B555C(), 0x55C) = b;
+        fn_800DB66C(a, b, s0, s1);
+    } else if (fn_800B55A8(fn_800B555C()) == 1 || fn_800B5948(fn_800B555C()) == 1 || fn_800B5C68(fn_800B555C()) == 1) {
+        int o0;
+        int o1;
+        void* g0 = lbl_8061930C;
+        FeI(t, 0x74) = 0;
+        fn_80078E10(g0, b, a, FeI(t, 0x2C), &o0, &o1);
+        FeP4 p1;
+        FeP4 p2;
+        FeP4* r1 = &p1;
+        FeP4* r2 = &p2;
+        r1->a = a;
+        r1->b = o1;
+        r1->c = 0;
+        r1->d = 0;
+        r2->a = b;
+        r2->b = o0;
+        r2->d = 0;
+        r2->c = 0;
+        fn_80080EC4__FP13Unk8007FF8C_Yiiiif((void*)FeI(lk, 0x14), r1, r2, 0, 0, lbl_805FB7C0);
+    } else if (fn_800B5634(fn_800B555C()) == 1) {
+        FeI(t, 0x74) = 0;
+        fn_80080E84__FP13Unk8007FF8C_Yii((void*)FeI(lk, 0x14), a, b);
+    }
+    fn_8050E394(x, (FeAB*)lk);
+    int v = FeI(x, 0x17C);
+    if (v == 5 || v == -1) {
+        FeI(t, 0x18) = FeI(t, 0x14);
+    } else {
+        int w = FeI(x, 0x1C0);
+        if (w == 5 || w == -1) {
+            FeI(t, 0x14) = FeI(t, 0x18);
+        }
+    }
+    if (fn_800B55A8(fn_800B555C()) == 1 && lbl_8061A308 == 0) {
+        fn_800E63A4__FP6Ue63A4(t);
+    }
+    if (fn_800B55A8(fn_800B555C()) == 1) {
+        fn_8006C698__11Unk80069F0C(lk);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_8050DFC8(FeScrD* x)
