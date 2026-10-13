@@ -302,3 +302,9 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | ealib/tu_803A0310 fn_803A2C9C | Six ordinary C forms; best 83/84 words (97.2%), first-vector saved register/copy and final store order remain; failed body in build/swarm23 only, source restored.
 
 - 2026-10-13 | db/tu_80565FD4 fn_805697A0 | Eight ordinary C forms; best 121/121 words, one cmpw uses copied limit r21 instead of input r30; date copy and call stream exact. Scratch build/swarm32, source restored.
+
+- 2026-10-13 | ealib/tu_803CECA4 fn_803D1C78 | Eight ordinary C forms; best 119/119 words, float period/offset register allocation and shared index byte-offset register remain. Scratch build/swarm39, source restored.
+
+- 2026-10-13 | ealib/tu_803CECA4 fn_803CF77C | Exact 123/123 draft blocked on Claude-owned game fn_80363108/current CF77C declaration omitting both float inputs; 88 literal refs zero mismatches/unresolved. Draft build/swarm39/803CECA4-F77C-exact.cpp only, source restored.
+
+- 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
