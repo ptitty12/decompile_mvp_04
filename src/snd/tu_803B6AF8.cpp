@@ -179,23 +179,20 @@ extern "C" int fn_803B6D50(SndRdC* r)
     return r->m20;
 }
 
-/* near-miss: only the position of `li r3,-1` differs (retail puts it between the compare and the branch;
-   every spelling of the -1 default tried hoists it to the top of the block) */
+/* Early return: the jump pass places `li r3,-1` between the compare and the branch, as in retail. */
 extern "C" int fn_803B6D58(SndRdC* r, int n, int unused, float* dst)
 {
-    int ret = -1;
     float* d = dst;
-    if (r->m20 < r->m1C) {
-        int k = fn_803B9508(r->m28, &d, n);
-        r->m20 = r->m20 + k;
-        d = d + k;
-        if (k < n) {
-            n -= k;
-            memset(d, 0, n * 4);
-        }
-        ret = 1;
+    if (r->m20 >= r->m1C)
+        return -1;
+    int k = fn_803B9508(r->m28, &d, n);
+    r->m20 = r->m20 + k;
+    d = d + k;
+    if (k < n) {
+        n -= k;
+        memset(d, 0, n * 4);
     }
-    return ret;
+    return 1;
 }
 
 extern "C" void fn_803B6DE8(SndRdC* r)
@@ -469,12 +466,14 @@ struct SndRdG {
     int m28;
 };
 
-/* near-miss: same `li r3,-1` placement as fn_803B6D58 */
+/* -1 assigned in the else arm: the jump pass places `li r3,-1` before the branch, as in retail (cf. fn_803B6D58). */
 extern "C" int fn_803B75A8(SndRdG* r, int n, int unused, float* dst)
 {
+    int ret;
     float* d = dst;
-    int ret = -1;
-    if (r->m28 < r->m24) {
+    if (r->m28 >= r->m24)
+        ret = -1;
+    else {
         int k = fn_803B82D0(r->m1C, &d, n);
         r->m28 = r->m28 + k;
         d += k;
