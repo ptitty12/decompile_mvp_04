@@ -18,7 +18,8 @@ extern "C" int fn_80075948(void* g, int a);
 extern "C" void fn_8055F5A0(int a);
 extern "C" void fn_8055EAFC(int a);
 extern void* lbl_8061930C;
-extern "C" char* fn_8040B61C(char* dst, const char* src);
+/* Retail calls resolve to the C strcpy provider at 0x8040B61C. */
+extern "C" char* strcpy(char* dst, const char* src);
 extern "C" int fn_804FEE04(void* x);
 extern const char lbl_806806B8[];
 extern "C" int fn_804FE34C(FeP10F0* x);
@@ -284,7 +285,7 @@ extern "C" FE_OVERLAY int fn_804FEB64(FeScrRos* x)
             p->fn_vslot86();
         }
     } else {
-        fn_8040B61C(x->m138, lbl_805F4450);
+        strcpy(x->m138, lbl_805F4450);
         x->fn_vslot80(0);
         fn_800B7ADC(FeGetMgr(), x);
     }
@@ -376,7 +377,7 @@ extern "C" FE_OVERLAY void fn_804FF0F8(int kind, FeScrRos* x)
 {
     if (kind != 0) {
         if (kind == 1) {
-            fn_8040B61C(x->m138, lbl_805F4450);
+            strcpy(x->m138, lbl_805F4450);
             x->fn_vslot80(1);
             fn_800B7ADC(FeGetMgr(), x);
         }
@@ -386,7 +387,7 @@ extern "C" FE_OVERLAY void fn_804FF0F8(int kind, FeScrRos* x)
 extern "C" FE_OVERLAY char* fn_804FF18C(FeScrJ* x, char* out)
 {
     out[0] = 0;
-    return fn_8040B61C(out, (char*)x + 0x138);
+    return strcpy(out, (char*)x + 0x138);
 }
 
 extern "C" FE_OVERLAY void fn_804FF1C0(FeScrN* x, int a)
@@ -400,9 +401,9 @@ extern "C" FE_OVERLAY void fn_804FF210(void* self, int a, int b)
     char buf[0x7D0];
     FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F0C);
     fn_800E4234__FiiPUs(a, b, buf);
-    fn_800DFF0C(buf, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x44D1));
-    const char* s1 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E9);
-    const char* s2 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E8);
+    fn_800DFF0C(buf, fn_80090880__FP11Unk80090880i(lbl_8061977C, 0x44D1));
+    const char* s1 = fn_80090880__FP11Unk80090880i(lbl_8061977C, 0x3E9);
+    const char* s2 = fn_80090880__FP11Unk80090880i(lbl_8061977C, 0x3E8);
     fn_801321D4(p, self, fn_804FF31C, 0, buf, 2, -1, 1, s1, s2, 0, 0, 0, 0);
     p->fn_vslot86();
 }
