@@ -1219,7 +1219,7 @@ config.libs = [
             Object(NonMatching, "libm/s_ceil.c"),
             Object(NonMatching, "libm/s_cos.cpp"),
             Object(Matching, "libm/s_fabs.cpp"),
-            Object(NonMatching, "libm/s_floor.cpp"),
+            Object(Matching, "libm/s_floor.cpp"),
             Object(NonMatching, "libm/s_sin.c"),
             Object(Matching, "libm/ef_acos.cpp"),
             Object(Matching, "libm/ef_asin.cpp"),

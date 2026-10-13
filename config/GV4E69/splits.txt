@@ -2250,6 +2250,7 @@ libm/s_fabs.cpp:
 
 libm/s_floor.cpp:
 	.text       start:0x80410634 end:0x80410790
+	.sdata      start:0x806EED78 end:0x806EED88
 
 libm/s_sin.c:
 	.text       start:0x80410790 end:0x80410870
