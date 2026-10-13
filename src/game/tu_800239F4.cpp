@@ -212,7 +212,7 @@ extern "C" void fn_80023F98(Unk80023AC4_Obj* x)
 
 extern "C" int fn_80022730(int unused, int b, int c);
 void fn_80035628(int a, int b, int c, int d, int e, int f, int g, int h);
-void fn_8003C388(int a, int b, int c, int d, int e);
+extern "C" void fn_8003C388(int a, int b, int c, int d, int e);
 
 extern "C" void fn_80024060(Unk80023AC4_Obj* x)
 {
