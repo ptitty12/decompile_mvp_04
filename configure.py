@@ -1293,7 +1293,7 @@ config.libs = [
             Object(NonMatching, "dolphin/os/tu_80431828.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),
             Object(NonMatching, "dolphin/os/tu_804321CC.c"),
             Object(NonMatching, "dolphin/os/tu_804330D0.c"),
-            Object(NonMatching, "dolphin/os/OSMessage.c"),
+            Object(Matching, "dolphin/os/OSMessage.c"),
             Object(NonMatching, "dolphin/os/tu_80435A10.c"),
             Object(NonMatching, "dolphin/os/tu_80437444.c"),
             Object(Matching, "dolphin/pad/Padclamp.c"),
