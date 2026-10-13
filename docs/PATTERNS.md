@@ -1476,3 +1476,56 @@ Switches:
 Data and literals:
 - Never write a symbol's address as an integer literal: name the symbol. check_literals resolves pointers to externs since 2026-10-12.
 - A struct of two floats `{0,0}` gives word stores; a 16-byte `{0,0,0,0}` gives a memset call.
+
+## Pass 5 (p5 batches, 2026-10-12 evening, condensed from worker reports)
+
+Loops and counters:
+- Which nested loop gets `bdnz` is decided by global-alloc priority of the count pseudos (floor_log2(refs)*refs/life), not by loop syntax; the innermost constant-count loop wins by default. To give CTR to an outer loop, declare its counter once at function scope and reuse it in sibling loops. Check with cc1plus `-dL -dg -dl`: look for `insert_bct N: ... failed: count register already in use`.
+- Byte-sum loops (the "SumRow" family) that compile to `bdnz` with `addi rX,rec,0x1B4` inside the loop are an inline `int SumB(Rec* r) { for (int j = 0; j < 0x80; j++) s += r->a[(unsigned char)j]; }`; written in the body they get the wrong registers.
+- Pre-tested loop with a call and a shared loop-invariant `lis`: write `if (!(a)) goto done; if (!(b)) goto done; do { ... if (!(a)) break; } while (b); done:`. for/while give `b <test>`.
+- A loop whose test contains calls stays rotated (entry `b` into the test): put the calls in the `while` condition.
+- Array-with-buffer ctor chains: `i = 0;` right before the loop, not at the top (else it merges with the shared zero register).
+- `new (heap) T[n]` with an inline ctor reproduces the vec-init guard (redundant second `cmpwi n,0`) and `do {...} while (k-- != 0)`.
+- `int k = j;` copy used for a later `*4` stops gcse sharing one `slwi` across a loop.
+
+Stores, loads and scheduling:
+- Volatile store then plain load (`*(volatile int*)&kk->m30 = v;`) reproduces a hoisted `li r0,0` plus reload in key-switch tails; use the v-form switch (`int v = 0; switch (k) {...} store v`).
+- A halfword stored then re-read without forwarding (`sth; lhz`): make that member volatile in a local view.
+- The first store of an inline V3 copy written as `*(float*)d = ...` keeps the next global load below it.
+- `{ int h = f(...); g = h; }` stops the `lis` for later stores hoisting over calls in static-init sequences.
+- Typed (FeW*) member stores block the scheduler from moving a later global load above them; a `void*` store does not.
+- The same call written in both arms of an if/else reproduces retail's partial cross-jump of the argument setup.
+- `v = v*16 - K + c` is reassociated; write `v *= 16; v += c - K;`.
+- Sum-term order (`x*x + z*z` vs `z*z + x*x`) changes fmadd operand order; brute-force the 2^n orders.
+
+Switches:
+- Lopsided compare chains: GCC deletes compares whose two outcomes are identical, so the original had extra empty cases. Add the sibling function's case values as empty `break` cases. Derive the case set from balance_case_nodes (a range counts as 2); put shared-body cases first in source order (jump2 keeps the first copy).
+- Switch on a copy (`int k2 = k;`) when an outer if precedes it, so gcse does not hoist the compare into a callee-saved CR.
+- After a `k==1||k==3` guard, an explicit inner `switch (k) { case 1: ... case 3: ... }` reproduces cr4 reuse and out-of-line bodies.
+
+Calls and arguments:
+- Pass-through: `fn_X(o->m4, h)` with h unset (callee reads the caller's live r4); a 2-arg callee called with one visible argument takes the byte already in r4.
+- A call site with `crclr` against a non-variadic definition: declare the exact `extern "C"` prototype and call through a variadic function-pointer cast (e.g. a `#define CALL_X ((R (*)(A, ...))X)`). PMF-returning functions: `((Pmf (*)(int, int, ...))fn)(self, k)`.
+- By-value struct argument: pass it through an inline wrapper. A struct-return field is read directly (`f(x).m2 == K`); a named copy adds a stack copy.
+- `(char)m` at the call gives the `extsb` there; keep the variable int.
+- A float that retail reloads after every call is an `extern float lbl_X`; a literal gets CSE'd into a callee-saved FPR.
+- `r = c ? -1 : 4;` and `c ? 4 : -1` give opposite `li`/`beq` orders. `if (!(r >= u)) r = u;` stores u directly; `r >?= u` adds an `fmr`.
+- A widget call whose argument contains a call keeps `this` and the vptr in callee-saved registers; compute the argument into a plain local first if retail does not.
+
+Frames and types:
+- char[5..7] locals are BLKmode (slot at declaration); char[4]/char[8] are scalar modes (end of frame).
+- `unsigned w[8]` with `*(float*)&w[i]` gives eight distinct slots where an inline's local would reuse one.
+- Inline float params take frame slots (`Rand(rng, scale)`); a plain local `float k = ...` gets the local slot, an inline float param the temp slot.
+- Vec3 temps: `Vec3 nn = Norm(*n);` is one copy, `nn = Norm(...)` two; placement new for `*out = Add(...)`; by-value Vec3 inline params allocate extra temps; scope Sub temps in `{}` to reuse slots; an else-branch keeps the if-condition's float-param slots live.
+- One function-level `float a;` reused across matrix rows raises its priority (gets f13).
+- Local copy of a rodata table: `Tab8 t = lbl_X;` with a struct-typed extern gives the block copy and keeps the relocation.
+- A virtual view with an empty polymorphic base (vptr at 0) plus `inline void CpQ(T* d, const T& s) { *d = s; }` gives frame-direct copies of a vcall-filled temp.
+- Bit getters: `*(unsigned char*)&w & 1` (lbz), `*(unsigned short*)&w & 1` (lhz), else `((unsigned)w >> n) & 1`. `x % m == 0` flags: `unsigned short r = nn % m; f = (r == 0);`.
+- Implicit copy assignment of a class with a vptr copies the whole object and restores the vptr; a small POD copies only data words.
+- A `__static_initialization_and_destruction_0` whose `_GLOBAL_.I/.D` wrappers live in another object gets a suffixed name; only a hand-written `fn_XXXX(int init, int prio)` pairs with it.
+- EA shader setup functions clone from fn_80366D94 (define `extern "C"`, run rename.py); only the `m0`/`m6C`/`m8` store order needs a permutation search.
+
+Tooling notes:
+- Q27/rv.py segments at the first column-0 `}` after the start line: indent inner blocks. Command lines overflow above ~500 variants; batch them.
+- Units that include `../../include/...` relative headers cannot be scored from a scratch directory unless the include is made absolute (or the header copied under scratch/include).
+- Wall: retail functions using `mftb`, `mtspr`, or a literal data word after a `bl` cannot be produced from C; skip them.
