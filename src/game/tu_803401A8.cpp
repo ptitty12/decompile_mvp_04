@@ -78,6 +78,55 @@ void fn_803409AC(Unk803401A8* self, int chrg)
     fn_80330BC8(self, chrg);
 }
 
+extern char lbl_806666D8[];
+extern char lbl_80666928[];
+
+void fn_803409CC(Unk803401A8* self, int chrg)
+{
+    PUT(0x2DC, lbl_806666D8);
+    PUT(0x1610, lbl_80666EC0);
+    PUT(0x15C4, lbl_80666EC0);
+    char* s0 = (char*)self + 0xEF4;
+    PUT(0x1570, lbl_80666EC0);
+    *(const void**)(s0 + 0x2DC) = lbl_80666928;
+    PUT(0x1508, lbl_80666EC0);
+    PUT(0x14A0, lbl_80666EC0);
+    PUT(0x1438, lbl_80666EC0);
+    PUT(0x13D0, lbl_80666EC0);
+    PUT(0x1368, lbl_80666EC0);
+    PUT(0x1300, lbl_80666EC0);
+    PUT(0x1298, lbl_80666EC0);
+    PUT(0x1230, lbl_80666EC0);
+    PUT(0x11DC, lbl_80666EC0);
+    fn_80330870(s0, 2);
+    char* s1 = (char*)self + 0xB74;
+    PUT(0xEB0, lbl_80666EC0);
+    *(const void**)(s1 + 0x2DC) = lbl_80666778;
+    PUT(0xE5C, lbl_80666EC0);
+    fn_80330870(s1, 2);
+    PUT(0xB30, lbl_80666EC0);
+    char* s2 = (char*)self + 0x32C;
+    PUT(0xACC, lbl_80666EC0);
+    PUT(0xA78, lbl_80666EC0);
+    PUT(0xA14, lbl_80666EC0);
+    PUT(0x9C0, lbl_80666EC0);
+    PUT(0x95C, lbl_80666EC0);
+    PUT(0x908, lbl_80666EC0);
+    *(const void**)(s2 + 0x2DC) = lbl_80666728;
+    PUT(0x8B4, lbl_80666EC0);
+    PUT(0x860, lbl_80666EC0);
+    PUT(0x80C, lbl_80666EC0);
+    PUT(0x7B8, lbl_80666EC0);
+    PUT(0x764, lbl_80666EC0);
+    PUT(0x710, lbl_80666EC0);
+    PUT(0x6BC, lbl_80666EC0);
+    PUT(0x668, lbl_80666EC0);
+    PUT(0x614, lbl_80666EC0);
+    fn_80330870(s2, 2);
+    PUT(0x2E8, lbl_80666EC0);
+    fn_80330870(self, chrg);
+}
+
 void fn_80340AE4(Unk803401A8* self, int chrg)
 {
     PUT(8, lbl_80666EC0);
