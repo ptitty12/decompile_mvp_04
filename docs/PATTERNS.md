@@ -1760,3 +1760,271 @@ Pad and SIBios keep their original private data/BSS while referencing the alread
 A private compiler literal pool does not need to become a collection of external constants. saems has 216 contiguous .rodata bytes whose 126 target references all belong to that unit; exact section bounds, bytes and no outside consumers permit normal source ownership. GXFrameBuf similarly owns its actual 16-byte compiler pool while leaving the following constants outside the split. Audit every relocation based on the old symbol, including addends beyond a proposed range, and current compiled source consumers before removing an old export. Shared SDK version strings instead need real named source objects so existing auto-data references still link.
 
 Some SDK __os.h inclusions emit five startup-only undefined symbols with no code relocations. Where the normal Dolphin headers already supply every used declaration, removing the redundant internal include eliminates those imports without a linker workaround. Keep actual provider parameter and result types, and prove code, local branches and final addresses independently of objdiff's masked relocation scores.
+
+## ProDG GCC 2.95.3 tricks from the RE4 decomp (adonis-singh/re4)
+
+Source: adonis-singh/re4 (Resident Evil 4, GameCube debug build, byte-identical), its `docs/matching.md`, `docs/research/compiler.md`
+and its 533 `COMPILER-DIFF` tags, distilled 2026-10-13 by a research agent. Every rule is RE4's claim, made on SN GCC 2.95.3 v1.79
+(built from SN's GPL source); we ship v1.76, so rules marked [v1.79] may not apply. Re-verified on MVP so far: two SDK bodies
+(`__ARChecksize`, `PackArgs`) and one libsn body (`DSIHandler`, which needs codeless asm, so it stays unmatched).
+
+RE4 matched ~19,900 GCC functions byte-for-byte with the same compiler family (ProDG 3.9.3, GCC 2.95.3 SN). It records
+for each remaining oddity the compiler pass that causes it. Only ~7 mechanisms account for nearly all of its 526
+"COMPILER-DIFF" workarounds; the rest was solved with plain source shapes. Counts below are RE4 cluster-table sites
+(`reg-equiv-const` 106, `cse-path` 76, `global-alloc-order` 67, jump2 22, gcse-`&local`/high 22, gcse numbering 19,
+loop insn-count 19, sched ties 29, narrow extend/truncate 20, local-alloc qty 13, argmove 13, other 67).
+Legend for RE4's tag numbers: #1 FP-arg-move order, #2 narrow extension, #3 `&local`/high PRE, #4 narrow truncation,
+#5 interblock hoist, #6 jump2 survivor, #7/#9 loop exit/entry, #8 parameter copy death, #12 cse path, #13 REG_EQUIV
+constant, #17 callee-saved naming.
+
+Policy: most of RE4's tagged levers are codeless `asm("" : "+r"(x))` launders and `register T x asm("rN")` pins
+(RE4 counts 263). CLAUDE.md forbids `asm` in any form and the verifier rejects the word, so only the C-only levers
+below are usable. Whether codeless asm may ever be allowed is an owner question (DECISIONS, 2026-10-13). Each
+mechanism lists the C-only lever first.
+
+### 0. Compiler context worth knowing
+- [v1.79] The v1.76 exe emits stray `mr rX,rY` copies between unrelated GPRs around `-mfast-cast` int<->float
+  conversions (it uses one unspec for the GQR fast-cast and the classic fpmem conversions, so reload_cse copies
+  across the two kinds). RE4's v1.79 build does not. Seen in 16 of 224 RE4 units. If an MVP near-miss (libm, filters,
+  anything with `-mfast-cast`) differs only by a dead `mr` between two conversions, it is the compiler, not the source.
+- Retail may not mark scalar MEMs: RE4's original build reloads a global pointer (`pG`, `pPL`) after a member store
+  through a varying pointer, at hundreds of sites. RE4 first spelled that with reference views and one-member struct
+  wrappers (~1,200 helper calls), then replaced all of it with a 1-rule compiler patch (alias.c never sees a scalar
+  MEM). MVP's PATTERNS already contains the same symptoms and workarounds ("in-struct view", cast pointers, per-function
+  volatile views). Hypothesis worth a cheap test: if many MVP near-misses are "retail reloads X after the store,
+  ours keeps it in a register", the same rule is at work. We cannot patch the exe, but SN's GPL source ships in
+  `ProDGforNGCv393_Source_Code.zip` ("GC source code/NGC_GNU_SRC.zip") with ProDG 3.9.3; RE4's `tools/sn-gcc/build.sh`
+  + 2 patches build it natively in ~5 s. That is also the only way to get instrumented dumps (see Tooling).
+- Negative results RE4 paid for (do not repeat): no SN GCC newer than v1.79 exists publicly; host-dependence of the
+  compiler (ASLR, heap, -O0 host build) is nil; every cost-model / PRE / interblock / jump2 variant tried on the whole
+  tree regressed thousands of matched functions. The compiler passes are stock 2.95.3 except as listed; so a mismatch
+  is nearly always a source-shape question.
+
+### 1. Constants that the original keeps in a register, or rematerialises (RE4 #13, 106 sites, the biggest class)
+- Tell: retail `li`/`lis`/`lfs` sits right before its use (often in r11/r0) while ours holds the constant in a
+  callee-saved register, or the reverse. Store issue order follows.
+- Mechanism: local-alloc `update_equiv_regs`: a pseudo that is set exactly once to a constant gets REG_EQUIV and is never
+  allocated; reload rematerialises it at each use. A pseudo set twice is allocated normally.
+- C-only levers: (a) make it multi-set (a second assignment, or reuse the variable in another case) to get a
+  callee-saved copy; (b) keep it single-set, one use in another block, so the `li` moves next to the use;
+  `int repType = 1;` at function top with the use inside an `if` gives `li` at the use; (c) a function-scope
+  `int zero = 0;` stored through the variable keeps one callee-saved zero across calls; (d) locals declared after a
+  call (`int x = 0;` after `OSReport(..)`) keep their `li` after the `bl` (declared at the top they are hoisted);
+  (e) three uses make `update_equiv_regs` leave the `lis` in block 0; (f) a fold only combine can do
+  (`((u32)e >> 16) & 0xFFFF0000`).
+- Example: retail `lis r30,0x1`-style constant kept across calls = `int type = 2;` at function scope, stored later
+  through the variable.
+
+### 2. cse path: fresh `lis`/`li` where the other side reuses a register (RE4 #12, 76 sites)
+- Tell: a second `lis sym@ha` in a later block where ours reuses the first, or the reverse; a copy reaching a join.
+- Mechanism: cse's extended basic block ends at a CODE_LABEL (not at a conditional jump); the "AROUND" path from the
+  branch into the join carries the hash table; `(high sym)` has cost 0 so cse always prefers it over a pseudo.
+- C-only levers: end or extend the ebb: `do { } while (0)` between the two uses; a dead test whose then-arm ends in a
+  jump; write the load twice vs once; `if (a && b) {..} else if (c && d)` gives the else-if block two predecessors, so
+  cr0 and members are not reused (gcse then PREs the member load, `lfs f0; fmr f12,f0`); nested ifs share cr0.
+  A label with two uses (join of `if/else if`) makes `&Key` after later calls a fresh `lis/addi`; two separate `if`s let
+  cse carry it in a callee-saved register.
+- Related: `-fcse-skip-blocks` rewrites a load after a skipped `if` using the address it knew before the branch, which
+  keeps a base symbol live across a call. Fix by changing the CFG in front (`if (z == 0.0f) z = 0.0f; else {..}` instead of
+  `z = 0.0f; if (z != 0.0f) {..}`).
+
+### 3. Callee-saved register names permuted (RE4 #17, 67 sites; PATTERNS already has the priority formula)
+New details:
+- Priority is `int(10000 * floor_log2(refs) * refs / live_length)`: it truncates to an integer, so near-ties are real
+  ties (30000/L buckets: L=386 and 390 both give 76/77). Ties go to the lower pseudo number. Hoisted never-dying
+  invariants (loop-invariant `lis` in a `for(;;)`) all truncate to the same priority and are allocated in pseudo order.
+- Live length after sched1 counts only real insns (block notes and braces do not matter); at flow time it also counts
+  notes. So moving a `{` does nothing, but deleted statements and different jump layout do.
+- Pass 0 of find_reg hands out only registers already used; virgin registers come in r31, r30, ... order. A value that
+  crosses no call is never given a callee-saved register: give each loop nest its own counter (`int i2, i3`); a
+  function-level `i` reused in a loop containing a call makes its `li` float to the block top.
+- Levers: an extra use (dead test, post-loop use of a giv/biv); a second assignment (kills REG_EQUIV and adds a ref);
+  `do { } while (0)` around a nest (loop depth reweights refs); make a block-local value global by one use in another block;
+  block-scoped copies of a pointer per section (shortens live ranges, re-ranks); reusing a dead pointer local for a later
+  block extends its life to the function end and gives it the top register; redundant second assignment (`parent = w->pParent;` twice) gives
+  REG_N_SETS=2 and stops regmove merging `lwz r0; mr r29,r0; cmpwi r0`.
+- Parameters: callee-saved copy order at entry follows parameter declaration order (assign_parms); int and FP parameters
+  are numbered independently, so you may reorder them in the declaration without changing the ABI.
+
+### 4. local-alloc scratch registers (r0/r9/r11, f0/f13 swaps; 13 sites)
+- Mechanism: block_alloc orders quantities by `refs*size/(death-birth)`; suggestion quantities first.
+- Levers: statement order (birth/death), one variable per value vs a reused variable, an inline helper's own locals vs
+  function-scope locals. A float assigned twice in a block is never tied (intermediates in f0); one variable per chain
+  gives the tied form. A float temp assigned in both arms of an `if` is global, so nothing ties.
+- Index vs base register class: `lwzx rD,rBase,rOfs` / `add rP,rBase,rOfs` puts the offset in r0 when the base pseudo is
+  pointer-flagged (a pointer parameter or local) and in r9/r11 when it is not. A retail offset in r9 where ours takes r0
+  means the base was an integer (`u32 addr` PARAMETER; a `u32 addr = (u32)ptr` local does not work).
+
+### 5. The stored-value order of independent stores: derive it, do not permute (sched1)
+- Rule (matches the "weight" rule in haifa): in a block of independent stores each store has weight +1, minus 1 per
+  source register that dies there. Lowest weight first, ties in source order. Stores whose source register DIES come
+  first, ordered as "[last member of the dying group in RTL order] + [rest of the group in RTL order]", then the
+  non-dying ones in RTL order. A byte store is a barrier that splits the block into two groups. A constant shared by
+  several stores is one pseudo, so only its last store is a death: `a = b = c = 0` comes out in reverse; separate
+  `x; y; z` as `z, x, y`; the dying zero store is the LAST zero statement in source.
+- QImode and SImode zero are separate pseudos: a byte `= 0` then word stores can not share a register; the narrower store
+  first gives two registers. Same for -1/0xFFFF. A `u8` field stored from an `int` argument (inline `Set(int,int,int,int)`)
+  makes it SImode.
+- sched1 flushes its pending-memory list after 32 entries (the 34th memory insn in a block is a barrier).
+- Use: compute the target order from the asm with the weight rule first; only brute-force (RE4 used a ~0.3 s/variant
+  loop) when two members tie. MVP has `tools/match/store_orders.py` for the brute-force half.
+
+### 6. `do { } while (0)` macros are full scheduling barriers
+- A `do { } while (0)` body emits NOTE_INSN_LOOP_BEG/END; haifa makes the first insn after a loop note depend on
+  everything before it. HALT/assert-style macros written as `do { } while (0)` therefore change argument/`lis` order
+  around them (`li r4,0` vs the string `lis`), stop PRE copies from moving above the next macro, and reweight refs
+  (loop depth). RE4 changed its HALT macro to a plain `{ }` block everywhere it matters; a few units needed the do/while
+  form. Try both per unit. Conversely a deliberate `do { } while (0)` is a codeless ebb/sched/loop-weight barrier.
+  Repeated across ~40 RE4 functions; MVP's PATTERNS has no mention.
+
+### 7. `&local` as a call argument (RE4 #3, 22 sites; PATTERNS has two cases)
+- Passing `&local` directly: precompute_register_parameters copies it to a pseudo, cse/gcse merge later `&local` uses and
+  PRE hoists it into a callee-saved register (`mr r4,rX`).
+- A `static inline` helper that takes the address as a `Vec*` parameter or owns the local: integrate.c substitutes the
+  frame address straight into the hard-register argument sets (`(set r4 (plus fp 8))`), which gcse never sees, so every
+  call gets a fresh `addi r4,r1,N`. Two locals of the helper must be one BLKmode object (struct with a user copy ctor)
+  or they get separate spilled slots.
+- The local at frame offset 0 (first declared) is always recomputed per call.
+- A constant stored through the pseudo is rejected by recog (no store-immediate on PPC) and cancels the substitution;
+  write constants through a value set before a label.
+- `Vec* pa = &ang2;` at the block top, or `n = name; sprintf(n,..)` (copy before the call coalesces) vs `sprintf(name,..); n = name;`
+  (two copies of the address) are the cheap forms.
+
+### 8. Constant pool order and dead pools
+- `const f32 name = literal;` (also `const f32 a = 800.0f, b = 300.0f;`) at the top of the function: the initializer is
+  expanded at the declaration (creating the pool entry in that order and a 4-byte slot) while every use is folded to
+  the literal, no code emitted. Confirmed on 9 RE4 functions. A dead `f32 x = C;` that is dropped at tree level, or a const
+  declared after the stores, creates nothing. `f32 ang = (f32)(int)cnt;` as a dead initializer puts the signed DF magic
+  first. `0.05f` appearing as 0x3D4CCCCC is `0.01f*5.0f` folded; `h / 1.3333333f` and `1.33333333f` differ by one ulp.
+- Unexplained words in `.rodata` (zero word between two pools, stray floats/strings) = the pool/strings of a never-called
+  `static` function that the original linker stripped. Write that function (pools are emitted right before each
+  function's body; `x != 0.0` gives a DF zero, `x != 0.0f` an SF zero) and put the unit on the strip list. Unused inline functions
+  and code under `if (0)` still emit their strings and constants. Pools of identical local aggregate initializers in
+  different functions merge into one `.rodata` template unless the types differ.
+- objdiff scores constant-pool VALUES symbolically: always compare `.rodata` bytes against the split object.
+
+### 9. gcse PRE numbering and table size (19 sites; obscure but explains "unsolvable" register ties)
+- PRE-created pseudos are numbered in expression-hash bucket order; `high(symbol)` hashes by the symbol NAME (so the
+  `.LCn` numbering matters), and the table size is `max_uid/4 | 1`. Spilled `&local` pseudos get stack slots in the same order.
+  Levers (all codeless): dead `f32 lcN = N.5f;` constants earlier in the TU shift `.LC` numbers; each dead
+  `int x = 0;` adds ~3 uids; a small dead block adds a few. Use only after the cheaper levers fail. Symptom: two
+  hoisted highs / pool constants with swapped callee-saved registers at equal priority; slot rotation of spilled `&local`s.
+- gcse is one pass (MAX_PASSES 1), block-based PRE: recomputes at the end of the earliest optimal block even if the block
+  already computes it; it inserts BEFORE the first parameter load if the block ends in a CALL (EH); C++ blocks end at every
+  call (flow appends `use (const_int 0)`), so `&member` computed in both arms of an if/else and used after the join gets
+  its copy right after the arm's `bl`. Copy signature: `lfs f0; fadds ..,f0; fmr f11,f0` = a member load reused by PRE
+  (no local); a local gives no `fmr`. PRE of a struct load across an if/else is blocked by any store in the arm.
+
+### 10. Loops (loop.c, jump.c)
+- Hoisting threshold: `threshold * savings * lifetime >= insn_count`; with a call in the loop `threshold = 1 + n_non_fixed_regs
+  = 71`. A `lis` (savings 1) is hoisted out of an outer loop only while it has <= ~71 real insns; two-pass: the second
+  pass can hoist an inner invariant. Lever: change the real insn count (dead statement in body, value computed before the loop).
+- Rotation table (what the spelling does):
+  `for(;;){ if (c) break; ..}` and `while (c)` rotate (single bottom test); `while (1)` with a deep break and
+  `if (!c) {..} else break;` do not; a `goto` loop gets NO loop notes (no invariant hoisting, no givs, un-rotated
+  `b test`); `i = 0; if (i < n) do {..} while (++i < n);` is the guarded do-while (entry test + bottom test); a `for`
+  with a call in the hit path plus `break` is not rotated; `return` inside the body gives `bdnz`; `for (i = n-1; i >= 0; i--)` gives `subic./bge`.
+  Constant trip count: `for (i = 0; i < N; i++) a[i] = f(a[i])` has no entry test and compares the pointer to the last
+  element (`cmplw`); `for (p = a; p <= &a[N-1]; p++)` keeps an entry test. `u32` counter gives `cmplw` and an up-counting
+  `mtctr` loop, `int` gives `cmpw` and a down-counting one. `insert_bct` refuses known counts < 3.
+- Strength reduction: a single-use giv is not combined; `u32` vs `int` decides cmplw/cmpw; a post-loop use keeps the biv
+  (`cmpwi i,N` stays); block-scoped `T* p = &a[i]` per loop gives replaceable givs; ONE function-scope pointer shared by all
+  loops makes loop.c use `final_giv_value` (an `addi r0,base,0x58` after the inner loop and `mr` into the next
+  loop's bound); `n = 0; f(C + n*step); n++` reproduces a `li rY,C` issued last in the preheader in the highest callee-saved.
+  `lbzu r0,4(rP)` at a loop top = `p += 4;` as the first body statement.
+- `return X` inside a loop is moved after the nearest BARRIER outside all loops (loop.c): `if (n == 0) return 0;` before the
+  loop creates a barrier; `if (n != 0) {loops} return 0;` does not.
+- Interblock scheduling (haifa `find_rgns`): a function whose last block is a plain return block with an insn gets
+  single-block regions only (no interblock motion at all); a `return` anywhere kills every region of the function; use
+  `on = 0` instead. Regions also need loops <= 10 blocks / 100 LUIDs. A loop body above the limit shows no speculative hoist.
+- Peeled first iteration / duplicated entry test: `for (p = list; p->next; p = p->next) { if (p->next == q) {..; ret = 1; break;} }`;
+  `return` in the body gives the rotated single-test loop. `if ((v = x) == 0) { do {..} while ((v = x) == 0); }` duplicates the entry test.
+
+### 11. Branch, store-flag and tail shapes (jump.c, 22 sites for jump2)
+- BRANCH_COST is 0 in SN's build: `&&` is never folded to `&`, so a `subfic/adde .. and.` pair is an explicit `&`.
+  `x = (a == 2)` is a setcc; `x = 1; if (f() != 2) x = 0;` store-flags to `xori/subfic/adde` (jump.c finds the constant 1
+  across the call); the reversed test `== 2` keeps `cmpwi/bne/li`. `return x == 0` gives `subfic r0,rX,0; adde`;
+  `return x != 0` a branch. An inline `if (c) return 1; return 0;` gives `li 0; bge; li 1`; `return c` gives `mfcr/extrwi`.
+  `x == 2 || x == 3 || ...` on one lvalue is range-folded (`subi; cmplwi`), but `||` of inline CALL_EXPRs
+  (`SysRegionIs(2) || SysRegionIs(3)`) is not (operand_equal_p refuses side effects) and gives the `cmpwi k; beq L1` chain.
+  `int susp = !(m->flag & bit); if (susp)` gives `xori; andi.`, direct gives plain `andi./beq`.
+- A diamond `if (c) x = a; else { x = b; ...}`: jump.c hoists `x = a` above the test only when the else arm STARTS with a set of the
+  same variable (an else arm starting with a call keeps it). `if (c) return call(); return NULL;` lets `li r3,0` hoist above the
+  branch because the fall-through arm starts with a set of r3; `if (!(f & 4)) return NULL; return call();` keeps it in an arm.
+- jump2 cross-jump (#6): the survivor is decided by the RTL at jump2 entry. flow.c appends `(use (const_int 0))` after any CALL
+  that ends a block, so one of N identical call tails stays unmerged unless the arm does not end in the call (repeat a
+  trailing store in each arm). `ret = f(); ...; return ret;` in every branch stops tail merging. A block ending in a call
+  followed by a label gets a nop that blocks the merge; a dead trailing statement suppresses it. `tools/research/xjump.py`
+  predicts the survivor (describe in Tooling).
+- reload_cse: `mr r3,rX; mr r4,rY` argument copies vanish in ours when nothing since the definition forgets the register table
+  (a CODE_LABEL, a CALL or a volatile ASM). Add the label by writing a loop/goto form between definition and call.
+  An early `return 0.0f` merged with the final return inserts such a label: the following call re-copies a still-valid argument.
+- `mr; cmpwi` vs `mr.`: combine always fuses `P = r3; cmp P` after a call into `mr.`; the copy survives only when
+  can_combine_p fails (set of r3 or volatile in between, a label, non-REG destination). RE4 tried ~30 forms: open.
+
+### 12. Narrow types
+- A `u8`/`u16` struct MEMBER read directly in two places, the first in a QI/HI-mode context (range fold `x >= 0xF8 && x <= 0xFD`,
+  a `switch`), stays a QI/HI pseudo and every later int use gets an explicit `clrlwi`; `u8 v = p->member` (local) is
+  promoted and never masked. `u32 no = rec->x6; if (no > 0x7F)` keeps `cmplwi 0x7f` where a u8 local folds to `andi.`.
+- A callee's parameter type drives `extsh`/`clrlwi` at the call site: read the type from the mangled symbol
+  (`setTime__8IDSystemP6IdUnits` = `s16`) before suspecting the compiler. `u8 f()` result assigned to a `u8` local is never
+  masked (SUBREG_PROMOTED); an `int` local holding it and passed to two u8 parameters gets one PRE'd `clrlwi`.
+  A byte field passed straight to a `u8`-prototyped call gives `lbz; clrlwi; mr`; with an `int` prototype it folds.
+- `(f32)(int) w->u8` gives the signed double trick, `(f32) u8` gives `psq_l qr2`; a `u32 x:8` bitfield gives the unsigned trick.
+  `s16 mem += (int)(s16)(float)` keeps `lha/extsh/add/sth`; without `(int)` the front end narrows to u16 arithmetic.
+- Plain `char` is signed; `switch` on `u32` gives `cmplwi`, `int` gives `cmpwi`. `1.0f` forms: `x + -1.0f` gives `fadds -1.0`, `x - 1.0f` `fsubs`.
+
+### 13. Frame layout (function.c)
+- Frame = ALIGN16(8 + ALIGN8(vars) + 8 fpmem + ALIGN8(saved gp+fp)). An "unexplained 8-byte slot" is often this rounding.
+- BLKmode locals get their slot at declaration (rounded to 8); address-taken sub-word scalars at the first `&` in parse order;
+  word-or-larger address-taken scalars go through ADDRESSOF and get slots at purge time (after every sub-word slot).
+  An unused aggregate local declared before them shifts every later slot (`addi r28,r1,0x18` instead of `0x8`). Sibling blocks
+  reuse freed slots first-fit; a nested block inside a live variable's block does not. `Vec`/`Mtx` locals are 8-aligned (Vec rounds
+  to 0x10, so `.x` and `.z` stores sit 8 apart). A struct local 8 bytes bigger than declared means the struct is bigger.
+  `double d;` unused keeps a frame; zero-length arrays are legal and free.
+
+### 14. Aliasing and reloads (see 0)
+- Cast-then-deref (`*(u32*)((u8*)p + ofs)`) yields a MEM without MEM_IN_STRUCT_P, so it aliases scalar globals and forces
+  `pG/pSys` reloads; `p[i]` / `*(p + i)` / `p->member` do not. Byte (QImode) stores alias everything (every global reloaded).
+  A store through a plain pointer variable (`*d = v`, no `+`) is assumed to alias static scalars; `p[i] = v` does not.
+  `memcpy` into byte-pointer arithmetic (`(u8*)w + ofs`) makes the next member store reload; into `&pG->m`, `(u8*)&pG->m` it does not;
+  a `void*` destination is not inlined at all.
+- `volatile u32 flag`: explains `lwz; stw; lwz; cmpwi` reloads after a store, a `lwz rX,0(rY); stw rX,0(rY)` no-op pair
+  (inline setter whose constant folds to `flag |= 0`), and `cb = g_cb; g_phase = 0; if (cb)` keeping the load before the store.
+  A volatile store never moves above a volatile load; a plain load can.
+- `new`: the original often stores ctor fields late with the object pointer in a callee-saved register and spills for
+  `&local`s because `new`'s result had no unique alias base (calls.c `is_malloc` -> REG_NOALIAS). RE4 binds class-scope
+  `operator new` to the `__builtin_new` symbol, or reads the global inside a non-inlined helper to break it.
+
+### 15. Calls
+- Declared floats-first: GPR and FPR argument registers are numbered independently, so a callee `init(int,int,int,f32 x7)` can be
+  declared `init(f32 x7, int,int,int)` (and its mangled name adjusted) to get the `fmr`s before the trailing `li`s, because
+  gcc emits register moves in declaration order. RE4 #1: 13 sites; 8 of 26 aliases were unnecessary, check the plain call first.
+  Passing float constants as locals (pseudos) instead of literals changes whether the constant survives in a callee-saved
+  register for later `= 0.0f` stores. The callee's real RETURN TYPE (void vs int) adds an r3 output dependence that moves
+  `li r3,..` to the end of the argument block (PATTERNS already has this).
+- Inline accessors used as call arguments are evaluated by precompute_arguments before stack-argument stores; plain member
+  reads reload the pointer after each store. `alpha * rate * helper(...)` evaluates the call first; `helper(..., alpha * rate)` precomputes.
+- `fabsf` as volatile asm is a scheduling barrier; `__builtin_fabsf` is not.
+- `f(x) ; g(&local)` where g is an in-class inline: see 7. A callee that ignores its declared arguments still gets them in r3..: declare it with the real parameters.
+- `switch (n) {..}` shape facts (casetree.py agrees with PATTERNS): the number of nodes, not only the values, shapes the tree;
+  empty `case k: break;` and default-equal arms count; `default:` written first is laid out first; identical case bodies written
+  twice keep two nodes and are cross-jumped into the LAST copy; a shared `case a: case b:` label is a range node.
+
+### 16. Layout and emission order (C++ and data)
+- In-class inline members of a class whose vtable the TU emits are ALL emitted (used or not), after the destructor, in
+  declaration order; an explicit `~C() {}` moves the base template destructor relative to them; the implicit one gives the DOL
+  order. An out-of-class `inline` member of that class is still emitted and called out of line from other units.
+- Vtables are emitted in reverse class-declaration order; marking a vtable that needs an uninstantiated template member
+  instantiates it in place (its strings land between vtable groups). `__static_initialization_and_destruction_0` and the `_GLOBAL_.I.<key>`
+  thunk come before out-of-class inline members; `<key>` is the first PUBLIC function/initialised object emitted.
+  A class with a ctor and an empty `~T() {}` emits both `global constructors keyed to` and `global destructors keyed to`.
+- Uninitialised globals are emitted in order of FIRST DECLARATION including header externs (so header extern order decides
+  `.bss/.sbss` layout); initialised objects at their definition; file-scope unreferenced statics are dropped; `static int x = 0;`
+  and `int x = 0;` go to `.sdata`; <= 8 bytes (-G 8) to `.sdata/.sdata2`; 16-byte zero-initialised to `.data`; an INCOMPLETE `extern T x[];`
+  declaration before the definition forces the full `lis/addi` form even for a small object; an 8-byte member raises a class's `.bss`
+  alignment to 8 (4-byte gaps); `__attribute__((aligned(32)))` creates the 0x10 holes.
+- `#line N "file"` before the FIRST `__FILE__` use in the TU (dead functions included) or a second shorter string appears.
+
+### 17. Also seen, already in PATTERNS (skipped): callee return types, cross-jump basics, switch trees, dead-compare switches,
+priority formula, `-O2` vs `-Os`, `fmadds` fusion, `cror` float branches, in-struct view casts, per-function volatile view.
