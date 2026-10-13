@@ -4,6 +4,16 @@
  */
 #include "game/fe_80459228.h"
 extern "C" {
+int fn_8057CF60(void* s, int a);
+void fn_80556348(void* p);
+int fn_8057CE00(int a);
+int fn_805559D4(void* buf, int n, int a);
+int fn_805563C4(void* p);
+int fn_80556410(void* p);
+char* fn_80403DE4(char* dst, const char* fmt, ...);
+void fn_80529028(int a, void* x);
+}
+extern "C" {
 int strcmp(const char* a, const char* b);
 char* strncpy(char* a, const char* b, unsigned n);
 }
@@ -477,4 +487,54 @@ FE_OVERLAY void fn_8046F4B0(void)
     fn_800E25E0(fn_800B7A94(FeGetMgr(), lbl_805F4F84), 0);
 }
 
+}
+
+/* near-miss: 98.65%, same 152 insns and CTR/mfctr loop shape; only callee-saved register numbers differ (retail t=r25 h=r29 i=r24 off2=r31, ours t=r24 h=r31 i=r27 off2=r25). */
+extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
+{
+    int sp20[4];
+    int sp30[4];
+    char sp40[0x1E0];
+    char buf[0x320];
+    int i;
+    void* t = lbl_8061977C;
+    void* h = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+    for (i = 0; i <= 3; i++) {
+        sp20[i] = 0;
+        sp30[i] = fn_8057CF60(h, i);
+    }
+    char* p = sp40;
+    int k = 11;
+    do {
+        fn_80556348(p);
+        p += 0x28;
+    } while (k-- != 0);
+    for (i = 0; i <= 3; i++) {
+        sp20[i] = 0x4635;
+        fn_8057CE00(i);
+        int n = fn_805559D4(sp40, 12, i);
+        if (n > 0) {
+            int off2 = 0;
+            int c = n;
+            do {
+                char* e = sp40 + off2;
+                if (fn_805563C4(e) == fn_80556410(e) && fn_80556410(e) == sp30[i]) {
+                    sp20[i] = 0x5DC0;
+                } else {
+                    char* e2 = sp40 + off2;
+                    if (fn_805563C4(e2) == sp30[i] || fn_80556410(e2) == sp30[i]) {
+                        sp20[i] = 0x5DC1;
+                    }
+                }
+                off2 += 0x28;
+            } while (--c != 0);
+        }
+    }
+    const char* s0 = fn_80090880__FP11Unk80090880(t, 0x38F0);
+    const char* s1 = fn_80090880__FP11Unk80090880(t, sp20[0]);
+    const char* s2 = fn_80090880__FP11Unk80090880(t, sp20[1]);
+    const char* s3 = fn_80090880__FP11Unk80090880(t, sp20[2]);
+    fn_80403DE4(buf, s0, s1, s2, s3, fn_80090880__FP11Unk80090880(t, sp20[3]));
+    fn_801321D4((FeW*)x->m140, x, (FeCbF)fn_80529028, 0, buf, 1, -1, 1, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x26DE), 0, 0, 0, 1, 0);
+    ((FeW*)x->m140)->fn_vslot86();
 }
