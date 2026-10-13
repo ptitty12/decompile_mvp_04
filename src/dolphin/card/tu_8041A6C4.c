@@ -625,13 +625,13 @@ s32 fn_8041B900(CARDControl* card, s32 result)
     return result;
 }
 
-/* CARDFreeBlocks
- * near-miss: instruction-identical but the retail frame is 8 bytes bigger (two more 4-byte stack locals around `card`). */
+/* CARDFreeBlocks */
 s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
 {
     CARDControl* card;
     u16* fat;
     CARDDir* dir;
+    CARDDir* ent;
     s32 result;
     u16 fileNo;
 
@@ -653,7 +653,8 @@ s32 fn_8041B964(s32 chan, s32* byteNotUsed, s32* filesNotUsed)
     if (filesNotUsed) {
         *filesNotUsed = 0;
         for (fileNo = 0; fileNo < 127; fileNo++) {
-            if (dir[fileNo].fileName[0] == 0xFF) {
+            ent = &dir[fileNo];
+            if (ent->fileName[0] == 0xFF) {
                 (*filesNotUsed)++;
             }
         }
