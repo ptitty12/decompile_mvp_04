@@ -45,6 +45,9 @@ void fn_8006F4D0(Unk8006902C_Handle* h);
 void fn_8014D81C(Unk8014D81C_Obj* p);
 Unk8006902C_Mode* fn_80086210(void* p);
 
+extern float lbl_805B3970[][2];
+extern "C" float fn_8007189C__FP1Wii(void* w, int k);
+
 inline int SumBytes(Unk8006902C_Side* s)
 {
     int t = 0;
@@ -460,6 +463,31 @@ inline int SideOf(Unk8006902C_Players* p)
 }
 int fn_80076644(int a, int b, int c);
 extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+/* near-miss (98%): all instructions match except the callee-saved assignment of the three arguments (retail: sd r31, ri r30, id r29; ours: sd r30, ri r29, id r31) and one load order in the loop. */
+void Unk80069F0C::fn_8006BA84(Unk8006902C_Side* sd, int ri, int id)
+{
+    float a = fn_8007189C__FP1Wii(sd->mC9C, 0x12);
+    float f = !((a - 0.4f) * 1.6949152f > 1.0f) ? ((a - 0.4f) * 1.6949152f >? 0.0f) : 1.0f;
+    float sum = 0.0f;
+    float diff, denom, q;
+    Unk8006A138_It<9> it(0);
+    int i = 0;
+    do {
+        int cnt = sd->m3E8[ri].mC[i];
+        if (cnt > 0) {
+            diff = lbl_805B3970[i][1] - lbl_805B3970[i][0];
+            denom = diff * f + lbl_805B3970[it.v][0];
+            q = (float)cnt / denom;
+            sum += q;
+        }
+        i = it.Next();
+    } while (i <= 9);
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    q = (float)sc->fn_8007A8DC(0x1C, id) * 0.0625f;
+    denom = q + sum;
+    sc->fn_8007A94C(0x1C, id, (int)(denom * 16.0f));
+}
 
 extern "C" int fn_8006BC74(Unk80069F0C* self, int idx)
 {

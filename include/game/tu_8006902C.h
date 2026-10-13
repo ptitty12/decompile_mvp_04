@@ -203,6 +203,7 @@ struct Unk80069F0C {
     void fn_8006B880();
     void fn_8006B990();
     int fn_8006A1B4();
+    void fn_8006BA84(Unk8006902C_Side* sd, int ri, int id);
     int fn_8006BDCC();
     int fn_8006BE18();
     void fn_8006C930();
