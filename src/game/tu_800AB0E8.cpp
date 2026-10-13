@@ -133,6 +133,56 @@ extern const char lbl_8065B8B8[];
 extern const char lbl_8065B780[];
 extern const char lbl_8065AD10[];
 extern const char lbl_8065ACD0[];
+/* fn_800ABFF8: 0x5C-byte element (vptr +8; embedded sub-object at +0xC with its vptr at +0x28). */
+struct FEOb5C {
+    int m0;
+    int m4;
+    const void* m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    const void* m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+};
+struct FESubC {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    const void* m1C;
+};
+extern const char lbl_8065B6A8[];
+extern const char lbl_8065BA20[];
+extern const char lbl_8065AE68[];
+extern const char lbl_8065AE88[];
+extern const char lbl_8065AD98[];
+extern const char lbl_8065ADB8[];
+extern "C" void fn_800AF544(void* p);
+extern "C" void fn_800AF148(void* p);
+inline void FESubCInit(FESubC* s)
+{
+    s->m1C = lbl_8065BA20;
+    s->m0 = 0;
+    s->m4 = 0;
+    s->m8 = 0;
+    s->mC = 0;
+    s->m10 = 0;
+    s->m14 = 0;
+    s->m18 = 0;
+}
+
 struct FEOb12 {
     int m0;
     int m4;
@@ -626,6 +676,31 @@ extern "C" int fn_800ABF74(UnkFETable* t, int key)
         }
     }
     return 0;
+}
+
+extern "C" UnkFETable* fn_800ABFF8(UnkFETable* self, int* src, int n)
+{
+    fn_800AB1CC(self, src, n);
+    self->m18 = lbl_8065B6A8;
+    for (int i = 0; i < n; i++) {
+        FEOb5C* o = (FEOb5C*)operator new(0x5C, 0x400);
+        fn_800AEFF4((FEOb12*)o, i, src[i]);
+        FESubCInit((FESubC*)((char*)o + 0xC));
+        o->m2C = 0;
+        o->m30 = 0;
+        o->m34 = 0;
+        o->m38 = 0;
+        o->m3C = 0;
+        o->m40 = 0;
+        o->m28 = lbl_8065AE68;
+        o->m8 = lbl_8065AE88;
+        fn_800AF544(o);
+        fn_800AF148(o);
+        o->m28 = lbl_8065AD98;
+        o->m8 = lbl_8065ADB8;
+        fn_800AB758(self, i, ((FEO8*)o)->s2(0));
+    }
+    return self;
 }
 
 /* near-miss (6 slots): retail copies the source pointer (mr r31,r30) after the loop pre-test and assigns n/i to r28/r27; only the register order differs */
