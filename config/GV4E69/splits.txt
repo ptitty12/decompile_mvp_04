@@ -2311,6 +2311,8 @@ libm/kf_sin.cpp:
 
 libm/kf_tan.cpp:
 	.text       start:0x80411F14 end:0x80412128
+	.sdata      start:0x806EF058 end:0x806EF078
+	.sdata2     start:0x806F03A4 end:0x806F03D8 align:4
 
 libm/ef_rem_pio2.cpp:
 	.text       start:0x80412128 end:0x80412478
