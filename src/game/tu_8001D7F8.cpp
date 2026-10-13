@@ -118,7 +118,7 @@ void Unk8001CE80::fn_8001DA7C()
 
 extern "C" void fn_80235BE0(float* out, int a, ...);
 extern "C" int fn_8022EA7C(int a, float* v, float s);
-int fn_80043940(float b, float c, int a);
+extern "C" int fn_80043940(float b, float c, int a);
 
 int Unk8001CE80::fn_8001DA9C()
 {
