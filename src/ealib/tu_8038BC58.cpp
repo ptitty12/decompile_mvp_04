@@ -403,6 +403,20 @@ extern "C" int fn_8038D170(int tex)
     return (int)p;
 }
 
+extern "C" int fn_803AC11C();
+extern "C" void fn_804005DC();
+extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" int fn_803FD964(int a, int b, int c, int d, int e);
+extern "C" int fn_803FDE54(int a, int b);
+extern "C" void fn_803FDD28(int h, int a, int b);
+extern "C" int fn_803FDFB4(int a, int b, int c, int d);
+extern "C" void fn_803FDBC4(int h, int a, int b, int c, int d);
+extern "C" int fn_803FB59C(int a, int b);
+extern "C" int fn_803FDEC0(int a, int b, int c, int d);
+extern char lbl_80605F8C[];
+extern char lbl_80605FA4[];
+extern int lbl_80699B9C;
+
 extern "C" VdM2* fn_8038D4E4(VdM2* self, int a, int b, int c, int d)
 {
     self->m64 = 0;
@@ -414,6 +428,87 @@ extern "C" VdM2* fn_8038D4E4(VdM2* self, int a, int b, int c, int d)
     } while (n-- != 0);
     fn_8038D57C(self, a, 0, b, 0, 0, 0, 0, 0, c, d);
     return self;
+}
+
+extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j)
+{
+    char* s = (char*)self;
+    int fl = j;
+    if (fn_803AC11C() == 0)
+        fl = 1;
+    fn_803FFC58(s, 0, 0x98);
+    *(int*)(s + 0x18) = i;
+    *(int*)(s + 0x20) = 0;
+    *(int*)(s + 0x28) = 0;
+    *(int*)(s + 0x1C) = fl;
+    *(int*)(s + 0x24) = 0;
+    *(int*)(s + 0x2C) = 0;
+    *(int*)(s + 0x44) = 0;
+    *(int*)(s + 0x60) = 0;
+    *(int*)(s + 0x68) = 0;
+    *(int*)(s + 0x00) = 0;
+    *(int*)(s + 0x74) = 0;
+    *(int*)(s + 0x78) = 0;
+    *(int*)(s + 0x94) = 0;
+    *(int*)(s + 0x0C) = a;
+    *(int*)(s + 0x10) = e;
+    int ok = 0;
+    if (lbl_80699B94.m0 != 0 && lbl_80699B94.m4 != 0)
+        ok = 1;
+    if (ok == 0) {
+        fn_804005DC();
+        return;
+    }
+    if (e != 0) {
+        *(int*)(s + 0x14) = 1;
+        *(int*)(s + 0x04) = (int)lbl_80699B94.m0(lbl_80605F8C, c, 0, 0, lbl_80699B94.m8);
+        *(int*)(s + 0x08) = (int)lbl_80699B94.m0(lbl_80605FA4, g, 0, 0, lbl_80699B94.m8);
+        *(int*)(s + 0x30) = fn_803FD964(2, 2, 1, *(int*)(s + 0x04), c);
+        *(int*)(s + 0x34) = fn_803FD964(2, 2, 1, *(int*)(s + 0x08), g);
+        fn_803FDD28(*(int*)(s + 0x34), 0x98, 0x34);
+        fn_803FDD28(*(int*)(s + 0x30), 0x98, 0x34);
+        fn_803FDBC4(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
+        fn_803FDBC4(*(int*)(s + 0x30), 2, 0, 0, -2);
+        if (*(int*)(s + 0x1C) == 0)
+            fn_803FDBC4(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, 1);
+        else
+            fn_803FDBC4(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, -1);
+        fn_803FDBC4(*(int*)(s + 0x34), 2, 0, 0, -2);
+        int mode = *(int*)(s + 0x18);
+        if (mode == 1) {
+            *(int*)(s + 0x2C) = fn_803FB59C(e, lbl_80699B94.m8);
+            *(int*)(s + 0x24) = fn_803FB59C(a, lbl_80699B94.m8);
+        } else if (mode == 0) {
+            *(int*)(s + 0x3C) = fn_803FDEC0(*(int*)(s + 0x34), e, h, 0);
+            *(int*)(s + 0x38) = fn_803FDEC0(*(int*)(s + 0x30), a, d, 0);
+        } else if (mode == 2) {
+            *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
+            *(int*)(s + 0x3C) = fn_803FDFB4(*(int*)(s + 0x34), *(int*)(s + 0x10), f, 0);
+        }
+    } else {
+        *(int*)(s + 0x14) = e;
+        int p = (int)lbl_80699B94.m0(lbl_80605F8C, c, 0, 0, lbl_80699B94.m8);
+        *(int*)(s + 0x04) = p;
+        *(int*)(s + 0x08) = e;
+        *(int*)(s + 0x30) = fn_803FD964(2, 3, 2, p, c);
+        *(int*)(s + 0x34) = fn_803FDE54(*(int*)(s + 0x30), 2);
+        fn_803FDD28(*(int*)(s + 0x34), 0x98, 0x34);
+        fn_803FDD28(*(int*)(s + 0x30), 0x98, 0x34);
+        fn_803FDBC4(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
+        fn_803FDBC4(*(int*)(s + 0x30), 3, 0, 0, -2);
+        if (*(int*)(s + 0x1C) == 0)
+            fn_803FDBC4(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, 2);
+        else
+            fn_803FDBC4(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, -1);
+        int mode = *(int*)(s + 0x18);
+        if (mode == 1) {
+            *(int*)(s + 0x24) = fn_803FB59C(a, lbl_80699B9C);
+        } else if (mode == 0) {
+            *(int*)(s + 0x38) = fn_803FDEC0(*(int*)(s + 0x30), a, d, 0);
+        } else if (mode == 2) {
+            *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
+        }
+    }
 }
 
 extern "C" int fn_8038DDE8(VdMain* s, float f)
