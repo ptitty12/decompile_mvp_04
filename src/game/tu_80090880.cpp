@@ -16,14 +16,14 @@ extern const char lbl_805B5790[];
 extern const char lbl_805B579C[];
 extern char lbl_806877CC[];
 
-char* fn_80090880(Unk80090880* p)
+char* fn_80090880(Unk80090880* p, int id)
 {
     char* s = p->m4;
     if (!s)
         s = p->m8;
     if (s) {
         char buf[0x80];
-        char* r = fn_80402CAC(s);
+        char* r = (char*)fn_80402CAC((const unsigned char*)s, id);
         if (!r) {
             fn_804089B4(buf, lbl_805B5734);
             fn_804031BC(lbl_806877CC, buf);

@@ -16,14 +16,14 @@ void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
  * Evidence: ctor args in the v5 slots (fn_80091240 etc.), m4/mC read in
  * fn_80090A24, virtual dtor called with 3 in the v6 slots.
  */
-/* Argument of fn_80090880 (reads +4 and +8 only). */
+/* String-table view for fn_80090880; incoming ID is forwarded to fn_80402CAC. */
 struct Unk80090880 {
     int m0;
     char* m4;
     char* m8;
 };
 
-char* fn_80090880(Unk80090880* p);
+char* fn_80090880(Unk80090880* p, int id);
 
 struct TblBase;
 struct DbObj {
@@ -76,7 +76,7 @@ struct RowRef;
 
 extern "C" {
 char* fn_8040B61C(char* dst, const char* src); /* strcpy */
-char* fn_80402CAC(char* s);
+const unsigned char* fn_80402CAC(const unsigned char* s, int id);
 int fn_804089B4(char* dst, const char* fmt, ...); /* sprintf */
 void fn_804031BC(char* dst, const char* src);
 int fn_800736EC(const char* s);
