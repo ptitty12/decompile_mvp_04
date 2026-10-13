@@ -462,7 +462,7 @@ extern "C" DB_OVERLAY int fn_80565E9C(Db80565CDC_S* self)
 }
 
 /* fn_805658F8: host vptr +0xDBC, row-set vptr +0x10, row status +0x20. */
-struct Db805658F8_Row { char pad0[0x1C]; int m1C; int m20; };
+struct Db805658F8_Row { int m0; char pad4[0xC]; float m10; char pad14[8]; int m1C; int m20; };
 class Db805658F8_Rows { public: char pad0[0x10];
     virtual void v1();
     virtual void v2();
@@ -490,8 +490,8 @@ class Db805658F8_Host { public: char pad0[0xDBC];
     virtual void v1();
     virtual void v2();
     virtual void v3();
-    virtual void v4();
-    virtual void v5();
+    virtual Db805658F8_Rows* v4(int);
+    virtual Db805658F8_Rows* v5(int);
     virtual void v6();
     virtual void v7();
     virtual Db805658F8_Rows* v8(int);
@@ -646,4 +646,78 @@ extern "C" DB_OVERLAY int* fn_80563D3C(int* out,int id,int level,int age,int kin
     if(!sc->fn_8007A270(id) && (selected==8 || selected==4))selected++;
     *out=selected;
     return out;
+}
+
+extern "C" int fn_800845E4__Fi(int);
+extern "C" int fn_8056B734(Unk8052B978_Tbl**,int);
+extern float lbl_805FF948;
+extern "C" DB_OVERLAY int fn_80565448(Db80565CDC_S* self,int a)
+{
+    float oldValue,oldBudget,change,newBudget;
+    Unk8052B978_Tbl* t=self->m28;
+    int last=fn_8052BD40(t);
+    int active=1;
+    if(t->m8[last].f4==0)active=0;
+    if(active==1) {
+        Db805658F8_Host* host=(Db805658F8_Host*)a;
+        Unk8006A138_It<25> first(0);
+        int i=0;
+        do {
+            if(host->v4(i)->v21(0)->m20!=4)goto failure;
+            i=first.Next();
+        }while(i<=5);
+        Unk8006A138_It<10> second(0);
+        int j=0;
+        do {
+            if(fn_800845E4__Fi(j)==1) {
+                Db805658F8_Rows* rows=host->v5(second.v);
+                int key=rows->v21(0)->m0;
+                oldValue=rows->v21(0)->m10;
+                oldBudget=(float)fn_8056B734(lbl_80619948->m28,key);
+                int key2=rows->v21(1)->m0;
+                change=rows->v21(1)->m10-oldValue;
+                newBudget=(float)fn_8056B734(lbl_80619948->m28,key2);
+                if(change<=(newBudget+oldBudget)*lbl_805FF948)goto failure;
+            }
+            j=second.Next();
+        }while(j<=1);
+        return 1;
+    }
+    failure:return 0;
+}
+
+extern float lbl_805FF958;
+extern "C" DB_OVERLAY int fn_805656A0(Db80565CDC_S* self,int a)
+{
+    float oldValue,oldBudget,change,newBudget;
+    Unk8052B978_Tbl* t=self->m2C;
+    int last=fn_8052BD40(t);
+    int active=1;
+    if(t->m8[last].f4==0)active=0;
+    if(active==1) {
+        Db805658F8_Host* host=(Db805658F8_Host*)a;
+        Unk8006A138_It<25> first(6);
+        int i=6;
+        do {
+            if(host->v4(i)->v21(0)->m20!=4)goto failure;
+            i=first.Next();
+        }while(i<=12);
+        Unk8006A138_It<10> second(2);
+        int j=2;
+        do {
+            if(fn_800845E4__Fi(j)==1) {
+                Db805658F8_Rows* rows=host->v5(second.v);
+                int key=rows->v21(0)->m0;
+                oldValue=rows->v21(0)->m10;
+                oldBudget=(float)fn_8056B734(lbl_80619948->m28,key);
+                int key2=rows->v21(1)->m0;
+                change=rows->v21(1)->m10-oldValue;
+                newBudget=(float)fn_8056B734(lbl_80619948->m28,key2);
+                if(change<=(newBudget+oldBudget)*lbl_805FF958)goto failure;
+            }
+            j=second.Next();
+        }while(j<=3);
+        return 1;
+    }
+    failure:return 0;
 }
