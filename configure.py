@@ -1213,7 +1213,7 @@ config.libs = [
         "cflags": cflags_libm,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "libm/e_exp.c"),
+            Object(Matching, "libm/e_exp.c"),
             Object(Matching, "libm/e_log.cpp"),
             Object(Matching, "libm/e_sqrt.cpp"),
             Object(NonMatching, "libm/s_ceil.c"),
