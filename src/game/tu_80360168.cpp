@@ -18,8 +18,9 @@ struct U {
 void fn_80377408(void* p);
 extern char lbl_8064A550[];
 extern char lbl_80655808[];
-void fn_800EC1B8(void* p, int chrg);
-void fn_8035686C(void* p, int chrg);
+struct UiScrRaw;
+extern "C" void fn_800EC1B8(UiScrRaw* p);
+extern "C" void fn_8035686C(void* p, int chrg);
 void fn_80360B60(void* p, int chrg);
 
 void fn_80360168(U* self, int chrg)
@@ -163,7 +164,7 @@ void fn_803604E8(U* self, int chrg)
 {
     PUT(0xd88, lbl_8064A550);
     PUT(0x3c, lbl_80655808);
-    fn_800EC1B8(self, chrg);
+    fn_800EC1B8((UiScrRaw*)self);
 }
 
 void fn_80360520(U* self, int chrg)
