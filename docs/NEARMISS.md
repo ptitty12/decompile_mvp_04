@@ -7,6 +7,8 @@ our C++ game units as they are.
 
 | Function | Unit | Best | What differs | Tried |
 |---|---|---|---|---|
+| fn_8053FCC4 | db/tu_8053E240.cpp | 82/82 exact | Requires canonical C by-value `fn_80329FA0(int,...)`; shared DB header exposes explicit-buffer form used by other TUs, so an isolated declaration change is not ABI-coherent | Exact typed by-value result; blocked pending coherent shared caller migration |
+| fn_8053FE0C | db/tu_8053E240.cpp | 51/51 exact | Same `fn_80329FA0` cross-TU declaration conflict as fn_8053FCC4 | Exact typed by-value result; blocked pending coherent shared caller migration |
 | fn_8027D3E8 | animation/goals/tu_8027C728.cpp | 99/99 insns, 3 differ | the &out pointer of the GetResult part is r4 in retail, r9 here (global-alloc pass 0 picks a reg already used and not preferred by a conflicting pseudo; the source of retail's r4 is unknown) | ~1500 forms (W5), param order, member, pointer local (sweep) |
 | fn_802931D0 | animation/goals/tu_802914C8.cpp | 339/339, 5 differ | only the final `mC = 4`: retail m190 index r9 / the 4 in r0. The index is an index register of the flagged `a` (r0 allowed); giving every SetPairF the cast expression (unflagged pointer) fixes it but loses the alias-based scheduling of the earlier stores; doing it for the last call only changes nothing (gcse merges it with `a`) | `int k4 = 4`, setter/Finish inlines, store order (sweep) |
 | fn_vslot17 (0x802726BC, cCircleChooser) | animation/choosers/tu_80271F14.cpp | 281/281, 6 differ | case 1 only: dead copy `mr r8,r11` and the pi/4 constant's lis get r8/r10 swapped, c2 reloaded through f13 vs f0 | ~1700 orders (W3), not retried |
