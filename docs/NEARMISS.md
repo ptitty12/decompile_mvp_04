@@ -354,3 +354,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `ealib/tu_803DE414` `fn_803DFB48` (swarm36, eight forms): scratch 99.52%, 25/25 words; best two adjacent final stores remain reversed after ordinary saved-value and independent tail-store ordering forms. Scratch SW02/build/swarm36.
 
 - `ealib/tu_803E2248` `fn_803E2248`: 97.120255%, 158/158 instructions after eight bounded ordinary C drafts; canonical owner/virtual-device and allocation/constructor bindings recover control flow, while four FPR colors and draw-argument scheduling differ; failed code stays in scratch.
+- ealib/tu_803927E4::fn_80393F64 (99.8% inherited): eight ordinary result initialization/counter/lifetime forms retain two parameter-register words; scratch build/root38/3F64, source restored.
