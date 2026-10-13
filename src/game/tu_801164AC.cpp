@@ -758,3 +758,66 @@ void fn_8011A468(int a, Unk800C7B40_Widget* w, const char* name)
 }
 
 }
+
+/* Four-word values are copied intact; their globals are dynamically initialized
+ * by tu_8014F47C (e.g. 80150CD0..80150D40) and read here through const views. */
+struct Unk801195C8_Word4 { unsigned m[4]; Unk801195C8_Word4() {} };
+struct Unk801195C8_Names16 { const char* names[16]; };
+extern const Unk801195C8_Word4 lbl_8068B528;
+extern const Unk801195C8_Word4 lbl_8068B538;
+extern const Unk801195C8_Word4 lbl_8068B568;
+extern const Unk801195C8_Word4 lbl_8068B588;
+extern const Unk801195C8_Word4 lbl_8068B5B8;
+extern const Unk801195C8_Names16 lbl_805BDA94;
+/* Retail calls slot35 with a copied four-word value and slot29 with a name. */
+struct Unk801195C8_Widget : Unk800C7B40_Data {
+    virtual ~Unk801195C8_Widget();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual Wid* fn_vslot29(const char*);
+    virtual void fn_vslot30();
+    virtual void fn_vslot31();
+    virtual void fn_vslot32();
+    virtual void fn_vslot33();
+    virtual void fn_vslot34();
+    virtual void fn_vslot35(Unk801195C8_Word4);
+};
+extern "C" void fn_801195C8(int index, Unk801195C8_Widget* widget)
+{
+    if (widget && (unsigned)(index - 1) <= 14) {
+        Unk801195C8_Word4 records[16] = {
+            lbl_8068B588, lbl_8068B538, lbl_8068B528, lbl_8068B5B8,
+            lbl_8068B528, lbl_8068B568, lbl_8068B528, lbl_8068B568,
+            lbl_8068B588, lbl_8068B588, lbl_8068B538, lbl_8068B568,
+            lbl_8068B528, lbl_8068B538, lbl_8068B528, lbl_8068B588
+        };
+        Unk801195C8_Names16 names = lbl_805BDA94;
+        widget->fn_vslot35(records[index]);
+        widget->fn_vslot29(names.names[index]);
+    }
+}
