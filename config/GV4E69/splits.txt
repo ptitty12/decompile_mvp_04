@@ -1845,6 +1845,7 @@ snd/tu_803B3E18.cpp:
 
 snd/cmn/sgetpvol.c:
 	.text       start:0x803B3FE0 end:0x803B4074
+	.rodata     start:0x806099D8 end:0x806099E4 align:4
 
 snd/tu_803B4074.cpp:
 	.text       start:0x803B4074 end:0x803B4B40
