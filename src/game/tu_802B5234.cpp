@@ -607,17 +607,16 @@ void fn_803185A0(void* a, int b, float* c, void* d, int e, Unk802B5F9C_Col f, in
 }
 void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
 float fn_801A0744(Unk8019F8C0_Owner* o);
-inline Unk802B5F9C_Col Unk802B5F9C_Id(const Unk802B5F9C_Col& c)
+inline void Unk802B5F9C_Send(Unk802B5F9C_H* a, int b, float* c, void* d, int e, Unk802B5F9C_Col f, int g, int h)
 {
-    return c;
+    fn_803185A0(a->m3C, b, c, d, e, f, g, h);
 }
 inline float Unk802B5F9C_Cl(float v)
 {
     return !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
 }
 
-/* near-miss (99.8%, same instruction count): the 16-byte Col temp copy for the by-value argument loads its words in the order
-   2,0,1,3 (retail 0,1,2,3). Tried: ref/value/pointer inline returning the struct, named-local return, field-wise copy. */
+
 void fn_802B5F9C(Unk802B5F9C_Obj* self)
 {
     float arr[8];
@@ -662,8 +661,7 @@ void fn_802B5F9C(Unk802B5F9C_Obj* self)
         Unk802B5F9C_H* h = lbl_8061FEDC;
         fn_803188FC(lbl_8061FF44, 5);
         ((Unk802B5F9C_G*)lbl_8061FF44)->m2C = 5;
-        Unk802B5F9C_Col t = col;
-        fn_803185A0(h->m3C, self->m34, arr, &self->m10, 0xFF, Unk802B5F9C_Id(t), 1, 1);
+        Unk802B5F9C_Send(h, self->m34, arr, &self->m10, 0xFF, col, 1, 1);
     }
 }
 
