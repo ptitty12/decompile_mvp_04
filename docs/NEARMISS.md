@@ -224,3 +224,45 @@ Six imports remain: __builtin_vec_delete, __vn__FUii, fn_80071604__FPv, fn_80071
 - fn_80596D88: caller fn_8059053C at 8059051C stores returned r3 at +0x28. Pointer-result correction matches the initial register setup but moves the final +0x2C store early. Eight return/store-order forms, no exact match; build/80596d88-{return,order*,reverse}.cpp. Do not repeat spelling permutations.
 - fn_80563F0C / fn_80564A98: allocation callers at 800A10D8/800A10F8 store returned r3. Typed return-self corrections alone leave initialization/register ordering differences (12/11 and 9/8 target/source words). Scratch build/agent-game-db-returnself; no source change accepted.
 - AX fn_804188D0: moving the actual helper-definition chain reduces unwanted inlining to 109 words versus retail 110, but changes other callers as helper visibility shifts. Bounded ordering probes did not produce an exact all-function candidate; build/agent-ax. No flags, attributes or invented boundaries used.
+
+### Twelve-worker conventional matching pass (2026-10-13)
+
+All failed candidates below stayed scratch-only. Do not repeat these source
+spelling/lifetime forms without new compiler or layout evidence. Detailed
+evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
+
+- `game/tu_800F1AEC::fn_800F2148`: eight boolean predicate forms; best 35/35
+  instructions with 13 differing slots (conditional branch versus mfcr and
+  r9/r11 allocation). `fn_801015EC` in `game/tu_80101254`: six table-copy and
+  virtual-call forms; best 45/45 instructions with four scheduling/counter
+  differences. Worker 01 scratch.
+- `animation/goals/tu_8028989C`: eight forms each for `fn_802898FC` (clamp
+  store/cross-jump placement), `fn_80289944` (temporary copy and store order;
+  original remains closest), and `fn_8028B13C` (m0 store insertion order;
+  baseline-equivalent four differing words). Worker 03 scratch.
+- `fe/tu_804BFB3C::fn_804C03A8`: deferred because the real
+  `fn_8035686C(void*, int)` conflicts with the shared header's one-argument
+  C declaration; requires an evidence-based shared ABI repair.
+  `fe/tu_80459228::fn_8045AD28`: four variants; best 69/69 instructions but
+  copy addressing/store order and search-base hoisting differ. Worker 05.
+- `game/tu_802E22EC::fn_802E301C`: one scratch form, 70 compiled instructions
+  versus 72 retail; not exhausted. Worker 07. Its other target `fn_802E7FA8`
+  was accepted separately.
+- `snd/tu_803B4BEC::fn_803B58E8`: four conventional bitmask/filter loop forms;
+  best 42 instructions versus 47 retail. CSE removes repeated index/mode
+  loads and changes branches. `fn_803B5B6C` was skipped because source already
+  records exhausted earlier attempts. Worker 08.
+- `gamelib/tu_80382BB8::fn_80382BD8`: eight switch/modulo/address forms;
+  first 30 words exact, best 43 versus 45 instructions. Compiler combines
+  object and index*136 and uses lfs+20 instead of separate base and lfsx.
+  `fn_80383394`: eight pointer/integer loop forms; signed comparison restored,
+  but best 7 versus 8 instructions, missing retail's extra mr r11,r3.
+  `fn_80380964` inspected only; not attempted. Worker 09.
+- `dolphin/gx/tu_8042F93C::fn_8042FF38`: eight natural C boolean/bit-insertion
+  variants with actual MWCC flags. Best remains eight changed register words
+  across 53 instructions; narrower/comparison forms change instruction count.
+  `CARDInit`/`fn_8041B75C` skipped due an existing source park. Worker 11.
+- `db/tu_805467E0::fn_80547D28`: eight iterator/setup forms; best 58/58
+  instructions with six initial scheduling differences. Iterator stack store
+  moves before base calculation/count load; remaining words match masked.
+  Fresh untouched alternatives: `fn_80582B7C`, `fn_8053EA68`. Worker 12.
