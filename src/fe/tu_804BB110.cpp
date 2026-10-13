@@ -127,6 +127,32 @@ extern "C" FE_OVERLAY void fn_804BB17C(FeCam* c, FeObj* w, int a)
     ((FeCamV*)c)->s22();
 }
 
+inline void clearFeRect(float* p) {
+    p[0] = 0.0f;
+    p[1] = 0.0f;
+    p[2] = 0.0f;
+    p[3] = 0.0f;
+}
+inline void clearFeRec(FeCamRec* r) {
+    r->cnt = 0;
+    for (int j = 0; j < 100; ++j) {
+        r->p[j].a = 0.0f;
+        r->p[j].b = 0.0f;
+    }
+}
+extern "C" FE_OVERLAY void fn_804BB334(FeCam* c)
+{
+    c->mCB4 = 0;
+    c->mCBC = 0;
+    c->mCB8 = 15;
+    c->m20 = 1;
+    clearFeRect(&c->m0);
+    clearFeRect(&c->m10);
+    for (int i = 0; i <= 3; ++i) {
+        clearFeRec(&c->rec[i]);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804BB3D0(FeCam* c, float a, float b, float d, float e)
 {
     c->m0 = a;
