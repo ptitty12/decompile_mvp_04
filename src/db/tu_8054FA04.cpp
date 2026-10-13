@@ -207,6 +207,86 @@ extern "C" void fn_805542CC(Db80553E54_S* self);
 extern "C" void fn_805542F0(Db805542F0_S* self, int mode);
 extern "C" void fn_8055440C();
 extern "C" void fn_80554540(Db80554540_S* self, int a, int b);
+struct Db80553760_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db80553760_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80553760_B1() { vp = lbl_8064A550; }
+};
+struct Db80553760_B2 : Db80553760_B1 {
+    Db80553760_B2(int* buf, int cap) : Db80553760_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80553760_B2() { vp = lbl_8064A550; }
+};
+struct Db80553760_B3 : Db80553760_B2 {
+    int buf[0xFA];
+    Db80553760_B3() : Db80553760_B2(buf, 0xFA)
+    {
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+        vp = lbl_8065C1B0;
+    }
+    ~Db80553760_B3() { vp = lbl_8064A550; }
+};
+struct Db80553760_S {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    int m20;
+    char pad24[0x3304 - 0x24];
+    float m3304[30];
+    int m337C[30];
+};
+extern "C" void fn_8007FE18__FP13Unk8007F198_E(void* e);
+extern "C" void fn_80538368(Unk805352B0_List* self, int x);
+extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
+extern "C" void fn_80535360(Unk805352B0_List* self, int x);
+extern "C" int fn_800A2E6C(Unk80538DD8_G* g);
+unsigned fn_8007F198(Unk8007F198_A* self, int x);
+int fn_8007F24C(Unk8007F198_A* self, int a, int x);
+struct Db80551A80_G {
+    char pad0[0x6C];
+    int m6C;
+};
+struct Db80551A80_V3 {
+    float m0;
+    float m4;
+    float m8;
+};
+inline float Db80551A80_Min(float a, float b)
+{
+    return a <? b;
+}
+inline float Db80551A80_Max(float a, float b)
+{
+    return a >? b;
+}
+inline float Db80551A80_Max2(float a, float b)
+{
+    return b >? a;
+}
+extern Db80551A80_V3 lbl_806E0394;
+extern int lbl_80622C1C;
+extern float lbl_80622C20;
+extern "C" float fn_80591270(void* p);
+extern "C" float fn_80550F00(int x);
+extern "C" float fn_80551C28(int x, float f);
 
 extern "C" DB_OVERLAY int fn_80550E68(int a)
 {
@@ -332,6 +412,28 @@ extern "C" DB_OVERLAY void fn_80551A04(int a, Unk80070DDC_Stream* io)
     io->v08(a, &lbl_806EFA08, 4);
 }
 
+/* near-miss: 99.8%; callee-saved r30/r31 swapped between the parameter x and the screen pointer. Clamps are g++ <?/>? nested
+ * through inline Min/Max2 (their float params give the 0x10..0x1C slots). */
+extern "C" DB_OVERLAY float fn_80551A80(int x, int flag)
+{
+    if (lbl_80622C1C == 0) {
+        float r = 0.0f;
+        if (((Db80551A80_G*)lbl_80619948)->m6C == 1 && flag != 0) {
+            Unk8007A4DC_Screen* sc = lbl_8061930C;
+            float t = fn_80598348();
+            t = (t - lbl_806EFA08) / lbl_806EFA08;
+            t = t + 0.5f;
+            t = (t <? 1.0f) >? 0.0f;
+            r = lbl_806E0394.m8 * t + (lbl_806E0394.m0 * fn_80550F00(x) + lbl_806E0394.m4 * fn_80591270(*(void**)((char*)sc + 0x30)));
+            r = fn_80551C28(x, r) * 0.2f + r;
+            r = Db80551A80_Max2(Db80551A80_Min(r, 1.0f), 0.0f);
+            *(float*)lbl_80622C18 = r;
+        }
+        return *(float*)lbl_80622C18;
+    }
+    return lbl_80622C20;
+}
+
 extern "C" DB_OVERLAY void fn_80552054()
 {
     lbl_806EFA08 = fn_80598348();
@@ -347,6 +449,38 @@ extern "C" DB_OVERLAY int fn_8055207C(float f)
     else if (!(f <= lbl_805FF424))
         r = 1;
     return r;
+}
+
+extern "C" DB_OVERLAY float fn_8055248C(int x)
+{
+    if (fn_800A2E6C(lbl_80619948) != 0 || x == 0)
+        return 70.0f;
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    float acc = 0.0f;
+    int sum = 0;
+    int i = 0;
+    fn_80552638(1);
+    int n = fn_8007F198((Unk8007F198_A*)sc, x);
+    if (i < n) {
+        do {
+            int id = fn_8007F24C((Unk8007F198_A*)sc, x, (unsigned char)i);
+            i++;
+            int v = sc->fn_8007A6A0(0x16, id) + 1;
+            sum += v * v;
+        } while (i < n);
+    }
+    i = 0;
+    if (i < n) {
+        do {
+            int id = fn_8007F24C((Unk8007F198_A*)sc, x, (unsigned char)i);
+            i++;
+            float w = fn_805520E4(id, 0, 0, 0, 0);
+            int v = sc->fn_8007A6A0(0x16, id) + 1;
+            acc += (float)(v * v) / (float)sum * w;
+        } while (i < n);
+    }
+    fn_80552638(0);
+    return acc;
 }
 
 extern "C" DB_OVERLAY float fn_8055260C(int a, int b, int c, int d)
@@ -478,6 +612,47 @@ extern "C" DB_OVERLAY void fn_805536B4(Db805536B4_S* self)
 extern "C" DB_OVERLAY void fn_80553754(Db80553754_S* self)
 {
     self->m10 = 10;
+}
+
+extern "C" DB_OVERLAY void fn_80553760(Db80553760_S* self, int flag)
+{
+    if (self->m18 == 0) {
+        Unk805352B0_List* l = (Unk805352B0_List*)((char*)self + 0x24);
+        int i = 0;
+        int off = 0;
+        fn_8007FE18__FP13Unk8007F198_E(lbl_8061930C);
+        Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+        float f = *(float*)((char*)sc + 0x1F4) * 15.0f;
+        fn_80538368(l, 0);
+        int z = fn_8007F7D0__FP13Unk8007F198_BUi(sc, 0);
+        do {
+            int id = sc->fn_8007B2FC(i);
+            if (id == z && flag == 0) {
+                self->m3304[i] = 0.0f;
+                self->m337C[i] = flag;
+            } else {
+                self->m3304[i] = sc->fn_80079EFC(id) - f;
+                Db80553760_B3 t;
+                fn_80535360((Unk805352B0_List*)&t, id);
+                self->m337C[i] = 0x5E - t.m4;
+            }
+            i++;
+        } while (i <= 0x1D);
+        fn_805362AC(l, 1);
+        self->m1C = 0x3FFFFFF;
+        if (self->m20 != 0) {
+            Unk8007B2B0_Screen* s2 = (Unk8007B2B0_Screen*)lbl_8061930C;
+            int z2 = fn_8007F7D0__FP13Unk8007F198_BUi(s2, 0);
+            int j;
+            for (j = 0; j <= 0x1D; j++) {
+                if (s2->fn_8007B2FC(j) == z2) {
+                    self->m1C &= ~(1 << j);
+                    break;
+                }
+            }
+        }
+        self->m18 = 1;
+    }
 }
 
 extern "C" DB_OVERLAY void fn_8055395C(Db8055395C_S* self)

@@ -140,6 +140,93 @@ extern "C" void fn_80539EDC(void* l, int e);
 extern "C" void fn_80542580(void* o);
 /* end Q18 decls */
 
+extern "C" Db805495DC_Hold* fn_8054BDDC(Db805495DC_Hold* o, Unk8007F198_C* s);
+extern "C" void fn_8054BE40(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BEA4(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BF08(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BF6C(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BFD0(Db805495DC_Hold* o, int mode);
+extern "C" void fn_80377408(void* p);
+struct Db805467E0_G3C {
+    char pad0[8];
+    float m8;
+    char padC[4];
+    int m10;
+    char pad14[4];
+    int m18;
+};
+struct Db805467E0_G {
+    char pad0[0x3C];
+    void* m3C;
+};
+extern "C" void fn_80563F3C(void* m3c, int a, int b, float* f, int* z, int* o, int x, int y);
+void fn_8007F330(Unk8007F198_A* self, int a, int b);
+DB_OVERLAY int fn_805467E0(char* o, int id)
+{
+    int r = fn_805474B8(o, id);
+    if (r != 0)
+        return r;
+    {
+        unsigned n = *(unsigned*)(o + 4);
+        unsigned i = 0;
+        int idx;
+        for (; i < n; i++) {
+            if (*(int*)((char*)*(int**)o + i * 4) == id) {
+                idx = i;
+                goto found;
+            }
+        }
+        idx = -1;
+    found:
+        int off = idx * 16;
+        IntSet(o + 0x3CC8, off, id);
+        Db8053967C_List* l = (Db8053967C_List*)(o + 0x32E0);
+        IntSet(o + 0x3CCC, off, *(int*)(l->mC * 4 + (int)*(int**)(o + 0x32E0)));
+        IntSet(o + 0x3CD0, off, IntAt(o + 0x10000, 0x7E8));
+        IntSet(o + 0x3CD4, off, 0);
+        IntSet(o + 0x10000, 0x7EC, IntAt(o + 0x10000, 0x7EC) - 1);
+        if (IntAt(o + 0x10000, 0x7F0) == 1) {
+            int cur = *(int*)(l->mC * 4 + (int)*(int**)(o + 0x32E0));
+            Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+            fn_8007F330((Unk8007F198_A*)s, cur, id);
+            Db805467E0_G3C* g = (Db805467E0_G3C*)((Db805467E0_G*)lbl_80619948)->m3C;
+            float f8;
+            int sp40;
+            int sp44;
+            fn_80563F3C(g, cur, id, &f8, &sp40, &sp44, 1, 1);
+            Unk800798BC_P p10;
+            Unk800798BC_P p20;
+            Unk800798BC_P p30;
+            p20.m0 = f8;
+            p20.m4 = sp40;
+            p20.m8 = sp44;
+            p10.m0 = s->fn_800799D0(((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x18, id));
+            p10.m4 = ((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x19, id);
+            p10.m8 = sp44;
+            p30.m0 = g->m8;
+            p30.m4 = g->m10;
+            p30.m8 = g->m18;
+            ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_800798BC(id, &p10, &p20, &p30);
+        }
+        if (IntAt(o + 0x10000, 0x7EC) > 0) {
+            if (l->mC == (int)l->m4 - 1) {
+                int v = IntAt(o + 0x10000, 0x7E8) + 1;
+                IntSet(o + 0x10000, 0x7E8, v);
+                if (IntAt(o + 0x10000, 0x7F0) == 1) {
+                    if (v == 0x19)
+                        fn_80548128(o, 1);
+                    else if (v == 0x32)
+                        fn_80548128(o, 2);
+                    else if (v == 0x4B)
+                        fn_80548128(o, 3);
+                }
+            }
+            l->mC = (l->mC + 1) % l->m4;
+        }
+    }
+    return 0;
+}
+
 /* near-miss: 96.7%; only the prologue order of the float-param spill and the r6 copy differs */
 DB_OVERLAY int fn_80546A24(char* o, int id, int a, int b, float f)
 {
@@ -323,6 +410,34 @@ DB_OVERLAY void fn_80547594(char* o, int a)
     *(int*)(p + 0xC) = z;
     fn_805381F0(o);
     fn_805362AC(o, 1);
+}
+
+DB_OVERLAY void fn_8054788C(void* unused, int mode)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Db805495DC_Hold* h = fn_8054BDDC((Db805495DC_Hold*)operator new(8, 0x100), (Unk8007F198_C*)sc);
+    if (mode == 0) {
+        fn_8054BE40(h, 1);
+        fn_8054BEA4(h, 1);
+        fn_8054BF08(h, 1);
+        fn_8054BF6C(h, 1);
+        fn_8054BFD0(h, 1);
+    } else if (mode == 1) {
+        while ((unsigned)(sc->fn_8007C458() + sc->fn_8007C4C8()) <= 0x4F)
+            fn_8054BE40(h, 0);
+        while ((unsigned)sc->fn_8007C724() <= 0x4F)
+            fn_8054BEA4(h, 0);
+        while ((unsigned)sc->fn_8007C948() <= 0x4F)
+            fn_8054BF08(h, 0);
+        while ((unsigned)sc->fn_8007CB6C() <= 0x77)
+            fn_8054BF6C(h, 0);
+        while ((unsigned)sc->fn_8007CD90() <= 0x31)
+            fn_8054BFD0(h, 0);
+    }
+    if (h != 0)
+        fn_80377408(h);
+    sc->fn_80072C28();
+    fn_80400CE4(0);
 }
 
 /* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */

@@ -184,6 +184,33 @@ int fn_8040ABA0();
 extern "C" int fn_80534078(char* o, int a, float f);
 extern "C" int fn_80534304(char* o, float f);
 extern const float lbl_805FF230;
+struct Db8054BCC8_E {
+    float w;
+    int used;
+};
+struct Db8054BCC8_S {
+    char pad0[0x14E5C];
+    Db8054BCC8_E e[15];
+};
+int fn_8054BCC8(Db8054BCC8_S* o);
+struct Db8054C814_N {
+    int m0;
+    char pad4[0x10];
+    int m14;
+};
+struct Db8054C814_S {
+    int m0;
+    int m4;
+    char pad8[0xC];
+    int* m14;
+    Db8054C814_N* m18;
+};
+extern "C" void fn_8057DF80(int* p);
+extern "C" void fn_8055A3B0(Db8054C814_N* p);
+extern "C" void fn_8055EAFC(int x);
+extern "C" void fn_80400CE4(int a);
+extern "C" int fn_8054C958(Db8054C814_S* o, int a, int b);
+int fn_8054C814(Db8054C814_S* o);
 /* end Q18 decls */
 
 DB_OVERLAY int fn_805495DC(int a, int k)
@@ -346,6 +373,45 @@ DB_OVERLAY int fn_8054BBA0(char* b, int kind, int a)
     }
     }
     return v;
+}
+
+DB_OVERLAY int fn_8054BCC8(Db8054BCC8_S* o)
+{
+    int r = 1;
+    float rnd = fn_8056FFB0();
+    float acc = lbl_805FF230;
+    float d = fn_8054BB48((char*)o);
+    unsigned i;
+    for (i = 1; i <= 14; i++) {
+        if (o->e[i].used == 0) {
+            acc += o->e[i].w / d;
+            if (rnd < acc) {
+                o->e[i].used = 1;
+                r = i;
+                break;
+            }
+        }
+    }
+    if (i > 14) {
+        int j = 14;
+        char* b = (char*)o + 0x14E60;
+        if (*(int*)(b + 0x70) == 0) {
+            r = 14;
+            *(int*)(b + 0x70) = 1;
+        } else {
+        again:
+            j--;
+            if (j > 0) {
+                int off = j * 8;
+                char* b2 = (char*)o + 0x14E60;
+                if (*(int*)(b2 + off) != 0)
+                    goto again;
+                r = j;
+                *(int*)(b2 + off) = 1;
+            }
+        }
+    }
+    return r;
 }
 
 /* near-miss: retail reads the 4-byte fn_80329FA0 buffer straight from the frame (addi r3,r1,8); ours keeps &buf in a saved register */
@@ -530,6 +596,30 @@ DB_OVERLAY void fn_8054C358(int* p, signed char* buf, int n)
     }
 }
 
+struct Db8054C3F4_Out {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned short m2;
+};
+typedef Db8054C3F4_Out (*Db8054C3F4_Fn)(int, ...);
+DB_OVERLAY int fn_8054C3F4(int* p, int lo, int hi)
+{
+    float f = fn_8056FFB0();
+    int base = lo + (int)(f * (float)(hi - lo));
+    int t = p[1];
+    t -= base;
+    t -= ((Db8054C3F4_Fn)fn_80329FA0)(1).m2;
+    int c;
+    if (t <= 0xFF) {
+        c = t;
+        if (c < 0)
+            c = 0;
+    } else {
+        c = 0xFF;
+    }
+    return c;
+}
+
 DB_OVERLAY int fn_8054C4AC(int* p, R8* r)
 {
     return fn_8054C648(p, (((r->w0 >> 3) & 0x7F) + ((r->w4 >> 23) & 0x7F) + ((r->w4 >> 12) & 0x7F) + ((r->w4 >> 3) & 0x7F)) >> 2, 1, 0x14);
@@ -603,6 +693,57 @@ DB_OVERLAY void fn_8054C7D0(H* o)
     o->m4 = 0;
     fn_8057DF60(o->m14);
     fn_8055A360(o->m18);
+}
+
+DB_OVERLAY int fn_8054C814(Db8054C814_S* o)
+{
+    o->m4 = 1;
+    switch (o->m0) {
+    case 0:
+        fn_8057DF80(o->m14);
+        {
+            int v = *o->m14;
+            if (v == 2)
+                goto next;
+            if (v == 1)
+                o->m4 = 5;
+        }
+        break;
+    case 1: {
+        unsigned n = 0;
+        do {
+            if ((n & 0x1FF) == 0)
+                fn_80400CE4(0);
+            n++;
+            fn_8055A3B0(o->m18);
+        } while (o->m18->m0 == 0);
+        switch (o->m18->m0) {
+        case 3:
+            goto next;
+        case 2:
+            fn_8055EAFC(o->m18->m14);
+            break;
+        case 1:
+            o->m4 = 3;
+            break;
+        }
+        break;
+    }
+    case 2:
+        if (fn_8054C958(o, 0, 1) != 0) {
+            o->m4 = 4;
+            break;
+        }
+    next:
+        o->m0 = o->m0 + 1;
+        break;
+    case 3:
+        o->m4 = 0;
+        break;
+    default:
+        o->m4 = 0;
+    }
+    return o->m4;
 }
 
 DB_OVERLAY int fn_8054C940(H* o)

@@ -188,6 +188,61 @@ extern "C" int fn_8055CCB0(int a, int b);
 extern "C" void fn_8055D2E8(Unk8007A4DC_Screen* sc, Unk805352B0_List* l);
 extern "C" void fn_8055D4B4(Db8055D4B4_L* self);
 extern "C" void fn_8055EAFC(void* x);
+extern "C" void fn_80535650(Unk805352B0_List* self, int x);
+void fn_8007F29C(Unk8007F198_A* self, int a, int b);
+extern "C" void fn_8055E878(Unk8007F198_A* sc, int a, Unk80535650_Tmp* l1, int b, int c, void* l2, int d);
+extern Unk8007A4DC_Screen* lbl_8061930C;
+struct Db8055F5A0_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db8055F5A0_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db8055F5A0_B1() { vp = lbl_8064A550; }
+};
+struct Db8055F5A0_B2 : Db8055F5A0_B1 {
+    Db8055F5A0_B2(int* buf, int cap) : Db8055F5A0_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db8055F5A0_B2() { vp = lbl_8064A550; }
+};
+struct Db8055F5A0_B3 : Db8055F5A0_B2 {
+    int buf[0x28];
+    Db8055F5A0_B3() : Db8055F5A0_B2(buf, 0x28)
+    {
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+        vp = lbl_8064A4C8;
+        fn_8040074C(m0, m8 << 2);
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    ~Db8055F5A0_B3() { vp = lbl_8064A550; }
+};
+extern Unk80538DD8_G* lbl_80619948;
+extern "C" int fn_800A2EFC(Unk80538DD8_G* g);
+extern "C" int fn_800A2F58(Unk80538DD8_G* g);
+extern "C" int fn_800A2F40(Unk80538DD8_G* g);
+extern "C" void fn_80563F3C(void* m3c, int a, int b, float* f, int* z, int* o, int x, int y);
+extern char lbl_8065C1B0[];
+struct Db8055D124_G {
+    char pad0[0x3C];
+    void* m3C;
+};
 
 extern "C" DB_OVERLAY int fn_8055A73C(int a, int b, int c)
 {
@@ -561,6 +616,43 @@ extern "C" DB_OVERLAY int fn_8055CCB0(int a, int b)
     return 0;
 }
 
+/* near-miss: 95.9%; only the argument-move order of the three fn_8007A808 calls differs (retail: mr r3,li r4,mr r5;
+ * ours: li r4,mr r5,mr r3). Tried locals, base-class pointers. */
+extern "C" DB_OVERLAY void fn_8055D124(Unk8007A4DC_Screen* sc, int x)
+{
+    int k;
+    if (fn_800A2EFC(lbl_80619948) == 0 || fn_800A2F58(lbl_80619948) != 0 || (k = fn_800A2F40(lbl_80619948)) == 6 || k == 8) {
+        Unk80535650_Tmp t;
+        int buf[0xFA];
+        Unk80535650_Tmp* q = &t;
+        q->C1(buf, 0xFA);
+        q->C2();
+        q->C3(lbl_8065C1B0);
+        fn_80535650((Unk805352B0_List*)q, x);
+        unsigned n = q->Count();
+        unsigned i = 0;
+        if (i < n) {
+            int off = 0;
+            do {
+                int e = *(int*)((char*)t.m0 + off);
+                if (sc->fn_8007A6A0(0x19, e) == 0) {
+                    Unk800798BC_P s;
+                    int o;
+                    fn_80563F3C(((Db8055D124_G*)lbl_80619948)->m3C, x, e, &s.m0, (int*)&s.m4, &o, 1, 0);
+                    s.m8 = o;
+                    sc->fn_8007A808(0x18, e, ((Unk8007B2B0_Screen*)sc)->fn_80079A58(s.m0));
+                    sc->fn_8007A808(0x19, e, s.m4);
+                    sc->fn_8007A808(0x32, e, s.m8);
+                    ((Unk8007B2B0_Screen*)sc)->fn_800798BC(e, &s, &s, &s);
+                }
+                i++;
+                off += 4;
+            } while (i < n);
+        }
+        q->D();
+    }
+}
+
 extern "C" DB_OVERLAY void fn_8055D2E8(Unk8007A4DC_Screen* sc, Unk805352B0_List* l)
 {
     unsigned i = 0;
@@ -625,5 +717,26 @@ extern "C" DB_OVERLAY void fn_8055EAFC(void* x)
     q->C3(lbl_8064A3B8);
     fn_80538368((Unk805352B0_List*)q, 0);
     fn_8055EBAC(x, (Unk805352B0_List*)q);
+    q->D();
+}
+
+extern "C" DB_OVERLAY void fn_8055F5A0(int x)
+{
+    Unk80535650_Tmp t;
+    int buf[0x78];
+    Unk80535650_Tmp* q = &t;
+    Unk8007F198_A* sc = (Unk8007F198_A*)lbl_8061930C;
+    q->C1(buf, 0x78);
+    q->C2();
+    q->C3(lbl_8064A440);
+    fn_80535650((Unk805352B0_List*)q, x);
+    unsigned n = q->Count();
+    unsigned i;
+    for (i = 0; i < n; i++)
+        fn_8007F29C(sc, x, t.At(i));
+    {
+        Db8055F5A0_B3 u;
+        fn_8055E878(sc, x, &t, 1, 0, &u, 0);
+    }
     q->D();
 }

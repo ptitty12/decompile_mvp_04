@@ -71,6 +71,89 @@ extern "C" void fn_8055FF28(int a, Db8055FF28_Obj* self, int b);
 extern "C" void fn_80560010(int x, int k);
 extern "C" int fn_805600F8(int s, int id);
 extern "C" int fn_8056087C(void* self);
+extern "C" void fn_80560314(int a, int b, int c);
+extern "C" void fn_80539020(Unk805352B0_List* self, int x);
+inline void Db805625F8_Append(Unk805352B0_List* dst, Unk80535650_Tmp* src)
+{
+    unsigned i;
+    for (i = 0; i < src->Count(); i++)
+        dst->Push(src->At(i));
+    dst->m14 = 1;
+}
+extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
+extern "C" void fn_80538EC4(Unk805352B0_List* self, int x, int y);
+extern "C" void fn_80539128(Unk805352B0_List* self, Unk805352B0_List* out);
+extern "C" int fn_80077BC4(void* g, int a);
+extern "C" void fn_80536C5C(Unk805352B0_List* self, int x);
+extern "C" void fn_80539380(Unk805352B0_List* self);
+extern "C" void fn_80535764(Unk805352B0_List* self, int x);
+inline void Db80560314_Step(int& v)
+{
+    int t;
+    if (v > 3)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+extern "C" float fn_8007824C(int a, int b);
+extern "C" int fn_8007E10C__FP13Unk8007DB74_A(void* g, int x);
+extern "C" int fn_8007DDC8__FP13Unk8007DB74_Aiii(void* g, int x, int b, int a);
+extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* g, int x, int i);
+extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* g, int x);
+extern "C" void fn_8007E34C__FP13Unk8007DB74_Aii(void* g, int x, int s);
+extern "C" void fn_8007EE98__FP13Unk8007DB74_Aii(void* g, int x, int r);
+extern "C" int fn_8007F0A8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007DD38__FP13Unk8007DB74_Aiiii(void* g, int x, int a, int b, int c);
+extern "C" int fn_8007E7A8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007E598__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" int fn_8007EAA8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007E898__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" int fn_8007EDA8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007EB98__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" void fn_8055EAFC(int x);
+extern "C" void fn_805628A0(int x, int a, int b);
+extern "C" void fn_8055E614(void* g, int x, int* arr, int n);
+extern "C" int fn_8055BD7C(int x);
+extern "C" void fn_8053943C(Unk805352B0_List* self);
+struct Db80562E34_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db80562E34_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80562E34_B1() { vp = lbl_8064A550; }
+    unsigned Count() { return m4; }
+};
+struct Db80562E34_B2 : Db80562E34_B1 {
+    Db80562E34_B2(int* buf, int cap) : Db80562E34_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80562E34_B2() { vp = lbl_8064A550; }
+};
+struct Db80562E34_B3 : Db80562E34_B2 {
+    int buf[0x28];
+    Db80562E34_B3() : Db80562E34_B2(buf, 0x28)
+    {
+        m14 = 0;
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A4C8;
+    }
+    ~Db80562E34_B3() { vp = lbl_8064A550; }
+};
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -210,6 +293,43 @@ extern "C" DB_OVERLAY int fn_8055F9B0(Db8055F7B8_List* l, int x)
     return 0;
 }
 
+extern "C" DB_OVERLAY int fn_8055FB50(Db8055F7B8_List* l, int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int e;
+    if (x == 2) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            int e2 = l->At(i);
+            int v5 = sc->fn_8007A6A0(5, e2);
+            int v6 = sc->fn_8007A6A0(6, e2);
+            if ((unsigned)(v5 - 6) <= 2 || v6 == 6 || v6 == 7 || v6 == 8)
+                return e2;
+        }
+    } else if (x == 3 || x == 5 || x == 4 || x == 1) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            e = l->At(i);
+            if (sc->fn_8007A6A0(9, e) == 0)
+                goto found;
+        }
+    } else if (x == 6 || x == 8) {
+        return *l->m0;
+    } else if (x == 7) {
+        unsigned i;
+        for (i = 0; i < l->m4; i++) {
+            e = l->At(i);
+            if (sc->fn_8007A6A0(6, e) == 13)
+                goto found;
+        }
+    }
+    goto out;
+found:
+    return e;
+out:
+    return 0;
+}
+
 extern "C" DB_OVERLAY int fn_8055FCF4(Db8055FCF4_S* s)
 {
     return *s->m0;
@@ -335,6 +455,115 @@ extern "C" DB_OVERLAY int fn_805600F8(int s, int id)
     return r;
 }
 
+extern "C" DB_OVERLAY void fn_805601F0(int x, int k)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk8006A138_It<3> it(k);
+    int cur = k;
+    if (cur <= 3) {
+        do {
+            int h = 0;
+            int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(cur), x);
+            int found;
+            do {
+                do {
+                    found = 0;
+                    unsigned n = fn_8007F674((Unk8007F198_A*)sc, g, h);
+                    unsigned i = 0;
+                    if (i < n) {
+                        do {
+                            int v = fn_8007F6C4((Unk8007F198_A*)sc, g, h, i);
+                            if (fn_8007F724((Unk8007F198_A*)sc, g, h, v, fn_800A2AE8(lbl_80619948)) <= 0) {
+                                fn_80560314(g, h, i);
+                                found = 1;
+                                break;
+                            }
+                            i++;
+                        } while (i < n);
+                    }
+                } while (found);
+                h++;
+            } while (h <= 1);
+            cur = it.Next();
+        } while (cur <= 3);
+    }
+}
+
+/* near-miss: 98.7%; instruction-for-instruction equal, callee-saved numbering shifted (a/b/k5 and x/h ranks; the final
+ * vptr store is r31-relative where retail is frame-relative). */
+extern "C" DB_OVERLAY void fn_80560314(int a, int b, int c)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int found = 0;
+    int x = fn_8007F6C4((Unk8007F198_A*)sc, a, b, c);
+    int h = ((Unk8007B2B0_Screen*)sc)->fn_80075948(a);
+    int e = 0;
+    goto test;
+step:
+    Db80560314_Step(e);
+test:
+    if (e <= 3) {
+        int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(e), h);
+        if (fn_8007F198((Unk8007F198_A*)sc, g) > 0x18)
+            goto step;
+        fn_8007F61C((Unk8007F198_A*)sc, a, b, x);
+        found = 1;
+        fn_8007F330((Unk8007F198_A*)sc, g, x);
+    }
+    Unk80535650_Tmp t;
+    int buf[0xFA];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0xFA);
+    q->C2();
+    q->C3(lbl_8065C1B0);
+    if (found == 0) {
+        fn_80535F5C((Unk805352B0_List*)q, h);
+        int pick = 0;
+        fn_805362AC((Unk805352B0_List*)q, 0);
+        unsigned i = 0;
+        int k5 = sc->fn_8007A6A0(5, x);
+        float fx = fn_8007824C(x, 0);
+        float best = 0.0f;
+        if (i < q->m4) {
+            int off = 0;
+            do {
+                int el = *(int*)((char*)t.m0 + off);
+                if (sc->fn_8007A6A0(5, el) == k5) {
+                    float f = fn_8007824C(el, 0);
+                    if (!(f >= fx) && (pick == 0 || !(f >= best))) {
+                        best = f;
+                        pick = el;
+                    }
+                }
+                i++;
+                off += 4;
+            } while (i < q->m4);
+        }
+        if (pick == 0) {
+            unsigned j = 0;
+            int off2 = 0;
+            int k2 = sc->fn_8007A270(x);
+            for (; j < t.m4; off2 += 4, j++) {
+                int el = *(int*)((char*)t.m0 + off2);
+                if (sc->fn_8007A270(el) == k2) {
+                    pick = el;
+                    break;
+                }
+            }
+        }
+        int g2 = fn_80077BC4(sc, pick);
+        fn_80079564(sc, pick, 0);
+        fn_8007F61C((Unk8007F198_A*)sc, a, b, x);
+        fn_8007F330((Unk8007F198_A*)sc, g2, x);
+    }
+    int p1 = sc->fn_8007A6A0(0x1E, x);
+    int p2 = sc->fn_8007A6A0(0x1F, x);
+    if (p1 != 0 && p2 > 0) {
+        fn_805600F8(fn_80077BC4(sc, x), x);
+    }
+    t.D();
+}
+
 /* near-miss: 6 slots (retail copies the index zero into the counter: li r30,0 / mr r31,r30; ours uses two li) */
 extern "C" DB_OVERLAY int fn_8056087C(void* self)
 {
@@ -403,6 +632,206 @@ extern "C" DB_OVERLAY void fn_80560A24(int x)
     t.vp = lbl_8064A550;
 }
 
+extern "C" DB_OVERLAY void fn_805625F8(int x, Unk805352B0_List* self, int kind)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0x28];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0x28);
+    q->C2();
+    q->C3(lbl_8064A4C8);
+    if (kind == 0) {
+        fn_80539020(self, x);
+    } else if (kind == 1) {
+        int s = sc->fn_80078A38(x);
+        int h = sc->fn_80075948(x);
+        int g1 = sc->fn_8007B320(1, h);
+        int g2 = sc->fn_8007B320(2, h);
+        int g3 = sc->fn_8007B320(3, h);
+        fn_8040074C(self->m0, self->m8 << 2);
+        self->m4 = 0;
+        self->mC = 0;
+        self->m14 = 0;
+        if (s <= 0) {
+            fn_80539020((Unk805352B0_List*)&t, g1);
+            Db805625F8_Append(self, &t);
+        }
+        if (s <= 1) {
+            fn_80539020((Unk805352B0_List*)&t, g2);
+            Db805625F8_Append(self, &t);
+        }
+        if (s <= 2) {
+            fn_80539020((Unk805352B0_List*)&t, g3);
+            Db805625F8_Append(self, &t);
+        }
+    }
+    t.D();
+}
+
+/* near-miss: one store differs (the final vptr store of the found branch: retail writes it frame-relative, 24(r1); ours 16(r29));
+ * tried t.D()/q->D()/references/explicit stores. */
+extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int r = 0;
+    int kind;
+    for (kind = 0; kind <= 1; kind++) {
+        Unk80535650_Tmp t;
+        int buf[0x28];
+        Unk80535650_Tmp* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        fn_805625F8(x, (Unk805352B0_List*)q, kind);
+        fn_80539128((Unk805352B0_List*)q, 0);
+        if (q->Count() == 0) {
+            q->D();
+            continue;
+        }
+        fn_805362AC((Unk805352B0_List*)q, 1);
+        unsigned i;
+        for (i = 0; i < q->Count(); i++) {
+            if (y == (sc->fn_8007A6A0(5, t.At(i)) == 0)) {
+                r = t.At(i);
+                break;
+            }
+        }
+        if (r == 0)
+            r = *t.m0;
+        t.D();
+        break;
+    }
+    if (r != 0) {
+        int g = fn_80077BC4(sc, r);
+        fn_8007F29C((Unk8007F198_A*)sc, g, r);
+        if (g != x && fn_8007F198((Unk8007F198_A*)sc, x) > 0x18) {
+            Unk80535650_Tmp t2;
+            int buf2[0x28];
+            Unk80535650_Tmp* q2 = &t2;
+            q2->C1(buf2, 0x28);
+            q2->C2();
+            q2->C3(lbl_8064A4C8);
+            fn_80538EC4((Unk805352B0_List*)q2, x, 0);
+            fn_805362AC((Unk805352B0_List*)q2, 0);
+            int e = *t2.m0;
+            fn_8007F29C((Unk8007F198_A*)sc, x, e);
+            fn_8007F330((Unk8007F198_A*)sc, g, e);
+            q2->D();
+        }
+        fn_8007F330((Unk8007F198_A*)sc, x, r);
+    }
+    return r;
+}
+
+/* near-miss: 96.3%; structure and instruction count equal. Retail recomputes addi r9,r1,8 for the arr[] stores inside the loop and
+ * again for the fn_8055E614 argument; ours hoists the frame address into a callee-saved register (CSE with the later use), which
+ * shifts every callee-saved number by one. Tried function-scope arr, struct member, for/do forms. */
+extern "C" DB_OVERLAY void fn_80562E34(int x)
+{
+    void* g = lbl_8061930C;
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) == 0) {
+        fn_8055EAFC(x);
+        return;
+    }
+    int a = 0;
+    do {
+        if (a != 0) {
+            int b = 0;
+            do {
+                if (fn_8007DDC8__FP13Unk8007DB74_Aiii(g, x, b, a) == 0)
+                    fn_805628A0(x, a, b);
+                b++;
+            } while (b <= 3);
+        }
+        a++;
+    } while (a <= 9);
+top:
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) > 4)
+        goto out;
+    {
+        int arr[5];
+        int i = 0;
+        int sel = fn_80562BC8(x, 1);
+        do {
+            arr[i] = fn_8007E154__FP13Unk8007DB74_Aii(g, x, i);
+            i++;
+        } while (i <= 4);
+        fn_8007E34C__FP13Unk8007DB74_Aii(g, x, sel);
+        fn_8055E614(g, x, arr, fn_8007E1F8__FP13Unk8007DB74_A(g, x));
+    }
+    goto top;
+out:
+    if (fn_8007F0A8__FP13Unk8007DB74_Ai(g, x) == 0) {
+        int r = fn_80562BC8(x, 0);
+        if (r != 0)
+            fn_8007EE98__FP13Unk8007DB74_Aii(g, x, r);
+    }
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) > 0) {
+        int j = 0;
+        int v = fn_8007E154__FP13Unk8007DB74_Aii(g, x, 0);
+        do {
+            int k = j;
+            j++;
+            fn_8007DD38__FP13Unk8007DB74_Aiiii(g, x, k, 0, v);
+        } while (j <= 3);
+    }
+    int off2 = 0;
+    Db80562E34_B3 t;
+    unsigned n = 0;
+    fn_80538EC4((Unk805352B0_List*)&t, x, 0);
+    fn_8053943C((Unk805352B0_List*)&t);
+    fn_80539128((Unk805352B0_List*)&t, 0);
+    if (n < t.Count()) {
+        do {
+            int e = *(int*)((char*)t.m0 + off2);
+            if (fn_8007E7A8__FP13Unk8007DB74_Ai(g, x) <= 2) {
+                fn_8007E598__FP13Unk8007DB74_Aii(g, x, e);
+            } else if (fn_8007EAA8__FP13Unk8007DB74_Ai(g, x) <= 3) {
+                fn_8007E898__FP13Unk8007DB74_Aii(g, x, e);
+            } else if (fn_8007EDA8__FP13Unk8007DB74_Ai(g, x) <= 1) {
+                fn_8007EB98__FP13Unk8007DB74_Aii(g, x, e);
+            }
+            n++;
+            off2 += 4;
+        } while (n < t.Count());
+    }
+    if (fn_8055BD7C(x) == 0)
+        fn_8055EAFC(x);
+}
+
+extern "C" DB_OVERLAY void fn_8056350C(int x)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    Unk8006A138_It<3> it(0);
+    int cur = 0;
+    do {
+        int h = 0;
+        int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(cur), x);
+        int found;
+        do {
+            do {
+                found = 0;
+                unsigned n = fn_8007F674((Unk8007F198_A*)sc, g, h);
+                unsigned i = 0;
+                if (i < n) {
+                    do {
+                        int v = fn_8007F6C4((Unk8007F198_A*)sc, g, h, i);
+                        if (fn_8007F724((Unk8007F198_A*)sc, g, h, v, fn_800A2AE8(lbl_80619948)) <= 0) {
+                            fn_80563628(g, h, i);
+                            found = 1;
+                            break;
+                        }
+                        i++;
+                    } while (i < n);
+                }
+            } while (found);
+            h++;
+        } while (h <= 1);
+        cur = it.Next();
+    } while (cur <= 3);
+}
+
 extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
 {
     Unk8007A4DC_Screen* sc = lbl_8061930C;
@@ -421,4 +850,57 @@ extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
     fn_80563740(a, sc->fn_8007A270(r));
     fn_8007F330((Unk8007F198_A*)sc, a, r);
     fn_80563140(a, r);
+}
+
+extern "C" DB_OVERLAY void fn_80563740(int x, int k)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int o0 = 0;
+    int o1 = 0;
+    int o2 = 0;
+    int o3 = 0;
+    sc->fn_80078AE0(x, &o0, &o1, &o2, &o3);
+    if ((int)fn_8007F198((Unk8007F198_A*)sc, x) > 0x18) {
+        Unk80535650_Tmp t;
+        int buf[0x28];
+        Unk80535650_Tmp* q = &t;
+        q->C1(buf, 0x28);
+        q->C2();
+        q->C3(lbl_8064A4C8);
+        if (k != 0) {
+            fn_80536C5C((Unk805352B0_List*)q, x);
+        } else {
+            fn_80538EC4((Unk805352B0_List*)q, x, 0);
+            fn_80539380((Unk805352B0_List*)q);
+            if (q->Count() == 0) {
+                fn_80535764((Unk805352B0_List*)q, x);
+                fn_80539380((Unk805352B0_List*)q);
+            }
+        }
+        fn_805362AC((Unk805352B0_List*)&t, 0);
+        int e = *t.m0;
+        int s = ((Unk8007B2B0_Screen*)sc)->fn_80078A38(x);
+        if (s == 3) {
+            fn_80079564(sc, e, 0);
+        } else {
+            int h = ((Unk8007B2B0_Screen*)sc)->fn_80075948(x);
+            int g = 0;
+            switch (s) {
+            case 0:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(1, h);
+                break;
+            case 1:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(2, h);
+                break;
+            case 2:
+                g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(3, h);
+                break;
+            }
+            fn_80563740(g, k);
+            fn_8007F29C((Unk8007F198_A*)sc, x, e);
+            fn_8007F330((Unk8007F198_A*)sc, g, e);
+            fn_80563140(g, e);
+        }
+        q->D();
+    }
 }

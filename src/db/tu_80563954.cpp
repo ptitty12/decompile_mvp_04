@@ -116,6 +116,46 @@ extern "C" int fn_80565CDC(Db80565CDC_S* s);
 extern "C" int fn_80565D48(Db80565CDC_S* self);
 extern "C" int fn_80565DDC(Db80565CDC_S* self);
 extern "C" int fn_80565E9C(Db80565CDC_S* self);
+struct Db80564910_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db80564910_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80564910_B1() { vp = lbl_8064A550; }
+};
+struct Db80564910_B2 : Db80564910_B1 {
+    Db80564910_B2(int* buf, int cap) : Db80564910_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80564910_B2() { vp = lbl_8064A550; }
+};
+struct Db80564910_B3 : Db80564910_B2 {
+    int buf[0x28];
+    Db80564910_B3() : Db80564910_B2(buf, 0x28)
+    {
+        m14 = 0;
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A4C8;
+    }
+    ~Db80564910_B3() { vp = lbl_8064A550; }
+};
+extern "C" void fn_80535650(Unk805352B0_List* self, int x);
+extern "C" void fn_805371C4(Unk805352B0_List* self, unsigned f);
+extern char lbl_8064A2A8[];
 
 extern "C" DB_OVERLAY int fn_80563B4C(float f)
 {
@@ -167,6 +207,39 @@ extern "C" DB_OVERLAY void fn_80563F0C(Db80563F0C_S* s)
     s->mC = 0;
     s->m10 = 0;
     s->m18 = 0;
+}
+
+/* near-miss: 99.4%; callee-saved r28/r29 swapped between the list element and the zero/offset register. */
+extern "C" DB_OVERLAY void fn_80564910()
+{
+    Unk80535650_Tmp t;
+    int buf[0x82];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    fn_805371C4((Unk805352B0_List*)q, 0x01F80000);
+    if ((int)q->m4 > 0) {
+        int n = q->m4;
+        int off = 0;
+        do {
+            int e = *(int*)((char*)t.m0 + off);
+            int off2 = 0;
+            Db80564910_B3 b;
+            fn_80535650((Unk805352B0_List*)&b, e);
+            if ((int)b.m4 > 0) {
+                int m = b.m4;
+                do {
+                    ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A808(0x18, *(int*)((char*)b.m0 + off2), 0);
+                    off2 += 4;
+                    m--;
+                } while (m != 0);
+            }
+            off += 4;
+            n--;
+        } while (n != 0);
+    }
+    q->D();
 }
 
 /* near-miss: same (8 vs 9 insns). */

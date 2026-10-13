@@ -95,6 +95,110 @@ inline int EntUsedP(Unk8052B5C4_Ent* e)
 }
 
 extern "C" void fn_80567F8C(Db80565CDC_S* s, int kind);
+extern "C" void fn_8052BA70(Unk8052B978_Tbl* self);
+void fn_80083E84(int t, int* a, int* b);
+int fn_80084070(int t);
+extern "C" void fn_80566F40(Db80565CDC_S* s, int a, int b);
+extern "C" void fn_80567174(Db80565CDC_S* s, int a, int b);
+struct Db80567F8C_MS {
+    unsigned char m;
+    unsigned char s;
+};
+extern "C" int fn_8032A118(Db80567F8C_MS v);
+inline Unk8052B978_Tbl* TblOf2(int o, TblSet a)
+{
+    return *(Unk8052B978_Tbl**)((char*)a + o);
+}
+struct Db80566B38_Row {
+    int m0;
+};
+struct Db80566B38_List {
+    Db80566B38_Row* m0;
+    unsigned m4;
+};
+struct Db80566B38_D {
+    char pad0[0xDBC];
+};
+struct Db80566B38_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db80566B38_List* v4(int a);
+    virtual Db80566B38_List* v5(int a);
+};
+extern "C" void fn_80569E60(Db80565CDC_S* s, int a, int b, int c, int d);
+struct Db8056746C_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+struct Db8056746C_OD {
+    char pad0[0x10];
+};
+struct Db8056746C_O : Db8056746C_OD {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual Db8056746C_Rec* v21(int a);
+};
+struct Db8056746C_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056746C_O* v4(int a);
+};
+int fn_8008463C(int x);
+extern "C" void fn_8056A058(int s, int a, int b, int c, int d, int e);
+struct Db8056792C_List {
+    Db8056746C_Rec* m0;
+    unsigned m4;
+};
+struct Db8056792C_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056792C_List* v4(int a);
+};
+float fn_8056FFB0();
+struct Db80567174_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056746C_O* v4(int a);
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual Db8056746C_O* v8(int a);
+    virtual Db8056746C_O* v9(int a);
+    virtual Db8056746C_O* v10(int a);
+};
+extern "C" int fn_8008499C__FPv(int a);
+int fn_80084114(int x);
+void fn_80084170(int x, int* lo, int* hi);
+int fn_80084600(int x);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -210,6 +314,127 @@ extern "C" DB_OVERLAY int fn_805668F0(Db80565CDC_S* s, int y)
     return fn_8032A394(fn_80329E74(d), 0);
 }
 
+inline void Db80566E78_Step(int& v)
+{
+    int t;
+    if (v > 10)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+extern "C" DB_OVERLAY void fn_80566B38(Db80565CDC_S* s, Db80566B38_H* h)
+{
+    fn_8052BA70(s->m28);
+    int a = h->v4(0)->m0->m0;
+    int b = h->v4(1)->m0->m0;
+    int c = h->v4(2)->m0->m0;
+    fn_80569E60(s, a, b, c, h->v5(0)->m0->m0);
+    a = h->v4(3)->m0->m0;
+    b = h->v4(4)->m0->m0;
+    c = h->v4(5)->m0->m0;
+    fn_80569E60(s, a, b, c, h->v5(1)->m0->m0);
+}
+
+extern "C" DB_OVERLAY void fn_80566CB4(Db80565CDC_S* s, Db80566B38_H* h)
+{
+    fn_8052BA70(s->m2C);
+    int a = h->v4(6)->m0->m0;
+    int b = h->v4(8)->m0->m0;
+    int c = h->v4(7)->m0->m0;
+    int d = h->v5(2)->m0->m0;
+    fn_8056A058((int)s, 1, 3, a, b, 0);
+    fn_8056A058((int)s, 1, 3, c, d, 0);
+    int e = h->v4(9)->m0->m0;
+    int f = h->v4(10)->m0->m0;
+    int g = h->v4(11)->m0->m0;
+    int i = h->v4(12)->m0->m0;
+    fn_8056A058((int)s, 1, 2, e, f, 0);
+    fn_8056A058((int)s, 1, 2, g, i, 0);
+}
+
+extern "C" DB_OVERLAY void fn_80566E78(Db80565CDC_S* s, int kind, int c)
+{
+    char* b = (char*)s + 0x28;
+    int off = kind * 4;
+    fn_8052BA70(*(Unk8052B978_Tbl**)(b + off));
+    int lo = 11;
+    int hi = 11;
+    fn_80083E84(kind, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_80084070(kind) == 1)
+                fn_80566F40(s, i, c);
+            else
+                fn_80567174(s, i, c);
+            Db80566E78_Step(i);
+        } while (i <= hi);
+    }
+}
+
+inline void Db80567174_Step(int& v)
+{
+    int t;
+    if (v > 25)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+/* near-miss: 97.8%; retail keeps the slot counter in r3 (mr r3,r0 before the compare and again at the loop end) and
+ * reuses it as the fn_8008499C argument, ours reloads it from its stack slot. */
+extern "C" DB_OVERLAY void fn_80566F40(Db80565CDC_S* s, int a, int b)
+{
+    Db80567174_H* h = (Db80567174_H*)b;
+    int kind = fn_80084114(a);
+    int lo = 0x1A;
+    int hi = 0x1A;
+    fn_80084170(a, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_8008499C__FPv(i) == 1) {
+                int x = h->v8(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, x, x, 0);
+                int y = h->v9(i)->v21(0)->m0;
+                int z = h->v10(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, y, z, 0);
+            } else {
+                int x = h->v8(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, x, x, 0);
+                int y = h->v9(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, y, y, 0);
+            }
+            Db80567174_Step(i);
+        } while (i <= hi);
+    }
+}
+
+extern "C" DB_OVERLAY void fn_80567174(Db80565CDC_S* s, int a, int b)
+{
+    Db80567174_H* h = (Db80567174_H*)b;
+    int kind = fn_80084114(a);
+    int lo = 0x1A;
+    int hi = 0x1A;
+    fn_80084170(a, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_80084600(a) == 1) {
+                int x = h->v8(i)->v21(0)->m0;
+                int y = h->v9(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 3, x, y, 0);
+            } else {
+                int x = h->v4(i)->v21(0)->m0;
+                int y = h->v4(i)->v21(1)->m0;
+                fn_8056A058((int)s, kind, 3, x, y, 0);
+            }
+            Db80567174_Step(i);
+        } while (i <= hi);
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80567338(Db80565CDC_S* s, int k, int v)
 {
     switch (k) {
@@ -258,6 +483,17 @@ extern "C" DB_OVERLAY void fn_805673AC(Db80565CDC_S* s, int a, int b, int c, int
     }
 }
 
+/* near-miss: 97.1%; retail copies the first record with dest r11 / counter r9 and hoists the second vptr load above
+ * the last three copy stores, ours swaps the two temporaries (struct-copy loop scheduling). */
+extern "C" DB_OVERLAY void fn_8056746C(int a, int b, int k)
+{
+    Db8056746C_H* h = (Db8056746C_H*)b;
+    Db8056746C_Rec p = *h->v4(k)->v21(0);
+    Db8056746C_Rec q = *h->v4(k)->v21(1);
+    if (p.m10 == q.m10)
+        fn_8056A058(a, fn_8008463C(k), 0, p.m0, q.m0, 1);
+}
+
 extern "C" DB_OVERLAY void fn_805678D8(int a, int b, int k)
 {
     if ((unsigned)(k - 13) <= 1)
@@ -266,6 +502,21 @@ extern "C" DB_OVERLAY void fn_805678D8(int a, int b, int k)
         fn_80567AF4(a, b, k);
     else if ((unsigned)(k - 17) <= 1)
         fn_80567AD4(a, b, k);
+}
+
+/* near-miss: 96.7%; same struct-copy shape as fn_8056746C: retail keeps the list pointer live (separate source/dest/counter
+ * temporaries) and loads the second vptr before the last three copy stores. */
+extern "C" DB_OVERLAY void fn_8056792C(int a, int b, int k)
+{
+    Db8056792C_H* h = (Db8056792C_H*)b;
+    Db8056746C_Rec p = h->v4(k)->m0[1];
+    Db8056746C_Rec q = h->v4(k)->m0[2];
+    if (p.m10 == q.m10 && p.m1C != 0) {
+        if (!(fn_8056FFB0() >= 0.5f))
+            fn_8056A058(a, 2, 0, p.m0, q.m0, 1);
+        else
+            fn_8056A058(a, 2, 0, q.m0, p.m0, 1);
+    }
 }
 
 extern "C" DB_OVERLAY void fn_80567AD4(int a, int b, int c)
@@ -282,6 +533,45 @@ extern "C" DB_OVERLAY void fn_80567B14(int a, int b, int c)
 {
     fn_80567B58(a, b, c);
     fn_80567D20(a, b, c);
+}
+
+extern "C" DB_OVERLAY void fn_80567F8C(Db80565CDC_S* s, int kind)
+{
+    unsigned cnt = TblOf2(kind * 4, (TblSet)&s->m28)->m4;
+    int best = 0;
+    int val = -1;
+    Db80567F8C_MS r;
+    Db80567F8C_MS* p = &r;
+    r.m = 0x13;
+    p->s = 5;
+    if (kind == 3)
+        r.m = 0xD;
+    int w = fn_8032A118(r);
+    unsigned i;
+    for (i = cnt - 1; i != 0; i--) {
+        Unk8052B978_Tbl* g = TblOf2(kind * 4, (TblSet)&s->m28);
+        int v = *(unsigned short*)((char*)g->m8 + i * 0x1C);
+        if (v != 0) {
+            best = i;
+            val = v;
+            break;
+        }
+    }
+    i = best + 1;
+    if (i < cnt) {
+        int o = i * 0x1C;
+        do {
+            char* b2 = (char*)&s->m28;
+            int o2 = kind * 4;
+            Unk8052B978_Tbl* g = *(Unk8052B978_Tbl**)(b2 + o2);
+            if (i < g->m4) {
+                fn_8052B5C4((Unk8052B5C4_Ent*)((int)g->m8 + o), val + 1);
+                fn_8052B5E8((Unk8052B5C4_Ent*)((int)g->m8 + o), w);
+            }
+            i++;
+            o += 0x1C;
+        } while (i < cnt);
+    }
 }
 
 extern "C" DB_OVERLAY int fn_805683AC(Db805683AC_S* s, int a, int k)
