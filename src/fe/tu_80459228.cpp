@@ -417,14 +417,12 @@ FE_OVERLAY void fn_8045A85C(FeScrA* x)
     } while (i <= 9);
 }
 
-/* near-miss: same 53 insns; only x and the row pointer p swap callee-saved registers (retail x=r30, p=r29; ours x=r29,
- * p=r30): global-alloc priority, x has 7 uses over the whole function and p 4 over the inner loop, so p ranks first. */
 FE_OVERLAY void fn_8045A8D8(FeScrA* x)
 {
+    fn_8007B738__18Unk8007B2B0_Screen(lbl_8061930C, (int)x->m160);
     int i = 1;
     char* q = (char*)x;
     int rowoff = 0;
-    fn_8007B738__18Unk8007B2B0_Screen(lbl_8061930C, (int)x->m160);
     do {
         int j = 0;
         int coloff = 0;
