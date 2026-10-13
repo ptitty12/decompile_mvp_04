@@ -968,7 +968,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "ealib/tu_803663B0.cpp"),
-            Object(NonMatching, "ealib/tu_803666EC.cpp"),
+            Object(Matching, "ealib/tu_803666EC.cpp"),
             Object(NonMatching, "ealib/tu_80367140.cpp"),
             Object(NonMatching, "ealib/tu_80367658.cpp"),
             Object(NonMatching, "ealib/tu_803682A8.cpp"),
