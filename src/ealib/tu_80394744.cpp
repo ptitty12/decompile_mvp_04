@@ -443,3 +443,34 @@ extern "C" void fn_803959D8(void* p)
 {
     lbl_806EE9C0 = p;
 }
+
+/* Same six-word additive generator as fn_804027DC; signed seed words are viewed as unsigned for carry tests. */
+struct Gen6 { unsigned w0,w1,w2,w3,w4,w5; };
+
+extern "C" unsigned fn_80394CE0()
+{
+    unsigned c = 0;
+    unsigned x = ((Gen6*)lbl_80624438)->w5 + ((Gen6*)lbl_80624438)->w4;
+    if (x < ((Gen6*)lbl_80624438)->w5 || x < ((Gen6*)lbl_80624438)->w4)
+        c = 1;
+    unsigned o0 = ((Gen6*)lbl_80624438)->w0;
+    unsigned o3 = ((Gen6*)lbl_80624438)->w3;
+    unsigned o2 = ((Gen6*)lbl_80624438)->w2;
+    unsigned o1 = ((Gen6*)lbl_80624438)->w1;
+    ((Gen6*)lbl_80624438)->w4 = x;
+    x = x + o3 + c;
+    ((volatile Gen6*)lbl_80624438)->w3 = x;
+    x = x + o2 + (x < o3);
+    ((volatile Gen6*)lbl_80624438)->w2 = x;
+    x = x + o1 + (x < o2);
+    ((volatile Gen6*)lbl_80624438)->w1 = x;
+    x = x + o0 + (x < o1);
+    ((Gen6*)lbl_80624438)->w0 = x;
+    if (++((Gen6*)lbl_80624438)->w5 == 0)
+        if (++((Gen6*)lbl_80624438)->w4 == 0)
+            if (++((Gen6*)lbl_80624438)->w3 == 0)
+                if (++((Gen6*)lbl_80624438)->w2 == 0)
+                    if (++((Gen6*)lbl_80624438)->w1 == 0)
+                        x = ++((Gen6*)lbl_80624438)->w0;
+    return x;
+}
