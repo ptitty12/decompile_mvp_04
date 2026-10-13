@@ -3,6 +3,8 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 
+#define FE_SCREEN_CF44_VOID
+
 #include "game/fe_804E02E0.h"
 
 /* Q16-DECL-BEGIN */
@@ -260,6 +262,50 @@ struct FeS17q : FeObj {
 };
 extern "C" void fn_804031BC(char* d, const char* s);
 extern const char lbl_805FA8A4[];
+class FeObjQ46 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(int a); virtual void v9();
+    virtual void v10(); virtual void v11(); virtual void v12(); virtual void v13();
+    virtual void v14(int a); virtual void v15(); virtual void v16(); virtual void v17();
+    virtual void v18(); virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22();
+    virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26(); virtual void v27();
+    virtual void v28(); virtual void v29(); virtual void v30(); virtual void v31(); virtual void v32();
+    virtual void v33(); virtual void v34(); virtual void v35(); virtual void v36(); virtual void v37();
+    virtual void v38(); virtual void v39(); virtual void v40(); virtual void v41();
+    virtual void v42(int a, int b, int c, int d); virtual void v43(int a, int b, int c, int d);
+    virtual void v44(int a, int b, const char* c, int d); virtual void v45(); virtual void v46();
+    virtual void v47(); virtual void v48(); virtual void v49(); virtual void v50(); virtual void v51();
+    virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55(); virtual void v56();
+    virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60(); virtual void v61();
+    virtual void v62(); virtual int v63(); virtual void v64(); virtual void v65(); virtual void v66();
+    virtual void v67(); virtual void v68(); virtual void v69(); virtual void v70(); virtual void v71();
+    virtual void v72(); virtual void v73(); virtual void v74(); virtual void v75(); virtual void v76();
+    virtual void v77(); virtual void v78(); virtual void v79(int a, int b);
+    virtual void v80(int a, int b); virtual void v81(); virtual void v82(); virtual void v83();
+    virtual void v84(); virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88();
+    virtual void v89(); virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93();
+    virtual void v94(); virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98();
+    virtual void v99(); virtual void v100(); virtual void v101(); virtual void v102();
+    virtual void v103(); virtual void v104(); virtual void v105(); virtual void v106();
+    virtual void v107(); virtual void v108(); virtual void v109(); virtual void v110();
+    virtual void v111(); virtual void v112(); virtual void v113(); virtual void v114();
+    virtual void v115(); virtual void v116(); virtual void v117(); virtual void v118();
+    virtual void v119(); virtual void v120(); virtual void v121(); virtual void v122();
+    virtual void v123(); virtual void v124(); virtual void v125(); virtual void v126();
+    virtual void v127();
+};
+extern "C" int sprintf(char* d, const char* fmt, ...);
+extern const char lbl_805F4ECC[];
+extern const char lbl_805FA7D8[];
+extern const char lbl_805FA7E0[];
+unsigned fn_8007DBB0(Unk8007DB74_A* a);
+extern "C" void fn_804EAD3C(void* self, int* out);
+struct FeS12q : FeObj {
+    char pad40[0x138 - 0x40];
+    FeObjQ46* m138;
+    FeObjQ46* m13C;
+};
 /* Q16-DECL-END */
 
 extern char lbl_80667378[];
@@ -355,6 +401,87 @@ extern "C" FE_OVERLAY int fn_804EA678(FeS12* self, FeObj2* a, int b, int c, int 
         return 1;
     } else
         return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804EA6D0(void* self_)
+{
+    FeS12q* self = (FeS12q*)self_;
+    Unk8007B2B0_Screen* sc = lbl_8061930C;
+    unsigned short tmp[12];
+    char buf[400];
+    int order[4];
+    int st[14];
+    int cnt = fn_8007DBB0((Unk8007DB74_A*)sc);
+    self->m138->v79(0xF, 0);
+    self->m138->v80(cnt + 1, 0);
+    self->m138->v3();
+    self->m138->v42(0x0, 0, 0xC25, 4);
+    self->m138->v42(0x1, 0, 0x415B, 5);
+    self->m138->v42(0x2, 0, 0x415C, 5);
+    self->m138->v42(0x3, 0, 0x415D, 5);
+    self->m138->v42(0x4, 0, 0x4164, 5);
+    self->m138->v42(0x5, 0, 0x4165, 5);
+    self->m138->v42(0x6, 0, 0x4166, 5);
+    self->m138->v42(0x7, 0, 0x415E, 5);
+    self->m138->v42(0x8, 0, 0x415F, 5);
+    self->m138->v42(0x9, 0, 0x4160, 5);
+    self->m138->v42(0xA, 0, 0x4162, 5);
+    self->m138->v42(0xB, 0, 0x4163, 5);
+    self->m138->v42(0xC, 0, 0x4167, 5);
+    self->m138->v42(0xD, 0, 0x4168, 5);
+    self->m138->v42(0xE, 0, 0x4169, 5);
+    if (cnt <= self->m138->v63() - 1)
+        self->m13C->v8(0);
+    if (cnt != 0) {
+        ((void (*)(void*, int*, int))fn_804EAD3C)(self, order, cnt);
+        for (unsigned i = 0; i < (unsigned)cnt; i++) {
+            int id = order[i] - 1;
+            sc->fn_8007CF44(id, (int)tmp, 9);
+            self->m138->v43(0, order[i], (int)tmp, 4);
+            st[0] = sc->fn_8007D050(id, 0xA);
+            st[1] = sc->fn_8007D050(id, 0xB);
+            st[3] = sc->fn_8007D050(id, 0xC);
+            st[4] = sc->fn_8007D050(id, 0xD);
+            st[6] = sc->fn_8007D050(id, 6);
+            st[7] = sc->fn_8007D050(id, 7);
+            st[9] = sc->fn_8007D050(id, 3);
+            st[10] = sc->fn_8007D050(id, 4);
+            st[11] = sc->fn_8007D050(id, 5);
+            st[12] = sc->fn_8007D80C(id, 2);
+            st[13] = sc->fn_8007D80C(id, 0);
+            for (int j = 1; j <= 0xE; j++) {
+                int d = j - 1;
+                switch (d) {
+                case 2:
+                    if (st[0] > 0)
+                        sprintf(buf, lbl_805FA7D8, (float)st[1] / (float)st[0]);
+                    else
+                        sprintf(buf, lbl_805FA7E0);
+                    self->m138->v44(j, order[i], buf, 4);
+                    break;
+                case 5:
+                    if (st[3] > 0)
+                        sprintf(buf, lbl_805FA7D8, (float)st[4] / (float)st[3]);
+                    else
+                        sprintf(buf, lbl_805FA7E0);
+                    self->m138->v44(j, order[i], buf, 4);
+                    break;
+                case 8:
+                    if (st[6] > 0)
+                        sprintf(buf, lbl_805FA7D8, (float)st[7] / (float)st[6]);
+                    else
+                        sprintf(buf, lbl_805FA7E0);
+                    self->m138->v44(j, order[i], buf, 4);
+                    break;
+                default:
+                    sprintf(buf, lbl_805F4ECC, st[d]);
+                    self->m138->v44(j, order[i], buf, 4);
+                    break;
+                }
+            }
+        }
+    }
+    self->m138->v14(1);
 }
 
 extern "C" FE_OVERLAY void fn_804EAD3C(void* self, int* out)
