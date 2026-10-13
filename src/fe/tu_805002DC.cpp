@@ -232,7 +232,6 @@ extern "C" FE_OVERLAY void fn_80500ED8(FeScrQ* x)
     fn_800C8040(x->fn_vslot32(lbl_805FB5A0, 1))->fn_vslot28(buf);
 }
 
-/* near-miss: loop pointers o/q/c land in r31/r29/r30 where retail has r30/r31/r29 (registers only) */
 extern "C" FE_OVERLAY int fn_80500F54(void* self, int* out, int a)
 {
     FeIdx40 buf[12];
@@ -244,17 +243,9 @@ extern "C" FE_OVERLAY int fn_80500F54(void* self, int* out, int a)
         p++;
     } while (k-- != 0);
     int n = fn_805559D4(h, buf, 12, a);
-    if (n > 0) {
-        int* o = out;
-        FeIdx40* q = buf;
-        int c = n;
-        do {
-            o[0] = fn_805563C4(q);
-            o[1] = fn_80556410(q);
-            q++;
-            o += 2;
-            c--;
-        } while (c != 0);
+    for (int i = 0; i < n; i++) {
+        out[i * 2] = fn_805563C4(&buf[i]);
+        out[i * 2 + 1] = fn_80556410(&buf[i]);
     }
     return n * 2;
 }
