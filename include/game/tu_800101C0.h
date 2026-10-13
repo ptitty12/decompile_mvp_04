@@ -19,7 +19,8 @@
  * is called with crclr cr1eq, i.e. no floating-point varargs.
  */
 void fn_80056C9C(int id);
-int fn_80391C04(unsigned char a, unsigned char b, unsigned short line);
+/* C linkage and unsigned result confirmed by ealib/tu_803912F8.cpp. */
+extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short line);
 extern void (*lbl_80624408)(int, int, ...);
 
 #endif
