@@ -1073,3 +1073,22 @@ extern "C" FE_OVERLAY void fn_804ECD6C()
     fn_800B82D0(fn_800B8144(), 8, 0);
     fn_800B8268(fn_800B8144(), 260.0f, 115.0f, 340.0f, 215.0f);
 }
+
+extern "C" FE_OVERLAY void fn_804EADD4(FeP4TabX* self, int n, int key, int value)
+{
+    self->m0 = 0;
+    self->e[n].m0 = 1;
+    for (unsigned i = 0; i < self->e[n].m8; ++i) {
+        if (key == self->e[n].s[i].a) {
+            ++self->e[n].s[i].b;
+            self->e[n].s[i].c += value;
+            self->e[n].m4F0 += value;
+            return;
+        }
+    }
+    self->e[n].s[self->e[n].m8].a = key;
+    self->e[n].s[self->e[n].m8].b = 1;
+    self->e[n].s[self->e[n].m8].c = value;
+    ++self->e[n].m8;
+    self->e[n].m4F0 += value;
+}
