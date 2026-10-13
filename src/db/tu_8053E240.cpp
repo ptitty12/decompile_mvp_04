@@ -79,7 +79,7 @@ int fn_8053ED0C(C30* c);
 int fn_8053F3B0(C30* c, Db8053E240_Tmp* t);
 int fn_80540F10(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, float x);
 int fn_805419C8(int a, int b, int c, int d, int e, int f, float x);
-void fn_80540258(int self, int a, int b, int n, int buf);
+int fn_80540258(int self, int a, int b, int n, int buf);
 void fn_80540530(int k);
 /* end Q18 decls */
 
@@ -454,6 +454,98 @@ DB_OVERLAY int fn_8054016C(int p0, int p1, int p2, int p3, int p4, int p5, int p
 DB_OVERLAY int fn_805401EC(int p0, int p1, int p2, int p3, int p4, int p5, int p6, float f)
 {
     return fn_80540F10(0x17, p0, p1, p2, p3, p4, 1, p5, p6, 0, f);
+}
+
+struct Db8053E240_It2 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    virtual int s1();
+    virtual void s2();
+    virtual int s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12(int n);
+};
+struct Db8053E240_TmpE : Db8053E240_Tmp {
+    ~Db8053E240_TmpE() { vp = lbl_8064A550; }
+};
+struct Db8053E240_Rng {
+    char b[0x20];
+};
+extern char lbl_8064A4C8[];
+extern const float lbl_805FEE30;
+extern "C" int fn_8040ABA0();
+extern "C" void fn_8014D81C(Db8053E240_Rng* r);
+extern "C" void fn_8014D860(Db8053E240_Rng* r, int seed);
+extern "C" int fn_8014D8AC(Db8053E240_Rng* r, int range, int a, int b);
+extern "C" void fn_80537E80(void* l, int g, int x, int flag);
+DB_OVERLAY int fn_80540258(int self_, int mode, int x, int n, int arr_)
+{
+    Db8053E240_It2* self = (Db8053E240_It2*)self_;
+    Db8053E240_EntF* arr = (Db8053E240_EntF*)arr_;
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    Db8053E240_Rng rng;
+    fn_8014D81C(&rng);
+    int rem = n;
+    for (int i = 0; i < n; i++) {
+        if (arr[i].w0 != 0)
+            rem--;
+    }
+    if (rem == 0)
+        return n;
+    self->s1();
+    fn_8014D860(&rng, fn_8040ABA0());
+    if (rem > 0) {
+        Db8053E240_EntF* wp = (Db8053E240_EntF*)(rem * -12 + (n * 12 + arr_));
+        do {
+            Db8053E240_TmpE t;
+            int buf[0x28];
+            Db8053E240_TmpE* q = &t;
+            t.m0 = buf;
+            t.vp = lbl_8064B298;
+            q->m8 = 0x28;
+            fn_8040074C(t.m0, t.m8 << 2);
+            q->m4 = 0;
+            q->mC = 0;
+            t.vp = lbl_8064A550;
+            fn_8040074C(t.m0, t.m8 << 2);
+            q->m4 = 0;
+            q->mC = 0;
+            q->m14 = 0;
+            int cm = self->m4;
+            t.vp = lbl_8064A4C8;
+            int cnt = fn_8014D8AC(&rng, cm, 0, 0);
+            self->s12(cnt);
+            fn_80537E80(&t, self->s3(), x, 1);
+            q->mC = 0;
+            if (t.m4 != 0) {
+                int r = fn_8014D8AC(&rng, t.m4, 0, 0);
+                t.mC = r;
+                int id = *(int*)((char*)t.m0 + r * 4);
+                if (s->fn_8007A6A0(0x1F, id) > 0)
+                    continue;
+                int k = 0;
+                while (k < n && arr[k].w0 != id)
+                    k++;
+                if (k == n) {
+                    wp->w0 = id;
+                    rem--;
+                    wp->w4 = self->s3();
+                    wp->w8 = lbl_805FEE30;
+                    wp++;
+                }
+            }
+        } while (rem > 0);
+    }
+    return fn_80541CAC((Db8053E240_Ent12*)arr, n);
 }
 
 DB_OVERLAY void fn_805404C8()
