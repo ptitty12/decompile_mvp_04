@@ -333,3 +333,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `ealib/tu_803912F8::fn_803923E8`: three ordinary drafts; best111vs112words/97.1%, selection-update factoring and saved-register allocation remain. Restored, batch21.
 - ealib/tu_803BE8BC::fn_803C1B50 (98.29%): eight local/sentinel/zero-chain initialization forms retain constant-register and store scheduling differences; scratch build/root-803C1B50.
 - fe/tu_8044F550::fn_80451028 (99.48%): eight indexed-access/local-condition/helper forms retain six index/base register slots or change branch layout; scratch build/root-80451028.
+- fe/tu_8050C9DC::fn_8050DA2C (99.23%) / fn_8050E7B0 (99.31%): existing two-argument FeDtorFn casts target canonical one-argument fn_800EC5F4 provider in game/tu_800EBF2C; coherent destructor ABI repair crosses GAME ownership, so no further cast-based variants.
