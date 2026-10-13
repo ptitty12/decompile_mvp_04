@@ -78,8 +78,13 @@ public:
     virtual int s5(int a);
     virtual void* s6();
 };
+struct Unk80305D30_C {
+    char pad0[0xB3C];
+    unsigned mB3C;
+};
 struct Unk80304858_VT98 : public Unk80304858_VT98V {
-    char pad9C[0x370 - 0x9C];
+    char pad9C[0x36C - 0x9C];
+    Unk80305D30_C* m36C;
     int m370;
 };
 struct Unk80304858_Rec {
@@ -96,6 +101,7 @@ struct Unk80304858_Sx {
     int m194;
 };
 extern int lbl_8061F94C;
+extern int lbl_80620378;
 extern int lbl_8061F960;
 extern int lbl_8061F964;
 struct Unk8030741C_E {
@@ -150,6 +156,7 @@ void fn_803D68AC(int h, void* mtx);
 void fn_8037D768(void* p);
 void fn_803DFEE0(Unk80304858_M44* dst, float x, float y, float z, float w);
 void fn_80328234(void* p, int a, int b);
+void fn_80305D30(Unk80304858_Sx* p);
 }
 
 struct Unk8030665C_E {
@@ -355,6 +362,32 @@ void fn_80305C88(Unk80305C88_P* p, short v)
 
 void fn_80305D2C()
 {
+}
+
+void fn_80305D30(Unk80304858_Sx* p)
+{
+    Unk80304858_VT98* c = p->m18C;
+    Unk80305D30_C* d = c->m36C;
+    if (d != 0) {
+        Unk80304858_M44 work = *(Unk80304858_M44*)((char*)c + 0x3A0);
+        unsigned f = d->mB3C;
+        if (f & 0x01000000) {
+            fn_803DFEE0(&work, 1.0f, 2.0f, 2.0f, 1.0f);
+        } else {
+            int t = (f >> 27) & 1;
+            if (lbl_80620378 != 0)
+                t = 1;
+            if (t != 0)
+                fn_803DFEE0(&work, 1.0f, 0.5f, 0.5f, 1.0f);
+        }
+        fn_803D68AC(p->m24, &work);
+        return;
+    }
+    Unk80304858_Rec* r = (Unk80304858_Rec*)c->s6();
+    if (r->m0 == 0)
+        fn_8037D768(r);
+    r->m0 = 1;
+    fn_803D68AC(p->m24, (char*)r + 0x20);
 }
 
 void* fn_80305E94(Unk80304858_At8* p, int a, int b, int c)
