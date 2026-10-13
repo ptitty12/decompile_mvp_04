@@ -319,6 +319,93 @@ struct Unk8030FD50_Obj {
     float mE4[8];
     Unk8030C5D8_F3 m104;
 };
+struct U;
+U* fn_8035F788(U* self);
+struct Unk8030FECC_B {
+    int w[40];
+};
+struct Unk8030FECC_Q {
+    int w[4];
+};
+struct Unk8030FECC_Obj {
+    const void* m0;
+    char pad4[0xA0];
+    Unk8030FECC_B mA4;
+    char pad144[0x704 - 0x144];
+    Unk8030FECC_B g[4][2];
+    Unk8030FECC_B h[4];
+    Unk8030FECC_Q mE84;
+    char padE94[0x10E0 - 0xE94];
+    int m10E0;
+};
+extern Unk8030FECC_Q lbl_806055E8;
+extern char lbl_806657C8[];
+extern unsigned int lbl_8061FE1C;
+struct Unk8019F8C0_Owner;
+struct Unk8030F598_Obj {
+    char pad0[0x1C];
+    Unk8019F8C0_Owner* m1C;
+    char pad20[0x60 - 0x20];
+    int m60;
+    float m64;
+    char pad68[0x80 - 0x68];
+    int m80;
+    char pad84[0xB8 - 0x84];
+    void* mB8;
+    void* mBC;
+    float mC0;
+};
+float fn_801A0744(Unk8019F8C0_Owner* o);
+struct Unk8030FD50_Obj;
+extern "C" void fn_8030FD50(Unk8030FD50_Obj* p, int i);
+extern "C" void fn_8030F2C4(void* p, int a, float b);
+extern "C" void fn_8030EF64(Unk8030EF64_Obj* p, float a, float b);
+struct Unk8030F0C8_Own {
+    char pad0[0x730];
+    void* m730;
+};
+struct Unk8030F0C8_Obj {
+    char pad0[0x1C];
+    Unk8030F0C8_Own* m1C;
+    char pad20[0x30 - 0x20];
+    float m30;
+    float m34;
+    int m38;
+    int m3C;
+    Unk8030C5D8_F3 m40;
+    Unk8030C5D8_F3 m4C;
+    char pad58[0x64 - 0x58];
+    float m64;
+    char pad68[0xB4 - 0x68];
+    float mB4;
+};
+struct Unk8030F0C8_Ent {
+    char pad0[0x120];
+    char* m120;
+};
+inline Unk8030C5D8_F3 Unk8030F0C8_Sub(const Unk8030C5D8_F3& a, const Unk8030C5D8_F3& b)
+{
+    Unk8030C5D8_F3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+extern "C" {
+Unk8030F0C8_Ent* fn_8031C1E4(void* h, int id);
+int fn_8031C2A4(void* h, int id, int* found, float t);
+void fn_8031C328(void* h, int id);
+}
+extern "C" {
+void fn_803E6B3C(void* p);
+void fn_803E6B74(void* p);
+void fn_80433060(void* p, int n);
+}
+extern "C" {
+void fn_803E47E8(void* p);
+void fn_803E4818(void* p);
+void fn_8040074C(void* p, int n);
+}
 extern "C" {
 char* fn_8040B61C(char* d, const char* s);
 void fn_80328234(void* p, int a, int b);
@@ -792,6 +879,78 @@ extern "C" void fn_8030EF64(Unk8030EF64_Obj* p, float a, float b)
     }
 }
 
+extern "C" void fn_8030F0C8(Unk8030F0C8_Obj* p, float a, float b)
+{
+    int s = p->m3C;
+    Unk8030F0C8_Own* o = p->m1C;
+    if (s == 1 && !(p->m64 <= 0.6f) && p->m38 == 0x3E) {
+        void* h = o->m730;
+        p->m40 = *(Unk8030C5D8_F3*)(fn_8031C1E4(h, 0x60)->m120 + 0x60);
+        fn_8031C328(h, 0x60);
+        p->m3C = 2;
+        return;
+    }
+    if (s == 2) {
+        void* h = o->m730;
+        Unk8030C5D8_F3 pos = *(Unk8030C5D8_F3*)(fn_8031C1E4(h, 0x60)->m120 + 0x60);
+        Unk8030C5D8_F3 d2 = Unk8030F0C8_Sub(pos, p->m40);
+        p->m4C = d2;
+        int found = 0;
+        if (fn_8031C2A4(h, 0x60, &found, a) == 0 && found != 0)
+            p->m3C = 3;
+    } else if (s == 3) {
+        if (!(p->mB4 >= p->m30)) {
+            if (!(b <= 0.0f)) {
+                float t = b * p->m34;
+                p->mB4 = p->mB4 + t;
+                p->mB4 = p->mB4 <? 1.0f;
+            }
+        }
+    }
+}
+
+extern "C" int fn_8030F598(Unk8030F598_Obj* p)
+{
+    float now = fn_801A0744(p->m1C);
+    float dt = p->mC0 < 0.0f ? 0.0f : now - p->mC0;
+    p->mC0 = now;
+    if (!(dt >= -16.0f))
+        dt = 0.0f;
+    int target = (int)((float)p->m60 * p->m64);
+    int changed = 0;
+    if (dt != 0.0f) {
+        changed = 1;
+        fn_803E6B3C((char*)p + 0x114);
+        fn_8030EF64((Unk8030EF64_Obj*)p, now, dt);
+        fn_8030F0C8((Unk8030F0C8_Obj*)p, now, dt);
+        fn_8030F2C4(p, target, dt);
+    }
+    if (target > p->m80) {
+        if (!changed) {
+            fn_803E6B3C((char*)p + 0x114);
+            changed = 1;
+        }
+        int c = p->m80;
+        int lim = c + 0x32;
+        if (lim > target)
+            lim = target;
+        for (int i = c; i < lim; i++)
+            fn_8030FD50((Unk8030FD50_Obj*)p, i);
+        p->m80 = lim;
+    } else if (target < p->m80) {
+        int v = p->m80 - 0x32;
+        if (v < target)
+            v = target;
+        p->m80 = v;
+    }
+    if (changed) {
+        fn_803E6B74((char*)p + 0x114);
+        fn_80433060(p->mB8, p->m80 * 0x18);
+        fn_80433060(p->mBC, p->m80 * 8);
+    }
+    return p->m80 != 0 ? 1 : 0;
+}
+
 void fn_8030F9DC(Unk8030C5D8_Em2* p)
 {
     float a = 1500.0f;
@@ -859,3 +1018,4 @@ extern "C" void fn_8030FD50(Unk8030FD50_Obj* p, int i)
     *(int*)((char*)p->mBC + k * 4) = p->m58;
     ((Unk8030FD50_Pr*)((char*)p->mBC + k * 4))->m4 = p->m5C;
 }
+
