@@ -164,6 +164,12 @@ inline void Unk80198F68_Push(Unk8019A998_Ring* r, Unk8018A254_Ret* m, float t)
     }
 }
 extern "C" void fn_8019A404(void* o, void* x, float* out);
+struct Unk8019BD10_O {
+    char pad0[0x34];
+    float m34;
+    float m38;
+    float m3C[4][4];
+};
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -769,4 +775,72 @@ extern "C" int fn_8019BC10(const Unk8019BC10_P* a, const Unk8019BC10_P* b, void*
         } else
             return 0;
     }
+}
+
+//@8019BD10
+extern "C" int fn_8019BD10(Unk8019BD10_O* o, float x, float z)
+{
+    int idx = 0;
+    float dx;
+    float dz = z - o->m38;
+    dx = x - o->m34;
+    int q;
+    if (!(dz < 0.0f)) {
+        q = 3;
+        if (!(dx < 0.0f))
+            q = 0;
+    } else {
+        q = 2;
+        if (!(dx < 0.0f))
+            q = 1;
+    }
+    float s = 0.0f;
+    if (!(dx >= 0.01f) && !(dx <= -0.01f)) {
+        s = 0.0f;
+    } else if (!(dz >= 0.01f) && !(dz <= -0.01f)) {
+        s = 100000000.0f;
+        if (q == 1 || q == 3)
+            s = -s;
+    } else {
+        s = dx / dz;
+    }
+    int i;
+    char* b;
+    int off;
+    char* b2;
+    int off2;
+    if (q == 0 || q == 2) {
+        off = q * 16;
+        b = (char*)o + 0x3C;
+        i = 3;
+        int e = off + 12;
+        if (!(s <= *(float*)(b + e))) {
+            idx = 3;
+            goto done;
+        }
+    L1:
+        i--;
+        if (i < 0)
+            goto done;
+        if (s <= *(float*)(b + (i * 4 + off)))
+            goto L1;
+        idx = i;
+        goto done;
+    }
+    b2 = (char*)o + 0x3C;
+    off2 = q * 16;
+    i = 0;
+    if (!(s > *(float*)(b2 + off2))) {
+        idx = 0;
+        goto done;
+    }
+L2:
+    i++;
+    if (i > 3)
+        goto done;
+    if (s > *(float*)(b2 + (i * 4 + off2)))
+        goto L2;
+    idx = i;
+done:
+    return idx + q * 4;
 }
