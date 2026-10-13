@@ -782,6 +782,37 @@ extern "C" void fn_80393828(McHdr5* p)
         base[i] = 0;
 }
 
+inline int* McTab(McHdr5* a)
+{
+    return (int*)((char*)a + ((((a->m2 >> 2) + 3) & ~3) + 8) + a->m4 * 4);
+}
+
+extern "C" int fn_8039387C(McHdr5* a, McSrc* g)
+{
+    int r = 1;
+    int i = 0;
+    int n = g->m4;
+    if (i < n) {
+        McEnt8* ents = g->m8;
+        do {
+            McEnt8* e = &ents[i];
+            if (e->m4 == 0xFF) {
+                int v = e->m6;
+                if (v != 0xFF && (v & 0x80)) {
+                    v &= 0x7F;
+                    int* t = McTab(a);
+                    if (t != 0 && t[v] == 0) {
+                        r = 0;
+                        break;
+                    }
+                }
+            }
+            i++;
+        } while (i < n);
+    }
+    return r;
+}
+
 extern "C" int fn_80393AD0(McCtxA* a, McHdr5* b, unsigned* c, int d)
 {
     int r = 1;
