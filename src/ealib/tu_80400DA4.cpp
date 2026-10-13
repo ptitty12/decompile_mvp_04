@@ -306,6 +306,36 @@ extern "C" void fn_80402970(const float* a, float* s, float* c);
 
 extern "C" void fn_80402970(const float* a, float* s, float* c);
 
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80401BFC(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, float angle)
+{
+    float s;
+    float c;
+    float a;
+    fn_80402970(&angle, &s, &c);
+    a = in->m00;
+    out->m00 = a * c + in->m02 * s;
+    out->m01 = in->m01;
+    out->m02 = in->m02 * c - a * s;
+    out->m03 = in->m03;
+    a = in->m10;
+    out->m10 = a * c + in->m12 * s;
+    out->m11 = in->m11;
+    out->m12 = in->m12 * c - a * s;
+    out->m13 = in->m13;
+    a = in->m20;
+    out->m20 = a * c + in->m22 * s;
+    out->m21 = in->m21;
+    out->m22 = in->m22 * c - a * s;
+    out->m23 = in->m23;
+    a = in->m30;
+    out->m30 = a * c + in->m32 * s;
+    out->m31 = in->m31;
+    out->m32 = in->m32 * c - a * s;
+    out->m33 = in->m33;
+}
+
 extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
 {
     Unk80402288_Mtx tmp;
