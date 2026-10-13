@@ -11,6 +11,19 @@
  * Not matched yet: LockSram/LockSramEx and the functions that inline them, UnlockSram, __OSInitSram
  * (the original keeps the static SramControl base in a callee-saved register, which an extern cannot reproduce),
  * fn_80436530 (OSGetResetButtonState) and fn_804372DC (__OSThreadInit) are done (see below).
+ *
+ * RE4/dolsdk2004 probes (adonis-singh/re4 src/lib/OSReset.c, OSRtc.c, OSMemory.c; score_variants):
+ * - With -opt nopeephole (and -inline noauto for fn_80436204) these already MATCH with the bodies below:
+ *   fn_80435BD0 (70), fn_80436154 (26), fn_804361BC (18), fn_80436204 (128), fn_80436404 (14). They are the tails of
+ *   OSMemory.c (0x80435BD0..0x80435CE8) and OSReset.c (0x80436154..0x8043643C) after their first original-code
+ *   function; every other function of the unit needs peephole ON (a unit split with those two ranges nopeephole
+ *   gains 1024 bytes).
+ * - fn_80436B54 (UnlockSram, 207 insns) MATCHES with the dolsdk2004 body (Scb.xxx used directly, no local pointer) if the
+ *   OSRtc.c static Scb is defined in the TU (`static SramControl lbl_806DF3C0;`; an extern gives 198 diff slots), and the
+ *   other OSRtc functions still match. It cannot be committed here: the .bss of this object would then hold Scb in
+ *   front of the OSThread statics below, which shifts every offset in fn_804372DC (86 insns, matches today) by
+ *   sizeof(SramControl); with Scb after them, UnlockSram and fn_804367E8 change. Needs OSRtc.c and the OSThread head in
+ *   separate units. fn_80436960 (__OSInitSram) and fn_8043719C (OSSetGbsMode) get closer (3 and 12 diff slots) but not equal.
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
