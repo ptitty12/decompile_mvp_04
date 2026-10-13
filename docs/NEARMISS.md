@@ -367,3 +367,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
 
 - `fe/tu_804CE408` `fn_804CEBAC`: inherited96.91304%; eight ordinary indexed/pointer/for/do loop forms retain counter-before-row setup and row-before-counter increment scheduling differences; source preserved, scratch build/root51/CEBAC.
+
+- `db/tu_80565FD4` `fn_8056746C`: inherited97.07921%; eight ordinary aggregate-copy/lifetime/array/memcpy forms retain record-copy register and second-vptr scheduling differences; source preserved, scratch build/root51/6746C.
