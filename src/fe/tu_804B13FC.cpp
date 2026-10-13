@@ -203,6 +203,35 @@ extern "C" FE_OVERLAY FeRaw* fn_804B1404(FeRaw* self, int a, int b, int c, int d
 }
 
 extern char lbl_8066AA40[];
+
+extern const char lbl_805F7B08[], lbl_805F7B10[], lbl_805F54F8[], lbl_805F7B14[], lbl_805F7B20[];
+extern "C" char* fn_8058F11C(char*, int);
+struct FeEntry804B14A4 { FeObj* data; FeObj* first; FeObj* second; };
+struct FeRows804B14A4 : FeObj { char pad40[0x154 - 0x40]; FeEntry804B14A4 rows[13]; };
+extern "C" FE_OVERLAY void fn_804B14A4(FeScr* x)
+{
+    fn_800ECE34(x);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    x->m140 = fn_800C8060(x->v32(lbl_805F7B08, 1));
+    x->m134 = fn_800C8038(x->v32(lbl_805F7B10, 1));
+    x->m138 = fn_800C8040(x->v32(lbl_805F54F8, 1));
+    x->m14C = fn_800B7AB8(UiGetMsgMgr(), lbl_805F7B14);
+    int i = 0;
+    FeObj* selection = fn_800C8048(((FeObj*)(((FeObjP2*)x->m140)->v73(0, 0)))->v32(lbl_805F7B20, 1));
+    x->m13C = selection;
+    ((FeObj1*)selection)->v43(9);
+    ((FeObj2*)x->m13C)->v46(20, 4);
+    while (i < ((FeObjI*)x->m140)->v59()) {
+        ((FeRows804B14A4*)x)->rows[i].data = (FeObj*)fn_8058F11C((char*)x->m144, i);
+        int row = i;
+        FeObj* child = (FeObj*)((FeObjP2*)x->m140)->v73(row, 0);
+        FeObj* first = fn_800C805C(((FeObjQ33*)child)->v33(11, 1));
+        ((FeRows804B14A4*)x)->rows[i].first = first;
+        ((FeRows804B14A4*)x)->rows[i].second = fn_800C8058(((FeObjQ33*)first)->v33(10, 1));
+        ++i;
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804B16F0(FeScr* x)
 {
     int o = 0;
