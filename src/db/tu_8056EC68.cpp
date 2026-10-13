@@ -414,18 +414,22 @@ extern "C" DB_OVERLAY void fn_8056F228(DbSel* self, int a, int b)
 }
 
 /* near-miss: ~8 slots; retail stores the counter before loading r3 and schedules li r5,0 later */
+inline int Db34Previous(DbDownIt& it)
+{
+ int t=it.v-1;
+ if(it.v<=-1)t=it.v;
+ it.v=t;
+ return t;
+}
 extern "C" DB_OVERLAY void fn_8056F494(DbSel* self)
 {
-    DbDownIt it(2);
-    if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10, 2)->m0 != 0xFF) {
-        int i;
-        do {
-            if (Round(self->m10) > 2)
-                break;
-            fn_8056EEA8(self, it.v, 0);
-            i = it.Next();
-        } while (i >= 0);
-    }
+ DbDownIt it(2);
+ int i=2;
+ do {
+  if(fn_80081CF8__FP13Unk8007FF8C_Yi(self->m10,i)->m0!=0xFF && Round(self->m10)<=2)
+   fn_8056EEA8(self,it.v,0);
+  i=Db34Previous(it);
+ }while(i>=0);
 }
 
 extern "C" DB_OVERLAY int fn_8056F51C(DbSel* self, int idx, void* p3)
