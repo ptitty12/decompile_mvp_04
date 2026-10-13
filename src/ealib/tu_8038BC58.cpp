@@ -51,6 +51,55 @@ extern "C" VdMain* fn_8038BC58(int a, int b, int unused, char* c)
     return fn_8038BCD0(p, a, b, spC);
 }
 
+struct VdSrcI {
+    int m0;
+    short* m4;
+};
+extern "C" void GXInitTexObjCI(void* obj, void* img, int w, int h, int fmt, int ws, int wt, int mip, int tlut);
+extern "C" void GXInitTexObjLOD(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
+extern "C" unsigned char* fn_8038C7D4(int a, int b);
+extern char lbl_80605E88[];
+/* near-miss (99.85%): same 172 instructions; only the frame size (0x58 vs 0x50) and the conv-temp displacement differ: retail
+   has 8 more bytes of locals below the int->float temp that no emitted code references (an unused char array, an empty-ctor
+   object and a dead conversion pair each failed to allocate a slot). */
+extern "C" VdMain* fn_8038BCD0(VdMain* p, int a, int b, int c)
+{
+    VdSrcI* sb = (VdSrcI*)b;
+    p->m0 = (VdCbObj*)a;
+    *(const void**)((char*)p + 4) = lbl_80605E88;
+    short* t = sb->m4;
+    int w = t[2];
+    int h = t[3];
+    *(int*)((char*)p + 0x94) = c;
+    *(float*)((char*)p + 0x70) = (float)w;
+    *(float*)((char*)p + 0x74) = (float)h;
+    if (sb->m0 == 3) {
+        w += 0x60;
+        h += 0x60;
+    }
+    int dx = ((unsigned short*)c)[2] - w;
+    int dy = ((unsigned short*)c)[3] - h;
+    float fz = 0.0f;
+    *(float*)((char*)p + 0x78) = fz;
+    *(float*)((char*)p + 0x7C) = (float)(dx / 2);
+    *(float*)((char*)p + 0x80) = (float)(dy / 2);
+    *(float*)((char*)p + 0x84) = *(float*)((char*)p + 0x7C) + (float)w;
+    *(float*)((char*)p + 0x88) = *(float*)((char*)p + 0x80) + (float)h;
+    *(float*)((char*)p + 0x8C) = 1.0f;
+    *(float*)((char*)p + 0x90) = 1.0f;
+    GXInitTexObjCI((char*)p + 0xC, 0, (unsigned short)w, (unsigned short)h, 9, 0, 0, 0, 2);
+    GXInitTexObjLOD((char*)p + 0xC, 0, 0, fz, fz, fz, 0, 0, 0);
+    unsigned short hw = (unsigned short)(w / 2);
+    unsigned short hh = (unsigned short)(h / 2);
+    GXInitTexObjCI((char*)p + 0x4C, 0, hw, hh, 9, 0, 0, 0, 1);
+    GXInitTexObjLOD((char*)p + 0x4C, 0, 0, fz, fz, fz, 0, 0, 0);
+    GXInitTexObjCI((char*)p + 0x2C, 0, hw, hh, 9, 0, 0, 0, 0);
+    GXInitTexObjLOD((char*)p + 0x2C, 0, 0, fz, fz, fz, 0, 0, 0);
+    p->m8 = (VdBufs*)((unsigned char* (*)(void*, void*, void*))fn_8038C7D4)((char*)p + 0xC, (char*)p + 0x4C, (char*)p + 0x2C);
+    p->m6C = 0;
+    return p;
+}
+
 extern "C" void fn_8038BF80(VdFilter* o, float a, float b, float c)
 {
     o->m84 = o->m70 * o->m8C + a;
