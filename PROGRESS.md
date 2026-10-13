@@ -1,16 +1,16 @@
 # PROGRESS
 
 ## Snapshot (update each session)
-- Phase: **1 (scaffold) exit criteria met; waiting for owner review** (verifier install, CI hosting, push/issues; see `docs/DECISIONS.md`)
+- Phase: **2 (matching decompilation), in progress**
 - Target: MVP Baseball **2005**, GameCube `GV4E69` (USA, rev 0). `main.dol` SHA-1 `da6becdbea614d03c4b5eae9f8a0fb08e0a184dd`
-- Build: `python configure.py && ninja` rebuilds a byte-identical `build/GV4E69/main.dol` from dtk-split assembly (24,158 functions, 5,896,176 code bytes, 199 auto objects)
+- Build: `python configure.py && ninja` rebuilds a byte-identical `build/GV4E69/main.dol` from compiled source plus remaining dtk-split assembly (24,158 functions, 5,896,176 code bytes).
 - Toolchain:
-  - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags for game code TBD; SN's libgcc matches with `-O2 -G0`.
-  - Dolphin SDK: MWCC GC/1.2.5n, template base flags + `-char unsigned -opt nopeephole` (one function so far: OS)
+  - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
+  - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched (committed): 0 / 24,158 (0%) | game: 0 | sdk/runtime: 0
-  - Not committed: 3 probe functions at 100% in a scratch clone (`__do_global_ctors`, `__main`, `OSRegisterVersion`)
-- Last audit: none yet
+- Functions matched: **20,881 / 24,158 (86.44%)**; code matched: **2,993,620 / 5,896,176 bytes (50.77%)**.
+- Source-linked: **169 units, 216,840 code bytes (3.68%)**, plus 7,522 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+- Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
 ## Session log (newest last)
 <!-- YYYY-MM-DD | agent/model | unit | matched N, abandoned M | blockers | owner decisions needed -->
@@ -186,3 +186,9 @@
 - 2026-10-13 | Codex | Csis/allocator source-link sweep | 13 more verified source-linked units (+65,808 B): two shared C linkage fixes unlock ten units; three local deallocator-call repairs unlock another three. Every source-linked promotion retains retail DOL SHA1 and passes literal checks and the unmodified verifier. Session source-link gains: 49 units / 148,996 B; complete units 64 -> 113, linked code 15,464 -> 164,460 B. New clone.py fix also copies separate inline member definitions when it copies the declaring class, including their dependencies; 4 new synthetic tests, 12 helper tests pass. Large renderer fn_803EA500 now reaches the correct 426 instructions in scratch but still fails the strict pre-check on its unresolved GXWGFifo address; left unapplied. Two multi-initializer functions in game/tu_80174318 remain parked after a bounded scratch probe. No owner action needed.
 
 - 2026-10-13 | Codex | newlib ctype data identity | Identified _ctype_ at 0x8060E9F0 (257 bytes, including the EOF sentinel), replacing the previous interior label at 0x8060E9F1. Confirmed zero sentinel and ASCII control/space/digit/uppercase/lowercase/hex masks in retail data. Three non-libc consumers now address masks through _ctype_ + 1; all passed the unmodified verifier without regressions. A trial retaining an overlapping interior label was rejected by the splitter and reverted; the final table has one proper object name and no alias. All 531 checked references across affected consumers resolve with 0 mismatches. Seven libc units now source-link (+1,236 B): strtol, strtoul, strcasecmp, strlwr, tolower, isdigit, isspace. Session source-link gains: 56 units / 150,232 B; complete units 64 -> 120, linked code 15,464 -> 165,696 B. Final batch integration required. Unused old declarations in two game headers remain; the three actual consumers use the canonical table. No owner action needed.
+
+- 2026-10-13 | Codex | Data ownership and unused SDK bodies | 49 more verified source-linked units / 51,144 code bytes since db183aa6. Complete units 120 -> 169; linked code 165,696 -> 216,840. Read-only data_candidates.py locates complete compiled sections using code relocation pairs, canonical sized global objects, initialized pointers and unique aligned whole-section matches. No zero-block or ambiguous search guesses. Synthetic helper suite: 27 tests PASS. Both ProDG halfword relocations and MWCC SDA21 halfword-vs-word locations are handled without changing target addresses or relocation kinds.
+  - Proper section ownership unlocks private libm/newlib constants and BSS, including vfprintf, vfscanf, vfiprintf, fopen and errno. Several old anonymous pool extents crossed proven boundaries and were corrected with compiled/retail-byte evidence. DVD's 11-byte pool includes five actual zero padding bytes in its split. ef_log remains blocked by a shared/external pool reference and stays extracted.
+  - Removed unused SDK definitions outside assigned target ranges, or made required private helpers static inline: GXTexture, GXTev, GXGeometry, GXBump, Padclamp, dvdidutils, EXIUart and ARQ. Every retained target function is unchanged. No target functions moved between units.
+  - atexit now compiles as C++ with a C ABI export and calls the existing GC allocation wrapper fn_8000E5BC(int), whose mangled name is the retail call target. FSasync's globals received canonical reference-backed names at relocation-proven addresses, resolving other extracted callers without aliases.
+  - Accepted two farm matches after scratch confirmation and the full acceptance gates: fe/tu_8046F770 fn_804707B8 (132 B, zero/one scheduling), db/tu_805721F8 fn_80573FB8 (548 B, weighted-sum operand order). Session gains now 12 functions / 5,708 code bytes; source-link gains from original session baseline: 105 units / 201,376 code bytes. Total source-linked units 64 -> 169. No owner action needed; final per-commit integration gate follows.
