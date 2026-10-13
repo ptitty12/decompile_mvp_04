@@ -1050,18 +1050,19 @@ void fn_801A7B5C(Unk801A7B5C_S* s)
     }
 }
 
-/* near-miss: 32/32 insns; retail keeps the buffer pointer in r31 and the queue global's address in r30
- * (mine swaps them), 9 slots differ. */
+extern "C" void fn_8035682C(void*);
+extern "C" Unk800B64BC* fn_800B64BC(void*);
+
 void fn_801A7CBC(Unk801A7B5C_S* o)
 {
-    Unk8035682C buf;
-    Unk8035682C* s = &buf;
-    fn_8040B830(s, lbl_805CEB0C, 0xF);
-    s->m0[0xF] = 0;
-    if (lbl_8061A32C == 0) {
-        lbl_8061A32C = new (0) Unk800B64BC;
-    }
-    fn_800B7B4C(lbl_8061A32C, s, 0);
+    char buf[16];
+    char* p = buf;
+    fn_8035682C(p);
+    fn_8040B830(p, lbl_805CEB0C, 15);
+    p[15] = 0;
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    fn_800B7B4C(lbl_8061A32C, (Unk8035682C*)p, 0);
 }
 
 void fn_801A8198(char* p)
