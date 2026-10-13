@@ -591,8 +591,8 @@ extern "C" FE_OVERLAY void fn_80446820(FeScr2* self)
     int a = ((FeObjI*)self->m138)->v60();
     int idx = a * 7 + ((FeObjI*)self->m138)->v61();
     char* st = (char*)fn_800B555C() + 8;
-    FeWidgetS* month = (FeWidgetS*)fn_800C8058(self->m134->v32("MONTH", 1));
     int d = self->m144;
+    FeWidgetS* month = (FeWidgetS*)fn_800C8058(self->m134->v32(lbl_805F4F28, 1));
     FeSub* s = (FeSub*)&month->mDC;
     fn_800C1FC8(st, d, idx, s->s5());
 }
