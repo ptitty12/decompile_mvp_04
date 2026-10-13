@@ -3,6 +3,13 @@
 
 #include "__card.h"
 
+extern OSTime fn_80438628(void); /* OSGetTime */
+extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
+extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
+
+
 static void UpdateIconOffsets(CARDDir* ent, CARDStat* stat) {
     u32 offset;
     BOOL iconTlut;
@@ -73,7 +80,7 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0)
         return result;
 
@@ -97,7 +104,7 @@ s32 CARDGetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
         UpdateIconOffsets(ent, stat);
     }
 
-    return __CARDPutControlBlock(card, result);
+    return fn_8041B900(card, result);
 }
 
 s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callback) {
@@ -119,7 +126,7 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
         return CARD_RESULT_FATAL_ERROR;
     }
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0)
         return result;
 
@@ -127,7 +134,7 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
     ent = &dir[fileNo];
     result = __CARDIsWritable(card, ent);
     if (result < 0)
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
 
     ent->bannerFormat = stat->bannerFormat;
     ent->iconAddr = stat->iconAddr;
@@ -140,18 +147,18 @@ s32 CARDSetStatusAsync(s32 chan, s32 fileNo, CARDStat* stat, CARDCallback callba
         CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
     }
 
-    ent->time = (u32)OSTicksToSeconds(OSGetTime());
+    ent->time = (u32)OSTicksToSeconds(fn_80438628());
     result = __CARDUpdateDir(chan, callback);
     if (result < 0)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     return result;
 }
 
 s32 CARDSetStatus(s32 chan, s32 fileNo, CARDStat* stat) {
-    s32 result = CARDSetStatusAsync(chan, fileNo, stat, __CARDSyncCallback);
+    s32 result = CARDSetStatusAsync(chan, fileNo, stat, fn_8041A6C8);
     if (result < 0) {
         return result;
     }
 
-    return __CARDSync(chan);
+    return fn_8041BB38(chan);
 }
