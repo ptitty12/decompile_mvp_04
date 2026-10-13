@@ -157,6 +157,15 @@ extern const float lbl_805F6A98;
 extern char* lbl_8061E978;
 extern "C" int fn_80403060(const unsigned short* s);
 extern "C" void fn_800D4254(unsigned short* s, int a, int* b, float* c);
+extern const char lbl_805F6AC4[];
+extern const char lbl_805F6AC8[];
+extern const char lbl_805F6AD0[];
+extern const char lbl_805F6AD4[];
+extern const char lbl_805F6ADC[];
+extern const char lbl_805F6AE4[];
+extern const char lbl_805F6AEC[];
+extern const char lbl_805F6B08[];
+extern "C" void fn_80495080(void* x);
 extern "C" {
 
 inline void Fe2FB4Get(char* rec, char* nm)
@@ -299,6 +308,54 @@ FE_OVERLAY void fn_80492FB4(void* x)
     Fe2FB4Get((char*)((FeScrB*)x)->m1A8[FeI(x, 0x184)], nm);
     ((void (*)(char*, const char*, ...))fn_80403DE4)(out, fmt, FeIdc(nm), n, suf);
     fn_80492BA8(x, out);
+}
+
+/* near-miss: 95.8%, same instructions; only registers differ: in the third loop retail keeps the counter in r31 and the record in r30 (ours swapped), and the dC register tie after the loop */
+FE_OVERLAY void fn_804930F8(void* x)
+{
+    char a8[0x68];
+    char b70[0x190];
+    char c200[0x38];
+    char d238[0x190];
+    char e3C8[0x38];
+    char f400[0x38];
+    int n = FeI(x, 0x184) == 0;
+    unsigned char i = 0;
+    int n2 = n;
+    char* bb = (char*)x + 0x1A8;
+    int off = n * 4;
+    int s1 = SumB5080(*(Fe5080Rec**)(bb + off));
+    int o12 = n * 12;
+    int off2 = n2 * 4;
+    Fe5080Rec* r2 = *(Fe5080Rec**)(bb + off2);
+    char* sb = (char*)x + 0x1B0;
+    int fb = 0;
+    int dA = s1 - *(int*)(sb + o12);
+    for (i = 0; i < r2->m3E4; i++) {
+        fb += (int)fn_80097F68(r2, 0, i, 2, 0);
+    }
+    int off3 = FeI(x, 0x184) * 4;
+    char* sb2 = (char*)x + 0x1B4;
+    int dB = fb - *(int*)(sb2 + o12);
+    Fe5080Rec* r3 = *(Fe5080Rec**)(bb + off3);
+    int ic = 0;
+    unsigned char j;
+    for (j = 0; j < r3->m3E4; j++) {
+        ic += fn_80097A70(r3, 1, j, 0);
+    }
+    int o12b = FeI(x, 0x184) * 12;
+    char* sb3 = (char*)x + 0x1B8;
+    ic -= *(int*)(sb3 + o12b);
+    sprintf(c200, lbl_805F6AEC, dA == 1 ? lbl_805F6AC4 : lbl_805F6AC8, dB == 1 ? lbl_805F6AD0 : lbl_805F6AD4, ic == 1 ? lbl_805F6ADC : lbl_805F6AE4);
+    fn_804031BC(a8, c200);
+    fn_80403DE4(b70, a8, dA, dB, ic);
+    fn_804031BC(a8, lbl_805F6B08);
+    Fe2FB4Get(*(char**)((char*)x + 0x1AC), e3C8);
+    Fe2FB4Get(*(char**)((char*)x + 0x1A8), f400);
+    fn_80403DE4(d238, a8, e3C8, SumB5080(*(Fe5080Rec**)((char*)x + 0x1AC)), f400, SumB5080(*(Fe5080Rec**)((char*)x + 0x1A8)));
+    fn_80495080(x);
+    fn_80492BA8(x, b70);
+    fn_80492BA8(x, d238);
 }
 
 FE_OVERLAY void fn_804933A0(void* x)
