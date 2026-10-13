@@ -64,7 +64,7 @@ struct Unk803BA4D0_Obj {
     int mC;
     int m10;
 };
-void fn_803BA4D0(void* list, int* p);
+extern "C" int fn_803BA4D0(void* list, int* p);
 
 /* Index tables of tu_803414A4 (fn_8034151C / fn_803415F0 and their users). */
 struct Unk8034151C {
@@ -82,9 +82,10 @@ struct Unk803415F0 {
 unsigned char fn_8034151C(Unk8034151C* t, int v);
 unsigned char fn_803415F0(Unk803415F0* t, int v);
 
-int fn_803B9D60(Unk803B9D60_Alloc** out);
-int fn_803B9DDC();
-int fn_803B9E08();
-int fn_803BA240(void* tbl, int* p, Unk803B9D60_Rec* rec);
+/* C entry points implemented by snd/tu_803B998C.cpp; these are local typed views of the allocator and Csis handles. */
+extern "C" int fn_803B9D60(Unk803B9D60_Alloc** out);
+extern "C" int fn_803B9DDC();
+extern "C" int fn_803B9E08();
+extern "C" int fn_803BA240(void* tbl, int* p, Unk803B9D60_Rec* rec);
 
 #endif
