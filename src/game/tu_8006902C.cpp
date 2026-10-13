@@ -433,6 +433,66 @@ void Unk80069F0C::fn_8006B990()
     }
 }
 
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+inline int SideOf(Unk8006902C_Players* p)
+{
+    int s = 0;
+    if (p->m1CD0 != 0)
+        s = 1;
+    return s;
+}
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_80097148(Unk8006902C_Side* s, unsigned c);
+
+extern "C" int fn_8006BC74(Unk80069F0C* self, int idx)
+{
+    int r = 0;
+    if (self->fn_8006BE18() == 0) {
+        Unk8006902C_Side* sd = &self->m14.m0->s[idx];
+        unsigned char c = sd->m17C[0];
+        char* attrs = sd->mC9C;
+        int a = fn_8008CFD8(attrs, 5, c);
+        int b = fn_8008CFD8(attrs, 6, c);
+        int x = fn_80097A9C(sd, 0xA, c, 2, 0);
+        Unk8006902C_Players* pl = self->m14.m0;
+        if (fn_80076644(0, a, b) != 0 && x <= 0 && fn_80097148(sd, c) != 1 && fn_80097148(sd, c) != 3) {
+            unsigned t = sd->m235;
+            if (t > 1 && pl != 0) {
+                int side = 0;
+                if (pl->m1CD0 != 0)
+                    side = 1;
+                if (side == idx) {
+                    r = 1;
+                    goto done;
+                }
+            }
+            if (self->m10->m22C == 0 && t <= 1 && x <= 0 && self->m14.m0->GetCA() <= 0 && self->m14.m0->GetCB() <= 0)
+                r = 1;
+        } else {
+            r = 1;
+        }
+    }
+done:
+    return r;
+}
+
 int Unk80069F0C::fn_8006BDCC()
 {
     int r = 0;
