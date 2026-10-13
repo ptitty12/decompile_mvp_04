@@ -4,10 +4,73 @@
  */
 
 #include "game/fe_804ABCBC.h"
+#define FE_V4I(n) virtual void v##n(int a, int b, int c, int d);
+class FeObj4I : public UiBase {
+public:
+    FE_LO(FE_V4I) virtual FeObj* v32(const char* a, int b); FE_HI(FE_V4I)
+};
+class FeV4L {
+public:
+    char pad0[0x4];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual int s10();
+    virtual struct FeRecL* s11(int a0);
+};
+struct FeRecL {
+    int m0;
+    int m4;
+    char pad8[0x24 - 8];
+    int m24;
+};
+extern "C" void fn_804AF1D8(FeScr* x, int a, int b);
+extern "C" void fn_804AF1B8(char* p, int i, int a, int b);
 extern "C" void fn_804AEF3C(FeScr* x);
 extern "C" void fn_800DD44C__FP13Unk800DD610_PPvi(void* a, void* b, int c);
 
 extern char lbl_80673B30[];
+extern "C" FE_OVERLAY void fn_804AEF3C(FeScr* x)
+{
+    int h = ((FeScrMgrView*)lbl_8061930C)->m2C;
+    ((FeObj2*)x->m138)->v79(0x32, 0);
+    x->m138->v3();
+    int cnt = 0;
+    int k = 0;
+    do {
+        FeV4L* lst = ((FeV4L * (*)(int, int)) fn_8058211C)(h, k);
+        int j = 0;
+        int n = lst->s10();
+        for (; j < n; j++) {
+            FeRecL* r = lst->s11(j);
+            if (r != 0) {
+                ((FeObj4I*)x->m138)->v42(cnt, 0, r->m24, 5);
+                ((FeObj3*)x->m138)->v91(cnt, 0, 1);
+                fn_804AF1D8(x, r->m0, cnt);
+                if (k == 4) {
+                    ((FeObj3*)x->m138)->v92(cnt, 2, 0);
+                    ((FeObj3*)x->m138)->v92(cnt, 3, 0);
+                } else {
+                    ((FeObj3*)x->m138)->v92(cnt, 2, r->m4);
+                    ((FeObj3*)x->m138)->v92(cnt, 3, 1);
+                }
+                fn_804AF1B8((char*)x, cnt, k, j);
+                cnt++;
+            }
+        }
+        k++;
+    } while (k <= 0xF);
+    ((FeObj1*)x->m138)->v68(0);
+    ((FeObj2*)x->m138)->v79(cnt, 0);
+    ((FeObj1*)x->m138)->v14(1);
+}
+
 extern "C" FE_OVERLAY FeRaw* fn_804AFF98(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -30,6 +93,89 @@ extern "C" FE_OVERLAY FeRaw* fn_804B0BA0(FeRaw* self, int a, int b, int c, int d
 extern "C" FE_OVERLAY void fn_804B0BEC(FeScr* x)
 {
     fn_800ECE34(x);
+}
+
+struct FeC0CN {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0xFFC - 0x19C];
+    int mFFC;
+};
+struct FeC0CSc {
+    char pad0[0x14];
+    FeC0CN* m14;
+};
+struct FeC0CGm {
+    char pad0[4];
+    FeC0CSc* m4;
+};
+extern FeC0CGm* lbl_806192E0;
+struct FeC0CObj {
+    char pad0[0xEC];
+    int mEC[2];
+    int mF4;
+};
+struct Unk800E6470_O;
+struct Ue8A6C;
+Unk800E6470_O* fn_800E6470(Unk800E6470_O* t);
+void fn_800E8A6C(Ue8A6C* m);
+void fn_800E64AC(void* t, int f);
+extern "C" void fn_800E64D4(void* o, FeObj* a, FeObj* b, void* sc, int f);
+extern "C" void fn_800DA54C(void* a, int b, void* c, int d, int e);
+struct FeC0CSubD {
+    char pad0[0x24];
+};
+struct FeC0CSub : FeC0CSubD {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+extern "C" FE_OVERLAY void fn_804B0C0C(FeScr* x)
+{
+    fn_800ECF18(x);
+    FeC0CSc* sc = lbl_806192E0->m4;
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1)))->v104(0);
+    FeC0CObj o;
+    fn_800E6470((Unk800E6470_O*)&o);
+    FeObj* a = fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1));
+    fn_800E64D4(&o, a, fn_800C8060(((FeObj*)x)->v32("CELL", 1)), sc, 1);
+    FeC0CObj* po = &o;
+    po->mF4 = 2;
+    int k0 = 0;
+    char* e = (char*)o.mEC;
+    int one = 1;
+    int k1 = 4;
+    *(int*)(e + k0) = one;
+    *(int*)(e + k1) = k0;
+    fn_800E8A6C((Ue8A6C*)po);
+    fn_800DA54C(sc, 1, fn_800C8060(((FeObj*)x)->v32("BOXSCORE", 1)), 0, 0);
+    int v2 = sc->m14->mFFC;
+    int v1 = sc->m14->m198;
+    ((FeC0CSub*)((char*)fn_800C8054(fn_800C8044(((FeObj*)x)->v32("BOXSCOREFRAME", 1))->v32("OPPLOGO", 1)) + 0x98))->s20(v2, 0);
+    ((FeC0CSub*)((char*)fn_800C8054(fn_800C8044(((FeObj*)x)->v32("BOXSCOREFRAME", 1))->v32("OPPLOGO1", 1)) + 0x98))->s20(v1, 0);
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("CELL", 1)))->v68(5);
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1)))->v68(5);
+    FeObj* n = fn_800B7A94(UiGetMsgMgr(), "NAVBAR");
+    fn_80124FA8(n, x);
+    fn_80125100(n);
+    fn_800E64AC(po, 2);
 }
 
 extern "C" FE_OVERLAY void fn_804B0F28(FeScr* x)
@@ -101,6 +247,53 @@ extern "C" FE_OVERLAY void fn_804AFFEC(FeScr* x)
     x->m134 = (FeObj*)fn_800C8060(((FeObj*)x)->v32("CELL", 1));
 }
 
+
+inline int FeNz(int v)
+{
+    int r = 0;
+    if (v != 0)
+        r = 1;
+    return r;
+}
+
+extern "C" int fn_80581900(int h, int i);
+
+extern "C" FE_OVERLAY void fn_804B00D8(FeScr* x)
+{
+    ((FeObj1*)x->m134)->v105(1);
+    int a[16] = { 7830, 7831, 7832, 7833, 7834, 7835, 7836, 7837, 7838, 7839, 7840, 7841, 7843, 7842, 9, 23652 };
+    int* pa = a;
+    int b[16] = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 1 };
+    int* pb = b;
+    int c[16] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0 };
+    int* pc = c;
+    int j = 0;
+    int i = 0;
+    int p23 = fn_800B56C4(fn_800B555C());
+    int p24 = fn_800B5758(fn_800B555C());
+    int sc = ((FeScrMgrView*)lbl_8061930C)->m2C;
+    do {
+        int ok = 0;
+        if (pc[i] == 1) {
+            int t = pb[i];
+            if (t == 2 || (p24 != 0 && t == 1) || (p23 != 0 && t == 0))
+                ok = 1;
+        }
+        if (ok != 0) {
+            int h = fn_80581900(sc, i);
+            char* base = (char*)x + 0x13C;
+            int o = j * 4;
+            *(int*)(base + o) = i;
+            ((FeObj4I*)x->m134)->v42(j, 0, pa[i], 5);
+            ((FeObj4I*)x->m134)->v42(j, 1, FeNz(h), 10);
+            j++;
+        }
+        i++;
+    } while (i <= 15);
+    ((FeObj2*)x->m134)->v79(j, 0);
+    ((FeObj2*)x->m134)->v67(0, 1);
+    ((FeObj1*)x->m134)->v14(1);
+}
 
 extern "C" FE_OVERLAY int fn_804B0738(FeScr* x)
 {
