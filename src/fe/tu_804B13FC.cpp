@@ -161,6 +161,14 @@ extern "C" void fn_800C49C4(void* m, FeObj* a, int b, int c);
 extern "C" void fn_804B2E18(FeScr* x, int k);
 extern "C" void fn_804B34B8(FeScr* x);
 extern "C" void fn_8058F09C(int a);
+struct Fe34B8Col {
+    int r, g, b, a;
+};
+struct Fe34B8W : FeObj {
+    char pad40[0xCC - 0x40];
+    Fe34B8Col mCC;
+};
+extern "C" Fe34B8Col fn_8014DBA0(int r, int g, int b, int a);
 extern "C" void fn_804B1B84(int unused, FeSrcC* src, FeObj* dst);
 extern "C" void fn_804B1DA0(FeScr* x, int a);
 class FeV1Cx { public: char pad0[0x1C]; virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6(); virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11(); virtual void s12(int a, float b, float c); };
@@ -593,6 +601,36 @@ extern "C" FE_OVERLAY void fn_804B3424(FeScr* x)
     }
     fn_804B34B8(x);
     fn_804B2B40(x, r);
+}
+
+/* near-miss (142/147 ins): in the i > cur arm retail schedules the fn_8014DBA0 hidden-pointer addi r3 last (after li r7,r4..r6); ours puts it first. Tried named temps, ternaries, int locals. */
+extern "C" FE_OVERLAY void fn_804B34B8(FeScr* x)
+{
+    FeV1Cz* l = (FeV1Cz*)x->m144;
+    int cur = l->s9();
+    if (((FeV1Cz*)x->m144)->s14() != 0) {
+        int i = 0;
+        while (i < FI(x->m144, 0x38)) {
+            FeObj* e = (FeObj*)((FeObjP2*)x->m134)->v73(i, 0);
+            Fe34B8W* w = (Fe34B8W*)fn_800C8048(((FeObjQ33*)e)->v33(5, 1));
+            if (i <= cur) {
+                if (i == cur)
+                    w->mCC = fn_8014DBA0(0, 0x83, 0xF2, 0xFF);
+                else
+                    w->mCC = fn_8014DBA0(0x1C, 0x69, 0xAA, 0xFF);
+                ((FeObj2*)x->m134)->v100(i, 1);
+                ((FeObj3*)x->m134)->v91(i, 0, 1);
+            } else {
+                w->mCC = fn_8014DBA0(0xD2, 0xD2, 0xB4, 0xFF);
+                ((FeObj2*)x->m134)->v100(i, 0);
+                if (i == cur + 1)
+                    ((FeObj3*)x->m134)->v91(i, 0, 1);
+                else
+                    ((FeObj3*)x->m134)->v91(i, 0, 0);
+            }
+            i++;
+        }
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804B3704(FeScr* x)
