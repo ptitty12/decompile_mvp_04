@@ -699,6 +699,65 @@ DB_OVERLAY int fn_80545AFC(int a)
     return 1;
 }
 
+extern "C" void fn_800762D8(void* g, int x);
+extern "C" void fn_8055EAFC(int id);
+extern "C" void fn_80563140(int a, int id);
+extern "C" int fn_80077BC4(void* g, int id);
+extern "C" void fn_80581938(int a, int b, int c, int d, int e);
+struct Db80541F40_Gm {
+    char pad0[0x2C];
+    int m2C;
+};
+DB_OVERLAY void fn_80546258(int x)
+{
+    fn_800762D8(lbl_8061930C, x);
+    if (fn_800B57EC(fn_800B555C()) == 1) {
+        int base = fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+        Unk8007B2B0_Screen* s1 = (Unk8007B2B0_Screen*)lbl_8061930C;
+        int a = s1->fn_80075948(fn_80599C80(x, 1));
+        Unk8007B2B0_Screen* s2 = (Unk8007B2B0_Screen*)lbl_8061930C;
+        int b = s2->fn_80075948(fn_80599C80(x, 0));
+        if (a != base) {
+            fn_8055EAFC(a);
+        } else {
+            unsigned i = 0;
+            for (; i < fn_80599C40(x, 0);) {
+                int v = fn_80599C50(x, 0, (unsigned char)i);
+                i++;
+                fn_80563140(fn_80077BC4(lbl_8061930C, v), v);
+            }
+        }
+        if (b != base) {
+            fn_8055EAFC(b);
+        } else {
+            unsigned i = 0;
+            for (; i < fn_80599C40(x, 1);) {
+                int v = fn_80599C50(x, 1, (unsigned char)i);
+                i++;
+                fn_80563140(fn_80077BC4(lbl_8061930C, v), v);
+            }
+        }
+        if (fn_80599C40(x, 0) == 1 && fn_80599C40(x, 1) == 1 && a != base && b != base) {
+            int p1 = fn_80599C50(x, 1, 0);
+            int q1 = fn_80599C80(x, 1);
+            int p0 = fn_80599C50(x, 0, 0);
+            int q0 = fn_80599C80(x, 0);
+            fn_80581938(((Db80541F40_Gm*)lbl_8061930C)->m2C, p1, q1, p0, q0);
+        }
+    } else {
+        unsigned i;
+        int g;
+        for (g = 0; g <= 1; g++) {
+            i = 0;
+            for (; i < fn_80599C40(x, g);) {
+                int v = fn_80599C50(x, g, (unsigned char)i);
+                i++;
+                fn_80563140(fn_80077BC4(lbl_8061930C, v), v);
+            }
+        }
+    }
+}
+
 DB_OVERLAY int fn_805464B4(int a, int b)
 {
     int i = 0;
