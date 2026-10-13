@@ -181,7 +181,6 @@ FE_OVERLAY void fn_804DA3EC(FeS804DA10C* x)
     }
 }
 
-/* near-miss: ~19 slots; retail computes idx*0xE64 twice and keeps the team-record pointer in r30 (tried 6 forms) */
 FE_OVERLAY void fn_804DA494(FeS804DA10C* x)
 {
     int id = x->m168[x->m158->fn_vslot60()];
@@ -192,7 +191,9 @@ FE_OVERLAY void fn_804DA494(FeS804DA10C* x)
         int r = fn_8007A6A0__18Unk8007A4DC_Screenii(lbl_8061930C, 9, id);
         FeTeamRec* base = g->m14;
         int idx = (a ^ x->m160->m198) == 0;
-        int s = base[idx].m164;
+        int idx2 = idx;
+        FeTeamRec* rec = &base[idx];
+        int s = rec->m164;
         if (s == 0 || s == 2) {
             s = 0;
             if (r != 0) {
@@ -204,7 +205,7 @@ FE_OVERLAY void fn_804DA494(FeS804DA10C* x)
                 s = 1;
             }
         }
-        fn_8009C54C(&base[idx], s);
+        fn_8009C54C(&base[idx2], s);
     }
 }
 
