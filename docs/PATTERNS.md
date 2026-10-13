@@ -1608,3 +1608,23 @@ Confirmed examples:
 Each example passed the unmodified verifier without regressions. A twin is a
 starting point; differing prototypes, flags or object modes can still prevent a
 match. Avoid copying a donor's guessed behavior when its retail shape differs.
+
+## Source-link import repair (Codex, 2026-10-13)
+
+Run link_candidates.py after a current successful build. A fully matched object
+with matching allocated sections can still be unlinked because its caller uses
+a guessed address-name declaration while main.elf exports the real C symbol.
+Inspect the actual implementation and symbols.txt before changing the caller.
+The trace-tag helper fn_80391C04 had a C implementation but several C++ caller
+declarations; one shared header correction plus 11 local fixes unlocked 15 units.
+
+Canonical libc names can enable builtins and silently alter generated code.
+Compare a scratch object first. For memcpy callers game/tu_803543FC and
+game/tu_80353930, per-unit -fno-builtin preserves the explicit retail calls and
+all code bytes. Do not apply that flag globally. Changing a declaration is
+accepted only after the final retail DOL hash, literal/target checks and the
+unmodified regression verifier pass; an import shortlist alone is not proof.
+
+Vector norm fn_80402A90: reusing x for x*x + y*y before loading z reproduced the
+exact 15 instructions, whereas a direct expression and separate product
+temporaries changed load/register order. Preserve floating-point grouping.
