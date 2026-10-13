@@ -40,10 +40,11 @@ struct UiMsgMgr {
     UiMsgMgr();
 };
 extern UiMsgMgr* lbl_8061A32C;
+extern "C" UiMsgMgr* fn_800B64BC(void*);
 inline UiMsgMgr* UiGetMsgMgr()
 {
     if (lbl_8061A32C == 0)
-        lbl_8061A32C = new (0) UiMsgMgr;
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     return lbl_8061A32C;
 }
 extern "C" {
@@ -51,6 +52,7 @@ void fn_8035682C(UiMsg* m);
 void fn_800B7B4C(UiMsgMgr* mgr, UiMsg* m, void* ctx);
 void fn_800B7ADC(UiMsgMgr* mgr, void* ctx);
 char* fn_8040B830(char* dst, const char* src, unsigned n);
+char* strncpy(char* dst, const char* src, unsigned n);
 }
 
 /* A tunable float: +0x48 points at an override value when non-null, else +0x4C is the
@@ -245,7 +247,6 @@ int fn_800A1960(FeGame* g);
 int fn_80546B18(int a, int b, int c);
 void fn_80126CF4(void* o, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
 int fn_800B5758(FeState* st);
-void fn_800E4B70();
 FeObj* fn_800C8040(void* p);
 FeObj* fn_800C8044(void* p);
 FeObj* fn_800C8054(void* p);
@@ -255,6 +256,8 @@ FeObj* fn_800C8060(void* p);
 void fn_80131F34(FeObj* o, void* self, FeCb cb, FeCb2 cb2, int b, int c, int d, int e, int f,
                  int g, int h, int i, int j, int k);
 }
+
+void fn_800E4B70();
 
 Unk8001BC8C* fn_8001BC4C();
 
