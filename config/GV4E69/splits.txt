@@ -2222,6 +2222,7 @@ libm/e_exp.c:
 
 libm/e_log.cpp:
 	.text       start:0x8040FF1C end:0x804101AC
+	.sdata      start:0x806EECB0 end:0x806EED38
 
 libm/e_sqrt.cpp:
 	.text       start:0x804101AC end:0x804103C0
