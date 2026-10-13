@@ -41,6 +41,54 @@ extern "C" FE_OVERLAY void fn_80477068(FeScrD* x)
     fn_800ECE34(x);
 }
 
+extern "C" FE_OVERLAY void fn_80477088(void* xv)
+{
+    FeW* x = (FeW*)xv;
+    fn_800ECF18(x);
+    int r0 = ((int (*)(void))fn_800B8144)();
+    ((void (*)(int, int, int))fn_800B83F8)(r0, 1, 1);
+    int g = FeI(lbl_80619948, 0x28);
+    char* nb = (char*)lbl_806192E0->m4->m14;
+    char* nb2 = nb + 0xE64;
+    void* w = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(w, x);
+    fn_801250D8(w);
+    FeI(x, 0x140) = FeI(fn_800B555C(), 0x608);
+    FeI(x, 0x13C) = fn_800C203C((int)((char*)fn_800B555C() + 8));
+    if (FeI(x, 0x140) == 0 && fn_8056AAE4(g, fn_800A2AE8(lbl_80619948), 0) != 0) {
+        void* gm = lbl_8061930C;
+        x->fn_vslot29(lbl_805F5F34);
+        fn_800C8044()->fn_vslot8(0);
+        x->fn_vslot29(lbl_805F5F48);
+        fn_800C8044()->fn_vslot8(0);
+        int t = fn_8007B8C4__18Unk8007B2B0_Screenii(gm, 0, (void*)FeI(x, 0x13C));
+        FeI(x, 0x13C) = fn_80084408__Fi(t);
+        FeI(x, 0x138) = fn_8056AD54(g, fn_80084114__Fi(t));
+    } else {
+        FeI(x, 0x138) = FeI(fn_800B555C(), 0x610);
+    }
+    fn_80477498(x);
+    fn_80477560(x);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    x->fn_vslot29(lbl_805F5F5C)->fn_vslot8(0);
+    x->fn_vslot29(lbl_805F5F80)->fn_vslot8(0);
+    int r26 = FeI(nb, 0x198);
+    int r27 = FeI(nb2, 0x198);
+    int c1 = (int)fn_800C33D0();
+    x->fn_vslot29(lbl_805F5F5C);
+    fn_800C3ED4(c1, fn_800C8038(), fn_80097210(nb2, 0));
+    int c2 = (int)fn_800C33D0();
+    x->fn_vslot29(lbl_805F5F80);
+    fn_800C3ED4(c2, fn_800C8038(), fn_80097210(nb, 0));
+    x->fn_vslot29(lbl_805F5FA4);
+    ((FeSubV20*)((char*)fn_800C8054() + 0x98))->s20(r27, 0);
+    x->fn_vslot29(lbl_805F5FC8);
+    ((FeSubV20*)((char*)fn_800C8054() + 0x98))->s20(r26, 0);
+    if (fn_800B555C()->m0 == 0x20) {
+        fn_800A3640(lbl_80619948);
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80477418(void* x)
 {
     fn_800ED254(x);
@@ -220,6 +268,69 @@ extern "C" FE_OVERLAY void fn_80478118(void* p)
         ((void (*)(void*, int))fn_800A2F9C)(lbl_80619948, 1);
 }
 
+struct Fe8EE8I : Unk800C7B40_Data {
+    virtual ~Fe8EE8I();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(); virtual void s29(int a); virtual void s30(); virtual void s31();
+    virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35(); virtual void s36();
+    virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40(); virtual void s41();
+    virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46();
+    virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50(); virtual void s51();
+    virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55(); virtual void s56();
+    virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60(); virtual void s61();
+    virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65(); virtual void s66();
+    virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70(); virtual void s71();
+    virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75(); virtual void s76();
+    virtual void s77(); virtual void s78(); virtual void s79(); virtual void s80(); virtual void s81();
+    virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85(); virtual void s86();
+    virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90(); virtual void s91();
+    virtual void s92(); virtual void s93(); virtual void s94(); virtual void s95(); virtual void s96();
+    virtual void s97(); virtual void s98(); virtual void s99(); virtual void s100(); virtual void s101();
+    virtual void s102(); virtual void s103(); virtual void s104(); virtual void s105(); virtual void s106();
+    virtual void s107(); virtual void s108(); virtual void s109(); virtual void s110(); virtual void s111();
+    virtual void s112(); virtual void s113(); virtual void s114(); virtual void s115(); virtual void s116();
+    virtual void s117(); virtual void s118(); virtual void s119(); virtual void s120(); virtual void s121();
+    virtual void s122(); virtual void s123(); virtual void s124(); virtual void s125(); virtual void s126();
+    virtual void s127();
+};
+extern "C" FE_OVERLAY void fn_80478EE8(void* xv, int sel)
+{
+    FeW* x = (FeW*)xv;
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F609C);
+    ((FeW*)fn_800C8048())->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F60AC);
+    ((FeW*)fn_800C8048())->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F60BC)->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F60D4)->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F60EC)->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F60F4)->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F6100);
+    ((FeW*)fn_800C8040())->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F6110);
+    ((FeW*)fn_800C8040())->fn_vslot8(0);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F6120);
+    ((FeW*)fn_800C8058())->fn_vslot8(1);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot29(lbl_805F6120);
+    ((Fe8EE8I*)fn_800C8058())->s29(0x4F45);
+    FeAt(x, 0x1C0)->fn_vslot73(sel, 0);
+    fn_800C8044()->fn_vslot32(lbl_805F4EF4, 1);
+    fn_800C8060()->fn_vslot16(0);
+}
+
 extern "C" FE_OVERLAY void fn_80479378(int a, FeW* x)
 {
     x->fn_vslot32("GAMEGRID", 1);
@@ -290,6 +401,76 @@ extern "C" FE_OVERLAY void fn_80479614(void* x, int a)
         FeWp(x, 0x1C0)->fn_vslot14(1);
     else
         FeWp(x, 0x1C0)->fn_vslot14(0);
+}
+
+/* near-miss: 96.4%; only the callee-saved register numbering differs (sel/z/FeGetMgr lis/vslot60 result permuted) */
+extern "C" FE_OVERLAY void fn_80479690(void* xv, int sel, int arg)
+{
+    FeW* x = (FeW*)xv;
+    int z = FeI(x, 0x1AC);
+    if (z == 0) {
+        FeMsg m;
+        FeMsg* mp = &m;
+        fn_8035682C(mp);
+        void* pop = fn_800B7AB8(FeGetMgr(), lbl_805F5394);
+        FeAt(x, 0x1C0)->fn_vslot70()->fn_vslot32(lbl_805F4EF4, 1);
+        int r25 = fn_800C8060()->fn_vslot61();
+        int r29 = FeAt(x, 0x1C0)->fn_vslot60();
+        switch (sel) {
+        case 0:
+            strncpy(mp->name, lbl_805F4450, 15);
+            mp->name[15] = z;
+            fn_800B7B4C(FeGetMgr(), mp, x);
+            return;
+        case 1:
+            if (fn_800A1A6C(lbl_80619948) != 0 && (fn_800B555C(), fn_800B56C4() != 0)) {
+                strncpy(mp->name, lbl_805F5258, 15);
+                mp->name[15] = z;
+            } else {
+                strncpy(mp->name, lbl_805F6130, 15);
+                mp->name[15] = 0;
+            }
+            fn_800B7B4C(FeGetMgr(), &m, x);
+            return;
+        case 3:
+            fn_80125AAC(FeI(x, 0x1C8));
+            fn_8001BC4C()->fn_8001BDAC(0x9D);
+            {
+                char* b1 = (char*)x + 0x14C;
+                char* b2 = (char*)x + 0x150;
+                int off = r29 * 0xC;
+                fn_80124B40(pop, x, *(int*)(b1 + off), *(int*)(b2 + off), (void*)fn_80479480);
+            }
+            return;
+        case 2: {
+            int off = r29 * 0xC;
+            FeI(x, 0x1D0) = FeI(fn_800B555C(), 0x608);
+            char* bb2 = (char*)x + 0x150;
+            fn_800C2034((char*)fn_800B555C() + 8, *(int*)(bb2 + off));
+            char* bb1 = (char*)x + 0x14C;
+            FeI(fn_800B555C(), 0x610) = *(int*)(bb1 + off);
+            int t = fn_804799E8((char*)x);
+            FeI(x, 0x1BC) = arg;
+            FeI(x, 0x144) = t;
+            FeI(x, 0x148) = r29;
+            if (r29 == t) {
+                if (r25 == 0) {
+                    fn_8047AE14(x, 1);
+                    return;
+                }
+                FeI(x, 0x13C) = z;
+                fn_8047AE14(x, 3);
+                return;
+            }
+            int s484D = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x484D);
+            int s3E9 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E9);
+            int s3E8 = fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3E8);
+            fn_801321D4(FeAt(x, 0x1CC), x, fn_80479378, 0, (void*)s484D, 2, -1, 1, (const char*)s3E9, (const char*)s3E8, (const char*)z, z, z, z);
+            FeAt(x, 0x1CC)->fn_vslot86();
+            break;
+        }
+        }
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804799E8(char* x)

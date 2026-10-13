@@ -333,6 +333,52 @@ extern "C" FE_OVERLAY void fn_8048A378(FeScrCell* x)
     x->m13C = fn_800B7AB8(FeGetMgr(), "BATPITCHSTATS");
 }
 
+struct Fe8A43C_List {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    int m10;
+    int m14;
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+};
+struct Fe8A43C_Buf {
+    unsigned short a;
+    unsigned short b;
+};
+#define FE8A43C_TIME ((Fe8A43C_Buf(*)(int, ...))fn_80329FA0)
+#define FE8A43C_SCR ((int (*)(void*, int, int))fn_8007A6A0__18Unk8007A4DC_Screenii)
+/* near-miss: 96.2%; retail stores the incremented m4 before the full test and compares a copy of it (mr r0,r9), with m8 loaded before the add (6 slots) */
+extern "C" FE_OVERLAY void fn_8048A43C(Fe8A43C_List* a, Fe8A43C_List* b)
+{
+    unsigned i;
+    void* g = lbl_8061930C;
+    unsigned short base = FE8A43C_TIME(fn_800A2AE8(lbl_80619948)).b;
+    fn_8040074C(b->m0, b->m8 * 4);
+    b->m4 = 0;
+    b->mC = 0;
+    b->m14 = 0;
+    i = 0;
+    for (; i < a->m4; i++) {
+        int id = a->At(i);
+        int z = fn_80077BC4(g, id) == 0;
+        int r = FE8A43C_SCR(g, 0x16, id);
+        int d = base - FE8A43C_TIME(FE8A43C_SCR(g, 1, id)).b;
+        if (!(z && (d <= 0x18 || r <= 1))) {
+            if (b->m4 >= b->m8)
+                break;
+            b->m0[b->m4] = id;
+            b->m4++;
+            if (b->m4 >= b->m8)
+                break;
+        }
+    }
+}
+
 extern "C" FE_OVERLAY void fn_8048AB24(void* x)
 {
     fn_800ED254(x);
