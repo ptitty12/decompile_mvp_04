@@ -296,3 +296,7 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `fe/tu_8043FDC0::fn_80442AA0`: accurate canonical one-argument F198 call gives169vs170words; two-register ABI dataflow is proven at8007F1B0/805A19DC, but exact source is blocked on Claude-owned F198 provider/canonical ABI repair. Incompatible call cast removed; recovery ref codex/swarm21-f198-recovery, batch21.
 - `ealib/tu_803912F8::fn_803923E8`: three ordinary drafts; best111vs112words/97.1%, selection-update factoring and saved-register allocation remain. Restored, batch21.
+
+- 2026-10-13 | db/tu_80565FD4 fn_8056A058 | Eight ordinary C forms; best 97/97 words (98.6%), four table address/load preparation differences. Boolean CR4 preservation and data flow exact; failed body retained only in build/swarm23, source restored.
+
+- 2026-10-13 | ealib/tu_803A0310 fn_803A2C9C | Six ordinary C forms; best 83/84 words (97.2%), first-vector saved register/copy and final store order remain; failed body in build/swarm23 only, source restored.
