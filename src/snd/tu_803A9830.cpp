@@ -17,7 +17,7 @@ extern const float lbl_806095D8;
 extern int lbl_80625448;
 extern "C" int fn_803AB9F0(int h, int ch, float vol);
 
-extern "C" void* fn_803AB310();
+extern "C" void* fn_803AB310(int h);
 extern "C" void fn_803B43FC(SNDLINKLIST* list, void* node);
 extern "C" void fn_803B4344(SNDLINKLIST* list, void* node);
 extern "C" void fn_803FE7E0(int handle, void* p);
@@ -106,11 +106,11 @@ SNDSTREAMCHANNEL* SNDSTRMI_getstreamptr(int sndstreamhandle)
     return lbl_8069CADC.pssc[sndstreamhandle];
 }
 
-/* near-miss: one register differs: retail computes (unsigned char)h << 2 into r0, ours overwrites r3; unsigned char param, local index, mask forms tried */
+/* fn_803AB310 takes the handle (its definition in tu_803AB310 reads r3), so h stays live in r3 across the index. */
 extern "C" void fn_803A9CF4(int h)
 {
     SNDSTREAMCHANNEL* pssc = lbl_8069CADC.pssc[(unsigned char)h];
-    void* req = fn_803AB310();
+    void* req = fn_803AB310(h);
     fn_803B43FC(&pssc->allocatedrequests, req);
     fn_803B4344(&pssc->freerequests, req);
     if (pssc->parsingrequest == req)
