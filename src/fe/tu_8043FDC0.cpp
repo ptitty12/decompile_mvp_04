@@ -14,7 +14,7 @@ inline void FeTunableSet(FeTunable* t, float v)
 
 extern "C" {
 void fn_8032F574(void* it, int a);
-float fn_80551984(void* o, int k);
+float fn_80551984(int id, int k);
 float fn_805519CC(int k);
 float fn_8055248C();
 }
@@ -328,10 +328,10 @@ extern "C" FE_OVERLAY void fn_80442640(FeMenuF* self)
     fn_8032F574(&self->m474, 0);
     self->m734 = (void*)1;
     FeItemSet(&self->m664, 1);
-    FeTunableSet(&self->m4D4, fn_80551984(FeItemObj(&self->m474), 0));
-    FeTunableSet(&self->m538, fn_80551984(FeItemObj(&self->m474), 1));
-    FeTunableSet(&self->m59C, fn_80551984(FeItemObj(&self->m474), 2));
-    FeTunableSet(&self->m600, fn_80551984(FeItemObj(&self->m474), 3));
+    FeTunableSet(&self->m4D4, fn_80551984((int)FeItemObj(&self->m474), 0));
+    FeTunableSet(&self->m538, fn_80551984((int)FeItemObj(&self->m474), 1));
+    FeTunableSet(&self->m59C, fn_80551984((int)FeItemObj(&self->m474), 2));
+    FeTunableSet(&self->m600, fn_80551984((int)FeItemObj(&self->m474), 3));
     FeTunableSet(&self->m6CC, fn_805519CC((int)self->m734 - 1));
     if (fn_8007F84C((Unk8007F198_B*)lbl_8061930C) != 0) {
         fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
@@ -341,23 +341,23 @@ extern "C" FE_OVERLAY void fn_80442640(FeMenuF* self)
 
 extern "C" FE_OVERLAY void fn_80442840(FeMenuF* self)
 {
-    fn_805519A0(FeItemObj(&self->m474), 0, FeTunableGet(&self->m4D4));
-    fn_805519A0(FeItemObj(&self->m474), 1, FeTunableGet(&self->m538));
-    fn_805519A0(FeItemObj(&self->m474), 2, FeTunableGet(&self->m59C));
-    fn_805519A0(FeItemObj(&self->m474), 3, FeTunableGet(&self->m600));
-    fn_805519E0(self->m734, FeTunableGet(&self->m6CC));
+    fn_805519A0((int)FeItemObj(&self->m474), 0, FeTunableGet(&self->m4D4));
+    fn_805519A0((int)FeItemObj(&self->m474), 1, FeTunableGet(&self->m538));
+    fn_805519A0((int)FeItemObj(&self->m474), 2, FeTunableGet(&self->m59C));
+    fn_805519A0((int)FeItemObj(&self->m474), 3, FeTunableGet(&self->m600));
+    fn_805519E0((int)self->m734, FeTunableGet(&self->m6CC));
 }
 
 extern void* lbl_806215DC;
 extern int lbl_806215E0;
 extern "C" void fn_80377488(void* p);
-/* near-miss: retail stores a fresh `li r0,0` for lbl_806215E0; ours reuses the zero register that the == 0 test proves (13 slots)  */
+/* The count is reset even when the allocation already exists. */
 extern "C" FE_OVERLAY void fn_80442930(void)
 {
     if (lbl_806215DC == 0) {
         lbl_806215DC = fn_803774A8(40000, 0x100);
-        lbl_806215E0 = 0;
     }
+    lbl_806215E0 = 0;
 }
 
 extern "C" FE_OVERLAY void fn_80442984(void)
@@ -418,6 +418,134 @@ extern "C" FE_OVERLAY void fn_80442E2C(void)
         fn_80377488(lbl_806215DC);
         lbl_806215DC = 0;
     }
+}
+
+extern "C" void fn_8032D880(void* item, const char* text);
+extern const char lbl_805F4B54[], lbl_805F4B70[], lbl_805F4B88[], lbl_805F4BA0[];
+extern "C" FE_OVERLAY void fn_80442E6C(FeMenuF* self, int action)
+{
+    float value;
+    fn_80330BC8(self, action);
+    if ((unsigned)(action - 3) <= 1) {
+        FeItem* selector = &self->m474;
+        FeItem* current = self->items[self->m174];
+        if (current == selector) {
+            FeTunable* p0 = &self->m4D4;
+            fn_805519A0(self->m730, 0, FeTunableGet(p0));
+            FeTunable* p1 = &self->m538;
+            fn_805519A0(self->m730, 1, FeTunableGet(p1));
+            FeTunable* p2 = &self->m59C;
+            fn_805519A0(self->m730, 2, FeTunableGet(p2));
+            FeTunable* p3 = &self->m600;
+            fn_805519A0(self->m730, 3, FeTunableGet(p3));
+            self->m730 = selector->m4C;
+            {
+                value = fn_80551984(self->m730, 0);
+                float* slot = p0->m48;
+                if (slot == 0) p0->m4C = value;
+                else *slot = value;
+            }
+            {
+                value = fn_80551984(self->m730, 1);
+                float* slot = p1->m48;
+                if (slot == 0) p1->m4C = value;
+                else *slot = value;
+            }
+            {
+                value = fn_80551984(self->m730, 2);
+                float* slot = p2->m48;
+                if (slot == 0) p2->m4C = value;
+                else *slot = value;
+            }
+            {
+                value = fn_80551984(self->m730, 3);
+                float* slot = p3->m48;
+                if (slot == 0) p3->m4C = value;
+                else *slot = value;
+            }
+        } else {
+          FeItem* category = &self->m664;
+          if (current == category && (int)self->m734 > 0 && (int)self->m734 <= 6) {
+            FeTunable* rate = &self->m6CC;
+            fn_805519E0((int)self->m734 - 1, FeTunableGet(rate));
+            self->m734 = (void*)FeItemGetB(category);
+            value = fn_805519CC((int)self->m734 - 1);
+            float* slot = rate->m48;
+            if (slot == 0)
+                rate->m4C = value;
+            else
+                *slot = value;
+        } else if (current == (FeItem*)&self->m4D4 || current == (FeItem*)&self->m538 ||
+                   current == (FeItem*)&self->m59C || current == (FeItem*)&self->m600) {
+            fn_805519A0(self->m730, 0, FeTunableGet(&self->m4D4));
+            fn_805519A0(self->m730, 1, FeTunableGet(&self->m538));
+            fn_805519A0(self->m730, 2, FeTunableGet(&self->m59C));
+            fn_805519A0(self->m730, 3, FeTunableGet(&self->m600));
+          }
+        }
+    }
+    if (fn_8007F84C((Unk8007F198_B*)lbl_8061930C)) {
+        FeTunable* live = &self->m410;
+        fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0);
+        value = fn_8055248C();
+        float* slot = live->m48;
+        if (slot == 0)
+            live->m4C = value;
+        else
+            *slot = value;
+    }
+    if (lbl_806215DC == 0) {
+        fn_8032D880((char*)self + 0x2E0, lbl_805F4B54);
+        fn_8032D880((char*)self + 0x32C, lbl_805F4B70);
+        fn_8032D880((char*)self + 0x3C4, lbl_805F4B70);
+        return;
+    }
+    fn_8032D880((char*)self + 0x2E0, lbl_805F4B70);
+    fn_8032D880((char*)self + 0x32C, lbl_805F4B88);
+    fn_8032D880((char*)self + 0x3C4, lbl_805F4BA0);
+}
+
+extern const char lbl_805F4B54[], lbl_805F4B88[], lbl_805F4BA0[], lbl_805F4BC0[], lbl_805F4BC8[], lbl_805F4BDC[];
+extern const char lbl_805F4BF4[], lbl_805F4C00[], lbl_805F4C0C[], lbl_805F4C14[], lbl_805F4C20[], lbl_805F4C30[];
+extern char lbl_80667288[];
+extern int lbl_806215E4;
+extern "C" void fn_80442AA0(void);
+extern "C" void* fn_8032E70C(void*, const char*, float, float, float, float);
+extern "C" FE_OVERLAY FeMenuF* fn_80443238(FeMenuF* self, int arg)
+{
+    FeMenuSimInit((FeMenuSim*)self, arg);
+    ((FeMenuSim*)self)->m2DC = lbl_80667288;
+    FeItemB* b0 = (FeItemB*)((char*)self + 0x2E0);
+    FeItemB* b1 = (FeItemB*)((char*)self + 0x32C);
+    FeItemB* b2 = (FeItemB*)((char*)self + 0x378);
+    FeItemB* b3 = (FeItemB*)((char*)self + 0x3C4);
+    FeButtonInit(b0, lbl_805F4B54, (void*)fn_80442930);
+    FeButtonInit(b1, lbl_805F4B88, (void*)fn_80442984);
+    FeButtonInit(b2, lbl_805F4BC8, (void*)fn_80442AA0);
+    FeButtonInit(b3, lbl_805F4BA0, (void*)fn_80442E2C);
+    fn_8032E70C(&self->m410, lbl_805F4BDC, 0.0f, 0.0f, 0.0f, 100.0f);
+    fn_8032F428(&self->m474, lbl_805F4BF4, &lbl_806215E4, 4, 0);
+    fn_8032E70C(&self->m4D4, lbl_805F4C00, 0.0f, 0.01f, 0.0f, 100.0f);
+    fn_8032E70C(&self->m538, lbl_805F4BC0, 0.0f, 0.01f, 0.0f, 100.0f);
+    fn_8032E70C(&self->m59C, lbl_805F4C0C, 0.0f, 0.01f, 0.0f, 100.0f);
+    fn_8032E70C(&self->m600, lbl_805F4C14, 0.0f, 0.01f, 0.0f, 100.0f);
+    fn_8032EC38(&self->m664, lbl_805F4C20, 0, 1, 1, 6);
+    fn_8032E70C(&self->m6CC, lbl_805F4C30, 0.0f, 0.005f, 0.0f, 1.0f);
+    self->m730 = 0;
+    self->m734 = (void*)1;
+    fn_80330ACC(self, (FeItem*)b2);
+    fn_80330ACC(self, (FeItem*)b0);
+    fn_80330ACC(self, (FeItem*)b1);
+    fn_80330ACC(self, (FeItem*)b3);
+    fn_80330ACC(self, (FeItem*)&self->m410);
+    fn_80330ACC(self, &self->m474);
+    fn_80330ACC(self, (FeItem*)&self->m4D4);
+    fn_80330ACC(self, (FeItem*)&self->m538);
+    fn_80330ACC(self, (FeItem*)&self->m59C);
+    fn_80330ACC(self, (FeItem*)&self->m600);
+    fn_80330ACC(self, &self->m664);
+    fn_80330ACC(self, (FeItem*)&self->m6CC);
+    return self;
 }
 
 extern "C" FE_OVERLAY void fn_80443598(FeMenuEmail* self)
