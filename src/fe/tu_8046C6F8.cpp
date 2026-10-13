@@ -489,7 +489,9 @@ FE_OVERLAY void fn_8046F4B0(void)
 
 }
 
-/* near-miss: same 152 insns and CTR/mfctr loop shape; only callee-saved register numbers differ: retail has the first loop's i in r28 and h in r29 (ours the reverse), and the second loop's offset giv in r27 and the count copy in r28 (ours the reverse). Separate loop variables per loop and the 4-argument fn_805559D4(kind, ...) (kind = fn_8057CE00 result) already applied. */
+/* One variable holds the Unk8007F198 pointer and then the do-while counter (retail r29), and one counter serves the
+ * first for loop and the trip count of the inner do-while (retail r28): shared pseudos change the global-alloc order
+ * (cc1plus -dl). The 4-argument fn_805559D4(kind, ...) takes the fn_8057CE00 result as kind (r3 passes through). */
 extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
 {
     int sp20[4];
@@ -497,13 +499,14 @@ extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
     char sp40[0x1E0];
     char buf[0x320];
     void* t = lbl_8061977C;
-    void* h = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
-    for (int i = 0; i <= 3; i++) {
-        sp20[i] = 0;
-        sp30[i] = fn_8057CF60(h, i);
+    int cnt;
+    int k = (int)fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+    for (cnt = 0; cnt <= 3; cnt++) {
+        sp20[cnt] = 0;
+        sp30[cnt] = fn_8057CF60((void*)k, cnt);
     }
     char* p = sp40;
-    int k = 11;
+    k = 11;
     do {
         fn_80556348(p);
         p += 0x28;
@@ -513,7 +516,7 @@ extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
         int n = fn_805559D4(fn_8057CE00(i), sp40, 12, i);
         if (n > 0) {
             int off2 = 0;
-            int c = n;
+            cnt = n;
             do {
                 char* e = sp40 + off2;
                 if (fn_805563C4(e) == fn_80556410(e) && fn_80556410(e) == sp30[i]) {
@@ -525,7 +528,7 @@ extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
                     }
                 }
                 off2 += 0x28;
-            } while (--c != 0);
+            } while (--cnt != 0);
         }
     }
     const char* s0 = fn_80090880__FP11Unk80090880(t, 0x38F0);
