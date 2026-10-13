@@ -4,6 +4,7 @@
  * Every data object is extern by its lbl_ name.
  */
 
+
 #include "../../include/game/tu_803E097C.h"
 
 struct Unk803E1B54_Init {
@@ -134,7 +135,7 @@ union PPCWGPipe {
     unsigned int u32;
     float f32;
 };
-extern volatile PPCWGPipe GXWGFifo;
+#include "../../include/ealib/gx_fifo.h"
 extern "C" {
 int fn_803D9E3C();
 void GXSetCopyClear(void* clr, unsigned int z);
@@ -200,34 +201,34 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
     {
         float x = n->mC.mCC;
         float y = n->mC.mD0;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = 0.99999988f;
-        GXWGFifo.u32 = n->mC.m8;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = 0.99999988f;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = n->mC.m8;
     }
     {
         float x = n->mC.mCC + n->mC.mD4;
         float y = n->mC.mD0;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = 0.99999988f;
-        GXWGFifo.u32 = n->mC.m8;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = 0.99999988f;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = n->mC.m8;
     }
     {
         float x = n->mC.mCC + n->mC.mD4;
         float y = n->mC.mD0 + n->mC.mD8;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = 0.99999988f;
-        GXWGFifo.u32 = n->mC.m8;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = 0.99999988f;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = n->mC.m8;
     }
     {
         float x = n->mC.mCC;
         float y = n->mC.mD0 + n->mC.mD8;
-        GXWGFifo.f32 = x;
-        GXWGFifo.f32 = y;
-        GXWGFifo.f32 = 0.99999988f;
-        GXWGFifo.u32 = n->mC.m8;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = 0.99999988f;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = n->mC.m8;
     }
     fn_8042FE78(1);
     if (n->mC.m4 == 0)
