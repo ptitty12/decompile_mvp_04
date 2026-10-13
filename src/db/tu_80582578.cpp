@@ -950,3 +950,51 @@ extern "C" DB_OVERLAY DbSubObj* fn_80584C80(DbSubObj* self)
     *(const void**)((char*)self + 4) = lbl_80683390;
     return self;
 }
+
+extern "C" int fn_800A2EB4(void*);
+extern int lbl_80622DC4;
+struct DbMatchParticipant { char pad0[0x198]; int m198; };
+extern "C" DB_OVERLAY int fn_80583D3C(DbSubX* self, DbMatchParticipant* left, DbMatchParticipant* right)
+{
+    if (fn_800A2EB4(lbl_80619948) || lbl_80622DC4) {
+        int side = left->m198;
+        void* game = lbl_8061930C;
+        int other = right->m198;
+        int owner = fn_8007F7D0__FP13Unk8007F198_BUi(game, 0);
+        int flag = fn_80078A38__18Unk8007B2B0_Screeni(game, side);
+        int mode = fn_8007B8C4__18Unk8007B2B0_Screenii(game, 0, side);
+        int threshold;
+        if (mode == 6) threshold = 7;
+        else if (flag) threshold = 6;
+        else threshold = 11;
+        int winner = 0;
+        int firstScore = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(game, 0, side, 1);
+        int loser = 0;
+        int secondScore = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(game, 0, other, 1);
+        if (firstScore >= threshold) { winner = side; loser = other; }
+        else if (secondScore >= threshold) { winner = other; loser = side; }
+        if (winner || lbl_80622DC4) {
+            fn_8007B320__18Unk8007B2B0_Screenii(game, 0, owner);
+            if (!fn_8057CED4(owner, side)) {
+                if (!fn_8057CED4(owner, other)) return 0;
+                side = other;
+            }
+            if (side == winner || lbl_80622DC4) {
+                int result = fn_80583C70((int)self, 3, 0, flag);
+                if (result) return 0;
+                char obj[0x18];
+                fn_8052E198(obj, self->v3(), side, 0, 0, 0, (char)flag, 0, 3, result);
+                fn_80582CF8(self, obj, 0, 0, 0);
+                if (!flag) { fn_80360AF0(obj, 2); return 1; }
+                fn_80360AF0(obj, 2);
+            }
+            if ((side == loser || lbl_80622DC4) && !flag && !fn_80583C70((int)self, 3, 1, 0)) {
+                char obj[0x18];
+                fn_8052E198(obj, self->v3(), side, 0, 0, 1, 0, 0, 3, flag);
+                fn_80582CF8(self, obj, 0, 0, 0);
+                fn_80360AF0(obj, 2);
+            }
+        }
+    }
+    return 0;
+}
