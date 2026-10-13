@@ -79,6 +79,54 @@ void fn_8003D33C(int a, int b, int c);
 void fn_8003CB00(int a);
 int fn_8002A2D4(Unk80023AC4_Obj* x);
 
+extern const float lbl_805A6220;
+extern "C" void fn_800352B4(int a, int b, int c, int d, int e, int f);
+class Unk8003A5DC;
+void fn_8003CDB4(Unk8003A5DC* p);
+
+inline float Unk80026A48_Secs(Unk8001F2C4_World* w)
+{
+    return (float)w->m48 * 0.016666668f;
+}
+
+extern "C" void fn_80027CF0(Unk80023AC4_Obj* x)
+{
+    int d = x->mD0;
+    if (d != 0) {
+        int c = x->m514;
+        int e = x->m634;
+        int f = x->m740 <= lbl_805A6220;
+        int g = fn_8002A3DC(x);
+        fn_800352B4(d, c, e, f, g, fn_8002A2D4(x));
+    }
+    x->m12C = x->m798;
+    fn_8002A244(x, 0x1B, Unk80026A48_Secs(x->m80[0]));
+    volatile int n = 0;
+    int i = 0;
+    do {
+        int* p = (int*)x->m270[i].m0;
+        if (p != 0 && p[0x5C0 / 4] == -1) {
+            x->m7C8 = i;
+            int t = x->m264;
+            x->m7CC = x->m270[n].m0;
+            if (t == 1)
+                x->fn_800233B4(0x2E, 0xF, 0);
+            else if (t > 1)
+                x->fn_800233B4(0x2E, 0x2D, 0);
+        }
+        int w = n;
+        int u;
+        if (w > 3)
+            u = w;
+        else
+            u = w + 1;
+        n = u;
+        i = u;
+    } while (i <= 2);
+    if (x->m108 == 1)
+        fn_8003CDB4((Unk8003A5DC*)x->m6C8);
+}
+
 extern "C" void fn_80027E70(Unk80023AC4_Obj* x)
 {
     int z = x->m514 == 0;
