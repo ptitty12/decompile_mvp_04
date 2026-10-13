@@ -287,13 +287,11 @@ extern "C" int fn_8001EDE4(Unk8001E444_Obj* x)
     return 0;
 }
 
-/* near-miss: 99/99 insns, branch targets only: retail shares one `li r30,4` block between the
- * cases 0, 1 and 2 (separate compares, one body); here the three identical bodies are not
- * cross-jumped. Fallthrough labels give a range compare instead; default/if-chain forms differ more. */
+/* fn_80235C18 returns an eight-byte pair; the two-word buffer preserves retail stack allocation. */
 extern "C" int fn_8001EE28(Unk8001E444_Obj* x)
 {
     int r = 0;
-    int buf[3];
+    int buf[2];
     int* b = buf;
     Unk801A4B34_Pos* pp = x->m130->m44C->m6CC;
     int pl = x->m130->m44C->m700->m3B0;
