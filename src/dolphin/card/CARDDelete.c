@@ -3,6 +3,14 @@
 
 #include "__card.h"
 
+extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
+extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
+extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
+
+
 // prototypes
 static void DeleteCallback(s32 chan, s32 result);
 
@@ -10,7 +18,7 @@ static void DeleteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     callback = card->apiCallback;
     card->apiCallback = NULL;
 
@@ -23,7 +31,7 @@ static void DeleteCallback(s32 chan, s32 result) {
     return;
 
 error:
-    __CARDPutControlBlock(card, result);
+    fn_8041B900(card, result);
     if (callback)
         callback(chan, result);
 }
@@ -40,7 +48,7 @@ s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback) {
     if (fileNo < 0 || CARD_MAX_FILE <= fileNo)
         return CARD_RESULT_FATAL_ERROR;
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0)
         return result;
 
@@ -48,28 +56,28 @@ s32 CARDFastDeleteAsync(s32 chan, s32 fileNo, CARDCallback callback) {
     ent = &dir[fileNo];
     result = __CARDIsWritable(card, ent);
     if (result < 0)
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
 
     if (__CARDIsOpened(card, fileNo))
-        return __CARDPutControlBlock(card, CARD_RESULT_BUSY);
+        return fn_8041B900(card, CARD_RESULT_BUSY);
 
     card->startBlock = ent->startBlock;
     memset(ent, 0xff, sizeof(CARDDir));
 
-    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    card->apiCallback = callback ? callback : fn_8041A6C4;
     result = __CARDUpdateDir(chan, DeleteCallback);
     if (result < 0)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     return result;
 }
 
 s32 CARDFastDelete(s32 chan, s32 fileNo) {
-    s32 result = CARDFastDeleteAsync(chan, fileNo, __CARDSyncCallback);
+    s32 result = CARDFastDeleteAsync(chan, fileNo, fn_8041A6C8);
     if (result < 0) {
         return result;
     }
 
-    return __CARDSync(chan);
+    return fn_8041BB38(chan);
 }
 
 s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
@@ -79,31 +87,31 @@ s32 CARDDeleteAsync(s32 chan, const char* fileName, CARDCallback callback) {
     CARDDir* dir;
     CARDDir* ent;
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0)
         return result;
     result = __CARDGetFileNo(card, fileName, &fileNo);
     if (result < 0)
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
     if (__CARDIsOpened(card, fileNo))
-        return __CARDPutControlBlock(card, CARD_RESULT_BUSY);
+        return fn_8041B900(card, CARD_RESULT_BUSY);
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileNo];
     card->startBlock = ent->startBlock;
     memset(ent, 0xff, sizeof(CARDDir));
 
-    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    card->apiCallback = callback ? callback : fn_8041A6C4;
     result = __CARDUpdateDir(chan, DeleteCallback);
     if (result < 0)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     return result;
 }
 
 s32 CARDDelete(s32 chan, const char* fileName) {
-    s32 result = CARDDeleteAsync(chan, fileName, __CARDSyncCallback);
+    s32 result = CARDDeleteAsync(chan, fileName, fn_8041A6C8);
     if (result < 0)
         return result;
 
-    return __CARDSync(chan);
+    return fn_8041BB38(chan);
 }
