@@ -368,3 +368,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `dolphin/ax/tu_8041783C` `fn_80417F50`: inherited99.39161%; eight ordinary AuxB channel-pointer/base forms fail to recover two folded offset words; source preserved, scratch build/root47/17F50.
 - `dolphin/ax/tu_8041783C` `fn_804190A4`: inherited98.52362%; eight ordinary scalar-helper/lifetime forms retain the extra initial studio-pointer copy; source preserved, scratch build/root47/190A4.
+- 2026-10-13 | db/tu_80554628 fn_80556A10 | 99.79592%, 196/196 words after eight forms: seven constant-address/FPR register differences in second threshold block. |
