@@ -5,6 +5,10 @@
 
 #include "game/tu_80355A6C.h"
 
+struct UiScrRaw;
+void fn_800EC704(UiScrRaw*, int);
+extern "C" char* strcpy(char*, const char*);
+
 void fn_803560F8(void* self, int c)
 {
     PUT(0x100, lbl_8065A2B0);
@@ -150,7 +154,7 @@ void fn_803567C8(void* self, int c)
 
 void* fn_803567FC(char* self, const char* s)
 {
-    fn_8040B61C(self, s);
+    strcpy(self, s);
     return self;
 }
 
@@ -163,4 +167,4 @@ extern "C" void fn_80356838(void* self, int c)
         fn_80377408(self);
 }
 
-extern "C" void fn_8035686C(void* a, int b) { fn_800EC704(a, b); }
+extern "C" void fn_8035686C(void* a, int b) { fn_800EC704((UiScrRaw*)a, b); }
