@@ -236,10 +236,13 @@ struct Unk800D7008_Obj {
 };
 
 inline void* operator new(unsigned int, void* p) { return p; }
-/* Chooser/object root (ctor 0x8037B3E8): only its constructor is called here. */
+/* Chooser/object root (ctor 0x8037B3E8): its constructor and the spline
+ * registration member (fn_800D69E8) are called here. The last parameter of
+ * fn_8037B728 is really a const char*; `int` keeps the retail mangled name. */
 class Unk8037B3E8 {
 public:
     Unk8037B3E8(unsigned int hash);
+    void fn_8037B728(const char* name, const char* name2, void* list, int flags);
 };
 extern "C" void fn_8033CCE0(void* p);
 extern char lbl_806557A8[];
