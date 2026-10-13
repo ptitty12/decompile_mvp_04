@@ -45,6 +45,6 @@ You are a matching worker on a private matching decompilation of MVP Baseball 20
 
 Before each commit:
 - Run a full `ninja`, then `python tools/match/check_literals.py <unit>`, which must report 0 mismatches.
-- One unit per commit, message `match(<unit path>): <function> [N/M funcs]`, ending with the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
+- One unit per commit, message `match(<unit path>): <function> [N/M funcs]`, ending with the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. A kept near-miss uses `match(<unit path>): <function> near-miss NN.N% [N/M funcs]` (never `wip(`).
 
 Scratch: `<SCRATCH>\Q6_<NN>\` (already exists; keep all scratch files there, never in the worktree). Verify with `python tools/verify/verify.py --baseline-ref $(git merge-base HEAD origin/main)`. If verify fails with an HTTP error during its baseline build, re-run it. Timebox: work until <END> CDT by the wall clock (check with `date`; don't estimate elapsed time). Stop early only if every function in your worklist is matched or parked. Commit locally; do not push, merge, rebase or reset. Report per unit: before/after matched, what blocked the rest.

@@ -136,3 +136,49 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
 ## W7 p5-02 (20:10, 14 new; merged 6671eaec)
 - game/tu_800C2F90 59->60 (complete); tu_800C5158 55->57; tu_800CB3A8 56->57; tu_800CF178 54->56; tu_80107F74 57->59; tu_8014013C 35->39; tu_80147748 55->56 (fn_8014849C mftb); tu_801547AC 57->58 (fn_80154EF4 97.7 near-miss 24-byte copy); tu_800BCD38 fn_800BCD38 86.8 dropped.
 - Patterns: -ffloat-store float param spilled at its position in C param list; `n.m4 = 0; cnt = 0;` separate zero regs; float clamp polarity table (`!(f <= K)` -> cror un,eq,lt; `!(cur < hi)` -> blt; `f > K` -> ble); by-value Vec3 inline param gives extra stack copy; `(q = &pl->m58C, (q->m4 & M) || fn(q))`; unsigned int->float via `(float)*(unsigned*)&x`; diff_unit needs mangled substring for methods; ins.py --auto anchors only on free fns (use --before Class::method).
+
+## W8 p5-25 (20:19, 4 new; merged 7bf03b56)
+- animation/goals/tu_8027FD64 10->13 (header: goal pad fields named); tu_8029B70C 12->13 (fn_8029D2E0 99.2 near-miss; fn_8029CB34 94.7 dropped: `mr r0,r3` before cmpwi on call result unresolved); tu_80287600 fn_802893DC 267/267 regs only.
+- Patterns: Abs(float) inline param slot for fabs store/reload; extern const data vector loads schedule above stores; duplicate arms instead of ternaries (no -ffloat-store spill); atan2f `extern "C"`; macro OR chain for hash-probe; uninitialised multi-assigned `int r` + goto label in the arm for shared `return 2`.
+
+## W11 p5-01 (20:20, 5 new + 3 near-miss; merged 433e15db after rewording 3 wip( commits to match()
+- game/tu_8007FF8C 56->57 (fn_80081D88 99.8); tu_800AB0E8 57->58; tu_8006902C 28->29 (fn_8006BA84 98.0); tu_80050A68 25->26 (fn_80050BCC SumRow-like reload ~85); tu_800A9858 fn_800AABA4 98.2; tu_80070DDC 55->56.
+- Patterns: owner dtor with `delete p` per owned class with declared dtor -> `_._11Cls(p,3)`; explicit `self->t.~T()` in reverse -> (p,2) calls; CR0 compare live across calls from plain source; separate lbz via inline accessors; `!(E > hi) ? (E >? lo) : hi` clamp w/o spill; inline returning float for per-arm ternary sharing one stfs; loop bound read in condition (`i < o->m100`) avoids bdnz.
+
+## W12 p5-12 (20:22, 11 new + 4 near-miss; merged 674a01ed; 2 wip( commits went to main unreworded - 31 older ones exist too)
+- fe/tu_805283C4 55->56; tu_8051E878 49->50; tu_8050C9DC 33->38 (near-misses fn_8050DA2C 99.2, fn_8050E7B0 ~99 vptr-first store family; fn_8050DD7C 95.9); tu_80516990 fn_80516B6C 98.2; tu_80520BE0 35->37; tu_80529364 69->71 (complete).
+- Patterns: `return (float)p[N] * k;` per case for cross-jumped conversion tail; typed-field cast for vptr-load-before-addi sub-object call; `(a() + 1) % b()` one expression; inner calls as separate locals to stop global-load CSE; repeat `(char*)self + K` inline for rematerialised dtor array start; stores via typed view on char* sub-pointer; stack-struct init through pointers `FeP4* r1 = &p1;`; int-returning ctor prototypes; `f(x) == 0` -> subfic/adde.
+
+## W1 p5-00 (20:23, 7 new + 3 near-miss; merged 4185dc6e)
+- game/tu_80008540 19->20 (`_._11Unk800085B0` via explicit inline `virtual ~X() {}` in the class: implicit derived dtors go to .gnu.linkonce.t and never pair -> SWEEP candidate); tu_8001D7F8 fn_8001DEC0 99.95; tu_8001E444 24->25 (fn_8001F030 96.1 gcse slwi sharing; array ctor loop calls plain fn_80344538(Unk*) not a ctor -> hand-written do-while); tu_80026A48 26->28; tu_8003AEE4 fn_8003C388 99.54 (float->unsigned cror vs blt); tu_800437AC 24->26; tu_80044C10 26->27 (`r = r | (flag | 2)` form decides RA); tu_80046964 fn_8004763C mftb.
+- report.json is the authority; objdiff-cli diff/diff_unit can score literal-pool functions lower.
+
+## W2 p5-05 (20:24, 5 new + 4 near-miss; merged d2f8df99)
+- game/tu_8035ECE4 51->53 (complete; copy ctors as extern "C" plain functions); tu_80362FB4 41->42 (4 wrap functions 98.3: (float)(int) temp regs, local-alloc order - one fix fixes all four); tu_80362A30 `_._11Unk80362C2C` implicit-dtor (stores vptr when user-declared); fe/tu_804439E4 28->30.
+- Patterns: vcall target before branches via inline with control flow as the argument; `inline float Zero()` keeps pool load late; `FeTimer* t = 0;` before calls shares zero reg; `int dd = day;` loop var flips param priority; last loop on a copy `int j = idx;` keeps retail's redundant cmpwi/ble (99.97 -> 100).
+
+## W3 p5-07 (20:25, 9 new + 2 near-miss; merged 3bff1b78)
+- fe/tu_8048E6A0 27->33; tu_80477068 43->45 (fn_80479690 96.4); tu_80488CDC fn_8048A43C 96.2.
+- Patterns: ctor in plain ascending offset order (compiler emits later-in-source first per kind); `int a[2][25]` nested zero loop; typed struct pointer keeps unfolded addi; volatile reads into locals in retail order; `&m` vs `FeMsg* mp = &m` alias stops cross-jump of identical tails; long vslot73/fn_800C80xx runs straight from m2c are the cheapest wins.
+- 20:27 usage 77% (5h), 73% weekly: W1/W2/W3 slots held empty; restart cron 22:56.
+
+## W6 p5-10 (20:3x, 8 new + 2 near-miss)
+- fe/tu_804BB110 fn_804BB8B4 98.5; tu_804C713C 33->34; tu_804D6180 37->39; tu_804DA10C 40->41 (fn_804DA74C 98.0); tu_804E1A6C 41->45 (fn_804E2E00 shared lis + `cmpwi 4; blt` same as fn_804E2D1C).
+- Patterns: fnptr cast for true return type; r3 pass-through as first arg (`fn_800E5C74__Fiii(l->s3(), a, b)`); void vs int slot stops cross-jump of identical vcall tails; float slots by function-scope declaration order; `int (*cmp)(float,float) = fn;`; `*(int*)(o + (int)t->m0) = v` -> stwx offset-first; UiMsgMgr via local inline `lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0))`.
+
+## W7 p6-03 (20:35, 1 new + 1 near-miss) - cut-p4 game units are Vec-heavy, low yield
+- game/tu_8020ADC4 19->20 (fn_8020E9CC 96.7 Vec copy store order); tu_802028E4 record-push family (fn_80203C24 + 5 siblings) needs args kept in r3..r8 not callee-saved.
+- Patterns: fully nested `*v = Add(base, Mul(Norm(d), K))` allocates inline return temps outermost first; Norm from Len/Scale inlines with `float s = N/len` local; Vec d by const ref keeps &d callee-saved across sqrt; LenSqXZ accessor in compare shares x*x/z*z; literal 0.0f (same value) keeps one pooled FPR across a call while extern const float reloads.
+
+## W9 p5-27 (20:39, 36 new + 3 near-miss; merged 2adda5b1)
+- dolphin/dvd/tu_804227D4 17->53 (dvd.c state machine, callbacks, dvdfs, async starters). fn_804227D4 (dvdfs.c) defined at END of the merged unit so it is not inlined into later callers -> owner question (proper fix = split at 0x80422FD8, which verify would count as a regression for moved matched functions). Do NOT sort_functions this file.
+- ax fn_80419F7C VPB init loops unroll 64 vs retail 8 (dropped); gx fn_8042D9F8 psq (original asm); os/tu_804330D0 17/20 original-code.
+- Patterns: one struct overlay over adjacent .bss objects (`DvdBss* b = &lbl_X;`); unused `u32 pad[2];` for +8 frame (MWCC); volatile for store-then-load order; `u32` extern for cmplwi; explicit `command - 4 <= 1`; inlined BOOL function for li/li/cmpwi; address marker comment keeps static helper above user; MWCC evaluates retail-second operand first in `tolower(*a++) != tolower(*b++)`; OSPanic as fn_80433CE8; switch case order from the jump table.
+
+## W10 p6-02 (20:40, 4 new + 2 near-miss)
+- game/tu_801E6D88 41->44 (fn_801E8EF4 99.9); tu_801EA36C 16->17; tu_801EE438 fn_801EE438 99.7; tu_801F263C triage only (switch + shared tail + Vec3 temps).
+- Patterns: `inline float G() { return lbl_X; }` keeps global in f31 across call; volatile counted-loop shape; explicit per-arm `if (fn(k, K) == 1) r = 1;` for shared call tail; `*out = cond ? a : b` in both arms; forward-declared structs reproduce mangled callee names.
+
+## W5 p5-06 (20:41, 7 new + 1 near-miss)
+- fe/tu_80459228 29->30; tu_8045B134 26->27; tu_804654A0 28->29; tu_8046C6F8 fn_8046F510 98.65; tu_8046F770 39->40 (fn_80471390 296/296 but frame +8); tu_804740A8 41->44.
+- Patterns: per-call return-type casts (char* vs void) for the same callee; int flag tested twice -> second test on a copy `int d = c;` (avoids CR4 save); `a >? b` for fcmpu/cror max; ternary for if/else float before spill; `float fv[4]` for out-param spill slot; pointer locals for stack buffers keep them callee-saved; FeW* t local inside each cross-jumped case block; bit-test `(*(int*)(b+off) >> (i - (q<<5))) & 1`.
