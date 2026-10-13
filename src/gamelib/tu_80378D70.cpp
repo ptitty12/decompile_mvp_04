@@ -379,6 +379,74 @@ extern "C" int fn_803794DC(int n)
     return 1;
 }
 
+inline Unk80379324_Vec3 fn_80379530_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float fn_80379530_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline float fn_80379530_Len(const Unk80379324_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+inline void fn_80379530_Mul(Unk80379324_Vec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+inline Unk80379324_Vec3 fn_80379530_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_80379530_Add(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+extern "C" Unk80379324_Vec3* fn_80379530(Unk80379324_Vec3* out, const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* p, float* tOut, float t0, float t1)
+{
+    Unk80379324_Vec3 dir = fn_80379530_Sub(*b, *a);
+    float len = fn_80379530_Len(dir);
+    float inv = 1.0f / len;
+    fn_80379530_Mul(dir, inv);
+    Unk80379324_Vec3 ap = fn_80379530_Sub(*p, *a);
+    float proj = fn_80379530_Dot(ap, dir);
+    if (!(proj >= 0.0f)) {
+        if (tOut)
+            *tOut = t0;
+        *out = *a;
+    } else if (!(proj > len)) {
+        if (tOut)
+            *tOut = (t1 - t0) * proj * inv + t0;
+        new (out) Unk80379324_Vec3(fn_80379530_Add(*a, fn_80379530_Scale(dir, proj)));
+    } else {
+        if (tOut)
+            *tOut = t1;
+        *out = *b;
+    }
+    return out;
+}
+
 extern "C" float fn_80379AF4(const Unk80379324* a, const Unk80379324* b)
 {
     float r = a->x * b->x + a->y * b->y + a->z * b->z - b->w;
