@@ -251,6 +251,64 @@ public:
 int fn_80083F6C(int a);
 int fn_80084114(int a);
 int fn_800E190C(int a);
+class FeObjQ23 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+    virtual void v31(); virtual void v32(); virtual FeObjQ23* v33(int a, int b); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+    virtual FeObjQ23* v70(); virtual void v71(); virtual void v72(); virtual void v73();
+    virtual void v74(); virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+    virtual void v79(); virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83();
+    virtual void v84(); virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88();
+    virtual void v89(); virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93();
+    virtual void v94(); virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98();
+    virtual void v99(); virtual void v100(); virtual void v101(); virtual void v102();
+    virtual void v103(); virtual void v104(); virtual void v105(); virtual void v106();
+    virtual void v107(); virtual void v108(); virtual void v109(); virtual void v110();
+    virtual void v111(); virtual void v112(); virtual void v113(); virtual void v114();
+    virtual void v115(); virtual void v116(); virtual void v117(); virtual void v118();
+    virtual void v119(); virtual void v120(); virtual void v121(); virtual void v122();
+    virtual void v123(); virtual void v124(); virtual void v125(); virtual void v126();
+    virtual void v127();
+};
+struct FeBit31 {
+    unsigned top : 1;
+    unsigned rest : 31;
+};
+struct FeS7w : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObjQ23* m134;
+    int m138;
+    char pad13C[0x144 - 0x13C];
+    UiBase* m144;
+};
+struct FeStQ23 {
+    char pad0[0x4C4];
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
+    char pad4D4[0x614 - 0x4D4];
+    int m614;
+    int m618;
+};
+extern const char lbl_805FA738[];
+extern const char lbl_805FA740[];
+extern const char lbl_805FA620[];
+extern const char lbl_805F5B44[];
+extern const char lbl_805F4450[];
+extern "C" FeObj* fn_800C8068(void* p);
 /* Q16-DECL-END */
 
 extern "C" FE_OVERLAY void fn_804E750C(FeS7z* self)
@@ -398,6 +456,66 @@ extern "C" FE_OVERLAY void fn_804E7D44(FeS7* s7, int a)
 }
 
 extern char lbl_8066BA30[];
+/* near-miss: 99.8%; in the d == 0 branch retail stores m4CC (the zero in r31) last, ours hoists it first; all 24 store orders tried. The flag is a 1-bit field (srwi + separate cmpwi). */
+extern "C" FE_OVERLAY void fn_804E7E80(FeS7w* self, int kind, int arg2)
+{
+    unsigned flag = ((FeBit31*)&self->m144->m24)->top;
+    if (flag == 0) {
+        switch (kind) {
+        case 0: {
+            char* p = (char*)fn_800C8068(self->m134->v70()->v33(14, 1)) + 0xC;
+            if (fn_8040B574(lbl_805FA738, p) == 0 || fn_8040B574(lbl_805FA620, p) == 0) {
+                if (fn_8007DBB0((Unk8007DB74_A*)lbl_8061930C) == 4 && self->m138 == -1) {
+                    fn_804E7BD8((FeS7e*)self);
+                    return;
+                }
+                int mm = self->m138;
+                if (mm != -1)
+                    fn_8007DB74((Unk8007DB74_A*)lbl_8061930C, mm);
+            }
+            if (fn_8040B574(lbl_805F5B44, p) != 0) {
+                int c = fn_8040B574(lbl_805FA620, p);
+                if (c == 0) {
+                    FeStQ23* s = (FeStQ23*)((char*)fn_800B555C() + 8);
+                    s->m614 = 1;
+                    s->m618 = arg2;
+                    FeStQ23* st = (FeStQ23*)((char*)fn_800B555C() + 8);
+                    st->m4D0 = (int)fn_80090880(lbl_8061977C, 0x60D);
+                    st->m4C4 = c;
+                    st->m4CC = c;
+                    st->m4C8 = 0x200000;
+                } else {
+                    int d = fn_8040B574(lbl_805FA740, p);
+                    if (d == 0) {
+                        FeStQ23* st = (FeStQ23*)((char*)fn_800B555C() + 8);
+                        st->m4D0 = (int)fn_80090880(lbl_8061977C, 0x60D);
+                        st->m4C4 = 2;
+                        st->m4C8 = 0x200000;
+                        st->m4CC = d;
+                    }
+                }
+            }
+            UiMsg m;
+            UiMsg* mp = &m;
+            fn_8035682C(mp);
+            fn_8040B830(mp->name, p, 15);
+            mp->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), mp, self);
+            break;
+        }
+        case 1: {
+            UiMsg m;
+            UiMsg* mp = &m;
+            fn_8035682C(mp);
+            fn_8040B830(mp->name, lbl_805F4450, 15);
+            mp->name[15] = flag;
+            fn_800B7B4C(UiGetMsgMgr(), mp, self);
+            break;
+        }
+        }
+    }
+}
+
 extern "C" FE_OVERLAY FeScrRaw* fn_804E80FC(FeScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
