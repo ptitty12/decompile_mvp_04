@@ -110,6 +110,59 @@ void fn_8026C75C(Unk80270BA0_X* x, int a, Unk8022FE34_Ctx* c);
 void fn_8026C8FC(Unk80270BA0_X* x);
 void fn_8024DD80(Unk80270BA0_X* x);
 void fn_8024DDDC(void* p);
+/* 0x74-byte sub-object at x+0x360 / x+0x3D4 (fn_8024DD80 passes both): +0x20 a hashed name,
+ * bitfields at +0x24 (7 bits) and +0x3C (10, 1, 5, 6 bits). */
+struct Unk8024DDDC_T {
+    char name[0x20];
+    unsigned m20;
+    unsigned a24 : 7;
+    unsigned r24 : 25;
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    union {
+        int m38;
+        struct {
+            unsigned f0 : 1;
+            unsigned f1 : 4;
+            unsigned f5 : 4;
+            unsigned f9 : 3;
+            unsigned f12 : 7;
+            unsigned f19 : 3;
+            unsigned r38 : 10;
+        };
+    };
+    unsigned a3C : 10;
+    unsigned b3C : 1;
+    unsigned c0 : 1;
+    unsigned c1 : 1;
+    unsigned c2 : 1;
+    unsigned c3 : 1;
+    unsigned c4 : 1;
+    unsigned d3C : 6;
+    unsigned r3C : 10;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+    int m68;
+    int m6C;
+    int m70;
+};
+struct Unk8024C118_V {
+    char pad0[0x360];
+    Unk8024DDDC_T s0;
+    Unk8024DDDC_T s1;
+};
+extern "C" char* strcpy(char* d, const char* s);
+extern "C" void fn_803296AC();
 extern const float lbl_805D9770;
 extern const float lbl_805D9774;
 extern char lbl_80661498[];
@@ -258,6 +311,23 @@ void fn_8024C0D0(int v)
     fn_802526D8(p + 0x480);
     fn_8024FF48(p + 0x4D8);
     fn_8024EB7C((Unk8024EA50_T*)(p + 0xA0C));
+}
+
+extern "C" void fn_8024C118(void* o)
+{
+    Unk8024C118_V* v = (Unk8024C118_V*)o;
+    v->s0.a3C = 0x385;
+    v->s0.b3C = 0;
+    strcpy(v->s0.name, "");
+    v->s0.m20 = fn_80378568(v->s0.name, 0);
+    v->s0.d3C = 0;
+    v->s0.f1 = 6;
+    v->s0.f5 = 0;
+    v->s0.f9 = 0;
+    v->s0.f19 = 0;
+    v->s0.a24 = 0;
+    v->s1 = v->s0;
+    fn_803296AC();
 }
 
 void fn_8024CC08(Unk80270BA0_X* x)
@@ -703,6 +773,49 @@ void fn_8024DD80(Unk80270BA0_X* x)
 
 extern const float lbl_8061D634[];
 extern const float lbl_8061D634[];
+extern int lbl_8061D460;
+extern int lbl_8061D468;
+void fn_8024DDDC(void* p)
+{
+    Unk8024DDDC_T* t = (Unk8024DDDC_T*)p;
+    t->m20 = fn_80378568("", 0);
+    t->a24 = 0;
+    t->m30 = 0x48;
+    t->m34 = 200;
+    t->f0 = 0;
+    t->f1 = 0;
+    t->f5 = 0;
+    t->f9 = 0;
+    t->f12 = 0;
+    t->f19 = 0;
+    t->r38 = 0;
+    t->m28 = 0;
+    t->m2C = 0;
+    t->a3C = 0x385;
+    t->b3C = 0;
+    if (lbl_8061D460 != 0)
+        t->a3C = lbl_8061D468;
+    t->m70 = 0;
+    t->m40 = 0;
+    t->m44 = 0;
+    t->c0 = 0;
+    t->c1 = 0;
+    t->c2 = 0;
+    t->c3 = 0;
+    t->c4 = 0;
+    t->m48 = 0;
+    t->m4C = 0;
+    t->m50 = 0;
+    t->m54 = 0;
+    t->m58 = 0;
+    t->m64 = 0;
+    t->m68 = 0;
+    t->m5C = 0;
+    t->m60 = 0;
+    t->m6C = 0;
+    t->d3C = 0;
+}
+
 int fn_8024DEC4(Unk80270BA0_X* x, int idx)
 {
     float prev = 0.0f;
