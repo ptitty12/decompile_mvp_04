@@ -300,3 +300,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `db/tu_80574AE4` `fn_8057AF3C`: 99.02778%, 216/216 instructions; one argument move crosses four setup instructions after twenty bounded forms; canonical round queries and the observed nine-word record swap preserved in scratch only.
 
 - `fe/tu_8043FDC0` `fn_80440210`: 97.89474%, 19/19 instructions after six bounded countdown forms; the count and one-based index occupy r31/r30 instead of retail r30/r31; failed drafts kept in scratch only.
+
+- `ealib/tu_803E2248` `fn_803E2248`: 97.120255%, 158/158 instructions after eight bounded ordinary C drafts; canonical owner/virtual-device and allocation/constructor bindings recover control flow, while four FPR colors and draw-argument scheduling differ; failed code stays in scratch.
