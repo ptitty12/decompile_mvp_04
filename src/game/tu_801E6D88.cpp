@@ -438,6 +438,79 @@ struct Unk801E8A3C_Tbl {
 };
 extern const Unk801E8A3C_Tbl lbl_805D4244;
 
+struct Unk801E8810_Q {
+    char pad0[0x14];
+    float m14;
+    char pad18[8];
+    int m20;
+    char pad24[0x38 - 0x24];
+    int m38;
+};
+struct Unk801E8810_R {
+    char pad0[8];
+    float m8;
+    char padC[8];
+    float m14;
+    float m18;
+};
+struct Unk802F8324_O3;
+struct Unk802F8324_Rec;
+void fn_802FAD5C(Unk802F8324_O3* o, int k, Unk802F8324_Rec* r);
+extern int lbl_8061B9C8;
+
+extern "C" int fn_801E8810(I* s, int a, int sel, float* out, float f)
+{
+    int r = 0;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    Unk801E8810_Q* q = (Unk801E8810_Q*)(s->m9C->m0->m700->m3B0 + 0xC);
+    if (q->m20 == 1)
+        r = q->m38 == 0;
+    if (sel == -1) {
+        if (fn_802D7DB4(k, 0xC5) == 1 || fn_802D7DB4(k, 0xC6) == 1)
+            r = 1;
+    } else if (sel == 0) {
+        if (fn_802D7DB4(k, 0xC0) == 1)
+            r = 1;
+    } else if (sel == 1) {
+        if (fn_802D7DB4(k, 0xC1) == 1)
+            r = 1;
+    } else if (sel == 2) {
+        if (fn_802D7DB4(k, 0xC2) == 1)
+            r = 1;
+    } else if (sel == 3) {
+        if (fn_802D7DB4(k, 0xC3) == 1)
+            r = 1;
+    }
+    Unk801E8810_R* rec = (Unk801E8810_R*)((char*)s + 0xC4);
+    fn_801A497C(s->m9C->m0, 4, a);
+    float v0 = -1.0f;
+    float w;
+    if (r == 1) {
+        if (!(f >= 0.0f))
+            v0 = rec->m14;
+        else
+            v0 = rec->m18 + f;
+        w = v0;
+        rec->m14 = w;
+        w = (float)lbl_8061B9C8 * 0.016666668f + rec->m18;
+        rec->m18 = w;
+        if (!(rec->m18 <= v0)) {
+            w = v0;
+            r = 0;
+            rec->m18 = w;
+        }
+    }
+    if (q->m20 == 1 && q->m38 == 0) {
+        fn_802FAD5C(*(Unk802F8324_O3**)((char*)s->m9C->m0 + 0x720), k, (Unk802F8324_Rec*)q);
+        *out = q->m14;
+    } else {
+        *out = rec->m18 / rec->m14;
+    }
+    w = *out;
+    rec->m8 = w;
+    return r;
+}
+
 extern "C" int fn_801E8A3C(I* s, int a, int skip)
 {
     int found = 0;
