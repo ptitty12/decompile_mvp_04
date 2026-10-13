@@ -96,7 +96,7 @@ extern int lbl_80627380[];
 extern int lbl_80627374[];
 extern int lbl_80627324;
 extern int lbl_806272D0;
-extern int lbl_80627304;
+extern volatile int lbl_80627304;
 extern short lbl_806272E0;
 /* GX draw-sync callback fn803D9454 (registered at803D8F24) publishes samples to render readers. */
 extern volatile short lbl_806E9938[];
@@ -366,11 +366,11 @@ struct Unk803D8640Dev {
     int mD8;
     int mDC;
 };
-extern int lbl_806272D4;
+extern volatile int lbl_806272D4;
 extern unsigned char lbl_80627308;
 extern int lbl_80627390[];
-/* near-miss (96.6%): retail stores lbl_806272D4 = 0 and lbl_80627304 = 1 one after the other through r0; ours
-   hoists both constants above the first store. Tried one-int-struct globals and statement order. */
+/* Completion flags are shared with the retrace callback fn_803D8828 and
+   draw-sync callback fn_803D9454; publish the reset before enabling completion. */
 extern "C" void fn_803D8640(Unk803D8640Dev* self)
 {
     fn_803E2D18();
@@ -401,8 +401,8 @@ extern "C" void fn_803D8640(Unk803D8640Dev* self)
     fn_8042FE78(1);
     lbl_806272E8 = self->mDC;
     OSReceiveMessage(lbl_80627390, &msg, 1);
-    lbl_80627304 = 1;
     lbl_806272D4 = 0;
+    lbl_80627304 = 1;
     fn_8042C3B0(0x8000);
     fn_803D95FC(0, (int)fn_803D8828);
     GXCopyDisp(self->mB8, lbl_80627308);

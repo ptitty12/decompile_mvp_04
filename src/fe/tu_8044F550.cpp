@@ -372,9 +372,9 @@ extern "C" FE_OVERLAY void fn_80450C4C(FeScr6* self)
     if (self->m18C == 0) {
         self->m18C = (FeSlotObj*)fn_800B7A94(UiGetMsgMgr(), "NOTIFIEDSIMPROG");
         self->m18C->m30C = fn_80451C78;
-        ((FeObj1*)self->m18C)->v8(0);
-        ((FeObj1*)self->m18C)->v16(0);
     }
+    ((FeObj1*)self->m18C)->v8(0);
+    ((FeObj1*)self->m18C)->v16(0);
     FeObj* p = fn_800B7A94(UiGetMsgMgr(), "POPUP");
     self->m190 = p;
     ((FeObj1*)p)->v16(0);
