@@ -504,6 +504,56 @@ extern "C" void fn_80391EA4()
     lbl_8069B9BC[0] = 0;
 }
 
+struct McRecW {
+    unsigned short m0;
+    unsigned short m2;
+    unsigned short m4;
+};
+
+extern "C" int fn_8039582C();
+extern "C" void fn_803927E4(int i);
+
+extern "C" int fn_80391F70(unsigned x, int y)
+{
+    int ret = -1;
+    int skip = -1;
+    int i = 0;
+    do {
+        if (lbl_8069B80C.ch[i].m6 == 0) {
+            ret = i;
+            goto done;
+        }
+        i++;
+    } while (i <= 15);
+    {
+        unsigned now = fn_8039582C();
+        i = 0;
+        do {
+            McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
+            if (r->m2 != 0 && now - lbl_8069B80C.ch[i].m0 > r->m2 && skip != i) {
+                fn_803927E4(i);
+                ret = i;
+                goto done;
+            }
+            i++;
+        } while (i <= 15);
+    }
+    i = 0;
+    do {
+        McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
+        int slot = lbl_8069B80C.ch[i].m7;
+        if (r->m4 <= x && slot == y) {
+            lbl_8069B80C.ch[i].m6 = 0;
+            ret = i;
+            lbl_8069B80C.cnt[slot] -= 1;
+            goto done;
+        }
+        i++;
+    } while (i <= 15);
+done:
+    return ret;
+}
+
 /* near-miss: retail forms lbl+0x20 first and indexes it; 3 spellings of the +8 index tried. */
 extern "C" int fn_80392098(int i)
 {
