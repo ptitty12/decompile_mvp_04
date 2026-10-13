@@ -2,6 +2,9 @@
  * Database overlay code, .database_codeoverlay 0x80541F40-0x805467E0 (code-only unit;
  * placeholder TU). Define every function DB_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
+/* newlib ctype table: byte zero is the EOF sentinel. */
+extern "C" const char _ctype_[];
+
 #include "game/db_8053967C.h"
 
 typedef Db8053967C_List L;
@@ -158,7 +161,7 @@ DB_OVERLAY void fn_80541FDC(void* self, const char* path)
             unsigned n = fn_80379134(p, 10);
             for (i = 0; i < n; i++) {
                 int c = (signed char)p[i];
-                if (*(unsigned char*)(c + (int)lbl_8060E9F1) & 1)
+                if (*(unsigned char*)(c + (int)((const unsigned char*)_ctype_ + 1)) & 1)
                     c += 0x20;
                 tmp[i] = c;
                 if ((signed char)c == 10 || (signed char)c == 13)
@@ -184,7 +187,7 @@ DB_OVERLAY int fn_805421B8(Db8053967C_DbObj* list, const char* str)
     unsigned i = 0;
     for (; i < n; i++) {
         int c = (signed char)str[i];
-        if (*(unsigned char*)(c + (int)lbl_8060E9F1) & 1)
+        if (*(unsigned char*)(c + (int)((const unsigned char*)_ctype_ + 1)) & 1)
             c += 0x20;
         buf[i] = c;
     }
