@@ -391,6 +391,47 @@ inline Unk8030C5D8_F3 Unk8030F0C8_Sub(const Unk8030C5D8_F3& a, const Unk8030C5D8
     r.z = a.z - b.z;
     return r;
 }
+struct Unk8030F768_Mtx {
+    float m[16];
+};
+struct Unk8030F768_C {
+    char pad0[0x54];
+    int m54;
+};
+struct Unk8030F768_O {
+    char pad0[0x54C];
+    Unk8030F768_C* m54C;
+};
+struct Unk8030F768_Obj {
+    char pad0[0x1C];
+    Unk8019F8C0_Owner* m1C;
+    char pad20[0x3C - 0x20];
+    int m3C;
+    char pad40[0x4C - 0x40];
+    float m4C;
+    char pad50[0x54 - 0x50];
+    float m54;
+    char pad58[0x80 - 0x58];
+    int m80;
+    float m84[6];
+    char pad9C[0x9C - 0x9C];
+    float m9C;
+    float mA0;
+    float mA4;
+    float mA8;
+    float mAC;
+    float mB0;
+    float mB4;
+    char padB8[0x110 - 0xB8];
+    int m110;
+};
+extern int lbl_8061FDCC;
+extern const Unk8030F768_Mtx lbl_8060E938;
+int fn_801A04A8(Unk8019F8C0_Owner* o, int k);
+extern "C" {
+void fn_803E6D00(void* p, void* m);
+void fn_803E6C28(void* p, int n);
+}
 extern "C" {
 Unk8030F0C8_Ent* fn_8031C1E4(void* h, int id);
 int fn_8031C2A4(void* h, int id, int* found, float t);
@@ -949,6 +990,55 @@ extern "C" int fn_8030F598(Unk8030F598_Obj* p)
         fn_80433060(p->mBC, p->m80 * 8);
     }
     return p->m80 != 0 ? 1 : 0;
+}
+
+extern "C" void fn_8030F768(Unk8030F768_Obj* p)
+{
+    Unk8030F768_C* cc = ((Unk8030F768_O*)p->m1C)->m54C;
+    if (lbl_8061FDCC != 0 && cc->m54 == 3 && fn_8030F598((Unk8030F598_Obj*)p) != 0 && fn_801A04A8(p->m1C, 5) == 0) {
+        Unk8030F768_Mtx tbl = lbl_8060E938;
+        int k = 0;
+        int off = 0;
+        Unk8030C5D8_F3 pos;
+        pos.x = p->m9C * 0.5f;
+        pos.y = p->mA0 * 0.5f;
+        pos.z = p->mA4 * 0.5f;
+        int n = p->m80 * 2;
+        tbl.m[0] = p->m9C;
+        tbl.m[5] = p->mA0;
+        tbl.m[10] = p->mA4;
+        do {
+            if (k != 0 || p->m3C != 3) {
+                char* b1 = (char*)p + 0x84;
+                char* b2 = (char*)p + 0x88;
+                char* b3 = (char*)p + 0x8C;
+                tbl.m[12] = *(float*)(b1 + off) - pos.x;
+                tbl.m[13] = *(float*)(b2 + off) - pos.y;
+                tbl.m[14] = *(float*)(b3 + off) - pos.z;
+                if (k == 0 && p->m3C == 2) {
+                    tbl.m[12] += p->m4C;
+                    tbl.m[14] += p->m54;
+                }
+                fn_803E6D00((char*)p + 0x114, &tbl);
+                fn_803E6C28((char*)p + 0x114, n);
+                p->m110 = 1;
+            }
+            if (k == 0) {
+                if (p->m3C == 0)
+                    break;
+                n = (int)((float)n * p->mB4);
+                n = n & -2;
+                tbl.m[0] = tbl.m[0] * p->mA8;
+                tbl.m[10] = tbl.m[10] * p->mB0;
+                pos.x = pos.x * p->mA8;
+                pos.z = pos.z * p->mB0;
+                if (n <= 0)
+                    break;
+            }
+            k++;
+            off += 12;
+        } while (k <= 1);
+    }
 }
 
 void fn_8030F9DC(Unk8030C5D8_Em2* p)
