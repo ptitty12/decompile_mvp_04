@@ -4,6 +4,8 @@
  */
 
 #include "game/fe_804FE34C.h"
+extern "C" char* strcpy(char*, const char*);
+extern "C" char* strncpy(char*, const char*, unsigned);
 
 /* Q16-DECL-BEGIN */
 extern "C" FeW* fn_800C8040(FeW* w);
@@ -102,6 +104,8 @@ extern const char lbl_805FB588[];
 extern const char lbl_805FB57C[];
 extern const char lbl_80680C08[];
 extern const char lbl_805FA738[];
+extern const char lbl_805F5004[];
+extern const char lbl_805FB590[];
 extern "C" int fn_804FF6B4(FeScrB* x);
 extern "C" char* fn_804FF710(FeScrN* x, char* out);
 extern "C" void fn_804FF834(FeScrD* x);
@@ -136,7 +140,7 @@ extern "C" FE_OVERLAY int fn_804FF6B4(FeScrB* x)
 
 extern "C" FE_OVERLAY char* fn_804FF710(FeScrN* x, char* out)
 {
-    return fn_8040B61C(out, x->m134->fn_vslot70()->fn_vslot33(5, 1)->mC);
+    return strcpy(out, x->m134->fn_vslot70()->fn_vslot33(5, 1)->mC);
 }
 
 extern "C" FE_OVERLAY FeScrAr* fn_804FF780(FeScrAr* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -245,9 +249,9 @@ extern "C" FE_OVERLAY void fn_804FFBF4(void* q)
     FeSub134* p = (FeSub134*)&x->m134;
     char buf[0x38];
     fn_8007B924__18Unk8007B2B0_ScreeniiPc(lbl_8061930C, 1, x->m134[p->mC], buf);
-    fn_800C8040((FeW*)x->fn_vslot32("TEAMNAME", 1));
+    fn_800C8040((FeW*)x->fn_vslot32(lbl_805F5004, 1));
     fn_8007B924__18Unk8007B2B0_ScreeniiPc(lbl_8061930C, 3, x->m134[p->mC], buf);
-    fn_800C8040((FeW*)x->fn_vslot32("TEAMCITY", 1));
+    fn_800C8040((FeW*)x->fn_vslot32(lbl_805FB590, 1));
 }
 
 extern "C" FE_OVERLAY FeScrN* fn_804FFCB4(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -320,7 +324,7 @@ extern "C" FE_OVERLAY void fn_80500030(void* x)
     FeMsg m;
     FeMsg* mp = &m;
     fn_8035682C(mp);
-    fn_8040B830(mp->name, lbl_805FA738, 15);
+    strncpy(mp->name, lbl_805FA738, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, x);
 }
@@ -332,13 +336,13 @@ extern "C" FE_OVERLAY void fn_805000B4(FeScrN* x, int kind)
     fn_8035682C(mp);
     switch (kind) {
     case 0:
-        fn_8040B830(mp->name, lbl_805F4450, 15);
+        strncpy(mp->name, lbl_805F4450, 15);
         mp->name[15] = 0;
         fn_800B7B4C(FeGetMgr(), mp, x);
         break;
     case 1:
         if (x->m138->fn_vslot60() != 0) {
-            fn_8040B830(mp->name, fn_800C8048(x->m138->fn_vslot70()->fn_vslot33(5, 1)) + 0xC, 15);
+            strncpy(mp->name, fn_800C8048(x->m138->fn_vslot70()->fn_vslot33(5, 1)) + 0xC, 15);
             mp->name[15] = 0;
             fn_800B7B4C(FeGetMgr(), mp, x);
         } else
