@@ -5,7 +5,6 @@
 #include "game/fe_804D08D0.h"
 
 extern "C" {
-/* near-miss: 2 slots; retail loads n->m38 into r5 (we use r0) */
 FE_OVERLAY void fn_804D08D0(FeS804D08D0* x)
 {
     if (x->m134 != 0) {
@@ -14,14 +13,14 @@ FE_OVERLAY void fn_804D08D0(FeS804D08D0* x)
             int a = ((FeWX*)x->m134)->s88(0);
             int t = n->m38;
             if (t != -1 && a == -1) {
-                ((FeWX*)x)->s67(-3);
+                ((FeWX*)x)->s67(-3, t);
             }
             fn_804D292C(n, a);
             FeNav* m = &x->m144;
             int b = ((FeWX*)x->m134)->s88(1);
             t = m->m38;
             if (t != -1 && b == -1) {
-                ((FeWX*)x)->s67(-3);
+                ((FeWX*)x)->s67(-3, t);
             }
             fn_804D292C(m, b);
         }
