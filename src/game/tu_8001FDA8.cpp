@@ -469,14 +469,17 @@ void Unk8001FE34::fn_80020FCC()
         fn_80042C78(fn_8004072C(), m4);
 }
 
-/* near-miss: 53/53 insns, 2 slots differ: the stray `mr r9,r11` copy of the int-to-float
- * path is `mr r3,r11` here (register choice only). Tried temps for m4/scale and return forms. */
+/* The two conversions go through one result variable: with two returns the dead copy in the m4 path
+ * is `mr r3,r11` (it gets the return register as a preference) instead of retail's `mr r9,r11`. */
 int Unk8001FE34::fn_80021010(int idx, float f)
 {
     float t = !(f > lbl_805A5AA0) ? (f >? lbl_805A5AA4) : lbl_805A5AA0;
+    int r;
     if (idx == 0 || idx == 3)
-        return (int)(t * lbl_80616508[idx] * lbl_805A5AA8);
-    return (int)(t * lbl_80616508[idx] * (float)m4);
+        r = (int)(t * lbl_80616508[idx] * lbl_805A5AA8);
+    else
+        r = (int)(t * lbl_80616508[idx] * (float)m4);
+    return r;
 }
 
 void Unk8001FE34::fn_800210E4(float f, int idx)
