@@ -88,9 +88,9 @@ extern "C" int fn_800A3430(Unk80361034_Own* o);
  * +0x198) with the task's mC; fn_80361DF0 / E84 / F18 are
  * m0->m0->fn_8007D0E0(m0->m28, K, 1). */
 struct Unk8007B2B0_Screen {
-    int fn_8007D0E0(unsigned i, int a, int b);
-    int fn_8007D180(unsigned i, int a);
-    int fn_8007D998(unsigned i, int a);
+    void fn_8007D0E0(unsigned i, int a, int b);
+    void fn_8007D180(unsigned i, int a);
+    void fn_8007D998(unsigned i, int a);
     int fn_80078A38(int a);
 };
 struct Unk80361A80_R {

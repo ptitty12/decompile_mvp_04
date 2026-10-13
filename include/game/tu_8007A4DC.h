@@ -531,23 +531,23 @@ struct Unk8007B2B0_Screen {
     int fn_8007CE3C(int a, int b, int c);
     int fn_8007CEA4(int a, int b, char* c);
     int fn_8007CF0C(int a, int b, int c);
-#ifdef FE_SCREEN_CF44_VOID /* retail schedules some callers (fe overlay screens) as a void call */
+#ifdef FE_SCREEN_CF44_VOID /* legacy caller macro; the database provider returns void */
     void fn_8007CF44(unsigned i, int a, int b);
 #else
-    int fn_8007CF44(unsigned i, int a, int b);
+    void fn_8007CF44(unsigned i, int a, int b);
 #endif
-    int fn_8007CF90(unsigned i, int a);
+    void fn_8007CF90(unsigned i, int a);
     Entry* fn_8007CFDC(unsigned i);
-#ifdef FE_SCREEN_D004_VOID /* same as FE_SCREEN_CF44_VOID: callers scheduled as for a void call */
+#ifdef FE_SCREEN_D004_VOID /* legacy caller macro; the database provider returns void */
     void fn_8007D004(unsigned i, int a, int b);
 #else
-    int fn_8007D004(unsigned i, int a, int b);
+    void fn_8007D004(unsigned i, int a, int b);
 #endif
     int fn_8007D050(unsigned i, int a);
     int fn_8007D098(unsigned i, int a);
-    int fn_8007D0E0(unsigned i, int a, int b);
-    int fn_8007D12C(unsigned i, int a, int b, int c);
-    int fn_8007D180(unsigned i, int a);
+    void fn_8007D0E0(unsigned i, int a, int b);
+    void fn_8007D12C(unsigned i, int a, int b, int c);
+    void fn_8007D180(unsigned i, int a);
     int fn_8007D1C8(unsigned i, int a, int b);
     int fn_8007D214(unsigned i, int a);
     int fn_8007D25C(unsigned i, int a, int b);
@@ -567,15 +567,15 @@ struct Unk8007B2B0_Screen {
     int fn_8007D658(unsigned i);
     int fn_8007D69C(unsigned i);
     int fn_8007D6E0(unsigned i);
-    int fn_8007D724(unsigned i, int a, int b, int c, int d);
+    void fn_8007D724(unsigned i, int a, int b, int c, int d);
     int fn_8007D77C(unsigned i, int a);
     int fn_8007D7C4(unsigned i, int a);
     int fn_8007D80C(unsigned i, int a);
     int fn_8007D854(unsigned i, int a, int b);
     int fn_8007D8A0(unsigned i, int a, int b);
-    int fn_8007D8EC(unsigned i, int a, int b, int c, int d);
+    void fn_8007D8EC(unsigned i, int a, int b, int c, int d);
     int fn_8007D944(unsigned i, int a, int b, int c);
-    int fn_8007D998(unsigned i, int a);
+    void fn_8007D998(unsigned i, int a);
     int fn_8007D9E0(unsigned i, int a);
     int fn_8007DA28();
     int fn_8007DA34(int i);
