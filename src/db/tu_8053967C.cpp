@@ -815,7 +815,7 @@ extern "C" int fn_80409DAC(const char* s);
 extern "C" int fn_8053C550(const char* s);
 extern "C" void fn_8053C6F4(R* r, int id, int kind, int v);
 extern "C" int fn_805A1958(R* r, int a, int b, unsigned char c);
-/* near-miss: 98.0%; the two int stores at 0xFC + n*4 + K: retail does slwi/addi then base+index (stwx), ours addi/slwi (same count) */
+/* near-miss: 98.7%; the two int stores at 0xFC + n*4 + K: retail does slwi then addi (offset), then base+index (stwx); ours addi then slwi (same count) */
 DB_OVERLAY void fn_8053BEC8(Db8053967C_Ld* self)
 {
     if (self->s3() == self->m0)
@@ -903,14 +903,12 @@ DB_OVERLAY void fn_8053BEC8(Db8053967C_Ld* self)
                     fn_805A1958(cur, 3, 0, 0xFF);
             }
             if (n1 >= 0) {
-                int o1 = (n1 + 11) * 4;
-                char* bs = (char*)cur + 0xFC;
-                *(int*)(bs + o1) = 0;
+                int* sp = (int*)((char*)cur + 0xFC);
+                sp[n1 + 11] = 0;
             }
             if (n3 >= 0) {
-                int o3 = (n3 + 35) * 4;
-                char* bs = (char*)cur + 0xFC;
-                *(int*)(bs + o3) = 0;
+                int* sp = (int*)((char*)cur + 0xFC);
+                sp[n3 + 35] = 0;
             }
         } else {
             fn_8053C6F4(cur, 0, k0, hash);
