@@ -238,7 +238,10 @@ struct TaskInner {
     int m74;
     char pad78[0x80 - 0x78];
     int m80;
-    char pad84[0x98 - 0x84];
+    char pad84[0x8C - 0x84];
+    int m8C;
+    char pad90[4];
+    int m94;
     int m98;
     char pad9C[0xA4 - 0x9C];
     int mA4;

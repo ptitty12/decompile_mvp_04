@@ -244,6 +244,58 @@ int fn_802280E0(Task* t, int a)
     return 0;
 }
 
+extern const float lbl_805D6558;
+extern "C++" { void fn_8035B7B0(U* p); }
+int fn_8021157C(CmpPos* a, CmpPos* b);
+Vec3f fn_8018959C(Obj4_36C* o, float t);
+int fn_801DC658(void* o, Vec3f* v, int k);
+int fn_8024D408(void* p);
+void qsort(void* a, unsigned n, unsigned es, int (*cmp)());
+
+struct Ent802281D0 {
+    int idx;
+    float d;
+    int pad8;
+    Ent802281D0() { fn_8035B7B0((U*)this); }
+};
+
+inline float Id802281D0(float v)
+{
+    return v;
+}
+
+int fn_802281D0(Task* t, int a, int b, int c)
+{
+    Ent802281D0 arr[9];
+    int n = 0;
+    Vec3f ref = lbl_806055AC;
+    int rr = fn_801DC658(*(void**)((char*)t->m9C->m0->m700 + 0x3B8), &ref, 0);
+    Obj4_36C* o4 = t->m9C->m0->m6CC;
+    if (rr == 0) {
+        float f = lbl_805D6558; ref = fn_8018959C(o4, lbl_805D6558);
+    }
+    for (int k = 0; k <= 8; k++) {
+        if (k == a)
+            continue;
+        TaskInner* in = t->m9C;
+        int sel = in->m8C;
+        void* o = in->m8[k];
+        if (sel != 0 && in->m94 == 1 && sel == (int)o)
+            continue;
+        if (fn_8024D408(o) != 0 && b == 0)
+            continue;
+        if (c != 0 && fn_802280E0(t, k) == 0)
+            continue;
+        arr[n].idx = k;
+        Vec3f p = ((PosObj*)o)->m60;
+        Vec3f d = p - ref;
+        arr[n].d = d.x * d.x + d.z * d.z;
+        n++;
+    }
+    qsort(arr, n, 0xC, (int (*)())fn_8021157C);
+    return arr[0].idx;
+}
+
 int fn_8022921C(Task* t, int a)
 {
     int r = -1;
