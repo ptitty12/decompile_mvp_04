@@ -2297,6 +2297,8 @@ libm/ef_atan2.cpp:
 
 libm/ef_log.c:
 	.text       start:0x80410F08 end:0x80411188
+	.sdata      start:0x806EEE98 end:0x806EEEE0
+	.sdata2     start:0x806F0000 end:0x806F002C align:4
 
 libm/ef_sqrt.cpp:
 	.text       start:0x80411188 end:0x80411280
