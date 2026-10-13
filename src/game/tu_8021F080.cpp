@@ -541,3 +541,80 @@ void fn_80222B54(Task* t, int a, RecQueue* q)
     }
 }
 }
+
+extern "C" {
+
+void fn_801BCD3C(void* x, Obj4_36C* c, void* pp, int z);
+void fn_80189300(Obj4_36C* c, void* pp);
+extern int lbl_8061D138;
+extern const float lbl_805D63E4;
+
+/* near-miss: same instruction stream as retail; differs only in slwi r0 vs r11 and the zero/one constant registers of the early-return
+   store block (retail reuses r0 for li 1 and li 0; ours keeps li 0 in r11). Tried all 24 orders of the four stores. */
+void fn_80222D70(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Obj4_36C* o = t->m9C->m4;
+    if (e->mA4 != 0) {
+        fn_802044A4(t, a, (char*)q + 0x48, e->m84);
+        e->mA4 = 0;
+    }
+    if (fn_80205664(t->m9C) == 1)
+        fn_801E8A3C(t->m9C->m3A64, a, -1);
+    TaskInner* in = t->m9C;
+    if (in->m88 > 5) {
+        in->m88 = 0;
+        if (o != 0 && o->m36C == 0) {
+            TaskInner* in2 = t->m9C;
+            PosObj* pp = (PosObj*)in2->m8[a];
+            if (pp != 0) {
+                Vec3f d = ((PosObj*)o)->m60 - pp->m60;
+                if (!(d.x * d.x + d.y * d.y + d.z * d.z >= 3600.0f)) {
+                    if (o->m38C == 1 || o->m390 == 1)
+                        fn_801BCD3C(*(void**)((char*)in2->m0->m700 + 0x3BC), o, pp, 0);
+                    fn_80189300(o, pp);
+                }
+            }
+        }
+    }
+    if (lbl_8061D138 == 0) {
+        Unk80222B54_S* sub = (Unk80222B54_S*)((char*)t + 0xA0);
+        if (!(e->m84 < sub->m4)) {
+            float v = (float)t->m9C->m0->m4C * 0.016666668f + fn_8018A214(o);
+            if (!(v < e->m84)) {
+                SetM4(sub, v);
+                fn_80205450(t->m9C, a);
+                fn_802123D4(t, 1, 1);
+                fn_801EC5F8(t, a);
+            }
+        }
+    }
+    if (o->m36C != 0) {
+        t->m9C->mA4 = -1;
+        t->m9C->m30 = 4;
+        if (o->m36C->m460 != a) {
+            e->mA4 = 1;
+            e->m80 = lbl_805D63E4;
+            e->m9C = 0;
+            e->mAC = 0;
+            return;
+        }
+        if (t->m9C->m6A8 == 1 && fn_80210C98((Sub*)&t->m9C, 3) == 0) {
+            int r = fn_802055F4(t->m9C);
+            if (r == 0) {
+                fn_80205450(t->m9C, a);
+                fn_801EE6F4(t, a);
+                fn_801F0EA8(t, a);
+                fn_802123D4(t, 1, 1);
+                fn_8021CE28(t, 0.8333334f);
+                t->m9C->m6A8 = r;
+                return;
+            }
+        }
+        fn_801EE6F4(t, a);
+        fn_801F0EA8(t, a);
+        fn_801F0174(t, a, 0);
+    }
+}
+
+}
