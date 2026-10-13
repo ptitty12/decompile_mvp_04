@@ -304,9 +304,7 @@ extern "C" int fn_80391A10(unsigned a, int b, int c)
 {
     int q = b / c;
     unsigned r = b - q * c;
-    if (a > r)
-        return q * a + r;
-    return q * a + a;
+    return a > r ? (int)(q * a + r) : (int)(q * a + a);
 }
 
 extern "C" void fn_80391A3C(McRec* r)
