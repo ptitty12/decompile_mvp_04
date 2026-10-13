@@ -409,6 +409,8 @@ extern "C" void fn_803E1F6C()
 }
 
 /*
- * Not matched yet: fn_803E0ACC, fn_803E0F9C, fn_803E1578, fn_803E1850 (collision test through fn_803DED40).
+ * Not matched yet: fn_803E0ACC, fn_803E0F9C, fn_803E1850 (collision test through fn_803DED40).
+ * fn_803E1850 (p5-20): structure is right (79 of 79 instructions, early outs share one return 0); retail puts each sum and
+ * product in f13 where ours reuses the f0 operand register.
  * The original code stays linked for these.
  */
