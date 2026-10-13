@@ -47,7 +47,7 @@ int fn_803FBF10(int a, int b);
 int fn_803FC190(int a, int b);
 int fn_803FC2E0(int a, int b, int c);
 int fn_803FC034(int a);
-void fn_803FB64C();
+extern "C" int fn_803FB64C(int a, int b, int c);
 void fn_802B9EFC(Unk8068B4F8* p, int v);
 void* fn_802B9CCC(int a, int* b, int c);
 void fn_802B9ED4(int a);
@@ -232,9 +232,9 @@ extern "C" void fn_802B961C(const char* p, int x)
     }
 }
 
-void fn_802B96A4()
+int fn_802B96A4(int a, int b, int c)
 {
-    fn_803FB64C();
+    return fn_803FB64C(a, b, c);
 }
 
 int fn_802B96C4(int a)
