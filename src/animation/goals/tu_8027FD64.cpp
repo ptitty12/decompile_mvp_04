@@ -7,10 +7,13 @@
  */
 #include "game/chooser.h"
 #include "game/goals/tu_8027FD64.h"
+#include "game/goals/tu_8027A84C.h"
 extern "C" float atan2f(float y, float x);
 
 float lbl_8061E6D0 = 45.0f;
 extern Unk80273498_Vec3 lbl_805DED28;
+float fn_8041171C(float x);
+float fn_80411554(float x);
 
 void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
 int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
@@ -131,6 +134,112 @@ float fn_802816D0(Unk8027FD64_Goal* g, Unk8014D8AC_Ctx* ctx)
         result = 60.0f;
     }
     return result;
+}
+
+/* Motion query (constructor in animation/choosers/tu_80279AE4.cpp, size 0xDC): fields this unit writes. */
+class Unk80279BB8 {
+public:
+    Unk80279BB8(Unk80270BA0_X* x);
+    char pad0[0xCC];
+    int mCC;
+    float mD0;
+    float mD4;
+    int mD8;
+    void SetD4(float v) { mD4 = v; }
+    void SetCC(int v) { mCC = v; }
+};
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = 0.0f;
+    r.z = fn_80411554(angle);
+    return r;
+}
+
+inline Unk80273498_Vec3 FlatPos(Unk80270BA0_X* x)
+{
+    Unk80273498_Vec3 t = x->m60;
+    t.y = 0.0f;
+    return t;
+}
+
+/* Root goal (Unk8028F178_Goal): fields written here. */
+struct Unk802817A0_Root {
+    char pad0[0x38];
+    int m38;
+    char pad3C[0x58 - 0x3C];
+    int m58;
+};
+void fn_8028F440(Unk802817A0_Root* g);
+void fn_8028F45C(Unk802817A0_Root* g, Unk80273498_Vec3 v);
+void fn_80281A7C(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q);
+int fn_8026D988(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+int fn_8026D7B4(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+int fn_8026D7E0(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+float fn_80382BB8(Unk80271DBC_Link* l);
+int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int hash, int ev, float* out, int flags);
+extern int lbl_806242B4;
+
+void fn_802817A0(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
+{
+    Unk80273498_Vec3 pos;
+    float heading;
+    int hash;
+
+    ((Unk8027A84C*)g)->fn_8027AD3C(x, o, &pos, &heading, 0, 0, &hash, 0);
+    Unk80271DBC_Link* link = x->m618;
+    if (fn_8026D988(x, o)) {
+        float f = 0.0f;
+        Unk80279BB8 q(x);
+
+        fn_80386110(link, &q, hash, lbl_806242B4, &f, 0x12);
+        q.SetD4(f);
+        q.SetCC(3);
+        fn_80281A7C(g, x, &q);
+        g->mE8.f21 = 0;
+    } else if (fn_8026D7B4(x, o)) {
+        float f = 0.0f;
+        Unk80279BB8 q(x);
+
+        fn_80386110(link, &q, hash, lbl_806242B4, &f, 0x12);
+        q.SetD4(f);
+        q.SetCC(3);
+        fn_80281A7C(g, x, &q);
+        g->mE8.f21 = 0;
+    } else if (!g->mE8.f21 && fn_8026D7E0(x, o)) {
+        Unk80273498_Vec3 p = FlatPos(x);
+        float ang = fn_80382BB8(x->m618);
+
+        fn_8028F440((Unk802817A0_Root*)g->m4);
+        fn_8028F45C((Unk802817A0_Root*)g->m4, p + Direction(ang) * 144.0f);
+        ((Unk802817A0_Root*)g->m4)->m38 = 2;
+        ((Unk802817A0_Root*)g->m4)->m58 = 7;
+        g->mC = 1;
+        g->mE8.f21 = 1;
+    } else {
+        fn_80281A7C(g, x, 0);
+        g->mE8.f21 = 0;
+    }
 }
 
 void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)

@@ -123,7 +123,8 @@ struct Unk8027FD64_Goal {
     int m0;
     void* m4;
     Unk8027A05C* m8;
-    char padC[0x1C - 0xC];
+    int mC;
+    char pad10[0x1C - 0x10];
     Unk80273498_Vec3 m1C;
     char pad28[0x2C - 0x28];
     int m2C;
