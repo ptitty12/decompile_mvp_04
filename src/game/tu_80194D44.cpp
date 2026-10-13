@@ -271,6 +271,22 @@ extern "C" void fn_80195974(Unk80195974_O* o, const Unk80183918_Vec3* p1, const 
     o->mA90 = t;
 }
 
+//@80195A9C
+extern "C" void fn_80195A9C(Unk80195A9C_O* o)
+{
+    Unk80191C5C_S* p = &o->mA34;
+    o->m48 = 0.0f;
+    o->m44 = 0.0f;
+    o->m50 = 0;
+    o->m54 = 0;
+    o->m58 = *p;
+    o->m4C = 0;
+    int mode = p->m24;
+    Unk80195A9C_T t;
+    fn_80191AD8(&t.m10, mode);
+    o->mAB4 = t;
+}
+
 //@80195E60
 /* near-miss: 32 vs 30 insns: retail reloads the state word at +0x7C for each test (three
  * lwz) and tests the +0x6C field before the second +0x7C compare; here the loads are CSE'd. */

@@ -255,7 +255,7 @@ void fn_801593F8(void* p);
 void fn_800AB9A8(void* p, int a);
 void fn_8017BE28(void* p);
 void fn_801580A0(void* p);
-void fn_8019CD04(void* o);
+int fn_8019CD04(void* o, const float* a, const float* b);
 void fn_8033E464(void* list, void* obj);
 void fn_8033E3FC(void* o, int a);
 void fn_8017B0D8(void* p);

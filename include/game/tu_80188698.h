@@ -89,9 +89,9 @@ struct Unk80189C38_Vec4 {
 };
 extern "C" {
 Unk80189C38_Vec4 fn_801971B8(Unk80195404* p, float t);
-void fn_8019E114(void* a, void* b, int c, int d, int e, float f);
-void fn_8019DF6C(void* a, void* b, int c, int d, float f);
-void fn_8019DE2C(void* a, void* b, int c, int d);
+float fn_8019E114(void* a, void* b, int c, int d, int e, float f);
+float fn_8019DF6C(void* a, void* b, int c, int d, float f);
+float fn_8019DE2C(void* a, void* b, int c, int d);
 void fn_801965CC(Unk80195404* p, float a, float b, float c);
 void* fn_801A497C(void* ctx, int a, int b);
 void* fn_801C1638(void* ctx, int a);

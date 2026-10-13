@@ -41,6 +41,36 @@ extern char lbl_80660158[];
 extern "C" void fn_803BD720();
 void fn_8035A5C4(void* p, int c);
 extern "C" void fn_80328374(void* p, int c);
+struct Unk8019DD34_E {
+    float k;
+    float v;
+};
+struct Unk8019DD34_C {
+    float m0;
+    Unk8019DD34_E e[8];
+};
+struct Unk8019CD04_E {
+    float lo;
+    float hi;
+};
+struct Unk8019CD04_O {
+    float m0[2];
+    char pad8[8];
+    int m10[2];
+    Unk8019CD04_E* m18[2];
+    int m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+};
+inline int Unk8019CD04_Cell(Unk8019CD04_O* o, int k, float x)
+{
+    float d = x - o->m0[k];
+    if (!(d >= 0.0f))
+        return -1;
+    return (int)(d * 0.008333334f);
+}
 //@BODY
 //@8019C41C
 extern "C" float fn_8019C41C(float x)
@@ -51,9 +81,33 @@ extern "C" float fn_8019C41C(float x)
 }
 
 //@8019CCE4
-extern "C" void fn_8019CCE4(void* o)
+extern "C" void fn_8019CCE4(void* o, const float* a, const float* b)
 {
-    fn_8019CD04(o);
+    fn_8019CD04(o, a, b);
+}
+
+//@8019CD04
+extern "C" int fn_8019CD04(void* op, const float* a, const float* b)
+{
+    Unk8019CD04_O* o = (Unk8019CD04_O*)op;
+    if (o->m20 == 0)
+        return 0;
+    if (!(a[0] <= o->m24 || b[0] <= o->m24 || a[0] >= o->m2C || b[0] >= o->m2C || a[2] <= o->m28 || b[2] <= o->m28 || a[2] >= o->m30 || b[2] >= o->m30))
+        return 1;
+    for (int k = 0; k <= 1; k++) {
+        float a1 = k == 0 ? a[0] : a[2];
+        float b1 = k == 0 ? b[0] : b[2];
+        float a2 = k == 0 ? a[2] : a[0];
+        float b2 = k == 0 ? b[2] : b[0];
+        int ia = Unk8019CD04_Cell(o, k, a1);
+        int ib = Unk8019CD04_Cell(o, k, b1);
+        if (ia < o->m10[k] && ia >= 0 && ia == ib) {
+            Unk8019CD04_E* e = (Unk8019CD04_E*)((ia << 3) + (int)o->m18[k]);
+            if (!(a2 >= e->hi || a2 <= e->lo || b2 >= e->hi) && b2 > e->lo)
+                return 1;
+        }
+    }
+    return 0;
 }
 
 //@8019CF24
@@ -84,6 +138,111 @@ extern "C" void fn_8019D010()
 //@8019D014
 Unk8019D014::~Unk8019D014()
 {
+}
+
+//@8019DBA0
+extern "C" float fn_8019DBA0(Unk8019DD34_C* arr, int idx, float t)
+{
+    Unk8019DD34_C* c = &arr[idx];
+    if (!(t <= c->e[1].k)) {
+        if (!(t >= c->e[0].k)) {
+            float u = Unk8019CF3C_Norm(c->e[1].k, t, c->e[0].k);
+            float r = Unk8019CF3C_Lerp(c->e[1].v, u, c->e[0].v);
+            return r;
+        }
+    } else {
+        for (int i = 2; i < 8; i++) {
+            if (!(t <= c->e[i].k)) {
+                float u = Unk8019CF3C_Norm(c->e[i].k, t, c->e[i - 1].k);
+                float r = Unk8019CF3C_Lerp(c->e[i].v, u, c->e[i - 1].v);
+                return r;
+            }
+        }
+    }
+    return 15.0f;
+}
+
+//@8019DD34
+extern "C" int fn_8019DD34(void* self, Unk8019DD34_C* c, float* out, float* out0, float t)
+{
+    *out0 = c->m0;
+    int found = 0;
+    for (int i = 0; i < 7; i++) {
+        if (c->e[i].k == t) {
+            found = 1;
+            *out = c->e[i].v;
+        } else if (!(c->e[i].k < t)) {
+            if (!(c->e[i + 1].k > t)) {
+                float u = Unk8019CF3C_Norm(c->e[i + 1].k, t, c->e[i].k);
+                *out = Unk8019CF3C_Lerp(c->e[i + 1].v, u, c->e[i].v);
+                found = 1;
+            }
+        }
+        if (found)
+            break;
+    }
+    return found;
+}
+
+struct Unk8019DE2C_R {
+    float m0;
+    char pad4[0x10];
+    float m14;
+    char pad18[0x44 - 0x18];
+};
+struct Unk8019DE2C_T {
+    Unk8019DE2C_R r[24];
+};
+inline Unk80183918_Vec3 Unk8019DE2C_Sub(const Unk80183918_Vec3& a, const Unk80183918_Vec3& b)
+{
+    Unk80183918_Vec3 r;
+    r.m0 = a.m0 - b.m0;
+    r.m4 = a.m4 - b.m4;
+    r.m8 = a.m8 - b.m8;
+    return r;
+}
+inline float Unk8019DE2C_LenR(const Unk80183918_Vec3& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+//@8019DE2C
+extern "C" float fn_8019DE2C(void* tp, void* unused, int ia, int ib)
+{
+    Unk8019DE2C_T* t = (Unk8019DE2C_T*)tp;
+    float res = -1.0f;
+    float len = Unk8019DE2C_LenR(Unk8019DE2C_Sub(*(const Unk80183918_Vec3*)ia, *(const Unk80183918_Vec3*)ib));
+    Unk8019DE2C_R* p = &t->r[1];
+    for (int i = 0; i < 23; i++, p++) {
+        if (!(len <= p->m14)) {
+            float u = Unk8019CF3C_Norm(p->m14, len, p[-1].m14);
+            res = Unk8019CF3C_Lerp(p->m0, u, p[-1].m0);
+            break;
+        }
+    }
+    return res;
+}
+
+//@8019DF6C
+extern "C" float fn_8019DF6C(void* tp, void* unused, int ia, int ib, float f)
+{
+    Unk8019DD34_C* t = (Unk8019DD34_C*)tp;
+    float res = -1.0f;
+    float len = Unk8019DE2C_LenR(Unk8019DE2C_Sub(*(const Unk80183918_Vec3*)ia, *(const Unk80183918_Vec3*)ib));
+    float x1, y1, x2, y2;
+    for (int i = 0; i <= 22; i++) {
+        if (!(len > t[i].e[0].k)) {
+            if (fn_8019DD34(tp, &t[i], &x1, &y1, len)) {
+                if (fn_8019DD34(tp, &t[i + 1], &x2, &y2, len)) {
+                    if (!(f < x1) && !(f > x2)) {
+                        float u = Unk8019CF3C_Norm(x1, f, x2);
+                        res = Unk8019CF3C_Lerp(y2, u, y1);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return res;
 }
 
 //@8019E3C0
