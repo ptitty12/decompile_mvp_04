@@ -368,16 +368,16 @@ extern "C" RcBlk* fn_803EDCEC(RcHeap* h, int n, int rev)
 extern "C" RcBlk* fn_803EDD8C(RcHeap* h, int n, int rev, int off, int mask, int* out)
 {
     RcBlk* p = &h->head;
-    int pad;
+    int pad,address;
     if (rev == 0) {
         do {
             p = p->m10;
-            pad = ((mask & ~((int)p + off)) + 1) & mask;
+            address=(int)p+off;pad=((mask & ~address)+1)&mask;
         } while (n + pad > p->m4);
     } else {
         do {
             p = p->m14;
-            pad = ((int)p + (p->m4 + off)) & mask;
+            address=(int)p+(p->m4+off);pad=address&mask;
         } while (n + pad > p->m4);
     }
     if (p->m0 == 0x4253)
