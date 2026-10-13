@@ -155,6 +155,93 @@ void fn_80220808(Task* t, int a, RecQueue* q)
     }
 }
 
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+struct Unk8024EF40_A;
+struct Unk8024EF40_P;
+extern "C++" {
+int fn_8026D914(Unk8026C414_O* o, Unk8026C414_X* x);
+int fn_80254A90(Unk8024EF40_A* a);
+void fn_80251E80(Unk8024EF40_P* p);
+}
+extern "C++" { int fn_8026DD60(Unk8026C414_O* o, Unk8026C414_X* x); }
+int fn_802110F8(Sub* t, int kind, void* o, int k);
+void fn_801EC5F8(Task* t, int a);
+void fn_80205450(TaskInner* g, int i);
+void fn_802123D4(Task* t, int a, int b);
+void fn_8021D4A4(Task* t);
+void fn_801F0EA8(Task* t, int a);
+void fn_801F0174(Task* t, int a, int b);
+void fn_802252F4(Task* t, int a, RecQueue* q);
+float fn_804028E4(float x);
+extern const float lbl_805D6294;
+extern const float lbl_805D6298;
+extern const float lbl_805D629C;
+extern const float lbl_805D62A8;
+extern int lbl_8061B9C8;
+
+/* near-miss 98.4%: same instruction stream; differs in slwi r0 vs r11 (index temp) and the order of the lfs f1 / lfs f31
+   pair before fn_804028E4. The dead 'float k' local reproduces the stfs f31,8(r1) spill. Tried hoisting k, an int index copy. */
+void fn_80220BFC(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Player* pl = e->m28;
+    Player* p = (Player*)t->m9C->m8[a];
+    int ok = 0;
+    if (fn_8026D914((Unk8026C414_O*)p, 0) == 1)
+        goto set;
+    if (e->m90 > lbl_805D6294)
+        goto big;
+    if (fn_80254A90((Unk8024EF40_A*)&pl->m58C) != 0)
+        goto after;
+set:
+    ok = 1;
+    goto after;
+big:
+    if (*(unsigned*)((char*)pl + 0x590) & 0x20000000)
+        goto set;
+    e->m90 = e->m90 - lbl_805D6298;
+after:
+    if (ok == 1) {
+        if (e->m1C == 3 && fn_8026D914((Unk8026C414_O*)p, 0) == 1) {
+            if (p->m44C->m6CC->m36C == 0) {
+                fn_80251E80((Unk8024EF40_P*)p);
+                fn_80205450(t->m9C, a);
+                fn_802123D4(t, 0, 1);
+                fn_8021D4A4(t);
+                if (fn_80210C98((Sub*)&t->m9C, 0) == 1) {
+                    fn_801EC5F8(t, a);
+                    return;
+                }
+                goto generic;
+            }
+            return;
+        }
+    generic:
+        fn_801F0EA8(t, a);
+        if (p->m450 != 0) {
+            fn_80251E80((Unk8024EF40_P*)p);
+            fn_801F0174(t, a, 0);
+        } else {
+            fn_80205450(t->m9C, a);
+            fn_802123D4(t, 0, 1);
+            fn_8021D4A4(t);
+            if (fn_80210C98((Sub*)&t->m9C, 0) == 1)
+                fn_801EC5F8(t, a);
+        }
+    } else {
+        float k = lbl_805D629C;
+        float v = fn_804028E4(*(float*)((char*)pl + 0x8E8)) / ((float)lbl_8061B9C8 * lbl_805D62A8);
+        if (fn_8026DD60((Unk8026C414_O*)pl, 0) == 0) {
+            if (fn_802110F8((Sub*)&t->m9C, 2, pl, e->m1C) == 0 || !(v >= lbl_805D629C)) {
+                fn_801F0174(t, a, 0);
+                return;
+            }
+        }
+        fn_802252F4(t, a, (RecQueue*)e);
+    }
+}
+
 void fn_80220E48(Task* t, int a, Player* p)
 {
     TaskInner* in = t->m9C;
@@ -453,4 +540,81 @@ void fn_80222B54(Task* t, int a, RecQueue* q)
         fn_801F0174(t, a, 0);
     }
 }
+}
+
+extern "C" {
+
+void fn_801BCD3C(void* x, Obj4_36C* c, void* pp, int z);
+void fn_80189300(Obj4_36C* c, void* pp);
+extern int lbl_8061D138;
+extern const float lbl_805D63E4;
+
+/* near-miss: same instruction stream as retail; differs only in slwi r0 vs r11 and the zero/one constant registers of the early-return
+   store block (retail reuses r0 for li 1 and li 0; ours keeps li 0 in r11). Tried all 24 orders of the four stores. */
+void fn_80222D70(Task* t, int a, RecQueue* q)
+{
+    Rec* e = &q->e[0];
+    Obj4_36C* o = t->m9C->m4;
+    if (e->mA4 != 0) {
+        fn_802044A4(t, a, (char*)q + 0x48, e->m84);
+        e->mA4 = 0;
+    }
+    if (fn_80205664(t->m9C) == 1)
+        fn_801E8A3C(t->m9C->m3A64, a, -1);
+    TaskInner* in = t->m9C;
+    if (in->m88 > 5) {
+        in->m88 = 0;
+        if (o != 0 && o->m36C == 0) {
+            TaskInner* in2 = t->m9C;
+            PosObj* pp = (PosObj*)in2->m8[a];
+            if (pp != 0) {
+                Vec3f d = ((PosObj*)o)->m60 - pp->m60;
+                if (!(d.x * d.x + d.y * d.y + d.z * d.z >= 3600.0f)) {
+                    if (o->m38C == 1 || o->m390 == 1)
+                        fn_801BCD3C(*(void**)((char*)in2->m0->m700 + 0x3BC), o, pp, 0);
+                    fn_80189300(o, pp);
+                }
+            }
+        }
+    }
+    if (lbl_8061D138 == 0) {
+        Unk80222B54_S* sub = (Unk80222B54_S*)((char*)t + 0xA0);
+        if (!(e->m84 < sub->m4)) {
+            float v = (float)t->m9C->m0->m4C * 0.016666668f + fn_8018A214(o);
+            if (!(v < e->m84)) {
+                SetM4(sub, v);
+                fn_80205450(t->m9C, a);
+                fn_802123D4(t, 1, 1);
+                fn_801EC5F8(t, a);
+            }
+        }
+    }
+    if (o->m36C != 0) {
+        t->m9C->mA4 = -1;
+        t->m9C->m30 = 4;
+        if (o->m36C->m460 != a) {
+            e->mA4 = 1;
+            e->m80 = lbl_805D63E4;
+            e->m9C = 0;
+            e->mAC = 0;
+            return;
+        }
+        if (t->m9C->m6A8 == 1 && fn_80210C98((Sub*)&t->m9C, 3) == 0) {
+            int r = fn_802055F4(t->m9C);
+            if (r == 0) {
+                fn_80205450(t->m9C, a);
+                fn_801EE6F4(t, a);
+                fn_801F0EA8(t, a);
+                fn_802123D4(t, 1, 1);
+                fn_8021CE28(t, 0.8333334f);
+                t->m9C->m6A8 = r;
+                return;
+            }
+        }
+        fn_801EE6F4(t, a);
+        fn_801F0EA8(t, a);
+        fn_801F0174(t, a, 0);
+    }
+}
+
 }
