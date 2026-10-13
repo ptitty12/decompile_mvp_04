@@ -907,6 +907,78 @@ extern "C" DB_OVERLAY void fn_8056350C(int x)
     } while (cur <= 3);
 }
 
+
+int fn_80076644(int,int,int);
+int fn_8007668C(int,int);
+extern "C" int fn_8007F1E0__FP13Unk8007F198_Aii(Unk8007F198_A*,int,int);
+extern "C" int fn_8007E10C__FP13Unk8007DB74_Ai(void*,int);
+extern "C" int fn_8007DED4__FP13Unk8007DB74_Aiii(void*,int,int,int);
+extern "C" void fn_8007E39C__FP13Unk8007DB74_Aiii(void*,int,int,int);
+extern "C" int fn_8007E48C__FP13Unk8007DB74_Aii(void*,int,int);
+extern "C" int fn_8007E7F0__FP13Unk8007DB74_Aii(void*,int,int);
+extern "C" int fn_8007EAF0__FP13Unk8007DB74_Aii(void*,int,int);
+extern "C" int fn_8007EDF0__FP13Unk8007DB74_Aii(void*,int,int);
+extern "C" int fn_8007F0F0__FP13Unk8007DB74_Aii(void*,int,int);
+extern const float lbl_805FF82C;
+
+/* The entry call retains player in r4 and passes team in r5 to F1E0.
+ * E154 returns the player id (provider game/tu_8007DB74.cpp), used by 7824C.
+ * Negated >=/<= tests preserve retail's unordered floating-point behavior. */
+extern "C" DB_OVERLAY void fn_80563140(int team,int player)
+{
+    Unk8007A4DC_Screen* sc=lbl_8061930C;
+    if(fn_8007F1E0__FP13Unk8007F198_Aii((Unk8007F198_A*)sc,player,team)==0) return;
+    int valid=sc->fn_8007A270(player);
+    int position=sc->fn_8007A6A0(5,player);
+    float score = fn_8007824C(player,0);
+    if(fn_8007E48C__FP13Unk8007DB74_Aii(sc,team,player)!=0 ||
+       fn_8007E7F0__FP13Unk8007DB74_Aii(sc,team,player)!=0 ||
+       fn_8007EAF0__FP13Unk8007DB74_Aii(sc,team,player)!=0 ||
+       fn_8007EDF0__FP13Unk8007DB74_Aii(sc,team,player)!=0 ||
+       fn_8007F0F0__FP13Unk8007DB74_Aii(sc,team,player)!=0) return;
+    if(valid!=0) {
+        if(position==0) {
+            int count=fn_8007E10C__FP13Unk8007DB74_Ai(sc,team);
+            if(count<=4) {fn_8007E34C__FP13Unk8007DB74_Aii(sc,team,player);return;}
+            float best = fn_8007824C(fn_8007E154__FP13Unk8007DB74_Aii(sc,team,0),0);
+            int chosen=0;
+            for(int i=1;i<count;i++) {
+                float current = fn_8007824C(fn_8007E154__FP13Unk8007DB74_Aii(sc,team,i),0);
+                if(!(current>=best)) {best=current;chosen=i;}
+            }
+            if(!(score<=best)) fn_8007E39C__FP13Unk8007DB74_Aiii(sc,team,player,chosen);
+        }
+        fn_80562E34(team);
+        return;
+    }
+    for(int group=0;group<=3;group++) {
+        if(fn_8007DED4__FP13Unk8007DB74_Aiii(sc,team,player,group)==0) {
+            for(int slot=0;slot<=9;slot++) {
+                if(slot==0 || (slot==9 && group!=2 && group!=0)) continue;
+                if(fn_8007DDC8__FP13Unk8007DB74_Aiii(sc,team,group,slot)==0 && fn_80076644(slot,position,sc->fn_8007A6A0(6,player))) {
+                    fn_8007DD38__FP13Unk8007DB74_Aiiii(sc,team,group,slot,player);break;
+                }
+            }
+        }
+    }
+    for(int group=0;group<=3;group++) {
+        if(fn_8007DED4__FP13Unk8007DB74_Aiii(sc,team,player,group)==0) {
+            for(int slot=0;slot<=9;slot++) {
+                if(slot==0 || (slot==9 && group!=2 && group!=0)) continue;
+                if(fn_80076644(slot,position,sc->fn_8007A6A0(6,player))) {
+                    int other=fn_8007DDC8__FP13Unk8007DB74_Aiii(sc,team,group,slot);
+                    if(other!=0) {
+                        float candidate = fn_8007824C(other,0);
+                        int otherpos=sc->fn_8007A6A0(6,other);
+                        if(fn_8007668C(slot,sc->fn_8007A6A0(6,other)) && !fn_8007668C(slot,otherpos)) candidate*=lbl_805FF82C;
+                        if(!(score<candidate)) {fn_8007DD38__FP13Unk8007DB74_Aiiii(sc,team,group,slot,player);break;}
+                    }
+                }
+            }
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80563628(int a, int b, int c)
 {
     Unk8007A4DC_Screen* sc = lbl_8061930C;
