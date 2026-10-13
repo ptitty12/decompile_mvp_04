@@ -155,6 +155,7 @@ public:
     virtual int fn_80005E8C();
     virtual void fn_80005A50();
     virtual void fn_80005F4C(int a, int b, int c);
+    void fn_80170668(Unk8016FF40* a, int b);
 };
 class Unk801748D8_Obj {
 public:
