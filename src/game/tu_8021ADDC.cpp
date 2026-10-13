@@ -68,6 +68,57 @@ inline int NeFlag(int a, int b)
         r = 1;
     return r;
 }
+struct Unk8021BA44_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+inline Vec3f Unk8021BA44_Flat(Unk8021BA44_Obj* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+extern "C" int fn_802112B4(Sub* t, Player** out);
+extern const Vec3f lbl_806055DC;
+extern const float lbl_805D60DC;
+void fn_8021BA44(Task* t)
+{
+    Unk8021BA44_Obj* cur = (Unk8021BA44_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    Vec3f pos = lbl_806055DC;
+    Unk8021BA44_Obj* tgt = 0;
+    fn_802112B4((Sub*)&t->m9C, (Player**)&tgt);
+    if (tgt != 0) {
+        pos = Unk8021BA44_Flat(tgt) - Unk8021BA44_Flat(cur);
+    }
+    RecQueue* q = t->m9C->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 3;
+    e->m0 = 0xF;
+    e->m9C = 1;
+    e->mC = 1;
+    e->m8 = 1;
+    e->m80 = lbl_805D60DC;
+    int diff = 0;
+    Vec3f* pp = &pos;
+    Vec3f* kp = (Vec3f*)&lbl_806055DC;
+    if (pos.x != kp->x || pp->y != kp->y || pp->z != kp->z)
+        diff = 1;
+    if (diff != 0) {
+        e->m94 = 1;
+        e->m50 = pos;
+    }
+}
+
 /* near-miss: 148/148 insns, 16 slots differ (98%), all register numbers or scheduling order. Retail loads the
    lbl_806055DC.x float (lfs f0) before the word loads of the struct copy, and keeps &cur->m60 in r4 so the li
    constants 3 and 6 land in r5 and r6 (ours r4 and r5, pointer in r6). Tried: compare forms (else-if chain, negated
