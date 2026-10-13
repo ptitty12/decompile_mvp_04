@@ -4,6 +4,9 @@
  * .text 0x803FEB34-0x803FFD9C (code-only unit, 31 functions; TU boundaries approximate, placeholder).
  * Every data object is extern by its lbl_ name.
  */
+/* newlib ctype table: byte zero is the EOF sentinel. */
+extern "C" const char _ctype_[];
+
 
 /* RealCore async file I/O front end (hd: device). Callees are the request-queue entry points of tu_803F9350. */
 extern "C" void fn_8040021C(int on);
@@ -32,7 +35,6 @@ struct FsState {
 };
 extern FsState lbl_806ADEC0;
 extern char lbl_806B8238[];
-extern const unsigned char lbl_8060E9F1[];
 extern unsigned char lbl_806EEAB0;
 extern "C" {
 int OSSendMessage(void* q, int msg, int flags);
@@ -278,7 +280,7 @@ extern "C" int fn_803FF008(const char* a, const char* b)
         if (cb == 0)
             return i;
         int ca = a[i];
-        if (lbl_8060E9F1[ca] & 1)
+        if (((const unsigned char*)_ctype_ + 1)[ca] & 1)
             ca += 0x20;
         if (ca != cb)
             return 0;
