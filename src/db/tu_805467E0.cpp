@@ -277,28 +277,19 @@ DB_OVERLAY int fn_80546B18(char* o, int a, int b)
     return 0;
 }
 
-/* near-miss: retail sets r3 (this) in each arm and jumps to one shared call tail; ours sets it once */
 DB_OVERLAY int fn_80546BCC(char* o, int a, int b)
 {
     if (*(int*)(o + 0x107F0) == 0) {
         int ao = a * 4;
         return *(int*)((char*)*(int**)(o + 0x32E0) + ao);
     }
-    int* arr = *(int**)(o + 0x32E0);
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
-    int h = s->fn_80075948(arr[a]);
-    int k;
-    if (b <= 0x18)
-        k = 0;
-    else if (b <= 0x31)
-        k = 1;
-    else if (b <= 0x4A)
-        k = 2;
-    else if (b <= 0x63)
-        k = 3;
-    else
-        return 0;
-    return s->fn_8007B320(k, h);
+    int h = s->fn_80075948(IntAt((char*)IntAt(o,0x32E0),a*4));
+    if (b <= 0x18) return s->fn_8007B320(0,h);
+    if (b <= 0x31) return s->fn_8007B320(1,h);
+    if (b <= 0x4A) return s->fn_8007B320(2,h);
+    if (b <= 0x63) return s->fn_8007B320(3,h);
+    return 0;
 }
 
 void fn_8036179C(void* p);

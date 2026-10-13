@@ -200,6 +200,40 @@ int fn_80084114(int x);
 void fn_80084170(int x, int* lo, int* hi);
 int fn_80084600(int x);
 
+
+extern "C" Unk8007F198_DI* fn_8007FE04__FP13Unk8007F198_D(Unk8007F198_D*);
+extern "C" int fn_8007F7D0__FP13Unk8007F198_BUi(void*, unsigned);
+extern "C" int fn_8007B320__18Unk8007B2B0_Screenii(void*, int, int);
+extern "C" int fn_8007B8C4__18Unk8007B2B0_Screenii(void*, int, int);
+extern "C" int fn_80596538(void*, int);
+extern float lbl_80601A40[][4];
+/* fn_80565FD4 reads mode words at +0x1EC/+0x22C and the screen table
+ * through +0x30 then +0x10. These views leave shared layouts unchanged. */
+struct Db80565FD4_Mode { char pad0[0x1EC]; int m1EC; char pad1F0[0x22C-0x1F0]; int m22C; };
+struct Db80565FD4_Sub { char pad0[0x10]; void* m10; };
+struct Db80565FD4_Screen { char pad0[0x30]; Db80565FD4_Sub* m30; };
+extern "C" DB_OVERLAY int fn_80565FD4(Db80565CDC_S* s, int a, int idx)
+{
+    Unk8007A4DC_Screen* g=lbl_8061930C;
+    if (((Db80565FD4_Mode*)fn_8007FE04__FP13Unk8007F198_D((Unk8007F198_D*)g))->m1EC && fn_80566674(s)!=1) {
+        if(fn_80084600(a)==1) return 0;
+        TblSet tables=&s->m28;
+        int side=fn_80084114(a);
+        Unk8052B5C4_Ent* entry=(Unk8052B5C4_Ent*)(idx*28+(int)TblAt(tables,side)->m8);
+        int id=*(int*)((char*)entry+4);
+        if(side!=0 || ((Db80565FD4_Mode*)fn_8007FE04__FP13Unk8007F198_D((Unk8007F198_D*)g))->m22C!=13 || fn_8007B320__18Unk8007B2B0_Screenii(g,0,fn_8007F7D0__FP13Unk8007F198_BUi(g,0))!=id || fn_80596538(((Db80565FD4_Screen*)g)->m30->m10,idx)!=1) {
+            Unk80329FA0_Out d=fn_80329FA0(KeyAt(TblAt(tables,side),idx));
+            if ((unsigned)(d.m0-3)<=2) {
+                int group=fn_8007B8C4__18Unk8007B2B0_Screenii(lbl_8061930C,5,id);
+                float chance=lbl_80601A40[group][d.m0-2];
+                float random=fn_8056FFB0();
+                return random<chance;
+            }
+        }
+    }
+    return 0;
+}
+
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
     int a = fn_80566570(s);
@@ -272,23 +306,16 @@ extern "C" DB_OVERLAY int fn_805666E0(Db80565CDC_S* s, int y)
     return 0;
 }
 
-/* near-miss: ours keeps &out in a saved register; retail forms the frame address per use (35 vs 34 insns). */
 extern "C" DB_OVERLAY int fn_8056681C(Db80565CDC_S* s, int v)
 {
-    Unk80329FA0_Out o = fn_80329FA0(v);
-    int base = fn_805668A4(s, o.m2);
+    int base = fn_805668A4(s, fn_80329FA0(v).m2);
     if (v < base)
         return -1;
     int d = v - base;
-    if (d > 6) {
-        if (d > 13) {
-            if (d > 20)
-                return 3;
-            return 2;
-        }
-        return 1;
-    }
-    return 0;
+    if (d <= 6) return 0;
+    if (d <= 13) return 1;
+    if (d <= 20) return 2;
+    return 3;
 }
 
 /* near-miss: the stores and calls match; retail builds the by-value date in place (frame word at 8, address

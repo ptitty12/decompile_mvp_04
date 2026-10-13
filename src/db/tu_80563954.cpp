@@ -313,20 +313,15 @@ extern "C" DB_OVERLAY void fn_80564E6C(Db80565CDC_S* s)
         fn_8056516C(s, 0x7D5);
 }
 
-/* near-miss: the 12-byte and 4-byte results are read straight from the frame in retail; ours forms their
- * addresses in saved registers (22 vs 21 insns). */
 extern "C" DB_OVERLAY void fn_8056503C(Db80565CDC_S* s)
 {
-    Unk8007F198_S12 t = fn_8052BD58(s->m28);
-    Unk80329FA0_Out o = fn_80329FA0(t.w0);
-    fn_805650DC(s, o.m2 + 1);
+    int key = fn_8052BD58(s->m28).w0;
+    fn_805650DC(s, fn_80329FA0(key).m2 + 1);
 }
 
-/* near-miss: as fn_8056503C (20 vs 19 insns). */
 extern "C" DB_OVERLAY void fn_80565090(Db80565CDC_S* s)
 {
-    Unk80329FA0_Out o = fn_80329FA0(*(unsigned short*)s->m28->m8);
-    fn_8056516C(s, o.m2);
+    fn_8056516C(s, fn_80329FA0(*(unsigned short*)s->m28->m8).m2);
 }
 
 extern "C" DB_OVERLAY void fn_805650DC(Db80565CDC_S* self, int y)
