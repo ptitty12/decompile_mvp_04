@@ -298,3 +298,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `db/tu_80574AE4` `fn_80577218`: 99.49468%, 188/188 instructions; comparator branches and the two 12-byte statistics constructors match, but winning-rate denominator/zero FPR allocation differs after ten forms; source dropped.
 
 - `db/tu_80574AE4` `fn_8057AF3C`: 99.02778%, 216/216 instructions; one argument move crosses four setup instructions after twenty bounded forms; canonical round queries and the observed nine-word record swap preserved in scratch only.
+
+- `fe/tu_8043FDC0` `fn_80440210`: 97.89474%, 19/19 instructions after six bounded countdown forms; the count and one-based index occupy r31/r30 instead of retail r30/r31; failed drafts kept in scratch only.
