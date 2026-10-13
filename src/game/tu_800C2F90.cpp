@@ -7,8 +7,9 @@
 
 extern Unk8007B2B0_Screen* lbl_8061930C;
 
-extern "C" {
 void fn_800DC3D8(int* a, int* b, int c);
+
+extern "C" {
 int fn_800DC1B8(int a, int b, int c, int d, int e);
 void fn_800C42FC(Unk800C341C_Mgr* m, int w, int a);
 int fn_800DBAE0(int a, int b, int c, int d);
@@ -20,11 +21,12 @@ extern "C" {
 void fn_800C40B4(Unk800C341C_Mgr* m, int w, int c, int obj);
 }
 
-extern "C" int fn_8025416C(char* p, int a);
+struct Unk8024EF40_W;
+int fn_8025416C(Unk8024EF40_W* p, int a);
 extern "C" void fn_800C3ED4(Unk800C341C_Mgr* m, int w, int obj);
 
 extern "C" {
-int fn_804089B4(char* dst, const char* fmt, ...);
+int sprintf(char* dst, const char* fmt, ...);
 }
 
 extern const float lbl_805BBE14;
@@ -53,7 +55,7 @@ struct Unk800C49C4_Letters {
 };
 extern const Unk800C493C_Letters lbl_805BBE98 __attribute__((aligned(4)));
 extern const Unk800C49C4_Letters lbl_805BBEAC __attribute__((aligned(4)));
-extern "C" int fn_8040B574(const char* a, const char* b);
+extern "C" int strcmp(const char* a, const char* b);
 extern "C" void fn_80433004(void* a, int b);
 extern "C" int fn_800C5CF8(Unk800C341C_Mgr* m, const char* name);
 extern "C" void* fn_803774A8(unsigned n, int heap);
@@ -73,8 +75,10 @@ void fn_80400CE4(int a);
 void fn_803FB888(int a);
 int fn_803FB6FC(int a);
 void fn_803FFFA8(int a);
-void* fn_802B0638(void* obj, const char* name, int a);
 }
+
+struct Unk802ACD88_Mgr;
+void fn_802B0638(Unk802ACD88_Mgr* obj, const char* name, int a);
 
 extern void* lbl_8061E978;
 struct Unk800C4C48_Tbl {
@@ -152,28 +156,29 @@ extern "C" void fn_800C2FF0(Unk800C2250_File* f)
     f->m464 = 0;
 }
 
+struct Unk802ACD88_Mgr;
+void fn_802B058C(Unk802ACD88_Mgr* obj, const char* name, void* a);
+int fn_802B94EC(int path, int a, int b, int c);
+int fn_802B96A4(int a, int b, int c);
 extern "C" {
-int fn_802B96A4(const char* path, void* a, int b);
-void fn_802B94EC(const char* path, void* a, int b, int c);
-void fn_802B058C(void* obj, Unk800C2250_File* f, void* a);
 void fn_800C2A1C(Unk800C2250_File* f, Unk800C1BE4_Widget* w, float t);
-char* fn_8040B61C(char* dst, const char* src);
+char* strcpy(char* dst, const char* src);
 void fn_800C313C(Unk800C2250_File* f);
 }
 
 extern "C" void fn_800C3054(Unk800C2250_File* f, const char* name, Unk800C1BE4_Widget* w, int c, float t)
 {
     char buf[0x400];
-    fn_8040B61C(&f->m0, name);
-    fn_804089B4(buf, lbl_805BBD3C, name, lbl_805BB0E4);
+    strcpy(&f->m0, name);
+    sprintf(buf, lbl_805BBD3C, name, lbl_805BB0E4);
     if (c != 0) {
         f->m454 = 1;
-        f->m458 = fn_802B96A4(buf, f->m45C, f->m460);
+        f->m458 = fn_802B96A4((int)buf, (int)f->m45C, f->m460);
         f->m404 = 3;
         fn_800C2A1C(f, w, t);
     } else {
-        fn_802B94EC(buf, f->m45C, f->m460, 14);
-        fn_802B058C(lbl_8061E978, f, f->m45C);
+        fn_802B94EC((int)buf, (int)f->m45C, f->m460, 14);
+        fn_802B058C((Unk802ACD88_Mgr*)lbl_8061E978, (const char*)f, f->m45C);
         f->m404 = 4;
         fn_800C2A1C(f, w, t);
         fn_800C313C(f);
@@ -202,7 +207,7 @@ extern "C" void fn_800C31FC(Unk800C2250_File* f)
         break;
     case 4:
     case 5:
-        fn_802B0638(lbl_8061E978, fn_800C2F84(f), 0);
+        fn_802B0638((Unk802ACD88_Mgr*)lbl_8061E978, fn_800C2F84(f), 0);
         break;
     case 3:
         if (fn_800C33D0()->m0 != 0) {
@@ -272,7 +277,7 @@ extern "C" void fn_800C334C(Unk800C2250_File* f)
         case 18:
         case 19:
         case 20:
-            delete[] (char*)f->m45C;
+            if (f->m45C != 0) fn_80377488((void*)f->m45C);
             f->m45C = 0;
             f->m464 = 60;
             break;
@@ -287,7 +292,8 @@ extern "C" Unk800C341C_Mgr* fn_800C33D0()
     return lbl_8061ABDC;
 }
 
-extern "C" void fn_80356E88(Unk800C3A10_Rec* r);
+struct Unk80356E88;
+void fn_80356E88(Unk80356E88* r);
 extern const char lbl_80658378[];
 
 extern "C" Unk800C341C_Mgr* fn_800C341C(Unk800C341C_Mgr* m)
@@ -342,7 +348,7 @@ extern "C" Unk800C341C_Mgr* fn_800C341C(Unk800C341C_Mgr* m)
     Unk800C3A10_Rec* r = &m->recs[0];
     n = 11;
     do {
-        fn_80356E88(r);
+        fn_80356E88((Unk80356E88*)r);
         r++;
     } while (n-- != 0);
     m->m5D94 = 0;
@@ -606,17 +612,17 @@ extern "C" void fn_800C3DCC(Unk800C341C_Mgr* m, int w, Unk800C3FEC_Obj* obj)
         lbl_8061A32C = fn_800B64BC((Unk800B64BC_Mgr*)operator new(0xD8, 0));
     if (lbl_8061A32C->mB8 == 1) {
         char* p = (char*)obj + 0x588;
-        int k = fn_8025416C(p, 7);
+        int k = fn_8025416C((Unk8024EF40_W*)p, 7);
         if (k >= 0) {
             if (k > 1) {
                 if (k == 2) {
                     Unk800C3FEC_Tmp t;
-                    fn_80356930(&t);
+                    fn_80356930((char*)&t);
                     obj->fn_vslot11(&t, -1);
                     fn_800C422C(m, w, t.m2C - 0x385, t.m34, t.m3C, t.m38);
                 }
             } else {
-                fn_800C429C(m, w, fn_8025416C(p, 0));
+                fn_800C429C(m, w, fn_8025416C((Unk8024EF40_W*)p, 0));
             }
         }
     } else {
@@ -652,7 +658,7 @@ extern "C" void fn_800C3FEC(Unk800C341C_Mgr* m, int w, int c, Unk800C3FEC_Obj* o
         lbl_8061A32C = fn_800B64BC((Unk800B64BC_Mgr*)operator new(0xD8, 0));
     if (lbl_8061A32C->mB8 == 1) {
         Unk800C3FEC_Tmp t;
-        fn_80356930(&t);
+        fn_80356930((char*)&t);
         obj->fn_vslot11(&t, -1);
         fn_800C422C(m, w, t.m2C - 0x385, t.m34, t.m3C, t.m38);
     } else {
@@ -690,21 +696,21 @@ extern "C" void fn_800C40B4(Unk800C341C_Mgr* m, int w, int c, int obj)
 extern "C" void fn_800C422C(Unk800C341C_Mgr* m, int idx, int a, int b, int unused, int d)
 {
     char buf[1024];
-    fn_804089B4(buf, lbl_805BBE1C, a + 0x61, b + 0x61, 0x64, d + 0x61);
+    sprintf(buf, lbl_805BBE1C, a + 0x61, b + 0x61, 0x64, d + 0x61);
     fn_800C537C(m, 1, buf, idx, lbl_805BBE28, 1);
 }
 
 extern "C" void fn_800C429C(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[1024];
-    fn_804089B4(buf, lbl_805BBE2C, x);
+    sprintf(buf, lbl_805BBE2C, x);
     fn_800C537C(m, 1, buf, idx, lbl_805BBE34, 1);
 }
 
 extern "C" void fn_800C42FC(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[1024];
-    fn_804089B4(buf, lbl_805BBE38, x);
+    sprintf(buf, lbl_805BBE38, x);
     fn_800C537C(m, 1, buf, idx, lbl_805BBE40, 1);
 }
 
@@ -762,7 +768,7 @@ extern "C" void fn_800C44E8(Unk800C341C_Mgr* m, Unk800C1BE4_Widget* w, int idx)
 extern "C" void fn_800C4568(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[1024];
-    fn_804089B4(buf, lbl_805BBE4C, x);
+    sprintf(buf, lbl_805BBE4C, x);
     fn_800C537C(m, 5, buf, idx, lbl_805BBE54, 1);
 }
 
@@ -817,7 +823,7 @@ extern "C" int fn_800C45C8(Unk800C341C_Mgr* m, Unk800D2338_Obj* w, int x)
 extern "C" void fn_800C4720(Unk800C341C_Mgr* m, Unk800D2338_Obj* w)
 {
     char buf[0x400];
-    fn_804089B4(buf, lbl_805BBE6C, w->fn_vslot33(0), lbl_805BB0E4);
+    sprintf(buf, lbl_805BBE6C, w->fn_vslot33(0), lbl_805BB0E4);
     int idx = fn_800C5CF8(m, buf);
     if (idx != -1) {
         Unk800C2250_File* f = &m->files[idx];
@@ -860,7 +866,7 @@ extern "C" void fn_800C493C(Unk800C341C_Mgr* m, int idx, int k)
 {
     Unk800C493C_Letters t __attribute__((aligned(4))) = lbl_805BBE98;
     char buf[24];
-    fn_804089B4(buf, lbl_805BBEA0, t.c[k]);
+    sprintf(buf, lbl_805BBEA0, t.c[k]);
     fn_800C537C(m, 0xe, buf, idx, lbl_805BBEA8, 1);
 }
 
@@ -870,42 +876,42 @@ extern "C" void fn_800C49C4(Unk800C341C_Mgr* m, int idx, int k, int z)
     char buf[24];
     if (k == 0)
         z = 0;
-    fn_804089B4(buf, lbl_805BBEBC, t.c[k], z);
+    sprintf(buf, lbl_805BBEBC, t.c[k], z);
     fn_800C537C(m, 0xf, buf, idx, lbl_805BBEC4, 1);
 }
 
 extern "C" void fn_800C4A68(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBEC8, x);
+    sprintf(buf, lbl_805BBEC8, x);
     fn_800C537C(m, 16, buf, idx, lbl_805BBED0, 1);
 }
 
 extern "C" void fn_800C4AC8(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBED4, x);
+    sprintf(buf, lbl_805BBED4, x);
     fn_800C537C(m, 17, buf, idx, lbl_805BBEDC, 1);
 }
 
 extern "C" void fn_800C4B28(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBEE0, x);
+    sprintf(buf, lbl_805BBEE0, x);
     fn_800C537C(m, 18, buf, idx, lbl_805BBEE8, 1);
 }
 
 extern "C" void fn_800C4B88(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBEE0, x);
+    sprintf(buf, lbl_805BBEE0, x);
     fn_800C537C(m, 18, buf, idx, lbl_805BBEEC, 1);
 }
 
 extern "C" void fn_800C4BE8(Unk800C341C_Mgr* m, int idx, int x)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBEC8, x);
+    sprintf(buf, lbl_805BBEC8, x);
     fn_800C537C(m, 16, buf, idx, lbl_805BBEF0, 1);
 }
 
@@ -913,14 +919,14 @@ extern "C" void fn_800C4C48(Unk800C341C_Mgr* m, int w, int idx)
 {
     Unk800C4C48_Tbl t __attribute__((aligned(4))) = lbl_805BBEF4;
     char buf[20];
-    fn_804089B4(buf, lbl_805BBF34, t.v[idx]);
+    sprintf(buf, lbl_805BBF34, t.v[idx]);
     fn_800C537C(m, 0x13, buf, w, lbl_805BBF3C, 1);
 }
 
 extern "C" void fn_800C4D28(Unk800C341C_Mgr* m, int idx, int x, int y)
 {
     char buf[24];
-    fn_804089B4(buf, lbl_805BBF40, x, (char)(y + 0x61));
+    sprintf(buf, lbl_805BBF40, x, (char)(y + 0x61));
     fn_800C537C(m, 0x14, buf, idx, lbl_805BBF48, 1);
 }
 
@@ -970,7 +976,7 @@ extern "C" void fn_800C4F64(Unk800C341C_Mgr* m, const char* name)
 
 extern "C" void fn_800C4FA8(Unk800C341C_Mgr* m, const char* name)
 {
-    if (fn_8040B574(name, &lbl_805B6F58) != 0) {
+    if (strcmp(name, &lbl_805B6F58) != 0) {
         int idx = fn_800C5CF8(m, name);
         if (idx != -1)
             fn_800C28C8(&m->files[idx]);
@@ -1011,3 +1017,4 @@ extern "C" int fn_800C512C(Unk800C341C_Mgr* m, int idx)
 {
     return fn_800C2F74(&m->files[idx]);
 }
+

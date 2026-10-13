@@ -2349,7 +2349,7 @@ struct Unk800C3FEC_Tmp {
     int m3C;
     char pad40[0xC0 - 0x40];
 };
-extern "C" void fn_80356930(Unk800C3FEC_Tmp* t);
+void* fn_80356930(char* t);
 /* Object whose vptr is at +0x98 (slot 11 fills a temp from the object). */
 struct Unk800C3FEC_Data {
     char pad0[0x98];
