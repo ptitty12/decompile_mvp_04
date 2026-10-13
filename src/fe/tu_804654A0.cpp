@@ -141,29 +141,21 @@ no:
     return 0;
 }
 
-/* near-miss: 1 instruction short (retail hoists `li r3,1` ahead of the last beq; tried 12 tail forms) */
 FE_OVERLAY int fn_804672F4(unsigned k, int a, int b)
 {
     void* g = lbl_8061930C;
     if (k <= 1) {
         if (a == 0 || fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_80075948__18Unk8007B2B0_Screeni(g, a))) != k) {
-            if (b != 0) {
-                if (fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_80075948__18Unk8007B2B0_Screeni(g, b))) == k)
-                    goto yes;
-            }
-            goto no;
+            if (b != 0 && fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, fn_8007B320__18Unk8007B2B0_Screenii(g, 0, fn_80075948__18Unk8007B2B0_Screeni(g, b))) == k)
+                return 1;
+            return 0;
         }
-        goto yes;
-    }
-    if (a != 0 && fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, a) == k) {
-yes:
         return 1;
     }
-    if (b != 0) {
-        if (fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, b) == k)
-            goto yes;
-    }
-no:
+    if (a != 0 && fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, a) == k)
+        return 1;
+    if (b != 0 && fn_8007B8C4__18Unk8007B2B0_Screenii(g, 0, b) == k)
+        return 1;
     return 0;
 }
 
