@@ -254,6 +254,43 @@ extern "C" void fn_803FB3DC(int count, int arg)
 }
 
 
+struct RcEntV {
+    int m0;
+    char pad4[0x18];
+    int m1C;
+    char pad20[0x10];
+};
+extern "C" void fn_803FB4B0()
+{
+    if (lbl_806EEA98 != 0) {
+        int i;
+        for (i = 0; i < lbl_806EF468; i++)
+            fn_803FB888(lbl_806EEA98[i].m0);
+        for (;;) {
+            int busy = 0;
+            i = 0;
+            if (i < lbl_806EF468) {
+                RcEntV* e = (RcEntV*)lbl_806EEA98;
+                i = lbl_806EF468;
+                do {
+                    if (e->m1C != 0)
+                        busy = 1;
+                    e++;
+                } while (--i != 0);
+            }
+            if (busy == 0)
+                break;
+            if (fn_80400008(0) != 0)
+                fn_80400CE4(0);
+            fn_803FFFA8(0);
+        }
+        RcEnt* z = 0;
+        lbl_806ADE94[0]((int)lbl_806EEA98);
+        fn_804007FC(lbl_806ADEA0);
+        lbl_806EEA98 = z;
+    }
+}
+
 extern "C" int fn_803FB59C(int a, int b)
 {
     RcLNode* n = fn_803FAF00(&lbl_806EF46C);
