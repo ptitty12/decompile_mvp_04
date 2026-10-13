@@ -335,6 +335,43 @@ extern "C" FE_OVERLAY int fn_80476220(int x, int b)
     return lbl_806217E8[fn_80476134(x, b)];
 }
 
+extern "C" FE_OVERLAY void fn_80476258(void* x)
+{
+    char b8[0x68];
+    char b70[200];
+    float fv[4];
+    float* p26C;
+    int i270;
+    char b148[0x20];
+    char b168[0x100];
+    char* p8 = b8;
+    char* p70 = b70;
+    char* p148 = b148;
+    char* p168 = b168;
+    int id = FeI(x, 0x138);
+    fn_80563F3C(*(int*)((char*)lbl_80619948 + 0x3C), FeI(x, 0x134), id, &fv[0], &p26C, &i270, 0, 0);
+    fv[2] = fv[0];
+    ((char* (*)(char*, int, int, float))fn_800DF254)(p8, 0, 3, fv[2]);
+    ((char* (*)(char*, const char*, ...))fn_80403DE4)(p70, (const char*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x389D), p26C, p8);
+    ((FeWV*)FeWp(x, 0x170))->s28(p70);
+    ((void (*)(void*, void*))fn_804031BC)(p148, lbl_805F5EEC);
+    int g = fn_8007A270__18Unk8007A4DC_Screeni(lbl_8061930C, id);
+    const char* s1 = (const char*)fn_80090880__FP11Unk80090880(lbl_8061977C, fn_804761D0(i270, g));
+    ((void (*)(char*, char*, const char*, ...))fn_80403DE4)(p168, p148, (const char*)fn_80090880__FP11Unk80090880(lbl_8061977C, fn_80476220(i270, g)), s1);
+    ((FeWV*)FeWp(x, 0x174))->s28(p168);
+    int c;
+    float b = ((c = fn_80476134(i270, g)) != 3) ? FeF(lbl_8061930C, 0x1F4) : lbl_805F5EF4;
+    FeW57* fw = (FeW57*)FeWp(x, 0x154);
+    fw->s57(lbl_805F5EB4, b, ((FeW57*)FeWp(x, 0x154))->s61(), ((FeW57*)FeWp(x, 0x154))->s62());
+    ((FeW57*)FeWp(x, 0x154))->s59(!(((FeW57*)FeWp(x, 0x154))->s61() >= fv[0]) ? ((FeW57*)FeWp(x, 0x154))->s61() : fv[0]);
+    ((FeW57*)FeWp(x, 0x158))->s59((float)(unsigned)p26C);
+    FeW* w160 = FeWp(x, 0x160);
+    ((FeSub*)((char*)w160 + 0xDC))->s6(c);
+    FeW* w15C = FeWp(x, 0x15C);
+    ((FeSub*)((char*)w15C + 0xDC))->s6(fn_80476178(i270, g));
+    fn_8012E1C4(FeI(x, 0x16C), 1, 0x234F);
+}
+
 extern "C" FE_OVERLAY void fn_80476584(void* x)
 {
     char buf[0xC8];
