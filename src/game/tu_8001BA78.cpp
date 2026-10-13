@@ -24,7 +24,7 @@ extern Unk8001C314* lbl_806164F4;
 struct Unk80686D90 {
     int m0;
 };
-extern Unk80686D90 lbl_80686D90;
+extern const Unk80686D90 lbl_80686D90;
 
 Unk8001BA78::Unk8001BA78()
 {
@@ -508,7 +508,6 @@ int Unk8001C314::fn_8001C620(int idx)
     }
     m24[idx].m0 = slot;
     if (result >= 0) {
-        /* near-miss: retail has `li r0,1` before the `lwz r3` of the global (2 slots swapped) */
         int h = lbl_80686D90.m0;
         m24[idx].m4 = 1;
         fn_80020C5C(fn_80020BCC(h));
