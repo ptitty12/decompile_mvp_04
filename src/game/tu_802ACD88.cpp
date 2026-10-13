@@ -939,3 +939,64 @@ void fn_802B0638(Mgr* m, const char* name, int del)
         *(void**)(tz + oz) = 0;
     }
 }
+
+class Unk8037C7FC {
+public:
+    int fn_8037CE98(int arg, int value, int flags);
+};
+Unk8037C7FC* fn_8037C7FC();
+int fn_803119C0();
+void fn_80310E1C(int h, unsigned i, void* a, void* b, void* c, void* d);
+void fn_802C8058(void* p);
+void fn_802BB074(void* p);
+extern int lbl_8068D9D4;
+extern "C" void* memset(void* d, int c, unsigned int n);
+
+struct Unk802AD538_R {
+    int a;
+    int b;
+    int c;
+    int d;
+    int e;
+    int f;
+};
+struct Unk802AD538_T {
+    Unk802AD538_R r[5];
+};
+extern Unk802AD538_T lbl_805DFE48;
+extern Unk802AD538_T lbl_805DFEC0;
+extern Unk802AD538_T lbl_805DFF38;
+
+void fn_802AD538(Mgr* m, int h)
+{
+    Unk802AD538_T t1 = lbl_805DFE48;
+    Unk802AD538_T t2 = lbl_805DFEC0;
+    Unk802AD538_T t3 = lbl_805DFF38;
+    Unk802AD538_T t4 = {};
+    int hd;
+    if (h != 0)
+        hd = h;
+    else
+        hd = fn_803119C0();
+    if (hd != 0) {
+        int p = fn_8037C7FC()->fn_8037CE98(0xC22CAFD4, lbl_8068D9D4, 0);
+        Unk802AD538_T* a = &t1;
+        Unk802AD538_T* b = &t2;
+        Unk802AD538_T* c = &t3;
+        if (p != 0) {
+            a = (Unk802AD538_T*)(p + 8);
+            b = (Unk802AD538_T*)(p + 0x80);
+            c = (Unk802AD538_T*)(p + 0xF8);
+            h = p + 0x170;
+        } else {
+            h = (int)&t4;
+        }
+        for (unsigned i = 0; i <= 3; i++)
+            fn_80310E1C(hd, i, a, b, c, (Unk802AD538_T*)h);
+        fn_802C8058((char*)m + 0x12204);
+        fn_802BB074((char*)m + 0x16EF0);
+        fn_80314D60(m->m3B10);
+        fn_802ACDB4();
+    }
+}
+
