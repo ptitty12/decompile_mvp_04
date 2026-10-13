@@ -10,6 +10,39 @@ typedef Unk8007FF8C_List List;
 typedef Unk8007FF8C_Item Item;
 typedef Unk8007FF8C_Slot Slot;
 
+/* fn_800804D8: state behind lbl_806192E0 (+4 -> world; world +0xC -> record with a
+ * flag word at +0x600 and a sub-object at +0xA0; world +0x10 -> two ids at +0x6C/+0x70). */
+struct Unk800804D8_Ids {
+    char pad0[0x6C];
+    int m6C;
+    int m70;
+};
+struct Unk800804D8_Rec {
+    char pad0[0xA0];
+    int mA0;
+    char pad_A4[0x600 - 0xA4];
+    int m600;
+};
+struct Unk800804D8_World {
+    char pad0[0xC];
+    Unk800804D8_Rec* mC;
+    Unk800804D8_Ids* m10;
+};
+struct Unk800804D8_Gm {
+    char pad0[4];
+    Unk800804D8_World* m4;
+};
+struct Unk800804D8_St {
+    char pad0[0x660];
+    int m660;
+};
+struct Unk8007B2B0_Screen {
+    int fn_8007DA34(int i);
+    int fn_80078A38(int i);
+    float fn_8007BB28(int a, int b, int c);
+};
+struct Unk8007DB74_A;
+
 void fn_8059A490(EI* p);
 void fn_8059A4B4(EI* p);
 void fn_8059A4D8(EI* p);
@@ -119,7 +152,7 @@ void fn_80096544(void* self, int a, int b, int c, float f);
 void fn_80080BFC(Y* self);
 Q* fn_80081CF8(Y* self, int i);
 void fn_80081C94(Y* self, int i, int a, int b, int c);
-void fn_80081D88(Y* self);
+extern "C" void fn_80081D88(Y* self);
 void fn_800810E8(Y* self);
 
 
@@ -363,6 +396,35 @@ int fn_80080464(void* self, int a, int b)
         a = r;
     }
     return a;
+}
+
+extern Unk800804D8_Gm* lbl_806192E0;
+extern Unk8007B2B0_Screen* lbl_8061930C;
+extern "C" Unk800804D8_St* fn_800B555C();
+extern "C" void fn_800A72E4(void* dst, void* src);
+void* fn_8007DBBC(Unk8007DB74_A* a, int idx);
+
+void fn_800804D8()
+{
+    Unk800804D8_World* w = lbl_806192E0->m4;
+    unsigned s = fn_800B555C()->m660 - 4;
+    Unk800804D8_Ids* ids = w->m10;
+    int a = ids->m6C;
+    int b = ids->m70;
+    int bm = b == -1;
+    int am = a == -1;
+    if (s <= 1 && w->mC->m600 == 0) {
+        if (!am && lbl_8061930C->fn_8007DA34(a) != -1) {
+            Unk8007B2B0_Screen* sc = lbl_8061930C;
+            void* r = &lbl_806192E0->m4->mC->mA0;
+            fn_800A72E4(fn_8007DBBC((Unk8007DB74_A*)sc, sc->fn_8007DA34(a)), r);
+        }
+        if (!bm && lbl_8061930C->fn_8007DA34(b) != -1) {
+            Unk8007B2B0_Screen* sc = lbl_8061930C;
+            void* r = &lbl_806192E0->m4->mC->mA0;
+            fn_800A72E4(fn_8007DBBC((Unk8007DB74_A*)sc, sc->fn_8007DA34(b)), r);
+        }
+    }
 }
 
 I* fn_800805FC(I* self)
@@ -681,6 +743,50 @@ void fn_80081D70(Y* self)
     self->z0.b2 = 0;
     self->z0.b4 = 0;
     self->z0.b5 = 0;
+}
+
+extern "C" float fn_8057BC94(int a, int b, float c);
+
+inline float Ratio81(int n, int d)
+{
+    return d > 0 ? (float)n / (float)d : 0.0f;
+}
+
+/* near-miss: all insns match except that retail allocates r0 (not r9) for the four lwz temps feeding the fn_8007BB28 sums. */
+extern "C" void fn_80081D88(Y* self)
+{
+    Unk8007B2B0_Screen* sc = lbl_8061930C;
+    int r = 2;
+    int id1 = *(int*)((char*)self + 0x198);
+    int id2 = *(int*)((char*)self + 0xFFC);
+    int k1 = sc->fn_80078A38(id1);
+    int eq = k1 == sc->fn_80078A38(id2);
+    float res = 1.0f;
+    if (eq) {
+        int h1 = (int)sc->fn_8007BB28(0, id1, 1);
+        int t1 = h1 + (int)sc->fn_8007BB28(1, id1, 1);
+        int h2 = (int)sc->fn_8007BB28(0, id2, 1);
+        int t2 = h2 + (int)sc->fn_8007BB28(1, id2, 1);
+        if (t1 <= 9 || t2 <= 9) {
+            h1 = (int)sc->fn_8007BB28(0, id1, 0);
+            t1 = h1 + (int)sc->fn_8007BB28(1, id1, 0);
+            h2 = (int)sc->fn_8007BB28(0, id2, 0);
+            t2 = h2 + (int)sc->fn_8007BB28(1, id2, 0);
+        }
+        float x = Ratio81(h1, t1);
+        float y = Ratio81(h2, t2);
+        float u = fn_8057BC94(t1, h1, y);
+        float v = fn_8057BC94(t2, h2, x);
+        if (!(x <= y)) {
+            res = u;
+            r = 0;
+        } else if (!(x >= y)) {
+            res = v;
+            r = 1;
+        }
+    }
+    self->m1D40 = r;
+    self->m1D44 = res;
 }
 
 /* near-miss: same iterator-init scheduling difference as fn_80080BFC. */

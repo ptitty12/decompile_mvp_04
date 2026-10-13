@@ -5,6 +5,78 @@
 #include "game/tu_80070DDC.h"
 #include "game/tu_8000E618.h"
 
+/* fn_80072530: destructor of the 0x210-byte singleton (Unk80071FA0_Obj, vptr lbl_8064A5D8 at +0x20C).
+ * The classes below only carry what the destructor needs: a user-declared destructor (symbol
+ * _._11<name>) and, for the virtual ones, a data-only base so the vptr lands at the right offset. */
+class Unk80353280 { public: char pad[4]; ~Unk80353280(); };
+class Unk803533A8 { public: char pad[4]; ~Unk803533A8(); };
+class Unk80353478 { public: char pad[4]; ~Unk80353478(); };
+class Unk803534F0 { public: char pad[4]; ~Unk803534F0(); };
+struct Unk80072530_B4 { char pad[4]; };
+struct Unk80072530_B18 { char pad[0x18]; };
+struct Unk80072530_BC4 { char pad[0xC4]; };
+struct Unk80072530_B204 { char pad[0x204]; };
+struct Unk80072530_B438 { char pad[0x438]; };
+struct Unk80072530_B7C0 { char pad[0x7C0]; };
+struct Unk80072530_V4 : Unk80072530_B4 { virtual ~Unk80072530_V4(); };
+struct Unk80072530_V18 : Unk80072530_B18 { virtual ~Unk80072530_V18(); };
+struct Unk80072530_VC4 : Unk80072530_BC4 { virtual ~Unk80072530_VC4(); };
+struct Unk80072530_V204 : Unk80072530_B204 { virtual ~Unk80072530_V204(); };
+struct Unk80072530_V438 : Unk80072530_B438 { virtual ~Unk80072530_V438(); };
+struct Unk80072530_V7C0 : Unk80072530_B7C0 { virtual ~Unk80072530_V7C0(); };
+struct Tbl80090B28 { char pad[0x14]; ~Tbl80090B28(); };
+struct Tbl8009101C { char pad[0x1C]; ~Tbl8009101C(); };
+struct Tbl80091760 { char pad[0x20]; ~Tbl80091760(); };
+struct Tbl80091EAC { char pad[0x10]; ~Tbl80091EAC(); };
+struct Tbl80092370 { char pad[0x20]; ~Tbl80092370(); };
+struct Tbl800927D0 { char pad[0x10]; ~Tbl800927D0(); };
+struct Tbl80092C94 { char pad[0x20]; ~Tbl80092C94(); };
+struct Tbl800930F4 { char pad[0x10]; ~Tbl800930F4(); };
+struct Tbl800935B8 { char pad[0x20]; ~Tbl800935B8(); };
+struct Tbl80093A18 { char pad[0x10]; ~Tbl80093A18(); };
+struct Tbl80093EDC { char pad[0x20]; ~Tbl80093EDC(); };
+struct Tbl8009433C { char pad[0x10]; ~Tbl8009433C(); };
+struct Tbl80094800 { char pad[0x44]; ~Tbl80094800(); };
+struct Tbl800956D8 { char pad[0x28]; ~Tbl800956D8(); };
+struct Unk80072530_Obj {
+    void* m0;
+    Unk80353280* m4;
+    Unk803533A8* m8;
+    void* mC;
+    void* m10;
+    void* m14;
+    void* m18;
+    void* m1C;
+    Unk80353478* m20;
+    Unk803534F0* m24;
+    Unk80072530_V18* m28;
+    Unk80072530_V204* m2C;
+    Unk80072530_VC4* m30;
+    Unk80072530_V438* m34;
+    Tbl80090B28 t38;
+    Tbl8009101C t4C;
+    Unk80072530_V7C0* m68;
+    Tbl80091760 t6C;
+    Tbl80091760 t8C;
+    Tbl80091EAC tAC;
+    Tbl80092370 tBC;
+    Tbl800927D0 tDC;
+    Tbl80092C94 tEC;
+    Tbl800930F4 t10C;
+    Tbl800935B8 t11C;
+    Tbl80093A18 t13C;
+    Tbl80093EDC t14C;
+    Tbl8009433C t16C;
+    Tbl80094800 t17C;
+    Tbl800956D8 t1C0;
+    Unk80072530_V4* m1E8;
+    char pad1EC[0x20C - 0x1EC];
+    const void* m20C;
+};
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_8052BA1C(void* p, int c);
+extern const char lbl_8064A5D8[];
+
 void* operator new(unsigned int size, int heap);
 void* fn_803774A8(unsigned n, int heap);
 unsigned fn_800734D4(void* self, unsigned flags);
@@ -553,6 +625,92 @@ void fn_80071F48(void)
         delete lbl_8061930C;
         lbl_8061930C = 0;
     }
+}
+
+void fn_80072530(Unk80072530_Obj* self, int flag)
+{
+    self->m20C = lbl_8064A5D8;
+    if (self->m0 != 0) {
+        fn_80377408(self->m0);
+        self->m0 = 0;
+    }
+    if (self->m4 != 0) {
+        delete self->m4;
+        self->m4 = 0;
+    }
+    if (self->m8 != 0) {
+        delete self->m8;
+        self->m8 = 0;
+    }
+    if (self->mC != 0) {
+        fn_8052BA1C(self->mC, 3);
+        self->mC = 0;
+    }
+    if (self->m10 != 0) {
+        fn_8052BA1C(self->m10, 3);
+        self->m10 = 0;
+    }
+    if (self->m14 != 0) {
+        fn_8052BA1C(self->m14, 3);
+        self->m14 = 0;
+    }
+    if (self->m18 != 0) {
+        fn_8052BA1C(self->m18, 3);
+        self->m18 = 0;
+    }
+    if (self->m1C != 0) {
+        fn_80377408(self->m1C);
+        self->m1C = 0;
+    }
+    if (self->m20 != 0) {
+        delete self->m20;
+        self->m20 = 0;
+    }
+    if (self->m24 != 0) {
+        delete self->m24;
+        self->m24 = 0;
+    }
+    if (self->m28 != 0) {
+        delete self->m28;
+        self->m28 = 0;
+    }
+    if (self->m2C != 0) {
+        delete self->m2C;
+        self->m2C = 0;
+    }
+    if (self->m34 != 0) {
+        delete self->m34;
+        self->m34 = 0;
+    }
+    if (self->m30 != 0) {
+        delete self->m30;
+        self->m30 = 0;
+    }
+    if (self->m68 != 0) {
+        delete self->m68;
+        self->m68 = 0;
+    }
+    if (self->m1E8 != 0) {
+        delete self->m1E8;
+        self->m1E8 = 0;
+    }
+    self->t1C0.~Tbl800956D8();
+    self->t17C.~Tbl80094800();
+    self->t16C.~Tbl8009433C();
+    self->t14C.~Tbl80093EDC();
+    self->t13C.~Tbl80093A18();
+    self->t11C.~Tbl800935B8();
+    self->t10C.~Tbl800930F4();
+    self->tEC.~Tbl80092C94();
+    self->tDC.~Tbl800927D0();
+    self->tBC.~Tbl80092370();
+    self->tAC.~Tbl80091EAC();
+    self->t8C.~Tbl80091760();
+    self->t6C.~Tbl80091760();
+    self->t4C.~Tbl8009101C();
+    self->t38.~Tbl80090B28();
+    if (flag & 1)
+        fn_80377408(self);
 }
 
 void Unk8007A4DC_Screen::fn_8007285C()
