@@ -119,16 +119,18 @@ extern "C" int fn_803D2B5C()
     return 0;
 }
 
-/* near-miss (one instruction short): retail forms hi - lo first in f13 and reuses f1 for the quotient, and
-   tests t >= hi with cror/bso; ours keeps the difference in f12. In-place and negated-compare spellings
-   gave 24-26 instructions. */
-extern "C" int fn_803D2B64(float t, float lo, float hi)
+extern "C" int fn_803D2B64(float x, float lo, float hi)
 {
-    float d = hi - lo;
-    if (t < lo)
-        return (int)((lo - t) / d);
-    if (!(t < hi))
-        return (int)((t - hi) / d) + 1;
+    float range = hi - lo;
+    float t;
+    if (x < lo) {
+        t = lo - x;
+        return (int)(t / range);
+    }
+    if (x >= hi) {
+        t = x - hi;
+        return (int)(t / range) + 1;
+    }
     return 0;
 }
 
