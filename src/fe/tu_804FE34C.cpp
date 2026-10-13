@@ -132,6 +132,84 @@ extern "C" FE_OVERLAY void fn_804FE620(FeScrRos* x)
     x->m10F0->fn_vslot16(v != 4 ? 1 : 0);
 }
 
+// Secondary list base: vptr +0x24, selection getter at virtual slot11.
+struct FeSelect804FE6B8 {
+    char pad[0x24];
+    virtual void s1(); virtual void s2(); virtual void s3(); virtual void s4();
+    virtual void s5(); virtual void s6(); virtual void s7(); virtual void s8();
+    virtual void s9(); virtual void s10(); virtual int s11();
+};
+inline FeSelect804FE6B8* SelectControl804FE6B8(void* screen) {
+    FeSelect804FE6B8* control = *(FeSelect804FE6B8**)((char*)screen + 0x10F8);
+    control = (FeSelect804FE6B8*)((char*)control + 0xDC);
+    return control;
+}
+// Retail fn_804FE6B8 builds this six-word array header before a 40-int buffer.
+struct FeArray804FE6B8 { int* m0; int m4, m8, mC; const void* vp; int m14; };
+extern const char lbl_8064B298[], lbl_8064A550[], lbl_8064A4C8[];
+extern "C" void fn_8040074C(void*, int);
+extern "C" void fn_80535650(FeArray804FE6B8*, int);
+extern "C" void fn_804FE0F4(void*, int);
+extern "C" int fn_804D1278(void*);
+extern "C" void fn_804D1CB8(void*, int, int);
+inline void ArrayBase804FE6B8(FeArray804FE6B8* a, int* buf, int cap) {
+    a->vp = lbl_8064B298; a->m0 = buf; a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+inline void ArrayMid804FE6B8(FeArray804FE6B8* a) {
+    a->m4 = 0; a->mC = 0; a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
+inline void ArrayDerived804FE6B8(FeArray804FE6B8* a) {
+    a->vp = lbl_8064A4C8; a->m4 = 0; a->mC = 0; a->m14 = 0;
+}
+inline void ArrayDestroy804FE6B8(FeArray804FE6B8* a) { a->vp = lbl_8064A550; }
+// fn_800B555C()+8 exposes the selected team/player and screen index here.
+struct FeState804FE6B8 { char pad[0x4F4]; int m4F4, m4F8, m4FC; };
+extern "C" FE_OVERLAY void fn_804FE6B8(FeScrRos* x, int kind, int arg)
+{
+    switch (kind) {
+    case 4:
+        fn_804FE0F4(x, ((FeSub*)((char*)x->m10F4 + 0xDC))->s5());
+        break;
+    case 5: {
+        int selected = SelectControl804FE6B8(x)->s11();
+        if (selected != 0) {
+            FeArray804FE6B8 a;
+            int buf[40];
+            ArrayBase804FE6B8(&a, buf, 40);
+            ArrayMid804FE6B8(&a);
+            ArrayDerived804FE6B8(&a);
+            fn_80535650(&a, selected);
+            ((FeWY*)x)->s84((int)&a);
+            ArrayDestroy804FE6B8(&a);
+        }
+        break;
+    }
+    case 0: {
+        FeState804FE6B8* state = (FeState804FE6B8*)((char*)fn_800B555C() + 8);
+        state->m4F8 = -1;
+        state->m4FC = 0;
+        fn_804D1CB8(x, 0, 0);
+        break;
+    }
+    case 1: {
+        FeState804FE6B8* state = (FeState804FE6B8*)((char*)fn_800B555C() + 8);
+        int team = ((FeSub*)((char*)x->m10F4 + 0xDC))->s5();
+        int player = SelectControl804FE6B8(x)->s11();
+        state->m4F8 = team;
+        state->m4FC = player;
+        FeState804FE6B8* state2 = (FeState804FE6B8*)((char*)fn_800B555C() + 8);
+        state2->m4F4 = fn_804D1278(x);
+        fn_804D1CB8(x, 1, 0);
+        break;
+    }
+    default:
+        fn_804D1CB8(x, kind, arg);
+        break;
+    }
+}
+
 extern "C" FE_OVERLAY FeScrRos* fn_804FE8AC(FeScrRos* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
