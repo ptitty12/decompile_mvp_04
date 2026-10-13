@@ -8,6 +8,8 @@
 #include "snd/cmn/sndcmn.h"
 
 extern SNDPACKETSTATE lbl_806AA500;
+/* Existing retail symbol for snd packet-state pointer table at +0x304, 32 entries. */
+extern SNDPACKETCHAN* lbl_806AA804[32];
 
 struct Unk803B5E44_Sub {
     int (*m0)(Unk803B5E44_Sub*, int, float*, float*, int);
@@ -117,7 +119,8 @@ extern "C" int fn_803AB480(int shandle);
 
 extern "C" void fn_803A975C();
 extern "C" void fn_803A979C();
-extern "C" int fn_803B0368(int slot, void* pmem);
+struct Unk803B0714;
+extern "C" int fn_803B0368(int slot, Unk803B0714* pmem);
 extern "C" int fn_803B0360();
 extern "C" int fn_803B042C(int h, int voice, int timemult, int lowpass, int highpass, SNDSAMPLEFORMAT* pssf, SNDSAMPLEATTR* pssa);
 extern "C" int fn_803B58E8(int* prenderindex, SNDIPATCHHEADER* pph);
@@ -169,18 +172,17 @@ extern "C" int SNDPKTPLAY_overhead(int n)
     return a + fn_803B0360();
 }
 
-/* near-miss: 61 vs 58 insns (SNDPKTPLAY_create, structure from the nfsmw spktplay.c reference): retail recomputes the ppc table address (lis/addi + addi 0x304) for the final store after the call and uses a one-step lbl_806AA804 base in the search loop; ours keeps the loop base in a saved register (r26) and reuses it for the store */
 extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pframesfunc)(int, int, void*), void* pclientdata, void* pmem, int memsize)
 {
     SNDPACKETCHAN* ppchan;
     int packetinstancehandle;
     void* pplatformmem;
-    int i;
+    int i = 0;
 
     fn_803A975C();
 
-    for (i = 0; i < sndgs.sso.set.maxstreams; i++) {
-        if (lbl_806AA500.ppc[i] == 0) {
+    for (; i < sndgs.sso.set.maxstreams; i++) {
+        if (lbl_806AA804[i] == 0) {
             goto allocated;
         }
     }
@@ -189,7 +191,7 @@ extern "C" int SNDPKTPLAY_create(void (*preleasefunc)(void*, void*), void (*pfra
     return -9;
 
 allocated:
-    packetinstancehandle = fn_803B0368(i, pmem);
+    packetinstancehandle = fn_803B0368(i, (Unk803B0714*)pmem);
     if (packetinstancehandle < 0) {
         fn_803A979C();
         return -6;
@@ -206,7 +208,7 @@ allocated:
     ppchan->pframesfunc = pframesfunc;
     ppchan->pclientdata = pclientdata;
     ppchan->shandle = -1;
-    *(SNDPACKETCHAN**)((char*)&lbl_806AA500 + 0x304 + i * 4) = ppchan;
+    lbl_806AA500.ppc[i] = ppchan;
 
     fn_803A979C();
     return i;
