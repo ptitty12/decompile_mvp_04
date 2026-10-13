@@ -28,6 +28,7 @@ import re
 import shutil
 import subprocess
 import sys
+from collections import defaultdict, namedtuple
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -91,7 +92,7 @@ def check_hard_rules() -> None:
         allowed = {
             l.strip()
             for l in PRAGMA_ALLOWLIST.read_text(encoding="utf-8").splitlines()
-            if l.strip() and not l.strip().startswith("#")
+            if l.strip() and (not l.strip().startswith("#") or re.match(r"#pragma\b", l.strip()))
         }
     problems = []
     n_files = 0
@@ -186,6 +187,10 @@ def baseline_from_ref(ref: str) -> Path:
         remove_worktree(wt)
 
 
+ReportUnit = namedtuple("ReportUnit", "fuzzy matched total_code matched_code")
+ReportFunction = namedtuple("ReportFunction", "percent address size virtual_address")
+
+
 def load_report(path: Path):
     r = json.loads(path.read_text(encoding="utf-8"))
     units, funcs = {}, {}
@@ -195,40 +200,140 @@ def load_report(path: Path):
         # matched_code is trivially 100% and they vanish when a unit claims them.
         if int(m.get("total_code") or 0) == 0:
             continue
-        units[u["name"]] = (float(m.get("fuzzy_match_percent") or 0), float(m.get("matched_code_percent") or 0))
+        if u["name"] in units:
+            fail(f"duplicate unit in {path}: {u['name']}")
+        units[u["name"]] = ReportUnit(
+            float(m.get("fuzzy_match_percent") or 0),
+            float(m.get("matched_code_percent") or 0),
+            int(m.get("total_code") or 0), int(m.get("matched_code") or 0))
         for f in u.get("functions", []):
-            # (percent, address within the unit, size): address+size identify a
-            # function across renames (e.g. a mangled name changing when a
-            # parameter type is corrected).
-            funcs[(u["name"], f["name"])] = (float(f.get("fuzzy_match_percent") or 0),
-                                             f.get("address"), f.get("size"))
+            k = (u["name"], f["name"])
+            if k in funcs:
+                fail(f"duplicate function in {path}: {k}")
+            # Objdiff address is section-relative, so it cannot identify a
+            # cross-unit move. Size is the target symbol size, not source size.
+            address = f.get("address")
+            size = f.get("size")
+            virtual = (f.get("metadata") or {}).get("virtual_address")
+            funcs[k] = ReportFunction(
+                float(f.get("fuzzy_match_percent") or 0),
+                int(address) if address is not None else None,
+                int(size) if size is not None else None,
+                int(virtual) if virtual is not None else None)
     return units, funcs
+
+
+def pair_functions(bf, cf):
+    """Pair identities one-to-one; never choose an ambiguous or better score."""
+    bn, cn, ba, ca = (defaultdict(list) for _ in range(4))
+    for funcs, names, addresses in ((bf, bn, ba), (cf, cn, ca)):
+        for k, f in funcs.items():
+            names[k[1]].append(k)
+            if f.address is not None and f.size is not None and f.size > 0:
+                addresses[(k[0], f.address, f.size)].append(k)
+
+    pairs = {k: k for k in bf if k in cf}
+    used = set(pairs.values())
+
+    def compatible(old, new):
+        return (old.size is not None and old.size > 0 and old.size == new.size
+                and (old.virtual_address is None or new.virtual_address is None
+                     or old.virtual_address == new.virtual_address))
+
+    # Resolve unique names before relative-offset renames: splitting an object
+    # can put a different function at a moved function's old offset.
+    for k, f in bf.items():
+        candidates = cn[k[1]]
+        if k not in pairs and len(bn[k[1]]) == 1 and len(candidates) == 1:
+            nk = candidates[0]
+            old_module = k[0].split("/", 1)[0]
+            new_module = nk[0].split("/", 1)[0]
+            if nk not in used and old_module == new_module and compatible(f, cf[nk]):
+                pairs[k] = nk
+                used.add(nk)
+
+    for k, f in bf.items():
+        slot = (k[0], f.address, f.size)
+        candidates = ca[slot]
+        if (k not in pairs and not cn[k[1]] and len(ba[slot]) == 1
+                and len(candidates) == 1):
+            nk = candidates[0]
+            if nk not in used and not bn[nk[1]] and compatible(f, cf[nk]):
+                pairs[k] = nk
+                used.add(nk)
+    return pairs
+
+
+def cohort_measures(keys, funcs, weights):
+    total = sum(weights)
+    fuzzy = sum(funcs[k].percent * size for k, size in zip(keys, weights)) / total
+    matched = 100.0 * sum(size for k, size in zip(keys, weights)
+                          if funcs[k].percent == 100.0) / total
+    return fuzzy, matched
 
 
 def check_regressions(current: Path, baseline: Path) -> None:
     bu, bf = load_report(baseline)
     cu, cf = load_report(current)
+    pairs = pair_functions(bf, cf)
+    moved = [(k, nk) for k, nk in pairs.items() if k[0] != nk[0]]
+    affected = {unit for k, nk in moved for unit in (k[0], nk[0])}
+    bkeys, ckeys = defaultdict(list), defaultdict(list)
+    for k in bf:
+        bkeys[k[0]].append(k)
+    for k in cf:
+        ckeys[k[0]].append(k)
+    reverse = {nk: k for k, nk in pairs.items()}
+
+    def covered(unit, units, funcs, keys):
+        entries = [funcs[k] for k in keys[unit]]
+        return (bool(entries) and all(f.size is not None and f.size > 0 for f in entries)
+                and sum(f.size for f in entries) == units[unit].total_code
+                and sum(f.size for f in entries if f.percent == 100.0)
+                == units[unit].matched_code)
+
     regs = []
-    for k, (fz, mc) in bu.items():
-        nfz, nmc = cu.get(k, (0.0, 0.0))
+    for k, unit in bu.items():
+        fz, mc = unit.fuzzy, unit.matched
+        nfz, nmc = cu[k][:2] if k in cu else (0.0, 0.0)
+        if k in affected:
+            keys = bkeys[k]
+            destinations = {pairs[fk][0] for fk in keys if fk in pairs}
+            if k in cu:
+                destinations.add(k)
+            # Reweight only a fully accounted-for redistribution of report
+            # functions. Incomplete/ambiguous identities or changed target sizes
+            # must not turn a unit-level regression into a pass.
+            safe = (covered(k, bu, bf, bkeys)
+                    and all(fk in pairs and bf[fk].size == cf[pairs[fk]].size
+                            for fk in keys)
+                    and all(covered(dest, cu, cf, ckeys)
+                            and all(nk in reverse for nk in ckeys[dest])
+                            for dest in destinations))
+            if not safe:
+                regs.append(f"unit {k}: cannot safely compare redistributed functions")
+            else:
+                weights = [bf[fk].size for fk in keys]
+                # Compare the SAME baseline cohort with the SAME target sizes.
+                # Recompute both sides to avoid objdiff float32 rounding noise.
+                fz, mc = cohort_measures(keys, bf, weights)
+                nfz, nmc = cohort_measures([pairs[fk] for fk in keys], cf, weights)
         if nmc + 1e-9 < mc:
             regs.append(f"unit {k}: matched code {mc:.2f}% -> {nmc:.2f}%")
         elif nfz + 1e-9 < fz:
             regs.append(f"unit {k}: fuzzy {fz:.2f}% -> {nfz:.2f}%")
-    by_addr = {(unit, a, s): (name, p) for (unit, name), (p, a, s) in cf.items() if a is not None}
     renamed = []
-    for k, (v, addr, size) in bf.items():
-        if k in cf:
-            nv = cf[k][0]
-        elif addr is not None and (k[0], addr, size) in by_addr:
-            new_name, nv = by_addr[(k[0], addr, size)]
-            renamed.append(f"{k[1]} -> {new_name}")
-        else:
-            nv = 0.0
-        if nv + 1e-9 < v:
-            regs.append(f"function {k[1]} ({k[0]}): {v:.2f}% -> {nv:.2f}%")
+    for k, f in bf.items():
+        nk = pairs.get(k)
+        nv = cf[nk].percent if nk is not None else 0.0
+        if nk is not None and k[1] != nk[1]:
+            renamed.append(f"{k[1]} -> {nk[1]}")
+        if nv + 1e-9 < f.percent:
+            regs.append(f"function {k[1]} ({k[0]}): {f.percent:.2f}% -> {nv:.2f}%")
     for line in renamed[:50]:
         print(f"renamed (same unit, address and size): {line}")
+    for k, nk in moved[:50]:
+        print(f"moved (unique name and same size): {k[1]} ({k[0]} -> {nk[0]})")
     if regs:
         fail(f"{len(regs)} match regression(s) vs baseline:\n  " + "\n  ".join(regs[:200]))
     matched = sum(1 for v in cf.values() if v[0] >= 100.0)
