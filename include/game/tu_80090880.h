@@ -23,6 +23,8 @@ struct Unk80090880 {
     char* m8;
 };
 
+char* fn_80090880(Unk80090880* p);
+
 struct TblBase;
 struct DbObj {
     char* m0;

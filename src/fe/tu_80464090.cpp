@@ -3,6 +3,7 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_80459228.h"
+#include "game/tu_80090880.h"
 
 extern "C" char* strncpy(char* dst, const char* src, unsigned n);
 
@@ -35,7 +36,6 @@ void fn_804644D8(FeScrF* x);
 
 extern void* lbl_8061977C;
 extern "C" {
-unsigned short* fn_80090880__FP11Unk80090880(void* t, int id);
 void fn_80403DE4(unsigned short* dst, const unsigned short* fmt, ...);
 }
 
@@ -131,7 +131,7 @@ FE_OVERLAY void fn_804644D8(FeScrF* x)
 {
     unsigned short buf[0x34];
     if (x->m140 <= 6) {
-        fn_80403DE4(buf, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x419E), x->m140, 6);
+        fn_80403DE4(buf, ((unsigned short* (*)(Unk80090880*, int))fn_80090880)((Unk80090880*)lbl_8061977C, 0x419E), x->m140, 6);
         ((FeW*)x->m13C)->fn_vslot28((const char*)buf);
         ((FeWV*)x->m138)->s101(0, 1);
         ((FeWV*)x->m138)->s101(2, 1);
