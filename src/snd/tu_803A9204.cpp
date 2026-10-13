@@ -62,31 +62,33 @@ extern "C" void fn_803A9294(unsigned int seed)
         lbl_8069CAB8[i] = lbl_806251F0[i] + seed;
 }
 
-/* near-miss: 62 vs 66 insns; retail reloads the s[5..1] words for the carry increments (no store-to-load forwarding across the early returns) and returns s[0] through r3; tried global-array, local-copy, nested-if, goto and loop forms */
+/* Six-word generator; intermediate stores preserve the later carry reloads. */
 unsigned int iSNDrandom()
 {
-    unsigned int t = lbl_8069CAB8[5] + lbl_8069CAB8[4];
-    unsigned int carry = 0;
-    if (t < lbl_8069CAB8[5] || t < lbl_8069CAB8[4])
-        carry = 1;
-    unsigned int b = lbl_8069CAB8[3];
-    unsigned int c = lbl_8069CAB8[2];
-    lbl_8069CAB8[4] = t;
-    t = t + b + carry;
-    unsigned int d = lbl_8069CAB8[1];
-    lbl_8069CAB8[3] = t;
-    unsigned int u = t + c + (t < b);
-    lbl_8069CAB8[2] = u;
-    unsigned int v = u + d + (u < c);
-    lbl_8069CAB8[1] = v;
-    unsigned int w = v + lbl_8069CAB8[0] + (v < d);
-    lbl_8069CAB8[0] = w;
-    if (++lbl_8069CAB8[5] != 0) return w;
-    if (++lbl_8069CAB8[4] != 0) return w;
-    if (++lbl_8069CAB8[3] != 0) return w;
-    if (++lbl_8069CAB8[2] != 0) return w;
-    if (++lbl_8069CAB8[1] != 0) return w;
-    return lbl_8069CAB8[0] = w + 1;
+    unsigned c = 0;
+    unsigned x = lbl_8069CAB8[5] + lbl_8069CAB8[4];
+    if (x < lbl_8069CAB8[5] || x < lbl_8069CAB8[4])
+        c = 1;
+    unsigned o0 = lbl_8069CAB8[0];
+    unsigned o3 = lbl_8069CAB8[3];
+    unsigned o2 = lbl_8069CAB8[2];
+    unsigned o1 = lbl_8069CAB8[1];
+    lbl_8069CAB8[4] = x;
+    x = x + o3 + c;
+    ((volatile unsigned*)lbl_8069CAB8)[3] = x;
+    x = x + o2 + (x < o3);
+    ((volatile unsigned*)lbl_8069CAB8)[2] = x;
+    x = x + o1 + (x < o2);
+    ((volatile unsigned*)lbl_8069CAB8)[1] = x;
+    x = x + o0 + (x < o1);
+    lbl_8069CAB8[0] = x;
+    if (++lbl_8069CAB8[5] == 0)
+        if (++lbl_8069CAB8[4] == 0)
+            if (++lbl_8069CAB8[3] == 0)
+                if (++lbl_8069CAB8[2] == 0)
+                    if (++lbl_8069CAB8[1] == 0)
+                        x = ++lbl_8069CAB8[0];
+    return x;
 }
 
 /* near-miss: all 32 insns, but retail loads r4 (a) before the addi r3 for &pph in the fn_803AFD88 call; inline wrapper, local pointer and != / > 0 loop forms did not move it */
