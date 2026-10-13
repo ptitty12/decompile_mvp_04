@@ -74,7 +74,9 @@ void fn_803DFCB0(Mtx4* dst, float x, float y, float z, float w);
 void fn_803E1C44(void* o, Mtx4* m);
 void fn_803D74EC(Unk803D50E4Dev* d);
 void fn_803D7830(void);
-void fn_803D6528(void* out, Unk803D50E4Obj* self, int a);
+/* The retail return copies five words at offsets 0 through 0x10. */
+struct Result803D6528 { int words[5]; };
+Result803D6528 fn_803D6528(Unk803D50E4Obj* self, int a);
 void fn_803D675C(Unk803D50E4Obj* self, void* t, int b);
 void fn_803D7414(int a, int b);
 void fn_803D7600(struct Unk803D7600Obj* self, int c);
@@ -534,9 +536,8 @@ extern "C" void fn_803D7480()
 
 extern "C" void fn_803D74A0(Unk803D50E4Obj* self, int a, int b)
 {
-    char t[0x1C];
-    fn_803D6528(t, self, a);
-    fn_803D675C(self, t, b);
+    Result803D6528 t = fn_803D6528(self, a);
+    fn_803D675C(self, &t, b);
 }
 
 extern "C" void fn_803D74EC(Unk803D50E4Dev* d)
