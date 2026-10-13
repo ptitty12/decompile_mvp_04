@@ -117,6 +117,40 @@ extern "C" void fn_801E6E48(I* s, int chrg)
         operator delete(s);
 }
 
+inline Vec3 Unk801E7218_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk801E7218_Len2(Vec3 v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+extern const Vec3 lbl_805D3FE0[];
+extern "C" Vec3 fn_801DC814(Unk801DB948* self, Unk801DB948_Obj* o, int c, int d);
+extern "C" int fn_801E7E00(Unk801DD660_Ctx* self, int idx, Vec3* v, int a, int b);
+
+extern "C" Vec3 fn_801E7218(Unk801DD660_Ctx* self, int idx, Unk801DB948_Obj* o, int c, const Vec3* pos)
+{
+    Unk801DB948_J* j = self->m0->m700;
+    Vec3 base = fn_801DC814(j->m3B8, o, c, idx);
+    int f1 = 0;
+    int f2 = 0;
+    if (pos != 0) {
+        if (!(Unk801E7218_Len2(Unk801E7218_Sub(*pos, lbl_805D3FE0[idx * 2])) >= 36.0f))
+            f2 = 1;
+        if (!(Unk801E7218_Len2(Unk801E7218_Sub(*pos, lbl_805D3FE0[idx * 2 + 1])) >= 36.0f)) {
+            f1 = 1;
+            f2 = 1;
+        }
+    }
+    int k = fn_801E7E00(self, idx, &base, f1, f2);
+    return *(const Vec3*)((const char*)lbl_805D3FE0 + idx * 24 + k * 12);
+}
+
 extern "C" Vec3 fn_801E73B8(void* self, int k)
 {
     return lbl_805D4040[k];
@@ -289,6 +323,38 @@ extern "C" int fn_801E8328(I* s, Vec3* out, float f)
         out->z = fn_8041171C(a + b);
     } else {
         *out = lbl_806055AC;
+    }
+    return r;
+}
+
+extern "C" int fn_801E8428(I* s, int a, Vec3* out, float* outf)
+{
+    int r = 0;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    *outf = 3.0f;
+    float c = fn_802D7E2C(k, 0xBC);
+    if (!(c <= 1.0f))
+        c = 1.0f;
+    float a1 = fn_802D7F40(k);
+    float b1 = fn_802D7E88(k, 0xBC);
+    P* p = fn_801A497C(s->m9C->m0, 4, a);
+
+    float thr;
+    if (!(c <= (thr = 0.04f))) {
+        r = 1;
+        a1 = -a1;
+        *outf = c;
+        b1 = b1 - 3.1415927f;
+        out->x = fn_80411554(a1 + b1) * 240.0f;
+        out->y = 0.0f;
+        out->z = fn_8041171C(a1 + b1) * 240.0f;
+        const Vec3* pv = &p->m60;
+        out->x = out->x + pv->x;
+        out->y = out->y + pv->y;
+        out->z = out->z + pv->z;
+    } else {
+        *outf = 0.0f;
+        *out = p->m60;
     }
     return r;
 }
