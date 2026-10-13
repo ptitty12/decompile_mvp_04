@@ -93,6 +93,14 @@ void fn_80425BE4(void);
 void fn_80423F94(void);
 int __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block);
 DVDCommandBlock* __DVDPopWaitingQueue(void);
+extern void (*lbl_806EF1A8)(DVDCommandBlock*, DVDLowCallback);
+extern s32 lbl_806EF674;
+void fn_804245BC(u32 intType);
+BOOL fn_80426A40(u32 subcmd, DVDLowCallback callback);
+BOOL fn_804269A8(u32 subcmd, u32 length, u32 offset, DVDLowCallback callback);
+BOOL fn_8042690C(void* addr, DVDLowCallback callback);
+int __DVDCheckWaitingQueue(void);
+extern s32 lbl_806EF68C;
 int __DVDDequeueWaitingQueue(DVDCommandBlock* block);
 void fn_80426C24(void);
 void* fn_80426C38(void);
@@ -126,7 +134,7 @@ void fn_804235E4(u32 intType);
 void fn_8042516C(void);
 
 extern s32 lbl_806EF6AC;
-extern s32 lbl_806EF6A8;
+extern u32 lbl_806EF6A8;
 extern s32 lbl_806EF6A4;
 extern const char* lbl_806EF1A0;
 
@@ -600,6 +608,193 @@ void fn_80423EA8(u32 intType) {
         fn_80425020();
         fn_80432224(&b->resetAlarm);
         fn_80432484(&b->resetAlarm, OSMillisecondsToTicks(1150), fn_80423CD4);
+        break;
+    }
+}
+
+void fn_80423F94(void) {
+    DvdBss* b = &lbl_806DE160;
+    DVDCommandBlock* finished;
+
+    if (__DVDCheckWaitingQueue() == 0) {
+        lbl_806EF660 = NULL;
+        return;
+    }
+    if (lbl_806EF66C) {
+        lbl_806EF670 = 1;
+        lbl_806EF660 = NULL;
+        return;
+    }
+    lbl_806EF660 = __DVDPopWaitingQueue();
+    if (lbl_806EF678) {
+        lbl_806EF660->state = -1;
+        finished = lbl_806EF660;
+        lbl_806EF660 = &b->dummy;
+        if (finished->callback) {
+            finished->callback(-1, finished);
+        }
+        fn_80423F94();
+        return;
+    }
+    lbl_806EF67C = lbl_806EF660->command;
+    if (lbl_806EF688) {
+        switch (lbl_806EF688) {
+        case 2:
+            lbl_806EF660->state = 11;
+            fn_80426724(fn_80423EA8);
+            break;
+        case 3:
+            lbl_806EF660->state = 4;
+            fn_80426724(fn_80423EA8);
+            break;
+        case 4:
+            lbl_806EF660->state = 5;
+            fn_80426724(fn_80423EA8);
+            break;
+        case 1:
+        case 6:
+        case 7:
+            lbl_806EF660->state = 3;
+            switch (lbl_806EF67C) {
+            case 4:
+            case 5:
+            case 13:
+            case 15:
+                __DVDClearWaitingQueue();
+                finished = lbl_806EF660;
+                lbl_806EF660 = &b->dummy;
+                if (finished->callback) {
+                    finished->callback(-4, finished);
+                }
+                fn_80423F94();
+                break;
+            default:
+                lbl_806EF6A8 = 0;
+                fn_80425020();
+                fn_80432224(&b->resetAlarm);
+                fn_80432484(&b->resetAlarm, OSMillisecondsToTicks(1150), fn_80423CD4);
+                break;
+            }
+            break;
+        case 5:
+            fn_80425A70(lbl_806EF68C);
+            fn_804267F4(fn_804231C4);
+            break;
+        }
+        lbl_806EF688 = 0;
+    } else if (lbl_806EF6A8 == 0) {
+        lbl_806EF660->state = 1;
+        fn_8042427C(lbl_806EF660);
+    } else {
+        switch (lbl_806EF67C) {
+        case 4:
+        case 5:
+        case 13:
+        case 15:
+            __DVDClearWaitingQueue();
+            finished = lbl_806EF660;
+            lbl_806EF660 = &b->dummy;
+            if (finished->callback) {
+                finished->callback(-4, finished);
+            }
+            fn_80423F94();
+            break;
+        default:
+            lbl_806EF6A8 = 0;
+            fn_80425020();
+            fn_80432224(&b->resetAlarm);
+            fn_80432484(&b->resetAlarm, OSMillisecondsToTicks(1150), fn_80423CD4);
+            break;
+        }
+    }
+}
+
+void fn_8042427C(DVDCommandBlock* block) {
+    DVDCommandBlock* finished;
+
+    lbl_806EF6B8 = fn_8042427C;
+    switch (block->command) {
+    case 5:
+        __DIRegs[1] = __DIRegs[1];
+        block->currTransferSize = 0x20;
+        fn_80426750(block->addr, fn_804245BC);
+        break;
+    case 1:
+    case 4:
+        if (block->length == 0) {
+            finished = lbl_806EF660;
+            lbl_806EF660 = &lbl_806DE1A0;
+            finished->state = 0;
+            if (finished->callback) {
+                finished->callback(0, finished);
+            }
+            fn_80423F94();
+            break;
+        }
+        __DIRegs[1] = __DIRegs[1];
+        block->currTransferSize = (block->length - block->transferredSize > 0x80000) ? 0x80000 : block->length - block->transferredSize;
+        fn_804263F8((u8*)block->addr + block->transferredSize, block->currTransferSize, block->offset + block->transferredSize, fn_804245BC);
+        break;
+    case 2:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426690(block->offset, fn_804245BC);
+        break;
+    case 3:
+        fn_804267F4(fn_804245BC);
+        break;
+    case 15:
+        fn_804267F4(fn_804245BC);
+        break;
+    case 6:
+        __DIRegs[1] = __DIRegs[1];
+        if (lbl_806EF674) {
+            lbl_806EF660->currTransferSize = 0;
+            fn_80426A40(0, fn_804245BC);
+        } else {
+            lbl_806EF660->currTransferSize = 1;
+            fn_804269A8(0, block->length, block->offset, fn_804245BC);
+        }
+        break;
+    case 7:
+        __DIRegs[1] = __DIRegs[1];
+        fn_804269A8(0x10000, 0, 0, fn_804245BC);
+        break;
+    case 8:
+        __DIRegs[1] = __DIRegs[1];
+        lbl_806EF674 = 1;
+        fn_804269A8(0, 0, 0, fn_804245BC);
+        break;
+    case 9:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426A40(0, fn_804245BC);
+        break;
+    case 10:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426A40(0x10000, fn_804245BC);
+        break;
+    case 11:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426A40(0x20000, fn_804245BC);
+        break;
+    case 12:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426A40(0x30000, fn_804245BC);
+        break;
+    case 13:
+        __DIRegs[1] = __DIRegs[1];
+        fn_80426ACC(block->offset, block->length, fn_804245BC);
+        break;
+    case 14:
+        __DIRegs[1] = __DIRegs[1];
+        block->currTransferSize = 0x20;
+        fn_8042690C(block->addr, fn_804245BC);
+        break;
+    case 16:
+        __DIRegs[1] = __DIRegs[1];
+        fn_804267F4(fn_804245BC);
+        break;
+    default:
+        lbl_806EF1A8(block, fn_804245BC);
         break;
     }
 }
