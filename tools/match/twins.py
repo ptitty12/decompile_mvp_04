@@ -303,6 +303,9 @@ def unit_sources(unit: str) -> list[Path]:
 def extract_definition(text: str, pat: str):
     """(line number, source) of the first definition matching pat, or None."""
     for m in re.finditer(pat, text):
+        line_prefix = text[text.rfind("\n", 0, m.start()) + 1 : m.start()]
+        if "//" in line_prefix or line_prefix.rfind("/*") > line_prefix.rfind("*/"):
+            continue  # a mention inside a comment
         # walk to the end of the parameter list
         i, depth = m.end() - 1, 0
         while i < len(text):
