@@ -218,6 +218,65 @@ int fn_80282E5C(Unk8027FD64_Goal* g)
     return result;
 }
 
+class Unk8027A05C {
+public:
+    float fn_8027A280(int a);
+};
+
+struct Unk802831B0_Ext {
+    char pad0[0xD4];
+    float mD4;
+};
+
+int fn_802831B0(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float a, Unk802831B0_Ext* p, int c, float b)
+{
+    float lo, mid, hi, r, t;
+
+    if (!(b <= 36.0f)) {
+        lo = fn_80248FC8(x, 1);
+        mid = fn_80248FC8(x, 0);
+        hi = fn_80248FC8(x, 2);
+        r = lo;
+        if (!(b >= 60.0f)) {
+            t = (b - 36.0f) * 0.041666668f;
+            r = t * (lo - mid) + mid;
+        }
+        if (g->mE8.f14) {
+            r = mid;
+        } else if (g->mE8.f17) {
+            r = hi;
+        }
+        int kind = g->m38;
+        if (g->m3C != -1) {
+            kind = g->m3C;
+        }
+        if (kind == 4) {
+            t = fn_80248FC8(x, 2) - 39.37008f;
+            if (c) {
+                t = fn_80248FC8(x, 1);
+            }
+            r = t;
+        }
+        return a < r;
+    }
+    if (!(g->m80 > 0.0f)) {
+        return 1;
+    }
+    int idx = fn_8027FC20(g, g->m0);
+    t = g->m8->fn_8027A280(idx);
+    r = b / fn_80248FC8(x, 1);
+    t += r;
+    if (p) {
+        t += p->mD4;
+    }
+    mid = 0.25f;
+    hi = t / g->m80;
+    if (g->mE8.f1 && g->m68 == 7) {
+        mid = 0.6f;
+    }
+    return hi < 1.0f - mid;
+}
+
 void fn_802833E8(void* unused, Unk802833E8_Req* o, int a5, int a6, int a7, Unk80273498_Vec3* v, float* f1, float* f2)
 {
     if (a6) {

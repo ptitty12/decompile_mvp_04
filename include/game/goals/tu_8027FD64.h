@@ -118,14 +118,21 @@ struct Unk8027B304_Obj {
 /* Goal object (first argument of most functions here). Evidence: the offsets
  * used by fn_8027FD64, fn_80280F08, fn_80282B78, fn_80282C58, fn_80282CC0 and
  * fn_80282E5C. */
+class Unk8027A05C;
 struct Unk8027FD64_Goal {
-    char pad0[0x4];
+    int m0;
     void* m4;
-    char pad8[0x1C - 0x8];
+    Unk8027A05C* m8;
+    char padC[0x1C - 0xC];
     Unk80273498_Vec3 m1C;
     char pad28[0x2C - 0x28];
     int m2C;
-    char pad30[0x74 - 0x30];
+    char pad30[0x38 - 0x30];
+    int m38;
+    int m3C;
+    char pad40[0x68 - 0x40];
+    int m68;
+    char pad6C[0x74 - 0x6C];
     int m74;
     int m78;
     char pad7C[0x80 - 0x7C];
@@ -192,6 +199,7 @@ struct Unk80280230_Anim {
 };
 
 int fn_8027FC20(Unk8027FD64_Goal* g, int a);
+float fn_80248FC8(Unk80270BA0_X* x, int a);
 void fn_80386110(Unk80280230_Anim* a, Unk80386110_Query* q, unsigned int hash, int v, float* out, int flag);
 extern int lbl_806242B4;
 
