@@ -13,6 +13,8 @@
  *
  * Resource table of the MAD/VP6 file layer: lbl_806243F8[0] = entries (8 bytes each), lbl_80624400[0] = capacity,
  * lbl_80624404[0] = used count. Evidence: fn_803913FC clears n entries, fn_80391784 searches them. */
+#include "../../include/prodg/stdarg.h"
+
 struct McEntry {
     int m0;
     void* m4;
@@ -619,6 +621,26 @@ extern "C" int fn_803920BC(int* arg0)
         }
     }
     lbl_80624410[0] = 0;
+    return r;
+}
+
+extern "C" int fn_80392B80(int size);
+
+extern "C" int fn_8039223C(int first, int n, ...)
+{
+    va_list ap;
+    int r = 0;
+    va_start(ap, n);
+    int* buf = (int*)fn_80392B80(n * 4 + 4);
+    if (buf != 0) {
+        int i;
+        buf[0] = first;
+        for (i = 1; i <= n; i++)
+            buf[i] = va_arg(ap, int);
+        r = fn_803920BC(buf);
+        if (r == 0)
+            fn_80392BC0(buf);
+    }
     return r;
 }
 
