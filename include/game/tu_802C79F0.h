@@ -55,7 +55,10 @@ struct Unk802C95F8 {
     char pad4[0x438 - 4];
     Unk802C95F8_Sub* m438;
     char* m43C;
-    char pad440[0x4B0 - 0x440];
+    int m440;
+    char pad444[0x46C - 0x444];
+    int m46C;
+    char pad470[0x4B0 - 0x470];
     int m4B0;
     char pad4B4[0];
 };

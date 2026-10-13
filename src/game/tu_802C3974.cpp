@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_802C3974.h"
+#include "game/tu_802C79F0.h"
 
 extern unsigned char lbl_805E1B82[];
 extern unsigned char lbl_805E1B9A[];
