@@ -58,3 +58,9 @@ The typed volatile FIFO view in include/ealib/gx_fifo.h addresses 0xCC008000
 relative to a 0xCC010000 base with a signed displacement. sizeof-based indexing
 supports both 4-byte and 8-byte union views. Compile-only synthetic tests check
 the actual generated address form without touching hardware.
+
+Clone twin shapes retain function-relative local-label destinations. The compiled
+pre-check also resolves local branch relocations from the ELF symbol table and
+compares function-relative destinations, so relocation masking cannot hide a
+changed conditional path. External call/data bindings still need literal checks;
+all accepted source changes still need the unmodified verifier and retail hash.

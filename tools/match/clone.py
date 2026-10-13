@@ -59,6 +59,8 @@ from collections import defaultdict
 from pathlib import Path
 
 from score_variants import compiler_command, c_source_text, ninja_vars
+from check_literals import Elf
+from branch_targets import local_branch_destinations
 
 ROOT = Path(__file__).resolve().parents[2]
 VER = "GV4E69"
@@ -86,7 +88,10 @@ class Fn:
         self.unit, self.addr, self.name, self.raw = unit, addr, name, raw
         self.ops, self.syms = [], []
         for i in raw:
-            i = re.sub(r"\.L_[0-9A-F]+", "L", i)
+            # Local labels describe control flow, not interchangeable symbols.
+            # Preserve destinations relative to the function across twin addresses.
+            i = re.sub(r"\.L_([0-9A-F]+)",
+                       lambda m: "L" + format(int(m.group(1), 16) - self.addr, "+#x"), i)
             self.syms.append(SYM_RE.findall(i))
             self.ops.append(SYM_RE.sub("S", i))
         self.matched = False
@@ -603,6 +608,13 @@ class Cloner:
             m = re.match(r"^\s+[0-9a-f]+: (R_PPC_\w+)\s+(\S+)", line)
             if m and res[cur]:
                 res[cur][-1][2] = m.group(2)
+        elf = Elf(Path(obj))
+        local = local_branch_destinations(elf, elf.text_index())
+        for name, destinations in local.items():
+            if name not in res or len(res[name]) != len(destinations):
+                raise ValueError("incomplete function disassembly: " + name)
+            for instruction, destination in zip(res[name], destinations):
+                instruction.append(destination)
         return res
 
     def target_func(self, rel, addr_hex):
@@ -631,6 +643,8 @@ class Cloner:
         for k, (a, b) in enumerate(zip(ours, theirs)):
             if self.mask(a[0], a[2]) != self.mask(b[0], b[2]):
                 return f"insn {k}: {a[1]} | {b[1]}"
+            if len(a) > 3 and len(b) > 3 and a[3] != b[3]:
+                return f"branch {k}: local destination {a[3]} vs {b[3]}"
             if a[2] and b[2]:
                 sa, sb = re.sub(r"\+0x[0-9a-f]+$", "", a[2]), re.sub(r"\+0x[0-9a-f]+$", "", b[2])
                 if sa.startswith(("fn_", "lbl_", "gap_")) and sb.startswith(("fn_", "lbl_", "gap_")):
