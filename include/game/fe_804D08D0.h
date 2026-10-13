@@ -84,7 +84,7 @@ struct FeWX : Unk800C7B40_Data {
     virtual void s64();
     virtual void s65();
     virtual void s66();
-    virtual void s67(int a);
+    virtual void s67(int a, int b);
     virtual void s68();
     virtual void s69();
     virtual void s70();

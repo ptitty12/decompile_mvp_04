@@ -49,7 +49,6 @@ FE_OVERLAY int fn_804DDC10(FeScrB* x)
     return 1;
 }
 
-/* near-miss: 79 vs 80 insns; retail shares the m4C4/m4C8/m4CC tail between the SAVE and DELETE branches (24 store orders tried) */
 FE_OVERLAY void fn_804DDC6C(FeS804DDB20* x, char* out)
 {
     FeW* w = x->m134->fn_vslot70();
@@ -59,26 +58,26 @@ FE_OVERLAY void fn_804DDC6C(FeS804DDB20* x, char* out)
     int v = fn_8040B574(s, lbl_805F9804);
     if (v == 0) {
         FeStateE* st = (FeStateE*)((char*)fn_800B555C() + 8);
-        st->m4D0 = t1;
         st->m4C4 = 1;
         st->m4C8 = 0x11;
         st->m4CC = v;
+        st->m4D0 = t1;
     } else {
         v = fn_8040B574(s, lbl_805F9810);
         if (v == 0) {
             FeStateE* st = (FeStateE*)((char*)fn_800B555C() + 8);
-            st->m4D0 = t1;
+            st->m4C4 = v;
             st->m4C8 = 0x11;
             st->m4CC = v;
-            st->m4C4 = v;
+            st->m4D0 = t1;
         } else {
             v = fn_8040B574(s, lbl_805F981C);
             if (v == 0) {
                 FeStateE* st = (FeStateE*)((char*)fn_800B555C() + 8);
-                st->m4D0 = t2;
                 st->m4C4 = 2;
                 st->m4C8 = 0x11;
                 st->m4CC = v;
+                st->m4D0 = t2;
             }
         }
     }
