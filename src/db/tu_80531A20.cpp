@@ -757,18 +757,20 @@ extern "C" DB_OVERLAY int fn_8053350C(Unk805334B0_T* self, unsigned i)
     return r;
 }
 
-/* near-miss: same as fn_8053217C (retail keeps the result in r3 and branches the first compare with
- * blt; ours reuses r3 for the base pointer). */
 extern "C" DB_OVERLAY int fn_8053352C(Unk805334B0_T* self, float x)
 {
     int r = 0;
+    unsigned i = 0;
     float acc = lbl_805FEAC4;
-    unsigned i;
-    for (i = 0; i <= 18; i++) {
-        acc = acc + self->m8[i].m0;
-        if (!(x >= acc)) {
-            r = i;
-            break;
+    i = r;
+    acc = acc + self->m8[i].m0;
+    if (!(x < acc)) {
+        while (++i <= 18) {
+            acc = acc + self->m8[i].m0;
+            if (!(x >= acc)) {
+                r = i;
+                break;
+            }
         }
     }
     return r;
