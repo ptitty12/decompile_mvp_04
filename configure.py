@@ -543,7 +543,7 @@ config.libs = [
             Object(NonMatching, "game/tu_80061C6C.cpp"),
             Object(NonMatching, "game/tu_80063648.cpp"),
             Object(NonMatching, "game/tu_80064D48.cpp"),
-            Object(NonMatching, "game/tu_80067A20.cpp"),
+            Object(Matching, "game/tu_80067A20.cpp"),
             Object(NonMatching, "game/tu_80068380.cpp"),
             Object(NonMatching, "game/tu_80068CE0.cpp"),
             Object(NonMatching, "game/tu_8006902C.cpp"),
