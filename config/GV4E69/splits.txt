@@ -2186,6 +2186,7 @@ libc/isspace.c:
 
 libc/errno.c:
 	.text       start:0x8040ECB0 end:0x8040ECB8
+	.sbss       start:0x806EFC3C end:0x806EFC40 align:4
 
 libc/locale.c:
 	.text       start:0x8040ECB8 end:0x8040ECE8
