@@ -329,6 +329,63 @@ inline Unk801EE438_Vec VecSub(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b
     return r;
 }
 
+extern const float lbl_805D599C;
+extern const float lbl_805D59A0;
+extern const float lbl_805D59A4;
+extern const float lbl_805D59A8;
+inline float LenSqXZCDA0(const Unk801EE438_Vec& v)
+{
+    return v.m0 * v.m0 + v.m8 * v.m8;
+}
+inline float LenCDA0(const Unk801EE438_Vec& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+inline Unk801EE438_Vec ScaleCDA0(const Unk801EE438_Vec& v, float len)
+{
+    Unk801EE438_Vec r;
+    float s = lbl_805D59A4 / len;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec NormCDA0(const Unk801EE438_Vec& v)
+{
+    float len = LenCDA0(v);
+    if (len != lbl_805D59A0) {
+        return ScaleCDA0(v, len);
+    }
+    return lbl_806055AC;
+}
+inline Unk801EE438_Vec MulCDA0(const Unk801EE438_Vec& v, float s)
+{
+    Unk801EE438_Vec r;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec AddCDA0(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 + b.m0;
+    r.m4 = a.m4 + b.m4;
+    r.m8 = a.m8 + b.m8;
+    return r;
+}
+extern const Unk801EE438_Vec lbl_805D6790;
+
+extern "C" int fn_8020CDA0(void* p, Unk801EE438_Vec* v)
+{
+    Unk801EE438_Vec d = Sub8DD9C(*v, lbl_805D6790);
+    if (!(LenSqXZCDA0(d) <= lbl_805D599C)) {
+        *v = AddCDA0(lbl_805D6790, MulCDA0(NormCDA0(d), lbl_805D59A8));
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" int fn_8020CFA8(Scr*, Unk801EE438_Vec* a)
 {
     Unk801EE438_Vec d = VecSub(*a, lbl_805D6790);
@@ -464,6 +521,60 @@ extern const float lbl_805D5B60;
 extern const float lbl_805D5B64;
 extern const float lbl_805D5B68;
 
+
+extern const float lbl_805D5B34;
+extern const float lbl_805D5B38;
+extern const float lbl_805D5B3C;
+extern const float lbl_805D5B40;
+extern const Unk801EE438_Vec lbl_805D6760[];
+inline Unk801EE438_Vec ScaleE9CC(const Unk801EE438_Vec& v, float len)
+{
+    Unk801EE438_Vec r;
+    float s = lbl_805D5B3C / len;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec NormE9CC(const Unk801EE438_Vec& v)
+{
+    float len = LenCDA0(v);
+    if (len != 0.0f) {
+        return ScaleE9CC(v, len);
+    }
+    return lbl_806055AC;
+}
+
+inline Unk801EE438_Vec FlatE9CC(Unk801EE438_Player* pl)
+{
+    Unk801EE438_Vec v = *(Unk801EE438_Vec*)&pl->m60;
+    v.m4 = 0.0f;
+    return v;
+}
+
+/* near-miss (96.7%, all 161 words present): the three stores of the first Vec copy are scheduled in a
+   different order (b.x is stored after the y-zero store in ours, before it in retail); the stack
+   layout and registers match. Tried: Flat inline vs hand copy, local float order, nested/named temps. */
+extern "C" float fn_8020E9CC(Scr* p, Unk801EE438_Player* pl, int idx, Unk801EE438_Vec* out, float* outF)
+{
+    float f8 = lbl_805D5B3C;
+    float fC = lbl_805D5B34;
+    float f10 = lbl_805D5B38;
+    Unk801EE438_Vec b = FlatE9CC(pl);
+    Unk801EE438_Vec d = Sub8DD9C(lbl_805D6760[idx], b);
+    float f80;
+    Unk801EE438_Vec e = AddCDA0(b, MulCDA0(NormE9CC(d), lbl_805D5B40));
+    f80 = lbl_805D5B40;
+    *out = e;
+    Unk8027C728_Goal* g = fn_802448F4((Unk80270BA0_X*)pl, 1);
+    g->m10 = 5;
+    fn_8027C728(g);
+    Unk80299920_Goal* sub = (Unk80299920_Goal*)g->m18;
+    sub->fn_80299F64(8);
+    *outF = sub->fn_8029A948();
+    fn_8027D368(g);
+    return f8;
+}
 
 extern "C" float fn_8020EC50(Scr* p, int k)
 {
