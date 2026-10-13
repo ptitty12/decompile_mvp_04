@@ -2063,6 +2063,7 @@ libc/stdio.c:
 
 libc/vfscanf.c:
 	.text       start:0x80408CE4 end:0x80409BBC
+	.rodata     start:0x8060EB24 end:0x8060EB48 align:4
 
 libc/vprintf.c:
 	.text       start:0x80409BBC end:0x80409BF0

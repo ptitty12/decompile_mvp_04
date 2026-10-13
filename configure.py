@@ -1152,7 +1152,7 @@ config.libs = [
             Object(Matching, "libc/sprintf.c"),
             Object(Matching, "libc/sscanf.c"),
             Object(Matching, "libc/stdio.c"),
-            Object(NonMatching, "libc/vfscanf.c"),
+            Object(Matching, "libc/vfscanf.c"),
             Object(Matching, "libc/vprintf.c"),
             Object(Matching, "libc/vsprintf.c"),
             Object(NonMatching, "libc/assert.c"),
