@@ -57,7 +57,7 @@ extern s32 lbl_806334B8[8];         /* SectorSizeTable */
 extern s32 lbl_806334D8[8];         /* LatencyTable */
 extern u16 lbl_806EF178;            /* __CARDVendorID */
 
-static void fn_8041D8DC(s32 chan, s32 result);
+void fn_8041D8DC(s32 chan, s32 result);
 static void fn_8041DBFC(s32 chan, s32 result);
 static void fn_8041DD44(s32 chan, s32 result);
 static s32 fn_8041D488(s32 chan);
@@ -623,7 +623,7 @@ error:
 }
 
 /* __CARDMountCallback */
-static void fn_8041D8DC(s32 chan, s32 result)
+void fn_8041D8DC(s32 chan, s32 result)
 {
     CARDControl* card;
     CARDCallback callback;
