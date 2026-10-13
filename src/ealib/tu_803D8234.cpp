@@ -8,7 +8,7 @@ extern "C" {
 void fn_80377408(void* p); /* __builtin_delete */
 void GXInvalidateVtxCache(void);
 void GXInvalidateTexAll(void);
-void VISetPreRetraceCallback(int cb);
+void VISetPostRetraceCallback(int cb);
 void fn_803DB4CC(void);
 void fn_8043000C(int a);
 void fn_8042C464(void);
@@ -729,7 +729,7 @@ extern "C" void fn_803D9AD0(Unk803D8234Sub* self, int c)
     self->m10 = lbl_806867A0;
     if (lbl_806272EC) {
         lbl_806272EC = lbl_806272EC - 1;
-        VISetPreRetraceCallback(0);
+        VISetPostRetraceCallback(0);
     }
     if (self->m94) {
         fn_803EDA0C(fn_803DD7C0((void*)self->m94));

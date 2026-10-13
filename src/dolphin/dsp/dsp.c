@@ -3,6 +3,15 @@
 #include <dolphin.h>
 #include <dolphin/hw_regs.h>
 
+
+#define __DSP_rude_task_pending lbl_806EF624
+#define __DSP_rude_task lbl_806EF628
+#define __DSP_tmp_task lbl_806EF62C
+#define __DSP_last_task lbl_806EF630
+#define __DSP_first_task lbl_806EF634
+#define __DSP_curr_task lbl_806EF638
+#define __DSP_init_flag lbl_806EF610
+#define __DSPVersion lbl_806EF190
 #include "__dsp.h"
 
 #define BUILD_DATE "Apr  5 2004"
@@ -12,16 +21,33 @@
 #define BUILD_TIME "04:15:32"
 #endif
 
+struct DSPVersionStrings {
+    char version[72];
+    char format[32];
+    char date[12];
+    char time[9];
+};
 #ifdef DEBUG
-const char* __DSPVersion = "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>";
+struct DSPVersionStrings lbl_80633678 = {
+    "<< Dolphin SDK - DSP\tdebug build: Apr  5 2004 03:56:49 (0x2301) >>",
+    "DSPInit(): Build Date: %s %s\n",
+    "Apr  5 2004",
+    "03:56:49"
+};
 #else
-const char* __DSPVersion = "<< Dolphin SDK - DSP\trelease build: Apr  5 2004 04:15:32 (0x2301) >>";
+struct DSPVersionStrings lbl_80633678 = {
+    "<< Dolphin SDK - DSP\trelease build: Apr  5 2004 04:15:32 (0x2301) >>",
+    "DSPInit(): Build Date: %s %s\n",
+    "Apr  5 2004",
+    "04:15:32"
+};
 #endif
+const char* __DSPVersion = lbl_80633678.version;
 
 extern DSPTaskInfo* __DSP_rude_task;
 extern int __DSP_rude_task_pending;
 
-static BOOL __DSP_init_flag;
+extern BOOL __DSP_init_flag;
 
 
 u32 DSPCheckMailToDSP(void) {
@@ -30,10 +56,6 @@ u32 DSPCheckMailToDSP(void) {
 
 u32 DSPCheckMailFromDSP(void) {
     return (__DSPRegs[2] & (1 << 15)) >> 15;
-}
-
-u32 DSPReadCPUToDSPMbox(void) {
-    return (__DSPRegs[0] << 16) | __DSPRegs[1];
 }
 
 u32 DSPReadMailFromDSP(void) {
@@ -45,7 +67,7 @@ void DSPSendMailToDSP(u32 mail) {
     __DSPRegs[1] = mail & 0xFFFF;
 }
 
-void DSPAssertInt(void) {
+static inline void __DSPAssertInt(void) {
     BOOL old;
     u16 tmp;
 
@@ -60,7 +82,7 @@ void DSPInit(void) {
     BOOL old;
     u16 tmp;
 
-    __DSP_debug_printf("DSPInit(): Build Date: %s %s\n", BUILD_DATE, BUILD_TIME);
+    __DSP_debug_printf(lbl_80633678.format, lbl_80633678.date, lbl_80633678.time);
 
     if (__DSP_init_flag == 1)
         return;
@@ -86,44 +108,6 @@ void DSPInit(void) {
 
 BOOL DSPCheckInit(void) {
     return __DSP_init_flag;
-}
-
-void DSPReset(void) {
-    BOOL old;
-    u16 tmp;
-
-    old = OSDisableInterrupts();
-    tmp = __DSPRegs[5];
-    tmp = (tmp & ~0xA8) | 0x800 | 1;
-    __DSPRegs[5] = tmp;
-    __DSP_init_flag = 0;
-    OSRestoreInterrupts(old);
-}
-
-void DSPHalt(void) {
-    BOOL old;
-    u16 tmp;
-
-    old = OSDisableInterrupts();
-    tmp = __DSPRegs[5];
-    tmp = (tmp & ~0xA8) | 4;
-    __DSPRegs[5] = tmp;
-    OSRestoreInterrupts(old);
-}
-
-void DSPUnhalt(void) {
-    BOOL old;
-    u16 tmp;
-
-    old = OSDisableInterrupts();
-    tmp = __DSPRegs[5];
-    tmp = (tmp & ~0xAC);
-    __DSPRegs[5] = tmp;
-    OSRestoreInterrupts(old);
-}
-
-u32 DSPGetDMAStatus(void) {
-    return (__DSPRegs[5] & (1 << 9));
 }
 
 DSPTaskInfo* DSPAddTask(DSPTaskInfo* task) {
@@ -175,7 +159,7 @@ DSPTaskInfo* DSPAssertTask(DSPTaskInfo* task) {
         __DSP_rude_task = task;
         __DSP_rude_task_pending = 1;
         if (__DSP_curr_task->state == 1) {
-            DSPAssertInt();
+            __DSPAssertInt();
         }
         OSRestoreInterrupts(old);
         return task;
@@ -184,3 +168,4 @@ DSPTaskInfo* DSPAssertTask(DSPTaskInfo* task) {
     OSRestoreInterrupts(old);
     return NULL;
 }
+

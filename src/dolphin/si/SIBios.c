@@ -2,15 +2,21 @@
 #include <dolphin/si.h>
 #include <dolphin/vi.h>
 
-#include "__os.h"
+
+extern void fn_80432568(OSAlarm*);
+extern void fn_80432484(OSAlarm*, OSTime, OSAlarmHandler);
+extern void fn_80437080(s32, u16);
+extern u16 fn_80436FFC(s32);
+
 
 #define ROUND(n, a) (((u32)(n) + (a)-1) & ~((a)-1))
 
 #ifdef DEBUG
-const char* __SIVersion = "<< Dolphin SDK - SI\tdebug build: Apr  5 2004 03:55:31 (0x2301) >>";
+char lbl_80648C90[] = "<< Dolphin SDK - SI	debug build: Apr  5 2004 03:55:31 (0x2301) >>";
 #else
-const char* __SIVersion = "<< Dolphin SDK - SI\trelease build: Apr  5 2004 04:14:16 (0x2301) >>";
+char lbl_80648C90[] = "<< Dolphin SDK - SI	release build: Apr  5 2004 04:14:16 (0x2301) >>";
 #endif
+const char* __SIVersion = lbl_80648C90;
 
 static SIControl Si = {
     /* chan */       -1,
@@ -31,11 +37,11 @@ static BOOL InputBufferValid[4];
 static u32 InputBuffer[4][2];
 static volatile u32 InputBufferVcount[4];
 
-u32 __PADFixBits;
+extern u32 lbl_806EF8A8;
 
 // prototypes
 static u32 CompleteTransfer();
-static void SITransferNext(s32 chan);
+static inline void SITransferNext(s32 chan);
 static void SIInterruptHandler(__OSInterrupt interrupt, OSContext* context);
 static int __SITransfer(s32 chan, void* output, u32 outputBytes, void* input, u32 inputBytes, SICallback callback);
 static void AlarmHandler(OSAlarm* alarm, OSContext* context);
@@ -50,7 +56,7 @@ BOOL SIIsChanBusy(s32 chan) {
     return Packet[chan].chan != -1 || Si.chan == chan;
 }
 
-static void SIClearTCInterrupt(void) {
+static inline void SIClearTCInterrupt(void) {
     u32 reg;
 
     reg = __SIRegs[SI_COMCSR_IDX];
@@ -106,7 +112,7 @@ static u32 CompleteTransfer(void) {
     return sr;
 }
 
-static void SITransferNext(s32 chan) {
+static inline void SITransferNext(s32 chan) {
     int i;
     SIPacket* packet;
 
@@ -118,7 +124,7 @@ static void SITransferNext(s32 chan) {
         if (packet->chan != -1) {
             if (packet->fire <= __OSGetSystemTime()) {
                 if (__SITransfer(packet->chan, packet->output, packet->outputBytes, packet->input, packet->inputBytes, packet->callback) != 0) {
-                    OSCancelAlarm(&Alarm[chan]);
+                    fn_80432568(&Alarm[chan]);
                     packet->chan = -1;
                 }
                 return;
@@ -157,9 +163,9 @@ static void SIInterruptHandler(__OSInterrupt interrupt, OSContext* context) {
         __SIRegs[SI_STATUS_IDX] = sr;
 
         if (Type[chan] == SI_ERROR_BUSY && !SIIsChanBusy(chan)) {
-            static u32 cmdTypeAndStatus;
+            extern u32 lbl_806EF8A0;
 
-            SITransfer(chan, &cmdTypeAndStatus, 1, &Type[chan], 3, &GetTypeCallback, OSMicrosecondsToTicks(65));
+            SITransfer(chan, &lbl_806EF8A0, 1, &Type[chan], 3, &GetTypeCallback, OSMicrosecondsToTicks(65));
         }
     }
 
@@ -353,18 +359,7 @@ static int __SITransfer(s32 chan, void* output, u32 outputBytes, void* input, u3
     return 1;
 }
 
-u32 SISync(void) {
-    BOOL enabled;
-    u32 sr;
 
-    do {} while(__SIRegs[SI_COMCSR_IDX] & SI_COMCSR_TSTART_MASK);
-
-    enabled = OSDisableInterrupts();
-    sr = CompleteTransfer();
-    SITransferNext(4);
-    OSRestoreInterrupts(enabled);
-    return sr;
-}
 
 u32 SIGetStatus(s32 chan) {
     BOOL enabled;
@@ -391,10 +386,7 @@ void SISetCommand(s32 chan, u32 command) {
     __SIRegs[chan* 3] = command;
 }
 
-u32 SIGetCommand(s32 chan) {
-    ASSERTMSGLINE(770, (chan >= 0) && (chan < 4), "SIGetCommand(): invalid channel.");
-    return __SIRegs[chan* 3];
-}
+
 
 void SITransferCommands(void) {
     __SIRegs[SI_STATUS_IDX] = SI_COMCSR_TCINT_MASK;
@@ -537,7 +529,7 @@ BOOL SITransfer(s32 chan, void* output, u32 outputBytes, void* input, u32 inputB
 
     if (now < fire) {
         delay = fire - now;
-        OSSetAlarm(&Alarm[chan], delay, AlarmHandler);
+        fn_80432484(&Alarm[chan], delay, AlarmHandler);
     } else if (__SITransfer(chan, output, outputBytes, input, inputBytes, callback)) {
         OSRestoreInterrupts(enabled);
         return TRUE;
@@ -554,7 +546,7 @@ BOOL SITransfer(s32 chan, void* output, u32 outputBytes, void* input, u32 inputB
     return TRUE;
 }
 
-static void CallTypeAndStatusCallback(s32 chan, u32 type) {
+static inline void CallTypeAndStatusCallback(s32 chan, u32 type) {
     SITypeCallback callback;
     int i;
 
@@ -583,16 +575,16 @@ static void GetTypeCallback(s32 chan, u32 error, OSContext* context) {
 
     type = Type[chan];
     chanBit = 0x80000000 >> chan;
-    fix = __PADFixBits & chanBit;
-    __PADFixBits &= ~chanBit;
+    fix = lbl_806EF8A8 & chanBit;
+    lbl_806EF8A8 &= ~chanBit;
 
     if ((error & 0xF) != 0 || (type & 0x18000000) != 0x08000000 || (type & 0x80000000) == 0 || (type & 0x04000000) != 0) {
-        OSSetWirelessID(chan, 0);
+        fn_80437080(chan, 0);
         CallTypeAndStatusCallback(chan, Type[chan]);
     } else {
         static u32 cmdFixDevice[4];
 
-        id = OSGetWirelessID(chan) << 8;
+        id = fn_80436FFC(chan) << 8;
         
         if (fix != 0 && (id & 0x100000) != 0) {
             cmdFixDevice[chan] = 0x4E000000 | (id & 0xCFFF00) | 0x100000;
@@ -606,7 +598,7 @@ static void GetTypeCallback(s32 chan, u32 error, OSContext* context) {
                 if ((id & 0x100000) == 0) {
                     id = type & 0xCFFF00;
                     id |= 0x100000;
-                    OSSetWirelessID(chan, id >> 8);
+                    fn_80437080(chan, id >> 8);
                 }
 
                 cmdFixDevice[chan] = 0x4E000000 | id;
@@ -618,7 +610,7 @@ static void GetTypeCallback(s32 chan, u32 error, OSContext* context) {
             if ((type & 0x40000000) != 0) {
                 id = type & 0xCFFF00;
                 id |= 0x100000;
-                OSSetWirelessID(chan, id >> 8);
+                fn_80437080(chan, id >> 8);
 
                 cmdFixDevice[chan] = 0x4E000000 | id;
                 Type[chan] = SI_ERROR_BUSY;
@@ -626,7 +618,7 @@ static void GetTypeCallback(s32 chan, u32 error, OSContext* context) {
                 return;
             }
 
-            OSSetWirelessID(chan, 0);
+            fn_80437080(chan, 0);
         }
 
         CallTypeAndStatusCallback(chan, Type[chan]);
@@ -634,7 +626,7 @@ static void GetTypeCallback(s32 chan, u32 error, OSContext* context) {
 }
 
 u32 SIGetType(s32 chan) {
-    static u32 cmdTypeAndStatus;
+    extern u32 cmdTypeAndStatus_806EF8A4;
     BOOL enabled;
     u32 type;
     OSTime diff;
@@ -665,7 +657,7 @@ u32 SIGetType(s32 chan) {
     }
 
     TypeTime[chan] = __OSGetSystemTime();
-    SITransfer(chan, &cmdTypeAndStatus, 1, &Type[chan], 3, &GetTypeCallback, OSMicrosecondsToTicks(65));
+    SITransfer(chan, &cmdTypeAndStatus_806EF8A4, 1, &Type[chan], 3, &GetTypeCallback, OSMicrosecondsToTicks(65));
     OSRestoreInterrupts(enabled);
     return type;
 }
@@ -699,101 +691,8 @@ u32 SIGetTypeAsync(s32 chan, SITypeCallback callback) {
     return type;
 }
 
-u32 SIDecodeType(u32 type) {
-    u32 error;
 
-    error = type & 0xFF;
-    type &= ~0xFF;
 
-    if (error & SI_ERROR_NO_RESPONSE) {
-        return SI_ERROR_NO_RESPONSE;
-    }
 
-    if (error & (SI_ERROR_UNKNOWN | SI_ERROR_COLLISION | SI_ERROR_OVER_RUN | SI_ERROR_UNDER_RUN)) {
-        return SI_ERROR_UNKNOWN;
-    }
 
-    if (error != 0) {
-        ASSERTLINE(1371, error == SI_ERROR_BUSY);
-        return SI_ERROR_BUSY;
-    }
 
-    if ((type & SI_TYPE_MASK) == SI_TYPE_N64) {
-        switch (type & 0xFFFF0000) {
-        case SI_N64_MIC:
-        case SI_N64_KEYBOARD:
-        case SI_GBA:
-        case SI_N64_MOUSE:
-        case SI_N64_CONTROLLER:
-            return type & 0xFFFF0000;
-        default:
-            return SI_ERROR_UNKNOWN;
-        }
-    }
-
-    if ((type & SI_TYPE_MASK) != SI_TYPE_DOLPHIN) {
-        return SI_ERROR_UNKNOWN;
-    }
-
-    switch (type & 0xFFFF0000) {
-    case SI_GC_STEERING:
-    case SI_GC_CONTROLLER:
-        return type & 0xFFFF0000;
-    }
-
-    if ((type & 0xFFE00000) == SI_GC_KEYBOARD) {
-        return SI_GC_KEYBOARD;
-    }
-
-    if ((type & SI_GC_WIRELESS) != 0 && (type & SI_WIRELESS_IR) == 0) {
-        if ((type & SI_GC_WAVEBIRD) == SI_GC_WAVEBIRD) {
-            return SI_GC_WAVEBIRD;
-        }
-
-        if ((type & SI_WIRELESS_STATE) == 0) {
-            return SI_GC_RECEIVER;
-        }
-    }
-
-    if ((type & SI_GC_CONTROLLER) == SI_GC_CONTROLLER) {
-        return SI_GC_CONTROLLER;
-    }
-
-    return SI_ERROR_UNKNOWN;
-}
-
-u32 SIProbe(s32 chan) {
-    return SIDecodeType(SIGetType(chan));
-}
-
-char* SIGetTypeString(u32 type) {
-    switch (SIDecodeType(type)) {
-    case SI_ERROR_NO_RESPONSE:
-        return "No response";
-    case SI_ERROR_BUSY:
-        return "Busy";
-    case SI_N64_CONTROLLER:
-        return "N64 controller";
-    case SI_N64_MIC:
-        return "N64 microphone";
-    case SI_N64_KEYBOARD:
-        return "N64 keyboard";
-    case SI_N64_MOUSE:
-        return "N64 mouse";
-    case SI_GBA:
-        return "GameBoy Advance";
-    case SI_GC_CONTROLLER:
-        return "Standard controller";
-    case SI_GC_RECEIVER:
-        return "Wireless receiver";
-    case SI_GC_WAVEBIRD:
-        return "WaveBird controller";
-    case SI_GC_KEYBOARD:
-        return "Keyboard";
-    case SI_GC_STEERING:
-        return "Steering";
-    case SI_ERROR_UNKNOWN:
-    default:
-        return "Unknown";
-    }
-}

@@ -2,11 +2,11 @@
 #include <dolphin.h>
 #include <dolphin/si.h>
 
-#include "__os.h"
+
 
 #define LATENCY 8
 
-static u32 SamplingRate = 0;
+extern u32 SamplingRate;
 
 typedef struct XY {
     u16 line;
