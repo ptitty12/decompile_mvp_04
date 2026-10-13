@@ -531,6 +531,59 @@ extern "C" void fn_803B39A4()
     fn_803A979C();
 }
 
+extern unsigned char lbl_8069CBBC;
+extern float lbl_8069CBA8[5];
+/* 3D speaker angles per output layout (lbl_8069CBA8) and the source-channel angle table (srcchancfg3d). The stereo pair is stored in both arms, so jump2 merges the identical stores into the shared tail. */
+extern "C" void fn_803B39E4()
+{
+    if (lbl_8069CBBC == 1) {
+        lbl_8069CBC0 = 0;
+        lbl_8069CBA8[0] = 0.0f;
+    } else if (lbl_8069CBBC == 2) {
+        lbl_8069CBC0 = 1;
+        lbl_8069CBA8[0] = 90.0f;
+        lbl_8069CBA8[1] = 270.0f;
+    } else if (lbl_8069CBBC == 4) {
+        lbl_8069CBC0 = 2;
+        lbl_8069CBA8[0] = 45.0f;
+        lbl_8069CBA8[1] = 135.0f;
+        lbl_8069CBA8[2] = 225.0f;
+        lbl_8069CBA8[3] = 315.0f;
+    } else if (lbl_8069CBBC == 6) {
+        lbl_8069CBC0 = 3;
+        lbl_8069CBA8[0] = 0.0f;
+        lbl_8069CBA8[1] = 45.0f;
+        lbl_8069CBA8[2] = 135.0f;
+        lbl_8069CBA8[3] = 225.0f;
+        lbl_8069CBA8[4] = 315.0f;
+    }
+    if (sndgs.sso.set.outputchannels == 2) {
+        sndgs.srcchancfg3d[1][0] = -0x4000;
+        sndgs.srcchancfg3d[1][1] = 0x4000;
+    } else {
+        sndgs.srcchancfg3d[1][0] = -0x2000;
+        sndgs.srcchancfg3d[1][1] = 0x2000;
+    }
+    sndgs.srcchancfg3d[3][0] = -0x2000;
+    sndgs.srcchancfg3d[3][1] = 0x2000;
+    sndgs.srcchancfg3d[3][2] = -0x6000;
+    sndgs.srcchancfg3d[3][3] = 0x6000;
+    sndgs.srcchancfg3d[4][0] = -0x2000;
+    sndgs.srcchancfg3d[4][1] = 0;
+    sndgs.srcchancfg3d[4][2] = 0x2000;
+    sndgs.srcchancfg3d[4][3] = -0x6000;
+    sndgs.srcchancfg3d[4][4] = 0x6000;
+    sndgs.srcchancfg3d[5][1] = 0;
+    sndgs.srcchancfg3d[2][0] = sndgs.sso.set.virtualspkrcfg3d[2][2];
+    sndgs.srcchancfg3d[2][1] = sndgs.sso.set.virtualspkrcfg3d[2][0];
+    sndgs.srcchancfg3d[2][2] = sndgs.sso.set.virtualspkrcfg3d[2][1];
+    sndgs.srcchancfg3d[5][0] = -0x2000;
+    sndgs.srcchancfg3d[5][2] = 0x2000;
+    sndgs.srcchancfg3d[5][3] = -0x6000;
+    sndgs.srcchancfg3d[5][4] = 0x6000;
+    sndgs.srcchancfg3d[5][5] = 0;
+}
+
 extern "C" int fn_803B3B98(int a)
 {
     int s = 0x1000;
