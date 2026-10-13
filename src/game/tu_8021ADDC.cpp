@@ -40,6 +40,8 @@ struct Unk8026C414_X;
 int fn_8026D730(Unk8026C414_O* o, Unk8026C414_X* x);
 struct Unk80069F0C;
 int fn_8006BE18(Unk80069F0C* o);
+struct Unk8024EF40_A;
+int fn_80255028(Unk8024EF40_A* a);
 extern "C" {
 
 void fn_801EDE78(Task* t, int x);
@@ -49,6 +51,69 @@ struct Unk8021C24C_Obj {
     char pad6C[0x928 - 0x6C];
     Player* m928;
 };
+struct Unk8021BFFC_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x928 - 0x6C];
+    Player* m928;
+};
+extern "C" Vec3f fn_801E73E8(void* self, int k, int sel);
+extern const Vec3f lbl_806055DC;
+extern const float lbl_805D60EC;
+extern const float lbl_805D60F0;
+inline int NeFlag(int a, int b)
+{
+    int r = 0;
+    if (a != b)
+        r = 1;
+    return r;
+}
+/* near-miss: 148/148 insns, 16 slots differ (98%), all register numbers or scheduling order. Retail loads the
+   lbl_806055DC.x float (lfs f0) before the word loads of the struct copy, and keeps &cur->m60 in r4 so the li
+   constants 3 and 6 land in r5 and r6 (ours r4 and r5, pointer in r6). Tried: compare forms (else-if chain, negated
+   ==, braces), the copy through an inline, diff/pos order, and a hill-climb over the store order. */
+void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8021BFFC_Obj* cur = (Unk8021BFFC_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    PlayerSub* ps = &p->m58C;
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    cur->m928 = p;
+    int flag = NeFlag(fn_80255028((Unk8024EF40_A*)ps), ps->m38);
+    int diff = 0;
+    Vec3f pos = lbl_806055DC;
+    if (v->x != lbl_806055DC.x || v->y != lbl_806055DC.y || v->z != lbl_806055DC.z)
+        diff = 1;
+    if (diff != 0)
+        pos = *v;
+    else
+        fn_801E73E8(t, a, flag);
+    e->m4 = 0x1E;
+    e->m0 = 0x19;
+    e->m28 = p;
+    e->m1C = a;
+    e->m9C = 1;
+    e->m38 = pos;
+    e->m80 = lbl_805D60EC;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m90 = lbl_805D60F0;
+    e->m10 = 6;
+    e->m94 = 1;
+    e->m50 = lbl_806055AC - cur->m60;
+    t->m9C->m60 = 0;
+}
+
 void fn_8021C24C(Task* t, Player* p)
 {
     RecQueue* q = t->m9C->m3A60;
