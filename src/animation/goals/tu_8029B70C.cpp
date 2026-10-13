@@ -329,17 +329,17 @@ Unk801A4CE8_Obj* fn_801A4CE8(Unk8014D8AC_Ctx* ctx, int a);
 extern "C" int strcmp(const char* a, const char* b);
 Unk80273498_Vec3 fn_8014E388(int idx);
 int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t);
-extern Unk80273498_Vec3 lbl_805DCB7C;
+extern const Unk80273498_Vec3 lbl_805DCB7C;
 
 inline int Unk8029D2E0_Left(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
 {
     return !(a.x * b.z - a.z * b.x >= 0.0f);
 }
 
-/* near-miss (98.4%, 255 of 255 instructions, 9 lines differ): in the else arm of the "BehindHome" test retail
- * stores pos.x before computing the p copy addresses and loads the 0.0f compare constant after the p copy;
- * ours schedules both about 3 instructions later. Tried: pos/p declaration order and assignment forms, the
- * compare in the caller or in the inline (float vs int return, `<`, `>=`, ternary). */
+/* near-miss (255 of 255 instructions, 5 lines differ): retail loads the 0.0f compare constant (inside the Left
+ * inline) four instructions earlier, before the first param copy. lbl_805DCB7C must be const (that took
+ * 9 lines down to 5). Tried: pos/p declaration order and assignment forms, the compare in the caller or in
+ * the inline (float vs int return, `<`, `>=`, ternary). */
 unsigned int fn_8029D2E0(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int a)
 {
     Unk80273498_Vec3 v;
