@@ -566,6 +566,86 @@ void fn_8017EF78() {}
 
 Unk8017EF7C::Unk8017EF7C() : Unk8037B3E8(0xEF8A9748) {}
 
+extern const char* lbl_8061C710;
+extern const char lbl_805CC958[];
+extern const char lbl_805CC968[];
+extern const char lbl_805CC978[];
+extern const char lbl_805CC988[];
+extern const char lbl_805CC998[];
+extern const char lbl_805CC9A8[];
+extern const char lbl_805CC9B8[];
+extern const char lbl_805CC9CC[];
+extern const char lbl_805CC9D8[];
+extern const char lbl_805CC9EC[];
+extern const char lbl_805CC9F8[];
+extern const char lbl_805CCA08[];
+extern const char lbl_805CCA14[];
+extern const char lbl_805CCA24[];
+extern const char lbl_805CCA34[];
+extern const char lbl_805CCA44[];
+extern const char lbl_805CCA50[];
+extern const char lbl_805CCA60[];
+extern const char lbl_805CCA74[];
+extern const char lbl_805CCA88[];
+extern const char lbl_805CCAA0[];
+extern const char lbl_805CCAAC[];
+extern const char lbl_805CCAB8[];
+extern const char lbl_805CCAC4[];
+extern const char lbl_805CCAD0[];
+extern const char lbl_805CCADC[];
+extern const char lbl_805CCAEC[];
+extern const char lbl_805CCAF8[];
+extern const char lbl_805CCB08[];
+extern const char lbl_805CCB18[];
+extern const char lbl_805CCB28[];
+extern const char lbl_805CCB38[];
+extern const char lbl_805CCB4C[];
+extern const char lbl_805CCB60[];
+extern const char lbl_805CCB68[];
+extern const char lbl_805CCB78[];
+
+void Unk8017EF7C::fn_vslot2() /* 8017EFC0 */
+{
+    fn_8037B7E4(lbl_8061C710);
+    fn_8037B7E8(lbl_805CC958);
+    fn_8037B50C(lbl_805CC968, &m48, lbl_805CC978, 0);
+    fn_8037B50C(lbl_805CC988, &m4C, lbl_805CC978, 0);
+    fn_8037B50C(lbl_805CC998, &m50, lbl_805CC978, 0);
+    fn_8037B50C(lbl_805CC9A8, &m54, lbl_805CC978, 0);
+    fn_8037B50C(lbl_805CC9B8, &m58, lbl_805CC978, 0);
+    fn_8037B50C(lbl_805CC9CC, &m5C, lbl_805CC978, 0);
+    fn_8037B830(lbl_805CC958);
+    fn_8037B7E8(lbl_805CC9D8);
+    fn_8037B50C(lbl_805CC9EC, &m4, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA08, &m8, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA14, &mC, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA24, &m10, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA34, &m14, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA44, &m18, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA50, &m1C, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA60, &m20, lbl_805CC9F8, 0);
+    fn_8037B50C(lbl_805CCA74, &m24, lbl_805CC9F8, 0);
+    fn_8037B830(lbl_805CC9D8);
+    fn_8037B7E8(lbl_805CCA88);
+    fn_8037B50C(lbl_805CCAA0, &m28, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCAB8, &m2C, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCAC4, &m30, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCAD0, &m34, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCADC, &m38, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCAEC, &m3C, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCAF8, &m40, lbl_805CCAAC, 0);
+    fn_8037B50C(lbl_805CCB08, &m44, lbl_805CCAAC, 0);
+    fn_8037B830(lbl_805CCA88);
+    fn_8037B7E8(lbl_805CCB18);
+    fn_8037B494(lbl_805CCB28, &m68, 0, 0);
+    fn_8037B494(lbl_805CCB38, &m6C, 0, 0);
+    fn_8037B830(lbl_805CCB18);
+    fn_8037B7E8(lbl_805CCB4C);
+    fn_8037B50C(lbl_805CCB60, &m60, lbl_805CCB68, 0);
+    fn_8037B50C(lbl_805CCB78, &m64, lbl_805CCB68, 0);
+    fn_8037B830(lbl_805CCB4C);
+}
+
 Unk8017EF7C::~Unk8017EF7C() {}
 
 int fn_8017F3B4(int a)

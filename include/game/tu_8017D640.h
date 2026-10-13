@@ -22,6 +22,11 @@ public:
     virtual void fn_vslot8();
     virtual void fn_vslot9();
     virtual void fn_vslot10();
+    void fn_8037B7E4(const char* name);
+    void fn_8037B7E8(const char* group);
+    void fn_8037B830(const char* group);
+    void fn_8037B50C(const char* name, float* field, const char* range, int a);
+    void fn_8037B494(const char* name, int* field, const char* range, const char* def);
 };
 
 void* operator new(unsigned int size, int heap);        /* 0x80377428 */
@@ -182,8 +187,35 @@ class Unk8017EF7C : public Unk8037B3E8 {
 public:
     Unk8017EF7C();
     virtual ~Unk8017EF7C();
+    virtual void fn_vslot2();
     Unk8037B3E8* fn_vslot5();
-    char pad4[0x70 - 4];
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    float m38;
+    float m3C;
+    float m40;
+    float m44;
+    float m48;
+    float m4C;
+    float m50;
+    float m54;
+    float m58;
+    float m5C;
+    float m60;
+    float m64;
+    int m68;
+    int m6C;
 };
 
 struct Unk8017F8A0_T {
