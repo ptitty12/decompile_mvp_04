@@ -675,10 +675,13 @@ extern "C" FE_OVERLAY void fn_8051FEA8(FeV10* x)
 //@8051FEF4
 FE_OVERLAY FeRecA::FeRecA(int a)
 {
-    m0 = -1;
+    int init8 = 0x3BEE;
+    int initC = 0;
+    int init0 = -1;
+    m0 = init0;
     m4 = a;
-    m8 = 0x3BEE;
-    mC = 0;
+    m8 = init8;
+    mC = initC;
     m10 = lbl_8067A5E8;
 }
 
