@@ -447,6 +447,99 @@ extern "C" Unk80379324_Vec3* fn_80379530(Unk80379324_Vec3* out, const Unk8037932
     return out;
 }
 
+/* Plane (normal, distance) as read by fn_803797AC; AddV/ScaleV take their vector by value, which gives retail's temp slots. */
+struct fn_803797AC_Plane {
+    float x, y, z, w;
+};
+
+inline Unk80379324_Vec3 fn_803797AC_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_AddV(const Unk80379324_Vec3& a, Unk80379324_Vec3 b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_ScaleV(Unk80379324_Vec3 v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline float fn_803797AC_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline float fn_803797AC_Abs(float x)
+{
+    return __builtin_fabs(x);
+}
+
+inline float fn_803797AC_Sgn(float v)
+{
+    if (!(v <= 0.0f))
+        return 1.0f;
+    if (!(v >= 0.0f))
+        return -1.0f;
+    return 0.0f;
+}
+
+extern "C" int fn_803797AC(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const fn_803797AC_Plane* pl, Unk80379324_Vec3* out, float* tOut, float t0, float t1)
+{
+    const Unk80379324_Vec3* n = (const Unk80379324_Vec3*)pl;
+    Unk80379324_Vec3 p = fn_803797AC_Scale(*n, pl->w);
+    float da;
+    {
+        Unk80379324_Vec3 va = fn_803797AC_Sub(*a, p);
+        da = fn_803797AC_Dot(va, *n);
+    }
+    float db;
+    {
+        Unk80379324_Vec3 vb = fn_803797AC_Sub(*b, p);
+        db = fn_803797AC_Dot(vb, *n);
+    }
+    if (fn_803797AC_Sgn(da) != fn_803797AC_Sgn(db)) {
+        float t = -da / (db - da);
+        Unk80379324_Vec3 hit = fn_803797AC_AddV(*a, fn_803797AC_ScaleV(fn_803797AC_Sub(*b, *a), t));
+        *out = hit;
+        if (tOut)
+            *tOut = (t1 - t0) * t + t0;
+        return 1;
+    } else if (!(fn_803797AC_Abs(da) >= fn_803797AC_Abs(db))) {
+        *out = *a;
+        if (tOut)
+            *tOut = t0;
+    } else {
+        *out = *b;
+        if (tOut)
+            *tOut = t1;
+    }
+    return 0;
+}
+
 extern "C" float fn_80379AF4(const Unk80379324* a, const Unk80379324* b)
 {
     float r = a->x * b->x + a->y * b->y + a->z * b->z - b->w;
