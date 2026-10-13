@@ -984,3 +984,73 @@ extern "C" int fn_8013BBF0(int a)
     }
     return -1;
 }
+
+#include "game/tu_8007A4DC.h"
+extern "C" int fn_8013BC2C(Scr* self, unsigned side)
+{
+    Unk8007B2B0_Screen* screen = (Unk8007B2B0_Screen*)lbl_8061930C;
+    if (side > 1) return 1;
+    /* Retail table base sp+8 (8013BC60/BD34), saved r14 begins sp+0x80.
+     * Accesses cover offsets 0..0x60: 25 initialized values. Both capacities
+     * 29 and 30 compile identically; 30 is a layout inference, not proven
+     * original capacity. The callee receives values, never this array. */
+    int attributes[30];
+    int n = 0;
+    if (side == 0) {
+        attributes[n++] = 4;
+        attributes[n++] = 7;
+        attributes[n++] = 8;
+        attributes[n++] = 10;
+        attributes[n++] = 11;
+        attributes[n++] = 14;
+        attributes[n++] = 16;
+        attributes[n++] = 21;
+        attributes[n++] = 22;
+        attributes[n++] = 26;
+        attributes[n++] = 27;
+        attributes[n++] = 33;
+        attributes[n++] = 38;
+        attributes[n++] = 41;
+        attributes[n++] = 42;
+        attributes[n++] = 44;
+        attributes[n++] = 48;
+        attributes[n++] = 49;
+        attributes[n++] = 50;
+        attributes[n++] = 53;
+        attributes[n++] = 54;
+        attributes[n++] = 55;
+        attributes[n++] = 57;
+        attributes[n++] = 58;
+        attributes[n++] = 59;
+    } else {
+        attributes[n++] = 0;
+        attributes[n++] = 3;
+        attributes[n++] = 6;
+        attributes[n++] = 13;
+        attributes[n++] = 17;
+        attributes[n++] = 18;
+        attributes[n++] = 20;
+        attributes[n++] = 23;
+        attributes[n++] = 24;
+        attributes[n++] = 28;
+        attributes[n++] = 30;
+        attributes[n++] = 31;
+        attributes[n++] = 32;
+        attributes[n++] = 35;
+        attributes[n++] = 36;
+        attributes[n++] = 37;
+        attributes[n++] = 39;
+        attributes[n++] = 40;
+        attributes[n++] = 43;
+        attributes[n++] = 45;
+        attributes[n++] = 46;
+        attributes[n++] = 51;
+        attributes[n++] = 52;
+        attributes[n++] = 56;
+        attributes[n++] = 60;
+    }
+    for (int i = 0; i < n; ++i) {
+        if (!screen->fn_8007D464((unsigned)self->m150, attributes[i])) return 0;
+    }
+    return 1;
+}
