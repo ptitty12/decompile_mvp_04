@@ -780,7 +780,50 @@ struct Unk8008882C_Self {
     Unk8008882C_Teams* m0;
 };
 extern "C" unsigned char fn_800968C0(void* o, int key, int flag);
+Unk80087A58_Pair* fn_8008903C(Unk80087A58_Pair* out, O* o, int i);
+extern float lbl_805B47E8;
 extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+inline int Mth88664(Unk8008882C_Self* s, int k, int side, int k2)
+{
+    int z = side == 0;
+    int off1 = side * 0xE64;
+    int a = fn_800968C0(s->m0->m14 + off1, k, 1);
+    int off2 = z * 0xE64;
+    int b = fn_800968C0(s->m0->m14 + off2, k2, 1);
+    int c = fn_8008CFD8(s->m0->m14 + off1 + 0xC9C, 9, a);
+    int d = fn_8008CFD8(s->m0->m14 + off2 + 0xC9C, 8, b);
+    if (d == 2)
+        d = c == 0;
+    return d;
+}
+extern "C" void fn_80088664(O* o, int side, int* outCount, float* outVal)
+{
+    if (fn_80087B14()) {
+        int cnt = 0;
+        unsigned n = fn_80353D9C(o);
+        unsigned i = 0;
+        float acc = lbl_805B47E8;
+        for (; i < n; i++) {
+            if (fn_80088EFC(o, i) == side) {
+                int s1 = fn_80088F84(o, i);
+                int s2 = fn_80088F48(o, i);
+                cnt++;
+                int m = Mth88664((Unk8008882C_Self*)o, s1, side, s2);
+                Unk80087A58_V2 p;
+                ((Unk80087A58_V2* (*)(Unk80087A58_V2*, O*, ...))fn_8008903C)(&p, o, i);
+                float v = p.x;
+                if (m == 1)
+                    v = -v;
+                acc += v;
+            }
+        }
+        if (cnt > 0)
+            acc /= (float)cnt;
+        *outVal = acc;
+        *outCount = cnt;
+    }
+}
 
 int fn_8008882C(Unk8008882C_Self* s, int k, int side, int k2)
 {
