@@ -2244,6 +2244,7 @@ libm/s_ceil.c:
 
 libm/s_cos.cpp:
 	.text       start:0x80410518 end:0x804105F8
+	.sdata      start:0x806EED70 end:0x806EED78
 
 libm/s_fabs.cpp:
 	.text       start:0x804105F8 end:0x80410634

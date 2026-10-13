@@ -1217,7 +1217,7 @@ config.libs = [
             Object(Matching, "libm/e_log.cpp"),
             Object(Matching, "libm/e_sqrt.cpp"),
             Object(NonMatching, "libm/s_ceil.c"),
-            Object(NonMatching, "libm/s_cos.cpp"),
+            Object(Matching, "libm/s_cos.cpp"),
             Object(Matching, "libm/s_fabs.cpp"),
             Object(Matching, "libm/s_floor.cpp"),
             Object(NonMatching, "libm/s_sin.c"),
