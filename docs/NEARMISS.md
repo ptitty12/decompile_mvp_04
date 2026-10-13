@@ -300,3 +300,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | db/tu_80565FD4 fn_8056A058 | Eight ordinary C forms; best 97/97 words (98.6%), four table address/load preparation differences. Boolean CR4 preservation and data flow exact; failed body retained only in build/swarm23, source restored.
 
 - 2026-10-13 | ealib/tu_803A0310 fn_803A2C9C | Six ordinary C forms; best 83/84 words (97.2%), first-vector saved register/copy and final store order remain; failed body in build/swarm23 only, source restored.
+
+- 2026-10-13 | db/tu_80565FD4 fn_805697A0 | Eight ordinary C forms; best 121/121 words, one cmpw uses copied limit r21 instead of input r30; date copy and call stream exact. Scratch build/swarm32, source restored.
