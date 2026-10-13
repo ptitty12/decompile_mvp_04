@@ -49,7 +49,8 @@ struct Unk80360CB8_Obj {
     char m[1];
 };
 extern "C" Unk80360CB8_Obj* fn_8051F4D8();
-extern "C" void fn_80089EE0(char* a, int b, int c, int d);
+struct Unk80089894_PackTabD;
+void fn_80089EE0(Unk80089894_PackTabD* a, unsigned b, unsigned c, int d);
 extern "C" void fn_8008D850(char* a, int b, int c, int d);
 extern "C" int fn_8008CFD8(char* a, int b, int c);
 struct Unk80360D24_Pad10 {
@@ -86,7 +87,8 @@ struct Unk80360F2C {
     float m0, m4, m8, mC;
 };
 extern float lbl_805FC4D8;
-extern "C" void fn_800EC5F4(void* self, int a);
+struct UiScrRaw;
+void fn_800EC5F4(UiScrRaw* self);
 extern char lbl_80667118[];
 struct DtorAt4 { char pad[0x4]; const void* m; };
 extern char lbl_80683F28[];
@@ -123,7 +125,7 @@ void fn_80360CB8(void)
     Unk80360CB8_Obj* o = fn_8051F4D8();
     Unk80360CB8_Sub* sub = (Unk80360CB8_Sub*)(o->m);
     int r = sub->v11();
-    fn_80089EE0(y->mC74, 0x1a, b, r);
+    fn_80089EE0((Unk80089894_PackTabD*)y->mC74, 0x1a, b, r);
 }
 
 void fn_80360D24(Unk80360D24* s)
@@ -201,7 +203,7 @@ void fn_80360F2C(Unk80360F2C* s)
 
 extern "C" void fn_80360F48(void* self, int a)
 {
-    fn_800EC5F4(self, a);
+    fn_800EC5F4((UiScrRaw*)self);
 }
 
 void fn_80360F68(DtorAt4* self, int chrg)
