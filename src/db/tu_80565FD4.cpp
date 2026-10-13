@@ -193,7 +193,9 @@ struct Db80567174_H : Db80566B38_D {
     virtual void v7();
     virtual Db8056746C_O* v8(int a);
     virtual Db8056746C_O* v9(int a);
+    virtual Db8056746C_O* v10(int a);
 };
+extern "C" int fn_8008499C__FPv(int a);
 int fn_80084114(int x);
 void fn_80084170(int x, int* lo, int* hi);
 int fn_80084600(int x);
@@ -380,6 +382,35 @@ inline void Db80567174_Step(int& v)
         t = v + 1;
     v = t;
 }
+/* near-miss: 97.8%; retail keeps the slot counter in r3 (mr r3,r0 before the compare and again at the loop end) and
+ * reuses it as the fn_8008499C argument, ours reloads it from its stack slot. */
+extern "C" DB_OVERLAY void fn_80566F40(Db80565CDC_S* s, int a, int b)
+{
+    Db80567174_H* h = (Db80567174_H*)b;
+    int kind = fn_80084114(a);
+    int lo = 0x1A;
+    int hi = 0x1A;
+    fn_80084170(a, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_8008499C__FPv(i) == 1) {
+                int x = h->v8(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, x, x, 0);
+                int y = h->v9(i)->v21(0)->m0;
+                int z = h->v10(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, y, z, 0);
+            } else {
+                int x = h->v8(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, x, x, 0);
+                int y = h->v9(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 1, y, y, 0);
+            }
+            Db80567174_Step(i);
+        } while (i <= hi);
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80567174(Db80565CDC_S* s, int a, int b)
 {
     Db80567174_H* h = (Db80567174_H*)b;
