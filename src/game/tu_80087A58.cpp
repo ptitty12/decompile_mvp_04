@@ -12,6 +12,11 @@ extern int lbl_8068B618;
 extern char lbl_8064A208[];
 extern float lbl_805B4640;
 extern double lbl_805B4638;
+extern const char lbl_805B475C[];
+extern const char lbl_805B47A8[];
+extern "C" void fn_8033E958(const char* fmt, ...);
+extern "C" void fn_80088B9C(O* o, int a, int b);
+extern "C" void fn_800888F4(O* o);
 extern float lbl_805B47D4;
 
 
@@ -610,6 +615,48 @@ void fn_8008801C()
 
 void fn_80088020()
 {
+}
+
+/* near-miss 98.3%: only the order of the entry moves differs (retail copies r8 after the two loads of *p) */
+void fn_80088024(void* s, int hi, int a, int b, Unk80087A58_Pair* p, int c)
+{
+    O* o = (O*)s;
+    unsigned cur = o->m4;
+    Unk80087A58_Pair q = *p;
+    if (cur <= 0x256) {
+        o->m8 = cur;
+        o->m4 = cur + 1;
+    } else {
+        fn_8033E958(lbl_805B475C);
+        fn_8033E958(lbl_805B47A8, o->m8);
+        int src = 0x258;
+        int dst = 0;
+        int n = 0x23A;
+        do {
+            E* t = o->mF5C;
+            *(E*)(dst + (int)t) = *(E*)(src + (int)t);
+            src += 0x14;
+            dst += 0x14;
+        } while (--n != 0);
+        o->m4 = 0x23A;
+        o->m8 = 0x239;
+        fn_80087EBC(&o->mF60, 0x1E);
+    }
+    fn_80087C40(&o->mF5C[o->m8]);
+    o->mF5C[o->m8].b10.hi = hi;
+    o->mF5C[o->m8].m0 = a;
+    o->mF5C[o->m8].m4 = b;
+    *(Unk80087A58_Pair*)&o->mF5C[o->m8].m8 = q;
+    o->mF5C[o->m8].b10.a = c;
+    unsigned idx = o->m8;
+    E* e2;
+    int r = fn_80087B8C(*(Unk80087A58_V2*)&q);
+    e2 = (E*)(idx * 0x14 + (int)o->mF5C);
+    e2->b10.c = r;
+    ((void (*)(H*, int, int, int))fn_80087D0C)(&o->mF60, hi, b, o->m8);
+    fn_80088B9C(o, a, b);
+    fn_800888F4(o);
+    o->m1750 = 0;
 }
 
 void fn_800881FC(void* s, int a, int b, int c, Unk80087A58_Rec* z)
