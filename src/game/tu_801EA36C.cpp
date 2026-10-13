@@ -386,6 +386,72 @@ static inline void ClearSlots(Unk801DD660_Ctx* c)
     } while (cnt != 0);
 }
 
+struct Unk8024EF40_P;
+float fn_802537E0(Unk8024EF40_P* p);
+struct Unk8035BE7C {
+    void fn_8035BED0(int v);
+};
+struct Unk801EB070_Rec {
+    int m0;
+    float m4;
+    float m8;
+    int mC;
+    int m10;
+};
+struct Unk805D4AA8_F {
+    float v;
+};
+extern Unk805D4AA8_F lbl_805D4AA8;
+extern float lbl_8061D574;
+inline int SlotAt801EB070(char* b, int off) { return *(int*)(b + off); }
+inline float G8061D574() { return lbl_8061D574; }
+extern "C" int fn_80205664(Unk801DD660_Ctx* c);
+extern "C" void fn_801EBEE8(I* s, int a);
+extern "C" void fn_801EBE1C(I* s, int k);
+
+extern "C" void fn_801EB070(I* s, int a)
+{
+    switch (s->m9C->m34) {
+    case 0:
+        break;
+    case 1:
+        if (fn_802055F4(s->m9C) == 1) {
+            Unk801DB948_It it;
+            P* p = 0;
+            fn_8014E09C(&it, s->m9C->m0, 1);
+            while (it.Cur() != 10 && (p = (P*)SlotAt801EB070((char*)s->m9C + 8, it.Cur() * 4)) == 0)
+                fn_8014E108(&it);
+            float v = lbl_805D4AA8.v;
+            float u;
+            if (fn_80205644(s->m9C->m3A64->m9C) != 0) {
+                fn_8023CAF0(p);
+                v = G8061D574() * fn_802537E0((Unk8024EF40_P*)p);
+            }
+            if (fn_80205664(s->m9C) == 1)
+                v = 90.0f;
+            float w = v;
+            s->mE8 = w;
+        }
+        fn_801EBE1C(s, *(int*)((char*)s->m9C + 0xCA4));
+        break;
+    case 2:
+    case 3:
+    case 4:
+        fn_801EBE1C(s, *(int*)((char*)s->m9C + 0xCA4));
+        break;
+    }
+    fn_801EBEE8(s, a);
+    s->mC0 = 3;
+    Unk801EB070_Rec* base = (Unk801EB070_Rec*)((char*)s->m9C + 0x62C);
+    Unk801EB070_Rec* q = base;
+    for (int k = 0; k < 4; k++, q++) {
+        q->m0 = 0;
+        q->m8 = q->m4 = lbl_805D4AA8.v;
+        q->mC = 0;
+    }
+    ((Unk8035BE7C*)base)->fn_8035BED0(0);
+}
+
 extern "C" void fn_801EBBAC(I* s)
 {
     ClearSlots(s->m9C);
