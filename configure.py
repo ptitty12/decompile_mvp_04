@@ -1131,7 +1131,7 @@ config.libs = [
             Object(NonMatching, "libsn/tu_80403E80.c"),
             Object(Matching, "libsn/FSasync.c"),
             Object(NonMatching, "libsn/tu_80407604.c"),
-            Object(NonMatching, "libsn/dummy.c"),
+            Object(Matching, "libsn/dummy.c"),
         ],
     },
     {
