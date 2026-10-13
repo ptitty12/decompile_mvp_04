@@ -49,9 +49,13 @@ struct Unk80276758_Rec {
 };
 
 /* Static table rows (0x328 bytes each) cleared by the chooser constructor. */
+class Unk80270BA0_Obj;
+struct Unk8027C728_Goal;
 struct Unk80276DB8_Row {
-    int m0;
-    char pad4[0x328 - 4];
+    Unk80270BA0_Obj* m0;       /* owner (fn_802780B0 compares it with the player's Obj subobject) */
+    Unk8027C728_Goal* g[16];   /* goal stack (fn_802780B0) */
+    int n;                     /* +0x44: entries in g */
+    char pad48[0x328 - 0x48];
 };
 
 /* Chooser with the "LogicType"/"animlist"/"CatchInAirOnly" attributes (size 0x34,

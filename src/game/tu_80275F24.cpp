@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80275F24.h"
+#include "game/goals/tu_8027C728.h"
 
 typedef Unk80275F24_S S;
 typedef Unk80275F24 H;
@@ -39,6 +40,7 @@ inline float AbsF(float v)
 extern "C++" {
 float fn_8037AF10(void* a, void* b, void* c, int d, int e);
 void fn_80278F1C(int a, int b, int c);
+Unk8027C728_Goal* fn_8027D31C(Unk8027C728_Goal* g);
 }
 
 int fn_80275FD4(S* self);
@@ -124,6 +126,32 @@ void fn_802771A0(void* p)
     if (p)
         lbl_806EF9D4 = 0;
     lbl_806EF9D0 = p;
+}
+
+struct Unk802780B0_V {
+    char pad0[0x934];
+    Unk8027C728_Goal* m934;
+};
+
+int fn_802780B0(void* unused, Unk80270BA0_Obj* o, int* out)
+{
+    *out = 0;
+    Unk80270BA0_X* x = o->fn_vslot1();
+    for (int i = 0; i < 1; i++) {
+        if (lbl_8068D5E4[i].m0 == (Unk80270BA0_Obj*)x && ((Unk802780B0_V*)x)->m934 != 0) {
+            Unk8027C728_Goal* g = fn_8027D31C(((Unk802780B0_V*)x)->m934);
+            int k = lbl_8068D5E4[i].n - 1;
+            while (k >= 0 && g != 0) {
+                if (lbl_8068D5E4[i].g[k] != g)
+                    return 0;
+                if (g)
+                    g = g->m4;
+                k--;
+            }
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int fn_802781AC(int x)
