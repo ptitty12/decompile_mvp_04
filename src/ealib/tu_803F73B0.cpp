@@ -655,6 +655,61 @@ extern "C" int fn_803F8434(void* o, void* f, void* buf, int len, int* outlen)
     return rc;
 }
 
+extern "C" int fn_803F8EA4(void*, char*, void*, int, int*);
+
+/* near-miss: 95%; same shape as retail, but the hoisted file pointer (rec + 0x48) is shared by both CARD loops here (callee-saved regs r26..r28 rotate) */
+extern "C" int fn_803F7EE4(void* o, void* f, void* buf, int len, int* outlen)
+{
+    char* rec = (char*)fn_803F74D8(o, f);
+    if (RCI(rec, 0xe0) == 0)
+        return fn_803F8EA4(o, rec, buf, len, outlen);
+    if (outlen != 0)
+        *outlen = len;
+    if (len > 0) {
+        do {
+            int i = RCI(rec, 0xc8);
+            if (i < RCI(o, 0x2b4) && len > 0) {
+                do {
+                    unsigned char c = *(unsigned char*)buf;
+                    buf = (unsigned char*)buf + 1;
+                    len--;
+                    ((unsigned char*)RCI(o, 0x2c0))[i] = c;
+                    RCI(rec, 0xc8) = i + 1;
+                    i = i + 1;
+                    RCI(rec, 0xd4) = 1;
+                } while (i < RCI(o, 0x2b4) && len > 0);
+            }
+            if (RCI(rec, 0xc8) == RCI(o, 0x2b4)) {
+                if (RCI(rec, 0xcc) < 0)
+                    return 0;
+                int st;
+                do {
+                    st = CARDWrite(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                    lbl_806EEA34->v6(1);
+                } while (st == -1);
+                int rc = fn_803F73B0(o, st);
+                if (rc != 0)
+                    return rc;
+                RCI(rec, 0xcc) += RCI(o, 0x2b4);
+                RCI(rec, 0xc8) = rc;
+                RCI(rec, 0xd4) = rc;
+                if ((unsigned)(fn_803F7584(o, (int)(rec + 8), rec + 0xc, 0) * RCI(o, 0x2b4)) < (unsigned)RCI(rec, 0xcc)) {
+                    do {
+                        st = CARDRead(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                        lbl_806EEA34->v6(1);
+                    } while (st == -1);
+                    rc = fn_803F73B0(o, st);
+                    if (rc != 0)
+                        return rc;
+                    RCI(rec, 0xcc) += RCI(o, 0x2b4);
+                } else
+                    memset((void*)RCI(o, 0x2c0), 0, RCI(o, 0x2b4));
+            }
+        } while (len > 0);
+    }
+    return 0;
+}
+
 extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
 {
     int s0 = 0;
