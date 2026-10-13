@@ -207,60 +207,9 @@ void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale 
     __GXData->bpSentNot = 0;
 }
 
-void GXSetTevColor(GXTevRegID id, GXColor color) {
-    u32 rgba;
-    u32 regRA;
-    u32 regBG;
 
-    CHECK_GXBEGIN(740, "GXSetTevColor");
-    rgba = *(u32*)&color;
 
-    regRA = (0xE0 + id * 2) << 24;
-    SET_REG_FIELD(745, regRA, 8, 0, rgba >> 24);
-    SET_REG_FIELD(746, regRA, 8, 12, rgba & 0xFF);
 
-    regBG = (0xE1 + id * 2) << 24;
-    SET_REG_FIELD(749, regBG, 8, 0, (rgba >> 8) & 0xFF);
-    SET_REG_FIELD(750, regBG, 8, 12, (rgba >> 16) & 0xFF);
-
-    GX_WRITE_RAS_REG(regRA);
-    GX_WRITE_RAS_REG(regBG);
-    GX_WRITE_RAS_REG(regBG);
-    GX_WRITE_RAS_REG(regBG);
-
-    __GXData->bpSentNot = 0;
-}
-
-void GXSetTevColorS10(GXTevRegID id, GXColorS10 color) {
-    u32 sRG;
-    u32 sBA;
-    u32 regRA;
-    u32 regBG;
-
-    ASSERTMSGLINE(777, color.r >= -1024 && color.r < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
-    ASSERTMSGLINE(778, color.g >= -1024 && color.g < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
-    ASSERTMSGLINE(779, color.b >= -1024 && color.b < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
-    ASSERTMSGLINE(780, color.a >= -1024 && color.a < 1024, "GXSetTevColorS10: Color not in range -1024 to +1023");
-
-    CHECK_GXBEGIN(782, "GXSetTevColorS10");
-    sRG = *(u32*)&color;
-    sBA = *((u32*)&color + 1);
-
-    regRA = (0xE0 + id * 2) << 24;
-    SET_REG_FIELD(789, regRA, 11,  0, (sRG >> 16) & 0x7FF);
-    SET_REG_FIELD(790, regRA, 11, 12, sBA & 0x7FF);
-
-    regBG = (0xE1 + id * 2) << 24;
-    SET_REG_FIELD(793, regBG, 11, 0, (sBA >> 16) & 0x7FF);
-    SET_REG_FIELD(794, regBG, 11, 12, sRG & 0x7FF);
-
-    GX_WRITE_RAS_REG(regRA);
-    GX_WRITE_RAS_REG(regBG);
-    GX_WRITE_RAS_REG(regBG);
-    GX_WRITE_RAS_REG(regBG);
-
-    __GXData->bpSentNot = 0;
-}
 
 void GXSetTevKColor(GXTevKColorID id, GXColor color) {
     u32 rgba;
@@ -362,9 +311,7 @@ void GXSetTevSwapModeTable(GXTevSwapSel table, GXTevColorChan red, GXTevColorCha
     __GXData->bpSentNot = 0;
 }
 
-void GXSetTevClampMode(void) {
-    ASSERTMSGLINE(1012, 0, "GXSetTevClampMode: not available on this hardware");
-}
+
 
 void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1) {
     u32 reg;
