@@ -2311,6 +2311,8 @@ libm/k_rem_pio2.cpp:
 
 libm/kf_rem_pio2.cpp:
 	.text       start:0x80412D00 end:0x80413584
+	.sdata      start:0x806EF0F0 end:0x806EF118
+	.sdata2     start:0x806F0808 end:0x806F0840 align:4
 
 libm/s_scalbn.cpp:
 	.text       start:0x80413584 end:0x804136D8
