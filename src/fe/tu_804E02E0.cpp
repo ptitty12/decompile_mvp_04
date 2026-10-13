@@ -321,6 +321,70 @@ extern "C" FE_OVERLAY void fn_804E1020(FeTitle* self)
     }
 }
 
+
+struct FeEvent804E1200 {
+    int type;
+    int active;
+    int field8;
+    const unsigned short* text;
+};
+extern "C" FeEvent804E1200* fn_801723B8__FP16Unk80171A10_Menu(void*);
+extern "C" int fn_801718E8__11Unk80171760(FeEvent804E1200*);
+extern "C" unsigned char* fn_8007FE04__FP13Unk8007F198_D(void*);
+extern "C" void fn_80135328(void*, FeEvent804E1200*);
+extern "C" void fn_801354D4(void*);
+extern "C" void fn_80134F98(void*);
+extern "C" void fn_8040316C(unsigned short*, const unsigned short*, int);
+extern "C" int fn_804030C8(const unsigned short*, const unsigned short*);
+extern const char lbl_805F99A8[];
+extern int lbl_8061A308;
+extern "C" FE_OVERLAY void fn_804E1200(FeTitle* self)
+{
+    FeEvent804E1200* event = fn_801723B8__FP16Unk80171A10_Menu(*(void**)self->m134);
+    if (event != 0) {
+        if (event->active != 0) {
+            ((FeObj1*)self->v32(lbl_805F9940, 1))->v8(0);
+            ((FeObj1*)self->v32(lbl_805F99A8, 1))->v8(0);
+            int type = event->type;
+            if (type == 1) {
+                if (self->m1FC == 0 || fn_801718E8__11Unk80171760(event) != 0) {
+                    fn_80135328(self, event);
+                    fn_8040316C((unsigned short*)((char*)self + 0x200), event->text, 0x200);
+                    self->m1FC = type;
+                } else {
+                    unsigned short* text = (unsigned short*)((char*)self + 0x200);
+                    if (fn_804030C8(event->text, text) != 0) {
+                        fn_801354D4(self);
+                        fn_80135328(self, event);
+                        fn_8040316C(text, event->text, 0x200);
+                    }
+                }
+            }
+        }
+        if (event->type == 5) {
+            if ((unsigned)(self->m1D8 - 5) <= 1)
+                fn_80134F98(self->m134);
+            if (self->m1D8 == 5) {
+                unsigned char* settings = fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C);
+                unsigned char* levels = settings + 4;
+                fn_8001BC4C()->fn_8001C05C(0, (unsigned)levels[0] * (1.0f / 255.0f), 1);
+                fn_8001BC4C()->fn_8001C05C(3, (unsigned)levels[3] * (1.0f / 255.0f), 1);
+                fn_8001BC4C()->fn_8001C05C(1, (unsigned)levels[1] * (1.0f / 255.0f), 1);
+                fn_8001BC4C()->fn_8001C05C(4, (unsigned)levels[4] * (1.0f / 255.0f), 1);
+                fn_8001BC4C()->fn_8001C05C(2, (unsigned)levels[2] * (1.0f / 255.0f), 1);
+                int loaded = 1;
+                lbl_8061A308 = loaded;
+            }
+            fn_804E14EC(self, ++self->m1D8);
+        }
+        if (event->type == 6) {
+            fn_804E14EC(self, ++self->m1D8);
+            if (self->m1D8 == 7)
+                fn_801354D4(self);
+        }
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804E14EC(FeTitle* self, int a)
 {
     switch (a) {
