@@ -495,12 +495,14 @@ extern "C" void fn_803F108C(RcSysX* s, int v)
 /* near-miss: 2 slots; retail emits li 1 before li -1 (r11/r9) yet stores m18 first, every store order tried */
 extern "C" void fn_803F113C(RcSysX* s, int* a, int x, const char* str)
 {
+    int active;
     s->m18->v3();
     int v = a[0];
     RcEvS* e = &lbl_806AB2D8;
+    active = 1;
     e->m14.s = 0;
-    e->m18 = -1;
-    e->m1C = 1;
+    e->m18 = -active;
+    e->m1C = active;
     e->m8 = 0;
     e->m14.i = v;
     strncpy(e->m20, str, 0x24);
