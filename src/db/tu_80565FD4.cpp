@@ -275,24 +275,19 @@ extern "C" DB_OVERLAY int fn_805666E0(Db80565CDC_S* s, int y)
 /* near-miss: ours keeps &out in a saved register; retail forms the frame address per use (35 vs 34 insns). */
 extern "C" DB_OVERLAY int fn_8056681C(Db80565CDC_S* s, int v)
 {
-    Unk80329FA0_Out o = fn_80329FA0(v);
-    int base = fn_805668A4(s, o.m2);
-    if (v < base)
-        return -1;
+    int year = fn_80329FA0(v).m2;
+    int base = fn_805668A4(s, year);
+    if (v < base) return -1;
     int d = v - base;
-    if (d > 6) {
-        if (d > 13) {
-            if (d > 20)
-                return 3;
-            return 2;
-        }
-        return 1;
+    if (d <= 6) return 0;
+    if (d > 13) {
+        int result = 2;
+        if (d > 20) result = 3;
+        return result;
     }
-    return 0;
+    return 1;
 }
 
-/* near-miss: the stores and calls match; retail builds the by-value date in place (frame word at 8, address
- * in r9) while ours fills a local at 12 and copies it into the argument slot (20 vs 19 insns). */
 extern "C" DB_OVERLAY int fn_805668A4(Db80565CDC_S* s, int y)
 {
     Db80565FD4_Date d;
