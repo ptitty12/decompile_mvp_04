@@ -289,3 +289,10 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `ealib/tu_803CECA4::fn_803D1E54`: four product-temporary forms; best101/101words retains seven float-load/product scheduling words (99.4% inherited). Restored; batch17.
 - `fe/tu_80520BE0::fn_80523960`: two early-return forms23vs21words; inherited21/21word form retains `mr.` versus retail `cmpwi` (96.9%). Restored; batch17.
+
+- `fe/tu_8043FDC0::fn_80440210`: three countdown forms recover19/19words but swap the two saved induction registers (six words); source restored, batch21.
+- `fe/tu_804F81E0::fn_804FAB88`: six offset/local/inline-accessor forms; best16/16words has correct global half constant and OR4 indexing, five words swap the two offset registers. Restored, batch21.
+- `fe/tu_804F81E0::fn_804F8668`: one explicit-break form shortens to43vs49words; inherited49/49words retains106/bge versus105/bgt bound normalization (99.9%). Restored, batch21.
+
+- `fe/tu_8043FDC0::fn_80442AA0`: accurate canonical one-argument F198 call gives169vs170words; two-register ABI dataflow is proven at8007F1B0/805A19DC, but exact source is blocked on Claude-owned F198 provider/canonical ABI repair. Incompatible call cast removed; recovery ref codex/swarm21-f198-recovery, batch21.
+- `ealib/tu_803912F8::fn_803923E8`: three ordinary drafts; best111vs112words/97.1%, selection-update factoring and saved-register allocation remain. Restored, batch21.
