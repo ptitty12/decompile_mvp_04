@@ -304,8 +304,20 @@ void fn_8011489C(UnkScrA* self)
     if (lbl_8061A32C == 0)
         lbl_8061A32C = (UnkFEMgr*)fn_800B64BC(operator new(0xd8, 0));
     fn_800B7B4C(lbl_8061A32C, np, self);
-    UnkEv ev(0x9E);
-    fn_8037893C((char*)fn_8011AA24(0) + 0x704, ev.m0, &ev, 0, 0);
+    /* Stack event: id at +0, vptr at +4 (stores at 0x8011492C/0x80114930).
+     * The empty destructor gives the same object mode as fn_80117BBC's event. */
+    struct Unk8011489C_Ev {
+        int id;
+        const void* vt;
+        ~Unk8011489C_Ev() {}
+    };
+    Unk8011489C_Ev ev;
+    const void* base = lbl_80649DA0;
+    ev.vt = base;
+    ev.id = 0x9E;
+    ev.vt = lbl_8065B888;
+    fn_8037893C((char*)fn_8011AA24(0) + 0x704, ev.id, &ev, 0, 0);
+    ev.vt = base;
 }
 
 void fn_8011496C(UnkScrA* self)
