@@ -8,6 +8,26 @@
 extern const char lbl_805F5010[];
 extern const char lbl_805F4ECC[];
 extern const char lbl_805F5638[];
+struct FeBig107 {
+    char pad0[0x32E0];
+    int* m32E0;
+    char pad32E4[8];
+    int m32EC;
+    char pad32F0[0x107E8 - 0x32F0];
+    int m107E8;
+    int m107EC;
+    int m107F0;
+};
+extern "C" {
+int fn_800A1960(void* g);
+int fn_800A2F9C(void* g, int a);
+int fn_800B5758(void* s);
+int fn_804615C4(FeScrD* x);
+void fn_8045FE04(FeScrD* x);
+void fn_80460278(FeScrD* x);
+void fn_80460E70(FeScrD* x);
+void fn_80460714(FeScrD* x);
+}
 extern "C" {
 void fn_8007824C(int v, int a);
 int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
@@ -682,6 +702,57 @@ FE_OVERLAY FeScrD* fn_8045D920(FeScrD* self, int a, int b, int c, int d, int e, 
     self->m67B8 = 0;
     self->m67BC = 1;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_8045E950(FeScrD* x)
+{
+    fn_800ECAA4(x);
+    if (fn_804615C4(x) == 0) {
+        FeGlobal80619948* g = lbl_80619948;
+        FeBig107* b = (FeBig107*)fn_800A1960(g);
+        int f = 0;
+        if (b->m107EC == 0 || (b->m107F0 == 0 && b->m107E8 > 9) || (b->m107F0 == 1 && b->m107E8 > 0x5E)) {
+            f = 1;
+        }
+        if (f != 0) {
+            int r = fn_800B5758(fn_800B555C());
+            if (r == 0) {
+                *(int*)((char*)fn_800B555C() + 0x588) = r;
+            }
+            FeW* w154 = x->m154;
+            x->m138 = 1;
+            ((FeSub*)((char*)w154 + 0xDC))->s6(((FeSub*)((char*)w154 + 0xDC))->s13() - 1);
+            fn_800B555C()->m508 = -1;
+            if (lbl_8061A32C == 0) {
+                lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+            }
+            fn_800B7ADC(lbl_8061A32C, x);
+            return;
+        }
+        if (g->m74 == 2) {
+            if (x->m13C != 0) {
+                fn_800A2F9C(g, 1);
+                x->fn_vslot16(0);
+                ((FeW*)x->m170)->fn_vslot8(0);
+            } else {
+                if (*(int*)((char*)x->m15C + 0x24) >= 0) {
+                    x->fn_vslot16(1);
+                }
+                ((FeW*)x->m170)->fn_vslot8(1);
+            }
+        } else {
+            x->fn_vslot16(0);
+            ((FeW*)x->m170)->fn_vslot8(0);
+        }
+        int v = b->m32E0[b->m32EC];
+        if (v != x->m140) {
+            x->m140 = v;
+            fn_8045FE04(x);
+            fn_80460278(x);
+            fn_80460E70(x);
+            fn_80460714(x);
+        }
+    }
 }
 
 FE_OVERLAY void fn_8045EBBC(FeScrD* x)
