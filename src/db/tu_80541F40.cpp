@@ -521,6 +521,96 @@ DB_OVERLAY int fn_80543A68(Db80541F40_Obj* o)
     return 1;
 }
 
+struct Db80541F40_S5 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+};
+struct Db80541F40_Pair {
+    Db80541F40_S5 a;
+    Db80541F40_S5 b;
+    int bufa[5];
+    int bufb[5];
+};
+extern char lbl_80649FB0[];
+extern char lbl_80683BC8[];
+extern "C" void fn_80599B54(int x);
+extern "C" int fn_8057DE6C();
+extern "C" void fn_80542D54(void* l, int id, int mode, float v);
+extern "C" int fn_80543DEC(Db80541F40_Obj* o, int a, int b);
+extern "C" int fn_805449E8(Db80541F40_Obj* o, int a, int b);
+/* near-miss: 98.9%; identical instructions, only callee-saved register numbers differ (retail: self=r24 list=r22 s=r26) */
+DB_OVERLAY int fn_80543AB8(Db80541F40_Obj* self, L* list, int x, int y, int* out, int flag)
+{
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    Db80541F40_Obj* g = lbl_80619948;
+    float* pf = ((float* (*)(int, int))fn_8057DDC4)(g->m44, self->m44);
+    Db80541F40_Pair pr;
+    unsigned i = 0;
+    Db80541F40_S5* qa = &pr.a;
+    Db80541F40_S5* qb = &pr.b;
+    qa->vp = lbl_80649FB0;
+    pr.a.m0 = pr.bufa;
+    qa->m8 = 5;
+    fn_8040074C(pr.a.m0, 0x14);
+    qa->m4 = 0;
+    qa->mC = 0;
+    qb->vp = lbl_80683BC8;
+    pr.b.m0 = pr.bufb;
+    qb->m8 = 5;
+    fn_8040074C(pr.b.m0, 0x14);
+    qb->m4 = 0;
+    qb->mC = 0;
+    fn_80599B54(x);
+    int kind = rand() % 7;
+    unsigned n = list->m4;
+    for (; i < n; i++) {
+        int io = i * 4;
+        int id = *(int*)((char*)list->m0 + io);
+        int h = s->fn_8007A11C(id);
+        if (s->fn_8007A8DC(0xB, h) == 0) {
+            s->fn_8007A8DC(5, h);
+            if (fn_8057DE6C() == kind) {
+                float v = fn_8007824C(id, 0);
+                if (!(v <= pf[0x30 / 4]))
+                    fn_80542D54(&pr.a, h, 0, v);
+            }
+        }
+    }
+    unsigned cnt = qa->m4;
+    unsigned rem;
+    if (flag != 0)
+        rem = 0;
+    else
+        rem = *(unsigned*)lbl_80619948->m44 - 1;
+    unsigned pick = 0;
+    if (cnt != 0) {
+        if (s->fn_8007A8DC(0x16, pr.a.m0[0]) <= 2) {
+            unsigned tot = cnt + rem;
+            if (tot != 0)
+                pick = rand() % tot;
+        }
+    } else if (rem != 0) {
+        pick = rand() % rem;
+    } else {
+        return 0;
+    }
+    if (rem + cnt == 0)
+        return 0;
+    int r;
+    if (pick < cnt) {
+        *out = 0;
+        int po = pick * 4;
+        r = fn_805449E8(self, *(int*)((char*)pr.a.m0 + po), y);
+    } else {
+        *out = 1;
+        r = fn_80543DEC(self, kind, x);
+    }
+    return r;
+}
+
 DB_OVERLAY void fn_80543D28(L* l)
 {
     unsigned n = l->m4;
