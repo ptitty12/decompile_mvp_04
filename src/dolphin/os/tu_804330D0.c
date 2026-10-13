@@ -815,35 +815,35 @@ u32 fn_80434590(void);
 
 /* PackArgs */
 /* flags: not matched (near-miss) */
-/* near-miss: ptr/argv callee-saved registers swapped (r30/r29) */
+/* near-miss 96.1%: ptr/argv callee-saved registers swapped (r30/r29); one return TRUE at the end (retail has a single exit), the
+ * rest is instruction scheduling (addi n+1 / clrrwi order) and one extra addi copy */
 BOOL fn_80434314(void* ptr, int argc, char* argv[])
 {
     int n;
-    u32 j;
     char* p;
     char** newArgv;
+    u32 j;
 
     memset(ptr, 0, 0x2000);
     if (argc == 0) {
         *((u32*)ptr + 2) = 0;
-        return TRUE;
-    }
+    } else {
+        n = argc;
+        p = (char*)ptr + 0x2000;
+        while (--argc >= 0) {
+            p -= strlen(argv[argc]) + 1;
+            strcpy(p, argv[argc]);
+            argv[argc] = (char*)(p - (char*)ptr);
+        }
 
-    n = argc;
-    p = (char*)ptr + 0x2000;
-    while (--argc >= 0) {
-        p -= strlen(argv[argc]) + 1;
-        strcpy(p, argv[argc]);
-        argv[argc] = (char*)(p - (char*)ptr);
+        p = (char*)ptr + (((u32)(p - (char*)ptr)) & ~3);
+        newArgv = (char**)p - (n + 1);
+        for (j = 0; j < n + 1; j++) {
+            newArgv[j] = argv[j];
+        }
+        *((u32*)newArgv - 1) = n;
+        *((u32*)ptr + 2) = (u32)((u8*)(newArgv - 1) - (u8*)ptr);
     }
-
-    p = (char*)ptr + (((u32)(p - (char*)ptr)) & ~3);
-    newArgv = (char**)p - (n + 1);
-    for (j = 0; j < n + 1; j++) {
-        newArgv[j] = argv[j];
-    }
-    *((u32*)newArgv - 1) = n;
-    *((u32*)ptr + 2) = (u32)((u8*)(newArgv - 1) - (u8*)ptr);
     return TRUE;
 }
 
