@@ -353,6 +353,95 @@ extern "C" int fn_803F870C(void* a, void* b)
 }
 
 /* near-miss: 9 slots; retail loads *h (lhz) before zeroing the two out slots, order of the zero stores differs */
+struct RcCardStat {
+    char pad0[0x2e];
+    unsigned char bannerFormat;
+    char pad2f;
+    unsigned iconAddr;
+    unsigned short iconFormat;
+    unsigned short iconSpeed;
+    unsigned commentAddr;
+    char pad3c[0x6c - 0x3c];
+};
+
+struct RcCardDesc {
+    int m0;
+    char pad4[0x24];
+    int m28;
+    int m2C;
+};
+
+struct RcCardFile {
+    int m0;
+    char pad4[4];
+    unsigned short m8;
+    char padA[0x1e];
+    RcCardDesc* m28;
+    int* m2C;
+    char pad30[0x2c];
+    RcCardStat stat;
+};
+
+#define RC_SET_BANNER(s, f) ((s)->bannerFormat = (unsigned char)(((s)->bannerFormat & ~3) | (f)))
+#define RC_SET_ANIM(s, f) ((s)->bannerFormat = (unsigned char)(((s)->bannerFormat & ~4) | (f)))
+#define RC_SET_ICONFMT(s, n, f) ((s)->iconFormat = (unsigned short)(((s)->iconFormat & ~(3 << (2 * (n)))) | ((f) << (2 * (n)))))
+#define RC_SET_ICONSPD(s, n, f) ((s)->iconSpeed = (unsigned short)(((s)->iconSpeed & ~(3 << (2 * (n)))) | ((f) << (2 * (n)))))
+extern "C" int CARDSetStatus(int, int, void*);
+
+extern "C" int fn_803F81F4(void* o, RcCardFile* f)
+{
+    memset(&f->stat, 0, 0x6c);
+    f->stat.commentAddr = 4;
+    f->stat.iconAddr = 0x44;
+    if (f->m2C != 0) {
+        if (*f->m2C == 0)
+            RC_SET_BANNER(&f->stat, 2);
+        else
+            RC_SET_BANNER(&f->stat, 1);
+    } else
+        RC_SET_BANNER(&f->stat, 0);
+    int n = f->m28->m0;
+    if (n <= 7) {
+        RC_SET_ICONFMT(&f->stat, n, 0);
+        RC_SET_ICONSPD(&f->stat, n, 0);
+    }
+    if (f->m28->m2C == 2)
+        RC_SET_ANIM(&f->stat, 4);
+    else if (f->m28->m2C == 1)
+        RC_SET_ANIM(&f->stat, 0);
+    for (int i = 0; i < n; i++) {
+        if (f->m28->m28 == 0)
+            RC_SET_ICONFMT(&f->stat, i, 2);
+        else
+            RC_SET_ICONFMT(&f->stat, i, 1);
+        char* b = (char*)f->m28 + 8;
+        int off = i * 4;
+        int s = *(int*)(b + off);
+        switch (s) {
+        case 1:
+            f->stat.iconSpeed = f->stat.iconSpeed | (3 << (2 * i));
+            break;
+        case 2:
+            RC_SET_ICONSPD(&f->stat, i, s);
+            break;
+        case 3:
+            RC_SET_ICONSPD(&f->stat, i, 1);
+            break;
+        default:
+            RC_SET_ICONSPD(&f->stat, i, 2);
+            break;
+        }
+    }
+    int r;
+    do {
+        r = CARDSetStatus(f->m8, f->m0, &f->stat);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    if (fn_803F73B0(o, r) != 0)
+        return -1;
+    return 0;
+}
+
 extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
 {
     int s0 = 0;
