@@ -183,6 +183,63 @@ extern "C" Unk800D1614_Raw* fn_800CF8A0(Unk800D1614_Raw* self, int p1, int p2, i
     return self;
 }
 
+/* Scroll-style widget as seen by fn_800CF92C: slots 29/31/32/34 return the two ends, a count and a position. */
+struct Unk800CF92C_Obj : Unk800C7B40_Data {
+    virtual ~Unk800CF92C_Obj();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual Unk800C7B40_Widget* fn_vslot29();
+    virtual void fn_vslot30();
+    virtual Unk800C7B40_Widget* fn_vslot31();
+    virtual int fn_vslot32();
+    virtual void fn_vslot33();
+    virtual int fn_vslot34();
+};
+extern float lbl_805BC208;
+
+extern "C" void fn_800CF92C(Unk800CF92C_Obj* o)
+{
+    Unk800C7B40_Widget* a = o->fn_vslot31();
+    Unk800C7B40_Widget* b = o->fn_vslot29();
+    if (b != 0 && a != 0) {
+        short b26 = b->m26;
+        short b2A = b->m2A;
+        short a2A = a->m2A;
+        float t;
+        if (o->fn_vslot32() == 1)
+            t = lbl_805BC208;
+        else
+            t = (float)(b2A - a2A) / (float)(o->fn_vslot32() - 1);
+        int p = (int)((float)b26 + (float)o->fn_vslot34() * t);
+        a->fn_vslot9(p);
+    }
+}
+
 extern "C" void fn_800CFAC4(Unk800D1614_Obj* o, int v)
 {
     o->fn_800D1714(v);
