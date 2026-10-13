@@ -16,6 +16,14 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+#define FEWP_(n) virtual void s##n();
+struct FeW29 : Unk800C7B40_Data {
+    virtual ~FeW29();
+    FEWP_(2) FEWP_(3) FEWP_(4) FEWP_(5) FEWP_(6) FEWP_(7) FEWP_(8) FEWP_(9) FEWP_(10) FEWP_(11) FEWP_(12) FEWP_(13) FEWP_(14) FEWP_(15) FEWP_(16) FEWP_(17) FEWP_(18) FEWP_(19) FEWP_(20) FEWP_(21) FEWP_(22) FEWP_(23) FEWP_(24) FEWP_(25) FEWP_(26) FEWP_(27) FEWP_(28)
+    virtual FeW* s29(const char* n);
+};
+extern "C" void fn_800DEA90(FeW* w);
+extern "C" FeW* fn_800C8038(FeW* w);
 extern const char lbl_805F4F20[];
 typedef int (*FeFnOIII)(FeW*, int, int, int);
 extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* g, int a);
@@ -406,6 +414,40 @@ FE_OVERLAY void fn_804A410C(FeScrD* x)
     fn_800ED254(x);
     fn_800C33D0();
     fn_800C3BE0();
+}
+
+FE_OVERLAY void fn_804A4134(FeW* x)
+{
+    fn_800ECF18(x);
+    void* nav = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(nav, x);
+    fn_80125100(nav);
+    FeList* pop = (FeList*)fn_800B7AB8(FeGetMgr(), "PLAYERINFOBAR");
+    FeP(x, 0x21C) = pop;
+    fn_80126CF4(pop, 0, 0, 0, 1, (int)fn_804A7284, 0, 0, 1, 1, 0);
+    FeW* w = fn_800C8044(((FeW29*)x)->s29("ANIMFROMRIGHT1/MAIN/TEAMMATCHUP/GAMEIMPACT"));
+    FeP(x, 0x244) = w;
+    w->fn_vslot8(0);
+    fn_804A4558(x, (void*)fn_800C203C((char*)fn_800B555C() + 8));
+    FeW* pt = fn_800C8044(fn_800C8044(fn_800C8044(x->fn_vslot32("MAIN", 1))->fn_vslot32("STARTER", 1))->fn_vslot32("PITCHTYPES", 1));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("LONG1", 1)));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("LONG2", 1)));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("LONG3", 1)));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("LONG4", 1)));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("LONG5", 1)));
+    fn_800DEA90(fn_800C8058(pt->fn_vslot32("ABBRLIST", 1)));
+    fn_800C3AB4(fn_800C33D0(), 9);
+    FeW* m = fn_800C8044(x->fn_vslot32("MAIN", 1));
+    FeP(x, 0x220) = fn_800C8060(((FeW29*)m)->s29("LINEUP/LINEUP"));
+    FeP(x, 0x228) = fn_800C8060(((FeW29*)m)->s29("TEAMMATCHUP/MATCHGRID"));
+    FeW* c = fn_800C8044(x->fn_vslot32("CONTROLS", 1));
+    FeW* sg = fn_800C805C(c->fn_vslot32("SG1", 1));
+    FeP(x, 0x224) = sg;
+    ((FeWQ*)sg)->s14(1);
+    FeP(x, 0x23C) = fn_800C8038(m->fn_vslot32("LARGEFACE", 0));
+    FeP(x, 0x240) = fn_800C8038(m->fn_vslot32("FACE", 1));
+    fn_804A560C(x);
+    fn_804A5854(x, 0);
 }
 
 FE_OVERLAY void fn_804A4AA8(void* x, int a, void* c)
