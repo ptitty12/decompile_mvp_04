@@ -624,7 +624,7 @@ extern "C" FE_OVERLAY char* fn_80505178(char* buf, int k)
     return buf;
 }
 
-/* near-miss: switch tree and c copy differ (retail: root 1 + separate copy of a == 1 for case 0; ours root 0); 8 attempts */
+/* near-miss: the switch tree matches now (an empty case 2 gives root 1); retail still keeps a separate copy of a == 1 for case 0 (mr r9,r0 before the tree) */
 extern "C" FE_OVERLAY char* fn_805051F8(char* buf, int a, int b)
 {
     int c = a == 1;
@@ -642,7 +642,7 @@ extern "C" FE_OVERLAY char* fn_805051F8(char* buf, int a, int b)
             id = 0x206F;
         }
         break;
-    case -1:
+    case 2:
         break;
     }
     fn_80403144(buf, fn_80090880__FP11Unk80090880(lbl_8061977C, id));
