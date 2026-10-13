@@ -624,11 +624,10 @@ extern "C" FE_OVERLAY void fn_804EB23C(int a, FeS13* self)
 {
     if (a == 0)
         fn_80313634(lbl_8061FEDC);
-    else if (a == 1) {
+    else if (a == 1)
         fn_803136A0(lbl_8061FEDC);
-        self->m200 = 1;
-        self->m1FC = 1;
-    }
+    self->m1FC = 1;
+    self->m200 = 1;
     fn_804EB2C8(self);
 }
 
