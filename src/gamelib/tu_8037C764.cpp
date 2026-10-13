@@ -68,6 +68,137 @@ struct Unk8037D92C {
     char pad0[0x60];
     V3S m60;
 };
+struct Ent16F {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+    Ent16F()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0.0f;
+        mC = 0.0f;
+    }
+};
+struct Unk8037E118 {
+    char pad0[4];
+    int m4;
+    Ent16F* m8;
+};
+extern "C" int atoi(const char* s);
+extern "C" double atof(const char* s);
+void* operator new[](unsigned int size, int heap);
+extern "C" void fn_8037E600(Unk8037E600* o, int idx);
+struct Unk80379324 {
+    Unk80379324();
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct E3B8_V3 {
+    float x;
+    float y;
+    float z;
+};
+struct E3B8_Ent {
+    int m0;
+    int m4;
+    float m8;
+    float mC;
+};
+struct E3B8_Arg0 {
+    char pad0[8];
+    E3B8_Ent* m8;
+};
+struct E3B8_VB31 {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual int s14();
+    virtual int s15();
+};
+struct E3B8_Obj31 : E3B8_VB31 {
+    E3B8_V3 m4;
+    Unk80379324 m10;
+};
+struct E3B8_Arg4 {
+    virtual void s1();
+    virtual void s2(int a, E3B8_V3* b, int c, Unk80379324* d);
+};
+struct E3B8_Arg5 {
+    char pad0[8];
+    virtual void s1();
+    virtual void s2(int a, int b, int c);
+};
+struct E3B8_VB27 {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12(int a, E3B8_Arg5* b, float f1, float f2);
+    virtual E3B8_Obj31* s13();
+};
+struct V4F {
+    float x;
+    float y;
+    float z;
+    float w;
+};
+struct Unk8037D958 {
+    char pad0[0x98];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(V3F* r);
+};
+inline V3F operator-(const V3F& a, const V3F& b)
+{
+    V3F r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline V3F operator+(const V3F& a, const V3F& b)
+{
+    V3F r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+inline V3F operator*(const V3F& v, float s)
+{
+    V3F r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+struct Unk8037DAD0 {
+    char pad0[0x6C];
+    int m6C;
+    V3S m70;
+    V4F m7C;
+};
 
 
 extern "C" {
@@ -441,6 +572,26 @@ extern "C" void fn_8037D1A0(Unk8037D0E8* o, int chrg)
         fn_80377408(o);
 }
 
+struct Ld2B0 {
+    SortArr* m0;
+    char* m4;
+    int* m8;
+};
+struct Ld2B0View;
+extern "C" {
+int atoi(const char* s);
+int fn_803791BC(const char* s, int n);
+void* fn_8037BDA8(int hash, int a, void* c);
+int fn_8037BEE4(int hash, const char* name);
+void fn_8037C3F8(int hash, int a, int flag, void* obj);
+void fn_80377FCC(SortArr* a, int v1, int v2, int key);
+void fn_803780D0(SortArr* a, int v1, int v2, int key);
+void fn_80378184(SortArr* a);
+void fn_80378D70(const char* s, int a, char* dst, int max, int ch, int* len);
+void fn_8037BFCC(int hash, int idx, const char* s);
+}
+extern int lbl_80624264;
+extern const char* lbl_806EFC18;
 struct DtorAt0 { const void* m; };
 
 extern "C" void fn_8037BF88(DtorAt0* s, int chrg);
@@ -448,6 +599,92 @@ extern "C" void fn_8037BF88(DtorAt0* s, int chrg);
 extern "C" void fn_8037D290(DtorAt0* s, int chrg)
 {
     fn_8037BF88(s, chrg);
+}
+
+extern "C" void fn_8037D2B0(void* ov, void* datav, int size)
+{
+    Ld2B0* o = (Ld2B0*)ov;
+    const char* data = (const char*)datav;
+    if (data != 0 && size != 0) {
+        char* tmp = (char*)fn_803774A8(0x7530, 0x100);
+        const char* cur = data;
+        int used = 0;
+        while (data[size - 1] == '\n' || data[size - 1] == '\r')
+            size--;
+        int maxn = 0;
+        int remain = size;
+        char* tok;
+        int tokLen;
+        if ((unsigned)(cur - data) < (unsigned)size) {
+            do {
+                fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                int h = fn_803791BC(tok, 0);
+                fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                int n = atoi(tok);
+                if (n > maxn)
+                    maxn = n;
+                fn_80378E48((char**)&cur, &remain, ';', &tok, &tokLen);
+                int m = atoi(tok);
+                if (n > 0) {
+                    int off = 0;
+                    int i = n;
+                    do {
+                        fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                        int id = atoi(tok);
+                        fn_80378D70(cur, size, o->m4 + id * 0x38, 0x32, ';', &used);
+                        cur += used + 1;
+                        *(int*)(off + (int)o->m8) = id;
+                        off += 4;
+                    } while (--i != 0);
+                }
+                lbl_80624264++;
+                for (int j = 0; j < m; j++) {
+                    int ok = 1;
+                    fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                    int key = fn_803791BC(tok, 0);
+                    void* ent = fn_8037BDA8(h, key, o);
+                    if (ent == 0)
+                        ok = 0;
+                    if (ok != 0) {
+                        if (j == 0 && j < n) {
+                            int off = 0;
+                            int i = n;
+                            do {
+                                int id = *(int*)(off + (int)o->m8);
+                                off += 4;
+                                int rec = id * 0x38;
+                                *(int*)(rec + (int)o->m4 + 0x34) = fn_8037BEE4(h, o->m4 + rec);
+                            } while (--i != 0);
+                        }
+                    }
+                    if (ok != 0) {
+                        if (fn_8037D680((Unk8037D0E8_P*)o, h, key) != 0)
+                            fn_80377FCC(o->m0, (int)ent, h, key);
+                        else
+                            fn_803780D0(o->m0, (int)ent, h, key);
+                    }
+                    lbl_806EFC18 = cur;
+                    fn_80378E48((char**)&cur, &remain, ';', &tok, &tokLen);
+                    int cnt = atoi(tok);
+                    if (cnt > 0) {
+                        int c = cnt;
+                        do {
+                            fn_80378E48((char**)&cur, &remain, ' ', &tok, &tokLen);
+                            int idx = atoi(tok);
+                            fn_80378D70(cur, size, tmp, 0x7530, ';', &used);
+                            cur += used + 1;
+                            if (ok != 0)
+                                fn_8037BFCC(h, *(int*)(o->m4 + idx * 0x38 + 0x34), tmp);
+                        } while (--c != 0);
+                    }
+                    if (ok != 0)
+                        fn_8037C3F8(h, key, 1, ent);
+                }
+            } while ((unsigned)(cur - data) < (unsigned)size);
+        }
+        fn_80378184(o->m0);
+        fn_80377408(tmp);
+    }
 }
 
 extern "C" int fn_8037D680(Unk8037D0E8_P* o, int x, int y)
@@ -539,6 +776,34 @@ extern "C" void fn_8037D8DC(Unk8037D768* o, int a, int b)
     fn_803DED40((char*)o + 0x20, a, b);
 }
 
+extern "C" void fn_8037D92C(Unk8037D92C* s, V3S** out)
+{
+    *(*out)++ = s->m60;
+}
+
+extern "C" void fn_8037D958(Unk8037D958* o, V3F** pa, V3F** pb, float t)
+{
+    float tt = t;
+    if (*pa != 0 && *pb != 0) {
+        V3F a = *(*pa)++;
+        V3F b = *(*pb)++;
+        o->s3(&((b - a) * tt + a));
+    }
+}
+
+extern "C" void fn_8037DAD0(Unk8037DAD0* o, float** out)
+{
+    if (o->m6C != 0) {
+        const V4F& q = o->m7C;
+        *(*out)++ = q.x;
+        *(*out)++ = q.y;
+        *(*out)++ = q.z;
+        *(*out)++ = q.w;
+    } else {
+        *(*(V3S**)out)++ = o->m70;
+    }
+}
+
 extern "C" void fn_8037E050(int x)
 {
     lbl_80624288 = x;
@@ -567,6 +832,101 @@ extern "C" void fn_8037E0C0(KnotBuf* p, int chrg)
         fn_80377488((void*)p->m8);
     if (chrg & 1)
         fn_80377408(p);
+}
+
+extern "C" void fn_8037E118(Unk8037E118* o, char* data, int len)
+{
+    o->m4 = atoi(data);
+    if (o->m8 != 0) {
+        fn_80377488(o->m8);
+        o->m8 = 0;
+    }
+    int n = o->m4;
+    if (n != 0) {
+        o->m8 = new (lbl_806EF9B4 | 0x100) Ent16F[n];
+    }
+    char* cursor = data;
+    int rem = len;
+    char* tok;
+    int tokLen;
+    int i = 0;
+    fn_80378E48(&cursor, &rem, '#', &tok, &tokLen);
+    if (i < o->m4) {
+        int off = 0;
+        do {
+            i++;
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            *(unsigned*)(off + (int)o->m8) = fn_80378568(tok, tokLen);
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->m4 = fn_80378568(tok, tokLen);
+            fn_80378E48(&cursor, &rem, ',', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->m8 = (float)atof(tok);
+            fn_80378E48(&cursor, &rem, '#', &tok, &tokLen);
+            ((Ent16F*)(off + (int)o->m8))->mC = (float)atof(tok);
+            off += 0x10;
+        } while (i < o->m4);
+    }
+    i = 0;
+    if (o->m4 - 1 > 0) {
+        do {
+            int off = i * 0x10;
+            Ent16F* e = (Ent16F*)(off + (int)o->m8);
+            Ent16F* f = e + 1;
+            if (!(e->m8 <= f->m8)) {
+                Ent16F t;
+                t = *f;
+                *f = t;
+                o->m8[i] = t;
+                if (i > 0)
+                    i--;
+            } else {
+                i++;
+            }
+        } while (i < o->m4 - 1);
+    }
+}
+
+extern int lbl_8062427C;
+inline void CpQ(Unk80379324* d, const Unk80379324& s)
+{
+    *d = s;
+}
+inline void CpV(E3B8_V3* d, const E3B8_V3& s)
+{
+    *d = s;
+}
+extern int lbl_8062427C;
+extern "C" void fn_8037E3B8(E3B8_Arg0* o, int arg1, int* keys, int n, E3B8_Arg4* a4, E3B8_Arg5* a5)
+{
+    int k0 = lbl_8062427C;
+    for (int i = 0; i < n; i++) {
+        int key = keys[i];
+        if (key == -1) {
+            a5->s2(k0, 0, 0);
+        } else if (key == -2) {
+            a5->s2(k0, 0, 1);
+        } else {
+            E3B8_VB27* p = ((E3B8_VB27 * (*)(E3B8_Arg0*, int)) fn_8037E600)(o, key);
+            if (p != 0) {
+                E3B8_Obj31* q = p->s13();
+                if (a4 != 0 && q != 0) {
+                    E3B8_V3 sp8;
+                    if (q->s15() != 0) {
+                        Unk80379324 sp18;
+                        a4->s2(q->s14(), &sp8, 0, &sp18);
+                        CpQ(&q->m10, sp18);
+                        q->m4 = sp8;
+                    } else {
+                        a4->s2(q->s14(), &sp8, 0, 0);
+                        q->m4 = sp8;
+                    }
+                }
+                int kk = keys[i] << 4;
+                E3B8_Ent* e = (E3B8_Ent*)(kk + (int)o->m8);
+                p->s12(arg1, a5, e->m8, e->mC);
+            }
+        }
+    }
 }
 
 extern "C" void fn_8037E600(Unk8037E600* o, int idx)

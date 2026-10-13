@@ -693,6 +693,40 @@ extern "C" void fn_8037ECC0(Unk8037E9D0* o, Pair2* out)
         fn_8037ECA4((Unk8037ECA4*)((char*)o + (((o->m861 + 2) % 3) * 0x88 + 0x10)), 0);
 }
 
+extern "C" int fn_8037F2C4(Unk8037E9D0* o, char** out, int max)
+{
+    int i = 0;
+    if (!(i < o->m4EC.m0))
+        goto done;
+    if (!(i < max))
+        goto done;
+    {
+    int off = 0;
+    char** p = out;
+    do {
+        char* base = (char*)o + 0x4F4;
+        int busy = 0;
+        Ent68Obj* ob = *(Ent68Obj**)(base + off);
+        if (ob->mC != 0 || ((VM884b*)o->m884)->s30() != 0)
+            busy = 1;
+        char* b50C = (char*)o + 0x50C;
+        char* dst = *p;
+        int v = (int)(*(float*)(b50C + off) * 100.0f);
+        const char* s = busy ? lbl_80605AB4 : lbl_80605ABC;
+        char* b500 = (char*)o + 0x500;
+        char* b4F0 = (char*)o + 0x4F0;
+        sprintf(dst, lbl_80605A94, v, s, *(int*)(b4F0 + off), *(float*)(b500 + off) * 100.0f, (*(Ent68Obj**)(base + off))->m4);
+        off += 0x68;
+        p++;
+        i++;
+        if (!(i < o->m4EC.m0))
+            break;
+    } while (i < max);
+    }
+done:
+    return i;
+}
+
 extern "C" int fn_8037FCE4(Unk8037FCE4* o)
 {
     return o->mC->v7();

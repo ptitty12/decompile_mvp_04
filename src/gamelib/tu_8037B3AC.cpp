@@ -64,6 +64,15 @@ extern int lbl_8062425C;
 extern int lbl_806942AC[0x200];
 extern int lbl_80694AAC[0x200];
 extern "C" int fn_8037C544(int key);
+extern "C" int atoi(const char* s);
+extern "C" double atof(const char* s);
+extern "C" int strncmp(const char* a, const char* b, unsigned n);
+extern "C" int sscanf(const char* s, const char* fmt, ...);
+extern "C" int fn_80379134(const char* s, int c);
+extern const char lbl_806057C4[];
+struct Set12View {
+    virtual void v1(const char* s, int len);
+};
 
 /* View of the root class vtable with the true return type of slot 10 (a "is registered" query). */
 struct Unk8037BB0C_View {
@@ -240,6 +249,8 @@ Unk8037B3E8::Unk8037B3E8(unsigned int hash)
     fn_8037B9D4(this, hash);
 }
 
+Unk8037B3E8::~Unk8037B3E8() {}
+
 extern "C" int fn_8037BA74(int hash)
 {
     if (lbl_806EFC14 != hash) {
@@ -362,6 +373,116 @@ extern "C" void fn_8037BF88()
     for (int i = 0; i < lbl_80624250; i++)
         lbl_806E9684[i] = 0;
 }
+
+/* near-miss: 8 of 267 slots differ (case 13: retail keeps the cursor in r30 and the token length in r29, ours the reverse) */
+#define REC8037 ((Unk8037BCC0_Entry*)(off + (int)lbl_80624254))
+extern "C" void fn_8037BFCC(int hash, int idx, const char* s)
+{
+    if (fn_8037BA74(hash) != 0 && idx >= 0) {
+        int off = idx * 0x44;
+        void* tgt = (void*)REC8037->m38;
+        if (tgt != 0) {
+            switch (*(int*)(off + (int)lbl_80624254)) {
+            case 1:
+            case 10:
+                *(int*)(void*)REC8037->m38 = atoi(s);
+                break;
+            case 2:
+            case 9:
+                *(char*)(void*)REC8037->m38 = atoi(s);
+                break;
+            case 3:
+                *(short*)(void*)REC8037->m38 = atoi(s);
+                break;
+            case 4: {
+                int c = atoi(s);
+                int* d = (int*)(void*)REC8037->m38;
+                *d = c != 0 ? 1 : 0;
+                break;
+            }
+            case 5:
+                *(float*)(void*)REC8037->m38 = (float)atof(s);
+                break;
+            case 6: {
+                int n = REC8037->m40;
+                if (n != 0) {
+                    n = n - 1;
+                    strncpy((char*)tgt, s, n);
+                    ((char*)tgt)[n] = 0;
+                } else
+                    strcpy((char*)tgt, s);
+                break;
+            }
+            case 7:
+            case 8:
+            case 11:
+                *(unsigned*)(void*)REC8037->m38 = fn_80378568(s, 0);
+                break;
+            case 13: {
+                const char* p = (const char*)REC8037->m3C;
+                int k = 0;
+                int len = strlen(s);
+                for (;;) {
+                    int n = fn_80379134(p, 0x2C);
+                    if (n == 0) {
+                        k = 0;
+                        break;
+                    }
+                    if (n == len && strncmp(p, s, n) == 0)
+                        break;
+                    k++;
+                    p += n + 1;
+                }
+                *(int*)(void*)REC8037->m38 = k;
+                break;
+            }
+            case 12: {
+                Set12View* v = (Set12View*)tgt;
+                v->v1(s, strlen(s));
+                break;
+            }
+            case 14: {
+                int a = 0;
+                int b = 0;
+                int c = 0;
+                sscanf(s, lbl_806057C4, &a, &b, &c);
+                ((int*)(void*)REC8037->m38)[0] = a;
+                ((int*)(void*)REC8037->m38)[1] = b;
+                ((int*)(void*)REC8037->m38)[2] = c;
+                break;
+            }
+            case 18: {
+                float sc = 0.003921569f;
+                int a = 0;
+                int b = 0;
+                int c = 0;
+                sscanf(s, lbl_806057C4, &a, &b, &c);
+                ((float*)(void*)REC8037->m38)[0] = (float)a * sc;
+                ((float*)(void*)REC8037->m38)[1] = (float)b * sc;
+                ((float*)(void*)REC8037->m38)[2] = (float)c * sc;
+                break;
+            }
+            case 15: {
+                int bits = atoi(s);
+                int mask = atoi((const char*)REC8037->m3C);
+                if (bits > 0) {
+                    *(int*)(void*)REC8037->m38 |= mask;
+                } else {
+                    int* d = (int*)(void*)REC8037->m38;
+                    int v;
+                    if (mask == 0)
+                        v = *d & 1;
+                    else
+                        v = 0;
+                    *d = v;
+                }
+                break;
+            }
+            }
+        }
+    }
+}
+#undef REC8037
 
 /* near-miss (99.9%): swaps the live object with the registered one; same instructions, but retail loads the tested registry entry into r4 where ours uses r0 (one cmpwi pair). */
 extern "C" void fn_8037C3F8(int hash, int a, int flag, Unk8037C3F8_View* obj)
