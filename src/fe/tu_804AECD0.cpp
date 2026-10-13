@@ -95,6 +95,89 @@ extern "C" FE_OVERLAY void fn_804B0BEC(FeScr* x)
     fn_800ECE34(x);
 }
 
+struct FeC0CN {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0xFFC - 0x19C];
+    int mFFC;
+};
+struct FeC0CSc {
+    char pad0[0x14];
+    FeC0CN* m14;
+};
+struct FeC0CGm {
+    char pad0[4];
+    FeC0CSc* m4;
+};
+extern FeC0CGm* lbl_806192E0;
+struct FeC0CObj {
+    char pad0[0xEC];
+    int mEC[2];
+    int mF4;
+};
+struct Unk800E6470_O;
+struct Ue8A6C;
+Unk800E6470_O* fn_800E6470(Unk800E6470_O* t);
+void fn_800E8A6C(Ue8A6C* m);
+void fn_800E64AC(void* t, int f);
+extern "C" void fn_800E64D4(void* o, FeObj* a, FeObj* b, void* sc, int f);
+extern "C" void fn_800DA54C(void* a, int b, void* c, int d, int e);
+struct FeC0CSubD {
+    char pad0[0x24];
+};
+struct FeC0CSub : FeC0CSubD {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20(int a, int b);
+};
+extern "C" FE_OVERLAY void fn_804B0C0C(FeScr* x)
+{
+    fn_800ECF18(x);
+    FeC0CSc* sc = lbl_806192E0->m4;
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1)))->v104(0);
+    FeC0CObj o;
+    fn_800E6470((Unk800E6470_O*)&o);
+    FeObj* a = fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1));
+    fn_800E64D4(&o, a, fn_800C8060(((FeObj*)x)->v32("CELL", 1)), sc, 1);
+    FeC0CObj* po = &o;
+    po->mF4 = 2;
+    int k0 = 0;
+    char* e = (char*)o.mEC;
+    int one = 1;
+    int k1 = 4;
+    *(int*)(e + k0) = one;
+    *(int*)(e + k1) = k0;
+    fn_800E8A6C((Ue8A6C*)po);
+    fn_800DA54C(sc, 1, fn_800C8060(((FeObj*)x)->v32("BOXSCORE", 1)), 0, 0);
+    int v2 = sc->m14->mFFC;
+    int v1 = sc->m14->m198;
+    ((FeC0CSub*)((char*)fn_800C8054(fn_800C8044(((FeObj*)x)->v32("BOXSCOREFRAME", 1))->v32("OPPLOGO", 1)) + 0x98))->s20(v2, 0);
+    ((FeC0CSub*)((char*)fn_800C8054(fn_800C8044(((FeObj*)x)->v32("BOXSCOREFRAME", 1))->v32("OPPLOGO1", 1)) + 0x98))->s20(v1, 0);
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("CELL", 1)))->v68(5);
+    ((FeObj1*)fn_800C8060(((FeObj*)x)->v32("FIRSTCELL", 1)))->v68(5);
+    FeObj* n = fn_800B7A94(UiGetMsgMgr(), "NAVBAR");
+    fn_80124FA8(n, x);
+    fn_80125100(n);
+    fn_800E64AC(po, 2);
+}
+
 extern "C" FE_OVERLAY void fn_804B0F28(FeScr* x)
 {
     fn_800ECAA4(x);
