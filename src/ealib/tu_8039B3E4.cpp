@@ -160,23 +160,25 @@ void fn_8039B47C(const unsigned char* p, int* out)
     out[10] = (A * (255U - p[10])) >> 8;
 }
 
-/* near-miss: same instruction count; scratch registers are numbered differently. */
 void fn_8039B5D8(const unsigned char* p, int* out)
 {
-    unsigned t, u;
+    unsigned t;
     t = ((unsigned)p[0] * p[1]) >> 8;
     out[0] = (t * p[2]) >> 8;
     out[1] = (t * (255U - p[2])) >> 8;
     t = ((unsigned)p[0] * (255U - p[1])) >> 8;
     out[2] = (t * p[3]) >> 8;
     out[3] = (t * (255U - p[3])) >> 8;
-    u = ((((255U - p[0]) * p[4]) >> 8) * p[5]) >> 8;
-    out[4] = (u * p[6]) >> 8;
-    out[5] = (u * (255U - p[6])) >> 8;
-    u = ((((255U - p[0]) * p[4]) >> 8) * (255U - p[5])) >> 8;
-    out[6] = (u * p[7]) >> 8;
-    out[7] = (u * (255U - p[7])) >> 8;
-    out[8] = ((255U - p[0]) * (255U - p[4])) >> 8;
+    t = ((255U - p[0]) * p[4]) >> 8;
+    t = (t * p[5]) >> 8;
+    out[4] = (t * p[6]) >> 8;
+    out[5] = (t * (255U - p[6])) >> 8;
+    t = ((255U - p[0]) * p[4]) >> 8;
+    t = (t * (255U - p[5])) >> 8;
+    out[6] = (t * p[7]) >> 8;
+    out[7] = (t * (255U - p[7])) >> 8;
+    t = ((255U - p[0]) * (255U - p[4])) >> 8;
+    out[8] = t;
 }
 
 void fn_8039BC28(Vp6Hdr* h)

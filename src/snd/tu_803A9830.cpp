@@ -34,7 +34,8 @@ extern "C" int fn_803AAA3C(int h);
 extern "C" void fn_803AA2E8();
 extern "C" void fn_803FDC80(int h);
 extern "C" void fn_803FE418(int h);
-extern "C" void fn_803FE660(int h);
+struct RcHnd;
+extern "C" unsigned char* fn_803FE660(RcHnd* h);
 extern "C" int fn_803AA4B0(void* a, int b, void* c, void* d, int e, int f, int g);
 extern void* lbl_8069CA44;
 extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type);
@@ -183,6 +184,41 @@ extern "C" void fn_803AA07C(SNDSTREAMCHANNEL* pssc, int* hdr)
     }
 }
 
+extern "C" void fn_803A9928(SNDSTREAMCHANNEL*);
+extern "C" int fn_803AA194(int,int*);
+extern "C" int fn_803AA20C(SNDSTREAMCHANNEL*);
+extern "C" void fn_803AA2E8()
+{
+    fn_803A975C();
+    int i = 0;
+    int limit = sndgs.sso.set.maxstreams;
+    for (; i < limit; i++, limit = sndgs.sso.set.maxstreams) {
+        SNDSTREAMCHANNEL* ch = lbl_8069CADC.pssc[i];
+        if (!ch || !ch->allocatedrequests.items) continue;
+        if (ch->state == 2) {
+            if (SNDPKTPLAY_framesoutstanding(ch->packetinstancehandle) > 0) continue;
+            ch->cursf = ch->newsf;
+            ch->cursa = ch->newsa;
+            ch->newsa.ptsdata[0] = 0;
+            SNDPKTPLAY_stop(ch->packetinstancehandle);
+            fn_803A9928(ch);
+        }
+        if (fn_803AA20C(ch)) continue;
+        int count;
+        if (ch->state == 1) {
+            count = SNDPKTPLAY_submitspace(ch->packetinstancehandle);
+            if (count <= 0) continue;
+        } else count = 8;
+        int result = 0;
+        do {
+            count--;
+            unsigned char* data = fn_803FE660((RcHnd*)ch->streamhandle);
+            if (data) result = fn_803AA194(i,(int*)data);
+        } while (result && count > 0);
+    }
+    fn_803A979C();
+}
+
 extern "C" int fn_803AA194(int h, int* hdr)
 {
     SNDSTREAMCHANNEL* pssc = lbl_8069CADC.pssc[h];
@@ -312,7 +348,7 @@ extern "C" int fn_803AAA3C(int h)
     pssc->shandle = -1;
     if (pssc->fromtap == 0) {
         fn_803FE418(pssc->streamhandle);
-        fn_803FE660(pssc->streamhandle);
+        fn_803FE660((RcHnd*)pssc->streamhandle);
     }
     if (pssc->newsa.ptsdata[0] != 0) {
         int i;

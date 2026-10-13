@@ -557,9 +557,6 @@ extern "C" DB_OVERLAY void fn_8055669C(Db8055638C_Idx* self, int v)
     self->m8 = self->m8 + 1;
 }
 
-/* near-miss (97%): one swap, retail emits the compare for the first delimiter before the add that forms the
- * row pointer (cmpwi r28,2 / add r30), ours the other way round. Tried pointer-arithmetic spellings, loop forms
- * and callee return types. */
 extern "C" DB_OVERLAY void fn_805566BC(Db80556D20_Obj* obj, const char* path)
 {
     unsigned n = 0;
@@ -579,14 +576,14 @@ extern "C" DB_OVERLAY void fn_805566BC(Db80556D20_Obj* obj, const char* path)
             fn_80329C4C(&text, &n, &x2, 1, 5, 0x2c);
             float* q = (float*)(o + m + (int)obj);
             int j = 0;
-            do {
+            for (; j <= 2; ) {
                 float f;
                 int d = j == 2 ? 10 : 0x2c;
                 j++;
                 fn_80329B98(&text, &n, &f, d);
                 *q = f;
                 q++;
-            } while (j <= 2);
+            }
             m += 0x3c;
         } while (--b != 0);
         o += 0xc;
