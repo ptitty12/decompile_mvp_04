@@ -287,3 +287,29 @@ void Unk802E8FB0::fn_802E9380()
     m64->s1();
     m3 = 1;
 }
+
+extern const char lbl_805E5684[];
+/* fn_802E7FA8 reads the type byte, vector +0x120 and radius +0x184. */
+struct Unk802E7FA8_S {
+    unsigned char m0;
+    char pad1[0x120-1];
+    Unk802E4B98_V4 m120;
+    char pad130[0x184-0x130];
+    float m184;
+    float m188;
+};
+inline Unk802E4B98_V4 Scale802E7FA8(const Unk802E4B98_V4& v, float s)
+{
+    return Unk802E4B98_V4(v.m0*s, v.m4*s, v.m8*s, v.mC*s);
+}
+inline void Radius802E7FA8(Unk802E7FA8_S* self, float radius)
+{
+    self->m184 = radius;
+    self->m188 = radius * radius;
+}
+extern "C" void fn_802E7FA8(Unk802E7FA8_S* self, Unk802E7FA8_S* o, float* scale)
+{
+    lbl_8061F68C->s2(o->m0 == 4, lbl_805E5684, 39);
+    self->m120 = Scale802E7FA8(o->m120, *scale);
+    Radius802E7FA8(self, o->m184);
+}
