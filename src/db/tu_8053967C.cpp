@@ -750,6 +750,146 @@ DB_OVERLAY void fn_8053BE58(O58* o)
         fn_8053B548(o->m10 + i * 0x1E0, 0);
 }
 
+struct Db8053967C_Ld {
+    int m0;
+    char pad4[0x50];
+    virtual void s1();
+    virtual void s2();
+    virtual int s3();
+};
+extern "C" char* fn_802B9300(const char* path, int a, int b, unsigned* n);
+extern "C" void fn_802B961C(char* buf, int b);
+extern "C" int fn_80409DAC(const char* s);
+extern "C" int fn_8053C550(const char* s);
+extern "C" void fn_8053C6F4(R* r, int id, int kind, int v);
+extern "C" int fn_805A1958(R* r, int a, int b, unsigned char c);
+/* near-miss: 98.0%; the two int stores at 0xFC + n*4 + K: retail does slwi/addi then base+index (stwx), ours addi/slwi (same count) */
+DB_OVERLAY void fn_8053BEC8(Db8053967C_Ld* self)
+{
+    if (self->s3() == self->m0)
+        return;
+    fn_8053BE58((O58*)self);
+    unsigned len = 0;
+    char* buf = fn_802B9300((char*)self + 0x14, 0x100, 4, &len);
+    char* end = buf + len;
+    char* p = buf;
+    while (*p != ';')
+        p++;
+    int last = 0;
+    R* cur = 0;
+    while (p < end) {
+        while (*p != ',')
+            p++;
+        while (*p != ' ')
+            p++;
+        p++;
+        int team = ((int (*)(const char*, int))fn_8053A1B0)(p, 0);
+        while (*p != ' ')
+            p++;
+        p++;
+        int hash = ((int (*)(const char*, int))fn_8053A190)(p, 0);
+        while (*p != ' ')
+            p++;
+        p++;
+        int k0 = fn_8053C550(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int n0 = fn_80409DAC(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int k1 = fn_8053C550(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int n1 = fn_80409DAC(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int k2 = fn_8053C550(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int n2 = fn_80409DAC(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int k3 = fn_8053C550(p);
+        while (*p != ' ')
+            p++;
+        p++;
+        int n3 = fn_80409DAC(p);
+        while (*p != ';')
+            p++;
+        if (team != last) {
+            cur = (R*)fn_8053C40C((O58*)self, team);
+            last = team;
+        }
+        if (cur->m4 < cur->m8) {
+            cur->m0[cur->m4] = hash;
+            cur->m4++;
+        }
+        if (k0 == 0 || (unsigned)(k0 - 10) <= 9) {
+            fn_8053C6F4(cur, 0, k0, hash);
+            if (k0 == 10) {
+                if (hash != 0)
+                    fn_805A1958(cur, 0, 0, fn_8053B6CC(cur, hash));
+                else
+                    fn_805A1958(cur, 0, 0, 0xFF);
+                if (hash != 0)
+                    fn_805A1958(cur, 1, 0, fn_8053B6CC(cur, hash));
+                else
+                    fn_805A1958(cur, 1, 0, 0xFF);
+                if (hash != 0)
+                    fn_805A1958(cur, 2, 0, fn_8053B6CC(cur, hash));
+                else
+                    fn_805A1958(cur, 2, 0, 0xFF);
+                if (hash != 0)
+                    fn_805A1958(cur, 3, 0, fn_8053B6CC(cur, hash));
+                else
+                    fn_805A1958(cur, 3, 0, 0xFF);
+            }
+            if (n1 >= 0) {
+                int o1 = (n1 + 11) * 4;
+                char* bs = (char*)cur + 0xFC;
+                *(int*)(bs + o1) = 0;
+            }
+            if (n3 >= 0) {
+                int o3 = (n3 + 35) * 4;
+                char* bs = (char*)cur + 0xFC;
+                *(int*)(bs + o3) = 0;
+            }
+        } else {
+            fn_8053C6F4(cur, 0, k0, hash);
+            fn_8053C6F4(cur, 1, k1, hash);
+            fn_8053C6F4(cur, 2, k2, hash);
+            fn_8053C6F4(cur, 3, k3, hash);
+            if (n0 > 0)
+                fn_8053AF9C((X*)cur, 0, n0 - 1, hash);
+            if (n1 > 0)
+                fn_8053AF9C((X*)cur, 1, n1 - 1, hash);
+            if (n2 > 0)
+                fn_8053AF9C((X*)cur, 2, n2 - 1, hash);
+            if (n3 > 0)
+                fn_8053AF9C((X*)cur, 3, n3 - 1, hash);
+        }
+        for (;;) {
+            int c = *p;
+            if (p >= end)
+                goto done;
+            if ((unsigned)(c - 0x30) <= 9)
+                break;
+            if (c == '-')
+                break;
+            p++;
+        }
+    }
+done:
+    self->m0 = self->s3();
+    fn_802B961C(buf, 4);
+}
+
 /* near-miss: retail hoists the sp8 load above the compare and lays out the found arm first */
 DB_OVERLAY char* fn_8053C40C(O58* o, int id)
 {
