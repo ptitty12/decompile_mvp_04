@@ -549,3 +549,10 @@ void fn_8043857C(u8 val)
         *p = pattern;
     }
 }
+
+BOOL fn_80438724(void);
+
+BOOL fn_80438704(void)
+{
+    return fn_80438724();
+}
