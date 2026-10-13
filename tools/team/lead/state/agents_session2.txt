@@ -26,3 +26,28 @@ W8 p4-21 a16cd01a339b31ce3 (15:02)
 W7 p4-32b a84bbd04ea92341f7 (15:04)
 W9 p5-18 (15:06)
 W12 p5-22 (15:07)
+W5 p5-15 afb1f5bc8e9a19715 (15:20, until 17:50)
+# wall-clock deadlines sent 15:21: W1 16:50, W2/W3/W11 17:00, W10 17:15, W6/W4 17:25, W8 17:30, W7/W9/W12/W7s3 17:35
+# agent ids: W1 a0a7f5e6489ead9f4, W2 a2efbca1d67374ebe, W3 ab874cbfccdb27689, W11 afc6a74fb4f0900b8, W10 a78bdcf250ea1aafa,
+#   W6 ab9f2e235751f5bce, W4 a74c94d0a452ef4d8, W8 a16cd01a339b31ce3, W7 a84bbd04ea92341f7, W9 ad0d9dd1785e460da,
+#   W12 a07e8ad73b57d2d24, W7s3 af8887e247572aff5
+# fleet restart 2026-10-12 17:55 (fresh agents, deadline ~20:20 in prompts)
+W1 p5-20 aa21035586784e580
+W2 p5-13 a3f88d8cc72ebfeb3
+W3 p5-21 a4d001428da4b0b92
+W4 p5-08 a70957ebb2ddaac41
+W5 p5-11 ac7ae15e90bcf51aa
+W6 p5-26 a4cf6806a487a1c06
+W7 p5-24 a33eb652e89b18cab
+W7s3 p5-09 a420f052663b3600f
+W8 p5-23 aead31386b01d9426
+W9 p5-17 a5255c90cdeb19af3
+W10 p5-14 a4dca768b674227d8
+W11 p5-16 a9bb78d49de0c9566
+W12 p5-03 a62a16b08f114f290
+W7 p5-02 a884df4e84e64d466  (19:20, END 20:45 (moved from 21:15))
+W1 p5-00 aa0ae8fb643a8838c  (19:28, END 20:45 (moved from 21:15))
+W11 p5-01 a55dcf591fc0a5ac8  (19:32, END 20:45 (moved from 21:15))
+W12 p5-12 a0e3c44fce4a2ac1f  (19:32, END 20:45 (moved from 21:15))
+W4 p5-04 ac543f893e0cb3752  (19:35, END 20:45)
+W8 p5-25 a303b642ec59102a7  (19:35, END 20:45)

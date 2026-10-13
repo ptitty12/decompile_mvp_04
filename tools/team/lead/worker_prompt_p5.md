@@ -41,9 +41,10 @@ You are a matching worker on a private matching decompilation of MVP Baseball 20
 - Installing code: `Q12/ins.py <unit> <fn> <file> --auto` inserts without re-sorting; `Q16/put.py` and plain ins.py re-sort via sort_functions, which can move a `static inline` helper below its users and break the build.
 - A function with an unmangled symbol that another unit references can't be renamed by rename.py: define it `extern "C"`. A callee called with more arguments than its definition needs an `extern "C"` declaration under its exact mangled symbol name.
 - Write Python helpers with the Write tool, not heredocs. Preserve line endings (never `sed -i` on sources: it strips CRLF). Never write the word "asm" in source, even in comments.
+- Twelve other workers share this machine. Kill only processes you started yourself (by the PID your own command returned); never kill by name or command-line pattern.
 
 Before each commit:
 - Run a full `ninja`, then `python tools/match/check_literals.py <unit>`, which must report 0 mismatches.
 - One unit per commit, message `match(<unit path>): <function> [N/M funcs]`, ending with the line `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`.
 
-Scratch: `<SCRATCH>\Q5_<NN>\` (already exists; keep all scratch files there, never in the worktree). Verify with `python tools/verify/verify.py --baseline-ref $(git merge-base HEAD origin/main)`. If verify fails with an HTTP error during its baseline build, re-run it. Timebox about 2.5 hours. Commit locally; do not push, merge, rebase or reset. Report per unit: before/after matched, what blocked the rest.
+Scratch: `<SCRATCH>\Q5_<NN>\` (already exists; keep all scratch files there, never in the worktree). Verify with `python tools/verify/verify.py --baseline-ref $(git merge-base HEAD origin/main)`. If verify fails with an HTTP error during its baseline build, re-run it. Timebox: work until <END> CDT by the wall clock (check with `date`; don't estimate elapsed time). Stop early only if every function in your worklist is matched or parked. Commit locally; do not push, merge, rebase or reset. Report per unit: before/after matched, what blocked the rest.
