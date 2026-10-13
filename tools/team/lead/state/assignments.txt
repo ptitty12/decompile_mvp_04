@@ -1,16 +1,16 @@
 # worktree -> branch  status  unitsfile
-W1 work/p5-00  idle  p5_00.txt
-W2 work/p5-05  idle  p5_05.txt
-W3 work/p5-07  idle  p5_07.txt
-W4 work/p6-01  running  p6_01.txt
+W1 work/p6-35  idle  p6_35.txt
+W2 work/p6-40  running  p6_40.txt
+W3 work/p6-09  running  p6_09.txt
+W4 work/p6-19  running  p6_19.txt
 W5 work/p5-06  idle  p5_06.txt
 W6 work/p5-10  idle  p5_10.txt
 W7 work/p6-03  idle  p6_03.txt
-W7s3 work/p6-00  running  p6_00.txt
-W8 work/p6-04  running  p6_04.txt
+W7s3 work/p6-00  idle  p6_00.txt
+W8 work/p6-04  idle  p6_04.txt
 W9 work/p5-27  idle  p5_27.txt
 W10 work/p6-02  idle  p6_02.txt
-W11 work/p6-05  running  p6_05.txt
-W12 work/p6-06  running  p6_06.txt
+W11 work/p6-05  idle  p6_05.txt
+W12 work/p6-06  idle  p6_06.txt
 # next: tail_02..10, pass2_g21, g22, g12, g11, ...; db range-43 pass2
 match work/opus-families-7  held(no commits; on resume skip tu_801EE438/tu_80216CF4 until p4-15 merges)  opus_07.txt

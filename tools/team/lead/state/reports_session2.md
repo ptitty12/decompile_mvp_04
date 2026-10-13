@@ -182,3 +182,28 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
 ## W5 p5-06 (20:41, 7 new + 1 near-miss)
 - fe/tu_80459228 29->30; tu_8045B134 26->27; tu_804654A0 28->29; tu_8046C6F8 fn_8046F510 98.65; tu_8046F770 39->40 (fn_80471390 296/296 but frame +8); tu_804740A8 41->44.
 - Patterns: per-call return-type casts (char* vs void) for the same callee; int flag tested twice -> second test on a copy `int d = c;` (avoids CR4 save); `a >? b` for fcmpu/cror max; ternary for if/else float before spill; `float fv[4]` for out-param spill slot; pointer locals for stack buffers keep them callee-saved; FeW* t local inside each cross-jumped case block; bit-test `(*(int*)(b+off) >> (i - (q<<5))) & 1`.
+
+## W4 p6-01 (20:42, 1 new) - low yield (batch had 10 small fns, mostly Vec/float stack temps)
+- game/tu_801DC918 51->52 (fn_801DCC1C). Goal-factory family (fn_801E5644, fn_801E5928, fn_801E57A8, fn_801E52B8, near-misses fn_801E5A8C/5D7C): retail keeps `mr r28,r27` copy of g; cse-skip-blocks propagates it away - needs a construct whose skipped block is too big or has two predecessors.
+- Patterns: give the result pseudo MORE sets (separate case bodies) to raise global-alloc priority (diagnose with cc1plus -dg -dl "regs to allocate"); switch shapes with dummy case 2 into default, range [2..5] root, backward goto into a shared block.
+- Tool: Q12/hc12.py hard-codes src/fe/.
+
+## W7s3 p6-00 (20:4x, 4 new + 1 near-miss)
+- game/tu_801C16B0 57->58; tu_801C2C64 36->37 (fn_801C3B04 144/144 callee-saved rotation, best in scratch Q6_00); tu_801CF054 38->40 (fn_801D04C0 99.2; fn_801CF430 goal-pointer copy `mr r30,r28` same family as W4's goal-factory copy problem).
+- Patterns: literal float stays in f31 across call; inline FZero()/FOne() to keep lfs below int stores; `int b = f() != 0;` vs `int b = 1; if (!f()) b = 0;`; mfcr extrwi bit 28 = LT; dead float locals still stored under -ffloat-store (keep them); register dump `ngccc -dg -save-temps` -> t.i.greg (regs to allocate, dispositions).
+
+## W8 p6-04 (20:5x, 2 new)
+- game/tu_8021ADDC 14->16 (fn_8021BA44, fn_8021BFFC); fn_8021DDEC q/e/cur register allocation; tu_80216CF4 fn_80218AF8 82.9 (spilled float param reload hoisted in retail).
+- Patterns: header `extern const Vec3f` loads hoist above int stores -> compare/copy through a non-const view `Vec3f* kp = (Vec3f*)&lbl_X`; `const Vec3f* cp = &cur->m60;` declared right before the stores; brute-force all 720 orders of 6 consecutive constant stores (hill-climb stalls); NeFlag inline keeps li after the call; mangled callees declared outside extern "C" block; discarded struct return as a plain statement.
+
+## W12 p6-06 (21:0x, 8 new + 2 near-miss)
+- game/tu_802362A8 25->30 (fn_80237E9C 98.4); tu_8023DB8C 23->25 (fn_80241A94 constant-true `li r0,1; cmpwi; beq` folds away); tu_80241C24 26->27; tu_80233F08 fn_80234B18 98.4.
+- Patterns: vptr at +0x98 view class; stack event object via inline Base/Derived/Set/Dtor with `Msg* mp=&m`; nest the rest under `if (!(x <= K)) {...} return 0;` for cror/bso; `Vec v = Pos(p)` by-value inline gives z,y,x copy order; byte-offset accumulation in a local for table index; ArmB inline called in each arm for cross-jumped tail; clamp `if (n0<=5){n=n0; if(n<=0)n=1;} else n=5;` -> mr.; dead local float array stores are kept.
+
+## W11 p6-05 (21:0x, 4 new + 3 near-miss)
+- game/tu_8022FE34 31->34; tu_80227564 14->15; tu_8022309C fn_80226BC0 98.1; tu_8021F080 fn_80220BFC 98.4, fn_80222D70 97.9. Unsolved recurring: `slwi r0` vs `r11` index temp in `in->m8[id]` loops; `cmpwi` before `li r3,4` in `cond ? k : 4`.
+- Patterns: dead float local `float f = lbl_X; call(lbl_X)` reproduces never-reloaded -ffloat-store spill (`fmr f1,f0; stfs f0,N(r1)`); sub-record reset in inline + literal 0.0f keeps lfs below int stores, source order = retail order rotated left by one; class by value = hidden ref + callee copy; gotos in retail block order for flag chains.
+
+## W1 p6-35 (21:34, 7 new + 1 near-miss)
+- ealib/tu_803912F8 26->30 (varargs packer via prodg/stdarg.h); tu_80394744 16->18 (McPair halves unsigned short; fn_803950B4 96.9); tu_803927E4 43->44.
+- Patterns: give a stale-r3/r4 callee its params and pass the caller's value (fixed 2 near-misses); hold base as `int` to flip lbzx/add operand order; inline taking int* for addi+mr; `fn(i); ret = i;` keeps index live across call; scratch include tree under scratchpad/include for rv.py on relative-include units (shared).
