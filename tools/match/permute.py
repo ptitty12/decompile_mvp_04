@@ -71,6 +71,19 @@ BINUTILS = ROOT / "build" / "binutils"
 SECTION = re.compile(r"^\s*\.(text|data|rodata|bss|sdata2?|sbss2?|section\s+\S+.*)\s*$")
 
 
+def git_bash_dir():
+    """Git for Windows' bash directory (not WSL's System32\\bash.exe, which may come first on PATH)."""
+    for d in (os.environ.get("GIT_BASH_DIR"), r"C:\Program Files\Git\usr\bin", r"C:\Program Files\Git\bin"):
+        if d and Path(d, "bash.exe").exists():
+            return d
+    git = shutil.which("git")
+    if git:
+        for d in (Path(git).parents[1] / "usr" / "bin", Path(git).parents[1] / "bin"):
+            if (d / "bash.exe").exists():
+                return str(d)
+    return None if os.name == "nt" else str(Path(shutil.which("bash") or "/bin/bash").parent)
+
+
 def compiler(v):
     """(argv prefix, env) that compile like the unit's ninja rule."""
     tool = ROOT / "build" / "compilers" / v["mw_version"]
@@ -244,8 +257,8 @@ def setup(a):
     for p in (PERMUTER_DIR / "permuter.py", PERMUTER_PY, PRODG / f"CPP{EXE}", BINUTILS / f"powerpc-eabi-as{EXE}"):
         if not p.exists():
             sys.exit(f"missing {p}" + (" (run `ninja build/binutils`)" if "binutils" in str(p) else ""))
-    if not shutil.which("bash"):
-        sys.exit("bash is not on PATH (Git for Windows provides it)")
+    if not git_bash_dir():
+        sys.exit("Git for Windows' bash not found (set GIT_BASH_DIR)")
 
     v = ninja_vars(unit)
     cc, env = compiler(v)
@@ -348,8 +361,8 @@ def setup_cxx(a, d, cc, cflags, env, pre, cname):
         f"exec {shlex.quote(Path(sys.executable).as_posix())} {shlex.quote(Path(__file__).resolve().as_posix())} "
         f"--splice {shlex.quote(d.as_posix())} \"$1\" \"$3\"\n",
         encoding="utf-8", newline="\n")
-    r = subprocess.run(["bash", str(d / "compile.sh"), str(d / "base.c"), "-o", str(d / "base.o")],
-                       capture_output=True, text=True)
+    r = subprocess.run([str(Path(git_bash_dir(), "bash.exe")) if os.name == "nt" else "bash", str(d / "compile.sh"),
+                        str(d / "base.c"), "-o", str(d / "base.o")], capture_output=True, text=True)
     if r.returncode:
         sys.exit(f"REFUSED: base.c's body does not compile inside the unit:\n{(r.stdout + r.stderr)[-1500:]}")
     print(f"base.c: {base.count(chr(10))} lines of C (the function and what it uses)")
@@ -405,7 +418,8 @@ def splice_compile(d, cand, out):
 
 def run(d, a):
     env = dict(os.environ)
-    env["PATH"] = os.pathsep.join([str(PRODG), str(BINUTILS), env.get("PATH", "")])  # cpp, powerpc-eabi-objdump
+    # cpp (ProDG's CPP.exe), powerpc-eabi-objdump, and Git's bash ahead of WSL's
+    env["PATH"] = os.pathsep.join([str(PRODG), str(BINUTILS), git_bash_dir() or "", env.get("PATH", "")])
     log = d / "permuter.log"
     cmd = [str(PERMUTER_PY), str(PERMUTER_DIR / "permuter.py"), str(d), "-j", str(a.jobs), "--stop-on-zero"]
     if a.show_errors:
@@ -431,6 +445,7 @@ def run(d, a):
         print(f"  {score:6}  {o / 'source.c'}")
     if not base:
         print("the permuter did not start; last lines of its log:\n" + "\n".join(text.splitlines()[-15:]))
+    return (int(base.group(1)) if base else None), (outs[0] if outs else None)
 
 
 def main():

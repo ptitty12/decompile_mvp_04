@@ -426,7 +426,38 @@ def collect() -> Dict[str, Any]:
         "last_merge": int(last_merge) if last_merge else None,
         "close": close_to_matching(main),
         "near_recent": near_recent,
+        "farm": farm_status(),
     }
+
+
+FARM_LEDGER = Path(os.environ.get("FARM_DIR", r"C:\Users\Patrick Taylor\decompile_mvp_04-farm")) / "build" / "permute_farm" / "ledger.json"
+
+
+def farm_status() -> Optional[Dict[str, Any]]:
+    """tools/match/permute_farm.py's ledger: queue, current function, outcomes."""
+    try:
+        db = json.loads(FARM_LEDGER.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    fns = list(db.get("functions", {}).values())
+    counts: Dict[str, int] = {}
+    for e in fns:
+        counts[e["status"]] = counts.get(e["status"], 0) + 1
+    st = db.get("state", {})
+    return {
+        "queue": st.get("queue"), "current": st.get("current"), "unit": st.get("current_unit"),
+        "since": st.get("current_since"), "counts": counts,
+        "improved": sum(1 for e in fns if e.get("best") is not None and e.get("base") and e["best"] < e["base"]),
+        "matched": sorted((e for e in fns if e["status"] == "matched"), key=lambda e: -e.get("time", 0)),
+    }
+
+
+def farm_line(f: Dict[str, Any], now: float) -> str:
+    c = f["counts"]
+    tried = sum(c.values())
+    cur = f"now {f['current'].split('__')[0]} ({f['unit']}, {ago(f['since'], now)})" if f.get("current") else "idle"
+    return (f"{cur}; queue {f['queue']}; tried {tried}: {c.get('matched', 0)} match candidates, "
+            f"{f['improved']} improved, {c.get('refused', 0)} refused")
 
 
 # ----------------------------------------------------------------------------- formatting
@@ -611,6 +642,10 @@ def render_terminal(st: Dict[str, Any], every: Optional[int], width: int = 120) 
             close = f"{r['close']:.1f}%" if r["close"] else "  ?  "
             fns = (r["near"][0] + (f" +{len(r['near']) - 1}" if len(r["near"]) > 1 else "")) if r["near"] else "-"
             out.append(f"  {hm(r['t'])}  {close:>6}  {fns:<15} {r['unit']}")
+    if st["farm"]:
+        out += ["", f"{B}PERMUTER FARM{R}  {farm_line(st['farm'], now)}"]
+        for e in st["farm"]["matched"][:4]:
+            out.append(f"  MATCH  {e['fn'].split('__')[0]:<14} {e['unit']}  (was {e['pct']:.2f}%; patch in ledger)")
     return "\n".join(out)
 
 
@@ -711,7 +746,15 @@ def render_md(st: Dict[str, Any], chart: str) -> str:
         out += md_table(["Time", "Closest", "Functions", "Unit"], [
             [hm(r["t"]), f"{r['close']:.1f}%" if r["close"] else "-", ", ".join(f"`{f}`" for f in r["near"][:4]) or "-",
              f"`{r['unit']}`"] for r in st["near_recent"]], "lrll") + [""]
-    hours = ", ".join(f"{hm(x['t0'])} {x['kb_per_h']:.0f} KB" for x in st["hourly"] if x["commits"])
+    if st["farm"]:
+        out += ["## Permuter farm", "", "Unattended decomp-permuter runs over main's near-misses at idle CPU priority "
+                "(`tools/match/permute_farm.py`). A match candidate is confirmed by rebuilding its unit and "
+                "waits as a patch for a worker to apply and verify.", "", farm_line(st["farm"], now), ""]
+        if st["farm"]["matched"]:
+            out += md_table(["Match candidate", "Unit", "Was"], [
+                [f"`{e['fn'].split('__')[0]}`", f"`{e['unit']}`", f"{e['pct']:.2f}%"] for e in st["farm"]["matched"][:20]],
+                "llr") + [""]
+    hours =", ".join(f"{hm(x['t0'])} {x['kb_per_h']:.0f} KB" for x in st["hourly"] if x["commits"])
     out += [f"<sub>Code claimed per hour behind the chart: {hours}</sub>", ""]
     return "\n".join(out)
 
