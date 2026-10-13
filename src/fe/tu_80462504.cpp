@@ -617,15 +617,11 @@ FE_OVERLAY void fn_80463C28(int unused, FeScrE* x)
 
 FE_OVERLAY int fn_80463C64(FeScrE* x)
 {
-    int r;
-    if (x->m13C == x->m134) {
-        r = x->m14C->fn_vslot86() != 0;
-    } else if (x->m13C == x->m138) {
-        r = x->m14C->fn_vslot87() != 0;
-    } else {
-        r = 0;
-    }
-    return r;
+    if (x->m13C == x->m134)
+        return x->m14C->fn_vslot86() != 0;
+    if (x->m13C == x->m138)
+        return x->m14C->fn_vslot87() != 0;
+    return 0;
 }
 
 FE_OVERLAY int fn_80463CE4(FeScrE* x)
