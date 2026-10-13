@@ -1,12 +1,8 @@
 /*
  * Dolphin SDK OS (OSThread, MWCC GC/1.2.5n, cflags_dolphin_sdk),
- * .text 0x80437444-0x80438778 (code-only unit; TU boundaries approximate, placeholder).
+ * .text 0x80437444-0x80438628 (code-only unit). OSTime.c (0x80438628-0x80438778) is its own unit, dolphin/os/OSTime.c.
  * Every data object is extern by its lbl_ name.
- * OSThread.c is done (fn_80437444..fn_8043857C). Not reproduced: fn_80438628/fn_80438640 (OSGetTime/OSGetTick,
- * mftb: original code) and fn_80438704/fn_80438724 (a walk over a zeroed 4-entry function table at lbl_80649298;
- * unoptimised code with branch-to-next chains, no source shape found). __OSGetSystemTime (0x80438648) and
- * __OSTimeToSystemTime (0x804386AC) are OSTime.c: they match only with -opt nopeephole (copies come out as mr
- * instead of addi), so they need their own unit with the nopeephole flags (owner/lead: split at 0x80438628).
+ * OSThread.c is done (fn_80437444..fn_8043857C).
  *
  * Statics: RunQueue/IdleThread/DefaultThread/IdleContext are real .bss statics here (the compiler addresses
  * them off one shared base, which an extern cannot reproduce); RunQueueBits/RunQueueHint/Reschedule are volatile.
@@ -548,11 +544,4 @@ void fn_8043857C(u8 val)
     for (p = fn_80437444()->stackEnd + 1; p < (u32*)sp; p++) {
         *p = pattern;
     }
-}
-
-BOOL fn_80438724(void);
-
-BOOL fn_80438704(void)
-{
-    return fn_80438724();
 }

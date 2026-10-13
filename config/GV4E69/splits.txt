@@ -2568,7 +2568,10 @@ dolphin/os/tu_80435A10.c:
 	.text       start:0x80435A10 end:0x80437444
 
 dolphin/os/tu_80437444.c:
-	.text       start:0x80437444 end:0x80438778
+	.text       start:0x80437444 end:0x80438628
+
+dolphin/os/OSTime.c:
+	.text       start:0x80438628 end:0x80438778
 
 dolphin/pad/Padclamp.c:
 	.text       start:0x80438778 end:0x80438A2C

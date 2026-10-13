@@ -1296,6 +1296,7 @@ config.libs = [
             Object(Matching, "dolphin/os/OSMessage.c"),
             Object(NonMatching, "dolphin/os/tu_80435A10.c"),
             Object(NonMatching, "dolphin/os/tu_80437444.c"),
+            Object(NonMatching, "dolphin/os/OSTime.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),  # OSTime.c: peephole off (docs/DECISIONS.md 2026-10-13)
             Object(Matching, "dolphin/pad/Padclamp.c"),
             Object(Matching, "dolphin/pad/Pad.c"),
             Object(Matching, "dolphin/si/SIBios.c"),
