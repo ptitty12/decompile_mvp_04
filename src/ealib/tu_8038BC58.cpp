@@ -231,9 +231,13 @@ void GXSetTevKColorSel(int a, int b);
 #define F0 0.0f
 #define K 0.0625f
 
-/* near-miss (99.96%): same 420 instructions; only the frame size (0x88 vs 0x78) and the conv-temp displacement differ: retail
-   has 16 more bytes of locals between cb and the unsigned->float temp (an unused local array or spill slots; none of the
-   spellings tried reproduces a slot there). GX calls are fn_ names (no SDK names in symbols.txt yet). */
+/* near-miss: same 420 instructions and frame size (0x88). Retail has 16 bytes of frame that no emitted code touches, above
+   kt/ca/cb and below the unsigned->float temp: a local object with an empty inline destructor (see VdSpare8) reproduces the
+   frame size, but wherever it is declared our ca/cb land 20 bytes higher than retail (0x40/0x44 instead of 0x2c/0x30; 6 insns). */
+struct VdSpare16 {
+    int m0, m4, m8, mC;
+    ~VdSpare16() {}
+};
 extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
 {
     GXColor kt;
@@ -268,6 +272,7 @@ extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(0, 1, 0xc, 0x3c, 0, 0x7d);
     GXSetTexCoordGen2(1, 1, 0xc, 0x3c, 0, 0x7d);
+    VdSpare16 sp;
     m[0] = (float)(unsigned)p1->w * K;
     m[1] = F0;
     m[4] = (float)(unsigned)p1->h * K;
