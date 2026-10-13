@@ -639,6 +639,7 @@ struct Unk801CF054_Mgr {
 };
 struct Unk8022FE34_U {
     int fn_80235E28();
+    float fn_80235DA8();
 };
 struct Unk8024F40C_Mgr;
 struct Unk8024EF40_Q;
@@ -950,4 +951,33 @@ extern "C" int fn_801D251C(Y* y)
             return 1;
     }
     return 0;
+}
+
+extern Unk801CF054_F4 lbl_805D296C;
+extern "C" int fn_801D0BB0(Y* y);
+
+extern "C" float fn_801D2E0C(Y* y)
+{
+    float r = 0.0f;
+    int f = 0;
+    if (!(((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235DA8() <= 0.75f))
+        f = RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4D0) < 0.25f;
+    if (f) {
+        r = RandF2(y->m30->m554, 0.35f, lbl_805D25E0, 0x4D8);
+    } else {
+        Unk801CF054_F4 tbl = lbl_805D296C;
+        r = tbl.v[fn_801D0BB0(y)];
+        float t = ((Unk801C16B0_Z*)y->m2C)->m1FC;
+        t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+        r = r * LerpATB(0.8f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4EC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        r = fn_801A0AA8(y->m30, r, 0.25f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float d = fn_801D18C8(y);
+        d = !(d > 1.0f) ? (d >? 0.0f) : 1.0f;
+        r = r * LerpATB(1.0f, d, 1.35f);
+        r = r * LerpATB(1.0f, fn_80088E74(y->m30->m6F8->mC->mC), 1.3f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
 }
