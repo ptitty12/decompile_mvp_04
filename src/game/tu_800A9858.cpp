@@ -95,6 +95,54 @@ struct UnkFETbl {
     char pad6C[0x7C - 0x6C];
     const void* m7C;
 };
+/* fn_800AABA4: the 0x84-byte table object (members at +8..+0x7C, each a base ctor
+ * fn_80356798 plus a vptr and one value word; +0x6C is a FEMsg16). */
+struct FEMm {
+    const void* v;
+    int n;
+};
+struct FEMm4 {
+    const void* v;
+    int n;
+    int n2;
+    int n3;
+};
+struct FEMmB {
+    const void* v;
+    char b;
+};
+struct FETblC {
+    const void* m0;
+    int m4;
+    FEMm m8;
+    FEMm m10;
+    FEMm m18;
+    FEMm m20;
+    FEMm m28;
+    FEMm m30;
+    FEMm4 m38;
+    FEMm m48;
+    FEMm m50;
+    FEMm m58;
+    FEMm m60;
+    const void* m68;
+    char pad6C[0x10];
+    FEMmB m7C;
+};
+extern const char lbl_8065BB60[];
+extern const char lbl_8065BB20[];
+extern const char lbl_8065BAE0[];
+extern const char lbl_8065BAA0[];
+extern const char lbl_8065CE50[];
+extern const char lbl_8065CED0[];
+extern const char lbl_8065CF10[];
+extern const char lbl_8065CF90[];
+extern const char lbl_8065CF50[];
+extern const char lbl_8065CDD0[];
+extern const char lbl_8065CE10[];
+extern const char lbl_8065BBA8[];
+extern const char lbl_8065BBE8[];
+
 inline void* operator new(unsigned int, void* p)
 {
     return p;
@@ -790,6 +838,32 @@ void fn_800AAB40(UnkFEVec* self, int c)
     if (c & 1) {
         fn_80377408(self);
     }
+}
+
+/* near-miss: 112 of 114 insns; retail stores the first vptr (stw r9,0(r29)) before the mr r3,r30 argument move, ours after it. */
+void* fn_800AABA4(void* p)
+{
+    new (p) Unk8037B3E8(0x6A8513FF);
+    FETblC* self = (FETblC*)p;
+    self->m0 = lbl_8065BA40;
+    self->m4 = 0;
+
+    FEMm* t8 = &self->m8; fn_80356798(t8); self->m8.v = lbl_8065BB60; t8->n = 0;
+    FEMm* t10 = &self->m10; fn_80356798(t10); self->m10.v = lbl_8065BB20; t10->n = -0x3E7;
+    FEMm* t18 = &self->m18; fn_80356798(t18); self->m18.v = lbl_8065BAE0; t18->n = -0x3E7;
+    FEMm* t20 = &self->m20; fn_80356798(t20); self->m20.v = lbl_8065BAA0; t20->n = 0;
+    FEMm* t28 = &self->m28; fn_80356798(t28); self->m28.v = lbl_8065CE50; t28->n = 0;
+    FEMm* t30 = &self->m30; fn_80356798(t30); self->m30.v = lbl_8065CED0; t30->n = 0x9D;
+    FEMm4* t38 = &self->m38; fn_80356798(t38); self->m38.v = lbl_8065CF10; t38->n = 0; t38->n2 = 0;
+    FEMm* t48 = &self->m48; fn_80356798(t48); self->m48.v = lbl_8065CF90; t48->n = -0x3E7;
+    FEMm* t50 = &self->m50; fn_80356798(t50); self->m50.v = lbl_8065CF90; t50->n = -0x3E7; self->m50.v = lbl_8065CF50;
+    FEMm* t58 = &self->m58; fn_80356798(t58); self->m58.v = lbl_8065CDD0; t58->n = 0;
+    FEMm* t60 = &self->m60; fn_80356798(t60); self->m60.v = lbl_8065CE10; t60->n = 0;
+    fn_80356798(&self->m68);
+    self->m68 = lbl_8065BBA8;
+    fn_8035682C((FEMsg16*)self->pad6C);
+    FEMmB* t7C = &self->m7C; fn_80356798(t7C); self->m7C.v = lbl_8065BBE8; t7C->b = 0;
+    return self;
 }
 
 void fn_800AAD6C(char* p, int c)
