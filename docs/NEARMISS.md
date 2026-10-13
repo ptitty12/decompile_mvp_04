@@ -307,3 +307,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - fe/tu_80492680::fn_80493F20 (99.14%): eight byte/unsigned/accessor/condition forms leave the retail redundant byte extension absent or change allocation; scratch build/root-80493F20.
 
 - fe/tu_80492680::fn_80492BA8 (97.58%): eight provider-grounded float/layout/accessor forms leave eight widget/conversion register slots; corrected two-float output contract in scratch build/root-80492BA8, no source change promoted.
+
+- ealib/tu_803BE8BC::fn_803C1B50 (98.29%): eight local/sentinel/zero-chain initialization forms retain constant-register and store scheduling differences; scratch build/root-803C1B50.
