@@ -4,7 +4,7 @@
 
 #include "__dvd.h"
 
-static u32 strnlen(const char* str, u32 maxlen) {
+static inline u32 strnlen(const char* str, u32 maxlen) {
     u32 i;
 
     for (i = 0; i < maxlen; i++) {
@@ -74,25 +74,4 @@ int DVDCompareDiskID(const DVDDiskID* id1, const DVDDiskID* id2) {
     return 1;
 }
 
-DVDDiskID* DVDGenerateDiskID(DVDDiskID* id, const char* game, const char* company, u8 diskNum, u8 version) {
-    ASSERTMSGLINE(123, id, "DVDGenerateDiskID(): Specified id is NULL\n");
-    ASSERTMSGLINE(124, game == NULL || strlen(game) == 4, "DVDGenerateDiskID(): Specified game name is neither NULL nor 4 character long\n");
-    ASSERTMSGLINE(125, company, "DVDGenerateDiskID(): Specified company name is NULL\n");
-    ASSERTMSGLINE(126, strlen(company) == 2, "DVDGenerateDiskID(): Specified company name is not 2 character long\n");
-    ASSERTMSGLINE(127, diskNum == 0xFF || ((diskNum / 16) < 10 && diskNum % 16 < 10), "DVDGenerateDiskID(): Specified disk number is neither 0xff nor a BCD number");
-    ASSERTMSGLINE(128, version == 0xFF || ((version / 16) < 10 && version % 16 < 10), "DVDGenerateDiskID(): Specified version number is neither 0xff nor a BCD number");
 
-    memset(id, 0, sizeof(DVDDiskID));
-
-    if (game != NULL) {
-        strncpy(id->gameName, game, 4);
-    }
-
-    if (company != NULL) {
-        strncpy(id->company, company, 2);
-    }
-
-    id->diskNumber = diskNum;
-    id->gameVersion = version;
-    return id;
-}
