@@ -763,7 +763,7 @@ config.libs = [
             Object(Matching, "game/tu_8034B8C0.cpp"),
             Object(Matching, "game/tu_8034D550.cpp"),
             Object(Matching, "game/tu_8034F350.cpp"),
-            Object(NonMatching, "game/tu_80351150.cpp"),
+            Object(Matching, "game/tu_80351150.cpp"),
             Object(NonMatching, "game/tu_80352E64.cpp"),
             Object(Matching, "game/tu_80353930.cpp", cflags=cflags_game + ["-fno-builtin"]),
             Object(Matching, "game/tu_803543FC.cpp", cflags=cflags_game + ["-fno-builtin"]),

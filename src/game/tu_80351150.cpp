@@ -862,7 +862,7 @@ void fn_80352E04(Unk80352E04* self, int chrg)
 {
     self->m10 = lbl_80649750;
     if (self->mC != 0) {
-        delete[] self->mC;
+        fn_80377488(self->mC);
         self->mC = 0;
     }
     if (chrg & 1)
