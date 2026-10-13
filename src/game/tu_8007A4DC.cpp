@@ -4,19 +4,28 @@
  */
 #include "game/tu_8007A4DC.h"
 
-int Unk8007A4DC_Screen::fn_8007A4DC(int a)
+struct SortArr;
+extern "C" void* fn_800A883C(void** h);
+extern "C" int fn_80377E90(SortArr* list, int* a, int* b, int idx);
+int fn_800803F0(void* s, int a, int b);
+int fn_80080464(void* s, int a, int b);
+struct Unk8052FA84_List;
+extern "C" int fn_8052FC1C(Unk8052FA84_List* self, int a, int row, int col);
+extern "C" void fn_80402EF8(unsigned short* dst, const char* src);
+
+float Unk8007A4DC_Screen::fn_8007A4DC(int a, int b)
 {
-    return fn_8007189C(m184, a);
+    return fn_8007189C(m184, a, b);
 }
 
-int Unk8007A4DC_Screen::fn_8007A500(int a)
+float Unk8007A4DC_Screen::fn_8007A500(int a, int b)
 {
-    return fn_8007189C(m1C8, a);
+    return fn_8007189C(m1C8, a, b);
 }
 
-int Unk8007A4DC_Screen::fn_8007A524(int a, int b, int i)
+float Unk8007A4DC_Screen::fn_8007A524(int a, int b, int i)
 {
-    return fn_8007189C(m188[i], a);
+    return fn_8007189C(m188[i], a, b);
 }
 
 int Unk8007A4DC_Screen::fn_8007A550(int a)
@@ -68,7 +77,7 @@ char* Unk8007A4DC_Screen::fn_8007A7C8(int a, int b, char* out)
 {
     char buf[0x400];
     fn_8007A700(a, b, buf);
-    fn_80402EF8(out, buf);
+    fn_80402EF8((unsigned short*)out, buf);
     return out;
 }
 
@@ -161,13 +170,13 @@ int Unk8007A4DC_Screen::fn_8007AD34(int sel, int x, int y)
     int p, q;
     int p2, q2;
     if (sel == 0xD) {
-        fn_80377E90(fn_800A883C(&m17C), &p, &q, x);
-        r = fn_800803F0(this, y, p);
+        fn_80377E90((SortArr*)fn_800A883C((void**)&m17C), &p, &q, x);
+        r = fn_800803F0((void*)this, y, p);
     } else if (sel != 0x10) {
         r = y;
     } else {
-        fn_80377E90(fn_800A883C(&m17C), &p2, &q2, x);
-        r = fn_80080464(this, y, p2);
+        fn_80377E90((SortArr*)fn_800A883C((void**)&m17C), &p2, &q2, x);
+        r = fn_80080464((void*)this, y, p2);
     }
     return r;
 }
@@ -179,8 +188,8 @@ int Unk8007A4DC_Screen::fn_8007ADD0(unsigned sel, int x, int y)
     if (sel > 1)
         r = y;
     else {
-        fn_80377E90(fn_800A883C(&m17C), &p, &q, x);
-        r = fn_800803F0(this, y, p);
+        fn_80377E90((SortArr*)fn_800A883C((void**)&m17C), &p, &q, x);
+        r = fn_800803F0((void*)this, y, p);
     }
     return r;
 }
@@ -188,9 +197,9 @@ int Unk8007A4DC_Screen::fn_8007ADD0(unsigned sel, int x, int y)
 int Unk8007A4DC_Screen::fn_8007AE38(int sel, int x, int y)
 {
     if (sel == 0xD)
-        return fn_800803F0(this, y, x);
+        return fn_800803F0((void*)this, y, x);
     if (sel == 0x10)
-        return fn_80080464(this, y, x);
+        return fn_80080464((void*)this, y, x);
     return y;
 }
 
@@ -198,7 +207,7 @@ int Unk8007A4DC_Screen::fn_8007AE84(unsigned sel, int x, int y)
 {
     if (sel > 1)
         return y;
-    return fn_800803F0(this, y, x);
+    return fn_800803F0((void*)this, y, x);
 }
 
 int Unk8007A4DC_Screen::fn_8007AEBC(int a, int b)
@@ -253,12 +262,12 @@ int Unk8007A4DC_Screen::fn_8007B1B4(int a, int b, int c)
 
 int Unk8007A4DC_Screen::fn_8007B1EC()
 {
-    return fn_800A883C(&m17C) ? fn_800A883C(&m17C)->m4 : 0;
+    return fn_800A883C((void**)&m17C) ? ((Obj*)fn_800A883C((void**)&m17C))->m4 : 0;
 }
 
 int Unk8007A4DC_Screen::fn_8007B238()
 {
-    return fn_800A883C(&m1C0) ? fn_800A883C(&m1C0)->m4 : 0;
+    return fn_800A883C((void**)&m1C0) ? ((Obj*)fn_800A883C((void**)&m1C0))->m4 : 0;
 }
 
 int Unk8007A4DC_Screen::fn_8007B284(int a, int i)
@@ -268,7 +277,7 @@ int Unk8007A4DC_Screen::fn_8007B284(int a, int i)
 
 int Unk8007B2B0_Screen::fn_8007B2B0()
 {
-    return fn_800A883C(&m38) ? fn_800A883C(&m38)->m4 : 0;
+    return fn_800A883C((void**)&m38) ? ((Obj*)fn_800A883C((void**)&m38))->m4 : 0;
 }
 
 int Unk8007B2B0_Screen::fn_8007B2FC(int a)
@@ -336,7 +345,7 @@ int Unk8007B2B0_Screen::fn_8007B6B8(int a, int b, int c)
     return m40->v40(a, b, c);
 }
 
-int Unk8007B2B0_Screen::fn_8007B6F0()
+int Unk8007B2B0_Screen::fn_8007B6F0(int a, int row, int col)
 {
-    return fn_8052FC1C(m48);
+    return fn_8052FC1C((Unk8052FA84_List*)m48, a, row, col);
 }
