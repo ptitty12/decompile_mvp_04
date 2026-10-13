@@ -1339,6 +1339,94 @@ struct Unk802C75D0_Own {
     }
 };
 
+struct Unk802C73C4_List {
+    int w[0x52];
+};
+void* fn_8030AC4C(Unk802C73C4_List* p);
+extern int lbl_805E1B34[];
+void* operator new[](unsigned int n, int heap);
+
+struct Unk802C73C4_E12 {
+    int m0;
+    int m4;
+    int m8;
+    Unk802C73C4_E12()
+    {
+        m0 = 0;
+        m4 = 0;
+        m8 = 0;
+    }
+};
+
+struct Unk802C73C4_SlotD {
+    int m0;
+    Unk802C73C4_List m4;
+    int m14C;
+    int m150;
+    int m154;
+    int m158;
+    int m15C;
+    int m160;
+};
+class Unk802C73C4_Slot : public Unk802C73C4_SlotD {
+public:
+    Unk802C73C4_Slot()
+    {
+        m0 = 0;
+        fn_8030AC4C(&m4);
+        m14C = 0;
+        m150 = 0;
+        m154 = 0;
+        m158 = 0;
+        m15C = 0;
+        m160 = 0;
+    }
+    virtual ~Unk802C73C4_Slot();
+};
+
+struct Unk802C73C4_Entry {
+    Unk802C73C4_Entry();
+    ~Unk802C73C4_Entry();
+    char pad0[0x460];
+    int m460;
+    int m464;
+    int m468;
+    char pad46C[0x4B4 - 0x46C];
+};
+
+class Unk802C73C4_Own {
+public:
+    Unk802C73C4_Own();
+    virtual ~Unk802C73C4_Own();
+    Unk802C73C4_E12 a0[4];
+    Unk802C73C4_E12 a30[2];
+    Unk802C73C4_E12 a48[4];
+    Unk802C73C4_E12 a78[4];
+    Unk802C73C4_E12 aA8[6];
+    Unk802C73C4_Slot aF0[2];
+    char* m3C0;
+    Unk802C73C4_Entry* m3C4[4];
+    unsigned char m3D4;
+};
+
+/* near-miss (131/131 insns, 96.6%): retail keeps the vec-new counter in r31 and the array base in r29, ours the reverse
+ * (global-alloc priority; retail also stores m3C4[k] after the loop-bound load). Loop form, local array pointer and
+ * statement order variants all give the same 18 differing lines. */
+Unk802C73C4_Own::Unk802C73C4_Own()
+{
+    m3C0 = 0;
+    m3D4 = 0;
+    for (int k = 0; k <= 3; k++) {
+        int n = lbl_805E1B34[k];
+        m3C4[k] = new (0) Unk802C73C4_Entry[n];
+        for (int j = 0; j < lbl_805E1B34[k]; j++) {
+            m3C4[k][j].m460 = k;
+            m3C4[k][j].m468 = j;
+        }
+        aA8[k].m4 = 0;
+    }
+}
+
 void fn_802C75D0(Unk802C75D0_Own* p, int c)
 {
     p->~Unk802C75D0_Own();
