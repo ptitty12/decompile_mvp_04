@@ -322,3 +322,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
 - `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.
+- `db/tu_805881E4` `fn_80588A3C` (swarm24, 2 forms): existing 95.69%; 130/130 words, best 30 register/schedule slots. Index-first setup fixes two words, but id/screen/predicate occupy r29/r31/r30 rather than retail r31/r30/r29.
+- `db/tu_805881E4` `fn_8058B048` (swarm27, 5 forms): scratch 144/144 words; held for shared ABI repair. Retail at 8058B1E0 consumes canonical BB28 return in f1, but game provider and member header still declare int; no new conflicting declaration retained.
