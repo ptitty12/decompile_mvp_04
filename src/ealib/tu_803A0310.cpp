@@ -701,10 +701,11 @@ void fn_803A2A44(Vp6MvView* c, short* out, int mode)
     }
     i = 0;
     rc = &c->m150;
-    j = 0;
+    const unsigned char* p706 = (const unsigned char*)c + 0x706;
     k = 0;
+    j = 0;
     do {
-        if (!fn_803A0E18(rc, Vp6Rd(c, 0x706, i))) {
+        if (!fn_803A0E18(rc, p706[i])) {
             if (fn_803A0E18(rc, Vp6Rd(c, 0x708, j))) {
                 if (fn_803A0E18(rc, Vp6Rd(c, 0x70C, j))) {
                     v = fn_803A0E18(rc, Vp6Rd(c, 0x70E, j)) + 6;
@@ -734,9 +735,13 @@ void fn_803A2A44(Vp6MvView* c, short* out, int mode)
             v = -v;
         }
         if (i != 0) {
-            out[1] = py + v;
+            int result = v;
+            result += py;
+            out[1] = result;
         } else {
-            out[0] = px + v;
+            int result0 = v;
+            result0 += px;
+            out[0] = result0;
         }
         i++;
         k += 8;
