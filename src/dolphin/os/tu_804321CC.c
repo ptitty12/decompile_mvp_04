@@ -255,10 +255,9 @@ static Cell* DLExtract(Cell* list, Cell* cell)
         cell->next->prev = cell->prev;
     }
     if (cell->prev == NULL) {
-        list = cell->next;
-    } else {
-        cell->prev->next = cell->next;
+        return cell->next;
     }
+    cell->prev->next = cell->next;
     return list;
 }
 
