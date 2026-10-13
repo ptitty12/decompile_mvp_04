@@ -470,16 +470,15 @@ extern "C" void fn_803AE5EC(int v)
     SNDVOICEI_free(v + sndgs.sso.set.voicesdsp);
 }
 
-/* near-miss: 53 vs 54 insns: retail loads o->m14 into r11 before the chan base (lbl_8069CA48 in r10) and keeps both live for the second chan index; ours loads m14 into r0 and rebuilds the base */
 extern "C" void fn_803AE618(Unk803AE618* o)
 {
     int idx = o->m14;
-    CHANPUB* c = &sndgs.chan[idx];
-    int m = c->masterchan;
-    int base = m;
-    if (m == -1)
-        base = idx;
-    CHANPUB* mc = &sndgs.chan[base];
+    CHANPUB* chans = sndgs.chan;
+    CHANPUB* mc = &chans[idx];
+    int m = mc->masterchan;
+    int base;
+    if (m == -1) base = idx; else base = m;
+    mc = &chans[base];
     int i;
     for (i = 0; i < mc->numchan; i++) {
         int v = mc->voices[i];
