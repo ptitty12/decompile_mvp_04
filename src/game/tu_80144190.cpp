@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8012C8CC.h"
+extern "C" void fn_80377408(void*);
 
 extern const char lbl_8065CCE8[];
 extern const char lbl_8065CFD0[];
@@ -51,7 +52,7 @@ extern "C" void fn_80144190(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -59,7 +60,7 @@ extern "C" void fn_801441C4(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -67,7 +68,7 @@ extern "C" void fn_801441F8(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -75,7 +76,7 @@ extern "C" void fn_8014422C(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -83,7 +84,7 @@ extern "C" void fn_80144260(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -91,7 +92,7 @@ extern "C" void fn_80144294(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -99,7 +100,7 @@ extern "C" void fn_801442C8(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -107,7 +108,7 @@ extern "C" void fn_801442FC(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -115,7 +116,7 @@ extern "C" void fn_80144330(UnkP0* p, int chrg)
 {
     p->m0 = lbl_8065CFD0;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
@@ -123,7 +124,7 @@ extern "C" void fn_80144364(UnkP3C* p, int chrg)
 {
     p->m3C = lbl_8065CCE8;
     if (chrg & 1) {
-        delete p;
+        fn_80377408(p);
     }
 }
 
