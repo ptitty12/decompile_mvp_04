@@ -119,13 +119,14 @@ extern "C" void fn_80402A50(int n, const V3* a, V3* out, float k)
     }
 }
 
-/* near-miss: same length; the register order of the three loads and the two fmadds (z*z + (x*x + y*y)) differs. */
 extern "C" float fn_80402A90(const V3* v)
 {
     float y = v->y;
     float x = v->x;
+    x = x * x + y * y;
     float z = v->z;
-    return (float)sqrt(z * z + (x * x + y * y));
+    x = z * z + x;
+    return (float)sqrt(x);
 }
 
 /* near-miss: same length; retail interleaves the six loads and three products differently (locals in draft order tried). */
