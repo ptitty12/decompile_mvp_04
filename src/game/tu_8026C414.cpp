@@ -206,6 +206,33 @@ extern "C" void* fn_8026C65C(Unk8026C8FC_M* s, int owner)
     return s;
 }
 
+extern "C" void* fn_80328234(void*, int, int);
+extern "C" void* fn_8026C75C(Unk8026C8FC_M* s, int owner, int flag)
+{
+    Unk8026C65C_Base* base = (Unk8026C65C_Base*)s;
+    base->vptr = lbl_806604F8;
+    new (&s->m7C) Unk80379324;
+    E* entry = (E*)((char*)s + 0xC4);
+    int n = 5;
+    fn_8035A618(s);
+    fn_80328234((char*)s + 0xA0, owner, flag);
+    *(void**)((char*)s + 0xB8) = lbl_80663F20;
+    base->vptr = lbl_80663FB0;
+    do {
+        entry->pos = lbl_806055AC;
+        fn_8035EA10((Unk8035EA10*)entry);
+        ++entry;
+    } while (n--);
+    Unk8026C65C_Base* first = (Unk8026C65C_Base*)((char*)s + 0x1A0);
+    Unk8026C65C_Base* second = (Unk8026C65C_Base*)((char*)s + 0x280);
+    first->Initialize();
+    fn_80319218((char*)s + 0x244);
+    second->Initialize();
+    fn_8026C8FC(s);
+    s->m264 = 0;
+    return s;
+}
+
 void fn_8026CA58() {}
 
 void fn_8026CA5C(M* self)
