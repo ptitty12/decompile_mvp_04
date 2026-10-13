@@ -236,6 +236,47 @@ int fn_802CC8EC(Unk802CBD04* o)
     return r;
 }
 
+struct Unk8019F8C0_Owner;
+struct Unk802CE2C4_Obj {
+    char pad0[0x3D44];
+    int m3D44;
+};
+Unk802CE2C4_Obj* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
+extern "C" Unk802CBD04_Vec3 fn_80183918(int a, int b, int c);
+extern "C" void fn_80402B48(const Unk802CBD04_Vec3* v, Unk802CBD04_Vec3* out);
+extern Unk802CBD04_Vec3 lbl_806055AC;
+inline Unk802CBD04_Vec3 Unk802CE2C4_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
+{
+    Unk802CBD04_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+void fn_802CE2C4(Unk802CBD04* o, int k, int kind, Unk802CBD04_Vec3* out)
+{
+    *out = lbl_806055AC;
+    if (o->mD8 != 0) {
+        if (kind == 0x2F) {
+            Unk802CE2C4_Obj* ow = fn_801A6D84((Unk8019F8C0_Owner*)o->mD8, k);
+            int h = 0;
+            if (ow != 0)
+                h = ow->m3D44;
+            if (o->mD8->m6B8 != 0) {
+                Unk802CBD04_Vec3 b;
+                Unk802CBD04_Vec3 a;
+                a = fn_80183918(o->mD8->m6B8, h, 0);
+                b = fn_80183918(o->mD8->m6B8, h, 2);
+                *out = Unk802CE2C4_Sub(b, a);
+                fn_80402B48(out, out);
+            }
+        } else {
+            *out = lbl_806055AC;
+        }
+    }
+}
+
 void* fn_802CF168(void* o)
 {
     return fn_8037CF5C(fn_8037C7FC(), 0xB38E54D3, o);
