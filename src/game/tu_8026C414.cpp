@@ -164,6 +164,48 @@ void fn_8026C8FC(Unk8026C8FC_M* s)
     s->m350 = 0.0f;
 }
 
+
+extern "C" void fn_8035A618(void*);
+extern "C" void* fn_803282A8(void*, int);
+extern "C" void* fn_80319218(void*);
+struct Unk8035EA10;
+void fn_8035EA10(Unk8035EA10*);
+inline void* operator new(unsigned int, void* p) { return p; }
+/* The transform base has its vptr at +0x98, and its vector at +0x7C. */
+struct Unk8026C65C_Base : Unk8026C8FC_B {
+    void* vptr;
+    inline void Initialize() {
+        vptr = lbl_806604F8;
+        new (&m7C) Unk80379324;
+        fn_8035A618(this);
+    }
+};
+extern "C" void* fn_8026C65C(Unk8026C8FC_M* s, int owner)
+{
+    Unk8026C65C_Base* base = (Unk8026C65C_Base*)s;
+    base->vptr = lbl_806604F8;
+    new (&s->m7C) Unk80379324;
+    E* entry = (E*)((char*)s + 0xC4);
+    int n = 5;
+    fn_8035A618(s);
+    fn_803282A8((char*)s + 0xA0, owner);
+    *(void**)((char*)s + 0xB8) = lbl_80663F20;
+    base->vptr = lbl_80663FB0;
+    do {
+        entry->pos = lbl_806055AC;
+        fn_8035EA10((Unk8035EA10*)entry);
+        ++entry;
+    } while (n--);
+    Unk8026C65C_Base* first = (Unk8026C65C_Base*)((char*)s + 0x1A0);
+    Unk8026C65C_Base* second = (Unk8026C65C_Base*)((char*)s + 0x280);
+    first->Initialize();
+    fn_80319218((char*)s + 0x244);
+    second->Initialize();
+    fn_8026C8FC(s);
+    s->m264 = 0;
+    return s;
+}
+
 void fn_8026CA58() {}
 
 void fn_8026CA5C(M* self)
