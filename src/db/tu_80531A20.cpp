@@ -850,17 +850,20 @@ extern "C" DB_OVERLAY int fn_8053381C(Unk805337C8_T* self, int a, unsigned b)
     return r;
 }
 
-/* near-miss: same as fn_8053217C. */
 extern "C" DB_OVERLAY int fn_8053384C(Unk805337C8_T* self, int row, float x)
 {
     int r = 0;
+    unsigned i = 0;
     float acc = lbl_805FEAE0;
-    unsigned i;
-    for (i = 0; i <= 13; i++) {
-        acc = acc + self->m8[row][i].m0;
-        if (!(x >= acc)) {
-            r = i;
-            break;
+    i = r;
+    acc = acc + self->m8[row][i].m0;
+    if (!(x < acc)) {
+        while (++i <= 13) {
+            acc = acc + self->m8[row][i].m0;
+            if (!(x >= acc)) {
+                r = i;
+                break;
+            }
         }
     }
     return r;
