@@ -274,15 +274,16 @@ int Unk8007B2B0_Screen::fn_8007DA28()
     return m8->cur;
 }
 
-/* near-miss: 2 slots, the scaled index lands in r0 instead of r11 (slwi/lwzx). */
+/* The table pointer is held in an int: a pointer-typed local is flagged as a pointer, which makes the index
+ * register class include r0 (retail's index is r11, the base then the only pointer-like operand). */
 int Unk8007B2B0_Screen::fn_8007DA34(int i)
 {
     int r;
-    EntryTable* t = m8;
+    int t = (int)m8;
     if (i == -1)
         r = -1;
     else
-        r = t->list[i];
+        r = ((EntryTable*)t)->list[i];
     return r;
 }
 
@@ -293,11 +294,12 @@ void Unk8007B2B0_Screen::fn_8007DA58(int a)
     fn_800759F8(this, a);
 }
 
-/* near-miss: 2 slots, the scaled index lands in r0 instead of r11 (slwi/stwx). */
+/* Same int table pointer as fn_8007DA34 (index in r11, not r0); the count is read as a plain int. */
 void Unk8007B2B0_Screen::fn_8007DA8C(int a, int b)
 {
-    if (b < m8->count && a > -1 && a <= 3)
-        m8->list[a] = b;
+    int t = (int)m8;
+    if (b < *(int*)t && a > -1 && a <= 3)
+        ((EntryTable*)t)->list[a] = b;
     fn_800759F8(this, b);
 }
 

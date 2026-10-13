@@ -78,20 +78,17 @@ void fn_80047CA4(Unk8004763C* t)
     t->mF8 = 0;
 }
 
-/* near-miss: same loop shape as fn_80047958 (li r9,0 / addi r11 order) */
 void fn_80047D40(Unk8004763C* t, int idx)
 {
     if (t->mF4 == 1) {
-        int* a = t->mBE0;
-        int off = idx * 4;
-        if (*(int*)((char*)a + off) >= 0) {
+        if (t->mBE0[idx] >= 0) {
             fn_80392708();
-            *(int*)((char*)a + off) = -1;
+            t->mBE0[idx] = -1;
             t->mC00 = -1;
             int k;
             for (k = 0; k < 8; k++) {
-                if (a[k] >= 0) {
-                    t->mC00 = a[k];
+                if (t->mBE0[k] >= 0) {
+                    t->mC00 = t->mBE0[k];
                     break;
                 }
             }
@@ -182,12 +179,11 @@ int fn_800480FC(Unk8004763C* t)
     return total;
 }
 
-/* near-miss: 8 slots differ (fail/i callee-saved registers swapped: retail fail=r27, i=r26; tail layout) */
 int fn_80048294(Unk8004763C* t, int idx)
 {
     int any = 0;
-    int i = 0;
     int fail = 0;
+    int i = 0;
     do {
         if (lbl_805B10B4[idx].m80[i] == 1) {
             int s0 = t->mSlots[i].m0;
@@ -208,13 +204,18 @@ int fn_80048294(Unk8004763C* t, int idx)
         }
         i++;
     } while (i <= 7);
-    int r = -2;
-    if (any != 0 || fail != 1)
+    int r;
+    if (any == 0) {
+        if (fail != 1)
+            r = fail ^ 1;
+        else
+            r = -2;
+    } else {
         r = fail ^ 1;
+    }
     return r;
 }
 
-/* near-miss: 1 slot differs (lwzx r4,r9,r27 vs r4,r27,r9 operand order for the lbl_805B0A95+0x23 word) */
 int fn_8004838C(Unk8004763C* t, int idx)
 {
     int sp8 = 0;
@@ -229,12 +230,15 @@ int fn_8004838C(Unk8004763C* t, int idx)
         if (sp8 <= 0 || buf == 0) {
             t->mSlots[idx].m0 = 0;
             t->mSlots[idx].mC = 0;
-        } else if (fn_80395250(buf, *(int*)(lbl_805B0A95 + 0x23 + off)) <= 0) {
-            t->mSlots[idx].m0 = 0;
-            fn_803EDA0C((void*)t->mSlots[idx].mC);
-            t->mSlots[idx].mC = 0;
         } else {
-            r = 1;
+            char* q = lbl_805B0A95 + 0x23;
+            if (fn_80395250(buf, *(int*)(q + off)) <= 0) {
+                t->mSlots[idx].m0 = 0;
+                fn_803EDA0C((void*)t->mSlots[idx].mC);
+                t->mSlots[idx].mC = 0;
+            } else {
+                r = 1;
+            }
         }
     }
     return r;

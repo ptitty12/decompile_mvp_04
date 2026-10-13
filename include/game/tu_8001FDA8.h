@@ -99,7 +99,7 @@ public:
     void fn_80020ECC();
     void fn_80020F4C();
     void fn_80020FCC();
-    int fn_80021010(int idx, float f);
+    int fn_80021010(float f, int idx);
     void fn_800210E4(float f, int idx);
     void fn_8002114C(int v);
 

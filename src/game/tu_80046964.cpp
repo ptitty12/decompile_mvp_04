@@ -214,6 +214,15 @@ inline int SumSide(Unk80044C10_Side* s)
     return t;
 }
 
+/* SumSide on an int base: with no pointer-typed base the index pseudo may not take r0 (see fn_800474A4). */
+inline int SumSideI(int sb)
+{
+    int t = 0;
+    for (int i = 0; i < 0x80; i++)
+        t += ((Unk80044C10_Side*)sb)->m1B4[(unsigned char)i];
+    return t;
+}
+
 int fn_80046F94(int a)
 {
     int r = (unsigned)a <= 1 ? 0x200 : 0;
@@ -424,14 +433,13 @@ int fn_8004740C(int a)
     return r;
 }
 
-/* near-miss: 5 slots differ (loop temps r9/r11/r0 and the E pointer register) */
 int fn_800474A4(Unk80044C10_A* o)
 {
     Unk80044C10_C* c = o->m130->m44C->m6F8;
-    Unk80044C10_E* e = c->m14;
+    int e = (int)c->m14;
     unsigned lim = c->m10->m1C;
-    int a = SumSide(&e->sides[0]);
-    int b = SumSide(&e->sides[1]);
+    int a = SumSideI(e);
+    int b = SumSideI(e + sizeof(Unk80044C10_Side));
     int hi = a;
     int lo = b;
     int r = 0;

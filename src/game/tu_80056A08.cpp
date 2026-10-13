@@ -17,13 +17,14 @@ Unk80056A08_Ring::~Unk80056A08_Ring()
     }
 }
 
-/* near-miss (2 slots): see fn_80056AC0. */
+/* The element address is written i * 12 + base so the strength-reduced offset is the first operand of the
+ * add / stfsx (retail: add off,base). */
 void fn_80056A68(Unk80056970_Obj* r)
 {
     r->m0 = 0;
     r->m4 = 0;
     for (unsigned i = 0; i < r->m8; i++) {
-        Unk80056970_Entry* e = &r->mC[i];
+        Unk80056970_Entry* e = (Unk80056970_Entry*)(i * 12 + (int)r->mC);
         e->m0 = lbl_805AB8A4;
         e->m8 = i;
         e->m4 = 0x1D8;
@@ -35,11 +36,10 @@ static inline void SetVal(Unk80056970_Entry* e, float x)
     e->m0 = x;
 }
 
-/* near-miss (2 slots): retail forms the element address as add off,base and uses
- * stfsx off,base; this gives add base,off. Same in fn_80056A68. */
+/* Element address written index * 12 + base, as in fn_80056A68 (retail: add off,base / stfsx off,base). */
 void fn_80056AC0(Unk80056970_Obj* r, int id, float v)
 {
-    Unk80056970_Entry* e = &r->mC[r->m0];
+    Unk80056970_Entry* e = (Unk80056970_Entry*)(r->m0 * 12 + (int)r->mC);
     SetVal(e, v);
     e->m4 = id;
     r->m0 = (r->m0 + 1) % r->m8;

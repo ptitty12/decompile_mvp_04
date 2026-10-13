@@ -740,7 +740,8 @@ void fn_80076758(Unk800766B8_Obj* self, Unk80076758_Ev* ev)
         fn_8053FC0C((*g)->m5C);
 }
 
-/* near-miss (95%): 3 insns; retail keeps q in r9 and the table index byte in r9, ours q in r11 and the index in r0 */
+/* The table base is an int (`tb`): a pointer-typed local is flagged as a pointer, which puts the index pseudo
+ * in the index class (r0 allowed); retail's index byte and its *0x34 product stay in r9. */
 extern "C" void fn_800767DC(Unk8007B2B0_Screen* s, Unk800767DC_P* p)
 {
     int a = 0;
@@ -750,7 +751,7 @@ extern "C" void fn_800767DC(Unk8007B2B0_Screen* s, Unk800767DC_P* p)
     case 4: {
         char* q = (char*)p->m14;
         k = 7;
-        char* tb = q + 0x124C;
+        int tb = (int)q + 0x124C;
         int off = (*(unsigned char*)(*(unsigned char**)(q + 0xFCC) + *(int*)(q + 0xFD8))) * 0x34;
         v = *(int*)(tb + off);
         a = fn_8008CFD8(q + 0xC9C, 9, *(unsigned char*)(q + 0x17C));
