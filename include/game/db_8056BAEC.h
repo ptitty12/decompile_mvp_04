@@ -60,7 +60,7 @@ float fn_80079E74__18Unk8007B2B0_Screeni(void* a0, int a1);
 unsigned fn_8007A0D0__18Unk8007B2B0_Screeni(void* a0, int a1);
 int fn_8007A11C__18Unk8007A4DC_Screeni(void* a0, int a1);
 int fn_8007A270__18Unk8007A4DC_Screeni(void* a0, int a1);
-int fn_8007A3FC__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
+float fn_8007A3FC__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
 int fn_8007A6A0__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
 int fn_8007A8DC__18Unk8007A4DC_Screenii(void* a0, int a1, int a2);
 int fn_8007B320__18Unk8007B2B0_Screenii(void* a0, int a1, int a2);
