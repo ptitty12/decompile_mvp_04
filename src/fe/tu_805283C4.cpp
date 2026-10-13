@@ -75,6 +75,13 @@ extern "C" void fn_80528648(FeScrN* self, int c);
 extern "C" void fn_80528708(FeVptr<0x20>* self, int c);
 extern "C" void fn_80528754(int* p);
 
+class Fe8858E {
+public:
+    char pad[0x20];
+    virtual void d(int c);
+};
+extern const char lbl_8067C878[];
+
 extern "C" FE_OVERLAY void fn_805283C4(FeScrN* self)
 {
     self->SetVptr(lbl_80681F30);
@@ -274,6 +281,23 @@ extern "C" FE_OVERLAY void fn_80528808(void* x, int a)
 extern "C" FE_OVERLAY void fn_80528830(void* x, int a)
 {
     fn_8044C7CC(x, 1, a);
+}
+
+extern "C" FE_OVERLAY void fn_80528858(FeScrN* self, int c)
+{
+    self->SetVptr(lbl_8067C878);
+    char* start = (char*)self + 0x174;
+    if (start != 0) {
+        char* end = (char*)self + 0x6EC;
+        if (start != end) {
+            do {
+                end -= 0x28;
+                ((Fe8858E*)end)->d(0);
+            } while (start != end);
+        }
+    }
+    self->SetVptr(lbl_8067CBD0);
+    ((FeDtorFn)fn_8035686C)(self, c);
 }
 
 extern "C" FE_OVERLAY void fn_805288E4(void) {}
