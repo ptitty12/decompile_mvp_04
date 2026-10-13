@@ -579,12 +579,12 @@ extern const char lbl_805A511C[];
 extern const float lbl_805A5130;
 extern const float lbl_805A5134;
 int fn_80400DA4();
-void fn_80303BC4(const char* fmt, int a, ...);
+void fn_80303BC4(const char* fmt, float a, float b, ...);
 
-/* near-miss: retail loads the three lis (floats, then the string) before the lfs pair and does `mr r4,r3` first (7 slots) */
 void fn_8001CA78()
 {
     if (lbl_806164F8 == 1) {
-        fn_80303BC4(lbl_805A511C, fn_80400DA4(), lbl_805A5130, lbl_805A5134);
+        int v = fn_80400DA4();
+        fn_80303BC4(lbl_805A511C, lbl_805A5130, lbl_805A5134, v);
     }
 }
