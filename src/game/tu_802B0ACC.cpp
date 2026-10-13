@@ -791,6 +791,27 @@ void fn_802B2EE0(T* self)
     *(float*)((char*)self + 0x18) = -1.0f;
 }
 
+struct Unk802B2EF0_S {
+    char pad0[0x24];
+    void* m24;
+    char pad28[0x38 - 0x28];
+    void* m38[1];
+};
+
+/* near-miss 99.8%: retail skips the m24 store when the handle is null (store inside the if); that form swaps r30/r31 (self/offset) */
+void fn_802B2EF0(Unk802B2EF0_S* self)
+{
+    for (int i = 0; i < 1; i++) {
+        if (self->m38[i] != 0)
+            fn_803DD73C(self->m38[i], 3);
+        self->m38[i] = 0;
+    }
+    if (self->m24 != 0) {
+        fn_803DD73C(self->m24, 3);
+    }
+    self->m24 = 0;
+}
+
 extern "C" int strcmp(const char* a, const char* b);
 extern int lbl_8061EA6C;
 extern const char lbl_805E0280[];
