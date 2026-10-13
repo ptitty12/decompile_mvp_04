@@ -4,16 +4,21 @@
 #include <dolphin.h>
 #include <dolphin/hw_regs.h>
 
+#define __DSP_rude_task_pending lbl_806EF624
+#define __DSP_rude_task lbl_806EF628
+#define __DSP_tmp_task lbl_806EF62C
+#define __DSP_last_task lbl_806EF630
+#define __DSP_first_task lbl_806EF634
+#define __DSP_curr_task lbl_806EF638
 #include "__dsp.h"
 
-static u32 t0, t1, t2;  // unused
+extern int __DSP_rude_task_pending;
+extern DSPTaskInfo* __DSP_rude_task;
 
-DSPTaskInfo* __DSP_curr_task;
-DSPTaskInfo* __DSP_first_task;
-DSPTaskInfo* __DSP_last_task;
-DSPTaskInfo* __DSP_tmp_task;
-DSPTaskInfo* __DSP_rude_task;
-int __DSP_rude_task_pending;
+extern void fn_80433814(OSContext* context);
+extern void fn_8043364C(OSContext* context);
+
+
 
 void __DSPHandler(__OSInterrupt intr, OSContext* context) {
     u8 unused[4];
@@ -25,8 +30,8 @@ void __DSPHandler(__OSInterrupt intr, OSContext* context) {
     tmp = (tmp & ~0x28) | 0x80;
     __DSPRegs[5] = tmp;
 
-    OSClearContext(&exceptionContext);
-    OSSetCurrentContext(&exceptionContext);
+    fn_80433814(&exceptionContext);
+    fn_8043364C(&exceptionContext);
     ASSERTMSGLINE(143, __DSP_curr_task != NULL, "__DSPHandler(): No current task! Someone set us up the bomb!\n");
     
     while (DSPCheckMailFromDSP() == 0)
@@ -152,8 +157,8 @@ void __DSPHandler(__OSInterrupt intr, OSContext* context) {
         ASSERTMSGLINEV(519, 0, "__DSPHandler(): Unknown msg from DSP 0x%08X - task sync failed!\n", mail);
     }
 
-    OSClearContext(&exceptionContext);
-    OSSetCurrentContext(context);
+    fn_80433814(&exceptionContext);
+    fn_8043364C(context);
 }
 
 void __DSP_exec_task(DSPTaskInfo* curr, DSPTaskInfo* next) {
@@ -316,24 +321,7 @@ void __DSP_insert_task(DSPTaskInfo* task) {
     }
 }
 
-void __DSP_add_task(DSPTaskInfo* task) {
-    ASSERTMSGLINE(771, task != NULL, "__DSP_add_task(): Why are you adding a NULL task?\n");
 
-    if (__DSP_last_task == NULL) {
-        __DSP_curr_task = task;
-        __DSP_last_task = task;
-        __DSP_first_task = task;
-        task->next = task->prev = NULL;
-    } else {
-        __DSP_last_task->next = task;
-        task->next = NULL;
-        task->prev = __DSP_last_task;
-        __DSP_last_task = task;
-    }
-
-    task->state = 0;
-    __DSP_debug_printf("__DSP_add_task() : Added task    : 0x%08X\n", (u32)task);
-}
 
 void __DSP_remove_task(DSPTaskInfo* task) {
     ASSERTMSGLINE(813, task != NULL, "__DSP_remove_task(): NULL task! Why? WHY?!?!\n");
