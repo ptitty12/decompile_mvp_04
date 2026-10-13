@@ -287,6 +287,84 @@ void fn_802CF1A4(void* o)
     fn_8037C7FC()->fn_8037CE98(0xB38E54D3, (int)o, 0);
 }
 
+/* Camera rig as seen by fn_802CF1E4: vptr at +0x98 (slot 3 takes a position), data at +0, +0x60, +0x6C, +0x70, +0xA4. */
+class Unk802CF1E4_CamB {
+public:
+    int m0;
+    char pad4[0x60 - 4];
+    Unk802CBD04_Vec3 m60;
+    int m6C;
+    Unk802CBD04_Vec3 m70;
+    char pad7C[0x98 - 0x7C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3(Unk802CBD04_Vec3* v);
+};
+class Unk802CF1E4_Cam : public Unk802CF1E4_CamB {
+public:
+    int m9C;
+    int mA0;
+    float mA4;
+};
+/* Camera controller: vptr at +0, slots 12..15 (+0x60, +0x68, +0x70, +0x78) are the follow steps. */
+class Unk802CF1E4_Vb {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12(int a, Unk802CBD04_Vec3* v, Unk802CF1E4_Cam* c, int k);
+    virtual void s13(Unk802CBD04_Vec3* p, Unk802CBD04_Vec3* v, float t);
+    virtual void s14(int a, Unk802CBD04_Vec3* v, float* f, Unk802CF1E4_Cam* c, int k);
+    virtual void s15(Unk802CBD04_Vec3* p, Unk802CBD04_Vec3* v, float* f, float x, float t);
+};
+class Unk802CF1E4_Self : public Unk802CF1E4_Vb {
+public:
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
+inline void Unk802CF1E4_SetA4(Unk802CF1E4_Cam* c, float v)
+{
+    c->mA4 = v;
+}
+inline void Unk802CF1E4_SetP70(Unk802CF1E4_Cam* c, const Unk802CBD04_Vec3& v)
+{
+    c->m70 = v;
+}
+
+void fn_802CF1E4(Unk802CF1E4_Self* self, int a, Unk802CF1E4_Cam* cam, int k, int flag, float t)
+{
+    Unk802CBD04_Vec3 v1;
+    Unk802CBD04_Vec3 v2;
+    float f3;
+    int var = k;
+    if (flag != 0 && self->m14 != 0)
+        var = 1;
+    self->s12(a, &v1, cam, var);
+    if (var == 0)
+        self->s13(&cam->m60, &v1, t);
+    cam->s3(&v1);
+    self->s14(a, &v2, &f3, cam, var);
+    if (var == 0)
+        self->s15(&cam->m70, &v2, &f3, fn_802CBD90((Unk802CBD04*)cam), t);
+    cam->m0 = 0;
+    cam->m6C = 0;
+    Unk802CF1E4_SetP70(cam, v2);
+    fn_802CC038((Unk802CBD04*)cam);
+    Unk802CF1E4_SetA4(cam, f3);
+}
+
 void fn_802CF368(Unk802CF368_Self* o)
 {
     o->fn_8037B458(lbl_805E32DC, &o->m8, lbl_805E2568, lbl_805E26D8);
