@@ -167,7 +167,7 @@ inline char* FeIdc(char* p)
 {
     return p;
 }
-/* near-miss: 97.1%, same instructions; retail has sp8 at r1+8 and spC at r1+12 (ours swapped: the first address-taken local gets the higher slot) and p/cnt in r30/r31 in the line-count loop */
+/* near-miss: 97.6%, same instructions; retail has the int out-param at r1+8 and the float at r1+12 (ours swapped: the first address-taken local gets the higher slot, in every spelling tried incl. a struct) */
 FE_OVERLAY void fn_80492BA8(void* x, char* sc)
 {
     unsigned short* s = (unsigned short*)sc;
@@ -218,13 +218,13 @@ FE_OVERLAY void fn_80492BA8(void* x, char* sc)
         cnt++;
         p += i + 1;
     }
-    unsigned short* q2 = (unsigned short*)FeI(x, 0x32C);
+    p = (unsigned short*)FeI(x, 0x32C);
     FeI(x, 0x330) = cnt;
-    while (cnt > 3 && (i = fn_80403088(q2, 10)) != 0xFFFF) {
+    while (cnt > 3 && (i = fn_80403088(p, 10)) != 0xFFFF) {
         cnt--;
-        q2 += i + 1;
+        p += i + 1;
     }
-    ((FeWV*)FeMem(x, 0x1D0))->s28(q2);
+    ((FeWV*)FeMem(x, 0x1D0))->s28(p);
     FeW* w248 = FeMem(x, 0x248);
     int c2 = FeI(x, 0x330);
     int b2 = c2 - 10;
