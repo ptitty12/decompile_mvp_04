@@ -5,6 +5,43 @@
 #include "game/tu_80090880.h"
 #include "game/tu_80094578.h"
 
+struct Rec36_9A34C {
+    int m0;
+    char pad4[0x20];
+};
+struct List_9A34C {
+    Rec36_9A34C* m0;
+    int m4;
+};
+extern "C" int fn_8007B8C4__18Unk8007B2B0_Screenii(int g, int a, int b);
+extern "C" float fn_8007BB28__18Unk8007B2B0_Screeniii(int g, int a, int b, int c);
+extern "C" int fn_800A2E90(int p);
+extern "C" List_9A34C* fn_8057CFA8(int a, int b);
+extern int lbl_80619948;
+extern int lbl_8061930C;
+extern "C" void* fn_800B555C();
+extern "C" int fn_800B57EC(void* p);
+extern "C" void fn_8009A6F8(Obj3* o);
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A330[];
+extern "C" void fn_805371C4(void* l, unsigned f);
+extern "C" int fn_80539A84(int id);
+int fn_80084014(int a, int b);
+extern "C" void fn_8009A85C(Obj3* o, int a, int* arr, int n);
+/* Stack id list with a 0x28-word embedded buffer (same layout as Unk80535650_Tmp in tu_8052A220.h,
+ * which this unit can't include; the three constructors are written out in fn_8009A6F8): data
+ * pointer, count, capacity, cursor, vptr at +0x10. */
+struct Tmp_9A6F8 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    const void* vp;
+    int m14;
+};
+
+
 
 
 extern "C" void fn_8008B690(void* p);
@@ -681,6 +718,26 @@ struct VecObj8009A4A4 {
     virtual void v10();
 };
 
+extern "C" void fn_8009A34C(Obj3* o)
+{
+    Sub198* s = &o->m198;
+    int g = lbl_8061930C;
+    int id = s->m0;
+    int saved = s->m4;
+    if (fn_800B57EC(fn_800B555C()) == 1 && fn_800A2E90(lbl_80619948) == 1) {
+        List_9A34C* lst = fn_8057CFA8(fn_8007B8C4__18Unk8007B2B0_Screenii(g, 1, id), 0);
+        int off = (lst->m4 - 1) * 0x24;
+        s->mC = (id == lst->m0[0].m0);
+        s->m10 = (id == *(int*)((char*)lst->m0 + off));
+        if (s->mC == 1) {
+            Rec36_9A34C t = lst->m0[1];
+        }
+        s->m18 = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(g, 2, id, 1);
+    }
+    if (saved == 0)
+        fn_8009A6F8(o);
+}
+
 extern "C" void fn_8009A4A4(Obj3* o, VecObj8009A4A4* v, int* out, int n)
 {
     int cnt = v->m4;
@@ -758,4 +815,36 @@ extern "C" void fn_8009A620(Obj3* o, int n, int* arr, int slot, int off, int mod
         char* p = (char*)o + 0x404;
         p[off + so2] = r;
     }
+}
+
+extern "C" void fn_8009A6F8(Obj3* o)
+{
+    int arr[34];
+    Tmp_9A6F8 t;
+    int buf[0x28];
+    Tmp_9A6F8* q = &t;
+    t.m0 = buf;
+    t.vp = lbl_8064B298;
+    q->m8 = 0x28;
+    fn_8040074C(t.m0, t.m8 << 2);
+    q->m4 = 0;
+    q->mC = 0;
+    t.vp = lbl_8064A550;
+    fn_8040074C(t.m0, t.m8 << 2);
+    int id = o->m198.m4;
+    q->m4 = 0;
+    q->mC = 0;
+    q->m14 = 0;
+    t.vp = lbl_8064A330;
+    fn_805371C4(q, fn_80539A84(id));
+    int n = t.m4;
+    for (int i = 0; i < n; i++) {
+        arr[i] = t.m0[t.mC];
+        t.mC = (t.mC + 1) % t.m4;
+    }
+    q->mC = 0;
+    fn_8009A85C(o, fn_80084014(id, 1), arr, n);
+    if (fn_800B57EC(fn_800B555C()) == 1)
+        fn_8009A85C(o, fn_80084014(id, 0), arr, n);
+    t.vp = lbl_8064A550;
 }
