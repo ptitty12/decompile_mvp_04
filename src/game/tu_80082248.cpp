@@ -238,14 +238,14 @@ void fn_80082510(Tree* self)
 
 typedef Node** (*Acc82588)(void*);
 
-/* near-miss: register numbers only (retail keeps the rotation-direction pair in r26/r27 and the copy of its function pointer in r25) */
+/* dA is written as two shifts (decomp-permuter): a one-step `>> 16` gives different registers for the pair. */
 void fn_80082588(Node** root, Node* x, P8* A, P8* B)
 {
     P8 pa = *A;
     P8 pb = *B;
     int dB = pb.a >> 16;
     Acc82588 fb = (Acc82588)pb.b;
-    int dA = pa.a >> 16;
+    int dA = (pa.a >> 11) >> 5;
     Acc82588 fa = (Acc82588)pa.b;
     char* xb = (char*)x + dB;
     Node* y = *fb(xb);
