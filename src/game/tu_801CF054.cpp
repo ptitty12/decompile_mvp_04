@@ -100,7 +100,7 @@ struct Unk801CF054_F4 {
     float v[4];
 };
 extern Unk801CF054_F4 lbl_805D2788;
-extern "C" float fn_801D1994(Y* y);
+extern "C" float fn_801D1994(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_8024D0F8(P* p, int k);
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v);
@@ -513,6 +513,133 @@ static inline int OkF(int f)
     return ok;
 }
 
+struct Unk801CF054_S44 {
+    int m0;
+    float m4;
+    int m8;
+    float mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    float m24;
+};
+struct Unk801CF054_Yv {
+    char pad0[0x44];
+    int m44;
+    float m48;
+    int m4C;
+};
+#define YV(y) ((Unk801CF054_Yv*)(y))
+inline float FZero() { return 0.0f; }
+static inline int OkM2(int f, int m)
+{
+    int ok;
+    if ((unsigned)(f + 1) > 1) {
+        ok = 1;
+        if ((f & m) == 0)
+            ok = 0;
+    } else
+        ok = 0;
+    return ok;
+}
+extern "C" int fn_801C1638(P* p, int k);
+extern "C" void fn_801D6F6C(Y* y);
+extern "C" void fn_801D441C(Y* y);
+extern "C" void fn_801D386C(Y* y);
+extern "C" void fn_801D573C(Y* y);
+extern "C" int fn_801D22DC(Y* y);
+extern "C" void fn_801D28E4(Y* y);
+extern "C" int fn_801D0C30(void);
+extern "C" void fn_801D094C(Y* y);
+extern "C" float fn_801CF740(Z* z);
+extern "C" float fn_801CF8CC(float x);
+typedef float (*Unk801CF054_F8Fn)(void*, float);
+typedef int (*Unk801CF054_C30Fn)(Y*);
+extern int lbl_80620318;
+extern float lbl_8062031C;
+extern float lbl_80620320;
+extern int lbl_80620324;
+extern float lbl_80620328;
+extern int lbl_8062032C;
+extern float lbl_80620330;
+extern int lbl_80691CA8;
+
+/* near-miss (99.2%): same instructions; case 7 schedules the second RandF2 scale-slot store (f30 to 0x20(r1))
+ * before the y->m54 store in retail, and the last block loads the two lerp bounds into swapped f0/f13. Tried typed vs
+ * view stores for m50/m54, local temps for the lerp results and statement permutations of the zeroing block. */
+extern "C" void fn_801D04C0(Y* y)
+{
+    YV(y)->m44 = 0;
+    {
+        Unk801CF054_S44* s = (Unk801CF054_S44*)y->m44;
+        s->m4 = FZero();
+        s->m8 = 0;
+        s->mC = FZero();
+        s->m10 = FZero();
+        s->m24 = FZero();
+        s->m14 = 0;
+        s->m18 = 0;
+        s->m1C = 0;
+        s->m20 = 0;
+    }
+    int k = y->m30->m6F4;
+    if (k == 3) {
+        fn_801D6F6C(y);
+    } else if (k == 2) {
+        YV(y)->m44 = ((Unk801CF054_C30Fn)fn_801D0C30)(y);
+        if (YV(y)->m44 != 0) {
+            fn_801D28E4(y);
+            fn_801D441C(y);
+        }
+    } else if (k == 7) {
+        YV(y)->m44 = 1;
+        YV(y)->m4C = 1;
+        y->m54 = LerpATB(-1.0f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0xBF), 1.0f);
+        y->m50 = LerpATB(-1.0f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0xC0), 1.0f);
+        {
+            float a = ((Unk801CF054_F8Fn)fn_801CF8CC)(y->m2C, y->m50);
+            float b = fn_801CF740((Z*)y->m2C);
+            float t = LerpATB(-0.8f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0xC4), 0.8f);
+            YV(y)->m48 = t * b + a;
+        }
+    } else {
+        YV(y)->m44 = fn_801D22DC(y);
+        if (YV(y)->m44 != 0) {
+            fn_801D386C(y);
+            fn_801D573C(y);
+            fn_801D094C(y);
+        }
+    }
+    if (lbl_80620324 != 0)
+        y->m50 = lbl_80620328;
+    if (lbl_8062032C != 0)
+        y->m54 = lbl_80620330;
+    if (lbl_80691CA8 != 0 || lbl_80620318 != 0) {
+        P* p = y->m30;
+        int a = 1;
+        Unk801CF054_X3C0* x = ((Unk801CF054_X700*)p->m700)->m3C0;
+        if (fn_801C1638(p, 0xA) == 0)
+            a = 0;
+        int b = fn_801C1638(y->m30, 0xB) != 0;
+        int ok = 0;
+        if ((OkM2(x->m14, 2) != 0 && b != 0) || (OkM2(x->m14, 1) != 0 && a != 0))
+            ok = 1;
+        if (ok == 0) {
+            YV(y)->m4C = 1;
+            YV(y)->m44 = 1;
+            float t = ((Unk801CF054_F8Fn)fn_801CF8CC)(y->m2C, y->m50);
+            YV(y)->m48 = t;
+            if (lbl_80620318 != 0) {
+                float u = fn_801CF740((Z*)y->m2C);
+                float w = LerpATB(lbl_8062031C, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x107), lbl_80620320);
+                YV(y)->m48 = w * u + t;
+            }
+        }
+    }
+}
+
 extern "C" void fn_801D094C(Y* y)
 {
     if (OkF(((Unk801CF054_X700*)y->m30->m700)->m3C0->m14) == 0) {
@@ -639,6 +766,7 @@ struct Unk801CF054_Mgr {
 };
 struct Unk8022FE34_U {
     int fn_80235E28();
+    float fn_80235DA8();
 };
 struct Unk8024F40C_Mgr;
 struct Unk8024EF40_Q;
@@ -713,6 +841,39 @@ extern Unk801CF054_Tbl12 lbl_805D27C4;
 extern "C" int fn_8017C954(void* p);
 #define UNK801CF054_CLAMP(x, lo, hi) (!((x) > (hi)) ? (!((x) < (lo)) ? (x) : (lo)) : (hi))
 
+extern "C" float fn_801D1F58(Y* y, Unk801CF054_V2* v);
+struct Unk8024F4AC_Mgr;
+int fn_8024F4AC(Unk8024F4AC_Mgr* self, int a, Unk8024EF40_Q* q, int k);
+float fn_80088E74(Unk80087A58_O* o);
+
+extern "C" float fn_801D1994(Y* y, Unk801CF054_V2* v)
+{
+    int h = ((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235E28();
+    P* p = fn_801A4B34(y->m30);
+    int cls = fn_8024F54C(h);
+    float a = fn_801D1F58(y, v);
+    a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
+    float r = a;
+    float s = fn_801D17D0(y, v);
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    r = r * LerpATB(0.9f, s, 1.1f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    float b = 1.0f - (float)fn_8024F4AC((Unk8024F4AC_Mgr*)p->mA0C, p->mA04, (Unk8024EF40_Q*)p->m44C, cls) * 0.01f;
+    b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+    r = r * LerpATB(0.9f, b, 1.1f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    float d = fn_801D18C8(y);
+    r = r * LerpATB(1.0f, d, 1.12f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    Unk801CF054_V2 w;
+    fn_8022EA60(&w, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    if (!(AbsF(w.x) >= 1.0f) && !(AbsF(w.y) >= 1.0f)) {
+        r = r * LerpATB(1.0f, fn_80088E74(y->m30->m6F8->mC->mC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
+}
+
 extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v)
 {
     Unk801CF054_Tbl12 t = lbl_805D27C4;
@@ -764,7 +925,7 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
         small = AbsF(v->y) <= 1.0f;
     float t = 0.0f;
     if (small)
-        t = fn_801D1994(y);
+        t = fn_801D1994(y, v);
     else
         t = fn_801D15C0(y, v);
     P* q = fn_801A4B34(y->m30);
@@ -917,4 +1078,33 @@ extern "C" int fn_801D251C(Y* y)
             return 1;
     }
     return 0;
+}
+
+extern Unk801CF054_F4 lbl_805D296C;
+extern "C" int fn_801D0BB0(Y* y);
+
+extern "C" float fn_801D2E0C(Y* y)
+{
+    float r = 0.0f;
+    int f = 0;
+    if (!(((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235DA8() <= 0.75f))
+        f = RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4D0) < 0.25f;
+    if (f) {
+        r = RandF2(y->m30->m554, 0.35f, lbl_805D25E0, 0x4D8);
+    } else {
+        Unk801CF054_F4 tbl = lbl_805D296C;
+        r = tbl.v[fn_801D0BB0(y)];
+        float t = ((Unk801C16B0_Z*)y->m2C)->m1FC;
+        t = !(t > 1.0f) ? (t >? 0.0f) : 1.0f;
+        r = r * LerpATB(0.8f, RandF2(y->m30->m554, 1.0f, lbl_805D25E0, 0x4EC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        r = fn_801A0AA8(y->m30, r, 0.25f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+        float d = fn_801D18C8(y);
+        d = !(d > 1.0f) ? (d >? 0.0f) : 1.0f;
+        r = r * LerpATB(1.0f, d, 1.35f);
+        r = r * LerpATB(1.0f, fn_80088E74(y->m30->m6F8->mC->mC), 1.3f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
 }

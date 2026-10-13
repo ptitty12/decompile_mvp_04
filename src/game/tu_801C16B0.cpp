@@ -219,6 +219,105 @@ Unk801C1AF0::~Unk801C1AF0() {}
 
 extern "C" void fn_801C1E24(void* self) { fn_801C1E44(self); }
 
+struct Unk801C16B0_V2 {
+    float x;
+    float y;
+};
+struct Unk801C16B0_S120 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    Unk801C16B0_V2 m30;
+    char pad38[0x44 - 0x38];
+    float m44;
+    char pad48[0x60 - 0x48];
+    float m60;
+    char pad64[0x88 - 0x64];
+    int m88;
+    int m8C;
+    char pad90[0xA8 - 0x90];
+    int mA8;
+    int mAC;
+    float mB0;
+    float mB4;
+    float mB8;
+    float mBC[6];
+    char padD4[0xD4 - 0xD4];
+    int mD4;
+    float mD8;
+};
+extern const Vec3 lbl_806055AC;
+extern Unk801C16B0_V2 lbl_8060558C;
+extern "C" void fn_801D7918(void* a);
+inline float FOne() { return 1.0f; }
+extern "C" void fn_801D03FC(void* a, void* b, P* c);
+extern "C" void fn_801D7FC8(void* a);
+
+extern "C" void fn_801C1E44(void* self)
+{
+    Z* z = (Z*)self;
+    z->m208 = 10;
+    z->m128 = 0;
+    z->m288 = 0;
+    z->m294 = 0.0f;
+    z->m1FC = 0.0f;
+    z->m200 = 6;
+    Unk801C16B0_Mode* md = &z->m28C;
+    md->m0 = 0;
+    md->m4 = 0;
+    fn_801D7918(z->m8);
+    z->m120 = 0;
+    Unk801C16B0_S120* s = (Unk801C16B0_S120*)&z->m120;
+    s->m4 = 0;
+    s->m10 = 5;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m1C = 0.0f;
+    s->m20 = 0.0f;
+    s->m24 = 0.0f;
+    s->m28 = 0.0f;
+    s->m2C = FOne();
+    s->m30 = lbl_8060558C;
+    s->m18 = 0.0f;
+    s->m60 = 0.0f;
+    z->m184 = lbl_806055AC;
+    z->m190 = lbl_806055AC;
+    s->m44 = 0.0f;
+    z->m158 = lbl_806055AC;
+    z->m168 = lbl_806055AC;
+    z->m174 = lbl_806055AC;
+    z->m19C = lbl_806055AC;
+    s->m88 = 6;
+    s->m8C = 0;
+    z->m1B0 = lbl_806055AC;
+    z->m1BC = lbl_806055AC;
+    s->mA8 = 0;
+    s->mAC = 0;
+    s->mD4 = 0;
+    s->mB0 = 0.0f;
+    s->mB4 = 0.0f;
+    s->mB8 = 0.0f;
+    s->mD8 = 0.0f;
+    for (int i = 0; i < 6; i++)
+        s->mBC[i] = 0.0f;
+    fn_801D03FC(z->m20C, z, z->m204);
+    fn_801D7FC8(z->mE0);
+    for (int i = 0; i < 3; i++) {
+        z->m29C[i].a = lbl_806055AC;
+        z->m29C[i].b = lbl_806055AC;
+    }
+    z->m298 = 0;
+}
+
 extern "C" void fn_801C20A8(char* self) { fn_801D6044(self + 0x20C); }
 
 extern "C" void fn_801C20CC(Z* z)
