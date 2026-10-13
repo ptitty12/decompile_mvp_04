@@ -16,7 +16,7 @@ union PPCWGPipe {
     unsigned int u32;
     float f32;
 };
-extern volatile PPCWGPipe GXWGFifo;
+#include "../../include/ealib/gx_fifo.h"
 
 struct GXColor {
     unsigned char r, g, b, a;
@@ -167,9 +167,9 @@ extern "C" void fn_803728E8(Unk803E3C08* a, Unk80623D04* b)
     void* dl = a->m28;
     int dlsz = a->m2C;
     if (a->mB8) {
-        GXWGFifo.u8 = 0x40;
-        GXWGFifo.u32 = (unsigned int)dl;
-        GXWGFifo.u32 = dlsz;
+        EALIB_GX_FIFO(PPCWGPipe).u8 = 0x40;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
     } else {
         fn_80430124(dl, dlsz);
     }
