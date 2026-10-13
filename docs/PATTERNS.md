@@ -1547,3 +1547,31 @@ Pass 5, second half (p5-09/11/13/14/17/21/26/04):
 - diff_unit's MATCH can hide a different branch target: trust report.json fuzzy == 100. check_literals reads the linked main.elf, so run it after a full ninja.
 - A -ffloat-store float parameter is spilled at its position in the C parameter list, regardless of register class: `fn(o, a, b, char* name, float f, int flag)` puts `stfs f1,8(r1)` between the r6 and r7 copies. Float clamp polarity: `if (!(f <= K))` gives cror un,eq,lt/bso; `if (!(f >= K))` cror un,eq,gt/bso; `if (!(cur < hi))` a plain blt; `f > K` ble.
 - `n.m4 = 0; cnt = 0;` (the scalar assigned after the struct store) keeps two separate zero registers. Unsigned int-to-float without xoris is `(float)*(unsigned*)&x`.
+
+## Near-miss pass and pass 6 (2026-10-12 night, condensed from worker reports)
+
+Method that converted near-misses (nm-03: 10/10, nm-05: 7 plus 2 raised):
+- Read the allocator instead of guessing. `cc1plus -dg -dl` (or `ngccc ... -dg -save-temps`, giving `t.i.greg`/`.lreg`) lists "regs to allocate" in priority order with refs and live length per pseudo. Global-alloc priority is floor_log2(refs)*refs/life, and the higher priority gets the higher callee-saved register. To flip two registers, change one pseudo's refs or life:
+  - duplicate `return r;` on every path;
+  - give the result pseudo more sets (separate case bodies);
+  - share one local between two loops;
+  - copy an index (`unsigned j = i;`).
+- A/B a pass with flags (`-fno-gcse`, `-fno-cse-skip-blocks`) to find which pass rewrites the code, then defeat it in source: reuse the temporary for a later value, add a dead store, or write a lookup once per arm.
+- Block-local pseudos are allocated in creation order: writing an expression once per arm (`c ? A[f(x,0)] : B[f(x,b)]`) changes which one gets r0/r9/r11.
+- Score many small variants with `tools/match/score_variants.py` (about 0.2 s each) from a spec of OLD text plus replacements.
+- decomp-permuter (`tools/match/permute.py`) mostly produced cheating candidates: dropped calls, early returns, uninitialised temps. Use it only as a lead; reject any candidate that loses a `bl` or changes the instruction count.
+
+Shapes:
+- Select-then-store (`v = c ? 0 : 1; x->m = v;`) vs per-arm stores (`if (c) x->m = 0; else x->m = 1;`): retail is usually per-arm (jump2 tail-merges them).
+- A shared `yes:` label merges the `li r3,1`. Write `if (... ) return 1;` in each arm when retail keeps separate ones.
+- Peeled first iteration of a search loop: read through the index variable copied from the result (`i = r; acc += m[i];`), not through a literal 0.
+- MIN/MAX (`<?`, `>?`) expand operand 1 first, including a global's `lis`, so `lbl_B >? (lbl_A <? v)` decides which `lis` comes first.
+- Struct-return outputs: read the whole word and truncate (`unsigned bw = *(unsigned*)&buf; (unsigned short)bw`) to get `lhz` at the right offset. A field read goes through an address register.
+- A byte-aligned shift (`(w >> 24) & 0x7F`) is narrowed to `lbz`. Retail's `lwz` + `rlwinm` needs a local bitfield view.
+- A float-returning callee (fctiwz after the call): declare its exact mangled name locally as `extern "C" float`.
+- An empty inline destructor on a local object reserves an unreferenced stack slot (see Pass 5). A spare 32-byte dtor object can move all temporaries by 0x20.
+- Header `extern const Vec3f` loads hoist above int stores. Compare and copy through a non-const view (`Vec3f* kp = (Vec3f*)&lbl_X`) to keep them below.
+- Brute-force short store runs exhaustively (6 stores = 720 orders, about 2 minutes); hill-climbing stalls on them.
+- Data walls not solved yet:
+  - by-value Date stores into the frame: (mem (addressof)) at a nonzero offset is forced into a register, and CSE merges the two;
+  - a peeled first iteration that is not constant-folded (`lbzx` with the zero register; fn_80097318 and its siblings).
