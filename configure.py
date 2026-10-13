@@ -1187,7 +1187,7 @@ config.libs = [
             Object(NonMatching, "libc/vfprintf.c"),
             Object(NonMatching, "libc/vfiprintf.c"),
             Object(Matching, "libc/strtol.c"),
-            Object(NonMatching, "libc/isdigit.c"),
+            Object(Matching, "libc/isdigit.c"),
             Object(NonMatching, "libc/isspace.c"),
             Object(NonMatching, "libc/errno.c"),
             Object(NonMatching, "libc/locale.c"),
