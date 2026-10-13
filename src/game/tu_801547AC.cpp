@@ -4,6 +4,7 @@
  */
 #include "game/tu_801527C8.h"
 #include "game/goals/tu_8028C6B8.h"
+#include "game/goals/tu_8027A84C.h"
 
 extern float lbl_805C88D4;
 
@@ -233,6 +234,61 @@ int cScriptReachGoal::fn_cslot8() /* 80154AF8 */
     m1C = n;
     if (n < 0) {
         m1C = 3;
+    }
+}
+
+/* Goal object at Unk8027C728_Goal::m18 (full layout in goals/tu_8028B194.h, which clashes with tu_8028C6B8.h): m38 and the setters used by cScriptReachGoal::fn_cslot11. */
+class Unk8028B194 {
+public:
+    char pad0[0x38];
+    int m38;
+    Unk8028B194* fn_8028B194(Unk80273498_Vec3 v);
+    Unk8028B194* fn_8028B1F0(int a);
+    void fn_8028B31C(int id);
+    Unk8028B194* fn_8028B51C(float a);
+};
+extern float lbl_805C841C;
+extern float lbl_805C8420;
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
+inline void SetDir(Unk8027A84C* o, Unk80273498_Vec3 v)
+{
+    o->fn_8027A898(&v);
+}
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = lbl_805C8420;
+    r.z = fn_80411554(angle);
+    return r;
+}
+
+int cScriptReachGoal::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80154B24 */
+{
+    Unk8016C788_Obj* o = fn_8016C788(ctx, a);
+    if (o != 0) {
+        Unk8027C728_Goal* g = fn_802448F4(o, 1);
+        g->m10 = 10;
+        fn_8027C728(g);
+        Unk8028B194* b = (Unk8028B194*)g->m18;
+        if (m18 != 0) {
+            b->fn_8028B1F0(m1C);
+        } else {
+            b->fn_8028B194(*(Unk80273498_Vec3*)&m4);
+        }
+        Unk80273498_Vec3 v = Direction(m10 * lbl_805C841C);
+        SetDir((Unk8027A84C*)b, v);
+        if (m14 == 0x1A) {
+            b->fn_8028B31C(0);
+        } else {
+            b->fn_8028B31C(m14);
+        }
+        if (m20 != 0) {
+            b->fn_8028B51C(m24);
+        }
+        b->m38 = 3;
+        fn_8015152C(o, g);
     }
 }
 
