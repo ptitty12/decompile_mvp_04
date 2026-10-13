@@ -420,6 +420,31 @@ void Unk802362A8_Cpu::fn_80237B60(float* out)
     *out = *out * f;
 }
 
+int Unk802362A8_Cpu::fn_80237C24(Unk802362A8_Req* p)
+{
+    float tbl[16] = { 0.0f, 0.0f, 0.0f, 0.0f, 0.42f, 0.4f, 0.32f, 0.05f, 0.47f, 0.45f, 0.32f, 0.05f, 0.5f, 0.46f, 0.32f, 0.05f };
+    int o = *(int*)((char*)p + 0x10) * 4;
+    Unk8022FE34_Game* gm = m2E4->m6F8;
+    int idx = gm->m14[2].m8 == 0;
+    int pl = At(gm->m10 + 0x14, idx);
+    o += pl * 16;
+    float sp48 = *(float*)((char*)tbl + o);
+    int sp68 = 0;
+    float sp4C = fn_80088518(gm->mC->mC, idx, &sp68, lbl_805D7DD8[pl]);
+    float v2[4] = { 0.0f, 0.1f, 0.15f, 0.25f };
+    Unk801AB63C_P* q = Unk802378E0_P3C8(m2E4);
+    sp48 = v2[pl] * sp4C + sp48;
+    int n = fn_801B38A8(q, idx, 1);
+    if (n > 0 && fn_801AD3C4(q, idx) != 0
+        && fn_801B2834(q, (Unk801B23A8_Q*)fn_801C1638(m2E4, 0)) > 0x78)
+        sp48 = (float)n * 0.2f + sp48;
+    sp48 = sp48 + fn_802377F4((Unk802362A8_Pg*)p);
+    fn_80237B60(&sp48);
+    if (Unk802378E0_Rand(this, 1.0f, 0x2B2) >= sp48)
+        return 1;
+    return 9;
+}
+
 inline float Unk80237E9C_Rand(Unk802362A8_Cpu* c, float scale, int line)
 {
     const char* f = lbl_805D7978;
