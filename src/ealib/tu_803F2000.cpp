@@ -407,8 +407,10 @@ extern "C" void fn_803F28A4()
         lbl_806AAF2C.m8 = 0x69;
         e->m14.s = 0;
         e->m18 = -1;
-        e->m34 = lbl_806AAF2C.m4;
-        e->m14.i = lbl_806AAF2C.m14.i;
+        int v34 = lbl_806AAF2C.m4;
+        int v14 = lbl_806AAF2C.m14.i;
+        e->m14.i = v14;
+        e->m34 = v34;
         e->m30 = 0xf;
         e->m8 = 0;
         e->m2C = 0;
