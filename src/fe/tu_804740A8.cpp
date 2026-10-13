@@ -320,14 +320,7 @@ extern "C" FE_OVERLAY int fn_80476178(int x, int b)
 
 extern "C" FE_OVERLAY int fn_804761D0(int x, int b)
 {
-    int* t;
-    if (b == 0) {
-        b = 0;
-        t = lbl_806217D8;
-    } else {
-        t = lbl_806217C4;
-    }
-    return t[fn_80476178(x, b)];
+    return b == 0 ? lbl_806217D8[fn_80476178(x, 0)] : lbl_806217C4[fn_80476178(x, b)];
 }
 
 extern "C" FE_OVERLAY int fn_80476220(int x, int b)
