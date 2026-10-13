@@ -89,6 +89,26 @@ extern Vp6Fn4 lbl_806EF3C8;
 extern Vp6Fn3 lbl_806EF3CC;
 extern Vp6Fn3 lbl_806EF3D0;
 
+/* Decoder fields used by the motion vector reader fn_803A2A44 (not part of Vp6Ctx yet). */
+struct Vp6MvView {
+    char pad0[0x3C];
+    short m3C;
+    short m3E;
+    char pad40[4];
+    int m44;
+    short m48;
+    short m4A;
+    char pad4C[4];
+    int m50;
+    char pad54[0x150 - 0x54];
+    Vp6Rc m150;
+    char pad168[0x704 - 0x168];
+    unsigned char m704[2];
+    unsigned char m706[2];
+    unsigned char m708[14];
+    char pad716[6];
+    unsigned char m71C[16];
+};
 extern "C" {
 
 void fn_803A00A0(int, int, int, int);
@@ -515,6 +535,77 @@ int fn_803A25A8(Vp6Ctx* c, int a, int b)
         }
     }
     return r;
+}
+
+//// a
+static inline unsigned char Vp6Rd(Vp6MvView* c, int k, int idx)
+{
+    unsigned char* b = (unsigned char*)c + k;
+    return b[idx];
+}
+
+/* near-miss 99.1%: 4 slots differ; the final v + py / v + px adds take their operands in the other order, and one loop-invariant addi sits one slot earlier. */
+void fn_803A2A44(Vp6MvView* c, short* out, int mode)
+{
+    int v;
+    short px = 0;
+    short py = 0;
+    unsigned i;
+    int j;
+    int k;
+    Vp6Rc* rc;
+    if (mode == 2) {
+        if (c->m44 <= 1) {
+            px = c->m3C;
+            py = c->m3E;
+        }
+    } else if (c->m50 <= 1) {
+        px = c->m48;
+        py = c->m4A;
+    }
+    i = 0;
+    rc = &c->m150;
+    j = 0;
+    k = 0;
+    do {
+        if (!fn_803A0E18(rc, Vp6Rd(c, 0x706, i))) {
+            if (fn_803A0E18(rc, Vp6Rd(c, 0x708, j))) {
+                if (fn_803A0E18(rc, Vp6Rd(c, 0x70C, j))) {
+                    v = fn_803A0E18(rc, Vp6Rd(c, 0x70E, j)) + 6;
+                } else {
+                    v = fn_803A0E18(rc, Vp6Rd(c, 0x70D, j)) + 4;
+                }
+            } else if (fn_803A0E18(rc, Vp6Rd(c, 0x709, j))) {
+                v = fn_803A0E18(rc, Vp6Rd(c, 0x70B, j)) + 2;
+            } else {
+                v = fn_803A0E18(rc, Vp6Rd(c, 0x70A, j));
+            }
+        } else {
+            v = fn_803A0E18(rc, Vp6Rd(c, 0x71C, k));
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x71D, k)) * 2;
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x71E, k)) * 4;
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x723, k)) << 7;
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x722, k)) << 6;
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x721, k)) << 5;
+            v += fn_803A0E18(rc, Vp6Rd(c, 0x720, k)) * 16;
+            if (v & 0xF0) {
+                v += fn_803A0E18(rc, Vp6Rd(c, 0x71F, k)) * 8;
+            } else {
+                v += 8;
+            }
+        }
+        if (v != 0 && fn_803A0E18(rc, Vp6Rd(c, 0x704, i))) {
+            v = -v;
+        }
+        if (i != 0) {
+            out[1] = py + v;
+        } else {
+            out[0] = px + v;
+        }
+        i++;
+        k += 8;
+        j += 7;
+    } while (i <= 1);
 }
 
 void fn_803A30D0(Vp6McView* c, int mode)
