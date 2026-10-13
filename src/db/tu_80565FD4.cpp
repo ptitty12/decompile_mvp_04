@@ -318,8 +318,6 @@ extern "C" DB_OVERLAY int fn_8056681C(Db80565CDC_S* s, int v)
     return 3;
 }
 
-/* near-miss: the stores and calls match; retail builds the by-value date in place (frame word at 8, address
- * in r9) while ours fills a local at 12 and copies it into the argument slot (20 vs 19 insns). */
 extern "C" DB_OVERLAY int fn_805668A4(Db80565CDC_S* s, int y)
 {
     Db80565FD4_Date d;

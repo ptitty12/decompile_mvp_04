@@ -337,3 +337,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `db/tu_805721F8` `fn_805721F8`: 99.21965%, 173/173 instructions; roster score array view recovers indexed loads, but round/found/clamped-value registers and the initial search-index copy differ after seventeen bounded forms; new code dropped.
 - `db/tu_80574AE4` `fn_80577218`: 99.49468%, 188/188 instructions; comparator branches and the two 12-byte statistics constructors match, but winning-rate denominator/zero FPR allocation differs after ten forms; source dropped.
+- 2026-10-13 | db/tu_80565FD4 fn_8056A058 | Eight ordinary C forms; best 97/97 words (98.6%), four table address/load preparation differences. Boolean CR4 preservation and data flow exact; failed body retained only in build/swarm23, source restored.
+- 2026-10-13 | ealib/tu_803A0310 fn_803A2C9C | Six ordinary C forms; best 83/84 words (97.2%), first-vector saved register/copy and final store order remain; failed body in build/swarm23 only, source restored.
