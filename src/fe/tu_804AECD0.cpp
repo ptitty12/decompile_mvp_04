@@ -4,10 +4,73 @@
  */
 
 #include "game/fe_804ABCBC.h"
+#define FE_V4I(n) virtual void v##n(int a, int b, int c, int d);
+class FeObj4I : public UiBase {
+public:
+    FE_LO(FE_V4I) virtual FeObj* v32(const char* a, int b); FE_HI(FE_V4I)
+};
+class FeV4L {
+public:
+    char pad0[0x4];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual int s10();
+    virtual struct FeRecL* s11(int a0);
+};
+struct FeRecL {
+    int m0;
+    int m4;
+    char pad8[0x24 - 8];
+    int m24;
+};
+extern "C" void fn_804AF1D8(FeScr* x, int a, int b);
+extern "C" void fn_804AF1B8(char* p, int i, int a, int b);
 extern "C" void fn_804AEF3C(FeScr* x);
 extern "C" void fn_800DD44C__FP13Unk800DD610_PPvi(void* a, void* b, int c);
 
 extern char lbl_80673B30[];
+extern "C" FE_OVERLAY void fn_804AEF3C(FeScr* x)
+{
+    int h = ((FeScrMgrView*)lbl_8061930C)->m2C;
+    ((FeObj2*)x->m138)->v79(0x32, 0);
+    x->m138->v3();
+    int cnt = 0;
+    int k = 0;
+    do {
+        FeV4L* lst = ((FeV4L * (*)(int, int)) fn_8058211C)(h, k);
+        int j = 0;
+        int n = lst->s10();
+        for (; j < n; j++) {
+            FeRecL* r = lst->s11(j);
+            if (r != 0) {
+                ((FeObj4I*)x->m138)->v42(cnt, 0, r->m24, 5);
+                ((FeObj3*)x->m138)->v91(cnt, 0, 1);
+                fn_804AF1D8(x, r->m0, cnt);
+                if (k == 4) {
+                    ((FeObj3*)x->m138)->v92(cnt, 2, 0);
+                    ((FeObj3*)x->m138)->v92(cnt, 3, 0);
+                } else {
+                    ((FeObj3*)x->m138)->v92(cnt, 2, r->m4);
+                    ((FeObj3*)x->m138)->v92(cnt, 3, 1);
+                }
+                fn_804AF1B8((char*)x, cnt, k, j);
+                cnt++;
+            }
+        }
+        k++;
+    } while (k <= 0xF);
+    ((FeObj1*)x->m138)->v68(0);
+    ((FeObj2*)x->m138)->v79(cnt, 0);
+    ((FeObj1*)x->m138)->v14(1);
+}
+
 extern "C" FE_OVERLAY FeRaw* fn_804AFF98(FeRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
