@@ -1142,7 +1142,7 @@ config.libs = [
         "objects": [
             Object(Matching, "libc/fclose.c"),
             Object(Matching, "libc/fflush.c"),
-            Object(NonMatching, "libc/fopen.c"),
+            Object(Matching, "libc/fopen.c"),
             Object(Matching, "libc/fprintf.c"),
             Object(Matching, "libc/fseek.c"),
             Object(Matching, "libc/fwalk.c"),
