@@ -130,7 +130,7 @@ void fn_80432224(OSAlarm* alarm);
 void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
 BOOL fn_80426690(u32 offset, DVDLowCallback callback);
 void fn_80423828(void);
-void fn_804230B0(DVDCommandBlock* block);
+void fn_804230B0(void);
 s32 fn_8042280C(const char* path);
 void fn_80423CD4(OSAlarm* alarm, OSContext* context);
 BOOL fn_80422E84(const char* path);
@@ -367,9 +367,9 @@ void fn_80422FA4(s32 result, DVDCommandBlock* block) {
 void fn_80422FD4(s32 result, DVDCommandBlock* block) {
 }
 
-/* near-miss 99.86%: retail frame is 16 bytes, ours 24 (cause unknown; the copy inlined into fn_80423B0C has the 24-byte frame) */
-void fn_804230B0(DVDCommandBlock* block) {
-    lbl_806EF6B8 = fn_804230B0;
+/* takes no parameter: an unused parameter adds an 8-byte frame slot in MWCC (retail frame is 16). Stored in lbl_806EF6B8 via a cast. */
+void fn_804230B0(void) {
+    lbl_806EF6B8 = (void (*)(DVDCommandBlock*))fn_804230B0;
     if (!(lbl_806EF668->FSTMaxLength >= BB2.FSTLength)) {
         fn_80433CE8("dvd.c", 0x295, "DVDChangeDisk(): FST in the new disc is too big.   ");
     }
@@ -652,7 +652,7 @@ void fn_80423B0C(u32 intType) {
         fn_80423270();
     } else if (intType & 1) {
         lbl_806EF694 = 0;
-        fn_804230B0(lbl_806EF660);
+        fn_804230B0();
     } else {
         fn_80426880(fn_80423380);
     }
