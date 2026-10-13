@@ -341,6 +341,40 @@ union McTagU {
     } f;
 };
 
+extern "C" int fn_80391444();
+
+/* near-miss 99.1%: same code; retail keeps the record pointer in r30 and the result in r29 (ours swapped), and adds
+ * the row offset first in the shift loop. */
+extern "C" int fn_80391B1C(McRec* r)
+{
+    int ret = -1;
+    if (lbl_806243F8[0] != 0) {
+        int idx = fn_80391444();
+        if (idx < lbl_80624400[0] && idx >= 0) {
+            if (r->m4 & 0x80)
+                fn_80391A3C(r);
+            int off = idx * 8;
+            int i = lbl_80624404[0];
+            if (i > idx) {
+                McEntry* t = lbl_806243F8[0];
+                do {
+                    McEntry* e = (McEntry*)(i * 8 + (char*)t);
+                    i--;
+                    *e = e[-1];
+                } while (i > idx);
+            }
+            McEntry* tab = lbl_806243F8[0];
+            ret = lbl_806243FC[0];
+            int n = lbl_80624404[0];
+            tab[idx].m4 = r;
+            tab[idx].m0 = ret;
+            lbl_806243FC[0] = ret + 1;
+            lbl_80624404[0] = n + 1;
+        }
+    }
+    return ret;
+}
+
 extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short c)
 {
     McTagU t;
