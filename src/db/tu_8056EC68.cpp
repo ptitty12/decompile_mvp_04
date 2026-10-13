@@ -3,6 +3,7 @@
  * placeholder TU). Define every function DB_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/db_8056BAEC.h"
+#include "game/tu_80094578.h"
 
 extern char lbl_80693C7C[];
 extern const float lbl_805FFDF8;
@@ -1305,4 +1306,62 @@ extern "C" DB_OVERLAY void fn_80571EA0(DbMgr* self)
         fn_8056BAEC(s, cur, side, 0);
         fn_8056C0A0(s, cur);
     }
+}
+
+extern const float lbl_805FFE00;
+extern "C" float fn_8007824C(int id,int kind);
+extern "C" unsigned char fn_800968C0(Obj3* team,int id,int flag);
+extern "C" void fn_800999CC(Obj3* team,int id,int kind);
+extern "C" void fn_8056CAC4(void* queue,int id,int side,int kind);
+extern "C" DB_OVERLAY int fn_80571F4C(DbMgr* self,int side,int kind)
+{
+ int result=0;
+ if(kind!=0){
+  Obj3* team=(Obj3*)TeamAt(self->m8->m14,side);
+  int any=0,same=0,compatible=0;
+  float anyScore,sameScore,compatibleScore;
+  anyScore=lbl_805FFE00;
+  sameScore=lbl_805FFE00;
+  compatibleScore=lbl_805FFE00;
+  unsigned char index=0;
+  unsigned char n=team->m3E4;
+  if(index<n) do{
+   if(fn_80097148(team,index)==0){
+    char* stats=(char*)team+0xC9C;
+    int id=team->m3E8[index].m0;
+    float score=fn_8007824C(id,0);
+    int position=fn_8008CFD8(stats,5,index);
+    int alternate=fn_8008CFD8(stats,6,index);
+    if(!(anyScore>=score) && position!=0 && position!=10){anyScore=score;any=id;}
+    if(position==kind && !(sameScore>=score)){sameScore=score;same=id;}
+    if(fn_80076644__Fiii(kind,position,alternate) && !(compatibleScore>=score)){compatibleScore=score;compatible=id;}
+   }
+   ++index;
+  }while(index<n);
+  if(any==0 && same==0 && compatible==0)return 0;
+  if(kind!=9 || same!=0 || compatible!=0){
+   if(!(sameScore>=compatibleScore) && compatible!=0) any=compatible;
+   else if(same!=0) any=same;
+  }
+  fn_8056CAC4(&self->mFC,any,side,kind);
+  result=1;
+  unsigned char old=team->m17C[kind];
+  int slot=-1;
+  int currentSide=0;
+  if(self->mC->m1CD0!=0)currentSide=1;
+  if(side==currentSide){
+   Db80571060_It<3> it;it.v=0;
+   while(it.v<=3){
+    if(fn_80081CF8__FP13Unk8007FF8C_Yi(self->mC,it.v)->m0==old){slot=it.v;break;}
+    it.Next();
+   }
+  }
+  int next=fn_800968C0(team,any,1);
+  fn_800999CC(team,next,kind);
+  if(slot!=-1){
+   DbQ* q=fn_80081CF8__FP13Unk8007FF8C_Yi(self->mC,slot);
+   fn_80081C94__FP13Unk8007FF8C_Yiiii(self->mC,slot,next,q->m1,q->m4);
+  }
+ }
+ return result;
 }
