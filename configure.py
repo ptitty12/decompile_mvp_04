@@ -1314,7 +1314,7 @@ config.libs = [
             Object(NonMatching, "dolphin/dvd/dvdqueue.c"),
             Object(NonMatching, "dolphin/dvd/tu_80425954.c", cflags=[f if f != "-inline auto" else "-inline noauto" for f in cflags_dolphin_dvd]),  # dvderror.c: ErrorCode2Num stays out of line
             Object(Matching, "dolphin/dvd/dvdidutils.c"),
-            Object(NonMatching, "dolphin/dvd/tu_80425BE4.c"),
+            Object(Matching, "dolphin/dvd/tu_80425BE4.c"),
         ],
     },
     {

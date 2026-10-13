@@ -2457,6 +2457,8 @@ dolphin/dvd/dvdidutils.c:
 
 dolphin/dvd/tu_80425BE4.c:
 	.text       start:0x80425BE4 end:0x80425E54
+	.data       start:0x80634310 end:0x80634380
+	.sdata      start:0x806EF200 end:0x806EF210
 
 dolphin/exi/tu_80425E54.c:
 	.text       start:0x80425E54 end:0x80426CD0
