@@ -331,7 +331,89 @@ struct Unk802495CC_X {
     float mAD0;
 };
 extern float lbl_8061D4C4;
-void fn_802494C4(Unk80270BA0_X* x, int a, float f);
+void* fn_802494C4(Unk80270BA0_X* x, int a, float f);
+struct Unk802494C4_Row {
+    char pad0[0x1CC8];
+    unsigned char m1CC8;
+};
+struct Unk802494C4_Game {
+    char pad0[0x14];
+    Unk802494C4_Row* m14;
+};
+struct Unk802494C4_Ctx {
+    char pad0[0x4C];
+    unsigned m4C;
+    char pad50[0x6F8 - 0x50];
+    Unk802494C4_Game* m6F8;
+    char pad6FC[0x738 - 0x6FC];
+    void* m738;
+};
+struct Unk802494C4_X {
+    char pad0[0x60];
+    Unk80273498_Vec3 m60;
+    char pad6C[0x44C - 0x6C];
+    Unk802494C4_Ctx* m44C;
+    char pad450[0xAC4 - 0x450];
+    int mAC4;
+    float mAC8;
+    float mACC;
+    float mAD0;
+    Unk80273498_Vec3 mAD4;
+};
+struct Unk802494C4_G {
+    char pad0[0x110];
+    int m110;
+};
+extern Unk802494C4_G* lbl_8061FE10;
+extern float lbl_8061D4C0;
+extern "C" void* fn_8030D1E4(void* o, int k, Unk80273498_Vec3* a, Unk80273498_Vec3* b, int z, float f);
+inline Unk80273498_Vec3 Unk802494C4_Flat(const Unk80273498_Vec3& v)
+{
+    Unk80273498_Vec3 r = v;
+    r.y = 0.0f;
+    return r;
+}
+extern float lbl_8061D4B8;
+extern float lbl_8061D4BC;
+/* near-miss (97.6%, 82 insns): two slots swapped near the end (lfs f13,12(r1) vs the first fadds of mAC8); all 120
+   orders of the five trailing statements tried, 6 minutes of permuter found nothing. */
+void fn_8024937C(Unk80270BA0_X* xx, Unk80273498_Vec3* t, float a, float b)
+{
+    Unk802494C4_X* x = (Unk802494C4_X*)xx;
+    Unk80273498_Vec3 p = Unk802494C4_Flat(x->m60);
+    float s = Unk80246D04_Secs(x->m44C->m4C);
+    Unk80273498_Vec3 dir = *t - p;
+    x->mAD4 = dir;
+    x->mAC8 = a + lbl_8061D4B8 + s;
+    x->mACC = b + lbl_8061D4BC + s;
+    if (!(x->mACC > x->mAC8))
+        x->mACC = x->mAC8 + 0.1f;
+}
+
+/* near-miss (96.6%, 66 insns): only the x.z load (lwz 8(r11)) is scheduled before the r3 load; retail puts it after
+   lwz r0,36(r1). Tried Flat() variants (ref/pointer/by-value/two-level), void and returning forms, order of the
+   locals; permuter base score too noisy. */
+void* fn_802494C4(Unk80270BA0_X* xx, int a, float f)
+{
+    Unk802494C4_X* x = (Unk802494C4_X*)xx;
+    Unk802494C4_Ctx* c = x->m44C;
+    void* r = c->m738;
+    Unk80273498_Vec3 w = Unk802494C4_Flat(x->m60);
+    w.y += lbl_8061D4C0;
+    if (a != 0 && (lbl_8061FE10 == 0 || lbl_8061FE10->m110 == 0)) {
+        float k = 1.0f;
+        int t = c->m6F8->m14->m1CC8;
+        if (t == 0)
+            k = 0.0f;
+        else if (t == 1)
+            k = 0.4f;
+        r = fn_8030D1E4(r, 11, &w, &x->mAD4, 3, k);
+    }
+    x->mAC4 = 1;
+    x->mAD0 = f;
+    return r;
+}
+
 void fn_802495CC(Unk802495CC_X* x)
 {
     Unk802495CC_C* c = x->m44C;
@@ -367,6 +449,116 @@ void fn_80249724(Unk80270BA0_X* x)
 {
     if (((Unk8024B99C_V*)x)->mAE8 != 0)
         fn_80249750(x);
+}
+
+struct Unk80249958_F {
+    unsigned f0 : 1;
+    unsigned f1 : 1;
+    unsigned f2 : 1;
+    unsigned rest : 29;
+};
+struct Unk80249958_G {
+    unsigned pad : 21;
+    unsigned f21 : 1;
+    unsigned rest : 10;
+};
+struct Unk80249958_X {
+    char pad0[0x71C];
+    Unk80249958_G m71C;
+    char pad720[0xAEC - 0x720];
+    Unk80273498_Vec3 mAEC;
+    Unk80273498_Vec3 mAF8;
+    char padB04[0xB08 - 0xB04];
+    int mB08;
+    int mB0C;
+    float mB10;
+    float mB14;
+    float mB18;
+    int mB1C;
+    char padB20[0xB3C - 0xB20];
+    Unk80249958_F mB3C;
+};
+extern const Unk80273498_Vec3 lbl_806055AC;
+void fn_8024A550(Unk80270BA0_X* x, float f);
+struct Unk80249750_Q {
+    char pad0[0x48];
+    float m48[0x52];
+    int m190;
+};
+inline void Unk80249750_Set2(Unk80249750_Q* q, float v)
+{
+    if (q->m190 == 1)
+        q->m48[0] = v;
+    int off = q->m190 * 4 + 0x48;
+    *(float*)((char*)q + off) = v;
+}
+inline void Unk80249750_Set(Unk80249750_Q* q, float v)
+{
+    Unk80249750_Set2(q, v);
+}
+int fn_8026DAE8(Unk8026C414_O* o, Unk8026C414_X* a);
+int fn_8026D890(Unk8026C414_O* o, Unk8026C414_X* a);
+int fn_80380964(Unk80271DBC_Link* link);
+void fn_80249750(Unk80270BA0_X* x)
+{
+    Unk8024B99C_V* v = (Unk8024B99C_V*)x;
+    Unk80271DBC_Link* link = v->m618[0];
+    int on = 0;
+    float t = Unk80246D04_Secs(x->m44C->m4C);
+    float r = -1.0f;
+    float d = 0.6666667f;
+    float a = 0.16666667f;
+    if (!(t <= v->mAE4 + a)) {
+        on = 1;
+        r = a / d + 1.0f;
+    } else {
+        int id = link->m838;
+        if (fn_8026DAE8((Unk8026C414_O*)x, 0) != 0 && id != 0x58A2B20F && id != (int)0xB4F5C907 && fn_80380964(link) == 0) {
+            on = 1;
+            r = (t - v->mAE4) / d + 1.0f;
+        }
+    }
+    if (on != 0) {
+        r = !(r > 1.5f) ? (r >? 1.0f) : 1.5f;
+        Unk80249750_Set((Unk80249750_Q*)((char*)x + 0x734), r);
+        fn_803814A4(link, v->mAE0, 1, 4.0f);
+        v->mAE8 = 0;
+        v->mAE4 = -1.0f;
+        v->mAE0 = 0;
+        return;
+    }
+    if (fn_8026D890((Unk8026C414_O*)x, 0) != 0)
+        fn_803814A4(link, 0xEA68D008, 1, 4.0f);
+}
+
+void fn_80249958(Unk80270BA0_X* xx, Unk80273498_Vec3* p, int flag, float f)
+{
+    Unk80249958_X* x = (Unk80249958_X*)xx;
+    int st = x->mB0C;
+    x->mB18 = -1.0f;
+    x->mB08 = 1;
+    x->mB1C = 0;
+    x->mB3C.f2 = flag;
+    x->mB3C.f0 = 0;
+    if (st == 0 || st == 6 || st == 8) {
+        x->mAF8 = lbl_806055AC;
+        x->m71C.f21 = 0;
+    } else {
+        Unk80273498_Vec3 d = *p - x->mAEC;
+        if (!(Unk80246D04_LenSq(d) >= 3600.0f)) {
+            fn_8024A550(xx, f);
+            x->mAEC = *p;
+            return;
+        }
+        if (st != 7) {
+            x->mAF8 = x->mAEC;
+            x->m71C.f21 = 1;
+        }
+    }
+    x->mB0C = 1;
+    x->mB10 = 0.0f;
+    x->mB14 = f;
+    x->mAEC = *p;
 }
 
 void fn_80249B08(Unk80270BA0_X* x, int a, float f)
