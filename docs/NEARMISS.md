@@ -137,3 +137,39 @@ No tracked source/config/verification file was edited; these are scratch finding
 
 
 The clone scanner now has only three shape candidates: two already parked in game/tu_80174318, and the 32-byte destructor at 0x80362C2C. The latter calls the same in-charge destructor family as the parked fn_8035B16C; the free-function clone reports a missing function after compilation because the retail target is a destructor symbol. No match was accepted.
+
+
+### Bounded continuation trials (2026-10-13)
+
+- fn_8038B630 (gamelib/tu_80387E28): eight forms total. Const source, explicit
+  members, taking the source address before the preceding call, and an inline
+  value-return helper did not remove the base-addi/first-lwz swap. Best two
+  differences; no source change. build/clone-snapshot/build/probe-8038b630*.
+- fn_8035C24C: the two remaining aggregate-destructor/store-order forms failed;
+  the eight-attempt budget is exhausted. build/agent-abi-next.
+- fn_801F0004 (game/tu_801EE438): eight initialization, declaration-order and
+  constness forms. Best retains two float-store ordering differences; copy and
+  mutable-threshold forms add instructions. build/clone-snapshot/build/probe-801f0004*.
+- fn_8038871C: four float/threshold forms; fn_8001CCE0: sum/temp forms;
+  fn_803BE594: six pointer/offset forms; fn_803A0408: four product/load forms;
+  fn_803FC064: three argument forms; fn_8031E960: linkage correction and constant
+  order forms. None matched. Separate C-linkage issue in fn_8031E960 is recorded
+  in scratch but not accepted alone. build/agent-float-math-* and agent-call-eval-*.
+
+Bounded near-miss probe summary (2026-10-13)
+
+- `game/tu_800A9858::fn_800AABA4` (456B, 112/114 matched): 3 behavior-preserving reorder variants in `near-800AABA4/` all retained the same 2-instruction swap (target stw r9,0(r29) then mr r3,r30; source reverse). Moving the first embedded initializer ahead of the header writes created 20 mismatches. Park after 3 meaningful variants.
+- `game/tu_800437AC::fn_80043884` (116B, 29 instructions): 4 forms (sum order reversed, direct compare, XOR temporary, natural pointer/stride form) failed; best remains 7 instruction-register differences. Control-flow/algorithm matches, but compiler register allocation is stubborn. Park.
+- `game/tu_800AB0E8::fn_800AC128` (212B, 53 instructions): 8 bounded forms (pointer increment while/for, explicit count locals, direct pointer-range, pointer-based index) failed. Best variants retain the 6-slot pre-loop register-order mismatch; end-pointer and reverse forms were worse. Park.
+- `game/tu_8001CACC::Unk8001C314::fn_8001CACC` (312B, 78 instructions): 4 semantically equivalent status-flag/control-flow forms did not yield the retail r30=this/r31=ok allocation; best had 7 instruction differences. Park.
+
+No target reached exact instruction/branch match. Compiler scoring was direct scratch-only using the unit's `-Os -G0 -ffloat-store -fno-rtti -fno-exceptions -Iinclude` flags.
+
+
+Park note — game/tu_80089894 (scratch audit)
+
+The source object has 60 functions / 13,776B .text, but also emits 152B .rodata while the retail split object allocates only .text. Every referenced source pool offset maps by paired function relocations to existing retail objects: 0x00–0x24 -> lbl_805B4BB4..lbl_805B4BD8; 0x28,0x30,0x34,0x38 -> lbl_805B4C70, lbl_805B4C78, lbl_805B4C7C, lbl_805B4C80; 0x40,0x48,0x50,0x58,0x5c,0x60,0x68,0x70,0x78,0x80,0x88,0x90 -> lbl_805B4E08..lbl_805B4E80. Direct extern substitutions shrank the pool by only 16B and changed code scheduling (fn_8008A624: 38 target instructions vs 36 candidate), so this is not a safe source-link fix.
+
+Six imports remain: __builtin_vec_delete, __vn__FUii, fn_80071604__FPv, fn_80071688__FPvi, fn_80071E2C__FPviT0, fn_8040074C__FPvi. Source/provider evidence: fn_80071604 is actually (Unk80071604*, const char*, Obj*, unsigned), but local source calls it with only self; fn_80071688 is the one-int charge overload; fn_80071E2C is (Unk80071604*, int, Unk80070DDC_Stream*); fn_8040074C is C-linkage memset-like (void*, unsigned). ABI repairs need caller evidence and still would not solve the extra literal pool. Park.
+
+

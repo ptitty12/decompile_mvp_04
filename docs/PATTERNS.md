@@ -1708,3 +1708,21 @@ arbitrary unreferenced constants. Check exact words and all data bytes per unit.
 An unresolved vector-deallocation builtin may also hide a simple null guard:
 in fn_800C334C, guarded fn_80377488(pointer) reproduces all 33 instructions;
 an unguarded call had only 31. Check the actual provider and local branch targets.
+
+
+### Inline float result placement (2026-10-13)
+
+In fn_801A2158, an inline clamp assigned a conditional expression to its own
+float parameter before returning it. The caller returned the helper result
+directly, introducing a distinct stack slot for that inline return. Returning
+the expression directly from the helper and assigning it to the caller's
+existing local produces the exact 56 target words, including eight local branch
+destinations. Either change alone failed. All other 65 function streams stayed
+unchanged. Preserve the existing comparison and GNU min-expression semantics;
+sequential min/max operations generated different instructions and branches.
+
+Named canonical data references can also keep reconstructed objects code-only:
+fe/tu_804B985C retains its local ids/values arrays but initializes them with
+memcpy from the two original 120-byte table objects. Paired relocations prove
+which objects are used; bytes and extents are checked independently. Replacing
+the locals with direct global reads would change the original stack behavior.

@@ -8,8 +8,8 @@
   - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched: **20,899 / 24,158 (86.51%)**; code matched: **3,000,204 / 5,896,176 bytes (50.88%)**.
-- Source-linked: **212 units, 312,792 code bytes (5.30%)**, plus 8,234 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+- Functions matched: **20,902 / 24,158 (86.52%)**; code matched: **3,001,156 / 5,896,176 bytes (50.90%)**.
+- Source-linked: **214 units, 323,280 code bytes (5.48%)**, plus 8,234 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
 ## Session log (newest last)
@@ -223,3 +223,8 @@
   - fe/tu_804FF6B4 source-linked (3,112 code B): bind string calls to the actual strcpy/strncpy providers and TEAMNAME/TEAMCITY to their existing data symbols. All 27 functions and local edges match; 129 references check with zero mismatches/unresolved names. Full hash and verifier pass. Two independent worker audits agreed on the import addresses.
   - Read-only import_candidates.py pairs matched source/retail REL24 call sites and lists canonical exported provider names. It distinguishes conflicting destinations and unresolved imports, preserving all aliases as leads rather than selecting a guessed ABI. Seven new synthetic regression tests pass; matching-helper suite is 84/84.
   - Source-linked totals are now 212 units / 312,792 code B / 8,234 data B; exact functions remain 20,899. The table v4 argument repair is parked under the one-TU commit rule; no conditional class definitions or mismatched function-pointer calls were accepted.
+
+- 2026-10-13 | Codex + three Luna workers, continued | Three new exact functions, +952 matched code B: fn_801B58D4 (368 B, recover C-linkage unsigned RNG return and label/scale evaluation order); fn_801A2158 (224 B, return inline clamp expression directly and assign it to the caller's existing float local); fn_801F522C (360 B, declare actual eight-byte output scratch before the vector copies, preserving the target's existing float data references). Every candidate passes retail hash, literal checks and the unmodified regression verifier. Exact functions 20,899 -> 20,902; matched code 3,000,204 -> 3,001,156 B.
+  - fe/tu_804B38C4 source-linked (4,164 B, 36 functions): real C singleton-constructor entry, correct C++ zero-argument function linkage, strncpy, and named original literals. All 16 shared-header users compile without word or local-edge changes across 617 functions; actual full build and regression verification pass. 237 references check with zero mismatch/unresolved names.
+  - fe/tu_804B985C source-linked (6,324 B, 28 functions): original string/table objects plus canonical sprintf/strncpy. Stack-local 30-element arrays remain local and initialize from the existing exact 120-byte tables via memcpy; all 59 local branches and 192 checked references agree. Full hash and verifier pass. Source-linked totals now 214 units / 323,280 code B / 8,234 data B.
+  - Bounded unsuccessful trials are preserved under build/ and logged in NEARMISS.md. Workers continue on two disjoint front-end ranges plus a read-only stack-slot scanner; the existing permuter farm remains active. This is an integration checkpoint, not the end of authorized work.
