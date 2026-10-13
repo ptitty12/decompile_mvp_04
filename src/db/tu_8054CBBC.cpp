@@ -242,12 +242,13 @@ DB_OVERLAY void fn_8054EE44(O* o)
     }
 }
 
-/* near-miss: fn_8007BB28 returns a float in retail (fctiwz after the call); the shared Screen header declares int */
+/* fn_8007BB28 returns a float in retail (fctiwz after the call); the shared Screen header declares int. */
+extern "C" float fn_8007BB28__18Unk8007B2B0_Screeniii(void* s, int a, int b, int c);
 DB_OVERLAY void fn_8054EED4(O* o)
 {
     if (fn_800A2E6C(lbl_80619948) == 0) {
         int t0 = o->m4->fn_8007B320(0, o->m0);
-        int v = o->m4->fn_8007BB28(0, t0, 1);
+        int v = (int)fn_8007BB28__18Unk8007B2B0_Screeniii(o->m4, 0, t0, 1);
         int i = fn_8054CDC4(o, 0xE);
         if (i != -1)
             fn_8054CCAC(o, i, v + fn_8054CCF0(o, i, 0xE));
