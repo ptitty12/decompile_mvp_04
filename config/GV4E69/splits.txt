@@ -2285,6 +2285,7 @@ libm/sf_ceil.c:
 
 libm/sf_cos.cpp:
 	.text       start:0x80411554 end:0x80411630
+	.sdata      start:0x806EEEFC end:0x806EEF00 align:4
 
 libm/sf_fabs.cpp:
 	.text       start:0x80411630 end:0x80411654
