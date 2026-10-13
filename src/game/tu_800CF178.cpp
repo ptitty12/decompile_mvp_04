@@ -183,6 +183,63 @@ extern "C" Unk800D1614_Raw* fn_800CF8A0(Unk800D1614_Raw* self, int p1, int p2, i
     return self;
 }
 
+/* Scroll-style widget as seen by fn_800CF92C: slots 29/31/32/34 return the two ends, a count and a position. */
+struct Unk800CF92C_Obj : Unk800C7B40_Data {
+    virtual ~Unk800CF92C_Obj();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6();
+    virtual void fn_vslot7();
+    virtual void fn_vslot8();
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual void fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22();
+    virtual void fn_vslot23();
+    virtual void fn_vslot24();
+    virtual void fn_vslot25();
+    virtual void fn_vslot26();
+    virtual void fn_vslot27();
+    virtual void fn_vslot28();
+    virtual Unk800C7B40_Widget* fn_vslot29();
+    virtual void fn_vslot30();
+    virtual Unk800C7B40_Widget* fn_vslot31();
+    virtual int fn_vslot32();
+    virtual void fn_vslot33();
+    virtual int fn_vslot34();
+};
+extern float lbl_805BC208;
+
+extern "C" void fn_800CF92C(Unk800CF92C_Obj* o)
+{
+    Unk800C7B40_Widget* a = o->fn_vslot31();
+    Unk800C7B40_Widget* b = o->fn_vslot29();
+    if (b != 0 && a != 0) {
+        short b26 = b->m26;
+        short b2A = b->m2A;
+        short a2A = a->m2A;
+        float t;
+        if (o->fn_vslot32() == 1)
+            t = lbl_805BC208;
+        else
+            t = (float)(b2A - a2A) / (float)(o->fn_vslot32() - 1);
+        int p = (int)((float)b26 + (float)o->fn_vslot34() * t);
+        a->fn_vslot9(p);
+    }
+}
+
 extern "C" void fn_800CFAC4(Unk800D1614_Obj* o, int v)
 {
     o->fn_800D1714(v);
@@ -391,6 +448,69 @@ extern "C" void fn_800CFFF0(Unk800CFFF0_Obj* o)
 {
     while (o->fn_vslot13() > 0)
         o->fn_vslot3(o->fn_vslot13() - 1);
+}
+
+/* Selector as seen by fn_800D0074: slot 11 returns the current entry, slot 22 takes the extra argument. */
+struct Unk800D0074_Sel : Unk800CFEEC_Data {
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual void fn_vslot3();
+    virtual void fn_vslot4();
+    virtual void fn_vslot5();
+    virtual void fn_vslot6(int i);
+    virtual void fn_vslot7();
+    virtual void fn_vslot8(int p);
+    virtual void fn_vslot9();
+    virtual void fn_vslot10();
+    virtual int fn_vslot11();
+    virtual void fn_vslot12();
+    virtual void fn_vslot13();
+    virtual void fn_vslot14();
+    virtual void fn_vslot15();
+    virtual void fn_vslot16();
+    virtual void fn_vslot17();
+    virtual void fn_vslot18();
+    virtual void fn_vslot19();
+    virtual void fn_vslot20();
+    virtual void fn_vslot21();
+    virtual void fn_vslot22(int q);
+};
+extern Unk8007B2B0_Screen* lbl_8061930C;
+int fn_80083FC0(int a);
+
+extern "C" void fn_800D0074(Unk800CFEEC_Sel* p, int idx, int q)
+{
+    Unk800D0074_Sel* s = (Unk800D0074_Sel*)p;
+    Unk8007B2B0_Screen* g;
+    if (s->mC != idx) {
+        s->m10[s->mC] = s->fn_vslot11();
+        int r = s->fn_vslot11();
+        s->mC = idx;
+        s->fn_vslot22(q);
+        if (s->m20 == 0) {
+            int v = s->m10[s->mC];
+            if (v != 0 || s->b3) {
+                s->fn_vslot8(v);
+            } else {
+                goto zero;
+            }
+        } else if (s->m20 == 1) {
+            if (s->b3 && r == 0) {
+                s->fn_vslot8(0);
+                return;
+            }
+            g = lbl_8061930C;
+            if (g->fn_8007B3E0(0xE, g->fn_80075948(r)) == 0) {
+            zero:
+                s->fn_vslot6(0);
+            } else {
+                int t = fn_80083FC0(s->mC);
+                int u = lbl_8061930C->fn_80075948(r);
+                int w = lbl_8061930C->fn_8007B320(t, u);
+                s->fn_vslot8(w);
+            }
+        }
+    }
 }
 
 extern "C" void fn_800D0210(Unk800CFEEC_Sel* s, Unk800C7B40_Widget* p, int q)

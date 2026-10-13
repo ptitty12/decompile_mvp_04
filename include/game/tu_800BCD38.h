@@ -386,7 +386,8 @@ struct Unk800C5E74_Data {
     int m10;
     int m14;
     char m18;
-    char pad19[0xF];
+    char pad19[0xB];
+    int m24;
     int m28;
     int m2C;
     int m30;

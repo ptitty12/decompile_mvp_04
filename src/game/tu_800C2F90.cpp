@@ -766,6 +766,54 @@ extern "C" void fn_800C4568(Unk800C341C_Mgr* m, int idx, int x)
     fn_800C537C(m, 5, buf, idx, lbl_805BBE54, 1);
 }
 
+struct Unk80084910_N {
+    int m0;
+    int m4;
+};
+void fn_80086030(Unk80084910_N* self, char* buf);
+void fn_80086078(Unk80084910_N* self, char* buf);
+void fn_800860E0(Unk80084910_N* self, char* buf);
+extern "C" int sprintf(char*, const char*, ...);
+extern "C" int fn_803FAB68(const char* path, int a, int* out);
+extern const float lbl_805BBE64;
+extern const float lbl_805BBE68;
+extern const char lbl_805BBD44[];
+extern int lbl_8061AB98;
+
+extern "C" int fn_800C45C8(Unk800C341C_Mgr* m, Unk800D2338_Obj* w, int x)
+{
+    char a[0x400];
+    char b[0x400];
+    char c[0x20];
+    char d[0x400];
+    Unk80084910_N n;
+    Unk80084910_N n2;
+    int out;
+    int cnt;
+    int i;
+    n.m0 = x;
+    n.m4 = 0;
+    cnt = 0;
+    fn_80086030(&n, a);
+    i = 0;
+    w->fn_vslot20(lbl_805BBE64);
+    fn_800C537C(m, 6, a, (int)fn_800C8038(w), lbl_805BBE68, 1);
+    ((Unk800CFEEC_Sel*)((char*)w + 0x98))->fn_vslot15();
+    do {
+        n2.m0 = x;
+        n2.m4 = i;
+        fn_80086078(&n2, b);
+        sprintf(d, lbl_805BBD44, lbl_8061AB98, b);
+        if (fn_803FAB68(d, 1, &out) != 0) {
+            cnt++;
+            fn_800860E0(&n2, c);
+            w->fn_vslot31(c, 0, 1);
+        }
+        i++;
+    } while (i <= 15);
+    return cnt;
+}
+
 extern "C" void fn_800C4720(Unk800C341C_Mgr* m, Unk800D2338_Obj* w)
 {
     char buf[0x400];

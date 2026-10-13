@@ -4,6 +4,7 @@
  */
 #include "game/tu_801527C8.h"
 #include "game/goals/tu_8028C6B8.h"
+#include "game/goals/tu_8027A84C.h"
 
 extern float lbl_805C88D4;
 
@@ -236,6 +237,61 @@ int cScriptReachGoal::fn_cslot8() /* 80154AF8 */
     }
 }
 
+/* Goal object at Unk8027C728_Goal::m18 (full layout in goals/tu_8028B194.h, which clashes with tu_8028C6B8.h): m38 and the setters used by cScriptReachGoal::fn_cslot11. */
+class Unk8028B194 {
+public:
+    char pad0[0x38];
+    int m38;
+    Unk8028B194* fn_8028B194(Unk80273498_Vec3 v);
+    Unk8028B194* fn_8028B1F0(int a);
+    void fn_8028B31C(int id);
+    Unk8028B194* fn_8028B51C(float a);
+};
+extern float lbl_805C841C;
+extern float lbl_805C8420;
+extern "C" float fn_8041171C(float x);
+extern "C" float fn_80411554(float x);
+inline void SetDir(Unk8027A84C* o, Unk80273498_Vec3 v)
+{
+    o->fn_8027A898(&v);
+}
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = lbl_805C8420;
+    r.z = fn_80411554(angle);
+    return r;
+}
+
+int cScriptReachGoal::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80154B24 */
+{
+    Unk8016C788_Obj* o = fn_8016C788(ctx, a);
+    if (o != 0) {
+        Unk8027C728_Goal* g = fn_802448F4(o, 1);
+        g->m10 = 10;
+        fn_8027C728(g);
+        Unk8028B194* b = (Unk8028B194*)g->m18;
+        if (m18 != 0) {
+            b->fn_8028B1F0(m1C);
+        } else {
+            b->fn_8028B194(*(Unk80273498_Vec3*)&m4);
+        }
+        Unk80273498_Vec3 v = Direction(m10 * lbl_805C841C);
+        SetDir((Unk8027A84C*)b, v);
+        if (m14 == 0x1A) {
+            b->fn_8028B31C(0);
+        } else {
+            b->fn_8028B31C(m14);
+        }
+        if (m20 != 0) {
+            b->fn_8028B51C(m24);
+        }
+        b->m38 = 3;
+        fn_8015152C(o, g);
+    }
+}
+
 Unk8037B3E8* cScriptReachGoal::fn_vslot5() /* 80154C9C */
 {
     return new (lbl_806EF9B4) cScriptReachGoal;
@@ -279,6 +335,79 @@ int cScriptReplay::fn_cslot8() /* 80154EB0 */
 inline void SetF(float* p, float v)
 {
     *p = v;
+}
+
+extern float lbl_805C8500;
+extern float lbl_805C8504;
+extern float lbl_805C8510;
+extern const int lbl_8061BD88[];
+extern Unk80326F44_Out lbl_805EBA10;
+extern "C" Unk80326F44_Out* fn_8033ACE8();
+extern "C" void fn_803296AC();
+extern "C" void* fn_803285F4(void* p);
+extern "C" void fn_80328E50(void* t, int a, int b);
+int fn_80326DF0(Unk801527C8_Sub* s, int a);
+int fn_80326E64(Unk801527C8_Sub* s, int a);
+
+/* near-miss (97.7%): everything matches except the scheduling/registers of the 24-byte copy of lbl_805EBA10 into e (retail keeps
+   the lis for lbl_805EBA10 in r9 and addi r9,r9,lo in place, loads words 0,3,5,1,2,4; we use r11/r9 and a different load order).
+   Tried: key before e, e declared outside the block, pointer copy, const extern, copy before the m44 store. */
+int cScriptReplay::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80154EF4 */
+{
+    Unk801527C8_Actor* pa = ctx->mA4C;
+    int on = m4;
+    Unk801527C8_Actor* pb = ctx->mA54;
+    Unk801527C8_Sub* rec = &pa->m50;
+    if (on != 0) {
+        float cur = (float)*(unsigned*)&pa->m4C * 0.016666668f;
+        if (m8 != 0) {
+            if (pb->m44 != 1)
+                fn_803296AC();
+            pb->m44 = 1;
+            Unk80326F44_Out e = lbl_805EBA10;
+            int key = lbl_8061BD88[mC];
+            char* d = (char*)pb->m40;
+            Unk80326F44_Out* p7 = (Unk80326F44_Out*)(d + 0x3D48);
+            switch (key) {
+            case 0xC5:
+                e = *fn_8033ACE8();
+                break;
+            case 0xA7:
+                e = *p7;
+                break;
+            case 0xA8:
+                e = *(Unk80326F44_Out*)(d + 0x3D60);
+                break;
+            case 0xA9:
+                e = *(Unk80326F44_Out*)(d + 0x3D78);
+                break;
+            default:
+                e = rec->fn_80326F44(key, 1, -1.0f);
+                break;
+            }
+            int ok = 1;
+            if (e.m0 == 0xC7)
+                ok = 0;
+            if (ok != 0)
+                cur = e.m4;
+        }
+        cur += m10;
+        float lo = (float)fn_80326DF0(rec, 0) * 0.016666668f;
+        float hi = (float)fn_80326E64(rec, 0) * 0.016666668f;
+        if (!(cur >= lo))
+            cur = lo;
+        if (!(cur < hi))
+            cur = hi;
+        SetF(&pb->m4C, cur);
+        void* t = fn_803285F4(pa);
+        fn_80328E50(t, -1, 0);
+    } else {
+        if (pb->m44 != 0)
+            fn_803296AC();
+        pb->m44 = on;
+        SetF(&pb->m4C, (float)*(unsigned*)&pa->m4C * 0.016666668f + 0.5f);
+        SetF((float*)&pb->m50, 0.016666668f);
+    }
 }
 
 int cScriptReplay::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80155288 */
