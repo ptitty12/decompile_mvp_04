@@ -424,6 +424,28 @@ inline float Lerp(float a, float t, float b)
     return a + t * (b - a);
 }
 
+extern const float lbl_805D6F78;
+extern const float lbl_805D6F88;
+
+void Unk8022FE34_Pai::fn_8023104C(int i, Unk8022FE34_Ent e)
+{
+    Unk8022FE34_Ent tmp = e;
+    m4[i].fn_80230CC8(&tmp);
+    m4[i].m1E0 += fn_8023A888(&e);
+    m4[i].m1F0 = lbl_805D6F78;
+    m4[i].m1F4 = lbl_805D6F78;
+    for (int j = 0; j < m4[i].m1D0; j++) {
+        m4[i].m1F0 += m4[i].m4[j].mC;
+        m4[i].m1F4 += fn_8023A888(&m4[i].m4[j]);
+    }
+    m4[i].m1F0 /= (float)m4[i].m1D0;
+    m4[i].m1F4 /= (float)m4[i].m1D0;
+    if (!(m4[i].m1F0 >= lbl_805D6F88))
+        m4[i].m1F0 = lbl_805D6F88;
+    if (!(m4[i].m1F4 >= lbl_805D6F78))
+        m4[i].m1F4 = lbl_805D6F78;
+}
+
 float fn_8023125C(float x)
 {
     if ((int)x == 0) {
@@ -434,6 +456,8 @@ float fn_8023125C(float x)
     float r = Lerp(lbl_8061D158, t, lbl_8061D15C);
     return r;
 }
+
+
 
 void Unk8022FE34_Owner::fn_80231D0C(int i)
 {
