@@ -113,3 +113,18 @@
   - Incident: one worker killed every python.exe on the machine (taskkill /IM). Workers re-ran their jobs; the prompts forbid it now.
   - Walls (unchanged rules): `mftb`/`mtspr`, paired-single (psq_) kernels, a literal data word after `bl`, and g++ virtual-base destructor machinery are not attempted.
   - Blockers: none new. The owner-only questions in DECISIONS are unchanged.
+- 2026-10-12 | Claude Opus 5.5 (lead session 2, update 21:40 CDT) | fleet | **20,582 -> 20,703 functions at 100%** (85.7%); +362 since 17:52.
+  - p5 is finished: every p5 batch has been worked once and merged. Late merges: p5-00 (+7), 01 (+5), 05 (+5), 06 (+7), 07 (+9), 10 (+8), 12 (+11), 25 (+4), 27 (+36, the dvd.c state machine).
+  - p6 so far: p6-00 (+4), 01 (+1), 02 (+4), 03 (+1), 04 (+2), 05 (+4), 06 (+8), 35 (+7). The first p6 batches (the cut-p4 game units around 0x801C-0x8022) are Vec/float-temporary heavy, with few small functions. `queue/p6_order.txt` is now ranked by the count of functions <= 0x200. The dolphin p6 batches (mostly hand-written code) are last.
+  - New owner question in DECISIONS: dolphin/dvd/tu_804227D4 merges dvdfs.c and dvd.c, and fn_804227D4 is defined at the end of the file to stop inlining.
+  - Tooling:
+    - integ.sh rewords `wip(` near-miss commits to `match(` on the worker branch before merging (31 older `wip(` commits are already on main).
+    - rv.py scores a directory, so there is no command-line length limit.
+    - The p6 prompt has the near-miss commit format and the background-job rule.
+  - Recurring unsolved shapes:
+    - `slwi r0` vs `r11` index temps in `in->m8[id]` loops;
+    - `cmpwi` before `li r3,4` in `c ? k : 4`;
+    - goal-pointer copies (`mr r28,r27`) removed by cse-skip-blocks;
+    - `mr r0,r3` before `cmpwi` on a call result.
+  - Usage: the 5 h window was 92% used at 21:36 and the weekly limit 77%. The fleet restarts at the 22:50 window reset.
+

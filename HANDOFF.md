@@ -12,13 +12,13 @@ The lead holds full decision authority (DECISIONS 2026-10-10). Never give the ow
 (anything under `tools/verify/**`, `.github/workflows/**`, `.claude/**`) are recorded once in
 DECISIONS "Open questions for owner"; then keep working.
 
-## Session 2 status (lead, updated 2026-10-12 20:15 CDT; this block overrides sections 1, 4 and 7 below)
+## Session 2 status (lead, updated 2026-10-12 21:40 CDT; this block overrides sections 1, 4 and 7 below)
 
-- main: **20,582 / 24,158 functions** (85.2%) at 6671eaec. Measure as in section 1.
+- main: **20,703 / 24,158 functions** (85.7%) at 30f8e596. Measure as in section 1.
 - Slots and agents: `tools/team/lead/state/assignments.txt` and `state/agents_session2.txt` (agent ids; the last block is the live fleet). Worker reports: `state/reports_session2.md`.
 - Assigning a slot: `LEAD_SCRATCH=<lead scratchpad, Windows path> END=HH:MM bash tools/team/lead/prep.sh W<n> p6 <NN>`. That runs assign.sh and writes the filled prompt to `$LEAD_SCRATCH/prompt_W<n>.md`. Then launch a Sonnet Agent that reads that prompt file. `END` sets the wall-clock deadline (default now + 150 min).
 - Templates: `worker_prompt_p4.md`, `worker_prompt_p5.md`, `worker_prompt_p6.md`.
-- Queue: p4 and p5 are fully assigned (all p5 batches worked once). **p6** is the sweep: every 0% function up to 0x800 in units that are not busy. Units of the p4 batches cut short at 16:00 come first. Batches are `queue/p6_NN.txt` in the order of `queue/p6_order.txt`. p6-00..03 are assigned. Regenerate with `gen_p6.py <report.json> --write` once the current p5/p6 units are free; it skips busy units and unassigned p5 batches.
+- Queue: p4 and p5 are fully assigned (all p5 batches worked once). **p6** is the sweep: every 0% function up to 0x800 in units that are not busy. Units of the p4 batches cut short at 16:00 come first. Batches are `queue/p6_NN.txt` in the order of `queue/p6_order.txt`. p6-00..06, 35, 40, 09 and 19 are assigned. The rest of p6_order.txt is ranked by the count of small functions (<= 0x200). Regenerate with `gen_p6.py <report.json> --write` once the current p5/p6 units are free; it skips busy units and unassigned p5 batches.
 - Pacing: workers run 50-90 min before their context fills (600-900k tokens), so short deadlines (`END`) waste little. The full fleet burns about 27-35% of a 5 h window per hour; the weekly limit (71% at 20:12) is the binding constraint. When the limit hits, every agent stops; resume with SendMessage to its agentId, or stash leftovers and prep.sh fresh.
 - Section 7 status:
   - item 3 (EXI split) is done;
