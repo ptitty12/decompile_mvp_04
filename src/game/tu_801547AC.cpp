@@ -337,6 +337,79 @@ inline void SetF(float* p, float v)
     *p = v;
 }
 
+extern float lbl_805C8500;
+extern float lbl_805C8504;
+extern float lbl_805C8510;
+extern const int lbl_8061BD88[];
+extern Unk80326F44_Out lbl_805EBA10;
+extern "C" Unk80326F44_Out* fn_8033ACE8();
+extern "C" void fn_803296AC();
+extern "C" void* fn_803285F4(void* p);
+extern "C" void fn_80328E50(void* t, int a, int b);
+int fn_80326DF0(Unk801527C8_Sub* s, int a);
+int fn_80326E64(Unk801527C8_Sub* s, int a);
+
+/* near-miss (97.7%): everything matches except the scheduling/registers of the 24-byte copy of lbl_805EBA10 into e (retail keeps
+   the lis for lbl_805EBA10 in r9 and addi r9,r9,lo in place, loads words 0,3,5,1,2,4; we use r11/r9 and a different load order).
+   Tried: key before e, e declared outside the block, pointer copy, const extern, copy before the m44 store. */
+int cScriptReplay::fn_cslot11(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80154EF4 */
+{
+    Unk801527C8_Actor* pa = ctx->mA4C;
+    int on = m4;
+    Unk801527C8_Actor* pb = ctx->mA54;
+    Unk801527C8_Sub* rec = &pa->m50;
+    if (on != 0) {
+        float cur = (float)*(unsigned*)&pa->m4C * 0.016666668f;
+        if (m8 != 0) {
+            if (pb->m44 != 1)
+                fn_803296AC();
+            pb->m44 = 1;
+            Unk80326F44_Out e = lbl_805EBA10;
+            int key = lbl_8061BD88[mC];
+            char* d = (char*)pb->m40;
+            Unk80326F44_Out* p7 = (Unk80326F44_Out*)(d + 0x3D48);
+            switch (key) {
+            case 0xC5:
+                e = *fn_8033ACE8();
+                break;
+            case 0xA7:
+                e = *p7;
+                break;
+            case 0xA8:
+                e = *(Unk80326F44_Out*)(d + 0x3D60);
+                break;
+            case 0xA9:
+                e = *(Unk80326F44_Out*)(d + 0x3D78);
+                break;
+            default:
+                e = rec->fn_80326F44(key, 1, -1.0f);
+                break;
+            }
+            int ok = 1;
+            if (e.m0 == 0xC7)
+                ok = 0;
+            if (ok != 0)
+                cur = e.m4;
+        }
+        cur += m10;
+        float lo = (float)fn_80326DF0(rec, 0) * 0.016666668f;
+        float hi = (float)fn_80326E64(rec, 0) * 0.016666668f;
+        if (!(cur >= lo))
+            cur = lo;
+        if (!(cur < hi))
+            cur = hi;
+        SetF(&pb->m4C, cur);
+        void* t = fn_803285F4(pa);
+        fn_80328E50(t, -1, 0);
+    } else {
+        if (pb->m44 != 0)
+            fn_803296AC();
+        pb->m44 = on;
+        SetF(&pb->m4C, (float)*(unsigned*)&pa->m4C * 0.016666668f + 0.5f);
+        SetF((float*)&pb->m50, 0.016666668f);
+    }
+}
+
 int cScriptReplay::fn_cslot12(Unk801527C8_Ctx* ctx, int a, float f1, float f2, float f3) /* 80155288 */
 {
     Unk801527C8_Actor* act = ctx->mA54;
