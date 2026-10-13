@@ -295,3 +295,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `fn_8056EC68`: explicit boolean-result form loses the retail CR4 lifetime; baseline 96.61% retains the two next-index/call scheduling slots. Scratch SW02/build/swarm22.
 - `fn_805706B8`: existing source casts the shared int-declared fn_8007189C to a float provider; canonical return-type repair is required before further matching. Baseline 99.54%; no new casts or aliases added.
+
+- `fe/tu_804439E4` `fn_804459D0` (swarm22, 2 forms): existing 96.18%; 81/82 words, aligned 7. False bit-test path reuses zero in r0 rather than retail explicit li; first virtual-table load/store scheduling also differs.
