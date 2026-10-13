@@ -179,6 +179,22 @@ extern "C" FE_OVERLAY void fn_804BB780(FeCam* c, int a, int b)
     }
 }
 
+/* near-miss: 98.5%; retail keeps the record index in r0 and the zero in r9, ours swaps the two */
+extern "C" FE_OVERLAY int fn_804BB8B4(FeCam* c, int n)
+{
+    for (int i = 0; i < n; i++) {
+        int k = c->mCB4;
+        FeCamRec* r = (FeCamRec*)((char*)c + k * 0x324 + 0x24);
+        r->cnt = 0;
+        for (int j = 0; j < 100; j++) {
+            r->p[j].a = lbl_805F7E18;
+            r->p[j].b = lbl_805F7E18;
+        }
+    }
+    c->rec[c->mCB4].cnt = n;
+    return c->mCB4++;
+}
+
 /* near-miss: retail forms the three base addresses with addi and reloads the count each time; 11 slots differ */
 extern "C" FE_OVERLAY int fn_804BB92C(FeCam* c, int i, float a, float b)
 {

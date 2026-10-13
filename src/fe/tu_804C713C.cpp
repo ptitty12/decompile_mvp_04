@@ -19,6 +19,108 @@ int fn_8007F7D0(Unk8007F198_B* b, unsigned i);
 int fn_8009047C(int a, int b);
 extern "C" void fn_80125154(void* w, int a);
 extern "C" int fn_804C7F30(FeScrN* x);
+struct FeV8 : Unk800C7B40_Data {
+    virtual ~FeV8();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(int a); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(); virtual void s29(); virtual void s30(); virtual void s31();
+    virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35(); virtual void s36();
+    virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40(); virtual void s41();
+    virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46();
+    virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50(); virtual void s51();
+    virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55(); virtual void s56();
+    virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60(); virtual void s61();
+    virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65(); virtual void s66();
+    virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70(); virtual void s71();
+    virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75(); virtual void s76();
+    virtual void s77(); virtual void s78(); virtual void s79(); virtual void s80(); virtual void s81();
+    virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85(); virtual void s86();
+    virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90(); virtual void s91();
+    virtual void s92(); virtual void s93(); virtual void s94(); virtual void s95(); virtual void s96();
+    virtual void s97(); virtual void s98(); virtual void s99(); virtual void s100(); virtual void s101();
+    virtual void s102(); virtual void s103(); virtual void s104(); virtual void s105(); virtual void s106();
+    virtual void s107(); virtual void s108(); virtual void s109(); virtual void s110(); virtual void s111();
+    virtual void s112(); virtual void s113(); virtual void s114(); virtual void s115(); virtual void s116();
+    virtual void s117(); virtual void s118(); virtual void s119(); virtual void s120(); virtual void s121();
+    virtual void s122(); virtual void s123(); virtual void s124(); virtual void s125(); virtual void s126();
+    virtual void s127();
+};
+struct FeV32 : Unk800C7B40_Data {
+    virtual ~FeV32();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(); virtual void s29(); virtual void s30(); virtual void s31();
+    virtual FeW* s32(const char* a, int b); virtual void s33(); virtual void s34(); virtual void s35();
+    virtual void s36(); virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40();
+    virtual void s41(); virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45();
+    virtual void s46(); virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50();
+    virtual void s51(); virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55();
+    virtual void s56(); virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60();
+    virtual void s61(); virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65();
+    virtual void s66(); virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70();
+    virtual void s71(); virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75();
+    virtual void s76(); virtual void s77(); virtual void s78(); virtual void s79(); virtual void s80();
+    virtual void s81(); virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85();
+    virtual void s86(); virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90();
+    virtual void s91(); virtual void s92(); virtual void s93(); virtual void s94(); virtual void s95();
+    virtual void s96(); virtual void s97(); virtual void s98(); virtual void s99(); virtual void s100();
+    virtual void s101(); virtual void s102(); virtual void s103(); virtual void s104(); virtual void s105();
+    virtual void s106(); virtual void s107(); virtual void s108(); virtual void s109(); virtual void s110();
+    virtual void s111(); virtual void s112(); virtual void s113(); virtual void s114(); virtual void s115();
+    virtual void s116(); virtual void s117(); virtual void s118(); virtual void s119(); virtual void s120();
+    virtual void s121(); virtual void s122(); virtual void s123(); virtual void s124(); virtual void s125();
+    virtual void s126(); virtual void s127();
+};
+struct FeV28 : Unk800C7B40_Data {
+    virtual ~FeV28();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(const char* a); virtual void s29(); virtual void s30();
+    virtual void s31(); virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35();
+    virtual void s36(); virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40();
+    virtual void s41(); virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45();
+    virtual void s46(); virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50();
+    virtual void s51(); virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55();
+    virtual void s56(); virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60();
+    virtual void s61(); virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65();
+    virtual void s66(); virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70();
+    virtual void s71(); virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75();
+    virtual void s76(); virtual void s77(); virtual void s78(); virtual void s79(); virtual void s80();
+    virtual void s81(); virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85();
+    virtual void s86(); virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90();
+    virtual void s91(); virtual void s92(); virtual void s93(); virtual void s94(); virtual void s95();
+    virtual void s96(); virtual void s97(); virtual void s98(); virtual void s99(); virtual void s100();
+    virtual void s101(); virtual void s102(); virtual void s103(); virtual void s104(); virtual void s105();
+    virtual void s106(); virtual void s107(); virtual void s108(); virtual void s109(); virtual void s110();
+    virtual void s111(); virtual void s112(); virtual void s113(); virtual void s114(); virtual void s115();
+    virtual void s116(); virtual void s117(); virtual void s118(); virtual void s119(); virtual void s120();
+    virtual void s121(); virtual void s122(); virtual void s123(); virtual void s124(); virtual void s125();
+    virtual void s126(); virtual void s127();
+};
+int fn_8008FD78(int a);
+int fn_8008FD14(int a);
+extern "C" float fn_80090380__FPv(int a, int b);
+extern "C" const char* fn_80090880__FP11Unk80090880(void* t, int id);
+extern "C" void fn_800C40B4(void* h, void* w, int a, int b);
+extern "C" int fn_800DE538__Fiiii(char* out, int a, int b, int c);
+inline char* DfW(char* o, int a, int b, float f)
+{
+    return fn_800DF254(o, a, b, f);
+}
+extern "C" void fn_80403DE4(char* dst, const char* fmt, ...);
+extern "C" void fn_804C8874(FeScrN* x, int i);
+extern const char lbl_805F55DC[];
+extern void* lbl_8061977C;
+extern "C" void* fn_800C8038(void* w);
 class FeVt18 {
 public:
     char pad0[0x18];
@@ -266,6 +368,32 @@ extern "C" FE_OVERLAY int fn_804C7F30(FeScrN* x)
         i = t;
     } while (i <= 9);
     return 0;
+}
+
+extern "C" FE_OVERLAY void fn_804C7FE4(FeScrN* x)
+{
+    int idx = fn_804C79E0(x);
+    int a = fn_8008FD78(idx);
+    int ioff = idx * 4;
+    char* ib = (char*)x + 0x178;
+    int item = *(int*)(ib + ioff);
+    ((FeV8*)x->m160)->s8(1);
+    if (item != 0) {
+        void* h = fn_800C33D0();
+        char wb[0x100];
+        char nb[0x320];
+        FeW* w = ((FeV32*)x->m160)->s32(lbl_805F55DC, 1);
+        fn_800C40B4(h, fn_800C8038(w), a, item);
+        fn_800DE538__Fiiii(nb, a, item, 1);
+        ((FeV28*)x->m164)->s28(nb);
+        ((FeV28*)x->m168)->s28(fn_80090880__FP11Unk80090880(lbl_8061977C, fn_8008FD14(a)));
+        int b = fn_8009047C(a, item);
+        float f = fn_80090380__FPv(a, item);
+        DfW(nb, 0, 3, f);
+        fn_80403DE4(wb, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x389D), b, nb);
+        ((FeV28*)x->m16C)->s28(wb);
+        fn_804C8874(x, idx);
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804C81A0(FeScrN* x)
