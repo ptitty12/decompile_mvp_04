@@ -195,7 +195,7 @@ struct FeTab2 {
     FeW* m94;
 };
 extern "C" void fn_80599BC8(int w, int a, int b);
-extern "C" double fn_8007824C(int v, int a);
+extern "C" float fn_8007824C(int v, int a);
 
 inline void FeSet(char* a, int i, int v)
 {
@@ -211,8 +211,8 @@ struct FeSideRec2 {
     FeW* mA4;
     FeW* mA8;
 };
-extern "C" unsigned fn_80599C40(int w, int a);
-extern "C" int fn_80599C50(int w, int a, int b);
+extern "C" int fn_80599C40(int w, int a);
+extern "C" int fn_80599C50(int w, int a, unsigned b);
 extern "C" int fn_80599C80(int w, int a);
 extern const char lbl_8066A248[];
 class FeSubK {
@@ -476,6 +476,40 @@ extern "C" FE_OVERLAY void fn_80516FEC(FeScrT* x)
     }
     fn_80131F34(p, x, fn_80528524, 0, b, 1, -1, 1, 0x26DE, 0, 0, 0, 0, 0);
     p->fn_vslot86();
+}
+
+extern "C" FE_OVERLAY void fn_805170C0(void* self, int w)
+{
+    int players[4];
+    int side = 0;
+    do {
+        int count = fn_80599C40(w, side);
+        int used = 0;
+        while (fn_80599C40(w, side) != 0) {
+            players[used++] = fn_80599C50(w, side, 0);
+            fn_80599BC8(w, side, 0);
+        }
+        int i = 0;
+        for (; i < count; ++i) {
+            for (int j = i + 1; j < count; ++j) {
+                if (!(fn_8007824C(players[j], 0) <= fn_8007824C(players[i], 0))) {
+                    int temp = players[i];
+                    players[i] = players[j];
+                    players[j] = temp;
+                }
+            }
+        }
+        if (count > 0) {
+            used = 0;
+            i = count;
+            do {
+                int player = players[used];
+                ++used;
+                fn_80599B94(w, side, player);
+            } while (--i != 0);
+        }
+        ++side;
+    } while (side <= 1);
 }
 
 extern "C" FE_OVERLAY FeScrN* fn_80517200(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
