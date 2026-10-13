@@ -184,6 +184,15 @@ int fn_8040ABA0();
 extern "C" int fn_80534078(char* o, int a, float f);
 extern "C" int fn_80534304(char* o, float f);
 extern const float lbl_805FF230;
+struct Db8054BCC8_E {
+    float w;
+    int used;
+};
+struct Db8054BCC8_S {
+    char pad0[0x14E5C];
+    Db8054BCC8_E e[15];
+};
+int fn_8054BCC8(Db8054BCC8_S* o);
 /* end Q18 decls */
 
 DB_OVERLAY int fn_805495DC(int a, int k)
@@ -346,6 +355,45 @@ DB_OVERLAY int fn_8054BBA0(char* b, int kind, int a)
     }
     }
     return v;
+}
+
+DB_OVERLAY int fn_8054BCC8(Db8054BCC8_S* o)
+{
+    int r = 1;
+    float rnd = fn_8056FFB0();
+    float acc = lbl_805FF230;
+    float d = fn_8054BB48((char*)o);
+    unsigned i;
+    for (i = 1; i <= 14; i++) {
+        if (o->e[i].used == 0) {
+            acc += o->e[i].w / d;
+            if (rnd < acc) {
+                o->e[i].used = 1;
+                r = i;
+                break;
+            }
+        }
+    }
+    if (i > 14) {
+        int j = 14;
+        char* b = (char*)o + 0x14E60;
+        if (*(int*)(b + 0x70) == 0) {
+            r = 14;
+            *(int*)(b + 0x70) = 1;
+        } else {
+        again:
+            j--;
+            if (j > 0) {
+                int off = j * 8;
+                char* b2 = (char*)o + 0x14E60;
+                if (*(int*)(b2 + off) != 0)
+                    goto again;
+                r = j;
+                *(int*)(b2 + off) = 1;
+            }
+        }
+    }
+    return r;
 }
 
 /* near-miss: retail reads the 4-byte fn_80329FA0 buffer straight from the frame (addi r3,r1,8); ours keeps &buf in a saved register */
