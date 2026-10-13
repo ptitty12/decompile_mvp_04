@@ -3,6 +3,14 @@
 
 #include "__card.h"
 
+extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern void fn_80432FA8(void* addr, u32 nBytes); /* DCInvalidateRange */
+extern void fn_8041A6C4(s32 chan, s32 result); /* fn_8041A6C4 */
+extern void fn_8041A6C8(s32 chan, s32 result); /* fn_8041A6C8 */
+extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
+
 #define TRUNC(n, a) (((u32)(n)) & ~((a)-1))
 
 // prototypes
@@ -18,7 +26,7 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
     ASSERTLINE(98, 0 <= fileInfo->chan && fileInfo->chan < 2);
     ASSERTLINE(99, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
 
-    result = __CARDGetControlBlock(fileInfo->chan, &card);
+    result = fn_8041B848(fileInfo->chan, &card);
     if (result < 0)
         return result;
 
@@ -26,7 +34,7 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
     ASSERTLINE(107, fileInfo->offset < card->cBlock * card->sectorSize);
 
     if (!CARDIsValidBlockNo(card, fileInfo->iBlock) || card->cBlock * card->sectorSize <= fileInfo->offset)
-        return __CARDPutControlBlock(card, CARD_RESULT_FATAL_ERROR);
+        return fn_8041B900(card, CARD_RESULT_FATAL_ERROR);
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];
@@ -34,7 +42,7 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
     ASSERTLINE(117, ent->gameName[0] != 0xff);
 
     if (ent->length * card->sectorSize <= offset || ent->length * card->sectorSize < offset + length)
-        return __CARDPutControlBlock(card, CARD_RESULT_LIMIT);
+        return fn_8041B900(card, CARD_RESULT_LIMIT);
 
     card->fileInfo = fileInfo;
     fileInfo->length = length;
@@ -42,7 +50,7 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
         fileInfo->offset = 0;
         fileInfo->iBlock = ent->startBlock;
         if (!CARDIsValidBlockNo(card, fileInfo->iBlock))
-            return __CARDPutControlBlock(card, CARD_RESULT_BROKEN);
+            return fn_8041B900(card, CARD_RESULT_BROKEN);
     }
 
     fat = __CARDGetFatBlock(card);
@@ -50,7 +58,7 @@ s32 __CARDSeek(CARDFileInfo* fileInfo, s32 length, s32 offset, CARDControl** pca
         fileInfo->offset += card->sectorSize;
         fileInfo->iBlock = fat[fileInfo->iBlock];
         if (!CARDIsValidBlockNo(card, fileInfo->iBlock))
-            return __CARDPutControlBlock(card, CARD_RESULT_BROKEN);
+            return fn_8041B900(card, CARD_RESULT_BROKEN);
     }
 
     fileInfo->offset = offset;
@@ -66,7 +74,7 @@ static void ReadCallback(s32 chan, s32 result) {
     CARDFileInfo* fileInfo;
     s32 length;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (result < 0)
         goto error;
 
@@ -103,7 +111,7 @@ static void ReadCallback(s32 chan, s32 result) {
 error:
     callback = card->apiCallback;
     card->apiCallback = NULL;
-    __CARDPutControlBlock(card, result);
+    fn_8041B900(card, result);
     ASSERTLINE(217, callback);
     callback(chan, result);
 }
@@ -129,47 +137,25 @@ s32 CARDReadAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CAR
     ent = &dir[fileInfo->fileNo];
     result = __CARDIsReadable(card, ent);
     if (result < 0)
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
 
-    DCInvalidateRange(buf, (u32)length);
-    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    fn_80432FA8(buf, (u32)length);
+    card->apiCallback = callback ? callback : fn_8041A6C4;
 
     offset = (s32)OFFSET(fileInfo->offset, card->sectorSize);
     length = (length < card->sectorSize - offset) ? length : card->sectorSize - offset;
     result = __CARDRead(fileInfo->chan, card->sectorSize * (u32)fileInfo->iBlock + offset, length, buf, ReadCallback);
     if (result < 0)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     return result;
 }
 
 s32 CARDRead(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
-    s32 result = CARDReadAsync(fileInfo, buf, length, offset, __CARDSyncCallback);
+    s32 result = CARDReadAsync(fileInfo, buf, length, offset, fn_8041A6C8);
     if (result < 0) {
         return result;
     }
 
-    return __CARDSync(fileInfo->chan);
+    return fn_8041BB38(fileInfo->chan);
 }
 
-s32 CARDCancel(CARDFileInfo* fileInfo) {
-    BOOL enabled;
-    s32 result;
-    CARDControl* card;
-
-    ASSERTLINE(338, 0 <= fileInfo->chan && fileInfo->chan < 2);
-    ASSERTLINE(339, 0 <= fileInfo->fileNo && fileInfo->fileNo < CARD_MAX_FILE);
-
-    enabled = OSDisableInterrupts();
-    
-    card = &__CARDBlock[fileInfo->chan];
-    result = CARD_RESULT_READY;
-    if (!card->attached)
-        result = CARD_RESULT_NOCARD;
-    else if (card->result == CARD_RESULT_BUSY && card->fileInfo == fileInfo) {
-        fileInfo->length = -1;
-        result = CARD_RESULT_CANCELED;
-    }
-
-    OSRestoreInterrupts(enabled);
-    return result;
-}

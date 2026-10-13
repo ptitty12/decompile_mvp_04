@@ -1771,6 +1771,7 @@ ealib/tu_803A0310.cpp:
 
 snd/cmn/saems.c:
 	.text       start:0x803A4214 end:0x803A6B64
+	.rodata     start:0x80609480 end:0x80609558
 
 snd/tu_803A6B64.cpp:
 	.text       start:0x803A6B64 end:0x803A6D80
@@ -2408,6 +2409,8 @@ dolphin/ar/arq.c:
 
 dolphin/ax/AX.c:
 	.text       start:0x80417798 end:0x8041783C
+	.data       start:0x8062F9F8 end:0x8062FA40
+	.sdata      start:0x806EF160 end:0x806EF168
 
 dolphin/ax/tu_8041783C.c:
 	.text       start:0x8041783C end:0x8041A5A4
@@ -2465,6 +2468,8 @@ dolphin/db/db.c:
 
 dolphin/dsp/dsp.c:
 	.text       start:0x80421C70 end:0x80421F00
+	.data       start:0x80633678 end:0x806336F8
+	.sdata      start:0x806EF190 end:0x806EF198
 
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x80421F00 end:0x80421F50
@@ -2518,6 +2523,8 @@ dolphin/gx/GXGeometry.c:
 
 dolphin/gx/GXFrameBuf.c:
 	.text       start:0x8042CB6C end:0x8042D84C
+	.data       start:0x806349B0 end:0x80635130
+	.sdata2     start:0x806F0D28 end:0x806F0D38
 
 dolphin/gx/tu_8042D84C.c:
 	.text       start:0x8042D84C end:0x8042DD30
@@ -2570,15 +2577,25 @@ dolphin/pad/Padclamp.c:
 
 dolphin/pad/Pad.c:
 	.text       start:0x80438A2C end:0x8043A374
+	.data       start:0x80648C38 end:0x80648C90
+	.bss        start:0x806DFE10 end:0x806DFE60
+	.sdata      start:0x806EF300 end:0x806EF320
 
 dolphin/si/SIBios.c:
 	.text       start:0x8043A374 end:0x8043BA64
+	.data       start:0x80648C90 end:0x80648CF8
+	.bss        start:0x806DFE60 end:0x806E0060
+	.sdata      start:0x806EF320 end:0x806EF324
 
 dolphin/si/SISamplingRate.c:
 	.text       start:0x8043BA64 end:0x8043BB6C
+	.data       start:0x80648DA8 end:0x80648E40
 
 dolphin/vi/vi.c:
 	.text       start:0x8043BB6C end:0x8043D960
+	.data       start:0x80648E40 end:0x80649224
+	.bss        start:0x806E0060 end:0x806E01A8
+	.sdata      start:0x806EF338 end:0x806EF348
 
 dolphin/vm/tu_8043D960.c:
 	.text       start:0x8043D960 end:0x8043E344
@@ -2589,6 +2606,7 @@ sdk/tu_8043E344.c:
 
 libsn/dummy.c:
 	.text       start:0x8043EDC4 end:0x8043EFA4
+	.data       start:0x80649290 end:0x80649294 align:4
 
 libc/tolower.c:
 	.text       start:0x8043EFA4 end:0x8043EFC0

@@ -3,6 +3,13 @@
 #include <dolphin/os.h>
 
 #include "__gx.h"
+#define GXNtsc480IntDf lbl_80634AA0
+#define GXNtsc480Int lbl_80634ADC
+#define GXNtsc480Prog lbl_80634B54
+#define GXMpal480IntDf lbl_80634CF8
+#define GXPal528IntDf lbl_80634E9C
+#define GXEurgb60Hz480IntDf lbl_80635040
+
 
 GXRenderModeObj GXNtsc240Ds = {
     1,
@@ -214,7 +221,7 @@ void GXSetCopyClamp(GXFBClamp clamp) {
     SET_REG_FIELD(1439, __GXData->cpTex, 1, 1, clmpB);
 }
 
-static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
+static inline u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     u32 count;
     u32 realHt;
     u32 iScaleD;
@@ -239,14 +246,6 @@ static u32 __GXGetNumXfbLines(u32 efbHt, u32 iScale) {
     }
 
     return realHt;
-}
-
-u16 GXGetNumXfbLines(u16 efbHeight, f32 yScale) {
-    u32 iScale;
-    ASSERTMSGLINE(1486, yScale >= 1.0f, "GXGetNumXfbLines: Vertical scale must be >= 1.0");
-
-    iScale = (u32)(256.0f / yScale) & 0x1FF;
-    return __GXGetNumXfbLines(efbHeight, iScale);
 }
 
 f32 GXGetYScaleFactor(u16 efbHeight, u16 xfbHeight) {
@@ -596,9 +595,4 @@ void GXClearBoundingBox(void) {
     __GXData->bpSentNot = 0;
 }
 
-void GXReadBoundingBox(u16* left, u16* top, u16* right, u16* bottom) {
-    *left = GX_GET_PE_REG(8);
-    *top = GX_GET_PE_REG(10);
-    *right = GX_GET_PE_REG(9);
-    *bottom = GX_GET_PE_REG(11);
-}
+

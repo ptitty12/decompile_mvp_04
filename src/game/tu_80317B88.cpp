@@ -981,3 +981,24 @@ void fn_8031B2A8(FxC* self, int i) {
         for (int j = 0; j < n; j++) self->aD8[j] = (&src->m4)[j];
     }
 }
+
+extern const float lbl_805E9FBC;
+inline FxVx Make80319F68(const FxVx& v) { FxVx r;r.x=v.x;r.y=v.y;r.z=v.z;r.w=v.w;return r; }
+inline FxVx Convert80319F68(const FxV3& v) { FxVx t;t.x=v.x;t.y=v.y;t.z=v.z;t.w=lbl_805E9FBC;return Make80319F68(t); }
+inline FxVx UV80319F68(const float& x,const float& y) { FxVx t;t.x=x;t.y=y;t.z=lbl_805E9FBC;t.w=lbl_805E9FBC;return Make80319F68(t); }
+extern "C" void fn_80319F68(FxB* self,int texture,FxVx* rect,const FxV3* a,const FxV3* b,const FxV3* c,const FxV3* d,const int* color) {
+ int rgba=*color;
+ if(self->mF4<self->mF0) {
+    rect->z+=rect->x;rect->w+=rect->y;
+    FxQb* q=(FxQb*)&self->mF8[self->mF4];
+    q->a8[0]=Convert80319F68(*a);
+    q->a8[1]=Convert80319F68(*b);
+    q->a8[2]=Convert80319F68(*c);
+    q->a8[3]=Convert80319F68(*d);
+    q->a48[0]=UV80319F68(rect->x,rect->y);
+    q->a48[1]=UV80319F68(rect->z,rect->y);
+    q->a48[2]=UV80319F68(rect->x,rect->w);
+    q->a48[3]=UV80319F68(rect->z,rect->w);
+    q->m0=texture;q->m4=rgba;q->m90=self->m28;self->mF4++;
+ }
+}

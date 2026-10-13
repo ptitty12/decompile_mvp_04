@@ -844,3 +844,27 @@ L2:
 done:
     return idx + q * 4;
 }
+
+extern const float lbl_805CE414,lbl_805CE418;
+extern const Unk80183918_Vec3 lbl_805D0064;
+inline Unk80183918_Vec3 Scale801991AC(const Unk80183918_Vec3& v,const float& s) {
+    Unk80183918_Vec3 r;r.m0=v.m0*s;r.m4=v.m4*s;r.m8=v.m8*s;return r;
+}
+inline Unk80183918_Vec3 Scaled801991AC(const Unk80183918_Vec3& v,float s) { return Scale801991AC(v,s); }
+inline Unk80198CC0_Vec4 Make801991AC(const Unk80183918_Vec3& v,float w) {
+    Unk80198CC0_Vec4 r;r.m[0]=v.m0;r.m[1]=v.m4;r.m[2]=v.m8;r.m[3]=w;return r;
+}
+inline Unk80198CC0_Vec4 Sum801991AC(const Unk80198CC0_Vec4& a,const Unk80198CC0_Vec4& b) {
+    Unk80198CC0_Vec4 r;r.m[0]=a.m[0]+b.m[0];r.m[1]=a.m[1]+b.m[1];r.m[2]=a.m[2]+b.m[2];r.m[3]=a.m[3]+b.m[3];return r;
+}
+inline Unk80198CC0_Vec4 Added801991AC(const Unk80198CC0_Vec4& a,const Unk80198CC0_Vec4& b) { return Sum801991AC(a,b); }
+inline void Add3_801991AC(Unk80183918_Vec3& v,const Unk80183918_Vec3& a) {
+ v.m0+=a.m0;v.m4+=a.m4;v.m8+=a.m8;
+}
+extern "C" void fn_801991AC(Unk80199928_O* self,Unk80198CC0_Vec4* a,Unk80198CC0_Vec4* b,Unk80198CC0_Vec4* c) {
+    Unk80198CC0_Vec4 offset=Make801991AC(Scaled801991AC(self->m3E4,lbl_805CE414),lbl_805CE418);
+    *a=Added801991AC(*a,offset);a->m[3]=lbl_805CE418;
+    *b=Added801991AC(*b,offset);b->m[3]=lbl_805CE418;
+    *c=Added801991AC(*c,offset);c->m[3]=lbl_805CE418;
+    Add3_801991AC(self->m3E4,lbl_805D0064);
+}

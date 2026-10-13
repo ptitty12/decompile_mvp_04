@@ -13,10 +13,16 @@ struct Unk803D7ED4Item;
 struct Unk803D7ED4Link {
     Unk803D7ED4Item* mNext;
 };
-struct Unk803D7ED4Item {
+struct Unk803D7ED4ItemData {
     char pad0[0x4];
     int m4;
     Unk803D7ED4Link* m8;
+};
+struct Unk803D7ED4Item : Unk803D7ED4ItemData {
+    virtual void fn_803D92D4();
+    virtual void fn_803D8640();
+    virtual void fn_803D9810(float*, float*);
+    virtual void cleanup(int);
 };
 
 class Unk803D7ED4Pool {
@@ -24,7 +30,6 @@ public:
     char pad0[0xC];
     Unk803D7ED4Item* mC;
     void fn_803D8080(Unk803D7ED4Item* item);
-    void fn_803D8094(Unk803D7ED4Item* item);
     Unk803D7ED4Item* fn_803D7F0C();
     void fn_803D7FD0(Unk803D7ED4Item* item);
     Unk803D7ED4Item* fn_803D7F74();
@@ -32,6 +37,7 @@ public:
 };
 Unk803D7ED4Item* fn_803D91F8(void* mem, Unk803D7ED4Pool* owner);
 Unk803D7ED4Item* fn_803E09B4(void* mem, Unk803D7ED4Pool* owner);
+extern "C" void fn_803D8094(Unk803D7ED4Pool* pool, Unk803D7ED4Item* item);
 
 extern int lbl_8062729C;
 extern int lbl_806272A0;
@@ -50,6 +56,27 @@ void Unk803D7ED4Pool::fn_803D8080(Unk803D7ED4Item* item)
 {
     item->m8->mNext = mC;
     mC = item;
+}
+
+extern "C" void fn_803D8094(Unk803D7ED4Pool* pool, Unk803D7ED4Item* item)
+{
+    Unk803D7ED4Item* current = pool->mC;
+    if (item == current) {
+        pool->mC = item->m8->mNext;
+        if (item) {
+            item->cleanup(3);
+        }
+    } else {
+        while (current && current->m8->mNext != item)
+            current = current->m8->mNext;
+        Unk803D7ED4Item* removed = current->m8->mNext;
+        current->m8->mNext = removed->m8->mNext;
+        if (removed) {
+            removed->cleanup(3);
+        }
+    }
+    if (lbl_806272A4 == (int)item)
+        lbl_806272A4 = 0;
 }
 
 int fn_803D817C()
@@ -106,7 +133,7 @@ Unk803D7ED4Item* Unk803D7ED4Pool::fn_803D7F74()
 
 void Unk803D7ED4Pool::fn_803D803C(Unk803D7ED4Item* item)
 {
-    fn_803D8094(item);
+    fn_803D8094(this, item);
     if (lbl_806272A0 == (int)item)
         lbl_806272A0 = 0;
 }
@@ -121,7 +148,7 @@ Unk803D7ED4Item* Unk803D7ED4Pool::fn_803D7F0C()
 
 void Unk803D7ED4Pool::fn_803D7FD0(Unk803D7ED4Item* item)
 {
-    fn_803D8094(item);
+    fn_803D8094(this, item);
     if (lbl_8062729C == (int)item) {
         Unk803D7ED4Item* p = mC;
         while (p && p->m4 != 0)

@@ -590,3 +590,33 @@ extern "C" void fn_8018405C(Unk80181140* o, void* x, void* y, int z)
     fn_80183FFC(o, 15, x, y, z);
 }
 
+
+extern const float lbl_805CD514,lbl_805CD518,lbl_805CD51C;
+struct Unk801812EC_Q {float x,y,z,w;};
+struct Unk801812EC_M {float m[16];};
+inline float Ref801812EC(const float& f) { return f; }
+extern "C" Unk801812EC_M fn_801812EC(const Unk801812EC_Q* q) {
+    Unk801812EC_M r;
+    float factor=lbl_805CD514;
+    float x2=q->x*Ref801812EC(factor),y2=q->y*Ref801812EC(factor),z2=q->z*Ref801812EC(factor);
+    float wx=q->w*Ref801812EC(x2),wy=q->w*Ref801812EC(y2),wz=q->w*Ref801812EC(z2);
+    float xx=q->x*Ref801812EC(x2),xy=q->x*Ref801812EC(y2),xz=q->x*Ref801812EC(z2);
+    float yy=q->y*Ref801812EC(y2),yz=q->y*Ref801812EC(z2),zz=q->z*Ref801812EC(z2);
+    r.m[0]=lbl_805CD518-(Ref801812EC(yy)+Ref801812EC(zz));
+    r.m[4]=Ref801812EC(xy)-Ref801812EC(wz);
+    r.m[8]=Ref801812EC(xz)+Ref801812EC(wy);
+    r.m[12]=lbl_805CD51C;
+    r.m[1]=Ref801812EC(xy)+Ref801812EC(wz);
+    r.m[5]=lbl_805CD518-(Ref801812EC(xx)+Ref801812EC(zz));
+    r.m[9]=Ref801812EC(yz)-Ref801812EC(wx);
+    r.m[13]=lbl_805CD51C;
+    r.m[2]=Ref801812EC(xz)-Ref801812EC(wy);
+    r.m[6]=Ref801812EC(yz)+Ref801812EC(wx);
+    r.m[10]=lbl_805CD518-(Ref801812EC(xx)+Ref801812EC(yy));
+    r.m[14]=lbl_805CD51C;
+    r.m[3]=lbl_805CD51C;
+    r.m[7]=lbl_805CD51C;
+    r.m[11]=lbl_805CD51C;
+    r.m[15]=lbl_805CD518;
+    return r;
+}

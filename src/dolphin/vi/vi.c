@@ -8,14 +8,55 @@
 #include <dolphin/hw_regs.h>
 
 #include "__gx.h"
-#include "__os.h"
 #include "__vi.h"
 
+/* Target relocations bind these SDK calls to existing exports. */
+void fn_80433814(OSContext*);
+void fn_8043364C(OSContext*);
+void fn_804383B8(OSThreadQueue*);
+void fn_80437434(OSThreadQueue*);
+void fn_804382CC(OSThreadQueue*);
+OSSram* fn_80436A9C(void);
+BOOL fn_80436E90(BOOL);
+void fn_80433CE8(const char*, int, const char*, ...);
+OSSram* __OSLockSram(void); /* real declaration retained only for source-level type checking */
+int __OSUnlockSram(BOOL);
+
+#define OSClearContext fn_80433814
+#define OSSetCurrentContext fn_8043364C
+#define OSWakeupThread fn_804383B8
+#define OSInitThreadQueue fn_80437434
+#define OSSleepThread fn_804382CC
+#define __OSLockSram fn_80436A9C
+#define __OSUnlockSram fn_80436E90
+#define OSPanic fn_80433CE8
+#define __VIVersion lbl_806EF338
+
+#define IsInitialized lbl_806EF8B8
+#define retraceCount lbl_806EF8BC
+#define flushFlag lbl_806EF8C0
+#define retraceQueue lbl_806EF8C4
+#define PreCB lbl_806EF8CC
+#define PostCB lbl_806EF8D0
+#define PositionCallback lbl_806EF8D4
+#define encoderType lbl_806EF8D8
+#define changeMode lbl_806EF8E0
+#define changed lbl_806EF8E8
+#define shdwChangeMode lbl_806EF8F0
+#define shdwChanged lbl_806EF8F8
+#define CurrTiming lbl_806EF900
+#define CurrTvMode CurrTvMode_806EF904
+#define NextBufAddr lbl_806EF908
+#define CurrBufAddr lbl_806EF90C
+#define FBSet lbl_806EF910
+#define timingExtra lbl_806EF914
+
 #ifdef DEBUG
-const char* __VIVersion = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
+char lbl_80648E40[] = "<< Dolphin SDK - VI\tdebug build: Apr  7 2004 03:55:59 (0x2301) >>";
 #else
-const char* __VIVersion = "<< Dolphin SDK - VI\trelease build: Apr  7 2004 04:13:59 (0x2301) >>";
+char lbl_80648E40[] = "<< Dolphin SDK - VI\trelease build: Apr  7 2004 04:13:59 (0x2301) >>";
 #endif
+const char* __VIVersion = lbl_80648E40;
 
 typedef struct {
     u8 equ;
@@ -77,26 +118,26 @@ typedef struct {
     VITiming* timing;
 } SomeVIStruct;
 
-static BOOL IsInitialized;
-static volatile u32 retraceCount;
+extern BOOL IsInitialized;
+extern volatile u32 retraceCount;
 
-static volatile u32 flushFlag;
-static OSThreadQueue retraceQueue;
-static void (*PreCB)(u32);
-static void (*PostCB)(u32);
-static void (*PositionCallback)(s16, s16);
-static u32 encoderType;
-static s16 displayOffsetH;
-static s16 displayOffsetV;
-static volatile u32 changeMode;
-static volatile u64 changed;
-static volatile u32 shdwChangeMode;
+extern volatile u32 flushFlag;
+extern OSThreadQueue retraceQueue;
+extern void (*PreCB)(u32);
+extern void (*PostCB)(u32);
+extern void (*PositionCallback)(s16, s16);
+extern u32 encoderType;
+extern s16 lbl_806EF8DC;
+extern s16 lbl_806EF8DE;
+extern volatile u32 changeMode;
+extern volatile u64 changed;
+extern volatile u32 shdwChangeMode;
 static volatile u16 regs[59];
-static volatile u64 shdwChanged;
-static VITiming* CurrTiming;
-static u32 CurrTvMode;
-static u32 NextBufAddr;
-static u32 CurrBufAddr;
+extern volatile u64 shdwChanged;
+extern VITiming* CurrTiming;
+extern u32 CurrTvMode;
+extern u32 NextBufAddr;
+extern u32 CurrBufAddr;
 static volatile u16 shdwRegs[59];
 
 #define MARK_CHANGED(index) (changed |= 1LL << (63 - (index)))
@@ -131,8 +172,8 @@ static u16 taps[25] = {
 };
 
 static SomeVIStruct HorVer;
-static u32 FBSet;
-static VITiming* timingExtra;
+extern u32 FBSet;
+extern VITiming* timingExtra;
 
 // prototypes
 static u32 getCurrentFieldEvenOdd(void);
@@ -146,11 +187,11 @@ int __VIGetLatch1Position(s16* px, s16* py);
 int __VIGetLatchPosition(u32 port, s16* px, s16* py);
 
 
-static u32 getEncoderType(void) {
+static inline u32 getEncoderType(void) {
     return 1;
 }
 
-static s32 cntlzd(u64 bit) {
+static inline s32 cntlzd(u64 bit) {
     u32 hi;
     u32 lo;
     s32 value;
@@ -164,7 +205,7 @@ static s32 cntlzd(u64 bit) {
     return __cntlzw(lo) + 32;
 }
 
-static int VISetRegs(void) {
+static inline int VISetRegs(void) {
     s32 regIndex;
 
     if (shdwChangeMode != 1 || getCurrentFieldEvenOdd() != 0) {
@@ -271,17 +312,6 @@ static void __VIRetraceHandler(__OSInterrupt unused, OSContext* context) {
     OSSetCurrentContext(context);
 }
 
-VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback cb) {
-    BOOL enabled;
-    VIRetraceCallback oldcb;
-
-    oldcb = PreCB;
-    enabled = OSDisableInterrupts();
-    PreCB = cb;
-    OSRestoreInterrupts(enabled);
-    return oldcb;
-}
-
 VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     BOOL enabled;
     VIRetraceCallback oldcb;
@@ -293,12 +323,7 @@ VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb) {
     return oldcb;
 }
 
-VITiming* __VISetExtraTiming(VITiming* t) {
-    VITiming* old = timingExtra;
 
-    timingExtra = t;
-    return old;
-}
 
 static VITiming* getTiming(VITVMode mode) {
     switch (mode) {
@@ -402,30 +427,30 @@ void __VIInit(VITVMode mode) {
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define CLAMP(val, min, max) ((val) > (max) ? (max) : (val) < (min) ? (min) : (val))
 
-static void AdjustPosition(u16 acv) {
+static inline void AdjustPosition(u16 acv) {
     s32 coeff;
     s32 frac;
 
-    HorVer.AdjustedDispPosX = CLAMP((s16)HorVer.DispPosX + displayOffsetH, 0, 0x2D0 - HorVer.DispSizeX);
+    HorVer.AdjustedDispPosX = CLAMP((s16)HorVer.DispPosX + lbl_806EF8DC, 0, 0x2D0 - HorVer.DispSizeX);
     coeff = (HorVer.FBMode == VI_XFBMODE_SF) ? 2 : 1;
     frac = HorVer.DispPosY & 1;
-    HorVer.AdjustedDispPosY = MAX((s16)HorVer.DispPosY + displayOffsetV, frac);
+    HorVer.AdjustedDispPosY = MAX((s16)HorVer.DispPosY + lbl_806EF8DE, frac);
     HorVer.AdjustedDispSizeY = HorVer.DispSizeY
-                             + MIN((s16)HorVer.DispPosY + displayOffsetV - frac, 0)
-                             - MAX((s16)HorVer.DispPosY + (s16)HorVer.DispSizeY + displayOffsetV - (((s16)acv * 2) - frac), 0);
+                             + MIN((s16)HorVer.DispPosY + lbl_806EF8DE - frac, 0)
+                             - MAX((s16)HorVer.DispPosY + (s16)HorVer.DispSizeY + lbl_806EF8DE - (((s16)acv * 2) - frac), 0);
     HorVer.AdjustedPanPosY = HorVer.PanPosY
-                           - (MIN((s16)HorVer.DispPosY + displayOffsetV - frac, 0) / coeff);
+                           - (MIN((s16)HorVer.DispPosY + lbl_806EF8DE - frac, 0) / coeff);
     HorVer.AdjustedPanSizeY = HorVer.PanSizeY
-                            + (MIN((s16)HorVer.DispPosY + displayOffsetV - frac, 0) / coeff)
-                            - (MAX((s16)HorVer.DispPosY + (s16)HorVer.DispSizeY + displayOffsetV - (((s16)acv * 2) - frac), 0) / coeff);
+                            + (MIN((s16)HorVer.DispPosY + lbl_806EF8DE - frac, 0) / coeff)
+                            - (MAX((s16)HorVer.DispPosY + (s16)HorVer.DispSizeY + lbl_806EF8DE - (((s16)acv * 2) - frac), 0) / coeff);
 }
 
-static void ImportAdjustingValues(void) {
+static inline void ImportAdjustingValues(void) {
     OSSram* sram = __OSLockSram();
 
     ASSERTLINE(1322, sram);
-    displayOffsetH = sram->displayOffsetH;
-    displayOffsetV = 0;
+    lbl_806EF8DC = sram->displayOffsetH;
+    lbl_806EF8DE = 0;
     __OSUnlockSram(0);
 }
 
@@ -537,7 +562,7 @@ void VIWaitForRetrace(void) {
     OSRestoreInterrupts(enabled);
 }
 
-static void setInterruptRegs(VITiming* tm) {
+static inline void setInterruptRegs(VITiming* tm) {
 #if DEBUG
     u16 vct, hct;
 #else
@@ -562,7 +587,7 @@ static void setInterruptRegs(VITiming* tm) {
     vct;  // fixes regalloc
 }
 
-static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSizeX, u8* wordPerLine, u8* std, u8* wpl, u8* xof) {
+static inline void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSizeX, u8* wordPerLine, u8* std, u8* wpl, u8* xof) {
     *wordPerLine = (fbSizeX + 15) / 16;
     *std = (xfbMode == VI_XFBMODE_SF) ? *wordPerLine : (u8)(*wordPerLine * 2);
     *xof = panPosX % 16;
@@ -571,7 +596,7 @@ static void setPicConfig(u16 fbSizeX, VIXFBMode xfbMode, u16 panPosX, u16 panSiz
     changed |= 0x8000000;
 }
 
-static void setBBIntervalRegs(VITiming* tm) {
+static inline void setBBIntervalRegs(VITiming* tm) {
     u16 val;
 
     val = tm->bs1 | (tm->be1 << 5);
@@ -591,7 +616,7 @@ static void setBBIntervalRegs(VITiming* tm) {
     changed |= (1LL << (63-12));
 }
 
-static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
+static inline void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
     u32 scale;
 
     panSizeX = threeD ? (panSizeX << 1) : panSizeX;
@@ -607,7 +632,7 @@ static void setScalingRegs(u16 panSizeX, u16 dispSizeX, BOOL threeD) {
     }
 }
 
-static void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine, VIXFBMode xfbMode, u16 dispPosY, u32* tfbb, u32* bfbb) {
+static inline void calcFbbs(u32 bufAddr, u16 panPosX, u16 panPosY, u8 wordPerLine, VIXFBMode xfbMode, u16 dispPosY, u32* tfbb, u32* bfbb) {
     u32 bytesPerLine;
     u32 xoffInWords;
     u32 tmp;
@@ -667,7 +692,7 @@ static void setFbbRegs(SomeVIStruct* HorVer, u32* tfbb, u32* bfbb, u32* rtfbb, u
     }
 }
 
-static void setHorizontalRegs(VITiming* tm, u16 dispPosX, u16 dispSizeX) {
+static inline void setHorizontalRegs(VITiming* tm, u16 dispPosX, u16 dispSizeX) {
     u32 hbe;
     u32 hbs;
     u32 hbeLo;
@@ -738,11 +763,11 @@ static void setVerticalRegs(u16 dispPosY, u16 dispSizeY, u8 equ, u16 acv, u16 pr
     MARK_CHANGED(8);
 }
 
-static void PrintDebugPalCaution(void) {
-    static u32 message;
+static inline void PrintDebugPalCaution(void) {
+    extern u32 message_806EF918;
 
-    if (message == 0) {
-        message = 1;
+    if (message_806EF918 == 0) {
+        message_806EF918 = 1;
         OSReport("***************************************\n");
         OSReport(" ! ! ! C A U T I O N ! ! !             \n");
         OSReport("This TV format \"DEBUG_PAL\" is only for \n");
@@ -889,39 +914,6 @@ void VIConfigure(const GXRenderModeObj* rm) {
     OSRestoreInterrupts(enabled);
 }
 
-void VIConfigurePan(u16 xOrg, u16 yOrg, u16 width, u16 height) {
-    BOOL enabled;
-    VITiming* tm;
-
-#if DEBUG
-    ASSERTMSGLINEV(2118, (xOrg & 1) == 0,
-        "VIConfigurePan(): Odd number(%d) is specified to xOrg\n",
-        xOrg);
-    if (HorVer.FBMode == VI_XFBMODE_DF) {
-        ASSERTMSGLINEV(2123, (height & 1) == 0,
-            "VIConfigurePan(): Odd number(%d) is specified to height when DF XFB mode\n",
-            height);
-    }
-#endif
-    enabled = OSDisableInterrupts();
-    HorVer.PanPosX   = xOrg;
-    HorVer.PanPosY   = yOrg;
-    HorVer.PanSizeX  = width;
-    HorVer.PanSizeY  = height;
-    HorVer.DispSizeY = (HorVer.nonInter == 2)           ? HorVer.PanSizeY :
-                       (HorVer.nonInter == 3)           ? HorVer.PanSizeY :
-                       (HorVer.FBMode == VI_XFBMODE_SF) ? (u16)(HorVer.PanSizeY * 2) :
-                                                          HorVer.PanSizeY;
-    tm = HorVer.timing;
-    AdjustPosition(tm->acv);
-    setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
-    setPicConfig(HorVer.FBSizeX, HorVer.FBMode, HorVer.PanPosX, HorVer.PanSizeX, &HorVer.wordPerLine, &HorVer.std, &HorVer.wpl, &HorVer.xof);
-    if (FBSet != 0) {
-        setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
-    }
-    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.DispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
-    OSRestoreInterrupts(enabled);
-}
 
 void VIFlush(void) {
     BOOL enabled;
@@ -956,26 +948,8 @@ void VISetNextFrameBuffer(void* fb) {
     OSRestoreInterrupts(enabled);
 }
 
-void* VIGetNextFrameBuffer(void) {
-    return *(void**)(&NextBufAddr);
-}
 
-void* VIGetCurrentFrameBuffer(void) {
-    return *(void**)(&CurrBufAddr);
-}
 
-void VISetNextRightFrameBuffer(void* fb) {
-    BOOL enabled;
-
-    ASSERTMSGLINEV(2284, ((u32)fb & 0x1F) == 0,
-        "VISetNextFrameBuffer(): Frame buffer address(0x%08x) is not 32byte aligned\n",
-        fb);
-    enabled = OSDisableInterrupts();
-    HorVer.rbufAddr = (u32)fb;
-    FBSet = 1;
-    setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
-    OSRestoreInterrupts(enabled);
-}
 
 void VISetBlack(BOOL black) {
     BOOL enabled;
@@ -988,23 +962,7 @@ void VISetBlack(BOOL black) {
     OSRestoreInterrupts(enabled);
 }
 
-void VISet3D(BOOL threeD) {
-    BOOL enabled;
-    u32 reg;
 
-    enabled = OSDisableInterrupts();
-    HorVer.threeD = threeD;
-    reg = regs[1];
-    OLD_SET_REG_FIELD(2355, reg, 1, 3, HorVer.threeD);
-    regs[1] = reg;
-    MARK_CHANGED(1);
-    setScalingRegs(HorVer.PanSizeX, HorVer.DispSizeX, HorVer.threeD);
-    OSRestoreInterrupts(enabled);
-}
-
-u32 VIGetRetraceCount(void) {
-    return retraceCount;
-}
 
 static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
     u32 hcount, vcount0, vcount;
@@ -1020,7 +978,7 @@ static void GetCurrentDisplayPosition(u32* hct, u32* vct) {
     *vct = vcount;
 }
 
-static u32 getCurrentHalfLine(void) {
+static inline u32 getCurrentHalfLine(void) {
     u32 hcount, vcount;
     GetCurrentDisplayPosition(&hcount, &vcount);
 
@@ -1088,21 +1046,6 @@ u32 VIGetTvFormat(void) {
     return format;
 }
 
-u32 VIGetScanMode(void) {
-    u32 scanMode;
-    BOOL enabled = OSDisableInterrupts();
-
-    if ((u32)(__VIRegs[54] & 1) == 1) {
-        scanMode = 2;
-    } else if (!((__VIRegs[1] & (1 << 2)) >> 2)) {
-        scanMode = 0;
-    } else {
-        scanMode = 1;
-    }
-    
-    OSRestoreInterrupts(enabled);
-    return scanMode;
-}
 
 u32 VIGetDTVStatus(void) {
     u32 dtvStatus;
@@ -1113,79 +1056,10 @@ u32 VIGetDTVStatus(void) {
     return dtvStatus & 1;
 }
 
-void __VISetAdjustingValues(s16 x, s16 y) {
-    BOOL enabled;
-    VITiming* tm;
 
-    ASSERTMSGLINE(2611, (y & 1) == 0, "__VISetAdjustValues(): y offset should be an even number");
-    enabled = OSDisableInterrupts();
-    displayOffsetH = x;
-    displayOffsetV = y;
-    tm = HorVer.timing;
-    AdjustPosition(tm->acv);
-    setHorizontalRegs(tm, HorVer.AdjustedDispPosX, HorVer.DispSizeX);
-    if (FBSet != 0) {
-        setFbbRegs(&HorVer, &HorVer.tfbb, &HorVer.bfbb, &HorVer.rtfbb, &HorVer.rbfbb);
-    }
-    setVerticalRegs(HorVer.AdjustedDispPosY, HorVer.AdjustedDispSizeY, tm->equ, tm->acv, tm->prbOdd, tm->prbEven, tm->psbOdd, tm->psbEven, HorVer.black);
-    OSRestoreInterrupts(enabled);
-}
-
-void __VIGetAdjustingValues(s16* x, s16* y) {
-    BOOL enabled;
-
-    enabled = OSDisableInterrupts();
-    *x = displayOffsetH;
-    *y = displayOffsetV;
-    OSRestoreInterrupts(enabled);
-}
 
 // DEBUG NONMATCHING - wrong reg use, equivalent
-void __VIEnableRawPositionInterrupt(s16 x, s16 y, void (*callback)(s16, s16)) {
-    BOOL enabled;
-    u32 halfLine;
-    u32 halfLineOff;
 
-    enabled = OSDisableInterrupts();
-    __VIRegs[29] = x + 1U;
-    __VIRegs[31] = x + 1U;
-
-    if (HorVer.nonInter == 0) {
-        if (y & 1) {
-            halfLineOff = CurrTiming->prbEven + ((CurrTiming->equ * 3) + CurrTiming->nhlines);
-            __VIRegs[30] = (((halfLineOff / 2) + (y / 2)) + 1) | 0x1000;
-        } else {
-            halfLineOff = CurrTiming->prbOdd + (CurrTiming->equ * 3);
-            __VIRegs[28] = (((halfLineOff / 2) + (y / 2)) + 1) | 0x1000;
-        }
-    } else if (HorVer.nonInter == 1) {
-        ASSERTLINE(2702, (y & 1) == 0);
-        halfLine = CurrTiming->prbOdd + ((CurrTiming->equ * 3)) + y;
-        __VIRegs[28] = ((halfLine / 2) + 1) | 0x1000;
-        __VIRegs[30] = (((halfLine + CurrTiming->nhlines) / 2) + 1) | 0x1000;
-    } else if (HorVer.nonInter == 2) {
-        halfLine = CurrTiming->prbOdd + ((CurrTiming->equ * 3)) + y;
-        __VIRegs[28] = (halfLine + 1) | 0x1000;
-        __VIRegs[30] = 0;
-    }
-
-    PositionCallback = callback;
-    OSRestoreInterrupts(enabled);
-}
-
-void (*__VIDisableRawPositionInterrupt())(s16, s16) {
-    BOOL enabled;
-    void (*old)(s16, s16);
-
-    enabled = OSDisableInterrupts();
-    __VIRegs[28] = 0;
-    __VIRegs[30] = 0;
-
-    old = PositionCallback;
-    PositionCallback = 0;
-    OSRestoreInterrupts(enabled);
-    return old;
-}
 
 void __VIDisplayPositionToXY(u32 hct, u32 vct, s16* x, s16* y) {
     u32 halfLine = ((vct - 1) << 1) + ((hct - 1) / CurrTiming->hlw);
@@ -1252,53 +1126,10 @@ void __VIGetCurrentPosition(s16* x, s16* y) {
     __VIDisplayPositionToXY(hcount, vcount, x, y);
 }
 
-void __VISetLatchMode(u32 mode) {
-    u32 reg;
 
-    reg = __VIRegs[1];
-    OLD_SET_REG_FIELD(2834, reg, 2, 4, mode);
-    OLD_SET_REG_FIELD(2835, reg, 2, 6, mode);
-    __VIRegs[1] = reg;
-}
 
-int __VIGetLatch0Position(s16* px, s16* py) {
-    u32 hcount;
-    u32 vcount;
 
-    if (((__VIRegs[32] & 0x8000) >> 15) != 0) {
-        vcount = __VIRegs[32] & 0x7FF;
-        hcount = __VIRegs[33] & 0x7FF;
-        __VIRegs[32] = 0;
-        __VIRegs[33] = 0;
-        __VIDisplayPositionToXY(hcount, vcount, px, py);
-        return 1;
-    }
 
-    *px = *py = -1;
-    return 0;
-}
 
-int __VIGetLatch1Position(s16* px, s16* py) {
-    u32 hcount;
-    u32 vcount;
 
-    if (((__VIRegs[34] & 0x8000) >> 15) != 0) {
-        vcount = __VIRegs[34] & 0x7FF;
-        hcount = __VIRegs[35] & 0x7FF;
-        __VIRegs[34] = 0;
-        __VIRegs[35] = 0;
-        __VIDisplayPositionToXY(hcount, vcount, px, py);
-        return 1;
-    }
 
-    *px = *py = -1;
-    return 0;
-}
-
-int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
-    if (port == 0) {
-        return __VIGetLatch0Position(px, py);
-    } else {
-        return __VIGetLatch1Position(px, py);
-    }
-}
