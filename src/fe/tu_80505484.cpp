@@ -97,6 +97,64 @@ extern "C" void fn_8040074C(void* p, int n);
 extern "C" void fn_805371C4(FeLstQ* l, unsigned f);
 extern "C" void fn_80537054(FeLstQ* l, int mode);
 extern "C" void fn_80539AE8(FeLstQ* l, int k);
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A440[];
+extern const char lbl_8064A3B8[];
+extern const char lbl_8065C1B0[];
+extern const char lbl_8064A330[];
+extern const char lbl_806683C0[];
+extern "C" void fn_8040074C(void* p, int n);
+struct FeAr {
+    int* m0;
+    int m4;
+    int m8;
+    int mC;
+    const void* vp;
+    int m14;
+};
+struct FeEl78 {
+    FeAr ar;
+    int buf[0x78];
+};
+struct FeElFA {
+    FeAr ar;
+    int buf[0xFA];
+};
+struct FeEl28 {
+    FeAr ar;
+    int buf[0x28];
+};
+struct FeElCB2 {
+    FeAr ar;
+    int buf[0xCB2];
+};
+struct FeBigS {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad40[0x130 - 0x40];
+    int m130;
+    char pad134[0x34C0 - 0x134];
+    FeEl78 g1[4][40];
+    FeElCB2 big;
+    FeElFA g2[4][10];
+    FeEl78 g3[4][26];
+    FeEl28 g4[4];
+};
+inline void FeArA(FeAr* a, int* buf, int cap)
+{
+    a->vp = lbl_8064B298;
+    a->m0 = buf;
+    a->m8 = cap;
+    fn_8040074C(a->m0, cap * 4);
+}
+inline void FeArB(FeAr* a)
+{
+    a->m4 = 0;
+    a->mC = 0;
+    a->vp = lbl_8064A550;
+    fn_8040074C(a->m0, a->m8 * 4);
+}
 /* Q16-DECL-END */
 
 extern "C" FeW* fn_800C8058(FeW* w);
@@ -142,6 +200,82 @@ extern "C" int fn_80507FB8(FeScrN* x);
 extern "C" int fn_80507FF4(void* self, int k);
 extern "C" int fn_805082B8(int c);
 extern "C" int fn_80508BF4(char* x, int a, int b);
+
+extern "C" FE_OVERLAY FeBigS* fn_80505484(FeBigS* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_800EC648(self, a, b, c, d, e, f, g, h);
+    self->m130 = 0;
+    self->m3C = lbl_806683C0;
+    FeEl78 (*g1)[40] = self->g1;
+    int i = 3;
+    do {
+        FeEl78* p = *g1;
+        int j = 39;
+        do {
+            FeArA(&p->ar, p->buf, 0x78);
+            FeArB(&p->ar);
+            p->ar.m4 = 0;
+            p->ar.vp = lbl_8064A440;
+            p->ar.mC = 0;
+            p->ar.m14 = 0;
+            p++;
+        } while (j-- != 0);
+        g1++;
+    } while (i-- != 0);
+    {
+        FeElCB2* p = &self->big;
+        FeArA(&p->ar, p->buf, 0xCB2);
+        FeArB(&p->ar);
+        p->ar.m4 = 0;
+        p->ar.vp = lbl_8064A3B8;
+        p->ar.mC = 0;
+        p->ar.m14 = 0;
+    }
+    FeElFA (*g2)[10] = self->g2;
+    i = 3;
+    do {
+        FeElFA* p = *g2;
+        int j = 9;
+        do {
+            FeArA(&p->ar, p->buf, 0xFA);
+            FeArB(&p->ar);
+            p->ar.m4 = 0;
+            p->ar.vp = lbl_8065C1B0;
+            p->ar.mC = 0;
+            p->ar.m14 = 0;
+            p++;
+        } while (j-- != 0);
+        g2++;
+    } while (i-- != 0);
+    FeEl78 (*g3)[26] = self->g3;
+    i = 3;
+    do {
+        FeEl78* p = *g3;
+        int j = 25;
+        do {
+            FeArA(&p->ar, p->buf, 0x78);
+            FeArB(&p->ar);
+            p->ar.m4 = 0;
+            p->ar.vp = lbl_8064A440;
+            p->ar.mC = 0;
+            p->ar.m14 = 0;
+            p++;
+        } while (j-- != 0);
+        g3++;
+    } while (i-- != 0);
+    FeEl28* p = self->g4;
+    int k = 3;
+    do {
+        FeArA(&p->ar, p->buf, 0x28);
+        FeArB(&p->ar);
+        p->ar.m4 = 0;
+        p->ar.vp = lbl_8064A330;
+        p->ar.mC = 0;
+        p->ar.m14 = 0;
+        p++;
+    } while (k-- != 0);
+    return self;
+}
 
 extern "C" FE_OVERLAY void fn_80505760(FeScrD* x)
 {
