@@ -308,3 +308,8 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `fn_80551A80`: two named-call/inline-getter forms retain the five r30/r31 swap words or worsen float spills (best 106/106; baseline 99.76%). Scratch SW02/build/swarm16.
 - `ealib/tu_803CECA4::fn_803D1E54`: four product-temporary forms; best101/101words retains seven float-load/product scheduling words (99.4% inherited). Restored; batch17.
 - `fe/tu_80520BE0::fn_80523960`: two early-return forms23vs21words; inherited21/21word form retains `mr.` versus retail `cmpwi` (96.9%). Restored; batch17.
+
+- fe/tu_80492680::fn_80494108 (99.59%): eight typed index/record/parameter forms retain three r11-versus-r0 allocation differences; scratch build/root-80494108.
+- fe/tu_80492680::fn_80493F20 (99.14%): eight byte/unsigned/accessor/condition forms leave the retail redundant byte extension absent or change allocation; scratch build/root-80493F20.
+
+- fe/tu_80492680::fn_80492BA8 (97.58%): eight provider-grounded float/layout/accessor forms leave eight widget/conversion register slots; corrected two-float output contract in scratch build/root-80492BA8, no source change promoted.
