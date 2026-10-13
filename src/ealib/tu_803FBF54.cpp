@@ -113,7 +113,7 @@ struct RcMapTab {
     int m2C;
 };
 
-extern "C" int fn_803FE418(int);
+extern "C" void fn_803FE418(int);
 extern "C" int fn_80400008(int);
 extern "C" void fn_80400CE4(int);
 extern "C" void fn_803FFFA8(int);
@@ -750,6 +750,88 @@ extern "C" int fn_803FDFB4(RcHnd* h, unsigned char* data, int len, int tag)
     if (was == 0)
         fn_803FD494(o, 0);
     return n->m0;
+}
+
+extern "C" void fn_803FCF1C(RcFile*, RcNd*);
+struct RcFileV {
+    char pad0[0x30];
+    char* m30;
+    int m34;
+    char* m38;
+    char* m3C;
+    char pad40[4];
+    int m44;
+    char pad48[0x10];
+    int m58;
+    char* m5C;
+    char* m60;
+    char pad64[4];
+    RcNd* m68;
+    RcNd* m6C;
+    RcNd* m70;
+};
+extern "C" void fn_803FE154(int, int);
+/* near-miss: 96.0%; retail reuses the reloaded handle (r3 / r8) across the loop bodies, ours reloads it from the stack in each body */
+extern "C" void fn_803FE418(int h)
+{
+    RcFileV* o;
+    RcHnd* p;
+    unsigned sz = 0;
+    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, &p) == 0) {
+        RcNd* nd = o->m70;
+        if (nd != 0) {
+            while ((unsigned)(nd->m4 - 1) <= 1) {
+                fn_803FE154(h, nd->m0);
+                nd = o->m70;
+            }
+            while (o->m68 != o->m6C)
+                fn_803FCF1C((RcFile*)o, o->m68);
+            o->m6C->m4 = 4;
+            int i;
+            for (i = 0; i < o->m34; i++)
+                RCI(o->m30, i * 0x10 + 8) = 0;
+            fn_803FCD4C((RcFile*)o, o->m58);
+            char* q = o->m5C;
+            if (q != o->m60) {
+                do {
+                    if ((((unsigned char)q[3] << 24) | ((unsigned char)q[2] << 16) | ((unsigned char)q[1] << 8) | (unsigned char)q[0]) == -1)
+                        q = o->m3C;
+                    else {
+                        char* t = q + 4;
+                        sz = (((unsigned char)t[3] << 24) | ((unsigned char)t[2] << 16) | ((unsigned char)t[1] << 8) | (unsigned char)q[4]) & 0xffffff;
+                        q[0] = -2;
+                        q[1] = -1;
+                        q[2] = -1;
+                        q[3] = -1;
+                        q[4] = sz;
+                        t[3] = sz >> 24;
+                        q += sz;
+                        t[1] = sz >> 8;
+                        t[2] = sz >> 16;
+                    }
+                } while (q != o->m60);
+            }
+            if (o->m44 == 2) {
+                if (q == o->m3C) {
+                    o->m60 = o->m38;
+                    o->m3C = o->m60;
+                } else {
+                    int pad = 0x20 - ((int)o->m60 & 0x1f);
+                    if (pad == 0x20)
+                        pad = 0;
+                    char* r = o->m60 - sz;
+                    sz += pad;
+                    char* t2 = r + 4;
+                    r[4] = sz;
+                    t2[3] = sz >> 24;
+                    t2[1] = sz >> 8;
+                    t2[2] = sz >> 16;
+                    o->m60 = o->m60 + pad;
+                }
+                o->m44 = 0;
+            }
+        }
+    }
 }
 
 /* near-miss: 2 slots; retail schedules slwi before the mr r4,r9 copy of the handle in the first loop test */
