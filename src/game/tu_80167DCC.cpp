@@ -722,3 +722,46 @@ void Unk8016ACAC::fn_8016BBF4(Unk8016D9A0_Rec* rec) /* 8016BBF4 */
     }
     fn_8016BCCC();
 }
+
+extern const float lbl_805CAD24;
+/* fn_8016B774 calls slot3 of the entry's callback (vptr +0). */
+class Unk8016B774_Callback {
+public:
+    virtual void fn_vslot1();
+    virtual void fn_vslot2();
+    virtual int fn_vslot3(Unk8016C1C4_List*, int, int, int, float);
+};
+inline int CurIdB774(Unk8016C1C4_List* list)
+{ return list->mCur >= 0 ? list->m4[list->mCur].m0 : 0; }
+extern "C" void fn_8016B774(Unk8016C1C4_List* self, int index, float step)
+{
+    int again = 1;
+    Unk8016C1C4_List* list = self + index;
+    while (again && CurIdB774(list)) {
+        Unk8016C1C4_Ent* entry = &list->m4[list->mCur];
+        int count = entry->m8++;
+        int first = entry->m10 == lbl_805CAD24;
+        float previous = entry->m10;
+        entry->m10 += step;
+        switch (((Unk8016B774_Callback*)entry->m4)->fn_vslot3(self, index, count, first, previous)) {
+        case 3:
+            entry->m10 = lbl_805CAD24;
+            self->fn_8016C424(index);
+            again = 0;
+            break;
+        case 0:
+            again = 0;
+            entry->m8--;
+            break;
+        case 1:
+            entry->m10 = lbl_805CAD24;
+            again = 1;
+            break;
+        case 2:
+            entry->m10 = lbl_805CAD24;
+            self->fn_8016C424(index);
+            again = 0;
+            break;
+        }
+    }
+}
