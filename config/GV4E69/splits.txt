@@ -2259,6 +2259,7 @@ libm/ef_acos.cpp:
 
 libm/ef_asin.cpp:
 	.text       start:0x80410ABC end:0x80410CE8
+	.sdata      start:0x806EEDE0 end:0x806EEE20 align:4
 
 libm/ef_atan2.cpp:
 	.text       start:0x80410CE8 end:0x80410F08
