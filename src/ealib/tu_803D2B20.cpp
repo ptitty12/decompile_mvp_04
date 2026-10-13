@@ -10,6 +10,8 @@
 
 struct Unk803D2B20Key {
     unsigned short m0;
+    Unk803D2B20Key(int v) : m0(v) {}
+    Unk803D2B20Key(const Unk803D2B20Key& other) : m0(other.m0) {}
 };
 
 extern "C" {
@@ -258,18 +260,18 @@ extern "C" void fn_803D3878(Unk803D2B20* self, int a, float x, float y)
 
 /* near-miss (4 instructions short): retail copies the key twice on the stack (0x18, 0x10) after the virtual
    call, passes &key and a result slot at 0x20(r1), and reads the result byte with lbz 0x20(r1). */
-extern "C" void fn_803D38B4(Unk803D2B20Obj* self, unsigned char flag)
+extern "C" void fn_803D38B4(Unk803D2B20Obj* self, int flag)
 {
     self->m12 = flag;
-    if (self->m13 == 0 && flag != 0) {
-        Unk803D2B20Key key;
-        key.m0 = 1;
+    if (self->m13 == 0 && self->m12 != 0) {
+        Unk803D2B20Key key(1);
         void* tbl = ((Unk803D2B20*)self)->v16();
         if (tbl) {
-            Unk803D2B20Key k2 = key;
+            Unk803D2B20Key k2(key);
+            Unk803D2B20Key k3(k2);
             int res;
-            if (fn_803D2D74(tbl, &k2, &res))
-                self->m13 = res;
+            if (fn_803D2D74(tbl, &k3, &res))
+                self->m13 = ((unsigned char*)&res)[0];
         }
     }
 }
@@ -361,18 +363,18 @@ extern "C" void fn_803D4934(Unk803D2B20* self, int a, float x, float y)
 }
 
 /* near-miss: same shape as fn_803D38B4 (twin class). */
-extern "C" void fn_803D4970(Unk803D2B20Obj* self, unsigned char flag)
+extern "C" void fn_803D4970(Unk803D2B20Obj* self, int flag)
 {
     self->m12 = flag;
-    if (self->m13 == 0 && flag != 0) {
-        Unk803D2B20Key key;
-        key.m0 = 1;
+    if (self->m13 == 0 && self->m12 != 0) {
+        Unk803D2B20Key key(1);
         void* tbl = ((Unk803D2B20*)self)->v16();
         if (tbl) {
-            Unk803D2B20Key k2 = key;
+            Unk803D2B20Key k2(key);
+            Unk803D2B20Key k3(k2);
             int res;
-            if (fn_803D2D74(tbl, &k2, &res))
-                self->m13 = res;
+            if (fn_803D2D74(tbl, &k3, &res))
+                self->m13 = ((unsigned char*)&res)[0];
         }
     }
 }
