@@ -234,3 +234,18 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
 - rmfn.py now parks into $QDIR or a temp dir (never the shared tools folder).
 - All slots idle 22:30; main 20,740. Restart cron 22:56.
 - 22:35 permute.py handles C++ (7dce9440; ~85% of near-misses set up, refuses ctors/methods/named-return). gen_nm.py wrote nm_01..nm_39 (580 fns >= 95%, closest-first in queue/nm_order.txt). Machine: 28 logical CPUs, 64 GB -> plan 7 nm workers (one permuter at -j 3 each) + 6 p6 workers at the 22:56 restart.
+
+## W4 nm-03 (00:01, 10 new: all 8 near-misses in its units -> 100% plus 2 bonus; merged 1150c561)
+- fe units tu_8047BB8C, tu_804A2AB4, tu_804654A0, tu_8049B0CC, tu_80459228 (+2), tu_804987EC, tu_804740A8 (+2), tu_8046C6F8.
+- Permuter: no help (candidates cheat: drop calls, move returns; refused fn_8049C524 parse). Suggest penalising lost `bl`/shorter code.
+- What worked: cc1plus -dg -dl lreg priorities (floor_log2(refs)*refs/life; duplicate `return r;` raises a pseudo); -fno-gcse A/B to find the rewriting pass; per-arm expressions change local-alloc creation order; per-arm stores instead of select-then-store; score_variants specs (~0.2 s/variant).
+
+## W6 nm-05 (00:1x, 7 new + 2 near-miss raises)
+- db units: fn_8052BD58, fn_8052DEE8, fn_8052DFDC, fn_8053352C, fn_8053384C, fn_8053217C (bonus), fn_8054EED4 -> 100; fn_80534C7C 98.4->99.8, fn_8053DB30 95.9->99.1.
+- Permuter: only truncation candidates (score rewards deleted code, not alignment-aware); slow under load; refuses <?/>? and methods; orphaned --splice helpers need tree kill.
+- Patterns: `unsigned j = i;` copy for indexed copy loop giv base; peeled first search iteration reads via `i = r` not literal 0; MIN/MAX `<?`/`>?` expand operand 1 first; struct-return outputs read as whole word then truncated; bitfield view for byte-aligned shifts (lwz+rlwinm, not lbz/lhz); float-returning callee via local extern "C" mangled decl. Unsolved: by-value Date frame stores (addressof CSE merges; fn_80530F0C, fn_805997C4).
+
+## 00:10 owner shutdown ("make a writeup ... and spin down")
+- All 12 running workers stopped (TaskStop); uncommitted leftovers stashed as "leftover <branch> (stopped 00:10 for owner shutdown)" in W5, W8, W9, W10, W11, W12. Orphaned permuter runs (W2, W3, W4 worktrees) killed by PID; the farm (idle priority, no tokens) left running.
+- Session crons deleted; scheduled task mvp-decomp-lead-resume DISABLED (re-enable to resume the 2:25 auto-restart). busy_units.txt emptied (no running slots), so the farm may now take any unit.
+- Committed branches integrated: nm-00, 01, 02, 04, 06, p6-14, 10, 26, 28, 07, 13 (see PROGRESS).
