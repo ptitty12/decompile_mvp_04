@@ -299,3 +299,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `fe/tu_804439E4` `fn_804459D0` (swarm22, 2 forms): existing 96.18%; 81/82 words, aligned 7. False bit-test path reuses zero in r0 rather than retail explicit li; first virtual-table load/store scheduling also differs.
 
 - `db/tu_805881E4` `fn_80588A3C` (swarm24, 2 forms): existing 95.69%; 130/130 words, best 30 register/schedule slots. Index-first setup fixes two words, but id/screen/predicate occupy r29/r31/r30 rather than retail r31/r30/r29.
+
+- `db/tu_805881E4` `fn_8058B048` (swarm27, 5 forms): scratch 144/144 words; held for shared ABI repair. Retail at 8058B1E0 consumes canonical BB28 return in f1, but game provider and member header still declare int; no new conflicting declaration retained.
