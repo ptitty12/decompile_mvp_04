@@ -401,9 +401,10 @@ extern "C" FE_OVERLAY void fn_80445EF4(FeScr2* self, int idx)
             fn_80444FE4(t);
         }
     }
-    for (; idx <= 0x22;) {
+    int j = idx;
+    for (; j <= 0x22;) {
         d.b = 0;
-        t = (FeTimer*)((FeObjP1*)self)->v89(idx++);
+        t = (FeTimer*)((FeObjP1*)self)->v89(j++);
         int w = *(int*)&d;
         t->m10 = -1;
         t->m14 = -1;
