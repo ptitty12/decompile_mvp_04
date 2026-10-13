@@ -270,10 +270,12 @@ extern "C" void fn_8001DEC0(Unk8001CE80* x)
     } else {
         Unk8001DEC0_Pl* p = (Unk8001DEC0_Pl*)x->m3B0;
         int idx;
-        if ((p && !(Unk8001DEC0_StOf(p)->m4 & 0x20000000) && Unk8001DEC0_StOf(p)->m44 != 2
-             && (idx = Unk8001DEC0_StOf(p)->m38) > 0 && idx <= 2)
-            || ((Unk8001DEC0_Pl*)x->m3B0 && (idx = ((Unk8001DEC0_Pl*)x->m3B0)->m5CC) != -1)) {
-            sp[idx] = p;
+        if (p) {
+            if ((!(Unk8001DEC0_StOf(p)->m4 & 0x20000000) && Unk8001DEC0_StOf(p)->m44 != 2
+                 && (idx = Unk8001DEC0_StOf(p)->m38) > 0 && idx <= 2)
+                || ((Unk8001DEC0_Pl*)x->m3B0 && (idx = ((Unk8001DEC0_Pl*)x->m3B0)->m5CC) != -1)) {
+                sp[idx] = p;
+            }
         }
         for (int i = 0; i < x->m100; i++) {
             Unk8001D974_Ent* e = &x->m70[i];
