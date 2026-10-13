@@ -1129,7 +1129,7 @@ config.libs = [
         "progress_category": "sdk",
         "objects": [
             Object(NonMatching, "libsn/tu_80403E80.c"),
-            Object(NonMatching, "libsn/FSasync.c"),
+            Object(Matching, "libsn/FSasync.c"),
             Object(NonMatching, "libsn/tu_80407604.c"),
             Object(NonMatching, "libsn/dummy.c"),
         ],

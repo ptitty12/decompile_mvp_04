@@ -2024,6 +2024,8 @@ libsn/tu_80403E80.c:
 
 libsn/FSasync.c:
 	.text       start:0x80406DCC end:0x80407604
+	.data       start:0x8062F1F0 end:0x8062F200 align:4
+	.bss        start:0x806C31E0 end:0x806C3220 align:32
 
 libsn/tu_80407604.c:
 	.text       start:0x80407604 end:0x80407C64
