@@ -598,19 +598,13 @@ extern "C" DB_OVERLAY int fn_8052DEE8(Unk8052DD58_Set* self, Unk8052DD58_Ent* sr
     return ret;
 }
 
-/* near-miss: loop and copy match; retail addresses the source entry as base+28 with negative
- * displacements, ours folds the base to the destination. */
 extern "C" DB_OVERLAY void fn_8052DFDC(Unk8052DD58_Set* self, unsigned i)
 {
     unsigned last = self->m0 - 1;
-    if (i < last) {
-        Unk8052DD58_Ent* s = &self->m4[i + 1];
-        for (; i < last; i++) {
-            s[-1] = s[0];
-            s++;
-        }
-    }
-    fn_8052DD58(&self->m4[i]);
+    unsigned j = i;
+    for (; j < last; j++)
+        self->m4[j] = self->m4[j + 1];
+    fn_8052DD58(&self->m4[j]);
     self->m0--;
 }
 
