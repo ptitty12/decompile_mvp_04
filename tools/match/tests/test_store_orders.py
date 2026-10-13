@@ -26,6 +26,16 @@ class StoreOrderTests(unittest.TestCase):
             with self.subTest(fn=fn, line=line, count=count), self.assertRaises(ValueError):
                 store_span(text, fn, line, count)
 
+    def test_accepts_float_literals_without_accepting_expressions(self):
+        for value in ('0.0f', '-1.0f', '.5', '1.', '1e-6f', '2.5E+3', '0xFFUL', '42U'):
+            with self.subTest(value=value):
+                text = 'void f() {\ns->m0 = ' + value + ';\ns->m4 = 0.0f;\n}'
+                _, _, rows = store_span(text, 'f', 2, 2)
+                self.assertIn(value, rows[0])
+        for value in ('1.0f + 2', 'float(1)', '1.2.3', '1e', '0x1p2'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                store_span('void f() {\ns->m0 = ' + value + ';\ns->m4 = 0;\n}', 'f', 2, 2)
+
 
 if __name__ == '__main__':
     unittest.main()

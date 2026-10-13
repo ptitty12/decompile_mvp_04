@@ -20,7 +20,8 @@ from pathlib import Path
 from cxx2c import base_name, definition_body
 from score_variants import ROOT
 
-STORE = re.compile(r"\s*(\w+)->(\w+)\s*=\s*(?:[A-Za-z_]\w*|-?(?:0[xX][\da-fA-F]+|\d+)[uUlL]*)\s*;\s*")
+NUMBER = r"-?(?:0[xX][\da-fA-F]+[uUlL]*|\d+[uUlL]*|(?:\d+\.\d*|\.\d+|\d+)(?:[eE][+-]?\d+)?[fFlL]?)"
+STORE = re.compile(r"\s*(\w+)->(\w+)\s*=\s*(?:[A-Za-z_]\w*|" + NUMBER + r")\s*;\s*")
 
 
 def store_span(text, function, line, count):
