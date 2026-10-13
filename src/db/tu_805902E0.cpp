@@ -566,6 +566,93 @@ extern "C" DB_OVERLAY float fn_8059139C(Db805909D4_S* self, int id)
     return t >= 0 ? self->m30[t] : 0.0f;
 }
 
+struct Db805913C0_Scr {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Db805913C0_G {
+    char pad0[0x28];
+    int m28;
+    char pad2C[0x84 - 0x2C];
+    int m84;
+};
+extern "C" int fn_8056B87C(int a);
+extern "C" void fn_805819EC(int a, int b);
+extern float lbl_806EF9B8;
+extern float lbl_806EF9BC;
+
+#define FAC(p) (*(float*)&(p)->mAC)
+/* near-miss: 96.8%, 271 vs 269 insns; retail shares one lis (r29) for every lbl_80619948 load and loads m28 after d, ours reloads the hi part once and schedules the m28 load earlier */
+extern "C" DB_OVERLAY void fn_805913C0(Db80590A4C_S* s, int force)
+{
+    float w;
+    float cur;
+    float d;
+    float k;
+    float x0;
+    float x1;
+    float x2;
+    if (fn_800B5758(fn_800B555C()) == 1 && fn_800A2E90(lbl_80619948) == 1) {
+        if (force != 0 || s->mA8 == 0 || (s->mA8 - fn_800A2AE8(lbl_80619948)) <= 0) {
+            Unk8007B2B0_Screen* scr = (Unk8007B2B0_Screen*)lbl_8061930C;
+            int sc = ((Db805913C0_Scr*)scr)->m2C;
+            int t = fn_8007F7D0((Unk8007F198_B*)scr, 0);
+            const float base = 0.0f;
+            w = base;
+            cur = scr->fn_80079E74(t);
+            int mg = ((Db805913C0_G*)lbl_80619948)->m28;
+            if (!(cur <= 45500000.0f))
+                w = cur - 45500000.0f;
+            k = base;
+            d = cur - s->mBC;
+            if (fn_800A2AE8(lbl_80619948) == fn_8056B87C(mg) && fn_80329FA0(((Db805913C0_G*)lbl_80619948)->m84).m2 == 0x7D5) {
+                x2 = w * 0.15f;
+                x1 = w * 0.25f;
+                x0 = w * 0.6f;
+                fn_80591B6C(s->m0, 3, 0);
+                fn_80591B6C(s->m0, 3, 1);
+                fn_80591B6C(s->m0, 3, 2);
+                fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x0);
+                fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+                fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x2);
+                FAC(s) = base;
+                s->mBC = cur;
+            } else if (d > 4000000.0f || !(d >= -4000000.0f)) {
+                if (!(d <= 0.0f))
+                    k = d * lbl_806EF9B8;
+                else
+                    k = d * lbl_806EF9BC;
+                if (s->mB4 == 0) {
+                    if (fn_800A2AE8(lbl_80619948) != fn_8056B87C(mg)) {
+                        fn_805819EC(sc, 0xA);
+                        s->mB4 = 1;
+                    }
+                }
+                FAC(s) = k * 0.14285715f;
+                x2 = FAC(s) * 0.6f;
+                x1 = FAC(s) * 0.25f;
+                x0 = FAC(s) * 0.15f;
+                s->mBC = cur;
+                fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x2);
+                fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+                fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x0);
+            } else {
+                FAC(s) = 0.0f;
+            }
+            s->mA8 = fn_800A2AE8(lbl_80619948) + 7;
+            s->mB0 = fn_800A2AE8(lbl_80619948);
+        } else if (FAC(s) != 0.0f && s->mB0 < fn_800A2AE8(lbl_80619948)) {
+            x2 = FAC(s) * 0.6f;
+            x1 = FAC(s) * 0.25f;
+            x0 = FAC(s) * 0.15f;
+            fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x2);
+            fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+            fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x0);
+            s->mB0 = fn_800A2AE8(lbl_80619948);
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_805919E8(Db805919E8_M* m, int x, int i, int k, float f)
 {
     if (k != 0) {
@@ -648,6 +735,50 @@ extern "C" DB_OVERLAY void fn_80591D3C(Db805919E8_M* m)
             m->t1[r][j] = 0.0f;
     fn_80591DEC(m);
     m->m12B78 = m->m12B7C;
+}
+
+extern "C" DB_OVERLAY void fn_80591DEC(Db805919E8_M* m)
+{
+    /* function-wide counters: their priority decides which loop of a nest gets the CTR bdnz */
+    int v0;
+    int v1;
+    for (v0 = 0; v0 < 13; v0++)
+        for (int j = 0; j < 16; j++)
+            m->t2[v0][j] = 0.0f;
+    for (v0 = 0; v0 < 4; v0++)
+        for (int j = 0; j < 16; j++)
+            m->t3[v0][j] = 0.0f;
+    for (v0 = 0; v0 < 84; v0++) {
+        for (v1 = 0; v1 < 4; v1++) {
+            for (int j = 0; j < 16; j++) {
+                m->a[v0].c[v1][j].m0 = 0.0f;
+                m->a[v0].c[v1][j].m4 = 0;
+                m->a[v0].c[v1][j].m8 = 0;
+            }
+        }
+        m->ra[v0].m0 = -1;
+        m->ra[v0].m8 = -1.0f;
+        m->ra[v0].mC = 0;
+        m->ra[v0].m4 = -1;
+    }
+    for (v0 = 0; v0 < 11; v0++) {
+        for (v1 = 0; v1 < 4; v1++) {
+            for (int j = 0; j < 16; j++) {
+                m->b[v0].c[v1][j].m0 = 0.0f;
+                m->b[v0].c[v1][j].m4 = 0;
+                m->b[v0].c[v1][j].m8 = 0;
+            }
+        }
+        m->rb[v0].m0 = -1;
+        m->rb[v0].m8 = -1.0f;
+        m->rb[v0].mC = 0;
+        m->rb[v0].m4 = -1;
+    }
+    m->m12B84 = 0;
+    m->m12B70 = -1;
+    m->m12B74 = -1;
+    m->m12B88 = -1;
+    m->m12B8C = -1;
 }
 
 extern "C" DB_OVERLAY void fn_80591FC8(Db805919E8_M* m)
@@ -965,6 +1096,29 @@ extern "C" DB_OVERLAY char* fn_805932E4(char* m, int a, int b, int c)
     if (fn_800A2EB4(lbl_80619948) == 0)
         return m + (c * 0x300 + 0x880) + a * 0xC0 + b * 0xC;
     return m + (c * 0x300 + 0x109C0) + a * 0xC0 + b * 0xC;
+}
+
+extern "C" DB_OVERLAY float fn_80593370(Db805919E8_M* m, int g)
+{
+    float s = 0.0f;
+    /* function-wide outer counter: gives the outer loop the CTR bdnz */
+    int x;
+    if (fn_800A2EB4(lbl_80619948) == 0) {
+        for (x = 0; x < 4; x++) {
+            for (int j = 0; j < 16; j++) {
+                int o = j * 0xC + x * 0xC0 + g * 0x300;
+                char* a = (char*)m + 0x888; char* b = (char*)m + 0x880; s += (float)*(int*)(a + o) * *(float*)(b + o);
+            }
+        }
+    } else {
+        for (x = 0; x < 4; x++) {
+            for (int j = 0; j < 16; j++) {
+                int o = j * 0xC + x * 0xC0 + g * 0x300;
+                char* a = (char*)m + 0x109C8; char* b = (char*)m + 0x109C0; s += (float)*(int*)(a + o) * *(float*)(b + o);
+            }
+        }
+    }
+    return s;
 }
 
 extern "C" DB_OVERLAY int fn_805934C0(Db805919E8_M* m, int key, int start, int flag)

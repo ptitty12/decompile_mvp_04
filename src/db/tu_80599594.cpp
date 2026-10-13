@@ -499,6 +499,89 @@ extern "C" DB_OVERLAY void fn_80599CA0(Db80599B54_Ent* self, int a, Unk80070DDC_
     io->v08(a, self, 2);
 }
 
+struct Db80599D30_T {
+    int sid;
+    int total;
+    int b;
+    int ab;
+    int cnt;
+    int ok;
+};
+extern "C" int fn_80075948__18Unk8007B2B0_Screeni(void* g, int a);
+extern "C" void fn_80078C04__18Unk8007A4DC_ScreeniPiN32(void* g, int a, int* o1, int* o2, int* o3, int* o4);
+extern "C" float fn_80079EFC__18Unk8007B2B0_Screeni(void* g, int a);
+extern "C" int fn_8007A270__18Unk8007A4DC_Screeni(void* g, int a);
+extern "C" float fn_8007A768__18Unk8007A4DC_Screenii(void* g, int a, int b);
+extern void* lbl_8061930C;
+
+/* near-miss: 4 of 190 insns differ; retail sets the zero for result before the argument copies and copies it into i (mr r30,r26), ours emits two li after the copies */
+extern "C" DB_OVERLAY int fn_80599D30(Db80599B54_Ent* ent, int skip)
+{
+    int result = 0;
+    void* scr = lbl_8061930C;
+    Db80599D30_T t[2];
+    int a, b, c, d;
+    unsigned i = 0;
+    unsigned k;
+    do {
+        int ok = 0;
+        k = 0;
+        int sid = fn_80075948__18Unk8007B2B0_Screeni(scr, fn_80599C80(ent, i));
+        fn_80078C04__18Unk8007A4DC_ScreeniPiN32(scr, sid, &a, &b, &c, &d);
+        while (k < fn_80599C40(ent, i)) {
+            if (fn_8007A270__18Unk8007A4DC_Screeni(scr, fn_80599C50(ent, i, (unsigned char)k)))
+                ok++;
+            k++;
+        }
+        t[i].sid = sid;
+        t[i].total = a + b + c + d;
+        t[i].b = b;
+        t[i].ab = a + b;
+        t[i].cnt = fn_80599C40(ent, i);
+        t[i].ok = ok;
+        if (t[i].cnt == 0)
+            result = i + 2;
+        i++;
+    } while (i <= 1);
+    if (result == 0 && t[1].cnt == 0 && t[0].cnt == 0)
+        result = 1;
+    for (i = 0; i <= 1; i++) {
+        if (result == 0) {
+            unsigned o = (i == 0);
+            int x = t[i].total + (t[o].cnt - t[i].cnt);
+            int y = t[o].ok - t[i].ok;
+            if ((unsigned)x > 100)
+                result = i + 4;
+            else if ((unsigned)(t[i].ab + y) > 60)
+                result = i + 10;
+        }
+    }
+    Db80599D30_T* p = t;
+    for (i = 0; i <= 1; i++) {
+        unsigned o = (i == 0);
+        if (result == 0 && skip == 0) {
+            k = 0;
+            float base = fn_80079EFC__18Unk8007B2B0_Screeni(scr, p->sid);
+            float s = base;
+            while (k < fn_80599C40(ent, i)) {
+                float f = fn_8007A768__18Unk8007A4DC_Screenii(scr, 5, fn_80599C50(ent, i, (unsigned char)k));
+                k++;
+                s = s + f;
+            }
+            k = 0;
+            while (k < fn_80599C40(ent, o)) {
+                float f = fn_8007A768__18Unk8007A4DC_Screenii(scr, 5, fn_80599C50(ent, o, (unsigned char)k));
+                k++;
+                s = s - f;
+            }
+            if (!(s >= 0.0f) && !(s > base))
+                result = i + 12;
+        }
+        p++;
+    }
+    return result;
+}
+
 //@8059A028
 extern "C" DB_OVERLAY Db8059A028_Cont* fn_8059A028(Db8059A028_Cont* self)
 {
