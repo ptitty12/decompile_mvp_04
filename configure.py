@@ -1243,7 +1243,7 @@ config.libs = [
             Object(Matching, "libm/k_rem_pio2.cpp"),
             Object(Matching, "libm/kf_rem_pio2.cpp"),
             Object(Matching, "libm/s_scalbn.cpp"),
-            Object(NonMatching, "libm/sf_scalbn.cpp"),
+            Object(Matching, "libm/sf_scalbn.cpp"),
             Object(Matching, "libm/s_copysign.cpp"),
             Object(Matching, "libm/sf_copysign.cpp"),
         ],

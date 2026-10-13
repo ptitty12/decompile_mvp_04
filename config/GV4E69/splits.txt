@@ -2339,6 +2339,7 @@ libm/s_scalbn.cpp:
 
 libm/sf_scalbn.cpp:
 	.text       start:0x804136D8 end:0x804137F4
+	.sdata      start:0x806EF138 end:0x806EF148 align:4
 
 libm/s_copysign.cpp:
 	.text       start:0x804137F4 end:0x80413844
