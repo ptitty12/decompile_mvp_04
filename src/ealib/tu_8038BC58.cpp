@@ -153,27 +153,27 @@ struct GXTexSize {
     unsigned h;
 };
 extern "C" {
-void fn_8042EFA4(int id, int s, int t);
-void fn_8042E24C(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
-void fn_8042E61C(void* tlut, int id);
-void fn_8042E590(void* obj, int id);
-void fn_8042F4C4(int id, GXColor c);
-void fn_8042F628(int id, int a, int b, int c, int d);
-void fn_8042BF50(int n);
-void fn_8042BCD0(int a, int b, int c, int d, int e, int f);
-void fn_8042EE2C(int id, float* m, int scale);
-void fn_8042F1D4(int n);
-void fn_8042F0E8(int a, int b, int c);
-void fn_8042EDC0(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
-void fn_8042F914(int n);
-void fn_8042F778(int a, int b, int c, int d);
-void fn_8042F240(int n);
-void fn_8042F3F4(int a, int b, int c, int d, int e, int f);
-void fn_8042F36C(int a, int b, int c, int d, int e);
-void fn_8042F45C(int a, int b, int c, int d, int e, int f);
-void fn_8042F3B0(int a, int b, int c, int d, int e);
-void fn_8042F5E0(int a, int b, int c);
-void fn_8042F528(int a, int b);
+void GXSetIndTexCoordScale(int id, int s, int t);
+void GXInitTexObjLOD(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
+void GXLoadTlut(void* tlut, int id);
+void GXLoadTexObj(void* obj, int id);
+void GXSetTevKColor(int id, GXColor c);
+void GXSetTevSwapModeTable(int id, int a, int b, int c, int d);
+void GXSetNumTexGens(int n);
+void GXSetTexCoordGen2(int a, int b, int c, int d, int e, int f);
+void GXSetIndTexMtx(int id, float* m, int scale);
+void GXSetNumIndStages(int n);
+void GXSetIndTexOrder(int a, int b, int c);
+void GXSetTevIndirect(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+void GXSetNumTevStages(int n);
+void GXSetTevOrder(int a, int b, int c, int d);
+void GXSetTevIndRepeat(int n);
+void GXSetTevColorOp(int a, int b, int c, int d, int e, int f);
+void GXSetTevColorIn(int a, int b, int c, int d, int e);
+void GXSetTevAlphaOp(int a, int b, int c, int d, int e, int f);
+void GXSetTevAlphaIn(int a, int b, int c, int d, int e);
+void GXSetTevSwapMode(int a, int b, int c);
+void GXSetTevKColorSel(int a, int b);
 }
 #define F0 0.0f
 #define K 0.0625f
@@ -189,86 +189,86 @@ extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
     GXTexSize* p1 = (GXTexSize*)s->m604;
     char* p0 = (char*)s->m600;
     float m[6];
-    fn_8042EFA4(0, 0, 0);
-    fn_8042EFA4(1, 0, 0);
-    fn_8042EFA4(2, 0, 0);
-    fn_8042EFA4(3, 0, 0);
-    fn_8042E24C(t3, 0, 0, F0, F0, F0, 0, 0, 0);
-    fn_8042E24C(t2, 0, 0, F0, F0, F0, 0, 0, 0);
-    fn_8042E24C(t1, 0, 0, F0, F0, F0, 0, 0, 0);
-    fn_8042E61C((char*)s + 0x620, 0);
-    fn_8042E61C((char*)s + 0x614, 1);
-    fn_8042E61C((char*)s + 0x608, 2);
-    fn_8042E590(t3, 0);
-    fn_8042E590(t2, 1);
-    fn_8042E590(t1, 2);
-    fn_8042E590((char*)p1 + 0x14, 3);
-    fn_8042E590((char*)p1 + 0x40, 4);
-    fn_8042E590(p0 + 0x14, 5);
-    fn_8042E590(p0 + 0x40, 6);
+    GXSetIndTexCoordScale(0, 0, 0);
+    GXSetIndTexCoordScale(1, 0, 0);
+    GXSetIndTexCoordScale(2, 0, 0);
+    GXSetIndTexCoordScale(3, 0, 0);
+    GXInitTexObjLOD(t3, 0, 0, F0, F0, F0, 0, 0, 0);
+    GXInitTexObjLOD(t2, 0, 0, F0, F0, F0, 0, 0, 0);
+    GXInitTexObjLOD(t1, 0, 0, F0, F0, F0, 0, 0, 0);
+    GXLoadTlut((char*)s + 0x620, 0);
+    GXLoadTlut((char*)s + 0x614, 1);
+    GXLoadTlut((char*)s + 0x608, 2);
+    GXLoadTexObj(t3, 0);
+    GXLoadTexObj(t2, 1);
+    GXLoadTexObj(t1, 2);
+    GXLoadTexObj((char*)p1 + 0x14, 3);
+    GXLoadTexObj((char*)p1 + 0x40, 4);
+    GXLoadTexObj(p0 + 0x14, 5);
+    GXLoadTexObj(p0 + 0x40, 6);
     kt = ca;
-    fn_8042F4C4(0, kt);
+    GXSetTevKColor(0, kt);
     kt = cb;
-    fn_8042F4C4(1, kt);
-    fn_8042F628(1, 3, 0, 0, 0);
-    fn_8042F628(2, 1, 3, 1, 1);
-    fn_8042BF50(2);
-    fn_8042BCD0(0, 1, 0xc, 0x3c, 0, 0x7d);
-    fn_8042BCD0(1, 1, 0xc, 0x3c, 0, 0x7d);
+    GXSetTevKColor(1, kt);
+    GXSetTevSwapModeTable(1, 3, 0, 0, 0);
+    GXSetTevSwapModeTable(2, 1, 3, 1, 1);
+    GXSetNumTexGens(2);
+    GXSetTexCoordGen2(0, 1, 0xc, 0x3c, 0, 0x7d);
+    GXSetTexCoordGen2(1, 1, 0xc, 0x3c, 0, 0x7d);
     m[0] = (float)(unsigned)p1->w * K;
     m[1] = F0;
     m[4] = (float)(unsigned)p1->h * K;
     m[3] = F0;
     m[2] = F0;
     m[5] = F0;
-    fn_8042EE2C(1, m, 4);
+    GXSetIndTexMtx(1, m, 4);
     m[0] = K;
     m[4] = K;
     m[1] = F0;
     m[3] = F0;
     m[2] = F0;
     m[5] = F0;
-    fn_8042EE2C(2, m, 4);
-    fn_8042F1D4(4);
-    fn_8042F0E8(0, 0, 3);
-    fn_8042EDC0(0, 0, 0, 0, 1, 6, 6, 0, 0, 0);
-    fn_8042F0E8(1, 0, 4);
-    fn_8042EDC0(1, 1, 0, 2, 2, 6, 0, 1, 0, 0);
-    fn_8042F0E8(2, 1, 5);
-    fn_8042EDC0(3, 2, 0, 0, 1, 6, 6, 0, 0, 0);
-    fn_8042F0E8(3, 1, 6);
-    fn_8042EDC0(4, 3, 0, 2, 2, 6, 0, 1, 0, 0);
-    fn_8042F914(5);
-    fn_8042F778(0, 0, 0, 0xff);
-    fn_8042F778(1, 0, 0, 0xff);
-    fn_8042F240(2);
-    fn_8042F778(2, 0, 1, 0xff);
-    fn_8042F778(3, 1, 2, 0xff);
-    fn_8042F778(4, 1, 2, 0xff);
-    fn_8042F3F4(0, 0, 0, 0, 1, 0);
-    fn_8042F36C(0, 0xf, 0xf, 0xf, 0xf);
-    fn_8042F45C(0, 0, 0, 0, 1, 0);
-    fn_8042F3B0(0, 7, 7, 7, 7);
-    fn_8042F3F4(1, 0, 0, 0, 1, 0);
-    fn_8042F36C(1, 0xf, 8, 0xe, 0xf);
-    fn_8042F45C(1, 0, 0, 0, 1, 0);
-    fn_8042F3B0(1, 7, 7, 7, 7);
-    fn_8042F5E0(1, 1, 2);
-    fn_8042F528(1, 0xd);
-    fn_8042F3F4(2, 0, 2, 1, 0, 0);
-    fn_8042F36C(2, 0xf, 8, 0xe, 0);
-    fn_8042F45C(2, 0, 0, 0, 1, 0);
-    fn_8042F3B0(2, 7, 7, 7, 7);
-    fn_8042F5E0(2, 1, 1);
-    fn_8042F528(2, 0xc);
-    fn_8042F3F4(3, 0, 0, 0, 0, 0);
-    fn_8042F36C(3, 0xf, 0xf, 0xf, 0);
-    fn_8042F45C(3, 0, 0, 0, 1, 0);
-    fn_8042F3B0(3, 7, 7, 7, 7);
-    fn_8042F3F4(4, 0, 0, 0, 1, 0);
-    fn_8042F36C(4, 8, 0xf, 0xf, 0);
-    fn_8042F45C(4, 0, 0, 0, 1, 0);
-    fn_8042F3B0(4, 7, 7, 7, 4);
+    GXSetIndTexMtx(2, m, 4);
+    GXSetNumIndStages(4);
+    GXSetIndTexOrder(0, 0, 3);
+    GXSetTevIndirect(0, 0, 0, 0, 1, 6, 6, 0, 0, 0);
+    GXSetIndTexOrder(1, 0, 4);
+    GXSetTevIndirect(1, 1, 0, 2, 2, 6, 0, 1, 0, 0);
+    GXSetIndTexOrder(2, 1, 5);
+    GXSetTevIndirect(3, 2, 0, 0, 1, 6, 6, 0, 0, 0);
+    GXSetIndTexOrder(3, 1, 6);
+    GXSetTevIndirect(4, 3, 0, 2, 2, 6, 0, 1, 0, 0);
+    GXSetNumTevStages(5);
+    GXSetTevOrder(0, 0, 0, 0xff);
+    GXSetTevOrder(1, 0, 0, 0xff);
+    GXSetTevIndRepeat(2);
+    GXSetTevOrder(2, 0, 1, 0xff);
+    GXSetTevOrder(3, 1, 2, 0xff);
+    GXSetTevOrder(4, 1, 2, 0xff);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevColorIn(0, 0xf, 0xf, 0xf, 0xf);
+    GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(0, 7, 7, 7, 7);
+    GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+    GXSetTevColorIn(1, 0xf, 8, 0xe, 0xf);
+    GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(1, 7, 7, 7, 7);
+    GXSetTevSwapMode(1, 1, 2);
+    GXSetTevKColorSel(1, 0xd);
+    GXSetTevColorOp(2, 0, 2, 1, 0, 0);
+    GXSetTevColorIn(2, 0xf, 8, 0xe, 0);
+    GXSetTevAlphaOp(2, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(2, 7, 7, 7, 7);
+    GXSetTevSwapMode(2, 1, 1);
+    GXSetTevKColorSel(2, 0xc);
+    GXSetTevColorOp(3, 0, 0, 0, 0, 0);
+    GXSetTevColorIn(3, 0xf, 0xf, 0xf, 0);
+    GXSetTevAlphaOp(3, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(3, 7, 7, 7, 7);
+    GXSetTevColorOp(4, 0, 0, 0, 1, 0);
+    GXSetTevColorIn(4, 8, 0xf, 0xf, 0);
+    GXSetTevAlphaOp(4, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(4, 7, 7, 7, 4);
 }
 
 extern "C" void fn_8038D02C(VdTile* t, unsigned a, unsigned b, unsigned c, unsigned d)
@@ -306,6 +306,26 @@ extern "C" void fn_8038D110(char* o)
     lbl_80699B94.m4(o);
 }
 
+/* Swizzled-texture record built by fn_8038D170: block size m0/m4, size m8/mC, two swizzle maps (m10, m3C) with GX texture objects at +0x14 and +0x40. */
+struct VdSwz {
+    int m0;
+    int m4;
+    unsigned m8;
+    unsigned mC;
+    unsigned char* m10;
+    char pad14[0x34 - 0x14];
+    unsigned m34;
+    unsigned m38;
+    unsigned char* m3C;
+    char pad40[0x60 - 0x40];
+};
+extern "C" unsigned GXGetTexObjWidth(int tex);
+extern "C" unsigned GXGetTexObjHeight(int tex);
+extern "C" int GXGetTexObjFmt(int tex);
+extern "C" void GXInitTexObj(void* obj, void* img, int w, int h, int fmt, int ws, int wt, int mip);
+extern "C" void GXInitTexObjLOD(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
+extern char lbl_80605F5C[];
+
 struct VdM2 {
     char pad0[0x64];
     int m64;
@@ -313,6 +333,76 @@ struct VdM2 {
     VdA m7C[2];
 };
 extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+extern "C" int fn_8038D170(int tex)
+{
+    unsigned bw = 0;
+    unsigned bh = 0;
+    unsigned w = GXGetTexObjWidth(tex);
+    unsigned h = GXGetTexObjHeight(tex);
+    switch (GXGetTexObjFmt(tex)) {
+    case 0:
+    case 8:
+        bw = 8;
+        bh = 8;
+        break;
+    case 1:
+    case 2:
+    case 9:
+        bw = 8;
+        bh = 4;
+        break;
+    case 3:
+    case 4:
+    case 5:
+        bw = 4;
+        bh = 4;
+        break;
+    }
+    VdTile t;
+    int sp[2];
+    fn_8038D02C(&t, bw, bh, w, h);
+    unsigned y = 0;
+    const char* nm = lbl_80605F5C;
+    VdSwz* p = (VdSwz*)lbl_80699B94.m0(nm, 0x60, 0, 0, lbl_80699B94.m8);
+    p->m0 = bw;
+    p->m4 = bh;
+    p->m8 = w;
+    p->mC = bh;
+    unsigned sz = w * bh * 2;
+    p->m10 = (unsigned char*)lbl_80699B94.m0(nm, sz, 0x20, 0, lbl_80699B94.m8);
+    p->m34 = w;
+    p->m38 = bh;
+    p->m3C = (unsigned char*)lbl_80699B94.m0(nm, sz, 0x20, 0, lbl_80699B94.m8);
+    for (; y < p->mC; y++) {
+        for (unsigned x = 0; x < p->m8; x++) {
+            fn_8038D068(sp, x, y, &t);
+            int idx = fn_8038D0E0(x, y, p->m34);
+            idx = idx / 2 * 2;
+            unsigned char* q = p->m10 + idx;
+            q[0] = (unsigned)sp[0] / bw;
+            q[1] = (unsigned)sp[1] / bh;
+        }
+    }
+    GXInitTexObj((char*)p + 0x14, p->m10, (unsigned short)p->m8, (unsigned short)p->mC, 3, 0, 1, 0);
+    y = 0;
+    GXInitTexObjLOD((char*)p + 0x14, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+    for (; y < p->m38; y++) {
+        for (unsigned x = 0; x < p->m34; x++) {
+            fn_8038D068(sp, x, y, &t);
+            int idx = fn_8038D0E0(x, y, p->m34);
+            idx = idx / 2 * 2;
+            unsigned char* q = p->m3C + idx;
+            q[0] = (unsigned)sp[0] % bw;
+            q[1] = (unsigned)sp[1] % bh - y + 0x80;
+        }
+    }
+    GXInitTexObj((char*)p + 0x40, p->m3C, (unsigned short)p->m34, (unsigned short)p->m38, 3, 0, 1, 0);
+    GXInitTexObjLOD((char*)p + 0x40, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
+    fn_80432FD4(p->m10, p->m8 * p->mC * 2);
+    fn_80432FD4(p->m3C, p->m34 * p->m38 * 2);
+    return (int)p;
+}
+
 extern "C" VdM2* fn_8038D4E4(VdM2* self, int a, int b, int c, int d)
 {
     self->m64 = 0;
