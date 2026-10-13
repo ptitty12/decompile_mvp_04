@@ -830,3 +830,32 @@ void fn_802CB7DC()
 {
     fn_802CA5AC(0, 0xFFFF);
 }
+
+extern "C" float atan2f(float y, float x);
+float fn_804028E4(float x);
+extern const Unk8000E618_Vec3 lbl_806055AC;
+
+inline Unk8000E618_Vec3 Sub(const Unk8000E618_Vec3& a, const Unk8000E618_Vec3& b)
+{
+    Unk8000E618_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Len(const Unk8000E618_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+Unk8000E618_Vec3 fn_802CB808(Unk8000E618_Vec3 a, Unk8000E618_Vec3 b)
+{
+    Unk8000E618_Vec3 r = lbl_806055AC;
+    Unk8000E618_Vec3 d = Sub(b, a);
+    Unk8000E618_Vec3 e = d;
+    e.y = 0.0f;
+    r.y = atan2f(d.x, d.z);
+    r.x = atan2f(d.y, Len(e));
+    return r;
+}
