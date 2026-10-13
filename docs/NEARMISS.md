@@ -290,3 +290,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `snd/tu_803A9830` `fn_803A9CF4`: 99.615%, 26/26 instructions; rlwinm/lwzx index r3 versus retail r0 remains after byte/local/accessor/const forms.
 - `ealib/tu_80394744` `fn_803950B4`: 96.923%, 39/39 instructions; count-load scheduling and register allocation remain; separate count and if/do forms regress.
 - `ealib/tu_803D50E4` `fn_803D675C`: 84/84 instructions, 2 load operands differ (stack versus current-iterator base); member iterator/end-return/increment forms converge, remaining source trials parked.
+
+- `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
+- `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.
