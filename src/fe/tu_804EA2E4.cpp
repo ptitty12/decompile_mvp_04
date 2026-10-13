@@ -220,7 +220,7 @@ public:
     virtual void v15(); virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
     virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24();
     virtual void v25(); virtual void v26(); virtual void v27(); virtual void v28(const char* a);
-    virtual void v29(); virtual void v30(); virtual void v31(); virtual void v32(); virtual void v33();
+    virtual void v29(); virtual void v30(); virtual void v31(); virtual void v32(); virtual void v33(int a);
     virtual void v34(); virtual void v35(FeT16 t); virtual void v36(); virtual void v37();
     virtual void v38(); virtual void v39(); virtual void v40(); virtual void v41(); virtual void v42();
     virtual void v43(); virtual void v44(); virtual void v45(); virtual void v46(); virtual void v47();
@@ -248,7 +248,7 @@ public:
     char pad0[0x64];
     virtual int s1(); virtual int s2(); virtual int s3(); virtual int s4(); virtual int s5(); virtual int s6();
     virtual int s7(); virtual int s8(); virtual const char* s9(int a); virtual int s10(); virtual int s11(); virtual int s12();
-    virtual int s13(); virtual FeT16 s14();
+    virtual int s13(); virtual FeT16 s14(); virtual int s15(); virtual int s16(); virtual FeT16 s17();
 };
 struct FeS17q : FeObj {
     char pad40[0x138 - 0x40];
@@ -736,6 +736,34 @@ extern "C" FE_OVERLAY void fn_804EC294(void* p, FeD64* o)
             fn_804EC3E8(self, d, self->m144, &n);
         }
     }
+}
+
+extern "C" FE_OVERLAY int fn_804EC3E8(void* self, FeD64* o_, FeObjZ* w, int* out)
+{
+    FeD64e* o = (FeD64e*)o_;
+    FeObjQ* t;
+    FeObjQ42* q;
+    int k;
+    int cnt = w->v62();
+    int len = o->s8();
+    if (cnt - *out < len)
+        return 0;
+    t = w->v73(*out, 0);
+    q = (FeObjQ42*)fn_800C8040(t->v33(4, 1));
+    q->v28(o->s9(0));
+    q->v35(o->s14());
+    q->v33(o->s10());
+    for (k = 1; k < len; k++) {
+        t = w->v73(k + *out, 0);
+        q = (FeObjQ42*)fn_800C8040(t->v33(4, 1));
+        q->v28(o->s9(k));
+        q->v35(o->s17());
+    }
+    *out = k + *out;
+    w->v79(*out, 0);
+    ((FeObjQ42*)w)->v8(1);
+    fn_804EBC7C((FeS14*)self);
+    return 1;
 }
 
 extern "C" FE_OVERLAY void fn_804EC68C(FeS16* self, FeD64* o)
