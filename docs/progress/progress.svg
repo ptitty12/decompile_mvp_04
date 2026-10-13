@@ -33,7 +33,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="512.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
 <text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">3.00 MB / 5.90 MB</text>
 <text x="724.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Data matched</text>
-<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">8.8 KB / 1.37 MB</text>
+<text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">8.9 KB / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
 <rect x="24" y="140" width="464.1" height="12" class="b5" clip-path="url(#bar)"/>
