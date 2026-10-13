@@ -260,6 +260,33 @@ extern "C" void fn_80535360(Unk805352B0_List* self, int x);
 extern "C" int fn_800A2E6C(Unk80538DD8_G* g);
 unsigned fn_8007F198(Unk8007F198_A* self, int x);
 int fn_8007F24C(Unk8007F198_A* self, int a, int x);
+struct Db80551A80_G {
+    char pad0[0x6C];
+    int m6C;
+};
+struct Db80551A80_V3 {
+    float m0;
+    float m4;
+    float m8;
+};
+inline float Db80551A80_Min(float a, float b)
+{
+    return a <? b;
+}
+inline float Db80551A80_Max(float a, float b)
+{
+    return a >? b;
+}
+inline float Db80551A80_Max2(float a, float b)
+{
+    return b >? a;
+}
+extern Db80551A80_V3 lbl_806E0394;
+extern int lbl_80622C1C;
+extern float lbl_80622C20;
+extern "C" float fn_80591270(void* p);
+extern "C" float fn_80550F00(int x);
+extern "C" float fn_80551C28(int x, float f);
 
 extern "C" DB_OVERLAY int fn_80550E68(int a)
 {
@@ -383,6 +410,28 @@ extern "C" DB_OVERLAY void fn_80551A04(int a, Unk80070DDC_Stream* io)
 {
     io->v08(a, lbl_80622C18, 4);
     io->v08(a, &lbl_806EFA08, 4);
+}
+
+/* near-miss: 99.8%; callee-saved r30/r31 swapped between the parameter x and the screen pointer. Clamps are g++ <?/>? nested
+ * through inline Min/Max2 (their float params give the 0x10..0x1C slots). */
+extern "C" DB_OVERLAY float fn_80551A80(int x, int flag)
+{
+    if (lbl_80622C1C == 0) {
+        float r = 0.0f;
+        if (((Db80551A80_G*)lbl_80619948)->m6C == 1 && flag != 0) {
+            Unk8007A4DC_Screen* sc = lbl_8061930C;
+            float t = fn_80598348();
+            t = (t - lbl_806EFA08) / lbl_806EFA08;
+            t = t + 0.5f;
+            t = (t <? 1.0f) >? 0.0f;
+            r = lbl_806E0394.m8 * t + (lbl_806E0394.m0 * fn_80550F00(x) + lbl_806E0394.m4 * fn_80591270(*(void**)((char*)sc + 0x30)));
+            r = fn_80551C28(x, r) * 0.2f + r;
+            r = Db80551A80_Max2(Db80551A80_Min(r, 1.0f), 0.0f);
+            *(float*)lbl_80622C18 = r;
+        }
+        return *(float*)lbl_80622C18;
+    }
+    return lbl_80622C20;
 }
 
 extern "C" DB_OVERLAY void fn_80552054()
