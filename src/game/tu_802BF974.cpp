@@ -79,6 +79,31 @@ Unk802BF974::~Unk802BF974()
 }
 
 /* near-miss (73 vs 73 insns, schedule only): retail sets r3 = &sp8 last in each call; the pointer-local recipe made it worse. */
+int fn_802BFAA8(int a, int k, float* p, float* q, int c, int d, int e, float f);
+
+/* near-miss 97.5%: instructions identical, only the callee-saved registers of a0/a3/a4/a5 are permuted (retail: a0 r26, a3 r29, a4 r28, a5 r27) */
+int fn_802C0050(int a0, float* p, float* q, int a3, int a4, int a5, float f)
+{
+    if (!(p[0] >= -5.0f) && q[0] < -5.0f)
+        return 0;
+    if (!(p[2] >= -5.0f) && q[2] < -5.0f)
+        return 0;
+    if (!(p[1] <= 5.0f) && q[1] > 5.0f)
+        return 0;
+    const float lo = 1056.0f;
+    const float hi = 1104.0f;
+    if (!(p[0] >= lo) && !(q[0] >= lo) && !(p[2] >= lo) && q[2] < lo)
+        return 0;
+    if (!(p[0] <= hi) && !(q[0] <= hi) && !(p[2] <= hi) && !(q[2] <= hi))
+        return 0;
+    int r = fn_802BFAA8(a0, 0, p, q, a3, a4, a5, f);
+    if (r == 0) {
+        r = fn_802BFAA8(a0, 1, p, q, a3, a4, a5, f);
+        if (r == 0)
+            r = fn_802BFAA8(a0, 2, p, q, a3, a4, a5, f);
+    }
+    return r;
+}
 int* fn_802C1288(const char* text)
 {
     int len = fn_8040B6A0(text);
