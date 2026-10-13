@@ -100,6 +100,15 @@ void fn_80083E84(int t, int* a, int* b);
 int fn_80084070(int t);
 extern "C" void fn_80566F40(Db80565CDC_S* s, int a, int b);
 extern "C" void fn_80567174(Db80565CDC_S* s, int a, int b);
+struct Db80567F8C_MS {
+    unsigned char m;
+    unsigned char s;
+};
+extern "C" int fn_8032A118(Db80567F8C_MS v);
+inline Unk8052B978_Tbl* TblOf2(int o, TblSet a)
+{
+    return *(Unk8052B978_Tbl**)((char*)a + o);
+}
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -316,6 +325,45 @@ extern "C" DB_OVERLAY void fn_80567B14(int a, int b, int c)
 {
     fn_80567B58(a, b, c);
     fn_80567D20(a, b, c);
+}
+
+extern "C" DB_OVERLAY void fn_80567F8C(Db80565CDC_S* s, int kind)
+{
+    unsigned cnt = TblOf2(kind * 4, (TblSet)&s->m28)->m4;
+    int best = 0;
+    int val = -1;
+    Db80567F8C_MS r;
+    Db80567F8C_MS* p = &r;
+    r.m = 0x13;
+    p->s = 5;
+    if (kind == 3)
+        r.m = 0xD;
+    int w = fn_8032A118(r);
+    unsigned i;
+    for (i = cnt - 1; i != 0; i--) {
+        Unk8052B978_Tbl* g = TblOf2(kind * 4, (TblSet)&s->m28);
+        int v = *(unsigned short*)((char*)g->m8 + i * 0x1C);
+        if (v != 0) {
+            best = i;
+            val = v;
+            break;
+        }
+    }
+    i = best + 1;
+    if (i < cnt) {
+        int o = i * 0x1C;
+        do {
+            char* b2 = (char*)&s->m28;
+            int o2 = kind * 4;
+            Unk8052B978_Tbl* g = *(Unk8052B978_Tbl**)(b2 + o2);
+            if (i < g->m4) {
+                fn_8052B5C4((Unk8052B5C4_Ent*)((int)g->m8 + o), val + 1);
+                fn_8052B5E8((Unk8052B5C4_Ent*)((int)g->m8 + o), w);
+            }
+            i++;
+            o += 0x1C;
+        } while (i < cnt);
+    }
 }
 
 extern "C" DB_OVERLAY int fn_805683AC(Db805683AC_S* s, int a, int k)
