@@ -33,6 +33,29 @@ public:
     virtual void v28(char* a);
 };
 extern "C" const char* fn_80090880__FP11Unk80090880(void* t, int id);
+class FeVQ44 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14();
+    virtual void v15(); virtual void v16(); virtual void v17(); virtual void v18();
+    virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22();
+    virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26();
+    virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+    virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38();
+    virtual void v39(); virtual void v40(); virtual void v41(); virtual void v42();
+    virtual void v43(int a, int b, const char* c, int d);
+    virtual void v44(int a, int b, const char* c, int d);
+};
+extern "C" int sprintf(char* buf, const char* fmt, ...);
+extern "C" UiMsgMgr* fn_800B64BC(void* p);
+inline UiMsgMgr* UiMgrB()
+{
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    return lbl_8061A32C;
+}
 
 struct Unk8007F198_D;
 struct FeRetA {
@@ -169,6 +192,42 @@ extern "C" FE_OVERLAY void fn_804E2280(FeMask* self, int idx)
 {
     FeObj1* w = (FeObj1*)fn_800C805C(((FeObjQ*)((FeObjK*)self->m184)->v73(idx, 2))->v33(11, 1));
     w->v37(fn_804E2274(self, self->m188, idx) == 0);
+}
+
+extern "C" FE_OVERLAY void fn_804E232C(FeMask* self)
+{
+    fn_800ECF18(self);
+    unsigned short v = fn_8007FE04((Unk8007F198_D*)lbl_8061930C)->mA;
+    self->m180 = 0;
+    self->m188 = v;
+    self->m18A = v;
+    FeObj* h = fn_800B7A94(UiMgrB(), "NAVBAR");
+    fn_80124FA8(h, self);
+    ((int (*)(FeObj*, int))fn_80125154)(h, 0);
+    ((int (*)(FeObj*, int, int, int))fn_801251CC)(h, 0, 0x1A0A, 1);
+    ((FeObj2*)self->m184)->v79(9, 0);
+    ((FeObj*)self->m184)->v3();
+    ((FeObj1*)self->m184)->v69(1);
+    unsigned i = 0;
+    do {
+        char nbuf[0x20];
+        char wbuf[0x200];
+        unsigned n = i + 1;
+        sprintf(nbuf, "%d", n);
+        int off = i * 12;
+        ((FeVQ44*)self->m184)->v44(i, 0, nbuf, 4);
+        fn_804031BC(wbuf, "");
+        char* t = (char*)lbl_805FD58C;
+        char* t4 = t + 4;
+        fn_800DFF0C(wbuf, (char*)fn_80090880__FP11Unk80090880(lbl_8061977C, *(int*)(t4 + off)));
+        fn_800DFEAC(wbuf, " - \"");
+        fn_800DFF0C(wbuf, (char*)fn_80090880__FP11Unk80090880(lbl_8061977C, *(int*)(t + off)));
+        fn_800DFEAC(wbuf, "\"");
+        ((FeVQ44*)self->m184)->v43(i, 1, wbuf, 5);
+        fn_804E2280(self, i);
+        i = n;
+    } while (i <= 8);
+    ((FeObj1*)self->m184)->v14(1);
 }
 
 extern "C" FE_OVERLAY void fn_804E2560(FeMask* self, FeObj* w)
