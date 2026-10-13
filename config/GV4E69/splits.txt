@@ -2593,6 +2593,9 @@ dolphin/si/SISamplingRate.c:
 
 dolphin/vi/vi.c:
 	.text       start:0x8043BB6C end:0x8043D960
+	.data       start:0x80648E40 end:0x80649224
+	.bss        start:0x806E0060 end:0x806E01A8
+	.sdata      start:0x806EF338 end:0x806EF348
 
 dolphin/vm/tu_8043D960.c:
 	.text       start:0x8043D960 end:0x8043E344
