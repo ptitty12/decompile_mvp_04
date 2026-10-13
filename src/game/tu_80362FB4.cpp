@@ -24,7 +24,7 @@ struct Unk80363ECC {
     int m1C;
 };
 struct Unk806AA8E0 {
-    char pad0[0x10];
+    float m0, m4, m8, mC;
     float m10;
     float m14;
     float m18;
@@ -134,6 +134,55 @@ struct Unk80364A3C {
     Unk80364A3C(int a, int n);
 };
 
+struct Unk803639F4_T {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4(float a, float b);
+    virtual void v5();
+    virtual void v6();
+    virtual void v7(float t);
+    virtual void v8(float t);
+    virtual void v9();
+    virtual void v10(float a, float b);
+};
+struct Unk803639F4 {
+    char pad0[0xC];
+    float mC;
+    float m10;
+    float m14;
+    Unk803639F4_T* m18;
+};
+/* Wraps a time into [mC, m10] by the period m14, as an argument so the virtual
+ * call target is computed before the branches (retail does that). near-miss
+ * (98.3% in fn_803639F4, fn_80363AEC, fn_80363694, fn_80363844): only the
+ * integer registers of the (float)(int) conversion temporaries differ
+ * (retail: 0x4330 constant in r8, converted word in r0, call target in r6/r7;
+ * ours: r0, r11, r7/r8). The float side matches, including which loads are
+ * shared between the two wraps. Tried: in-place t, separate d, named int n,
+ * operand order, direct member use (all the same score). */
+inline float Unk803639F4_Wrap(Unk803639F4* s, float t)
+{
+    float lo = s->mC;
+    if (t < lo) {
+        float r = s->m14;
+        t -= lo;
+        t = s->m10 - (t - (float)(int)(t / r) * r);
+    } else if (t > s->m10) {
+        float r = s->m14;
+        t -= s->m10;
+        t = lo + (t - (float)(int)(t / r) * r);
+    }
+    return t;
+}
+struct Unk803646DC_Q {
+    float m0, m4, m8, mC;
+};
+extern "C" float sqrtf(float x);
+inline float Unk803646DC_Zero()
+{
+    return 0.0f;
+}
 void fn_80362FB4(DtorAt0* s, int chrg)
 {
     s->m = lbl_806855D0;
@@ -249,6 +298,26 @@ void fn_8036365C(DtorAt0* s, int chrg)
     s->m = lbl_80685268;
     if (chrg & 1)
         fn_80363CC0(s, 0x1c);
+}
+
+void fn_80363694(Unk803639F4* s, float a, float b)
+{
+    s->m18->v4(Unk803639F4_Wrap(s, a), Unk803639F4_Wrap(s, b));
+}
+
+void fn_80363844(Unk803639F4* s, float a, float b)
+{
+    s->m18->v10(Unk803639F4_Wrap(s, a), Unk803639F4_Wrap(s, b));
+}
+
+void fn_803639F4(Unk803639F4* s, float t)
+{
+    s->m18->v7(Unk803639F4_Wrap(s, t));
+}
+
+void fn_80363AEC(Unk803639F4* s, float t)
+{
+    s->m18->v8(Unk803639F4_Wrap(s, t));
 }
 
 void fn_80363BE4(void* p, int n)
@@ -398,6 +467,35 @@ void fn_80364358(float** pp, Unk80364310* o)
     o->m10 = *(*pp)++;
     o->m14 = *(*pp)++;
     o->m18 = *(*pp)++;
+}
+
+extern "C" void fn_803646DC(float** p0, float** p1, Unk803646DC_Q* q, float t)
+{
+    lbl_806AA8E0.m0 = *(*p0)++;
+    lbl_806AA8E0.m4 = *(*p0)++;
+    lbl_806AA8E0.m8 = *(*p0)++;
+    lbl_806AA8E0.mC = *(*p0)++;
+    q->m0 = *(*p1)++;
+    q->m4 = *(*p1)++;
+    q->m8 = *(*p1)++;
+    q->mC = *(*p1)++;
+    float a = q->m0, b = q->m4, c = q->m8, d = q->mC;
+    if (lbl_806AA8E0.mC * d + (lbl_806AA8E0.m8 * c + (lbl_806AA8E0.m0 * a + lbl_806AA8E0.m4 * b)) > Unk803646DC_Zero()) {
+        q->m0 = t * (a - lbl_806AA8E0.m0) + lbl_806AA8E0.m0;
+        q->m4 = t * (b - lbl_806AA8E0.m4) + lbl_806AA8E0.m4;
+        q->m8 = t * (c - lbl_806AA8E0.m8) + lbl_806AA8E0.m8;
+        q->mC = t * (d - lbl_806AA8E0.mC) + lbl_806AA8E0.mC;
+    } else {
+        q->m0 = lbl_806AA8E0.m0 - t * (a + lbl_806AA8E0.m0);
+        q->m4 = lbl_806AA8E0.m4 - t * (b + lbl_806AA8E0.m4);
+        q->m8 = lbl_806AA8E0.m8 - t * (c + lbl_806AA8E0.m8);
+        q->mC = lbl_806AA8E0.mC - t * (d + lbl_806AA8E0.mC);
+    }
+    float s = 1.0f / sqrtf(q->mC * q->mC + (q->m8 * q->m8 + (q->m0 * q->m0 + q->m4 * q->m4)));
+    q->m0 *= s;
+    q->m4 *= s;
+    q->m8 *= s;
+    q->mC *= s;
 }
 
 extern "C" void fn_803648C0(float** p0, float** p1, Unk80364310* o, float t)
