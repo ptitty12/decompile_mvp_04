@@ -500,3 +500,56 @@ extern "C" FE_OVERLAY FeMenuSim* fn_804438DC(FeMenuSim* self, int a)
     fn_80330ACC(self, &self->m32C);
     return self;
 }
+
+extern const char lbl_805F4B54[],lbl_805F4B70[],lbl_805F4B88[],lbl_805F4BA0[];
+extern "C" void fn_8032D880(void*,const char*);
+inline int FeReadCombo(FeItem* item)
+{
+ if(item->m48==0)return item->m4C;
+ return *item->m48;
+}
+extern "C" FE_OVERLAY void fn_80442E6C(FeMenuF* self,int action)
+{
+ fn_80330BC8(self,action);
+ if((unsigned)(action-3)<=1){
+  void* focus=self->items[self->m174];
+  FeItem* selector=&self->m474;
+  if(focus==selector){
+   FeTunable* t0=&self->m4D4;
+   fn_805519A0((void*)self->m730,0,FeTunableGet(t0));
+   FeTunable* t1=&self->m538;
+   fn_805519A0((void*)self->m730,1,FeTunableGet(t1));
+   FeTunable* t2=&self->m59C;
+   fn_805519A0((void*)self->m730,2,FeTunableGet(t2));
+   FeTunable* t3=&self->m600;
+   fn_805519A0((void*)self->m730,3,FeTunableGet(t3));
+   self->m730=selector->m4C;
+   FeTunableSet(t0,fn_80551984((void*)self->m730,0));
+   FeTunableSet(t1,fn_80551984((void*)self->m730,1));
+   FeTunableSet(t2,fn_80551984((void*)self->m730,2));
+   FeTunableSet(t3,fn_80551984((void*)self->m730,3));
+  }else if(focus==&self->m664 && (int)self->m734>0 && (int)self->m734<=6){
+   fn_805519E0((void*)((int)self->m734-1),FeTunableGet(&self->m6CC));
+   self->m734=(void*)FeReadCombo(&self->m664);
+   FeTunableSet(&self->m6CC,fn_805519CC((int)self->m734-1));
+  }else if(focus==&self->m4D4 || focus==&self->m538 || focus==&self->m59C || focus==&self->m600){
+   fn_805519A0((void*)self->m730,0,FeTunableGet(&self->m4D4));
+   fn_805519A0((void*)self->m730,1,FeTunableGet(&self->m538));
+   fn_805519A0((void*)self->m730,2,FeTunableGet(&self->m59C));
+   fn_805519A0((void*)self->m730,3,FeTunableGet(&self->m600));
+  }
+ }
+ if(fn_8007F84C((Unk8007F198_B*)lbl_8061930C)){
+  fn_8007F7D0((Unk8007F198_B*)lbl_8061930C,0);
+  FeTunableSet(&self->m410,fn_8055248C());
+ }
+ if(lbl_806215DC==0){
+  fn_8032D880((char*)self+0x2E0,lbl_805F4B54);
+  fn_8032D880((char*)self+0x32C,lbl_805F4B70);
+  fn_8032D880((char*)self+0x3C4,lbl_805F4B70);
+ }else{
+  fn_8032D880((char*)self+0x2E0,lbl_805F4B70);
+  fn_8032D880((char*)self+0x32C,lbl_805F4B88);
+  fn_8032D880((char*)self+0x3C4,lbl_805F4BA0);
+ }
+}
