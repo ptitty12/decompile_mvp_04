@@ -257,6 +257,9 @@ extern "C" void fn_8007FE18__FP13Unk8007F198_E(void* e);
 extern "C" void fn_80538368(Unk805352B0_List* self, int x);
 extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
 extern "C" void fn_80535360(Unk805352B0_List* self, int x);
+extern "C" int fn_800A2E6C(Unk80538DD8_G* g);
+unsigned fn_8007F198(Unk8007F198_A* self, int x);
+int fn_8007F24C(Unk8007F198_A* self, int a, int x);
 
 extern "C" DB_OVERLAY int fn_80550E68(int a)
 {
@@ -397,6 +400,38 @@ extern "C" DB_OVERLAY int fn_8055207C(float f)
     else if (!(f <= lbl_805FF424))
         r = 1;
     return r;
+}
+
+extern "C" DB_OVERLAY float fn_8055248C(int x)
+{
+    if (fn_800A2E6C(lbl_80619948) != 0 || x == 0)
+        return 70.0f;
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    float acc = 0.0f;
+    int sum = 0;
+    int i = 0;
+    fn_80552638(1);
+    int n = fn_8007F198((Unk8007F198_A*)sc, x);
+    if (i < n) {
+        do {
+            int id = fn_8007F24C((Unk8007F198_A*)sc, x, (unsigned char)i);
+            i++;
+            int v = sc->fn_8007A6A0(0x16, id) + 1;
+            sum += v * v;
+        } while (i < n);
+    }
+    i = 0;
+    if (i < n) {
+        do {
+            int id = fn_8007F24C((Unk8007F198_A*)sc, x, (unsigned char)i);
+            i++;
+            float w = fn_805520E4(id, 0, 0, 0, 0);
+            int v = sc->fn_8007A6A0(0x16, id) + 1;
+            acc += (float)(v * v) / (float)sum * w;
+        } while (i < n);
+    }
+    fn_80552638(0);
+    return acc;
 }
 
 extern "C" DB_OVERLAY float fn_8055260C(int a, int b, int c, int d)
