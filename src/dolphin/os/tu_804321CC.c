@@ -216,15 +216,20 @@ BOOL fn_80432904(BOOL final)
     OSAlarm* alarm;
     OSAlarm* next;
 
-    if (final) {
+    if (final != FALSE) {
         alarm = lbl_806EF7D8.head;
-        next = alarm ? alarm->next : NULL;
-        for (; alarm; alarm = next, next = alarm ? alarm->next : NULL) {
-            if (!fn_80425724(alarm)) {
+        next = (alarm) ? alarm->next : NULL;
+
+        while (alarm != 0) {
+            if (fn_80425724(alarm) == FALSE) {
                 fn_80432568(alarm);
             }
+
+            alarm = next;
+            next = (alarm) ? alarm->next : NULL;
         }
     }
+
     return TRUE;
 }
 
@@ -428,6 +433,84 @@ long fn_80432C48(void* start, void* end)
     return -1;
 }
 
+/* ---- OSAudioSystem: __OSInitAudioSystem ----
+ * Emitted ahead of the OSArena block on purpose: in the original OSAudioSystem.c is its own file and calls
+ * OSGetArenaHi (fn_80432CB4) out of line; defined after fn_80432CB4 here, the compiler expands that call inline.
+ * Body: dolsdk2004 OSAudioSystem.c (adonis-singh/re4 src/lib/OSAudioSystem.c), instruction stream equal. */
+
+extern u8 lbl_80635DE0[0x80];        /* DSPInitCode */
+
+void fn_80432D00(void);
+void fn_80432EBC(void);
+
+/* __OSInitAudioSystem */
+void fn_80432D00(void)
+{
+    u8 errFlag;
+    u16 reg16;
+    u32 start_tick;
+
+    memcpy((void*)((u32)fn_80432CB4() - 0x80), (void*)0x81000000, 0x80);
+    memcpy((void*)0x81000000, (void*)lbl_80635DE0, 0x80);
+    fn_80432FD4((void*)0x81000000, 0x80);
+
+    __DSPRegs[9] = 0x43;
+
+    __DSPRegs[5] = 0x8AC;
+    __DSPRegs[5] |= 1;
+
+    while (__DSPRegs[5] & 1);
+        __DSPRegs[0] = 0;
+
+    while (((__DSPRegs[2] << 16) | __DSPRegs[3]) & 0x80000000);
+
+    *(u32*)&__DSPRegs[16] = 0x1000000;
+    *(u32*)&__DSPRegs[18] = 0;
+    *(u32*)&__DSPRegs[20] = 0x20;
+
+    reg16 = __DSPRegs[5];
+    while (!(reg16 & 0x20))
+        reg16 = __DSPRegs[5];
+
+    __DSPRegs[5] = reg16;
+
+    start_tick = fn_80438640();
+    while ((s32)(fn_80438640() - start_tick) < 0x892);
+
+    *(u32*)&__DSPRegs[16] = 0x1000000;
+    *(u32*)&__DSPRegs[18] = 0;
+    *(u32*)&__DSPRegs[20] = 0x20;
+
+    reg16 = __DSPRegs[5];
+    while (!(reg16 & 0x20)) {
+        reg16 = __DSPRegs[5];
+    }
+    __DSPRegs[5] = reg16;
+
+    __DSPRegs[5] &= ~0x800;
+    while ((__DSPRegs[5]) & 0x400);
+
+    __DSPRegs[5] &= ~4;
+    errFlag = 0;
+
+    reg16 = __DSPRegs[2];
+
+    while (!(reg16 & 0x8000)) {
+        reg16 = __DSPRegs[2];
+    }
+
+    if (((u32)((reg16 << 16) | __DSPRegs[3]) + 0x7FAC0000U) != 0x4348) {
+    }
+
+    reg16 != 0x81800;  /* no code; fixes the register allocation (as in the dolsdk2004 source) */
+    __DSPRegs[5] |= 4;
+    __DSPRegs[5] = 0x8AC;
+    __DSPRegs[5] |= 1;
+    while (__DSPRegs[5] & 1);
+
+    memcpy((void*)0x81000000, (void*)((u32)fn_80432CB4() - 0x80), 0x80);
+}
+
 /* ---- OSArena ---- */
 
 extern void* lbl_806EF7F0;           /* __OSArenaHi */
@@ -477,94 +560,36 @@ void* fn_80432CD4(u32 size, u32 align)
     return ptr;
 }
 
-/* ---- OSAudioSystem ---- */
-
-extern u8 lbl_80635DE0[0x80];        /* DSPInitCode */
-
-void fn_80432D00(void);
-void fn_80432EBC(void);
-
-/* __OSInitAudioSystem */
-/* near-miss: loop shapes of the DSP register polls differ */
-void fn_80432D00(void)
-{
-    u32 r28;
-    u16 r3;
-    u16 r5;
-    u16 r4;
-
-    memcpy((void*)((u8*)fn_80432CB4() - 0x80), (void*)0x81000000, 0x80);
-    memcpy((void*)0x81000000, lbl_80635DE0, 0x80);
-    fn_80432FD4((void*)0x81000000, 0x80);
-
-    __DSPRegs[9] = 0x43;
-    __DSPRegs[5] = 0x8ac;
-    __DSPRegs[5] |= 1;
-    while (__DSPRegs[5] & 1) {
-    }
-
-    __DSPRegs[0] = 0;
-    while (((__DSPRegs[2] << 16) | __DSPRegs[3]) & 0x80000000) {
-    }
-
-    *(volatile u32*)&__DSPRegs[16] = 0x1000000;
-    *(volatile u32*)&__DSPRegs[18] = 0;
-    *(volatile u32*)&__DSPRegs[20] = 0x20;
-    r3 = __DSPRegs[5];
-    while (!(r3 & 0x20)) {
-        r3 = __DSPRegs[5];
-    }
-    __DSPRegs[5] = r3;
-    r28 = fn_80438640();
-    while ((s32)(fn_80438640() - r28) < 0x892) {
-    }
-
-    *(volatile u32*)&__DSPRegs[16] = 0x1000000;
-    *(volatile u32*)&__DSPRegs[18] = 0;
-    *(volatile u32*)&__DSPRegs[20] = 0x20;
-    r3 = __DSPRegs[5];
-    while (!(r3 & 0x20)) {
-        r3 = __DSPRegs[5];
-    }
-    __DSPRegs[5] = r3;
-    __DSPRegs[5] &= ~0x800;
-    while (__DSPRegs[5] & 0x400) {
-    }
-    __DSPRegs[5] &= ~0x4;
-    r5 = __DSPRegs[2];
-    while (!(r5 & 0x8000)) {
-        r5 = __DSPRegs[2];
-    }
-    r4 = __DSPRegs[3];
-    __DSPRegs[5] |= 4;
-    __DSPRegs[5] = 0x8ac;
-    __DSPRegs[5] |= 1;
-    while (__DSPRegs[5] & 1) {
-    }
-
-    memcpy((void*)0x81000000, (u8*)fn_80432CB4() - 0x80, 0x80);
-}
+/* ---- OSAudioSystem: __OSStopAudioSystem ---- */
 
 /* __OSStopAudioSystem */
-/* near-miss: 3 instructions scheduled differently around the first DSP register store */
 void fn_80432EBC(void)
 {
-    u32 r28;
+    u16 reg16;
+    u32 start_tick;
+
+    #define waitUntil(load, mask)  \
+        reg16 = (load);            \
+        while (reg16 & (mask)) {   \
+            reg16 = (load);        \
+        }
 
     __DSPRegs[5] = 0x804;
-    __DSPRegs[27] &= ~0x8000;
-    while (__DSPRegs[5] & 0x400) {
-    }
-    while (__DSPRegs[5] & 0x200) {
-    }
+    reg16 = __DSPRegs[27];
+    __DSPRegs[27] = reg16 & ~0x8000;
+    waitUntil(__DSPRegs[5], 0x400);
+    waitUntil(__DSPRegs[5], 0x200);
     __DSPRegs[5] = 0x8ac;
     __DSPRegs[0] = 0;
-    while (((__DSPRegs[2] << 16) | __DSPRegs[3]) & 0x80000000) {
-    }
-    r28 = fn_80438640();
-    while ((s32)(fn_80438640() - r28) < 0x2c) {
-    }
-    __DSPRegs[5] |= 1;
-    while (__DSPRegs[5] & 1) {
-    }
+
+    while (((__DSPRegs[2] << 16) | __DSPRegs[3]) & 0x80000000);
+
+    start_tick = fn_80438640();
+    while ((s32)(fn_80438640() - start_tick) < 0x2c);
+
+    reg16 = __DSPRegs[5];
+    __DSPRegs[5] = reg16 | 1;
+    waitUntil(__DSPRegs[5], 0x001);
+
+    #undef waitUntil
 }
