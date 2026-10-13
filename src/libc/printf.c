@@ -3,16 +3,7 @@
 #include "newlib_stdio.h"
 
 /* Reentrant printf: formats into the reent's stdout. */
-int _printf_r(struct _reent *ptr, const char *fmt, ...)
-{
-    int ret;
-    va_list ap;
 
-    va_start(ap, fmt);
-    ret = _vfprintf_r(ptr, _stdout_r(ptr), fmt, ap);
-    va_end(ap);
-    return ret;
-}
 
 /* printf onto stdout. */
 int printf(const char *fmt, ...)

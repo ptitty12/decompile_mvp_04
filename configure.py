@@ -1147,7 +1147,7 @@ config.libs = [
             Object(Matching, "libc/fseek.c"),
             Object(Matching, "libc/fwalk.c"),
             Object(Matching, "libc/makebuf.c"),
-            Object(NonMatching, "libc/printf.c"),
+            Object(Matching, "libc/printf.c"),
             Object(Matching, "libc/refill.c"),
             Object(Matching, "libc/sprintf.c"),
             Object(Matching, "libc/sscanf.c"),
