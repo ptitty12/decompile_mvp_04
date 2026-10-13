@@ -5,12 +5,16 @@ Reads objdiff's progress report (build/GV4E69/report.json, written by
 `ninja progress`), records the day's totals in docs/progress/history.csv and
 writes docs/progress/progress.svg:
 
-  - headline: percent of code bytes matched, plus function/code/data counts;
+  - headline: percent of code bytes matched, plus function/code/data counts
+    and the code built from source (units linked from our C/C++, objdiff's
+    "complete" measures);
   - treemap: one block per unit, sized by code bytes and shaded by objdiff's
     fuzzy match percent (gray = not started, darkest blue = fully matched).
     Blocks split as units are carved out of the auto-generated ones;
-  - history: percent of code matched over time, one point per day the card
-    is regenerated (re-running on the same day replaces that day's point).
+  - history: percent of code matched and of code built from source over
+    time, one point per day the card is regenerated (re-running on the same
+    day replaces that day's point). Days recorded before 2026-10-13 have no
+    built-from-source value.
 
 With --if-changed nothing is written unless the totals or the treemap differ
 from the current card, so a new date alone never produces a commit.
@@ -48,6 +52,7 @@ text { font-family: %s; }
 .t1 { fill: #0b0b0b; } .t2 { fill: #52514e; } .t3 { fill: #898781; }
 .grid { stroke: #e1e0d9; } .axis { stroke: #c3c2b7; }
 .line { fill: none; stroke: #2a78d6; } .dot { fill: #2a78d6; stroke: #fcfcfb; }
+.line2 { fill: none; stroke: #c4580e; } .dot2 { fill: #c4580e; stroke: #fcfcfb; } .k2 { fill: #c4580e; }
 .b0 { fill: #dcdbd4; } .b1 { fill: #86b6ef; } .b2 { fill: #5598e7; }
 .b3 { fill: #2a78d6; } .b4 { fill: #1c5cab; } .b5 { fill: #0d366b; }
 .l0, .l1, .l2, .l3 { fill: #0b0b0b; } .l4, .l5 { fill: #ffffff; }
@@ -57,6 +62,7 @@ text { font-family: %s; }
   .t1 { fill: #ffffff; } .t2 { fill: #c3c2b7; } .t3 { fill: #898781; }
   .grid { stroke: #2c2c2a; } .axis { stroke: #383835; }
   .line { stroke: #3987e5; } .dot { fill: #3987e5; stroke: #1a1a19; }
+  .line2 { stroke: #f0913a; } .dot2 { fill: #f0913a; stroke: #1a1a19; } .k2 { fill: #f0913a; }
   .b0 { fill: #383835; } .b1 { fill: #184f95; } .b2 { fill: #256abf; }
   .b3 { fill: #3987e5; } .b4 { fill: #6da7ec; } .b5 { fill: #b7d3f6; }
   .l0 { fill: #c3c2b7; } .l1, .l2 { fill: #ffffff; } .l3, .l4, .l5 { fill: #0b0b0b; }
@@ -74,6 +80,9 @@ HISTORY_FIELDS = [
     "total_functions",
     "matched_data",
     "total_data",
+    "complete_code",
+    "complete_units",
+    "total_units",
 ]
 
 
@@ -145,7 +154,7 @@ def read_history(path: Path) -> List[Dict[str, Any]]:
 
 def write_history(path: Path, rows: List[Dict[str, Any]]) -> None:
     with open(path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=HISTORY_FIELDS, lineterminator="\n")
+        writer = csv.DictWriter(f, fieldnames=HISTORY_FIELDS, lineterminator="\n", restval="")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -166,6 +175,7 @@ def draw_header(out: List[str], m: Dict[str, Any], date: str) -> float:
     mc, tc = num(m, "matched_code"), num(m, "total_code")
     mf, tf = num(m, "matched_functions"), num(m, "total_functions")
     md, td = num(m, "matched_data"), num(m, "total_data")
+    cc, cu, tu = num(m, "complete_code"), num(m, "complete_units"), num(m, "total_units")
     pct = 100.0 * mc / tc if tc else 0.0
 
     out.append(text(PAD, 40, "MVP Baseball 2005 (GV4E69) decompilation", "t2", 14, weight=600))
@@ -176,13 +186,18 @@ def draw_header(out: List[str], m: Dict[str, Any], date: str) -> float:
     stats = [
         ("Functions matched", f"{mf:,} / {tf:,}"),
         ("Code matched", f"{fmt_bytes(mc)} / {fmt_bytes(tc)}"),
+        ("Built from source", f"{100.0 * cc / tc if tc else 0.0:.1f}% ({cu} units)"),
         ("Data matched", f"{fmt_bytes(md)} / {fmt_bytes(td)}"),
     ]
-    col_w = (W - PAD - 300) / len(stats)
+    col_w = (W - PAD - 260) / len(stats)
     for i, (label, value) in enumerate(stats):
-        x = 300 + i * col_w
-        out.append(text(x, 72, label, "t3", 12))
-        out.append(text(x, 96, value, "t1", 18, weight=600))
+        x = 260 + i * col_w
+        if label == "Built from source":
+            out.append(f'<rect x="{x:.1f}" y="62" width="10" height="10" rx="2" class="k2"/>')
+            out.append(text(x + 15, 72, label, "t3", 12))
+        else:
+            out.append(text(x, 72, label, "t3", 12))
+        out.append(text(x, 96, value, "t1", 16, weight=600))
 
     y, bw, bh = 140, W - 2 * PAD, 12
     out.append(f'<clipPath id="bar"><rect x="{PAD}" y="{y}" width="{bw}" height="{bh}" rx="{bh / 2}"/></clipPath>')
@@ -190,6 +205,9 @@ def draw_header(out: List[str], m: Dict[str, Any], date: str) -> float:
     if mc:
         fw = max(bw * mc / tc, 2.0)
         out.append(f'<rect x="{PAD}" y="{y}" width="{fw:.1f}" height="{bh}" class="b5" clip-path="url(#bar)"/>')
+    if cc:
+        lw = max(bw * cc / tc, 2.0)
+        out.append(f'<rect x="{PAD}" y="{y}" width="{lw:.1f}" height="{bh}" class="k2" clip-path="url(#bar)"/>')
     return y + bh
 
 
@@ -242,10 +260,16 @@ def nice_scale(vmax: float) -> Tuple[float, float]:
 
 def draw_history(out: List[str], rows: List[Dict[str, Any]], top: float) -> float:
     out.append(text(PAD, top + 32, "Code matched over time", "t1", 14, weight=600))
+    out.append(text(PAD + 182, top + 32, "blue = matched, orange = built from source", "t3", 12))
 
     dates = [datetime.date.fromisoformat(r["date"]) for r in rows]
     vals = [100.0 * int(r["matched_code"]) / int(r["total_code"]) if int(r["total_code"]) else 0.0 for r in rows]
-    ymax, step = nice_scale(max(vals))
+    # Built-from-source share; None for days recorded before the column existed.
+    linked = [
+        100.0 * int(r["complete_code"]) / int(r["total_code"]) if r.get("complete_code") and int(r["total_code"]) else None
+        for r in rows
+    ]
+    ymax, step = nice_scale(max(vals + [v for v in linked if v is not None]))
 
     x0, x1 = PAD + 44, W - PAD
     y0, y1 = top + 52, top + 192  # plot top, plot bottom (baseline)
@@ -277,6 +301,18 @@ def draw_history(out: List[str], rows: List[Dict[str, Any]], top: float) -> floa
             f'<title>{r["date"]}: {vals[i]:.2f}% of code, {int(r["matched_functions"]):,} / '
             f'{int(r["total_functions"]):,} functions</title></circle>'
         )
+
+    pts2 = [(px(d), py(v)) for d, v in zip(dates, linked) if v is not None]
+    if len(pts2) > 1:
+        path = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts2)
+        out.append(f'<polyline points="{path}" class="line2" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>')
+    if pts2:
+        last = [v for v in linked if v is not None][-1]
+        out.append(
+            f'<circle cx="{pts2[-1][0]:.1f}" cy="{pts2[-1][1]:.1f}" r="4" class="dot2" stroke-width="2">'
+            f'<title>{rows[-1]["date"]}: {last:.2f}% of code built from source</title></circle>'
+        )
+        out.append(text(pts2[-1][0], pts2[-1][1] - 10, f"{last:.2f}%", "t1", 12, anchor="end", weight=600))
 
     # Direct label on the latest point only.
     lx, ly = pts[-1]
@@ -322,6 +358,9 @@ def main() -> None:
         "total_functions": num(m, "total_functions"),
         "matched_data": num(m, "matched_data"),
         "total_data": num(m, "total_data"),
+        "complete_code": num(m, "complete_code"),
+        "complete_units": num(m, "complete_units"),
+        "total_units": num(m, "total_units"),
     }
     old_rows = read_history(hist_path)
     rows = sorted([r for r in old_rows if r["date"] != args.date] + [row], key=lambda r: r["date"])
@@ -336,7 +375,9 @@ def main() -> None:
     summary = (
         f"{100.0 * mc / tc if tc else 0.0:.2f}% of code matched as of {args.date}: "
         f"{num(m, 'matched_functions'):,} of {num(m, 'total_functions'):,} functions, "
-        f"{mc:,} of {tc:,} code bytes, {len(units)} units with code."
+        f"{mc:,} of {tc:,} code bytes, {len(units)} units with code; "
+        f"{100.0 * num(m, 'complete_code') / tc if tc else 0.0:.2f}% of code built from source "
+        f"({num(m, 'complete_units')} of {num(m, 'total_units')} units linked)."
     )
     svg = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{h}" viewBox="0 0 {W} {h}" role="img" aria-labelledby="title desc">',
@@ -351,7 +392,7 @@ def main() -> None:
     content = "\n".join(svg) + "\n"
 
     if args.if_changed and old_rows and out_svg.is_file():
-        same_totals = all(str(old_rows[-1][k]) == str(row[k]) for k in HISTORY_FIELDS if k != "date")
+        same_totals = all(str(old_rows[-1].get(k) or "") == str(row[k]) for k in HISTORY_FIELDS if k != "date")
         old_svg = out_svg.read_text(encoding="utf-8")
         if same_totals and treemap_part(old_svg) == treemap_part(content):
             print(f"No change since {old_rows[-1]['date']}; card left as is.")
