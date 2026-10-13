@@ -546,6 +546,65 @@ extern "C" FE_OVERLAY FeScrN* fn_80524C1C(FeScrN* self, int a, int b, int c, int
     return self;
 }
 
+/* Widget at +0x164 of the screen of fn_80525498: its own vptr (+0x3C) has slot 33 taking an index; the sub-object at +0x98
+ * has vptr +0x24 with an int getter (slot 5), a setter (slot 6) and a count (slot 13). */
+class FeCycSub {
+public:
+    char pad0[0x24];
+    virtual void c1();
+    virtual void c2();
+    virtual void c3();
+    virtual void c4();
+    virtual int c5();
+    virtual void c6(int a);
+    virtual void c7();
+    virtual void c8();
+    virtual void c9();
+    virtual void c10();
+    virtual void c11();
+    virtual void c12();
+    virtual int c13();
+};
+class FeCycW {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual int s33(int a);
+};
+extern "C" void fn_800CFB38(int a);
+extern float lbl_805FC4C0;
+
 extern "C" FE_OVERLAY void fn_80524C94(void* x)
 {
     fn_8040B61C((char*)x + 0x134);
@@ -602,6 +661,38 @@ extern "C" FE_OVERLAY void fn_80525390(FeScrN* self)
                 fn_80525498(self, 1);
             break;
         }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80525498(FeScrN* self, int mode)
+{
+    FeI(self, 0x168) = mode;
+    switch (mode) {
+    case 0:
+        break;
+    case 1:
+        if (FeI(self, 0x164) != 0) {
+            fn_800C5E28();
+            fn_800C618C();
+            int v = (((FeCycSub*)((char*)self->m164 + 0x98))->c5() + 1) % ((FeCycSub*)((char*)self->m164 + 0x98))->c13();
+            ((FeCycSub*)((char*)self->m164 + 0x98))->c6(v);
+            int w = ((FeCycW*)self->m164)->s33(v);
+            ((void (*)(void*, int))fn_80524C94)(self, w);
+            fn_805252C0(self, lbl_805FC4C0);
+        }
+        if (FeI(self, 0x150) != 0) {
+            fn_800CFB38(FeI(self, 0x15C));
+        } else {
+            fn_800CFB38(FeI(self, 0x160));
+        }
+        break;
+    case 2:
+        FeI(self, 0x154) = lbl_8061A328 + 0x168;
+        {
+            int t = FeI(self, 0x160) != 0 ? FeI(self, 0x150) ^ 1 : 1;
+            FeI(self, 0x150) = t;
+        }
+        break;
     }
 }
 
