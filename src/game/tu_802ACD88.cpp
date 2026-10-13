@@ -189,6 +189,105 @@ void fn_802ACF58(Mgr* m)
     fn_802ACE20(m, p, n);
 }
 
+extern "C" int sprintf(char* buf, const char* fmt, ...);
+extern "C" void __assert(const char* file, int line, const char* expr);
+struct Unk802B0778_C;
+extern Unk802B0778_C* lbl_8061FEDC;
+extern int lbl_8061E9F8;
+extern int lbl_8061E9FC;
+extern const char lbl_805DFC20[];
+extern const char lbl_805DFC34[];
+extern const char lbl_805DFC38[];
+extern const char lbl_805DFC48[];
+extern const char lbl_805DFC64[];
+extern const char lbl_805DFC9C[];
+extern const char lbl_805DFD0C[];
+extern const char lbl_805DFD28[];
+extern const char lbl_805DFD84[];
+extern const char lbl_805DFDA0[];
+extern const char lbl_805DFDBC[];
+extern const char lbl_805DFE14[];
+int fn_802B9764(int a);
+int fn_802B96C4(int a);
+void fn_802B8B34();
+void fn_802B8BFC();
+int fn_803FED48(const char* fmt, int a, int b, int* out);
+void fn_80316614(Unk802B0778_C* h, int a, float v);
+void* fn_803DD628(void* mem, void* p);
+void fn_802BACDC(void* p);
+void fn_802C4294(void* p);
+void fn_802C8008(void* p);
+void fn_802ACF58(Mgr* m);
+void fn_802AE13C(Mgr* m);
+void fn_802AD538(Mgr* m, int h);
+int fn_802AEB7C(Mgr* m);
+
+struct Unk802ACFB0_M {
+    char pad0[0x3B0C];
+    void* m3B0C;
+    char pad3B10[0x3B50 - 0x3B10];
+    void* m3B50;
+    void* m3B54;
+    char pad3B58[4];
+    int m3B5C;
+    int m3B60;
+    char pad3B64[4];
+    int m3B68;
+    void* m3B6C;
+    void* m3B70;
+    int m3B74;
+    char pad3B78[0x18700 - 0x3B78];
+    int m18700;
+};
+
+void fn_802ACFB0(Mgr* m)
+{
+    Unk802ACFB0_M* v = (Unk802ACFB0_M*)m;
+    char b1[32];
+    char b2[64];
+    sprintf(b1, lbl_805DFC20, lbl_805DFC34);
+    int n = fn_802B9764((int)b1);
+    lbl_8061E9FC = n;
+    if (n > 0) {
+        const char* nm = lbl_805DFC38;
+        if (((int (*)(const char*, int))fn_802B96C4)(nm, 0) != 0) {
+            lbl_8061E9F8 = 1;
+            fn_803FED48(nm, 0, 0, &v->m3B74);
+        }
+        fn_80316614(lbl_8061FEDC, 2, 0.4292683f);
+        fn_802B8B34();
+        fn_802B8BFC();
+        fn_802ACF58(m);
+        sprintf(b2, lbl_805DFC48, lbl_805DFC34);
+        v->m3B50 = fn_802B9300(b2, 0x400, 1, 0);
+        if (v->m3B50 == 0)
+            __assert(lbl_805DFC64, 0x2B8, lbl_805DFC9C);
+        int* q = &v->m18700;
+        *q = (int)fn_803DD628(lbl_8062C668(0x58, 0), (char*)v->m3B50 + *(int*)((char*)v->m3B50 + 0x14));
+        fn_802BACDC((char*)m + 0x16EF0);
+        sprintf(b2, lbl_805DFD0C, lbl_805DFC34);
+        v->m3B54 = fn_802B9300(b2, 0x400, 1, 0);
+        if (v->m3B54 == 0)
+            __assert(lbl_805DFC64, 0x2C2, lbl_805DFD28);
+        v->m3B60 = (int)fn_803DD628(lbl_8062C668(0x58, 0), (char*)v->m3B54 + *(int*)((char*)v->m3B54 + 0x14));
+        sprintf(b2, lbl_805DFD84, lbl_805DFC34);
+        v->m3B6C = fn_802B9300(b2, 0x400, 1, 0);
+        v->m3B5C = (int)fn_803DD628(lbl_8062C668(0x58, 0), (char*)v->m3B6C + *(int*)((char*)v->m3B6C + 0x14));
+        sprintf(b2, lbl_805DFDA0, lbl_805DFC34);
+        v->m3B70 = fn_802B9300(b2, 0x400, 1, 0);
+        if (v->m3B70 == 0)
+            __assert(lbl_805DFC64, 0x2D6, lbl_805DFDBC);
+        v->m3B68 = (int)fn_803DD628(lbl_8062C668(0x58, 0), (char*)v->m3B70 + *(int*)((char*)v->m3B70 + 0x14));
+        sprintf(b2, lbl_805DFE14, lbl_805DFC34);
+        v->m3B0C = fn_802B9300(b2, 0x400, 1, 0);
+        fn_802AE13C(m);
+        fn_802C4294((char*)m + 0x11F78);
+        fn_802C8008((char*)m + 0x12204);
+        fn_80316614(lbl_8061FEDC, 2, 0.5512195f);
+        fn_802AD538(m, 0);
+        fn_802AEB7C(m);
+    }
+}
 Mgr* fn_802AD4C8(Mgr* m, int a)
 {
     fn_802BAD48(m, a + 0x16EF0);
