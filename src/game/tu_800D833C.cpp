@@ -716,3 +716,46 @@ void fn_800DC088(Unk800DB840_Slot* o, int a, int idx, int b)
         fn_800991AC(p, a, fn_800968C0(p, b, 1));
     }
 }
+
+struct Unk8007F198_B;
+int fn_8007F7D0(Unk8007F198_B*, unsigned);
+extern "C" {
+int fn_80539A84(int);
+void* fn_8057C8F8(void*, unsigned);
+void fn_8057C99C(void*, int);
+void fn_8057CA60(void*, int);
+int fn_8057CCA4(void*, int);
+int fn_8057CDB8(void*, int);
+}
+extern "C" int fn_800D83C8(int* out)
+{
+    Unk8007B2B0_Screen* screen = (Unk8007B2B0_Screen*)lbl_8061930C;
+    int selected = screen->fn_8007B320(0, fn_8007F7D0((Unk8007F198_B*)screen, 0));
+    int automatic = fn_800D83A0();
+    /* Same constructor's established caller fn_800A19E4 uses this 0x418-byte local. */
+    char list[0x418];
+    fn_8057C8F8(list, fn_80539A84(0));
+    fn_8057CA60(list, 0);
+    int rank = fn_8057CCA4(list, selected);
+    if (automatic) {
+        if (rank > 4) {
+            *out = fn_8057CDB8(list, rank);
+            if (*out != selected) {
+                fn_8057C99C(list, 2);
+                return 1;
+            }
+        } else {
+            *out = fn_8057CDB8(list, 5);
+            if (*out != selected) {
+                fn_8057C99C(list, 2);
+                return 1;
+            }
+        }
+    } else if (screen->fn_8007B3E0(15, fn_8007F7D0((Unk8007F198_B*)screen, 0)) % 3 == 2) {
+        *out = selected;
+        fn_8057C99C(list, 2);
+        return 1;
+    }
+    fn_8057C99C(list, 2);
+    return 0;
+}
