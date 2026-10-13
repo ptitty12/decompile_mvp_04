@@ -417,6 +417,8 @@ FE_OVERLAY void fn_8045A85C(FeScrA* x)
     } while (i <= 9);
 }
 
+/* near-miss: same 53 insns; only x and the row pointer p swap callee-saved registers (retail x=r30, p=r29; ours x=r29,
+ * p=r30): global-alloc priority, x has 7 uses over the whole function and p 4 over the inner loop, so p ranks first. */
 FE_OVERLAY void fn_8045A8D8(FeScrA* x)
 {
     int i = 1;
@@ -441,8 +443,9 @@ FE_OVERLAY void fn_8045A8D8(FeScrA* x)
                 *(int*)(b2 + off) = 4;
             } else {
                 int h = fn_80077BC4(lbl_8061930C, v);
+                int r = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, h);
                 char* b3 = (char*)x + 0x168;
-                *(int*)(b3 + off) = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, h);
+                *(int*)(b3 + off) = r;
             }
         } while (j <= 9);
         i++;
