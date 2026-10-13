@@ -25,7 +25,9 @@ a raw immediate on the other (e.g. `lis r9,GXWGFifo@ha` vs retail `lis r9,0xcc01
 This is a search aid, not verification: tools/verify/verify.py and objdiff decide.
 """
 import argparse
+from functools import lru_cache
 import os
+import shlex
 import re
 import subprocess
 import sys
@@ -37,24 +39,54 @@ VERSION = "GV4E69"
 EXE = ".exe" if os.name == "nt" else ""
 
 
-def ninja_vars(unit):
-    """Return the variables (cflags, mw_version, ...) of the build statement for src/<unit>.o."""
-    text = (ROOT / "build.ninja").read_text(encoding="utf-8")
-    text = re.sub(r"\$\n\s*", "", text)  # ninja line continuations
+@lru_cache(maxsize=2)
+def _build_variables(text):
+    """Parse once when many farm units share an unchanged Ninja file."""
+    text = re.sub(r"\$\n\s*", "", text)
+    result, current = {}, None
+    for line in text.splitlines():
+        match = re.match(r"build (.+?): \S+ ", line)
+        if match:
+            current = {}
+            result[os.path.normpath(match.group(1).replace("$ ", " "))] = current
+        elif current is not None:
+            variable = re.match(r"\s+(\w+) = (.*)$", line)
+            if variable:
+                current[variable.group(1)] = variable.group(2).replace("$ ", " ")
+            else:
+                current = None
+    return result
+
+
+def ninja_vars(unit, root=None):
+    """Return variables for src/<unit>.o, optionally in another build root."""
+    path = (Path(root) if root is not None else ROOT) / "build.ninja"
+    variables = _build_variables(path.read_text(encoding="utf-8"))
     want = os.path.normpath(f"build/{VERSION}/src/{unit}.o")
-    lines = text.splitlines()
-    for i, line in enumerate(lines):
-        m = re.match(r"build (.+?): \S+ ", line)
-        if not (m and os.path.normpath(m.group(1).replace("$ ", " ")) == want):
-            continue
-        out = {}
-        for var in lines[i + 1:]:
-            vm = re.match(r"\s+(\w+) = (.*)$", var)
-            if not vm:
-                break
-            out[vm.group(1)] = vm.group(2).replace("$ ", " ")
-        return out
+    if want in variables:
+        return dict(variables[want])
     sys.exit(f"no build statement for {want} in build.ninja (run configure.py?)")
+
+
+def compiler_command(variables, root=None):
+    """Use the unit's actual compiler and required environment."""
+    root = Path(root) if root is not None else ROOT
+    tool = root / "build" / "compilers" / variables.get("mw_version", "ProDG/3.9.3")
+    if (tool / f"ngccc{EXE}").is_file():
+        return [str(tool / f"ngccc{EXE}")], dict(os.environ, SN_NGC_PATH=str(tool))
+    if (tool / f"mwcceppc{EXE}").is_file():
+        return [str(tool / f"mwcceppc{EXE}")], dict(os.environ)
+    raise FileNotFoundError(f"no ngccc or mwcceppc in {tool}; run configure.py and ninja first")
+
+
+def c_source_text(text, flags):
+    """Generated C declarations need no C++ linkage annotation."""
+    args = shlex.split(flags)
+    explicit_c = "-lang=c" in args or any(arg in ("-lang", "-x") and index+1<len(args)
+                                        and args[index+1]=="c" for index,arg in enumerate(args))
+    if not explicit_c:
+        return text
+    return re.sub(r'(?m)^([ \t]*)extern[ \t]+"C"[ \t]+', r'\1', text)
 
 
 def functions(objdump, obj):
@@ -120,11 +152,15 @@ def main():
 
     unit = a.unit.replace("\\", "/").removeprefix("src/").removesuffix(".cpp").removesuffix(".c")
     v = ninja_vars(unit)
-    cflags = (a.flags or v["cflags"]).split()
+    cflags = shlex.split(a.flags or v["cflags"])
     prodg = ROOT / "build" / "compilers" / v.get("mw_version", r"ProDG\3.9.3")
     objdump = ROOT / "build" / "binutils" / f"powerpc-eabi-objdump{EXE}"
     target_obj = ROOT / "build" / VERSION / "obj" / f"{unit}.o"
-    for p in (prodg / f"ngccc{EXE}", objdump, target_obj):
+    try:
+        prefix, env = compiler_command(v)
+    except FileNotFoundError as exc:
+        sys.exit(str(exc))
+    for p in (objdump, target_obj):
         if not p.exists():
             sys.exit(f"missing {p} (run configure.py and ninja first)")
 
@@ -140,12 +176,11 @@ def main():
     files = []
     for f in a.files:  # a directory stands for every .c/.cpp file in it
         files += sorted(str(p) for p in Path(f).iterdir() if p.suffix in (".c", ".cpp")) if os.path.isdir(f) else [f]
-    env = dict(os.environ, SN_NGC_PATH=str(prodg))
     tmp = tempfile.mkdtemp(prefix="score_")
     show = a.show or len(files) == 1
     for i, src in enumerate(files):
         obj = os.path.join(tmp, f"v{i}.o")
-        r = subprocess.run([str(prodg / f"ngccc{EXE}"), *cflags, "-c", os.path.abspath(src), "-o", obj],
+        r = subprocess.run([*prefix, *cflags, "-c", os.path.abspath(src), "-o", obj],
                            cwd=ROOT, env=env, capture_output=True, text=True)
         if r.returncode:
             print(f"ERROR  {src}\n{(r.stdout + r.stderr).strip()[-1500:]}")

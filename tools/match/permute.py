@@ -61,7 +61,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from score_variants import EXE, ROOT, VERSION, ninja_vars  # noqa: E402
+from score_variants import EXE, ROOT, VERSION, compiler_command, ninja_vars  # noqa: E402
 from cxx2c import base_name, cxx_to_c, definition_body, is_definition_of, needed_only, segments  # noqa: E402
 
 PERMUTER_DIR = Path(os.environ.get("PERMUTER_DIR", r"C:\Users\Patrick Taylor\tools-ext\permuter"))
@@ -86,12 +86,10 @@ def git_bash_dir():
 
 def compiler(v):
     """(argv prefix, env) that compile like the unit's ninja rule."""
-    tool = ROOT / "build" / "compilers" / v["mw_version"]
-    if (tool / f"ngccc{EXE}").exists():
-        return [str(tool / f"ngccc{EXE}")], dict(os.environ, SN_NGC_PATH=str(tool))
-    if (tool / f"mwcceppc{EXE}").exists():
-        return [str(tool / f"mwcceppc{EXE}")], dict(os.environ)
-    sys.exit(f"no ngccc or mwcceppc in {tool} (run configure.py and ninja first)")
+    try:
+        return compiler_command(v, root=ROOT)
+    except FileNotFoundError as exc:
+        sys.exit(str(exc))
 
 
 def target_asm(unit, fn):

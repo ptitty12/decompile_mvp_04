@@ -41,7 +41,8 @@ Limits (skipped, reported as "skip:<reason>"):
   - a literal the twin builds by an expression (not a plain float or string literal);
   - symbol maps that are inconsistent or non-injective in a way the compile cannot resolve;
   - anything that does not compile: the unit's own types are never altered.
-Clones are always emitted extern "C" (the name stays fn_<ADDR>, so rename.py has nothing to
+C++ clones use extern "C"; explicitly C units use plain C declarations (the name stays
+fn_<ADDR>, so rename.py has nothing to
 mangle and callers in other units keep linking).  Everything it adds is plain C++ the repo's
 rules allow; the verifier and check_literals decide, not this tool.
 """
@@ -49,12 +50,15 @@ import argparse
 import json
 import os
 import re
+import shlex
 import struct
 import subprocess
 import sys
 import tempfile
 from collections import defaultdict
 from pathlib import Path
+
+from score_variants import compiler_command, c_source_text, ninja_vars
 
 ROOT = Path(__file__).resolve().parents[2]
 VER = "GV4E69"
@@ -562,37 +566,23 @@ class Cloner:
 
     # ---- compiling
     def cflags(self, rel):
-        if rel in self._vars:
-            return self._vars[rel]
-        text = (ROOT / "build.ninja").read_text(encoding="utf-8")
-        text = re.sub(r"\$\n\s*", "", text)
-        want = os.path.normpath(f"build/{VER}/src/{rel}.o")
-        lines = text.splitlines()
-        for i, line in enumerate(lines):
-            m = re.match(r"build (.+?): \S+ ", line)
-            if not (m and os.path.normpath(m.group(1).replace("$ ", " ")) == want):
-                continue
-            out = {}
-            for var in lines[i + 1:]:
-                vm = re.match(r"\s+(\w+) = (.*)$", var)
-                if not vm:
-                    break
-                out[vm.group(1)] = vm.group(2).replace("$ ", " ")
-            self._vars[rel] = out
-            return out
-        raise SystemExit(f"no build statement for {rel} in build.ninja (run configure.py?)")
+        if rel not in self._vars:
+            self._vars[rel] = ninja_vars(rel, root=ROOT)
+        return self._vars[rel]
 
     def compile(self, rel, text):
-        v = self.cflags(rel)
-        prodg = ROOT / "build" / "compilers" / v.get("mw_version", r"ProDG\3.9.3")
-        env = dict(os.environ, SN_NGC_PATH=str(prodg))
-        d = tempfile.mkdtemp(prefix="clone_")
-        src, obj = os.path.join(d, "u.cpp"), os.path.join(d, "u.o")
+        variables = self.cflags(rel)
+        try:
+            prefix, env = compiler_command(variables, root=ROOT)
+        except FileNotFoundError as exc:
+            return None, str(exc)
+        directory = tempfile.mkdtemp(prefix="clone_")
+        src, obj = os.path.join(directory, "u.cpp"), os.path.join(directory, "u.o")
         Path(src).write_text(text, encoding="utf-8")
-        r = subprocess.run([str(prodg / f"ngccc{EXE}"), *v["cflags"].split(), "-c", src, "-o", obj],
-                           cwd=ROOT, env=env, capture_output=True, text=True)
-        if r.returncode:
-            return None, (r.stdout + r.stderr).strip()
+        result = subprocess.run([*prefix, *shlex.split(variables["cflags"]), "-c", src, "-o", obj],
+                                cwd=ROOT, env=env, capture_output=True, text=True)
+        if result.returncode:
+            return None, (result.stdout + result.stderr).strip()
         return obj, ""
 
     def objfuncs(self, obj):
@@ -957,6 +947,7 @@ class Cloner:
             tried_sigs.add(sig)
             inc_pos, ins_pos = self.positions(text, tg.addr, tgt.path)
             new_text, upto = self.compose(text, inc_pos, ins_pos, includes, decls, clone)
+            new_text = c_source_text(new_text, self.cflags(tgt.rel)["cflags"])
             obj, err = self.compile(tgt.rel, new_text)
             if obj is None and os.environ.get("CLONE_DEBUG") == f"{tg.addr:08X}":
                 print("----- scratch tail -----\n" + new_text[:upto][-2500:] + "\n----- error -----\n" + err[:1500])

@@ -50,6 +50,12 @@ def proof(unit,linked,unit_starts,exports,source_object=None):
  tf=a.funcs(ti);sf=b.funcs(bi);tr=a.relocs(ti);sr=b.relocs(bi)
  allocated=[i for i,s in enumerate(b.secs) if s[2]&2 and s[5] and b.names[i] not in CODE_SECTIONS]
  bases={i:set() for i in allocated};unknown=[]
+ # Existing exact-sized data ownership is also a declared anchor, useful
+ # for one-pointer ctor sections too small for a unique blob search.
+ for i in allocated:
+  name=b.names[i];actual=unit_starts.get((unit,name))
+  if actual is not None and name in a.names and b.secs[i][5]==a.secs[a.names.index(name)][5]:
+   bases[i].add(actual)
  # A canonical global object definition anchors even a zero-filled section.
  # ProDG C emits sized globals as STT_NOTYPE; accept those as well as OBJECT.
  # Local labels and section symbols cannot establish ownership by name.

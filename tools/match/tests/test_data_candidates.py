@@ -40,11 +40,11 @@ class DataPlacementTests(unittest.TestCase):
     def main_image(self,rodata=b'ABCDWXYZ',data=b'',bss=b''):
         return FixtureElf({'.rodata':rodata,'.data':data,'.bss':bss},
             {'.text':0x1000,'.rodata':0x2000,'.data':0x3000,'.bss':0x4000})
-    def locate(self,source,target=None,main=None,exports=None):
+    def locate(self,source,target=None,main=None,exports=None,unit_starts=None):
         target=target or FixtureElf()
         main=main or self.main_image()
         with patch.object(data_candidates,'Elf',side_effect=lambda path: target if 'obj' in Path(path).parts else source):
-            result=data_candidates.proof('unit',main,{('unit','.text'):0x1000},exports or {})
+            result=data_candidates.proof('unit',main,unit_starts or {('unit','.text'):0x1000},exports or {})
         return {row['section']:row for row in result['sections']}
     def anchored(self,blob=b'ABCDWXYZ',source_offset=0,target_address=0x2000):
         source=FixtureElf({'.rodata':blob},
@@ -75,6 +75,29 @@ class DataPlacementTests(unittest.TestCase):
         with patch.object(data_candidates,'Elf',side_effect=[target,source]):
             result=data_candidates.proof('unit',self.main_image(),{('unit','.text'):0x1000},{'constant':0x2000})
         self.assertEqual(len(result['unknown_code_refs']),1)
+    def test_existing_exact_sized_split_anchors_small_section(self):
+        source=FixtureElf({'.rodata':b'ABCD'})
+        target=FixtureElf({'.rodata':b'ABCD'})
+        row=self.locate(source,target,main=self.main_image(b'----ABCD'),
+            unit_starts={('unit','.text'):0x1000,('unit','.rodata'):0x2004})['.rodata']
+        self.assertEqual(row['base'],'0x2004')
+        self.assertTrue(row['exact'])
+    def test_different_sized_split_does_not_anchor_small_section(self):
+        source=FixtureElf({'.rodata':b'ABCD'})
+        target=FixtureElf({'.rodata':b'ABCDWXYZ'})
+        row=self.locate(source,target,main=self.main_image(),
+            unit_starts={('unit','.text'):0x1000,('unit','.rodata'):0x2000})['.rodata']
+        self.assertIsNone(row['base'])
+    def test_declared_split_and_code_anchor_conflict_is_refused(self):
+        source=FixtureElf({'.rodata':b'ABCDWXYZ'},
+            relocations={1:{0:(0,4,0)}},symbols=[('',0,0,3,2)])
+        target=FixtureElf({'.rodata':b'ABCDWXYZ'},
+            relocations={1:{0:(0,4,0)}},symbols=[('constant',0,0,17,0)])
+        row=self.locate(source,target,exports={'constant':0x2000},
+            unit_starts={('unit','.text'):0x1000,('unit','.rodata'):0x2008})['.rodata']
+        self.assertEqual(len(row['bases']),2)
+        self.assertIsNone(row['base'])
+        self.assertFalse(row['exact'])
     def test_unique_full_section_search(self):
         source=FixtureElf({'.rodata':b'ABCDWXYZ'})
         row=self.locate(source,main=self.main_image(b'----ABCDWXYZ'))['.rodata']

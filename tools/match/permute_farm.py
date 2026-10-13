@@ -9,8 +9,9 @@ tools/match/permute.py for --minutes. Units the lead has handed to workers
 (tools/team/lead/state/busy_units.txt in the main checkout) are skipped.
 
 Ledger: <farm>/build/permute_farm/ledger.json, one entry per function: unit, match %, a
-hash of the unit's source, status (refused / tried / matched / mismatch), base and best
-score, best candidate. A function is tried again only after its unit's source changes.
+fingerprint of source/search inputs, status (refused / tried / matched / mismatch), base and best
+score, best candidate. A function is tried again after its source, included headers,
+compiler flags, or matching helper inputs change.
 
 On a score of 0 the farm puts the candidate's function body into src/<unit>, rebuilds that
 unit with ninja, checks that the function's code equals the retail target, saves the
@@ -32,6 +33,7 @@ import json
 import os
 import re
 import shutil
+import shlex
 import subprocess
 import sys
 import time
@@ -41,6 +43,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve()
 sys.path.insert(0, str(HERE.parent))
 from cxx2c import definition_body  # noqa: E402
+from score_variants import ninja_vars  # noqa: E402
 
 FARM = Path(os.environ.get("FARM_DIR", r"C:\Users\Patrick Taylor\decompile_mvp_04-farm"))
 STATE = FARM / "build" / "permute_farm"
@@ -178,21 +181,67 @@ def busy_units():
     return set(re.findall(r"[\w./-]+/tu_[0-9A-Fa-f]{8}", text))
 
 
+def helper_fingerprint():
+    """Invalidate stale attempts after a change to the actual search helpers."""
+    digest = hashlib.sha256(b"farm-search-inputs-v2")
+    for name in ("permute.py", "cxx2c.py", "score_variants.py"):
+        path = FARM / "tools" / "match" / name
+        digest.update(name.encode())
+        digest.update(path.read_bytes())
+    return digest.digest()
+
+
+def input_fingerprint(unit, source, helpers):
+    """Hash source, recursively resolved includes, and the unit's build flags."""
+    flags = ninja_vars(unit, root=FARM)
+    digest = hashlib.sha256(helpers)
+    digest.update(json.dumps({k: flags.get(k, "") for k in ("cflags", "mw_version")},
+                             sort_keys=True).encode())
+    roots = [FARM / "include", FARM / "include" / "prodg"]
+    args = shlex.split(flags.get("cflags", ""))
+    for index, arg in enumerate(args):
+        if arg in ("-I", "-i", "-isystem") and index + 1 < len(args):
+            roots.append(FARM / args[index + 1])
+        elif arg.startswith("-I") and len(arg) > 2:
+            roots.append(FARM / arg[2:])
+    pending, seen = [source], set()
+    while pending:
+        path = pending.pop().resolve()
+        if path in seen:
+            continue
+        seen.add(path)
+        data = path.read_bytes()
+        digest.update(str(path).encode())
+        digest.update(b"\0" + data + b"\0")
+        for name in re.findall(rb'^\s*#\s*include\s*[<"]([^">]+)[">]', data, re.M):
+            name = name.decode("utf-8")
+            include = next((root / name for root in [path.parent, *roots]
+                            if (root / name).is_file()), None)
+            if include is None:
+                digest.update(b"missing-include\0" + name.encode() + b"\0")
+            else:
+                pending.append(include)
+    return digest.hexdigest()
+
+
 def queue(ledger, min_pct):
     report = json.loads((FARM / "build" / VERSION / "report.json").read_text(encoding="utf-8"))
     busy, todo = busy_units(), []
+    helpers = helper_fingerprint()
     for u in report["units"]:
         unit = u["name"].split("/", 1)[-1]
         src = unit_source(unit)
         if src is None or unit in busy:
             continue
-        digest = hashlib.sha1(src.read_bytes()).hexdigest()
         fns = u.get("functions") or []
+        eligible = [f for f in fns if min_pct <= float(f.get("fuzzy_match_percent", 0)) < 100
+                    and int(f.get("size", 0))]
+        if not eligible:
+            continue
+        digest = input_fingerprint(unit, src, helpers)
         done = sum(1 for f in fns if float(f.get("fuzzy_match_percent", 0)) >= 100)
-        for f in fns:
+        for f in eligible:
             pct = float(f.get("fuzzy_match_percent", 0))
-            if not (min_pct <= pct < 100) or not int(f.get("size", 0)):
-                continue
             old = ledger.get(f["name"])
             if old and old.get("src") == digest:
                 continue
@@ -235,6 +284,10 @@ def apply_match(t, cand, run_dir):
     cname = re.search(r'func_name = "([^"]+)"', settings).group(1)
     src = unit_source(t["unit"])
     rel = src.relative_to(FARM).as_posix()
+    # A trial must not capture unrelated edits in its patch or erase them later.
+    if sh(["git", "diff", "--quiet", "HEAD", "--", rel], check=False).returncode:
+        return {"status": "mismatch", "why": "source has local edits; trial skipped"}
+    raw = src.read_bytes()
     text, cand_text = src.read_text(encoding="utf-8"), cand.read_text(encoding="utf-8")
     sb, cb = definition_body(text, cname), definition_body(cand_text, cname)
     if not sb or not cb:
@@ -254,7 +307,7 @@ def apply_match(t, cand, run_dir):
         log(f"MATCH CANDIDATE {t['fn']}: {patch}")
         return {"status": "matched", "patch": str(patch)}
     finally:
-        sh(["git", "checkout", "--quiet", "--", rel])  # the farm worktree stays clean
+        src.write_bytes(raw)  # restore exact prior contents, including line endings
 
 
 # ----------------------------------------------------------------------------- driver

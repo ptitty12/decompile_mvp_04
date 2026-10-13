@@ -1,6 +1,6 @@
 """Rank fully matched source objects for source-link trials (read-only).
 
-    python tools/match/link_candidates.py [--limit 30] [--json] [--all]
+    python tools/match/link_candidates.py [--limit 30] [--json] [--all | --footprint]
 
 Requires a successful current build. Candidates have 100% matched code/data,
 the same allocated section layout as their retail split object, and preferably
@@ -18,6 +18,12 @@ from check_literals import Elf, BUILD
 def allocated_layout(obj):
     return [(name, sec[1], sec[2], sec[5], sec[8])
             for name, sec in zip(obj.names, obj.secs) if sec[2] & 2 and sec[5]]
+
+
+def allocated_footprint(obj):
+    """Section names/types/sizes, ignoring object order, flags and alignment."""
+    return sorted((name, sec[1], sec[5])
+                  for name, sec in zip(obj.names, obj.secs) if sec[2] & 2 and sec[5])
 
 
 def candidates(report, linked):
@@ -40,7 +46,8 @@ def candidates(report, linked):
                           if s[4] == 0 and s[3] >> 4 != 0 and s[0] not in exports | local})
         rows.append({"unit": name, "source": meta["source_path"],
                      "bytes": int(m["total_code"]), "missing": missing,
-                     "same_layout": allocated_layout(retail) == allocated_layout(built)})
+                     "same_layout": allocated_layout(retail) == allocated_layout(built),
+                     "same_footprint": allocated_footprint(retail) == allocated_footprint(built)})
     return sorted(rows, key=lambda r: (not r["same_layout"], len(r["missing"]), -r["bytes"], r["unit"]))
 
 
@@ -49,6 +56,7 @@ def main():
     ap.add_argument("--limit", type=int, default=30)
     ap.add_argument("--json", action="store_true", help="print structured shortlist")
     ap.add_argument("--all", action="store_true", help="also list mismatched section layouts")
+    ap.add_argument("--footprint", action="store_true", help="also shortlist equal section sizes/types despite order, flags or alignment differences")
     a = ap.parse_args()
     if a.limit < 1:
         ap.error("--limit must be positive")
@@ -57,16 +65,18 @@ def main():
         rows = candidates(report, Elf(BUILD / "main.elf"))
     except OSError as e:
         ap.error(f"missing build input: {e}; run configure.py and ninja first")
-    rows = [r for r in rows if a.all or r["same_layout"]]
+    rows = [r for r in rows if a.all or r["same_layout"] or a.footprint and r["same_footprint"]]
     if a.json:
         print(json.dumps(rows[:a.limit], indent=2))
         return
-    ready = [r for r in rows if r["same_layout"] and not r["missing"]]
-    print(f"{len(rows)} candidates; {len(ready)} with matching layouts and resolved imports "
+    ready = [r for r in rows if (r["same_layout"] or a.footprint and r["same_footprint"]) and not r["missing"]]
+    print(f"{len(rows)} candidates; {len(ready)} with shortlisted layouts/footprints and resolved imports "
           f"({sum(r['bytes'] for r in ready)} code bytes). Still require a retail-hash trial.")
+    if a.footprint:
+        print("Equal footprints do not prove placement: final retail hash, literal checks and verifier remain required.")
     for r in rows[:a.limit]:
         print(f"{r['bytes']:6} B  {len(r['missing']):3} missing  "
-              f"{'layout OK' if r['same_layout'] else 'layout differs':14}  {r['unit']}")
+              f"{'layout OK' if r['same_layout'] else 'footprint only' if r['same_footprint'] else 'layout differs':14}  {r['unit']}")
         if r["missing"]:
             print("    " + ", ".join(r["missing"]))
 
