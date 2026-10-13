@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">51.59% of code matched as of 2026-10-13: 21,019 of 24,158 functions, 3,041,624 of 5,896,176 code bytes, 760 units with code; 6.55% of code built from source (234 of 845 units linked).</desc>
+<desc id="desc">51.59% of code matched as of 2026-10-13: 21,020 of 24,158 functions, 3,041,800 of 5,896,176 code bytes, 760 units with code; 6.55% of code built from source (234 of 845 units linked).</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -31,7 +31,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">51.59%</text>
 <text x="26.0" y="118.0" class="t2" font-size="13" font-weight="400" text-anchor="start">of code matched</text>
 <text x="260.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Functions matched</text>
-<text x="260.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">21,019 / 24,158</text>
+<text x="260.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">21,020 / 24,158</text>
 <text x="429.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
 <text x="429.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">3.04 MB / 5.90 MB</text>
 <rect x="598.0" y="62" width="10" height="10" rx="2" class="k2"/>
@@ -107,7 +107,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="164.2" y="356.8" width="27.5" height="28.8" rx="2" class="b3"><title>game/tu_80156714: 17,280 bytes of code, 60.3% fuzzy match</title></rect>
 <rect x="164.2" y="387.6" width="27.5" height="28.8" rx="2" class="b1"><title>game/tu_802EFF28: 17,276 bytes of code, 2.8% fuzzy match</title></rect>
 <rect x="164.2" y="418.3" width="27.5" height="28.7" rx="2" class="b2"><title>game/tu_8030C5D8: 17,244 bytes of code, 50.0% fuzzy match</title></rect>
-<rect x="164.2" y="449.0" width="27.5" height="28.7" rx="2" class="b3"><title>game/tu_8010E0F4: 17,224 bytes of code, 57.1% fuzzy match</title></rect>
+<rect x="164.2" y="449.0" width="27.5" height="28.7" rx="2" class="b3"><title>game/tu_8010E0F4: 17,224 bytes of code, 57.3% fuzzy match</title></rect>
 <rect x="164.2" y="479.7" width="27.5" height="28.7" rx="2" class="b1"><title>game/tu_80190A00: 17,220 bytes of code, 24.6% fuzzy match</title></rect>
 <rect x="164.2" y="510.4" width="27.5" height="28.6" rx="2" class="b1"><title>game/tu_80188698: 17,200 bytes of code, 16.3% fuzzy match</title></rect>
 <rect x="193.7" y="201.0" width="27.0" height="29.1" rx="2" class="b4"><title>db/tu_80535360: 17,180 bytes of code, 91.0% fuzzy match</title></rect>
@@ -770,7 +770,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <circle cx="68.0" cy="739.8" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
 <circle cx="357.3" cy="699.2" r="4" class="dot" stroke-width="2"><title>2026-10-11: 29.15% of code, 16,053 / 24,158 functions</title></circle>
 <circle cx="646.7" cy="670.0" r="4" class="dot" stroke-width="2"><title>2026-10-12: 49.98% of code, 20,740 / 24,158 functions</title></circle>
-<circle cx="936.0" cy="667.8" r="4" class="dot" stroke-width="2"><title>2026-10-13: 51.59% of code, 21,019 / 24,158 functions</title></circle>
+<circle cx="936.0" cy="667.8" r="4" class="dot" stroke-width="2"><title>2026-10-13: 51.59% of code, 21,020 / 24,158 functions</title></circle>
 <circle cx="936.0" cy="730.8" r="4" class="dot2" stroke-width="2"><title>2026-10-13: 6.55% of code built from source</title></circle>
 <text x="936.0" y="720.8" class="t1" font-size="12" font-weight="600" text-anchor="end">6.55%</text>
 <text x="936.0" y="657.8" class="t1" font-size="12" font-weight="600" text-anchor="end">51.59%</text>
