@@ -93,6 +93,8 @@ void fn_80425BE4(void);
 void fn_80423F94(void);
 int __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block);
 DVDCommandBlock* __DVDPopWaitingQueue(void);
+extern u32 lbl_80633CF4[3];
+extern u32 lbl_806EF1B4;
 int tolower(int c);
 extern u32 lbl_806EF654;
 extern void (*lbl_806EF1A8)(DVDCommandBlock*, DVDLowCallback);
@@ -924,6 +926,202 @@ void fn_8042427C(DVDCommandBlock* block) {
     default:
         lbl_806EF1A8(block, fn_804245BC);
         break;
+    }
+}
+
+/* 804245B8 */
+static BOOL CheckCancelB(DvdBss* b, u32 resume) {
+    DVDCommandBlock* finished;
+
+    if (lbl_806EF680) {
+        lbl_806EF688 = resume;
+        finished = lbl_806EF660;
+        lbl_806EF680 = 0;
+        lbl_806EF660 = &b->dummy;
+        finished->state = 10;
+        if (finished->callback) {
+            finished->callback(-3, finished);
+        }
+        if (lbl_806EF684) {
+            lbl_806EF684(0, finished);
+        }
+        fn_80423F94();
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* 804245B8 */
+static BOOL IsDmaCommand(u32 command) {
+    if (command == 1 || command == 4 || command == 5 || command == 14) {
+        return TRUE;
+    }
+    if (command == lbl_806EF1B4) {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* 804245B8 */
+static BOOL IsImmCommandWithResult(u32 command) {
+    s32 i;
+
+    if (command - 9 <= 3) {
+        return TRUE;
+    }
+    for (i = 0; i < 3; i++) {
+        if (command == lbl_80633CF4[i]) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+/* near-miss: one scheduling swap (retail computes addi r5,r4,0x1c before the lwz of currTransferSize in the INITSTREAM case) */
+void fn_804245BC(u32 intType) {
+    DvdBss* b = &lbl_806DE160;
+    DVDCommandBlock* finished;
+    u32 result;
+    u32 command;
+
+    if (intType == 0x10) {
+        fn_80423270();
+        return;
+    }
+    if (lbl_806EF67C == 3 || lbl_806EF67C == 15) {
+        if (intType & 2) {
+            fn_80425A70(0x1234567);
+            fn_804267F4(fn_804231C4);
+            return;
+        }
+        lbl_806EF694 = 0;
+        if (lbl_806EF67C == 15) {
+            lbl_806EF698 = 1;
+        }
+        if (CheckCancelB(b, 7)) {
+            return;
+        }
+        lbl_806EF660->state = 7;
+        fn_80426724(fn_80423EA8);
+        return;
+    }
+    if (IsDmaCommand(lbl_806EF67C)) {
+        lbl_806EF660->transferredSize += lbl_806EF660->currTransferSize - __DIRegs[6];
+    }
+    if (intType & 8) {
+        finished = lbl_806EF660;
+        lbl_806EF680 = 0;
+        lbl_806EF660 = &b->dummy;
+        finished->state = 10;
+        if (finished->callback) {
+            finished->callback(-3, finished);
+        }
+        if (lbl_806EF684) {
+            lbl_806EF684(0, finished);
+        }
+        fn_80423F94();
+        return;
+    }
+    if (intType & 1) {
+        lbl_806EF694 = 0;
+        if (lbl_806EF67C == 16) {
+            lbl_806EF6A8 = 1;
+            finished = lbl_806EF660;
+            lbl_806EF660 = &b->dummy;
+            finished->state = 0;
+            if (finished->callback) {
+                finished->callback(0, finished);
+            }
+            fn_80423F94();
+            return;
+        }
+        if (CheckCancelB(b, 0)) {
+            return;
+        }
+        if (IsDmaCommand(lbl_806EF67C)) {
+            if (lbl_806EF660->transferredSize != lbl_806EF660->length) {
+                fn_8042427C(lbl_806EF660);
+                return;
+            }
+            finished = lbl_806EF660;
+            lbl_806EF660 = &b->dummy;
+            finished->state = 0;
+            if (finished->callback) {
+                finished->callback(finished->transferredSize, finished);
+            }
+            fn_80423F94();
+            return;
+        }
+        if (IsImmCommandWithResult(lbl_806EF67C)) {
+            if (lbl_806EF67C == 11 || lbl_806EF67C == 10) {
+                result = __DIRegs[8] << 2;
+            } else {
+                result = __DIRegs[8];
+            }
+            finished = lbl_806EF660;
+            lbl_806EF660 = &b->dummy;
+            finished->state = 0;
+            if (finished->callback) {
+                finished->callback(result, finished);
+            }
+            fn_80423F94();
+            return;
+        }
+        if (lbl_806EF67C == 6) {
+            finished = lbl_806EF660;
+            if (lbl_806EF660->currTransferSize == 0) {
+                if (__DIRegs[8] & 1) {
+                    lbl_806EF660 = &b->dummy;
+                    finished->state = 9;
+                    if (finished->callback) {
+                        finished->callback(-2, finished);
+                    }
+                    fn_80423F94();
+                    return;
+                }
+                lbl_806EF674 = 0;
+                lbl_806EF660->currTransferSize = 1;
+                fn_804269A8(0, lbl_806EF660->length, lbl_806EF660->offset, fn_804245BC);
+                return;
+            }
+            lbl_806EF660 = &b->dummy;
+            finished->state = 0;
+            if (finished->callback) {
+                finished->callback(0, finished);
+            }
+            fn_80423F94();
+            return;
+        }
+        finished = lbl_806EF660;
+        lbl_806EF660 = &b->dummy;
+        finished->state = 0;
+        if (finished->callback) {
+            finished->callback(0, finished);
+        }
+        fn_80423F94();
+    } else {
+        if (lbl_806EF67C == 14) {
+            fn_80425A70(0x1234567);
+            fn_804267F4(fn_804231C4);
+            return;
+        }
+        if (lbl_806EF67C == 1 || lbl_806EF67C == 4 || lbl_806EF67C == 5 || lbl_806EF67C == 14) {
+            finished = lbl_806EF660;
+            if (finished->transferredSize == finished->length) {
+                if (CheckCancelB(b, 0)) {
+                    return;
+                }
+                finished = lbl_806EF660;
+                lbl_806EF660 = &b->dummy;
+                finished->state = 0;
+                if (finished->callback) {
+                    finished->callback(finished->transferredSize, finished);
+                }
+                fn_80423F94();
+                return;
+            }
+        }
+        fn_80426880(fn_80423380);
     }
 }
 
