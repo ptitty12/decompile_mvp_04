@@ -183,6 +183,20 @@ struct Db8056792C_H : Db80566B38_D {
     virtual Db8056792C_List* v4(int a);
 };
 float fn_8056FFB0();
+struct Db80567174_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056746C_O* v4(int a);
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual Db8056746C_O* v8(int a);
+    virtual Db8056746C_O* v9(int a);
+};
+int fn_80084114(int x);
+void fn_80084170(int x, int* lo, int* hi);
+int fn_80084600(int x);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -353,6 +367,39 @@ extern "C" DB_OVERLAY void fn_80566E78(Db80565CDC_S* s, int kind, int c)
             else
                 fn_80567174(s, i, c);
             Db80566E78_Step(i);
+        } while (i <= hi);
+    }
+}
+
+inline void Db80567174_Step(int& v)
+{
+    int t;
+    if (v > 25)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+extern "C" DB_OVERLAY void fn_80567174(Db80565CDC_S* s, int a, int b)
+{
+    Db80567174_H* h = (Db80567174_H*)b;
+    int kind = fn_80084114(a);
+    int lo = 0x1A;
+    int hi = 0x1A;
+    fn_80084170(a, &lo, &hi);
+    int i = lo;
+    if (i <= hi) {
+        do {
+            if (fn_80084600(a) == 1) {
+                int x = h->v8(i)->v21(0)->m0;
+                int y = h->v9(i)->v21(0)->m0;
+                fn_8056A058((int)s, kind, 3, x, y, 0);
+            } else {
+                int x = h->v4(i)->v21(0)->m0;
+                int y = h->v4(i)->v21(1)->m0;
+                fn_8056A058((int)s, kind, 3, x, y, 0);
+            }
+            Db80567174_Step(i);
         } while (i <= hi);
     }
 }
