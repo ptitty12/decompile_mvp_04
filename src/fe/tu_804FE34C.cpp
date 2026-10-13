@@ -224,6 +224,45 @@ extern "C" FE_OVERLAY void fn_804FE8FC(FeScrD* x)
     fn_800ECE34(x);
 }
 
+extern "C" FeW* fn_800C8044(FeW*);
+extern "C" char* fn_80549F54(char*);
+extern "C" void fn_8054A024(char*, int, int);
+extern "C" int fn_8007B1EC__18Unk8007A4DC_Screen(void*);
+extern "C" void fn_80377408(void*);
+extern "C" void* fn_800B8144();
+extern "C" void fn_800B82D0(void*, int, int);
+extern const char lbl_805FB538[], lbl_805F5058[];
+extern "C" FE_OVERLAY void fn_804FE91C(FeScrRos* x)
+{
+    fn_800ECF18(x);
+    char* temporary = fn_80549F54((char*)operator new(0x14ED4, 0x100));
+    unsigned count = fn_8007B1EC__18Unk8007A4DC_Screen(lbl_8061930C);
+    while (count <= 0xCB1) {
+        ++count;
+        fn_8054A024(temporary, 0, 1);
+    }
+    if (temporary != 0)
+        fn_80377408(temporary);
+    x->m19C = 0;
+    FeW* normal = fn_800C8044(x->fn_vslot32(lbl_805FB52C, 1));
+    FeW* special = fn_800C8044(x->fn_vslot32(lbl_805FB538, 1));
+    if (fn_800B555C()->m0 == 2) {
+        normal->fn_vslot8(0);
+        special->fn_vslot8(1);
+        *(FeW**)((char*)x + 0x134) = fn_800C8060(special->fn_vslot32(lbl_805F5058, 1));
+    } else {
+        normal->fn_vslot8(1);
+        special->fn_vslot8(0);
+        *(FeW**)((char*)x + 0x134) = fn_800C8060(normal->fn_vslot32(lbl_805F4EF4, 1));
+    }
+    FeW* navigation = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(navigation, x);
+    fn_801250D8(navigation);
+    fn_80125100(navigation);
+    if (fn_800B555C()->m0 == 0x32)
+        fn_800B82D0(fn_800B8144(), -2, 1);
+}
+
 extern "C" FE_OVERLAY int fn_804FEB40(FeScrJ* x)
 {
     fn_804FEE04(x);
