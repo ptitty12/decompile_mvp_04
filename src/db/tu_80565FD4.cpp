@@ -109,6 +109,24 @@ inline Unk8052B978_Tbl* TblOf2(int o, TblSet a)
 {
     return *(Unk8052B978_Tbl**)((char*)a + o);
 }
+struct Db80566B38_Row {
+    int m0;
+};
+struct Db80566B38_List {
+    Db80566B38_Row* m0;
+    unsigned m4;
+};
+struct Db80566B38_D {
+    char pad0[0xDBC];
+};
+struct Db80566B38_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db80566B38_List* v4(int a);
+    virtual Db80566B38_List* v5(int a);
+};
+extern "C" void fn_80569E60(Db80565CDC_S* s, int a, int b, int c, int d);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -233,6 +251,19 @@ inline void Db80566E78_Step(int& v)
         t = v + 1;
     v = t;
 }
+extern "C" DB_OVERLAY void fn_80566B38(Db80565CDC_S* s, Db80566B38_H* h)
+{
+    fn_8052BA70(s->m28);
+    int a = h->v4(0)->m0->m0;
+    int b = h->v4(1)->m0->m0;
+    int c = h->v4(2)->m0->m0;
+    fn_80569E60(s, a, b, c, h->v5(0)->m0->m0);
+    a = h->v4(3)->m0->m0;
+    b = h->v4(4)->m0->m0;
+    c = h->v4(5)->m0->m0;
+    fn_80569E60(s, a, b, c, h->v5(1)->m0->m0);
+}
+
 extern "C" DB_OVERLAY void fn_80566E78(Db80565CDC_S* s, int kind, int c)
 {
     char* b = (char*)s + 0x28;
