@@ -2306,6 +2306,8 @@ libm/kf_tan.cpp:
 
 libm/ef_rem_pio2.cpp:
 	.text       start:0x80412128 end:0x80412478
+	.sdata      start:0x806EF078 end:0x806EF0B0
+	.sdata2     start:0x806F03D8 end:0x806F0770 align:4
 
 libm/k_rem_pio2.cpp:
 	.text       start:0x80412478 end:0x80412D00
