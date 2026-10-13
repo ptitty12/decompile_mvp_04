@@ -5,6 +5,7 @@
 #include "game/tu_802C79F0.h"
 #include "game/warp_b.h"
 #include "game/tu_8000E618.h"
+#include "game/tu_8007A4DC.h"
 
 extern char lbl_806EF9E9;
 extern char lbl_806EF9DD;
