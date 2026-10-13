@@ -509,6 +509,58 @@ extern "C" DB_OVERLAY Db80594A10_P* fn_80595598(Db80594A10_P* self, int a, Db805
     return self;
 }
 
+extern Db80594C2C_Rec lbl_80601C78[];
+extern Db80594C2C_Rec lbl_80601CC8[];
+extern int lbl_80601C90[];
+extern float lbl_806E035C[];
+inline float Db8059581C_At(float* b, int o)
+{
+    return *(float*)((char*)b + o);
+}
+
+inline int Db8059581C_AtI(int* b, int o)
+{
+    return *(int*)((char*)b + o);
+}
+extern "C" DB_OVERLAY void fn_8059581C(Db80594C2C_Obj* self)
+{
+    Db805919E8_M* mgr = (Db805919E8_M*)self->m0;
+    int i = 0;
+    int off = 0;
+    int total = fn_8059394C((Db805937A4_Mgr*)mgr, fn_80592E04((Db805937A4_Mgr*)mgr, fn_80591A50(mgr)));
+    float s = 0.0f;
+    do {
+        int v = 0;
+        s = Db8059581C_At(lbl_806E035C, off) * (float)total;
+        float d = fn_80594418(self, i) - self->v30(i)->m0;
+        int k = (int)(d / self->v30(i)->m4 - 1.0);
+        int cap = fn_80595398((Db805951B8_T*)self->m18, i);
+        if (cap > 0) {
+            if (d == 0.0f) {
+                v = (int)(s + 0.5f);
+            } else if (!(d >= 0.0f)) {
+                Db80594C2C_Rec* rec = (Db80594C2C_Rec*)((char*)lbl_80601C78 + Db8059581C_AtI(lbl_80601C90, off) * 12);
+                float t = (float)(fn_8040ABA0() % 100) * (rec->a * 0.01f) + rec->b + (float)rec->c;
+                v = (int)(s * t + 0.5f);
+            } else if (!(d <= 0.0f)) {
+                Db80594C2C_Rec* rb = (Db80594C2C_Rec*)((char*)lbl_80601CC8 + Db8059581C_AtI(lbl_80601C90, off) * 12);
+                Db80594C2C_Rec* rec = (Db80594C2C_Rec*)((char*)(k * 24) + (int)rb);
+                float t = (float)(fn_8040ABA0() % 100) * (rec->a * 0.01f) + rec->b + (float)rec->c;
+                v = (int)(s - s * t + 0.5f);
+            }
+            int w = v;
+            if (w > cap)
+                w = cap;
+            v = w;
+            Db805919E8_M* m = (Db805919E8_M*)self->m0;
+            fn_80594418(self, i);
+            fn_80591B8C(m, 2, i, cap, v, 0);
+        }
+        i++;
+        off += 4;
+    } while (i <= 13);
+}
+
 extern "C" DB_OVERLAY Db805942E0_P* fn_80595B64(Db805942E0_P* self, Db805937A4_Mgr* m, int x)
 {
     fn_805942E0(self, m, 5, x);
