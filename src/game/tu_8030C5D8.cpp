@@ -301,7 +301,6 @@ struct Unk8030EF64_Obj {
     char pad38[0x64 - 0x38];
     float m64;
 };
-extern "C" void fn_8030EBC8(void* p, int a, int b);
 void fn_8030FA9C(Unk8030C5D8_Em* p);
 void fn_8030FB5C(Unk8030C5D8_Em* p);
 struct Unk8030FD50_Pr {
@@ -428,6 +427,24 @@ struct Unk8030F768_Obj {
 extern int lbl_8061FDCC;
 extern const Unk8030F768_Mtx lbl_8060E938;
 int fn_801A04A8(Unk8019F8C0_Owner* o, int k);
+struct Unk8030EBC8_Obj {
+    char pad0[0x1C];
+    Unk8030C5D8_Md* m1C;
+    char pad20[0x24 - 0x20];
+    int m24;
+    float m28;
+    float m2C;
+    float m30;
+    float m34;
+    char pad38[0x3C - 0x38];
+    int m3C;
+    char pad40[0x64 - 0x40];
+    float m64;
+};
+inline float Unk8030EBC8_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
 extern "C" {
 void fn_803E6D00(void* p, void* m);
 void fn_803E6C28(void* p, int n);
@@ -888,6 +905,59 @@ extern "C" void fn_8030EB38(void* pp)
     }
 }
 
+extern "C" int fn_8030EBC8(Unk8030EBC8_Obj* p, int st, int fl)
+{
+    float t0 = 0.0f;
+    if (p->m1C != 0)
+        t0 = Unk8030EBC8_Secs(p->m1C->m4C);
+    if (st == 3 && p->m3C == 0)
+        st = 2;
+    p->m24 = st;
+    p->m64 = 0.0f;
+    p->m2C = -1.0f;
+    if (fl != 0)
+        p->m34 = 0.167f;
+    else
+        p->m34 = 0.00167f;
+    switch (p->m24) {
+    case 1:
+        if (fl != 0) {
+            p->m28 = t0 + 5.0f;
+            p->m2C = p->m28 + 20.0f;
+        } else {
+            p->m28 = t0 + 300.0f + (float)(rand() % 600);
+            p->m2C = p->m28 + 180.0f + (float)(rand() % 120);
+        }
+        p->m30 = 0.1f;
+        break;
+    case 2:
+        if (fl != 0)
+            p->m28 = t0 + 5.0f;
+        else
+            p->m28 = t0 + (float)(rand() % 600);
+        p->m2C = p->m28 + 300.0f + (float)(rand() % 300);
+        p->m30 = 0.15f;
+        goto tail;
+    case 3:
+        if (fl != 0)
+            p->m28 = t0 + 5.0f;
+        else
+            p->m28 = t0 + (float)(rand() % 600);
+        p->m30 = 1.0f;
+        break;
+    case 0:
+    default:
+        p->m24 = 0;
+        p->m28 = -1.0f;
+        p->m30 = 0.0f;
+        break;
+    }
+tail:
+    p->m30 = p->m30 * 3.0f;
+    p->m30 = p->m30 <? 1.0f;
+    return p->m24;
+}
+
 extern "C" void fn_8030EF64(Unk8030EF64_Obj* p, float a, float b)
 {
     if (!(b <= 0.0f)) {
@@ -907,7 +977,7 @@ extern "C" void fn_8030EF64(Unk8030EF64_Obj* p, float a, float b)
                     if (!(p->m64 > 0.0f)) {
                         p->m64 = 0.0f;
                         if (p->m24 == 1)
-                            fn_8030EBC8(p, 1, 0);
+                            fn_8030EBC8((Unk8030EBC8_Obj*)p, 1, 0);
                     }
                 }
             }
