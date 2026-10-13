@@ -630,6 +630,53 @@ float Unk802362A8_Cpu::fn_80239DFC(int a)
     return r;
 }
 
+double fn_804103C0(double x);
+
+float fn_80239F58(float a, float b, float c, float d)
+{
+    float tab[6];
+    tab[0] = 0.75f;
+    tab[1] = 1.0f;
+    tab[2] = 0.9f;
+    tab[3] = 1.0f;
+    tab[4] = 0.85f;
+    tab[5] = 1.0f;
+    if (!(c >= a * 0.5f))
+        c = 0.0f;
+    float x = Lerp(0.75f, a, 1.0f);
+    float y = Lerp(0.9f, b, 1.0f);
+    float z = Lerp(0.85f, 1.0f - c, 1.0f);
+    float w = 0.0f;
+    int n0 = (int)(float)fn_804103C0(d * 5.0f);
+    int n;
+    if (n0 <= 5) {
+        n = n0;
+        if (n <= 0)
+            n = 1;
+    } else {
+        n = 5;
+    }
+    switch (n) {
+    case 1:
+        w = 0.1f;
+        break;
+    case 2:
+        w = 0.05f;
+        break;
+    case 3:
+        w = 0.0f;
+        break;
+    case 4:
+        w = -0.05f;
+        break;
+    case 5:
+        w = -0.1f;
+        break;
+    }
+    float r = x * y * z - w;
+    return r;
+}
+
 void Unk802362A8_Cpu::fn_8023A13C()
 {
     char* p = (char*)m2E0 + 0xC;
