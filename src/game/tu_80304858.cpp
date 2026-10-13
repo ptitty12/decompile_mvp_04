@@ -190,6 +190,46 @@ struct Unk803065EC_P {
     char pad1C[0xC];
     Unk8030665C_E e[8];
 };
+struct Unk80306494_R {
+    float m0;
+    int m4;
+    int m8;
+    int mC;
+    float m10;
+    float m14;
+    int m18;
+    int m1C;
+    int m20;
+    float m24;
+    int m28;
+    int m2C;
+    int m30;
+};
+struct Unk80306494_O {
+    char pad0[0x14];
+    int m14;
+    const void* m18;
+    char pad1C[8];
+    int m24;
+    Unk8030665C_E e[8];
+    int m208;
+    int m20C;
+    int m210;
+    int m214;
+    int m218;
+    int m21C;
+    Unk80306494_R r0;
+    Unk80306494_R r1;
+    char pad288[0x2D0 - 0x288];
+    float m2D0;
+    float m2D4;
+    float m2D8;
+    float m2DC;
+    int m2E0;
+};
+extern const char lbl_805E8710[];
+extern "C" char* strcpy(char* d, const char* s);
+extern "C" Unk80306494_O* fn_80306494(Unk80306494_O* o, int b);
 extern float lbl_805E8728;
 extern char lbl_805E7988;
 extern "C" void* fn_8040B830(void* dst, const void* src, int n);
@@ -500,6 +540,47 @@ int fn_80306438()
     }
     fn_803063E8();
     return 1;
+}
+
+Unk80306494_O* fn_80306494(Unk80306494_O* o, int b)
+{
+    fn_80328234(o, 0x10, b);
+    Unk8030665C_E* e = &o->e[0];
+    o->m24 = 0;
+    o->m18 = lbl_80665B18;
+    int i = 7;
+    do {
+        new (e) Unk8030665C_E();
+        e++;
+    } while (i-- != 0);
+    o->m208 = 0;
+    o->m20C = 0;
+    o->m210 = 0;
+    o->m214 = 1;
+    o->m218 = 2;
+    o->m21C = 0;
+    o->m2D0 = 0.0f;
+    o->m2D4 = 1.0f;
+    o->m2D8 = 0.0f;
+    o->m2DC = 0.0f;
+    o->m2E0 = 0;
+    o->r0.m4 = 0;
+    o->r0.m0 = 0.0f;
+    o->r0.mC = 0;
+    o->r0.m10 = 0.0f;
+    o->r0.m18 = 1;
+    o->r0.m1C = 1;
+    o->r0.m14 = 0.5f;
+    o->r0.m20 = 1;
+    o->r0.m8 = 0;
+    o->r0.m28 = 2;
+    o->r0.m2C = 2;
+    o->r0.m24 = 0.5f;
+    o->r0.m30 = 1;
+    o->r1 = o->r0;
+    o->m14 = 0;
+    strcpy((char*)o, lbl_805E8710);
+    return o;
 }
 
 void fn_803065EC(Unk803065EC_P* p, int c)
