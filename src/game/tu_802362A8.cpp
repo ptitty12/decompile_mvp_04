@@ -378,6 +378,40 @@ void Unk802362A8_Cpu::fn_80237B60(float* out)
     *out = *out * f;
 }
 
+inline float Unk80237E9C_Rand(Unk802362A8_Cpu* c, float scale, int line)
+{
+    const char* f = lbl_805D7978;
+    return (float)(unsigned)((Unk8014D8AC*)c->m2E4->m554)->fn_8014D8AC(1000000, f, line) * scale * 0.000001f;
+}
+extern "C" float fn_80088518(void* a, int idx, int* out, int k);
+extern int lbl_805D7DD8[];
+
+/* near-miss: 98.4%, 3 slots of 123: retail stores sp38 (stw r6,0x38) before 'slwi r30' and the sp18 store (stfs f0,0x18) after it; ours emits the stfs first.
+   Tried reordering the sp18/sp38 declarations and moving either earlier or later (all worse or equal). */
+int Unk802362A8_Cpu::fn_80237E9C(Unk802362A8_Req* p)
+{
+    if (fn_80238B84() != 0)
+        return 9;
+    char* g = ((Unk802362A8_Pg*)p)->m0;
+    if (!(fn_8024F048(g + 0xA0C, *(int*)(g + 0xA04), *(int*)(g + 0x44C), *(int*)(g + 0x708), 1) <= 0.9f)
+        && (*(int*)((char*)p + 8) != 0 || *(int*)((char*)p + 0xC) != 0))
+        return 1;
+    float v1[3] = { 0.2f, 0.3f, 0.4f };
+    Unk8022FE34_Game* gm = m2E4->m6F8;
+    int idx = gm->m14[2].m8 == 0;
+    int pl = At(gm->m10 + 0x14, idx);
+    float sp18 = v1[p->m14];
+    int sp38 = 0;
+    float sp1C = fn_80088518(gm->mC->mC, idx, &sp38, lbl_805D7DD8[pl]);
+    float v2[4] = { 0.0f, 0.1f, 0.15f, 0.25f };
+    sp18 = v2[pl] * sp1C + sp18;
+    sp18 = sp18 + fn_802377F4((Unk802362A8_Pg*)p);
+    fn_80237B60(&sp18);
+    if (Unk80237E9C_Rand(this, 1.0f, 0x2DC) >= sp18)
+        return 1;
+    return 9;
+}
+
 int Unk802362A8_Cpu::fn_80238088(Unk802362A8_Req* p)
 {
     if (fn_80238B84()) {
