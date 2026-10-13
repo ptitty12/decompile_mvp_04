@@ -297,7 +297,6 @@ extern "C" FE_OVERLAY void fn_8048A144(FeW* x)
     fn_80590CA8(*(int*)((char*)lbl_8061930C + 0x30));
 }
 
-/* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
 extern "C" FE_OVERLAY FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -317,9 +316,9 @@ extern "C" FE_OVERLAY FeScrArr* fn_8048A2AC(FeScrArr* self, int a, int b, int c,
     s->mC = 0;
     s->m10 = lbl_8064A550;
     fn_8040074C(s->m0, s->m8 * 4);
-    s->mC = 0;
     s->m10 = lbl_8064A3B8;
     s->m4 = 0;
+    s->mC = 0;
     s->m14 = 0;
     return self;
 }
