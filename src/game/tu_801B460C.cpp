@@ -150,7 +150,7 @@ struct Unk801B460C_Tbl {
     int m8;
     Unk801B460C_Ent m0C[25];
 };
-int fn_8014D8AC(void* a, int b, const char* c, int d);
+extern "C" unsigned fn_8014D8AC(void* a, int b, const char* c, int d);
 extern char lbl_805CF800[];
 extern float lbl_805CF7FC;
 int fn_8014E2B4(int a);
@@ -685,7 +685,7 @@ int fn_801B5880(Unk801B460C_Tbl* t)
     return t->m0C[fn_8014D8AC(t->m0->m8->m554, t->m8, lbl_805CF800, 0x945)].a;
 }
 
-/* near-miss: same code; only the order of the two arg-address loads (lis r4/r5) before fn_8014D8AC differs. */
+/* Named call arguments retain the retail label/scale evaluation order. */
 int fn_801B58D4(Unk801B460C_Tbl* t)
 {
     float w[25];
@@ -697,7 +697,9 @@ int fn_801B58D4(Unk801B460C_Tbl* t)
         total += w[i];
     }
     float s = total;
-    x = (float)(unsigned)fn_8014D8AC(t->m0->m8->m554, 1000000, lbl_805CF800, 0x960) * s * 1e-6f;
+    const char* label = lbl_805CF800;
+    int scale = 1000000;
+    x = (float)(unsigned)fn_8014D8AC(t->m0->m8->m554, scale, label, 0x960) * s * 1e-6f;
     volatile float pad;
     float acc = 0.0f;
     int res = 0;
