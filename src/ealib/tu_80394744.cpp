@@ -289,6 +289,35 @@ extern "C" int fn_80395250(int x, unsigned y)
     return r;
 }
 
+struct McRec6 {
+    char pad0[6];
+    unsigned char m6;
+};
+
+struct McTri {
+    int a;
+    int b;
+    int c;
+};
+
+inline unsigned char* McT(McRec6* p)
+{
+    int n = p->m6 * 2;
+    n = (n + 3) & ~3;
+    return (unsigned char*)p + (n + 0xc);
+}
+
+extern "C" int fn_80395350(McRec6* p, int i)
+{
+    McTri v;
+    int t = (int)McT(p);
+    int k = i * 3;
+    v.a = *(unsigned char*)(k + t);
+    v.b = *(unsigned char*)(k + t + 1);
+    v.c = *(unsigned char*)(k + t + 2);
+    return v.a;
+}
+
 extern "C" int fn_80395714(McRec67* p, int i, int c, int d)
 {
     int x;
