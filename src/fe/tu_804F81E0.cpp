@@ -773,16 +773,11 @@ extern "C" FE_OVERLAY void fn_804F9F9C(FeCap* self, int b, int c)
 extern "C" FE_OVERLAY float fn_804FA098(FeS23* self, int i, float x)
 {
     float r = 0.0f;
-    float* a;
-    float* b;
     if (self->m870 != 0) {
-        a = lbl_80622260;
-        b = lbl_80622280;
+        r = lbl_80622260[i] + lbl_80622280[i] * x;
     } else {
-        a = lbl_80622220;
-        b = lbl_80622240;
+        r = lbl_80622220[i] + lbl_80622240[i] * x;
     }
-    r = b[i] * x + a[i];
     return r;
 }
 
