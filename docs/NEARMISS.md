@@ -365,3 +365,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805721F8::fn_805744D4: 99.966446%, 149/149 instructions; eight source forms leave one local edge at slot 55 (retail +0xE4, candidate +0xEC), skipping the pointer-bound compare. Candidate reverted.
 - 2026-10-13 | db/tu_80565FD4 fn_8056693C | 99.71654%, 127/127 words, five differences after eight ordinary forms: initial day-store address and table-address temporary registers. |
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
+
+- `dolphin/ax/tu_8041783C` `fn_80417F50`: inherited99.39161%; eight ordinary AuxB channel-pointer/base forms fail to recover two folded offset words; source preserved, scratch build/root47/17F50.
+- `dolphin/ax/tu_8041783C` `fn_804190A4`: inherited98.52362%; eight ordinary scalar-helper/lifetime forms retain the extra initial studio-pointer copy; source preserved, scratch build/root47/190A4.
