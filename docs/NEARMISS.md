@@ -318,3 +318,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805467E0::fn_805489FC (98.42%): eight record/cursor/copy forms retain missing post-loop spill and frame-size difference; scratch build/root26/489FC, source restored.
 - db/tu_805467E0::fn_80547B38 (95.93%): four getter/index forms retain address CSE and register differences; scratch build/root26/47B38, source restored.
 - db/tu_805467E0::fn_80547EC0: eight ordinary missing-body forms reach 77/79 strict words (97.47%), two memory-load scheduling slots remain; scratch build/root26/47EC0, no source promoted.
+
+- db/tu_805467E0::fn_805479F0 (96.34% inherited): eight ordinary list/counter/lifetime forms retain register and block differences (best81/82 words); scratch build/root35/479F0, source restored.
