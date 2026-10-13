@@ -147,6 +147,67 @@ void fn_802349E8(Unk8022FE34_Owner* t)
     }
 }
 
+class Unk802F42A4 {
+public:
+    void fn_802F44D0();
+};
+void fn_80232500(Unk8022FE34_Owner* t);
+void fn_8022F204(Unk8022FE34_Owner* t);
+int fn_801DBF3C(void* p);
+extern "C" void* fn_800AB5C8(void* self);
+extern "C" char* fn_800AEC78(void* self, void* ctx);
+extern void* lbl_80619D10;
+extern int lbl_80620860;
+extern float lbl_8061D184;
+extern float lbl_8061D188;
+extern float lbl_805D729C[1];
+extern const float lbl_805D72AC;
+extern const float lbl_805D72B0;
+
+inline void ArmB(Unk8022FE34_Owner* t, float f)
+{
+    t->m438.a = 1;
+    t->m438.b = (int)(f * lbl_805D729C[0]);
+}
+inline void ArmC(Unk8022FE34_Owner* t, int a, float f)
+{
+    t->m438.a = a;
+    t->m438.b = (int)(f * lbl_805D729C[0]);
+}
+
+/* near-miss: 98.4%, 145/145 insns, one slot: retail schedules 'li r4,1' (the fn_8022F2B8 argument) before the m438.a store in the
+   shared tail; ours leaves it right before the call. Everything else, including the b-vs-a register for the stored 1, matches. */
+void fn_80234B18(Unk8022FE34_U* u)
+{
+    fn_80232500(u->m4);
+    ((Unk802F42A4*)u->fn_80235FA8()->m720)->fn_802F44D0();
+    int a = u->fn_80234D5C();
+    int b = fn_801DBF3C(*(void**)((char*)u->m8 + 0x3B8));
+    if (*(int*)((char*)fn_801A6DB8(u->fn_80235FA8()) + 0x7C) != 0) {
+        if (u->fn_80235FA8()->m6F4 == 8) {
+            char* t = fn_800AEC78(fn_800AB5C8(lbl_80619D10), u->fn_80235FA8());
+            if (t == 0 || *(int*)(*(char**)(t + 4) + 0x14) != 0)
+                return;
+            fn_8022F204(u->m4);
+            ArmB(u->m4, lbl_8061D184);
+        } else {
+            ArmB(u->m4, lbl_805D72AC);
+        }
+        fn_8022F2B8(u->m4, 1);
+        u->m6C = (float)u->fn_80235FA8()->m4C * 0.016666668f;
+    } else if (((Unk8022FE34_U*)u->m4)->fn_802348F4() == 1 && b == 1 && a == 1) {
+        fn_8022F2B8(u->m4, 1);
+        if (u->m80 == 0)
+            u->m6C = (float)u->fn_80235FA8()->m4C * 0.016666668f;
+        if (lbl_80620860 != 0) {
+            ArmC(u->m4, b, lbl_805D72B0);
+        } else if (u->fn_80235FA8()->m6F4 == 7) {
+            ArmC(u->m4, b, lbl_8061D188);
+        }
+        u->m4->fn_80231FC0();
+    }
+}
+
 int Unk8022FE34_U::fn_80234D5C()
 {
     const float c = 4.0f;
