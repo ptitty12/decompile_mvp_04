@@ -59,7 +59,7 @@ extern int lbl_80620418;
 float fn_802D7E2C(int h);
 void fn_802D095C(void* o, float a, float b);
 void fn_802D0D30(void* o);
-void fn_802D0F74(void* o, float t);
+extern "C" void fn_802D0F74(Unk802D0B4C* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t);
 
 Unk802D0B4C::Unk802D0B4C()
 {
@@ -95,6 +95,36 @@ struct Unk802CF894_Self;
 class Unk802CF894_Reg;
 void fn_802CF894(Unk802CF894_Self* s, Unk802CF894_Reg* r);
 void fn_802CF368(Unk802CF368_Self* o);
+
+inline Unk802D0B4C_Vec3 Unk802D0F74_Sub(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D0F74_Mul(const Unk802D0B4C_Vec3& v, float k)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D0F74_Add(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+extern "C" void fn_802D0F74(Unk802D0B4C* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t)
+{
+    *b = Unk802D0F74_Add(*a, Unk802D0F74_Mul(Unk802D0F74_Sub(*b, *a), !((1.0f - self->m18) > 1.0f) ? ((1.0f - self->m18) >? 0.0f) : 1.0f));
+}
 
 void fn_802D1128(Unk802CF368_Self* self)
 {
@@ -150,7 +180,7 @@ void fn_802D11D0(char* o)
 
 void fn_802D11F4(char* o, float t)
 {
-    fn_802D0F74(o + 0xD4, t);
+    ((void (*)(char*, float))fn_802D0F74)(o + 0xD4, t);
 }
 
 void fn_802D1220(char* o)
