@@ -345,6 +345,76 @@ extern "C" FE_OVERLAY void fn_80445DA8(FeScr2* self)
     fn_804469DC(self, 1);
 }
 
+extern "C" FE_OVERLAY void fn_80445EF4(FeScr2* self, int idx)
+{
+    int arr[0x3E];
+    FeDate3 d;
+    FeDate3* pd = &d;
+    int o1;
+    int o2;
+    FeTimer* t = 0;
+    int tbl = fn_8056B094(lbl_80619948->m28, self->m14C, arr, 0x3E, self->m144);
+    int g = lbl_8061930C->fn_80078A38(self->m14C);
+    d.a = 0;
+    pd->b = 0;
+    pd->c = self->m152;
+    d.a = ((unsigned char*)&self->m144)[3] + 1;
+    if (idx == 0) {
+        int k = 0;
+        idx = fn_8032A130(self->m144, 1, self->m152);
+        for (; k < idx;) {
+            d.b = 0;
+            t = (FeTimer*)((FeObjP1*)self)->v89(k++);
+            int w = *(int*)&d;
+            t->m10 = -1;
+            t->m14 = -1;
+            t->m8 = -1;
+            *(int*)&t->mC = w;
+            t->s12();
+            fn_80444FE4(t);
+        }
+    }
+    int day = 1;
+    o1 = -1;
+    o2 = -1;
+    int cnt = fn_8032A2CC(self->m144, self->m152);
+    for (; day <= cnt && idx <= 0x22 && ((t = (FeTimer*)((FeObjP1*)self)->v89(idx)), 1); idx++, day++) {
+        int r = fn_80446334(self, arr, tbl, day, &o1, &o2, g);
+        d.b = day;
+        if (r == 0) {
+            int w = *(int*)&d;
+            t->m10 = -1;
+            t->m14 = -1;
+            t->m8 = 3;
+            *(int*)&t->mC = w;
+            t->s12();
+            fn_80444FE4(t);
+        } else {
+            int a1 = o1;
+            int a2 = o2;
+            int w = *(int*)&d;
+            t->m10 = a1;
+            t->m14 = a2;
+            t->m8 = -2;
+            *(int*)&t->mC = w;
+            t->s12();
+            fn_80444FE4(t);
+        }
+    }
+    for (; idx <= 0x22;) {
+        d.b = 0;
+        t = (FeTimer*)((FeObjP1*)self)->v89(idx++);
+        int w = *(int*)&d;
+        t->m10 = -1;
+        t->m14 = -1;
+        t->m8 = -1;
+        *(int*)&t->mC = w;
+        t->s12();
+        fn_80444FE4(t);
+    }
+    ((FeObj*)self)->v85();
+}
+
 extern "C" FE_OVERLAY int fn_804461A0(FeScr2* self, int n, int day, int idx)
 {
     int arr[0x3E];
