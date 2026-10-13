@@ -812,6 +812,264 @@ extern "C" void fn_80317120(int a, int b)
     lbl_8061FF4C = 0.0f;
 }
 
+extern float lbl_8068E550;
+extern int lbl_8068E554;
+extern float lbl_8068E558;
+extern int lbl_8068E55C;
+extern float lbl_8068E560;
+extern int lbl_8068E564;
+extern float lbl_8068E568;
+extern int lbl_8068E56C;
+extern float lbl_8068E570;
+extern int lbl_8068E574;
+extern float lbl_8068E520;
+extern int lbl_8068E524;
+extern float lbl_8068E528;
+extern int lbl_8068E52C;
+extern float lbl_8068E530;
+extern int lbl_8068E534;
+extern float lbl_8068E538;
+extern int lbl_8068E53C;
+extern float lbl_8068E540;
+extern int lbl_8068E544;
+extern float lbl_8068E548;
+extern int lbl_8068E54C;
+extern "C" void fn_80317240(float* p, float* unused, int a, int b)
+{
+    if (lbl_8061FEDC->m204 != 0) {
+        if (lbl_8068E524 == 0) {
+            lbl_8068E520 = 1.3333334f;
+            lbl_8068E524 = 1;
+        }
+        if (lbl_8068E52C == 0) {
+            float* q = &lbl_8068E528;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14;
+            lbl_8068E52C = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E534 == 0) {
+            float* q = &lbl_8068E530;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+            lbl_8068E534 = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E53C == 0) {
+            lbl_8068E538 = lbl_8068E530 * lbl_8068E520 <? lbl_8068E528;
+            lbl_8068E53C = 1;
+        }
+        if (lbl_8068E544 == 0) {
+            lbl_8068E540 = lbl_8068E538 / lbl_8068E528;
+            lbl_8068E544 = 1;
+        }
+        if (lbl_8068E54C == 0) {
+            lbl_8068E548 = (lbl_8068E528 - lbl_8068E538) * 0.5f / lbl_8068E528;
+            lbl_8068E54C = 1;
+        }
+        if (b == 0 && a == 0) {
+            *p *= lbl_8068E540;
+            *p += lbl_8068E548;
+        }
+        *p += lbl_8061FF4C;
+    }
+}
+
+extern "C" void fn_8031746C(float* p, int unused, int flag)
+{
+    if (lbl_8061FEDC->m204 != 0) {
+        if (lbl_8068E554 == 0) {
+            lbl_8068E550 = 1.3333334f;
+            lbl_8068E554 = 1;
+        }
+        if (lbl_8068E55C == 0) {
+            float* q = &lbl_8068E558;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14;
+            lbl_8068E55C = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E564 == 0) {
+            float* q = &lbl_8068E560;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+            lbl_8068E564 = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E56C == 0) {
+            lbl_8068E568 = lbl_8068E560 * lbl_8068E550 <? lbl_8068E558;
+            lbl_8068E56C = 1;
+        }
+        if (lbl_8068E574 == 0) {
+            lbl_8068E574 = 1;
+            lbl_8068E570 = lbl_8068E568 / lbl_8068E558;
+        }
+        if (flag == 0)
+            *p *= lbl_8068E570;
+    }
+}
+
+extern float lbl_8068E578;
+extern int lbl_8068E57C;
+extern float lbl_8068E580;
+extern int lbl_8068E584;
+extern float lbl_8068E588;
+extern int lbl_8068E58C;
+extern float lbl_8068E590;
+extern int lbl_8068E594;
+extern float lbl_8068E598;
+extern int lbl_8068E59C;
+extern "C" void fn_80317624(int* p, int* unused, int flag)
+{
+    if (lbl_8061FEDC->m204 != 0 && flag != 0) {
+        if (lbl_8068E57C == 0) {
+            lbl_8068E578 = 1.3333334f;
+            lbl_8068E57C = 1;
+        }
+        if (lbl_8068E584 == 0) {
+            float* q = &lbl_8068E580;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14;
+            lbl_8068E584 = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E58C == 0) {
+            float* q = &lbl_8068E588;
+            int v = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+            lbl_8068E58C = 1;
+            *q = (float)v;
+        }
+        if (lbl_8068E594 == 0) {
+            lbl_8068E590 = lbl_8068E588 * lbl_8068E578 <? lbl_8068E580;
+            lbl_8068E594 = 1;
+        }
+        if (lbl_8068E59C == 0) {
+            lbl_8068E598 = lbl_8068E580 / lbl_8068E590;
+            lbl_8068E59C = 1;
+        }
+        *p = (int)((float)*p * lbl_8068E598);
+    }
+}
+
+struct Unk80313C14_M16 {
+    float f[16];
+};
+extern Unk80313C14_M16 lbl_806E2144;
+extern const void* const lbl_806658C0[];
+extern const void* const lbl_80693CAC[];
+extern const char lbl_805E79A4[];
+struct Unk80313C14_FxA {
+    char pad0[0x18];
+    const void* m18;
+    char pad1C[8];
+    int m24;
+    int m28;
+    int m2C;
+    char* m30;
+    char* m34;
+    char* m38;
+    const void* m3C;
+    char pad40[0x3C];
+    char m7C[60];
+    char mB8[60];
+    int mF4;
+    int mF8;
+    int mFC;
+    int m100[6];
+    int m118;
+    int m11C;
+    int m120;
+    int m124[6];
+    void* m13C;
+    void* m140;
+    void* m144;
+    char* m148[6];
+    float m160;
+    float m164;
+};
+extern "C" {
+void fn_80328234(void* p, int a, int b);
+int fn_803E9B98(const void* a, void* b);
+void fn_803DBD54(void* p);
+void fn_803E6660(void* p);
+void* fn_803774A8(unsigned size, int heap);
+void fn_8035F77C(void* p);
+void fn_80317C94(void* p);
+void* memset(void* p, int c, unsigned n, ...);
+}
+void* fn_80317810(void* pp, int a, int b, int c, int d)
+{
+    Unk80313C14_FxA* self = (Unk80313C14_FxA*)pp;
+    int zero = 0;
+    char* sub = (char*)self + 0x3C;
+    int k = a - 1;
+    char tmp[8];
+    fn_80328234(self, 0xA, 0);
+    self->m18 = lbl_806658C0;
+    self->m3C = lbl_80693CAC;
+    self->m24 = zero;
+    *(int*)(sub + 4) = zero;
+    *(int*)(sub + 0x14) = fn_803E9B98(lbl_805E79A4, tmp);
+    *(int*)(sub + 0x10) = 1;
+    fn_803DBD54(self->m7C);
+    fn_803E6660(self->mB8);
+    lbl_8061FF44 = (int)self;
+    self->m2C = zero;
+    self->mF4 = a;
+    self->mF8 = b;
+    self->mFC = d;
+    char* arr = (char*)fn_803774A8(a * 0x98, 0x100);
+    char* q = arr;
+    if (a != 0) {
+        do {
+            fn_8035F77C(q);
+            q += 0x98;
+        } while (k-- != 0);
+    }
+    self->m13C = arr;
+    int k2 = b - 1;
+    char* arr2 = (char*)fn_803774A8(b * 0x98, 0x100);
+    char* q2 = arr2;
+    if (b != 0) {
+        do {
+            fn_8035F77C(q2);
+            q2 += 0x98;
+        } while (k2-- != 0);
+    }
+    self->m140 = arr2;
+    self->m144 = fn_803774A8(d * 0x24, 0x100);
+    self->m118 = 0;
+    self->m11C = 0;
+    self->m120 = 0;
+    int i = 0;
+    int cnt = 6;
+    do {
+        char* b1 = (char*)self + 0x100;
+        *(int*)(b1 + i) = c;
+        char* b2 = (char*)self + 0x148;
+        *(char**)(b2 + i) = (char*)fn_803774A8(c * 2, 0x100);
+        char* b3 = (char*)self + 0x124;
+        *(int*)(b3 + i) = 0;
+        i += 4;
+    } while (--cnt != 0);
+    Unk80313C14_M16 m;
+    Unk80313C14_M16* mp = &m;
+    memset(mp, 0, 0x40);
+    m.f[0] = -1.0f;
+    m.f[5] = 1.0f;
+    m.f[10] = 1.0f;
+    m.f[15] = 1.0f;
+    lbl_806E2144 = *mp;
+    self->m28 = 0;
+    int n = self->mF4;
+    if (n < self->mF8)
+        n = self->mF8;
+    int n6 = n * 6;
+    self->m30 = (char*)fn_803774A8(n * 0x48, 0x100);
+    self->m34 = (char*)fn_803774A8(n6 * 8, 0x100);
+    self->m38 = (char*)fn_803774A8(n6 * 4, 0x100);
+    self->m160 = 0.0015625f;
+    self->m164 = 0.0020833334f;
+    fn_8031883C(self);
+    fn_80317C94(self);
+    return self;
+}
+
 void fn_80317AB0(int flag)
 {
     if (lbl_8061FF44 == 0) {
