@@ -1232,7 +1232,7 @@ config.libs = [
             Object(Matching, "libm/sf_fabs.cpp"),
             Object(Matching, "libm/sf_floor.cpp"),
             Object(NonMatching, "libm/sf_sin.cpp"),
-            Object(NonMatching, "libm/sf_tan.cpp"),
+            Object(Matching, "libm/sf_tan.cpp"),
             Object(Matching, "libm/k_cos.cpp"),
             Object(Matching, "libm/k_sin.cpp"),
             Object(Matching, "libm/e_rem_pio2.cpp"),

@@ -2299,6 +2299,7 @@ libm/sf_sin.cpp:
 
 libm/sf_tan.cpp:
 	.text       start:0x804117F8 end:0x80411878
+	.sdata      start:0x806EEF0C end:0x806EEF10 align:4
 
 libm/k_cos.cpp:
 	.text       start:0x80411878 end:0x8041196C
