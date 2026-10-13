@@ -7,6 +7,16 @@
  */
 #include "game/tu_80050A68.h"
 
+/* fn_80050D24: 0x18-byte entries at a + 0x45C (m8 the linked object, mC a flag). */
+struct Unk80050D24_Ent {
+    int m0;
+    int m4;
+    Unk80044C10_A* m8;
+    int mC;
+    int m10;
+    int m14;
+};
+
 void fn_80050A68(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     Unk80050A68_Obj* o = (Unk80050A68_Obj*)a;
@@ -47,6 +57,77 @@ void fn_80050A68(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
             fn_8001014C(x, y, z, fn_8001F904(a));
         }
     }
+}
+
+int fn_80050D24(Unk800493D4_Sm* s, Unk80044C10_A* a)
+{
+    int r = -1;
+    if (a->m448 == 0 || a->m444 == 8) {
+        int k = a->m4D4;
+        if (k == 3) {
+            r = 8;
+        } else if ((a->m4D8 == 2 && a->m448 == 0) || a->m444 == 8) {
+            int off = k * 0x18;
+            Unk80044C10_A* p = (Unk80044C10_A*)s->mA14[0];
+            Unk80050D24_Ent* e0 = (Unk80050D24_Ent*)((char*)a + (off + 0x45C));
+            Unk80050D24_Ent* e1 = (Unk80050D24_Ent*)((char*)a + (off + 0x474));
+            if (p != 0) {
+                int pv = p->m460;
+                if (pv == 2) {
+                    if (e0->mC == 1) {
+                        Unk80044C10_A* x = e0->m8;
+                        if (x != 0 && x->m460 == 5 && e1->mC == 0) {
+                            Unk80044C10_A* y = e1->m8;
+                            if (y != 0) {
+                                int v = y->m460;
+                                if (v == 0)
+                                    r = 0;
+                                else if (v == 2)
+                                    r = 1;
+                            }
+                        }
+                    }
+                } else if (pv == 3) {
+                    if (e0->mC == 1) {
+                        Unk80044C10_A* x = e0->m8;
+                        if (x != 0 && x->m460 == 5 && e1->mC == 0) {
+                            Unk80044C10_A* y = e1->m8;
+                            if (y != 0 && y->m460 == 2)
+                                r = 2;
+                        }
+                    }
+                } else if (pv == 4) {
+                    if (e0->mC == 1) {
+                        Unk80044C10_A* x = e0->m8;
+                        if (x != 0 && x->m460 == 3 && e1->mC == 0) {
+                            Unk80044C10_A* y = e1->m8;
+                            if (y != 0 && y->m460 == 2)
+                                r = 3;
+                        }
+                    }
+                } else if (pv == 5) {
+                    if (e0->mC == 1) {
+                        Unk80044C10_A* x = e0->m8;
+                        if (x != 0 && e1->mC == 0) {
+                            Unk80044C10_A* y = e1->m8;
+                            if (y != 0 && y->m460 == 2) {
+                                int v = x->m460;
+                                if (v == 5)
+                                    r = 4;
+                                else if (v == 3)
+                                    r = 5;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (fn_8004FF78(s, s->m9D8, 0x33) >= 0)
+        r = 6;
+    if (fn_8004FF78(s, s->m9D8, 0x1C) >= 0 && fn_8004FF78(s, s->m9D8, 8) >= 0 && a->m4D4 == 3)
+        r = 7;
+    return r;
 }
 
 void fn_80050F9C(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)

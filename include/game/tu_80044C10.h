@@ -176,7 +176,8 @@ public:
     float m428;
     char pad42C[0x4];
     float m430;
-    char pad434[0x14];
+    char pad434[0x10];
+    int m444;
     int m448;
     Unk80044C10_B* m44C;
     char pad450[0x4];
