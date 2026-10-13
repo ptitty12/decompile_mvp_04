@@ -288,7 +288,8 @@ extern "C" void fn_8002E820(Unk8002D15C* self)
         self->m7AC = 1;
     fn_800233B4(self, 0x1C, 0x64, 0);
     self->m6BC = 0;
-    if (self->m80->m6F8->m10->m6C[self->m7A0->m708] == -1)
+    int tb = (int)self->m80->m6F8->m10;
+    if (((Unk8002D15C_Tbl10*)tb)->m6C[self->m7A0->m708] == -1)
         fn_8002F1E4(self);
     if (lbl_8061B8C0->m24 == 0)
         fn_8002F1E4(self);
@@ -311,7 +312,8 @@ extern "C" void fn_8002E9D4(Unk8002D15C* self)
     fn_8003049C(self, 0x94, m->mC, m->m8);
     fn_800233B4(self, 0x1D, 0x64, 0);
     self->m6BC = 0;
-    if (self->m80->m6F8->m10->m6C[self->m7A0->m708] == -1)
+    int tb = (int)self->m80->m6F8->m10;
+    if (((Unk8002D15C_Tbl10*)tb)->m6C[self->m7A0->m708] == -1)
         fn_8002F1E4(self);
 }
 
