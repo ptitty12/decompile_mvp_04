@@ -731,7 +731,6 @@ extern "C" FE_OVERLAY void fn_8050EBC8(FeScrQ* x)
     ((FeWm*)x)->s95(1, 0);
 }
 
-/* near-miss: first s88 vcall loads lwz r0/lha in the other order (4 lines); 4 variants tried */
 extern "C" FE_OVERLAY void fn_8050FB34(FeScrN* x)
 {
     FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805FB7B4);
@@ -741,8 +740,8 @@ extern "C" FE_OVERLAY void fn_8050FB34(FeScrN* x)
         fn_80086EC0(o, 1, a);
         int b = ((FeWX*)p)->s88(0);
         fn_80086EC0(o, 0, b);
+        ((FeWX*)x)->s89();
     }
-    ((FeWX*)x)->s89();
 }
 
 extern "C" FE_OVERLAY void fn_80510020(FeScrD* x)

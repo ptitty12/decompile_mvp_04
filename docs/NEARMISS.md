@@ -322,3 +322,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
 - `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.
+- fe/tu_8050C9DC::fn_8050DA2C (99.23%) / fn_8050E7B0 (99.31%): existing two-argument FeDtorFn casts target canonical one-argument fn_800EC5F4 provider in game/tu_800EBF2C; coherent destructor ABI repair crosses GAME ownership, so no further cast-based variants.
