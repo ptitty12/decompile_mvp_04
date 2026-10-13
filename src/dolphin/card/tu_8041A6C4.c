@@ -540,13 +540,16 @@ s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 }
 
 /* CARDInit
- * near-miss: 45 vs 43; retail keeps &__CARDBlock in the callee-saved loop pointer (r30) from the diskID tests on, ours
- * re-forms it after them (early-return, local-pointer and if-body spellings tried). */
+ * near-miss 97.4%: one extra instruction (44 vs 43): retail reads the first diskID through the callee-saved block pointer
+ * (lwz r0,268(r30)); ours reads it through the full address in r3 and copies it into r30 afterwards. The pointer is now the
+ * loop variable from the start, which fixes the register assignment (early-return, local-pointer, cast and pointer-arithmetic
+ * spellings of the test all give the same copy). */
 void fn_8041B75C(void)
 {
+    CARDControl* card = &lbl_806DCF20.block[0];
     s32 chan;
 
-    if (lbl_806DCF20.block[0].diskID && lbl_806DCF20.block[1].diskID) {
+    if (card[0].diskID && card[1].diskID) {
         return;
     }
 
@@ -554,8 +557,7 @@ void fn_8041B75C(void)
     OSRegisterVersion(lbl_806EF170);
     DSPInit();
     fn_804321CC();
-    for (chan = 0; chan < 2; ++chan) {
-        CARDControl* card = &lbl_806DCF20.block[chan];
+    for (chan = 0; chan < 2; ++chan, ++card) {
         card->result = CARD_RESULT_NOCARD;
         fn_80437434(&card->threadQueue);
         fn_80432224(&card->alarm);
