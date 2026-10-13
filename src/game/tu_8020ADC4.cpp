@@ -329,6 +329,63 @@ inline Unk801EE438_Vec VecSub(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b
     return r;
 }
 
+extern const float lbl_805D599C;
+extern const float lbl_805D59A0;
+extern const float lbl_805D59A4;
+extern const float lbl_805D59A8;
+inline float LenSqXZCDA0(const Unk801EE438_Vec& v)
+{
+    return v.m0 * v.m0 + v.m8 * v.m8;
+}
+inline float LenCDA0(const Unk801EE438_Vec& v)
+{
+    return fn_804028E4(v.m0 * v.m0 + v.m4 * v.m4 + v.m8 * v.m8);
+}
+inline Unk801EE438_Vec ScaleCDA0(const Unk801EE438_Vec& v, float len)
+{
+    Unk801EE438_Vec r;
+    float s = lbl_805D59A4 / len;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec NormCDA0(const Unk801EE438_Vec& v)
+{
+    float len = LenCDA0(v);
+    if (len != lbl_805D59A0) {
+        return ScaleCDA0(v, len);
+    }
+    return lbl_806055AC;
+}
+inline Unk801EE438_Vec MulCDA0(const Unk801EE438_Vec& v, float s)
+{
+    Unk801EE438_Vec r;
+    r.m0 = v.m0 * s;
+    r.m4 = v.m4 * s;
+    r.m8 = v.m8 * s;
+    return r;
+}
+inline Unk801EE438_Vec AddCDA0(const Unk801EE438_Vec& a, const Unk801EE438_Vec& b)
+{
+    Unk801EE438_Vec r;
+    r.m0 = a.m0 + b.m0;
+    r.m4 = a.m4 + b.m4;
+    r.m8 = a.m8 + b.m8;
+    return r;
+}
+extern const Unk801EE438_Vec lbl_805D6790;
+
+extern "C" int fn_8020CDA0(void* p, Unk801EE438_Vec* v)
+{
+    Unk801EE438_Vec d = Sub8DD9C(*v, lbl_805D6790);
+    if (!(LenSqXZCDA0(d) <= lbl_805D599C)) {
+        *v = AddCDA0(lbl_805D6790, MulCDA0(NormCDA0(d), lbl_805D59A8));
+        return 1;
+    }
+    return 0;
+}
+
 extern "C" int fn_8020CFA8(Scr*, Unk801EE438_Vec* a)
 {
     Unk801EE438_Vec d = VecSub(*a, lbl_805D6790);
