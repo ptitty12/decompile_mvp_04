@@ -67,9 +67,11 @@ def proof(unit,linked,unit_starts,exports,source_object=None):
  for n,(off,sz) in tf.items():
   if n not in sf or sf[n][1]!=sz:continue
   soff=sf[n][0]
-  for pos in range(0,sz,4):
-   source=sr.get(soff+pos);target=tr.get(off+pos)
-   if not source:continue
+  # ProDG's ADDR16 relocations can address the immediate halfword (+2),
+  # while SDA21 relocations address the instruction word. Visit both.
+  for source_pos,source in sr.items():
+   if not soff<=source_pos<soff+sz:continue
+   pos=source_pos-soff;target=tr.get(off+pos)
    si,_,add=source;sn,sv,_,_,sh=b.syms[si]
    if sh not in bases:continue
    if not target:

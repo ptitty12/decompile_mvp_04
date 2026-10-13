@@ -55,6 +55,13 @@ class DataPlacementTests(unittest.TestCase):
         row=self.anchored(source_offset=4,target_address=0x2004)['.rodata']
         self.assertEqual(row['base'],'0x2000')
         self.assertTrue(row['exact'])
+    def test_prodg_immediate_halfword_relocation(self):
+        source=FixtureElf({'.rodata':b'ABCDWXYZ'},
+            relocations={1:{2:(0,6,0)}},symbols=[('',0,0,3,2)])
+        target=FixtureElf(relocations={1:{2:(0,6,0)}},symbols=[('constant',0,0,17,0)])
+        row=self.locate(source,target,exports={'constant':0x2000})['.rodata']
+        self.assertEqual(row['base'],'0x2000')
+        self.assertTrue(row['exact'])
     def test_unique_full_section_search(self):
         source=FixtureElf({'.rodata':b'ABCDWXYZ'})
         row=self.locate(source,main=self.main_image(b'----ABCDWXYZ'))['.rodata']
