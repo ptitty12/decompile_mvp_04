@@ -19,7 +19,7 @@ extern "C" void fn_8055F5A0(int a);
 extern "C" void fn_8055EAFC(int a);
 extern void* lbl_8061930C;
 extern "C" char* fn_8040B61C(char* dst, const char* src);
-extern "C" void fn_804FEE04(void* x);
+extern "C" int fn_804FEE04(void* x);
 extern const char lbl_806806B8[];
 extern "C" int fn_804FE34C(FeP10F0* x);
 extern "C" int fn_804FE38C(FeP10F0* x);
@@ -279,6 +279,45 @@ extern "C" FE_OVERLAY int fn_804FEDA8(FeScrN* x)
 extern "C" FE_OVERLAY void fn_804FEDE4(FeScrD* x)
 {
     fn_804FEE04(x);
+}
+
+// fn_804FEE04 writes these four prompt fields relative to fn_800B555C()+8.
+struct FePrompt804FEE04 { char pad[0x4C4]; int m4C4, m4C8, m4CC; const char* m4D0; };
+extern "C" int strcmp(const char*, const char*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" const char* fn_80090880__FP11Unk80090880i(void*, int);
+extern const char lbl_805FB544[], lbl_805FB550[], lbl_805FB55C[], lbl_805FB56C[];
+extern "C" FE_OVERLAY int fn_804FEE04(void* x)
+{
+    const char* name = (*(FeW**)((char*)x + 0x134))->fn_vslot70()->fn_vslot33(5, 1)->mC;
+    const char* label = fn_80090880__FP11Unk80090880i(lbl_8061977C, 0x60F);
+    if (strcmp(name, lbl_805FB544) == 0) {
+        FePrompt804FEE04* state = (FePrompt804FEE04*)((char*)fn_800B555C() + 8);
+        state->m4C4 = 1;
+        state->m4C8 = 0x100;
+        state->m4CC = 0;
+        state->m4D0 = label;
+    } else if (strcmp(name, lbl_805FB550) == 0) {
+        FePrompt804FEE04* state = (FePrompt804FEE04*)((char*)fn_800B555C() + 8);
+        state->m4C4 = 0;
+        state->m4C8 = 0x100;
+        state->m4CC = 0;
+        state->m4D0 = label;
+    } else if (strcmp(name, lbl_805FB55C) == 0) {
+        FePrompt804FEE04* state = (FePrompt804FEE04*)((char*)fn_800B555C() + 8);
+        state->m4C4 = 2;
+        state->m4C8 = 0x100;
+        state->m4CC = 0;
+        state->m4D0 = label;
+    } else if (strcmp(name, lbl_805FB56C) == 0) {
+        FeW* popup = (FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F0C);
+        fn_80131F34(popup, x, (FeCbF)fn_804FF014, (int)fn_80528450, 0x3761, 2, -1, 1, 0x3E9, 0x3E8, 0, 0, 0, 0);
+        popup->fn_vslot86();
+        return 0;
+    }
+    strcpy((char*)x + 0x138, name);
+    fn_800B7ADC(FeGetMgr(), x);
+    return 1;
 }
 
 extern "C" FE_OVERLAY void fn_804FF014(int kind, FeScrRos* x)
