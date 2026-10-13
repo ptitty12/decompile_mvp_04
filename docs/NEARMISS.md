@@ -84,3 +84,42 @@ Matched by Opus hard-case families 6 (2026-10-12; PATTERNS.md, "Hard-case famili
 fn_80163CC4, fn_80143134, fn_80022780, fn_80022A28, fn_80022BE0, fn_8002395C, fn_800292EC,
 fn_800297D4, fn_80029FE4, fn_8002BB3C, fn_8002BE10, fn_8002BF20, fn_8002C540, fn_800243D4,
 fn_800263D4, fn_800264F4, fn_80291378, fn_8029D094, fn_802456C8, fn_802496BC.
+
+
+## 2026-10-13 bounded Codex probes
+
+Read this table before assigning more near-match agents. These are failed trials,
+not accepted source changes. Retry only with new callee/layout/compiler evidence
+or a new mechanism; varying the same spelling again wastes the attempt budget.
+The ignored scratch paths are in the attached Codex worktree, so a different
+checkout may need the sources reconstructed from these notes. Farm candidates
+still require real branch/target/literal checks and the unmodified verifier.
+
+| Function(s) | Unit | Result / attempted mechanism |
+|---|---|---|
+| fn_cslot11 | game/tu_801527C8 | Stack-only 820 B lead parked: actual getter uses a twelve-byte Vec3 and returns a pointer; no evidence for padding, larger result or hidden parameter. Do not shrink/invent buffers from frame size alone. |
+| fn_8052FC4C | db/tu_8052E4C0 | Eight source reconstructions: counter initialization, signed index loads, end pointer and loop forms. Best 95/95 words, eight different. Frozen scratch build/probe-8052fc4c; no accepted draft. |
+| fn_8054F970 | db/tu_8054CBBC | Eight float/double/const/register/helper forms; actual provider fn_800D8108 returns void with three integers, string and float. Float-store forces a stack temp instead of retail f31. Frozen scratch build/probe-8054f970. |
+| fn_8054F748 | db/tu_8054CBBC | Eight counter initialization/scope forms retained the two initialization differences. build/float-audit. |
+| fn_801971B8 | game/tu_80194D44 | Ten reciprocal/local/helper forms did not move the sole float spill from sp+0x7c to retail sp+0x74. |
+| fn_802B2C98 | game/tu_802B0ACC | All 120 distinct five-float-store orders failed. No source retained. |
+| fn_80392884 | ealib/tu_803927E4 | Eight index/base commutations failed to produce retail lwzx operand order. |
+| fn_8032F684, fn_803A0554, fn_8053B6CC | game/tu_8032ECD8; ealib/tu_803A0310; db/tu_8053967C | Bounded min/add/index source variants failed; last two were accidentally repeated by another audit with the same one-word residual. Search notes before dispatch. |
+| fn_802684B0, fn_801EAAE0, fn_804B3110 | game/tu_80268190; game/tu_801EA36C; fe/tu_804B13FC | Bounded compare/counter/copy forms did not improve single-word residuals. |
+| fn_8058C3C4 | db/tu_8058BF2C | Seven variants: true int index parameter, named float-to-int result, and known-zero last argument. Best remains seven words of call setup/result-register scheduling. build/probe-8058c3c4. |
+| fn_800653F8 | game/tu_80064D48 | Eight variants: getter temporaries, m4/m8 store order, saved ok flag, evaluation order and nested conditions. Best four words: two argument moves and two stores; compiler CSE uses known p==1 instead of saved ok. Frozen build/agent-vector/shortcut-800653f8. |
+| fn_8013F60C | game/tu_8013BE4C | Five aggregate-member views changed virtual-call behavior/code and were discarded. Existing held-subobject load is one word different but addresses the same vptr at w+0x100; fresh-expression/holder trials already recorded in source. Frozen build/probe-8013f60c. |
+| fn_804245BC | dolphin/dvd/tu_804227D4 | Eight pointer/local/inline forms: best retains the adjacent INITSTREAM addi/lwz swap (406/406 words). Frozen build/probe-804245bc. No new volatile qualifiers or compiler flags used. |
+| fn_803F0D94 | ealib/tu_803F00FC | Four extra trials using the new active/-active dependency, with short-zero store early/late and inactive=active-1. Best nine words unchanged; farm's string-event constant recipe does not fix this family. Frozen build/probe-803f0d94. |
+| fn_8035B16C | game/tu_8035AB44 | Real provider is Unk8037B3E8 destructor at 0x8037B424. Typed destructor call hardcodes in-charge=2; target forwards caller's argument. No legal exact typed call found; no alias or fake prototype accepted. |
+
+The current exact-layout, zero-missing-import source-link shortlist is exhausted.
+The next promotion needs new evidence for data ownership, imports or real TU
+boundaries. Existing verified source linking and function matching are distinct
+measures; the final DOL still contains extracted code for unmatched units.
+
+
+Follow-up with the new event-state dependency: fn_803F0FCC reached three differing
+words (from five) but no exact match. fn_803F108C's three active/zero variants were
+worse. The accepted string-event trio is recorded in PATTERNS.md; these remaining
+functions still need a new mechanism, not more permutations of the same stores.

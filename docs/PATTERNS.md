@@ -1669,3 +1669,25 @@ Oversized anonymous constant-pool metadata can cross a proven new boundary.
 Correct an extent only with compiled-section and retail-byte evidence. Keep
 shared pools extracted until their users and actual ownership are understood;
 ef_log and sf_sin trials exposed references from other extracted objects.
+
+
+### Paired constant state initialization (2026-10-13)
+
+For the event-string initializers fn_803F113C, fn_803F1204 and fn_803F12D4,
+retail loads the positive state before the negative state but stores the negative
+field first. Store permutations alone failed. An initialized local preserves the
+source dependency until the compiler's scheduling stages:
+
+```cpp
+int active;
+// Existing lock and event-pointer setup.
+active = 1;
+event->m18 = -active;
+event->m1C = active;
+```
+
+This produces the same -1/1 field values and exact instructions in all three
+functions (612 B). It does not fix every related initializer: fn_803F0FCC still
+has three differing words, and the short-zero variants fn_803F0D94/108C remain
+parked. Keep successful rewrites function-local and recheck branches, literal
+targets and the retail hash; do not apply the recipe unit-wide.
