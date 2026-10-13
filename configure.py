@@ -363,8 +363,9 @@ cflags_ealib = ["-O2", "-G0", "-fno-rtti", "-fno-exceptions"]
 # Dolphin SDK OS library (built May 21 2004, later than the other SDK libs).
 cflags_dolphin_os = [*cflags_base, "-char unsigned", "-opt nopeephole"]
 
-# Dolphin SDK AI library (built Apr 5 2004). Flags TBD; start from the OS ones.
-cflags_dolphin_ai = [*cflags_base, "-char unsigned", "-opt nopeephole"]
+# Dolphin SDK AI library (built Apr 5 2004). Peephole stays on (unlike OS): with it every compiled function of AI.c
+# is byte-identical (retail `addi rX,rY,0` copies); with -opt nopeephole they come out as `mr` and 8 functions differ.
+cflags_dolphin_ai = [*cflags_base, "-char unsigned"]
 
 # EA gamelib (C:/mvp2004/libraries/gamelib: memory, datafile, animlib; 0x80377048..0x8038BC58):
 # built with the game flags. See docs/DECISIONS.md (tail split).
