@@ -262,19 +262,9 @@ extern "C" FE_OVERLAY void fn_804756F0(void* x)
     fn_800B7B4C(FeGetMgr(), p, x);
 }
 
-/* near-miss: 6 of 30 slots differ (scheduling of mr r31,r5 vs the lbl_8061930C load; r9/r11 roles in the offset math) */
 extern "C" FE_OVERLAY int fn_80475774(int a, int b, int c)
 {
-    int* t;
-    int o;
-    if (fn_8007A270__18Unk8007A4DC_Screeni(lbl_8061930C, a) == 0) {
-        o = (b << 2) + (c << 4);
-        t = lbl_805FD54C;
-    } else {
-        o = (b << 2) + c * 20;
-        t = lbl_805FD4FC;
-    }
-    return *(int*)((char*)t + o);
+    return fn_8007A270__18Unk8007A4DC_Screeni(lbl_8061930C, a) == 0 ? *(int*)((char*)lbl_805FD54C + b * 4 + c * 16) : *(int*)((char*)lbl_805FD4FC + b * 4 + c * 20);
 }
 
 extern "C" FE_OVERLAY void fn_80475EF0(void* x)
