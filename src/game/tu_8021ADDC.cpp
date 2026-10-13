@@ -40,6 +40,8 @@ struct Unk8026C414_X;
 int fn_8026D730(Unk8026C414_O* o, Unk8026C414_X* x);
 struct Unk80069F0C;
 int fn_8006BE18(Unk80069F0C* o);
+struct Unk8024EF40_A;
+int fn_80255028(Unk8024EF40_A* a);
 extern "C" {
 
 void fn_801EDE78(Task* t, int x);
@@ -49,6 +51,118 @@ struct Unk8021C24C_Obj {
     char pad6C[0x928 - 0x6C];
     Player* m928;
 };
+struct Unk8021BFFC_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+    char pad6C[0x928 - 0x6C];
+    Player* m928;
+};
+extern "C" Vec3f fn_801E73E8(void* self, int k, int sel);
+extern const Vec3f lbl_806055DC;
+extern const float lbl_805D60EC;
+extern const float lbl_805D60F0;
+inline int NeFlag(int a, int b)
+{
+    int r = 0;
+    if (a != b)
+        r = 1;
+    return r;
+}
+struct Unk8021BA44_Obj {
+    char pad0[0x60];
+    Vec3f m60;
+};
+inline Vec3f Unk8021BA44_Flat(Unk8021BA44_Obj* o)
+{
+    Vec3f v = o->m60;
+    v.y = 0.0f;
+    return v;
+}
+extern "C" int fn_802112B4(Sub* t, Player** out);
+extern const Vec3f lbl_806055DC;
+extern const float lbl_805D60DC;
+void fn_8021BA44(Task* t)
+{
+    Unk8021BA44_Obj* cur = (Unk8021BA44_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    Vec3f pos = lbl_806055DC;
+    Unk8021BA44_Obj* tgt = 0;
+    fn_802112B4((Sub*)&t->m9C, (Player**)&tgt);
+    if (tgt != 0) {
+        pos = Unk8021BA44_Flat(tgt) - Unk8021BA44_Flat(cur);
+    }
+    RecQueue* q = t->m9C->m3A60;
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    e->m4 = 3;
+    e->m0 = 0xF;
+    e->m9C = 1;
+    e->mC = 1;
+    e->m8 = 1;
+    e->m80 = lbl_805D60DC;
+    int diff = 0;
+    Vec3f* pp = &pos;
+    Vec3f* kp = (Vec3f*)&lbl_806055DC;
+    if (pos.x != kp->x || pp->y != kp->y || pp->z != kp->z)
+        diff = 1;
+    if (diff != 0) {
+        e->m94 = 1;
+        e->m50 = pos;
+    }
+}
+
+void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
+{
+    RecQueue* q = t->m9C->m3A60;
+    Unk8021BFFC_Obj* cur = (Unk8021BFFC_Obj*)t->m9C->m8[t->m9C->m3A5C];
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    PlayerSub* ps = &p->m58C;
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    cur->m928 = p;
+    int flag = NeFlag(fn_80255028((Unk8024EF40_A*)ps), ps->m38);
+    int diff = 0;
+    Vec3f pos = lbl_806055DC;
+    Vec3f* kp = (Vec3f*)&lbl_806055DC;
+    if (v->x != kp->x || v->y != kp->y || v->z != kp->z)
+        diff = 1;
+    if (diff != 0)
+        pos = *v;
+    else
+        fn_801E73E8(t, a, flag);
+    const Vec3f* cp = &cur->m60;
+    e->m4 = 0x1E;
+    e->m0 = 0x19;
+    e->m28 = p;
+    e->m1C = a;
+    e->m9C = 1;
+    e->m38 = pos;
+    e->m80 = lbl_805D60EC;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m10 = 6;
+    e->m90 = lbl_805D60F0;
+    e->m94 = 1;
+    e->m50 = lbl_806055AC - *cp;
+    t->m9C->m60 = 0;
+}
+
 void fn_8021C24C(Task* t, Player* p)
 {
     RecQueue* q = t->m9C->m3A60;
