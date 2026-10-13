@@ -250,14 +250,13 @@ extern "C" DB_OVERLAY void fn_80532144(Unk80531A20_Tbl<20, 3>* self, int i, int 
         self->m8[i][j] = f;
 }
 
-/* near-miss: loop and exits match; retail keeps the result in r3 (base pointer in r10) and branches
- * the first compare with blt, ours reuses r3 for the base. */
 extern "C" DB_OVERLAY int fn_8053217C(Unk80531A20_Tbl<20, 3>* self, int col, float x)
 {
-    float acc = lbl_805FE9EC;
     int r = 0;
     unsigned i = 0;
-    acc = acc + self->m8[0][col];
+    float acc = lbl_805FE9EC;
+    i = r;
+    acc = acc + self->m8[i][col];
     if (!(x < acc)) {
         while (++i <= 19) {
             acc = acc + self->m8[i][col];
