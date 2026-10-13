@@ -457,6 +457,58 @@ extern "C" void fn_80141214(void* xp, int idx)
 }
 
 extern const int lbl_805C3C00[];
+struct Unk801413E8_Obj : Unk800C7B40_Widget {
+    char pad40[0x148];
+    Unk80141214_Ctl* m188;
+    Unk800C7B40_Widget* m18C;
+};
+struct Unk8061E978_Obj {
+    int m0;
+    int m4;
+};
+extern Unk8061E978_Obj* lbl_8061E978;
+int fn_80075EF4(int a);
+extern "C" int fn_800B5758();
+
+extern "C" void fn_801413E8(void* xp, int id)
+{
+    Unk801413E8_Obj* x = (Unk801413E8_Obj*)xp;
+    ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot15();
+    if (fn_80075EF4(id) != 0 || id == 0x34 || id == 0x35 || id == 0x36 || id == 0x14 || id == 8 || id == 0x1D) {
+        x->m188->fn_vslot51(0x3CA5, 4);
+        ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot8(4);
+        x->m18C->fn_vslot16(0);
+        lbl_8061E978->m4 = 4;
+    } else if (id == 0x25 || id == 0x27 || id == 0x1E || id == 0x19 || id == 0x18 || id == 0xA || id == 0x2D) {
+        x->m188->fn_vslot51(0x14F3, 3);
+        ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot8(3);
+        x->m18C->fn_vslot16(0);
+        lbl_8061E978->m4 = 3;
+    } else {
+        x->m188->fn_vslot51(0x3CA5, 4);
+        x->m188->fn_vslot51(0x14FA, 0);
+        x->m188->fn_vslot51(0x14FB, 1);
+        x->m188->fn_vslot51(0x5C9F, 2);
+        x->m18C->fn_vslot16(1);
+        fn_800B555C();
+        if (fn_800B5758() != 0 && id == 0x37 && ((Unk8061930C_Inner*)lbl_8061930C->m34)->m42C != 0) {
+            int r = fn_8058F11C(lbl_8061930C->m34, 9)->fn_vslot4();
+            switch (r) {
+            case 0:
+                ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot8(0);
+                lbl_8061E978->m4 = r;
+                return;
+            case 1:
+                ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot8(1);
+                lbl_8061E978->m4 = r;
+                return;
+            }
+        }
+        ((UnkDC*)((char*)x->m188 + 0xDC))->fn_vslot8(4);
+        lbl_8061E978->m4 = 4;
+    }
+}
+
 extern "C" int fn_80141710(int i) { return lbl_805C3C00[i]; }
 
 extern "C" void fn_80141724(Unk80141724* x)
