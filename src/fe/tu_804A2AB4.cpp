@@ -14,6 +14,9 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+extern "C" int fn_800A2E6C(void* g);
+extern "C" int fn_800A2E90(void* g);
+int fn_800E4FDC(void);
 extern const char lbl_805F64F0[];
 extern const char lbl_805F664C[];
 extern const char lbl_805F653C[];
@@ -53,6 +56,42 @@ FE_OVERLAY FeScrH* fn_804A2AB4(FeScrH* self, int a, int b, int c, int d, int e, 
     self->m130 = 0;
     FeI(self, 0x134) = 0;
     return self;
+}
+
+FE_OVERLAY void fn_804A2B04(FeW* x)
+{
+    fn_800ECF18(x);
+    void* nav = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(nav, x);
+    fn_80125100(nav);
+    fn_801250D8(nav);
+    if (fn_800A2E6C(lbl_80619948) != 0) {
+        FeW* p = (FeW*)fn_800B7A94(FeGetMgr(), "FTOPBAR");
+        p->fn_vslot8(0);
+        fn_804A7760(p);
+    }
+    int a = 1;
+    int b = 1;
+    if (fn_800B57EC(fn_800B555C()) != 0) {
+        FeP(x, 0x134) = fn_800C8060(x->fn_vslot32("FRANCHISE", 1));
+        x->fn_vslot32("SEASON", 1)->fn_vslot8(0);
+    } else {
+        FeP(x, 0x134) = fn_800C8060(x->fn_vslot32("SEASON", 1));
+        x->fn_vslot32("FRANCHISE", 1)->fn_vslot8(0);
+    }
+    FeMem(x, 0x134)->fn_vslot8(1);
+    if (fn_800A2E90(lbl_80619948) == 0 && fn_800A2E6C(lbl_80619948) == 0)
+        a = 0;
+    if (fn_800E4FDC() == 0) {
+        a = 0;
+        b = 0;
+    }
+    if (a == 0) {
+        ((FeW3*)FeMem(x, 0x134))->s91(0, 0, 0);
+        ((FeWQ*)FeMem(x, 0x134))->s68(1);
+    }
+    if (b == 0)
+        ((FeW3*)FeMem(x, 0x134))->s91(2, 0, 0);
 }
 
 FE_OVERLAY int fn_804A2DBC(FeScrK* x)
