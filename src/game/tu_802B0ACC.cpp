@@ -869,3 +869,186 @@ void fn_802B3130(void* unused, Unk802B3130_In* x, Unk802B3130_Out* out)
     for (int i = 0; i < n; i++)
         out->mC[i] = 1;
 }
+
+struct Unk802B31A0_O {
+    char pad0[0x3708];
+    char* m3708;
+    char* m370C;
+    char* m3710;
+    char pad3714[4];
+    char* m3718;
+    char* m371C;
+    char* m3720;
+    char pad3724[4];
+    char* m3728;
+    char* m372C;
+    char* m3730;
+    char pad3734[4];
+    char* m3738;
+    char* m373C;
+    char* m3740;
+    char pad3744[4];
+    char* m3748;
+    char* m374C;
+    char* m3750;
+    char pad3754[4];
+    char* m3758;
+    char* m375C;
+    char* m3760;
+    char pad3764[4];
+    char* m3768;
+    char* m376C;
+    char* m3770;
+    char pad3774[4];
+    char* m3778;
+    char* m377C;
+    char* m3780;
+    char pad3784[4];
+    char* m3788;
+    char* m378C;
+    char* m3790;
+    char pad3794[4];
+    char* m3798;
+    char* m379C;
+    char* m37A0;
+    char pad37A4[4];
+    char* m37A8;
+    char* m37AC;
+    char* m37B0;
+};
+
+void fn_802B31A0(Unk802B31A0_O* o)
+{
+    if (o->m3708 != 0) {
+        delete[] o->m3708;
+        o->m3708 = 0;
+    }
+    if (o->m370C != 0) {
+        delete[] o->m370C;
+        o->m370C = 0;
+    }
+    if (o->m3710 != 0) {
+        delete[] o->m3710;
+        o->m3710 = 0;
+    }
+    if (o->m3718 != 0) {
+        delete[] o->m3718;
+        o->m3718 = 0;
+    }
+    if (o->m371C != 0) {
+        delete[] o->m371C;
+        o->m371C = 0;
+    }
+    if (o->m3720 != 0) {
+        delete[] o->m3720;
+        o->m3720 = 0;
+    }
+    if (o->m3728 != 0) {
+        delete[] o->m3728;
+        o->m3728 = 0;
+    }
+    if (o->m372C != 0) {
+        delete[] o->m372C;
+        o->m372C = 0;
+    }
+    if (o->m3730 != 0) {
+        delete[] o->m3730;
+        o->m3730 = 0;
+    }
+    if (o->m3738 != 0) {
+        delete[] o->m3738;
+        o->m3738 = 0;
+    }
+    if (o->m373C != 0) {
+        delete[] o->m373C;
+        o->m373C = 0;
+    }
+    if (o->m3740 != 0) {
+        delete[] o->m3740;
+        o->m3740 = 0;
+    }
+    if (o->m3748 != 0) {
+        delete[] o->m3748;
+        o->m3748 = 0;
+    }
+    if (o->m374C != 0) {
+        delete[] o->m374C;
+        o->m374C = 0;
+    }
+    if (o->m3750 != 0) {
+        delete[] o->m3750;
+        o->m3750 = 0;
+    }
+    if (o->m3758 != 0) {
+        delete[] o->m3758;
+        o->m3758 = 0;
+    }
+    if (o->m375C != 0) {
+        delete[] o->m375C;
+        o->m375C = 0;
+    }
+    if (o->m3760 != 0) {
+        delete[] o->m3760;
+        o->m3760 = 0;
+    }
+    if (o->m3768 != 0) {
+        delete[] o->m3768;
+        o->m3768 = 0;
+    }
+    if (o->m376C != 0) {
+        delete[] o->m376C;
+        o->m376C = 0;
+    }
+    if (o->m3770 != 0) {
+        delete[] o->m3770;
+        o->m3770 = 0;
+    }
+    if (o->m3778 != 0) {
+        delete[] o->m3778;
+        o->m3778 = 0;
+    }
+    if (o->m377C != 0) {
+        delete[] o->m377C;
+        o->m377C = 0;
+    }
+    if (o->m3780 != 0) {
+        delete[] o->m3780;
+        o->m3780 = 0;
+    }
+    if (o->m3788 != 0) {
+        delete[] o->m3788;
+        o->m3788 = 0;
+    }
+    if (o->m378C != 0) {
+        delete[] o->m378C;
+        o->m378C = 0;
+    }
+    if (o->m3790 != 0) {
+        delete[] o->m3790;
+        o->m3790 = 0;
+    }
+    if (o->m3798 != 0) {
+        delete[] o->m3798;
+        o->m3798 = 0;
+    }
+    if (o->m379C != 0) {
+        delete[] o->m379C;
+        o->m379C = 0;
+    }
+    if (o->m37A0 != 0) {
+        delete[] o->m37A0;
+        o->m37A0 = 0;
+    }
+    if (o->m37A8 != 0) {
+        delete[] o->m37A8;
+        o->m37A8 = 0;
+    }
+    if (o->m37AC != 0) {
+        delete[] o->m37AC;
+        o->m37AC = 0;
+    }
+    if (o->m37B0 != 0) {
+        delete[] o->m37B0;
+        o->m37B0 = 0;
+    }
+}
