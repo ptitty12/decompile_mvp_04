@@ -334,3 +334,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - ealib/tu_803BE8BC::fn_803C1B50 (98.29%): eight local/sentinel/zero-chain initialization forms retain constant-register and store scheduling differences; scratch build/root-803C1B50.
 - fe/tu_8044F550::fn_80451028 (99.48%): eight indexed-access/local-condition/helper forms retain six index/base register slots or change branch layout; scratch build/root-80451028.
 - fe/tu_8050C9DC::fn_8050DA2C (99.23%) / fn_8050E7B0 (99.31%): existing two-argument FeDtorFn casts target canonical one-argument fn_800EC5F4 provider in game/tu_800EBF2C; coherent destructor ABI repair crosses GAME ownership, so no further cast-based variants.
+
+- `db/tu_805721F8` `fn_805721F8`: 99.21965%, 173/173 instructions; roster score array view recovers indexed loads, but round/found/clamped-value registers and the initial search-index copy differ after seventeen bounded forms; new code dropped.
+- `db/tu_80574AE4` `fn_80577218`: 99.49468%, 188/188 instructions; comparator branches and the two 12-byte statistics constructors match, but winning-rate denominator/zero FPR allocation differs after ten forms; source dropped.
