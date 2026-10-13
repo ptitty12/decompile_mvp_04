@@ -453,6 +453,17 @@ extern "C" void fn_803F6F48(RcAllocIf* a)
     lbl_806EEA74 = a;
 }
 
+inline RcReq* RcLink(const RcReq& x, const RcReq& y)
+{
+    ((RcReq&)y).next = (RcReq*)&x;
+    return (RcReq*)&y;
+}
+
+extern "C" void* fn_803F6F50(int a, int b, int c, int d, int e)
+{
+    return lbl_806EEA74->v0(b, RcLink(RcReq(1, a), RcReq(2, c)));
+}
+
 extern "C" void fn_803F6FC4(int a, int b)
 {
     lbl_806EEA74->v1(a, b);
