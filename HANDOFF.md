@@ -12,23 +12,66 @@ The lead holds full decision authority (DECISIONS 2026-10-10). Never give the ow
 (anything under `tools/verify/**`, `.github/workflows/**`, `.claude/**`) are recorded once in
 DECISIONS "Open questions for owner"; then keep working.
 
-## Session 2 status (lead, updated 2026-10-12 21:45 CDT; this block overrides sections 1, 4 and 7 below)
+## Session 2 status (lead, updated 2026-10-13 00:30 CDT; this block overrides sections 1, 4 and 7 below)
 
-- main: **20,730 / 24,158 functions** (85.8%) at ff1ba576. All slots idle at 21:45 (window at ~95%); the lead restarts the fleet at the 22:50 reset. Measure as in section 1.
-- Slots and agents: `tools/team/lead/state/assignments.txt` and `state/agents_session2.txt` (agent ids; the last block is the live fleet). Worker reports: `state/reports_session2.md`.
-- Assigning a slot: `LEAD_SCRATCH=<lead scratchpad, Windows path> END=HH:MM bash tools/team/lead/prep.sh W<n> p6 <NN>`. That runs assign.sh and writes the filled prompt to `$LEAD_SCRATCH/prompt_W<n>.md`. Then launch a Sonnet Agent that reads that prompt file. `END` sets the wall-clock deadline (default now + 150 min).
-- Templates: `worker_prompt_p4.md`, `worker_prompt_p5.md`, `worker_prompt_p6.md`.
-- Queue: p4 and p5 are fully assigned (all p5 batches worked once). **p6** is the sweep: every 0% function up to 0x800 in units that are not busy. Units of the p4 batches cut short at 16:00 come first. Batches are `queue/p6_NN.txt` in the order of `queue/p6_order.txt`. p6-00..06, 35, 40, 09 and 19 are assigned. The rest of p6_order.txt is ranked by the count of small functions (<= 0x200). Regenerate with `gen_p6.py <report.json> --write` once the current p5/p6 units are free; it skips busy units and unassigned p5 batches.
-- Pacing: workers run 50-90 min before their context fills (600-900k tokens), so short deadlines (`END`) waste little. The full fleet burns about 27-35% of a 5 h window per hour; the weekly limit (71% at 20:12) is the binding constraint. When the limit hits, every agent stops; resume with SendMessage to its agentId, or stash leftovers and prep.sh fresh.
-- Section 7 status:
-  - item 3 (EXI split) is done;
-  - item 4 was replaced by a flags change (cflags_ealib_sda_nsr);
-  - items 6 and 7 were no-ops;
-  - item 9 is done (228 branches deleted);
-  - item 5 (Opus round 7): the slot `-match` is on work/opus-families-7 and held. Families 5, 7 and 9 remain.
-- Open: the OSTime pair needs a nopeephole split (dolphin/os). Never run two integ jobs at once: they share the orch worktree and break each other's verify.
-- Known fragile point: two branches adding the same declaration to a shared header merge cleanly into a duplicate, and the build gate catches it. Fix it on the branch (git merge origin/main, dedupe), then re-integrate.
-- Worker incidents: one worker ran `taskkill /IM python.exe` (killed every worker's jobs). The p5/p6 templates forbid killing processes by name or pattern.
+**Stopped by the owner at 00:10 CDT ("spin down").** No agents are running. Every committed worker branch is merged (see PROGRESS, 2026-10-13 entry for the final count). The fleet restarts only when a lead session is started by hand, or when the scheduled task `mvp-decomp-lead-resume` is re-enabled (it was disabled at shutdown).
+
+### State
+- main: **20,869 / 24,158 functions (86.4%)** at e2d9a1cf (2026-10-13 00:25), up from 19,329 at the start of lead session 2 (2026-10-12 10:28) and 20,341 at the 17:52 restart.
+- Slots W1..W12 and W7s3 are all idle (`tools/team/lead/state/assignments.txt`); `busy_units.txt` is empty.
+- Uncommitted leftovers from the stopped workers are `git stash` entries named `leftover <branch> (stopped 00:10 for owner shutdown)` in W5, W8, W9, W10, W11 and W12. They are partial attempts; drop them or hand them to the next worker of the same batch.
+- Agent ids (resumable with SendMessage, context intact, but large contexts are costly): `state/agents_session2.txt`. Worker report digests: `state/reports_session2.md`.
+
+### Still running with no agents (and no tokens)
+- **Permuter farm**: `tools/match/permute_farm.py` in worktree `decompile_mvp_04-farm`. Scheduled task "MVP decomp permuter farm" acts as a 10-minute watchdog, at idle CPU priority. It works over main's 95-99.99% functions and skips units in `state/busy_units.txt`.
+  - It never commits. A match is saved as `<farm>/build/permute_farm/runs/<fn>/match.patch`; list them with `python tools/match/permute_farm.py --status`.
+  - To collect a match: apply the patch in a worker worktree, build, verify, commit `match(...)`, then integrate.
+  - To stop it: `--uninstall`, then end its pythonw process.
+- **Dashboard**: scheduled task "MVP decomp live dashboard" (every minute, worktree `decompile_mvp_04-dash`) publishes https://github.com/ptitty12/decompile_mvp_04/tree/dashboard. The local view is `python tools/fleet_dashboard.py --watch 5`.
+- **Progress bot**: scheduled task "MVP decomp progress card", every 2 minutes.
+- Do not delete the `-farm` or `-dash` worktrees: the scheduled tasks run from them.
+
+### How to resume
+1. Read this block, `CLAUDE.md`, and the last sections of `docs/PATTERNS.md`.
+2. Check usage first (`get_usage`). The weekly limit binds: a full 5 h window of 13 Sonnet workers costs about 20% of the weekly quota. The weekly quota was at 85% at shutdown (5 h window 25%) and resets 2026-10-14 02:00 CDT.
+3. Assign a slot with `LEAD_SCRATCH=<scratchpad> END=HH:MM bash tools/team/lead/prep.sh W<n> <pass> <NN>`, then launch a Sonnet Agent that reads `$LEAD_SCRATCH/prompt_W<n>.md`. When a worker reports, merge its branch with `bash tools/team/lead/integ.sh work/<pass>-<NN>`, one merge at a time; the merges share the orch worktree. integ.sh rewords `wip(` commits to `match(` before merging.
+4. Queues, best first:
+   - **Near-miss batches** `queue/nm_NN.txt`, in the order of `queue/nm_order.txt`. Template `worker_prompt_nm.md`, generator `gen_nm.py`.
+     - Done: nm-00 (+23, includes the AI flags fix), nm-01 (+7), nm-02 (+7), nm-03 (+10), nm-04 (+16), nm-05 (+7), nm-06 (+7). That is +77 functions in about 75 minutes of 7 workers.
+     - nm-07 and nm-08 were assigned but never worked.
+     - This pass had the best yield per agent-hour of the session.
+   - **Pass 6 sweep** `queue/p6_NN.txt`, in the order of `queue/p6_order.txt` (ranked by the count of functions <= 0x200). Template `worker_prompt_p6.md`.
+     - Worked: 00-07, 09, 10, 12, 13, 14, 19, 26, 28, 35, 36, 40 (the last six in the final round gave 3-14 each).
+     - The rest are mostly Vec/float-heavy game code, at 1-10 matches per batch.
+   - p4 and p5 are finished.
+5. Pacing: workers' context fills at 400-900k tokens after 35-90 minutes, and then they stop on their own. Use `END` deadlines and refill each slot as it reports. Keep about 5% of the window for the lead's merges.
+
+### Tools added this session
+- `tools/match/permute.py` (C and C++): decomp-permuter wrapper. Run `--setup-only` first; it refuses ctors, methods and named-return functions.
+  - Its score rewards deleted code, so candidates often cheat (drop a call, move a return). Treat any candidate as a lead only.
+  - In nm-03 and nm-05 every match came from hand edits guided by compiler dumps (`cc1plus -dg -dl`, `-fno-gcse` A/B), not from the permuter.
+- `tools/team/lead/gen_p6.py` and `gen_nm.py` (batch generators).
+- `prep.sh END=` deadlines.
+- integ.sh rewords `wip(` commits.
+- `Q27/rv.py` scores a directory (no command-line length limit).
+- `rmfn.py` parks into `$QDIR`.
+
+### Owner questions (DECISIONS, Open questions)
+- verify keys regressions by (unit, function), so unit splits count as regressions. Instances:
+  - the SDK splits;
+  - dolphin/dvd/tu_804227D4, which merges dvdfs.c and dvd.c; its fn_804227D4 is defined at the end of the file.
+- Extra usage: the owner said not yet.
+- The repo is public, but the docs say private.
+- Does the owner have MVP 2004/2005 discs for other platforms (symbols)?
+
+### Recurring unsolved shapes (for whoever continues)
+- `slwi r0` vs `r11` index temps in `in->m8[id]` loops.
+- `cmpwi` before `li r3,4` in `c ? k : 4`.
+- Goal-pointer copies (`mr r28,r27`) removed by cse-skip-blocks.
+- `mr r0,r3` before `cmpwi` on a call result.
+- By-value Date stores into the frame (addressof CSE).
+- fn_80097318 and its siblings: a peeled first iteration that is not constant-folded.
+- Functions using `mftb`, `mtspr` or paired-single instructions are hand-written and stay unmatched.
 
 ---
 

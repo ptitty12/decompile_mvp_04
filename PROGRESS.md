@@ -157,4 +157,18 @@
   - Owner decisions passed on, not decided here:
     - extra usage (a cost decision);
     - a verify rule that keys regressions by address (behind the verifier lock).
+- 2026-10-13 | Claude Opus 5.5 (lead session 2, final, 22:50-00:25 CDT) | fleet | **20,740 -> 20,869 functions at 100%** (86.4%). Session 2 total: 19,329 -> 20,869 (+1,540).
+  - New near-miss pass with decomp-permuter tooling (tools/match/permute.py, from the enablers session, now for C and C++):
+    - 7 batches in about 75 minutes: nm-00 +23 (includes the AI.c flags fix below), nm-01 +7, nm-02 +7, nm-03 +10, nm-04 +16, nm-05 +7, nm-06 +7;
+    - the best yield per agent-hour of the session.
+    - Nearly every match came from hand edits guided by compiler dumps (`cc1plus -dg -dl` register priorities, `-fno-gcse` A/B); permuter candidates mostly cheated (dropped calls). See PATTERNS "Near-miss pass".
+  - Pass 6 final round: p6-07 +7, p6-10 +9, p6-13 +14, p6-14 +12, p6-26 +3, p6-28 +7.
+  - dolphin/ai/AI: `cflags_dolphin_ai` no longer has `-opt nopeephole`, which makes every compiled AI.c function byte-identical (DECISIONS 2026-10-13).
+  - Process: p6-10's branch had worker scratch files committed; the lead removed them from the branch history before merging. integ.sh now rewords `wip(` commits.
+  - Stopped at 00:10 on the owner's instruction:
+    - all agents stopped; leftovers stashed; orphaned permuter runs killed;
+    - session crons deleted and the `mvp-decomp-lead-resume` scheduled task disabled;
+    - the permuter farm, dashboard and progress bot (no tokens) keep running.
+    - Resume steps are in the HANDOFF "Session 2 status" block.
+  - Blockers: none new. Owner questions are unchanged (verify keyed by unit name blocks splits; public repo; extra usage; other-platform discs).
 
