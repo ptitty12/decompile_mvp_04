@@ -195,7 +195,6 @@ extern "C" FE_OVERLAY int fn_804BB8B4(FeCam* c, int n)
     return c->mCB4++;
 }
 
-/* near-miss: retail forms the three base addresses with addi and reloads the count each time; 11 slots differ */
 extern "C" FE_OVERLAY int fn_804BB92C(FeCam* c, int i, float a, float b)
 {
     int o = i * 0x324;
@@ -204,9 +203,7 @@ extern "C" FE_OVERLAY int fn_804BB92C(FeCam* c, int i, float a, float b)
     char* pb = (char*)c + 0x28;
     *(float*)(pa + (*(int*)(cnt + o) * 8 + o)) = a;
     *(float*)(pb + (*(int*)(cnt + o) * 8 + o)) = b;
-    int r = *(int*)(cnt + o);
-    *(int*)(cnt + o) = r + 1;
-    return r;
+    return (*(int*)(cnt + o))++;
 }
 
 extern "C" FE_OVERLAY void fn_804BB988(FeCam* c, int i, int j, float a, float b)
