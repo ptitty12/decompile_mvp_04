@@ -563,6 +563,50 @@ extern "C" FE_OVERLAY void fn_804B2D6C(FeScr* x, int k)
 }
 
 /* near-miss: one argument move; in the cur == sel arm retail passes sel (r29), ours cur (r31) */
+
+extern const char lbl_805F4F0C[];
+extern "C" void fn_804B3234(int, int);
+extern "C" void fn_805298AC();
+extern "C" FE_OVERLAY void fn_804B2E18(FeScr* x, int kind)
+{
+    char prompt[400];
+    char value[100];
+    Unk80090880* strings = lbl_8061977C;
+    int valid = 1;
+    if (kind == 1) {
+        int selected = ((FeObjI*)x->m134)->v60();
+        fn_804B3110(x, value);
+        if (((FeV1Cz*)x->m144)->s14() != 0)
+            fn_80403DE4(prompt, fn_80090880(strings, 0x14D3), selected + 1, value);
+    } else if (kind == 3) {
+        int selected = ((FeV1Cz*)x->m144)->s9();
+        float amount = fn_8058FA38(x->m144, selected);
+        // Retail fn_800DF254 returns its destination (r27); the shared declaration is void.
+        ((char* (*)(char*, int, int, float))fn_800DF254)(value, 0, 3, amount);
+        if (((FeV1Cz*)x->m144)->s14() != 0)
+            fn_80403DE4(prompt, fn_80090880(strings, 0x14D1), selected + 1, value);
+    } else if (kind == 2) {
+        int selected = ((FeObjI*)x->m134)->v60();
+        if (((FeV1Cz*)x->m144)->s14() != 0) {
+            char* state = **(char***)((char*)lbl_8061930C + 0x30);
+            float balance = *(float*)(state + 0x12B78);
+            if (!(balance >= *(float*)fn_80594240(x->m144, selected)))
+                valid = 0;
+            else
+                fn_80403DE4(prompt, fn_80090880(strings, 0x14D2), selected + 1);
+        }
+    }
+    FeObj* popup = fn_800B7AB8(UiGetMsgMgr(), lbl_805F4F0C);
+    if (valid != 0) {
+        const char* yes = fn_80090880(strings, 0x26DF);
+        const char* no = fn_80090880(strings, 0x26DE);
+        fn_801321D4(popup, x, (FeCb)fn_804B3234, 0, prompt, 2, -1, 1, yes, no, 0, 0, 0, 0);
+    } else {
+        fn_80131F34(popup, x, (FeCb)fn_805298AC, 0, 0x14D4, 1, -1, 1, 0x26DE, valid, valid, valid, valid, valid);
+    }
+    popup->v86();
+}
+
 extern "C" FE_OVERLAY void fn_804B3110(FeScr* x, char* out)
 {
     float sum;
