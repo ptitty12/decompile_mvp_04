@@ -1085,7 +1085,7 @@ config.libs = [
         "cflags": cflags_snd,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "snd/cmn/saems.c"),
+            Object(Matching, "snd/cmn/saems.c"),
             Object(NonMatching, "snd/tu_803A6B64.cpp"),
             Object(NonMatching, "snd/tu_803A6D80.cpp"),
             Object(Matching, "snd/cmn/salloc.c"),
