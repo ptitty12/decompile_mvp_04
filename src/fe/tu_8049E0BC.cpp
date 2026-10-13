@@ -51,6 +51,22 @@ extern const char lbl_805F7558[];
 extern const char lbl_805F6548[];
 extern "C" void fn_80529158(void);
 extern "C" void fn_804A193C(int a, FeW* x);
+struct FeSubA8 : FeSubBD {
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8(int a);
+};
+extern const char lbl_805F4F20[];
+extern "C" void fn_800D0074(void* a, int b, int c);
+int fn_800E1990(int i);
+extern "C" FeW* fn_800C8030(void* p);
+extern "C" void* fn_800B8144(void);
+extern "C" void fn_800B83F8(void* a, int b, int c);
 struct Fe1A18Date {
     unsigned char a;
     unsigned char b;
@@ -271,6 +287,44 @@ FE_OVERLAY void fn_8049E830(void* x, int a)
     }
     FeI(x, 0x174) = a;
     fn_8049E94C(x);
+}
+
+FE_OVERLAY void fn_8049E94C(void* xx)
+{
+    FeW* x = (FeW*)xx;
+    void* nav = fn_800B7A94(FeGetMgr(), "NAVBAR");
+    if (FeI(x, 0x13C) != 0)
+        fn_80125180(nav, 0, 0x10);
+    else if (FeI(x, 0x144) != 0)
+        fn_801250D8(nav);
+    if (FeI(x, 0x140) != 0)
+        fn_80125100(nav);
+    ((FeWQ*)x->fn_vslot32("BUTTONS", 1))->s8(FeI(x, 0x13C));
+    FeW* tk = fn_800C8030(fn_800B7AB8(FeGetMgr(), lbl_805F4F20));
+    ((FeWQ*)tk)->s8(FeI(x, 0x134) ^ 1);
+    fn_804A77AC(tk, fn_800B548C(FeI(x, 0x178)));
+    FePopup* pp = fn_800B7AB8(FeGetMgr(), "FTICKER");
+    ((FeWQ*)pp)->s8(FeI(x, 0x138) ^ 1);
+    if (FeI(x, 0x138) != 0)
+        FeI(pp, 0x138) = 1;
+    ((FeWQ*)x->fn_vslot32("FRANCHISEGOALS", 1))->s8(FeI(x, 0x164) ^ 1);
+    ((FeWQ*)x->fn_vslot32("GOALART", 1))->s8(FeI(x, 0x164) ^ 1);
+    FeW* w = fn_800C805C(x->fn_vslot32("SG1", 1));
+    fn_800D0074((char*)fn_800C8058(w->fn_vslot32("TEAM", 1)) + 0xDC, fn_800E1990(FeI(x, 0x178)), 0);
+    FeW* tw = fn_800C8058(w->fn_vslot32("TEAM", 1));
+    int a8 = fn_800B548C(FeI(x, 0x178));
+    char* sp = (char*)tw + 0xDC;
+    ((FeSubA8*)sp)->s8(a8);
+    ((FeWQ*)w)->s44(FeI(x, 0x14C));
+    if (FeI(fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C), 0x1E0) != 1) {
+        ((FeWQ*)x->fn_vslot32("BUDGETSTUFF", 1))->s8(0);
+        ((FeWQ*)x->fn_vslot32("BUDGETBACKING", 1))->s8(0);
+    }
+    fn_800C3AB4(fn_800C33D0(), 9);
+    if (FeI(x, 0x164) != 0) {
+        fn_800B83F8(fn_800B8144(), 1, 1);
+    }
+    fn_804A0B18(x);
 }
 
 FE_OVERLAY void fn_8049ED34(void* a, void* cb)
