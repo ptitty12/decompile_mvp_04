@@ -852,3 +852,38 @@ extern "C" DB_OVERLAY void fn_80554540(Db80554540_S* self, int a, int b)
     fn_80553358(self->mC, p3, b);
     fn_80553388(self->mC);
 }
+
+extern float lbl_80622C64[];
+extern float lbl_805FF340;
+extern "C" DB_OVERLAY float fn_8054FA04(int a,int b,int c,int d)
+{
+ if(c == 0) {
+  int flag=0;
+  if(fn_800A2E90(lbl_80619948)) flag=1;
+  Unk8007A4DC_Screen* sc=lbl_8061930C;
+  int limit; int n;
+  if(sc->fn_8007A270(a)) {
+   limit=4;
+   n=sc->fn_80074754(0,a,flag);
+   n+=sc->fn_80074754(0,a,2);
+   n+=sc->fn_80074754(0,a,3);
+   n+=sc->fn_80074754(0,a,4);
+  } else {
+   limit=50;
+   n=sc->fn_800739E0(11,a,flag,2);
+   n+=sc->fn_800739E0(11,a,2,2);
+   n+=sc->fn_800739E0(11,a,3,2);
+   n+=sc->fn_800739E0(11,a,4,2);
+  }
+  if(n < limit) { float ratio=(float)n/(float)limit; return lbl_80622C24[b][c]*ratio; }
+ } else if(d<=14) {
+  // Retail stores this scale at sp+8 without a subsequent reload.
+  float scale=lbl_805FF340;
+  float left=(float)(15-d)*lbl_805FF340;
+  float right=(float)d*lbl_805FF340;
+  float p=lbl_80622C64[c]*left;
+  float q=lbl_80622C24[b][c]*right;
+  return p+q;
+ }
+ return lbl_80622C24[b][c];
+}
