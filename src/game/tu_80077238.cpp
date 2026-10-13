@@ -614,11 +614,12 @@ float Unk8007B2B0_Screen::fn_80079EFC(int a)
     return r;
 }
 
-/* near-miss: 3 slots; retail loads m204 before the int->float conversion and m1F4 after
- * it (fmadds f1,f1,f13,f0), ours loads them the other way round. */
+/* Both fields are read through an inline accessor: an operand that is an inline call is loaded when
+ * it is expanded, which gives retail's m204-before-conversion, m1F4-after load order. */
+inline float Rd79F54(const float* p) { return *p; }
 float Unk8007B2B0_Screen::fn_80079F54(int n)
 {
-    return m1F4 + (float)n * m204;
+    return Rd79F54(&m1F4) + (float)n * Rd79F54(&m204);
 }
 
 int Unk8007B2B0_Screen::fn_80079F90(float f)
