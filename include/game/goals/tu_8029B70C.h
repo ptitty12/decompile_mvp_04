@@ -37,7 +37,17 @@ struct Unk8029B70C_Req {
     int m20;
     int m24;
     int m28;
-    char pad2C[0x58 - 0x2C];
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+    int m3C;
+    int m40;
+    int m44;
+    int m48;
+    int m4C;
+    int m50;
+    int m54;
 };
 
 /* Sub-goal object at goal+0x4 (fn_8029C914). Offsets seen. */

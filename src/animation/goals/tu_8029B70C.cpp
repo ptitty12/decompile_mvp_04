@@ -436,6 +436,49 @@ Unk8029B70C_Req fn_8029E4AC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int
     return s;
 }
 
+float fn_8018CA78(Unk80273498_Pos* p);
+
+#define UNK8029E6BC_CHK(f, h) (r.f != 0 && fn_80381E9C(link, h, 0, 0))
+
+int fn_8029E6BC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int a, int b, Unk8029B70C_Req r)
+{
+    Unk80273498_Pos* p = fn_8027A918(g)->m6CC;
+    float f = fn_8018CA78(p);
+
+    if (f < 0.0f || !(p->m3F4 + 0.3f > f)) {
+        if (a
+            && (UNK8029E6BC_CHK(m14, 0xDB7AB022) || UNK8029E6BC_CHK(m8, 0x0E246B08) || UNK8029E6BC_CHK(m8, 0xF4318E1D)
+                || UNK8029E6BC_CHK(m8, 0x4C226115) || UNK8029E6BC_CHK(m4, 0x512ADB3C) || UNK8029E6BC_CHK(m2C, 0xEE1B6C46)
+                || UNK8029E6BC_CHK(m30, 0x8CFB37B7) || UNK8029E6BC_CHK(m38, 0x1F8D6080) || UNK8029E6BC_CHK(m3C, 0x9D44D7EE)
+                || UNK8029E6BC_CHK(m40, 0x5C53C627) || UNK8029E6BC_CHK(m44, 0xC0F46231) || UNK8029E6BC_CHK(m48, 0xE14981C4)
+                || UNK8029E6BC_CHK(m4C, 0x9D803AF7) || UNK8029E6BC_CHK(m34, 0xD484ACC6) || UNK8029E6BC_CHK(m18, 0x8249F53C)
+                || UNK8029E6BC_CHK(m0, 0xE433AA50) || UNK8029E6BC_CHK(m0, 0x9CEA8000) || UNK8029E6BC_CHK(m0, 0x8C1988B6))) {
+            int h = link->m83C;
+
+            g->mD0.f6 = 0;
+            g->m50 = h;
+            if (h == 0x7BF65171 || h == 0x0E246B08) {
+                g->m4C = 2;
+            } else {
+                g->m4C = 1;
+            }
+            return 1;
+        }
+        if (b
+            && (UNK8029E6BC_CHK(m50, 0xFA01EA4A) || UNK8029E6BC_CHK(m54, 0x34CFAED1) || UNK8029E6BC_CHK(m20, 0xA68012D3)
+                || UNK8029E6BC_CHK(m2C, 0x0C0032D1) || UNK8029E6BC_CHK(m30, 0x1407B459) || UNK8029E6BC_CHK(m1C, 0x07CBFA4B)
+                || UNK8029E6BC_CHK(m28, 0x36E74862) || UNK8029E6BC_CHK(m24, 0xE9868307))) {
+            int h = link->m83C;
+
+            g->m4C = 2;
+            g->m50 = h;
+            g->mD0.f6 = 0;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fn_8029EC30(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int kind, int a, int b, Unk8029B70C_Req o)
 {
     if (!(g->m74 <= 0.0f)) {
