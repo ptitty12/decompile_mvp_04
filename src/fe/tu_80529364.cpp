@@ -115,6 +115,32 @@ extern "C" void fn_80529D34(FeScrN* self, int c);
 extern "C" void fn_80529A38(FeScrN* self, int c);
 extern "C" void fn_8052A1DC(void);
 
+/* Element of the arrays destroyed by fn_80529B10 (vptr at +0x10; the destructor is called through vtable slot 15). */
+class FeD10 {
+public:
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15(int c);
+};
+extern const char lbl_806683C0[];
+extern const char lbl_8064A550[];
+
 extern "C" FE_OVERLAY void fn_80529364(FeVptr<0xCC0>* self, int c)
 {
     self->vp = lbl_80672168;
@@ -419,6 +445,50 @@ extern "C" FE_OVERLAY void fn_80529ADC(FeScrN* self)
 }
 
 extern "C" FE_OVERLAY void fn_80529B0C(void) {}
+
+extern "C" FE_OVERLAY void fn_80529B10(FeScrN* self, int c)
+{
+    self->SetVptr(lbl_806683C0);
+    if ((char*)self + 0x30F60 != 0) {
+        char* e = (char*)self + 0x31240;
+        if ((char*)self + 0x30F60 != e) {
+            do {
+                e -= 0xB8;
+                ((FeD10*)e)->s15(0);
+            } while ((char*)self + 0x30F60 != e);
+        }
+    }
+    if ((char*)self + 0x242A0 != 0) {
+        char* e = (char*)self + 0x30F60;
+        if ((char*)self + 0x242A0 != e) {
+            do {
+                e -= 0x1F8;
+                ((FeD10*)e)->s15(0);
+            } while ((char*)self + 0x242A0 != e);
+        }
+    }
+    if ((char*)self + 0x1A2A0 != 0) {
+        char* e = (char*)self + 0x242A0;
+        if ((char*)self + 0x1A2A0 != e) {
+            do {
+                e -= 0x400;
+                ((FeD10*)e)->s15(0);
+            } while ((char*)self + 0x1A2A0 != e);
+        }
+    }
+    FeVptr<0x10>* t = (FeVptr<0x10>*)((char*)self + 0x16FC0);
+    t->vp = lbl_8064A550;
+    if ((char*)self + 0x34C0 != 0) {
+        char* e = (char*)t;
+        if ((char*)self + 0x34C0 != e) {
+            do {
+                e -= 0x1F8;
+                ((FeD10*)e)->s15(0);
+            } while ((char*)self + 0x34C0 != e);
+        }
+    }
+    ((FeDtorFn)fn_8035686C)(self, c);
+}
 
 extern "C" FE_OVERLAY void fn_80529C74(FeScrN* self)
 {
