@@ -189,6 +189,38 @@ extern "C" FE_OVERLAY void fn_804E0C24(FeRaw0BAC* self, int chrg)
     fn_80135200(self, chrg);
 }
 
+
+extern "C" void* fn_800C5E28();
+extern "C" void fn_800C62B8(void*, FeObj*, FeObj*, const char*, float, int);
+extern "C" void fn_80135264(void*);
+extern "C" void fn_803D9E1C(int);
+extern const char lbl_805F7B80[], lbl_805F9928[], lbl_805F9930[], lbl_805F9938[];
+extern char lbl_805F994C[];
+extern const char lbl_805F9940[], lbl_805F9958[], lbl_805F9978[];
+extern float lbl_805F999C;
+#define FE_CA4_GET(n) virtual FeObj* v##n(const char*);
+class FeLookup804E0CA4 : public UiBase {
+public:
+    FE_LO(FE_CA4_GET) virtual FeObj* v32(const char*,int); FE_HI(FE_CA4_GET)
+};
+#undef FE_CA4_GET
+extern "C" FE_OVERLAY void fn_804E0CA4(FeTitle* self)
+{
+    fn_800ECF18(self);
+    FeObj* popup = fn_800B7AB8(UiGetMsgMgr(), lbl_805F7B80);
+    FeObj* first = fn_800C8038(popup->v32(lbl_805F9928, 1));
+    FeObj* second = fn_800C8038(popup->v32(lbl_805F9930, 1));
+    fn_800C62B8(fn_800C5E28(), first, second, lbl_805F9938, lbl_805F999C, 0);
+    ((FeMsgMgrB*)UiGetMsgMgr())->mC0 = 0;
+    fn_80135264(self);
+    self->m1F4 = 0;
+    ((FeObj1*)self->v32(lbl_805F9940, 1))->v8(0);
+    ((FeObj1*)self->v32(lbl_805F994C, 1))->v8(1);
+    fn_803D9E1C(1);
+    ((FeObj1*)fn_800C8048(((FeLookup804E0CA4*)self)->v29(lbl_805F9958)))->v29(0x37C8);
+    ((FeObj1*)fn_800C8040(((FeLookup804E0CA4*)self)->v29(lbl_805F9978)))->v29(0x37C8);
+}
+
 extern "C" FE_OVERLAY void fn_804E0EC4(FeObj* self)
 {
     fn_800ED254(self);
