@@ -2472,6 +2472,7 @@ dolphin/dvd/tu_804227D4.c:
 
 dolphin/dvd/dvdqueue.c:
 	.text       start:0x8042575C end:0x80425954
+	.bss        start:0x806DE1F8 end:0x806DE218
 
 dolphin/dvd/tu_80425954.c:
 	.text       start:0x80425954 end:0x80425AEC
