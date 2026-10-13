@@ -89,6 +89,133 @@ extern "C" void fn_8001E810(Unk8001E444_Obj* x)
  * (they are stored with the local triple at sp8..sp10) and reloads the other constants; two
  * fewer instructions here (the float temporaries are scheduled differently). Tried array,
  * Vec3 and const-float locals. */
+extern const float lbl_805A533C;
+extern const float lbl_805A5340;
+extern const float lbl_805A5344;
+extern const float lbl_805A5350;
+extern const float lbl_805A5354;
+extern const float lbl_805A5358;
+extern const float lbl_805A535C;
+extern "C" int fn_8001FC60(Unk8001E444_Obj* x);
+extern "C" int fn_800974B8(void* p, int a);
+extern "C" int fn_8009841C(char* o, int a, int b);
+struct Unk8024EF40_W;
+int fn_8025416C(Unk8024EF40_W* p, int n);
+int fn_80046FB4(int a);
+int fn_80046F94(int a);
+extern "C" int fn_8001FC90(Unk8001E444_Obj* x);
+
+struct Unk80344538 {
+    int m0;
+    float m4;
+    char pad8[0x20 - 0x8];
+    float m20;
+    char pad24[0x2C - 0x24];
+};
+void fn_80344538(Unk80344538* p);
+extern const float lbl_805A533C;
+extern const float lbl_805A5340;
+extern const float lbl_805A5344;
+extern const float lbl_805A5350;
+extern const float lbl_805A5354;
+extern const float lbl_805A5358;
+extern const float lbl_805A535C;
+extern "C" int fn_8001FC60(Unk8001E444_Obj* x);
+extern "C" int fn_800974B8(void* p, int a);
+extern "C" int fn_8009841C(char* o, int a, int b);
+struct Unk8024EF40_W;
+int fn_8025416C(Unk8024EF40_W* p, int n);
+int fn_80046FB4(int a);
+int fn_80046F94(int a);
+extern "C" int fn_8001FC90(Unk8001E444_Obj* x);
+
+extern "C" int fn_8001E854(Unk8001E444_Obj* x)
+{
+    Unk8001E444_Owner* o = x->m130;
+    int r = 0;
+    int key = o->m704;
+    Unk8001F218_Pair* pr = o->m44C->m6F8->m14;
+    int z = pr->m1CD0 == 0;
+    Unk8001F5CC_Ent* row = &pr->e[z];
+    Unk80344538 arr[5];
+    Unk80344538* cp = arr;
+    int ci = 4;
+    do {
+        fn_80344538(cp);
+        cp++;
+    } while (ci-- != 0);
+    int n = fn_8001CF18(x, (Unk80344538_Rec*)arr);
+    float v0 = lbl_805A533C;
+    float v1 = lbl_805A5340;
+    float v2 = lbl_805A5344;
+    float v3 = lbl_805A5340;
+    float v4 = lbl_805A5340;
+    float v5 = lbl_805A5340;
+    float v6 = lbl_805A533C;
+    int c8 = 0;
+    int fl0 = 0;
+    int fl1 = 0;
+    int fl2 = 0;
+    int c10 = 0;
+    int c7 = 0;
+    int c6 = 0;
+    float lo;
+    float hi;
+    for (int i = 0; i < n; i++) {
+        int kind = arr[i].m0;
+        lo = arr[i].m4;
+        hi = (&arr[i])->m20;
+        if (kind == 15) {
+            if (!(hi < lbl_805A533C))
+                fl0 = 1;
+            if (!(hi < lbl_805A5340))
+                fl1 = 1;
+            if (!(hi > lbl_805A5344))
+                fl2 = 1;
+        }
+        if (kind == 2 || kind == 6 || kind == 1) {
+            if (!(lo < lbl_805A5340))
+                c10++;
+            if (!(hi < lbl_805A5340)) {
+                c7++;
+                goto l6;
+            }
+        } else {
+        l6:
+            if (!(hi < lbl_805A5340))
+                c6++;
+        }
+        if (!(hi < lbl_805A533C))
+            c8++;
+    }
+    if (fl0 != 0)
+        r |= 0x802;
+    if (fl1 != 0 && c10 > 0)
+        r |= 0x80;
+    if (fl2 != 0 && c7 > 0)
+        r |= 0x10C;
+    if (c6 > 2)
+        r |= 0x1000;
+    if (c8 > 0 && fn_8025416C((Unk8024EF40_W*)o->m588, 0x16) > 4)
+        r |= 0x20;
+    r |= fn_80046FB4(fn_8001FC60(x));
+    r |= fn_80046F94(fn_8001FC90(x));
+    if (fn_800974B8(row, key) != 0) {
+        hi = (float)fn_8009841C((char*)row, 7, o->m70C);
+        lo = (float)fn_8009841C((char*)row, 4, o->m70C);
+        float q = !(lo <= lbl_805A5350) ? hi / lo : hi;
+        if (!((hi + lo) < lbl_805A5354)) {
+            if (!(q < lbl_805A5358))
+                r |= 0x4000;
+            else if (!(q < lbl_805A535C))
+                r |= 0x2000;
+            else
+                r |= 0x10;
+        }
+    }
+    return r;
+}
+
 extern "C" int fn_8001EB78(Unk8001E444_Obj* x)
 {
     Unk801A4B34_Vec3 a;

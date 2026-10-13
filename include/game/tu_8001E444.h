@@ -179,13 +179,18 @@ struct Unk8001E444_Owner {
     char m588[0x17C];
     int m704;
     int m708;
+    unsigned char m70C;
 };
 
 
 /* 0x2C-byte record built in an array of five (fn_8001ED28). */
 struct Unk80344538_Rec {
     Unk80344538_Rec();
-    char data[0x2C];
+    int m0;
+    float m4;
+    char pad8[0x20 - 0x8];
+    float m20;
+    char pad24[0x2C - 0x24];
 };
 
 /* Player object (same as Unk80270BA0_X) with its vptr at +0x98; only slot 24 is called here. */
