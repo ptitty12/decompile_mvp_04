@@ -881,3 +881,61 @@ extern "C" void fn_802B09CC(void* mem, const char* name, int base, int n, int pp
         }
     }
 }
+
+extern "C" int fn_80378060(void* a, const char* s, int n);
+extern "C" void fn_80377C50(void* a, int key);
+extern "C" void fn_80377DBC(void* a, int* o1, int* o2, int idx);
+extern "C" void fn_80377BEC(void* a, int idx);
+struct Unk802B0638_Rec {
+    int m0;
+    int m4;
+    int m8;
+    char padC[0x1C - 0xC];
+};
+
+void fn_802B0638(Mgr* m, const char* name, int del)
+{
+    unsigned int h = fn_80378060((char*)m + 0xFA98, name, 0);
+    if (h <= 0x95) {
+        fn_80377C50((char*)m + 0xFA98, (int)name);
+        int i = 0;
+        int n = *(int*)((char*)m + 0xFA84);
+        while (i < n) {
+            int x;
+            int y;
+            fn_80377DBC((char*)m + 0xFA80, &x, &y, i);
+            if (y == (int)h) {
+                n--;
+                fn_80377BEC((char*)m + 0xFA80, i);
+            } else {
+                i++;
+            }
+        }
+        int* p = (int*)((char*)m + 0x402C);
+        int off = 0;
+        for (i = 0; i < 0x5C3; i++) {
+            char* b1 = (char*)m + 0x4034;
+            if (*(int*)(b1 + off) == (int)h) {
+                char* b2 = (char*)m + 0x4030;
+                char* t = (char*)m + 0xE3D8;
+                int o = *(int*)(b2 + off) * 4;
+                fn_802AFC3C(*(void**)(t + o));
+                *(void**)(t + o) = 0;
+                *p = 0;
+            }
+            p += 7;
+            off += 0x1C;
+        }
+        if (del != 0) {
+            char* tb = (char*)m + 0xE180;
+            int o = h * 4;
+            if (*(void**)(tb + o) != 0) {
+                delete *(void**)(tb + o);
+                *(void**)(tb + o) = 0;
+            }
+        }
+        char* tz = (char*)m + 0xE180;
+        int oz = h * 4;
+        *(void**)(tz + oz) = 0;
+    }
+}
