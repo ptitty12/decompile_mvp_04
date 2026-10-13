@@ -99,7 +99,7 @@ inline int FeIs0(int v)
 extern "C" void fn_804A1724(int a, FeW* x);
 extern "C" int fn_80552D98(void);
 struct Unk8007B2B0_Screen {
-    void fn_8007B924(int a, int b, char* out);
+    int fn_8007B924(int a, int b, char* out);
 };
 extern "C" void fn_80402EF8(char* a, char* b);
 extern "C" void fn_804031F8(char* dst, const char* s, char* p);
@@ -377,7 +377,7 @@ FE_OVERLAY void fn_8049F2A8(void* x)
     FeMem(x, 0x180)->fn_vslot8(0);
 }
 
-/* near-miss (136/138 ins): retail sets r6 (b408) before r3 for the fn_8007B924 call; tried local pointer copies, member call, int/pointer locals, 7 variants. */
+/* near-miss (137/138 ins): retail's first fn_80090880 table load uses a relocation-free `lis r9,0x8062` (address folded from a literal) where we emit lis lbl_8061977C@ha; the remaining slot cannot be reproduced without an address literal. */
 FE_OVERLAY void fn_8049F2E4(void* xx)
 {
     FeW* x = (FeW*)xx;
