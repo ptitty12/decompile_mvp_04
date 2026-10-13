@@ -600,6 +600,59 @@ struct Unk8037B10C_Obj {
     float m38;
 };
 
+inline Unk80379324_Vec3 fn_8037AF10_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline void fn_8037AF10_Mul(Unk80379324_Vec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+inline void fn_8037AF10_SubEq(Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+}
+
+extern "C" float fn_8037AF10(const Unk80379324_Vec3* p, const Unk80379324_Vec3* s0, const Unk80379324_Vec3* s1, int sq, int* out)
+{
+    Unk80379324_Vec3 v1 = fn_8037AF10_Sub(*p, *s0);
+    Unk80379324_Vec3 v2 = fn_8037AF10_Sub(*s1, *s0);
+    float r;
+    float dot;
+    float l2;
+    dot = v1.y * v2.y + (v1.x * v2.x + v1.z * v2.z);
+    if (!(dot > 0.0f)) {
+        if (out)
+            *out = 0;
+    } else {
+        l2 = v2.z * v2.z + (v2.x * v2.x + v2.y * v2.y);
+        if (!(dot < l2)) {
+            v1 = fn_8037AF10_Sub(*p, *s1);
+            if (out)
+                *out = 0;
+        } else {
+            fn_8037AF10_Mul(v2, dot / l2);
+            fn_8037AF10_SubEq(v1, v2);
+            if (out)
+                *out = 1;
+        }
+    }
+    r = v1.z * v1.z + (v1.x * v1.x + v1.y * v1.y);
+    if (sq == 0)
+        r = fn_804028E4(r);
+    return r;
+}
+
 extern "C" void fn_8037B10C(Unk8037B10C_Obj* m, const Unk80379324_Vec3* v)
 {
     m->m30 = v->x;
