@@ -507,6 +507,55 @@ extern "C" void fn_800CD690(Unk800CB3A8_Grid* g)
         g->mF0 = 0.0f;
 }
 
+struct Unk800CD750_Vec {
+    int* m0;
+    unsigned m4;
+};
+
+extern "C" void fn_800CD750(Unk800CB3A8_Grid* g, unsigned a, unsigned b, Unk800CD750_Vec* c, int* d, int* e)
+{
+    char buf[0xD0];
+    int j = 0;
+    while (j < g->m54) {
+        fn_80403144(buf, g->m90 + ((b * g->m54 + j) * g->m44) * 2);
+        g->fn_vslot43(b, j, (int)(g->m90 + ((a * g->m54 + j) * g->m44) * 2), 4);
+        g->fn_vslot43(a, j, (int)buf, 4);
+        if (g->m98 != 0) {
+            unsigned t = g->m98[a * g->m54 + j];
+            g->m98[a * g->m54 + j] = g->m98[b * g->m54 + j];
+            g->m98[b * g->m54 + j] = t;
+            g->fn_vslot91(a, j, (g->m98[a * g->m54 + j] >> 1) & 1);
+            g->fn_vslot91(b, j, (g->m98[b * g->m54 + j] >> 1) & 1);
+            g->fn_vslot90(a, j, g->m98[a * g->m54 + j] & 1);
+            g->fn_vslot90(b, j, g->m98[b * g->m54 + j] & 1);
+        }
+        j++;
+    }
+    if (c != 0) {
+        char* p = (char*)c->m0;
+        int oa = a * 4;
+        int ob = b * 4;
+        int va = *(int*)(p + oa);
+        int vb = *(int*)(p + ob);
+        if (a >= c->m4)
+            c->m4 = a + 1;
+        c->m0[a] = vb;
+        if (b >= c->m4)
+            c->m4 = b + 1;
+        c->m0[b] = va;
+    } else if (d != 0) {
+        int x = d[b];
+        int y = d[a];
+        d[a] = x;
+        d[b] = y;
+    } else if (e != 0) {
+        int x = e[b];
+        int y = e[a];
+        e[a] = x;
+        e[b] = y;
+    }
+}
+
 void Unk800CD5A4_Obj::fn_800CDA14(int a, int b, int c)
 {
     fn_vslot125(a, b, 0, c, 0);
