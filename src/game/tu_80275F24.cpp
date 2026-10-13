@@ -167,6 +167,44 @@ float fn_80278B10(void* a, void* b, void* c, float x)
     return x;
 }
 
+float fn_8037AC20(void* a, void* b, void* c, int d, int e);
+
+float fn_80278B5C(int* out, float* a, float* b, char* c)
+{
+    float best = 100000000.0f;
+    float t = 100000000.0f;
+    int eq = 0;
+    if (b[0] == b[15])
+        eq = b[2] == b[17];
+    *out = eq;
+    if (eq) {
+        if (c != 0) {
+            best = fn_8037AC20(a, b, c, 1, 0);
+        } else {
+            best = (b[0] - a[0]) * (b[0] - a[0]) + (b[2] - a[2]) * (b[2] - a[2]);
+        }
+    } else if (c != 0) {
+        int pc = (int)c;
+        int pb = (int)b;
+        int end = pc + 0x3C;
+        do {
+            t = fn_8037AF10(a, (void*)pb, (void*)pc, 1, 0);
+            if (!(t >= best))
+                best = t;
+            pc += 12;
+            pb += 12;
+        } while (pc <= end);
+    } else {
+        char* b2 = (char*)b + 12;
+        best = fn_80278B10(a, b, b2, best);
+        best = fn_80278B10(a, b, (char*)b + 24, best);
+        best = fn_80278B10(a, b, (char*)b + 36, best);
+        best = fn_80278B10(a, b2, (char*)b + 48, best);
+        best = fn_80278B10(a, b2, (char*)b + 60, best);
+    }
+    return best;
+}
+
 void fn_80278EFC(int a, int b, int c)
 {
     fn_80278F1C(a, b, c);
