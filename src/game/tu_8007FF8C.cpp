@@ -10,6 +10,37 @@ typedef Unk8007FF8C_List List;
 typedef Unk8007FF8C_Item Item;
 typedef Unk8007FF8C_Slot Slot;
 
+/* fn_800804D8: state behind lbl_806192E0 (+4 -> world; world +0xC -> record with a
+ * flag word at +0x600 and a sub-object at +0xA0; world +0x10 -> two ids at +0x6C/+0x70). */
+struct Unk800804D8_Ids {
+    char pad0[0x6C];
+    int m6C;
+    int m70;
+};
+struct Unk800804D8_Rec {
+    char pad0[0xA0];
+    int mA0;
+    char pad_A4[0x600 - 0xA4];
+    int m600;
+};
+struct Unk800804D8_World {
+    char pad0[0xC];
+    Unk800804D8_Rec* mC;
+    Unk800804D8_Ids* m10;
+};
+struct Unk800804D8_Gm {
+    char pad0[4];
+    Unk800804D8_World* m4;
+};
+struct Unk800804D8_St {
+    char pad0[0x660];
+    int m660;
+};
+struct Unk8007B2B0_Screen {
+    int fn_8007DA34(int i);
+};
+struct Unk8007DB74_A;
+
 void fn_8059A490(EI* p);
 void fn_8059A4B4(EI* p);
 void fn_8059A4D8(EI* p);
@@ -363,6 +394,35 @@ int fn_80080464(void* self, int a, int b)
         a = r;
     }
     return a;
+}
+
+extern Unk800804D8_Gm* lbl_806192E0;
+extern Unk8007B2B0_Screen* lbl_8061930C;
+extern "C" Unk800804D8_St* fn_800B555C();
+extern "C" void fn_800A72E4(void* dst, void* src);
+void* fn_8007DBBC(Unk8007DB74_A* a, int idx);
+
+void fn_800804D8()
+{
+    Unk800804D8_World* w = lbl_806192E0->m4;
+    unsigned s = fn_800B555C()->m660 - 4;
+    Unk800804D8_Ids* ids = w->m10;
+    int a = ids->m6C;
+    int b = ids->m70;
+    int bm = b == -1;
+    int am = a == -1;
+    if (s <= 1 && w->mC->m600 == 0) {
+        if (!am && lbl_8061930C->fn_8007DA34(a) != -1) {
+            Unk8007B2B0_Screen* sc = lbl_8061930C;
+            void* r = &lbl_806192E0->m4->mC->mA0;
+            fn_800A72E4(fn_8007DBBC((Unk8007DB74_A*)sc, sc->fn_8007DA34(a)), r);
+        }
+        if (!bm && lbl_8061930C->fn_8007DA34(b) != -1) {
+            Unk8007B2B0_Screen* sc = lbl_8061930C;
+            void* r = &lbl_806192E0->m4->mC->mA0;
+            fn_800A72E4(fn_8007DBBC((Unk8007DB74_A*)sc, sc->fn_8007DA34(b)), r);
+        }
+    }
 }
 
 I* fn_800805FC(I* self)
