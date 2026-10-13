@@ -211,6 +211,98 @@ int fn_8024394C()
     return 0;
 }
 
+struct Unk80243CDC_V {
+    float x;
+    float y;
+    float z;
+    void Add(const Unk80243CDC_V& o)
+    {
+        x += o.x;
+        y += o.y;
+        z += o.z;
+    }
+};
+struct Unk80243CDC_D {
+    int m0;
+    int m4;
+};
+struct Unk80243CDC_C {
+    char pad0[0xA0];
+    Unk80243CDC_D* mA0;
+};
+struct Unk80243CDC_B {
+    char pad0[0xC];
+    Unk80243CDC_C* mC;
+};
+struct Unk80243CDC_A {
+    char pad0[0x64];
+    Unk80243CDC_B* m64;
+};
+struct Unk80243CDC_I {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    int m20;
+};
+struct Unk80243CDC_Ctx {
+    char pad0[0x6CC];
+    int m6CC;
+    char pad6D0[0x744 - 0x6D0];
+    Unk80243CDC_I* m744;
+};
+struct Unk80243CDC_S {
+    char pad0[0x8C];
+    Unk80243CDC_V m8C;
+    char pad98[0xC4 - 0x98];
+    Unk8026C414_E e[6];
+    char pad184[0x1A0 - 0x184];
+    int m1A0;
+    char pad1A4[0x200 - 0x1A4];
+    Unk80243CDC_V m200;
+    char pad20C[0x22C - 0x20C];
+    Unk80243CDC_V m22C;
+    int m238;
+    int m23C;
+    int m240;
+    char pad244[0x44C - 0x244];
+    Unk80243CDC_Ctx* m44C;
+};
+void* fn_801A4CE8(Unk80243CDC_Ctx* c, int a);
+void fn_80188920(Unk80243CDC_V* out, int a);
+extern float lbl_8061D488;
+
+void fn_80243CDC(Unk80243CDC_S* self, int i)
+{
+    Unk8026C414_E* e = &self->e[i];
+    self->m240 = e->f0;
+    Unk80243CDC_V v = *(Unk80243CDC_V*)e;
+    if (i == 1) {
+        if (e->m14 == 1 && self->m44C->m744->m20 == 0) {
+            Unk80243CDC_A* a = (Unk80243CDC_A*)fn_801A4CE8(self->m44C, 1);
+            if (a) {
+                Unk80243CDC_D* d = a->m64->mC->mA0;
+                if (d && d->m4 != 0) {
+                    v.x -= lbl_8061D488 * 12.0f;
+                    v.z -= lbl_8061D488 * 12.0f;
+                    *(Unk80243CDC_V*)e = v;
+                }
+            }
+        }
+        if (e->m14 == 0) {
+            Unk80243CDC_Ctx* c = self->m44C;
+            if (c->m744->m18 != 0) {
+                Unk80243CDC_V t;
+                fn_80188920(&t, c->m6CC);
+                v.Add(t);
+            }
+        }
+    }
+    self->m1A0 = 0;
+    self->m200 = v;
+    self->m1A0 = 0;
+    self->m22C = self->m8C;
+}
+
 void fn_80244858(Unk80270BA0_X* x, float f)
 {
     float t = AngleDiff(f, 0.0f);
