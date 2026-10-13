@@ -207,6 +207,56 @@ extern "C" void fn_805542CC(Db80553E54_S* self);
 extern "C" void fn_805542F0(Db805542F0_S* self, int mode);
 extern "C" void fn_8055440C();
 extern "C" void fn_80554540(Db80554540_S* self, int a, int b);
+struct Db80553760_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db80553760_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80553760_B1() { vp = lbl_8064A550; }
+};
+struct Db80553760_B2 : Db80553760_B1 {
+    Db80553760_B2(int* buf, int cap) : Db80553760_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80553760_B2() { vp = lbl_8064A550; }
+};
+struct Db80553760_B3 : Db80553760_B2 {
+    int buf[0xFA];
+    Db80553760_B3() : Db80553760_B2(buf, 0xFA)
+    {
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+        vp = lbl_8065C1B0;
+    }
+    ~Db80553760_B3() { vp = lbl_8064A550; }
+};
+struct Db80553760_S {
+    char pad0[0x18];
+    int m18;
+    int m1C;
+    int m20;
+    char pad24[0x3304 - 0x24];
+    float m3304[30];
+    int m337C[30];
+};
+extern "C" void fn_8007FE18__FP13Unk8007F198_E(void* e);
+extern "C" void fn_80538368(Unk805352B0_List* self, int x);
+extern "C" void fn_805362AC(Unk805352B0_List* self, int mode);
+extern "C" void fn_80535360(Unk805352B0_List* self, int x);
 
 extern "C" DB_OVERLAY int fn_80550E68(int a)
 {
@@ -478,6 +528,47 @@ extern "C" DB_OVERLAY void fn_805536B4(Db805536B4_S* self)
 extern "C" DB_OVERLAY void fn_80553754(Db80553754_S* self)
 {
     self->m10 = 10;
+}
+
+extern "C" DB_OVERLAY void fn_80553760(Db80553760_S* self, int flag)
+{
+    if (self->m18 == 0) {
+        Unk805352B0_List* l = (Unk805352B0_List*)((char*)self + 0x24);
+        int i = 0;
+        int off = 0;
+        fn_8007FE18__FP13Unk8007F198_E(lbl_8061930C);
+        Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+        float f = *(float*)((char*)sc + 0x1F4) * 15.0f;
+        fn_80538368(l, 0);
+        int z = fn_8007F7D0__FP13Unk8007F198_BUi(sc, 0);
+        do {
+            int id = sc->fn_8007B2FC(i);
+            if (id == z && flag == 0) {
+                self->m3304[i] = 0.0f;
+                self->m337C[i] = flag;
+            } else {
+                self->m3304[i] = sc->fn_80079EFC(id) - f;
+                Db80553760_B3 t;
+                fn_80535360((Unk805352B0_List*)&t, id);
+                self->m337C[i] = 0x5E - t.m4;
+            }
+            i++;
+        } while (i <= 0x1D);
+        fn_805362AC(l, 1);
+        self->m1C = 0x3FFFFFF;
+        if (self->m20 != 0) {
+            Unk8007B2B0_Screen* s2 = (Unk8007B2B0_Screen*)lbl_8061930C;
+            int z2 = fn_8007F7D0__FP13Unk8007F198_BUi(s2, 0);
+            int j;
+            for (j = 0; j <= 0x1D; j++) {
+                if (s2->fn_8007B2FC(j) == z2) {
+                    self->m1C &= ~(1 << j);
+                    break;
+                }
+            }
+        }
+        self->m18 = 1;
+    }
 }
 
 extern "C" DB_OVERLAY void fn_8055395C(Db8055395C_S* self)
