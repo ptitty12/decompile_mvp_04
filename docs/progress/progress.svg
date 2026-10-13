@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">46.27% of code matched as of 2026-10-12: 20,354 of 24,158 functions, 2,728,412 of 5,896,176 code bytes, 760 units with code.</desc>
+<desc id="desc">46.38% of code matched as of 2026-10-12: 20,364 of 24,158 functions, 2,734,596 of 5,896,176 code bytes, 760 units with code.</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -26,17 +26,17 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="0.5" y="0.5" width="959" height="781" rx="8" class="border"/>
 <text x="24.0" y="40.0" class="t2" font-size="14" font-weight="600" text-anchor="start">MVP Baseball 2005 (GV4E69) decompilation</text>
 <text x="936.0" y="40.0" class="t3" font-size="12" font-weight="400" text-anchor="end">as of 2026-10-12</text>
-<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">46.27%</text>
+<text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">46.38%</text>
 <text x="26.0" y="118.0" class="t2" font-size="13" font-weight="400" text-anchor="start">of code matched</text>
 <text x="300.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Functions matched</text>
-<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">20,354 / 24,158</text>
+<text x="300.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">20,364 / 24,158</text>
 <text x="512.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
 <text x="512.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">2.73 MB / 5.90 MB</text>
 <text x="724.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Data matched</text>
 <text x="724.0" y="96.0" class="t1" font-size="18" font-weight="600" text-anchor="start">3.1 KB / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
-<rect x="24" y="140" width="422.0" height="12" class="b5" clip-path="url(#bar)"/>
+<rect x="24" y="140" width="423.0" height="12" class="b5" clip-path="url(#bar)"/>
 <text x="24.0" y="184.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code by unit</text>
 <text x="122.0" y="184.0" class="t3" font-size="12" font-weight="400" text-anchor="start">area = code size, shade = fuzzy match</text>
 <rect x="487.4" y="174" width="12" height="12" rx="2" class="b0"/>
@@ -244,7 +244,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="511.9" y="385.8" width="25.0" height="24.1" rx="2" class="b2"><title>fe/tu_804BB110: 13,392 bytes of code, 41.1% fuzzy match</title></rect>
 <rect x="511.9" y="411.9" width="25.0" height="24.0" rx="2" class="b2"><title>game/tu_80198DB8: 13,376 bytes of code, 37.9% fuzzy match</title></rect>
 <rect x="511.9" y="438.0" width="25.0" height="23.9" rx="2" class="b1"><title>animation/choosers/tu_80272B20: 13,316 bytes of code, 20.8% fuzzy match</title></rect>
-<rect x="511.9" y="463.9" width="25.0" height="23.8" rx="2" class="b2"><title>ealib/tu_803E3C08: 13,232 bytes of code, 40.8% fuzzy match</title></rect>
+<rect x="511.9" y="463.9" width="25.0" height="23.8" rx="2" class="b4"><title>ealib/tu_803E3C08: 13,232 bytes of code, 75.5% fuzzy match</title></rect>
 <rect x="511.9" y="489.7" width="25.0" height="23.7" rx="2" class="b3"><title>fe/tu_804B4908: 13,200 bytes of code, 61.9% fuzzy match</title></rect>
 <rect x="511.9" y="515.4" width="25.0" height="23.6" rx="2" class="b3"><title>fe/tu_804A721C: 13,168 bytes of code, 71.4% fuzzy match</title></rect>
 <rect x="539.0" y="201.0" width="23.6" height="24.9" rx="2" class="b3"><title>game/tu_8014F47C: 13,132 bytes of code, 51.9% fuzzy match</title></rect>
@@ -329,7 +329,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="914.4" y="224.8" width="20.6" height="20.7" rx="2" class="b4"><title>game/tu_80341B78: 9,736 bytes of code, 86.6% fuzzy match</title></rect>
 <rect x="638.6" y="247.4" width="20.0" height="21.2" rx="2" class="b3"><title>game/tu_801498C0: 9,700 bytes of code, 69.8% fuzzy match</title></rect>
 <rect x="638.6" y="270.6" width="20.0" height="21.2" rx="2" class="b3"><title>game/tu_800CF178: 9,696 bytes of code, 69.3% fuzzy match</title></rect>
-<rect x="638.6" y="293.7" width="20.0" height="21.1" rx="2" class="b1"><title>ealib/tu_803D2B20: 9,668 bytes of code, 23.1% fuzzy match</title></rect>
+<rect x="638.6" y="293.7" width="20.0" height="21.1" rx="2" class="b1"><title>ealib/tu_803D2B20: 9,668 bytes of code, 25.0% fuzzy match</title></rect>
 <rect x="638.6" y="316.8" width="20.0" height="21.1" rx="2" class="b3"><title>game/tu_80026A48: 9,656 bytes of code, 53.4% fuzzy match</title></rect>
 <rect x="638.6" y="339.9" width="20.0" height="20.9" rx="2" class="b3"><title>ealib/tu_803DE414: 9,576 bytes of code, 70.2% fuzzy match</title></rect>
 <rect x="638.6" y="362.8" width="20.0" height="20.5" rx="2" class="b2"><title>fe/tu_804C19EC: 9,440 bytes of code, 39.8% fuzzy match</title></rect>
@@ -463,7 +463,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="740.7" y="361.0" width="14.8" height="14.9" rx="2" class="b5"><title>game/tu_800042B0: 5,416 bytes of code, 100.0% fuzzy match</title></rect>
 <rect x="740.7" y="378.0" width="14.8" height="14.9" rx="2" class="b3"><title>animation/goals/tu_8028B194: 5,412 bytes of code, 59.5% fuzzy match</title></rect>
 <rect x="740.7" y="394.9" width="14.8" height="14.8" rx="2" class="b3"><title>ealib/tu_803912F8: 5,356 bytes of code, 54.1% fuzzy match</title></rect>
-<rect x="740.7" y="411.7" width="14.8" height="14.7" rx="2" class="b2"><title>ealib/tu_803E0ACC: 5,324 bytes of code, 37.4% fuzzy match</title></rect>
+<rect x="740.7" y="411.7" width="14.8" height="14.7" rx="2" class="b3"><title>ealib/tu_803E0ACC: 5,324 bytes of code, 51.1% fuzzy match</title></rect>
 <rect x="740.7" y="428.3" width="14.8" height="14.3" rx="2" class="b4"><title>game/tu_800437AC: 5,220 bytes of code, 75.2% fuzzy match</title></rect>
 <rect x="740.7" y="444.6" width="14.8" height="14.3" rx="2" class="b4"><title>game/tu_80035DF0: 5,216 bytes of code, 75.3% fuzzy match</title></rect>
 <rect x="740.7" y="461.0" width="14.8" height="14.2" rx="2" class="b5"><title>dolphin/gx/GXAttr: 5,188 bytes of code, 100.0% fuzzy match</title></rect>
@@ -601,7 +601,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="839.5" y="529.2" width="9.3" height="9.8" rx="2" class="b5"><title>dolphin/vm/tu_8043D960: 2,532 bytes of code, 100.0% fuzzy match</title></rect>
 <rect x="850.8" y="444.0" width="9.2" height="9.9" rx="2" class="b5"><title>game/tu_8035688C: 2,528 bytes of code, 100.0% fuzzy match</title></rect>
 <rect x="862.0" y="444.0" width="8.8" height="9.9" rx="2" class="b5"><title>libc/qsort: 2,444 bytes of code, 100.0% fuzzy match</title></rect>
-<rect x="872.8" y="444.0" width="8.8" height="9.9" rx="2" class="b2"><title>ealib/tu_803E3280: 2,440 bytes of code, 37.5% fuzzy match</title></rect>
+<rect x="872.8" y="444.0" width="8.8" height="9.9" rx="2" class="b3"><title>ealib/tu_803E3280: 2,440 bytes of code, 65.5% fuzzy match</title></rect>
 <rect x="883.7" y="444.0" width="8.8" height="9.9" rx="2" class="b4"><title>dolphin/os/tu_80431828: 2,424 bytes of code, 82.4% fuzzy match</title></rect>
 <rect x="894.4" y="444.0" width="8.7" height="9.9" rx="2" class="b5"><title>game/tu_80360C18: 2,408 bytes of code, 100.0% fuzzy match</title></rect>
 <rect x="905.1" y="444.0" width="8.6" height="9.9" rx="2" class="b5"><title>game/tu_80067A20: 2,400 bytes of code, 100.0% fuzzy match</title></rect>
@@ -761,11 +761,11 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="60.0" y="632.0" class="t3" font-size="11" font-weight="400" text-anchor="end">40%</text>
 <line x1="68" y1="600.0" x2="936" y2="600.0" class="grid" stroke-width="1"/>
 <text x="60.0" y="604.0" class="t3" font-size="11" font-weight="400" text-anchor="end">50%</text>
-<polyline points="68.0,739.5 502.0,658.4 936.0,610.4" class="line" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="68.0,739.5 502.0,658.4 936.0,610.1" class="line" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <circle cx="68.0" cy="739.5" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
 <circle cx="502.0" cy="658.4" r="4" class="dot" stroke-width="2"><title>2026-10-11: 29.15% of code, 16,053 / 24,158 functions</title></circle>
-<circle cx="936.0" cy="610.4" r="4" class="dot" stroke-width="2"><title>2026-10-12: 46.27% of code, 20,354 / 24,158 functions</title></circle>
-<text x="936.0" y="600.4" class="t1" font-size="12" font-weight="600" text-anchor="end">46.27%</text>
+<circle cx="936.0" cy="610.1" r="4" class="dot" stroke-width="2"><title>2026-10-12: 46.38% of code, 20,364 / 24,158 functions</title></circle>
+<text x="936.0" y="600.1" class="t1" font-size="12" font-weight="600" text-anchor="end">46.38%</text>
 <text x="68.0" y="758.0" class="t3" font-size="11" font-weight="400" text-anchor="start">2026-10-10</text>
 <text x="936.0" y="758.0" class="t3" font-size="11" font-weight="400" text-anchor="end">2026-10-12</text>
 </svg>
