@@ -283,6 +283,25 @@ extern "C" int fn_80394FD4(int a, int b)
     return v;
 }
 
+/* near-miss 96.9%: same code; retail keeps the slot offset in r7, the record in r10 and the byte index in r8 (ours r8,
+ * r11, r10) and loads the table size before the inner test. */
+extern "C" void fn_803950B4(int key)
+{
+    int i = 0;
+    do {
+        McHdrB* s = lbl_8069B7CC[i].m0;
+        if (s != 0 && lbl_8069B7CC[i].m4 == key) {
+            int j = 0;
+            unsigned char* tab = (unsigned char*)s + ((((s->m10 * 2) + 3) & ~3) + 0x18);
+            while (j < lbl_8069B7CC[i].m0->m12) {
+                tab[j] = 0xFF;
+                j++;
+            }
+        }
+        i++;
+    } while (i <= 7);
+}
+
 extern "C" int fn_80395150(int x, unsigned y)
 {
     int r = 0;
