@@ -39,7 +39,7 @@ struct Unk8061FEDC {
 extern Unk8061FEDC* lbl_8061FEDC;
 extern char lbl_8064A1B8[];
 extern char lbl_80649DB8[];
-void fn_803785E4(Unk80069F0C* self, Unk8006902C_Ctx* a);
+void fn_803785E4(Unk80069F0C* self);
 void fn_80378620(Unk80069F0C* self, int chrg);
 void fn_8006F4D0(Unk8006902C_Handle* h);
 void fn_8014D81C(Unk8014D81C_Obj* p);
@@ -70,11 +70,12 @@ void fn_80069EE0(void)
     fn_8006902C(1, 0xFFFF);
 }
 
-/* near-miss: 2 slots; retail computes this+0x28 (r29) before the root-ctor call, ours after it. */
+/* The root-ctor call takes only this (as in the other units' fn_803785E4(void*)); a stays in r4 for it.
+ * With the second argument written out, sched1 moved the this+0x28 add after the call. */
 Unk80069F0C* Unk80069F0C::fn_80069F0C(Unk8006902C_Ctx* a)
 {
     Unk8014D81C_Obj* p = &m28;
-    fn_803785E4(this, a);
+    fn_803785E4(this);
     m8 = lbl_8064A1B8;
     mC = a;
     m10 = 0;
