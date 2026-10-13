@@ -351,15 +351,14 @@ void fn_8011A9B8(const char* s, Wid* w, const char* name)
     fn_800C8040(w->fn_vslot32(name, 1))->fn_vslot30(s);
 }
 
-/* near-miss: retail's lwzx index is r11, ours r0 (2 slots; many spellings of the offset/base tried:
- * inline base+offset, char* locals, member-array pointer). */
+/* The table base is held as an int: with a char* base the scaled index lands in r0; retail has r11. */
 UnkGame* fn_8011AA24(int i)
 {
     UnkGameTbl* t = lbl_8061B8C0;
     UnkGame* r;
     if ((unsigned)i <= 2) {
         int o = i * 4;
-        char* b = (char*)t + 8;
+        int b = (int)t + 8;
         r = *(UnkGame**)(b + o);
     } else
         r = 0;
