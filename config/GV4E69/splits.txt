@@ -2104,6 +2104,9 @@ libc/tu_8040ABC4.c:
 
 libc/strtod2.c:
 	.text       start:0x8040AC00 end:0x8040AF30
+	.rodata     start:0x8060ED88 end:0x8060EDA8
+	.data       start:0x8062F8BC end:0x8062F8E0 align:4
+	.sdata      start:0x806EEB38 end:0x806EEB3C align:4
 
 libc/strtoul.c:
 	.text       start:0x8040AF30 end:0x8040B100

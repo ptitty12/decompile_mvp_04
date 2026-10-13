@@ -1165,7 +1165,7 @@ config.libs = [
             Object(Matching, "libc/qsort.c"),
             Object(Matching, "libc/rand.c"),
             Object(NonMatching, "libc/tu_8040ABC4.c"),
-            Object(NonMatching, "libc/strtod2.c"),
+            Object(Matching, "libc/strtod2.c"),
             Object(Matching, "libc/strtoul.c"),
             Object(Matching, "libc/memcmp.c"),
             Object(Matching, "libc/memcpy.c"),
