@@ -128,3 +128,21 @@
     - `mr r0,r3` before `cmpwi` on a call result.
   - Usage: the 5 h window was 92% used at 21:36 and the weekly limit 77%. The fleet restarts at the 22:50 window reset.
 
+### 2026-10-12 evening (enablers: fleet dashboard, tooling only)
+
+- Unit: none. Functions matched: 0 (tooling session).
+- Added `tools/fleet_dashboard.py`. It reads git only (no build, no model calls) and reports:
+  - verified and worker-claimed code and functions per hour;
+  - near-miss share of commits;
+  - per-worker activity, the merge backlog and sessions;
+  - the functions closest to 100% in the progress bot's last build.
+- `--watch` runs in a terminal. `--publish` replaces the single orphan commit on the `dashboard` branch.
+  - A new scheduled task, "MVP decomp live dashboard", runs it every minute from the worktree `decompile_mvp_04-dash`. That worktree must stay.
+- Pushed the two progress-bot commits that were only on the local `main` checkout (2-minute poll, rebase on a push race).
+- Verify: PASS at 3738240c (20,730 functions, no regressions).
+- Reading of session 3 (17:57 onward):
+  - Verified code per hour held steady against session 2 (about 55-70 KB/h vs about 63 KB/h).
+  - Functions per hour fell, because the remaining functions average about 860 B against about 140 B for matched ones.
+  - The near-miss share of commits rose from about 4% at 18:00 to 40-60% after 21:00.
+- Owner question added to DECISIONS: the GitHub repo is public.
+
