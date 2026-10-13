@@ -313,13 +313,11 @@ FE_OVERLAY void fn_804A335C(void* x, char* dst)
 FE_OVERLAY FeScrH* fn_804A33A4(FeScrH* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
-    /* near-miss (2 slots: the stw 0x134/0x138 pair swapped): all 720 orders of these six statements
-     * with a shared int zero tried; the float needs an extern const float to hoist its lfs. */
     int z = 0;
     self->SetVptr(lbl_80682260);
     self->m130 = z;
-    FeI(self, 0x138) = z;
     FeI(self, 0x134) = z;
+    FeI(self, 0x138) = z;
     *(float*)((char*)self + 0x10E0) = lbl_805F7708;
     *(short*)((char*)self + 0x140) = z;
     return self;
