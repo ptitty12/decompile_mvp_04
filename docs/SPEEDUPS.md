@@ -144,6 +144,15 @@ Roughly ordered by expected payoff for the effort.
     so tools/decompctx.py output doesn't parse. It needs a C-flattened header
     export. twins.py's callee prototypes cover part of the need.
 
+19. **An integration lock shared by every integrator.** `needs owner` (Codex sessions are outside the Claude team)
+    The lead, the Codex swarm's integrator and side sessions all push to main.
+    The verify gate takes 6-20 min, so a gated push loses whenever someone else
+    pushes in that window. On 2026-10-13 one batch passed verify three times
+    before its push landed, and the lead reported the same. A cooperative lock
+    (e.g. a ref or a file that an integrator claims before verifying and
+    releases after pushing) would stop the wasted verifies. All three
+    integrators have to honor it, so the owner would tell the Codex coordinator.
+
 ## Observations log
 
 <!-- YYYY-MM-DD | who | observation | idea (item #) | rough impact -->
@@ -182,6 +191,8 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-13 | REA session (model test) | Four agents worked on never-attempted big functions with twins.py and the same brief. The full build plus verify.py took 10-20 min per commit under load, longer than the matching (16-35 min). Main moves every 10-20 min (Codex batches, lead merges, progress card), so a 12-min verify often loses the push race. integrate.py --push then refuses ("origin/main moved") | 10 (tight loop), new: verify against the progress bot's report of origin/main instead of rebuilding the baseline | halves the gate; fewer lost races
 - 2026-10-13 | REA session (model test) | rename.py needs the unit with its extension (`game/tu_800D4D0C.cpp`); without it, it reports "no .text range". Overlay units (fe/db) get that message either way, and their extern "C" symbols pair by name | 2 | small, recurring confusion
 
+- 2026-10-13 | REA session | Push race: the twins1 batch passed verify.py 3 times (17:23, 17:29, 17:35) and lost each push to a newer main; it landed on attempt 4 (17:47). The lead saw the same on nm-08. Each lost round is a full build+verify | 19 | about 20 min and 3 full builds per batch at peak
+
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
@@ -217,3 +228,5 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-13 | 18 | `m2c --context` with decompctx.py output for game/tu_800D4D0C: "Syntax error when parsing C context. Directives not supported yet" (it needs preprocessed input), and the context holds C++ classes that pycparser can't read | deferred
 - 2026-10-13 | 16 | Fable 5.1 on three never-attempted big functions (same brief, twins.py, 80-min timebox): game fn_800D69E8 (1,460 B, tweaker registration) matched on its first source version in 35 min, 147k tokens; fe fn_8048C9F4 (2,460 B, widget/frame-layout heavy) matched in 34 min, 3 iterations, 218k tokens; db fn_8059E708 (2,360 B, 119-case bit getter) matched on the first build in 16 min, 92k tokens. Sonnet 5.5 control on fn_8048C9F4: also matched, about 24 min to the match, ~14 iterations, 227k tokens | 3/3 matched (6.3 KB). The big functions were mostly never attempted because batches capped size at 0x400-0x800, not because they're too hard. With twins.py both models match 2.5 KB functions in under 40 min; Fable needed fewer iterations, but on the one A/B the token cost was the same. Next: lift the size cap for Sonnet batches and keep Fable for functions that fail twice
 - 2026-10-13 | 14 | What the agents said twins.py gave them: the "matched functions sharing the most callees" line was the most useful in all four runs. It led to fn_80147F00's declaration block (extern "C" with explicit self), fn_8046F510's record-loop idiom and fn_8059F18C's bit-getter expressions. Callee prototypes exposed headers with the wrong arity (fn_8056A2F8 takes 10 args; fn_800D7008). Missing: string contents of the target's .rodata, and stack-slot reuse rules (PATTERNS covers those) | adopted; consider printing referenced string literals
+- 2026-10-13 | 6, 15 | RE4 SDK reuse. Two Sonnet workers ported dolsdk2004 bodies from adonis-singh/re4 into our SDK units: 10 functions, 8.9 KB (__ARChecksize 6,132 B, PackArgs, GetFontCode, ParseStringS, __OSModuleInit, DVDGetCurrentDir, __OSInitAudioSystem, __OSStopAudioSystem, __GXAbort, GXAbortFrame), merged in aa9bfc7b. Another ~12 KB match exactly but only per original file with `-opt nopeephole`. Our merged code-only units mix files with different flags (tu_804330D0 is 7-8 files; GXInit.c, OSTime.c, OSRtc.c and OSReset tails are the others). The splits and per-section drafts were handed to the lead, who started with OSTime.c | reuse works; unit splits along the original files are the remaining SDK lever
+- 2026-10-13 | 14 | twins1 worker, three never-attempted mid-size functions with strong twins (0x27C-0x288): 3/3 matched, 1.9 KB, in 3, 5 and 29 min (6330ed05). The 29-min one was a loop strength-reduction decision; recipe in PATTERNS "Loop dumps". Its requests went into twins.py --diff: callee/offset/constant substitution tables, a shorter/longer note, and a stale near-miss comment flag | twins with score >= 0.85 are near-mechanical
