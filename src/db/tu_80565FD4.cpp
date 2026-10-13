@@ -172,6 +172,17 @@ struct Db8056746C_H : Db80566B38_D {
 };
 int fn_8008463C(int x);
 extern "C" void fn_8056A058(int s, int a, int b, int c, int d, int e);
+struct Db8056792C_List {
+    Db8056746C_Rec* m0;
+    unsigned m4;
+};
+struct Db8056792C_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056792C_List* v4(int a);
+};
+float fn_8056FFB0();
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -413,6 +424,21 @@ extern "C" DB_OVERLAY void fn_805678D8(int a, int b, int k)
         fn_80567AF4(a, b, k);
     else if ((unsigned)(k - 17) <= 1)
         fn_80567AD4(a, b, k);
+}
+
+/* near-miss: 96.7%; same struct-copy shape as fn_8056746C: retail keeps the list pointer live (separate source/dest/counter
+ * temporaries) and loads the second vptr before the last three copy stores. */
+extern "C" DB_OVERLAY void fn_8056792C(int a, int b, int k)
+{
+    Db8056792C_H* h = (Db8056792C_H*)b;
+    Db8056746C_Rec p = h->v4(k)->m0[1];
+    Db8056746C_Rec q = h->v4(k)->m0[2];
+    if (p.m10 == q.m10 && p.m1C != 0) {
+        if (!(fn_8056FFB0() >= 0.5f))
+            fn_8056A058(a, 2, 0, p.m0, q.m0, 1);
+        else
+            fn_8056A058(a, 2, 0, q.m0, p.m0, 1);
+    }
 }
 
 extern "C" DB_OVERLAY void fn_80567AD4(int a, int b, int c)
