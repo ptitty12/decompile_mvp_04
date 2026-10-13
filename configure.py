@@ -1273,7 +1273,7 @@ config.libs = [
             Object(Matching, "dolphin/card/CARDRename.c", cflags=cflags_dolphin_dvd),
             Object(Matching, "dolphin/card/tu_80420228.c"),
             Object(NonMatching, "dolphin/card/CARDUnlock.c"),
-            Object(NonMatching, "dolphin/card/CARDRdwr.c"),
+            Object(Matching, "dolphin/card/CARDRdwr.c"),
             Object(Matching, "dolphin/card/CARDStatEx.c"),
             Object(NonMatching, "dolphin/db/db.c"),
             Object(NonMatching, "dolphin/dsp/dsp.c"),

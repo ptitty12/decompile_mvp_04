@@ -3,6 +3,11 @@
 
 #include "__card.h"
 
+extern CARDControl lbl_806DCF20[2];
+extern s32 fn_8041B900(CARDControl* card, s32 result);
+extern s32 fn_8041B3DC(s32 chan, CARDCallback callback);
+extern s32 fn_8041B510(s32 chan, CARDCallback callback);
+
 // prototypes
 static void BlockReadCallback(s32 chan, s32 result);
 static void BlockWriteCallback(s32 chan, s32 result);
@@ -11,7 +16,7 @@ static void BlockReadCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
 
     if ((result >= 0)) {
         card->xferred += 0x200;
@@ -19,7 +24,7 @@ static void BlockReadCallback(s32 chan, s32 result) {
         ((u8*)card->buffer) += 0x200;
 
         if (--card->repeat > 0) {
-            result = __CARDReadSegment(chan, BlockReadCallback);
+            result = fn_8041B3DC(chan, BlockReadCallback);
             if (result >= 0) {
                 return;
             }
@@ -27,7 +32,7 @@ static void BlockReadCallback(s32 chan, s32 result) {
     }
 
     if (!card->apiCallback) {
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     }
 
     callback = card->xferCallback;
@@ -43,7 +48,7 @@ s32 __CARDRead(s32 chan, u32 addr, s32 length, void* dst, CARDCallback callback)
     ASSERTLINE(91, 0 < length && length % CARD_SEG_SIZE == 0);
     ASSERTLINE(92, 0 <= chan && chan < 2);
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (card->attached == 0) {
         return CARD_RESULT_NOCARD;
     }
@@ -51,21 +56,21 @@ s32 __CARDRead(s32 chan, u32 addr, s32 length, void* dst, CARDCallback callback)
     card->repeat = (length / 512u);
     card->addr = addr;
     card->buffer = dst;
-    return __CARDReadSegment(chan, BlockReadCallback);
+    return fn_8041B3DC(chan, BlockReadCallback);
 }
 
 static void BlockWriteCallback(s32 chan, s32 result) {
     CARDControl* card;
     CARDCallback callback;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (result >= 0) {
         card->xferred += card->pageSize;
         card->addr += card->pageSize;
         ((u8*)card->buffer) += card->pageSize;
 
         if (--card->repeat > 0) {
-            result = __CARDWritePage(chan, BlockWriteCallback);
+            result = fn_8041B510(chan, BlockWriteCallback);
             if (result >= 0) {
                 return;
             }
@@ -73,7 +78,7 @@ static void BlockWriteCallback(s32 chan, s32 result) {
     }
 
     if (!card->apiCallback) {
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     }
 
     callback = card->xferCallback;
@@ -85,7 +90,7 @@ static void BlockWriteCallback(s32 chan, s32 result) {
 
 s32 __CARDWrite(s32 chan, u32 addr, s32 length, void* dst, CARDCallback callback) {
     CARDControl* card;
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
 
     ASSERTLINE(153, 0 < length && length % card->pageSize == 0);
     ASSERTLINE(154, 0 <= chan && chan < 2);
@@ -97,10 +102,6 @@ s32 __CARDWrite(s32 chan, u32 addr, s32 length, void* dst, CARDCallback callback
     card->repeat = (length / card->pageSize);
     card->addr = addr;
     card->buffer = dst;
-    return __CARDWritePage(chan, BlockWriteCallback);
+    return fn_8041B510(chan, BlockWriteCallback);
 }
 
-s32 CARDGetXferredBytes(s32 chan) {
-    ASSERTLINE(183, 0 <= chan && chan < 2);
-    return __CARDBlock[chan].xferred;
-}
