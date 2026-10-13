@@ -8,8 +8,10 @@ time, repeats, or could be automated. One line each: what happened, the idea,
 and a rough impact. Don't fix it on the spot if it's outside your unit. Ideas
 move into the candidate list, and their results go under "Tried".
 
-Status keys: `idea`, `trying`, `adopted`, `rejected`, `needs owner` (a
-download, a persistent service, cost, or owner-held material).
+Status keys: `idea`, `trying`, `adopted`, `rejected`, `needs owner`.
+Since 2026-10-12 the owner pre-approves downloads, persistent services and
+cost (DECISIONS 2026-10-12). Only owner-held material, such as the owner's
+own discs, still needs the owner.
 
 ## Where the work is
 
@@ -38,7 +40,8 @@ matters a lot.
 
 Roughly ordered by expected payoff for the effort.
 
-1. **Near-miss queue and decomp-permuter.** `idea`, `needs owner` (download).
+1. **Near-miss queue and decomp-permuter.** `idea`, approved by the owner 2026-10-12 (download).
+   Caveat: the permuter parses C only (docs/NEARMISS.md), so C++ game units need a C extraction of the function first.
    GCC 2.95 misses on register allocation and instruction scheduling are what
    the permuter is built for: it tries random source rewrites and keeps the
    ones that score better in the diff. It runs unattended on the CPU and uses no
@@ -80,7 +83,7 @@ Roughly ordered by expected payoff for the effort.
      opportunity. Check which libraries (EAGL and others) and versions overlap.
 
    Record each source in DECISIONS.md, as CLAUDE.md requires.
-7. **Symbols from other builds the owner owns.** `needs owner`
+7. **Symbols from other builds the owner owns.** `needs owner` (owner-held discs; asked 2026-10-12)
    Source paths read `C:/mvp2004/source/...`, so the code is shared with MVP
    2004. Other platform builds (PS2, Xbox, PSP) of MVP 2004/2005 sometimes
    shipped unstripped executables or map files. Any copy the owner owns that has
@@ -90,7 +93,7 @@ Roughly ordered by expected payoff for the effort.
 8. **A first-draft decompiler (m2c, PowerPC).** `adopted` (tools/match/m2c_draft.py; m2c in an external venv)
    It produces starting C from the asm, which is faster than writing it by hand
    or cleaning up Ghidra output. Most useful on mid-size functions.
-9. **Route work to different models and effort levels.** `idea`, `needs owner` (cost)
+9. **Route work to different models and effort levels.** `idea`, approved by the owner 2026-10-12 (cost)
    Small boilerplate goes to a faster model; large float-heavy functions and the
    near-miss queue go to a stronger model at high effort.
 10. **A tighter build-and-diff loop.** `idea`
