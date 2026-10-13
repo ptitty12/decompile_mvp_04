@@ -88,7 +88,7 @@ void fn_80599B24(void* p);
 void fn_80361580(void* p);
 void fn_8057DA7C(int a, int b);
 void fn_8057DDC4(int a, int b);
-int fn_8040ABA0();
+extern "C" int rand();
 void* fn_800A199C(void* g);
 Db80541F40_Cur* fn_800A1960(void* g);
 int fn_805426B8(Db80541F40_Slot* s, int a);
@@ -442,7 +442,7 @@ DB_OVERLAY int fn_80542B2C(char* o)
     int lim = 0x18;
     if (n <= 0xD)
         lim = 0xD;
-    int c = fn_8040ABA0() % 24;
+    int c = rand() % 24;
     if (c > 0) {
         do {
             int d = lim + 1;
@@ -532,7 +532,7 @@ DB_OVERLAY void fn_80543D28(L* l)
             do {
                 unsigned r;
                 if (rem != 0)
-                    r = fn_8040ABA0() % rem;
+                    r = rand() % rem;
                 else
                     r = 0;
                 int* d = l->m0;

@@ -482,7 +482,7 @@ struct Db8053E240_Rng {
 };
 extern char lbl_8064A4C8[];
 extern const float lbl_805FEE30;
-extern "C" int fn_8040ABA0();
+extern "C" int rand();
 extern "C" void fn_8014D81C(Db8053E240_Rng* r);
 extern "C" void fn_8014D860(Db8053E240_Rng* r, int seed);
 extern "C" int fn_8014D8AC(Db8053E240_Rng* r, int range, int a, int b);
@@ -502,7 +502,7 @@ DB_OVERLAY int fn_80540258(int self_, int mode, int x, int n, int arr_)
     if (rem == 0)
         return n;
     self->s1();
-    fn_8014D860(&rng, fn_8040ABA0());
+    fn_8014D860(&rng, rand());
     if (rem > 0) {
         Db8053E240_EntF* wp = (Db8053E240_EntF*)(rem * -12 + (n * 12 + arr_));
         do {
@@ -526,22 +526,22 @@ DB_OVERLAY int fn_80540258(int self_, int mode, int x, int n, int arr_)
             self->s12(cnt);
             fn_80537E80(&t, self->s3(), x, 1);
             q->mC = 0;
-            if (t.m4 != 0) {
-                int r = fn_8014D8AC(&rng, t.m4, 0, 0);
-                t.mC = r;
-                int id = *(int*)((char*)t.m0 + r * 4);
-                if (s->fn_8007A6A0(0x1F, id) > 0)
-                    continue;
-                int k = 0;
-                while (k < n && arr[k].w0 != id)
-                    k++;
-                if (k == n) {
-                    wp->w0 = id;
-                    rem--;
-                    wp->w4 = self->s3();
-                    wp->w8 = lbl_805FEE30;
-                    wp++;
-                }
+            if (t.m4 == 0)
+                continue;
+            int r = fn_8014D8AC(&rng, t.m4, 0, 0);
+            t.mC = r;
+            int id = *(int*)((char*)t.m0 + r * 4);
+            if (s->fn_8007A6A0(0x1F, id) > 0)
+                continue;
+            int k = 0;
+            while (k < n && arr[k].w0 != id)
+                k++;
+            if (k == n) {
+                wp->w0 = id;
+                rem--;
+                wp->w4 = self->s3();
+                wp->w8 = lbl_805FEE30;
+                wp++;
             }
         } while (rem > 0);
     }
