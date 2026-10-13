@@ -128,6 +128,51 @@ inline int& FeI(void* p, int off)
     return *(int*)((char*)p + off);
 }
 
+typedef void (*FeDtorFn)(void* self, int c);
+extern "C" void fn_804D3DD0(void* p, int c);
+extern "C" void fn_804D61F4(void* p, int c);
+extern "C" void fn_800EC5F4__FP8UiScrRaw(void* self, int c);
+extern const char lbl_8067F420[];
+extern const char lbl_806800B0[];
+extern const char lbl_80655E98[];
+extern const char lbl_80655BA8[];
+
+struct Fe3CVMulti {
+    char pad0[0x3C];
+    const void* m3C;
+    char pad1[0x184 - 0x40];
+    const void* m184;
+    char pad2[0x1C8 - 0x188];
+    const void* m1C8;
+};
+
+extern "C" void fn_80360F48(void* self, int c);
+extern const char lbl_8066E538[];
+
+extern "C" void fn_804CEF34(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D4704(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D7FE0(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D6184(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" int fn_804D3D74(void* self, int a, int b, int c, int d, int e, int f, int g, int h);
+extern "C" void fn_804D24E8(void* nav, void* w);
+
+extern "C" void fn_804CF304(void* x);
+extern "C" void fn_8007DA8C__18Unk8007B2B0_Screenii(void* g, int a, int b);
+extern "C" int fn_8007DA28__18Unk8007B2B0_Screen(void* g);
+extern "C" void* fn_800B8144();
+extern "C" void fn_800B83F8(void* a, int b, int c);
+extern "C" void fn_804D28B4(void* n);
+extern "C" void fn_804D4F4C(void* w);
+extern "C" void fn_801389A4(void* w, int v);
+extern "C" int fn_800ED2B0(void* x, const char* s);
+extern "C" int fn_800CFB38();
+extern const char lbl_805F852C[];
+extern const char lbl_805FB7A8[];
+
+struct FeSl144 {
+    char pad0[0x144];
+    int m144;
+};
 extern "C" FE_OVERLAY FeScrN* fn_8050C9DC(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -185,10 +230,122 @@ extern "C" FE_OVERLAY int fn_8050D7DC(FeScrN* x)
     return 1;
 }
 
+extern "C" FE_OVERLAY FeScrN* fn_8050D840(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_804CEF34(self, a, b, c, d, e, f, g, h);
+    char* s1E0 = (char*)self + 0x1E0;
+    self->SetVptr(lbl_8067F420);
+    fn_804D4704(s1E0, a, b, c, d, e, f, g, h);
+    char* s390 = (char*)self + 0x390;
+    char* s540 = (char*)self + 0x540;
+    fn_804D4704(s390, a, b, c, d, e, f, g, h);
+    char* s6C8 = (char*)self + 0x6C8;
+    char* s850 = (char*)self + 0x850;
+    fn_804D6184(s540, a, b, c, d, e, f, g, h);
+    char* s9B8 = (char*)self + 0x9B8;
+    char* n144 = (char*)self + 0x144;
+    fn_804D6184(s6C8, a, b, c, d, e, f, g, h);
+    char* n188 = (char*)self + 0x188;
+    fn_804D3D74(s850, a, b, c, d, e, f, g, h);
+    fn_804D3D74(s9B8, a, b, c, d, e, f, g, h);
+    FeI(self, 0xF80) = 1;
+    fn_804D24E8(n144, s1E0);
+    fn_804D24E8(n188, s390);
+    if (fn_800B5BD4(fn_800B555C()) == 0) {
+        fn_804D24E8(n144, s540);
+        fn_804D24E8(n188, s6C8);
+        if (fn_800B57EC(fn_800B555C()) == 0) {
+            fn_804D24E8(n144, s850);
+            fn_804D24E8(n188, s9B8);
+        }
+    }
+    fn_800C3AB4(fn_800C33D0(), 9);
+    return self;
+}
+
+/* near-miss: 99.2%; trailing three stores come out vptr-first (retail m184, vptr, m1C8), same family as fn_801470E0 / fn_8052849C */
+extern "C" FE_OVERLAY void fn_8050DA2C(FeScrN* self, int c)
+{
+    self->SetVptr(lbl_8067F420);
+    fn_804D3DD0((char*)self + 0x9B8, 2);
+    fn_804D3DD0((char*)self + 0x850, 2);
+    fn_804D61F4((char*)self + 0x6C8, 2);
+    fn_804D61F4((char*)self + 0x540, 2);
+    FeW* a = (FeW*)((char*)self + 0x390);
+    a->SetVptr(lbl_806800B0);
+    ((FeDtorFn)fn_800EC5F4__FP8UiScrRaw)(a, 2);
+    FeW* b = (FeW*)((char*)self + 0x1E0);
+    b->SetVptr(lbl_806800B0);
+    ((FeDtorFn)fn_800EC5F4__FP8UiScrRaw)(b, 2);
+    Fe3CVMulti* t = (Fe3CVMulti*)self;
+    t->m3C = lbl_80655BA8;
+    t->m1C8 = lbl_80655E98;
+    t->m184 = lbl_80655E98;
+    ((FeDtorFn)fn_8035686C)(self, c);
+}
+
 extern "C" FE_OVERLAY void fn_8050DAEC(FeScrM* x)
 {
     fn_8055AC44((char*)x + 0xB20, 0);
     fn_804CEF98(x);
+}
+
+extern "C" FE_OVERLAY int fn_8050DB28(FeScrQ* x)
+{
+    fn_804CF304(x);
+    if (fn_800B57EC(fn_800B555C()) == 0 && (FeI(fn_800B555C(), 4) & 1)) {
+        int i = 0;
+        void* g = lbl_8061930C;
+        do {
+            int k = i;
+            i++;
+            fn_8007DA8C__18Unk8007B2B0_Screenii(g, k, -1);
+        } while (i <= 3);
+        int k = FeI(x, 0x1C0);
+        fn_8007DA8C__18Unk8007B2B0_Screenii(g, k, fn_8007DA28__18Unk8007B2B0_Screen(g));
+    }
+    fn_800B83F8(fn_800B8144(), 1, 1);
+    FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(p, x);
+    ((int (*)(void*, int))fn_80125128)(p, -1);
+    ((int (*)(void*, int))fn_80125154)(p, -2);
+    int f = ((FeI(fn_800B555C(), 4) >> 2) & 1) ^ 1;
+    FeI(x, 0xF80) = f;
+    if (f != 0) {
+        fn_801251CC(p, 3, 0x3BEE, -4);
+        if (fn_800B57EC(fn_800B555C()) == 0) {
+            fn_801251CC(p, 2, 0x3CA5, 0);
+        }
+    }
+    if (FeI(fn_800B555C(), 4) & 1) {
+        ((FeWm*)x)->s95(1, 1);
+        ((FeWm*)x)->s95(0, 1);
+    }
+    fn_804D28B4((char*)x + 0x144);
+    fn_804D28B4((char*)x + 0x188);
+    if (fn_800B5BD4(fn_800B555C()) != 0) {
+        int a = FeI(fn_800B555C(), 0x558);
+        int b = FeI(fn_800B555C(), 0x55C);
+        if (a != 0) {
+            FeSl144* w = (FeSl144*)((char*)x + 0x390);
+            w->m144 = a;
+            fn_804D4F4C(w);
+        }
+        if (b != 0) {
+            FeSl144* w = (FeSl144*)((char*)x + 0x1E0);
+            w->m144 = b;
+            fn_804D4F4C(w);
+        }
+    }
+    void* q = fn_800B7A94(FeGetMgr(), lbl_805F852C);
+    if (q != 0) {
+        fn_801389A4(q, 0);
+    }
+    int r = fn_800ED2B0(x, lbl_805FB7A8);
+    if (r != 0) {
+        r = fn_800CFB38();
+    }
+    return r;
 }
 
 extern "C" FE_OVERLAY void fn_8050DFC8(FeScrD* x)
@@ -301,6 +458,63 @@ extern "C" FE_OVERLAY void fn_8050E394(void* a0, FeAB* y)
 
 extern "C" FE_OVERLAY void fn_8050E574()
 {
+}
+
+extern "C" FE_OVERLAY FeScrN* fn_8050E578(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
+{
+    fn_804CEF34(self, a, b, c, d, e, f, g, h);
+    char* s390 = (char*)self + 0x390;
+    char* s1E0 = (char*)self + 0x1E0;
+    self->SetVptr(lbl_8066E538);
+    fn_804D4704(s1E0, a, b, c, d, e, f, g, h);
+    char* s540 = (char*)self + 0x540;
+    char* s6B4 = (char*)self + 0x6B4;
+    fn_804D4704(s390, a, b, c, d, e, f, g, h);
+    char* s828 = (char*)self + 0x828;
+    char* s9B0 = (char*)self + 0x9B0;
+    fn_804D7FE0(s540, a, b, c, d, e, f, g, h);
+    char* sB38 = (char*)self + 0xB38;
+    char* sCA0 = (char*)self + 0xCA0;
+    fn_804D7FE0(s6B4, a, b, c, d, e, f, g, h);
+    char* n144 = (char*)self + 0x144;
+    char* n188 = (char*)self + 0x188;
+    fn_804D6184(s828, a, b, c, d, e, f, g, h);
+    fn_804D6184(s9B0, a, b, c, d, e, f, g, h);
+    fn_804D3D74(sB38, a, b, c, d, e, f, g, h);
+    fn_804D3D74(sCA0, a, b, c, d, e, f, g, h);
+    fn_804D24E8(n144, s1E0);
+    fn_804D24E8(n188, s390);
+    fn_804D24E8(n144, s540);
+    fn_804D24E8(n188, s6B4);
+    fn_804D24E8(n144, s828);
+    fn_804D24E8(n188, s9B0);
+    fn_804D24E8(n144, sB38);
+    fn_804D24E8(n188, sCA0);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    return self;
+}
+
+/* near-miss: 99%; trailing three stores differ only in register/store order (retail m184, vptr, m1C8 with lis r10/r11); same family as fn_8050DA2C */
+extern "C" FE_OVERLAY void fn_8050E7B0(FeScrN* self, int c)
+{
+    self->SetVptr(lbl_8066E538);
+    fn_804D3DD0((char*)self + 0xCA0, 2);
+    fn_804D3DD0((char*)self + 0xB38, 2);
+    fn_804D61F4((char*)self + 0x9B0, 2);
+    fn_804D61F4((char*)self + 0x828, 2);
+    fn_80360F48((char*)self + 0x6B4, 2);
+    fn_80360F48((char*)self + 0x540, 2);
+    FeW* a = (FeW*)((char*)self + 0x390);
+    a->SetVptr(lbl_806800B0);
+    fn_800EC5F4__FP8UiScrRaw(a, 2);
+    FeW* b = (FeW*)((char*)self + 0x1E0);
+    b->SetVptr(lbl_806800B0);
+    fn_800EC5F4__FP8UiScrRaw(b, 2);
+    Fe3CVMulti* t = (Fe3CVMulti*)self;
+    t->m3C = lbl_80655BA8;
+    t->m1C8 = lbl_80655E98;
+    t->m184 = lbl_80655E98;
+    ((FeDtorFn)fn_8035686C)(self, c);
 }
 
 extern "C" FE_OVERLAY void fn_8050E888(FeScrM* x)
