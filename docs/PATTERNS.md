@@ -1652,3 +1652,20 @@ Use it only when no element/object destructor is being skipped. For a real
 class destructor, a class-specific inline operator delete can forward to that
 same runtime function. Both approaches in this sweep were retained only after
 the actual source-linked DOL retained the exact retail hash.
+
+## Data ownership can block fully matched code (Codex, 2026-10-13)
+
+A code-only split target may omit the private constants or BSS that its actual
+source object emits. data_candidates.py uses paired relocations, canonical
+sized global objects, initialized pointers, and unique aligned whole-section
+byte searches to shortlist placements. It refuses zero-block and ambiguous
+searches. ProDG C globals may have sized STT_NOTYPE symbols rather than OBJECT.
+Check external users and existing split ownership before changing boundaries;
+identical bytes alone do not prove ownership. The retail hash and unmodified
+verifier remain mandatory. This approach source-linked 29 units and 26,996
+code bytes in the initial trials, with 4,160 bytes of compiled data.
+
+Oversized anonymous constant-pool metadata can cross a proven new boundary.
+Correct an extent only with compiled-section and retail-byte evidence. Keep
+shared pools extracted until their users and actual ownership are understood;
+ef_log and sf_sin trials exposed references from other extracted objects.
