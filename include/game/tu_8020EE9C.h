@@ -119,7 +119,8 @@ struct CtxOwner;
 struct Player {
     char pad0[0x44C];
     CtxOwner* m44C;
-    char pad450[8];
+    int m450;
+    char pad454[4];
     int m458;
     char pad45C[4];
     int m460;
