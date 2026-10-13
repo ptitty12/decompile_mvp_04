@@ -1772,6 +1772,8 @@ snd/tu_803A6D80.cpp:
 
 snd/cmn/salloc.c:
 	.text       start:0x803A7BEC end:0x803A81E0
+	.data       start:0x806251E0 end:0x806251E4 align:4
+	.bss        start:0x8069C870 end:0x8069C87C align:4
 
 snd/tu_803A81E0.cpp:
 	.text       start:0x803A81E0 end:0x803A8438

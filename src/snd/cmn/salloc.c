@@ -1,6 +1,9 @@
 /* Imported from dbalatoni13/nfsmw @ 9ca26bc1 (src/Speed/Indep/Libs/snd/9/source/library/cmn/salloc.c). EA SND audio library (rwaudiocore), matched against NFS Most Wanted GC; CC0. */
 #include "./sndcmn.h"
 
+/* SND stop entry point implemented in snd/tu_803AB310.cpp. */
+extern "C" int fn_803AB480(int shandle);
+
 short sndvoicereserved[6];
 
 int SNDVOICEI_isreserved(int voice, int voicesallocated) {
@@ -112,7 +115,7 @@ int SNDVOICEI_alloc(int voicesneeded, int priority, int *phandle, int minvoicera
             if (temphandle < 0) {
                 temphandle = sndgs.chan[pv->masterchan].handle;
             }
-            SNDstop(temphandle);
+            fn_803AB480(temphandle);
         }
 
         pv->status = 1;
