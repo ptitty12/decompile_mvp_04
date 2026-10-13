@@ -7,9 +7,14 @@
 extern char lbl_806648E8[];
 struct Unk805A3AD8 { float v; };
 extern Unk805A3AD8 lbl_805A3AD8;
-void fn_802DC9CC(void* p);
-void fn_80377488(void* p);
-void fn_80377408(void* p);
+/* Retail 0x802DC9CC is Unk802DC9F8's constructor; its subobject is 0x24 bytes. */
+struct Unk802DC9F8 {
+    char pad[0x24];
+    Unk802DC9F8();
+};
+inline void* operator new(unsigned int, void* address) { return address; }
+extern "C" void fn_80377488(void* p);
+extern "C" void fn_80377408(void* p);
 
 struct Unk803414A4_Ent {
     short m0;
@@ -48,7 +53,7 @@ Unk803414A4* fn_803414A4(Unk803414A4* self)
         e->m8 = -1;
         e->mC = lbl_805A3AD8.v;
     }
-    fn_802DC9CC(self->m1558);
+    new (self->m1558) Unk802DC9F8;
     return self;
 }
 
