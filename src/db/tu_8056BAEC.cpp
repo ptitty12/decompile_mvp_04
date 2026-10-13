@@ -376,6 +376,23 @@ extern "C" void fn_8056E6E4(DbSel* self, int flags);
 extern "C" void fn_8056E858(DbSel* self, int flags);
 extern "C" void fn_8056E8B4(DbSel* self, int a, int flags);
 extern "C" void fn_8056EA58(DbSel* self, int a, int flags);
+struct Db8056CDDC_A {
+    char pad0[4];
+    int m4;
+    char pad8[0x44 - 8];
+    float m44;
+    float m48;
+};
+struct Db8056CDDC_B {
+    char pad0[0x14];
+    DbG* m14;
+};
+struct Db8056CDDC_S {
+    char pad0[0x30];
+    Db8056CDDC_A* m30;
+    int m34;
+    Db8056CDDC_B* m38;
+};
 
 extern "C" DB_OVERLAY void fn_8056BAEC(DbScr* self, int a, int b, int c)
 {
@@ -702,6 +719,56 @@ extern "C" DB_OVERLAY int fn_8056CCD0(void* unused, DbScrB* scr, int side)
     if (Round(g) <= 1 && q0 != 0xFF && (q1 == 0xFF || q2 == 0xFF) && d <= 2)
         return 1;
     return 0;
+}
+
+extern "C" DB_OVERLAY float fn_8056CDDC(Db8056CDDC_S* self, int kind)
+{
+    int side = 0;
+    float res = 0.0f;
+    if (self->m38->m14->m1CD0 != 0)
+        side = 1;
+    char* tb = (char*)self->m34;
+    unsigned char* bp = (unsigned char*)(tb + (side ^ 1) * 0xE64 + 0x17C);
+    unsigned char b = bp[kind];
+    Db8056CDDC_A* a = self->m30;
+    float s = a->m44 * 0.6f + a->m48 * 0.4f;
+    float t = 1.0f - 2.0f * (s * 0.3f);
+    switch (kind) {
+    case 0:
+        res = t * 0.0332f + 0.0393f;
+        break;
+    case 2:
+        if (fn_8008CFD8(tb + a->m4 * 0xE64 + 0xC9C, 9, b) == 0)
+            res = t * 0.0127f + 0.0135f;
+        else
+            res = t * 0.0065f + 0.0064f;
+        break;
+    case 3:
+        res = t * 0.016f + 0.0234f;
+        break;
+    case 4:
+        res = t * 0.0251f + 0.0403f;
+        break;
+    case 5:
+        res = t * 0.016f + 0.0268f;
+        break;
+    case 1:
+        res = t * 0.0074f + 0.0089f;
+        break;
+    case 8:
+        res = t * 0.0074f + 0.01640839f;
+        break;
+    case 6:
+        res = t * 0.0074f + 0.01859728f;
+        break;
+    case 7:
+        res = t * 0.0074f + 0.01487539f;
+        break;
+    default:
+        res = 0.0f;
+        break;
+    }
+    return res;
 }
 
 extern "C" DB_OVERLAY void fn_8056D994(Db8056D994_S* self)
