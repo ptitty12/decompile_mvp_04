@@ -1276,7 +1276,7 @@ config.libs = [
             Object(Matching, "dolphin/card/CARDRdwr.c"),
             Object(Matching, "dolphin/card/CARDStatEx.c"),
             Object(NonMatching, "dolphin/db/db.c"),
-            Object(NonMatching, "dolphin/dsp/dsp.c"),
+            Object(Matching, "dolphin/dsp/dsp.c"),
             Object(Matching, "dolphin/dsp/dsp_debug.c"),
             Object(Matching, "dolphin/dsp/dsp_task.c"),
             Object(Matching, "dolphin/gx/tu_80428C64.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),  # GXInit.c head (docs/DECISIONS.md 2026-10-12)

@@ -2465,6 +2465,8 @@ dolphin/db/db.c:
 
 dolphin/dsp/dsp.c:
 	.text       start:0x80421C70 end:0x80421F00
+	.data       start:0x80633678 end:0x806336F8
+	.sdata      start:0x806EF190 end:0x806EF198
 
 dolphin/dsp/dsp_debug.c:
 	.text       start:0x80421F00 end:0x80421F50
