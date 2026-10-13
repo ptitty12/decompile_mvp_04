@@ -629,7 +629,6 @@ extern "C" DB_OVERLAY int fn_8052BD40(Unk8052B978_Tbl* self)
     return r;
 }
 
-/* near-miss: 99.96%; the two zero stores of the n == 0 path (frame +8 and +0xC) come out in the opposite order */
 extern "C" DB_OVERLAY Db8052A220_S12 fn_8052BD58(Unk8052B978_Tbl* t)
 {
     Db8052A220_S12 r;
@@ -651,8 +650,8 @@ extern "C" DB_OVERLAY Db8052A220_S12 fn_8052BD58(Unk8052B978_Tbl* t)
             r.w0 = e->m0;
             r.w1 = e->f2 + 0x21C;
         } else {
-            r.w1 = n;
             r.w0 = n;
+            r.w1 = n;
         }
     }
     return r;
