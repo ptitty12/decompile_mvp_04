@@ -41,6 +41,8 @@ extern BOOL lbl_806EF1A4;
 typedef struct DvdBss {
     DVDBB2 bb2;
     DVDDiskID tmp;
+    DVDCommandBlock dummy;
+    OSAlarm resetAlarm;
 } DvdBss;
 extern DvdBss lbl_806DE160;
 extern DVDDiskID lbl_806DE180;
@@ -70,11 +72,12 @@ extern volatile s32 lbl_806EF66C;
 extern volatile s32 lbl_806EF670;
 extern DVDCommandBlock* lbl_806EF660;
 extern s32 lbl_806EF678;
-extern s32 lbl_806EF67C;
+extern volatile u32 lbl_806EF67C;
 extern volatile u32 lbl_806EF680;
 extern DVDCBCallback lbl_806EF684;
 extern volatile s32 lbl_806EF688;
 extern volatile s32 lbl_806EF694;
+extern u32 lbl_806EF690;
 extern s32 lbl_806EF698;
 extern void (*lbl_806EF6B8)(DVDCommandBlock*);
 extern DVDCommandBlock lbl_806DE1A0;
@@ -83,6 +86,7 @@ extern DVDCommandBlock lbl_806DE1A0;
 #define TMPID (&lbl_806DE160.tmp)
 
 void fn_80425A70(u32 error);
+void fn_80433CE8(const char* file, int line, const char* msg, ...);
 void fn_80426B68(void);
 void fn_80432FA8(void* addr, u32 nBytes);
 void fn_80425BE4(void);
@@ -94,13 +98,35 @@ void fn_804231C4(u32 intType);
 void fn_80423144(u32 intType);
 void fn_80423640(u32 intType);
 void fn_80423A10(u32 intType);
+u32 fn_804232CC(u32 error);
+void fn_80423D18(void);
+void fn_80432224(OSAlarm* alarm);
+void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
+BOOL fn_80426690(u32 offset, DVDLowCallback callback);
 void fn_80423828(void);
 void fn_804230B0(DVDCommandBlock* block);
 s32 fn_8042280C(const char* path);
-void fn_80423CD4(s32 result, DVDCommandBlock* block);
+void fn_80423CD4(OSAlarm* alarm, OSContext* context);
 BOOL fn_80422E84(const char* path);
 void fn_804235E4(u32 intType);
 void fn_8042516C(void);
+
+extern s32 lbl_806EF6AC;
+extern s32 lbl_806EF6A8;
+extern s32 lbl_806EF6A4;
+extern const char* lbl_806EF1A0;
+
+BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo);
+BOOL fn_80422DC0(char* path, u32 maxlen);
+u32 fn_80422C60(s32 entrynum, char* path, u32 maxlen);
+BOOL fn_80422EE4(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio);
+int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, DVDCBCallback callback, s32 prio);
+void fn_80422FD8(void);
+void fn_80425E54(void);
+void fn_80425E94(__OSInterrupt interrupt, OSContext* context);
+void fn_80437434(OSThreadQueue* queue);
+void fn_80425CEC(void);
+void __DVDClearWaitingQueue(void);
 
 void fn_804227D4(void);
 BOOL fn_80422B00(s32 entrynum, DVDFileInfo* fileInfo);
@@ -140,6 +166,26 @@ BOOL fn_80422B00(s32 entrynum, DVDFileInfo* fileInfo) {
     return TRUE;
 }
 
+BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo) {
+    s32 entry;
+    char currentDir[128];
+
+    entry = fn_8042280C(fileName);
+    if (entry < 0) {
+        fn_80422DC0(currentDir, 128);
+        OSReport("Warning: DVDOpen(): file '%s' was not found under %s.\n", fileName, currentDir);
+        return FALSE;
+    }
+    if (FST_IS_DIR(&lbl_806EF644[entry])) {
+        return FALSE;
+    }
+    fileInfo->startAddr = lbl_806EF644[entry].parentOrPosition;
+    fileInfo->length = lbl_806EF644[entry].nextEntryOrLength;
+    fileInfo->callback = NULL;
+    fileInfo->cb.state = 0;
+    return TRUE;
+}
+
 BOOL fn_80422C3C(DVDFileInfo* fileInfo) {
     fn_80425438(&fileInfo->cb);
     return TRUE;
@@ -152,6 +198,18 @@ BOOL fn_80422E84(const char* path) {
         return FALSE;
     }
     lbl_806EF650 = entry;
+    return TRUE;
+}
+
+BOOL fn_80422EE4(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio) {
+    if (!((0 <= offset) && (offset <= fileInfo->length))) {
+        fn_80433CE8("dvdfs.c", 0x2EE, "DVDReadAsync(): specified area is out of the file  ");
+    }
+    if (!((0 <= offset + length) && (offset + length < fileInfo->length + 32))) {
+        fn_80433CE8("dvdfs.c", 0x2F4, "DVDReadAsync(): specified area is out of the file  ");
+    }
+    fileInfo->callback = callback;
+    fn_80424C14(&fileInfo->cb, addr, length, (s32)(fileInfo->startAddr + offset), fn_80422FA4, prio);
     return TRUE;
 }
 
@@ -170,7 +228,7 @@ void fn_80422FD4(s32 result, DVDCommandBlock* block) {
 void fn_804230B0(DVDCommandBlock* block) {
     lbl_806EF6B8 = fn_804230B0;
     if (!(lbl_806EF668->FSTMaxLength >= BB2.FSTLength)) {
-        OSPanic("dvd.c", 0x295, "DVDChangeDisk(): FST in the new disc is too big.   ");
+        fn_80433CE8("dvd.c", 0x295, "DVDChangeDisk(): FST in the new disc is too big.   ");
     }
     fn_804263F8(lbl_806EF668->FSTLocation, OSRoundUp32B(BB2.FSTLength), BB2.FSTPosition, fn_80423144);
 }
@@ -230,6 +288,90 @@ void fn_804232A4(void) {
     fn_80426880(fn_80423380);
 }
 
+u32 fn_804232CC(u32 error) {
+    if (error == 0x20400) {
+        lbl_806EF690 = error;
+        return 1;
+    }
+    error &= 0x00FFFFFF;
+    if (error == 0x62800 || error == 0x23A00 || error == 0xB5A01) {
+        return 0;
+    }
+    lbl_806EF694++;
+    if (lbl_806EF694 == 2) {
+        if (error == lbl_806EF690) {
+            lbl_806EF690 = error;
+            return 1;
+        }
+        lbl_806EF690 = error;
+        return 2;
+    }
+    lbl_806EF690 = error;
+    if (error == 0x31100 || lbl_806EF660->command == 5) {
+        return 2;
+    }
+    return 3;
+}
+
+void fn_80423380(u32 intType) {
+    u32 error;
+    u32 status;
+    u32 category;
+    u32 state;
+
+    if (intType == 0x10) {
+        fn_80423270();
+    } else if (intType & 2) {
+        fn_80425A70(0x1234567);
+        fn_804267F4(fn_804231C4);
+    } else {
+        error = __DIRegs[8];
+        status = error & 0xFF000000;
+        category = fn_804232CC(error);
+        if (category == 1) {
+            fn_80425A70(error);
+            fn_804267F4(fn_804231C4);
+            return;
+        }
+        if (category == 2 || category == 3) {
+            state = 0;
+        } else if (status == 0x01000000) {
+            state = 4;
+        } else if (status == 0x02000000) {
+            state = 6;
+        } else if (status == 0x03000000) {
+            state = 3;
+        } else {
+            state = 5;
+        }
+        if (CheckCancel(state)) {
+            return;
+        }
+        if (category == 2) {
+            fn_80425A70(error);
+            fn_804236C0();
+        } else if (category == 3) {
+            if ((error & 0x00FFFFFF) == 0x31100) {
+                fn_80426690(lbl_806EF660->offset, fn_804235E4);
+            } else {
+                lbl_806EF6B8(lbl_806EF660);
+            }
+        } else if (status == 0x01000000) {
+            lbl_806EF660->state = 5;
+            fn_80423E80();
+        } else if (status == 0x02000000) {
+            lbl_806EF660->state = 3;
+            fn_80423D18();
+        } else if (status == 0x03000000) {
+            lbl_806EF660->state = 4;
+            fn_80423E80();
+        } else {
+            fn_80425A70(0x1234567);
+            fn_804267F4(fn_804231C4);
+        }
+    }
+}
+
 void fn_804235E4(u32 intType) {
     if (intType == 0x10) {
         fn_80423270();
@@ -254,6 +396,53 @@ void fn_80423640(u32 intType) {
 
 void fn_804236C0(void) {
     fn_804267F4(fn_804236E8);
+}
+
+void fn_804236E8(u32 intType) {
+    if (intType == 0x10) {
+        fn_80423270();
+    } else if (intType & 2) {
+        fn_80425A70(0x1234567);
+        fn_804267F4(fn_804231C4);
+    } else {
+        lbl_806EF694 = 0;
+        if (lbl_806EF67C == 4 || lbl_806EF67C == 5 || lbl_806EF67C == 13 || lbl_806EF67C == 15) {
+            lbl_806EF698 = 1;
+        }
+        if (CheckCancel(2)) {
+            return;
+        }
+        lbl_806EF660->state = 11;
+        fn_80423E80();
+    }
+}
+
+void fn_80423828(void) {
+    DvdBss* b = &lbl_806DE160;
+    void* bb;
+
+    switch (lbl_806EF67C) {
+    case 3:
+        if (DVDCompareDiskID(&b->tmp, lbl_806EF660->id)) {
+            memcpy(lbl_806EF664, &b->tmp, 0x20);
+            bb = &lbl_806DE160.bb2;
+            lbl_806EF660->state = 1;
+            fn_80432FA8(bb, 0x20);
+            lbl_806EF6B8 = fn_8042393C;
+            fn_8042393C(lbl_806EF660);
+        } else {
+            fn_804267F4(fn_80423A10);
+        }
+        break;
+    default:
+        if (memcmp(&b->tmp, lbl_806EF664, 0x20) != 0) {
+            fn_804267F4(fn_80423A10);
+        } else {
+            lbl_806EF6B8 = fn_80423908;
+            fn_80423908(lbl_806EF660);
+        }
+        break;
+    }
 }
 
 void fn_80423908(DVDCommandBlock* block) {
@@ -321,11 +510,37 @@ void fn_80423BE4(u32 intType) {
     }
 }
 
-void fn_80423CD4(s32 result, DVDCommandBlock* block) {
+void fn_80423CD4(OSAlarm* alarm, OSContext* context) {
     fn_80425020();
     fn_80432FA8(&lbl_806DE180, 0x20);
     lbl_806EF6B8 = fn_80423DEC;
     fn_80423DEC(lbl_806EF660);
+}
+
+void fn_80423D18(void) {
+    DvdBss* b = &lbl_806DE160;
+    DVDCommandBlock* finished;
+
+    switch (lbl_806EF67C) {
+    case 4:
+    case 5:
+    case 13:
+    case 15:
+        __DVDClearWaitingQueue();
+        finished = lbl_806EF660;
+        lbl_806EF660 = &b->dummy;
+        if (finished->callback) {
+            finished->callback(-4, finished);
+        }
+        fn_80423F94();
+        break;
+    default:
+        lbl_806EF6A8 = 0;
+        fn_80425020();
+        fn_80432224(&b->resetAlarm);
+        fn_80432484(&b->resetAlarm, OSMillisecondsToTicks(1150), fn_80423CD4);
+        break;
+    }
 }
 
 void fn_80423DEC(DVDCommandBlock* block) {
@@ -345,6 +560,34 @@ void fn_80423E1C(u32 intType) {
 
 void fn_80423E80(void) {
     fn_80426724(fn_80423EA8);
+}
+
+void fn_80423EA8(u32 intType) {
+    DvdBss* b = &lbl_806DE160;
+    DVDCommandBlock* finished;
+
+    __DIRegs[1] = 0;
+    lbl_806EF660->state = 3;
+    switch (lbl_806EF67C) {
+    case 4:
+    case 5:
+    case 13:
+    case 15:
+        __DVDClearWaitingQueue();
+        finished = lbl_806EF660;
+        lbl_806EF660 = &b->dummy;
+        if (finished->callback) {
+            finished->callback(-4, finished);
+        }
+        fn_80423F94();
+        break;
+    default:
+        lbl_806EF6A8 = 0;
+        fn_80425020();
+        fn_80432224(&b->resetAlarm);
+        fn_80432484(&b->resetAlarm, OSMillisecondsToTicks(1150), fn_80423CD4);
+        break;
+    }
 }
 
 void fn_80425020(void) {
