@@ -48,6 +48,8 @@ union PPCWGPipe {
     float f32;
     double f64;
 };
+#include "../../include/ealib/gx_fifo.h"
+/* fn_803D83BC still needs the symbol view to preserve its nearer scheduling. */
 extern volatile PPCWGPipe GXWGFifo;
 
 /* Render device object (size at least 0xF0): sub-objects at +0x10 and +0x38, owner at +0xEC. */
@@ -642,10 +644,10 @@ extern "C" void fn_803D9918(const double* p, unsigned n)
         double b = p[1];
         double c = p[2];
         double d = p[3];
-        GXWGFifo.f64 = a;
-        GXWGFifo.f64 = b;
-        GXWGFifo.f64 = c;
-        GXWGFifo.f64 = d;
+        EALIB_GX_FIFO(PPCWGPipe).f64 = a;
+        EALIB_GX_FIFO(PPCWGPipe).f64 = b;
+        EALIB_GX_FIFO(PPCWGPipe).f64 = c;
+        EALIB_GX_FIFO(PPCWGPipe).f64 = d;
         p += 4;
         n -= 32;
     }
@@ -653,7 +655,7 @@ extern "C" void fn_803D9918(const double* p, unsigned n)
         double a = p[0];
         p++;
         n -= 8;
-        GXWGFifo.f64 = a;
+        EALIB_GX_FIFO(PPCWGPipe).f64 = a;
     }
     if (n != 0) {
         const unsigned char* q = (const unsigned char*)p;
@@ -661,7 +663,7 @@ extern "C" void fn_803D9918(const double* p, unsigned n)
             unsigned char c = *q;
             n--;
             q++;
-            GXWGFifo.u8 = c;
+            EALIB_GX_FIFO(PPCWGPipe).u8 = c;
         } while (n != 0);
     }
 }
@@ -783,5 +785,5 @@ extern "C" void* fn_803D9BE0(Unk803D8234Light* self, void* owner)
 /*
  * Not matched yet: fn_803D8918 (510 instructions); fn_803D8828 and fn_803D9378 read the time base (mftb);
  * fn_803D9528 ends in a trap word after the fatal-error call. The original code stays linked for these.
- * fn_803D9918 differs from retail only in the GXWGFifo reloc versus lis 0xcc01 (objdiff scores 100%).
+ * fn_803D9918 uses the shared FIFO view for the retail signed displacement.
  */
