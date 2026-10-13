@@ -5,6 +5,18 @@
 #include "game/fe_80459228.h"
 extern "C" int fn_800B56C4(FeState* s);
 extern "C" {
+int fn_8007B320__18Unk8007B2B0_Screenii(void* g, int a, void* b);
+float fn_8007BB28__18Unk8007B2B0_Screeniii(void* g, int a, int b, int c);
+float fn_800A39C4(void* g, int a);
+void fn_800DC580(float f);
+int fn_80553260();
+int fn_8056B628(int a, int b, int c);
+/* float arguments first: the int (name string, a call) is evaluated last at this call site */
+void fn_80442D48(float f1, float f2, float f3, float f4, float f5, float f6, float f7, float f8, int a);
+}
+extern char lbl_805F5364[];
+extern int lbl_806215DC;
+extern "C" {
 int fn_800A2E6C(void* g);
 }
 extern "C" {
@@ -616,6 +628,39 @@ FE_OVERLAY void fn_80470FAC(FeScrL* x)
         ((FeWV*)x->m344)->s28(spD0);
     }
     fn_80471390(x);
+}
+
+FE_OVERLAY void fn_80471100(FeScrL* x, int a, int b, int c, int* p)
+{
+    FeGlobal80619948* g = lbl_80619948;
+    void* h = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+    if (*p != b) {
+        int r = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, c, h);
+        if (*p == 0 || fn_8056B628(*(int*)((char*)g + 0x28), b, r) == 1) {
+            *p = b;
+            float f0 = fn_800A39C4(g, r);
+            ((FeW*)x->m350)->fn_vslot73(a, 0)->fn_vslot32(lbl_805F5364, 1);
+            fn_800C8044();
+            fn_800DC580(f0);
+            int fl = 1;
+            if (lbl_806215DC == 0) {
+                fl = 0;
+            }
+            if (fl != 0 && c == 0) {
+                int r1 = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 1, h);
+                int r2 = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 2, h);
+                int r3 = fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 3, h);
+                float f1 = fn_800A39C4(g, r1);
+                float f2 = fn_800A39C4(g, r2);
+                float f3 = fn_800A39C4(g, r3);
+                float f4 = fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 5, r, 1);
+                float f5 = fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 5, r1, 1);
+                float f6 = fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 5, r2, 1);
+                float f7 = fn_8007BB28__18Unk8007B2B0_Screeniii(lbl_8061930C, 5, r3, 1);
+                fn_80442D48(f0, f1, f2, f3, f4, f5, f6, f7, (int)fn_80090880__FP11Unk80090880(lbl_8061977C, fn_80553260()));
+            }
+        }
+    }
 }
 
 FE_OVERLAY void fn_80471830(FeScrL* x)
