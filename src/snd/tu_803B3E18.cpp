@@ -46,16 +46,13 @@ extern "C" int fn_803B3EA8(int shandle, int ch, int level)
     return voice;
 }
 
-/* near-miss: 29/32: retail does cmpwi r4,0 then subi (we emit mr. and a different order); loop and rem placement variants tried */
+/* Big-endian n-byte read, sign-extended for 1-3 bytes; a plain while (rem-- != 0) gives retail's rotated loop. */
 extern "C" int fn_803B3F60(const unsigned char* p, int n)
 {
     int v = 0;
-    if (n != 0) {
-        int rem = n - 1;
-        do {
-            v = (v << 8) + *p++;
-        } while (rem-- != 0);
-    }
+    int rem = n;
+    while (rem-- != 0)
+        v = (v << 8) + *p++;
     if (n == 1 && v > 0x7f)
         v -= 0x100;
     else if (n == 2 && v > 0x7fff)
