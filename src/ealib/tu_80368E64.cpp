@@ -5,13 +5,11 @@
  * node into a global list. The 0x60 + 0x2c pair at the end is the GCC
  * __static_initialization_and_destruction_0 / _GLOBAL_.I wrapper.
  *
- * GXWGFifo (0xCC008000) is an extern symbol: retail has lis 0xcc01 /
- * -0x8000(rX) for it, which gcc 2.95 only produces for a symbol reference (a
- * literal address gives lis/ori and different loop hoisting).
+ * FIFO accesses use the typed page-relative volatile view in ealib/gx_fifo.h.
  */
 
 struct Unk803DA440 {
-    Unk803DA440(void (*fn)(), const void* a, const void* b, const void* c); /* 0x803DA440 */
+    Unk803DA440(void (*fn)(), void* a, void* b, void* c); /* 0x803DA440 */
     char pad[0x14];
 };
 
@@ -21,7 +19,7 @@ union PPCWGPipe {
     unsigned int u32;
     float f32;
 };
-extern volatile PPCWGPipe GXWGFifo;
+#include "../../include/ealib/gx_fifo.h"
 
 struct GXColor {
     unsigned char r, g, b, a;
@@ -138,8 +136,8 @@ inline void Unk803DBE08Out::StoreHdr(int per)
 inline void Unk803DBE08Out::Begin(int n)
 {
     fn_8042C8B0(0x90, 0, 0);
-    GXWGFifo.u8 = (unsigned char)m0;
-    GXWGFifo.u16 = n;
+    EALIB_GX_FIFO(PPCWGPipe).u8 = (unsigned char)m0;
+    EALIB_GX_FIFO(PPCWGPipe).u16 = n;
 }
 
 extern "C" {
@@ -213,9 +211,9 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
         void* dl = a->m28;
         int dlsz = a->m2C;
         if (a->mB8) {
-            GXWGFifo.u8 = 0x40;
-            GXWGFifo.u32 = (unsigned int)dl;
-            GXWGFifo.u32 = dlsz;
+            EALIB_GX_FIFO(PPCWGPipe).u8 = 0x40;
+            EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)dl;
+            EALIB_GX_FIFO(PPCWGPipe).u32 = dlsz;
         } else {
             fn_80430124(dl, dlsz);
         }
@@ -246,9 +244,9 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
             int first = 0;
             while (n >= per) {
                 if (first) {
-                    GXWGFifo.u8 = 0x40;
-                    GXWGFifo.u32 = (unsigned int)lbl_8062C660;
-                    GXWGFifo.u32 = sz;
+                    EALIB_GX_FIFO(PPCWGPipe).u8 = 0x40;
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = (unsigned int)lbl_8062C660;
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = sz;
                 } else {
                     fn_80430124(lbl_8062C660, sz);
                     first = 1;
@@ -263,25 +261,25 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
             v.Begin(n);
             if (b->m0 == 4) {
                 for (i1 = 0; i1 < n; i1++) {
-                    GXWGFifo.u32 = i1 | (i1 << 8) | (i1 << 16) | (i1 << 24);
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = i1 | (i1 << 8) | (i1 << 16) | (i1 << 24);
                 }
             } else if (b->m0 == 3) {
                 for (i1 = 0; i1 < n; i1++) {
-                    GXWGFifo.u16 = i1 | (i1 << 8);
-                    GXWGFifo.u8 = i1;
+                    EALIB_GX_FIFO(PPCWGPipe).u16 = i1 | (i1 << 8);
+                    EALIB_GX_FIFO(PPCWGPipe).u8 = i1;
                 }
             } else if (b->m0 == 2) {
                 for (i1 = 0; i1 < n; i1++) {
-                    GXWGFifo.u16 = i1 | (i1 << 8);
+                    EALIB_GX_FIFO(PPCWGPipe).u16 = i1 | (i1 << 8);
                 }
             } else if (b->m0 == 1) {
                 for (i1 = 0; i1 < n; i1++) {
-                    GXWGFifo.u8 = i1;
+                    EALIB_GX_FIFO(PPCWGPipe).u8 = i1;
                 }
             } else {
                 for (i1 = 0; i1 < n; i1++) {
                     for (int j = 0; j < b->m0; j++) {
-                        GXWGFifo.u8 = i1;
+                        EALIB_GX_FIFO(PPCWGPipe).u8 = i1;
                     }
                 }
             }
@@ -289,32 +287,32 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
             n += 3;
             while (n & 0x1f) {
                 n++;
-                GXWGFifo.u8 = 0;
+                EALIB_GX_FIFO(PPCWGPipe).u8 = 0;
             }
         } else {
             v.Begin(n);
             if (b->m0 == 4) {
                 for (i2 = 0; i2 < n; i2++) {
-                    GXWGFifo.u32 = i2 | (i2 << 16);
-                    GXWGFifo.u32 = i2 | (i2 << 16);
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = i2 | (i2 << 16);
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = i2 | (i2 << 16);
                 }
             } else if (b->m0 == 3) {
                 for (i2 = 0; i2 < n; i2++) {
-                    GXWGFifo.u32 = i2 | (i2 << 16);
-                    GXWGFifo.u16 = i2;
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = i2 | (i2 << 16);
+                    EALIB_GX_FIFO(PPCWGPipe).u16 = i2;
                 }
             } else if (b->m0 == 2) {
                 for (i2 = 0; i2 < n; i2++) {
-                    GXWGFifo.u32 = i2 | (i2 << 16);
+                    EALIB_GX_FIFO(PPCWGPipe).u32 = i2 | (i2 << 16);
                 }
             } else if (b->m0 == 1) {
                 for (i2 = 0; i2 < n; i2++) {
-                    GXWGFifo.u16 = i2;
+                    EALIB_GX_FIFO(PPCWGPipe).u16 = i2;
                 }
             } else {
                 for (i2 = 0; i2 < n; i2++) {
                     for (int j = 0; j < b->m0; j++) {
-                        GXWGFifo.u16 = i2;
+                        EALIB_GX_FIFO(PPCWGPipe).u16 = i2;
                     }
                 }
             }
@@ -322,7 +320,7 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
             n += 3;
             while (n & 0x1f) {
                 n++;
-                GXWGFifo.u8 = 0;
+                EALIB_GX_FIFO(PPCWGPipe).u8 = 0;
             }
         }
     }
@@ -384,4 +382,4 @@ extern "C" void fn_80369554(void* x)
     }
 }
 
-Unk803DA440 lbl_80693CFC((void (*)())fn_80369554, lbl_80623230, lbl_80623248, lbl_80603718);
+Unk803DA440 lbl_80693CFC((void (*)())fn_80369554, (void*)lbl_80623230, (void*)lbl_80623248, (void*)lbl_80603718);
