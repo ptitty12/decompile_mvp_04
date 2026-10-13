@@ -120,11 +120,11 @@ void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXCo
     __GXData->bpSentNot = 0;
 }
 
-/* near-miss: loop-invariant 2.0f / width is hoisted into f25 in the original but the iw/sc registers come out swapped here */
 void fn_8042FB50(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]) {
-    f32 xi, iw, rangeScale, sqrtTerm, ratio;
-    u32 i;
+    f32 xi, rangeScale, sqrtTerm, ratio;
     f32 sc;
+    f32 iw;
+    u32 i;
     u32 r;
 
     if (projmtx[3][3] == 0.0) {
@@ -138,9 +138,9 @@ void fn_8042FB50(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]) {
     sc = 2.0f / width;
     for (i = 0; i < 10; i++) {
         xi = (i + 1) << 5;
-        xi = xi * sc * iw;
-        sqrtTerm = 1.0f + (xi * xi) / (rangeScale * rangeScale);
-        sqrtTerm = sqrtf(sqrtTerm);
+        xi = xi * sc;
+        xi = xi * iw;
+        sqrtTerm = sqrtf(1.0f + (xi * xi) / (rangeScale * rangeScale));
         r = (u32)(256.0f * sqrtTerm);
         table->r[i] = r & 0xFFF;
     }
