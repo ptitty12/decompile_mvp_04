@@ -388,12 +388,9 @@ extern "C" FE_OVERLAY void fn_80523824(FeW* x, int a, int b, int c, int d, int e
 
 extern "C" FE_OVERLAY int fn_8052388C(void* x, int a)
 {
-    int r = fn_805238EC(x, a);
-    if (r) {
+    if (fn_805238EC(x, a))
         fn_80523A90(x, FeP(x, 0x2DC)->fn_vslot61());
-        r = 1;
-    }
-    return r;
+    return 1;
 }
 
 /* near-miss: retail loads r3 = 0 first and returns with bnelr (9 spellings tried) */
