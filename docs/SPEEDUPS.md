@@ -113,6 +113,37 @@ Roughly ordered by expected payoff for the effort.
     `docs/progress/history.csv` already records daily totals. This is how we'll
     tell which items above actually help.
 
+14. **Twin examples and callee prototypes for each function.** `adopted` (tools/match/twins.py, 2026-10-13)
+    For any function: the matched functions that look most like it (opcode
+    edit distance, shared callees, field offsets) with their source, plus every
+    callee's prototype as already written in matched source. Basis: similarity-
+    guided examples were the biggest long-tail gain in the Snowboard Kids decomp
+    ("The Long Tail of LLM-Assisted Decompilation", blog.chrislewis.au). On
+    main few close twins remain, but most callees of the big functions are
+    already called from matched code, so the prototype part covers the tail.
+    See "Tried".
+15. **ProDG GCC 2.95.3 knowledge from the RE4 decomp.** `trying`
+    adonis-singh/re4 (Resident Evil 4, GameCube debug build, byte-identical)
+    uses our exact compilers: ProDG GCC 2.95.3 and CodeWarrior GC/1.2.5n. Its
+    526 `COMPILER-DIFF` notes are a catalog of source tricks for this compiler,
+    to be distilled into docs/PATTERNS.md. Also check its SDK/libsn sources
+    against our remaining SDK functions.
+16. **The strongest model on the big-function tail.** `trying` (owner 2026-10-13: a few test cases before any broad use)
+    Melee's AI co-author lines were mostly Claude Fable 5 (per an analysis of
+    its commits), and the RE4 author credits Fable 5.1. Test: three never-
+    attempted 1.4-2.5 KB functions with Fable 5.1, plus a Sonnet 5.5 control on
+    one of them, same brief and timebox. Results under "Tried".
+17. **Melee's working rules.** `adopted` (prompts/11_TEAM_WORKER.md, 2026-10-13)
+    From the Melee decomp's agent skill: about 10 minutes per small function,
+    and at 95-99% fix headers and prototypes before the body. Permuter output is
+    a lead, not a recipe: Snowboard Kids dropped the permuter because the model
+    copied its artifacts, and the lead saw the same on 2026-10-13.
+18. **Typed m2c drafts (`m2c --context`).** `idea` (blocked)
+    m2c reads structs and prototypes from a context file, but only
+    preprocessed plain C. Our headers are C++ (classes, methods, `extern "C"`),
+    so tools/decompctx.py output doesn't parse. It needs a C-flattened header
+    export. twins.py's callee prototypes cover part of the need.
+
 ## Observations log
 
 <!-- YYYY-MM-DD | who | observation | idea (item #) | rough impact -->
@@ -145,6 +176,9 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-11 | Opus (families) | Two near-miss families were one-line fixes once the mechanism was known. (a) Pass-through arguments: the callee reads an argument register the caller never set, so the call passes the caller's parameter (13 functions). (b) Pointer locals for &n/&cur used in a loop (12 CSV loaders). A 120-line asm scanner (scratchpad W7s3/passthru.py) lists every unmatched function with a pass-through call in about 3 s. Families tagged "only callee-saved registers permuted" are worth running it on first | cookbook (3), scout (2) | 25 functions in about 2 h, mostly mechanism-hunting
 - 2026-10-12 | enablers (fleet dashboard) | Measure speed in code bytes per hour, not functions: verified code/h was flat from session 2 (about 63 KB/h) to session 3 (about 55-70 KB/h) while functions/h fell from about 170 to about 100-130, because the remaining 3,428 functions average about 860 B against about 140 B matched. The near-miss share of worker commits climbed through session 3 (about 4% at 18:00, about 22% at 19:00-20:30, 40-60% after 21:00), and the last main build has 263 functions at >= 99% (100 KB) and 345 at 95-99% (123 KB). `tools/fleet_dashboard.py` tracks all of this live | permuter queue (1), measure (13) | the >= 99% band is about 3.5% of the remaining code; a dedicated near-miss pass may beat fresh batches now
 
+- 2026-10-13 | research (REA session) | How other decomps finished. Melee (19,828 functions) took six years with 155 contributors, and AI closed its tail. RE4 was possible because the debug build shipped symbol files naming every function. Mario Strikers Charged reused its predecessor's matched classes. Snowboard Kids 2 jumped from 25% to 58% with one-shot LLM matching, then stalled near 75%; human experts finished its last functions. Its author says Claude "more or less gives up immediately" above about 1,000 instructions. No public example found of a large retail game matched in days without symbols or a donor codebase | 7 (symbols), 14, 16 | sets expectations: the tail is slow everywhere
+- 2026-10-13 | research (REA session) | Remaining work on main (report at 8fef9a8f): 3,165 functions, 2.88 MB. 85% of those bytes are in functions >= 0x200, and 1,600 of those were never attempted. Built from source: 6.5% of code, 234 of 845 units; 1.30 MB of data still sits in auto chunks | 13 (measure) | the progress card now shows built-from-source
+
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
@@ -176,3 +210,5 @@ Roughly ordered by expected payoff for the effort.
 - 2026-10-12 | Opus (families 6) | Score-gated recipe appliers: once a recipe is a mechanical source rewrite (here: route `(float)n * (1/60)` through an inline), a script that rewrites one function at a time, compiles the unit copy and keeps only rewrites that reach MATCH found 11 extra functions in 6 units in about 10 minutes (two also needed a store-order permutation) (`scratchpad/W8o6/fam3gen.py`, `fam3gapply.py`). Applying the rewrite unit-wide made 2 functions worse | tooling (2) | high for any recipe that is a regex rewrite
 
 - 2026-10-13 | Return-layout shortlist | Stack-frame-only differences can expose oversized reconstructed return buffers. New tools/match/frame_candidates.py found three exact fixes (792 B) by checking actual callee layouts: two floats, two floats, five words. Equal instruction count and branch paths filter the search; a smaller frame alone is not evidence. Another 820 B candidate remains parked because its callee still establishes a real twelve-byte Vec3. | bounded search / ABI evidence | Three accepted matches, one rejected lead; no speculative buffer shrinkage.
+- 2026-10-13 | 14 | `twins.py rank` over all 3,165 unmatched functions (2.5 min). Best-twin score >= 0.9: 5 functions; 0.7-0.9: 108; below 0.6: 2,953 (2.80 MB). Exact-shape clones: 8 (380 B). The bulk sweeps already took the look-alikes. For the 1,762 functions >= 0x200: 72% of their callees are already called from matched code, 432 have every callee covered, and 571 share at least half their callees with one matched function. Example: fn_800D69E8 (0x5B4, twin score 0.57) surfaced two same-family vslot2 functions and all 8 callee prototypes | close twins are rare now; callee context is the part that helps the tail
+- 2026-10-13 | 18 | `m2c --context` with decompctx.py output for game/tu_800D4D0C: "Syntax error when parsing C context. Directives not supported yet" (it needs preprocessed input), and the context holds C++ classes that pycparser can't read | deferred
