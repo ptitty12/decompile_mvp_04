@@ -771,6 +771,98 @@ struct RcFileV {
     RcNd* m70;
 };
 extern "C" void fn_803FE154(int, int);
+struct RcSlotV {
+    int m0, m4, m8;
+    RcSlotV* mC;
+    char pad10[0x110];
+    char* m120;
+};
+struct RcMapE {
+    int m0, m4, m8, mC;
+};
+extern "C" unsigned char* fn_803FE660(RcHnd*);
+extern "C" void fn_803FE7E0(RcHnd*, char*);
+/* near-miss: 99.3%; retail keeps lo/cur in r22/r26 (ours swapped) and holds the fn_803FE660 result in r31 across the handle reload */
+extern "C" void fn_803FE154(int h, int key)
+{
+    RcFileV* o;
+    RcMapE* e;
+    char* lo = 0;
+    char* cur = 0;
+    char* hi = 0;
+    int skip;
+    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, (RcHnd**)&e) == 0) {
+        fn_80400828(o->pad0 + 4);
+        RcSlotV* nd = (RcSlotV*)fn_803FCECC((RcTab*)o, key);
+        if (nd == 0 || nd->m4 == 4)
+            skip = 1;
+        else if (nd->m4 == 1) {
+            skip = 1;
+            fn_803FCF1C((RcFile*)o, (RcNd*)nd);
+        } else {
+            nd->m4 = 4;
+            lo = (char*)((int*)o)[0x5c / 4];
+            cur = lo;
+            if ((RcNd*)nd != o->m68)
+                cur = nd->m120;
+            RcSlotV* nx = nd->mC;
+            if (nx == 0 || nx->m4 == 1)
+                hi = o->m60;
+            else
+                hi = nx->m120;
+            skip = 0;
+        }
+        fn_8040084C(o->pad0 + 4);
+        if (skip == 0) {
+            int i;
+            for (i = 0; i < o->m34; i++) {
+                e = (RcMapE*)(o->m30 + i * 0x10);
+                if (e->m8 > 0) {
+                    if (fn_803FCD0C((unsigned)lo, (unsigned)cur, e->mC) != 0) {
+                        char* q = cur;
+                        int tag = e->m4 << 24;
+                        if (cur != hi) {
+                            do {
+                                if ((((unsigned char)q[3] << 24) | ((unsigned char)q[2] << 16) | ((unsigned char)q[1] << 8) | (unsigned char)q[0]) == -1)
+                                    q = o->m3C;
+                                else {
+                                    char* t = q + 4;
+                                    unsigned v = ((unsigned char)t[3] << 24) | ((unsigned char)t[2] << 16) | ((unsigned char)t[1] << 8) | (unsigned char)q[4];
+                                    unsigned sz = v & 0xffffff;
+                                    if ((int)(v & 0xff000000) == tag) {
+                                        fn_80400828(o->pad0 + 4);
+                                        e->m8 = e->m8 - sz;
+                                        fn_8040084C(o->pad0 + 4);
+                                        fn_803FCD4C((RcFile*)o, sz);
+                                        q[0] = -2;
+                                        q[1] = -1;
+                                        q[2] = -1;
+                                        q[3] = -1;
+                                        q[4] = sz;
+                                        t[1] = sz >> 8;
+                                        t[2] = sz >> 16;
+                                        t[3] = sz >> 24;
+                                    }
+                                    q += sz;
+                                }
+                            } while (q != hi);
+                        }
+                    } else {
+                        if (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0) {
+                            do {
+                                char* hh = (char*)fn_803FE660((RcHnd*)e);
+                                fn_803FE7E0((RcHnd*)e, hh);
+                                if (e->m8 <= 0)
+                                    break;
+                            } while (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /* near-miss: 96.0%; retail reuses the reloaded handle (r3 / r8) across the loop bodies, ours reloads it from the stack in each body */
 extern "C" void fn_803FE418(int h)
 {
