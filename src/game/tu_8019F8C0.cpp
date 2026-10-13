@@ -469,6 +469,51 @@ float fn_801A0958(Unk8019F8C0_Owner* o, float mean, float sd)
     float r = sd * a + mean;
     return r;
 }
+extern const char lbl_805CE64C[];
+inline float Unk801A0AA8_Rand(Unk8014D8AC* rng, float scale)
+{
+    const char* f = lbl_805CE64C;
+    return (float)(unsigned)rng->fn_8014D8AC(1000000, f, 0x172) * scale * 1e-6f;
+}
+inline float Unk801A0AA8_Abs(float v)
+{
+    return (float)__builtin_fabs(v);
+}
+
+inline void Unk801A0AA8_Gauss(Unk8014D8AC* rng, float* pa, float* pb)
+{
+    float x;
+    float y;
+    float s;
+    do {
+        x = 2.0f * ((float)(unsigned)rng->fn_8014D8AC(10000, lbl_805CB8F0, 0x1CF) * 0.0001f) - 1.0f;
+        y = 2.0f * ((float)(unsigned)rng->fn_8014D8AC(10000, lbl_805CB8F0, 0x1CF) * 0.0001f) - 1.0f;
+        s = x * x + y * y;
+    } while (s >= 1.0f);
+    s = fn_804028E4(logf(s) * -2.0f / s);
+    *pa = x * s;
+    *pb = y * s;
+}
+
+extern "C" float fn_801A0AA8(Unk8019F8C0_Owner* o, float a, float b)
+{
+    float r = 0.0f;
+    if (!(Unk801A0AA8_Rand((Unk8014D8AC*)o->m554, 1.0f) >= 0.5f)) {
+        float K = 2.0f * a * b;
+        float g1;
+        float g2;
+        Unk801A0AA8_Gauss((Unk8014D8AC*)o->m554, &g1, &g2);
+        r = a - K * Unk801A0AA8_Abs(g1);
+    } else {
+        float K = 2.0f * (1.0f - a) * b;
+        float g1;
+        float g2;
+        Unk801A0AA8_Gauss((Unk8014D8AC*)o->m554, &g1, &g2);
+        r = K * Unk801A0AA8_Abs(g1) + a;
+    }
+    return !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+}
+
 void fn_801A15A0(Unk8019F8C0_Owner* o)
 {
     fn_801A0488(o);
