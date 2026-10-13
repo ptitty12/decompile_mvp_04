@@ -24,7 +24,7 @@ extern Unk8001C314* lbl_806164F4;
 struct Unk80686D90 {
     int m0;
 };
-extern Unk80686D90 lbl_80686D90;
+extern const Unk80686D90 lbl_80686D90;
 
 Unk8001BA78::Unk8001BA78()
 {
@@ -74,13 +74,12 @@ void fn_8001BC58()
     }
 }
 
-/* near-miss: store order of the m0/global/m4/m8 writes and the lwz of lbl_80686D90 differ (about 10 slots) */
 Unk8001BC8C::Unk8001BC8C() : m4(0), m8(0), mC(-1), m10(0)
 {
     lbl_806164F0 = this;
     m0 = fn_80020BCC(lbl_80686D90.m0);
-    m8 = 0;
     m4 = 0;
+    m8 = 0;
 }
 
 void fn_8001BCF0()
@@ -508,7 +507,6 @@ int Unk8001C314::fn_8001C620(int idx)
     }
     m24[idx].m0 = slot;
     if (result >= 0) {
-        /* near-miss: retail has `li r0,1` before the `lwz r3` of the global (2 slots swapped) */
         int h = lbl_80686D90.m0;
         m24[idx].m4 = 1;
         fn_80020C5C(fn_80020BCC(h));
@@ -581,12 +579,12 @@ extern const char lbl_805A511C[];
 extern const float lbl_805A5130;
 extern const float lbl_805A5134;
 int fn_80400DA4();
-void fn_80303BC4(const char* fmt, int a, ...);
+void fn_80303BC4(const char* fmt, float a, float b, ...);
 
-/* near-miss: retail loads the three lis (floats, then the string) before the lfs pair and does `mr r4,r3` first (7 slots) */
 void fn_8001CA78()
 {
     if (lbl_806164F8 == 1) {
-        fn_80303BC4(lbl_805A511C, fn_80400DA4(), lbl_805A5130, lbl_805A5134);
+        int v = fn_80400DA4();
+        fn_80303BC4(lbl_805A511C, lbl_805A5130, lbl_805A5134, v);
     }
 }

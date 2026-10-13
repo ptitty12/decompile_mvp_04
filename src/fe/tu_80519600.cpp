@@ -539,13 +539,14 @@ extern "C" FE_OVERLAY int fn_8051E198(int k)
 
 extern "C" FE_OVERLAY int fn_8051E25C(int n)
 {
-    if (n > 12) {
+    switch (n) {
+    case 10:
+    case 11:
+    case 12:
+        return 0;
+    default:
         return fn_80084114__Fi(fn_8051E198(n));
     }
-    if (n >= 10) {
-        return 0;
-    }
-    return fn_80084114__Fi(fn_8051E198(n));
 }
 
 enum FeE29 { FeE29_Neg = -1, FeE29_10 = 10, FeE29_12 = 12 };

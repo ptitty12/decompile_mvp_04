@@ -713,7 +713,7 @@ extern "C" FE_OVERLAY int fn_80507FF4(void* self, int k)
 }
 
 #define FE_FILLQ(SRCINIT, D, K, DINIT)                              \
-    do {                                                            \
+    {                                                               \
         DINIT;                                                      \
         fn_8040074C(self->D.m0, d_->m8 * 4);                        \
         SRCINIT;                                                    \
@@ -731,9 +731,8 @@ extern "C" FE_OVERLAY int fn_80507FF4(void* self, int k)
         }                                                           \
         d_->m14 = 1;                                                \
         fn_80539AE8(&self->D, K);                                   \
-    } while (0)
+    }
 
-/* near-miss: 96.6%; retail moves the r4 argument (li r4,K) before the r3 argument in the three fn_80539AE8 calls and in fn_80537054; return-type toggles of all callees did not change it */
 extern "C" FE_OVERLAY void fn_805080B8(FeBigQ* self)
 {
     FeLstQ* s = &self->src;

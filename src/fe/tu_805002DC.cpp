@@ -232,7 +232,6 @@ extern "C" FE_OVERLAY void fn_80500ED8(FeScrQ* x)
     fn_800C8040(x->fn_vslot32(lbl_805FB5A0, 1))->fn_vslot28(buf);
 }
 
-/* near-miss: loop pointers o/q/c land in r31/r29/r30 where retail has r30/r31/r29 (registers only) */
 extern "C" FE_OVERLAY int fn_80500F54(void* self, int* out, int a)
 {
     FeIdx40 buf[12];
@@ -244,17 +243,9 @@ extern "C" FE_OVERLAY int fn_80500F54(void* self, int* out, int a)
         p++;
     } while (k-- != 0);
     int n = fn_805559D4(h, buf, 12, a);
-    if (n > 0) {
-        int* o = out;
-        FeIdx40* q = buf;
-        int c = n;
-        do {
-            o[0] = fn_805563C4(q);
-            o[1] = fn_80556410(q);
-            q++;
-            o += 2;
-            c--;
-        } while (c != 0);
+    for (int i = 0; i < n; i++) {
+        out[i * 2] = fn_805563C4(&buf[i]);
+        out[i * 2 + 1] = fn_80556410(&buf[i]);
     }
     return n * 2;
 }
@@ -633,7 +624,7 @@ extern "C" FE_OVERLAY char* fn_80505178(char* buf, int k)
     return buf;
 }
 
-/* near-miss: switch tree and c copy differ (retail: root 1 + separate copy of a == 1 for case 0; ours root 0); 8 attempts */
+/* near-miss: the switch tree matches now (an empty case 2 gives root 1); retail still keeps a separate copy of a == 1 for case 0 (mr r9,r0 before the tree) */
 extern "C" FE_OVERLAY char* fn_805051F8(char* buf, int a, int b)
 {
     int c = a == 1;
@@ -651,7 +642,7 @@ extern "C" FE_OVERLAY char* fn_805051F8(char* buf, int a, int b)
             id = 0x206F;
         }
         break;
-    case -1:
+    case 2:
         break;
     }
     fn_80403144(buf, fn_80090880__FP11Unk80090880(lbl_8061977C, id));

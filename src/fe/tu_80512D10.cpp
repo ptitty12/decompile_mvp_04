@@ -561,7 +561,6 @@ extern "C" FE_OVERLAY void fn_80514538(FeScrQ* x)
     fn_805140D8(x);
 }
 
-/* near-miss: retail emits `li r4,1` before `mr r3,r31` for the fn_805362AC call (2 of 81 insns); all return-type and cast variants tried */
 extern "C" FE_OVERLAY void fn_8051457C(FeScrQ* x, void* yp)
 {
     FeRec84* y = (FeRec84*)yp;
@@ -588,7 +587,7 @@ extern "C" FE_OVERLAY void fn_8051457C(FeScrQ* x, void* yp)
     y->m84 = n;
     for (int i = 0; i < y->m84; i++) {
         y->m4[i] = *(int*)(lst.m0 + s->mC * 4);
-        s->mC = (s->mC + 1) % lst.m4;
+        s->mC = (s->mC + 1) % *(volatile unsigned*)&s->m4;
     }
     lst.m10 = lbl_8064A550;
 }
