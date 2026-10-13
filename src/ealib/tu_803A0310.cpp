@@ -109,10 +109,52 @@ struct Vp6MvView {
     char pad716[6];
     unsigned char m71C[16];
 };
+/* Macroblock decode context fields used by fn_803A2244 (offsets read from the original code). */
+struct Vp6MbView {
+    char pad0[8];
+    int m8;
+    char pad0C[0x64 - 0xC];
+    int m64;
+    int m68;
+    char pad6C[4];
+    int m70;
+    int m74;
+    int m78;
+    int m7C;
+    int m80;
+    char pad84[4];
+    int m88;
+    char pad8C[0xBC - 0x8C];
+    int mBC;
+    void* mC0;
+    void* mC4;
+    int mC8;
+    char padCC[0x10C - 0xCC];
+    int m10C;
+    int m110;
+    int m114;
+    char pad118[0x150 - 0x118];
+    Vp6Rc m150;
+    char pad168[0x1AC - 0x168];
+    unsigned char m1AC;
+    char pad1AD[0xB];
+    int m1B8;
+    int m1BC;
+    char pad1C0[0x1DC - 0x1C0];
+    int m1DC;
+    char pad1E0[0x21C - 0x1E0];
+    int m21C;
+    int m220;
+    int m224;
+    char pad228[0x6EB - 0x228];
+    unsigned char m6EB;
+};
 extern "C" {
 
 void fn_803A00A0(int, int, int, int);
 void fn_803A00D8(int, int, int);
+void fn_803A0FCC(Vp6MbView* c, int mbx, unsigned mby, int blk);
+void fn_803A26D4(Vp6MbView* c, int mbx, unsigned mby);
 
 void fn_803A2DEC(Vp6McView* c, int dst, int mode);
 
@@ -165,8 +207,6 @@ void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
     dst[2] = (src[1] * 0xCDU + src[2] * 0x33U + 0x80) >> 8;
     dst[3] = (src[1] * 0x33U + src[2] * 0xCDU + 0x80) >> 8;
     dst[4] = src[2];
-void fn_803A00A0(int, int, int, int);
-void fn_803A00D8(int, int, int);
 }
 
 /* near-miss: 4 slots, order of the first two loads and multiplies. */
@@ -485,6 +525,102 @@ int fn_803A0F38(Vp6Rc* rc, unsigned prob)
     rc->mC = count;
     rc->m8 = value;
     return bit;
+}
+
+//// a
+/* near-miss 96.5%: same instructions; about 28 slots differ in the order of the independent field stores and the t8/t10 registers. */
+void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
+{
+    int step;
+    int v;
+    if (c->m1DC != 0) {
+        unsigned char p = c->m6EB;
+        if (mby > 3) {
+            if (c->mC8 != 0) {
+                p = p - (p >> 1);
+            } else {
+                p = p + ((0x100 - p) >> 1);
+            }
+        }
+        c->mC8 = fn_803A0F38(&c->m150, p);
+    } else {
+        c->mC8 = 0;
+    }
+    if (c->m1AC == 0) {
+        c->m8 = 1;
+    } else {
+        fn_803A26D4(c, mbx, mby);
+    }
+    if (c->mC8 == 0) {
+        c->m74 = c->m1B8;
+        step = 8;
+    } else {
+        step = 1;
+        c->m74 = c->m1B8 * 2;
+    }
+    int t10 = c->m1B8;
+    int t8 = mbx * 16;
+    int t27 = mby * 16;
+    int t29 = mby << 5;
+    c->m68 = t27;
+    void* t28 = (char*)c + 0xCC;
+    int t30 = c->m21C + t8 * t10 + t27;
+    c->m70 = t30;
+    c->mC0 = t28;
+    c->m7C = 2;
+    c->m80 = 3;
+    c->m64 = t8;
+    int t25 = t29 + 16;
+    c->m88 = t10;
+    void* t26 = (char*)c + 0xDC;
+    c->mC4 = (char*)c + 0x124;
+    c->m78 = 0;
+    c->mBC = c->m10C + t29;
+    fn_803A0FCC(c, mbx, mby, 0);
+    c->mC0 = t28;
+    c->m70 = c->m70 + 8;
+    c->mBC = c->m10C + t25;
+    c->m68 = c->m68 + 8;
+    fn_803A0FCC(c, mbx, mby, 1);
+    c->mC0 = t26;
+    c->m68 = c->m68 - 8;
+    c->mBC = c->m10C + t29;
+    c->m70 = t30 + step * c->m1B8;
+    c->m64 = c->m64 + step;
+    fn_803A0FCC(c, mbx, mby, 2);
+    c->mC0 = t26;
+    c->m70 = c->m70 + 8;
+    c->mBC = c->m10C + t25;
+    c->m68 = c->m68 + 8;
+    fn_803A0FCC(c, mbx, mby, 3);
+    int u10 = c->m1BC;
+    int u28 = mbx * 8;
+    int u29 = mby * 8;
+    int u8 = u28 * u10;
+    c->m7C = 3;
+    int u9 = c->m110 + t27;
+    c->mC4 = (char*)c + 0x12C;
+    void* u7 = (char*)c + 0xEC;
+    c->m80 = 7;
+    c->m70 = c->m220 + u8 + u29;
+    c->mBC = u9;
+    c->mC0 = u7;
+    c->m88 = u10;
+    c->m78 = 1;
+    c->m74 = u10;
+    c->m64 = u28;
+    c->m68 = u29;
+    fn_803A0FCC(c, mbx, mby, 4);
+    void* w8 = (char*)c + 0xFC;
+    void* w7 = (char*)c + 0x134;
+    int w10 = c->m68;
+    c->m78 = 2;
+    c->mBC = c->m114 + t27;
+    c->mC0 = w8;
+    int w9 = c->m224 + c->m64 * c->m74 + w10;
+    c->mC4 = w7;
+    c->m70 = w9;
+    fn_803A0FCC(c, mbx, mby, 5);
 }
 
 int fn_803A2524(Vp6Ctx* c)
