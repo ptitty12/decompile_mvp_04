@@ -62,6 +62,19 @@ class DataPlacementTests(unittest.TestCase):
         row=self.locate(source,target,exports={'constant':0x2000})['.rodata']
         self.assertEqual(row['base'],'0x2000')
         self.assertTrue(row['exact'])
+    def test_mwcc_sda21_halfword_pairs_with_retail_word(self):
+        source=FixtureElf({'.rodata':b'ABCDWXYZ'},
+            relocations={1:{2:(0,109,0)}},symbols=[('',0,0,3,2)])
+        target=FixtureElf(relocations={1:{0:(0,109,0)}},symbols=[('constant',0,0,17,0)])
+        row=self.locate(source,target,exports={'constant':0x2000})['.rodata']
+        self.assertTrue(row['exact'])
+    def test_different_relocation_kind_is_not_paired(self):
+        source=FixtureElf({'.rodata':b'ABCDWXYZ'},
+            relocations={1:{2:(0,109,0)}},symbols=[('',0,0,3,2)])
+        target=FixtureElf(relocations={1:{0:(0,6,0)}},symbols=[('constant',0,0,17,0)])
+        with patch.object(data_candidates,'Elf',side_effect=[target,source]):
+            result=data_candidates.proof('unit',self.main_image(),{('unit','.text'):0x1000},{'constant':0x2000})
+        self.assertEqual(len(result['unknown_code_refs']),1)
     def test_unique_full_section_search(self):
         source=FixtureElf({'.rodata':b'ABCDWXYZ'})
         row=self.locate(source,main=self.main_image(b'----ABCDWXYZ'))['.rodata']

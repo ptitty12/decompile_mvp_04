@@ -72,6 +72,10 @@ def proof(unit,linked,unit_starts,exports,source_object=None):
   for source_pos,source in sr.items():
    if not soff<=source_pos<soff+sz:continue
    pos=source_pos-soff;target=tr.get(off+pos)
+   # MWCC SDA21 can name the halfword while dtk names the same word.
+   if target is None or target[1]!=source[1]:
+    matches=[rel for at,rel in tr.items() if at//4==(off+pos)//4 and rel[1]==source[1]]
+    target=matches[0] if len(matches)==1 else None
    si,_,add=source;sn,sv,_,_,sh=b.syms[si]
    if sh not in bases:continue
    if not target:
