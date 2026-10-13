@@ -1089,7 +1089,7 @@ config.libs = [
             Object(NonMatching, "snd/tu_803A6B64.cpp"),
             Object(NonMatching, "snd/tu_803A6D80.cpp"),
             Object(NonMatching, "snd/cmn/salloc.c"),
-            Object(NonMatching, "snd/tu_803A81E0.cpp"),
+            Object(Matching, "snd/tu_803A81E0.cpp"),
             Object(Matching, "snd/cmn/sballoc.c"),
             Object(Matching, "snd/cmn/sbhdrcpy.c"),
             Object(Matching, "snd/cmn/sbhdrsze.c"),
