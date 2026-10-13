@@ -496,6 +496,53 @@ extern "C" int fn_8014188C(Unk8014188C* x, int a)
 }
 
 extern const char lbl_8064B738[];
+class Unk8037B3E8 {
+public:
+    Unk8037B3E8(unsigned int hash);
+    int m0;
+};
+inline void* operator new(unsigned int, void* p) { return p; }
+extern const float lbl_805C2834;
+struct Unk801418B4_Cfg {
+    const void* m0;
+    float m4[9];
+    float m28[6];
+    float m40[5];
+    float m54[13];
+    float m88[14];
+    float mC0[3];
+    float mCC[4];
+    float mDC[6];
+    float mF4;
+    float mF8;
+};
+
+extern "C" void* fn_801418B4(void* p)
+{
+    new (p) Unk8037B3E8(0x6DB1A80F);
+    Unk801418B4_Cfg* x = (Unk801418B4_Cfg*)p;
+    x->m0 = lbl_8064B738;
+    for (int i = 0; i < 9; i++)
+        x->m4[i] = lbl_805C2834;
+    for (int i = 0; i < 6; i++)
+        x->m28[i] = lbl_805C2834;
+    for (int i = 0; i < 5; i++)
+        x->m40[i] = lbl_805C2834;
+    for (int i = 0; i < 13; i++)
+        x->m54[i] = lbl_805C2834;
+    for (int i = 0; i < 14; i++)
+        x->m88[i] = lbl_805C2834;
+    for (int i = 0; i < 3; i++)
+        x->mC0[i] = lbl_805C2834;
+    for (int i = 0; i < 4; i++)
+        x->mCC[i] = lbl_805C2834;
+    for (int i = 0; i < 6; i++)
+        x->mDC[i] = lbl_805C2834;
+    x->mF4 = lbl_805C2834;
+    x->mF8 = lbl_805C2834;
+    return p;
+}
+
 extern "C" void fn_801421D4(UnkP0* x, int chrg)
 {
     x->m0 = lbl_8064B738;
