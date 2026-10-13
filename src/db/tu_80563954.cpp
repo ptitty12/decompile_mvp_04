@@ -71,6 +71,8 @@ extern float lbl_805FF8A4;
 extern float lbl_805FF914;
 extern int lbl_80622D88;
 extern int lbl_80622D8C;
+/* fn_80563F0C initializes the 0x20-byte state; fn_80564C9C compares the id at +0,
+ * float threshold at +4 and unsigned counter at +0xC. */
 struct Db80563F0C_S {
     int m0;
     float m4;
@@ -249,6 +251,24 @@ extern "C" DB_OVERLAY void fn_80564A98(Db80563F0C_S* s)
     s->m8 = lbl_805FF914;
     s->mC = 0;
     s->m4 = lbl_805FF914;
+}
+
+extern "C" DB_OVERLAY int fn_80564C9C(Db80563F0C_S* s, float value, float unused3, int unused, int id, int unused2, unsigned count)
+{
+    int result = 0;
+    if (s->m0 == id) {
+        if (!(value >= s->m4)) {
+            if (count > (unsigned)s->mC) {
+                float scale = (float)(int)(count - s->mC) * 0.1f + 1.0f;
+                float adjusted = value * scale;
+                if (!(adjusted < s->m4))
+                    result = 1;
+            }
+        } else {
+            result = 1;
+        }
+    }
+    return result;
 }
 
 extern "C" DB_OVERLAY Db80564D40_S* fn_80564D40(Db80564D40_S* s)
