@@ -55,6 +55,8 @@ extern float lbl_80619314;
 extern int lbl_80622DEC;
 extern int lbl_80622DF0;
 
+extern "C" int fn_8056B094(int t, int a, int* out, int max, int X);
+extern "C" FE_OVERLAY int fn_80446334(FeScr2* self, int* arr, int n, int target, int* out1, int* out2, int g);
 extern "C" FE_OVERLAY void fn_80443E4C(char* self)
 {
     lbl_80622C1C = FeItemGet((FeItem*)(self + 0x334));
@@ -341,6 +343,52 @@ extern "C" FE_OVERLAY void fn_80445DA8(FeScr2* self)
         r++;
     } while (r <= 4);
     fn_804469DC(self, 1);
+}
+
+extern "C" FE_OVERLAY int fn_804461A0(FeScr2* self, int n, int day, int idx)
+{
+    int arr[0x3E];
+    FeDate3 d;
+    FeDate3* pd = &d;
+    int o1;
+    int o2;
+    FeTimer* t;
+    int cnt = fn_8032A2CC(n, self->m152);
+    t = 0;
+    int tbl = fn_8056B094(lbl_80619948->m28, self->m14C, arr, 0x3E, n);
+    int g = lbl_8061930C->fn_80078A38(self->m14C);
+    d.a = 0;
+    o1 = -1;
+    o2 = -1;
+    pd->b = 0;
+    pd->c = 0;
+    d.a = n + 1;
+    pd->c = self->m152;
+    int dd = day;
+    for (; dd <= cnt; dd++, idx++) {
+        t = (FeTimer*)((FeObjP1*)self)->v89(idx);
+        pd->b = dd;
+        if (fn_80446334(self, arr, tbl, dd, &o1, &o2, g) == 0) {
+            int w = *(int*)&d;
+            t->m10 = -1;
+            t->m14 = -1;
+            t->m8 = 3;
+            *(int*)&t->mC = w;
+            t->s12();
+            fn_80444FE4(t);
+        } else {
+            int a1 = o1;
+            int a2 = o2;
+            int w = *(int*)&d;
+            t->m10 = a1;
+            t->m14 = a2;
+            t->m8 = -2;
+            *(int*)&t->mC = w;
+            t->s12();
+            fn_80444FE4(t);
+        }
+    }
+    return idx;
 }
 
 extern "C" FE_OVERLAY int fn_80446334(FeScr2* self, int* arr, int n, int target, int* out1, int* out2, int g)
