@@ -154,10 +154,12 @@ struct Unk80313C14_Fx3C {
 struct Unk80313C14_Scr {
     char pad0[0x14];
     int m14;
-    char pad18[0x10];
+    int m18;
+    char pad1C[0xC];
     int m28;
     int m2C;
-    char pad30[0x204 - 0x30];
+    int m30;
+    char pad34[0x204 - 0x34];
     int m204;
 };
 extern Unk80313C14_Scr* lbl_8061FEDC;
@@ -387,6 +389,89 @@ void fn_80313FBC(Unk80313C14_Ld* self)
     fn_803DBE38(h, 1);
     fn_803DBE78(h, 1);
     self->m10 = 1;
+}
+
+struct Unk80313C14_V2 {
+    float x;
+    float y;
+};
+struct Unk80313C14_Vtx {
+    float x;
+    float y;
+    float u;
+    float v;
+};
+inline int Unk80313C14_ScrW()
+{
+    return lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m2C : lbl_8061FEDC->m14;
+}
+extern "C" {
+void fn_803E50BC(int h, int k);
+void fn_803E54B8(int h, Unk80313C14_Vtx* v, int* c);
+void fn_803E5270(int h);
+void fn_803E6D28(int h);
+}
+/* near-miss 97.2%: 94/94 insns, 9 slots differ: retail loads self->m10 after the first V2 copy pair, ours hoists it above the stores; frame and registers match */
+extern "C" void fn_80314034(Unk80313C14_Ld* self, Unk80313C14_V2* a, Unk80313C14_V2* b, Unk80313C14_Col* c)
+{
+    Unk80313C14_V2 pa = *a;
+    Unk80313C14_V2 pb = *b;
+    if (self->m10 == 0)
+        fn_80313FBC(self);
+    unsigned w = Unk80313C14_ScrW();
+    unsigned h = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+    Unk80313C14_Vtx q[4];
+    q[0].x = (float)w * pa.x;
+    q[0].y = (float)h * pa.y;
+    q[0].u = 0.0f;
+    q[0].v = 1.0f;
+    q[1].x = (float)w * pb.x;
+    q[1].y = (float)h * pb.y;
+    q[1].u = 0.0f;
+    q[1].v = 1.0f;
+    int col = fn_8014DDAC(c);
+    fn_803E50BC(self->mC, 0xA8);
+    int c1 = col;
+    fn_803E54B8(self->mC, &q[0], &c1);
+    int c2 = col;
+    fn_803E54B8(self->mC, &q[1], &c2);
+    fn_803E5270(self->mC);
+    fn_803E6D28(self->mC);
+}
+
+/* near-miss 97.7%: 111/111 insns, 9 slots differ: same as fn_80314034 (the m10 load is hoisted above the V2 copies); frame and registers match */
+extern "C" void fn_803141AC(Unk80313C14_Ld* self, Unk80313C14_V2* a, Unk80313C14_V2* b, Unk80313C14_V2* c2, Unk80313C14_Col* c)
+{
+    Unk80313C14_V2 pa = *a;
+    Unk80313C14_V2 pb = *b;
+    Unk80313C14_V2 pc = *c2;
+    if (self->m10 == 0)
+        fn_80313FBC(self);
+    unsigned w = Unk80313C14_ScrW();
+    unsigned h = lbl_8061FEDC->m28 != 0 ? lbl_8061FEDC->m30 : lbl_8061FEDC->m18;
+    Unk80313C14_Vtx q[4];
+    q[0].x = (float)w * pa.x;
+    q[0].y = (float)h * pa.y;
+    q[0].u = 0.0f;
+    q[0].v = 1.0f;
+    q[1].x = (float)w * pb.x;
+    q[1].y = (float)h * pb.y;
+    q[1].u = 0.0f;
+    q[1].v = 1.0f;
+    q[2].x = (float)w * pc.x;
+    q[2].y = (float)h * pc.y;
+    q[2].u = 0.0f;
+    q[2].v = 1.0f;
+    int col = fn_8014DDAC(c);
+    fn_803E50BC(self->mC, 0x90);
+    int c1 = col;
+    fn_803E54B8(self->mC, &q[0], &c1);
+    int cc2 = col;
+    fn_803E54B8(self->mC, &q[1], &cc2);
+    int c3 = col;
+    fn_803E54B8(self->mC, &q[2], &c3);
+    fn_803E5270(self->mC);
+    fn_803E6D28(self->mC);
 }
 
 extern "C" void fn_803145D8(void* pp, int unused, int v, float a, float b, int idx)
@@ -620,6 +705,30 @@ void fn_80316310(char* self)
 int fn_803164A0()
 {
     return fn_803D9E1C(1);
+}
+
+struct Unk80313C14_Pt {
+    float m0;
+    char pad4[4];
+    float m8;
+};
+inline int Unk80313C14_Near(float px, float pz, float cx, float cz, float r)
+{
+    return (px - cx) * (px - cx) + (pz - cz) * (pz - cz) < r * r;
+}
+extern "C" int fn_803164C4(Unk80313C14_Pt* p)
+{
+    const float r = 120.0f;
+    const float s = 1080.0f;
+    if (Unk80313C14_Near(p->m0, p->m8, s, 0.0f, r))
+        goto hit;
+    if (Unk80313C14_Near(p->m0, p->m8, 0.0f, s, r))
+        goto hit;
+    if (Unk80313C14_Near(p->m0, p->m8, s, s, r))
+        goto hit;
+    return Unk80313C14_Near(p->m0, p->m8, 0.0f, 0.0f, r);
+hit:
+    return 1;
 }
 
 void fn_803167F0(Unk80313C14_Fl* p, float a, float b, float c, float d)
