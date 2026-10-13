@@ -50,7 +50,6 @@ void fn_80430634(GXClipMode mode);
 void fn_8043065C(s32 mtx);
 void fn_804310D0(void);
 
-/* near-miss: same instructions, only the scheduling of the three early loads/inserts and the temp registers differ */
 void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fogColorReg = 0, fogParamReg0 = 0, fogParamReg1 = 0, fogParamReg2 = 0, fogParamReg3 = 0;
     u32 fsel;
@@ -110,7 +109,10 @@ void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXCo
     SET_REG_FIELD(0, fogParamReg3, 1, 20, proj);
     SET_REG_FIELD(0, fogParamReg3, 3, 21, fsel);
     SET_REG_FIELD(0, fogParamReg3, 8, 24, 0xF1);
-    SET_REG_FIELD(0, fogColorReg, 24, 0, *(u32*)&color >> 8);
+    {
+        u32 cc = *(u32*)&color;
+        SET_REG_FIELD(0, fogColorReg, 24, 0, cc >> 8);
+    }
     SET_REG_FIELD(0, fogColorReg, 8, 24, 0xF2);
     GX_WRITE_RAS_REG(fogParamReg0);
     GX_WRITE_RAS_REG(fogParamReg1);
