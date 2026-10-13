@@ -1153,8 +1153,8 @@ inline void* FeItemObj(FeItem* it)
     return (void*)it->m4C;
 }
 extern "C" {
-void fn_805519A0(void* o, int k, float v);
-void fn_805519E0(void* o, float v);
+void fn_805519A0(int id, int k, float v);
+void fn_805519E0(int id, float v);
 }
 
 /* 0x28-byte sample record kept in the buffer at lbl_806215DC (fn_80442D48). */

@@ -35,6 +35,7 @@ cd "<WORKTREE>" && export PATH="/c/Users/Patrick Taylor/AppData/Local/Microsoft/
 python configure.py > /dev/null && ninja > /dev/null     # once at the start
 python tools/scout/packet.py <START> <END>                 # unit overview
 python tools/match/asm_show.py build/GV4E69/asm show fn_XXXXXXXX
+python tools/match/twins.py show fn_XXXXXXXX -n 3          # matched look-alikes + callee prototypes: read before writing
 python tools/match/m2c_draft.py <UNIT_NO_EXT> fn_XXXXXXXX   # first-draft C (m2c); a start, not a match
 python tools/match/diff_unit.py <UNIT_NO_EXT>              # rebuild + per-function result
 python tools/match/diff_unit.py <UNIT_NO_EXT> fn_XXXXXXXX  # side-by-side diff of one function
@@ -74,6 +75,19 @@ Range workers get a list of `unit:start-end` lines instead of one unit.
 - Commit each unit with its own renames, after VERIFY PASS.
 
 ## Quick tips (details in docs/PATTERNS.md)
+
+- Before writing a function, run `twins.py show`. A twin's source is a worked
+  example of how this compiler produced that shape. Copy the callee
+  prototypes it prints exactly: a wrong prototype changes argument
+  registers and scheduling. For big functions the matched functions that
+  share the most callees are the best guide to argument types and call order.
+- Stuck at 95–99%? Fix the types first: callee prototypes (`twins.py`,
+  `protolint.py`), field types and struct layout. At that stage the fix is
+  usually in the declarations, not in the body (Melee's rule).
+- Move on after about 10 minutes without measurable progress on a small
+  function; come back with fresh eyes or leave it parked.
+- Permuter candidates are leads, never recipes: don't copy `do {} while (0)`,
+  `(void)0` or nested-assignment artifacts into source as a pattern.
 
 - objdiff's 100% ignores relocation targets: a wrong float/string literal, a
   swapped global or a call to the wrong function still scores 100%.

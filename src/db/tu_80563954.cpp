@@ -460,3 +460,190 @@ extern "C" DB_OVERLAY int fn_80565E9C(Db80565CDC_S* self)
     }
     return res;
 }
+
+/* fn_805658F8: host vptr +0xDBC, row-set vptr +0x10, row status +0x20. */
+struct Db805658F8_Row { char pad0[0x1C]; int m1C; int m20; };
+class Db805658F8_Rows { public: char pad0[0x10];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual Db805658F8_Row* v21(int);
+};
+class Db805658F8_Host { public: char pad0[0xDBC];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual Db805658F8_Rows* v8(int);
+    virtual Db805658F8_Rows* v9(int);
+    virtual Db805658F8_Rows* v10(int);
+};
+extern "C" int fn_8052BD40(Unk8052B978_Tbl*);
+extern "C" int fn_80084954__FPv(void*);
+extern "C" DB_OVERLAY int fn_805658F8(Db80565CDC_S* self,int a)
+{
+    Unk8052B978_Tbl* t=*(Unk8052B978_Tbl**)((char*)self+0x30);
+    int last=fn_8052BD40(t);
+    int active=1;
+    if(t->m8[last].f4==0) active=0;
+    if(active==1) {
+        Db805658F8_Host* host=(Db805658F8_Host*)a;
+        Unk8006A138_It<25> it(13);
+        int i=13;
+        do {
+            Db805658F8_Rows* rows=host->v8(i);
+            if(rows->v21(0)->m20!=4) goto failure;
+            if(fn_80084954__FPv((void*)it.v)==1) {
+                if(host->v9(it.v)->v21(0)->m20!=4) goto failure;
+            } else {
+                if(rows->v21(1)->m20!=4) goto failure;
+            }
+            i=it.Next();
+        } while(i<=18);
+        return 1;
+    }
+    failure:return 0;
+}
+
+extern "C" int fn_80566570();
+extern "C" int fn_80566520(Db80565CDC_S*);
+extern "C" int fn_800A3AB0(void*);
+extern "C" int fn_800A3AF4(void*);
+extern "C" int fn_800A3B38(void*);
+extern "C" int fn_800A3B7C(void*);
+extern "C" void fn_80567338(Db80565CDC_S*,int,int);
+extern "C" void fn_8056693C(Db80565CDC_S*,int,int,int,int);
+extern "C" void fn_80568EA8(Db80565CDC_S*);
+extern "C" void fn_80568F5C(Db80565CDC_S*);
+extern "C" void fn_80569000(Db80565CDC_S*);
+extern "C" void fn_80569094(Db80565CDC_S*);
+extern "C" DB_OVERLAY void fn_80564EB0(Db80565CDC_S* self)
+{
+    if(fn_80566570()==1) {
+        Unk8006A138_It<3> first(0);
+        int maximum=-1;
+        int i=0;
+        do {
+            Unk8052B978_Tbl* t=Db805650DC_At(self,i*4);
+            int last=(int)t->m4-1;
+            int off=last*28;
+            int key=*(unsigned short*)(off+(unsigned)t->m8);
+            if(maximum==-1 || key>maximum)maximum=key;
+            i=first.Next();
+        }while(i<=3);
+        Unk8006A138_It<3> second(0);
+        int j=0;
+        do {
+            fn_80567338(self,j,maximum+1);
+            j=second.Next();
+        }while(j<=3);
+        return;
+    }
+    void* g=lbl_80619948;
+    int a=fn_800A3AB0(g);
+    int b=fn_800A3AF4(g);
+    int c=fn_800A3B38(g);
+    int d=fn_800A3B7C(g);
+    if(fn_80566520(self)==1 && fn_805653B4(self,a,b,c,d)==1) {
+        fn_8056693C(self,a,b,c,d);
+        return;
+    }
+    if(fn_80566520(self)) {
+        fn_80568EA8(self);fn_80568F5C(self);fn_80569000(self);fn_80569094(self);
+    }
+}
+
+extern "C" int fn_8008499C__FPv(void*);
+extern "C" DB_OVERLAY int fn_80565A50(Db80565CDC_S* self,int a)
+{
+    Unk8052B978_Tbl* t=*(Unk8052B978_Tbl**)((char*)self+0x34);
+    int last=fn_8052BD40(t);
+    int active=1;
+    if(t->m8[last].f4==0) active=0;
+    if(active==1) {
+        Db805658F8_Host* host=(Db805658F8_Host*)a;
+        Unk8006A138_It<25> it(19);
+        int i=19;
+        do {
+            Db805658F8_Rows* rows=host->v8(i);
+            if(rows->v21(0)->m1C!=0) goto failure;
+            if(fn_80084954__FPv((void*)it.v)==1) {
+                if(host->v9(it.v)->v21(0)->m1C!=0) goto failure;
+                if(fn_8008499C__FPv((void*)it.v)==1) {
+                    if(host->v10(it.v)->v21(0)->m1C!=2)goto failure;
+                }
+            } else {
+                if(rows->v21(1)->m1C!=3) goto failure;
+            }
+            i=it.Next();
+        } while(i<=24);
+        return 1;
+    }
+    failure:return 0;
+}
+
+struct Db80563D3C_Six { int v[6]; };
+extern const Db80563D3C_Six lbl_805FF88C;
+extern float lbl_806022C0[][10];
+extern signed char lbl_80602360[];
+extern float lbl_8060236C[][10];
+extern signed char lbl_8060240C[];
+extern float lbl_80602418[][10];
+extern signed char lbl_806024B8[];
+extern "C" DB_OVERLAY int* fn_80563D3C(int* out,int id,int level,int age,int kind)
+{
+    int raw=level+1;
+    Db80563D3C_Six map=lbl_805FF88C;
+    Unk8007A4DC_Screen* sc=(Unk8007A4DC_Screen*)lbl_8061930C;
+    int k=map.v[kind];
+    int low=1;
+    if(low<raw)low=raw;
+    int n=low;
+    if(n>5)n=5;
+    int young=18;
+    if(young<age)young=age;
+    int a=young;
+    if(a>44)a=44;
+    int adjust=0;
+    int limit;
+    float* curve;
+    signed char* result;
+    if(sc->fn_8007A270(id)) {
+        if(sc->fn_8007A6A0(5,id)==0) {
+            curve=lbl_8060236C[k]; limit=9; result=lbl_8060240C;
+        }else {
+            curve=lbl_80602418[k]; result=lbl_806024B8;
+            if(n<=1)adjust=-1;
+            else if(n>2)adjust=1;
+            limit=4;
+        }
+    }else {
+        curve=lbl_806022C0[k]; limit=12; result=lbl_80602360;
+    }
+    int value=(int)fn_80563BF0(n,a,curve)+adjust;
+    if(value<=limit) {if(value<0)value=0;} else value=limit;
+    int selected=result[value];
+    if(!sc->fn_8007A270(id) && (selected==8 || selected==4))selected++;
+    *out=selected;
+    return out;
+}

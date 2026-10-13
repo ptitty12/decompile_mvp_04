@@ -7,6 +7,8 @@ our C++ game units as they are.
 
 | Function | Unit | Best | What differs | Tried |
 |---|---|---|---|---|
+| fn_8053FCC4 | db/tu_8053E240.cpp | 82/82 exact | Requires canonical C by-value `fn_80329FA0(int,...)`; shared DB header exposes explicit-buffer form used by other TUs, so an isolated declaration change is not ABI-coherent | Exact typed by-value result; blocked pending coherent shared caller migration |
+| fn_8053FE0C | db/tu_8053E240.cpp | 51/51 exact | Same `fn_80329FA0` cross-TU declaration conflict as fn_8053FCC4 | Exact typed by-value result; blocked pending coherent shared caller migration |
 | fn_8027D3E8 | animation/goals/tu_8027C728.cpp | 99/99 insns, 3 differ | the &out pointer of the GetResult part is r4 in retail, r9 here (global-alloc pass 0 picks a reg already used and not preferred by a conflicting pseudo; the source of retail's r4 is unknown) | ~1500 forms (W5), param order, member, pointer local (sweep) |
 | fn_802931D0 | animation/goals/tu_802914C8.cpp | 339/339, 5 differ | only the final `mC = 4`: retail m190 index r9 / the 4 in r0. The index is an index register of the flagged `a` (r0 allowed); giving every SetPairF the cast expression (unflagged pointer) fixes it but loses the alias-based scheduling of the earlier stores; doing it for the last call only changes nothing (gcse merges it with `a`) | `int k4 = 4`, setter/Finish inlines, store order (sweep) |
 | fn_vslot17 (0x802726BC, cCircleChooser) | animation/choosers/tu_80271F14.cpp | 281/281, 6 differ | case 1 only: dead copy `mr r8,r11` and the pi/4 constant's lis get r8/r10 swapped, c2 reloaded through f13 vs f0 | ~1700 orders (W3), not retried |
@@ -322,3 +324,12 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
 - `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.
+- `db/tu_805881E4` `fn_80588A3C` (swarm24, 2 forms): existing 95.69%; 130/130 words, best 30 register/schedule slots. Index-first setup fixes two words, but id/screen/predicate occupy r29/r31/r30 rather than retail r31/r30/r29.
+- `db/tu_805881E4` `fn_8058B048` (swarm27, 5 forms): scratch 144/144 words; held for shared ABI repair. Retail at 8058B1E0 consumes canonical BB28 return in f1, but game provider and member header still declare int; no new conflicting declaration retained.
+- `fe/tu_8043FDC0::fn_80440210`: three countdown forms recover19/19words but swap the two saved induction registers (six words); source restored, batch21.
+- `fe/tu_804F81E0::fn_804FAB88`: six offset/local/inline-accessor forms; best16/16words has correct global half constant and OR4 indexing, five words swap the two offset registers. Restored, batch21.
+- `fe/tu_804F81E0::fn_804F8668`: one explicit-break form shortens to43vs49words; inherited49/49words retains106/bge versus105/bgt bound normalization (99.9%). Restored, batch21.
+- `fe/tu_8043FDC0::fn_80442AA0`: accurate canonical one-argument F198 call gives169vs170words; two-register ABI dataflow is proven at8007F1B0/805A19DC, but exact source is blocked on Claude-owned F198 provider/canonical ABI repair. Incompatible call cast removed; recovery ref codex/swarm21-f198-recovery, batch21.
+- `ealib/tu_803912F8::fn_803923E8`: three ordinary drafts; best111vs112words/97.1%, selection-update factoring and saved-register allocation remain. Restored, batch21.
+- ealib/tu_803BE8BC::fn_803C1B50 (98.29%): eight local/sentinel/zero-chain initialization forms retain constant-register and store scheduling differences; scratch build/root-803C1B50.
+- fe/tu_8044F550::fn_80451028 (99.48%): eight indexed-access/local-condition/helper forms retain six index/base register slots or change branch layout; scratch build/root-80451028.

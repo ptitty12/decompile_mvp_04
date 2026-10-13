@@ -740,3 +740,48 @@ extern "C" DB_OVERLAY void fn_8055F5A0(int x)
     }
     q->D();
 }
+
+extern float lbl_805FF758;
+extern "C" void fn_8007DD38__FP13Unk8007DB74_Aiiii(void*,int,int,int,int);
+extern "C" DB_OVERLAY void fn_8055C504(Unk8007B2B0_Screen* sc,int team,int* ids,int count,int flag)
+{
+    int preferred=0;
+    if(flag) {
+        int idteam=sc->fn_80075948(team);
+        int col=0;
+        do {
+            int id=sc->fn_8007B6F0(idteam,9,(unsigned char)col);
+            if(id) {
+                int i;
+                for(i=0;i<count;i++) {
+                    if(ids[i]==id){preferred=id;break;}
+                }
+                if(preferred)break;
+            }
+            col++;
+        }while(col<=9);
+    }
+    for(int pos=0;pos<=3;pos++) {
+        int selected=preferred;
+        if(pos!=1 && pos!=3) {
+            if(!selected) {
+                int i;
+                for(i=0;i<count;i++) {
+                    if(ids[i] && ((Unk8007A4DC_Screen*)sc)->fn_8007A6A0(6,ids[i])==9){ selected=ids[i];break; }
+                }
+                if(!selected) {
+                    float best=lbl_805FF758;
+                    for(i=0;i<count;i++) {
+                        if(ids[i]) {
+                            float values[4];
+                            fn_8055C444((Unk8007A4DC_Screen*)sc,ids[i],pos,9,values);
+                            float score=values[0]+values[1];
+                            if(score>best || selected==0){ best=score;selected=ids[i]; }
+                        }
+                    }
+                }
+            }
+            fn_8007DD38__FP13Unk8007DB74_Aiiii(sc,team,pos,9,selected);
+        }
+    }
+}
