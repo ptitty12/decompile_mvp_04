@@ -536,6 +536,7 @@ game/tu_800401E4.cpp:
 
 game/tu_80042DBC.cpp:
 	.text       start:0x80042DBC end:0x800437AC
+	.rodata     start:0x805A8DF8 end:0x805A8E00
 
 game/tu_800437AC.cpp:
 	.text       start:0x800437AC end:0x80044C10

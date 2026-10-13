@@ -16,7 +16,7 @@ extern int lbl_805B1CAC[][3];
 extern int lbl_805B1D1C[];
 extern int* lbl_8061B9C4;
 
-int fn_803445A0(void* p);
+int fn_803445A0(int* p);
 
 int fn_80042DBC(float f)
 {
@@ -279,7 +279,7 @@ int fn_800433CC(Unk800433CC_Obj* o)
 {
     int r = 0;
     Unk800433CC_Outer* p = o->m130->m44C->m700;
-    if (fn_803445A0(p->m3A4 + 0x28c) == 7)
+    if (fn_803445A0((int*)(p->m3A4 + 0x28c)) == 7)
         r |= 8;
     else
         r |= 0x10;
