@@ -145,6 +145,132 @@ extern "C" unsigned char* fn_8038C7D4(int a, int b)
     return t;
 }
 
+struct GXColor {
+    unsigned char r, g, b, a;
+};
+struct GXTexSize {
+    unsigned w;
+    unsigned h;
+};
+extern "C" {
+void fn_8042EFA4(int id, int s, int t);
+void fn_8042E24C(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
+void fn_8042E61C(void* tlut, int id);
+void fn_8042E590(void* obj, int id);
+void fn_8042F4C4(int id, GXColor c);
+void fn_8042F628(int id, int a, int b, int c, int d);
+void fn_8042BF50(int n);
+void fn_8042BCD0(int a, int b, int c, int d, int e, int f);
+void fn_8042EE2C(int id, float* m, int scale);
+void fn_8042F1D4(int n);
+void fn_8042F0E8(int a, int b, int c);
+void fn_8042EDC0(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
+void fn_8042F914(int n);
+void fn_8042F778(int a, int b, int c, int d);
+void fn_8042F240(int n);
+void fn_8042F3F4(int a, int b, int c, int d, int e, int f);
+void fn_8042F36C(int a, int b, int c, int d, int e);
+void fn_8042F45C(int a, int b, int c, int d, int e, int f);
+void fn_8042F3B0(int a, int b, int c, int d, int e);
+void fn_8042F5E0(int a, int b, int c);
+void fn_8042F528(int a, int b);
+}
+#define F0 0.0f
+#define K 0.0625f
+
+/* near-miss (99.96%): same 420 instructions; only the frame size (0x88 vs 0x78) and the conv-temp displacement differ: retail
+   has 16 more bytes of locals between cb and the unsigned->float temp (an unused local array or spill slots; none of the
+   spellings tried reproduces a slot there). GX calls are fn_ names (no SDK names in symbols.txt yet). */
+extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
+{
+    GXColor kt;
+    GXColor ca = { 0xff, 0xff, 0, 0 };
+    GXColor cb = { 0, 0xff, 0xff, 0 };
+    GXTexSize* p1 = (GXTexSize*)s->m604;
+    char* p0 = (char*)s->m600;
+    float m[6];
+    fn_8042EFA4(0, 0, 0);
+    fn_8042EFA4(1, 0, 0);
+    fn_8042EFA4(2, 0, 0);
+    fn_8042EFA4(3, 0, 0);
+    fn_8042E24C(t3, 0, 0, F0, F0, F0, 0, 0, 0);
+    fn_8042E24C(t2, 0, 0, F0, F0, F0, 0, 0, 0);
+    fn_8042E24C(t1, 0, 0, F0, F0, F0, 0, 0, 0);
+    fn_8042E61C((char*)s + 0x620, 0);
+    fn_8042E61C((char*)s + 0x614, 1);
+    fn_8042E61C((char*)s + 0x608, 2);
+    fn_8042E590(t3, 0);
+    fn_8042E590(t2, 1);
+    fn_8042E590(t1, 2);
+    fn_8042E590((char*)p1 + 0x14, 3);
+    fn_8042E590((char*)p1 + 0x40, 4);
+    fn_8042E590(p0 + 0x14, 5);
+    fn_8042E590(p0 + 0x40, 6);
+    kt = ca;
+    fn_8042F4C4(0, kt);
+    kt = cb;
+    fn_8042F4C4(1, kt);
+    fn_8042F628(1, 3, 0, 0, 0);
+    fn_8042F628(2, 1, 3, 1, 1);
+    fn_8042BF50(2);
+    fn_8042BCD0(0, 1, 0xc, 0x3c, 0, 0x7d);
+    fn_8042BCD0(1, 1, 0xc, 0x3c, 0, 0x7d);
+    m[0] = (float)(unsigned)p1->w * K;
+    m[1] = F0;
+    m[4] = (float)(unsigned)p1->h * K;
+    m[3] = F0;
+    m[2] = F0;
+    m[5] = F0;
+    fn_8042EE2C(1, m, 4);
+    m[0] = K;
+    m[4] = K;
+    m[1] = F0;
+    m[3] = F0;
+    m[2] = F0;
+    m[5] = F0;
+    fn_8042EE2C(2, m, 4);
+    fn_8042F1D4(4);
+    fn_8042F0E8(0, 0, 3);
+    fn_8042EDC0(0, 0, 0, 0, 1, 6, 6, 0, 0, 0);
+    fn_8042F0E8(1, 0, 4);
+    fn_8042EDC0(1, 1, 0, 2, 2, 6, 0, 1, 0, 0);
+    fn_8042F0E8(2, 1, 5);
+    fn_8042EDC0(3, 2, 0, 0, 1, 6, 6, 0, 0, 0);
+    fn_8042F0E8(3, 1, 6);
+    fn_8042EDC0(4, 3, 0, 2, 2, 6, 0, 1, 0, 0);
+    fn_8042F914(5);
+    fn_8042F778(0, 0, 0, 0xff);
+    fn_8042F778(1, 0, 0, 0xff);
+    fn_8042F240(2);
+    fn_8042F778(2, 0, 1, 0xff);
+    fn_8042F778(3, 1, 2, 0xff);
+    fn_8042F778(4, 1, 2, 0xff);
+    fn_8042F3F4(0, 0, 0, 0, 1, 0);
+    fn_8042F36C(0, 0xf, 0xf, 0xf, 0xf);
+    fn_8042F45C(0, 0, 0, 0, 1, 0);
+    fn_8042F3B0(0, 7, 7, 7, 7);
+    fn_8042F3F4(1, 0, 0, 0, 1, 0);
+    fn_8042F36C(1, 0xf, 8, 0xe, 0xf);
+    fn_8042F45C(1, 0, 0, 0, 1, 0);
+    fn_8042F3B0(1, 7, 7, 7, 7);
+    fn_8042F5E0(1, 1, 2);
+    fn_8042F528(1, 0xd);
+    fn_8042F3F4(2, 0, 2, 1, 0, 0);
+    fn_8042F36C(2, 0xf, 8, 0xe, 0);
+    fn_8042F45C(2, 0, 0, 0, 1, 0);
+    fn_8042F3B0(2, 7, 7, 7, 7);
+    fn_8042F5E0(2, 1, 1);
+    fn_8042F528(2, 0xc);
+    fn_8042F3F4(3, 0, 0, 0, 0, 0);
+    fn_8042F36C(3, 0xf, 0xf, 0xf, 0);
+    fn_8042F45C(3, 0, 0, 0, 1, 0);
+    fn_8042F3B0(3, 7, 7, 7, 7);
+    fn_8042F3F4(4, 0, 0, 0, 1, 0);
+    fn_8042F36C(4, 8, 0xf, 0xf, 0);
+    fn_8042F45C(4, 0, 0, 0, 1, 0);
+    fn_8042F3B0(4, 7, 7, 7, 4);
+}
+
 extern "C" void fn_8038D02C(VdTile* t, unsigned a, unsigned b, unsigned c, unsigned d)
 {
     t->m0 = a;
