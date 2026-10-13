@@ -131,7 +131,7 @@ FE_OVERLAY void fn_804644D8(FeScrF* x)
 {
     unsigned short buf[0x34];
     if (x->m140 <= 6) {
-        fn_80403DE4(buf, ((unsigned short* (*)(Unk80090880*, int))fn_80090880)((Unk80090880*)lbl_8061977C, 0x419E), x->m140, 6);
+        fn_80403DE4(buf, (unsigned short*)fn_80090880((Unk80090880*)lbl_8061977C, 0x419E), x->m140, 6);
         ((FeW*)x->m13C)->fn_vslot28((const char*)buf);
         ((FeWV*)x->m138)->s101(0, 1);
         ((FeWV*)x->m138)->s101(2, 1);
