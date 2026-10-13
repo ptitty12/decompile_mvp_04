@@ -16,6 +16,8 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+extern const char lbl_805F4F20[];
+typedef int (*FeFnOIII)(FeW*, int, int, int);
 extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* g, int a);
 struct Unk8007A4DC_Screen {
     void fn_8007A700(int a, int b, char* out);
@@ -447,6 +449,44 @@ FE_OVERLAY void fn_804A4B88(FeW* x, FeW* w, int d)
         fn_804A560C(x);
     }
     FeI(x, 0x24C) = 0;
+}
+
+FE_OVERLAY void fn_804A4C74(FeW* x, int a)
+{
+    if (a == 0) {
+        void* nav = fn_800B7A94(FeGetMgr(), lbl_805F4F84);
+        FeW* pop = (FeW*)fn_800B7AB8(FeGetMgr(), lbl_805F4F20);
+        fn_8001BC4C()->fn_8001BDAC(0x9D);
+        if (FeI(FeMem(x, 0x21C), 0x24) < 0) {
+            ((FeWR*)FeMem(x, 0x21C))->s84(2, 0);
+            ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x1A2F, 0);
+            FeMem(x, 0x21C)->fn_vslot8(0);
+            FeMem(x, 0x220)->fn_vslot16(1);
+            FeMem(x, 0x224)->fn_vslot16(1);
+            fn_804A763C(pop, 0);
+            return;
+        }
+        if (FeI(x, 0x210) == 1) {
+            int id = fn_8007E1F8__FP13Unk8007DB74_A(lbl_8061930C, FeI(x, 0x13C));
+            FeList* l = (FeList*)FeMem(x, 0x21C);
+            fn_80126CF4(l, l->m164, id, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+            ((FeWR*)FeMem(x, 0x21C))->s84(1, 0);
+            FeMem(x, 0x21C)->fn_vslot8(1);
+        } else {
+            void* g = lbl_8061930C;
+            int u = FeI(x, 0x13C);
+            int v = FeI(x, 0x214);
+            int id = fn_8007DF5C__FP13Unk8007DB74_Aiii(g, u, v, ((FeWI*)FeMem(x, 0x220))->s60());
+            FeList* l = (FeList*)FeMem(x, 0x21C);
+            fn_80126CF4(l, l->m164, id, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+            ((FeWR*)FeMem(x, 0x21C))->s84(1, 0);
+            FeMem(x, 0x21C)->fn_vslot8(1);
+            FeMem(x, 0x220)->fn_vslot16(0);
+        }
+        FeMem(x, 0x224)->fn_vslot16(0);
+        ((int (*)(void*, int, int, int))fn_801251CC)(nav, 3, 0x37A2, 0);
+        fn_804A763C(pop, 1);
+    }
 }
 
 FE_OVERLAY int fn_804A4F98(FeW* x, FeW* w, int a, int k)
