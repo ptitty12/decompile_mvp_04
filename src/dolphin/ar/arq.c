@@ -39,7 +39,7 @@ void fn_80417554(ARQRequest* request, u32 owner, u32 type, u32 priority, u32 sou
 void fn_804176B0(ARQRequest* request);
 
 /* __ARQPopTaskQueueHi */
-static void __ARQPopTaskQueueHi(void)
+static inline void __ARQPopTaskQueueHi(void)
 {
     if (lbl_806EF4F8) {
         if (lbl_806EF4F8->type == ARQ_TYPE_MRAM_TO_ARAM) {
