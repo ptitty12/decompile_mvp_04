@@ -742,17 +742,16 @@ DB_OVERLAY int fn_80541CAC(Db8053E240_Ent12* e, int n)
     return c;
 }
 
-/* near-miss: 2 slots; retail returns the selected parameter slot without spilling the selection */
 DB_OVERLAY float fn_80541CDC(float a, float b, float c, float d, float e)
 {
-    float r;
+    struct { float value; } result;
     if (a == lbl_805FEEE4)
-        r = c;
+        result.value = c;
     else if (!(a > lbl_805FEEE8))
-        r = e;
+        result.value = e;
     else
-        r = d;
-    return r * b;
+        result.value = d;
+    return result.value * b;
 }
 
 DB_OVERLAY float fn_80541D3C(int a, int b, float base)

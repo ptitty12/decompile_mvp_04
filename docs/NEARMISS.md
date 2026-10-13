@@ -351,3 +351,10 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `fe/tu_8043FDC0` `fn_80440210`: 97.89474%, 19/19 instructions after six bounded countdown forms; the count and one-based index occupy r31/r30 instead of retail r30/r31; failed drafts kept in scratch only.
 - 2026-10-13 | db/tu_80565FD4 fn_805697A0 | Eight ordinary C forms; best 121/121 words, one cmpw uses copied limit r21 instead of input r30; date copy and call stream exact. Scratch build/swarm32, source restored.
+- `ealib/tu_803DE414` `fn_803DFB48` (swarm36, eight forms): scratch 99.52%, 25/25 words; best two adjacent final stores remain reversed after ordinary saved-value and independent tail-store ordering forms. Scratch SW02/build/swarm36.
+
+- `ealib/tu_803E2248` `fn_803E2248`: 97.120255%, 158/158 instructions after eight bounded ordinary C drafts; canonical owner/virtual-device and allocation/constructor bindings recover control flow, while four FPR colors and draw-argument scheduling differ; failed code stays in scratch.
+- ealib/tu_803927E4::fn_80393F64 (99.8% inherited): eight ordinary result initialization/counter/lifetime forms retain two parameter-register words; scratch build/root38/3F64, source restored.
+- 2026-10-13 | ealib/tu_803CECA4 fn_803D1C78 | Eight ordinary C forms; best 119/119 words, float period/offset register allocation and shared index byte-offset register remain. Scratch build/swarm39, source restored.
+- 2026-10-13 | ealib/tu_803CECA4 fn_803CF77C | Exact 123/123 draft blocked on Claude-owned game fn_80363108/current CF77C declaration omitting both float inputs; 88 literal refs zero mismatches/unresolved. Draft build/swarm39/803CECA4-F77C-exact.cpp only, source restored.
+- 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
