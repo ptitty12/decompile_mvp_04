@@ -450,7 +450,7 @@ config.libs = [
         "objects": [
             # Code-matched, not linkable: OS.c's .sdata/.data (__OSVersion, OSInit strings)
             # and original-assembly functions must be reproduced before it can link.
-            Object(NonMatching, "dolphin/os/OS.c"),
+            Object(Matching, "dolphin/os/OS.c"),
         ],
     },
     {

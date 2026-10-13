@@ -5,8 +5,10 @@
  */
 
 void OSReport(const char* msg, ...);
+/* Existing four-byte format object in retail small data. */
+extern char lbl_806EF2C4[4];
 
 void OSRegisterVersion(const char* id)
 {
-    OSReport("%s\n", id);
+    OSReport(lbl_806EF2C4, id);
 }
