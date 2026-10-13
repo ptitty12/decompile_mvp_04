@@ -49,10 +49,11 @@ struct Vp6HEnt {
     unsigned char m8;
 };
 
+union Vp6HuffTag { Vp6HW bits; unsigned word; };
 struct Vp6Link {
     int next;
     int key;
-    int pad;
+    Vp6HuffTag tag; /* +8, child word and packed representation. */
 };
 
 extern unsigned char lbl_8069C140[];
@@ -547,6 +548,45 @@ void fn_8039F5CC(Vp6Link* t, int idx, int* head)
     } else {
         t[prev].next = idx;
         t[idx].next = cur;
+    }
+}
+
+void fn_8039F654(Vp6HEnt* tree, int* weights, int n)
+{
+    Vp6Link nodes[64];
+    int newIndex = 0;
+    int head = newIndex;
+    int outIndex = n - 1;
+    int i;
+    i = 0;
+    if (newIndex < n) {
+      for (; i < n; i++) {
+        nodes[i].tag.bits.leaf = 1;
+        nodes[i].tag.bits.idx = i;
+        if (weights[i] == 0) weights[i] = 1;
+        nodes[i].key = weights[i];
+        nodes[i].next = -1;
+      }
+    }
+    newIndex = n;
+    for (i = 1; i < n; i++) {
+        fn_8039F5CC(nodes, i, &head);
+    }
+    while (nodes[head].next != -1) {
+        int first = head;
+        int second = nodes[first].next;
+        int sum = nodes[first].key + nodes[second].key;
+        --outIndex;
+        *(unsigned*)&tree[outIndex].w[0] = nodes[first].tag.word;
+        *(unsigned*)&tree[outIndex].w[1] = nodes[second].tag.word;
+        tree[outIndex].m8 = (nodes[first].key << 8) / sum;
+        nodes[newIndex].tag.bits.leaf = 0;
+        nodes[newIndex].tag.bits.idx = outIndex;
+        nodes[newIndex].key = sum;
+        nodes[newIndex].next = -1;
+        head = nodes[second].next;
+        fn_8039F5CC(nodes, newIndex, &head);
+        newIndex++;
     }
 }
 
