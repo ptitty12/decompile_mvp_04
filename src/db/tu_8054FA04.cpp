@@ -166,7 +166,7 @@ inline int Db805542F0_At(int* a, int i)
 extern float lbl_805FF3B0;
 extern float lbl_80602590[];
 
-extern unsigned char lbl_806025A0[];
+extern unsigned char lbl_806025A0[][9];
 extern float lbl_805FF3C0;
 /* forward declarations (definitions are in address order) */
 extern "C" int fn_80550E68(int a);
@@ -337,7 +337,6 @@ extern "C" DB_OVERLAY int fn_805513E0(int a, int p2, int b)
     return base;
 }
 
-/* near-miss: 7 slots, retail forms (table + 9/0x12/0x1B) in a register and indexes it; ours folds idx + K into the index */
 extern "C" DB_OVERLAY int fn_8055150C(int flag, int a, int p, int c, int d, float f)
 {
     int idx = c / 20;
@@ -356,17 +355,17 @@ extern "C" DB_OVERLAY int fn_8055150C(int flag, int a, int p, int c, int d, floa
         break;
     }
     if (flag != 0) {
-        if (a < lbl_806025A0[idx])
+        if (a < lbl_806025A0[0][idx])
             base += 1;
-    } else if (a >= lbl_806025A0[9 + idx]) {
+    } else if (a >= lbl_806025A0[1][idx]) {
         base += 1;
-    } else if (a >= lbl_806025A0[0x12 + idx]) {
+    } else if (a >= lbl_806025A0[2][idx]) {
         base += 2;
     } else if (!(f < lbl_805FF3C0)) {
         base += 3;
     } else {
         base += 4;
-        int v = lbl_806025A0[0x1B + idx];
+        int v = lbl_806025A0[3][idx];
         if (!(d > v)) {
             if (d > (int)((unsigned)v >> 1))
                 base += 1;
