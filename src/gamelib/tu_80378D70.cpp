@@ -281,16 +281,38 @@ Unk80379324::Unk80379324(const Unk80379324& o)
     *this = o;
 }
 
-/* fn_8037936C (0x28 bytes) is a second, identical Vec4 copy ctor of another class;
- * it stays unmatched here: other units reference its fn_ name, so a real ctor
- * (which the "mr r9,r3" copy needs) would have to rename it. */
-
 Unk80379324::Unk80379324(float a, float b, float c, float d)
 {
     x = a;
     y = b;
     z = c;
     w = d;
+}
+
+extern "C" int fn_803791BC(const char* s, int max)
+{
+    int v = 0;
+    const char* end = s + 0x1E;
+    int c = *s;
+    if (max != 0)
+        end = s + max;
+    while ((unsigned)(c - '0') > 9 && (unsigned)(c - 'A') > 5 && (unsigned)(c - 'a') > 5 && c != 0 && s < end)
+        c = *++s;
+    int seen = 0;
+    while (s < end) {
+        if ((unsigned)(c - '0') <= 9)
+            { v *= 16; v += c - 0x30; }
+        else if ((unsigned)(c - 'a') <= 5)
+            { v *= 16; v += c - 0x57; }
+        else if ((unsigned)(c - 'A') <= 5)
+            { v *= 16; v += c - 0x37; }
+        else if (c == 'x' && v == 0 && seen == 0)
+            seen = 1;
+        else
+            break;
+        c = *++s;
+    }
+    return v;
 }
 
 extern "C" void fn_803792AC(unsigned char** pp, unsigned* len)
@@ -320,6 +342,16 @@ extern "C" void fn_803792AC(unsigned char** pp, unsigned* len)
         *len = 0;
 }
 
+struct Unk8037936C_Quat {
+    float x, y, z, w;
+};
+
+extern "C" Unk8037936C_Quat* fn_8037936C(Unk8037936C_Quat* self, const Unk8037936C_Quat* o)
+{
+    *self = *o;
+    return self;
+}
+
 extern "C" Unk803793D4_Vec4 fn_803793D4(float w, const Unk80379324_Vec3* v)
 {
     Unk803793D4_Vec4 u;
@@ -347,6 +379,167 @@ extern "C" int fn_803794DC(int n)
     return 1;
 }
 
+inline Unk80379324_Vec3 fn_80379530_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float fn_80379530_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline float fn_80379530_Len(const Unk80379324_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+inline void fn_80379530_Mul(Unk80379324_Vec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+inline Unk80379324_Vec3 fn_80379530_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_80379530_Add(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+extern "C" Unk80379324_Vec3* fn_80379530(Unk80379324_Vec3* out, const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* p, float* tOut, float t0, float t1)
+{
+    Unk80379324_Vec3 dir = fn_80379530_Sub(*b, *a);
+    float len = fn_80379530_Len(dir);
+    float inv = 1.0f / len;
+    fn_80379530_Mul(dir, inv);
+    Unk80379324_Vec3 ap = fn_80379530_Sub(*p, *a);
+    float proj = fn_80379530_Dot(ap, dir);
+    if (!(proj >= 0.0f)) {
+        if (tOut)
+            *tOut = t0;
+        *out = *a;
+    } else if (!(proj > len)) {
+        if (tOut)
+            *tOut = (t1 - t0) * proj * inv + t0;
+        new (out) Unk80379324_Vec3(fn_80379530_Add(*a, fn_80379530_Scale(dir, proj)));
+    } else {
+        if (tOut)
+            *tOut = t1;
+        *out = *b;
+    }
+    return out;
+}
+
+/* Plane (normal, distance) as read by fn_803797AC; AddV/ScaleV take their vector by value, which gives retail's temp slots. */
+struct fn_803797AC_Plane {
+    float x, y, z, w;
+};
+
+inline Unk80379324_Vec3 fn_803797AC_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_AddV(const Unk80379324_Vec3& a, Unk80379324_Vec3 b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_ScaleV(Unk80379324_Vec3 v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_803797AC_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline float fn_803797AC_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+inline float fn_803797AC_Abs(float x)
+{
+    return __builtin_fabs(x);
+}
+
+inline float fn_803797AC_Sgn(float v)
+{
+    if (!(v <= 0.0f))
+        return 1.0f;
+    if (!(v >= 0.0f))
+        return -1.0f;
+    return 0.0f;
+}
+
+extern "C" int fn_803797AC(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const fn_803797AC_Plane* pl, Unk80379324_Vec3* out, float* tOut, float t0, float t1)
+{
+    const Unk80379324_Vec3* n = (const Unk80379324_Vec3*)pl;
+    Unk80379324_Vec3 p = fn_803797AC_Scale(*n, pl->w);
+    float da;
+    {
+        Unk80379324_Vec3 va = fn_803797AC_Sub(*a, p);
+        da = fn_803797AC_Dot(va, *n);
+    }
+    float db;
+    {
+        Unk80379324_Vec3 vb = fn_803797AC_Sub(*b, p);
+        db = fn_803797AC_Dot(vb, *n);
+    }
+    if (fn_803797AC_Sgn(da) != fn_803797AC_Sgn(db)) {
+        float t = -da / (db - da);
+        Unk80379324_Vec3 hit = fn_803797AC_AddV(*a, fn_803797AC_ScaleV(fn_803797AC_Sub(*b, *a), t));
+        *out = hit;
+        if (tOut)
+            *tOut = (t1 - t0) * t + t0;
+        return 1;
+    } else if (!(fn_803797AC_Abs(da) >= fn_803797AC_Abs(db))) {
+        *out = *a;
+        if (tOut)
+            *tOut = t0;
+    } else {
+        *out = *b;
+        if (tOut)
+            *tOut = t1;
+    }
+    return 0;
+}
+
 extern "C" float fn_80379AF4(const Unk80379324* a, const Unk80379324* b)
 {
     float r = a->x * b->x + a->y * b->y + a->z * b->z - b->w;
@@ -357,7 +550,7 @@ struct fn_80379C80_Plane {
     float x, y, z, w;
 };
 
-extern "C" void fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n);
+extern "C" fn_80379C80_Plane* fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n);
 
 inline Unk80379324_Vec3 fn_80379C80_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
 {
@@ -377,6 +570,44 @@ inline Unk80379324_Vec3 fn_80379C80_Cross(const Unk80379324_Vec3& a, const Unk80
     return r;
 }
 
+inline Unk80379324_Vec3 fn_80379B34_Norm(const Unk80379324_Vec3& v, float len)
+{
+    Unk80379324_Vec3 r;
+    float inv = 1.0f / len;
+    r.x = v.x * inv;
+    r.y = v.y * inv;
+    r.z = v.z * inv;
+    return r;
+}
+
+inline Unk80379324_Vec3 fn_80379B34_NormD(const Unk80379324_Vec3& v)
+{
+    float len = fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (len != 0.0f)
+        return fn_80379B34_Norm(v, len);
+    return lbl_806055AC;
+}
+
+inline float fn_80379B34_Dot(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
+
+struct fn_80379B34_Pl {
+    Unk80379324_Vec3 n;
+    float d;
+};
+
+extern "C" fn_80379C80_Plane* fn_80379B34(fn_80379C80_Plane* out, const Unk80379324_Vec3* p, const Unk80379324_Vec3* n)
+{
+    fn_80379B34_Pl pl;
+    Unk80379324_Vec3 nn = fn_80379B34_NormD(*n);
+    pl.n = nn;
+    pl.d = fn_80379B34_Dot(*p, pl.n);
+    *(fn_80379B34_Pl*)out = pl;
+    return out;
+}
+
 extern "C" fn_80379C80_Plane* fn_80379C80(fn_80379C80_Plane* out, const Unk80379324_Vec3* p0, const Unk80379324_Vec3* p1, const Unk80379324_Vec3* p2)
 {
     Unk80379324_Vec3 a = fn_80379C80_Sub(*p1, *p0);
@@ -384,6 +615,28 @@ extern "C" fn_80379C80_Plane* fn_80379C80(fn_80379C80_Plane* out, const Unk80379
     Unk80379324_Vec3 c = fn_80379C80_Cross(a, b);
     fn_80379B34(out, p0, &c);
     return out;
+}
+
+/* Quaternion returned by value; its copy constructor is fn_8037936C (a second Vec4 copy ctor). */
+struct Unk80379DA0_Quat {
+    float x, y, z, w;
+    Unk80379DA0_Quat(const Unk80379DA0_Quat& o);
+};
+
+inline Unk80379324_Vec3 fn_80379DA0_Scale(const Unk80379324_Vec3& v, float s)
+{
+    Unk80379324_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+/* near-miss (97.9%): same instructions except the order of `fmr f1,f31` and `mr r3,r30` before the fn_803793D4 call (retail loads the return-slot pointer last, as in fn_8037B310). */
+extern "C" Unk80379DA0_Quat fn_80379DA0(const Unk80379324_Vec3* axis, float angle)
+{
+    Unk803793D4_Vec4 t = fn_803793D4(fn_80411554(angle * 0.5f), &(const Unk80379324_Vec3&)fn_80379DA0_Scale(fn_80379B34_NormD(*axis), fn_8041171C(angle * 0.5f)));
+    return *(Unk80379DA0_Quat*)&t;
 }
 
 extern "C" float fn_80379F1C(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b, const Unk80379324_Vec3* c, Unk80379324_Vec3* out)
@@ -439,6 +692,110 @@ struct Unk8037B10C_Obj {
     float m34;
     float m38;
 };
+
+inline Unk80379324_Vec3 fn_8037AF10_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline void fn_8037AF10_Mul(Unk80379324_Vec3& v, float s)
+{
+    v.x *= s;
+    v.y *= s;
+    v.z *= s;
+}
+
+inline void fn_8037AF10_SubEq(Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    a.x -= b.x;
+    a.y -= b.y;
+    a.z -= b.z;
+}
+
+inline Unk80379324_Vec3 fn_8037AC20_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" float fn_8037AC20(const Unk80379324_Vec3* p, const Unk80379324_Vec3* s0, const Unk80379324_Vec3* s1, int sq, int* out)
+{
+    Unk80379324_Vec3 v1 = fn_8037AC20_Sub(*p, *s0);
+    Unk80379324_Vec3 v2 = fn_8037AC20_Sub(*s1, *s0);
+    float r;
+    float dot;
+    float l2;
+    dot = v1.x * v2.x + v1.z * v2.z;
+    if (!(dot > 0.0f)) {
+        r = v1.x * v1.x + v1.z * v1.z;
+        if (sq == 0)
+            r = fn_804028E4(r);
+        if (out)
+            *out = 0;
+    } else {
+        l2 = v2.x * v2.x + v2.z * v2.z;
+        if (!(dot < l2)) {
+            v1 = fn_8037AC20_Sub(*p, *s1);
+            r = v1.x * v1.x + v1.z * v1.z;
+            if (sq == 0)
+                r = fn_804028E4(r);
+            if (out)
+                *out = 0;
+        } else {
+            Unk80379324_Vec3 n;
+            n.y = 0.0f;
+            n.z = -v2.x;
+            n.x = v2.z;
+            Unk80379324_Vec3 nn = fn_80379B34_NormD(n);
+            n = nn;
+            r = n.x * v1.x + n.z * v1.z;
+            if (sq)
+                r = r * r;
+            else if (!(r >= 0.0f))
+                r = -r;
+            if (out)
+                *out = 1;
+        }
+    }
+    return r;
+}
+
+extern "C" float fn_8037AF10(const Unk80379324_Vec3* p, const Unk80379324_Vec3* s0, const Unk80379324_Vec3* s1, int sq, int* out)
+{
+    Unk80379324_Vec3 v1 = fn_8037AF10_Sub(*p, *s0);
+    Unk80379324_Vec3 v2 = fn_8037AF10_Sub(*s1, *s0);
+    float r;
+    float dot;
+    float l2;
+    dot = v1.y * v2.y + (v1.x * v2.x + v1.z * v2.z);
+    if (!(dot > 0.0f)) {
+        if (out)
+            *out = 0;
+    } else {
+        l2 = v2.z * v2.z + (v2.x * v2.x + v2.y * v2.y);
+        if (!(dot < l2)) {
+            v1 = fn_8037AF10_Sub(*p, *s1);
+            if (out)
+                *out = 0;
+        } else {
+            fn_8037AF10_Mul(v2, dot / l2);
+            fn_8037AF10_SubEq(v1, v2);
+            if (out)
+                *out = 1;
+        }
+    }
+    r = v1.z * v1.z + (v1.x * v1.x + v1.y * v1.y);
+    if (sq == 0)
+        r = fn_804028E4(r);
+    return r;
+}
 
 extern "C" void fn_8037B10C(Unk8037B10C_Obj* m, const Unk80379324_Vec3* v)
 {

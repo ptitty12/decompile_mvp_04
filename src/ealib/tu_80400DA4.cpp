@@ -218,6 +218,37 @@ extern "C" int fn_80401644(const unsigned char* p, int* outLen)
 
 extern "C" int fn_80401710(const unsigned char* p, int a);
 
+extern "C" int fn_80401924(unsigned char* dst, const unsigned char* src, int* outLen);
+
+extern "C" int fn_80401710(const unsigned char* p, int a)
+{
+    int r = 0;
+    if (p[1] == 0xFB) {
+        switch (p[0] & 0xFE) {
+        case 0x10:
+        case 0x90:
+            r = fn_80401924((unsigned char*)a, p, 0);
+            break;
+        case 0x18:
+        case 0x1A:
+        case 0x1C:
+        case 0x30:
+        case 0x32:
+        case 0x34:
+        case 0x46:
+        case 0x98:
+        case 0x9A:
+        case 0x9E:
+        case 0xB0:
+        case 0xB2:
+        case 0xB4:
+        case 0xC6:
+            break;
+        }
+    }
+    return r;
+}
+
 extern "C" int fn_804017B0(const unsigned char* p, int a)
 {
     return fn_80401710(p, a);
@@ -267,6 +298,42 @@ extern "C" int fn_80401904(const unsigned char* p)
 extern "C" int fn_80401BBC(int a, int b)
 {
     return (int)(((long long)a * b + 0x8000) >> 16);
+}
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80402970(const float* a, float* s, float* c);
+
+extern "C" void fn_80401BFC(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, float angle)
+{
+    float s;
+    float c;
+    float a;
+    fn_80402970(&angle, &s, &c);
+    a = in->m00;
+    out->m00 = a * c + in->m02 * s;
+    out->m01 = in->m01;
+    out->m02 = in->m02 * c - a * s;
+    out->m03 = in->m03;
+    a = in->m10;
+    out->m10 = a * c + in->m12 * s;
+    out->m11 = in->m11;
+    out->m12 = in->m12 * c - a * s;
+    out->m13 = in->m13;
+    a = in->m20;
+    out->m20 = a * c + in->m22 * s;
+    out->m21 = in->m21;
+    out->m22 = in->m22 * c - a * s;
+    out->m23 = in->m23;
+    a = in->m30;
+    out->m30 = a * c + in->m32 * s;
+    out->m31 = in->m31;
+    out->m32 = in->m32 * c - a * s;
+    out->m33 = in->m33;
 }
 
 extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
