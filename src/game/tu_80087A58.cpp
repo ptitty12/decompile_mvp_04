@@ -782,6 +782,17 @@ struct Unk8008882C_Self {
 extern "C" unsigned char fn_800968C0(void* o, int key, int flag);
 Unk80087A58_Pair* fn_8008903C(Unk80087A58_Pair* out, O* o, int i);
 extern float lbl_805B47E8;
+extern float lbl_805B482C;
+extern float lbl_805B4830;
+extern float lbl_805B4834;
+extern float lbl_805B4838;
+extern float lbl_805B483C;
+extern const char lbl_805B47F8[];
+extern const char lbl_805B4810[];
+extern "C" int fn_80353D90(void* p);
+extern "C" float fn_804028E4(float v);
+extern "C" void fn_80303CA0(const char* fmt, ...);
+extern "C" int fn_801A2034__FP17Unk8019F8C0_Owneri(void* o, int v);
 extern "C" int fn_8008CFD8(void* p, int a, int b);
 
 inline int Mth88664(Unk8008882C_Self* s, int k, int side, int k2)
@@ -837,6 +848,64 @@ int fn_8008882C(Unk8008882C_Self* s, int k, int side, int k2)
     if (d == 2)
         d = c == 0;
     return d == 1;
+}
+
+/* near-miss: only the two argument moves of the variadic fn_8008903C calls are swapped (retail: mr r3,<&local> before mr r4,o) */
+extern "C" void fn_800888F4(O* o)
+{
+    o->m174C = 0;
+    Unk80087A58_X* x = fn_80087B14();
+    if (x != 0) {
+        unsigned n = fn_80353D9C(o);
+        int side = ((Unk80087A58_X*(*)(O*))fn_80089798)(o)->m6F8->m14->m1CD0 == 0;
+        if (fn_80353D90(o) <= 0x257) {
+            int k0 = fn_80088FFC(o, -1);
+            Unk80087A58_V2 p0;
+            ((Unk80087A58_V2*(*)(Unk80087A58_V2*, O*, ...))fn_8008903C)(&p0, o, -1);
+            int s0 = fn_80088F84(o, -1);
+            if (fn_8008882C((Unk8008882C_Self*)o, s0, side, fn_80088F48(o, -1)))
+                p0.x = -p0.x;
+            int c1 = 0;
+            int c2 = 0;
+            int c3 = 0;
+            int i = n - 2;
+            if (i >= 0) {
+                do {
+                    if (fn_80088EFC(o, i) == side && fn_80088F84(o, i) == s0) {
+                        Unk80087A58_V2 q;
+                        ((Unk80087A58_V2*(*)(Unk80087A58_V2*, O*, ...))fn_8008903C)(&q, o, i);
+                        c1++;
+                        int k = fn_80088FFC(o, i);
+                        int s = fn_80088F84(o, i);
+                        if (fn_8008882C((Unk8008882C_Self*)o, s, side, fn_80088F48(o, i)))
+                            q.x = -q.x;
+                        if (k0 != 3 && k0 == k)
+                            c2++;
+                        Unk80087A58_V2 d;
+                        d.x = p0.x - q.x;
+                        d.y = p0.y - q.y;
+                        Unk80087A58_Pair dd = *(Unk80087A58_Pair*)&d;
+                        float len = fn_804028E4(*(float*)&dd.a * *(float*)&dd.a + *(float*)&dd.b * *(float*)&dd.b);
+                        if (!(len >= lbl_805B482C))
+                            c3++;
+                    }
+                    if (c1 > 10)
+                        break;
+                    i--;
+                } while (i >= 0);
+            }
+            if (fn_801A2034__FP17Unk8019F8C0_Owneri(x, x->m6F8->m14->m1CD0 == 0) != -1) {
+                if (c2 > 7) {
+                    fn_80303CA0(lbl_805B47F8, lbl_805B4830, lbl_805B4834, lbl_805B4838);
+                    o->m174C = 1;
+                }
+                if (c3 > 7) {
+                    fn_80303CA0(lbl_805B4810, lbl_805B4830, lbl_805B4834, lbl_805B483C);
+                    o->m174C = 1;
+                }
+            }
+        }
+    }
 }
 
 float fn_80088E74(O* o)
