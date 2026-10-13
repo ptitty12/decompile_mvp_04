@@ -2509,7 +2509,10 @@ dolphin/gx/tu_80428C64.c:
 	.text       start:0x80428C64 end:0x80428F14
 
 dolphin/gx/tu_80428F14.c:
-	.text       start:0x80428F14 end:0x8042AB48
+	.text       start:0x80428F14 end:0x80429FF0
+
+dolphin/gx/GXFifo.c:
+	.text       start:0x80429FF0 end:0x8042AB48
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8042AB48 end:0x8042BF8C

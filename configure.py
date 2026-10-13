@@ -1280,7 +1280,8 @@ config.libs = [
             Object(Matching, "dolphin/dsp/dsp_debug.c"),
             Object(Matching, "dolphin/dsp/dsp_task.c"),
             Object(Matching, "dolphin/gx/tu_80428C64.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),  # GXInit.c head (docs/DECISIONS.md 2026-10-12)
-            Object(NonMatching, "dolphin/gx/tu_80428F14.c"),
+            Object(NonMatching, "dolphin/gx/tu_80428F14.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),  # GXInit.c tail (docs/DECISIONS.md 2026-10-13)
+            Object(NonMatching, "dolphin/gx/GXFifo.c"),
             Object(Matching, "dolphin/gx/GXAttr.c"),
             Object(NonMatching, "dolphin/gx/tu_8042BF8C.c"),
             Object(Matching, "dolphin/gx/GXGeometry.c"),
