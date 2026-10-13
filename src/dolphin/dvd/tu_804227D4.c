@@ -172,15 +172,6 @@ DVDDiskID* fn_80425508(void);
 void fn_804254E4(s32 result, DVDCommandBlock* block);
 BOOL fn_80425724(const OSAlarm* alarm);
 
-void fn_804227D4(void) {
-    lbl_806EF640 = (OSBootInfo*)OS_BASE_CACHED;
-    lbl_806EF644 = (FstEntry*)lbl_806EF640->FSTLocation;
-    if (lbl_806EF644) {
-        lbl_806EF64C = lbl_806EF644[0].nextEntryOrLength;
-        lbl_806EF648 = (char*)&lbl_806EF644[lbl_806EF64C];
-    }
-}
-
 /* 80422808 */
 static BOOL isSame(const char* path, const char* string) {
     while (*string != '\0') {
@@ -383,6 +374,26 @@ void fn_804230B0(DVDCommandBlock* block) {
         fn_80433CE8("dvd.c", 0x295, "DVDChangeDisk(): FST in the new disc is too big.   ");
     }
     fn_804263F8(lbl_806EF668->FSTLocation, OSRoundUp32B(BB2.FSTLength), BB2.FSTPosition, fn_80423144);
+}
+
+void fn_80423144(u32 intType) {
+    DVDCommandBlock* finished;
+
+    if (intType == 0x10) {
+        fn_80423270();
+    } else if (intType & 1) {
+        lbl_806EF694 = 0;
+        fn_804227D4();
+        finished = lbl_806EF660;
+        lbl_806EF660 = &lbl_806DE1A0;
+        finished->state = 0;
+        if (finished->callback) {
+            finished->callback(0, finished);
+        }
+        fn_80423F94();
+    } else {
+        fn_804232A4();
+    }
 }
 
 void fn_804231C4(u32 intType) {
@@ -1529,4 +1540,39 @@ BOOL fn_80425724(const OSAlarm* alarm) {
         return TRUE;
     }
     return fn_80426C98(alarm);
+}
+
+void fn_80422FD8(void) {
+    if (lbl_806EF6AC) {
+        return;
+    }
+    OSRegisterVersion(lbl_806EF1A0);
+    lbl_806EF6AC = 1;
+    fn_804227D4();
+    __DVDClearWaitingQueue();
+    fn_80425E54();
+    lbl_806EF668 = (OSBootInfo*)OS_BASE_CACHED;
+    lbl_806EF6A8 = 0;
+    lbl_806EF664 = (DVDDiskID*)OS_BASE_CACHED;
+    __OSSetInterruptHandler(0x15, fn_80425E94);
+    __OSUnmaskInterrupts(0x400);
+    fn_80437434(&lbl_806EF658);
+    __DIRegs[0] = 0x2A;
+    __DIRegs[1] = 0;
+    if (*(u32*)((u8*)lbl_806EF668 + 0x20) == 0xE5207C22) {
+        OSReport("load fst\n");
+        fn_80425CEC();
+    } else if (*(u32*)((u8*)lbl_806EF668 + 0x20) != 0x0D15EA5E) {
+        lbl_806EF6A4 = 1;
+    }
+}
+
+/* kept below its callers on purpose: retail has it in another object, so the compiler must not inline it into fn_80422FD8/fn_80423144 */
+void fn_804227D4(void) {
+    lbl_806EF640 = (OSBootInfo*)OS_BASE_CACHED;
+    lbl_806EF644 = (FstEntry*)lbl_806EF640->FSTLocation;
+    if (lbl_806EF644) {
+        lbl_806EF64C = lbl_806EF644[0].nextEntryOrLength;
+        lbl_806EF648 = (char*)&lbl_806EF644[lbl_806EF64C];
+    }
 }
