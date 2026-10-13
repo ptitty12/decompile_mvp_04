@@ -37,7 +37,8 @@ void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
 void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk802CBD04_Vec3* c);
 void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
 void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
-void fn_802CC748(int e, int a, int b, Unk802CBD04_Vec3* v);
+class Unk802CC608_Obj;
+void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p);
 extern "C" void* fn_8037CF5C(Unk8037C7FC* c, unsigned int hash, void* obj);
 
 class Unk802CBD04_Iface : public Unk802CC53C_Target {
@@ -148,6 +149,70 @@ int fn_802CC580(Unk802CBD04* o, int k, unsigned idx)
     return r;
 }
 
+/* Object with its vptr at +0x98 (slot 6 returns the object whose +0x60 position is used while lbl_806202F8 is 0). */
+class Unk802CC608_Obj {
+public:
+    char pad0[0x60];
+    Unk802CBD04_Vec3 m60;
+    char pad6C[0x98 - 0x6C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual Unk802CC608_Obj* s6();
+};
+extern int lbl_806202F8;
+float fn_804028E4(float x);
+inline Unk802CBD04_Vec3 Unk802CC608_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
+{
+    Unk802CBD04_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk802CC608_Len(const Unk802CBD04_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+void fn_802CC608(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p)
+{
+    if (o != 0) {
+        float d = 0.0f;
+        if (lbl_806202F8 == 0) {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->s6()->m60, *p);
+            d = Unk802CC608_Len(v);
+        } else {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->m60, *p);
+            d = Unk802CC608_Len(v);
+        }
+        if (!(d <= *bestD)) {
+            *best = o;
+            *bestD = d;
+        }
+    }
+}
+
+void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p)
+{
+    if (o != 0) {
+        float d = 0.0f;
+        if (lbl_806202F8 == 0) {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->s6()->m60, *p);
+            d = Unk802CC608_Len(v);
+        } else {
+            Unk802CBD04_Vec3 v = Unk802CC608_Sub(o->m60, *p);
+            d = Unk802CC608_Len(v);
+        }
+        if (!(d >= *bestD)) {
+            *best = o;
+            *bestD = d;
+        }
+    }
+}
+
 void fn_802CC888(Unk802CBD04* o, int idx, int a, int b, Unk802CBD04_Vec3* v)
 {
     int e;
@@ -157,7 +222,7 @@ void fn_802CC888(Unk802CBD04* o, int idx, int a, int b, Unk802CBD04_Vec3* v)
         e = 0;
     }
     Unk802CBD04_Vec3 t = *v;
-    fn_802CC748(e, a, b, &t);
+    fn_802CC748((Unk802CC608_Obj*)e, (Unk802CC608_Obj**)a, (float*)b, &t);
 }
 
 int fn_802CC8EC(Unk802CBD04* o)
