@@ -49,6 +49,28 @@ struct Unk8019DD34_C {
     float m0;
     Unk8019DD34_E e[8];
 };
+struct Unk8019CD04_E {
+    float lo;
+    float hi;
+};
+struct Unk8019CD04_O {
+    float m0[2];
+    char pad8[8];
+    int m10[2];
+    Unk8019CD04_E* m18[2];
+    int m20;
+    float m24;
+    float m28;
+    float m2C;
+    float m30;
+};
+inline int Unk8019CD04_Cell(Unk8019CD04_O* o, int k, float x)
+{
+    float d = x - o->m0[k];
+    if (!(d >= 0.0f))
+        return -1;
+    return (int)(d * 0.008333334f);
+}
 //@BODY
 //@8019C41C
 extern "C" float fn_8019C41C(float x)
@@ -59,9 +81,33 @@ extern "C" float fn_8019C41C(float x)
 }
 
 //@8019CCE4
-extern "C" void fn_8019CCE4(void* o)
+extern "C" void fn_8019CCE4(void* o, const float* a, const float* b)
 {
-    fn_8019CD04(o);
+    fn_8019CD04(o, a, b);
+}
+
+//@8019CD04
+extern "C" int fn_8019CD04(void* op, const float* a, const float* b)
+{
+    Unk8019CD04_O* o = (Unk8019CD04_O*)op;
+    if (o->m20 == 0)
+        return 0;
+    if (!(a[0] <= o->m24 || b[0] <= o->m24 || a[0] >= o->m2C || b[0] >= o->m2C || a[2] <= o->m28 || b[2] <= o->m28 || a[2] >= o->m30 || b[2] >= o->m30))
+        return 1;
+    for (int k = 0; k <= 1; k++) {
+        float a1 = k == 0 ? a[0] : a[2];
+        float b1 = k == 0 ? b[0] : b[2];
+        float a2 = k == 0 ? a[2] : a[0];
+        float b2 = k == 0 ? b[2] : b[0];
+        int ia = Unk8019CD04_Cell(o, k, a1);
+        int ib = Unk8019CD04_Cell(o, k, b1);
+        if (ia < o->m10[k] && ia >= 0 && ia == ib) {
+            Unk8019CD04_E* e = (Unk8019CD04_E*)((ia << 3) + (int)o->m18[k]);
+            if (!(a2 >= e->hi || a2 <= e->lo || b2 >= e->hi) && b2 > e->lo)
+                return 1;
+        }
+    }
+    return 0;
 }
 
 //@8019CF24
