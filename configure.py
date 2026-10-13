@@ -1267,7 +1267,7 @@ config.libs = [
             Object(Matching, "dolphin/card/CARDOpen.c", cflags=cflags_dolphin_dvd),
             Object(Matching, "dolphin/card/CARDCreate.c"),
             Object(NonMatching, "dolphin/card/CARDRead.c"),
-            Object(NonMatching, "dolphin/card/CARDWrite.c"),
+            Object(Matching, "dolphin/card/CARDWrite.c"),
             Object(Matching, "dolphin/card/CARDDelete.c"),
             Object(Matching, "dolphin/card/CARDStat.c"),
             Object(Matching, "dolphin/card/CARDRename.c", cflags=cflags_dolphin_dvd),

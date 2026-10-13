@@ -3,6 +3,16 @@
 
 #include "__card.h"
 
+extern void fn_80433004(void* addr, u32 nBytes); /* DCStoreRange */
+extern OSTime fn_80438628(void); /* OSGetTime */
+extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
+extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
+extern s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback); /* __CARDEraseSector */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
+
+
 // prototypes
 static void fn_8041F430(s32 chan, s32 result);
 static void fn_8041F5A0(s32 chan, s32 result);
@@ -15,7 +25,7 @@ static void fn_8041F430(s32 chan, s32 result) {
     CARDDir* ent;
     CARDFileInfo* fileInfo;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (result >= 0) {
         fileInfo = card->fileInfo;
         if (fileInfo->length < 0) {
@@ -26,7 +36,7 @@ static void fn_8041F430(s32 chan, s32 result) {
         if (fileInfo->length <= 0) {
             dir = __CARDGetDirBlock(card);
             ent = dir + fileInfo->fileNo;
-            ent->time = OSGetTime()/(__OSBusClock/4);
+            ent->time = fn_80438628()/(__OSBusClock/4);
             callback = card->apiCallback;
             card->apiCallback = NULL;
             result = __CARDUpdateDir(chan, callback);
@@ -39,7 +49,7 @@ static void fn_8041F430(s32 chan, s32 result) {
                 result = CARD_RESULT_BROKEN;
                 goto after;
             }
-            result = __CARDEraseSector(chan, card->sectorSize * fileInfo->iBlock, fn_8041F5A0);
+            result = fn_8041B64C(chan, card->sectorSize * fileInfo->iBlock, fn_8041F5A0);
 check:;
             if (result < 0) {
                 goto after;
@@ -49,7 +59,7 @@ check:;
 after:;
         callback = card->apiCallback;
         card->apiCallback = NULL;
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
         ASSERTLINE(0x86, callback);
         callback(chan, result);
     }
@@ -60,7 +70,7 @@ static void fn_8041F5A0(s32 chan, s32 result) {
     CARDCallback callback;
     CARDFileInfo* fileInfo;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (result >= 0) {
         fileInfo = card->fileInfo;
         ASSERTLINE(161, OFFSET(fileInfo->offset, card->sectorSize) == 0);
@@ -72,7 +82,7 @@ static void fn_8041F5A0(s32 chan, s32 result) {
 after:;
         callback = card->apiCallback;
         card->apiCallback = NULL;
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
         ASSERTLINE(175, callback);
         callback(chan, result);
     }
@@ -96,29 +106,29 @@ s32 CARDWriteAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CA
     ASSERTLINE(218, OFFSET(length, card->sectorSize) == 0);
 
     if (OFFSET(offset, card->sectorSize) != 0 || OFFSET(length, card->sectorSize) != 0)
-        return __CARDPutControlBlock(card, CARD_RESULT_FATAL_ERROR);
+        return fn_8041B900(card, CARD_RESULT_FATAL_ERROR);
 
     dir = __CARDGetDirBlock(card);
     ent = &dir[fileInfo->fileNo];
     result = __CARDIsWritable(card, ent);
     if (result < 0)
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
 
-    DCStoreRange((void*)buf, (u32)length);
-    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    fn_80433004((void*)buf, (u32)length);
+    card->apiCallback = callback ? callback : fn_8041A6C4;
     card->buffer = (void*)buf;
 
-    result = __CARDEraseSector(fileInfo->chan, card->sectorSize * (u32)fileInfo->iBlock, fn_8041F5A0);
+    result = fn_8041B64C(fileInfo->chan, card->sectorSize * (u32)fileInfo->iBlock, fn_8041F5A0);
     if (result < 0)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     return result;
 }
 
 s32 CARDWrite(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset) {
-    s32 result = CARDWriteAsync(fileInfo, buf, length, offset, __CARDSyncCallback);
+    s32 result = CARDWriteAsync(fileInfo, buf, length, offset, fn_8041A6C8);
     if (result < 0) {
         return result;
     }
 
-    return __CARDSync(fileInfo->chan);
+    return fn_8041BB38(fileInfo->chan);
 }
