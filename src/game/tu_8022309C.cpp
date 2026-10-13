@@ -325,3 +325,64 @@ void fn_802258FC(Task* t)
 }
 
 }
+
+struct U;
+extern "C++" { void fn_8035B7B0(U* p); }
+
+struct Ent80226BC0 {
+    int idx;
+    float d;
+    int pad8;
+    Ent80226BC0() { fn_8035B7B0((U*)this); }
+};
+
+extern "C" {
+
+int fn_801E816C(Obj3A64* p, int a);
+int fn_801E82CC(Obj3A64* p, int a);
+int fn_80226E28(Task* t, Ent80226BC0* arr, int n, int one, float f);
+extern const float lbl_805D64E8;
+
+/* near-miss 98.1%: same instructions; only the scratch registers of the id*4 / id*0x5C temporaries differ
+   (retail slwi r11 / mulli r10, ours slwi r0 / mulli r11). Tried q-before-p, idx store first, typed obj, offset locals. */
+int fn_80226BC0(Task* t)
+{
+    Ent80226BC0 arr[9];
+    int n = 0;
+    int i = 0;
+    Obj3A64* o = t->m9C->m3A64;
+    int n1 = o->m794;
+    if (i < n1) {
+        do {
+            int id = fn_801E82CC(o, i);
+            i++;
+            TaskInner* in = t->m9C;
+            PosObj* obj = (PosObj*)in->m8[id];
+            arr[n].idx = id;
+            Vec3f p = obj->m60;
+            Vec3f q = *(Vec3f*)((char*)&in->m6D0[id] + 0x20);
+            Vec3f d = p - q;
+            arr[n].d = d.x * d.x + d.z * d.z;
+            n++;
+        } while (i < n1);
+    }
+    int n2 = o->m798;
+    i = 0;
+    if (i < n2) {
+        do {
+            int id = fn_801E816C(o, i);
+            i++;
+            TaskInner* in = t->m9C;
+            PosObj* obj = (PosObj*)in->m8[id];
+            arr[n].idx = id;
+            Vec3f p = obj->m60;
+            Vec3f q = *(Vec3f*)((char*)&in->m6D0[id] + 0x20);
+            Vec3f d = p - q;
+            arr[n].d = d.x * d.x + d.z * d.z;
+            n++;
+        } while (i < n2);
+    }
+    return fn_80226E28(t, arr, n, 1, lbl_805D64E8) == -1 ? 0 : 1;
+}
+
+}
