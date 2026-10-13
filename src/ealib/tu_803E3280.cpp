@@ -123,6 +123,93 @@ extern "C" void fn_803E3280(Unk803E3AFC_Obj* o, Unk803E3280_Item* items, int cou
 }
 
 /* static initializer / destructor of the global at lbl_806AAB20 */
+/* Texture header (data at +0x10, or at +0x10 + m10 when flag 0x10000000 is set in mC). */
+struct Unk803E34ACHdr {
+    unsigned char m0;
+    char pad1[3];
+    short m4;
+    short m6;
+    char pad8[4];
+    unsigned int mC;
+    int m10;
+};
+struct Unk803E34ACEnt {
+    int val;
+    unsigned char key;
+    char pad5[3];
+};
+extern Unk803E34ACEnt lbl_8062C5B8[];
+extern Unk803E34ACEnt lbl_8062C5F8[];
+extern Unk803E34ACEnt lbl_8062C610[];
+extern char lbl_8060C9B4[];
+extern "C" {
+Unk803E34ACHdr* fn_803EBF90(Unk803E34ACHdr* h);
+void* fn_803ED604(void* tag, int size, int z);
+void GXInitTexObj(void* obj, void* data, unsigned short w, unsigned short h, int fmt, int a, int b, int c);
+void GXInitTexObjCI(void* obj, void* data, unsigned short w, unsigned short h, int fmt, int a, int b, int c, int tlut);
+void GXInitTlutObj(void* obj, void* data, int fmt, unsigned short n);
+}
+
+extern "C" void fn_803E34AC(Unk803E3AFC_Obj* o)
+{
+    int off = *(int*)((char*)o + 0x1C);
+    Unk803E3AFC_Gfx* g = &o->m20;
+    Unk803E34ACHdr* hdr = (Unk803E34ACHdr*)((char*)o + off);
+    Unk803E34ACHdr* pal = fn_803EBF90(hdr);
+    g->m18 = 1.0f;
+    g->m1C = 1.0f;
+    g->m8 = 0.0f;
+    g->m24 = 1.0f / (float)hdr->m4;
+    g->m20 = 1.0f / (float)hdr->m6;
+    g->m14 = 0.0f;
+    g->m10 = 0.0f;
+    if (pal == 0) {
+        unsigned int i = 0;
+        if (lbl_8062C5B8[0].key != *((unsigned char*)o + off)) {
+            do {
+                i++;
+                if (i > 7)
+                    break;
+            } while (lbl_8062C5B8[i].key != hdr->m0);
+        }
+        if (g->m5C == 0)
+            g->m5C = fn_803ED604(lbl_8060C9B4, 0x50, 0);
+        char* t = (char*)g->m5C;
+        void* tx = t + 0x28;
+        void* data = (hdr->mC & 0x10000000) ? (char*)hdr + hdr->m10 : (char*)hdr + 0x10;
+        GXInitTexObj(tx, data, (unsigned short)hdr->m4, (unsigned short)hdr->m6, lbl_8062C5B8[i].val, 0, 0, 0);
+    } else {
+        unsigned int i = 0;
+        int pk = pal->m0;
+        if (lbl_8062C610[0].key != *((unsigned char*)o + off)) {
+            do {
+                i++;
+                if (i > 1)
+                    break;
+            } while (lbl_8062C610[i].key != hdr->m0);
+        }
+        unsigned int j = 0;
+        if (lbl_8062C5F8[0].key != (unsigned char)pk) {
+            do {
+                j++;
+                if (j > 2)
+                    break;
+            } while (lbl_8062C5F8[j].key != (unsigned char)pk);
+        }
+        if (g->m5C == 0)
+            g->m5C = fn_803ED604(lbl_8060C9B4, 0x50, 0);
+        char* t = (char*)g->m5C;
+        void* tx = t + 0x28;
+        void* tl = t + 0x1C;
+        void* data = (hdr->mC & 0x10000000) ? (char*)hdr + hdr->m10 : (char*)hdr + 0x10;
+        GXInitTexObjCI(tx, data, (unsigned short)hdr->m4, (unsigned short)hdr->m6, lbl_8062C610[i].val, 0, 0, 0, 0);
+        void* pdata = (pal->mC & 0x10000000) ? (char*)pal + pal->m10 : (char*)pal + 0x10;
+        GXInitTlutObj(tl, pdata, lbl_8062C5F8[j].val, (unsigned short)pal->m4);
+    }
+    *(void**)((char*)g->m5C + 0x4C) = hdr;
+    *(void**)((char*)g->m5C + 0x48) = pal;
+}
+
 extern "C" void fn_803E3A74(int initialize, int priority)
 {
     if (priority == 0xFFFF) {
