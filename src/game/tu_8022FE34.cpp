@@ -635,6 +635,104 @@ void Unk8022FE34_Owner::fn_802321BC()
     fn_8017B4F8((Unk8017A930_T*)m4->m8);
 }
 
+struct Unk802F8324_O3;
+struct Unk802F8324_Rec;
+void fn_802FABC4(Unk802F8324_O3* o, int i, Unk802F8324_Rec* r);
+extern "C" int fn_80239448__15Unk802362A8_Cpu(void* w);
+extern "C" int fn_8023A79C__Fv(void* w);
+extern "C" int fn_8023A7BC__Fv(void* w);
+extern "C" int fn_8023A7C4__15Unk802362A8_Cpu(void* w, void* p);
+extern "C" void fn_8017B6C0(void* p, int a, int b);
+extern const float lbl_805D70AC;
+extern const float lbl_805D70B0;
+
+struct Unk80232254_O {
+    char pad0[0xA0];
+    int mA0;
+    int mA4;
+};
+struct Unk80232254_U {
+    char pad0[4];
+    int m4;
+    char pad8[8];
+    int m10;
+    float m14;
+    float m18;
+    char pad1C[4];
+    int m20;
+    char pad24[8];
+    int m2C;
+    int m30;
+};
+
+int Unk8022FE34_Owner::fn_80232254()
+{
+    int r = 0;
+    int idx = fn_801A2034(m0, 4);
+    int st = m18;
+    Unk80232254_O* o = (Unk80232254_O*)m0->m720;
+    if (st == 1) {
+        Unk80232254_U* u = (Unk80232254_U*)((char*)m4 + 0xC);
+        if (idx == -1) {
+            void* w = &m440;
+            if (fn_80239448__15Unk802362A8_Cpu(w) != 0) {
+                fn_8017B6C0(m0->m700, 0, 1);
+                fn_8022F2B8(this, 4);
+            } else {
+                r = fn_8023A79C__Fv(w);
+                int r2 = fn_8023A7BC__Fv(w);
+                if (r == 1 || fn_8023A7BC__Fv(w) == 1) {
+                    mC = 0xF;
+                    u->m18 = lbl_805D70AC;
+                    u->m14 = lbl_805D70B0;
+                    m14 = u->m18;
+                    m10 = u->m14;
+                    m430 = r;
+                    int v = 0;
+                    if (r == 0 && r2 != 0)
+                        v = 1;
+                    m434 = v;
+                    r = 1;
+                } else {
+                    r = fn_8023A7C4__15Unk802362A8_Cpu(w, &mC);
+                    if (r != 0) {
+                        fn_8037893C(m0->m704, 0x59, 0, 0, 0);
+                        u->m10 = st;
+                    }
+                }
+            }
+        } else {
+            fn_802FABC4((Unk802F8324_O3*)o, idx, (Unk802F8324_Rec*)u);
+            if (u->m20 == 0) {
+                if (u->m10 == 1) {
+                    r = 1;
+                    mC = u->m4;
+                    m14 = u->m18;
+                    m10 = u->m14;
+                } else if (u->m2C == 1 || u->m30 == 1) {
+                    mC = 0xF;
+                    int v2 = 0;
+                    int c2 = u->m2C;
+                    m430 = c2;
+                    if (c2 == 0 && u->m30 != 0)
+                        v2 = 1;
+                    m434 = v2;
+                    r = 1;
+                    u->m18 = lbl_805D70AC;
+                    u->m14 = lbl_805D70B0;
+                    m14 = u->m18;
+                    m10 = u->m14;
+                }
+            }
+            if (r == 0) {
+                o->mA4 = r;
+                o->mA0 = 1;
+            }
+        }
+    }
+    return r;
+}
+
 void Unk8022FE34_Owner::fn_8023246C()
 {
     int idx = fn_801A2034(m0, 4);

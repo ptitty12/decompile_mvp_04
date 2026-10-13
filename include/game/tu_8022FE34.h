@@ -55,7 +55,8 @@ struct Unk8022FE34_Ctx {
     char pad3[0x6F4 - 0x6D0];
     int m6F4;
     Unk8022FE34_Game* m6F8;
-    char pad4[0x704 - 0x6FC];
+    char pad6FC[4];
+    void* m700;
     char m704[0x1C];
     void* m720;
 };
@@ -215,6 +216,7 @@ struct Unk8022FE34_Owner {
     void fn_8023246C();
     int fn_802324E0();
     int fn_802324EC();
+    int fn_80232254();
     int fn_80232084();
     void fn_8023262C(int i, Unk8022FE34_Pl* pl, Unk8022FE34_Row* r);
     void fn_802326C4(int i, int j);
