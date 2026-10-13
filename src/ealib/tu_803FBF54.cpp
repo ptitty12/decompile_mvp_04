@@ -367,19 +367,12 @@ extern "C" int fn_803FCCCC(RcHnd* h, RcFile** o1, RcHnd** o2)
     return 0;
 }
 
-/* near-miss: 7 slots; unsigned b >= a is subfc/subfe/neg in retail, li/adde here */
 extern "C" int fn_803FCD0C(unsigned x, unsigned a, unsigned b)
 {
     if (x <= a) {
-        if (b < x)
-            return 0;
-        return b >= a;
+        return b >= x && b < a;
     }
-    if (b >= x)
-        return 1;
-    if (b >= a)
-        return 0;
-    return 1;
+    return b >= x || b < a;
 }
 
 extern "C" void fn_803FCD4C(RcFile* o, int n)
