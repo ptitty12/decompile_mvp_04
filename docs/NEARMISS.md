@@ -173,3 +173,29 @@ The source object has 60 functions / 13,776B .text, but also emits 152B .rodata 
 Six imports remain: __builtin_vec_delete, __vn__FUii, fn_80071604__FPv, fn_80071688__FPvi, fn_80071E2C__FPviT0, fn_8040074C__FPvi. Source/provider evidence: fn_80071604 is actually (Unk80071604*, const char*, Obj*, unsigned), but local source calls it with only self; fn_80071688 is the one-int charge overload; fn_80071E2C is (Unk80071604*, int, Unk80070DDC_Stream*); fn_8040074C is C-linkage memset-like (void*, unsigned). ABI repairs need caller evidence and still would not solve the extra literal pool. Park.
 
 
+
+
+### Further bounded leads (2026-10-13)
+
+- fn_803FDFB4: six byte-decode association, temporary, inline-decoder and unsigned
+  forms failed to remove the final OR/compare result-register pair; no source
+  retained. build/clone-snapshot/build/probe-803fdfb4.
+- fn_801C4C3C: inline DifferenceFromPosition returns the vector difference and
+  fixes all fifty masked words/stack offsets, but the original local sqrt
+  declaration has C++ linkage and float input. Real export is C; provider source
+  currently declares double input. Correct C/double declaration changes four
+  FPR/FMA words; four further typed variants fail. Across 358 caller functions
+  in 128 objects, arguments are float-valued in f1, and the provider forwards f1
+  to sqrt then rounds the result. These observations cannot distinguish float
+  and double formals. No provider type was changed to force a match; this lead
+  remains unaccepted. build/probe_801c4c3c*, build/801c4c3c-final.cpp.
+- fn_801D14A0: eight structural/lifetime forms fail. The actual by-value vector
+  is eight bytes, so enlarging it is unsupported. A separate RandF4 C-linkage
+  correction retains the stack differences and is scratch-only. Evidence in
+  build/agent-stack-801d14a0/proof.json.
+- fn_8025AC0C: four inline-return/lifetime forms; fn_800F6F0C: six compiling
+  declaration/pointer forms. None match. build/stack_lead_attempts.json.
+- fe/tu_80529364: code matches, but .ctors points to fn_8052A1DC, which calls
+  startup helper fn_80525670(1,-1) in the preceding split. Source has no global
+  object/dynamic initializer that naturally emits that entry. No dummy global,
+  constructor attribute, manual section pointer or other hook was introduced.

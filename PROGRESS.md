@@ -9,7 +9,7 @@
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
 - Functions matched: **20,902 / 24,158 (86.52%)**; code matched: **3,001,156 / 5,896,176 bytes (50.90%)**.
-- Source-linked: **214 units, 323,280 code bytes (5.48%)**, plus 8,234 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+- Source-linked: **215 units, 330,388 code bytes (5.60%)**, plus 8,242 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
 ## Session log (newest last)
@@ -228,3 +228,6 @@
   - fe/tu_804B38C4 source-linked (4,164 B, 36 functions): real C singleton-constructor entry, correct C++ zero-argument function linkage, strncpy, and named original literals. All 16 shared-header users compile without word or local-edge changes across 617 functions; actual full build and regression verification pass. 237 references check with zero mismatch/unresolved names.
   - fe/tu_804B985C source-linked (6,324 B, 28 functions): original string/table objects plus canonical sprintf/strncpy. Stack-local 30-element arrays remain local and initialize from the existing exact 120-byte tables via memcpy; all 59 local branches and 192 checked references agree. Full hash and verifier pass. Source-linked totals now 214 units / 323,280 code B / 8,234 data B.
   - Bounded unsuccessful trials are preserved under build/ and logged in NEARMISS.md. Workers continue on two disjoint front-end ranges plus a read-only stack-slot scanner; the existing permuter farm remains active. This is an integration checkpoint, not the end of authorized work.
+
+- 2026-10-13 | Codex + three Luna workers, continued | fe/tu_804B7C98 source-linked: 7,108 code B and the real 8-byte integer-to-float bias pool. The only two retail references to lbl_805F7CA0 come from this unit; paired relocations uniquely anchor its exact aligned pool, with no external alias needed. Correct typed UiS C++ calls and strncpy plus original string/float symbols retain all fifty function streams/local branches. The actual build passes retail SHA1, 229 reference checks (zero mismatch/unresolved), and the unmodified regression verifier. Total source-linked: 215 units / 330,388 code B / 8,242 data B; exact functions remain 20,902.
+  - Prior five source commits passed per-commit integration and reached main at 148f23ce. The permuter farm remains active (129 ledger entries, four matches already accepted); no new farm match was available at this checkpoint. Workers continue on the database candidate and read-only scanners.
