@@ -1726,3 +1726,13 @@ fe/tu_804B985C retains its local ids/values arrays but initializes them with
 memcpy from the two original 120-byte table objects. Paired relocations prove
 which objects are used; bytes and extents are checked independently. Replacing
 the locals with direct global reads would change the original stack behavior.
+
+
+### Local object alias and destructor-store addressing (2026-10-13)
+
+fn_80562BC8 used a pointer q = &t for a stack-local temporary list. Calling the
+same operations through t directly lets ProDG address the final inline destructor
+vptr store as 24(r1), exactly as retail, instead of 16(r29). Only that one word
+changes in the 155-instruction function; twelve local branches and thirty data/call
+references agree. This is alias/lifetime code generation, not a reason to change
+the list layout or to replace required destructor behavior with manual stores.

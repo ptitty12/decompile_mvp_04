@@ -8,7 +8,7 @@
   - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched: **20,902 / 24,158 (86.52%)**; code matched: **3,001,156 / 5,896,176 bytes (50.90%)**.
+- Functions matched: **20,903 / 24,158 (86.53%)**; code matched: **3,001,776 / 5,896,176 bytes (50.91%)**.
 - Source-linked: **215 units, 330,388 code bytes (5.60%)**, plus 8,242 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
@@ -231,3 +231,6 @@
 
 - 2026-10-13 | Codex + three Luna workers, continued | fe/tu_804B7C98 source-linked: 7,108 code B and the real 8-byte integer-to-float bias pool. The only two retail references to lbl_805F7CA0 come from this unit; paired relocations uniquely anchor its exact aligned pool, with no external alias needed. Correct typed UiS C++ calls and strncpy plus original string/float symbols retain all fifty function streams/local branches. The actual build passes retail SHA1, 229 reference checks (zero mismatch/unresolved), and the unmodified regression verifier. Total source-linked: 215 units / 330,388 code B / 8,242 data B; exact functions remain 20,902.
   - Prior five source commits passed per-commit integration and reached main at 148f23ce. The permuter farm remains active (129 ledger entries, four matches already accepted); no new farm match was available at this checkpoint. Workers continue on the database candidate and read-only scanners.
+
+- 2026-10-13 | Codex + three Luna workers, continued | fn_80562BC8 (db/tu_8055F730, 620 B) now exact: remove the first temporary-list pointer alias and access the real local directly. This makes the final vptr store frame-relative, as in retail. Original loop-variable scopes are preserved; all other 23 compiled function bodies and relocation signatures remain unchanged. All 155 instructions, twelve local branches, thirty checked references, full hash and unmodified verifier pass. Totals: 20,903 exact functions, 3,001,776 matched code B (50.91%).
+  - New read-only stack_candidates.py finds same-frame slot differences and explicitly labels provisional relocation mismatches when requested. It found the fn_801D14A0 and fn_801C4C3C leads; both remain unaccepted after bounded trials/ABI audits. Six new synthetic tests include all three executable sections, changed branch conditions/destinations, malformed stack operands and call/data binding differences. Matching-helper suite: 90/90. Tool commit is separate from game source and still uses the normal integration gates.

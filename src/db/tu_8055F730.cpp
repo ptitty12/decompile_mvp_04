@@ -669,8 +669,7 @@ extern "C" DB_OVERLAY void fn_805625F8(int x, Unk805352B0_List* self, int kind)
     t.D();
 }
 
-/* near-miss: one store differs (the final vptr store of the found branch: retail writes it frame-relative, 24(r1); ours 16(r29));
- * tried t.D()/q->D()/references/explicit stores. */
+/* Exact: use the local temporary directly instead of retaining q = &t; this lets ProDG emit the final vptr store frame-relative. */
 extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
 {
     Unk8007A4DC_Screen* sc = lbl_8061930C;
@@ -679,19 +678,18 @@ extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
     for (kind = 0; kind <= 1; kind++) {
         Unk80535650_Tmp t;
         int buf[0x28];
-        Unk80535650_Tmp* q = &t;
-        q->C1(buf, 0x28);
-        q->C2();
-        q->C3(lbl_8064A4C8);
-        fn_805625F8(x, (Unk805352B0_List*)q, kind);
-        fn_80539128((Unk805352B0_List*)q, 0);
-        if (q->Count() == 0) {
-            q->D();
+        t.C1(buf, 0x28);
+        t.C2();
+        t.C3(lbl_8064A4C8);
+        fn_805625F8(x, (Unk805352B0_List*)&t, kind);
+        fn_80539128((Unk805352B0_List*)&t, 0);
+        if (t.Count() == 0) {
+            t.D();
             continue;
         }
-        fn_805362AC((Unk805352B0_List*)q, 1);
+        fn_805362AC((Unk805352B0_List*)&t, 1);
         unsigned i;
-        for (i = 0; i < q->Count(); i++) {
+        for (i = 0; i < t.Count(); i++) {
             if (y == (sc->fn_8007A6A0(5, t.At(i)) == 0)) {
                 r = t.At(i);
                 break;
@@ -712,8 +710,8 @@ extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
             q2->C1(buf2, 0x28);
             q2->C2();
             q2->C3(lbl_8064A4C8);
-            fn_80538EC4((Unk805352B0_List*)q2, x, 0);
-            fn_805362AC((Unk805352B0_List*)q2, 0);
+            fn_80538EC4((Unk805352B0_List*)&t2, x, 0);
+            fn_805362AC((Unk805352B0_List*)&t2, 0);
             int e = *t2.m0;
             fn_8007F29C((Unk8007F198_A*)sc, x, e);
             fn_8007F330((Unk8007F198_A*)sc, g, e);
