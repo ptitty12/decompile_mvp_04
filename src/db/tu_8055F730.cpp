@@ -97,6 +97,63 @@ inline void Db80560314_Step(int& v)
     v = t;
 }
 extern "C" float fn_8007824C(int a, int b);
+extern "C" int fn_8007E10C__FP13Unk8007DB74_A(void* g, int x);
+extern "C" int fn_8007DDC8__FP13Unk8007DB74_Aiii(void* g, int x, int b, int a);
+extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* g, int x, int i);
+extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* g, int x);
+extern "C" void fn_8007E34C__FP13Unk8007DB74_Aii(void* g, int x, int s);
+extern "C" void fn_8007EE98__FP13Unk8007DB74_Aii(void* g, int x, int r);
+extern "C" int fn_8007F0A8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007DD38__FP13Unk8007DB74_Aiiii(void* g, int x, int a, int b, int c);
+extern "C" int fn_8007E7A8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007E598__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" int fn_8007EAA8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007E898__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" int fn_8007EDA8__FP13Unk8007DB74_Ai(void* g, int x);
+extern "C" void fn_8007EB98__FP13Unk8007DB74_Aii(void* g, int x, int e);
+extern "C" void fn_8055EAFC(int x);
+extern "C" void fn_805628A0(int x, int a, int b);
+extern "C" void fn_8055E614(void* g, int x, int* arr, int n);
+extern "C" int fn_8055BD7C(int x);
+extern "C" void fn_8053943C(Unk805352B0_List* self);
+struct Db80562E34_B1 {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    Db80562E34_B1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80562E34_B1() { vp = lbl_8064A550; }
+    unsigned Count() { return m4; }
+};
+struct Db80562E34_B2 : Db80562E34_B1 {
+    Db80562E34_B2(int* buf, int cap) : Db80562E34_B1(buf, cap)
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    ~Db80562E34_B2() { vp = lbl_8064A550; }
+};
+struct Db80562E34_B3 : Db80562E34_B2 {
+    int buf[0x28];
+    Db80562E34_B3() : Db80562E34_B2(buf, 0x28)
+    {
+        m14 = 0;
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A4C8;
+    }
+    ~Db80562E34_B3() { vp = lbl_8064A550; }
+};
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -665,6 +722,82 @@ extern "C" DB_OVERLAY int fn_80562BC8(int x, int y)
         fn_8007F330((Unk8007F198_A*)sc, x, r);
     }
     return r;
+}
+
+/* near-miss: 96.3%; structure and instruction count equal. Retail recomputes addi r9,r1,8 for the arr[] stores inside the loop and
+ * again for the fn_8055E614 argument; ours hoists the frame address into a callee-saved register (CSE with the later use), which
+ * shifts every callee-saved number by one. Tried function-scope arr, struct member, for/do forms. */
+extern "C" DB_OVERLAY void fn_80562E34(int x)
+{
+    void* g = lbl_8061930C;
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) == 0) {
+        fn_8055EAFC(x);
+        return;
+    }
+    int a = 0;
+    do {
+        if (a != 0) {
+            int b = 0;
+            do {
+                if (fn_8007DDC8__FP13Unk8007DB74_Aiii(g, x, b, a) == 0)
+                    fn_805628A0(x, a, b);
+                b++;
+            } while (b <= 3);
+        }
+        a++;
+    } while (a <= 9);
+top:
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) > 4)
+        goto out;
+    {
+        int arr[5];
+        int i = 0;
+        int sel = fn_80562BC8(x, 1);
+        do {
+            arr[i] = fn_8007E154__FP13Unk8007DB74_Aii(g, x, i);
+            i++;
+        } while (i <= 4);
+        fn_8007E34C__FP13Unk8007DB74_Aii(g, x, sel);
+        fn_8055E614(g, x, arr, fn_8007E1F8__FP13Unk8007DB74_A(g, x));
+    }
+    goto top;
+out:
+    if (fn_8007F0A8__FP13Unk8007DB74_Ai(g, x) == 0) {
+        int r = fn_80562BC8(x, 0);
+        if (r != 0)
+            fn_8007EE98__FP13Unk8007DB74_Aii(g, x, r);
+    }
+    if (fn_8007E10C__FP13Unk8007DB74_A(g, x) > 0) {
+        int j = 0;
+        int v = fn_8007E154__FP13Unk8007DB74_Aii(g, x, 0);
+        do {
+            int k = j;
+            j++;
+            fn_8007DD38__FP13Unk8007DB74_Aiiii(g, x, k, 0, v);
+        } while (j <= 3);
+    }
+    int off2 = 0;
+    Db80562E34_B3 t;
+    unsigned n = 0;
+    fn_80538EC4((Unk805352B0_List*)&t, x, 0);
+    fn_8053943C((Unk805352B0_List*)&t);
+    fn_80539128((Unk805352B0_List*)&t, 0);
+    if (n < t.Count()) {
+        do {
+            int e = *(int*)((char*)t.m0 + off2);
+            if (fn_8007E7A8__FP13Unk8007DB74_Ai(g, x) <= 2) {
+                fn_8007E598__FP13Unk8007DB74_Aii(g, x, e);
+            } else if (fn_8007EAA8__FP13Unk8007DB74_Ai(g, x) <= 3) {
+                fn_8007E898__FP13Unk8007DB74_Aii(g, x, e);
+            } else if (fn_8007EDA8__FP13Unk8007DB74_Ai(g, x) <= 1) {
+                fn_8007EB98__FP13Unk8007DB74_Aii(g, x, e);
+            }
+            n++;
+            off2 += 4;
+        } while (n < t.Count());
+    }
+    if (fn_8055BD7C(x) == 0)
+        fn_8055EAFC(x);
 }
 
 extern "C" DB_OVERLAY void fn_8056350C(int x)
