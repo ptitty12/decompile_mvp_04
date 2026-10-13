@@ -2292,6 +2292,7 @@ libm/sf_fabs.cpp:
 
 libm/sf_floor.cpp:
 	.text       start:0x80411654 end:0x8041171C
+	.sdata      start:0x806EEF00 end:0x806EEF08 align:4
 
 libm/sf_sin.cpp:
 	.text       start:0x8041171C end:0x804117F8
