@@ -24,7 +24,13 @@ Unk801527C8_Actor* fn_801A04A8(Unk801527C8_Actor* a, int i);
 Unk801527C8_Actor* fn_801A49F0(Unk801527C8_Actor* a, int k, int v);
 Unk801527C8_Actor* fn_801A4910(Unk801527C8_Actor* a, int k, int v);
 int fn_8014E310(int id);
-void fn_8022EA60(Unk80273498_Vec3* out, void* a, ...);
+/* Pair8 layout and C return ABI are shared with tu_8022BB90. */
+struct Pair8 {
+    float x;
+    float y;
+};
+struct Fe8022;
+extern "C" Pair8 fn_8022EA60(Fe8022* a);
 void fn_8018CA5C(Unk80189300* o, float* a, float* b, float* c);
 
 void Unk80159F28::fn_80163A98() /* 80163A98 */
@@ -561,13 +567,12 @@ void Unk80159F28::fn_80165328(Unk80165328_Evt* e, float t) /* 80165328 */
     s->fn_80326EF4(u, 0.0f, 0xAC, -1, -1, 0);
 }
 
-/* near-miss: 80/80 insns, instruction stream identical; retail's frame is 40 bytes (the 12-byte vector keeps 4-byte alignment), ours 48 */
+/* fn_8022EA60 returns Pair8 (two floats); this local matches the eight-byte result. */
 void Unk80159F28::fn_801653B0(int id, float t) /* 801653B0 */
 {
     float x;
-    Unk80273498_Vec3 v;
-    Unk80273498_Vec3* pv = &v;
-    fn_8022EA60(pv, mC->m700->m3B0);
+    Pair8 v = fn_8022EA60((Fe8022*)mC->m700->m3B0);
+    Pair8* pv = &v;
     if (fn_8015F840() != 0) {
         v.x = -v.x;
     }
