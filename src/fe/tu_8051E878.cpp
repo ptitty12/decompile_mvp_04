@@ -456,6 +456,24 @@ extern "C" FE_OVERLAY void fn_8051EDDC(int a, int b, int c)
     }
 }
 
+extern "C" FE_OVERLAY float fn_8051F290(int a, int b)
+{
+    unsigned char* p = (unsigned char*)b;
+    switch (a) {
+    case 0x35:
+        return (float)p[4] * 0.003921569f;
+    case 0x36:
+        return (float)p[7] * 0.003921569f;
+    case 0x37:
+        return (float)p[5] * 0.003921569f;
+    case 0x38:
+        return (float)p[8] * 0.003921569f;
+    case 0x39:
+        return (float)p[6] * 0.003921569f;
+    }
+    return 0.0f;
+}
+
 extern "C" FE_OVERLAY void fn_8051F32C(int a, int b, float f)
 {
     switch (a) {
