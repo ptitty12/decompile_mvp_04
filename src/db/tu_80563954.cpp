@@ -460,3 +460,66 @@ extern "C" DB_OVERLAY int fn_80565E9C(Db80565CDC_S* self)
     }
     return res;
 }
+
+/* fn_805658F8: host vptr +0xDBC, row-set vptr +0x10, row status +0x20. */
+struct Db805658F8_Row { char pad0[0x20]; int m20; };
+class Db805658F8_Rows { public: char pad0[0x10];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual Db805658F8_Row* v21(int);
+};
+class Db805658F8_Host { public: char pad0[0xDBC];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual Db805658F8_Rows* v8(int);
+    virtual Db805658F8_Rows* v9(int);
+};
+extern "C" int fn_8052BD40(Unk8052B978_Tbl*);
+extern "C" int fn_80084954__FPv(void*);
+extern "C" DB_OVERLAY int fn_805658F8(Db80565CDC_S* self,int a)
+{
+    Unk8052B978_Tbl* t=*(Unk8052B978_Tbl**)((char*)self+0x30);
+    int last=fn_8052BD40(t);
+    int active=1;
+    if(t->m8[last].f4==0) active=0;
+    if(active==1) {
+        Db805658F8_Host* host=(Db805658F8_Host*)a;
+        Unk8006A138_It<25> it(13);
+        int i=13;
+        do {
+            Db805658F8_Rows* rows=host->v8(i);
+            if(rows->v21(0)->m20!=4) goto failure;
+            if(fn_80084954__FPv((void*)it.v)==1) {
+                if(host->v9(it.v)->v21(0)->m20!=4) goto failure;
+            } else {
+                if(rows->v21(1)->m20!=4) goto failure;
+            }
+            i=it.Next();
+        } while(i<=18);
+        return 1;
+    }
+    failure:return 0;
+}
