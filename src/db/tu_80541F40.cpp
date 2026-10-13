@@ -646,7 +646,6 @@ DB_OVERLAY void fn_80543D28(L* l)
     }
 }
 
-/* near-miss: 99.8%; the last test's layout: retail branches on low < 0.85f straight to the return-0 block, ours branches on the inverse to return 1 */
 DB_OVERLAY int fn_80545110(Db80541F40_Obj* o, int mode, int* best)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
@@ -696,11 +695,14 @@ DB_OVERLAY int fn_80545110(Db80541F40_Obj* o, int mode, int* best)
         }
     }
     int lim = mode == 0 ? 7 : 3;
-    if (cnt >= lim)
-        return 1;
-    if (cls != 0 || cnt <= 1 || low < 0.85f)
-        return 0;
+    if (cnt >= lim) goto success;
+    if (cls != 0) goto failure;
+    if (cnt <= 1) goto failure;
+    if (low < 0.85f) goto failure;
+success:
     return 1;
+failure:
+    return 0;
 }
 
 struct Db80541F40_Screen : Unk8007A4DC_Screen {
