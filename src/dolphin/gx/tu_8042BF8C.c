@@ -84,67 +84,46 @@ void fn_8042C020(void) {
     fn_8041A5DC();
 }
 
-static inline void AbortWait(u32 clocks) {
-    OSTime time0, time1;
+static inline void __GXAbortWait(u32 clocks) {
+    OSTime time0;
+    OSTime time1;
 
     time0 = fn_80438628();
     do {
         time1 = fn_80438628();
-    } while (time1 - time0 <= clocks / 2);
+    } while (time1 - time0 <= (clocks / 4));
 }
 
-static inline u32 ReadMEM(u32 hiIdx, u32 loIdx) {
-    u32 hi, hi2, lo;
+static inline void __GXAbortWaitPECopyDone(void) {
+    u32 peCnt0;
+    u32 peCnt1;
 
-    hi = GX_GET_MEM_REG(hiIdx);
+    peCnt0 = __GXReadMEMCounterU32(0x28, 0x27);
     do {
-        hi2 = hi;
-        lo = GX_GET_MEM_REG(loIdx);
-        hi = GX_GET_MEM_REG(hiIdx);
-    } while (hi != hi2);
-    return (hi << 16) | lo;
+        peCnt1 = peCnt0;
+        __GXAbortWait(32);
+
+        peCnt0 = __GXReadMEMCounterU32(0x28, 0x27);
+    } while (peCnt0 != peCnt1);
 }
 
-/* near-miss: loop copy placement (target copies the old count at the loop end, we copy at the top) */
-/* __GXAbort */
+/* __GXAbort: body of dolsdk2004 GXMisc.c (adonis-singh/re4 src/lib/GXMisc.c); the static helpers stay
+ * plain static (not inline) so that the compiler expands them the way the original did */
 void fn_8042C07C(void) {
-    u32 cnt0, cnt1;
-    volatile u32* piReg;
-
     if (__GXData->abtWaitPECopy && fn_8042A898()) {
-        cnt1 = ReadMEM(39, 40);
-        do {
-            cnt0 = cnt1;
-            AbortWait(16);
-            cnt1 = ReadMEM(39, 40);
-        } while (cnt1 != cnt0);
+        __GXAbortWaitPECopyDone();
     }
-    piReg = (volatile u32*)0xCC003000;
-    piReg[6] = 1;
-    AbortWait(100);
-    piReg[6] = 0;
-    AbortWait(10);
+
+    __PIRegs[0x18 / 4] = 1;
+    __GXAbortWait(200);
+    __PIRegs[0x18 / 4] = 0;
+    __GXAbortWait(20);
 }
 
-/* near-miss: same loop copy placement as fn_8042C07C (its body is inlined here) */
 /* GXAbortFrame */
 void fn_8042C1E8(void) {
-    u32 cnt0, cnt1;
-    volatile u32* piReg;
+    fn_8042C07C();
 
-    if (__GXData->abtWaitPECopy && fn_8042A898()) {
-        cnt1 = ReadMEM(39, 40);
-        do {
-            cnt0 = cnt1;
-            AbortWait(16);
-            cnt1 = ReadMEM(39, 40);
-        } while (cnt1 != cnt0);
-    }
-    piReg = (volatile u32*)0xCC003000;
-    piReg[6] = 1;
-    AbortWait(100);
-    piReg[6] = 0;
-    AbortWait(10);
     if (fn_8042A898()) {
         fn_8042A790();
         __GXInitRevisionBits();
