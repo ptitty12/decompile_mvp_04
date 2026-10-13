@@ -410,7 +410,7 @@ void Unk8001FE34::fn_80020C5C()
         fn_80020D58();
         fn_80020ECC();
         Unk8004072C_Obj* o = fn_8004072C();
-        fn_800414FC(o, fn_80021010(lbl_805AF5FC, m8[0x51]), 0x51);
+        fn_800414FC(o, fn_80021010(m8[0x51], lbl_805AF5FC), 0x51);
     }
     fn_80020E3C();
 }
@@ -418,16 +418,16 @@ void Unk8001FE34::fn_80020C5C()
 void Unk8001FE34::fn_80020D58()
 {
     for (int i = 0; i <= 7; i++) {
-        int v = fn_80021010(lbl_805B09D4[i], m194[i]);
+        int v = fn_80021010(m194[i], lbl_805B09D4[i]);
         fn_800489B4(fn_800475EC(), i, v);
     }
 }
 
 void Unk8001FE34::fn_80020DC8()
 {
-    int v = fn_80021010(lbl_805B09D4[4], m1B4[4]);
+    int v = fn_80021010(m1B4[4], lbl_805B09D4[4]);
     fn_800489B4(fn_800475EC(), 4, v);
-    v = fn_80021010(lbl_805B09D4[1], m1B4[1]);
+    v = fn_80021010(m1B4[1], lbl_805B09D4[1]);
     fn_800489B4(fn_800475EC(), 1, v);
 }
 
@@ -435,11 +435,11 @@ void Unk8001FE34::fn_80020E3C()
 {
     int v;
     if (fn_8001C394()->fn_8001CC40(5))
-        v = fn_80021010(3, m8[46]);
+        v = fn_80021010(m8[46], 3);
     else if (fn_8001C394()->fn_8001CC40(1))
-        v = fn_80021010(3, m8[33]);
+        v = fn_80021010(m8[33], 3);
     else
-        v = fn_80021010(3, m8[82]);
+        v = fn_80021010(m8[82], 3);
     fn_8005B76C(fn_8005ACE4(), v);
 }
 
@@ -450,7 +450,7 @@ void Unk8001FE34::fn_80020ECC()
 {
     for (int i = 0; i <= 0x50; i++) {
         Unk8004072C_Obj* o = fn_8004072C();
-        fn_800414FC(o, fn_80021010(lbl_805AF370[i].m4, m8[i]), i);
+        fn_800414FC(o, fn_80021010(m8[i], lbl_805AF370[i].m4), i);
     }
 }
 
@@ -459,7 +459,7 @@ void Unk8001FE34::fn_80020F4C()
 {
     for (int i = 0x51; i <= 0x62; i++) {
         Unk8004072C_Obj* o = fn_8004072C();
-        fn_800414FC(o, fn_80021010(lbl_805AF370[i].m4, m8[i]), i);
+        fn_800414FC(o, fn_80021010(m8[i], lbl_805AF370[i].m4), i);
     }
 }
 
@@ -471,7 +471,7 @@ void Unk8001FE34::fn_80020FCC()
 
 /* The two conversions go through one result variable: with two returns the dead copy in the m4 path
  * is `mr r3,r11` (it gets the return register as a preference) instead of retail's `mr r9,r11`. */
-int Unk8001FE34::fn_80021010(int idx, float f)
+int Unk8001FE34::fn_80021010(float f, int idx)
 {
     float t = !(f > lbl_805A5AA0) ? (f >? lbl_805A5AA4) : lbl_805A5AA0;
     int r;
