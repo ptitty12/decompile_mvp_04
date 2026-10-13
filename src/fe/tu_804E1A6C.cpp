@@ -90,6 +90,19 @@ struct FeS3b : FeObj {
 extern "C" int fn_8007DA28__18Unk8007B2B0_Screen(void* g);
 extern "C" void fn_8007CF44__18Unk8007B2B0_ScreenUiii(void* g, unsigned h, char* buf, int b);
 extern "C" int fn_8007D050__18Unk8007B2B0_ScreenUii(void* g, unsigned h, int a);
+struct FeM2C {
+    char pad0[0x38];
+    FeP4Tab* m38;
+};
+struct FeGameC {
+    char pad0[0x2C];
+    FeM2C m2C;
+};
+extern "C" void fn_804EAF18(FeP4Tab* t);
+extern "C" int fn_804EAF88(FeP4Tab* t);
+extern "C" void fn_80529848(void);
+extern "C" void fn_801323C8(FeObj* w, void* self, void (*cb)(void), int a, char* buf, int c, int d, int e, const char* s,
+                            int z1, int z2, int z3, int z4);
 
 struct Unk8007F198_D;
 struct FeRetA {
@@ -307,6 +320,44 @@ extern "C" FE_OVERLAY FeScrRaw* fn_804E2798(FeScrRaw* self, int a, int b, int c,
     self->m13C = 0;
     self->m140 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804E27F4(FeS3b* self)
+{
+    int total = 0;
+    fn_800ECF18(self);
+    FeGameC* gl = (FeGameC*)lbl_80619948;
+    fn_804EAF18(gl->m2C.m38);
+    FeM2C* s;
+    for (int i = 0; i < 4; i++) {
+        s = &gl->m2C;
+        FeP4Tab* t = s->m38;
+        if (t->e[i].m0 != 0)
+            total += t->e[i].m4F0 * (t->e[i].m4 + 1);
+    }
+    FeObj* pop = fn_800B7A94(UiMgrB(), "POPUP");
+    FeObj* h = fn_800B7A94(UiMgrB(), "NAVBAR");
+    fn_80124FA8(h, self);
+    ((int (*)(FeObj*, int, int, int))fn_801251CC)(h, 0, 0x1A0D, 0);
+    ((int (*)(FeObj*, int, int, int))fn_801251CC)(h, 3, 0x3FB2, 2);
+    self->m144 = fn_804EAF88(s->m38);
+    self->m138 = fn_800C8060(self->v32("POINTS", 1));
+    self->m13C = fn_800C8060(self->v32("INFO", 1));
+    self->m140 = fn_800C8060(self->v32("TOTALS", 1));
+    if (fn_804EAF54(s->m38) > 1)
+        ((FeObj1*)fn_800C805C(self->m13C->v32("SG1", 1)))->v8(1);
+    else
+        ((FeObj1*)fn_800C805C(self->m13C->v32("SG1", 1)))->v8(0);
+    fn_804E3174(self, 1);
+    char buf[0x7D0];
+    fn_80403DE4(buf, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x4883), total);
+    int v = s->m38->m0;
+    if (v == 0) {
+        fn_801323C8(pop, self, fn_80529848, 0, buf, 1, -1, 1, fn_80090880__FP11Unk80090880(lbl_8061977C, 0x26DE), v, v, v, v);
+        ((FeObj1*)pop)->v84(1);
+        pop->v86();
+        s->m38->m0 = 1;
+    }
 }
 
 extern "C" FE_OVERLAY int fn_804E2B14(FeS3* self)
