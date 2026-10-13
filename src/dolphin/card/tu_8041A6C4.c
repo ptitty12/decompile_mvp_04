@@ -461,9 +461,7 @@ s32 fn_8041B3DC(s32 chan, CARDCallback callback)
     return result;
 }
 
-/* __CARDWritePage
- * near-miss: same length; the `addi r5,r4,0` (exiCallback argument) is scheduled first instead of after `addi r3,r30,0`;
- * all 6 orders of the last three stores tried. */
+/* __CARDWritePage (the explicit & 0xFF on cmd[2] fixes the scheduling of the argument copies) */
 s32 fn_8041B510(s32 chan, CARDCallback callback)
 {
     CARDControl* card;
@@ -476,7 +474,7 @@ s32 fn_8041B510(s32 chan, CARDCallback callback)
     } else {
         card->cmd[1] = (u8)((card->addr >> 17) & 0x7F);
     }
-    card->cmd[2] = (u8)(card->addr >> 9);
+    card->cmd[2] = (u8)((card->addr >> 9) & 0xFF);
     card->cmd[3] = (u8)((card->addr >> 7) & 3);
     card->cmd[4] = (u8)(card->addr & 0x7F);
     card->cmdlen = 5;
@@ -501,8 +499,7 @@ s32 fn_8041B510(s32 chan, CARDCallback callback)
     return result;
 }
 
-/* __CARDEraseSector
- * near-miss: same length; the cmd[2] byte temp lands in r0 instead of r3 (all 120 orders of the five stores tried). */
+/* __CARDEraseSector (the explicit & 0xFF on cmd[2] fixes the byte temp's register) */
 s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 {
     CARDControl* card;
@@ -519,7 +516,7 @@ s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback)
 
     card->cmd[0] = 0xF1;
     card->cmd[1] = (u8)((addr >> 17) & 0x7F);
-    card->cmd[2] = (u8)(addr >> 9);
+    card->cmd[2] = (u8)((addr >> 9) & 0xFF);
     card->cmdlen = 3;
     card->mode = 0xFFFFFFFF;
     card->retry = 3;
