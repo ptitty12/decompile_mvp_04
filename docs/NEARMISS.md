@@ -351,3 +351,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `fe/tu_8043FDC0` `fn_80440210`: 97.89474%, 19/19 instructions after six bounded countdown forms; the count and one-based index occupy r31/r30 instead of retail r30/r31; failed drafts kept in scratch only.
 - 2026-10-13 | db/tu_80565FD4 fn_805697A0 | Eight ordinary C forms; best 121/121 words, one cmpw uses copied limit r21 instead of input r30; date copy and call stream exact. Scratch build/swarm32, source restored.
+- `ealib/tu_803DE414` `fn_803DFB48` (swarm36, eight forms): scratch 99.52%, 25/25 words; best two adjacent final stores remain reversed after ordinary saved-value and independent tail-store ordering forms. Scratch SW02/build/swarm36.
