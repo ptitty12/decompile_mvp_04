@@ -538,13 +538,12 @@ int fn_80245730(Unk80270BA0_X* x)
     if (v->m914 != 0) {
         Goal* g = v->m934;
         v->m914 = 0;
-        Unk8027A84C* d = 0;
-        if (g != 0) {
-            d = ((Unk8027A84C_Owner*)g)->fn_8027C67C();
-            g = v->m934;
-            if (g->m14 == 1)
-                d = ((Unk8027A84C_Owner*)g->m0)->fn_8027C67C();
-        }
+        if (g == 0)
+            return 0;
+        Unk8027A84C* d = ((Unk8027A84C_Owner*)g)->fn_8027C67C();
+        g = v->m934;
+        if (g->m14 == 1)
+            d = ((Unk8027A84C_Owner*)g->m0)->fn_8027C67C();
         int t = v->m910;
         if (t != 0) {
             Unk8027A84C_Owner* o = d->m44;
