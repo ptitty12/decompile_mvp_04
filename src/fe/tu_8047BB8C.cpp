@@ -35,7 +35,6 @@ struct FeWV87 : Unk800C7B40_Data {
 };
 extern "C" void fn_8047D24C(void* p, void* a, int b);
 
-/* near-miss: 2 slots differ (order of the final m4/mC stores after the vptr store) */
 extern "C" FE_OVERLAY FeScrArr2* fn_8047BB8C(FeScrArr2* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_8049A1F0(self, a, b, c, d, e, f, g, h);
@@ -62,8 +61,8 @@ extern "C" FE_OVERLAY FeScrArr2* fn_8047BB8C(FeScrArr2* self, int a, int b, int 
     s->m10 = lbl_8064A550;
     fn_8040074C(s->m0, s->m8 * 4);
     s->m10 = lbl_8065C1B0;
-    s->mC = 0;
     s->m4 = 0;
+    s->mC = 0;
     s->m14 = 0;
     return self;
 }
