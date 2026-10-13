@@ -257,12 +257,11 @@ extern "C" void fn_8001EC80(Unk8001E444_Obj* x)
     fn_8004378C(c);
 }
 
-/* near-miss: 22/22 insns, 2 slots differ: retail sets up the array address (addi r4,r1,8)
- * before the move of x into r3; member-call, temp and &arr[0] forms give the same order. */
-extern "C" void fn_8001ED28(Unk8001E444_Obj* x)
+/* Retail callers store the integer returned by fn_800437AC. */
+extern "C" int fn_8001ED28(Unk8001E444_Obj* x)
 {
     Unk80344538_Rec arr[5];
-    fn_800437AC(fn_8001CF18(x, arr));
+    return fn_800437AC(fn_8001CF18(x, arr));
 }
 
 extern "C" void fn_8001ED80(Unk8001E444_Obj* x)
@@ -437,7 +436,7 @@ extern "C" void fn_8001F300(Unk8001E444_Obj* x)
 
 extern "C" void fn_8001F33C(Unk8001E444_Obj* x)
 {
-    fn_8004618C(fn_8025416C(x->m3B0->m588, 0) > 0x4E1F);
+    fn_8004618C(fn_8025416C((Unk8024EF40_W*)x->m3B0->m588, 0) > 0x4E1F);
 }
 
 extern "C" int fn_8001F378()
@@ -452,9 +451,11 @@ extern "C" int fn_8001F378()
 /* near-miss: 17/17 insns, 2 slots differ. Retail tests y first (mr. r4,r4) and then
  * loads r3 = 0 in the branch delay; every form tried (ternary, &&, if/else, bool/int
  * temps) puts the li r3,0 before the test or adds a join branch. */
-extern "C" void fn_8001F3B8(Unk8001E444_Obj* x, Unk8001E444_Char* y)
+extern "C" int fn_8001F3B8(Unk8001E444_Obj* x, Unk8001E444_Char* y)
 {
-    fn_8004618C(y && fn_8025416C(y->m588, 0) > 0x4E1F);
+    if (y)
+        return fn_8004618C(fn_8025416C((Unk8024EF40_W*)y->m588, 0) > 0x4E1F);
+    return 0;
 }
 
 extern "C" void fn_8001F3FC(Unk8001E444_Obj* x, Unk8001E444_Char* y)

@@ -279,7 +279,6 @@ float fn_80254330(void* p, int a);
 float fn_8025454C(void* p, int a);
 void fn_8009E1D4(void* p, int a, int b);
 void fn_80045024(int a);
-void fn_8004618C(bool a);
 void fn_80043B78(int a);
 void fn_80046780(int a);
 int fn_800458C0(float a);
@@ -306,7 +305,6 @@ struct Unk800B555C_Obj {
 };
 Unk800B555C_Obj* fn_800B555C();
 int fn_8001CF18(Unk8001E444_Obj* x, Unk80344538_Rec* arr);
-void fn_800437AC(int a);
 int fn_802F922C(int p);
 int fn_802F92CC(int p);
 int fn_802F92A4(int p);
@@ -339,5 +337,8 @@ int fn_802540A0(void* p, int a, int b);
 void fn_80042E24(int a);
 int fn_800B57EC();
 }
+
+int fn_8004618C(int a);
+int fn_800437AC(int a);
 
 #endif
