@@ -782,25 +782,8 @@ extern "C" FE_OVERLAY float fn_804FA098(FeS23* self, int i, float x)
 }
 
 /* near-miss: retail loads a[i] inside each branch and b[i] after the join; same register-reuse problem as fn_804FA098 */
-extern "C" FE_OVERLAY float fn_804FA104(FeS23* self, int i, int flag, float x)
-{
-    float r = 0.0f;
-    float* a;
-    float* b;
-    if (self->m870 != 0 && flag == 0) {
-        a = lbl_80622260;
-        b = lbl_80622280;
-    } else {
-        a = lbl_80622220;
-        b = lbl_80622240;
-    }
-    r = (x - a[i]) / b[i];
-    if (r < 0.0f)
-        r = 0.0f;
-    else if (!(r <= 1.0f))
-        r = 1.0f;
-    return r;
-}
+extern "C" FE_OVERLAY float fn_804FA104(FeS23* self, int i, int flag, float x) { float r=0.0f; if (self->m870 != 0 && flag == 0) r=(x-lbl_80622260[i])/lbl_80622280[i]; else r=(x-lbl_80622220[i])/lbl_80622240[i]; if(r<0.0f) r=0.0f; else if(!(r<=1.0f)) r=1.0f; return r; }
+
 
 extern "C" FE_OVERLAY void fn_804FA1AC(FeCap* self, int mode, int x)
 {
