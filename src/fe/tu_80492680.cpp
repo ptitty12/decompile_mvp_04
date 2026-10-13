@@ -346,7 +346,10 @@ FE_OVERLAY void fn_804930F8(void* x)
     int o12b = FeI(x, 0x184) * 12;
     char* sb3 = (char*)x + 0x1B8;
     ic -= *(int*)(sb3 + o12b);
-    sprintf(c200, lbl_805F6AEC, dA == 1 ? lbl_805F6AC4 : lbl_805F6AC8, dB == 1 ? lbl_805F6AD0 : lbl_805F6AD4, ic == 1 ? lbl_805F6ADC : lbl_805F6AE4);
+    const char* suffixA = dA == 1 ? lbl_805F6AC4 : lbl_805F6AC8;
+    const char* suffixB = dB == 1 ? lbl_805F6AD0 : lbl_805F6AD4;
+    const char* suffixC = ic == 1 ? lbl_805F6ADC : lbl_805F6AE4;
+    sprintf(c200, lbl_805F6AEC, suffixA, suffixB, suffixC);
     fn_804031BC(a8, c200);
     fn_80403DE4(b70, a8, dA, dB, ic);
     fn_804031BC(a8, lbl_805F6B08);
@@ -1212,4 +1215,56 @@ FE_OVERLAY void fn_804987C0(void* a, void* b)
 
 FE_OVERLAY void fn_804987E8(void) {}
 
+}
+
+void fn_8001C2E4(float);
+/* Retail fields: flags +140/+150/+154, scores +170/+174, mix +17c,
+   mode +180, host +1a0 (total +1c), context +1a4 (round byte +1cc8). */
+struct Fe6310 {
+    char pad0[0x140]; int m140; char pad144[12]; int m150; int m154;
+    char pad158[24]; int m170; int m174; int m178; float m17C; int m180;
+    char pad184[28]; void* m1A0; void* m1A4;
+};
+extern "C" FE_OVERLAY void fn_80496310(Fe6310* x)
+{
+    int round = *(unsigned char*)((char*)x->m1A4 + 0x1CC8) + 1;
+    int total = FeI(x->m1A0, 0x1C);
+    if (x->m154 == 0) {
+        if (x->m140 != 0) {
+            if (round == 7) fn_8001BC4C()->fn_8001BDAC(0xAA);
+            else fn_8001BC4C()->fn_8001BDAC(0xA9);
+        }
+        if (x->m150 != 0) {
+            x->m150 = 0;
+            if (FeI(fn_800B555C(), 0x62C) != 0) fn_8001BC4C()->fn_8001BDAC(0xB0);
+            fn_8001BC4C()->fn_8001BDAC(0xA8);
+        }
+    }
+    x->m154 = 0;
+    /* Retail negated ordered comparisons also take the increase path for NaN. */
+    if (x->m170 - x->m174 > 3) {
+        if (!(x->m17C >= 0.5f)) x->m17C += 0.001f;
+        else if (!(x->m17C <= 0.5f)) x->m17C -= 0.001f;
+        else return;
+        x->m180 = 1;
+        fn_8001BC4C(); fn_8001C2E4(x->m17C);
+    } else if (x->m174 - x->m170 > 3) {
+        if (!(x->m17C >= 0.1f)) x->m17C += 0.001f;
+        else if (!(x->m17C <= 0.1f)) x->m17C -= 0.001f;
+        else return;
+        x->m180 = 0;
+        fn_8001BC4C(); fn_8001C2E4(x->m17C);
+    } else if (!((float)round / (float)total >= 0.6666666865348816f)) {
+        if (!(x->m17C >= 0.1f)) x->m17C += 0.001f;
+        else if (!(x->m17C <= 0.1f)) x->m17C -= 0.001f;
+        else return;
+        x->m180 = 0;
+        fn_8001BC4C(); fn_8001C2E4(x->m17C);
+    } else {
+        if (!(x->m17C >= 0.75f)) x->m17C += 0.001f;
+        else if (!(x->m17C <= 0.75f)) x->m17C -= 0.001f;
+        else return;
+        x->m180 = 2;
+        fn_8001BC4C(); fn_8001C2E4(x->m17C);
+    }
 }
