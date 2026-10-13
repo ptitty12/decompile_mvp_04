@@ -227,19 +227,11 @@ extern "C" DB_OVERLAY void fn_805947F0(Db80593CD0_Data* self)
 /* near-miss (4 slots): retail copies the zero of sum into the counter (mr r31,r29) and sets r29 before the arg moves. */
 extern "C" DB_OVERLAY int fn_80594810(Db80593CD0_Data* self, int k)
 {
-    int sum = 0;
+    int s = 0;
     int r = 0;
-    int off = 0;
-    do {
-        int t = fn_80593E7C(self, r);
-        r++;
-        char* b = (char*)self + 0x20;
-        int o = k * 4 + off;
-        int v = *(int*)(b + o);
-        off += 0x34;
-        sum += t * v;
-    } while (r <= 8);
-    return sum;
+    for (r = s; r <= 8; r++)
+        s += fn_80593E7C(self, r) * ((Db805945A4_Obj*)self)->w[r][k];
+    return s;
 }
 
 extern "C" DB_OVERLAY int fn_80594880(Db80593CD0_Data* self, int k, int r)
