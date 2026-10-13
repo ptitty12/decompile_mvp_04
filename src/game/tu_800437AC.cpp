@@ -109,6 +109,57 @@ int fn_8004390C(int a)
 /* near-miss: 30/30 slots; retail emits "li r10,1" after the first null
  * test and the pointer loads; every spelling tried (if/else, ternary, &&)
  * schedules it differently. */
+extern const float lbl_805A8E3C;
+extern const float lbl_805A8E40;
+extern const float lbl_805A8E44;
+inline float Unk80043940_Abs(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" int fn_80043940(int a, float x, float y)
+{
+    int r = 0;
+    if (a == 0) {
+        if (!(x <= lbl_805A8E3C)) {
+            r = 4;
+            if (y > lbl_805A8E3C)
+                r = 0x44;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x84;
+        } else if (!(x >= lbl_805A8E3C)) {
+            r = 8;
+            if (y > lbl_805A8E3C)
+                r = 0x18;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x28;
+        }
+    } else {
+        if (!(x >= lbl_805A8E3C)) {
+            r = 4;
+            if (!(y <= lbl_805A8E3C))
+                r = 0x44;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x84;
+        } else if (!(x <= lbl_805A8E3C)) {
+            r = 8;
+            if (!(y <= lbl_805A8E3C))
+                r = 0x18;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x28;
+        }
+    }
+    if (!(Unk80043940_Abs(y) >= lbl_805A8E40) && !(Unk80043940_Abs(x) >= lbl_805A8E40)
+        && (Unk80043940_Abs(y) >= lbl_805A8E40 || x != lbl_805A8E3C))
+        r |= 0x400;
+    if (!(Unk80043940_Abs(y) >= lbl_805A8E44) && !(Unk80043940_Abs(x) >= lbl_805A8E44))
+        r |= 0x100;
+    else
+        r |= 0x200;
+    if (!(y <= lbl_805A8E3C))
+        r |= 1;
+    else if (!(y >= lbl_805A8E3C))
+        r |= 2;
+    return r;
+}
+
 int fn_80043B00(Unk80043B00_Pl* a, Unk80043B00_Pl* b, Unk80043B00_Pl* c)
 {
     int x;
@@ -401,6 +452,71 @@ int fn_80044240(int a)
     if (a <= 0x36)
         return (a == 0x1d) << 2;
     return 2;
+}
+
+struct Unk80044270_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+extern "C" float fn_804028E4(float x);
+extern const Unk80044270_Vec3 lbl_80687554;
+extern const Unk80044270_Vec3 lbl_80687560;
+extern const Unk80044270_Vec3 lbl_8068756C;
+extern const Unk80044270_Vec3 lbl_80687578;
+extern const Unk80044270_Vec3 lbl_80687584;
+extern const float lbl_805B1D60;
+extern const float lbl_806875A0;
+extern const float lbl_806875AC;
+extern const float lbl_80687594;
+extern const float lbl_805A8E48;
+
+inline Unk80044270_Vec3 Unk80044270_Sub(const Unk80044270_Vec3& a, const Unk80044270_Vec3& b)
+{
+    Unk80044270_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+inline float Unk80044270_Len(const Unk80044270_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+extern "C" int fn_80044270(Unk80044270_Vec3* p)
+{
+    int r = 0;
+    float d = Unk80044270_Len(*p);
+    if (!(d > lbl_805B1D60)) {
+        if (!(p->z <= -lbl_806875A0) && !(p->x <= -lbl_806875A0)) {
+            Unk80044270_Vec3 a = Unk80044270_Sub(*p, lbl_80687554);
+            if (!(Unk80044270_Len(a) > lbl_806875A0)) {
+                r = 1;
+            } else {
+                Unk80044270_Vec3 b = Unk80044270_Sub(*p, lbl_8068756C);
+                if (!(Unk80044270_Len(b) > lbl_806875A0)) {
+                    r = 4;
+                } else {
+                    Unk80044270_Vec3 c = Unk80044270_Sub(*p, lbl_80687560);
+                    if (!(Unk80044270_Len(c) > lbl_806875AC)) {
+                        r = 2;
+                    } else {
+                        Unk80044270_Vec3 e = Unk80044270_Sub(*p, lbl_80687578);
+                        if (!(Unk80044270_Len(e) > lbl_80687594)) {
+                            r = 0x20;
+                        } else {
+                            Unk80044270_Vec3 f = Unk80044270_Sub(*p, lbl_80687584);
+                            if (!(Unk80044270_Len(f) > lbl_805A8E48))
+                                r = 8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return r;
 }
 
 int fn_80044580(int a, int b, int c)

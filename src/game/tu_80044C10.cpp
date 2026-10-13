@@ -313,6 +313,112 @@ int fn_80045348(int a, int b)
     return 4;
 }
 
+struct Unk80045388_Pos {
+    char pad0[0x3F4];
+    float m3F4;
+};
+struct Unk80045388_Outer {
+    char pad0[0x3B8];
+    int m3B8;
+};
+struct Unk80045388_Mid {
+    char pad0[0x6CC];
+    Unk80045388_Pos* m6CC;
+    char pad6D0[0x700 - 0x6D0];
+    Unk80045388_Outer* m700;
+};
+struct Unk80045388_V {
+    float x;
+    float y;
+    float z;
+};
+extern "C" void fn_8018CA5C(Unk80045388_Pos* p, float* a, float* b, float* c);
+extern "C" float fn_8018CAF0(Unk80045388_Pos* p);
+extern "C" float atan2f(float y, float x);
+extern "C" int fn_801DC1CC(int h, int* out, float* in);
+extern "C" float fn_80248450(int h, int* out, int a, int b);
+extern const float lbl_805A8E88;
+extern const float lbl_805A8E8C;
+extern const float lbl_806177F0;
+extern const float lbl_806177F4;
+extern const float lbl_806177F8;
+extern const float lbl_806177FC;
+
+/* The third int (r5) is unused; the caller declares the parameters as (a, b, c, d, e, f, g, h, i).
+ * atan2f is retail's name for 0x80410CE8. `r = r | (flag | 2)` keeps r above d in the register allocation. */
+extern "C" int fn_80045388(int a, int b, int unused, int c, int d, Unk80045388_Mid* e, Unk80045388_V* f, Unk80045388_V* g, Unk80045388_V* h)
+{
+    int r = 0;
+    Unk80045388_Pos* pos = e->m6CC;
+    float s0;
+    float s1;
+    float s2;
+    fn_8018CA5C(pos, &s0, &s1, &s2);
+    s0 = s0 * lbl_805A8E88;
+    if (c == 0 || d == 8 || (d == 7 && a <= 1)) {
+        float p_base = lbl_806177F0;
+        float p0;
+        float p1;
+        float p3 = lbl_806177F8;
+        if (!(lbl_806177FC >= lbl_806177F4)) {
+            p0 = lbl_806177FC;
+            p1 = lbl_806177F4;
+        } else {
+            p0 = lbl_806177F4;
+            p1 = lbl_806177FC;
+        }
+        float th;
+        if (!(s0 >= p0)) {
+            th = (p0 - p_base) * lbl_805A8E8C;
+            if (!(s0 - p_base <= th) && !(p0 - s0 <= th))
+                r |= 0xC;
+        } else if (!(s0 >= p1)) {
+            th = (p1 - p0) * lbl_805A8E8C;
+            if (!(s0 - p0 <= th) && !(p1 - s0 <= th))
+                r |= 0x14;
+        } else {
+            th = (p3 - p1) * lbl_805A8E8C;
+            if (!(s0 - p1 <= th) && !(p3 - s0 <= th))
+                r |= 0x24;
+        }
+    } else if ((c == 2 && b > 1) || (c == 1 && a > 0)) {
+        int flag = 0;
+        float a1 = atan2f(f->x, f->z) * lbl_805A8E88;
+        float a2 = atan2f(g->x, g->z) * lbl_805A8E88;
+        float a3 = atan2f(h->x, h->z) * lbl_805A8E88;
+        float th;
+        if (!(a1 < s0) && !(s0 < a2)) {
+            th = (a1 - a2) * lbl_805A8E8C;
+            if (!(s0 - a2 <= th))
+                {
+                    int g = (a1 - s0) > th;
+                    flag = g << 7;
+                }
+        } else if (!(a2 < s0) && !(s0 < a3)) {
+            th = (a2 - a3) * lbl_805A8E8C;
+            if (!(s0 - a3 <= th) && !(a2 - s0 <= th))
+                flag = 0x40;
+        }
+        int buf[4];
+        int hnd = fn_801DC1CC(e->m700->m3B8, buf, &th);
+        float base = fn_8018CAF0(pos);
+        if (flag != 0 && hnd != 0) {
+            float q = fn_80248450(hnd, buf, 3, 9);
+            if (!(q <= base - pos->m3F4)) {
+                r = r | (flag | 2);
+                if (a == 3) {
+                    r |= 1;
+                    if (r & 0x80)
+                        r |= 0x200;
+                    else if (r & 0x40)
+                        r |= 0x100;
+                }
+            }
+        }
+    }
+    return r;
+}
+
 int fn_8004570C(unsigned a)
 {
     int r = 2;

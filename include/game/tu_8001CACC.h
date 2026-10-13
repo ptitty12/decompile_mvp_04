@@ -143,7 +143,8 @@ public:
 /* 0x24-byte records at Unk8001CE80+0x70 (four of them, count at +0x100); fn_8001D974 searches for m0 == m3B0. */
 struct Unk8001D974_Ent {
     Unk8001CE80_Sub* m0;
-    char pad4[8];
+    char pad4[4];
+    int m8;
     int mC;
     int m10;
     char pad14[0x24 - 0x14];
@@ -240,7 +241,8 @@ public:
     int m3E4;
     char pad3E8[0x10];
     int m3F8;
-    char pad3FC[0x8];
+    char pad3FC[0x4];
+    int m400;
     int m404;
     int m408;
     int m40C;

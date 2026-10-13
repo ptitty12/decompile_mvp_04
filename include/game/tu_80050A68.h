@@ -102,7 +102,7 @@ void fn_800119A4();
 void fn_80010F3C(int a, int b);
 void fn_8001014C(int a, int b, int c, int d);
 int fn_8025416C(Unk8024EF40_W* w, int k);
-int fn_80044270(Unk80044C10_Vec3* v);
+extern "C" int fn_80044270(Unk80044C10_Vec3* v);
 void fn_80013724(int a);
 void fn_8000F968(int a);
 int fn_80042E58(int a);

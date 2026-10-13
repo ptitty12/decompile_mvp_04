@@ -118,7 +118,7 @@ void Unk8001CE80::fn_8001DA7C()
 
 extern "C" void fn_80235BE0(float* out, int a, ...);
 extern "C" int fn_8022EA7C(int a, float* v, float s);
-int fn_80043940(float b, float c, int a);
+extern "C" int fn_80043940(float b, float c, int a);
 
 int Unk8001CE80::fn_8001DA9C()
 {
@@ -228,6 +228,64 @@ void Unk8001CE80::fn_8001DDFC()
 void Unk8001CE80::fn_8001DE9C()
 {
     fn_80043D70(m4D4);
+}
+
+struct Unk8001DEC0_St {
+    int m0;
+    unsigned m4;
+    char pad8[0x30];
+    int m38;
+    char pad3C[8];
+    int m44;
+};
+struct Unk8001DEC0_Pl {
+    char pad0[0x5CC];
+    int m5CC;
+};
+inline Unk8001DEC0_St* Unk8001DEC0_StOf(Unk8001DEC0_Pl* p)
+{
+    return (Unk8001DEC0_St*)((char*)p + 0x58C);
+}
+struct Unk80043B00_Pl;
+int fn_80043B00(Unk80043B00_Pl* a, Unk80043B00_Pl* b, Unk80043B00_Pl* c);
+
+/* near-miss (99.95%, all slots match): retail's first null test of m3B0 branches straight to the
+ * end (jump-threaded) while the second test, at the join of the failed conditions, keeps its own
+ * cmpwi. Here the first beq goes to that second test. Re-reading m3B0 in the second operand keeps
+ * the compare; the plain `p && .. || p && ..` form threads the jump but then drops the compare
+ * (cr7 reuse). Also tried: goto chain, else-if, inline Ok/Any helpers, a copy of p. */
+extern "C" void fn_8001DEC0(Unk8001CE80* x)
+{
+    Unk8001DEC0_Pl* sp[4] = { 0, 0, 0, 0 };
+    if (x->m400 == 1) {
+        sp[0] = (Unk8001DEC0_Pl*)x->m3B0;
+        if (x->m110 != 0)
+            sp[1] = (Unk8001DEC0_Pl*)x->m110;
+        else
+            sp[1] = (Unk8001DEC0_Pl*)x->m118;
+        if (x->m110 != 0 && x->m118 != 0)
+            sp[2] = (Unk8001DEC0_Pl*)x->m118;
+        else
+            sp[2] = (Unk8001DEC0_Pl*)x->m120;
+    } else {
+        Unk8001DEC0_Pl* p = (Unk8001DEC0_Pl*)x->m3B0;
+        int idx;
+        if ((p && !(Unk8001DEC0_StOf(p)->m4 & 0x20000000) && Unk8001DEC0_StOf(p)->m44 != 2
+             && (idx = Unk8001DEC0_StOf(p)->m38) > 0 && idx <= 2)
+            || ((Unk8001DEC0_Pl*)x->m3B0 && (idx = ((Unk8001DEC0_Pl*)x->m3B0)->m5CC) != -1)) {
+            sp[idx] = p;
+        }
+        for (int i = 0; i < x->m100; i++) {
+            Unk8001D974_Ent* e = &x->m70[i];
+            Unk8001DEC0_Pl* q = (Unk8001DEC0_Pl*)e->m0;
+            if (q && !(Unk8001DEC0_StOf(q)->m4 & 0x20000000) && Unk8001DEC0_StOf(q)->m44 != 2 && e->m8 > 0 && e->m8 <= 2) {
+                sp[e->m8] = q;
+            } else if (((Unk8001DEC0_Pl*)e->m0)->m5CC != -1) {
+                sp[q->m5CC] = q;
+            }
+        }
+    }
+    fn_80043B00((Unk80043B00_Pl*)sp[0], (Unk80043B00_Pl*)sp[1], (Unk80043B00_Pl*)sp[2]);
 }
 
 void Unk8001CE80::fn_8001E054()

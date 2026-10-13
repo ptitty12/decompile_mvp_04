@@ -519,6 +519,81 @@ void fn_8003C270(Unk8003A5DC* self, int a)
     fn_8003B618(self);
 }
 
+struct Unk8003C388_Vec3 {
+    float x;
+    float y;
+    float z;
+};
+struct Unk8003C388_Pos {
+    char pad0[0x3F4];
+    float m3F4;
+};
+struct Unk8005BA1C_Obj;
+Unk8005BA1C_Obj* fn_8005BA9C();
+int fn_8005C7E8(Unk8005BA1C_Obj* o, int a);
+void fn_8003E53C(Unk8003A5DC* self, int a);
+extern "C" float fn_8018CDB8(Unk8003C388_Pos* p, int a, float f);
+extern "C" void fn_8018959C(Unk8003C388_Vec3* out, Unk8003C388_Pos* p, float t);
+extern "C" float fn_804028E4(float x);
+extern "C" int rand();
+extern int lbl_805B0C78;
+extern const float lbl_805A75EC;
+extern const float lbl_805A75F0;
+extern const float lbl_805A75F4;
+extern const float lbl_805A7600;
+
+inline float Unk8003C388_M3F4(const Unk8003C388_Pos* p) { return p->m3F4; }
+
+inline float Unk8003C388_Len(const Unk8003C388_Vec3& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+/* near-miss (99.29%, 227 vs 226 insns): the float->unsigned conversion of the first call (e * lbl_805A75F4)
+ * comes out as `cror; bns; b`, retail has `blt; b` (plain LT) there; the second call's conversion matches.
+ * Tried: unsigned locals, one shared call through a goto, the reversed (l1 - l0) test. Every 0.0f is a
+ * literal (retail's lbl_805A75E8 pool entry); the m3F4 read of the first subtraction goes through an inline
+ * accessor so it loads before e. */
+extern "C" void fn_8003C388(Unk8003A5DC* self, int a, int b, unsigned c, int d)
+{
+    if (fn_8003E844(self) == 1) {
+        int t = fn_8005C7E8(fn_8005BA9C(), lbl_805B0C78);
+        if (a != 0) {
+            Unk8003C388_Pos* pos = *(Unk8003C388_Pos**)((char*)self->m10C + 0x6CC);
+            float e = fn_8018CDB8(pos, 0xB, 0.0f);
+            if (!(e <= 0.0f)) {
+                float f10 = fn_8018CDB8(pos, 0xA, 0.0f);
+                float f3 = fn_8018CDB8(pos, 3, 0.0f);
+                Unk8003C388_Vec3 v0;
+                fn_8018959C(&v0, pos, e - Unk8003C388_M3F4(pos));
+                float l0 = Unk8003C388_Len(v0) * lbl_805A75EC;
+                if (!(f3 <= 0.0f) && !(f3 <= e)) {
+                    Unk8003C388_Vec3 v1;
+                    fn_8018959C(&v1, pos, f3 - pos->m3F4);
+                    float l1 = Unk8003C388_Len(v1) * lbl_805A75EC;
+                    if (!((l1 - l0) >= lbl_805A75F0))
+                        fn_8003D944(self, 2, (unsigned)(e * lbl_805A75F4), self->m138, self->m130);
+                } else if (!(f10 <= 0.0f) && !(f10 <= e)) {
+                    Unk8003C388_Vec3 v1;
+                    fn_8018959C(&v1, pos, f10 - pos->m3F4);
+                    float l1 = Unk8003C388_Len(v1) * lbl_805A75EC;
+                    if (!((l1 - l0) >= lbl_805A75F0))
+                        fn_8003D944(self, 2, (unsigned)(e * lbl_805A7600), self->m138, self->m130);
+                }
+            }
+        } else if (b != 0) {
+            if (self->m138 == 1 && rand() % 100 <= 0x1D)
+                fn_8003D944(self, 0xD, c >> 1, self->m138, self->m130);
+        } else if (d != 0 && self->m138 == 1 && rand() % 100 <= 0x1D) {
+            fn_8003D944(self, 0xE, c >> 1, self->m138, self->m130);
+        }
+        if (t == 0 && self->m184 != -1)
+            fn_8003E53C(self, 0);
+        else if (self->m138 == 0)
+            fn_8003D840(self);
+    }
+}
+
 void fn_8003C710(Unk8003A5DC* self, int a)
 {
     Unk800475EC_Obj* o = fn_800475EC();
