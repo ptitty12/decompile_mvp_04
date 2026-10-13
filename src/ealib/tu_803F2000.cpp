@@ -197,6 +197,95 @@ extern "C" void fn_803F6FC4(int a, int b);
 extern "C" void fn_803F6AD8(int a);
 extern short* (*lbl_806EEA68)(int);
 
+struct RcFeE {
+    int m0, m4;
+    char pad8[0x38];
+    int m40, m44, m48;
+    unsigned short m4C;
+    char pad4E[0x1e];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+    int m8C;
+    char m90[0x24];
+};
+struct RcFeS {
+    short s0, s2;
+    const char* m4;
+    int m8, mC, m10;
+    char m14[4];
+    char m18[2];
+};
+inline void RcFeInit(RcFeE* e, int a, int b)
+{
+    e->m0 = a;
+    e->m4 = b;
+    e->m6C = 0;
+    e->m70 = 0;
+    e->m74 = 0;
+    e->m78 = 0;
+    e->m7C = 0;
+    e->m80 = 0;
+    e->m84 = 0;
+    e->m88 = 0;
+}
+extern RcFeE lbl_806AADFC;
+extern RcFeS lbl_806AB5B8;
+extern int lbl_806EF464;
+extern "C" void fn_803EFBA4(void*);
+extern "C" int fn_803F89B0(void*, int, void*);
+extern "C" int fn_803F8A2C(void*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" void* memset(void*, int, unsigned);
+extern "C" char fn_803F2404(const char* wild, const char* str);
+
+extern "C" RcFeE* fn_803F2240(int a0, const char* pat, int a2)
+{
+    RcFeInit(&lbl_806AADFC, 0, 0);
+    memset(lbl_806AADFC.m90, 0, 0x24);
+    lbl_806AADFC.m0 = 0x19;
+    lbl_806AADFC.m4 = 0xb;
+    lbl_806AADFC.m70 = 0;
+    lbl_806AADFC.m74 = 0;
+    lbl_806AADFC.m78 = 0;
+    lbl_806AADFC.m7C = 0;
+    lbl_806AADFC.m80 = 0;
+    lbl_806AADFC.m84 = 0;
+    lbl_806AADFC.m88 = 0;
+    lbl_806AADFC.m6C = 0;
+    if (lbl_806EF464 == 0) {
+        lbl_806AB5B8.s0 = 0;
+        lbl_806AB5B8.s2 = 0;
+        fn_803EFBA4(&lbl_806AB5B8);
+        lbl_806EF464 = 1;
+    }
+    int r;
+    if (a2 != 0) {
+        lbl_806AB5B8.m4 = 0;
+        lbl_806AB5B8.m8 = 0;
+        lbl_806AB5B8.mC = 0;
+        lbl_806AB5B8.m10 = 0;
+        memset(lbl_806AB5B8.m14, 0, 4);
+        memset(lbl_806AB5B8.m18, 0, 2);
+        r = fn_803F89B0(lbl_806EEA2C, a0, &lbl_806AB5B8);
+    } else
+        r = fn_803F8A2C(lbl_806EEA2C);
+    int found = 0;
+    while (r == 0 && found == 0) {
+            int t = fn_803F2404(pat, lbl_806AB5B8.m4);
+            if (t == 0) {
+                found = 1;
+                lbl_806AADFC.m4 = t;
+                lbl_806AADFC.m44 = lbl_806AB5B8.m8;
+                lbl_806AADFC.m48 = lbl_806AB5B8.mC;
+                lbl_806AADFC.m4C = *(unsigned short*)lbl_806AB5B8.m18;
+                *(int*)((char*)&lbl_806AADFC + 0x4e) = *(int*)lbl_806AB5B8.m14;
+                lbl_806AADFC.m40 = (int)lbl_806AB5B8.m4;
+                strcpy(lbl_806AADFC.m90, lbl_806AB5B8.m4);
+            } else
+                r = fn_803F8A2C(lbl_806EEA2C);
+    }
+    return &lbl_806AADFC;
+}
+
 extern "C" char fn_803F2404(const char* wild, const char* str)
 {
     const char* cp = 0;
