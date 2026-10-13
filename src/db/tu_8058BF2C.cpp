@@ -343,6 +343,61 @@ extern "C" DB_OVERLAY void fn_8058D81C(void* self, void* rec, unsigned short* ds
     }
 }
 
+extern "C" int fn_800B56C4(Db800B555C_Obj* o);
+extern "C" float fn_8007824C(int a, int b);
+extern "C" float fn_8033CDC4(void* tbl, float x);
+extern "C" int fn_80582E38(void* self, int a, int b);
+extern "C" int fn_80083FC0__Fi(int k);
+int fn_8007F1E0(Unk8007F198_A* a, int b, int c);
+extern "C" char lbl_8068B4C0[];
+
+extern "C" DB_OVERLAY void fn_8058D8E0(Db805822D0_V* self, int a, int b)
+{
+    int z = self->m0;
+    if (z == 0) {
+        Unk8007A4DC_Screen* s = lbl_8061930C;
+        Unk8007B2B0_Screen* sb = (Unk8007B2B0_Screen*)s;
+        int t = fn_8007F7D0((Unk8007F198_B*)s, 0);
+        float f;
+        float c;
+        Db8052E198_E e;
+        Unk8006A138_It<3> it(z);
+        int i = 0;
+        do {
+            if (b == sb->fn_8007B320(fn_80083FC0__Fi(i), t))
+                return;
+            i = it.Next();
+        } while (i <= 3);
+        int p = 0;
+        if (fn_800B5758(fn_800B555C())) {
+            Unk8007A4DC_Screen* s2 = lbl_8061930C;
+            int q = fn_8008FE14(6);
+            p = ((Unk8007B2B0_Screen*)s2)->fn_8007B380(q, fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        }
+        int m = fn_8040ABA0() % 2;
+        int n;
+        if (fn_800B56C4(fn_800B555C())) {
+            n = 0;
+        } else {
+            int r = fn_8040ABA0();
+            if (fn_800B56C4(fn_800B555C()))
+                n = r;
+            else
+                n = r % 2;
+        }
+        f = fn_8007824C(a, 0);
+        c = fn_8033CDC4(lbl_8068B4C0, f);
+        if (!(c < 0.8f)) {
+            int w = fn_80582E38(self, a, self->v18());
+            if (w == 0 && fn_8007F1E0((Unk8007F198_A*)s, a, b) != 0) {
+                fn_8052E198(&e, self->v18(), a, b, p, (char)m, n, 0, w, w);
+                fn_80582CF8(self, &e, 0, 0, 0);
+                fn_80360AF0((Db80586420_Ent*)&e, 2);
+            }
+        }
+    }
+}
+
 extern "C" DB_OVERLAY int fn_8058DB0C(void* self, unsigned short* rec)
 {
     int k = rec[8] & 3;
