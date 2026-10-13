@@ -1166,7 +1166,7 @@ config.libs = [
             Object(Matching, "libc/rand.c"),
             Object(NonMatching, "libc/tu_8040ABC4.c"),
             Object(NonMatching, "libc/strtod2.c"),
-            Object(NonMatching, "libc/strtoul.c"),
+            Object(Matching, "libc/strtoul.c"),
             Object(Matching, "libc/memcmp.c"),
             Object(Matching, "libc/memcpy.c"),
             Object(Matching, "libc/memmove.c"),
