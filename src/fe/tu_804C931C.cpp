@@ -323,16 +323,14 @@ extern "C" FE_OVERLAY int fn_804CA1E8(void* x)
     return 5;
 }
 
-/* near-miss: 2 slots (retail compares `cmpwi r3,4; bge`, we emit `cmpwi r3,3; bgt`). The
- * comma form below is the closest of ~14 spellings of `n >= 4 && n <= 5`. */
 extern "C" FE_OVERLAY int fn_804CA2F0(void* x)
 {
-    int n = fn_804CA1E8(x);
-    int r;
-    if (n > 5 || (r = 1, n < 4)) {
-        r = 0;
+    switch (fn_804CA1E8(x)) {
+    case 4:
+    case 5:
+        return 1;
     }
-    return r;
+    return 0;
 }
 
 extern "C" FE_OVERLAY void fn_804CA328(FeScrN* x, int a)
