@@ -13,6 +13,8 @@
  *
  * Resource table of the MAD/VP6 file layer: lbl_806243F8[0] = entries (8 bytes each), lbl_80624400[0] = capacity,
  * lbl_80624404[0] = used count. Evidence: fn_803913FC clears n entries, fn_80391784 searches them. */
+#include "../../include/prodg/stdarg.h"
+
 struct McEntry {
     int m0;
     void* m4;
@@ -341,6 +343,38 @@ union McTagU {
     } f;
 };
 
+extern "C" int fn_80391444(McRec* r);
+
+extern "C" int fn_80391B1C(McRec* r)
+{
+    int ret = -1;
+    if (lbl_806243F8[0] != 0) {
+        int idx = fn_80391444(r);
+        if (idx < lbl_80624400[0] && idx >= 0) {
+            if (r->m4 & 0x80)
+                fn_80391A3C(r);
+            int off = idx * 8;
+            int i = lbl_80624404[0];
+            if (i > idx) {
+                int t = (int)lbl_806243F8[0];
+                do {
+                    McEntry* e = (McEntry*)(i * 8 + t);
+                    i--;
+                    *e = e[-1];
+                } while (i > idx);
+            }
+            McEntry* tab = lbl_806243F8[0];
+            ret = lbl_806243FC[0];
+            int n = lbl_80624404[0];
+            tab[idx].m4 = r;
+            tab[idx].m0 = ret;
+            lbl_806243FC[0] = ret + 1;
+            lbl_80624404[0] = n + 1;
+        }
+    }
+    return ret;
+}
+
 extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short c)
 {
     McTagU t;
@@ -470,10 +504,144 @@ extern "C" void fn_80391EA4()
     lbl_8069B9BC[0] = 0;
 }
 
+struct McRecW {
+    unsigned short m0;
+    unsigned short m2;
+    unsigned short m4;
+};
+
+extern "C" int fn_8039582C();
+extern "C" void fn_803927E4(int i);
+
+extern "C" int fn_80391F70(unsigned x, int y)
+{
+    int ret = -1;
+    int skip = -1;
+    int i = 0;
+    do {
+        if (lbl_8069B80C.ch[i].m6 == 0) {
+            ret = i;
+            goto done;
+        }
+        i++;
+    } while (i <= 15);
+    {
+        unsigned now = fn_8039582C();
+        i = 0;
+        do {
+            McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
+            if (r->m2 != 0 && now - lbl_8069B80C.ch[i].m0 > r->m2 && skip != i) {
+                fn_803927E4(i);
+                ret = i;
+                goto done;
+            }
+            i++;
+        } while (i <= 15);
+    }
+    i = 0;
+    do {
+        McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
+        int slot = lbl_8069B80C.ch[i].m7;
+        if (r->m4 <= x && slot == y) {
+            lbl_8069B80C.ch[i].m6 = 0;
+            ret = i;
+            lbl_8069B80C.cnt[slot] -= 1;
+            goto done;
+        }
+        i++;
+    } while (i <= 15);
+done:
+    return ret;
+}
+
 /* near-miss: retail forms lbl+0x20 first and indexes it; 3 spellings of the +8 index tried. */
 extern "C" int fn_80392098(int i)
 {
     return (unsigned)lbl_8069B80C.pos[i] <= 15;
+}
+
+struct McRecV {
+    char pad0[4];
+    unsigned short m4;
+    char pad6[3];
+    signed char m9;
+    unsigned char mA;
+};
+
+extern int lbl_80624410[];
+extern "C" int fn_80394FD4(int a, int b);
+extern "C" int fn_8039582C();
+extern "C" int fn_80391F70(unsigned x, int y);
+extern "C" void fn_80392988(int slot);
+
+inline unsigned char Lo8(int* p)
+{
+    return *((unsigned char*)p + 3);
+}
+
+extern "C" int fn_803920BC(int* arg0)
+{
+    int r = 0;
+    int spC;
+    McTag tag;
+    int* pSp;
+    if (lbl_80624410[0] == 0) {
+        lbl_80624410[0] = 1;
+        if (arg0 != 0) {
+            *(int*)&tag = *arg0;
+            McRecV* o = (McRecV*)fn_80391CCC(&tag);
+            if (o != 0 && fn_80391D20(&tag, &spC) != 0) {
+                int lim = o->m9;
+                if (fn_80394FD4(100, -1) <= lim) {
+                    int ch = fn_80391F70(o->m4, spC);
+                    if (ch >= 0) {
+                        int now = fn_8039582C();
+                        if (now == lbl_8069B9B8[0])
+                            lbl_8069B9BC[0] += 1;
+                        else
+                            lbl_8069B9BC[0] = 0;
+                        McRaw* p = (McRaw*)((char*)&lbl_8069B80C + ch * 16);
+                        lbl_8069B80C.ch[ch].m8 = (int)o;
+                        p->m47 = Lo8(&spC);
+                        p->m44 = lbl_8069B9BC[0];
+                        lbl_8069B9B8[0] = now;
+                        lbl_8069B80C.ch[ch].m0 = now;
+                        if (lbl_8069B80C.ch[ch].mC != 0)
+                            fn_80392BC0(lbl_8069B80C.ch[ch].mC);
+                        lbl_8069B80C.ch[ch].mC = arg0;
+                        lbl_8069B80C.cnt[spC] += 1;
+                        p->m46 = 1;
+                        lbl_8069B80C.pos[spC] = ch;
+                        if (o->mA & 0x20)
+                            fn_80392988(spC);
+                        r = 1;
+                    }
+                }
+            }
+        }
+    }
+    lbl_80624410[0] = 0;
+    return r;
+}
+
+extern "C" int fn_80392B80(int size);
+
+extern "C" int fn_8039223C(int first, int n, ...)
+{
+    va_list ap;
+    int r = 0;
+    va_start(ap, n);
+    int* buf = (int*)fn_80392B80(n * 4 + 4);
+    if (buf != 0) {
+        int i;
+        buf[0] = first;
+        for (i = 1; i <= n; i++)
+            buf[i] = va_arg(ap, int);
+        r = fn_803920BC(buf);
+        if (r == 0)
+            fn_80392BC0(buf);
+    }
+    return r;
 }
 
 extern "C" void fn_80392388(int* p)

@@ -16,8 +16,8 @@ extern int (*lbl_806243F0[])();
 extern void* lbl_806EE9C0;
 
 struct McPair {
-    short a;
-    short b;
+    unsigned short a;
+    unsigned short b;
 };
 
 extern McPair lbl_8069BEC0[];
@@ -196,6 +196,37 @@ extern "C" void fn_80394DE8(int x)
     lbl_80624438[5] = e + 0xD1A9FBE7;
 }
 
+extern "C" int fn_80394E3C(int a, int n, int b)
+{
+    int r = -1;
+    if (n > 0x20)
+        n = 0x20;
+    int idx = lbl_80624450[0];
+    int cnt = 0;
+    int steps = 0;
+    int done = 0;
+    do {
+        if (cnt < n) {
+            if (lbl_8069BEC0[idx].b == b) {
+                cnt++;
+                if (lbl_8069BEC0[idx].a == a) {
+                    done = 1;
+                    r = cnt - 1;
+                }
+            }
+        } else {
+            done = 1;
+        }
+        idx--;
+        if (idx < 0)
+            idx += 0x20;
+        steps++;
+        if (steps > 0x20)
+            done = 1;
+    } while (done == 0);
+    return r;
+}
+
 extern "C" void fn_80394EE4(int a, int b)
 {
     lbl_80624450[0] = lbl_80624450[0] + 1;
@@ -252,6 +283,25 @@ extern "C" int fn_80394FD4(int a, int b)
     return v;
 }
 
+/* near-miss 96.9%: same code; retail keeps the slot offset in r7, the record in r10 and the byte index in r8 (ours r8,
+ * r11, r10) and loads the table size before the inner test. */
+extern "C" void fn_803950B4(int key)
+{
+    int i = 0;
+    do {
+        McHdrB* s = lbl_8069B7CC[i].m0;
+        if (s != 0 && lbl_8069B7CC[i].m4 == key) {
+            int j = 0;
+            unsigned char* tab = (unsigned char*)s + ((((s->m10 * 2) + 3) & ~3) + 0x18);
+            while (j < lbl_8069B7CC[i].m0->m12) {
+                tab[j] = 0xFF;
+                j++;
+            }
+        }
+        i++;
+    } while (i <= 7);
+}
+
 extern "C" int fn_80395150(int x, unsigned y)
 {
     int r = 0;
@@ -287,6 +337,35 @@ extern "C" int fn_80395250(int x, unsigned y)
         fn_803958FC(x);
     }
     return r;
+}
+
+struct McRec6 {
+    char pad0[6];
+    unsigned char m6;
+};
+
+struct McTri {
+    int a;
+    int b;
+    int c;
+};
+
+inline unsigned char* McT(McRec6* p)
+{
+    int n = p->m6 * 2;
+    n = (n + 3) & ~3;
+    return (unsigned char*)p + (n + 0xc);
+}
+
+extern "C" int fn_80395350(McRec6* p, int i)
+{
+    McTri v;
+    int t = (int)McT(p);
+    int k = i * 3;
+    v.a = *(unsigned char*)(k + t);
+    v.b = *(unsigned char*)(k + t + 1);
+    v.c = *(unsigned char*)(k + t + 2);
+    return v.a;
 }
 
 extern "C" int fn_80395714(McRec67* p, int i, int c, int d)
