@@ -7,6 +7,7 @@
  */
 #include "game/chooser.h"
 #include "game/goals/tu_8027FD64.h"
+extern "C" float atan2f(float y, float x);
 
 float lbl_8061E6D0 = 45.0f;
 extern Unk80273498_Vec3 lbl_805DED28;
@@ -227,6 +228,64 @@ struct Unk802831B0_Ext {
     char pad0[0xD4];
     float mD4;
 };
+
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+/* Sibling of fn_802831B0 (pass 5). Frame notes: the vector `d` sits in its own block so its slot is free
+ * again for the Abs wrapper's parameter (retail's 0x28 slot); `u` is read through the Abs wrapper. */
+int fn_80282EE4(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float a, Unk802831B0_Ext* p, float b, Unk80273498_Vec3* v1, Unk80273498_Vec3* v2, float th, int e, int c)
+{
+    float lo, hi, v, t, w;
+
+    if (!(b <= 36.0f)) {
+        lo = fn_80248FC8(x, 1);
+        hi = fn_80248FC8(x, 2);
+        v = fn_80248FC8(x, 2);
+        t = v + 39.37008f;
+        if (c) {
+            t = hi;
+        }
+        if (e) {
+            {
+                Unk80273498_Vec3 d = *v2 - *v1;
+                w = atan2f(d.x, d.z);
+            }
+            float u = Unk8027FD64_Abs(AngleDiff(th, w));
+            if (!(u <= 1.5707964f)) {
+                t = hi;
+            }
+            if (!(u <= 0.7853982f)) {
+                if (c) {
+                    t = (hi + lo) * 0.5f;
+                }
+            }
+        }
+        return a > t;
+    }
+    if (!(g->m80 > 0.0f)) {
+        return 0;
+    }
+    int idx = fn_8027FC20(g, g->m0);
+    float u = g->m8->fn_8027A280(idx);
+    w = b / fn_80248FC8(x, 3);
+    u += w;
+    if (p) {
+        u += p->mD4;
+    }
+    v = 0.25f;
+    t = u / g->m80;
+    if (g->mE8.f1 && g->m68 == 7) {
+        v = 0.6f;
+    }
+    return t > v + 1.0f;
+}
 
 int fn_802831B0(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float a, Unk802831B0_Ext* p, int c, float b)
 {
