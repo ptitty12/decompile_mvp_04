@@ -448,6 +448,58 @@ DB_OVERLAY void fn_8053AF9C(X* x, int a, int b, int c)
     } while (idx <= 9);
 }
 
+DB_OVERLAY int fn_8053B064(R* r)
+{
+    int cnt = 0;
+    int i = 0;
+    unsigned j;
+    int nb = fn_8053CA58((X*)r);
+    unsigned char n = r->m4;
+    int v68 = *(int*)((char*)r + 0x68);
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    if (n != 0) {
+        do {
+            int o = (unsigned char)i * 4;
+            if (s->fn_8007A270(*(int*)((char*)r->m0 + o)) == 0)
+                cnt++;
+            i++;
+        } while (i < n);
+    }
+    Db8053967C_Tab* tb = (Db8053967C_Tab*)r;
+    for (j = 0; j <= 3; j++) {
+        int flag = 0;
+        if (j == 0 || j == 2)
+            flag = 1;
+        for (i = 0; i != 10; i++) {
+            if (i == 0)
+                continue;
+            if (i == 9) {
+                if (flag == 0)
+                    continue;
+            }
+            if (tb->r[j].b[i] == 0xFF)
+                return 4;
+        }
+    }
+    if (cnt <= 8)
+        return 3;
+    if (nb <= 4)
+        return 1;
+    if (v68 <= 0)
+        return 2;
+    for (j = 0; j < 2; j++) {
+        unsigned n2 = fn_8053BA1C(r, j);
+        for (i = 0; (unsigned)i < n2; i++) {
+            int off = i * 8 + j * 16;
+            char* bs = (char*)r + 0x1B0;
+            int id = *(int*)(bs + off);
+            if (fn_8053BAD0(r, j, id, fn_800A2AE8(lbl_80619948)) <= 0)
+                return 6;
+        }
+    }
+    return 0;
+}
+
 DB_OVERLAY unsigned char fn_8053B210(R* r, int id)
 {
     unsigned char i = 0;
