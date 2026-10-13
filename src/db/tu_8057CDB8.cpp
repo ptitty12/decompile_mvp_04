@@ -435,17 +435,16 @@ extern "C" DB_OVERLAY void fn_8057DF60(void)
 extern "C" DB_OVERLAY int fn_8057DF80(int* out)
 {
     int t = fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C)->m1D8;
-    if (t == 1) {
-        DbO74* o = (DbO74*)lbl_80619948;
-        if ((fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C)->m1D4 == 1 && fn_800A4EA4(o) != 0) || fn_800A2EB4(o) != 0 || o->m74 == 2)
-            return 2;
-        if (fn_80545BB8((char*)o + 0xA8, 0) != 0)
-            *out = t;
-        else
-            *out = 2;
-        return *out;
-    }
-    return 2;
+    if (t != 1)
+        return 2;
+    DbO74* o = (DbO74*)lbl_80619948;
+    if ((fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C)->m1D4 == 1 && fn_800A4EA4(o) != 0) || fn_800A2EB4(o) != 0 || o->m74 == 2)
+        return 2;
+    if (fn_80545BB8((char*)o + 0xA8, 0) != 0)
+        *out = t;
+    else
+        *out = 2;
+    return *out;
 }
 
 extern "C" DB_OVERLAY void fn_8057E03C(void* self, int c)

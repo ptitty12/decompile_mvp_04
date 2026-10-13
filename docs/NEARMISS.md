@@ -313,3 +313,12 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - fe/tu_80492680::fn_80493F20 (99.14%): eight byte/unsigned/accessor/condition forms leave the retail redundant byte extension absent or change allocation; scratch build/root-80493F20.
 
 - fe/tu_80492680::fn_80492BA8 (97.58%): eight provider-grounded float/layout/accessor forms leave eight widget/conversion register slots; corrected two-float output contract in scratch build/root-80492BA8, no source change promoted.
+- `fn_8056EC68`: explicit boolean-result form loses the retail CR4 lifetime; baseline 96.61% retains the two next-index/call scheduling slots. Scratch SW02/build/swarm22.
+- `fn_805706B8`: existing source casts the shared int-declared fn_8007189C to a float provider; canonical return-type repair is required before further matching. Baseline 99.54%; no new casts or aliases added.
+- `fe/tu_804439E4` `fn_804459D0` (swarm22, 2 forms): existing 96.18%; 81/82 words, aligned 7. False bit-test path reuses zero in r0 rather than retail explicit li; first virtual-table load/store scheduling also differs.
+- `snd/tu_803A9830` `fn_803A9CF4`: 99.615%, 26/26 instructions; rlwinm/lwzx index r3 versus retail r0 remains after byte/local/accessor/const forms.
+- `ealib/tu_80394744` `fn_803950B4`: 96.923%, 39/39 instructions; count-load scheduling and register allocation remain; separate count and if/do forms regress.
+- `ealib/tu_803D50E4` `fn_803D675C`: 84/84 instructions, 2 load operands differ (stack versus current-iterator base); member iterator/end-return/increment forms converge, remaining source trials parked.
+
+- `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
+- `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.

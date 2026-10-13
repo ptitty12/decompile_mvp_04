@@ -714,3 +714,39 @@ extern "C" DB_OVERLAY void fn_8057CCE8(DbSL* self)
         }
     }
 }
+
+extern const float lbl_805FFF74, lbl_805FFF78, lbl_805FFF7C, lbl_805FFF88;
+extern "C" int fn_803794DC(int);
+extern "C" float fn_804028E4(double);
+extern "C" double fabs(double);
+static inline float DbNormalMagnitude(float z)
+{
+    return (float)fabs(z);
+}
+extern "C" DB_OVERLAY float fn_8057BC94(int n, int k, float p)
+{
+    float result = lbl_805FFF74;
+    float q = lbl_805FFF78 - p;
+    if (n <= 9 && !(p >= lbl_805FFF7C)) {
+        unsigned i = 0;
+        do {
+            fn_803794DC(i);
+            i++;
+        } while (i <= 19);
+        float remain = (float)(n - k);
+        float numerator = (float)fn_803794DC(n);
+        float firstPower = Db8057BF64_Pw(p, (float)k);
+        float secondPower = Db8057BF64_Pw(q, remain);
+        float firstFactor = (float)fn_803794DC(k);
+        float secondFactor = (float)fn_803794DC((int)remain);
+        float product = numerator * firstPower * secondPower;
+        float denominator = firstFactor * secondFactor;
+        result = product / denominator;
+    } else {
+        float magnitude = DbNormalMagnitude(!((float)k <= (float)n * p)
+            ? ((float)k + lbl_805FFF88 - (float)n * p) / fn_804028E4((float)n * p * q)
+            : ((float)k - lbl_805FFF88 - (float)n * p) / fn_804028E4((float)n * p * q));
+        result = fn_8057BF64(magnitude);
+    }
+    return result;
+}
