@@ -127,6 +127,51 @@ struct Db80566B38_H : Db80566B38_D {
     virtual Db80566B38_List* v5(int a);
 };
 extern "C" void fn_80569E60(Db80565CDC_S* s, int a, int b, int c, int d);
+struct Db8056746C_Rec {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    float m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+};
+struct Db8056746C_OD {
+    char pad0[0x10];
+};
+struct Db8056746C_O : Db8056746C_OD {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual Db8056746C_Rec* v21(int a);
+};
+struct Db8056746C_H : Db80566B38_D {
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual Db8056746C_O* v4(int a);
+};
+int fn_8008463C(int x);
+extern "C" void fn_8056A058(int s, int a, int b, int c, int d, int e);
 
 extern "C" DB_OVERLAY int fn_80566520(Db80565CDC_S* s)
 {
@@ -330,6 +375,17 @@ extern "C" DB_OVERLAY void fn_805673AC(Db80565CDC_S* s, int a, int b, int c, int
             o += 0x1C;
         } while (i < cnt);
     }
+}
+
+/* near-miss: 97.1%; retail copies the first record with dest r11 / counter r9 and hoists the second vptr load above
+ * the last three copy stores, ours swaps the two temporaries (struct-copy loop scheduling). */
+extern "C" DB_OVERLAY void fn_8056746C(int a, int b, int k)
+{
+    Db8056746C_H* h = (Db8056746C_H*)b;
+    Db8056746C_Rec p = *h->v4(k)->v21(0);
+    Db8056746C_Rec q = *h->v4(k)->v21(1);
+    if (p.m10 == q.m10)
+        fn_8056A058(a, fn_8008463C(k), 0, p.m0, q.m0, 1);
 }
 
 extern "C" DB_OVERLAY void fn_805678D8(int a, int b, int k)
