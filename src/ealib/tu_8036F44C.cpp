@@ -370,22 +370,8 @@ extern "C" void fn_8036FAF4(void* x)
 }
 
 
-extern "C" void fn_803DA440(void* self, void (*fn)(), void* a, void* b, void* c);
-extern char lbl_80693D9C[];
 extern char lbl_80623908[];
 extern char lbl_80623928[];
 extern char lbl_806044F4[];
 
-extern "C" void fn_8036FE14(int a, int b)
-{
-    if (b == 0xFFFF) {
-        if (a != 0) {
-            fn_803DA440(lbl_80693D9C, (void (*)())fn_8036FAF4, lbl_80623908, lbl_80623928, lbl_806044F4);
-        }
-    }
-}
-
-extern "C" void fn_8036FE74()
-{
-    fn_8036FE14(1, 0xFFFF);
-}
+Unk803DA440 lbl_80693D9C((void (*)())fn_8036FAF4, lbl_80623908, lbl_80623928, lbl_806044F4);

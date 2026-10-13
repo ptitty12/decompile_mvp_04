@@ -991,7 +991,7 @@ config.libs = [
             Object(NonMatching, "ealib/tu_80375038.cpp"),
             Object(NonMatching, "ealib/tu_80375AE8.cpp"),
             Object(NonMatching, "ealib/tu_80376598.cpp"),
-            Object(NonMatching, "ealib/tu_8036F44C.cpp"),
+            Object(Matching, "ealib/tu_8036F44C.cpp"),
             Object(NonMatching, "ealib/tu_8038BC58.cpp"),
             Object(NonMatching, "ealib/tu_803BA9DC.cpp"),
             Object(NonMatching, "ealib/tu_803BD944.cpp"),
