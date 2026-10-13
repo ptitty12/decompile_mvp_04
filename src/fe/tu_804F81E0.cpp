@@ -416,6 +416,26 @@ struct FeS29 : FeObj {
 extern const char lbl_805FB2F4[];
 extern "C" void fn_804F33C0(void* self, int a);
 extern "C" void fn_8013D164(void* w, int v);
+struct FeS30 : FeObj {
+    char pad40[0x7B8 - 0x40];
+    FeObj* m7B8;
+    char pad7BC[0x7CC - 0x7BC];
+    FeObj* m7CC;
+    char pad7D0[0x7E0 - 0x7D0];
+    FeObj* m7E0;
+};
+extern const char lbl_805FB46C[];
+extern const char lbl_805FB47C[];
+extern const char lbl_805FB48C[];
+extern const char lbl_805FB49C[];
+extern const char lbl_805FB4AC[];
+extern const char lbl_805FB4BC[];
+extern const char lbl_805FB4CC[];
+extern const char lbl_805FB4DC[];
+extern const char lbl_805FB4EC[];
+extern const char lbl_805FB4FC[];
+extern const char lbl_805FB50C[];
+extern const char lbl_805FB51C[];
 /* Q16-DECL-END */
 
 extern "C" int fn_804FB7F4(FeS19* s);
@@ -1417,6 +1437,43 @@ extern "C" FE_OVERLAY int fn_804FD3C4(FeS20* s, int a)
 }
 
 extern char lbl_80680EB8[];
+extern "C" FE_OVERLAY void fn_804FD418(FeS30* self)
+{
+    if (((FeSubQ45*)((char*)self->m7B8 + 0xDC))->s11() == 0) {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB46C, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB47C, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB48C, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB49C, 1)))->v16(0);
+    } else {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB46C, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB47C, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB48C, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB49C, 1)))->v16(1);
+    }
+    if (((FeSubQ45*)((char*)self->m7CC + 0xDC))->s11() == 0) {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4AC, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4BC, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4CC, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4DC, 1)))->v16(0);
+    } else {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4AC, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4BC, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4CC, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4DC, 1)))->v16(1);
+    }
+    if (((FeSubQ45*)((char*)self->m7E0 + 0xDC))->s11() == 0) {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4EC, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4FC, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB50C, 1)))->v16(0);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB51C, 1)))->v16(0);
+    } else {
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4EC, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB4FC, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB50C, 1)))->v16(1);
+        ((FeObjQ45*)fn_800C805C(self->v32(lbl_805FB51C, 1)))->v16(1);
+    }
+}
+
 extern "C" FE_OVERLAY FeRawBig* fn_804FDB24(FeRawBig* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_804D1070((FeScr6Raw*)self, a, b, c, d, e, f, g, h);
