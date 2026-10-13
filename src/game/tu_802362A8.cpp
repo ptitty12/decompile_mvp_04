@@ -497,6 +497,54 @@ int Unk802362A8_Cpu::fn_802386A8(float* out)
     return 1;
 }
 
+extern char lbl_80649DA0[];
+extern char lbl_80660D68[];
+extern "C" void fn_8037893C(void* q, int id, void* e, int a, int b);
+class Unk80238934_Pl {
+public:
+    char pad0[0x98];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual int v4();
+};
+struct Unk80238934_Msg {
+    int m0;
+    const void* vptr;
+    int m8;
+    void Base(int id)
+    {
+        vptr = lbl_80649DA0;
+        m0 = id;
+    }
+    void Derived() { vptr = lbl_80660D68; }
+    void Dtor() { vptr = lbl_80649DA0; }
+    void Set(int v) { m8 = v; }
+};
+void Unk802362A8_Cpu::fn_80238934(float* p)
+{
+    int v = ((Unk80238934_Pl*)fn_801A4B34(m2E4))->v4();
+    Unk80238934_Msg m;
+    m.Base(0xAA);
+    m.Derived();
+    if (!(p[0] < -1.0f) && !(p[0] > -0.4f)) {
+        if (v)
+            m.Set(2);
+        else
+            m.Set(0);
+    } else if (!(p[0] < -0.4f) && !(p[0] > 0.4f)) {
+        m.Set(1);
+    } else {
+        if (v)
+            m.Set(0);
+        else
+            m.Set(2);
+    }
+    Unk80238934_Msg* mp = &m;
+    fn_8037893C((char*)m2E4 + 0x704, m.m0, mp, 0, 0);
+    mp->Dtor();
+}
+
 int fn_80238A40(Unk802362A8_Cpu* c, float* out)
 {
     out[0] = Unk80238A40_LerpATB(-1.0f, Unk80238A40_RandC(c, 1.0f, 0x461), 1.0f);
