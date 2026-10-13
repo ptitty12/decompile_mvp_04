@@ -146,6 +146,109 @@ FE_OVERLAY FeRecB::FeRecB(int a, int b)
     m10 = lbl_8067A1A8;
 }
 
+/* Screen view whose vtable slot 89 (+0x2C8) takes an int (fn_80523A90). */
+class FeV89 {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual void s33();
+    virtual void s34();
+    virtual void s35();
+    virtual void s36();
+    virtual void s37();
+    virtual void s38();
+    virtual void s39();
+    virtual void s40();
+    virtual void s41();
+    virtual void s42();
+    virtual void s43();
+    virtual void s44();
+    virtual void s45();
+    virtual void s46();
+    virtual void s47();
+    virtual void s48();
+    virtual void s49();
+    virtual void s50();
+    virtual void s51();
+    virtual void s52();
+    virtual void s53();
+    virtual void s54();
+    virtual void s55();
+    virtual void s56();
+    virtual void s57();
+    virtual void s58();
+    virtual void s59();
+    virtual void s60();
+    virtual void s61();
+    virtual void s62();
+    virtual void s63();
+    virtual void s64();
+    virtual void s65();
+    virtual void s66();
+    virtual void s67();
+    virtual void s68();
+    virtual void s69();
+    virtual void s70();
+    virtual void s71();
+    virtual void s72();
+    virtual void s73();
+    virtual void s74();
+    virtual void s75();
+    virtual void s76();
+    virtual void s77();
+    virtual void s78();
+    virtual void s79();
+    virtual void s80();
+    virtual void s81();
+    virtual void s82();
+    virtual void s83();
+    virtual void s84();
+    virtual void s85();
+    virtual void s86();
+    virtual void s87();
+    virtual void s88();
+    virtual void s89(int a);
+};
+extern "C" FeW* fn_800C8038(FeW* w);
+extern "C" void fn_800C3C80(void* a, void* b);
+extern const char lbl_805FC318[];
+extern const char lbl_805FC330[];
+extern const char lbl_805FC348[];
+extern const char lbl_805FC360[];
+extern const char lbl_805FC378[];
+extern const char lbl_805FC390[];
+
 extern "C" FE_OVERLAY void fn_80520C0C(FeV10B* x)
 {
     int v = fn_8051E910(x->m4, lbl_80622648);
@@ -352,6 +455,32 @@ extern "C" FE_OVERLAY int fn_80523A5C(void* x, int a, int b, int c, int d)
     return 0;
 }
 
+extern "C" FE_OVERLAY void fn_80523A90(void* x, int mode)
+{
+    FeScrN* self = (FeScrN*)x;
+    fn_8001BC4C()->fn_8001BDAC(0x9D);
+    int v = 1;
+    ((FeV89*)self)->s89(1);
+    fn_80524408(self, 1);
+    switch (mode) {
+    case 0:
+        break;
+    case 1:
+        v = 0;
+        break;
+    case 2:
+        v = 2;
+        break;
+    }
+    ((void (*)(int, int))FeI(self, 0x334))(v, FeI(self, 0x148));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC318)));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC330)));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC348)));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC360)));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC378)));
+    fn_800C3C80(fn_800C33D0(), fn_800C8038((FeW*)FeP(self, 0x304)->fn_vslot29(lbl_805FC390)));
+}
+
 extern "C" FE_OVERLAY void fn_805243C4(void* x)
 {
     if (FeI(x, 0x308) > 1) {
@@ -546,6 +675,65 @@ extern "C" FE_OVERLAY FeScrN* fn_80524C1C(FeScrN* self, int a, int b, int c, int
     return self;
 }
 
+/* Widget at +0x164 of the screen of fn_80525498: its own vptr (+0x3C) has slot 33 taking an index; the sub-object at +0x98
+ * has vptr +0x24 with an int getter (slot 5), a setter (slot 6) and a count (slot 13). */
+class FeCycSub {
+public:
+    char pad0[0x24];
+    virtual void c1();
+    virtual void c2();
+    virtual void c3();
+    virtual void c4();
+    virtual int c5();
+    virtual void c6(int a);
+    virtual void c7();
+    virtual void c8();
+    virtual void c9();
+    virtual void c10();
+    virtual void c11();
+    virtual void c12();
+    virtual int c13();
+};
+class FeCycW {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29();
+    virtual void s30();
+    virtual void s31();
+    virtual void s32();
+    virtual int s33(int a);
+};
+extern "C" void fn_800CFB38(int a);
+extern float lbl_805FC4C0;
+
 extern "C" FE_OVERLAY void fn_80524C94(void* x)
 {
     fn_8040B61C((char*)x + 0x134);
@@ -602,6 +790,38 @@ extern "C" FE_OVERLAY void fn_80525390(FeScrN* self)
                 fn_80525498(self, 1);
             break;
         }
+    }
+}
+
+extern "C" FE_OVERLAY void fn_80525498(FeScrN* self, int mode)
+{
+    FeI(self, 0x168) = mode;
+    switch (mode) {
+    case 0:
+        break;
+    case 1:
+        if (FeI(self, 0x164) != 0) {
+            fn_800C5E28();
+            fn_800C618C();
+            int v = (((FeCycSub*)((char*)self->m164 + 0x98))->c5() + 1) % ((FeCycSub*)((char*)self->m164 + 0x98))->c13();
+            ((FeCycSub*)((char*)self->m164 + 0x98))->c6(v);
+            int w = ((FeCycW*)self->m164)->s33(v);
+            ((void (*)(void*, int))fn_80524C94)(self, w);
+            fn_805252C0(self, lbl_805FC4C0);
+        }
+        if (FeI(self, 0x150) != 0) {
+            fn_800CFB38(FeI(self, 0x15C));
+        } else {
+            fn_800CFB38(FeI(self, 0x160));
+        }
+        break;
+    case 2:
+        FeI(self, 0x154) = lbl_8061A328 + 0x168;
+        {
+            int t = FeI(self, 0x160) != 0 ? FeI(self, 0x150) ^ 1 : 1;
+            FeI(self, 0x150) = t;
+        }
+        break;
     }
 }
 

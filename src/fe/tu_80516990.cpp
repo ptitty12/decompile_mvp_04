@@ -345,6 +345,61 @@ extern "C" FE_OVERLAY int fn_80516B1C(FeScrT* x)
     return r;
 }
 
+/* near-miss: 99%+; only the loop's slwi/addi pair order differs (retail slwi first); b-first variants hoist the base, off-first ones fold it */
+extern "C" FE_OVERLAY void fn_80516B6C(FeScrT* x)
+{
+    fn_80125100(FeP(x, 0x2B8));
+    FeW* p = FeP(x, 0x2B8);
+    int a0 = fn_80516ACC(x);
+    int code = 0x1A2F;
+    if (a0 != 0) {
+        code = 0x37A2;
+    }
+    ((int (*)(void*, int, int))fn_80125180)(p, 3, code);
+    if (fn_80516B1C(x) == 0 && FeI(x, 0x1BC) > 0 && FeI(x, 0x274) > 0) {
+        fn_80125180(FeP(x, 0x2B8), 2, 0x1A3D);
+    } else {
+        fn_80125084(FeP(x, 0x2B8), 2);
+    }
+    if (fn_80516ACC(x) != 0) {
+        goto K;
+    }
+    {
+        FeTab2* t;
+        FeTab2* u;
+        int idx;
+        int val;
+        int found;
+        if (((FeTab2*)x->m2A8)->m94->fn_vslot60() < ((FeTab2*)x->m2A8)->m84) {
+            t = (FeTab2*)x->m2A8;
+            idx = t->m94->fn_vslot60();
+            u = (FeTab2*)x->m2A8;
+            val = t->m4[idx];
+            found = 0;
+            for (int i = 0; i < *(volatile int*)&u->m88; i++) {
+                char* b = (char*)u + 0x78;
+                if (val == *(int*)(b + i * 4)) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (found) {
+                fn_80125180(FeP(x, 0x2B8), 0, 0x1A46);
+                return;
+            }
+            if (((FeTab2*)((volatile FeScrT*)x)->m2A8)->m88 <= 2) {
+                fn_80125180(FeP(x, 0x2B8), 0, 0x1A45);
+                return;
+            }
+        K:
+            fn_80125084(FeP(x, 0x2B8), 0);
+        } else {
+            fn_80125084(FeP(x, 0x2B8), 0);
+            fn_80125084(FeP(x, 0x2B8), 3);
+        }
+    }
+}
+
 extern "C" FE_OVERLAY void fn_80516D24(FeScrT* x, char* dst)
 {
     *dst = 0;
