@@ -87,6 +87,16 @@ extern "C" int fn_80077BC4(void* g, int a);
 extern "C" void fn_80536C5C(Unk805352B0_List* self, int x);
 extern "C" void fn_80539380(Unk805352B0_List* self);
 extern "C" void fn_80535764(Unk805352B0_List* self, int x);
+inline void Db80560314_Step(int& v)
+{
+    int t;
+    if (v > 3)
+        t = v;
+    else
+        t = v + 1;
+    v = t;
+}
+extern "C" float fn_8007824C(int a, int b);
 
 extern "C" DB_OVERLAY int fn_8055F730(Db8055F7B8_List* l, int x, int kind)
 {
@@ -420,6 +430,81 @@ extern "C" DB_OVERLAY void fn_805601F0(int x, int k)
             cur = it.Next();
         } while (cur <= 3);
     }
+}
+
+/* near-miss: 98.7%; instruction-for-instruction equal, callee-saved numbering shifted (a/b/k5 and x/h ranks; the final
+ * vptr store is r31-relative where retail is frame-relative). */
+extern "C" DB_OVERLAY void fn_80560314(int a, int b, int c)
+{
+    Unk8007A4DC_Screen* sc = lbl_8061930C;
+    int found = 0;
+    int x = fn_8007F6C4((Unk8007F198_A*)sc, a, b, c);
+    int h = ((Unk8007B2B0_Screen*)sc)->fn_80075948(a);
+    int e = 0;
+    goto test;
+step:
+    Db80560314_Step(e);
+test:
+    if (e <= 3) {
+        int g = ((Unk8007B2B0_Screen*)sc)->fn_8007B320(fn_80083FC0(e), h);
+        if (fn_8007F198((Unk8007F198_A*)sc, g) > 0x18)
+            goto step;
+        fn_8007F61C((Unk8007F198_A*)sc, a, b, x);
+        found = 1;
+        fn_8007F330((Unk8007F198_A*)sc, g, x);
+    }
+    Unk80535650_Tmp t;
+    int buf[0xFA];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0xFA);
+    q->C2();
+    q->C3(lbl_8065C1B0);
+    if (found == 0) {
+        fn_80535F5C((Unk805352B0_List*)q, h);
+        int pick = 0;
+        fn_805362AC((Unk805352B0_List*)q, 0);
+        unsigned i = 0;
+        int k5 = sc->fn_8007A6A0(5, x);
+        float fx = fn_8007824C(x, 0);
+        float best = 0.0f;
+        if (i < q->m4) {
+            int off = 0;
+            do {
+                int el = *(int*)((char*)t.m0 + off);
+                if (sc->fn_8007A6A0(5, el) == k5) {
+                    float f = fn_8007824C(el, 0);
+                    if (!(f >= fx) && (pick == 0 || !(f >= best))) {
+                        best = f;
+                        pick = el;
+                    }
+                }
+                i++;
+                off += 4;
+            } while (i < q->m4);
+        }
+        if (pick == 0) {
+            unsigned j = 0;
+            int off2 = 0;
+            int k2 = sc->fn_8007A270(x);
+            for (; j < t.m4; off2 += 4, j++) {
+                int el = *(int*)((char*)t.m0 + off2);
+                if (sc->fn_8007A270(el) == k2) {
+                    pick = el;
+                    break;
+                }
+            }
+        }
+        int g2 = fn_80077BC4(sc, pick);
+        fn_80079564(sc, pick, 0);
+        fn_8007F61C((Unk8007F198_A*)sc, a, b, x);
+        fn_8007F330((Unk8007F198_A*)sc, g2, x);
+    }
+    int p1 = sc->fn_8007A6A0(0x1E, x);
+    int p2 = sc->fn_8007A6A0(0x1F, x);
+    if (p1 != 0 && p2 > 0) {
+        fn_805600F8(fn_80077BC4(sc, x), x);
+    }
+    t.D();
 }
 
 /* near-miss: 6 slots (retail copies the index zero into the counter: li r30,0 / mr r31,r30; ours uses two li) */
