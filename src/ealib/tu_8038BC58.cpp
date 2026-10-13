@@ -19,6 +19,13 @@ struct VdQ16 {
     int m8;
     int mC;
 };
+struct LowMem {
+    char pad[0xF8];
+    unsigned busClock;
+    unsigned cpuClock;
+};
+#define LOWMEM ((LowMem*)0x80000000)
+
 extern "C" int fn_803A975C();
 extern "C" int fn_803A979C();
 extern "C" int fn_803AB8A4(int h, void* out);
@@ -247,6 +254,39 @@ extern "C" void fn_8038E05C(I* p)
 }
 
 extern "C" int fn_8038E1A8(int a, int b);
+
+/* near-miss (99.46%): only the r9/r11 assignment of the shifted value and the zero in the last block differs. */
+extern "C" unsigned fn_8038E080(VdMain* s)
+{
+    VdClock* c = s->m60;
+    fn_8038E468(c);
+    unsigned tk = c->m8 / (LOWMEM->busClock / 4000);
+    int t = tk - s->m4C;
+    if (s->m58 != 0) {
+        struct { int w, x, y, z; } b;
+        struct { int w, x, y, z; } a;
+        fn_803A975C();
+        fn_803AB8A4(s->m0->mC, &a);
+        fn_803AB644(a.x, &b);
+        fn_803A979C();
+        int v = b.x - fn_803A925C();
+        if (v > s->m54) {
+            int diff = v - t;
+            s->m54 = v;
+            s->m5C = s->m5C - s->m5C / 8 + diff;
+            int ad = -s->m5C;
+            if (ad < s->m5C)
+                ad = s->m5C;
+            if (ad > 0x108) {
+                int m = s->m4C - s->m5C / 8;
+                s->m5C = 0;
+                s->m4C = m;
+                t = tk - s->m4C;
+            }
+        }
+    }
+    return t;
+}
 
 extern "C" int fn_8038E3EC(int a, int* b)
 {
