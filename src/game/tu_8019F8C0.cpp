@@ -633,12 +633,10 @@ float fn_801A20F8(Unk8019F8C0_Owner* o, int idx, float a, float b)
     return r;
 }
 
-/* near-miss: same code; retail stores the clamp result straight into v's slot (sp+8), ours via the
-   inline's return temp (sp+0x20), 2 slots. */
+/* Return the clamp expression directly; the caller rounds it in its existing float local. */
 inline float Unk8019F8C0_Clamp(float lo, float t, float hi)
 {
-    t = !(t > hi) ? (t >? lo) : hi;
-    return t;
+    return !(t > hi) ? (t >? lo) : hi;
 }
 
 float fn_801A2158(Unk8019F8C0_Owner* o, int idx)
@@ -656,7 +654,8 @@ float fn_801A2158(Unk8019F8C0_Owner* o, int idx)
         v = v - lbl_805CE6C8;
         break;
     }
-    return Unk8019F8C0_Clamp(lbl_805CE6CC, v, lbl_805CE6D0);
+    v = Unk8019F8C0_Clamp(lbl_805CE6CC, v, lbl_805CE6D0);
+    return v;
 }
 
 int fn_801A2238(Unk8019F8C0_Owner* o, int a)
