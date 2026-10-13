@@ -12,10 +12,12 @@
  * so functions that use several strings only match when each file is compiled as its own unit. The "flags:" tags
  * give the compiler flags a function needs: untagged functions match with the configured flags; the OSCache,
  * OSContext and OSInterrupt files compile with -opt nopeephole after their first original-code function.
- * Not matched yet: fn_80434314 (callee-saved regs r29/r30 swapped), fn_80434590 (exact at -opt nopeephole except a
- * frame 8 bytes larger and `cmpwi` on the 0x800030F4 word; the OSExec file needs nopeephole as a whole), fn_80434654 and
- * fn_80434AD8 (not attempted), fn_8043402C (string base / table base registers swapped), fn_80435350 and
- * __OSUnmaskInterrupts (callee-saved regs permuted), fn_80435460, fn_804357F4, the OSFont functions.
+ * Compile flags per source file (found by compiling each "====" section below as its own unit; every function tagged
+ * "matches only with -opt nopeephole" is an exact match with that flag, and the untagged ones match with the configured
+ * flags): OSCache, OSContext, OSExec (after Run, 0x8043449C) and OSInterrupt need -opt nopeephole; OSError, OSExec up to
+ * Run (PackArgs) and OSFont use the configured flags. Section address ranges: OSCache 0x804330D0, OSContext 0x804333F8,
+ * OSError 0x80433C68, OSExec 0x80434314, OSFont 0x80434C74, OSInterrupt 0x80434F88, OSLink (__OSModuleInit) 0x804357F4.
+ * Not matched yet: fn_8043402C (callee-saved string base / table base swapped).
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -319,6 +321,8 @@ typedef OSErrorHandler ErrHandler;
 
 
 /* flags: not matched (near-miss) */
+/* near-miss: only the callee-saved registers differ (string base r31 / error table r30 in retail, swapped here); the
+ * `dar` argument of the program-exception report is part of the original call */
 /* __OSUnhandledException */
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 {
@@ -390,7 +394,7 @@ void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
         break;
     case 6:
         OSReport("\nProgram exception : Possible illegal instruction/operation at or around 0x%x (read from SRR0)\n",
-                 context->srr0);
+                 context->srr0, dar);
         break;
     case 15:
         OSReport("\n");
@@ -402,6 +406,447 @@ void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 
     OSReport("\nLast interrupt (%d): SRR0 = 0x%08x  TB = 0x%016llx\n", lbl_806EF818, lbl_806EF814, lbl_806EF820);
     fn_8041A5E4();
+}
+
+/* ==== OSExec ==== */
+
+extern int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, void* callback, s32 prio);  /* DVDReadAbsAsyncPrio */
+extern s32 fn_80425064(DVDCommandBlock* block);        /* DVDGetCommandBlockStatus */
+extern BOOL fn_80425510(void);                         /* DVDCheckDisk */
+extern void fn_804361BC(int);                          /* __OSDoHotReset */
+extern s32 lbl_806EF7F8;                               /* Prepared */
+extern s32 lbl_806EF7FC;                               /* cached dol/FST offset */
+
+BOOL fn_80434314(void* ptr, int argc, char* argv[]);
+void fn_804344D8(void* addr, s32 length, s32 offset);
+void fn_80434544(void);
+void fn_80434550(OSExecParams* params);
+s32 fn_80434590(void);
+void fn_80434654(u32 doloffset, u32 restartCode, void* regionStart, void* regionEnd, BOOL argsUseDefault, s32 argc, char** argv);
+void fn_80434AD8(u32 doloffset, u32 restartCode, const char** argv);
+
+/* PackArgs */
+BOOL fn_80434314(void* addr, int argc, char* argv[])
+{
+    int numArgs;
+    char* bootInfo2;
+    char* ptr;
+    char** list;
+    u32 i;
+
+    bootInfo2 = (char*)addr;
+    memset(bootInfo2, 0, 0x2000);
+
+    if (argc == 0) {
+        *(u32*)(bootInfo2 + 8) = 0;
+    } else {
+        numArgs = argc;
+        ptr = bootInfo2 + 0x2000;
+        while (--argc >= 0) {
+            ptr -= strlen(argv[argc]) + 1;
+            strcpy(ptr, argv[argc]);
+            argv[argc] = (char*)(ptr - bootInfo2);
+        }
+
+        ptr = bootInfo2 + ((ptr - bootInfo2) & ~0x3);
+        ptr -= ((numArgs + 1) * 4);
+        list = (char**)ptr;
+
+        for (i = 0; i < numArgs + 1; i++) {
+            list[i] = argv[i];
+        }
+
+        ptr -= 4;
+        *(u32*)ptr = numArgs;
+
+        *(u32*)(bootInfo2 + 8) = (ptr - bootInfo2);
+    }
+
+    return 1;
+}
+
+/* flags: matches only with -opt nopeephole */
+/* Read (DVDReadAbsAsyncPrio + wait) */
+void fn_804344D8(void* addr, s32 length, s32 offset)
+{
+    DVDCommandBlock block;
+
+    fn_80424C14(&block, addr, length, offset, NULL, 0);
+    while (fn_80425064(&block)) {
+        if (!fn_80425510()) {
+            fn_804361BC(0);
+        }
+    }
+}
+
+/* Callback */
+void fn_80434544(void)
+{
+    lbl_806EF7F8 = 1;
+}
+
+/* flags: matches only with -opt nopeephole */
+/* __OSGetExecParams */
+void fn_80434550(OSExecParams* params)
+{
+    if (OS_BASE_CACHED <= *(u32*)0x800030F0) {
+        memcpy(params, *(void**)0x800030F0, sizeof(OSExecParams));
+    } else {
+        params->valid = FALSE;
+    }
+}
+
+extern void fn_80434F9C(void);                         /* OSEnableInterrupts */
+extern u32 fn_80435350(u32 global);                    /* __OSMaskInterrupts */
+extern u32 __OSUnmaskInterrupts(u32 global);
+extern void fn_80422FD8(void);                         /* DVDInit */
+extern BOOL fn_8042515C(BOOL autoInvalidation);        /* DVDSetAutoInvalidation */
+extern void fn_8042516C(void);                         /* DVDResume */
+extern void fn_80425608(DVDCBCallback callback);       /* __DVDPrepareResetAsync */
+extern DVDDiskID* fn_80425508(void);                   /* DVDGetCurrentDiskID */
+extern int fn_80424E94(DVDCommandBlock* block, DVDCBCallback callback);  /* DVDCancelStreamAsync */
+extern void fn_8043449C(void* entry);                  /* Run (original code) */
+extern void fn_804330C0(void);                         /* ICFlashInvalidate */
+extern void fn_80435FA4(void** start, void** end);     /* OSGetSaveRegion */
+
+extern BOOL lbl_806EF7AC;                              /* __OSIsGcam */
+extern volatile u32 lbl_812FDFF0 AT_ADDRESS(0x812FDFF0);
+extern volatile u32 lbl_812FDFEC AT_ADDRESS(0x812FDFEC);
+extern volatile u8 lbl_800030E2 AT_ADDRESS(0x800030E2);
+
+/* flags: matches only with -opt nopeephole */
+/* GetApploaderPosition */
+s32 fn_80434590(void)
+{
+    u32* tgcHeader;
+    s32 apploaderOffsetInTGC;
+
+    if (lbl_806EF7FC != 0) {
+        return lbl_806EF7FC;
+    }
+
+    if (__OSAppLoaderOffset != 0) {
+        tgcHeader = fn_80432CD4(0x40, 0x20);
+        fn_804344D8(tgcHeader, 0x40, __OSAppLoaderOffset);
+        apploaderOffsetInTGC = tgcHeader[14];
+        lbl_806EF7FC = __OSAppLoaderOffset + apploaderOffsetInTGC;
+    } else {
+        lbl_806EF7FC = 0x2440;
+    }
+    return lbl_806EF7FC;
+}
+
+typedef struct {
+    char date[16];
+    u32 entry;
+    u32 size;
+    u32 rebootSize;
+    u32 reserved2;
+} AppLoaderStruct;
+
+/* StartDol */
+static void StartDol(const OSExecParams* params, void* entry)
+{
+    OSExecParams* paramsWork = (OSExecParams*)fn_80432CD4(sizeof(OSExecParams), 1);
+
+    memcpy(paramsWork, params, sizeof(OSExecParams));
+    __OSExecParams = paramsWork;
+    __PIRegs[9] = 7;
+
+    OSDisableInterrupts();
+    fn_8043449C(entry);
+}
+
+/* IsStreamEnabled */
+static int IsStreamEnabled(void)
+{
+    if (fn_80425508()->streaming) {
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
+/* StopStreaming */
+static void StopStreaming(void)
+{
+    DVDCommandBlock block;
+
+    if (!lbl_806EF7AC && IsStreamEnabled()) {
+        AISetStreamVolLeft(0);
+        AISetStreamVolRight(0);
+        fn_80424E94(&block, NULL);
+
+        while (fn_80425064(&block)) {
+            if (!fn_80425510()) {
+                fn_804361BC(0);
+            }
+        }
+
+        AISetStreamPlayState(0);
+    }
+}
+
+/* LoadApploader */
+static AppLoaderStruct* LoadApploader(void)
+{
+    AppLoaderStruct* header;
+
+    header = (AppLoaderStruct*)fn_80432CD4(sizeof(AppLoaderStruct), 0x20);
+    fn_804344D8(header, sizeof(AppLoaderStruct), fn_80434590());
+
+    fn_804344D8((void*)0x81200000, OSRoundUp32B(header->size), fn_80434590() + 0x20);
+    ICInvalidateRange((void*)0x81200000, OSRoundUp32B(header->size));
+    return header;
+}
+
+/* LoadDol */
+static void* LoadDol(const OSExecParams* params, AppLoaderCallback getInterface)
+{
+    appInitCallback appInit;
+    appGetNextCallback appGetNext;
+    appGetEntryCallback appGetEntry;
+    void* addr;
+    u32 length;
+    u32 offset;
+    OSExecParams* paramsWork;
+
+    getInterface(&appInit, &appGetNext, &appGetEntry);
+    paramsWork = (OSExecParams*)fn_80432CD4(sizeof(OSExecParams), 1);
+    memcpy(paramsWork, params, sizeof(OSExecParams));
+    __OSExecParams = paramsWork;
+    appInit((void (*)(char*))OSReport);
+    fn_80432CCC(paramsWork);
+
+    while (appGetNext(&addr, &length, &offset) != 0) {
+        fn_804344D8(addr, length, offset);
+    }
+
+    return appGetEntry();
+}
+
+/* IsNewApploader */
+static BOOL IsNewApploader(AppLoaderStruct* header)
+{
+    return strncmp(header->date, "2004/02/01", 10) > 0 ? TRUE : FALSE;
+}
+
+/* flags: matches only with -opt nopeephole */
+/* __OSBootDolSimple */
+void fn_80434654(u32 doloffset, u32 restartCode, void* regionStart, void* regionEnd, BOOL argsUseDefault, s32 argc, char** argv)
+{
+    OSExecParams* params;
+    void* dolEntry;
+    AppLoaderStruct* header;
+
+    OSDisableInterrupts();
+    params = (OSExecParams*)fn_80432CD4(sizeof(OSExecParams), 1);
+    params->valid = TRUE;
+    params->restartCode = restartCode;
+    params->regionStart = regionStart;
+    params->regionEnd = regionEnd;
+    params->argsUseDefault = argsUseDefault;
+
+    if (!argsUseDefault) {
+        params->argsAddr = fn_80432CD4(0x2000, 1);
+        fn_80434314(params->argsAddr, argc, argv);
+    }
+
+    fn_80422FD8();
+    fn_8042515C(TRUE);
+    fn_8042516C();
+
+    lbl_806EF7F8 = FALSE;
+
+    fn_80425608((DVDCBCallback)fn_80434544);
+    fn_80435350(0xFFFFFFE0);
+    __OSUnmaskInterrupts(0x400);
+    fn_80434F9C();
+
+    while (lbl_806EF7F8 != TRUE) {
+        if (!fn_80425510()) {
+            fn_804361BC(0);
+        }
+    }
+
+    StopStreaming();
+
+    header = LoadApploader();
+    if (IsNewApploader(header)) {
+        if (doloffset == 0xFFFFFFFF) {
+            doloffset = (fn_80434590() + 0x20) + header->size;
+        }
+
+        params->bootDol = doloffset;
+        dolEntry = LoadDol(params, (AppLoaderCallback)header->entry);
+        StartDol(params, dolEntry);
+    } else {
+        lbl_812FDFF0 = (u32)regionStart;
+        lbl_812FDFEC = (u32)regionEnd;
+        lbl_800030E2 = 1;
+
+        fn_804344D8((void*)0x81300000, OSRoundUp32B(header->rebootSize), (fn_80434590() + 0x20) + header->size);
+        ICInvalidateRange((void*)0x81300000, OSRoundUp32B(header->rebootSize));
+        OSDisableInterrupts();
+        fn_804330C0();
+        fn_8043449C((void*)0x81300000);
+    }
+}
+
+/* flags: matches only with -opt nopeephole */
+/* __OSBootDol */
+void fn_80434AD8(u32 doloffset, u32 restartCode, const char** argv)
+{
+    char doloffInString[20];
+    s32 argvlen;
+    char** argvToPass;
+    s32 i;
+    void* saveStart;
+    void* saveEnd;
+
+    fn_80435FA4(&saveStart, &saveEnd);
+    sprintf(doloffInString, "%d", doloffset);
+    argvlen = 0;
+
+    if (argv != 0) {
+        while (argv[argvlen] != 0) {
+            argvlen++;
+        }
+    }
+
+    argvlen++;
+    argvToPass = (char**)fn_80432CD4((argvlen + 1) * 4, 1);
+    *argvToPass = doloffInString;
+
+    for (i = 1; i < argvlen; i++) {
+        argvToPass[i] = (char*)argv[i - 1];
+    }
+
+    fn_80434654(-1, restartCode, saveStart, saveEnd, FALSE, argvlen, argvToPass);
+}
+
+/* ==== OSFont ==== */
+
+extern u16 lbl_80636598[];              /* single-byte code table (0x20..0xDF) */
+extern u16 lbl_80636718[];              /* SJIS level 1 table */
+extern u16 lbl_806EF2F0;                /* FontEncode */
+extern void* lbl_806EF80C;              /* ParseString function pointer */
+extern void* lbl_806EF800;              /* font data (ANSI) */
+extern void* lbl_806EF804;              /* font data (SJIS) */
+
+u32 fn_80434C74(u16 encode, u16 code);
+u16 fn_80434DE8(void);
+char* fn_80434E4C(u16 encode, const char* string, void** pfont, int* pfontCode);
+
+static BOOL IsSjisTrailByte(u8 c)
+{
+    return (0x40 <= c && c <= 0xFC) && (c != 0x7F);
+}
+
+static BOOL IsSjisLeadByte(u8 c)
+{
+    return (0x81 <= c && c <= 0x9F) || (0xE0 <= c && c <= 0xFC);
+}
+
+/* GetFontCode */
+
+u32 fn_80434C74(u16 encode, u16 code)
+{
+    if (encode == 1) {
+        if (code >= 0x20 && code <= 0xDF) {
+            return lbl_80636598[code - 0x20];
+        }
+        if (code > 0x889E && code <= 0x9872) {
+            int row = code >> 8;
+            int col = code & 0xFF;
+            int idx = (row - 0x88) * 0xBC;
+
+            if (!IsSjisTrailByte(col)) {
+                return 0;
+            }
+            col -= 0x40;
+            if (col >= 0x40) {
+                col--;
+            }
+            return idx + col + 0x2BE;
+        }
+        if (code >= 0x8140 && code < 0x879E) {
+            int row = code >> 8;
+            int col = code & 0xFF;
+            int idx = (row - 0x81) * 0xBC;
+
+            if (!IsSjisTrailByte(col)) {
+                return 0;
+            }
+            col -= 0x40;
+            if (col >= 0x40) {
+                col--;
+            }
+            return lbl_80636718[idx + col];
+        }
+    } else {
+        if (code > 0x20 && code <= 0xFF) {
+            return code - 0x20;
+        }
+    }
+    return 0;
+}
+
+/* OSGetFontEncode (VI_PAL..VI_EURGB60 are empty cases that fall into default) */
+u16 fn_80434DE8(void)
+{
+    if (lbl_806EF2F0 != 0xFFFF) {
+        return lbl_806EF2F0;
+    }
+    switch (*(volatile int*)0x800000CC) {
+    case 0:
+        lbl_806EF2F0 = (__VIRegs[55] & 2) ? 1 : 0;
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    default:
+        lbl_806EF2F0 = 0;
+        break;
+    }
+    lbl_806EF80C = (void*)fn_80434E4C;
+    return lbl_806EF2F0;
+}
+
+/* ParseStringS */
+char* fn_80434E4C(u16 encode, const char* string, void** pfont, int* pfontCode)
+{
+    void* font;
+    u16 code = 0;
+
+    switch (encode) {
+    case 0:
+        font = lbl_806EF800;
+        code = *string;
+        if (code != 0) {
+            string++;
+        }
+        break;
+    case 1:
+        font = lbl_806EF804;
+        code = *string;
+        if (code == 0) {
+            break;
+        }
+        string++;
+
+        if (IsSjisLeadByte(code) && IsSjisTrailByte(*string)) {
+            code = (code << 8 | *string++);
+        }
+        break;
+    }
+
+    *pfont = font;
+    *pfontCode = fn_80434C74(encode, code);
+
+    return (char*)string;
 }
 
 /* ==== OSInterrupt ==== */
@@ -441,8 +886,8 @@ void fn_80435004(void)
 {
     lbl_806EF810 = (InterruptHandler*)0x80003040;
     memset(lbl_806EF810, 0, 32 * sizeof(InterruptHandler));
-    *(volatile u32*)0x800000C4 = 0;
-    *(volatile u32*)0x800000C8 = 0;
+    *(u32*)0x800000C4 = 0;
+    *(u32*)0x800000C8 = 0;
     __PIRegs[1] = 0xF0;
     fn_80435350(0xFFFFFFE0);
     fn_80432014(4, (void*)fn_804357A4);
@@ -600,7 +1045,13 @@ u32 fn_80435078(u32 mask, u32 current)
     return mask;
 }
 
-/* flags: not matched (near-miss) */
+/* with -opt nopeephole (OSInterrupt compiled as its own unit) the exact body is
+ *   mask = ~(prev | local) & global; global |= prev; *(u32*)0x800000C4 = global;
+ *   while (mask) { mask = SetInterruptMask(mask, global | local); }
+ * (and the mirror image for the unmask: mask = (prev | local) & global; global = prev & ~global; ...),
+ * with plain (non-volatile) reads of 0x800000C4/0x800000C8; with the configured flags that form scores lower
+ * (86.32% against 90.29% for the volatile form below), so the volatile form is kept. */
+/* flags: not matched (near-miss; this form is the better one with the configured flags) */
 /* __OSMaskInterrupts */
 u32 fn_80435350(u32 global)
 {
@@ -623,7 +1074,7 @@ u32 fn_80435350(u32 global)
     return prev;
 }
 
-/* flags: not matched (near-miss) */
+/* flags: not matched (near-miss; see the note above __OSMaskInterrupts) */
 /* __OSUnmaskInterrupts */
 u32 __OSUnmaskInterrupts(u32 global)
 {
@@ -646,8 +1097,8 @@ u32 __OSUnmaskInterrupts(u32 global)
     return prev;
 }
 
-/* flags: not matched (near-miss) */
-/* ExternalInterruptHandler */
+/* flags: matches only with -opt nopeephole */
+/* __OSDispatchInterrupt */
 void fn_80435460(u16 exception, OSContext* context)
 {
     s16 interrupt;
@@ -770,7 +1221,7 @@ void fn_80435460(u16 exception, OSContext* context)
             }
         }
 
-        handler = lbl_806EF810[interrupt];
+        handler = fn_80434FF0(interrupt);
         if (handler) {
             if (interrupt > 4) {
                 lbl_806EF818 = interrupt;
@@ -788,234 +1239,12 @@ void fn_80435460(u16 exception, OSContext* context)
 }
 
 extern void fn_804357A4(void);                         /* ExternalInterruptHandler wrapper (original code) */
+extern OSModuleQueue __OSModuleInfoList AT_ADDRESS(0x800030C8);
+extern void* __OSStringTable AT_ADDRESS(0x800030D0);
 
-/* flags: not matched (near-miss) */
-/* __OSModuleInit */
+/* __OSModuleInit (OSLink.c: own unit, configured flags) */
 void fn_804357F4(void)
 {
-    *(volatile u32*)0x800030CC = 0;
-    *(volatile u32*)0x800030C8 = 0;
-    *(volatile u32*)0x800030D0 = 0;
-}
-
-/* ==== OSExec ==== */
-
-extern int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, void* callback, s32 prio);  /* DVDReadAbsAsyncPrio */
-extern s32 fn_80425064(DVDCommandBlock* block);        /* DVDGetCommandBlockStatus */
-extern BOOL fn_80425510(void);                         /* DVDCheckDisk */
-extern void fn_804361BC(int);                          /* __OSDoHotReset */
-extern s32 lbl_806EF7F8;                               /* Prepared */
-extern u32 lbl_806EF7FC;                               /* cached dol/FST offset */
-
-BOOL fn_80434314(void* ptr, int argc, char* argv[]);
-void fn_804344D8(void* addr, s32 length, s32 offset);
-void fn_80434544(void);
-void fn_80434550(OSExecParams* params);
-u32 fn_80434590(void);
-
-/* PackArgs */
-/* flags: not matched (near-miss) */
-/* near-miss 96.1%: ptr/argv callee-saved registers swapped (r30/r29); one return TRUE at the end (retail has a single exit), the
- * rest is instruction scheduling (addi n+1 / clrrwi order) and one extra addi copy */
-BOOL fn_80434314(void* ptr, int argc, char* argv[])
-{
-    int n;
-    char* p;
-    char** newArgv;
-    u32 j;
-
-    memset(ptr, 0, 0x2000);
-    if (argc == 0) {
-        *((u32*)ptr + 2) = 0;
-    } else {
-        n = argc;
-        p = (char*)ptr + 0x2000;
-        while (--argc >= 0) {
-            p -= strlen(argv[argc]) + 1;
-            strcpy(p, argv[argc]);
-            argv[argc] = (char*)(p - (char*)ptr);
-        }
-
-        p = (char*)ptr + (((u32)(p - (char*)ptr)) & ~3);
-        newArgv = (char**)p - (n + 1);
-        for (j = 0; j < n + 1; j++) {
-            newArgv[j] = argv[j];
-        }
-        *((u32*)newArgv - 1) = n;
-        *((u32*)ptr + 2) = (u32)((u8*)(newArgv - 1) - (u8*)ptr);
-    }
-    return TRUE;
-}
-
-/* flags: matches only with -opt nopeephole */
-/* Read (DVDReadAbsAsyncPrio + wait) */
-void fn_804344D8(void* addr, s32 length, s32 offset)
-{
-    DVDCommandBlock block;
-
-    fn_80424C14(&block, addr, length, offset, NULL, 0);
-    while (fn_80425064(&block)) {
-        if (!fn_80425510()) {
-            fn_804361BC(0);
-        }
-    }
-}
-
-/* Callback */
-void fn_80434544(void)
-{
-    lbl_806EF7F8 = 1;
-}
-
-/* flags: matches only with -opt nopeephole */
-/* __OSGetExecParams */
-void fn_80434550(OSExecParams* params)
-{
-    if (OS_BASE_CACHED <= *(u32*)0x800030F0) {
-        memcpy(params, *(void**)0x800030F0, sizeof(OSExecParams));
-    } else {
-        params->valid = FALSE;
-    }
-}
-
-/* ==== OSFont ==== */
-
-extern u16 lbl_80636598[];              /* single-byte code table (0x20..0xDF) */
-extern u16 lbl_80636718[];              /* SJIS level 1 table */
-extern u16 lbl_806EF2F0;                /* FontEncode */
-extern void* lbl_806EF80C;              /* ParseString function pointer */
-extern void* lbl_806EF800;              /* font data (ANSI) */
-extern void* lbl_806EF804;              /* font data (SJIS) */
-
-u32 fn_80434C74(u16 encode, u16 code);
-u16 fn_80434DE8(void);
-char* fn_80434E4C(u16 encode, char* str, void** data, u32* out);
-
-static int IsTrailRange(u8 c)
-{
-    return c >= 0x40 && c <= 0xFC;
-}
-
-static int IsSjisTrail(u8 c)
-{
-    return IsTrailRange(c) && c != 0x7F;
-}
-
-/* GetFontCode */
-/* flags: not matched (near-miss) */
-/* near-miss: addi 702 / add idx order swapped in the level-2 kanji return */
-u32 fn_80434C74(u16 encode, u16 code)
-{
-    if (encode == 1) {
-        if (code >= 0x20 && code <= 0xDF) {
-            return lbl_80636598[code - 0x20];
-        }
-        if (code > 0x889E && code <= 0x9872) {
-            int row = code >> 8;
-            int col = code & 0xFF;
-            int idx = (row - 0x88) * 0xBC;
-
-            if (!IsSjisTrail(col)) {
-                return 0;
-            }
-            col -= 0x40;
-            if (col >= 0x40) {
-                col--;
-            }
-            return idx + (col + 0x2BE);
-        }
-        if (code >= 0x8140 && code < 0x879E) {
-            int row = code >> 8;
-            int col = code & 0xFF;
-            int idx = (row - 0x81) * 0xBC;
-
-            if (!IsSjisTrail(col)) {
-                return 0;
-            }
-            col -= 0x40;
-            if (col >= 0x40) {
-                col--;
-            }
-            return lbl_80636718[idx + col];
-        }
-    } else {
-        if (code > 0x20 && code <= 0xFF) {
-            return code - 0x20;
-        }
-    }
-    return 0;
-}
-
-/* OSGetFontEncode (VI_PAL..VI_EURGB60 are empty cases that fall into default) */
-u16 fn_80434DE8(void)
-{
-    if (lbl_806EF2F0 != 0xFFFF) {
-        return lbl_806EF2F0;
-    }
-    switch (*(volatile int*)0x800000CC) {
-    case 0:
-        lbl_806EF2F0 = (__VIRegs[55] & 2) ? 1 : 0;
-        break;
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    default:
-        lbl_806EF2F0 = 0;
-        break;
-    }
-    lbl_806EF80C = (void*)fn_80434E4C;
-    return lbl_806EF2F0;
-}
-
-/* flags: not matched (near-miss) */
-/* ParseString */
-char* fn_80434E4C(u16 encode, char* str, void** data, u32* out)
-{
-    u32 code = 0;
-    void* d = NULL;
-
-    switch (encode) {
-    case 0:
-        code = (u8)*str;
-        d = lbl_806EF800;
-        if (code != 0) {
-            str++;
-        }
-        break;
-    case 1:
-        code = (u8)*str;
-        d = lbl_806EF804;
-        if (code != 0) {
-            int lead = 1;
-            int isLead = 0;
-
-            str++;
-            if (code >= 0x81 && code <= 0x9F) {
-                isLead = 1;
-            }
-            if (!isLead) {
-                isLead = 0;
-                if (code >= 0xE0 && code <= 0xFC) {
-                    isLead = 1;
-                }
-                if (!isLead) {
-                    lead = 0;
-                }
-            }
-            if (lead) {
-                u8 t = *str;
-
-                if (IsSjisTrail(t)) {
-                    code = (code << 8) | (u8)*str;
-                    str++;
-                }
-            }
-        }
-        break;
-    }
-    *data = d;
-    *out = fn_80434C74(encode, code);
-    return str;
+    __OSModuleInfoList.head = __OSModuleInfoList.tail = 0;
+    __OSStringTable = 0;
 }
