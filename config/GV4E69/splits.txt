@@ -2306,6 +2306,7 @@ libm/k_cos.cpp:
 
 libm/k_sin.cpp:
 	.text       start:0x8041196C end:0x80411A18
+	.sdata      start:0x806EEF58 end:0x806EEF90
 
 libm/e_rem_pio2.cpp:
 	.text       start:0x80411A18 end:0x80411D7C
