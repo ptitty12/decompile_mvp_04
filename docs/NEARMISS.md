@@ -341,3 +341,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | ealib/tu_803A0310 fn_803A2C9C | Six ordinary C forms; best 83/84 words (97.2%), first-vector saved register/copy and final store order remain; failed body in build/swarm23 only, source restored.
 - `ealib/tu_803959E0` `fn_803977FC` (swarm31, four forms): existing 95.38%; best 101/101 words with 11 differing slots. Result register allocation and history/base load plus common-store scheduling remain unmatched. Scratch SW02/build/swarm29.
 - ealib/tu_803E9C20::fn_803E9E30: eight forms yield scratch 72/72 words and local edges exact, but runtime free override GAME8031268C is one-argument while callback contract is (void*, int); retain build/root-803E9E30/v7-integer-address.cpp pending coherent GAME-owned callback repair, no body promoted.
+
+- `db/tu_80574AE4` `fn_8057AF3C`: 99.02778%, 216/216 instructions; one argument move crosses four setup instructions after twenty bounded forms; canonical round queries and the observed nine-word record swap preserved in scratch only.
