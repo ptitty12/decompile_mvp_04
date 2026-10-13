@@ -151,6 +151,68 @@ int fn_80254B60(A* self)
     return 0;
 }
 
+struct Unk80256C80_M;
+struct Unk80270BA0_X;
+extern "C" {
+int fn_80247858__FP13Unk80270BA0_X(void* x, float* out);
+int fn_8026D75C__FP13Unk8026C414_OP13Unk8026C414_X(void* o, void* x);
+Unk8024EF40_P* fn_80257B40__FP13Unk80256C80_M(void* list);
+void* fn_80257BD0(void* list, void* p, int a);
+}
+struct Unk80254BEC_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk80254BEC_Pt {
+    float x;
+    float y;
+    float z;
+};
+extern Unk80254BEC_Pt lbl_805D9E14[];
+extern float lbl_805D9D18;
+extern float lbl_805D9D20;
+
+
+inline float Unk80254BEC_D2(P* pl, Unk80254BEC_Pt* t)
+{
+    return (pl->m60 - t->x) * (pl->m60 - t->x) + (pl->m68 - t->z) * (pl->m68 - t->z);
+}
+
+extern "C" int fn_80254BEC(A* self)
+{
+    if (fn_80254B60(self) != 0) {
+        float x = lbl_805D9D18;
+        const float k = 14400.0f;
+        float z = lbl_805D9D20;
+        int s = self->m30;
+        int idx = fn_80247858__FP13Unk80270BA0_X(self->m0, &z);
+        float d1 = Unk80254BEC_D2(self->m0->m44C->m6CC, &lbl_805D9E14[idx]);
+        float d2 = Unk80254BEC_D2(self->m0, &lbl_805D9E14[idx]);
+        if (s != idx && z > k)
+            return 1;
+        if (z > 57600.0f)
+            return 1;
+        if (d1 < d2)
+            return 1;
+        if (fn_8026D75C__FP13Unk8026C414_OP13Unk8026C414_X(self->m0, 0) == 1)
+            return 1;
+        void* list = self->m0->m44C->m700->m3B4;
+        void* p2 = fn_80257B40__FP13Unk80256C80_M(list);
+        while (p2 != 0) {
+            A* a2 = &((P*)p2)->m58C;
+            if (a2 != self) {
+                int s2 = a2->m30;
+                float f = lbl_805D9D20;
+                if (fn_80247858__FP13Unk80270BA0_X(p2, &z) == idx && s2 == idx && f < lbl_805D9D18)
+                    return 1;
+            }
+            p2 = fn_80257BD0(list, p2, 0);
+        }
+    }
+    return 0;
+}
+
 void fn_80254DA4(A* self, int a)
 {
     P* p = self->m0;
@@ -245,6 +307,100 @@ void fn_8025505C(A* self, int a, int b)
     fn_80255314(self, a, b);
     P* p = self->m0;
     fn_8017BA50(p->m44C->m700, p, a, 7);
+}
+
+struct U;
+void fn_8035E1E0(U* self, int chrg);
+extern char lbl_80660ED8[];
+float fn_80255754(A* self);
+float fn_802558E0(A* self);
+
+struct Unk802A9BAC_Obj {
+    char pad0[0x5BC];
+    int m5BC;
+};
+struct Unk802A9BAC {
+    void fn_802A9BAC(int a, Unk802A9BAC_Obj* b, int c, int d);
+    int m0;
+    const void* vptr;
+    int m8;
+    Unk802A9BAC_Obj* mC;
+    int m10;
+    int m14;
+    float m18;
+    void Base() { vptr = lbl_80649DA0; }
+    void Derived()
+    {
+        vptr = lbl_80660ED8;
+        m18 = -1.0f;
+    }
+};
+
+inline void Unk802550A8_Post(Unk8024EF40_Q* q, Unk802A9BAC* o)
+{
+    fn_8037893C(q->m704, o->m0, o, 0, 0);
+    fn_8035E1E0((U*)o, 2);
+}
+
+void fn_802550A8(A* self, int a, int b)
+{
+    Unk802A9BAC m;
+    int kind;
+    switch (self->m28) {
+    case 0:
+        kind = 6;
+        break;
+    case 1:
+    case 2:
+        kind = 6;
+        break;
+    case 4:
+        kind = 6;
+        break;
+    case 7:
+    case 8:
+    case 9:
+    case 10:
+        kind = 6;
+        break;
+    case 0x13:
+    case 0x14:
+        kind = 6;
+        break;
+    case 0x1A:
+        kind = 6;
+        break;
+    default:
+        kind = 6;
+        break;
+    case 0xB ... 0x10:
+        kind = 5;
+        break;
+    case 0x11:
+        kind = 4;
+        break;
+    case 0x12:
+        kind = 2;
+        break;
+    }
+    Unk802A9BAC* mp = &m;
+    m.Base();
+    m.m0 = 0x62;
+    m.Derived();
+    Unk802A9BAC_Obj* o = (Unk802A9BAC_Obj*)self->m0;
+    int d = 1;
+    if (self->m38 == b)
+        d = 0;
+    m.fn_802A9BAC(a, o, kind, d);
+    A* aa = &self->m0->m58C;
+    if (aa->m18 != 0.0f) {
+        float t = Secs(self->m0->m44C) - fn_802558E0(aa);
+        mp->m18 = t;
+    } else if (aa->m14 != 0.0f) {
+        float t = Secs(self->m0->m44C) - fn_80255754(aa);
+        mp->m18 = t;
+    }
+    Unk802550A8_Post(self->m0->m44C, &m);
 }
 
 /* The search call is written twice (before the loop and at its end): jump2 cross-jumps the two copies'

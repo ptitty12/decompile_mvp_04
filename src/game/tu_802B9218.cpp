@@ -911,6 +911,43 @@ Unk802BAAB0::Unk802BAAB0() : m0(0)
 {
 }
 
+struct Unk802BB948;
+void fn_802BB948(Unk802BB948* p);
+void fn_802B961C(const char* p, int a);
+
+struct Unk802BAAB0D_H3 {
+    ~Unk802BAAB0D_H3() { fn_802BB948((Unk802BB948*)this); }
+    int m0;
+    int m4;
+    int m8;
+};
+
+struct Unk802BAAB0D_SlotI : public Unk802BAAB0_SlotD {
+    ~Unk802BAAB0D_SlotI() { vp = lbl_806604E0; }
+    const void* vp;
+};
+
+struct Unk802BAAB0D {
+    ~Unk802BAAB0D();
+    int m0;
+    Unk802BAAB0D_H3 h4;
+    Unk802BAAB0_Slot a[8];
+    Unk802BAAB0D_H3 hB50;
+    Unk802BAAB0_Slot b[8];
+    Unk802BAAB0D_H3 h169C;
+    Unk802BAAB0D_SlotI c;
+};
+
+Unk802BAAB0D::~Unk802BAAB0D()
+{
+    if (m0 != 0) {
+        fn_802B961C((const char*)m0, 1);
+        m0 = 0;
+    }
+    fn_802BB948((Unk802BB948*)&h4);
+    fn_802BB948((Unk802BB948*)&hB50);
+}
+
 void fn_802BACDC(Unk802BACDC_Bat* b)
 {
     char buf[0x40];
