@@ -1325,7 +1325,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "dolphin/exi/tu_80425E54.c", cflags=cflags_dolphin_sdk),  # dvdlow.c: -O4,p (docs/DECISIONS.md 2026-10-12)
             Object(Matching, "dolphin/exi/tu_80426CD0.c"),
-            Object(NonMatching, "dolphin/exi/tu_804286AC.c", cflags=cflags_dolphin_dvd),  # EXIUart.c: -O4,p, signed char (docs/DECISIONS.md 2026-10-12)
+            Object(Matching, "dolphin/exi/tu_804286AC.c", cflags=cflags_dolphin_dvd),  # EXIUart.c: -O4,p, signed char (docs/DECISIONS.md 2026-10-12)
         ],
     },
     {

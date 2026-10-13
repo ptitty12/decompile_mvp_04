@@ -118,7 +118,7 @@ u32 fn_804289F4(u32 baudRate) {
     return 0;
 }
 
-static int QueueLength(void) {
+static inline int QueueLength(void) {
     u32 cmd;
 
     if (fn_8042792C(lbl_806EF728, lbl_806EF72C, 3) == 0) {
