@@ -98,9 +98,10 @@ extern int lbl_80627324;
 extern int lbl_806272D0;
 extern int lbl_80627304;
 extern short lbl_806272E0;
-extern short lbl_806E9938[];
-extern short lbl_806EB938[];
-extern unsigned char lbl_806ED938[];
+/* GX draw-sync callback fn803D9454 (registered at803D8F24) publishes samples to render readers. */
+extern volatile short lbl_806E9938[];
+extern volatile short lbl_806EB938[];
+extern volatile unsigned char lbl_806ED938[];
 extern const void* lbl_80686740[];
 extern const void* lbl_806867E8[];
 extern const void* lbl_806867B8[];
@@ -492,10 +493,7 @@ extern "C" void fn_803D92D4(Unk803D8234Dev* dev)
     lbl_8062C2B4 = 0;
 }
 
-/* near-miss (same length): the register assignment matches retail (x in r30, idx = x & 0xFFF before the
-   call), but the lhz loads and the three table stores come out in another order; 24 orderings of the three
-   stores and of the sum operands were tried. */
-extern "C" void fn_803D9454(int x)
+extern "C" void fn_803D9454(unsigned short x)
 {
     if (x == 0x8000) {
         lbl_80627304 = 0;
