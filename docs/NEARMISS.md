@@ -320,3 +320,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805467E0::fn_80547EC0: eight ordinary missing-body forms reach 77/79 strict words (97.47%), two memory-load scheduling slots remain; scratch build/root26/47EC0, no source promoted.
 
 - db/tu_805467E0::fn_805479F0 (96.34% inherited): eight ordinary list/counter/lifetime forms retain register and block differences (best81/82 words); scratch build/root35/479F0, source restored.
+
+- ealib/tu_803927E4::fn_80393F64 (99.8% inherited): eight ordinary result initialization/counter/lifetime forms retain two parameter-register words; scratch build/root38/3F64, source restored.
