@@ -292,6 +292,53 @@ Unk8023ECD4_V* fn_8023F29C(Unk8023ECD4_V* out, Unk8023F29C_O* o)
     return out;
 }
 
+struct Unk8024015C_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk8024015C_R {
+    char pad0[0x60];
+    Unk8024015C_V m60;
+};
+class Unk8024015C_B {
+public:
+    char pad0[0x98];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual Unk8024015C_R* v6();
+};
+struct Unk8019F8C0_Owner;
+void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
+void fn_8031EE20(Unk8024015C_V* out, void* m, Unk8024015C_V* in);
+float fn_80313F28(int h, int id);
+void fn_80303BC4(int id, float a, float b, ...);
+extern int lbl_8061FEDC;
+extern float lbl_805D8F5C;
+extern float lbl_805D8F60;
+
+void fn_8024015C(Unk8023DB8C_P* p, int n, int* ids, int flag, float x, float y)
+{
+    Unk8019F8C0_Owner* o = (Unk8019F8C0_Owner*)p->m44C;
+    Unk8024015C_V pos = ((Unk8024015C_B*)p)->v6()->m60;
+    if (n > 0) {
+        Unk8024015C_V out;
+        fn_8031EE20(&out, fn_801A04A8(o, 1), &pos);
+        for (int i = 0; i < n; i++) {
+            Unk8024015C_V t = out;
+            int h = lbl_8061FEDC;
+            float* q = &lbl_805D8F5C;
+            if (flag)
+                t.x -= fn_80313F28(h, ids[i]) * lbl_805D8F60;
+            fn_80303BC4(ids[i], t.x, t.y);
+            out.y += *q;
+        }
+    }
+}
+
 void fn_80240D3C(Unk8023DB8C_P* p)
 {
     fn_8023EC24(p);
