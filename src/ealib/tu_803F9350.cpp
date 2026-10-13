@@ -196,7 +196,6 @@ extern "C" int fn_803F9664(int h)
     return r;
 }
 
-/* near-miss: 2 slots; retail loads j->m8 into r4 before j->m14 into r5 for the callback args */
 extern "C" void fn_803F96B0(int h, void (*cb)(int, int, int))
 {
     RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
@@ -204,7 +203,7 @@ extern "C" void fn_803F96B0(int h, void (*cb)(int, int, int))
     j->m28 = (int)cb;
     if (m8 != 0) {
         lbl_806ADE4C.m10++;
-        cb(h, j->m8, j->m14);
+        cb(h, *(volatile int*)&j->m8, j->m14);
         lbl_806ADE4C.m10--;
     }
 }
