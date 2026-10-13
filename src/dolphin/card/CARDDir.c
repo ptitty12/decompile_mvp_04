@@ -3,6 +3,13 @@
 
 #include "__card.h"
 
+extern void fn_80433004(void* addr, u32 nBytes); /* DCStoreRange */
+extern void fn_8041C2D8(void* ptr, int length, u16* checksum, u16* checksumInv); /* __CARDCheckSum */
+extern s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback); /* __CARDEraseSector */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
+
+
 // prototypes
 static void fn_8041C07C(s32 chan, s32 result);
 static void fn_8041C14C(s32 chan, s32 result);
@@ -13,7 +20,7 @@ CARDDir* __CARDGetDirBlock(CARDControl* card) {
 }
 
 static void fn_8041C07C(s32 chan, s32 result) {
-    CARDControl* card = &__CARDBlock[chan];
+    CARDControl* card = &lbl_806DCF20[chan];
     CARDCallback callback;
 
     if (result >= 0) {
@@ -33,7 +40,7 @@ static void fn_8041C07C(s32 chan, s32 result) {
     }
 
     if (!card->apiCallback)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
 
     callback = card->eraseCallback;
     if (callback) {
@@ -43,7 +50,7 @@ static void fn_8041C07C(s32 chan, s32 result) {
 }
 
 static void fn_8041C14C(s32 chan, s32 result) {
-    CARDControl* card = &__CARDBlock[chan];
+    CARDControl* card = &lbl_806DCF20[chan];
     CARDCallback callback;
     CARDDir* dir;
     u32 addr;
@@ -57,7 +64,7 @@ static void fn_8041C14C(s32 chan, s32 result) {
     }
 
     if (!card->apiCallback)
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
 
     callback = card->eraseCallback;
     if (callback) {
@@ -74,17 +81,17 @@ s32 __CARDUpdateDir(s32 chan, CARDCallback callback) {
 
     ASSERTLINE(173, 0 <= chan && chan < 2);
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     if (!card->attached)
         return CARD_RESULT_NOCARD;
 
     dir = __CARDGetDirBlock(card);
     check = CARDGetDirCheck(dir);
     ++check->checkCode;
-    __CARDCheckSum(dir, 0x2000 - sizeof(u32), &check->checkSum, &check->checkSumInv);
-    DCStoreRange(dir, 0x2000);
+    fn_8041C2D8(dir, 0x2000 - sizeof(u32), &check->checkSum, &check->checkSumInv);
+    fn_80433004(dir, 0x2000);
 
     card->eraseCallback = callback;
     addr = ((u32)dir - (u32)card->workArea) / 0x2000 * card->sectorSize;
-    return __CARDEraseSector(chan, addr, fn_8041C14C);
+    return fn_8041B64C(chan, addr, fn_8041C14C);
 }
