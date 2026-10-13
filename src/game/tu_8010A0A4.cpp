@@ -152,7 +152,7 @@ struct UiEvt10A150 : UiEvtBase10A150 {
     }
     ~UiEvt10A150() { vt = lbl_80649DA0; }
 };
-void fn_800DE440(short* buf, int a, int b);
+extern "C" int fn_800DE440(short* buf, int a, int b);
 int fn_800968C0(char* e, int a, int b);
 int fn_80097148(char* e, int a);
 int fn_80097210(char* e, int a);
@@ -218,7 +218,6 @@ void fn_8010A150(short* a, int flag)
     fn_804031F8(a, fn_80090880(lbl_8061977C, 0x414A), buf);
 }
 
-/* near-miss: 2 words swapped (retail: mr r4,r28 / li r5,0 / mr r3,r27 before the fn_800DE440 call; ours sets r3 before r5) */
 void fn_8010A284(short* a, int flag)
 {
     int p;
