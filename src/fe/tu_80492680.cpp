@@ -550,7 +550,6 @@ FE_OVERLAY void fn_80495080(void* x)
     FeI(x, 0x1C4) = s1c;
 }
 
-/* near-miss: 95.1%, both byte-sum loops match; retail computes j*4 (slwi r0,r31,2) twice in the second half, ours shares one slwi (GCSE) */
 FE_OVERLAY void fn_80495248(void* x)
 {
     char buf[16];
@@ -560,9 +559,10 @@ FE_OVERLAY void fn_80495248(void* x)
     sprintf(buf, lbl_805F4ECC, s);
     ((FeWV*)*(void**)(ww + FeI(x, 0x184) * 4))->s30(buf);
     int j = FeI(x, 0x184) == 0;
+    int k = j;
     int s2 = SumB5080(*(Fe5080Rec**)(bb + j * 4));
     sprintf(buf, lbl_805F4ECC, s2);
-    ((FeWV*)*(void**)(ww + j * 4))->s30(buf);
+    ((FeWV*)*(void**)(ww + k * 4))->s30(buf);
 }
 
 FE_OVERLAY void fn_8049535C(void* x)
