@@ -12,22 +12,23 @@ The lead holds full decision authority (DECISIONS 2026-10-10). Never give the ow
 (anything under `tools/verify/**`, `.github/workflows/**`, `.claude/**`) are recorded once in
 DECISIONS "Open questions for owner"; then keep working.
 
-## Session 2 status (lead, updated 2026-10-12 15:10 CDT; this block overrides sections 1, 4 and 7 below)
+## Session 2 status (lead, updated 2026-10-12 20:15 CDT; this block overrides sections 1, 4 and 7 below)
 
-- main: **20,118 / 24,158 functions** (83.3%). Measure as in section 1.
-- Slots and agents: `tools/team/lead/state/assignments.txt` and `state/agents_session2.txt`. Worker reports: `state/reports_session2.md`.
-- Assigning a slot: `LEAD_SCRATCH=<lead scratchpad, Windows path> bash tools/team/lead/prep.sh W<n> p5 <NN>`. That runs assign.sh and writes the filled prompt to `$LEAD_SCRATCH/prompt_W<n>.md`. Then launch a Sonnet Agent that reads that prompt file.
-- Templates: `worker_prompt_p4.md` and `worker_prompt_p5.md`.
-- Queue: p4 is fully assigned. p5 batches are `queue/p5_NN.txt`, in the priority order of `queue/p5_order.txt` (p5-18, p5-22 and p5-19 are already taken). Regenerate with `gen_p5.py` once the p4-13..21 units are free.
+- main: **20,582 / 24,158 functions** (85.2%) at 6671eaec. Measure as in section 1.
+- Slots and agents: `tools/team/lead/state/assignments.txt` and `state/agents_session2.txt` (agent ids; the last block is the live fleet). Worker reports: `state/reports_session2.md`.
+- Assigning a slot: `LEAD_SCRATCH=<lead scratchpad, Windows path> END=HH:MM bash tools/team/lead/prep.sh W<n> p6 <NN>`. That runs assign.sh and writes the filled prompt to `$LEAD_SCRATCH/prompt_W<n>.md`. Then launch a Sonnet Agent that reads that prompt file. `END` sets the wall-clock deadline (default now + 150 min).
+- Templates: `worker_prompt_p4.md`, `worker_prompt_p5.md`, `worker_prompt_p6.md`.
+- Queue: p4 and p5 are fully assigned (all p5 batches worked once). **p6** is the sweep: every 0% function up to 0x800 in units that are not busy. Units of the p4 batches cut short at 16:00 come first. Batches are `queue/p6_NN.txt` in the order of `queue/p6_order.txt`. p6-00..03 are assigned. Regenerate with `gen_p6.py <report.json> --write` once the current p5/p6 units are free; it skips busy units and unassigned p5 batches.
+- Pacing: workers run 50-90 min before their context fills (600-900k tokens), so short deadlines (`END`) waste little. The full fleet burns about 27-35% of a 5 h window per hour; the weekly limit (71% at 20:12) is the binding constraint. When the limit hits, every agent stops; resume with SendMessage to its agentId, or stash leftovers and prep.sh fresh.
 - Section 7 status:
   - item 3 (EXI split) is done;
   - item 4 was replaced by a flags change (cflags_ealib_sda_nsr);
   - items 6 and 7 were no-ops;
   - item 9 is done (228 branches deleted);
-  - item 5 (Opus round 7): the slot `-match` is on work/opus-families-7 and held. Families 5, 7 and 9 remain; on resume, skip tu_801EE438 and tu_80216CF4 until p4-15 merges, and skip family 8 if p4-21 matched it.
-- **Stopped 2026-10-12 ~16:00 CDT by the lead (usage nearly exhausted); main 20,341 functions.** All 13 workers committed and stopped, and all their branches are merged. Their batches are unfinished (p4-13..17, p4-19..21, p4-32b, p5-15, p5-18, p5-19, p5-22): resume each worker with SendMessage (ids in state/agents_session2.txt) or prep.sh the slot to a new p5 batch from queue/p5_order.txt. Leftover uncommitted edits to stash before reassigning: W2 (fn_801DE660), W3 (fn_80218AF8), W6 (fn_802C7C08), W8 (a broken include/game/tu_80317B88.h edit), W1 (a stray ealib edit). Open: the OSTime pair needs a nopeephole split (dolphin/os). Never run two integ jobs at once: they share the orch worktree and break each other's verify.
-- Usage limit: the full fleet burns roughly 35% of a 5 h window per hour. When the limit hits, every agent stops; resume each one with SendMessage to its agentId (context survives) rather than relaunching.
+  - item 5 (Opus round 7): the slot `-match` is on work/opus-families-7 and held. Families 5, 7 and 9 remain.
+- Open: the OSTime pair needs a nopeephole split (dolphin/os). Never run two integ jobs at once: they share the orch worktree and break each other's verify.
 - Known fragile point: two branches adding the same declaration to a shared header merge cleanly into a duplicate, and the build gate catches it. Fix it on the branch (git merge origin/main, dedupe), then re-integrate.
+- Worker incidents: one worker ran `taskkill /IM python.exe` (killed every worker's jobs). The p5/p6 templates forbid killing processes by name or pattern.
 
 ---
 

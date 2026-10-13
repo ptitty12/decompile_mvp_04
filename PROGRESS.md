@@ -106,3 +106,10 @@
     - the inlined stack Unk803597C4 record ctor prologue (fn_80163390 and 3 more);
     - fn_80097318 plus 4 siblings (one shape).
   - Blockers: none new. Functions that need `mftb` stay unmatched (inline-asm-only, existing rule).
+- 2026-10-12 | Claude Opus 5.5 (lead session 2, evening, 17:52-20:15 CDT) | fleet | **20,341 -> 20,582 functions at 100%** (85.2%); +241 since the 16:00 stop.
+  - The fleet restarted at 17:52 when the usage window reset: 13 fresh Sonnet workers on p5 batches (0% functions up to 0x800). Every branch was merged with VERIFY PASS: p5-02 (+14), 03 (+11), 04 (+4), 08 (+19), 09 (+36), 11 (+30), 13 (+21), 14 (+20), 16 (+11), 17 (+19), 20 (+10), 21 (+13), 23 (+12), 24 (+13), 26 (+8). About 40 near-misses (95-99.99%) were committed with notes.
+  - Pass 6 (`tools/team/lead/gen_p6.py`, 46 batches): every 0% function up to 0x800 in free units. Units of the p4 batches cut short at 16:00 come first. Running: p5-00/01/05/06/07/10/12/25/27 and p6-00..03.
+  - Patterns: PATTERNS.md "Pass 5" section. Notably, an object with an empty inline destructor reserves an unreferenced stack slot, which explains many spare-frame-byte near-misses.
+  - Incident: one worker killed every python.exe on the machine (taskkill /IM). Workers re-ran their jobs; the prompts forbid it now.
+  - Walls (unchanged rules): `mftb`/`mtspr`, paired-single (psq_) kernels, a literal data word after `bl`, and g++ virtual-base destructor machinery are not attempted.
+  - Blockers: none new. The owner-only questions in DECISIONS are unchanged.
