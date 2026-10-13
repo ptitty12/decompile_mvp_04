@@ -36,6 +36,19 @@ struct Vp6LimView {
     int* m34;
 };
 
+/* Huffman tree word: 7-bit symbol or child index, leaf flag (read by fn_8039F7F4). */
+struct Vp6HW {
+    unsigned idx : 7;
+    unsigned leaf : 1;
+    unsigned rest : 24;
+};
+
+/* Output tree entry (12 bytes): two child words and the branch probability byte. */
+struct Vp6HEnt {
+    Vp6HW w[2];
+    unsigned char m8;
+};
+
 struct Vp6Link {
     int next;
     int key;
@@ -535,6 +548,30 @@ void fn_8039F5CC(Vp6Link* t, int idx, int* head)
         t[prev].next = idx;
         t[idx].next = cur;
     }
+}
+
+void fn_8039F7F4(Vp6HEnt* t, unsigned short* out)
+{
+    int i = 0;
+    do {
+        int len = 0;
+        int n = 6;
+        Vp6HW cur;
+        cur.idx = 0;
+        cur.leaf = 0;
+        do {
+            n--;
+            len++;
+            if ((i >> n) & 1) {
+                cur = t[cur.idx].w[1];
+            } else {
+                cur = t[cur.idx].w[0];
+            }
+            if (cur.leaf) break;
+        } while (n != 0);
+        out[i] = (*(unsigned*)&cur >> 24) | (len << 12);
+        i++;
+    } while (i <= 63);
 }
 
 int* fn_8039F94C(Vp6LimView* d, int n)
