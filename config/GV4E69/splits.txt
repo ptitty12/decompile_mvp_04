@@ -2572,6 +2572,9 @@ dolphin/pad/Padclamp.c:
 
 dolphin/pad/Pad.c:
 	.text       start:0x80438A2C end:0x8043A374
+	.data       start:0x80648C38 end:0x80648C90
+	.bss        start:0x806DFE10 end:0x806DFE60
+	.sdata      start:0x806EF300 end:0x806EF320
 
 dolphin/si/SIBios.c:
 	.text       start:0x8043A374 end:0x8043BA64
