@@ -351,6 +351,90 @@ extern "C" int fn_803F7BE8(void* o, char* f)
     return res;
 }
 
+struct RcSlotBase {
+    char d[0x44];
+};
+struct RcSlotV : RcSlotBase {
+    virtual void v0();
+    virtual void v1(unsigned short*, int*, int);
+};
+extern "C" int CARDOpen(int, const char*, void*);
+extern "C" int CARDFastOpen(int, int, void*);
+extern "C" int fn_803F8FF8(void*, char*);
+extern "C" int fn_803F7BE8(void*, char*);
+extern "C" int fn_803F81F4(void*, char*);
+extern "C" int fn_803F9114(void*, void*);
+extern "C" int fn_803F87A8(void*, unsigned short*, int*);
+
+/* near-miss: 98%; the out pointer and the map flag swap callee-saved registers (r21/r22) */
+extern "C" int fn_803F7958(void* o, unsigned short* h, int* name, int flags, void** out)
+{
+    char* s = (char*)fn_803F74B0((char*)o);
+    if (s == 0)
+        return 0xF;
+    *out = 0;
+    int rc = 0xF;
+    int st = 0;
+    int cnt = 0;
+    ((RcSlotV*)s)->v1(h, name, flags);
+    if (h[1] != 1)
+        cnt = fn_803F7584(o, (int)h, s + 0xC, (int*)(s + 0xD0));
+    int mapRc = 1;
+    if (flags & 0x200) {
+        if (h[1] == 1) {
+            st = fn_803F8FF8(o, s);
+        } else {
+            rc = fn_803F87A8(o, h, name);
+            if (rc != 5) {
+                int sz = cnt * RCI(o, 0x2b4);
+                do {
+                    st = CARDCreate(h[0], (const char*)*name, sz, s + 0x48);
+                    lbl_806EEA34->v6(1);
+                } while (st == -1);
+            } else
+                st = -5;
+        }
+    } else {
+        do {
+            if (h[1] == 1) {
+                int tmp = -1;
+                rc = fn_803F8CB4(o, (const char*)*name, &tmp);
+                if (rc == 0)
+                    st = CARDFastOpen(h[0], tmp, s + 0x48);
+                else
+                    mapRc = 0;
+            } else
+                st = CARDOpen(h[0], (const char*)*name, s + 0x48);
+            lbl_806EEA34->v6(1);
+        } while (st == -1);
+    }
+    if (mapRc)
+        rc = fn_803F73B0(o, st);
+    if (rc == 0) {
+        int x = RCI(s, 0x4c);
+        RCI(s, 0x40) = 1;
+        RCI(s, 0) = x;
+        CARDGetStatus(*(unsigned short*)(s + 8), x, s + 0x5c);
+        *out = s;
+        if (h[1] == 1) {
+            RCI(s, 0xe0) = rc;
+        } else {
+            RCI(s, 0xe0) = 1;
+            if (flags & 0x200) {
+                if (fn_803F7BE8(o, s) != 0 || fn_803F81F4(o, s) == -1)
+                    rc = 0xF;
+            } else
+                rc = fn_803F9114(o, s);
+            if (rc != 0) {
+                CARDClose(s + 0x48);
+                RCI(s, 0x40) = 0;
+                *out = 0;
+            }
+        }
+    }
+    return rc;
+}
+
 extern "C" int fn_803F7E98(void* a, void* b)
 {
     int* t = (int*)RCI(b, 0x20);
@@ -459,8 +543,9 @@ struct RcCardFile {
 #define RC_SET_ICONSPD(s, n, f) ((s)->iconSpeed = (unsigned short)(((s)->iconSpeed & ~(3 << (2 * (n)))) | ((f) << (2 * (n)))))
 extern "C" int CARDSetStatus(int, int, void*);
 
-extern "C" int fn_803F81F4(void* o, RcCardFile* f)
+extern "C" int fn_803F81F4(void* o, char* fp)
 {
+    RcCardFile* f = (RcCardFile*)fp;
     memset(&f->stat, 0, 0x6c);
     f->stat.commentAddr = 4;
     f->stat.iconAddr = 0x44;
