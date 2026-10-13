@@ -325,13 +325,13 @@ FE_OVERLAY void fn_804D53B8(FeS804D4704* x, int a)
     fn_804D563C(x);
 }
 
-/* near-miss: 1 slot; retail re-reads lbl_8061930C via a callee-saved lis register, we cache the value (tried g = &lbl, if/else shapes) */
 FE_OVERLAY void fn_804D54DC(FeS804D4704* x)
 {
     if (x->m154 != 0) {
         int r;
         int t;
-        if (FeW24(x->m168) >= 0 || (r = fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, ((FeSubX*)((char*)x->m194 + 0x98))->s21()), t = x->m138, t == 5) || t == -1) {
+        int sv;
+        if (FeW24(x->m168) >= 0 || (sv = ((FeSubX*)((char*)x->m194 + 0x98))->s21(), r = fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, sv), t = x->m138, t == 5) || t == -1) {
             x->m188->fn_vslot16(0);
             return;
         }
