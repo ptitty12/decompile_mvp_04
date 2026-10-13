@@ -784,7 +784,7 @@ config.libs = [
             Object(NonMatching, "game/tu_80360168.cpp"),
             Object(Matching, "game/tu_803606B0.cpp"),
             Object(NonMatching, "game/tu_80360C18.cpp"),
-            Object(NonMatching, "game/tu_80361580.cpp"),
+            Object(Matching, "game/tu_80361580.cpp"),
             Object(NonMatching, "game/tu_80361F98.cpp"),
             Object(NonMatching, "game/tu_80362A30.cpp"),
             # EA-lib flags, not game flags: see DECISIONS (fn_8036344C matches only at -O2 without -ffloat-store).

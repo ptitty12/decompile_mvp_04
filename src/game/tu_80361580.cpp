@@ -96,6 +96,7 @@ struct Unk80361834 {
     Unk80362930 mCE8;
     char pad[0x3FD4 - 0xCE8 - sizeof(Unk80362930)];
     const void* m3FD4;
+    static void operator delete(void* p) { fn_80377408(p); }
     ~Unk80361834();
 };
 extern char lbl_80683EF8[];
