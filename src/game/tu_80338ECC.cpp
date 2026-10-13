@@ -30,6 +30,15 @@ extern V3x lbl_805F2D64, lbl_805F2D70;
 extern float lbl_805F2D7C;
 extern int lbl_80620DF0, lbl_80691DEC;
 struct Unk738Mgr { char pad0[0x738]; void* m738; };
+struct UnkMgrF4 { char pad0[0x6F4]; int m6F4; };
+struct Unk801800FC { char pad0[0x5C]; ~Unk801800FC(); };
+extern int lbl_80620874;
+extern "C" {
+int fn_801A57B8__Fv(void* o);
+void* fn_80180088__FPv(void* s, void* o);
+void fn_80180124(void* s);
+int fn_8018019C(void* s);
+}
 extern "C" {
 Rec24 fn_80326F44(int a, int b, float f, int k);
 void fn_8030D1E4(void* o, int k, V3x* a, V3x* b, int z, float f);
@@ -200,6 +209,20 @@ extern "C" void fn_80339A08()
         } while (b <= 0x18);
         a++;
     } while (a <= 1);
+}
+
+/* near-miss: 97%; retail loads lbl_80620874 into r0 and copies it to r4 (lwz r0; mr r4,r0), ours loads straight into r4.
+ * Tried a local, an inline getter, an inline setter taking the value, and a volatile global (5 attempts). */
+extern "C" void fn_80339F60(Menu* p)
+{
+    UnkMgrF4* m = (UnkMgrF4*)lbl_8061B8C0->m8;
+    if (m->m6F4 == 0 && fn_801A57B8__Fv(m)) {
+        Unk801800FC s;
+        fn_80180088__FPv(&s, m);
+        fn_80180124(&s);
+        fn_8018019C(&s);
+        fn_8032FB78((char*)p + 0xA8C, lbl_80620874);
+    }
 }
 
 Rec24* fn_8033ACE8() { return &lbl_80691BF4[lbl_80691DF4]; }

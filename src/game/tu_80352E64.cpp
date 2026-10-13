@@ -335,6 +335,46 @@ void fn_803536B0(Unk803536B0* s)
 }
 
 void fn_803536B0(Unk803536B0* s);
+struct Unk80071604;
+struct Obj;
+struct Unk80353724_Blk { char pad0[0x28]; };
+struct Unk80353724 {
+    char pad0[0x28];
+    void* m28;
+    void* m2C;
+    Unk80353724_Blk m30;
+    void* m58;
+    void* m5C;
+    Unk80353724_Blk m60;
+    Unk80353724_Blk m88;
+    Unk80353724_Blk mB0;
+    Unk80353724_Blk mD8;
+    Unk80353724_Blk m100;
+};
+extern const char lbl_805B3108[];
+extern "C" {
+void* fn_8008B254__FPt13Unk80089894_K1Z14Unk80089894_TC(void* self, const char* name, void* type, unsigned n);
+void* fn_800805FC__FP13Unk8007FF8C_I(void* self, const char* name, void* type, unsigned n);
+void* fn_8008BDDC__FPt13Unk80089894_K1Z14Unk80089894_TC(void* self, const char* name, void* type, unsigned n);
+}
+Unk80071604* fn_8006F9FC(Unk80071604* self, const char* name, Obj* type, unsigned count);
+Unk80071604* fn_8006FE88(Unk80071604* self, const char* name, Obj* type, unsigned count);
+Unk80353724* fn_80353724(Unk80353724* s)
+{
+    fn_8008B254__FPt13Unk80089894_K1Z14Unk80089894_TC(s, lbl_805B3108, 0, 0x19);
+    fn_8006F9FC((Unk80071604*)&s->m30, lbl_805B3108, 0, 0x19);
+    fn_800805FC__FP13Unk8007FF8C_I(&s->m60, lbl_805B3108, 0, 0x19);
+    fn_8008BDDC__FPt13Unk80089894_K1Z14Unk80089894_TC(&s->m88, lbl_805B3108, 0, 0x19);
+    fn_8008BDDC__FPt13Unk80089894_K1Z14Unk80089894_TC(&s->mB0, lbl_805B3108, 0, 0x19);
+    fn_8006FE88((Unk80071604*)&s->mD8, lbl_805B3108, 0, 0x19);
+    fn_8006FE88((Unk80071604*)&s->m100, lbl_805B3108, 0, 0x19);
+    s->m2C = &s->m88;
+    s->m28 = &s->mB0;
+    s->m5C = &s->mD8;
+    s->m58 = &s->m100;
+    return s;
+}
+
 Unk803536B0* fn_803537FC(Unk803536B0* s)
 {
     s->m4.Init(s->m28, 9, lbl_8064B218);
