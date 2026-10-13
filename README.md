@@ -26,6 +26,14 @@ python tools/progress_bot.py --uninstall   # remove it
 python tools/progress_bot.py --force       # run once now
 ```
 
+**[Live fleet dashboard](https://github.com/ptitty12/decompile_mvp_04/tree/dashboard)**:
+matching speed (verified on `main` and claimed by workers, per hour), the
+near-miss share, each worker's activity, the merge backlog and the functions
+closest to matching. `tools/fleet_dashboard.py --publish` builds it from git
+history alone (no build, no model calls). A second scheduled task runs it every
+minute and replaces the one commit on the `dashboard` branch, so `main` gets
+no extra commits. `--watch` shows the same numbers live in a terminal.
+
 ## What's in this kit
 
 | File | Purpose | When you use it |
