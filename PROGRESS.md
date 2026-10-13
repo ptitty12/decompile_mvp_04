@@ -8,7 +8,7 @@
   - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched: **20,909 / 24,158 (86.55%)**; code matched: **3,002,516 / 5,896,176 bytes (50.92%)**.
+- Functions matched: **20,915 / 24,158 (86.58%)**; code matched: **3,003,604 / 5,896,176 bytes (50.94%)**.
 - Source-linked: **219 units, 338,668 code bytes (5.74%)**, plus 9,142 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
@@ -250,3 +250,7 @@
 
 - 2026-10-13 | Codex + three Luna workers | GAME/EA/DB/FE return and lifetime recovery | matched five functions / 720 code bytes: fn_8001ED28 (88), fn_8001F3B8 (68), lbl_Owner::fn_803DA038 (96), fn_8057CFA8 (220), fn_804DF4D4 (248). Real callers prove integer/node/list results; corrected actual callee declarations and all shared-header users rebuilt. FE message-pointer materialization belongs inside each handled branch. Separate caller declaration/preparation commits preserve one-TU history. All strict binding/local-edge checks, full retail SHA1, literal checks and unmodified verifier PASS; per-commit integration queued. | none
 - 2026-10-13 | Codex + Luna shortcut worker | SDK GXAttr, CARDStatEx, dsp_debug, dsp_task | source-linked four units / 8,280 code bytes and 900 target data bytes including alignment padding. Removed only source revision functions absent from target, corrected canonical imports, and bound GX small tables / DSP state to existing real globals. GX owns its eight exact compiler jump tables; DSP owns its exact format-string pool while shared state stays external to avoid a real section-order cycle. All full hashes/literals/regressions PASS. | none
+
+- 2026-10-13 | Codex + Luna helper worker | tools/match/link_candidates.py | added per-function section-relative placement diagnostics across all allocated executable sections; reports missing/extra/moved/ambiguous functions and requires identical placement for ready counts. Identical alias entries are retained; conflicting locations and zero extents remain provisional. 109 helper tests PASS, actual DA038 five moved functions detected, full retail hash and unmodified verifier PASS. | none
+
+- 2026-10-13 | Codex integration | rebased continuation over the concurrent six-function / 1,088-byte swarm pass, preserving both source changes and both bounded-attempt logs. Fresh full build retains retail SHA1; combined snapshot 20,915 exact functions and 3,003,604 matched code bytes. | none
