@@ -1298,7 +1298,7 @@ config.libs = [
             Object(NonMatching, "dolphin/os/tu_80437444.c"),
             Object(Matching, "dolphin/pad/Padclamp.c"),
             Object(Matching, "dolphin/pad/Pad.c"),
-            Object(NonMatching, "dolphin/si/SIBios.c"),
+            Object(Matching, "dolphin/si/SIBios.c"),
             Object(Matching, "dolphin/si/SISamplingRate.c"),
             Object(NonMatching, "dolphin/vi/vi.c"),
             Object(NonMatching, "sdk/tu_8043E344.c"),
