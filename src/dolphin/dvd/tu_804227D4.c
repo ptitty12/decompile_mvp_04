@@ -334,6 +334,29 @@ u32 fn_80422C60(u32 entry, char* path, u32 maxlen) {
     return loc;
 }
 
+static inline BOOL DVDConvertEntrynumToPath(s32 entrynum, char* path, u32 maxlen) {
+    u32 loc;
+
+    loc = fn_80422C60((u32)entrynum, path, maxlen);
+    if (loc == maxlen) {
+        path[maxlen - 1] = '\0';
+        return FALSE;
+    }
+    if (FST_IS_DIR(&lbl_806EF644[entrynum])) {
+        if (loc == maxlen - 1) {
+            path[loc] = '\0';
+            return FALSE;
+        }
+        path[loc++] = '/';
+    }
+    path[loc] = '\0';
+    return TRUE;
+}
+
+BOOL fn_80422DC0(char* path, u32 maxlen) {
+    return DVDConvertEntrynumToPath((s32)lbl_806EF650, path, maxlen);
+}
+
 BOOL fn_80422E84(const char* path) {
     s32 entry = fn_8042280C(path);
 
