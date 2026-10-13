@@ -1009,3 +1009,49 @@ extern "C" DB_OVERLAY int fn_8058A670(int a,int b,void* rec)
     }
     return fn_80582DF4(a,b,t);
 }
+
+extern "C" int fn_80589B90(int*,int,int,float,float,float);
+extern "C" int fn_80582EE4(void*,int);
+extern "C" float fn_800748D4(Unk8007A4DC_Screen*,int,int,int);
+extern const float lbl_8060083C;
+extern const float lbl_80600840;
+extern const float lbl_80600844;
+extern const float lbl_80600848;
+extern const float lbl_80600858;
+extern const float lbl_8060085C;
+extern "C" DB_OVERLAY void fn_805898D8(int* self,int team,int flag)
+{
+    float value;
+    float weighted;
+    Db8058B628_E e;
+    int initial=*self;
+    if(initial==0) {
+        Unk8007A4DC_Screen* sc=lbl_8061930C;
+        int id=fn_80589B90(self,team,flag,lbl_8060083C,lbl_80600840,lbl_80600844);
+        if(id) {
+            int kind=((Unk8007B2B0_Screen*)sc)->fn_80078A38(fn_80077BC4(sc,id));
+            int mode=fn_80582EE4(self,id);
+            int group=fn_80084014__Fii(kind,1);
+            if(flag) {
+                value=fn_800748D4(sc,1,id,group);
+                short a=(short)(value*lbl_80600848);
+                int x=sc->fn_80074754(1,id,group);
+                int y=sc->fn_80074754(2,id,group);
+                weighted=(float)x+(float)y*lbl_80600858;
+                short b=(short)(weighted*lbl_8060085C);
+                int out=fn_800E4584__Fiii(team,mode==1?2:0,kind);
+                fn_8052E360(&e,2,id,a,b,out,(signed char)mode,(signed char)kind,initial,initial,initial);
+                fn_80582CF8(self,&e,0,0,0);
+                fn_80360AF0((Db80586420_Ent*)&e,2);
+            } else {
+                weighted=sc->fn_80073C10(2,id,group,2);
+                short a=(short)(weighted*lbl_80600848);
+                short b=(short)sc->fn_800739E0(11,id,group,2);
+                int out=fn_800E4584__Fiii(team,0,kind);
+                fn_8052E360(&e,2,id,a,b,out,0,(signed char)kind,flag,flag,flag);
+                fn_80582CF8(self,&e,0,0,0);
+                fn_80360AF0((Db80586420_Ent*)&e,2);
+            }
+        }
+    }
+}
