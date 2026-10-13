@@ -609,12 +609,16 @@ class Cloner:
             if m and res[cur]:
                 res[cur][-1][2] = m.group(2)
         elf = Elf(Path(obj))
-        local = local_branch_destinations(elf, elf.text_index())
-        for name, destinations in local.items():
-            if name not in res or len(res[name]) != len(destinations):
-                raise ValueError("incomplete function disassembly: " + name)
-            for instruction, destination in zip(res[name], destinations):
-                instruction.append(destination)
+        for section_index, section in enumerate(elf.secs):
+            # SHF_EXECINSTR sections can include overlay code as well as .text.
+            if not section[2] & 0x4 or not section[5]:
+                continue
+            local = local_branch_destinations(elf, section_index)
+            for name, destinations in local.items():
+                if name not in res or len(res[name]) != len(destinations):
+                    raise ValueError("incomplete function disassembly: " + name)
+                for instruction, destination in zip(res[name], destinations):
+                    instruction.append(destination)
         return res
 
     def target_func(self, rel, addr_hex):
