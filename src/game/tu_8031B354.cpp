@@ -670,3 +670,27 @@ extern "C" int fn_8031D6B0(FxI* self) {
     }
     return 1;
 }
+
+extern "C" VdMain* fn_8038BC58(int,int,int,char*);
+extern const float lbl_805EA698,lbl_805EA69C;
+struct Unk8031D148_Video { char pad0[0x68]; int m68; };
+struct Unk8031D148_Dims { short pad0[2];short width,height; };
+struct Unk8031D148_Frame { int m0; Unk8031D148_Dims* m4; };
+class Unk8031D148_Screen {
+public:
+    char pad0[12];
+    virtual void s1();virtual void s2();virtual void s3(float*,float*);
+};
+extern "C" void fn_8031D148(FxI* self) {
+    if(self->m10) {delete self->m10;self->m10=0;}
+    FxCtxB* context=lbl_8061FEDC->m38;
+    self->m10=(FxIObj*)fn_8038BC58(((Unk8031D148_Video*)self->m4)->m68,self->m48,context->m0,(char*)context->m4);
+    Unk8031D148_Dims* dims=((Unk8031D148_Frame*)self->m48)->m4;
+    self->m14=(float)dims->width;
+    self->m18=(float)dims->height;
+    ((Unk8031D148_Screen*)lbl_8061FEDC->m38->m4)->s3(&self->m1C,&self->m20);
+    self->m24=(self->m1C-self->m14*self->m2C)*lbl_805EA698;
+    self->m28=(self->m20-self->m18*self->m30)*lbl_805EA698;
+    self->m10->s2(self->m24,self->m28,lbl_805EA69C);
+    self->m10->s3(self->m2C,self->m30);
+}
