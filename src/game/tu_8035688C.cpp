@@ -4,6 +4,17 @@
  */
 
 #include "game/tu_80355A6C.h"
+extern "C" char* strncpy(char*, const char*, unsigned int);
+extern "C" void* memcpy(void*, const void*, unsigned int);
+extern "C" UiMsgMgr* fn_800B64BC(void*);
+/* Same lazy singleton as the shared view, using its real C constructor entry. */
+inline UiMsgMgr* GetUiMsgMgr()
+{
+    if (lbl_8061A32C == 0)
+        lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
+    return lbl_8061A32C;
+}
+
 
 void fn_8035688C(void* a, char* p) { *p = 0; }
 
@@ -306,9 +317,9 @@ void fn_80356FEC(void* self)
     UiMsg* p = &m;
     fn_800ECF18(self);
     fn_8035682C(p->name);
-    fn_8040B830(p->name, lbl_805B955C, 15);
+    strncpy(p->name, lbl_805B955C, 15);
     p->name[15] = 0;
-    fn_800B7B4C(UiGetMsgMgr(), &m, self);
+    fn_800B7B4C(GetUiMsgMgr(), &m, self);
 }
 
 int fn_80357074(float a, float b) { return a < b; }
@@ -322,7 +333,7 @@ void* fn_8035709C(void* self)
 void fn_803570B0(int* self, char** pp, const void* src, int n)
 {
     if (*self == 0)
-        fn_8040B190(*pp, src, n);
+        memcpy(*pp, src, n);
     *pp += n;
 }
 
