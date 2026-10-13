@@ -153,6 +153,10 @@ extern const char lbl_805F5338[];
 extern const char lbl_805F70C8[];
 extern const char lbl_805F70CC[];
 extern "C" void fn_800DE354__FiP8UdE354_Tiii(char* out, int a, int b, int c, int d);
+extern const float lbl_805F6A98;
+extern char* lbl_8061E978;
+extern "C" int fn_80403060(const unsigned short* s);
+extern "C" void fn_800D4254(unsigned short* s, int a, int* b, float* c);
 extern "C" {
 
 inline void Fe2FB4Get(char* rec, char* nm)
@@ -163,6 +167,73 @@ inline char* FeIdc(char* p)
 {
     return p;
 }
+/* near-miss: 97.1%, same instructions; retail has sp8 at r1+8 and spC at r1+12 (ours swapped: the first address-taken local gets the higher slot) and p/cnt in r30/r31 in the line-count loop */
+FE_OVERLAY void fn_80492BA8(void* x, char* sc)
+{
+    unsigned short* s = (unsigned short*)sc;
+    float spC = lbl_805F6A98;
+    int sp8;
+    int i;
+    int n = fn_80403060((unsigned short*)FeI(x, 0x32C));
+    if (s != 0) {
+        int len;
+        while (n + (len = fn_80403060(s)) > 0x270F && (i = fn_80403088((unsigned short*)FeI(x, 0x32C), 10)) != 0xFFFF) {
+            unsigned short* m = (unsigned short*)FeI(x, 0x32C);
+            fn_80403144((char*)m, (const char*)(m + i + 1));
+            n = fn_80403060((unsigned short*)FeI(x, 0x32C));
+        }
+        char* tbase = lbl_8061E978;
+        int j = len;
+        int idx = (int)FeMem(x, 0x1D4)->fn_vslot34();
+        char* tb = tbase + 0x11E88;
+        int q = *(int*)(tb + idx * 4);
+        fn_800D4254(s, q, &sp8, &spC);
+        if (!(spC < (float)*(short*)(*(char**)((char*)x + 0x1CC) + 0x2A))) {
+                do {
+                if (j < len) {
+                    s[j] = 0x20;
+                }
+                j--;
+                if (j > 0) {
+                    if (s[j] != 0x20) {
+                        do {
+                            j--;
+                            if (j <= 0) {
+                                break;
+                            }
+                        } while (s[j] != 0x20);
+                    }
+                    if (j > 0) {
+                        s[j] = 0xA;
+                    }
+                }
+                fn_800D4254(s, q, &sp8, &spC);
+            } while (spC >= (float)*(short*)(*(char**)((char*)x + 0x1CC) + 0x2A));
+        }
+        fn_800DFF0C((unsigned short*)FeI(x, 0x32C), s);
+    }
+    unsigned short* p = (unsigned short*)FeI(x, 0x32C);
+    int cnt = 0;
+    while ((i = fn_80403088(p, 10)) != 0xFFFF) {
+        cnt++;
+        p += i + 1;
+    }
+    unsigned short* q2 = (unsigned short*)FeI(x, 0x32C);
+    FeI(x, 0x330) = cnt;
+    while (cnt > 3 && (i = fn_80403088(q2, 10)) != 0xFFFF) {
+        cnt--;
+        q2 += i + 1;
+    }
+    ((FeWV*)FeMem(x, 0x1D0))->s28(q2);
+    FeW* w248 = FeMem(x, 0x248);
+    int c2 = FeI(x, 0x330);
+    int b2 = c2 - 10;
+    int a1 = c2 - 9;
+    ((FeWQ*)w248)->s33(a1 < 0 ? 0 : a1);
+    ((FeWQ*)FeMem(x, 0x248))->s35(b2 < 0 ? 0 : b2);
+    fn_80492E94(x);
+}
+
 FE_OVERLAY void fn_80492E94(void* x)
 {
     unsigned short buf[200];
