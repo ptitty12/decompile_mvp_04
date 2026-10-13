@@ -9,7 +9,7 @@ class lbl_Owner {
 public:
     char pad0[0x8];
     void* m8;
-    void fn_803DA038();
+    lbl_Node* fn_803DA038();
     void fn_803DA098(lbl_Node* node);
 };
 
