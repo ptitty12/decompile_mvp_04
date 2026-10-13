@@ -946,8 +946,7 @@ u32 fn_80434C74(u16 encode, u16 code)
     return 0;
 }
 
-/* flags: not matched (near-miss) */
-/* OSGetFontEncode */
+/* OSGetFontEncode (VI_PAL..VI_EURGB60 are empty cases that fall into default) */
 u16 fn_80434DE8(void)
 {
     if (lbl_806EF2F0 != 0xFFFF) {
@@ -957,6 +956,11 @@ u16 fn_80434DE8(void)
     case 0:
         lbl_806EF2F0 = (__VIRegs[55] & 2) ? 1 : 0;
         break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
     default:
         lbl_806EF2F0 = 0;
         break;
