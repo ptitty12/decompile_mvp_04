@@ -301,3 +301,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `db/tu_805881E4` `fn_80588A3C` (swarm24, 2 forms): existing 95.69%; 130/130 words, best 30 register/schedule slots. Index-first setup fixes two words, but id/screen/predicate occupy r29/r31/r30 rather than retail r31/r30/r29.
 
 - `db/tu_805881E4` `fn_8058B048` (swarm27, 5 forms): scratch 144/144 words; held for shared ABI repair. Retail at 8058B1E0 consumes canonical BB28 return in f1, but game provider and member header still declare int; no new conflicting declaration retained.
+
+- `ealib/tu_803959E0` `fn_803977FC` (swarm31, four forms): existing 95.38%; best 101/101 words with 11 differing slots. Result register allocation and history/base load plus common-store scheduling remain unmatched. Scratch SW02/build/swarm29.
