@@ -439,7 +439,9 @@ int fn_800A9E04(UnkFEObj* self)
     return 1;
 }
 
-/* near-miss (86/86 insns, 37 slots): retail joins every failing arm at one shared `li r3,0` block placed after the 0x20 return; early-return, goto and nested forms tried */
+/* The flags word is read once through a volatile view (f4, used for bits 4 and 8) and again plainly
+ * for bits 0x20/0x40: retail does not share the two loads. The loop reads through two separate
+ * base pointers (+8, +0x4F4) indexed by off, which gives lwzx. */
 int fn_800A9E1C(UnkFEObj* self, char* s)
 {
     if (self->fn_vslot3()) {
@@ -456,12 +458,13 @@ int fn_800A9E1C(UnkFEObj* self, char* s)
                 return 0;
             }
         }
-        if (self->m4 & 4) {
+        unsigned f4 = *(volatile unsigned*)&self->m4;
+        if (f4 & 4) {
             if (lbl_806192E0->m4->m10->m120 == 0) {
                 return 0;
             }
         }
-        if (self->m4 & 8) {
+        if (f4 & 8) {
             return 0;
         }
         if (self->m4 & 0x20) {
@@ -470,8 +473,10 @@ int fn_800A9E1C(UnkFEObj* self, char* s)
             FE80619948* o = lbl_80619948;
             int off = 0;
             for (int k = 0; k < 4; k++) {
-                int a = *(int*)(o->m64 + 8 + off);
-                int b = *(int*)(o->m64 + 0x4F4 + off);
+                char* ra = o->m64 + 8;
+                char* rb = o->m64 + 0x4F4;
+                int a = *(int*)(ra + off);
+                int b = *(int*)(rb + off);
                 if (b * (a + 1) != 0) {
                     return 0;
                 }
