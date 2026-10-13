@@ -91,6 +91,73 @@ inline int Ge(int s, int lo)
     return s >= lo;
 }
 
+
+#include "game/tu_80268190.h"
+struct U;
+char* fn_8035E8CC(char*, unsigned);
+void fn_8035E8F0(U*, int);
+void fn_8035E924(U*, int);
+void fn_8035E958(U*, int);
+void fn_80268998(Unk80268190_S*, int);
+extern "C" void fn_8037893C(void*, int, void*, int, int);
+extern char lbl_80661868[], lbl_80661850[], lbl_80661838[];
+/* Leading fields of the 0x38-byte state record (fn_8035E8CC); +4, +C
+ * and +10 are compared/copied by fn_8026C414. */
+struct Unk8026C414_Record {
+    int m0, m4, m8, mC, m10;
+};
+struct Unk8026C414_Event {
+    int id;
+    void* vptr;
+    int m8;
+    int mC;
+    Unk8026C414_Event(int i, void* v, Unk8026C414_Record* r) {
+        vptr = lbl_80649DA0;
+        id = i;
+        vptr = v;
+        if (i == 129) {
+            m8 = r->m10;
+        } else {
+            int y = r->mC;
+            int x = r->m10;
+            mC = x;
+            m8 = y;
+        }
+    }
+};
+extern "C" void fn_8026C414(Unk80268190_T* s, char* state)
+{
+    for (int i=0;i<s->m448;++i) {
+        Unk80268190_Pl* pl=s->m438[i];
+        if (pl) {
+            int type=pl->m458;
+            Unk8026C414_Record* next=(Unk8026C414_Record*)fn_8035E8CC(state,type);
+            Unk8026C414_Record* prev=(Unk8026C414_Record*)fn_8035E8CC((char*)s+0x204,type);
+            int a=next->m4,b=prev->m4;
+            if(a!=b || next->mC!=prev->mC) {
+                int changed = b==10 && a==11;
+                if(a==10) {
+                    if(b==11) fn_80268998((Unk80268190_S*)((char*)s+0xBC),type);
+                    Unk8026C414_Event event(127,lbl_80661868,next);
+                    fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                    fn_8035E8F0((U*)&event,2);
+                } else if(changed) {
+                    if(next->mC!=prev->mC) {
+                        fn_80268998((Unk80268190_S*)((char*)s+0xBC),type);
+                        Unk8026C414_Event event(128,lbl_80661850,next);
+                        fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                        fn_8035E924((U*)&event,2);
+                    }
+                } else if(a==1 && b==10) {
+                    Unk8026C414_Event event(129,lbl_80661838,next);
+                    fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                    fn_8035E958((U*)&event,2);
+                }
+            }
+        }
+    }
+}
+
 void fn_8026C630()
 {
     fn_8026AA0C(1, 0xFFFF);
