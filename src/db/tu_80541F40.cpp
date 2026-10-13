@@ -127,6 +127,56 @@ DB_OVERLAY void fn_80541F98(void* self, int chrg)
         fn_80377408(self);
 }
 
+extern "C" char* fn_802B9300(const char* path, int a, int b, unsigned* n);
+extern "C" void fn_802B961C(char* buf, int b);
+extern "C" int fn_80409DAC(const char* s);
+extern "C" unsigned fn_80379134(const char* s, int n);
+extern "C" void fn_80377FCC(Db8053967C_DbObj* d, int a, int b, int c);
+DB_OVERLAY void fn_80541FDC(void* self, const char* path)
+{
+    Db8053967C_DbObj* d = (Db8053967C_DbObj*)self;
+    unsigned i = 0;
+    unsigned len = 0;
+    int ia;
+    int ib;
+    char* buf = fn_802B9300(path, 0x100, 6, &len);
+    char* end = buf + len;
+    if (buf != 0 && (int)len > 0) {
+        ia = 0;
+        ib = 0;
+        char* p = buf;
+        while (*p != '\n' && p < end)
+            p++;
+        for (p++; p < end; p++) {
+            while ((unsigned)((unsigned char)*p - 0x30) > 9)
+                p++;
+            int num = fn_80409DAC(p);
+            while (*p != ',' && p < end)
+                p++;
+            p++;
+            char tmp[0x80];
+            unsigned n = fn_80379134(p, 10);
+            for (i = 0; i < n; i++) {
+                int c = (signed char)p[i];
+                if (*(unsigned char*)(c + (int)lbl_8060E9F1) & 1)
+                    c += 0x20;
+                tmp[i] = c;
+                if ((signed char)c == 10 || (signed char)c == 13)
+                    tmp[i] = 0;
+            }
+            tmp[n] = 0;
+            int h = fn_80378568(tmp, 0);
+            if (fn_80377E90(d, &ia, &ib, h) == 0)
+                fn_80377CD8(d, num, num, h);
+            else
+                fn_80377FCC(d, num, num, h);
+            while (*p != '\n' && p < end)
+                p++;
+        }
+    }
+    fn_802B961C(buf, 6);
+}
+
 DB_OVERLAY int fn_805421B8(Db8053967C_DbObj* list, const char* str)
 {
     char buf[0x80];
