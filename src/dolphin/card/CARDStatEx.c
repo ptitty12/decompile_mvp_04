@@ -4,6 +4,11 @@
 
 #include "__card.h"
 
+extern void fn_8041A6C8(s32 chan, s32 result);
+extern s32 fn_8041B848(s32 chan, CARDControl** pcard);
+extern s32 fn_8041B900(CARDControl* card, s32 result);
+extern s32 fn_8041BB38(s32 chan);
+
 s32 __CARDGetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
     ASSERTLINE(85, 0 <= chan && chan < 2);
     ASSERTLINE(86, 0 <= fileNo && fileNo < CARD_MAX_FILE);
@@ -16,7 +21,7 @@ s32 __CARDGetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
         CARDControl* card;
         CARDDir* dir;
         CARDDir* ent;
-        s32 result = __CARDGetControlBlock(chan, &card);
+        s32 result = fn_8041B848(chan, &card);
 
         if (result < 0) {
             return result;
@@ -28,7 +33,7 @@ s32 __CARDGetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
         if (result >= 0) {
             memcpy(dirent, ent, 0x40);
         }
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
     }
 }
 
@@ -51,7 +56,7 @@ s32 __CARDSetStatusExAsync(s32 chan, s32 fileNo, CARDDir* dirent, CARDCallback c
         return CARD_RESULT_FATAL_ERROR;
     }
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0) {
         return result;
     }
@@ -60,7 +65,7 @@ s32 __CARDSetStatusExAsync(s32 chan, s32 fileNo, CARDDir* dirent, CARDCallback c
     ent = &dir[fileNo];
     result = __CARDIsWritable(card, ent);
     if (result < 0) {
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
     }
 
     for (p = dirent->fileName; p < (u8*)&dirent->time; p++) {
@@ -90,7 +95,7 @@ s32 __CARDSetStatusExAsync(s32 chan, s32 fileNo, CARDDir* dirent, CARDCallback c
                     && (memcmp(&ent->gameName, &dirent->gameName, 4) == 0) 
                     && (memcmp(&ent->company, &dirent->company, 2) == 0) 
                     && (memcmp(&ent->fileName, &dirent->fileName, 0x20) == 0)) {
-                        return __CARDPutControlBlock(card, -7);
+                        return fn_8041B900(card, -7);
                 }
             }
         }
@@ -110,16 +115,9 @@ s32 __CARDSetStatusExAsync(s32 chan, s32 fileNo, CARDDir* dirent, CARDCallback c
 
     result = __CARDUpdateDir(chan, callback);
     if (result < 0) {
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
     }
     return result;
 }
 
-s32 __CARDSetStatusEx(s32 chan, s32 fileNo, CARDDir* dirent) {
-    s32 result = __CARDSetStatusExAsync(chan, fileNo, dirent, &__CARDSyncCallback);
-    if (result < 0) {
-        return result;
-    }
 
-    return __CARDSync(chan);
-}
