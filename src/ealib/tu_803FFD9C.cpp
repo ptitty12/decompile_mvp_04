@@ -368,6 +368,23 @@ extern "C" void fn_80400678()
     exit(0);
 }
 
+/* Check for an existing callback, then occupy the first empty entry. */
+extern "C" void fn_80400690(void (*callback)())
+{
+    for (int i = 0; i < 64; ++i) {
+        if (lbl_8062EB20[i] == callback)
+            return;
+    }
+    int i = 0;
+    while (i < 64) {
+        if (lbl_8062EB20[i] == 0) {
+            lbl_8062EB20[i] = callback;
+            break;
+        }
+        ++i;
+    }
+}
+
 /* Remove the first registered shutdown callback that matches. */
 extern "C" void fn_804006FC(void (*callback)())
 {
