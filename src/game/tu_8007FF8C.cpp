@@ -38,6 +38,8 @@ struct Unk800804D8_St {
 };
 struct Unk8007B2B0_Screen {
     int fn_8007DA34(int i);
+    int fn_80078A38(int i);
+    float fn_8007BB28(int a, int b, int c);
 };
 struct Unk8007DB74_A;
 
@@ -150,7 +152,7 @@ void fn_80096544(void* self, int a, int b, int c, float f);
 void fn_80080BFC(Y* self);
 Q* fn_80081CF8(Y* self, int i);
 void fn_80081C94(Y* self, int i, int a, int b, int c);
-void fn_80081D88(Y* self);
+extern "C" void fn_80081D88(Y* self);
 void fn_800810E8(Y* self);
 
 
@@ -741,6 +743,50 @@ void fn_80081D70(Y* self)
     self->z0.b2 = 0;
     self->z0.b4 = 0;
     self->z0.b5 = 0;
+}
+
+extern "C" float fn_8057BC94(int a, int b, float c);
+
+inline float Ratio81(int n, int d)
+{
+    return d > 0 ? (float)n / (float)d : 0.0f;
+}
+
+/* near-miss: all insns match except that retail allocates r0 (not r9) for the four lwz temps feeding the fn_8007BB28 sums. */
+extern "C" void fn_80081D88(Y* self)
+{
+    Unk8007B2B0_Screen* sc = lbl_8061930C;
+    int r = 2;
+    int id1 = *(int*)((char*)self + 0x198);
+    int id2 = *(int*)((char*)self + 0xFFC);
+    int k1 = sc->fn_80078A38(id1);
+    int eq = k1 == sc->fn_80078A38(id2);
+    float res = 1.0f;
+    if (eq) {
+        int h1 = (int)sc->fn_8007BB28(0, id1, 1);
+        int t1 = h1 + (int)sc->fn_8007BB28(1, id1, 1);
+        int h2 = (int)sc->fn_8007BB28(0, id2, 1);
+        int t2 = h2 + (int)sc->fn_8007BB28(1, id2, 1);
+        if (t1 <= 9 || t2 <= 9) {
+            h1 = (int)sc->fn_8007BB28(0, id1, 0);
+            t1 = h1 + (int)sc->fn_8007BB28(1, id1, 0);
+            h2 = (int)sc->fn_8007BB28(0, id2, 0);
+            t2 = h2 + (int)sc->fn_8007BB28(1, id2, 0);
+        }
+        float x = Ratio81(h1, t1);
+        float y = Ratio81(h2, t2);
+        float u = fn_8057BC94(t1, h1, y);
+        float v = fn_8057BC94(t2, h2, x);
+        if (!(x <= y)) {
+            res = u;
+            r = 0;
+        } else if (!(x >= y)) {
+            res = v;
+            r = 1;
+        }
+    }
+    self->m1D40 = r;
+    self->m1D44 = res;
 }
 
 /* near-miss: same iterator-init scheduling difference as fn_80080BFC. */
