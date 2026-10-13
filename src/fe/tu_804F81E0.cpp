@@ -773,39 +773,17 @@ extern "C" FE_OVERLAY void fn_804F9F9C(FeCap* self, int b, int c)
 extern "C" FE_OVERLAY float fn_804FA098(FeS23* self, int i, float x)
 {
     float r = 0.0f;
-    float* a;
-    float* b;
     if (self->m870 != 0) {
-        a = lbl_80622260;
-        b = lbl_80622280;
+        r = lbl_80622260[i] + lbl_80622280[i] * x;
     } else {
-        a = lbl_80622220;
-        b = lbl_80622240;
+        r = lbl_80622220[i] + lbl_80622240[i] * x;
     }
-    r = b[i] * x + a[i];
     return r;
 }
 
 /* near-miss: retail loads a[i] inside each branch and b[i] after the join; same register-reuse problem as fn_804FA098 */
-extern "C" FE_OVERLAY float fn_804FA104(FeS23* self, int i, int flag, float x)
-{
-    float r = 0.0f;
-    float* a;
-    float* b;
-    if (self->m870 != 0 && flag == 0) {
-        a = lbl_80622260;
-        b = lbl_80622280;
-    } else {
-        a = lbl_80622220;
-        b = lbl_80622240;
-    }
-    r = (x - a[i]) / b[i];
-    if (r < 0.0f)
-        r = 0.0f;
-    else if (!(r <= 1.0f))
-        r = 1.0f;
-    return r;
-}
+extern "C" FE_OVERLAY float fn_804FA104(FeS23* self, int i, int flag, float x) { float r=0.0f; if (self->m870 != 0 && flag == 0) r=(x-lbl_80622260[i])/lbl_80622280[i]; else r=(x-lbl_80622220[i])/lbl_80622240[i]; if(r<0.0f) r=0.0f; else if(!(r<=1.0f)) r=1.0f; return r; }
+
 
 extern "C" FE_OVERLAY void fn_804FA1AC(FeCap* self, int mode, int x)
 {
@@ -1265,17 +1243,8 @@ extern "C" FE_OVERLAY int fn_804FB7F4(FeS19* s)
 }
 
 /* near-miss: retail tests r == 10 with cmpwi/bne; ours folds to xori/subfic/adde (3 slots differ) */
-extern "C" FE_OVERLAY int fn_804FB84C(FeS19* s)
-{
-    if (s->m630 != 2)
-        return 0;
-    int r = ((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(5, s->m86C);
-    if (r == 0)
-        return 0;
-    if (r != 10)
-        return 0;
-    return 1;
-}
+extern "C" FE_OVERLAY int fn_804FB84C(FeS19* s) { if (s->m630 == 2) { int r=((Unk8007A4DC_Screen*)lbl_8061930C)->fn_8007A6A0(5,s->m86C); if (r==0) goto yes; if (r!=10) goto no; yes: return 1; no: return 0; } return 0; }
+
 
 extern "C" FE_OVERLAY void fn_804FB8A4(FeS19* s, int a, int b)
 {
