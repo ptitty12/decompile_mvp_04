@@ -483,6 +483,89 @@ extern "C" void fn_801E8BEC(I* s, Vec3* b)
     fn_801E8328(s, b, v = lbl_805D4254);
 }
 
+struct Unk8024EF40_A;
+int fn_80254A90(Unk8024EF40_A* a);
+extern "C" int fn_801EFD98(I* s, P** out);
+extern const float lbl_805D4268;
+struct Unk801E8EF4_Dn {
+    int v;
+    Unk801E8EF4_Dn(int x) { v = x; }
+    ~Unk801E8EF4_Dn() {}
+    int Next()
+    {
+        int t;
+        if (v > -1)
+            t = v - 1;
+        else
+            t = v;
+        v = t;
+        return t;
+    }
+};
+inline Vec3 Unk801E8EF4_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline P* Unk801E8EF4_At(Unk801DB948_Game* g, int i)
+{
+    if ((unsigned)i <= 12) {
+        int off = i * 4;
+        char* b = (char*)g + 0x65C;
+        return *(P**)(b + off);
+    }
+    return 0;
+}
+
+/* near-miss (1 slot): retail slwi writes r11 (the loop index) in place; ours uses r0 for the scaled offset. Tried: unsigned idx,
+   ii copy, int/unsigned At() param, branch/early-return forms, off/base order */
+extern "C" int fn_801E8EF4(I* s, int idx, P** out)
+{
+    float u = lbl_805D4268;
+    int r = 0;
+    P* o = fn_801A497C(s->m9C->m0, 4, idx);
+    P* best = 0;
+    Vec3 pos = o->m60;
+    float bestD = lbl_805D4268;
+    P* found = 0;
+    if (fn_801EFD98(s, &found) == 1) {
+        best = found;
+        Vec3 d = Unk801E8EF4_Sub(best->m60, pos);
+        bestD = d.x * d.x + d.z * d.z;
+    } else {
+        int cnt = 12;
+        int idx = 12;
+        do {
+            P* c = Unk801E8EF4_At(s->m9C->m0, idx);
+            if (c != 0 && fn_80254A90((Unk8024EF40_A*)((char*)c + 0x58C)) == 1) {
+                float d2;
+                Vec3 d = Unk801E8EF4_Sub(c->m60, pos);
+                d2 = d.x * d.x + d.z * d.z;
+                if (!(d2 >= bestD)) {
+                    bestD = d2;
+                    best = c;
+                }
+            }
+            int cc = *(volatile int*)&cnt;
+            int t;
+            if (cc <= -1)
+                t = cc;
+            else
+                t = cc - 1;
+            *(volatile int*)&cnt = t;
+            idx = t;
+        } while (idx > 8);
+    }
+    if (best != 0) {
+        *out = best;
+        r = 1;
+    }
+    return r;
+}
+
 extern "C" int fn_801E90F4(I* s)
 {
     int k = fn_801A2034(s->m9C->m0, 4);
