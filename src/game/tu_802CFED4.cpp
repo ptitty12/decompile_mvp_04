@@ -527,6 +527,38 @@ void fn_802D23B8()
 {
 }
 
+extern float lbl_8061EDBC;
+inline Unk802D0B4C_Vec3 Unk802D30CC_Sub(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D30CC_Mul(const Unk802D0B4C_Vec3& v, float k)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = v.x * k;
+    r.y = v.y * k;
+    r.z = v.z * k;
+    return r;
+}
+inline Unk802D0B4C_Vec3 Unk802D30CC_Add(const Unk802D0B4C_Vec3& a, const Unk802D0B4C_Vec3& b)
+{
+    Unk802D0B4C_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+void fn_802D30CC(void* self, Unk802D0B4C_Vec3* a, Unk802D0B4C_Vec3* b, float t)
+{
+    float k = 1.0f - lbl_8061EDBC;
+    *b = Unk802D30CC_Add(*a, Unk802D30CC_Mul(Unk802D30CC_Sub(*b, *a), !(k > 1.0f) ? (k >? 0.0f) : 1.0f));
+}
+
 void fn_802D3210(char* o)
 {
     fn_802CFED4(o + 0x78);
