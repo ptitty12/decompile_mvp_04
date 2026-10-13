@@ -358,3 +358,7 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | ealib/tu_803CECA4 fn_803D1C78 | Eight ordinary C forms; best 119/119 words, float period/offset register allocation and shared index byte-offset register remain. Scratch build/swarm39, source restored.
 - 2026-10-13 | ealib/tu_803CECA4 fn_803CF77C | Exact 123/123 draft blocked on Claude-owned game fn_80363108/current CF77C declaration omitting both float inputs; 88 literal refs zero mismatches/unresolved. Draft build/swarm39/803CECA4-F77C-exact.cpp only, source restored.
 - 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
+
+- `ealib/tu_803912F8` `fn_80391C20` (swarm45, six forms): existing97.22222%,18/18words; halfword offset/value registers and indexed-load operand order remain. Pointer, element-view and inline-accessor forms dropped to scratch.
+- `ealib/tu_803912F8` `fn_80391DC4` (swarm45, four forms): existing98.65385%,26/26words; six intermediate pointer/count/address registers remain after scalar, unsigned, inline payload and association forms; source unchanged.
+- `ealib/tu_803912F8` `fn_80391444` (swarm45, seven forms): valid new scratch99.89899%,99/99words; sole difference at slot57 is add r9,r7,r5 versus add r9,r5,r7. Typed previous-record accessor recovers the signed-short return boundaries and full control flow; no pointer-integer or instruction workaround retained.
