@@ -2028,3 +2028,22 @@ New details:
 
 ### 17. Also seen, already in PATTERNS (skipped): callee return types, cross-jump basics, switch trees, dead-compare switches,
 priority formula, `-O2` vs `-Os`, `fmadds` fusion, `cror` float branches, in-struct view casts, per-function volatile view.
+
+## Loop dumps: when a giv gets strength-reduced (twins1 worker, 2026-10-13)
+
+Found on fn_80343B44 (game/tu_80341B78, `-Os`). It is the twin fn_8034387C minus a second counter, and it came out 6
+instructions longer until this was understood:
+
+- Symptom: retail enters the loop with a `b` to the bottom test and indexes with `slwi; stwx`. Ours duplicated the
+  test above the loop (`li` in the preheader, pre-tested loop) and added a strength-reduced pointer register. A
+  shorter target than its twin, with a whole block missing, usually means an optimizer decision like this, not a
+  missing statement (`twins.py --diff` now says so).
+- Read the decision instead of guessing: `ngccc -E` the unit, then run cc1plus on the `.i` with the unit's flags plus
+  `-dL` (e.g. `cc1plus -Os -G0 -ffloat-store -fno-rtti -fno-exceptions -quiet -dL x.i`) and read `x.i.loop`. Lines
+  like `giv of insn N not worth while, 73 vs 75` give the cost. Here the giv was reduced exactly when the loop had
+  73 or fewer real instructions at the second loop pass, and the reduction is also what turned the rotated `b test`
+  loop into the pre-tested one. This agrees with RE4's loop.c threshold notes above.
+- C-only lever that kept it unreduced: name the scaled offset, so loop.c scores the giv at a large negative benefit:
+  `int off = j << 2; j++; *(int*)(off + (int)self->m10) = v;` instead of `self->m10[j++] = v;`.
+- Things that do NOT change the count: dead counters, `(unsigned short)` casts and `int x = call()` temporaries are
+  gone before the loop pass. Volatile junk stores raise the count but change the output.

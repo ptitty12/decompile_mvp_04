@@ -448,19 +448,100 @@ def fmt_parts(p: dict) -> str:
     return f"score {p['total']:.2f} ({s}){flags}"
 
 
+def function_insns(unit: str, name: str) -> list[tuple[str, str]]:
+    """(mnemonic, operands) for one function, re-read from its split asm file."""
+    rel = unit[len("main/"):] if unit.startswith("main/") else unit
+    path = ASM_DIR / f"{rel}.s"
+    if not path.exists():
+        return []
+    m = re.search(rf"^\.fn {re.escape(name)}, \w+$(.*?)^\.endfn {re.escape(name)}$",
+                  path.read_text(encoding="utf-8", errors="replace"), re.S | re.M)
+    return [(x.group(1), x.group(2)) for x in INS_RE.finditer(m.group(1))] if m else []
+
+
+def _count(pairs: dict, key) -> None:
+    pairs[key] = pairs.get(key, 0) + 1
+
+
+def _fmt_pairs(pairs: dict, limit: int) -> str:
+    items = sorted(pairs.items(), key=lambda kv: -kv[1])
+    s = ", ".join(f"{a} -> {b}" + (f" (x{n})" if n > 1 else "") for (a, b), n in items[:limit])
+    return s + (f", ... {len(items) - limit} more" if len(items) > limit else "")
+
+
 def opcode_diff(idx: Index, t: int, c: int, limit: int = 4) -> list[str]:
+    """Where the opcode sequences differ, plus what changes inside the aligned parts:
+    callee and data-symbol substitutions, field offsets and small constants (twin -> target).
+    limit=0 prints every differing block."""
     names = {v: k for k, v in idx.opcode_ids.items()}
     a = [names[o] for o in idx.ops[t]]
     b = [names[o] for o in idx.ops[c]]
-    out = []
+    ta = function_insns(*idx.keys[t])
+    tb = function_insns(*idx.keys[c])
+    have_ops = len(ta) == len(a) and len(tb) == len(b)
+    out, blocks = [], 0
+    calls, fields, consts, data = {}, {}, {}, {}
+    missing_in_target = extra_in_target = 0
     for tag, i1, i2, j1, j2 in difflib.SequenceMatcher(None, a, b, autojunk=False).get_opcodes():
         if tag == "equal":
+            if have_ops:
+                for k in range(i2 - i1):
+                    (mn, x), (_, y) = ta[i1 + k], tb[j1 + k]
+                    if x == y:
+                        continue
+                    if mn in ("bl", "b") and not x.startswith(".L") and not y.startswith(".L"):
+                        _count(calls, (y.split()[0], x.split()[0]))
+                        continue
+                    mx, my = MEM_RE.findall(x), MEM_RE.findall(y)
+                    if mx and len(mx) == len(my):
+                        for (ox, rx), (oy, ry) in zip(mx, my):
+                            if ox != oy and rx not in ("r1", "r2", "r13"):
+                                _count(fields, (f"{int(oy, 0):#x}", f"{int(ox, 0):#x}"))
+                    sx, sy = SYM_RE.findall(x), SYM_RE.findall(y)
+                    if sx and len(sx) == len(sy):
+                        for p, q in zip(sx, sy):
+                            if p != q:
+                                _count(data, (q, p))
+                    if mn in ("li", "cmpwi", "cmplwi", "addi") and not sx:
+                        vx, vy = x.split(",")[-1].strip(), y.split(",")[-1].strip()
+                        if vx != vy and re.fullmatch(r"-?(0x)?[0-9A-Fa-f]+", vx) and re.fullmatch(r"-?(0x)?[0-9A-Fa-f]+", vy):
+                            _count(consts, (f"{mn} {vy}", vx))
+            continue
+        missing_in_target += (j2 - j1) - (i2 - i1) if (j2 - j1) > (i2 - i1) else 0
+        extra_in_target += (i2 - i1) - (j2 - j1) if (i2 - i1) > (j2 - j1) else 0
+        blocks += 1
+        if limit and blocks > limit:
             continue
         out.append(f"   target[{i1}:{i2}] {' '.join(a[i1:i2]) or '-'}  |  twin[{j1}:{j2}] {' '.join(b[j1:j2]) or '-'}")
-        if len(out) >= limit:
-            out.append("   ...")
-            break
+    if limit and blocks > limit:
+        out.append(f"   ... {blocks - limit} more differing blocks (--full shows all)")
+    if calls:
+        out.append("   callees (twin -> target): " + _fmt_pairs(calls, 12))
+    if fields:
+        out.append("   field offsets (twin -> target): " + _fmt_pairs(fields, 12))
+    if data:
+        out.append("   data symbols (twin -> target): " + _fmt_pairs(data, 8))
+    if consts:
+        out.append("   constants (twin -> target): " + _fmt_pairs(consts, 8))
+    if len(a) < len(b) and missing_in_target >= 3:
+        out.append(f"   note: the target is {len(b) - len(a)} instructions shorter and lacks a block the twin has. That is often an"
+                   " optimizer decision (loop strength reduction, rotation, inlining) rather than a missing statement:"
+                   " see PATTERNS 'Loop dumps'.")
+    elif len(a) > len(b) and extra_in_target >= 3:
+        out.append(f"   note: the target is {len(a) - len(b)} instructions longer: an extra statement, a helper the twin had"
+                   " inlined, or the reverse of a strength-reduction/rotation difference.")
     return out
+
+
+def near_miss_comment(src_where: str, cache: dict) -> bool:
+    """True if the comment just above a matched twin's definition still says near-miss."""
+    path, _, line = src_where.rpartition(":")
+    try:
+        text = file_text(Path(path), cache)
+    except OSError:
+        return False
+    above = text.splitlines()[max(0, int(line) - 6) : int(line) - 1]
+    return any("near-miss" in l.lower() or "near miss" in l.lower() for l in above)
 
 
 def cmd_show(args) -> None:
@@ -480,9 +561,10 @@ def cmd_show(args) -> None:
             src = twin_source(idx, c, cache)
             where = src[0] if src else f"(source not found in {unit_sources(cu) or 'src/'})"
             print(f"-- #{rank} {cn}  {fmt_parts(p)}")
-            print(f"   {cu}, {idx.size[c]:#x} B, {len(idx.ops[c])} ins, {where}")
-            if args.diff:
-                print("\n".join(opcode_diff(idx, t, c)))
+            stale = " (its comment still says near-miss; it is matched)" if src and near_miss_comment(src[0], cache) else ""
+            print(f"   {cu}, {idx.size[c]:#x} B, {len(idx.ops[c])} ins, objdiff 100%{stale}, {where}")
+            if args.diff or args.full:
+                print("\n".join(opcode_diff(idx, t, c, 0 if args.full else 4)))
             if src and args.lines > 0:
                 lines = src[1].splitlines()
                 body = lines[: args.lines] + ([f"   ... ({len(lines) - args.lines} more lines)"] if len(lines) > args.lines else [])
@@ -581,7 +663,9 @@ def main() -> None:
     s.add_argument("--unit", help="disambiguate a name that exists in several units")
     s.add_argument("-n", type=int, default=3)
     s.add_argument("--lines", type=int, default=80, help="max source lines per twin (0 = location only)")
-    s.add_argument("--diff", action="store_true", help="show where the opcode sequences differ")
+    s.add_argument("--diff", action="store_true",
+                   help="where the opcode sequences differ (first 4 blocks), plus callee, field-offset, data and constant substitutions")
+    s.add_argument("--full", action="store_true", help="like --diff, but every differing block")
     s.add_argument("--no-callees", action="store_true", help="skip the callee prototype section")
     u = sub.add_parser("unit", help="best twin for every unmatched function in a unit")
     u.add_argument("unit")
