@@ -168,13 +168,14 @@ extern "C" FE_OVERLAY FeRaw0BAC* fn_804E0BAC(FeRaw0BAC* self, int a, int b, int 
     fn_80135180(self, a, b, c, d, e, f, g, h, 0);
     self->m17C = lbl_8066D248;
     self->m3C = lbl_8066D260;
-    fn_800D876C(&self->m1DC);
-    self->m200 = 0;
+    /* The provider at 0x800D876C returns the initialized timer pointer. */
+    ((Unk800D876C_A* (*)(Unk800D876C_A*))fn_800D876C)(&self->m1DC);
     self->m1F0 = 0;
     self->m1F4 = 0;
     self->m1F8 = 0;
     self->m1FC = 0;
     self->m1D8 = 0;
+    self->m200 = 0;
     return self;
 }
 
