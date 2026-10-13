@@ -623,6 +623,57 @@ inline void fn_8037AF10_SubEq(Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
     a.z -= b.z;
 }
 
+inline Unk80379324_Vec3 fn_8037AC20_Sub(const Unk80379324_Vec3& a, const Unk80379324_Vec3& b)
+{
+    Unk80379324_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+extern "C" float fn_8037AC20(const Unk80379324_Vec3* p, const Unk80379324_Vec3* s0, const Unk80379324_Vec3* s1, int sq, int* out)
+{
+    Unk80379324_Vec3 v1 = fn_8037AC20_Sub(*p, *s0);
+    Unk80379324_Vec3 v2 = fn_8037AC20_Sub(*s1, *s0);
+    float r;
+    float dot;
+    float l2;
+    dot = v1.x * v2.x + v1.z * v2.z;
+    if (!(dot > 0.0f)) {
+        r = v1.x * v1.x + v1.z * v1.z;
+        if (sq == 0)
+            r = fn_804028E4(r);
+        if (out)
+            *out = 0;
+    } else {
+        l2 = v2.x * v2.x + v2.z * v2.z;
+        if (!(dot < l2)) {
+            v1 = fn_8037AC20_Sub(*p, *s1);
+            r = v1.x * v1.x + v1.z * v1.z;
+            if (sq == 0)
+                r = fn_804028E4(r);
+            if (out)
+                *out = 0;
+        } else {
+            Unk80379324_Vec3 n;
+            n.y = 0.0f;
+            n.z = -v2.x;
+            n.x = v2.z;
+            Unk80379324_Vec3 nn = fn_80379B34_NormD(n);
+            n = nn;
+            r = n.x * v1.x + n.z * v1.z;
+            if (sq)
+                r = r * r;
+            else if (!(r >= 0.0f))
+                r = -r;
+            if (out)
+                *out = 1;
+        }
+    }
+    return r;
+}
+
 extern "C" float fn_8037AF10(const Unk80379324_Vec3* p, const Unk80379324_Vec3* s0, const Unk80379324_Vec3* s1, int sq, int* out)
 {
     Unk80379324_Vec3 v1 = fn_8037AF10_Sub(*p, *s0);
