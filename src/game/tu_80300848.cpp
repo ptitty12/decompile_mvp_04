@@ -243,6 +243,47 @@ extern "C" int fn_801BBF24(int a);
 extern "C" int fn_801DBEC0(Unk803015D8_X* x);
 extern "C" void fn_8014E09C(Unk803015D8_It* it, Unk803015D8_Own* o, int k);
 extern "C" void fn_8014E108(Unk803015D8_It* it);
+struct Unk80301E44_V {
+    float x;
+    float y;
+    float z;
+};
+struct Unk80301E44_C {
+    char pad0[0x24];
+    int m24;
+};
+struct Unk80301E44_B {
+    char pad0[0xC];
+    Unk80301E44_C* mC;
+};
+struct Unk80301E44_O {
+    char pad0[0x6B8];
+    void* m6B8;
+    char pad6BC[0x6F8 - 0x6BC];
+    Unk80301E44_B* m6F8;
+};
+extern Unk80301E44_V lbl_805E77EC;
+extern float lbl_8061F924;
+float fn_804028E4(float x);
+extern "C" float fn_8018514C(void* o, Unk80301E44_V* v, void* out);
+static inline Unk80301E44_V Sub80301E44(const Unk80301E44_V& a, const Unk80301E44_V& b)
+{
+    Unk80301E44_V r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+static inline float Len80301E44(const Unk80301E44_V& v)
+{
+    return fn_804028E4(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+static inline float Query2_80301E44(Unk80301E44_O* o, const Unk80301E44_V& s, Unk80301E44_V* out)
+{
+    Unk80301E44_V v = s;
+    return fn_8018514C(o->m6B8, &v, out);
+}
+
 struct Unk80305C88_P;
 void fn_80305C88(Unk80305C88_P* p, short v);
 extern const char lbl_805E7B04[];
@@ -274,6 +315,7 @@ void fn_80303F28(Unk80303ADC_Mgr* m);
 void* fn_80304098(Unk80304098_Obj* p, int a, char* b, int c, int d, int e);
 void fn_803015D8(Unk803015D8_Obj* p);
 void fn_803017D4(Unk803015D8_Obj* p);
+float fn_80301E44(Unk80301E44_O* o, Unk80301E44_V* p);
 }
 
 void fn_8030408C(Unk80300848_P1124* p);
@@ -372,6 +414,25 @@ void fn_803017D4(Unk803015D8_Obj* p)
         p->m30 = -1;
         fn_80301798((Unk80300848_S*)p);
     }
+}
+
+/* near-miss 99.7%: every instruction matches except the word order of the 12-byte copy of w into the
+   by-value query vector (retail loads/stores x,y,z; ours y,x,z). Tried: const-ref, pointer, by-value and
+   field-wise copies in the inline, w declared before/after out, a Query wrapper. */
+float fn_80301E44(Unk80301E44_O* o, Unk80301E44_V* p)
+{
+    float r = 0.5f;
+    int flag = 0;
+    int st = o->m6F8->mC->m24;
+    Unk80301E44_V d = Sub80301E44(*p, lbl_805E77EC);
+    if (Len80301E44(d) < 144.0f || st == 0x10 || st == 0x36)
+        flag = 1;
+    if (flag) {
+        Unk80301E44_V w = *p;
+        Unk80301E44_V out;
+        r = Query2_80301E44(o, w, &out) + lbl_8061F924;
+    }
+    return r;
 }
 
 Unk80300848_S* fn_80301F7C(Unk80300848_S* p)
