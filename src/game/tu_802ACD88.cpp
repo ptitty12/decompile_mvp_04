@@ -1000,3 +1000,89 @@ void fn_802AD538(Mgr* m, int h)
     }
 }
 
+struct Unk802AD2B8_Rec {
+    char pad0[0xC];
+    int mC;
+};
+struct Unk802AD2B8_Seq {
+    Unk802AD2B8_Rec* m0;
+    int m4;
+};
+struct Unk802AD2B8_It {
+    Unk802AD2B8_Rec* p;
+};
+struct Unk802AD2B8_Res {
+    void* m0;
+    void* m4;
+    int m8;
+};
+struct Unk802AD2B8_O {
+    Unk802AD2B8_Seq* m0;
+    char pad4[0x14C - 4];
+    Unk802AD2B8_Rec* m14C;
+    Unk802AD2B8_Rec* m150;
+    Unk802AD2B8_Rec* m154;
+    Unk802AD2B8_Rec* m158;
+    Unk802AD2B8_Rec* m15C;
+    Unk802AD2B8_Rec* m160;
+};
+typedef Unk802AD2B8_It (*Unk802AD2B8_Find)(Unk802AD2B8_Seq*, const char*, ...);
+extern "C" Unk802AD2B8_It fn_803D775C(Unk802AD2B8_Seq* s, const char* name);
+extern "C" Unk802AD2B8_It fn_803D7378(Unk802AD2B8_Seq* s, const char* name);
+extern "C" int fn_803D77EC(Unk802AD2B8_Rec* e);
+extern "C" void fn_803DBE2C(int a, int b);
+void fn_8030ACCC(void* p);
+void fn_80305C88(void* p, int a);
+void fn_80305C30(void* p, int a, int b, int c);
+extern const char lbl_805DEFC4[];
+extern const char lbl_805DEFDC[];
+extern const char lbl_805DEFE4[];
+extern const char lbl_805DFE34[];
+
+/* near-miss 97.0%: retail stores fn_803E9640's result straight from r3 (stw r3,4(r29)); ours copies it through r0 first and loads res->m0/out in the other order */
+void fn_802AD2B8(Unk802AD2B8_O* o, Unk802AD2B8_Res* res, const char* name, int a, int b)
+{
+    int out;
+    int n;
+    Unk802AE13C_Z z;
+    res->m0 = fn_802B9300(name, 0x400, 1, &out);
+    res->m8 = 1;
+    void* alloc = lbl_8062C668(0x30, 0);
+    void* r = fn_803E9640(alloc, res->m0, out, (void*)fn_80312700);
+    n = 0;
+    z.m0 = 0;
+    res->m4 = r;
+    Unk802AE13C_Z* pz = &z;
+    pz->m8 = 0;
+    fn_803E9994(r, lbl_8060D190, &n, pz);
+    Unk802AD2B8_Seq* t = (Unk802AD2B8_Seq*)z.m8;
+    o->m0 = 0;
+    fn_8030ACCC((char*)o + 4);
+    o->m0 = t;
+    if (t != 0) {
+        o->m14C = ((Unk802AD2B8_Find)fn_803D775C)(o->m0, lbl_805DEFC4).p;
+        o->m150 = ((Unk802AD2B8_Find)fn_803D7378)(o->m0, lbl_805DEFC4).p;
+        o->m154 = ((Unk802AD2B8_Find)fn_803D775C)(o->m0, lbl_805DEFDC).p;
+        o->m158 = ((Unk802AD2B8_Find)fn_803D7378)(o->m0, lbl_805DEFDC).p;
+        o->m15C = ((Unk802AD2B8_Find)fn_803D775C)(o->m0, lbl_805DEFE4).p;
+        o->m160 = ((Unk802AD2B8_Find)fn_803D7378)(o->m0, lbl_805DEFE4).p;
+        fn_80305C88(o, 0);
+    }
+    if (a != 0)
+        fn_80305C30(o, a, b, 0);
+    Unk802AD2B8_Seq* s = o->m0;
+    Unk802AD2B8_Rec* it = ((Unk802AD2B8_Find)fn_803D775C)(s, lbl_805DFE34).p;
+    if (it != s->m0 + s->m4) {
+        int v;
+        int ok;
+        if (fn_803D77EC(it) != 0) {
+            v = it->mC;
+            ok = 1;
+        } else {
+            v = 0;
+            ok = 0;
+        }
+        if (ok != 0)
+            fn_803DBE2C(v, 1);
+    }
+}
