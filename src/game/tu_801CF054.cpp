@@ -100,7 +100,7 @@ struct Unk801CF054_F4 {
     float v[4];
 };
 extern Unk801CF054_F4 lbl_805D2788;
-extern "C" float fn_801D1994(Y* y);
+extern "C" float fn_801D1994(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_801D15C0(Y* y, Unk801CF054_V2* v);
 extern "C" float fn_8024D0F8(P* p, int k);
 extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v);
@@ -713,6 +713,39 @@ extern Unk801CF054_Tbl12 lbl_805D27C4;
 extern "C" int fn_8017C954(void* p);
 #define UNK801CF054_CLAMP(x, lo, hi) (!((x) > (hi)) ? (!((x) < (lo)) ? (x) : (lo)) : (hi))
 
+extern "C" float fn_801D1F58(Y* y, Unk801CF054_V2* v);
+struct Unk8024F4AC_Mgr;
+int fn_8024F4AC(Unk8024F4AC_Mgr* self, int a, Unk8024EF40_Q* q, int k);
+float fn_80088E74(Unk80087A58_O* o);
+
+extern "C" float fn_801D1994(Y* y, Unk801CF054_V2* v)
+{
+    int h = ((Unk8022FE34_U*)((Unk801C16B0_M4*)y->m34)->m3B0)->fn_80235E28();
+    P* p = fn_801A4B34(y->m30);
+    int cls = fn_8024F54C(h);
+    float a = fn_801D1F58(y, v);
+    a = !(a > 1.0f) ? (a >? 0.0f) : 1.0f;
+    float r = a;
+    float s = fn_801D17D0(y, v);
+    s = !(s > 1.0f) ? (s >? 0.0f) : 1.0f;
+    r = r * LerpATB(0.9f, s, 1.1f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    float b = 1.0f - (float)fn_8024F4AC((Unk8024F4AC_Mgr*)p->mA0C, p->mA04, (Unk8024EF40_Q*)p->m44C, cls) * 0.01f;
+    b = !(b > 1.0f) ? (b >? 0.0f) : 1.0f;
+    r = r * LerpATB(0.9f, b, 1.1f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    float d = fn_801D18C8(y);
+    r = r * LerpATB(1.0f, d, 1.12f);
+    r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    Unk801CF054_V2 w;
+    fn_8022EA60(&w, ((Unk801C16B0_M4*)y->m34)->m3B0);
+    if (!(AbsF(w.x) >= 1.0f) && !(AbsF(w.y) >= 1.0f)) {
+        r = r * LerpATB(1.0f, fn_80088E74(y->m30->m6F8->mC->mC), 1.2f);
+        r = !(r > 1.0f) ? (r >? 0.0f) : 1.0f;
+    }
+    return r;
+}
+
 extern "C" float fn_801D1D3C(Y* y, Unk801CF054_V2* v)
 {
     Unk801CF054_Tbl12 t = lbl_805D27C4;
@@ -764,7 +797,7 @@ extern "C" float fn_801D21F4(Y* y, Unk801CF054_V2* v)
         small = AbsF(v->y) <= 1.0f;
     float t = 0.0f;
     if (small)
-        t = fn_801D1994(y);
+        t = fn_801D1994(y, v);
     else
         t = fn_801D15C0(y, v);
     P* q = fn_801A4B34(y->m30);
