@@ -39,6 +39,8 @@ struct RcSysJ {
     int m14;
     RcJob* m18;
     char* m1C;
+    int m20;
+    int m24;
 };
 
 struct RcBuf14 {
@@ -46,6 +48,7 @@ struct RcBuf14 {
 };
 
 extern RcJob* lbl_806ADE64[3];
+extern RcJob* lbl_806ADE6C[3];
 extern RcJob* lbl_806ADE70[3];
 extern RcSysJ lbl_806ADE4C;
 extern char lbl_806ADE74[];
@@ -75,7 +78,7 @@ extern "C" void fn_803FA948(RcJob*);
 extern "C" char* strncpy(char*, const char*, unsigned);
 
 extern "C" void* memset(void*, int, unsigned, ...);
-extern "C" void fn_803F9EFC(int, int, int);
+extern "C" void fn_803F9EFC(int, int, RcJob*);
 struct RcB30x {
     int w[12];
 };
@@ -206,6 +209,88 @@ extern "C" void fn_803F96B0(int h, void (*cb)(int, int, int))
     }
 }
 
+extern "C" void fn_803F972C(int h, int prio)
+{
+    RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
+    if (fn_803F93F4(h) != 0) {
+        fn_80435D20(lbl_806ADE74);
+        int old = j->m10;
+        j->m10 = prio;
+        if (lbl_806ADE4C.mC > 1 && (int)j != lbl_806ADE4C.m14 && j->m8 == 0 && old != prio) {
+            RcJob* p = (RcJob*)lbl_806ADE4C.m20;
+            RcJob* t = 0;
+            while (p != 0 && p != j) {
+                t = p;
+                p = (RcJob*)p->m2C;
+            }
+            if (p == 0) {
+                fn_80435DFC(lbl_806ADE74);
+                return;
+            }
+            if (t != 0)
+                t->m2C = j->m2C;
+            else
+                lbl_806ADE6C[0] = (RcJob*)j->m2C;
+            t = 0;
+            RcJob* c = lbl_806ADE6C[0];
+            j->m2C = (int)c;
+            if (c != 0) {
+                int pr = j->m10;
+                if (c->m10 <= pr) {
+                    do {
+                        t = (RcJob*)j->m2C;
+                        c = (RcJob*)t->m2C;
+                        j->m2C = (int)c;
+                    } while (c != 0 && c->m10 <= pr);
+                }
+            }
+            if (t != 0)
+                t->m2C = (int)j;
+            else
+                lbl_806ADE6C[0] = j;
+        }
+        fn_80435DFC(lbl_806ADE74);
+    }
+}
+
+extern "C" void fn_803F9884(int h)
+{
+    int state = 0;
+    fn_80435D20(lbl_806ADE74);
+    if (fn_803F93F4(h) != 0 && ((unsigned char*)&h)[2] != 3 && ((unsigned char*)&h)[2] != 10) {
+        RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
+        if (lbl_806ADE4C.m14 == (int)j) {
+            j->m4 = 1;
+            state = 1;
+        } else {
+            if (j->m8 != 1) {
+                RcJob* p = (RcJob*)lbl_806ADE4C.m20;
+                RcJob* t = 0;
+                while (p != 0 && p != j) {
+                    t = p;
+                    p = (RcJob*)p->m2C;
+                }
+                if (p == 0) {
+                    fn_80435DFC(lbl_806ADE74);
+                    return;
+                }
+                if (t != 0)
+                    t->m2C = j->m2C;
+                else
+                    lbl_806ADE6C[0] = (RcJob*)j->m2C;
+                state = 2;
+                lbl_806ADE4C.mC = lbl_806ADE4C.mC - 1;
+            }
+            j->m8 = -1;
+        }
+        if ((state != 1 || *((unsigned char*)j + 2) != 4) && state == 2) {
+            if (j->m28 != 0)
+                ((void (*)(int, int, int))j->m28)(j->m0, -1, j->m14);
+        }
+    }
+    fn_80435DFC(lbl_806ADE74);
+}
+
 extern "C" int fn_803F99E8(int h)
 {
     RcJob* j = lbl_806ADE64[0] + ((unsigned char*)&h)[3];
@@ -221,6 +306,62 @@ extern "C" int fn_803F99E8(int h)
         if (((volatile RcJob*)j)->m8 != 0)
             return ((volatile RcJob*)j)->m8;
     }
+}
+
+extern "C" void fn_803FAA38(void*);
+extern "C" void fn_803FAB1C(void*);
+struct RcM104 {
+    char pad[0x104];
+    int m104;
+};
+extern "C" int fn_803F9A80(int h)
+{
+    int ret = 0;
+    RcJob* j = lbl_806ADE64[0] + ((unsigned char*)&h)[3];
+    switch (j->m8) {
+    case 0:
+        break;
+    case 1:
+        switch (*((unsigned char*)j + 2)) {
+        case 2:
+        case 9:
+            ret = j->m24;
+            break;
+        case 3:
+        case 7:
+        case 10:
+            ret = j->m8;
+            break;
+        case 6:
+        case 8:
+            ret = j->m18;
+            break;
+        case 4:
+            ret = j->m1C;
+            break;
+        case 5: {
+            RcM104* o = (RcM104*)j->m24;
+            ret = j->m1C;
+            int t = ret + j->m18;
+            if (t > o->m104)
+                o->m104 = t;
+            break;
+        }
+        case 11:
+            ret = 1;
+            break;
+        }
+        break;
+    case -1:
+    case -2: {
+        unsigned char t = *((unsigned char*)j + 2);
+        if (t == 2 || t == 9)
+            fn_803FAB1C((void*)j->m24);
+        break;
+    }
+    }
+    fn_803FAA38(j);
+    return ret;
 }
 
 extern "C" int fn_803F9BC8(const char* name, int a, int b)
@@ -331,6 +472,40 @@ extern "C" int fn_803F9E90(RcJob* x, int a, int b)
     return j->m0;
 }
 
+extern "C" int fn_803FC300(int);
+extern "C" int fn_803FC360(int);
+extern void (*lbl_806ADE94[3])(int);
+extern char lbl_8060E79C[];
+extern "C" void fn_803F9EFC(int h, int unused, RcJob* req)
+{
+    RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
+    int prio = j->m10;
+    int o = j->m24;
+    req->mC = o;
+    ((RcJob*)req->m10)->m24 = o;
+    fn_803F9A80(h);
+    if (fn_803FC300(req->m0) == 0)
+        lbl_806ADE94[0](req->m0);
+    int len = fn_803FC360(req->m0);
+    if (len > req->m4) {
+        RcBuf14* q = &lbl_806ADE8C;
+        char* a = (char*)((void* (*)(char*, int, int))q->m4)(lbl_8060E79C, len, req->m8 ^ 0x100);
+        fn_803FFA60(a, (void*)req->m0, req->m4);
+        ((void (*)(int))q->m8)(req->m0);
+        char* b = (char*)((void* (*)(char*, int, int))q->m4)(lbl_8060E7AC, len, req->m8);
+        fn_803FFA60(b, a, req->m4);
+        ((void (*)(char*))q->m8)(a);
+        req->m0 = (int)b;
+        h = fn_803F9D74((RcJob*)req->mC, req->m4, (int)b + req->m4, len - req->m4, prio, (int)req);
+        fn_803F96B0(h, (void (*)(int, int, int))fn_803F9EFC);
+        req->m4 = len;
+    } else {
+        req->m14 = lbl_806ADE4C.m24;
+        lbl_806ADE4C.m24 = (int)req;
+        fn_803FA410(req->m10);
+    }
+}
+
 extern "C" void fn_803FA068(int h, int k, RcJob* req)
 {
     int sav = (lbl_806ADE64[0] + ((unsigned char*)&h)[3])->m10;
@@ -342,6 +517,32 @@ extern "C" void fn_803FA068(int h, int k, RcJob* req)
         h = fn_803F9D74((RcJob*)x, 0, req->m0, 0x800, sav, (int)req);
         fn_803F96B0(h, (void (*)(int, int, int))fn_803F9EFC);
     }
+}
+
+/* near-miss: 98.0%; retail keeps the list cursor in r31 and the job in r29 (ours swapped) */
+extern "C" int fn_803FA100(const char* name, int a, int b, int c)
+{
+    RcJob* p = lbl_806ADE70[0];
+    RcJob* j = fn_803FA94C();
+    *((unsigned char*)j + 2) = 9;
+    j->m14 = c;
+    j->m10 = b;
+    while (p != 0) {
+        if (strncmp(name, (char*)p->mC + 5, 0xff) == 0) {
+            j->m24 = p->mC;
+            fn_803FA410((int)j);
+            return (int)j;
+        }
+        p = (RcJob*)p->m14;
+    }
+    RcBuf14* q = &lbl_806ADE8C;
+    RcJob* n = (RcJob*)((void* (*)(const char*, int, int))q->m4)(name, 0x18, a);
+    n->m4 = 0x800;
+    n->m10 = (int)j;
+    n->m0 = (int)((void* (*)(char*, int, int))q->m4)(lbl_8060E7AC, 0x800, a);
+    n->m8 = a;
+    fn_803F96B0(fn_803F9C58(name, 1, b, (int)n), (void (*)(int, int, int))fn_803FA068);
+    return j->m0;
 }
 
 extern "C" void fn_803FA214(int a, int b, int p)
@@ -416,6 +617,63 @@ extern "C" void fn_803FAB1C(void* p)
     fn_80435D20(lbl_806ADE74);
     fn_803FFC58(p, 0, 0x144);
     fn_80435DFC(lbl_806ADE74);
+}
+
+extern "C" char* strchr(const char*, int);
+extern "C" int strcmp(const char*, const char*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" int fn_803FF058(const char*, int, void*);
+extern "C" int fn_803FF7C4(void*);
+extern "C" void fn_803FF1BC(void*);
+extern "C" int fn_803FC3E8(int, char*, int, int*, int*);
+extern "C" int fn_803FAB68(const char* path, int flags, int* out)
+{
+    char name[0x100];
+    char rest[0x100];
+    char obj[0x148];
+    int tmp;
+    int val;
+    int found = 0;
+    int kind;
+    *out = 0;
+    rest[0] = 0;
+    if (strchr(path, 0x7c) != 0) {
+        if (path[0] == 0x7c)
+            kind = 2;
+        else {
+            int n = strchr(path, 0x7c) - path;
+            kind = 4;
+            strncpy(name, path, n);
+            name[n] = 0;
+        }
+        strcpy(rest, strchr(path, 0x7c) + 1);
+    } else {
+        kind = 1;
+        if ((flags & 0x81) == 1) {
+            kind = 3;
+            strcpy(rest, path);
+        }
+    }
+    if (kind & 1) {
+        if (fn_803FF058(path, flags, obj) != 0) {
+            found = 1;
+            *out = fn_803FF7C4(obj);
+            fn_803FF1BC(obj);
+        }
+    }
+    if (found == 0 && (kind & 6)) {
+        RcJob* p = lbl_806ADE70[0];
+        while (p != 0 && found == 0) {
+            if ((kind & 4) == 0 || strcmp((char*)p->mC + 5, name) == 0) {
+                if (fn_803FC3E8(p->m0, rest, 0, &tmp, &val) != 0) {
+                    found = 1;
+                    *out = val;
+                }
+            }
+            p = (RcJob*)p->m14;
+        }
+    }
+    return found;
 }
 
 extern "C" int fn_803FACFC(int* p)
