@@ -568,29 +568,30 @@ BOOL fn_80436848(void* buffer, u32 offset, u32 size)
 }
 
 /* flags: not matched (near-miss) */
+/* near-miss 97.8%: err/ok share one variable and the stores are locked-then-enabled (matches the retail order); still differs in
+ * `bne L; b END` vs `beq END` after the first EXILock test and `addi r3,r30,0` vs `mr r3,r30` (peephole-off shapes; the unit is
+ * built with peephole on) */
 /* __OSInitSram */
 void fn_80436960(void)
 {
     SramControl* scb = &lbl_806DF3C0;
-    BOOL err;
     u32 cmd;
-    BOOL ok;
+    BOOL ok = FALSE;
 
-    scb->enabled = scb->locked = FALSE;
+    scb->locked = scb->enabled = FALSE;
     fn_80432FA8(&lbl_806DF3C0, 64);
-    ok = FALSE;
     if (fn_804280EC(0, 1, 0)) {
         if (!fn_8042792C(0, 1, 3)) {
             fn_804281E0(0);
         } else {
             cmd = 0x20000100;
-            err = !fn_80426DC4(0, &cmd, 4, 1, 0);
-            err |= !fn_804271AC(0);
-            err |= !fn_804270C0(0, &lbl_806DF3C0, 64, 0, 0);
-            err |= !fn_804271AC(0);
-            err |= !fn_80427A58(0);
+            ok = !fn_80426DC4(0, &cmd, 4, 1, 0);
+            ok |= !fn_804271AC(0);
+            ok |= !fn_804270C0(0, &lbl_806DF3C0, 64, 0, 0);
+            ok |= !fn_804271AC(0);
+            ok |= !fn_80427A58(0);
             fn_804281E0(0);
-            ok = !err;
+            ok = !ok;
         }
     }
     scb->sync = ok;
@@ -598,6 +599,7 @@ void fn_80436960(void)
     fn_8043719C(fn_8043712C());
 }
 
+/* flags: not matched (near-miss) */
 /* __OSLockSram */
 OSSram* fn_80436A9C(void)
 {
@@ -615,6 +617,7 @@ OSSram* fn_80436A9C(void)
     return (OSSram*)scb;
 }
 
+/* flags: not matched (near-miss) */
 /* __OSLockSramEx */
 OSSramEx* fn_80436AF8(void)
 {
@@ -689,6 +692,7 @@ BOOL fn_80436ED8(void)
     return lbl_806DF3C0.sync;
 }
 
+/* flags: not matched (near-miss) */
 /* OSGetSoundMode */
 u32 fn_80436EE8(void)
 {
@@ -699,6 +703,7 @@ u32 fn_80436EE8(void)
     return mode;
 }
 
+/* flags: not matched (near-miss) */
 /* OSSetSoundMode */
 void fn_80436F58(u32 mode)
 {
@@ -717,6 +722,7 @@ void fn_80436F58(u32 mode)
     r = fn_80436B54(TRUE, 0);
 }
 
+/* flags: not matched (near-miss) */
 /* OSGetWirelessID */
 u16 fn_80436FFC(s32 chan)
 {
@@ -728,6 +734,7 @@ u16 fn_80436FFC(s32 chan)
     return id;
 }
 
+/* flags: not matched (near-miss) */
 /* OSSetWirelessID */
 void fn_80437080(s32 chan, u16 id)
 {
@@ -741,6 +748,7 @@ void fn_80437080(s32 chan, u16 id)
     }
 }
 
+/* flags: not matched (near-miss) */
 /* OSGetGbsMode */
 u16 fn_8043712C(void)
 {
