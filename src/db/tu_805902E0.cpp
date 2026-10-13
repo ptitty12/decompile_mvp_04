@@ -566,6 +566,93 @@ extern "C" DB_OVERLAY float fn_8059139C(Db805909D4_S* self, int id)
     return t >= 0 ? self->m30[t] : 0.0f;
 }
 
+struct Db805913C0_Scr {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Db805913C0_G {
+    char pad0[0x28];
+    int m28;
+    char pad2C[0x84 - 0x2C];
+    int m84;
+};
+extern "C" int fn_8056B87C(int a);
+extern "C" void fn_805819EC(int a, int b);
+extern float lbl_806EF9B8;
+extern float lbl_806EF9BC;
+
+#define FAC(p) (*(float*)&(p)->mAC)
+/* near-miss: 96.8%, 271 vs 269 insns; retail shares one lis (r29) for every lbl_80619948 load and loads m28 after d, ours reloads the hi part once and schedules the m28 load earlier */
+extern "C" DB_OVERLAY void fn_805913C0(Db80590A4C_S* s, int force)
+{
+    float w;
+    float cur;
+    float d;
+    float k;
+    float x0;
+    float x1;
+    float x2;
+    if (fn_800B5758(fn_800B555C()) == 1 && fn_800A2E90(lbl_80619948) == 1) {
+        if (force != 0 || s->mA8 == 0 || (s->mA8 - fn_800A2AE8(lbl_80619948)) <= 0) {
+            Unk8007B2B0_Screen* scr = (Unk8007B2B0_Screen*)lbl_8061930C;
+            int sc = ((Db805913C0_Scr*)scr)->m2C;
+            int t = fn_8007F7D0((Unk8007F198_B*)scr, 0);
+            const float base = 0.0f;
+            w = base;
+            cur = scr->fn_80079E74(t);
+            int mg = ((Db805913C0_G*)lbl_80619948)->m28;
+            if (!(cur <= 45500000.0f))
+                w = cur - 45500000.0f;
+            k = base;
+            d = cur - s->mBC;
+            if (fn_800A2AE8(lbl_80619948) == fn_8056B87C(mg) && fn_80329FA0(((Db805913C0_G*)lbl_80619948)->m84).m2 == 0x7D5) {
+                x2 = w * 0.15f;
+                x1 = w * 0.25f;
+                x0 = w * 0.6f;
+                fn_80591B6C(s->m0, 3, 0);
+                fn_80591B6C(s->m0, 3, 1);
+                fn_80591B6C(s->m0, 3, 2);
+                fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x0);
+                fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+                fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x2);
+                FAC(s) = base;
+                s->mBC = cur;
+            } else if (d > 4000000.0f || !(d >= -4000000.0f)) {
+                if (!(d <= 0.0f))
+                    k = d * lbl_806EF9B8;
+                else
+                    k = d * lbl_806EF9BC;
+                if (s->mB4 == 0) {
+                    if (fn_800A2AE8(lbl_80619948) != fn_8056B87C(mg)) {
+                        fn_805819EC(sc, 0xA);
+                        s->mB4 = 1;
+                    }
+                }
+                FAC(s) = k * 0.14285715f;
+                x2 = FAC(s) * 0.6f;
+                x1 = FAC(s) * 0.25f;
+                x0 = FAC(s) * 0.15f;
+                s->mBC = cur;
+                fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x2);
+                fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+                fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x0);
+            } else {
+                FAC(s) = 0.0f;
+            }
+            s->mA8 = fn_800A2AE8(lbl_80619948) + 7;
+            s->mB0 = fn_800A2AE8(lbl_80619948);
+        } else if (FAC(s) != 0.0f && s->mB0 < fn_800A2AE8(lbl_80619948)) {
+            x2 = FAC(s) * 0.6f;
+            x1 = FAC(s) * 0.25f;
+            x0 = FAC(s) * 0.15f;
+            fn_80591B8C(s->m0, 3, 0, 0, 0, 1, x2);
+            fn_80591B8C(s->m0, 3, 1, 0, 0, 1, x1);
+            fn_80591B8C(s->m0, 3, 2, 0, 0, 1, x0);
+            s->mB0 = fn_800A2AE8(lbl_80619948);
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_805919E8(Db805919E8_M* m, int x, int i, int k, float f)
 {
     if (k != 0) {
