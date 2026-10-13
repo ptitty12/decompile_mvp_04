@@ -358,3 +358,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | ealib/tu_803CECA4 fn_803D1C78 | Eight ordinary C forms; best 119/119 words, float period/offset register allocation and shared index byte-offset register remain. Scratch build/swarm39, source restored.
 - 2026-10-13 | ealib/tu_803CECA4 fn_803CF77C | Exact 123/123 draft blocked on Claude-owned game fn_80363108/current CF77C declaration omitting both float inputs; 88 literal refs zero mismatches/unresolved. Draft build/swarm39/803CECA4-F77C-exact.cpp only, source restored.
 - 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
+
+- `dolphin/ax/tu_8041783C` `fn_80417F50`: inherited99.39161%; eight ordinary AuxB channel-pointer/base forms fail to recover two folded offset words; source preserved, scratch build/root47/17F50.
+- `dolphin/ax/tu_8041783C` `fn_804190A4`: inherited98.52362%; eight ordinary scalar-helper/lifetime forms retain the extra initial studio-pointer copy; source preserved, scratch build/root47/190A4.
