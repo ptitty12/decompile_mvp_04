@@ -598,35 +598,36 @@ void fn_80436960(void)
     fn_8043719C(fn_8043712C());
 }
 
-/* flags: not matched (near-miss) */
 /* __OSLockSram */
 OSSram* fn_80436A9C(void)
 {
     SramControl* scb = &lbl_806DF3C0;
     BOOL enabled = OSDisableInterrupts();
+    BOOL* lockp = &scb->locked;
 
-    if (scb->locked) {
+    if (*lockp) {
         OSRestoreInterrupts(enabled);
-        return NULL;
+        scb = NULL;
+    } else {
+        scb->enabled = enabled;
+        *lockp = TRUE;
     }
-    scb->enabled = enabled;
-    scb->locked = TRUE;
     return (OSSram*)scb;
 }
 
-/* flags: not matched (near-miss) */
 /* __OSLockSramEx */
 OSSramEx* fn_80436AF8(void)
 {
     SramControl* scb = &lbl_806DF3C0;
     BOOL enabled = OSDisableInterrupts();
+    BOOL* lockp = &scb->locked;
 
-    if (scb->locked) {
+    if (*lockp) {
         OSRestoreInterrupts(enabled);
         return NULL;
     }
     scb->enabled = enabled;
-    scb->locked = TRUE;
+    *lockp = TRUE;
     return (OSSramEx*)(scb->sram + sizeof(OSSram));
 }
 
@@ -688,47 +689,45 @@ BOOL fn_80436ED8(void)
     return lbl_806DF3C0.sync;
 }
 
-/* flags: not matched (near-miss) */
 /* OSGetSoundMode */
 u32 fn_80436EE8(void)
 {
     OSSram* sram = fn_80436A9C();
-    u32 mode = (sram->flags & 0x80) ? OS_SOUND_MODE_STEREO : OS_SOUND_MODE_MONO;
+    u32 mode = (sram->flags >> 7) & 1;
 
     fn_80436B54(FALSE, 0);
     return mode;
 }
 
-/* flags: not matched (near-miss) */
 /* OSSetSoundMode */
 void fn_80436F58(u32 mode)
 {
     OSSram* sram;
+    BOOL r;
 
     mode <<= 7;
     mode &= 0x80;
     sram = fn_80436A9C();
     if (mode == (sram->flags & 0x80)) {
-        fn_80436B54(FALSE, 0);
+        r = fn_80436B54(FALSE, 0);
         return;
     }
     sram->flags &= ~0x80;
     sram->flags |= mode;
-    fn_80436B54(TRUE, 0);
+    r = fn_80436B54(TRUE, 0);
 }
 
-/* flags: not matched (near-miss) */
 /* OSGetWirelessID */
 u16 fn_80436FFC(s32 chan)
 {
     OSSramEx* sram = fn_80436AF8();
     u16 id = sram->wirelessPadID[chan];
+    BOOL r;
 
-    fn_80436B54(FALSE, sizeof(OSSram));
+    r = fn_80436B54(FALSE, sizeof(OSSram));
     return id;
 }
 
-/* flags: not matched (near-miss) */
 /* OSSetWirelessID */
 void fn_80437080(s32 chan, u16 id)
 {
@@ -742,7 +741,6 @@ void fn_80437080(s32 chan, u16 id)
     }
 }
 
-/* flags: not matched (near-miss) */
 /* OSGetGbsMode */
 u16 fn_8043712C(void)
 {
