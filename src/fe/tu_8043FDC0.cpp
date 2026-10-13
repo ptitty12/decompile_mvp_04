@@ -356,8 +356,8 @@ extern "C" FE_OVERLAY void fn_80442930(void)
 {
     if (lbl_806215DC == 0) {
         lbl_806215DC = fn_803774A8(40000, 0x100);
-        lbl_806215E0 = 0;
     }
+    lbl_806215E0 = 0;
 }
 
 extern "C" FE_OVERLAY void fn_80442984(void)
