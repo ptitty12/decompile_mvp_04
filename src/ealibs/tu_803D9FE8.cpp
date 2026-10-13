@@ -25,15 +25,16 @@ public:
     char pad0[0x8];
     lbl_Impl* m8;
 
-    void fn_803DA038();
+    lbl_Node* fn_803DA038();
     void fn_803DA098(lbl_Node* node);
     lbl_Node* fn_803DA148();
     void fn_803DA154(lbl_Impl* impl);
 };
 
 extern void* (*lbl_8062C668)(int size, int heap);
-lbl_Node* fn_803E1F98(void* mem, lbl_Owner* owner);
-void fn_803E2188(lbl_Node* node, int flags);
+struct Unk803E1F98_Node;
+extern "C" Unk803E1F98_Node* fn_803E1F98(Unk803E1F98_Node* mem, lbl_Owner* owner);
+extern "C" void fn_803E2188(Unk803E1F98_Node* node, int flags);
 
 struct Unk803D9FE8 {
     int a, b, c;
@@ -49,11 +50,12 @@ struct Unk803D9FE8Big {
 Unk803D9FE8 lbl_806AA920(4, 4, 1);
 Unk803D9FE8Big lbl_806AA92C(3, 3, 1);
 
-void lbl_Owner::fn_803DA038()
+lbl_Node* lbl_Owner::fn_803DA038()
 {
-    lbl_Node* node = fn_803E1F98(lbl_8062C668(0x1AC, 0), this);
+    lbl_Node* node = (lbl_Node*)fn_803E1F98((Unk803E1F98_Node*)lbl_8062C668(0x1AC, 0), this);
     node->mNext = m8->mHead;
     m8->mHead = node;
+    return node;
 }
 
 void lbl_Owner::fn_803DA098(lbl_Node* node)
@@ -62,7 +64,7 @@ void lbl_Owner::fn_803DA098(lbl_Node* node)
     if (node == impl->mHead) {
         impl->mHead = node->mNext;
         if (node)
-            fn_803E2188(node, 3);
+            fn_803E2188((Unk803E1F98_Node*)node, 3);
     } else {
         lbl_Node* p = impl->mHead;
         while (p && p->mNext != node)
@@ -70,7 +72,7 @@ void lbl_Owner::fn_803DA098(lbl_Node* node)
         lbl_Node* found = p->mNext;
         p->mNext = found->mNext;
         if (found)
-            fn_803E2188(found, 3);
+            fn_803E2188((Unk803E1F98_Node*)found, 3);
     }
     if (node == m8->mCur)
         m8->mCur = 0;
