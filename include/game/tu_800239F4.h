@@ -316,7 +316,8 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m534;
     char pad538[0x4];
     int m53C;
-    char pad540[0x8];
+    int m540;
+    char pad544[0x4];
     int m548;
     char pad54C[0xC];
     int m558;
@@ -361,7 +362,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m6E0;
     int m6E4;
     int m6E8;
-    char pad6EC[0x4];
+    int m6EC;
     int m6F0;
     unsigned char m6F4;
     unsigned char m6F5;
@@ -370,7 +371,7 @@ struct Unk80023AC4_Obj : public Unk80021A60 {
     int m6FC;
     int m700;
     int m704;
-    char pad708[0x4];
+    int m708;
     int m70C;
     int m710;
     int m714;
