@@ -752,3 +752,45 @@ int fn_80308648(void* a, const Unk80304858_V3* v)
         r = v->z <= 0.0f;
     return r;
 }
+
+/* fn_80308414 copies a 64-byte record, flag stride8, and two16-byte records. */
+struct Unk80308414_Flag { int m0; short m4; short pad6; };
+struct Unk80308414_Record {
+    float m0, m4, m8, mC;
+};
+struct Unk80308414_State {
+    Unk80304858_M44* m0;
+    Unk80308414_Flag* m4;
+    Unk80308414_Record* m8;
+    Unk80308414_Record* mC;
+    int m10;
+    char pad14[0x40-0x14];
+    int m40;
+    int m44;
+};
+extern int lbl_8061B930;
+extern int lbl_8061B92C;
+extern const Unk80308414_Record lbl_8061FB18[];
+extern "C" void fn_80308414(Unk80308414_State* self, const Unk80304858_M44* record, const Unk80308414_Record* value, int kind, const float time)
+{
+    self->m0[self->m10] = *record;
+    self->m4[self->m10].m0 = 1;
+    if (lbl_8061B930) {
+        if (self->m40) {
+            if ((self->m10 & 3) != 3) self->m4[self->m10].m0 = 0;
+        } else {
+            if ((self->m10 & 3) == 3) self->m4[self->m10].m0 = 0;
+        }
+    } else if (lbl_8061B92C) {
+        if (self->m44) {
+            if ((self->m10 & 3) == 3) self->m4[self->m10].m0 = 0;
+        } else {
+            if (self->m10 & 1) self->m4[self->m10].m0 = 0;
+        }
+    }
+    self->m4[self->m10].m4 = 0;
+    self->m8[self->m10] = *value;
+    self->mC[self->m10] = lbl_8061FB18[kind];
+    self->mC[self->m10].m8 = time;
+    ++self->m10;
+}
