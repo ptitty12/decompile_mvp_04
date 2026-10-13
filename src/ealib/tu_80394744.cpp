@@ -16,8 +16,8 @@ extern int (*lbl_806243F0[])();
 extern void* lbl_806EE9C0;
 
 struct McPair {
-    short a;
-    short b;
+    unsigned short a;
+    unsigned short b;
 };
 
 extern McPair lbl_8069BEC0[];
@@ -194,6 +194,37 @@ extern "C" void fn_80394DE8(int x)
     int e = d + 0x97327AE1;
     lbl_80624438[4] = e;
     lbl_80624438[5] = e + 0xD1A9FBE7;
+}
+
+extern "C" int fn_80394E3C(int a, int n, int b)
+{
+    int r = -1;
+    if (n > 0x20)
+        n = 0x20;
+    int idx = lbl_80624450[0];
+    int cnt = 0;
+    int steps = 0;
+    int done = 0;
+    do {
+        if (cnt < n) {
+            if (lbl_8069BEC0[idx].b == b) {
+                cnt++;
+                if (lbl_8069BEC0[idx].a == a) {
+                    done = 1;
+                    r = cnt - 1;
+                }
+            }
+        } else {
+            done = 1;
+        }
+        idx--;
+        if (idx < 0)
+            idx += 0x20;
+        steps++;
+        if (steps > 0x20)
+            done = 1;
+    } while (done == 0);
+    return r;
 }
 
 extern "C" void fn_80394EE4(int a, int b)
