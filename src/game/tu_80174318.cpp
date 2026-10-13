@@ -390,6 +390,65 @@ void fn_8017696C(void* self)
     fn_801769A8(self, 1);
 }
 
+struct Unk80177974_T;
+void fn_80177974(Unk80177974_T* p);
+struct Unk801769A8_Obj {
+    char pad0[0x38C];
+    int m38C;
+    char pad390[0x458 - 0x390];
+    int m458;
+};
+void fn_80176ADC(Unk80176C0C_T* p, Unk80176ADC_Obj* a, int idx);
+/* near-miss 96.6%: retail computes `f * 0x48` once into r9 and copies it (`mr r3,r9`) before the `add r9,r9,r31`
+ * for the second use; here the product lives in r3 and the sum goes to r9 (75 instrs vs 77; 6 variants of the
+ * address spelling tried, the permuter found nothing closer). */
+void fn_801769A8(void* self, int a) /* 801769A8 */
+{
+    Unk80176C0C_T* p = (Unk80176C0C_T*)self;
+    Unk80176ADC_Obj* x = 0;
+    Unk80176ADC_Obj* y = 0;
+    fn_8017DD80((Unk8017DD64_T*)((Unk80176780_T*)p)->m4, a, (int*)&x, (int*)&y);
+    int k0;
+    int k1;
+    if (a == 1) {
+        k0 = 2;
+        k1 = 3;
+    } else {
+        k0 = 0;
+        k1 = 1;
+    }
+    if (x != 0) {
+        int t = 0;
+        if (((Unk801769A8_Obj*)x)->m458 != 1) {
+            t = ((Unk801769A8_Obj*)x)->m38C;
+        }
+        int f;
+        int g;
+        if (t == 0) {
+            f = k1;
+            g = k0;
+        } else {
+            f = k0;
+            g = k1;
+        }
+        int off = f * 0x48;
+        if (*(void**)((char*)p + off + 0x18) != x) {
+            fn_80177974((Unk80177974_T*)((char*)p + (off + 0xC)));
+        }
+        int off2 = g * 0x48;
+        if (*(void**)((char*)p + off2 + 0x18) != y) {
+            fn_80177974((Unk80177974_T*)((char*)p + (off2 + 0xC)));
+        }
+        fn_80176ADC(p, x, f);
+        if (y != 0) {
+            fn_80176ADC(p, y, g);
+        }
+    } else {
+        fn_80177974((Unk80177974_T*)((char*)p + (k0 * 0x48 + 0xC)));
+        fn_80177974((Unk80177974_T*)((char*)p + (k1 * 0x48 + 0xC)));
+    }
+}
+
 /* near-miss: retail recomputes `off + this` for each use (37 instrs); the byte-offset and entry-pointer
  * spellings tried CSE it (34-35). */
 void fn_80176ADC(Unk80176C0C_T* p, Unk80176ADC_Obj* a, int idx)
