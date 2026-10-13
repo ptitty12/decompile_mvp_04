@@ -280,6 +280,77 @@ extern "C" int fn_803F78CC(void* o, unsigned short* h)
     return 0;
 }
 
+struct RcSave {
+    char pad0[4];
+    int m4;
+    char pad8[4];
+    char* mC;
+    int m10;
+    char* m14;
+    int m18;
+    struct RcBuf* m1C;
+    struct RcBuf* m20;
+};
+struct RcBuf {
+    int m0;
+    signed char* m4;
+};
+extern "C" int fn_803F7EE4(void*, void*, void*, int, int*);
+extern "C" void* memcpy();
+
+extern "C" int fn_803F7BE8(void* o, char* f)
+{
+    RcSave* h = (RcSave*)(f + 0xC);
+    int res = 0;
+    if (fn_803F7EE4(o, f, f + 0x10, 4, 0) == 0xF)
+        res = 0xF;
+    signed char buf[0x20];
+    int w = h->m4;
+    int sum = 0;
+    signed char* p = (signed char*)&w;
+    for (int i = 0; i < 4; i++)
+        sum += *p++;
+    int n = h->m10;
+    if (n > 0x20)
+        n = 0x20;
+    memset(buf, 0, 0x20);
+    memcpy(buf, h->mC, n);
+    if (fn_803F7EE4(o, f, buf, 0x20, 0) == 0xF)
+        res = 0xF;
+    p = buf;
+    for (int i = 0; i < 0x20; i++)
+        sum += *p++;
+    n = h->m18;
+    if (n > 0x20)
+        n = 0x20;
+    memset(buf, 0, 0x20);
+    memcpy(buf, h->m14, n);
+    if (fn_803F7EE4(o, f, buf, 0x20, 0) == 0xF)
+        res = 0xF;
+    p = buf;
+    for (int i = 0; i < 0x20; i++)
+        sum += *p++;
+    if (h->m20 != 0) {
+        unsigned len = fn_803F7E98(o, h);
+        if (fn_803F7EE4(o, f, h->m20->m4, len, 0) == 0xF)
+            res = 0xF;
+        p = h->m20->m4;
+        for (unsigned i = 0; i < len; i++)
+            sum += *p++;
+    }
+    if (h->m1C != 0) {
+        unsigned len = fn_803F7EB4(o, h);
+        if (fn_803F7EE4(o, f, h->m1C->m4, len, 0) == 0xF)
+            res = 0xF;
+        p = h->m1C->m4;
+        for (unsigned i = 0; i < len; i++)
+            sum += *p++;
+    }
+    if (fn_803F7EE4(o, f, &sum, 4, 0) == 0xF)
+        res = 0xF;
+    return res;
+}
+
 extern "C" int fn_803F7E98(void* a, void* b)
 {
     int* t = (int*)RCI(b, 0x20);
