@@ -556,15 +556,14 @@ extern "C" FE_OVERLAY void fn_8051F748(void* x)
     FeSubOf(x)->s11();
 }
 
-/* near-miss: the else-arm FeSubOf(x)->s8(a) call gets the two-register delta form in ours, retail uses add r3,r3,r0 (int/void s8 both tried) */
 extern "C" FE_OVERLAY void fn_8051F784(FeV10* x, int a)
 {
     if (FeSubOf(x)->s7(a) == -1) {
         FeSubOf(x)->s6(0);
     } else {
         FeSubOf(x)->s8(a);
-        x->s9();
     }
+    x->s9();
 }
 
 extern "C" FE_OVERLAY void fn_8051F848(FeV10E* x)
