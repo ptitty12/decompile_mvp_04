@@ -207,3 +207,15 @@ check_literals to compare pointer values for extern targets (80b44d84). Prompt n
 ## W1 p6-35 (21:34, 7 new + 1 near-miss)
 - ealib/tu_803912F8 26->30 (varargs packer via prodg/stdarg.h); tu_80394744 16->18 (McPair halves unsigned short; fn_803950B4 96.9); tu_803927E4 43->44.
 - Patterns: give a stale-r3/r4 callee its params and pass the caller's value (fixed 2 near-misses); hold base as `int` to flip lbzx/add operand order; inline taking int* for addi+mr; `fn(i); ret = i;` keeps index live across call; scratch include tree under scratchpad/include for rv.py on relative-include units (shared).
+
+## W2 p6-40 (21:38, 9 new + 11 near-miss)
+- ealib/tu_803F9350 26->32 (fn_803FADD0 99.1, fn_803FA100 98.0); tu_803FAE94 23->24 (fn_803FBB48 98.6, fn_803FBC94 97.6); tu_803EBF90 39->40 (fn_803EC568 switch in loop with CR fields + 16-byte local); tu_803FBF54 40 (5 near-misses 96-99.9).
+- Patterns: objdiff fuzzy gives 96-99% for register-only permutations (most land above the keep line); `*(volatile int*)&j->m8` read in callback args for r4-before-r5 load order; store first then local (`j->m4 = 1; state = 1;`) for separate constants; shared loop counter keeps second loop out of bdnz (`addic.; bne`); typed struct do-while with `--i != 0`; 16-byte struct for a one-byte address-taken local frame hole; `extern T* lbl[3]` (>8 bytes) to avoid small-data addressing; byte-assembled 24-bit sizes with brute-forced store order.
+
+## W3 p6-09 (21:39, 10 new + 3 near-miss)
+- game/tu_8026C414 47->51; tu_80275F24 16->18 (header Unk80276DB8_Row fields); tu_802ACD88 48->51 (fn_802AD2B8 97.0); tu_802B0ACC 26->27 (fn_802B2EF0 99.8 branch target); tu_802BF974 near-misses fn_802C37F8 99.8, fn_802C0050 97.5.
+- Patterns: inline Reset() at two offsets, member stores in reverse of emitted order; `Tab t1 = lbl_X; Tab t4 = {};` block copy + memset; classifier leaves as `int r = 3; if (!(u <= K)) r = 4; return r;`; unused float local reserves a slot; count-down `for (i = 1; i != 0; i--)` with `m38[1-i]`; `const float k` spilled once (no extra copy); signed cursor compare needs int not pointer; `int* q = &v->m18700; *q = f(...)` computes address first.
+
+## W4 p6-19 (21:5x, 9 new + 4 near-miss)
+- game/tu_80087A58 46->49 (fn_80088024 98.3, fn_800888F4 99.8); tu_8009BC3C 23->27 (fn_8009CF6C 96.9, fn_8009DA60 95.3); tu_800975A8 35->37; tu_80094578 fn_80097318 family (4 siblings): ~200 loop variants, retail's peeled first iteration is not constant-folded (lbzx with zero reg) - unsolved.
+- Patterns: stack ByteVec stores via `q = &v`; `*(int*)&sp` plain read of a volatile counter as call arg; 8-byte Pair struct copied whole lives in a register pair; extern "C" under the mangled name of a same-unit C++ function -> ICE 378 (use fnptr cast); `if (i != 9 || f != 0) k = call(); else k = 0xFF;` keeps call arm first; `int a; if (c) a = X; else a = 0;` vs `int a = 0; if (c) a = X;` before a call.

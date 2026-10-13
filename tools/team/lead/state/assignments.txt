@@ -1,8 +1,8 @@
 # worktree -> branch  status  unitsfile
 W1 work/p6-35  idle  p6_35.txt
-W2 work/p6-40  running  p6_40.txt
-W3 work/p6-09  running  p6_09.txt
-W4 work/p6-19  running  p6_19.txt
+W2 work/p6-40  idle  p6_40.txt
+W3 work/p6-09  idle  p6_09.txt
+W4 work/p6-19  idle  p6_19.txt
 W5 work/p5-06  idle  p5_06.txt
 W6 work/p5-10  idle  p5_10.txt
 W7 work/p6-03  idle  p6_03.txt

@@ -12,9 +12,9 @@ The lead holds full decision authority (DECISIONS 2026-10-10). Never give the ow
 (anything under `tools/verify/**`, `.github/workflows/**`, `.claude/**`) are recorded once in
 DECISIONS "Open questions for owner"; then keep working.
 
-## Session 2 status (lead, updated 2026-10-12 21:40 CDT; this block overrides sections 1, 4 and 7 below)
+## Session 2 status (lead, updated 2026-10-12 21:45 CDT; this block overrides sections 1, 4 and 7 below)
 
-- main: **20,703 / 24,158 functions** (85.7%) at 30f8e596. Measure as in section 1.
+- main: **20,730 / 24,158 functions** (85.8%) at ff1ba576. All slots idle at 21:45 (window at ~95%); the lead restarts the fleet at the 22:50 reset. Measure as in section 1.
 - Slots and agents: `tools/team/lead/state/assignments.txt` and `state/agents_session2.txt` (agent ids; the last block is the live fleet). Worker reports: `state/reports_session2.md`.
 - Assigning a slot: `LEAD_SCRATCH=<lead scratchpad, Windows path> END=HH:MM bash tools/team/lead/prep.sh W<n> p6 <NN>`. That runs assign.sh and writes the filled prompt to `$LEAD_SCRATCH/prompt_W<n>.md`. Then launch a Sonnet Agent that reads that prompt file. `END` sets the wall-clock deadline (default now + 150 min).
 - Templates: `worker_prompt_p4.md`, `worker_prompt_p5.md`, `worker_prompt_p6.md`.
