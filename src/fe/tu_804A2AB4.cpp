@@ -16,6 +16,19 @@ extern const char lbl_805F59C4[];
 extern const char lbl_805F770C[];
 extern const char lbl_805F632C[];
 extern const char lbl_805F7818[];
+extern "C" int fn_8007E1F8__FP13Unk8007DB74_A(void* g, int a);
+struct Unk8007A4DC_Screen {
+    void fn_8007A700(int a, int b, char* out);
+};
+extern "C" int fn_8007A700__18Unk8007A4DC_ScreeniiPc(void* g, int a, int b, char* out);
+extern "C" int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
+char* fn_800E5F38(int a);
+extern "C" int fn_80074754__18Unk8007A4DC_Screeniii(void* g, int a, int b, int c);
+extern "C" float fn_800748D4(void* g, int a, int b, int c);
+extern "C" int fn_80075094__18Unk8007A4DC_Screeniiii(void* g, int a, int b, int c, int d);
+extern "C" void fn_80119FF0(char* buf, float f);
+extern "C" void fn_800E1388(void* w, int a, int b, int c);
+extern "C" void fn_800C3ED4(void* m, FeW* w, int id);
 #define FEW4S_(n) virtual void s##n(int a, int b, char* c, int d);
 struct FeW4S : Unk800C7B40_Data {
     virtual ~FeW4S();
@@ -639,6 +652,42 @@ FE_OVERLAY void fn_804A5E8C(FeW* x)
     }
 }
 
+
+FE_OVERLAY void fn_804A6050(FeW* x)
+{
+    char b8[0x190];
+    char b198[0x190];
+    char b328[0x190];
+    char b4B8[0x28];
+    float f;
+    void* g = lbl_8061930C;
+    int id = fn_8007E1F8__FP13Unk8007DB74_A(g, FeI(x, 0x13C));
+    FeW* p = fn_800C8044(x->fn_vslot32("STARTER", 1));
+    int t = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, FeI(x, 0x13C));
+    int d = fn_80084014(t, 1);
+    fn_8007A700__18Unk8007A4DC_ScreeniiPc(g, 0, id, b198);
+    fn_8007A700__18Unk8007A4DC_ScreeniiPc(g, 1, id, b328);
+    int v4 = fn_8007A6A0__18Unk8007A4DC_Screenii(g, 4, id);
+    int v5 = fn_8007A6A0__18Unk8007A4DC_Screenii(g, 5, id);
+    sprintf(b8, "%s - %s %s - #%d", fn_800E5F38(v5), b198, b328, v4);
+    FeW* q = fn_800C8040(p->fn_vslot32("NAME", 1));
+    ((FeWQ*)q)->s30((int)b8);
+    q->fn_vslot8(1);
+    fn_800DE1C4(b4B8, id);
+    ((FeWQ*)fn_800C8040(p->fn_vslot32("B/TVAL", 1)))->s28((int)b4B8);
+    int s3 = fn_80074754__18Unk8007A4DC_Screeniii(g, 3, id, d);
+    sprintf(b8, "%d-%d", s3, fn_80074754__18Unk8007A4DC_Screeniii(g, 4, id, d));
+    ((FeWQ*)fn_800C8040(p->fn_vslot32("WLVAL", 1)))->s30((int)b8);
+    f = fn_800748D4(g, 1, id, d);
+    fn_80119FF0(b8, f);
+    ((FeWQ*)fn_800C8040(p->fn_vslot32("ERAVAL", 1)))->s30((int)b8);
+    sprintf(b8, "%d", fn_80075094__18Unk8007A4DC_Screeniiii(g, 2, id, d, 2));
+    ((FeWQ*)fn_800C8040(p->fn_vslot32("KVAL", 1)))->s30((int)b8);
+    FeW* iw = fn_800C8044(x->fn_vslot32("INFOGROUP", 1));
+    FeMem(x, 0x240)->fn_vslot8(0);
+    fn_800E1388(iw, id, 0, 0);
+    fn_800C3ED4(fn_800C33D0(), FeMem(x, 0x23C), id);
+}
 
 FE_OVERLAY void fn_804A6EE8(FeW* x, int arg)
 {
