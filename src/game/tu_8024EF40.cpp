@@ -439,7 +439,7 @@ void fn_8024F7C8(Unk80250244_S* self)
 }
 
 extern void fn_801D865C(char* a);
-extern void fn_8024FAE0(Unk80250244_S* self, int arg);
+extern "C" void fn_8024FAE0(Unk80250244_S* self, int arg);
 extern void fn_8024FD1C(Unk8024FD00_S* self, int a, int b);
 extern int fn_8035E318(A* a);
 void fn_8024F810(Unk80250244_S* self, int arg, int unused, int slot, int mode)
@@ -468,6 +468,85 @@ void fn_8024F810(Unk80250244_S* self, int arg, int unused, int slot, int mode)
 }
 
 extern int fn_80255028(A* a);
+extern int fn_80254984(A* a);
+struct Unk8024F930_Tbl {
+    char pad0[0xF8];
+    int mF8;
+    char padFC[0x114 - 0xFC];
+    int m114;
+    int m118;
+};
+struct Unk8024F930_Ctx {
+    char pad0[0x3A4];
+    Unk8024F930_Tbl* m3A4;
+    char pad3A8[0x3B4 - 0x3A8];
+    int m3B4;
+    int m3B8;
+};
+extern void fn_801C2DEC(void* t, int k);
+extern int fn_801DC6D4(int k);
+extern int fn_80259330(int k);
+extern void fn_80254DA4(A* a, int k);
+extern "C" void fn_8024F930(Unk80250244_S* self, int arg, int flag)
+{
+    if (self->m4 == 0) {
+        Unk8024F930_Ctx* c = (Unk8024F930_Ctx*)((P*)self->m0)->m44C->m700;
+        fn_801D865C((char*)c->m3A4 + 0xE0);
+        if (flag != 0)
+            fn_801C2DEC(c->m3A4, 1);
+        if ((arg == 2 && fn_80259330(c->m3B4) == 1) || c->m3A4->mF8 == 1
+            || fn_801DC6D4(c->m3B8) == ((P*)self->m0)->m460) {
+            fn_8024FAE0(self, arg);
+            return;
+        }
+        int i = 0;
+        do {
+            P* p = Unk8024F810_At(((P*)self->m0)->m44C, i + 9);
+            if (p != 0) {
+                Unk8024EF40_Q* q = p->m44C;
+                int ka = ((unsigned char*)q->m6F8->m14)[0x1CC9];
+                int kb = ((Unk8024F930_Ctx*)q->m700)->m3A4->m114;
+                if (flag != 0 && ka + kb > 1) {
+                    fn_80254DA4(&p->m58C, 0);
+                    fn_8024FD1C(&self->m8[i], (int)p, fn_8035E318(&p->m58C));
+                } else {
+                    fn_8024FD1C(&self->m8[i], (int)p, p->m58C.m38);
+                }
+                if (flag != 0)
+                    c->m3A4->m118 = 1;
+                self->m4 = arg;
+            } else {
+                fn_8024FD00(&self->m8[i]);
+            }
+            i++;
+        } while (i <= 3);
+    }
+}
+
+extern "C" void fn_8024FAE0(Unk80250244_S* self, int arg)
+{
+    if (self->m4 == 0) {
+        fn_801D865C(((Unk8024FE4C_Ctx*)((P*)self->m0)->m44C->m700)->m3A4 + 0xE0);
+        int i = 0;
+        do {
+            P* p = Unk8024F810_At(((P*)self->m0)->m44C, i + 9);
+            A* a;
+            if (p != 0 && fn_80254984(a = &p->m58C) == 1) {
+                if (a->m8 != 0.0f) {
+                    fn_8024FD1C(&self->m8[i], (int)p, a->m38);
+                    self->m4 = arg;
+                } else {
+                    fn_8024FD1C(&self->m8[i], (int)p, fn_80255028(a));
+                    self->m4 = arg;
+                }
+            } else {
+                fn_8024FD00(&self->m8[i]);
+            }
+            i++;
+        } while (i <= 3);
+    }
+}
+
 extern "C" void fn_8024FBEC(Unk80250244_S* self, int k)
 {
     int f = 0;
