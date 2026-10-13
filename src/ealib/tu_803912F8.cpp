@@ -510,6 +510,72 @@ extern "C" int fn_80392098(int i)
     return (unsigned)lbl_8069B80C.pos[i] <= 15;
 }
 
+struct McRecV {
+    char pad0[4];
+    unsigned short m4;
+    char pad6[3];
+    signed char m9;
+    unsigned char mA;
+};
+
+extern int lbl_80624410[];
+extern "C" int fn_80394FD4(int a, int b);
+extern "C" int fn_8039582C();
+extern "C" int fn_80391F70(unsigned x, int y);
+extern "C" void fn_80392988();
+
+inline unsigned char Lo8(int* p)
+{
+    return *((unsigned char*)p + 3);
+}
+
+/* near-miss 99.9%: same code; retail loads the slot index (lwz 12(r1)) into r3 and shifts it into r11, ours loads it
+ * straight into r11. */
+extern "C" int fn_803920BC(int* arg0)
+{
+    int r = 0;
+    int spC;
+    McTag tag;
+    int* pSp;
+    if (lbl_80624410[0] == 0) {
+        lbl_80624410[0] = 1;
+        if (arg0 != 0) {
+            *(int*)&tag = *arg0;
+            McRecV* o = (McRecV*)fn_80391CCC(&tag);
+            if (o != 0 && fn_80391D20(&tag, &spC) != 0) {
+                int lim = o->m9;
+                if (fn_80394FD4(100, -1) <= lim) {
+                    int ch = fn_80391F70(o->m4, spC);
+                    if (ch >= 0) {
+                        int now = fn_8039582C();
+                        if (now == lbl_8069B9B8[0])
+                            lbl_8069B9BC[0] += 1;
+                        else
+                            lbl_8069B9BC[0] = 0;
+                        McRaw* p = (McRaw*)((char*)&lbl_8069B80C + ch * 16);
+                        lbl_8069B80C.ch[ch].m8 = (int)o;
+                        p->m47 = Lo8(&spC);
+                        p->m44 = lbl_8069B9BC[0];
+                        lbl_8069B9B8[0] = now;
+                        lbl_8069B80C.ch[ch].m0 = now;
+                        if (lbl_8069B80C.ch[ch].mC != 0)
+                            fn_80392BC0(lbl_8069B80C.ch[ch].mC);
+                        lbl_8069B80C.ch[ch].mC = arg0;
+                        lbl_8069B80C.cnt[spC] += 1;
+                        p->m46 = 1;
+                        lbl_8069B80C.pos[spC] = ch;
+                        if (o->mA & 0x20)
+                            fn_80392988();
+                        r = 1;
+                    }
+                }
+            }
+        }
+    }
+    lbl_80624410[0] = 0;
+    return r;
+}
+
 extern "C" void fn_80392388(int* p)
 {
     p[0] = 0;
