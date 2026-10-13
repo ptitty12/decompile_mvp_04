@@ -473,6 +473,9 @@ FE_OVERLAY FePair fn_8045A9C0(FeScrA* x, int idx)
     return r;
 }
 
+/* The extra 'return r;' copies matter: each return copies the pair through the hidden result pointer, and the
+ * number of copies sets that pointer's global-alloc priority (cc1plus -dl: 8 uses over 44 insns with these
+ * returns, 5 over 35 with one). At 8 uses it outranks idx (3 uses over 7 insns): result pointer r30, idx r29. */
 FE_OVERLAY FePair fn_8045AAB4(FeScrA* x, int idx)
 {
     FePair r;
@@ -480,18 +483,23 @@ FE_OVERLAY FePair fn_8045AAB4(FeScrA* x, int idx)
     if (idx != 0) {
         if (idx == 1) {
             int i = x->m154;
-            if (i <= x->m7D4 && i != -1) {
-                return x->m434[i];
+            if (i <= x->m7D4) {
+                if (i != -1) {
+                    return x->m434[i];
+                }
+                return r;
             }
+            return r;
         }
+        return r;
     } else {
         int j = x->m158;
         if (j != -1) {
             int k = x->m15C - 1;
             return x->m164[k][j];
         }
+        return r;
     }
-    return r;
 }
 
 FE_OVERLAY void fn_8045AB6C(FeScrA* x)
