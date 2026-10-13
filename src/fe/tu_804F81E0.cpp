@@ -321,6 +321,8 @@ struct FeS23w : FeObj {
     FeObjQ38* m82C;
 };
 extern const char lbl_805FB3BC[];
+extern float lbl_805FB3A8;
+extern "C" void fn_804FA8F0(FeCap* self, int i, float x);
 /* Q16-DECL-END */
 
 extern "C" int fn_804FB7F4(FeS19* s);
@@ -743,6 +745,111 @@ extern "C" FE_OVERLAY int fn_804FA320(void* self, int v)
             return i;
     }
     return -1;
+}
+
+extern "C" FE_OVERLAY void fn_804FA374(FeCap* self, int i, int a, int mode, int x, int sel)
+{
+    float f = fn_800DC77C(self->m7F4[i]);
+    int c1 = !(mode ^ 1);
+    Unk8007FF8C_G* g = (Unk8007FF8C_G*)lbl_8061930C;
+    float v = fn_804FA098((FeS23*)self, a, f);
+    int c0 = !mode;
+    float t;
+    int n = 9;
+    int gen = 1;
+    switch (i) {
+    case 0:
+        gen = 0;
+        if (c1) {
+            fn_800800C8(g, sel, v, 0x12);
+            fn_800800C8(g, sel, v, 0x2);
+            fn_800800C8(g, sel, v, 0x3);
+            fn_800800C8(g, sel, v, 0x4);
+            fn_800800C8(g, sel, v, 0x9);
+        } else if (c0) {
+            self->m4F0[0x12] = v;
+            self->m4F0[0x2] = v;
+            self->m4F0[0x3] = v;
+            self->m4F0[0x4] = v;
+            self->m4F0[0x9] = v;
+        } else {
+            t = lbl_805FB3A8;
+            if (mode == 3)
+                t = fn_804FAB88(self, (float*)fn_802CA5A0((Unk802CA5A0_Elem*)((char*)lbl_8061E978 + 0x125E0), sel), 0x9);
+            else
+                t = fn_80080110(g, sel, 0x9);
+            fn_804FA8F0(self, i, t);
+        }
+        break;
+    case 1:
+        gen = 0;
+        if (c1) {
+            fn_800800C8(g, sel, v, 0x0);
+            fn_800800C8(g, sel, v, 0x1);
+        } else if (c0) {
+            self->m4F0[0x0] = v;
+            self->m4F0[0x1] = v;
+        } else {
+            t = lbl_805FB3A8;
+            if (mode == 3)
+                t = fn_804FAB88(self, (float*)fn_802CA5A0((Unk802CA5A0_Elem*)((char*)lbl_8061E978 + 0x125E0), sel), 0x0);
+            else
+                t = fn_80080110(g, sel, 0x0);
+            fn_804FA8F0(self, i, t);
+        }
+        break;
+    case 2:
+        gen = 0;
+        if (c1) {
+            fn_800800C8(g, sel, v, 0xA);
+            fn_800800C8(g, sel, v, 0xB);
+        } else if (c0) {
+            self->m4F0[0xA] = v;
+            self->m4F0[0xB] = v;
+        } else {
+            t = lbl_805FB3A8;
+            if (mode == 3)
+                t = fn_804FAB88(self, (float*)fn_802CA5A0((Unk802CA5A0_Elem*)((char*)lbl_8061E978 + 0x125E0), sel), 0xA);
+            else
+                t = fn_80080110(g, sel, 0xA);
+            fn_804FA8F0(self, i, t);
+        }
+        break;
+    case 3:
+        gen = 0;
+        if (c1) {
+            fn_800800C8(g, sel, v, 0x5);
+            fn_800800C8(g, sel, v, 0x6);
+        } else if (c0) {
+            self->m4F0[0x5] = v;
+            self->m4F0[0x6] = v;
+        } else {
+            t = lbl_805FB3A8;
+            if (mode == 3)
+                t = fn_804FAB88(self, (float*)fn_802CA5A0((Unk802CA5A0_Elem*)((char*)lbl_8061E978 + 0x125E0), sel), 0x5);
+            else
+                t = fn_80080110(g, sel, 0x5);
+            fn_804FA8F0(self, i, t);
+        }
+        break;
+    default:
+        n = fn_804F9C64(self, i);
+        break;
+    }
+    if (gen != 0) {
+        if (c1) {
+            fn_800800C8(g, sel, v, n);
+        } else if (c0) {
+            self->m4F0[n] = v;
+        } else {
+            t = lbl_805FB3A8;
+            if (mode == 3)
+                t = fn_804FAB88(self, (float*)fn_802CA5A0((Unk802CA5A0_Elem*)((char*)lbl_8061E978 + 0x125E0), sel), n);
+            else
+                t = fn_80080110(g, sel, n);
+            fn_804FA8F0(self, i, t);
+        }
+    }
 }
 
 extern "C" FE_OVERLAY float fn_804FA7BC(void* self, float x)
