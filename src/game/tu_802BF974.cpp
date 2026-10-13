@@ -599,3 +599,26 @@ void* fn_802C3794(int, int, int h)
     fn_802C2FF4(im, w, ht, fn_803EC03C(im), w / 2, 0);
     return im;
 }
+
+/* near-miss 99.8%: only the temp registers of the two (int)(w * k) results differ (lwz r11/r9 then addi into r7/r4; retail loads straight into r7/r4 and expands the 0.765625 product first) */
+void fn_802C37F8(Unk802C2188* o)
+{
+    Unk802C3794_Img* im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[1]);
+    o->a8[0x1C] = (int)im;
+    int ht = im->h;
+    int w = im->w;
+    int fmt = fn_803EC03C(im);
+    int x7 = (int)((float)w * 0.765625f) - 2;
+    int x4 = (int)((float)w * 0.46875f) - 4;
+    fn_802C2FF4((void*)o->a8[0x1C], x4, ht * 3 / 4, fmt, x7, ht / 4);
+    im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[2]);
+    o->a8[0x1D] = (int)im;
+    w = im->w;
+    ht = im->h;
+    fmt = fn_803EC03C(im);
+    fn_802C2FF4((void*)o->a8[0x1D], w / 2, ht, fmt, w / 4, 0);
+    o->a8[0x1E] = (int)fn_802C3794((int)o, o->a8[0x1E], o->a8[4]);
+    o->a8[0x20] = (int)fn_802C3794((int)o, o->a8[0x20], o->a8[6]);
+    o->a8[0x1F] = (int)fn_802C3794((int)o, o->a8[0x1F], o->a8[5]);
+    o->a8[0x21] = (int)fn_802C3794((int)o, o->a8[0x21], o->a8[3]);
+}
