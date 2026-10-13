@@ -173,6 +173,49 @@ struct FeSl144 {
     char pad0[0x144];
     int m144;
 };
+/* Widget view whose vtable slot 29 (+0xE8) takes an int id (fn_8050E8DC). */
+class FeV29i {
+public:
+    char pad0[0x3C];
+    virtual void s1();
+    virtual void s2();
+    virtual void s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+    virtual void s11();
+    virtual void s12();
+    virtual void s13();
+    virtual void s14();
+    virtual void s15();
+    virtual void s16();
+    virtual void s17();
+    virtual void s18();
+    virtual void s19();
+    virtual void s20();
+    virtual void s21();
+    virtual void s22();
+    virtual void s23();
+    virtual void s24();
+    virtual void s25();
+    virtual void s26();
+    virtual void s27();
+    virtual void s28();
+    virtual void s29(int a);
+};
+extern "C" FeW* fn_800C8044(void* w);
+extern "C" FeW* fn_800C8040(void* w);
+extern "C" FeW* fn_800C8038(void* w);
+extern "C" void fn_800DD204__FP3UiST0(void* a, void* b);
+extern const char lbl_805F54F8[];
+extern const char lbl_805F5100[];
+extern const char lbl_805FB7EC[];
+
+
 extern "C" FE_OVERLAY FeScrN* fn_8050C9DC(FeScrN* self, int a, int b, int c, int d, int e, int f, int g, int h)
 {
     fn_800EC648(self, a, b, c, d, e, f, g, h);
@@ -525,6 +568,49 @@ extern "C" FE_OVERLAY void fn_8050E888(FeScrM* x)
     fn_804D292C(&x->m188, 0);
 }
 
+extern "C" FE_OVERLAY void fn_8050E8DC(FeScrQ* x)
+{
+    fn_804CF304(x);
+    if (fn_800B57EC(fn_800B555C()) == 0 && (FeI(fn_800B555C(), 4) & 1)) {
+        int i = 0;
+        void* g = lbl_8061930C;
+        do {
+            int k = i;
+            i++;
+            fn_8007DA8C__18Unk8007B2B0_Screenii(g, k, -1);
+        } while (i <= 3);
+        int k = FeI(x, 0x1C0);
+        fn_8007DA8C__18Unk8007B2B0_Screenii(g, k, fn_8007DA28__18Unk8007B2B0_Screen(g));
+    }
+    fn_800B83F8(fn_800B8144(), 1, 1);
+    FePopup* p = fn_800B7AB8(FeGetMgr(), lbl_805F4F84);
+    fn_80124FA8(p, x);
+    ((int (*)(void*, int))fn_80125128)(p, -1);
+    ((int (*)(void*, int))fn_80125154)(p, -2);
+    ((int (*)(void*, int, int, int))fn_801251CC)(p, 3, 0x3BEE, -4);
+    FeW* w1 = fn_800C8044(((FeW*)x)->fn_vslot32(lbl_805F54F8, 1));
+    FeW* w2 = fn_800C8040(w1->fn_vslot32(lbl_805F54F8, 1));
+    FeW* w3 = fn_800C8038(w1->fn_vslot32(lbl_805F5100, 1));
+    FeW* w4 = fn_800C8044(((FeW*)x)->fn_vslot32(lbl_805FB7EC, 1));
+    w4->fn_vslot8(0);
+    if (FeI(fn_800B555C(), 0) == 0x4B) {
+        ((FeV29i*)w2)->s29(0x2C1);
+    } else if (FeI(fn_800B555C(), 0) == 0x4A) {
+        ((FeV29i*)w2)->s29(0x2C0);
+        w4->fn_vslot8(1);
+        fn_801251CC(p, 2, 0x3CA5, 0);
+    } else {
+        ((FeV29i*)w2)->s29(0x2C2);
+    }
+    fn_800DD204__FP3UiST0(w2, w3);
+    if (FeI(fn_800B555C(), 4) & 1) {
+        ((FeWm*)x)->s95(1, 1);
+        ((FeWm*)x)->s95(0, 1);
+    }
+    fn_804D28B4((char*)x + 0x144);
+    fn_804D28B4((char*)x + 0x188);
+}
+
 extern "C" FE_OVERLAY void fn_8050EBC8(FeScrQ* x)
 {
     fn_804CF6A4(x);
@@ -729,3 +815,4 @@ extern "C" FE_OVERLAY int fn_80510920(FeScrN* x)
     x->m134->fn_vslot39();
     return 1;
 }
+
