@@ -582,7 +582,9 @@ struct Obj8009984C {
     Item8009984C items[16];
 };
 
-/* near-miss: retail forms the new item pointer with an update-form store (stwu) and keeps o in r31 */
+/* The item pointer is stepped in place (`it = o + n*8; it += 0x238`) so combine folds the add into the
+ * first store as an update form (stwu); a separate `it = o + n*8 + 0x238` pseudo left stw + addi.
+ * The four byte stores are written m4, m5, m6, m7 because sched2 then emits them as m7, m4, m5, m6. */
 extern "C" void fn_8009984C(Obj3* o, int a1, int a2, int a3, int a4, int a5)
 {
     Obj8009984C* w = (Obj8009984C*)o;
@@ -592,12 +594,13 @@ extern "C" void fn_8009984C(Obj3* o, int a1, int a2, int a3, int a4, int a5)
         if (s == 0 || s == 10) {
             w->items[o->m235 - 1].m6 = a2 - a3;
             w->items[o->m235 - 1].m5 = a4;
-            Item8009984C* it = (Item8009984C*)(o->m235 * 8 + (int)o + 0x238);
+            Item8009984C* it = (Item8009984C*)(o->m235 * 8 + (int)o);
+            it = (Item8009984C*)((char*)it + 0x238);
             it->m0 = 0;
-            it->m7 = 0;
             it->m4 = 0;
             it->m5 = 0;
             it->m6 = 0;
+            it->m7 = 0;
             char* b = (char*)o + 0x238;
             *(int*)(b + o->m235 * 8) = a1;
             w->items[o->m235].m4 = a4;
