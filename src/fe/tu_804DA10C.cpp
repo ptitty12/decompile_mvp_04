@@ -87,6 +87,37 @@ struct FeSD74 : FeW {
 };
 extern "C" int fn_8008CFD8(void* t, int a, unsigned char b);
 extern const char lbl_805F4F84[];
+struct FeVT : Unk800C7B40_Data {
+    virtual ~FeVT();
+    virtual void s2(); virtual void s3(); virtual void s4(); virtual void s5(); virtual void s6();
+    virtual void s7(); virtual void s8(); virtual void s9(); virtual void s10(); virtual void s11();
+    virtual void s12(); virtual void s13(); virtual void s14(int a); virtual void s15(); virtual void s16();
+    virtual void s17(); virtual void s18(); virtual void s19(); virtual void s20(); virtual void s21();
+    virtual void s22(); virtual void s23(); virtual void s24(); virtual void s25(); virtual void s26();
+    virtual void s27(); virtual void s28(); virtual void s29(); virtual void s30(); virtual void s31();
+    virtual void s32(); virtual void s33(); virtual void s34(); virtual void s35(); virtual void s36();
+    virtual void s37(); virtual void s38(); virtual void s39(); virtual void s40(); virtual void s41();
+    virtual void s42(); virtual void s43(); virtual void s44(); virtual void s45(); virtual void s46();
+    virtual void s47(); virtual void s48(); virtual void s49(); virtual void s50(); virtual void s51();
+    virtual void s52(); virtual void s53(); virtual void s54(); virtual void s55(); virtual void s56();
+    virtual void s57(); virtual void s58(); virtual void s59(); virtual void s60(); virtual void s61();
+    virtual void s62(); virtual void s63(); virtual void s64(); virtual void s65(); virtual void s66();
+    virtual void s67(); virtual void s68(); virtual void s69(); virtual void s70(); virtual void s71();
+    virtual void s72(); virtual void s73(); virtual void s74(); virtual void s75(); virtual void s76();
+    virtual void s77(); virtual void s78(); virtual void s79(int a, int b); virtual void s80();
+    virtual void s81(); virtual void s82(); virtual void s83(); virtual void s84(); virtual void s85();
+    virtual void s86(); virtual void s87(); virtual void s88(); virtual void s89(); virtual void s90();
+    virtual void s91(); virtual void s92(); virtual void s93(); virtual void s94(); virtual void s95();
+    virtual void s96(); virtual void s97(); virtual void s98(); virtual void s99(); virtual void s100();
+    virtual void s101(); virtual void s102(); virtual void s103(); virtual void s104();
+    virtual void s105(int a); virtual void s106(); virtual void s107(); virtual void s108();
+    virtual void s109(); virtual void s110(); virtual void s111(); virtual void s112(); virtual void s113();
+    virtual void s114(); virtual void s115(); virtual void s116(); virtual void s117(); virtual void s118();
+    virtual void s119(); virtual void s120(); virtual void s121(); virtual void s122(); virtual void s123();
+    virtual void s124(); virtual void s125(); virtual void s126(); virtual void s127();
+};
+extern "C" void fn_800E0374(void* a, void* b, int n, int c, FeW* w, int d, int e, int f, int g, int h);
+extern "C" int fn_804DAAF0(FeS804DA10C* x);
 extern "C" {
 
 FE_OVERLAY void fn_804DA10C(FeS804DA10C* x)
@@ -214,6 +245,109 @@ FE_OVERLAY void fn_804DA6D8(FeS804DA10C* x)
     int idx = x->m158->fn_vslot60();
     lbl_8061B2B8 = x->m13C == 0;
     fn_800E1388(x->m15C, x->m168[idx], 1, 0);
+}
+
+/* near-miss: 98%; retail loads each list count into r0 and copies it to r28, and keeps the row offset in r6 */
+FE_OVERLAY void fn_804DA74C(FeS804DA10C* x)
+{
+    x->m164 = 0;
+    {
+        int i = 0;
+        int n = *(int*)((char*)x->m160 + 0x4);
+        for (; i < n; i++) {
+            unsigned char b = (*(unsigned char**)((char*)x->m160 + 0x0))[(unsigned char)i];
+            if (((int (*)(FeS804DA10C*, unsigned char))fn_804DAAF0)(x, b) != 0) {
+                int eo = b * 0x34;
+                char* tb = (char*)x->m160 + 0x3E8;
+                char* a1 = (char*)x + 0x168;
+                int o1 = x->m164 * 4;
+                *(int*)(a1 + o1) = *(int*)(tb + eo);
+                char* a2 = (char*)x + 0x1A4;
+                int o2 = x->m164 * 4;
+                *(int*)(a2 + o2) = 0xE80;
+                x->m164++;
+            }
+        }
+    }
+    {
+        int i = 0;
+        int n = *(int*)((char*)x->m160 + 0x18);
+        for (; i < n; i++) {
+            unsigned char b = (*(unsigned char**)((char*)x->m160 + 0x14))[(unsigned char)i];
+            if (((int (*)(FeS804DA10C*, unsigned char))fn_804DAAF0)(x, b) != 0) {
+                int eo = b * 0x34;
+                char* tb = (char*)x->m160 + 0x3E8;
+                char* a1 = (char*)x + 0x168;
+                int o1 = x->m164 * 4;
+                *(int*)(a1 + o1) = *(int*)(tb + eo);
+                char* a2 = (char*)x + 0x1A4;
+                int o2 = x->m164 * 4;
+                *(int*)(a2 + o2) = 0xE83;
+                x->m164++;
+            }
+        }
+    }
+    {
+        int i = 0;
+        int n = *(int*)((char*)x->m160 + 0x2c);
+        for (; i < n; i++) {
+            unsigned char b = (*(unsigned char**)((char*)x->m160 + 0x28))[(unsigned char)i];
+            if (((int (*)(FeS804DA10C*, unsigned char))fn_804DAAF0)(x, b) != 0) {
+                int eo = b * 0x34;
+                char* tb = (char*)x->m160 + 0x3E8;
+                char* a1 = (char*)x + 0x168;
+                int o1 = x->m164 * 4;
+                *(int*)(a1 + o1) = *(int*)(tb + eo);
+                char* a2 = (char*)x + 0x1A4;
+                int o2 = x->m164 * 4;
+                *(int*)(a2 + o2) = 0xE84;
+                x->m164++;
+            }
+        }
+    }
+    {
+        int i = 0;
+        int n = *(int*)((char*)x->m160 + 0x40);
+        for (; i < n; i++) {
+            unsigned char b = (*(unsigned char**)((char*)x->m160 + 0x3c))[(unsigned char)i];
+            if (((int (*)(FeS804DA10C*, unsigned char))fn_804DAAF0)(x, b) != 0) {
+                int eo = b * 0x34;
+                char* tb = (char*)x->m160 + 0x3E8;
+                char* a1 = (char*)x + 0x168;
+                int o1 = x->m164 * 4;
+                *(int*)(a1 + o1) = *(int*)(tb + eo);
+                char* a2 = (char*)x + 0x1A4;
+                int o2 = x->m164 * 4;
+                *(int*)(a2 + o2) = 0xE85;
+                x->m164++;
+            }
+        }
+    }
+    {
+        int i = 0;
+        int n = *(int*)((char*)x->m160 + 0x54);
+        for (; i < n; i++) {
+            unsigned char b = (*(unsigned char**)((char*)x->m160 + 0x50))[(unsigned char)i];
+            if (((int (*)(FeS804DA10C*, unsigned char))fn_804DAAF0)(x, b) != 0) {
+                int eo = b * 0x34;
+                char* tb = (char*)x->m160 + 0x3E8;
+                char* a1 = (char*)x + 0x168;
+                int o1 = x->m164 * 4;
+                *(int*)(a1 + o1) = *(int*)(tb + eo);
+                char* a2 = (char*)x + 0x1A4;
+                int o2 = x->m164 * 4;
+                *(int*)(a2 + o2) = 0xE7F;
+                x->m164++;
+            }
+        }
+    }
+    lbl_8061B2B8 = (x->m13C == 0);
+    ((FeVT*)x->m158)->s79(x->m164, 0);
+    x->m158->fn_vslot3();
+    fn_800E0374((char*)x + 0x168, (char*)x + 0x1A4, x->m164, 0, x->m158, 0, 0, 1, 1, 0);
+    ((FeVT*)x->m158)->s105(1);
+    ((FeVT*)x->m158)->s14(1);
+    fn_804DA6D8(x);
 }
 
 FE_OVERLAY int fn_804DAAF0(FeS804DA10C* x)
