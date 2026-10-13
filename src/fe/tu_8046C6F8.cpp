@@ -7,7 +7,7 @@ extern "C" {
 int fn_8057CF60(void* s, int a);
 void fn_80556348(void* p);
 int fn_8057CE00(int a);
-int fn_805559D4(void* buf, int n, int a);
+int fn_805559D4(int kind, void* buf, int n, int a);
 int fn_805563C4(void* p);
 int fn_80556410(void* p);
 char* fn_80403DE4(char* dst, const char* fmt, ...);
@@ -489,17 +489,16 @@ FE_OVERLAY void fn_8046F4B0(void)
 
 }
 
-/* near-miss: 98.65%, same 152 insns and CTR/mfctr loop shape; only callee-saved register numbers differ (retail t=r25 h=r29 i=r24 off2=r31, ours t=r24 h=r31 i=r27 off2=r25). */
+/* near-miss: same 152 insns and CTR/mfctr loop shape; only callee-saved register numbers differ: retail has the first loop's i in r28 and h in r29 (ours the reverse), and the second loop's offset giv in r27 and the count copy in r28 (ours the reverse). Separate loop variables per loop and the 4-argument fn_805559D4(kind, ...) (kind = fn_8057CE00 result) already applied. */
 extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
 {
     int sp20[4];
     int sp30[4];
     char sp40[0x1E0];
     char buf[0x320];
-    int i;
     void* t = lbl_8061977C;
     void* h = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
-    for (i = 0; i <= 3; i++) {
+    for (int i = 0; i <= 3; i++) {
         sp20[i] = 0;
         sp30[i] = fn_8057CF60(h, i);
     }
@@ -509,10 +508,9 @@ extern "C" FE_OVERLAY void fn_8046F510(FeScrJ* x)
         fn_80556348(p);
         p += 0x28;
     } while (k-- != 0);
-    for (i = 0; i <= 3; i++) {
+    for (int i = 0; i <= 3; i++) {
         sp20[i] = 0x4635;
-        fn_8057CE00(i);
-        int n = fn_805559D4(sp40, 12, i);
+        int n = fn_805559D4(fn_8057CE00(i), sp40, 12, i);
         if (n > 0) {
             int off2 = 0;
             int c = n;
