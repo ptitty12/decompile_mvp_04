@@ -455,6 +455,53 @@ void fn_80109640(UiObj* self)
     fn_800ED254(self);
 }
 
+struct Unk8017DD64_T;
+struct Unk8019F8C0_Owner;
+int fn_8017E030(Unk8017DD64_T* a, int b, int c);
+int fn_801A2034(Unk8019F8C0_Owner* o, int k);
+struct UiV_138_140 : UiObj {
+    char pad40[0x138 - 0x40];
+    UiObj* m138;
+    char pad13C[4];
+    int m140;
+};
+struct Ui800B555C_S8 {
+    char pad0[0x568];
+    int m568;
+};
+
+void fn_80109660(UiObj* x)
+{
+    UiV_138_140* self = (UiV_138_140*)x;
+    Ui8011AA24* g = fn_8011AA24(0);
+    UiObj* o = fn_800B7A94(UiGetMsgMgr(), lbl_805BA6D0);
+    self->m138 = o;
+    fn_80124FA8(o, self);
+    if (self->m140 == 0)
+        fn_801251CC(self->m138, 1, 0x1A0B, 0);
+    fn_80125490(self->m138, 1, 4, 0x38C8, 1);
+    fn_801251CC(self->m138, 0, 0x1A0D, 2);
+    if (fn_800B555C()->m0 == 0x22) {
+        fn_800B555C()->m570 = 0;
+        Ui800B555C_S8* t;
+        int k;
+        if (fn_8017E030((Unk8017DD64_T*)g->m700, 0, 0) != 0) {
+            t = (Ui800B555C_S8*)((char*)fn_800B555C() + 8);
+            k = 0;
+            goto set;
+        }
+        if (fn_8017E030((Unk8017DD64_T*)g->m700, 1, 0) != 0) {
+            t = (Ui800B555C_S8*)((char*)fn_800B555C() + 8);
+            k = 1;
+        set:
+            t->m568 = fn_801A2034((Unk8019F8C0_Owner*)g, k);
+        }
+    }
+    int v = fn_800B555C()->m570;
+    fn_800C80C0(self->m138, v);
+    fn_800C80C0(self, v);
+}
+
 int fn_801097B8(UiScr134* self, int a)
 {
     if (fn_800B555C()->m570 == a)
