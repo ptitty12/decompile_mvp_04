@@ -248,6 +248,98 @@ extern "C" void fn_801C2F28(Z* z, P* other, int unused, int mode)
     z->mF4 = 1;
 }
 
+struct Unk801C2C64_Pr {
+    float x;
+    float y;
+};
+struct Unk801C2C64_S120 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    Unk801C2C64_Pr m30;
+    char pad38[0x44 - 0x38];
+    float m44;
+    char pad48[0x60 - 0x48];
+    float m60;
+    char pad64[0x88 - 0x64];
+    int m88;
+    int m8C;
+    char pad90[0xA8 - 0x90];
+    int mA8;
+    int mAC;
+    float mB0;
+    float mB4;
+    float mB8;
+    float mBC[6];
+    int mD4;
+    float mD8;
+};
+extern const Vec3 lbl_806055AC;
+extern Unk801C2C64_Pr lbl_8060558C;
+inline float FOne() { return 1.0f; }
+inline float FZero() { return 0.0f; }
+extern "C" void fn_801D5C7C(void* p);
+extern "C" void fn_801D8330(void* p);
+
+extern "C" void fn_801C30F8(Z* z)
+{
+    fn_801D5C7C(z->m20C);
+    z->m120 = 0;
+    Unk801C2C64_S120* s = (Unk801C2C64_S120*)&z->m120;
+    s->m10 = 5;
+    s->m4 = 0;
+    s->mC = 0;
+    s->m14 = 0;
+    s->m1C = FZero();
+    s->m20 = FZero();
+    s->m24 = FZero();
+    s->m28 = FZero();
+    s->m2C = FOne();
+    s->m30 = lbl_8060558C;
+    s->m18 = FZero();
+    s->m60 = FZero();
+    z->m184 = lbl_806055AC;
+    z->m190 = lbl_806055AC;
+    s->m44 = FZero();
+    z->m158 = lbl_806055AC;
+    z->m168 = lbl_806055AC;
+    z->m174 = lbl_806055AC;
+    z->m19C = lbl_806055AC;
+    s->m88 = 6;
+    s->m8C = 0;
+    z->m1B0 = lbl_806055AC;
+    z->m1BC = lbl_806055AC;
+    s->mA8 = 0;
+    s->mAC = 0;
+    s->mD4 = 0;
+    s->mB0 = FZero();
+    s->mB4 = FZero();
+    s->mB8 = FZero();
+    s->mD8 = FZero();
+    for (int i = 0; i < 6; i++)
+        s->mBC[i] = 0.0f;
+    if (fn_801C3F00(z)) {
+        fn_801CF1BC(z);
+        fn_801C34AC(z, 6);
+    }
+    int t = z->m208;
+    z->m28C.m0 = 0;
+    if (t == 8 || t == 4)
+        fn_801C34AC(z, 9);
+    if (z->m204->m6F4 == 2)
+        fn_801C34AC(z, 0);
+    fn_801D8330(z->mE0);
+}
+
 extern "C" void fn_801C3330(Z* z)
 {
     fn_801C2284(z);
@@ -739,7 +831,6 @@ extern "C" void fn_801C53D8(void) {}
 
 extern "C" void fn_801C53DC(Z* z) { fn_801C4F98(z); }
 
-extern const Vec3 lbl_806055AC;
 extern int lbl_806242A0;
 extern "C" int fn_80244DC4(void* b, Vec3* v, void* w, float t, float k);
 extern "C" void fn_801C5740(Z* z, void* b, Vec3* v, void* w, int c, int d, int e, int f, int g);
