@@ -1628,3 +1628,27 @@ unmodified regression verifier pass; an import shortlist alone is not proof.
 Vector norm fn_80402A90: reusing x for x*x + y*y before loading z reproduced the
 exact 15 instructions, whereas a direct expression and separate product
 temporaries changed load/register order. Preserve floating-point grouping.
+
+## Real global initialization and inline dependencies (Codex, 2026-10-13)
+
+For a large compiler-generated vector initializer, adapt an already matched
+global-initialization twin and keep the target's points and destination globals.
+Do not replace C++ object initialization with a sequence of assignments: the
+old compiler creates different aggregate temporaries and spills. For
+game/tu_800034A0 the explicit assignments were 967 instructions; the 13 genuine
+global initializers reproduce the retail 889. The compiler-generated names are
+recorded in symbols.txt with the static helper scoped local. The original
+unit's unrelated rodata remains a separate source-link blocker.
+
+When clone.py copies a class declaration, it now also collects the donor's
+separate inline member bodies and their dependencies. Previously it copied the
+prototypes alone, producing out-of-line calls. This fixed the 415-vs-426 length
+failure for fn_803EA500, but its unresolved GXWGFifo still fails the strict
+pre-check. Do not relax that check to declare a match.
+
+For trivial arrays/objects, an explicit call to the established deallocator can
+resolve a compiler-generated __builtin_delete import without a linker alias.
+Use it only when no element/object destructor is being skipped. For a real
+class destructor, a class-specific inline operator delete can forward to that
+same runtime function. Both approaches in this sweep were retained only after
+the actual source-linked DOL retained the exact retail hash.

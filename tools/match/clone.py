@@ -846,6 +846,22 @@ class Cloner:
                 raise Fail("too many declarations to copy")
             visit(text)
             out.append(text)
+            if c.kind == "type":
+                # A class declaration can name inline methods whose bodies are
+                # separate chunks in the donor .cpp. Without those bodies the
+                # scratch clone compiles out-of-line calls instead of inlining.
+                for member in tw_ctx.chunks:
+                    if member.kind != "fdef" or not member.inline or member.tmpl:
+                        continue
+                    qualified = [n for n in member.names if n.startswith(tn + "::")]
+                    if not qualified or any(n in seen or tgt_ctx.has(n) for n in qualified):
+                        continue
+                    seen.update(qualified)
+                    body = replace_tokens(member.text, names, {})
+                    if tn != name:
+                        body = replace_tokens(body, {tn: name}, {})
+                    visit(body)
+                    out.append(body)
 
         visit(clone)
         return out, includes
