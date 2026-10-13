@@ -123,3 +123,17 @@ Follow-up with the new event-state dependency: fn_803F0FCC reached three differi
 words (from five) but no exact match. fn_803F108C's three active/zero variants were
 worse. The accepted string-event trio is recorded in PATTERNS.md; these remaining
 functions still need a new mechanism, not more permutations of the same stores.
+
+
+### Shared table v4 ABI migration (2026-10-13)
+
+Candidate source set: `v4-final/src/tu_80090880.cpp`, `tu_800928B0.cpp`, `tu_80094578.cpp`, `tu_8007B714.cpp`; shared final header copies are under `v4-final/include/game/`. The three provider TUs change 14 names from `v4__11Tbl<Class>` to `v4__11Tbl<Class>i` while retaining all function addresses, sizes, instructions, local branch destinations, and allocated section sizes. Per-TU rename maps and direct-compile/object evidence are in `staging-manifest.json`, `comparison-output.json`, and `allocated-layout-output.txt`.
+
+B714 now gives pointer-typed formals where current call sites establish pointers: `void*` object followed by integer indices/values for B714/B780/B7C8/B7EC/B810/B834/B858/B8A0; B738/B7A4/B87C take `void*`. The DB provider APIs still receive the original 32-bit value via explicit pointer-to-int conversion where needed. B714 compiles with all 60 functions exactly matching target and unchanged from source, text size 5040 bytes.
+
+Caller source migration evidence: `src/game/tu_800E4234.cpp:384-399` calls B7A4/B7C8/B7EC/B834/B858 with `void* o` and row index; `src/fe/tu_80459228.cpp:411,422` passes `FeScrA::m160` (`void*`, header line 214) to B714/B738; `src/fe/tu_8046C6F8.cpp:228-239` and `src/fe/tu_804740A8.cpp:146,163` pass a widget pointer plus flag to B780; `src/game/tu_80073914.cpp:772` passes a widget pointer then five ints to B8A0; `src/game/tu_800A23F4.cpp:111` passes a widget pointer to B87C. Corresponding old free-function prototypes are in `include/game/tu_800E4234.h`, `include/game/fe_80459228.h`, and `include/game/fe_80471EBC.h`.
+
+No tracked source/config/verification file was edited; these are scratch findings only. Full verifier/hash/regression gates have not been run.
+
+
+The clone scanner now has only three shape candidates: two already parked in game/tu_80174318, and the 32-byte destructor at 0x80362C2C. The latter calls the same in-charge destructor family as the parked fn_8035B16C; the free-function clone reports a missing function after compilation because the retail target is a destructor symbol. No match was accepted.

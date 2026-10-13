@@ -9,7 +9,7 @@
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
 - Functions matched: **20,899 / 24,158 (86.51%)**; code matched: **3,000,204 / 5,896,176 bytes (50.88%)**.
-- Source-linked: **210 units, 309,040 code bytes (5.24%)**, plus 8,118 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+- Source-linked: **212 units, 312,792 code bytes (5.30%)**, plus 8,234 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
 ## Session log (newest last)
@@ -218,3 +218,8 @@
   - Double/float ceil (344/196 B + 16/8 B data): mutable huge objects and x+huge arithmetic reproduce the exact instructions and writable small-data blocks. The former const definition produced an unreferenced read-only duplicate with ambiguous ownership; no pool was placed by guessing. Public reference licenses preserved.
   - game/tu_800C2F90 (8,648 B): canonical C/C++ import types plus guarded real deallocation retain all sixty functions and 152 branch edges. Before linking it, corrected fn_802B96A4's actual three-integer arguments and result in its provider TU; its 32-byte code is unchanged. Metadata rename Fv -> Fiii preserves address and size, with no aliases or final mismatched function-pointer call. All 334 consumer references resolve and compare exactly.
   - New compiler lead: -mps-float enables ProDG __ps_t and paired-single builtins. Native lvalues fold offsets, but fn_803A3D4C remains seven words off because quantization/register encodings differ; no flags or unmatched SIMD source were accepted. Indexed builtin probes returned success without producing ELF, so their API acceptance is unproven. Scratch remains under build/agent-event.
+
+- 2026-10-13 | Codex + three Luna workers, continued | libm/ef_log source-linked (640 code B / 116 data B): export its existing first coefficient as lbl_806F0000, which an external extracted table already references. Other coefficients remain private and unchanged. Source/target code, 20 local branch destinations and both data blocks are exact; full retail hash, literals and verifier pass. The initial wrong scratch path was rejected and restored before the correct reference was used.
+  - fe/tu_804FF6B4 source-linked (3,112 code B): bind string calls to the actual strcpy/strncpy providers and TEAMNAME/TEAMCITY to their existing data symbols. All 27 functions and local edges match; 129 references check with zero mismatches/unresolved names. Full hash and verifier pass. Two independent worker audits agreed on the import addresses.
+  - Read-only import_candidates.py pairs matched source/retail REL24 call sites and lists canonical exported provider names. It distinguishes conflicting destinations and unresolved imports, preserving all aliases as leads rather than selecting a guessed ABI. Seven new synthetic regression tests pass; matching-helper suite is 84/84.
+  - Source-linked totals are now 212 units / 312,792 code B / 8,234 data B; exact functions remain 20,899. The table v4 argument repair is parked under the one-TU commit rule; no conditional class definitions or mismatched function-pointer calls were accepted.
