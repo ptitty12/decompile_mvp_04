@@ -79,6 +79,31 @@ Unk802BF974::~Unk802BF974()
 }
 
 /* near-miss (73 vs 73 insns, schedule only): retail sets r3 = &sp8 last in each call; the pointer-local recipe made it worse. */
+int fn_802BFAA8(int a, int k, float* p, float* q, int c, int d, int e, float f);
+
+/* near-miss 97.5%: instructions identical, only the callee-saved registers of a0/a3/a4/a5 are permuted (retail: a0 r26, a3 r29, a4 r28, a5 r27) */
+int fn_802C0050(int a0, float* p, float* q, int a3, int a4, int a5, float f)
+{
+    if (!(p[0] >= -5.0f) && q[0] < -5.0f)
+        return 0;
+    if (!(p[2] >= -5.0f) && q[2] < -5.0f)
+        return 0;
+    if (!(p[1] <= 5.0f) && q[1] > 5.0f)
+        return 0;
+    const float lo = 1056.0f;
+    const float hi = 1104.0f;
+    if (!(p[0] >= lo) && !(q[0] >= lo) && !(p[2] >= lo) && q[2] < lo)
+        return 0;
+    if (!(p[0] <= hi) && !(q[0] <= hi) && !(p[2] <= hi) && !(q[2] <= hi))
+        return 0;
+    int r = fn_802BFAA8(a0, 0, p, q, a3, a4, a5, f);
+    if (r == 0) {
+        r = fn_802BFAA8(a0, 1, p, q, a3, a4, a5, f);
+        if (r == 0)
+            r = fn_802BFAA8(a0, 2, p, q, a3, a4, a5, f);
+    }
+    return r;
+}
 int* fn_802C1288(const char* text)
 {
     int len = fn_8040B6A0(text);
@@ -598,4 +623,27 @@ void* fn_802C3794(int, int, int h)
     int ht = im->h;
     fn_802C2FF4(im, w, ht, fn_803EC03C(im), w / 2, 0);
     return im;
+}
+
+/* near-miss 99.8%: only the temp registers of the two (int)(w * k) results differ (lwz r11/r9 then addi into r7/r4; retail loads straight into r7/r4 and expands the 0.765625 product first) */
+void fn_802C37F8(Unk802C2188* o)
+{
+    Unk802C3794_Img* im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[1]);
+    o->a8[0x1C] = (int)im;
+    int ht = im->h;
+    int w = im->w;
+    int fmt = fn_803EC03C(im);
+    int x7 = (int)((float)w * 0.765625f) - 2;
+    int x4 = (int)((float)w * 0.46875f) - 4;
+    fn_802C2FF4((void*)o->a8[0x1C], x4, ht * 3 / 4, fmt, x7, ht / 4);
+    im = (Unk802C3794_Img*)fn_803EBF2C(o->a8[2]);
+    o->a8[0x1D] = (int)im;
+    w = im->w;
+    ht = im->h;
+    fmt = fn_803EC03C(im);
+    fn_802C2FF4((void*)o->a8[0x1D], w / 2, ht, fmt, w / 4, 0);
+    o->a8[0x1E] = (int)fn_802C3794((int)o, o->a8[0x1E], o->a8[4]);
+    o->a8[0x20] = (int)fn_802C3794((int)o, o->a8[0x20], o->a8[6]);
+    o->a8[0x1F] = (int)fn_802C3794((int)o, o->a8[0x1F], o->a8[5]);
+    o->a8[0x21] = (int)fn_802C3794((int)o, o->a8[0x21], o->a8[3]);
 }

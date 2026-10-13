@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_80275F24.h"
+#include "game/goals/tu_8027C728.h"
 
 typedef Unk80275F24_S S;
 typedef Unk80275F24 H;
@@ -39,6 +40,7 @@ inline float AbsF(float v)
 extern "C++" {
 float fn_8037AF10(void* a, void* b, void* c, int d, int e);
 void fn_80278F1C(int a, int b, int c);
+Unk8027C728_Goal* fn_8027D31C(Unk8027C728_Goal* g);
 }
 
 int fn_80275FD4(S* self);
@@ -126,6 +128,32 @@ void fn_802771A0(void* p)
     lbl_806EF9D0 = p;
 }
 
+struct Unk802780B0_V {
+    char pad0[0x934];
+    Unk8027C728_Goal* m934;
+};
+
+int fn_802780B0(void* unused, Unk80270BA0_Obj* o, int* out)
+{
+    *out = 0;
+    Unk80270BA0_X* x = o->fn_vslot1();
+    for (int i = 0; i < 1; i++) {
+        if (lbl_8068D5E4[i].m0 == (Unk80270BA0_Obj*)x && ((Unk802780B0_V*)x)->m934 != 0) {
+            Unk8027C728_Goal* g = fn_8027D31C(((Unk802780B0_V*)x)->m934);
+            int k = lbl_8068D5E4[i].n - 1;
+            while (k >= 0 && g != 0) {
+                if (lbl_8068D5E4[i].g[k] != g)
+                    return 0;
+                if (g)
+                    g = g->m4;
+                k--;
+            }
+            return 1;
+        }
+    }
+    return 0;
+}
+
 int fn_802781AC(int x)
 {
     return (x + 60) % 30;
@@ -137,6 +165,44 @@ float fn_80278B10(void* a, void* b, void* c, float x)
     if (!(t >= x))
         x = t;
     return x;
+}
+
+float fn_8037AC20(void* a, void* b, void* c, int d, int e);
+
+float fn_80278B5C(int* out, float* a, float* b, char* c)
+{
+    float best = 100000000.0f;
+    float t = 100000000.0f;
+    int eq = 0;
+    if (b[0] == b[15])
+        eq = b[2] == b[17];
+    *out = eq;
+    if (eq) {
+        if (c != 0) {
+            best = fn_8037AC20(a, b, c, 1, 0);
+        } else {
+            best = (b[0] - a[0]) * (b[0] - a[0]) + (b[2] - a[2]) * (b[2] - a[2]);
+        }
+    } else if (c != 0) {
+        int pc = (int)c;
+        int pb = (int)b;
+        int end = pc + 0x3C;
+        do {
+            t = fn_8037AF10(a, (void*)pb, (void*)pc, 1, 0);
+            if (!(t >= best))
+                best = t;
+            pc += 12;
+            pb += 12;
+        } while (pc <= end);
+    } else {
+        char* b2 = (char*)b + 12;
+        best = fn_80278B10(a, b, b2, best);
+        best = fn_80278B10(a, b, (char*)b + 24, best);
+        best = fn_80278B10(a, b, (char*)b + 36, best);
+        best = fn_80278B10(a, b2, (char*)b + 48, best);
+        best = fn_80278B10(a, b2, (char*)b + 60, best);
+    }
+    return best;
 }
 
 void fn_80278EFC(int a, int b, int c)

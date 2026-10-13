@@ -54,6 +54,74 @@ void fn_8026C630()
     fn_8026AA0C(1, 0xFFFF);
 }
 
+struct Unk8026C8FC_V4 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+extern Unk8026C8FC_V4 lbl_8069429C;
+extern V3 lbl_806055AC;
+
+struct Unk8026C8FC_B {
+    int m0;
+    char pad4[0x5C];
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    float m70;
+    float m74;
+    float m78;
+    Unk8026C8FC_V4 m7C;
+    float m8C;
+    float m90;
+    float m94;
+    inline void Reset()
+    {
+        m0 = 0;
+        m6C = 0;
+        m94 = 1.0f;
+        m90 = 1.0f;
+        m8C = 1.0f;
+        m78 = 0.0f;
+        m74 = 0.0f;
+        m70 = 0.0f;
+        m7C = lbl_8069429C;
+        m68 = 0.0f;
+        m64 = 0.0f;
+        m60 = 0.0f;
+    }
+};
+
+struct Unk8026C8FC_M : Unk8026C8FC_B {
+    char pad98[0x240 - 0x98];
+    int m240;
+    char pad244[0x264 - 0x244];
+    int m264;
+    char pad268[0x280 - 0x268];
+    Unk8026C8FC_B m280;
+    char pad318[0x320 - 0x318];
+    V3 m320;
+    V3 m32C;
+    V3 m338;
+    V3 m344;
+    float m350;
+};
+
+void fn_8026C8FC(Unk8026C8FC_M* s)
+{
+    s->Reset();
+    s->m240 = 1;
+    s->m264 = 1;
+    s->m320 = lbl_806055AC;
+    s->m32C = lbl_806055AC;
+    s->m338 = lbl_806055AC;
+    s->m344 = lbl_806055AC;
+    s->m280.Reset();
+    s->m350 = 0.0f;
+}
+
 void fn_8026CA58() {}
 
 void fn_8026CA5C(M* self)
@@ -175,6 +243,138 @@ int fn_8026CF70(O* self, Unk8026CF70_P* p, int* out1, int* out2, float* fp)
             *out2 = fn_8026CE60(*out1, p->m60);
             r = 1;
         }
+    }
+    return r;
+}
+
+int fn_8026CFF8(int sel, float* p, int flag, Unk80273498_Vec3* out)
+{
+    const float k = 15.0f;
+    int r = 1;
+    Unk80273498_Vec3 v = fn_8014E388(sel);
+    switch (sel) {
+    case 3:
+        if (out != 0)
+            v.x = v.x + 18.0f;
+        else
+            v.x = v.x + k;
+        r = p[0] > v.x;
+        break;
+    case 1:
+        if (flag == 0) {
+            v.z = v.z - k;
+            r = p[2] < v.z;
+        } else {
+            v.x = v.x - k;
+            r = p[0] < v.x;
+        }
+        break;
+    case 0:
+        if (flag != 0) {
+            v.z = v.z - k;
+            r = p[2] < v.z;
+        } else {
+            v.x = v.x + k;
+            r = p[0] > v.x;
+        }
+        break;
+    case 2:
+        if (flag != 0) {
+            v.z = v.z + k;
+            r = p[2] > v.z;
+        } else {
+            v.x = v.x - k;
+            r = p[0] < v.x;
+        }
+        break;
+    }
+    if (out != 0)
+        *out = v;
+    return r;
+}
+
+float fn_802D7E88(int a, int b);
+
+int fn_8026D184(int a, int flag)
+{
+    float t = fn_802D7E88(a, 0xBD);
+    float u = t;
+    if (flag != 0) {
+        float w = fn_802D7E88(a, 0xBC);
+        float unused;
+        float p = t;
+        float q = w;
+        float d = p - q;
+        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        u = d;
+    } else {
+        u = t + 1.5707964f;
+        if (!(u <= 3.1415927f))
+            u = u - 6.2831855f;
+    }
+    int r;
+    if (!(u <= -0.3926991f)) {
+        if (!(u <= 1.1780972f)) {
+            if (!(u <= 1.9634955f)) {
+                r = 3;
+                if (!(u <= 2.7488937f))
+                    r = 4;
+            } else {
+                r = 2;
+            }
+        } else {
+            r = u > 0.3926991f;
+        }
+    } else if (!(u <= -1.9634955f)) {
+        r = 6;
+        if (!(u <= -1.1780972f))
+            r = 7;
+    } else {
+        r = 4;
+        if (!(u <= -2.7488937f))
+            r = 5;
+    }
+    return r;
+}
+
+int fn_8026D344(int a, int flag)
+{
+    float t = fn_802D7E88(a, 0xBC);
+    float u = t;
+    if (flag != 0) {
+        float w = fn_802D7E88(a, 0xBD);
+        float unused;
+        float p = t;
+        float q = w;
+        float d = p - q;
+        d -= (float)fn_80410634(d * 0.15915494f + 0.5f) * 6.2831855f;
+        u = d;
+    } else {
+        u = t + 1.5707964f;
+        if (!(u <= 3.1415927f))
+            u = u - 6.2831855f;
+    }
+    int r;
+    if (!(u <= -0.3926991f)) {
+        if (!(u <= 1.1780972f)) {
+            if (!(u <= 1.9634955f)) {
+                r = 3;
+                if (!(u <= 2.7488937f))
+                    r = 4;
+            } else {
+                r = 2;
+            }
+        } else {
+            r = u > 0.3926991f;
+        }
+    } else if (!(u <= -1.9634955f)) {
+        r = 6;
+        if (!(u <= -1.1780972f))
+            r = 7;
+    } else {
+        r = 4;
+        if (!(u <= -2.7488937f))
+            r = 5;
     }
     return r;
 }
