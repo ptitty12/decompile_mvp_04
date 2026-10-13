@@ -191,14 +191,15 @@ extern "C" int fn_803B02CC(int v)
     return m;
 }
 
-/* near-miss: one register: retail keeps masterchan in r0 (lha r0), we use r9; lha/short/inline-index variants tried */
+/* One channel pointer reused for both entries: a fresh pointer dies at the lha and pulls masterchan into its register. */
 extern "C" int fn_803B02FC(int v)
 {
     int idx = v + sndgs.sso.set.voicesdsp;
-    int m = ChanAt(sndgs.chan, idx)->masterchan;
+    CHANPUB* mc = ChanAt(sndgs.chan, idx);
+    int m = mc->masterchan;
     if (m == -1)
         return 0;
-    CHANPUB* mc = ChanAt(sndgs.chan, m);
+    mc = ChanAt(sndgs.chan, m);
     int i;
     for (i = 1; i <= 5; i++) {
         if (mc->voices[i] == idx)
