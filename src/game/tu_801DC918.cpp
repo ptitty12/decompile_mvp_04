@@ -29,6 +29,45 @@ extern const float lbl_805D3A78;
 extern const float lbl_805D3A88;
 extern const Vec3 lbl_805D6760[];
 
+struct Unk8026C414_O;
+struct Unk8026C414_X;
+int fn_8026D5FC(Unk8026C414_O* o, Unk8026C414_X* x);
+struct Unk801DCC1C_Sub {
+    char pad0[0x68];
+    int m68;
+};
+struct Unk801DCC1C_Rec {
+    char pad0[0x9C];
+    Unk801DCC1C_Sub* m9C;
+    char padA0[0x168 - 0xA0];
+    int m168;
+};
+struct Unk801DCC1C_X {
+    char pad0[4];
+    Unk801DCC1C_Rec* m4;
+};
+struct Unk801DCC1C_Obj {
+    char pad0[0x3B8];
+    Unk801DCC1C_X* m3B8;
+    int m3BC;
+};
+struct Unk801DCC1C_Ctx {
+    char pad0[0x700];
+    Unk801DCC1C_Obj* m700;
+};
+struct Unk801DCC1C_P {
+    char pad0[0x44C];
+    Unk801DCC1C_Ctx* m44C;
+    char pad450[8];
+    int m458;
+    char pad45C[4];
+    int m460;
+};
+extern "C" int fn_801BBC30(int x);
+extern "C" int fn_801BBC0C(int x);
+extern "C" int fn_801BBF24(int x);
+extern "C" Unk801DB948_Rt* fn_801A6DB8(Unk801DB948_Game* g);
+
 extern "C" {
 Unk801DB948_Game* fn_801DCC0C(W* self);
 int fn_801A2034(Unk801DB948_Game* g, int a);
@@ -201,6 +240,90 @@ extern "C" void fn_801DCBE8(W* self)
 extern "C" Unk801DB948_Game* fn_801DCC0C(W* self)
 {
     return self->m4->m9C->m0;
+}
+
+extern "C" int fn_801DCC1C(Unk801DCC1C_P* p, const Vec3* v)
+{
+    int r = 1;
+    Unk801DCC1C_Rec* rec = p->m44C->m700->m3B8->m4;
+    int k = rec->m168;
+    if ((unsigned)(k - 7) <= 1) {
+        int t = p->m44C->m700->m3BC;
+        int a = 0;
+        if (fn_801BBC30(t) != 0 || fn_801BBC0C(t) != 0 || fn_801BBF24(t) == 0)
+            a = 1;
+        switch (p->m458) {
+        case 0:
+            if (fn_8026D5FC((Unk8026C414_O*)p, 0) != 0) {
+            L8:
+                r = 8;
+                break;
+            }
+        case 2:
+        default:
+            r = 1;
+            if (a != 0)
+                r = 5;
+            break;
+        case 1:
+            if (p->m44C->m700->m3B8->m4->m9C->m68 == 1 || fn_801A6DB8((Unk801DB948_Game*)p->m44C)->m4 == 0) {
+                r = 0xC;
+            } else {
+                r = 1;
+                if (a != 0)
+                    r = 5;
+            }
+            break;
+        }
+    } else {
+        char* b = (char*)rec + 0x13C;
+        int off = p->m460 * 4;
+        int tbl = *(int*)(b + off);
+        switch (p->m458) {
+        case 0:
+            goto L8;
+        case 1:
+            switch (k) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+                r = 0xC;
+                break;
+            case 5:
+            case 6:
+                r = 0xD;
+                break;
+            case 9:
+                r = 0xD;
+                break;
+            case 7:
+            case 8:
+                break;
+            default:
+                r = 1;
+                break;
+            }
+            break;
+        case 6:
+        case 7:
+        case 8:
+            r = 2;
+            if (tbl == 1)
+                r = 4;
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        default:
+            r = 1;
+            if (tbl == 1)
+                r = 3;
+            break;
+        }
+    }
+    return r;
 }
 
 extern "C" int fn_801DCDCC(Unk801DD660_Sub* s)
