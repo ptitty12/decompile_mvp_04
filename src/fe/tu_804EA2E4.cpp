@@ -978,7 +978,6 @@ extern "C" FE_OVERLAY void fn_804EC9C4(FeS15* s)
     s->m160--;
 }
 
-/* near-miss: 99.7%; retail allocates the +0x17C pointer copy to r0 and the lha temps to r4 (ours r9/r0). Statement-order and declaration variants tried */
 extern "C" FE_OVERLAY void fn_804ECA60(FeS15* self)
 {
     fn_800ECAA4(self);
@@ -999,7 +998,8 @@ extern "C" FE_OVERLAY void fn_804ECA60(FeS15* self)
                     FeObj1* o = (FeObj1*)self->m17C[0];
                     int* p0 = self->m17C;
                     int h = o->m2C;
-                    int base = o->m28 - 3;
+                    int mm = o->m28;
+                    int base = mm - 3;
                     if (base >= 0) {
                         int k = 0;
                         int* pp = p0;
@@ -1014,7 +1014,8 @@ extern "C" FE_OVERLAY void fn_804ECA60(FeS15* self)
                                 break;
                             o = (FeObj1*)*++pp;
                             h = o->m2C;
-                            base = o->m28 - 3;
+                            mm = o->m28;
+                            base = mm - 3;
                         } while (base >= lim);
                     }
                 }
