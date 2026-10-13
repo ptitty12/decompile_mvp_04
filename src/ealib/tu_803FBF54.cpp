@@ -528,6 +528,61 @@ extern "C" void fn_803FD398(int, int, RcFile* f)
     }
 }
 
+/* near-miss: 96.5%; callee-saved registers rotated (retail: a=r27 job=r28 cr=r29 empty=r30; ours a=r28 job=r29 cr=r30 empty=r27) */
+extern "C" void fn_803FD494(RcFile* o, int a)
+{
+    char* job = 0;
+    fn_80400828(o->m4);
+    int empty;
+    RcNd* h = o->m6C;
+    if (h == 0)
+        empty = 1;
+    else if (h->m4 != 1) {
+        RcNd* nx = h->mC;
+        if (nx == 0)
+            empty = 1;
+        else {
+            o->m6C = nx;
+            empty = 0;
+        }
+    } else
+        empty = 0;
+    if (empty != 0) {
+        o->m44 = 0;
+    } else {
+        job = (char*)o->m6C;
+        int cur = RCI(o, 0x60);
+        RCI(job, 4) = 2;
+        RCI(job, 0x120) = cur;
+    }
+    fn_8040084C(o->m4);
+    if (empty == 0) {
+        RCI(o, 0x64) = RCI(o, 0x60);
+        if (RCI(job, 0x10) == 1) {
+            o->m17C = 0;
+        } else {
+            o->m17C = RCI(job, 0x118);
+            if (strcmp(job + 0x14, (char*)o + 0x78) != 0) {
+                strcpy((char*)o + 0x78, job + 0x14);
+                int k = o->m178;
+                if (k == 0) {
+                    int hd = fn_803F9C58((char*)o + 0x78, 1, a, o);
+                    o->m180 = hd;
+                    if (hd != 0)
+                        fn_803F96B0(hd, fn_803FD2F4);
+                } else {
+                    int hd = fn_803F9CE8(k, a, o);
+                    o->m180 = hd;
+                    if (hd != 0)
+                        fn_803F96B0(hd, fn_803FD33C);
+                }
+                return;
+            }
+        }
+        fn_803FD5F8(o, a);
+    }
+}
+
 extern "C" int fn_803FD944(int a, int b, int c)
 {
     int t1 = b * 0xc;
@@ -653,6 +708,89 @@ extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
             fn_803FD494(o, o->m48);
     }
     return n->m0;
+}
+
+struct RcHndV {
+    int m0, m4, m8;
+    unsigned char* mC;
+};
+/* near-miss: 2 slots; the loop-back compare value is r0 in retail (or r0,r9,r10; cmpw r0,r28), r9 here */
+extern "C" int fn_803FDFB4(RcHnd* h, unsigned char* data, int len, int tag)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC(h, &o, &p) != 0)
+        return 0;
+    RcNd* n = fn_803FCDCC(o);
+    if (n == 0)
+        return 0;
+    if (len == 0) {
+        unsigned char* q = data;
+        if (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) != tag) {
+            do {
+                const unsigned char* t = q + 4;
+                int sz = (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | q[4];
+                q += sz;
+                len += sz;
+            } while (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) != tag);
+        }
+        const unsigned char* t = q + 4;
+        len += (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | q[4];
+    }
+    RCI(n, 0x114) = (int)data;
+    RCI(n, 0x118) = len;
+    RCI(n, 0x11c) = tag;
+    RCI(n, 0x10) = 1;
+    fn_803FCE50(o, n);
+    fn_80400828(o->m4);
+    int was = o->m44;
+    if (was == 0)
+        o->m44 = 1;
+    fn_8040084C(o->m4);
+    if (was == 0)
+        fn_803FD494(o, 0);
+    return n->m0;
+}
+
+/* near-miss: 2 slots; retail schedules slwi before the mr r4,r9 copy of the handle in the first loop test */
+extern "C" unsigned char* fn_803FE660(RcHnd* hnd)
+{
+    RcFile* o;
+    RcHndV* h;
+    if (fn_803FCCCC(hnd, &o, (RcHnd**)&h) != 0)
+        return 0;
+    {
+        if (h->m8 == 0)
+            return 0;
+        unsigned char* p = h->mC;
+        const unsigned char* t = p + 4;
+        unsigned sz = ((t[3] << 24) | (t[2] << 16) | (t[1] << 8) | p[4]) & 0xffffff;
+        p[4] = sz;
+        ((unsigned char*)t)[1] = sz >> 8;
+        ((unsigned char*)t)[2] = sz >> 16;
+        ((unsigned char*)t)[3] = sz >> 24;
+        fn_80400828(o->m4);
+        int rem = h->m8 - sz;
+        h->m8 = rem;
+        fn_8040084C(o->m4);
+        if (rem > 0) {
+            unsigned char* q = p + sz;
+            int key = h->m4 << 24;
+            if ((q[7] << 24) != key) {
+                do {
+                    if (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) == -1)
+                        q = (unsigned char*)o->pad3C;
+                    else {
+                        const unsigned char* t2 = q + 4;
+                        sz = ((t2[3] << 24) | (t2[2] << 16) | (t2[1] << 8) | q[4]) & 0xffffff;
+                        q += sz;
+                    }
+                } while ((q[7] << 24) != key);
+            }
+            h->mC = q;
+        }
+        return p;
+    }
 }
 
 extern "C" void fn_803FE7E0(RcHnd* h, char* p)
