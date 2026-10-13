@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8034B370.h"
+extern "C" void* memcpy(void*, const void*, unsigned);
 #include "game/tu_803606B0.h"
 
 extern char lbl_8064A208[];
@@ -288,9 +289,9 @@ void fn_80353FF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
     unsigned cur;
     if (st->v2() == 1) {
         unsigned i = 0;
-        fn_8040B190(*cursor, &self->m4, 4);
+        memcpy(*cursor, &self->m4, 4);
         *cursor += 4;
-        fn_8040B190(*cursor, &self->mC, 4);
+        memcpy(*cursor, &self->mC, 4);
         *cursor += 4;
         for (; i < self->m4; i++) {
             int o = i * 4;
@@ -299,9 +300,9 @@ void fn_80353FF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
         }
     } else {
         unsigned j;
-        fn_8040B190(&cnt, *cursor, 4);
+        memcpy(&cnt, *cursor, 4);
         *cursor += 4;
-        fn_8040B190(&cur, *cursor, 4);
+        memcpy(&cur, *cursor, 4);
         *cursor += 4;
         if (st->m0 == 0) {
             self->m4 = cnt;
