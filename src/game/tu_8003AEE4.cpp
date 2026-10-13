@@ -535,6 +535,7 @@ void fn_8003E53C(Unk8003A5DC* self, int a);
 extern "C" float fn_8018CDB8(Unk8003C388_Pos* p, int a, float f);
 extern "C" void fn_8018959C(Unk8003C388_Vec3* out, Unk8003C388_Pos* p, float t);
 extern "C" float fn_804028E4(float x);
+extern "C" int rand();
 extern int lbl_805B0C78;
 extern const float lbl_805A75EC;
 extern const float lbl_805A75F0;
@@ -581,9 +582,9 @@ extern "C" void fn_8003C388(Unk8003A5DC* self, int a, int b, unsigned c, int d)
                 }
             }
         } else if (b != 0) {
-            if (self->m138 == 1 && fn_8040ABA0() % 100 <= 0x1D)
+            if (self->m138 == 1 && rand() % 100 <= 0x1D)
                 fn_8003D944(self, 0xD, c >> 1, self->m138, self->m130);
-        } else if (d != 0 && self->m138 == 1 && fn_8040ABA0() % 100 <= 0x1D) {
+        } else if (d != 0 && self->m138 == 1 && rand() % 100 <= 0x1D) {
             fn_8003D944(self, 0xE, c >> 1, self->m138, self->m130);
         }
         if (t == 0 && self->m184 != -1)
