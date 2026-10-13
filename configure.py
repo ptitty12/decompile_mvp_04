@@ -1237,7 +1237,7 @@ config.libs = [
             Object(Matching, "libm/k_sin.cpp"),
             Object(Matching, "libm/e_rem_pio2.cpp"),
             Object(Matching, "libm/kf_cos.cpp"),
-            Object(NonMatching, "libm/kf_sin.cpp"),
+            Object(Matching, "libm/kf_sin.cpp"),
             Object(Matching, "libm/kf_tan.cpp"),
             Object(Matching, "libm/ef_rem_pio2.cpp"),
             Object(Matching, "libm/k_rem_pio2.cpp"),

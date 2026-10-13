@@ -2319,6 +2319,7 @@ libm/kf_cos.cpp:
 
 libm/kf_sin.cpp:
 	.text       start:0x80411E68 end:0x80411F14
+	.sdata      start:0x806EF03C end:0x806EF058 align:4
 
 libm/kf_tan.cpp:
 	.text       start:0x80411F14 end:0x80412128
