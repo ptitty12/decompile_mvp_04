@@ -300,7 +300,7 @@ void fn_80042EA8(int a, int b);
 int fn_8040ABA0();
 int fn_80044D90(int a, int b);
 void fn_800450A8(int a, int b, int c, int d, int e, Unk8001D47C_Mid* f);
-void fn_80045388(int a, int b, int c, int d, int e, Unk8001D47C_Mid* f, int* g, int* h, int* i);
+extern "C" void fn_80045388(int a, int b, int c, int d, int e, Unk8001D47C_Mid* f, int* g, int* h, int* i);
 void fn_80043628(int a);
 void fn_80046024(int a, float b);
 
