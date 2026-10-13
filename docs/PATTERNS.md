@@ -1575,3 +1575,36 @@ Shapes:
 - Data walls not solved yet:
   - by-value Date stores into the frame: (mem (addressof)) at a nonzero offset is forced into a register, and CSE merges the two;
   - a peeled first iteration that is not constant-folded (`lbzx` with the zero register; fn_80097318 and its siblings).
+
+
+## Matched twins for existing near-misses (Codex, 2026-10-13)
+
+Run `tools/match/clone.py --scan` before expensive random search, even if the
+remaining functions already have definitions. The scan finds exact retail
+instruction-shape twins, but normal clone mode skips existing definitions. That
+skip does not mean a twin is useless: compare the matched twin's source manually,
+retain the target's symbols/types/section, score a scratch copy, then run the full
+build, literal/target check and verifier. Do not copy relocation targets blindly.
+
+Confirmed examples:
+- `snd/tu_803A9204` iSNDrandom: twin `ealib/tu_804027DC` fn_804027DC. The same
+  six-word generator has array vs struct storage. Three volatile intermediate
+  stores preserve the later carry reloads; adapt the state accesses, not its
+  extern declaration. Reached 66/66 instructions, +264 bytes.
+- `fe/tu_8051E878` fn_8051F784: twin fn_8051FA24 in the same unit. The final
+  s9 call belongs after the conditional, so both arms execute it. Reached 49/49.
+- `ealib/tu_803D2B20` fn_803D2B64: twin `ealib/tu_803CECA4` fn_803D189C.
+  Use a separate difference temporary and `x >= hi` (not `!(x < hi)`, which
+  differs for NaNs). Reached 23/23.
+- `game/tu_8011243C` fn_8011489C: twin `game/tu_801164AC` fn_80117BBC.
+  Its 8-byte event needs an empty destructor to select the old compiler's
+  object mode. Explicit id/vptr stores with a plain trivial struct were 54
+  instructions; the empty-destructor form is the exact 52-instruction target.
+- `game/tu_801A57C8` fn_801A7CBC: twin `game/tu_800B5C68` fn_800B7FC4.
+  A 16-byte character buffer and explicit calls to fn_8035682C / fn_800B64BC
+  reproduce register priority; the class-constructor form swapped r30/r31.
+  Reached 32/32. The target's string remains lbl_805CEB0C.
+
+Each example passed the unmodified verifier without regressions. A twin is a
+starting point; differing prototypes, flags or object modes can still prevent a
+match. Avoid copying a donor's guessed behavior when its retail shape differs.
