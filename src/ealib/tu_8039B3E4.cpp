@@ -133,31 +133,29 @@ void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
     }
 }
 
-/* near-miss: same instruction count; scratch registers are numbered differently. */
 void fn_8039B47C(const unsigned char* p, int* out)
 {
-    unsigned c0, A, B, C, E, G;
     out[11] = ((unsigned)p[0] * p[1]) >> 8;
     out[0] = ((unsigned)p[0] * (255U - p[1])) >> 8;
-    c0 = 255U - p[0];
-    out[1] = (c0 * p[2]) >> 8;
-    A = (c0 * (255U - p[2])) >> 8;
-    B = (A * p[3]) >> 8;
-    out[2] = (B * p[4]) >> 8;
-    C = (B * (255U - p[4])) >> 8;
-    out[3] = (C * p[5]) >> 8;
-    out[4] = (C * (255U - p[5])) >> 8;
-    A = (A * (255U - p[3])) >> 8;
-    E = (A * p[6]) >> 8;
-    out[5] = (E * p[7]) >> 8;
-    out[6] = (E * (255U - p[7])) >> 8;
-    A = (A * (255U - p[6])) >> 8;
-    G = (A * p[8]) >> 8;
-    out[7] = (G * p[9]) >> 8;
-    out[8] = (G * (255U - p[9])) >> 8;
-    A = (A * (255U - p[8])) >> 8;
-    out[9] = (A * p[10]) >> 8;
-    out[10] = (A * (255U - p[10])) >> 8;
+    unsigned root = 255U - p[0];
+    out[1] = (root * p[2]) >> 8;
+    root = (root * (255U - p[2])) >> 8;
+    unsigned t = (root * p[3]) >> 8;
+    out[2] = (t * p[4]) >> 8;
+    t = (t * (255U - p[4])) >> 8;
+    out[3] = (t * p[5]) >> 8;
+    out[4] = (t * (255U - p[5])) >> 8;
+    root = (root * (255U - p[3])) >> 8;
+    t = (root * p[6]) >> 8;
+    out[5] = (t * p[7]) >> 8;
+    out[6] = (t * (255U - p[7])) >> 8;
+    root = (root * (255U - p[6])) >> 8;
+    t = (root * p[8]) >> 8;
+    out[7] = (t * p[9]) >> 8;
+    out[8] = (t * (255U - p[9])) >> 8;
+    root = (root * (255U - p[8])) >> 8;
+    out[9] = (root * p[10]) >> 8;
+    out[10] = (root * (255U - p[10])) >> 8;
 }
 
 void fn_8039B5D8(const unsigned char* p, int* out)
