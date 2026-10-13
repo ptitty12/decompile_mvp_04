@@ -163,7 +163,7 @@ extern "C" int fn_8057CDB8(DbIdList* self, int k);
 extern "C" int fn_8057CE00(int a);
 extern "C" int fn_8057CED4(int a, int b);
 extern "C" void fn_8057CF60(int a, int b);
-extern "C" void fn_8057CFA8(int a, int b);
+extern "C" DbRows* fn_8057CFA8(int a, int b);
 extern "C" int fn_8057D084(int a);
 extern "C" int fn_8057D0F0(int a);
 extern "C" int fn_8057D15C(int a);
@@ -238,18 +238,18 @@ extern "C" DB_OVERLAY void fn_8057CF60(int a, int b)
     fn_8007B320__18Unk8007B2B0_Screenii(s, fn_80083FC0__Fi(b), a);
 }
 
-extern "C" DB_OVERLAY void fn_8057CFA8(int a, int b)
+extern "C" DB_OVERLAY DbRows* fn_8057CFA8(int a, int b)
 {
     if (fn_80084954__FPv(a) == 1) {
         int id = fn_8008463C__Fi(a);
         DbHost* h = fn_800A3A10(lbl_80619948, id);
         if (fn_8057D15C(id) == 0 || b == 1)
-            h->v8(a);
+            return h->v8(a);
         else
-            h->v9(a);
+            return h->v9(a);
     } else {
         int id = fn_8008463C__Fi(a);
-        fn_800A3A10(lbl_80619948, id)->v4(a);
+        return fn_800A3A10(lbl_80619948, id)->v4(a);
     }
 }
 
