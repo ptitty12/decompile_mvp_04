@@ -54,6 +54,74 @@ void fn_8026C630()
     fn_8026AA0C(1, 0xFFFF);
 }
 
+struct Unk8026C8FC_V4 {
+    int a;
+    int b;
+    int c;
+    int d;
+};
+extern Unk8026C8FC_V4 lbl_8069429C;
+extern V3 lbl_806055AC;
+
+struct Unk8026C8FC_B {
+    int m0;
+    char pad4[0x5C];
+    float m60;
+    float m64;
+    float m68;
+    int m6C;
+    float m70;
+    float m74;
+    float m78;
+    Unk8026C8FC_V4 m7C;
+    float m8C;
+    float m90;
+    float m94;
+    inline void Reset()
+    {
+        m0 = 0;
+        m6C = 0;
+        m94 = 1.0f;
+        m90 = 1.0f;
+        m8C = 1.0f;
+        m78 = 0.0f;
+        m74 = 0.0f;
+        m70 = 0.0f;
+        m7C = lbl_8069429C;
+        m68 = 0.0f;
+        m64 = 0.0f;
+        m60 = 0.0f;
+    }
+};
+
+struct Unk8026C8FC_M : Unk8026C8FC_B {
+    char pad98[0x240 - 0x98];
+    int m240;
+    char pad244[0x264 - 0x244];
+    int m264;
+    char pad268[0x280 - 0x268];
+    Unk8026C8FC_B m280;
+    char pad318[0x320 - 0x318];
+    V3 m320;
+    V3 m32C;
+    V3 m338;
+    V3 m344;
+    float m350;
+};
+
+void fn_8026C8FC(Unk8026C8FC_M* s)
+{
+    s->Reset();
+    s->m240 = 1;
+    s->m264 = 1;
+    s->m320 = lbl_806055AC;
+    s->m32C = lbl_806055AC;
+    s->m338 = lbl_806055AC;
+    s->m344 = lbl_806055AC;
+    s->m280.Reset();
+    s->m350 = 0.0f;
+}
+
 void fn_8026CA58() {}
 
 void fn_8026CA5C(M* self)
