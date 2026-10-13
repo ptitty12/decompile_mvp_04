@@ -109,6 +109,57 @@ int fn_8004390C(int a)
 /* near-miss: 30/30 slots; retail emits "li r10,1" after the first null
  * test and the pointer loads; every spelling tried (if/else, ternary, &&)
  * schedules it differently. */
+extern const float lbl_805A8E3C;
+extern const float lbl_805A8E40;
+extern const float lbl_805A8E44;
+inline float Unk80043940_Abs(float v) { return (float)__builtin_fabs(v); }
+
+extern "C" int fn_80043940(int a, float x, float y)
+{
+    int r = 0;
+    if (a == 0) {
+        if (!(x <= lbl_805A8E3C)) {
+            r = 4;
+            if (y > lbl_805A8E3C)
+                r = 0x44;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x84;
+        } else if (!(x >= lbl_805A8E3C)) {
+            r = 8;
+            if (y > lbl_805A8E3C)
+                r = 0x18;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x28;
+        }
+    } else {
+        if (!(x >= lbl_805A8E3C)) {
+            r = 4;
+            if (!(y <= lbl_805A8E3C))
+                r = 0x44;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x84;
+        } else if (!(x <= lbl_805A8E3C)) {
+            r = 8;
+            if (!(y <= lbl_805A8E3C))
+                r = 0x18;
+            else if (!(y >= lbl_805A8E3C))
+                r = 0x28;
+        }
+    }
+    if (!(Unk80043940_Abs(y) >= lbl_805A8E40) && !(Unk80043940_Abs(x) >= lbl_805A8E40)
+        && (Unk80043940_Abs(y) >= lbl_805A8E40 || x != lbl_805A8E3C))
+        r |= 0x400;
+    if (!(Unk80043940_Abs(y) >= lbl_805A8E44) && !(Unk80043940_Abs(x) >= lbl_805A8E44))
+        r |= 0x100;
+    else
+        r |= 0x200;
+    if (!(y <= lbl_805A8E3C))
+        r |= 1;
+    else if (!(y >= lbl_805A8E3C))
+        r |= 2;
+    return r;
+}
+
 int fn_80043B00(Unk80043B00_Pl* a, Unk80043B00_Pl* b, Unk80043B00_Pl* c)
 {
     int x;
