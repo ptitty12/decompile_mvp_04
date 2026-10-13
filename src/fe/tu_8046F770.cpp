@@ -465,15 +465,16 @@ FE_OVERLAY void fn_80470710(FeScrL* x, int a)
     x->fn_vslot8(0);
 }
 
-/* near-miss: 4 slots; retail puts the 0 in r9 and the 1 in r0 (we swap them); all 120 store orders tried */
+/* The assignment in the first call preserves retail zero/one register scheduling. */
 FE_OVERLAY void fn_804707B8(FeScrL* x, int a)
 {
-    x->m334 = 0;
+    int zero;
     x->m338 = 1;
+    x->m334 = 0;
     x->m324 = a;
     x->m314 = 0xD;
     x->m330 = 4;
-    x->fn_vslot89(0);
+    x->fn_vslot89(zero = 0);
     x->fn_vslot8(0);
 }
 
