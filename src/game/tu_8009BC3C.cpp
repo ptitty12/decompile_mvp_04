@@ -10,6 +10,24 @@ extern const char lbl_805B3B4C[];
 extern "C" void fn_8009CBC8(void* o, int x);
 extern "C" void fn_8009CF6C(void* o, int x);
 extern "C" void fn_8009D0D4(void* o);
+extern char lbl_8064B218[];
+extern float lbl_805B5960;
+extern "C" void fn_8009CCB0(Obj3* o, int* out, int n);
+extern "C" int fn_8009CDC8(void* self, int* arr);
+extern "C" void fn_8009CE1C(void* o, int idx, int* arr, ByteVec* v);
+extern "C" float fn_8056FFB0();
+extern "C" unsigned char fn_8007DE50__FP13Unk8007DB74_Aiii(int g, int a, int group, int idx);
+extern "C" unsigned char fn_8007DFF4__FP13Unk8007DB74_Aiii(int g, int a, int group, int idx);
+extern "C" int fn_8007E060__FP13Unk8007DB74_Aiii(int g, int a, int group, int idx);
+extern "C" unsigned fn_8007E0E4__FP13Unk8007DB74_Aii(int g, int a, int group);
+int fn_8007668C(int a, int b);
+extern "C" void fn_8008D850(void* p, int k, int id, int v);
+struct W;
+float fn_8007189C(W* w, int a, int b);
+extern float lbl_805B5964, lbl_805B5968, lbl_805B596C, lbl_805B5970, lbl_805B5974, lbl_805B5978;
+extern "C" int fn_8009D248(Obj3* o, int idx, ByteVec* v, int flag);
+int fn_80076644(int a, int b, int c);
+extern "C" int fn_8008CFD8(void* p, int a, int b);
 
 extern int lbl_8061930C;
 struct Unk8007F198_A;
@@ -26,6 +44,47 @@ struct TailE48_8009C398 {
     unsigned char mE48[25];
 };
 extern "C" Sub198* fn_80096244(Sub198* d, Sub198* s);
+
+inline int Clamp15_9BC3C(int t)
+{
+    int v;
+    if (t <= 15) {
+        v = t;
+        if (v < 0)
+            v = 0;
+    } else
+        v = 15;
+    return v;
+}
+extern "C" void fn_8009BC3C(Obj3* o)
+{
+    volatile int sp = 1;
+    int i = 1;
+    do {
+        unsigned char b = o->m17C[i];
+        char* p = (char*)o + 0xC9C;
+        int a = fn_8008CFD8(p, 5, b);
+        int c = fn_8008CFD8(p, 6, b);
+        int x = fn_8007668C(*(int*)&sp, a);
+        int y = fn_8007668C(*(int*)&sp, c);
+        if (x == 0) {
+            int d = 1;
+            if (y == 0)
+                d = 5;
+            fn_8008D850(p, 0xF, b, Clamp15_9BC3C(fn_8008CFD8(p, 0xF, b) - d));
+            fn_8008D850(p, 0x10, b, Clamp15_9BC3C(fn_8008CFD8(p, 0x10, b) - d));
+            fn_8008D850(p, 0xE, b, Clamp15_9BC3C(fn_8008CFD8(p, 0xE, b) - d));
+        }
+        int cc = sp;
+        int t;
+        if (cc > 9)
+            t = cc;
+        else
+            t = cc + 1;
+        sp = t;
+        i = t;
+    } while (i <= 8);
+}
 
 extern "C" void fn_8009C398(Obj3* o)
 {
@@ -77,6 +136,58 @@ extern "C" void fn_8009C498(Obj3* o)
     }
 }
 
+inline void Set8009C54C(ByteVec* v, unsigned i, unsigned char c)
+{
+    if (i >= v->m4)
+        v->m4 = i + 1;
+    v->m0[i] = c;
+}
+extern "C" void fn_8009C54C(Obj3* o, int mode)
+{
+    if (o->m164 != mode) {
+        int g = lbl_8061930C;
+        int f = 0;
+        if (mode == 0 || mode == 2)
+            f = 1;
+        o->m164 = mode;
+        volatile int sp = 0;
+        int i = 0;
+        unsigned char first = o->m17C[0];
+        do {
+            unsigned char k;
+            if (i != 0) {
+                if (i != 9 || f != 0)
+                    k = fn_8007DE50__FP13Unk8007DB74_Aiii(g, o->m198.m0, mode, i);
+                else
+                    k = 0xFF;
+            } else
+                k = first;
+            if (k != 0xFF)
+                o->m17C[sp] = k;
+            int cc = sp;
+            int t;
+            if (cc > 9)
+                t = cc;
+            else
+                t = cc + 1;
+            sp = t;
+            i = t;
+        } while (i <= 9);
+        unsigned j = 0;
+        unsigned n = fn_8007E0E4__FP13Unk8007DB74_Aii(g, o->m198.m0, mode);
+        if (j < n) {
+            do {
+                unsigned char b = fn_8007DFF4__FP13Unk8007DB74_Aiii(g, o->m198.m0, mode, j);
+                if (fn_8007E060__FP13Unk8007DB74_Aiii(g, o->m198.m0, mode, j) == 0)
+                    Set8009C54C(&o->m168, j, first);
+                else
+                    Set8009C54C(&o->m168, j, b);
+                j++;
+            } while (j < n);
+        }
+    }
+}
+
 extern "C" void fn_8009CB5C(void* o, int kind, int x)
 {
     if (kind != 0) {
@@ -96,6 +207,28 @@ extern "C" void fn_8009CB5C(void* o, int kind, int x)
 
 extern int lbl_80619780[10][5];
 extern "C" int fn_8008CFD8(void* p, int a, int b);
+
+extern "C" void fn_8009CBC8(void* ov, int x)
+{
+    Obj3* o = (Obj3*)ov;
+    unsigned char buf[10];
+    ByteVec v;
+    ByteVec* q = &v;
+    int arr[10];
+    v.m0 = buf;
+    v.vptr10 = lbl_8064B218;
+    q->m8 = 10;
+    fn_8040074C(v.m0, v.m8);
+    q->m4 = 0;
+    *(int*)q->padC = 0;
+    fn_8009CCB0(o, arr, x);
+    int idx;
+    while ((idx = fn_8009CDC8(o, arr)) != -1 && v.m4 <= 1) {
+        if ((int)(fn_8056FFB0() * lbl_805B5960) <= arr[idx])
+            fn_8009CE1C(o, idx, arr, &v);
+        arr[idx] = 0;
+    }
+}
 
 /* near-miss: register choice only (retail keeps the loaded table value in r0 and the byte offset in r9) */
 extern "C" void fn_8009CCB0(Obj3* o, int* out, int n)
@@ -190,6 +323,93 @@ int fn_80089AA0(Unk80089894_PackTabD* self, unsigned t, unsigned i);
 extern "C" float fn_8056FFB0();
 extern "C" void fn_8009D9AC(Obj3* o);
 
+extern "C" void fn_8009CE1C(void* ov, int idx, int* arr, ByteVec* v)
+{
+    Obj3* o = (Obj3*)ov;
+    if (fn_8009D248(o, idx, v, 0) == 0) {
+        volatile int sp8 = 0;
+        int found = -1;
+        int i = 0;
+        do {
+            if (i != idx && i != 0) {
+                unsigned char b = o->m17C[i];
+                if (b != 0xFF) {
+                    char* base = (char*)o + 0xC9C;
+                    int a = fn_8008CFD8(base, 5, b);
+                    int c = fn_8008CFD8(base, 6, b);
+                    if (fn_80076644(idx, a, c) == 1) {
+                        found = sp8;
+                        break;
+                    }
+                }
+            }
+            int cc = sp8;
+            int t;
+            if (cc > 9)
+                t = cc;
+            else
+                t = cc + 1;
+            sp8 = t;
+            i = t;
+        } while (i <= 9);
+        if (found != -1) {
+            unsigned char* l = o->m17C;
+            unsigned char x = l[found];
+            unsigned char y = l[idx];
+            l[idx] = x;
+            l[found] = y;
+            if (fn_8009D248(o, found, v, 0) == 0)
+                fn_8009D248(o, found, v, 1);
+            arr[found] = 0;
+        } else
+            fn_8009D248(o, idx, v, 1);
+    }
+}
+
+/* near-miss 96.9%: register choice only (retail loads the product operand into f13 and the constant into f12; the lis registers follow) */
+extern "C" void fn_8009CF6C(void* ov, int x)
+{
+    Obj3* o = (Obj3*)ov;
+    unsigned char buf[10];
+    ByteVec v;
+    ByteVec* q = &v;
+    v.m0 = buf;
+    v.vptr10 = lbl_8064B218;
+    q->m8 = 10;
+    fn_8040074C(v.m0, v.m8);
+    q->m4 = 0;
+    *(int*)q->padC = 0;
+    float f;
+    float g;
+    float r;
+    float h;
+    volatile int sp = 1;
+    int i = 1;
+    do {
+        unsigned char b = o->m17C[i];
+        if (b != 0xFF) {
+            f = fn_8007189C((W*)((char*)o + 0xC9C), 0x12, b);
+            g = f * lbl_805B5964 + lbl_805B5968;
+            r = fn_8056FFB0();
+            h = lbl_805B5970 - lbl_805B596C * g;
+            if (!(h >= lbl_805B5974))
+                h = lbl_805B5974;
+            if (!(h <= lbl_805B5978))
+                h = lbl_805B5978;
+            if (r < h || o->m3E8[b].m4 == 1)
+                fn_8009D248(o, sp, &v, 0);
+        }
+        int cc = sp;
+        int t;
+        if (cc > 9)
+            t = cc;
+        else
+            t = cc + 1;
+        sp = t;
+        i = t;
+    } while (i <= 9);
+}
+
 /* near-miss: the ratio is stored in each arm of the ternary; retail joins them with one store */
 extern "C" void fn_8009D0D4(void* ov)
 {
@@ -266,6 +486,31 @@ extern "C" void fn_8009D9AC(Obj3* o)
 extern "C" int fn_8009DA60(Obj3* o, int x);
 extern "C" int fn_80097A9C(char* o, int a, int b, int c, int i);
 extern "C" int fn_80097A70(char* o, int a, int b, int i);
+
+extern "C" float fn_80097B60(Obj3* o, int a, int b, int c, int d);
+extern "C" int fn_8009764C(Obj3* o, int a, int b, int c);
+extern "C" void fn_800B555C();
+extern "C" int fn_800B5948();
+extern float lbl_805B5998;
+
+/* near-miss 95.3%: retail zeroes the first flag (li r0,0) before the lfs/fcmpu pair; the else form leaves it after the compare, and the init-first form keeps it live across the call */
+extern "C" int fn_8009DA60(Obj3* o, int x)
+{
+    int a;
+    if (fn_80097B60(o, 0, x, 2, 0) != lbl_805B5998)
+        a = 0;
+    else
+        a = !(o->m235 ^ 1);
+    int b = 0;
+    if (a)
+        b = fn_8009764C(o, 1, x, 0) > 8;
+    int c = 0;
+    if (b) {
+        fn_800B555C();
+        c = fn_800B5948() == 0;
+    }
+    return c;
+}
 
 extern "C" int fn_8009DB0C(Obj3* o, int x)
 {
