@@ -397,21 +397,19 @@ static inline int Kind9C524()
     }
     return r;
 }
-/* near-miss: 99.0%, only the kind selection differs: retail keeps the 0/1/2 value in r0 (li r0,2 after the cmpwi), ours puts it in r9 with li before the cmpwi */
 FE_OVERLAY void fn_8049C524(FeScrD* xx)
 {
     Fe9C524Scr* x = (Fe9C524Scr*)xx;
     fn_800ECF18(x);
     fn_8049D430((char*)x);
     FeW* w29 = fn_800C8044(x->fn_vslot32(lbl_805F57D0, 1));
-    int v;
     if (((Fe9C524St*)fn_800B555C())->m0 == 0x18) {
-        v = 0;
+        x->m334 = 0;
+    } else if (((Fe9C524St*)fn_800B555C())->m0 == 0x19) {
+        x->m334 = 1;
     } else {
-        int k = ((Fe9C524St*)fn_800B555C())->m0;
-        v = k == 0x19 ? 1 : 2;
+        x->m334 = 2;
     }
-    x->m334 = v;
     ((FeW*)fn_800B7A94(FeGetMgr(), lbl_805F4F20))->fn_vslot8(0);
     int sv = 0x190B;
     switch (FeI(x, 0x334)) {
