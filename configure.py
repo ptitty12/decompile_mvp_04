@@ -1254,7 +1254,7 @@ config.libs = [
         "cflags": cflags_dolphin_sdk,
         "progress_category": "sdk",
         "objects": [
-            Object(NonMatching, "dolphin/amcstubs/AmcExi2Stubs.c"),
+            Object(Matching, "dolphin/amcstubs/AmcExi2Stubs.c"),
             Object(NonMatching, "dolphin/ar/ar.c"),
             Object(Matching, "dolphin/ar/arq.c"),
             Object(NonMatching, "dolphin/ax/AX.c"),

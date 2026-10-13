@@ -24,7 +24,3 @@ AmcExiError EXI2_WriteN(const void *bytes, unsigned long length) {
 void EXI2_Reserve(void) {}
 
 void EXI2_Unreserve(void) {}
-
-int AMC_IsStub(void) {
-    return 1;
-}
