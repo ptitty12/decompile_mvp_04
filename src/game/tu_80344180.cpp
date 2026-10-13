@@ -11,10 +11,10 @@ extern char lbl_80649DA0[];
 extern char lbl_80649E50[];
 extern char lbl_80649E18[];
 extern char lbl_80649DE0[];
-void fn_80377408(void* p);
-void fn_80378620(void* p, int chrg);
+extern "C" void fn_80377408(void* p);
+extern "C" void fn_80378620(void* p, int chrg);
 unsigned int fn_80378568(const char* token, int len);
-char* fn_8040B61C(char* dst, const char* src);
+extern "C" char* strcpy(char* dst, const char* src);
 
 struct Rng { unsigned short lo; unsigned short hi; };
 struct K { char pad0[8]; Rng* m8; int pad; int* m10; };
@@ -167,7 +167,7 @@ unsigned int fn_80344408(Unk80344408* self)
 void fn_8034446C(char* self, const char* s)
 {
     *(int*)(self + 0x14) = 0;
-    fn_8040B61C(self, s);
+    strcpy(self, s);
 }
 
 void fn_80344494(char* self, int v)
@@ -491,3 +491,4 @@ Unk803B9D60_Rec* fn_80344D8C(Unk803B9D60_In3* s)
     fn_803BA240(lbl_80686E04, &r->m4, r);
     return r;
 }
+
