@@ -1560,6 +1560,7 @@ ealib/tu_80367658.cpp:
 ealib/tu_803682A8.cpp:
 	.text       start:0x803682A8 end:0x80368E64
 	.ctors      start:0x805A2C58 end:0x805A2C5C
+	.rodata     start:0x80603568 end:0x80603578 align:4
 	.bss        start:0x80693CE8 end:0x80693CFC
 
 ealib/tu_80368E64.cpp:
