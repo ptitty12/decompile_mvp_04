@@ -1,5 +1,6 @@
 """rv.py <unit> <sym> <startpat> <variants.txt> [--show N] [--apply N]
-Segment = the definition whose first line contains <startpat> (col 0) up to the next line == '}'.
+Segment = the definition whose first line contains <startpat> (col 0) up to the next line == '}'
+(so indent every inner block: a column-0 '}' inside the body ends the segment early).
 variants.txt: full replacement definitions separated by lines '//---'.
 Scores each against retail function <sym> (substring ok) with score_variants.py (from the repo root)."""
 import sys, os, subprocess, shutil
@@ -36,7 +37,8 @@ if apply is not None:
     open(srcp, 'w', newline='').write(txt.replace('\n', '\r\n') if crlf else txt)
     print('applied', apply)
     sys.exit(0)
-args = ['python', 'tools/match/score_variants.py', unit, sym] + [f'{D}/v{i:03d}.cpp' for i in range(len(vs))] + ['--relax']
+# Pass the directory, not one path per variant: Windows command lines overflow past a few dozen paths.
+args = ['python', 'tools/match/score_variants.py', unit, sym, D, '--relax']
 if show is not None:
     args = ['python', 'tools/match/score_variants.py', unit, sym, f'{D}/v{show:03d}.cpp', '--relax', '--show']
 r = subprocess.run(args, capture_output=True, text=True)

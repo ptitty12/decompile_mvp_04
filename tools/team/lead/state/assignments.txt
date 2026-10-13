@@ -1,15 +1,15 @@
 # worktree -> branch  status  unitsfile
 W1 work/p5-00  running  p5_00.txt
-W2 work/p5-13  running  p5_13.txt
-W3 work/p5-21  running  p5_21.txt
-W4 work/p5-04  running  p5_04.txt
-W5 work/p5-11  running  p5_11.txt
-W6 work/p5-26  running  p5_26.txt
-W7 work/p5-02  running  p5_02.txt
-W7s3 work/p5-09  running  p5_09.txt
+W2 work/p5-05  running  p5_05.txt
+W3 work/p5-07  running  p5_07.txt
+W4 work/p6-01  running  p6_01.txt
+W5 work/p5-06  running  p5_06.txt
+W6 work/p5-10  running  p5_10.txt
+W7 work/p6-03  running  p6_03.txt
+W7s3 work/p6-00  running  p6_00.txt
 W8 work/p5-25  running  p5_25.txt
-W9 work/p5-17  running  p5_17.txt
-W10 work/p5-14  running  p5_14.txt
+W9 work/p5-27  running  p5_27.txt
+W10 work/p6-02  running  p6_02.txt
 W11 work/p5-01  running  p5_01.txt
 W12 work/p5-12  running  p5_12.txt
 # next: tail_02..10, pass2_g21, g22, g12, g11, ...; db range-43 pass2
