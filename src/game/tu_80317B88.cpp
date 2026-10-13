@@ -85,7 +85,7 @@ int fn_803DBE18(void* p, int n);
 int fn_803DBE38(void* p, int n);
 int fn_803DBE20(void* p, int n);
 int fn_803DBE68(void* p, int n);
-void fn_803DBE78(void* p, int n);
+int fn_803DBE78(void* p, int n);
 void fn_803DBD54(void* p);
 void fn_803E6660(void* p);
 int fn_8040B574(const char* a, const char* b);
@@ -152,10 +152,11 @@ void fn_8031B250(FxC* self, int i, int a, float f, FxSrc* b);
 void fn_8031B27C(FxC* self, int i);
 void fn_8031B2A8(FxC* self, int i);
 void fn_8031A3D0(FxB* self, int arg);
-/* near-miss 95.6%: 103/103 insns, 34 slots differ: retail keeps the frame 8 bytes larger (hole at 0x10) and one more callee-saved register; vertex loop address registers differ */
 void fn_803185A0(Fx* self, int tex, FxV2b* pos, FxV2b* uv, int a7, void* col, int p9, int p10);
-/* near-miss 97.6%: 145/145 insns; retail keeps the record pointer in r31 and &sp14 in r30 (ours the other way round), and stores sp10 before sp8 */
 void fn_8031A948(const char* text, unsigned len, FxRec* arr, int* count);
+void fn_80317C94(Fx* self);
+void fn_80318F3C(Fx* self, FxPart* pp);
+void fn_803195A8(FxCfg* self);
 // PROTOS-END
 void fn_80319D78(FxB* self);
 void fn_80319938(FxCfg7* cfg, int on);
@@ -178,6 +179,67 @@ void fn_80317B88(Fx* self, int a) {
     fn_803E6708(self->mB8, 2);
     fn_803DBD84(self->m7C, 2);
     fn_80328374(self, a);
+}
+
+extern const float lbl_805E9C88;
+extern const float lbl_805E9C8C;
+extern "C" {
+int fn_803DBE44(void* p, int n);
+}
+void fn_80317C94(Fx* self)
+{
+    char tmp[60];
+    char* h = self->mB8;
+    fn_803DBD54(tmp);
+    char* m = self->m7C;
+    fn_803E67A0(h, (char*)self + 0x3C);
+    fn_803E6B3C(h);
+    fn_803E6950(h, lbl_805E89D4);
+    fn_803E69D8(h, lbl_805E89D4, lbl_8061FF54, 4, 1);
+    fn_803E69D8(h, lbl_805E89E0, self->m30, 0xC, 0x4B0);
+    fn_803E69D8(h, lbl_805E89EC, self->m34, 8, 0x4B0);
+    fn_803E69D8(h, lbl_805E89F0, self->m38, 4, 0x4B0);
+    fn_803DBDD8(m, 0x90);
+    fn_803DBE18(m, 1);
+    fn_803DBE38(m, 1);
+    fn_803DBE20(m, 0);
+    fn_803DBE68(m, 1);
+    fn_803DBE78(m, 1);
+    fn_803DBE44(m, 0);
+    fn_803E69D8(h, lbl_805E89F8, m, 0x3C, 1);
+    fn_803E69D8(h, lbl_805E8A00, (void*)lbl_8062C290, 0x40, 1);
+    fn_803E68B0(h, 0x90);
+    fn_803E6B74(h);
+    for (int i = 0; i < self->mF4; i++) {
+        int off = i * 0x98;
+        for (int k = 0; k < 4; k++) {
+            int o = k * 16;
+            char* b0 = (char*)(off + (int)self->m13C) + 0x10;
+            *(float*)(b0 + o) = lbl_805E9C88;
+            char* b1 = (char*)(off + (int)self->m13C) + 0x14;
+            *(float*)(b1 + o) = lbl_805E9C8C;
+            char* b2 = (char*)(off + (int)self->m13C) + 0x50;
+            *(float*)(b2 + o) = lbl_805E9C8C;
+            char* b3 = (char*)(off + (int)self->m13C) + 0x54;
+            *(float*)(b3 + o) = lbl_805E9C8C;
+        }
+    }
+    for (int i = 0; i < *(int*)((char*)self + 0xF8); i++) {
+        int off = i * 0x98;
+        for (int k = 0; k < 4; k++) {
+            int o = k * 16;
+            char* b0 = (char*)(off + (int)self->m140) + 0x10;
+            *(float*)(b0 + o) = lbl_805E9C88;
+            char* b1 = (char*)(off + (int)self->m140) + 0x14;
+            *(float*)(b1 + o) = lbl_805E9C8C;
+            char* b2 = (char*)(off + (int)self->m140) + 0x50;
+            *(float*)(b2 + o) = lbl_805E9C8C;
+            char* b3 = (char*)(off + (int)self->m140) + 0x54;
+            *(float*)(b3 + o) = lbl_805E9C8C;
+        }
+    }
+    fn_8031883C(self);
+    fn_803DBD84(tmp, 2);
 }
 
 void fn_80317F30(Fx* self, int a) { self->m24 = a; }
@@ -221,6 +283,7 @@ void fn_80318140(int a, int b, int c, float x1, float x2, float x3, float x4, in
 }
 
 extern "C" void fn_80317240(float* x, float* y, int a, int b);
+/* near-miss 95.6%: 103/103 insns, 34 slots differ: retail keeps the frame 8 bytes larger (hole at 0x10) and one more callee-saved register; vertex loop address registers differ */
 void fn_803185A0(Fx* self, int tex, FxV2b* pos, FxV2b* uv, int a7, void* col, int p9, int p10)
 {
     if (self->m118 < self->mF4) {
@@ -309,6 +372,53 @@ void fn_803188FC(Fx* self, int id) {
     self->m124[id] = 0;
     lbl_8061FF50 = 0;
     self->m24 = 0;
+}
+
+void fn_80318F3C(Fx* self, FxPart* pp)
+{
+    FxQb* p = (FxQb*)pp;
+    int i = self->m28 * 6;
+    ((FxV3*)self->m30)[i].x = p->a8[0].x;
+    ((FxV3*)self->m30)[i].y = p->a8[0].y;
+    ((FxV3*)self->m30)[i].z = p->a8[0].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[0].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[0].y;
+    ((int*)self->m38)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m30)[i].x = p->a8[1].x;
+    ((FxV3*)self->m30)[i].y = p->a8[1].y;
+    ((FxV3*)self->m30)[i].z = p->a8[1].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[1].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[1].y;
+    ((int*)self->m38)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m30)[i].x = p->a8[3].x;
+    ((FxV3*)self->m30)[i].y = p->a8[3].y;
+    ((FxV3*)self->m30)[i].z = p->a8[3].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[3].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[3].y;
+    ((int*)self->m38)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m30)[i].x = p->a8[0].x;
+    ((FxV3*)self->m30)[i].y = p->a8[0].y;
+    ((FxV3*)self->m30)[i].z = p->a8[0].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[0].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[0].y;
+    ((int*)self->m38)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m30)[i].x = p->a8[3].x;
+    ((FxV3*)self->m30)[i].y = p->a8[3].y;
+    ((FxV3*)self->m30)[i].z = p->a8[3].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[3].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[3].y;
+    ((int*)self->m38)[i] = p->m4;
+    i++;
+    ((FxV3*)self->m30)[i].x = p->a8[2].x;
+    ((FxV3*)self->m30)[i].y = p->a8[2].y;
+    ((FxV3*)self->m30)[i].z = p->a8[2].z;
+    ((FxV2b*)self->m34)[i].x = p->a48[2].x;
+    ((FxV2b*)self->m34)[i].y = p->a48[2].y;
+    ((int*)self->m38)[i] = p->m4;
 }
 
 /* Texture-state refresh: rebuilds the vertex description (fn_803191AC, fn_8031A760). */
@@ -409,6 +519,35 @@ FxCfg* fn_80319534(FxCfg* self) {
     self->m54 = 1;
     self->m58 = 1;
     return self;
+}
+
+void fn_803195A8(FxCfg* self)
+{
+    Unk8037B3E8* b = (Unk8037B3E8*)self;
+    b->fn_8037B7E4("lod");
+    const char* rng = "0,1000,1";
+    b->fn_8037B494("PLAYER_LOD_0_INGAME_MIN_IMPORTANCE", (int*)((char*)self + 0x4), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_1_INGAME_MIN_IMPORTANCE", (int*)((char*)self + 0x8), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_2_INGAME_MIN_IMPORTANCE", (int*)((char*)self + 0xC), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_0_OUTOFGAME_MIN_IMPORTANCE", (int*)((char*)self + 0x10), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_1_OUTOFGAME_MIN_IMPORTANCE", (int*)((char*)self + 0x14), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_2_OUTOFGAME_MIN_IMPORTANCE", (int*)((char*)self + 0x18), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_0_HRD_MIN_IMPORTANCE", (int*)((char*)self + 0x1C), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_1_HRD_MIN_IMPORTANCE", (int*)((char*)self + 0x20), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_2_HRD_MIN_IMPORTANCE", (int*)((char*)self + 0x24), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_0_JUMBOTRON_MIN_IMPORTANCE", (int*)((char*)self + 0x28), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_1_JUMBOTRON_MIN_IMPORTANCE", (int*)((char*)self + 0x2C), rng, 0);
+    b->fn_8037B494("PLAYER_LOD_2_JUMBOTRON_MIN_IMPORTANCE", (int*)((char*)self + 0x30), rng, 0);
+    b->fn_8037B458("ENABLE_HELMET_ENVIRONMENT_MAPS", (int*)((char*)self + 0x38), 0, 0);
+    b->fn_8037B458("ENABLE_DUST_CLOUD_EFFECT", (int*)((char*)self + 0x3C), 0, 0);
+    b->fn_8037B458("ENABLE_FRONTEND_MOVIES", (int*)((char*)self + 0x40), 0, 0);
+    b->fn_8037B494("SCREEN_RES_INDEX", (int*)((char*)self + 0x34), 0, 0);
+    b->fn_8037B458("ENABLE_LIVE_JUMBOTRONS", (int*)((char*)self + 0x44), 0, 0);
+    b->fn_8037B458("ENABLE_PLAYER_SHADOWS", (int*)((char*)self + 0x48), 0, 0);
+    b->fn_8037B458("DISPLAY_CROWDS", (int*)((char*)self + 0x4C), 0, 0);
+    b->fn_8037B458("DISPLAY_UMPIRES", (int*)((char*)self + 0x50), 0, 0);
+    b->fn_8037B458("DISPLAY_PIP_WINDOWS", (int*)((char*)self + 0x54), 0, 0);
+    b->fn_8037B458("DISPLAY_CATCHER_IN_BATTER_PITCHER_VIEW", (int*)((char*)self + 0x58), 0, 0);
 }
 
 FxCfg* fn_8031984C() { return fn_80319534((FxCfg*)operator new(0x5C, lbl_806EF9B4)); }
@@ -699,6 +838,7 @@ void fn_80329C4C(const char** pp, unsigned* pn, int* out, int lo, int hi, int de
 int fn_80329B98(const char** pp, unsigned* pn, float* out, int delim);
 }
 extern "C" char* strcpy(char* d, const char* s);
+/* near-miss 97.6%: 145/145 insns; retail keeps the record pointer in r31 and &sp14 in r30 (ours the other way round), and stores sp10 before sp8 */
 void fn_8031A948(const char* text, unsigned len, FxRec* arr, int* count)
 {
     const char* sp8;
