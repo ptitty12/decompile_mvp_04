@@ -10,7 +10,7 @@ union PPCWGPipe {
     unsigned int u32;
     float f32;
 };
-extern volatile PPCWGPipe GXWGFifo;
+#include "../../include/ealib/gx_fifo.h"
 
 /* sprite definition: size, texel rectangle and pixel offset */
 struct Unk803E3280_Sprite {
@@ -95,30 +95,30 @@ extern "C" void fn_803E3280(Unk803E3AFC_Obj* o, Unk803E3280_Item* items, int cou
         float v0 = (f0_2 - 0.5f) * f1;
         float u1 = ((f13 + f11) - 0.5f) * f2;
         float v1 = ((f0_2 + f12) - 0.5f) * f1;
-        GXWGFifo.f32 = x0;
-        GXWGFifo.f32 = f10;
-        GXWGFifo.f32 = f6;
-        GXWGFifo.u32 = col;
-        GXWGFifo.f32 = u0;
-        GXWGFifo.f32 = v0;
-        GXWGFifo.f32 = x1;
-        GXWGFifo.f32 = f10;
-        GXWGFifo.f32 = f6;
-        GXWGFifo.u32 = col;
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v0;
-        GXWGFifo.f32 = x1;
-        GXWGFifo.f32 = y1;
-        GXWGFifo.f32 = f6;
-        GXWGFifo.u32 = col;
-        GXWGFifo.f32 = u1;
-        GXWGFifo.f32 = v1;
-        GXWGFifo.f32 = x0;
-        GXWGFifo.f32 = y1;
-        GXWGFifo.f32 = f6;
-        GXWGFifo.u32 = col;
-        GXWGFifo.f32 = u0;
-        GXWGFifo.f32 = v1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f10;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f6;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = col;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = u0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = v0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f10;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f6;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = col;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = u1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = v0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f6;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = col;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = u1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = v1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = x0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = y1;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = f6;
+        EALIB_GX_FIFO(PPCWGPipe).u32 = col;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = u0;
+        EALIB_GX_FIFO(PPCWGPipe).f32 = v1;
     }
 }
 
