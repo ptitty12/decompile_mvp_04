@@ -74,13 +74,12 @@ void fn_8001BC58()
     }
 }
 
-/* near-miss: store order of the m0/global/m4/m8 writes and the lwz of lbl_80686D90 differ (about 10 slots) */
 Unk8001BC8C::Unk8001BC8C() : m4(0), m8(0), mC(-1), m10(0)
 {
     lbl_806164F0 = this;
     m0 = fn_80020BCC(lbl_80686D90.m0);
-    m8 = 0;
     m4 = 0;
+    m8 = 0;
 }
 
 void fn_8001BCF0()
