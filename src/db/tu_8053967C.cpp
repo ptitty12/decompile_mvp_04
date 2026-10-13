@@ -500,11 +500,12 @@ DB_OVERLAY int fn_8053B064(R* r)
     return 0;
 }
 
+inline unsigned CountB210(R* r) {return r->m4;}
 DB_OVERLAY unsigned char fn_8053B210(R* r, int id)
 {
     unsigned char i = 0;
-    for (; i < (unsigned char)r->m4; i++) {
-        if (r->m0[i] == id)
+    for (; i < (unsigned char)CountB210(r); i++) {
+        if (*(int*)((char*)r->m0+((unsigned)i<<2)) == id)
             return i;
     }
     return 0xFF;
@@ -668,18 +669,21 @@ DB_OVERLAY void fn_8053B85C(R* r, int id)
     }
 }
 
-/* near-miss: retail keeps &m1D0[0] in a register and walks three lockstep counters */
+inline int AtBytesB8C0(int* p, int offset) { return *(int*)((char*)p + offset); }
 DB_OVERLAY int fn_8053B8C0(R* r)
 {
-    int n = 0;
+    int* base = r->m1D0;
     unsigned k = 0;
-    if (r->m1D0[0] != 0) {
+    int n = 0;
+    if (AtBytesB8C0(base, n)) {
+        int offset = 0;
         do {
             k++;
             n++;
+            offset += 4;
             if (k > 2)
                 return n;
-        } while (r->m1D0[k] != 0);
+        } while (*(int*)((char*)base + offset));
     }
     return n;
 }
@@ -749,11 +753,10 @@ DB_OVERLAY void fn_8053BA94(R* r)
     fn_8053BA64(r, 1);
 }
 
-/* near-miss: callee-saved assignment (retail keeps the found value in r29) */
 DB_OVERLAY int fn_8053BAD0(R* r, int h, int id, int now)
 {
-    unsigned n = fn_8053BA1C(r, h);
     int t = 0;
+    unsigned n = fn_8053BA1C(r, h);
     unsigned k = 0;
     for (; k < n; k++) {
         if (r->m1B0[h][k].id == id)

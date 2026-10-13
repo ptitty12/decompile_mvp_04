@@ -449,19 +449,20 @@ FE_OVERLAY void fn_804705F0(FeScrL* x, int a, int b, int c)
     fn_80470E30(x, a, b, k, c);
 }
 
-/* near-miss: 8 slots; same constant register swap as fn_804707B8 */
+/* The zero assignment and independent stores preserve retail constant scheduling. */
 FE_OVERLAY void fn_80470710(FeScrL* x, int a)
 {
+    int zero;
     FeGlobal80619948* g = lbl_80619948;
-    x->m324 = a;
-    x->m334 = 0;
     x->m338 = 1;
+    x->m334 = 0;
+    x->m324 = a;
     int v = fn_800A2AE8(g);
     x->m318 = v;
     fn_800A29C4(g, v);
-    x->m330 = 5;
     x->m314 = 0xD;
-    x->fn_vslot89(0);
+    x->m330 = 5;
+    x->fn_vslot89(zero = 0);
     x->fn_vslot8(0);
 }
 

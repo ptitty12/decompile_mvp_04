@@ -271,24 +271,29 @@ extern "C" void fn_803FEFC4(char* dst, const unsigned char* src)
     dst[i] = src[i];
 }
 
-/* near-miss: 19 vs 20 slots; retail rotates the loop (jump into the test, increment at the top). */
+/* Prefix scan with the increment block preceding the shared test. */
 extern "C" int fn_803FF008(const char* a, const char* b)
 {
+    const unsigned char* table = (const unsigned char*)_ctype_ + 1;
     int i = 0;
-    for (;;) {
-        char cb = b[i];
-        if (cb == 0)
-            return i;
-        int ca = a[i];
-        if (((const unsigned char*)_ctype_ + 1)[ca] & 1)
-            ca += 0x20;
-        if (ca != cb)
-            return 0;
-        i++;
-    }
+    char cb;
+    int ca;
+    goto test;
+next:
+    i++;
+test:
+    cb = b[i];
+    if (cb == 0)
+        return i;
+    ca = a[i];
+    if (*(const unsigned char*)((unsigned)ca + (unsigned)table) & 1)
+        ca += 0x20;
+    if (ca == cb)
+        goto next;
+    return 0;
 }
 
-/* near-miss: 23 vs 21 slots; retail builds r != 0 with subfic/adde after a shared mr, ours branches. */
+/* subfic/adde converts zero to one after the shared close result. */
 extern "C" int fn_803FF1BC(FsState* s)
 {
     int r = 0;
@@ -296,7 +301,7 @@ extern "C" int fn_803FF1BC(FsState* s)
         r = fn_80406208(((int*)s)[0x108 / 4]);
     else if (s->m0 == 2)
         r = fn_80422C3C((char*)s + 0x108);
-    return r != 0;
+    return r == 0;
 }
 
 extern "C" void fn_803FF210()
@@ -365,15 +370,15 @@ extern "C" int fn_803FF760(FsState* s, int a, int b, int c)
     return r;
 }
 
-/* near-miss: 34 vs 33 slots. */
+/* Reload the request handle after each seek call. */
 extern "C" int fn_803FF7C4(FsState* s)
 {
     int r;
     if (s->m0 == 3) {
         int h = ((int*)s)[0x108 / 4];
         int a = fn_80406220(h, 0, 1);
-        int b = fn_80406220(h, 0, 2);
-        fn_80406220(h, a, 0);
+        int b = fn_80406220(((int*)s)[0x108 / 4], 0, 2);
+        fn_80406220(((int*)s)[0x108 / 4], a, 0);
         return b;
     }
     r = 0;

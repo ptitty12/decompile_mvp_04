@@ -203,6 +203,35 @@ extern "C" FE_OVERLAY FeRaw* fn_804B1404(FeRaw* self, int a, int b, int c, int d
 }
 
 extern char lbl_8066AA40[];
+
+extern const char lbl_805F7B08[], lbl_805F7B10[], lbl_805F54F8[], lbl_805F7B14[], lbl_805F7B20[];
+extern "C" char* fn_8058F11C(char*, int);
+struct FeEntry804B14A4 { FeObj* data; FeObj* first; FeObj* second; };
+struct FeRows804B14A4 : FeObj { char pad40[0x154 - 0x40]; FeEntry804B14A4 rows[13]; };
+extern "C" FE_OVERLAY void fn_804B14A4(FeScr* x)
+{
+    fn_800ECE34(x);
+    fn_800C3AB4(fn_800C33D0(), 9);
+    x->m140 = fn_800C8060(x->v32(lbl_805F7B08, 1));
+    x->m134 = fn_800C8038(x->v32(lbl_805F7B10, 1));
+    x->m138 = fn_800C8040(x->v32(lbl_805F54F8, 1));
+    x->m14C = fn_800B7AB8(UiGetMsgMgr(), lbl_805F7B14);
+    int i = 0;
+    FeObj* selection = fn_800C8048(((FeObj*)(((FeObjP2*)x->m140)->v73(0, 0)))->v32(lbl_805F7B20, 1));
+    x->m13C = selection;
+    ((FeObj1*)selection)->v43(9);
+    ((FeObj2*)x->m13C)->v46(20, 4);
+    while (i < ((FeObjI*)x->m140)->v59()) {
+        ((FeRows804B14A4*)x)->rows[i].data = (FeObj*)fn_8058F11C((char*)x->m144, i);
+        int row = i;
+        FeObj* child = (FeObj*)((FeObjP2*)x->m140)->v73(row, 0);
+        FeObj* first = fn_800C805C(((FeObjQ33*)child)->v33(11, 1));
+        ((FeRows804B14A4*)x)->rows[i].first = first;
+        ((FeRows804B14A4*)x)->rows[i].second = fn_800C8058(((FeObjQ33*)first)->v33(10, 1));
+        ++i;
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804B16F0(FeScr* x)
 {
     int o = 0;
@@ -534,6 +563,50 @@ extern "C" FE_OVERLAY void fn_804B2D6C(FeScr* x, int k)
 }
 
 /* near-miss: one argument move; in the cur == sel arm retail passes sel (r29), ours cur (r31) */
+
+extern const char lbl_805F4F0C[];
+extern "C" void fn_804B3234(int, int);
+extern "C" void fn_805298AC();
+extern "C" FE_OVERLAY void fn_804B2E18(FeScr* x, int kind)
+{
+    char prompt[400];
+    char value[100];
+    Unk80090880* strings = lbl_8061977C;
+    int valid = 1;
+    if (kind == 1) {
+        int selected = ((FeObjI*)x->m134)->v60();
+        fn_804B3110(x, value);
+        if (((FeV1Cz*)x->m144)->s14() != 0)
+            fn_80403DE4(prompt, fn_80090880(strings, 0x14D3), selected + 1, value);
+    } else if (kind == 3) {
+        int selected = ((FeV1Cz*)x->m144)->s9();
+        float amount = fn_8058FA38(x->m144, selected);
+        // Retail fn_800DF254 returns its destination (r27); the shared declaration is void.
+        ((char* (*)(char*, int, int, float))fn_800DF254)(value, 0, 3, amount);
+        if (((FeV1Cz*)x->m144)->s14() != 0)
+            fn_80403DE4(prompt, fn_80090880(strings, 0x14D1), selected + 1, value);
+    } else if (kind == 2) {
+        int selected = ((FeObjI*)x->m134)->v60();
+        if (((FeV1Cz*)x->m144)->s14() != 0) {
+            char* state = **(char***)((char*)lbl_8061930C + 0x30);
+            float balance = *(float*)(state + 0x12B78);
+            if (!(balance >= *(float*)fn_80594240(x->m144, selected)))
+                valid = 0;
+            else
+                fn_80403DE4(prompt, fn_80090880(strings, 0x14D2), selected + 1);
+        }
+    }
+    FeObj* popup = fn_800B7AB8(UiGetMsgMgr(), lbl_805F4F0C);
+    if (valid != 0) {
+        const char* yes = fn_80090880(strings, 0x26DF);
+        const char* no = fn_80090880(strings, 0x26DE);
+        fn_801321D4(popup, x, (FeCb)fn_804B3234, 0, prompt, 2, -1, 1, yes, no, 0, 0, 0, 0);
+    } else {
+        fn_80131F34(popup, x, (FeCb)fn_805298AC, 0, 0x14D4, 1, -1, 1, 0x26DE, valid, valid, valid, valid, valid);
+    }
+    popup->v86();
+}
+
 extern "C" FE_OVERLAY void fn_804B3110(FeScr* x, char* out)
 {
     float sum;

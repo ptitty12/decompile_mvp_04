@@ -91,6 +91,73 @@ inline int Ge(int s, int lo)
     return s >= lo;
 }
 
+
+#include "game/tu_80268190.h"
+struct U;
+char* fn_8035E8CC(char*, unsigned);
+void fn_8035E8F0(U*, int);
+void fn_8035E924(U*, int);
+void fn_8035E958(U*, int);
+void fn_80268998(Unk80268190_S*, int);
+extern "C" void fn_8037893C(void*, int, void*, int, int);
+extern char lbl_80661868[], lbl_80661850[], lbl_80661838[];
+/* Leading fields of the 0x38-byte state record (fn_8035E8CC); +4, +C
+ * and +10 are compared/copied by fn_8026C414. */
+struct Unk8026C414_Record {
+    int m0, m4, m8, mC, m10;
+};
+struct Unk8026C414_Event {
+    int id;
+    void* vptr;
+    int m8;
+    int mC;
+    Unk8026C414_Event(int i, void* v, Unk8026C414_Record* r) {
+        vptr = lbl_80649DA0;
+        id = i;
+        vptr = v;
+        if (i == 129) {
+            m8 = r->m10;
+        } else {
+            int y = r->mC;
+            int x = r->m10;
+            mC = x;
+            m8 = y;
+        }
+    }
+};
+extern "C" void fn_8026C414(Unk80268190_T* s, char* state)
+{
+    for (int i=0;i<s->m448;++i) {
+        Unk80268190_Pl* pl=s->m438[i];
+        if (pl) {
+            int type=pl->m458;
+            Unk8026C414_Record* next=(Unk8026C414_Record*)fn_8035E8CC(state,type);
+            Unk8026C414_Record* prev=(Unk8026C414_Record*)fn_8035E8CC((char*)s+0x204,type);
+            int a=next->m4,b=prev->m4;
+            if(a!=b || next->mC!=prev->mC) {
+                int changed = b==10 && a==11;
+                if(a==10) {
+                    if(b==11) fn_80268998((Unk80268190_S*)((char*)s+0xBC),type);
+                    Unk8026C414_Event event(127,lbl_80661868,next);
+                    fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                    fn_8035E8F0((U*)&event,2);
+                } else if(changed) {
+                    if(next->mC!=prev->mC) {
+                        fn_80268998((Unk80268190_S*)((char*)s+0xBC),type);
+                        Unk8026C414_Event event(128,lbl_80661850,next);
+                        fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                        fn_8035E924((U*)&event,2);
+                    }
+                } else if(a==1 && b==10) {
+                    Unk8026C414_Event event(129,lbl_80661838,next);
+                    fn_8037893C(s->m1EC->m704,event.id,&event,0,0);
+                    fn_8035E958((U*)&event,2);
+                }
+            }
+        }
+    }
+}
+
 void fn_8026C630()
 {
     fn_8026AA0C(1, 0xFFFF);
@@ -162,6 +229,75 @@ void fn_8026C8FC(Unk8026C8FC_M* s)
     s->m344 = lbl_806055AC;
     s->m280.Reset();
     s->m350 = 0.0f;
+}
+
+
+extern "C" void fn_8035A618(void*);
+extern "C" void* fn_803282A8(void*, int);
+extern "C" void* fn_80319218(void*);
+struct Unk8035EA10;
+void fn_8035EA10(Unk8035EA10*);
+inline void* operator new(unsigned int, void* p) { return p; }
+/* The transform base has its vptr at +0x98, and its vector at +0x7C. */
+struct Unk8026C65C_Base : Unk8026C8FC_B {
+    void* vptr;
+    inline void Initialize() {
+        vptr = lbl_806604F8;
+        new (&m7C) Unk80379324;
+        fn_8035A618(this);
+    }
+};
+extern "C" void* fn_8026C65C(Unk8026C8FC_M* s, int owner)
+{
+    Unk8026C65C_Base* base = (Unk8026C65C_Base*)s;
+    base->vptr = lbl_806604F8;
+    new (&s->m7C) Unk80379324;
+    E* entry = (E*)((char*)s + 0xC4);
+    int n = 5;
+    fn_8035A618(s);
+    fn_803282A8((char*)s + 0xA0, owner);
+    *(void**)((char*)s + 0xB8) = lbl_80663F20;
+    base->vptr = lbl_80663FB0;
+    do {
+        entry->pos = lbl_806055AC;
+        fn_8035EA10((Unk8035EA10*)entry);
+        ++entry;
+    } while (n--);
+    Unk8026C65C_Base* first = (Unk8026C65C_Base*)((char*)s + 0x1A0);
+    Unk8026C65C_Base* second = (Unk8026C65C_Base*)((char*)s + 0x280);
+    first->Initialize();
+    fn_80319218((char*)s + 0x244);
+    second->Initialize();
+    fn_8026C8FC(s);
+    s->m264 = 0;
+    return s;
+}
+
+extern "C" void* fn_80328234(void*, int, int);
+extern "C" void* fn_8026C75C(Unk8026C8FC_M* s, int owner, int flag)
+{
+    Unk8026C65C_Base* base = (Unk8026C65C_Base*)s;
+    base->vptr = lbl_806604F8;
+    new (&s->m7C) Unk80379324;
+    E* entry = (E*)((char*)s + 0xC4);
+    int n = 5;
+    fn_8035A618(s);
+    fn_80328234((char*)s + 0xA0, owner, flag);
+    *(void**)((char*)s + 0xB8) = lbl_80663F20;
+    base->vptr = lbl_80663FB0;
+    do {
+        entry->pos = lbl_806055AC;
+        fn_8035EA10((Unk8035EA10*)entry);
+        ++entry;
+    } while (n--);
+    Unk8026C65C_Base* first = (Unk8026C65C_Base*)((char*)s + 0x1A0);
+    Unk8026C65C_Base* second = (Unk8026C65C_Base*)((char*)s + 0x280);
+    first->Initialize();
+    fn_80319218((char*)s + 0x244);
+    second->Initialize();
+    fn_8026C8FC(s);
+    s->m264 = 0;
+    return s;
 }
 
 void fn_8026CA58() {}

@@ -918,7 +918,7 @@ void fn_8041A3B4(AXVPB* p, AXPBADPCM* adpcm)
     OSRestoreInterrupts(old);
 }
 
-u32 fn_80406C74(double x); /* __cvt_fp2unsigned */
+u32 __cvt_fp2unsigned(double x); /* __cvt_fp2unsigned */
 
 /* AXSetVoiceSrcRatio */
 void fn_8041A458(AXVPB* p, f32 ratio)
@@ -929,8 +929,8 @@ void fn_8041A458(AXVPB* p, f32 ratio)
 
     old = OSDisableInterrupts();
     f = 65536.0f * ratio;
-    r = fn_80406C74(f);
-    if (fn_80406C74(f) > 0x40000) {
+    r = __cvt_fp2unsigned(f);
+    if (__cvt_fp2unsigned(f) > 0x40000) {
         r = 0x40000;
     }
     p->pb.src.ratioHi = (u16)(r >> 16);

@@ -5,50 +5,42 @@
 
 #include "__card.h"
 
-static u8 CardData[352] ATTRIBUTE_ALIGN(DOLPHIN_ALIGNMENT) = {
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x21, 0x02, 0xFF, 0x00, 0x21, 0x13, 0x06, 0x12, 0x03, 0x12, 0x04,
-    0x13, 0x05, 0x00, 0x92, 0x00, 0xFF, 0x00, 0x88, 0xFF, 0xFF, 0x00, 0x89, 0xFF, 0xFF, 0x00, 0x8A, 0xFF, 0xFF, 0x00,
-    0x8B, 0xFF, 0xFF, 0x8F, 0x00, 0x02, 0xBF, 0x00, 0x88, 0x16, 0xFC, 0xDC, 0xD1, 0x16, 0xFD, 0x00, 0x00, 0x16, 0xFB,
-    0x00, 0x01, 0x02, 0xBF, 0x00, 0x8E, 0x25, 0xFF, 0x03, 0x80, 0xFF, 0x00, 0x02, 0x94, 0x00, 0x27, 0x02, 0xBF, 0x00,
-    0x8E, 0x1F, 0xDF, 0x24, 0xFF, 0x02, 0x40, 0x0F, 0xFF, 0x00, 0x98, 0x04, 0x00, 0x00, 0x9A, 0x00, 0x10, 0x00, 0x99,
-    0x00, 0x00, 0x8E, 0x00, 0x02, 0xBF, 0x00, 0x94, 0x02, 0xBF, 0x86, 0x44, 0x02, 0xBF, 0x00, 0x88, 0x16, 0xFC, 0xDC,
-    0xD1, 0x16, 0xFD, 0x00, 0x03, 0x16, 0xFB, 0x00, 0x01, 0x8F, 0x00, 0x02, 0xBF, 0x00, 0x8E, 0x03, 0x80, 0xCD, 0xD1,
-    0x02, 0x94, 0x00, 0x48, 0x27, 0xFF, 0x03, 0x80, 0x00, 0x01, 0x02, 0x95, 0x00, 0x5A, 0x03, 0x80, 0x00, 0x02, 0x02,
-    0x95, 0x80, 0x00, 0x02, 0x9F, 0x00, 0x48, 0x00, 0x21, 0x8E, 0x00, 0x02, 0xBF, 0x00, 0x8E, 0x25, 0xFF, 0x02, 0xBF,
-    0x00, 0x8E, 0x25, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x25, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x00, 0xC5, 0xFF, 0xFF, 0x03,
-    0x40, 0x0F, 0xFF, 0x1C, 0x9F, 0x02, 0xBF, 0x00, 0x8E, 0x00, 0xC7, 0xFF, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x00, 0xC6,
-    0xFF, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x00, 0xC0, 0xFF, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x20, 0xFF, 0x03, 0x40, 0x0F,
-    0xFF, 0x1F, 0x5F, 0x02, 0xBF, 0x00, 0x8E, 0x21, 0xFF, 0x02, 0xBF, 0x00, 0x8E, 0x23, 0xFF, 0x12, 0x05, 0x12, 0x06,
-    0x02, 0x9F, 0x80, 0xB5, 0x00, 0x21, 0x27, 0xFC, 0x03, 0xC0, 0x80, 0x00, 0x02, 0x9D, 0x00, 0x88, 0x02, 0xDF, 0x27,
-    0xFE, 0x03, 0xC0, 0x80, 0x00, 0x02, 0x9C, 0x00, 0x8E, 0x02, 0xDF, 0x2E, 0xCE, 0x2C, 0xCF, 0x00, 0xF8, 0xFF, 0xCD,
-    0x00, 0xF9, 0xFF, 0xC9, 0x00, 0xFA, 0xFF, 0xCB, 0x26, 0xC9, 0x02, 0xC0, 0x00, 0x04, 0x02, 0x9D, 0x00, 0x9C, 0x02,
-    0xDF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-};
+extern BOOL fn_8042792C(s32 chan, u32 device, u32 frequency); /* EXISelect */
+extern BOOL fn_80427020(s32 chan, void* buffer, s32 length, u32 type); /* EXIImmEx */
+extern BOOL fn_80427A58(s32 chan); /* EXIDeselect */
+extern BOOL fn_804281E0(s32 chan); /* EXIUnlock */
+extern BOOL fn_80427630(s32 chan); /* EXIProbe */
+extern u32 fn_80438640(void); /* OSGetTick */
+extern void fn_80432FD4(void* addr, u32 length); /* DCFlushRange */
+extern void fn_80432FA8(void* addr, u32 length); /* DCInvalidateRange */
+extern s32 fn_8041AAD8(s32 chan, u8* status); /* __CARDReadStatus */
+extern void fn_8041D8DC(s32 chan, s32 result); /* __CARDMountCallback */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
 
-static u32 next = 1;
+extern u8 lbl_80633500[352]; /* target lbl_80633500 at .data:0x80633500, size 0x160 */
+
+extern u32 lbl_806EF180; /* random seed word in retail global */
 
 // prototypes
-static u32 exnor_1st(u32 data, u32 rshift);
-static u32 exnor(u32 data, u32 lshift);
+static inline u32 exnor_1st(u32 data, u32 rshift);
+static inline u32 exnor(u32 data, u32 lshift);
 static u32 bitrev(u32 data);
 static s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen, int mode);
-static u32 GetInitVal(void);
+static inline u32 GetInitVal(void);
 static s32 DummyLen(void);
 static void InitCallback(void* _task);
 static void DoneCallback(void* _task);
 
-static int CARDRand(void) {
-    next = (next * 0x41C64E6D) + 0x3039;
-    return (next / 0x10000) & 0x7FFF;
+static inline int CARDRand(void) {
+    lbl_806EF180 = (lbl_806EF180 * 0x41C64E6D) + 0x3039;
+    return (lbl_806EF180 / 0x10000) & 0x7FFF;
 }
 
-static void CARDSrand(unsigned int seed) {
-    next = seed;
+static inline void CARDSrand(unsigned int seed) {
+    lbl_806EF180 = seed;
 }
 
-static u32 exnor_1st(u32 data, u32 rshift) {
+static inline u32 exnor_1st(u32 data, u32 rshift) {
     u32 wk;
     u32 work;
     u32 i;
@@ -62,7 +54,7 @@ static u32 exnor_1st(u32 data, u32 rshift) {
     return work;
 }
 
-static u32 exnor(u32 data, u32 lshift) {
+static inline u32 exnor(u32 data, u32 lshift) {
     u32 wk;
     u32 work;
     u32 i;
@@ -113,8 +105,8 @@ static s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen, int mode) {
 
     ASSERTLINE(240, 0 <= chan && chan < 2);
 
-    card = &__CARDBlock[chan];
-    if (!EXISelect(chan, 0, CARDFreq))
+    card = &lbl_806DCF20[chan];
+    if (!fn_8042792C(chan, 0, CARDFreq))
         return CARD_RESULT_NOCARD;
 
     data &= 0xfffff000;
@@ -131,19 +123,19 @@ static s32 ReadArrayUnlock(s32 chan, u32 data, void* rbuf, s32 rlen, int mode) {
     }
 
     err = FALSE;
-    err |= !EXIImmEx(chan, cmd, 5, 1);
-    err |= !EXIImmEx(chan, (u8* )card->workArea + (u32)sizeof(CARDID), card->latency, 1);
-    err |= !EXIImmEx(chan, rbuf, rlen, 0);
-    err |= !EXIDeselect(chan);
+    err |= !fn_80427020(chan, cmd, 5, 1);
+    err |= !fn_80427020(chan, (u8* )card->workArea + (u32)sizeof(CARDID), card->latency, 1);
+    err |= !fn_80427020(chan, rbuf, rlen, 0);
+    err |= !fn_80427A58(chan);
 
     return err ? CARD_RESULT_NOCARD : CARD_RESULT_READY;
 }
 
-static u32 GetInitVal(void) {
+static inline u32 GetInitVal(void) {
     u32 tmp;
     u32 tick;
 
-    tick = OSGetTick();
+    tick = fn_80438640();
     CARDSrand(tick);
     tmp = 0x7fec8000;
     tmp |= CARDRand();
@@ -159,14 +151,14 @@ static s32 DummyLen(void) {
 
     wk = 1;
     max = 0;
-    tick = OSGetTick();
+    tick = fn_80438640();
     CARDSrand(tick);
 
     tmp = CARDRand();
     tmp &= 0x0000001f;
     tmp += 1;
     while ((tmp < 4) && (max < 10)) {
-        tick = OSGetTick();
+        tick = fn_80438640();
         tmp = (s32)(tick << wk);
         wk++;
         if (wk > 16)
@@ -209,7 +201,7 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
     u8* input;
     u8* output;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     task = &card->task;
     param = (CARDDecParam*)card->workArea;
     input = (u8*)((u8* )param + sizeof(CARDDecParam));
@@ -284,12 +276,12 @@ s32 __CARDUnlock(s32 chan, u8 flashID[12]) {
     param->outputAddr = output;
     param->aramAddr = 0;
 
-    DCFlushRange(input, 8);
-    DCInvalidateRange(output, 4);
-    DCFlushRange(param, sizeof(CARDDecParam));
+    fn_80432FD4(input, 8);
+    fn_80432FA8(output, 4);
+    fn_80432FD4(param, sizeof(CARDDecParam));
 
     task->priority = 255;
-    task->iram_mmem_addr = (u16*)OSCachedToPhysical(CardData);
+    task->iram_mmem_addr = (u16*)OSCachedToPhysical(lbl_80633500);
     task->iram_length = 0x160;
     task->iram_addr = 0;
     task->dsp_init_vector = 0x10;
@@ -315,7 +307,7 @@ static void InitCallback(void* _task) {
 
     task = _task;
     for (chan = 0; chan < 2; ++chan) {
-        card = &__CARDBlock[chan];
+        card = &lbl_806DCF20[chan];
         if ((DSPTaskInfo*)&card->task == task)
             break;
     }
@@ -354,7 +346,7 @@ static void DoneCallback(void* _task) {
     u8* output;
     task = _task;
     for (chan = 0; chan < 2; ++chan) {
-        card = &__CARDBlock[chan];
+        card = &lbl_806DCF20[chan];
         if ((DSPTaskInfo* )&card->task == task)
             break;
     }
@@ -371,8 +363,8 @@ static void DoneCallback(void* _task) {
     rlen = dummy;
     data = ((Ans2 ^ card->scramble) & 0xffff0000);
     if (ReadArrayUnlock(chan, data, rbuf, rlen, 1) < 0) {
-        EXIUnlock(chan);
-        __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+        fn_804281E0(chan);
+        fn_8041D8DC(chan, CARD_RESULT_NOCARD);
         return;
     }
 
@@ -385,22 +377,22 @@ static void DoneCallback(void* _task) {
     rlen = dummy;
     data = (((Ans2 << 16) ^ card->scramble) & 0xffff0000);
     if (ReadArrayUnlock(chan, data, rbuf, rlen, 1) < 0) {
-        EXIUnlock(chan);
-        __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+        fn_804281E0(chan);
+        fn_8041D8DC(chan, CARD_RESULT_NOCARD);
         return;
     }
 
-    result = __CARDReadStatus(chan, &unk);
-    if (!EXIProbe(chan)) {
-        EXIUnlock(chan);
-        __CARDMountCallback(chan, CARD_RESULT_NOCARD);
+    result = fn_8041AAD8(chan, &unk);
+    if (!fn_80427630(chan)) {
+        fn_804281E0(chan);
+        fn_8041D8DC(chan, CARD_RESULT_NOCARD);
         return;
     }
 
     if (result == CARD_RESULT_READY && !(unk & 0x40)) {
-        EXIUnlock(chan);
+        fn_804281E0(chan);
         result = CARD_RESULT_IOERROR;
     }
 
-    __CARDMountCallback(chan, result);
+    fn_8041D8DC(chan, result);
 }
