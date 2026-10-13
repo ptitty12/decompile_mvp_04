@@ -239,6 +239,56 @@ extern "C" FE_OVERLAY void fn_804E0FE0(FeTitle* self)
         fn_804E1020(self);
 }
 
+extern int lbl_80692664;
+extern int lbl_8061B8B8;
+extern char lbl_805F994C[], lbl_805F99A0[];
+extern "C" int fn_80400DA4();
+extern "C" void fn_800B7280(UiMsgMgr*, int);
+extern "C" int fn_802DC9C0();
+extern "C" int fn_800D8938(Unk800D876C_A*);
+extern "C" void* fn_800ED2B0(FeObj*, const char*);
+extern "C" void fn_800CFB38(void*);
+extern "C" void fn_804E1200(FeTitle*);
+extern "C" FE_OVERLAY void fn_804E1020(FeTitle* self)
+{
+    switch (self->m1D8) {
+    case 0:
+        if (lbl_80692664 + 300 <= fn_80400DA4()) {
+            ((FeObj1*)self)->v8(1);
+            ((FeObj1*)self->v32(lbl_805F994C, 1))->v8(0);
+            self->m1F0 = 0;
+            self->m1D8 = 1;
+            self->m1F8 = fn_80400DA4();
+        }
+        break;
+    case 1:
+        if (self->m1F8 + 15 <= fn_80400DA4()) {
+            fn_800B7280(UiGetMsgMgr(), 1);
+            self->m1D8 = 2;
+        }
+        break;
+    case 2:
+        if (self->m1F8 + 240 <= fn_80400DA4()) {
+            self->m1D8 = 3;
+            fn_800D878C(&self->m1DC);
+            fn_800CFB38(fn_800ED2B0(self, lbl_805F99A0));
+        }
+        break;
+    case 3:
+        fn_802DC9C0();
+        if (fn_800D8938(&self->m1DC) != 0) {
+            ++lbl_8061B8B8;
+            fn_800B7ADC(UiGetMsgMgr(), self);
+        }
+        break;
+    case 8: case 9:
+        break;
+    default:
+        fn_804E1200(self);
+        break;
+    }
+}
+
 extern "C" FE_OVERLAY void fn_804E14EC(FeTitle* self, int a)
 {
     switch (a) {
