@@ -553,3 +553,51 @@ extern "C" FE_OVERLAY int fn_804CE204(int k)
     }
     return r;
 }
+struct Unk8007F198_C;
+int fn_8007FB98(Unk8007F198_C*, int, int, int);
+// Same seven-slot iterator as db/tu_80554628; ctor/reset accesses +0..+0x24.
+struct FeIndex804CE2AC { int m0, m4, m8, slots[7]; };
+// fn_804CE2AC copies four words into the state block at +0x688.
+struct FeResult804CE2AC { int m0, m4, m8, mC; };
+struct FeState804CE2AC {
+    char pad[0x688];
+    FeResult804CE2AC result;
+    void Set(FeResult804CE2AC value) { result = value; }
+};
+extern "C" int fn_800B57EC(void*);
+extern "C" FeIndex804CE2AC* fn_80556348(FeIndex804CE2AC*);
+extern "C" int fn_80555C44(FeIndex804CE2AC*, int*, int, int);
+extern "C" int fn_805563C4(FeIndex804CE2AC*);
+extern "C" void fn_8055655C(FeIndex804CE2AC*, int*, int*);
+extern "C" int fn_8057CE00(int);
+extern "C" int fn_80555F18(int, int);
+extern "C" FE_OVERLAY void fn_804CE2AC(int team, int game)
+{
+    if (fn_800B57EC(fn_800B555C()) != 0) {
+        Unk8007F198_C* screen = (Unk8007F198_C*)lbl_8061930C;
+        if (screen != 0) {
+            int first = fn_8007FB98(screen, team, 0, game);
+            int second = fn_8007FB98(screen, team, 1, game);
+            FeIndex804CE2AC idx;
+            FeResult804CE2AC result;
+            fn_80556348(&idx);
+            int index = -1;
+            int league = fn_8057CE00(game);
+            fn_80555C44(&idx, &index, league, first);
+            int id = fn_805563C4(&idx);
+            int home = 0, away = 0;
+            fn_8055655C(&idx, &home, &away);
+            result.m0 = league;
+            result.mC = fn_80555F18(league, idx.m0);
+            if (second == id) {
+                result.m4 = home;
+                result.m8 = away;
+            } else {
+                result.m4 = away;
+                result.m8 = home;
+            }
+            FeState804CE2AC* state = (FeState804CE2AC*)fn_800B555C();
+            state->Set(result);
+        }
+    }
+}
