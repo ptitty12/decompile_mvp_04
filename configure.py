@@ -1257,7 +1257,7 @@ config.libs = [
             Object(Matching, "dolphin/amcstubs/AmcExi2Stubs.c"),
             Object(NonMatching, "dolphin/ar/ar.c"),
             Object(Matching, "dolphin/ar/arq.c"),
-            Object(NonMatching, "dolphin/ax/AX.c"),
+            Object(Matching, "dolphin/ax/AX.c"),
             Object(NonMatching, "dolphin/ax/tu_8041783C.c"),
             Object(NonMatching, "dolphin/base/tu_8041A5A4.c"),
             Object(NonMatching, "dolphin/card/tu_8041A6C4.c"),

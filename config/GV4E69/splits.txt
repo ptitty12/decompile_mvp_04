@@ -2408,6 +2408,8 @@ dolphin/ar/arq.c:
 
 dolphin/ax/AX.c:
 	.text       start:0x80417798 end:0x8041783C
+	.data       start:0x8062F9F8 end:0x8062FA40
+	.sdata      start:0x806EF160 end:0x806EF168
 
 dolphin/ax/tu_8041783C.c:
 	.text       start:0x8041783C end:0x8041A5A4
