@@ -1736,3 +1736,7 @@ vptr store as 24(r1), exactly as retail, instead of 16(r29). Only that one word
 changes in the 155-instruction function; twelve local branches and thirty data/call
 references agree. This is alias/lifetime code generation, not a reason to change
 the list layout or to replace required destructor behavior with manual stores.
+
+### Recover constructor results from actual callers
+
+A reconstructed void initializer may preserve r3 accidentally while retail callers consume it. Check actual post-call stores and the allocation path before selecting the result type. In db/tu_80596D88, fn_80597A5C must return the initialized pointer: `return self;` gives the retail `mr r11,r3` and vptr store while preserving r3. Caller fn_8059053C stores that pointer at +0x2C. A better score alone is insufficient: fn_80596D88 also has a consumed pointer result, but eight return/store forms retain an ordering mismatch and remain unmatched. Use protolint consumed-result findings as evidence leads, then verify instruction words, local edges and actual relocation bindings.

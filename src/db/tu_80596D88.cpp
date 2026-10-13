@@ -491,7 +491,7 @@ extern "C" void fn_805974B8(Db80596D88_Obj* self);
 extern "C" void fn_8059754C(Db80596D88_Obj* self);
 extern "C" void fn_80597618(void* self, int a, Unk80070DDC_Stream* io);
 extern "C" void fn_80597818(Db80596D88_Obj* self);
-extern "C" void fn_80597A5C(U* self);
+extern "C" void* fn_80597A5C(void* self);
 extern "C" void fn_80597A70(U* self, int chrg);
 extern "C" float fn_80597EE0(float x);
 extern "C" float fn_80597FE4(void* self, int k);
@@ -844,11 +844,12 @@ extern "C" DB_OVERLAY void fn_80597818(Db80596D88_Obj* self)
     }
 }
 
-/* near-miss: retail copies r3 (mr r11,r3) before the vptr store */
+/* The allocator caller consumes the returned object pointer; preserve self in r3. */
 //@80597A5C
-extern "C" DB_OVERLAY void fn_80597A5C(U* self)
+extern "C" DB_OVERLAY void* fn_80597A5C(void* self)
 {
     PUT(0x18, lbl_80682D30);
+    return self;
 }
 
 extern "C" DB_OVERLAY void fn_80597A70(U* self, int chrg)

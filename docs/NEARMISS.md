@@ -218,5 +218,9 @@ Six imports remain: __builtin_vec_delete, __vn__FUii, fn_80071604__FPv, fn_80071
 - fn_80492FB4 already had eight earlier variants; it was not retried.
 - fn_801790BC, fn_80244DC4 and Unk800085B0::vslot22: four small float/spill forms
   per target, with mangled-symbol/provider types checked; no exact match.
-- fn_8041A55C (Dolphin AX): seven pointer/index/base-expression and lifetime
+- fn_8041A55C (Dolphin AX): eight pointer/index/base-expression and lifetime
   forms retain the five register differences. build/clone-snapshot/build/probe-8041a55c*.
+
+- fn_80596D88: caller fn_8059053C at 8059051C stores returned r3 at +0x28. Pointer-result correction matches the initial register setup but moves the final +0x2C store early. Eight return/store-order forms, no exact match; build/80596d88-{return,order*,reverse}.cpp. Do not repeat spelling permutations.
+- fn_80563F0C / fn_80564A98: allocation callers at 800A10D8/800A10F8 store returned r3. Typed return-self corrections alone leave initialization/register ordering differences (12/11 and 9/8 target/source words). Scratch build/agent-game-db-returnself; no source change accepted.
+- AX fn_804188D0: moving the actual helper-definition chain reduces unwanted inlining to 109 words versus retail 110, but changes other callers as helper visibility shifts. Bounded ordering probes did not produce an exact all-function candidate; build/agent-ax. No flags, attributes or invented boundaries used.

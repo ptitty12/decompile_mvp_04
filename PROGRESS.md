@@ -8,7 +8,7 @@
   - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched: **20,903 / 24,158 (86.53%)**; code matched: **3,001,776 / 5,896,176 bytes (50.91%)**.
+- Functions matched: **20,904 / 24,158 (86.53%)**; code matched: **3,001,796 / 5,896,176 bytes (50.91%)**.
 - Source-linked: **215 units, 330,388 code bytes (5.60%)**, plus 8,242 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
@@ -237,3 +237,5 @@
 
 - 2026-10-13 | Codex + three Luna workers, continued | B7 source-link, DB exact match and stack scanner passed per-commit integration and reached main at 3661cb68. Added read-only literal_pair_map.py: pair equal-sized matched functions across all executable sections, require equal relocation kinds, skip executable symbol targets, validate source/retail extents, preserve alternate names and mark incomplete prefix checks. Seven new synthetic tests cover mixed sections, unpaired/mistyped references, executable targets, negative/oversized/truncated reads and alias ambiguity. Helper suite 97/97. The mapper recovered the B7 bias-pool lead before that unit's full acceptance gates.
   - Read-only global reference audit: 90,594 checked, 0 mismatches, 1,104 unresolved names. Unresolved names remain exclusions, not proof that all bindings are settled. A paired-call scan of 224 high-score call-site leads found no evidence-backed prototype repair beyond already accepted work; remaining names/ABI equivalence alone did not justify changes.
+
+- 2026-10-13 | Codex continuation | db/tu_80596D88.cpp | matched fn_80597A5C (20 bytes), 43/47 unit functions | Retail caller fn_8059053C stores returned r3 at +0x2C after allocation; correct pointer result and return self reproduce all five words. Strict references, full build, retail hash, literal check and unmodified verifier PASS. fn_80596D88: eight return/order forms improve ABI correctness but retain store-order differences; parked. | none
