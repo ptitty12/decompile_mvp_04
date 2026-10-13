@@ -293,3 +293,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `ealib/tu_803FEB34` `fn_803FF058`: 97.022%, 89/89 instructions after eight ordinary path-opening drafts; host/end/path registers and initial byte-load scheduling differ; 256-byte buffer and canonical DVD imports preserved.
 - `ealib/tu_803FEB34` `fn_803FF888`: 96.716%, 67/67 instructions after eight timer initializer forms; callback address addi and initialized-byte store are reversed; canonical OSTime/alarm ABI and hardware-clock layout used, no instruction/config workaround.
+
+- `db/tu_805721F8` `fn_805721F8`: 99.21965%, 173/173 instructions; roster score array view recovers indexed loads, but round/found/clamped-value registers and the initial search-index copy differ after seventeen bounded forms; new code dropped.
+- `db/tu_80574AE4` `fn_80577218`: 99.49468%, 188/188 instructions; comparator branches and the two 12-byte statistics constructors match, but winning-rate denominator/zero FPR allocation differs after ten forms; source dropped.
