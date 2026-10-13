@@ -93,6 +93,8 @@ void fn_80425BE4(void);
 void fn_80423F94(void);
 int __DVDPushWaitingQueue(s32 prio, DVDCommandBlock* block);
 DVDCommandBlock* __DVDPopWaitingQueue(void);
+int tolower(int c);
+extern u32 lbl_806EF654;
 extern void (*lbl_806EF1A8)(DVDCommandBlock*, DVDLowCallback);
 extern s32 lbl_806EF674;
 void fn_804245BC(u32 intType);
@@ -140,7 +142,7 @@ extern const char* lbl_806EF1A0;
 
 BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo);
 BOOL fn_80422DC0(char* path, u32 maxlen);
-u32 fn_80422C60(s32 entrynum, char* path, u32 maxlen);
+u32 fn_80422C60(u32 entry, char* path, u32 maxlen);
 BOOL fn_80422EE4(DVDFileInfo* fileInfo, void* addr, s32 length, s32 offset, DVDCallback callback, s32 prio);
 int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, DVDCBCallback callback, s32 prio);
 void fn_80422FD8(void);
@@ -174,6 +176,104 @@ void fn_804227D4(void) {
     if (lbl_806EF644) {
         lbl_806EF64C = lbl_806EF644[0].nextEntryOrLength;
         lbl_806EF648 = (char*)&lbl_806EF644[lbl_806EF64C];
+    }
+}
+
+/* 80422808 */
+static BOOL isSame(const char* path, const char* string) {
+    while (*string != '\0') {
+        if (tolower(*path++) != tolower(*string++)) {
+            return FALSE;
+        }
+    }
+    if (*path == '/' || *path == '\0') {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+s32 fn_8042280C(const char* pathPtr) {
+    const char* ptr;
+    const char* stringPtr;
+    BOOL isDir;
+    u32 length;
+    u32 dirLookAt;
+    u32 i;
+    const char* origPathPtr = pathPtr;
+    const char* extentionStart;
+    BOOL illegal;
+    BOOL extention;
+
+    dirLookAt = lbl_806EF650;
+    while (1) {
+        if (*pathPtr == '\0') {
+            return (s32)dirLookAt;
+        }
+        if (*pathPtr == '/') {
+            dirLookAt = 0;
+            pathPtr++;
+            continue;
+        }
+        if (*pathPtr == '.') {
+            if (*(pathPtr + 1) == '.') {
+                if (*(pathPtr + 2) == '/') {
+                    dirLookAt = lbl_806EF644[dirLookAt].parentOrPosition;
+                    pathPtr += 3;
+                    continue;
+                } else if (*(pathPtr + 2) == '\0') {
+                    return (s32)lbl_806EF644[dirLookAt].parentOrPosition;
+                }
+            } else if (*(pathPtr + 1) == '/') {
+                pathPtr += 2;
+                continue;
+            } else if (*(pathPtr + 1) == '\0') {
+                return (s32)dirLookAt;
+            }
+        }
+        if (lbl_806EF654 == 0) {
+            extention = FALSE;
+            illegal = FALSE;
+            for (ptr = pathPtr; (*ptr != '\0') && (*ptr != '/'); ptr++) {
+                if (*ptr == '.') {
+                    if ((ptr - pathPtr > 8) || (extention == TRUE)) {
+                        illegal = TRUE;
+                        break;
+                    }
+                    extention = TRUE;
+                    extentionStart = ptr + 1;
+                } else if (*ptr == ' ') {
+                    illegal = TRUE;
+                }
+            }
+            if ((extention == TRUE) && (ptr - extentionStart > 3)) {
+                illegal = TRUE;
+            }
+            if (illegal) {
+                fn_80433CE8("dvdfs.c", 0x183, "DVDConvertEntrynumToPath(possibly DVDOpen or DVDChangeDir or DVDOpenDir): specified directory or file (%s) doesn't match standard 8.3 format. This is a temporary restriction and will be removed soon\n", origPathPtr);
+            }
+        } else {
+            for (ptr = pathPtr; (*ptr != '\0') && (*ptr != '/'); ptr++) {
+            }
+        }
+        isDir = (*ptr == '\0') ? FALSE : TRUE;
+        length = (u32)(ptr - pathPtr);
+        for (i = dirLookAt + 1; i < lbl_806EF644[dirLookAt].nextEntryOrLength;
+             i = FST_IS_DIR(&lbl_806EF644[i]) ? lbl_806EF644[i].nextEntryOrLength : (i + 1)) {
+            if (FST_IS_DIR(&lbl_806EF644[i]) == FALSE && isDir == TRUE) {
+                continue;
+            }
+            stringPtr = lbl_806EF648 + (lbl_806EF644[i].isDirAndStringOff & 0x00FFFFFF);
+            if (isSame(pathPtr, stringPtr) == TRUE) {
+                goto found;
+            }
+        }
+        return -1;
+    found:
+        if (!isDir) {
+            return (s32)i;
+        }
+        dirLookAt = i;
+        pathPtr += length + 1;
     }
 }
 
@@ -211,6 +311,34 @@ BOOL fn_80422B74(const char* fileName, DVDFileInfo* fileInfo) {
 BOOL fn_80422C3C(DVDFileInfo* fileInfo) {
     fn_80425438(&fileInfo->cb);
     return TRUE;
+}
+
+/* 80422C5F */
+static u32 myStrncpy(char* dst, const char* src, u32 maxlen) {
+    u32 i = maxlen;
+
+    while ((i > 0) && (*src != 0)) {
+        *dst++ = *src++;
+        i--;
+    }
+    return (maxlen - i);
+}
+
+u32 fn_80422C60(u32 entry, char* path, u32 maxlen) {
+    const char* name;
+    u32 loc;
+
+    if (entry == 0) {
+        return 0;
+    }
+    name = lbl_806EF648 + (lbl_806EF644[entry].isDirAndStringOff & 0x00FFFFFF);
+    loc = fn_80422C60(lbl_806EF644[entry].parentOrPosition, path, maxlen);
+    if (loc == maxlen) {
+        return loc;
+    }
+    path[loc++] = '/';
+    loc += myStrncpy(path + loc, name, maxlen - loc);
+    return loc;
 }
 
 BOOL fn_80422E84(const char* path) {
