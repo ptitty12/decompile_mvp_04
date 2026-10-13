@@ -756,7 +756,6 @@ extern "C" void fn_803B5F9C(Unk803B5F9C** head, Unk803B5F9C* n)
     n->m10 = prev;
 }
 
-/* near-miss: 24 vs 31 insns: retail keeps two dead null/equality checks after the search loop and copies the load through r9; the plain while/if forms fold them away */
 extern "C" void fn_803B6004(Unk803B5F9C** head, Unk803B5F9C* n)
 {
     Unk803B5F9C* p = *head;
@@ -764,16 +763,9 @@ extern "C" void fn_803B6004(Unk803B5F9C** head, Unk803B5F9C* n)
         *head = p->m8;
         return;
     }
-    Unk803B5F9C* q = p->m8;
-    if (q == 0)
-        return;
-    while (q != n) {
-        p = q;
-        q = p->m8;
-        if (q == 0)
-            return;
-    }
-    if (q != 0 && q == n) {
+    while (p->m8 != 0 && p->m8 != n)
+        p = p->m8;
+    if (p->m8 != 0 && p->m8 == n) {
         if (n->m8 != 0)
             n->m8->m10 = p;
         p->m8 = p->m8->m8;
