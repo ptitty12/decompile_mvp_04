@@ -224,6 +224,65 @@ DB_OVERLAY int fn_8053F268(C30* c)
     return r;
 }
 
+C30* fn_8053EA68(C30* c, int k, int a, int b, float* f);
+/* near-miss: 98.7%; instructions identical, only the callee-saved register numbers differ (retail: c=r31, &t=r27, k=r29; ours c=r27, &t=r31) */
+DB_OVERLAY void fn_8053F79C(C30* c)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Db8053E240_Tmp t;
+    int buf[0x82];
+    Db8053E240_Tmp* q = &t;
+    int z = 0;
+    int a = fn_8007F7D0((Unk8007F198_B*)s, 0);
+    int b = s->fn_8007B320(0, a);
+    int sel = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B8C4(0, b);
+    q->C1(buf, 0x82);
+    q->C2();
+    q->C3(lbl_8064A2A8);
+    if (sel == 0)
+        fn_805371C4(q, 0x70000007);
+    else
+        fn_805371C4(q, 0x70000038);
+    fn_8053FCC4(c, 1, fn_8053E8B8(c, (int)&t, 1, 0));
+    int k = 8;
+    fn_8053FCC4(c, 2, fn_8053E934(c, (int)&t, 1, 0));
+    for (; k <= 0xE; k++) {
+        if (k == 0xE) {
+            C30* r = fn_8053EA20(c, 0xE, (int)&t, 1, 0);
+            fn_8053FCC4(c, 0xE, r->m0);
+            fn_8053FCC4(c, 0xE, *(int*)((char*)r + 0xC));
+            fn_8053FCC4(c, 0xE, *(int*)((char*)r + 0x18));
+        } else {
+            fn_8053FCC4(c, k, fn_8053EA20(c, k, (int)&t, 1, 0)->m0);
+        }
+    }
+    for (k = 0xF; k <= 0x16; k++) {
+        switch (k) {
+        case 0xF:
+            if (sel == 1)
+                fn_8053FCC4(c, 0xF, fn_8053EA68(c, 0xF, (int)&t, 1, 0)->m0);
+            break;
+        case 0x10:
+            if (sel == 0)
+                fn_8053FCC4(c, 0x10, fn_8053EA68(c, 0x10, (int)&t, 1, 0)->m0);
+            break;
+        case 0x16: {
+            C30* r = fn_8053EA68(c, 0x16, (int)&t, 1, 0);
+            fn_8053FCC4(c, 0x16, r->m0);
+            fn_8053FCC4(c, 0x16, *(int*)((char*)r + 0xC));
+            fn_8053FCC4(c, 0x16, *(int*)((char*)r + 0x18));
+            break;
+        }
+        default:
+            fn_8053FCC4(c, k, fn_8053EA68(c, k, (int)&t, 1, 0)->m0);
+            break;
+        }
+    }
+    fn_8053FCC4(c, 3, fn_8053E9E8(c, (int)&t, 1, 0));
+    fn_8053FCC4(c, 0, fn_8053E96C(c, (int)&t, 1, 0));
+    t.vp = lbl_8064A550;
+}
+
 DB_OVERLAY void fn_8053FAD4(C30* c)
 {
     if (fn_800A2ED8(lbl_80619948) == 1) {
