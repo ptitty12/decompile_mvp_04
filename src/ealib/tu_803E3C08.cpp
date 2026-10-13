@@ -730,6 +730,37 @@ extern "C" void fn_803E6044(char* o)
     }
 }
 
+extern "C" void fn_803E628C(char* o, Unk803E6660_Rec* rec, int* val, Unk803E6660_Ent* ent)
+{
+    if (*(int*)(o + 0xc) == 0xC0) {
+        Unk803E6660* s = (Unk803E6660*)(o + 0x10);
+        FlushInl(s);
+        int st = *(int*)(o + 0xc);
+        if (st != 0) {
+            BuildInl((Unk803E6660*)(o + 0x10), st);
+            *(int*)(o + 0xc) = 0;
+        }
+        ReadyInl((Unk803E6660*)(o + 0x10));
+        switch (*(int*)(o + 0x4c)) {
+        case 0x98:
+            fn_803E628C(o, (Unk803E6660_Rec*)(*(char**)o + 0x8E8), (int*)(*(char**)(o + 4) + 0x2F8),
+                        (Unk803E6660_Ent*)(*(char**)(o + 8) + 0x5F0));
+            fn_803E628C(o, (Unk803E6660_Rec*)(*(char**)o + 0x8F4), (int*)(*(char**)(o + 4) + 0x2FC),
+                        (Unk803E6660_Ent*)(*(char**)(o + 8) + 0x5F8));
+            break;
+        case 0xB0:
+            fn_803E628C(o, (Unk803E6660_Rec*)(*(char**)o + 0x8F4), (int*)(*(char**)(o + 4) + 0x2FC),
+                        (Unk803E6660_Ent*)(*(char**)(o + 8) + 0x5F8));
+            break;
+        }
+    }
+    int n = *(int*)(o + 0xc);
+    *(Unk803E6660_Rec*)(*(char**)o + n * 12) = *rec;
+    ((int*)*(char**)(o + 4))[*(int*)(o + 0xc)] = *val;
+    ((Unk803E6660_Ent*)*(char**)(o + 8))[*(int*)(o + 0xc)] = *ent;
+    *(int*)(o + 0xc) = *(int*)(o + 0xc) + 1;
+}
+
 extern char lbl_8060CC1C[];
 
 extern "C" void fn_803E6508(char* o, int arg)
