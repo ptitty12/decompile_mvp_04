@@ -119,10 +119,11 @@ void fn_8021BA44(Task* t)
     }
 }
 
-/* near-miss: 148/148 insns, 16 slots differ (98%), all register numbers or scheduling order. Retail loads the
-   lbl_806055DC.x float (lfs f0) before the word loads of the struct copy, and keeps &cur->m60 in r4 so the li
-   constants 3 and 6 land in r5 and r6 (ours r4 and r5, pointer in r6). Tried: compare forms (else-if chain, negated
-   ==, braces), the copy through an inline, diff/pos order, and a hill-climb over the store order. */
+/* near-miss: 148/148 insns, 13 slots differ (about 97%), all register numbers or scheduling order. Retail keeps &cur->m60
+   in r4 and gives the lbl_805D60F0 and lbl_806055AC address registers different numbers, so the li constant 6 lands in
+   r6 (ours r4). The lbl_806055DC compare through a non-const view (kp) fixed the first half. Tried: compare forms,
+   the copy through an inline, diff/pos order, a hill-climb and a permutation search over the store order, and the
+   same non-const view for lbl_806055AC. */
 void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
 {
     RecQueue* q = t->m9C->m3A60;
@@ -143,7 +144,8 @@ void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
     int flag = NeFlag(fn_80255028((Unk8024EF40_A*)ps), ps->m38);
     int diff = 0;
     Vec3f pos = lbl_806055DC;
-    if (v->x != lbl_806055DC.x || v->y != lbl_806055DC.y || v->z != lbl_806055DC.z)
+    Vec3f* kp = (Vec3f*)&lbl_806055DC;
+    if (v->x != kp->x || v->y != kp->y || v->z != kp->z)
         diff = 1;
     if (diff != 0)
         pos = *v;
