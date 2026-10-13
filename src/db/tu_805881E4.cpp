@@ -1011,7 +1011,7 @@ extern "C" DB_OVERLAY int fn_8058A670(int a,int b,void* rec)
 }
 
 extern "C" int fn_80589B90(int*,int,int,float,float,float);
-extern "C" int fn_80582EE4(void*,int);
+extern "C" int fn_80582EE4(int,int);
 extern "C" float fn_800748D4(Unk8007A4DC_Screen*,int,int,int);
 extern const float lbl_8060083C;
 extern const float lbl_80600840;
@@ -1030,7 +1030,7 @@ extern "C" DB_OVERLAY void fn_805898D8(int* self,int team,int flag)
         int id=fn_80589B90(self,team,flag,lbl_8060083C,lbl_80600840,lbl_80600844);
         if(id) {
             int kind=((Unk8007B2B0_Screen*)sc)->fn_80078A38(fn_80077BC4(sc,id));
-            int mode=fn_80582EE4(self,id);
+            int mode=fn_80582EE4((int)self,id);
             int group=fn_80084014__Fii(kind,1);
             if(flag) {
                 value=fn_800748D4(sc,1,id,group);
