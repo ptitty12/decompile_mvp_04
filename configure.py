@@ -1155,7 +1155,7 @@ config.libs = [
             Object(Matching, "libc/vfscanf.c"),
             Object(Matching, "libc/vprintf.c"),
             Object(Matching, "libc/vsprintf.c"),
-            Object(NonMatching, "libc/assert.c"),
+            Object(Matching, "libc/assert.c"),
             Object(NonMatching, "libc/atexit.c"),
             Object(Matching, "libc/atof.c"),
             Object(Matching, "libc/atoi.c"),

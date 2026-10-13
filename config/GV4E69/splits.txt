@@ -2074,6 +2074,7 @@ libc/vsprintf.c:
 
 libc/assert.c:
 	.text       start:0x80409CC0 end:0x80409CF0
+	.rodata     start:0x8060EB48 end:0x8060EB74 align:4
 
 libc/atexit.c:
 	.text       start:0x80409CF0 end:0x80409D88
