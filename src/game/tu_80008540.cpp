@@ -140,9 +140,9 @@ void Unk800085B0::vslot22(int a, float f)
     if (m15E4) {
         if (!m15F8 && m1600 <= 0) {
             m15E8 = a;
+            m15F8 = 1;
             m15E0 = 1;
             m15EC = f;
-            m15F8 = 1;
         }
         m1600 = 5;
     }
