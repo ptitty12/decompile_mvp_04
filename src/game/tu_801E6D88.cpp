@@ -117,6 +117,40 @@ extern "C" void fn_801E6E48(I* s, int chrg)
         operator delete(s);
 }
 
+inline Vec3 Unk801E7218_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline float Unk801E7218_Len2(Vec3 v)
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
+extern const Vec3 lbl_805D3FE0[];
+extern "C" Vec3 fn_801DC814(Unk801DB948* self, Unk801DB948_Obj* o, int c, int d);
+extern "C" int fn_801E7E00(Unk801DD660_Ctx* self, int idx, Vec3* v, int a, int b);
+
+extern "C" Vec3 fn_801E7218(Unk801DD660_Ctx* self, int idx, Unk801DB948_Obj* o, int c, const Vec3* pos)
+{
+    Unk801DB948_J* j = self->m0->m700;
+    Vec3 base = fn_801DC814(j->m3B8, o, c, idx);
+    int f1 = 0;
+    int f2 = 0;
+    if (pos != 0) {
+        if (!(Unk801E7218_Len2(Unk801E7218_Sub(*pos, lbl_805D3FE0[idx * 2])) >= 36.0f))
+            f2 = 1;
+        if (!(Unk801E7218_Len2(Unk801E7218_Sub(*pos, lbl_805D3FE0[idx * 2 + 1])) >= 36.0f)) {
+            f1 = 1;
+            f2 = 1;
+        }
+    }
+    int k = fn_801E7E00(self, idx, &base, f1, f2);
+    return *(const Vec3*)((const char*)lbl_805D3FE0 + idx * 24 + k * 12);
+}
+
 extern "C" Vec3 fn_801E73B8(void* self, int k)
 {
     return lbl_805D4040[k];
@@ -293,6 +327,38 @@ extern "C" int fn_801E8328(I* s, Vec3* out, float f)
     return r;
 }
 
+extern "C" int fn_801E8428(I* s, int a, Vec3* out, float* outf)
+{
+    int r = 0;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    *outf = 3.0f;
+    float c = fn_802D7E2C(k, 0xBC);
+    if (!(c <= 1.0f))
+        c = 1.0f;
+    float a1 = fn_802D7F40(k);
+    float b1 = fn_802D7E88(k, 0xBC);
+    P* p = fn_801A497C(s->m9C->m0, 4, a);
+
+    float thr;
+    if (!(c <= (thr = 0.04f))) {
+        r = 1;
+        a1 = -a1;
+        *outf = c;
+        b1 = b1 - 3.1415927f;
+        out->x = fn_80411554(a1 + b1) * 240.0f;
+        out->y = 0.0f;
+        out->z = fn_8041171C(a1 + b1) * 240.0f;
+        const Vec3* pv = &p->m60;
+        out->x = out->x + pv->x;
+        out->y = out->y + pv->y;
+        out->z = out->z + pv->z;
+    } else {
+        *outf = 0.0f;
+        *out = p->m60;
+    }
+    return r;
+}
+
 extern "C" int fn_801E85D0()
 {
     return 1;
@@ -372,6 +438,79 @@ struct Unk801E8A3C_Tbl {
 };
 extern const Unk801E8A3C_Tbl lbl_805D4244;
 
+struct Unk801E8810_Q {
+    char pad0[0x14];
+    float m14;
+    char pad18[8];
+    int m20;
+    char pad24[0x38 - 0x24];
+    int m38;
+};
+struct Unk801E8810_R {
+    char pad0[8];
+    float m8;
+    char padC[8];
+    float m14;
+    float m18;
+};
+struct Unk802F8324_O3;
+struct Unk802F8324_Rec;
+void fn_802FAD5C(Unk802F8324_O3* o, int k, Unk802F8324_Rec* r);
+extern int lbl_8061B9C8;
+
+extern "C" int fn_801E8810(I* s, int a, int sel, float* out, float f)
+{
+    int r = 0;
+    int k = fn_801A2034((Unk8019F8C0_Owner*)s->m9C->m0, 4);
+    Unk801E8810_Q* q = (Unk801E8810_Q*)(s->m9C->m0->m700->m3B0 + 0xC);
+    if (q->m20 == 1)
+        r = q->m38 == 0;
+    if (sel == -1) {
+        if (fn_802D7DB4(k, 0xC5) == 1 || fn_802D7DB4(k, 0xC6) == 1)
+            r = 1;
+    } else if (sel == 0) {
+        if (fn_802D7DB4(k, 0xC0) == 1)
+            r = 1;
+    } else if (sel == 1) {
+        if (fn_802D7DB4(k, 0xC1) == 1)
+            r = 1;
+    } else if (sel == 2) {
+        if (fn_802D7DB4(k, 0xC2) == 1)
+            r = 1;
+    } else if (sel == 3) {
+        if (fn_802D7DB4(k, 0xC3) == 1)
+            r = 1;
+    }
+    Unk801E8810_R* rec = (Unk801E8810_R*)((char*)s + 0xC4);
+    fn_801A497C(s->m9C->m0, 4, a);
+    float v0 = -1.0f;
+    float w;
+    if (r == 1) {
+        if (!(f >= 0.0f))
+            v0 = rec->m14;
+        else
+            v0 = rec->m18 + f;
+        w = v0;
+        rec->m14 = w;
+        w = (float)lbl_8061B9C8 * 0.016666668f + rec->m18;
+        rec->m18 = w;
+        if (!(rec->m18 <= v0)) {
+            w = v0;
+            r = 0;
+            rec->m18 = w;
+        }
+    }
+    if (q->m20 == 1 && q->m38 == 0) {
+        fn_802FAD5C(*(Unk802F8324_O3**)((char*)s->m9C->m0 + 0x720), k, (Unk802F8324_Rec*)q);
+        *out = q->m14;
+    } else {
+        *out = rec->m18 / rec->m14;
+    }
+    w = *out;
+    rec->m8 = w;
+    return r;
+}
+
 extern "C" int fn_801E8A3C(I* s, int a, int skip)
 {
     int found = 0;
@@ -415,6 +554,89 @@ extern "C" void fn_801E8BEC(I* s, Vec3* b)
 {
     float v;
     fn_801E8328(s, b, v = lbl_805D4254);
+}
+
+struct Unk8024EF40_A;
+int fn_80254A90(Unk8024EF40_A* a);
+extern "C" int fn_801EFD98(I* s, P** out);
+extern const float lbl_805D4268;
+struct Unk801E8EF4_Dn {
+    int v;
+    Unk801E8EF4_Dn(int x) { v = x; }
+    ~Unk801E8EF4_Dn() {}
+    int Next()
+    {
+        int t;
+        if (v > -1)
+            t = v - 1;
+        else
+            t = v;
+        v = t;
+        return t;
+    }
+};
+inline Vec3 Unk801E8EF4_Sub(const Vec3& a, const Vec3& b)
+{
+    Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+inline P* Unk801E8EF4_At(Unk801DB948_Game* g, int i)
+{
+    if ((unsigned)i <= 12) {
+        int off = i * 4;
+        char* b = (char*)g + 0x65C;
+        return *(P**)(b + off);
+    }
+    return 0;
+}
+
+/* near-miss (1 slot): retail slwi writes r11 (the loop index) in place; ours uses r0 for the scaled offset. Tried: unsigned idx,
+   ii copy, int/unsigned At() param, branch/early-return forms, off/base order */
+extern "C" int fn_801E8EF4(I* s, int idx, P** out)
+{
+    float u = lbl_805D4268;
+    int r = 0;
+    P* o = fn_801A497C(s->m9C->m0, 4, idx);
+    P* best = 0;
+    Vec3 pos = o->m60;
+    float bestD = lbl_805D4268;
+    P* found = 0;
+    if (fn_801EFD98(s, &found) == 1) {
+        best = found;
+        Vec3 d = Unk801E8EF4_Sub(best->m60, pos);
+        bestD = d.x * d.x + d.z * d.z;
+    } else {
+        int cnt = 12;
+        int idx = 12;
+        do {
+            P* c = Unk801E8EF4_At(s->m9C->m0, idx);
+            if (c != 0 && fn_80254A90((Unk8024EF40_A*)((char*)c + 0x58C)) == 1) {
+                float d2;
+                Vec3 d = Unk801E8EF4_Sub(c->m60, pos);
+                d2 = d.x * d.x + d.z * d.z;
+                if (!(d2 >= bestD)) {
+                    bestD = d2;
+                    best = c;
+                }
+            }
+            int cc = *(volatile int*)&cnt;
+            int t;
+            if (cc <= -1)
+                t = cc;
+            else
+                t = cc - 1;
+            *(volatile int*)&cnt = t;
+            idx = t;
+        } while (idx > 8);
+    }
+    if (best != 0) {
+        *out = best;
+        r = 1;
+    }
+    return r;
 }
 
 extern "C" int fn_801E90F4(I* s)

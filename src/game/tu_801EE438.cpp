@@ -12,6 +12,97 @@ extern float lbl_805D4CB0;
 
 extern "C" {
 
+struct Unk801EE438_PlE438 {
+    char pad0[0x450];
+    int m450;
+};
+int fn_80211D78(int* sub);
+Unk801EE438_Vec fn_8014E388(unsigned idx);
+float fn_80248450(Unk801EE438_Player* pl, Unk801EE438_Vec* v, int a, int b);
+void fn_8021AA44(Unk801EE438_Scr* p, int a, int b);
+int fn_801EE77C(Unk801EE438_Scr* p, int slot, int k);
+
+inline Unk801EE438_Slot* SlotAtE438(Unk801EE438_Slot* a, int i)
+{
+    Unk801EE438_Slot* q = a + i;
+    return q;
+}
+
+inline int RdE438(char* b, int off)
+{
+    return *(int*)(b + off);
+}
+inline void WrE438(char* b, int off, int v)
+{
+    *(int*)(b + off) = v;
+}
+
+/* near-miss (register numbering only): retail keeps the iterator index in r11 and the row pointer in r10; ours swaps them (and
+   the later i*4 temp). Tried: explicit index local, row pointer, byte-offset accessors, decl-order permutations of the slot setup */
+void fn_801EE438(Scr* p, int a, int b)
+{
+    Unk801EE438_G* g = p->m9C;
+    if (((Unk801EE438_PlE438*)g->m8[b])->m450 == 0) {
+        Unk801EE438_Slot* sl = SlotAtE438(g->mCA8, b);
+        int f = 0;
+        if (sl->m0 == 0 || sl->m4[0].m0 == 0x17 || sl->m4[0].m0 == 0x29 || sl->m4[0].m0 == 0x25 || sl->m4[0].m0 == 0xE || sl->m4[0].m0 == 0x12)
+            f = 1;
+        if (f == 1) {
+            fn_80205450(g, b);
+            fn_801F0EA8(p, b);
+            fn_802123D4(p, 0, 1);
+            fn_80213988(p, a, 1);
+        }
+    }
+    if (fn_80211D78(&p->m9C->mE8) != a) {
+        Unk801EE438_G* h = p->m9C;
+        int ho = b << 4;
+        if (RdE438((char*)h + 0x9FC, ho) == 0 || RdE438((char*)h + 0x9F4, ho) != a) {
+            Unk801EE438_It it;
+            fn_8014E09C(&it, h->m0, 1);
+            while (it.m8 != 10) {
+                Unk801EE438_It* ip = &it;
+                if (ip->m8 != b) {
+                    Unk801EE438_G* g3 = p->m9C;
+                    if (*(int*)((char*)g3 + 0x9FC + ip->m8 * 16) == 1 && *(int*)((char*)g3 + 0x9F4 + ip->m8 * 16) == a) {
+                        Unk801EE438_Player* o = g3->m8[ip->m8];
+                        Unk801EE438_Player* me = g3->m8[b];
+                        if (g3->m4->m36C != o) {
+                            float f1;
+                            {
+                                Unk801EE438_Vec tmp = fn_8014E388(a);
+                                f1 = fn_80248450(me, &tmp, 3, 7);
+                            }
+                            float f2;
+                            {
+                                Unk801EE438_Vec tmp = fn_8014E388(a);
+                                f2 = fn_80248450(o, &tmp, 3, 7);
+                            }
+                            if (!(f1 <= f2) && fn_801EE77C(p, ip->m8, a) == 1) {
+                                fn_801EE6F4(p, ip->m8);
+                                fn_801EE6F4(p, b);
+                                WrE438((char*)p->m9C + 0xC0, a * 4, ip->m8);
+                                fn_80205450(p->m9C, ip->m8);
+                                fn_801F0EA8(p, ip->m8);
+                                fn_802123D4(p, 0, 1);
+                                Unk801EE438_Player* pp = p->m9C->m4->m36C;
+                                if (pp != 0 && b != pp->m460) {
+                                    fn_80205450(p->m9C, b);
+                                    fn_802123D4(p, 1, 0);
+                                    fn_8021AA44(p, a, ip->m8);
+                                }
+                                fn_80205450(p->m9C, ip->m8);
+                                fn_80213988(p, a, 1);
+                            }
+                        }
+                    }
+                }
+                fn_8014E108(&it);
+            }
+        }
+    }
+}
+
 int fn_801EE6F4(Scr* p, int a)
 {
     int r = 0;
