@@ -4,6 +4,48 @@
  */
 #include "game/tu_8026C414.h"
 #include "game/chooser.h"
+#include "game/tu_802A6334.h"
+extern char lbl_80663F20[], lbl_80663FB0[], lbl_806604F8[], lbl_80664008[];
+extern "C" void fn_80319360(Unk802A6334*);
+extern "C" void fn_80328374(void*, int);
+extern "C" void fn_80377408(void*);
+/* fn_8026C864: transform vptrs at +0x98/+0x238/+0x318, secondary
+ * vptr at +0xB8, and owned node pool at +0x244 (derived vptr +0x260).
+ * The pool cleanup restores its derived vptr before the base destructor. */
+struct Unk8026C864_Pool {
+    Unk802A6334 p;
+    void* vptr;
+    inline void Destroy()
+    {
+        vptr = lbl_80664008;
+        p.Unk802A6334::~Unk802A6334();
+    }
+};
+struct Unk8026C864 {
+    char pad0[0x98];
+    void* m98;
+    char pad9C[0x1C];
+    void* mB8;
+    char padBC[0x238 - 0xBC];
+    void* m238;
+    char pad23C[8];
+    Unk8026C864_Pool m244;
+    char pad264[0x318 - 0x264];
+    void* m318;
+};
+extern "C" void fn_8026C864(Unk8026C864* self, int chrg)
+{
+    self->mB8 = lbl_80663F20;
+    self->m98 = lbl_80663FB0;
+    fn_80319360(&self->m244.p);
+    self->m318 = lbl_806604F8;
+    self->m244.Destroy();
+    self->m238 = lbl_806604F8;
+    fn_80328374((char*)self + 0xA0, 0);
+    self->m98 = lbl_806604F8;
+    if (chrg & 1)
+        fn_80377408(self);
+}
 
 typedef Unk8026C414_O O;
 typedef Unk8026C414_X X;
