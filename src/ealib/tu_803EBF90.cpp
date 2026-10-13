@@ -186,6 +186,70 @@ extern "C" unsigned fn_803EC418(RcBlk* t, int x, int y, int lvl)
     return r;
 }
 
+extern "C" int fn_803ECF4C(int, int);
+extern "C" int fn_803ECF68(int, int);
+extern "C" int fn_803ECF84(int, int);
+extern "C" int fn_803ECFA0(int, int);
+extern "C" int fn_803EC568(unsigned char tag, short w, short h, int levels, int flag)
+{
+    struct RcTmpN {
+        unsigned char tag;
+        char pad[15];
+    } tmpn;
+    tmpn.tag = tag;
+    int total = 0;
+    int bpp = fn_803EC03C((RcNode*)&tmpn);
+    if (bpp == 0xf)
+        bpp = 0x10;
+    unsigned i;
+    if (flag != 0) {
+        i = 0;
+        if ((unsigned)total <= (unsigned)levels) {
+            do {
+                switch (bpp) {
+                case 0x20:
+                    total += fn_803ECF4C(w >> i, h >> i);
+                    break;
+                case 0xf:
+                case 0x10:
+                    total += fn_803ECF68(w >> i, h >> i);
+                    break;
+                case 8:
+                    total += fn_803ECF84(w >> i, h >> i);
+                    break;
+                case 4:
+                    total += fn_803ECFA0(w >> i, h >> i);
+                    break;
+                }
+                i++;
+            } while (i <= (unsigned)levels);
+        }
+    } else {
+        i = 0;
+        if ((unsigned)total <= (unsigned)levels) {
+            do {
+                int cw = w >> i;
+                int ch = h >> i;
+                if (cw <= 0)
+                    cw = 1;
+                if (ch <= 0)
+                    ch = 1;
+                if (tag == 0x1e) {
+                    cw = (cw + 7) & ~7;
+                    ch = (ch + 7) & ~7;
+                }
+                if (total != 0)
+                    total = (total + 0x1f) & ~0x1f;
+                total += ((cw * bpp + 7) / 8) * ch;
+                i++;
+            } while (i <= (unsigned)levels);
+        }
+    }
+    if (total != 0)
+        total += 0x10;
+    return total;
+}
+
 extern "C" int fn_803EC6F8(RcBlk* n)
 {
     int r = 0;
