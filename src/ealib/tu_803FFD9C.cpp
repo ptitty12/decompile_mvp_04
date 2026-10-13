@@ -267,17 +267,16 @@ extern "C" void fn_8040021C(int msg)
     OSSendMessage(lbl_806B8308, msg, 0);
 }
 
-/* near-miss: retail forms &msg per call (addi r4,r1,8); ours keeps it in a callee-saved register. */
 extern "C" int fn_8040024C()
 {
     int msg = 0;
-    do {
+    while (msg != 2) {
         OSReceiveMessage(lbl_806B8308, &msg, 1);
         if (msg == 0)
             fn_803FF9D4();
         else if (msg == 1)
             fn_80400EF8();
-    } while (msg != 2);
+    }
     return 0;
 }
 
