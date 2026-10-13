@@ -319,12 +319,107 @@ int fn_8029D184(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
     return fn_8024B99C(x, &v, &w, &z, 0, 0);
 }
 
-void fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror118, int, 0x118)
+
+struct Unk801A4CE8_Obj {
+    char pad0[0x128];
+    char m128[1];
+};
+Unk801A4CE8_Obj* fn_801A4CE8(Unk8014D8AC_Ctx* ctx, int a);
+extern "C" int strcmp(const char* a, const char* b);
+Unk80273498_Vec3 fn_8014E388(int idx);
+int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t);
+extern const Unk80273498_Vec3 lbl_805DCB7C;
+
+inline int Unk8029D2E0_Left(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
+{
+    return !(a.x * b.z - a.z * b.x >= 0.0f);
+}
+
+/* near-miss (255 of 255 instructions, 5 lines differ): retail loads the 0.0f compare constant (inside the Left
+ * inline) four instructions earlier, before the first param copy. lbl_805DCB7C must be const (that took
+ * 9 lines down to 5). Tried: pos/p declaration order and assignment forms, the compare in the caller or in
+ * the inline (float vs int return, `<`, `>=`, ternary). */
+unsigned int fn_8029D2E0(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int a)
+{
+    Unk80273498_Vec3 v;
+    int r = 0;
+    float ang = fn_80382BB8(x->m618);
+
+    if (fn_8029D184(g, x, 6.0f) == 1) {
+        r = 1;
+    } else {
+        float k = 18000.0f;
+
+        if ((unsigned int)(kind - 5) <= 2) {
+            v = fn_8014E388(2);
+            v.z -= 18000.0f;
+            Unk80273498_Vec3 pos = v;
+            r = fn_8029D6DC(g, x, &pos);
+        }
+        if (r == 0) {
+            if ((unsigned int)(kind - 1) <= 2) {
+                v = fn_8014E388(0);
+                v.x -= 18000.0f;
+                Unk80273498_Vec3 pos = v;
+                r = fn_8029D6DC(g, x, &pos);
+            }
+            if (r == 0) {
+                if (kind == 0 || kind == 7 || kind == 1) {
+                    if (strcmp(fn_801A4CE8(fn_8027A918(g), 1)->m128, "BehindHomeFirst ") == 0
+                        || strcmp(fn_801A4CE8(fn_8027A918(g), 1)->m128, "BehindHomeThird ") == 0) {
+                        v = fn_8014E388(3);
+                        v.x = v.x - 18000.0f;
+                        v.z = v.z - 18000.0f;
+                    } else {
+                        v = fn_8014E388(3);
+                        Unk80273498_Vec3 pos = lbl_805DCB7C;
+                        Unk80273498_Vec3 p = x->m60;
+                        if (Unk8029D2E0_Left(pos, p)) {
+                            v.x = v.x + 18000.0f;
+                            v.z = v.z + 9000.0f;
+                        } else {
+                            v.x = v.x + 9000.0f;
+                            v.z = v.z + 18000.0f;
+                        }
+                    }
+                    Unk80273498_Vec3 pos = v;
+                    r = fn_8029D6DC(g, x, &pos);
+                }
+            }
+        }
+    }
+    if (r != 0) {
+        int t = fn_8029D184(g, x, 54.0f) == 0;
+        int val;
+        unsigned int ret;
+
+        if (a) {
+            val = 0;
+            if (t) {
+                val = 2;
+            }
+            ret = 0x61469778;
+        } else {
+            val = 1;
+            if (t) {
+                val = 3;
+            }
+            ret = 0x0B0B3C8F;
+        }
+        Unk8029B70C_Mirror118(&x->m734, val);
+        return ret;
+    }
+    fn_80244858(x, ang);
+    return 0;
+}
+
+int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t)
 {
     float ang = fn_80410CE8(t->x - x->m60.x, t->z - x->m60.z);
     float tgt = fn_80382BB8(x->m618) + AngleDiff(ang, fn_80382BB8(x->m618));
     fn_80244858(x, tgt);
-    fn_8029D184(g, x, 6.0f);
+    return fn_8029D184(g, x, 6.0f);
 }
 
 int fn_8029D7C4(Unk8029B70C_Goal* g)
@@ -434,6 +529,49 @@ Unk8029B70C_Req fn_8029E4AC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int
         }
     }
     return s;
+}
+
+float fn_8018CA78(Unk80273498_Pos* p);
+
+#define UNK8029E6BC_CHK(f, h) (r.f != 0 && fn_80381E9C(link, h, 0, 0))
+
+int fn_8029E6BC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int a, int b, Unk8029B70C_Req r)
+{
+    Unk80273498_Pos* p = fn_8027A918(g)->m6CC;
+    float f = fn_8018CA78(p);
+
+    if (f < 0.0f || !(p->m3F4 + 0.3f > f)) {
+        if (a
+            && (UNK8029E6BC_CHK(m14, 0xDB7AB022) || UNK8029E6BC_CHK(m8, 0x0E246B08) || UNK8029E6BC_CHK(m8, 0xF4318E1D)
+                || UNK8029E6BC_CHK(m8, 0x4C226115) || UNK8029E6BC_CHK(m4, 0x512ADB3C) || UNK8029E6BC_CHK(m2C, 0xEE1B6C46)
+                || UNK8029E6BC_CHK(m30, 0x8CFB37B7) || UNK8029E6BC_CHK(m38, 0x1F8D6080) || UNK8029E6BC_CHK(m3C, 0x9D44D7EE)
+                || UNK8029E6BC_CHK(m40, 0x5C53C627) || UNK8029E6BC_CHK(m44, 0xC0F46231) || UNK8029E6BC_CHK(m48, 0xE14981C4)
+                || UNK8029E6BC_CHK(m4C, 0x9D803AF7) || UNK8029E6BC_CHK(m34, 0xD484ACC6) || UNK8029E6BC_CHK(m18, 0x8249F53C)
+                || UNK8029E6BC_CHK(m0, 0xE433AA50) || UNK8029E6BC_CHK(m0, 0x9CEA8000) || UNK8029E6BC_CHK(m0, 0x8C1988B6))) {
+            int h = link->m83C;
+
+            g->mD0.f6 = 0;
+            g->m50 = h;
+            if (h == 0x7BF65171 || h == 0x0E246B08) {
+                g->m4C = 2;
+            } else {
+                g->m4C = 1;
+            }
+            return 1;
+        }
+        if (b
+            && (UNK8029E6BC_CHK(m50, 0xFA01EA4A) || UNK8029E6BC_CHK(m54, 0x34CFAED1) || UNK8029E6BC_CHK(m20, 0xA68012D3)
+                || UNK8029E6BC_CHK(m2C, 0x0C0032D1) || UNK8029E6BC_CHK(m30, 0x1407B459) || UNK8029E6BC_CHK(m1C, 0x07CBFA4B)
+                || UNK8029E6BC_CHK(m28, 0x36E74862) || UNK8029E6BC_CHK(m24, 0xE9868307))) {
+            int h = link->m83C;
+
+            g->m4C = 2;
+            g->m50 = h;
+            g->mD0.f6 = 0;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int fn_8029EC30(Unk8029B70C_Goal* g, Unk80270BA0_X* x, Unk80271DBC_Link* link, int kind, int a, int b, Unk8029B70C_Req o)

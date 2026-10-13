@@ -7,9 +7,13 @@
  */
 #include "game/chooser.h"
 #include "game/goals/tu_8027FD64.h"
+#include "game/goals/tu_8027A84C.h"
+extern "C" float atan2f(float y, float x);
 
 float lbl_8061E6D0 = 45.0f;
 extern Unk80273498_Vec3 lbl_805DED28;
+float fn_8041171C(float x);
+float fn_80411554(float x);
 
 void fn_80280418(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int d);
 int fn_802834E8(Unk8027FD64_Goal* g, Unk80270BA0_X* x, int c);
@@ -132,6 +136,112 @@ float fn_802816D0(Unk8027FD64_Goal* g, Unk8014D8AC_Ctx* ctx)
     return result;
 }
 
+/* Motion query (constructor in animation/choosers/tu_80279AE4.cpp, size 0xDC): fields this unit writes. */
+class Unk80279BB8 {
+public:
+    Unk80279BB8(Unk80270BA0_X* x);
+    char pad0[0xCC];
+    int mCC;
+    float mD0;
+    float mD4;
+    int mD8;
+    void SetD4(float v) { mD4 = v; }
+    void SetCC(int v) { mCC = v; }
+};
+
+inline Unk80273498_Vec3 operator+(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    r.z = a.z + b.z;
+    return r;
+}
+
+inline Unk80273498_Vec3 operator*(Unk80273498_Vec3 v, float s)
+{
+    Unk80273498_Vec3 r;
+    r.x = v.x * s;
+    r.y = v.y * s;
+    r.z = v.z * s;
+    return r;
+}
+
+inline Unk80273498_Vec3 Direction(float angle)
+{
+    Unk80273498_Vec3 r;
+    r.x = fn_8041171C(angle);
+    r.y = 0.0f;
+    r.z = fn_80411554(angle);
+    return r;
+}
+
+inline Unk80273498_Vec3 FlatPos(Unk80270BA0_X* x)
+{
+    Unk80273498_Vec3 t = x->m60;
+    t.y = 0.0f;
+    return t;
+}
+
+/* Root goal (Unk8028F178_Goal): fields written here. */
+struct Unk802817A0_Root {
+    char pad0[0x38];
+    int m38;
+    char pad3C[0x58 - 0x3C];
+    int m58;
+};
+void fn_8028F440(Unk802817A0_Root* g);
+void fn_8028F45C(Unk802817A0_Root* g, Unk80273498_Vec3 v);
+void fn_80281A7C(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk80279BB8* q);
+int fn_8026D988(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+int fn_8026D7B4(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+int fn_8026D7E0(Unk80270BA0_X* x, Unk8027AD3C_Obj* o);
+float fn_80382BB8(Unk80271DBC_Link* l);
+int fn_80386110(Unk80271DBC_Link* link, Unk80279BB8* q, int hash, int ev, float* out, int flags);
+extern int lbl_806242B4;
+
+void fn_802817A0(Unk8027FD64_Goal* g, Unk80270BA0_X* x, Unk8027AD3C_Obj* o)
+{
+    Unk80273498_Vec3 pos;
+    float heading;
+    int hash;
+
+    ((Unk8027A84C*)g)->fn_8027AD3C(x, o, &pos, &heading, 0, 0, &hash, 0);
+    Unk80271DBC_Link* link = x->m618;
+    if (fn_8026D988(x, o)) {
+        float f = 0.0f;
+        Unk80279BB8 q(x);
+
+        fn_80386110(link, &q, hash, lbl_806242B4, &f, 0x12);
+        q.SetD4(f);
+        q.SetCC(3);
+        fn_80281A7C(g, x, &q);
+        g->mE8.f21 = 0;
+    } else if (fn_8026D7B4(x, o)) {
+        float f = 0.0f;
+        Unk80279BB8 q(x);
+
+        fn_80386110(link, &q, hash, lbl_806242B4, &f, 0x12);
+        q.SetD4(f);
+        q.SetCC(3);
+        fn_80281A7C(g, x, &q);
+        g->mE8.f21 = 0;
+    } else if (!g->mE8.f21 && fn_8026D7E0(x, o)) {
+        Unk80273498_Vec3 p = FlatPos(x);
+        float ang = fn_80382BB8(x->m618);
+
+        fn_8028F440((Unk802817A0_Root*)g->m4);
+        fn_8028F45C((Unk802817A0_Root*)g->m4, p + Direction(ang) * 144.0f);
+        ((Unk802817A0_Root*)g->m4)->m38 = 2;
+        ((Unk802817A0_Root*)g->m4)->m58 = 7;
+        g->mC = 1;
+        g->mE8.f21 = 1;
+    } else {
+        fn_80281A7C(g, x, 0);
+        g->mE8.f21 = 0;
+    }
+}
+
 void fn_80282B78(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float f)
 {
     float lim = 76176.0f;
@@ -216,6 +326,123 @@ int fn_80282E5C(Unk8027FD64_Goal* g)
         }
     }
     return result;
+}
+
+class Unk8027A05C {
+public:
+    float fn_8027A280(int a);
+};
+
+struct Unk802831B0_Ext {
+    char pad0[0xD4];
+    float mD4;
+};
+
+inline Unk80273498_Vec3 operator-(const Unk80273498_Vec3& a, const Unk80273498_Vec3& b)
+{
+    Unk80273498_Vec3 r;
+    r.x = a.x - b.x;
+    r.y = a.y - b.y;
+    r.z = a.z - b.z;
+    return r;
+}
+
+/* Sibling of fn_802831B0 (pass 5). Frame notes: the vector `d` sits in its own block so its slot is free
+ * again for the Abs wrapper's parameter (retail's 0x28 slot); `u` is read through the Abs wrapper. */
+int fn_80282EE4(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float a, Unk802831B0_Ext* p, float b, Unk80273498_Vec3* v1, Unk80273498_Vec3* v2, float th, int e, int c)
+{
+    float lo, hi, v, t, w;
+
+    if (!(b <= 36.0f)) {
+        lo = fn_80248FC8(x, 1);
+        hi = fn_80248FC8(x, 2);
+        v = fn_80248FC8(x, 2);
+        t = v + 39.37008f;
+        if (c) {
+            t = hi;
+        }
+        if (e) {
+            {
+                Unk80273498_Vec3 d = *v2 - *v1;
+                w = atan2f(d.x, d.z);
+            }
+            float u = Unk8027FD64_Abs(AngleDiff(th, w));
+            if (!(u <= 1.5707964f)) {
+                t = hi;
+            }
+            if (!(u <= 0.7853982f)) {
+                if (c) {
+                    t = (hi + lo) * 0.5f;
+                }
+            }
+        }
+        return a > t;
+    }
+    if (!(g->m80 > 0.0f)) {
+        return 0;
+    }
+    int idx = fn_8027FC20(g, g->m0);
+    float u = g->m8->fn_8027A280(idx);
+    w = b / fn_80248FC8(x, 3);
+    u += w;
+    if (p) {
+        u += p->mD4;
+    }
+    v = 0.25f;
+    t = u / g->m80;
+    if (g->mE8.f1 && g->m68 == 7) {
+        v = 0.6f;
+    }
+    return t > v + 1.0f;
+}
+
+int fn_802831B0(Unk8027FD64_Goal* g, Unk80270BA0_X* x, float a, Unk802831B0_Ext* p, int c, float b)
+{
+    float lo, mid, hi, r, t;
+
+    if (!(b <= 36.0f)) {
+        lo = fn_80248FC8(x, 1);
+        mid = fn_80248FC8(x, 0);
+        hi = fn_80248FC8(x, 2);
+        r = lo;
+        if (!(b >= 60.0f)) {
+            t = (b - 36.0f) * 0.041666668f;
+            r = t * (lo - mid) + mid;
+        }
+        if (g->mE8.f14) {
+            r = mid;
+        } else if (g->mE8.f17) {
+            r = hi;
+        }
+        int kind = g->m38;
+        if (g->m3C != -1) {
+            kind = g->m3C;
+        }
+        if (kind == 4) {
+            t = fn_80248FC8(x, 2) - 39.37008f;
+            if (c) {
+                t = fn_80248FC8(x, 1);
+            }
+            r = t;
+        }
+        return a < r;
+    }
+    if (!(g->m80 > 0.0f)) {
+        return 1;
+    }
+    int idx = fn_8027FC20(g, g->m0);
+    t = g->m8->fn_8027A280(idx);
+    r = b / fn_80248FC8(x, 1);
+    t += r;
+    if (p) {
+        t += p->mD4;
+    }
+    mid = 0.25f;
+    hi = t / g->m80;
+    if (g->mE8.f1 && g->m68 == 7) {
+        mid = 0.6f;
+    }
+    return hi < 1.0f - mid;
 }
 
 void fn_802833E8(void* unused, Unk802833E8_Req* o, int a5, int a6, int a7, Unk80273498_Vec3* v, float* f1, float* f2)
