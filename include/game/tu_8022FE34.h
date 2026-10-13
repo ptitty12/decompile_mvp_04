@@ -216,6 +216,7 @@ struct Unk8022FE34_Owner {
     void fn_8023246C();
     int fn_802324E0();
     int fn_802324EC();
+    void fn_80232500();
     int fn_80232254();
     int fn_80232084();
     void fn_8023262C(int i, Unk8022FE34_Pl* pl, Unk8022FE34_Row* r);

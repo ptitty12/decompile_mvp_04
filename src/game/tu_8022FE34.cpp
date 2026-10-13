@@ -756,6 +756,74 @@ int Unk8022FE34_Owner::fn_802324EC()
     return m1C == 1;
 }
 
+extern "C" float atan2f(float y, float x);
+struct Unk80270BA0_X;
+void fn_80299B98(Unk80270BA0_X* x, const Unk80273498_Vec3& v, float* p);
+void fn_8023A7E8(int* p);
+
+struct UView232500 {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    float m14;
+    float m18;
+    float m1C;
+    int m20;
+    char pad24[4];
+    int m28;
+    int m2C;
+    int m30;
+    int m34;
+    int m38;
+};
+
+inline void UInit232500(UView232500* u)
+{
+    u->m38 = 0;
+    u->m34 = 0;
+    u->m2C = 0;
+    u->m20 = 0;
+    u->m10 = 0;
+    u->m0 = 0;
+    u->m30 = 0;
+    u->m4 = 0;
+    u->m8 = 0;
+    u->mC = 0;
+    u->m14 = 0.0f;
+    u->m18 = 0.0f;
+    u->m1C = 0.0f;
+    u->m28 = -1;
+}
+
+void Unk8022FE34_Owner::fn_80232500()
+{
+    float a;
+    fn_8023A7E8(&m440.m0);
+    Unk8022FE34_Ctx* c = m0;
+    void* ap = c->m65C;
+    int z = 0;
+    if (ap != 0) {
+        m1C = z;
+        m430 = z;
+        m434 = z;
+        if (c->m6F4 == 8) {
+            Unk8022FE34_V3 t = fn_80231E4C();
+            a = atan2f(*(float*)&t.a, *(float*)&t.c);
+            fn_80299B98((Unk80270BA0_X*)ap, lbl_805D7DCC, &a);
+        }
+        Unk8027C728_Goal* g = fn_802448F4(ap, 1);
+        g->m10 = 2;
+        fn_8027C728(g);
+        Unk8027A84C* kb = (Unk8027A84C*)((Unk80287D70*)g->m18)->fn_80287DB8(8);
+        Unk8022FE34_V3 t2 = fn_80231E4C();
+        kb->fn_8027A898((const Unk80273498_Vec3*)&t2);
+        fn_8027D33C(g);
+    }
+    UInit232500((UView232500*)((char*)m4 + 0xc));
+}
+
 void Unk8022FE34_Owner::fn_8023262C(int i, Unk8022FE34_Pl* pl, Unk8022FE34_Row* r)
 {
     m18 = 0;
