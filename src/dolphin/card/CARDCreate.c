@@ -3,6 +3,15 @@
 
 #include "__card.h"
 
+extern OSTime fn_80438628(void); /* OSGetTime */
+extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
+extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
+extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
+extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
+extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
+extern CARDControl lbl_806DCF20[2]; /* __CARDBlock */
+
+
 // prototypes
 static void CreateCallbackFat(s32 chan, s32 result);
 
@@ -12,7 +21,7 @@ static void CreateCallbackFat(s32 chan, s32 result) {
     CARDDir* ent;
     CARDCallback callback;
 
-    card = &__CARDBlock[chan];
+    card = &lbl_806DCF20[chan];
     callback = card->apiCallback;
     card->apiCallback = NULL;
 
@@ -35,14 +44,14 @@ static void CreateCallbackFat(s32 chan, s32 result) {
         CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
         card->fileInfo->offset = 0;
         card->fileInfo->iBlock = ent->startBlock;
-        ent->time = OSTicksToSeconds(OSGetTime());
+        ent->time = OSTicksToSeconds(fn_80438628());
         result = __CARDUpdateDir(chan, callback);
         if (result < 0) {
             goto after;
         }
     } else {
 after:;
-        __CARDPutControlBlock(card, result);
+        fn_8041B900(card, result);
         if (callback) {
             callback(chan, result);
         }
@@ -65,7 +74,7 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
         return CARD_RESULT_NAMETOOLONG;
     }
 
-    result = __CARDGetControlBlock(chan, &card);
+    result = fn_8041B848(chan, &card);
     if (result < 0) {
         return result;
     }
@@ -87,20 +96,20 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
         } else if (memcmp(ent->gameName, card->diskID->gameName, sizeof(ent->gameName)) == 0 &&
                              memcmp(ent->company, card->diskID->company, sizeof(ent->company)) == 0 &&
                              __CARDCompareFileName(ent, fileName)) {
-            return __CARDPutControlBlock(card, CARD_RESULT_EXIST);
+            return fn_8041B900(card, CARD_RESULT_EXIST);
         }
     }
 
     if (freeNo == (u16)-1) {
-        return __CARDPutControlBlock(card, CARD_RESULT_NOENT);
+        return fn_8041B900(card, CARD_RESULT_NOENT);
     }
 
     fat = __CARDGetFatBlock(card);
     if (card->sectorSize * fat[CARD_FAT_FREEBLOCKS] < size) {
-        return __CARDPutControlBlock(card, CARD_RESULT_INSSPACE);
+        return fn_8041B900(card, CARD_RESULT_INSSPACE);
     }
 
-    card->apiCallback = callback ? callback : __CARDDefaultApiCallback;
+    card->apiCallback = callback ? callback : fn_8041A6C4;
     card->freeNo = freeNo;
     ent = &dir[freeNo];
     ent->length = (u16)(size / card->sectorSize);
@@ -112,16 +121,16 @@ s32 CARDCreateAsync(s32 chan, const char* fileName, u32 size, CARDFileInfo* file
 
     result = __CARDAllocBlock(chan, size / card->sectorSize, CreateCallbackFat);
     if (result < 0) {
-        return __CARDPutControlBlock(card, result);
+        return fn_8041B900(card, result);
     }
     return result;
 }
 
 s32 CARDCreate(s32 chan, const char* fileName, u32 size, CARDFileInfo* fileInfo) {
-    s32 result = CARDCreateAsync(chan, fileName, size, fileInfo, __CARDSyncCallback);
+    s32 result = CARDCreateAsync(chan, fileName, size, fileInfo, fn_8041A6C8);
     if (result < 0) {
         return result;
     }
 
-    return __CARDSync(chan);
+    return fn_8041BB38(chan);
 }
