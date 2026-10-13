@@ -119,11 +119,6 @@ void fn_8021BA44(Task* t)
     }
 }
 
-/* near-miss: 148/148 insns, 13 slots differ (about 97%), all register numbers or scheduling order. Retail keeps &cur->m60
-   in r4 and gives the lbl_805D60F0 and lbl_806055AC address registers different numbers, so the li constant 6 lands in
-   r6 (ours r4). The lbl_806055DC compare through a non-const view (kp) fixed the first half. Tried: compare forms,
-   the copy through an inline, diff/pos order, a hill-climb and a permutation search over the store order, and the
-   same non-const view for lbl_806055AC. */
 void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
 {
     RecQueue* q = t->m9C->m3A60;
@@ -151,6 +146,7 @@ void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
         pos = *v;
     else
         fn_801E73E8(t, a, flag);
+    const Vec3f* cp = &cur->m60;
     e->m4 = 0x1E;
     e->m0 = 0x19;
     e->m28 = p;
@@ -160,10 +156,10 @@ void fn_8021BFFC(Task* t, int a, Player* p, Vec3f* v)
     e->m80 = lbl_805D60EC;
     e->mC = 4;
     e->m8 = 3;
-    e->m90 = lbl_805D60F0;
     e->m10 = 6;
+    e->m90 = lbl_805D60F0;
     e->m94 = 1;
-    e->m50 = lbl_806055AC - cur->m60;
+    e->m50 = lbl_806055AC - *cp;
     t->m9C->m60 = 0;
 }
 
