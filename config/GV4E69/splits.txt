@@ -1823,6 +1823,7 @@ snd/tu_803A9830.cpp:
 
 snd/cmn/sstgetpv.c:
 	.text       start:0x803AB278 end:0x803AB310
+	.rodata     start:0x80609600 end:0x8060960C align:4
 
 snd/tu_803AB310.cpp:
 	.text       start:0x803AB310 end:0x803AC88C

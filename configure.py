@@ -1105,7 +1105,7 @@ config.libs = [
             Object(Matching, "snd/cmn/spitch.c"),
             Object(NonMatching, "snd/tu_803A9204.cpp"),
             Object(NonMatching, "snd/tu_803A9830.cpp"),
-            Object(NonMatching, "snd/cmn/sstgetpv.c"),
+            Object(Matching, "snd/cmn/sstgetpv.c"),
             Object(NonMatching, "snd/tu_803AB310.cpp"),
             Object(NonMatching, "snd/tu_803AC88C.cpp"),
             Object(NonMatching, "snd/tu_803AFDC0.cpp"),
