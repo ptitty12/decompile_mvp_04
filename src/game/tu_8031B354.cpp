@@ -639,3 +639,34 @@ void fn_8031D61C(FxI* self) {
     }
     fn_803125D0(lbl_8061FEDC);
 }
+
+struct VdMain;
+extern "C" int fn_8038DDE8(VdMain*,float);
+extern "C" int fn_8038DE6C(VdMain*);
+extern "C" int fn_8038DF08(int*);
+class Unk8031D6B0_Callback : public FxIObj { public: virtual void s6(); };
+struct Unk8031D6B0_Time { char pad0[0x48]; float m48; };
+extern "C" int fn_8031D6B0(FxI* self) {
+    if(self->m40 || !self->m48) {
+        if(self->m0!=2) return 0;
+        if(!self->m34) {
+            int paused=self->m1AC;
+            if(paused) return 1;
+            if(!self->m48) {
+                self->m40=1;
+                self->m44=fn_8038DF08((int*)self->m4);
+            } else if(fn_8038DE6C((VdMain*)self->m4)) {
+                ((Unk8031D6B0_Callback*)self->m10)->s6();
+                self->m48=fn_8038DDE8((VdMain*)self->m4,((Unk8031D6B0_Time*)self->m4)->m48);
+                if(self->m48) self->m40=paused; else self->m40=1;
+            }
+            if(self->m44) {
+                if(*(int*)((char*)self+0x38)) { fn_8031D610(self); self->m44=0; }
+            }
+            if(!self->m44 && !self->m34) return 1;
+        }
+        self->m0=0;
+        return 0;
+    }
+    return 1;
+}
