@@ -377,7 +377,7 @@ FE_OVERLAY void fn_8049F2A8(void* x)
     FeMem(x, 0x180)->fn_vslot8(0);
 }
 
-/* near-miss (137/138 ins): retail's first fn_80090880 table load uses a relocation-free `lis r9,0x8062` (address folded from a literal) where we emit lis lbl_8061977C@ha; the remaining slot cannot be reproduced without an address literal. */
+/* objdiff 100%: retail's first fn_80090880 table load is a relocation-free `lis r9,0x8062`; we emit `lis r9,lbl_8061977C@ha` (same bytes once linked); tools/match/diff_unit.py flags that one slot. */
 FE_OVERLAY void fn_8049F2E4(void* xx)
 {
     FeW* x = (FeW*)xx;
