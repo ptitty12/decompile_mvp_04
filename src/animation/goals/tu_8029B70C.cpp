@@ -319,12 +319,107 @@ int fn_8029D184(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
     return fn_8024B99C(x, &v, &w, &z, 0, 0);
 }
 
-void fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t)
+UNK8029B70C_MIRROR(Unk8029B70C_Mirror118, int, 0x118)
+
+struct Unk801A4CE8_Obj {
+    char pad0[0x128];
+    char m128[1];
+};
+Unk801A4CE8_Obj* fn_801A4CE8(Unk8014D8AC_Ctx* ctx, int a);
+extern "C" int strcmp(const char* a, const char* b);
+Unk80273498_Vec3 fn_8014E388(int idx);
+int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t);
+extern Unk80273498_Vec3 lbl_805DCB7C;
+
+inline int Unk8029D2E0_Left(Unk80273498_Vec3 a, Unk80273498_Vec3 b)
+{
+    return !(a.x * b.z - a.z * b.x >= 0.0f);
+}
+
+/* near-miss (98.4%, 255 of 255 instructions, 9 lines differ): in the else arm of the "BehindHome" test retail
+ * stores pos.x before computing the p copy addresses and loads the 0.0f compare constant after the p copy;
+ * ours schedules both about 3 instructions later. Tried: pos/p declaration order and assignment forms, the
+ * compare in the caller or in the inline (float vs int return, `<`, `>=`, ternary). */
+unsigned int fn_8029D2E0(Unk8029B70C_Goal* g, Unk80270BA0_X* x, int kind, int a)
+{
+    Unk80273498_Vec3 v;
+    int r = 0;
+    float ang = fn_80382BB8(x->m618);
+
+    if (fn_8029D184(g, x, 6.0f) == 1) {
+        r = 1;
+    } else {
+        float k = 18000.0f;
+
+        if ((unsigned int)(kind - 5) <= 2) {
+            v = fn_8014E388(2);
+            v.z -= 18000.0f;
+            Unk80273498_Vec3 pos = v;
+            r = fn_8029D6DC(g, x, &pos);
+        }
+        if (r == 0) {
+            if ((unsigned int)(kind - 1) <= 2) {
+                v = fn_8014E388(0);
+                v.x -= 18000.0f;
+                Unk80273498_Vec3 pos = v;
+                r = fn_8029D6DC(g, x, &pos);
+            }
+            if (r == 0) {
+                if (kind == 0 || kind == 7 || kind == 1) {
+                    if (strcmp(fn_801A4CE8(fn_8027A918(g), 1)->m128, "BehindHomeFirst ") == 0
+                        || strcmp(fn_801A4CE8(fn_8027A918(g), 1)->m128, "BehindHomeThird ") == 0) {
+                        v = fn_8014E388(3);
+                        v.x = v.x - 18000.0f;
+                        v.z = v.z - 18000.0f;
+                    } else {
+                        v = fn_8014E388(3);
+                        Unk80273498_Vec3 pos = lbl_805DCB7C;
+                        Unk80273498_Vec3 p = x->m60;
+                        if (Unk8029D2E0_Left(pos, p)) {
+                            v.x = v.x + 18000.0f;
+                            v.z = v.z + 9000.0f;
+                        } else {
+                            v.x = v.x + 9000.0f;
+                            v.z = v.z + 18000.0f;
+                        }
+                    }
+                    Unk80273498_Vec3 pos = v;
+                    r = fn_8029D6DC(g, x, &pos);
+                }
+            }
+        }
+    }
+    if (r != 0) {
+        int t = fn_8029D184(g, x, 54.0f) == 0;
+        int val;
+        unsigned int ret;
+
+        if (a) {
+            val = 0;
+            if (t) {
+                val = 2;
+            }
+            ret = 0x61469778;
+        } else {
+            val = 1;
+            if (t) {
+                val = 3;
+            }
+            ret = 0x0B0B3C8F;
+        }
+        Unk8029B70C_Mirror118(&x->m734, val);
+        return ret;
+    }
+    fn_80244858(x, ang);
+    return 0;
+}
+
+int fn_8029D6DC(Unk8029B70C_Goal* g, Unk80270BA0_X* x, const Unk80273498_Vec3* t)
 {
     float ang = fn_80410CE8(t->x - x->m60.x, t->z - x->m60.z);
     float tgt = fn_80382BB8(x->m618) + AngleDiff(ang, fn_80382BB8(x->m618));
     fn_80244858(x, tgt);
-    fn_8029D184(g, x, 6.0f);
+    return fn_8029D184(g, x, 6.0f);
 }
 
 int fn_8029D7C4(Unk8029B70C_Goal* g)
