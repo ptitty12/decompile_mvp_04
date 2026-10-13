@@ -2308,6 +2308,7 @@ libm/sf_atan.cpp:
 
 libm/sf_ceil.c:
 	.text       start:0x80411490 end:0x80411554
+	.sdata      start:0x806EEEF4 end:0x806EEEFC align:4
 
 libm/sf_cos.cpp:
 	.text       start:0x80411554 end:0x80411630

@@ -18,7 +18,7 @@
 #include "fdlibm.h"
 
 #ifdef __STDC__
-static const float huge = 1.0e30;
+static float huge = 1.0e30;
 #else
 static float huge = 1.0e30;
 #endif
@@ -37,14 +37,14 @@ static float huge = 1.0e30;
 	j0 = ((i0>>23)&0xff)-0x7f;
 	if(j0<23) {
 	    if(j0<0) { 	/* raise inexact if x != 0 */
-		if(huge+x>(float)0.0) {/* return 0*sign(x) if |x|<1 */
+		if(x+huge>(float)0.0) {/* return 0*sign(x) if |x|<1 */
 		    if(i0<0) {i0=0x80000000;}
 		    else if(i0!=0) { i0=0x3f800000;}
 		}
 	    } else {
 		i = (0x007fffff)>>j0;
 		if((i0&i)==0) return x; /* x is integral */
-		if(huge+x>(float)0.0) {	/* raise inexact flag */
+		if(x+huge>(float)0.0) {	/* raise inexact flag */
 		    if(i0>0) i0 += (0x00800000)>>j0;
 		    i0 &= (~i);
 		}
