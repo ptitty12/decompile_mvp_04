@@ -144,6 +144,73 @@ extern "C" DB_OVERLAY void fn_8058C388(char* self)
     fn_8040B320(self + 8, 0, 0x12);
 }
 
+struct Db8058C3C4_Rec {
+    char pad0[0x198];
+    int m198;
+    char pad19C[0x3E4 - 0x19C];
+    unsigned char m3E4;
+    char pad3E5[3];
+    char m3E8[1];
+};
+extern "C" int fn_8007FB2C__FP13Unk8007F198_Ci(void* a0, int a1);
+extern "C" int fn_8007FB98__FP13Unk8007F198_Ciii(void* a0, int a1, int a2, int a3);
+extern "C" int fn_80097620(void* p, int a, unsigned char b, int c);
+extern "C" int fn_80097A9C(void* p, int a, unsigned char b, int c, int d);
+extern "C" float fn_80097F68(void* p, int a, unsigned char b, int c, int d);
+extern "C" int fn_8058C7A4(Db805822D0_V* self, int k, int x, void* rec, int n, int y);
+
+/* near-miss: 7 of 248 insns differ; retail sets li r7,0 before the other argument moves of the fn_80097F68 call and keeps its int result in r7 */
+extern "C" DB_OVERLAY void fn_8058C3C4(Db805822D0_V* self, Db8058C3C4_Rec* rec)
+{
+    Unk8007A4DC_Screen* s = lbl_8061930C;
+    int id = rec->m198;
+    int z = ((Unk8007B2B0_Screen*)s)->fn_80078A38(id);
+    if (z == 0 && self->m0 == 0) {
+        int j;
+        int cnt = fn_8007FB2C__FP13Unk8007F198_Ci(s, 0);
+        j = 0;
+        int c = 0;
+        if (j < cnt) {
+            do {
+                int a = fn_8007FB98__FP13Unk8007F198_Ciii(s, j, 0, z);
+                int b = fn_8007FB98__FP13Unk8007F198_Ciii(s, j, 1, z);
+                if (id == a || id == b)
+                    c++;
+                j++;
+            } while (j < cnt);
+        }
+        int n2 = rec->m3E4;
+        j = 0;
+        if (j < n2) {
+            do {
+                unsigned char i = j;
+                char* tb = rec->m3E8;
+                int to = i * 0x34;
+                int tid = *(int*)(tb + to);
+                if (fn_80097EA4(rec, 0, i, 2, 0))
+                    fn_8058C7A4(self, 0, tid, rec, s->fn_800739E0(0, tid, 1, 2), c);
+                if (fn_80097EA4(rec, 1, i, 2, 0))
+                    fn_8058C7A4(self, 1, tid, rec, s->fn_800739E0(1, tid, 1, 2), c);
+                if (fn_80097620(rec, 1, i, 0))
+                    fn_8058C7A4(self, 2, tid, rec, s->fn_80073710(1, tid, 1), c);
+                if ((int)fn_80097F68(rec, 0, i, 2, 0))
+                    fn_8058C7A4(self, 3, tid, rec, (int)s->fn_80073C10(0, tid, 1, 2), c);
+                if (fn_80097EA4(rec, 3, i, 2, 0))
+                    fn_8058C7A4(self, 4, tid, rec, s->fn_800739E0(3, tid, 1, 2), c);
+                if (fn_80097EA4(rec, 4, i, 2, 0))
+                    fn_8058C7A4(self, 5, tid, rec, s->fn_800739E0(4, tid, 1, 2), c);
+                if (fn_80097A9C(rec, 2, i, 2, 0))
+                    fn_8058C7A4(self, 6, tid, rec, s->fn_80075094(2, tid, 1, 2), c);
+                if (fn_8009764C(rec, 3, i, 0))
+                    fn_8058C7A4(self, 7, tid, rec, s->fn_80074754(3, tid, 1), c);
+                if (fn_8009764C(rec, 7, i, 0))
+                    fn_8058C7A4(self, 8, tid, rec, s->fn_80074754(7, tid, 1), c);
+                j++;
+            } while (j < n2);
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_8058C9B8(Db8058C9B8_P* out, int unused, int k)
 {
     switch (k) {
