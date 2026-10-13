@@ -236,6 +236,53 @@ extern "C" int fn_8001EFB4(Unk8001E444_Obj* x)
     return r;
 }
 
+struct Unk80087A58_O;
+int fn_8008838C(Unk80087A58_O* o, int a, int b);
+extern "C" Unk801A4B34_Pos* fn_801C1638(Unk8001F2C4_World* w, int a);
+extern const float lbl_805A5388;
+extern const float lbl_805A538C;
+
+/* near-miss (96.04%, 121 vs 122 insns): -fno-gcse gives 122/122 with only the loop's address
+ * register order left. Retail computes p*4 twice (slwi r0 for the first m2F8 test, a second slwi r4
+ * shared by the m290 and second m2F8 reads, no callee-saved register for it); here gcse shares one
+ * slwi, which takes r12 across the loop and pushes the E sum into a sixth callee-saved register
+ * (stmw r26). Tried: char* base + explicit off, an int* cnt local, nested ifs, n-first, unsigned p,
+ * a reloaded copy of p. */
+extern "C" int fn_8001F030(Unk8001E444_Obj* x)
+{
+    int r = 0;
+    Unk8001F2C4_World* w = x->m130->m44C;
+    Unk80087A58_O* o = (Unk80087A58_O*)*(int*)((char*)w->m6F8->mC + 0xC);
+    int p = fn_801C1638(w, 0)->m708;
+    int n = fn_8008838C(o, x->m130->m704, p);
+    int* cnt = x->m2F8;
+    if (cnt[p] > 1 && n > 20) {
+        int a = 0;
+        int d = 0;
+        int b = 0;
+        int c = 0;
+        int e = 0;
+        for (int k = 0; k < 3; k++) {
+            b += x->m348[p][k];
+            a += x->m318[p][k];
+            d += x->m380[p][k];
+            c += x->m368[p][k];
+            e += x->m398[p][k];
+        }
+        float f1 = (float)e / (float)(c + e);
+        float f2 = (float)(d + a) / (float)b;
+        int t = 3;
+        if (x->m290[p] != 0)
+            t = 4;
+        if (d >= t) {
+            r = 2;
+        } else if (!(f1 <= lbl_805A5388) && cnt[p] > 3 && !(f2 >= lbl_805A538C)) {
+            r = 1;
+        }
+    }
+    return r;
+}
+
 extern "C" void fn_8001F218(Unk8001E444_Obj* x)
 {
     Unk8001F218_Pair* base = x->m130->m44C->m6F8->m14;
