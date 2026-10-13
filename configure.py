@@ -476,7 +476,7 @@ config.libs = [
             Object(NonMatching, "game/tu_8000D650.cpp"),
             Object(NonMatching, "game/tu_8000E618.cpp"),
             Object(NonMatching, "game/tu_8000F598.cpp"),
-            Object(NonMatching, "game/tu_800101C0.cpp"),
+            Object(Matching, "game/tu_800101C0.cpp"),
             Object(NonMatching, "game/tu_80010E38.cpp"),
             Object(NonMatching, "game/tu_80011950.cpp"),
             Object(NonMatching, "game/tu_800124C0.cpp"),
