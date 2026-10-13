@@ -607,6 +607,54 @@ float fn_802398C8(Unk8022FE34_W* w)
     return lbl_805D7C18;
 }
 
+int Unk802362A8_Cpu::fn_802398D4()
+{
+    Unk8022FE34_Game* gm = m2E4->m6F8;
+    unsigned char* row = (unsigned char*)gm->m14;
+    int cnt = *(int*)(gm->m10 + 0x1C) - 1;
+    if (cnt - RB80238110(row, 0x1CC8) <= 5) {
+        int s1 = 0;
+        int ia = *(int*)(row + 0x1CD0) == 0;
+        unsigned char* ra = row + ia * 0xE64;
+        for (int n = 0; n < 128; n++)
+            s1 += RB80238110(ra + 0x1B4, (unsigned char)n);
+        int ib = 0;
+        if (*(volatile int*)(row + 0x1CD0) != 0)
+            ib = 1;
+        int s2 = 0;
+        unsigned char* rb = row + ib * 0xE64;
+        for (int n = 0; n < 128; n++)
+            s2 += RB80238110(rb + 0x1B4, (unsigned char)n);
+        int d = s1 - s2;
+        int ad = d < 0 ? -d : d;
+        if (ad <= 3) {
+            char* o = *(char**)((char*)m2E4 + 0x684);
+            if (o != 0) {
+                if (!(*(float*)(o + 0x5D8) <= 0.7f)) {
+                    int x1 = fn_801C1638(m2E4, 0xB) != 0;
+                    int x2 = fn_801C1638(m2E4, 0xC) != 0;
+                    if (x1 == 0 && x2 == 0) {
+                        unsigned char* row2 = (unsigned char*)gm->m14;
+                        int b = row2[0x1CCB];
+                        int a = row2[0x1CCA];
+                        if (b == 0) {
+                            if (a == 2)
+                                return ((Unk8014D8AC*)m2E4->m554)->fn_8014D8AC(2, lbl_805D7978, 0x6BE) == 0;
+                            if (a == 1)
+                                return ((Unk8014D8AC*)m2E4->m554)->fn_8014D8AC(4, lbl_805D7978, 0x6C3) == 0;
+                            if (a == 0)
+                                return ((Unk8014D8AC*)m2E4->m554)->fn_8014D8AC(6, lbl_805D7978, 0x6C8) == 0;
+                        }
+                        if (b == 1 && a == 2)
+                            return ((Unk8014D8AC*)m2E4->m554)->fn_8014D8AC(5, lbl_805D7978, 0x6CD) == 0;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 inline float Unk80239DFC_AbsF(float v)
 {
     return (float)__builtin_fabs(v);
