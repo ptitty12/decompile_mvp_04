@@ -573,16 +573,15 @@ extern "C" DB_OVERLAY void fn_8052DE9C(Unk8052DD58_Set* self)
     } while (i <= 31);
 }
 
-/* near-miss: 2-slot swap (li/addi order at the loop entry). */
 extern "C" DB_OVERLAY int fn_8052DEE8(Unk8052DD58_Set* self, Unk8052DD58_Ent* src)
 {
     int ret = -1;
     if (self->m0 == 32) {
         unsigned best = 0;
         unsigned bv = (unsigned)-1;
-        unsigned i;
+        unsigned i = 0;
         Unk8052DD58_Ent* q = self->m4;
-        for (i = 0; i < self->m0; i++, q++) {
+        for (; i < self->m0; i++, q++) {
             unsigned v = q->m12;
             if (v != 0 && v < bv) {
                 bv = v;
