@@ -1226,7 +1226,7 @@ config.libs = [
             Object(Matching, "libm/ef_atan2.cpp"),
             Object(NonMatching, "libm/ef_log.c"),
             Object(Matching, "libm/ef_sqrt.cpp"),
-            Object(NonMatching, "libm/sf_atan.cpp"),
+            Object(Matching, "libm/sf_atan.cpp"),
             Object(NonMatching, "libm/sf_ceil.c"),
             Object(NonMatching, "libm/sf_cos.cpp"),
             Object(Matching, "libm/sf_fabs.cpp"),
