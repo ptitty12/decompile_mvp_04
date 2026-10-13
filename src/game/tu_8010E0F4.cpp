@@ -140,6 +140,7 @@ void fn_8010F9CC(Scr* self, int a);
 void fn_8012E1C4(Unk800C7B40_Widget* w, int a, int b);
 void fn_8010FFD8(int a, Scr* b);
 void fn_80131F34(Unk800C7B40_Widget* w, Scr* self, void (*cb)(int, Scr*), int a, int b, int c, int d, int e, int f, int g, int h, int i, int j, int k);
+extern "C" char* strncpy(char* dst, const char* src, unsigned int n);
 }
 
 // PROTOS-BEGIN
@@ -632,7 +633,9 @@ int fn_8010FC20(Scr* self, int a)
     return 1;
 }
 
-/* near-miss: 2 slots; retail loads the fn_8040B830 arguments as lis r4, li r5, addi r4, mr r3 (name pointer last). */
+/* near-miss: strncpy is called with its real C prototype (retail's argument order). Left: before fn_80131F34, retail
+   copies w into r3 after the stack-argument stores (li r9,-1 / stw r0,8(r1) / mr r3,r30); linkage, return type and
+   the matched prototype's parameter types do not move it. */
 
 int fn_8010FE70(Scr* self, int a)
 {
@@ -642,7 +645,7 @@ int fn_8010FE70(Scr* self, int a)
             char name[16];
             char* np = name;
             fn_8035682C(np);
-            fn_8040B830(np, lbl_805BE138, 0xF);
+            strncpy(np, lbl_805BE138, 0xF);
             np[15] = v;
             self->fn_vslot80(0);
             if (lbl_8061A32C == 0)
@@ -660,7 +663,7 @@ int fn_8010FE70(Scr* self, int a)
     return 1;
 }
 
-/* near-miss: same argument-order difference as fn_8010FE70 (name pointer copied last in retail). */
+/* strncpy (0x8040B830) with its real C prototype gives retail's argument order (name pointer copied last). */
 
 void fn_8010FFD8(int a, Scr* b)
 {
@@ -669,7 +672,7 @@ void fn_8010FFD8(int a, Scr* b)
         char name[16];
         char* np = name;
         fn_8035682C(np);
-        fn_8040B830(np, lbl_805BE138, 0xF);
+        strncpy(np, lbl_805BE138, 0xF);
         np[15] = 0;
         b->fn_vslot80(1);
         if (lbl_8061A32C == 0)
