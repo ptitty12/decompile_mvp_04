@@ -126,6 +126,44 @@ struct Unk8019A998_Obj : public Unk8019A998_Virt {
 };
 extern "C" void fn_80198694(Unk8019A998_Ring* r, char* a, char* b, char* c, void* p1, void* p2);
 
+struct Unk80198F68_X {
+    char pad0[0xAB8];
+    void* mAB8;
+};
+struct Unk80198F68_C {
+    char pad0[0x4C];
+    unsigned m4C;
+};
+struct Unk80198F68_Obj : public Unk8019A998_Virt {
+    char pad9C[0xBC - 0x9C];
+    Unk80198F68_C* mBC;
+    char padC0[0x378 - 0xC0];
+    Unk80198F68_X* m378;
+    char pad37C[0x3FC - 0x37C];
+    Unk8019A998_Ring m3FC;
+};
+inline float Unk80198F68_Secs(unsigned n)
+{
+    return (float)n * 0.016666668f;
+}
+extern "C" int fn_8035A97C(Unk8019A998_Ring* r, int v);
+inline void Unk80198F68_Cp(Unk80379324* d, const Unk80379324& s)
+{
+    *d = s;
+}
+inline void Unk80198F68_Push(Unk8019A998_Ring* r, Unk8018A254_Ret* m, float t)
+{
+    int need = 0;
+    if (r->mC == -1 || !(*(float*)((char*)((r->mC << 7) + (int)r->m4)) >= t))
+        need = 1;
+    if (need) {
+        r->mC = fn_8035A97C(r, r->mC);
+        *(Unk8018A254_Ret*)((char*)((r->mC << 7) + (int)r->m4) + 0x20) = *m;
+        *(float*)((char*)((r->mC << 7) + (int)r->m4)) = t;
+        *(int*)((char*)((r->mC << 7) + (int)r->m4) + 0x60) = 1;
+    }
+}
+extern "C" void fn_8019A404(void* o, void* x, float* out);
 //@BODY
 //@80198DB8
 extern "C" void* fn_80198DB8(void* o)
@@ -206,6 +244,28 @@ extern "C" float fn_80198F44(Unk80198E5C_Obj* o)
     if (o->m37C == 2)
         return 1.25f;
     return 1.35f;
+}
+
+//@80198F68
+/* near-miss (99.8%): identical instructions; the q.m4 / q.m8 words of the Unk80379324 copy into o->m7C land in
+ * swapped registers (retail r6/r5, here r5/r6). Tried: Cp by reference/pointer, explicit field order, qp alias. */
+extern "C" void fn_80198F68(void* op)
+{
+    Unk80198F68_Obj* o = (Unk80198F68_Obj*)op;
+    if (o->m378 != 0) {
+        Unk8018A254_Ret m;
+        fn_80389BD8(o->m378->mAB8, lbl_806EF9C4, &m, 3);
+        Unk8019A998_Ring* r = &o->m3FC;
+        Unk80183918_Vec3 v;
+        Unk80379324 q;
+        fn_8019A404(&m, &q, (float*)&v);
+        o->v3(&v);
+        o->m0 = 0;
+        o->m6C = 1;
+        Unk80198F68_Cp(&o->m7C, q);
+        float f = Unk80198F68_Secs(o->mBC->m4C);
+        Unk80198F68_Push(r, &m, f);
+    }
 }
 
 //@80199158
