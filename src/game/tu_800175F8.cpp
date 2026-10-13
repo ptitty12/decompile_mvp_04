@@ -13,7 +13,7 @@
 
 extern int (*lbl_80624408)(int, int, ...);
 void fn_80056C9C(int);
-int fn_80391C04(int, int, int);
+extern "C" unsigned fn_80391C04(unsigned char, unsigned char, unsigned short);
 
 void fn_800175F8()
 {
