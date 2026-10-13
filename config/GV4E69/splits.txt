@@ -2507,6 +2507,7 @@ dolphin/gx/tu_80428F14.c:
 
 dolphin/gx/GXAttr.c:
 	.text       start:0x8042AB48 end:0x8042BF8C
+	.data       start:0x806346E0 end:0x80634954
 
 dolphin/gx/tu_8042BF8C.c:
 	.text       start:0x8042BF8C end:0x8042C830

@@ -20,7 +20,7 @@
 #define CHECK_LISTPTR(line, list)    ASSERTMSGLINE(line, (list) != NULL, "GXSetVtxAttrFmt: list pointer is NULL")
 #define CHECK_MTXIDX(line, attr, type)    ASSERTMSGLINE(line, (attr) > GX_VA_TEX7MTXIDX || (type) <= GX_VA_TEX0MTXIDX, "GXSetVtxDesc: GX_VA_*MTXIDX accepts GX_NONE or GX_DIRECT only")
 
-static void __GXXfVtxSpecs(void) {
+static inline void __GXXfVtxSpecs(void) {
     u32 nCols = 0;
     u32 nNrm;
     u32 nTex;
@@ -141,10 +141,11 @@ void __GXSetVCD(void) {
     __GXXfVtxSpecs();
 }
 
+extern u8 lbl_806EF258[4];
+extern u8 lbl_806EF25C[4];
+extern u8 lbl_806EF260[4];
+
 void __GXCalculateVLim(void) {
-    static u8 tbl1[] = { 0, 4, 1, 2 };
-    static u8 tbl2[] = { 0, 8, 1, 2 };
-    static u8 tbl3[] = { 0, 12, 1, 2 };
 
     GXCompCnt nc = 0;
     u32 vlm;
@@ -168,7 +169,7 @@ void __GXCalculateVLim(void) {
         vlm += (u8)GET_REG_FIELD(vl, 1, 6);
         vlm += (u8)GET_REG_FIELD(vl, 1, 7);
         vlm += (u8)GET_REG_FIELD(vl, 1, 8);
-        vlm += tbl3[(u8)GET_REG_FIELD(vl, 2, 9)];
+        vlm += lbl_806EF260[(u8)GET_REG_FIELD(vl, 2, 9)];
         
         if (nc == 1) {
             b = 3;
@@ -176,17 +177,17 @@ void __GXCalculateVLim(void) {
             b = 1;
         }
 
-        vlm += tbl3[(u8)GET_REG_FIELD(vl, 2, 11)] * b;
-        vlm += tbl1[(u8)GET_REG_FIELD(vl, 2, 13)];
-        vlm += tbl1[(u8)GET_REG_FIELD(vl, 2, 15)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 0)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 2)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 4)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 6)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 8)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 10)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 12)];
-        vlm += tbl2[(u8)GET_REG_FIELD(vh, 2, 14)];
+        vlm += lbl_806EF260[(u8)GET_REG_FIELD(vl, 2, 11)] * b;
+        vlm += lbl_806EF258[(u8)GET_REG_FIELD(vl, 2, 13)];
+        vlm += lbl_806EF258[(u8)GET_REG_FIELD(vl, 2, 15)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 0)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 2)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 4)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 6)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 8)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 10)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 12)];
+        vlm += lbl_806EF25C[(u8)GET_REG_FIELD(vh, 2, 14)];
         __GXData->vLim = vlm;
     }
 }
@@ -494,21 +495,7 @@ void GXGetVtxAttrFmt(GXVtxFmt fmt, GXAttr attr, GXCompCnt* cnt, GXCompType* type
     }
 }
 
-void GXGetVtxAttrFmtv(GXVtxFmt fmt, GXVtxAttrFmtList* vat) {
-    GXAttr attr;
 
-    CHECK_GXBEGIN(930, "GXGetVtxAttrFmtv");
-    CHECK_LISTPTR(931, vat);
-    CHECK_VTXFMT(932, fmt);
-
-    for (attr = GX_VA_POS; attr <= GX_VA_TEX7; attr++) {
-        vat->attr = attr;
-        GXGetVtxAttrFmt(fmt, attr, &vat->cnt, &vat->type, &vat->frac);
-        vat++;
-    }
-
-    vat->attr = GX_VA_NULL;
-}
 
 void GXSetArray(GXAttr attr, void* base_ptr, u8 stride) {
     GXAttr cpAttr;
@@ -533,6 +520,10 @@ void GXInvalidateVtxCache(void) {
     CHECK_GXBEGIN(988, "GXInvalidateVtxCache");
     GX_WRITE_U8(0x48);
 }
+
+extern void fn_8043065C(s32);
+
+extern void fn_8043065C(s32);
 
 void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx) {
     u32 reg = 0;
@@ -635,7 +626,7 @@ void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc sr
     }
 
     mtxIdAttr = dst_coord + 1;
-    __GXSetMatrixIndex(mtxIdAttr);
+    fn_8043065C(mtxIdAttr);
 }
 
 void GXSetNumTexGens(u8 nTexGens) {
@@ -644,3 +635,5 @@ void GXSetNumTexGens(u8 nTexGens) {
     GX_WRITE_XF_REG(0x3F, nTexGens);
     __GXData->dirtyState |= 4;
 }
+
+
