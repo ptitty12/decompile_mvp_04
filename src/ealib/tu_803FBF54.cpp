@@ -113,7 +113,7 @@ struct RcMapTab {
     int m2C;
 };
 
-extern "C" int fn_803FE418(int);
+extern "C" void fn_803FE418(int);
 extern "C" int fn_80400008(int);
 extern "C" void fn_80400CE4(int);
 extern "C" void fn_803FFFA8(int);
@@ -528,6 +528,61 @@ extern "C" void fn_803FD398(int, int, RcFile* f)
     }
 }
 
+/* near-miss: 96.5%; callee-saved registers rotated (retail: a=r27 job=r28 cr=r29 empty=r30; ours a=r28 job=r29 cr=r30 empty=r27) */
+extern "C" void fn_803FD494(RcFile* o, int a)
+{
+    char* job = 0;
+    fn_80400828(o->m4);
+    int empty;
+    RcNd* h = o->m6C;
+    if (h == 0)
+        empty = 1;
+    else if (h->m4 != 1) {
+        RcNd* nx = h->mC;
+        if (nx == 0)
+            empty = 1;
+        else {
+            o->m6C = nx;
+            empty = 0;
+        }
+    } else
+        empty = 0;
+    if (empty != 0) {
+        o->m44 = 0;
+    } else {
+        job = (char*)o->m6C;
+        int cur = RCI(o, 0x60);
+        RCI(job, 4) = 2;
+        RCI(job, 0x120) = cur;
+    }
+    fn_8040084C(o->m4);
+    if (empty == 0) {
+        RCI(o, 0x64) = RCI(o, 0x60);
+        if (RCI(job, 0x10) == 1) {
+            o->m17C = 0;
+        } else {
+            o->m17C = RCI(job, 0x118);
+            if (strcmp(job + 0x14, (char*)o + 0x78) != 0) {
+                strcpy((char*)o + 0x78, job + 0x14);
+                int k = o->m178;
+                if (k == 0) {
+                    int hd = fn_803F9C58((char*)o + 0x78, 1, a, o);
+                    o->m180 = hd;
+                    if (hd != 0)
+                        fn_803F96B0(hd, fn_803FD2F4);
+                } else {
+                    int hd = fn_803F9CE8(k, a, o);
+                    o->m180 = hd;
+                    if (hd != 0)
+                        fn_803F96B0(hd, fn_803FD33C);
+                }
+                return;
+            }
+        }
+        fn_803FD5F8(o, a);
+    }
+}
+
 extern "C" int fn_803FD944(int a, int b, int c)
 {
     int t1 = b * 0xc;
@@ -653,6 +708,263 @@ extern "C" int fn_803FDEC0(RcHnd* h, const char* name, int a, int b)
             fn_803FD494(o, o->m48);
     }
     return n->m0;
+}
+
+struct RcHndV {
+    int m0, m4, m8;
+    unsigned char* mC;
+};
+/* near-miss: 2 slots; the loop-back compare value is r0 in retail (or r0,r9,r10; cmpw r0,r28), r9 here */
+extern "C" int fn_803FDFB4(RcHnd* h, unsigned char* data, int len, int tag)
+{
+    RcFile* o;
+    RcHnd* p;
+    if (fn_803FCCCC(h, &o, &p) != 0)
+        return 0;
+    RcNd* n = fn_803FCDCC(o);
+    if (n == 0)
+        return 0;
+    if (len == 0) {
+        unsigned char* q = data;
+        if (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) != tag) {
+            do {
+                const unsigned char* t = q + 4;
+                int sz = (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | q[4];
+                q += sz;
+                len += sz;
+            } while (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) != tag);
+        }
+        const unsigned char* t = q + 4;
+        len += (t[3] << 24) | (t[2] << 16) | (t[1] << 8) | q[4];
+    }
+    RCI(n, 0x114) = (int)data;
+    RCI(n, 0x118) = len;
+    RCI(n, 0x11c) = tag;
+    RCI(n, 0x10) = 1;
+    fn_803FCE50(o, n);
+    fn_80400828(o->m4);
+    int was = o->m44;
+    if (was == 0)
+        o->m44 = 1;
+    fn_8040084C(o->m4);
+    if (was == 0)
+        fn_803FD494(o, 0);
+    return n->m0;
+}
+
+extern "C" void fn_803FCF1C(RcFile*, RcNd*);
+struct RcFileV {
+    char pad0[0x30];
+    char* m30;
+    int m34;
+    char* m38;
+    char* m3C;
+    char pad40[4];
+    int m44;
+    char pad48[0x10];
+    int m58;
+    char* m5C;
+    char* m60;
+    char pad64[4];
+    RcNd* m68;
+    RcNd* m6C;
+    RcNd* m70;
+};
+extern "C" void fn_803FE154(int, int);
+struct RcSlotV {
+    int m0, m4, m8;
+    RcSlotV* mC;
+    char pad10[0x110];
+    char* m120;
+};
+struct RcMapE {
+    int m0, m4, m8, mC;
+};
+extern "C" unsigned char* fn_803FE660(RcHnd*);
+extern "C" void fn_803FE7E0(RcHnd*, char*);
+/* near-miss: 99.3%; retail keeps lo/cur in r22/r26 (ours swapped) and holds the fn_803FE660 result in r31 across the handle reload */
+extern "C" void fn_803FE154(int h, int key)
+{
+    RcFileV* o;
+    RcMapE* e;
+    char* lo = 0;
+    char* cur = 0;
+    char* hi = 0;
+    int skip;
+    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, (RcHnd**)&e) == 0) {
+        fn_80400828(o->pad0 + 4);
+        RcSlotV* nd = (RcSlotV*)fn_803FCECC((RcTab*)o, key);
+        if (nd == 0 || nd->m4 == 4)
+            skip = 1;
+        else if (nd->m4 == 1) {
+            skip = 1;
+            fn_803FCF1C((RcFile*)o, (RcNd*)nd);
+        } else {
+            nd->m4 = 4;
+            lo = (char*)((int*)o)[0x5c / 4];
+            cur = lo;
+            if ((RcNd*)nd != o->m68)
+                cur = nd->m120;
+            RcSlotV* nx = nd->mC;
+            if (nx == 0 || nx->m4 == 1)
+                hi = o->m60;
+            else
+                hi = nx->m120;
+            skip = 0;
+        }
+        fn_8040084C(o->pad0 + 4);
+        if (skip == 0) {
+            int i;
+            for (i = 0; i < o->m34; i++) {
+                e = (RcMapE*)(o->m30 + i * 0x10);
+                if (e->m8 > 0) {
+                    if (fn_803FCD0C((unsigned)lo, (unsigned)cur, e->mC) != 0) {
+                        char* q = cur;
+                        int tag = e->m4 << 24;
+                        if (cur != hi) {
+                            do {
+                                if ((((unsigned char)q[3] << 24) | ((unsigned char)q[2] << 16) | ((unsigned char)q[1] << 8) | (unsigned char)q[0]) == -1)
+                                    q = o->m3C;
+                                else {
+                                    char* t = q + 4;
+                                    unsigned v = ((unsigned char)t[3] << 24) | ((unsigned char)t[2] << 16) | ((unsigned char)t[1] << 8) | (unsigned char)q[4];
+                                    unsigned sz = v & 0xffffff;
+                                    if ((int)(v & 0xff000000) == tag) {
+                                        fn_80400828(o->pad0 + 4);
+                                        e->m8 = e->m8 - sz;
+                                        fn_8040084C(o->pad0 + 4);
+                                        fn_803FCD4C((RcFile*)o, sz);
+                                        q[0] = -2;
+                                        q[1] = -1;
+                                        q[2] = -1;
+                                        q[3] = -1;
+                                        q[4] = sz;
+                                        t[1] = sz >> 8;
+                                        t[2] = sz >> 16;
+                                        t[3] = sz >> 24;
+                                    }
+                                    q += sz;
+                                }
+                            } while (q != hi);
+                        }
+                    } else {
+                        if (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0) {
+                            do {
+                                char* hh = (char*)fn_803FE660((RcHnd*)e);
+                                fn_803FE7E0((RcHnd*)e, hh);
+                                if (e->m8 <= 0)
+                                    break;
+                            } while (fn_803FCD0C((unsigned)cur, (unsigned)hi, e->mC) != 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* near-miss: 96.0%; retail reuses the reloaded handle (r3 / r8) across the loop bodies, ours reloads it from the stack in each body */
+extern "C" void fn_803FE418(int h)
+{
+    RcFileV* o;
+    RcHnd* p;
+    unsigned sz = 0;
+    if (fn_803FCCCC((RcHnd*)h, (RcFile**)&o, &p) == 0) {
+        RcNd* nd = o->m70;
+        if (nd != 0) {
+            while ((unsigned)(nd->m4 - 1) <= 1) {
+                fn_803FE154(h, nd->m0);
+                nd = o->m70;
+            }
+            while (o->m68 != o->m6C)
+                fn_803FCF1C((RcFile*)o, o->m68);
+            o->m6C->m4 = 4;
+            int i;
+            for (i = 0; i < o->m34; i++)
+                RCI(o->m30, i * 0x10 + 8) = 0;
+            fn_803FCD4C((RcFile*)o, o->m58);
+            char* q = o->m5C;
+            if (q != o->m60) {
+                do {
+                    if ((((unsigned char)q[3] << 24) | ((unsigned char)q[2] << 16) | ((unsigned char)q[1] << 8) | (unsigned char)q[0]) == -1)
+                        q = o->m3C;
+                    else {
+                        char* t = q + 4;
+                        sz = (((unsigned char)t[3] << 24) | ((unsigned char)t[2] << 16) | ((unsigned char)t[1] << 8) | (unsigned char)q[4]) & 0xffffff;
+                        q[0] = -2;
+                        q[1] = -1;
+                        q[2] = -1;
+                        q[3] = -1;
+                        q[4] = sz;
+                        t[3] = sz >> 24;
+                        q += sz;
+                        t[1] = sz >> 8;
+                        t[2] = sz >> 16;
+                    }
+                } while (q != o->m60);
+            }
+            if (o->m44 == 2) {
+                if (q == o->m3C) {
+                    o->m60 = o->m38;
+                    o->m3C = o->m60;
+                } else {
+                    int pad = 0x20 - ((int)o->m60 & 0x1f);
+                    if (pad == 0x20)
+                        pad = 0;
+                    char* r = o->m60 - sz;
+                    sz += pad;
+                    char* t2 = r + 4;
+                    r[4] = sz;
+                    t2[3] = sz >> 24;
+                    t2[1] = sz >> 8;
+                    t2[2] = sz >> 16;
+                    o->m60 = o->m60 + pad;
+                }
+                o->m44 = 0;
+            }
+        }
+    }
+}
+
+/* near-miss: 2 slots; retail schedules slwi before the mr r4,r9 copy of the handle in the first loop test */
+extern "C" unsigned char* fn_803FE660(RcHnd* hnd)
+{
+    RcFile* o;
+    RcHndV* h;
+    if (fn_803FCCCC(hnd, &o, (RcHnd**)&h) != 0)
+        return 0;
+    {
+        if (h->m8 == 0)
+            return 0;
+        unsigned char* p = h->mC;
+        const unsigned char* t = p + 4;
+        unsigned sz = ((t[3] << 24) | (t[2] << 16) | (t[1] << 8) | p[4]) & 0xffffff;
+        p[4] = sz;
+        ((unsigned char*)t)[1] = sz >> 8;
+        ((unsigned char*)t)[2] = sz >> 16;
+        ((unsigned char*)t)[3] = sz >> 24;
+        fn_80400828(o->m4);
+        int rem = h->m8 - sz;
+        h->m8 = rem;
+        fn_8040084C(o->m4);
+        if (rem > 0) {
+            unsigned char* q = p + sz;
+            int key = h->m4 << 24;
+            if ((q[7] << 24) != key) {
+                do {
+                    if (((q[3] << 24) | (q[2] << 16) | (q[1] << 8) | q[0]) == -1)
+                        q = (unsigned char*)o->pad3C;
+                    else {
+                        const unsigned char* t2 = q + 4;
+                        sz = ((t2[3] << 24) | (t2[2] << 16) | (t2[1] << 8) | q[4]) & 0xffffff;
+                        q += sz;
+                    }
+                } while ((q[7] << 24) != key);
+            }
+            h->mC = q;
+        }
+        return p;
+    }
 }
 
 extern "C" void fn_803FE7E0(RcHnd* h, char* p)

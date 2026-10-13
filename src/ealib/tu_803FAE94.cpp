@@ -254,6 +254,43 @@ extern "C" void fn_803FB3DC(int count, int arg)
 }
 
 
+struct RcEntV {
+    int m0;
+    char pad4[0x18];
+    int m1C;
+    char pad20[0x10];
+};
+extern "C" void fn_803FB4B0()
+{
+    if (lbl_806EEA98 != 0) {
+        int i;
+        for (i = 0; i < lbl_806EF468; i++)
+            fn_803FB888(lbl_806EEA98[i].m0);
+        for (;;) {
+            int busy = 0;
+            i = 0;
+            if (i < lbl_806EF468) {
+                RcEntV* e = (RcEntV*)lbl_806EEA98;
+                i = lbl_806EF468;
+                do {
+                    if (e->m1C != 0)
+                        busy = 1;
+                    e++;
+                } while (--i != 0);
+            }
+            if (busy == 0)
+                break;
+            if (fn_80400008(0) != 0)
+                fn_80400CE4(0);
+            fn_803FFFA8(0);
+        }
+        RcEnt* z = 0;
+        lbl_806ADE94[0]((int)lbl_806EEA98);
+        fn_804007FC(lbl_806ADEA0);
+        lbl_806EEA98 = z;
+    }
+}
+
 extern "C" int fn_803FB59C(int a, int b)
 {
     RcLNode* n = fn_803FAF00(&lbl_806EF46C);
@@ -424,6 +461,33 @@ extern "C" int fn_803FBB04(int a, int b)
     return fn_803FA3B4(fn_803FBA28, 0, lbl_806EEAA0, &q);
 }
 
+/* near-miss: 98.6%; retail copies n-1 from r4 (addi r4,r31,-1; mr r28,r4) and rotates p/m/len0 registers */
+extern "C" int fn_803FBB48(int n, RcReq* p)
+{
+    int out;
+    int mode = 1;
+    if (p->a4 & 0x40)
+        mode = 0x41;
+    if (fn_803FEBDC(p->a0, mode, n, &out) != 0) {
+        int m = n - 1;
+        int len0 = fn_803FECF8(out, m);
+        int len;
+        if (p->a4 & 0x40)
+            len = (len0 + 0x7ff) & ~0x7ff;
+        else
+            len = len0;
+        int r = ((int (*)(int, int, int))lbl_806ADE90[0])(p->a0, len, p->a4);
+        if (r != 0) {
+            fn_803FEC4C(out, 0, r, len, m);
+            fn_803FEC9C(out, m);
+            p->a2 = len0;
+            return r;
+        }
+        fn_803FEC9C(out, m);
+    }
+    return 0;
+}
+
 extern "C" void fn_803FBC34(int a, int* out, int c)
 {
     RcReq q;
@@ -433,6 +497,22 @@ extern "C" void fn_803FBC34(int a, int* out, int c)
     fn_803FA3B4(fn_803FBB48, 0, lbl_806EEAA0, &q);
     if (out != 0)
         *out = q.a2;
+}
+
+/* near-miss: 97.6%; callee-saved registers rotated (retail p=r29 n=r30 lim=r31, ours n=r29 lim=r30 p=r31) */
+extern "C" int fn_803FBC94(int n, RcReq* p)
+{
+    int out;
+    int lim = p->a2;
+    if (lim <= 0)
+        lim = 0x7fffffff;
+    if (fn_803FEBDC(p->a0, 1, n, &out) != 0) {
+        int m = n - 1;
+        int r = fn_803FEC4C(out, 0, p->a1, lim, m);
+        fn_803FEC9C(out, m);
+        return r;
+    } else
+        return 0;
 }
 
 extern "C" int fn_803FBD28(int a, int b, int c)
