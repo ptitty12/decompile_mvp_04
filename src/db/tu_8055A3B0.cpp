@@ -785,3 +785,57 @@ extern "C" DB_OVERLAY void fn_8055C504(Unk8007B2B0_Screen* sc,int team,int* ids,
         }
     }
 }
+
+struct Db8055CDA4_Stats { int v[2]; };
+extern Db8055CDA4_Stats lbl_805FF75C;
+extern "C" DB_OVERLAY void fn_8055CDA4(Unk8007A4DC_Screen* sc, Unk805352B0_List* dst, int* quota, Unk805352B0_List* src, int reserve)
+{
+    int capacity = 25 - reserve;
+    int extra = capacity - dst->m4;
+    int first = 0;
+    if (extra < 0) extra = 0;
+    Db8055CDA4_Stats stats = lbl_805FF75C;
+    for (int category = 0; category <= 8; category++) {
+        int count = src->m4;
+        int i = 0;
+        for (int stat = 0; stat < 2; stat++) {
+            while (quota[category] > 0 && i < count) {
+                int id = src->At(i);
+                int value = sc->fn_8007A6A0(stats.v[stat], id);
+                int flagged = sc->fn_8007A6A0(30, id) != 0;
+                if (!flagged && fn_8055CCB0(value, lbl_80622D64[category])) {
+                    dst->Push(id);
+                    src->RemoveAt(i);
+                    count--;
+                    quota[category]--;
+                } else i++;
+            }
+        }
+        if (i == count && quota[category] > 0) {
+            if (!category) first += quota[0];
+            else extra += quota[category];
+        }
+    }
+    int count = src->m4;
+    int i = 0;
+    while (extra > 0 && i < count) {
+        int id = src->At(i);
+        if (!sc->fn_8007A270(id)) {
+            dst->Push(id);
+            src->RemoveAt(i);
+            count--;
+            extra--;
+        } else i++;
+    }
+    count = src->m4;
+    i = 0;
+    while (first > 0 && i < count) {
+        int id = src->At(i);
+        if (sc->fn_8007A270(id)) {
+            dst->Push(id);
+            src->RemoveAt(i);
+            count--;
+            first--;
+        } else i++;
+    }
+}

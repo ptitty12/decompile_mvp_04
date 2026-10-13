@@ -68,7 +68,6 @@ extern "C" unsigned int OSDisableInterrupts();
 extern "C" void OSRestoreInterrupts(unsigned int);
 extern "C" void fn_80417B10(void* p);
 extern "C" void fn_804176B0(void* p);
-/* near-miss: 70 vs 72 insns: retail keeps the table slot in r5 (the fn_803AEA78 result, or the idx argument copied there) and the aligned size in r8/r11 across both arms; ours keeps the argument registers in different saved registers (stmw r25 vs r26); slot-variable and record-pointer forms tried */
 extern "C" int fn_803AEB50(int a, int b, int c, int d, int e);
 
 struct Unk8069E200_RecA {
@@ -470,16 +469,15 @@ extern "C" void fn_803AE5EC(int v)
     SNDVOICEI_free(v + sndgs.sso.set.voicesdsp);
 }
 
-/* near-miss: 53 vs 54 insns: retail loads o->m14 into r11 before the chan base (lbl_8069CA48 in r10) and keeps both live for the second chan index; ours loads m14 into r0 and rebuilds the base */
 extern "C" void fn_803AE618(Unk803AE618* o)
 {
     int idx = o->m14;
-    CHANPUB* c = &sndgs.chan[idx];
-    int m = c->masterchan;
-    int base = m;
-    if (m == -1)
-        base = idx;
-    CHANPUB* mc = &sndgs.chan[base];
+    CHANPUB* chans = sndgs.chan;
+    CHANPUB* mc = &chans[idx];
+    int m = mc->masterchan;
+    int base;
+    if (m == -1) base = idx; else base = m;
+    mc = &chans[base];
     int i;
     for (i = 0; i < mc->numchan; i++) {
         int v = mc->voices[i];
@@ -561,8 +559,9 @@ extern "C" int fn_803AEB50(int a, int b, int c, int d, int idx)
         lbl_8069E200.recB[slot].m24 = a;
         lbl_8069E200.recB[slot].m28 = b;
         lbl_8069E200.recB[slot].m2C = c;
-        aligned = d + 0x1f;
-        lbl_8069E200.recB[slot].m30 = aligned & ~0x1f;
+        int size = d + 0x1f;
+        lbl_8069E200.recB[slot].m30 = size & ~0x1f;
+        aligned = size;
         lbl_8069E200.recB[slot].m34 = sndgs.audiotick;
     } else {
         slot = idx;

@@ -851,3 +851,72 @@ extern "C" DB_OVERLAY void fn_80554540(Db80554540_S* self, int a, int b)
     fn_80553358(self->mC, p3, b);
     fn_80553388(self->mC);
 }
+
+extern float lbl_80622C64[];
+extern float lbl_805FF340;
+extern "C" DB_OVERLAY float fn_8054FA04(int a,int b,int c,int d)
+{
+ if(c == 0) {
+  int flag=0;
+  if(fn_800A2E90(lbl_80619948)) flag=1;
+  Unk8007A4DC_Screen* sc=lbl_8061930C;
+  int limit; int n;
+  if(sc->fn_8007A270(a)) {
+   limit=4;
+   n=sc->fn_80074754(0,a,flag);
+   n+=sc->fn_80074754(0,a,2);
+   n+=sc->fn_80074754(0,a,3);
+   n+=sc->fn_80074754(0,a,4);
+  } else {
+   limit=50;
+   n=sc->fn_800739E0(11,a,flag,2);
+   n+=sc->fn_800739E0(11,a,2,2);
+   n+=sc->fn_800739E0(11,a,3,2);
+   n+=sc->fn_800739E0(11,a,4,2);
+  }
+  if(n < limit) { float ratio=(float)n/(float)limit; return lbl_80622C24[b][c]*ratio; }
+ } else if(d<=14) {
+  // Retail stores this scale at sp+8 without a subsequent reload.
+  float scale=lbl_805FF340;
+  float left=(float)(15-d)*lbl_805FF340;
+  float right=(float)d*lbl_805FF340;
+  float p=lbl_80622C64[c]*left;
+  float q=lbl_80622C24[b][c]*right;
+  return p+q;
+ }
+ return lbl_80622C24[b][c];
+}
+
+extern unsigned char lbl_80602524,lbl_80602525,lbl_80602526,lbl_80602527,lbl_80602528;
+extern "C" int fn_8007E48C__FP13Unk8007DB74_Aii(void*,int,int);
+extern "C" DB_OVERLAY float fn_80551630(int a,int b,int c,int d)
+{
+ Unk8007A4DC_Screen* sc=lbl_8061930C;
+ if(c<=14) return (float)lbl_80602526;
+ int delta;
+ if(sc->fn_8007A270(a)) {
+  int hits=sc->fn_80074754(9,a,d);
+  int innings=sc->fn_80074754(1,a,d);
+  int v=sc->fn_80074754(7,a,d);
+  float rate=((float)v+(float)sc->fn_80074754(8,a,d))/(float)c;
+  int nominal=sc->fn_8007A6A0(50,a);
+  int flag=fn_8007E48C__FP13Unk8007DB74_Aii(sc,b,a);
+  unsigned adjusted=fn_8055150C(flag,hits,b,c,innings,rate);
+  delta=nominal-adjusted;
+  if(adjusted<=1) return (float)(int)lbl_80602528;
+ } else {
+  int n=sc->fn_800739E0(11,a,d,2);
+  int nominal=sc->fn_8007A6A0(50,a);
+  unsigned adjusted=fn_805513E0(n,b,c);
+  delta=nominal-adjusted;
+  if(adjusted<=1) return (float)(int)lbl_80602528;
+ }
+ unsigned char result;
+ switch(delta) {
+ case 1:result=lbl_80602527;break;
+ case 0:result=lbl_80602526;break;
+ case -1:result=lbl_80602525;break;
+ default:if(delta>1) result=lbl_80602528;else result=lbl_80602524;break;
+ }
+ return (float)(int)result;
+}

@@ -18,7 +18,7 @@ extern const short lbl_80607A68[];
 extern int lbl_8069BF40[];
 extern unsigned char lbl_8069C040[];
 extern int lbl_8069C6A8[];
-extern char lbl_8069C4A0;
+extern char lbl_8069C4A0[];
 extern const char lbl_8062457C[];
 extern const char lbl_8062467C[];
 extern const char lbl_8062477C[];
@@ -208,7 +208,6 @@ extern Vp6Fn5R lbl_806EF400;
 extern "C" void fn_803A0C9C(Vp6Buf*, int, Vp6Frm*);
 extern "C" void fn_80396604(Vp6Buf*, unsigned char, unsigned char, int, int, int, int, int, int, int);
 
-/* near-miss: 4 slots (li r4 / stw order around the memsets). */
 Vp6Ctx* fn_80395C68()
 {
     Vp6Params p;
@@ -220,7 +219,7 @@ Vp6Ctx* fn_80395C68()
     if (c == 0) {
         return 0;
     }
-    MEMSET_V(c, 0, 0x4954);
+    memset(c, 0, 0x4954);
     c->m1B0 = p;
     if (!fn_80395B38(c)) {
         fn_80398614(c);
