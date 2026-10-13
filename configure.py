@@ -1171,7 +1171,7 @@ config.libs = [
             Object(Matching, "libc/memcpy.c"),
             Object(Matching, "libc/memmove.c"),
             Object(Matching, "libc/memset.c"),
-            Object(NonMatching, "libc/strcasecmp.c"),
+            Object(Matching, "libc/strcasecmp.c"),
             Object(Matching, "libc/strcat.c"),
             Object(Matching, "libc/strchr.c"),
             Object(Matching, "libc/strcmp.c"),
