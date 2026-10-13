@@ -683,7 +683,8 @@ void fn_80104544(UiObj* self, int a)
     fn_800CFB38();
 }
 
-/* near-miss: two arg moves swapped (retail: mr r3,r29 before mr r5,r27 before the sprintf-like call) */
+/* fn_80403DE4 is the C formatter (unmangled symbol); called through its extern "C" declaration with a void result,
+   which gives retail's argument-move order (mr r3 before mr r5). */
 void fn_80104798(short* out, int n, int strId, int flag)
 {
     short buf[20];
@@ -694,7 +695,7 @@ void fn_80104798(short* out, int n, int strId, int flag)
         fn_800DFF0C(buf, (short*)fn_80090880(g, 0x19B5));
     if (n > 1) {
         short* fmt = (short*)fn_80090880(g, 0x19B3);
-        fn_80403DE4(tmp, fmt, n, (short*)fn_80090880(g, strId));
+        ((void (*)(short*, short*, ...))((int (*)(char*, const char*, ...))fn_80403DE4))(tmp, fmt, n, (short*)fn_80090880(g, strId));
         fn_800DFF0C(buf, tmp);
     } else
         fn_800DFF0C(buf, (short*)fn_80090880(g, strId));

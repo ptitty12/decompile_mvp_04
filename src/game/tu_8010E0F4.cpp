@@ -131,7 +131,7 @@ void fn_8011243C(Scr* self);
 void fn_80112D90(Scr* self);
 void fn_801138FC(Scr* self);
 void fn_80113CA8(Scr* self);
-int fn_8006BC74(void* p);
+extern "C" int fn_8006BC74(void* p, int idx);
 int fn_801059E4();
 int fn_8017E030(UnkGameP700* a, int b, int c);
 void fn_8010F2CC(Scr* self);
@@ -352,7 +352,10 @@ int fn_8010EA4C(Scr* self, int a)
     return 1;
 }
 
-/* near-miss: 7 slots, all register naming (retail reloads m168 into r4 and keeps t in r31); AtI() gives retail's r11 index register. */
+/* Base-first indexed read (lwzx base, index). */
+inline int AtB(int* p, int i) { char* b = (char*)p; int o = i * 4; return *(int*)(b + o); }
+
+/* fn_8006BC74 is extern "C" (self, idx) in tu_8006902C; the caller passes self->m168, which retail keeps in r4. */
 int fn_8010EAF4(Scr* self)
 {
     int r27 = 0;
@@ -361,12 +364,12 @@ int fn_8010EAF4(Scr* self)
     int t = fn_8017E030(p700, fn_801059E4(), 0);
     int e = fn_800B555C()->m570;
     UnkGameP6F8* p = g->m6F8;
-    int x = e ^ AtI(&p->m10->m6C, self->m168);
+    int x = e ^ AtB(&p->m10->m6C, self->m168);
     int c = x == 0;
     if (self->m144 != 3 && self->m144 != 6 && self->m144 != 7)
         r27 = 1;
     int f = 0;
-    if ((unsigned)(t - 1) <= 1 || fn_8006BC74(p) != 0)
+    if ((unsigned)(t - 1) <= 1 || fn_8006BC74(p, self->m168) != 0)
         f = 1;
     int r = 0;
     if (c != 0 && (r27 != 0 || f != 0))
