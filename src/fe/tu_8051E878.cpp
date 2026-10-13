@@ -675,10 +675,13 @@ extern "C" FE_OVERLAY void fn_8051FEA8(FeV10* x)
 //@8051FEF4
 FE_OVERLAY FeRecA::FeRecA(int a)
 {
-    m0 = -1;
+    int init8 = 0x3BEE;
+    int initC = 0;
+    int init0 = -1;
+    m0 = init0;
     m4 = a;
-    m8 = 0x3BEE;
-    mC = 0;
+    m8 = init8;
+    mC = initC;
     m10 = lbl_8067A5E8;
 }
 
@@ -823,17 +826,8 @@ extern "C" FE_OVERLAY void fn_805207E4(FeV10* x)
 
 //@8052083C
 FE_OVERLAY FeRecC::FeRecC(int a, int b, int c, int d, int e)
-{
-    m0 = -1;
-    m4 = a;
-    m8 = b;
-    m10 = lbl_8067A2E0;
-    m14 = c;
-    m18 = d;
-    m1C = e;
-    m20 = 0;
-    mC = d / e;
-}
+    : m0(-1), m4(a), m8(b), mC(d / e), m10(lbl_8067A2E0), m14(c), m18(d), m1C(e), m20(0)
+{}
 
 extern "C" FE_OVERLAY void fn_8052088C(FeV10B* x)
 {
