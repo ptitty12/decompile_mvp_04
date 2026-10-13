@@ -4,6 +4,7 @@
  */
 #include "game/tu_8020EE9C.h"
 
+extern "C" void fn_80379F1C(const Vec3f*, const Vec3f&, const Vec3f&, Vec3f*);
 extern "C" {
 int fn_802055F4(TaskInner* in);
 void fn_80205450(TaskInner* in, int x);
@@ -559,4 +560,45 @@ void fn_8022AB04(Task* t)
     t->m9C->m30 = 6;
 }
 
+
+extern const float lbl_805D6660;
+inline Vec3f FlatPosForClone(const Vec3f& p) { Vec3f r=p; r.y=lbl_805D6660; return r; }
+extern const Vec3f lbl_805D6760[];
+extern const float lbl_805D6664;
+
+
+void fn_8022A71C(Task* t, int a, Player* b)
+{
+    TaskInner* in = t->m9C;
+    Obj4_36C* g = in->m4;
+    RecQueue* q = in->m3A60;
+    Player* pl = (Player*)ObjAt(in->m8, in->m3A5C);
+    int n = q->count;
+    if (n > 5) {
+        for (int i = 0; i < n; i++) {
+        }
+        for (int i = 0; i < n; i++) {
+        }
+        q->count = 0;
+    }
+    const Vec3f& gp = ((PosObj*)g)->m60;
+    const Vec3f& pp = ((PosObj*)pl)->m60;
+    fn_80204CCC(&q->e[q->count]);
+    Rec* e = &q->e[q->count];
+    q->count++;
+    Vec3f out = lbl_806055DC;
+    fn_80379F1C(&lbl_805D6760[a], FlatPosForClone(gp), FlatPosForClone(pp), &out);
+    e->m4 = 6;
+    e->m0 = 0x30;
+    e->mC = 4;
+    e->m8 = 3;
+    e->m9C = 1;
+    e->m38 = out;
+    e->m1C = a;
+    e->m28 = b;
+    e->m88 = lbl_805D6664;
+    e->m80 = lbl_805D6664;
+    e->m94 = 1;
+    e->m50 = gp - pp;
+}
 }
