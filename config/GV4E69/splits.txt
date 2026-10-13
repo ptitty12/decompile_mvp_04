@@ -2266,6 +2266,7 @@ libm/e_sqrt.cpp:
 
 libm/s_ceil.c:
 	.text       start:0x804103C0 end:0x80410518
+	.sdata      start:0x806EED60 end:0x806EED70
 
 libm/s_cos.cpp:
 	.text       start:0x80410518 end:0x804105F8
