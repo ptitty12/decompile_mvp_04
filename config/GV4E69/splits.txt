@@ -2502,6 +2502,7 @@ dolphin/gx/GXTexture.c:
 
 dolphin/gx/GXBump.c:
 	.text       start:0x8042EDC0 end:0x8042F2E0
+	.sdata2     start:0x806F0DD8 end:0x806F0DDC
 
 dolphin/gx/GXTev.c:
 	.text       start:0x8042F2E0 end:0x8042F93C

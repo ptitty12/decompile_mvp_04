@@ -1287,7 +1287,7 @@ config.libs = [
             Object(NonMatching, "dolphin/gx/GXFrameBuf.c"),
             Object(NonMatching, "dolphin/gx/tu_8042D84C.c"),
             Object(Matching, "dolphin/gx/GXTexture.c"),
-            Object(NonMatching, "dolphin/gx/GXBump.c"),
+            Object(Matching, "dolphin/gx/GXBump.c"),
             Object(Matching, "dolphin/gx/GXTev.c"),
             Object(NonMatching, "dolphin/gx/tu_8042F93C.c"),
             Object(NonMatching, "dolphin/os/tu_80431828.c", cflags=[*cflags_dolphin_sdk, "-opt nopeephole"]),
