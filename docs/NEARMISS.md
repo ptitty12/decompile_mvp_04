@@ -296,3 +296,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 
 - `db/tu_805721F8` `fn_805721F8`: 99.21965%, 173/173 instructions; roster score array view recovers indexed loads, but round/found/clamped-value registers and the initial search-index copy differ after seventeen bounded forms; new code dropped.
 - `db/tu_80574AE4` `fn_80577218`: 99.49468%, 188/188 instructions; comparator branches and the two 12-byte statistics constructors match, but winning-rate denominator/zero FPR allocation differs after ten forms; source dropped.
+
+- `db/tu_80574AE4` `fn_8057AF3C`: 99.02778%, 216/216 instructions; one argument move crosses four setup instructions after twenty bounded forms; canonical round queries and the observed nine-word record swap preserved in scratch only.
