@@ -281,7 +281,9 @@ FE_OVERLAY int fn_8049A480(char* x)
     return 1;
 }
 
-/* near-miss: register permutation only: retail keeps aa/all in r25/r24 and the aa && ok temp in r0, ours puts the temp in r30 and reads it after the loop */
+/* gcse copy propagation would replace aa and bb in the final `aa == 1 && bb == 1` test by their && temporaries
+ * (making them live across the loop). Retail keeps reading aa/bb, so the copy `aa = t` must be killed: t is the
+ * same variable as the next-index temporary below, and nb is overwritten (dead store) right after `bb = nb`. */
 FE_OVERLAY void fn_8049A4DC(void* x)
 {
     void* g = lbl_8061930C;
@@ -309,10 +311,14 @@ FE_OVERLAY void fn_8049A4DC(void* x)
         } else {
             ok = 1;
         }
-        aa = aa != 0 && ok != 0;
-        bb = bb != 0 || (ok != 0 && fn_8057CE00(sp8) <= 1);
-        int c = sp8;
         int t;
+        int nb;
+        t = aa != 0 && ok != 0;
+        aa = t;
+        nb = bb != 0 || (ok != 0 && fn_8057CE00(sp8) <= 1);
+        bb = nb;
+        nb = e;
+        int c = sp8;
         if (c > 3) {
             t = c;
         } else {
