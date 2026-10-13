@@ -566,6 +566,107 @@ void fn_802B5F58(Rr* self)
     }
 }
 
+struct Unk8019F8C0_Owner;
+struct Unk802B5F9C_Obj {
+    float m0;
+    float m4;
+    float m8;
+    float mC;
+    float m10;
+    float m14;
+    float m18;
+    float m1C;
+    float m20;
+    float m24;
+    float m28;
+    float m2C;
+    Unk8019F8C0_Owner* m30;
+    int m34;
+};
+struct Unk802B5F9C_Col {
+    float r;
+    float g;
+    float b;
+    float a;
+};
+struct Unk802B5F9C_G {
+    char pad0[0x2C];
+    int m2C;
+};
+struct Unk802B5F9C_H {
+    char pad0[0x3C];
+    void* m3C;
+};
+extern Unk802B5F9C_H* lbl_8061FEDC;
+extern int lbl_8061EAB0;
+extern "C" {
+int rand();
+void fn_8014D9C4(void* p);
+float fn_8041171C(float x);
+void fn_803185A0(void* a, int b, float* c, void* d, int e, Unk802B5F9C_Col f, int g, int h);
+}
+void* fn_801A04A8(Unk8019F8C0_Owner* o, int i);
+float fn_801A0744(Unk8019F8C0_Owner* o);
+inline Unk802B5F9C_Col Unk802B5F9C_Id(const Unk802B5F9C_Col& c)
+{
+    return c;
+}
+inline float Unk802B5F9C_Cl(float v)
+{
+    return !(v > 1.0f) ? (v >? 0.0f) : 1.0f;
+}
+
+/* near-miss (99.8%, same instruction count): the 16-byte Col temp copy for the by-value argument loads its words in the order
+   2,0,1,3 (retail 0,1,2,3). Tried: ref/value/pointer inline returning the struct, named-local return, field-wise copy. */
+void fn_802B5F9C(Unk802B5F9C_Obj* self)
+{
+    float arr[8];
+    arr[0] = 0.0f;
+    arr[1] = 0.0f;
+    arr[3] = 0.0f;
+    arr[4] = 0.0f;
+    arr[2] = 1.0f;
+    arr[6] = 1.0f;
+    arr[7] = 1.0f;
+    arr[5] = 1.0f;
+    float rnd = (float)(rand() % 10000) * 2.0f * 0.0001f;
+    Unk802B5F9C_Col col;
+    fn_8014D9C4(&col);
+    if (fn_801A04A8(self->m30, 1) != 0) {
+        float cur = fn_801A0744(self->m30);
+        self->mC = !(self->m8 < 0.0f) ? cur - self->m8 : 0.0f;
+        self->m8 = cur;
+        float a = fn_8041171C(self->m0) * 0.07f + 0.7f;
+        col.r = Unk802B5F9C_Cl(1.0f);
+        col.g = Unk802B5F9C_Cl(1.0f);
+        col.b = Unk802B5F9C_Cl(1.0f);
+        col.a = Unk802B5F9C_Cl(a * 0.5f);
+        if (!(self->m0 <= 6.284f)) {
+            self->m0 = 0.0f;
+            self->m4 = (float)(rand() % 10000) * 0.00004f + 0.4f;
+        }
+        if (self->mC != 0.0f) {
+            if (lbl_8061EAB0-- < 0) {
+                self->m10 = rnd;
+                self->m14 = rnd;
+                self->m18 = rnd + 1.0f;
+                self->m1C = rnd;
+                self->m20 = rnd;
+                self->m28 = rnd + 1.0f;
+                self->m2C = rnd + 1.0f;
+                self->m24 = rnd + 1.0f;
+                lbl_8061EAB0 = 2;
+            }
+            self->m0 = self->m4 * 60.024014f * self->mC + self->m0;
+        }
+        Unk802B5F9C_H* h = lbl_8061FEDC;
+        fn_803188FC(lbl_8061FF44, 5);
+        ((Unk802B5F9C_G*)lbl_8061FF44)->m2C = 5;
+        Unk802B5F9C_Col t = col;
+        fn_803185A0(h->m3C, self->m34, arr, &self->m10, 0xFF, Unk802B5F9C_Id(t), 1, 1);
+    }
+}
+
 void fn_802B7A28(void* unused, int idx)
 {
     char a[0x100] = "";
