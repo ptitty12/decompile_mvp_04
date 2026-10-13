@@ -348,3 +348,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805467E0::fn_80547B38 (95.93%): four getter/index forms retain address CSE and register differences; scratch build/root26/47B38, source restored.
 - db/tu_805467E0::fn_80547EC0: eight ordinary missing-body forms reach 77/79 strict words (97.47%), two memory-load scheduling slots remain; scratch build/root26/47EC0, no source promoted.
 - db/tu_805467E0::fn_805479F0 (96.34% inherited): eight ordinary list/counter/lifetime forms retain register and block differences (best81/82 words); scratch build/root35/479F0, source restored.
+
+- `fe/tu_8043FDC0` `fn_80440210`: 97.89474%, 19/19 instructions after six bounded countdown forms; the count and one-based index occupy r31/r30 instead of retail r30/r31; failed drafts kept in scratch only.
