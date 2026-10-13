@@ -622,9 +622,23 @@ DB_OVERLAY Unk80084910_T8* fn_8053DB20(K8* self, int i)
     return &self->m24[i];
 }
 
-/* near-miss: only the frame addresses differ. Retail reads the two 4-byte stack buffers
- * (fn_80329FA0 output at sp+0xC, the date at sp+0x10) straight from the frame; ours forms
- * them in callee-saved registers (addi rX,r1,12). Tried: arrays, scalars, structs. */
+struct Db8053DB30_W4 {
+    unsigned p0 : 1;
+    unsigned a : 7;
+    unsigned p1 : 1;
+    unsigned b : 7;
+    unsigned p2 : 1;
+    unsigned c : 7;
+    unsigned p3 : 1;
+    unsigned d : 7;
+};
+/* near-miss: 99.1%. The one remaining difference is the date (Db8053CC9C_Date at sp+0x10): retail
+ * stores its bytes straight into the frame, ours forms `addi rX,r1,16` for the nonzero-offset
+ * stores (one extra insn). Tried: ctor/dtor/none on the Date, declaration position, aggregate
+ * init, volatile views, byte-pointer stores. The dtor form puts the Date in an early frame slot
+ * (sp+8) and moves the call temps, which breaks the layout. Matched parts: the fn_80329FA0 output
+ * is read as a whole word then truncated (gives retail's lhz 14(r1)); the four byte-aligned
+ * w4 fields are read as 7-bit bitfields (a plain shift by 24/16 is narrowed to lbz/lhz). */
 DB_OVERLAY R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src)
 {
     fn_8040074C(dst, 0x2C);
@@ -632,7 +646,9 @@ DB_OVERLAY R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src)
                 (src->w4 >> 8) & 0x3FF);
     Db8053CC9C_Buf3 buf;
     fn_80329FA0(&buf, 1);
-    unsigned short yr = *(unsigned char*)src + buf.b;
+    unsigned bw = *(unsigned*)&buf;
+    int tt = (unsigned short)bw;
+    unsigned short yr = *(unsigned char*)src + tt;
     unsigned mon = ((src->w0 >> 10) & 0xF) % 12;
     unsigned dim = fn_8032A2CC(mon, yr);
     Db8053CC9C_Date d;
@@ -648,10 +664,10 @@ DB_OVERLAY R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src)
     dst->f7 = (src->w4 & 0x7F) % 100;
     dst->f8 = (src->w0 >> 8) & 0x3F;
     dst->f10 = fn_80090244((src->w0 >> 3) & 0x7F);
-    dst->f11 = fn_80090244((src->w4 >> 24) & 0x7F);
-    dst->f12 = fn_80090244((src->w4 >> 16) & 0x7F);
-    dst->f13 = fn_80090244((src->w4 >> 8) & 0x7F);
-    dst->f14 = fn_80090244(src->w4 & 0x7F);
+    dst->f11 = fn_80090244(((Db8053DB30_W4*)&src->w4)->a);
+    dst->f12 = fn_80090244(((Db8053DB30_W4*)&src->w4)->b);
+    dst->f13 = fn_80090244(((Db8053DB30_W4*)&src->w4)->c);
+    dst->f14 = fn_80090244(((Db8053DB30_W4*)&src->w4)->d);
     return dst;
 }
 

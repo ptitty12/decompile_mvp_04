@@ -250,14 +250,13 @@ extern "C" DB_OVERLAY void fn_80532144(Unk80531A20_Tbl<20, 3>* self, int i, int 
         self->m8[i][j] = f;
 }
 
-/* near-miss: loop and exits match; retail keeps the result in r3 (base pointer in r10) and branches
- * the first compare with blt, ours reuses r3 for the base. */
 extern "C" DB_OVERLAY int fn_8053217C(Unk80531A20_Tbl<20, 3>* self, int col, float x)
 {
-    float acc = lbl_805FE9EC;
     int r = 0;
     unsigned i = 0;
-    acc = acc + self->m8[0][col];
+    float acc = lbl_805FE9EC;
+    i = r;
+    acc = acc + self->m8[i][col];
     if (!(x < acc)) {
         while (++i <= 19) {
             acc = acc + self->m8[i][col];
@@ -758,18 +757,20 @@ extern "C" DB_OVERLAY int fn_8053350C(Unk805334B0_T* self, unsigned i)
     return r;
 }
 
-/* near-miss: same as fn_8053217C (retail keeps the result in r3 and branches the first compare with
- * blt; ours reuses r3 for the base pointer). */
 extern "C" DB_OVERLAY int fn_8053352C(Unk805334B0_T* self, float x)
 {
     int r = 0;
+    unsigned i = 0;
     float acc = lbl_805FEAC4;
-    unsigned i;
-    for (i = 0; i <= 18; i++) {
-        acc = acc + self->m8[i].m0;
-        if (!(x >= acc)) {
-            r = i;
-            break;
+    i = r;
+    acc = acc + self->m8[i].m0;
+    if (!(x < acc)) {
+        while (++i <= 18) {
+            acc = acc + self->m8[i].m0;
+            if (!(x >= acc)) {
+                r = i;
+                break;
+            }
         }
     }
     return r;
@@ -849,17 +850,20 @@ extern "C" DB_OVERLAY int fn_8053381C(Unk805337C8_T* self, int a, unsigned b)
     return r;
 }
 
-/* near-miss: same as fn_8053217C. */
 extern "C" DB_OVERLAY int fn_8053384C(Unk805337C8_T* self, int row, float x)
 {
     int r = 0;
+    unsigned i = 0;
     float acc = lbl_805FEAE0;
-    unsigned i;
-    for (i = 0; i <= 13; i++) {
-        acc = acc + self->m8[row][i].m0;
-        if (!(x >= acc)) {
-            r = i;
-            break;
+    i = r;
+    acc = acc + self->m8[row][i].m0;
+    if (!(x < acc)) {
+        while (++i <= 13) {
+            acc = acc + self->m8[row][i].m0;
+            if (!(x >= acc)) {
+                r = i;
+                break;
+            }
         }
     }
     return r;
