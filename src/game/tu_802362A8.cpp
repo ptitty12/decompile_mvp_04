@@ -628,19 +628,29 @@ void Unk802362A8_Cpu::fn_80238934(float* p)
     Unk80238934_Msg m;
     m.Base(0xAA);
     m.Derived();
-    if (!(p[0] < -1.0f) && !(p[0] > -0.4f)) {
-        if (v)
-            m.Set(2);
-        else
-            m.Set(0);
-    } else if (!(p[0] < -0.4f) && !(p[0] > 0.4f)) {
-        m.Set(1);
-    } else {
-        if (v)
-            m.Set(0);
-        else
-            m.Set(2);
+    if (p[0] < -1.0f) {
+        if (p[0] < -0.4f)
+            goto other;
+        goto middle;
     }
+    if (p[0] > -0.4f)
+        goto middle;
+    if (v)
+        m.Set(2);
+    else
+        m.Set(0);
+    goto done;
+middle:
+    if (p[0] > 0.4f)
+        goto other;
+    m.Set(1);
+    goto done;
+other:
+    if (v)
+        m.Set(0);
+    else
+        m.Set(2);
+done:;
     Unk80238934_Msg* mp = &m;
     fn_8037893C((char*)m2E4 + 0x704, m.m0, mp, 0, 0);
     mp->Dtor();
