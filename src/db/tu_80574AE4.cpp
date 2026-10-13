@@ -286,7 +286,7 @@ extern "C" DB_OVERLAY int fn_8057763C(DbScan* self, int a)
     return total - hit;
 }
 
-/* near-miss: ~20 slots; retail walks one base (self+0x1990) with the first list at negative offsets, we pick the lower list as the base */
+/* Keep the retail loop base; the preceding list is addressed at negative offsets. */
 extern "C" DB_OVERLAY void fn_805788CC(char* self)
 {
     unsigned i = 0;
@@ -294,13 +294,13 @@ extern "C" DB_OVERLAY void fn_805788CC(char* self)
     fn_8057487C(self);
     do {
         i += 1;
-        DbList* a = (DbList*)((char*)b - 0xBD0);
-        fn_8040074C(a->m0, a->m8 * 0x24);
-        a->m4 = 0;
-        a->mC = 0;
-        fn_8040074C(a->m14, a->m1C * 4);
-        a->m18 = 0;
-        a->m20 = 0;
+        char* p = (char*)b;
+        fn_8040074C(*(void**)(p - 0xBD0), *(int*)(p - 0xBC8) * 0x24);
+        *(int*)(p - 0xBCC) = 0;
+        *(int*)(p - 0xBC4) = 0;
+        fn_8040074C(*(void**)(p - 0xBBC), *(int*)(p - 0xBB4) * 4);
+        *(int*)(p - 0xBB8) = 0;
+        *(int*)(p - 0xBB0) = 0;
         fn_8040074C(b->m0, b->m8 * 0x24);
         b->m4 = 0;
         b->mC = 0;
