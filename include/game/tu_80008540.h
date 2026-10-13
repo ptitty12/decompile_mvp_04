@@ -198,6 +198,7 @@ public:
     int m1600;
 
     Unk800085B0(int idx);
+    virtual ~Unk800085B0() {}
     virtual int vslot21() { return 1; }
     virtual void vslot22(int a, float f);
     virtual void vslot23(int a, float f);
