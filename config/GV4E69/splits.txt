@@ -1409,6 +1409,7 @@ game/tu_8033CED8.cpp:
 
 game/tu_8033FAFC.cpp:
 	.text       start:0x8033FAFC end:0x803401A8
+	.rodata     start:0x805F3258 end:0x805F326C align:4
 
 game/tu_803401A8.cpp:
 	.text       start:0x803401A8 end:0x803414A4
