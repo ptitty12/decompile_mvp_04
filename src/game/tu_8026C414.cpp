@@ -247,6 +247,52 @@ int fn_8026CF70(O* self, Unk8026CF70_P* p, int* out1, int* out2, float* fp)
     return r;
 }
 
+int fn_8026CFF8(int sel, float* p, int flag, Unk80273498_Vec3* out)
+{
+    const float k = 15.0f;
+    int r = 1;
+    Unk80273498_Vec3 v = fn_8014E388(sel);
+    switch (sel) {
+    case 3:
+        if (out != 0)
+            v.x = v.x + 18.0f;
+        else
+            v.x = v.x + k;
+        r = p[0] > v.x;
+        break;
+    case 1:
+        if (flag == 0) {
+            v.z = v.z - k;
+            r = p[2] < v.z;
+        } else {
+            v.x = v.x - k;
+            r = p[0] < v.x;
+        }
+        break;
+    case 0:
+        if (flag != 0) {
+            v.z = v.z - k;
+            r = p[2] < v.z;
+        } else {
+            v.x = v.x + k;
+            r = p[0] > v.x;
+        }
+        break;
+    case 2:
+        if (flag != 0) {
+            v.z = v.z + k;
+            r = p[2] > v.z;
+        } else {
+            v.x = v.x - k;
+            r = p[0] < v.x;
+        }
+        break;
+    }
+    if (out != 0)
+        *out = v;
+    return r;
+}
+
 float fn_8026D504(O* self, X* ctx)
 {
     float r = 0.0f;
