@@ -4,6 +4,8 @@
  */
 #include "game/fe_80459228.h"
 
+extern "C" char* strncpy(char* dst, const char* src, unsigned n);
+
 
 extern const char lbl_805F5068[];
 extern const char lbl_805F4F20[];
@@ -118,7 +120,7 @@ FE_OVERLAY void fn_804643A0(FeScrF* x, int sel)
     case 3:
     case 4:
     default:
-        fn_8040B830(mp->name, fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1))->fn_vslot70()->fn_vslot33(5, 1)->mC, 15);
+        strncpy(mp->name, fn_800C8060(x->fn_vslot32(lbl_805F4EF4, 1))->fn_vslot70()->fn_vslot33(5, 1)->mC, 15);
         mp->name[15] = 0;
         fn_800B7B4C(FeGetMgr(), mp, x);
         return;
@@ -176,7 +178,7 @@ FE_OVERLAY void fn_8046488C(int a, void* x)
             FeMsg m;
             FeMsg* mp = &m;
             fn_8035682C(mp);
-            fn_8040B830(mp->name, lbl_805F5284, 15);
+            strncpy(mp->name, lbl_805F5284, 15);
             mp->name[15] = 0;
             fn_800B7B4C(FeGetMgr(), mp, x);
             fn_8054899C(lbl_80619948->m58);
@@ -206,7 +208,7 @@ FE_OVERLAY void fn_80464A0C(int a, void* x)
                 FeMsg m;
                 FeMsg* mp = &m;
                 fn_8035682C(mp);
-                fn_8040B830(mp->name, lbl_805F5284, 15);
+                strncpy(mp->name, lbl_805F5284, 15);
                 mp->name[15] = 0;
                 fn_800B7B4C(FeGetMgr(), mp, x);
             }
@@ -225,7 +227,7 @@ FE_OVERLAY void fn_80464B60(void* x)
     FeMsg m;
     FeMsg* mp = &m;
     fn_8035682C(mp);
-    fn_8040B830(mp->name, lbl_805F5284, 15);
+    strncpy(mp->name, lbl_805F5284, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, x);
     fn_8054899C(lbl_80619948->m58);
@@ -261,7 +263,7 @@ FE_OVERLAY void fn_80464D68()
     FeMsg m;
     FeMsg* mp = &m;
     fn_8035682C(mp);
-    fn_8040B830(mp->name, lbl_805F5284, 15);
+    strncpy(mp->name, lbl_805F5284, 15);
     mp->name[15] = 0;
     fn_800B7B4C(FeGetMgr(), mp, p);
 }
@@ -413,7 +415,7 @@ FE_OVERLAY int fn_804653E8(void) { return 0; }
 
 FE_OVERLAY void fn_804653F0(int a, char* dst)
 {
-    fn_8040B830(dst, lbl_805F3CA8, 16);
+    strncpy(dst, lbl_805F3CA8, 16);
 }
 
 FE_OVERLAY FeScrI* fn_80465420(FeScrI* self, int a, int b, int c, int d, int e, int f, int g, int h)
