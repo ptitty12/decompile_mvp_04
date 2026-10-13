@@ -3,7 +3,278 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 
+#define FE_SCREEN_CF44_VOID
+
 #include "game/fe_804E02E0.h"
+
+class FeObjQ27 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(int a); virtual void v9();
+    virtual void v10(); virtual void v11(); virtual void v12(); virtual void v13();
+    virtual void v14(int a); virtual void v15(); virtual void v16(); virtual void v17();
+    virtual void v18(); virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22();
+    virtual void v23(); virtual void v24(); virtual void v25(); virtual void v26(); virtual void v27();
+    virtual void v28(char* a); virtual void v29(); virtual void v30(char* a); virtual void v31();
+    virtual FeObjQ27* v32(const char* a, int b); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68();
+    virtual void v69(int a); virtual void v70(); virtual void v71(); virtual void v72();
+    virtual FeObjQ27* v73(int a, int b); virtual void v74(); virtual void v75(); virtual void v76();
+    virtual void v77(); virtual void v78(); virtual void v79(); virtual void v80(); virtual void v81();
+    virtual void v82(); virtual void v83(); virtual void v84(); virtual void v85(); virtual void v86();
+    virtual void v87(); virtual void v88(); virtual void v89(); virtual void v90(); virtual void v91();
+    virtual void v92(); virtual void v93(); virtual void v94(); virtual void v95(); virtual void v96();
+    virtual void v97(); virtual void v98(); virtual void v99(); virtual void v100();
+    virtual void v101(); virtual void v102(); virtual void v103(); virtual void v104();
+    virtual void v105(); virtual void v106(); virtual void v107(); virtual void v108();
+    virtual void v109(); virtual void v110(); virtual void v111(); virtual void v112();
+    virtual void v113(); virtual void v114(); virtual void v115(); virtual void v116();
+    virtual void v117(); virtual void v118(); virtual void v119(); virtual void v120();
+    virtual void v121(); virtual void v122(); virtual void v123(); virtual void v124();
+    virtual void v125(); virtual void v126(); virtual void v127();
+};
+struct FeS5d : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObjQ27* m134;
+    FeObjQ27* m138;
+};
+extern const char lbl_805FA2CC[];
+extern const char lbl_805F977C[];
+extern const char lbl_805F9914[];
+extern const char lbl_805F4ECC[];
+extern const char lbl_805F5190[];
+extern const char lbl_805FA628[];
+extern const char lbl_805F4ED0[];
+extern "C" int sprintf(char* d, const char* fmt, ...);
+extern "C" void fn_801250D8(FeObj* w);
+
+class FeObjQ21 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29(); virtual void v30();
+    virtual void v31(); virtual void v32(); virtual FeObjQ21* v33(int a, int b); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+    virtual FeObjQ21* v70(); virtual void v71(); virtual void v72(); virtual void v73();
+    virtual void v74(); virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78();
+    virtual void v79(); virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83();
+    virtual void v84(); virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88();
+    virtual void v89(); virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93();
+    virtual void v94(); virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98();
+    virtual void v99(); virtual void v100(); virtual void v101(); virtual void v102();
+    virtual void v103(); virtual void v104(); virtual void v105(); virtual void v106();
+    virtual void v107(); virtual void v108(); virtual void v109(); virtual void v110();
+    virtual void v111(); virtual void v112(); virtual void v113(); virtual void v114();
+    virtual void v115(); virtual void v116(); virtual void v117(); virtual void v118();
+    virtual void v119(); virtual void v120(); virtual void v121(); virtual void v122();
+    virtual void v123(); virtual void v124(); virtual void v125(); virtual void v126();
+    virtual void v127();
+};
+struct FeS5c : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObjQ21* m134;
+};
+struct FeStQ21 {
+    char pad0[0x4C4];
+    int m4C4;
+    int m4C8;
+    int m4CC;
+    int m4D0;
+};
+struct FeStQ22 {
+    char pad0[0x644];
+    int m644;
+};
+extern const char lbl_805F5B98[];
+extern const char lbl_805F3CA8[];
+extern const char lbl_805F6388[];
+extern const char lbl_805F4450[];
+extern const char lbl_805F5B44[];
+extern const char lbl_805FA620[];
+
+class FeObjQ20 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(char* a); virtual void v29();
+    virtual void v30(); virtual void v31(); virtual FeObjQ20* v32(const char* a, int b);
+    virtual void v33(); virtual void v34(); virtual void v35(); virtual void v36(); virtual void v37();
+    virtual void v38(); virtual void v39(); virtual void v40(); virtual void v41(); virtual void v42();
+    virtual void v43(); virtual void v44(); virtual void v45(); virtual void v46(); virtual void v47();
+    virtual void v48(); virtual void v49(); virtual void v50(); virtual void v51(int a, int b);
+    virtual void v52(); virtual void v53(); virtual void v54(); virtual void v55(); virtual void v56();
+    virtual void v57(); virtual void v58(); virtual void v59(); virtual void v60(); virtual void v61();
+    virtual void v62(); virtual void v63(); virtual void v64(); virtual void v65(); virtual void v66();
+    virtual void v67(); virtual void v68(); virtual void v69(); virtual void v70(); virtual void v71();
+    virtual void v72(); virtual void v73(); virtual void v74(); virtual void v75(); virtual void v76();
+    virtual void v77(); virtual void v78(); virtual void v79(); virtual void v80(); virtual void v81();
+    virtual void v82(); virtual void v83(); virtual void v84(); virtual void v85(); virtual void v86();
+    virtual void v87(); virtual void v88(); virtual void v89(); virtual void v90(); virtual void v91();
+    virtual void v92(); virtual void v93(); virtual void v94(); virtual void v95(); virtual void v96();
+    virtual void v97(); virtual void v98(); virtual void v99(); virtual void v100();
+    virtual void v101(); virtual void v102(); virtual void v103(); virtual void v104();
+    virtual void v105(); virtual void v106(); virtual void v107(); virtual void v108();
+    virtual void v109(); virtual void v110(); virtual void v111(); virtual void v112();
+    virtual void v113(); virtual void v114(); virtual void v115(); virtual void v116();
+    virtual void v117(); virtual void v118(); virtual void v119(); virtual void v120();
+    virtual void v121(); virtual void v122(); virtual void v123(); virtual void v124();
+    virtual void v125(); virtual void v126(); virtual void v127();
+};
+class FeSubQ20 {
+public:
+    char pad0[0x24];
+    virtual int s1(); virtual int s2(); virtual int s3(); virtual void s4(int a); virtual int s5(); virtual int s6();
+    virtual int s7(); virtual void s8(int a); virtual int s9(); virtual int s10(); virtual int s11(); virtual int s12();
+    virtual int s13(); virtual int s14(); virtual void s15();
+};
+struct FeS5b : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObjQ20* m134;
+    char pad138[0x13C - 0x138];
+    FeObjQ20* m13C;
+    char pad140[0x150 - 0x140];
+    int m150;
+    int m154;
+};
+extern const char lbl_805F977C[];
+
+class FeObjQ18 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(int a); virtual void v9();
+    virtual void v10(); virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14();
+    virtual void v15(); virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19();
+    virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24();
+    virtual void v25(); virtual void v26(); virtual void v27(); virtual void v28();
+    virtual FeObjQ18* v29(const char* a); virtual void v30(); virtual void v31();
+    virtual FeObjQ18* v32(const char* a, int b); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+    virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74();
+    virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79();
+    virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83(); virtual void v84();
+    virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88(); virtual void v89();
+    virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93(); virtual void v94();
+    virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98(); virtual void v99();
+    virtual void v100(); virtual void v101(); virtual void v102(); virtual void v103();
+    virtual void v104(); virtual void v105(); virtual void v106(); virtual void v107();
+    virtual void v108(); virtual void v109(); virtual void v110(); virtual void v111();
+    virtual void v112(); virtual void v113(); virtual void v114(); virtual void v115();
+    virtual void v116(); virtual void v117(); virtual void v118(); virtual void v119();
+    virtual void v120(); virtual void v121(); virtual void v122(); virtual void v123();
+    virtual void v124(); virtual void v125(); virtual void v126(); virtual void v127();
+};
+class FeObjQ19 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(char* a); virtual void v29(int a);
+    virtual void v30(); virtual void v31(); virtual void v32(); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+    virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74();
+    virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79();
+    virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83(); virtual void v84();
+    virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88(); virtual void v89();
+    virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93(); virtual void v94();
+    virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98(); virtual void v99();
+    virtual void v100(); virtual void v101(int a, int b); virtual void v102(); virtual void v103();
+    virtual void v104(); virtual void v105(); virtual void v106(); virtual void v107();
+    virtual void v108(); virtual void v109(); virtual void v110(); virtual void v111();
+    virtual void v112(); virtual void v113(); virtual void v114(); virtual void v115();
+    virtual void v116(); virtual void v117(); virtual void v118(); virtual void v119();
+    virtual void v120(); virtual void v121(); virtual void v122(); virtual void v123();
+    virtual void v124(); virtual void v125(); virtual void v126(); virtual void v127();
+};
+extern const char lbl_805F7B70[];
+extern const char lbl_805F52D0[];
+extern const char lbl_805FA5FC[];
+extern const char lbl_805FA60C[];
+struct FeS5a : FeObj {
+    char pad40[0x134 - 0x40];
+    FeObj* m134;
+};
+extern const char lbl_805F4F84[];
+extern "C" void fn_80125128(FeObj* w, int v);
+void fn_800E25E0(int a, int b);
+extern "C" int fn_800B57EC(FeState* s);
+
+class FeObjQ13 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(int a); virtual void v9();
+    virtual void v10(); virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14();
+    virtual void v15(); virtual void v16(int a); virtual void v17(); virtual void v18(int a);
+    virtual void v19(); virtual void v20(); virtual void v21(); virtual void v22(); virtual void v23();
+    virtual void v24(); virtual void v25(); virtual void v26(); virtual void v27();
+    virtual void v28(char* b); virtual void v29(); virtual void v30(); virtual void v31();
+    virtual FeObjQ13* v32(const char* a, int b); virtual void v33(); virtual void v34();
+    virtual void v35(); virtual void v36(); virtual void v37(); virtual void v38(); virtual void v39();
+    virtual void v40(); virtual void v41(); virtual void v42(); virtual void v43(); virtual void v44();
+    virtual void v45(); virtual void v46(); virtual void v47(); virtual void v48(); virtual void v49();
+    virtual void v50(); virtual void v51(); virtual void v52(); virtual void v53(); virtual void v54();
+    virtual void v55(); virtual void v56(); virtual void v57(); virtual void v58(); virtual void v59();
+    virtual void v60(); virtual void v61(); virtual void v62(); virtual void v63(); virtual void v64();
+    virtual void v65(); virtual void v66(); virtual void v67(); virtual void v68(); virtual void v69();
+    virtual void v70(); virtual void v71(); virtual void v72(); virtual void v73(); virtual void v74();
+    virtual void v75(); virtual void v76(); virtual void v77(); virtual void v78(); virtual void v79();
+    virtual void v80(); virtual void v81(); virtual void v82(); virtual void v83(); virtual void v84();
+    virtual void v85(); virtual void v86(); virtual void v87(); virtual void v88(); virtual void v89();
+    virtual void v90(); virtual void v91(); virtual void v92(); virtual void v93(); virtual void v94();
+    virtual void v95(); virtual void v96(); virtual void v97(); virtual void v98(); virtual void v99();
+    virtual void v100(); virtual void v101(); virtual void v102(); virtual void v103();
+    virtual void v104(); virtual void v105(); virtual void v106(); virtual void v107();
+    virtual void v108(); virtual void v109(); virtual void v110(); virtual void v111();
+    virtual void v112(); virtual void v113(); virtual void v114(); virtual void v115();
+    virtual void v116(); virtual void v117(); virtual void v118(); virtual void v119();
+    virtual void v120(); virtual void v121(); virtual void v122(); virtual void v123();
+    virtual void v124(); virtual void v125(); virtual void v126(); virtual void v127();
+};
+extern const char lbl_805FA6F4[];
+extern const char lbl_805FA6FC[];
+extern const char lbl_805FA704[];
+extern const char lbl_805FA708[];
+extern const char lbl_805F4EF4[];
+struct FeStQ13 {
+    char pad0[0x4F0];
+    int m4F0;
+    char pad4F4[0x614 - 0x4F4];
+    int m614;
+    int m618;
+};
+void fn_800E2944(int a, int b);
+extern "C" void fn_800ECE34(void* x);
 
 extern char lbl_8066C4D0[];
 extern "C" FE_OVERLAY FeScrRaw* fn_804E5180(FeScrRaw* self, int a, int b, int c, int d, int e, int f, int g, int h)
@@ -13,6 +284,35 @@ extern "C" FE_OVERLAY FeScrRaw* fn_804E5180(FeScrRaw* self, int a, int b, int c,
     self->m130 = 0;
     self->m134 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804E51D0(FeS5a* self)
+{
+    char buf[0x18];
+    fn_800ECF18(self);
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), lbl_805F4F84);
+    fn_80124FA8(p, self);
+    ((int (*)(FeObj*, int))fn_80125154)(p, 2);
+    ((int (*)(FeObj*, int))fn_80125128)(p, 1);
+    fn_800E25E0((int)p, 0);
+    self->m134 = fn_800C8060(((FeObjQ18*)self)->v32(lbl_805F7B70, 1));
+    Unk8007B2B0_Screen* g = lbl_8061930C;
+    int sel = g->fn_8007DA28();
+    if (sel == -1) {
+        ((FeObjQ18*)((FeObjQ18*)self)->v32(lbl_805F52D0, 1))->v8(1);
+        FeObjQ18* t = ((FeObjQ18*)self)->v29(lbl_805FA5FC);
+        ((FeObjQ19*)fn_800C8040(t))->v29(0x4B3);
+        ((FeObjQ19*)fn_800C8060(((FeObjQ18*)self)->v29(lbl_805FA60C)))->v101(1, 1);
+        ((FeObjQ19*)fn_800C8060(((FeObjQ18*)self)->v29(lbl_805FA60C)))->v101(2, 0);
+        ((FeObjQ19*)fn_800C8060(((FeObjQ18*)self)->v29(lbl_805FA60C)))->v101(3, 0);
+        ((FeObjQ19*)fn_800C8060(((FeObjQ18*)self)->v29(lbl_805FA60C)))->v101(4, 0);
+    } else {
+        ((FeObjQ18*)((FeObjQ18*)self)->v32(lbl_805F52D0, 1))->v8(0);
+        g->fn_8007CF44(sel, (int)buf, 9);
+        ((FeObjQ19*)fn_800C8040(((FeObjQ18*)self)->v29(lbl_805FA5FC)))->v28(buf);
+    }
+    if (fn_800B57EC(fn_800B555C()) != 0)
+        ((FeObjQ19*)fn_800C8060(((FeObjQ18*)self)->v29(lbl_805FA60C)))->v101(1, 0);
 }
 
 extern "C" FE_OVERLAY int fn_804E5518(FeScr_80447264* self)
@@ -39,6 +339,66 @@ extern "C" FE_OVERLAY int fn_804E55CC(FeScr_80447264* self)
     return 1;
 }
 
+extern "C" FE_OVERLAY void fn_804E5608(FeS5c* self, int kind)
+{
+    UiMsg m;
+    UiMsg* mp = &m;
+    fn_8035682C(mp);
+    switch (kind) {
+    case 0:
+        fn_8040B830(mp->name, lbl_805F5B98, 15);
+        mp->name[15] = kind;
+        fn_800B7B4C(UiGetMsgMgr(), mp, self);
+        break;
+    case 2: {
+        int r = fn_800B57EC(fn_800B555C());
+        if (r != 0) {
+            r = ((FeStQ22*)fn_800B555C())->m644;
+            if (r == 0) {
+                fn_8040B830(mp->name, lbl_805F3CA8, 15);
+                mp->name[15] = r;
+            } else {
+                fn_8040B830(mp->name, lbl_805F6388, 15);
+                mp->name[15] = 0;
+            }
+        } else {
+            fn_8040B830(mp->name, lbl_805F4450, 15);
+            mp->name[15] = r;
+        }
+        fn_800B7B4C(UiGetMsgMgr(), &m, self);
+        break;
+    }
+    case 1: {
+        char* name = (char*)self->m134->v70()->v33(1, 1) + 0xC;
+        int c = strcmp(name, lbl_805F5B44);
+        if (c == 0) {
+            const char* s = fn_80090880(lbl_8061977C, 0x60D);
+            FeStQ21* st = (FeStQ21*)((char*)fn_800B555C() + 8);
+            st->m4C4 = 1;
+            st->m4C8 = 0x200000;
+            st->m4CC = 0;
+            st->m4D0 = (int)s;
+        } else {
+            int d = strcmp(name, lbl_805FA620);
+            if (d == 0) {
+                const char* s = fn_80090880(lbl_8061977C, 0x60D);
+                FeStQ21* st = (FeStQ21*)((char*)fn_800B555C() + 8);
+                st->m4C8 = 0x200000;
+                st->m4C4 = 0;
+                st->m4CC = 0;
+                st->m4D0 = (int)s;
+            }
+        }
+        if (((UiBase*)self->m134->v70()->v33(5, 1))->m24 & 0x40000000) {
+            fn_8040B830(mp->name, name, 15);
+            mp->name[15] = 0;
+            fn_800B7B4C(UiGetMsgMgr(), mp, self);
+        }
+        break;
+    }
+    }
+}
+
 extern "C" FE_OVERLAY int fn_804E58BC(FeObj* self)
 {
     ((FeObj2*)self)->v67(1, fn_800C8070(self));
@@ -59,6 +419,43 @@ extern "C" FE_OVERLAY FeScrRaw* fn_804E5974(FeScrRaw* self, int a, int b, int c,
     self->m134 = 0;
     self->m138 = 0;
     return self;
+}
+
+extern "C" FE_OVERLAY void fn_804E59C8(FeS5d* self)
+{
+    char buf1[400];
+    char buf2[0x18];
+    fn_800ECF18(self);
+    Unk8007B2B0_Screen* g = lbl_8061930C;
+    int sel = g->fn_8007DA28();
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), lbl_805F4F84);
+    fn_80124FA8(p, self);
+    fn_80125100(p);
+    fn_801250D8(p);
+    self->m134 = (FeObjQ27*)fn_800C8044(((FeObjQ27*)self)->v32(lbl_805FA2CC, 1));
+    self->m138 = (FeObjQ27*)fn_800C8060(((FeObjQ27*)self)->v32(lbl_805F4EF4, 1));
+    g->fn_8007CF44(sel, (int)buf2, 9);
+    ((FeObjQ27*)fn_800C8040(self->m134->v32(lbl_805F977C, 1)))->v28(buf2);
+    sprintf(buf1, lbl_805F4ECC, g->fn_8007D050(sel, 8));
+    ((FeObjQ27*)fn_800C8040(self->m134->v32(lbl_805F9914, 1)))->v30(buf1);
+    sprintf(buf1, lbl_805F5190, g->fn_8007D6E0(sel), 2);
+    FeObjQ27* r1 = (FeObjQ27*)fn_800C8044(self->m138->v73(0, 1)->v32(lbl_805FA628, 1));
+    ((FeObjQ27*)fn_800C8040(r1->v32(lbl_805F4ED0, 1)))->v30(buf1);
+    r1->v8(0);
+    sprintf(buf1, lbl_805F5190, g->fn_8007D69C(sel), 0x3F);
+    FeObjQ27* r2 = (FeObjQ27*)fn_800C8044(self->m138->v73(0, 2)->v32(lbl_805FA628, 1));
+    ((FeObjQ27*)fn_800C8040(r2->v32(lbl_805F4ED0, 1)))->v30(buf1);
+    r2->v8(0);
+    sprintf(buf1, lbl_805F5190, g->fn_8007D614(sel), 0x77);
+    FeObjQ27* r3 = (FeObjQ27*)fn_800C8044(self->m138->v73(0, 3)->v32(lbl_805FA628, 1));
+    ((FeObjQ27*)fn_800C8040(r3->v32(lbl_805F4ED0, 1)))->v30(buf1);
+    r3->v8(0);
+    sprintf(buf1, lbl_805F5190, g->fn_8007D658(sel), 0xF);
+    FeObjQ27* r4 = (FeObjQ27*)fn_800C8044(self->m138->v73(0, 4)->v32(lbl_805FA628, 1));
+    ((FeObjQ27*)fn_800C8040(r4->v32(lbl_805F4ED0, 1)))->v30(buf1);
+    r4->v8(0);
+    self->m138->v69(0);
+    self->m138->v14(1);
 }
 
 extern "C" FE_OVERLAY int fn_804E5EFC(FeS5* self)
@@ -199,6 +596,36 @@ extern "C" FE_OVERLAY void fn_804E6428(FeS6* self)
     self->m14C = fn_800C8044(self->v32("TOTAL", 1));
 }
 
+extern "C" FE_OVERLAY void fn_804E6590(FeS5b* self)
+{
+    char buf[0x18];
+    fn_800ECF18(self);
+    Unk8007B2B0_Screen* g = lbl_8061930C;
+    FeObj* p = fn_800B7A94(UiGetMsgMgr(), lbl_805F4F84);
+    fn_80124FA8(p, self);
+    fn_80125100(p);
+    int sel = g->fn_8007DA28();
+    self->m150 = sel;
+    g->fn_8007CF44(sel, (int)buf, 9);
+    ((FeObjQ20*)fn_800C8040(self->m134->v32(lbl_805F977C, 1)))->v28(buf);
+    ((FeSubQ20*)((char*)self->m13C + 0xDC))->s15();
+    self->m13C->v51(0x429A, 0);
+    self->m13C->v51(0x429B, 1);
+    self->m13C->v51(0x429C, 2);
+    self->m13C->v51(0x429D, 3);
+    self->m13C->v51(0x429E, 4);
+    self->m13C->v51(0x429F, 5);
+    self->m13C->v51(0x42A0, 6);
+    self->m13C->v51(0x42A1, 7);
+    self->m13C->v51(0x42A2, 8);
+    self->m13C->v51(0x42A3, 9);
+    self->m13C->v51(0x42A5, 10);
+    ((FeSubQ20*)((char*)self->m13C + 0xDC))->s4(6);
+    self->m154 = 0;
+    ((FeSubQ20*)((char*)self->m13C + 0xDC))->s8(0);
+    fn_804E6A58(self);
+}
+
 extern "C" FE_OVERLAY int fn_804E687C(FeObj* self)
 {
     fn_800C33D0();
@@ -260,4 +687,30 @@ extern "C" FE_OVERLAY void fn_804E7278(FeScrRaw* self, int chrg)
 {
     self->m3C = lbl_8066BCD8;
     fn_8035686C(self, chrg);
+}
+
+extern "C" FE_OVERLAY void fn_804E72A8(FeScr_80447264* self)
+{
+    char buf[0x320];
+    fn_800ECE34(self);
+    self->m134 = fn_800C8060(((FeObjQ13*)self)->v32(lbl_805FA6F4, 1));
+    self->m144 = (FePopup*)fn_800C8044(((FeObjQ13*)self)->v32(lbl_805FA6FC, 1));
+    self->m140 = fn_800C8060(((FeObjQ13*)self->m144)->v32(lbl_805F4EF4, 1));
+    ((FeObjQ13*)self->m140)->v16(0);
+    ((FeObjQ13*)self->m144)->v8(0);
+    int t = ((UiBase*)self->m144)->m2E + 3;
+    ((FeObjQ13*)self->m144)->v18(t);
+    ((FeObjQ13*)self->m140)->v18(t);
+    ((FeObjQ13*)self->m144)->v32(lbl_805FA704, 1)->v18(t);
+    ((FeObjQ13*)self->m144)->v32(lbl_805FA708, 1)->v18(t);
+    fn_80403DE4(buf, fn_80090880(lbl_8061977C, 0x3FCD), 4);
+    ((FeObjQ13*)fn_800C8040(((FeObjQ13*)self->m144)->v32(lbl_805FA704, 1)))->v28(buf);
+    FeStQ13* s = (FeStQ13*)((char*)fn_800B555C() + 8);
+    if (s->m614 != 0) {
+        s->m614 = 0;
+        int v = s->m618;
+        if (s->m4F0 != 0) {
+            fn_800E2944(lbl_8061930C->fn_8007DA28(), v);
+        }
+    }
 }
