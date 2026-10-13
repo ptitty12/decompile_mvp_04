@@ -151,6 +151,36 @@ extern "C" void fn_803E72EC(Unk803E7008_Pair* p)
     fn_803EA08C(p->m14);
 }
 
+struct va_list_tag {
+    char gpr;
+    char fpr;
+    char* overflow_arg_area;
+    char* reg_save_area;
+};
+typedef va_list_tag va_list[1];
+#define va_start(AP, LASTARG) (__builtin_next_arg(LASTARG), *(AP) = *(va_list_tag*)__builtin_saveregs())
+struct Unk803E7320_Reent {
+    int m0, m4;
+    void* m8;
+};
+extern Unk803E7320_Reent* _impure_ptr __attribute__((section(".sdata")));
+extern int (*lbl_8062C670)(const char*, va_list);
+extern "C" int vfprintf(void*, const char*, va_list);
+
+extern "C" int fn_803E7320(int level, const char* fmt, ...)
+{
+    va_list ap;
+    int r = 0;
+    if (level <= lbl_8062C674) {
+        va_start(ap, fmt);
+        if (lbl_8062C670)
+            r = lbl_8062C670(fmt, ap);
+        else
+            r = vfprintf(_impure_ptr->m8, fmt, ap);
+    }
+    return r;
+}
+
 extern "C" void fn_803E73F4(int v)
 {
     lbl_8062C674 = v;
@@ -166,6 +196,105 @@ extern Unk803E7008_Pair lbl_806AAB80;
 extern char lbl_8060D220[];
 extern void* (*lbl_8062C668)(int size, const char* tag);
 extern "C" int fn_803E9978(Unk803E7008_Ent** pp);
+
+struct Unk803E7A60_Arg {
+    const char* m0;
+    int m4;
+    char** m8;
+};
+extern char lbl_8060CC24[];
+extern char lbl_8060CC2C[];
+extern char lbl_8060D04C[];
+extern char lbl_8060D060[];
+extern char lbl_8060D06C[];
+extern char lbl_8060D07C[];
+extern char lbl_8060D090[];
+extern char lbl_8060D0A4[];
+extern char lbl_8060D0B8[];
+extern char lbl_8060D0D0[];
+extern char lbl_8060D0E0[];
+extern char lbl_8060D0F4[];
+extern char lbl_8060D108[];
+extern char lbl_8060D120[];
+extern "C" void fn_803DBDD8(int, int);
+extern "C" void fn_803DBE18(int, int);
+extern "C" void fn_803DBE20(int, int);
+extern "C" void fn_803DBE2C(int, int);
+extern "C" void fn_803DBE38(int, int);
+extern "C" void fn_803DBE44(int, int);
+extern "C" void fn_803DBE50(int, int);
+extern "C" void fn_803DBE5C(int, int);
+extern "C" void fn_803DBE68(int, int);
+extern "C" void fn_803DBE70(int, int);
+extern "C" void fn_803DBE78(int, int);
+extern "C" void fn_803DBE84(int, int*);
+extern "C" int fn_803E7400(const char*);
+extern "C" int atoi(const char*);
+extern "C" int sscanf(const char*, const char*, ...);
+inline int Unk803E7A60_Is(Unk803E7A60_Arg* a, const char* name)
+{
+    int r;
+    if (a->m4 == 1)
+        r = strcmp(name, a->m0) == 0;
+    else
+        r = 0;
+    return r;
+}
+
+/* near-miss: 99.98%; the two address-taken ints of the sscanf case are in the other stack order (retail: v at +0xC, w at +0x8) */
+extern "C" void fn_803E7A60(int h, Unk803E7A60_Arg* a)
+{
+    if (Unk803E7A60_Is(a, lbl_8060D04C)) {
+        fn_803DBDD8(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D060)) {
+        fn_803DBE18(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D06C)) {
+        fn_803DBE20(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D07C)) {
+        fn_803DBE68(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D090)) {
+        fn_803DBE70(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0A4)) {
+        fn_803DBE2C(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0B8)) {
+        fn_803DBE78(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0D0)) {
+        int v;
+        sscanf(*a->m8, lbl_8060CC2C, &v);
+        int w = v;
+        fn_803DBE84(h, &w);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0E0)) {
+        fn_803DBE38(h, fn_803E7400(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D0F4)) {
+        fn_803DBE44(h, strcmp(*a->m8, lbl_8060CC24) == 0);
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D108)) {
+        fn_803DBE50(h, atoi(*a->m8));
+        return;
+    }
+    if (Unk803E7A60_Is(a, lbl_8060D120)) {
+        fn_803DBE5C(h, fn_803E7400(*a->m8));
+    }
+}
 
 extern "C" void fn_803E7E88(Unk803E7E88_Obj* c)
 {

@@ -197,6 +197,170 @@ extern "C" void fn_803F6FC4(int a, int b);
 extern "C" void fn_803F6AD8(int a);
 extern short* (*lbl_806EEA68)(int);
 
+struct RcFeE {
+    int m0, m4;
+    char pad8[0x38];
+    int m40, m44, m48;
+    unsigned short m4C;
+    char pad4E[0x1e];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+    int m8C;
+    char m90[0x24];
+};
+struct RcFeS {
+    short s0, s2;
+    const char* m4;
+    int m8, mC, m10;
+    char m14[4];
+    char m18[2];
+};
+inline void RcFeInit(RcFeE* e, int a, int b)
+{
+    e->m0 = a;
+    e->m4 = b;
+    e->m6C = 0;
+    e->m70 = 0;
+    e->m74 = 0;
+    e->m78 = 0;
+    e->m7C = 0;
+    e->m80 = 0;
+    e->m84 = 0;
+    e->m88 = 0;
+}
+extern RcFeE lbl_806AADFC;
+extern RcFeS lbl_806AB5B8;
+extern int lbl_806EF464;
+extern "C" void fn_803EFBA4(void*);
+extern "C" int fn_803F89B0(void*, int, void*);
+extern "C" int fn_803F8A2C(void*);
+extern "C" char* strcpy(char*, const char*);
+extern "C" void* memset(void*, int, unsigned);
+extern "C" char fn_803F2404(const char* wild, const char* str);
+
+extern "C" RcFeE* fn_803F2240(int, const char*, int);
+
+struct RcEvM : RcEv {
+    int m40;
+    int m44;
+};
+struct RcSysC {
+    int m0, m4;
+    int w[33];
+    const void* vp;
+};
+extern RcEvM lbl_806AB364;
+extern char lbl_806AB378[];
+extern const void* lbl_806AB554[3];
+
+extern "C" void fn_803F2000()
+{
+    switch (lbl_806AB364.m8) {
+    case 0:
+        lbl_806AB364.mC = lbl_806AB364.m8;
+        lbl_806AB364.m8 = 0xC;
+    case 0xC: {
+        RcFeE* r = fn_803F2240((int)lbl_806AB378, lbl_806AB378 + 0xC, 1);
+        if (r->m4 == 0xB) {
+            lbl_806AB364.m8 = 0x7B;
+            lbl_806AB364.mC = 0;
+        } else {
+            lbl_806AB364.m44++;
+            if (lbl_806AB364.m1C != 0) {
+                RcSysC* y = (RcSysC*)&lbl_806AB4C8;
+                const void* volatile sv = y->vp;
+                *y = *(RcSysC*)r;
+                lbl_806AB554[0] = sv;
+            }
+            lbl_806AB364.m8 = 0xD;
+            lbl_806AB364.mC = 0;
+        }
+        break;
+    }
+    case 0xD: {
+        RcFeE* r = fn_803F2240((int)&lbl_806AB364.m14, (const char*)&lbl_806AB364 + 0x20, 0);
+        if (r->m4 == 0xB) {
+            lbl_806AB364.m8 = 0x7B;
+            lbl_806AB364.mC = 0;
+            break;
+        }
+        lbl_806AB364.m44++;
+        if (lbl_806AB364.m1C != 0) {
+            RcSysC* y = (RcSysC*)&lbl_806AB4C8;
+            const void* volatile sv = y->vp;
+            *y = *(RcSysC*)r;
+            lbl_806AB554[0] = sv;
+        }
+        break;
+    }
+    case 0x7B: {
+        lbl_806AB364.m0->v1(&lbl_806AB364);
+        if (lbl_806AB364.m1C != 0) {
+            RcSys* y = &lbl_806AB4C8;
+            y->m6C = 0;
+            y->m70 = 0;
+            y->m74 = 0;
+            y->m78 = 0;
+            y->m7C = 0;
+            y->m80 = 0;
+            y->m84 = 0;
+            y->m88 = 0;
+            y->m0 = 0xc;
+            y->m4 = 0;
+        }
+        break;
+    }
+    }
+}
+
+extern "C" RcFeE* fn_803F2240(int a0, const char* pat, int a2)
+{
+    RcFeInit(&lbl_806AADFC, 0, 0);
+    memset(lbl_806AADFC.m90, 0, 0x24);
+    lbl_806AADFC.m0 = 0x19;
+    lbl_806AADFC.m4 = 0xb;
+    lbl_806AADFC.m70 = 0;
+    lbl_806AADFC.m74 = 0;
+    lbl_806AADFC.m78 = 0;
+    lbl_806AADFC.m7C = 0;
+    lbl_806AADFC.m80 = 0;
+    lbl_806AADFC.m84 = 0;
+    lbl_806AADFC.m88 = 0;
+    lbl_806AADFC.m6C = 0;
+    if (lbl_806EF464 == 0) {
+        lbl_806AB5B8.s0 = 0;
+        lbl_806AB5B8.s2 = 0;
+        fn_803EFBA4(&lbl_806AB5B8);
+        lbl_806EF464 = 1;
+    }
+    int r;
+    if (a2 != 0) {
+        lbl_806AB5B8.m4 = 0;
+        lbl_806AB5B8.m8 = 0;
+        lbl_806AB5B8.mC = 0;
+        lbl_806AB5B8.m10 = 0;
+        memset(lbl_806AB5B8.m14, 0, 4);
+        memset(lbl_806AB5B8.m18, 0, 2);
+        r = fn_803F89B0(lbl_806EEA2C, a0, &lbl_806AB5B8);
+    } else
+        r = fn_803F8A2C(lbl_806EEA2C);
+    int found = 0;
+    while (r == 0 && found == 0) {
+            int t = fn_803F2404(pat, lbl_806AB5B8.m4);
+            if (t == 0) {
+                found = 1;
+                lbl_806AADFC.m4 = t;
+                lbl_806AADFC.m44 = lbl_806AB5B8.m8;
+                lbl_806AADFC.m48 = lbl_806AB5B8.mC;
+                lbl_806AADFC.m4C = *(unsigned short*)lbl_806AB5B8.m18;
+                *(int*)((char*)&lbl_806AADFC + 0x4e) = *(int*)lbl_806AB5B8.m14;
+                lbl_806AADFC.m40 = (int)lbl_806AB5B8.m4;
+                strcpy(lbl_806AADFC.m90, lbl_806AB5B8.m4);
+            } else
+                r = fn_803F8A2C(lbl_806EEA2C);
+    }
+    return &lbl_806AADFC;
+}
+
 extern "C" char fn_803F2404(const char* wild, const char* str)
 {
     const char* cp = 0;
@@ -360,6 +524,76 @@ extern "C" unsigned short* fn_803F644C(void* l, int k)
     return lbl_806EEA58;
 }
 
+struct RcMsk {
+    char pad0[8];
+    int m8, mC, m10, m14, m18, m1C, m20, m24, m28, m2C, m30;
+    char pad34[0x6c - 0x34];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+};
+extern "C" int fn_803F6AE0(int, ...);
+extern "C" void* memset(void*, int, unsigned);
+
+extern "C" void fn_803F6460(RcMsk* o, int mask, int flag, int arg3)
+{
+    int arr[16];
+    int n = 0;
+    memset(arr, 0, 0x40);
+    if (mask & 1)
+        arr[n++] = 3;
+    if (mask & 2)
+        arr[n++] = 7;
+    if (mask & 4)
+        arr[n++] = 4;
+    if (mask & 8)
+        arr[n++] = 9;
+    if ((mask & 0x10) && flag == 1)
+        arr[n++] = 6;
+    if (mask & 0x20)
+        arr[n++] = 8;
+    if (mask & 0x40)
+        arr[n++] = 7;
+    if (mask & 0x100)
+        arr[n++] = 0xb;
+    if (mask & 0x80)
+        arr[n++] = 0xa;
+    if (mask & 0x200)
+        arr[n++] = 0xc;
+    o->m10 = n;
+    o->m14 = arr[0];
+    o->m18 = arr[1];
+    o->m1C = arr[2];
+    o->m20 = arr[3];
+    switch (o->m6C) {
+    case 0:
+        o->mC = fn_803F6AE0(o->m8, 0);
+        break;
+    case 1:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70);
+        break;
+    case 2:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74);
+        break;
+    case 3:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78);
+        break;
+    case 4:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78, o->m7C);
+        break;
+    case 7:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78, o->m7C, o->m80, o->m84, o->m88);
+        break;
+    }
+    int cnt = o->m10;
+    if (cnt > 0)
+        o->m24 = fn_803F6AE0(o->m14, 0);
+    if (cnt > 1)
+        o->m28 = fn_803F6AE0(o->m18, 0);
+    if (cnt > 2)
+        o->m2C = fn_803F6AE0(o->m1C, 0);
+    if (cnt > 3)
+        o->m30 = fn_803F6AE0(o->m20, 0);
+}
+
 extern "C" void fn_803F67C8()
 {
     short* a = lbl_806EEA68(1);
@@ -451,6 +685,17 @@ extern "C" int fn_803F6F18(unsigned short* p)
 extern "C" void fn_803F6F48(RcAllocIf* a)
 {
     lbl_806EEA74 = a;
+}
+
+inline RcReq* RcLink(const RcReq& x, const RcReq& y)
+{
+    ((RcReq&)y).next = (RcReq*)&x;
+    return (RcReq*)&y;
+}
+
+extern "C" void* fn_803F6F50(int a, int b, int c, int d, int e)
+{
+    return lbl_806EEA74->v0(b, RcLink(RcReq(1, a), RcReq(2, c)));
 }
 
 extern "C" void fn_803F6FC4(int a, int b)

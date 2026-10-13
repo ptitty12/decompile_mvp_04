@@ -60,7 +60,7 @@ extern "C" int strcmp(const char*, const char*);
 
 extern "C" int fn_8041DC98(int);
 extern "C" int fn_8041D30C(int, int*, int*);
-extern "C" int fn_803F8434(void*, void*, void*, int, int);
+extern "C" int fn_803F8434(void*, void*, void*, int, int*);
 extern int lbl_806EEA84;
 extern int lbl_806EEA80;
 /* Card status buffer (lbl_806ADDE0): fn_803F8A2C copies the +0x20..+0x2C words into the open record. */
@@ -180,6 +180,45 @@ extern "C" int fn_803F7584(void* o, int a, void* b, int* out)
     return (unsigned)(n + d - 1) / d;
 }
 
+extern "C" int fn_803F7748(void* o, unsigned short* h);
+
+extern "C" int fn_803F7748(void* o, unsigned short* h);
+
+extern "C" int fn_803F7604(char* o, unsigned short* p)
+{
+    int saved = RCI(o, 0x2c4);
+    int a = 0;
+    int b = 0;
+    if (lbl_806EEA84 != 0) {
+        if (*p != *(unsigned short*)(o + 0x2c4)) {
+            fn_803F78CC(o, (unsigned short*)(o + 0x2c4));
+            a = 1;
+            fn_803F7748(o, p);
+        }
+    } else {
+        b = 1;
+        fn_803F7748(o, p);
+    }
+    int r = 0;
+    int out = 0;
+    do {
+        r = fn_8041BAB4(*p, &out);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    int rc = fn_803F73B0(o, r);
+    if (rc != 0) {
+        if (rc == 3)
+            out = lbl_806EEA80;
+    }
+    if (a) {
+        fn_803F78CC(o, p);
+        fn_803F7748(o, (unsigned short*)&saved);
+    } else if (b) {
+        fn_803F78CC(o, p);
+    }
+    return out;
+}
+
 extern "C" void fn_803F773C()
 {
     lbl_806EEA88 = 0;
@@ -239,6 +278,161 @@ extern "C" int fn_803F78CC(void* o, unsigned short* h)
         return fn_803F73B0(o, r);
     }
     return 0;
+}
+
+struct RcSave {
+    char pad0[4];
+    int m4;
+    char pad8[4];
+    char* mC;
+    int m10;
+    char* m14;
+    int m18;
+    struct RcBuf* m1C;
+    struct RcBuf* m20;
+};
+struct RcBuf {
+    int m0;
+    signed char* m4;
+};
+extern "C" int fn_803F7EE4(void*, void*, void*, int, int*);
+extern "C" void* memcpy();
+
+extern "C" int fn_803F7BE8(void* o, char* f)
+{
+    RcSave* h = (RcSave*)(f + 0xC);
+    int res = 0;
+    if (fn_803F7EE4(o, f, f + 0x10, 4, 0) == 0xF)
+        res = 0xF;
+    signed char buf[0x20];
+    int w = h->m4;
+    int sum = 0;
+    signed char* p = (signed char*)&w;
+    for (int i = 0; i < 4; i++)
+        sum += *p++;
+    int n = h->m10;
+    if (n > 0x20)
+        n = 0x20;
+    memset(buf, 0, 0x20);
+    memcpy(buf, h->mC, n);
+    if (fn_803F7EE4(o, f, buf, 0x20, 0) == 0xF)
+        res = 0xF;
+    p = buf;
+    for (int i = 0; i < 0x20; i++)
+        sum += *p++;
+    n = h->m18;
+    if (n > 0x20)
+        n = 0x20;
+    memset(buf, 0, 0x20);
+    memcpy(buf, h->m14, n);
+    if (fn_803F7EE4(o, f, buf, 0x20, 0) == 0xF)
+        res = 0xF;
+    p = buf;
+    for (int i = 0; i < 0x20; i++)
+        sum += *p++;
+    if (h->m20 != 0) {
+        unsigned len = fn_803F7E98(o, h);
+        if (fn_803F7EE4(o, f, h->m20->m4, len, 0) == 0xF)
+            res = 0xF;
+        p = h->m20->m4;
+        for (unsigned i = 0; i < len; i++)
+            sum += *p++;
+    }
+    if (h->m1C != 0) {
+        unsigned len = fn_803F7EB4(o, h);
+        if (fn_803F7EE4(o, f, h->m1C->m4, len, 0) == 0xF)
+            res = 0xF;
+        p = h->m1C->m4;
+        for (unsigned i = 0; i < len; i++)
+            sum += *p++;
+    }
+    if (fn_803F7EE4(o, f, &sum, 4, 0) == 0xF)
+        res = 0xF;
+    return res;
+}
+
+struct RcSlotBase {
+    char d[0x44];
+};
+struct RcSlotV : RcSlotBase {
+    virtual void v0();
+    virtual void v1(unsigned short*, int*, int);
+};
+extern "C" int CARDOpen(int, const char*, void*);
+extern "C" int CARDFastOpen(int, int, void*);
+extern "C" int fn_803F8FF8(void*, char*);
+extern "C" int fn_803F7BE8(void*, char*);
+extern "C" int fn_803F81F4(void*, char*);
+extern "C" int fn_803F9114(void*, void*);
+extern "C" int fn_803F87A8(void*, unsigned short*, int*);
+
+/* near-miss: 98%; the out pointer and the map flag swap callee-saved registers (r21/r22) */
+extern "C" int fn_803F7958(void* o, unsigned short* h, int* name, int flags, void** out)
+{
+    char* s = (char*)fn_803F74B0((char*)o);
+    if (s == 0)
+        return 0xF;
+    *out = 0;
+    int rc = 0xF;
+    int st = 0;
+    int cnt = 0;
+    ((RcSlotV*)s)->v1(h, name, flags);
+    if (h[1] != 1)
+        cnt = fn_803F7584(o, (int)h, s + 0xC, (int*)(s + 0xD0));
+    int mapRc = 1;
+    if (flags & 0x200) {
+        if (h[1] == 1) {
+            st = fn_803F8FF8(o, s);
+        } else {
+            rc = fn_803F87A8(o, h, name);
+            if (rc != 5) {
+                int sz = cnt * RCI(o, 0x2b4);
+                do {
+                    st = CARDCreate(h[0], (const char*)*name, sz, s + 0x48);
+                    lbl_806EEA34->v6(1);
+                } while (st == -1);
+            } else
+                st = -5;
+        }
+    } else {
+        do {
+            if (h[1] == 1) {
+                int tmp = -1;
+                rc = fn_803F8CB4(o, (const char*)*name, &tmp);
+                if (rc == 0)
+                    st = CARDFastOpen(h[0], tmp, s + 0x48);
+                else
+                    mapRc = 0;
+            } else
+                st = CARDOpen(h[0], (const char*)*name, s + 0x48);
+            lbl_806EEA34->v6(1);
+        } while (st == -1);
+    }
+    if (mapRc)
+        rc = fn_803F73B0(o, st);
+    if (rc == 0) {
+        int x = RCI(s, 0x4c);
+        RCI(s, 0x40) = 1;
+        RCI(s, 0) = x;
+        CARDGetStatus(*(unsigned short*)(s + 8), x, s + 0x5c);
+        *out = s;
+        if (h[1] == 1) {
+            RCI(s, 0xe0) = rc;
+        } else {
+            RCI(s, 0xe0) = 1;
+            if (flags & 0x200) {
+                if (fn_803F7BE8(o, s) != 0 || fn_803F81F4(o, s) == -1)
+                    rc = 0xF;
+            } else
+                rc = fn_803F9114(o, s);
+            if (rc != 0) {
+                CARDClose(s + 0x48);
+                RCI(s, 0x40) = 0;
+                *out = 0;
+            }
+        }
+    }
+    return rc;
 }
 
 extern "C" int fn_803F7E98(void* a, void* b)
@@ -314,6 +508,208 @@ extern "C" int fn_803F870C(void* a, void* b)
 }
 
 /* near-miss: 9 slots; retail loads *h (lhz) before zeroing the two out slots, order of the zero stores differs */
+struct RcCardStat {
+    char pad0[0x2e];
+    unsigned char bannerFormat;
+    char pad2f;
+    unsigned iconAddr;
+    unsigned short iconFormat;
+    unsigned short iconSpeed;
+    unsigned commentAddr;
+    char pad3c[0x6c - 0x3c];
+};
+
+struct RcCardDesc {
+    int m0;
+    char pad4[0x24];
+    int m28;
+    int m2C;
+};
+
+struct RcCardFile {
+    int m0;
+    char pad4[4];
+    unsigned short m8;
+    char padA[0x1e];
+    RcCardDesc* m28;
+    int* m2C;
+    char pad30[0x2c];
+    RcCardStat stat;
+};
+
+#define RC_SET_BANNER(s, f) ((s)->bannerFormat = (unsigned char)(((s)->bannerFormat & ~3) | (f)))
+#define RC_SET_ANIM(s, f) ((s)->bannerFormat = (unsigned char)(((s)->bannerFormat & ~4) | (f)))
+#define RC_SET_ICONFMT(s, n, f) ((s)->iconFormat = (unsigned short)(((s)->iconFormat & ~(3 << (2 * (n)))) | ((f) << (2 * (n)))))
+#define RC_SET_ICONSPD(s, n, f) ((s)->iconSpeed = (unsigned short)(((s)->iconSpeed & ~(3 << (2 * (n)))) | ((f) << (2 * (n)))))
+extern "C" int CARDSetStatus(int, int, void*);
+
+extern "C" int fn_803F81F4(void* o, char* fp)
+{
+    RcCardFile* f = (RcCardFile*)fp;
+    memset(&f->stat, 0, 0x6c);
+    f->stat.commentAddr = 4;
+    f->stat.iconAddr = 0x44;
+    if (f->m2C != 0) {
+        if (*f->m2C == 0)
+            RC_SET_BANNER(&f->stat, 2);
+        else
+            RC_SET_BANNER(&f->stat, 1);
+    } else
+        RC_SET_BANNER(&f->stat, 0);
+    int n = f->m28->m0;
+    if (n <= 7) {
+        RC_SET_ICONFMT(&f->stat, n, 0);
+        RC_SET_ICONSPD(&f->stat, n, 0);
+    }
+    if (f->m28->m2C == 2)
+        RC_SET_ANIM(&f->stat, 4);
+    else if (f->m28->m2C == 1)
+        RC_SET_ANIM(&f->stat, 0);
+    for (int i = 0; i < n; i++) {
+        if (f->m28->m28 == 0)
+            RC_SET_ICONFMT(&f->stat, i, 2);
+        else
+            RC_SET_ICONFMT(&f->stat, i, 1);
+        char* b = (char*)f->m28 + 8;
+        int off = i * 4;
+        int s = *(int*)(b + off);
+        switch (s) {
+        case 1:
+            f->stat.iconSpeed = f->stat.iconSpeed | (3 << (2 * i));
+            break;
+        case 2:
+            RC_SET_ICONSPD(&f->stat, i, s);
+            break;
+        case 3:
+            RC_SET_ICONSPD(&f->stat, i, 1);
+            break;
+        default:
+            RC_SET_ICONSPD(&f->stat, i, 2);
+            break;
+        }
+    }
+    int r;
+    do {
+        r = CARDSetStatus(f->m8, f->m0, &f->stat);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    if (fn_803F73B0(o, r) != 0)
+        return -1;
+    return 0;
+}
+
+extern "C" int fn_803F8DDC(void*, char*, void*, int, int*);
+
+extern "C" int fn_803F8434(void* o, void* f, void* buf, int len, int* outlen)
+{
+    char* rec = (char*)fn_803F74D8(o, f);
+    if (RCI(rec, 0xe0) == 0)
+        return fn_803F8DDC(o, rec, buf, len, outlen);
+    unsigned char* src = (unsigned char*)buf;
+    int rc = 0;
+    int remain = len;
+    if (RCI(rec, 0xd4) != 0)
+        fn_803F80EC(o, f);
+    int cc = RCI(rec, 0xcc);
+    int total = RCI(rec, 0x7c);
+    int off;
+    if (cc != 0)
+        off = cc - RCI(o, 0x2b4);
+    else
+        off = 0;
+    while (remain != 0) {
+        int pos = off + RCI(rec, 0xc8);
+        if (pos < 0 || pos >= total) {
+            rc = 0xb;
+            break;
+        }
+        if (RCI(rec, 0xdc) != 0) {
+            int st;
+            do {
+                st = CARDRead(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                lbl_806EEA34->v6(1);
+            } while (st == -1);
+            rc = fn_803F73B0(o, st);
+            if (rc != 0)
+                break;
+            RCI(rec, 0xcc) += RCI(o, 0x2b4);
+            RCI(rec, 0xdc) = rc;
+        }
+        int i = RCI(rec, 0xc8);
+        while (i < RCI(o, 0x2b4) && remain != 0) {
+            if (src != 0) {
+                *src = ((unsigned char*)RCI(o, 0x2c0))[i];
+                src++;
+            }
+            remain--;
+            RCI(rec, 0xc8) = RCI(rec, 0xc8) + 1;
+            i = RCI(rec, 0xc8);
+        }
+        if (RCI(rec, 0xc8) == RCI(o, 0x2b4)) {
+            RCI(rec, 0xdc) = 1;
+            RCI(rec, 0xc8) = 0;
+        }
+    }
+    if (outlen != 0)
+        *outlen = len - remain;
+    return rc;
+}
+
+extern "C" int fn_803F8EA4(void*, char*, void*, int, int*);
+
+/* near-miss: 95%; same shape as retail, but the hoisted file pointer (rec + 0x48) is shared by both CARD loops here (callee-saved regs r26..r28 rotate) */
+extern "C" int fn_803F7EE4(void* o, void* f, void* buf, int len, int* outlen)
+{
+    char* rec = (char*)fn_803F74D8(o, f);
+    if (RCI(rec, 0xe0) == 0)
+        return fn_803F8EA4(o, rec, buf, len, outlen);
+    if (outlen != 0)
+        *outlen = len;
+    if (len > 0) {
+        do {
+            int i = RCI(rec, 0xc8);
+            if (i < RCI(o, 0x2b4) && len > 0) {
+                do {
+                    unsigned char c = *(unsigned char*)buf;
+                    buf = (unsigned char*)buf + 1;
+                    len--;
+                    ((unsigned char*)RCI(o, 0x2c0))[i] = c;
+                    RCI(rec, 0xc8) = i + 1;
+                    i = i + 1;
+                    RCI(rec, 0xd4) = 1;
+                } while (i < RCI(o, 0x2b4) && len > 0);
+            }
+            if (RCI(rec, 0xc8) == RCI(o, 0x2b4)) {
+                if (RCI(rec, 0xcc) < 0)
+                    return 0;
+                int st;
+                do {
+                    st = CARDWrite(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                    lbl_806EEA34->v6(1);
+                } while (st == -1);
+                int rc = fn_803F73B0(o, st);
+                if (rc != 0)
+                    return rc;
+                RCI(rec, 0xcc) += RCI(o, 0x2b4);
+                RCI(rec, 0xc8) = rc;
+                RCI(rec, 0xd4) = rc;
+                if ((unsigned)(fn_803F7584(o, (int)(rec + 8), rec + 0xc, 0) * RCI(o, 0x2b4)) < (unsigned)RCI(rec, 0xcc)) {
+                    do {
+                        st = CARDRead(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                        lbl_806EEA34->v6(1);
+                    } while (st == -1);
+                    rc = fn_803F73B0(o, st);
+                    if (rc != 0)
+                        return rc;
+                    RCI(rec, 0xcc) += RCI(o, 0x2b4);
+                } else
+                    memset((void*)RCI(o, 0x2c0), 0, RCI(o, 0x2b4));
+            }
+        } while (len > 0);
+    }
+    return 0;
+}
+
 extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
 {
     int s0 = 0;
@@ -560,6 +956,31 @@ extern "C" int fn_803F8F80(void* o, char* p)
     if (rc == 0)
         RCI(p, 0x40) = rc;
     return rc;
+}
+
+extern "C" int fn_803F8FF8(void* o, char* f)
+{
+    int r;
+    do {
+        r = CARDCreate(*(unsigned short*)(f + 8), (const char*)RCI(f, 0xc), RCI(f, 0x10), f + 0x48);
+        lbl_806EEA34->v6(1);
+    } while (r == -1);
+    switch (r) {
+    case 0:
+        RCI(f, 0xe0) = 0;
+        RCI(f, 0xd8) = 0;
+        break;
+    case -128: RCI(f, 0xd8) = -1; break;
+    case -3: RCI(f, 0xd8) = -2; break;
+    case -1: RCI(f, 0xd8) = -3; break;
+    case -7: RCI(f, 0xd8) = -4; break;
+    case -8: RCI(f, 0xd8) = -5; break;
+    case -9: RCI(f, 0xd8) = -6; break;
+    case -12: RCI(f, 0xd8) = -7; break;
+    case -5: RCI(f, 0xd8) = -8; break;
+    default: RCI(f, 0xd8) = -10; break;
+    }
+    return r;
 }
 
 extern "C" int fn_803F9114(void* o, void* f)

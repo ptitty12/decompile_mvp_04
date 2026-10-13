@@ -45,7 +45,7 @@ extern "C" int fn_803EE020(int, const void*, int (*)(const char*, ...));
 extern "C" int fn_803EE81C();
 extern "C" void fn_803EE878();
 extern "C" int fn_803EDF10(const char* fmt, ...);
-extern "C" int fn_803EE238();
+extern "C" void fn_803EE238();
 extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, int);
 extern "C" int fn_803EE318(char* p);
 extern "C" int fn_803EE320(char* p);
@@ -103,7 +103,7 @@ extern char lbl_8060DF50[];
 extern char lbl_8060DF58[];
 extern "C" int fn_803EDC98(void*, int);
 extern "C" int fn_803EDC04(int);
-extern "C" int fn_80400690(int (*)(void));
+extern "C" int fn_80400690(void (*)(void));
 extern "C" void* fn_80432A50(void*, int);
 extern "C" int fn_80432CBC();
 extern "C" int fn_80432CB4();
@@ -505,6 +505,32 @@ extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...)
         r = pr(lbl_8060DFE8);
     }
     return r;
+}
+
+extern "C" void fn_80432B4C(void*, void*);
+
+extern "C" void fn_803EE238()
+{
+    int i, j;
+    for (i = 0; i < 64; i++) {
+        for (j = 0; j < 64; j++) {
+            if (i != j) {
+                RcHeap* a = lbl_806AABF4[i];
+                if (a == lbl_806AABF4[j] && a != 0)
+                    lbl_806AABF4[j] = 0;
+            }
+        }
+    }
+    for (i = 62; i >= 0; i--) {
+        RcHeap* h = lbl_806AABF4[i];
+        if (h != 0) {
+            void* m = h->m58;
+            fn_803ED8EC(i);
+            if (m != 0)
+                fn_80432B4C(lbl_806EF2C8, m);
+            lbl_806AABF4[i] = 0;
+        }
+    }
 }
 
 extern "C" int fn_803EE310(char* p)
