@@ -2193,6 +2193,8 @@ libc/locale.c:
 
 libc/math_support.c:
 	.text       start:0x8040ECE8 end:0x8040F5FC
+	.rodata     start:0x8060EF38 end:0x8060F018
+	.sdata2     start:0x806EFC60 end:0x806EFCE0
 
 libc/closer.c:
 	.text       start:0x8040F5FC end:0x8040F64C
