@@ -289,7 +289,10 @@ extern "C" DB_OVERLAY void fn_80534C3C(Unk80534BAC_T* self)
     }
 }
 
-/* near-miss: same instruction count; the lis/lfs of the clamp constants are scheduled differently. */
+/* near-miss: 99.8%. GCC 2.95 expands the operand of `a <? b` / `a >? b` that is written second
+ * first, so `(v <? A) >? B` computes B's address (lis) before the first compare, where retail
+ * does it after. Writing the outer operator as `B >? (A <? v)` puts the lis in retail's place;
+ * what is left is the operand/register roles of the second compare (f0/f13 swapped, 3 slots). */
 extern "C" DB_OVERLAY void fn_80534C7C(Unk80534BAC_T* self, const char* path)
 {
     unsigned n = 0;
@@ -326,7 +329,7 @@ extern "C" DB_OVERLAY void fn_80534C7C(Unk80534BAC_T* self, const char* path)
                     if (i > 0x1B)
                         i = 0x1B;
                     float v = (float)raw * lbl_805FEB60;
-                    v = (v <? lbl_805FEB64) >? lbl_805FEB68;
+                    v = (lbl_805FEB68 >? (lbl_805FEB64 <? v));
                     self->m8[i][b] = v;
                 }
                 while (p < end && *p != 10)
