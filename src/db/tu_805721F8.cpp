@@ -357,7 +357,7 @@ extern "C" DB_OVERLAY float fn_80573E10(Db80573E10_S* self, DbT* t)
     return r;
 }
 
-/* near-miss: 2 slots; retail loads +0x58 before +0x4C in the closing sum */
+/* Closing weighted sum follows retail operand evaluation order. */
 extern "C" DB_OVERLAY float fn_80573FB8(Db80573FB8_S* self, DbT* t)
 {
     float r;
@@ -369,7 +369,7 @@ extern "C" DB_OVERLAY float fn_80573FB8(Db80573FB8_S* self, DbT* t)
     self->m4C = Db80573E10_R(pt, 0xD, w2) * lbl_805FFEC8 + Db80573E10_R(pt, 0x10, w2) * lbl_805FFECC + Db80573E10_R(pt, 0xF, w2) * lbl_805FFED0 + Db80573E10_R(pt, 0xE, w2) * lbl_805FFED0 + Db80573E10_R(pt, 0x11, w2) * lbl_805FFED0;
     unsigned char w3 = pb[8];
     self->m54 = Db80573E10_R(pt, 0xD, w3) * lbl_805FFEC8 + Db80573E10_R(pt, 0x10, w3) * lbl_805FFECC + Db80573E10_R(pt, 0xF, w3) * lbl_805FFED0 + Db80573E10_R(pt, 0xE, w3) * lbl_805FFED0 + Db80573E10_R(pt, 0x11, w3) * lbl_805FFED0;
-    r = self->m60 * self->m54 + (self->m5C * self->m50 + self->m58 * self->m4C);
+    r = (self->m5C * self->m50 + self->m58 * self->m4C) + self->m60 * self->m54;
     return r;
 }
 
