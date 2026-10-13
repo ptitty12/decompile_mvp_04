@@ -632,6 +632,83 @@ extern "C" DB_OVERLAY void fn_80560A24(int x)
     t.vp = lbl_8064A550;
 }
 
+
+extern char lbl_8064A3B8[];
+extern "C" void fn_80538368(Unk805352B0_List*, Unk805352B0_List*);
+extern "C" void fn_805394F8(Unk805352B0_List*, int);
+extern "C" unsigned fn_805395E4(Unk805352B0_List*, int);
+
+/* Retail initializes 0x28 words at sp+0x20, ending at the second list at
+ * sp+0xC0; that list's 0xCB2-word buffer is sp+0xD8..sp+0x33A0, immediately
+ * before the saved registers. Both use the existing 0x18-byte list view.
+ * Keep the duplicated fn_8007B320(2, h): retail calls selector 2 twice. */
+extern "C" DB_OVERLAY void fn_8056222C(int x, Unk805352B0_List* self, int kind, int y, int filter)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Unk80535650_Tmp t;
+    int buf[0x28];
+    Unk80535650_Tmp* q = &t;
+    q->C1(buf, 0x28);
+    q->C2();
+    q->C3(lbl_8064A4C8);
+    if (kind == 0) {
+        fn_80538EC4(self, x, y);
+    } else if (kind == 1) {
+        int state = sc->fn_80078A38(x);
+        int h = sc->fn_80075948(x);
+        int g1 = sc->fn_8007B320(1, h);
+        int g2 = sc->fn_8007B320(2, h);
+        int g3 = sc->fn_8007B320(2, h);
+        fn_8040074C(self->m0, self->m8 << 2);
+        self->m4 = 0;
+        self->mC = 0;
+        self->m14 = 0;
+        if (state <= 0) {
+            fn_80535764((Unk805352B0_List*)&t, g1);
+            Db805625F8_Append(self, &t);
+        }
+        if (state <= 1) {
+            fn_80535764((Unk805352B0_List*)&t, g2);
+            Db805625F8_Append(self, &t);
+        }
+        if (state <= 2) {
+            fn_80535764((Unk805352B0_List*)&t, g3);
+            Db805625F8_Append(self, &t);
+        }
+        if ((int)self->m4 == 0) {
+            Unk80535650_Tmp all;
+            int allbuf[0xCB2];
+            Unk80535650_Tmp* a = &all;
+            all.m0 = allbuf;
+            all.vp = lbl_8064B298;
+            a->m8 = 0xCB2;
+            fn_8040074C(all.m0, all.m8 << 2);
+            a->m4 = 0;
+            a->mC = 0;
+            all.vp = lbl_8064A550;
+            fn_8040074C(all.m0, all.m8 << 2);
+            a->m4 = 0;
+            a->mC = 0;
+            a->m14 = 0;
+            all.vp = lbl_8064A3B8;
+            fn_80538368((Unk805352B0_List*)a, 0);
+            fn_80539128((Unk805352B0_List*)a, 0);
+            if (fn_805395E4((Unk805352B0_List*)a, filter) == 0) {
+                if (filter != 0)
+                    fn_80539380((Unk805352B0_List*)a);
+                else
+                    fn_8053943C((Unk805352B0_List*)a);
+            } else {
+                fn_805394F8((Unk805352B0_List*)a, filter);
+            }
+            fn_805362AC((Unk805352B0_List*)a, 0);
+            self->Push(*all.m0);
+            all.D();
+        }
+    }
+    t.D();
+}
+
 extern "C" DB_OVERLAY void fn_805625F8(int x, Unk805352B0_List* self, int kind)
 {
     Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
