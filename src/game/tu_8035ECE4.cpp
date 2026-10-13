@@ -114,6 +114,47 @@ Unk8035ECE4::Unk8035ECE4()
     CPUT(0x4, lbl_80664268);
 }
 
+/* Copy-constructed transform objects (vptr 0x806604F8 at +0x98; derived vptr
+ * 0x80664788). Evidence: fn_8035F248 / fn_8035F008 copy these members in this
+ * order; +0x4..0x20 is not copied. */
+struct Unk8035F248_V3 {
+    float x, y, z;
+};
+struct Unk8035F248_M4 {
+    float m[16];
+};
+struct Unk8035F248 {
+    int m0;
+    char pad4[0x20 - 0x4];
+    Unk8035F248_M4 m20;
+    Unk8035F248_V3 m60;
+    int m6C;
+    Unk8035F248_V3 m70;
+    char m7C[0x10];
+    Unk8035F248_V3 m8C;
+    const void* m98;
+};
+extern "C" void fn_8037936C(void* d, const void* s);
+extern "C" Unk8035F248* fn_8035F248(Unk8035F248* self, const Unk8035F248* o);
+extern char lbl_80664788[];
+struct Unk8035F008_M12 {
+    char b[0x48];
+};
+struct Unk8035F008 : Unk8035F248 {
+    int pad9C;
+    int mA0;
+    float mA4, mA8, mAC, mB0, mB4, mB8, mBC, mC0, mC4, mC8, mCC, mD0;
+    int mD4, mD8, mDC, mE0;
+    Unk8035F248_V3 mE4;
+    Unk8035F248_V3 mF0;
+    Unk8035F248_V3 mFC;
+    char pad108[0x120 - 0x108];
+    Unk8035F248_M4 m120;
+    Unk8035F248_V3 m160;
+    Unk8035F248_V3 m16C;
+    Unk8035F248_V3 m178;
+    Unk8035F008_M12 m184;
+};
 void fn_8035ED00(U* self, int chrg)
 {
     PUT(0x4, lbl_80664390);
@@ -237,6 +278,51 @@ void fn_8035EFD4(U* self, int chrg)
     PUT(0x98, lbl_806604F8);
     if (chrg & 1)
         fn_80377408(self);
+}
+
+extern "C" Unk8035F008* fn_8035F008(Unk8035F008* self, const Unk8035F008* o)
+{
+    fn_8035F248(self, o);
+    self->m98 = lbl_80664788;
+    self->mA0 = o->mA0;
+    self->mA4 = o->mA4;
+    self->mA8 = o->mA8;
+    self->mAC = o->mAC;
+    self->mB0 = o->mB0;
+    self->mB4 = o->mB4;
+    self->mB8 = o->mB8;
+    self->mBC = o->mBC;
+    self->mC0 = o->mC0;
+    self->mC4 = o->mC4;
+    self->mC8 = o->mC8;
+    self->mCC = o->mCC;
+    self->mD0 = o->mD0;
+    self->mD4 = o->mD4;
+    self->mD8 = o->mD8;
+    self->mDC = o->mDC;
+    self->mE0 = o->mE0;
+    self->mE4 = o->mE4;
+    self->mF0 = o->mF0;
+    self->mFC = o->mFC;
+    self->m120 = o->m120;
+    self->m160 = o->m160;
+    self->m16C = o->m16C;
+    self->m178 = o->m178;
+    self->m184 = o->m184;
+    return self;
+}
+
+extern "C" Unk8035F248* fn_8035F248(Unk8035F248* self, const Unk8035F248* o)
+{
+    self->m98 = lbl_806604F8;
+    self->m0 = o->m0;
+    self->m20 = o->m20;
+    self->m60 = o->m60;
+    self->m6C = o->m6C;
+    self->m70 = o->m70;
+    fn_8037936C(self->m7C, o->m7C);
+    self->m8C = o->m8C;
+    return self;
 }
 
 void fn_8035F36C(U* self, int chrg)
