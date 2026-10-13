@@ -3,6 +3,7 @@
  * boundaries unknown, placeholder). Every data object is extern by its lbl_ name.
  */
 #include "game/tu_8034B370.h"
+extern "C" void* memcpy(void*, const void*, unsigned);
 
 struct Unk803622F0_Data {
     int m0;
@@ -55,9 +56,9 @@ extern "C" void fn_803545BC(Unk803541D4* self, char** cursor, Unk803622F0* st)
     unsigned cur;
     if (st->v2() == 1) {
         unsigned i = 0;
-        fn_8040B190(*cursor, &self->m4, 4);
+        memcpy(*cursor, &self->m4, 4);
         *cursor += 4;
-        fn_8040B190(*cursor, &self->mC, 4);
+        memcpy(*cursor, &self->mC, 4);
         *cursor += 4;
         for (; i < self->m4; i++) {
             int o = i * 0x24;
@@ -66,9 +67,9 @@ extern "C" void fn_803545BC(Unk803541D4* self, char** cursor, Unk803622F0* st)
         }
     } else {
         unsigned j;
-        fn_8040B190(&cnt, *cursor, 4);
+        memcpy(&cnt, *cursor, 4);
         *cursor += 4;
-        fn_8040B190(&cur, *cursor, 4);
+        memcpy(&cur, *cursor, 4);
         *cursor += 4;
         if (st->m0 == 0) {
             self->m4 = cnt;
@@ -224,9 +225,9 @@ extern "C" void fn_80354DF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
     unsigned cur;
     if (st->v2() == 1) {
         unsigned i = 0;
-        fn_8040B190(*cursor, &self->m4, 4);
+        memcpy(*cursor, &self->m4, 4);
         *cursor += 4;
-        fn_8040B190(*cursor, &self->mC, 4);
+        memcpy(*cursor, &self->mC, 4);
         *cursor += 4;
         for (; i < self->m4; i++) {
             int o = i * 4;
@@ -235,9 +236,9 @@ extern "C" void fn_80354DF4(Unk80353E68* self, char** cursor, Unk803622F0* st)
         }
     } else {
         unsigned j;
-        fn_8040B190(&cnt, *cursor, 4);
+        memcpy(&cnt, *cursor, 4);
         *cursor += 4;
-        fn_8040B190(&cur, *cursor, 4);
+        memcpy(&cur, *cursor, 4);
         *cursor += 4;
         if (st->m0 == 0) {
             self->m4 = cnt;
@@ -314,9 +315,9 @@ extern "C" void fn_80355128(Unk80353234* self, char** cursor, Unk803622F0* st)
     unsigned cur;
     if (st->v2() == 1) {
         unsigned i = 0;
-        fn_8040B190(*cursor, &self->m4, 4);
+        memcpy(*cursor, &self->m4, 4);
         *cursor += 4;
-        fn_8040B190(*cursor, &self->mC, 4);
+        memcpy(*cursor, &self->mC, 4);
         *cursor += 4;
         for (; i < self->m4; i++) {
             tmp = self->m0[i];
@@ -324,9 +325,9 @@ extern "C" void fn_80355128(Unk80353234* self, char** cursor, Unk803622F0* st)
         }
     } else {
         unsigned j;
-        fn_8040B190(&cnt, *cursor, 4);
+        memcpy(&cnt, *cursor, 4);
         *cursor += 4;
-        fn_8040B190(&cur, *cursor, 4);
+        memcpy(&cur, *cursor, 4);
         *cursor += 4;
         if (st->m0 == 0) {
             self->m4 = cnt;
@@ -349,7 +350,7 @@ struct Unk803552F8 {
 void fn_803552F8(Unk803552F8* self, char** cursor, void* dst, int n)
 {
     if (self->m0 == 0)
-        fn_8040B190(dst, *cursor, n);
+        memcpy(dst, *cursor, n);
     *cursor += n;
 }
 
@@ -471,9 +472,9 @@ extern "C" void fn_80355734(Unk80355414* self, char** cursor, Unk803622F0* st)
     unsigned cur;
     if (st->v2() == 1) {
         unsigned i = 0;
-        fn_8040B190(*cursor, &self->m4, 4);
+        memcpy(*cursor, &self->m4, 4);
         *cursor += 4;
-        fn_8040B190(*cursor, &self->mC, 4);
+        memcpy(*cursor, &self->mC, 4);
         *cursor += 4;
         for (; i < self->m4; i++) {
             int o = i * 0x1C;
@@ -482,9 +483,9 @@ extern "C" void fn_80355734(Unk80355414* self, char** cursor, Unk803622F0* st)
         }
     } else {
         unsigned j;
-        fn_8040B190(&cnt, *cursor, 4);
+        memcpy(&cnt, *cursor, 4);
         *cursor += 4;
-        fn_8040B190(&cur, *cursor, 4);
+        memcpy(&cur, *cursor, 4);
         *cursor += 4;
         if (st->m0 == 0) {
             self->m4 = cnt;
