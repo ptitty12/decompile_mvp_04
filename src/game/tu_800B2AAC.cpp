@@ -1059,3 +1059,24 @@ extern "C" int fn_800B5BD4()
     }
     return r;
 }
+
+extern const float lbl_805B9BB4;
+extern "C" {
+int fn_800B2034(GObj*);
+int fn_800B2048(GObj*);
+int fn_800B205C(GObj*);
+int fn_800B214C(GObj*);
+void fn_801201B4(float, FEV3C*, int);
+}
+extern "C" void fn_800B302C(GObj* self)
+{
+    if (self->mDC && self->mD8 == 1 && fn_800B214C(self) == 0 && fn_800B205C(self) == 0) {
+        float ratio = lbl_805B9BB4;
+        if (fn_800B2204(self) > 0 && fn_800B2048(self) != fn_800B2204(self)) {
+            int count = fn_800B2048(self);
+            ratio = (float)count / (float)fn_800B2204(self);
+        }
+        fn_801201B4(ratio, self->mDC, fn_800B2048(self));
+        self->m144 = fn_800B2034(self);
+    }
+}
