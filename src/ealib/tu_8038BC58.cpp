@@ -58,10 +58,13 @@ struct VdSrcI {
 extern "C" void GXInitTexObjCI(void* obj, void* img, int w, int h, int fmt, int ws, int wt, int mip, int tlut);
 extern "C" void GXInitTexObjLOD(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
 extern "C" unsigned char* fn_8038C7D4(int a, int b);
+/* Retail has 8 bytes of frame below the int->float temp that no emitted code touches: a local object with an empty inline
+   destructor (a never-used local array or an empty-ctor-only object does not allocate a slot; one with a destructor does). */
+struct VdSpare8 {
+    int m0, m4;
+    ~VdSpare8() {}
+};
 extern char lbl_80605E88[];
-/* near-miss (99.85%): same 172 instructions; only the frame size (0x58 vs 0x50) and the conv-temp displacement differ: retail
-   has 8 more bytes of locals below the int->float temp that no emitted code references (an unused char array, an empty-ctor
-   object and a dead conversion pair each failed to allocate a slot). */
 extern "C" VdMain* fn_8038BCD0(VdMain* p, int a, int b, int c)
 {
     VdSrcI* sb = (VdSrcI*)b;
@@ -73,6 +76,7 @@ extern "C" VdMain* fn_8038BCD0(VdMain* p, int a, int b, int c)
     *(int*)((char*)p + 0x94) = c;
     *(float*)((char*)p + 0x70) = (float)w;
     *(float*)((char*)p + 0x74) = (float)h;
+    VdSpare8 sp;
     if (sb->m0 == 3) {
         w += 0x60;
         h += 0x60;
