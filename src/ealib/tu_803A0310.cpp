@@ -46,6 +46,7 @@ struct Vp6BufView {
 
 typedef void (*Vp6Fn5)(int, int, int, int, int);
 typedef void (*Vp6Fn4)(int, int, int, int);
+typedef void (*Vp6Fn3)(int, int, int);
 extern Vp6Fn5 lbl_806EF418;
 extern Vp6Fn4 lbl_806EF428;
 extern Vp6Fn4 lbl_806EF414;
@@ -70,7 +71,28 @@ struct Vp6McView {
     int m284;
 };
 
+/* Scaler descriptor: source and destination width/height pairs at +0x58..+0x64 (fn_803A0604). */
+struct Vp6ScView {
+    char pad0[0x58];
+    int m58;
+    int m5C;
+    int m60;
+    int m64;
+};
+extern Vp6Fn3 lbl_806EF3B0;
+extern Vp6Fn3 lbl_806EF3B4;
+extern Vp6Fn3 lbl_806EF3B8;
+extern Vp6Fn3 lbl_806EF3BC;
+extern Vp6Fn4 lbl_806EF3C0;
+extern Vp6Fn4 lbl_806EF3C4;
+extern Vp6Fn4 lbl_806EF3C8;
+extern Vp6Fn3 lbl_806EF3CC;
+extern Vp6Fn3 lbl_806EF3D0;
+
 extern "C" {
+
+void fn_803A00A0(int, int, int, int);
+void fn_803A00D8(int, int, int);
 
 void fn_803A2DEC(Vp6McView* c, int dst, int mode);
 
@@ -100,7 +122,6 @@ struct Vp6McView2 {
     int m290;
 };
 
-typedef void (*Vp6Fn3)(int, int, int);
 extern Vp6Fn3 lbl_806EF3A4;
 extern Vp6Fn3 lbl_806EF3A0;
 extern Vp6Fn4 lbl_806EF43C;
@@ -124,6 +145,8 @@ void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
     dst[2] = (src[1] * 0xCDU + src[2] * 0x33U + 0x80) >> 8;
     dst[3] = (src[1] * 0x33U + src[2] * 0xCDU + 0x80) >> 8;
     dst[4] = src[2];
+void fn_803A00A0(int, int, int, int);
+void fn_803A00D8(int, int, int);
 }
 
 /* near-miss: 4 slots, order of the first two loads and multiplies. */
@@ -192,6 +215,90 @@ void fn_803A05DC(unsigned char* p, int stride, unsigned n)
         p[stride] = p[0];
         p++;
     }
+}
+
+//// a
+//// a
+int fn_803A0604(Vp6ScView* c, int a1, int a2, int a3, int unused, int a5, int a6, int a7, unsigned a8)
+{
+    unsigned n1 = 0;
+    unsigned n2 = 0;
+    int ok = 1;
+    Vp6Fn4 fa = 0;
+    Vp6Fn3 fb = 0;
+    Vp6Fn3 fc = 0;
+    unsigned k;
+    unsigned m;
+    int dh = c->m64;
+    int dd = c->m60;
+    switch (c->m5C * 10 / c->m58) {
+    case 8:
+        fa = lbl_806EF3C8;
+        break;
+    case 6:
+        fa = lbl_806EF3C4;
+        break;
+    case 5:
+        fa = lbl_806EF3C0;
+        break;
+    case 10:
+        fa = (Vp6Fn4)fn_803A00A0;
+        break;
+    default:
+        ok = 0;
+        break;
+    }
+    switch (dh * 10 / dd) {
+    case 8:
+        fb = lbl_806EF3B0;
+        n1 = 4;
+        fc = lbl_806EF3B4;
+        n2 = 5;
+        break;
+    case 6:
+        fb = lbl_806EF3B8;
+        n1 = 3;
+        fc = lbl_806EF3BC;
+        n2 = 5;
+        break;
+    case 5:
+        fb = lbl_806EF3CC;
+        n1 = 1;
+        fc = lbl_806EF3D0;
+        n2 = 2;
+        break;
+    case 10:
+        n1 = 4;
+        fc = (Vp6Fn3)fn_803A00D8;
+        n2 = 4;
+        fb = fc;
+        break;
+    default:
+        ok = 0;
+        break;
+    }
+    if (!ok) {
+        return ok;
+    }
+    {
+        fa(a1, a3, a5, a7);
+        for (k = 0; k < (a8 + n2 - 1) / n2 - 1; k++) {
+            for (m = 1; m < n1; m++) {
+                fa(a1 + a2 * m, a3, a5 + a6 * m, a7);
+            }
+            int na = a1 + n1 * a2;
+            int nd = a5 + n2 * a6;
+            fa(na, a3, nd, a7);
+            a1 = na;
+            fb(a5, a6, a7);
+            a5 = nd;
+        }
+        for (m = 1; m < n1; m++) {
+            fa(a1 + a2 * m, a3, a5 + a6 * m, a7);
+        }
+        fc(a5, a6, a7);
+    }
+    return ok;
 }
 
 void fn_803A0AF4(Vp6BufView* b, unsigned char* base, Vp6Out* r)
