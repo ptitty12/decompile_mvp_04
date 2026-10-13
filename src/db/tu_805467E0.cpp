@@ -140,6 +140,13 @@ extern "C" void fn_80539EDC(void* l, int e);
 extern "C" void fn_80542580(void* o);
 /* end Q18 decls */
 
+extern "C" Db805495DC_Hold* fn_8054BDDC(Db805495DC_Hold* o, Unk8007F198_C* s);
+extern "C" void fn_8054BE40(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BEA4(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BF08(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BF6C(Db805495DC_Hold* o, int mode);
+extern "C" void fn_8054BFD0(Db805495DC_Hold* o, int mode);
+extern "C" void fn_80377408(void* p);
 /* near-miss: 96.7%; only the prologue order of the float-param spill and the r6 copy differs */
 DB_OVERLAY int fn_80546A24(char* o, int id, int a, int b, float f)
 {
@@ -323,6 +330,34 @@ DB_OVERLAY void fn_80547594(char* o, int a)
     *(int*)(p + 0xC) = z;
     fn_805381F0(o);
     fn_805362AC(o, 1);
+}
+
+DB_OVERLAY void fn_8054788C(void* unused, int mode)
+{
+    Unk8007B2B0_Screen* sc = (Unk8007B2B0_Screen*)lbl_8061930C;
+    Db805495DC_Hold* h = fn_8054BDDC((Db805495DC_Hold*)operator new(8, 0x100), (Unk8007F198_C*)sc);
+    if (mode == 0) {
+        fn_8054BE40(h, 1);
+        fn_8054BEA4(h, 1);
+        fn_8054BF08(h, 1);
+        fn_8054BF6C(h, 1);
+        fn_8054BFD0(h, 1);
+    } else if (mode == 1) {
+        while ((unsigned)(sc->fn_8007C458() + sc->fn_8007C4C8()) <= 0x4F)
+            fn_8054BE40(h, 0);
+        while ((unsigned)sc->fn_8007C724() <= 0x4F)
+            fn_8054BEA4(h, 0);
+        while ((unsigned)sc->fn_8007C948() <= 0x4F)
+            fn_8054BF08(h, 0);
+        while ((unsigned)sc->fn_8007CB6C() <= 0x77)
+            fn_8054BF6C(h, 0);
+        while ((unsigned)sc->fn_8007CD90() <= 0x31)
+            fn_8054BFD0(h, 0);
+    }
+    if (h != 0)
+        fn_80377408(h);
+    sc->fn_80072C28();
+    fn_80400CE4(0);
 }
 
 /* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */
