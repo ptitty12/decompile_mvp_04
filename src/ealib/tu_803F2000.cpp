@@ -360,6 +360,76 @@ extern "C" unsigned short* fn_803F644C(void* l, int k)
     return lbl_806EEA58;
 }
 
+struct RcMsk {
+    char pad0[8];
+    int m8, mC, m10, m14, m18, m1C, m20, m24, m28, m2C, m30;
+    char pad34[0x6c - 0x34];
+    int m6C, m70, m74, m78, m7C, m80, m84, m88;
+};
+extern "C" int fn_803F6AE0(int, ...);
+extern "C" void* memset(void*, int, unsigned);
+
+extern "C" void fn_803F6460(RcMsk* o, int mask, int flag, int arg3)
+{
+    int arr[16];
+    int n = 0;
+    memset(arr, 0, 0x40);
+    if (mask & 1)
+        arr[n++] = 3;
+    if (mask & 2)
+        arr[n++] = 7;
+    if (mask & 4)
+        arr[n++] = 4;
+    if (mask & 8)
+        arr[n++] = 9;
+    if ((mask & 0x10) && flag == 1)
+        arr[n++] = 6;
+    if (mask & 0x20)
+        arr[n++] = 8;
+    if (mask & 0x40)
+        arr[n++] = 7;
+    if (mask & 0x100)
+        arr[n++] = 0xb;
+    if (mask & 0x80)
+        arr[n++] = 0xa;
+    if (mask & 0x200)
+        arr[n++] = 0xc;
+    o->m10 = n;
+    o->m14 = arr[0];
+    o->m18 = arr[1];
+    o->m1C = arr[2];
+    o->m20 = arr[3];
+    switch (o->m6C) {
+    case 0:
+        o->mC = fn_803F6AE0(o->m8, 0);
+        break;
+    case 1:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70);
+        break;
+    case 2:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74);
+        break;
+    case 3:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78);
+        break;
+    case 4:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78, o->m7C);
+        break;
+    case 7:
+        o->mC = fn_803F6AE0(o->m8, arg3, o->m70, o->m74, o->m78, o->m7C, o->m80, o->m84, o->m88);
+        break;
+    }
+    int cnt = o->m10;
+    if (cnt > 0)
+        o->m24 = fn_803F6AE0(o->m14, 0);
+    if (cnt > 1)
+        o->m28 = fn_803F6AE0(o->m18, 0);
+    if (cnt > 2)
+        o->m2C = fn_803F6AE0(o->m1C, 0);
+    if (cnt > 3)
+        o->m30 = fn_803F6AE0(o->m20, 0);
+}
+
 extern "C" void fn_803F67C8()
 {
     short* a = lbl_806EEA68(1);
