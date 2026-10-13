@@ -4,6 +4,35 @@
  */
 
 #include "game/fe_804E02E0.h"
+extern "C" void fn_800DFEAC(char* a, const char* b);
+extern "C" void fn_804031BC(char* dst, const char* src);
+struct Fe3W {
+    int a;
+    int b;
+    int c;
+};
+extern Fe3W lbl_805FD58C[];
+class FeVP30 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27(); virtual void v28(); virtual void v29();
+    virtual FeObj* v30(const char* a, int b);
+};
+class FeVS28 : public UiBase {
+public:
+    virtual void v1(); virtual void v2(); virtual void v3(); virtual void v4(); virtual void v5();
+    virtual void v6(); virtual void v7(); virtual void v8(); virtual void v9(); virtual void v10();
+    virtual void v11(); virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual void v17(); virtual void v18(); virtual void v19(); virtual void v20();
+    virtual void v21(); virtual void v22(); virtual void v23(); virtual void v24(); virtual void v25();
+    virtual void v26(); virtual void v27();
+    virtual void v28(char* a);
+};
+extern "C" const char* fn_80090880__FP11Unk80090880(void* t, int id);
 
 struct Unk8007F198_D;
 struct FeRetA {
@@ -140,6 +169,24 @@ extern "C" FE_OVERLAY void fn_804E2280(FeMask* self, int idx)
 {
     FeObj1* w = (FeObj1*)fn_800C805C(((FeObjQ*)((FeObjK*)self->m184)->v73(idx, 2))->v33(11, 1));
     w->v37(fn_804E2274(self, self->m188, idx) == 0);
+}
+
+extern "C" FE_OVERLAY void fn_804E2560(FeMask* self, FeObj* w)
+{
+    if (w == self->m184) {
+        int sel = ((FeObjK*)w)->v60();
+        if (sel >= 0) {
+            char buf[0x200];
+            fn_804031BC(buf, "");
+            fn_800DFF0C(buf, (char*)fn_80090880__FP11Unk80090880(lbl_8061977C, 0x3799));
+            fn_800DFEAC(buf, " ");
+            fn_800DFF0C(buf, (char*)fn_80090880__FP11Unk80090880(lbl_8061977C, lbl_805FD58C[sel].c));
+            ((FeVS28*)fn_800C8040(((FeVP30*)self)->v30("ALBUM", 1)))->v28(buf);
+            ((FeObj1*)fn_800C8040(((FeVP30*)self)->v30("ALBUM", 1)))->v8(1);
+        } else {
+            ((FeObj1*)fn_800C8040(((FeVP30*)self)->v30("ALBUM", 1)))->v8(0);
+        }
+    }
 }
 
 extern "C" FE_OVERLAY void fn_804E26E4(FeMask* self, int idx)
