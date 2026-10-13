@@ -1019,3 +1019,49 @@ extern "C" void fn_8030FD50(Unk8030FD50_Obj* p, int i)
     ((Unk8030FD50_Pr*)((char*)p->mBC + k * 4))->m4 = p->m5C;
 }
 
+/* near-miss: only the scheduling of the first word store of the 16-byte copy into
+ * mE84 differs (stw before the third lwz in retail). */
+extern "C" void* fn_8030FECC(void* vp)
+{
+    Unk8030FECC_Obj* p = (Unk8030FECC_Obj*)vp;
+    new (p) Unk8037B3E8(0xABA1DAEFu);
+    Unk8030FECC_B* row = &p->g[0][0];
+    int k = 3;
+    p->m0 = lbl_806657C8;
+    fn_8035F788((U*)((char*)p + 4));
+    fn_803E47E8(&p->mA4);
+    do {
+        Unk8030FECC_B* e = row;
+        int j = 1;
+        do {
+            fn_803E47E8(e);
+            e++;
+        } while (j-- != 0);
+        row += 2;
+    } while (k-- != 0);
+    Unk8030FECC_B* h = p->h;
+    int m = 3;
+    do {
+        fn_803E47E8(h);
+        h++;
+    } while (m-- != 0);
+    p->mE84 = lbl_806055E8;
+    p->m10E0 = 0;
+    if (lbl_8061FE1C == 0)
+        lbl_8061FE1C = 0x18556765;
+    fn_8040074C((char*)p + 0x1A4, 0x10);
+    fn_8040074C((char*)p + 0x1E4, 0x10);
+    fn_8040074C((char*)p + 0x224, 0x10);
+    fn_8040074C((char*)p + 0x1B4, 0x30);
+    fn_8040074C((char*)p + 0x1F4, 0x30);
+    fn_8040074C((char*)p + 0x234, 0x30);
+    fn_8040074C((char*)p + 0x264, 0x20);
+    fn_8040074C((char*)p + 0x284, 0x140);
+    fn_8040074C((char*)p + 0x3C4, 0x40);
+    fn_8040074C((char*)p + 0x404, 0x100);
+    fn_8040074C((char*)p + 0x504, 0x180);
+    fn_8040074C((char*)p + 0x684, 0x80);
+    for (unsigned i = 0; i <= 3; i++)
+        fn_803E4818(&p->h[i]);
+    return p;
+}
