@@ -488,15 +488,16 @@ extern "C" int fn_803FBB48(int n, RcReq* p)
     return 0;
 }
 
-extern "C" void fn_803FBC34(int a, int* out, int c)
+extern "C" int fn_803FBC34(int a, int* out, int c)
 {
     RcReq q;
     q.a0 = a;
     q.a4 = c;
     q.a3 = 0;
-    fn_803FA3B4(fn_803FBB48, 0, lbl_806EEAA0, &q);
+    int r = fn_803FA3B4(fn_803FBB48, 0, lbl_806EEAA0, &q);
     if (out != 0)
         *out = q.a2;
+    return r;
 }
 
 /* near-miss: 97.6%; callee-saved registers rotated (retail p=r29 n=r30 lim=r31, ours n=r29 lim=r30 p=r31) */

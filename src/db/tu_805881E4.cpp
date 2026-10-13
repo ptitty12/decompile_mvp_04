@@ -973,3 +973,39 @@ extern "C" DB_OVERLAY int fn_8058BE5C(void* self, int a, int b, int* out)
     }
     return best;
 }
+
+extern const Db80586420_Tri lbl_806005E8;
+extern "C" DB_OVERLAY int fn_8058A670(int a,int b,void* rec)
+{
+    Db80586420_Tri t=lbl_806005E8;
+    int kind=fn_8058A3B8((void*)a,rec);
+    Db80586420_Ent e(rec);
+    switch(kind) {
+    case 1:
+        t.a=0x5C51;t.b=0x1D70;
+        { int value=0x1E28; if((int)e.mC.e<=3)value=0x1E27;t.c=value; }
+        break;
+    case 2:t.a=0x5C51;t.b=0x1D70;t.c=0x1E48;break;
+    case 3:
+        t.a=0x5C51;
+        if(e.HasE()){t.b=0x1D89;t.c=0x1E49;}
+        else{t.b=0x1D8A;t.c=0x1E4A;}
+        break;
+    case 4:t.a=0x5C51;t.b=0x1D8B;t.c=0x1E4B;break;
+    case 5:
+        { int title=0x5C4D; if(!e.mC.h)title=0x5C4F;
+        t.a=title;t.b=0x1D8C;t.c=0x1E4C; } break;
+    case 6:
+        { int title=0x5C4E; if(!e.mC.h)title=0x5C50;
+        t.a=title;t.b=0x1D8D;t.c=0x1E4D; } break;
+    case 7:
+        t.a=0x5C51;t.b=0x1D8E;
+        unsigned value=e.mC.f;
+        if(value<=2)t.c=0x1E4F;
+        else if(value-3<=2)t.c=0x1E4E;
+        else if(value-6<=2)t.c=0x1E50;
+        else t.c=0x1E51;
+        break;
+    }
+    return fn_80582DF4(a,b,t);
+}

@@ -702,7 +702,7 @@ extern "C" int fn_80393640(unsigned x)
     return (x & 0x1F) * lbl_80624418[(x >> 5) & 7];
 }
 
-/* near-miss: 2 slots, the index/base operand order of the first lhzx (idx,base in the original code). */
+/* near-miss: 99.81%; indexed-load RA/RB order persists after direct-array, byte-offset, inline-accessor, unsigned-index, and hoisted-offset forms. */
 extern "C" void fn_8039365C(McHdr16* p, unsigned char* out)
 {
     int w[256];
