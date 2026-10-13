@@ -60,7 +60,7 @@ extern "C" int strcmp(const char*, const char*);
 
 extern "C" int fn_8041DC98(int);
 extern "C" int fn_8041D30C(int, int*, int*);
-extern "C" int fn_803F8434(void*, void*, void*, int, int);
+extern "C" int fn_803F8434(void*, void*, void*, int, int*);
 extern int lbl_806EEA84;
 extern int lbl_806EEA80;
 /* Card status buffer (lbl_806ADDE0): fn_803F8A2C copies the +0x20..+0x2C words into the open record. */
@@ -596,6 +596,63 @@ extern "C" int fn_803F81F4(void* o, char* fp)
     if (fn_803F73B0(o, r) != 0)
         return -1;
     return 0;
+}
+
+extern "C" int fn_803F8DDC(void*, char*, void*, int, int*);
+
+extern "C" int fn_803F8434(void* o, void* f, void* buf, int len, int* outlen)
+{
+    char* rec = (char*)fn_803F74D8(o, f);
+    if (RCI(rec, 0xe0) == 0)
+        return fn_803F8DDC(o, rec, buf, len, outlen);
+    unsigned char* src = (unsigned char*)buf;
+    int rc = 0;
+    int remain = len;
+    if (RCI(rec, 0xd4) != 0)
+        fn_803F80EC(o, f);
+    int cc = RCI(rec, 0xcc);
+    int total = RCI(rec, 0x7c);
+    int off;
+    if (cc != 0)
+        off = cc - RCI(o, 0x2b4);
+    else
+        off = 0;
+    while (remain != 0) {
+        int pos = off + RCI(rec, 0xc8);
+        if (pos < 0 || pos >= total) {
+            rc = 0xb;
+            break;
+        }
+        if (RCI(rec, 0xdc) != 0) {
+            int st;
+            do {
+                st = CARDRead(rec + 0x48, (void*)RCI(o, 0x2c0), RCI(o, 0x2b4), RCI(rec, 0xcc));
+                lbl_806EEA34->v6(1);
+            } while (st == -1);
+            rc = fn_803F73B0(o, st);
+            if (rc != 0)
+                break;
+            RCI(rec, 0xcc) += RCI(o, 0x2b4);
+            RCI(rec, 0xdc) = rc;
+        }
+        int i = RCI(rec, 0xc8);
+        while (i < RCI(o, 0x2b4) && remain != 0) {
+            if (src != 0) {
+                *src = ((unsigned char*)RCI(o, 0x2c0))[i];
+                src++;
+            }
+            remain--;
+            RCI(rec, 0xc8) = RCI(rec, 0xc8) + 1;
+            i = RCI(rec, 0xc8);
+        }
+        if (RCI(rec, 0xc8) == RCI(o, 0x2b4)) {
+            RCI(rec, 0xdc) = 1;
+            RCI(rec, 0xc8) = 0;
+        }
+    }
+    if (outlen != 0)
+        *outlen = len - remain;
+    return rc;
 }
 
 extern "C" int fn_803F8730(void* o, unsigned short* h, int* out1, int* out2)
