@@ -383,3 +383,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | fe/tu_8044F550 fn_8044FE0C | Eight bounded source forms; best 217/220 instructions, exact length/branches; only three reset-store order slots remain (+0x14,+0x04,+0x0C). Scratch build/agent-a8/fe-8044fe0c-v8.cpp; source restored.
 - `gamelib/tu_80378D70` `fn_8037B310`: 99.2%, 25/25 instructions after eight ordinary temporary/reference/inline-builder forms; the input-vector and output-slot address instructions remain reversed. Scratch build/root-8037B310, source preserved.
 - `db/tu_80599594` `fn_80599D30`: 97.5%, 190/190 instructions after eight ordinary shared-zero initializer/type/order forms; four prologue zero/copy scheduling words remain. Scratch build/root-80599D30, source preserved.
+- fn_803D1E54 (ealib/tu_803CECA4): 99.38614%,101/101 instructions; m38*m28/m2C product order and f0/f12/f13 operands differ; eight total forms (four SW17, four SW49), scratch only.
+- fn_80591B8C (db/tu_805902E0): 97.96296%,108/108 instructions; only entry stfs f1 versus two integer parameter moves differs; eight typed-array/branch/value/reference forms, scratch only.
