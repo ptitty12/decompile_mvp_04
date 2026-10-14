@@ -228,6 +228,118 @@ extern "C" int fn_800D8938(Unk800D876C_A* t)
     return r;
 }
 
+struct Unk8007DB74_A;
+int fn_8007E10C(Unk8007DB74_A* self, int id);
+int fn_8007E154(Unk8007DB74_A* self, int a, int x);
+extern "C" int fn_8007F198__FP13Unk8007F198_A(int g, int team);
+extern "C" int fn_8007F24C__FP13Unk8007F198_Aii(int g, int team, unsigned char i);
+extern "C" void* fn_8007FE04__FP13Unk8007F198_D(int g);
+extern "C" void fn_8007FDD4__FP13Unk8007F198_D(int g, int v);
+extern "C" void fn_80086278(Unk800D878C_C* t, void* v);
+extern "C" void fn_80086EC0(Unk800D878C_C* p, int a, int b);
+int fn_800DA07C(Unk800D876C_A* t, int u);
+extern "C" void fn_80086DFC(Unk800D878C_C* o, int v);
+extern "C" void fn_8006A004__11Unk80069F0C(void* w);
+extern "C" void fn_8006C698__11Unk80069F0C(void* w);
+extern "C" void fn_8006F784(void* p, int a);
+extern "C" void fn_80081028__FP13Unk8007FF8C_Yiiii(void* y, int a, int b, int c, int d);
+extern "C" void fn_80081088__FP13Unk8007FF8C_Yiiii(void* y, int a, int b, int c, int d);
+extern "C" void fn_8033E958(const char* fmt, ...);
+extern "C" int rand();
+extern const float lbl_805BD684;
+extern const char lbl_805BD528[];
+extern const char lbl_805BD574[];
+extern const char lbl_805BD5A4[];
+extern const char lbl_805BD600[];
+extern const char lbl_805BD62C[];
+extern const char lbl_805BD65C[];
+extern const char lbl_805B7FE4[];
+extern const char lbl_805B7FF0[];
+extern int lbl_8061ADEC;
+extern int lbl_8061C728[];
+
+/* near-miss (99.2%): only the position of the `addi r3,r3,lbl_805BD574@l` among the argument copies of the
+   "HOME: %d" log call differs (retail sets r4..r7 first). Argument-side forms tried: locals, casts, const-ness. */
+extern "C" void fn_800D8EE0(void* t, int mode)
+{
+    int g = lbl_8061930C;
+    Unk800D878C_B* w = lbl_806192E0->m4;
+    Unk800D878C_C* m = w->m10;
+    fn_80086278(m, fn_8007FE04__FP13Unk8007F198_D(g));
+    fn_80086EC0(m, 1, -1);
+    fn_80086EC0(m, 0, -1);
+    char a0[0x80] = "";
+    char a1[0x80] = "";
+    int home = fn_800DA07C((Unk800D876C_A*)t, 0);
+    int flag = fn_800D86E8(lbl_805BD684);
+    int away;
+    int again;
+    do {
+        away = fn_800DA07C((Unk800D876C_A*)t, 1);
+        int same = away == home;
+        int c1 = ((Unk8007B2B0_Screen*)g)->fn_80078A38(home);
+        int c2 = ((Unk8007B2B0_Screen*)g)->fn_80078A38(away);
+        again = 0;
+        if (same != 0 || (c1 != c2 && flag == 0))
+            again = 1;
+    } while (again != 0);
+    fn_8006A004__11Unk80069F0C(w);
+    int n1 = fn_8007E10C((Unk8007DB74_A*)g, home);
+    int p1;
+    if (n1 > 0)
+        p1 = rand() % n1;
+    else
+        p1 = 0;
+    int v31 = fn_8007E154((Unk8007DB74_A*)g, home, p1);
+    int p2;
+    if (fn_8007F198__FP13Unk8007F198_A(g, away) != 0) {
+        int r = rand();
+        p2 = r % fn_8007F198__FP13Unk8007F198_A(g, away);
+    } else {
+        p2 = 0;
+    }
+    int y = fn_8007F24C__FP13Unk8007F198_Aii(g, away, p2);
+    switch (mode) {
+    case 4:
+        fn_80081028__FP13Unk8007FF8C_Yiiii(w->m14, home, away, v31, y);
+        break;
+    case 5:
+        fn_80081088__FP13Unk8007FF8C_Yiiii(w->m14, home, away, v31, y);
+        break;
+    }
+    int sel = 0;
+    int k1 = fn_800B5520(home);
+    int k2 = fn_800B5520(away);
+    Unk80084910_N h1 = fn_800D9978((int)t, k1);
+    Unk80084910_N h2 = fn_800D9978((int)t, k2);
+    *(Unk80084910_N*)((char*)m + 0x78) = h1;
+    *(Unk80084910_N*)((char*)m + 0x80) = h2;
+    switch (mode) {
+    case 4:
+        sel = 0x25;
+        break;
+    case 5:
+        sel = 0x26;
+        break;
+    }
+    fn_8006F784(*(void**)((char*)w + 0xC), sel);
+    lbl_8061ADEC++;
+    char n_away[0x32] = "";
+    char n_home[0x32] = "";
+    ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B924(2, away, n_away);
+    ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B924(2, home, n_home);
+    fn_8033E958(lbl_805BD528);
+    fn_8033E958(lbl_805BD65C, mode == 4 ? lbl_805B7FE4 : lbl_805B7FF0, lbl_8061ADEC);
+    fn_8033E958(lbl_805BD574, home, n_home, away, n_away, lbl_8061C728[sel]);
+    fn_8033E958(lbl_805BD5A4, *(int*)((char*)m + 0x78), *(int*)((char*)m + 0x7C), *(int*)((char*)m + 0x80), *(int*)((char*)m + 0x84));
+    fn_8033E958(lbl_805BD600);
+    fn_8033E958(lbl_805BD62C);
+    m->m120 = 1;
+    fn_80086DFC(m, mode);
+    fn_8007FDD4__FP13Unk8007F198_D(lbl_8061930C, mode);
+    fn_8006C698__11Unk80069F0C(w);
+}
+
 void fn_800D92D8(void* t)
 {
     int r = fn_8040ABA0() % 3;
