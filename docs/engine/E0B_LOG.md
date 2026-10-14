@@ -10,7 +10,7 @@ A later session resumes from "Next step".
 |---|---|---|---|
 | 1 | Skeleton (CMake, presets, doctest, ctest) | Done | see git log |
 | 2 | Disc and DOL | Done | see git log |
-| 3 | Decoder and disassembler | | |
+| 3 | Decoder and disassembler | Done | see git log |
 | 4 | Semantics library and reference interpreter | | |
 | 5 | Functions and CFGs | | |
 | 6 | IR and C++ emitter | | |
@@ -41,6 +41,7 @@ A later session resumes from "Next step".
 |---|---|
 | `engine/common/` | Byte order, SHA-1, host file helpers |
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
+| `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler; later the semantics library and the interpreter. Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -69,6 +70,44 @@ A later session resumes from "Next step".
 - `mvp-disc info|ls|sections|dol` prints identity, FST, section table; `dol`
   extracts `main.dol` (only ever into `build/`).
 
+### 3. Decoder and disassembler (done)
+
+- `ppc/isa.h`: every Gekko opcode (base PowerPC 750 user and supervisor set plus
+  paired singles; 222 opcodes) as `X(name, pattern, mask)`. The mask covers the
+  opcode fields and every reserved bit, so a word with reserved bits set is
+  `Op::invalid`. `decode()` is a primary-opcode table plus a 10-bit extended-opcode
+  table per primary, built at startup with an overlap check.
+- `ppc/disasm.cpp` prints dtk's conventions: simplified mnemonics (li/lis/subi/
+  subis/subic, mr, nop, slwi/srwi/clrlwi/clrrwi/extlwi/extrwi/clrlslwi/rotlwi,
+  rotlw, cmpw/cmpwi/cmplw/cmplwi, crset/crclr/crmove/crnot, mtlr/mfsprg/mtibatu
+  etc., beq/bne/.../bdnz/beqlr/bctr with optional crN), lowercase hex immediates,
+  `addis` operands unsigned, cr bit names (`lt`, `cr1eq`), SPR names (`HID2`,
+  `GQR0`). Branch targets print as absolute addresses. The text rules were taken
+  from dtk's own listing; powerpc-rs's `isa.yaml` (MIT/Apache-2.0) was read to
+  confirm the simplified-mnemonic conditions. Nothing was copied.
+- Exit evidence (2026-10-14): `local_disasm` reads every `.s` file of dtk's split
+  (1,064 files; an address listed twice, from stale files of an older split, takes
+  the newest file), checks each listed word against the DOL bytes, and compares
+  our text with dtk's: **1,474,207 / 1,474,207 code words match** (.init 227, .text
+  1,110,598, .feoverlay 239,890, .dboverlay 123,492; 20 of them are zero words
+  that both print as `.4byte 0x00000000 /* invalid */`). Of those:
+  - 1,140,705 identical text;
+  - 319,954 where dtk prints a relocation (`lbl_X@l(r11)`, `fn_X`, `.L_X`,
+    `X@sda21(r0)`): evaluated with `symbols.txt` (plus `_SDA_BASE_` and
+    `_SDA2_BASE_`, read from `__start`'s own lis/ori pairs) and equal by value;
+  - 13,546 where dtk keeps the base mnemonic because the operand is relocated
+    (`addi rD, rA, sym@l` for our `subi`, `li rD, sym@sda21` for our
+    `addi/subi rD, r13, d`), checked by value;
+  - 1 branch whose target dtk couldn't label (0x804052C8, target in .bss), which
+    dtk prints as the raw displacement;
+  - 1 dtk quirk: dtk prints `ori r0, r0, 0xf1e8` (0x80406274) as `nop`; ours keeps
+    the `ori` because it changes r0.
+- CI: `test_ppc_decode` (2,700+ assertions): every opcode's pattern decodes to
+  itself with spare fields set, every masked bit flip leaves the opcode, reserved
+  bits give `invalid`, and ~150 hand-built disassembly vectors.
+- Survey §4 said 1,474,044 instructions; the listing's code sections hold 1,474,207
+  words. The difference is not investigated; the check covers every listed word.
+
 ## Next step
 
-Item 3: decoder and disassembler.
+Item 4: semantics library and reference interpreter.

@@ -17,6 +17,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(MVP_DISC "$ENV{MVP_DISC}" CACHE FILEPATH "Player's GV4E69 disc image (ISO or CISO), for local-only tests")
 set(MVP_DTK_ASM "$ENV{MVP_DTK_ASM}" CACHE PATH "dtk split assembly directory (build/GV4E69/asm), for the local disassembler check")
 
+# Forward-slash copies for C string literals (compile definitions).
+file(TO_CMAKE_PATH "${MVP_DISC}" MVP_DISC_PATH)
+file(TO_CMAKE_PATH "${MVP_DTK_ASM}" MVP_DTK_ASM_PATH)
+
 # Repository root: config/GV4E69 (symbols.txt, splits.txt) is metadata, not game data.
 get_filename_component(MVP_REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 
@@ -49,3 +53,4 @@ endfunction()
 
 add_subdirectory(common)
 add_subdirectory(vfs)
+add_subdirectory(ppc)
