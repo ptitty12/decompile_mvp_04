@@ -24,7 +24,9 @@ Rules the tool enforces:
     which is logged and messaged to the owner);
   - the integration lock is first come, first served (a waiting queue), expires
     45 min after its last refresh, and `run-locked` refreshes it while the
-    command runs and always releases it.
+    command runs and always releases it. `run-locked` is not re-entrant: a
+    second run under the same NAME waits for the first one instead of sharing
+    its lock (and then releasing it under the first one's feet).
 
 Standard library only. It decides nothing about matching: objdiff and
 tools/verify/verify.py do.
@@ -296,7 +298,7 @@ def lock_owner():
     return read_json(D / "lock" / "owner.json", None) if (D / "lock").exists() else None
 
 
-def try_acquire(name: str, purpose: str) -> tuple[bool, str]:
+def try_acquire(name: str, purpose: str, reentrant: bool = True) -> tuple[bool, str]:
     with mutex():
         q = D / "queue"
         q.mkdir(parents=True, exist_ok=True)
@@ -311,7 +313,7 @@ def try_acquire(name: str, purpose: str) -> tuple[bool, str]:
             waiting.append(w)
         waiting.sort(key=lambda w: w["since"])
         owner = lock_owner()
-        if owner and owner["owner"] != name and now() - owner.get("refreshed", 0) > LOCK_TTL_SECONDS:
+        if owner and (owner["owner"] != name or not reentrant) and now() - owner.get("refreshed", 0) > LOCK_TTL_SECONDS:
             event("lock-expired", name, previous=owner["owner"])
             append_jsonl(D / "messages.jsonl", {"t": now(), "from": name, "to": owner["owner"],
                                                 "text": "your integration lock expired (no refresh for 45 min) and was taken over"})
@@ -320,7 +322,7 @@ def try_acquire(name: str, purpose: str) -> tuple[bool, str]:
             os.rmdir(D / "lock")
             owner = None
         if owner:
-            if owner["owner"] == name:
+            if owner["owner"] == name and reentrant:
                 return True, "already held"
             return False, f"held by {owner['owner']} since {stamp(owner['acquired'])} ({owner.get('purpose', '')})"
         if waiting and waiting[0]["name"] != name:
@@ -332,11 +334,11 @@ def try_acquire(name: str, purpose: str) -> tuple[bool, str]:
         return True, "acquired"
 
 
-def acquire(name: str, purpose: str, wait_min: float) -> None:
+def acquire(name: str, purpose: str, wait_min: float, reentrant: bool = True) -> None:
     touch(name)
     t0, last = now(), ""
     while True:
-        ok, why = try_acquire(name, purpose)
+        ok, why = try_acquire(name, purpose, reentrant)
         if ok:
             print(f"integration lock {why} by {name}")
             return
@@ -395,7 +397,9 @@ def cmd_lock_status(args) -> None:
 def cmd_run_locked(args) -> None:
     if not args.cmd:
         raise SystemExit("coord: nothing to run (put the command after --)")
-    acquire(args.name, args.purpose, args.wait)
+    # Not re-entrant: two run-locked commands under one name (e.g. a lead's queued merges) must not overlap;
+    # with a shared lock the first to finish released it while the other was still verifying.
+    acquire(args.name, args.purpose, args.wait, reentrant=False)
     stop = threading.Event()
 
     def keepalive():
