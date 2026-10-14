@@ -293,6 +293,72 @@ test:
     return 0;
 }
 
+struct DevPrefixes {
+    const char* m0;
+    const char* m4;
+    const char* m8;
+};
+extern const DevPrefixes lbl_8060E80C;
+extern "C" int DVDConvertPathToEntrynum(const char* path);
+extern "C" int DVDFastOpen(int entry, void* fi);
+
+/* EA openfile_plat(path, mode, state): "pc:"-style prefixes (or write mode) go to the host file interface, anything
+ * else through the DVD. Backslashes become slashes.
+ * near-miss (97%): 89 insns as retail; viaPC and the loop end pointer have swapped callee-saved registers (retail
+ * viaPC r30, end r28) and the first character of path is loaded with lbz 0(r29) instead of li r9,0 / lbzx. */
+extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
+{
+    char buf[0x100];
+    char* fi = (char*)s + 0x108;
+    DevPrefixes pref = lbl_8060E80C;
+    int n = 0;
+    int viaPC = (mode ^ 1) & 1;
+    int r;
+    if (viaPC == 0) {
+        const char** q;
+        for (q = &pref.m0; q <= &pref.m8; q++) {
+            n = fn_803FF008((const char*)path, *q);
+            if (n != 0) {
+                viaPC = 1;
+                break;
+            }
+        }
+    }
+    if (viaPC != 0) {
+        fn_803FEFC4(buf, path + n);
+        r = fn_803FEEE8((int)buf, mode, (int*)((char*)s + 0x108));
+        if (r == 0)
+            PCclose(((int*)s)[0x108 / 4]);
+        else
+            s->m0 = 3;
+    } else {
+        int i = 0;
+        unsigned char c = path[i];
+        if (c != 0) {
+            do {
+                if (c == 0x5C)
+                    buf[i] = '/';
+                else
+                    buf[i] = c;
+                i++;
+                c = path[i];
+            } while (c != 0);
+        }
+        buf[i] = path[i];
+        int e = DVDConvertPathToEntrynum(buf);
+        if (e == -1) {
+            r = 0;
+        } else {
+            r = DVDFastOpen(e, fi);
+            if (r == 0)
+                DVDClose((char*)s + 0x108);
+        }
+        if (r != 0)
+            s->m0 = 2;
+    }
+    return r;
+}
+
 /* subfic/adde converts zero to one after the shared close result. */
 extern "C" int fn_803FF1BC(FsState* s)
 {
