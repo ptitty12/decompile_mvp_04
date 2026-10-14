@@ -122,13 +122,13 @@ void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
         }
     }
     unsigned max = 0;
-    for (i = 0; i < 64; i++) {
-        if (v->m5BC[i] > max) {
-            max = v->m5BC[i];
+    for (k = 0; k < 64; k++) {
+        if (v->m5BC[k] > max) {
+            max = v->m5BC[k];
         }
-        v->m5FC[i] = max;
+        v->m5FC[k] = max;
         if (v->m19C > 6) {
-            v->m5FC[i] = max + 1;
+            v->m5FC[k] = max + 1;
         }
     }
 }
