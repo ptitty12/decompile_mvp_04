@@ -693,7 +693,7 @@ void fn_8039FBB0(int x, unsigned char* p, int stride)
     }
 }
 
-/* near-miss: 87 insns like the original code; the original keeps the clamped value in r0 and reloads the low byte (lbz) instead of copying it. */
+/* In-range samples use their low byte in the big-endian short representation. */
 void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
 {
     int i;
@@ -703,7 +703,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[0];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[1];
         } else {
             r = 0;
         }
@@ -711,7 +711,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[1];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[3];
         } else {
             r = 0;
         }
@@ -719,7 +719,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[2];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[5];
         } else {
             r = 0;
         }
@@ -727,7 +727,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[3];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[7];
         } else {
             r = 0;
         }
@@ -735,7 +735,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[4];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[9];
         } else {
             r = 0;
         }
@@ -743,7 +743,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[5];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[11];
         } else {
             r = 0;
         }
@@ -751,7 +751,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[6];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[13];
         } else {
             r = 0;
         }
@@ -759,7 +759,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
         v = src[7];
         if (v >= 0) {
             r = 255;
-            if (v <= 255) r = v;
+            if (v <= 255) r = ((const unsigned char*)src)[15];
         } else {
             r = 0;
         }

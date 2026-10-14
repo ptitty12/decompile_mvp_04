@@ -48,13 +48,13 @@ void fn_803FF5E8(int, int);
 
 extern "C" {
 void fn_803F96B0(void* p);
-void fn_803F99E8(int h);
+int fn_803F99E8(int h);
 int fn_803F9664(int h);
 int fn_803F9A80(int h);
-int fn_803F9C58(int a, int b, int c, int d);
+int fn_803F9C58(const char* a, int b, int c, int d);
 int fn_803F9CE8(int a, int b, int c);
 int fn_803F9E90(int a, int b, int c);
-int fn_803FA100(int a, int b, int c, int d);
+int fn_803FA100(const char* a, int b, int c, int d);
 int fn_803FA248(int a, int b, int c);
 int fn_803F9BC8(int a, int b, int c);
 extern char fn_803FEA38[];
@@ -130,14 +130,14 @@ extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int
     return r.result;
 }
 
-/* near-miss: 29 vs 28; retail keeps the xori before the subfic/adde (x ^ 1) != 0, gcc folds it to x != 1 in every spelling tried. */
+/* Retail xori/subfic/adde returns one exactly when the request status is one. */
 extern "C" int fn_803FEBDC(int a, int b, int c, int* out)
 {
     int ok = 0;
-    int h = fn_803F9C58(a, b, c, 0);
+    int h = fn_803F9C58((const char*)a, b, c, 0);
     if (h != 0) {
         fn_803F99E8(h);
-        ok = fn_803F9664(h) != 1;
+        ok = fn_803F9664(h) == 1;
         *out = fn_803F9A80(h);
     } else {
         *out = ok;
@@ -179,14 +179,14 @@ extern "C" int fn_803FECF8(int a, int b)
     return r;
 }
 
-/* near-miss: same as fn_803FEBDC. */
+/* Same request-status equality test as fn_803FEBDC. */
 extern "C" int fn_803FED48(int a, int b, int c, int* out)
 {
     int ok = 0;
-    int h = fn_803FA100(a, b, c, 0);
+    int h = fn_803FA100((const char*)a, b, c, 0);
     if (h != 0) {
         fn_803F99E8(h);
-        ok = fn_803F9664(h) != 1;
+        ok = fn_803F9664(h) == 1;
         *out = fn_803F9A80(h);
     } else {
         *out = ok;

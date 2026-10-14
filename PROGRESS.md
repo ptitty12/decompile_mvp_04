@@ -331,3 +331,5 @@
     - sort_functions.py moved type definitions below their first use in game/tu_80341B78 (needs a guard).
     - rename.py hung 12 minutes on dolphin/ar/ar.c (needs a timeout).
     - integrate.py loses push races when verify takes 10-20 minutes and main moves every few minutes; my merges needed up to 6 attempts.
+
+- 2026-10-13 20:15 CDT | Sole-integrator matching batch: root18, local60 and coordinator63 add seven exact functions /908 code bytes versus publishedec45a02a. Retail control-flow evidence corrects front-end unconditional-success returns and request-status equality; big-endian byte access recovers audio clipping. Canonical request-provider declarations preserve all25 other compiled functions in the wrapper unit. Full worker builds, zero literal mismatches and final committed-HEAD verifier gates pass. Stock integration verifies and pushes the combined batch under the shared lock; six workers continue fresh four-unit packets, no new source linking.
