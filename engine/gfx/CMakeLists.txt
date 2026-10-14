@@ -57,7 +57,7 @@ if(MVP_HAVE_WEBGPU)
   find_package(SDL3 CONFIG REQUIRED PATHS "${MVP_SDL3_DIR}/cmake" NO_DEFAULT_PATH)
   message(STATUS "gfx: WebGPU renderer with Dawn ${MVP_DAWN_RELEASE} and SDL3 ${MVP_SDL3_VERSION}")
 
-  set(_mvp_wgpu_sources wgpu/gpu.cpp wgpu/window.cpp)
+  set(_mvp_wgpu_sources wgpu/gpu.cpp wgpu/window.cpp wgpu/renderer.cpp)
   # The prebuilt Dawn may come from a newer MSVC STL than the installed one
   # (wgpu/msvc_stl_compat.cpp explains); add the forwarding shim only when
   # the toolset lacks the split min/max_element entry points.
@@ -113,4 +113,7 @@ if(MVP_HAVE_WEBGPU)
   # Needs a GPU adapter; exits 77 (skipped) where there is none.
   engine_test(test_gfx_gpu SOURCES tests/test_gpu.cpp LIBS engine_gfx_wgpu)
   mvp_copy_sdl3(test_gfx_gpu)
+  engine_test(test_gfx_render SOURCES tests/test_gfx_render.cpp LIBS engine_gfx_wgpu)
+  target_include_directories(test_gfx_render PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  mvp_copy_sdl3(test_gfx_render)
 endif()

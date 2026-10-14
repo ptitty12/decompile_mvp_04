@@ -11,8 +11,8 @@ Newest state first in "Status"; a later session resumes from "Next step".
 | 1 | `engine/gfx/`: WebGPU device (Dawn) and window (SDL3); off-screen triangle test; CMake option | Done |
 | 2 | GX state machine: CP/XF/BP registers, vertex loading, transform, draws | Done |
 | 3 | Texture decoders (I4, I8, IA4, IA8, RGB565, RGB5A3, RGBA8, CMPR, C4/C8/C14X2) | Done |
-| 4 | TEV -> WGSL generator and pipeline cache | To do |
-| 5 | EFB and XFB: copies, present at each VI frame | To do |
+| 4 | TEV -> WGSL generator and pipeline cache | Done (indirect texturing and fog: not yet) |
+| 5 | EFB and XFB: copies, present at each VI frame | Done (backend side; presenting is in step 6) |
 | 6 | Run it: `mvp-play` window and frame captures | To do |
 
 ## How to build and test (agents)
@@ -37,6 +37,8 @@ Newest state first in "Status"; a later session resumes from "Next step".
 | `gx_processor.h/.cpp` | The GX state machine: register loads (BP mask), indexed XF loads, TLUT loads, vertex loading, the transform unit on the CPU, primitive assembly, EFB copies |
 | `tests/gx_stream.h` | Builds synthetic command streams for the tests |
 | `texture_decode.h/.cpp` | GameCube texture formats to RGBA8; level sizes |
+| `tev_wgsl.h/.cpp` | TEV -> WGSL: one module per `PipelineConfig` |
+| `wgpu/renderer.h/.cpp` | The WebGPU backend: EFB, draws, pipeline/texture/sampler caches, EFB copies to XFB frames and to textures, clears |
 
 ## Step notes
 
@@ -106,6 +108,49 @@ Newest state first in "Status"; a later session resumes from "Next step".
   blocks), texel conversions at known values, palettes (C4/C8/C14X2, out-of-range
   entries), a CMPR block in both modes, level and mip-chain sizes.
 
+### 4. TEV -> WGSL (done; indirect texturing and fog not yet)
+
+- `generate_wgsl(PipelineConfig)`: a pass-through vertex stage (the transform ran on
+  the CPU) and a fragment stage computing the TEV in integers as the hardware does:
+  8-bit a/b/c (masked), 11-bit signed d and registers, lerp with c + (c >> 7), bias
+  +-128, scale x1/x2/x4 (rounding +128, +127 when subtracting) and /2, clamp to 0..255
+  or -1024..1023; all 16 stages; texture and rasterized-color swap tables; konst
+  selection (fractions and K0-K3 components); the eight compare modes for color and
+  alpha (alpha modes 0-5 compare the color operands); the pixel takes the last
+  stage's destination registers; the alpha test (two references, and/or/xor/xnor);
+  logic ops clear, inverted copy and set without blending (no-op becomes a write mask).
+- Pipeline state from the same config: blend factors (destination alpha reads as 1 on
+  EFB formats without alpha), subtractive blending, color/alpha write masks (alpha only
+  on RGBA6_Z24), depth compare and update (no update when the test is off), cull mode
+  (hardware 1 = back, 2 = front, front face clockwise), triangle/line/point lists.
+- Caches: pipelines by `PipelineConfig` bytes; shader modules by WGSL text.
+
+### 5. EFB, copies and clears (done)
+
+- EFB: 640 x 528 RGBA8 color plus Depth32Float. Draws go into one open render pass;
+  each draw appends its vertices and a 512-byte uniform slot (dynamic offset) to
+  per-pass arrays that `flush()` uploads before submitting. A texture re-upload while
+  the open pass still samples the old contents submits the pass first.
+- Textures: decoded from guest memory (`texture_decode`), all mip levels, keyed by
+  address, format, size, levels and palette contents; revalidated by a hash of their
+  memory once per texture-cache epoch (BP 0x66). Samplers by wrap/filter/LOD state.
+- EFB copies: to the XFB, a copy of the source rectangle into a frame texture kept per
+  destination address (`Renderer::xfb(addr)`); to a texture, a conversion pass (box
+  filter when halving, intensity through BT.601 luma, A8/R8/G8/B8/RG8/GB8 channel
+  selects, depth when the EFB format is Z24) into a GPU texture kept per destination
+  address. A later draw that samples that address and size gets the GPU copy instead
+  of decoding memory, as long as the guest memory there is unchanged since the copy
+  (the copy is never written back to guest memory: rendering does not write guest state).
+- Clears (the copy's clear bit): a full-screen triangle scissored to the copy rectangle
+  with the color/alpha/depth write masks of the moment; formats without alpha keep
+  alpha at 1.
+- Exit evidence (2026-10-14): `test_gfx_render` (GPU, data-free): a vertex-colored quad
+  over a cleared EFB copied to the XFB; a textured quad from synthetic RGB565 memory
+  modulated by a konst color; alpha blending (white at alpha 128 over black reads back
+  128) and an alpha-test rejection; an EFB copy to a texture sampled by a later draw
+  (no memory decode); 200 random TEV configurations (1-16 stages) compile with 0
+  WebGPU errors. `test_tev_wgsl` checks the generated text without a GPU.
+
 ## Determinism
 
 The renderer reads guest state and never writes it. The only GPU-side values the
@@ -115,4 +160,5 @@ stream.
 
 ## Next step
 
-Step 4: TEV -> WGSL generator and pipeline cache.
+Step 6: `mvp-play` (window, present at each VI field, captures), then look at the
+game's frames and fill in what they need (indirect texturing, fog, ...).
