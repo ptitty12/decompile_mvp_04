@@ -90,7 +90,7 @@ void fn_80395A44(void* p)
     if (a != 0) {
         a->Free(p, 0);
     } else {
-        fn_8040ABC4(p);
+        free(p);
     }
 }
 

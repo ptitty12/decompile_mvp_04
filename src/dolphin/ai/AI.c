@@ -34,9 +34,9 @@ extern BOOL OSRestoreInterrupts(BOOL level);
 extern void OSRegisterVersion(const char* version);
 extern void __OSSetInterruptHandler(int interrupt, void* handler);
 extern u32 __OSUnmaskInterrupts(u32 mask);
-extern void fn_80433814(OSContext* context);
-extern void fn_8043364C(OSContext* context);
-extern s64 fn_80438628(void);
+extern void OSClearContext(OSContext* context);
+extern void OSSetCurrentContext(OSContext* context);
+extern s64 OSGetTime(void);
 extern void fn_804155D8(AIDCallback callback);
 
 extern const char* lbl_806EF148;
@@ -226,13 +226,13 @@ void fn_804154B0(int interrupt, OSContext* context)
     OSContext tmpContext;
 
     __AIRegs[0] |= 8;
-    fn_80433814(&tmpContext);
-    fn_8043364C(&tmpContext);
+    OSClearContext(&tmpContext);
+    OSSetCurrentContext(&tmpContext);
     if (lbl_806EF488) {
         lbl_806EF488(__AIRegs[2]);
     }
-    fn_80433814(&tmpContext);
-    fn_8043364C(context);
+    OSClearContext(&tmpContext);
+    OSSetCurrentContext(context);
 }
 
 void fn_8041552C(int interrupt, OSContext* context)
@@ -243,8 +243,8 @@ void fn_8041552C(int interrupt, OSContext* context)
     tmp = __DSPRegs[5];
     tmp = (tmp & ~0xA0) | 8;
     __DSPRegs[5] = (u16)tmp;
-    fn_80433814(&tmpContext);
-    fn_8043364C(&tmpContext);
+    OSClearContext(&tmpContext);
+    OSSetCurrentContext(&tmpContext);
     if (lbl_806EF48C && !lbl_806EF49C) {
         lbl_806EF49C = 1;
         if (lbl_806EF490) {
@@ -254,6 +254,6 @@ void fn_8041552C(int interrupt, OSContext* context)
         }
         lbl_806EF49C = 0;
     }
-    fn_80433814(&tmpContext);
-    fn_8043364C(context);
+    OSClearContext(&tmpContext);
+    OSSetCurrentContext(context);
 }

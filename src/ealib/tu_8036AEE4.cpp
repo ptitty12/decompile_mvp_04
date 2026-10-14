@@ -61,16 +61,16 @@ struct Unk80623E94 {
 
 extern "C" {
 void fn_8036AEE4(Unk803E3C08* a, Unk80623E94* b);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
 void fn_803DDE7C(void);
 void fn_803DDBF0(void);
-void fn_8042B460(void);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
 void fn_803DDB5C(int n);
-void fn_8042DC44(int n);
+void GXSetNumChans(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DA468(int attr, void* base, int stride);
 void fn_803E3C08(Unk803E3C08* self, void* x, int n);
@@ -102,15 +102,15 @@ extern "C" void fn_8036BB24(void* x)
     fn_803E3C08(&a, x, -1);
     if (a.mB0) {
         GXColor c = { 0xff, 0xff, 0xff, 0xff };
-        fn_8042DA74(4, c);
-        fn_8042DB5C(4, c);
+        GXSetChanAmbColor(4, c);
+        GXSetChanMatColor(4, c);
         fn_803DDE7C();
         fn_803DDBF0();
     }
     if (a.mB4 != 0 || a.m50[10] != lbl_806234B4.m34 || a.m50[11] != lbl_806234B4.m38
         || a.m50[16] != lbl_806234B4.m4C) {
         a.mB8 = 0;
-        fn_8042B460();
+        GXClearVtxDesc();
         lbl_806234E8 = a.m50[10];
         if (lbl_806234E8) {
             GXSetVtxDesc(9, 2);
@@ -136,7 +136,7 @@ extern "C" void fn_8036BB24(void* x)
         fn_803DBF78(0, 0xd, 1, 3, 8);
         fn_803DDB88(0, 1, 4, 0x3c, 0, 0x7d);
         fn_803DDB5C(1);
-        fn_8042DC44(0);
+        GXSetNumChans(0);
         lbl_806234B4.m8 = 0x4600;
         lbl_806234B4.m0 = 3;
         lbl_806234B4.m6C = 1;

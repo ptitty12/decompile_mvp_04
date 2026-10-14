@@ -53,7 +53,14 @@ included, can never break a mod. It only makes the game easier to understand.
 
 ## 3. Where we are (2026-10-14)
 
-- **Engine:** not started. E0 is next.
+- **Determinism and main loop** (`docs/DETERMINISM.md`, 2026-10-14):
+  - **Gameplay already runs at 60 Hz on the console.** The simulation ticks in 1/60 s steps, with up to 3 logic ticks per rendered frame to catch up, so "60 fps" means holding 60 Hz in the browser.
+  - The inventory has 65 nondeterminism sources, plus requirements R1-R17 for the engine.
+- **Roster data** (`docs/ROSTERS.md`, `tools/rosters/`, 2026-10-14):
+  - The 18 database tables in `database.big` are **plain-text tables** (RefPack-compressed). The tools round-trip them byte for byte.
+  - Rows are keyed by a djb2 hash of "Last,First" for players and of the 3-letter team code for teams.
+  - The player arrays hold 3,250, with 2,921 used. Teams are fixed at 126 (30 MLB, 2 All-Star, 90 minor-league, 4 specials), so new teams replace slots until code hooks raise the limit.
+- **Engine:** E0a is done (`docs/engine/E0_SURVEY.md`; D1 and D4 decided). E0b, the native boot spike, is next.
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
   live card is in `README.md`.
@@ -89,7 +96,7 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
 | E5 | **Netplay.** Lobby, signaling and TURN relay on the owner's VPS; lockstep from power-on; input-delay setting; desync detector. | Two players on different networks finish an exhibition game |
 | E6 | **Roster packs.** Pack format, loader and an authoring CLI; the pack's hash is part of the lobby handshake. | A pack that changes a team's roster is chosen in the lobby, and both players play with it |
 | E7 | **Team packs.** Replace a team slot's name, abbreviation, roster, logos, uniforms and load screen. | A custom team, in a replaced slot, plays a netplay game |
-| Later | Extra team slots (code hooks; needs the K2 limit inventory), rollback netcode, 60 fps, widescreen, higher internal resolution, spectators | Planned when E7 is done |
+| Later | Extra team slots (code hooks; needs the K2 limit inventory), rollback netcode, widescreen, higher internal resolution, spectators | Planned when E7 is done |
 
 ### Knowledge track
 
@@ -114,8 +121,8 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
    functions against dolsdk2004 and the mitsevox SDK. Then rename them in
    `symbols.txt` with evidence. List them with
    `python tools/goals/targets.py --list K1 --todo`.
-2. **E0a survey** (one Opus side session). Write `docs/engine/E0_SURVEY.md` and record D1-D2.
-3. **E0b boot spike** (the same side session, once D1 is decided).
+2. ~~**E0a survey**~~ Done 2026-10-14: write our own translator (D1), with resumable guest threads (D4).
+3. **E0b boot spike** (one Opus side session): the 10 items in `docs/engine/E0_SURVEY.md` §8, MSVC + CMake natively.
 4. **K2-K4 worker batches** (Sonnet). Build batches from
    `python tools/goals/targets.py --units K3` (and K2, K4). In these batches, names
    and types are the deliverable. Match a function whenever the type knowledge

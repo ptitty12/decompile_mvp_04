@@ -289,7 +289,7 @@ extern int lbl_806193B8[];
 extern "C" void fn_804031BC(short* dst, const char* src);
 
 
-extern "C" double fn_804103C0(double x);
+extern "C" double ceil(double x);
 
 
 extern int lbl_805B6B90[];
@@ -1064,7 +1064,7 @@ int fn_80086D34(Unk80084910_W* self, int i)
 /* The channel bytes are unsigned: a char store folds the 255 arm to -1 (li -1), and a named int local takes r0. */
 void fn_80086D44(char* base, int idx, float f)
 {
-    float t = (float)fn_804103C0(f * 255.0f);
+    float t = (float)ceil(f * 255.0f);
     unsigned char* p = (unsigned char*)base + 4;
     p[idx] = !(t > 255.0f) ? (int)(t >? 0.0f) : 255;
 }

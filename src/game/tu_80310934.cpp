@@ -367,7 +367,7 @@ void fn_803D9E54(int h, int v);
 void fn_803D9DF0(int v);
 void fn_803D982C(int h, int v);
 int fn_803D9824(int h);
-int fn_80436404();
+int OSGetResetCode();
 int OSGetProgressiveMode();
 int VIGetDTVStatus();
 Unk80310934_Tx* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
@@ -889,7 +889,7 @@ void fn_803134A0(Unk80310934_S134* self, int x, int y, int a3, int a4, int c, in
     else
         fn_803D982C(self->m38->m4, c);
     ((void (*)(void*))fn_80312DA8)(self);
-    if (fn_80436404() < 0 && OSGetProgressiveMode() != 0 && VIGetDTVStatus() == 1)
+    if (OSGetResetCode() < 0 && OSGetProgressiveMode() != 0 && VIGetDTVStatus() == 1)
         fn_803D9DDC(lbl_8061FEDC->m38->m4 + 0x10, lbl_80634B54, 0x10);
     fn_803D8918(self->m38->m4);
     float sp8;

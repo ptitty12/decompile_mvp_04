@@ -15,8 +15,8 @@
 extern int __DSP_rude_task_pending;
 extern DSPTaskInfo* __DSP_rude_task;
 
-extern void fn_80433814(OSContext* context);
-extern void fn_8043364C(OSContext* context);
+extern void OSClearContext(OSContext* context);
+extern void OSSetCurrentContext(OSContext* context);
 
 
 
@@ -30,8 +30,8 @@ void __DSPHandler(__OSInterrupt intr, OSContext* context) {
     tmp = (tmp & ~0x28) | 0x80;
     __DSPRegs[5] = tmp;
 
-    fn_80433814(&exceptionContext);
-    fn_8043364C(&exceptionContext);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(&exceptionContext);
     ASSERTMSGLINE(143, __DSP_curr_task != NULL, "__DSPHandler(): No current task! Someone set us up the bomb!\n");
     
     while (DSPCheckMailFromDSP() == 0)
@@ -157,8 +157,8 @@ void __DSPHandler(__OSInterrupt intr, OSContext* context) {
         ASSERTMSGLINEV(519, 0, "__DSPHandler(): Unknown msg from DSP 0x%08X - task sync failed!\n", mail);
     }
 
-    fn_80433814(&exceptionContext);
-    fn_8043364C(context);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(context);
 }
 
 void __DSP_exec_task(DSPTaskInfo* curr, DSPTaskInfo* next) {

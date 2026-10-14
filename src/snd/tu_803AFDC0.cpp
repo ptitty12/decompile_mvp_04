@@ -15,7 +15,7 @@ extern char lbl_806AA030[];
 
 extern "C" void fn_803B5D30(int a);
 extern "C" void* fn_803B5B6C(int a);
-extern "C" void fn_80432FD4(int a, int b);
+extern "C" void DCFlushRange(int a, int b);
 extern "C" void fn_803AEB50(int a, int b, int c, int d, int e);
 extern int* lbl_806AA2C4;
 
@@ -340,7 +340,7 @@ extern "C" int fn_803B115C(int unused, int p)
 
 extern "C" void fn_803B11A8(int unused, int a, int b, int c)
 {
-    fn_80432FD4(a, c);
+    DCFlushRange(a, c);
     fn_803AEB50(0, a, b, c, -1);
 }
 

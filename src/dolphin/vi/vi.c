@@ -11,25 +11,18 @@
 #include "__vi.h"
 
 /* Target relocations bind these SDK calls to existing exports. */
-void fn_80433814(OSContext*);
-void fn_8043364C(OSContext*);
+void OSClearContext(OSContext*);
+void OSSetCurrentContext(OSContext*);
 void OSWakeupThread(OSThreadQueue*);
-void fn_80437434(OSThreadQueue*);
-void fn_804382CC(OSThreadQueue*);
-OSSram* fn_80436A9C(void);
-BOOL fn_80436E90(BOOL);
-void fn_80433CE8(const char*, int, const char*, ...);
+void OSInitThreadQueue(OSThreadQueue*);
+void OSSleepThread(OSThreadQueue*);
+OSSram* __OSLockSram(void);
+BOOL __OSUnlockSram(BOOL);
+void OSPanic(const char*, int, const char*, ...);
 OSSram* __OSLockSram(void); /* real declaration retained only for source-level type checking */
 int __OSUnlockSram(BOOL);
 
-#define OSClearContext fn_80433814
-#define OSSetCurrentContext fn_8043364C
 #define OSWakeupThread OSWakeupThread
-#define OSInitThreadQueue fn_80437434
-#define OSSleepThread fn_804382CC
-#define __OSLockSram fn_80436A9C
-#define __OSUnlockSram fn_80436E90
-#define OSPanic fn_80433CE8
 #define __VIVersion lbl_806EF338
 
 #define IsInitialized lbl_806EF8B8

@@ -764,7 +764,7 @@ struct DVDDiskID;
 extern "C" void fn_803F9234(char*);
 extern "C" void fn_803F92D8(char*);
 extern "C" void CARDInit();
-extern "C" DVDDiskID* fn_80425508();
+extern "C" DVDDiskID* DVDGetCurrentDiskID();
 extern "C" char* strncpy(char*, const char*, unsigned);
 extern char lbl_8060E664[], lbl_8060E678[], lbl_8060E6A8[], lbl_8060E6C8[];
 extern int lbl_806EEA80, lbl_806EEA84, lbl_806EEA88;
@@ -812,7 +812,7 @@ extern "C" RcIfB* fn_803F713C(void* object, void* handle)
     self->m2BC = (int)self->m2B8->v0(0xA000, (request = RcLink(RcReq(1, (int)lbl_8060E664), RcReq(2, 0x20)), lbl_806EEA88 = 0, request));
     self->m2C0 = (int)self->m2B8->v0(*(int*)((char*)self + 0x2B4), RcLink(RcReq(1, (int)lbl_8060E678), RcReq(2, 0x20)));
     CARDInit();
-    const char* id = (const char*)fn_80425508();
+    const char* id = (const char*)DVDGetCurrentDiskID();
     strncpy((char*)self + 0x2C8, id, 4);
     strncpy((char*)self + 0x2CC, id + 4, 2);
     return (RcIfB*)self;

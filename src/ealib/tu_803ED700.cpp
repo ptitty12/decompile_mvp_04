@@ -104,13 +104,13 @@ extern char lbl_8060DF58[];
 extern "C" int fn_803EDC98(void*, int);
 extern "C" int fn_803EDC04(int);
 extern "C" int fn_80400690(void (*)(void));
-extern "C" void* fn_80432A50(void*, int);
-extern "C" int fn_80432CBC();
-extern "C" int fn_80432CB4();
+extern "C" void* OSAllocFromHeap(void*, int);
+extern "C" int OSGetArenaLo();
+extern "C" int OSGetArenaHi();
 extern "C" int OSInitAlloc(int, int, int);
-extern "C" int fn_80432CCC(int);
-extern "C" int fn_80432C48(int, int);
-extern "C" int fn_80432BC8();
+extern "C" int OSSetArenaLo(int);
+extern "C" int OSCreateHeap(int, int);
+extern "C" int OSSetCurrentHeap();
 extern char lbl_8060DF60[];
 extern char lbl_8060DF64[];
 extern void* lbl_806EF2C8;
@@ -316,7 +316,7 @@ extern "C" int fn_803EDC04(int a)
     int r = 0;
     fn_80400690(fn_803EE238);
     fn_803EE878();
-    void* p = fn_80432A50(lbl_806EF2C8, a);
+    void* p = OSAllocFromHeap(lbl_806EF2C8, a);
     if (p != 0) {
         r = fn_803EDC98(p, a);
         lbl_806AABF4[0]->m58 = p;
@@ -507,7 +507,7 @@ extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...)
     return r;
 }
 
-extern "C" void fn_80432B4C(void*, void*);
+extern "C" void OSFreeToHeap(void*, void*);
 
 extern "C" void fn_803EE238()
 {
@@ -527,7 +527,7 @@ extern "C" void fn_803EE238()
             void* m = h->m58;
             fn_803ED8EC(i);
             if (m != 0)
-                fn_80432B4C(lbl_806EF2C8, m);
+                OSFreeToHeap(lbl_806EF2C8, m);
             lbl_806AABF4[i] = 0;
         }
     }
@@ -713,8 +713,8 @@ extern "C" int fn_803EE81C()
     if (lbl_806EEA0C != 0)
         r = 0;
     else {
-        int a = fn_80432CBC();
-        int b = fn_80432CB4();
+        int a = OSGetArenaLo();
+        int b = OSGetArenaHi();
         a = (a + 0x1f) & ~0x1f;
         b &= ~0x1f;
         r = b - a - lbl_806EEA08;
@@ -726,13 +726,13 @@ extern "C" void fn_803EE878()
 {
     if (lbl_806EEA0C == 0) {
         lbl_806EEA0C = 1;
-        int a = fn_80432CBC();
-        int b = fn_80432CB4();
+        int a = OSGetArenaLo();
+        int b = OSGetArenaHi();
         a = OSInitAlloc(a, b, 1);
         b &= ~0x1f;
-        fn_80432CCC(a);
-        fn_80432C48((a + 0x1f) & ~0x1f, b);
-        fn_80432BC8();
-        fn_80432CCC(b);
+        OSSetArenaLo(a);
+        OSCreateHeap((a + 0x1f) & ~0x1f, b);
+        OSSetCurrentHeap();
+        OSSetArenaLo(b);
     }
 }

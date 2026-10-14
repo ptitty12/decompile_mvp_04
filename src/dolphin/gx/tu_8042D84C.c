@@ -26,11 +26,11 @@ f32 cosf(f32 x);
 
 void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func);
 void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z);
-void fn_8042D9EC(GXLightObj* lt_obj, GXColor* color);
-void fn_8042DA74(GXChannelID chan, GXColor amb_color);
-void fn_8042DB5C(GXChannelID chan, GXColor mat_color);
-void fn_8042DC44(u8 nChans);
-void fn_8042DC80(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
+void GXInitLightColor(GXLightObj* lt_obj, GXColor color);
+void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color);
+void GXSetChanMatColor(GXChannelID chan, GXColor mat_color);
+void GXSetNumChans(u8 nChans);
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
 
 void fn_8042D84C(GXLightObj* lt_obj, f32 cutoff, GXSpotFn spot_func) {
     f32 a0, a1, a2;
@@ -99,13 +99,13 @@ void GXInitLightPos(GXLightObj* lt_obj, f32 x, f32 y, f32 z) {
     obj->lpos[2] = z;
 }
 
-void fn_8042D9EC(GXLightObj* lt_obj, GXColor* color) {
+void GXInitLightColor(GXLightObj* lt_obj, GXColor color) {
     LightObjInt* obj = (LightObjInt*)lt_obj;
 
-    obj->color = *(u32*)color;
+    obj->color = *(u32*)&color;
 }
 
-void fn_8042DA74(GXChannelID chan, GXColor amb_color) {
+void GXSetChanAmbColor(GXChannelID chan, GXColor amb_color) {
     u32 reg, colIdx;
 
     switch (chan) {
@@ -145,7 +145,7 @@ void fn_8042DA74(GXChannelID chan, GXColor amb_color) {
     __GXData->ambColor[colIdx] = reg;
 }
 
-void fn_8042DB5C(GXChannelID chan, GXColor mat_color) {
+void GXSetChanMatColor(GXChannelID chan, GXColor mat_color) {
     u32 reg, colIdx;
 
     switch (chan) {
@@ -185,13 +185,13 @@ void fn_8042DB5C(GXChannelID chan, GXColor mat_color) {
     __GXData->matColor[colIdx] = reg;
 }
 
-void fn_8042DC44(u8 nChans) {
+void GXSetNumChans(u8 nChans) {
     SET_REG_FIELD(0, __GXData->genMode, 3, 4, nChans);
     GX_WRITE_XF_REG(9, nChans);
     __GXData->dirtyState |= 4;
 }
 
-void fn_8042DC80(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn) {
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn) {
     u32 reg, idx;
 
     idx = chan & 3;

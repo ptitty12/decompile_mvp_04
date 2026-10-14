@@ -33,7 +33,7 @@ int fn_804089B4(char* dst, const char* fmt, ...);      /* behaves like sprintf *
 void fn_80402FCC(char* dst, const void* src);
 Unk80170034_Entry* fn_80170034(Unk80170034_Info* info, int idx);
 void fn_8017008C(Unk80170034_Info* info, const char* name);
-void fn_80436204(int a, int b, int c);
+void OSResetSystem(int a, int b, int c);
 void fn_80402EF8(void* dst, const char* src);
 void fn_80403144(void* dst, const void* src);
 int fn_80403060(const unsigned short* s);
@@ -121,7 +121,7 @@ Unk800058BC::~Unk800058BC()
 
 void Unk800058BC::fn_80005A50()
 {
-    fn_80436204(1, 1, 1);
+    OSResetSystem(1, 1, 1);
 }
 
 void Unk800058BC::fn_80005A7C(Unk80170034_Info* info)

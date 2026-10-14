@@ -5,9 +5,9 @@
  * This file needs -opt nopeephole (OS.c compiles with it, like dolphin/os/OS.c).
  *
  * Original-code functions are not reproduced: fn_80431FEC, fn_80432010, fn_80432044 (OSExceptionVector),
- * fn_804320E0, fn_80432138 (__OSPSInit, GQR clears). fn_80431D6C (OSExceptionInit) refers to labels inside
+ * fn_804320E0, __OSPSInit (__OSPSInit, GQR clears). fn_80431D6C (OSExceptionInit) refers to labels inside
  * them: the labels inside fn_80432044 have no symbols.txt entry, so they are lbl_ placeholders (see below).
- * fn_80432014 / fn_80432030 / fn_8043218C are the tiny accessors below.
+ * __OSSetExceptionHandler / __OSGetExceptionHandler / fn_8043218C are the tiny accessors below.
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -30,7 +30,7 @@ extern BOOL lbl_806EF7C0;                  /* AreWeInitialized */
 extern BOOL lbl_806EF7C8;
 extern BOOL lbl_806EF7AC;
 extern OSTime lbl_806EF7D0;                 /* __OSStartTime */
-extern void** lbl_806EF7C4;                 /* exception handler table */
+extern __OSExceptionHandler* OSExceptionTable;
 extern const char* lbl_806EF2B8;            /* __OSVersion */
 /* The string __OSVersion points to is the first object of OS.c .data; the later string offsets (relative to the
  * pool base register) only come out right when it precedes them. The pointer itself is extern above. */
@@ -43,9 +43,9 @@ extern int fn_80424F50(DVDCommandBlock* block, void* info, void* cb);   /* DVDIn
 extern void fn_80427F18(void);              /* EXIInit */
 extern void fn_80431D6C(void);              /* OSExceptionInit */
 extern void fn_80433C20(void);              /* __OSContextInit */
-extern void fn_80433304(void);              /* __OSCacheInit */
+extern void __OSCacheInit(void);
 extern void fn_80434550(OSExecParams* params);   /* __OSGetExecParams */
-extern void fn_80434F9C(void);              /* OSEnableInterrupts */
+extern BOOL OSEnableInterrupts(void);
 extern void fn_80435004(void);              /* __OSInterruptInit */
 extern void fn_804357F4(void);              /* __OSModuleInit */
 extern void fn_8043643C(void);              /* __OSResetSWInterruptHandler */
@@ -53,15 +53,15 @@ extern void fn_80435BD0(void);              /* __OSInitMemoryProtection */
 extern void fn_80436960(void);              /* __OSInitSram */
 extern void fn_80437274(void);              /* __OSInitSystemCall */
 extern void fn_804372DC(void);              /* __OSThreadInit */
-extern void fn_804321CC(void);              /* OSInitAlarm */
+extern void OSInitAlarm(void);
 extern void fn_80432D00(void);              /* __OSInitAudioSystem */
-extern u32 fn_80436404(void);               /* OSGetResetCode */
+extern u32 OSGetResetCode(void);
 
 u32 fn_80431828(void);
 void fn_80431850(s32 result, DVDCommandBlock* block);
 void fn_8043188C(void);
-void* fn_80432014(u8 exception, void* handler);
-void* fn_80432030(u8 exception);
+__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler);
+__OSExceptionHandler __OSGetExceptionHandler(__OSException exception);
 u32 fn_8043218C(void);
 
 /* flags: matches only with -opt nopeephole */
@@ -131,20 +131,20 @@ void fn_8043188C(void)
         }
 
         lbl_806EF654 = 1;
-        fn_80432CCC(lbl_806EF7A0->arenaLo == NULL ? (void*)0x80701040 : lbl_806EF7A0->arenaLo);
+        OSSetArenaLo(lbl_806EF7A0->arenaLo == NULL ? (void*)0x80701040 : lbl_806EF7A0->arenaLo);
         if (lbl_806EF7A0->arenaLo == NULL && lbl_806EF7A4 != NULL && *lbl_806EF7A4 < 2) {
-            fn_80432CCC((char*)(((u32)lbl_80701020 + 0x1F) & ~0x1F));
+            OSSetArenaLo((char*)(((u32)lbl_80701020 + 0x1F) & ~0x1F));
         }
         fn_80432CC4(lbl_806EF7A0->arenaHi == NULL ? (void*)0x81780000 : lbl_806EF7A0->arenaHi);
 
         fn_80431D6C();
         fn_80437274();
-        fn_804321CC();
+        OSInitAlarm();
         fn_804357F4();
         fn_80435004();
         __OSSetInterruptHandler(0x16, (void*)fn_8043643C);
         fn_80433C20();
-        fn_80433304();
+        __OSCacheInit();
         fn_80427F18();
         SIInit();
         fn_80436960();
@@ -190,7 +190,7 @@ void fn_8043188C(void)
         }
         }
         OSReport("Memory %d MB\n", lbl_806EF7A0->memorySize >> 20);
-        OSReport("Arena : 0x%x - 0x%x\n", fn_80432CBC(), fn_80432CB4());
+        OSReport("Arena : 0x%x - 0x%x\n", OSGetArenaLo(), OSGetArenaHi());
         OSRegisterVersion(lbl_806EF2B8);
         if (lbl_806EF7A4 != NULL && *lbl_806EF7A4 >= 2) {
             fn_80403FF8();
@@ -198,35 +198,35 @@ void fn_8043188C(void)
 
         /* ClearArena */
         {
-            BOOL reset = (fn_80436404() & 0x80000000) ? 1 : 0;
+            BOOL reset = (OSGetResetCode() & 0x80000000) ? 1 : 0;
             u32* saveStart = (u32*)&bss->params.regionStart;
 
             if (!reset) {
-                memset(fn_80432CBC(), 0, (u32)fn_80432CB4() - (u32)fn_80432CBC());
+                memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
             } else if (*saveStart == 0) {
-                memset(fn_80432CBC(), 0, (u32)fn_80432CB4() - (u32)fn_80432CBC());
-            } else if ((u32)fn_80432CBC() < *saveStart) {
-                if ((u32)fn_80432CB4() <= *saveStart) {
-                    memset(fn_80432CBC(), 0, (u32)fn_80432CB4() - (u32)fn_80432CBC());
+                memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
+            } else if ((u32)OSGetArenaLo() < *saveStart) {
+                if ((u32)OSGetArenaHi() <= *saveStart) {
+                    memset(OSGetArenaLo(), 0, (u32)OSGetArenaHi() - (u32)OSGetArenaLo());
                 } else {
                     u32 saveEnd;
 
-                    memset(fn_80432CBC(), 0, *saveStart - (u32)fn_80432CBC());
+                    memset(OSGetArenaLo(), 0, *saveStart - (u32)OSGetArenaLo());
                     saveEnd = (u32)bss->params.regionEnd;
-                    if ((u32)fn_80432CB4() > saveEnd) {
-                        memset((void*)saveEnd, 0, (u32)fn_80432CB4() - saveEnd);
+                    if ((u32)OSGetArenaHi() > saveEnd) {
+                        memset((void*)saveEnd, 0, (u32)OSGetArenaHi() - saveEnd);
                     }
                 }
             }
         }
 
-        fn_80434F9C();
+        OSEnableInterrupts();
         if (lbl_806EF7C8 == 0) {
             fn_80422FD8();
             if (lbl_806EF7AC != 0) {
                 __OSDeviceCode = 0x9000;
             } else {
-                fn_80432FA8(bss, 0x20);
+                DCInvalidateRange(bss, 0x20);
                 fn_80424F50(&bss->block, bss, (void*)fn_80431850);
             }
         }
@@ -243,7 +243,7 @@ extern u8 lbl_8043209C[];
 extern u8 lbl_804320AC[];
 extern u8 lbl_804320DC[];
 extern void fn_804320E0(void);   /* OSDefaultExceptionHandler (original code) */
-void fn_80421C20(char* str, ...);               /* DBPrintf */
+void DBPrintf(char* str, ...);
 BOOL fn_80421C04(__OSException exception);      /* __DBIsExceptionMarked */
 
 static u32 __OSExceptionLocations[] = {
@@ -269,65 +269,65 @@ void fn_80431D6C(void)
 
     destAddr = (void*)OSPhysicalToCached(0x60);
     if (*(u32*)destAddr == 0) {
-        fn_80421C20("Installing OSDBIntegrator\n");
+        DBPrintf("Installing OSDBIntegrator\n");
         memcpy(destAddr, (void*)fn_80431FEC, (u32)fn_80432010 - (u32)fn_80431FEC);
-        fn_80433034(destAddr, (u32)fn_80432010 - (u32)fn_80431FEC);
+        DCFlushRangeNoSync(destAddr, (u32)fn_80432010 - (u32)fn_80431FEC);
         __sync();
         ICInvalidateRange(destAddr, (u32)fn_80432010 - (u32)fn_80431FEC);
     }
 
     for (exception = 0; exception < 15; exception++) {
         if (lbl_806EF7A4 && (*lbl_806EF7A4 >= 2) && fn_80421C04(exception)) {
-            fn_80421C20(">>> OSINIT: exception %d commandeered by TRK\n", exception);
+            DBPrintf(">>> OSINIT: exception %d commandeered by TRK\n", exception);
             continue;
         }
 
         *opCodeAddr = oldOpCode | exception;
 
         if (fn_80421C04(exception)) {
-            fn_80421C20(">>> OSINIT: exception %d vectored to debugger\n", exception);
-            memcpy((void*)lbl_8043209C, (void*)fn_80432010, (u32)fn_80432014 - (u32)fn_80432010);
+            DBPrintf(">>> OSINIT: exception %d vectored to debugger\n", exception);
+            memcpy((void*)lbl_8043209C, (void*)fn_80432010, (u32)__OSSetExceptionHandler - (u32)fn_80432010);
         } else {
             u32* ops = (u32*)lbl_8043209C;
             int cb;
 
-            for (cb = 0; cb < (u32)fn_80432014 - (u32)fn_80432010; cb += sizeof(u32)) {
+            for (cb = 0; cb < (u32)__OSSetExceptionHandler - (u32)fn_80432010; cb += sizeof(u32)) {
                 *ops++ = 0x60000000;
             }
         }
 
         destAddr = (void*)OSPhysicalToCached(__OSExceptionLocations[(u32)exception]);
         memcpy(destAddr, handlerStart, handlerSize);
-        fn_80433034(destAddr, handlerSize);
+        DCFlushRangeNoSync(destAddr, handlerSize);
         __sync();
         ICInvalidateRange(destAddr, handlerSize);
     }
-    lbl_806EF7C4 = (void**)OSPhysicalToCached(0x3000);
+    OSExceptionTable = (__OSExceptionHandler*)OSPhysicalToCached(0x3000);
 
     for (exception = 0; exception < 15; exception++) {
-        fn_80432014(exception, (void*)fn_804320E0);
+        __OSSetExceptionHandler(exception, (__OSExceptionHandler)fn_804320E0);
     }
 
     *opCodeAddr = oldOpCode;
 
-    fn_80421C20("Exceptions initialized...\n");
+    DBPrintf("Exceptions initialized...\n");
 }
 
 /* flags: matches only with -opt nopeephole */
 /* __OSSetExceptionHandler */
-void* fn_80432014(u8 exception, void* handler)
+__OSExceptionHandler __OSSetExceptionHandler(__OSException exception, __OSExceptionHandler handler)
 {
-    void* old = lbl_806EF7C4[exception];
+    __OSExceptionHandler old = OSExceptionTable[exception];
 
-    lbl_806EF7C4[exception] = handler;
+    OSExceptionTable[exception] = handler;
     return old;
 }
 
 /* flags: matches only with -opt nopeephole */
 /* __OSGetExceptionHandler */
-void* fn_80432030(u8 exception)
+__OSExceptionHandler __OSGetExceptionHandler(__OSException exception)
 {
-    return lbl_806EF7C4[exception];
+    return OSExceptionTable[exception];
 }
 
 /* flags: matches only with -opt nopeephole */

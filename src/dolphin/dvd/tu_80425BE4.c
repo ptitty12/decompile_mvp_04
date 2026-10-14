@@ -21,8 +21,8 @@
 int fn_80424CF0(DVDCommandBlock* block, void* addr, s32 length, s32 offset, DVDCBCallback callback);
 int fn_80424DC0(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback);
 void fn_80425020(void);
-s32 fn_804250B0(void);
-void* fn_80432CB4(void);
+s32 DVDGetDriveStatus(void);
+void* OSGetArenaHi(void);
 void fn_80432CC4(void* newHi);
 
 extern void (*lbl_806EF6C0)(void);
@@ -70,13 +70,13 @@ void fn_80425CEC(void) {
     u8 idTmpBuf[63];
     DVDDiskID* idTmp;
 
-    fn_80432CB4();
+    OSGetArenaHi();
     idTmp = (DVDDiskID*)OSRoundUp32B(idTmpBuf);
     lbl_806EF6D0 = idTmp;
     lbl_806EF6CC = (DVDBB2*)OSRoundUp32B(lbl_806DE218);
     fn_80425020();
     fn_80424DC0(&lbl_806DE258, lbl_806EF6D0, fn_80425C14);
-    while (fn_804250B0() != 0) {
+    while (DVDGetDriveStatus() != 0) {
     }
     bootInfo = (OSBootInfo*)0x80000000;
     id = (DVDDiskID*)0x80000000;

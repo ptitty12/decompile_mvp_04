@@ -74,7 +74,7 @@ struct UnkCfg {
 };
 
 extern "C" {
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
 void fn_803DB5A0(void* state);
 void fn_803DDCD4(void);
 void GXCallDisplayList(void* list, int nbytes);
@@ -132,7 +132,7 @@ void fn_803DE2D4(void* o, int a);
 void PSMTXScale(Mtx34* m, float x, float y, float z);
 void PSMTXTrans(Mtx34* m, float x, float y, float z);
 void PSMTXConcat(Mtx34* a, Mtx34* b, Mtx34* ab);
-void fn_80430398(Mtx34* m, int id, int type);
+void GXLoadTexMtxImm(Mtx34* m, int id, int type);
 void GXCallDisplayList(void* list, int nbytes);
 }
 
@@ -150,13 +150,13 @@ struct Unk8062BC30 {
 extern Unk8062BC30 lbl_8062BC30;
 
 extern "C" {
-void fn_8042DC44(int n);
+void GXSetNumChans(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
-void fn_8042B460(void);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
@@ -167,13 +167,13 @@ void fn_8036CC08(Unk803E3C08* a, UnkCfg* b);
 }
 
 extern "C" {
-void fn_8042DC44(int n);
+void GXSetNumChans(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
-void fn_8042B460(void);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
@@ -241,7 +241,7 @@ extern "C" void fn_8036E65C(Unk803E3C08* a, UnkCfg* b)
         PSMTXTrans(&m2, 0.5f, 0.5f, 1.0f);
         PSMTXConcat(&m3, &m2, &m2);
         PSMTXConcat(&m2, &m1, &m2);
-        fn_80430398(&m2, 0x40, 0);
+        GXLoadTexMtxImm(&m2, 0x40, 0);
         float* kf = (float*)a->m0[11].m4;
         fn_803DD7C8(a->m0[10].m4, 0);
         fn_803DDB5C(3);
@@ -269,19 +269,19 @@ extern "C" void fn_8036E65C(Unk803E3C08* a, UnkCfg* b)
         m1.f[9] = 0.0f;
         m1.f[10] = 0.0f;
         m1.f[11] = 1.0f;
-        fn_80430398(&m1, 0x43, 0);
+        GXLoadTexMtxImm(&m1, 0x43, 0);
         GXColor c;
         Unk8036E65CParam* pp = a->m0;
         c.r = (unsigned char)(((float*)pp[12].m4)[0] * 255.0f);
         c.g = (unsigned char)(((float*)pp[12].m4)[1] * 255.0f);
         c.b = (unsigned char)(((float*)pp[12].m4)[2] * 255.0f);
         c.a = (unsigned char)(((float*)pp[12].m4)[3] * 255.0f);
-        fn_8042DA74(4, c);
+        GXSetChanAmbColor(4, c);
         if (c.a == 0xff) {
-            fn_8042DC80(0, 1, 0, 1, 0, 0, 2);
-            fn_8042DC80(2, 0, 1, 1, 0, 0, 2);
+            GXSetChanCtrl(0, 1, 0, 1, 0, 0, 2);
+            GXSetChanCtrl(2, 0, 1, 1, 0, 0, 2);
         } else {
-            fn_8042DC80(4, 1, 0, 1, 0, 0, 2);
+            GXSetChanCtrl(4, 1, 0, 1, 0, 0, 2);
         }
         fn_803DB5A0(b->m4);
         if (b->m6C == 0) {
@@ -424,14 +424,14 @@ extern "C" void fn_8036F010(void* x)
     fn_803E3C08(&a, x, -1);
     if (a.mB0) {
         GXColor c = { 0xff, 0xff, 0xff, 0xff };
-        fn_8042DA74(4, c);
-        fn_8042DB5C(4, c);
+        GXSetChanAmbColor(4, c);
+        GXSetChanMatColor(4, c);
         fn_803DDE7C();
         fn_803DDBF0();
     }
     if (a.mB4 != 0 || a.m50[10] != lbl_80623894.m34 || a.m50[11] != lbl_80623894.m38 || a.m50[16] != lbl_80623894.m4C || a.m50[14] != lbl_80623894.m44) {
         a.mB8 = 0;
-        fn_8042B460();
+        GXClearVtxDesc();
         GXSetVtxDesc(0, 1);
         GXSetVtxDesc(2, 1);
         GXSetVtxDesc(3, 1);
@@ -467,7 +467,7 @@ extern "C" void fn_8036F010(void* x)
         fn_803DDB88(0, 1, 4, 0x3c, 0, 0x7d);
         fn_803DBF78(0, 0xb, 1, 5, 0);
         fn_803DDB5C(1);
-        fn_8042DC44(1);
+        GXSetNumChans(1);
         lbl_80623894.m0 = 4;
         lbl_80623894.m8 = 0x560d;
         lbl_80623894.m6C = 1;
