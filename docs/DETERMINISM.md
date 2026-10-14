@@ -724,6 +724,61 @@ Not named, with reasons (names pass 01):
   (`__init_user`): mitsevox names them, but dtk then renames about 150 more symbols (checked again
   in pass 01 with `rename_symbols.py --from-dtk --dry-run`).
 
+Names pass 02 (`work/names-02`, `tools/goals/renames/names02.tsv`): 278 more tier E names, 150 in
+`snd/` (the AEMS, stream, system, mixer, filter and utility code) and 128 in `ealib/` (the RealGraph
+SHAPE/FONT library, the RealMem manager, the async file and STREAM code, small math, locale and
+EAGL helpers). Each one is a free function whose reference name is the same in every build that has
+it, or the clear majority (six ties are recorded in the tsv). Not named, with reasons (names pass 02):
+
+- **Methods and namespace functions whose class is not in our source (486): 437 in `ealib/`, 8
+  in `ealibs/`, 40 in `snd/`, 1 in `gamelib/`.** By family: `EAGL::*` 196 (Transform, DynamicLoader,
+  ViewPort, Device, RenderContext*, TAR*, Model, DrawArray, ...), `EAGLAnim::*` 112 (the animation
+  channels and blenders in `tu_803BA9DC` to `tu_803D2B20`), `Realmc::*` 92 (the RealCore GameCube
+  layer: `GCInterface` 38, `GCDriver` 31, ...), `Snd::*` 31 (`getbits`, `discardbits`,
+  `readsamples`, `interpolate`, `reftolpc`, `filter`, `decodexac`, `decodemut`,
+  `process_raw_block` and the `CMTBLKDecf` / `CEAXABLKDecf` decoders in `snd/tu_803B7DA0`, plus
+  `Snd::System`, `Snd::Memory` and `Snd::Util`, which `include/snd/sndo.h` and `src/snd/cmn/sndcmn.h` declare, but our
+  definitions are `extern "C"` free functions with guessed prototypes), `RCMP::*` 21, `Csis::*` 9
+  and 25 more (GCHW_VD, VP6_/MAD_CODEC_INTERNAL, MyAllocator, ...). A correct g++ 2.95 name needs
+  the class or namespace and the real parameter list.
+- **Header clashes (19), all in `snd/`.** The name is already declared in `src/snd/cmn/sndcmn.h`
+  or `include/snd/sndo.h` with a different prototype (void vs int return, `void *` vs a struct
+  pointer, `int` vs `Snd::Channel`) or with C++ linkage, so the compiler rejects the rename: `SNDbankadd`
+  (`fn_803A82A8`), `SNDAEMS_addmodulebank` (`fn_803A6B64`), `SNDstop` (`fn_803AB480`),
+  `SNDSTRM_destroy` (`fn_803AA95C`), `SNDplaysetdef` (`fn_803A9204`), `SNDSTRM_pitchmult`
+  (`fn_803AB56C`), `SNDSTRM_setvol` (`fn_803AB9F0`), `SNDSTRM_setazimuth` (`fn_803AAB7C`),
+  `SNDI_parsetimbre` (`fn_803AD2F0`), `SNDPLATFORM_getvoicerange` (`fn_803AFD44`),
+  `SNDPLATFORM_memalloc` / `memfree` / `download` / `downloadcomplete` / `packetplaycreate` /
+  `packetplay` / `packetplaydestroy` (`fn_803B1118`, `fn_803B115C`, `fn_803B11A8`, `fn_803B11FC`,
+  `fn_803B0368`, `fn_803B042C`, `fn_803B0714`), `SNDfxlevel` (`fn_803B3EA8`) and
+  `SNDI_validrendermode` (`fn_803B58E8`). Fixing them means changing prototypes or linkage in
+  every caller (a contract commit), not renaming.
+- **Hand-written static-init emulations (9).** `fn_803BD800`, `fn_803DD4E4`, `fn_803DE0F0`,
+  `fn_803E1B54`, `fn_803E2E18`, `fn_803E3A74`, `fn_803E9594`, `fn_803EF23C`, `fn_803FADD0` are
+  `__static_initialization_and_destruction_0` in the reference builds. That is a compiler-generated
+  name (36 `scope:local` copies of it already exist in `symbols.txt`), and in our sources these
+  are ordinary `extern "C"` functions that a TU with its own static constructors would collide with.
+- **Ambiguous names, left alone (5).** `fn_803BD358` (`Multiply` in ge and moh4, `MtxMult` in moh3
+  and nfsu: a 2-2 tie), `fn_80402FCC` (`RealmcUtils::Unicode2Ascii` in hp, `USTR_strcpyW` in nfsu),
+  `fn_803F6754` (`Realmc::GetVersionNumber` in ge, hp and nfsmw, `GetVersionNumber` in moh4),
+  `fn_803EFE60` (`cGroperBindGroup::Init` in hp, `Realmc::GCMessage::Clear` in moh3, moh4 and nfsu),
+  `fn_803E6FB8` (`GaugesMgr_BeginShareDraft` in nascar, `EAGLInternal::DefaultMalloc` in nfsu). The
+  Freedom Fighters, Goldeneye and Medal of Honor game-class names that show up as a lone rival
+  (`ZCOUNTER::GetNrCounters`, `ZDllSound::SetMasterVolume`, `hud::HudTimer`, ...) are look-alikes
+  and were ignored when the other builds agree.
+- **Overload and single-build outliers (2).** `fn_803EC568` is EA's overload
+  `SHAPE_size(int, int, int, unsigned int, bool)` (`SHAPE_size__FiiiUib`); `fn_803EC6F8`, the
+  unmangled one, took the plain name, and C linkage cannot hold two, so the overload keeps its
+  placeholder until its prototype is settled. `fn_803DF7A0` (`mload44`, Freedom Fighters only) has
+  no family around it in the EAGL transform code. Two statics with the same base name in different
+  units (`locaterequest` in asyncfile and in stream) took their mangled names
+  (`locaterequest__Fi`, `locaterequest__FP15STREAMHEADERtagi`).
+- **Game code (107 hits, none applied).** Every hit outside the library units is a look-alike
+  (`GuiGetChampionsLeagueMatchType`, `RangedRandInt`, `LUAShutdown`, `bServiceFileSystem`,
+  `DVDValidErrorState`, ...); no second reason found for any.
+- **SDK units (273 hits: `dolphin/*` 237, `sdk/*` 24, `libgcc` 7, `libsn` 5).** Not in scope for
+  this pass; they belong to K1b because dtk renames more symbols once these are named.
+
 ## 8. Open points for E0b / E4 to settle
 
 1. Who calls `Present` (`fn_803D8640`) in gameplay, and whether the render phase or any
