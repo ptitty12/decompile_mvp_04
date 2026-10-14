@@ -390,3 +390,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `snd/tu_803AC88C` `fn_803AE6F0` (swarm52, eight forms): scratch 97.8344%, 157/157 words; only dry/factor FPR definitions remain swapped in best draft. Consistent unsigned-short ADE24/ADEEC parameters and direct setfxlevel call preserve all three existing functions, but all contract repairs and the new body remain scratch-only.
 - `snd/tu_803B4BEC` `fn_803B66D4` (728 B): 97.58242%, seven forms; 182/182 words, seven arithmetic/register and zero-fill scheduling differences; best draft `build/swarm53/B66D4-v6.cpp`.
 - `ealib/tu_803DBFF4` `fn_803DD068` (568 B): 99.788734%, eight forms; 142/142 words, six register differences in the final direct-texture branch; draft `build/swarm53/DD068-v8.cpp`.
+
+- `snd/tu_803AB310` `fn_803AC5CC`: swarm55 eight ordinary lifetime/global-pointer/block-scope forms; best95.8871%,62/62words, global/result saved-register allocation and result-move versus installed-store scheduling differ; source unchanged, scratch build/root55/AC5CC.
