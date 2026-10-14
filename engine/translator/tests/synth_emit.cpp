@@ -26,7 +26,9 @@ int main(int argc, char** argv) {
   for (const auto& e : cfg.error_list) std::fprintf(stderr, "mvp-synth-emit: %s\n", e.c_str());
   if (cfg.errors) return 1;
   EmitOptions opt;
-  for (std::size_t k = 0; k < rt::hle_table().size(); ++k) opt.hle[rt::hle_table()[k].name] = static_cast<int>(k);
+  const auto& table = rt::hle_table();
+  for (std::size_t k = 0; k < table.size(); ++k)
+    opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == rt::HleKind::Before});
   opt.shards = 2;
   std::string err;
   if (!emit_cpp(cfg, argv[1], opt, nullptr, &err)) {

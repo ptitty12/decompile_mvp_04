@@ -1,10 +1,12 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp input.cpp ax.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
 
 engine_test(test_boot_hw SOURCES tests/test_boot_hw.cpp LIBS engine_runtime)
 engine_test(test_clock SOURCES tests/test_clock.cpp LIBS engine_runtime)
 engine_test(test_devices SOURCES tests/test_devices.cpp LIBS engine_runtime)
+engine_test(test_input SOURCES tests/test_input.cpp LIBS engine_runtime)
+engine_test(test_ax SOURCES tests/test_ax.cpp LIBS engine_runtime)
 
 # Lockstep checker (development): translated code against the interpreter.
 add_library(engine_lockstep STATIC lockstep.cpp)
@@ -78,4 +80,10 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
            COMMAND ${CMAKE_COMMAND} -DBOOT=$<TARGET_FILE:mvp-boot> -DWORK=${CMAKE_BINARY_DIR} -DUNTIL=0x8035A198
                    -DENTRIES=100000000 -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/twice.cmake)
   set_tests_properties(local_boot_twice PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 600)
+  # E0c (R14): a scripted START press at frame 280 changes the run after that
+  # frame and not before; two runs with the script are identical.
+  add_test(NAME local_input_start
+           COMMAND ${CMAKE_COMMAND} -DBOOT=$<TARGET_FILE:mvp-boot> -DWORK=${CMAKE_BINARY_DIR} -DPRESS=280 -DFRAMES=290
+                   -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/input.cmake)
+  set_tests_properties(local_input_start PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 1800)
 endif()

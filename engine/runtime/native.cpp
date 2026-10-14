@@ -8,11 +8,16 @@
 namespace mvp::rt {
 
 EntryHook g_entry_hook = nullptr;
+bool g_unwinding = false;
+bool g_resume = false;
 std::uint64_t g_unwinds = 0;
+std::uint64_t g_inframe_resumes = 0;
+std::uint64_t g_resume_entries = 0;
 std::uint64_t g_interpreted = 0;
 int g_exception_depth = 0;
 u32 g_exception_lr = 0;
 NativeTable g_native;
+NativeTable g_resume_labels;
 SafeSet g_safe;
 SafeSet g_idle;
 
@@ -28,8 +33,6 @@ void SafeSet::set(const u32* addrs, std::size_t count) {
   bits_.assign((hi - lo) / 4 + 1, false);
   for (std::size_t k = 0; k < count; ++k) bits_[(addrs[k] - lo) / 4] = true;
 }
-
-void unwind(Cpu&) { throw Unwind{}; }
 
 void trap(Cpu& c, u32 address, const char* why) {
   char b[128];
@@ -57,20 +60,57 @@ GuestFn NativeTable::find(u32 address) const {
   return k < dense_.size() ? dense_[k] : nullptr;
 }
 
+u32 resume_target(Cpu& c, u32 sp, GuestFn self) {
+  if (g_resume) {  // a dispatcher re-enters this body at c.pc
+    g_resume = false;
+    return c.pc;
+  }
+  if (c.gpr[1] == sp && g_resume_labels.find(c.pc) == self) {
+    // The guest continues in this activation (same function, same stack frame):
+    // the unwind ends here, and this frame goes on natively.
+    g_unwinding = false;
+    ++g_inframe_resumes;
+    return c.pc;
+  }
+  g_unwinding = true;
+  return 0;
+}
+
 namespace {
 
 // Runs from c.pc, entering native code at translated entries, until c.pc == stop
-// (when `has_stop`) at an instruction boundary.
-void dispatch(Cpu& c, bool has_stop, u32 stop) {
+// at an instruction boundary (nested: an interpreted call made by translated
+// code), or forever (the top level). A nested loop returns as soon as an unwind
+// passes through it, so the translated frames below it unwind too; the top level
+// ends the unwind and goes on at c.pc, re-entering native code at resume labels.
+void dispatch(Cpu& c, bool nested, u32 stop) {
+  auto unwound = [&]() {
+    if (!g_unwinding) return false;
+    if (nested) return true;
+    g_unwinding = false;
+    ++g_unwinds;  // native frames are gone; continue at c.pc
+    return false;
+  };
   for (;;) {
-    if (has_stop && c.pc == stop) return;
+    if (nested && c.pc == stop) return;
     if (GuestFn fn = g_native.find(c.pc)) {
       fn(c);
+      if (unwound()) return;
       continue;
+    }
+    if (!nested) {
+      if (GuestFn fn = g_resume_labels.find(c.pc)) {
+        ++g_resume_entries;
+        g_resume = true;
+        fn(c);
+        unwound();
+        continue;
+      }
     }
     if ((c.ticks >= c.next_event && g_safe.has(c.pc)) || g_idle.has(c.pc)) {
       u32 at = c.pc;
       c.hooks->safepoint(c);
+      if (unwound()) return;
       if (c.pc != at) continue;  // an interrupt moved on to other code
     }
     ppc::step(c);
@@ -100,35 +140,28 @@ void run_handler(Cpu& c, u32 resume_pc, u32 sp) {
   // handler), always with MSR[EE] clear. An rfi that sets EE ends the exception:
   // back to the interrupted point, or into another thread. An rfi into a thread
   // that runs with EE clear keeps running here, in the interpreter, until that
-  // thread's own rfi or a translated OSLoadContext (Unwind) settles it.
-  try {
-    for (;;) {
-      if (GuestFn fn = g_native.find(c.pc)) {
-        fn(c);
-        if (c.pc == resume_pc && c.gpr[1] == sp) return;
-        continue;
+  // thread's own rfi or a translated OSLoadContext (an unwind) settles it.
+  auto at_resume = [&] { return c.pc == resume_pc && c.gpr[1] == sp; };
+  for (;;) {
+    if (GuestFn fn = g_native.find(c.pc)) {
+      fn(c);
+      if (g_unwinding) {
+        // An rfi in translated code (or a switch below it) ended the exception.
+        if (at_resume()) g_unwinding = false;
+        return;
       }
-      ppc::Op op = ppc::step(c);
-      ++g_interpreted;
-      if (op == ppc::Op::rfi && (c.msr & ppc::msr::EE)) {
-        if (c.pc == resume_pc && c.gpr[1] == sp) return;
-        throw Unwind{};  // another thread resumes
-      }
+      if (at_resume()) return;
+      continue;
     }
-  } catch (const Unwind&) {
-    if (c.pc == resume_pc && c.gpr[1] == sp) return;
-    throw;
+    ppc::Op op = ppc::step(c);
+    ++g_interpreted;
+    if (op == ppc::Op::rfi && (c.msr & ppc::msr::EE)) {
+      if (!at_resume()) g_unwinding = true;  // another thread resumes
+      return;
+    }
   }
 }
 
-void run(Cpu& c) {
-  for (;;) {
-    try {
-      dispatch(c, false, 0);
-    } catch (const Unwind&) {
-      ++g_unwinds;  // native frames are gone; continue at c.pc
-    }
-  }
-}
+void run(Cpu& c) { dispatch(c, false, 0); }
 
 }  // namespace mvp::rt

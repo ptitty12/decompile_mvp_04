@@ -6,6 +6,7 @@
 // Reads the disc from MVP_DISC (or the build's default) and config/GV4E69/symbols.txt.
 // Output describes the retail binary's structure only; it stays in the terminal
 // or under build/.
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -58,7 +59,9 @@ int main(int argc, char** argv) {
   if (cmd == "emit-cpp") {
     if (argc < 3) return 2;
     EmitOptions opt;
-    for (std::size_t k = 0; k < rt::hle_table().size(); ++k) opt.hle[rt::hle_table()[k].name] = static_cast<int>(k);
+    const auto& table = rt::hle_table();
+    for (std::size_t k = 0; k < table.size(); ++k)
+      opt.hle.push_back({table[k].name, table[k].address, static_cast<int>(k), table[k].kind == rt::HleKind::Before});
     for (int k = 3; k + 1 < argc; ++k)
       if (!std::strcmp(argv[k], "--shards")) opt.shards = std::atoi(argv[k + 1]);
     ProgramCfg p = build_cfg(in->disc.dol, in->symbols);
@@ -71,9 +74,20 @@ int main(int argc, char** argv) {
       std::fprintf(stderr, "mvp-xlat: %s\n", err.c_str());
       return 1;
     }
-    std::printf("emitted %zu functions (%zu entry points), %zu instructions, %zu bytes of C++ in %d shards\n",
-                st.functions, st.entries, st.instructions, st.bytes, opt.shards);
-    return 0;
+    std::printf("emitted %zu functions (%zu entry points, %zu resume labels), %zu instructions, %zu bytes of C++ in "
+                "%d shards\n",
+                st.functions, st.entries, st.resume_labels, st.instructions, st.bytes, opt.shards);
+    // Every replacement and hook must find its function: a rename in symbols.txt
+    // (or a wrong address) would otherwise drop it silently.
+    int missing = 0;
+    for (std::size_t k = 0; k < table.size(); ++k)
+      if (std::count(st.hle_matched.begin(), st.hle_matched.end(), static_cast<int>(k)) != 1) {
+        std::fprintf(stderr, "mvp-xlat: HLE entry %zu (%s, 0x%08X) matches %d functions, not 1\n", k, table[k].name,
+                     table[k].address,
+                     static_cast<int>(std::count(st.hle_matched.begin(), st.hle_matched.end(), static_cast<int>(k))));
+        ++missing;
+      }
+    return missing ? 1 : 0;
   }
   std::fprintf(stderr, "mvp-xlat: unknown command %s\n", cmd.c_str());
   return 2;

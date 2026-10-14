@@ -3,10 +3,22 @@
 // Calling convention of a translated function `void f_XXXXXXXX(Cpu&)`:
 // - the caller sets LR (as the guest `bl` would) and calls;
 // - the guest `blr` sets c.pc = LR & ~3 and returns;
-// - after the call the caller checks c.pc against its own return address. Any
-//   other value means guest code changed the return path (a context switch, a
-//   longjmp): the caller calls unwind(), which throws Unwind to the dispatcher,
-//   and the dispatcher resumes at c.pc in the reference interpreter (D4).
+// - after the call the caller checks c.pc against its own return address, and
+//   g_unwinding. Either one off means guest code changed the return path (a
+//   context switch, a longjmp, an rfi): the native frames are *unwinding*.
+//
+// Unwinding (D4, E0c) is plain C++ returns, no exceptions. A frame that sees an
+// unwinding return goes to its resume block: if the new guest state continues
+// in this very activation (same stack pointer as at the call, and c.pc is one of
+// this function's resume labels: a call's return address or a loop back edge),
+// it clears g_unwinding and jumps there ("resumes in frame"). Otherwise it
+// returns too, with g_unwinding set, and the next frame up tries. A dispatcher
+// (run, call_indirect's interpreter loop, run_handler) ends the unwind. The top
+// level then continues at c.pc: a function entry runs natively; a resume label
+// re-enters its function's body there (the function is called with g_resume
+// set); anything else runs in the reference interpreter. Native frames hold no
+// guest state (only the C++ stack), so whichever frame runs guest code, the
+// result is the same: these rules change speed, never behaviour.
 #pragma once
 
 #include <cstdint>
@@ -21,17 +33,25 @@ using ppc::Cpu;
 using u32 = std::uint32_t;
 using GuestFn = void (*)(Cpu&);
 
-// A translated entry point: guest address and its native function.
+// A translated entry point (or resume label): guest address and its native function.
 struct NativeEntry {
   u32 address;
   GuestFn fn;
 };
 
-// Thrown to abandon the native frames; the dispatcher resumes at c.pc.
-struct Unwind {};
+// Set while native frames return because the guest's return path changed (see
+// above). Translated code and the dispatchers keep it; nothing guest-visible.
+extern bool g_unwinding;
+// Set by a dispatcher right before calling a function at a resume label: the
+// function skips its prologue and continues at c.pc.
+extern bool g_resume;
 
-// Number of times run() resumed at c.pc after an Unwind (statistics).
+// Statistics (D4): unwinds that reached the top-level dispatcher (native frames
+// abandoned), unwinds that ended in a live frame of the same activation, and
+// re-entries of a function body at a resume label.
 extern std::uint64_t g_unwinds;
+extern std::uint64_t g_inframe_resumes;
+extern std::uint64_t g_resume_entries;
 
 // Optional hook run at every translated function entry (tracing, lockstep).
 using EntryHook = void (*)(Cpu&, u32 address);
@@ -66,11 +86,13 @@ inline void safepoint_check(Cpu& c) {
   if (c.ticks >= c.next_event) c.hooks->safepoint(c);
 }
 
-[[noreturn]] void unwind(Cpu& c);
+// An unwinding return starts here: translated code calls this and returns.
+inline void leave() { g_unwinding = true; }
+
 [[noreturn]] void trap(Cpu& c, u32 address, const char* why);
 
 // Calls the guest function at `target` (LR already set): native if translated,
-// otherwise in the interpreter until it returns to LR.
+// otherwise in the interpreter until it returns to LR (or an unwind passes).
 void call_indirect(Cpu& c, u32 target);
 // bla to an address outside the DOL (code the OS installs in low memory).
 void absolute_call(Cpu& c, u32 target);
@@ -88,19 +110,27 @@ class NativeTable {
   std::vector<GuestFn> dense_;  // (address - base) / 4
 };
 extern NativeTable g_native;
+// Resume labels: address -> the function (its first entry) whose body has it.
+extern NativeTable g_resume_labels;
+
+// A translated function's resume block: whether to continue at c.pc in this
+// frame. Returns c.pc when it should (a dispatcher's g_resume, or an unwind that
+// arrives at one of `self`'s resume labels with the stack pointer `sp` the frame
+// had at its call or safe point), else 0 with g_unwinding set (keep returning).
+u32 resume_target(Cpu& c, u32 sp, GuestFn self);
 
 // Runs guest code from c.pc. Whenever c.pc is a translated entry point, the
-// native function runs; anything else, and the frames left after an Unwind, run
-// in the reference interpreter, which enters native code again as soon as it
-// reaches a translated entry. Returns only by exception (GuestFault, or whatever
-// an Io handler or hook throws to stop the run).
+// native function runs; a resume label re-enters its function's body; anything
+// else runs in the reference interpreter. Returns only by exception (GuestFault,
+// or whatever an Io handler or hook throws to stop the run).
 void run(Cpu& c);
 
-// Runs an exception handler entered at c.pc (SRR0/SRR1 set) until it returns to
-// the interrupted point: an rfi back to `resume_pc` with the stack pointer `sp`.
-// If it resumes anything else (the scheduler switched threads), the native frames
-// of the interrupted thread are abandoned: throws Unwind with c.pc at the new
-// thread, and run() continues there.
+// Runs an exception handler entered at c.pc (SRR0/SRR1 set) until the exception
+// ends: an rfi that sets MSR[EE] in the interpreter, or an rfi in translated code
+// (OSLoadContext), whose unwind ends here. Back at the interrupted point (an rfi
+// to `resume_pc` with the stack pointer `sp`) it returns normally; anywhere else
+// (the scheduler switched threads) it returns with g_unwinding set and c.pc at
+// the new thread, and the interrupted frames unwind from their safe point.
 void run_handler(Cpu& c, u32 resume_pc, u32 sp);
 
 // Instructions run by the interpreter in run() and run_handler(), for the

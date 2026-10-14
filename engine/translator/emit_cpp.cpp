@@ -57,6 +57,13 @@ std::string op_ident(Op op) {
   }
 }
 
+// The replacement or hook for a function: by address when the spec has one, else by name.
+const HleSpec* find_hle(const EmitOptions& o, const FunctionCfg& f) {
+  for (const HleSpec& h : o.hle)
+    if (h.address ? h.address == f.start : h.name == f.sym->name) return &h;
+  return nullptr;
+}
+
 class Writer {
  public:
   explicit Writer(const EmitOptions& o) : opt_(o) {}
@@ -72,18 +79,41 @@ class Writer {
     bool multi = f.entries.size() > 1;
     if (multi) labels.insert(f.entries.begin(), f.entries.end());
 
-    auto hle = opt_.hle.find(f.sym->name);
-    int hle_id = hle != opt_.hle.end() && !multi ? hle->second : -1;
-    out_ << "// " << f.sym->name << (hle_id >= 0 ? " (replaced: runtime/hle.h)" : "") << "\n";
+    const HleSpec* spec = find_hle(opt_, f);
+    if (spec && multi) spec = nullptr;  // not supported on functions with secondary entries
+    if (spec) stats_.hle_matched.push_back(spec->index);
+    int hle_id = spec && !spec->before ? spec->index : -1;
+    int hook_id = spec && spec->before ? spec->index : -1;
+    // Resume labels (runtime/native.h): every call's return address and every
+    // back edge inside the function, where an unwind may continue natively.
+    resume_.clear();
+    if (hle_id < 0) {
+      std::set<u32> entries(f.entries.begin(), f.entries.end());
+      auto add = [&](u32 a) {
+        if (f.contains(a) && f.reachable[(a - f.start) / 4] && !entries.count(a)) resume_.insert(a);
+      };
+      for (u32 a : f.resume_points) add(a);
+      for (u32 a : f.back_edges) add(a);
+    }
+    labels.insert(resume_.begin(), resume_.end());
+    const std::string self = fname(f.start), body = "b_" + self.substr(2);
+    miss_ = resume_.empty() ? "{ rt::leave(); return; }" : "goto R_;";
+
+    out_ << "// " << f.sym->name << (hle_id >= 0 ? " (replaced: runtime/hle.h)" : hook_id >= 0 ? " (hooked: runtime/hle.h)" : "")
+         << "\n";
     if (hle_id >= 0) {
-      out_ << "static void " << fname(f.start) << "_orig(Cpu& c) {\n";
+      out_ << "static void " << self << "_orig(Cpu& c) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
     } else if (multi) {
-      out_ << "static void b_" << std::string(fname(f.start)).substr(2) << "(Cpu& c, u32 entry) {\n";
+      out_ << "static void " << body << "(Cpu& c, u32 entry) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
       out_ << "  switch (entry) {\n";
+      if (!resume_.empty()) out_ << "    case 0: goto R_;\n";
       for (u32 e : f.entries) out_ << "    case " << h8(e) << ": goto " << label(e) << ";\n";
       out_ << "    default: rt::trap(c, entry, \"bad entry\");\n  }\n";
     } else {
-      out_ << "void " << fname(f.start) << "(Cpu& c) {\n" << entry_prologue(f.start);
+      out_ << "void " << self << "(Cpu& c) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
+      if (!resume_.empty()) out_ << "  if (rt::g_resume) goto R_;\n";
+      out_ << entry_prologue(f.start, miss_);
+      if (hook_id >= 0) out_ << "  rt::hle_before(c, " << hook_id << ");\n";
     }
     back_edges_.clear();
     back_edges_.insert(f.back_edges.begin(), f.back_edges.end());
@@ -108,22 +138,36 @@ class Writer {
         out_ << "  rt::trap(c, " << h8(f.end) << ", \"ran off the end of a function\");\n";
       }
     }
+    if (!resume_.empty()) {
+      // The resume block: an unwind arriving in this frame, or a dispatcher
+      // re-entering the body at a resume label.
+      out_ << "R_:\n  switch (rt::resume_target(c, sp, &" << self << ")) {\n";
+      for (u32 a : resume_) out_ << "    case " << h8(a) << ": goto " << label(a) << ";\n";
+      out_ << "    case 0: return;\n    default: rt::trap(c, c.pc, \"no resume label\");\n  }\n";
+      for (u32 a : resume_) resume_table_.push_back({a, f.start});
+      stats_.resume_labels += resume_.size();
+    }
     out_ << "}\n";
+    const std::string leave = "{ rt::leave(); return; }";
     if (hle_id >= 0) {
-      out_ << "void " << fname(f.start) << "(Cpu& c) {\n" << entry_prologue(f.start) << "  rt::hle_call(c, "
-           << hle_id << ", &" << fname(f.start) << "_orig);\n}\n";
+      out_ << "void " << self << "(Cpu& c) {\n" << entry_prologue(f.start, leave) << "  rt::hle_call(c, " << hle_id
+           << ", &" << self << "_orig);\n}\n";
       ++stats_.hle_stubs;
     }
     if (multi) {
       for (u32 e : f.entries) {
-        out_ << "void " << fname(e) << "(Cpu& c) {\n" << entry_prologue(e) << "  b_"
-             << std::string(fname(f.start)).substr(2) << "(c, " << h8(e) << ");\n}\n";
+        out_ << "void " << fname(e) << "(Cpu& c) {\n";
+        if (e == f.start && !resume_.empty()) out_ << "  if (rt::g_resume) {\n    " << body << "(c, 0);\n    return;\n  }\n";
+        out_ << entry_prologue(e, leave) << "  " << body << "(c, " << h8(e) << ");\n}\n";
       }
     }
     out_ << "\n";
     ++stats_.functions;
     stats_.entries += f.entries.size();
   }
+
+  // (label, function start) for every resume label emitted so far.
+  const std::vector<std::pair<u32, u32>>& resume_table() const { return resume_table_; }
 
   std::string take() {
     std::string s = out_.str();
@@ -144,13 +188,16 @@ class Writer {
 
   // Function entry: the PC, the entry hook, then the entry safe point (before the
   // first instruction runs). An interrupt there that switches threads unwinds.
-  static std::string entry_prologue(u32 e) {
+  static std::string entry_prologue(u32 e, const std::string& miss) {
     return "  c.pc = " + h8(e) + ";\n  rt::on_entry(c, " + h8(e) + ");\n  rt::safepoint_check(c);\n  if (c.pc != " +
-           h8(e) + ") rt::unwind(c);\n";
+           h8(e) + " || rt::g_unwinding) " + miss + "\n";
   }
 
+  // A call: the frame's stack pointer for the resume check, the call, and the
+  // return check (runtime/native.h).
   void call_and_check(u32 ret, const std::string& call, const std::string& indent) {
-    out_ << indent << call << "\n" << indent << "if (c.pc != " << h8(ret) << ") rt::unwind(c);\n";
+    out_ << indent << "sp = c.gpr[1];\n" << indent << call << "\n" << indent << "if (c.pc != " << h8(ret)
+         << " || rt::g_unwinding) " << miss_ << "\n";
   }
 
   void emit_insn(const FunctionCfg& f, const InsnInfo& x, const FunctionIndex& fx) {
@@ -161,9 +208,11 @@ class Writer {
     // The PC, the back-edge safe point (before the branch runs), and the virtual clock.
     if (opt_.pc_per_insn || back_edges_.count(a)) out_ << "  c.pc = " << h8(a) << ";\n";
     if (idle_.count(a))
-      out_ << "  c.hooks->safepoint(c);\n  if (c.pc != " << h8(a) << ") rt::unwind(c);\n";
+      out_ << "  sp = c.gpr[1];\n  c.hooks->safepoint(c);\n  if (c.pc != " << h8(a) << " || rt::g_unwinding) " << miss_
+           << "\n";
     else if (back_edges_.count(a))
-      out_ << "  rt::safepoint_check(c);\n  if (c.pc != " << h8(a) << ") rt::unwind(c);\n";
+      out_ << "  sp = c.gpr[1];\n  rt::safepoint_check(c);\n  if (c.pc != " << h8(a) << " || rt::g_unwinding) "
+           << miss_ << "\n";
     out_ << "  ++c.ticks;\n";
     const std::string cond = "sem::branch_cond(c, " + insn(w) + ")";
     switch (x.flow) {
@@ -171,7 +220,7 @@ class Writer {
         switch (x.op) {
           case Op::sc:
             out_ << "  c.pc = " << h8(ret) << ";\n  c.hooks->system_call(c);\n  if (c.pc != " << h8(ret)
-                 << ") rt::unwind(c);\n";
+                 << " || rt::g_unwinding) " << miss_ << "\n";
             return;
           case Op::tw:
             out_ << "  if (sem::tw_taken(c, " << insn(w) << ")) rt::trap(c, " << h8(a) << ", \"tw\");\n";
@@ -245,8 +294,8 @@ class Writer {
         out_ << "  c.lr = " << h8(ret) << ";\n";
         call_and_check(ret, "rt::absolute_call(c, " + h8(x.target) + ");", "  ");
         return;
-      case Flow::Rfi:
-        out_ << "  sem::rfi(c);\n  rt::unwind(c);\n";
+      case Flow::Rfi:  // the guest continues at SRR0: unwind (runtime/native.h)
+        out_ << "  sem::rfi(c);\n  rt::leave();\n  return;\n";
         return;
       case Flow::Trap:
         out_ << "  rt::trap(c, " << h8(a) << ", \""
@@ -260,6 +309,9 @@ class Writer {
   EmitStats stats_;
   std::set<u32> back_edges_;  // of the function being emitted
   std::set<u32> idle_;        // its pure spin back edges
+  std::set<u32> resume_;      // its resume labels
+  std::string miss_;          // what an unwinding return does in it
+  std::vector<std::pair<u32, u32>> resume_table_;
 };
 
 const char* kPrelude =
@@ -352,9 +404,9 @@ bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& op
   table << "\n};\n\nstatic const mvp::rt::HleSite kHle[] = {\n";
   std::size_t hle_sites = 0;
   for (const auto& f : p.functions) {
-    auto it = opt.hle.find(f.sym->name);
-    if (it == opt.hle.end() || f.entries.size() > 1) continue;
-    table << "  {" << h8(f.start) << ", " << it->second << "},\n";
+    const HleSpec* spec = find_hle(opt, f);
+    if (!spec || spec->before || f.entries.size() > 1) continue;
+    table << "  {" << h8(f.start) << ", " << spec->index << "},\n";
     ++hle_sites;
   }
   if (!hle_sites) table << "  {0, -1},\n";
@@ -365,10 +417,17 @@ bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& op
   table << "};\n\nstatic const std::uint32_t kIdle[] = {\n";
   for (u32 a : idle) table << "  " << h8(a) << ",\n";
   if (idle.empty()) table << "  0,\n";
+  // Resume labels (runtime/native.h): address -> the function whose body has it.
+  table << "};\n\nstatic const mvp::rt::NativeEntry kResume[] = {\n";
+  std::vector<std::pair<u32, u32>> resume = w.resume_table();
+  std::sort(resume.begin(), resume.end());
+  for (const auto& [a, fs] : resume) table << "  {" << h8(a) << ", &" << fname(fs) << "},\n";
+  if (resume.empty()) table << "  {0, nullptr},\n";
   table << "};\n\nvoid mvp_register_game() {\n"
         << "  mvp::rt::g_native.set(kEntries, sizeof kEntries / sizeof kEntries[0]);\n"
         << "  mvp::rt::g_safe.set(kSafe, sizeof kSafe / sizeof kSafe[0]);\n"
         << "  mvp::rt::g_idle.set(kIdle, " << idle.size() << ");\n"
+        << "  mvp::rt::g_resume_labels.set(kResume, " << resume.size() << ");\n"
         << "  mvp::rt::set_hle_sites(kHle, " << hle_sites << ");\n}\n";
   bytes += table.str().size();
   if (!write(fs::path(dir) / "game_table.cpp", table.str(), error)) return false;
