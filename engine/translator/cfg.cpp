@@ -400,8 +400,24 @@ void walk(FunctionCfg& f, const FunctionIndex& fx) {
     if (!f.reachable[k]) continue;
     const InsnInfo& x = f.insns[k];
     if (is_call(x.flow)) f.resume_points.push_back(x.addr + 4);
-    if ((x.flow == Flow::Jump || x.flow == Flow::CondJump) && f.contains(x.target) && x.target <= x.addr)
+    if ((x.flow == Flow::Jump || x.flow == Flow::CondJump) && f.contains(x.target) && x.target <= x.addr) {
       f.back_edges.push_back(x.addr);
+      // A pure spin: only loads and compares between the target and this branch,
+      // which does not count down CTR (a bdnz loop ends by itself).
+      if ((x.addr - x.target) / 4 + 1 <= 4 && (x.op == Op::b || (ppc::Insn{x.word}.bo() & 4))) {
+        bool pure = true;
+        for (u32 a = x.target; a < x.addr && pure; a += 4) {
+          switch (f.at(a).op) {
+            case Op::lbz: case Op::lhz: case Op::lha: case Op::lwz: case Op::lbzx: case Op::lhzx: case Op::lhax:
+            case Op::lwzx: case Op::cmp: case Op::cmpi: case Op::cmpl: case Op::cmpli:
+              break;
+            default:
+              pure = false;
+          }
+        }
+        if (pure) f.idle_spins.push_back(x.addr);
+      }
+    }
     if (x.flow == Flow::JumpTable)
       for (const auto& jt : f.tables)
         if (jt.site == x.addr)
@@ -507,6 +523,7 @@ ProgramCfg build_cfg(const vfs::Dol& dol, const SymbolTable& syms) {
     }
     p.resume_points += f.resume_points.size();
     p.back_edges += f.back_edges.size();
+    p.idle_spins += f.idle_spins.size();
     p.secondary_entries += f.entries.size() - 1;
     p.falls_into_next += f.falls_into ? 1 : 0;
     p.expected_traps += f.expected_traps.size();

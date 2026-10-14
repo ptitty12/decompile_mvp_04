@@ -103,7 +103,7 @@ struct State {
     ppc::Cpu& c = ref->cpu();
     u32 pc = c.pc;
     xlat::Flow fl = map.in(pc) ? map.flow[(pc - map.base) / 4] : xlat::Flow::Plain;
-    if (c.ticks >= c.next_event && g_safe.has(pc)) c.hooks->safepoint(c);
+    if ((c.ticks >= c.next_event && g_safe.has(pc)) || g_idle.has(pc)) c.hooks->safepoint(c);
     if (c.pc != pc) return xlat::Flow::Rfi;  // the safe point moved the PC (an interrupt)
     if (hle_interpret(c)) return xlat::Flow::Return;  // a replacement returns like a blr
     ppc::step(c);

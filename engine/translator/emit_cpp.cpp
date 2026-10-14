@@ -87,6 +87,8 @@ class Writer {
     }
     back_edges_.clear();
     back_edges_.insert(f.back_edges.begin(), f.back_edges.end());
+    idle_.clear();
+    idle_.insert(f.idle_spins.begin(), f.idle_spins.end());
     bool prev_falls = false;
     for (std::size_t k = 0; k < f.insns.size(); ++k) {
       if (!f.reachable[k]) {
@@ -158,7 +160,10 @@ class Writer {
     out_ << "  // " << ppc::disasm(w, a) << "\n";
     // The PC, the back-edge safe point (before the branch runs), and the virtual clock.
     if (opt_.pc_per_insn || back_edges_.count(a)) out_ << "  c.pc = " << h8(a) << ";\n";
-    if (back_edges_.count(a)) out_ << "  rt::safepoint_check(c);\n  if (c.pc != " << h8(a) << ") rt::unwind(c);\n";
+    if (idle_.count(a))
+      out_ << "  c.hooks->safepoint(c);\n  if (c.pc != " << h8(a) << ") rt::unwind(c);\n";
+    else if (back_edges_.count(a))
+      out_ << "  rt::safepoint_check(c);\n  if (c.pc != " << h8(a) << ") rt::unwind(c);\n";
     out_ << "  ++c.ticks;\n";
     const std::string cond = "sem::branch_cond(c, " + insn(w) + ")";
     switch (x.flow) {
@@ -254,6 +259,7 @@ class Writer {
   std::ostringstream out_;
   EmitStats stats_;
   std::set<u32> back_edges_;  // of the function being emitted
+  std::set<u32> idle_;        // its pure spin back edges
 };
 
 const char* kPrelude =
@@ -352,9 +358,17 @@ bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& op
     ++hle_sites;
   }
   if (!hle_sites) table << "  {0, -1},\n";
+  // Pure spin back edges (the idle skip).
+  std::vector<u32> idle;
+  for (const auto& f : p.functions) idle.insert(idle.end(), f.idle_spins.begin(), f.idle_spins.end());
+  std::sort(idle.begin(), idle.end());
+  table << "};\n\nstatic const std::uint32_t kIdle[] = {\n";
+  for (u32 a : idle) table << "  " << h8(a) << ",\n";
+  if (idle.empty()) table << "  0,\n";
   table << "};\n\nvoid mvp_register_game() {\n"
         << "  mvp::rt::g_native.set(kEntries, sizeof kEntries / sizeof kEntries[0]);\n"
         << "  mvp::rt::g_safe.set(kSafe, sizeof kSafe / sizeof kSafe[0]);\n"
+        << "  mvp::rt::g_idle.set(kIdle, " << idle.size() << ");\n"
         << "  mvp::rt::set_hle_sites(kHle, " << hle_sites << ");\n}\n";
   bytes += table.str().size();
   if (!write(fs::path(dir) / "game_table.cpp", table.str(), error)) return false;

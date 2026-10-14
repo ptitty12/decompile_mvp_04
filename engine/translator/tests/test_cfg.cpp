@@ -124,6 +124,26 @@ TEST_CASE("unreachable words and running off the end") {
   CHECK(p.functions[1].errors[0].find("past the end") != std::string::npos);
 }
 
+TEST_CASE("back edges and idle spins") {
+  // h1: 0: lwz r3, 0(r4) / 4: cmpwi r3, 0 / 8: beq 0     (a pure spin: idle)
+  //     c: lwz r5, 0(r4) / 10: bdnz c                    (counts down CTR: not idle)
+  //     14: addi r6, r6, 1 / 18: cmpwi r6, 9 / 1c: blt 14 (does work: not idle)
+  //     20: blr
+  Image im;
+  im.text = {D(32, 3, 4, 0), D(11, 0, 3, 0), B(12, 2, -8), D(32, 5, 4, 0), B(16, 0, -4),
+             D(14, 6, 6, 1), D(11, 0, 6, 9), B(12, 0, -8), X(19, 20, 0, 0, 16)};
+  im.data = {0};
+  SymbolTable st = SymbolTable::parse("h1 = .text:0x80003100; // type:function size:0x24\n");
+  auto dol = im.dol();
+  ProgramCfg p = build_cfg(dol, st);
+  REQUIRE(p.functions.size() == 1);
+  const FunctionCfg& f = p.functions[0];
+  CHECK(f.errors.empty());
+  CHECK(f.back_edges == std::vector<u32>{kText + 8, kText + 0x10, kText + 0x1C});
+  CHECK(f.idle_spins == std::vector<u32>{kText + 8});
+  CHECK(p.idle_spins == 1);
+}
+
 TEST_CASE("secondary entries, gap functions, running into the next function, expected traps") {
   // h1 @0: bl into h2's body (+8); bl gap (a code label outside every function);
   //        then a call to h3 that does not return, followed by an invalid word.

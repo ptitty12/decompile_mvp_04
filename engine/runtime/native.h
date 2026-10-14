@@ -58,6 +58,9 @@ class SafeSet {
   std::vector<bool> bits_;
 };
 extern SafeSet g_safe;
+// Back edges of pure spin loops: the safe point runs on every pass there (the
+// runtime may skip virtual time to the next event), not only when an event is due.
+extern SafeSet g_idle;
 
 inline void safepoint_check(Cpu& c) {
   if (c.ticks >= c.next_event) c.hooks->safepoint(c);
@@ -92,5 +95,22 @@ extern NativeTable g_native;
 // reaches a translated entry. Returns only by exception (GuestFault, or whatever
 // an Io handler or hook throws to stop the run).
 void run(Cpu& c);
+
+// Runs an exception handler entered at c.pc (SRR0/SRR1 set) until it returns to
+// the interrupted point: an rfi back to `resume_pc` with the stack pointer `sp`.
+// If it resumes anything else (the scheduler switched threads), the native frames
+// of the interrupted thread are abandoned: throws Unwind with c.pc at the new
+// thread, and run() continues there.
+void run_handler(Cpu& c, u32 resume_pc, u32 sp);
+
+// Instructions run by the interpreter in run() and run_handler(), for the
+// interpreted-share statistic (D4, E0b item 9).
+extern std::uint64_t g_interpreted;
+// While an interrupt is being handled: the depth (1 inside a handler) and the
+// interrupted code's LR. Function entries reached with LR still equal to it were
+// reached from the vector by rfi and by branches, not by calls (tools that
+// attribute entries to call sites use this).
+extern int g_exception_depth;
+extern u32 g_exception_lr;
 
 }  // namespace mvp::rt

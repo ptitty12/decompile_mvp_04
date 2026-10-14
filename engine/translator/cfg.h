@@ -89,6 +89,10 @@ struct FunctionCfg {
   std::vector<JumpTable> tables;
   std::vector<std::uint32_t> resume_points;  // return address of every call site
   std::vector<std::uint32_t> back_edges;     // branches to an earlier local address (safe points)
+  // Back edges of pure spin loops (at most 4 instructions: loads, compares and the
+  // branch): the guest is waiting for an interrupt, so the runtime may skip
+  // virtual time to the next event there (the idle skip, E0b item 9).
+  std::vector<std::uint32_t> idle_spins;
   std::vector<std::uint32_t> entries;        // the start, plus secondary entry points other code calls
   std::uint32_t falls_into = 0;              // next function's start, when execution can run off the end
   // Invalid words that execution can reach only as a function's first word (a
@@ -108,7 +112,8 @@ struct ProgramCfg {
   // Summary counts.
   std::size_t words = 0, reachable_words = 0, blocks = 0, calls = 0, tail_calls = 0, indirect_calls = 0,
               jump_tables = 0, indirect_jumps = 0, absolute_calls = 0, resume_points = 0, back_edges = 0,
-              secondary_entries = 0, falls_into_next = 0, expected_traps = 0, gap_functions = 0, errors = 0;
+              secondary_entries = 0, falls_into_next = 0, expected_traps = 0, gap_functions = 0, idle_spins = 0,
+              errors = 0;
   std::vector<std::string> error_list;  // "function: message"
 };
 

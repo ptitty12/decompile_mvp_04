@@ -16,8 +16,12 @@ A later session resumes from "Next step".
 | 6 | IR and C++ emitter | Done | see git log |
 | 7 | Boot environment | Done | see git log |
 | 8 | HLE boundary and SDK log | Done | see git log |
-| 9 | Virtual clock, interrupts, threads (D4) | | |
-| 10 | Devices to the first retrace | | |
+| 9 | Virtual clock, interrupts, threads (D4) | Done (one commit with 10) | see git log |
+| 10 | Devices to the first retrace | Done (one commit with 9) | see git log |
+
+Items 9 and 10 share one commit: item 9's exit (all four `OSCreateThread` sites)
+is only reachable with item 10's devices (the fourth thread is created after the
+game has loaded data from the disc, started AX and initialized CARD).
 
 ## How to build and test (agents)
 
@@ -43,7 +47,7 @@ A later session resumes from "Next step".
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
 | `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler (`isa.h`, `decode.cpp`, `disasm.cpp`); CPU state, guest memory page table, runtime hooks (`cpu.h`, `mem_access.h`); floating-point core (`fp.h/.cpp`); per-opcode semantics (`sem.h`); reference interpreter (`interp.h/.cpp`). Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
 | `engine/translator/` | Symbol map parser (`symbols.h/.cpp`), function and CFG recovery (`cfg.h/.cpp`), input loading (`program.h/.cpp`), `mvp-xlat` CLI |
-| `engine/runtime/` | `native.h/.cpp` (what translated code calls: entry hook, unwind, indirect calls, the entry table, the run loop), `machine.h/.cpp` (MEM1, DOL loading, real-mode mapping, the code-intact check), `boot.h/.cpp` (IPL/apploader environment), `hw.h/.cpp` (hardware registers and device models), `sys_hooks.h/.cpp` (CPU hooks), `lockstep.h/.cpp` (translated vs interpreter checker), `mvp-boot` CLI |
+| `engine/runtime/` | `native.h/.cpp` (what translated code calls: entry hook, unwind, indirect calls, the entry table, the run loop, the exception-handler loop), `machine.h/.cpp` (MEM1, DOL loading, real-mode mapping, the code-intact check), `boot.h/.cpp` (IPL/apploader environment), `hw.h/.cpp` (hardware registers and device models), `gx_fifo.h/.cpp` (GX command stream parser), `sys_hooks.h/.cpp` (CPU hooks: virtual clock, decrementer, interrupt delivery, idle skip), `hle.h/.cpp` (replacements by name), `lockstep.h/.cpp` (translated vs interpreter checker), `mvp-boot` CLI, `tools/twice.cmake` (two-run determinism check) |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -357,6 +361,157 @@ A later session resumes from "Next step".
   land on main between the listing build and this worktree no longer break the
   check.
 
+### 9. Virtual clock, interrupts and threads (done, with item 10)
+
+- **Virtual clock** (`runtime/sys_hooks.h`, DETERMINISM R1): `c.ticks` counts guest
+  instructions started (translated code and interpreter alike). The time base is
+  `offset + ticks x cpi / 12` with `cpi = 2` CPU cycles per instruction (486 MHz CPU,
+  time base at 1/12: 243 million instructions per guest second). `mttb` moves the
+  offset. The decrementer is a value written at a time base: it fires when it
+  turns negative (one tick after reaching 0); a negative write is pending at once.
+  Host time never enters.
+- **Interrupts** (R4): delivered only at safe points (every function entry and
+  every loop back edge, already emitted in item 8) while MSR[EE] is set, external
+  (PI cause & mask) before decrementer. Delivery is the hardware's: SRR0/SRR1, the
+  new MSR (real mode), and the OS's own vector code at 0x500/0x900, run by
+  `rt::run_handler` in the interpreter (it is low-memory code the OS copied, not
+  DOL code), entering translated code at function entries. The exception ends with
+  the first `rfi` that sets EE: back at the interrupted point and stack, the
+  handler returns into the interrupted native frame; anywhere else (the scheduler
+  picked another thread), it throws `Unwind` and `rt::run` resumes the new thread
+  at its PC (D4). The vector stub's own `rfi` into the handler keeps EE clear, so
+  it does not end the exception (an earlier rule, "first rfi", treated every
+  interrupt as a thread switch).
+- **Events**: `SystemHooks::reschedule` sets `c.next_event` to the earliest of the
+  decrementer, the hardware's next event (`Hardware::next_event_tb`: VI display
+  interrupts, DVD completion, AI sample counter edge, AI DMA block, DSP mail) and
+  the instruction budget; with EE set and a cause pending, the next safe point. A
+  register write that may raise or unmask a cause makes the CPU check at its next
+  safe point (`Hardware::kick`).
+- **Idle skip**: the CFG marks pure spin loops (back edge of at most 4 instructions,
+  only loads and compares before the branch, and no CTR count-down: 13 in the DOL,
+  among them SelectThread's idle loop, two in `__AI_SRC_INIT`, the AX init wait
+  and a deliberate `bne .` hang in EA's GX ring). Their back edge runs the safe
+  point on every pass; when the
+  branch is about to be taken, EE is set and nothing is pending, virtual time jumps
+  to the next event. The pass that leaves the loop skips nothing. `local_cfg`
+  reports the count.
+- **SDK log**: a function entry reached from an exception vector (LR still equal to
+  the interrupted code's LR, `rt::g_exception_depth`) is not a call; `blrl` call
+  sites are checked against the register of the `mtlr` just before. Without this,
+  `ExternalInterruptHandler`'s branch into `__OSDispatchInterrupt` was logged as a
+  call from whatever game code was interrupted.
+- **Exit evidence (2026-10-14)**: `mvp-boot run --until 0x8035A198` (the entry of
+  the fifth guest thread, the memory-card worker) twice, `local_boot_twice`:
+  - **all four `OSCreateThread` sites run**, each followed by `OSResumeThread`:
+    `ttInit` (fn_8040015C, EA tick thread, TH2), `initfiledev` (fn_803FEE70, file
+    I/O thread, TH3), `SNDPLATFORM_init` (fn_803AF61C, EA SND thread, TH4),
+    `THREAD_createparam` (fn_803FFE3C, EA's thread wrapper, here for the
+    memory-card worker TH5), and TH5 reaches its entry fn_8035A198;
+  - at that point: 9.796 s of guest time (2,380,543,064 instructions counted, of
+    them 736,193,092 skipped by 1,598 idle skips), 585 VI fields, 5,010 external
+    and 585 decrementer interrupts, 30,396,154 translated function entries;
+  - **thread switches: 6,265, 10.71 per VI field** (counted as changes of the OS's
+    current-thread pointer at 0x800000E4 between two non-idle threads);
+  - **interpreted share: 193,214,000 instructions, 11.75 % of those run** (the
+    vector code, handler paths that run with EE clear, and code resumed after an
+    unwind until the next function entry);
+  - 46,288 unwinds, 7.4 per switch: OSYieldThread and SelectThread reload the
+    *same* thread's context through OSLoadContext's `rfi` far more often than they
+    switch, and each reload unwinds the native frames (see Next step);
+  - **two runs give identical reports and identical SDK logs**: 5,921,933 boundary
+    calls into 178 SDK functions, all named, log 203,393,662 bytes, sha1
+    `db1ddedddcc8a2c7449d37c6017d6f5e44295b6e` with the symbols.txt of origin/main
+    c9650bf9 (the log holds names, so renames change the hash; before the rebase,
+    with older names, the same run gave `8f517eb1...`, 182,244,939 bytes, and
+    identical counts). The log stays in build/;
+  - host time about 22 s per run (`/Od` translated code, the per-entry trace on).
+- CI: `test_clock` (time base and decrementer arithmetic; decrementer interrupts
+  through a real-mode handler at 0x900 at a loop back edge, counted and re-armed;
+  the idle skip with its exact tick accounting and no skip on the leaving pass; VI
+  display interrupts at their lines and the PI cause/mask), `test_translator_cfg`
+  (back edges and idle spins: a pure spin, a `bdnz` loop and a working loop).
+
+### 10. Devices to the first retrace (done, with item 9)
+
+All in `runtime/hw.h/.cpp` unless noted; every timing is a constant of the
+configuration, so both peers compute the same events.
+
+- **VI**: display interrupts DI0-DI3 at their programmed lines; a frame is
+  1,351,350 time-base ticks (two fields of 675,675, R2) of 525 lines; the beam
+  position (VCT) follows the clock.
+- **PE**: draw done (BP 0x45) and tokens (BP 0x47/0x48) set the PE interrupt status
+  bits at the moment the GP reads them; token register; enables and
+  write-1-to-clear acknowledgement; PI causes 0x200/0x400.
+- **GX FIFO** (R11): the write-gather pipe collects 32 bytes and writes them to
+  the CPU FIFO in memory at the PI write pointer (wrapping at the FIFO end, with the
+  wrap bit). With the CP linked, the GP reads from its read pointer up to the
+  write pointer at once (an infinitely fast GPU), so tokens and draw-done take
+  effect at 32-byte burst boundaries, a deterministic point. The GP stops at an
+  enabled breakpoint until software moves or disables it; status (idle, watermarks,
+  breakpoint) and the CP interrupt (0x800) follow the registers the SDK's
+  GXCPInterruptHandler reads. EA's draw-sync ring (fn_803D9774 records the FIFO
+  write pointer and enables a breakpoint there; the breakpoint callback runs the
+  frame-swap callback fn_803D8828) depends on exactly this: without the
+  breakpoint, the second frame waited forever for its swap message.
+- **GX stream parser** (`runtime/gx_fifo.h`): command lengths from the public GX
+  format (NOP, CP load, XF load, indexed XF loads, display list call, vertex cache
+  invalidation, BP load, primitives sized from the current VCD/VAT), display lists
+  run from memory; nothing is drawn. A byte that starts no command would lose the
+  stream; it never happens on this path (0 parse losses, 0 bad lists).
+- **DI** (R7): the drive reads the disc image through `vfs::Source`. Commands
+  modeled: read (0xA8, including the disc-ID read), inquiry (0x12, fixed drive info),
+  seek, request error, audio-stream status and configuration, stop motor; any other
+  command stops the run. A command completes 1 ms after it starts plus its length
+  at 3 MiB/s (`HardwareConfig::di_latency_tb`, `di_tb_per_kib`), DMAs into MEM1,
+  raises TCINT. Break aborts with BRKINT. The cover is closed.
+- **AI**: the streaming sample counter counts at 32 or 48 kHz of virtual time while
+  playing (`__AI_SRC_INIT` times its edges and checks the interval); AI DMA plays a
+  block of `len x 32` bytes of 16-bit stereo at the DSP rate (AICR bit 6: 32 kHz)
+  and raises AIDINT at each block start; bytes-left reads follow the clock. No
+  streaming-audio interrupt (AIIT) is modeled.
+- **DSP** (R8, without running DSP code): the mailbox to the DSP is taken at once
+  (the hardware's valid bit is set by the low-half write); mails from the DSP wait
+  in time order and only one sits in the mailbox. The first unhalt after reset is
+  the IPL init microcode (mail 0x80544348), later ones the boot ROM (0x8071FEED);
+  `__DSP_boot_task`'s ten mails start the task, which mails 0xDCD10000 (init)
+  0.1 ms later with DSPINT; each AX command list (0xBABExxxx and its address) is
+  answered with 0xDCD10002 (yield) after 0.5 ms; 0xCDD10003 resumes. Any other
+  mail stops the run. The mix is not computed and voice parameter blocks are not
+  updated (see Next step). ARAM: the controller reports ready (0x5016 bit 0).
+- **SI**: registers store and read back (no controllers); **EXI**: as in item 7.
+- `mvp-boot` reports DI, DSP, AI and GX counts; `--fifo FILE` dumps the first MiB
+  of the GP's stream (build/ only); `--until` takes a name or `0x` address;
+  `--unnamed log` logs unnamed SDK callees and continues.
+- **Exit evidence (2026-10-14)**, same runs as item 9:
+  - `VIWaitForRetrace` returns after the first retrace (twice in GfxInit), then the
+    game's frame loop runs: 18 draw-done, 37 primitives, 4,749 GX commands, 18,176
+    bytes through the write-gather pipe by the time TH5 starts;
+  - 543 DVD commands, 9,035,552 bytes read; 1,902 AX frames answered and 1,902 AI
+    DMA blocks; OSReport shows the SDK banners through AR, ARQ, AI, AX, DSP and
+    CARD;
+  - **the SDK log is complete**: every boundary call names its callee (178
+    functions);
+  - two runs byte-identical (item 9).
+- **No unnamed SDK function is called across the boundary on this path.** Unnamed
+  SDK functions identified on the way (evidence in the code; hints for K1, not
+  committed names): fn_804357A4 `ExternalInterruptHandler` (saves r0-r2, r6-r31
+  and GQR1-7 into the context, branches to fn_80435460), fn_80435460
+  `__OSDispatchInterrupt`, fn_8042C670 GX token interrupt handler (reads the PE
+  token, calls the draw-sync callback; installed by `__GXPEInit` for interrupt
+  0x12), fn_8042C73C GX finish interrupt handler (sets the draw-done flag, wakes
+  the finish queue; interrupt 0x13), fn_80429FF0 GX CP interrupt handler
+  (overflow, underflow, breakpoint), fn_8042690C `DVDLowInquiry` (command 0x12,
+  0x20 bytes, 10 s timeout alarm), fn_804188D0 AX new frame (mails 0xBABE0180 and
+  the command list), fn_80418A88 AX AI-DMA callback, fn_80418B44 / fn_80418B50 /
+  fn_80418BA8 AX DSP task init / resume / done callbacks, fn_80418BD4 AX DSP
+  init (adds the task, waits for the init flag).
+- CI: `test_devices` (GX stream lengths, vertex sizes, PE effects and split
+  pushes; display lists from memory; FIFO bursts, the GP following, breakpoint
+  stall and release, wrap-around; DVD read timing, DMA, TCINT, errors; the AI
+  counter at both rates; the DSP boot and AX frame handshake; AI DMA periods),
+  `test_boot_hw` (write-gather bursts).
+
 ## Decisions to record (for the lead)
 
 - E0b-FP1: the FP model above (exact integer softfloat as the single source of
@@ -364,9 +519,43 @@ A later session resumes from "Next step".
 - E0b-FP2: FPSCR status bits are not modeled; estimates are correctly rounded.
   Both are deterministic. Revisit if a game path reads FPSCR status or if a
   hardware table for the estimates becomes available under a permissive license.
+- E0b-CLK1: the time base is derived from guest instructions at 2 cycles per
+  instruction (`ClockConfig::cpi`); part of the netplay handshake.
+- E0b-GX1: the GP is infinitely fast except at FIFO breakpoints; PE and CP events
+  happen at 32-byte burst boundaries of the write-gather pipe (R11's "defined
+  points").
+- E0b-DVD1: a drive command completes 1 ms + length at 3 MiB/s after it starts
+  (R7); inquiry returns fixed drive info (revision 2, device 6, 2002-04-02).
+- E0b-DSP1: the DSP is replaced by a mailbox HLE; AX frames yield 0.5 ms after
+  their command list. Nothing is mixed and voice state is not advanced, so a game
+  path that waits for a voice to finish would wait forever (R8 follow-up).
+- R12 0x800000F4: see item 7 (we set it to the BI2 copy, as the apploader does).
 
 ## Next step
 
-Item 9: virtual clock (time base and decrementer from `c.ticks`), DEC and PI
-interrupts delivered at safe points, idle skip in SelectThread. The counters and
-safe points are already emitted (see item 9 notes when written).
+E0b is complete. Suggested follow-ups, in order of value:
+
+1. **Unwind cost.** 46,288 unwinds by 9.8 s of guest time, 7.4 per real thread
+   switch: OSYieldThread / SelectThread reload the current thread through
+   OSLoadContext's `rfi`, which abandons the native frames and makes the
+   interpreter resume until the next function entry (most of the 11.75 %
+   interpreted share). Options: resume native code at call-return points
+   (`FunctionCfg::resume_points`) instead of interpreting, or replace the
+   same-thread reload by name.
+2. **Where the boot goes next.** A long run (pre-rebase symbols, 2026-10-14:
+   `--until none --unnamed log --max-ticks 25000000000`, 16.4 min of host time
+   with the per-entry trace) reached 102.9 s of guest time with no stop other than
+   the budget: 6,164 VI fields, 716 DVD commands (30,988,832 bytes), 20,519 AX
+   frames, 2,411 draw-done, 7,217 primitives and 5,493,664 bytes of GX commands,
+   27,635,575 SDK boundary calls into 196 functions, all named, 95,631 unwinds,
+   interpreted share 1.13 %. The game keeps loading and rendering front-end
+   frames. Input (R14) and a renderer are the next needs to see where it is;
+   `--fifo` already dumps the command stream.
+3. **AX HLE (R8)**: advance voice parameter blocks (end-of-sample, loop) so code
+   waiting for a sound to end behaves as on hardware.
+4. `local_boot_twice` takes about 45 s; a shorter budget can be used if CI time
+   matters.
+
+How to resume: build with the `msvc` preset; `ctest --preset msvc` runs 11
+data-free and 6 local tests (all pass); `mvp-boot run --until none --unnamed log
+--max-entries N --max-ticks N` explores further.

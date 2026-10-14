@@ -43,8 +43,8 @@ int main(int argc, char** argv) {
                 "absolute calls %zu\n",
                 p.calls, p.tail_calls, p.indirect_calls, p.jump_tables, p.indirect_jumps, p.absolute_calls);
     std::printf("resume points %zu, back edges %zu, secondary entries %zu, runs into the next function %zu, "
-                "expected traps %zu, errors %zu\n",
-                p.resume_points, p.back_edges, p.secondary_entries, p.falls_into_next, p.expected_traps,
+                "expected traps %zu, pure spins %zu, errors %zu\n",
+                p.resume_points, p.back_edges, p.secondary_entries, p.falls_into_next, p.expected_traps, p.idle_spins,
                 p.errors);
     if (show_tables)
       for (const auto& f : p.functions)
