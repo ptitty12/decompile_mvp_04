@@ -199,7 +199,7 @@ struct Unk803EB660_Tbl {
     int m18;
 };
 
-extern "C" int fn_803EB660(Unk803EB660_Tbl* t, Unk803EB660_Entry* e, int key)
+extern "C" int FONT_getkern(Unk803EB660_Tbl* t, Unk803EB660_Entry* e, int key)
 {
     signed char r = 0;
     if (e->mB) {

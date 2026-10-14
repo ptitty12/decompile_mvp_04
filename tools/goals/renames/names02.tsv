@@ -276,3 +276,6 @@ fn_80402C24	getstringidbyindex	E	EA getstringidbyindex__FUsPC12LOCALE_INDEX [ge,
 fn_80402CAC	LOCALE_getstr	E	EA LOCALE_getstr [fifa05,ge,moh3,moh4,nfsu,uefa]
 fn_80402DE4	LOCALE_create	E	EA LOCALE_create/LOCALE_create__FPvi [fifa05,ge,hp,moh3,moh4,nfsmw,nfsu,uefa]
 fn_80403534	USTR_vsprintf	E	EA USTR_vsprintf [fifa05,uefa]
+fn_803B31B4	SFILTER_timestretchsetratio	E	EA SFILTER_timestretchsetratio__FP16TIMESTRETCHSTATEi [ge,hp,moh4,nascar,nfsmw]; Freedom Fighters has ZDllSound::SetMasterVolume (a game class, look-alike) -- five builds in the SFILTER family agree
+fn_803DF1A0	MultMatrix	E	EA MultMatrix(MATRIX4 *, MATRIX4 *, MATRIX4 *)/MultMatrix__FPC7MATRIX4T0P7MATRIX4 [fifa05,ge,moh3,moh4,nfsu,uefa]; nfsmw has it as EAGL4::MultMatrix (its newer EAGL namespace), same base name
+fn_803EB660	FONT_getkern	E	EA FONT_getkern [fifa05,ge,moh3,moh4,nfsu,uefa]; nfsmw has the newer C++ RealFontOld::Font::GetKern -- six builds say FONT_getkern

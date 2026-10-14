@@ -96,7 +96,7 @@ void GXSetDither(int dither);
 
 extern "C" {
 float sqrtf(float x);
-void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out);
+void MultMatrix(Mtx4* a, Mtx4* b, Mtx4* out);
 void MEM_copy(void* dst, const void* src, int n);
 void fn_803DE7D0(Mtx4* a, Mtx4* b);
 void fn_803DF4E4(Mtx4* out);
@@ -293,10 +293,10 @@ extern "C" void fn_803DF028(Mtx4* m, int count, char* in, int inStride, char* ou
 /* 803DE000 */
 inline void MtxMul(Mtx4* a, Mtx4* b, Mtx4* out)
 {
-    fn_803DF1A0(a, b, out);
+    MultMatrix(a, b, out);
 }
 
-extern "C" void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out)
+extern "C" void MultMatrix(Mtx4* a, Mtx4* b, Mtx4* out)
 {
     out->m[0] = a->m[0] * b->m[0] + a->m[1] * b->m[4] + a->m[2] * b->m[8] + a->m[3] * b->m[12];
     out->m[1] = a->m[0] * b->m[1] + a->m[1] * b->m[5] + a->m[2] * b->m[9] + a->m[3] * b->m[13];
@@ -319,7 +319,7 @@ extern "C" void fn_803DF1A0(Mtx4* a, Mtx4* b, Mtx4* out)
 extern "C" void fn_803DF66C(Mtx4* a, Mtx4* b)
 {
     Mtx4 t;
-    fn_803DF1A0(a, b, &t);
+    MultMatrix(a, b, &t);
     MEM_copy(a, &t, 0x40);
 }
 
@@ -584,13 +584,13 @@ extern "C" void fn_803E01F4(Mtx4* out, float x, float y, float z, float w, float
 
 extern "C" void fn_803E02B8(Mtx4* a, Mtx4* b, Mtx4* out)
 {
-    fn_803DF1A0(b, a, out);
+    MultMatrix(b, a, out);
 }
 
 extern "C" void fn_803E02E4(Mtx4* dst, Mtx4* other)
 {
     Mtx4 t;
-    fn_803DF1A0(other, dst, &t);
+    MultMatrix(other, dst, &t);
     MEM_copy(dst, &t, 0x40);
 }
 

@@ -92,7 +92,7 @@ extern unsigned short lbl_8069C8A2;
 extern "C" void SFILTER_remove(Unk803B21EC_Node** head, void* node);
 extern "C" void SFILTER_createHPFFIR8(void* obj);
 extern "C" void SFILTER_modifyHPFFIR8(void* obj, int* buf);
-extern "C" void fn_803B31B4(Unk803B31B4* obj, int v);
+extern "C" void SFILTER_timestretchsetratio(Unk803B31B4* obj, int v);
 
 struct Unk803B3334;
 struct Unk803B3334_Src {
@@ -270,7 +270,7 @@ extern "C" void MIX_settimemult(int idx, int v)
 {
     Unk803B21EC* e = &lbl_806AA4B0[idx];
     if (e->m4C != 0)
-        fn_803B31B4(e->m4C, v);
+        SFILTER_timestretchsetratio(e->m4C, v);
 }
 
 extern "C" void crossfade(float* a, float* b, float* out, int n, int shift)
@@ -431,7 +431,7 @@ extern "C" int stretch(Unk803B3334* o, int count, float* src, float* dst)
     return total;
 }
 
-extern "C" void fn_803B31B4(Unk803B31B4* o, int v)
+extern "C" void SFILTER_timestretchsetratio(Unk803B31B4* o, int v)
 {
     o->m24 = v * 0.000244140625f;
 }

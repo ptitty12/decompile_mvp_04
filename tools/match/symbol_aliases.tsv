@@ -871,3 +871,6 @@ fn_80402C24	getstringidbyindex
 fn_80402CAC	LOCALE_getstr
 fn_80402DE4	LOCALE_create
 fn_80403534	USTR_vsprintf
+fn_803B31B4	SFILTER_timestretchsetratio
+fn_803DF1A0	MultMatrix
+fn_803EB660	FONT_getkern
