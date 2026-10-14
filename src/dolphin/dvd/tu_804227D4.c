@@ -170,7 +170,7 @@ void fn_804239D8(DVDCommandBlock* block);
 void fn_80423DEC(DVDCommandBlock* block);
 void fn_80423E80(void);
 s32 DVDGetCommandBlockStatus(const DVDCommandBlock* block);
-BOOL fn_8042515C(BOOL autoInvalidation);
+BOOL fn_8042515C(BOOL autoInval);
 DVDDiskID* DVDGetCurrentDiskID(void);
 void fn_804254E4(s32 result, DVDCommandBlock* block);
 BOOL fn_80425724(const OSAlarm* alarm);
@@ -1323,10 +1323,10 @@ s32 DVDGetDriveStatus(void) {
     return retVal;
 }
 
-BOOL fn_8042515C(BOOL autoInvalidation) {
+BOOL fn_8042515C(BOOL autoInval) {
     BOOL prev = lbl_806EF1A4;
 
-    lbl_806EF1A4 = autoInvalidation;
+    lbl_806EF1A4 = autoInval;
     return prev;
 }
 
