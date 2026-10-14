@@ -360,3 +360,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - 2026-10-13 | db/tu_80565FD4 fn_80567B58 | Seven ordinary C forms; best 114/114 words, first 36-byte copy destination/count r9/r11 and receiver vptr reload order remain. Scratch build/swarm39, source restored.
 
 - fn_803D1E54 (ealib/tu_803CECA4): 99.38614%,101/101 instructions; m38*m28/m2C product order and f0/f12/f13 operands differ; eight total forms (four SW17, four SW49), scratch only.
+- fn_80591B8C (db/tu_805902E0): 97.96296%,108/108 instructions; only entry stfs f1 versus two integer parameter moves differs; eight typed-array/branch/value/reference forms, scratch only.
