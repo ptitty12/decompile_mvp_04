@@ -177,6 +177,54 @@ TEST_CASE("textured quad from synthetic RGB565 memory, with konst modulation") {
   CHECK(gpu().errors() == 0);
 }
 
+TEST_CASE("indirect texturing: the coordinate comes from an indirect texture through a matrix") {
+  Scene sc;
+  // Map 0: the 8 x 8 red | green texture of the previous case.
+  for (u32 y = 0; y < 8; ++y)
+    for (u32 x = 0; x < 8; ++x) {
+      u32 tile = (y / 4) * 2 + x / 4, in = (y % 4) * 4 + x % 4;
+      put_be16(&sc.mem[0x40000 + tile * 32 + in * 2], x < 4 ? 0xF800 : 0x07E0);
+    }
+  // Map 1: a 4 x 4 IA8 indirect texture, every texel (alpha 6, intensity 1): (s, t, u) = (6, 1, 1).
+  for (u32 k = 0; k < 16; ++k) {
+    sc.mem[0x50000 + 2 * k] = 6;
+    sc.mem[0x50000 + 2 * k + 1] = 1;
+  }
+  Stream s = base();
+  s.xf(xf::kNumTexGens, {1});
+  s.xf(xf::kTexGen, {5u << 7});
+  s.xff(60 * 4, {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0});
+  s.cp(cp::kMatIndexA, 60u << 6);
+  s.bp(bp::kGenMode, 1u | 1u << 4 | 1u << 16);  // one indirect stage
+  s.bp(bp::kIref, 1u | 0u << 3);                 // indirect stage 0: map 1, coordinate 0
+  s.bp(bp::kTref, 0u | 0u << 3 | 1u << 6);
+  s.bp(bp::kTevColorEnv, color_env(kZeroC, kZeroC, kZeroC, kTexC));
+  // Matrix 0 = [[512, 0, 0], [0, 512, 0]] with exponent field 18: (M x crd) >> 3, then << 1.
+  s.bp(bp::kIndMtx + 0, 512u | 2u << 22);
+  s.bp(bp::kIndMtx + 1, 512u << 11);
+  s.bp(bp::kIndMtx + 2, 1u << 22);
+  // Stage 0: indirect stage 0, 8-bit, matrix 0, both regular coordinates wrapped to 0:
+  // the coordinate is (6, 1) texels wherever the quad is.
+  s.bp(bp::kIndCmd + 0, 1u << 9 | 6u << 13 | 6u << 16);
+  s.bp(bp::tex_reg(bp::kTexImage0, 0), 7u | 7u << 10 | 4u << 20);
+  s.bp(bp::tex_reg(bp::kTexImage3, 0), 0x40000 >> 5);
+  s.bp(bp::tex_reg(bp::kTexImage0, 1), 3u | 3u << 10 | 3u << 20);
+  s.bp(bp::tex_reg(bp::kTexImage3, 1), 0x50000 >> 5);
+  for (int k = 0; k < 8; ++k) {
+    s.bp(static_cast<u8>(bp::kSuSSize + 2 * k), 7);
+    s.bp(static_cast<u8>(bp::kSuTSize + 2 * k), 7);
+  }
+  copy_xfb(s, 0x000000FF);
+  quad(s, 0, 0, 320, 240, 0xFFFFFFFF);
+  copy_xfb(s, 0x000000FF, false);
+  s.run(sc.p);
+  auto img = sc.r.read_frame(*sc.r.xfb(0x80000));
+  CHECK(near(px(img, 640, 40, 100), 0, 255, 0));   // the left half samples texel (6, 1) too
+  CHECK(near(px(img, 640, 280, 200), 0, 255, 0));
+  CHECK(sc.r.stats().indirect_draws == 1);
+  CHECK(gpu().errors() == 0);
+}
+
 TEST_CASE("alpha blending and the alpha test") {
   Scene sc;
   Stream s = base();
@@ -249,9 +297,16 @@ TEST_CASE("generated TEV shaders compile for many configurations") {
       st.ras_chan = static_cast<u8>(rng() % 8);
       st.kcsel = static_cast<u8>(rng() % 32);
       st.kasel = static_cast<u8>(rng() % 32);
+      st.ind_cmd = (rng() & 1) ? (rng() & 0x1FFFFF) : 0;
     }
     for (auto& t : c.swap)
       for (auto& k : t) k = static_cast<u8>(rng() % 4);
+    c.num_ind = static_cast<u8>(rng() % 5);
+    for (int k = 0; k < 4; ++k) {
+      c.iref_map[k] = static_cast<u8>(rng() % 8);
+      c.iref_coord[k] = static_cast<u8>(rng() % 8);
+      c.ind_scale[k] = static_cast<u8>(rng() % 256);
+    }
     c.alpha_comp0 = static_cast<u8>(rng() % 8);
     c.alpha_comp1 = static_cast<u8>(rng() % 8);
     c.alpha_logic = static_cast<u8>(rng() % 4);

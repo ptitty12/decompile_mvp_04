@@ -13,7 +13,7 @@ struct U {
   konst: array<vec4i, 4>,
   alpha_ref: vec4i,
   tex_scale: array<vec4f, 8>,
-  ind_mtx: array<vec4f, 6>,
+  ind_mtx: array<vec4i, 6>,
   fog: array<vec4f, 2>,
   dst_alpha: vec4i,
 };
@@ -101,6 +101,20 @@ fn tev3(a: vec3i, b: vec3i, c: vec3i, d: vec3i, sub: bool, bias: i32, shift: u32
 
 fn tev1(a: i32, b: i32, c: i32, d: i32, sub: bool, bias: i32, shift: u32, clampv: bool) -> i32 {
   return tev3(vec3i(a), vec3i(b), vec3i(c), vec3i(d), sub, bias, shift, clampv).x;
+}
+
+// Texture coordinate in the rasterizer's fixed point (1/128 texel of its size).
+fn fixuv(t: vec3f, coord: u32) -> vec2i {
+  let q = select(t.z, 1.0, t.z == 0.0);
+  return vec2i(t.xy / q * u.tex_scale[coord].xy * 128.0);
+}
+// Normalized sampling coordinate of a fixed-point coordinate on map `map`
+// (half a unit in, so nearest sampling lands on the texel the hardware takes).
+fn fixst(c: vec2i, map: u32) -> vec2f { return (vec2f(c) + 0.5) / 128.0 / u.tex_scale[map].zw; }
+// Indirect matrix scale: the shift held in the row's w (17 - exponent).
+fn indshift(v: vec2i, w: i32) -> vec2i {
+  if (w >= 0) { return v >> vec2u(u32(min(w, 31))); }
+  return v << vec2u(u32(min(-w, 31)));
 }
 
 fn pack16(v: vec3i) -> i32 { return (v.g << 8u) | v.r; }
@@ -202,19 +216,84 @@ std::string generate_wgsl(const PipelineConfig& c) {
   s += "\n@fragment fn fs_main(in: VOut) -> @location(0) vec4f {\n";
   s += "  var prev = u.tev_regs[0];\n  var r0 = u.tev_regs[1];\n  var r1 = u.tev_regs[2];\n  var r2 = u.tev_regs[3];\n";
   const int n = c.num_stages < 1 ? 1 : c.num_stages > 16 ? 16 : c.num_stages;
+  // Indirect texturing: when any stage uses it, every stage's coordinate goes
+  // through the hardware's fixed-point path (1/128 texel, 24-bit wrap).
+  bool indirect = false;
+  for (int i = 0; i < n; ++i) indirect = indirect || c.stages[i].ind_cmd != 0;
+  const int nind = c.num_ind > 4 ? 4 : c.num_ind;
+  if (indirect) {
+    s += "  var tevcoord = vec2i(0);\n  var alphabump = 0;\n";
+    for (int k = 0; k < nind; ++k) {
+      // The indirect texture's (a, b, g) as (s, t, u), sampled at its coordinate scaled down.
+      const u32 ss = bits(c.ind_scale[k], 0, 4), st = bits(c.ind_scale[k], 4, 4);
+      s += str("  let ic%d = fixuv(in.t%u, %uu);\n", k, c.iref_coord[k], c.iref_coord[k]);
+      s += str("  let ind%d = vec3i(round(textureSample(tex%u, samp%u, fixst(vec2i(ic%d.x >> %uu, ic%d.y >> %uu), %uu)).abg "
+               "* 255.0));\n",
+               k, c.iref_map[k], c.iref_map[k], k, ss, k, st, c.iref_map[k]);
+    }
+  }
   u32 last_color_dest = 0, last_alpha_dest = 0;
   for (int i = 0; i < n; ++i) {
     const TevStage& st = c.stages[i];
     const u32 ce = st.color_env, ae = st.alpha_env;
     s += str("  // stage %d\n  {\n", i);
+    if (indirect) {
+      const u32 ic = st.ind_cmd;
+      s += str("    let fp = fixuv(in.t%u, %uu);\n", st.texcoord, st.texcoord);
+      if (ic == 0) {
+        s += "    tevcoord = fp;\n";
+      } else {
+        const u32 bt = bits(ic, 0, 2), fmt = bits(ic, 2, 2), bias = bits(ic, 4, 3), bs = bits(ic, 7, 2);
+        const u32 mid = bits(ic, 9, 4), sw = bits(ic, 13, 3), tw = bits(ic, 16, 3), fb = bits(ic, 20, 1);
+        static const char* kMask[4] = {"255", "31", "15", "7"};
+        static const char* kBumpMask[4] = {"248", "224", "240", "248"};
+        if (static_cast<int>(bt) < nind) s += str("    var crd = ind%u & vec3i(%s);\n", bt, kMask[fmt]);
+        else s += "    var crd = vec3i(0);\n";
+        const char* b = fmt == 0 ? "-128" : "1";
+        if (bias & 1) s += str("    crd.x += %s;\n", b);
+        if (bias & 2) s += str("    crd.y += %s;\n", b);
+        if (bias & 4) s += str("    crd.z += %s;\n", b);
+        if (bs && static_cast<int>(bt) < nind)
+          s += str("    alphabump = ind%u.%c & %s;\n", bt, "xyz"[bs - 1], kBumpMask[fmt]);
+        if (mid >= 1 && mid <= 3) {
+          const u32 m = 2 * (mid - 1);
+          s += str("    let tr = indshift(vec2i(dot(u.ind_mtx[%u].xyz, crd), dot(u.ind_mtx[%u].xyz, crd)) >> vec2u(3u), "
+                   "u.ind_mtx[%u].w);\n",
+                   m, m + 1, m);
+        } else if (mid >= 5 && mid <= 7) {
+          s += str("    let tr = indshift((fp * crd.xx) >> vec2u(8u), u.ind_mtx[%u].w);\n", 2 * (mid - 5));
+        } else if (mid >= 9 && mid <= 11) {
+          s += str("    let tr = indshift((fp * crd.yy) >> vec2u(8u), u.ind_mtx[%u].w);\n", 2 * (mid - 9));
+        } else {
+          s += "    let tr = vec2i(0);\n";
+        }
+        auto wrap = [&](u32 w, char comp) -> std::string {
+          if (w == 0) return str("fp.%c", comp);
+          if (w >= 6) return "0";
+          return str("(fp.%c & %d)", comp, ((256 >> (w - 1)) << 7) - 1);
+        };
+        s += "    let wrapped = vec2i(" + wrap(sw, 'x') + ", " + wrap(tw, 'y') + ");\n";
+        if (fb) s += "    tevcoord = tevcoord + wrapped + tr;\n";
+        else s += "    tevcoord = wrapped + tr;\n";
+        s += "    tevcoord = (tevcoord << vec2u(8u)) >> vec2u(8u);\n";
+      }
+    }
     if (st.tex_enable) {
-      s += str("    let tex = to8(textureSample(tex%u, samp%u, tc(in.t%u, %uu, %uu)))%s;\n", st.texmap, st.texmap,
-               st.texcoord, st.texcoord, st.texmap, swizzle(c.swap[bits(ae, 2, 2)]).c_str());
+      if (indirect)
+        s += str("    let tex = to8(textureSample(tex%u, samp%u, fixst(tevcoord, %uu)))%s;\n", st.texmap, st.texmap,
+                 st.texmap, swizzle(c.swap[bits(ae, 2, 2)]).c_str());
+      else
+        s += str("    let tex = to8(textureSample(tex%u, samp%u, tc(in.t%u, %uu, %uu)))%s;\n", st.texmap, st.texmap,
+                 st.texcoord, st.texcoord, st.texmap, swizzle(c.swap[bits(ae, 2, 2)]).c_str());
     } else {
       s += "    let tex = vec4i(0);\n";
     }
     if (st.ras_chan == 0 || st.ras_chan == 1) {
       s += str("    let ras = to8(in.c%u)%s;\n", st.ras_chan, swizzle(c.swap[bits(ae, 0, 2)]).c_str());
+    } else if (indirect && st.ras_chan == 5) {
+      s += "    let ras = vec4i(alphabump);\n";
+    } else if (indirect && st.ras_chan == 6) {
+      s += "    let ras = vec4i(alphabump | (alphabump >> 5u));\n";
     } else {
       s += "    let ras = vec4i(0);\n";
     }

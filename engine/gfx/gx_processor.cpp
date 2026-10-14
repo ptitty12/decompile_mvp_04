@@ -654,15 +654,18 @@ void GxProcessor::snapshot(DrawCall& d) const {
   u.dst_alpha[1] = static_cast<std::int32_t>(bits(cm1, 0, 8));
   for (int m = 0; m < 3; ++m) {
     u32 r0 = bp_[bp::kIndMtx + 3 * m], r1 = bp_[bp::kIndMtx + 3 * m + 1], r2 = bp_[bp::kIndMtx + 3 * m + 2];
-    int scale = static_cast<int>(bits(r0, 22, 2) | bits(r1, 22, 2) << 2 | bits(r2, 22, 2) << 4) - 17;
-    float f = std::ldexp(1.0f / 1024.0f, scale);
+    const std::int32_t shift = 17 - static_cast<std::int32_t>(bits(r0, 22, 2) | bits(r1, 22, 2) << 2 | bits(r2, 22, 2) << 4);
     // Rows: (ma, mc, me), (mb, md, mf); elements are 11-bit signed.
-    u.ind_mtx[m][0] = static_cast<float>(sext11(bits(r0, 0, 11))) * f;
-    u.ind_mtx[m][1] = static_cast<float>(sext11(bits(r1, 0, 11))) * f;
-    u.ind_mtx[m][2] = static_cast<float>(sext11(bits(r2, 0, 11))) * f;
-    u.ind_mtx[m][4] = static_cast<float>(sext11(bits(r0, 11, 11))) * f;
-    u.ind_mtx[m][5] = static_cast<float>(sext11(bits(r1, 11, 11))) * f;
-    u.ind_mtx[m][6] = static_cast<float>(sext11(bits(r2, 11, 11))) * f;
+    std::int32_t* row0 = u.ind_mtx[2 * m];
+    std::int32_t* row1 = u.ind_mtx[2 * m + 1];
+    row0[0] = sext11(bits(r0, 0, 11));
+    row0[1] = sext11(bits(r1, 0, 11));
+    row0[2] = sext11(bits(r2, 0, 11));
+    row0[3] = shift;
+    row1[0] = sext11(bits(r0, 11, 11));
+    row1[1] = sext11(bits(r1, 11, 11));
+    row1[2] = sext11(bits(r2, 11, 11));
+    row1[3] = shift;
   }
 
   for (int m = 0; m < 8; ++m) {

@@ -69,7 +69,9 @@ struct DrawUniforms {
   std::int32_t konst[4][4] = {};      // K0-K3 (8-bit)
   std::int32_t alpha_ref[4] = {};     // ref0, ref1
   float tex_scale[8][4] = {};         // texcoord n: (s scale / map width, t scale / map height) for its map
-  float ind_mtx[3][8] = {};           // indirect matrices: 2 rows of 3 + scale exponent, padded
+  // Indirect matrices 0-2, two rows each: (ma, mc, me, 17 - scale), (mb, md, mf, 17 - scale),
+  // elements 11-bit signed (1.0 = 1024), scale the raw 6-bit exponent field.
+  std::int32_t ind_mtx[6][4] = {};
   float fog[8] = {};                  // a, b, c (z), color r g b, unused
   std::int32_t dst_alpha[4] = {};     // enable, value
 };
