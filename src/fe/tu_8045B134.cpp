@@ -384,21 +384,20 @@ FE_OVERLAY void fn_8045BEA4(FeScrB* x, int a)
     if (a == 0) {
         if (FeW24(x->m1EC) >= 0) {
             int id = x->m1B8->fn_vslot60();
-            if (((FeWV*)x->m1B8)->s94(id, 2) != 0) {
-                int r = fn_8045D420(x, id);
-                FeList* l = x->m1EC;
-                fn_80126CF4(l, l->m164, r, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
-                x->m1EC->fn_vslot84(1, 0);
-                x->m1EC->fn_vslot8(1);
-                x->m1B8->fn_vslot16(0);
-                fn_8045D338(x);
-            }
+            if (((FeWV*)x->m1B8)->s94(id, 2) == 0)
+                return;
+            int r = fn_8045D420(x, id);
+            FeList* l = x->m1EC;
+            fn_80126CF4(l, l->m164, r, l->m134, l->m16C, l->m170, 0, l->m138, l->m13C, l->m148, l->m14C);
+            x->m1EC->fn_vslot84(1, 0);
+            x->m1EC->fn_vslot8(1);
+            x->m1B8->fn_vslot16(0);
         } else {
             x->m1EC->fn_vslot84(2, 0);
             x->m1EC->fn_vslot8(0);
             x->m1B8->fn_vslot16(1);
-            fn_8045D338(x);
         }
+        fn_8045D338(x);
     }
 }
 
