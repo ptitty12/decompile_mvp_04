@@ -90,7 +90,7 @@ public:
     void operator delete(void* p) { lbl_80699B94.m4(p); }
 };
 
-extern "C" void fn_8038D110(char* o);
+extern "C" void DELETE_tBigSwizzler(char* o);
 
 struct VdRes;
 

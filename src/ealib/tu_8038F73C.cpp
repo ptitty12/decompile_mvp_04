@@ -393,7 +393,7 @@ extern "C" void fn_80390504(int n)
 
 extern const int lbl_8069ABB8[];
 
-extern "C" int fn_8039055C()
+extern "C" int getdelta()
 {
     int e = lbl_8069ABB8[lbl_806EF38C >> 26];
     fn_80390504(e & 0xFF);
@@ -402,7 +402,7 @@ extern "C" int fn_8039055C()
 
 extern int lbl_8069B5B8[];
 
-extern "C" void fn_803905A0(int* dst, int stride)
+extern "C" void dcblock(int* dst, int stride)
 {
     for (int i = 0; i < 8; i++) {
         dst[0] = lbl_8069B5B8[0];
@@ -456,7 +456,7 @@ extern "C" void fn_80390694(unsigned char* src, int stride, int* dst, int bias)
     }
 }
 
-extern "C" void fn_8039072C(short* src, unsigned char* dst, int stride)
+extern "C" void setluma(short* src, unsigned char* dst, int stride)
 {
     for (int i = 0; i < 16; i++) {
         dst[0] = McClip(src[0]);
@@ -480,7 +480,7 @@ extern "C" void fn_8039072C(short* src, unsigned char* dst, int stride)
     }
 }
 
-extern "C" void fn_8039084C(short* src, unsigned char* dst, int stride)
+extern "C" void setchroma(short* src, unsigned char* dst, int stride)
 {
     for (int i = 0; i < 8; i++) {
         dst[0] = McClip(src[0]);
@@ -502,11 +502,11 @@ extern int lbl_80607218[];
 extern int lbl_806242E0[];
 extern int lbl_8069ACB8[];
 extern "C" int fixedmult(int a, int b);
-extern "C" void fn_80390248();
-extern "C" void fn_803908EC(unsigned char* src, int a, int b)
+extern "C" void madinit();
+extern "C" void MAD_initdecode(unsigned char* src, int a, int b)
 {
     if (lbl_806EF394 == 0)
-        fn_80390248();
+        madinit();
     lbl_806EF38C = ((src[1] << 8 | src[0]) << 16) | (src[3] << 8 | src[2]);
     lbl_806EF390 = 0x20;
     lbl_806EF388 = src + 4;
@@ -516,15 +516,15 @@ extern "C" void fn_803908EC(unsigned char* src, int a, int b)
         lbl_8069ACB8[i] = fixedmult((b * lbl_80607218[i]) << 13, lbl_806242E0[i]);
 }
 
-extern "C" int fn_80390D54();
-extern "C" void fn_80391194(int* dst, int stride);
+extern "C" int madvlcdecode();
+extern "C" void idctcompute(int* dst, int stride);
 extern int lbl_8069ADB8[];
 extern int lbl_8069ADD8[];
 extern int lbl_8069AFB8[];
 extern int lbl_8069AFD8[];
 extern int lbl_8069B1B8[];
 extern int lbl_8069B2B8[];
-extern "C" void fn_803909C4(unsigned char* y, unsigned char* u, unsigned char* v, unsigned char* oy, unsigned char* ou, unsigned char* ov, int stride)
+extern "C" void MAD_decodemacroblock(unsigned char* y, unsigned char* u, unsigned char* v, unsigned char* oy, unsigned char* ou, unsigned char* ov, int stride)
 {
     int half = stride >> 1;
     unsigned flags;
@@ -541,8 +541,8 @@ extern "C" void fn_803909C4(unsigned char* y, unsigned char* u, unsigned char* v
             flags = lbl_806EF38C >> 24;
             fn_80390504(8);
         }
-        int dx = fn_8039055C();
-        int dy = fn_8039055C();
+        int dx = getdelta();
+        int dy = getdelta();
         y += dy * stride + dx;
         dx >>= 1;
         dy >>= 1;
@@ -551,68 +551,68 @@ extern "C" void fn_803909C4(unsigned char* y, unsigned char* u, unsigned char* v
         v += c;
     }
     if ((flags & 1) == 0) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069ADB8, 0x10);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069ADB8, 0x10);
         } else {
-            fn_80391194(lbl_8069ADB8, 0x10);
+            idctcompute(lbl_8069ADB8, 0x10);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_803905FC(y, stride, lbl_8069ADB8, bias);
     }
     if (!(flags & 2)) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069ADD8, 0x10);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069ADD8, 0x10);
         } else {
-            fn_80391194(lbl_8069ADD8, 0x10);
+            idctcompute(lbl_8069ADD8, 0x10);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_803905FC(y + 8, stride, lbl_8069ADD8, bias);
     }
     if (!(flags & 4)) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069AFB8, 0x10);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069AFB8, 0x10);
         } else {
-            fn_80391194(lbl_8069AFB8, 0x10);
+            idctcompute(lbl_8069AFB8, 0x10);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_803905FC(y + stride * 8, stride, lbl_8069AFB8, bias);
     }
     if (!(flags & 8)) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069AFD8, 0x10);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069AFD8, 0x10);
         } else {
-            fn_80391194(lbl_8069AFD8, 0x10);
+            idctcompute(lbl_8069AFD8, 0x10);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_803905FC(y + stride * 8 + 8, stride, lbl_8069AFD8, bias);
     }
     if (!(flags & 0x10)) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069B1B8, 8);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069B1B8, 8);
         } else {
-            fn_80391194(lbl_8069B1B8, 8);
+            idctcompute(lbl_8069B1B8, 8);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_80390694(u, half, lbl_8069B1B8, bias);
     }
     if (!(flags & 0x20)) {
-        if (fn_80390D54() == 1) {
-            fn_803905A0(lbl_8069B2B8, 8);
+        if (madvlcdecode() == 1) {
+            dcblock(lbl_8069B2B8, 8);
         } else {
-            fn_80391194(lbl_8069B2B8, 8);
+            idctcompute(lbl_8069B2B8, 8);
         }
     } else {
-        int bias = fn_8039055C() * 2 - 0x80;
+        int bias = getdelta() * 2 - 0x80;
         fn_80390694(v, half, lbl_8069B2B8, bias);
     }
-    fn_8039072C((short*)lbl_8069ADB8, oy, stride);
-    fn_8039084C((short*)lbl_8069B1B8, ou, half);
-    fn_8039084C((short*)lbl_8069B2B8, ov, half);
+    setluma((short*)lbl_8069ADB8, oy, stride);
+    setchroma((short*)lbl_8069B1B8, ou, half);
+    setchroma((short*)lbl_8069B2B8, ov, half);
 }
 
 extern "C" void fn_80390CFC(int n)
@@ -633,13 +633,13 @@ extern "C" void fn_80390CFC(int n)
 extern int lbl_8069B5B8[];
 extern int lbl_8069B6B8[];
 extern int lbl_8069B6D8[];
-extern "C" void fn_80390EC0(int* in, int* out);
-extern "C" void fn_80391060(int* in, int* out);
+extern "C" void IdctColumn(int* in, int* out);
+extern "C" void IdctRow(int* in, int* out);
 extern const unsigned lbl_80699BB8[];
 extern const unsigned lbl_8069A3B8[];
 extern const unsigned lbl_8069A7B8[];
 extern const int lbl_80607318[];
-extern "C" int fn_80390D54()
+extern "C" int madvlcdecode()
 {
     lbl_8069B5B8[0] = ((int)lbl_806EF38C >> 24) * lbl_8069ACB8[0];
     fn_80390CFC(8);
@@ -686,22 +686,22 @@ extern "C" int fn_80390D54()
     }
 }
 
-extern "C" void fn_80391194(int* dst, int stride)
+extern "C" void idctcompute(int* dst, int stride)
 {
-    fn_80390EC0(lbl_8069B5B8 + 0, lbl_8069B6B8 + 0);
-    fn_80390EC0(lbl_8069B5B8 + 8, lbl_8069B6B8 + 1);
-    fn_80390EC0(lbl_8069B5B8 + 16, lbl_8069B6B8 + 2);
-    fn_80390EC0(lbl_8069B5B8 + 24, lbl_8069B6B8 + 3);
-    fn_80390EC0(lbl_8069B5B8 + 32, lbl_8069B6B8 + 4);
-    fn_80390EC0(lbl_8069B5B8 + 40, lbl_8069B6B8 + 5);
-    fn_80390EC0(lbl_8069B5B8 + 48, lbl_8069B6B8 + 6);
-    fn_80390EC0(lbl_8069B5B8 + 56, lbl_8069B6B8 + 7);
-    fn_80391060(lbl_8069B6B8, dst);
-    fn_80391060(lbl_8069B6D8 + 0, dst + stride * 1);
-    fn_80391060(lbl_8069B6D8 + 8, dst + stride * 2);
-    fn_80391060(lbl_8069B6D8 + 16, dst + stride * 3);
-    fn_80391060(lbl_8069B6D8 + 24, dst + stride * 4);
-    fn_80391060(lbl_8069B6D8 + 32, dst + stride * 5);
-    fn_80391060(lbl_8069B6D8 + 40, dst + stride * 6);
-    fn_80391060(lbl_8069B6D8 + 48, dst + stride * 7);
+    IdctColumn(lbl_8069B5B8 + 0, lbl_8069B6B8 + 0);
+    IdctColumn(lbl_8069B5B8 + 8, lbl_8069B6B8 + 1);
+    IdctColumn(lbl_8069B5B8 + 16, lbl_8069B6B8 + 2);
+    IdctColumn(lbl_8069B5B8 + 24, lbl_8069B6B8 + 3);
+    IdctColumn(lbl_8069B5B8 + 32, lbl_8069B6B8 + 4);
+    IdctColumn(lbl_8069B5B8 + 40, lbl_8069B6B8 + 5);
+    IdctColumn(lbl_8069B5B8 + 48, lbl_8069B6B8 + 6);
+    IdctColumn(lbl_8069B5B8 + 56, lbl_8069B6B8 + 7);
+    IdctRow(lbl_8069B6B8, dst);
+    IdctRow(lbl_8069B6D8 + 0, dst + stride * 1);
+    IdctRow(lbl_8069B6D8 + 8, dst + stride * 2);
+    IdctRow(lbl_8069B6D8 + 16, dst + stride * 3);
+    IdctRow(lbl_8069B6D8 + 24, dst + stride * 4);
+    IdctRow(lbl_8069B6D8 + 32, dst + stride * 5);
+    IdctRow(lbl_8069B6D8 + 40, dst + stride * 6);
+    IdctRow(lbl_8069B6D8 + 48, dst + stride * 7);
 }
