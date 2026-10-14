@@ -612,7 +612,6 @@ extern "C" FE_OVERLAY void fn_80446974(FeScr2* self)
     self->m15C = ((FeObjI*)self->m13C)->v61();
 }
 
-/* near-miss: retail does not CSE m158/m15C with the vcall results x/y in the equal branch (1 slot) */
 extern "C" FE_OVERLAY void fn_804469DC(FeScr2* self, int a)
 {
     int x = ((FeObjI*)self->m13C)->v60();
@@ -620,8 +619,8 @@ extern "C" FE_OVERLAY void fn_804469DC(FeScr2* self, int a)
     if (self->m158 == x && self->m15C == y) {
         if (a == 0)
             return;
-        ((FeTimer*)((FeObjP2*)self)->v90(self->m158, self->m15C))->s4();
     }
+    ((FeTimer*)((FeObjP2*)self)->v90(self->m158, self->m15C))->s4();
     ((FeTimer*)((FeObjP2*)self)->v90(x, y))->s3();
 }
 

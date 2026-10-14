@@ -567,12 +567,12 @@ FE_OVERLAY void fn_80470C08(FeScrL* x, int c)
     }
 }
 
-/* near-miss: store/load order of the m338/m328/m324 group differs */
+/* Retail reads the global value before storing the new mode and state fields. */
 FE_OVERLAY void fn_80470E30(FeScrL* x, int a, int b, int c, int d)
 {
     FeGlobal80619948* g = lbl_80619948;
-    x->m338 = b;
     x->m328 = g->m8C;
+    x->m338 = b;
     x->m324 = d;
     x->m334 = 0;
     if (x->m33C != a) {
