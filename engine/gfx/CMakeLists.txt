@@ -8,11 +8,16 @@
 # docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest of
 # the engine builds as before.
 
-add_library(engine_gfx STATIC png.cpp)
+add_library(engine_gfx STATIC png.cpp gx_processor.cpp)
 target_link_libraries(engine_gfx PUBLIC engine_common)
 target_compile_options(engine_gfx PRIVATE ${ENGINE_WARN})
 
 engine_test(test_gfx_png SOURCES tests/test_png.cpp LIBS engine_gfx)
+engine_test(test_gx_processor SOURCES tests/test_gx_processor.cpp LIBS engine_gfx)
+target_include_directories(test_gx_processor PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# The runtime's hook (runtime/gx_fifo.h) feeding the processor.
+engine_test(test_gfx_hook SOURCES tests/test_gfx_hook.cpp LIBS engine_gfx engine_runtime)
+target_include_directories(test_gfx_hook PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 # ---- WebGPU backend (Dawn + SDL3) ----
 # Pinned versions (docs/engine/TOOLCHAIN.md). The defaults point at the pinned

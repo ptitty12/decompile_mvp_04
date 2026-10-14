@@ -103,13 +103,14 @@ void GxFifo::call_list(std::uint32_t addr, std::uint32_t size, Effects& fx) {
       ++display_list_errors_;
       return;
     }
-    execute(p + at, fx, true);
+    execute(p + at, len, fx, true);
     at += len;
   }
 }
 
-void GxFifo::execute(const std::uint8_t* cmd, Effects& fx, bool in_list) {
+void GxFifo::execute(const std::uint8_t* cmd, std::size_t len, Effects& fx, bool in_list) {
   ++commands_;
+  if (observer_ && cmd[0] != 0x40) observer_->gx_command(cmd, len);
   switch (cmd[0]) {
     case 0x08: {
       std::uint8_t reg = cmd[1];
@@ -164,7 +165,7 @@ GxFifo::Effects GxFifo::push(const std::uint8_t* bytes, std::size_t n) {
       return fx;
     }
     if (len == 0 || len > pending_.size() - at) break;  // the rest of the command is still to come
-    execute(pending_.data() + at, fx, false);
+    execute(pending_.data() + at, len, fx, false);
     consumed_ += len;
     at += len;
   }
