@@ -34,7 +34,8 @@ In the worktree, read first:
 - Use `python tools/match/m2c_draft.py <unit> fn_XXXXXXXX` for a first draft, and `python tools/match/diff_unit.py <unit>` to rebuild and score.
 - Identical masked instruction words do NOT mean a match: branch destinations count. Never write a symbol's address as an integer literal: declare `extern char lbl_X[];` and use `lbl_X`.
 - Near-misses: `python tools/match/permute.py <unit> <fn> --setup-only`, then `--minutes 15 -j 2` in the background, one run at a time. Port a 0-score candidate by hand and verify it.
-- **Names.** Don't edit `config/GV4E69/symbols.txt` or rename shared symbols yourself; the lead applies names centrally. For each target function you understand, record a proposed name in your report, *only* with evidence:
+- **Pairing:** once a function's source compiles, run `python tools/scout/rename.py <unit> --write` so symbols.txt pairs it with its compiled (mangled) name; otherwise the match doesn't count. That is the only symbols.txt edit you make.
+- **Names.** Don't hand-edit `config/GV4E69/symbols.txt` or rename shared symbols yourself; the lead applies real names centrally. For each target function you understand, record a proposed name in your report, *only* with evidence:
   - a string it references (a source path, an assert or a debug message);
   - an EA reference name (`twins.py` shows refnames);
   - an SDK call pattern;

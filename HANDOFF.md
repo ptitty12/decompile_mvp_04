@@ -9,6 +9,12 @@
 > - New commit kinds: `name(...)` and `contract(...)`. The two contract repairs parked in DECISIONS
 >   ("Open questions") can now land.
 > - Engine work (`engine/`) is done by side sessions; integrate it with `--allow engine/ --allow docs/`.
+> - **2026-10-14 lead notes.**
+>   - Workers started before a symbol rename need `python tools/goals/rename_symbols.py tools/goals/renames/k1b_applied.tsv`
+>     after `git merge origin/main` (it does nothing on an already-renamed tree).
+>   - Pair new matches with `python tools/scout/rename.py <unit> --write`.
+>   - If the orch build fails to link on *old* `fn_` names, its dtk split is stale (ninja's depfile lost `symbols.txt`).
+>     Delete `build/GV4E69/config.json` in the orch worktree and rebuild.
 
 You are taking over as **lead/coordinator** (Opus) of the MVP Baseball 2005 GameCube matching decomp.
 Read `CLAUDE.md` first (hard rules), then this file. Owner standing orders (verbatim):

@@ -70,10 +70,14 @@ included, can never break a mod. It only makes the game easier to understand.
 
 | Target | Functions | Named | Matched | Done |
 |---|---:|---:|---:|---:|
-| K1 SDK boundary: SDK functions that game/EA code calls | 299 | 143 | 251 | 48% |
-| K2 roster data: database load/save path | 60 | 4 | 56 | 7% |
-| K3 determinism: time reads, `rand`/`srand`, async callbacks | 192 | 0 | 112 | 0% |
-| K4 main loop: `main` and two levels of callees | 81 | 1 | 70 | 1% |
+| K1 SDK boundary: SDK functions that game/EA code calls | 299 | 143 → **295** | 251 | 48% → **99%** |
+| K2 roster data: database load/save path | 60 | 4 | 56 → 57 | 7% |
+| K3 determinism: time reads, `rand`/`srand`, async callbacks | 192 → 201 | 0 → 2 | 112 → 137 | 0% |
+| K4 main loop: `main` and two levels of callees | 81 | 1 | 70 → 73 | 1% |
+
+Updated at the end of 2026-10-14 (main `22d10e4c`, 21,141 functions matched).
+- K1 is done apart from OSInit/DVDInit (they need data splits), `__init_user` and one function with no evidence.
+- K3 and K4 now need names more than matches. Several K3 functions read `mftb` directly, which has no C form under our rules, so they can't match; for those, "done" means named and documented in `docs/DETERMINISM.md`.
 
 Most of the code the engine needs is already matched. What's missing is
 **names and types**: for example, 251 of the 299 K1 functions match, but 156 of them
@@ -117,7 +121,7 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
 
 ## 5. Next steps, in order
 
-1. **K1 naming sweep** (lead, mostly scripted). Body-match the 156 unnamed K1
+1. ~~**K1 naming sweep**~~ 99% done 2026-10-14 (K1a 94 names, K1b 58 names plus dtk's cascade). Body-match the 156 unnamed K1
    functions against dolsdk2004 and the mitsevox SDK. Then rename them in
    `symbols.txt` with evidence. List them with
    `python tools/goals/targets.py --list K1 --todo`.

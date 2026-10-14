@@ -395,3 +395,16 @@
   - Held back: OSInit and DVDInit (their dtk cascade renames 150 more symbols: 82 functions, 68 data; needs six more contracts, the dvd.c BB2 overlay taken apart, and data splits for the linked fstload and EXIBios units whose statics dtk makes scope:local, including the function-local block$16); __init_user (dtk then names _ctors at 0x80649298, which SN's libgcc already uses for .ctors at 0x805A2BC0); fn_8040405C (no evidence).
   - Note: dtk makes signature-known statics scope:local and writes them as `<name>_<ADDR>` in the split asm when another object uses them. Units that reference such a name and are not linked are fine; linking one later needs its data split into it (GXResetFuncInfo in gx/tu_80428F14 is already in this state).
   | Owner: nothing pending.
+- 2026-10-14 (afternoon) | Claude Opus 5.5 ("claude-side-goals", acting lead) + 11 subagents | first day of the goal-driven plan | **matched 21,109 → 21,141 (+32)**, all merged and verified.
+  - **K1 (SDK names) 48% → 99%.**
+    - K1a: 94 names from mitsevox/mvp2005 (same DOL, CC0) plus RE4 and source-comment evidence.
+    - K1b: 58 more, plus dtk's signature cascade (34 functions, 18 data objects) and 12 contract commits that align prototypes with the SDK headers.
+    - New tools: `tools/goals/rename_symbols.py` (re-runnable, `--from-dtk`), and check_literals now resolves dtk's `<name>_<ADDR>` local spellings, which checks 5 more references.
+  - **Research landed:**
+    - `docs/engine/E0_SURVEY.md`: D1 is to write our own translator; D4 is resumable guest threads.
+    - `docs/DETERMINISM.md` (K3/K4): **gameplay is natively 60 Hz**; 65 nondeterminism sources; engine requirements R1-R17.
+    - `docs/ROSTERS.md` and `tools/rosters/` (K2): the database tables are RefPack-compressed **text**, round-tripped byte-exact; capacities 3,250 players, 1,800 pitchers and 126 teams.
+  - **K-target matching:** 5 Sonnet workers (k_01..k_05) matched 32 functions in K2/K3/K4 units. Several K3 functions read `mftb` and can't be matched under the no-asm rule.
+  - **Running at the end of the day:** E0b (native boot spike; Opus, worktree `decompile_mvp_04-e0b`, branch `engine/e0b`); the names pass (W1, `work/names-01`); roster/team pack format v1 (`side/packs-1014`); team-slot asset mapping (`side/teamassets-1014`).
+  - **Held back:** OSInit and DVDInit names (they need data splits for fstload and EXIBios); `__init_user` (dtk relocates `_ctors`).
+  | Owner: nothing pending.
