@@ -588,11 +588,23 @@ void Renderer::draw(const DrawCall& d) {
     }
   if (c.fog_type) ++stats_.fog_draws;
   wgpu::RenderPipeline p = pipeline(c);
-  wgpu::BindGroupDescriptor bgd{};
-  bgd.layout = bgl_textures_;
-  bgd.entryCount = 16;
-  bgd.entries = te;
-  wgpu::BindGroup tg = gpu_.device().CreateBindGroup(&bgd);
+  // Texture bind groups by their views and samplers. A cached group holds
+  // references to its views, so a handle's identity is never reused while the
+  // entry exists.
+  std::array<const void*, 16> key{};
+  for (int k = 0; k < 8; ++k) {
+    key[static_cast<std::size_t>(k)] = te[k].textureView.Get();
+    key[static_cast<std::size_t>(8 + k)] = te[8 + k].sampler.Get();
+  }
+  if (bind_groups_.size() > 4096) bind_groups_.clear();
+  wgpu::BindGroup& tg = bind_groups_[key];
+  if (!tg) {
+    wgpu::BindGroupDescriptor bgd{};
+    bgd.layout = bgl_textures_;
+    bgd.entryCount = 16;
+    bgd.entries = te;
+    tg = gpu_.device().CreateBindGroup(&bgd);
+  }
 
   begin_pass();
   const std::uint32_t uoff = static_cast<std::uint32_t>(udata_.size());

@@ -11,6 +11,7 @@
 
 #include <webgpu/webgpu_cpp.h>
 
+#include <array>
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -101,6 +102,7 @@ class Renderer : public Backend {
   std::map<std::uint64_t, std::unique_ptr<TexEntry>> textures_;
   std::map<std::uint32_t, std::unique_ptr<CopyEntry>> copies_;  // EFB copies to textures, by address
   std::map<std::uint32_t, wgpu::Sampler> samplers_;
+  std::map<std::array<const void*, 16>, wgpu::BindGroup> bind_groups_;
   std::uint64_t epoch_ = 1;
 
   // Clears and EFB-to-texture conversion.
