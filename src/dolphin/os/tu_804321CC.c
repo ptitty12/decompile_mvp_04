@@ -13,12 +13,12 @@
 
 /* ---- OSAlarm ---- */
 
-typedef struct AlarmQueue {
+typedef struct OSAlarmQueue {
     OSAlarm* head;
     OSAlarm* tail;
-} AlarmQueue;
+} OSAlarmQueue;
 
-extern AlarmQueue lbl_806EF7D8;
+extern OSAlarmQueue lbl_806EF7D8;
 extern OSResetFunctionInfo lbl_80635850;
 
 void fn_804321CC(void);
