@@ -113,7 +113,7 @@ void fn_80425608(DVDCBCallback callback);
 int fn_80424CF0(DVDCommandBlock* block, void* addr, s32 length, s32 offset, DVDCBCallback callback);
 int fn_80424DC0(DVDCommandBlock* block, DVDDiskID* diskID, DVDCBCallback callback);
 int fn_80424E94(DVDCommandBlock* block, DVDCBCallback callback);
-int fn_80424F50(DVDCommandBlock* block, void* info, DVDCBCallback callback);
+int fn_80424F50(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback);
 s32 DVDGetDriveStatus(void);
 int fn_804251BC(DVDCommandBlock* block, DVDCBCallback callback);
 void OSSleepThread(OSThreadQueue* queue);
@@ -1251,7 +1251,7 @@ int fn_80424E94(DVDCommandBlock* block, DVDCBCallback callback) {
     return idle;
 }
 
-int fn_80424F50(DVDCommandBlock* block, void* info, DVDCBCallback callback) {
+int fn_80424F50(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback) {
     BOOL idle;
     BOOL enabled;
     u32 pad[2];

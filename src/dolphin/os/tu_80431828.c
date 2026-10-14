@@ -15,7 +15,7 @@
 #include <dolphin/tail10.h>
 
 typedef struct OsBss {
-    /* 0x00 */ u8 driveInfo[0x20];
+    /* 0x00 */ DVDDriveInfo driveInfo;
     /* 0x20 */ DVDCommandBlock block;
     /* 0x50 */ OSExecParams params;
 } OsBss;
@@ -39,7 +39,7 @@ extern u8 lbl_80701020[] AT_ADDRESS(0x80701020);
 
 extern void fn_80403FF8(void);              /* EnableMetroTRKInterrupts */
 extern void fn_80422FD8(void);              /* DVDInit */
-extern int fn_80424F50(DVDCommandBlock* block, void* info, void* cb);   /* DVDInquiryAsync */
+extern int fn_80424F50(DVDCommandBlock* block, DVDDriveInfo* info, DVDCBCallback callback);   /* DVDInquiryAsync */
 extern void fn_80427F18(void);              /* EXIInit */
 extern void fn_80431D6C(void);              /* OSExceptionInit */
 extern void fn_80433C20(void);              /* __OSContextInit */
@@ -80,7 +80,7 @@ void fn_80431850(s32 result, DVDCommandBlock* block)
 {
     switch (block->state) {
     case 0:
-        __OSDeviceCode = (u16)(0x8000 | *(u16*)(lbl_806DF020.driveInfo + 2));
+        __OSDeviceCode = (u16)(0x8000 | lbl_806DF020.driveInfo.deviceCode);
         break;
     default:
         __OSDeviceCode = 1;
@@ -227,7 +227,7 @@ void fn_8043188C(void)
                 __OSDeviceCode = 0x9000;
             } else {
                 DCInvalidateRange(bss, 0x20);
-                fn_80424F50(&bss->block, bss, (void*)fn_80431850);
+                fn_80424F50(&bss->block, &bss->driveInfo, fn_80431850);
             }
         }
     }
