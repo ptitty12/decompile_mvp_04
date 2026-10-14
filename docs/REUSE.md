@@ -144,3 +144,13 @@ All reported:
    where `tools/scout/` and the matching effort go.
 5. **Check mvp2005's progress regularly** while the owner decides: it's active
    and ahead of us on infrastructure.
+
+## 6. Vendored into `engine/`
+
+Code copied into the engine tree. Only MIT, BSD, zlib, Apache-2.0 or CC0 code may
+appear here (CLAUDE.md). Each entry keeps its license file next to the code and is
+pinned to the exact upstream commit it was fetched from.
+
+| Path | Upstream | License | Pinned commit | Used for |
+|---|---|---|---|---|
+| `engine/third_party/doctest/doctest.h`, `LICENSE.txt` | [doctest/doctest](https://github.com/doctest/doctest) v2.5.3 | MIT | `2d0a9359a60c51affe2a9bebb1be1dca47868151` | Unit-test framework for every data-free engine test |

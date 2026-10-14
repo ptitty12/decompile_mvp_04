@@ -10,8 +10,8 @@ and the VPS services.
 - Rules: [`../CLAUDE.md`](../CLAUDE.md), "Rules for the engine track" and the hard
   rules for everyone.
 
-**Status (2026-10-14):** no code yet. E0a (recompiler survey) is next; its report
-goes to `docs/engine/E0_SURVEY.md`.
+**Status (2026-10-14):** E0b (native boot spike) in progress. Progress, build
+instructions and measurements: [`../docs/engine/E0B_LOG.md`](../docs/engine/E0B_LOG.md).
 
 Three rules matter most here:
 
