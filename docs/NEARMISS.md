@@ -394,3 +394,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `snd/tu_803AB310` `fn_803AC5CC`: swarm55 eight ordinary lifetime/global-pointer/block-scope forms; best95.8871%,62/62words, global/result saved-register allocation and result-move versus installed-store scheduling differ; source unchanged, scratch build/root55/AC5CC.
 
 - `fe/tu_8050C9DC` `fn_8050DD7C`: swarm55 eight ordinary field-store/lifetime orders with truthful int-address fn_80080EC4 boundary; best95.918365%,147/147words,four slots remain around final p2 store and float/p1-zero scheduling; source unchanged, scratch build/root55/DD7C.
+- `ealib/tu_8038BC58` `fn_8038E080`: swarm59 eight ordinary signed-division temporary, store-order, pointer and lifetime forms; best99.45946%,74/74words, division-result versus zero GPR assignment differs in six slots; source unchanged, build/root59/E080.
+- `ealib/tu_8038BC58` `fn_8038E8A4`: swarm59 eight ordinary store-order, pointer-lifetime and void-return forms; best99.166664%,18/18words, vtable base r9/r11 allocation differs in three slots; source unchanged, build/root59/E8A4.
