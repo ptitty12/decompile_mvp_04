@@ -546,7 +546,7 @@ extern "C" void fn_801BA0B8(B* u, P* q)
 }
 
 extern "C" float fn_801A0AA8(P* p, float a, float b);
-float fn_8017CC70(void* pl, int team);
+float fn_8017CC70(void* pl, int team, int* ev);
 
 /* near-miss: same code; the event id is loaded into r5 (tied to the pointer parameter) instead of r0. */
 inline void Unk801BA130_Set(Unk801B7FB0_Team* t, float v)
@@ -568,7 +568,7 @@ extern "C" int fn_801BA130(B* u, int team, int* ev, float amt)
     if (ok == 0 || e == 0x48 || e == 0x41) {
         cur = 0.0f;
     } else {
-        float v = fn_8017CC70(u->m4->m700, team);
+        float v = fn_8017CC70(u->m4->m700, team, ev);
         const float k1 = 0.6f;
         if (!(v <= k1)) {
             v = k1;
