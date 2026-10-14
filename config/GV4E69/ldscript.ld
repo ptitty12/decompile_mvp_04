@@ -64,4 +64,9 @@ SECTIONS
     . = ALIGN(32);
     .sdata2 : { *(.sdata2) }
     .sbss2 : { *(.sbss2) }
+
+    _stack_end = 0x806F1020;
+    _stack_addr = 0x80701020;
+    __ArenaLo = 0x80701040;
+    __ArenaHi = 0x81780000;
 }
