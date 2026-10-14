@@ -184,7 +184,7 @@ struct RcDt1 {
 struct RcDt2 {
     void* vp;
     char pad4[0x2b4];
-    RcD* m2B8;
+    RcAllocIf* m2B8;
     int m2BC;
     int m2C0;
 };
@@ -757,4 +757,63 @@ extern "C" void fn_803F7310(RcDt2* self, int c)
     self->vp = lbl_8060E6E8;
     if (c & 1)
         fn_803F6FC4((int)self, 0x2d0);
+}
+
+struct RcIfB;
+struct DVDDiskID;
+extern "C" void fn_803F9234(char*);
+extern "C" void fn_803F92D8(char*);
+extern "C" void fn_8041B75C();
+extern "C" DVDDiskID* fn_80425508();
+extern "C" char* strncpy(char*, const char*, unsigned);
+extern char lbl_8060E664[], lbl_8060E678[], lbl_8060E6A8[], lbl_8060E6C8[];
+extern int lbl_806EEA80, lbl_806EEA84, lbl_806EEA88;
+/* Constructor caller in tu_803EE8F8 uses RcIfB*(void*,void*); the handle
+ * supplies the same allocation interface used by fn_803F6F50. */
+extern "C" RcIfB* fn_803F713C(void* object, void* handle)
+{
+    RcDt2* self = (RcDt2*)object;
+    self->vp = lbl_8060E690;
+    char* item = (char*)self + 8;
+    int remaining = 2;
+    char* words;
+    do {
+        words = item + 0xC;
+        *(int*)(words - 0xC) = 0;
+        *(const void**)(words + 0x38) = lbl_8060E6C8;
+        *(short*)(words - 4) = 0;
+        *(short*)(words - 2) = 0;
+        *(int*)(words + 0) = 0;
+        *(int*)(words + 4) = 0;
+        *(int*)(words + 8) = 0;
+        *(int*)(words + 0xC) = 0;
+        *(int*)(words + 0x10) = 0;
+        *(int*)(words + 0x14) = 0;
+        *(int*)(words + 0x18) = 0;
+        *(int*)(words + 0x1C) = 0;
+        *(int*)(words + 0x20) = 0;
+        *(int*)(words + 0x24) = 0;
+        *(int*)(words + 0x28) = 0;
+        *(int*)(words + 0x2C) = 0;
+        *(int*)(words - 8) = 0x524D4306;
+        fn_803F9234(item);
+        *(const void**)(words + 0x38) = lbl_8060E6A8;
+        char* previous = item;
+        item += 0xE4;
+        fn_803F92D8(previous);
+    } while (remaining-- != 0);
+    struct Counts { short first, second; };
+    Counts* counts = (Counts*)((char*)self + 0x2C4);
+    counts->second = counts->first = 0;
+    self->m2B8 = *(RcAllocIf**)handle;
+    *(int*)((char*)self + 0x2B4) = lbl_806EEA80;
+    lbl_806EEA84 = 0;
+    RcReq* request;
+    self->m2BC = (int)self->m2B8->v0(0xA000, (request = RcLink(RcReq(1, (int)lbl_8060E664), RcReq(2, 0x20)), lbl_806EEA88 = 0, request));
+    self->m2C0 = (int)self->m2B8->v0(*(int*)((char*)self + 0x2B4), RcLink(RcReq(1, (int)lbl_8060E678), RcReq(2, 0x20)));
+    fn_8041B75C();
+    const char* id = (const char*)fn_80425508();
+    strncpy((char*)self + 0x2C8, id, 4);
+    strncpy((char*)self + 0x2CC, id + 4, 2);
+    return (RcIfB*)self;
 }
