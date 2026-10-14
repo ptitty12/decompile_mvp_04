@@ -1,8 +1,7 @@
 {"ops": [
+  {"op": "team.names", "team": "Ana", "location": "Harbor City", "nickname": "Lanterns", "abbreviation": "HCL"},
   {"op": "team.edit", "team": "Ana",
-   "set": {"team": {"team_location": "Harbor City", "team_long_name": "Lanterns", "team_short_name": "HCL", "team_steals": 2}}},
-  {"op": "loc.set", "file": "FEENG.LOC", "strings": {"2010": "Lanterns", "2050": "Harbor City Lanterns"}},
-  {"op": "loc.set", "file": "IGENG.LOC", "strings": {"2010": "Lanterns", "2050": "Harbor City Lanterns"}},
+   "set": {"team": {"team_steals": 2}}},
   {"op": "roster.set", "team": "Ana", "release": "remove",
    "entries": [
     {"player": "Arkwright,Desmond", "pos": "C:8", "lh_al": "B", "lh_nl": "B"},

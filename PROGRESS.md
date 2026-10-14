@@ -411,18 +411,21 @@
 - 2026-10-14 | Claude Opus 5.5 ("claude-side-packs" side session) | E6/E7 foundation: roster and team pack format v1, on branch side/packs-1014 (not pushed; for the lead to integrate) | matched 0 | No milestone exit yet (E6 needs the engine loader); the format and its reference implementation are done.
   - New: `docs/MODDING.md`, the v1 contract. It covers:
     - the manifest and pack layout;
-    - 11 operations: player add, edit, remove and rename; roster set, replace and swap; team edit; manager edit and rename (also by team code, so a team pack never names the retail manager); LOC text;
-    - asset mappings to BIG entries under `/data/frontend/`;
+    - 12 operations: player add, edit, remove and rename; roster set, replace and swap; team names and team edit; manager edit and rename (also by team code, so a team pack never names the retail manager); LOC text;
+    - `team.names` sets `team.dat` and every LOC string of a team, finding the ids in the player's own `main.dol` through the slot tables of ROSTERS.md §12;
+    - asset mappings to existing BIG entries under the file-overridable roots (frontend, models.big, stadium, announcer audio). Rebuilds keep each archive's payload alignment, so the 64- and 128-byte aligned announcer archives now rebuild byte for byte;
+    - section 13 (team slots), filled from ROSTERS.md §12: what v1 can replace, and what it can't (home park, tid list, LOC-id tables, uniform letters; load screens are global);
     - static and full validation with stable error codes;
     - composition: a pack may overwrite or use another pack's cells only if it depends on it;
     - canonical serialization and the pack, set and result hashes;
     - the semver policy (minor versions only relax or add);
-    - a worked example, a TODO table of team-slot ids and paths, and open questions.
-  - New: `tools/rosters/pack.py` (validate, apply, hash, new) and `tools/rosters/tests/test_pack.py` (36 tests on a synthetic disc; all 59 roster tests pass).
+    - a worked example and open questions for a boot.
+  - New: `tools/rosters/pack.py` (validate, apply, hash, new) and `tools/rosters/tests/test_pack.py` (41 tests on a synthetic disc with a synthetic `main.dol`; all 64 roster tests pass). `big.py` gained `payload_alignment()` and an `align` parameter.
   - New: `docs/examples/packs/fictional-league/`, which replaces the Anaheim slot with an invented club (25 players, full depth chart, names, manager).
   - Evidence used for the roster rules: the `roster.dat` loader in `src/db/tu_8053967C.cpp` keeps at most 25 ids per team, at most 3 LR, 4 MR, 2 SU and 1 CP per lineup, and reads pitching roles from the first lineup column only.
   - Local end-to-end on GV4E69, nothing committed:
-    - the example applies with 0 errors and 8 warnings;
+    - the example applies with 0 errors and 9 warnings;
+    - `team.names` hit exactly Anaheim's ids 2010, 2050 and 7210 (both LOC files) and 17618 (FEENG);
     - every untouched retail row, the other 125 rosters and `tstat`'s stored bytes are identical;
     - two runs, and an image versus an extracted directory, give identical bytes;
     - `database.big` grows from 1,010,678 to 1,056,803 bytes.

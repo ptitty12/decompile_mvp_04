@@ -120,9 +120,12 @@ written as 9 lowercase hex digits in every player table and in `roster`.
 ### 4.2 Teams
 
 A team is named by its `unique_team` code (`"Ana"`, `"NYY"`, `"ChC"`, `"AL"`), case-sensitive.
-The 126 team slots are fixed (`ROSTERS.md` §4.4, §6). A team pack **keeps the slot's code**
-and changes the display fields, the roster, the manager, the text and the art. Packs cannot
-change `unique_team`, `team_league`, `team_division` or `team_artid`.
+The 126 team rows are fixed (`ROSTERS.md` §4.4, §6). A team pack **keeps the slot's code, row
+and `team_artid`** (= row + 1) and changes the names, the roster, the manager and the art.
+Packs cannot change `unique_team`, `team_league`, `team_division` or `team_artid`, and cannot
+reorder rows. The game turns a code into a *tid* through a list compiled into `main.dol`, so
+the set of codes is fixed by the program, not by the data (section 13). Rows 124 and 125 (`Eaa`, `Eab`,
+the two Burnaby teams) have no tid. They can hold players, but they are not team slots.
 
 ### 4.3 Managers
 
@@ -161,6 +164,7 @@ change what an earlier op did. Between packs, section 8 applies.
 | `roster.set` | `team`, `entries`, [`release`] | Replace a team's whole roster and depth chart |
 | `roster.replace` | `team`, `out`, `in`, [`release`] | `in` takes `out`'s place on that team |
 | `roster.swap` | `a`, `b` | Two players exchange places (a trade, or a depth-chart swap) |
+| `team.names` | `team`, [`location`], [`nickname`], [`abbreviation`], [`full_name`] | A team's names in `team.dat` and in every LOC string the game shows for it |
 | `team.edit` | `team`, `set` | Fields of `team`, `tstat` and `org` |
 | `manager.edit` | `manager` or `team`, `set` | Fields of `manager` |
 | `manager.rename` | `manager` or `team`, `to` | Change a manager's name and key; `org` links follow |
@@ -237,6 +241,30 @@ a lineup key overrides it.
 ### 5.3 Teams
 
 ```json
+{"op": "team.names", "team": "Ana", "location": "Harbor City", "nickname": "Lanterns",
+ "abbreviation": "HCL"}
+```
+
+`team.names` is how a pack renames a team. The game shows a team's names from two places,
+and both are live (`ROSTERS.md` §12.6): the `team.dat` strings and LOC strings that the game
+finds through four id tables in `main.dol`, indexed by tid. The op sets:
+
+| Field | `team.dat` column | LOC strings (ids from the player's own `main.dol`) |
+|---|---|---|
+| `location` | `team_location` | city, `FEENG.LOC` |
+| `nickname` | `team_long_name` | nickname, `FEENG.LOC` and `IGENG.LOC` |
+| `abbreviation` | `team_short_name` | abbreviation, both files |
+| `full_name` | none | full name, both files. If omitted and `location` or `nickname` is given, it is `"<location> <nickname>"` after the change |
+
+- `location` and `nickname` follow the `team.dat` text rules (Appendix A), and `abbreviation` is
+  1-3 characters of `A-Z 0-9`. `full_name` follows the LOC rules (section 5.5).
+- A few city strings are shared by two teams. Changing one gives warning `W-LOC-SHARED`
+  naming the other team, whose city text changes too.
+- On rows 124 and 125 only `team.dat` changes, with warning `W-NOT-A-SLOT`.
+- The tables are read from the player's disc, and `main.dol` must have the retail SHA-1
+  (`da6becdb...`). A pack never contains the ids.
+
+```json
 {"op": "team.edit", "team": "Ana", "set": {
   "team": {"team_location": "Harbor City", "team_long_name": "Lanterns",
            "team_short_name": "HCL", "team_steals": 2},
@@ -244,10 +272,9 @@ a lineup key overrides it.
   "org": {"org_budget": 60000, "org_mlb_manager": "Quarrington,Basil"}}}
 ```
 
-`team_location` is the city, `team_long_name` the nickname and `team_short_name` the display
-abbreviation. The same names also live in the LOC files: change those with `loc.set`
-(section 5.5). `org` exists only for the 30 clubs, the two All-Star sides and the two MVP
-teams. Manager columns of `org` take a manager name.
+`team.edit` sets single columns. Setting the name columns there changes `team.dat` only;
+use `team.names` to keep the LOC strings consistent. `org` exists only for the 30 clubs,
+the two All-Star sides and the two MVP teams. Manager columns of `org` take a manager name.
 
 ### 5.4 Managers
 
@@ -272,7 +299,8 @@ renames and edits the slot's manager. `Default,Default` is protected.
 - Text is at most 400 characters of printable ASCII, plus the five non-ASCII characters the
   retail files use (U+00A0, U+00A9, U+00AE, U+2026, U+2122). Text longer than the string it
   replaces gives warning `W-LOC-LENGTH`, because the screen box may be too small.
-- Which ids hold which team's names is in section 13.
+- For team names, use `team.names`, which finds the ids itself. `loc.set` is for any other
+  string, such as a park name (section 13).
 
 ### 5.6 Assets
 
@@ -283,16 +311,21 @@ The manifest's `assets` list maps authored files to game paths:
 {"path": "/data/frontend/intro.vp6", "file": "assets/intro.vp6"}
 ```
 
-- `path` is the absolute disc path, matched case-insensitively. v1 accepts paths under
-  `/data/frontend/` only; later minor versions may add roots.
-- A `.big` archive is changed entry by entry: `entry` names an existing entry, and the
-  archive is rebuilt with that entry's payload replaced. Any other file is replaced whole.
+- `path` is the absolute disc path, matched case-insensitively. v1 accepts the places that
+  hold file-overridable team art and audio: `/data/frontend/`, `/data/models.big`,
+  `/data/stadium/`, `/data/audio/spch_pbp/` and `/data/audio/spch_pa/`. Later minor versions
+  may add roots.
+- A `.big` archive is changed entry by entry: `entry` names an **existing** entry, and the
+  archive is rebuilt with that entry's payload replaced. The rebuild keeps the archive's
+  payload alignment: 4 for most archives, 64 or 128 for the announcer archives. v1 does not
+  add entries, so it cannot add uniform letters. Any other file is replaced whole.
 - The file's bytes become the payload as they are: the pack supplies the game's own format
   (`.gsh` textures, for example). Converting from PNG is a tooling job, not part of the
   format. The game accepts raw payloads as well as RefPack ones (`ROSTERS.md` §2.2).
 - An asset may not be a BIG archive or a LOC file, may not equal the retail bytes it replaces,
   and only one asset per target is allowed in a pack.
-- Which entries belong to which team slot is section 13.
+- Which entries belong to which team slot is section 13. Matching `.gsh` layouts (image names
+  and sizes inside the container) is the author's job in v1. The tools do not parse them yet.
 
 ## 6. Rosters: the rules the game imposes
 
@@ -337,7 +370,7 @@ All shipped rosters satisfy these rules. On output the `roster` table is rebuilt
 - `set`: the table is allowed for the op, the column exists and is settable, and the value has
   the right type and range.
 - Roster entries: syntax of every place.
-- `loc.set`: file name, id syntax, characters and length.
+- `loc.set` and `team.names`: file name, id syntax, characters and length.
 - Assets: path root, `entry` rules, file kinds, duplicate targets.
 - The set: unique ids, and every dependency earlier in the order with a matching version.
 
@@ -380,7 +413,8 @@ the output. Codes are stable within a major version:
 | `E-CAPACITY` | Over a table capacity |
 | `E-CONFLICT` | Two packs change the same thing without a dependency (section 8) |
 | `E-RETAIL-COPY` | An asset equals the retail bytes it replaces |
-| `W-LOC-LENGTH`, `W-FREE-SLOTS`, `W-ALLSTAR-ONLY`, `W-PITCHER-BENCH` | Warnings (above) |
+| `W-LOC-LENGTH`, `W-LOC-SHARED`, `W-NOT-A-SLOT` | Warnings: text longer than before; a city string another team shares; names set on a row with no tid |
+| `W-FREE-SLOTS`, `W-ALLSTAR-ONLY`, `W-PITCHER-BENCH` | Warnings (sections 6 and 7.3) |
 
 ## 8. Composition and conflicts
 
@@ -396,9 +430,9 @@ Applying records which pack last wrote each **cell**:
 | one column of one player's row in one table | `player.add` (every column), `player.edit` |
 | a player's pitcher status | `player.edit` with `pitcher` |
 | a team's roster | `roster.set`, `roster.replace`, `roster.swap` |
-| one column of a team's `team`, `tstat` or `org` row | `team.edit` |
+| one column of a team's `team`, `tstat` or `org` row | `team.edit`, `team.names` |
 | a manager's existence, one manager column | `manager.rename`, `manager.edit` |
-| one LOC string (file, id) | `loc.set` |
+| one LOC string (file, id) | `loc.set`, `team.names` |
 | one asset target (path, entry) | `assets` |
 
 The rules:
@@ -443,7 +477,10 @@ is the table and LOC text, and the *result hash* (section 10) covers exactly tha
 
 **Output layout.** `pack.py apply` writes only the changed files, at their disc paths, under
 `--out`: `data/database/database.big`, `data/FEENG.LOC`, `data/frontend/logos.big`, and so
-on. It also writes `pack-apply.json` with the hashes and the issues. The engine's virtual disc
+on. Rebuilt archives keep their payload alignment, so an archive rebuilt with no changes is
+identical to the disc's (checked on all six archive kinds touched by slot assets, including
+the 64- and 128-byte aligned announcer archives). It also writes `pack-apply.json` with the
+hashes and the issues. The engine's virtual disc
 mounts the same files over the image. `--out` must not be inside a git work tree unless git
 ignores it: these files are derived from the disc and are never committed or hosted.
 
@@ -479,7 +516,7 @@ engine bug before the match, and a hash is not game data.
   declares the version it targets in `engine_api`. An engine with API `X.Y` accepts packs
   with the same `X` and a minor version up to `Y`.
 - **A minor version** only adds or relaxes: new ops, new optional fields, more settable
-  columns, wider ranges, more asset roots, slot tables (section 13), an error relaxed to a
+  columns, wider ranges, more asset roots, slot shorthands (section 13), an error relaxed to a
   warning. Every pack valid under `1.x` stays valid under `1.y` (y > x) and **produces the same
   output and the same hashes**.
 - **A major version** is anything else: changed semantics, serialization, ordering, hashing
@@ -504,7 +541,7 @@ number in it is invented.
 |---|---|
 | `pack.json` | id `fictional-league`, version 1.0.0, `engine_api` 1.0, no dependencies, three patch files |
 | `patches/players.json` | 25 `player.add`: 13 position players and 12 pitchers (`"pitcher": true`). Each sets positions, handedness and the main ratings; everything else comes from `Default,Default`. The relievers set pitches 3 and 4 to `"-"` |
-| `patches/harbor-city.json` | `team.edit` (location, nickname, abbreviation `HCL`, a strategy setting); `loc.set` of ids 2010 (nickname) and 2050 (full name) in `FEENG.LOC` and `IGENG.LOC`; `roster.set` with the full depth chart and `"release": "remove"`; `manager.rename` and `manager.edit` through `"team": "Ana"` |
+| `patches/harbor-city.json` | `team.names` (Harbor City, Lanterns, `HCL`); `team.edit` of a strategy setting; `roster.set` with the full depth chart and `"release": "remove"`; `manager.rename` and `manager.edit` through `"team": "Ana"` |
 | `patches/tweaks.json` | `player.edit` of one player's speed; `roster.swap` of the two catchers, so the left-handed hitter starts against right-handers |
 
 The depth chart shows the platoon form: the starting catcher is `"pos": "C:8"` with
@@ -512,14 +549,14 @@ The depth chart shows the platoon form: the starting catcher is `"pos": "C:8"` w
 the `_nl` lineups, and `SP1` bats ninth there.
 
 Static validation: no errors. Pack hash
-`cabf0cf1272567483667678424437106377851e6343931731fb767aa58515612`, set hash (this pack alone)
-`208cb5501ba163ad72bfc95919c4c598531621d15e6eb0ef26c6f4aa94dbed1c`.
+`e83c0341774a0363d2ce834624a8ca62bbc944a9e005806fd025f42bb2aab4f5`, set hash (this pack alone)
+`b9a04e6578e789b4abe0f8a95d4c269ebda1881ace871e083c399f1d6023cafb`.
 
 Applied to GV4E69 rev 0 (checked locally on 2026-10-14; nothing derived from the disc is in the
 repo):
 
-- No errors; 8 warnings:
-  - 4 `W-LOC-LENGTH` (the new names are longer than the old ones);
+- No errors; 9 warnings:
+  - 5 `W-LOC-LENGTH` (the new names are longer than the old ones);
   - 2 `W-FREE-SLOTS` (327 player and 368 pitcher slots left);
   - 2 `W-ALLSTAR-ONLY`: two released Anaheim players are also on the AL All-Star roster, so
     they are kept.
@@ -528,33 +565,65 @@ repo):
   - every retail row that the pack did not touch is identical, in the same order;
   - the rosters of the other 125 teams are identical;
   - `tstat` keeps its original compressed bytes;
-  - the LOC files differ only at ids 2010 and 2050;
+  - `team.names` resolved Anaheim's ids from `main.dol`: the LOC files differ only at ids 2010
+    (nickname), 2050 (full name) and 7210 (abbreviation) in both files, and 17618 (city) in
+    `FEENG.LOC`;
   - the `org` row of Anaheim points to the renamed manager.
 - A second run gave byte-identical files.
 - `database.big` grew from 1,010,678 to 1,056,803 bytes, because 17 tables were recompressed.
 
-## 13. TODO: team-slot tables
+## 13. Team slots: what a team pack can replace
 
-The mechanisms above (explicit `loc.set` ids and explicit asset paths) are complete and stable.
-What is missing is the **table of which ids and paths belong to each of the 126 slots**. It
-comes from the team-slot asset mapping work (`ROSTERS.md` §7, §10 question 1). When it lands, a
-minor version adds it here and may add a slot-level shorthand (for example
-`{"slot": "Ana", "kind": "logo", "file": ...}`) that expands to the explicit form. Packs that
-use the explicit form stay valid.
+From `ROSTERS.md` §12 (the team-slot asset mapping, 2026-10-14), where the evidence is.
 
-| Item | Known so far | Still needed |
-|---|---|---|
-| Nickname, full name | `FEENG.LOC`/`IGENG.LOC` ids `2000+n` and `2040+n` for the 30 clubs and the All-Star sides (`n` in division order, not team-row order: AL East, Central, West, NL East, Central, West; Anaheim is `n = 10`) | `n` for every slot; ids for the 90 minor-league and 4 special teams; the other copies (around 16000, 17200, 17618-17645, 22177-22208, 22941-22964) |
-| Logo | `frontend/logos.big` `l000`-`l125`, `logos_a.big` `a000`-`a125`; index probably `team_artid - 1` | confirm the index; the `l994`-`l999` entries |
-| Uniforms | `frontend/uniforms.big` `000`-`123` plus lettered variants; `coopunis.big` `c001`-`c122` | which entry is home, away and alternate for each slot; the in-game uniform textures |
-| Load screen | `frontend/load0.big`-`load48.big` | the slot-to-screen map |
-| Stadium picture and name | `frontend/stadiums.big`, stadium LOC strings | the team-to-stadium table |
-| Announcer clips | `audio/spch_pbp/tnamedat.big` (124 entries), `spch_pa/tnamedat.big` | format; the asset root `/data/audio/` (not allowed in v1) |
+**Three numberings.** The **row** `r` (0-125) is the team's row in `team.dat`, with
+`team_artid = r + 1`. It names the art files and the announcer clip. The **tid** (0-123) is
+the team's position in a list compiled into `main.dol`. It selects the LOC ids and the home
+park. The **stadium id** `S` comes from the tid and selects the park. A slot keeps all three,
+so a team pack works per row and puts every asset at the row's number.
+
+**Replaceable in v1** (`<r>` is the row as three digits, `NN` is `r + 1` as two digits, or
+three above 99):
+
+| What | How |
+|---|---|
+| Names: city, nickname, abbreviation, full name | `team.names` (section 5.3) |
+| Logo, cap, colour bar, gradient (front end and scoreboard) | assets `/data/frontend/logos.big` entry `l<r>.gsh` and `/data/frontend/logos_a.big` entry `a<r>.gsh`: SHPG containers with the images `l j i g e d a` + number. The team colours are those images; there is no colour table |
+| Uniforms, front end | `/data/frontend/uniforms.big` entries `<r>.gsh` (one image per letter) and `<r>a.gsh`, `<r>b.gsh` |
+| Uniforms, on the field | `/data/models.big` entries `u<r>a.gsh`, `u<r>b.gsh` (jersey sheet, 28 parts) and `f<r>a.gsh`, `f<r>b.gsh` (numbers and letters); optionally `a<r><x>.gsh`. The game falls back to letter `a` |
+| Team-name announcer clip | `/data/audio/spch_pbp/tnamedat.big` entry `NN.dat` (EA `SCHl` stream) and `tnamehdr.big` entry `NN.hdr` (`4A 9A` then `NN` as a big-endian 16-bit number at bytes 2-3); public address: `/data/audio/spch_pa/`, `NN` up to 92. A missing or unchanged clip leaves silence or the old name |
+| Roster, depth chart, manager, org | the ops of section 5 |
+| Park contents and pictures (optional) | `/data/stadium/<park>.big` entries, `/data/frontend/stadiums.big` and `fields.big` entries, the park-name LOC string (`loc.set`) and `stdnmdat.big`/`stdnmhdr.big` clips. MLB clubs own their park. Each minor-league park is shared by 10 teams, so replacing its files changes all 10 |
+
+Per level: rows 0-29 (MLB) have uniform letters `a`, `b` and more; rows 30, 31 (All-Stars) and
+122, 123 (Legends, Heroes) have `a` only; rows 32-121 have `a` and `b`. Announcer clips exist
+for rows 0-123 (play by play) and up to row 91 (public address, none for Washington).
+
+**Not replaceable in v1.** These are words in `main.dol`, not files. Changing them needs an
+engine data patch, which is a future, separately versioned API:
+
+- **which park a team plays in** (tid to `S` to park files);
+- **the tid list**, and with it the `unique_team` codes;
+- **the LOC-id tables** (which string ids a team uses);
+- **the 16 uniform letters** `a`-`p`;
+- the All-Star host parks and the park-name tables.
+
+**Not per team.** Load screens (`/data/frontend/load0.big`-`load48.big`) are chosen at random
+for every game, so a pack can only replace them for everybody. Cooperstown art and background
+screens are not per team either.
+
+**Rows 124 and 125** (Burnaby) have no tid. The front end shows the first slot's (Anaheim's)
+names, logo and uniforms for them, and they have no announcer clip. They hold players, but a
+team pack does not target them.
+
+A slot-level shorthand for assets (for example `{"slot": "Ana", "kind": "logo", "file": ...}`
+expanding to the paths above) may come in a minor version. Packs that use explicit paths stay
+valid.
 
 ## 14. Open questions
 
 These need the engine, a real boot or more decomp. None of them blocks the format: each one
-can only relax a v1 rule or fill section 13.
+can only relax a v1 rule or add to section 13.
 
 1. **Larger `database.big`.** The game loads the file whole into a buffer sized from the file
    (`ROSTERS.md` §2.2), but nobody has booted a recompressed or larger one. The example grows it
@@ -572,11 +641,15 @@ can only relax a v1 rule or fill section 13.
    the set hash in the save and warn when it differs.
 7. **`hist.dat`.** Career history lines are keyed by the player key. A renamed or removed player
    loses his lines, and an added one has none. v1 does not patch `hist.dat`.
-8. **Announcer audio.** Renamed teams and new players have no spoken names until audio packs
-   exist (`audioid`, `tnamedat.big`).
-9. **Archives with non-standard alignment** (`tnamedat.big`, `stdnmdat.big`, `frontend/misc.big`):
-   rebuilding them changes their layout. Check before adding their roots.
-10. **The draft.** How many free player slots a dynasty needs (the `W-FREE-SLOTS` threshold).
+8. **Announcer audio.** A new team name needs an EA `SCHl` GameCube stream and the meaning of
+   the `.hdr` cut points (`ROSTERS.md` §12.12). Until a tool writes them, a renamed slot is
+   silent or says the old name. New players have the same problem (`audioid`).
+9. **Art formats.** The pixel formats and limits the GSH loader enforces on authored images,
+   and whether the `l`/`a` logo halves must have identical layouts. A `.gsh` checker would let
+   validation catch a broken texture before boot.
+10. **Uniform letters.** The default home and away letters, the unlock rules, and adding letters
+    (v1 replaces existing entries only).
+11. **The draft.** How many free player slots a dynasty needs (the `W-FREE-SLOTS` threshold).
 
 ## Appendix A: settable columns and ranges
 
@@ -617,5 +690,6 @@ pack.py hash PACK...
 pack.py new DIR --id ID [--name NAME]
 ```
 
-`IMAGE` is an ISO or CISO image, or a directory holding an extracted disc. Exit status 0 means
+`IMAGE` is an ISO or CISO image, or a directory holding an extracted disc (`data/...`, and
+`sys/main.dol` when a pack uses `team.names`). Exit status 0 means
 no errors (warnings allowed), 1 means errors, 2 means a usage or I/O problem.
