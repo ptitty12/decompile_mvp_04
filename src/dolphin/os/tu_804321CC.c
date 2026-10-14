@@ -248,7 +248,7 @@ typedef struct HeapDesc {
     Cell* allocated;
 } HeapDesc;
 
-extern volatile long lbl_806EF2C8;   /* __OSCurrHeap */
+extern volatile OSHeapHandle lbl_806EF2C8; /* __OSCurrHeap */
 extern HeapDesc* lbl_806EF7E0;       /* HeapArray */
 extern int lbl_806EF7E4;             /* NumHeaps */
 extern void* lbl_806EF7E8;           /* ArenaStart */
@@ -277,11 +277,11 @@ static Cell* DLAddFront(Cell* list, Cell* cell)
 }
 
 Cell* fn_804329A4(Cell* list, Cell* cell);
-void* fn_80432A50(long heap, u32 size);
-void fn_80432B4C(long heap, void* ptr);
-long fn_80432BC8(long heap);
+void* fn_80432A50(OSHeapHandle heap, u32 size);
+void fn_80432B4C(OSHeapHandle heap, void* ptr);
+OSHeapHandle fn_80432BC8(OSHeapHandle heap);
 void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps);
-long fn_80432C48(void* start, void* end);
+OSHeapHandle fn_80432C48(void* start, void* end);
 
 /* DLInsert */
 Cell* fn_804329A4(Cell* list, Cell* cell)
@@ -323,7 +323,7 @@ Cell* fn_804329A4(Cell* list, Cell* cell)
 }
 
 /* OSAllocFromHeap */
-void* fn_80432A50(long heap, u32 size)
+void* fn_80432A50(OSHeapHandle heap, u32 size)
 {
     HeapDesc* hd = &lbl_806EF7E0[heap];
     long sz = (long)(((size + 32) + 31) & ~31);
@@ -365,7 +365,7 @@ void* fn_80432A50(long heap, u32 size)
 
 /* OSFreeToHeap */
 /* near-miss: same instructions, stack frame 32 bytes vs retail 24 */
-void fn_80432B4C(long heap, void* ptr)
+void fn_80432B4C(OSHeapHandle heap, void* ptr)
 {
     Cell* cell = (Cell*)((char*)ptr - 32);
     HeapDesc* hd = &lbl_806EF7E0[heap];
@@ -375,9 +375,9 @@ void fn_80432B4C(long heap, void* ptr)
 }
 
 /* OSSetCurrentHeap */
-long fn_80432BC8(long heap)
+OSHeapHandle fn_80432BC8(OSHeapHandle heap)
 {
-    long prev = lbl_806EF2C8;
+    OSHeapHandle prev = lbl_806EF2C8;
     lbl_806EF2C8 = heap;
     return prev;
 }
@@ -408,9 +408,9 @@ void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps)
 }
 
 /* OSCreateHeap */
-long fn_80432C48(void* start, void* end)
+OSHeapHandle fn_80432C48(void* start, void* end)
 {
-    long heap;
+    OSHeapHandle heap;
     HeapDesc* hd;
     Cell* cell;
 
