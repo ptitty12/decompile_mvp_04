@@ -12,11 +12,11 @@ void GXGetVtxDescv(void* list);
 void GXSetVtxDescv(void* list);
 void GXGetCullMode(int* mode);
 void GXSetCullMode(int mode);
-void fn_8042B460(void);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void GXBegin(int a, int b, int c);
-void fn_8042FED0(int a, int b, int c);
-void fn_8042FE78(int a);
+void GXSetZMode(int a, int b, int c);
+void GXSetColorUpdate(int a);
 }
 
 union PPCWGPipe {
@@ -101,11 +101,11 @@ extern "C" void fn_803DB4CC()
     int e = 0;
     if (b)
         e = 1;
-    fn_8042FED0(1, v, e);
+    GXSetZMode(1, v, e);
     int f = 0;
     if (lbl_80627A88)
         f = 1;
-    fn_8042FE78(f);
+    GXSetColorUpdate(f);
 }
 
 extern "C" void fn_803DB9C0(int flags, int mode)
@@ -113,7 +113,7 @@ extern "C" void fn_803DB9C0(int flags, int mode)
     if (flags == lbl_80627A8C && mode == lbl_80627A90)
         return;
     if (mode != -1) {
-        fn_8042B460();
+        GXClearVtxDesc();
         if (flags & 0x1)
             GXSetVtxDesc(0, 1);
         if (flags & 0x2)

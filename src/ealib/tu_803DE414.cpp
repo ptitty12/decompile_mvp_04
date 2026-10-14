@@ -90,8 +90,8 @@ extern "C" {
 int fn_803E0898(Unk803DE414Light* self);
 void GXInvalidateVtxCache(void);
 void GXInvalidateTexAll(void);
-void fn_8042FF38(int fmt, int z);
-void fn_8043000C(int dither);
+void GXSetPixelFmt(int fmt, int z);
+void GXSetDither(int dither);
 }
 
 extern "C" {
@@ -615,15 +615,15 @@ extern "C" void fn_803E032C(Unk803E032CObj* self)
     int r = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
     if (r != lbl_80627324) {
         if (r != 0)
-            fn_8042FF38(1, 0);
+            GXSetPixelFmt(1, 0);
         else
-            fn_8042FF38(0, 0);
+            GXSetPixelFmt(0, 0);
     }
     if (r != 0) {
         int d = 0;
         if (self->m70 != 0)
             d = 1;
-        fn_8043000C(d);
+        GXSetDither(d);
     }
 }
 
@@ -646,17 +646,17 @@ void GXSetCopyFilter(unsigned char aa, unsigned char* pattern, unsigned char vf,
 void GXCopyTex(void* dest, int clear);
 void fn_803D9E00(void* a, int* b, unsigned char** c);
 void fn_803D9268(void* p);
-void fn_8042FF38(int fmt, int z);
-void fn_8042FED0(int a, int b, int c);
-void fn_8042FE78(int a);
+void GXSetPixelFmt(int fmt, int z);
+void GXSetZMode(int a, int b, int c);
+void GXSetColorUpdate(int a);
 }
 
 extern "C" void fn_803E0458(Unk803E0458Obj* self)
 {
     Unk803E032CSub* sub = (Unk803E032CSub*)((char*)self + 0x3C);
     fn_803D81B4(fn_803D81FC() + 4, 0);
-    fn_8042FED0(1, 3, 1);
-    fn_8042FE78(1);
+    GXSetZMode(1, 3, 1);
+    GXSetColorUpdate(1);
     unsigned short w = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m4;
     unsigned short h = ((Unk803E0458Info*)fn_803DD7C0(self->m54))->m6;
     float a = 640.0f;
@@ -691,9 +691,9 @@ extern "C" void fn_803E0458(Unk803E0458Obj* self)
     int r2 = fn_803E0898((Unk803DE414Light*)((char*)self + 0x10));
     if (r2 != lbl_80627324) {
         if (lbl_80627324 != 0)
-            fn_8042FF38(1, 0);
+            GXSetPixelFmt(1, 0);
         else
-            fn_8042FF38(0, 0);
+            GXSetPixelFmt(0, 0);
     }
     fn_803D81FC();
     fn_803D9268((char*)fn_803D817C() + 0x38);

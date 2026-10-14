@@ -17,7 +17,9 @@ Relocations to symbols outside the object (calls, globals) are compared by
 address through symbols.txt: a call to the wrong function or a load of the
 wrong global also scores 100% in the default report. Targets whose name is
 not in symbols.txt are counted as unresolved (they would fail to link) and
-listed with -v. Prints one line per mismatch and exits 1 if there are any.
+listed with -v. dtk spells a scope:local symbol that another split object
+references as <name>_<ADDR>; those resolve by the address in the name, and a
+name that symbols.txt gives several addresses (local statics) matches any of them. Prints one line per mismatch and exits 1 if there are any.
 This is a lead-side extra check; it does not replace tools/verify.
 """
 import json
@@ -95,10 +97,12 @@ def main():
     report = json.loads((BUILD / "report.json").read_text())
     dol = Elf(BUILD / "main.elf")
     addr_of = {}
+    addrs = {}  # every address a name has: scope:local names (ResetFunctionInfo, @69) repeat
     for line in (ROOT / "config" / "GV4E69" / "symbols.txt").read_text().splitlines():
         m = re.match(r"^(\S+) = [.\w]+:0x([0-9A-Fa-f]+);", line)
         if m:
             addr_of[m.group(1)] = int(m.group(2), 16)
+            addrs.setdefault(m.group(1), set()).add(int(m.group(2), 16))
     # Sources written before a symbol got its real name still reference the
     # old placeholder; resolve those through the alias table.
     aliases = ROOT / "tools" / "match" / "symbol_aliases.tsv"
@@ -138,7 +142,13 @@ def main():
                     continue
                 gname = orig.syms[g[0]][0]
                 if gname not in addr_of:
-                    continue
+                    # dtk spells a scope:local symbol that another split object
+                    # references as <name>_<ADDR> (Scb_806DF3C0).
+                    lm = re.match(r"^(.+)_([0-9A-F]{8})$", gname)
+                    if not lm or int(lm.group(2), 16) not in addrs.get(lm.group(1), ()):
+                        continue
+                    addr_of[gname] = int(lm.group(2), 16)
+                    addrs[gname] = {addr_of[gname]}
                 if sym[4] == 0:  # undefined in our object: compare addresses
                     checked += 1
                     if sym[0] not in addr_of:
@@ -151,7 +161,8 @@ def main():
                         unresolved += 1
                         if verbose:
                             print(f"unresolved {name} {fn} +0x{off - ov:X}: {sym[0]} (original {gname})")
-                    elif addr_of[sym[0]] + r[2] != addr_of[gname] + g[2]:
+                    elif not ({a + r[2] for a in addrs.get(sym[0]) or {addr_of[sym[0]]}}
+                              & {a + g[2] for a in addrs.get(gname) or {addr_of[gname]}}):
                         bad += 1
                         print(f"{name} {fn} +0x{off - ov:X}: target {sym[0]}+{r[2]} vs {gname}+{g[2]}")
                     continue

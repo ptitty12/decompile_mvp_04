@@ -122,9 +122,9 @@ extern "C" void GXDrawDone();
 void fn_8043D3EC(int);
 void fn_8043D250();
 void fn_8043C580();
-extern "C" void fn_80436204(int, int, int);
+extern "C" void OSResetSystem(int, int, int);
 extern "C" void PADControlMotor(int, int);
-extern "C" int fn_804250B0();
+extern "C" int DVDGetDriveStatus();
 extern "C" void fn_800B81BC(int);
 extern "C" void fn_800B8194();
 extern "C" int fn_803D9E3C();
@@ -190,16 +190,16 @@ void fn_800043AC()
             fn_8043C580();
             switch (lbl_8060F704) {
             case 1:
-                fn_80436204(0, 1, 0);
+                OSResetSystem(0, 1, 0);
                 break;
             case 2:
-                fn_80436204(1, 1, 0);
+                OSResetSystem(1, 1, 0);
                 break;
             case 3:
-                fn_80436204(1, 1, 1);
+                OSResetSystem(1, 1, 1);
                 break;
             default:
-                fn_80436204(2, 1, 1);
+                OSResetSystem(2, 1, 1);
                 break;
             }
         }
@@ -221,7 +221,7 @@ int fn_8000446C()
         if (fn_801747A0() == 0) {
             break;
         }
-        t = fn_804250B0();
+        t = DVDGetDriveStatus();
         s = fn_800042B0(t);
         if (flag == 0 && s != 5) {
             PADControlMotor(0, 0);

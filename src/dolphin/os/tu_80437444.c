@@ -11,9 +11,9 @@
 #include <dolphin/os.h>
 #include <dolphin/tail10.h>
 
-extern volatile s32 lbl_806EF868;               /* Reschedule */
+extern volatile s32 Reschedule;
 extern volatile u32 lbl_806EF860;               /* RunQueueBits */
-extern volatile s32 lbl_806EF864;               /* RunQueueHint */
+extern volatile s32 RunQueueHint;
 extern void (*lbl_806EF2F8)(OSThread* from, OSThread* to);   /* SwitchThreadCallback */
 /* OSThread.c statics: one .bss block at lbl_806DF418 (the compiler addresses them off a shared base) */
 static OSThreadQueue RunQueue[OS_PRIORITY_MAX + 1];
@@ -23,8 +23,8 @@ static OSContext IdleContext;
 
 extern OSContext* fn_804336A8(void);   /* OSGetCurrentContext */
 extern u32 fn_804336B4(OSContext* context);   /* OSSaveContext */
-extern void fn_80434F9C(void);         /* OSEnableInterrupts */
-extern void fn_80433734(OSContext* context);  /* OSLoadContext */
+extern BOOL OSEnableInterrupts(void);
+extern void OSLoadContext(OSContext* context);
 extern void fn_80433838(OSContext* context, u32 pc, u32 newsp);   /* OSInitContext */
 extern u32 fn_8043380C(void);          /* OSGetStackPointer */
 extern void fn_80435EC4(OSThread* thread);    /* __OSUnlockAllMutex */
@@ -85,26 +85,26 @@ extern void* lbl_806DF090[17];         /* __OSErrorTable */
         (thread)->queue = &RunQueue[(thread)->priority];                \
         AddTail((thread)->queue, (thread), link);                       \
         lbl_806EF860 |= 1u << (OS_PRIORITY_MAX - (thread)->priority);   \
-        lbl_806EF864 = TRUE;                                            \
+        RunQueueHint = TRUE;                                            \
     } while (0)
 
 OSThread* OSGetCurrentThread(void);
 BOOL OSIsThreadTerminated(OSThread* thread);
-s32 fn_80437484(void);
-s32 fn_804374C4(void);
+s32 OSDisableScheduler(void);
+s32 OSEnableScheduler(void);
 static void fn_80437504(OSThread* thread);
 s32 fn_8043756C(OSThread* thread);
 OSThread* fn_804375A8(OSThread* thread, OSPriority priority);
 void fn_80437768(OSThread* thread, OSPriority priority);
-OSThread* fn_804377B8(BOOL yield);
-void fn_804379E0(void);
+OSThread* SelectThread(BOOL yield);
+void __OSReschedule(void);
 void OSYieldThread(void);
 int OSCreateThread(OSThread* thread, void* (*func)(void*), void* param, void* stack, u32 stackSize, OSPriority priority, u16 attr);
 void fn_80437C34(void* val);
-void fn_80437D18(OSThread* thread);
+void OSCancelThread(OSThread* thread);
 s32 OSResumeThread(OSThread* thread);
 s32 fn_8043815C(OSThread* thread);
-void fn_804382CC(OSThreadQueue* queue);
+void OSSleepThread(OSThreadQueue* queue);
 void OSWakeupThread(OSThreadQueue* queue);
 int OSSetThreadPriority(OSThread* thread, OSPriority priority);
 void fn_8043857C(u8 val);
@@ -122,25 +122,25 @@ BOOL OSIsThreadTerminated(OSThread* thread)
 }
 
 /* OSDisableScheduler */
-s32 fn_80437484(void)
+s32 OSDisableScheduler(void)
 {
     BOOL enabled;
     s32 count;
 
     enabled = OSDisableInterrupts();
-    count = lbl_806EF868++;
+    count = Reschedule++;
     OSRestoreInterrupts(enabled);
     return count;
 }
 
 /* OSEnableScheduler */
-s32 fn_804374C4(void)
+s32 OSEnableScheduler(void)
 {
     BOOL enabled;
     s32 count;
 
     enabled = OSDisableInterrupts();
-    count = lbl_806EF868--;
+    count = Reschedule--;
     OSRestoreInterrupts(enabled);
     return count;
 }
@@ -193,7 +193,7 @@ OSThread* fn_804375A8(OSThread* thread, OSPriority priority)
         }
         break;
     case OS_THREAD_STATE_RUNNING:
-        lbl_806EF864 = TRUE;
+        RunQueueHint = TRUE;
         thread->priority = priority;
         break;
     }
@@ -232,7 +232,7 @@ void fn_80437768(OSThread* thread, OSPriority priority)
 }
 
 /* SelectThread */
-OSThread* fn_804377B8(BOOL yield)
+OSThread* SelectThread(BOOL yield)
 {
     OSContext* currentContext;
     OSThread* currentThread;
@@ -240,7 +240,7 @@ OSThread* fn_804377B8(BOOL yield)
     OSPriority priority;
     OSThreadQueue* queue;
 
-    if (0 < lbl_806EF868) {
+    if (0 < Reschedule) {
         return NULL;
     }
     currentContext = fn_804336A8();
@@ -266,16 +266,16 @@ OSThread* fn_804377B8(BOOL yield)
     if (lbl_806EF860 == 0) {
         lbl_806EF2F8(OSGetCurrentThread(), NULL);
         __OSCurrentThread = NULL;
-        fn_8043364C(&IdleContext);
+        OSSetCurrentContext(&IdleContext);
         do {
-            fn_80434F9C();
+            OSEnableInterrupts();
             while (lbl_806EF860 == 0) {
             }
             OSDisableInterrupts();
         } while (lbl_806EF860 == 0);
-        fn_80433814(&IdleContext);
+        OSClearContext(&IdleContext);
     }
-    lbl_806EF864 = FALSE;
+    RunQueueHint = FALSE;
     priority = __cntlzw(lbl_806EF860);
     queue = &RunQueue[priority];
     RemoveHead(queue, nextThread, link);
@@ -286,16 +286,16 @@ OSThread* fn_804377B8(BOOL yield)
     nextThread->state = OS_THREAD_STATE_RUNNING;
     lbl_806EF2F8(OSGetCurrentThread(), nextThread);
     __OSCurrentThread = nextThread;
-    fn_8043364C(&nextThread->context);
-    fn_80433734(&nextThread->context);
+    OSSetCurrentContext(&nextThread->context);
+    OSLoadContext(&nextThread->context);
     return nextThread;
 }
 
 /* __OSReschedule */
-void fn_804379E0(void)
+void __OSReschedule(void)
 {
-    if (lbl_806EF864) {
-        fn_804377B8(FALSE);
+    if (RunQueueHint) {
+        SelectThread(FALSE);
     }
 }
 
@@ -305,7 +305,7 @@ void OSYieldThread(void)
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    fn_804377B8(TRUE);
+    SelectThread(TRUE);
     OSRestoreInterrupts(enabled);
 }
 
@@ -363,7 +363,7 @@ void fn_80437C34(void* val)
 
     enabled = OSDisableInterrupts();
     currentThread = OSGetCurrentThread();
-    fn_80433814(&currentThread->context);
+    OSClearContext(&currentThread->context);
     if (currentThread->attr & OS_THREAD_ATTR_DETACH) {
         RemoveItem(&__OSActiveThreadQueue, currentThread, linkActive);
         currentThread->state = 0;
@@ -373,13 +373,13 @@ void fn_80437C34(void* val)
     }
     fn_80435EC4(currentThread);
     OSWakeupThread(&currentThread->queueJoin);
-    lbl_806EF864 = TRUE;
-    fn_804379E0();
+    RunQueueHint = TRUE;
+    __OSReschedule();
     OSRestoreInterrupts(enabled);
 }
 
 /* OSCancelThread */
-void fn_80437D18(OSThread* thread)
+void OSCancelThread(OSThread* thread)
 {
     BOOL enabled;
 
@@ -391,7 +391,7 @@ void fn_80437D18(OSThread* thread)
         }
         break;
     case OS_THREAD_STATE_RUNNING:
-        lbl_806EF864 = TRUE;
+        RunQueueHint = TRUE;
         break;
     case OS_THREAD_STATE_WAITING:
         RemoveItem(thread->queue, thread, link);
@@ -404,7 +404,7 @@ void fn_80437D18(OSThread* thread)
         OSRestoreInterrupts(enabled);
         return;
     }
-    fn_80433814(&thread->context);
+    OSClearContext(&thread->context);
     if (thread->attr & OS_THREAD_ATTR_DETACH) {
         RemoveItem(&__OSActiveThreadQueue, thread, linkActive);
         thread->state = 0;
@@ -413,7 +413,7 @@ void fn_80437D18(OSThread* thread)
     }
     fn_80435EC4(thread);
     OSWakeupThread(&thread->queueJoin);
-    fn_804379E0();
+    __OSReschedule();
     OSRestoreInterrupts(enabled);
 }
 
@@ -442,7 +442,7 @@ s32 OSResumeThread(OSThread* thread)
             }
             break;
         }
-        fn_804379E0();
+        __OSReschedule();
     }
     OSRestoreInterrupts(enabled);
     return suspendCount;
@@ -459,7 +459,7 @@ s32 fn_8043815C(OSThread* thread)
     if (suspendCount == 0) {
         switch (thread->state) {
         case OS_THREAD_STATE_RUNNING:
-            lbl_806EF864 = TRUE;
+            RunQueueHint = TRUE;
             thread->state = OS_THREAD_STATE_READY;
             break;
         case OS_THREAD_STATE_READY:
@@ -474,14 +474,14 @@ s32 fn_8043815C(OSThread* thread)
             }
             break;
         }
-        fn_804379E0();
+        __OSReschedule();
     }
     OSRestoreInterrupts(enabled);
     return suspendCount;
 }
 
 /* OSSleepThread */
-void fn_804382CC(OSThreadQueue* queue)
+void OSSleepThread(OSThreadQueue* queue)
 {
     BOOL enabled;
     OSThread* currentThread;
@@ -491,8 +491,8 @@ void fn_804382CC(OSThreadQueue* queue)
     currentThread->state = OS_THREAD_STATE_WAITING;
     currentThread->queue = queue;
     AddPrio(queue, currentThread, link);
-    lbl_806EF864 = TRUE;
-    fn_804379E0();
+    RunQueueHint = TRUE;
+    __OSReschedule();
     OSRestoreInterrupts(enabled);
 }
 
@@ -510,7 +510,7 @@ void OSWakeupThread(OSThreadQueue* queue)
             SetRun(thread);
         }
     }
-    fn_804379E0();
+    __OSReschedule();
     OSRestoreInterrupts(enabled);
 }
 
@@ -526,7 +526,7 @@ int OSSetThreadPriority(OSThread* thread, OSPriority priority)
     if (thread->base != priority) {
         thread->base = priority;
         UpdatePriority(thread);
-        fn_804379E0();
+        __OSReschedule();
     }
     OSRestoreInterrupts(enabled);
     return TRUE;

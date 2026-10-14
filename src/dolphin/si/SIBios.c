@@ -4,7 +4,7 @@
 
 
 extern void OSCancelAlarm(OSAlarm*);
-extern void fn_80432484(OSAlarm*, OSTime, OSAlarmHandler);
+extern void OSSetAlarm(OSAlarm*, OSTime, OSAlarmHandler);
 extern void fn_80437080(s32, u16);
 extern u16 fn_80436FFC(s32);
 
@@ -529,7 +529,7 @@ BOOL SITransfer(s32 chan, void* output, u32 outputBytes, void* input, u32 inputB
 
     if (now < fire) {
         delay = fire - now;
-        fn_80432484(&Alarm[chan], delay, AlarmHandler);
+        OSSetAlarm(&Alarm[chan], delay, AlarmHandler);
     } else if (__SITransfer(chan, output, outputBytes, input, inputBytes, callback)) {
         OSRestoreInterrupts(enabled);
         return TRUE;

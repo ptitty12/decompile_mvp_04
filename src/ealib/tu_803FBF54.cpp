@@ -81,7 +81,7 @@ extern RcBuf14 lbl_806ADE8C;
 extern void (*lbl_806ADE94[3])(int);
 extern "C" int fn_803FBC34(int, int*, int);
 extern "C" int fn_80401710(void*, void*);
-extern "C" void fn_80432FD4(void*, int);
+extern "C" void DCFlushRange(void*, int);
 extern "C" void fn_803FFA60(void*, void*, int);
 extern "C" int fn_803FBF54(int, RcCtx*);
 extern "C" int fn_803FA3B4(int (*)(int, RcCtx*), int, int, RcArgs*);
@@ -175,7 +175,7 @@ extern "C" void fn_803FC034(int a)
     fn_804017D0(buf);
 }
 
-/* near-miss: 2 slots; retail moves r3 (src) before r4 (len) for the fn_80432FD4 call; return-type toggles of the neighbouring callees did not change it */
+/* near-miss: 2 slots; retail moves r3 (src) before r4 (len) for the DCFlushRange call; return-type toggles of the neighbouring callees did not change it */
 extern "C" int fn_803FC064(int a, int b)
 {
     int sz;
@@ -199,7 +199,7 @@ extern "C" int fn_803FC064(int a, int b)
             ((void (*)(char*))q->m8)(t);
         }
         lbl_806ADE94[0]((int)tmp);
-        fn_80432FD4(src, len);
+        DCFlushRange(src, len);
     }
     return (int)src;
 }

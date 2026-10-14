@@ -10,16 +10,16 @@
 #include "__gx.h"
 
 /* GXMisc.c / GXCpu2Efb.c pieces. Callees that symbols.txt names only by address:
- * PPCSync PPCSync, fn_80438628 OSGetTime, fn_804382CC OSSleepThread, OSWakeupThread OSWakeupThread,
- * fn_80437434 OSInitThreadQueue, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
+ * PPCSync PPCSync, OSGetTime, OSSleepThread, OSWakeupThread OSWakeupThread,
+ * OSInitThreadQueue, OSClearContext, OSSetCurrentContext,
  * fn_8042A898 __GXIsGPFifoReady, fn_8042A790 __GXCleanGPFifo. */
 void PPCSync(void);
-OSTime fn_80438628(void);
-void fn_804382CC(OSThreadQueue* queue);
+OSTime OSGetTime(void);
+void OSSleepThread(OSThreadQueue* queue);
 void OSWakeupThread(OSThreadQueue* queue);
-void fn_80437434(OSThreadQueue* queue);
-void fn_80433814(OSContext* context);
-void fn_8043364C(OSContext* context);
+void OSInitThreadQueue(OSThreadQueue* queue);
+void OSClearContext(OSContext* context);
+void OSSetCurrentContext(OSContext* context);
 u32 fn_8042A898(void);
 void fn_8042A790(void);
 
@@ -42,7 +42,7 @@ void fn_8042C5B8(GXBool update_enable);
 void fn_8042C5D0(GXBool enable, u8 alpha);
 void fn_8042C5F4(GXBool update_enable);
 void fn_8042C60C(GXBool compare_enable, GXCompare func, GXBool update_enable);
-GXDrawSyncCallback fn_8042C62C(GXDrawSyncCallback cb);
+GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb);
 void fn_8042C670(__OSInterrupt interrupt, OSContext* context);
 GXDrawDoneCallback fn_8042C6F8(GXDrawDoneCallback cb);
 void fn_8042C73C(__OSInterrupt interrupt, OSContext* context);
@@ -88,9 +88,9 @@ static inline void __GXAbortWait(u32 clocks) {
     OSTime time0;
     OSTime time1;
 
-    time0 = fn_80438628();
+    time0 = OSGetTime();
     do {
-        time1 = fn_80438628();
+        time1 = OSGetTime();
     } while (time1 - time0 <= (clocks / 4));
 }
 
@@ -165,7 +165,7 @@ static inline void GXWaitDrawDoneInt(void) {
 
     enabled = OSDisableInterrupts();
     while (!lbl_806EF788) {
-        fn_804382CC(&lbl_806EF78C);
+        OSSleepThread(&lbl_806EF78C);
     }
     OSRestoreInterrupts(enabled);
 }
@@ -254,7 +254,7 @@ void fn_8042C60C(GXBool compare_enable, GXCompare func, GXBool update_enable) {
 }
 
 /* GXSetDrawSyncCallback */
-GXDrawSyncCallback fn_8042C62C(GXDrawSyncCallback cb) {
+GXDrawSyncCallback GXSetDrawSyncCallback(GXDrawSyncCallback cb) {
     GXDrawSyncCallback old;
     BOOL enabled;
 
@@ -273,11 +273,11 @@ void fn_8042C670(__OSInterrupt interrupt, OSContext* context) {
 
     token = GX_GET_PE_REG(7);
     if (lbl_806EF780) {
-        fn_80433814(&exceptContext);
-        fn_8043364C(&exceptContext);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(&exceptContext);
         lbl_806EF780(token);
-        fn_80433814(&exceptContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(context);
     }
     reg = GX_GET_PE_REG(5);
     SET_REG_FIELD(0, reg, 1, 2, 1);
@@ -306,11 +306,11 @@ void fn_8042C73C(__OSInterrupt interrupt, OSContext* context) {
     GX_SET_PE_REG(5, reg);
     lbl_806EF788 = 1;
     if (lbl_806EF784) {
-        fn_80433814(&exceptContext);
-        fn_8043364C(&exceptContext);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(&exceptContext);
         lbl_806EF784();
-        fn_80433814(&exceptContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(context);
     }
     OSWakeupThread(&lbl_806EF78C);
 }
@@ -320,7 +320,7 @@ void __GXPEInit(void) {
 
     __OSSetInterruptHandler(18, fn_8042C670);
     __OSSetInterruptHandler(19, fn_8042C73C);
-    fn_80437434(&lbl_806EF78C);
+    OSInitThreadQueue(&lbl_806EF78C);
     __OSUnmaskInterrupts(0x2000);
     __OSUnmaskInterrupts(0x1000);
     reg = GX_GET_PE_REG(5);

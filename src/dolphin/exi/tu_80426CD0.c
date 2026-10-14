@@ -22,7 +22,7 @@
  * -O3,p; they need their own units. ProbeBarnacle also cannot match inside this TU: the EXIBios functions
  * defined above it get auto-inlined into it (retail calls them out of line, being another file).
  * Placeholder callees: fn_80435350 __OSMaskInterrupts, fn_80434FF0 __OSGetInterruptHandler,
- * fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext, fn_80438628 OSGetTime,
+ * OSClearContext, OSSetCurrentContext, OSGetTime,
  * fn_80431828 OSGetConsoleType, fn_8043218C __OSGetDIConfig.
  */
 #include <dolphin.h>
@@ -49,9 +49,9 @@ extern const char* lbl_806EF218;  /* __EXIVersion */
 
 void fn_80435350(u32 mask);
 u32 fn_80434FF0(s32 interrupt);
-void fn_80433814(OSContext* context);
-void fn_8043364C(OSContext* context);
-OSTime fn_80438628(void);
+void OSClearContext(OSContext* context);
+void OSSetCurrentContext(OSContext* context);
+OSTime OSGetTime(void);
 u32 fn_80431828(void);
 u32 fn_8043218C(void);
 
@@ -300,7 +300,7 @@ int fn_804274BC(s32 chan) {
         }
 
         if (cpr & 0x1000) {
-            t = ((s32)(OSTicksToMilliseconds(fn_80438628()) / 100) + 1);
+            t = ((s32)(OSTicksToMilliseconds(OSGetTime()) / 100) + 1);
 
             if (__gUnknown800030C0[chan] == 0) {
                 __gUnknown800030C0[chan] = t;
@@ -501,11 +501,11 @@ void fn_80427B68(__OSInterrupt interrupt, OSContext* context) {
     if (callback) {
         OSContext exceptionContext;
 
-        fn_80433814(&exceptionContext);
-        fn_8043364C(&exceptionContext);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
         callback(chan, context);
-        fn_80433814(&exceptionContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
     }
 }
 
@@ -527,11 +527,11 @@ void fn_80427C30(__OSInterrupt interrupt, OSContext* context) {
         exi->tcCallback = NULL;
         CompleteTransfer(chan);
 
-        fn_80433814(&exceptionContext);
-        fn_8043364C(&exceptionContext);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
         callback(chan, context);
-        fn_80433814(&exceptionContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
     }
 }
 
@@ -550,12 +550,12 @@ void fn_80427E48(__OSInterrupt interrupt, OSContext* context) {
     if (callback) {
         OSContext exceptionContext;
 
-        fn_80433814(&exceptionContext);
-        fn_8043364C(&exceptionContext);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
         exi->extCallback = NULL;
         callback(chan, context);
-        fn_80433814(&exceptionContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
     }
 }
 

@@ -13,7 +13,7 @@ int OSCreateThread(int, int, int, int, int, int, int);
 void OSResumeThread(int);
 void OSInitMutex(int);
 int OSIsThreadTerminated(int);
-void fn_80437D18(void);
+void OSCancelThread(void);
 void OSSetThreadPriority(int, int);
 int fn_804000C8(int);
 void fn_803FFFA8(int);
@@ -52,11 +52,11 @@ void fn_80400948(void);
 void OSYieldThread(void);
 void fn_80400F80(void* p);
 void fn_80400FE4(void* p);
-void fn_80432224(void* alarm);
-void fn_80432484(void* alarm, long long tick, void (*cb)(void*));
+void OSCreateAlarm(void* alarm);
+void OSSetAlarm(void* alarm, long long tick, void (*cb)(void*));
 void OSCancelAlarm(void* alarm);
 void fn_803FFF0C(char* p);
-void fn_80433CE8(const char* file, int line, const char* msg, ...);
+void OSPanic(const char* file, int line, const char* msg, ...);
 }
 extern void (*lbl_8062EB20[64])();
 extern unsigned lbl_8062E720[256];
@@ -169,7 +169,7 @@ extern "C" void fn_803FFEB8(int h)
         else
             t = h;
         if (t != 0)
-            fn_80437D18();
+            OSCancelThread();
     }
 }
 
@@ -189,8 +189,8 @@ extern "C" void fn_803FFF30(long long ticks)
         return;
     }
     fn_80400F80(ev);
-    fn_80432224(alarm);
-    fn_80432484(alarm, ticks, (void (*)(void*))fn_803FFF0C);
+    OSCreateAlarm(alarm);
+    OSSetAlarm(alarm, ticks, (void (*)(void*))fn_803FFF0C);
     fn_80400FE4(ev);
     OSCancelAlarm(alarm);
 }
@@ -348,7 +348,7 @@ extern "C" unsigned fn_80400560(const unsigned char* p, int n)
 extern "C" void fn_804005DC()
 {
     if (lbl_806EEAD8 != 0)
-        fn_80433CE8(lbl_8060E864, 0, lbl_8060E864);
+        OSPanic(lbl_8060E864, 0, lbl_8060E864);
 }
 
 extern "C" void fn_8040061C()
