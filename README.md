@@ -1,8 +1,9 @@
-# MVP Baseball 2005 (GameCube, GV4E69) — Matching Decompilation Kit
+# mvp2005-decomp — MVP Baseball 2005 (GameCube, GV4E69) matching decompilation
 
-Personal, private project. Goal: a C/C++ source tree that compiles back into a
-byte-identical copy of the original `main.dol`, then later a native/WASM port
-for personal play behind authenticated access.
+Personal project; the repository is public (owner, 2026-10-13). Goal: a C/C++
+source tree that compiles back into a byte-identical copy of the original
+`main.dol`, then later a native/WASM port for personal play behind
+authenticated access.
 
 ## Progress
 
@@ -18,7 +19,10 @@ The card updates itself. A scheduled task on the owner's PC runs
 `main` in a private worktree (`build/_progress/wt`), redraws the card if the
 numbers moved, runs `tools/verify/verify.py`, and pushes a
 `docs: update progress card` commit. Nothing needs doing by hand. Its log is
-`build/_progress/bot.log`.
+`build/_progress/bot.log`. Before that push it also uploads the build's
+`report.json` to the `progress-report` release, which
+`.github/workflows/decomp-dev.yml` republishes in the artifact format
+decomp.dev reads. The project is not listed on decomp.dev (owner, 2026-10-13).
 
 ```sh
 python tools/progress_bot.py --install     # register the task (done once)
@@ -26,7 +30,7 @@ python tools/progress_bot.py --uninstall   # remove it
 python tools/progress_bot.py --force       # run once now
 ```
 
-**[Live fleet dashboard](https://github.com/ptitty12/decompile_mvp_04/tree/dashboard)**:
+**[Live fleet dashboard](https://github.com/ptitty12/mvp2005-decomp/tree/dashboard)**:
 matching speed (verified on `main` and claimed by workers, per hour), the
 near-miss share, each worker's activity, the merge backlog and the functions
 closest to matching. `tools/fleet_dashboard.py --publish` builds it from git
@@ -60,7 +64,7 @@ no extra commits. `--watch` shows the same numbers live in a terminal.
    works too.
 4. **Install prerequisites:** git, Python 3, ninja, Ghidra + a JDK, Node 22.19+/24.11+,
    Claude Code, and REA (`npx rea-agents setup`). Phase 0 will tell you what's missing.
-5. **Create a PRIVATE GitHub repo.** Never public. Never commit game files.
+5. **Create the GitHub repo.** This one is public (owner, 2026-10-13). Never commit game files.
 6. **Approve the compiler decision** at the end of Phase 0 (see below).
 
 ## The one decision that can change everything
@@ -78,7 +82,7 @@ Phase 0 stops and reports before any scaffolding so you can make this call.
 
 ## How to run it
 
-1. Make an empty private repo, copy `CLAUDE.md`, `.claude/`, `templates/*` into it.
+1. Make an empty repo, copy `CLAUDE.md`, `.claude/`, `templates/*` into it.
 2. Put your disc dump where Phase 0 asks (it'll be `orig/<GAME_ID>/`, gitignored).
 3. Open Claude Code in the repo, paste `prompts/00_KICKOFF.md`.
 4. Read the Phase 0 report. Approve or redirect.

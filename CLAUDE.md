@@ -1,7 +1,9 @@
 # CLAUDE.md — MVP Baseball 2005 (GameCube, GV4E69) matching decompilation
 
-You are working on a private, personal matching decompilation of MVP Baseball 2005
+You are working on a personal matching decompilation of MVP Baseball 2005
 for GameCube (`GV4E69`, USA rev 0), using a disc image the owner dumped from their own copy.
+The GitHub repository, `ptitty12/mvp2005-decomp`, is public (owner, 2026-10-13), so
+everything pushed is published: source, tooling and docs only, never game data.
 Re-read this file whenever a prompt tells you to, and whenever you are unsure.
 
 ## The goal, precisely
