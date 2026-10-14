@@ -1,4 +1,4 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp input.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp input.cpp ax.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
 
@@ -6,6 +6,7 @@ engine_test(test_boot_hw SOURCES tests/test_boot_hw.cpp LIBS engine_runtime)
 engine_test(test_clock SOURCES tests/test_clock.cpp LIBS engine_runtime)
 engine_test(test_devices SOURCES tests/test_devices.cpp LIBS engine_runtime)
 engine_test(test_input SOURCES tests/test_input.cpp LIBS engine_runtime)
+engine_test(test_ax SOURCES tests/test_ax.cpp LIBS engine_runtime)
 
 # Lockstep checker (development): translated code against the interpreter.
 add_library(engine_lockstep STATIC lockstep.cpp)

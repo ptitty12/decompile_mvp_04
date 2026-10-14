@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "common/bytes.h"
+#include "runtime/ax.h"
 #include "vfs/source.h"
 
 namespace mvp::rt {
@@ -534,9 +535,24 @@ void Hardware::dsp_receive(u32 mail) {
       }
       return;
     case DspState::Running:
-      if (dsp_cmdlist_next_) {  // the command list address: mix a frame, then yield
+      if (dsp_cmdlist_next_) {  // the command list address: run a frame, then yield
         dsp_cmdlist_next_ = false;
         ++dsp_frames_;
+        if (cfg_.ax_voices) {  // the voices advance (R8, runtime/ax.h)
+          ax::FrameStats st =
+              ax::process_frame(mem1_, mem1_size_, {aram_.data(), static_cast<u32>(aram_.size())}, mail);
+          if (!st.error.empty()) {
+            char at[32];
+            std::snprintf(at, sizeof at, " (pc 0x%08X)", cpu_ ? cpu_->pc : 0u);
+            throw StopRun{st.error + at};
+          }
+          ax_.voice_frames += st.running;
+          ax_.samples += st.samples;
+          ax_.ended += st.ended;
+          ax_.looped += st.looped;
+          ax_.updates += st.updates;
+          ax_.max_running = std::max<std::uint64_t>(ax_.max_running, st.running);
+        }
         dsp_post(kAxFrameTb, 0xDCD10002u, true);
         return;
       }

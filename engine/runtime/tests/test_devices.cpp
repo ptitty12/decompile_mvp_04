@@ -266,16 +266,33 @@ TEST_CASE("DSP: boot ROM, task loading and the AX frame handshake") {
   CHECK(mail_from_dsp() == 0xDCD10000u);
   g.w(0xCC00500A, 0x100 | 0x80, 2);  // acknowledge DSPINT
   CHECK_FALSE(g.hw.interrupt_pending());
-  // An AX frame: command list length and address; the microcode yields.
+  // An AX frame: command list length and address; the voices advance
+  // (runtime/ax.h); the microcode yields. The list names one PB: a running PCM16
+  // voice of 64 samples, without rate conversion, which ends in this frame.
+  const u16 cl[] = {0x0002, 0x8070, 0x0100, 0x0003};
+  for (u32 k = 0; k < 4; ++k) put_be16(&g.mem[0x700000 + 2 * k], cl[k]);
+  put_be16(&g.mem[0x700100 + 0x0E], 1);       // state: run
+  put_be16(&g.mem[0x700100 + 0x08], 2);       // srcSelect: none
+  put_be16(&g.mem[0x700100 + 0x70], 0x000A);  // format: PCM16
+  put_be32(&g.mem[0x700100 + 0x76], 63);      // end address
   std::uint64_t t0 = 1000000;
   g.hw.advance(t0);
   mail_to_dsp(0xBABE0180);
   mail_to_dsp(0x80700000);
+  CHECK(g.hw.ax_stats().voice_frames == 1);
+  CHECK(g.hw.ax_stats().samples == 64);
+  CHECK(g.hw.ax_stats().ended == 1);
+  CHECK(be16(&g.mem[0x700100 + 0x0E]) == 0);   // stopped
+  CHECK(be32(&g.mem[0x700100 + 0x7A]) == 63);  // at its end
   CHECK(g.hw.next_event_tb() == t0 + 20250);
   g.hw.advance(t0 + 20250);
   CHECK(mail_from_dsp() == 0xDCD10002u);
   CHECK(g.hw.dsp_frames() == 1);
   mail_to_dsp(0xCDD10003);  // resume the same task
+  // A command list the model does not understand stops the run.
+  put_be16(&g.mem[0x700200], 0x0009);
+  mail_to_dsp(0xBABE0180);
+  CHECK_THROWS_AS(mail_to_dsp(0x80700200), StopRun);
   CHECK_THROWS_AS(mail_to_dsp(0x12345678), StopRun);
 }
 

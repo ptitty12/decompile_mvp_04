@@ -10,8 +10,10 @@ and the VPS services.
 - Rules: [`../CLAUDE.md`](../CLAUDE.md), "Rules for the engine track" and the hard
   rules for everyone.
 
-**Status (2026-10-14):** E0b (native boot spike) in progress. Progress, build
-instructions and measurements: [`../docs/engine/E0B_LOG.md`](../docs/engine/E0B_LOG.md).
+**Status (2026-10-14):** E0b (native boot spike) done; E0c (unwinds, controller
+input, AX voices) done. Build instructions and measurements:
+[`../docs/engine/E0B_LOG.md`](../docs/engine/E0B_LOG.md),
+[`../docs/engine/E0C_LOG.md`](../docs/engine/E0C_LOG.md).
 
 Three rules matter most here:
 

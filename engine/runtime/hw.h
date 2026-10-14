@@ -12,7 +12,8 @@
 //   start), and the DSP side of the mailbox protocol, without running DSP code:
 //   the IPL init microcode's answer, the boot ROM's task loader, and the AX
 //   microcode's frame handshake (each command list is answered with a yield
-//   after a fixed time; the mix itself is not computed, R8);
+//   after a fixed time; the voices advance through runtime/ax.h, the mix itself
+//   is not computed, R8);
 // - DI: the DVD drive reads the disc image (vfs::Source); a command completes
 //   after a fixed latency plus its transfer time (R7), then raises TCINT;
 // - AI: the streaming sample counter counts at 32 or 48 kHz of virtual time
@@ -62,6 +63,14 @@ struct HardwareConfig {
   // netplay handshake. 40,500 ticks = 1 ms; 13,184 ticks per KiB = 3 MiB/s.
   std::uint32_t di_latency_tb = 40500;
   std::uint32_t di_tb_per_kib = 13184;
+  // AX voices (R8, runtime/ax.h): each audio frame advances the running voices'
+  // parameter blocks (play position, loop, end). Off: they never move (E0b).
+  bool ax_voices = true;
+};
+
+// What the AX voice model did (runtime/ax.h), summed over all frames.
+struct AxStats {
+  std::uint64_t voice_frames = 0, samples = 0, ended = 0, looped = 0, updates = 0, max_running = 0;
 };
 
 class Hardware : public ppc::Io {
@@ -97,6 +106,7 @@ class Hardware : public ppc::Io {
   void set_disc(vfs::Source* disc) { disc_ = disc; }
   std::uint64_t di_commands() const { return di_commands_; }
   std::uint64_t dsp_frames() const { return dsp_frames_; }
+  const AxStats& ax_stats() const { return ax_; }
   int dsp_state() const { return static_cast<int>(dsp_state_); }
   std::size_t dsp_mails_waiting() const { return dsp_out_.size(); }
   u32 dsp_control() const { return dsp_cr_; }
@@ -166,6 +176,7 @@ class Hardware : public ppc::Io {
   bool dsp_cmdlist_next_ = false;
   std::vector<DspMail> dsp_out_;
   std::uint64_t dsp_frames_ = 0;
+  AxStats ax_;
 
   // AI DMA (DSP registers 0x30-0x3A): the block being played and its end.
   void aid_start_block(std::uint64_t tb);

@@ -6,6 +6,7 @@
 //   mvp-boot run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE]
 //                [--max-entries N] [--max-ticks N] [--unnamed stop|log]
 //                [--input SCRIPT] [--frames N] [--ports MASK] [--frame-log FILE]
+//                [--ax-voices on|off]
 //                       E0b items 7 and 8: boot with the IPL environment
 //                       (runtime/boot.h) and the hardware model (runtime/hw.h).
 //                       Prints the calls __start makes; logs every call from game
@@ -19,7 +20,8 @@
 //                       pressed; --ports sets the connected ports), --frames N
 //                       stops at the poll of frame N (after frames 0..N-1), and
 //                       one line per frame poll goes to the frame log (default
-//                       frames.log).
+//                       frames.log). --ax-voices off freezes the AX voices
+//                       (E0b behaviour; runtime/ax.h).
 //
 // Needs the disc (MVP_DISC) and a build with the translated code. Prints register
 // values, names and addresses only; the log stays under build/ (only its hash may
@@ -218,6 +220,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::size_t mmio_lines = 40;
   std::uint64_t max_entries = 20000000, max_ticks = 2000000000ull, max_frames = ~0ull;
   u32 ports = 1;
+  HardwareConfig hw_cfg;
   for (int k = 2; k + 1 < argc; ++k) {
     std::string a = argv[k];
     if (a == "--until") until = argv[k + 1];
@@ -231,6 +234,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
     if (a == "--frames") max_frames = std::strtoull(argv[k + 1], nullptr, 10);
     if (a == "--ports") ports = static_cast<u32>(std::strtoul(argv[k + 1], nullptr, 0)) & 0xF;
     if (a == "--frame-log") frame_log_path = argv[k + 1];
+    if (a == "--ax-voices") hw_cfg.ax_voices = std::string(argv[k + 1]) != "off";
   }
   // Controller input (R14): a script, or port(s) connected with nothing pressed.
   std::string script_text = "mvp-input 1\n";
@@ -263,7 +267,7 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   BootLayout L = setup_boot_environment(m, in.disc);
   std::printf("boot: FST at 0x%08X (%u bytes), BI2 at 0x%08X, arena hi 0x%08X\n", L.fst, L.fst_size, L.bi2,
               L.arena_hi);
-  Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
+  Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size, hw_cfg);
   hw.set_disc(in.disc.image.get());
   SystemHooks hooks(&m, &hw);
   m.memory().io = &hw;
@@ -362,6 +366,11 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
               ull(hooks.icbi_blocks));
   std::printf("DI: %llu drive commands, %llu bytes read; DSP: %llu AX frames; AI: %llu DMA blocks\n", ull(hw.di_commands()), ull(hw.di_bytes()),
               ull(hw.dsp_frames()), ull(hw.ai_dma_blocks()));
+  const AxStats& ax = hw.ax_stats();
+  std::printf("AX voices (%s): %llu voice frames (at most %llu voices at once), %llu input samples, %llu ended, "
+              "%llu loop wraps, %llu PB updates\n",
+              hw_cfg.ax_voices ? "advanced" : "frozen", ull(ax.voice_frames), ull(ax.max_running), ull(ax.samples),
+              ull(ax.ended), ull(ax.looped), ull(ax.updates));
   std::printf("DSP: state %d, %zu mails waiting, mailbox 0x%08X, control 0x%04X; PI cause 0x%05X mask 0x%05X\n",
               hw.dsp_state(), hw.dsp_mails_waiting(), hw.dsp_mail_to_cpu(), hw.dsp_control(), hw.pi_cause(),
               hw.pi_mask());
@@ -400,6 +409,6 @@ int main(int argc, char** argv) {
   if (cmd == "run") return run_boot(*in, argc, argv);
   std::fprintf(stderr, "usage: mvp-boot lockstep | run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE] "
                        "[--max-entries N] [--max-ticks N] [--unnamed stop|log] [--input SCRIPT] [--frames N] "
-                       "[--ports MASK] [--frame-log FILE]\n");
+                       "[--ports MASK] [--frame-log FILE] [--ax-voices on|off]\n");
   return 2;
 }

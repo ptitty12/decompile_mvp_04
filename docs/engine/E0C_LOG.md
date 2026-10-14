@@ -11,7 +11,7 @@ local tests).
 |---|---|---|
 | 1 | Fewer unwinds per thread switch (D4, performance) | Done |
 | 2 | Controller input (R14): per-frame input queue, scripted input | Done |
-| 3 | AX voice state (R8) | |
+| 3 | AX voice state (R8) | Done |
 
 ## 1. Unwinds per thread switch (done)
 
@@ -73,6 +73,9 @@ translated code and `mvp-boot`'s per-entry trace hook (30 M entries, each decodi
 its call site; 5.9 M of them build and hash an SDK log line).
 
 `local_boot_twice` passes (two runs byte-identical); `ctest --preset msvc`: 17/17.
+Over the 102.9 s run of item 3 (scripted START presses): 59,050 thread switches,
+59,051 unwinds (1.000 per switch), 43,028 in-frame resumes, interpreted share
+0.0645 %.
 
 **Tests (data-free)**: the synthetic program (`translator/tests/synth.h`) gained
 `save_ctx`/`load_ctx` (OSSaveContext/OSLoadContext in miniature: r1, LR, MSR, `rfi`)
@@ -146,10 +149,115 @@ it runs per tick through `fn_802D75D4 -> s13` (the tagged-I link is wrong).
   `tap 3 START` at frame 150 changes the time base from frame 152 and the SDK call
   count from frame 211; at 280, 450 and 570 the SDK call count changes at the very
   next poll (281, 451, 571), and the runs with the press at 280 and 450 reach frame
-  700 about 2.6 s of guest time earlier (the press skips something in the intro).
+  700 2.6 s and 2.9 s of guest time earlier (the press skips part of the intro).
 - `local_input_start` (new ctest, 176 s): `280 1 tap 3 START`, 290 frames, three
   runs: the two runs with the script are byte-identical (report, SDK log sha1
   `c6d85264...`, frame log); the run without differs (`e652d99f...`); the frame logs
   are identical through frame 280 and first differ at frame 281.
 - `local_boot_twice` still passes; its SDK log hash changed to `0054fb22...` (the
   boot-time PADRead now sees a connected controller: 36 more function entries).
+
+## 3. AX voice state (done)
+
+**What the game needs** (read from the retail code): the SDK's AX library keeps
+the DSP's copy of every voice's parameter block (PB) in `__AXPB` (lbl_806CB720, 64 x
+0xF4 bytes, linked by `next`, set up by __AXVPBInit fn_80419F7C). Each frame
+__AXSyncPBs (fn_80419CB4 -> fn_80419568) reads back `state`, `ve.currentVolume` and
+`addr.currentAddress` from it, and __AXNextFrame (fn_804181DC) sends a command list
+whose command 0x02 names the first PB. EA's SND driver (`snd/tu_803AC88C`) then
+- frees a voice whose `pb.state` went to 0 (0x803AFC84: `SNDDRV_freeaxvoice`), and
+- refills a streaming double buffer when the play position crosses its middle
+  (0x803AFB60: `SNDPKTPLAYI_freeframes`, `SNDDRV_fillbufwithpackets`).
+With E0b's DSP model nothing ever wrote the PBs: no voice ever ended and no stream
+ever advanced.
+
+**Model (E0c-AX1)**, `runtime/ax.h` (DSP side only, no mixing): when the CPU posts
+its command list (the mail after 0xBABExxxx: a point fixed by guest instructions,
+DSP1), the DSP walks the PB list and advances each running voice by one 5 ms frame
+of 160 output samples at 32 kHz:
+- the converter consumes `floor((frac + ratio x 160) / 65536)` input samples (16.16
+  ratio, fraction carried in `src.currentAddressFrac`); `srcSelect` 2 (none): 160;
+- samples are read from ARAM at `addr.currentAddress` in the format's units (ADPCM
+  nibbles, skipping each 8-byte frame's header and loading `pred_scale` from it;
+  PCM16 samples; PCM8 bytes); ADPCM is decoded (`yn1`/`yn2`), the last four input
+  samples go to `src.last_samples`;
+- after the sample at `addr.endAddress` the voice loops (`loopFlag`; ADPCM takes
+  `adpcmLoop.loop_pred_scale` and, unless it is a stream voice, `loop_yn1/yn2`) or
+  stops (`state` 0);
+- PB updates (`update.updNum[5]`, offset/value pairs) apply at the start of their
+  millisecond (32 samples);
+- `ve.currentVolume` is left alone (the envelope belongs to the mixer, E3);
+- a command list it does not understand stops the run.
+`advance()` takes an optional sample sink, so E3's mixer can consume the same
+decoded input samples instead of re-deriving the addressing. The model follows
+the PB fields as the SDK's headers and code use them; hardware-exact details (the
+exact end-of-sample ordering, the polyphase filter) are not verified against a
+console, but every rule is a pure function of guest memory, so it is deterministic.
+`HardwareConfig::ax_voices` (default on; `mvp-boot --ax-voices off`) freezes the
+voices as E0b did, for comparisons.
+
+**Exit evidence (2026-10-14)**: 102.9 s of guest time (25,000,000,000 instructions,
+the length of E0b's long run), with a script that taps START every 150 frames from
+frame 280 (`starts.txt`, 78 events). Without input, the same length runs 2,302
+frame polls, is still decoding the intro video at 102.9 s (stopped in
+`FilterBlock_GC`) and acquires no voice, much like E0b's long run:
+- with voices advancing: 4,736 frame polls; EA SND plays a sound at frame 730
+  (36.05 s: `SNDPLATFORM_playtimbre` -> two `AXAcquireVoice`, rate-converted);
+  both voices end after 127 audio frames (25,216 input samples) and **the SND driver
+  frees them at frame 768 (36.69 s): `AXFreeVoice <- SNDDRV_freeaxvoice`, twice**;
+- frozen (`--ax-voices off`, otherwise identical): the two voices never end and are
+  never freed (no `AXFreeVoice` in 102.9 s); the SDK logs differ from frame 769
+  on (also in a few GX counts: the game draws slightly differently afterwards);
+  frame timing is unchanged (same time base at every poll);
+- two runs with voices advancing are byte-identical: identical reports, SDK log
+  (617,258,591 bytes, sha1 `1799af5c...`) and frame log (sha1 `781d8834...`); each
+  took about 2.7 min of host time (these screens idle a lot, and the idle skip jumps);
+- `test_ax` (data-free, 6 cases): ADPCM addressing across frame headers, header
+  `pred_scale`, decoding against an independent computation, end stop; loops for
+  normal and stream voices; PCM16/PCM8 units; converter arithmetic with the carried
+  fraction; a frame walking a three-PB list from a command list (stopped PB
+  untouched, a looping one wrapping, unknown commands refused); updates at their
+  millisecond. `test_devices` checks the DSP handshake now advances a voice.
+- `local_boot_twice` unchanged (`0054fb22...`): no voice runs by its stop point
+  (9.8 s); `local_input_start` unchanged (no voice by frame 290).
+
+## Decisions to record (for the lead)
+
+- **E0c-D4b** (refines D4): context switches unwind by C++ return, not by
+  exception; a frame resumes in place when the guest continues in the same
+  activation (same function, same stack pointer, at a resume label); the
+  dispatcher re-enters function bodies at resume labels (call returns and loop
+  back edges), so suspended frames run natively. The interpreter only runs code
+  outside the DOL (exception vectors) and PCs between resume labels.
+- **E0c-IN1** (R14): the input boundary is the frame poll, the entry of
+  fn_8014865C (by retail address); one `FrameInput` (four `PadState` v1) is
+  consumed per poll; PADRead is replaced and returns the current frame's input to
+  every read until the next poll. Ports default to "port 1 connected"; the port
+  mask is part of the netplay handshake.
+- **E0c-AX1** (R8, DSP1): the DSP advances AX voices when the CPU posts its command
+  list, by the model in `runtime/ax.h` (160 output samples per frame at 32 kHz, the
+  16.16 converter with carried fraction, ARAM addressing per format, end/loop,
+  ADPCM decode, per-millisecond PB updates, no envelope). `HardwareConfig::ax_voices`
+  is part of the configuration (default on).
+- HLE hooks (`HleKind::Before`) are keyed by retail address for game functions;
+  `mvp-xlat` refuses to emit when an HLE entry matches no function.
+
+## Next step
+
+1. **Renderer (E1 input):** with scripted START presses the game gets past the
+   intro to screens that run at full frame rate and play sounds (4,736 frames in
+   102.9 s; presumably the front end, unverified without a picture). A GX stream
+   renderer (even a debug one writing EFB copies to `build/`) is the next way to
+   see where it is and to script inputs against the screen.
+2. **Host time:** a 102.9 s run takes several minutes, dominated by `/Od`
+   translated code and `mvp-boot`'s per-entry trace (SDK log). Options: a
+   `--no-trace` mode for long runs (keep the log for tests), optimized
+   translated code (`/O1` on the generated shards, measured against compile time),
+   and dropping the per-instruction `c.pc` store where no fault can occur.
+3. **Input:** DETERMINISM §2.3/R14 should be corrected (PADRead runs per logic tick
+   through fn_802D75D4 -> s13, not per pass through s6). For netplay (E5), the
+   queue's source becomes the peer link; the frame-poll hook is where a frame
+   would wait for remote input.
+4. **AX (E3):** mix from `ax::advance`'s sample sink (SRC filter, volumes, envelope,
+   aux buses); compare the end-of-sample and loop rules with a console capture or a
+   permissive reference when one is available.

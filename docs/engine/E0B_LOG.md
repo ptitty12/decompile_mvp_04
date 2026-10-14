@@ -533,7 +533,8 @@ configuration, so both peers compute the same events.
 
 ## Next step
 
-E0b is complete. Suggested follow-ups, in order of value:
+E0b is complete. Suggested follow-ups, in order of value (1, the input part of 2,
+and 3 were done in E0c: `docs/engine/E0C_LOG.md`):
 
 1. **Unwind cost.** 46,288 unwinds by 9.8 s of guest time, 7.4 per real thread
    switch: OSYieldThread / SelectThread reload the current thread through
