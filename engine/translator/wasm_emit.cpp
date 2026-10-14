@@ -24,6 +24,7 @@ namespace {
 // Every field before the pointers is laid out identically on x64 and wasm32, so
 // a native build of the emitter (the CLI) writes the same module.
 constexpr u32 kGpr = offsetof(ppc::Cpu, gpr);
+constexpr u32 kFpr = offsetof(ppc::Cpu, fpr);  // Fpr: ps0 then ps1, 8 bytes each
 constexpr u32 kCr = offsetof(ppc::Cpu, cr);
 constexpr u32 kLr = offsetof(ppc::Cpu, lr);
 constexpr u32 kCtr = offsetof(ppc::Cpu, ctr);
@@ -39,6 +40,9 @@ static_assert(kMem % 8 == 0, "Cpu::mem must sit at the same offset on 32- and 64
 static_assert(offsetof(ppc::Cpu, mem) == kMem);
 #endif
 static_assert(offsetof(ppc::Memory, page) == 0);
+static_assert(sizeof(ppc::Fpr) == 16 && offsetof(ppc::Fpr, ps1) == 8);
+u32 ps0(u32 r) { return kFpr + 16 * r; }
+u32 ps1(u32 r) { return kFpr + 16 * r + 8; }
 
 u32 reg_offset(int r) {
   if (r < 32) return kGpr + 4 * static_cast<u32>(r);
@@ -52,7 +56,7 @@ u32 reg_offset(int r) {
 }
 
 // ---- module interface ----
-enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, kTypes };
+enum Ty : u32 { tV_I, tV_II, tI_IIIL, tV_IIIIL, tV_IIIL, tI_III, tV_III, tI_II, tL_I, tI_L, kTypes };
 enum Imp : u32 {
   iOnEntry, iSafepoint, iRead8, iRead16, iRead32, iWrite8, iWrite16, iWrite32, iExec, iCallIndirect,
   iAbsoluteCall, iResume, iHleCall, iHleBefore, iTrap, iRfi, iSystemCall, iTw, kImports
@@ -60,10 +64,12 @@ enum Imp : u32 {
 constexpr Ty kImportType[kImports] = {tV_II,   tV_I,  tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL, tV_IIIL,
                                       tV_II,   tV_II, tI_III,  tV_III,  tV_II,   tV_III,   tV_I,     tV_I,     tV_III};
 // Helpers defined in every module, after the imports.
-enum Hlp : u32 { hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, kFirstGuest };
+enum Hlp : u32 {
+  hRd8 = kImports, hRd16, hRd32, hWr8, hWr16, hWr32, hCmps, hCmpu, hDivw, hDivwu, hS2D, hD2S, kFirstGuest
+};
 constexpr u32 kHelperCount = static_cast<u32>(kFirstGuest) - static_cast<u32>(kImports);
-constexpr Ty kHelperType[kHelperCount] = {tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL,
-                                                    tV_IIIIL, tI_III,  tI_III,  tI_II,    tI_II};
+constexpr Ty kHelperType[kHelperCount] = {tI_IIIL, tI_IIIL, tI_IIIL, tV_IIIIL, tV_IIIIL, tV_IIIIL,
+                                          tI_III,  tI_III,  tI_II,   tI_II,    tL_I,     tI_L};
 // Imported globals (immutable i32): the table base and three runtime addresses.
 enum Glb : u32 { gTableBase, gUnwinding, gResume, gHook, kGlobals };
 
@@ -91,6 +97,13 @@ bool is_inline(Op op, Insn i) {
       return true;
     case Op::mfspr: case Op::mtspr:
       return i.spr() == ppc::spr::LR || i.spr() == ppc::spr::CTR;
+    // Floating point that only moves bits (FPRs stay in the Cpu struct).
+    case Op::lfs: case Op::lfsu: case Op::lfsx: case Op::lfsux: case Op::lfd: case Op::lfdu: case Op::lfdx:
+    case Op::lfdux: case Op::stfs: case Op::stfsu: case Op::stfsx: case Op::stfsux: case Op::stfd: case Op::stfdu:
+    case Op::stfdx: case Op::stfdux: case Op::stfiwx: case Op::fmr: case Op::fneg: case Op::fabs: case Op::fnabs:
+    case Op::ps_mr: case Op::ps_neg: case Op::ps_abs: case Op::ps_nabs: case Op::ps_merge00: case Op::ps_merge01:
+    case Op::ps_merge10: case Op::ps_merge11:
+      return true;
     default:
       return false;
   }
@@ -112,6 +125,9 @@ bool is_memory(Op op) {
     case Op::lhzux: case Op::lha: case Op::lhau: case Op::lhax: case Op::lhaux: case Op::lwz: case Op::lwzu:
     case Op::lwzx: case Op::lwzux: case Op::stb: case Op::stbu: case Op::stbx: case Op::stbux: case Op::sth:
     case Op::sthu: case Op::sthx: case Op::sthux: case Op::stw: case Op::stwu: case Op::stwx: case Op::stwux:
+    case Op::lfs: case Op::lfsu: case Op::lfsx: case Op::lfsux: case Op::lfd: case Op::lfdu: case Op::lfdx:
+    case Op::lfdux: case Op::stfs: case Op::stfsu: case Op::stfsx: case Op::stfsux: case Op::stfd: case Op::stfdu:
+    case Op::stfdx: case Op::stfdux: case Op::stfiwx:
       return true;
     default:
       return false;
@@ -169,7 +185,7 @@ class FuncGen {
 
   // locals
   static constexpr u32 kCpu = 0;
-  u32 L_label = 0, L_sp = 0, L_tc = 0, L_tgt = 0, L_tmp = 0, L_t = 0, L_w = 0;
+  u32 L_label = 0, L_sp = 0, L_tc = 0, L_tgt = 0, L_tmp = 0, L_t = 0, L_w = 0, L_w2 = 0;
   int regloc_[reg::kCount];
 
   bool classify(std::string* error);
@@ -695,6 +711,49 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     b.call(helper);
     update(mode);
   };
+  // Effective address into L_tmp (FP loads and stores).
+  auto ea_tmp = [&](int mode) {
+    if (mode == 1 || mode == 3) {
+      G(rA);
+      if (mode == 1) b.i32c(i.simm());
+      else G(rB);
+      b.op(op::i32_add);
+    } else if (mode == 0) {
+      ea_d(i);
+    } else {
+      ea_x(i);
+    }
+    b.set(L_tmp);
+  };
+  auto rd32_tmp = [&](u32 off) {  // pushes the big-endian word at L_tmp + off
+    b.get(kCpu);
+    b.get(L_tmp);
+    if (off) {
+      b.i32c(off);
+      b.op(op::i32_add);
+    }
+    b.i32c(a);
+    ticks_expr();
+    b.call(hRd32);
+  };
+  auto wr32_tmp = [&](u32 off, const std::function<void()>& value) {
+    b.get(kCpu);
+    b.get(L_tmp);
+    if (off) {
+      b.i32c(off);
+      b.op(op::i32_add);
+    }
+    value();
+    b.i32c(a);
+    ticks_expr();
+    b.call(hWr32);
+  };
+  auto sign_op = [&](int sop /*0 move, 1 negate, 2 clear (abs), 3 set (nabs)*/) {
+    if (sop == 0) return;
+    if (sop == 2) b.i64c(0x7FFFFFFFFFFFFFFFll);
+    else b.i64c(static_cast<s64>(0x8000000000000000ull));
+    b.op(sop == 1 ? op::i64_xor : sop == 2 ? op::i64_and : op::i64_or);
+  };
   auto cr_bit = [&](u32 bit) {
     G(reg::CR);
     if (31 - bit) {
@@ -942,6 +1001,105 @@ void FuncGen::emit_inline(const InsnInfo& x) {
     case Op::stwu: store(hWr32, 1); return;
     case Op::stwx: store(hWr32, 2); return;
     case Op::stwux: store(hWr32, 3); return;
+    // ---- floating point: loads, stores and moves of FPR bits ----
+    case Op::lfs: case Op::lfsu: case Op::lfsx: case Op::lfsux: {
+      int mode = o == Op::lfs ? 0 : o == Op::lfsu ? 1 : o == Op::lfsx ? 2 : 3;
+      ea_tmp(mode);
+      b.get(kCpu);
+      rd32_tmp(0);
+      b.call(hS2D);
+      b.tee(L_w);
+      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.get(kCpu);
+      b.get(L_w);
+      b.mem(op::i64_store, 3, ps1(i.rD()));
+      update(mode);
+      return;
+    }
+    case Op::lfd: case Op::lfdu: case Op::lfdx: case Op::lfdux: {
+      int mode = o == Op::lfd ? 0 : o == Op::lfdu ? 1 : o == Op::lfdx ? 2 : 3;
+      ea_tmp(mode);
+      b.get(kCpu);
+      rd32_tmp(0);  // read64: the high word, then the low word
+      b.op(op::i64_extend_i32_u);
+      b.i64c(32);
+      b.op(op::i64_shl);
+      rd32_tmp(4);
+      b.op(op::i64_extend_i32_u);
+      b.op(op::i64_or);
+      b.mem(op::i64_store, 3, ps0(i.rD()));
+      update(mode);
+      return;
+    }
+    case Op::stfs: case Op::stfsu: case Op::stfsx: case Op::stfsux: {
+      int mode = o == Op::stfs ? 0 : o == Op::stfsu ? 1 : o == Op::stfsx ? 2 : 3;
+      ea_tmp(mode);
+      wr32_tmp(0, [&] {
+        b.get(kCpu);
+        b.mem(op::i64_load, 3, ps0(i.rS()));
+        b.call(hD2S);
+      });
+      update(mode);
+      return;
+    }
+    case Op::stfd: case Op::stfdu: case Op::stfdx: case Op::stfdux: case Op::stfiwx: {
+      int mode = (o == Op::stfd) ? 0 : o == Op::stfdu ? 1 : (o == Op::stfdx || o == Op::stfiwx) ? 2 : 3;
+      ea_tmp(mode);
+      if (o != Op::stfiwx) {
+        wr32_tmp(0, [&] {  // write64: the high word, then the low word
+          b.get(kCpu);
+          b.mem(op::i64_load, 3, ps0(i.rS()));
+          b.i64c(32);
+          b.op(op::i64_shr_u);
+          b.op(op::i32_wrap_i64);
+        });
+      }
+      wr32_tmp(o == Op::stfiwx ? 0 : 4, [&] {
+        b.get(kCpu);
+        b.mem(op::i64_load, 3, ps0(i.rS()));
+        b.op(op::i32_wrap_i64);
+      });
+      update(mode);
+      return;
+    }
+    case Op::fmr: case Op::fneg: case Op::fabs: case Op::fnabs:
+      b.get(kCpu);
+      b.get(kCpu);
+      b.mem(op::i64_load, 3, ps0(i.rB()));
+      sign_op(o == Op::fmr ? 0 : o == Op::fneg ? 1 : o == Op::fabs ? 2 : 3);
+      b.mem(op::i64_store, 3, ps0(i.rD()));
+      return;
+    case Op::ps_mr: case Op::ps_neg: case Op::ps_abs: case Op::ps_nabs: case Op::ps_merge00: case Op::ps_merge01:
+    case Op::ps_merge10: case Op::ps_merge11: {
+      // Both halves are read before either is written (rD may be rA or rB).
+      u32 src0 = ps0(i.rB()), src1 = ps1(i.rB());
+      int sop = 0;
+      switch (o) {
+        case Op::ps_neg: sop = 1; break;
+        case Op::ps_abs: sop = 2; break;
+        case Op::ps_nabs: sop = 3; break;
+        case Op::ps_merge00: src0 = ps0(i.rA()); src1 = ps0(i.rB()); break;
+        case Op::ps_merge01: src0 = ps0(i.rA()); src1 = ps1(i.rB()); break;
+        case Op::ps_merge10: src0 = ps1(i.rA()); src1 = ps0(i.rB()); break;
+        case Op::ps_merge11: src0 = ps1(i.rA()); src1 = ps1(i.rB()); break;
+        default: break;
+      }
+      b.get(kCpu);
+      b.mem(op::i64_load, 3, src0);
+      sign_op(sop);
+      b.set(L_w);
+      b.get(kCpu);
+      b.mem(op::i64_load, 3, src1);
+      sign_op(sop);
+      b.set(L_w2);
+      b.get(kCpu);
+      b.get(L_w);
+      b.mem(op::i64_store, 3, ps0(i.rD()));
+      b.get(kCpu);
+      b.get(L_w2);
+      b.mem(op::i64_store, 3, ps1(i.rD()));
+      return;
+    }
     default:
       return;  // is_inline() and this switch list the same opcodes
   }
@@ -1027,6 +1185,7 @@ void FuncGen::emit_node(std::size_t k) {
       return;
     case kHelper:
       ++ctx_.out->stats.helper_insns;
+      ++ctx_.out->stats.helper_by_op[static_cast<std::size_t>(x.op)];
       flush(N.R & D);
       b.get(kCpu);
       b.i32c(x.word);
@@ -1277,10 +1436,11 @@ bool FuncGen::run(Fn& body, std::string* error) {
   const u32 n_i32 = next - params;
   L_t = next++;
   L_w = next++;
+  L_w2 = next++;
   body.uleb(2);
   body.uleb(n_i32);
   body.byte(kI32);
-  body.uleb(2);
+  body.uleb(3);
   body.byte(kI64);
 
   // Preamble.
@@ -1573,6 +1733,162 @@ Fn helper_div(bool is_signed) {  // sem::divw / divwu, the hardware's overflow r
   return h;
 }
 
+// fp::single_to_double (lfs), in integer arithmetic: (s) -> double bits.
+Fn helper_single_to_double() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(2);
+  h.byte(kI32);  // local 1: the exponent; local 2: the normalizing shift
+  auto sign = [&] {
+    h.get(0);
+    h.i32c(0x80000000u);
+    h.op(op::i32_and);
+    h.op(op::i64_extend_i32_u);
+    h.i64c(32);
+    h.op(op::i64_shl);
+  };
+  auto frac_shl29 = [&] {  // (s & 0x7FFFFF) << 29, or-ed in
+    h.get(0);
+    h.i32c(0x7FFFFF);
+    h.op(op::i32_and);
+    h.op(op::i64_extend_i32_u);
+    h.i64c(29);
+    h.op(op::i64_shl);
+    h.op(op::i64_or);
+  };
+  h.get(0);
+  h.i32c(23);
+  h.op(op::i32_shr_u);
+  h.i32c(0xFF);
+  h.op(op::i32_and);
+  h.tee(1);
+  h.i32c(0xFF);
+  h.op(op::i32_eq);
+  h.if_i64();
+  sign();  // infinity or NaN: the payload is kept
+  h.i64c(0x7FF0000000000000ll);
+  h.op(op::i64_or);
+  frac_shl29();
+  h.else_();
+  h.get(1);
+  h.op(op::i32_eqz);
+  h.if_i64();
+  h.get(0);
+  h.i32c(0x7FFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_eqz);
+  h.if_i64();
+  sign();  // signed zero
+  h.else_();
+  // A denormal single: shift the leading 1 to bit 23; exponent -126 - shift.
+  h.get(0);
+  h.i32c(0x7FFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_clz);
+  h.i32c(8);
+  h.op(op::i32_sub);
+  h.set(2);
+  sign();
+  h.i32c(897);
+  h.get(2);
+  h.op(op::i32_sub);
+  h.op(op::i64_extend_i32_u);
+  h.i64c(52);
+  h.op(op::i64_shl);
+  h.op(op::i64_or);
+  h.get(0);
+  h.i32c(0x7FFFFF);
+  h.op(op::i32_and);
+  h.get(2);
+  h.op(op::i32_shl);
+  h.i32c(0x7FFFFF);
+  h.op(op::i32_and);
+  h.op(op::i64_extend_i32_u);
+  h.i64c(29);
+  h.op(op::i64_shl);
+  h.op(op::i64_or);
+  h.end();
+  h.else_();
+  sign();  // normal: rebias the exponent
+  h.get(1);
+  h.i32c(896);
+  h.op(op::i32_add);
+  h.op(op::i64_extend_i32_u);
+  h.i64c(52);
+  h.op(op::i64_shl);
+  h.op(op::i64_or);
+  frac_shl29();
+  h.end();
+  h.end();
+  h.byte(op::end);
+  return h;
+}
+
+// fp::double_to_single (stfs: no rounding, denormalizing), in integer arithmetic.
+Fn helper_double_to_single() {
+  Fn h;
+  h.uleb(1);
+  h.uleb(1);
+  h.byte(kI32);  // local 1: the exponent
+  h.get(0);
+  h.i64c(52);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x7FF);
+  h.op(op::i32_and);
+  h.tee(1);
+  h.i32c(874);
+  h.op(op::i32_lt_u);
+  h.get(1);
+  h.i32c(896);
+  h.op(op::i32_gt_u);
+  h.op(op::i32_or);
+  h.get(0);
+  h.i64c(0x7FFFFFFFFFFFFFFFll);
+  h.op(op::i64_and);
+  h.op(op::i64_eqz);
+  h.op(op::i32_or);
+  h.if_i32();
+  // The top two bits of the high word and the next 30 bits of the double.
+  h.get(0);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0xC0000000u);
+  h.op(op::i32_and);
+  h.get(0);
+  h.i64c(29);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x3FFFFFFF);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.else_();
+  // Denormalize: the significand with its hidden bit, shifted right, truncated.
+  h.get(0);
+  h.i64c(0x000FFFFFFFFFFFFFll);
+  h.op(op::i64_and);
+  h.i64c(21);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x80000000u);
+  h.op(op::i32_or);
+  h.i32c(905);
+  h.get(1);
+  h.op(op::i32_sub);
+  h.op(op::i32_shr_u);
+  h.get(0);
+  h.i64c(32);
+  h.op(op::i64_shr_u);
+  h.op(op::i32_wrap_i64);
+  h.i32c(0x80000000u);
+  h.op(op::i32_and);
+  h.op(op::i32_or);
+  h.end();
+  h.byte(op::end);
+  return h;
+}
+
 void functype(Buf& b, const std::vector<u8>& params, const std::vector<u8>& results) {
   b.byte(0x60);
   b.uleb(params.size());
@@ -1614,6 +1930,7 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
   }
   Ctx ctx{p, opt, {}, {}, out};
   ctx.start_slot.assign(p.functions.size(), -1);
+  out->stats.helper_by_op.assign(static_cast<std::size_t>(Op::count), 0);
   std::vector<WFunc> funcs;
   u32 slot = 0;
   auto index_of = [&](std::size_t k) { return kFirstGuest + static_cast<u32>(k); };
@@ -1665,6 +1982,8 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
   put(helper_cmp(false));
   put(helper_div(true));
   put(helper_div(false));
+  put(helper_single_to_double());
+  put(helper_double_to_single());
   struct BodyInfo {  // per Body: its entries' dispatcher indices, and whether it has resume labels
     std::vector<std::pair<u32, u32>> entry_seg;
     bool resume = false;
@@ -1759,6 +2078,8 @@ bool emit_wasm(const ProgramCfg& p, const WasmEmitOptions& opt, WasmModule* out,
     functype(t, {kI32, kI32, kI32}, {kI32});          // tI_III
     functype(t, {kI32, kI32, kI32}, {});              // tV_III
     functype(t, {kI32, kI32}, {kI32});                // tI_II
+    functype(t, {kI32}, {kI64});                      // tL_I
+    functype(t, {kI64}, {kI32});                      // tI_L
     m.section(1, t);
   }
   {

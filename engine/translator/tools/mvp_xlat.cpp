@@ -140,6 +140,14 @@ int main(int argc, char** argv) {
                 "%zu spills, %zu reloads\n",
                 s.instructions, s.inline_insns, pct(s.inline_insns), s.helper_insns, pct(s.helper_insns),
                 s.branch_insns, pct(s.branch_insns), s.spills, s.reloads);
+    std::vector<std::pair<std::size_t, int>> by_op;
+    for (std::size_t k = 0; k < s.helper_by_op.size(); ++k)
+      if (s.helper_by_op[k]) by_op.push_back({s.helper_by_op[k], static_cast<int>(k)});
+    std::sort(by_op.rbegin(), by_op.rend());
+    std::printf("through the runtime, by opcode:");
+    for (std::size_t k = 0; k < by_op.size() && k < 24; ++k)
+      std::printf(" %s %zu", ppc::op_name(static_cast<ppc::Op>(by_op[k].second)), by_op[k].first);
+    std::printf("\n");
     return 0;
   }
   std::fprintf(stderr, "mvp-xlat: unknown command %s\n", cmd.c_str());

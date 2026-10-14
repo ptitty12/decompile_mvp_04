@@ -61,6 +61,7 @@ struct WasmEmitStats {
   std::size_t functions = 0, wasm_functions = 0, entries = 0, instructions = 0, inline_insns = 0, helper_insns = 0,
               branch_insns = 0, resume_labels = 0, dispatch_functions = 0, spills = 0, reloads = 0, hle_stubs = 0;
   std::size_t code_bytes = 0;
+  std::vector<std::size_t> helper_by_op;  // per ppc::Op: instructions that go through rt.exec
 };
 
 struct WasmModule {

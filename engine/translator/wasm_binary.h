@@ -28,7 +28,8 @@ inline constexpr u8 unreachable = 0x00, block = 0x02, loop = 0x03, if_ = 0x04, e
                     i32_gt_u = 0x4B, i32_le_u = 0x4D, i64_ge_u = 0x5A, i32_clz = 0x67, i32_add = 0x6A, i32_sub = 0x6B,
                     i32_mul = 0x6C, i32_div_s = 0x6D, i32_div_u = 0x6E, i32_and = 0x71, i32_or = 0x72, i32_xor = 0x73,
                     i32_shl = 0x74, i32_shr_s = 0x75, i32_shr_u = 0x76, i32_rotl = 0x77, i32_rotr = 0x78,
-                    i64_add = 0x7C, i64_mul = 0x7E, i64_shr_u = 0x88, i32_wrap_i64 = 0xA7, i64_extend_i32_s = 0xAC,
+                    i64_eqz = 0x50, i64_add = 0x7C, i64_mul = 0x7E, i64_and = 0x83, i64_or = 0x84, i64_xor = 0x85,
+                    i64_shl = 0x86, i64_shr_u = 0x88, i32_wrap_i64 = 0xA7, i64_extend_i32_s = 0xAC,
                     i64_extend_i32_u = 0xAD, i32_extend8_s = 0xC0, i32_extend16_s = 0xC1;
 }  // namespace op
 
@@ -91,6 +92,11 @@ struct Fn : Buf {
   int if_i32() {
     byte(op::if_);
     byte(kI32);
+    return depth++;
+  }
+  int if_i64() {
+    byte(op::if_);
+    byte(kI64);
     return depth++;
   }
   void else_() { byte(op::else_); }
