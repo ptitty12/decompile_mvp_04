@@ -623,7 +623,7 @@ extern "C" int fn_8038DB54(char* s, int a, int b)
     *(int*)(s + 0x78) = fn_8038E9D8(*(VdCbObj**)(s + 0x68), 0);
     VdClock* c = (VdClock*)lbl_80699B94.m0(lbl_80605F88, 0x18, 0, 0, lbl_80699B94.m8);
     c->m8 = 0;
-    c->m0 = fn_80438628();
+    c->m0 = OSGetTime();
     c->m10 = 0x1000;
     *(VdClock**)(s + 0x60) = c;
     fn_8038E468(c);
