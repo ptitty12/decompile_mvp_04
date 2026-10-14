@@ -42,7 +42,7 @@ void fn_804300AC(GXBool field_mode, GXBool half_aspect_ratio);
 void GXCallDisplayList(void* list, u32 nbytes);
 void fn_80430364(u32 id);
 void fn_8043044C(void);
-void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
+void fn_804304DC(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field);
 void fn_80430534(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
 void fn_8043057C(u32 left, u32 top, u32 wd, u32 ht);
 void fn_804305F4(u32 x_off, u32 y_off);
@@ -316,7 +316,7 @@ void fn_8043044C(void) {
     GX_WRITE_F32(oz);
 }
 
-void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
+void fn_804304DC(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
     if (field == 0) {
         top -= 0.5f;
     }
