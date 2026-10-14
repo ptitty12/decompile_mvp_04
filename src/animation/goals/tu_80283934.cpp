@@ -221,7 +221,7 @@ int fn_802857C4(Unk80283934_Goal* g, const Unk80283934_Goal* o)
                 if (!(AbsF(g->m84 - fn_80286F9C(o)) > 0.35f)) {
                     if (g->m4->m18C & 0x80000) {
                         float u = g->m84 - fn_80286F9C(o);
-                        fn_8028F588(Speed(g->m4) - u);
+                        ((void (*)(Unk80283934_Ent*, float))fn_8028F588)(g->m4, Speed(g->m4) - u);
                     }
                     g->m84 = fn_80286F9C(o);
                     return 1;
