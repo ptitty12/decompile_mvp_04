@@ -81,7 +81,7 @@ inline Unk80183918_Vec3 Unk801852A4_Add(const Unk80183918_Vec3& a, const Unk8018
     r.m8 = a.m8 + b.m8;
     return r;
 }
-inline Unk80183918_Vec3 Unk801852A4_Mul(Unk80183918_Vec3 v, float s)
+inline Unk80183918_Vec3 Unk801852A4_Mul(const Unk80183918_Vec3& v, float s)
 {
     Unk80183918_Vec3 r;
     r.m0 = v.m0 * s;
@@ -178,16 +178,17 @@ extern "C" float fn_8018514C(Unk8018514C_O* o, Unk80183918_Vec3* p, Unk80183918_
 }
 
 //@801852A4
-/* near-miss (99.6%): instructions identical, only stack offsets differ. Retail: Mul param copy 0x20, Sub local and
- * the final return temp share 0x30, Mul result temp 0x40, Add local 0x68 (frame 0x78); here the return temp is
- * allocated first (0x20) and the frame is 0x70. Tried named/nested Sub/Mul/Add results and by-ref/by-value params. */
+/* Frame layout: the Sub result is a named local (slot 0x20) and Mul takes it by const reference, so the
+ * `*out = Add(...)` statement's return temporary reuses Sub's freed inline frame (0x30). A by-value Mul
+ * parameter would be an EABI invisible-reference copy and allocate one more 16-byte slot. */
 extern "C" int fn_801852A4(void* self, Unk80183918_Vec3* a, Unk80183918_Vec3* b, Unk80183918_Vec3* out, Unk80183918_Vec3* out2, float* t)
 {
     if (!(a->m4 <= 0.0f) && !(b->m4 >= 0.0f)) {
         float fa = Unk801852A4_Abs(a->m4 - b->m4);
         float fb = Unk801852A4_Abs(a->m4);
         *t = fb / fa;
-        *out = Unk801852A4_Add(*a, Unk801852A4_Mul(Unk801852A4_Sub(*b, *a), *t));
+        Unk80183918_Vec3 d = Unk801852A4_Sub(*b, *a);
+        *out = Unk801852A4_Add(*a, Unk801852A4_Mul(d, *t));
         *out2 = lbl_806055C4;
         return 1;
     }
