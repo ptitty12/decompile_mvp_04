@@ -17,7 +17,7 @@ struct Vp6Allocator {
     virtual void Free(void* p, int flags);
 };
 
-/* Bit reader over a big-endian byte buffer (fn_8039E914 initialises it). */
+/* Bit reader over a big-endian byte buffer (InitHeaderBuffer initialises it). */
 struct Vp6BitReader {
     const unsigned char* m0;
     unsigned m4;
@@ -25,7 +25,7 @@ struct Vp6BitReader {
     unsigned mC;
 };
 
-/* Probability pair table: two 10-entry rows per entry (fn_8039CD38). */
+/* Probability pair table: two 10-entry rows per entry (VP6_DecodeModeProbs). */
 struct Vp6Tab {
     unsigned char a[10];
     unsigned char b[10];
@@ -86,7 +86,7 @@ struct Vp6Buf {
     int mC4;
 };
 
-/* Decoder sub-object used by fn_80398B40 / fn_80398BEC. */
+/* Decoder sub-object used by fn_80398B40 / SetupDeblocker. */
 struct Vp6Dq {
     int m0;
     char pad4[8];

@@ -44,11 +44,11 @@ extern "C" {
 void* fopen(const char* path, const char* mode);
 int fprintf(void* f, const char* fmt, ...);
 int fclose(void* f);
-void fn_8039E914(Vp6BitReader* br, const unsigned char* buf);
-int fn_8039EF48(Vp6Ctx* c);
-void fn_80398634(Vp6Rc* rc, const unsigned char* buf);
-void fn_8039C63C(Vp6Ctx* c);
-void fn_8039868C(Vp6Buf* b, unsigned char* base);
+void InitHeaderBuffer(Vp6BitReader* br, const unsigned char* buf);
+int VP6_LoadFrame(Vp6Ctx* c);
+void VP6_StartDecode(Vp6Rc* rc, const unsigned char* buf);
+void VP6_DecodeFrameMbs(Vp6Ctx* c);
+void UpdateUMVBorder(Vp6Buf* b, unsigned char* base);
 void VP6_DeleteTmpBuffers(Vp6Ctx* c);
 int VP6_AllocateTmpBuffers(Vp6Ctx* c);
 void InitPostProcessing(int* a, int* b, int* c, unsigned d);
@@ -61,16 +61,16 @@ void* fn_803985F4(int size, int flags);
 void fn_80398614(void* p);
 void fn_80396DA8(Vp6TblHolder* h);
 void fn_80396274(Vp6SubB* b);
-void fn_8039894C(Vp6Buf* b, int v, int s);
-int fn_8039F3A8(Vp6Ctx* c);
-void fn_8039EFD4(Vp6Ctx* c);
-void fn_8039F264(Vp6Ctx* c);
+void CopyFrame(Vp6Buf* b, int v, int s);
+int VP6_InitFrameDetails(Vp6Ctx* c);
+void VP6_DeleteFragmentInfo(Vp6Ctx* c);
+void VP6_DeleteFrameInfo(Vp6Ctx* c);
 void fn_8039F5BC(Vp6Ctx* c);
 void fn_803962CC(Vp6Buf* b, int v);
 int fn_8039847C();
 void fn_80398484();
 void fn_80397CAC();
-void fn_80398324(unsigned d);
+void PostProcMachineSpecificConfig(unsigned d);
 }
 
 extern "C" {
@@ -205,7 +205,7 @@ struct Vp6SizeView {
 
 typedef void (*Vp6Fn5R)(Vp6Buf*, int, int, int, int);
 extern Vp6Fn5R lbl_806EF400;
-extern "C" void fn_803A0C9C(Vp6Buf*, int, Vp6Frm*);
+extern "C" void ScaleOrCenter(Vp6Buf*, int, Vp6Frm*);
 extern "C" void PostProcess(Vp6Buf*, unsigned char, unsigned char, int, int, int, int, int, int, int);
 
 Vp6Ctx* VP6_CreatePBInstance()
@@ -274,7 +274,7 @@ void InitPostProcessing(int* a, int* b, int* c, unsigned d)
         lbl_806EF458 = (int)lbl_80624C7C;
         lbl_806EF454 = (int)lbl_8062457C;
     }
-    fn_80398324(d);
+    PostProcMachineSpecificConfig(d);
 }
 
 void DeletePostProcBuffers(Vp6Buf* b)
@@ -562,7 +562,7 @@ int VP6_StartDecoder(Vp6Ctx** out, int w, int h)
     (*out)->m298 = CreatePostProcInstance(&(*out)->m1B0);
     (*out)->m13C = VP6_CreateQuantizer();
     (*out)->m1A4 = lbl_806EF39C;
-    if (!fn_8039F3A8(*out)) {
+    if (!VP6_InitFrameDetails(*out)) {
         VP6_DeletePBInstance(out);
         return 0;
     }
@@ -583,8 +583,8 @@ void VP6_SetPbParam(Vp6Ctx* c, unsigned kind, int val)
         fn_803962CC(c->m298, val);
         break;
     case 7:
-        fn_8039894C(c->m298, val, c->m254);
-        fn_8039894C(c->m298, val, c->m24C);
+        CopyFrame(c->m298, val, c->m254);
+        CopyFrame(c->m298, val, c->m24C);
         break;
     case 0:
         if (val == 9) {
@@ -640,9 +640,9 @@ void VP6_GetYUVConfig(Vp6SizeView* c, Vp6Frm* o)
         o->m20 = c->m264 + ab + hh;
         o->m24 = c->m264;
         if (c->m1A0 != 0)
-            fn_803A0C9C(c->m298, c->m25C, o);
+            ScaleOrCenter(c->m298, c->m25C, o);
         else
-            fn_803A0C9C(c->m298, c->m254, o);
+            ScaleOrCenter(c->m298, c->m254, o);
         o->m18 = o->m18 + ((((o->m4 - c->m240) >> 1) * o->m8) + ((o->m0 - c->m23C) >> 1));
         o->m0 = c->m23C;
         o->m4 = c->m240;
@@ -681,8 +681,8 @@ void VP6_GetYUVConfig(Vp6SizeView* c, Vp6Frm* o)
 int VP6_DecodeFrameToYUV_internal(Vp6Ctx* c, const unsigned char* buf, int size)
 {
     c->m1E8 = size;
-    fn_8039E914(&c->m450C, buf);
-    if (!fn_8039EF48(c)) {
+    InitHeaderBuffer(&c->m450C, buf);
+    if (!VP6_LoadFrame(c)) {
         return -1;
     }
     if (c->m944 != 0 || c->m19D == 0) {
@@ -691,14 +691,14 @@ int VP6_DecodeFrameToYUV_internal(Vp6Ctx* c, const unsigned char* buf, int size)
             c->m194 = 0;
             c->m198 = buf + c->m451C;
         } else {
-            fn_80398634(&c->m170, buf + c->m451C);
+            VP6_StartDecode(&c->m170, buf + c->m451C);
         }
     }
-    fn_8039C63C(c);
+    VP6_DecodeFrameMbs(c);
     int t = c->m244;
     c->m244 = c->m254;
     c->m254 = t;
-    fn_8039868C(c->m298, (unsigned char*)t);
+    UpdateUMVBorder(c->m298, (unsigned char*)t);
     if (c->m1AC == 0 || c->m698 != 0) {
         MEMCPY_V((void*)c->m24C, (void*)c->m254, c->m208 + c->m20C * 2);
     }
@@ -723,8 +723,8 @@ int VP6_StopDecoder(Vp6Ctx** h)
     if (*h) {
         fn_80396DA8((Vp6TblHolder*)((char*)*h + 0x13C));
         fn_80396274((Vp6SubB*)((char*)*h + 0x298));
-        fn_8039EFD4(*h);
-        fn_8039F264(*h);
+        VP6_DeleteFragmentInfo(*h);
+        VP6_DeleteFrameInfo(*h);
         VP6_DeletePBInstance(h);
     }
     return 1;

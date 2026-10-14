@@ -14,7 +14,7 @@ struct Vp6TapPair {
 };
 extern const Vp6TapPair lbl_8062453C[];
 
-/* Plane copy descriptor (fn_8039894C): luma rows/stride, then chroma. */
+/* Plane copy descriptor (CopyFrame): luma rows/stride, then chroma. */
 struct Vp6Planes {
     int m0, m4, m8, mC, m10, m14;
     const unsigned char* m18;
@@ -47,68 +47,68 @@ extern Vp6Fn lbl_8069C5A4[0x41];
 extern "C" {
 
 void fn_80398494();
-void fn_80398498();
+void UtilMachineSpecificConfig();
 void VP6_BuildQuantIndex_Generic();
 void fn_80397AB0();
 void AverageBlock_C();
 void SubtractBlock_C();
 void fn_80397C0C();
 void Copy12x12_C();
-void fn_803A31C0();
-void fn_803A3214();
-void fn_803A3270();
+void ScalarReconIntra_GC();
+void ScalarReconInter_GC();
+void ReconBlock_GC();
 void fn_803A32CC();
 void fn_803A3998();
-void fn_803A3D0C();
-void fn_803A3D4C();
-void fn_803A3F0C();
-void fn_8039FF6C();
-void fn_8039F9F8();
-void fn_8039FA68();
+void IDct1_GC();
+void UnpackBlock_GC();
+void FilterBlock_GC();
+void ScalarReconInterHalfPixel2();
+void FilterHoriz_Generic();
+void FilterVert_Generic();
 void fn_8039F94C();
 int* fn_80398B40(Vp6Dq* d, int n);
-void fn_8039D830();
-void fn_8039D120();
-void fn_80398FE0();
-void fn_80399EA8();
-void fn_8039A778();
+void DeringBlockWeak_C();
+void DeringBlockStrong_C();
+void DeblockLoopFilteredBand_C();
+void DeblockNonFilteredBand_C();
+void DeblockNonFilteredBandNewFilter_C();
 void FilterHoriz_Simple_C();
 void FilterVert_Simple_C();
-void fn_803A0554();
-void fn_803A05A0();
+void HorizontalLine_1_2_Scale_C();
+void VerticalBand_1_2_Scale_C();
 void fn_803A05DC();
-void fn_803A0310();
-void fn_803A0408();
-void fn_803A04BC();
-void fn_803A00DC();
-void fn_803A01D4();
-void fn_803A0288();
+void HorizontalLine_3_5_Scale_C();
+void VerticalBand_3_5_Scale_C();
+void LastVerticalBand_3_5_Scale_C();
+void HorizontalLine_4_5_Scale_C();
+void VerticalBand_4_5_Scale_C();
+void LastVerticalBand_4_5_Scale_C();
 void fn_8039FB00();
 void fn_8039FBB0();
 void fn_8039FC88();
 void fn_8039FD38();
-void fn_8039D058();
-void fn_80398A78(Vp6Buf* b, int lo, int hi, unsigned char* dst, const unsigned char* src);
+void CFastDeInterlace();
+void ClampLevels_C(Vp6Buf* b, int lo, int hi, unsigned char* dst, const unsigned char* src);
 void PlaneAddNoise_C();
-void fn_80397DBC(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
-void fn_80397EA8(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
-void fn_8039800C(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
-void fn_8039868C(Vp6Buf* b, unsigned char* base);
-void fn_8039B058(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* src, unsigned char* dst, int* tbl);
-void fn_80399808(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
-void fn_80398C5C(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
-void fn_80399BF0(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
-void fn_8039AE60(Vp6Buf* b, unsigned char* src, unsigned char* dst, unsigned plane);
-void fn_80398BEC(Vp6Dq* d);
-void fn_80398138(const int* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void FilterBlock2dFirstPass(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void FilterBlock2dSecondPass(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void FilterBlock2dBil_FirstPass(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void UpdateUMVBorder(Vp6Buf* b, unsigned char* base);
+void DeblockPlaneNew(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* src, unsigned char* dst, int* tbl);
+void DeblockVerticalEdgesInNonFilteredBand(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void DeblockVerticalEdgesInLoopFilteredBand(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void DeblockVerticalEdgesInNonFilteredBandNewFilter(Vp6Buf* b, unsigned char* x, unsigned char* y, int stride, unsigned w, int a, int* tbl);
+void DeblockPlane(Vp6Buf* b, unsigned char* src, unsigned char* dst, unsigned plane);
+void SetupDeblocker(Vp6Dq* d);
+void FilterBlock2dBil_SecondPass_8(const int* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 
 void fn_80397CAC()
 {
     fn_80398494();
-    fn_80398498();
+    UtilMachineSpecificConfig();
 }
 
-void fn_80397CD0(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
+void FilterBlock1d(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
     for (unsigned r = 0; r < rows; r++) {
         for (unsigned c = 0; c < cols; c++) {
@@ -126,7 +126,7 @@ void fn_80397CD0(const unsigned char* src, short* dst, int stride, int step, uns
     }
 }
 
-void fn_80397DBC(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
+void FilterBlock2dFirstPass(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
     for (unsigned r = 0; r < rows; r++) {
         for (unsigned c = 0; c < cols; c++) {
@@ -144,7 +144,7 @@ void fn_80397DBC(const unsigned char* src, int* dst, int stride, int step, unsig
     }
 }
 
-void fn_80397EA8(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
+void FilterBlock2dSecondPass(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
     for (unsigned r = 0; r < rows; r++) {
         for (unsigned c = 0; c < cols; c++) {
@@ -162,25 +162,13 @@ void fn_80397EA8(const int* src, short* dst, int stride, int step, unsigned rows
     }
 }
 
-void fn_80397F98(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB)
+void FilterBlock2d(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB)
 {
-    fn_80397DBC(src - stride, (int*)lbl_8069C340, stride, 1, 11, 8, tapsA);
-    fn_80397EA8(lbl_8069C360, dst, 8, 8, 8, 8, tapsB);
+    FilterBlock2dFirstPass(src - stride, (int*)lbl_8069C340, stride, 1, 11, 8, tapsA);
+    FilterBlock2dSecondPass(lbl_8069C360, dst, 8, 8, 8, 8, tapsB);
 }
 
-void fn_8039800C(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
-{
-    for (unsigned r = 0; r < rows; r++) {
-        for (unsigned c = 0; c < cols; c++) {
-            dst[c] = (src[0] * taps[0] + src[step] * taps[1] + 0x40) >> 7;
-            src++;
-        }
-        src += stride - cols;
-        dst += cols;
-    }
-}
-
-void fn_803980A8(const unsigned char* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
+void FilterBlock2dBil_FirstPass(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
     for (unsigned r = 0; r < rows; r++) {
         for (unsigned c = 0; c < cols; c++) {
@@ -192,7 +180,7 @@ void fn_803980A8(const unsigned char* src, unsigned char* dst, int stride, int s
     }
 }
 
-void fn_80398138(const int* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
+void FilterBlock1dBil_8(const unsigned char* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
     for (unsigned r = 0; r < rows; r++) {
         for (unsigned c = 0; c < cols; c++) {
@@ -204,13 +192,25 @@ void fn_80398138(const int* src, unsigned char* dst, int stride, int step, unsig
     }
 }
 
-void fn_803981D0(const unsigned char* src, unsigned char* dst, int stride, const int* tapsA, const int* tapsB)
+void FilterBlock2dBil_SecondPass_8(const int* src, unsigned char* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps)
 {
-    fn_8039800C(src, (int*)lbl_8069C340, stride, 1, 9, 8, tapsA);
-    fn_80398138(lbl_8069C340, dst, 8, 8, 8, 8, tapsB);
+    for (unsigned r = 0; r < rows; r++) {
+        for (unsigned c = 0; c < cols; c++) {
+            dst[c] = (src[0] * taps[0] + src[step] * taps[1] + 0x40) >> 7;
+            src++;
+        }
+        src += stride - cols;
+        dst += cols;
+    }
 }
 
-void fn_80398238(const unsigned char* p0, const unsigned char* p1, unsigned char* dst, int stride, int i, int j)
+void FilterBlock2dBil_8(const unsigned char* src, unsigned char* dst, int stride, const int* tapsA, const int* tapsB)
+{
+    FilterBlock2dBil_FirstPass(src, (int*)lbl_8069C340, stride, 1, 9, 8, tapsA);
+    FilterBlock2dBil_SecondPass_8(lbl_8069C340, dst, 8, 8, 8, 8, tapsB);
+}
+
+void FilterBlockBil_8_C(const unsigned char* p0, const unsigned char* p1, unsigned char* dst, int stride, int i, int j)
 {
     int d = p1 - p0;
     if (d < 0) {
@@ -219,44 +219,44 @@ void fn_80398238(const unsigned char* p0, const unsigned char* p1, unsigned char
         d = t - p1;
     }
     if (d == 1) {
-        fn_803980A8(p0, dst, stride, 1, 8, 8, &lbl_8062453C[i].a);
+        FilterBlock1dBil_8(p0, dst, stride, 1, 8, 8, &lbl_8062453C[i].a);
     } else if (d == stride) {
-        fn_803980A8(p0, dst, stride, stride, 8, 8, &lbl_8062453C[j].a);
+        FilterBlock1dBil_8(p0, dst, stride, stride, 8, 8, &lbl_8062453C[j].a);
     } else if (d == stride - 1) {
-        fn_803981D0(p0 - 1, dst, stride, &lbl_8062453C[i].a, &lbl_8062453C[j].a);
+        FilterBlock2dBil_8(p0 - 1, dst, stride, &lbl_8062453C[i].a, &lbl_8062453C[j].a);
     } else if (d == stride + 1) {
-        fn_803981D0(p0, dst, stride, &lbl_8062453C[i].a, &lbl_8062453C[j].a);
+        FilterBlock2dBil_8(p0, dst, stride, &lbl_8062453C[i].a, &lbl_8062453C[j].a);
     }
 }
 
-void fn_80398324()
+void PostProcMachineSpecificConfig()
 {
-    lbl_806EF3F8 = fn_8039F9F8;
-    lbl_806EF3FC = fn_8039FA68;
+    lbl_806EF3F8 = FilterHoriz_Generic;
+    lbl_806EF3FC = FilterVert_Generic;
     lbl_806EF3F0 = fn_8039F94C;
     lbl_806EF3F4 = fn_80398B40;
-    lbl_806EF3DC = fn_8039D830;
-    lbl_806EF3E0 = fn_8039D120;
-    lbl_806EF3E4 = (Vp6McFn)fn_80398FE0;
-    lbl_806EF3E8 = (Vp6McFn)fn_80399EA8;
-    lbl_806EF3EC = (Vp6McFn)fn_8039A778;
+    lbl_806EF3DC = DeringBlockWeak_C;
+    lbl_806EF3E0 = DeringBlockStrong_C;
+    lbl_806EF3E4 = (Vp6McFn)DeblockLoopFilteredBand_C;
+    lbl_806EF3E8 = (Vp6McFn)DeblockNonFilteredBand_C;
+    lbl_806EF3EC = (Vp6McFn)DeblockNonFilteredBandNewFilter_C;
     lbl_806EF3D4 = FilterHoriz_Simple_C;
     lbl_806EF3D8 = FilterVert_Simple_C;
-    lbl_806EF3C0 = fn_803A0554;
-    lbl_806EF3CC = fn_803A05A0;
+    lbl_806EF3C0 = HorizontalLine_1_2_Scale_C;
+    lbl_806EF3CC = VerticalBand_1_2_Scale_C;
     lbl_806EF3D0 = fn_803A05DC;
-    lbl_806EF3C4 = fn_803A0310;
-    lbl_806EF3B8 = fn_803A0408;
-    lbl_806EF3BC = fn_803A04BC;
-    lbl_806EF3C8 = fn_803A00DC;
-    lbl_806EF3B0 = fn_803A01D4;
-    lbl_806EF3B4 = fn_803A0288;
+    lbl_806EF3C4 = HorizontalLine_3_5_Scale_C;
+    lbl_806EF3B8 = VerticalBand_3_5_Scale_C;
+    lbl_806EF3BC = LastVerticalBand_3_5_Scale_C;
+    lbl_806EF3C8 = HorizontalLine_4_5_Scale_C;
+    lbl_806EF3B0 = VerticalBand_4_5_Scale_C;
+    lbl_806EF3B4 = LastVerticalBand_4_5_Scale_C;
     lbl_806EF3AC = fn_8039FB00;
     lbl_806EF3A8 = fn_8039FBB0;
     lbl_806EF3A4 = fn_8039FC88;
     lbl_806EF3A0 = fn_8039FD38;
-    lbl_806EF404 = fn_8039D058;
-    lbl_806EF400 = (Vp6Fn)fn_80398A78;
+    lbl_806EF404 = CFastDeInterlace;
+    lbl_806EF400 = (Vp6Fn)ClampLevels_C;
     lbl_806EF408 = PlaneAddNoise_C;
 }
 
@@ -274,12 +274,12 @@ void fn_80398494()
 {
 }
 
-void fn_80398498()
+void UtilMachineSpecificConfig()
 {
     int i;
     for (i = 0; i < 0x41; i++) {
         if (i <= 1) {
-            lbl_8069C4A0[i] = fn_803A3D0C;
+            lbl_8069C4A0[i] = IDct1_GC;
         } else if (i <= 10) {
             lbl_8069C4A0[i] = fn_803A3998;
         } else {
@@ -288,7 +288,7 @@ void fn_80398498()
     }
     for (i = 0; i < 0x41; i++) {
         if (i <= 1) {
-            lbl_8069C5A4[i] = fn_803A3D0C;
+            lbl_8069C5A4[i] = IDct1_GC;
         } else if (i <= 10) {
             lbl_8069C5A4[i] = fn_803A3998;
         } else {
@@ -296,17 +296,17 @@ void fn_80398498()
         }
     }
     lbl_806EF424 = fn_80397AB0;
-    lbl_806EF414 = fn_803A31C0;
-    lbl_806EF418 = fn_803A3214;
-    lbl_806EF41C = fn_8039FF6C;
+    lbl_806EF414 = ScalarReconIntra_GC;
+    lbl_806EF418 = ScalarReconInter_GC;
+    lbl_806EF41C = ScalarReconInterHalfPixel2;
     lbl_806EF434 = AverageBlock_C;
-    lbl_806EF430 = fn_803A3D4C;
-    lbl_806EF428 = fn_803A3270;
+    lbl_806EF430 = UnpackBlock_GC;
+    lbl_806EF428 = ReconBlock_GC;
     lbl_806EF42C = SubtractBlock_C;
     lbl_806EF438 = fn_80397C0C;
     lbl_806EF43C = Copy12x12_C;
-    lbl_806EF440 = (Vp6Fn)fn_80398238;
-    lbl_806EF444 = fn_803A3F0C;
+    lbl_806EF440 = (Vp6Fn)FilterBlockBil_8_C;
+    lbl_806EF444 = FilterBlock_GC;
 }
 
 void* fn_803985F4(int size, int flags)
@@ -319,7 +319,7 @@ void fn_80398614(void* p)
     fn_80395A44(p);
 }
 
-void fn_80398634(Vp6Rc* rc, const unsigned char* buf)
+void VP6_StartDecode(Vp6Rc* rc, const unsigned char* buf)
 {
     rc->m0 = 0;
     rc->m4 = 0xFF;
@@ -332,7 +332,7 @@ void fn_80398634(Vp6Rc* rc, const unsigned char* buf)
 
 /* near-miss: same structure as the original code, but callee-saved registers are
    allocated differently (b in r23 vs r24) and the chroma blocks differ in CSE; 170 slots. */
-void fn_8039868C(Vp6Buf* b, unsigned char* base)
+void UpdateUMVBorder(Vp6Buf* b, unsigned char* base)
 {
     unsigned char* p = base + b->m78;
     int border = b->mB4;
@@ -411,7 +411,7 @@ void fn_8039868C(Vp6Buf* b, unsigned char* base)
     }
 }
 
-void fn_8039894C(Vp6Buf* b, Vp6Planes* f, unsigned char* base)
+void CopyFrame(Vp6Buf* b, Vp6Planes* f, unsigned char* base)
 {
     unsigned char* p = base + b->m78;
     const unsigned char* q = f->m18;
@@ -437,10 +437,10 @@ void fn_8039894C(Vp6Buf* b, Vp6Planes* f, unsigned char* base)
         q += f->m14;
         p += b->m9C;
     }
-    fn_8039868C(b, base);
+    UpdateUMVBorder(b, base);
 }
 
-void fn_80398A78(Vp6Buf* b, int lo, int hi, unsigned char* dst, const unsigned char* src)
+void ClampLevels_C(Vp6Buf* b, int lo, int hi, unsigned char* dst, const unsigned char* src)
 {
     unsigned char lut[256];
 int cols = b->m90 << 3;
@@ -475,7 +475,7 @@ int* fn_80398B40(Vp6Dq* d, int n)
     return base;
 }
 
-void fn_80398BEC(Vp6Dq* d)
+void SetupDeblocker(Vp6Dq* d)
 {
     if (d->m0 > 1) {
         d->m38 = fn_80398B40(d, lbl_806EF454[d->mC]);
@@ -485,7 +485,7 @@ void fn_80398BEC(Vp6Dq* d)
 }
 
 /* near-miss: 126 vs 125 insns; plane setup registers allocated differently. */
-void fn_8039AE60(Vp6Buf* b, unsigned char* a, unsigned char* c, unsigned plane)
+void DeblockPlane(Vp6Buf* b, unsigned char* a, unsigned char* c, unsigned plane)
 {
     Vp6McFn fn;
     Vp6McFn end;
@@ -502,10 +502,10 @@ void fn_8039AE60(Vp6Buf* b, unsigned char* a, unsigned char* c, unsigned plane)
     int k;
     if (reinterpret_cast<Vp6Dq*>(b)->m0 > 1) {
         fn = lbl_806EF3E8;
-        end = fn_80399808;
+        end = DeblockVerticalEdgesInNonFilteredBand;
     } else {
         fn = lbl_806EF3E4;
-        end = fn_80398C5C;
+        end = DeblockVerticalEdgesInLoopFilteredBand;
     }
     if (plane == 0) {
         off = b->m78;
@@ -565,10 +565,10 @@ void fn_8039AE60(Vp6Buf* b, unsigned char* a, unsigned char* c, unsigned plane)
 }
 
 /* near-miss: 75 insns like the original code; stride and the copy pointer swap r29/r30 (priority of the loop pointer). */
-void fn_8039B058(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* X, unsigned char* Y, int* tbl)
+void DeblockPlaneNew(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned char* X, unsigned char* Y, int* tbl)
 {
     Vp6McFn fn = lbl_806EF3EC;
-    Vp6McFn last = fn_80399BF0;
+    Vp6McFn last = DeblockVerticalEdgesInNonFilteredBandNewFilter;
     unsigned i;
     unsigned j;
     unsigned char* x = X;
@@ -594,34 +594,34 @@ void fn_8039B058(Vp6Buf* b, int stride, int a, unsigned w, unsigned h, unsigned 
     last(b, X, Y, stride, w, a, tbl);
 }
 
-void fn_8039B184(Vp6Buf* b, unsigned char* src, unsigned char* dst)
+void DeblockFrame(Vp6Buf* b, unsigned char* src, unsigned char* dst)
 {
     memset(b->m28, 0, b->m8C * 4);
     if (reinterpret_cast<Vp6Dq*>(b)->m0 > 1) {
-        fn_80398BEC(reinterpret_cast<Vp6Dq*>(b));
+        SetupDeblocker(reinterpret_cast<Vp6Dq*>(b));
     }
     if (reinterpret_cast<Vp6Dq*>(b)->m0 > 4) {
-        fn_8039B058(b, b->m98, 0, b->m90, b->m94, src + b->m78, dst + b->m78, lbl_806EF448);
-        fn_8039B058(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m7C, dst + b->m7C, lbl_806EF44C);
-        fn_8039B058(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m80, dst + b->m80, lbl_806EF44C);
+        DeblockPlaneNew(b, b->m98, 0, b->m90, b->m94, src + b->m78, dst + b->m78, lbl_806EF448);
+        DeblockPlaneNew(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m7C, dst + b->m7C, lbl_806EF44C);
+        DeblockPlaneNew(b, b->m9C, 0, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, src + b->m80, dst + b->m80, lbl_806EF44C);
     } else {
-        fn_8039AE60(b, src, dst, 0);
-        fn_8039AE60(b, src, dst, 1);
-        fn_8039AE60(b, src, dst, 2);
+        DeblockPlane(b, src, dst, 0);
+        DeblockPlane(b, src, dst, 1);
+        DeblockPlane(b, src, dst, 2);
     }
 }
 
-void fn_8039B2B0(Vp6Buf* b, unsigned char* a, unsigned char* c)
+void DeblockFrameInterlaced(Vp6Buf* b, unsigned char* a, unsigned char* c)
 {
-    fn_80398BEC(reinterpret_cast<Vp6Dq*>(b));
+    SetupDeblocker(reinterpret_cast<Vp6Dq*>(b));
     void* save = b->m28;
     memset(save, 0, b->m8C * 4);
-    fn_8039B058(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + b->m78, c + b->m78, lbl_806EF448);
+    DeblockPlaneNew(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + b->m78, c + b->m78, lbl_806EF448);
     b->m28 = reinterpret_cast<int*>(b->m28) + (((unsigned)(b->m90 * b->m94)) >> 1);
-    fn_8039B058(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + (b->m78 + b->m98), c + (b->m78 + b->m98), lbl_806EF448);
+    DeblockPlaneNew(b, b->m98 * 2, 0, b->m90, (unsigned)b->m94 >> 1, a + (b->m78 + b->m98), c + (b->m78 + b->m98), lbl_806EF448);
     b->m28 = save;
-    fn_8039B058(b, b->m9C, b->m84, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m7C, c + b->m7C, lbl_806EF44C);
-    fn_8039B058(b, b->m9C, b->m84 + b->m88, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m80, c + b->m80, lbl_806EF44C);
+    DeblockPlaneNew(b, b->m9C, b->m84, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m7C, c + b->m7C, lbl_806EF44C);
+    DeblockPlaneNew(b, b->m9C, b->m84 + b->m88, (unsigned)b->m90 >> 1, (unsigned)b->m94 >> 1, a + b->m80, c + b->m80, lbl_806EF44C);
 }
 
 }

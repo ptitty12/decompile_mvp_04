@@ -12,7 +12,7 @@ struct Vp6Mul {
 };
 extern const Vp6Mul lbl_8060918C[];
 
-/* Output frame descriptor passed to the macroblock copy functions (fn_803A0884 / fn_803A0AF4). */
+/* Output frame descriptor passed to the macroblock copy functions (AnyRatioFrameScale / CenterImage). */
 struct Vp6Out {
     int m0;
     int m4;
@@ -24,7 +24,7 @@ struct Vp6Out {
     unsigned char* m20;
 };
 
-/* Decoder fields used by fn_803A0C9C (offsets inside the frame buffer set). */
+/* Decoder fields used by ScaleOrCenter (offsets inside the frame buffer set). */
 struct Vp6BufView {
     char pad0[8];
     int m8;
@@ -52,7 +52,7 @@ extern Vp6Fn4 lbl_806EF428;
 extern Vp6Fn4 lbl_806EF414;
 extern const int lbl_80624494[];
 
-/* Decoder context fields used by fn_803A30D0 (not part of Vp6Ctx yet). */
+/* Decoder context fields used by VP6_ReconstructBlock (not part of Vp6Ctx yet). */
 struct Vp6McView {
     char pad0[8];
     int m8;
@@ -71,7 +71,7 @@ struct Vp6McView {
     int m284;
 };
 
-/* Scaler descriptor: source and destination width/height pairs at +0x58..+0x64 (fn_803A0604). */
+/* Scaler descriptor: source and destination width/height pairs at +0x58..+0x64 (AnyRatio_2D_Scale). */
 struct Vp6ScView {
     char pad0[0x58];
     int m58;
@@ -89,7 +89,7 @@ extern Vp6Fn4 lbl_806EF3C8;
 extern Vp6Fn3 lbl_806EF3CC;
 extern Vp6Fn3 lbl_806EF3D0;
 
-/* Decoder fields used by the motion vector reader fn_803A2A44 (not part of Vp6Ctx yet). */
+/* Decoder fields used by the motion vector reader VP6_decodeMotionVector (not part of Vp6Ctx yet). */
 struct Vp6MvView {
     char pad0[0x3C];
     short m3C;
@@ -109,7 +109,7 @@ struct Vp6MvView {
     char pad716[6];
     unsigned char m71C[16];
 };
-/* Macroblock decode context fields used by fn_803A2244 (offsets read from the original code). */
+/* Macroblock decode context fields used by VP6_DecodeMacroBlock (offsets read from the original code). */
 struct Vp6MbView {
     char pad0[8];
     int m8;
@@ -151,25 +151,25 @@ struct Vp6MbView {
 };
 extern "C" {
 
-void fn_803A00A0(int, int, int, int);
+void HorizontalLine_Copy(int, int, int, int);
 void fn_803A00D8(int, int, int);
-void fn_803A0FCC(Vp6MbView* c, int mbx, unsigned mby, int blk);
-void fn_803A26D4(Vp6MbView* c, int mbx, unsigned mby);
+void VP6_DecodeBlock(Vp6MbView* c, int mbx, unsigned mby, int blk);
+void VP6_decodeModeAndMotionVector(Vp6MbView* c, int mbx, unsigned mby);
 
-void fn_803A2DEC(Vp6McView* c, int dst, int mode);
+void VP6_PredictFilteredBlock(Vp6McView* c, int dst, int mode);
 
-void fn_8039868C(Vp6BufView* b, unsigned char* base);
-void fn_803A0884(Vp6BufView* b, unsigned char* base, Vp6Out* r, int a, int c);
+void UpdateUMVBorder(Vp6BufView* b, unsigned char* base);
+void AnyRatioFrameScale(Vp6BufView* b, unsigned char* base, Vp6Out* r, int a, int c);
 
-int fn_803A0EBC(Vp6Rc* rc);
-int fn_803A0E18(Vp6Rc* rc, unsigned prob);
+int VP6_DecodeBool128(Vp6Rc* rc);
+int VP6_DecodeBool(Vp6Rc* rc, unsigned prob);
 
 extern const int lbl_8062501C[];
 extern const int lbl_80624F9C[];
-void fn_803A3D84(const unsigned char* src, short* dst, int stride, int rows, const int* taps);
-void fn_803A3E08(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
-void fn_80397CD0(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
-void fn_80397F98(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
+void FilterBlock1dBil_GC(const unsigned char* src, short* dst, int stride, int rows, const int* taps);
+void FilterBlock2dBil_GC(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
+void FilterBlock1d(const unsigned char* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
+void FilterBlock2d(const unsigned char* src, short* dst, int stride, const int* tapsA, const int* tapsB);
 
 struct Vp6McView2 {
     char pad0[0x74];
@@ -188,8 +188,8 @@ extern Vp6Fn3 lbl_806EF3A4;
 extern Vp6Fn3 lbl_806EF3A0;
 extern Vp6Fn4 lbl_806EF43C;
 
-/* near-miss: same weights as fn_803A00DC; load and multiply scheduling differ (72 vs 62 insns). */
-void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
+/* near-miss: same weights as HorizontalLine_4_5_Scale_C; load and multiply scheduling differ (72 vs 62 insns). */
+void HorizontalLine_3_5_Scale_C(const unsigned char* src, unsigned n, unsigned char* dst)
 {
     unsigned i;
     n -= 3;
@@ -210,7 +210,7 @@ void fn_803A0310(const unsigned char* src, unsigned n, unsigned char* dst)
 }
 
 /* near-miss: 4 slots, order of the first two loads and multiplies. */
-void fn_803A0408(unsigned char* p, int s, unsigned n)
+void VerticalBand_3_5_Scale_C(unsigned char* p, int s, unsigned n)
 {
     unsigned i;
     for (i = 0; i < n; i++) {
@@ -226,7 +226,7 @@ void fn_803A0408(unsigned char* p, int s, unsigned n)
     }
 }
 
-void fn_803A04BC(unsigned char* p, int s, unsigned n)
+void LastVerticalBand_3_5_Scale_C(unsigned char* p, int s, unsigned n)
 {
     unsigned i;
     for (i = 0; i < n; i++) {
@@ -242,7 +242,7 @@ void fn_803A04BC(unsigned char* p, int s, unsigned n)
 }
 
 /* near-miss: 1 slot (add operand order) */
-void fn_803A0554(const unsigned char* src, unsigned n, unsigned char* dst)
+void HorizontalLine_1_2_Scale_C(const unsigned char* src, unsigned n, unsigned char* dst)
 {
     unsigned i;
     n--;
@@ -259,7 +259,7 @@ void fn_803A0554(const unsigned char* src, unsigned n, unsigned char* dst)
     dst[1] = c;
 }
 
-void fn_803A05A0(unsigned char* p, int stride, unsigned n)
+void VerticalBand_1_2_Scale_C(unsigned char* p, int stride, unsigned n)
 {
     unsigned i;
     for (i = 0; i < n; i++) {
@@ -279,7 +279,7 @@ void fn_803A05DC(unsigned char* p, int stride, unsigned n)
 
 //// a
 //// a
-int fn_803A0604(Vp6ScView* c, int a1, int a2, int a3, int unused, int a5, int a6, int a7, unsigned a8)
+int AnyRatio_2D_Scale(Vp6ScView* c, int a1, int a2, int a3, int unused, int a5, int a6, int a7, unsigned a8)
 {
     unsigned n1 = 0;
     unsigned n2 = 0;
@@ -302,7 +302,7 @@ int fn_803A0604(Vp6ScView* c, int a1, int a2, int a3, int unused, int a5, int a6
         fa = lbl_806EF3C0;
         break;
     case 10:
-        fa = (Vp6Fn4)fn_803A00A0;
+        fa = (Vp6Fn4)HorizontalLine_Copy;
         break;
     default:
         ok = 0;
@@ -361,7 +361,7 @@ int fn_803A0604(Vp6ScView* c, int a1, int a2, int a3, int unused, int a5, int a6
     return ok;
 }
 
-void fn_803A0AF4(Vp6BufView* b, unsigned char* base, Vp6Out* r)
+void CenterImage(Vp6BufView* b, unsigned char* base, Vp6Out* r)
 {
     unsigned i;
     unsigned hh = (r->m4 - b->m44) >> 1;
@@ -389,26 +389,26 @@ void fn_803A0AF4(Vp6BufView* b, unsigned char* base, Vp6Out* r)
     }
 }
 
-void fn_803A0C9C(Vp6BufView* b, unsigned char* base, Vp6Out* r)
+void ScaleOrCenter(Vp6BufView* b, unsigned char* base, Vp6Out* r)
 {
     if (b->m8 != 0) {
-        fn_8039868C(b, base);
+        UpdateUMVBorder(b, base);
     }
     switch (b->m68) {
     case 0:
     case 1: {
         unsigned t = (r->m4 - b->m74) >> 1;
         unsigned u = (r->m0 - b->m70) >> 1;
-        fn_803A0884(b, base, r, t * r->m0 + u, ((int)t >> 1) * r->mC + ((int)u >> 1));
+        AnyRatioFrameScale(b, base, r, t * r->m0 + u, ((int)t >> 1) * r->mC + ((int)u >> 1));
         break;
     }
     case 2:
-        fn_803A0AF4(b, base, r);
+        CenterImage(b, base, r);
         break;
     }
 }
 
-void fn_803A0D54(Vp6Ctx* c)
+void VP6_ConfigureContexts(Vp6Ctx* c)
 {
     const unsigned char* in = reinterpret_cast<unsigned char*>(c) + 0x3A0;
     unsigned char* out = reinterpret_cast<unsigned char*>(c) + 0x542;
@@ -430,7 +430,7 @@ void fn_803A0D54(Vp6Ctx* c)
 }
 
 /* near-miss: 41 insns like the original code; range/value swap r7/r8 (the original keeps range in r8). */
-int fn_803A0E18(Vp6Rc* rc, unsigned prob)
+int VP6_DecodeBool(Vp6Rc* rc, unsigned prob)
 {
     unsigned range = rc->m4;
     int bit = 0;
@@ -466,7 +466,7 @@ int fn_803A0E18(Vp6Rc* rc, unsigned prob)
     return bit;
 }
 
-int fn_803A0EBC(Vp6Rc* rc)
+int VP6_DecodeBool128(Vp6Rc* rc)
 {
     unsigned range = rc->m4;
     unsigned value = rc->m8;
@@ -496,7 +496,7 @@ int fn_803A0EBC(Vp6Rc* rc)
 }
 
 /* near-miss: 37 insns like the original code; range and value swap r7/r8. */
-int fn_803A0F38(Vp6Rc* rc, unsigned prob)
+int nDecodeBool(Vp6Rc* rc, unsigned prob)
 {
     unsigned range = rc->m4;
     int bit = 0;
@@ -529,7 +529,7 @@ int fn_803A0F38(Vp6Rc* rc, unsigned prob)
 
 //// a
 /* near-miss 96.5%: same instructions; about 28 slots differ in the order of the independent field stores and the t8/t10 registers. */
-void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
+void VP6_DecodeMacroBlock(Vp6MbView* c, int mbx, unsigned mby)
 {
     int step;
     int v;
@@ -542,14 +542,14 @@ void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
                 p = p + ((0x100 - p) >> 1);
             }
         }
-        c->mC8 = fn_803A0F38(&c->m150, p);
+        c->mC8 = nDecodeBool(&c->m150, p);
     } else {
         c->mC8 = 0;
     }
     if (c->m1AC == 0) {
         c->m8 = 1;
     } else {
-        fn_803A26D4(c, mbx, mby);
+        VP6_decodeModeAndMotionVector(c, mbx, mby);
     }
     if (c->mC8 == 0) {
         c->m74 = c->m1B8;
@@ -576,23 +576,23 @@ void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
     c->mC4 = (char*)c + 0x124;
     c->m78 = 0;
     c->mBC = c->m10C + t29;
-    fn_803A0FCC(c, mbx, mby, 0);
+    VP6_DecodeBlock(c, mbx, mby, 0);
     c->mC0 = t28;
     c->m70 = c->m70 + 8;
     c->mBC = c->m10C + t25;
     c->m68 = c->m68 + 8;
-    fn_803A0FCC(c, mbx, mby, 1);
+    VP6_DecodeBlock(c, mbx, mby, 1);
     c->mC0 = t26;
     c->m68 = c->m68 - 8;
     c->mBC = c->m10C + t29;
     c->m70 = t30 + step * c->m1B8;
     c->m64 = c->m64 + step;
-    fn_803A0FCC(c, mbx, mby, 2);
+    VP6_DecodeBlock(c, mbx, mby, 2);
     c->mC0 = t26;
     c->m70 = c->m70 + 8;
     c->mBC = c->m10C + t25;
     c->m68 = c->m68 + 8;
-    fn_803A0FCC(c, mbx, mby, 3);
+    VP6_DecodeBlock(c, mbx, mby, 3);
     int u10 = c->m1BC;
     int u28 = mbx * 8;
     int u29 = mby * 8;
@@ -610,7 +610,7 @@ void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
     c->m74 = u10;
     c->m64 = u28;
     c->m68 = u29;
-    fn_803A0FCC(c, mbx, mby, 4);
+    VP6_DecodeBlock(c, mbx, mby, 4);
     void* w8 = (char*)c + 0xFC;
     void* w7 = (char*)c + 0x134;
     int w10 = c->m68;
@@ -620,14 +620,14 @@ void fn_803A2244(Vp6MbView* c, int mbx, unsigned mby)
     int w9 = c->m224 + c->m64 * c->m74 + w10;
     c->mC4 = w7;
     c->m70 = w9;
-    fn_803A0FCC(c, mbx, mby, 5);
+    VP6_DecodeBlock(c, mbx, mby, 5);
 }
 
-int fn_803A2524(Vp6Ctx* c)
+int VP6_DecodeBlockMode(Vp6Ctx* c)
 {
     Vp6Rc* rc = &c->m150;
-    int v = fn_803A0EBC(rc) * 2;
-    v += fn_803A0EBC(rc);
+    int v = VP6_DecodeBool128(rc) * 2;
+    v += VP6_DecodeBool128(rc);
     switch (v) {
     case 0:
         return 0;
@@ -641,32 +641,32 @@ int fn_803A2524(Vp6Ctx* c)
     return 0;
 }
 
-int fn_803A25A8(Vp6Ctx* c, int a, int b)
+int VP6_DecodeMode(Vp6Ctx* c, int a, int b)
 {
     Vp6Rc* rc = &c->m150;
     int r = a;
     const unsigned char* t = reinterpret_cast<unsigned char*>(c) + 0x77C;
     int idx = b * 10;
-    if (fn_803A0E18(rc, t[a + idx]) == 0) {
+    if (VP6_DecodeBool(rc, t[a + idx]) == 0) {
         const unsigned char* p = reinterpret_cast<unsigned char*>(c) + (b * 0x5A + 0x7A4) + a * 9;
-        if (fn_803A0E18(rc, p[0])) {
-            if (fn_803A0E18(rc, p[2])) {
-                if (fn_803A0E18(rc, p[6])) {
-                    r = fn_803A0E18(rc, p[8]) + 8;
+        if (VP6_DecodeBool(rc, p[0])) {
+            if (VP6_DecodeBool(rc, p[2])) {
+                if (VP6_DecodeBool(rc, p[6])) {
+                    r = VP6_DecodeBool(rc, p[8]) + 8;
                 } else {
-                    r = fn_803A0E18(rc, p[7]) + 5;
+                    r = VP6_DecodeBool(rc, p[7]) + 5;
                 }
             } else {
                 r = 1;
-                if (fn_803A0E18(rc, p[5])) {
+                if (VP6_DecodeBool(rc, p[5])) {
                     r = 7;
                 }
             }
         } else {
-            if (fn_803A0E18(rc, p[1])) {
-                r = fn_803A0E18(rc, p[4]) + 3;
+            if (VP6_DecodeBool(rc, p[1])) {
+                r = VP6_DecodeBool(rc, p[4]) + 3;
             } else {
-                r = fn_803A0E18(rc, p[3]) << 1;
+                r = VP6_DecodeBool(rc, p[3]) << 1;
             }
         }
     }
@@ -681,7 +681,7 @@ static inline unsigned char Vp6Rd(Vp6MvView* c, int k, int idx)
 }
 
 /* near-miss 99.1%: 4 slots differ; the final v + py / v + px adds take their operands in the other order, and one loop-invariant addi sits one slot earlier. */
-void fn_803A2A44(Vp6MvView* c, short* out, int mode)
+void VP6_decodeMotionVector(Vp6MvView* c, short* out, int mode)
 {
     int v;
     short px = 0;
@@ -705,33 +705,33 @@ void fn_803A2A44(Vp6MvView* c, short* out, int mode)
     k = 0;
     j = 0;
     do {
-        if (!fn_803A0E18(rc, p706[i])) {
-            if (fn_803A0E18(rc, Vp6Rd(c, 0x708, j))) {
-                if (fn_803A0E18(rc, Vp6Rd(c, 0x70C, j))) {
-                    v = fn_803A0E18(rc, Vp6Rd(c, 0x70E, j)) + 6;
+        if (!VP6_DecodeBool(rc, p706[i])) {
+            if (VP6_DecodeBool(rc, Vp6Rd(c, 0x708, j))) {
+                if (VP6_DecodeBool(rc, Vp6Rd(c, 0x70C, j))) {
+                    v = VP6_DecodeBool(rc, Vp6Rd(c, 0x70E, j)) + 6;
                 } else {
-                    v = fn_803A0E18(rc, Vp6Rd(c, 0x70D, j)) + 4;
+                    v = VP6_DecodeBool(rc, Vp6Rd(c, 0x70D, j)) + 4;
                 }
-            } else if (fn_803A0E18(rc, Vp6Rd(c, 0x709, j))) {
-                v = fn_803A0E18(rc, Vp6Rd(c, 0x70B, j)) + 2;
+            } else if (VP6_DecodeBool(rc, Vp6Rd(c, 0x709, j))) {
+                v = VP6_DecodeBool(rc, Vp6Rd(c, 0x70B, j)) + 2;
             } else {
-                v = fn_803A0E18(rc, Vp6Rd(c, 0x70A, j));
+                v = VP6_DecodeBool(rc, Vp6Rd(c, 0x70A, j));
             }
         } else {
-            v = fn_803A0E18(rc, Vp6Rd(c, 0x71C, k));
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x71D, k)) * 2;
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x71E, k)) * 4;
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x723, k)) << 7;
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x722, k)) << 6;
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x721, k)) << 5;
-            v += fn_803A0E18(rc, Vp6Rd(c, 0x720, k)) * 16;
+            v = VP6_DecodeBool(rc, Vp6Rd(c, 0x71C, k));
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x71D, k)) * 2;
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x71E, k)) * 4;
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x723, k)) << 7;
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x722, k)) << 6;
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x721, k)) << 5;
+            v += VP6_DecodeBool(rc, Vp6Rd(c, 0x720, k)) * 16;
             if (v & 0xF0) {
-                v += fn_803A0E18(rc, Vp6Rd(c, 0x71F, k)) * 8;
+                v += VP6_DecodeBool(rc, Vp6Rd(c, 0x71F, k)) * 8;
             } else {
                 v += 8;
             }
         }
-        if (v != 0 && fn_803A0E18(rc, Vp6Rd(c, 0x704, i))) {
+        if (v != 0 && VP6_DecodeBool(rc, Vp6Rd(c, 0x704, i))) {
             v = -v;
         }
         if (i != 0) {
@@ -749,13 +749,13 @@ void fn_803A2A44(Vp6MvView* c, short* out, int mode)
     } while (i <= 1);
 }
 
-void fn_803A30D0(Vp6McView* c, int mode)
+void VP6_ReconstructBlock(Vp6McView* c, int mode)
 {
     int m = c->m8;
     if (m == 0) {
         lbl_806EF418(c->m284, c->m244 + c->m70, c->m254 + c->m70, c->m270, c->m74);
     } else if (lbl_80624494[m] != 0) {
-        fn_803A2DEC(c, c->m284, mode);
+        VP6_PredictFilteredBlock(c, c->m284, mode);
         lbl_806EF428(c->m284, c->m270, c->m244 + c->m70, c->m74);
     } else if (m == 5) {
         lbl_806EF418(c->m284, c->m244 + c->m70, c->m24C + c->m70, c->m270, c->m74);
@@ -764,7 +764,7 @@ void fn_803A30D0(Vp6McView* c, int mode)
     }
 }
 
-void fn_803A3D0C(const short* a, const short* b, short* out)
+void IDct1_GC(const short* a, const short* b, short* out)
 {
     int dc = (a[0] * b[0] + 15) >> 5;
     unsigned packed = dc;
@@ -779,7 +779,7 @@ void fn_803A3D0C(const short* a, const short* b, short* out)
     }
 }
 
-void fn_803A3F0C(const unsigned char* a, const unsigned char* b, short* dst, int stride, int i, int j, int flag)
+void FilterBlock_GC(const unsigned char* a, const unsigned char* b, short* dst, int stride, int i, int j, int flag)
 {
     int d = b - a;
     if (d < 0) {
@@ -789,34 +789,34 @@ void fn_803A3F0C(const unsigned char* a, const unsigned char* b, short* dst, int
     }
     if (flag == 0) {
         if (d == 1) {
-            fn_803A3D84(a, dst, stride, 1, lbl_8062501C + i * 2);
+            FilterBlock1dBil_GC(a, dst, stride, 1, lbl_8062501C + i * 2);
             return;
         }
         if (d == stride) {
-            fn_803A3D84(a, dst, stride, stride, lbl_8062501C + j * 2);
+            FilterBlock1dBil_GC(a, dst, stride, stride, lbl_8062501C + j * 2);
             return;
         }
         if (d == stride - 1)
-            fn_803A3E08(a - 1, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
+            FilterBlock2dBil_GC(a - 1, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
         else
-            fn_803A3E08(a, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
+            FilterBlock2dBil_GC(a, dst, stride, lbl_8062501C + i * 2, lbl_8062501C + j * 2);
         return;
     }
     if (d == 1) {
-        fn_80397CD0(a, dst, stride, 1, 8, 8, lbl_80624F9C + i * 4);
+        FilterBlock1d(a, dst, stride, 1, 8, 8, lbl_80624F9C + i * 4);
         return;
     }
     if (d == stride) {
-        fn_80397CD0(a, dst, stride, stride, 8, 8, lbl_80624F9C + j * 4);
+        FilterBlock1d(a, dst, stride, stride, 8, 8, lbl_80624F9C + j * 4);
         return;
     }
     if (d == stride - 1)
-        fn_80397F98(a - 1, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
+        FilterBlock2d(a - 1, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
     else
-        fn_80397F98(a, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
+        FilterBlock2d(a, dst, stride, lbl_80624F9C + i * 4, lbl_80624F9C + j * 4);
 }
 
-unsigned fn_803A4094(const unsigned char* p, int stride)
+unsigned Var16Point(const unsigned char* p, int stride)
 {
     unsigned sum = 0;
     unsigned sq = 0;
@@ -840,7 +840,7 @@ unsigned fn_803A4094(const unsigned char* p, int stride)
     return (sq * 16 - sum * sum) >> 8;
 }
 
-void fn_803A4104(Vp6McView2* c, int base, int a, int b)
+void VP6_PredictFiltered(Vp6McView2* c, int base, int a, int b)
 {
     int p = c->m290;
     int x, y;
