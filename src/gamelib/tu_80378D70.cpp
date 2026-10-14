@@ -129,7 +129,7 @@ extern "C" void fn_80378D70(const char* s, int a, char* dst, int max, int ch, in
     }
 }
 
-/* near-miss (97.4%): token scan; same instructions except the closing `(*pp)++`, which retail reloads *pp for (the join before it has a second predecessor in retail), ours reuses the compared pointer (one lwz less). */
+/* The initial delimiter test joins the closing increment directly. */
 extern "C" void fn_80378E48(const char** pp, int* rem, int ch, const char** tok, int* tokLen)
 {
     *tokLen = 0;
@@ -137,25 +137,29 @@ extern "C" void fn_80378E48(const char** pp, int* rem, int ch, const char** tok,
     if (*rem != 0) {
         const char* p = *pp;
         int c = *p;
-        if (c != 0 && c != ch) {
-            do {
-                *pp = p + 1;
-                (*tokLen)++;
-                if (--*rem == 0)
-                    break;
-                p = *pp;
-                c = *p;
-                if (c == 0)
-                    break;
-            } while (c != ch);
-        }
+        if (c == 0)
+            goto after_scan;
+        if (c == ch)
+            goto matched;
+        do {
+            *pp = p + 1;
+            (*tokLen)++;
+            if (--*rem == 0)
+                break;
+            p = *pp;
+            c = *p;
+            if (c == 0)
+                break;
+        } while (c != ch);
     } else {
         *tok = 0;
     }
-    if (**pp == ch) {
-        if (ch != 0)
-            (*pp)++;
-    }
+after_scan:
+    if (**pp != ch)
+        return;
+matched:
+    if (ch != 0)
+        (*pp)++;
 }
 
 extern "C" void fn_80378EF8(const unsigned char* s, int a, char* dst, int max, int* len)
