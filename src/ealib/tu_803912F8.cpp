@@ -382,13 +382,14 @@ extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short
     return *(unsigned*)&t;
 }
 
-/* near-miss: lhzx operand order and the r0/r9 temps swapped (retail indexes (i*2, base+0x18)); 12 spellings tried. */
+/* The id array's address is held as an int, which gives retail's index-first lhzx (i*2, base+0x18). */
 extern "C" unsigned short* fn_80391C20(McRec* r, int key)
 {
     int i = 0;
     int n = r->m10;
     while (i < n) {
-        unsigned short* e = (unsigned short*)((char*)r + r->m18[i] * 4);
+        int t = (int)r->m18;
+        unsigned short* e = (unsigned short*)((char*)r + *(unsigned short*)(i * 2 + t) * 4);
         if (*e == key)
             return e;
         i++;
