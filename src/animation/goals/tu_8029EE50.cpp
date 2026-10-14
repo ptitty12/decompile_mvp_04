@@ -6,7 +6,7 @@
  * other parts of the TU, so every data object it uses is declared extern by
  * its lbl_ name (no .rodata/.data split for this unit).
  *
- * Status: 22/33 match. Near-misses carry a note above them. Not written (the
+ * Status: 23/33 match. Near-misses carry a note above them. Not written (the
  * original assembly stays): fn_8029EFAC and fn_8029FB9C (about 760 instructions
  * each, the goal state functions), fn_802A1D7C (496, float compares kept as
  * values) and fn_802A30B0 (214, a dozen by-value Vec3 temporaries).
@@ -298,15 +298,18 @@ int fn_802A168C(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f, unsigned int has
     return 0;
 }
 
-/* near-miss: 379 of 379 instructions, 99.6% by objdiff; the remaining difference is
- * the frame (304 bytes, retail 312). The control flow, registers and the first
- * 50 frame offsets match. Found here: the nested Scale(Scale(Dir())) call only gets
- * retail's frame order when the vector is a class with a user-declared copy
- * constructor (Unk802A1790_V3), so that each by-value argument is a real
- * temporary allocated outermost first; the position `a` is one variable reused
- * for the later probe. Still different: the by-value float of the second probe is
- * allocated at +0xE8 (the temporary of the operator+ result), retail puts it at +0xF8
- * with the temporary still live, and retail compares m720 before f at the end. */
+/* The second probe is written out in the body (a named Unk802A1790_V3 plus a
+ * float local): as an inline taking the vector and the float by value, the
+ * float reused the operator+ result's slot (+0xE8 instead of retail's +0xF8)
+ * and the later `v` reused the parameter copy's slot. The single `return 0x11`
+ * after the if/else keeps `li r3,12` below its `bne` (a separate return inside
+ * the block lets jump.c hoist it). Reading m720 through an inline accessor
+ * loads it before the float-store reload of `f`. */
+inline float Unk802A1790_M720(Unk80270BA0_X* x)
+{
+    return ((Unk802A2604_Player*)x)->m720;
+}
+
 int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
 {
     Unk80273498_Vec3 pos = FlatPosOf(x);
@@ -353,7 +356,10 @@ int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
                             flagB = 1;
                         } else {
                             float ang = fn_80382BB8(x->m618);
-                            if (Unk802A1790_Probe(p, a + Unk802A1790_Scale(Unk802A1790_Scale(Unk802A1790_Dir(ang), f), 0.35f), 0.0f)) {
+                            Unk802A1790_V3 pv = a + Unk802A1790_Scale(Unk802A1790_Scale(Unk802A1790_Dir(ang), f), 0.35f);
+                            float h = 0.0f;
+                            fn_80191068(p, &pv, 0, &h, lbl_8061E858, lbl_8061E85C);
+                            if (!(h <= lbl_8061E854)) {
                                 float eps = 65.0f;
                                 flagB = 1;
                                 Unk80273498_Vec3 v;
@@ -377,26 +383,26 @@ int fn_802A1790(Unk8029B70C_Goal* g, Unk80270BA0_X* x, float f)
         if (r == 2) {
             return 0xC;
         }
-        return 0x11;
-    }
-    g->mD0.f2 = 0;
-    if (g->m60) {
-        fn_802A2A64(g, x, g->m60);
-        int flag = 0;
-        g->m70 = fn_80410CE8(g->m60->m60.x - pos.x, g->m60->m60.z - pos.z);
-        g->mD0.f2 = 1;
-        int a = fn_8026DC5C(x, 0);
-        if (!a || fn_8026DB3C(x, 0)) {
-            flag = 1;
-        }
-        g->m50 = ((Unk8027A84C*)g)->fn_8027BB88(x, (Unk8027BBA8_Obj*)g->m60, a, flag, 1);
-        if (g->m50) {
-            g->mD0.f6 = 0;
-            return 0xB;
-        }
-        if (!(f <= ((Unk802A2604_Player*)x)->m720)) {
-            if (fn_8027D708(g, (Unk8027C728_Player*)x, (Unk8027C728_Player*)g->m60) == 1) {
-                return 0xD;
+    } else {
+        g->mD0.f2 = 0;
+        if (g->m60) {
+            fn_802A2A64(g, x, g->m60);
+            int flag = 0;
+            g->m70 = fn_80410CE8(g->m60->m60.x - pos.x, g->m60->m60.z - pos.z);
+            g->mD0.f2 = 1;
+            int a = fn_8026DC5C(x, 0);
+            if (!a || fn_8026DB3C(x, 0)) {
+                flag = 1;
+            }
+            g->m50 = ((Unk8027A84C*)g)->fn_8027BB88(x, (Unk8027BBA8_Obj*)g->m60, a, flag, 1);
+            if (g->m50) {
+                g->mD0.f6 = 0;
+                return 0xB;
+            }
+            if (!(f <= Unk802A1790_M720(x))) {
+                if (fn_8027D708(g, (Unk8027C728_Player*)x, (Unk8027C728_Player*)g->m60) == 1) {
+                    return 0xD;
+                }
             }
         }
     }

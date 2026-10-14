@@ -242,14 +242,6 @@ extern float lbl_8061E858;
 extern float lbl_8061E85C;
 extern float lbl_8061E850;
 extern float lbl_8061E854;
-/* The second probe of fn_802A1790: the position and the result float are
- * by-value parameters (copies in the inline's own frame) and the compare is
- * inside. */
-inline int Unk802A1790_Probe(Unk802A1790_Pos* p, Unk802A1790_V3 v, float h)
-{
-    fn_80191068(p, &v, 0, &h, lbl_8061E858, lbl_8061E85C);
-    return !(h <= lbl_8061E854);
-}
 
 /* Writes the vector through the first argument (fn_802A1790). The same
  * address is declared in tu_8027A84C.h as returning the vector by value; the
