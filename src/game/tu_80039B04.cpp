@@ -351,10 +351,9 @@ int fn_8003A498(Unk80039B04_Mgr* self, int a, int b, float f)
     return result;
 }
 
-/* near-miss: 141/142 slots; retail stores m24 first in the 20-valued group
- * (before m28), here it lands after m138. Permuting the group (1680 orders)
- * and member-initializer forms did not fix it. */
-Unk8003A5DC::Unk8003A5DC() : Unk8037B3E8(0xAB6EE03F)
+/* m18..m24 are in the member-initializer list (that is what puts m24's store ahead of m28's); among the
+ * same-valued -1 stores the one written last (m190) is emitted first. */
+Unk8003A5DC::Unk8003A5DC() : Unk8037B3E8(0xAB6EE03F), m18(20), m1C(20), m20(20), m24(20)
 {
     int i;
     mC = 10;
@@ -364,10 +363,6 @@ Unk8003A5DC::Unk8003A5DC() : Unk8037B3E8(0xAB6EE03F)
     m2C = lbl_805A74A8;
     m118 = lbl_805A74AC;
     m138 = 1;
-    m18 = 20;
-    m1C = 20;
-    m20 = 20;
-    m24 = 20;
     mD0 = 0;
     mFC = 0;
     m100 = 0;
@@ -385,7 +380,6 @@ Unk8003A5DC::Unk8003A5DC() : Unk8037B3E8(0xAB6EE03F)
     m134 = 0;
     m13C = 0;
     m140 = 0;
-    m190 = -1;
     m17C = lbl_805A74B0;
     m144 = 0;
     m148 = 0;
@@ -403,6 +397,7 @@ Unk8003A5DC::Unk8003A5DC() : Unk8037B3E8(0xAB6EE03F)
     m178 = -1;
     m180 = -1;
     m184 = -1;
+    m190 = -1;
     m188 = 0;
     m18C = 0;
     m194 = 0;

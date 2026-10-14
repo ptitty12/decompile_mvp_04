@@ -497,6 +497,61 @@ extern "C" void fn_8006E710(Unk80069F0C* self)
     fn_80089164(self->mC->mC);
 }
 
+/* Cumulative thresholds (rows 0/1) and [lo, hi) count ranges, in .rodata. */
+struct Unk8006F08C_F {
+    float f[2][3];
+};
+struct Unk8006F08C_R {
+    int r[3][2];
+};
+struct Unk8006F08C_Mode {
+    char pad0[0x24];
+    int m24;
+};
+struct Unk8007DB74_A;
+int fn_8007E154(Unk8007DB74_A* self, int a, int x);
+extern "C" float fn_8056FFB0(void);
+extern "C" int rand();
+extern const Unk8006F08C_F lbl_805B3A20;
+extern const Unk8006F08C_R lbl_805B3A38;
+extern const float lbl_805B3A50;
+
+extern "C" int fn_8006F08C(Unk80069F0C* self, int a, int b)
+{
+    int result = 0;
+    float unused = lbl_805B3A50;
+    float roll = fn_8056FFB0();
+    int ok = 0;
+    int t = ((Unk8006F08C_Mode*)self->m10)->m24;
+    if (t == 1 || (t == 2 && self->mC->m84 == 0))
+        ok = 1;
+    if (ok == 1 && !(roll >= lbl_805B3A50)) {
+        Unk8006F08C_F f = lbl_805B3A20;
+        Unk8006F08C_R rg = lbl_805B3A38;
+        Unk8007DB74_A* g = (Unk8007DB74_A*)lbl_8061930C;
+        unsigned i = 0;
+        int row = 1;
+        for (; i <= 4; i++) {
+            if (fn_8007E154(g, b, i) == a) {
+                row = 0;
+                break;
+            }
+        }
+        float rr = fn_8056FFB0();
+        for (i = 0; i <= 2; i++) {
+            if (!(rr >= f.f[row][i])) {
+                unsigned d = rg.r[i][1] - rg.r[i][0];
+                if (d != 0)
+                    result = rg.r[i][0] + rand() % d;
+                else
+                    result = rg.r[i][0];
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 Unk8006902C_Handle* fn_8006F4D0(Unk8006902C_Handle* h)
 {
     h->m0 = 0;
