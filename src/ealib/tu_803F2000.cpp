@@ -152,7 +152,7 @@ extern RcSys lbl_806AB4C8;
 extern int lbl_806AB3C4[3];
 extern int lbl_806AAF50[3];
 extern void* lbl_806EEA2C;
-extern "C" int fn_803F78CC(void*, void*);
+extern "C" int fn_803F78CC(void*, unsigned short*);
 
 struct RcD {
     virtual RcD* v0();
@@ -184,7 +184,7 @@ struct RcDt1 {
 struct RcDt2 {
     void* vp;
     char pad4[0x2b4];
-    RcD* m2B8;
+    RcAllocIf* m2B8;
     int m2BC;
     int m2C0;
 };
@@ -430,7 +430,7 @@ extern "C" void fn_803F28A4()
     case RFS_DONE: {
         RcEv* s = &lbl_806AAF2C;
         if (s->m24 != 0) {
-            fn_803F78CC(lbl_806EEA2C, &s->m14);
+            fn_803F78CC(lbl_806EEA2C, (unsigned short*)&s->m14);
             s->m24 = 0;
         }
         RcSys* y = &lbl_806AB4C8;
@@ -500,7 +500,7 @@ extern "C" void fn_803F2A70()
     case 0x7c: {
         RcEvT* s = &lbl_806AAF58;
         if (s->m24 != 0) {
-            fn_803F78CC(lbl_806EEA2C, &s->m14);
+            fn_803F78CC(lbl_806EEA2C, (unsigned short*)&s->m14);
             s->m24 = 0;
         }
         RcSys* y = &lbl_806AB4C8;
@@ -757,4 +757,207 @@ extern "C" void fn_803F7310(RcDt2* self, int c)
     self->vp = lbl_8060E6E8;
     if (c & 1)
         fn_803F6FC4((int)self, 0x2d0);
+}
+
+struct RcIfB;
+struct DVDDiskID;
+extern "C" void fn_803F9234(char*);
+extern "C" void fn_803F92D8(char*);
+extern "C" void fn_8041B75C();
+extern "C" DVDDiskID* fn_80425508();
+extern "C" char* strncpy(char*, const char*, unsigned);
+extern char lbl_8060E664[], lbl_8060E678[], lbl_8060E6A8[], lbl_8060E6C8[];
+extern int lbl_806EEA80, lbl_806EEA84, lbl_806EEA88;
+/* Constructor caller in tu_803EE8F8 uses RcIfB*(void*,void*); the handle
+ * supplies the same allocation interface used by fn_803F6F50. */
+extern "C" RcIfB* fn_803F713C(void* object, void* handle)
+{
+    RcDt2* self = (RcDt2*)object;
+    self->vp = lbl_8060E690;
+    char* item = (char*)self + 8;
+    int remaining = 2;
+    char* words;
+    do {
+        words = item + 0xC;
+        *(int*)(words - 0xC) = 0;
+        *(const void**)(words + 0x38) = lbl_8060E6C8;
+        *(short*)(words - 4) = 0;
+        *(short*)(words - 2) = 0;
+        *(int*)(words + 0) = 0;
+        *(int*)(words + 4) = 0;
+        *(int*)(words + 8) = 0;
+        *(int*)(words + 0xC) = 0;
+        *(int*)(words + 0x10) = 0;
+        *(int*)(words + 0x14) = 0;
+        *(int*)(words + 0x18) = 0;
+        *(int*)(words + 0x1C) = 0;
+        *(int*)(words + 0x20) = 0;
+        *(int*)(words + 0x24) = 0;
+        *(int*)(words + 0x28) = 0;
+        *(int*)(words + 0x2C) = 0;
+        *(int*)(words - 8) = 0x524D4306;
+        fn_803F9234(item);
+        *(const void**)(words + 0x38) = lbl_8060E6A8;
+        char* previous = item;
+        item += 0xE4;
+        fn_803F92D8(previous);
+    } while (remaining-- != 0);
+    struct Counts { short first, second; };
+    Counts* counts = (Counts*)((char*)self + 0x2C4);
+    counts->second = counts->first = 0;
+    self->m2B8 = *(RcAllocIf**)handle;
+    *(int*)((char*)self + 0x2B4) = lbl_806EEA80;
+    lbl_806EEA84 = 0;
+    RcReq* request;
+    self->m2BC = (int)self->m2B8->v0(0xA000, (request = RcLink(RcReq(1, (int)lbl_8060E664), RcReq(2, 0x20)), lbl_806EEA88 = 0, request));
+    self->m2C0 = (int)self->m2B8->v0(*(int*)((char*)self + 0x2B4), RcLink(RcReq(1, (int)lbl_8060E678), RcReq(2, 0x20)));
+    fn_8041B75C();
+    const char* id = (const char*)fn_80425508();
+    strncpy((char*)self + 0x2C8, id, 4);
+    strncpy((char*)self + 0x2CC, id + 4, 2);
+    return (RcIfB*)self;
+}
+
+struct RcGate61 { int pending; unsigned size, position; };
+extern RcGate61 lbl_806AAD9C;
+struct RcEventBig61 : RcEv {
+    int m40,m44,m48,m4C,m50,m54,m58,m5C,m60,m64,m68,m6C;
+    int m70,m74,m78,m7C,m80,m84,m88,m8C,m90;
+};
+struct RcBlock48_61 { int words[12]; };
+extern RcEventBig61 lbl_806AAEB0, lbl_806AB434;
+extern int lbl_806AB44C[];
+extern "C" int fn_8041BC20(int);
+extern "C" void fn_803F24E8()
+{
+    int ready;
+    if (lbl_806AAD9C.pending != 0) {
+        if (lbl_806AAD9C.position < lbl_806AAD9C.size) {
+            ready = 1;
+            lbl_806AAD9C.pending = 0;
+        } else ready = 0;
+    } else ready = 1;
+    if (ready != 0) {
+        int state = lbl_806AAEB0.m8;
+        switch (state) {
+        case 0:
+            fn_8041BC20(1);
+            lbl_806AAEB0.m24 = state;
+            lbl_806AAEB0.m8 = 0x65;
+            lbl_806AAEB0.mC = state;
+        case 0x65: {
+            int substate = lbl_806AAEB0.mC;
+            switch (substate) {
+            case 0: {
+                RcEventBig61* owner = &lbl_806AAEB0;
+                if (owner->m24 != 0) {
+                    fn_803F78CC(lbl_806EEA2C, (unsigned short*)&owner->m14);
+                    owner->m24 = substate;
+                }
+                RcEv* event = &lbl_806AB3AC;
+                event->m14.s = substate;
+                owner->mC = 0x69;
+                event->m18 = -1;
+                int value34 = owner->m4;
+                int value14 = owner->m14.i;
+                event->m14.i = value14;
+                event->m34 = value34;
+                event->m30 = 0xF;
+                event->m1C = substate;
+                event->m8 = substate;
+                event->m2C = substate;
+                event->m38 = substate;
+                event->m3C = substate;
+                event->m0->v0(event);
+                return;
+            }
+            case 0x69:
+                lbl_806AAEB0.m78 = lbl_806AB3AC.m18;
+                if (lbl_806AB3AC.m18 == 0 || lbl_806AB3AC.m18 == 3) {
+                    lbl_806AAEB0.m24 = 1;
+                    lbl_806AAEB0.m14.i = lbl_806AB3AC.m14.i;
+                    lbl_806AAEB0.m8 = 0x1A;
+                    lbl_806AAEB0.mC = 0;
+                    return;
+                }
+                lbl_806AAEB0.m24 = 0;
+                lbl_806AAEB0.m8 = 0x7B;
+                lbl_806AAEB0.mC = 0;
+                return;
+            }
+            break;
+        }
+        case 0x1A: {
+            int substate = lbl_806AAEB0.mC;
+            switch (substate) {
+            case 0: {
+                RcEventBig61* event = &lbl_806AB434;
+                event->m14.s = substate;
+                lbl_806AAEB0.mC = 0x1B;
+                event->m18 = -1;
+                event->m1C = 1;
+                event->m8 = substate;
+                event->m14.i = lbl_806AAEB0.m14.i;
+                int ownerType = lbl_806AAEB0.m4;
+                *(RcBlock48_61*)&event->m2C = *(RcBlock48_61*)&lbl_806AAEB0.m2C;
+                event->m5C = ownerType;
+                event->m60 = 0;
+                event->m90 = 0;
+                event->m68 = 0;
+                event->m6C = 0;
+                event->m70 = 0;
+                event->m74 = 0;
+                event->m78 = 0;
+                event->m7C = 0;
+                event->m64 = 0;
+                event->m80 = 0;
+                event->m84 = 0;
+                event->m88 = 0;
+                event->m8C = 0;
+                event->m0->v0(event);
+                return;
+            }
+            case 0x1B:
+                lbl_806AAEB0.m8 = 0x7B;
+                lbl_806AAEB0.m78 = lbl_806AB434.m18;
+                lbl_806AAEB0.mC = 0;
+                switch (lbl_806AB434.m60) {
+                case 1:
+                    lbl_806AAEB0.m8 = 0x65;
+                    lbl_806AAEB0.mC = 0;
+                    return;
+                case 4: case 16: case 0:
+                    if (lbl_806AB44C[0] == 3) {
+                        lbl_806AAEB0.m8 = 0x65;
+                        lbl_806AAEB0.mC = 0;
+                        return;
+                    }
+                    break;
+                }
+                break;
+            }
+            break;
+        }
+        case 0x7B: {
+            RcEventBig61* owner = &lbl_806AAEB0;
+            if (owner->m24 != 0) {
+                fn_803F78CC(lbl_806EEA2C, (unsigned short*)&owner->m14);
+                owner->m24 = 0;
+            }
+            owner->m0->v1(owner);
+            RcSys* output = &lbl_806AB4C8;
+            output->m0 = 1;
+            output->m6C = 0;
+            output->m70 = 0;
+            output->m74 = 0;
+            output->m78 = 0;
+            output->m7C = 0;
+            output->m80 = 0;
+            output->m84 = 0;
+            output->m88 = 0;
+            output->m4 = owner->m78;
+            break;
+        }
+        }
+    }
 }

@@ -343,3 +343,5 @@
   - Owner decisions recorded tonight: Fable 5.1 when needed; no codeless asm; Claude/Codex coordinate via tools/coord.py; names from related EA builds count as tier-E2 evidence.
   - Best remaining reference hope: MVP Baseball 2004 for GameCube (owner's copy), then demo discs and MVP 06 NCAA (PS2).
   | Owner: nothing pending from this session
+
+- 2026-10-13 21:15 CDT | Final Codex wind-down matching batch: local61, local69 and B12 add five exact functions /2808 code bytes. Source field snapshots, row-base lifetime, native bounded iterators and nested DB scans match retail. ROOT21 adds the provider-grounded shared sound-copy callback contract with zero matching gain. Required one-line near misses from batches61/68/69/71 are retained; obsolete notes for newly exact functions are removed. Worker full Ninja builds, zero literal mismatches and committed-HEAD stock verifiers pass; unchanged inherited allocation-name unresolved imports are disclosed in worker evidence. Combined stock integration gates and pushes under the shared lock. Owner requested a usage-saving stop: no new functions or batches; successful work committed and unsuccessful drafts restored.
