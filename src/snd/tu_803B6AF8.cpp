@@ -42,8 +42,8 @@ void fn_803B9770(int, SndT3*, int);
 void fn_803B978C(int, int);
 void fn_803B9478(int, void*, int, int);
 int fn_803B9508(int, float**, int);
-void fn_803B02CC(int, void*);
-char fn_803B02FC(int);
+void SNDDRV_getmastervoice(int, void*);
+char SNDDRV_getsamplechan(int);
 int fn_803B4BEC();
 void fn_803B5738(int, unsigned char, int);
 char* fn_803B54FC(int, unsigned char, void*, void*);
@@ -380,9 +380,9 @@ extern "C" void fn_803B7348(SndRdE* r)
 extern "C" void fn_803B7374(SndRdE* r, SndSrc* s)
 {
     r->m0 = (void*)fn_803B70F0;
-    fn_803B02CC(s->m1C, s);
+    SNDDRV_getmastervoice(s->m1C, s);
     r->m24 = fn_803B4BEC();
-    r->m38 = fn_803B02FC(s->m1C);
+    r->m38 = SNDDRV_getsamplechan(s->m1C);
     r->m1C = 0;
     r->m2C = 0;
     r->m30 = s->m24;
@@ -445,9 +445,9 @@ extern "C" int fn_803B7404(SndRdF* r, int n, int unused, float* dst)
 extern "C" void fn_803B7534(SndRdF* r, SndSrc* s)
 {
     r->m0 = (void*)fn_803B7404;
-    fn_803B02CC(s->m1C, s);
+    SNDDRV_getmastervoice(s->m1C, s);
     r->m28 = fn_803B4BEC();
-    r->m31 = fn_803B02FC(s->m1C);
+    r->m31 = SNDDRV_getsamplechan(s->m1C);
     r->m20 = -1;
     r->m1C = 0;
     r->m24 = 0;
@@ -707,9 +707,9 @@ extern "C" void fn_803B7C78(SndRdI* r, SndSrc* s)
 {
     r->m0 = (void*)fn_803B7A94;
     r->m4 = (void*)fn_803B7C4C;
-    fn_803B02CC(s->m1C, s);
+    SNDDRV_getmastervoice(s->m1C, s);
     r->m30 = fn_803B4BEC();
-    r->m38 = fn_803B02FC(s->m1C);
+    r->m38 = SNDDRV_getsamplechan(s->m1C);
     r->m2C = s->m24;
     r->m20 = 0;
     r->m24 = s->mC;

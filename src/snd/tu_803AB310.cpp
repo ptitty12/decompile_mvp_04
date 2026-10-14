@@ -12,7 +12,7 @@ extern "C" void SNDSYS_entercritical();
 extern "C" void SNDSYS_leavecritical();
 extern "C" void fn_803B4160(int shandle, int cutoff);
 extern "C" void fn_803B445C(int shandle, int cutoff);
-extern "C" void fn_803B0F24(int voice);
+extern "C" void SNDPLATFORM_stop(int voice);
 extern "C" int fn_803FD944(int a, int b, int c);
 extern "C" void fn_803AA810(int h, int a, void* b, int c, int d);
 extern "C" int fn_803FE914(int h);
@@ -56,7 +56,7 @@ extern Unk8069CB9C lbl_8069CB9C;
 extern int lbl_80625440;
 
 extern "C" int SNDPLATFORM_restore(int a);
-extern "C" void fn_803B39A4();
+extern "C" void SNDI_freespkrtable();
 extern "C" void fn_803B12CC();
 extern "C" int SNDMEMI_restore();
 
@@ -113,7 +113,7 @@ extern "C" int fn_803AB480(int shandle)
     if (voice >= 0) {
         setvoice = -1;
         while (iSNDpatchkey(voice, &setvoice))
-            fn_803B0F24(setvoice);
+            SNDPLATFORM_stop(setvoice);
     }
     return voice;
 }
@@ -509,7 +509,7 @@ extern "C" int SNDSYS_restore()
         sndgs.streamrestore();
     if (sndgs.midirestore != 0)
         sndgs.midirestore();
-    fn_803B39A4();
+    SNDI_freespkrtable();
     if (sndgs.bankremove != 0)
         sndgs.bankremove(-1);
     SNDPLATFORM_restore(0);

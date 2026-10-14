@@ -117,7 +117,7 @@ struct Unk8069E200 {
 };
 extern Unk8069E200 lbl_8069E200;
 
-extern "C" void fn_803B14D0();
+extern "C" void SNDSYS_linkmaincpumixer();
 extern "C" void fn_803B5ACC();
 extern "C" int AXRegisterAuxACallback(int a, int b);
 extern "C" void OSCancelThread(void* p);
@@ -633,7 +633,7 @@ extern "C" void SNDDRV_initmixer()
 {
     Unk803AEE98 b;
     int i;
-    fn_803B14D0();
+    SNDSYS_linkmaincpumixer();
     b.m10 = sndgs.sso.set.voicesmaincpu;
     if (sndgs.sso.set.outputchannels != 1)
         b.m11 = sndgs.sso.set.outputchannels;
@@ -858,7 +858,7 @@ extern "C" int SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER* pph, int base, in
 }
 
 extern char lbl_8069E23C[];
-extern "C" void fn_803B2320(int idx, int ch, float v);
+extern "C" void SNDMIX_setwetgain(int idx, int ch, float v);
 
 int SNDPLATFORM_setfxlevel(int voice, int bus)
 {
@@ -877,7 +877,7 @@ int SNDPLATFORM_setfxlevel(int voice, int bus)
         for (; i < c->numchan; i++) {
             if (i == 5)
                 v = 0.0f;
-            fn_803B2320(c->voices[i] - sndgs.sso.set.voicesdsp, bus, v);
+            SNDMIX_setwetgain(c->voices[i] - sndgs.sso.set.voicesdsp, bus, v);
         }
     } else {
         return -15;
