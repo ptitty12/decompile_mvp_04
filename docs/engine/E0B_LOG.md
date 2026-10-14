@@ -12,7 +12,7 @@ A later session resumes from "Next step".
 | 2 | Disc and DOL | Done | see git log |
 | 3 | Decoder and disassembler | Done | see git log |
 | 4 | Semantics library and reference interpreter | Done | see git log |
-| 5 | Functions and CFGs | | |
+| 5 | Functions and CFGs | Done | see git log |
 | 6 | IR and C++ emitter | | |
 | 7 | Boot environment | | |
 | 8 | HLE boundary and SDK log | | |
@@ -42,6 +42,7 @@ A later session resumes from "Next step".
 | `engine/common/` | Byte order, SHA-1, host file helpers |
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
 | `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler (`isa.h`, `decode.cpp`, `disasm.cpp`); CPU state, guest memory page table, runtime hooks (`cpu.h`, `mem_access.h`); floating-point core (`fp.h/.cpp`); per-opcode semantics (`sem.h`); reference interpreter (`interp.h/.cpp`). Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
+| `engine/translator/` | Symbol map parser (`symbols.h/.cpp`), function and CFG recovery (`cfg.h/.cpp`), input loading (`program.h/.cpp`), `mvp-xlat` CLI |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -184,6 +185,48 @@ A later session resumes from "Next step".
     it now clears XER[0-3].
 - Total `ctest`: 8 tests (6 data-free, 2 local), all pass.
 
+### 5. Functions and CFGs (done)
+
+- `xlat::build_cfg(dol, symbols)` decodes every function symbols.txt lists, classifies
+  every branch (local jump, conditional jump, call, tail call, return, conditional
+  return, indirect call through LR/CTR, jump table, absolute call), walks
+  reachability from every entry point, and forms blocks (calls do not end blocks).
+  Per function it records the resume points (each call's return address) and the
+  back edges (safe points for interrupt delivery, D4).
+- Jump tables: from the `bctr` back to `mtctr`, its `lwzx`, and the constant base
+  (`lis`/`addi`); the entry count comes from the data symbol at the base (any name),
+  else the `cmplwi` bound check. Every entry must land inside the function.
+- Accepted without error because the hardware does the same (each counted and
+  listed by `local_cfg`):
+  - calls into another function's body: 8 secondary entry points (`_savegpr_23/24/27`
+    and `_restgpr_23/24/27` in `__save_gpr`/`__restore_gpr`, 0x80404C00 in libsn,
+    0x80414E64 in libgcc);
+  - 1 gap function: libsn's `_exit` label at 0x80413F3C is outside every function
+    symbol; it becomes a function up to the next one. Its first word is invalid (a
+    deliberate trap);
+  - 6 functions whose last instruction is a call that does not return
+    (`__assert`, `exit`, `abort`, fn_80400678, fn_8040787C, and fn_80432010's
+    `bla 0x60`): execution would run into the next function, so that is an implicit
+    tail call;
+  - 3 expected traps: `_exit`'s first word, and 2 invalid words right after calls
+    that do not return (0x803D95AC, 0x80407AB8).
+- Exit evidence (2026-10-14), `local_cfg` (needs the disc):
+  - 24,159 functions (24,158 from symbols.txt + `_exit`), 1,474,046 words, 1,473,997
+    reachable (49 unreachable: padding and data inside function bodies), 187,612
+    blocks;
+  - 92,977 calls, 55 tail calls, 22,170 indirect calls, 1 absolute call
+    (`bla 0x60`, fn_80432010);
+  - **22 of 22 `bctr` through recovered jump tables** (21 `jumptable_*` symbols plus
+    `@740` at 0x80649204), no other indirect jump;
+  - 115,148 resume points, 10,471 back edges;
+  - **0 errors**: no unresolved branch target; every tail branch lands on a function
+    start; every call on a function start or a listed secondary entry.
+- CI: `test_translator_cfg` (synthetic DOLs: calls, loop, jump table, tail call,
+  conditional return, stray branch error, unreachable padding, running off the end,
+  secondary entries, gap function, expected traps; symbols.txt parsing).
+- Counts differ slightly from the survey's §4 (it counted 46 cross-function `b`;
+  the 55 tail calls here include conditional ones and those of the gap function).
+
 ## Decisions to record (for the lead)
 
 - E0b-FP1: the FP model above (exact integer softfloat as the single source of
@@ -194,4 +237,4 @@ A later session resumes from "Next step".
 
 ## Next step
 
-Item 5: functions and CFGs from `symbols.txt`.
+Item 6: IR and C++ emitter.
