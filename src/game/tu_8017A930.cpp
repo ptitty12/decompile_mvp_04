@@ -748,16 +748,16 @@ void fn_8017C75C(Unk8017A930_T* p, Unk8017C75C_Obj* o)
         int t = o->m458;
         switch (t) {
         case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
-            fn_801DBDA4(p->m3B8);
+            ((void (*)(void*, void*))fn_801DBDA4)(p->m3B8, o);
             break;
         case 9:
             fn_801C3B04(p->m3A4);
             break;
         case 10: case 11: case 12:
-            fn_80258070(p->m3B4);
+            ((void (*)(void*, void*))fn_80258070)(p->m3B4, o);
             break;
         case 13: case 17:
-            fn_80178F10(p->m3AC);
+            ((void (*)(void*, void*))fn_80178F10)(p->m3AC, o);
             break;
         case 15: case 16:
             fn_8017696C(p->m3A8);
