@@ -645,13 +645,14 @@ extern "C" FE_OVERLAY int fn_8050C42C(FeRecList* x, int id)
     int idx = 0;
     if (fn_80084114(id) != 0) {
         int n = x->m148;
-        FeRec28* p = x->m14C;
-        for (int i = 0; i < n; i++) {
-            if (p->m0 == id) {
-                idx = i;
-                break;
-            }
-            p++;
+        int i=0;
+        if(i<n && x->m14C[0].m0!=id) {
+            FeRec28* p=x->m14C;
+            do {
+                ++i;++p;
+                if(i>=n)break;
+            }while(p->m0!=id);
+            if(i<n)idx=i;
         }
     }
     return idx;
