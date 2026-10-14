@@ -1,5 +1,15 @@
 # Lead handoff: GV4E69 matching decomp orchestration (written 2026-10-12 ~10:30 CDT)
 
+> **Direction changed 2026-10-14 (owner). Read this first.** The goal is now a browser-playable game with
+> online multiplayer and easy roster/team mods, not a 100% matching decomp. Read `CLAUDE.md`, then
+> `docs/ROADMAP.md` (milestones, and the ordered next steps in §5), then this file for the mechanics.
+> - Build batches from the knowledge targets: `python tools/goals/targets.py --units K<n>`. Start with K1:
+>   name the SDK functions the game calls.
+> - Paused: the hard/nm/p6 queues below and Fable passes on non-target functions.
+> - New commit kinds: `name(...)` and `contract(...)`. The two contract repairs parked in DECISIONS
+>   ("Open questions") can now land.
+> - Engine work (`engine/`) is done by side sessions; integrate it with `--allow engine/ --allow docs/`.
+
 You are taking over as **lead/coordinator** (Opus) of the MVP Baseball 2005 GameCube matching decomp.
 Read `CLAUDE.md` first (hard rules), then this file. Owner standing orders (verbatim):
 

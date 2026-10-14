@@ -53,6 +53,17 @@ layouts, formats and our own notes enter the repo.
 
 ## Ideas not done yet
 
+- **Overlay builds on our own disc (found 2026-10-14).** `/data/ovlay.big` holds the front-end and
+  database code overlays the game reloads at runtime. They are RefPack-compressed and unpack to exactly
+  the DOL's `.frontend_codeoverlay` (0xEA448) and `.database_codeoverlay` (0x78990) sizes. The disc
+  also carries two other builds that retail code doesn't reference by name:
+  - `ovlay_d.big`: database 0x102BE8 bytes, front end 0x1C8B44 bytes, about twice the size;
+  - `ovlay_m.big`: database 0x794C0 bytes, front end 0xEED68 bytes.
+
+  If `_d` is a debug or unoptimized build, its strings, asserts and simpler code could name and type
+  much of `fe/` and `db/`, which is useful for K2. Read only on the owner's machine; never extract into
+  the repo.
+
 - **Unit names from the 2003 debug build's file list:** link our units to
   source files through strings both builds use. This improves readability
   only.

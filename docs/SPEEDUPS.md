@@ -172,6 +172,8 @@ Roughly ordered by expected payoff for the effort.
 ## Observations log
 
 <!-- YYYY-MM-DD | who | observation | idea (item #) | rough impact -->
+- 2026-10-14 | claude-side-goals | The direction changed (DECISIONS 2026-10-14): match count is no longer the measure. The engine needs **names and types** for specific functions, and most of them are already matched: K1 has 251 of 299 matched but only 143 named; K3 has 112 of 192 matched and 0 named. The K1 renames can mostly be scripted (body-match against dolsdk2004 and the mitsevox SDK) | rank by `tools/goals/targets.py`; scripted SDK naming | high: unblocks the engine's SDK replacements for a few hours of lead time
+- 2026-10-14 | claude-side-goals | Engine commits go through `integrate.py`, which builds and verifies the whole DOL (10-20 min) even when only `engine/` changed. Fine for E0; once engine commits are frequent, an engine-only gate (diff limited to `engine/` and `docs/`, plus engine tests) would cut that | new idea | medium, later
 - 2026-10-10 | matcher (first game unit) | About 1 h on `animation/choosers/playeridchooser.cpp`, mostly finding its boundaries (no symbols), proving class names from strings, and checking the g++ 2.95 ABI | scout pre-pass (2) | high: this is per-unit setup that repeats for every unit
 - 2026-10-10 | matcher | 6 functions at 100%; 5 near-misses on register allocation and instruction order | permuter queue (1) | high on the hard tail
 - 2026-10-10 | matcher | Class boilerplate (ctor/dtor/factory/attribute registration) reproduced exactly once the flags were known | cookbook and clustering (3) | high on function count

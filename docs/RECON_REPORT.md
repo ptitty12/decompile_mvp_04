@@ -328,7 +328,7 @@ executables. nfsmw runs them directly on Windows with no wrapper. Under WSL/Linu
    game function (ProDG) in objdiff.
    - **If no ProDG build reproduces game codegen,** stop and ask: (a) match SDK/libc only and switch game code to
      "functional" mode, or (b) look for the exact compiler build elsewhere (owner-sourced, legally).
-3. Then Phase 2a/2b as in `docs/PHASES.md`.
+3. Then Phase 2a/2b as in `docs/PHASES.md` (since replaced by `docs/ROADMAP.md`; its history is in §6 there).
 
 **Alternatives:** `functional` (skip byte-matching for game code entirely; much faster, gives up the verifier). Or `cw`
 (standard dtk-template CodeWarrior path), which the evidence says would not work.

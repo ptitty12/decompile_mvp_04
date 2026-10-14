@@ -39,7 +39,7 @@ newlib-derived libc around 0x80406000–0x80414000.
 3. **Small named game TUs:** `ai/scenes/scene.cpp`, `animation/goals/catchgoal.cpp`, `reachgoal.cpp`,
    `animation/choosers/playeridchooser.cpp`, `ai/bench/benchai.cpp`. They're small, named, and teach the
    class layouts.
-4. **Game logic outward** per `docs/PHASES.md` (sim/ratings/franchise in the two overlays; batting/pitching
+4. **Game logic outward** per `docs/PHASES.md` (since replaced by `docs/ROADMAP.md`) (sim/ratings/franchise in the two overlays; batting/pitching
    physics around 0x8018B000–0x802F0000).
 
 Sizes: the SDK spans between consecutive anchors are rough upper bounds (anchors are init

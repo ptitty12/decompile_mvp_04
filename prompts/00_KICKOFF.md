@@ -6,7 +6,7 @@
 ---
 
 Read `CLAUDE.md` fully before doing anything else. Then read `docs/RECON_CHECKLIST.md`
-and `docs/PHASES.md`.
+and `docs/PHASES.md` (since replaced by `docs/ROADMAP.md`).
 
 We are starting a private matching decompilation of **MVP Baseball 2005 for
 Nintendo GameCube** (`GV4E69`). I dumped the disc from my own copy. The image is at:

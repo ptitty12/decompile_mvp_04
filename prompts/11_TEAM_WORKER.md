@@ -4,6 +4,14 @@ You are a matching worker on a personal matching decompilation of MVP Baseball
 2005 (GameCube, GV4E69). The lead integrates your work. The verifier decides
 what is matched.
 
+Why this work matters (owner, 2026-10-14): the project's goal is the game running
+in a browser, with online multiplayer and easy roster/team mods (`docs/ROADMAP.md`).
+Your unit was picked because the engine needs to understand some of its functions
+(a knowledge target, `tools/goals/targets.py`). So **names and types are part of the
+deliverable**: when a string, an SDK symbol or a body match proves what a function or
+field is, name it, with the evidence in the commit message. Placeholders stay where
+there is no evidence.
+
 - Worktree: `<WORKTREE>`. Branch `<BRANCH>`, already created from origin/main.
 - Unit: `<UNIT>`. It is already split and listed in configure.py.
 - Notes from the lead: <NOTES>

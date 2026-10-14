@@ -3,70 +3,94 @@
 > Thank you\
 > -Human
 
-# mvp2005-decomp: MVP Baseball 2005 (GameCube, GV4E69) matching decompilation
+# mvp2005-decomp: MVP Baseball 2005 in the browser
 
-A matching decompilation of MVP Baseball 2005 for the Nintendo GameCube
-(`GV4E69`, USA, rev 0). The goal is C/C++ source that the original compilers
-turn back into a byte-identical `main.dol` (SHA-1
-`da6becdbea614d03c4b5eae9f8a0fb08e0a184dd`). A native/WASM port for personal
-play may follow later (Phase 3, not started).
+MVP Baseball 2005 for the Nintendo GameCube (`GV4E69`, USA, rev 0), brought
+to the web. The goals, in priority order (owner, 2026-10-14):
 
-This is a personal project, and the repository is public (owner, 2026-10-13).
-It holds source, tooling and docs only, never game data. To build it you need
-a disc image dumped from your own copy.
+1. **The game runs in a web browser.**
+2. **Online multiplayer in the browser.** Matchmaking runs on the owner's
+   server; each player's game runs locally in their own browser.
+3. **New rosters and teams are easy to add.**
 
-## Progress
+Above all, it is built on a foundation that creates no tech debt: mods never
+need rework because the decompilation moved on.
+
+This is a personal project, and the repository is public. It holds source,
+tooling and docs only, never game data. Every player brings a disc image dumped
+from their own copy, and everything derived from it stays in their browser.
+
+## How it works
+
+Two tracks feed one product ([`docs/ROADMAP.md`](docs/ROADMAP.md)):
+
+- **The engine** (`engine/`, [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)).
+  The browser runs the *retail* game code. A translator turns the PowerPC code
+  of the player's own `main.dol` into WebAssembly. A runtime supplies the rest:
+  memory, OS, disc, controllers, timing, audio, and a GX-to-WebGPU renderer.
+  - Netplay keeps two browsers in lockstep on controller inputs over WebRTC.
+  - The owner's VPS runs the lobby, signaling and a TURN relay.
+- **The knowledge track** (`src/`, `include/`, `config/`). A matching
+  decompilation: C/C++ that the original compilers turn back into a
+  byte-identical `main.dol` (SHA-1 `da6becdbea614d03c4b5eae9f8a0fb08e0a184dd`).
+  It is aimed at what the engine and the mods need:
+  - the SDK functions the engine replaces;
+  - everything that can make two netplay runs differ;
+  - the roster and team data;
+  - the main loop.
+
+  [`tools/goals/targets.py`](tools/goals/targets.py) measures those targets.
+
+**Mods depend only on three contracts that never change:**
+- the retail binary's code and addresses;
+- the game's own data formats (roster and team packs patch the database tables
+  the game reads);
+- the engine's versioned APIs.
+
+They never depend on decomp source, so decomp progress can't break them.
+
+## Status
+
+| Track | Where it stands (2026-10-14) | Next |
+|---|---|---|
+| Engine | Not started | E0: survey the GameCube recompilers, then a native boot spike |
+| Knowledge | 87.4% of functions matched; the targets the engine needs are mostly matched but not yet named (below) | K1: name the SDK functions the game calls |
+
+| Knowledge target | Functions | Named | Matched | Done |
+|---|---:|---:|---:|---:|
+| K1 SDK boundary | 299 | 143 | 251 | 48% |
+| K2 roster data | 60 | 4 | 56 | 7% |
+| K3 determinism | 192 | 0 | 112 | 0% |
+| K4 main loop | 81 | 1 | 70 | 1% |
+
+The milestones (E0-E7, K1-K5), their exit criteria and the ordered next steps
+are in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+### Decompilation progress
 
 ![Decompilation progress: percent of code matched, a treemap of units shaded by match percent, and progress over time](docs/progress/progress.svg)
 
-The card above is live. This table is a snapshot of `main` at `68d25430`
-(2026-10-13 22:53 CDT):
+The card above is live. This table is a snapshot of `main` at `d0a166c2`
+(2026-10-14):
 
 | Measure | Done | Total | Share |
 |---|---:|---:|---:|
-| Functions matched | 21,104 | 24,158 | 87.4% |
-| Code bytes matched | 3,073,968 | 5,896,176 | 52.1% |
+| Functions matched | 21,109 | 24,158 | 87.4% |
+| Code bytes matched | 3,075,304 | 5,896,176 | 52.2% |
 | Code built from source (units linked from our C/C++) | 386,148 | 5,896,176 | 6.5% |
 | Units built from source | 234 | 847 | 27.6% |
 | Data bytes matched | 12,710 | 1,369,010 | 0.9% |
 
 - **Matched** means objdiff scores the function 100% against the original
-  object code. **Built from source** means the whole unit (every function
-  and its data) links from our source and the final DOL still has the
-  retail hash. Until then, a matched unit's code still comes from the split
-  assembly.
-- The function count runs ahead of the byte count because small functions
-  went first. Of the 3,054 functions left, the 853 over 1 KB hold 1.86 MB of
-  the 2.82 MB of unmatched code. 507 functions sit at 95-99.99%.
-
-Each block in the treemap is one unit, sized by its code and shaded by
-objdiff's fuzzy match percent (gray = not started, darkest blue = fully
-matched). The daily numbers behind the line chart are in
-[`docs/progress/history.csv`](docs/progress/history.csv).
-
-The card updates itself. A scheduled task on the owner's PC runs
-`tools/progress_bot.py` every 2 minutes. When `main` has changed, it builds
-`main` in a private worktree (`build/_progress/wt`), redraws the card if the
-numbers moved, runs `tools/verify/verify.py`, and pushes a
-`docs: update progress card` commit. Before that push it uploads the build's
-`report.json` to the `progress-report` release, and
-`.github/workflows/decomp-dev.yml` republishes it in the artifact format
-decomp.dev reads. The project is not listed on decomp.dev (owner,
-2026-10-13).
-
-**[Live fleet dashboard](https://github.com/ptitty12/mvp2005-decomp/tree/dashboard)**:
-matching speed (verified on `main` and claimed by workers, per hour), the
-near-miss share, each worker's activity, the merge backlog and the functions
-closest to matching. `tools/fleet_dashboard.py --publish` builds it from git
-history alone, with no build and no model calls. A scheduled task runs it every
-minute and replaces the single commit on the `dashboard` branch, so `main`
-gets no extra commits.
-
-### Where the code is
+  object code. **Built from source** means the whole unit (every function and
+  its data) links from our source, and the final DOL still has the retail hash.
+- Of the 2.82 MB of code still unmatched, 2.50 MB has no source yet. The engine
+  doesn't need it, because it runs the retail code. The decomp covers it as the
+  targets reach it.
 
 | Source folder | What it is | Functions matched | Code matched |
 |---|---|---:|---:|
-| `src/game/` | Game code in main `.text` | 12,446 / 14,246 | 49.7% of 3.31 MB |
+| `src/game/` | Game code in main `.text` | 12,451 / 14,246 | 49.7% of 3.31 MB |
 | `src/fe/` | Front-end / franchise UI (`.frontend_codeoverlay`) | 3,132 / 3,408 | 55.2% of 960 KB |
 | `src/db/` | Database / roster / trade (`.database_codeoverlay`) | 1,520 / 1,779 | 50.2% of 494 KB |
 | `src/ealib/`, `src/ealibs/` | EA shared libraries (EAGL, RealCore, AV/VP6, ...) | 1,368 / 1,665 | 50.4% of 469 KB |
@@ -76,29 +100,29 @@ gets no extra commits.
 | `src/gamelib/` | EA gamelib (allocator, datafile, animlib) | 359 / 402 | 49.4% of 85 KB |
 | `src/libc/`, `src/libm/`, `src/libgcc/`, `src/libsn/` | SN runtime: newlib, fdlibm, libgcc, libsn | 179 / 273 | 82.0% of 70 KB |
 
-The address ranges and flags for each library are in `docs/DECISIONS.md`.
+The card updates itself. A scheduled task on the owner's PC runs
+`tools/progress_bot.py` every 2 minutes; it builds `main`, redraws the card,
+verifies and pushes a `docs: update progress card` commit. The
+**[live fleet dashboard](https://github.com/ptitty12/mvp2005-decomp/tree/dashboard)**
+shows matching speed, each worker's activity and the merge backlog.
 
-## How it works
+## The decompilation (knowledge track)
 
 ### Toolchain
 
-The game was built with a hybrid toolchain, found in Phase 0
-(`docs/RECON_REPORT.md`):
+Found in recon (`docs/RECON_REPORT.md`):
 
 - **Game code and EA libraries:** SN Systems ProDG 3.9.3 (`GNU C++ 2.95.3 SN
   BUILD v1.76`). Game code uses `-Os -G0 -fno-rtti -fno-exceptions
-  -ffloat-store`, and the EA libraries mostly use `-O2`. Flags are pinned per
+  -ffloat-store`; the EA libraries mostly use `-O2`. Flags are pinned per
   library, and sometimes per unit, with evidence in `docs/DECISIONS.md`.
 - **Dolphin SDK:** Metrowerks CodeWarrior GC/1.2.5n (GC/2.0 for VM and the
   debugger driver), with per-file flags such as `-opt nopeephole`.
 - **Link:** SN `ngcld` 1.5.1.692 with a static linker script
-  (`config/GV4E69/ldscript.ld`). `tools/mkdol.py` packs the DOL, because
-  retail `main.dol` has one DOL section per program segment.
+  (`config/GV4E69/ldscript.ld`). `tools/mkdol.py` packs the DOL.
 
-The project is built on dtk-template, decomp-toolkit and objdiff, patched for
-ProDG (`tools/project.py`). The game has no symbols or map. The disc's
-`/mvp.elf` is the stripped link output, and the build splits it into one
-section per ELF section, so the real section boundaries stay visible.
+Built on dtk-template, decomp-toolkit and objdiff, patched for ProDG
+(`tools/project.py`). The game has no symbols or map.
 
 ### Building
 
@@ -110,127 +134,99 @@ python configure.py
 ninja
 ```
 
-`configure.py` downloads the toolchain (dtk, objdiff, binutils and the
-compilers package from files.decomp.dev). `ninja` rebuilds
-`build/GV4E69/main.dol` from compiled source plus the remaining split
-assembly, checks it against `config/GV4E69/build.sha1`, and writes the
-objdiff report `build/GV4E69/report.json`. The host is native Windows: ProDG
-and MWCC are Win32 programs.
+`ninja` rebuilds `build/GV4E69/main.dol` from compiled source plus the
+remaining split assembly, checks it against `config/GV4E69/build.sha1`, and
+writes the objdiff report `build/GV4E69/report.json`. The host is native
+Windows: ProDG and MWCC are Win32 programs. The engine has no build yet (E0).
 
 ### What counts as matched
 
 The verifier decides, not any agent:
 
-- `tools/verify/verify.py` checks four things: protected-file integrity
-  (`protected.sha256`); that the build succeeds with the retail SHA-1;
-  the hard rules (no inline asm, naked functions or `.incbin`, and only
-  approved pragmas); and no unit or function score drops against a
-  baseline. `--baseline-ref origin/main` must pass on the exact commit
-  being pushed.
-- `tools/match/check_literals.py` covers what objdiff's score ignores. It
-  catches a "100%" function that loads the wrong float, string, global or
-  call target. `tools/team/integrate.py` refuses commits that add such
-  mismatches.
-- A unit becomes built-from-source (`Object(Matching)`) only after a
-  full-DOL trial keeps the retail hash.
-- CI (`.github/workflows/build.yml`) runs the integrity check on GitHub's
-  runners. The full build runs only on the owner's machine, because game
-  files never leave it.
+- `tools/verify/verify.py` checks four things:
+  - protected-file integrity;
+  - the retail SHA-1;
+  - the hard rules (no inline asm, naked functions or `.incbin`; only approved pragmas);
+  - no score drops against a baseline.
+- `tools/match/check_literals.py` catches a "100%" function that loads the
+  wrong float, string, global or call target. `tools/team/integrate.py` refuses
+  commits that add one.
+- CI runs the integrity check on GitHub. The full build runs only on the
+  owner's machine, because game files never leave it.
 
 ## Who does the work
 
-AI agents write every line of code and docs. The owner dumped the disc,
-approves the decisions that are theirs to make (`docs/DECISIONS.md`), and
+AI agents write every line of code and docs. The owner dumped the disc, sets
+the goals, approves the decisions that are theirs (`docs/DECISIONS.md`), and
 never runs commands.
 
 - **Claude Code:**
-  - An Opus 5.5 **lead** prepares units, owns shared headers and config, and
-    merges and verifies worker branches.
-  - Sonnet 5.5 **workers** match one unit at a time in their own worktrees
-    (`prompts/11_TEAM_WORKER.md`).
-  - Fable 5.1 takes big or parked functions "when needed".
-  - **Side sessions** build tools and do research.
-- **Codex** agents (a coordinator, an integrator and swarm workers) work
-  under the same rules. `AGENTS.md` points them at `CLAUDE.md`.
+  - an Opus 5.5 **lead** plans batches from the knowledge targets, owns shared
+    headers and config, and merges and verifies;
+  - Sonnet 5.5 **workers** match and name functions in their own worktrees;
+  - **side sessions** build the engine and the tools;
+  - Fable 5.1 takes hard functions "when needed".
+- **Codex** agents work under the same rules (`AGENTS.md`).
 - **Coordination:** `tools/coord.py` keeps a shared roster, unit claims, an
-  inbox and one integration lock. Every push to `main` holds the lock
-  (`docs/COORDINATION.md`). `claude-lead` settles conflicts, and the owner
-  can override.
-- **Background jobs** run as scheduled tasks on the owner's PC:
-  - the progress bot (every 2 minutes);
-  - the dashboard (every minute);
-  - the permuter farm (`tools/match/permute_farm.py`, every 10 minutes). It
-    runs decomp-permuter over near-misses and saves patches but never
-    commits.
+  inbox and one integration lock (`docs/COORDINATION.md`).
+- **Background jobs** run as scheduled tasks on the owner's PC: the progress
+  bot, the dashboard and the permuter farm.
 
 ## Rules, in short
 
 The full rules are in [`CLAUDE.md`](CLAUDE.md). The most important:
 
-- Never commit game data: disc images, DOL/REL files, assets or byte dumps.
-  `orig/` and `build/` are gitignored.
-- No inline asm in any form, including codeless `asm("")` and register pins.
-  No naked functions, byte arrays standing in for code, object patching or
-  linker tricks. Hand-written original assembly stays as split assembly.
-- Agents never change the verifier, CI or `.claude/` without the owner's
-  explicit approval.
-- One unit per commit: `match(<unit>): <functions> [N/M funcs]`.
-- Use placeholder names (`fn_80XXXXXX`, `lbl_80XXXXXX`, `Unk<addr>`,
-  `m<offset>`) until a string, an SDK symbol or a related EA build proves the
-  real name.
-- Mirror the original, bugs included. Refactoring waits for Phase 3.
-
-## Phases
-
-| Phase | Status |
-|---|---|
-| 0: Recon | Done 2026-10-10 (`docs/RECON_REPORT.md`) |
-| 1: Scaffold, byte-identical DOL from split assembly | Done 2026-10-10 |
-| 2a: Toolchain lock-in on SDK and runtime units | Done: compilers and flags pinned per library; 40 Dolphin SDK units and most libc/libm units build from source |
-| 2b: Game code | In progress: the 25/50/75% function milestones are passed; about half the game code bytes are matched |
-| 3: Port (native, then WASM) | Not started |
-
-Exit criteria are in [`docs/PHASES.md`](docs/PHASES.md).
+- Never commit or host game data, or anything derived from the disc:
+  - assets;
+  - translated game code;
+  - memory dumps, screenshots and recordings.
+- Mods depend only on the three contracts above, never on decomp source.
+- Decomp: no inline asm in any form, and no tricks that force a match. One unit
+  per commit, plus name commits and contract commits. The verifier decides.
+- Engine: determinism is an invariant. Every component has tests that need no
+  game data.
+- No GPL code copied in (Dolphin is a reference, not a source).
+- Agents never change the verifier, CI or `.claude/`.
 
 ## Repository layout
 
 | Path | Contents |
 |---|---|
+| `engine/` | The browser engine: translator, runtime, renderer, audio, virtual disc, mods, netplay, web shell, VPS services. Starts at E0 |
 | `src/` | Decompiled C/C++, one file per split unit (`game/tu_<addr>.cpp` until the original file name is known) |
 | `include/` | Shared headers. Struct comments record their evidence |
-| `config/GV4E69/` | dtk config (`splits.txt`, `symbols.txt`), linker script, DOL layout, retail hash, EA reference names (`refnames/`) and datafile schemas |
+| `config/GV4E69/` | dtk config (`splits.txt`, `symbols.txt`), linker script, DOL layout, retail hash, EA reference names and datafile schemas |
 | `configure.py`, `tools/project.py` | Build generator (dtk-template with the ProDG pipeline) |
+| `tools/goals/` | `targets.py`: the knowledge targets and their progress |
 | `tools/verify/` | The verifier and its protected-file hashes. Owner-only |
-| `tools/match/` | Matching helpers: diff, variants, twins, clone, permuter, link/import/literal checks ([README](tools/match/README.md)) |
-| `tools/scout/` | Unit packets and symbol renaming ([README](tools/scout/README.md)) |
-| `tools/swarm/` | Merge drivers, link-order check, worktree provisioning ([README](tools/swarm/README.md)) |
-| `tools/team/` | `integrate.py` (merge, verify, push), `merge_structs.py`, and the lead's batch scripts in `lead/` |
-| `tools/recon/` | Phase 0 disc and binary analysis ([README](tools/recon/README.md)) |
-| `tools/*.py` | `coord.py`, `progress_bot.py`, `progress_chart.py`, `fleet_dashboard.py`, `mkdol.py`, and dtk-template helpers |
-| `docs/` | Decisions, patterns, logs and research (below) |
-| `prompts/` | Agent briefs: kickoff, solo worker, team worker, audit |
-| `templates/` | Blank PROGRESS/DECISIONS templates from the original kit |
+| `tools/match/` | Matching helpers ([README](tools/match/README.md)) |
+| `tools/scout/`, `tools/swarm/`, `tools/team/` | Unit packets and renaming, merge drivers, integration and the lead's batch scripts |
+| `tools/recon/` | Disc and binary analysis ([README](tools/recon/README.md)) |
+| `tools/*.py` | `coord.py`, `progress_bot.py`, `progress_chart.py`, `fleet_dashboard.py`, `mkdol.py`, dtk-template helpers |
+| `docs/` | Roadmap, architecture, decisions, patterns, logs and research |
+| `prompts/` | Agent briefs |
 | `orig/`, `build/` | Disc files and build output. Gitignored, never committed |
 
 ## Docs
 
 | File | What's in it |
 |---|---|
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | The goal, the strategy, milestones with exit criteria, next steps |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Engine design: translator, runtime, renderer, audio, virtual disc, mods, netplay, decisions |
 | [`CLAUDE.md`](CLAUDE.md) | The rules every agent follows |
 | [`AGENTS.md`](AGENTS.md) | Entry point for Codex and other non-Claude agents |
 | [`PROGRESS.md`](PROGRESS.md) | Snapshot and session log, newest last |
 | [`HANDOFF.md`](HANDOFF.md) | The lead's hand-off: state, how to resume, queues, scripts |
-| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Owner-approved decisions (toolchain, flags, splits, policy) and open questions for the owner |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | Decisions (toolchain, flags, splits, policy, direction) and open questions for the owner |
 | [`docs/COORDINATION.md`](docs/COORDINATION.md) | The Claude/Codex coordination protocol (`tools/coord.py`) |
+| [`docs/GAME_DATA.md`](docs/GAME_DATA.md) | EA datafile, database tables, schedules and archive formats |
 | [`docs/PATTERNS.md`](docs/PATTERNS.md) | Source patterns that produced byte-identical matches with ProDG/g++ 2.95 |
 | [`docs/NEARMISS.md`](docs/NEARMISS.md) | Parked near-misses and what was tried |
 | [`docs/SPEEDUPS.md`](docs/SPEEDUPS.md) | Speed-up ideas, observations and what was tried |
-| [`docs/REUSE.md`](docs/REUSE.md), [`docs/REFERENCE_SOURCES.md`](docs/REFERENCE_SOURCES.md) | Public code we can port, and every outside source checked, with verdicts |
-| [`docs/GAME_DATA.md`](docs/GAME_DATA.md) | EA datafile, database tables, schedules and archive formats, for naming |
-| [`docs/PHASES.md`](docs/PHASES.md), [`docs/RECON_CHECKLIST.md`](docs/RECON_CHECKLIST.md) | Phase plan and the Phase 0 checklist |
-| [`docs/RECON_REPORT.md`](docs/RECON_REPORT.md) | Phase 0 report: disc, sections, toolchain evidence, subsystems (2026-10-10 snapshot) |
+| [`docs/REUSE.md`](docs/REUSE.md), [`docs/REFERENCE_SOURCES.md`](docs/REFERENCE_SOURCES.md) | Public code we can use, and every outside source checked, with verdicts |
+| [`docs/RECON_REPORT.md`](docs/RECON_REPORT.md), [`docs/RECON_CHECKLIST.md`](docs/RECON_CHECKLIST.md) | Recon report: disc, sections, toolchain evidence, subsystems (2026-10-10 snapshot) |
 | [`docs/UNITS.md`](docs/UNITS.md) | First-pass unit anchors (2026-10-10 snapshot; the live split is `config/GV4E69/splits.txt`) |
-| [`docs/SWARM_SESSION_2026-10-13.md`](docs/SWARM_SESSION_2026-10-13.md), [`docs/audits/`](docs/audits/) | A Codex swarm session report, and audit reports |
+| [`docs/SWARM_SESSION_2026-10-13.md`](docs/SWARM_SESSION_2026-10-13.md), [`docs/audits/`](docs/audits/), [`docs/notes/`](docs/notes/) | Session reports, audits and per-function notes |
 | [`docs/dtk/`](docs/dtk/) | decomp-toolkit / dtk-template reference docs |
 
 ## Credits and references
@@ -242,12 +238,12 @@ Exit criteria are in [`docs/PHASES.md`](docs/PHASES.md).
 - [decomp-permuter](https://github.com/simonlindholm/decomp-permuter) and
   [m2c](https://github.com/matt-kempster/m2c), used from external clones.
 - [mitsevox/mvp2005](https://github.com/mitsevox/mvp2005) (CC0): ported
-  Dolphin SDK, libc, libm, libsn and SND sources, and EA reference names
-  (`config/GV4E69/refnames/`).
+  Dolphin SDK, libc, libm, libsn and SND sources, and EA reference names.
 - [adonis-singh/re4](https://github.com/adonis-singh/re4): Dolphin SDK
   bodies (dolsdk2004) and ProDG compiler notes.
 - [dbalatoni13/nfsmw](https://github.com/dbalatoni13/nfsmw): prior art for
   ProDG matching on an EA GameCube title.
 
 MVP Baseball 2005 is a trademark of its owners. This project is not
-affiliated with EA, Nintendo or MLB, and it contains no game data.
+affiliated with EA, Nintendo or MLB. It contains no game data and hosts
+nothing derived from it: every player supplies their own disc.

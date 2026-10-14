@@ -1,13 +1,29 @@
 # AGENTS.md (for Codex and any other non-Claude agent)
 
-This is a personal matching decompilation of MVP Baseball 2005 (GameCube,
-GV4E69). Claude Code agents and Codex agents work on it at the same time.
+This is a personal project built on MVP Baseball 2005 (GameCube, GV4E69). The
+goals, in priority order: the game runs in a web browser, it has online
+multiplayer in the browser, and new rosters and teams are easy to add. All of it
+rests on a foundation without tech debt. There are two tracks:
 
-1. **Project rules:** read `CLAUDE.md` and follow it exactly. Its hard rules
-   apply to you too: no inline asm in any form, never touch `tools/verify/`,
-   `.github/` or `.claude/`, never commit game data, one unit per commit, and
-   matching is decided by the verifier.
-2. **Coordination:** read `docs/COORDINATION.md` and follow its protocol with
+- the **engine** (`engine/`), which runs the retail game code translated to
+  WebAssembly;
+- the **knowledge track**, the matching decompilation in `src/`, `include/` and
+  `config/`, aimed at what the engine and the mods need.
+
+Claude Code agents and Codex agents work on it at the same time.
+
+1. **Goal and plan:** read `docs/ROADMAP.md` (milestones and next steps), and
+   `docs/ARCHITECTURE.md` before any engine work. Choose knowledge work by
+   target: `python tools/goals/targets.py --list K<n> --todo`.
+2. **Project rules:** read `CLAUDE.md` and follow it exactly. Its hard rules
+   apply to you too:
+   - never commit or host game data or anything derived from the disc;
+   - no inline asm in any form;
+   - never touch `tools/verify/`, `.github/` or `.claude/`;
+   - one unit per commit (plus name and contract commits);
+   - matching is decided by the verifier;
+   - mods depend only on the three stable contracts.
+3. **Coordination:** read `docs/COORDINATION.md` and follow its protocol with
    `tools/coord.py`:
    - At the start of every session or batch, register (names like
      `codex-coordinator`, `codex-integrator`, `codex-sw03`), run `who`, and
@@ -17,5 +33,5 @@ GV4E69). Claude Code agents and Codex agents work on it at the same time.
      --purpose "..." -- <gate and push command>`.
    - Message Claude agents with `send <you> claude "..."` or by name
      (`claude-lead`).
-3. Conflicts over units, shared files or integration order are decided by
+4. Conflicts over units, shared files or integration order are decided by
    `claude-lead`; the owner can override.
