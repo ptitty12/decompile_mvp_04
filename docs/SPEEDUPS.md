@@ -195,6 +195,8 @@ Roughly ordered by expected payoff for the effort.
 
 - 2026-10-13 | REA session | Owner's reference discs: UEFA Champions League 2004-2005 (GameCube, GUCP69) ships `fifa_z.map`, EA's full SN linker map with demangled signatures and object paths, plus a symbol-less `fifa_z.elf`. NFS Most Wanted (GOWE69) has only the retail DOL. The FIFA 2005 image is a PlayStation 1 disc. mitsevox/tw2004 (Tiger Woods 2004, complete) is Tiburon's C engine on CodeWarrior with no EA SND/EAGL/AV code, so nothing to port. The public mitsevox/mvp2005 already fingerprinted 15 EA GameCube builds against MVP; its CC0 name tables are now imported (config/GV4E69/refnames) and cover 275 KB of unmatched code (ealib 208 of 236 KB, snd all, dolphin 34 of 35 KB) but almost none of the baseball code | 7 | names and real signatures for the library tail; the game code still needs MVP's own PS2/other-platform maps, if any
 
+- 2026-10-13 | REA session | Owner's MVP discs checked for symbols: MVP Baseball PSP (BOOT.BIN unencrypted, empty .symtab), MVP 2003 PS2 (SLUS_206.50, empty .mdebug), MVP 2004 PS2 (SLUS_208.68 and NTGUI.ELF) and MVP 2005 PS2 (SLUS_211.35 and NTGUI_NA.ELF): all stripped, and no map or symbol files on any of the four discs. MIPS builds of the same code, so no byte-level help either. Remaining hopes: magazine/EA demo discs with an MVP 2004/2005 demo (demo builds are often unstripped), MVP 06/07 NCAA Baseball (PS2) | 7 | none from these discs
+
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
