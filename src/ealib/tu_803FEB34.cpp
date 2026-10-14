@@ -47,7 +47,7 @@ void fn_803FF5E8(int, int);
 }
 
 extern "C" {
-void fn_803F96B0(void* p);
+void fn_803F96B0(int h, void* cb);
 int fn_803F99E8(int h);
 int fn_803F9664(int h);
 int fn_803F9A80(int h);
@@ -106,10 +106,22 @@ typedef void (*Fn0)(void);
 extern Fn0 lbl_8062EE40[8];
 extern char lbl_8060E7D4[];
 
-/* near-miss: 43 vs 42 slots; retail compares a reloaded r.len and stores fn after that load (volatile struct is the closest). */
+/* Request block on the stack: every field but h is volatile (retail reloads len/c/d around the call and keeps h in a
+   register), and fn is stored after the first read of len, hence the volatile fn pointer. */
+struct FsReqV {
+    volatile int e;
+    volatile int a;
+    volatile int b;
+    volatile int d;
+    volatile int result;
+    volatile int len;
+    volatile int c;
+    int (* volatile fn)(int, int, int, int, int, FsReq*);
+    int h;
+};
 extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int, int, int, int, FsReq*))
 {
-    volatile FsReq r;
+    FsReqV r;
     r.e = e;
     r.a = a;
     r.b = b;
@@ -117,12 +129,14 @@ extern "C" int fn_803FEB34(int a, int b, int c, int d, int e, int (*fn)(int, int
     r.result = 0;
     r.len = d;
     r.c = c;
+    int ln0 = r.len;
     r.fn = fn;
-    if (r.len > 0x100000)
+    if (ln0 > 0x100000)
         r.len = 0x100000;
-    r.h = fn(a, b, r.c, r.len, e, (FsReq*)&r);
+    int ln = r.len;
+    r.h = fn(a, b, r.c, ln, e, (FsReq*)&r);
     if (r.h != 0) {
-        fn_803F96B0(fn_803FEA38);
+        fn_803F96B0(r.h, fn_803FEA38);
         do {
             fn_803F99E8(r.h);
         } while (r.d != 0 || r.h != 0);
@@ -458,13 +472,14 @@ extern "C" int fn_803FF618()
 }
 
 
-/* near-miss: same length; the queue address (lis/addi) is formed between the stores in retail. */
+/* EA readfile (reference-build name): queues a read request for the worker thread. near-miss (98%): the request fields
+   are volatile stores in retail's order; only li r4,0 and the last store (m48) are swapped. */
 extern "C" int fn_803FF714(int a, int b, int c, int d)
 {
-    lbl_806ADEC0.m3C = a;
-    lbl_806ADEC0.m44 = c;
-    lbl_806ADEC0.m40 = b;
-    lbl_806ADEC0.m48 = d;
+    ((volatile FsState*)&lbl_806ADEC0)->m3C = a;
+    ((volatile FsState*)&lbl_806ADEC0)->m44 = c;
+    ((volatile FsState*)&lbl_806ADEC0)->m40 = b;
+    ((volatile FsState*)&lbl_806ADEC0)->m48 = d;
     OSSendMessage(lbl_806B8238, 0, 1);
     return 1;
 }
