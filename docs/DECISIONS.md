@@ -196,7 +196,7 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | Every mature GameCube recompiler is GPL, and none emits WebAssembly or translates in a browser (our D2). symbols.txt already gives all 24,158 functions and the 22 SDK jump tables. D4 is the only model that keeps save states and rollback possible without SharedArrayBuffer or JSPI. | docs/engine/E0_SURVEY.md §1-§6 (commit 868ef949)
 
-- 2026-10-14 | **Roster/team pack format v1 (engine API 1.0) settled** (lead, under the owner's 2026-10-14 delegation). The spec is `docs/MODDING.md`; the reference implementation is `tools/rosters/pack.py`, with 36 tests.
+- 2026-10-14 | **Roster/team pack format v1 (engine API 1.0) settled** (lead, under the owner's 2026-10-14 delegation). The spec is `docs/MODDING.md`; the reference implementation is `tools/rosters/pack.py`, with 41 tests. A `team.names` op sets a team's full name, nickname, abbreviation and city in `team.dat` and every LOC file, using string ids read from the player's own `main.dol` (SHA-1 checked), so packs never carry LOC ids. Asset roots cover the front end, `models.big`, stadiums and the announcer archives, and archive rebuilds keep the original alignment.
   - JSON manifest and patches.
   - Players keyed by "Last,First" text, never by row id; renames are explicit ops.
   - Teams keyed by `unique_team`, with the 126 slots fixed.
