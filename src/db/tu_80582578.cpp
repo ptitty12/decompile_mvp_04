@@ -573,30 +573,23 @@ extern "C" DB_OVERLAY DbSubObj* fn_80583404(DbSubObj* self)
     return self;
 }
 
-/* near-miss: ~25 slots; retail keeps self/k in r29/r28 and addresses the record object straight off sp; arm order of the t == 0 / t == 1 cases also differs */
 extern "C" DB_OVERLAY int fn_805837DC(int self, int k, DbRec12* rec)
 {
     DbTri a = lbl_806005E8;
-    DbRecObj obj;
-    fn_8052E408(&obj, rec);
+    Db805849D0_Ent obj(rec);
     int t = fn_8058391C(self, rec);
-    if (t != 0) {
-        if (t == 1) {
-            a.w0 = 0x1D5A;
-            a.w1 = 0x1D78;
-            a.w2 = 0x1E33;
-        }
-    } else {
-        a.w0 = 0x1D5A;
-        a.w1 = 0x1D77;
-        if (!(obj.mC & 0xFC0000))
-            a.w2 = 0x1E31;
-        else
-            a.w2 = 0x1E32;
+    switch (t) {
+    case 0:
+        a.w0=0x1D5A; a.w1=0x1D77;
+        if (!(obj.mC&0xFC0000)) a.w2=0x1E31;
+        else a.w2=0x1E32;
+        break;
+    case 1:
+        a.w0=0x1D5A; a.w1=0x1D78; a.w2=0x1E33;
+        break;
     }
     DbTri b = a;
     int r = fn_80582DF4(self, k, (int*)&b);
-    fn_80360AF0(&obj, 2);
     return r;
 }
 
