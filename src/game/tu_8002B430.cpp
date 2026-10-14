@@ -387,6 +387,108 @@ extern "C" void fn_8002C74C(Unk80023AC4_Obj* x)
     fn_8002C830(x);
 }
 
+struct Unk8003A5DC;
+struct Unk8005BA1C_Obj;
+void fn_8003B3DC(Unk8003A5DC* s, int a);
+void fn_8003B3E4(Unk8003A5DC* s, int a, int b, int c);
+void fn_8003D33C(Unk8003A5DC* s, int a, int b);
+void fn_8003CF04(Unk8003A5DC* s, int a);
+int fn_8005C498(Unk8005BA1C_Obj* o, int a);
+void fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
+extern "C" Unk8005BA1C_Obj* fn_8005BA9C__Fv();
+extern "C" int rand();
+extern const float lbl_805A649C;
+extern const float lbl_805A64A0;
+
+inline int Unk8002C830_Sum(Unk8001F5CC_Ent* e)
+{
+    int acc = 0;
+    for (int i = 0; i < 0x80; i++)
+        acc += e->m1B4[(unsigned char)i];
+    return acc;
+}
+
+extern "C" void fn_8002C830(Unk80023AC4_Obj* x)
+{
+    x->m510 = (Unk80023F98_Pl*)fn_801A4B34(x->m80[0]);
+    *(unsigned char*)&x->m160 = x->mC8->m14->m1CC8 + 1;
+    x->m290 = fn_801A497C(x->m80[0], x->m514 == 0, 0);
+    int side = 0;
+    if (x->m80[0]->m6F8->m14->m1CD0 != 0)
+        side = 1;
+    x->m3D4 = -1;
+    x->m160.m3C = x->m160.m3C + 1;
+    x->m514 = side;
+    x->m3D8 = 0;
+    x->m3DC = 0;
+    x->m3E0 = 0;
+    x->m3E4 = 0;
+    x->m534 = 0;
+    x->m714 = 0;
+    int o1 = 0;
+    if (side == 0)
+        o1 = 0xC;
+    char* b4 = (char*)x->m4A8;
+    int o2 = 0;
+    if (side == 0)
+        o2 = 0xC;
+    *(int*)(b4 + o1) = *(int*)(b4 + o2) + 1;
+    x->mEC = 0;
+    float dur = Unk8002B430_Secs(x->m80[0]->m48);
+    x->m160.m18[x->m514] = x->m160.m18[x->m514] + 1;
+    if (x->m514 == 0)
+        dur = dur + lbl_805A649C;
+    else
+        dur = dur + lbl_805A64A0;
+    if (x->mE8 != 0) {
+        fn_8002A244(x, 1, dur);
+        fn_8002A244(x, 0x4C, dur);
+    } else {
+        x->mE8 = 1;
+    }
+    Unk8003A5DC* h0 = (Unk8003A5DC*)x->m6C8;
+    int s2 = 0;
+    if (x->m80[0]->m6F8->m14->m1CD0 != 0)
+        s2 = 1;
+    fn_8003B3DC(h0, s2);
+    int f0 = 1;
+    Unk8003A5DC* hud = (Unk8003A5DC*)x->m6C8;
+    if (fn_8002A534(x, x->m80[0]) == 0)
+        f0 = 0;
+    int f1 = 1;
+    if (fn_8002A53C(x, x->m80[0]) == 0)
+        f1 = 0;
+    fn_8003B3E4(hud, f0, f1, fn_8002A544(x, x->m80[0]) != 0);
+    fn_8003D33C((Unk8003A5DC*)x->m6C8, Unk8002C830_Sum(&x->mC8->m14->e[0]), Unk8002C830_Sum(&x->mC8->m14->e[1]));
+    fn_8003CF04((Unk8003A5DC*)x->m6C8, (int)x->m510);
+    x->fn_800233B4(3, 0x8A, 0);
+    x->m6E0 = 1;
+    if (fn_8005C498(fn_8005BA9C__Fv(), 1) == 3) {
+        fn_8005C75C(fn_8005BA9C__Fv(), 1, 0x5DC);
+    } else if (fn_8005C498(fn_8005BA9C__Fv(), 1) == 4) {
+        fn_8005C75C(fn_8005BA9C__Fv(), 1, 0x5DC);
+    }
+    int idx = ((Unk801A4B34_Pos*)x->m510)->m708;
+    Unk8001F5CC_Tbl* w = x->m290->m44C->m6F8;
+    Unk8001F218_Pair* base = w->m14;
+    int off0 = idx * 0xE64;
+    int s0 = Unk8002C830_Sum((Unk8001F5CC_Ent*)((int)base + off0));
+    int oth = idx == 0;
+    int off1 = oth * 0xE64;
+    int s1 = Unk8002C830_Sum((Unk8001F5CC_Ent*)((int)base + off1));
+    if (*(unsigned char*)&x->m160 >= w->m10->m1C && s1 > s0 && x->m634 == 2) {
+        x->m578 = 0;
+    } else {
+        x->m578 = rand() % 100 > 0x46;
+    }
+    int fl = 0;
+    if (x->m160.m3C == 1 && x->m634 == 0 && x->m264 == 0) {
+        Unk8001F5CC_Ent* e = &w->m14->e[((Unk801A4B34_Pos*)x->m510)->m708];
+        fl = e->m1B4[(unsigned char)(*(unsigned char*)&x->m160 - 1)] == 0;
+    }
+    x->m518 = fl;
+}
+
 extern "C" void fn_8002CC7C(Unk80023AC4_Obj* x)
 {
     fn_8002A244(x, 0x30, (float)x->m80[0]->m48 * lbl_805A64B0);
