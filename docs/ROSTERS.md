@@ -384,7 +384,8 @@ so a pack that fills the table leaves nothing for the draft.
 ## 8. What a pack must patch
 
 Patches are semantic and applied to the tables read from the player's own disc (`ARCHITECTURE.md`
-section 8). The unit of change is a keyed record.
+section 8). The unit of change is a keyed record. The pack format that implements this section is
+[`MODDING.md`](MODDING.md) (format v1, reference implementation `tools/rosters/pack.py`).
 
 ### Roster pack (existing team slots)
 

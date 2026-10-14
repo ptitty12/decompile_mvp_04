@@ -1,0 +1,5 @@
+{"ops": [
+  {"op": "player.edit", "player": "Falkenrath,Jory",
+   "set": {"attrib": {"playerattrib_speed": 94}}},
+  {"op": "roster.swap", "a": "Arkwright,Desmond", "b": "Penhallow,Rufus"}
+]}

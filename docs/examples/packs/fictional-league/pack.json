@@ -1,0 +1,19 @@
+{
+  "id": "fictional-league",
+  "name": "Fictional League: Harbor City Lanterns",
+  "version": "1.0.0",
+  "game": "GV4E69-0",
+  "engine_api": "1.0",
+  "description": "Example pack for docs/MODDING.md. Replaces the Anaheim slot (unique_team Ana) with the fictional Harbor City Lanterns: 25 new players, depth chart, names and manager. Every name and number in it is invented.",
+  "authors": [
+    "mvp2005-decomp contributors"
+  ],
+  "license": "CC0-1.0",
+  "depends": [],
+  "patches": [
+    "patches/players.json",
+    "patches/harbor-city.json",
+    "patches/tweaks.json"
+  ],
+  "assets": []
+}

@@ -408,3 +408,22 @@
   - **Running at the end of the day:** E0b (native boot spike; Opus, worktree `decompile_mvp_04-e0b`, branch `engine/e0b`); the names pass (W1, `work/names-01`); roster/team pack format v1 (`side/packs-1014`); team-slot asset mapping (`side/teamassets-1014`).
   - **Held back:** OSInit and DVDInit names (they need data splits for fstload and EXIBios); `__init_user` (dtk relocates `_ctors`).
   | Owner: nothing pending.
+- 2026-10-14 | Claude Opus 5.5 ("claude-side-packs" side session) | E6/E7 foundation: roster and team pack format v1, on branch side/packs-1014 (not pushed; for the lead to integrate) | matched 0 | No milestone exit yet (E6 needs the engine loader); the format and its reference implementation are done.
+  - New: `docs/MODDING.md`, the v1 contract. It covers:
+    - the manifest and pack layout;
+    - 11 operations: player add, edit, remove and rename; roster set, replace and swap; team edit; manager edit and rename (also by team code, so a team pack never names the retail manager); LOC text;
+    - asset mappings to BIG entries under `/data/frontend/`;
+    - static and full validation with stable error codes;
+    - composition: a pack may overwrite or use another pack's cells only if it depends on it;
+    - canonical serialization and the pack, set and result hashes;
+    - the semver policy (minor versions only relax or add);
+    - a worked example, a TODO table of team-slot ids and paths, and open questions.
+  - New: `tools/rosters/pack.py` (validate, apply, hash, new) and `tools/rosters/tests/test_pack.py` (36 tests on a synthetic disc; all 59 roster tests pass).
+  - New: `docs/examples/packs/fictional-league/`, which replaces the Anaheim slot with an invented club (25 players, full depth chart, names, manager).
+  - Evidence used for the roster rules: the `roster.dat` loader in `src/db/tu_8053967C.cpp` keeps at most 25 ids per team, at most 3 LR, 4 MR, 2 SU and 1 CP per lineup, and reads pitching roles from the first lineup column only.
+  - Local end-to-end on GV4E69, nothing committed:
+    - the example applies with 0 errors and 8 warnings;
+    - every untouched retail row, the other 125 rosters and `tstat`'s stored bytes are identical;
+    - two runs, and an image versus an extracted directory, give identical bytes;
+    - `database.big` grows from 1,010,678 to 1,056,803 bytes.
+  | Owner: nothing pending. Boot questions for E2/E6, in MODDING.md §14: a larger, recompressed `database.big`; roster sizes other than 25/22; players with no team.

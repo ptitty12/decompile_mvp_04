@@ -181,7 +181,9 @@ what binds.
   count and table capacity.
 - **A pack's identity is a content hash.** Netplay requires both players to have
   the same packs in the same order.
-- Formats are specified in `docs/ROSTERS.md` (K2) and versioned with the engine API.
+- The data formats are in `docs/ROSTERS.md` (K2). The pack format (v1: manifest, operations,
+  validation, conflict rules, hashing, versioning) is in `docs/MODDING.md`, versioned with the
+  engine API; `tools/rosters/pack.py` is its reference implementation.
 
 ### Netplay (`engine/net/`, `engine/server/`)
 - **Lockstep on inputs**, the way emulator netplay works. Each frame, each player's
