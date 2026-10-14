@@ -241,6 +241,24 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   | The determinism invariant is kept: two-run SDK logs are byte-identical in every configuration. | commits 0a4ff1c4, 3968dfbb, d29148e8
 
+- 2026-10-14 | **E2 groundwork closed: in-browser translation is viable** (lead, under the owner's delegation; numbers in docs/engine/E2_SPIKE.md).
+  - **Measurements:**
+    - The translator itself, built as wasm, translates the whole DOL in 0.33 s.
+    - The module is 49.5 MB. V8's lazy compile takes 25-45 ms and eager Liftoff 0.22 s.
+    - The game code runs at 87% of native `/O2` speed.
+    - Booting through the wasm emitter gives the same SDK-log hash as native.
+    - FP digests are identical between native and wasm. FP is integer-only by design, so no FMA or NaN workaround was needed.
+  - **E2-W1, emitter design:**
+    - the WebAssembly emitter builds the module straight from the CFG, with no C compiler;
+    - guest registers live in locals, with spills decided by per-instruction register effects (`ppc/effects`);
+    - direct forward branches; a dispatcher for back edges, jump tables and resume labels;
+    - `return_call` only at guest tail calls;
+    - E0c's call protocol, so wasm-emitted and C++-emitted functions interchange.
+  - **E2-W2:** wasm exceptions are used only to end a run.
+  - **D2 refinement:** one module translated at startup is enough, so per-unit modules and lazy translation aren't needed now. Caching the translated module is optional (re-translating costs about 0.35 s).
+
+  | Retires E2 risk #2 (`E0_SURVEY.md` §7). Risk #3 (engine differences across Chrome, Firefox and Safari) remains for the browser page. | commits 7212973d..86ef36c9
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit): the name commit is held on one verify.py false positive (owner).** *Status (2026-10-14, claude-w2):* blockers 1 and 2 are resolved on `work/k1c-finish`; blocker 3 is new. Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Blockers:
