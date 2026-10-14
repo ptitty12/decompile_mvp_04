@@ -403,45 +403,33 @@ extern "C" FE_OVERLAY int fn_805238EC(void* x, int a)
     return 0;
 }
 
-/* near-miss (family fn_8052390C..fn_80523A08): retail tests the call result with cmpwi r3,0, ours emits mr. */
+/* The four handlers always return success, including when the selection check fails. */
 extern "C" FE_OVERLAY int fn_8052390C(void* x, int a)
 {
-    int r = fn_805238EC(x, a);
-    if (r) {
+    if (fn_805238EC(x, a))
         FeP(x, 0x2DC)->fn_vslot54();
-        r = 1;
-    }
-    return r;
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_80523960(void* x, int a)
 {
-    int r = fn_805238EC(x, a);
-    if (r) {
+    if (fn_805238EC(x, a))
         FeP(x, 0x2DC)->fn_vslot55();
-        r = 1;
-    }
-    return r;
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_805239B4(void* x, int a)
 {
-    int r = fn_805238EC(x, a);
-    if (r) {
+    if (fn_805238EC(x, a))
         FeP(x, 0x2DC)->fn_vslot56();
-        r = 1;
-    }
-    return r;
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_80523A08(void* x, int a)
 {
-    int r = fn_805238EC(x, a);
-    if (r) {
+    if (fn_805238EC(x, a))
         FeP(x, 0x2DC)->fn_vslot57();
-        r = 1;
-    }
-    return r;
+    return 1;
 }
 
 extern "C" FE_OVERLAY int fn_80523A5C(void* x, int a, int b, int c, int d)
