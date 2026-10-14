@@ -400,3 +400,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `ealib/tu_803E6FB8` `fn_803E97C4` (220 B): 98.36364%, three forms; original 55/55 words with object/block r30/r31 swapped; direct clear, early null guard, and raw address forms did not resolve allocation.
 - `ealib/tu_803E6FB8` `fn_803E92E8` (372 B): 99.30108%, eight forms; 93/93 words with only header/byte-offset r28/r29 exchanged; draft `build/swarm05-batch09/E92E8-v8.cpp`.
 - `db/tu_805495DC` `fn_8054C958` (612 B): 96.411766%, two forms; 151/153 words with saved-register and nested scan CFG differences; restored.
+
+- `db/tu_80574AE4` `fn_8057CCE8`: swarm65 eight ordinary signed/unsigned index, cached-count, pointer and do-loop forms; best97.40385%,51/52words, missing inner count reload plus bound/index register and scheduling differences; source unchanged, build/root65/CCE8.
