@@ -48,9 +48,9 @@ static void SetTimer(OSAlarm* alarm)
 /* OSInitAlarm */
 void fn_804321CC(void)
 {
-    if (fn_80432030(8) != (void*)fn_804328B4) {
+    if (fn_80432030(8) != fn_804328B4) {
         lbl_806EF7D8.head = lbl_806EF7D8.tail = NULL;
-        fn_80432014(8, (void*)fn_804328B4);
+        fn_80432014(8, fn_804328B4);
         OSRegisterResetFunction(&lbl_80635850);
     }
 }

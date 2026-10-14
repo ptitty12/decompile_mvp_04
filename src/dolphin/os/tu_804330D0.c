@@ -216,7 +216,7 @@ void fn_804338F4(OSContext* context)
 /* __OSContextInit */
 void fn_80433C20(void)
 {
-    fn_80432014(7, (void*)fn_80433B9C);
+    fn_80432014(7, (__OSExceptionHandler)fn_80433B9C);
     __OSFPUContextCached = NULL;
     fn_80421C20("FPU-unavailable handler installed\n");
 }
@@ -890,7 +890,7 @@ void fn_80435004(void)
     *(u32*)0x800000C8 = 0;
     __PIRegs[1] = 0xF0;
     fn_80435350(0xFFFFFFE0);
-    fn_80432014(4, (void*)fn_804357A4);
+    fn_80432014(4, (__OSExceptionHandler)fn_804357A4);
 }
 
 /* flags: matches only with -opt nopeephole */

@@ -30,7 +30,7 @@ extern BOOL lbl_806EF7C0;                  /* AreWeInitialized */
 extern BOOL lbl_806EF7C8;
 extern BOOL lbl_806EF7AC;
 extern OSTime lbl_806EF7D0;                 /* __OSStartTime */
-extern void** lbl_806EF7C4;                 /* exception handler table */
+extern __OSExceptionHandler* lbl_806EF7C4;  /* OSExceptionTable */
 extern const char* lbl_806EF2B8;            /* __OSVersion */
 /* The string __OSVersion points to is the first object of OS.c .data; the later string offsets (relative to the
  * pool base register) only come out right when it precedes them. The pointer itself is extern above. */
@@ -60,8 +60,8 @@ extern u32 fn_80436404(void);               /* OSGetResetCode */
 u32 fn_80431828(void);
 void fn_80431850(s32 result, DVDCommandBlock* block);
 void fn_8043188C(void);
-void* fn_80432014(u8 exception, void* handler);
-void* fn_80432030(u8 exception);
+__OSExceptionHandler fn_80432014(__OSException exception, __OSExceptionHandler handler);
+__OSExceptionHandler fn_80432030(__OSException exception);
 u32 fn_8043218C(void);
 
 /* flags: matches only with -opt nopeephole */
@@ -302,10 +302,10 @@ void fn_80431D6C(void)
         __sync();
         ICInvalidateRange(destAddr, handlerSize);
     }
-    lbl_806EF7C4 = (void**)OSPhysicalToCached(0x3000);
+    lbl_806EF7C4 = (__OSExceptionHandler*)OSPhysicalToCached(0x3000);
 
     for (exception = 0; exception < 15; exception++) {
-        fn_80432014(exception, (void*)fn_804320E0);
+        fn_80432014(exception, (__OSExceptionHandler)fn_804320E0);
     }
 
     *opCodeAddr = oldOpCode;
@@ -315,9 +315,9 @@ void fn_80431D6C(void)
 
 /* flags: matches only with -opt nopeephole */
 /* __OSSetExceptionHandler */
-void* fn_80432014(u8 exception, void* handler)
+__OSExceptionHandler fn_80432014(__OSException exception, __OSExceptionHandler handler)
 {
-    void* old = lbl_806EF7C4[exception];
+    __OSExceptionHandler old = lbl_806EF7C4[exception];
 
     lbl_806EF7C4[exception] = handler;
     return old;
@@ -325,7 +325,7 @@ void* fn_80432014(u8 exception, void* handler)
 
 /* flags: matches only with -opt nopeephole */
 /* __OSGetExceptionHandler */
-void* fn_80432030(u8 exception)
+__OSExceptionHandler fn_80432030(__OSException exception)
 {
     return lbl_806EF7C4[exception];
 }

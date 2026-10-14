@@ -35,8 +35,8 @@ void fn_8041A694(void);           /* PPCDisableSpeculation */
 void fn_8041A6BC(void);           /* PPCSetFpIEEEMode */
 
 /* OSException */
-void* fn_80432014(u8 exception, void* handler);  /* __OSSetExceptionHandler */
-void* fn_80432030(u8 exception);                 /* __OSGetExceptionHandler */
+__OSExceptionHandler fn_80432014(__OSException exception, __OSExceptionHandler handler); /* __OSSetExceptionHandler */
+__OSExceptionHandler fn_80432030(__OSException exception);  /* __OSGetExceptionHandler */
 
 /* OSArena */
 void* fn_80432CB4(void);          /* OSGetArenaHi */
