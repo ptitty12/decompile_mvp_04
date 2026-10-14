@@ -10,7 +10,7 @@ Newest state first in "Status"; a later session resumes from "Next step".
 |---|---|---|
 | 1 | `engine/gfx/`: WebGPU device (Dawn) and window (SDL3); off-screen triangle test; CMake option | Done |
 | 2 | GX state machine: CP/XF/BP registers, vertex loading, transform, draws | Done |
-| 3 | Texture decoders (I4, I8, IA4, IA8, RGB565, RGB5A3, RGBA8, CMPR, C4/C8/C14X2) | To do |
+| 3 | Texture decoders (I4, I8, IA4, IA8, RGB565, RGB5A3, RGBA8, CMPR, C4/C8/C14X2) | Done |
 | 4 | TEV -> WGSL generator and pipeline cache | To do |
 | 5 | EFB and XFB: copies, present at each VI frame | To do |
 | 6 | Run it: `mvp-play` window and frame captures | To do |
@@ -36,6 +36,7 @@ Newest state first in "Status"; a later session resumes from "Next step".
 | `draw.h` | What the processor hands a backend: `DrawCall` (transformed vertices, `PipelineConfig`, `DrawUniforms`, `TextureDesc`s, scissor), `EfbCopy`, the `Backend` interface |
 | `gx_processor.h/.cpp` | The GX state machine: register loads (BP mask), indexed XF loads, TLUT loads, vertex loading, the transform unit on the CPU, primitive assembly, EFB copies |
 | `tests/gx_stream.h` | Builds synthetic command streams for the tests |
+| `texture_decode.h/.cpp` | GameCube texture formats to RGBA8; level sizes |
 
 ## Step notes
 
@@ -91,6 +92,20 @@ Newest state first in "Status"; a later session resumes from "Next step".
   a draw out of the processor) pass. All engine tests pass; `local_boot_twice`
   unchanged (no observer in `mvp-boot`).
 
+### 3. Texture decoders (done)
+
+- Our own decoders (Aurora's `texture_convert.cpp` was read; it is tied to its
+  buffers, logging and GPU palette path, so vendoring it would cost more than the
+  ~250 lines here). Every format the hardware samples: I4, I8, IA4, IA8, RGB565,
+  RGB5A3, RGBA8 (AR/GB halves), C4, C8, C14X2 with IA8/RGB565/RGB5A3 palettes, CMPR
+  (four 4x4 DXT1-like sub-blocks per 8x8 tile, big-endian colors, the hardware's
+  5/8-3/8 interpolation, three-color mode with a transparent fourth entry).
+  Unknown formats decode to magenta so they stand out.
+- Exit evidence (2026-10-14): `test_texture_decode` (5 cases): every format's tiling
+  against an independent texel-address reference at four sizes (whole and partial
+  blocks), texel conversions at known values, palettes (C4/C8/C14X2, out-of-range
+  entries), a CMPR block in both modes, level and mip-chain sizes.
+
 ## Determinism
 
 The renderer reads guest state and never writes it. The only GPU-side values the
@@ -100,4 +115,4 @@ stream.
 
 ## Next step
 
-Step 3: texture decoders (data-free, synthetic textures), then step 4 (TEV -> WGSL).
+Step 4: TEV -> WGSL generator and pipeline cache.
