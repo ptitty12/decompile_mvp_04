@@ -74,7 +74,7 @@ void fn_803FB764(int a, int b, int c);
 void fn_80400CE4(int a);
 void fn_803FB888(int a);
 int fn_803FB6FC(int a);
-void fn_803FFFA8(int a);
+void THREAD_yield(int a);
 }
 
 struct Unk802ACD88_Mgr;
@@ -216,7 +216,7 @@ extern "C" void fn_800C31FC(Unk800C2250_File* f)
         } else {
             fn_803FB888(fn_800C2FE8(f));
             while (!fn_803FB6FC(fn_800C2FE8(f))) {
-                fn_803FFFA8(50);
+                THREAD_yield(50);
                 fn_80400CE4(0);
             }
         }

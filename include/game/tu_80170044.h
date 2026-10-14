@@ -18,7 +18,7 @@ int fn_80400560(int p, int n);
 void fn_80359B78(void* obj, int n);
 void fn_804007FC(void* p);
 void fn_8035A09C(void* p, int n);
-void fn_803FFEB8(void* p);
+void THREAD_destroy(void* p);
 }
 
 /* Service object at base+0x64: only the slot used here is named (slot 22,

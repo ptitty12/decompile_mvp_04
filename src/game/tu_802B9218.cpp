@@ -36,7 +36,7 @@ extern const char lbl_805E0F68[];
 void fn_8033E958(const char* fmt, ...);
 extern "C" void fn_8033E7A4();
 extern "C" int fn_803FC410(int a, const char* name, int b, int* c, void* d);
-extern "C" int fn_804017D0(int a);
+extern "C" int unpacksizez(int a);
 extern "C" int fn_803ED604(const char* name, int a, int b);
 extern "C" int fn_803EE310(int a);
 extern "C" void MEM_copy(int a, int b, int n);
@@ -132,7 +132,7 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
             fn_803FC410(s.sp8, name, 0, &s.sp10, &s.sp18);
             r = s.sp8 + s.sp10;
             int a = r;
-            int n = fn_804017D0(a);
+            int n = unpacksizez(a);
             if (n != 0) {
                 if (outn != 0) {
                     *outn = n;

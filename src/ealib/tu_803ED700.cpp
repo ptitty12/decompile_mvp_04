@@ -50,7 +50,7 @@ extern "C" int fn_803ED720(int, const void*, int, int, int, int, int, int, int, 
 extern "C" int fn_803EE318(char* p);
 extern "C" int fn_803EE320(char* p);
 extern "C" int fn_803EE4B8(RcBlk*);
-extern "C" int fn_80400520(const void* p, int n, int seed);
+extern "C" int MEM_crc16(const void* p, int n, int seed);
 extern char lbl_8060DF90[];
 extern char lbl_8060DFE8[];
 extern char lbl_8060E040[];
@@ -103,7 +103,7 @@ extern char lbl_8060DF50[];
 extern char lbl_8060DF58[];
 extern "C" int fn_803EDC98(void*, int);
 extern "C" int fn_803EDC04(int);
-extern "C" int fn_80400690(void (*)(void));
+extern "C" int SYSTEM_addexit(void (*)(void));
 extern "C" void* OSAllocFromHeap(void*, int);
 extern "C" int OSGetArenaLo();
 extern "C" int OSGetArenaHi();
@@ -122,7 +122,7 @@ extern "C" int fn_80400828(void*);
 extern "C" int fn_8040084C(void*);
 extern "C" RcBlk* fn_803EDCEC(RcHeap*, int, int);
 extern "C" int fn_803EDDF8(RcHeap*, int);
-extern "C" int fn_80400E8C(void*, int, int);
+extern "C" int MEMSYS_validaddress(void*, int, int);
 extern "C" int fn_803EE450(RcBlk*);
 extern "C" int fn_803EE4B8(RcBlk*);
 extern "C" int fn_803EE5A0(RcBlk*);
@@ -314,7 +314,7 @@ extern "C" int fn_803EDA0C(void* pp)
 extern "C" int fn_803EDC04(int a)
 {
     int r = 0;
-    fn_80400690(fn_803EE238);
+    SYSTEM_addexit(fn_803EE238);
     fn_803EE878();
     void* p = OSAllocFromHeap(lbl_806EF2C8, a);
     if (p != 0) {
@@ -488,13 +488,13 @@ extern "C" int fn_803EE020(int idx, const void* out, int (*pr)(const char*, ...)
             if (b->m2 & 0x4000) {
                 int sz = b->m4;
                 if (sz > 0x10 && !(b->m2 & 0x8000))
-                    crc = fn_80400520((char*)b + 0x18, sz - 0x18, 0xfbea);
+                    crc = MEM_crc16((char*)b + 0x18, sz - 0x18, 0xfbea);
                 total += sz;
                 pr((const char*)out, lbl_8060E058, data, sz, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], lbl_8060E054);
             } else {
                 crc = 0;
                 if (b->m4 != 0 && !(b->m2 & 0x8000))
-                    crc = fn_80400520(data, b->m4, 0xfbea);
+                    crc = MEM_crc16(data, b->m4, 0xfbea);
                 pr((const char*)out, nm, data, b->m4, (int)b->m8 - (int)b, b->m2, crc, lbl_8060E098[fn_803EE4B8(b)], nm2);
             }
             pr(lbl_8060E064);
@@ -581,7 +581,7 @@ extern "C" int fn_803EE3D4(int idx)
 extern "C" int fn_803EE450(RcBlk* p)
 {
     int r = 0;
-    if (fn_80400E8C(p, 0x18, 0) != 0 && (p->m0 == 0x4246 || p->m0 == 0x4253))
+    if (MEMSYS_validaddress(p, 0x18, 0) != 0 && (p->m0 == 0x4246 || p->m0 == 0x4253))
         r = 1;
     else
         lbl_806EEA00 = 1;

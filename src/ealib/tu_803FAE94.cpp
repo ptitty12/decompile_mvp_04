@@ -71,9 +71,9 @@ extern RcBuf14 lbl_806ADE8C;
 extern "C" void fn_804007D4(void*);
 extern "C" int fn_803FB888(int);
 extern "C" void fn_804007FC(void*);
-extern "C" int fn_80400008(int);
+extern "C" int THREAD_iscurrent(int);
 extern "C" void fn_80400CE4(int);
-extern "C" void fn_803FFFA8(int);
+extern "C" void THREAD_yield(int);
 extern void* (*lbl_806ADE90[4])(const char*, int, int);
 extern char lbl_8060E7C8[];
 extern RcLNode* lbl_806EF470;
@@ -280,9 +280,9 @@ extern "C" void fn_803FB4B0()
             }
             if (busy == 0)
                 break;
-            if (fn_80400008(0) != 0)
+            if (THREAD_iscurrent(0) != 0)
                 fn_80400CE4(0);
-            fn_803FFFA8(0);
+            THREAD_yield(0);
         }
         RcEnt* z = 0;
         lbl_806ADE94[0]((int)lbl_806EEA98);

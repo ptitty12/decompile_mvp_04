@@ -414,11 +414,11 @@ extern "C" void fn_8037B424(void*, int);
 extern "C" void fn_803DF74C(void*);
 extern "C" int fn_803ED5E0(const void*, int, int, int, int);
 extern "C" void fn_803EDA0C(int);
-extern "C" void fn_803FFE3C(void*, void (*)(void*), void*, int, int, int);
-extern "C" void fn_803FFEB8(void*);
-extern "C" void fn_803FFFA8(int);
-extern "C" void fn_80400068(void*, int);
-extern "C" void fn_80400114(void*, int);
+extern "C" void THREAD_createparam(void*, void (*)(void*), void*, int, int, int);
+extern "C" void THREAD_destroy(void*);
+extern "C" void THREAD_yield(int);
+extern "C" void THREAD_setpriority(void*, int);
+extern "C" void THREAD_waitexit(void*, int);
 extern "C" void fn_804007D4(void*);
 extern "C" void fn_804007FC(void*);
 extern "C" void fn_80400828(void*);
@@ -515,7 +515,7 @@ public:
 extern Unk80359C58 lbl_8068B884;
 extern int lbl_8068B8A8;
 /* Thread object (0x334 bytes). Evidence: ctor fn_80359F30/fn_80359E94 (vptr lbl_8065ED60, m4 = 1, mC = 0x19000,
-   memset of m14[0x318]), dtor fn_80359E30 (m330 flag, fn_803FFEB8(m14)), setters fn_8035A028/fn_8035A09C. */
+   memset of m14[0x318]), dtor fn_80359E30 (m330 flag, THREAD_destroy(m14)), setters fn_8035A028/fn_8035A09C. */
 void* fn_8035A134(void*);
 struct Unk80359E94 {
     const void* m0;

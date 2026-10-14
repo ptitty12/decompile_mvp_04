@@ -16,7 +16,7 @@ extern unsigned char lbl_80625454;
 extern void (*lbl_8069C93C)();
 extern int lbl_80625460;
 extern "C" void fn_80400C1C(int (*fn)(), int a, int b);
-extern "C" void fn_80400690(int (*fn)());
+extern "C" void SYSTEM_addexit(int (*fn)());
 extern "C" int fn_803B3E88();
 
 extern "C" void fn_803B9E08(DtorAt0* s, int chrg);
@@ -229,7 +229,7 @@ extern "C" int fn_803AD9BC()
         fn_80400C1C(fn_803AD994, 0, 1);
         lbl_80625460 = 1;
     }
-    fn_80400690(fn_803B3E88);
+    SYSTEM_addexit(fn_803B3E88);
     return 0;
 }
 

@@ -179,7 +179,7 @@ extern Unk8014D5C0_Own* lbl_80624270;
 extern const char* lbl_80620150;
 extern int lbl_8061977C;
 extern "C" {
-void fn_80400690(void (*cb)());
+void SYSTEM_addexit(void (*cb)());
 int fn_8033E958(const char* fmt, ...);
 FxBase8014C5A4* fn_80328234(FxBase8014C5A4* self, int a, int b);
 FxBase8014C5A4* fn_803282A8(FxBase8014C5A4* self, int a);
@@ -679,7 +679,7 @@ void fn_8014C5A4(int a, char** b)
     VT18** pa = &lbl_8068F1FC;
     VT18** pb = &lbl_8068F1F4;
     fn_8014BEB8(a, b);
-    fn_80400690(fn_8014D6A4);
+    SYSTEM_addexit(fn_8014D6A4);
     fn_8033E958(lbl_805C5678);
     FxBase8014C5A4* fx = (FxBase8014C5A4*)operator new(0x1128, 0);
     fn_80328234(fx, 0xB, 0);

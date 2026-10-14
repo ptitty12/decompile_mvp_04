@@ -345,8 +345,8 @@ extern "C" void fn_8019A314(Unk8019A314_O* o, float* a, void* out1, void* out2)
         fn_803DFD90(&m, -a[0], -a[1], -a[2]);
         fn_803DFD40(&m, len * 0.9549296f, o->m3F0.m0, o->m3F0.m4, o->m3F0.m8);
         fn_803DFD90(&m, a[0], a[1], a[2]);
-        fn_804023C4(out1, &m, out1);
-        fn_804023C4(out2, &m, out2);
+        MATRIX4_vect4mult(out1, &m, out1);
+        MATRIX4_vect4mult(out2, &m, out2);
     }
 }
 
@@ -378,7 +378,7 @@ extern "C" void fn_8019A44C(void* o, void* x)
 {
     Unk80198CC0_Vec4 t;
     Unk80183918_Vec3 b;
-    fn_804023C4(&lbl_806055F8, (Unk8018A254_Ret*)o, &t);
+    MATRIX4_vect4mult(&lbl_806055F8, (Unk8018A254_Ret*)o, &t);
     Unk80198CC0_Vec4* tp = &t;
     Unk80198CC0_Vec4 q;
     q.m[0] = tp->m[0];

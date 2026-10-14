@@ -163,7 +163,7 @@ void fn_801704C0()
     lbl_8068B8AC.m0 = lbl_8065ED60;
     if (lbl_8068B8AC.m330 != 0) {
         fn_8035A09C(&lbl_8068B8AC, 0);
-        fn_803FFEB8(&lbl_8068B8AC.m14);
+        THREAD_destroy(&lbl_8068B8AC.m14);
     }
 }
 

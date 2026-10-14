@@ -462,7 +462,7 @@ extern "C" int fn_8038D170(int tex)
 }
 
 extern "C" int fn_803AC11C();
-extern "C" void fn_804005DC();
+extern "C" void DEBUG_break();
 extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_803FD964(int a, int b, int c, int d, int e);
 extern "C" int fn_803FDE54(int a, int b);
@@ -514,7 +514,7 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
     if (lbl_80699B94.m0 != 0 && lbl_80699B94.m4 != 0)
         ok = 1;
     if (ok == 0) {
-        fn_804005DC();
+        DEBUG_break();
         return;
     }
     if (e != 0) {
@@ -754,7 +754,7 @@ extern "C" int fn_8038E468(VdClock* c)
 }
 
 extern "C" int fn_803AC11C();
-extern "C" void fn_804005DC();
+extern "C" void DEBUG_break();
 extern "C" void fn_803A9204(void* out);
 extern "C" int fn_803AB4E0(int a, int b);
 extern "C" int fn_803AB13C(int a, void* b, int c, int d, int e, int f);
@@ -769,7 +769,7 @@ struct VdRes2 {
 extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b)
 {
     if (fn_803AC11C() == 0) {
-        fn_804005DC();
+        DEBUG_break();
     } else {
         char q[24];
         o->m4 = 0;

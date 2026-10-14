@@ -77,7 +77,7 @@ struct FsReq {
 
 extern "C" {
 void OSCancelAlarm(void* alarm);
-void fn_804001E4(void);
+void ttKill(void);
 int OSCreateThread(void* thread, void* entry, int arg, int stackTop, int stackSize, int prio, int attr);
 void OSResumeThread(void* thread);
 void OSInitMessageQueue(void* q, void* msgs, int n);
@@ -85,14 +85,14 @@ void OSReceiveMessage(void* q, int* msg, int flags);
 void PCinit(void);
 int PCopen(int h, int a, int b);
 int PCcreat(int h, int a);
-int fn_804002BC(const char* fmt, ...);
+int REAL_abortmessage(const char* fmt, ...);
 int ReadFileThreadFunc();
 int PCread(int h, int a, int b);
 int DVDGetDriveStatus();
 int StartNonAlignedAyncRead(void* p, int a, int c, int b);
 void AyncDVDRead(void* p);
 void iFILE_CommandCompleteCallback(int);
-void fn_803FFFA8(int);
+void THREAD_yield(int);
 }
 extern unsigned char lbl_806EEAB1;
 extern char lbl_806B82E0[0x28];
@@ -261,7 +261,7 @@ extern "C" int openfile_plat(int h, unsigned mode, int* out)
         *out = PCcreat(h, 0);
         break;
     default:
-        fn_804002BC(lbl_8060E7D4, mode);
+        REAL_abortmessage(lbl_8060E7D4, mode);
         *out = -1;
         return 0;
     }
@@ -465,7 +465,7 @@ extern "C" int ReadFileThreadFunc()
             int r = DVDGetDriveStatus();
             if (r == 0 || r == 8 || r == 1)
                 break;
-            fn_803FFFA8(100);
+            THREAD_yield(100);
         }
         iFILE_CommandCompleteCallback(1);
     }
@@ -536,8 +536,8 @@ extern int lbl_806EEADC;
 extern "C" {
 long long OSGetTime(void);
 void OSSetPeriodicAlarm(void* alarm, long long start, long long period, void (*handler)());
-void fn_8040015C(void);
-void fn_80400690(void (*cb)());
+void ttInit(void);
+void SYSTEM_addexit(void (*cb)());
 void TIMER_restore();
 void fn_803FFA3C();
 }
@@ -552,10 +552,10 @@ extern "C" int TIMER_init(int hz)
     lbl_806EEADC = hz;
     long long start = OSGetTime();
     long long period = (int)((float)(LOWMEM->busClock >> 2) * (1.0f / (float)hz));
-    fn_8040015C();
+    ttInit();
     OSSetPeriodicAlarm(lbl_806B82E0, start, period, fn_803FFA3C);
     lbl_806EEAB1 = 1;
-    fn_80400690(TIMER_restore);
+    SYSTEM_addexit(TIMER_restore);
     return lbl_806EEADC;
 }
 
@@ -564,7 +564,7 @@ extern "C" void TIMER_restore()
     if (lbl_806EEAB1) {
         lbl_806EEAB1 = 0;
         OSCancelAlarm(lbl_806B82E0);
-        fn_804001E4();
+        ttKill();
     }
 }
 

@@ -97,7 +97,7 @@ inline McNode* McToNode(McFrame* f)
 extern char lbl_80606398[];
 extern char lbl_806061F0[];
 
-extern "C" int fn_804002BC(const char* fmt, ...);
+extern "C" int REAL_abortmessage(const char* fmt, ...);
 extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_8038EA9C(VdCbObj* s);
 extern "C" void fn_8038EAF4(VdCbObj* s, int b);
@@ -301,7 +301,7 @@ extern "C" McFrame* fn_80390020(McPool* p)
         f->m10 = 2;
         return f;
     }
-    fn_804002BC("MAD_CODEC_INTERNAL::CreateIorP() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )
+    REAL_abortmessage("MAD_CODEC_INTERNAL::CreateIorP() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )
 ");
     return 0;
 }
@@ -327,7 +327,7 @@ extern "C" McFrame* fn_803900C4(McPool* p)
         f->m10 = 1;
         return f;
     }
-    fn_804002BC("MAD_CODEC_INTERNAL::CreateB() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )
+    REAL_abortmessage("MAD_CODEC_INTERNAL::CreateB() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )
 ");
     return 0;
 }
@@ -501,7 +501,7 @@ extern int lbl_806EF398;
 extern int lbl_80607218[];
 extern int lbl_806242E0[];
 extern int lbl_8069ACB8[];
-extern "C" int fn_80401BBC(int a, int b);
+extern "C" int fixedmult(int a, int b);
 extern "C" void fn_80390248();
 extern "C" void fn_803908EC(unsigned char* src, int a, int b)
 {
@@ -511,9 +511,9 @@ extern "C" void fn_803908EC(unsigned char* src, int a, int b)
     lbl_806EF390 = 0x20;
     lbl_806EF388 = src + 4;
     lbl_806EF398 = a;
-    lbl_8069ACB8[0] = fn_80401BBC(lbl_80607218[0] << 16, lbl_806242E0[0]);
+    lbl_8069ACB8[0] = fixedmult(lbl_80607218[0] << 16, lbl_806242E0[0]);
     for (int i = 1; i < 64; i++)
-        lbl_8069ACB8[i] = fn_80401BBC((b * lbl_80607218[i]) << 13, lbl_806242E0[i]);
+        lbl_8069ACB8[i] = fixedmult((b * lbl_80607218[i]) << 13, lbl_806242E0[i]);
 }
 
 extern "C" int fn_80390D54();

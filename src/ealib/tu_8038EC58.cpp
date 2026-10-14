@@ -309,7 +309,7 @@ extern "C" float fn_8038EFBC(VdSrc* s)
     return s->m18;
 }
 
-extern "C" int fn_804002BC(const char* fmt, ...);
+extern "C" int REAL_abortmessage(const char* fmt, ...);
 
 extern "C" void fn_8038F278(VdFramePool* pool, VdFrame* f)
 {
@@ -367,7 +367,7 @@ extern "C" VdFrame* fn_8038F370(VdFramePool* pool)
         f->m10 = 1;
         return f;
     }
-    fn_804002BC("VP6_CODEC_INTERNAL::GetFrameFromList() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )\n");
+    REAL_abortmessage("VP6_CODEC_INTERNAL::GetFrameFromList() out of frames did you call CODEC::ReleaseFrame( FRAME *Frame )\n");
     return 0;
 }
 

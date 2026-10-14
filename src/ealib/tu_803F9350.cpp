@@ -60,15 +60,15 @@ extern char* lbl_806ADE68[3];
 extern char lbl_8060E700[];
 extern char lbl_8060E748[];
 
-extern "C" int fn_804002BC(const char*, ...);
+extern "C" int REAL_abortmessage(const char*, ...);
 extern "C" void OSLockMutex(void*);
 extern "C" void OSUnlockMutex(void*);
 extern "C" void MEM_fill(void*, int, int);
 extern "C" int FILESYS_completeop(int);
 extern "C" void iFILE_ExecCommand(int);
-extern "C" int fn_80400008(int);
+extern "C" int THREAD_iscurrent(int);
 extern "C" void fn_80400CE4(int);
-extern "C" void fn_803FFFA8(int);
+extern "C" void THREAD_yield(int);
 extern "C" void fn_8040074C(void*, int);
 extern "C" void MEM_copy(void*, void*, int);
 extern "C" int OPVALID(int);
@@ -126,13 +126,13 @@ extern "C" int OPVALID(int h)
 
 extern "C" int fn_803F9434()
 {
-    fn_804002BC(lbl_8060E700);
+    REAL_abortmessage(lbl_8060E700);
     return 0;
 }
 
 extern "C" int fn_803F9464()
 {
-    fn_804002BC(lbl_8060E748);
+    REAL_abortmessage(lbl_8060E748);
     return 0;
 }
 
@@ -296,10 +296,10 @@ extern "C" int FILESYS_waitop(int h)
     if (OPVALID(h) == 0)
         return -3;
     for (;;) {
-        if (fn_80400008(0) != 0)
+        if (THREAD_iscurrent(0) != 0)
             fn_80400CE4(0);
         else
-            fn_803FFFA8(10);
+            THREAD_yield(10);
         if (OPVALID(h) == 0)
             return -3;
         if (((volatile RcJob*)j)->m8 != 0)

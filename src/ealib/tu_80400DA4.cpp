@@ -8,7 +8,7 @@
 /* RealCore timing, wait and one-slot message helpers (EA). */
 extern "C" {
 void fn_80400CE4(void);
-void fn_803FFFA8(int);
+void THREAD_yield(int);
 void OSInitMessageQueue(void* q, void* buf, int n);
 int OSSendMessage(void* q, void* msg, int flags);
 int OSReceiveMessage(void* q, void* msg, int flags);
@@ -44,7 +44,7 @@ extern "C" int fn_80400DA4()
     return lbl_806EEAE0;
 }
 
-extern "C" int fn_80400DAC()
+extern "C" int TIMER_elapsedticks()
 {
     int old = lbl_806EEAF4;
     int now = fn_80400DA4();
@@ -64,7 +64,7 @@ extern "C" int fn_80400E18()
 {
     while (fn_80400E54() == 0) {
         fn_80400CE4();
-        fn_803FFFA8(0);
+        THREAD_yield(0);
     }
     return 0;
 }
@@ -83,7 +83,7 @@ extern "C" int fn_80400E84()
 extern int lbl_806EEAD4;
 extern void (*lbl_8062EE20[8])(void);
 
-extern "C" int fn_80400E8C(unsigned x)
+extern "C" int MEMSYS_validaddress(unsigned x)
 {
     return (x >= 0x80003100 && x <= 0x82FFFFFF)
         || (x >= 0xC0003100 && x <= 0xC2FFFFFF)
@@ -92,7 +92,7 @@ extern "C" int fn_80400E8C(unsigned x)
         || (x >= 0x7E000000 && x <= 0x7FFFFFFF);
 }
 
-extern "C" void fn_80400EF8()
+extern "C" void ttDoVTimerMsg()
 {
     lbl_806EEAD4++;
     for (int i = 0; i < 8; i++) {
@@ -107,13 +107,13 @@ extern "C" void fn_80400F54()
     OSReport(lbl_8060E8E8);
 }
 
-extern "C" int fn_80400F80(char* s)
+extern "C" int SIGNAL_create(char* s)
 {
     OSInitMessageQueue(s + 4, s + 0x24, 1);
     return 1;
 }
 
-extern "C" void fn_80400FB0(char* s)
+extern "C" void SIGNAL_set(char* s)
 {
     int msg = 0;
     OSSendMessage(s + 4, &msg, 0);
@@ -171,7 +171,7 @@ extern "C" int fn_80401610(int a, int v, char* buf, int flag)
 }
 
 /* near-miss (97.3%): same instructions except the first flag test: retail keeps `slwi; andi.` on (p[0] << 8) & 0x100 and the constant addi; ours folds them into rlwinm and addi p+5. */
-extern "C" int fn_80401644(const unsigned char* p, int* outLen)
+extern "C" int sizerefpack(const unsigned char* p, int* outLen)
 {
     int v = 0;
     if (p != 0) {
@@ -216,18 +216,18 @@ extern "C" int fn_80401644(const unsigned char* p, int* outLen)
     return v;
 }
 
-extern "C" int fn_80401710(const unsigned char* p, int a);
+extern "C" int unpackz(const unsigned char* p, int a);
 
-extern "C" int fn_80401924(unsigned char* dst, const unsigned char* src, int* outLen);
+extern "C" int REF_decode(unsigned char* dst, const unsigned char* src, int* outLen);
 
-extern "C" int fn_80401710(const unsigned char* p, int a)
+extern "C" int unpackz(const unsigned char* p, int a)
 {
     int r = 0;
     if (p[1] == 0xFB) {
         switch (p[0] & 0xFE) {
         case 0x10:
         case 0x90:
-            r = fn_80401924((unsigned char*)a, p, 0);
+            r = REF_decode((unsigned char*)a, p, 0);
             break;
         case 0x18:
         case 0x1A:
@@ -251,10 +251,10 @@ extern "C" int fn_80401710(const unsigned char* p, int a)
 
 extern "C" int fn_804017B0(const unsigned char* p, int a)
 {
-    return fn_80401710(p, a);
+    return unpackz(p, a);
 }
 
-extern "C" int fn_804017D0(const unsigned char* p)
+extern "C" int unpacksizez(const unsigned char* p)
 {
     int r = 0;
     if (p[1] == 0xFB) {
@@ -292,10 +292,10 @@ extern "C" int fn_804017D0(const unsigned char* p)
 
 extern "C" int fn_80401904(const unsigned char* p)
 {
-    return fn_804017D0(p);
+    return unpacksizez(p);
 }
 
-extern "C" int fn_80401BBC(int a, int b)
+extern "C" int fixedmult(int a, int b)
 {
     return (int)(((long long)a * b + 0x8000) >> 16);
 }
@@ -308,7 +308,7 @@ extern "C" void fn_80402970(const float* a, float* s, float* c);
 
 extern "C" void fn_80402970(const float* a, float* s, float* c);
 
-extern "C" void fn_80401BFC(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, float angle)
+extern "C" void MATRIX4_multyrot(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, float angle)
 {
     float s;
     float c;
@@ -336,7 +336,7 @@ extern "C" void fn_80401BFC(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, flo
     out->m33 = in->m33;
 }
 
-extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
+extern "C" void MATRIX4_mult(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, Unk80402288_Mtx* out)
 {
     Unk80402288_Mtx tmp;
     Unk80402288_Mtx* d = (out == a || out == b) ? &tmp : out;
@@ -360,7 +360,7 @@ extern "C" void fn_80401D14(const Unk80402288_Mtx* a, const Unk80402288_Mtx* b, 
         *out = tmp;
 }
 
-extern "C" void fn_804020F0(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
+extern "C" void MATRIX4_vect3mult(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
 {
     if (in == out) {
         Unk804020F0_V4 t;
@@ -377,7 +377,7 @@ extern "C" void fn_804020F0(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, 
     }
 }
 
-extern "C" void fn_80402288(const Unk80402288_V3* in, const Unk80402288_Mtx* m, Unk80402288_V3* out)
+extern "C" void MATRIX4_vect3mult3(const Unk80402288_V3* in, const Unk80402288_Mtx* m, Unk80402288_V3* out)
 {
     if (in == out) {
         Unk80402288_V3 t;
@@ -392,7 +392,7 @@ extern "C" void fn_80402288(const Unk80402288_V3* in, const Unk80402288_Mtx* m, 
     }
 }
 
-extern "C" void fn_804023C4(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
+extern "C" void MATRIX4_vect4mult(const Unk804020F0_V4* in, const Unk80402288_Mtx* m, Unk804020F0_V4* out)
 {
     if (in == out) {
         Unk804020F0_V4 t;
