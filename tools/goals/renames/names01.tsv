@@ -190,3 +190,4 @@ fn_801498C0	LoadGameAssets	S	string "end of LoadGameAssets" (lbl_805C4F8C, refer
 fn_80316614	DrawLoadingProgress	S	format string "DrawLoadingProgress: %d, %.3f @ %.3f seconds" printed by the function
 fn_802BB29C__FP15Unk802BB1E4_ObjT0	PrepareForDataUsage__FP15Unk802BB1E4_ObjT0	S	assert text "PrepareForDataUsage(): Code section corrupted." (lbl_805E105C) checked by the function after the overlay code CRC; C++ mangled suffix kept
 fn_802BB334__FP15Unk802BB1E4_ObjT0	RestoreOverlay__FP15Unk802BB1E4_ObjT0	S	assert text "RestoreOverlay(): Code section corrupted." (lbl_805E108C) checked by the function after the overlay is read back; C++ mangled suffix kept
+fn_80438724	__init_cpp	E+K	EA __init_cpp [fifa03,fifa04,ge,hp,moh2,moh3,moh4,nascar,nfsmw,nfsu]; mitsevox/mvp2005 f1e1763b names 0x80438724 __init_cpp (scope:local); walks the ctor table at lbl_80649298; dtk makes no other rename
