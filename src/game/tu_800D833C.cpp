@@ -34,6 +34,67 @@ int fn_800D83A0()
     return fn_80552D98() == 0;
 }
 
+struct Unk8007F198_C;
+int fn_8007F9B4(Unk8007F198_C* self);
+struct Unk8007F198_B;
+int fn_8007F7D0(Unk8007F198_B*, unsigned);
+struct Unk800D8500_Date {
+    unsigned char m0;
+    unsigned char m1;
+    unsigned short m2;
+};
+struct Unk800D8500_Big {
+    char pad0[0x12B78];
+    float m12B78;
+};
+struct Unk800D8500_P {
+    Unk800D8500_Big* m0;
+};
+struct Unk800D8500_G {
+    char pad0[0x30];
+    Unk800D8500_P* m30;
+};
+extern "C" Unk800D8500_Date fn_80329FA0(int v, ...);
+extern "C" int fn_800B56C4(Unk800DB5F4_S* s);
+extern "C" int fn_800B5758(Unk800DB5F4_S* s);
+extern "C" int fn_805981EC();
+extern "C" float fn_8059139C(void* self, int id);
+extern "C" int rand();
+extern const float lbl_805BD084;
+extern const float lbl_805BD088;
+extern const float lbl_805BD08C;
+
+extern "C" int fn_800D8500()
+{
+    float unused = lbl_805BD084;
+    float x = lbl_805BD088;
+    int g = lbl_8061930C;
+    int limit = 0x7D5;
+    unsigned short year = fn_80329FA0(fn_8007F9B4((Unk8007F198_C*)g)).m2;
+    if (fn_800B56C4(fn_800B555C()) == 1)
+        limit = 0x84D;
+    else if (fn_800B5758(fn_800B555C()) == 1)
+        limit = 0x7F3;
+    if (year >= limit - 1)
+        return 4;
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    s->fn_8007B320(0, fn_8007F7D0((Unk8007F198_B*)s, 0));
+    int k = fn_805981EC();
+    if (k == 0 || (k == 1 && (rand() & 3) == 0))
+        return 2;
+    if (year - 1 > 0x7D4)
+        x = fn_8059139C(((Unk800D8500_G*)g)->m30, year - 1);
+    else
+        x = lbl_805BD08C;
+    float c = ((Unk800D8500_G*)g)->m30->m0->m12B78;
+    if (!(x >= lbl_805BD084) && !(c >= lbl_805BD084))
+        return 1;
+    int r = 3;
+    if (!(c < lbl_805BD084))
+        r = 0;
+    return r;
+}
+
 int fn_800D867C()
 {
     int r;
