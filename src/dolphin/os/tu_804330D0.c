@@ -28,9 +28,9 @@ extern void DBPrintf(char* msg, ...);
 extern void ICEnable(void);
 extern void DCEnable(void);
 extern void OSDumpContext(OSContext* context);
-extern s16 lbl_806EF818;               /* __OSLastInterrupt */
-extern u32 lbl_806EF814;               /* __OSLastInterruptSrr0 */
-extern s64 lbl_806EF820;               /* __OSLastInterruptTime */
+extern volatile __OSInterrupt lbl_806EF818;   /* __OSLastInterrupt */
+extern volatile u32 lbl_806EF814;             /* __OSLastInterruptSrr0 */
+extern volatile OSTime lbl_806EF820;          /* __OSLastInterruptTime */
 extern OSTime OSGetTime(void);
 extern u32 fn_8043380C(void);                          /* OSGetStackPointer (original code) */
 extern void fn_80433B9C(void);                         /* floating point unavailable handler (original code) */
