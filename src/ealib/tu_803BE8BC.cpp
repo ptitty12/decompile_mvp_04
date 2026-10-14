@@ -701,11 +701,7 @@ extern "C" void fn_803BF9F0(EAGLSelfD* s)
         lbl_80626DD0->v13((void*)s->mC[i]);
 }
 
-struct EAGLKey {
-    unsigned short m0;
-    EAGLKey(int v) { m0 = v; }
-    EAGLKey(const EAGLKey& o) { m0 = o.m0; }
-};
+#include "../../include/game/eagl_key_803d2d74.h"
 
 struct EAGLSelfScale {
     const void* m0;
@@ -717,20 +713,20 @@ struct EAGLSelfScale {
     unsigned char m18;
 };
 
-extern "C" int fn_803D2D74(void* table, EAGLKey* key, unsigned char* out);
+extern "C" int fn_803D2D74(void* table, Unk803D2B20Key* key, int* out);
 
 extern "C" void fn_803BFA5C(EAGLSelfScale* s, int on)
 {
     s->m14 = on;
     if (s->m18 == 0 && on != 0) {
-        EAGLKey key(1);
+        Unk803D2B20Key key(1);
         void* tbl = ((Unk803D2B20*)s)->v16();
         if (tbl) {
-            EAGLKey k2(key);
-            EAGLKey k3(k2);
-            unsigned char res;
+            Unk803D2B20Key k2(key);
+            Unk803D2B20Key k3(k2);
+            int res;
             if (fn_803D2D74(tbl, &k3, &res))
-                s->m18 = res;
+                s->m18 = ((unsigned char*)&res)[0];
         }
     }
 }
