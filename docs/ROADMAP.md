@@ -53,6 +53,9 @@ included, can never break a mod. It only makes the game easier to understand.
 
 ## 3. Where we are (2026-10-14)
 
+- **Determinism and main loop** (`docs/DETERMINISM.md`, 2026-10-14):
+  - **Gameplay already runs at 60 Hz on the console.** The simulation ticks in 1/60 s steps, with up to 3 logic ticks per rendered frame to catch up, so "60 fps" means holding 60 Hz in the browser.
+  - The inventory has 65 nondeterminism sources, plus requirements R1-R17 for the engine.
 - **Engine:** E0a is done (`docs/engine/E0_SURVEY.md`; D1 and D4 decided). E0b, the native boot spike, is next.
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
@@ -89,7 +92,7 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
 | E5 | **Netplay.** Lobby, signaling and TURN relay on the owner's VPS; lockstep from power-on; input-delay setting; desync detector. | Two players on different networks finish an exhibition game |
 | E6 | **Roster packs.** Pack format, loader and an authoring CLI; the pack's hash is part of the lobby handshake. | A pack that changes a team's roster is chosen in the lobby, and both players play with it |
 | E7 | **Team packs.** Replace a team slot's name, abbreviation, roster, logos, uniforms and load screen. | A custom team, in a replaced slot, plays a netplay game |
-| Later | Extra team slots (code hooks; needs the K2 limit inventory), rollback netcode, 60 fps, widescreen, higher internal resolution, spectators | Planned when E7 is done |
+| Later | Extra team slots (code hooks; needs the K2 limit inventory), rollback netcode, widescreen, higher internal resolution, spectators | Planned when E7 is done |
 
 ### Knowledge track
 
