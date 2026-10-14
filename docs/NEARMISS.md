@@ -365,3 +365,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805721F8::fn_805744D4: 99.966446%, 149/149 instructions; eight source forms leave one local edge at slot 55 (retail +0xE4, candidate +0xEC), skipping the pointer-bound compare. Candidate reverted.
 - 2026-10-13 | db/tu_80565FD4 fn_8056693C | 99.71654%, 127/127 words, five differences after eight ordinary forms: initial day-store address and table-address temporary registers. |
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
+- `fe/tu_804D08D0` `__5FeNav` (swarm52, eight forms): scratch 99.10714%, 28/28 words; a layout-preserving POD/reset draft recovers the vptr/entry initialization order but five independent final-store slots remain. No header changes retained; scratch build/swarm52.
