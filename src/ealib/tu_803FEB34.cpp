@@ -302,8 +302,9 @@ extern const DevPrefixes lbl_8060E80C;
 extern "C" int DVDConvertPathToEntrynum(const char* path);
 extern "C" int DVDFastOpen(int entry, void* fi);
 
-/* EA openfile_plat(path, mode, state): "pc:"-style prefixes (or write mode) go to the host file interface, anything
- * else through the DVD. Backslashes become slashes.
+/* File open front end of the RealCore file device (no EA name known; its callees are EA's FixSlash, MyStrCmpi and
+ * openfile_plat = fn_803FEEE8): prefixes from lbl_8060E80C (or a non-read mode) go to the host file interface (PC*),
+ * everything else through DVDConvertPathToEntrynum/DVDFastOpen. Backslashes become slashes.
  * near-miss (97%): 89 insns as retail; viaPC and the loop end pointer have swapped callee-saved registers (retail
  * viaPC r30, end r28) and the first character of path is loaded with lbz 0(r29) instead of li r9,0 / lbzx. */
 extern "C" int fn_803FF058(const unsigned char* path, unsigned mode, FsState* s)
