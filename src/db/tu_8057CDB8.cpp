@@ -354,6 +354,150 @@ extern "C" DB_OVERLAY float fn_8057D62C(Db8057D62C_O* o, int i, int n)
     return v38;
 }
 
+extern char lbl_8064B298[];
+extern char lbl_8064A550[];
+extern char lbl_8064A2A8[];
+extern "C" void fn_8040074C(void* p, unsigned n);
+extern "C" void fn_805371C4(void* l, unsigned f);
+extern "C" int fn_80539A84(int k);
+extern "C" int rand();
+/* Stack int list (data, count, capacity, cursor, vptr slot, built flag); same shape as Unk80535650_Tmp. */
+struct Db8057DA7C_Tmp {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+    const void* vp;
+    int m14;
+    int At(unsigned i)
+    {
+        int o = i * 4;
+        return *(int*)((char*)m0 + o);
+    }
+    void C1(int* buf, int cap)
+    {
+        vp = lbl_8064B298;
+        m0 = buf;
+        m8 = cap;
+        fn_8040074C(m0, cap << 2);
+    }
+    void C2()
+    {
+        m4 = 0;
+        mC = 0;
+        vp = lbl_8064A550;
+        fn_8040074C(m0, m8 << 2);
+    }
+    void C3(const void* v)
+    {
+        vp = v;
+        m4 = 0;
+        mC = 0;
+        m14 = 0;
+    }
+    void D() { vp = lbl_8064A550; }
+};
+struct Db8057DA7C_Rec {
+    unsigned m0;
+    char m4[1];
+};
+/* K3: picks up to six distinct random items for a 0x634-byte-record list: the first slot is `id` itself, then the candidates
+ * (fn_805371C4 mask 0x70000000 | fn_80539A84(type of id), minus id) are drawn with rand() % count until the list holds six or
+ * 0x7F draws were made; if only the first slot is filled a final entry comes from fn_8007B320. near-miss: 95.8%, same code
+ * with the callee-saved registers permuted (retail keeps three separate zero registers; here found/n/p0 rotate). */
+extern "C" DB_OVERLAY void fn_8057DA7C(Db8057DA7C_Rec* self, int id)
+{
+    Db8057DA7C_Tmp t0;
+    int b0[0x82];
+    int b1[0x7E];
+    Db8057DA7C_Tmp t1;
+    Db8057DA7C_Tmp t2;
+    int b2[0x82];
+    int found = 0;
+    Db8057DA7C_Tmp* p0 = &t0;
+    Db8057DA7C_Tmp* p1 = &t1;
+    p0->vp = lbl_8064B298;
+    t0.m0 = b0;
+    p0->m8 = 0x82;
+    fn_8040074C(t0.m0, 0x208);
+    p0->m4 = 0;
+    p0->mC = 0;
+    p0->vp = lbl_8064A550;
+    fn_8040074C(t0.m0, p0->m8 * 4);
+    p0->m14 = 0;
+    p0->m4 = 0;
+    p0->mC = 0;
+    p0->vp = lbl_8064A2A8;
+    fn_805371C4(p0, 0x7000003F);
+    self->m0 = 0;
+    int h = fn_8007F9B4__FP13Unk8007F198_C(lbl_8061930C);
+    fn_8057D20C(self->m4, id, h, 0);
+    unsigned n = 0;
+    t1.vp = lbl_8064B298;
+    t1.m0 = b1;
+    p1->m8 = 0x7E;
+    self->m0++;
+    fn_8040074C(t1.m0, t1.m8 * 4);
+    p1->m4 = 0;
+    p1->mC = 0;
+    fn_8040074C(t1.m0, t1.m8 * 4);
+    p1->mC = 0;
+    p1->m4 = 0;
+    Db8057DA7C_Tmp* p2 = &t2;
+    t2.m0 = b2;
+    t2.vp = lbl_8064B298;
+    p2->m8 = 0x82;
+    fn_8040074C(t2.m0, t2.m8 * 4);
+    p2->m4 = 0;
+    p2->mC = 0;
+    t2.vp = lbl_8064A550;
+    fn_8040074C(t2.m0, t2.m8 * 4);
+    p2->m4 = 0;
+    p2->mC = 0;
+    p2->m14 = 0;
+    t2.vp = lbl_8064A2A8;
+    fn_805371C4(p2, fn_80539A84(fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, id)) | 0x70000000);
+    unsigned i;
+    for (i = 0; i < t2.m4; i++) {
+        int e = t2.At(i);
+        if (id != e && t1.m4 < t1.m8) {
+            t1.m0[t1.m4] = e;
+            t1.m4++;
+        }
+    }
+    n = 0;
+    while (self->m0 <= 5) {
+        n++;
+        if (t1.m4 != 0) {
+            found = 0;
+            unsigned j;
+            unsigned cnt = self->m0;
+            int pick = t1.m0[rand() % t1.m4];
+            for (j = 0; j < cnt; j++) {
+                if (*(int*)(self->m4 + j * 0x634) == pick) {
+                    found = 1;
+                    break;
+                }
+            }
+            if (found == 0) {
+                fn_8057D20C(self->m4 + self->m0 * 0x634, pick, h, 0);
+                self->m0++;
+            }
+            if (t1.m4 != 0 && n <= 0x7E)
+                continue;
+        }
+        if (self->m0 == 1) {
+            int w = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
+            char* dst = self->m4 + self->m0 * 0x634;
+            fn_8057D20C(dst, fn_8007B320__18Unk8007B2B0_Screenii(lbl_8061930C, 0, w), h, 0);
+            self->m0++;
+        }
+        break;
+    }
+    t2.vp = lbl_8064A550;
+    t0.vp = lbl_8064A550;
+}
+
 extern "C" DB_OVERLAY char* fn_8057DDB4(char* p, int i)
 {
     return p + (i * 0x634 + 4);
