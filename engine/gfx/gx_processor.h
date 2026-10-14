@@ -71,6 +71,17 @@ class GxProcessor {
   };
   const Stats& stats() const { return stats_; }
 
+  // The vertex format state of the last primitive, for debugging tools.
+  struct PrimInfo {
+    u8 op = 0;
+    u32 count = 0, vertex_size = 0;
+    u32 vcd_lo = 0, vcd_hi = 0, vat[3] = {}, matidx[2] = {};
+    u32 texgen[2] = {}, num_texgens = 0, dual_tex = 0;
+    u32 array_base[6] = {}, array_stride[6] = {};  // position, normal, colors, tex0, tex1
+    std::vector<u8> first_vertex;
+  };
+  const PrimInfo& last_primitive() const { return prim_info_; }
+
  private:
   void load_bp(u32 value);
   void load_cp(u8 reg, u32 value);
@@ -98,6 +109,7 @@ class GxProcessor {
   std::int32_t konst_[4][4] = {};
   std::vector<u8> tlut_;  // TMEM's palette half: 512 KiB
   Stats stats_;
+  PrimInfo prim_info_;
 };
 
 }  // namespace mvp::gfx

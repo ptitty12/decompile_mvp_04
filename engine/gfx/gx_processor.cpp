@@ -741,6 +741,26 @@ void GxProcessor::primitive(u8 op, const u8* data, u32 count) {
   vs.reserve(count);
   for (u32 k = 0; k < count; ++k) vs.push_back(transform(load_vertex(fmt, data + static_cast<std::size_t>(k) * vsize)));
 
+  prim_info_.op = op;
+  prim_info_.count = count;
+  prim_info_.vertex_size = vsize;
+  prim_info_.vcd_lo = vcd_lo_;
+  prim_info_.vcd_hi = vcd_hi_;
+  prim_info_.vat[0] = vat_a_[fmt];
+  prim_info_.vat[1] = vat_b_[fmt];
+  prim_info_.vat[2] = vat_c_[fmt];
+  prim_info_.matidx[0] = matidx_a_;
+  prim_info_.matidx[1] = matidx_b_;
+  prim_info_.texgen[0] = xf_word(xf::kTexGen);
+  prim_info_.texgen[1] = xf_word(xf::kTexGen + 1);
+  prim_info_.num_texgens = xf_word(xf::kNumTexGens);
+  prim_info_.dual_tex = xf_word(xf::kDualTex);
+  for (int k = 0; k < 6; ++k) {
+    prim_info_.array_base[k] = array_base_[static_cast<std::size_t>(k)];
+    prim_info_.array_stride[k] = array_stride_[static_cast<std::size_t>(k)];
+  }
+  prim_info_.first_vertex.assign(data, data + vsize);
+
   DrawCall d;
   snapshot(d);
   auto tri = [&](u32 a, u32 b, u32 c) {

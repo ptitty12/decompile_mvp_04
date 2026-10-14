@@ -126,5 +126,10 @@ if(MVP_HAVE_WEBGPU)
       target_link_options(mvp-play PRIVATE /STACK:67108864)
     endif()
     mvp_copy_sdl3(mvp-play)
+    # The renderer must not change the guest: same guest state with and without it.
+    add_test(NAME local_play_determinism
+             COMMAND ${CMAKE_COMMAND} -DPLAY=$<TARGET_FILE:mvp-play> -DWORK=${CMAKE_BINARY_DIR} -DFIELDS=700
+                     -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/play_twice.cmake)
+    set_tests_properties(local_play_determinism PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 900)
   endif()
 endif()

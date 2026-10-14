@@ -10,17 +10,25 @@
 //   --frames N        stop at the frame poll of frame N; --fields N: after N VI fields
 //   --max-ticks N     instruction budget (default: none)
 //   --headless        no window: render off-screen only (captures still work)
+//   --no-render       no renderer at all (the guest runs alone; for the determinism check)
 //   --present-every N show every Nth VI field (default 1)
-//   --capture DIR     write the scanned-out frame as DIR/field_NNNNNN.png every
+//   --capture DIR     write the scanned-out frame as DIR/field_N_frame_F.png (VI field N,
+//                     game frame poll F, the number input scripts use) every
 //                     --capture-every N fields (default 60) and at the --capture-at
 //                     fields; only frames that changed since the last capture
 //   --draw-log FILE   one line per draw and EFB copy (state, textures) from VI field
 //                     --draw-log-from N (default 0) to --draw-log-to N
+//   --dump-textures DIR at VI field --dump-field N: every texture each draw
+//                     samples, decoded from guest memory, as DIR/tex_F_D_M.png
 //
 // Determinism: the renderer only reads guest state, and window events never
 // reach the guest; with the same input script, the guest runs exactly as under
-// mvp-boot. Captures are game-derived: they belong under build/ and are never
-// committed.
+// mvp-boot. The report's "guest:" line (instructions, time base, SHA-1 of MEM1)
+// is the same with and without --no-render (local test local_play_determinism).
+// Captures are game-derived: they belong under build/ and are never committed.
+//
+// Exit status: 0 when the run ended by its budget with frames shown and no
+// WebGPU errors (or with --no-render), 1 otherwise, 77 without the disc.
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -28,8 +36,10 @@
 #include <string>
 
 #include "common/file.h"
+#include "common/sha1.h"
 #include "gfx/gx_processor.h"
 #include "gfx/png.h"
+#include "gfx/texture_decode.h"
 #include "gfx/wgpu/gpu.h"
 #include "gfx/wgpu/renderer.h"
 #include "gfx/wgpu/window.h"
@@ -53,8 +63,30 @@ struct DrawLog : gfx::Backend {
   gfx::Backend* next = nullptr;
   std::FILE* f = nullptr;
   const std::uint64_t* field = nullptr;
+  const gfx::GxProcessor* proc = nullptr;
   std::uint64_t from = 0, to = ~0ull;
   bool on() const { return f && *field >= from && *field <= to; }
+  // Texture dumps (--dump-textures).
+  const std::uint8_t* mem = nullptr;
+  std::uint32_t mem_size = 0;
+  std::string dump_dir;
+  std::uint64_t dump_field = ~0ull, dump_draw = 0;
+  void dump(const gfx::DrawCall& d) {
+    for (int m = 0; m < 8; ++m) {
+      const gfx::TextureDesc& t = d.tex[static_cast<std::size_t>(m)];
+      if (!t.valid || !gfx::texture_format_known(t.format)) continue;
+      const std::uint32_t a = t.addr & 0x01FFFFFFu;
+      const std::uint32_t bytes = gfx::texture_level_size(t.format, t.width, t.height);
+      if (a > mem_size || bytes > mem_size - a) continue;
+      std::vector<std::uint8_t> rgba(static_cast<std::size_t>(t.width) * t.height * 4);
+      gfx::decode_texture(t.format, t.width, t.height, mem + a, rgba.data(), t.tlut, t.tlut_format, t.tlut_entries);
+      char name[96];
+      std::snprintf(name, sizeof name, "/tex_%llu_%llu_%d.png", static_cast<unsigned long long>(*field),
+                    static_cast<unsigned long long>(dump_draw), m);
+      gfx::write_png_rgba(dump_dir + name, t.width, t.height, rgba.data());
+    }
+    ++dump_draw;
+  }
   void draw(const gfx::DrawCall& d) override {
     if (on()) {
       const gfx::PipelineConfig& c = d.cfg;
@@ -65,6 +97,16 @@ struct DrawLog : gfx::Backend {
                    c.z_update, c.cull, c.pixel_format, c.alpha_comp0, c.alpha_comp1, c.alpha_logic, d.u.alpha_ref[0],
                    d.u.alpha_ref[1], c.logic_enable, c.logic_op, c.fog_type, d.scissor[0], d.scissor[1], d.scissor[2],
                    d.scissor[3]);
+      if (proc) {
+        const auto& pi = proc->last_primitive();
+        std::fprintf(f, "  prim %02X x%u size %u vcd %08X %08X vat %08X %08X %08X matidx %08X %08X texgen %08X %08X n %u dual %u vtx",
+                     pi.op, pi.count, pi.vertex_size, pi.vcd_lo, pi.vcd_hi, pi.vat[0], pi.vat[1], pi.vat[2],
+                     pi.matidx[0], pi.matidx[1], pi.texgen[0], pi.texgen[1], pi.num_texgens, pi.dual_tex);
+        for (auto b : pi.first_vertex) std::fprintf(f, " %02X", b);
+        std::fprintf(f, "\n  arrays");
+        for (int k = 0; k < 6; ++k) std::fprintf(f, " %08X/%u", pi.array_base[k], pi.array_stride[k]);
+        std::fprintf(f, "\n");
+      }
       for (int i = 0; i < c.num_stages; ++i) {
         const gfx::TevStage& t = c.stages[i];
         std::fprintf(f, "  stage %d color %06X alpha %06X ind %06X tex %u map %u coord %u ras %u kc %u ka %u\n", i,
@@ -91,6 +133,7 @@ struct DrawLog : gfx::Backend {
                      v.color[0][3], v.tex[0][0], v.tex[0][1], v.tex[0][2], v.tex[1][0], v.tex[1][1], v.tex[1][2]);
       }
     }
+    if (!dump_dir.empty() && *field == dump_field) dump(d);
     next->draw(d);
   }
   void efb_copy(const gfx::EfbCopy& c) override {
@@ -115,10 +158,17 @@ struct Play : GfxObserver {
   std::uint64_t last_capture_serial = 0, captures = 0, fields = 0, presents = 0;
   std::uint64_t frames = 0, max_frames = ~0ull;
 
-  void gx_command(const std::uint8_t* cmd, std::size_t len) override { proc->command(cmd, len); }
+  // Without a renderer (--no-render) the observer only counts fields.
+  void gx_command(const std::uint8_t* cmd, std::size_t len) override {
+    if (proc) proc->command(cmd, len);
+  }
 
   void vi_field(std::uint64_t field, std::uint32_t xfb) override {
     fields = field;
+    if (!renderer) {
+      if (field >= max_fields) throw StopRun{"ran " + std::to_string(max_fields) + " VI fields (--fields)"};
+      return;
+    }
     renderer->flush();
     const gfx::Renderer::Frame* f = renderer->xfb(xfb);
     if (!f) f = renderer->latest_xfb();
@@ -133,7 +183,8 @@ struct Play : GfxObserver {
         (field % capture_every == 0 || capture_at.count(field))) {
       auto px = renderer->read_frame(*f);
       char name[64];
-      std::snprintf(name, sizeof name, "/field_%06llu.png", static_cast<unsigned long long>(field));
+      std::snprintf(name, sizeof name, "/field_%06llu_frame_%06llu.png", static_cast<unsigned long long>(field),
+                    static_cast<unsigned long long>(frames));
       if (gfx::write_png_rgba(capture_dir + name, f->width, f->height, px.data())) ++captures;
       last_capture_serial = f->serial;
     }
@@ -152,10 +203,11 @@ void frame_hook(ppc::Cpu&, std::uint64_t frame) {
 int main(int argc, char** argv) {
   std::setvbuf(stdout, nullptr, _IOLBF, 1 << 16);
   std::string input_path, capture_at, draw_log_path;
-  std::uint64_t draw_log_from = 0, draw_log_to = ~0ull;
+  std::uint64_t draw_log_from = 0, draw_log_to = ~0ull, dump_field = ~0ull;
+  std::string dump_dir;
   std::uint64_t max_ticks = ~0ull;
   u32 ports = 1;
-  bool headless = false;
+  bool headless = false, no_render = false;
   Play play;
   for (int k = 1; k < argc; ++k) {
     std::string a = argv[k];
@@ -166,6 +218,7 @@ int main(int argc, char** argv) {
     else if (a == "--fields") play.max_fields = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--max-ticks") max_ticks = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--headless") headless = true;
+    else if (a == "--no-render") no_render = headless = true;
     else if (a == "--present-every") play.present_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
     else if (a == "--capture") play.capture_dir = next();
     else if (a == "--capture-every") play.capture_every = std::max<std::uint64_t>(1, std::strtoull(next().c_str(), nullptr, 10));
@@ -173,10 +226,13 @@ int main(int argc, char** argv) {
     else if (a == "--draw-log") draw_log_path = next();
     else if (a == "--draw-log-from") draw_log_from = std::strtoull(next().c_str(), nullptr, 10);
     else if (a == "--draw-log-to") draw_log_to = std::strtoull(next().c_str(), nullptr, 10);
+    else if (a == "--dump-textures") dump_dir = next();
+    else if (a == "--dump-field") dump_field = std::strtoull(next().c_str(), nullptr, 10);
     else {
       std::fprintf(stderr,
                    "usage: mvp-play [--input SCRIPT] [--ports MASK] [--frames N] [--fields N] [--max-ticks N] "
-                   "[--headless] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...]\n");
+                   "[--headless] [--no-render] [--present-every N] [--capture DIR] [--capture-every N] [--capture-at F1,F2,...] "
+                   "[--draw-log FILE] [--draw-log-from N] [--draw-log-to N] [--dump-textures DIR --dump-field N]\n");
       return 2;
     }
   }
@@ -220,12 +276,15 @@ int main(int argc, char** argv) {
       return 1;
     }
   }
-  auto gpu = gfx::Gpu::create(&err);
-  if (!gpu) {
-    std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
-    return 1;
+  std::unique_ptr<gfx::Gpu> gpu;
+  if (!no_render) {
+    gpu = gfx::Gpu::create(&err);
+    if (!gpu) {
+      std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
+      return 1;
+    }
+    std::printf("gpu: %s\n", gpu->adapter_name().c_str());
   }
-  std::printf("gpu: %s\n", gpu->adapter_name().c_str());
   if (window && !window->attach(*gpu, &err)) {
     std::fprintf(stderr, "mvp-play: %s\n", err.c_str());
     return 1;
@@ -243,18 +302,27 @@ int main(int argc, char** argv) {
   hooks.reschedule(m.cpu());
   mvp_register_game();
 
-  gfx::Renderer renderer(*gpu, m.mem1(), Machine::kMem1Size);
+  std::unique_ptr<gfx::Renderer> renderer_owner;
+  if (gpu) renderer_owner = std::make_unique<gfx::Renderer>(*gpu, m.mem1(), Machine::kMem1Size);
+  gfx::Renderer* renderer = renderer_owner.get();
   DrawLog draw_log;
-  draw_log.next = &renderer;
+  draw_log.next = renderer;
   draw_log.field = &play.fields;
   draw_log.from = draw_log_from;
   draw_log.to = draw_log_to;
+  draw_log.mem = m.mem1();
+  draw_log.mem_size = Machine::kMem1Size;
+  draw_log.dump_dir = dump_dir;
+  draw_log.dump_field = dump_field;
   if (!draw_log_path.empty()) draw_log.f = std::fopen(draw_log_path.c_str(), "w");
-  gfx::GxProcessor proc(draw_log.f ? static_cast<gfx::Backend*>(&draw_log) : &renderer);
+  const bool wrap = draw_log.f || !dump_dir.empty();
+  gfx::GxProcessor proc(wrap ? static_cast<gfx::Backend*>(&draw_log) : renderer);
+  draw_log.proc = &proc;
   proc.set_memory(m.mem1(), Machine::kMem1Size);
   play.proc = &proc;
-  play.renderer = &renderer;
+  play.renderer = renderer;
   play.window = window.get();
+  if (!renderer) play.proc = nullptr;
   hw.set_gfx_observer(&play);
   g_play = &play;
   rt::g_input = &input;
@@ -275,21 +343,30 @@ int main(int argc, char** argv) {
   hw.set_gfx_observer(nullptr);
   rt::g_input = nullptr;
   rt::g_frame_hook = nullptr;
-  renderer.flush();
-  gpu->wait_idle();
+  if (renderer) {
+    renderer->flush();
+    gpu->wait_idle();
+  }
   if (draw_log.f) std::fclose(draw_log.f);
 
   auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
   const double guest = static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0;
   std::printf("stopped: %s\n", why.c_str());
+  {
+    Sha1 mem;
+    mem.update(m.mem1(), Machine::kMem1Size);
+    std::printf("guest: %llu instructions, time base %llu, %llu frame polls, MEM1 sha1 %s\n", ull(m.cpu().ticks),
+                ull(hooks.time_base(m.cpu())), ull(rt::g_frame_polls), Sha1::hex(mem.finish()).c_str());
+  }
   std::printf("time: %.3f s of guest time in %.1f s (%.2fx real time); %llu VI fields, %llu frame polls\n", guest, secs,
               secs > 0 ? guest / secs : 0.0, ull(hw.vi_fields()), ull(play.frames));
+  if (!renderer) return rc;
   const auto& ps = proc.stats();
   std::printf("gx: %llu commands, %llu draws, %llu vertices, %llu triangles, %llu EFB copies (%llu to the XFB), "
               "%llu TLUT loads, %llu unknown\n",
               ull(ps.commands), ull(ps.draws), ull(ps.vertices), ull(ps.triangles), ull(ps.copies), ull(ps.xfb_copies),
               ull(ps.tlut_loads), ull(ps.unknown));
-  const auto& rs = renderer.stats();
+  const auto& rs = renderer->stats();
   std::printf("renderer: %llu draws (%llu skipped), %llu passes, %llu pipelines, %llu textures decoded, %llu hits, "
               "%llu EFB-copy textures used, %llu texture copies, %llu clears; %llu unknown formats, "
               "%llu indirect draws, %llu fog draws\n",
@@ -298,5 +375,6 @@ int main(int argc, char** argv) {
               ull(rs.unknown_formats), ull(rs.indirect_draws), ull(rs.fog_draws));
   std::printf("display: %llu presents, %llu captures%s%s; WebGPU errors %llu\n", ull(play.presents), ull(play.captures),
               play.capture_dir.empty() ? "" : " in ", play.capture_dir.c_str(), ull(gpu->errors()));
+  if (gpu->errors() || ps.xfb_copies == 0) rc = 1;
   return rc;
 }
