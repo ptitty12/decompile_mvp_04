@@ -301,7 +301,7 @@ void fn_802C3D2C(Unk802C3B60* o, int n)
     }
 }
 
-extern "C" void fn_803EC054(int h);
+extern "C" void SHAPE_destroy(int h);
 extern "C" void fn_80377488(void* p);
 
 void fn_802C3EC0(Unk802C3B60* o)
@@ -316,14 +316,14 @@ void fn_802C3EC0(Unk802C3B60* o)
             }
             e->m8 = 0;
             if (e->m18 != 0)
-                fn_803EC054(e->m18);
+                SHAPE_destroy(e->m18);
             if (i == 0 || i > 2) {
                 if (e->mC != 0)
-                    fn_803EC054(e->mC);
+                    SHAPE_destroy(e->mC);
                 if (e->m10 != 0)
-                    fn_803EC054(e->m10);
+                    SHAPE_destroy(e->m10);
                 if (e->m14 != 0)
-                    fn_803EC054(e->m14);
+                    SHAPE_destroy(e->m14);
                 if (e->m4 != 0) {
                     fn_803EDA0C(e->m4);
                     e->m4 = 0;
@@ -1168,9 +1168,9 @@ struct Unk802C6BA4_Tex {
     unsigned int mC;
     int m10;
 };
-extern "C" unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
-Unk802C6BA4_Tex* fn_803EBF90(void* tex);
-extern "C" int fn_803EC6F8(void* tex);
+extern "C" unsigned char* SHAPE_getpixeladr(void* tex, int x, int y, int z);
+Unk802C6BA4_Tex* SHAPE_clut(void* tex);
+extern "C" int SHAPE_size(void* tex);
 
 /* near-miss (129/129 insns, 125 words equal): in the format-8 index search retail keeps p in r11, idx in r10 and the byte offset in r9 (formed after p); ours r9/r11/r11 */
 void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
@@ -1181,14 +1181,14 @@ void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
     case 0xDE3: {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                *(short*)fn_803EC1C0(tex, x, y, 0) = 0;
+                *(short*)SHAPE_getpixeladr(tex, x, y, 0) = 0;
             }
         }
         break;
     }
     case 8: {
         int y = 0;
-        Unk802C6BA4_Tex* t = fn_803EBF90(tex);
+        Unk802C6BA4_Tex* t = SHAPE_clut(tex);
         int idx = -1;
         for (; y < t->m4; y++) {
             int o = y * 2;
@@ -1205,17 +1205,17 @@ void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
         unsigned char v = idx;
         for (y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                *fn_803EC1C0(tex, x, y, 0) = v;
+                *SHAPE_getpixeladr(tex, x, y, 0) = v;
             }
         }
-        DCStoreRange((int)tex, fn_803EC6F8(tex));
+        DCStoreRange((int)tex, SHAPE_size(tex));
         break;
     }
     case 0xF:
     case 0x10: {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                *(short*)fn_803EC1C0(tex, x, y, 0) = 0;
+                *(short*)SHAPE_getpixeladr(tex, x, y, 0) = 0;
             }
         }
         break;
@@ -1223,7 +1223,7 @@ void fn_802C6BA4(Unk802C6BA4_Tex* tex, int fmt)
     case 0x20: {
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                *(int*)fn_803EC1C0(tex, x, y, 0) = 0;
+                *(int*)SHAPE_getpixeladr(tex, x, y, 0) = 0;
             }
         }
         break;
@@ -1237,24 +1237,24 @@ struct Unk802C72F4_Tex {
     int m10;
 };
 
-extern "C" int fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
-Unk802C72F4_Tex* fn_803EBF90();
-extern "C" int fn_803EC984(int h);
-extern "C" void fn_803EC054(int h);
+extern "C" int SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h);
+Unk802C72F4_Tex* SHAPE_clut();
+extern "C" int SHAPE_swizzle(int h);
+extern "C" void SHAPE_destroy(int h);
 void fn_802C6BA4(int a, int b);
 
 unsigned fn_802C6B74(unsigned r, unsigned g, unsigned b);
 unsigned fn_802C6B8C(unsigned r, unsigned g, unsigned b);
-extern "C" unsigned char* fn_803EC1C0(void* tex, int x, int y, int z);
-extern "C" int fn_803EC6F8(void* tex);
+extern "C" unsigned char* SHAPE_getpixeladr(void* tex, int x, int y, int z);
+extern "C" int SHAPE_size(void* tex);
 extern "C" int fn_803EC03C(int h);
-extern "C" int fn_803EC9D4();
+extern "C" int SHAPE_type();
 extern "C" int fn_8014DD68(unsigned a, unsigned b, unsigned c, int d);
 
 void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int w, int hh)
 {
     int kind = fn_803EC03C(h);
-    if (fn_803EC9D4() == 0x15)
+    if (SHAPE_type() == 0x15)
         kind = 0xDE3;
     unsigned s = fn_802C6B74(a, b, c);
     unsigned i = fn_802C6B8C(a, b, c);
@@ -1264,26 +1264,26 @@ void fn_802C7138(unsigned a, unsigned b, unsigned c, int h, int x0, int y0, int 
     case 0x10:
         for (int y = 0; y < hh; y++) {
             for (int x = 0; x < w; x++)
-                *(short*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = s;
+                *(short*)SHAPE_getpixeladr((void*)h, x + x0, y + y0, 0) = s;
         }
         break;
     case 0x20:
         for (int y = 0; y < hh; y++) {
             for (int x = 0; x < w; x++)
-                *(int*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = i;
+                *(int*)SHAPE_getpixeladr((void*)h, x + x0, y + y0, 0) = i;
         }
         break;
     case 0xDE3:
         for (int y = 0; y < hh; y++) {
             for (int x = 0; x < w; x++)
-                *(int*)fn_803EC1C0((void*)h, x + x0, y + y0, 0) = v;
+                *(int*)SHAPE_getpixeladr((void*)h, x + x0, y + y0, 0) = v;
         }
-        DCStoreRange(h, fn_803EC6F8((void*)h));
+        DCStoreRange(h, SHAPE_size((void*)h));
         break;
     }
 }
 
-/* near-miss (51 vs 52 insns): retail copies the fn_803EC984 result into a second callee-saved register after fn_803EC054 (mr r31,r30) and returns that copy */
+/* near-miss (51 vs 52 insns): retail copies the SHAPE_swizzle result into a second callee-saved register after SHAPE_destroy (mr r31,r30) and returns that copy */
 int fn_802C72F4(int a, int b, int c)
 {
     int n = 8;
@@ -1291,8 +1291,8 @@ int fn_802C72F4(int a, int b, int c)
         n = c;
     int h;
     if (n == 8) {
-        h = fn_803EBBA4(a, b, 8, 0xF, 0, 0x500, 0, 0);
-        Unk802C72F4_Tex* t = fn_803EBF90();
+        h = SHAPE_create(a, b, 8, 0xF, 0, 0x500, 0, 0);
+        Unk802C72F4_Tex* t = SHAPE_clut();
         int* p;
         if (t->mC & 0x10000000)
             p = (int*)((char*)t + t->m10);
@@ -1300,10 +1300,10 @@ int fn_802C72F4(int a, int b, int c)
             p = (int*)((char*)t + 0x10);
         *p = 0;
     } else {
-        h = fn_803EBBA4(a, b, n, 0, 0, 0x500, 0, 0);
+        h = SHAPE_create(a, b, n, 0, 0, 0x500, 0, 0);
     }
-    int r = fn_803EC984(h);
-    fn_803EC054(h);
+    int r = SHAPE_swizzle(h);
+    SHAPE_destroy(h);
     fn_802C6BA4(r, n);
     return r;
 }

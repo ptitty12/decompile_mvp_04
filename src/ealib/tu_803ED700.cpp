@@ -8,7 +8,7 @@
 /*
  * RealCore heap manager types (src/ealib/tu_803ED700.cpp and neighbours).
  * Evidence: fn_803ED700 (block header init), fn_803EDE64/fn_803EDEE8 (free list
- * insert/unlink through +0x10/+0x14), fn_803ED188 (allocator), heap pointer table lbl_806AABF4[64].
+ * insert/unlink through +0x10/+0x14), MEM_allocaligna (allocator), heap pointer table lbl_806AABF4[64].
  * Block tags: 0x4246 'BF' free (linked), 0x424D 'BM' allocated, 0x424F 'BO' unlinked, 0x4253 'BS' sentinel.
  */
 struct RcBlk {

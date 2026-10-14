@@ -97,7 +97,7 @@ void fn_803DD8E0(Unk803DBFF4Tex* self, int a, int b);
 int fn_803DD068(Unk803DBFF4Tex* t, Unk803DBFF4Info* info);
 void fn_803DD2A0(Unk803DBFF4Tex* t);
 void fn_803DD73C(Unk803DBFF4Obj* o, int c);
-Unk803DBFF4Info* fn_803EBF90(Unk803DBFF4Info* i);
+Unk803DBFF4Info* SHAPE_clut(Unk803DBFF4Info* i);
 int fn_803DDAC0(Unk803DBFF4Tex* t, Unk803DBFF4Info* info);
 }
 
@@ -220,7 +220,7 @@ extern "C" void fn_803DD8E0(Unk803DBFF4Tex* self, int a, int b)
         GXInitTexObjTlut(self->m20, b);
     }
     GXLoadTexObj(self->m20, a);
-    Unk803DBFF4Info* i = fn_803EBF90((Unk803DBFF4Info*)self->m0);
+    Unk803DBFF4Info* i = SHAPE_clut((Unk803DBFF4Info*)self->m0);
     if (i != 0 && i->m0 == 0x33) {
         char* data;
         if (i->mC & 0x10000000)

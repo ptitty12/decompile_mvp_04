@@ -63,15 +63,15 @@ int fn_8000446C(int a, int b);
 extern "C" int fn_804017B0(int a, int b);
 extern "C" int fn_80401904(int a);
 extern "C" void DCStoreRange(void* p, int n);
-extern "C" int fn_803EBFF8(void* p);
-extern "C" int fn_803EC3D4(void* p);
+extern "C" int SHAPE_comment(void* p);
+extern "C" int SHAPE_longname(void* p);
 void fn_8040B61C(void* dst, int src);
 int fn_803EBD14(void* a, int b);
-void* fn_803EBF90(void* p);
+void* SHAPE_clut(void* p);
 int fn_8040B574(const char* a, const char* b);
 void fn_802B0638(int a, void* b, int c);
-extern "C" int fn_803EC418(void* a, int x, int y, int z);
-extern "C" void fn_803ECA70(void* a, int x, int y, int z, unsigned v);
+extern "C" int SHAPE_readpixel(void* a, int x, int y, int z);
+extern "C" void SHAPE_writepixel(void* a, int x, int y, int z, unsigned v);
 
 void fn_802B9218()
 {
@@ -510,13 +510,13 @@ void fn_802B9FF0(void* a, Unk802B9FF0_Hdr* b)
         for (int n = cnt; n != 0; n--) {
             char* e = (char*)b + *pp;
             pp += 2;
-            void* tex = (void*)fn_803EBD14(a, fn_803EC3D4(e));
+            void* tex = (void*)fn_803EBD14(a, SHAPE_longname(e));
             int w = *(short*)(e + 4);
             int h = *(short*)(e + 6);
-            Unk802B9FF0_Pal* pal = (Unk802B9FF0_Pal*)fn_803EBF90(e);
+            Unk802B9FF0_Pal* pal = (Unk802B9FF0_Pal*)SHAPE_clut(e);
             for (int x = 0; x < w; x++) {
                 for (int y = 0; y < h; y++) {
-                    int idx = fn_803EC418(e, x, y, 0);
+                    int idx = SHAPE_readpixel(e, x, y, 0);
                     unsigned short* tab;
                     if (pal->mC & 0x10000000) {
                         tab = (unsigned short*)((char*)pal + pal->m10);
@@ -524,8 +524,8 @@ void fn_802B9FF0(void* a, Unk802B9FF0_Hdr* b)
                         tab = (unsigned short*)((char*)pal + 0x10);
                     }
                     unsigned c = fn_802B9FA8(tab[idx]) & 0xFFFFFF;
-                    unsigned o = fn_803EC418(tex, x, y, 0) & 0xFF000000;
-                    fn_803ECA70(tex, x, y, 0, c | o);
+                    unsigned o = SHAPE_readpixel(tex, x, y, 0) & 0xFF000000;
+                    SHAPE_writepixel(tex, x, y, 0, c | o);
                 }
             }
         }
@@ -544,14 +544,14 @@ void fn_802BA110(void* a, Unk802BA110_Src* b)
 
 void fn_802BA194(Unk802B9F40* p, Unk802B9FF0_Hdr* h)
 {
-    if (fn_803EBFF8((char*)h + h->m14) == 0) {
+    if (SHAPE_comment((char*)h + h->m14) == 0) {
         int n = h->m8;
         int i;
         if (n > 0) {
             char* d = (char*)p + 0x12;
             int* s = &h->m14;
             for (i = n; i != 0; i--) {
-                fn_8040B61C(d, fn_803EC3D4((char*)h + *s));
+                fn_8040B61C(d, SHAPE_longname((char*)h + *s));
                 s += 2;
                 d += 5;
             }

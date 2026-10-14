@@ -613,7 +613,7 @@ struct Unk800D4254_Font {
 };
 extern "C" void fn_803EB434(Unk800D4254_Font* font, const unsigned short* s, float* a, int c, float* b, int d);
 extern "C" int fn_80403060(const unsigned short* s);
-extern "C" char* fn_803EB2AC(int ch, char* tbl, int n, int stride);
+extern "C" char* FONT_bsearch(int ch, char* tbl, int n, int stride);
 
 inline char* FindGlyph(Unk800D4254_Font* font, unsigned short ch)
 {
@@ -625,7 +625,7 @@ inline char* FindGlyph(Unk800D4254_Font* font, unsigned short ch)
         if (*(unsigned short*)g == ch)
             return g;
     }
-    return fn_803EB2AC(ch, tbl, font->mA, stride);
+    return FONT_bsearch(ch, tbl, font->mA, stride);
 }
 extern "C" void fn_800D4254(const char* s0, void* f0, float* a, float* b)
 {

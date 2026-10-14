@@ -199,7 +199,7 @@ extern int lbl_8061FF3C;
 
 
 extern "C" {
-void fn_803EB454(Unk80313C14_Slot* s, char* str, ...);
+void FONT_drawtextfa(Unk80313C14_Slot* s, char* str, ...);
 void fn_803EB3CC(Unk80313C14_Slot* s, int x, float a, float b);
 void fn_803D982C(int h, int x);
 void fn_8033E958(const char* fmt, ...);
@@ -221,7 +221,7 @@ int fn_803E9994(void* a, char* tbl, int* n, void* z);
 void fn_803D6144(int a, int b);
 int fn_803E9A54(void* a, const char* key, int* n, int* out);
 void fn_803DD7C8(int h, int v);
-char* fn_803EC3D4(void* p);
+char* SHAPE_longname(void* p);
 void fn_803EC814(void* t, int i, char* out);
 void fn_803D74A0(void* h, char* s, void* v);
 unsigned int strlen(const char* s);
@@ -234,8 +234,8 @@ void fn_803E1E88(void* n);
 void fn_80315C90(void* self);
 void fn_80314368(void* c, unsigned short* s, int a, int b, float x, float y);
 void fn_80317624(int* a, int* b, int c);
-Unk80313C14_TxO* fn_803EBBA4(int a, int b, int c, int d, int e, int f, int g, int h);
-int fn_803EB864(int a, int b, int c, int d, int e, int f, int g);
+Unk80313C14_TxO* SHAPE_create(int a, int b, int c, int d, int e, int f, int g, int h);
+int SHAPE_createsize(int a, int b, int c, int d, int e, int f, int g);
 void DCStoreRange(void* a, int n);
 void* fn_803DD628(void* a, void* b);
 void fn_803D9E70(void* o, int a, int b, int c, int d, int e, int f, int g, int h);
@@ -316,7 +316,7 @@ void fn_80313CBC(void* a, Unk80313C14_Tbl* t)
             char buf[5];
             char* node = (char*)t + *e;
             e += 2;
-            char* s = fn_803EC3D4(node);
+            char* s = SHAPE_longname(node);
             if (s == 0 || strlen(s) > 4) {
                 fn_803EC814(t, i, buf);
                 char* p = buf + 3;
@@ -491,7 +491,7 @@ extern "C" void fn_80314688(void* o, int x, int y, char* str, int flag, int idx)
     if (lbl_8061E978 != 0) {
         if (lbl_8061E978->t[idx] != 0) {
             lbl_8061E978->t[idx]->m20 = flag == 0 ? 0x80B5AC95 : 0x80FFFFFF;
-            fn_803EB454(lbl_8061E978->t[idx], str, (float)x, (float)y);
+            FONT_drawtextfa(lbl_8061E978->t[idx], str, (float)x, (float)y);
         }
     }
 }
@@ -566,8 +566,8 @@ void fn_803157B4(Unk80313C14_Tx* self)
 {
     int w = self->m14;
     int h = self->m18;
-    self->m4 = fn_803EBBA4(w, h, 0x20, 0, 0, 0x100, 0, 0);
-    int sz = fn_803EB864(w, h, 0x20, 0xF, 0, 0, 0);
+    self->m4 = SHAPE_create(w, h, 0x20, 0, 0, 0x100, 0, 0);
+    int sz = SHAPE_createsize(w, h, 0x20, 0xF, 0, 0, 0);
     if (self->m4 != 0) {
         DCStoreRange(self->m4, sz);
         self->m4->m0 = 0x16;

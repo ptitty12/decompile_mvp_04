@@ -143,7 +143,7 @@ extern Unk803E34ACEnt lbl_8062C5F8[];
 extern Unk803E34ACEnt lbl_8062C610[];
 extern char lbl_8060C9B4[];
 extern "C" {
-Unk803E34ACHdr* fn_803EBF90(Unk803E34ACHdr* h);
+Unk803E34ACHdr* SHAPE_clut(Unk803E34ACHdr* h);
 void* fn_803ED604(void* tag, int size, int z);
 void GXInitTexObj(void* obj, void* data, unsigned short w, unsigned short h, int fmt, int a, int b, int c);
 void GXInitTexObjCI(void* obj, void* data, unsigned short w, unsigned short h, int fmt, int a, int b, int c, int tlut);
@@ -155,7 +155,7 @@ extern "C" void fn_803E34AC(Unk803E3AFC_Obj* o)
     int off = *(int*)((char*)o + 0x1C);
     Unk803E3AFC_Gfx* g = &o->m20;
     Unk803E34ACHdr* hdr = (Unk803E34ACHdr*)((char*)o + off);
-    Unk803E34ACHdr* pal = fn_803EBF90(hdr);
+    Unk803E34ACHdr* pal = SHAPE_clut(hdr);
     g->m18 = 1.0f;
     g->m1C = 1.0f;
     g->m8 = 0.0f;
