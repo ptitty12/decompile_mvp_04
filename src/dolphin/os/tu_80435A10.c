@@ -526,10 +526,10 @@ extern SramControl Scb;
 extern int fn_804280EC(s32 chan, u32 dev, RtcExiCallback cb);               /* EXILock */
 extern int fn_8042792C(s32 chan, u32 dev, u32 freq);                        /* EXISelect */
 extern int fn_804281E0(s32 chan);                                           /* EXIUnlock */
-extern int fn_80426DC4(s32 chan, void* buf, s32 len, u32 type, void* cb);   /* EXIImm */
+extern int fn_80426DC4(s32 chan, void* buf, s32 len, u32 type, EXICallback cb);   /* EXIImm */
 extern int fn_804271AC(s32 chan);                                           /* EXISync */
 extern int fn_80427020(s32 chan, void* buf, s32 len, u32 type);             /* EXIImmEx */
-extern int fn_804270C0(s32 chan, void* buf, s32 len, u32 type, void* cb);   /* EXIDma */
+extern int fn_804270C0(s32 chan, void* buf, s32 len, u32 type, EXICallback cb);   /* EXIDma */
 extern int fn_80427A58(s32 chan);                                           /* EXIDeselect */
 
 BOOL fn_80436848(void* buffer, u32 offset, u32 size);
