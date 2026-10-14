@@ -12,7 +12,8 @@ these modules.
 | `big.py` | BIGF archives: list, read, extract, rebuild. Opens a plain file or an entry of a disc image (`image.ciso:/data/database/database.big`, through `tools/recon/gcdisc.py`). `build()` writes the game's exact layout; 193 of the 197 archives under 20 MB on the disc rebuild byte for byte. |
 | `dbtables.py` | The 18 tables inside `database.big`: parse, list, dump as JSON, show value ranges, check the round trip, and write a table back. Also `djb2()`, the game's key hash. |
 | `loc.py` | The text files `FEENG.LOC`, `IGENG.LOC`, `MC_ENG.loc` (team names, stadium names and every other UI string): parse, dump, edit, re-serialize. All three files re-serialize byte for byte. |
-| `tests/test_rosters.py` | Unit tests. They build all their data in the test, so no game bytes are involved. |
+| `pack.py` | Roster and team packs, format v1: the reference implementation of [`docs/MODDING.md`](../../docs/MODDING.md). Validates packs (statically, or applied to a disc), applies a pack set to the player's own disc and writes the patched files outside the repo, prints pack and set hashes, scaffolds a new pack. |
+| `tests/test_rosters.py`, `tests/test_pack.py` | Unit tests. They build all their data in the test (a synthetic disc for the pack tests), so no game bytes are involved. |
 
 ## Use
 
@@ -30,6 +31,9 @@ python -I tools/rosters/dbtables.py write  database.big team team.json -o patche
 python -I tools/rosters/refpack.py d packed.bin unpacked.bin
 python -I tools/rosters/loc.py dump FEENG.LOC --grep stadium
 python -I tools/rosters/loc.py check FEENG.LOC
+python -I tools/rosters/pack.py validate docs/examples/packs/fictional-league
+python -I tools/rosters/pack.py apply --disc image.ciso --out <scratch dir> docs/examples/packs/fictional-league
+python -I tools/rosters/pack.py hash docs/examples/packs/fictional-league
 ```
 
 `<archive>` is a file path or `image:/path/inside/the/disc`. `dump` writes JSON to
