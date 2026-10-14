@@ -38,7 +38,8 @@ int main() {
               p.indirect_calls, p.absolute_calls);
   std::printf("bctr %zu, through recovered jump tables %zu; other indirect jumps %zu\n", bctr, bctr_tables,
               p.indirect_jumps);
-  std::printf("resume points %zu, back edges (safe points) %zu\n", p.resume_points, p.back_edges);
+  std::printf("resume points %zu, back edges (safe points) %zu, pure spins (idle skip) %zu\n",
+              p.resume_points, p.back_edges, p.idle_spins);
   std::printf("gap functions (branch-target code labels outside every function) %zu, secondary entry points %zu, "
               "functions running into the next one %zu, expected traps %zu\n",
               p.gap_functions, p.secondary_entries, p.falls_into_next, p.expected_traps);

@@ -3,7 +3,8 @@
 //   mvp-boot lockstep   E0b item 6: run the translated code from __start and the
 //                       reference interpreter side by side (runtime/lockstep.h)
 //                       up to the first MMIO access.
-//   mvp-boot run [--until main|none] [--mmio N] [--log FILE]
+//   mvp-boot run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE]
+//                [--max-entries N] [--max-ticks N] [--unnamed stop|log]
 //                       E0b items 7 and 8: boot with the IPL environment
 //                       (runtime/boot.h) and the hardware model (runtime/hw.h).
 //                       Prints the calls __start makes; logs every call from game
@@ -80,8 +81,20 @@ struct RunTrace {
   const xlat::UnitMap* units = nullptr;
   u32 start_fn = 0, stop_at = 0;
   std::uint64_t events = 0, max_events = 20000000;
-  std::string log;  // one line per SDK boundary call
-  std::uint64_t sdk_calls = 0;
+  // The SDK call log: one line per boundary call, streamed to a file and hashed.
+  std::FILE* log = nullptr;
+  Sha1 log_sha;
+  std::uint64_t log_bytes = 0;
+  void log_line(const std::string& s) {
+    log_sha.update(s.data(), s.size());
+    log_bytes += s.size();
+    if (log) std::fwrite(s.data(), 1, s.size(), log);
+  }
+  std::uint64_t sdk_calls = 0, exception_entries = 0, thread_switches = 0;
+  u32 thread = 0;
+  bool stop_on_unnamed = true;
+  std::map<u32, std::uint64_t> unnamed;  // unnamed SDK callees (input for K1)
+  std::map<u32, u32> unnamed_first_caller;
   std::map<std::string, std::uint64_t> per_function;
   std::vector<std::string> first_order;
 
@@ -102,6 +115,14 @@ RunTrace* g_trace = nullptr;
 void trace_hook(ppc::Cpu& c, u32 addr) {
   RunTrace& t = *g_trace;
   ++t.events;
+  // Thread switches: the OS's current-thread pointer (0x800000E4) changed.
+  if (const u8* p = c.mem->host(0x800000E4u)) {
+    u32 cur = be32(p);
+    if (cur != t.thread) {
+      if (t.thread && cur) ++t.thread_switches;
+      if (cur) t.thread = cur;
+    }
+  }
   u32 call_site = c.lr - 4;
   const xlat::Symbol* caller = t.cfg->index.containing(call_site);
   if (caller && caller->address == t.start_fn)
@@ -112,30 +133,50 @@ void trace_hook(ppc::Cpu& c, u32 addr) {
   // direct bl to it, or an indirect call); otherwise this entry was reached by a
   // tail call further down the chain (PCinit's `b` into its body, for example).
   bool direct = false;
-  if (const u8* p = c.mem->host(call_site)) {
+  if (rt::g_exception_depth > 0 && c.lr == rt::g_exception_lr) {
+    ++t.exception_entries;  // the OS's exception code, entered from its vector, not called
+  } else if (const u8* p = c.mem->host(call_site)) {
     ppc::Insn w{be32(p)};
     ppc::Op op = ppc::decode(w.w);
     if (op == ppc::Op::b && w.lk()) direct = (w.aa() ? static_cast<u32>(w.li()) : call_site + static_cast<u32>(w.li())) == addr;
-    else if ((op == ppc::Op::bclr || op == ppc::Op::bcctr) && w.lk()) direct = true;
+    else if (op == ppc::Op::bcctr && w.lk()) direct = (c.ctr & ~3u) == addr;
+    else if (op == ppc::Op::bclr && w.lk()) {
+      // blrl: LR no longer holds the target, but the register moved into it by
+      // the usual `mtlr rX` just before still does (the callee has not run yet).
+      direct = true;
+      for (u32 back = 4; back <= 16; back += 4) {
+        const u8* q = c.mem->host(call_site - back);
+        if (!q) break;
+        ppc::Insn m{be32(q)};
+        if (ppc::decode(m.w) == ppc::Op::mtspr && m.spr() == 8) {
+          direct = (c.gpr[m.rS()] & ~3u) == addr;
+          break;
+        }
+      }
+    }
   }
   if (direct && t.units->is_runtime(addr) && !t.units->is_runtime(call_site)) {
-    if (!t.named(addr)) {
+    if (!t.named(addr) && t.stop_on_unnamed) {
       char b[160];
       std::snprintf(b, sizeof b, "call into unnamed SDK function 0x%08X (%s, unit %s) from 0x%08X (%s)", addr,
                     t.name(addr).c_str(), t.units->unit_at(addr).c_str(), call_site, t.name(call_site).c_str());
       throw StopRun{b};
     }
     std::string callee = t.name(addr);
+    if (!t.named(addr)) {
+      if (t.unnamed[addr]++ == 0) t.unnamed_first_caller[addr] = call_site;
+      callee += " (unnamed)";
+    }
     ++t.sdk_calls;
     if (t.per_function[callee]++ == 0) t.first_order.push_back(callee);
-    t.log += callee + " <- " + t.name(call_site) + "\n";
+    t.log_line(callee + " <- " + t.name(call_site) + "\n");
   }
   if (addr == t.stop_at) throw StopRun{"reached " + t.name(addr)};
   if (t.events >= t.max_events) throw StopRun{"function-entry budget used up (--max-entries)"};
 }
 
 int run_boot(const xlat::Inputs& in, int argc, char** argv) {
-  std::string until = "main", log_path = "sdk_calls.log";
+  std::string until = "main", log_path = "sdk_calls.log", fifo_path, unnamed_mode = "stop";
   std::size_t mmio_lines = 40;
   std::uint64_t max_entries = 20000000, max_ticks = 2000000000ull;
   for (int k = 2; k + 1 < argc; ++k) {
@@ -143,6 +184,8 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
     if (a == "--until") until = argv[k + 1];
     if (a == "--mmio") mmio_lines = static_cast<std::size_t>(std::atoi(argv[k + 1]));
     if (a == "--log") log_path = argv[k + 1];
+    if (a == "--fifo") fifo_path = argv[k + 1];
+    if (a == "--unnamed") unnamed_mode = argv[k + 1];
     if (a == "--max-entries") max_entries = std::strtoull(argv[k + 1], nullptr, 10);
     if (a == "--max-ticks") max_ticks = std::strtoull(argv[k + 1], nullptr, 10);
   }
@@ -159,19 +202,33 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::printf("boot: FST at 0x%08X (%u bytes), BI2 at 0x%08X, arena hi 0x%08X\n", L.fst, L.fst_size, L.bi2,
               L.arena_hi);
   Hardware hw(&m.cpu(), m.mem1(), Machine::kMem1Size);
-  SystemHooks hooks(&m);
+  hw.set_disc(in.disc.image.get());
+  SystemHooks hooks(&m, &hw);
   m.memory().io = &hw;
   m.cpu().hooks = &hooks;
   hooks.tick_limit = max_ticks;
-  m.cpu().next_event = max_ticks;
+  hooks.reschedule(m.cpu());
   mvp_register_game();
   RunTrace t;
   t.cfg = &cfg;
   t.units = &units;
   t.start_fn = in.disc.dol.entry();
   t.max_events = max_entries;
+  t.stop_on_unnamed = unnamed_mode != "log";
   const xlat::Symbol* mainsym = in.symbols.find("main");
   t.stop_at = until == "main" ? (mainsym ? mainsym->address : 0x8014D63Cu) : 0;
+  if (until.rfind("0x", 0) == 0) {  // a function entry by address
+    t.stop_at = static_cast<u32>(std::strtoul(until.c_str(), nullptr, 16));
+  } else if (until != "main" && until != "none") {  // a function by its symbols.txt name
+    const xlat::Symbol* s = in.symbols.find(until);
+    if (!s) {
+      std::fprintf(stderr, "mvp-boot: no symbol %s\n", until.c_str());
+      return 2;
+    }
+    t.stop_at = s->address;
+  }
+  t.log = std::fopen(log_path.c_str(), "wb");
+  if (!t.log) std::fprintf(stderr, "mvp-boot: cannot write %s\n", log_path.c_str());
   g_trace = &t;
   rt::g_entry_hook = &trace_hook;
   std::string why;
@@ -188,16 +245,50 @@ int run_boot(const xlat::Inputs& in, int argc, char** argv) {
   std::printf("stopped: %s (pc 0x%08X in %s) after %llu function entries, %llu unwinds\n", why.c_str(),
               m.cpu().pc, t.name(m.cpu().pc).c_str(), static_cast<unsigned long long>(t.events),
               static_cast<unsigned long long>(rt::g_unwinds));
-  std::printf("SDK calls: %llu boundary calls to %zu functions, all named; OSReport lines %llu\n",
+  std::printf("SDK calls: %llu boundary calls to %zu functions, %s; OSReport lines %llu; %llu exception entries\n",
               static_cast<unsigned long long>(t.sdk_calls), t.per_function.size(),
-              static_cast<unsigned long long>(g_report_count));
+              t.unnamed.empty() ? "all named" : "SOME UNNAMED", static_cast<unsigned long long>(g_report_count),
+              static_cast<unsigned long long>(t.exception_entries));
+  for (const auto& [a, n] : t.unnamed)
+    std::printf("  unnamed SDK function 0x%08X (unit %s): %llu calls, first from 0x%08X (%s)\n", a,
+                t.units->unit_at(a).c_str(), static_cast<unsigned long long>(n), t.unnamed_first_caller[a],
+                t.name(t.unnamed_first_caller[a]).c_str());
   for (const auto& n : t.first_order) std::printf("  %-28s %llu\n", n.c_str(), static_cast<unsigned long long>(t.per_function[n]));
-  if (!write_file(log_path, t.log.data(), t.log.size())) std::fprintf(stderr, "mvp-boot: cannot write %s\n", log_path.c_str());
-  std::printf("SDK call log: %s, %zu bytes, sha1 %s\n", log_path.c_str(), t.log.size(),
-              Sha1::of(t.log.data(), t.log.size()).c_str());
-  std::printf("MMIO: %zu accesses logged, %zu bytes to the write-gather pipe, %llu sc, %llu icbi blocks\n",
-              hw.log().size(), hw.fifo().size(), static_cast<unsigned long long>(hooks.syscalls),
-              static_cast<unsigned long long>(hooks.icbi_blocks));
+  if (t.log) std::fclose(t.log);
+  std::printf("SDK call log: %s, %llu bytes, sha1 %s\n", log_path.c_str(), static_cast<unsigned long long>(t.log_bytes),
+              Sha1::hex(t.log_sha.finish()).c_str());
+  auto ull = [](std::uint64_t v) { return static_cast<unsigned long long>(v); };
+  std::printf("clock: %llu instructions, time base %llu (%.3f s of guest time), %llu VI fields\n", ull(m.cpu().ticks),
+              ull(hooks.time_base(m.cpu())), static_cast<double>(hooks.time_base(m.cpu())) / 40500000.0,
+              ull(hw.vi_fields()));
+  std::printf("threads: %llu switches (%.2f per VI field), %llu unwinds\n", ull(t.thread_switches),
+              hw.vi_fields() ? static_cast<double>(t.thread_switches) / static_cast<double>(hw.vi_fields()) : 0.0,
+              ull(rt::g_unwinds));
+  std::printf("interrupts: %llu external, %llu decrementer; idle skips %llu (%llu instructions skipped); "
+              "unwinds %llu; interpreted %llu instructions (%.4f%% of those run)\n",
+              ull(hooks.external_interrupts), ull(hooks.decrementer_interrupts), ull(hooks.idle_skips),
+              ull(hooks.idle_ticks_skipped), ull(rt::g_unwinds), ull(rt::g_interpreted),
+              m.cpu().ticks > hooks.idle_ticks_skipped
+                  ? 100.0 * static_cast<double>(rt::g_interpreted) /
+                        static_cast<double>(m.cpu().ticks - hooks.idle_ticks_skipped)
+                  : 0.0);
+  std::printf("MMIO: %zu accesses logged, %llu sc, %llu icbi blocks\n", hw.log().size(), ull(hooks.syscalls),
+              ull(hooks.icbi_blocks));
+  std::printf("DI: %llu drive commands, %llu bytes read; DSP: %llu AX frames; AI: %llu DMA blocks\n", ull(hw.di_commands()), ull(hw.di_bytes()),
+              ull(hw.dsp_frames()), ull(hw.ai_dma_blocks()));
+  std::printf("DSP: state %d, %zu mails waiting, mailbox 0x%08X, control 0x%04X; PI cause 0x%05X mask 0x%05X\n",
+              hw.dsp_state(), hw.dsp_mails_waiting(), hw.dsp_mail_to_cpu(), hw.dsp_control(), hw.pi_cause(),
+              hw.pi_mask());
+  if (!fifo_path.empty() && !write_file(fifo_path, hw.fifo().data(), hw.fifo().size()))
+    std::fprintf(stderr, "mvp-boot: cannot write %s\n", fifo_path.c_str());
+  const GxFifo& gx = hw.gx();
+  std::printf("GX: %llu bytes to the write-gather pipe, %llu commands (%llu BP loads, %llu primitives, %llu vertices, "
+              "%llu display list calls, %llu bad), %llu draw-done%s\n",
+              ull(hw.fifo_bytes()), ull(gx.commands()), ull(gx.bp_loads()), ull(gx.primitives()), ull(gx.vertices()),
+              ull(gx.display_lists()), ull(gx.display_list_errors()), ull(hw.draw_done_count()), gx.broken() ? "; PARSE LOST" : "");
+  if (gx.broken())
+    std::printf("GX: byte 0x%02X at stream offset %llu starts no command\n", gx.broken_opcode(),
+                ull(gx.broken_offset()));
   std::size_t shown = 0;
   for (const auto& a : hw.log()) {
     if (shown++ >= mmio_lines) break;
@@ -221,6 +312,7 @@ int main(int argc, char** argv) {
   }
   if (cmd == "lockstep") return lockstep(*in);
   if (cmd == "run") return run_boot(*in, argc, argv);
-  std::fprintf(stderr, "usage: mvp-boot lockstep | run [--until main|none] [--mmio N] [--log FILE]\n");
+  std::fprintf(stderr, "usage: mvp-boot lockstep | run [--until main|none|NAME|0xADDR] [--mmio N] [--log FILE] [--fifo FILE] "
+                       "[--max-entries N] [--max-ticks N] [--unnamed stop|log]\n");
   return 2;
 }

@@ -192,9 +192,15 @@ TEST_CASE("DSP: the init handshake of __OSInitAudioSystem and the ARAM DMA") {
 
 TEST_CASE("hardware log, write-gather pipe and the poll limit") {
   Rig g;
+  // The write-gather pipe passes data on in 32-byte bursts.
   g.w(0xCC008000, 0x61, 1);
   g.w(0xCC008000, 0x12345678);
-  CHECK(g.hw.fifo() == std::vector<u8>{0x61, 0x12, 0x34, 0x56, 0x78});
+  CHECK(g.hw.fifo().empty());
+  for (int k = 0; k < 6; ++k) g.w(0xCC008000, 0);
+  for (int k = 0; k < 3; ++k) g.w(0xCC008000, 0, 1);
+  REQUIRE(g.hw.fifo().size() == 32);
+  CHECK(std::vector<u8>(g.hw.fifo().begin(), g.hw.fifo().begin() + 5) == std::vector<u8>{0x61, 0x12, 0x34, 0x56, 0x78});
+  CHECK(g.hw.gx().bp_loads() == 1);
   g.w(0xCC003004, 0xF0);
   CHECK(g.r(0xCC003004) == 0xF0);
   CHECK(g.r(0xCC003006, 2) == 0xF0);

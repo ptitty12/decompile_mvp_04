@@ -1,8 +1,10 @@
-add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp sys_hooks.cpp hle.cpp)
+add_library(engine_runtime STATIC native.cpp machine.cpp boot.cpp hw.cpp gx_fifo.cpp sys_hooks.cpp hle.cpp)
 target_link_libraries(engine_runtime PUBLIC engine_ppc engine_vfs)
 target_compile_options(engine_runtime PRIVATE ${ENGINE_WARN})
 
 engine_test(test_boot_hw SOURCES tests/test_boot_hw.cpp LIBS engine_runtime)
+engine_test(test_clock SOURCES tests/test_clock.cpp LIBS engine_runtime)
+engine_test(test_devices SOURCES tests/test_devices.cpp LIBS engine_runtime)
 
 # Lockstep checker (development): translated code against the interpreter.
 add_library(engine_lockstep STATIC lockstep.cpp)
@@ -69,4 +71,11 @@ if(MVP_DISC_PATH AND EXISTS "${MVP_DISC_PATH}")
   # E0b item 7: boot with the IPL environment until main.
   add_test(NAME local_boot_main COMMAND mvp-boot run --until main --mmio 0)
   set_tests_properties(local_boot_main PROPERTIES SKIP_RETURN_CODE 77 LABELS local)
+  # E0b items 9 and 10: threads, interrupts and devices. Boots until the fifth
+  # guest thread (the memory-card worker, created by the fourth OSCreateThread
+  # site) starts at fn_8035A198; two runs must match.
+  add_test(NAME local_boot_twice
+           COMMAND ${CMAKE_COMMAND} -DBOOT=$<TARGET_FILE:mvp-boot> -DWORK=${CMAKE_BINARY_DIR} -DUNTIL=0x8035A198
+                   -DENTRIES=100000000 -P ${CMAKE_CURRENT_SOURCE_DIR}/tools/twice.cmake)
+  set_tests_properties(local_boot_twice PROPERTIES SKIP_RETURN_CODE 77 LABELS local TIMEOUT 600)
 endif()
