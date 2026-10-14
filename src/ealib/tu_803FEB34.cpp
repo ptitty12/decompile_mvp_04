@@ -310,6 +310,51 @@ extern "C" void fn_803FF210()
     fn_803FF5E8(0, 0);
 }
 
+extern "C" void fn_803FFA60(char* d, const char* s, int n);
+extern "C" int DVDReadAsyncPrio(void* fi, void* addr, int len, int off, void (*cb)(int, int), int prio);
+extern "C" void fn_80432FA8(void* p, int n);
+
+extern "C" void fn_803FF244(void* fi)
+{
+    int st = lbl_806ADEC0.m0;
+    if (st == 2) {
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.m34);
+        lbl_806ADEC0.m8 += lbl_806ADEC0.m34;
+        lbl_806ADEC0.m4 += lbl_806ADEC0.m34;
+    } else if (st == 3) {
+        fn_80432FA8((void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4);
+        int t = lbl_806ADEC0.m1C - lbl_806ADEC0.m4;
+        lbl_806ADEC0.m8 += t;
+        lbl_806ADEC0.m4 += t;
+    } else if (st == 4) {
+        int n = lbl_806ADEC0.m18 - lbl_806ADEC0.m4;
+        if (n > 0x4000)
+            n = 0x4000;
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)&lbl_806ADEC0 + 0x60, n);
+        lbl_806ADEC0.m8 += n;
+        lbl_806ADEC0.m4 += n;
+    } else if (st == 1) {
+        fn_803FFA60((char*)lbl_806ADEC0.m4, (char*)(((int*)&lbl_806ADEC0)[0x30 / 4] + (int)((char*)&lbl_806ADEC0 + 0x60)), lbl_806ADEC0.mC);
+        lbl_806ADEC0.m0 = st;
+        fn_803FF210();
+        return;
+    }
+    if (lbl_806ADEC0.m4 == lbl_806ADEC0.m14 && lbl_806ADEC0.m4 < lbl_806ADEC0.m1C) {
+        lbl_806ADEC0.m0 = 3;
+        lbl_806ADEC0.m38 = DVDReadAsyncPrio(fi, (void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4, lbl_806ADEC0.m8, fn_803FF5E8, 2);
+        return;
+    }
+    if (lbl_806ADEC0.m18 > lbl_806ADEC0.m4) {
+        int n = (lbl_806ADEC0.m18 - lbl_806ADEC0.m4 + 0x1f) & ~0x1f;
+        if (n > 0x4000)
+            n = 0x4000;
+        lbl_806ADEC0.m0 = 4;
+        lbl_806ADEC0.m38 += DVDReadAsyncPrio(fi, (char*)&lbl_806ADEC0 + 0x60, n, lbl_806ADEC0.m8, fn_803FF5E8, 2);
+        return;
+    }
+    fn_803FF210();
+}
+
 extern "C" void fn_803FF5E8(int, int)
 {
     OSSendMessage(lbl_806B8238, 1, 1);
@@ -398,6 +443,39 @@ extern "C" void fn_803FF850()
         fn_804321CC();
         lbl_806EEAB0++;
     }
+}
+
+/* OS low-memory globals: 0xF8 bus clock (read as 0x800000F8). */
+struct LowMem {
+    char pad[0xF8];
+    unsigned busClock;
+};
+#define LOWMEM ((LowMem*)0x80000000)
+extern int lbl_806EEADC;
+extern "C" {
+long long fn_80438628(void);
+void fn_804324EC(void* alarm, long long start, long long period, void (*handler)());
+void fn_8040015C(void);
+void fn_80400690(void (*cb)());
+void fn_803FF994();
+void fn_803FFA3C();
+}
+
+/* EA TIMER_init(int hz): starts the periodic alarm that ticks the RealCore timer thread (hz defaults to 100). */
+extern "C" int fn_803FF888(int hz)
+{
+    if (lbl_806EEAB1 != 0)
+        return lbl_806EEADC;
+    if (hz == 0)
+        hz = 100;
+    lbl_806EEADC = hz;
+    long long start = fn_80438628();
+    long long period = (int)((float)(LOWMEM->busClock >> 2) * (1.0f / (float)hz));
+    fn_8040015C();
+    fn_804324EC(lbl_806B82E0, start, period, fn_803FFA3C);
+    lbl_806EEAB1 = 1;
+    fn_80400690(fn_803FF994);
+    return lbl_806EEADC;
 }
 
 extern "C" void fn_803FF994()
