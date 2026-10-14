@@ -731,6 +731,51 @@ hit:
     return 1;
 }
 
+struct Unk80313C14_Fade {
+    char pad0[0x1D4];
+    int m1D4;
+    int m1D8;
+    int m1DC;
+    float m1E0;
+    float m1E4;
+    float m1E8;
+    float m1EC;
+};
+extern int lbl_8068E510;
+extern int lbl_8068E514;
+extern "C" {
+int fn_80400E84();
+int sprintf(char* buf, const char* fmt, ...);
+void* memset(void* p, int c, unsigned n, ...);
+}
+
+/* Draws the loading-progress gradient (misc/textures/grad.gsh); progress is clamped to [0, 1].
+   The first call stamps the time base (fn_80400DA4) that the debug line reports against. */
+extern "C" void fn_80316614(Unk80313C14_Fade* self, int state, float progress)
+{
+    if (self->m1D8 == 0) {
+        char name[0x40] = "";
+        sprintf(name, "misc/textures/grad.%s", "gsh");
+        self->m1D8 = fn_802B9300(name, 0x400, 0xE, 0);
+        self->m1D4 = (int)fn_803DD628(lbl_8062C668(0x58, 0), (char*)self->m1D8 + *(int*)(self->m1D8 + 0x14));
+    }
+    if (self->m1DC == state) {
+        if (lbl_8068E514 == 0) {
+            lbl_8068E510 = fn_80400DA4();
+            lbl_8068E514 = 1;
+        }
+        fn_8033E958("DrawLoadingProgress: %d, %.3f @ %.3f seconds
+", state, progress,
+                    (float)(fn_80400DA4() - lbl_8068E510) / (float)fn_80400E84());
+        int tex = self->m1D4;
+        if (!(progress <= 1.0f))
+            progress = 1.0f;
+        if (!(progress >= 0.0f))
+            progress = 0.0f;
+        fn_803155B4(lbl_8061FEDC, tex, 0, 0, self->m1E0, self->m1E4, self->m1E8 * progress, self->m1EC);
+    }
+}
+
 void fn_803167F0(Unk80313C14_Fl* p, float a, float b, float c, float d)
 {
     p->m1E0 = a;
