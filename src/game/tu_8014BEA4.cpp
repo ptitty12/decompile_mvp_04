@@ -321,7 +321,9 @@ int fn_8014EC94(int a, unsigned b, unsigned c);
 void* fn_8014F008(int a, int b, int c, int d);
 void fn_8014F34C(int a);
 void fn_8014F42C();
-extern const void* lbl_8068B3CC;
+struct Unk8068B3CC_E { int a; int b; int c; };
+struct Unk8068B3CC { const void* vptr; Unk8068B3CC_E e[1]; int m10; };
+extern Unk8068B3CC lbl_8068B3CC;
 extern const char lbl_8065D448[];
 void fn_80378744();
 extern UnkB8_Obj* lbl_8061A32C;
@@ -384,9 +386,246 @@ extern const char lbl_805C5020;
 extern const char lbl_805C5A64[];
 extern const char lbl_805C5ABC[];
 
+class Unk802D73B4_W { public: int m0; Unk802D73B4_W(); };
+class FxReg { public: int m0; int m4; FxReg(); };
+extern int lbl_8061B88C;
+extern unsigned lbl_8062F204;
+extern void (*lbl_80624248)();
+extern Unk8068B3CC* lbl_80624230;
+extern int lbl_8068B3E0;
+extern char lbl_8068B3E4[];
+extern int lbl_8068B3E8;
+extern char lbl_8068B3EC[];
+extern int lbl_8068B3F0;
+extern void* lbl_8062426C;
+extern void* lbl_80624274;
+extern int lbl_8061B9A8;
+extern int lbl_80624284;
+extern int lbl_80624280;
+extern int lbl_8062428C;
+extern int lbl_80624298;
+extern int lbl_8062429C;
+extern int lbl_80624290;
+extern int lbl_80624294;
+extern int lbl_8062427C;
+extern int lbl_80624234;
+extern int lbl_80624238;
+extern int lbl_8062423C;
+extern int lbl_80624240;
+extern int lbl_80624244;
+extern int lbl_8062422C;
+extern void* lbl_80621580;
+extern int lbl_8061B988;
+extern int lbl_8061B9AC;
+extern int lbl_80620334;
+extern int lbl_80620338;
+extern int lbl_8062033C;
+extern int lbl_80620340;
+extern int lbl_8061CBD0;
+extern int lbl_8061BE30;
+extern int lbl_80621548;
+extern void* lbl_8068F1F8;
+extern const char lbl_805C5270[];
+extern const char lbl_805C5284[];
+extern const char lbl_805C544C[];
+extern const char lbl_805C5464[];
+extern const char lbl_805C5474[];
+extern const char lbl_805C5490[];
+extern const char lbl_805C54AC[];
+extern const char lbl_805C5508[];
+extern const char lbl_805C551C[];
+extern const char lbl_805C55F4[];
+extern const char lbl_805C55FC[];
+extern const char lbl_805C5654[];
+struct Unk8014BEB8_FsOpts { int size; void* alloc; void* free; char* heap; int heapSize; };
+class Unk8001C314_T { public: void fn_8001C50C(); void fn_8001C568(); };
+Unk8001C314_T* fn_8001C394();
+void fn_8033E7A4();
+void fn_8043188C();
+void fn_80422FD8();
+void VIInit();
+int PADInit();
+void fn_8000D650();
+extern "C" int atexit(void (*fn)(void));
+void* fn_803579C0(void* self);
+void* fn_80357A70(void* self);
+void* fn_80357AEC(void* self);
+void fn_80377048();
+void fn_803FFE14();
+void fn_803FF888(int hz);
+int fn_80316B90();
+int fn_803FACFC(void* p);
+int fn_803FAD60(void* p);
+int fn_803F9494(int a, int b, int c);
+void* fn_802BB19C__Fv();
+void fn_8014BE28();
+int fn_803EE3D4(int i);
+void* fn_803ED604(const char* name, int sz, int k);
+void fn_803EDA0C(void* b);
+extern char lbl_8068A3CC[];
+void* fn_80312468(void* p);
+void fn_8031392C(int p);
+void fn_800057F0();
+int strcmp(const char* a, const char* b);
+int fn_802D7A84(int* a);
+void fn_802D75D4(int a);
+void fn_80400DE4(int d);
+void fn_80400E18();
+void fn_802D7AC4(int a, int b);
+void fn_8000D6D4();
+void fn_80316310(char* self);
+int DVDChangeDir(const char* path);
+struct Unk8014BEB8_Scr { char pad0[0x1DC]; int m1DC; };
+void fn_803167F0(void* p, float a, float b, float c, float d);
+void fn_800308FC();
+void fn_8014B514();
+void fn_802D3804();
+void fn_802A70F8();
+void fn_802AA210();
+void fn_800AA5F8();
+void fn_80169E38();
+extern const char lbl_805C5664[];
+
 void fn_8014BEA4()
 {
-    lbl_8068B3CC = lbl_8065D448;
+    lbl_8068B3CC.vptr = lbl_8065D448;
+}
+
+/* near-miss (95.9%, 321/321 insns): only the order of the config/constant store groups (lbl_8062427C..80624298,
+   lbl_80624234..80624244) and their callee-saved lis registers differ; hill-climbed and permuted store orders
+   (group sizes 8 and 5, full permutations of the second) tried; the unused-looking local 'z' holds the zero that
+   fn_802D7A84 receives by pointer.
+   System start-up (called first from fn_8014C5A4): initialises the OS, DVD, VI and pad libraries, the
+   memory pools and the frame timer ("UPDATEhz = %d" with 60), builds the global singletons and finishes with
+   "Init complete!". argc/argv are scanned for "-inifile". */
+void fn_8014BEB8(int argc, char** argv)
+{
+    int savedFlag = lbl_8061B88C;
+    lbl_8061B88C = 0;
+    lbl_8062F204 = 0x80000000;
+    fn_8043188C();
+    fn_80422FD8();
+    VIInit();
+    PADInit();
+    fn_8033E958(lbl_805C5270);
+    fn_8000D650();
+    fn_8033E958(lbl_805C5284);
+    lbl_80624248 = fn_8033E7A4;
+    fn_8000E65C();
+    if (lbl_8068B3E0 == 0) {
+        Unk8068B3CC* o = &lbl_8068B3CC;
+        fn_803579C0(o);
+        lbl_8068B3CC.vptr = lbl_8065D448;
+        int i = 0;
+        Unk8068B3CC_E* e = o->e;
+        do {
+            e->a = -1;
+            e->b = 0;
+            e->c = 0;
+            e++;
+        } while (i-- != 0);
+        o->m10 = 0;
+        lbl_8068B3E0 = 1;
+        atexit(fn_8014BEA4);
+    }
+    lbl_80624230 = &lbl_8068B3CC;
+    fn_80377048();
+    if (lbl_8068B3E8 == 0) {
+        fn_80357A70(lbl_8068B3E4);
+        lbl_8068B3E8 = 1;
+    }
+    lbl_8062426C = lbl_8068B3E4;
+    if (lbl_8068B3F0 == 0) {
+        fn_80357AEC(lbl_8068B3EC);
+        lbl_8068B3F0 = 1;
+    }
+    lbl_8062427C = 0;
+    lbl_80624298 = 0x44C;
+    lbl_80624280 = 0;
+    lbl_80624284 = lbl_8061B9A8;
+    lbl_8062428C = 0x55F0;
+    lbl_8062429C = 0x1F4;
+    lbl_80624290 = 0x1F4;
+    lbl_80624274 = lbl_8068B3EC;
+    lbl_80624294 = 0x1F4;
+    fn_803FFE14();
+    fn_8033E958(lbl_805C544C);
+    fn_803FF888(0x3C);
+    fn_8033E958(lbl_805C5464, 0x3C);
+    fn_80316B90();
+    Unk8014BEB8_FsOpts opts;
+    opts.size = 0x14;
+    fn_803FACFC(&opts);
+    opts.alloc = (void*)fn_803ED604;
+    opts.free = (void*)fn_803EDA0C;
+    opts.heap = lbl_8068A3CC;
+    opts.heapSize = 0x1000;
+    fn_803FAD60(&opts);
+    fn_803F9494(0x20, 0x800, 0x30);
+    fn_802BB19C__Fv();
+    fn_8014BE28();
+    lbl_8061B88C = savedFlag;
+    fn_8033E958(lbl_805C5474);
+    fn_8033E958(lbl_805C5490, fn_803EE3D4(0));
+    lbl_80624238 = 0x32;
+    lbl_8062423C = 0x3C;
+    lbl_80624240 = 0x46;
+    lbl_80624244 = 0x6E;
+    lbl_80624234 = 0x5F;
+    fn_80312468(operator new(0x20C, 0));
+    fn_8031392C(lbl_8061FEDC);
+    lbl_8062422C = lbl_8061FEDC;
+    fn_800057F0();
+    int idx = 0;
+    char** a = argv;
+    while (idx < argc && (*a == 0 || strcmp(*a, lbl_805C54AC) != 0)) {
+        a++;
+        idx++;
+    }
+    lbl_80621580 = operator new(1, 0);
+    lbl_8061B988 = 0;
+    fn_8033E958(lbl_805C5508);
+    lbl_8061B984 = (V0_8014D6A4*)new (0) Unk802D73B4_W;
+    int z = 0;
+    fn_802D7A84(&z);
+    fn_802D75D4(0);
+    int j = 0;
+    while (j < lbl_8061B9AC) {
+        j++;
+        fn_802D75D4(0);
+        fn_80400DE4(1);
+        fn_80400E18();
+    }
+    fn_802D7AC4(0, 0);
+    fn_802D7AC4(1, 1);
+    fn_8000D6D4();
+    fn_80316310((char*)lbl_8061FEDC);
+    fn_8033E958(lbl_805C551C);
+    lbl_80621548 = 0;
+    lbl_80620334 = 0;
+    lbl_80620338 = 0;
+    lbl_8062033C = 0;
+    lbl_80620340 = 0;
+    lbl_8061CBD0 = 0;
+    lbl_8061BE30 = 1;
+    fn_8001C394();
+    DVDChangeDir(lbl_805C55F4);
+    ((Unk8014BEB8_Scr*)lbl_8061FEDC)->m1DC = 2;
+    fn_803167F0((void*)lbl_8061FEDC, 0.323f, 0.838f, 0.358f, 0.022f);
+    fn_80316614((void*)lbl_8061FEDC, 2, 0.02f);
+    fn_800308FC();
+    fn_8014B514();
+    fn_802D3804();
+    fn_802A70F8();
+    fn_802AA210();
+    fn_800AA5F8();
+    fn_80169E38();
+    lbl_8068F1F8 = new (0) FxReg;
+    fn_8033E958(lbl_805C55FC);
+    fn_8001C394()->fn_8001C50C();
+    fn_8033E958(lbl_805C5654);
+    fn_8001C394()->fn_8001C568();
+    fn_8014EB44();
 }
 
 void fn_8014C3BC() { fn_80378744(); }
@@ -460,7 +699,7 @@ void fn_8014C5A4(int a, char** b)
     unsigned char* settings = fn_8007FE04__FP13Unk8007F198_D(lbl_8061930C);
     unsigned char* levels = settings + 4;
     Unk8001BC8C* snd = fn_8001BC4C();
-    snd->fn_8001C05C(0, (unsigned)settings[4] * (1.0f / 255.0f), 1); /* levels[0]: loaded before 'levels' is formed */
+    snd->fn_8001C05C(0, (unsigned)settings[4] * (1.0f / 255.0f), 1);
     snd->fn_8001C05C(3, (unsigned)levels[3] * (1.0f / 255.0f), 1);
     snd->fn_8001C05C(1, (unsigned)levels[1] * (1.0f / 255.0f), 1);
     snd->fn_8001C05C(4, (unsigned)levels[4] * (1.0f / 255.0f), 1);
