@@ -1147,7 +1147,7 @@ extern "C" DB_OVERLAY int fn_805934C0(Db805919E8_M* m, int key, int start, int f
     return i;
 }
 
-/* near-miss (98.2%): the call to fn_800A2E90 reads lbl_80619948 through a hoisted `lis` above the m4 store; retail keeps it below. */
+/* Retail keeps each branch's total store before the following global-address load. */
 extern "C" DB_OVERLAY void fn_805935B8(Db805919E8_M* m, int id)
 {
     Db805935B8_Obj* o = lbl_806192E0->m4;
@@ -1172,6 +1172,7 @@ extern "C" DB_OVERLAY void fn_805935B8(Db805919E8_M* m, int id)
         }
         fs[m->m12B70 * 4] = o->mC->m18;
         idx = m->m12B70;
+        vals[idx * 4] = total;
     } else {
         ids = (int*)(mc + 0x12AC0);
         vals = (int*)(mc + 0x12AC4);
@@ -1184,8 +1185,8 @@ extern "C" DB_OVERLAY void fn_805935B8(Db805919E8_M* m, int id)
         }
         fs[m->m12B74 * 4] = o->mC->m18;
         idx = m->m12B74;
+        vals[idx * 4] = total;
     }
-    vals[idx * 4] = total;
     void** gp = &lbl_80619948;
     if (fn_800A2E90(*gp) != 0) {
         int n = m->m12B70;

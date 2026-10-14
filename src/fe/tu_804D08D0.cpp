@@ -3,6 +3,7 @@
  * placeholder TU). Define every function FE_OVERLAY (game/overlay.h); data extern by lbl_ name.
  */
 #include "game/fe_804D08D0.h"
+#include "game/tu_8007A4DC.h"
 
 extern "C" {
 FE_OVERLAY void fn_804D08D0(FeS804D08D0* x)
@@ -455,4 +456,46 @@ FE_OVERLAY void fn_804D2A28(FeNav* n, int a, FeW* w)
         }
     }
 }
+}
+
+extern const char lbl_805F84C8[], lbl_805F84DC[], lbl_805F84F0[], lbl_805F8504[];
+extern "C" FE_OVERLAY void fn_804D0B60(FeS804D08D0* x, int group, int update)
+{
+    char name[24];
+    FeW* text;
+    FeW* icon;
+    int handle;
+    if (group == 0) {
+        text = fn_800C8040(x->fn_vslot29(lbl_805F84C8));
+        icon = x->fn_vslot28(lbl_805F84DC);
+        handle = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007DA34(x->m188.m38);
+    } else {
+        text = fn_800C8040(x->fn_vslot29(lbl_805F84F0));
+        icon = x->fn_vslot28(lbl_805F8504);
+        handle = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007DA34(x->m144.m38);
+    }
+    if (handle != -1) {
+        ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007CF44(handle, (int)name, 0);
+        text->fn_vslot28(name);
+        if (icon) {
+            if (((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007DADC(handle)) {
+                if (!icon->b0) icon->fn_vslot8(1);
+            } else icon->fn_vslot8(0);
+        }
+        if (update) {
+            fn_800B555C();
+            if (fn_800B57EC() == 0) {
+                int id = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007D098(handle, 0);
+                FeNav* nav;
+                if ((group == 0 && fn_804D24B0(nav = &x->m188)) ||
+                    (group == 1 && fn_804D24B0(nav = &x->m144))) {
+                    ((FeS804D1070*)fn_804D2310(nav))->m144 = id;
+                    fn_804D2310(nav)->fn_vslot87();
+                }
+            }
+        }
+    } else {
+        ((FeWV*)text)->s29(0xBBC);
+        if (icon) icon->fn_vslot8(0);
+    }
 }
