@@ -411,7 +411,7 @@ void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 /* ==== OSExec ==== */
 
 extern int fn_80424C14(DVDCommandBlock* block, void* addr, s32 length, s32 offset, void* callback, s32 prio);  /* DVDReadAbsAsyncPrio */
-extern s32 fn_80425064(DVDCommandBlock* block);        /* DVDGetCommandBlockStatus */
+extern s32 fn_80425064(const DVDCommandBlock* block);  /* DVDGetCommandBlockStatus */
 extern BOOL fn_80425510(void);                         /* DVDCheckDisk */
 extern void fn_804361BC(int);                          /* __OSDoHotReset */
 extern s32 lbl_806EF7F8;                               /* Prepared */
