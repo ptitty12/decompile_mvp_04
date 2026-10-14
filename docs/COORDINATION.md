@@ -56,6 +56,13 @@ counts as live while it has run any coord command in the last 45 minutes.
    to someone else's push. The progress bot is exempt: it pushes only
    `docs/progress/`, which the gate already tolerates. A lock not refreshed
    for 45 minutes expires.
+
+   Rebase onto origin/main *inside* the locked command, never before
+   queuing: main moves while you wait. integrate.py already starts from a
+   fresh origin/main. A plain docs or tools push looks like this:
+   ```
+   python tools/coord.py run-locked claude-side-rea --purpose "docs" -- bash -c "git fetch -q origin && git rebase -q origin/main && git push origin HEAD:main"
+   ```
 4. **When a unit is merged or abandoned, release it.**
    `python tools/coord.py release codex-sw03 fe/tu_804FE34C` (or `--all`).
 5. **Talking:** `send <you> <to> "<text>"`, where `<to>` is an agent name or
