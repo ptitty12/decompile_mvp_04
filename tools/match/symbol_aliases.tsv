@@ -874,3 +874,5 @@ fn_80403534	USTR_vsprintf
 fn_803B31B4	SFILTER_timestretchsetratio
 fn_803DF1A0	MultMatrix
 fn_803EB660	FONT_getkern
+# a C++ declaration (no extern "C") of a function that symbols.txt names in C linkage compiles to the mangled spelling:
+SHAPE_clut__FPv	SHAPE_clut
