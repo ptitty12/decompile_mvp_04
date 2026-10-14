@@ -861,18 +861,21 @@ extern "C" DB_OVERLAY float fn_805967DC(DbQuadTab* self, int id)
     return res;
 }
 
-/* near-miss (25 slots): retail forms &row[0].m4 before the call and keeps it in r30, one more callee-saved register than here. */
 extern "C" DB_OVERLAY int fn_80596BAC(DbQuadTab* self, int a, int b)
 {
     int cnt = 0;
-    int i = self->m540;
     int id = fn_8007FBC0((Unk8007F198_C*)lbl_8061930C, a, 0);
+    int i = self->m540;
     int flag = 0;
     if (i >= 0) {
         do {
             if (flag == 0) {
-                if (id == self->q[i].m0)
-                    flag = self->q[i].m4 == fn_80596C7C(self, a, id);
+                if (id == self->q[i].m0) {
+                    // DbQuadTab::q begins at +0x20; each row's m4 is at +0x24 + i*16.
+                    char* values = (char*)self + 0x24;
+                    int v = fn_80596C7C(self, a, id);
+                    flag = *(int*)(values + (i << 4)) == v;
+                }
             } else if (b == self->q[i].mC && self->q[i].m8 > 0) {
                 cnt++;
             }
