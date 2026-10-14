@@ -303,3 +303,31 @@
 - 2026-10-13 19:15 CDT | Sole-integrator matching batch: root15, coordinator54 and local49/local52/local53 add six net exact functions /2,036 code bytes versus published199b90d8; Notes-only A8/B8/root16 add no count. C9 canonical key/int-output preparation preserves all 64 affected functions, sections and relocations and adds no functions. Binary branch evidence corrects the front-end zero-selector arm; ordinary heap-address temporaries and per-arm DB total stores recover the remaining exact functions. Full worker builds, zero literal mismatches and final committed-HEAD verification pass; stock integration gates the combined batch before push. Six workers continue in disjoint four-unit packets, filtering main and durable attempt records; no new source linking.
 
 - 2026-10-13 19:45 CDT | Sole-integrator matching batch: local56/local58 and corrected A9 add seven exact functions /1,432 code bytes versus published73e1fc3a. Root55/root59/local57/localFE09 contribute only required near-miss notes. Canonical date pointer identity, existing record lifetime and sound buffer arithmetic match real providers; full worker builds, zero literal mismatches and final committed-HEAD verifier gates pass. Stock integration gates and pushes the combined batch under the shared integration lock. Six workers continue fresh four-unit matching packets; no new source linking.
+- 2026-10-13 | Claude Opus 5.5 (lead, solo at the owner's request, ~15:15-19:45 CDT; no fleet) | near-misses, SDK splits, link names | main 20,931 -> ~21,060 functions with Codex and the "REA library usage" session working in parallel.
+  - Near-misses converted by hand, all merged with VERIFY PASS:
+    - snd: fn_803A9CF4, fn_803B02FC, fn_803B3E18, fn_803B6D58, fn_803B75A8, fn_803B3F60 (tu_803B3E18 complete).
+    - game: fn_8011AA24, fn_80104798, fn_8010EAF4, fn_8010A284, fn_8010FFD8; fn_8010FE70 raised from 94.2% to 97.8%.
+    - Most were wrong callee declarations:
+      - a missing pass-through parameter (fn_803AB310(h), fn_8006BC74(p, idx));
+      - a C++ declaration of an extern "C" callee with the wrong return type (fn_800DE440, fn_80403DE4);
+      - strncpy called under its placeholder name.
+    - Others: an int-held table base for the r11 index register, an early return/else to place `li r3,-1`, a plain `while (rem--)` loop.
+  - SDK splits, now possible because verify follows moved functions (PR #135):
+    - dolphin/os/OSTime.c (0x80438628, -opt nopeephole): __OSGetSystemTime and __OSTimeToSystemTime match.
+    - dolphin/gx/GXFifo.c (0x80429FF0); the GXInit.c tail (tu_80428F14) gets -opt nopeephole: __GXInitRevisionBits and GXInit (1,956 B) match.
+    - Bodies come from the RE4 decomp's dolsdk2004 sources, ported by the REA session's worker.
+  - Link names: C++-linkage declarations of extern "C" callees were made extern "C" across about 205 files, with no codegen change (verify). linkcheck's c++->C group fell from 6,290 to 2,215 relocations. 56 names stay C++ because some files declare them as overloads.
+  - Evening, owner "keep solving functions": fn_802B2C98 (float store order, brute force), fn_80319534 (m34 store moved after m40), fn_80391C20 (index array address held as an int: index-first lhzx).
+  - Coordination: registered as claude-lead in tools/coord.py (docs/COORDINATION.md); integ.sh now runs integrate.py under `coord.py run-locked claude-lead`; nm-09/nm-10 units claimed.
+  - Parked near-misses (5-30 variants each; allocator ties): fn_803A7924, fn_803B7700, fn_803B5B6C, fn_803A6B64, fn_803A94BC, fn_80122570, fn_800EF2FC, fn_80220BFC, fn_8025AC0C (Vec3 slot), fn_802C920C (constant reassociation), fn_80391DC4, fn_803EDD8C, fn_8058DBEC (rec/fl register swap), fn_80392884, fn_802C7EF8.
+  - SDK backlog from the RE4 worker (lead-owned config; notes in that session's scratchpad sdk1/sdk2):
+    - dolphin/os/tu_804321CC: OnReset fn_80432904 matches with nopeephole; needs a file split.
+    - dolphin/os/tu_80435A10: ranges 0x80435BD0..0x80435CE8 and 0x80436154..0x8043643C match with nopeephole; UnlockSram needs OSRtc.c as its own unit.
+    - dolphin/os/tu_804330D0 is 8 SDK files with mixed flags (OSCache, OSContext, OSExec Run and OSInterrupt want nopeephole). About 5.7 KB.
+    - __GXInitGX (2,360 B) needs GXInit.c's data as TU statics.
+    - symbols.txt: lbl_80437270 (end label inside fn_80437254) and the resetFuncRegistered$145 rename.
+    - dolphin/ar/ar.c can become Matching (__ARChecksize matched).
+  - Tool notes for the owner:
+    - sort_functions.py moved type definitions below their first use in game/tu_80341B78 (needs a guard).
+    - rename.py hung 12 minutes on dolphin/ar/ar.c (needs a timeout).
+    - integrate.py loses push races when verify takes 10-20 minutes and main moves every few minutes; my merges needed up to 6 attempts.

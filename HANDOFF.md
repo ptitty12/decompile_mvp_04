@@ -14,6 +14,8 @@ DECISIONS "Open questions for owner"; then keep working.
 
 ## Session 2 status (lead, updated 2026-10-13 00:30 CDT; this block overrides sections 1, 4 and 7 below)
 
+**Update 2026-10-13 evening:** the lead worked solo, without the fleet, at the owner's request. See the PROGRESS entry of that date for the hand-matched near-misses, the OSTime.c and GXFifo.c splits, the extern "C" declaration fix, and the SDK backlog from the RE4 worker. Integration now goes through the shared lock (tools/coord.py run-locked, docs/COORDINATION.md); tools/team/lead/integ.sh does this.
+
 **Stopped by the owner at 00:10 CDT ("spin down").** No agents are running. Every committed worker branch is merged (see PROGRESS, 2026-10-13 entry for the final count). The fleet restarts only when a lead session is started by hand, or when the scheduled task `mvp-decomp-lead-resume` is re-enabled (it was disabled at shutdown).
 
 ### State
