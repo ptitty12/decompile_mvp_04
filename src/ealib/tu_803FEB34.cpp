@@ -393,7 +393,7 @@ extern "C" void fn_803FF210()
 
 extern "C" void fn_803FFA60(char* d, const char* s, int n);
 extern "C" int DVDReadAsyncPrio(void* fi, void* addr, int len, int off, void (*cb)(int, int), int prio);
-extern "C" void fn_80432FA8(void* p, int n);
+extern "C" void DCInvalidateRange(void* p, int n);
 
 extern "C" void fn_803FF244(void* fi)
 {
@@ -403,7 +403,7 @@ extern "C" void fn_803FF244(void* fi)
         lbl_806ADEC0.m8 += lbl_806ADEC0.m34;
         lbl_806ADEC0.m4 += lbl_806ADEC0.m34;
     } else if (st == 3) {
-        fn_80432FA8((void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4);
+        DCInvalidateRange((void*)lbl_806ADEC0.m4, lbl_806ADEC0.m1C - lbl_806ADEC0.m4);
         int t = lbl_806ADEC0.m1C - lbl_806ADEC0.m4;
         lbl_806ADEC0.m8 += t;
         lbl_806ADEC0.m4 += t;
@@ -534,8 +534,8 @@ struct LowMem {
 #define LOWMEM ((LowMem*)0x80000000)
 extern int lbl_806EEADC;
 extern "C" {
-long long fn_80438628(void);
-void fn_804324EC(void* alarm, long long start, long long period, void (*handler)());
+long long OSGetTime(void);
+void OSSetPeriodicAlarm(void* alarm, long long start, long long period, void (*handler)());
 void fn_8040015C(void);
 void fn_80400690(void (*cb)());
 void fn_803FF994();
@@ -550,10 +550,10 @@ extern "C" int fn_803FF888(int hz)
     if (hz == 0)
         hz = 100;
     lbl_806EEADC = hz;
-    long long start = fn_80438628();
+    long long start = OSGetTime();
     long long period = (int)((float)(LOWMEM->busClock >> 2) * (1.0f / (float)hz));
     fn_8040015C();
-    fn_804324EC(lbl_806B82E0, start, period, fn_803FFA3C);
+    OSSetPeriodicAlarm(lbl_806B82E0, start, period, fn_803FFA3C);
     lbl_806EEAB1 = 1;
     fn_80400690(fn_803FF994);
     return lbl_806EEADC;
