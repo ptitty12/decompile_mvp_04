@@ -45,7 +45,7 @@ void fn_803A6644(int a);
 extern "C" int fn_803A82A8(int* out, int a);
 int fn_803A8530(int a);
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
-int fn_803A84BC(int a);
+int fn_803A84BC(int a, int b);
 extern "C" int fn_803A6B64(int a, const char* b, int c, void (*cb)(int, int));
 Unk80040640* fn_8004072C();
 void fn_800404A8(int u, int size);
@@ -155,11 +155,10 @@ int Unk800401E4::fn_800404E0(int* p, const char* name)
     int r = fn_803A82A8(&m4, *p);
     if (r >= 0) {
         if (r == 7) {
-            char* t = new (0x400) char[fn_803A8530(m4)];
-            m0 = (int)t;
-            if (t == 0) {
+            m0 = (int)(new (0x400) char[fn_803A8530(m4)]);
+            if (m0 == 0) {
                 ok = 0;
-            } else if (fn_803A84BC(m4) < 0) {
+            } else if (fn_803A84BC(m0, m4) < 0) {
                 ok = 0;
                 if (m0 != 0)
                     delete[] (char*)m0;
