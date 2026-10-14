@@ -216,6 +216,19 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   D4 is confirmed: 10.7 thread switches per VI field, 11.75% of instructions interpreted early in boot and 1.13% over a long run. Reducing unwinds per switch is the next optimization. | These keep every source of time inside the guest (CLAUDE.md determinism invariant), so the same constants on every machine give identical runs. | commit f060c66c; local test local_boot_twice
 
+- 2026-10-14 | **Engine toolchain downloads approved by the owner.** Owner, in chat: "yes you can download the engine tool chain go crazy feel free to notify me if you have other questions but mostly i trust you". This covers:
+  - the Emscripten SDK (github.com/emscripten-core/emsdk);
+  - a native WebGPU implementation (Dawn, or wgpu-native prebuilts from their official releases);
+  - developer libraries the engine needs, such as SDL3.
+
+  Everything goes under `C:\Users\Patrick Taylor\tools-ext\`, with exact versions pinned in `docs/engine/TOOLCHAIN.md`. Nothing game-related is downloaded, ever. | E1 (renderer) and E2 (browser) need them. | owner reply in chat
+- 2026-10-14 | **Owner permits the K1c change to the protected linker script.** Owner, in chat, quoting the lead's note that the four linker symbols must be added to `config/GV4E69/ldscript.ld`: "you can change this i give permission".
+  - Scope: add `_stack_addr`, `_stack_end`, `__ArenaLo` and `__ArenaHi` (the exact lines in the K1c open question below).
+  - Refresh only `ldscript.ld`'s line in `tools/verify/protected.sha256`, using `python tools/verify/verify.py --print-protected`, so CI's integrity job stays consistent.
+  - No other protected file changes.
+
+  The lead also accepts the K1c link-order fix (12 `.sbss` split lines dropped, `libc/errno.c` with `-fcommon`; staged as `staged/k1c-scommon`, VERIFY PASS) under the owner's 2026-10-14 delegation. | dtk's SDK signatures for `__start`, OSInit and `__OSThreadInit` relocate to linker-defined symbols. Naming OSInit and DVDInit needs them. | owner reply in chat
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit) is held on two things only the owner or the lead can change.** Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Two blockers remain:
