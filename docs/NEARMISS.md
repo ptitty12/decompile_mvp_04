@@ -392,3 +392,5 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `ealib/tu_803DBFF4` `fn_803DD068` (568 B): 99.788734%, eight forms; 142/142 words, six register differences in the final direct-texture branch; draft `build/swarm53/DD068-v8.cpp`.
 
 - `snd/tu_803AB310` `fn_803AC5CC`: swarm55 eight ordinary lifetime/global-pointer/block-scope forms; best95.8871%,62/62words, global/result saved-register allocation and result-move versus installed-store scheduling differ; source unchanged, scratch build/root55/AC5CC.
+
+- `fe/tu_8050C9DC` `fn_8050DD7C`: swarm55 eight ordinary field-store/lifetime orders with truthful int-address fn_80080EC4 boundary; best95.918365%,147/147words,four slots remain around final p2 store and float/p1-zero scheduling; source unchanged, scratch build/root55/DD7C.
