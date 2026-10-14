@@ -16,7 +16,7 @@ extern "C" void SNDPLATFORM_stop(int voice);
 extern "C" int fn_803FD944(int a, int b, int c);
 extern "C" void fn_803AA810(int h, int a, void* b, int c, int d);
 extern "C" int fn_803FE914(int h);
-extern "C" void fn_803FDD78(int h, int v);
+extern "C" void STREAM_setgreedylevel(int h, int v);
 extern "C" void SNDCTRL_timemult(int shandle, int v);
 
 extern unsigned char lbl_8069C9E4[7];
@@ -199,7 +199,7 @@ extern "C" int SNDSTRM_setgreedylevel(int h, int v)
     SNDSTREAMCHANNEL* pssc = SNDSTRMI_getstreamptr(h);
     if (pssc == 0)
         return -8;
-    fn_803FDD78(pssc->streamhandle, v);
+    STREAM_setgreedylevel(pssc->streamhandle, v);
     return 0;
 }
 

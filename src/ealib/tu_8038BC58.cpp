@@ -465,12 +465,12 @@ extern "C" int fn_803AC11C();
 extern "C" void DEBUG_break();
 extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_803FD964(int a, int b, int c, int d, int e);
-extern "C" int fn_803FDE54(int a, int b);
-extern "C" void fn_803FDD28(int h, int a, int b);
-extern "C" int fn_803FDFB4(int a, int b, int c, int d);
-extern "C" void fn_803FDBC4(int h, int a, int b, int c, int d);
-extern "C" int fn_803FB59C(int a, int b);
-extern "C" int fn_803FDEC0(int a, int b, int c, int d);
+extern "C" int STREAM_taphandle(int a, int b);
+extern "C" void STREAM_setpriority(int h, int a, int b);
+extern "C" int STREAM_queuemem(int a, int b, int c, int d);
+extern "C" void STREAM_setfilter(int h, int a, int b, int c, int d);
+extern "C" int ASYNCFILE_load(int a, int b);
+extern "C" int STREAM_queuefile(int a, int b, int c, int d);
 extern char lbl_80605F8C[];
 extern char lbl_80605FA4[];
 extern int lbl_80699B9C;
@@ -523,25 +523,25 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
         *(int*)(s + 0x08) = (int)lbl_80699B94.m0(lbl_80605FA4, g, 0, 0, lbl_80699B94.m8);
         *(int*)(s + 0x30) = fn_803FD964(2, 2, 1, *(int*)(s + 0x04), c);
         *(int*)(s + 0x34) = fn_803FD964(2, 2, 1, *(int*)(s + 0x08), g);
-        fn_803FDD28(*(int*)(s + 0x34), 0x98, 0x34);
-        fn_803FDD28(*(int*)(s + 0x30), 0x98, 0x34);
-        fn_803FDBC4(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
-        fn_803FDBC4(*(int*)(s + 0x30), 2, 0, 0, -2);
+        STREAM_setpriority(*(int*)(s + 0x34), 0x98, 0x34);
+        STREAM_setpriority(*(int*)(s + 0x30), 0x98, 0x34);
+        STREAM_setfilter(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
+        STREAM_setfilter(*(int*)(s + 0x30), 2, 0, 0, -2);
         if (*(int*)(s + 0x1C) == 0)
-            fn_803FDBC4(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, 1);
+            STREAM_setfilter(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, 1);
         else
-            fn_803FDBC4(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, -1);
-        fn_803FDBC4(*(int*)(s + 0x34), 2, 0, 0, -2);
+            STREAM_setfilter(*(int*)(s + 0x34), 1, 0xFFFF, 0x4353, -1);
+        STREAM_setfilter(*(int*)(s + 0x34), 2, 0, 0, -2);
         int mode = *(int*)(s + 0x18);
         if (mode == 1) {
-            *(int*)(s + 0x2C) = fn_803FB59C(e, lbl_80699B94.m8);
-            *(int*)(s + 0x24) = fn_803FB59C(a, lbl_80699B94.m8);
+            *(int*)(s + 0x2C) = ASYNCFILE_load(e, lbl_80699B94.m8);
+            *(int*)(s + 0x24) = ASYNCFILE_load(a, lbl_80699B94.m8);
         } else if (mode == 0) {
-            *(int*)(s + 0x3C) = fn_803FDEC0(*(int*)(s + 0x34), e, h, 0);
-            *(int*)(s + 0x38) = fn_803FDEC0(*(int*)(s + 0x30), a, d, 0);
+            *(int*)(s + 0x3C) = STREAM_queuefile(*(int*)(s + 0x34), e, h, 0);
+            *(int*)(s + 0x38) = STREAM_queuefile(*(int*)(s + 0x30), a, d, 0);
         } else if (mode == 2) {
-            *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
-            *(int*)(s + 0x3C) = fn_803FDFB4(*(int*)(s + 0x34), *(int*)(s + 0x10), f, 0);
+            *(int*)(s + 0x38) = STREAM_queuemem(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
+            *(int*)(s + 0x3C) = STREAM_queuemem(*(int*)(s + 0x34), *(int*)(s + 0x10), f, 0);
         }
     } else {
         *(int*)(s + 0x14) = e;
@@ -549,29 +549,29 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
         *(int*)(s + 0x04) = p;
         *(int*)(s + 0x08) = e;
         *(int*)(s + 0x30) = fn_803FD964(2, 3, 2, p, c);
-        *(int*)(s + 0x34) = fn_803FDE54(*(int*)(s + 0x30), 2);
-        fn_803FDD28(*(int*)(s + 0x34), 0x98, 0x34);
-        fn_803FDD28(*(int*)(s + 0x30), 0x98, 0x34);
-        fn_803FDBC4(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
-        fn_803FDBC4(*(int*)(s + 0x30), 3, 0, 0, -2);
+        *(int*)(s + 0x34) = STREAM_taphandle(*(int*)(s + 0x30), 2);
+        STREAM_setpriority(*(int*)(s + 0x34), 0x98, 0x34);
+        STREAM_setpriority(*(int*)(s + 0x30), 0x98, 0x34);
+        STREAM_setfilter(*(int*)(s + 0x30), 1, 0xFF, 0x4D, 1);
+        STREAM_setfilter(*(int*)(s + 0x30), 3, 0, 0, -2);
         if (*(int*)(s + 0x1C) == 0)
-            fn_803FDBC4(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, 2);
+            STREAM_setfilter(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, 2);
         else
-            fn_803FDBC4(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, -1);
+            STREAM_setfilter(*(int*)(s + 0x30), 2, 0xFFFF, 0x4353, -1);
         int mode = *(int*)(s + 0x18);
         if (mode == 1) {
-            *(int*)(s + 0x24) = fn_803FB59C(a, lbl_80699B9C);
+            *(int*)(s + 0x24) = ASYNCFILE_load(a, lbl_80699B9C);
         } else if (mode == 0) {
-            *(int*)(s + 0x38) = fn_803FDEC0(*(int*)(s + 0x30), a, d, 0);
+            *(int*)(s + 0x38) = STREAM_queuefile(*(int*)(s + 0x30), a, d, 0);
         } else if (mode == 2) {
-            *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
+            *(int*)(s + 0x38) = STREAM_queuemem(*(int*)(s + 0x30), *(int*)(s + 0x0C), b, 0);
         }
     }
 }
 
 struct VdRes2;
 extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b);
-extern "C" int fn_803FB764(int id, int* p1, int* p2);
+extern "C" int ASYNCFILE_release(int id, int* p1, int* p2);
 extern "C" int fn_8038E3EC(int a, int* b);
 extern "C" int fn_8038E440(int a, int* b, int c);
 extern "C" int fn_8038DF3C(I* s, unsigned rate);
@@ -593,15 +593,15 @@ extern "C" int fn_8038DB54(char* s, int a, int b)
 {
     int sp18;
     int sp1C;
-    fn_803FDD28(*(int*)(s + 0x34), 0x97, 0x33);
-    fn_803FDD28(*(int*)(s + 0x30), 0x97, 0x33);
+    STREAM_setpriority(*(int*)(s + 0x34), 0x97, 0x33);
+    STREAM_setpriority(*(int*)(s + 0x30), 0x97, 0x33);
     if (*(int*)(s + 0x24) != 0) {
-        fn_803FB764(*(int*)(s + 0x24), (int*)(s + 0x20), &sp18);
-        *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x20), sp18, 0);
+        ASYNCFILE_release(*(int*)(s + 0x24), (int*)(s + 0x20), &sp18);
+        *(int*)(s + 0x38) = STREAM_queuemem(*(int*)(s + 0x30), *(int*)(s + 0x20), sp18, 0);
     }
     if (*(int*)(s + 0x2C) != 0) {
-        fn_803FB764(*(int*)(s + 0x2C), (int*)(s + 0x28), &sp1C);
-        *(int*)(s + 0x3C) = fn_803FDFB4(*(int*)(s + 0x34), *(int*)(s + 0x28), sp1C, 0);
+        ASYNCFILE_release(*(int*)(s + 0x2C), (int*)(s + 0x28), &sp1C);
+        *(int*)(s + 0x3C) = STREAM_queuemem(*(int*)(s + 0x34), *(int*)(s + 0x28), sp1C, 0);
     }
     if (*(int*)(s + 0x14) == 0)
         *(int*)(s + 0x3C) = *(int*)(s + 0x38);
@@ -731,11 +731,11 @@ extern "C" int fn_8038E3EC(int a, int* b)
     return fn_8038E1A8(*b, a);
 }
 
-extern "C" int fn_803FE7E0(int a, int b);
+extern "C" int STREAM_release(int a, int b);
 
 extern "C" int fn_8038E418(char* a, int* b)
 {
-    return fn_803FE7E0(*(int*)(a + 0x30), *b);
+    return STREAM_release(*(int*)(a + 0x30), *b);
 }
 
 extern "C" int fn_8038E440(int a, int* b, int c)
@@ -977,7 +977,7 @@ struct VdAlloc {
     void (*fn)(void*);
     int padC[3];
 };
-extern "C" void fn_803FDC80(int p);
+extern "C" void STREAM_destroy(int p);
 extern "C" void FILESYS_getopts(VdAlloc* a);
 class VdX2 {
 public:
@@ -1016,10 +1016,10 @@ VdX2::~VdX2()
         lbl_80699B94.m4(m60);
         m60 = 0;
     }
-    fn_803FDC80(m30);
+    STREAM_destroy(m30);
     m30 = 0;
     if (m14 != 0) {
-        fn_803FDC80(m34);
+        STREAM_destroy(m34);
         m34 = 0;
     }
     void* p = m20;

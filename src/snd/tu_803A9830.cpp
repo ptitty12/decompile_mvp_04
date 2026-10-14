@@ -20,7 +20,7 @@ extern "C" int fn_803AB9F0(int h, int ch, float vol);
 extern "C" void* SNDSTRMI_getrequestptr(int h);
 extern "C" void SNDLINKI_remove(SNDLINKLIST* list, void* node);
 extern "C" void SNDLINKI_push(SNDLINKLIST* list, void* node);
-extern "C" void fn_803FE7E0(int handle, void* p);
+extern "C" void STREAM_release(int handle, void* p);
 extern "C" int fn_803AA95C(int h);
 /* near-miss: 60 vs 70 insns: retail keeps both arms of the `if (req->isgeneric)` tests (numframes load and the psamples loop) as separate code with different temporaries, presumably an endian-conversion macro that expands to the same value in both arms; ours merges the arms. temp-variable variants tried */
 extern "C" void SNDSTRMI_parsedata(SNDSTREAMCHANNEL* pssc, int* hdr);
@@ -32,15 +32,15 @@ extern "C" void SNDSYS_leavecritical();
 extern "C" int SNDSTRMI_numcreated();
 extern "C" int fn_803AAA3C(int h);
 extern "C" void SNDSTRMI_service();
-extern "C" void fn_803FDC80(int h);
-extern "C" void fn_803FE418(int h);
+extern "C" void STREAM_destroy(int h);
+extern "C" void STREAM_kill(int h);
 struct RcHnd;
-extern "C" unsigned char* fn_803FE660(RcHnd* h);
+extern "C" unsigned char* STREAM_get(RcHnd* h);
 extern "C" int SNDSTRMI_create(void* a, int b, void* c, void* d, int e, int f, int g);
 extern void* lbl_8069CA44;
 extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type);
-extern "C" int fn_803FDEC0(int sh, void* a, void* b, int tag);
-extern "C" int fn_803FDFB4(int sh, void* a, int b, int tag);
+extern "C" int STREAM_queuefile(int sh, void* a, void* b, int tag);
+extern "C" int STREAM_queuemem(int sh, void* a, int b, int tag);
 extern "C" void SNDLINKI_pushtail(SNDLINKLIST* list, void* node);
 extern "C" void* SNDLINKI_pop(SNDLINKLIST* list);
 extern "C" void fn_803B3EA8(int shandle, int ch, int level);
@@ -121,7 +121,7 @@ extern "C" void SNDSTRMI_removerequest(int h)
 extern "C" void SNDSTRMI_releasecallback(int* p)
 {
     unsigned char* hdr = (unsigned char*)p[-1];
-    fn_803FE7E0(lbl_8069CADC.pssc[hdr[3]]->streamhandle, hdr);
+    STREAM_release(lbl_8069CADC.pssc[hdr[3]]->streamhandle, hdr);
 }
 
 extern "C" void SNDSTRMI_framescallback(int unused, unsigned int frames, SNDSTREAMCHANNEL* pssc)
@@ -173,7 +173,7 @@ extern "C" void SNDSTRMI_parsedata(SNDSTREAMCHANNEL* pssc, int* hdr)
         }
     }
     if (psp.numframes == 0) {
-        fn_803FE7E0(pssc->streamhandle, in);
+        STREAM_release(pssc->streamhandle, in);
     } else {
         ((int*)psp.psamples[0])[-1] = (int)in;
         in[0] = req->sndrequesthandle;
@@ -212,7 +212,7 @@ extern "C" void SNDSTRMI_service()
         int result = 0;
         do {
             count--;
-            unsigned char* data = fn_803FE660((RcHnd*)ch->streamhandle);
+            unsigned char* data = STREAM_get((RcHnd*)ch->streamhandle);
             if (data) result = SNDSTRMI_parsechunk(i,(int*)data);
         } while (result && count > 0);
     }
@@ -229,7 +229,7 @@ extern "C" int SNDSTRMI_parsechunk(int h, int* hdr)
         SNDSTRMI_parseheader(h, hdr);
         return 0;
     } else {
-        fn_803FE7E0(pssc->streamhandle, hdr);
+        STREAM_release(pssc->streamhandle, hdr);
     }
     return 1;
 }
@@ -280,9 +280,9 @@ extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type)
         return -13;
     SNDSYS_entercritical();
     if (type == 0)
-        b = (void*)fn_803FDEC0(pssc->streamhandle, a, b, 0x6c454353);
+        b = (void*)STREAM_queuefile(pssc->streamhandle, a, b, 0x6c454353);
     else if (type == 1)
-        b = (void*)fn_803FDFB4(pssc->streamhandle, a, 0, 0x6c454353);
+        b = (void*)STREAM_queuemem(pssc->streamhandle, a, 0, 0x6c454353);
     if (b == 0) {
         SNDSYS_leavecritical();
         return -1;
@@ -326,7 +326,7 @@ extern "C" int fn_803AA95C(int h)
     lbl_8069CADC.pssc[h] = 0;
     SNDSYS_leavecritical();
     if (tap == 0)
-        fn_803FDC80(sh);
+        STREAM_destroy(sh);
     return 0;
 }
 
@@ -347,8 +347,8 @@ extern "C" int fn_803AAA3C(int h)
         SNDPKTPLAY_stop(pssc->packetinstancehandle);
     pssc->shandle = -1;
     if (pssc->fromtap == 0) {
-        fn_803FE418(pssc->streamhandle);
-        fn_803FE660((RcHnd*)pssc->streamhandle);
+        STREAM_kill(pssc->streamhandle);
+        STREAM_get((RcHnd*)pssc->streamhandle);
     }
     if (pssc->newsa.ptsdata[0] != 0) {
         int i;

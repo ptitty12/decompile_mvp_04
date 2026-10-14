@@ -40,14 +40,14 @@ extern "C" int unpacksizez(int a);
 extern "C" int fn_803ED604(const char* name, int a, int b);
 extern "C" int fn_803EE310(int a);
 extern "C" void MEM_copy(int a, int b, int n);
-extern "C" int fn_803FBD28(int a, int b, int c);
+extern "C" int FILE_loadat(int a, int b, int c);
 extern "C" int fn_803FB954(int a);
-extern "C" int fn_803FB9E8(int a);
+extern "C" int FILE_size(int a);
 extern "C" int fn_803FBF10(int a, int b);
 extern "C" int fn_803FC190(int a, int b);
 extern "C" int fn_803FC2E0(int a, int b, int c);
 extern "C" int fn_803FC034(int a);
-extern "C" int fn_803FB64C(int a, int b, int c);
+extern "C" int ASYNCFILE_loadat(int a, int b, int c);
 void fn_802B9EFC(Unk8068B4F8* p, int v);
 void* fn_802B9CCC(int a, int* b, int c);
 void fn_802B9ED4(int a);
@@ -85,7 +85,7 @@ int fn_802B9250(int a, int b, int c)
     int tries = 1;
     do {
         fn_802B9EFC(&lbl_8068B4F8, 0);
-        r = fn_803FBD28(a, b, c);
+        r = FILE_loadat(a, b, c);
     } while (lbl_8068B4F8.Get() != 0 && --tries > 0);
     if (lbl_8068B4F8.Get() != 0) {
         fn_802B9ED4(a);
@@ -240,7 +240,7 @@ extern "C" void fn_802B961C(const char* p, int x)
 
 int fn_802B96A4(int a, int b, int c)
 {
-    return fn_803FB64C(a, b, c);
+    return ASYNCFILE_loadat(a, b, c);
 }
 
 int fn_802B96C4(int a)
@@ -264,7 +264,7 @@ int fn_802B9764(int a)
     int tries = 1;
     do {
         fn_802B9EFC(&lbl_8068B4F8, 0);
-        r = fn_803FB9E8(a);
+        r = FILE_size(a);
     } while (lbl_8068B4F8.Get() != 0 && --tries > 0);
     if (lbl_8068B4F8.Get() != 0) {
         fn_802B9ED4(a);

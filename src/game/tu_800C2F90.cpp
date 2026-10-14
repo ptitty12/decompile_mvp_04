@@ -70,10 +70,10 @@ extern Unk800C341C_Mgr* lbl_8061ABDC;
 extern int lbl_8061A708[];
 extern "C" {
 int fn_800C2FE8(Unk800C2250_File* f);
-void fn_803FB764(int a, int b, int c);
+void ASYNCFILE_release(int a, int b, int c);
 void fn_80400CE4(int a);
-void fn_803FB888(int a);
-int fn_803FB6FC(int a);
+void ASYNCFILE_cancel(int a);
+int ASYNCFILE_getstatus(int a);
 void THREAD_yield(int a);
 }
 
@@ -211,11 +211,11 @@ extern "C" void fn_800C31FC(Unk800C2250_File* f)
         break;
     case 3:
         if (fn_800C33D0()->m0 != 0) {
-            fn_803FB764(fn_800C2FE8(f), 0, 0);
+            ASYNCFILE_release(fn_800C2FE8(f), 0, 0);
             fn_80400CE4(0);
         } else {
-            fn_803FB888(fn_800C2FE8(f));
-            while (!fn_803FB6FC(fn_800C2FE8(f))) {
+            ASYNCFILE_cancel(fn_800C2FE8(f));
+            while (!ASYNCFILE_getstatus(fn_800C2FE8(f))) {
                 THREAD_yield(50);
                 fn_80400CE4(0);
             }
