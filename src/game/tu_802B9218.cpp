@@ -94,9 +94,11 @@ int fn_802B9250(int a, int b, int c)
     return r;
 }
 
-/* near-miss (97.3%): 123 insns as retail and the five stack slots now sit where retail has them (they must be members of one
-   struct: as separate address-taken scalars GCC numbers them in order of first use, which swapped sp14/sp18). Only the
-   callee-saved numbering of name and r is still swapped (retail: name r28, r r29), which moves a few mr/stw slots. */
+/* near-miss: 123 insns as retail, stack slots and callee-saved numbering now match; the only difference is where the
+   low half (addi) of the "Loading %s" format address is scheduled (retail: after the first two zeroing stores).
+   Notes: the five address-taken locals must be members of one struct (as separate scalars GCC numbers them in order
+   of first use, which swapped sp14/sp18); routing sp8 + sp10 through r (r = ...; int a = r;) raises r's register
+   priority above name's, which is what makes name r28 / r r29 as in retail (permuter find). */
 extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigned int* outn)
 {
     struct {
@@ -128,7 +130,8 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
     case 2:
         if (s.sp8 != 0) {
             fn_803FC410(s.sp8, name, 0, &s.sp10, &s.sp18);
-            int a = s.sp8 + s.sp10;
+            r = s.sp8 + s.sp10;
+            int a = r;
             int n = fn_804017D0(a);
             if (n != 0) {
                 if (outn != 0) {
