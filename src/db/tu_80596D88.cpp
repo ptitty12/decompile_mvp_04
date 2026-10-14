@@ -477,7 +477,7 @@ inline float Db8059841C_Ratio(Db80596D88_Game* g, int m28)
     return (float)(cur - base) / (float)(hi - fn_8056B87C(m28));
 }
 /* forward declarations (definitions are in address order) */
-extern "C" void fn_80596D88(Db80596D88_Obj* self);
+extern "C" void* fn_80596D88(Db80596D88_Obj* self);
 extern "C" void fn_80596DCC(void* self, int c);
 extern "C" void fn_80596E00(Db80596D88_Obj* self);
 extern "C" int fn_80596E3C(Db80596D88_Obj* self);
@@ -524,21 +524,34 @@ extern "C" float fn_80599448(G* self, int a);
 extern "C" float fn_805994C4(G* self, int a);
 extern "C" float fn_80599540(Db80599540_Obj* self, int a);
 
-/* near-miss: retail gives the halfword at +4 its own zero register (li r10/r9) and keeps the vptr store first */
+/* Constructor: the init-list members get their own zero register (the halfword at +4 shows it); the vptr and +0x30 go in the body. Returns this. */
 //@80596D88
-extern "C" DB_OVERLAY void fn_80596D88(Db80596D88_Obj* self)
+struct Db80596D88_Init {
+    int m0;
+    short m4;
+    char pad6[2];
+    int m8;
+    short mC;
+    char padE[2];
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    const void* m34;
+    Db80596D88_Init() : m34(lbl_80682EB0), m4(0), m8(0), mC(0), m10(0), m1C(0), m20(0), m24(0), m28(0), m2C(0)
+    {
+        m30 = 0;
+    }
+};
+extern "C" DB_OVERLAY void* fn_80596D88(Db80596D88_Obj* self)
 {
-    self->m34 = lbl_80682EB0;
-    self->m4 = 0;
-    self->m30 = 0;
-    self->m8 = 0;
-    self->mC = 0;
-    self->m10 = 0;
-    self->m1C = 0;
-    self->m20 = 0;
-    self->m24 = 0;
-    self->m28 = 0;
-    self->m2C = 0;
+    new (self) Db80596D88_Init;
+    return self;
 }
 
 extern "C" DB_OVERLAY void fn_80596DCC(void* self, int c)
@@ -548,22 +561,33 @@ extern "C" DB_OVERLAY void fn_80596DCC(void* self, int c)
         fn_80377408(self);
 }
 
-/* near-miss: same own-zero-register halfword at +4 as fn_80596D88 */
+/* Reset: same init-list shape as fn_80596D88 (all members but +0x30 in the init list). */
 //@80596E00
+struct Db80596E00_Init {
+    int m0;
+    short m4;
+    char pad6[2];
+    int m8;
+    short mC;
+    char padE[2];
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    int m24;
+    int m28;
+    int m2C;
+    int m30;
+    const void* m34;
+    Db80596E00_Init() : m4(0), m8(0), mC(0), m10(0), m14(0), m18(0), m1C(0), m20(0), m24(0), m28(0), m2C(0)
+    {
+        m30 = 0;
+    }
+};
 extern "C" DB_OVERLAY void fn_80596E00(Db80596D88_Obj* self)
 {
-    self->m30 = 0;
-    self->m4 = 0;
-    self->m8 = 0;
-    self->mC = 0;
-    self->m10 = 0;
-    self->m14 = 0;
-    self->m18 = 0;
-    self->m1C = 0;
-    self->m20 = 0;
-    self->m24 = 0;
-    self->m28 = 0;
-    self->m2C = 0;
+    new (self) Db80596E00_Init;
 }
 
 extern "C" DB_OVERLAY int fn_80596E3C(Db80596D88_Obj* self)
