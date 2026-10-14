@@ -64,6 +64,160 @@ void fn_80052908(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
     }
 }
 
+/* Same layout as Unk80052794_B3B0 but with slot 24 returning int (fn_80052A34 uses the result). */
+class Unk80052A34_V {
+public:
+    char pad0[0x98];
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void v12();
+    virtual void v13();
+    virtual void v14();
+    virtual void v15();
+    virtual void v16();
+    virtual void v17();
+    virtual void v18();
+    virtual void v19();
+    virtual void v20();
+    virtual void v21();
+    virtual void v22();
+    virtual void v23();
+    virtual int v24();
+};
+/* Methods of the game object (Unk8001CE80 is Unk80052794_Obj): symbols fn_8001CD94__11Unk8001CE80ii etc. */
+class Unk8001CE80 {
+public:
+    int fn_8001CD94(int a, int b);
+    int fn_8001D47C();
+    int fn_8001D694();
+    int fn_8001E054();
+    int fn_8001E2EC();
+};
+extern "C" int rand();
+extern "C" int fn_801D7A3C(int p, int v);
+extern "C" float fn_8009FE90(void* p, int a, int b);
+int fn_80043C60(int a, int b, int c);
+void fn_80013780(int a, int b, int c, int d, int e, int f, int g, int h);
+extern int lbl_805B1D9C[3][3];
+struct Unk80052A34_B {
+    char pad0[0x14];
+    char* m14;
+};
+struct Unk80052A34_G {
+    char pad0[4];
+    Unk80052A34_B* m4;
+};
+extern Unk80052A34_G* lbl_806192E0;
+
+/* near-miss 99.4%: all 274 insns identical in shape; only the callee-saved register numbering of the locals differs
+ * (retail: f2 r18, f1 r17, bestCol r16, bestRow r15; ours: bestCol r18, bestRow r17, f1 r15, f2 r14, and `mr r26,r18`
+ * for the first i = 0 is `li`). Declaration order and init placement did not move the allocator. */
+extern "C" void fn_80052A34(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
+{
+    Unk8001CE80* g = (Unk8001CE80*)obj;
+    int f2 = 0;
+    int res = -1;
+    int bestRow = -1;
+    int bestRowN = -1;
+    int bestCol = -1;
+    int bestColN = -1;
+    int f1 = 0;
+    char* cb = (char*)ctx + 0x3C;
+    int base = (*(Unk80052794_S44C**)(cb + idx * 0x48))->m700->m3A4;
+    int h = ((Unk80052A34_V*)obj->m3B0)->v24();
+    int i, k, n, prev;
+    for (i = 0; i <= 2; i++) {
+        n = 0;
+        prev = 0;
+        for (k = 0; k < 3; k++) {
+            if (fn_801D7A3C(base + 8, g->fn_8001CD94(lbl_805B1D9C[i][k], h)) == 2) {
+                if (n == 0 || prev != 0)
+                    n++;
+                prev = 1;
+            } else {
+                prev = 0;
+            }
+        }
+        if (bestRowN < n) {
+            bestRowN = n;
+            bestRow = i;
+        }
+    }
+    for (i = 0; i <= 2; i++) {
+        n = 0;
+        prev = 0;
+        for (k = 0; k < 3; k++) {
+            if (fn_801D7A3C(base + 8, g->fn_8001CD94(lbl_805B1D9C[k][i], h)) == 2) {
+                if (n == 0 || prev != 0)
+                    n++;
+                prev = 1;
+            } else {
+                prev = 0;
+            }
+        }
+        if (bestColN < n) {
+            bestColN = n;
+            bestCol = i;
+        }
+    }
+    if (bestColN > 1 || bestRowN > 1) {
+        int c = lbl_805B1D9C[bestRow][bestCol];
+        if (fn_801D7A3C(base + 8, g->fn_8001CD94(c, h)) == 2)
+            res = c;
+        else if (bestColN > bestRowN || (bestColN >= bestRowN && rand() % 3 <= 1))
+            f1 = 1;
+        else
+            f2 = 1;
+    }
+    if (res == -1) {
+        if (f1 != 0) {
+            int c = lbl_805B1D9C[0][bestCol];
+            if (fn_801D7A3C(base + 8, g->fn_8001CD94(c, h)) != 2) {
+                res = lbl_805B1D9C[2][bestCol];
+            } else if (fn_801D7A3C(base + 8, g->fn_8001CD94(lbl_805B1D9C[2][bestCol], h)) == 2) {
+                res = lbl_805B1D9C[1][bestCol];
+            } else {
+                res = c;
+            }
+        } else if (f2 != 0) {
+            int c = lbl_805B1D9C[bestRow][0];
+            if (fn_801D7A3C(base + 8, g->fn_8001CD94(c, h)) != 2) {
+                res = lbl_805B1D9C[bestRow][2];
+            } else if (fn_801D7A3C(base + 8, g->fn_8001CD94(lbl_805B1D9C[bestRow][2], h)) != 2) {
+                res = c;
+            } else {
+                res = lbl_805B1D9C[bestRow][1];
+            }
+        }
+        if (res == -1)
+            return;
+    }
+    if (fn_801D7A3C(base + 8, g->fn_8001CD94(res, h)) == 2) {
+        fn_800B555C();
+        int on = fn_800B57EC();
+        if (on == 1 && (int)fn_8009FE90((char*)(lbl_806192E0)->m4->m14 + 0xB4, 2, 0) + 1 > 0x50) {
+            int a1 = fn_8001E664(obj);
+            int a2 = fn_8001F954(obj);
+            int a3 = fn_80043C60(res, 0, 0);
+            int a4 = fn_8001FA20(obj);
+            int a5 = g->fn_8001D47C();
+            int a6 = g->fn_8001D694();
+            int a7 = g->fn_8001E054();
+            fn_80013780(a1, a2, a3, a4, a5, a6, a7, g->fn_8001E2EC());
+            ctx->mA54 = on;
+        }
+    }
+}
+
 void fn_80052E7C(Unk80052794_Ctx* ctx, int idx, Unk80052794_Obj* obj)
 {
     if (obj->m3D0 < *lbl_8061B9C4) {
