@@ -608,7 +608,8 @@ DB_OVERLAY unsigned fn_8053B6CC(R* r, int id)
     unsigned i = 0;
     unsigned res = -1;
     for (; i < n; i++) {
-        if (id == r->m0[i]) {
+        int o = i * 4;
+        if (id == *(int*)((char*)r->m0 + o)) {
             res = i;
             break;
         }
