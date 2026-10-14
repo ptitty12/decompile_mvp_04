@@ -1050,7 +1050,7 @@ int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch)
                     sum += lbl_805AE420[ch].e[i].m20;
                 }
             }
-            if (fn_803A7924(v->m4, sum - (lbl_80620548 << 10), cnt) >= 0) {
+            if (SNDAEMS_streaminit(v->m4, sum - (lbl_80620548 << 10), cnt) >= 0) {
                 v->m0 = 0;
             }
         }

@@ -23,7 +23,7 @@ extern "C" void fn_803AB480(int handle);
 extern "C" void fn_803B41C8(int voice);
 extern "C" int fn_803AD2F0(void** pptp, SNDIPATCHHEADER* pph);
 extern "C" int SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER* pph, int a, int b);
-extern "C" void fn_803A81E0(SNDIPATCHHEADER* pph, int a);
+extern "C" void SNDBANKI_userdatacallback(SNDIPATCHHEADER* pph, int a);
 extern "C" void fn_803B12D0(void* s, int chrg);
 extern "C" void fn_803B12F8(void* s, int chrg);
 extern "C" void fn_803A97DC(int initialize, int priority);
@@ -101,7 +101,7 @@ extern "C" int fn_803A93D0(unsigned int rendermodes, void* ptp, int a, int b)
         more = fn_803AD2F0(&p, &pph);
         if (pph.rendermode & rendermodes) {
             SNDPLATFORM_asyncresolvetimbre(&pph, a, b);
-            fn_803A81E0(&pph, 0);
+            SNDBANKI_userdatacallback(&pph, 0);
         }
     } while (more != 0);
     return 0;

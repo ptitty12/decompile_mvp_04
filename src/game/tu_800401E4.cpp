@@ -29,7 +29,7 @@ extern "C" int fn_800415C0(Unk80040640* self, int id, int a, int b, int c, int d
 int fn_80041350(Unk80040640* self, int id);
 int fn_80041418(Unk80040640* self, int i);
 void fn_80041478(Unk80040640* self, int id);
-extern "C" int fn_803A8548(int a, int b);
+extern "C" int SNDbankpatpresent(int a, int b);
 extern "C" void fn_803A975C();
 int fn_803A85B0(int a, int b, void* out);
 extern "C" void fn_803A979C();
@@ -40,7 +40,7 @@ int fn_802B96C4(const char* name, int a);
 int fn_802B9764(const char* name);
 extern "C" int fn_802B9300(const char* name, int a, int b, int* out);
 extern "C" void fn_803EDA0C(int p);
-extern "C" void fn_803A8648(int a);
+extern "C" void SNDbankremove(int a);
 void fn_803A6644(int a);
 extern "C" int fn_803A82A8(int* out, int a);
 int fn_803A8530(int a);
@@ -122,7 +122,7 @@ void Unk800401E4::fn_800403EC()
     if (m8 == 1) {
         switch (mC) {
         case 0:
-            fn_803A8648(m4);
+            SNDbankremove(m4);
             if (m0 != 0)
                 delete[] (char*)m0;
             break;
@@ -533,7 +533,7 @@ int fn_80041350(Unk80040640* self, int id)
     int r31 = lbl_805AF688[id].m8;
     if (r30 >= 0 || (r30 = fn_80041418(self, lbl_805AEAB8[a].m50), r31 = lbl_805AF688[id].m10, r30 >= 0)) {
         fn_80041478(self, id);
-        if (fn_803A8548(r30, r31) != 0) {
+        if (SNDbankpatpresent(r30, r31) != 0) {
             fn_803A975C();
             ret = fn_803A85B0(r30, r31, &self->m600);
             fn_803A979C();

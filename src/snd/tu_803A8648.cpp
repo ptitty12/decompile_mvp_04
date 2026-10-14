@@ -14,15 +14,15 @@ void fn_803A975C();
 void fn_803A979C();
 void fn_803AB480(int shandle);
 int fn_803AD2F0(void* ppatch, void* attr);
-void fn_803A81E0(void* attr, int type);
+void SNDBANKI_userdatacallback(void* attr, int type);
 void fn_803B115C(int a, void* p);
 
-int fn_803A8648(int bhandle)
+int SNDbankremove(int bhandle)
 {
     int i;
     if (bhandle == -1) {
         for (i = 0; i < sndgs.sso.set.maxbanks; i++) {
-            fn_803A8648(i);
+            SNDbankremove(i);
         }
         return 0;
     }
@@ -49,7 +49,7 @@ int fn_803A8648(int bhandle)
             cursor = reinterpret_cast<char*>(ppatch) + 4;
             do {
                 more = fn_803AD2F0(&cursor, attr);
-                fn_803A81E0(attr, 2);
+                SNDBANKI_userdatacallback(attr, 2);
             } while (more != 0);
         }
     }

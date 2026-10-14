@@ -14,7 +14,7 @@ int fn_803BA80C(Csis::GlobalVariableHandle*, void*);
 int fn_803A9204(SNDPLAYOPTS*);
 int fn_803AB480(int);
 int SNDvol(int, int);
-int fn_803A8648(int);
+int SNDbankremove(int);
 void fn_803A975C(void);
 void fn_803A979C(void);
 }
@@ -1206,10 +1206,10 @@ int SNDAEMS_removemodulebank(int mbhandle) {
                 SNDMEMI_free(pModuleBank->streamfilepath);
             }
             if (pModuleBank->sfxbhandle >= 0) {
-                fn_803A8648(pModuleBank->sfxbhandle);
+                SNDbankremove(pModuleBank->sfxbhandle);
             }
             if (pModuleBank->midibhandle >= 0) {
-                fn_803A8648(pModuleBank->midibhandle);
+                SNDbankremove(pModuleBank->midibhandle);
             }
 
             sndaems.modulebank.Remove(&pModuleBank->ln);

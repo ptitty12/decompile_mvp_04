@@ -599,3 +599,17 @@ fn_80390D54	madvlcdecode
 fn_80390EC0	IdctColumn
 fn_80391060	IdctRow
 fn_80391194	idctcompute
+fn_803A6D80	SNDAEMSI_streamgethandle
+fn_803A6F14	SNDAEMSI_streamvol
+fn_803A6F84	SNDAEMSI_streamazimuth
+fn_803A6FF4	SNDAEMSI_streamfxwet0
+fn_803A70C8	SNDAEMSI_streamdrylevel
+fn_803A710C	SNDAEMSI_playerplaystream
+fn_803A7280	SNDAEMSI_playerstopstream
+fn_803A735C	SNDAEMSI_playerpausestream
+fn_803A73D4	SNDAEMSI_playerunpausestream
+fn_803A7490	SNDAEMSI_playerupdatestream
+fn_803A77A8	SNDAEMSI_streamsystemtask
+fn_803A7924	SNDAEMS_streaminit
+fn_803A81E0	SNDBANKI_userdatacallback
+fn_803A8548	SNDbankpatpresent

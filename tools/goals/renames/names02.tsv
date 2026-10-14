@@ -1,0 +1,18 @@
+# Names pass 02 (work/names-02): functions named from evidence. old<TAB>new<TAB>tier<TAB>evidence
+# Tiers (CLAUDE.md naming rule): E = EA reference-build name for the same code (config/GV4E69/refnames, twins.py show).
+# Tier I (inferred from behavior) is never applied. Rows are appended in the order the commits landed.
+fn_803A6D80	SNDAEMSI_streamgethandle	E	EA SNDAEMSI_streamgethandle(int)/SNDAEMSI_streamgethandle__Fi [fifa05,nascar,nfsu,uefa]
+fn_803A6F14	SNDAEMSI_streamvol	E	EA SNDAEMSI_streamvol__Fii [nascar,nfsu]
+fn_803A6F84	SNDAEMSI_streamazimuth	E	EA SNDAEMSI_streamazimuth__Fii [nascar]
+fn_803A6FF4	SNDAEMSI_streamfxwet0	E	EA SNDAEMSI_streamfxwet0(int, int)/SNDAEMSI_streamfxwet0__Fii [fifa05,nascar,nfsu,uefa]
+fn_803A70C8	SNDAEMSI_streamdrylevel	E	EA SNDAEMSI_streamdrylevel__Fii [nascar,nfsu]
+fn_803A710C	SNDAEMSI_playerplaystream	E	EA SNDAEMSI_playerplaystream(AemsDef::PLAYERSTATE *, AemsDef::SAMPLEENTRY *)/SNDAEMSI_playerplaystream__FPQ27AemsDef11PLAYERSTATEPQ27AemsDef11SAMPLEENTRY [fifa05,nascar,nfsu,uefa]
+fn_803A7280	SNDAEMSI_playerstopstream	E	EA SNDAEMSI_playerstopstream(AemsDef::PLAYERSTATE *)/SNDAEMSI_playerstopstream__FPQ27AemsDef11PLAYERSTATE [fifa05,nascar,nfsu,uefa]
+fn_803A735C	SNDAEMSI_playerpausestream	E	EA SNDAEMSI_playerpausestream__FGQ27AemsDef12PLAYERHANDLE [nascar,nfsu]
+fn_803A73D4	SNDAEMSI_playerunpausestream	E	EA SNDAEMSI_playerunpausestream(AemsDef::PLAYERSTATE *)/SNDAEMSI_playerunpausestream__FPQ27AemsDef11PLAYERSTATE [fifa05,nascar,nfsu,uefa]
+fn_803A7490	SNDAEMSI_playerupdatestream	E	EA SNDAEMSI_playerupdatestream(AemsDef::PLAYERSTATE *)/SNDAEMSI_playerupdatestream__FPQ27AemsDef11PLAYERSTATE [fifa05,nascar,nfsu,uefa]
+fn_803A77A8	SNDAEMSI_streamsystemtask	E	EA SNDAEMSI_streamsystemtask(void)/SNDAEMSI_streamsystemtask__Fv [fifa05,nascar,nfsu,uefa]
+fn_803A7924	SNDAEMS_streaminit	E	EA SNDAEMS_streaminit [fifa05,nascar,nfsu,uefa]
+fn_803A81E0	SNDBANKI_userdatacallback	E	EA SNDBANKI_userdatacallback(SNDIPATCHHEADER *, int)/SNDBANKI_userdatacallback__FP15SNDIPATCHHEADERi [fifa05,ge,hp,moh3,moh4,nascar,nfsu,uefa]
+fn_803A8548	SNDbankpatpresent	E	EA SNDbankpatpresent [hp]
+fn_803A8648	SNDbankremove	E	EA SNDbankremove [ge,hp,moh4,nascar]
