@@ -774,6 +774,120 @@ DB_OVERLAY int fn_8053BAD0(R* r, int h, int id, int now)
     return res;
 }
 
+/* Element of the roster.dat table (0x1E0 bytes; see Db8053967C_RecB for the same layout): an int ring of 25 ids at +0, five
+ * byte rings at +0x14 with inline storage at +0x78, and two vptr slots (+0xEC, +0x1DC). */
+extern char lbl_80684660[];
+extern char lbl_8064B298[];
+extern char lbl_8064B218[];
+extern char lbl_806846A8[];
+extern char lbl_80684688[];
+extern "C" char* strcat(char* dst, const char* src);
+extern "C" char* strcpy(char* dst, const char* src);
+struct Db8053967C_IR {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    const void* m10;
+    void Init(int* buf, int n)
+    {
+        m10 = lbl_8064B298;
+        m0 = buf;
+        m8 = n;
+        fn_8040074C(m0, n << 2);
+        m4 = 0;
+        mC = 0;
+    }
+};
+struct Db8053967C_BR {
+    unsigned char* m0;
+    unsigned m4;
+    unsigned m8;
+    unsigned mC;
+    const void* m10;
+    void Init(unsigned char* buf, int n)
+    {
+        m10 = lbl_8064B218;
+        m0 = buf;
+        m8 = n;
+        fn_8040074C(m0, n);
+        m4 = 0;
+        mC = 0;
+    }
+    void Add(unsigned char v)
+    {
+        if (m4 < m8) {
+            m0[m4] = v;
+            m4++;
+        }
+    }
+};
+struct Db8053967C_El {
+    Db8053967C_IR r0;
+    Db8053967C_BR bl[5];
+    int buf0[25];
+    unsigned char b0[5];
+    unsigned char b1[3];
+    unsigned char b2[4];
+    unsigned char b3[2];
+    unsigned char b4[1];
+    char padEB;
+    const void* vEC;
+    char padF0[0x1DC - 0xF0];
+    const void* v1DC;
+};
+struct Db8053967C_Obj58F {
+    int m0;
+    Db8053967C_DbObj* m4;
+    unsigned m8;
+    int mC;
+    Db8053967C_El* m10;
+    char m14[0x40];
+    const void* m54;
+};
+/* K2: the roster.dat table object (0x58 bytes). The only caller (Tbl8009101C::v5, game/tu_80090880) passes
+ * lbl_805B5790 = "roster.dat", the DbObj and 0x7E (126 records); the path is copied to +0x14 and the
+ * 0x1E0-byte records (25-id roster ring, five byte rings, two vptr slots) are built with an inline array-new loop. */
+extern "C" DB_OVERLAY Db8053967C_Obj58F* fn_8053BB80(Db8053967C_Obj58F* self, const char* name, Db8053967C_DbObj* db, unsigned count)
+{
+    self->m4 = db;
+    self->m54 = lbl_80684660;
+    self->m8 = count;
+    char buf[0x140];
+    int zero = 0;
+    self->m0 = zero;
+    self->mC = zero;
+    self->m10 = 0;
+    buf[0] = zero;
+    strcat(buf, name);
+    strcpy(self->m14, buf);
+    if (self->m10 == 0) {
+        int n = count - 1;
+        char* first = (char*)operator new[](count * 0x1E0 + 8, 0) + 8;
+        ((int*)first)[-2] = count;
+        Db8053967C_El* e = (Db8053967C_El*)first;
+        if (count != 0) {
+            do {
+                e->v1DC = lbl_80684688;
+                e->vEC = lbl_806846A8;
+                e->r0.Init(e->buf0, 25);
+                e->bl[0].Init(e->b0, 5);
+                e->bl[1].Init(e->b1, 3);
+                e->bl[2].Init(e->b2, 4);
+                e->bl[3].Init(e->b3, 2);
+                e->bl[4].Init(e->b4, 1);
+                for (int k = 0; k < 5; k++)
+                    e->bl[0].Add(0xFF);
+                fn_8053B548((char*)e, 0);
+                e++;
+            } while (n-- != 0);
+        }
+        self->m10 = (Db8053967C_El*)first;
+    }
+    fn_8053BE58((O58*)self);
+    return self;
+}
+
 struct Db8053967C_RecV {
     char pad0[0x1DC];
     virtual ~Db8053967C_RecV();
