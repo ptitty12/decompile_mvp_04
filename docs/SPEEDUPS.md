@@ -197,6 +197,8 @@ Roughly ordered by expected payoff for the effort.
 
 - 2026-10-13 | REA session | Owner's MVP discs checked for symbols: MVP Baseball PSP (BOOT.BIN unencrypted, empty .symtab), MVP 2003 PS2 (SLUS_206.50, empty .mdebug), MVP 2004 PS2 (SLUS_208.68 and NTGUI.ELF) and MVP 2005 PS2 (SLUS_211.35 and NTGUI_NA.ELF): all stripped, and no map or symbol files on any of the four discs. MIPS builds of the same code, so no byte-level help either. Remaining hopes: magazine/EA demo discs with an MVP 2004/2005 demo (demo builds are often unstripped), MVP 06/07 NCAA Baseball (PS2) | 7 | none from these discs
 
+- 2026-10-13 | REA session | More owner-supplied discs, all without symbols: MVP 07 NCAA Baseball PS2 (SLUS_215.82, empty .mdebug; EA_DASH.ELF stripped) and an MVP 2003 Xbox preview build (Dec 2002, a prototype rather than an owner disc; release and debug PE executables, no COFF symbols or PDB; the debug build names 651 source files, 56 of which also appear in MVP 2005 GC's asserts). Best remaining candidate: MVP Baseball 2004 for GameCube, same platform and compiler; its executable might still have symbols | 7 | none yet; the 2003 file list could later name TUs
+
 ## Tried
 
 <!-- YYYY-MM-DD | item # | what was done | measured effect -->
