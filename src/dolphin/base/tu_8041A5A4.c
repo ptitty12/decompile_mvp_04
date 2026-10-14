@@ -7,12 +7,12 @@
 #include <dolphin.h>
 #include <dolphin/base/PPCArch.h>
 
-/* fn_8041A5B4 is the HID0 read (PPCMfhid0), fn_8041A5BC the HID0 write (PPCMthid0): hand-written original code. */
-u32 fn_8041A5B4(void);
+/* PPCMfhid0 is the HID0 read (PPCMfhid0), fn_8041A5BC the HID0 write (PPCMthid0): hand-written original code. */
+u32 PPCMfhid0(void);
 void fn_8041A5BC(u32 newHID0);
 
 void fn_8041A694(void);
 
 void fn_8041A694(void) {
-    fn_8041A5BC(fn_8041A5B4() | HID0_SPD);
+    fn_8041A5BC(PPCMfhid0() | HID0_SPD);
 }

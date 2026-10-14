@@ -789,7 +789,7 @@ float Unk802362A8_Cpu::fn_80239DFC(int a)
     return r;
 }
 
-extern "C" double fn_804103C0(double x);
+extern "C" double ceil(double x);
 
 float fn_80239F58(float a, float b, float c, float d)
 {
@@ -806,7 +806,7 @@ float fn_80239F58(float a, float b, float c, float d)
     float y = Lerp(0.9f, b, 1.0f);
     float z = Lerp(0.85f, 1.0f - c, 1.0f);
     float w = 0.0f;
-    int n0 = (int)(float)fn_804103C0(d * 5.0f);
+    int n0 = (int)(float)ceil(d * 5.0f);
     int n;
     if (n0 <= 5) {
         n = n0;

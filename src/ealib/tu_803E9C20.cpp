@@ -238,13 +238,13 @@ struct Unk80373AD8Mtx {
 
 extern "C" void fn_803DFBAC(Unk80373AD8Mtx* in, Unk80373AD8Mtx* out);
 
-extern "C" void fn_804302C4(Unk80373AD8Mtx* m, int id);
+extern "C" void GXLoadPosMtxImm(Unk80373AD8Mtx* m, int id);
 
-extern "C" void fn_80430364(int id);
+extern "C" void GXSetCurrentMtx(int id);
 
-extern "C" void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+extern "C" void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
 
-extern "C" void fn_8042DC44(int n);
+extern "C" void GXSetNumChans(int n);
 
 extern "C" void fn_803DB5A0(void* state);
 
@@ -308,15 +308,15 @@ extern "C" void fn_803EA500(Unk803E3C08* a, Unk80623E94* b)
         b->m4 = a->m0[6].m4;
         mtx = *(Unk80373AD8Mtx*)a->m0[1].m4;
         fn_803DFBAC(&mtx, &mtx);
-        fn_804302C4(&mtx, 0);
-        fn_80430364(0);
+        GXLoadPosMtxImm(&mtx, 0);
+        GXSetCurrentMtx(0);
         if (b->m70) {
-            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
-            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+            GXSetChanCtrl(4, 0, 1, 1, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 1, 1, 0, 0, 2);
         } else {
-            fn_8042DC44(1);
-            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
-            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+            GXSetNumChans(1);
+            GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 0, 0, 0, 0, 2);
         }
         fn_803DB5A0(b->m4);
         if (b->m6C == 0) {

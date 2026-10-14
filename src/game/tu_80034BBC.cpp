@@ -226,6 +226,8 @@ extern "C" void fn_80035AE8(void* self, int a, unsigned int b)
     }
 }
 
+/* near-miss 97.1%: retail hoists the first li r3,3 above the ble in the (a==1, b==1) arm; tried ternary,
+   early-break, inline helper and local-var forms without reproducing it. */
 extern "C" void fn_80035B90(void* self, int a, int b)
 {
     if (a == 1) {
@@ -234,7 +236,7 @@ extern "C" void fn_80035B90(void* self, int a, int b)
             fn_80039A3C(3, 0, 0);
             break;
         case 1:
-            if (fn_8040ABA0() % 100 > 0x31)
+            if (rand() % 100 > 0x31)
                 fn_80039A3C(3, 2, 0);
             else
                 fn_80039A3C(3, 1, 0);
@@ -243,7 +245,7 @@ extern "C" void fn_80035B90(void* self, int a, int b)
             fn_80039A3C(3, 0, 0);
             break;
         case 3:
-            if (fn_8040ABA0() % 100 <= 0x18)
+            if (rand() % 100 <= 0x18)
                 fn_80039A3C(4, 0, 0);
             fn_80039A3C(4, 1, 0);
             break;
@@ -254,7 +256,7 @@ extern "C" void fn_80035B90(void* self, int a, int b)
             fn_80039A3C(7, 0, 0);
             break;
         case 1:
-            if (fn_8040ABA0() % 100 > 0x31)
+            if (rand() % 100 > 0x31)
                 fn_80039A3C(7, 2, 0);
             else
                 fn_80039A3C(7, 1, 0);
@@ -263,10 +265,10 @@ extern "C" void fn_80035B90(void* self, int a, int b)
             fn_80039A3C(7, 0, 0);
             break;
         case 3:
-            if (fn_8040ABA0() % 100 > 0x31)
-                fn_80039A3C(5, 1, 0);
-            else
+            if (rand() % 100 <= 0x31)
                 fn_80039A3C(7, 1, 0);
+            else
+                fn_80039A3C(5, 1, 0);
             break;
         }
     }

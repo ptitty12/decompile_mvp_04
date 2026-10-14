@@ -120,7 +120,7 @@ extern Unk8069E200 lbl_8069E200;
 extern "C" void fn_803B14D0();
 extern "C" void fn_803B5ACC();
 extern "C" int AXRegisterAuxACallback(int a, int b);
-extern "C" void fn_80437D18(void* p);
+extern "C" void OSCancelThread(void* p);
 extern "C" void fn_80417808();
 extern "C" void fn_803A979C();
 extern "C" void fn_803A975C();
@@ -595,13 +595,13 @@ extern int lbl_8069E1E0;
 extern unsigned char lbl_8069C8BB;
 extern int lbl_80625C68;
 extern char lbl_8069FFE0[];
-extern "C" unsigned int fn_80434F9C();
+extern "C" unsigned int OSEnableInterrupts();
 extern "C" void OSWakeupThread(void* p);
 extern "C" int fn_803B1364(int i);
 
 extern "C" void fn_803AED08(int** outs)
 {
-    unsigned int en = fn_80434F9C();
+    unsigned int en = OSEnableInterrupts();
     if (lbl_8069E200.mC048 != 0) {
         int i;
         for (i = 0; i < lbl_80625448; i++) {
@@ -666,7 +666,7 @@ extern "C" void fn_803AEF88()
 
 extern "C" void fn_803A94BC();
 extern "C" void fn_803A9450();
-extern "C" void fn_804382CC(void* p);
+extern "C" void OSSleepThread(void* p);
 extern void (*lbl_806AA4D0)(void*, int);
 extern char lbl_806AA268[];
 extern float lbl_80625C6C;
@@ -692,7 +692,7 @@ struct Unk803AF014_Chan {
     unsigned char numchan;
 };
 
-extern "C" void fn_80432FD4(int a, int b);
+extern "C" void DCFlushRange(int a, int b);
 
 extern "C" void fn_803AF014(int h, Unk803AF014_Voice* s, Unk803AF014_Chan* c)
 {
@@ -734,7 +734,7 @@ extern "C" void fn_803AF014(int h, Unk803AF014_Voice* s, Unk803AF014_Chan* c)
         remaining = next;
     } while (remaining > 0);
     for (i = 0; i < c->numchan; i++) {
-        fn_80432FD4(s->mBuf[i], 0x600);
+        DCFlushRange(s->mBuf[i], 0x600);
         fn_803AEB50(1, s->mBuf[i], s->m259C[i] + s->m2599 * 3 * 0x200, 0x600, -1);
     }
 }
@@ -768,7 +768,7 @@ extern "C" void fn_803AF238()
         if (sndgs.profileleave != 0)
             sndgs.profileleave();
         ((void (*)())lbl_80625210)();
-        fn_804382CC(lbl_8069FFE0);
+        OSSleepThread(lbl_8069FFE0);
     }
 }
 
@@ -833,7 +833,7 @@ extern "C" int fn_803AF934()
             fn_803A979C();
         } while (sndgs.incritical != 0);
     }
-    fn_80437D18(lbl_8069FCC8);
+    OSCancelThread(lbl_8069FCC8);
     fn_80417808();
     return 0;
 }

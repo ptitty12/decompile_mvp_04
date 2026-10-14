@@ -76,22 +76,22 @@ struct Unk80623D04 {
 };
 
 extern "C" {
-void fn_8042DC44(int n);
+void GXSetNumChans(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
-void fn_8042B460(void);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB5C(int n);
 void fn_803DA468(int attr, void* base, int stride);
 void fn_803E3C08(Unk803E3C08* self, void* x, int n);
 void fn_803DFBAC(Unk803728E8Mtx* in, Unk803728E8Mtx* out);
-void fn_804302C4(Unk803728E8Mtx* m, int id);
-void fn_80430364(int id);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void GXLoadPosMtxImm(Unk803728E8Mtx* m, int id);
+void GXSetCurrentMtx(int id);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
 void fn_803DB5A0(void* state);
 void fn_803DDCD4(void);
 void GXCallDisplayList(void* list, int nbytes);
@@ -128,12 +128,12 @@ extern "C" void fn_803728E8(Unk803E3C08* a, Unk80623D04* b)
     if (a->mB0) {
         b->m4 = a->m0[9].m4;
         if (b->m70) {
-            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
-            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+            GXSetChanCtrl(4, 0, 1, 1, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 1, 1, 0, 0, 2);
         } else {
-            fn_8042DC44(1);
-            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
-            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+            GXSetNumChans(1);
+            GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 0, 0, 0, 0, 2);
         }
         fn_803DDB5C(0);
         fn_803DE1BC(&o);
@@ -148,17 +148,17 @@ extern "C" void fn_803728E8(Unk803E3C08* a, Unk80623D04* b)
         c2.g = (unsigned char)(((float*)p[8].m4)[1] * 255.0f);
         c2.b = (unsigned char)(((float*)p[8].m4)[2] * 255.0f);
         c2.a = (unsigned char)(((float*)p[8].m4)[3] * 255.0f);
-        fn_8042DA74(4, c1);
-        fn_8042DB5C(4, c2);
-        fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
+        GXSetChanAmbColor(4, c1);
+        GXSetChanMatColor(4, c2);
+        GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
         fn_803DB5A0(b->m4);
         if (b->m6C == 0) {
             fn_803DB9C0(b->m8, 3);
         }
         Unk803728E8Mtx mtx = *(Unk803728E8Mtx*)a->m0[4].m4;
         fn_803DFBAC(&mtx, &mtx);
-        fn_804302C4(&mtx, 0);
-        fn_80430364(0);
+        GXLoadPosMtxImm(&mtx, 0);
+        GXSetCurrentMtx(0);
         fn_803DBBE0(a->m0[7].m4);
         lbl_806279C8 = fn_803DBF98;
     }
@@ -188,14 +188,14 @@ extern "C" void fn_80372C30(void* x)
     fn_803E3C08(&a, x, -1);
     if (a.mB0) {
         GXColor c = { 0xff, 0xff, 0xff, 0xff };
-        fn_8042DA74(4, c);
-        fn_8042DB5C(4, c);
+        GXSetChanAmbColor(4, c);
+        GXSetChanMatColor(4, c);
         fn_803DDE7C();
         fn_803DDBF0();
     }
     if (a.mB4 != 0 || a.m50[10] != lbl_80623D04.m34 || a.m50[14] != lbl_80623D04.m44) {
         a.mB8 = 0;
-        fn_8042B460();
+        GXClearVtxDesc();
         GXSetVtxDesc(0, 1);
         lbl_80623D38 = a.m50[10];
         if (lbl_80623D38) {
@@ -214,7 +214,7 @@ extern "C" void fn_80372C30(void* x)
         fn_803DBF78(0, 9, 1, 4, 0);
         fn_803DBF78(0, 0xb, 1, 3, 0);
         fn_803DDB5C(0);
-        fn_8042DC44(1);
+        GXSetNumChans(1);
         lbl_80623D04.m0 = 2;
         lbl_80623D04.m8 = 0x1201;
         lbl_80623D04.m6C = 1;

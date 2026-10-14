@@ -39,9 +39,9 @@ struct Unk803E1A38Col {
 struct Unk803E1A38Mid {
     Unk803E1A38Fog* m0;
 };
-extern "C" void fn_8042F93C(int type, Unk803E1A38Col color, float startz, float endz, float nearz, float farz);
+extern "C" void GXSetFog(int type, Unk803E1A38Col color, float startz, float endz, float nearz, float farz);
 extern "C" void GXInitFogAdjTable(unsigned short* table, unsigned short width, float* projmtx);
-extern "C" void fn_8042FD00(int enable, unsigned short center, unsigned short* table);
+extern "C" void GXSetFogRangeAdj(int enable, unsigned short center, unsigned short* table);
 
 /* Node viewed with absolute offsets (View sits at Node+0xC, so Node+0x158 is View.m14C). */
 struct Unk803E0DD0Obj {
@@ -139,7 +139,7 @@ union PPCWGPipe {
 extern "C" {
 int fn_803D9E3C();
 void GXSetCopyClear(void* clr, unsigned int z);
-void fn_8042DC44(int a);
+void GXSetNumChans(int a);
 void GXSetTevOrder(int a, int b, int c, int d);
 void GXSetTevOp(int a, int b);
 void fn_803DB9C0(int a, int b);
@@ -147,13 +147,13 @@ void fn_803DBF78(int a, int b, int c, int d, int e);
 void GXSetCullMode(int a);
 void GXSetNumTexGens(int a);
 void GXSetNumTevStages(int a);
-void fn_80430364(int a);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
-void fn_8042FE24(int a, int b, int c, int d);
+void GXSetCurrentMtx(int a);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
+void GXSetBlendMode(int a, int b, int c, int d);
 void GXSetAlphaCompare(int a, int b, int c, int d, int e);
-void fn_8042FF04(int a);
-void fn_8042FE78(int a);
-void fn_8042FED0(int a, int b, int c);
+void GXSetZCompLoc(int a);
+void GXSetColorUpdate(int a);
+void GXSetZMode(int a, int b, int c);
 void GXBegin(int prim, int fmt, unsigned short n);
 }
 extern Unk803E1F98_Node* lbl_8062C2B4;
@@ -172,7 +172,7 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
         *(int*)col = c;
         GXSetCopyClear(col, 0xFFFFFF);
     }
-    fn_8042DC44(1);
+    GXSetNumChans(1);
     GXSetTevOrder(0, 0xFF, 0xFF, 4);
     GXSetTevOp(0, 4);
     fn_803DB9C0(0x1200, 1);
@@ -183,20 +183,20 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
     float x = n->mC.mCC;
     C_MTXOrtho(m, y, y + n->mC.mD8, x, x + n->mC.mD4, 0.0f, -1.0f);
     GXSetProjection(m, 1);
-    fn_80430364(0x3C);
+    GXSetCurrentMtx(0x3C);
     GXSetNumTexGens(0);
     GXSetNumTevStages(1);
     GXSetTevOp(0, 4);
-    fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
-    fn_8042FE24(0, 1, 0, 3);
+    GXSetChanCtrl(4, 0, 0, 1, 0, 2, 2);
+    GXSetBlendMode(0, 1, 0, 3);
     GXSetAlphaCompare(7, 0, 1, 7, 0);
-    fn_8042FF04(0);
+    GXSetZCompLoc(0);
     if ((flags ^ 1) & 1)
-        fn_8042FE78(0);
+        GXSetColorUpdate(0);
     if (flags & 2)
-        fn_8042FED0(1, 7, 1);
+        GXSetZMode(1, 7, 1);
     else
-        fn_8042FED0(0, 7, 0);
+        GXSetZMode(0, 7, 0);
     GXBegin(0x80, 5, 4);
     {
         float x = n->mC.mCC;
@@ -230,7 +230,7 @@ extern "C" void fn_803E1578(Unk803E1F98_Node* n, int flags)
         EALIB_GX_FIFO(PPCWGPipe).f32 = 0.99999988f;
         EALIB_GX_FIFO(PPCWGPipe).u32 = n->mC.m8;
     }
-    fn_8042FE78(1);
+    GXSetColorUpdate(1);
     if (n->mC.m4 == 0)
         GXSetProjection(n->mC.m14C, 0);
     else
@@ -282,7 +282,7 @@ extern "C" void fn_803E1A38(Unk803E198C_View* v)
     if (o) {
         Unk803E1A38Col color = *(Unk803E1A38Col*)&o->m0->m10;
         if (o->m0->m0) {
-            fn_8042F93C(o->m0->mC, color, o->m0->m4, o->m0->m8, v->mEC, v->mF0);
+            GXSetFog(o->m0->mC, color, o->m0->m4, o->m0->m8, v->mEC, v->mF0);
             if (((Unk803E1A38Mid*)v->m0)->m0->m14) {
                 unsigned short tbl[10];
                 unsigned short* t = tbl;
@@ -290,12 +290,12 @@ extern "C" void fn_803E1A38(Unk803E198C_View* v)
                 int w = (int)(v->mD4 * 0.5f + v->mCC);
                 if (w < 0)
                     w = 0;
-                fn_8042FD00(1, (unsigned short)w, t);
+                GXSetFogRangeAdj(1, (unsigned short)w, t);
             } else {
-                fn_8042FD00(0, 0, 0);
+                GXSetFogRangeAdj(0, 0, 0);
             }
         } else {
-            fn_8042F93C(0, color, 0.0f, 0.0f, 0.0f, 0.0f);
+            GXSetFog(0, color, 0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
 }

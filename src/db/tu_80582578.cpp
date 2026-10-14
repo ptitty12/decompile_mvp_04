@@ -253,7 +253,7 @@ extern "C" void fn_80582C54(DbSubX* self, int a, DbStream* io);
 extern "C" int fn_80582DF4(int unused, int k, int* arr);
 extern "C" int fn_80582E38(int unused, int a, int b);
 extern "C" int fn_80582EE4(int unused, int a);
-extern "C" int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c);
+extern "C" int fn_80582F40(void* self, float pa, float pb, int a, int b, int c, float pc);
 extern "C" int fn_80583000(int unused, int a);
 extern "C" int fn_8058313C(int a, Db8058313C_L* l, int c);
 extern "C" int fn_8058320C(void* unused, int id, int k);
@@ -457,17 +457,18 @@ extern "C" DB_OVERLAY int fn_80582EE4(int unused, int a)
     return k;
 }
 
-extern "C" DB_OVERLAY int fn_80582F40(void* self, float pa, float pb, float pc, int a, int b, int c)
+extern "C" DB_OVERLAY int fn_80582F40(void* self, float pa, float pb, int a, int b, int c, float pc)
 {
     int ia = (int)(pa * lbl_806005D0);
     int ib = (int)(pb * lbl_806005D0);
-    int r = fn_8040ABA0();
-    r = r % 100;
+    int r = rand() % 100;
+    int ret;
     if (r >= 0 && r < ia)
-        return a;
-    int ret = c;
-    if (r >= ia && r < ib)
+        ret = a;
+    else if (r >= ia && r < ib)
         ret = b;
+    else
+        ret = c;
     return ret;
 }
 

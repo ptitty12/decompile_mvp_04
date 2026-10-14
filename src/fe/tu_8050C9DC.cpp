@@ -744,6 +744,147 @@ extern "C" FE_OVERLAY void fn_8050FB34(FeScrN* x)
     }
 }
 
+extern "C" int fn_8007FDF8__FP13Unk8007F198_D(void* g);
+extern "C" int fn_8007A270__18Unk8007A4DC_Screeni(void* g, int a);
+extern "C" int fn_8007A6A0__18Unk8007A4DC_Screenii(void* g, int a, int b);
+extern "C" int fn_80075094__18Unk8007A4DC_Screeniiii(void* g, int a, int b, int c, int d);
+extern "C" int fn_800739E0__18Unk8007A4DC_Screeniiii(void* g, int a, int b, int c, int d);
+extern "C" int fn_80357074__Fff(float a, float b);
+extern "C" int fn_8007E154__FP13Unk8007DB74_Aii(void* g, int a, int b);
+extern const float lbl_805FB890;
+extern "C" int rand(void);
+/* Candidate list with an iterator vtable at +0x10 (slot 1 = begin, 3 = current, 6 = next). */
+struct Fe8050FC18_LB {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+};
+class Fe8050FC18_L : public Fe8050FC18_LB {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual int s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+};
+extern "C" void fn_80536C5C(Fe8050FC18_L* l, int a);
+extern "C" void fn_80535650(Fe8050FC18_L* l, int a);
+/* K3: picks a replacement id from a candidate list. The list is filled by fn_80536C5C (screen state 8) or fn_80535650, bubble-sorted
+ * by a float key (fn_80075094(2, ..) or fn_800739E0(0, ..)), then walked for the first id that is not `id`, is alive
+ * (fn_8007A270) and of a different class (fn_8007A6A0(9, ..)) than id's class (fn_8007A6A0(8, ..)); if none qualifies a random
+ * index rand() % 5 is handed to fn_8007E154. near-miss: 98.8%; jump2 shares the call tail of the iterator-begin call with
+ * the found-path call (3 insns), retail keeps both. */
+extern "C" FE_OVERLAY void fn_8050FC18(void* unused, int k, void* g, int id, Fe8050FC18_L* t)
+{
+    float sp8;
+    float spC;
+    int cls = fn_8007A6A0__18Unk8007A4DC_Screenii(g, 8, id);
+    if (fn_8007FDF8__FP13Unk8007F198_D(g) == 8) {
+        fn_80536C5C(t, k);
+        unsigned n = t->m4;
+        if (n != 0) {
+            int (*cmp)(float, float) = fn_80357074__Fff;
+            unsigned i = 0;
+            void* g2 = lbl_8061930C;
+            sp8 = lbl_805FB890;
+            spC = lbl_805FB890;
+            if (i < n) {
+                unsigned lim = n - 1;
+                unsigned lim2 = lim;
+                do {
+                    unsigned j = 0;
+                    if (j < lim) {
+                        do {
+                            int* d = t->m0;
+                            int o1 = j * 4;
+                            unsigned j1 = j + 1;
+                            int v0 = *(int*)((char*)d + o1);
+                            int o2 = j1 * 4;
+                            int v1 = *(int*)((char*)d + o2);
+                            sp8 = (float)fn_80075094__18Unk8007A4DC_Screeniiii(g2, 2, v0, 1, 2);
+                            spC = (float)fn_80075094__18Unk8007A4DC_Screeniiii(g2, 2, v1, 1, 2);
+                            if (cmp(sp8, spC) != 0) {
+                                if (j >= t->m4)
+                                    t->m4 = j1;
+                                *(int*)(o1 + (int)t->m0) = v1;
+                                if (j1 >= t->m4)
+                                    t->m4 = j1 + 1;
+                                *(int*)(o2 + (int)t->m0) = v0;
+                            }
+                            j = j1;
+                        } while (j < lim2);
+                    }
+                    i++;
+                    lim2--;
+                    lim--;
+                } while (i < n);
+            }
+        }
+    } else {
+        fn_80535650(t, k);
+        unsigned n = t->m4;
+        if (n != 0) {
+            int (*cmp)(float, float) = fn_80357074__Fff;
+            unsigned i = 0;
+            void* g2 = lbl_8061930C;
+            sp8 = lbl_805FB890;
+            spC = lbl_805FB890;
+            if (i < n) {
+                unsigned lim = n - 1;
+                unsigned lim2 = lim;
+                do {
+                    unsigned j = 0;
+                    if (j < lim) {
+                        do {
+                            int* d = t->m0;
+                            int o1 = j * 4;
+                            unsigned j1 = j + 1;
+                            int v0 = *(int*)((char*)d + o1);
+                            int o2 = j1 * 4;
+                            int v1 = *(int*)((char*)d + o2);
+                            sp8 = (float)fn_800739E0__18Unk8007A4DC_Screeniiii(g2, 0, v0, 1, 2);
+                            spC = (float)fn_800739E0__18Unk8007A4DC_Screeniiii(g2, 0, v1, 1, 2);
+                            if (cmp(sp8, spC) != 0) {
+                                if (j >= t->m4)
+                                    t->m4 = j1;
+                                *(int*)(o1 + (int)t->m0) = v1;
+                                if (j1 >= t->m4)
+                                    t->m4 = j1 + 1;
+                                *(int*)(o2 + (int)t->m0) = v0;
+                            }
+                            j = j1;
+                        } while (j < lim2);
+                    }
+                    i++;
+                    lim2--;
+                    lim--;
+                } while (i < n);
+            }
+        }
+    }
+    unsigned idx = 1;
+    int found = 0;
+    t->s1();
+    if (idx < t->m4 + 1) {
+        do {
+            int x = t->s3();
+            if (!(x == id || fn_8007A270__18Unk8007A4DC_Screeni(g, x) == 0 || fn_8007A6A0__18Unk8007A4DC_Screenii(g, 9, x) == cls)) {
+                found = 1;
+                break;
+            }
+            idx++;
+            t->s6();
+        } while (idx < t->m4 + 1);
+    }
+    if (found != 0) {
+        t->s3();
+        return;
+    }
+    fn_8007E154__FP13Unk8007DB74_Aii(g, k, rand() % 5);
+}
+
 extern "C" FE_OVERLAY void fn_80510020(FeScrD* x)
 {
     fn_804CF368(x);

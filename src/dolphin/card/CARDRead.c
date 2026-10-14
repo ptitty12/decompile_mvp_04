@@ -5,7 +5,7 @@
 
 extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
 extern s32 fn_8041B900(CARDControl* card, s32 result); /* __CARDPutControlBlock */
-extern void fn_80432FA8(void* addr, u32 nBytes); /* DCInvalidateRange */
+extern void DCInvalidateRange(void* addr, u32 nBytes);
 extern void fn_8041A6C4(s32 chan, s32 result); /* fn_8041A6C4 */
 extern void fn_8041A6C8(s32 chan, s32 result); /* fn_8041A6C8 */
 extern s32 fn_8041BB38(s32 chan); /* __CARDSync */
@@ -139,7 +139,7 @@ s32 CARDReadAsync(CARDFileInfo* fileInfo, void* buf, s32 length, s32 offset, CAR
     if (result < 0)
         return fn_8041B900(card, result);
 
-    fn_80432FA8(buf, (u32)length);
+    DCInvalidateRange(buf, (u32)length);
     card->apiCallback = callback ? callback : fn_8041A6C4;
 
     offset = (s32)OFFSET(fileInfo->offset, card->sectorSize);

@@ -363,6 +363,100 @@ DB_OVERLAY void fn_80546D5C(char* o, int a)
 
 /* near-miss: 1 slot; retail initialises i with `mr r30,r27` (copy of cnt's zero), ours uses li */
 /* near-miss: 1 slot; retail initialises i with `mr r30,r27` (copy of cnt's zero), ours uses li */
+extern const float lbl_805FF020;
+extern "C" int fn_8056087C(void* self);
+extern "C" float fn_8007824C(int id, int a);
+/* Team list of the roster screen: ids at +0 (count at +4), an iterator vtable at +0x10 (slot 1 = begin, 3 = current, 10 = next), the team-id
+ * list shuffled by fn_805479F0 at +0x32E0 and its cursor at +0x32EC. */
+struct Db805470F0_LB {
+    int* m0;
+    unsigned m4;
+    unsigned m8;
+    int mC;
+};
+class Db805470F0_V : public Db805470F0_LB {
+public:
+    virtual void s1();
+    virtual void s2();
+    virtual int s3();
+    virtual void s4();
+    virtual void s5();
+    virtual void s6();
+    virtual void s7();
+    virtual void s8();
+    virtual void s9();
+    virtual void s10();
+};
+class Db805470F0_O : public Db805470F0_V {
+public:
+    char pad14[0x32E0 - 0x14];
+    int* m32E0;
+    int m32E4;
+    int m32E8;
+    int m32EC;
+};
+struct Db805470F0_Best {
+    int id;
+    int score;
+    float f;
+};
+/* K3: picks the best candidate for the current team (the entry of the team-id list at +0x32E0, shuffled by fn_805479F0, at the
+ * cursor m32EC): one rand() % 4 chooses the rule (0, 2: every candidate; 1, 3: only candidates whose position kinds a / b suit the
+ * team's kind from fn_8056087C) and, among those, keeps the highest rating (rules 0, 1) or the highest float key fn_8007824C (rules 2, 3).
+ * Returns the chosen id (0 when none). near-miss: jump2 shares the call tail of the iterator-begin call (3 insns), retail keeps it. */
+extern "C" DB_OVERLAY int fn_805470F0(char* oc)
+{
+    Db805470F0_O* o = (Db805470F0_O*)oc;
+    Unk8007A4DC_Screen* s = (Unk8007A4DC_Screen*)lbl_8061930C;
+    unsigned i = 0;
+    unsigned n = o->m4;
+    int m = rand() % 4;
+    int kind = fn_8056087C((void*)o->m32E0[o->m32EC]);
+    Db805470F0_Best best;
+    best.id = 0;
+    best.score = 0;
+    best.f = lbl_805FF020;
+    o->s1();
+    for (; i < n; i++) {
+        if (fn_80546C88((char*)o, i) == 0) {
+            int sc = s->fn_8007A6A0(0x16, o->s3());
+            float f = fn_8007824C(o->s3(), 0);
+            int a = s->fn_8007A6A0(5, o->s3());
+            int b = s->fn_8007A6A0(6, o->s3());
+            if (best.id == 0)
+                best.id = o->s3();
+            switch (m) {
+            case 1:
+            case 3:
+                if (kind == 0 && !(a == 0 || b == 0 || a == 10 || b == 10))
+                    break;
+                if (kind == 2 && !(a == 2 || b == 2 || a == 12 || b == 12 || a == 13 || b == 13))
+                    break;
+                if (kind == 3 && !(a == 3 || b == 3 || a == 12 || b == 12 || a == 13 || b == 13))
+                    break;
+                if (kind == 4 && !(a == 4 || b == 4 || a == 12 || b == 12 || a == 13 || b == 13))
+                    break;
+                if (kind == 5 && !(a == 5 || b == 5 || a == 12 || b == 12 || a == 13 || b == 13))
+                    break;
+                if (kind == 1 && !(a == 1 || b == 1 || a == 12 || b == 12 || a == 13 || b == 13))
+                    break;
+                if ((unsigned)(kind - 6) <= 2 && !(a == 6 || b == 6 || a == 8 || b == 8 || a == 7 || b == 7 || a == 11 || b == 11 || a == 13 || b == 13))
+                    break;
+            case 0:
+            case 2:
+                if (((unsigned)m <= 1 && sc >= best.score) || ((unsigned)(m - 2) <= 1 && !(f < best.f))) {
+                    best.id = o->s3();
+                    best.score = sc;
+                    best.f = f;
+                }
+                break;
+            }
+        }
+        o->s10();
+    }
+    return best.id;
+}
+
 DB_OVERLAY int fn_805474B8(char* o, int a)
 {
     if (*(int*)(o + 0x107F0) != 0) {
@@ -431,13 +525,15 @@ DB_OVERLAY void fn_8054788C(void* unused, int mode)
     fn_80400CE4(0);
 }
 
-/* near-miss: 96.3%; callee-saved registers permuted (object in r29/list in r30 instead of r30/r28); instruction stream identical */
+/* K3: Fisher-Yates shuffle of the int list at +0x32E0 with rand() (called from the roster/lineup code; seed comes from the global rand state). */
 DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
 {
+    char* oo;
     IntSet(o + 0x10000, 0x7F8, x);
     IntSet(o + 0x10000, 0x7F0, 1);
-    char* l = o + 0x32E0;
-    fn_80546D0C(o);
+    oo = o;
+    char* l = oo + 0x32E0;
+    fn_80546D0C(oo);
     unsigned i = 0;
     fn_8053967C(l);
     if (kind == 0) {
@@ -446,45 +542,48 @@ DB_OVERLAY void fn_805479F0(char* o, int kind, int x)
         if (i < ll->m4) {
             int off = 0;
             do {
-                ll = (Db8053967C_List*)(o + 0x32E0);
+                ll = (Db8053967C_List*)(oo + 0x32E0);
                 unsigned r;
                 if (ll->m4 != i)
                     r = rand() % (ll->m4 - i);
                 else
                     r = 0;
                 unsigned j = r + i;
+                int flag = i >= ll->m4;
                 int jo = j * 4;
-                int* d = (int*)IntAt(o, 0x32E0);
-                int xv = *(int*)((char*)d + jo);
+                int* d = (int*)IntAt(oo, 0x32E0);
                 int yv = *(int*)((char*)d + off);
-                if (i >= ll->m4)
+                int xv = *(int*)((char*)d + jo);
+                if (flag)
                     ll->m4 = i + 1;
-                *(int*)(off + IntAt(o, 0x32E0)) = xv;
+                *(int*)(off + IntAt(oo, 0x32E0)) = xv;
                 if (j >= ll->m4)
                     ll->m4 = j + 1;
-                *(int*)(jo + IntAt(o, 0x32E0)) = yv;
+                *(int*)(jo + IntAt(oo, 0x32E0)) = yv;
                 i++;
                 off += 4;
             } while (i < ll->m4);
         }
     } else if (kind == 2) {
-        fn_805482D4(o);
+        fn_805482D4(oo);
     }
-    IntSet(o, 0x32EC, 0);
-    fn_8053971C(o);
-    IntSet(o + 0x10000, 0x7EC, *(int*)(o + 4));
-    fn_805362AC(o, 1);
-    fn_80542580(o + 0x10800);
+    IntSet(oo, 0x32EC, 0);
+    fn_8053971C(oo);
+    IntSet(oo + 0x10000, 0x7EC, *(int*)(oo + 4));
+    fn_805362AC(oo, 1);
+    fn_80542580(oo + 0x10800);
     fn_80400CE4(0);
 }
 
-/* near-miss: 95.9%; callee-saved registers permuted (retail reuses the list/kind registers inside the loop); instruction stream identical */
+/* K3: second copy of the rand() shuffle (list at +0x3500), see fn_805479F0. */
 DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
 {
-    IntSet(o + 0x10000, 0x7FC, x);
+    char* oo;
     IntSet(o + 0x10000, 0x7F4, 1);
-    char* l = o + 0x3500;
-    fn_80546D4C(o);
+    IntSet(o + 0x10000, 0x7FC, x);
+    oo = o;
+    char* l = oo + 0x3500;
+    fn_80546D4C(oo);
     unsigned i = 0;
     fn_80535EAC(l);
     if (kind == 0) {
@@ -493,31 +592,32 @@ DB_OVERLAY void fn_80547B38(char* o, int kind, int x)
         if (i < ll->m4) {
             int off = 0;
             do {
-                ll = (Db8053967C_List*)(o + 0x3500);
+                ll = (Db8053967C_List*)(oo + 0x3500);
                 unsigned r;
                 if (ll->m4 != i)
                     r = rand() % (ll->m4 - i);
                 else
                     r = 0;
                 unsigned j = r + i;
+                int flag = i >= ll->m4;
                 int jo = j * 4;
-                int* d = (int*)IntAt(o, 0x3500);
-                int xv = *(int*)((char*)d + jo);
+                int* d = (int*)IntAt(oo, 0x3500);
                 int yv = *(int*)((char*)d + off);
-                if (i >= ll->m4)
+                int xv = *(int*)((char*)d + jo);
+                if (flag)
                     ll->m4 = i + 1;
-                *(int*)(off + IntAt(o, 0x3500)) = xv;
+                *(int*)(off + IntAt(oo, 0x3500)) = xv;
                 if (j >= ll->m4)
                     ll->m4 = j + 1;
-                *(int*)(jo + IntAt(o, 0x3500)) = yv;
+                *(int*)(jo + IntAt(oo, 0x3500)) = yv;
                 i++;
                 off += 4;
             } while (i < ll->m4);
         }
     } else if (kind == 2) {
-        fn_805483C4(o);
+        fn_805483C4(oo);
     }
-    IntSet(o, 0x350C, 0);
+    IntSet(oo, 0x350C, 0);
     fn_80400CE4(0);
 }
 

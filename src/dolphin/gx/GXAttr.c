@@ -2,7 +2,6 @@
 /* The game code still calls this by its placeholder name; the placeholder keeps symbols.txt and the
  * callers consistent until a project-wide rename. */
 #define GXSetVtxDesc GXSetVtxDesc
-#define GXClearVtxDesc fn_8042B460
 #include <dolphin/gx.h>
 #include <dolphin/os.h>
 

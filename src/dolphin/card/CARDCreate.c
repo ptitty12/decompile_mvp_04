@@ -3,7 +3,7 @@
 
 #include "__card.h"
 
-extern OSTime fn_80438628(void); /* OSGetTime */
+extern OSTime OSGetTime(void);
 extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
 extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
 extern s32 fn_8041B848(s32 chan, CARDControl** pcard); /* __CARDGetControlBlock */
@@ -44,7 +44,7 @@ static void CreateCallbackFat(s32 chan, s32 result) {
         CARDSetIconSpeed(ent, 0, CARD_STAT_SPEED_FAST);
         card->fileInfo->offset = 0;
         card->fileInfo->iBlock = ent->startBlock;
-        ent->time = OSTicksToSeconds(fn_80438628());
+        ent->time = OSTicksToSeconds(OSGetTime());
         result = __CARDUpdateDir(chan, callback);
         if (result < 0) {
             goto after;

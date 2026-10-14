@@ -582,6 +582,114 @@ extern "C" void fn_800B3348(GObj6* self)
     fn_800B33D4(self);
 }
 
+struct Unk8022FE34_U {
+    void fn_80234E0C(float f);
+};
+struct G33D4_700 {
+    char pad0[0x3B0];
+    Unk8022FE34_U* m3B0;
+};
+struct G33D4_10 {
+    char pad0[0x14];
+    int m14;
+};
+struct G33D4_6F8 {
+    char pad0[0x10];
+    G33D4_10* m10;
+    char* m14;
+};
+struct G33D4_4 {
+    char pad0[0x6F8];
+    G33D4_6F8* m6F8;
+    char pad6FC[4];
+    G33D4_700* m700;
+};
+struct G33D4_Self {
+    char pad0[4];
+    G33D4_4* m4;
+};
+extern "C" void fn_80089EE0__FP20Unk80089894_PackTabDUiUii(void* t, unsigned k, unsigned c, int v);
+extern "C" void fn_8022E92C(void* h, int k);
+extern "C" int rand();
+extern Row16 lbl_805B9BD8[];
+extern Row16 lbl_805B9C28[];
+extern Row16 lbl_805B9C78[];
+extern Row16 lbl_805B9CC8[];
+extern int lbl_80619D24;
+extern int lbl_80619D28;
+extern int lbl_80619D2C;
+extern int lbl_80619D30;
+
+extern "C" void fn_800B33D4(GObj6* self)
+{
+    G33D4_Self* o = (G33D4_Self*)self;
+    Row16* tbl = 0;
+    int n = 0;
+    Unk8022FE34_U* ctl = o->m4->m700->m3B0;
+    ctl->fn_80234E0C(fn_800B3890((GObj*)self));
+    G33D4_6F8* p = o->m4->m6F8;
+    char* obj = p->m14;
+    unsigned char c = obj[0x17C];
+    switch (p->m10->m14) {
+    case 0:
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 2, c, 6);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 4, c, 0x64);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 5, c, 0x5F);
+        tbl = lbl_805B9BD8;
+        n = lbl_80619D24;
+        break;
+    case 1:
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 2, c, 9);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 4, c, 0x64);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 5, c, 0x5F);
+        tbl = lbl_805B9C28;
+        n = lbl_80619D28;
+        break;
+    case 2:
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 2, c, 0xC);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 4, c, 0x64);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 5, c, 0x62);
+        tbl = lbl_805B9C78;
+        n = lbl_80619D2C;
+        break;
+    case 3:
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 2, c, 0xF);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 4, c, 0x64);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 5, c, 0x62);
+        n = lbl_80619D30;
+        tbl = lbl_805B9CC8;
+        break;
+    }
+    fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 6, c, 0);
+    fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 0xB, c, 0);
+    fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 0x10, c, 0);
+    fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, 0x15, c, 0);
+    int m = lbl_80619D24;
+    if (m > 3)
+        m = 3;
+    for (int i = 0; i < m + 1; i++) {
+        int pick;
+        if (n > 0)
+            pick = rand() % n;
+        else
+            pick = 0;
+        if (fn_800B3734(self, tbl[pick].m0, obj, c) != 0) {
+            for (int j = 0; j < lbl_80619D24; j++) {
+                if (fn_800B3734(self, tbl[j].m0, obj, c) == 0) {
+                    pick = j;
+                    break;
+                }
+            }
+        }
+        Row16* r = (Row16*)(pick * 16 + (int)tbl);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, lbl_805C3C84[i].m0, c, r->m0);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, lbl_805C3C84[i].m4, c, r->m4);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, lbl_805C3C84[i].m8, c, r->m8);
+        fn_80089EE0__FP20Unk80089894_PackTabDUiUii(obj + 0xC74, lbl_805C3C84[i].mC, c, r->mC);
+    }
+    fn_8022E92C(o->m4->m700->m3B0, 0);
+}
+
 extern "C" int fn_800B3734(void* self, int target, char* obj, int c)
 {
     for (int i = 0; i <= 3; i++) {
