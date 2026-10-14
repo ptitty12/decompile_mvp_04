@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "ppc/mem_access.h"
+#include "runtime/input.h"
 #include "runtime/machine.h"
 
 namespace mvp::rt {
@@ -92,10 +93,50 @@ void hle_vm_alloc(Cpu& c, GuestFn) { c.gpr[3] = 1; }
 // void VMStoreAllPages(void), void VMSetLogStatsCallback(cb): nothing to do.
 void hle_nothing(Cpu&, GuestFn) {}
 
+// ---- controller input (R14, runtime/input.h) ----
+
+// u32 PADRead(PADStatus status[4]): the current frame's input, as the SDK reports
+// it after origin correction. A connected port: its controls and err 0
+// (PAD_ERR_NONE); a missing one: zeros and err -1 (PAD_ERR_NO_CONTROLLER). The
+// struct's padding byte (offset 11) is not written, as in the SDK. Returns the
+// channel bits of connected standard controllers (the SDK's rumble mask).
+void hle_pad_read(Cpu& c, GuestFn) {
+  ++g_pad_reads;
+  u32 status = c.gpr[3], motor = 0;
+  for (int k = 0; k < kPorts; ++k) {
+    PadState p = g_input ? g_input->current().pad[k] : PadState{};
+    if (!p.connected) p = PadState{};
+    u32 a = status + 12u * static_cast<u32>(k);
+    ppc::write16(c, a, p.buttons & pad::kAll);
+    ppc::write8(c, a + 2, static_cast<u8>(p.stick_x));
+    ppc::write8(c, a + 3, static_cast<u8>(p.stick_y));
+    ppc::write8(c, a + 4, static_cast<u8>(p.substick_x));
+    ppc::write8(c, a + 5, static_cast<u8>(p.substick_y));
+    ppc::write8(c, a + 6, p.trigger_l);
+    ppc::write8(c, a + 7, p.trigger_r);
+    ppc::write8(c, a + 8, p.analog_a);
+    ppc::write8(c, a + 9, p.analog_b);
+    ppc::write8(c, a + 10, p.connected ? 0x00u : 0xFFu);
+    if (p.connected) motor |= 0x80000000u >> k;
+  }
+  c.gpr[3] = motor;
+}
+
+// fn_8014865C (the frame loop's lock + controller poll, DETERMINISM §2.3): one
+// frame poll. Consumes the next frame's input before the game polls.
+void hle_frame_poll(Cpu& c, GuestFn) {
+  std::uint64_t frame = g_input ? g_input->begin_frame() : g_frame_polls;
+  ++g_frame_polls;
+  if (g_frame_hook) g_frame_hook(c, frame);
+}
+
 }  // namespace
 
 void (*g_report)(const std::string& line) = &default_report;
 std::uint64_t g_report_count = 0;
+InputQueue* g_input = nullptr;
+void (*g_frame_hook)(Cpu& c, std::uint64_t frame) = nullptr;
+std::uint64_t g_frame_polls = 0, g_pad_reads = 0;
 
 std::string format_guest(Cpu& c, u32 fmt_addr, int first_gpr) {
   std::string fmt = read_cstring(c, fmt_addr);
@@ -173,6 +214,10 @@ const std::vector<HleEntry>& hle_table() {
       {"VMAlloc", &hle_vm_alloc, "returns success: the region is plain RAM"},
       {"VMStoreAllPages", &hle_nothing, "no pages to write back"},
       {"VMSetLogStatsCallback", &hle_nothing, "no paging statistics"},
+      // E0c: controller input (R14).
+      {"PADRead", &hle_pad_read, "returns the frame's input from the input queue (runtime/input.h)"},
+      {"frame poll", &hle_frame_poll, "consumes one frame's input at the frame loop's controller poll",
+       0x8014865Cu, HleKind::Before},
   };
   return t;
 }
@@ -180,7 +225,7 @@ const std::vector<HleEntry>& hle_table() {
 int hle_index(const std::string& name) {
   const auto& t = hle_table();
   for (std::size_t k = 0; k < t.size(); ++k)
-    if (name == t[k].name) return static_cast<int>(k);
+    if (!t[k].address && name == t[k].name) return static_cast<int>(k);
   return -1;
 }
 
@@ -208,7 +253,10 @@ bool hle_interpret(Cpu& c) {
 
 void hle_call(Cpu& c, int index, GuestFn original) {
   hle_table()[static_cast<std::size_t>(index)].fn(c, original);
-  c.pc = c.lr & ~3u;  // return as the guest blr would
+  if (g_unwinding) return;  // the original, if called, switched threads
+  c.pc = c.lr & ~3u;        // return as the guest blr would
 }
+
+void hle_before(Cpu& c, int index) { hle_table()[static_cast<std::size_t>(index)].fn(c, nullptr); }
 
 }  // namespace mvp::rt

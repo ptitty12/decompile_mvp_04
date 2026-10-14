@@ -57,6 +57,13 @@ std::string op_ident(Op op) {
   }
 }
 
+// The replacement or hook for a function: by address when the spec has one, else by name.
+const HleSpec* find_hle(const EmitOptions& o, const FunctionCfg& f) {
+  for (const HleSpec& h : o.hle)
+    if (h.address ? h.address == f.start : h.name == f.sym->name) return &h;
+  return nullptr;
+}
+
 class Writer {
  public:
   explicit Writer(const EmitOptions& o) : opt_(o) {}
@@ -72,8 +79,11 @@ class Writer {
     bool multi = f.entries.size() > 1;
     if (multi) labels.insert(f.entries.begin(), f.entries.end());
 
-    auto hle = opt_.hle.find(f.sym->name);
-    int hle_id = hle != opt_.hle.end() && !multi ? hle->second : -1;
+    const HleSpec* spec = find_hle(opt_, f);
+    if (spec && multi) spec = nullptr;  // not supported on functions with secondary entries
+    if (spec) stats_.hle_matched.push_back(spec->index);
+    int hle_id = spec && !spec->before ? spec->index : -1;
+    int hook_id = spec && spec->before ? spec->index : -1;
     // Resume labels (runtime/native.h): every call's return address and every
     // back edge inside the function, where an unwind may continue natively.
     resume_.clear();
@@ -89,7 +99,8 @@ class Writer {
     const std::string self = fname(f.start), body = "b_" + self.substr(2);
     miss_ = resume_.empty() ? "{ rt::leave(); return; }" : "goto R_;";
 
-    out_ << "// " << f.sym->name << (hle_id >= 0 ? " (replaced: runtime/hle.h)" : "") << "\n";
+    out_ << "// " << f.sym->name << (hle_id >= 0 ? " (replaced: runtime/hle.h)" : hook_id >= 0 ? " (hooked: runtime/hle.h)" : "")
+         << "\n";
     if (hle_id >= 0) {
       out_ << "static void " << self << "_orig(Cpu& c) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
     } else if (multi) {
@@ -102,6 +113,7 @@ class Writer {
       out_ << "void " << self << "(Cpu& c) {\n  u32 sp = c.gpr[1];\n  (void)sp;\n";
       if (!resume_.empty()) out_ << "  if (rt::g_resume) goto R_;\n";
       out_ << entry_prologue(f.start, miss_);
+      if (hook_id >= 0) out_ << "  rt::hle_before(c, " << hook_id << ");\n";
     }
     back_edges_.clear();
     back_edges_.insert(f.back_edges.begin(), f.back_edges.end());
@@ -392,9 +404,9 @@ bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& op
   table << "\n};\n\nstatic const mvp::rt::HleSite kHle[] = {\n";
   std::size_t hle_sites = 0;
   for (const auto& f : p.functions) {
-    auto it = opt.hle.find(f.sym->name);
-    if (it == opt.hle.end() || f.entries.size() > 1) continue;
-    table << "  {" << h8(f.start) << ", " << it->second << "},\n";
+    const HleSpec* spec = find_hle(opt, f);
+    if (!spec || spec->before || f.entries.size() > 1) continue;
+    table << "  {" << h8(f.start) << ", " << spec->index << "},\n";
     ++hle_sites;
   }
   if (!hle_sites) table << "  {0, -1},\n";

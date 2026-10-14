@@ -10,7 +10,7 @@ local tests).
 | # | Item | State |
 |---|---|---|
 | 1 | Fewer unwinds per thread switch (D4, performance) | Done |
-| 2 | Controller input (R14): per-frame input queue, scripted input | |
+| 2 | Controller input (R14): per-frame input queue, scripted input | Done |
 | 3 | AX voice state (R8) | |
 
 ## 1. Unwinds per thread switch (done)
@@ -88,3 +88,68 @@ interpreted instructions.
 interpreter runs what is left of the suspended frames; with this change it is
 native code re-entered at resume labels, and same-activation reloads do not unwind
 at all.
+
+## 2. Controller input (done)
+
+**Design** (`runtime/input.h`, `runtime/hle.h`):
+- **Frame poll** = one pass of the frame loop (fn_80148930), at the entry of
+  fn_8014865C (DETERMINISM §2.3), numbered 0, 1, 2, ... from power-on. A new kind of
+  HLE entry, a *hook* (`HleKind::Before`), runs host code right after a translated
+  function's entry and before its body (not on resumes inside it). Game functions
+  are keyed by retail address (0x8014865C), not by placeholder name; `mvp-xlat
+  emit-cpp` now fails if any replacement or hook matches no function (a rename in
+  symbols.txt can no longer drop one silently).
+- **Input queue** (`InputQueue`): at each frame poll it consumes exactly one
+  frame's `FrameInput` (four `PadState`s): a pushed one, else its source's (a
+  script, later the netplay peer), else the previous frame's again. Before the
+  first poll it returns the boot input.
+- **PadState v1** (versioned API): connected, the SDK's button bits, the two
+  sticks, triggers, analog A/B, as PADRead reports them after origin correction.
+  Wire form: 1 version byte + 11 bytes per port (45 bytes per frame);
+  `decode_frame` rejects other versions, reserved bits and controls on a missing
+  pad.
+- **PADRead is replaced** (by name): it writes the current frame's input into the
+  game's PADStatus[4] (err 0, or -1 = no controller with zeros; the padding byte is
+  untouched) and returns the connected channels' bits. Every PADRead between two
+  polls returns the same frame's input, so a frame's input is part of the
+  deterministic state wherever it comes from. PADInit/PADReset/PADRecalibrate stay
+  SDK code (they only program SI; nothing reads their results any more).
+- **Scripts** (`InputScript`): `mvp-input 1` header, then `<frame> <port> <command>`
+  lines: `press`/`release` buttons, `tap N` buttons, `stick`, `cstick`, `trigger`,
+  `analog`, `connect`, `disconnect`; state holds until changed; errors name the line.
+- **`mvp-boot run`**: `--input SCRIPT`, `--frames N` (stop at the poll of frame N,
+  after frames 0..N-1), `--ports MASK` (default port 1 connected, nothing pressed),
+  `--frame-log FILE` (one line per poll: frame, time base, SDK calls so far, the
+  frame's input in wire form; hashed in the report).
+
+**Who consumes input, and how often** (measured with a back-chain at PADRead,
+2026-10-14): PADRead's only caller is fn_8000A44C (the PAD object's poll,
+`Unk800085B0::vslot42`; the port-0 object reads all four ports into lbl_806E0240
+and calls PADClampCircle, the others use that array). It runs from the *per-tick*
+pad update: fn_80148698 (one logic tick) -> fn_802D75D4 -> fn_8035F3A0 ->
+`Unk802D73B4_Mgr::s13` -> fn_8000A44C -> PADRead, i.e. **once per logic tick, 1 to 3
+times per frame**, plus once at boot (fn_8014BEB8 -> fn_802D75D4). fn_802D7588 (`s6`,
+called by fn_8014865C) does not reach PADRead. 0 to 700 frames: 701 polls and 1,190
+PADReads; the first poll is at 9.80 s of guest time, frame 700 at 33.1 s (frames
+take 1 to 4.3 sixtieths while loading and playing the intro movie). With the queue
+all ticks of a frame see that frame's input. **For the lead:** DETERMINISM §2.3
+(and R14) say PADRead runs once per pass through `fn_802D7588 -> s6`; in this run
+it runs per tick through `fn_802D75D4 -> s13` (the tagged-I link is wrong).
+
+**Exit evidence (2026-10-14):**
+- `test_input` (data-free, 6 cases, ~100 assertions): one input consumed per poll
+  in order, hold and source fallbacks, the boot input; wire round trip and
+  rejections; scripts (events, tap, sticks, connect/disconnect, going back, errors
+  by line); PADRead and the frame poll hook on a bare machine (bytes written, error
+  codes, padding untouched, return mask, same input for two reads in a frame).
+- START-press experiments to frame 700 (one run each, no input = reference): a
+  `tap 3 START` at frame 150 changes the time base from frame 152 and the SDK call
+  count from frame 211; at 280, 450 and 570 the SDK call count changes at the very
+  next poll (281, 451, 571), and the runs with the press at 280 and 450 reach frame
+  700 about 2.6 s of guest time earlier (the press skips something in the intro).
+- `local_input_start` (new ctest, 176 s): `280 1 tap 3 START`, 290 frames, three
+  runs: the two runs with the script are byte-identical (report, SDK log sha1
+  `c6d85264...`, frame log); the run without differs (`e652d99f...`); the frame logs
+  are identical through frame 280 and first differ at frame 281.
+- `local_boot_twice` still passes; its SDK log hash changed to `0054fb22...` (the
+  boot-time PADRead now sees a connected controller: 36 more function entries).
