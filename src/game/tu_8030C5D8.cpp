@@ -965,7 +965,7 @@ struct Unk8030E78C_Obj {
 /* K3: setup of an ambient particle emitter (a point-sprite EAGL::DrawArray with the named vars "Parameters", "Coordinates",
  * "Colours" and "State"): picks the effect variant with rand() (rand() % 4 when m38 == 0x3E, else rand() % 9 kept only if <= 2), stores
  * it in lbl_8062157C and calls fn_8030EBC8 with it, fills 2 * 512 coordinate/colour slots and seeds them with fn_8030FD50 (rand-driven).
- * near-miss: 98.6%; same code, the float constants land in different FPRs and the lis/lfs pairs are scheduled differently. */
+ * near-miss: 98.7%; same code, the float constants land in different FPRs and the lis/lfs pairs are scheduled differently. */
 void fn_8030E78C(void* pp, int a)
 {
     Unk8030E78C_Obj* p = (Unk8030E78C_Obj*)pp;
@@ -979,9 +979,9 @@ void fn_8030E78C(void* pp, int a)
     p->m74 = lbl_805E8FF4;
     p->m78 = lbl_805E8FF8;
     p->m7C = lbl_805E8FF0;
+    p->m70 = lbl_805E8FF0;
     p->mC0 = lbl_805E8FFC;
     p->m64 = lbl_805E9000;
-    p->m70 = lbl_805E8FF0;
     if (flag) {
         r = rand() % 4;
         p->m3C = 1;
