@@ -1,3 +1,21 @@
+/* Canonical GX LOD enum definitions from include/dolphin/gx/GXEnum.h. */
+struct _GXTexObj;
+typedef _GXTexObj GXTexObj;
+typedef enum _GXTexFilter {
+    GX_NEAR,
+    GX_LINEAR,
+    GX_NEAR_MIP_NEAR,
+    GX_LIN_MIP_NEAR,
+    GX_NEAR_MIP_LIN,
+    GX_LIN_MIP_LIN,
+} GXTexFilter;
+
+typedef enum _GXAnisotropy {
+    GX_ANISO_1,
+    GX_ANISO_2,
+    GX_ANISO_4,
+    GX_MAX_ANISOTROPY,
+} GXAnisotropy;
 /*
  * EA shared library code (ProDG, cflags_ealib: -O2 -G0),
  * .text 0x803DBFF4-0x803DDCD4 (code-only unit, 30 functions; TU boundaries approximate, placeholder).
@@ -350,5 +368,67 @@ extern "C" void fn_803DDCA8()
 
 /*
  * Not attempted: fn_803DBFF4 (912 instructions), fn_803DCE34 (141, string-keyed lookup with sprintf),
- * fn_803DD068 (142), fn_803DD2A0 (145). The original code stays linked.
+ * fn_803DD068 (142). The original code stays linked.
  */
+
+int fn_803D81FC();
+int fn_803D817C();
+extern "C" int fn_803D9DB8(int*);
+extern "C" int fn_803D9D90(int*);
+extern "C" int fn_803D9D7C(float*);
+extern "C" void fn_803D9DCC(int*);
+extern "C" void GXInitTexObjLOD(GXTexObj*, GXTexFilter, GXTexFilter, float, float, float, unsigned char, unsigned char, GXAnisotropy);
+extern float lbl_8060C6C0;
+extern "C" void fn_803DD2A0(Unk803DBFF4Tex* self)
+{
+    int minFilter = 1;
+    fn_803D81FC();
+    fn_803D817C();
+    const int levels = self->m4 - 1;
+    int maximum = levels;
+    if (levels != 0) minFilter = 3;
+    int mode;
+    fn_803D9DB8(&mode);
+    int selected = mode == -1 ? self->m10 : mode;
+    switch (selected) {
+    case 0: maximum = 0; break;
+    case 2:
+        if (self->m50 == 0) {
+            minFilter = 1;
+            if (levels != 0) minFilter = 5;
+        } else minFilter = 1;
+        break;
+    }
+    int filter;
+    float bias;
+    fn_803D9D90(&filter);
+    fn_803D9D7C(&bias);
+    int chosen = self->mC;
+    float value = self->m14;
+    switch (filter) {
+    case 1: chosen = 1; break;
+    case 2: chosen = 2; break;
+    case 3: chosen = 3; break;
+    }
+    if (bias != lbl_8060C6C0) value = bias;
+    int anisotropy = 2;
+    int override;
+    fn_803D9DCC(&override);
+    switch (override) {
+    case 0: anisotropy = 0; break;
+    case 1: anisotropy = 1; break;
+    case 2: anisotropy = 2; break;
+    }
+    if (self->m50 != 0 && chosen == 3) chosen = 2;
+    switch (chosen) {
+    case 1:
+        GXInitTexObjLOD((GXTexObj*)self->m20, (GXTexFilter)0, (GXTexFilter)0, lbl_8060C6C0, lbl_8060C6C0, value, self->m4C, 0, (GXAnisotropy)0);
+        break;
+    case 2:
+        GXInitTexObjLOD((GXTexObj*)self->m20, (GXTexFilter)minFilter, (GXTexFilter)1, lbl_8060C6C0, (float)maximum, value, self->m4C, 0, (GXAnisotropy)0);
+        break;
+    case 3:
+        GXInitTexObjLOD((GXTexObj*)self->m20, (GXTexFilter)minFilter, (GXTexFilter)1, lbl_8060C6C0, (float)maximum, value, self->m4C, 0, (GXAnisotropy)anisotropy);
+        break;
+    }
+}
