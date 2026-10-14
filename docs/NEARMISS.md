@@ -377,3 +377,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `fe/tu_804CE408` `fn_804CEBAC`: inherited96.91304%; eight ordinary indexed/pointer/for/do loop forms retain counter-before-row setup and row-before-counter increment scheduling differences; source preserved, scratch build/root51/CEBAC.
 
 - `db/tu_80565FD4` `fn_8056746C`: inherited97.07921%; eight ordinary aggregate-copy/lifetime/array/memcpy forms retain record-copy register and second-vptr scheduling differences; source preserved, scratch build/root51/6746C.
+- `db/tu_8056A248` `fn_8056A838`: 98.21429%; eight ordinary table-pointer/offset/load-order forms retain table/index and compare-operand register colors; source preserved, scratch build/root54/A838.
