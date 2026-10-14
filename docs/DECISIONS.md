@@ -229,6 +229,18 @@ Agents may propose entries under "Open questions"; only the owner moves them to 
 
   The lead also accepts the K1c link-order fix (12 `.sbss` split lines dropped, `libc/errno.c` with `-fcommon`; staged as `staged/k1c-scommon`, VERIFY PASS) under the owner's 2026-10-14 delegation. | dtk's SDK signatures for `__start`, OSInit and `__OSThreadInit` relocate to linker-defined symbols. Naming OSInit and DVDInit needs them. | owner reply in chat
 
+- 2026-10-14 | **E0c engine decisions** (lead, under the owner's delegation; details in docs/engine/E0C_LOG.md).
+  - **E0c-D4b, how D4 is implemented:**
+    - unwinding uses plain C++ returns;
+    - every call-return address and loop back edge (125,559 in the DOL) is a resume label;
+    - a resumed thread re-enters its native function body at the label.
+
+    Measured: exactly 1 unwind per real thread switch; the interpreted share went from 11.75% to 0.0116%.
+  - **E0c-IN1, input:** a per-frame input queue (`engine/runtime/input.h`, versioned `PadState` v1, 45 bytes per frame) is consumed at the frame poll (fn_8014865C). PADRead is replaced and returns that frame's state. This queue is the netplay lockstep entry point. A scripted START press changes the run from the next frame, and two runs with the same script are byte-identical.
+  - **E0c-AX1, audio voices:** on the DSP side, each running voice advances 160 samples per audio frame: 16.16 rate conversion; ADPCM, PCM16 and PCM8 addressing; loop or stop. There is no mixing yet (E3). Sounds now finish, and EA SND frees their voices.
+
+  | The determinism invariant is kept: two-run SDK logs are byte-identical in every configuration. | commits 0a4ff1c4, 3968dfbb, d29148e8
+
 ## Open questions for owner
 
 - 2026-10-14 | **K1c (OSInit, DVDInit) is held on two things only the owner or the lead can change.** Naming fn_8043188C OSInit and fn_80422FD8 DVDInit (`tools/goals/renames/k1c.tsv`, evidence there) makes dtk's SDK signatures rename 150 more symbols. work/k1c landed everything that is correct on its own: six contract commits, the BB2 overlay without its macro, fn_8042515C's parameter renamed, the .bss data splits of the two linked units (fstload.c: bb2Buf and __fstLoad's static block; EXIBios.c: Ecb), and stateBusy's switch table in dvd's split (without it dtk exports the static as `stateBusy_8042427C` and verify counts fn_8042427C as 100% -> 0%). Two blockers remain:

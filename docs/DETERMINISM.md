@@ -148,6 +148,13 @@ main(argc, argv):                              // fn_8014D63C
 
 ### 2.3 The frame loop
 
+> **Correction (E0c, 2026-10-14, measured):** `PADRead`'s only caller is fn_8000A44C. It is reached
+> through the per-tick update (fn_80148698 → fn_802D75D4 → fn_8035F3A0 → `Unk802D73B4_Mgr::s13`), so
+> **PADRead runs once per logic tick** (1-3 per frame), plus once at boot: 1,190 PADReads in 701 frame
+> polls. The path through fn_802D7588/s6 described below never reaches PADRead in measured runs.
+> The engine's input queue is still keyed by the frame poll (fn_8014865C, E0c-IN1); every tick in a
+> frame sees that frame's input.
+
 `fn_80148930(self)` (272 B), `self = lbl_8068B618`: prints `"top of game loop!"`, zeroes
 the counters `lbl_8061B8F0/8F4/8C4`, creates the `cFEManager` if missing, calls
 `fn_80148604` (clears `self+0x20` and `self+0x24`), prints `"after init!"`, calls
