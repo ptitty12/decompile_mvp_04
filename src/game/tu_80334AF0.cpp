@@ -610,6 +610,105 @@ void fn_803374A0()
     }
 }
 
+struct Unk80337598_Screen { int fn_8007A6A0(int a, int b); };
+struct Unk80337598_Screen2 { int fn_8007C514(int a, int b); };
+struct Unk80337598_List {
+    char* m0;
+    unsigned m4;
+    int m8;
+    unsigned mC;
+    const void* m10;
+    int m14;
+};
+extern Unk80337598_Screen* lbl_8061930C;
+extern const char lbl_8064B298[];
+extern const char lbl_8064A550[];
+extern const char lbl_8064A3B8[];
+extern const char lbl_80666F10[];
+extern "C" {
+void fn_8040074C(void* x, int a);
+void fn_805352B0(Unk80337598_List* self);
+void fn_80539FC0(Unk80337598_List* self);
+}
+
+/* near-miss (97.0%, 164 vs 166 insns): retail keeps the list pointer in r29 and the id in r31 in the first block
+   (ours swaps them), re-forms the frame address for the second block, and holds 'lis zero' differently;
+   declaration order of l/b/s/k, a shared zero local and a vtable local were tried. The vtable local in the
+   second block (vt) is what hoists lbl_8064A550 into r30 as in retail.
+   Rebuilds the two 0x385-entry lookup tables (lbl_806E2A50, lbl_806E3864) from the roster lists:
+   entry index = Screen::fn_8007A6A0(0x2C, id) for the first list (0xCB2 slots) and fn_8007C514(6, id) for the
+   second (0x1BE slots). */
+extern "C" void fn_80337598()
+{
+    int i;
+    for (i = 0; i < 0x385; i++) {
+        lbl_806E2A50[i] = 0;
+        lbl_806E3864[i] = 0;
+    }
+    if (lbl_8061B9BC != 0) {
+        {
+            Unk80337598_List l;
+            int b[0xCB2];
+            Unk80337598_List* s = &l;
+            s->m10 = lbl_8064B298;
+            l.m0 = (char*)b;
+            s->m8 = 0xCB2;
+            fn_8040074C(l.m0, 0x32C8);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A550;
+            fn_8040074C(l.m0, s->m8 * 4);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_8064A3B8;
+            s->m14 = 0;
+            fn_805352B0(s);
+            s->mC = 0;
+            unsigned k = 0;
+            for (; k < s->m4; k++) {
+                int id = *(int*)(l.m0 + s->mC * 4);
+                int t = lbl_8061930C->fn_8007A6A0(0x2C, id);
+                if (t <= 0x384) {
+                    lbl_806E2A50[t] = lbl_8061930C->fn_8007A6A0(0x24, id);
+                    lbl_806E3864[t] = lbl_8061930C->fn_8007A6A0(0x2D, id);
+                }
+                s->mC = (s->mC + 1) % s->m4;
+            }
+        }
+        {
+            Unk80337598_List l;
+            int b[0x1BE];
+            const void* vt = lbl_8064A550;
+            Unk80337598_List* s = &l;
+            s->m10 = lbl_8064B298;
+            l.m0 = (char*)b;
+            s->m8 = 0x1BE;
+            fn_8040074C(l.m0, 0x6F8);
+            s->m10 = vt;
+            s->m4 = 0;
+            s->mC = 0;
+            fn_8040074C(l.m0, s->m8 * 4);
+            s->m4 = 0;
+            s->mC = 0;
+            s->m10 = lbl_80666F10;
+            s->m14 = 0;
+            fn_80539FC0(s);
+            s->mC = 0;
+            unsigned k = 0;
+            for (; k < s->m4; k++) {
+                int id = *(int*)(l.m0 + s->mC * 4);
+                int t = ((Unk80337598_Screen2*)lbl_8061930C)->fn_8007C514(6, id);
+                if (t <= 0x384) {
+                    lbl_806E2A50[t] = ((Unk80337598_Screen2*)lbl_8061930C)->fn_8007C514(9, id);
+                    lbl_806E3864[t] = ((Unk80337598_Screen2*)lbl_8061930C)->fn_8007C514(7, id);
+                }
+                s->mC = (s->mC + 1) % s->m4;
+            }
+            s->m10 = lbl_8064A550;
+        }
+    }
+}
+
 int fn_80337830(int i) { return lbl_806E2A50[i]; }
 
 int fn_80337844(int i) { return lbl_806E3864[i]; }
