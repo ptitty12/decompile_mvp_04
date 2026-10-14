@@ -416,6 +416,81 @@ extern "C" DB_OVERLAY void fn_80588F68(void* self, void* rec, unsigned short* ds
     }
 }
 
+extern const float lbl_8060080C;
+extern const float lbl_80600810;
+extern const float lbl_80600814;
+extern "C" int fn_8058928C(void* self, int a, int sc, float f1, float f2, float f3);
+int fn_8007F9B4(Unk8007F198_C* s);
+
+/* K3: random news event. fn_8058928C picks the subject (a player id, 0 = none); a switch on the subject's
+ * type (fn_8007A6A0(5, id)) chooses the kind, with rand() % 3 / rand() % 2 sub-rolls; if the subject is 25 or younger
+ * (year from fn_80329FA0 minus fn_8007A768(3, id)) a kind-1 event is built (fn_8052E198) and queued (fn_80582CF8).
+ * The struct result of fn_80329FA0 is bound to a const reference so that retail's pointer register survives
+ * (a plain local is folded to sp+N). */
+extern "C" DB_OVERLAY void fn_80589020(int* self, int a)
+{
+    Db8058B628_E e;
+    if (*self == 0) {
+        int sc = 0;
+        if (fn_800B5758(fn_800B555C())) {
+            sc = ((Unk8007B2B0_Screen*)lbl_8061930C)->fn_8007B380(fn_8008FE14(7), fn_8007F7D0((Unk8007F198_B*)lbl_8061930C, 0));
+        }
+        Unk80536990_Screen* s = (Unk80536990_Screen*)lbl_8061930C;
+        a = fn_8058928C(self, a, sc, lbl_8060080C, lbl_80600810, lbl_80600814);
+        int st = s->fn_8007A6A0(5, a);
+        if (a != 0) {
+            int v = 1;
+            switch (st) {
+            case 0:
+                v = 2;
+                break;
+            case 1:
+            case 4:
+            case 8:
+                v = 0;
+                break;
+            case 2:
+            case 6:
+                v = 1;
+                break;
+            case 3:
+            case 5:
+                switch (rand() % 3) {
+                case 0:
+                    v = 1;
+                    break;
+                case 1:
+                    v = 0;
+                    break;
+                case 2:
+                    v = 3;
+                    break;
+                }
+                break;
+            case 7:
+                switch (rand() % 2) {
+                case 0:
+                    v = 0;
+                    break;
+                case 1:
+                    v = 3;
+                    break;
+                }
+                break;
+            }
+            const Db80329FA0_Out& o = fn_80329FA0(fn_8007F9B4((Unk8007F198_C*)s));
+            int age = o.m2;
+            if ((int)(age - (unsigned short)(int)s->fn_8007A768(3, a)) <= 0x19) {
+                int u = fn_80077BC4(s, a);
+                char c = ((Unk8007B2B0_Screen*)s)->fn_80078A38(u);
+                fn_8052E198(&e, 1, a, u, sc, v, c, 0, 0, 0);
+                fn_80582CF8(self, &e, 0, 0, 0);
+                fn_80360AF0((Db80586420_Ent*)&e, 2);
+            }
+        }
+    }
+}
+
 extern "C" DB_OVERLAY void fn_80589720(void* self, void* rec, unsigned short* dst)
 {
     fn_8058233C(self);
