@@ -81,8 +81,9 @@ Unk802BF974::~Unk802BF974()
 /* near-miss (73 vs 73 insns, schedule only): retail sets r3 = &sp8 last in each call; the pointer-local recipe made it worse. */
 extern "C" int fn_802BFAA8(int a, int k, float* p, float* q, int c, int d, int e, float f);
 
-/* near-miss 97.5%: instructions identical, only the callee-saved registers of a0/a3/a4/a5 are permuted (retail: a0 r26, a3 r29, a4 r28, a5 r27) */
-int fn_802C0050(int a0, float* p, float* q, int a3, int a4, int a5, float f)
+/* The float parameter is declared before a3..a5: its -ffloat-store spill (stfs f1) is emitted at its declaration position, one insn
+   before the a3/a4/a5 copies, so those pseudos live one insn less than a0 and win the higher callee-saved registers (r29/r28/r27 vs r26). */
+int fn_802C0050(int a0, float* p, float* q, float f, int a3, int a4, int a5)
 {
     if (!(p[0] >= -5.0f) && q[0] < -5.0f)
         return 0;
