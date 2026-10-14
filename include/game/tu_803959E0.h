@@ -247,7 +247,7 @@ void fn_80395A44(void* p);
 }
  /* C++ symbol fn_8000E5BC__Fi */
 extern "C" {
-void fn_8040ABC4(void* p);
+void free(void* p);
 void* memset(void* p, int c, unsigned n);
 void* memcpy(void* d, const void* s, unsigned n);
 int rand(void);

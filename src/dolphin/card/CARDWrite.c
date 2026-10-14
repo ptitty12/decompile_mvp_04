@@ -4,7 +4,7 @@
 #include "__card.h"
 
 extern void DCStoreRange(void* addr, u32 nBytes);
-extern OSTime fn_80438628(void); /* OSGetTime */
+extern OSTime OSGetTime(void);
 extern void fn_8041A6C4(s32 chan, s32 result); /* __CARDDefaultApiCallback */
 extern void fn_8041A6C8(s32 chan, s32 result); /* __CARDSyncCallback */
 extern s32 fn_8041B64C(s32 chan, u32 addr, CARDCallback callback); /* __CARDEraseSector */
@@ -36,7 +36,7 @@ static void fn_8041F430(s32 chan, s32 result) {
         if (fileInfo->length <= 0) {
             dir = __CARDGetDirBlock(card);
             ent = dir + fileInfo->fileNo;
-            ent->time = fn_80438628()/(__OSBusClock/4);
+            ent->time = OSGetTime()/(__OSBusClock/4);
             callback = card->apiCallback;
             card->apiCallback = NULL;
             result = __CARDUpdateDir(chan, callback);

@@ -23,13 +23,13 @@ extern s32 fn_804282FC(s32 chan, u32 dev, u32* id);          /* EXIGetID */
 extern EXICallback fn_80427440(s32 chan, EXICallback cb);    /* EXISetExiCallback */
 extern BOOL fn_80427630(s32 chan);                           /* EXIProbe */
 extern void OSCancelAlarm(OSAlarm* alarm);
-extern void fn_80432FA8(void* addr, u32 nBytes);             /* DCInvalidateRange */
+extern void DCInvalidateRange(void* addr, u32 nBytes);
 extern void DCStoreRange(void* addr, u32 nBytes);
-extern void* fn_80436A9C(void);                              /* __OSLockSram */
+extern void* __OSLockSram(void);
 extern void* fn_80436AF8(void);                              /* __OSLockSramEx */
-extern void fn_80436E90(BOOL commit);                        /* __OSUnlockSram */
+extern void __OSUnlockSram(BOOL commit);
 extern void fn_80436EB4(BOOL commit);                        /* __OSUnlockSramEx */
-extern OSTime fn_80438628(void);                             /* OSGetTime */
+extern OSTime OSGetTime(void);
 
 /* CARDBios.c (tu_8041A6C4) */
 extern s32 fn_8041B848(s32 chan, CARDControl** pcard);             /* __CARDGetControlBlock */
@@ -606,7 +606,7 @@ static s32 fn_8041D488(s32 chan)
         fn_80427440(chan, fn_8041A7D4);
         fn_804281E0(chan);
 
-        fn_80432FA8(card->workArea, CARD_WORKAREA_SIZE);
+        DCInvalidateRange(card->workArea, CARD_WORKAREA_SIZE);
     }
 
     step = card->mountStep - 2;
@@ -832,11 +832,11 @@ static s32 fn_8041DE88(s32 chan, u16 encode, CARDCallback callback)
     memset(id, 0xFF, CARD_SYSTEM_BLOCK_SIZE);
     viDimming = *(u16*)0xCC00206E;
     id->encode = encode;
-    sram = fn_80436A9C();
+    sram = __OSLockSram();
     *(u32*)&id->serial[20] = sram->counterBias;
     *(u32*)&id->serial[24] = sram->language;
-    fn_80436E90(FALSE);
-    time = fn_80438628();
+    __OSUnlockSram(FALSE);
+    time = OSGetTime();
     rand = time;
     flashID = (u8*)fn_80436AF8() + chan * 12;
     for (i = 0; i < 12; i++) {

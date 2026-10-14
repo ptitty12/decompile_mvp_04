@@ -42,7 +42,7 @@ int PCclose(int h);
 int PCwrite(int h, int a, int b);
 int PClseek(int h, int a, int b);
 int DVDClose(void* p);
-void fn_804321CC(void);
+void OSInitAlarm(void);
 void fn_803FF5E8(int, int);
 }
 
@@ -88,7 +88,7 @@ int PCcreat(int h, int a);
 int fn_804002BC(const char* fmt, ...);
 int fn_803FF618();
 int PCread(int h, int a, int b);
-int fn_804250B0();
+int DVDGetDriveStatus();
 int fn_803FF424(void* p, int a, int c, int b);
 void fn_803FF244(void* p);
 void fn_803FA888(int);
@@ -336,7 +336,7 @@ extern "C" int fn_803FF618()
             }
         }
         for (;;) {
-            int r = fn_804250B0();
+            int r = DVDGetDriveStatus();
             if (r == 0 || r == 8 || r == 1)
                 break;
             fn_803FFFA8(100);
@@ -395,7 +395,7 @@ extern "C" int fn_803FF848()
 extern "C" void fn_803FF850()
 {
     if (lbl_806EEAB0 == 0) {
-        fn_804321CC();
+        OSInitAlarm();
         lbl_806EEAB0++;
     }
 }

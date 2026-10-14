@@ -10,9 +10,9 @@ void GXInvalidateVtxCache(void);
 void GXInvalidateTexAll(void);
 void VISetPostRetraceCallback(int cb);
 void fn_803DB4CC(void);
-void fn_8043000C(int a);
+void GXSetDither(int a);
 void GXDrawDone(void);
-void fn_80432FA8(void);
+void DCInvalidateRange(void);
 void GXRedirectWriteGatherPipe(int a);
 void GXRestoreWriteGatherPipe(void);
 void GXEnableBreakPt(int a);
@@ -131,8 +131,8 @@ void fn_803E2D18(void);
 void fn_803D9E70(void* o, int a, int b, unsigned short c, unsigned short d, unsigned short e, unsigned short f, int g, int h);
 void fn_803D9ECC(void* o, int a, int b, int c, int d);
 void fn_803D8828(void);
-void fn_8042FED0(int a, int b, int c);
-void fn_8042FE78(int a);
+void GXSetZMode(int a, int b, int c);
+void GXSetColorUpdate(int a);
 void GXSetDrawSync(int a);
 int OSReceiveMessage(void* q, void* msg, int flags);
 void GXCopyDisp(int dest, int clear);
@@ -259,7 +259,7 @@ void fn_803DE1BC(float* m);
 void fn_803DE300(float* m, int a);
 void fn_803DE3D0(int a);
 void fn_803DDCD4();
-void fn_8042DC44(int a);
+void GXSetNumChans(int a);
 void GXSetNumTexGens(int n);
 void GXSetNumTevStages(int n);
 void fn_803DB9C0(int a, int b);
@@ -267,11 +267,11 @@ void fn_803DBF78(int a, int b, int c, int d, int e);
 void GXSetCullMode(int m);
 void C_MTXOrtho(float* m, float t, float b, float l, float r, float n, float f);
 void GXSetProjection(float* m, int type);
-void fn_80430364(int idx);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
-void fn_8042FE24(int a, int b, int c, int d);
+void GXSetCurrentMtx(int idx);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
+void GXSetBlendMode(int a, int b, int c, int d);
 void GXSetAlphaCompare(int a, int b, int c, int d, int e);
-void fn_8042FF04(int a);
+void GXSetZCompLoc(int a);
 void GXBegin(int a, int b, int c);
 }
 
@@ -295,7 +295,7 @@ extern "C" void fn_803D83BC(Unk803D83BCObj* self)
         fn_803DE300(m1, 0);
         fn_803DE3D0(1);
         fn_803DDCD4();
-        fn_8042DC44(1);
+        GXSetNumChans(1);
         GXSetNumTexGens(1);
         GXSetNumTevStages(1);
         fn_803DB9C0(0x5200, 1);
@@ -305,12 +305,12 @@ extern "C" void fn_803D83BC(Unk803D83BCObj* self)
         GXSetCullMode(0);
         C_MTXOrtho(m2, 0.0f, self->m20, 0.0f, self->m1C, 0.0f, -1.0f);
         GXSetProjection(m2, 1);
-        fn_80430364(0x3C);
-        fn_8042DC80(4, 0, 0, 1, 0, 2, 2);
-        fn_8042FE24(1, 4, 5, 3);
+        GXSetCurrentMtx(0x3C);
+        GXSetChanCtrl(4, 0, 0, 1, 0, 2, 2);
+        GXSetBlendMode(1, 4, 5, 3);
         GXSetAlphaCompare(7, 0, 1, 7, 0);
-        fn_8042FF04(0);
-        fn_8042FED0(0, 7, 0);
+        GXSetZCompLoc(0);
+        GXSetZMode(0, 7, 0);
         GXBegin(0x80, 5, 4);
         GXWGFifo.f32 = 0.0f;
         GXWGFifo.f32 = 0.0f;
@@ -397,8 +397,8 @@ extern "C" void fn_803D8640(Unk803D8640Dev* self)
         self->mD4 = 0;
     }
     int msg;
-    fn_8042FED0(1, 3, 1);
-    fn_8042FE78(1);
+    GXSetZMode(1, 3, 1);
+    GXSetColorUpdate(1);
     lbl_806272E8 = self->mDC;
     OSReceiveMessage(lbl_80627390, &msg, 1);
     lbl_806272D4 = 0;
@@ -470,7 +470,7 @@ extern "C" void fn_803D9268(Unk803D8234Sub* self)
         int v = 0;
         if (self->mB0)
             v = 1;
-        fn_8043000C(v);
+        GXSetDither(v);
     }
 }
 
@@ -488,7 +488,7 @@ extern "C" void fn_803D92D4(Unk803D8234Dev* dev)
         int v = 0;
         if (s->mB0)
             v = 1;
-        fn_8043000C(v);
+        GXSetDither(v);
     }
     lbl_8062C2B4 = 0;
 }
@@ -628,7 +628,7 @@ extern "C" int fn_803D98AC()
 
 extern "C" void fn_803D98C8(int x)
 {
-    fn_80432FA8();
+    DCInvalidateRange();
     if (lbl_80627320)
         fn_803D999C();
     lbl_80627320 = 1;

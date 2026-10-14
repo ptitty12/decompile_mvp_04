@@ -646,6 +646,99 @@ DB_OVERLAY void fn_80543D28(L* l)
     }
 }
 
+struct Db80544DD4_R1E0 {
+    char pad0[0x1E0];
+    int m1E0;
+};
+struct Db80544DD4_G {
+    char pad0[0x2C];
+    void* m2C;
+};
+extern "C" void fn_8007F524__FP13Unk8007F198_A(void* g, int team);
+extern "C" unsigned fn_8007F198__FP13Unk8007F198_A(void* g, int team);
+extern "C" int fn_8007F24C__FP13Unk8007F198_Aii(void* g, int team, unsigned char i);
+extern "C" int fn_8007F56C__FP13Unk8007F198_Aii(void* g, int team, int id);
+extern "C" int fn_8007F3E8__FP13Unk8007F198_Aii(void* g, int team, int id);
+extern "C" int fn_8007F488__FP13Unk8007F198_A(void* g, int team);
+extern "C" void fn_80581980(void* self, int id, int team);
+extern "C" void fn_80535764(void* l, int team);
+extern "C" void fn_80539128(void* l, void* out);
+extern "C" void fn_805362AC(void* l, int mode);
+extern const float lbl_805FEFBC;
+extern const float lbl_805FEFC0;
+extern char lbl_8064A4C8[];
+
+extern "C" DB_OVERLAY void fn_80544DD4(Db80541F40_Obj* o)
+{
+    Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;
+    unsigned i = 0;
+    int team = o->m44;
+    fn_8007F524__FP13Unk8007F198_A(s, team);
+    int best;
+    do {
+        if (i != 9) {
+            best = 0;
+            if (fn_80545110(o, i, &best) != 0 && fn_8007F56C__FP13Unk8007F198_Aii(s, team, best) == 0) {
+                if (fn_8007F3E8__FP13Unk8007F198_Aii(s, team, best) == 0)
+                    return;
+                if (lbl_80619948 != 0)
+                    fn_80581980(((Db80544DD4_G*)lbl_8061930C)->m2C, best, team);
+            }
+        }
+        i++;
+    } while (i <= 9);
+    if (((Db80544DD4_R1E0*)fn_8007FE04__FP13Unk8007F198_D(s))->m1E0 == 1) {
+        unsigned n = fn_8007F198__FP13Unk8007F198_A(s, team);
+        for (i = 0; i < n; i++) {
+            int pl = fn_8007F24C__FP13Unk8007F198_Aii(s, team, i);
+            if (((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x19, pl) != 1)
+                continue;
+            float v = fn_8007824C(pl, 0);
+            if (v < lbl_805FEFBC)
+                continue;
+            int t = s->fn_80075948(team);
+            float a = s->fn_800799D0(((Unk8007A4DC_Screen*)s)->fn_8007A6A0(0x18, pl));
+            float b = s->fn_80079EFC(t);
+            if (b > a * lbl_805FEFC0)
+                continue;
+            if (fn_8007F56C__FP13Unk8007F198_Aii(s, team, pl) != 0)
+                continue;
+            if (fn_8007F3E8__FP13Unk8007F198_Aii(s, team, pl) == 0)
+                return;
+            if (lbl_80619948 != 0)
+                fn_80581980(((Db80544DD4_G*)lbl_8061930C)->m2C, pl, team);
+        }
+    }
+    if (fn_8007F488__FP13Unk8007F198_A(s, team) != 0)
+        return;
+    if (rand() % 100 <= 0x3B) {
+        Db8053E240_Tmp t;
+        int buf[0x28];
+        Db8053E240_Tmp* q = &t;
+        t.m0 = buf;
+        t.vp = lbl_8064B298;
+        q->m8 = 0x28;
+        fn_8040074C(t.m0, t.m8 << 2);
+        q->m4 = 0;
+        q->mC = 0;
+        t.vp = lbl_8064A550;
+        fn_8040074C(t.m0, t.m8 << 2);
+        q->m4 = 0;
+        q->mC = 0;
+        q->m14 = 0;
+        t.vp = lbl_8064A4C8;
+        fn_80535764(q, team);
+        fn_80539128(q, 0);
+        fn_805362AC(q, 0);
+        if (t.m4 != 0) {
+            int id = *t.m0;
+            if (fn_8007F3E8__FP13Unk8007F198_Aii(s, team, id) != 0 && lbl_80619948 != 0)
+                fn_80581980(((Db80544DD4_G*)lbl_8061930C)->m2C, id, team);
+        }
+        t.D();
+    }
+}
+
 DB_OVERLAY int fn_80545110(Db80541F40_Obj* o, int mode, int* best)
 {
     Unk8007B2B0_Screen* s = (Unk8007B2B0_Screen*)lbl_8061930C;

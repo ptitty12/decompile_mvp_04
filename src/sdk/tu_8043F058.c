@@ -62,7 +62,7 @@ void fn_8043F058(void (*cb)(u32))
         lbl_806EF980 = 1;
         fn_8043F3DC(cb);
         {
-            u32 gap = 0x10000 - ((u32)fn_80432CBC() & 0xFFFF);
+            u32 gap = 0x10000 - ((u32)OSGetArenaLo() & 0xFFFF);
             if (gap >= 0x5000) {
                 fn_8043F420();
                 fn_8043F450();
@@ -178,23 +178,23 @@ void fn_8043F3DC(void (*cb)(u32))
 
 void fn_8043F3E4(void)
 {
-    u32 lo = (u32)fn_80432CBC();
+    u32 lo = (u32)OSGetArenaLo();
     lbl_806EF970 = lo + 0x10000 - (lo & 0xFFFF);
-    fn_80432CCC((void*)(lbl_806EF970 + 0x10000));
+    OSSetArenaLo((void*)(lbl_806EF970 + 0x10000));
     fn_8043F480();
 }
 
 void fn_8043F420(void)
 {
-    lbl_806EF978 = (u32)fn_80432CBC();
-    fn_80432CCC((void*)(lbl_806EF978 + 0x1000));
+    lbl_806EF978 = (u32)OSGetArenaLo();
+    OSSetArenaLo((void*)(lbl_806EF978 + 0x1000));
     fn_8043F5D8();
 }
 
 void fn_8043F450(void)
 {
-    lbl_806EF974 = (u32)fn_80432CBC();
-    fn_80432CCC((void*)(lbl_806EF974 + 0x4000));
+    lbl_806EF974 = (u32)OSGetArenaLo();
+    OSSetArenaLo((void*)(lbl_806EF974 + 0x4000));
     fn_8043F6B0();
 }
 
@@ -262,19 +262,19 @@ void fn_8043F8F8(void)
 void fn_8043FBBC(OSContext* ctx, u32 dar)
 {
     OSContext tmp;
-    fn_80433814(&tmp);
-    fn_8043364C(&tmp);
+    OSClearContext(&tmp);
+    OSSetCurrentContext(&tmp);
     lbl_806EF97C(dar);
-    fn_8043364C(ctx);
-    fn_80433734(ctx);
+    OSSetCurrentContext(ctx);
+    OSLoadContext(ctx);
 }
 
 void fn_8043FD60(OSContext* ctx)
 {
     OSContext tmp;
-    fn_80433814(&tmp);
-    fn_8043364C(&tmp);
+    OSClearContext(&tmp);
+    OSSetCurrentContext(&tmp);
     lbl_806EF97C(ctx->srr0);
-    fn_8043364C(ctx);
-    fn_80433734(ctx);
+    OSSetCurrentContext(ctx);
+    OSLoadContext(ctx);
 }

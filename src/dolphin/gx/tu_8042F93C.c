@@ -12,45 +12,45 @@
 #include "__gx.h"
 
 /* GXPixel.c / GXTransform.c / GXPerf.c part. Placeholder names kept (symbols.txt); likely SDK names:
- * fn_8042F93C GXSetFog, GXInitFogAdjTable GXInitFogAdjTable, fn_8042FD00 GXSetFogRangeAdj,
- * fn_8042FE24 GXSetBlendMode, fn_8042FE78 GXSetColorUpdate, fn_8042FEA4 GXSetAlphaUpdate,
- * fn_8042FED0 GXSetZMode, fn_8042FF04 GXSetZCompLoc, fn_8042FF38 GXSetPixelFmt,
- * fn_8043000C GXSetDither, fn_80430038 GXSetDstAlpha, fn_80430074 GXSetFieldMask,
+ * GXSetFog, GXInitFogAdjTable GXInitFogAdjTable, GXSetFogRangeAdj,
+ * GXSetBlendMode, GXSetColorUpdate, GXSetAlphaUpdate,
+ * GXSetZMode, GXSetZCompLoc, GXSetPixelFmt,
+ * GXSetDither, fn_80430038 GXSetDstAlpha, fn_80430074 GXSetFieldMask,
  * fn_804300AC GXSetFieldMode, GXCallDisplayList GXCallDisplayList, GXSetProjection GXSetProjection (psq),
- * fn_80430238 GXSetProjectionv (psq), fn_804302C4 GXLoadPosMtxImm (psq), fn_80430314
- * GXLoadNrmMtxImm (psq), fn_80430364 GXSetCurrentMtx, fn_80430398 GXLoadTexMtxImm (psq),
- * fn_8043044C __GXSetProjection helper (viewport), fn_804304DC GXSetViewportJitter,
- * fn_80430534 GXSetViewport, fn_8043057C GXSetScissor, fn_804305F4 GXSetScissorBoxOffset,
+ * fn_80430238 GXSetProjectionv (psq), GXLoadPosMtxImm (psq), GXLoadNrmMtxImm
+ * GXLoadNrmMtxImm (psq), GXSetCurrentMtx, GXLoadTexMtxImm (psq),
+ * fn_8043044C __GXSetProjection helper (viewport), GXSetViewportJitter,
+ * GXSetViewport, GXSetScissor, fn_804305F4 GXSetScissorBoxOffset,
  * fn_80430634 GXSetClipMode, fn_8043065C __GXSetMatrixIndex, fn_804306E0 GXSetGPMetric,
  * fn_80430F28 GXReadGPMetric, fn_804310D0 GXClearGPMetric.
  * fn_80406C74 is the double->u32 conversion helper (__cvt_fp2unsigned). */
 u32 fn_80406C74(double x);
 
-void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
+void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
 void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]);
-void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table);
-void fn_8042FE24(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
-void fn_8042FE78(GXBool update_enable);
-void fn_8042FEA4(GXBool update_enable);
-void fn_8042FED0(GXBool compare_enable, GXCompare func, GXBool update_enable);
-void fn_8042FF04(GXBool before_tex);
-void fn_8042FF38(GXPixelFmt pix_fmt, GXZFmt16 z_fmt);
-void fn_8043000C(GXBool dither);
+void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable* table);
+void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
+void GXSetColorUpdate(GXBool update_enable);
+void GXSetAlphaUpdate(GXBool update_enable);
+void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable);
+void GXSetZCompLoc(GXBool before_tex);
+void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt);
+void GXSetDither(GXBool dither);
 void fn_80430038(GXBool enable, u8 alpha);
 void fn_80430074(GXBool update_odd, GXBool update_even);
 void fn_804300AC(GXBool field_mode, GXBool half_aspect_ratio);
 void GXCallDisplayList(void* list, u32 nbytes);
-void fn_80430364(u32 id);
+void GXSetCurrentMtx(u32 id);
 void fn_8043044C(void);
-void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
-void fn_80430534(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
-void fn_8043057C(u32 left, u32 top, u32 wd, u32 ht);
+void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field);
+void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
+void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht);
 void fn_804305F4(u32 x_off, u32 y_off);
 void fn_80430634(GXClipMode mode);
 void fn_8043065C(s32 mtx);
 void fn_804310D0(void);
 
-void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
+void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color) {
     u32 fogColorReg = 0, fogParamReg0 = 0, fogParamReg1 = 0, fogParamReg2 = 0, fogParamReg3 = 0;
     u32 fsel;
     u32 proj;
@@ -148,7 +148,7 @@ void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4])
     }
 }
 
-void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table) {
+void GXSetFogRangeAdj(GXBool enable, u16 center, const GXFogAdjTable* table) {
     u32 fogRangeReg;
     u32 fogRangeRegK;
     u32 i;
@@ -170,7 +170,7 @@ void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table) {
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FE24(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
+void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op) {
     u32 reg = __GXData->cmode0;
 
     SET_REG_FIELD(0, reg, 1, 11, (type == GX_BM_SUBTRACT));
@@ -184,7 +184,7 @@ void fn_8042FE24(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_f
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FE78(GXBool update_enable) {
+void GXSetColorUpdate(GXBool update_enable) {
     u32 reg = __GXData->cmode0;
 
     SET_REG_FIELD(0, reg, 1, 3, update_enable);
@@ -193,7 +193,7 @@ void fn_8042FE78(GXBool update_enable) {
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FEA4(GXBool update_enable) {
+void GXSetAlphaUpdate(GXBool update_enable) {
     u32 reg = __GXData->cmode0;
 
     SET_REG_FIELD(0, reg, 1, 4, update_enable);
@@ -202,7 +202,7 @@ void fn_8042FEA4(GXBool update_enable) {
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FED0(GXBool compare_enable, GXCompare func, GXBool update_enable) {
+void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     u32 reg = __GXData->zmode;
 
     SET_REG_FIELD(0, reg, 1, 0, compare_enable);
@@ -213,7 +213,7 @@ void fn_8042FED0(GXBool compare_enable, GXCompare func, GXBool update_enable) {
     __GXData->bpSentNot = 0;
 }
 
-void fn_8042FF04(GXBool before_tex) {
+void GXSetZCompLoc(GXBool before_tex) {
     SET_REG_FIELD(0, __GXData->peCtrl, 1, 6, before_tex);
     GX_WRITE_RAS_REG(__GXData->peCtrl);
     __GXData->bpSentNot = 0;
@@ -222,7 +222,7 @@ void fn_8042FF04(GXBool before_tex) {
 extern u32 lbl_806354E0[8]; /* pixel format -> hardware format table */
 
 /* near-miss: the 1/0 value for the genMode bit lands in r5 here, r0 in the original */
-void fn_8042FF38(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
+void GXSetPixelFmt(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
     u32 oldPeCtrl;
 
     oldPeCtrl = __GXData->peCtrl;
@@ -241,7 +241,7 @@ void fn_8042FF38(GXPixelFmt pix_fmt, GXZFmt16 z_fmt) {
     __GXData->bpSentNot = 0;
 }
 
-void fn_8043000C(GXBool dither) {
+void GXSetDither(GXBool dither) {
     u32 reg = __GXData->cmode0;
 
     SET_REG_FIELD(0, reg, 1, 2, dither);
@@ -290,7 +290,7 @@ void GXCallDisplayList(void* list, u32 nbytes) {
     GX_WRITE_U32(nbytes);
 }
 
-void fn_80430364(u32 id) {
+void GXSetCurrentMtx(u32 id) {
     SET_REG_FIELD(0, __GXData->matIdxA, 6, 0, id);
     fn_8043065C(0);
 }
@@ -316,7 +316,7 @@ void fn_8043044C(void) {
     GX_WRITE_F32(oz);
 }
 
-void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
+void GXSetViewportJitter(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz, u32 field) {
     if (field == 0) {
         top -= 0.5f;
     }
@@ -330,7 +330,7 @@ void fn_804304DC(u32 field, f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 fa
     __GXData->bpSentNot = 1;
 }
 
-void fn_80430534(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
+void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
     __GXData->vpLeft = left;
     __GXData->vpTop = top;
     __GXData->vpWd = wd;
@@ -341,7 +341,7 @@ void fn_80430534(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz) {
     __GXData->bpSentNot = 1;
 }
 
-void fn_8043057C(u32 left, u32 top, u32 wd, u32 ht) {
+void GXSetScissor(u32 left, u32 top, u32 wd, u32 ht) {
     u32 tp, lf, bm, rt;
 
     tp = top + 0x156;
