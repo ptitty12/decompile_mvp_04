@@ -6,14 +6,18 @@ Newest state first in "Status"; a later session resumes from "Next step".
 
 ## Status
 
+**E1's exit is met (2026-10-14):** the EA SPORTS logo (the intro movie) and the title
+screen ("PRESS START") render recognizably, natively, through Dawn/WebGPU, in a window
+and in off-screen captures. Details and evidence: step 6.
+
 | # | Step | State |
 |---|---|---|
 | 1 | `engine/gfx/`: WebGPU device (Dawn) and window (SDL3); off-screen triangle test; CMake option | Done |
 | 2 | GX state machine: CP/XF/BP registers, vertex loading, transform, draws | Done |
 | 3 | Texture decoders (I4, I8, IA4, IA8, RGB565, RGB5A3, RGBA8, CMPR, C4/C8/C14X2) | Done |
-| 4 | TEV -> WGSL generator and pipeline cache | Done (indirect texturing and fog: not yet) |
-| 5 | EFB and XFB: copies, present at each VI frame | Done (backend side; presenting is in step 6) |
-| 6 | Run it: `mvp-play` window and frame captures | To do |
+| 4 | TEV -> WGSL generator and pipeline cache | Done (with indirect texturing and fog) |
+| 5 | EFB and XFB: copies, present at each VI frame | Done |
+| 6 | Run it: `mvp-play` window and frame captures | Done (exit evidence below) |
 
 ## How to build and test (agents)
 
@@ -21,8 +25,16 @@ Newest state first in "Status"; a later session resumes from "Next step".
   preset. The WebGPU backend needs Dawn and SDL3 from `tools-ext` (pinned in
   `docs/engine/TOOLCHAIN.md`, "Native: Dawn + SDL3"); CMake finds them by default and
   prints `gfx: WebGPU renderer with Dawn ...`. Without them only the data-free core builds.
-- Tests: `test_gfx_png` (data-free), `test_gfx_gpu` (off-screen WebGPU; exits 77 when
-  there is no adapter).
+- Tests (all in `ctest`):
+  - data-free: `test_gfx_png`, `test_gx_processor`, `test_gfx_hook`, `test_texture_decode`,
+    `test_tev_wgsl`;
+  - GPU, data-free (exit 77 without an adapter): `test_gfx_gpu`, `test_gfx_render`;
+  - local (disc and GPU): `local_play_determinism`.
+- Run the game with the renderer: `build/engine/msvc/gfx/mvp-play.exe` (needs `MVP_DISC`
+  like `mvp-boot`). `--headless --fields N --capture DIR --capture-every N` writes frames
+  as PNG under DIR (keep DIR under `build/`); without `--headless` a window shows the
+  game. `--input SCRIPT` takes `mvp-input 1` scripts (E0c). `--draw-log FILE` and
+  `--dump-textures DIR --dump-field N` dump draw state and decoded textures.
 
 ## Layout (`engine/gfx/`)
 
@@ -39,6 +51,8 @@ Newest state first in "Status"; a later session resumes from "Next step".
 | `texture_decode.h/.cpp` | GameCube texture formats to RGBA8; level sizes |
 | `tev_wgsl.h/.cpp` | TEV -> WGSL: one module per `PipelineConfig` |
 | `wgpu/renderer.h/.cpp` | The WebGPU backend: EFB, draws, pipeline/texture/sampler caches, EFB copies to XFB frames and to textures, clears |
+| `tools/mvp_play.cpp` | `mvp-play`: the game with the renderer (window or headless), captures, draw logs, texture dumps |
+| `tools/play_twice.cmake` | `local_play_determinism`: the guest state with and without the renderer |
 
 ## Step notes
 
@@ -125,6 +139,28 @@ Newest state first in "Status"; a later session resumes from "Next step".
   (hardware 1 = back, 2 = front, front face clockwise), triangle/line/point lists.
 - Caches: pipelines by `PipelineConfig` bytes; shader modules by WGSL text.
 
+### 4b. Indirect texturing and fog (done)
+
+- The intro movie needs indirect texturing: EA's video player draws one quad with five
+  TEV stages that sample the Y (736x448), U and V (368x224) planes as C8 textures with
+  IA8 palettes, and four indirect stages that look coordinates up in 368x4 and 736x4 IA8
+  tables (wrap repeat in t), with regular coordinates wrapped to 0 and
+  add-previous-coordinate chains.
+- When any stage has an indirect command, every stage's coordinate goes through the
+  hardware's fixed-point path in the shader (`fixuv`: s, t times the rasterizer size
+  times 128): indirect stages sample their map at their coordinate shifted by the
+  indirect scale and give (s, t, u) = texel (a, b, g); each stage masks them by format
+  (8/5/4/3 bits), adds the bias (-128 for 8-bit, else +1), multiplies by a static
+  matrix ((M x crd) >> 3, then the exponent's shift) or a dynamic s/t matrix, wraps the
+  regular coordinate (off, 256..16 texels, or 0), adds the previous stage's coordinate
+  if asked, and wraps to 24 bits. Bump alpha feeds the rasterized selects 5 and 6.
+- Fixed-point samples are taken half a unit (1/256 texel) in: without that, nearest
+  sampling at exact texel edges picked the neighbour and the movie showed vertical
+  stripes.
+- Fog: perspective ze = A / (B magnitude - (24-bit z >> B shift)) or orthographic A * z,
+  minus C, clamped, through the linear/exp/exp2/backexp/backexp2 curve, blended in 8-bit
+  fixed point. Range adjustment (BP 0xE8-0xED) is not applied yet.
+
 ### 5. EFB, copies and clears (done)
 
 - EFB: 640 x 528 RGBA8 color plus Depth32Float. Draws go into one open render pass;
@@ -151,14 +187,89 @@ Newest state first in "Status"; a later session resumes from "Next step".
   (no memory decode); 200 random TEV configurations (1-16 stages) compile with 0
   WebGPU errors. `test_tev_wgsl` checks the generated text without a GPU.
 
+### 6. Running the game (done): exit evidence
+
+- `mvp-play` (built when the disc and Dawn/SDL3 are configured) boots like `mvp-boot`
+  without the per-entry trace, attaches the state machine and the renderer to the
+  runtime's `GfxObserver`, and at every VI field shows the XFB copy at the VI's TFBL
+  address in the window (falling back to the latest copy).
+- **Frames seen (captures under `build/engine/msvc/captures/`, never committed; looked at
+  with the Read tool), 2026-10-14:**
+  - fields 30-570, no input: the boot loading screen, correct: a baseball photo (base,
+    cleats, grass), the EA SPORTS MVP Baseball 2005 badge, "Loading..." with a blue
+    progress bar that fills from field 60 to 570, "(c) 2005 Electronic Arts Inc. All
+    rights reserved."; 640 x 448 XFB;
+  - fields 600-720: the intro movie's **EA SPORTS logo**: the red "EA" over the blue
+    "SPORTS" in the silver ring on a light grey background, clean after the half-unit
+    sampling fix (before it, vertical stripes);
+  - fields 1080-3600: the rest of the intro movie (a Cardinals fan, Red Sox batters,
+    Fenway at night with fireworks, "The Donots - We Got the Noise",
+    "MAKE THE BIG PLAY ON DEFENSE");
+  - with `starts4.txt` (START taps at frames 280, 430, 580, 730): field 1800 (frame 443)
+    onwards the **title screen**: the Red Sox batter photo full screen, "MVP Baseball
+    2005" and "(c) 2005 Electronic Arts Inc. All rights reserved." along the bottom, and
+    the blinking **"PRESS START"** box (field 2160, frame 730); after the START at frame
+    730, the "No Memory Card found in Slot A." dialog with "Retry" / "Continue without
+    saving" over the title (fields 2400-6000; the panel's frame pieces and the dimming
+    look plausible but are unverified against hardware).
+- Measurements (RTX 4070 SUPER, MSVC `/Od` translated code):
+  - loading screen: 1.41x real time headless; 0.98x with the window (FIFO present paces
+    to the display);
+  - intro movie: 0.18x real time (the CPU decodes the video in translated code);
+  - title and menus: 6,000 fields (100 s of guest time) in 88 s headless; 86,149 draws,
+    1,372,262 vertices, 634,982 triangles, 4,587 XFB copies, 5 pipelines, 931 textures
+    decoded, 0 WebGPU errors.
+- Determinism: `local_play_determinism` passes: 700 fields with and without the
+  renderer give the same guest state (2,845,943,115 instructions, time base 474,323,852,
+  94 frame polls, MEM1 sha1 `eef70ba3...`).
+- Window: 400 fields shown in an SDL3 window, 395 presents, 0 WebGPU errors.
+
+## Open issues
+
+- **Small block artifacts in the intro movie** (isolated light or dark specks and small
+  rectangles that persist and accumulate over several frames, e.g. around the EA logo
+  and on the night-time Fenway shots). The movie's planes are decoded by the game on the
+  CPU. They look like decoder errors that persist through inter-frame prediction (a CPU
+  semantics or timing issue in the runtime) rather than renderer errors (those would be
+  systematic: whole columns or rows). Not proven yet: the planes are stored interleaved
+  (the 736 x 448 Y texture holds four column strips that the indirect tables put back in
+  order), so `--dump-textures` output has to be de-interleaved before it can be compared
+  with the capture.
+- Not implemented: fog range adjustment; line and point widths (1-pixel lines and points);
+  destination alpha (BP 0x42) and logic ops other than clear/copy/inverted copy/set/no-op;
+  z textures; texture LOD bias (the sampler has no bias); emboss texgens (copy of their
+  source); EFB peeks/pokes by the CPU; the XFB's vertical scale and VI scan-out
+  geometry (the frame is shown letterboxed at its own size); EFB-to-texture copies are
+  implemented and tested but no screen seen so far uses them.
+- Draws are one WebGPU draw per GX primitive command (texture bind groups are cached by
+  their views and samplers); batching comes when in-game scenes need it.
+
 ## Determinism
 
 The renderer reads guest state and never writes it. The only GPU-side values the
 guest reads (PE tokens, draw-done, the CP FIFO state) stay on E0b's deterministic
 model (GX1) in `runtime/hw.cpp`; the renderer is an observer of the same command
-stream.
+stream. EFB copies are never written back to guest memory (a later draw that samples
+the copy's address gets the GPU copy). Window events can only stop the run.
+
+Checked by `local_play_determinism` (`gfx/tools/play_twice.cmake`): `mvp-play` runs 700
+VI fields with the renderer and again with `--no-render`; the "guest:" lines
+(instructions, time base, frame polls, SHA-1 of MEM1) must be identical, and the
+rendered run must show frames with no WebGPU errors. `local_boot_twice` (E0b) is
+unchanged: `mvp-boot` attaches no observer.
 
 ## Next step
 
-Step 6: `mvp-play` (window, present at each VI field, captures), then look at the
-game's frames and fill in what they need (indirect texturing, fog, ...).
+E1 is done. Suggested follow-ups:
+
+1. The movie specks: de-interleave the decoded Y/U/V planes (`--dump-textures DIR
+   --dump-field N` at a field with specks, e.g. field 2040 with `280 1 tap 3 START`) and
+   compare them with the capture; if the planes have the specks, hand it to the runtime
+   (the video decoder runs on the CPU: paired singles, quantized loads, the movie's
+   DMA/ARAM timing).
+2. Go further into the front end with input scripts (`--capture` names files by game
+   frame, the number scripts use) and fix what the menus and the first match need
+   (in-game: fog range, line widths, z textures, EFB copies).
+3. E2: the same renderer in the browser through emdawnwebgpu (same Dawn release; see
+   TOOLCHAIN.md). `Window` is the only Windows-specific part (HWND surface); the browser
+   needs a canvas surface and an async device request instead of `WaitAny`.
