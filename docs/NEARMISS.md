@@ -397,3 +397,6 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `fe/tu_8050C9DC` `fn_8050DD7C`: swarm55 eight ordinary field-store/lifetime orders with truthful int-address fn_80080EC4 boundary; best95.918365%,147/147words,four slots remain around final p2 store and float/p1-zero scheduling; source unchanged, scratch build/root55/DD7C.
 - `ealib/tu_8038BC58` `fn_8038E080`: swarm59 eight ordinary signed-division temporary, store-order, pointer and lifetime forms; best99.45946%,74/74words, division-result versus zero GPR assignment differs in six slots; source unchanged, build/root59/E080.
 - `ealib/tu_8038BC58` `fn_8038E8A4`: swarm59 eight ordinary store-order, pointer-lifetime and void-return forms; best99.166664%,18/18words, vtable base r9/r11 allocation differs in three slots; source unchanged, build/root59/E8A4.
+- `ealib/tu_803E6FB8` `fn_803E97C4` (220 B): 98.36364%, three forms; original 55/55 words with object/block r30/r31 swapped; direct clear, early null guard, and raw address forms did not resolve allocation.
+- `ealib/tu_803E6FB8` `fn_803E92E8` (372 B): 99.30108%, eight forms; 93/93 words with only header/byte-offset r28/r29 exchanged; draft `build/swarm05-batch09/E92E8-v8.cpp`.
+- `db/tu_805495DC` `fn_8054C958` (612 B): 96.411766%, two forms; 151/153 words with saved-register and nested scan CFG differences; restored.
