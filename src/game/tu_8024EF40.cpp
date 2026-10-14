@@ -638,8 +638,8 @@ void fn_8024FE3C(Unk8024FD00_S* self, int a)
 }
 
 /* near-miss: 63 vs 63 insns, 5 differ: retail loads e->m10 (r5) before e->m8 (r4) for the fn_801D869C call and keeps the +0x56C id in r5 (ours r9). Tried temporaries for both args, return-type toggles of every callee */
-extern void fn_801D869C(char* a, int b, int c);
-extern P* fn_801A497C(Unk8024EF40_Q* q, int k);
+extern "C" void fn_801D869C(char* a, int b, int c);
+extern "C" P* fn_801A497C(Unk8024EF40_Q* q, int k, int id);
 extern void fn_80253B1C(W* w, int a);
 extern void fn_80253BFC(W* w, int a);
 extern void fn_80253C38(W* w, int a);
@@ -658,7 +658,7 @@ void fn_8024FE4C(Unk8024FD00_S* e, int k)
         P* tgt;
         int id = ((Unk8024FE4C_P*)pl)->m56C;
         if (id != -1 && id != pl->m460)
-            tgt = fn_801A497C(q, pl->m708);
+            tgt = fn_801A497C(q, pl->m708, id);
         else
             tgt = pl;
         switch (k) {
