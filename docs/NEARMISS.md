@@ -367,6 +367,7 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805721F8::fn_805744D4: 99.966446%, 149/149 instructions; eight source forms leave one local edge at slot 55 (retail +0xE4, candidate +0xEC), skipping the pointer-bound compare. Candidate reverted.
 - 2026-10-13 | db/tu_80565FD4 fn_8056693C | 99.71654%, 127/127 words, five differences after eight ordinary forms: initial day-store address and table-address temporary registers. |
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
+- `snd/tu_803AC88C` `fn_803AF61C` (swarm57, eight forms): scratch 96.257576%, 198/198 words; clamp source register, stream minimum/argument arithmetic, and voice-reset store scheduling remain. AX/OS callbacks and unsigned SDK address contracts repaired consistently only in scratch; no source/header changes retained.
 
 - `dolphin/ax/tu_8041783C` `fn_80417F50`: inherited99.39161%; eight ordinary AuxB channel-pointer/base forms fail to recover two folded offset words; source preserved, scratch build/root47/17F50.
 - `dolphin/ax/tu_8041783C` `fn_804190A4`: inherited98.52362%; eight ordinary scalar-helper/lifetime forms retain the extra initial studio-pointer copy; source preserved, scratch build/root47/190A4.
@@ -390,3 +391,12 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `snd/tu_803AC88C` `fn_803AE6F0` (swarm52, eight forms): scratch 97.8344%, 157/157 words; only dry/factor FPR definitions remain swapped in best draft. Consistent unsigned-short ADE24/ADEEC parameters and direct setfxlevel call preserve all three existing functions, but all contract repairs and the new body remain scratch-only.
 - `snd/tu_803B4BEC` `fn_803B66D4` (728 B): 97.58242%, seven forms; 182/182 words, seven arithmetic/register and zero-fill scheduling differences; best draft `build/swarm53/B66D4-v6.cpp`.
 - `ealib/tu_803DBFF4` `fn_803DD068` (568 B): 99.788734%, eight forms; 142/142 words, six register differences in the final direct-texture branch; draft `build/swarm53/DD068-v8.cpp`.
+
+- `snd/tu_803AB310` `fn_803AC5CC`: swarm55 eight ordinary lifetime/global-pointer/block-scope forms; best95.8871%,62/62words, global/result saved-register allocation and result-move versus installed-store scheduling differ; source unchanged, scratch build/root55/AC5CC.
+
+- `fe/tu_8050C9DC` `fn_8050DD7C`: swarm55 eight ordinary field-store/lifetime orders with truthful int-address fn_80080EC4 boundary; best95.918365%,147/147words,four slots remain around final p2 store and float/p1-zero scheduling; source unchanged, scratch build/root55/DD7C.
+- `ealib/tu_8038BC58` `fn_8038E080`: swarm59 eight ordinary signed-division temporary, store-order, pointer and lifetime forms; best99.45946%,74/74words, division-result versus zero GPR assignment differs in six slots; source unchanged, build/root59/E080.
+- `ealib/tu_8038BC58` `fn_8038E8A4`: swarm59 eight ordinary store-order, pointer-lifetime and void-return forms; best99.166664%,18/18words, vtable base r9/r11 allocation differs in three slots; source unchanged, build/root59/E8A4.
+- `ealib/tu_803E6FB8` `fn_803E97C4` (220 B): 98.36364%, three forms; original 55/55 words with object/block r30/r31 swapped; direct clear, early null guard, and raw address forms did not resolve allocation.
+- `ealib/tu_803E6FB8` `fn_803E92E8` (372 B): 99.30108%, eight forms; 93/93 words with only header/byte-offset r28/r29 exchanged; draft `build/swarm05-batch09/E92E8-v8.cpp`.
+- `db/tu_805495DC` `fn_8054C958` (612 B): 96.411766%, two forms; 151/153 words with saved-register and nested scan CFG differences; restored.

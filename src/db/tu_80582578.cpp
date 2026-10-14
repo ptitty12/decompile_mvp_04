@@ -304,31 +304,25 @@ extern "C" DB_OVERLAY int fn_805825BC(DbSubX* self, int a, int* o1, int* o2)
     return 0;
 }
 
-/* near-miss: ~25 slots (register naming); retail forms a second address pseudo for the record object after the ctor call */
 extern "C" DB_OVERLAY int fn_805826AC(DbSubX* self, DbRec12* rec)
 {
     if (fn_80582578(self, (int)rec) != 0) {
         DbTbl16i t = lbl_80600590;
         int w = t.w[rec->a];
         if (w != 0) {
-            char obj[0x18];
-            fn_8052E408(obj, rec);
-            char* p = obj;
+            Db805849D0_Ent obj(rec);
+            Db805849D0_Ent* p = &obj;
             int id = fn_80587728(p);
             int k = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
             if ((w & 1) && fn_8058320C(self, id, k) == 0) {
-                fn_80360AF0(p, 2);
                 return 7;
             }
             if ((w & 2) && fn_80583324((int)self, id) != 0) {
-                fn_80360AF0(obj, 2);
                 return 8;
             }
             if ((w & 4) && fn_80583354((int)self, id, k) != 0) {
-                fn_80360AF0(obj, 2);
                 return 9;
             }
-            fn_80360AF0(obj, 2);
         }
         return 1;
     }
@@ -520,7 +514,6 @@ extern "C" DB_OVERLAY int fn_8058313C(int a, Db8058313C_L* l, int c)
     return 0;
 }
 
-/* near-miss: ~14 slots; same structure, retail reads t.m0 and the final vptr store directly off sp and orders the C3 stores m4, mC, m14 */
 extern "C" DB_OVERLAY int fn_8058320C(void* unused, int id, int k)
 {
     DbStkList t;
@@ -528,20 +521,23 @@ extern "C" DB_OVERLAY int fn_8058320C(void* unused, int id, int k)
     DbStkList* q = &t;
     q->C1(buf, 0x78);
     q->C2();
-    q->C3(lbl_8064A440);
+    q->m4 = 0;
+    q->vp = lbl_8064A440;
+    q->mC = 0;
+    q->m14 = 0;
     fn_80535360(&t, k);
     unsigned n = q->m4;
-    unsigned i = 0;
     q->mC = 0;
+    unsigned i = 0;
     for (; i < n; i++) {
         int c = q->mC;
-        if (t.At(c) == id) {
-            q->D();
+        if (*(int*)((c * 4) + (char*)t.m0) == id) {
+            q->vp = lbl_8064A550;
             return 1;
         }
         q->mC = (c + 1) % q->m4;
     }
-    t.D();
+    t.vp = lbl_8064A550;
     return 0;
 }
 
@@ -577,30 +573,23 @@ extern "C" DB_OVERLAY DbSubObj* fn_80583404(DbSubObj* self)
     return self;
 }
 
-/* near-miss: ~25 slots; retail keeps self/k in r29/r28 and addresses the record object straight off sp; arm order of the t == 0 / t == 1 cases also differs */
 extern "C" DB_OVERLAY int fn_805837DC(int self, int k, DbRec12* rec)
 {
     DbTri a = lbl_806005E8;
-    DbRecObj obj;
-    fn_8052E408(&obj, rec);
+    Db805849D0_Ent obj(rec);
     int t = fn_8058391C(self, rec);
-    if (t != 0) {
-        if (t == 1) {
-            a.w0 = 0x1D5A;
-            a.w1 = 0x1D78;
-            a.w2 = 0x1E33;
-        }
-    } else {
-        a.w0 = 0x1D5A;
-        a.w1 = 0x1D77;
-        if (!(obj.mC & 0xFC0000))
-            a.w2 = 0x1E31;
-        else
-            a.w2 = 0x1E32;
+    switch (t) {
+    case 0:
+        a.w0=0x1D5A; a.w1=0x1D77;
+        if (!(obj.mC&0xFC0000)) a.w2=0x1E31;
+        else a.w2=0x1E32;
+        break;
+    case 1:
+        a.w0=0x1D5A; a.w1=0x1D78; a.w2=0x1E33;
+        break;
     }
     DbTri b = a;
     int r = fn_80582DF4(self, k, (int*)&b);
-    fn_80360AF0(&obj, 2);
     return r;
 }
 
