@@ -169,6 +169,12 @@ what binds.
   - **authored asset files** mapped to game paths: logos, uniforms, load screens.
 - **Patches are semantic and applied at load** to the tables from the player's own
   disc, so packs never contain retail files. Packs compose in a declared order.
+- The tables are RefPack-compressed **text** (`docs/ROSTERS.md`), keyed by djb2 hashes of
+  "Last,First" (players) and the 3-letter team code (teams).
+  - A pack edits rows and columns by key.
+  - A team pack keeps the slot's team code and changes only display fields.
+  - Capacities are fixed in code: 3,250 players, 1,800 pitchers and 126 teams. The
+    loader doesn't check them, so the pack validator must.
 - **New teams replace existing slots.** There are 30 MLB teams plus 4 extra teams
   (MVP Legends, MVP Heroes and two Burnaby teams; see `GAME_DATA.md` §3). Adding
   *more* slots means code hooks, after K2 has inventoried every hard-coded team

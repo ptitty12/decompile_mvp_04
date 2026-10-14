@@ -56,6 +56,10 @@ included, can never break a mod. It only makes the game easier to understand.
 - **Determinism and main loop** (`docs/DETERMINISM.md`, 2026-10-14):
   - **Gameplay already runs at 60 Hz on the console.** The simulation ticks in 1/60 s steps, with up to 3 logic ticks per rendered frame to catch up, so "60 fps" means holding 60 Hz in the browser.
   - The inventory has 65 nondeterminism sources, plus requirements R1-R17 for the engine.
+- **Roster data** (`docs/ROSTERS.md`, `tools/rosters/`, 2026-10-14):
+  - The 18 database tables in `database.big` are **plain-text tables** (RefPack-compressed). The tools round-trip them byte for byte.
+  - Rows are keyed by a djb2 hash of "Last,First" for players and of the 3-letter team code for teams.
+  - The player arrays hold 3,250, with 2,921 used. Teams are fixed at 126 (30 MLB, 2 All-Star, 90 minor-league, 4 specials), so new teams replace slots until code hooks raise the limit.
 - **Engine:** E0a is done (`docs/engine/E0_SURVEY.md`; D1 and D4 decided). E0b, the native boot spike, is next.
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
