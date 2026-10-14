@@ -17,9 +17,9 @@ int fn_80047B08(Unk8004763C* t)
     cb->m8 = fn_80400DA4;
     fn_80392B6C(fn_8001B950, fn_8001B9C0);
     int ok = 1;
-    int h = fn_80392C28(0x5622, 0x10, 1);
+    int h = SPCH_GetSampleDataRate(0x5622, 0x10, 1);
     t->mE0 = h;
-    fn_80392D08(fn_80044C98, t->mC04, h);
+    SPCH_Init(fn_80044C98, t->mC04, h);
     fn_80392C94(fn_8004483C, fn_80044B94);
     fn_80392CE4(fn_80044C10);
     fn_80392708();

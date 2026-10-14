@@ -1103,8 +1103,8 @@ void fn_8005A2E4(Unk8005BA1C_Voice* v, int k)
             if (f == 1) {
                 int h = lbl_805B09F4[k].mC4;
                 if (fn_803927D0(h) != 0) {
-                    fn_80392AA4(h);
-                    fn_80392A28(h);
+                    SPCH_Choose(h);
+                    SPCH_Play(h);
                 }
             }
         } else {

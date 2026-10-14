@@ -78,7 +78,7 @@ extern McState lbl_8069B80C;
 extern int lbl_8069B9B8[];
 extern short lbl_8069B9BC[];
 extern "C" void fn_80392BC0(void* p);
-extern "C" void fn_80392BF4();
+extern "C" void iSPCH_InitInGame();
 
 /* Declared as arrays of unknown size: retail reaches these with lis/lwz (not r13), i.e. this part of the
  * library was built without small data; an array of unknown size is never put in .sdata by -G8. */
@@ -510,7 +510,7 @@ struct McRecW {
 };
 
 extern "C" int fn_8039582C();
-extern "C" void fn_803927E4(int i);
+extern "C" void iSPCH_ClearEvent(int i);
 
 extern "C" int fn_80391F70(unsigned x, int y)
 {
@@ -530,7 +530,7 @@ extern "C" int fn_80391F70(unsigned x, int y)
         do {
             McRecW* r = (McRecW*)lbl_8069B80C.ch[i].m8;
             if (r->m2 != 0 && now - lbl_8069B80C.ch[i].m0 > r->m2 && skip != i) {
-                fn_803927E4(i);
+                iSPCH_ClearEvent(i);
                 ret = i;
                 goto done;
             }
@@ -571,7 +571,7 @@ extern int lbl_80624410[];
 extern "C" int fn_80394FD4(int a, int b);
 extern "C" int fn_8039582C();
 extern "C" int fn_80391F70(unsigned x, int y);
-extern "C" void fn_80392988(int slot);
+extern "C" void SPCH_PlayLastEvent(int slot);
 
 inline unsigned char Lo8(int* p)
 {
@@ -612,7 +612,7 @@ extern "C" int fn_803920BC(int* arg0)
                         p->m46 = 1;
                         lbl_8069B80C.pos[spC] = ch;
                         if (o->mA & 0x20)
-                            fn_80392988(spC);
+                            SPCH_PlayLastEvent(spC);
                         r = 1;
                     }
                 }
@@ -687,7 +687,7 @@ extern "C" void fn_80392708()
         if (v != 0)
             lbl_8069B80C.cnt[i] = 0;
     }
-    fn_80392BF4();
+    iSPCH_InitInGame();
 }
 
 extern int lbl_806E2A50[];
