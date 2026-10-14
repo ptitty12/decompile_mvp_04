@@ -85,6 +85,9 @@ read the host file system, as natively), memory growth up to 4 GB, a 16 MB stack
 and `EXIT_RUNTIME` so exit code 77 (skipped) reaches ctest.
 
 **Notes:**
+- The preset sets `MVP_GFX_WEBGPU=OFF`: the native Dawn + SDL3 backend above is a
+  Windows package. The renderer's data-free core (`engine_gfx`) and its tests
+  build and pass under Emscripten; the browser backend (emdawnwebgpu) comes later.
 - CMake 4.3.0-rc1 (the machine's CMake) prints a warning that it cannot build
   Emscripten *shared* libraries. The engine builds none, so it doesn't matter.
 - The pureikyubu test oracle reads the x86 cycle counter for optional profiling;
