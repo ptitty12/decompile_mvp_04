@@ -48,3 +48,44 @@ Browser builds must use the **same Dawn release's** `emdawnwebgpu_pkg-v20261013.
 - To update: download the new release's `windows-latest-Release` archive into
   `tools-ext\dawn\<release>\`, change `MVP_DAWN_RELEASE`/`MVP_DAWN_COMMIT` in
   `engine/gfx/CMakeLists.txt`, update this table, rebuild and run `ctest`.
+
+## Browser: Emscripten
+
+Added by E2 (2026-10-14). Builds the engine for WebAssembly (wasm32) and runs its
+tests under Node.
+
+| Piece | Version | Where |
+|---|---|---|
+| emsdk (the installer) | tag `6.0.12`, commit `35ff8a6d150541276abbc6bae512ca90bcfbe220` (github.com/emscripten-core/emsdk) | `tools-ext\emsdk` |
+| Emscripten SDK | **6.0.12** (`sdk-releases-6e9f6885cb17a3d6c8fd488a5cff730f50aba61d-64bit`; emscripten revision `5488e0871d46d19a3209988190fa6a653126256f`), released 2026-10-08, the emsdk "recommended" (`latest`) build on 2026-10-14 | `tools-ext\emsdk\upstream` |
+| clang / wasm-ld (in the SDK) | clang 24.0.0git (llvm-project `55ea1f4ebea23d0355d5cdb075f1e12f28ab82d0`) | `upstream\bin` |
+| Binaryen (in the SDK) | wasm-opt version 133 (`version_133-60-g93d6e9de7`) | `upstream\bin` |
+| Node.js (in the SDK) | 24.19.0 | `tools-ext\emsdk\node\24.19.0_64bit` |
+| Python (in the SDK, for emcc) | 3.13.3 | `tools-ext\emsdk\python\3.13.3_64bit` |
+
+Installed with `emsdk install 6.0.12` and `emsdk activate 6.0.12` (not `--permanent`:
+nothing is added to the user's environment). To reproduce on another machine, clone
+emsdk, check out tag `6.0.12`, and run the same two commands.
+
+**Use** (agents run these; the owner never does): `engine\tools\emsdk.cmd` sets
+`EMSDK`, `EM_CONFIG` and `PATH` for one command, like `engine\tools\msvc.cmd` does
+for MSVC:
+
+- configure: `engine\tools\emsdk.cmd cmake --preset emscripten` (Ninja, CMake's
+  Emscripten toolchain file from the SDK, `Release`);
+- build: `engine\tools\emsdk.cmd cmake --build --preset emscripten -j 8`;
+- test: `engine\tools\emsdk.cmd ctest --preset emscripten` (CMake runs each test's
+  `.js` under the SDK's Node as the cross-compiling emulator; build-time tools such
+  as `mvp-synth-emit` run the same way).
+
+**Build settings** (`engine/CMakeLists.txt`, `if(EMSCRIPTEN)`): native WebAssembly
+exceptions (`-fwasm-exceptions`, still used to end a run with `GuestFault` or
+`StopRun`; thread switches need none since E0c), `NODERAWFS` (tools and local tests
+read the host file system, as natively), memory growth up to 4 GB, a 16 MB stack,
+and `EXIT_RUNTIME` so exit code 77 (skipped) reaches ctest.
+
+**Notes:**
+- CMake 4.3.0-rc1 (the machine's CMake) prints a warning that it cannot build
+  Emscripten *shared* libraries. The engine builds none, so it doesn't matter.
+- The pureikyubu test oracle reads the x86 cycle counter for optional profiling;
+  under Emscripten `third_party/pureikyubu/pk_wasm_shim.h` stubs it (`docs/REUSE.md`).

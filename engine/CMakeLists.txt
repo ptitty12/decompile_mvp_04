@@ -32,6 +32,19 @@ else()
   set(ENGINE_WARN -Wall -Wextra -ffp-contract=off -fno-fast-math)
 endif()
 
+# Browser build (E2, preset "emscripten"): wasm32, run under Node.
+# - Native WebAssembly exceptions: the runtime still throws to end a run
+#   (GuestFault, StopRun); unwinding for thread switches needs none (E0c).
+# - NODERAWFS: tools and local tests read the host file system directly (the
+#   disc, symbols.txt), as their native builds do.
+# - A large stack: guest call chains nest translated frames deeply.
+# - EXIT_RUNTIME: the exit code reaches ctest (77 = skipped).
+if(EMSCRIPTEN)
+  add_compile_options(-fwasm-exceptions)
+  add_link_options(-fwasm-exceptions -sNODERAWFS=1 -sALLOW_MEMORY_GROWTH=1 -sINITIAL_MEMORY=64MB -sMAXIMUM_MEMORY=4GB -sSTACK_SIZE=16MB
+                   -sEXIT_RUNTIME=1 -sENVIRONMENT=node)
+endif()
+
 enable_testing()
 
 # Test framework (doctest, MIT, vendored: see docs/REUSE.md).

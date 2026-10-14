@@ -28,16 +28,26 @@
       "inherits": "base",
       "generator": "Ninja",
       "cacheVariables": { "CMAKE_CXX_COMPILER": "clang++" }
+    },
+    {
+      "name": "emscripten",
+      "displayName": "Emscripten + Ninja: wasm32, tests under Node (run inside engine/tools/emsdk.cmd)",
+      "inherits": "base",
+      "generator": "Ninja",
+      "toolchainFile": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
     }
   ],
   "buildPresets": [
     { "name": "msvc", "configurePreset": "msvc" },
     { "name": "vs", "configurePreset": "vs", "configuration": "RelWithDebInfo" },
-    { "name": "clang", "configurePreset": "clang" }
+    { "name": "clang", "configurePreset": "clang" },
+    { "name": "emscripten", "configurePreset": "emscripten" }
   ],
   "testPresets": [
     { "name": "msvc", "configurePreset": "msvc", "output": { "outputOnFailure": true } },
     { "name": "vs", "configurePreset": "vs", "configuration": "RelWithDebInfo", "output": { "outputOnFailure": true } },
-    { "name": "clang", "configurePreset": "clang", "output": { "outputOnFailure": true } }
+    { "name": "clang", "configurePreset": "clang", "output": { "outputOnFailure": true } },
+    { "name": "emscripten", "configurePreset": "emscripten", "output": { "outputOnFailure": true } }
   ]
 }
