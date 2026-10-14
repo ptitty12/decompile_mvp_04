@@ -24,7 +24,7 @@
 #include <dolphin/hw_regs.h>
 #include <dolphin/tail10.h>
 
-extern void fn_80421C20(const char* msg, ...);        /* DBPrintf */
+extern void fn_80421C20(char* msg, ...);              /* DBPrintf */
 extern void fn_804330D0(void);                         /* ICEnable */
 extern void fn_80432F94(void);                         /* DCEnable */
 extern void fn_804338F4(OSContext* context);
