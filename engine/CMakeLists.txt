@@ -51,6 +51,7 @@ function(engine_test name)
   endif()
 endfunction()
 
+add_subdirectory(third_party/pureikyubu)
 add_subdirectory(common)
 add_subdirectory(vfs)
 add_subdirectory(ppc)

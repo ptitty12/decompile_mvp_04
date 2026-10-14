@@ -11,7 +11,7 @@ A later session resumes from "Next step".
 | 1 | Skeleton (CMake, presets, doctest, ctest) | Done | see git log |
 | 2 | Disc and DOL | Done | see git log |
 | 3 | Decoder and disassembler | Done | see git log |
-| 4 | Semantics library and reference interpreter | | |
+| 4 | Semantics library and reference interpreter | Done | see git log |
 | 5 | Functions and CFGs | | |
 | 6 | IR and C++ emitter | | |
 | 7 | Boot environment | | |
@@ -41,7 +41,7 @@ A later session resumes from "Next step".
 |---|---|
 | `engine/common/` | Byte order, SHA-1, host file helpers |
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
-| `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler; later the semantics library and the interpreter. Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
+| `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler (`isa.h`, `decode.cpp`, `disasm.cpp`); CPU state, guest memory page table, runtime hooks (`cpu.h`, `mem_access.h`); floating-point core (`fp.h/.cpp`); per-opcode semantics (`sem.h`); reference interpreter (`interp.h/.cpp`). Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -108,6 +108,90 @@ A later session resumes from "Next step".
 - Survey §4 said 1,474,044 instructions; the listing's code sections hold 1,474,207
   words. The difference is not investigated; the check covers every listed word.
 
+### 4. Semantics library and reference interpreter (done)
+
+- **One definition per opcode.** `ppc/sem.h` has `void op(Cpu&, Insn)` for every
+  non-branch opcode (branches compute only their condition). The interpreter calls
+  them with decoded words; the C++ emitter (item 6) will call them with constant
+  words, so both paths share one semantics by construction.
+- **State** (`ppc/cpu.h`): GPRs, FPRs as two raw double halves (ps0/ps1), packed CR,
+  XER as SO/OV/CA + the other bits, LR, CTR, FPSCR, MSR, SRs, and every other SPR
+  by number (`spr[1024]`, GQRs at 912-919). Guest memory: 65,536 pages of 64 KiB,
+  each a host pointer (big-endian bytes) or null for `Io` (MMIO). Time base,
+  decrementer, MSR changes, `icbi` and `sc` go to `Hooks` (the runtime's virtual
+  clock in item 9). Guest errors throw `GuestFault` with the PC.
+- **Floating point** (`ppc/fp.cpp`) is computed in integer arithmetic (128-bit
+  products, jammed sticky bits, one rounding), so no host FPU, NaN payload or
+  rounding-mode behaviour can leak in; the same code will run in WebAssembly.
+  Model, all checked by tests:
+  - single-precision results round once from the exact result; double results too;
+  - `fmadd` family fused (one rounding), double and single;
+  - single-precision instructions round frC to a 25-bit significand first (force25);
+  - NaNs propagate in the order frA, frB, frC, quieted; invalid operations give
+    0x7FF8000000000000; a NaN to a single result keeps the top 23 fraction bits;
+    `fnmadd`/`fnmsub` never flip a NaN's sign;
+  - NI (the game sets it in OSInit): single results whose exact value is below
+    2^-126 flush to a signed zero; double results that round to a denormal flush;
+    inputs are not flushed (Dolphin's measured model);
+  - `lfs` fills both halves, single-precision results fill both halves, double
+    results and moves set ps0; `stfs` uses the manual's store conversion
+    (denormalizing, truncating); `fctiwz` sets bit 32 for negative zero results
+    and saturates;
+  - quantized `psq_l`/`psq_st` per GQR: integer types scale by 2^-S/2^S; stores
+    round to single, scale, truncate toward zero, saturate; NaN saturates high;
+    float-type stores flush single denormals to zero.
+- **Not modeled (deliberate, deterministic):** FPSCR status bits (FX, FEX, VX*,
+  OX, UX, ZX, XX, FR, FI, FPRF, FPCC) keep whatever the guest last wrote. The DOL
+  reads FPSCR only through `mffs`: 4 sites (0x804335A8 in dolphin/os, 0x8041A630
+  in dolphin/base, 0x80404FF8 and 0x80405A90 in libsn); none has been checked yet
+  for status-bit use, so this needs revisiting if one feeds game logic. `fres`,
+  `frsqrte`, `ps_res`, `ps_rsqrte` return correctly rounded values, not the
+  hardware's table estimates. The DOL has no `fres` and 2 `frsqrte`: 0x8042FC50
+  (GX) and 0x80438850 (PAD clamping, so it shapes stick input). That is a
+  fidelity gap, not a determinism one; bit-exact estimates need the hardware
+  tables from a permissive source or measurement.
+  Rounding modes other than nearest are implemented but unused.
+- **Undefined cases follow measured hardware** (as Dolphin's hardware tests
+  report, read as reference only): `divw` overflow gives 0 or -1 (negative
+  dividend), `divwu` by zero gives 0; `sraw` by 32 or more sets CA to the sign;
+  `stwcx.` to an address other than the reservation's does not store.
+- **Exit evidence (2026-10-14):**
+  - `test_ppc_sem`: vectors for every opcode (424 assertions); its last case checks
+    that every one of the 222 opcodes ran (only `eciwx`/`ecowx`, which fault by
+    design, are covered by fault checks instead). Passes.
+  - `test_ppc_fp`: 1,009,709 assertions, 0 failures: double add/sub/mul/div equal
+    host IEEE results on 200,000 random pairs each (wide exponents, denormals,
+    cancellation); single ops equal host float ops; double `madd` equals
+    `std::fma`; single `madd` equals an independent round-to-odd reference;
+    `round_to_single` equals host conversion; load/store conversions round-trip all
+    sampled words; fixed vectors for force25, zero signs, rounding modes,
+    `fctiw(z)`, estimates, quantization and NI.
+  - `test_ppc_fuzz_pk`: 30,000 random programs (48 instructions, 111 integer,
+    branch, CR, XER, SPR and load/store opcodes) on our interpreter and
+    pureikyubu's (CC0, pinned 0c29dca5, vendored as a test-only oracle):
+    **895,135 instructions compared after every step (GPRs, CR, XER, LR, CTR, PC)
+    plus data memory per program: 0 differences.** 19,165 programs ended early by
+    a fault in both (random pointers), 1,598 ended at an instruction excluded
+    below.
+  - Excluded from the fuzz comparison, each documented in the test and covered by
+    vectors: pureikyubu bugs (`crorc` not masked to one bit; conditional branches
+    with LK=1 that are not taken leave LR unchanged; `sraw` with rB[26:31]=0 and
+    rB≠0 sets CA through an out-of-range C++ shift; `sraw` of 0x80000000 by ≥32
+    clears CA), pureikyubu gaps (`divwo`, `divwuo`, `mullwo` halt; `icbi` takes a
+    DSI where ours has no effect), and architecturally undefined cases (divide
+    overflow, `stwcx.` with a reservation for another address).
+  - **One bug of ours found by the fuzz and fixed:** `mcrxr` left XER bit 3 set;
+    it now clears XER[0-3].
+- Total `ctest`: 8 tests (6 data-free, 2 local), all pass.
+
+## Decisions to record (for the lead)
+
+- E0b-FP1: the FP model above (exact integer softfloat as the single source of
+  truth; fast paths later only behind a differential test against it).
+- E0b-FP2: FPSCR status bits are not modeled; estimates are correctly rounded.
+  Both are deterministic. Revisit if a game path reads FPSCR status or if a
+  hardware table for the estimates becomes available under a permissive license.
+
 ## Next step
 
-Item 4: semantics library and reference interpreter.
+Item 5: functions and CFGs from `symbols.txt`.
