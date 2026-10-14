@@ -27,9 +27,12 @@ Sources (local refs and files; every worktree shares the refs):
   close     functions under 100% in the progress bot's last build of main
             (build/_progress/wt/build/GV4E69/report.json in the main checkout).
 
+The page opens with the browser plan: engine milestones and knowledge targets, from
+tools/goals/goals_view.py (its docstring lists its sources). The matching fleet follows.
+
 The `dashboard` branch is a single orphan commit, replaced on each push. It holds only
-README.md and the chart: no source, no game data, and no local paths (worktrees appear
-by slot name). It has no .github/, so pushing it starts no CI.
+README.md and the two charts: no source, no game data, and no local paths (worktrees
+appear by slot name). It has no .github/, so pushing it starts no CI.
 """
 import argparse
 import csv
@@ -50,7 +53,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "tools" / "goals"))
 from progress_chart import STYLE  # noqa: E402  (shared card look)
+import goals_view  # noqa: E402  (browser plan: engine milestones, knowledge targets)
 
 REPO_URL = "https://github.com/ptitty12/mvp2005-decomp"
 BRANCH = "dashboard"
@@ -701,26 +706,34 @@ def md_table(head: List[str], rows: List[List[str]], align: str = "") -> List[st
     return ["| " + " | ".join(head) + " |", "| " + " | ".join(sep) + " |"] + ["| " + " | ".join(r) + " |" for r in rows]
 
 
-def render_md(st: Dict[str, Any], chart: str) -> str:
+def render_md(st: Dict[str, Any], chart: str, goals: List[str]) -> str:
     now = st["now"]
     stamp = datetime.datetime.fromtimestamp(now).strftime(f"%a %b %d, %H:%M {tzname()}")
     out = [
-        "# MVP Baseball 2005 decomp: live fleet dashboard",
+        "# MVP Baseball 2005: live dashboard",
         "",
         f"**Updated {stamp}.** Refreshed about every minute while the owner's PC is on, by "
         f"[`tools/fleet_dashboard.py`]({REPO_URL}/blob/main/tools/fleet_dashboard.py) reading git history. "
-        f"*Verified* numbers come from the progress bot's build of `main` (last one at {hm(st['verified_at'])}). "
-        "*Claimed* numbers are worker commits that may not be merged or verified yet. "
         f"The overall progress card is on the [main README]({REPO_URL}#progress).",
+        "",
+    ]
+    out += goals
+    out += [
+        "## Matching fleet",
+        "",
+        f"General matching is paused outside the knowledge targets ([ROADMAP]({REPO_URL}/blob/main/docs/ROADMAP.md) "
+        "§5, 2026-10-14); this tracks the matching that still runs. "
+        f"*Verified* numbers come from the progress bot's build of `main` (last one at {hm(st['verified_at'])}). "
+        "*Claimed* numbers are worker commits that may not be merged or verified yet.",
         "",
     ]
     out += [f"- {line}" for line in headline(st)] + [f"- {session_line(st)}", ""]
 
     cols, table = speed_rows(st)
-    out += ["## Speed", ""] + md_table([""] + cols, table) + [""]
+    out += ["### Speed", ""] + md_table([""] + cols, table) + [""]
     out += [f"![Last {CHART_HOURS} hours: code claimed per hour, near-miss share of commits, and workers active, one bar per hour]({chart})", ""]
 
-    out += ["## Workers", ""]
+    out += ["### Workers", ""]
     rows = [[w["slot"], f"`{w['branch'].replace('work/', '')}`", w["state"], hm(w["last_commit"]), hm(w["built"]),
              str(w["commits_1h"]), str(w["near_1h"]), str(w["pending"]), escape(w["last_subject"][:70]).replace("|", "\\|")]
             for w in st["workers"]]
@@ -733,7 +746,7 @@ def render_md(st: Dict[str, Any], chart: str) -> str:
     c = st["close"]
     if c:
         b = c["bands"]
-        out += ["## Close to matching", "", f"Functions below 100% in the build of `main` at {hm(c['time'])}.", ""]
+        out += ["### Close to matching", "", f"Functions below 100% in the build of `main` at {hm(c['time'])}.", ""]
         out += md_table(["Match", "Functions", "Code"], [
             [">= 99%", str(b["99"][0]), kb(b["99"][1])],
             ["95-99%", str(b["95"][0]), kb(b["95"][1])],
@@ -742,12 +755,12 @@ def render_md(st: Dict[str, Any], chart: str) -> str:
         out += md_table(["Closest", "Match", "Size", "Unit"],
                         [[f"`{n.split('__')[0]}`", f"{p:.2f}%", f"{s:,} B", f"`{u}`"] for p, s, n, u in c["top"]], "lrrl") + [""]
     if st["near_recent"]:
-        out += ["## Recent near-miss commits", ""]
+        out += ["### Recent near-miss commits", ""]
         out += md_table(["Time", "Closest", "Functions", "Unit"], [
             [hm(r["t"]), f"{r['close']:.1f}%" if r["close"] else "-", ", ".join(f"`{f}`" for f in r["near"][:4]) or "-",
              f"`{r['unit']}`"] for r in st["near_recent"]], "lrll") + [""]
     if st["farm"]:
-        out += ["## Permuter farm", "", "Unattended decomp-permuter runs over main's near-misses at idle CPU priority "
+        out += ["### Permuter farm", "", "Unattended decomp-permuter runs over main's near-misses at idle CPU priority "
                 "(`tools/match/permute_farm.py`). A match candidate is confirmed by rebuilding its unit and "
                 "waits as a patch for a worker to apply and verify.", "", farm_line(st["farm"], now), ""]
         if st["farm"]["matched"]:
@@ -819,12 +832,30 @@ def log(msg: str) -> None:
         print(msg, flush=True)
 
 
+def goals_section(main: Optional[Path]) -> Tuple[List[str], List[Tuple[str, str]], str]:
+    """(markdown lines, [(chart name, svg)], change key) for the browser plan.
+
+    A failure there is logged and never stops the rest of the page. The change key leaves
+    out the clock ("6.2 h ago", bars growing to now), which the heartbeat refreshes."""
+    try:
+        g = goals_view.collect(main, STATE_DIR)
+        svg = goals_view.render_svg(g, STYLE)
+        name = f"goals-{hashlib.sha1(svg.encode()).hexdigest()[:10]}.svg"
+        return goals_view.render_md(g, name), [(name, svg)], goals_view.fingerprint(g)
+    except Exception:
+        log("goals view failed\n" + traceback.format_exc())
+        return ["## Browser plan", "", "*The goals view failed on this refresh; the publisher's log has the error.*", ""], [], "failed"
+
+
 def publish(force: bool, push: bool) -> None:
     st = collect()
     svg = render_svg(st)
     chart = f"chart-{hashlib.sha1(svg.encode()).hexdigest()[:10]}.svg"  # new name defeats image caches
-    md = render_md(st, chart)
-    digest = hashlib.sha1(re.sub(r"\*\*Updated [^*]*\*\*", "", md).encode() + svg.encode()).hexdigest()
+    goals, goal_charts, goals_key = goals_section(worktrees()[0])
+    md = render_md(st, chart, goals)
+    files = [("README.md", md), (chart, svg)] + goal_charts
+    digest = hashlib.sha1(re.sub(r"\*\*Updated [^*]*\*\*", "", render_md(st, chart, [])).encode()
+                          + svg.encode() + goals_key.encode()).hexdigest()
     try:
         last = json.loads(PUBLISHED.read_text(encoding="utf-8"))
     except (OSError, ValueError):
@@ -834,14 +865,14 @@ def publish(force: bool, push: bool) -> None:
     if not push:
         out = STATE_DIR / "preview"
         out.mkdir(parents=True, exist_ok=True)
-        for old in out.glob("chart-*.svg"):
+        for old in [*out.glob("chart-*.svg"), *out.glob("goals-*.svg")]:
             old.unlink()
-        (out / "README.md").write_text(md, encoding="utf-8")
-        (out / chart).write_text(svg, encoding="utf-8")
+        for name, text in files:
+            (out / name).write_text(text, encoding="utf-8")
         log(f"--no-push: wrote {out}")
         return
-    blobs = [git("hash-object", "-w", "--stdin", stdin=text).strip() for text in (md, svg)]
-    tree = git("mktree", stdin=f"100644 blob {blobs[0]}\tREADME.md\n100644 blob {blobs[1]}\t{chart}\n").strip()
+    blobs = [git("hash-object", "-w", "--stdin", stdin=text).strip() for _, text in files]
+    tree = git("mktree", stdin="".join(f"100644 blob {b}\t{name}\n" for b, (name, _) in zip(blobs, files))).strip()
     lt = st["latest"]
     msg = f"dashboard: {lt[1]:,} functions verified, {st['pending']} commits waiting" if lt else "dashboard"
     commit = git("commit-tree", tree, "-m", msg).strip()
