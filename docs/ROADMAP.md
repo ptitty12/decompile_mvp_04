@@ -121,21 +121,27 @@ Each milestone has a hard exit you can check. Don't advance on vibes.
 
 ## 5. Next steps, in order
 
-1. ~~**K1 naming sweep**~~ 99% done 2026-10-14 (K1a 94 names, K1b 58 names plus dtk's cascade). Body-match the 156 unnamed K1
-   functions against dolsdk2004 and the mitsevox SDK. Then rename them in
-   `symbols.txt` with evidence. List them with
-   `python tools/goals/targets.py --list K1 --todo`.
-2. ~~**E0a survey**~~ Done 2026-10-14: write our own translator (D1), with resumable guest threads (D4).
-3. **E0b boot spike** (one Opus side session): the 10 items in `docs/engine/E0_SURVEY.md` §8, MSVC + CMake natively.
-4. **K2-K4 worker batches** (Sonnet). Build batches from
-   `python tools/goals/targets.py --units K3` (and K2, K4). In these batches, names
-   and types are the deliverable. Match a function whenever the type knowledge
-   depends on it.
-5. ~~**K2 tools**~~ Done 2026-10-14: `tools/rosters/`, `docs/ROSTERS.md` (§12 team slot assets), and pack format v1 (`docs/MODDING.md`, `tools/rosters/pack.py`). The engine implements the same spec at E6.
-6. **K2 tools (original wording)** (side session). A BIG archive reader, a database table
-   reader/writer under `tools/rosters/`, and `docs/ROSTERS.md`.
-6. **Show the new progress** (enabler). Add K-target and E-milestone progress to the
-   progress card and the dashboard.
+Updated at the end of 2026-10-14.
+
+1. ~~**K1 naming sweep**~~ 99% done (K1a: 94 names; K1b: 58 names plus dtk's cascade). Left: OSInit and
+   DVDInit, which need data splits for fstload and EXIBios (see the K1b commit), and `__init_user`.
+2. ~~**E0a survey**~~ Done: we write our own translator (D1), with resumable guest threads (D4).
+3. **E0b boot spike**, in progress (one Opus side session, worktree `decompile_mvp_04-e0b`, branch
+   `engine/e0b`): the 10 items in `docs/engine/E0_SURVEY.md` §8, built natively with MSVC + CMake.
+4. **K2-K4 worker batches.** First round done: +32 matches (k_01..k_05) and 355 evidence-backed names
+   (names-01). Next: a second names pass over the remaining EA reference names (`config/GV4E69/refnames/`),
+   then batches from `python tools/goals/targets.py --units K3` (and K2, K4). K3 functions that read `mftb`
+   can't match; document them instead.
+5. ~~**K2 tools and pack format**~~ Done:
+   - `tools/rosters/`;
+   - `docs/ROSTERS.md` (§12 team slot assets);
+   - pack format v1 (`docs/MODDING.md`, `tools/rosters/pack.py`).
+
+   The engine implements the same spec at E6.
+6. **After E0b item 6:**
+   - the in-browser compile spike (E2 risk #2): install Emscripten, emit WebAssembly for the whole DOL, measure;
+   - E1 renderer groundwork: vendor Aurora's TEV/WGSL and texture decoders (MIT).
+7. **Show the new progress** (enabler): K-target and E-milestone progress on the progress card and the dashboard.
 
 **Paused** (owner direction, 2026-10-14): the near-miss tail (95-99.99% functions
 outside K targets), Fable hard-function passes on non-target functions, and size-ranked
