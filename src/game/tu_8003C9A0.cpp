@@ -323,9 +323,10 @@ void fn_8003D554(Unk8003A5DC* self)
     }
 }
 
-/* near-miss: 110/111 slots. Retail merges the fn_800412AC tails of the
- * 0x4C/0x4B/0x4A paths (cross-jump) and keeps r in r30 alone; a variant with
- * one shared call site (locals for id/value) was worse. */
+/* near-miss: 111/111 slots, register choice only. Retail picks the load order
+ * m1C, m18, m24 into r9/r0/r11 with s in r0 and t in r9; here s lands in r11 and t in r0.
+ * `rr - (rr / 100) * 100` (not `% 100`) puts the quotient in r0 like retail. Tried: operand
+ * order of s and t, s/t as locals or inline, one call site per id. */
 void fn_8003D648(Unk8003A5DC* self)
 {
     Unk800475EC_Obj* o = fn_800475EC();
@@ -333,7 +334,8 @@ void fn_8003D648(Unk8003A5DC* self)
     if (o->mF4 == 1)
         c = o->mC00 >= 0;
     if (c == 1 && fn_8003E844(self) == 1) {
-        int r = fn_8040ABA0() % 100;
+        int rr = fn_8040ABA0();
+        int r = rr - (rr / 100) * 100;
         if (fn_80075E7C(self->m10C->m6F8->mC->m24) == 0x37) {
             int cnt;
             int* p = fn_8006F9EC(self->m10C->m6F8->mC, &cnt);
@@ -353,16 +355,16 @@ void fn_8003D648(Unk8003A5DC* self)
                         fn_800412AC(fn_8004072C(), 0x4b, self->m124, 0, 0, 0);
                     else
                         fn_800412AC(fn_8004072C(), 0x4a, 0, 0, 0, 0);
-                    return;
                 }
-            } else if (v >= 0 && v <= 2) {
-                int s = self->m18 + self->m20;
-                if (!(r > s + self->m24)) {
-                    if (r <= s) {
-                        fn_800412AC(fn_8004072C(), 0x4a, 0, 0, 0, 0);
-                        return;
+            } else if (v >= 0) {
+                if (v <= 2) {
+                    int s = self->m18 + self->m20;
+                    if (r <= s + self->m24) {
+                        if (r <= s)
+                            fn_800412AC(fn_8004072C(), 0x4a, 0, 0, 0, 0);
+                        else
+                            fn_800412AC(fn_8004072C(), 0x4b, self->m124, 0, 0, 0);
                     }
-                    fn_800412AC(fn_8004072C(), 0x4b, self->m124, 0, 0, 0);
                 }
             }
         }
