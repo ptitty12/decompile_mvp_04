@@ -404,3 +404,4 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - `db/tu_80574AE4` `fn_8057CCE8`: swarm65 eight ordinary signed/unsigned index, cached-count, pointer and do-loop forms; best97.40385%,51/52words, missing inner count reload plus bound/index register and scheduling differences; source unchanged, build/root65/CCE8.
 
 - `fe/tu_804F81E0` `fn_804F9D10`: swarm65 eight ordinary counter declaration/lifetime, unsigned/do-loop and screen-alias forms; best99.263565%,129/129words, saved self/counter GPR allocation differs; source unchanged, build/root65/F9D10.
+- `ealib/tu_803F00FC` `fn_803F13A0` (swarm64, two forms): inherited 96.349205%, 63/63 words; truthful unsigned-short handle boundary, switch order and direct-entry field forms did not improve address-high CSE/scheduling. No source changes retained; scratch build/swarm64.
