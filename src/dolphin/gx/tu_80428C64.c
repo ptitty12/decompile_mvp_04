@@ -23,7 +23,7 @@ OSTime fn_80438628(void);
  * GXSetBreakPtCallback, fn_8042C62C GXSetDrawSyncCallback, fn_8042C6F8 GXSetDrawDoneCallback,
  * PPCSync PPCSync, fn_8042C07C __GXAbort. */
 GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
-void fn_8042C62C(void* cb);
+GXDrawSyncCallback fn_8042C62C(GXDrawSyncCallback cb);
 void fn_8042C6F8(void* cb);
 void PPCSync(void);
 void fn_8042C07C(void);
