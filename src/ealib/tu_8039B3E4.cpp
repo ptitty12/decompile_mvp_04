@@ -75,8 +75,8 @@ void fn_8039C980(Vp6Ctx* c);
 int fn_8039E9E0(void* ctx);
 void fn_8039F264(Vp6Ctx* c);
 void fn_8039EFD4(Vp6Ctx* c);
-void fn_8039733C(Vp6Ctx* c, unsigned kind, int val);
-void fn_80396114(Vp6Buf* b, const Vp6Params* p);
+void VP6_SetPbParam(Vp6Ctx* c, unsigned kind, int val);
+void ChangePostProcConfiguration(Vp6Buf* b, const Vp6Params* p);
 int fn_8039F0C0(Vp6Ctx* c);
 int fn_8039F2EC(Vp6Ctx* c, int n);
 
@@ -474,7 +474,7 @@ int fn_8039F2EC(Vp6Ctx* c, int n)
 int fn_8039F3A8(Vp6Ctx* c)
 {
     if (c->m1A8 != 0) {
-        fn_8039733C(c, 1, c->m1A8);
+        VP6_SetPbParam(c, 1, c->m1A8);
     }
     unsigned w, h, pw, ph, cols, rows, mbs, ysize, lsize, q, total;
     w = c->m1B0.m0;
@@ -511,7 +511,7 @@ int fn_8039F3A8(Vp6Ctx* c)
     for (int i = 0; i < 12; i++) {
         c->m6A8[i] = lbl_80608AC8[i * 2] * c->m230 + lbl_80608AC8[i * 2 + 1];
     }
-    fn_80396114(c->m298, &c->m1B0);
+    ChangePostProcConfiguration(c->m298, &c->m1B0);
     if (!fn_8039F0C0(c)) {
         return 0;
     }

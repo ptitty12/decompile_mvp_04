@@ -177,18 +177,18 @@ struct VdPacket {
     int m8;
 };
 
-extern "C" int fn_80397990(void* a, char* b, int c, int d, int e);
-extern "C" void fn_80397438(void* a, void* out);
+extern "C" int VP6_DecodeFrameToYUV(void* a, char* b, int c, int d, int e);
+extern "C" void VP6_GetYUVConfig(void* a, void* out);
 
 extern "C" VdFrame* fn_8038F370(VdFramePool* pool);
 
-extern "C" void fn_80397A4C(void* a);
+extern "C" void VP6_StopDecoder(void* a);
 extern "C" void fn_80395E14();
 extern char lbl_806061B0[];
 extern char lbl_806061F0[];
 
 
-extern "C" void fn_80395D94();
+extern "C" void VP6_VPInitLibrary();
 extern "C" void fn_803959D8(VdG* g);
 extern int lbl_806EF380;
 extern int lbl_806EF384;
@@ -252,7 +252,7 @@ extern "C" VdCodec* fn_8038ED98(VdCodec* c)
     lbl_806EF380 = 0;
     lbl_806EF384 = -1;
     fn_803959D8(&lbl_80699BA4);
-    fn_80395D94();
+    VP6_VPInitLibrary();
     return c;
 }
 
@@ -283,7 +283,7 @@ extern "C" void fn_8038EE54(VdCodec* c, int chrg)
         if (f != 0)
             fn_8038ED2C((VdRes2*)f, 3);
     }
-    fn_80397A4C(&c->m4);
+    VP6_StopDecoder(&c->m4);
     fn_80395E14();
     c->free.Poison();
     c->used.Poison();
@@ -336,8 +336,8 @@ extern "C" VdFrame* fn_8038F2D8(VdCodec* c, VdPacket* pk)
     int info[10];
     VdFrame* f = fn_8038F370((VdFramePool*)c);
     VdFrameHdr* h = (VdFrameHdr*)f->m4;
-    if (fn_80397990(c->m4.m0, pk->m4 + 8, pk->m8 - 8, c->m8.w, c->mC.w) == 0) {
-        fn_80397438(c->m4.m0, info);
+    if (VP6_DecodeFrameToYUV(c->m4.m0, pk->m4 + 8, pk->m8 - 8, c->m8.w, c->mC.w) == 0) {
+        VP6_GetYUVConfig(c->m4.m0, info);
         h->m10 = info[9] - (int)h;
         h->mC = h->mC | 0x10000000;
         h->m4 = c->m8.h.lo;

@@ -49,12 +49,12 @@ int fn_8039EF48(Vp6Ctx* c);
 void fn_80398634(Vp6Rc* rc, const unsigned char* buf);
 void fn_8039C63C(Vp6Ctx* c);
 void fn_8039868C(Vp6Buf* b, unsigned char* base);
-void fn_80395A94(Vp6Ctx* c);
-int fn_80395B38(Vp6Ctx* c);
-void fn_80395E18(int* a, int* b, int* c, unsigned d);
-void fn_80395F00(Vp6Buf* b);
-Vp6Buf* fn_8039620C(const Vp6Params* p);
-void fn_80396114(Vp6Buf* b, const Vp6Params* p);
+void VP6_DeleteTmpBuffers(Vp6Ctx* c);
+int VP6_AllocateTmpBuffers(Vp6Ctx* c);
+void InitPostProcessing(int* a, int* b, int* c, unsigned d);
+void DeletePostProcBuffers(Vp6Buf* b);
+Vp6Buf* CreatePostProcInstance(const Vp6Params* p);
+void ChangePostProcConfiguration(Vp6Buf* b, const Vp6Params* p);
 double fn_8040FCA0(double x);
 double fn_804101AC(double x);
 void* fn_803985F4(int size, int flags);
@@ -94,7 +94,7 @@ void fn_80395A44(void* p)
     }
 }
 
-void fn_80395A94(Vp6Ctx* c)
+void VP6_DeleteTmpBuffers(Vp6Ctx* c)
 {
     if (c->m274) fn_80398614(c->m274);
     if (c->m28C) fn_80398614(c->m28C);
@@ -113,9 +113,9 @@ void fn_80395A94(Vp6Ctx* c)
     c->m264 = 0;
 }
 
-int fn_80395B38(Vp6Ctx* c)
+int VP6_AllocateTmpBuffers(Vp6Ctx* c)
 {
-    fn_80395A94(c);
+    VP6_DeleteTmpBuffers(c);
     c->m274 = fn_803985F4(0xA0, 0);
     if (c->m274 != 0) {
         c->m270 = ((int)c->m274 + 0x1F) & ~0x1F;
@@ -133,14 +133,14 @@ int fn_80395B38(Vp6Ctx* c)
             }
         }
     }
-    fn_80395A94(c);
+    VP6_DeleteTmpBuffers(c);
     return 0;
 }
 
-void fn_80395C08(Vp6Ctx** h)
+void VP6_DeletePBInstance(Vp6Ctx** h)
 {
     if (*h) {
-        fn_80395A94(*h);
+        VP6_DeleteTmpBuffers(*h);
         fn_80396DA8((Vp6TblHolder*)((char*)*h + 0x13C));
         fn_80396274((Vp6SubB*)((char*)*h + 0x298));
     }
@@ -206,9 +206,9 @@ struct Vp6SizeView {
 typedef void (*Vp6Fn5R)(Vp6Buf*, int, int, int, int);
 extern Vp6Fn5R lbl_806EF400;
 extern "C" void fn_803A0C9C(Vp6Buf*, int, Vp6Frm*);
-extern "C" void fn_80396604(Vp6Buf*, unsigned char, unsigned char, int, int, int, int, int, int, int);
+extern "C" void PostProcess(Vp6Buf*, unsigned char, unsigned char, int, int, int, int, int, int, int);
 
-Vp6Ctx* fn_80395C68()
+Vp6Ctx* VP6_CreatePBInstance()
 {
     Vp6Params p;
     Vp6Params* pp = &p;
@@ -221,7 +221,7 @@ Vp6Ctx* fn_80395C68()
     }
     memset(c, 0, 0x4954);
     c->m1B0 = p;
-    if (!fn_80395B38(c)) {
+    if (!VP6_AllocateTmpBuffers(c)) {
         fn_80398614(c);
         return 0;
     }
@@ -232,14 +232,14 @@ Vp6Ctx* fn_80395C68()
     return c;
 }
 
-void fn_80395D94()
+void VP6_VPInitLibrary()
 {
     lbl_806EF39C = fn_8039847C();
     fn_80398484();
     for (int i = 0; i < 0x40; i++) {
         lbl_8069BF40[i] = lbl_80607A68[i] / 2 + 2;
     }
-    fn_80395E18(lbl_8069BF40, lbl_8069BF40, lbl_8069BF40, 7);
+    InitPostProcessing(lbl_8069BF40, lbl_8069BF40, lbl_8069BF40, 7);
     fn_80397CAC();
 }
 
@@ -247,7 +247,7 @@ void fn_80395E14()
 {
 }
 
-void fn_80395E18(int* a, int* b, int* c, unsigned d)
+void InitPostProcessing(int* a, int* b, int* c, unsigned d)
 {
     for (int i = 0; i < 0x300; i++) {
         int t = i - 0x100;
@@ -277,7 +277,7 @@ void fn_80395E18(int* a, int* b, int* c, unsigned d)
     fn_80398324(d);
 }
 
-void fn_80395F00(Vp6Buf* b)
+void DeletePostProcBuffers(Vp6Buf* b)
 {
     if (b->mB8) fn_80398614(b->mB8);
     b->mB8 = 0;
@@ -299,9 +299,9 @@ void fn_80395F00(Vp6Buf* b)
     b->m2C = 0;
 }
 
-int fn_80395FBC(Vp6Buf* b)
+int AllocatePostProcBuffers(Vp6Buf* b)
 {
-    fn_80395F00(b);
+    DeletePostProcBuffers(b);
     unsigned n = b->m98 * (b->m40.m4 + b->mB4 * 2);
     b->mB8 = fn_803985F4(n * 3 / 2 + 0x20, 0);
     if (b->mB8 != 0) {
@@ -328,12 +328,12 @@ int fn_80395FBC(Vp6Buf* b)
             }
         }
     }
-    fn_80395F00(b);
+    DeletePostProcBuffers(b);
     return 0;
 }
 
 /* near-miss: same arithmetic, callee-saved and scratch registers allocated differently. */
-void fn_80396114(Vp6Buf* b, const Vp6Params* p)
+void ChangePostProcConfiguration(Vp6Buf* b, const Vp6Params* p)
 {
     b->m40 = *p;
     unsigned w8 = b->m40.m0 >> 3;
@@ -361,14 +361,14 @@ void fn_80396114(Vp6Buf* b, const Vp6Params* p)
     b->m88 = q4;
 }
 
-Vp6Buf* fn_8039620C(const Vp6Params* p)
+Vp6Buf* CreatePostProcInstance(const Vp6Params* p)
 {
     Vp6Buf* b = (Vp6Buf*)fn_803985F4(0xC8, 0);
     if (b == 0) {
         return 0;
     }
     memset(b, 0, 0xC8);
-    fn_80396114(b, p);
+    ChangePostProcConfiguration(b, p);
     b->mC4 = 1;
     return b;
 }
@@ -376,7 +376,7 @@ Vp6Buf* fn_8039620C(const Vp6Params* p)
 void fn_80396274(Vp6SubB* s)
 {
     if (s->m0) {
-        fn_80395F00(s->m0);
+        DeletePostProcBuffers(s->m0);
         fn_80398614(s->m0);
         s->m0 = 0;
     }
@@ -397,7 +397,7 @@ void fn_803962CC(Vp6Buf* b, int v)
     b->mC4 = v;
 }
 
-void fn_803962D4(Vp6Mb* m)
+void UpdateFragQIndex(Vp6Mb* m)
 {
     int v = m->mC;
     for (unsigned i = 0; i < m->m8C; i++) {
@@ -407,7 +407,7 @@ void fn_803962D4(Vp6Mb* m)
     }
 }
 
-double fn_80396328(double a, double b, double c)
+double gaussian(double a, double b, double c)
 {
     double buf[2];
     double d = c - b;
@@ -421,7 +421,7 @@ extern const double lbl_80607450[];
 /* VP6 postprocess "PlaneAddNoise_C" (EA reference-build name, same code): dithers one plane with Gaussian noise drawn
  * through rand() (the C library generator the game shares): 2048 draws to fill the noise table plus one per row.
  * CharDist[0] must be read inside the loops (the loop optimizer hoists the load), `pad` reproduces retail's frame. */
-void fn_80396398(unsigned char* Start, unsigned Width, unsigned Height, int Pitch, int q)
+void PlaneAddNoise_C(unsigned char* Start, unsigned Width, unsigned Height, int Pitch, int q)
 {
     unsigned i, j;
     char A[16];
@@ -434,7 +434,7 @@ void fn_80396398(unsigned char* Start, unsigned Width, unsigned Height, int Pitc
     int idx = 0;
     double x;
     for (x = -32.0; x < 32.0; x += 1.0) {
-        int n = (int)(fn_80396328(sigma, lbl_80607450[0], x) * 256.0 + 0.5);
+        int n = (int)(gaussian(sigma, lbl_80607450[0], x) * 256.0 + 0.5);
         if (n) {
             int k;
             for (k = 0; k < n; k++)
@@ -466,12 +466,12 @@ void fn_80396398(unsigned char* Start, unsigned Width, unsigned Height, int Pitc
 
 
 
-void fn_80396ADC(Vp6Tbl* t)
+void VP6_InitQTables(Vp6Tbl* t)
 {
     *(Vp6Blk100*)((char*)t + 0x3C) = lbl_80607468;
 }
 
-void fn_80396B50(Vp6Tbl* t)
+void VP6_BuildQuantIndex_Generic(Vp6Tbl* t)
 {
     t->m13C = lbl_80608168;
     for (int i = 0; i < 0x40; i++) {
@@ -479,7 +479,7 @@ void fn_80396B50(Vp6Tbl* t)
     }
 }
 
-void fn_80396B8C(Vp6Tbl* t, int x)
+void VP6_init_dequantizer(Vp6Tbl* t, int x)
 {
     int i;
     for (i = 1; i < 0x40; i++) {
@@ -492,16 +492,16 @@ void fn_80396B8C(Vp6Tbl* t, int x)
     t->m184[0] = lbl_80607AE8[t->m0] << 2;
 }
 
-void fn_80396C5C(Vp6Tbl* t, int x)
+void VP6_UpdateQ(Vp6Tbl* t, int x)
 {
     if (t->m3C[t->m0] != t->m38) {
         t->m38 = t->m4;
         lbl_806EF410(t, x);
-        fn_80396B8C(t, x);
+        VP6_init_dequantizer(t, x);
     }
 }
 
-void fn_80396CC4(Vp6Tbl* t)
+void DeleteQuantizerBuffers(Vp6Tbl* t)
 {
     if (t->m188) fn_80398614(t->m188);
     t->m188 = 0;
@@ -511,9 +511,9 @@ void fn_80396CC4(Vp6Tbl* t)
     t->m184 = 0;
 }
 
-int fn_80396D20(Vp6Tbl* t)
+int AllocateQuantizerBuffers(Vp6Tbl* t)
 {
-    fn_80396CC4(t);
+    DeleteQuantizerBuffers(t);
     t->m188 = fn_803985F4(0xA0, 0);
     if (t->m188 != 0) {
         t->m180 = (unsigned short*)(((int)t->m188 + 0x1F) & ~0x1F);
@@ -523,20 +523,20 @@ int fn_80396D20(Vp6Tbl* t)
             return 1;
         }
     }
-    fn_80396CC4(t);
+    DeleteQuantizerBuffers(t);
     return 0;
 }
 
 void fn_80396DA8(Vp6TblHolder* h)
 {
     if (h->m0) {
-        fn_80396CC4(h->m0);
+        DeleteQuantizerBuffers(h->m0);
         fn_80398614(h->m0);
         h->m0 = 0;
     }
 }
 
-Vp6Tbl* fn_80396DF0()
+Vp6Tbl* VP6_CreateQuantizer()
 {
     Vp6Tbl* t = 0;
     t = (Vp6Tbl*)fn_803985F4(0x990, 0);
@@ -544,26 +544,26 @@ Vp6Tbl* fn_80396DF0()
         return 0;
     }
     memset(t, 0, 0x990);
-    if (fn_80396D20(t) == 0) {
+    if (AllocateQuantizerBuffers(t) == 0) {
         fn_80396DA8((Vp6TblHolder*)&t);
     }
     return t;
 }
 
-int fn_80397270(Vp6Ctx** out, int w, int h)
+int VP6_StartDecoder(Vp6Ctx** out, int w, int h)
 {
-    *out = fn_80395C68();
+    *out = VP6_CreatePBInstance();
     (*out)->m234 = w;
     (*out)->m238 = h;
     (*out)->m23C = w;
     (*out)->m240 = h;
     (*out)->m1B0.m0 = w;
     (*out)->m1B0.m4 = h;
-    (*out)->m298 = fn_8039620C(&(*out)->m1B0);
-    (*out)->m13C = fn_80396DF0();
+    (*out)->m298 = CreatePostProcInstance(&(*out)->m1B0);
+    (*out)->m13C = VP6_CreateQuantizer();
     (*out)->m1A4 = lbl_806EF39C;
     if (!fn_8039F3A8(*out)) {
-        fn_80395C08(out);
+        VP6_DeletePBInstance(out);
         return 0;
     }
     (*out)->m13C->m38 = 0;
@@ -571,7 +571,7 @@ int fn_80397270(Vp6Ctx** out, int w, int h)
     return 1;
 }
 
-void fn_8039733C(Vp6Ctx* c, unsigned kind, int val)
+void VP6_SetPbParam(Vp6Ctx* c, unsigned kind, int val)
 {
     switch (kind) {
     case 1:
@@ -588,7 +588,7 @@ void fn_8039733C(Vp6Ctx* c, unsigned kind, int val)
         break;
     case 0:
         if (val == 9) {
-            fn_8039733C(c, 1, 0x46);
+            VP6_SetPbParam(c, 1, 0x46);
         } else {
             c->m1A0 = val;
             c->m1A8 = 0;
@@ -606,7 +606,7 @@ void fn_8039733C(Vp6Ctx* c, unsigned kind, int val)
     }
 }
 
-void fn_80397438(Vp6SizeView* c, Vp6Frm* o)
+void VP6_GetYUVConfig(Vp6SizeView* c, Vp6Frm* o)
 {
     if (c->m1A0 != 0 || (c->m1DC != 0 && c->m4944 != 0)) {
         if (c->m25C == 0) {
@@ -615,9 +615,9 @@ void fn_80397438(Vp6SizeView* c, Vp6Frm* o)
             int p = (int)fn_803985F4(sz, 0);
             c->m260 = p;
             c->m25C = (p + 0x1f) & ~0x1f;
-            fn_80395FBC(c->m298);
+            AllocatePostProcBuffers(c->m298);
         }
-        fn_80396604(c->m298, c->m19C, c->m1AC, c->m1A0, c->m6A0, c->m254, c->m25C, c->m148, 4, 1);
+        PostProcess(c->m298, c->m19C, c->m1AC, c->m1A0, c->m6A0, c->m254, c->m25C, c->m148, 4, 1);
         if (c->m493C != 0)
             lbl_806EF400(c->m298, c->m493C, c->m4940, c->m25C, c->m25C);
     }
@@ -678,7 +678,7 @@ void fn_80397438(Vp6SizeView* c, Vp6Frm* o)
 }
 
 /* near-miss: 10 slots, register choice for the m6A0 value (r0 in the original code). */
-int fn_803977FC(Vp6Ctx* c, const unsigned char* buf, int size)
+int VP6_DecodeFrameToYUV_internal(Vp6Ctx* c, const unsigned char* buf, int size)
 {
     c->m1E8 = size;
     fn_8039E914(&c->m450C, buf);
@@ -718,14 +718,14 @@ int fn_803977FC(Vp6Ctx* c, const unsigned char* buf, int size)
     return 0;
 }
 
-int fn_80397A4C(Vp6Ctx** h)
+int VP6_StopDecoder(Vp6Ctx** h)
 {
     if (*h) {
         fn_80396DA8((Vp6TblHolder*)((char*)*h + 0x13C));
         fn_80396274((Vp6SubB*)((char*)*h + 0x298));
         fn_8039EFD4(*h);
         fn_8039F264(*h);
-        fn_80395C08(h);
+        VP6_DeletePBInstance(h);
     }
     return 1;
 }
@@ -734,7 +734,7 @@ void fn_80397AB0()
 {
 }
 
-void fn_80397AB4(const unsigned char* a, const unsigned char* b, short* out, int stride)
+void AverageBlock_C(const unsigned char* a, const unsigned char* b, short* out, int stride)
 {
     for (int i = 0; i < 8; i++) {
         out[0] = (a[0] + b[0]) >> 1;
@@ -751,7 +751,7 @@ void fn_80397AB4(const unsigned char* a, const unsigned char* b, short* out, int
     }
 }
 
-void fn_80397B70(const unsigned char* src, short* diff, int stride)
+void SubtractBlock_C(const unsigned char* src, short* diff, int stride)
 {
     for (int i = 0; i < 8; i++) {
         diff[0] = src[0] - diff[0];
@@ -777,7 +777,7 @@ void fn_80397C0C(const unsigned char* src, unsigned char* dst, int stride)
     }
 }
 
-void fn_80397C34(const unsigned char* src, unsigned char* dst, int sstride, int dstride)
+void Copy12x12_C(const unsigned char* src, unsigned char* dst, int sstride, int dstride)
 {
     for (int i = 0; i < 12; i++) {
         dst[0] = src[0];

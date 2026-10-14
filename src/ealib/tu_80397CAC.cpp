@@ -48,12 +48,12 @@ extern "C" {
 
 void fn_80398494();
 void fn_80398498();
-void fn_80396B50();
+void VP6_BuildQuantIndex_Generic();
 void fn_80397AB0();
-void fn_80397AB4();
-void fn_80397B70();
+void AverageBlock_C();
+void SubtractBlock_C();
 void fn_80397C0C();
-void fn_80397C34();
+void Copy12x12_C();
 void fn_803A31C0();
 void fn_803A3214();
 void fn_803A3270();
@@ -72,8 +72,8 @@ void fn_8039D120();
 void fn_80398FE0();
 void fn_80399EA8();
 void fn_8039A778();
-void fn_80396E5C();
-void fn_80396F4C();
+void FilterHoriz_Simple_C();
+void FilterVert_Simple_C();
 void fn_803A0554();
 void fn_803A05A0();
 void fn_803A05DC();
@@ -89,7 +89,7 @@ void fn_8039FC88();
 void fn_8039FD38();
 void fn_8039D058();
 void fn_80398A78(Vp6Buf* b, int lo, int hi, unsigned char* dst, const unsigned char* src);
-void fn_80396398();
+void PlaneAddNoise_C();
 void fn_80397DBC(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 void fn_80397EA8(const int* src, short* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
 void fn_8039800C(const unsigned char* src, int* dst, int stride, int step, unsigned rows, unsigned cols, const int* taps);
@@ -240,8 +240,8 @@ void fn_80398324()
     lbl_806EF3E4 = (Vp6McFn)fn_80398FE0;
     lbl_806EF3E8 = (Vp6McFn)fn_80399EA8;
     lbl_806EF3EC = (Vp6McFn)fn_8039A778;
-    lbl_806EF3D4 = fn_80396E5C;
-    lbl_806EF3D8 = fn_80396F4C;
+    lbl_806EF3D4 = FilterHoriz_Simple_C;
+    lbl_806EF3D8 = FilterVert_Simple_C;
     lbl_806EF3C0 = fn_803A0554;
     lbl_806EF3CC = fn_803A05A0;
     lbl_806EF3D0 = fn_803A05DC;
@@ -257,7 +257,7 @@ void fn_80398324()
     lbl_806EF3A0 = fn_8039FD38;
     lbl_806EF404 = fn_8039D058;
     lbl_806EF400 = (Vp6Fn)fn_80398A78;
-    lbl_806EF408 = fn_80396398;
+    lbl_806EF408 = PlaneAddNoise_C;
 }
 
 int fn_8039847C()
@@ -267,7 +267,7 @@ int fn_8039847C()
 
 void fn_80398484()
 {
-    lbl_806EF410 = fn_80396B50;
+    lbl_806EF410 = VP6_BuildQuantIndex_Generic;
 }
 
 void fn_80398494()
@@ -299,12 +299,12 @@ void fn_80398498()
     lbl_806EF414 = fn_803A31C0;
     lbl_806EF418 = fn_803A3214;
     lbl_806EF41C = fn_8039FF6C;
-    lbl_806EF434 = fn_80397AB4;
+    lbl_806EF434 = AverageBlock_C;
     lbl_806EF430 = fn_803A3D4C;
     lbl_806EF428 = fn_803A3270;
-    lbl_806EF42C = fn_80397B70;
+    lbl_806EF42C = SubtractBlock_C;
     lbl_806EF438 = fn_80397C0C;
-    lbl_806EF43C = fn_80397C34;
+    lbl_806EF43C = Copy12x12_C;
     lbl_806EF440 = (Vp6Fn)fn_80398238;
     lbl_806EF444 = fn_803A3F0C;
 }
