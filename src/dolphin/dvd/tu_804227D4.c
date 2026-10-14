@@ -38,11 +38,16 @@ extern u32 lbl_806EF64C;
 extern OSThreadQueue lbl_806EF658;
 extern DVDDiskID* lbl_806EF664;
 extern BOOL lbl_806EF1A4;
+/* dvd.c's .bss statics BB2 (0x806DE160), CurrDiskID (0x806DE180), DummyCommandBlock (0x806DE1A0) and
+ * ResetAlarm (0x806DE1D0) are contiguous. Retail reaches the later three as offsets from BB2's address in the
+ * functions that use several of them (MWCC addresses a unit's statics from one base), so this code-only unit
+ * declares them as one extern struct at BB2's address. Functions that use one object alone reference it by
+ * its own address (lbl_806DE180, DummyCommandBlock, lbl_806DE1D0 below), as retail does. */
 typedef struct DvdBss {
-    DVDBB2 bb2;
-    DVDDiskID tmp;
-    DVDCommandBlock dummy;
-    OSAlarm resetAlarm;
+    /* 0x00 */ DVDBB2 bb2;               /* BB2 */
+    /* 0x20 */ DVDDiskID tmp;            /* CurrDiskID */
+    /* 0x40 */ DVDCommandBlock dummy;    /* DummyCommandBlock */
+    /* 0x70 */ OSAlarm resetAlarm;       /* ResetAlarm */
 } DvdBss;
 extern DvdBss lbl_806DE160;
 extern DVDDiskID lbl_806DE180;
@@ -82,8 +87,6 @@ extern s32 lbl_806EF698;
 extern void (*lbl_806EF6B8)(DVDCommandBlock*);
 extern DVDCommandBlock DummyCommandBlock;
 
-#define BB2 (lbl_806DE160.bb2)
-#define TMPID (&lbl_806DE160.tmp)
 
 void fn_80425A70(u32 error);
 void OSPanic(const char* file, int line, const char* msg, ...);
@@ -393,10 +396,10 @@ void fn_80422FD4(s32 result, DVDCommandBlock* block) {
 /* takes no parameter: an unused parameter adds an 8-byte frame slot in MWCC (retail frame is 16). Stored in lbl_806EF6B8 via a cast. */
 void fn_804230B0(void) {
     lbl_806EF6B8 = (void (*)(DVDCommandBlock*))fn_804230B0;
-    if (!(lbl_806EF668->FSTMaxLength >= BB2.FSTLength)) {
+    if (!(lbl_806EF668->FSTMaxLength >= lbl_806DE160.bb2.FSTLength)) {
         OSPanic("dvd.c", 0x295, "DVDChangeDisk(): FST in the new disc is too big.   ");
     }
-    fn_804263F8(lbl_806EF668->FSTLocation, OSRoundUp32B(BB2.FSTLength), BB2.FSTPosition, fn_80423144);
+    fn_804263F8(lbl_806EF668->FSTLocation, OSRoundUp32B(lbl_806DE160.bb2.FSTLength), lbl_806DE160.bb2.FSTPosition, fn_80423144);
 }
 
 void fn_80423144(u32 intType) {
