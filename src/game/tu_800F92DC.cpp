@@ -364,7 +364,7 @@ UiScrFB* fn_800F9D0C(UiScrFB* self, int a, int b, int c, int d, int e, int f, in
     self->m248 = 0;
     self->m25C = 0;
     self->m260 = 0;
-    fn_803FFC58(self->m148, 0, 0x84);
+    MEM_fill(self->m148, 0, 0x84);
     for (int i = 0; i < 2; i++) {
         self->a1E8[i] = 0;
         self->a1F0[i] = 0;
@@ -433,7 +433,7 @@ void fn_800FB0E4(UiScrFB* self)
 {
     fn_800ED254((UiObj*)self);
     self->m13C = 0xC7;
-    fn_803FFC58(self->m148, 0, 0x84);
+    MEM_fill(self->m148, 0, 0x84);
     self->m1D8 = 0;
     self->m1D4 = 0;
     self->m1D0 = 0;

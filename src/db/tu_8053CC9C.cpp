@@ -673,7 +673,7 @@ DB_OVERLAY R2C* fn_8053DB30(R2C* dst, Db8053CC9C_Src* src)
 
 DB_OVERLAY void* fn_8053DD34(void* self, int a)
 {
-    fn_803FFA60(self, a, 8);
+    MEM_copy(self, a, 8);
     return self;
 }
 

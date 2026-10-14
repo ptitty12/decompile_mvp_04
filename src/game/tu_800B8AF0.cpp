@@ -56,7 +56,7 @@ void fn_80377408(void* p);
 void fn_80377488(void* p);
 void* fn_803774A8(unsigned n, int heap);
 void fn_8033E884(const char* s);
-void fn_803FFA60(char* d, const char* s, int n);
+void MEM_copy(char* d, const char* s, int n);
 const char* fn_802B9300(int v, int a, int b, int* outn);
 void* fn_803FC480(int path);
 int fn_80401904(void* f);
@@ -137,7 +137,7 @@ extern "C" void fn_800B8B3C(FEObj68* self, int k)
     int n = len;
     int h = fn_8000E65C()->fn_8000E6F0();
     self->mC = fn_803ED604(lbl_805BA5A4, n, h);
-    fn_803FFA60((char*)self->mC, data, len);
+    MEM_copy((char*)self->mC, data, len);
     fn_80377408((void*)data);
     fn_8000E65C()->fn_8000E6F8();
 }

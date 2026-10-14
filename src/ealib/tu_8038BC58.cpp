@@ -57,7 +57,7 @@ struct VdSrcI {
 };
 extern "C" void GXInitTexObjCI(void* obj, void* img, int w, int h, int fmt, int ws, int wt, int mip, int tlut);
 extern "C" void GXInitTexObjLOD(void* obj, int a, int b, float x, float y, float z, int c, int d, int e);
-extern "C" unsigned char* fn_8038C7D4(int a, int b);
+extern "C" unsigned char* NEW_tBigYUVSwizzlerTexture(int a, int b);
 /* Retail has 8 bytes of frame below the int->float temp that no emitted code touches: a local object with an empty inline
    destructor (a never-used local array or an empty-ctor-only object does not allocate a slot; one with a destructor does). */
 struct VdSpare8 {
@@ -99,7 +99,7 @@ extern "C" VdMain* fn_8038BCD0(VdMain* p, int a, int b, int c)
     GXInitTexObjLOD((char*)p + 0x4C, 0, 0, fz, fz, fz, 0, 0, 0);
     GXInitTexObjCI((char*)p + 0x2C, 0, hw, hh, 9, 0, 0, 0, 0);
     GXInitTexObjLOD((char*)p + 0x2C, 0, 0, fz, fz, fz, 0, 0, 0);
-    p->m8 = (VdBufs*)((unsigned char* (*)(void*, void*, void*))fn_8038C7D4)((char*)p + 0xC, (char*)p + 0x4C, (char*)p + 0x2C);
+    p->m8 = (VdBufs*)((unsigned char* (*)(void*, void*, void*))NEW_tBigYUVSwizzlerTexture)((char*)p + 0xC, (char*)p + 0x4C, (char*)p + 0x2C);
     p->m6C = 0;
     return p;
 }
@@ -155,32 +155,32 @@ extern "C" void fn_8038C784()
 {
 }
 
-extern "C" void fn_8038C788(VdBufs* s)
+extern "C" void DELETE_tBigYUVSwizzler(VdBufs* s)
 {
-    fn_8038D110((char*)s->m600);
-    fn_8038D110((char*)s->m604);
+    DELETE_tBigSwizzler((char*)s->m600);
+    DELETE_tBigSwizzler((char*)s->m604);
     lbl_80699B94.m4(s);
 }
 
 /* 8038BFDC */
 VdMain::~VdMain()
 {
-    fn_8038C788(m8);
+    DELETE_tBigYUVSwizzler(m8);
     if (m6C != 0)
         fn_8038EA64(m0, m6C);
 }
 
 extern "C" void GXInitTlutObj(void* obj, void* data, int fmt, int n);
 extern "C" void DCFlushRange(void* p, int n);
-extern "C" int fn_8038D170(int x);
+extern "C" int NEW_tBigSwizzlerTexture(int x);
 /* near-miss (96.4%): retail loads the 0x4330 high word into r4 and the byte 255 into r5; ours has them swapped (4 slots). */
-extern "C" unsigned char* fn_8038C7D4(int a, int b)
+extern "C" unsigned char* NEW_tBigYUVSwizzlerTexture(int a, int b)
 {
     unsigned char* t = (unsigned char*)lbl_80699B94.m0("VD::tBigSwizzler", 0x640, 0x20, 0, lbl_80699B94.m8);
     unsigned char* u = t + 0x200;
     unsigned char* v = t + 0x400;
-    *(int*)(t + 0x600) = fn_8038D170(a);
-    *(int*)(t + 0x604) = fn_8038D170(b);
+    *(int*)(t + 0x600) = NEW_tBigSwizzlerTexture(a);
+    *(int*)(t + 0x604) = NEW_tBigSwizzlerTexture(b);
     for (int i = 0; i < 256; i++) {
         t[i * 2] = 0xFF;
         t[i * 2 + 1] = i;
@@ -238,7 +238,7 @@ struct VdSpare16 {
     int m0, m4, m8, mC;
     ~VdSpare16() {}
 };
-extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
+extern "C" void tBigYUVSwizzler_DrawSetup(VdBufs* s, void* t1, void* t2, void* t3)
 {
     GXColor kt;
     GXColor ca = { 0xff, 0xff, 0, 0 };
@@ -329,7 +329,7 @@ extern "C" void fn_8038C99C(VdBufs* s, void* t1, void* t2, void* t3)
     GXSetTevAlphaIn(4, 7, 7, 7, 4);
 }
 
-extern "C" void fn_8038D02C(VdTile* t, unsigned a, unsigned b, unsigned c, unsigned d)
+extern "C" void CON_tTileSize2d(VdTile* t, unsigned a, unsigned b, unsigned c, unsigned d)
 {
     t->m0 = a;
     t->m4 = b;
@@ -342,7 +342,7 @@ extern "C" void fn_8038D02C(VdTile* t, unsigned a, unsigned b, unsigned c, unsig
     t->m18 = a * b;
 }
 
-extern "C" void fn_8038D068(int* out, unsigned x, unsigned y, VdTile* t)
+extern "C" void CON_tPixAdr2d(int* out, unsigned x, unsigned y, VdTile* t)
 {
     unsigned lin = y * t->m8 + x;
     unsigned a = x % t->m0 + (lin / t->m18 % t->m10) * t->m0;
@@ -357,14 +357,14 @@ extern "C" int fn_8038D0E0(int x, int y, int w)
     return ((((y >> 2) * ((w + 3) >> 2)) + (x >> 2)) << 5) + (((y & 3) << 3) + ((x & 3) << 1));
 }
 
-extern "C" void fn_8038D110(char* o)
+extern "C" void DELETE_tBigSwizzler(char* o)
 {
     lbl_80699B94.m4(*(void**)(o + 0x10));
     lbl_80699B94.m4(*(void**)(o + 0x3C));
     lbl_80699B94.m4(o);
 }
 
-/* Swizzled-texture record built by fn_8038D170: block size m0/m4, size m8/mC, two swizzle maps (m10, m3C) with GX texture objects at +0x14 and +0x40. */
+/* Swizzled-texture record built by NEW_tBigSwizzlerTexture: block size m0/m4, size m8/mC, two swizzle maps (m10, m3C) with GX texture objects at +0x14 and +0x40. */
 struct VdSwz {
     int m0;
     int m4;
@@ -391,7 +391,7 @@ struct VdM2 {
     VdA m7C[2];
 };
 extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
-extern "C" int fn_8038D170(int tex)
+extern "C" int NEW_tBigSwizzlerTexture(int tex)
 {
     unsigned bw = 0;
     unsigned bh = 0;
@@ -418,7 +418,7 @@ extern "C" int fn_8038D170(int tex)
     }
     VdTile t;
     int sp[2];
-    fn_8038D02C(&t, bw, bh, w, h);
+    CON_tTileSize2d(&t, bw, bh, w, h);
     unsigned y = 0;
     const char* nm = lbl_80605F5C;
     VdSwz* p = (VdSwz*)lbl_80699B94.m0(nm, 0x60, 0, 0, lbl_80699B94.m8);
@@ -433,7 +433,7 @@ extern "C" int fn_8038D170(int tex)
     p->m3C = (unsigned char*)lbl_80699B94.m0(nm, sz, 0x20, 0, lbl_80699B94.m8);
     for (; y < p->mC; y++) {
         for (unsigned x = 0; x < p->m8; x++) {
-            fn_8038D068(sp, x, y, &t);
+            CON_tPixAdr2d(sp, x, y, &t);
             int idx = fn_8038D0E0(x, y, p->m34);
             idx = idx / 2 * 2;
             unsigned char* q = p->m10 + idx;
@@ -446,7 +446,7 @@ extern "C" int fn_8038D170(int tex)
     GXInitTexObjLOD((char*)p + 0x14, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
     for (; y < p->m38; y++) {
         for (unsigned x = 0; x < p->m34; x++) {
-            fn_8038D068(sp, x, y, &t);
+            CON_tPixAdr2d(sp, x, y, &t);
             int idx = fn_8038D0E0(x, y, p->m34);
             idx = idx / 2 * 2;
             unsigned char* q = p->m3C + idx;
@@ -462,8 +462,8 @@ extern "C" int fn_8038D170(int tex)
 }
 
 extern "C" int fn_803AC11C();
-extern "C" void fn_804005DC();
-extern "C" void* fn_803FFC58(void* p, int v, int n);
+extern "C" void DEBUG_break();
+extern "C" void* MEM_fill(void* p, int v, int n);
 extern "C" int fn_803FD964(int a, int b, int c, int d, int e);
 extern "C" int fn_803FDE54(int a, int b);
 extern "C" void fn_803FDD28(int h, int a, int b);
@@ -494,7 +494,7 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
     int fl = j;
     if (fn_803AC11C() == 0)
         fl = 1;
-    fn_803FFC58(s, 0, 0x98);
+    MEM_fill(s, 0, 0x98);
     *(int*)(s + 0x18) = i;
     *(int*)(s + 0x20) = 0;
     *(int*)(s + 0x28) = 0;
@@ -514,7 +514,7 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
     if (lbl_80699B94.m0 != 0 && lbl_80699B94.m4 != 0)
         ok = 1;
     if (ok == 0) {
-        fn_804005DC();
+        DEBUG_break();
         return;
     }
     if (e != 0) {
@@ -754,7 +754,7 @@ extern "C" int fn_8038E468(VdClock* c)
 }
 
 extern "C" int fn_803AC11C();
-extern "C" void fn_804005DC();
+extern "C" void DEBUG_break();
 extern "C" void fn_803A9204(void* out);
 extern "C" int fn_803AB4E0(int a, int b);
 extern "C" int fn_803AB13C(int a, void* b, int c, int d, int e, int f);
@@ -769,7 +769,7 @@ struct VdRes2 {
 extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b)
 {
     if (fn_803AC11C() == 0) {
-        fn_804005DC();
+        DEBUG_break();
     } else {
         char q[24];
         o->m4 = 0;
@@ -978,7 +978,7 @@ struct VdAlloc {
     int padC[3];
 };
 extern "C" void fn_803FDC80(int p);
-extern "C" void fn_803FACFC(VdAlloc* a);
+extern "C" void FILESYS_getopts(VdAlloc* a);
 class VdX2 {
 public:
     VdRes* m0;
@@ -1026,7 +1026,7 @@ VdX2::~VdX2()
     if (p != 0) {
         VdAlloc a;
         a.op = 0x14;
-        fn_803FACFC(&a);
+        FILESYS_getopts(&a);
         a.fn(p);
         m20 = 0;
     }
@@ -1034,7 +1034,7 @@ VdX2::~VdX2()
     if (q != 0) {
         VdAlloc a;
         a.op = 0x14;
-        fn_803FACFC(&a);
+        FILESYS_getopts(&a);
         a.fn(q);
         m28 = 0;
     }

@@ -75,7 +75,7 @@ extern float lbl_805B4460;
 
 
 
-extern "C" void* fn_803FFA60(void* s, int a, int n);
+extern "C" void* MEM_copy(void* s, int a, int n);
 
 
 
@@ -968,7 +968,7 @@ T8* fn_80085C00(K8* self, int i)
 
 void* fn_80085EF8(void* self, int a)
 {
-    fn_803FFA60(self, a, 8);
+    MEM_copy(self, a, 8);
     return self;
 }
 

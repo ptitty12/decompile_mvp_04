@@ -156,7 +156,7 @@ extern char lbl_80687628[];
 extern "C" void fn_803A9204(void* p);
 extern "C" int fn_803A85B0(int h, int a, void* b);
 
-/* near-miss (2 slots): retail loads o->m78 (r4) before the handle (r3) for the fn_803ADA2C call. */
+/* near-miss (2 slots): retail loads o->m78 (r4) before the handle (r3) for the SNDvol call. */
 void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
 {
     o->mC[ch].mHandle = -1;
@@ -173,7 +173,7 @@ void fn_8005B1F0(Unk8005ADD0_Obj* o, int ch)
         fn_803A979C();
         if (o->mC[ch].mHandle >= 0) {
             fn_803A975C();
-            fn_803ADA2C(o->mC[ch].mHandle, o->m78);
+            SNDvol(o->mC[ch].mHandle, o->m78);
             fn_803A979C();
             o->mC[ch].mState = 3;
             return;
@@ -306,7 +306,7 @@ void fn_8005B76C(Unk8005ADD0_Obj* o, int vol)
             return;
         case 1:
             fn_803A975C();
-            fn_803ADA2C(o->mC[o->mA8].mHandle, o->m78);
+            SNDvol(o->mC[o->mA8].mHandle, o->m78);
             fn_803A979C();
             break;
         }

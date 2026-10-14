@@ -54,7 +54,7 @@ void fn_80377408(void* p);
 void fn_80377488(void* p);
 void fn_80408774(const char* fmt, ...);
 void* fn_803ED634(const char* name, unsigned size, int flags);
-void fn_803FFC58(void* p, unsigned pat, unsigned size);
+void MEM_fill(void* p, unsigned pat, unsigned size);
 
 int fn_80377814(const char* fmt, ...);
 int fn_80409BF0(char* buf, const char* fmt, va_list ap);
@@ -145,7 +145,7 @@ extern "C" void* fn_803771F4(void* a, const char* name, unsigned size, int flags
     void* p = fn_803ED634(name, size, flags);
     if (p == 0)
         fn_80377814(lbl_8060548C, name);
-    fn_803FFC58(p, 0xBB55BB55, size);
+    MEM_fill(p, 0xBB55BB55, size);
     if (lbl_80624248)
         lbl_80624248();
     return p;
@@ -176,7 +176,7 @@ extern "C" void fn_803772E0(void* p)
             return;
         }
     }
-    fn_803FFC58(p, 0xAA55AA55, fn_803EE310(p));
+    MEM_fill(p, 0xAA55AA55, fn_803EE310(p));
     fn_803EDA0C(p);
 }
 
@@ -323,7 +323,7 @@ extern "C" void fn_803778EC(SortArr* a, int chrg)
         fn_80377408(a);
 }
 
-extern "C" void* fn_803FFA60(void* dst, const void* src, unsigned n);
+extern "C" void* MEM_copy(void* dst, const void* src, unsigned n);
 
 /* near-miss: 90%; retail loads src->mC into r3 and stores/multiplies it there, with this/src in r31/r30 (2 saved regs); mine uses r29/r30 */
 extern "C" SortArr* fn_80377944(SortArr* a, SortArr* src, int heap)
@@ -332,7 +332,7 @@ extern "C" SortArr* fn_80377944(SortArr* a, SortArr* src, int heap)
     a->m10 = src->m10;
     a->m0 = (SortRec*)fn_803774A8((a->mC = src->mC) * 12, heap);
     a->m4 = src->m4;
-    fn_803FFA60(a->m0, src->m0, a->mC * 12);
+    MEM_copy(a->m0, src->m0, a->mC * 12);
     return a;
 }
 

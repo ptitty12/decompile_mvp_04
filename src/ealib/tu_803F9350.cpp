@@ -60,25 +60,25 @@ extern char* lbl_806ADE68[3];
 extern char lbl_8060E700[];
 extern char lbl_8060E748[];
 
-extern "C" int fn_804002BC(const char*, ...);
+extern "C" int REAL_abortmessage(const char*, ...);
 extern "C" void OSLockMutex(void*);
 extern "C" void OSUnlockMutex(void*);
-extern "C" void fn_803FFC58(void*, int, int);
-extern "C" int fn_803F9A80(int);
-extern "C" void fn_803FA410(int);
-extern "C" int fn_80400008(int);
+extern "C" void MEM_fill(void*, int, int);
+extern "C" int FILESYS_completeop(int);
+extern "C" void iFILE_ExecCommand(int);
+extern "C" int THREAD_iscurrent(int);
 extern "C" void fn_80400CE4(int);
-extern "C" void fn_803FFFA8(int);
+extern "C" void THREAD_yield(int);
 extern "C" void fn_8040074C(void*, int);
-extern "C" void fn_803FFA60(void*, void*, int);
-extern "C" int fn_803F93F4(int);
+extern "C" void MEM_copy(void*, void*, int);
+extern "C" int OPVALID(int);
 extern "C" RcJob* fn_803FA94C();
-extern "C" int fn_803FAA84(RcJob*);
+extern "C" int reservehandle(RcJob*);
 extern "C" void fn_803FA948(RcJob*);
 extern "C" char* strncpy(char*, const char*, unsigned);
 
 extern "C" void* memset(void*, int, unsigned, ...);
-extern "C" void fn_803F9EFC(int, int, RcJob*);
+extern "C" void iFILE_addbigreadcallback(int, int, RcJob*);
 struct RcB30x {
     int w[12];
 };
@@ -94,14 +94,14 @@ extern "C" void fn_803FADD0(int, int);
 
 extern RcJob* lbl_806ADE60[3];
 extern char lbl_8060E790[];
-extern "C" int fn_803F9544(int, int, int, void*);
+extern "C" int FILESYS_initadr(int, int, int, void*);
 extern "C" int fn_803F9434();
 extern "C" int fn_803F9464();
 
 extern "C" int fn_803F963C(int a, int b, int c);
 
 extern "C" void OSInitMutex(void*);
-extern "C" void fn_803FEE70(void);
+extern "C" void initfiledev(void);
 
 extern "C" int strncmp(const char*, const char*, unsigned);
 extern char lbl_8060E7AC[];
@@ -116,7 +116,7 @@ extern "C" void fn_803F9350(RcObj44* o, int* a, RcB30x* b, int c)
     *(int*)((char*)o + 0x40) = 0;
 }
 
-extern "C" int fn_803F93F4(int h)
+extern "C" int OPVALID(int h)
 {
     int r = 0;
     if (h != 0)
@@ -126,17 +126,17 @@ extern "C" int fn_803F93F4(int h)
 
 extern "C" int fn_803F9434()
 {
-    fn_804002BC(lbl_8060E700);
+    REAL_abortmessage(lbl_8060E700);
     return 0;
 }
 
 extern "C" int fn_803F9464()
 {
-    fn_804002BC(lbl_8060E748);
+    REAL_abortmessage(lbl_8060E748);
     return 0;
 }
 
-extern "C" int fn_803F9494(int a, int b, int c)
+extern "C" int FILESYS_init(int a, int b, int c)
 {
     RcBuf14* q = &lbl_806ADE8C;
     if (q->m4 == 0) {
@@ -145,12 +145,12 @@ extern "C" int fn_803F9494(int a, int b, int c)
     }
     if (lbl_806ADE4C.m0 == 0) {
         void* mem = ((void* (*)(const char*, int, int))q->m4)(lbl_8060E790, fn_803F963C(a, b, c), 0);
-        return fn_803F9544(a, b, c, mem);
+        return FILESYS_initadr(a, b, c, mem);
     }
     return 0;
 }
 
-extern "C" int fn_803F9544(int a, int b, int c, void* mem)
+extern "C" int FILESYS_initadr(int a, int b, int c, void* mem)
 {
     if (a == 0)
         a = 0x18;
@@ -169,9 +169,9 @@ extern "C" int fn_803F9544(int a, int b, int c, void* mem)
         lbl_806ADE4C.m0 = c;
         lbl_806ADE4C.m4 = a;
         OSInitMutex(lbl_806ADE74);
-        fn_803FFC58(lbl_806ADE4C.m18, 0, fn_803F963C(a, b, c));
+        MEM_fill(lbl_806ADE4C.m18, 0, fn_803F963C(a, b, c));
         lbl_806ADE4C.m1C = (char*)lbl_806ADE4C.m18 + lbl_806ADE4C.m0 * 0x30;
-        fn_803FEE70();
+        initfiledev();
         return 1;
     }
     return 0;
@@ -186,17 +186,17 @@ extern "C" int fn_803F963C(int a, int b, int c)
     return c * 0x30 + a * 0x144;
 }
 
-extern "C" int fn_803F9664(int h)
+extern "C" int FILESYS_opstatus(int h)
 {
     int r;
-    if (fn_803F93F4(h) != 0)
+    if (OPVALID(h) != 0)
         r = (lbl_806ADE64[0] + ((unsigned char*)&h)[3])->m8;
     else
         r = -3;
     return r;
 }
 
-extern "C" void fn_803F96B0(int h, void (*cb)(int, int, int))
+extern "C" void FILESYS_callbackop(int h, void (*cb)(int, int, int))
 {
     RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
     int m8 = j->m8;
@@ -208,10 +208,10 @@ extern "C" void fn_803F96B0(int h, void (*cb)(int, int, int))
     }
 }
 
-extern "C" void fn_803F972C(int h, int prio)
+extern "C" void FILESYS_priorityop(int h, int prio)
 {
     RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
-    if (fn_803F93F4(h) != 0) {
+    if (OPVALID(h) != 0) {
         OSLockMutex(lbl_806ADE74);
         int old = j->m10;
         j->m10 = prio;
@@ -252,11 +252,11 @@ extern "C" void fn_803F972C(int h, int prio)
     }
 }
 
-extern "C" void fn_803F9884(int h)
+extern "C" void FILESYS_cancelop(int h)
 {
     int state = 0;
     OSLockMutex(lbl_806ADE74);
-    if (fn_803F93F4(h) != 0 && ((unsigned char*)&h)[2] != 3 && ((unsigned char*)&h)[2] != 10) {
+    if (OPVALID(h) != 0 && ((unsigned char*)&h)[2] != 3 && ((unsigned char*)&h)[2] != 10) {
         RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
         if (lbl_806ADE4C.m14 == (int)j) {
             j->m4 = 1;
@@ -290,17 +290,17 @@ extern "C" void fn_803F9884(int h)
     OSUnlockMutex(lbl_806ADE74);
 }
 
-extern "C" int fn_803F99E8(int h)
+extern "C" int FILESYS_waitop(int h)
 {
     RcJob* j = lbl_806ADE64[0] + ((unsigned char*)&h)[3];
-    if (fn_803F93F4(h) == 0)
+    if (OPVALID(h) == 0)
         return -3;
     for (;;) {
-        if (fn_80400008(0) != 0)
+        if (THREAD_iscurrent(0) != 0)
             fn_80400CE4(0);
         else
-            fn_803FFFA8(10);
-        if (fn_803F93F4(h) == 0)
+            THREAD_yield(10);
+        if (OPVALID(h) == 0)
             return -3;
         if (((volatile RcJob*)j)->m8 != 0)
             return ((volatile RcJob*)j)->m8;
@@ -313,7 +313,7 @@ struct RcM104 {
     char pad[0x104];
     int m104;
 };
-extern "C" int fn_803F9A80(int h)
+extern "C" int FILESYS_completeop(int h)
 {
     int ret = 0;
     RcJob* j = lbl_806ADE64[0] + ((unsigned char*)&h)[3];
@@ -363,41 +363,41 @@ extern "C" int fn_803F9A80(int h)
     return ret;
 }
 
-extern "C" int fn_803F9BC8(const char* name, int a, int b)
+extern "C" int FILESYS_exists(const char* name, int a, int b)
 {
     RcJob* j = fn_803FA94C();
     j->m14 = b;
     j->m10 = a;
     *((unsigned char*)j + 2) = 8;
     j->m18 = 1;
-    j->m24 = fn_803FAA84(j);
+    j->m24 = reservehandle(j);
     if (j->m24 == 0) {
         j->mC = 2;
         fn_803FA948(j);
     }
     strncpy((char*)j->m24 + 5, name, 0xff);
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
-extern "C" int fn_803F9C58(const char* name, int a, int b, int c)
+extern "C" int FILESYS_open(const char* name, int a, int b, int c)
 {
     RcJob* j = fn_803FA94C();
     j->m14 = c;
     j->m18 = a;
     j->m10 = b;
     *((unsigned char*)j + 2) = 2;
-    j->m24 = fn_803FAA84(j);
+    j->m24 = reservehandle(j);
     if (j->m24 == 0) {
         j->mC = 2;
         fn_803FA948(j);
     }
     strncpy((char*)j->m24 + 5, name, 0xff);
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
-extern "C" int fn_803F9CE8(int x, int a, int b)
+extern "C" int FILESYS_close(int x, int a, int b)
 {
     RcJob* j = fn_803FA94C();
     RcJob* p = lbl_806ADE70[0];
@@ -413,11 +413,11 @@ extern "C" int fn_803F9CE8(int x, int a, int b)
         }
         p = (RcJob*)p->m14;
     }
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
-extern "C" int fn_803F9D74(RcJob* x, int a, int b, int c, int d, int e)
+extern "C" int FILESYS_read(RcJob* x, int a, int b, int c, int d, int e)
 {
     RcJob* j = fn_803FA94C();
     *((unsigned char*)j + 2) = 4;
@@ -434,11 +434,11 @@ extern "C" int fn_803F9D74(RcJob* x, int a, int b, int c, int d, int e)
     j->m1C = c;
     j->m20 = b;
     j->m18 = a;
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
-extern "C" int fn_803F9E0C(RcJob* x, int a, int b, int c, int d, int e)
+extern "C" int FILESYS_write(RcJob* x, int a, int b, int c, int d, int e)
 {
     RcJob* j = fn_803FA94C();
     *((unsigned char*)j + 2) = 5;
@@ -452,11 +452,11 @@ extern "C" int fn_803F9E0C(RcJob* x, int a, int b, int c, int d, int e)
     j->m1C = c;
     j->m18 = a;
     j->m20 = b;
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
-extern "C" int fn_803F9E90(RcJob* x, int a, int b)
+extern "C" int FILESYS_size(RcJob* x, int a, int b)
 {
     RcJob* j = fn_803FA94C();
     *((unsigned char*)j + 2) = 6;
@@ -467,7 +467,7 @@ extern "C" int fn_803F9E90(RcJob* x, int a, int b)
         fn_803FA948(j);
     }
     j->m24 = (int)x;
-    fn_803FA410((int)j);
+    iFILE_ExecCommand((int)j);
     return j->m0;
 }
 
@@ -475,51 +475,51 @@ extern "C" int fn_803FC300(int);
 extern "C" int fn_803FC360(int);
 extern void (*lbl_806ADE94[3])(int);
 extern char lbl_8060E79C[];
-extern "C" void fn_803F9EFC(int h, int unused, RcJob* req)
+extern "C" void iFILE_addbigreadcallback(int h, int unused, RcJob* req)
 {
     RcJob* j = lbl_806ADE4C.m18 + ((unsigned char*)&h)[3];
     int prio = j->m10;
     int o = j->m24;
     req->mC = o;
     ((RcJob*)req->m10)->m24 = o;
-    fn_803F9A80(h);
+    FILESYS_completeop(h);
     if (fn_803FC300(req->m0) == 0)
         lbl_806ADE94[0](req->m0);
     int len = fn_803FC360(req->m0);
     if (len > req->m4) {
         RcBuf14* q = &lbl_806ADE8C;
         char* a = (char*)((void* (*)(char*, int, int))q->m4)(lbl_8060E79C, len, req->m8 ^ 0x100);
-        fn_803FFA60(a, (void*)req->m0, req->m4);
+        MEM_copy(a, (void*)req->m0, req->m4);
         ((void (*)(int))q->m8)(req->m0);
         char* b = (char*)((void* (*)(char*, int, int))q->m4)(lbl_8060E7AC, len, req->m8);
-        fn_803FFA60(b, a, req->m4);
+        MEM_copy(b, a, req->m4);
         ((void (*)(char*))q->m8)(a);
         req->m0 = (int)b;
-        h = fn_803F9D74((RcJob*)req->mC, req->m4, (int)b + req->m4, len - req->m4, prio, (int)req);
-        fn_803F96B0(h, (void (*)(int, int, int))fn_803F9EFC);
+        h = FILESYS_read((RcJob*)req->mC, req->m4, (int)b + req->m4, len - req->m4, prio, (int)req);
+        FILESYS_callbackop(h, (void (*)(int, int, int))iFILE_addbigreadcallback);
         req->m4 = len;
     } else {
         req->m14 = lbl_806ADE4C.m24;
         lbl_806ADE4C.m24 = (int)req;
-        fn_803FA410(req->m10);
+        iFILE_ExecCommand(req->m10);
     }
 }
 
-extern "C" void fn_803FA068(int h, int k, RcJob* req)
+extern "C" void iFILE_addbigopencallback(int h, int k, RcJob* req)
 {
     int sav = (lbl_806ADE64[0] + ((unsigned char*)&h)[3])->m10;
-    int x = fn_803F9A80(h);
+    int x = FILESYS_completeop(h);
     if (k != 1) {
         ((RcJob*)req->m10)->mC = 4;
-        fn_803FA410(req->m10);
+        iFILE_ExecCommand(req->m10);
     } else {
-        h = fn_803F9D74((RcJob*)x, 0, req->m0, 0x800, sav, (int)req);
-        fn_803F96B0(h, (void (*)(int, int, int))fn_803F9EFC);
+        h = FILESYS_read((RcJob*)x, 0, req->m0, 0x800, sav, (int)req);
+        FILESYS_callbackop(h, (void (*)(int, int, int))iFILE_addbigreadcallback);
     }
 }
 
 /* near-miss: 98.0%; retail keeps the list cursor in r31 and the job in r29 (ours swapped) */
-extern "C" int fn_803FA100(const char* name, int a, int b, int c)
+extern "C" int FILESYS_addbig(const char* name, int a, int b, int c)
 {
     RcJob* p = lbl_806ADE70[0];
     RcJob* j = fn_803FA94C();
@@ -529,7 +529,7 @@ extern "C" int fn_803FA100(const char* name, int a, int b, int c)
     while (p != 0) {
         if (strncmp(name, (char*)p->mC + 5, 0xff) == 0) {
             j->m24 = p->mC;
-            fn_803FA410((int)j);
+            iFILE_ExecCommand((int)j);
             return (int)j;
         }
         p = (RcJob*)p->m14;
@@ -540,24 +540,24 @@ extern "C" int fn_803FA100(const char* name, int a, int b, int c)
     n->m10 = (int)j;
     n->m0 = (int)((void* (*)(char*, int, int))q->m4)(lbl_8060E7AC, 0x800, a);
     n->m8 = a;
-    fn_803F96B0(fn_803F9C58(name, 1, b, (int)n), (void (*)(int, int, int))fn_803FA068);
+    FILESYS_callbackop(FILESYS_open(name, 1, b, (int)n), (void (*)(int, int, int))iFILE_addbigopencallback);
     return j->m0;
 }
 
-extern "C" void fn_803FA214(int a, int b, int p)
+extern "C" void iFILE_delbigclosecallback(int a, int b, int p)
 {
-    fn_803F9A80(a);
-    fn_803FA410(p);
+    FILESYS_completeop(a);
+    iFILE_ExecCommand(p);
 }
 
-extern "C" int fn_803FA3B4(int (*cb)(int, int), int unused, int ctx, int arg)
+extern "C" int FILESYS_atomic(int (*cb)(int, int), int unused, int ctx, int arg)
 {
     RcSysJ* s = &lbl_806ADE4C;
     int saved = s->m8;
     s->m8 = ctx;
     int r = cb(ctx, arg);
     s->m8 = saved;
-    fn_803FA410(0);
+    iFILE_ExecCommand(0);
     return r;
 }
 
@@ -590,11 +590,11 @@ extern "C" RcJob* fn_803FA94C()
 extern "C" void fn_803FAA38(void* p)
 {
     OSLockMutex(lbl_806ADE74);
-    fn_803FFC58(p, 0, 0x30);
+    MEM_fill(p, 0, 0x30);
     OSUnlockMutex(lbl_806ADE74);
 }
 
-extern "C" int fn_803FAA84(RcJob*)
+extern "C" int reservehandle(RcJob*)
 {
     int i = 0;
     OSLockMutex(lbl_806ADE74);
@@ -614,7 +614,7 @@ extern "C" int fn_803FAA84(RcJob*)
 extern "C" void fn_803FAB1C(void* p)
 {
     OSLockMutex(lbl_806ADE74);
-    fn_803FFC58(p, 0, 0x144);
+    MEM_fill(p, 0, 0x144);
     OSUnlockMutex(lbl_806ADE74);
 }
 
@@ -622,10 +622,10 @@ extern "C" char* strchr(const char*, int);
 extern "C" int strcmp(const char*, const char*);
 extern "C" char* strcpy(char*, const char*);
 extern "C" int fn_803FF058(const char*, int, void*);
-extern "C" int fn_803FF7C4(void*);
-extern "C" void fn_803FF1BC(void*);
+extern "C" int getfilesize(void*);
+extern "C" void closefile(void*);
 extern "C" int fn_803FC3E8(int, char*, int, int*, int*);
-extern "C" int fn_803FAB68(const char* path, int flags, int* out)
+extern "C" int FILESYS_bypassqueuefileinfo(const char* path, int flags, int* out)
 {
     char name[0x100];
     char rest[0x100];
@@ -656,8 +656,8 @@ extern "C" int fn_803FAB68(const char* path, int flags, int* out)
     if (kind & 1) {
         if (fn_803FF058(path, flags, obj) != 0) {
             found = 1;
-            *out = fn_803FF7C4(obj);
-            fn_803FF1BC(obj);
+            *out = getfilesize(obj);
+            closefile(obj);
         }
     }
     if (found == 0 && (kind & 6)) {
@@ -675,22 +675,22 @@ extern "C" int fn_803FAB68(const char* path, int flags, int* out)
     return found;
 }
 
-extern "C" int fn_803FACFC(int* p)
+extern "C" int FILESYS_getopts(int* p)
 {
     int n = p[0];
     if (n > 0x14)
         fn_8040074C(p, n);
     lbl_806ADE8C.mC = lbl_806EEAAC;
     lbl_806ADE8C.m10 = lbl_806EEAA8;
-    fn_803FFA60(p, &lbl_806ADE8C, n);
+    MEM_copy(p, &lbl_806ADE8C, n);
     return 1;
 }
 
-extern "C" int fn_803FAD60(int* p)
+extern "C" int FILESYS_setopts(int* p)
 {
     if (p[0] <= 0x13)
         fn_8040074C(&lbl_806ADE8C, 0x14);
-    fn_803FFA60(&lbl_806ADE8C, p, p[0]);
+    MEM_copy(&lbl_806ADE8C, p, p[0]);
     lbl_806EEAA8 = lbl_806ADE8C.m10;
     lbl_806EEAAC = lbl_806ADE8C.mC;
     return 1;

@@ -16,7 +16,7 @@ extern char lbl_806AA030[];
 extern "C" void fn_803B5D30(int a);
 extern "C" void* fn_803B5B6C(int a);
 extern "C" void DCFlushRange(int a, int b);
-extern "C" void fn_803AEB50(int a, int b, int c, int d, int e);
+extern "C" void SNDDRV_dmapost(int a, int b, int c, int d, int e);
 extern int* lbl_806AA2C4;
 
 static inline CHANPUB* ChanAt(CHANPUB* a, int i) { return &a[i]; }
@@ -116,7 +116,7 @@ struct Unk806AA2D4B {
 extern Unk806AA2D4B lbl_806AA2D4;
 
 extern "C" void* fn_803B1118(int unused, int size);
-extern "C" void fn_803AEC70(int id);
+extern "C" void SNDDRV_restoredma(int id);
 extern "C" unsigned int OSDisableInterrupts();
 extern "C" void OSRestoreInterrupts(unsigned int);
 extern char lbl_806AE200[];
@@ -276,7 +276,7 @@ void Snd::Hal::SetDry(int voice)
 }
 
 extern "C" void fn_803AE0FC(void* h, int v);
-extern "C" void fn_803AE964(int v, int k);
+extern "C" void SNDDRV_freeaxvoice(int v, int k);
 extern "C" void AXSetVoiceState(int h, int v);
 
 
@@ -296,7 +296,7 @@ extern "C" int fn_803B0F24(int voice)
                 return -8;
             AXSetVoiceState((int)h, 0);
             if (lbl_8069E200.rec[c->voices[i]].m24 != 0) {
-                fn_803AE964(c->voices[i], 0);
+                SNDDRV_freeaxvoice(c->voices[i], 0);
                 lbl_8069E200.rec[c->voices[i]].m24 = 0;
             }
         }
@@ -341,7 +341,7 @@ extern "C" int fn_803B115C(int unused, int p)
 extern "C" void fn_803B11A8(int unused, int a, int b, int c)
 {
     DCFlushRange(a, c);
-    fn_803AEB50(0, a, b, c, -1);
+    SNDDRV_dmapost(0, a, b, c, -1);
 }
 
 extern "C" int fn_803B11FC(int id)
@@ -356,7 +356,7 @@ extern "C" int fn_803B11FC(int id)
         if (*(volatile int*)(ba + off) != -1 && *(volatile int*)(ba + off) == id) {
             if (sndgs.audiotick - *(unsigned int*)(bb + off) > 200) {
                 OSRestoreInterrupts(en);
-                fn_803AEC70(id);
+                SNDDRV_restoredma(id);
             } else {
                 OSRestoreInterrupts(en);
             }
@@ -741,7 +741,7 @@ extern int lbl_8069CBC0;
 extern unsigned char lbl_8069C8BB;
 extern unsigned short lbl_80625468[][4];
 extern "C" void fn_803B3908(unsigned short az, Unk8069E200_Rec* r);
-extern "C" void fn_803ADD4C(void* o, Unk8069E200_Rec* r, unsigned short az, int lfe);
+extern "C" void SNDDRV_DSPMixerSetPan(void* o, Unk8069E200_Rec* r, unsigned short az, int lfe);
 
 void Snd::Hal::SetPan(int voice)
 {
@@ -775,7 +775,7 @@ void Snd::Hal::SetPan(int voice)
 
     }
     if (c->rendermode & 0x200)
-        fn_803ADD4C(r->m3C, r, c->azimuth, c->isLfe);
+        SNDDRV_DSPMixerSetPan(r->m3C, r, c->azimuth, c->isLfe);
     else
         Snd::Hal::SetVol(voice);
 }

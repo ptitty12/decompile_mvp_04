@@ -424,7 +424,10 @@ before the K2 inventory of 6.2 is finished.
 
 ## 9. Proposed names
 
-None of these is applied. Evidence is the string argument, the callers or the matched source.
+None of the proposals in this table is applied: none has tier E (EA name), S (a string that names the
+function) or K (SDK name) evidence, only the string argument, the callers or the matched source. The rows
+marked **(named)** at the end are different: names pass 01 (2026-10-14, `tools/goals/renames/names01.tsv`)
+applied them from EA's reference-build names for the same code.
 
 | Address | Name | Evidence |
 |---|---|---|
@@ -446,6 +449,12 @@ None of these is applied. Evidence is the string argument, the callers or the ma
 | `fn_80378568` | `HashDjb2` | `h = h*33 + c` from 5381, as `src/gamelib/tu_80377CD4.cpp` already says; matches every key |
 | `fn_80574478` | `StadiumFactors::StadiumFactors` | 126-entry float table, loads `stadium.csv` |
 | `fn_805744D4` | `StadiumFactors::LoadCsv` | calls `fn_802B8E1C`, loads `"stadium.csv"` |
+| `fn_80401710` | `unpackz` **(named)** | RefPack decode entry (section 2.2); E: EA `unpackz` in fifa05, ge, moh4, uefa |
+| `fn_804017D0` | `unpacksizez` **(named)** | RefPack unpacked size (section 2.2), called by `fn_802B9300`; E: EA name in fifa05, ge, moh4, uefa |
+| `fn_80401924` | `REF_decode` **(named)** | RefPack decoder (section 2.2); E: EA name in fifa05, ge, moh4, uefa |
+| `fn_80401644` | `sizerefpack` **(named)** | RefPack size scan; E: EA name in fifa05, ge, moh3, moh4, uefa |
+| `fn_803FFA60` | `MEM_copy` **(named)** | the copy `fn_802B9300` uses for uncompressed payloads; E: EA name (ge, hp, moh4, nfsmw) |
+| `fn_803F9C58` / `fn_803F9D74` | `FILESYS_open` / `FILESYS_read` **(named)** | the EA file layer that `fn_802B9CCC` (the disc-read path of `fn_802B9300`) opens and reads through, with `FILESYS_waitop`, `FILESYS_size`; E: EA names in fifa05, ge, moh3, moh4, uefa |
 
 ## 10. Open questions
 

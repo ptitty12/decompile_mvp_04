@@ -354,7 +354,7 @@ void fn_80319D20(void* p);
 void fn_803D983C(int h, int k);
 int fn_803D986C(int h, int* out);
 int fn_803ED604(int b, int a, int k);
-void fn_803FFC58(int a, unsigned int tag, int b);
+void MEM_fill(int a, unsigned int tag, int b);
 int fn_803EE310(int a);
 void fn_803EDA0C(int a);
 int fn_803DBD84(void* p, int k);
@@ -848,13 +848,13 @@ int fn_80312604(Unk80310934_P60* p)
 int fn_8031263C(int a, int b)
 {
     int r = fn_803ED604(b, a, 0);
-    fn_803FFC58(r, 0xCC55CC55u, a);
+    MEM_fill(r, 0xCC55CC55u, a);
     return r;
 }
 
 void fn_8031268C(int a)
 {
-    fn_803FFC58(a, 0xDD55DD55u, fn_803EE310(a));
+    MEM_fill(a, 0xDD55DD55u, fn_803EE310(a));
     fn_803EDA0C(a);
 }
 

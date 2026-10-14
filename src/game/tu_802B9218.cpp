@@ -36,10 +36,10 @@ extern const char lbl_805E0F68[];
 void fn_8033E958(const char* fmt, ...);
 extern "C" void fn_8033E7A4();
 extern "C" int fn_803FC410(int a, const char* name, int b, int* c, void* d);
-extern "C" int fn_804017D0(int a);
+extern "C" int unpacksizez(int a);
 extern "C" int fn_803ED604(const char* name, int a, int b);
 extern "C" int fn_803EE310(int a);
-extern "C" void fn_803FFA60(int a, int b, int n);
+extern "C" void MEM_copy(int a, int b, int n);
 extern "C" int fn_803FBD28(int a, int b, int c);
 extern "C" int fn_803FB954(int a);
 extern "C" int fn_803FB9E8(int a);
@@ -51,12 +51,12 @@ extern "C" int fn_803FB64C(int a, int b, int c);
 void fn_802B9EFC(Unk8068B4F8* p, int v);
 void* fn_802B9CCC(int a, int* b, int c);
 void fn_802B9ED4(int a);
-extern "C" int fn_803F9C58(int a, int b, int c, int d);
-extern "C" void fn_803F99E8(int h);
-extern "C" int fn_803F9A80(int h);
-extern "C" int fn_803F9E90(int a, int b, int c);
+extern "C" int FILESYS_open(int a, int b, int c, int d);
+extern "C" void FILESYS_waitop(int h);
+extern "C" int FILESYS_completeop(int h);
+extern "C" int FILESYS_size(int a, int b, int c);
 extern "C" void* fn_803774A8(unsigned n, int heap);
-extern "C" int fn_803F9D74(int a, int b, void* c, int d, int e, int f);
+extern "C" int FILESYS_read(int a, int b, void* c, int d, int e, int f);
 extern "C" void fn_803FEC9C(int a, int b);
 extern "C" void fn_80377488(void* p);
 int fn_8000446C(int a, int b);
@@ -132,7 +132,7 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
             fn_803FC410(s.sp8, name, 0, &s.sp10, &s.sp18);
             r = s.sp8 + s.sp10;
             int a = r;
-            int n = fn_804017D0(a);
+            int n = unpacksizez(a);
             if (n != 0) {
                 if (outn != 0) {
                     *outn = n;
@@ -144,7 +144,7 @@ extern "C" const char* fn_802B9300(const char* name, int size, int kind, unsigne
                     *outn = s.sp18;
                 }
                 h = fn_803ED604(name, s.sp18, size);
-                fn_803FFA60(h, a, s.sp18);
+                MEM_copy(h, a, s.sp18);
             }
             r = h;
             break;
@@ -206,7 +206,7 @@ int fn_802B94EC(int h, int dst, int max, int kind)
             break;
         }
     L_copy:
-        fn_803FFA60(dst, sp8 + sp10, sp14);
+        MEM_copy(dst, sp8 + sp10, sp14);
         break;
     case 3:
     L_call:
@@ -335,32 +335,32 @@ int fn_802B9A04(int a)
 
 void* fn_802B9AA4(int a, int* b, int c)
 {
-    int h = fn_803F9C58(a, 0x21, 0, 0);
-    fn_803F99E8(h);
-    int s = fn_803F9A80(h);
-    h = fn_803F9E90(s, 0, 0);
-    fn_803F99E8(h);
-    *b = fn_803F9A80(h);
+    int h = FILESYS_open(a, 0x21, 0, 0);
+    FILESYS_waitop(h);
+    int s = FILESYS_completeop(h);
+    h = FILESYS_size(s, 0, 0);
+    FILESYS_waitop(h);
+    *b = FILESYS_completeop(h);
     void* p = fn_803774A8(*b, c | 0x400);
-    h = fn_803F9D74(s, 0, p, *b, 0, 0);
-    fn_803F99E8(h);
-    fn_803F9A80(h);
+    h = FILESYS_read(s, 0, p, *b, 0, 0);
+    FILESYS_waitop(h);
+    FILESYS_completeop(h);
     fn_803FEC9C(s, 0);
     return p;
 }
 
 void* fn_802B9B60(int a, int* b, int c)
 {
-    int h = fn_803F9C58(a, 0x21, 0, 0);
-    fn_803F99E8(h);
-    int s = fn_803F9A80(h);
-    h = fn_803F9E90(s, 0, 0);
-    fn_803F99E8(h);
-    *b = fn_803F9A80(h);
+    int h = FILESYS_open(a, 0x21, 0, 0);
+    FILESYS_waitop(h);
+    int s = FILESYS_completeop(h);
+    h = FILESYS_size(s, 0, 0);
+    FILESYS_waitop(h);
+    *b = FILESYS_completeop(h);
     void* p = fn_803774A8(*b, c);
-    h = fn_803F9D74(s, 0, p, *b, 0, 0);
-    fn_803F99E8(h);
-    fn_803F9A80(h);
+    h = FILESYS_read(s, 0, p, *b, 0, 0);
+    FILESYS_waitop(h);
+    FILESYS_completeop(h);
     fn_803FEC9C(s, 0);
     return p;
 }
@@ -851,8 +851,8 @@ void fn_80314D60(int a);
 extern "C" void* fn_803773D8(unsigned int n);
 void fn_802BB4BC(Unk802BB1E4_Obj* o);
 void fn_802BB4B8(Unk802BB1E4_Obj*, Unk802BB1E4_Obj*);
-void fn_802BB334(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
-void fn_802BB29C(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
+void RestoreOverlay(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
+void PrepareForDataUsage(Unk802BB1E4_Obj* a, Unk802BB1E4_Obj* b);
 struct Unk802BB0E4_O;
 Unk802BB0E4_O* fn_802BB0E4(Unk802BB0E4_O* p);
 
@@ -1159,15 +1159,15 @@ void fn_802BB1E4(Unk802BB1E4_Obj* o, int k)
     fn_802BB4BC(o);
     switch (k) {
     case 0:
-        fn_802BB334(o, o);
-        fn_802BB334(o, o + 1);
+        RestoreOverlay(o, o);
+        RestoreOverlay(o, o + 1);
         break;
     case 1:
-        fn_802BB29C(o, o);
-        fn_802BB29C(o, o + 1);
+        PrepareForDataUsage(o, o);
+        PrepareForDataUsage(o, o + 1);
         break;
     case 2:
-        fn_802BB29C(o, o);
+        PrepareForDataUsage(o, o);
         break;
     }
 }
@@ -1179,7 +1179,7 @@ int fn_802BB27C(char* o, int idx)
     return *(int*)(b + t * 0x1C);
 }
 
-void fn_802BB29C(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+void PrepareForDataUsage(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
 {
     void* r = fn_8014EB44();
     int cs = fn_80400560(o->m0, o->m4);
@@ -1191,7 +1191,7 @@ void fn_802BB29C(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
     fn_802BB4BC(self);
 }
 
-void fn_802BB334(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
+void RestoreOverlay(Unk802BB1E4_Obj* self, Unk802BB1E4_Obj* o)
 {
     int z = 0;
     int sp8;

@@ -165,7 +165,7 @@ void fn_80389BD8(void* p, int a, Unk8018A254_Ret* m, int b);
 void fn_803DF74C(Unk8018A254_Ret* m);
 void fn_803DFD90(Unk8018A254_Ret* m, float a, float b, float c);
 void fn_803DFD40(Unk8018A254_Ret* m, float a, float b, float c, float d);
-void fn_804023C4(void* out, Unk8018A254_Ret* m, void* in);
+void MATRIX4_vect4mult(void* out, Unk8018A254_Ret* m, void* in);
 void fn_8019755C(Unk8019755C_Data* self, int chrg);
 void fn_80198F68(void* o);
 void fn_80199554(void* o);

@@ -9,7 +9,7 @@
  */
 #include "game/tu_80008540.h"
 
-extern "C" void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
+extern "C" void* MEM_fill(void* dst, int val, unsigned int n);   /* memset */
 extern "C" void fn_80377408(void* p);                                          /* __builtin_delete */
 void* operator new[](unsigned int size, int heap);                  /* 0x803774A8 */
 extern int lbl_806EFA04;

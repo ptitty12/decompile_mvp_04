@@ -35,7 +35,7 @@ struct McCfg {
 extern McCfg lbl_8069B7B8;
 
 extern "C" void fn_80391320();
-extern "C" void fn_80391E2C();
+extern "C" void iSPCH_InitEventDat();
 
 struct McHdr5 {
     char pad0[2];
@@ -50,7 +50,7 @@ struct McHdr6 {
     unsigned char m5;
 };
 
-extern "C" int fn_80394FD4(int, int);
+extern "C" int iSPCH_Rand(int, int);
 
 struct McHdr7 {
     char pad0[4];
@@ -103,7 +103,7 @@ struct McEntry {
 
 extern McEntry* lbl_806243F8[];
 
-extern "C" int fn_803957A4(void*, int, int*, int*);
+extern "C" int iSPCH_GetSampleSizeData(void*, int, int*, int*);
 
 struct McRec12 {
     char pad0[4];
@@ -132,11 +132,11 @@ struct McRec16 {
 extern int lbl_8069B80C[];
 extern int lbl_80624414;
 extern "C" int fn_80392098(int);
-extern "C" void fn_803943A8(unsigned);
-extern "C" int fn_80394650(unsigned);
-extern "C" int fn_80392AA4(unsigned);
+extern "C" void iSPCH_ClearSentenceChoiceChannel(unsigned);
+extern "C" int iSPCH_PlayChosen(unsigned);
+extern "C" int SPCH_Choose(unsigned);
 extern "C" int fn_80394638(int);
-extern "C" int fn_80394C0C(int);
+extern "C" int iSPCH_ChooseSingleSentence(int);
 
 struct McA6 {
     char pad0[6];
@@ -152,14 +152,14 @@ struct McB {
     unsigned short mA;
 };
 
-extern "C" int fn_803931EC(McA6*, McB*, int);
+extern "C" int iSPCH_CheckTemplateSample(McA6*, McB*, int);
 
-extern "C" int fn_8039223C(int, int, ...);
+extern "C" int SPCH_AddEventV(int, int, ...);
 extern "C" void fn_803912F8();
-extern "C" void fn_80391EA4();
+extern "C" void iSPCH_InitEventQueue();
 extern "C" void fn_80394CD4(int);
-extern "C" void fn_80394F24(int);
-extern "C" void fn_8039445C();
+extern "C" void iSPCH_InitRandom(int);
+extern "C" void iSPCH_InitSentenceChoice();
 extern int (*lbl_80624408[])(int, int, ...);
 extern signed char lbl_80624454[];
 extern int lbl_8069B98C[];
@@ -171,10 +171,10 @@ struct McHdrP {
     unsigned char m3;
 };
 
-extern "C" int fn_80393D18(McHdrP*, McBufB*, int);
-extern "C" void fn_80393E60(int*, McBufB*, McHdrP*);
+extern "C" int iSPCH_ChooseSentenceIteratively(McHdrP*, McBufB*, int);
+extern "C" void iSPCH_PostGlobalMatchParms(int*, McBufB*, McHdrP*);
 
-extern "C" void fn_803927E4(unsigned);
+extern "C" void iSPCH_ClearEvent(unsigned);
 
 extern "C" void fn_80392BC0(int);
 
@@ -191,23 +191,23 @@ struct McSrcW {
     char pad5[3];
     McEnt8W m8[1];
 };
-extern "C" int fn_80391DC4(int*, unsigned char**);
+extern "C" int iSPCH_GetGlobalMatchParmsArray(int*, unsigned char**);
 
-extern "C" int fn_80393918(McBufB*, McHdrP*);
+extern "C" int iSPCH_TestMatchParms(McBufB*, McHdrP*);
 
-extern "C" char* fn_80395774(void*, int);
+extern "C" char* iSPCH_GetSampleParmAddr(void*, int);
 
 struct McSp {
     unsigned short a;
     short b;
 };
 
-extern "C" void fn_8039539C(int*, int, unsigned char, int*);
-extern "C" void fn_8039402C(int*, int, McHdrP*);
-extern "C" void fn_80394170(int, int, int*);
+extern "C" void iSPCH_RuleSet(int*, int, unsigned char, int*);
+extern "C" void iSPCH_ConstantRuleSet(int*, int, McHdrP*);
+extern "C" void iSPCH_MakeSampleRequests(int, int, int*);
 
-extern "C" int fn_803925A8(unsigned);
-extern "C" void fn_80392884(unsigned);
+extern "C" int iSPCH_ChooseEvent(unsigned);
+extern "C" void iSPCH_ClearOldEvents(unsigned);
 
 struct McCtxA {
     char pad0[0x90];
@@ -215,11 +215,11 @@ struct McCtxA {
     unsigned char m91;
 };
 
-extern "C" int fn_8039387C(McHdr5*, McSrc*);
-extern "C" int fn_8039305C(McSrc*, unsigned*, McRec12*);
-extern "C" int fn_803933E8(McCtxA*, McHdr5*, McRec12*, McSrc*, unsigned*);
+extern "C" int iSPCH_MatchParmInputsSet(McHdr5*, McSrc*);
+extern "C" int iSPCH_GetPhraseBank(McSrc*, unsigned*, McRec12*);
+extern "C" int iSPCH_ChooseSamples(McCtxA*, McHdr5*, McRec12*, McSrc*, unsigned*);
 
-extern "C" int fn_80391914(McB*, int);
+extern "C" int iSPCHBank_GetSampleTimeInQueue(McB*, int);
 
 struct McHdr16 {
     char pad0[6];
@@ -228,13 +228,13 @@ struct McHdr16 {
     unsigned short mC[1];
 };
 
-/* Object behind a channel record's +8 pointer (fn_80392884): flags byte at +0xA. */
+/* Object behind a channel record's +8 pointer (iSPCH_ClearOldEvents): flags byte at +0xA. */
 struct McFlagsH {
     char pad0[0xA];
     unsigned char mA;
 };
 
-extern "C" void fn_803927E4(unsigned n)
+extern "C" void iSPCH_ClearEvent(unsigned n)
 {
     if (n <= 15) {
         char* t = (char*)lbl_8069B80C;
@@ -261,7 +261,7 @@ extern "C" void fn_803927E4(unsigned n)
 
 /* near-miss (48 of 49 words): the v load is `lwzx r0,r11,r26` here and `lwzx r0,r26,r11` in retail (operand order only);
  * registers and schedule match. About 450 spellings of the table accesses tried. */
-extern "C" void fn_80392884(unsigned n)
+extern "C" void iSPCH_ClearOldEvents(unsigned n)
 {
     int off = n * 16;
     char* r = (char*)lbl_8069B80C + off;
@@ -278,7 +278,7 @@ extern "C" void fn_80392884(unsigned n)
             unsigned short hh = *(unsigned short*)(e + 0x44);
             if (v < v0 || (v == v0 && hh < h)) {
                 if (!((*(McFlagsH**)((char*)t48 + io))->mA & 4))
-                    fn_803927E4(i);
+                    iSPCH_ClearEvent(i);
             }
         }
     }
@@ -293,7 +293,7 @@ extern "C" int fn_80392948(int* p)
     return r;
 }
 
-extern "C" void fn_80392988(unsigned n)
+extern "C" void SPCH_PlayLastEvent(unsigned n)
 {
     if (lbl_80624414 == 0) {
         lbl_80624414 = 1;
@@ -301,50 +301,50 @@ extern "C" void fn_80392988(unsigned n)
             char* t = (char*)lbl_8069B80C;
             int* b = (int*)(t + 0x20);
             int id = *(int*)((char*)b + n * 4);
-            fn_803943A8(n);
-            int r = fn_80394C0C(id);
-            fn_803927E4(id);
+            iSPCH_ClearSentenceChoiceChannel(n);
+            int r = iSPCH_ChooseSingleSentence(id);
+            iSPCH_ClearEvent(id);
             if (r != 0)
-                fn_80394650(n);
+                iSPCH_PlayChosen(n);
         }
     }
     lbl_80624414 = 0;
 }
 
-extern "C" int fn_80392A28(int n)
+extern "C" int SPCH_Play(int n)
 {
     int r = 0;
     if (lbl_80624414 == 0) {
         lbl_80624414 = 1;
-        if (fn_80394638(n) != 0 || fn_80392AA4(n) != 0)
-            r = fn_80394650(n);
+        if (fn_80394638(n) != 0 || SPCH_Choose(n) != 0)
+            r = iSPCH_PlayChosen(n);
     }
     lbl_80624414 = 0;
     return r;
 }
 
-extern "C" int fn_80392AA4(unsigned n)
+extern "C" int SPCH_Choose(unsigned n)
 {
     int r = 0;
     if (n <= 7 && lbl_8069B80C[n] != 0) {
         char* t = (char*)lbl_8069B80C;
         int* pc = (int*)(t + 0x4c);
         for (;;) {
-            int idx = fn_803925A8(n);
+            int idx = iSPCH_ChooseEvent(n);
             if (idx < 0)
                 break;
             int sp = **(int**)((char*)pc + idx * 16);
             if (fn_80392948(&sp) == 1) {
-                fn_803943A8(n);
-                r = fn_80394C0C(idx);
+                iSPCH_ClearSentenceChoiceChannel(n);
+                r = iSPCH_ChooseSingleSentence(idx);
                 if (r == 0)
-                    fn_803927E4(idx);
+                    iSPCH_ClearEvent(idx);
             } else {
-                fn_803927E4(idx);
+                iSPCH_ClearEvent(idx);
             }
             if (r != 0) {
-                fn_80392884(idx);
-                fn_803927E4(idx);
+                iSPCH_ClearOldEvents(idx);
+                iSPCH_ClearEvent(idx);
                 break;
             }
         }
@@ -374,7 +374,7 @@ extern "C" void fn_80392BC0(int v)
 }
 
 /* needs -fno-strength-reduce */
-extern "C" void fn_80392BF4()
+extern "C" void iSPCH_InitInGame()
 {
     for (int i = 0; i < 8; i++) {
         lbl_8069B94C[i].m0 = 0xFFFF;
@@ -382,7 +382,7 @@ extern "C" void fn_80392BF4()
     }
 }
 
-extern "C" int fn_80392C28(int a, int b, int c)
+extern "C" int SPCH_GetSampleDataRate(int a, int b, int c)
 {
     int x = a * b / 8;
     switch (c) {
@@ -421,7 +421,7 @@ extern "C" void fn_80392CE4(int (*a)())
         lbl_8069B7C4[0] = a;
 }
 
-extern "C" int fn_80392D08(int a, int b, int c)
+extern "C" int SPCH_Init(int a, int b, int c)
 {
     lbl_80624454[0] = 0x53;
     if (lbl_806243E0[0] != 0 && lbl_806243E4[0] != 0) {
@@ -429,16 +429,16 @@ extern "C" int fn_80392D08(int a, int b, int c)
         lbl_8069B7B8.m0 = a;
         lbl_8069B98C[0] = b;
         lbl_8069B990[0] = c;
-        lbl_80624408[0] = fn_8039223C;
-        fn_80394F24(b);
-        fn_8039445C();
+        lbl_80624408[0] = SPCH_AddEventV;
+        iSPCH_InitRandom(b);
+        iSPCH_InitSentenceChoice();
         fn_80394CD4(0);
         for (int i = 0; i < 8; i++)
             lbl_8069B994[i] = 0;
-        fn_80391E2C();
-        fn_80392BF4();
+        iSPCH_InitEventDat();
+        iSPCH_InitInGame();
         fn_803912F8();
-        fn_80391EA4();
+        iSPCH_InitEventQueue();
         lbl_806243F4[0] = 0x01789A34;
         return 1;
     }
@@ -451,7 +451,7 @@ extern "C" void fn_80392DF4()
         lbl_806243F4[0] = 0;
         fn_80392CC0();
         fn_80391320();
-        fn_80391E2C();
+        iSPCH_InitEventDat();
     }
 }
 
@@ -467,7 +467,7 @@ extern "C" void fn_80392E3C(McTag2* p, int* a, int* b)
     *b = p->m9;
 }
 
-extern "C" void fn_80392E50(McHdr5* p, McSrc* q, unsigned char* r)
+extern "C" void iSPCH_PostMatchParmValue(McHdr5* p, McSrc* q, unsigned char* r)
 {
     int* base = (int*)((char*)p + ((((p->m2 >> 2) + 3) & ~3) + 8)) + p->m4;
     int n = q->m4;
@@ -480,7 +480,7 @@ extern "C" void fn_80392E50(McHdr5* p, McSrc* q, unsigned char* r)
     }
 }
 
-extern "C" int fn_80392ED8(McSrc* p)
+extern "C" int iSPCH_HasMatchParmToPost(McSrc* p)
 {
     int r = 0;
     int n = p->m4;
@@ -495,7 +495,7 @@ extern "C" int fn_80392ED8(McSrc* p)
     return r;
 }
 
-extern "C" int fn_80392F2C(McHdr5* p, McSrcW* q, int* tab, unsigned char* codes)
+extern "C" int iSPCH_MatchSample(McHdr5* p, McSrcW* q, int* tab, unsigned char* codes)
 {
     int r = 1;
     int n = q->m4;
@@ -522,7 +522,7 @@ extern "C" int fn_80392F2C(McHdr5* p, McSrcW* q, int* tab, unsigned char* codes)
                     } else {
                         int sp = *tab;
                         unsigned char* out;
-                        if (fn_80391DC4(&sp, &out) != 0 && c == out[b6])
+                        if (iSPCH_GetGlobalMatchParmsArray(&sp, &out) != 0 && c == out[b6])
                             r = 1;
                     }
                 } else if (bit & tab[e4]) {
@@ -537,7 +537,7 @@ extern "C" int fn_80392F2C(McHdr5* p, McSrcW* q, int* tab, unsigned char* codes)
     return r;
 }
 
-extern "C" void fn_80393154(McHdr6* p, int n)
+extern "C" void iSPCH_ClearCycleBit(McHdr6* p, int n)
 {
     int i = n / 8;
     int k = p->m4 & 0x7f;
@@ -547,14 +547,14 @@ extern "C" void fn_80393154(McHdr6* p, int n)
     b[j] = b[j] & m;
 }
 
-extern "C" int fn_803931B4(unsigned char* bits, int n)
+extern "C" int iSPCH_TestBit(unsigned char* bits, int n)
 {
     int i = n / 8;
     unsigned char m = 1 << (n - i * 8);
     return bits[i] & m;
 }
 
-extern "C" int fn_803931EC(McA6* a, McB* b, int x)
+extern "C" int iSPCH_CheckTemplateSample(McA6* a, McB* b, int x)
 {
     int r = 0;
     int s = a->m6;
@@ -570,21 +570,21 @@ extern "C" int fn_803931EC(McA6* a, McB* b, int x)
         p += off;
         if (b->m6)
             p += b->m6 + 1;
-        r = fn_803931B4(p, idx);
+        r = iSPCH_TestBit(p, idx);
     }
     return r;
 }
 
-extern "C" int fn_80393284(McA6* a, McB* b, int x)
+extern "C" int iSPCH_SampleExists(McA6* a, McB* b, int x)
 {
     int r = 1;
     if (x > b->m5) {
         r = 0;
-    } else if (a->m6 == -1 || (r = fn_803931EC(a, b, x)) != 0) {
+    } else if (a->m6 == -1 || (r = iSPCH_CheckTemplateSample(a, b, x)) != 0) {
         unsigned c4 = b->m4;
         if (c4 & 0x80) {
             int k = c4 & 0x7f;
-            r = fn_803931B4((unsigned char*)b + ((b->m5 * (k + 2) + 15) & ~3) + k * 4 + 1, x);
+            r = iSPCH_TestBit((unsigned char*)b + ((b->m5 * (k + 2) + 15) & ~3) + k * 4 + 1, x);
         }
     }
     return r;
@@ -608,7 +608,7 @@ extern "C" int fn_8039332C(McBuf* p, unsigned char v)
     return r;
 }
 
-extern "C" int fn_8039335C(McSrc* p, McHdr6* q, int* tab)
+extern "C" int iSPCH_BankHasValidSamples(McSrc* p, McHdr6* q, int* tab)
 {
     int r = 1;
     int k = q->m4 & 0x7f;
@@ -624,22 +624,22 @@ extern "C" int fn_8039335C(McSrc* p, McHdr6* q, int* tab)
     return r;
 }
 
-extern "C" int fn_803933E8(McCtxA* a, McHdr5* b, McRec12* rec, McSrc* g, unsigned* c)
+extern "C" int iSPCH_ChooseSamples(McCtxA* a, McHdr5* b, McRec12* rec, McSrc* g, unsigned* c)
 {
-    int has = fn_80392ED8(g);
+    int has = iSPCH_HasMatchParmToPost(g);
     int cnt = 0;
     McB* tbl = (McB*)lbl_806243F8[0][rec->m4].m4;
     int best = 0;
     int bestIdx = -1;
     int n = tbl->m5;
-    if (fn_8039335C(g, (McHdr6*)tbl, (int*)c) != 0) {
+    if (iSPCH_BankHasValidSamples(g, (McHdr6*)tbl, (int*)c) != 0) {
         int stride = (tbl->m4 & 0x7f) + 2;
         unsigned char* p = (unsigned char*)tbl + 0xe;
         int i = 0;
         if (cnt < n) {
             do {
-                if (fn_80392F2C(b, (McSrcW*)g, (int*)c, p) != 0 && fn_80393284((McA6*)rec, tbl, i) != 0) {
-                    int sc = fn_80391914(tbl, i);
+                if (iSPCH_MatchSample(b, (McSrcW*)g, (int*)c, p) != 0 && iSPCH_SampleExists((McA6*)rec, tbl, i) != 0) {
+                    int sc = iSPCHBank_GetSampleTimeInQueue(tbl, i);
                     if (sc > 0) {
                         if (sc > best) {
                             best = sc;
@@ -649,7 +649,7 @@ extern "C" int fn_803933E8(McCtxA* a, McHdr5* b, McRec12* rec, McSrc* g, unsigne
                         if (((int (*)(McBuf*, int))fn_8039332C)((McBuf*)a, i) != 0)
                             cnt++;
                         if (has != 0)
-                            fn_80392E50(b, g, p);
+                            iSPCH_PostMatchParmValue(b, g, p);
                     }
                 }
                 i++;
@@ -662,7 +662,7 @@ extern "C" int fn_803933E8(McCtxA* a, McHdr5* b, McRec12* rec, McSrc* g, unsigne
                 cnt = 1;
             if (has != 0) {
                 p = (unsigned char*)(base + bestIdx * stride);
-                fn_80392E50(b, g, p + 2);
+                iSPCH_PostMatchParmValue(b, g, p + 2);
             }
         }
     }
@@ -677,7 +677,7 @@ extern "C" int fn_80393584(int x)
     return r;
 }
 
-extern "C" int fn_803935A8(McHdr5* p, McBufB* q)
+extern "C" int iSPCH_SentenceLength(McHdr5* p, McBufB* q)
 {
     int sum = 0;
     int cnt = p->m2 >> 2;
@@ -687,7 +687,7 @@ extern "C" int fn_803935A8(McHdr5* p, McBufB* q)
             McRec12* e = (McRec12*)q + i;
             int a, b;
             unsigned char c = q->m92[e->mA];
-            if (fn_803957A4(lbl_806243F8[0][e->m4].m4, c, &a, &b))
+            if (iSPCH_GetSampleSizeData(lbl_806243F8[0][e->m4].m4, c, &a, &b))
                 sum += b;
             i++;
         } while (i < cnt);
@@ -723,7 +723,7 @@ extern "C" void fn_8039365C(McHdr16* p, unsigned char* out)
     }
     int pos = 0;
     while (total > 0) {
-        int r = fn_80394FD4(total, -1);
+        int r = iSPCH_Rand(total, -1);
         i = 0;
         while (i < n) {
             r -= w[i];
@@ -754,7 +754,7 @@ struct McSlotP {
     unsigned char m8;
 };
 
-extern "C" int fn_8039379C(McSlotP* p, int i)
+extern "C" int iSPCH_RepeatEvent(McSlotP* p, int i)
 {
     int r = 1;
     if (p->m0 == lbl_8069B94C[i].m0) {
@@ -765,7 +765,7 @@ extern "C" int fn_8039379C(McSlotP* p, int i)
     return r;
 }
 
-extern "C" int fn_803937E4(unsigned char* p, int x)
+extern "C" int iSPCH_ShortRuleStatus(unsigned char* p, int x)
 {
     int r = 0;
     int t = p[2] & 3;
@@ -775,7 +775,7 @@ extern "C" int fn_803937E4(unsigned char* p, int x)
     return r;
 }
 
-extern "C" void fn_80393828(McHdr5* p)
+extern "C" void iSPCH_InitMatchParmIO(McHdr5* p)
 {
     int* base = (int*)((char*)p + ((((p->m2 >> 2) + 3) & ~3) + 8)) + p->m4;
     for (int i = 0; i < p->m3; i++)
@@ -787,7 +787,7 @@ inline int* McTab(McHdr5* a)
     return (int*)((char*)a + ((((a->m2 >> 2) + 3) & ~3) + 8) + a->m4 * 4);
 }
 
-extern "C" int fn_8039387C(McHdr5* a, McSrc* g)
+extern "C" int iSPCH_MatchParmInputsSet(McHdr5* a, McSrc* g)
 {
     int r = 1;
     int i = 0;
@@ -813,15 +813,15 @@ extern "C" int fn_8039387C(McHdr5* a, McSrc* g)
     return r;
 }
 
-extern "C" int fn_80393AD0(McCtxA* a, McHdr5* b, unsigned* c, int d)
+extern "C" int iSPCH_SentenceGetChoices(McCtxA* a, McHdr5* b, unsigned* c, int d)
 {
     int r = 1;
     int tries = 200;
     int all;
     unsigned n = b->m2 >> 2;
-    if ((int)n > 12 || fn_803937E4((unsigned char*)b, d) == 0)
+    if ((int)n > 12 || iSPCH_ShortRuleStatus((unsigned char*)b, d) == 0)
         goto fail;
-    fn_80393828(b);
+    iSPCH_InitMatchParmIO(b);
     a->m90 = n;
     do {
         all = 1;
@@ -830,13 +830,13 @@ extern "C" int fn_80393AD0(McCtxA* a, McHdr5* b, unsigned* c, int d)
             unsigned char* ids = (unsigned char*)b + 8;
             McSrc* g = (McSrc*)((char*)b + ids[i] * 4);
             McRec12* rec = (McRec12*)a + i;
-            if (fn_8039387C(b, g) == 0) {
+            if (iSPCH_MatchParmInputsSet(b, g) == 0) {
                 all = 0;
             } else if (rec->mB == 0) {
                 rec->m8 = a->m91;
-                if (fn_8039305C(g, c, rec) == 0)
+                if (iSPCH_GetPhraseBank(g, c, rec) == 0)
                     goto fail;
-                int v = fn_803933E8(a, b, rec, g, c);
+                int v = iSPCH_ChooseSamples(a, b, rec, g, c);
                 if (v == 0)
                     goto fail;
                 rec->m9 = v;
@@ -852,7 +852,7 @@ done:
     return r;
 }
 
-extern "C" void fn_80393C00(McHdr5* p, McBufB* q)
+extern "C" void iSPCH_RandomizeSentencePicks(McHdr5* p, McBufB* q)
 {
     int cnt = p->m2 >> 2;
     int i = 0;
@@ -862,7 +862,7 @@ extern "C" void fn_80393C00(McHdr5* p, McBufB* q)
         unsigned char* a = q->m92 + e->m8;
         int k = e->m9;
         while (k > 1) {
-            int j = fn_80394FD4(k, -1);
+            int j = iSPCH_Rand(k, -1);
             unsigned char t = a[j];
             unsigned char u = a[k - 1];
             a[k - 1] = t;
@@ -873,7 +873,7 @@ extern "C" void fn_80393C00(McHdr5* p, McBufB* q)
     }
 }
 
-extern "C" int fn_80393C98(McHdr5* p, McBufB* q)
+extern "C" int iSPCH_IterateChoice(McHdr5* p, McBufB* q)
 {
     int r = 0;
     int done = 0;
@@ -900,7 +900,7 @@ extern "C" int fn_80393C98(McHdr5* p, McBufB* q)
     return r;
 }
 
-extern "C" int fn_80393D18(McHdrP* a, McBufB* b, int x)
+extern "C" int iSPCH_ChooseSentenceIteratively(McHdrP* a, McBufB* b, int x)
 {
     int ok = 0;
     int wrapped = 0;
@@ -912,29 +912,29 @@ extern "C" int fn_80393D18(McHdrP* a, McBufB* b, int x)
     while (wrapped == 0 && ok == 0) {
         ok = 1;
         if (x != 0)
-            ok = fn_803935A8((McHdr5*)a, b) <= x;
+            ok = iSPCH_SentenceLength((McHdr5*)a, b) <= x;
         if (ok) {
             if (a->m3 != 0) {
-                if (fn_80393918(b, a) == 0)
+                if (iSPCH_TestMatchParms(b, a) == 0)
                     ok = 0;
             }
         }
         if (ok == 0)
-            wrapped = fn_80393C98((McHdr5*)a, b);
+            wrapped = iSPCH_IterateChoice((McHdr5*)a, b);
     }
     return ok;
 }
 
-extern "C" int fn_80393E1C(McHdr7* p)
+extern "C" int iSPCH_PickPhraseSample(McHdr7* p)
 {
-    p->mA = p->m8 + fn_80394FD4(p->m9, p->m4);
+    p->mA = p->m8 + iSPCH_Rand(p->m9, p->m4);
     return 1;
 }
 
-extern "C" void fn_80393E60(int* a, McBufB* b, McHdrP* c)
+extern "C" void iSPCH_PostGlobalMatchParms(int* a, McBufB* b, McHdrP* c)
 {
     unsigned char* out;
-    if (fn_80391DC4(a, &out) != 0) {
+    if (iSPCH_GetGlobalMatchParmsArray(a, &out) != 0) {
         int n = c->m2 >> 2;
         for (int i = 0; i < n; i++) {
             unsigned char* ids = (unsigned char*)c + 8;
@@ -944,7 +944,7 @@ extern "C" void fn_80393E60(int* a, McBufB* b, McHdrP* c)
                 McEnt8* e = &ge[j];
                 if (e->m4 == 0xfe && !(e->m6 & 0x80)) {
                     McRec12* rec = (McRec12*)b + i;
-                    char* t = fn_80395774(lbl_806243F8[0][rec->m4].m4, b->m92[rec->mA]);
+                    char* t = iSPCH_GetSampleParmAddr(lbl_806243F8[0][rec->m4].m4, b->m92[rec->mA]);
                     if (t != 0)
                         out[e->m6] = t[j];
                 }
@@ -967,12 +967,12 @@ struct McTable {
 
 /* near-miss (48 of 50 words): d is kept in r29 here and r31 in retail (the `mr.` and the `mr r5` differ in the register only);
  * `int r = d;` lowers the result variable priority, other spellings left r in the wrong register. */
-extern "C" int fn_80393F64(int* a, McBufB* b, McHdrP* c, int unused, int d)
+extern "C" int iSPCH_SentenceMakeChoice(int* a, McBufB* b, McHdrP* c, int unused, int d)
 {
     int r = d;
     if (d > 0 || c->m3 != 0) {
-        fn_80393C00((McHdr5*)c, b);
-        r = fn_80393D18(c, b, d);
+        iSPCH_RandomizeSentencePicks((McHdr5*)c, b);
+        r = iSPCH_ChooseSentenceIteratively(c, b, d);
         goto join;
     }
     goto start;
@@ -986,12 +986,12 @@ start:
         int n = c->m2 >> 2;
         for (; i < n; i++) {
             McHdr7* e = (McHdr7*)b + i;
-            if (e->m9 == 0 || fn_80393E1C(e) == 0)
+            if (e->m9 == 0 || iSPCH_PickPhraseSample(e) == 0)
                 goto fail;
         }
     }
 join:
-    fn_80393E60(a, b, c);
+    iSPCH_PostGlobalMatchParms(a, b, c);
 out:
     return r;
 }
@@ -1006,7 +1006,7 @@ extern "C" void fn_8039437C(McTable* p)
     }
 }
 
-extern "C" void fn_803943A8(unsigned n)
+extern "C" void iSPCH_ClearSentenceChoiceChannel(unsigned n)
 {
     char* t = (char*)lbl_8069B9C0;
     int off = n * 160;
@@ -1039,7 +1039,7 @@ extern "C" void fn_803943A8(unsigned n)
     } while (j <= 11);
 }
 
-extern "C" void fn_8039445C()
+extern "C" void iSPCH_InitSentenceChoice()
 {
     int i = 0;
     do {
@@ -1078,7 +1078,7 @@ extern "C" int fn_80394638(int i)
     return r->m9;
 }
 
-extern "C" int fn_80394650(unsigned n)
+extern "C" int iSPCH_PlayChosen(unsigned n)
 {
     int r = 0;
     if (n <= 7 && fn_80394638(n) != 0) {
@@ -1088,9 +1088,9 @@ extern "C" int fn_80394650(unsigned n)
         int* p = *(int**)((char*)c + off);
         int sp = *p;
         int* c4 = (int*)(t + 4);
-        fn_8039539C(&sp, *(int*)(t + off), ((unsigned char*)(t + off))[8], p);
-        fn_8039402C(&sp, *(int*)(t + off), *(McHdrP**)((char*)c4 + off));
-        fn_80394170(*(int*)(t + off), *(int*)((char*)c4 + off), &sp);
+        iSPCH_RuleSet(&sp, *(int*)(t + off), ((unsigned char*)(t + off))[8], p);
+        iSPCH_ConstantRuleSet(&sp, *(int*)(t + off), *(McHdrP**)((char*)c4 + off));
+        iSPCH_MakeSampleRequests(*(int*)(t + off), *(int*)((char*)c4 + off), &sp);
         r = (*(McHdr5**)((char*)c4 + off))->m2 >> 2;
         char* s = (char*)lbl_8069B94C;
         int so = n * 8;
@@ -1106,6 +1106,6 @@ extern "C" int fn_80394650(unsigned n)
         }
         *(int*)((char*)s4 + so) = v;
     }
-    fn_803943A8(n);
+    iSPCH_ClearSentenceChoiceChannel(n);
     return r;
 }

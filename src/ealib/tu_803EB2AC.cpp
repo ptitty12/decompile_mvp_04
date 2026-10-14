@@ -16,11 +16,11 @@ extern Unk803EB2AC_Hooks* lbl_806EE9D8;
 extern void* lbl_806EE9DC;
 extern int lbl_8062C76C[];
 
-extern "C" void fn_804006FC(void (*cb)());
-extern "C" void fn_803FFA60(int* a, int* b, int c);
+extern "C" void REAL_removeexit(void (*cb)());
+extern "C" void MEM_copy(int* a, int* b, int c);
 extern "C" void fn_803EB330(void* p);
 extern "C" void fn_803EB560(void);
-extern "C" void fn_80400690(void (*cb)());
+extern "C" void SYSTEM_addexit(void (*cb)());
 extern "C" void* fn_803EB2EC(void* self);
 extern char lbl_8062C7A0[];
 extern "C" int fn_803EC9D4(int c);
@@ -133,7 +133,7 @@ extern "C" void fn_803EB520(Unk803EB2AC_Hooks* h)
 
 extern "C" void fn_803EB528(int* p)
 {
-    fn_803FFA60(lbl_8062C76C, p, *p);
+    MEM_copy(lbl_8062C76C, p, *p);
 }
 
 extern "C" int fn_803EB558(char* p)
@@ -146,7 +146,7 @@ extern "C" void fn_803EB560(void)
     if (lbl_806EE9DC) {
         fn_803EB330(lbl_806EE9DC);
         lbl_806EE9DC = 0;
-        fn_804006FC(fn_803EB560);
+        REAL_removeexit(fn_803EB560);
     }
 }
 
@@ -154,7 +154,7 @@ extern "C" void fn_803EB5A0(void)
 {
     if (lbl_806EE9DC == 0) {
         lbl_806EE9DC = fn_803EB2EC(lbl_8062C7A0);
-        fn_80400690(fn_803EB560);
+        SYSTEM_addexit(fn_803EB560);
     }
 }
 
@@ -355,7 +355,7 @@ struct Unk803EBDF4_Nd {
 };
 
 extern char lbl_8060DC04[];
-extern "C" void fn_80400774(void* dst, void* src, int n);
+extern "C" void MEM_move(void* dst, void* src, int n);
 
 /* size of a chain of nodes (24-bit relative links) with 16/32 byte alignment between them */
 inline unsigned char* Unk803EBD34_Next(unsigned char* n)
@@ -413,7 +413,7 @@ extern "C" void fn_803EBDF4(int dst, int x)
                 p0->off = (char*)prev - (char*)p0;
             prev->off = 0;
             if (sz != 0) {
-                fn_80400774(prev, n, sz);
+                MEM_move(prev, n, sz);
                 if (prev->tag == 0x69 && sz > 0x14)
                     sprintf((char*)prev + 0x10, lbl_8060DC04, prev->s4);
             }

@@ -132,7 +132,7 @@ extern int lbl_8068B5DC[];
 int fn_8014849C();
 extern int lbl_8068B5E8[];
 extern float lbl_8068B5F4;
-unsigned fn_804004D0();
+unsigned CPU_detect();
 extern const float lbl_805C4C98;
 extern UnkB8_Obj* lbl_8061A32C;
 void fn_802D7ACC();
@@ -439,7 +439,7 @@ float fn_80148520(int i)
 void fn_80148580()
 {
     int i = 0;
-    float t = (float)fn_804004D0();
+    float t = (float)CPU_detect();
     lbl_8068B5F4 = t * lbl_805C4C98;
     do {
         fn_801484A8(i);

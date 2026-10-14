@@ -3,7 +3,7 @@
  * Split off dolphin/os/tu_80437444.c (OSThread.c) on 2026-10-13: the OSTime.c functions match only with
  * MWCC's peephole pass off, see docs/DECISIONS.md.
  * Not reproduced: OSGetTime/OSGetTick (OSGetTime/fn_80438640, mftb: original code, kept as split assembly).
- * fn_80438724 is EA's __init_cpp (reference-build name): it calls each entry of the 4-word constructor table at lbl_80649298
+ * __init_cpp (EA reference-build name, same code; mitsevox/mvp2005 names this address too): it calls each entry of the 4-word constructor table at lbl_80649298
  * (declared void so MWCC takes r3 for the table address, as retail does; fn_80438704 is its void wrapper).
  */
 #include <dolphin.h>
@@ -38,17 +38,17 @@ OSTime fn_804386AC(OSTime time)                        /* __OSTimeToSystemTime *
     return result;
 }
 
-void fn_80438724(void);
+void __init_cpp(void);
 
 void fn_80438704(void)
 {
-    fn_80438724();
+    __init_cpp();
 }
 
 extern void (*lbl_80649298[])(void);
 
-/* EA __init_cpp (reference-build name): calls each static constructor in the .ctors-style table. */
-void fn_80438724(void)
+/* __init_cpp (EA reference-build name): calls each static constructor in the .ctors-style table. */
+void __init_cpp(void)
 {
     void (**ctor)(void);
     for (ctor = lbl_80649298; *ctor != 0; ctor++) {

@@ -1,7 +1,7 @@
 /*
  * Shared types of the VP6 video codec units (ealib/tu_803959E0..tu_803A0310).
  * Offsets were read from the original code: the decoder context allocated by
- * fn_80395C68 (0x4954 bytes) and the buffer pointers freed by fn_80395A94.
+ * VP6_CreatePBInstance (0x4954 bytes) and the buffer pointers freed by VP6_DeleteTmpBuffers.
  */
 #ifndef TU_803959E0_H
 #define TU_803959E0_H
@@ -17,7 +17,7 @@ struct Vp6Allocator {
     virtual void Free(void* p, int flags);
 };
 
-/* Bit reader over a big-endian byte buffer (fn_8039E914 initialises it). */
+/* Bit reader over a big-endian byte buffer (InitHeaderBuffer initialises it). */
 struct Vp6BitReader {
     const unsigned char* m0;
     unsigned m4;
@@ -25,7 +25,7 @@ struct Vp6BitReader {
     unsigned mC;
 };
 
-/* Probability pair table: two 10-entry rows per entry (fn_8039CD38). */
+/* Probability pair table: two 10-entry rows per entry (VP6_DecodeModeProbs). */
 struct Vp6Tab {
     unsigned char a[10];
     unsigned char b[10];
@@ -53,7 +53,7 @@ struct Vp6Params {
     int m18[8];
 };
 
-/* Frame buffer set (0xC8 bytes) built by fn_8039620C / fn_80396114. */
+/* Frame buffer set (0xC8 bytes) built by CreatePostProcInstance / ChangePostProcConfiguration. */
 struct Vp6Buf {
     char pad0[0x24];
     void* m24;
@@ -86,7 +86,7 @@ struct Vp6Buf {
     int mC4;
 };
 
-/* Decoder sub-object used by fn_80398B40 / fn_80398BEC. */
+/* Decoder sub-object used by fn_80398B40 / SetupDeblocker. */
 struct Vp6Dq {
     int m0;
     char pad4[8];
@@ -100,7 +100,7 @@ struct Vp6SubB {
     Vp6Buf* m0;
 };
 
-/* Per-macroblock flags: m18 data, m1C stride, m20 mask, m24 output (fn_803962D4). */
+/* Per-macroblock flags: m18 data, m1C stride, m20 mask, m24 output (UpdateFragQIndex). */
 struct Vp6Mb {
     char pad0[0xC];
     int mC;
@@ -113,7 +113,7 @@ struct Vp6Mb {
     unsigned m8C;
 };
 
-/* Dequant table object (0x990 bytes) built by fn_80396DF0. */
+/* Dequant table object (0x990 bytes) built by VP6_CreateQuantizer. */
 struct Vp6Blk100 {
     int w[64];
 };

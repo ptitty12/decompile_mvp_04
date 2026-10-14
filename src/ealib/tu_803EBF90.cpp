@@ -59,7 +59,7 @@ extern "C" int fn_803ECE88(unsigned char*, volatile unsigned char*, int, int);
 extern "C" int fn_803ECEC8(unsigned char*, volatile unsigned char*, int, int);
 extern "C" int fn_803ECF08(unsigned char*, volatile unsigned char*, int, int);
 extern "C" int strlen(const char* s);
-extern "C" int fn_80401644(void*, int*);
+extern "C" int sizerefpack(void*, int*);
 extern "C" int fn_803EC568(unsigned char, short, short, int, int);
 extern "C" RcBlk* fn_803EBF2C(RcBlk*);
 
@@ -272,7 +272,7 @@ extern "C" int fn_803EC6F8(RcBlk* n)
                 p = (char*)n + n->m10;
             else
                 p = (char*)n + 0x10;
-            if (fn_80401644(p, &sp8) != 0)
+            if (sizerefpack(p, &sp8) != 0)
                 r = sp8 + 0x10;
         } else {
             r = fn_803EC568(n->tag, n->m4.s.s4, n->m4.s.s6, (n->mC >> 12) & 0xf, (n->mC >> 29) & 1);

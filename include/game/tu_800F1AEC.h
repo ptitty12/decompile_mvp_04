@@ -1219,7 +1219,7 @@ struct UiScrA70C {
     char m238[12];
 };
 void fn_800EC648(UiScrA70C* self, int a, int b, int c, int d, int e, int f, int g, int h);
-extern "C" void fn_803FFC58(char* p, int v, int n);
+extern "C" void MEM_fill(char* p, int v, int n);
 
 extern int lbl_8061B3BC;
 void fn_8010098C(char* p, int a);

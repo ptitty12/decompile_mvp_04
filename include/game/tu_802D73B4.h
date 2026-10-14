@@ -179,7 +179,7 @@ extern int lbl_8061B9C8;
 struct Unk80084910_W;
 int fn_80086D34(Unk80084910_W* self, int i);
 extern "C" void fn_802D6304(int a, int b);
-extern "C" void* fn_803FFC58(void* dst, int val, unsigned int n);
+extern "C" void* MEM_fill(void* dst, int val, unsigned int n);
 struct Unk800085B0;
 int fn_80008540(Unk800085B0** arr, int n);
 extern "C" void fn_802D8B64(Unk802D73B4_Pad* p);

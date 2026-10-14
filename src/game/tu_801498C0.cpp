@@ -26,7 +26,7 @@ extern const char lbl_805C5044[];
 extern const char lbl_805C5054[];
 extern const char lbl_805C506C[];
 extern "C" int fn_803FEE14(char*, int);
-extern "C" int fn_803FECF8(int, int);
+extern "C" int FILESYS_sizesync(int, int);
 char* fn_8040B448(char*, const char*);
 struct Unk8014AD2C_V2 {
     float x;
@@ -138,7 +138,7 @@ extern "C" void fn_800C3A4C(void*);
 extern "C" int fn_80400DA4();
 extern "C" void fn_8037CDA4(void*);
 extern "C" void fn_80148394(void*);
-extern "C" void fn_80316614(int, int, float);
+extern "C" void DrawLoadingProgress(int, int, float);
 extern "C" void fn_8031618C(int);
 extern "C" void fn_801498BC();
 void fn_80313BA4(Unk80310934_P38*);
@@ -359,8 +359,8 @@ void fn_80149DD4(void* a, Unk80149DD4_B* b)
     if (kind >= 1 && kind <= 3) {
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(2);
     } else if (kind == 5) {
-        fn_80316614(lbl_8061FEDC, 3, 0.095238097f);
-        fn_80316614(lbl_8061FEDC, 5, 0.088495575f);
+        DrawLoadingProgress(lbl_8061FEDC, 3, 0.095238097f);
+        DrawLoadingProgress(lbl_8061FEDC, 5, 0.088495575f);
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(1);
     } else if (kind == 6) {
         ((Unk8001C314*)fn_8001C394())->fn_8001C89C(5);
@@ -550,7 +550,7 @@ void fn_8014A468(Unk8014A468_Obj* self, int a, int b, int c, int d, int e)
                 fn_804089B4(s4, lbl_805C5054);
                 fn_803FEC74(h, 0, s4, fn_8040B6A0(s4), 0x64);
             }
-            int pos = fn_803FECF8(h, 0x64);
+            int pos = FILESYS_sizesync(h, 0x64);
             fn_803FEC74(h, pos, s2, fn_8040B6A0(s2), 0x64);
             fn_803FEC9C(h, 0x64);
             s2[0] = 0;
@@ -599,7 +599,7 @@ void fn_8014A784(void* self, int a, int b, int c, int d, int e)
             return;
         fn_804089B4(s3, lbl_805C50F0, s1, b, c, d, e);
     }
-    fn_8014A2B8(self, h, fn_803FECF8(h, 0x64), s3);
+    fn_8014A2B8(self, h, FILESYS_sizesync(h, 0x64), s3);
     fn_803FEC9C(h, 0x64);
     fn_8014A1BC(self, (int)lbl_805C5100, s1);
 }

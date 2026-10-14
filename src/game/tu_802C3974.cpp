@@ -45,7 +45,7 @@ int fn_803EBD14(int h, const char* k);
 int fn_802B9954(int a, int b, int c);
 int fn_802B98AC(int a, int b);
 extern "C" int fn_803EE310(int a);
-extern "C" void fn_803FFA60(int dst, int src, int n);
+extern "C" void MEM_copy(int dst, int src, int n);
 extern "C" void DCStoreRange(int p, int n);
 extern "C" void fn_803EDA0C(int p);
 extern const char lbl_805DFC34[];
@@ -1023,7 +1023,7 @@ void fn_802C5A08(int, Unk802C58E0_Slot* o, Unk802C59D0_Req* req)
     char buf[0x40];
     fn_802C59D0(buf, req);
     int h = fn_802B98AC((int)buf, 0x500);
-    fn_803FFA60(o->m4, h, fn_803EE310(h));
+    MEM_copy(o->m4, h, fn_803EE310(h));
     DCStoreRange(o->m4, 0x4070);
     fn_803EDA0C(h);
     o->m0 = fn_803EBD14(o->m4, lbl_805E15E0);

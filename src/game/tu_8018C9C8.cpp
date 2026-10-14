@@ -12,7 +12,7 @@ struct Unk80190768_M {
 };
 extern "C" {
 void fn_80305AAC(void* a, Unk80190768_M* m, void* b, float k);
-void fn_804020F0(const void* in, const Unk80190768_M* m, Unk80190768_V4* out);
+void MATRIX4_vect3mult(const void* in, const Unk80190768_M* m, Unk80190768_V4* out);
 float fn_8018514C(void* o, Unk80183918_Vec3 v, Unk80183918_Vec3* out);
 }
 
@@ -431,7 +431,7 @@ extern "C" void fn_80190768(Unk80188698* o, void* a, void* b, Unk80183918_Vec3* 
     Unk80190768_M m;
     Unk80190768_V4 v;
     fn_80305AAC(a, &m, b, -1.0f);
-    fn_804020F0(b, &m, &v);
+    MATRIX4_vect3mult(b, &m, &v);
     float s = 1.0f;
     if (v.w != 0.0f) {
         s = 1.0f / v.w;

@@ -179,7 +179,7 @@ extern Unk8014D5C0_Own* lbl_80624270;
 extern const char* lbl_80620150;
 extern int lbl_8061977C;
 extern "C" {
-void fn_80400690(void (*cb)());
+void SYSTEM_addexit(void (*cb)());
 int fn_8033E958(const char* fmt, ...);
 FxBase8014C5A4* fn_80328234(FxBase8014C5A4* self, int a, int b);
 FxBase8014C5A4* fn_803282A8(FxBase8014C5A4* self, int a);
@@ -213,8 +213,8 @@ void fn_802D7A74();
 void fn_802D5BF4(Unk802D58E8* o, int a, const char* s);
 extern "C" {
 void fn_8006A1F4__11Unk80069F0C(void* self);
-void fn_80316614(void* o, int a, float f);
-int fn_801498C0(void* a, void* b);
+void DrawLoadingProgress(void* o, int a, float f);
+int LoadGameAssets(void* a, void* b);
 void fn_801810C8();
 void fn_8014CBE8(void* a, int b);
 Unk802D58E8* fn_801A4CE8(void* a, int b);
@@ -295,7 +295,7 @@ void fn_8014C4E8();
 void fn_8014C540();
 void fn_8014BEB8(int argc, char** argv);
 void fn_8014C5A4(int a, char** b);
-void fn_8014D63C(int a, char** b);
+int main(int a, char** b);
 void fn_8014D81C(int* p);
 void fn_8014D860(Unk8014D860_Obj* p, int a);
 Unk8014D9C4_Obj* fn_8014D9C4(Unk8014D9C4_Obj* p);
@@ -333,14 +333,13 @@ extern void* lbl_8061930C;
 void fn_80072B98(void*);
 void fn_8014C3DC();
 extern Unk8014D5C0_Own* lbl_8068B618;
-void __main();
 void fn_8014C8BC();
 int fn_80148930(void*);
 int fn_8014D1EC();
 void fn_8014D5C0();
 void fn_8014D488();
 extern const char lbl_805C5F90[];
-void fn_803FFA60(void*, const char*, int);
+void MEM_copy(void*, const char*, int);
 extern const float lbl_805C58AC;
 extern const float lbl_805C58B0;
 unsigned fn_8014DDAC(Vec4f8014DAFC* v);
@@ -452,11 +451,11 @@ void* fn_80357A70(void* self);
 void* fn_80357AEC(void* self);
 void fn_80377048();
 void fn_803FFE14();
-void fn_803FF888(int hz);
+void TIMER_init(int hz);
 int fn_80316B90();
-int fn_803FACFC(void* p);
-int fn_803FAD60(void* p);
-int fn_803F9494(int a, int b, int c);
+int FILESYS_getopts(void* p);
+int FILESYS_setopts(void* p);
+int FILESYS_init(int a, int b, int c);
 void* fn_802BB19C__Fv();
 void fn_8014BE28();
 int fn_803EE3D4(int i);
@@ -550,18 +549,18 @@ void fn_8014BEB8(int argc, char** argv)
     lbl_80624294 = 0x1F4;
     fn_803FFE14();
     fn_8033E958(lbl_805C544C);
-    fn_803FF888(0x3C);
+    TIMER_init(0x3C);
     fn_8033E958(lbl_805C5464, 0x3C);
     fn_80316B90();
     Unk8014BEB8_FsOpts opts;
     opts.size = 0x14;
-    fn_803FACFC(&opts);
+    FILESYS_getopts(&opts);
     opts.alloc = (void*)fn_803ED604;
     opts.free = (void*)fn_803EDA0C;
     opts.heap = lbl_8068A3CC;
     opts.heapSize = 0x1000;
-    fn_803FAD60(&opts);
-    fn_803F9494(0x20, 0x800, 0x30);
+    FILESYS_setopts(&opts);
+    FILESYS_init(0x20, 0x800, 0x30);
     fn_802BB19C__Fv();
     fn_8014BE28();
     lbl_8061B88C = savedFlag;
@@ -612,7 +611,7 @@ void fn_8014BEB8(int argc, char** argv)
     DVDChangeDir(lbl_805C55F4);
     ((Unk8014BEB8_Scr*)lbl_8061FEDC)->m1DC = 2;
     fn_803167F0((void*)lbl_8061FEDC, 0.323f, 0.838f, 0.358f, 0.022f);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.02f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.02f);
     fn_800308FC();
     fn_8014B514();
     fn_802D3804();
@@ -671,7 +670,7 @@ void fn_8014C540()
     lbl_8061A32C->mB8 = 1;
 }
 
-/* Game start-up (called from main, fn_8014D63C): runs fn_8014BEB8, registers the exit hook
+/* Game start-up (called from main): runs fn_8014BEB8, registers the exit hook
    fn_8014D6A4, builds two singletons, sets the audio levels from the saved settings and
    prints "Entering game loop." */
 void fn_8014C5A4(int a, char** b)
@@ -679,7 +678,7 @@ void fn_8014C5A4(int a, char** b)
     VT18** pa = &lbl_8068F1FC;
     VT18** pb = &lbl_8068F1F4;
     fn_8014BEB8(a, b);
-    fn_80400690(fn_8014D6A4);
+    SYSTEM_addexit(fn_8014D6A4);
     fn_8033E958(lbl_805C5678);
     FxBase8014C5A4* fx = (FxBase8014C5A4*)operator new(0x1128, 0);
     fn_80328234(fx, 0xB, 0);
@@ -692,7 +691,7 @@ void fn_8014C5A4(int a, char** b)
     fy->m18 = lbl_8065D5A0;
     fn_8033E958(lbl_805C5694);
     fn_8037C924(fn_8037C7FC__Fv());
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.39999998f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.39999998f);
     fn_8014BB70();
     lbl_80624270 = lbl_8068B618;
     lbl_80624278 = lbl_8061E978;
@@ -706,8 +705,8 @@ void fn_8014C5A4(int a, char** b)
     snd->fn_8001C05C(2, (unsigned)levels[2] * (1.0f / 255.0f), 1);
     fn_8031CE68();
     fn_802ACFB0(lbl_8061E978);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.7804878f);
-    fn_80316614((void*)lbl_8061FEDC, 2, 0.88780487f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.7804878f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 0.88780487f);
     fn_802BB894(fn_802BB580());
     fn_8031E1D4(fn_80314790((void*)lbl_8061FEDC), lbl_80620150);
     lbl_8061FF64->v2();
@@ -721,7 +720,7 @@ void fn_8014C5A4(int a, char** b)
     if (!lbl_8061A32C) {
         lbl_8061A32C = fn_800B64BC(operator new(0xD8, 0));
     }
-    fn_80316614((void*)lbl_8061FEDC, 2, 1.0f);
+    DrawLoadingProgress((void*)lbl_8061FEDC, 2, 1.0f);
     fn_803164A0__Fv((void*)lbl_8061FEDC);
     ((X1DC_8014D1EC*)lbl_8061FEDC)->m1DC = 0;
     fn_8033E958(lbl_805C56A0);
@@ -753,11 +752,11 @@ int fn_8014D1EC() /* 8014D1EC */
     fn_8006A1F4__11Unk80069F0C(p);
     fn_8014C540();
     fn_8014C3BC();
-    fn_80316614(x, 1, 0.02f);
-    fn_80316614(x, 3, 0.02f);
-    fn_80316614(x, 5, 0.02f);
+    DrawLoadingProgress(x, 1, 0.02f);
+    DrawLoadingProgress(x, 3, 0.02f);
+    DrawLoadingProgress(x, 5, 0.02f);
     fn_802BB1E4__FP15Unk802BB1E4_Obji(fn_802BB19C__Fv(), 1);
-    if (fn_801498C0(lbl_8068B618, p) == 0) {
+    if (LoadGameAssets(lbl_8068B618, p) == 0) {
         return 0;
     }
     fn_801810C8();
@@ -831,9 +830,8 @@ void fn_8014D5C0()
     fn_80148438(lbl_8068B618);
 }
 
-void fn_8014D63C(int a, char** b)
+int main(int a, char** b)
 {
-    __main();
     fn_8014C5A4(a, b);
     for (;;) {
         fn_8014C8BC();
@@ -891,7 +889,7 @@ void fn_8014D6A4()
 
 void fn_8014D81C(int* p)
 {
-    fn_803FFA60(p + 1, lbl_805C5F90, 0x18);
+    MEM_copy(p + 1, lbl_805C5F90, 0x18);
     *p = 0;
 }
 

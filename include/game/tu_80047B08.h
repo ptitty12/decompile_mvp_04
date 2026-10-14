@@ -8,7 +8,7 @@ Types for game/tu_80047B08.cpp (see tu_80044C10.h for the shared game object and
 the Unk8004763C manager).
 */
 
-extern "C" void fn_80392708();
+extern "C" void SPCH_ClearEventQueue();
 extern "C" void fn_80392DF4();
 extern "C" void fn_803EDA0C(void* p);
 extern "C" void fn_80377488(void* p); /* __builtin_vec_delete */
@@ -58,7 +58,7 @@ Unk8005BA1C_Obj* fn_8005BA9C();
 void fn_8005C384(Unk8005BA1C_Obj* o, int i);
 int fn_802B96C4(const char* name, int a);
 extern "C" int fn_802B9300(const char* name, int a, int b, int* out);
-extern "C" int fn_80395250(int buf, int x);
+extern "C" int SPCH_AddEventDB(int buf, int x);
 extern char lbl_805B0A09[];
 /* Callback record returned by fn_80395864 (three function pointers; fn_80047B08 fills them). */
 struct Unk80047B08_Cb {
@@ -77,12 +77,12 @@ void fn_8004483C(int a, int b, int c);
 void fn_80044B94(int a, int b, int c);
 void fn_80044C10();
 extern "C" void fn_80392B6C(void (*a)(unsigned), void (*b)(void*));
-extern "C" int fn_80392C28(int a, int b, int c);
-extern "C" void fn_80392D08(void (*a)(Unk80044C98_Arg*), int b, int c);
+extern "C" int SPCH_GetSampleDataRate(int a, int b, int c);
+extern "C" void SPCH_Init(void (*a)(Unk80044C98_Arg*), int b, int c);
 extern "C" void fn_80392C94(void (*a)(int, int, int), void (*b)(int, int, int));
 extern "C" void fn_80392CE4(void (*a)());
 extern "C" int fn_803913F4(int a);
-extern "C" void fn_803913FC(int a, int b);
+extern "C" void SPCH_InitBankMem(int a, int b);
 void* operator new[](unsigned int size, int heap); /* 0x803774A8 */
 struct Unk800642F0 {
     Unk800642F0();

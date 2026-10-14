@@ -205,7 +205,7 @@ void fn_80359E30(char* self, int c)
     PUT(0, lbl_8065ED60);
     if (F(int, self, 0x330) != 0) {
         fn_8035A09C(self, 0);
-        fn_803FFEB8(self + 0x14);
+        THREAD_destroy(self + 0x14);
     }
     if (c & 1)
         fn_80377408(self);
@@ -242,23 +242,23 @@ void fn_8035A028(char* self, int v)
     F(int, self, 0x8) = v;
     int h = fn_803ED5E0(lbl_805CB03C, F(int, self, 0xc), 0x10, 0, 0x100);
     F(int, self, 0x10) = h;
-    fn_803FFE3C(self + 0x14, (void (*)(void*))fn_8035A198, self, h, F(int, self, 0xc), F(int, self, 0x32c));
+    THREAD_createparam(self + 0x14, (void (*)(void*))fn_8035A198, self, h, F(int, self, 0xc), F(int, self, 0x32c));
     F(int, self, 0x330) = 1;
 }
 
 extern "C" void fn_8035A09C(char* self, int unused)
 {
-    fn_80400114(self + 0x14, 0);
+    THREAD_waitexit(self + 0x14, 0);
     fn_803EDA0C(F(int, self, 0x10));
     F(int, self, 0x330) = 0;
 }
 
-void fn_8035A0E0(void* a, int b) { fn_803FFFA8(b); }
+void fn_8035A0E0(void* a, int b) { THREAD_yield(b); }
 
 void fn_8035A104(char* self, int v)
 {
     F(int, self, 0x32c) = v;
-    fn_80400068(self + 0x14, v);
+    THREAD_setpriority(self + 0x14, v);
 }
 
 void* fn_8035A134(void* self)
@@ -283,7 +283,7 @@ Unk803442CC* fn_8035A15C(Unk803442CC* self)
 void fn_8035A198(void* t)
 {
     while (!fn_8035A2C8(t))
-        fn_803FFFA8(1);
+        THREAD_yield(1);
     ((void (*)(void*))fn_8035A2C0(t))(t);
 }
 

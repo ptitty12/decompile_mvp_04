@@ -248,9 +248,9 @@ void fn_80322164(void* s, char* a, int n, char* b, int m);
 int fn_802B9300(char* name, int a, int b, int* c);
 void fn_802B961C(int h, int k);
 int fn_803FC480(int h, char* s);
-int fn_804017D0();
+int unpacksizez();
 void* fn_803ED604(const char* name, int sz, int k);
-void fn_80401710(int h, void* b);
+void unpackz(int h, void* b);
 void DCStoreRange(void* a, int n);
 int fn_80400DA4();
 void* fn_803DD628(void* a, void* b);
@@ -625,7 +625,7 @@ void fn_80315C20(float* p, float* v, float a, float b, float c)
     }
 }
 
-/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the unpacksizez size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
 void fn_80315FFC(char* self)
 {
     char a[256];
@@ -633,9 +633,9 @@ void fn_80315FFC(char* self)
     fn_80322164(self + 0x1F0, a, 0x100, b, 0x100);
     int h1 = fn_802B9300(a, 0x500, 0xE, 0);
     int h2 = fn_803FC480(h1, b);
-    int sz = fn_804017D0();
+    int sz = unpacksizez();
     char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
-    fn_80401710(h2, buf);
+    unpackz(h2, buf);
     fn_802B961C(h1, 0xE);
     DCStoreRange(buf, sz);
     fn_803D9E1C(0);
@@ -651,7 +651,7 @@ void fn_80315FFC(char* self)
     fn_803EDA0C(buf);
 }
 
-/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the unpacksizez size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
 extern "C" void fn_8031618C(char* self)
 {
     char a[256];
@@ -659,9 +659,9 @@ extern "C" void fn_8031618C(char* self)
     fn_803220F4(self + 0x1F0, a, 0x100, b, 0x100);
     int h1 = fn_802B9300(a, 0x500, 0xE, 0);
     int h2 = fn_803FC480(h1, b);
-    int sz = fn_804017D0();
+    int sz = unpacksizez();
     char* buf = (char*)fn_803ED604(lbl_805E9AFC, sz, 0x500);
-    fn_80401710(h2, buf);
+    unpackz(h2, buf);
     fn_802B961C(h1, 0xE);
     DCStoreRange(buf, sz);
     fn_803D9E1C(0);
@@ -676,7 +676,7 @@ extern "C" void fn_8031618C(char* self)
     fn_803EDA0C(buf);
 }
 
-/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the fn_804017D0 size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
+/* near-miss: 100/100 insns, 5 slots differ: retail keeps the fn_803FC480 result in r30 and the unpacksizez size in r29; ours swaps them (local-alloc priority 2 refs/10 insns vs 3 refs/14 insns); inline wrappers and declaration order did not change it */
 void fn_80316310(char* self)
 {
     char a[256];
@@ -684,9 +684,9 @@ void fn_80316310(char* self)
     fn_803221D4(self + 0x1F0, a, 0x100, b, 0x100);
     int h1 = fn_802B9300(a, 0x500, 0xE, 0);
     int h2 = fn_803FC480(h1, b);
-    int sz = fn_804017D0();
+    int sz = unpacksizez();
     char* buf = (char*)fn_803ED604(lbl_805E9B24, sz, 0x500);
-    fn_80401710(h2, buf);
+    unpackz(h2, buf);
     fn_802B961C(h1, 0xE);
     DCStoreRange(buf, sz);
     fn_803D9E1C(0);
@@ -751,7 +751,7 @@ void* memset(void* p, int c, unsigned n, ...);
 
 /* Draws the loading-progress gradient (misc/textures/grad.gsh); progress is clamped to [0, 1].
    The first call stamps the time base (fn_80400DA4) that the debug line reports against. */
-extern "C" void fn_80316614(Unk80313C14_Fade* self, int state, float progress)
+extern "C" void DrawLoadingProgress(Unk80313C14_Fade* self, int state, float progress)
 {
     if (self->m1D8 == 0) {
         char name[0x40] = "";

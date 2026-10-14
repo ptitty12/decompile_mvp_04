@@ -619,7 +619,11 @@ Numbered for E0b (boot spike) and E4 (determinism). "Verify" says what to check.
 ## 7. Proposed names
 
 Evidence, not renames: the project rule is to keep `fn_` until evidence supports a name,
-and the last column is that evidence. Nothing here was applied to `symbols.txt`.
+and the last column is that evidence. The rows above the "Applied" block are proposals and were
+not applied to `symbols.txt`; the rows marked **(named)** at the end of the table were applied by
+names pass 01 (2026-10-14, `tools/goals/renames/names01.tsv`) and supersede the proposal for the
+same address. Where the two differ the applied name is EA's own (tier E), the string's (S) or the
+C runtime's (K).
 
 | Address | Placeholder | Proposed name | Evidence |
 |---|---|---|---|
@@ -670,6 +674,55 @@ and the last column is that evidence. Nothing here was applied to `symbols.txt`.
 | 80316614 | `fn_80316614` | `DrawLoadingProgress` | its format string |
 | 802D7588 / 802D75D4 | | `PadPoll` / `PadTickUpdate` | pad manager (`"Init cPad object"`) |
 | 80438628 / 80438640 / 80438648 | | `OSGetTime` / `OSGetTick` / `__OSGetSystemTime` | already named in the SDK (ours) |
+| **Applied** | | names pass 01 | |
+| 8014D63C | `fn_8014D63C` | `main` **(named)** | K: crt0 `__start` calls it with argc/argv; the ProDG g++ inserts `__main()` only into `main`, and with that name the function matches 100% |
+| 801498C0 | `fn_801498C0` | `LoadGameAssets` **(named)** | S: its own trace `"end of LoadGameAssets"` |
+| 80316614 | `fn_80316614` | `DrawLoadingProgress` **(named)** | S: its own format string |
+| 803FF888 | `fn_803FF888` | `TIMER_init` **(named)**, replaces `EaTimerInit` | E: EA `TIMER_init` in 8 builds |
+| 803FF850 / 803FF994 | | `InitAlarm` / `TIMER_restore` **(named)** | E: EA names (inittmr.cpp) |
+| 803FF9D4 | `fn_803FF9D4` | `ttDoTimerMsg` **(named)**, replaces `EaTickStep` | E: EA name (hp, nfsmw) |
+| 8040015C | `fn_8040015C` | `ttInit` **(named)**, replaces `EaTickThreadStart` | E: EA `ttInit` in 8 builds (timerthread.cpp) |
+| 8040024C | `fn_8040024C` | `TimerThreadFunc` **(named)**, replaces `EaTickThreadMain` | E: EA name in 6 builds |
+| 80400DAC | `fn_80400DAC` | `TIMER_elapsedticks` **(named)** | E: EA name (timer.cpp); the caller divides it by the rate to get ms |
+| 803FFFA8 / 803FFF30 | | `THREAD_yield` / `THREAD_yield64` **(named)**, replace `EaSleepMs` / `EaSleepTicks` | E: EA names (threads.cpp) |
+| 803FFE3C | `fn_803FFE3C` | `THREAD_createparam` **(named)** | E: EA name in the fifa05/uefa maps |
+| 80400690 | `fn_80400690` | `SYSTEM_addexit` **(named)** | E: EA name (hp, nfsmw) |
+| 803FF618 | `fn_803FF618` | `ReadFileThreadFunc` **(named)**, replaces `FileThreadMain` | E: EA name (ge, moh3, moh4) |
+| 803FEE70 | `fn_803FEE70` | `initfiledev` **(named)**, replaces `FileThreadStart` | E: EA name (filedev.cpp) |
+| 803F99E8 | `fn_803F99E8` | `FILESYS_waitop` **(named)**, replaces `FileWait` | E: EA name (filesys.cpp) |
+| 803F9494 / 803FACFC / 803FAD60 | | `FILESYS_init` / `FILESYS_getopts` / `FILESYS_setopts` **(named)** | E: EA names |
+| 803FF244 / 803FF424 | | `AyncDVDRead` / `StartNonAlignedAyncRead` **(named)** | E: EA names (sic) |
+| 803AF61C | `fn_803AF61C` | `SNDPLATFORM_init` **(named)**, replaces `SndInit` | E: EA name (5 builds) |
+| 803AF238 | `fn_803AF238` | `SNDDRV_thread` **(named)**, replaces `SndThreadMain` | E: EA name (6 builds) |
+| 803AED08 | `fn_803AED08` | `SNDDRV_audiocallback` **(named)**, replaces `SndAuxACallback` | E: EA name (5 builds) |
+| 803AEB04 / 803AEB50 | | `SNDDRV_dmcallback` / `SNDDRV_dmapost` **(named)** | E: ARQ DMA callback and post; EA names in 9 builds |
+| 80394DE8 / 80394F24 / 80394FD4 | | `iSPCH_EACseedrandom` / `iSPCH_InitRandom` / `iSPCH_Rand` **(named)** | E: the speech pick RNG (K3); EA names (nascar, nfsmw, fifa05, uefa) |
+| 8039582C | `fn_8039582C` | `SPCHEXT_gettick` **(named)** | E: the speech time source; EA name in fifa05, nascar, nfsmw, uefa |
+| 80438724 | `fn_80438724` | `__init_cpp` **(named)** | E and K: EA name, mitsevox names the address too |
+| 802BB29C / 802BB334 | | `PrepareForDataUsage__FP15Unk802BB1E4_ObjT0` / `RestoreOverlay__FP15Unk802BB1E4_ObjT0` **(named)** | S: their own assert strings; overlay manager |
+
+Not named, with reasons (names pass 01):
+
+- **EA methods whose class is not in our source.** The reference builds give EA's names, but a
+  correct g++ 2.95 name needs the class, which means restructuring: `fn_803D8918` is
+  `EAGL::RenderContext::SetupFrameBuffers` (E, and confirmed by its own strings
+  `"RenderContext::SetupFrameBuffers() - Could not allocate ..."`, S), so the table's `GfxInit` is
+  that function; `fn_803D8640` is `EAGL::RenderContext::EndFrame` (`GfxEndFrame`); `fn_803D9378`
+  is `EAGLInternal::RenderContextPrivate::VSyncCallback(unsigned long)` (`GfxRetraceCallback`);
+  `fn_803D8828` is `...::BreakPtCallback(unsigned)` (`GfxGpDoneCallback`); `fn_803D9454` is
+  `...::ReceiveToken`; `fn_803D95C4` / `fn_803D95FC` are `ProcessGPBreakPoint` / `SetGPBreakPoint`;
+  `fn_803E2D18` etc. are `EAGL::Profiler::*` and `EAGL::ProfilerRegion::*`; `fn_8038EA9C` is
+  `RCMP::DECODER::GetChunk`; `fn_8038DF3C` and `fn_8038E468` are `RCMP::AV_PLAYER::SetSpeed` and
+  `RCMP::AV_MS_TIMER::Update`; `fn_800B6D64` is `cFEManager::Init` (S, its strings).
+- **Linkage clash.** `fn_803AD2F0` (`SNDI_parsetimbre`) and `fn_803AFD44`
+  (`SNDPLATFORM_getvoicerange`): `src/snd/cmn/sndcmn.h` already declares those names with C++
+  linkage while the definitions here are `extern "C"`.
+- **No reference name.** `fn_80400DA4` / `fn_80400E84` / `fn_80400E18` / `fn_80400DE4` (tick, rate,
+  wait, set deadline), `fn_80400C1C` / `fn_80400CE4`, `fn_803774A8` (`operator new[]`), and the
+  tier I rows above (`InitSystems`, `BeginSession`, `RunGameLoop`, `StartGame`, `RngNext`, ...).
+- **Held by K1b.** `fn_8043188C` (`OSInit`), `fn_80422FD8` (`DVDInit`), `fn_80438704`
+  (`__init_user`): mitsevox names them, but dtk then renames about 150 more symbols (checked again
+  in pass 01 with `rename_symbols.py --from-dtk --dry-run`).
 
 ## 8. Open points for E0b / E4 to settle
 

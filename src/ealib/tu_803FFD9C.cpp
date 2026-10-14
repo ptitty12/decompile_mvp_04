@@ -7,7 +7,7 @@
 
 /* RealCore threading / diagnostics helpers (EA). */
 extern "C" {
-int fn_803FF850(void);
+int InitAlarm(void);
 int OSGetCurrentThread(void);
 int OSCreateThread(int, int, int, int, int, int, int);
 void OSResumeThread(int);
@@ -15,21 +15,21 @@ void OSInitMutex(int);
 int OSIsThreadTerminated(int);
 void OSCancelThread(void);
 void OSSetThreadPriority(int, int);
-int fn_804000C8(int);
-void fn_803FFFA8(int);
+int THREAD_testexit(int);
+void THREAD_yield(int);
 int OSSendMessage(void*, int, int);
 int OSReceiveMessage(void*, int*, int);
 void OSInitMessageQueue(void*, void*, int);
 void fn_803F9D74x(void);
-void fn_803FF9D4(void);
-void fn_80400EF8(void);
+void ttDoTimerMsg(void);
+void ttDoVTimerMsg(void);
 }
 extern char lbl_806B8308[];
 extern char lbl_806B8328[];
 extern char lbl_806B83A8[];
 extern char lbl_806B96C0[];
 extern int lbl_806EEAB8;
-extern "C" int fn_8040024C();
+extern "C" int TimerThreadFunc();
 extern int lbl_806EF47C;
 extern int lbl_8062EE40[8];
 extern unsigned short lbl_8062E520[];
@@ -44,13 +44,13 @@ extern BitRec lbl_8062EE60[];
 extern "C" {
 void exit(int);
 void fn_8040061C(void);
-void fn_803FFF30(long long ticks);
-void fn_803FFA60(void* d, const void* s, int n);
+void THREAD_yield64(long long ticks);
+void MEM_copy(void* d, const void* s, int n);
 void fn_80400870(int idx, int v);
 void fn_80400890(int a, int b);
 void fn_80400948(void);
 void OSYieldThread(void);
-void fn_80400F80(void* p);
+void SIGNAL_create(void* p);
 void fn_80400FE4(void* p);
 void OSCreateAlarm(void* alarm);
 void OSSetAlarm(void* alarm, long long tick, void (*cb)(void*));
@@ -118,11 +118,11 @@ extern char lbl_8060E840[];
 extern int lbl_806EEAC0;
 extern int lbl_806EEAC4;
 
-extern "C" void fn_80400BD4(int a, int b);
-extern "C" void fn_80400B70(int idx, int v);
+extern "C" void PRINT_setchannelstate(int a, int b);
+extern "C" void PRINT_setdevicestate(int idx, int v);
 
 /* priority map: a thread-priority class (3..-3) to the OS priority */
-extern "C" int fn_803FFD9C(int k)
+extern "C" int ThreadRealPriority2GCPriority(int k)
 {
     switch (k) {
     case 3:
@@ -146,24 +146,24 @@ extern "C" int fn_803FFD9C(int k)
 
 extern "C" void fn_803FFE14()
 {
-    fn_803FF850();
+    InitAlarm();
     lbl_806EF47C = OSGetCurrentThread();
 }
 
-extern "C" int fn_803FFE3C(int a, int b, int c, int d, int e, int f)
+extern "C" int THREAD_createparam(int a, int b, int c, int d, int e, int f)
 {
     int ok = 1;
-    if (OSCreateThread(a, b, c, d + e, e, fn_803FFD9C(f), 1) == 0)
+    if (OSCreateThread(a, b, c, d + e, e, ThreadRealPriority2GCPriority(f), 1) == 0)
         ok = 0;
     OSResumeThread(a);
     return ok;
 }
 
-/* The retail call forwards h in r3 to fn_804000C8. */
-extern "C" void fn_803FFEB8(int h)
+/* The retail call forwards h in r3 to THREAD_testexit. */
+extern "C" void THREAD_destroy(int h)
 {
     int t;
-    if (fn_804000C8(h) == 0) {
+    if (THREAD_testexit(h) == 0) {
         if (h == -1)
             t = OSGetCurrentThread();
         else
@@ -173,14 +173,14 @@ extern "C" void fn_803FFEB8(int h)
     }
 }
 
-extern "C" void fn_80400FB0(void* p);
+extern "C" void SIGNAL_set(void* p);
 
 extern "C" void fn_803FFF0C(char* p)
 {
-    fn_80400FB0(p + 0x28);
+    SIGNAL_set(p + 0x28);
 }
 
-extern "C" void fn_803FFF30(long long ticks)
+extern "C" void THREAD_yield64(long long ticks)
 {
     char alarm[0x28];
     char ev[0x28];
@@ -188,19 +188,19 @@ extern "C" void fn_803FFF30(long long ticks)
         OSYieldThread();
         return;
     }
-    fn_80400F80(ev);
+    SIGNAL_create(ev);
     OSCreateAlarm(alarm);
     OSSetAlarm(alarm, ticks, (void (*)(void*))fn_803FFF0C);
     fn_80400FE4(ev);
     OSCancelAlarm(alarm);
 }
 
-extern "C" void fn_803FFFA8(int ms)
+extern "C" void THREAD_yield(int ms)
 {
-    fn_803FFF30((long long)ms * (LOWMEM->busClock / 4000));
+    THREAD_yield64((long long)ms * (LOWMEM->busClock / 4000));
 }
 
-extern "C" int fn_80400008(int h)
+extern "C" int THREAD_iscurrent(int h)
 {
     int cur = OSGetCurrentThread();
     int t;
@@ -213,7 +213,7 @@ extern "C" int fn_80400008(int h)
     return cur == t;
 }
 
-extern "C" int fn_80400068(int h, int prio)
+extern "C" int THREAD_setpriority(int h, int prio)
 {
     int t;
     if (h == 0) {
@@ -223,11 +223,11 @@ extern "C" int fn_80400068(int h, int prio)
             h = OSGetCurrentThread();
         t = h;
     }
-    OSSetThreadPriority(t, fn_803FFD9C(prio));
+    OSSetThreadPriority(t, ThreadRealPriority2GCPriority(prio));
     return 1;
 }
 
-extern "C" int fn_804000C8(int h)
+extern "C" int THREAD_testexit(int h)
 {
     if (h == 0)
         h = lbl_806EF47C;
@@ -236,17 +236,17 @@ extern "C" int fn_804000C8(int h)
     return OSIsThreadTerminated(h) != 0;
 }
 
-extern "C" int fn_80400114(int h)
+extern "C" int THREAD_waitexit(int h)
 {
-    while (fn_804000C8(h) == 0)
-        fn_803FFFA8(10);
+    while (THREAD_testexit(h) == 0)
+        THREAD_yield(10);
     return 1;
 }
 
-extern "C" void fn_8040015C()
+extern "C" void ttInit()
 {
     if (lbl_806EEAB8 == 0) {
-        OSCreateThread((int)lbl_806B83A8, (int)fn_8040024C, 0, (int)lbl_806B96C0, 0x1000, 4, 1);
+        OSCreateThread((int)lbl_806B83A8, (int)TimerThreadFunc, 0, (int)lbl_806B96C0, 0x1000, 4, 1);
         OSInitMessageQueue(lbl_806B8308, lbl_806B8328, 0x20);
         OSResumeThread((int)lbl_806B83A8);
     }
@@ -255,7 +255,7 @@ extern "C" void fn_8040015C()
 
 extern "C" void fn_8040021C(int msg);
 
-extern "C" void fn_804001E4()
+extern "C" void ttKill()
 {
     lbl_806EEAB8--;
     if (lbl_806EEAB8 == 0)
@@ -267,20 +267,20 @@ extern "C" void fn_8040021C(int msg)
     OSSendMessage(lbl_806B8308, msg, 0);
 }
 
-extern "C" int fn_8040024C()
+extern "C" int TimerThreadFunc()
 {
     int msg = 0;
     while (msg != 2) {
         OSReceiveMessage(lbl_806B8308, &msg, 1);
         if (msg == 0)
-            fn_803FF9D4();
+            ttDoTimerMsg();
         else if (msg == 1)
-            fn_80400EF8();
+            ttDoVTimerMsg();
     }
     return 0;
 }
 
-extern "C" void fn_804002BC(const char* fmt, ...)
+extern "C" void REAL_abortmessage(const char* fmt, ...)
 {
     va_list ap;
     char buf[0x200];
@@ -292,7 +292,7 @@ extern "C" void fn_804002BC(const char* fmt, ...)
     lbl_806EEAEC(lbl_8060E830, buf);
 }
 
-extern "C" void fn_80400398(const char* fmt, ...)
+extern "C" void SYSTEM_abortmessage(const char* fmt, ...)
 {
     va_list ap;
     char buf[0x200];
@@ -318,7 +318,7 @@ extern "C" void fn_80400498(int v)
     }
 }
 
-extern "C" unsigned short fn_80400520(const unsigned char* p, int n, unsigned crc)
+extern "C" unsigned short MEM_crc16(const unsigned char* p, int n, unsigned crc)
 {
     const unsigned char* end = p + n;
     while (p < end) {
@@ -345,7 +345,7 @@ extern "C" unsigned fn_80400560(const unsigned char* p, int n)
     return ~crc;
 }
 
-extern "C" void fn_804005DC()
+extern "C" void DEBUG_break()
 {
     if (lbl_806EEAD8 != 0)
         OSPanic(lbl_8060E864, 0, lbl_8060E864);
@@ -368,7 +368,7 @@ extern "C" void fn_80400678()
 }
 
 /* Check for an existing callback, then occupy the first empty entry. */
-extern "C" void fn_80400690(void (*callback)())
+extern "C" void SYSTEM_addexit(void (*callback)())
 {
     for (int i = 0; i < 64; ++i) {
         if (lbl_8062EB20[i] == callback)
@@ -385,7 +385,7 @@ extern "C" void fn_80400690(void (*callback)())
 }
 
 /* Remove the first registered shutdown callback that matches. */
-extern "C" void fn_804006FC(void (*callback)())
+extern "C" void REAL_removeexit(void (*callback)())
 {
     int i = 0;
     while (i < 64) {
@@ -397,17 +397,17 @@ extern "C" void fn_804006FC(void (*callback)())
     }
 }
 
-extern "C" void fn_803FFC58(void* x, int k, int a);
+extern "C" void MEM_fill(void* x, int k, int a);
 
 extern "C" void fn_8040074C(void* x, int a)
 {
-    fn_803FFC58(x, 0, a);
+    MEM_fill(x, 0, a);
 }
 
-extern "C" void fn_80400774(unsigned char* d, unsigned char* s, unsigned n)
+extern "C" void MEM_move(unsigned char* d, unsigned char* s, unsigned n)
 {
     if (d <= s || d >= s + n) {
-        fn_803FFA60(d, s, n);
+        MEM_copy(d, s, n);
     } else {
         d += n;
         s += n;
@@ -424,7 +424,7 @@ extern "C" int fn_804007D4(int p)
 
 extern "C" void fn_804007FC(void* x)
 {
-    fn_803FFC58(x, 0xDEADBEEF, 4);
+    MEM_fill(x, 0xDEADBEEF, 4);
 }
 
 struct Unk8037E6F4 {
@@ -485,8 +485,8 @@ extern "C" void fn_80400948()
             lbl_8062EC20[i].m0 = 0;
             lbl_8062EC20[i].f1 = 0;
         }
-        fn_80400BD4(2, 1);
-        fn_80400B70(1, 1);
+        PRINT_setchannelstate(2, 1);
+        PRINT_setdevicestate(1, 1);
     }
 }
 
@@ -513,7 +513,7 @@ extern "C" void fn_80400ADC(int ch, const char* fmt, ...)
     fn_80400A30(ch, fmt, ap);
 }
 
-extern "C" void fn_80400B70(int idx, int v)
+extern "C" void PRINT_setdevicestate(int idx, int v)
 {
     if (lbl_8062EE60[idx].m4 != 0) {
         if (lbl_806EEAC8 == 0)
@@ -522,7 +522,7 @@ extern "C" void fn_80400B70(int idx, int v)
     }
 }
 
-extern "C" void fn_80400BD4(int a, int b)
+extern "C" void PRINT_setchannelstate(int a, int b)
 {
     if (lbl_806EEAC8 == 0)
         fn_80400948();

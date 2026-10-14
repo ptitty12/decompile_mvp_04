@@ -33,9 +33,9 @@ struct McRec1 {
     unsigned char m1;
 };
 
-extern "C" int fn_80394FD4(int a, int b);
-extern "C" int fn_80395150(int x, unsigned y);
-extern "C" void fn_803958FC(int x);
+extern "C" int iSPCH_Rand(int a, int b);
+extern "C" int iSPCH_BindData(int x, unsigned y);
+extern "C" void iSPCH_InitCsis(int x);
 
 struct McRec67 {
     char pad0[6];
@@ -43,7 +43,7 @@ struct McRec67 {
     unsigned char m7;
 };
 
-extern "C" void fn_8039566C(McRec67*, int, int*, int*);
+extern "C" void iSPCH_GetSentenceRuleSettings(McRec67*, int, int*, int*);
 
 struct McObjB {
     char pad0[0xB];
@@ -52,9 +52,9 @@ struct McObjB {
 
 typedef void* (*McMemcpyV)(void*, const void*, ...);
 extern "C" void* memcpy(void*, const void*, unsigned);
-extern "C" McObjB* fn_80391CCC(int*);
+extern "C" McObjB* iSPCH_FindEvent(int*);
 extern "C" int fn_80392B80(int);
-extern "C" int fn_803920BC(int*);
+extern "C" int iSPCH_AddEvent(int*);
 extern "C" void fn_80392BC0(int);
 
 struct McCfg2 {
@@ -69,10 +69,10 @@ extern int lbl_8069B80C[];
 extern "C" int fn_803948C0(int);
 
 extern "C" unsigned fn_80394CE0();
-extern "C" int fn_80394E3C(int a, int n, int b);
-extern "C" void fn_80394EE4(int a, int b);
+extern "C" int iSPCH_FindRandInQueue(int a, int n, int b);
+extern "C" void iSPCH_AddRandToQueue(int a, int b);
 
-/* Record of fn_803958FC: +4 offset of a table of 32-byte entries, +8/+9 tag bytes, +0xB "built" flag, +0x10 entry
+/* Record of iSPCH_InitCsis: +4 offset of a table of 32-byte entries, +8/+9 tag bytes, +0xB "built" flag, +0x10 entry
  * count, +0x18 halfword indices. */
 struct McRecD {
     char pad0[4];
@@ -99,7 +99,7 @@ struct McEntD {
 extern "C" unsigned fn_80391C04(unsigned char a, unsigned char b, unsigned short c);
 extern "C" void fn_803B9858(void* a, void* b);
 extern "C" void fn_803BA118(void* a, void* b);
-extern "C" void fn_80395870(void* src, int key);
+extern "C" void iSPCH_CsisCb(void* src, int key);
 
 struct McEntH {
     char pad0[8];
@@ -125,9 +125,9 @@ struct McSlotB {
 
 extern McSlotB lbl_8069B7CC[];
 extern "C" void fn_80392E3C(int x, int* a, int* b);
-extern "C" void fn_803950B4(int key);
+extern "C" void SPCH_ClearMatchParmSettings(int key);
 
-extern "C" int fn_80394744(unsigned v, int a, int idx)
+extern "C" int iSPCH_TestValidParm(unsigned v, int a, int idx)
 {
     int r = 0;
     unsigned t = (v >> (idx * 2)) & 3;
@@ -144,12 +144,12 @@ extern "C" int fn_80394744(unsigned v, int a, int idx)
     return r;
 }
 
-extern "C" int fn_8039487C(McRec1* p)
+extern "C" int iSPCH_CheckFrequency(McRec1* p)
 {
-    return fn_80394FD4(100, -1) < p->m1;
+    return iSPCH_Rand(100, -1) < p->m1;
 }
 
-extern "C" int fn_80394C0C(int idx)
+extern "C" int iSPCH_ChooseSingleSentence(int idx)
 {
     int r = 0;
     char* t = (char*)lbl_8069B80C;
@@ -181,7 +181,7 @@ extern "C" void fn_80394CD4(int x)
 
 extern int lbl_80624438[];
 
-extern "C" void fn_80394DE8(int x)
+extern "C" void iSPCH_EACseedrandom(int x)
 {
     int a = x + 0xF22D0E56;
     lbl_80624438[0] = a;
@@ -196,7 +196,7 @@ extern "C" void fn_80394DE8(int x)
     lbl_80624438[5] = e + 0xD1A9FBE7;
 }
 
-extern "C" int fn_80394E3C(int a, int n, int b)
+extern "C" int iSPCH_FindRandInQueue(int a, int n, int b)
 {
     int r = -1;
     if (n > 0x20)
@@ -227,7 +227,7 @@ extern "C" int fn_80394E3C(int a, int n, int b)
     return r;
 }
 
-extern "C" void fn_80394EE4(int a, int b)
+extern "C" void iSPCH_AddRandToQueue(int a, int b)
 {
     lbl_80624450[0] = lbl_80624450[0] + 1;
     if (lbl_80624450[0] > 31)
@@ -236,7 +236,7 @@ extern "C" void fn_80394EE4(int a, int b)
     lbl_8069BEC0[lbl_80624450[0]].b = b;
 }
 
-extern "C" void fn_80394F24(int seed)
+extern "C" void iSPCH_InitRandom(int seed)
 {
     int i;
     for (i = 0; i < 32; i++) {
@@ -245,13 +245,13 @@ extern "C" void fn_80394F24(int seed)
     }
     seed = seed + (seed << 16);
     lbl_80624450[0] = 0;
-    fn_80394DE8(seed);
+    iSPCH_EACseedrandom(seed);
     int n = 0x20 - (seed % 32);
     for (i = 0; i < n; i++)
-        fn_80394FD4(10, -1);
+        iSPCH_Rand(10, -1);
 }
 
-extern "C" int fn_80394FD4(int a, int b)
+extern "C" int iSPCH_Rand(int a, int b)
 {
     int cnt = 0;
     int done = 0;
@@ -264,7 +264,7 @@ extern "C" int fn_80394FD4(int a, int b)
     if (b != -1) {
         b = (unsigned short)b;
         do {
-            int r = fn_80394E3C(v, n, b);
+            int r = iSPCH_FindRandInQueue(v, n, b);
             if (r == -1) {
                 pick = v;
                 done = 1;
@@ -278,14 +278,14 @@ extern "C" int fn_80394FD4(int a, int b)
             if (done == 0)
                 v = ((fn_80394CE0() >> 16) * a) >> 16;
         } while (done == 0);
-        fn_80394EE4(pick, b);
+        iSPCH_AddRandToQueue(pick, b);
     }
     return v;
 }
 
 /* near-miss 96.9%: same code; retail keeps the slot offset in r7, the record in r10 and the byte index in r8 (ours r8,
  * r11, r10) and loads the table size before the inner test. */
-extern "C" void fn_803950B4(int key)
+extern "C" void SPCH_ClearMatchParmSettings(int key)
 {
     int i = 0;
     do {
@@ -302,7 +302,7 @@ extern "C" void fn_803950B4(int key)
     } while (i <= 7);
 }
 
-extern "C" int fn_80395150(int x, unsigned y)
+extern "C" int iSPCH_BindData(int x, unsigned y)
 {
     int r = 0;
     if ((*(int*)x & 0xFFFF0000) == 0x03120000) {
@@ -323,18 +323,18 @@ extern "C" int fn_80395150(int x, unsigned y)
                 break;
             }
         }
-        fn_803950B4(y);
+        SPCH_ClearMatchParmSettings(y);
     }
 out:
     return r;
 }
 
-extern "C" int fn_80395250(int x, unsigned y)
+extern "C" int SPCH_AddEventDB(int x, unsigned y)
 {
     int r = 0;
     if (y <= 7) {
-        r = fn_80395150(x, y);
-        fn_803958FC(x);
+        r = iSPCH_BindData(x, y);
+        iSPCH_InitCsis(x);
     }
     return r;
 }
@@ -357,7 +357,7 @@ inline unsigned char* McT(McRec6* p)
     return (unsigned char*)p + (n + 0xc);
 }
 
-extern "C" int fn_80395350(McRec6* p, int i)
+extern "C" int iSPCH_GetRuleID(McRec6* p, int i)
 {
     McTri v;
     int t = (int)McT(p);
@@ -368,25 +368,25 @@ extern "C" int fn_80395350(McRec6* p, int i)
     return v.a;
 }
 
-extern "C" int fn_80395714(McRec67* p, int i, int c, int d)
+extern "C" int iSPCH_CheckSentenceRules(McRec67* p, int i, int c, int d)
 {
     int x;
     int y;
-    fn_8039566C(p, i, &x, &y);
+    iSPCH_GetSentenceRuleSettings(p, i, &x, &y);
     y = y & ~d;
     x = x & y;
     return (y & c) == x;
 }
 
 /* near-miss: retail uses mullw (i * size) with a different add order and one fewer instruction; 4 spellings tried. */
-extern "C" char* fn_80395774(McRec* p, int i)
+extern "C" char* iSPCH_GetSampleParmAddr(McRec* p, int i)
 {
     if (i >= p->m5)
         return 0;
     return (char*)p + i * ((p->m4 & 0x7F) + 2) + 0xE;
 }
 
-extern "C" int fn_8039582C()
+extern "C" int SPCHEXT_gettick()
 {
     int r = 0;
     int (*f)() = lbl_806243F0[0];
@@ -400,23 +400,23 @@ extern "C" char* fn_80395864()
     return lbl_806243E8;
 }
 
-extern "C" void fn_80395870(void* src, int key)
+extern "C" void iSPCH_CsisCb(void* src, int key)
 {
     int sp = key;
-    McObjB* o = fn_80391CCC(&sp);
+    McObjB* o = iSPCH_FindEvent(&sp);
     if (o != 0) {
         int sz = o->mB * 4;
         int* buf = (int*)fn_80392B80(sz + 4);
         if (buf != 0) {
             buf[0] = sp;
             ((McMemcpyV)memcpy)(buf + 1, src, sz);
-            if (fn_803920BC(buf) == 0)
+            if (iSPCH_AddEvent(buf) == 0)
                 fn_80392BC0((int)buf);
         }
     }
 }
 
-extern "C" void fn_803958FC(int x)
+extern "C" void iSPCH_InitCsis(int x)
 {
     McRecD* r = (McRecD*)x;
     if (r != 0 && r->m4 != 0 && r->mB == 0) {
@@ -429,7 +429,7 @@ extern "C" void fn_803958FC(int x)
             e->m0 = (int)end + e->m0;
             fn_803B9858(e->m8, e);
             McEntH* e2 = (McEntH*)((char*)e + 0x10);
-            e2->m8 = (void*)fn_80395870;
+            e2->m8 = (void*)iSPCH_CsisCb;
             int ioff = i * 2;
 int tb = (int)r->m18;
             e2->mC = fn_80391C04(r->m8, r->m9, *(unsigned short*)((char*)r + *(unsigned short*)(ioff + tb) * 4));

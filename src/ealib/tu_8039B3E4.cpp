@@ -6,7 +6,7 @@
  */
 #include "../../include/game/tu_803959E0.h"
 
-/* List entry of fn_8039F5CC: next index, sort key, unused. */
+/* List entry of InsertSorted: next index, sort key, unused. */
 /* Four 16-byte entries at +0xCC: m4 = -1 and m8 = 4 after clearing. */
 struct Vp6Ent16 {
     int m0;
@@ -21,7 +21,7 @@ struct Vp6Hdr {
     Vp6Ent16 mCC[4];
 };
 
-/* Scan-order tables built by fn_8039B3E4 (offsets inside the decoder context). */
+/* Scan-order tables built by BuildScanOrder (offsets inside the decoder context). */
 struct Vp6ScanView {
     char pad0[0x19C];
     unsigned char m19C;
@@ -36,7 +36,7 @@ struct Vp6LimView {
     int* m34;
 };
 
-/* Huffman tree word: 7-bit symbol or child index, leaf flag (read by fn_8039F7F4). */
+/* Huffman tree word: 7-bit symbol or child index, leaf flag (read by VP6_BuildHuffLookupTable). */
 struct Vp6HW {
     unsigned idx : 7;
     unsigned leaf : 1;
@@ -64,21 +64,21 @@ extern const unsigned char lbl_80608678[];
 
 extern "C" {
 
-void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride);
+void SatUnsigned8(unsigned char* dst, const short* src, int dstride, int sstride);
 void fn_80398614(void* p);
 void* fn_803985F4(int size, int flags);
-int fn_803A0EBC(Vp6Rc* rc);
-int fn_8039EF84(Vp6Rc* rc, int n);
-int fn_803A0E18(Vp6Rc* rc, unsigned prob);
-int fn_8039CC38(Vp6Ctx* c);
-void fn_8039C980(Vp6Ctx* c);
-int fn_8039E9E0(void* ctx);
-void fn_8039F264(Vp6Ctx* c);
-void fn_8039EFD4(Vp6Ctx* c);
-void fn_8039733C(Vp6Ctx* c, unsigned kind, int val);
-void fn_80396114(Vp6Buf* b, const Vp6Params* p);
-int fn_8039F0C0(Vp6Ctx* c);
-int fn_8039F2EC(Vp6Ctx* c, int n);
+int VP6_DecodeBool128(Vp6Rc* rc);
+int VP6_bitread(Vp6Rc* rc, int n);
+int VP6_DecodeBool(Vp6Rc* rc, unsigned prob);
+int VP6_decodeModeDiff(Vp6Ctx* c);
+void VP6_BuildModeTree(Vp6Ctx* c);
+int LoadFrameHeader(void* ctx);
+void VP6_DeleteFrameInfo(Vp6Ctx* c);
+void VP6_DeleteFragmentInfo(Vp6Ctx* c);
+void VP6_SetPbParam(Vp6Ctx* c, unsigned kind, int val);
+void ChangePostProcConfiguration(Vp6Buf* b, const Vp6Params* p);
+int VP6_AllocateFragmentInfo(Vp6Ctx* c);
+int VP6_AllocateFrameInfo(Vp6Ctx* c, int n);
 
 struct VpEnt {
     unsigned char m0;
@@ -107,7 +107,7 @@ struct VpCtxE {
 };
 
 /* near-miss: loop structure right, the k counter and table base registers are allocated differently. */
-void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
+void BuildScanOrder(Vp6ScanView* v, const unsigned char* order)
 {
     int n = 1;
     unsigned k;
@@ -133,7 +133,7 @@ void fn_8039B3E4(Vp6ScanView* v, const unsigned char* order)
     }
 }
 
-void fn_8039B47C(const unsigned char* p, int* out)
+void BoolTreeToHuffCodes(const unsigned char* p, int* out)
 {
     out[11] = ((unsigned)p[0] * p[1]) >> 8;
     out[0] = ((unsigned)p[0] * (255U - p[1])) >> 8;
@@ -158,7 +158,7 @@ void fn_8039B47C(const unsigned char* p, int* out)
     out[10] = (root * (255U - p[10])) >> 8;
 }
 
-void fn_8039B5D8(const unsigned char* p, int* out)
+void ZerosBoolTreeToHuffCodes(const unsigned char* p, int* out)
 {
     unsigned t;
     t = ((unsigned)p[0] * p[1]) >> 8;
@@ -179,7 +179,7 @@ void fn_8039B5D8(const unsigned char* p, int* out)
     out[8] = t;
 }
 
-void fn_8039BC28(Vp6Hdr* h)
+void VP6_ResetLeftContext(Vp6Hdr* h)
 {
     MEMSET_V(&h->mCC[0], 0, 0x10);
     MEMSET_V(&h->mCC[1], 0, 0x10);
@@ -195,7 +195,7 @@ void fn_8039BC28(Vp6Hdr* h)
     h->mCC[3].m8 = 4;
 }
 
-void fn_8039BCC8(VpCtxE* c)
+void VP6_ResetAboveContext(VpCtxE* c)
 {
     unsigned i = 0;
     if ((int)c->m1F8 != -8) {
@@ -237,56 +237,56 @@ void fn_8039BCC8(VpCtxE* c)
     }
 }
 
-int fn_8039CC38(Vp6Ctx* c)
+int VP6_decodeModeDiff(Vp6Ctx* c)
 {
     Vp6Rc* rc = &c->m150;
-    if (!fn_803A0E18(rc, 0xCD)) {
+    if (!VP6_DecodeBool(rc, 0xCD)) {
         return 0;
     }
-    int sign = fn_803A0EBC(rc) * -2 + 1;
-    if (!fn_803A0E18(rc, 0xAB)) {
-        return sign << (3 - fn_803A0E18(rc, 0x53));
+    int sign = VP6_DecodeBool128(rc) * -2 + 1;
+    if (!VP6_DecodeBool(rc, 0xAB)) {
+        return sign << (3 - VP6_DecodeBool(rc, 0x53));
     }
-    if (!fn_803A0E18(rc, 0xC7)) {
-        if (fn_803A0E18(rc, 0x8C)) {
+    if (!VP6_DecodeBool(rc, 0xC7)) {
+        if (VP6_DecodeBool(rc, 0x8C)) {
             return sign * 12;
         }
-        if (fn_803A0E18(rc, 0x7D)) {
+        if (VP6_DecodeBool(rc, 0x7D)) {
             return sign << 4;
         }
-        if (fn_803A0E18(rc, 0x68)) {
+        if (VP6_DecodeBool(rc, 0x68)) {
             return sign * 20;
         }
         return sign * 24;
     }
-    return (sign * fn_8039EF84(rc, 7)) << 2;
+    return (sign * VP6_bitread(rc, 7)) << 2;
 }
 
 /* near-miss: 82 vs 84 insns; the original code keeps separate copies of the two table base pointers. */
-void fn_8039CD38(Vp6Ctx* c)
+void VP6_DecodeModeProbs(Vp6Ctx* c)
 {
     Vp6Rc* rc = &c->m150;
     int i;
     int j;
     for (i = 0; i <= 2; i++) {
-        if (fn_803A0E18(rc, 0xAE)) {
-            int idx = fn_8039EF84(rc, 4);
+        if (VP6_DecodeBool(rc, 0xAE)) {
+            int idx = VP6_bitread(rc, 4);
             const unsigned char* src = lbl_80608678 + (idx * 0x14 + i * 0x140);
             for (j = 0; j < 10; j++) {
                 c->m72C[i].b[j] = src[j * 2];
                 c->m72C[i].a[j] = src[j * 2 + 1];
             }
         }
-        if (fn_803A0E18(rc, 0xFE)) {
+        if (VP6_DecodeBool(rc, 0xFE)) {
             for (j = 0; j <= 9; j++) {
-                int v = fn_8039CC38(c) + c->m72C[i].b[j];
+                int v = VP6_decodeModeDiff(c) + c->m72C[i].b[j];
                 if (v >= 0) {
                     if (v > 255) v = 255;
                     c->m72C[i].b[j] = v;
                 } else {
                     c->m72C[i].b[j] = 0;
                 }
-                v = fn_8039CC38(c) + c->m72C[i].a[j];
+                v = VP6_decodeModeDiff(c) + c->m72C[i].a[j];
                 if (v >= 0) {
                     if (v > 255) v = 255;
                     c->m72C[i].a[j] = v;
@@ -296,11 +296,11 @@ void fn_8039CD38(Vp6Ctx* c)
             }
         }
     }
-    fn_8039C980(c);
+    VP6_BuildModeTree(c);
 }
 
 /* near-miss: callee-saved registers are allocated in a different order (stride r28, rows r30 in the original code). */
-void fn_8039D058(unsigned char* src, unsigned char* dst, int cols, int rows, int stride)
+void CFastDeInterlace(unsigned char* src, unsigned char* dst, int cols, int rows, int stride)
 {
     int i;
     int j;
@@ -318,7 +318,7 @@ void fn_8039D058(unsigned char* src, unsigned char* dst, int cols, int rows, int
     MEMCPY_V(dst + stride, src + stride, cols);
 }
 
-void fn_8039E914(Vp6BitReader* br, const unsigned char* buf)
+void InitHeaderBuffer(Vp6BitReader* br, const unsigned char* buf)
 {
     br->m0 = buf;
     br->m4 = (buf[0] << 24) + (buf[1] << 16) + (buf[2] << 8) + buf[3];
@@ -326,7 +326,7 @@ void fn_8039E914(Vp6BitReader* br, const unsigned char* buf)
     br->mC = 4;
 }
 
-unsigned fn_8039E958(Vp6BitReader* br, unsigned n)
+unsigned ReadHeaderBits(Vp6BitReader* br, unsigned n)
 {
     unsigned hi = 0;
     const unsigned char* buf = br->m0;
@@ -348,25 +348,25 @@ unsigned fn_8039E958(Vp6BitReader* br, unsigned n)
     return hi | (cur >> (32 - n));
 }
 
-int fn_8039EF48(void* ctx)
+int VP6_LoadFrame(void* ctx)
 {
     int r = 1;
-    if (fn_8039E9E0(ctx) == 0) {
+    if (LoadFrameHeader(ctx) == 0) {
         r = 0;
     }
     return r;
 }
 
-int fn_8039EF84(Vp6Rc* br, int n)
+int VP6_bitread(Vp6Rc* br, int n)
 {
     int v = 0;
     for (int i = n - 1; i >= 0; i--) {
-        v |= fn_803A0EBC(br) << i;
+        v |= VP6_DecodeBool128(br) << i;
     }
     return v;
 }
 
-void fn_8039EFD4(Vp6Ctx* c)
+void VP6_DeleteFragmentInfo(Vp6Ctx* c)
 {
     if (c->m0) fn_80398614(c->m0);
     c->m0 = 0;
@@ -394,9 +394,9 @@ void fn_8039EFD4(Vp6Ctx* c)
     c->m6F0 = 0;
 }
 
-int fn_8039F0C0(Vp6Ctx* c)
+int VP6_AllocateFragmentInfo(Vp6Ctx* c)
 {
-    fn_8039EFD4(c);
+    VP6_DeleteFragmentInfo(c);
     c->m0 = fn_803985F4(0x320, 0);
     if (c->m0 != 0) {
         c->m4 = ((int)c->m0 + 0x1F) & ~0x1F;
@@ -430,11 +430,11 @@ int fn_8039F0C0(Vp6Ctx* c)
             }
         }
     }
-    fn_8039EFD4(c);
+    VP6_DeleteFragmentInfo(c);
     return 0;
 }
 
-void fn_8039F264(Vp6Ctx* c)
+void VP6_DeleteFrameInfo(Vp6Ctx* c)
 {
     if (c->m248) fn_80398614(c->m248);
     if (c->m250) fn_80398614(c->m250);
@@ -449,10 +449,10 @@ void fn_8039F264(Vp6Ctx* c)
     c->m260 = 0;
 }
 
-int fn_8039F2EC(Vp6Ctx* c, int n)
+int VP6_AllocateFrameInfo(Vp6Ctx* c, int n)
 {
     int size = n + 0x20;
-    fn_8039F264(c);
+    VP6_DeleteFrameInfo(c);
     c->m248 = fn_803985F4(c->m1B0.m8 + size, 0);
     if (c->m248 != 0) {
         c->m244 = ((int)c->m248 + 0x1F) & ~0x1F;
@@ -466,15 +466,15 @@ int fn_8039F2EC(Vp6Ctx* c, int n)
             }
         }
     }
-    fn_8039F264(c);
+    VP6_DeleteFrameInfo(c);
     return 0;
 }
 
 /* near-miss: 28 slots; same instruction count, the flag/total temporaries get other callee-saved registers. */
-int fn_8039F3A8(Vp6Ctx* c)
+int VP6_InitFrameDetails(Vp6Ctx* c)
 {
     if (c->m1A8 != 0) {
-        fn_8039733C(c, 1, c->m1A8);
+        VP6_SetPbParam(c, 1, c->m1A8);
     }
     unsigned w, h, pw, ph, cols, rows, mbs, ysize, lsize, q, total;
     w = c->m1B0.m0;
@@ -511,12 +511,12 @@ int fn_8039F3A8(Vp6Ctx* c)
     for (int i = 0; i < 12; i++) {
         c->m6A8[i] = lbl_80608AC8[i * 2] * c->m230 + lbl_80608AC8[i * 2 + 1];
     }
-    fn_80396114(c->m298, &c->m1B0);
-    if (!fn_8039F0C0(c)) {
+    ChangePostProcConfiguration(c->m298, &c->m1B0);
+    if (!VP6_AllocateFragmentInfo(c)) {
         return 0;
     }
-    if (!fn_8039F2EC(c, total)) {
-        fn_8039EFD4(c);
+    if (!VP6_AllocateFrameInfo(c, total)) {
+        VP6_DeleteFragmentInfo(c);
         return 0;
     }
     if (c->m264 == 0 && c->m23C != 0) {
@@ -534,7 +534,7 @@ void fn_8039F5BC(Vp6Ctx* c)
     c->m1B0.m14 = 8;
 }
 
-void fn_8039F5CC(Vp6Link* t, int idx, int* head)
+void InsertSorted(Vp6Link* t, int idx, int* head)
 {
     int cur = *head;
     int prev = cur;
@@ -551,7 +551,7 @@ void fn_8039F5CC(Vp6Link* t, int idx, int* head)
     }
 }
 
-void fn_8039F654(Vp6HEnt* tree, int* weights, int n)
+void VP6_BuildHuffTree(Vp6HEnt* tree, int* weights, int n)
 {
     Vp6Link nodes[64];
     int newIndex = 0;
@@ -570,7 +570,7 @@ void fn_8039F654(Vp6HEnt* tree, int* weights, int n)
     }
     newIndex = n;
     for (i = 1; i < n; i++) {
-        fn_8039F5CC(nodes, i, &head);
+        InsertSorted(nodes, i, &head);
     }
     while (nodes[head].next != -1) {
         int first = head;
@@ -585,12 +585,12 @@ void fn_8039F654(Vp6HEnt* tree, int* weights, int n)
         nodes[newIndex].key = sum;
         nodes[newIndex].next = -1;
         head = nodes[second].next;
-        fn_8039F5CC(nodes, newIndex, &head);
+        InsertSorted(nodes, newIndex, &head);
         newIndex++;
     }
 }
 
-void fn_8039F7F4(Vp6HEnt* t, unsigned short* out)
+void VP6_BuildHuffLookupTable(Vp6HEnt* t, unsigned short* out)
 {
     int i = 0;
     do {
@@ -628,7 +628,7 @@ int* fn_8039F94C(Vp6LimView* d, int n)
 }
 
 /* near-miss: same operations; the original code keeps the clip table address in r3 and picks other scratch registers. */
-void fn_8039F9F8(void* unused, unsigned char* p, int stride, const int* lim)
+void FilterHoriz_Generic(void* unused, unsigned char* p, int stride, const int* lim)
 {
     for (int i = 0; i < 8; i++) {
         int v = (p[0] - 3 * p[1] + 3 * p[2] - p[3] + 4) >> 3;
@@ -640,7 +640,7 @@ void fn_8039F9F8(void* unused, unsigned char* p, int stride, const int* lim)
 }
 
 /* near-miss: same operations; the original code keeps the clip table address in r3 and picks other scratch registers. */
-void fn_8039FA68(void* unused, unsigned char* p, int stride, const int* lim)
+void FilterVert_Generic(void* unused, unsigned char* p, int stride, const int* lim)
 {
     for (int i = 0; i < 8; i++) {
         int v = (p[-2 * stride] - 3 * p[-stride] + 3 * p[0] - p[stride] + 4) >> 3;
@@ -694,7 +694,7 @@ void fn_8039FBB0(int x, unsigned char* p, int stride)
 }
 
 /* In-range samples use their low byte in the big-endian short representation. */
-void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
+void SatUnsigned8(unsigned char* dst, const short* src, int dstride, int sstride)
 {
     int i;
     int v;
@@ -769,7 +769,7 @@ void fn_8039FE10(unsigned char* dst, const short* src, int dstride, int sstride)
     }
 }
 
-void fn_8039FF6C(short* tmp, unsigned char* dst, const unsigned char* a, const unsigned char* b, const short* res, int stride)
+void ScalarReconInterHalfPixel2(short* tmp, unsigned char* dst, const unsigned char* a, const unsigned char* b, const short* res, int stride)
 {
     short* t = tmp;
     int i;
@@ -787,10 +787,10 @@ void fn_8039FF6C(short* tmp, unsigned char* dst, const unsigned char* a, const u
         res += 8;
         t += 8;
     }
-    fn_8039FE10(dst, tmp, stride, 8);
+    SatUnsigned8(dst, tmp, stride, 8);
 }
 
-void fn_803A00A0(const void* src, unsigned n, void* dst)
+void HorizontalLine_Copy(const void* src, unsigned n, void* dst)
 {
     MEMCPY_V(dst, src, n);
 }
@@ -800,7 +800,7 @@ void fn_803A00D8()
 }
 
 /* near-miss: weights and structure as in the original code; load and multiply scheduling differ (67 vs 62 insns). */
-void fn_803A00DC(const unsigned char* src, unsigned n, unsigned char* dst)
+void HorizontalLine_4_5_Scale_C(const unsigned char* src, unsigned n, unsigned char* dst)
 {
     unsigned i;
     n -= 4;
@@ -825,7 +825,7 @@ void fn_803A00DC(const unsigned char* src, unsigned n, unsigned char* dst)
 }
 
 /* near-miss: 4 slots, order of the first two loads and multiplies. */
-void fn_803A01D4(unsigned char* p, int s, unsigned n)
+void VerticalBand_4_5_Scale_C(unsigned char* p, int s, unsigned n)
 {
     unsigned i;
     for (i = 0; i < n; i++) {
@@ -842,7 +842,7 @@ void fn_803A01D4(unsigned char* p, int s, unsigned n)
     }
 }
 
-void fn_803A0288(unsigned char* p, int s, unsigned n)
+void LastVerticalBand_4_5_Scale_C(unsigned char* p, int s, unsigned n)
 {
     unsigned i;
     for (i = 0; i < n; i++) {

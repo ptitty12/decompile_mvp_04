@@ -1070,7 +1070,7 @@ void fn_800403EC(void* p);
 void fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
 int fn_8005C654(Unk8005BA1C_Obj* o, int a, int b, int c);
 extern "C" void fn_803AB480(int h);
-extern "C" void fn_803ADA2C(int h, int v);
+extern "C" void SNDvol(int h, int v);
 
 void fn_8005AEB0(Unk8005ADD0_Obj* o, int ch);
 /* fn_80053C88 */
@@ -1137,8 +1137,8 @@ extern int lbl_80620548;
 int fn_8005A010(Unk8005BA1C_Voice* v, int a, int ch);
 void fn_8005A240(Unk8005BA1C_Voice* v);
 
-extern "C" void fn_80392AA4(int h);
-extern "C" void fn_80392A28(int h);
+extern "C" void SPCH_Choose(int h);
+extern "C" void SPCH_Play(int h);
 struct Unk800580D4_Rec {
     float m0;
     Unk8005C97C_Sub m4;

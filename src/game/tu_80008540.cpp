@@ -15,7 +15,7 @@
 extern "C" {
 void SISetSamplingRate(int);                      /* called once before the pads are created */
 void* fn_8040B320(void* dst, int val, unsigned int n);   /* memset */
-void* fn_803FFC58(void* dst, int val, unsigned int n);   /* memset */
+void* MEM_fill(void* dst, int val, unsigned int n);   /* memset */
 void PADRecalibrate(unsigned int mask);
 void PADControlMotor(int chan, int cmd);   /* motor control */
 }
@@ -55,8 +55,8 @@ Unk800085B0::Unk800085B0(int idx)
     m15F4 = 0.0f;
     m15F8 = 0;
     m15FC = 0;
-    fn_803FFC58(lbl_806E0210, 0, 0x30);
-    fn_803FFC58(lbl_806E0240, 0, 0x30);
+    MEM_fill(lbl_806E0210, 0, 0x30);
+    MEM_fill(lbl_806E0240, 0, 0x30);
     PADRecalibrate(lbl_805A3B18[m15DC]);
 }
 

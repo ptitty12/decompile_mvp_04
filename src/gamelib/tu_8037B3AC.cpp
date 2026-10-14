@@ -91,7 +91,7 @@ struct Unk8037BB0C_View {
 extern "C" Unk8037B3E8* fn_8037D680(int c, int hash, int a);
 
 extern "C" int fn_803EE310(void* o);
-extern "C" void fn_803FFA60(void* dst, const void* src, unsigned n);
+extern "C" void MEM_copy(void* dst, const void* src, unsigned n);
 extern "C" void fn_803EDA0C(void* p);
 
 /* View of the root class vtable with the true signatures of slots 5 and 7..9 (fn_8037C3F8). */
@@ -501,9 +501,9 @@ extern "C" void fn_8037C3F8(int hash, int a, int flag, Unk8037C3F8_View* obj)
                 obj->v7();
             obj->~Unk8037C3F8_View();
             int n = fn_803EE310(obj);
-            fn_803FFA60(obj, lbl_806E9684[idx], n);
+            MEM_copy(obj, lbl_806E9684[idx], n);
             void* v = ((Unk8037C3F8_View*)lbl_806E9684[idx])->v5();
-            fn_803FFA60(lbl_806E9684[idx], v, n);
+            MEM_copy(lbl_806E9684[idx], v, n);
             fn_803EDA0C(v);
             obj->v9();
         }
