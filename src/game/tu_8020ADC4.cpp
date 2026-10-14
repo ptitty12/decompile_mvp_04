@@ -157,15 +157,20 @@ struct Unk8020C4B4_J {
     int m41C;
 };
 
-extern "C" int fn_80259330(int x);
+struct Unk80256C80_M;
+struct Unk8017A930_T;
+int fn_80259330(Unk80256C80_M* self);
+/* defined void in tu_8025877C.cpp; retail tests r3 after the call, so the caller saw an int-returning
+   declaration (GCC 2.x mangling ignores the return type) */
+int fn_80259C50(Unk80256C80_M* self, int a);
 extern "C" int fn_8020C90C(Scr* p);
-extern "C" int fn_8017C94C(void* j);
+int fn_8017C94C(Unk8017A930_T* p);
 extern "C" void fn_8037893C(void* q, int id, Unk8020C4B4_Ev* e, int a, int b);
 
 extern "C" int fn_8020C4B4(Scr* s)
 {
     int r = 1;
-    if (fn_80259330(s->m0->m0->m700->m3B4) == 1) {
+    if (fn_80259330((Unk80256C80_M*)s->m0->m0->m700->m3B4) == 1) {
         int idx = fn_8020C90C(s);
         if (idx == -1)
             idx = 3;
@@ -176,7 +181,7 @@ extern "C" int fn_8020C4B4(Scr* s)
         e.Derived();
         e.m8 = idx;
         fn_8037893C((char*)s->m0->m0 + 0x704, e.m0, &e, 0, 0);
-    } else if (fn_8017C94C(s->m0->m0->m700) == 1) {
+    } else if (fn_8017C94C((Unk8017A930_T*)s->m0->m0->m700) == 1) {
         r = 0x44;
         Unk801EE438_Game* g = s->m0->m0->m6CC;
         if ((void*)g->m36C == ((Unk8020C4B4_Own*)s->m0->m0)->m660)
@@ -192,21 +197,21 @@ extern "C" int fn_8020C5F4(Scr* p)
     return 0x42;
 }
 
-/* near-miss (17 slots): retail computes idx*4 and loads the first table word inside each branch and
- * cross-jumps only the rest of the 16-byte copy; if/else struct assignment gets the right length
- * but schedules the copy differently. */
 extern "C" int fn_8020C5FC(Scr* p)
 {
     Unk801EE438_G* g = p->m0;
     int idx = g->mC88;
     if (idx == -1)
         idx = 1;
-    Unk8020C5FC_Tbl t;
-    if (g->mC8C == 1)
-        t = lbl_805D5950;
-    else
-        t = lbl_805D5960;
-    return t.m[idx];
+    int r;
+    if (g->mC8C == 1) {
+        Unk8020C5FC_Tbl t = lbl_805D5950;
+        r = t.m[idx];
+    } else {
+        Unk8020C5FC_Tbl t = lbl_805D5960;
+        r = t.m[idx];
+    }
+    return r;
 }
 
 /* near-miss (6 slots): saturating-decrement loop and volatile counter match; retail puts the final
@@ -219,7 +224,7 @@ extern "C" int fn_8020C90C(Scr* p)
     int h = p->m0->m0->m700->m3B4;
     int e;
     while (sp8 = t, e = sp8, e > 0) {
-        if (fn_80259C50(h, e) != 0) {
+        if (fn_80259C50((Unk80256C80_M*)h, e) != 0) {
             r = sp8;
             break;
         }
@@ -243,8 +248,6 @@ extern "C" int fn_8020C90C(Scr* p)
     return r;
 }
 
-/* near-miss: body matches except for register choice: retail copies p to r10 up front and loads the
- * three m65C[10..12] tests into r3; ours keeps p in r3 and loads into r0 (same shape as fn_8020C90C). */
 extern "C" int fn_8020C9CC(Scr* p, int* out)
 {
     volatile int sp8;
@@ -265,17 +268,21 @@ extern "C" int fn_8020C9CC(Scr* p, int* out)
         } while (e <= 2);
     }
     int r = 0;
-    if (p->m0->m0->m65C[10] != 0) {
+    Unk801EE438_Player* pl;
+    pl = p->m0->m0->m65C[10];
+    if (pl != 0) {
         r = 1;
         if (out != 0)
             out[0] = 1;
     }
-    if (p->m0->m0->m65C[11] != 0) {
+    pl = p->m0->m0->m65C[11];
+    if (pl != 0) {
         r = 2;
         if (out != 0)
             out[1] = 1;
     }
-    if (p->m0->m0->m65C[12] != 0) {
+    pl = p->m0->m0->m65C[12];
+    if (pl != 0) {
         r = 3;
         if (out != 0)
             out[2] = 1;
