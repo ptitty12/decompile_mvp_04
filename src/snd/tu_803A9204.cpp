@@ -20,7 +20,7 @@ extern const float lbl_80609598;
 extern "C" int fn_803B0798();
 extern "C" void iSNDserve();
 extern "C" void fn_803AB480(int handle);
-extern "C" void fn_803B41C8(int voice);
+extern "C" void iSNDcalcvol(int voice);
 extern "C" int fn_803AD2F0(void** pptp, SNDIPATCHHEADER* pph);
 extern "C" int SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER* pph, int a, int b);
 extern "C" void SNDBANKI_userdatacallback(SNDIPATCHHEADER* pph, int a);
@@ -181,7 +181,7 @@ extern "C" void SNDSYSI_100hzserver()
                 p->envpertick = ((e->targetvol << 16) - p->envvol) / p->envduration;
             }
             if (dirty) {
-                fn_803B41C8(i);
+                iSNDcalcvol(i);
                 Snd::Hal::SetVol(i);
             }
         }

@@ -118,7 +118,7 @@ struct Unk8069E200 {
 extern Unk8069E200 lbl_8069E200;
 
 extern "C" void SNDSYS_linkmaincpumixer();
-extern "C" void fn_803B5ACC();
+extern "C" void SNDARAM_restore();
 extern "C" int AXRegisterAuxACallback(int a, int b);
 extern "C" void OSCancelThread(void* p);
 extern "C" void fn_80417808();
@@ -233,7 +233,7 @@ extern "C" int SNDSYS_vectortoreal()
     return 0;
 }
 
-extern "C" void fn_803B41C8(int voice);
+extern "C" void iSNDcalcvol(int voice);
 extern int lbl_80625448;
 
 extern "C" int SNDvol(int shandle, int vol)
@@ -252,7 +252,7 @@ extern "C" int SNDvol(int shandle, int vol)
                 p->fadePer100Hz = 0.0f;
                 if (p->programmedVol != v) {
                     p->programmedVol = v;
-                    fn_803B41C8(vc);
+                    iSNDcalcvol(vc);
                     changed = 1;
                     Snd::Hal::SetVol(vc);
                 }
@@ -827,7 +827,7 @@ extern "C" int SNDPLATFORM_restore()
     AXRegisterAuxACallback(0, 0);
     if (lbl_8069E200.mC048 != 0)
         SNDDRV_restoremixer();
-    fn_803B5ACC();
+    SNDARAM_restore();
     if (sndgs.incritical != 0) {
         do {
             SNDSYS_leavecritical();

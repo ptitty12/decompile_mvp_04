@@ -10,8 +10,8 @@
 
 extern "C" void SNDSYS_entercritical();
 extern "C" void SNDSYS_leavecritical();
-extern "C" float fn_803B44E4(float x);
-extern "C" float fn_803B457C(float x);
+extern "C" float SNDI_cos(float x);
+extern "C" float SNDI_sin(float x);
 extern unsigned char* lbl_806AA4E8[];
 extern void* lbl_806AA4E4;
 extern unsigned char lbl_806262F4[];
@@ -85,13 +85,13 @@ extern void (*lbl_806AA2D8)(int);
 
 extern "C" void MIX_stop(int idx);
 
-extern "C" void fn_803B5F9C(Unk803B21EC_Node** head, void* node);
-extern "C" void fn_803B65BC(void* obj);
-extern "C" void fn_803B65FC(void* obj, int* buf);
+extern "C" void SFILTER_add(Unk803B21EC_Node** head, void* node);
+extern "C" void SFILTER_createLPFRC(void* obj);
+extern "C" void SFILTER_modifyLPFRC(void* obj, int* buf);
 extern unsigned short lbl_8069C8A2;
-extern "C" void fn_803B6004(Unk803B21EC_Node** head, void* node);
-extern "C" void fn_803B5EC4(void* obj);
-extern "C" void fn_803B5F18(void* obj, int* buf);
+extern "C" void SFILTER_remove(Unk803B21EC_Node** head, void* node);
+extern "C" void SFILTER_createHPFFIR8(void* obj);
+extern "C" void SFILTER_modifyHPFFIR8(void* obj, int* buf);
 extern "C" void fn_803B31B4(Unk803B31B4* obj, int v);
 
 struct Unk803B3334;
@@ -122,8 +122,8 @@ struct Unk803B3334 {
 };
 
 extern "C" int SNDDRV_getmastervoice(int v);
-extern "C" int fn_803B4BEC(int v);
-extern "C" int fn_803B3F60(const unsigned char* p, int n);
+extern "C" int SNDPKTPLAYI_voicetopackethandle(int v);
+extern "C" int SNDI_getb(const unsigned char* p, int n);
 extern "C" int determineaction(int n, unsigned char** pp, float* ps, float x);
 extern "C" int SFILTER_timestretch(Unk803B3334* o, int count, float* src, float* dst);
 extern "C" int stretchframesneeded(Unk803B3334* o, int count);
@@ -133,7 +133,7 @@ extern int lbl_8069CBC0;
 
 extern "C" void SNDPLATFORM_filteradd(int voice, int v);
 
-extern "C" void fn_803B69AC(Unk803B27DC_Obj* o, int a, int flag);
+extern "C" void SFILTER_rsfinit(Unk803B27DC_Obj* o, int a, int flag);
 extern "C" void fn_803B66CC(Unk803B27DC_Obj* o, int v);
 extern unsigned char lbl_8069C9EB;
 
@@ -183,7 +183,7 @@ extern "C" void MIX_filteradd(int idx, int a, Unk803B270C_Desc* d)
     n->m0 = d->m10;
     n->m4 = d->m14;
     n->m1A = 0;
-    fn_803B5F9C(&e->m40, n);
+    SFILTER_add(&e->m40, n);
 }
 
 extern "C" int MIX_getframe(int idx)
@@ -203,15 +203,15 @@ extern "C" void MIX_sethighpass(int idx, int n)
             o->m4 = 0;
             e->m58->m18 = 0x50;
             e->m58->m1A = 0;
-            fn_803B5EC4(e->m58);
-            fn_803B5F9C(&e->m40, e->m58);
+            SFILTER_createHPFFIR8(e->m58);
+            SFILTER_add(&e->m40, e->m58);
         }
         int buf[2];
         buf[0] = n << 8;
         buf[1] = sndgs.sso.set.outputrate << 8;
-        fn_803B5F18(e->m58, buf);
+        SFILTER_modifyHPFFIR8(e->m58, buf);
     } else if (e->m58 != 0) {
-        fn_803B6004(&e->m40, e->m58);
+        SFILTER_remove(&e->m40, e->m58);
         SNDMEMI_free(e->m58);
         e->m58 = 0;
     }
@@ -227,8 +227,8 @@ extern "C" void MIX_setlowpass(int idx, float v)
             o->m4 = 0;
             e->m54->m18 = 0x28;
             e->m54->m1A = 0;
-            fn_803B65BC(e->m54);
-            fn_803B5F9C(&e->m40, e->m54);
+            SFILTER_createLPFRC(e->m54);
+            SFILTER_add(&e->m40, e->m54);
         }
         int buf[3];
         float t;
@@ -237,9 +237,9 @@ extern "C" void MIX_setlowpass(int idx, float v)
         int r = (int)(t >= 0.0f ? t + 0.5f : t - 0.5f);
         buf[0] = r << 7;
         buf[2] = 0x100;
-        fn_803B65FC(e->m54, buf);
+        SFILTER_modifyLPFRC(e->m54, buf);
     } else if (e->m54 != 0) {
-        fn_803B6004(&e->m40, e->m54);
+        SFILTER_remove(&e->m40, e->m54);
         SNDMEMI_free(e->m54);
         e->m54 = 0;
     }
@@ -260,8 +260,8 @@ extern "C" void MIX_setpitch(int idx, int v)
         o->m4 = 0;
         e->m50->m18 = 0xa0;
         e->m50->m1A = 0;
-        fn_803B69AC(e->m50, lbl_8069C9EB, big);
-        fn_803B5F9C(&e->m40, e->m50);
+        SFILTER_rsfinit(e->m50, lbl_8069C9EB, big);
+        SFILTER_add(&e->m40, e->m50);
     }
     fn_803B66CC(e->m50, v);
 }
@@ -478,14 +478,14 @@ extern "C" int SFILTER_timestretchinit(Unk803B3334* o, unsigned char* p, int v)
     o->m0 = (void*)SFILTER_timestretch;
     o->m4 = (void*)fn_803B3334;
     if (v >= 0)
-        o->m20 = fn_803B4BEC(SNDDRV_getmastervoice(v));
+        o->m20 = SNDPKTPLAYI_voicetopackethandle(SNDDRV_getmastervoice(v));
     else
         o->m20 = -1;
     o->m1C = p + 6;
     o->m24 = 1.0f;
     o->m28 = 0.0f;
     o->m2C = p[1] * 2;
-    o->m30 = fn_803B3F60(p + 2, 4);
+    o->m30 = SNDI_getb(p + 2, 4);
     o->m1830 = 0xabc;
     o->m34 = 0;
     o->m38 = 0;
@@ -509,8 +509,8 @@ extern "C" void SNDI_equalpower(float* out, float a, float b, float c)
     float y = c * 0.0174532942f - bk;
     y = y / x;
     y = y * 1.5707964f;
-    out[0] = fn_803B457C(y);
-    out[1] = fn_803B44E4(y);
+    out[0] = SNDI_sin(y);
+    out[1] = SNDI_cos(y);
 }
 
 extern "C" void SNDI_aztospkrvol(unsigned int idx, float* out)

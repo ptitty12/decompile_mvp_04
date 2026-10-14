@@ -18,8 +18,8 @@ extern int lbl_80625448;
 extern "C" int fn_803AB9F0(int h, int ch, float vol);
 
 extern "C" void* SNDSTRMI_getrequestptr(int h);
-extern "C" void fn_803B43FC(SNDLINKLIST* list, void* node);
-extern "C" void fn_803B4344(SNDLINKLIST* list, void* node);
+extern "C" void SNDLINKI_remove(SNDLINKLIST* list, void* node);
+extern "C" void SNDLINKI_push(SNDLINKLIST* list, void* node);
 extern "C" void fn_803FE7E0(int handle, void* p);
 extern "C" int fn_803AA95C(int h);
 /* near-miss: 60 vs 70 insns: retail keeps both arms of the `if (req->isgeneric)` tests (numframes load and the psamples loop) as separate code with different temporaries, presumably an endian-conversion macro that expands to the same value in both arms; ours merges the arms. temp-variable variants tried */
@@ -41,8 +41,8 @@ extern void* lbl_8069CA44;
 extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type);
 extern "C" int fn_803FDEC0(int sh, void* a, void* b, int tag);
 extern "C" int fn_803FDFB4(int sh, void* a, int b, int tag);
-extern "C" void fn_803B4380(SNDLINKLIST* list, void* node);
-extern "C" void* fn_803B43BC(SNDLINKLIST* list);
+extern "C" void SNDLINKI_pushtail(SNDLINKLIST* list, void* node);
+extern "C" void* SNDLINKI_pop(SNDLINKLIST* list);
 extern "C" void fn_803B3EA8(int shandle, int ch, int level);
 
 /* Average data rate of a sample format (bytes per second). */
@@ -112,8 +112,8 @@ extern "C" void SNDSTRMI_removerequest(int h)
 {
     SNDSTREAMCHANNEL* pssc = lbl_8069CADC.pssc[(unsigned char)h];
     void* req = SNDSTRMI_getrequestptr(h);
-    fn_803B43FC(&pssc->allocatedrequests, req);
-    fn_803B4344(&pssc->freerequests, req);
+    SNDLINKI_remove(&pssc->allocatedrequests, req);
+    SNDLINKI_push(&pssc->freerequests, req);
     if (pssc->parsingrequest == req)
         pssc->parsingrequest = 0;
 }
@@ -287,9 +287,9 @@ extern "C" int fn_803AA810(int h, int holdtime, void* a, void* b, int type)
         SNDSYS_leavecritical();
         return -1;
     }
-    Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)fn_803B43BC(&pssc->freerequests);
+    Snd::SNDSTREAMREQUEST* r = (Snd::SNDSTREAMREQUEST*)SNDLINKI_pop(&pssc->freerequests);
     memset(r, 0, 0x28);
-    fn_803B4380(&pssc->allocatedrequests, r);
+    SNDLINKI_pushtail(&pssc->allocatedrequests, r);
     r->streamrequestid = (int)b;
     pssc->lastsndrequesthandle += 0x100;
     if (pssc->lastsndrequesthandle < 0)
@@ -357,9 +357,9 @@ extern "C" int fn_803AAA3C(int h)
     }
     void* node;
 again:
-    node = fn_803B43BC(&pssc->allocatedrequests);
+    node = SNDLINKI_pop(&pssc->allocatedrequests);
     if (node != 0) {
-        fn_803B4344(&pssc->freerequests, node);
+        SNDLINKI_push(&pssc->freerequests, node);
         goto again;
     }
     pssc->parsingrequest = 0;

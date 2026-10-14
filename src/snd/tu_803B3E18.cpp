@@ -47,7 +47,7 @@ extern "C" int fn_803B3EA8(int shandle, int ch, int level)
 }
 
 /* Big-endian n-byte read, sign-extended for 1-3 bytes; a plain while (rem-- != 0) gives retail's rotated loop. */
-extern "C" int fn_803B3F60(const unsigned char* p, int n)
+extern "C" int SNDI_getb(const unsigned char* p, int n)
 {
     int v = 0;
     int rem = n;

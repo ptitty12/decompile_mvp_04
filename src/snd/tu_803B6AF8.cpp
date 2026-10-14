@@ -44,7 +44,7 @@ void fn_803B9478(int, void*, int, int);
 int fn_803B9508(int, float**, int);
 void SNDDRV_getmastervoice(int, void*);
 char SNDDRV_getsamplechan(int);
-int fn_803B4BEC();
+int SNDPKTPLAYI_voicetopackethandle();
 void fn_803B5738(int, unsigned char, int);
 char* fn_803B54FC(int, unsigned char, void*, void*);
 void* fn_803B8214(int);
@@ -63,8 +63,8 @@ struct SndHal {
 };
 extern SndHal lbl_806AA2D4;
 
-/* fn_803B6AF8: dst[i] = src[i] * gain + dst[i] */
-extern "C" void fn_803B6AF8(int n, float* src, float* dst, float gain)
+/* mixc: dst[i] = src[i] * gain + dst[i] */
+extern "C" void mixc(int n, float* src, float* dst, float gain)
 {
     int i;
     for (i = 0; i < n; i++)
@@ -86,7 +86,7 @@ extern "C" int fn_803B6B28(SndRdA* r)
     return r->m20;
 }
 
-extern "C" int fn_803B6B30(SndRdA* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackf(SndRdA* r, int n, int unused, float* dst)
 {
     unsigned pos = r->m20;
     unsigned end = r->m24;
@@ -116,9 +116,9 @@ struct SndRdA2 {
     int m2C;
 };
 
-extern "C" void fn_803B6C08(SndRdA* r, SndSrc* s)
+extern "C" void SFILTER_unpackfinit(SndRdA* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B6B30;
+    r->m0 = (void*)SFILTER_unpackf;
     r->m1C = (short*)s->m0;
     r->m20 = 0;
     r->m24 = s->mC;
@@ -132,7 +132,7 @@ extern "C" int fn_803B6C48(SndRdA2* r)
     return r->m20;
 }
 
-extern "C" int fn_803B6C50(SndRdA2* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpacklf(SndRdA2* r, int n, int unused, float* dst)
 {
     if (n > 0) {
         SndHal* hal = &lbl_806AA2D4;
@@ -153,9 +153,9 @@ extern "C" int fn_803B6C50(SndRdA2* r, int n, int unused, float* dst)
     return 1;
 }
 
-extern "C" void fn_803B6D0C(SndRdA2* r, SndSrc* s)
+extern "C" void SFILTER_unpacklfinit(SndRdA2* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B6C50;
+    r->m0 = (void*)SFILTER_unpacklf;
     r->m1C = (short*)s->m0;
     r->m20 = 0;
     r->m24 = s->m10;
@@ -180,7 +180,7 @@ extern "C" int fn_803B6D50(SndRdC* r)
 }
 
 /* Early return: the jump pass places `li r3,-1` between the compare and the branch, as in retail. */
-extern "C" int fn_803B6D58(SndRdC* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackmtf(SndRdC* r, int n, int unused, float* dst)
 {
     float* d = dst;
     if (r->m20 >= r->m1C)
@@ -201,9 +201,9 @@ extern "C" void fn_803B6DE8(SndRdC* r)
         fn_803B84F8(r->m28);
 }
 
-extern "C" void fn_803B6E14(SndRdC* r, SndSrc* s)
+extern "C" void SFILTER_unpackmtfinit(SndRdC* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B6D58;
+    r->m0 = (void*)SFILTER_unpackmtf;
     r->m1C = s->mC;
     r->m20 = 0;
     r->m24 = s->m24;
@@ -239,7 +239,7 @@ extern "C" int fn_803B6F14(SndRdD* r)
     return r->m20;
 }
 
-extern "C" int fn_803B6F1C(SndRdD* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackmtlf(SndRdD* r, int n, int unused, float* dst)
 {
     float* d = dst;
     if (n > 0) {
@@ -269,9 +269,9 @@ extern "C" void fn_803B6FE4(SndRdD* r)
         fn_803B84F8(r->m1C);
 }
 
-extern "C" void fn_803B7010(SndRdD* r, SndSrc* s)
+extern "C" void SFILTER_unpackmtlfinit(SndRdD* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B6F1C;
+    r->m0 = (void*)SFILTER_unpackmtlf;
     r->m4 = (void*)fn_803B6FE4;
     r->m2C = (void*)s->m4;
     r->m20 = 0;
@@ -288,7 +288,7 @@ extern "C" void fn_803B7010(SndRdD* r, SndSrc* s)
     s->m28 = (void*)fn_803B6F14;
 }
 
-/* family E: fn_803B70F0 / fn_803B7348 / fn_803B7374 */
+/* family E: SFILTER_unpackmtpf / fn_803B7348 / SFILTER_unpackmtpfinit */
 struct SndRdE {
     void* m0;
     void* m4;
@@ -303,9 +303,9 @@ struct SndRdE {
     unsigned char m38;
 };
 
-extern "C" int fn_803B70F0(SndRdE* r, int n, int unused, float* dst);
+extern "C" int SFILTER_unpackmtpf(SndRdE* r, int n, int unused, float* dst);
 
-extern "C" int fn_803B70F0(SndRdE* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackmtpf(SndRdE* r, int n, int unused, float* dst)
 {
     SndT3 t;
     SndT3 tmp;
@@ -377,11 +377,11 @@ extern "C" void fn_803B7348(SndRdE* r)
         fn_803B84F8(r->m34);
 }
 
-extern "C" void fn_803B7374(SndRdE* r, SndSrc* s)
+extern "C" void SFILTER_unpackmtpfinit(SndRdE* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B70F0;
+    r->m0 = (void*)SFILTER_unpackmtpf;
     SNDDRV_getmastervoice(s->m1C, s);
-    r->m24 = fn_803B4BEC();
+    r->m24 = SNDPKTPLAYI_voicetopackethandle();
     r->m38 = SNDDRV_getsamplechan(s->m1C);
     r->m1C = 0;
     r->m2C = 0;
@@ -392,7 +392,7 @@ extern "C" void fn_803B7374(SndRdE* r, SndSrc* s)
     r->m28 = 0;
 }
 
-/* family F: fn_803B7404 / fn_803B7534 */
+/* family F: SFILTER_unpackpf / SFILTER_unpackpfinit */
 struct SndRdF {
     void* m0;
     void* m4;
@@ -406,7 +406,7 @@ struct SndRdF {
     unsigned char m31;
 };
 
-extern "C" int fn_803B7404(SndRdF* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackpf(SndRdF* r, int n, int unused, float* dst)
 {
     int sp8;
     int spC;
@@ -442,11 +442,11 @@ extern "C" int fn_803B7404(SndRdF* r, int n, int unused, float* dst)
     return r->m2C;
 }
 
-extern "C" void fn_803B7534(SndRdF* r, SndSrc* s)
+extern "C" void SFILTER_unpackpfinit(SndRdF* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B7404;
+    r->m0 = (void*)SFILTER_unpackpf;
     SNDDRV_getmastervoice(s->m1C, s);
-    r->m28 = fn_803B4BEC();
+    r->m28 = SNDPKTPLAYI_voicetopackethandle();
     r->m31 = SNDDRV_getsamplechan(s->m1C);
     r->m20 = -1;
     r->m1C = 0;
@@ -455,7 +455,7 @@ extern "C" void fn_803B7534(SndRdF* r, SndSrc* s)
     r->m2C = 0;
 }
 
-/* family G: fn_803B75A8 / fn_803B763C / fn_803B7644 / fn_803B7670 */
+/* family G: SFILTER_unpackxaf / fn_803B763C / fn_803B7644 / SFILTER_unpackxafinit */
 struct SndRdG {
     void* m0;
     void* m4;
@@ -466,8 +466,8 @@ struct SndRdG {
     int m28;
 };
 
-/* -1 assigned in the else arm: the jump pass places `li r3,-1` before the branch, as in retail (cf. fn_803B6D58). */
-extern "C" int fn_803B75A8(SndRdG* r, int n, int unused, float* dst)
+/* -1 assigned in the else arm: the jump pass places `li r3,-1` before the branch, as in retail (cf. SFILTER_unpackmtf). */
+extern "C" int SFILTER_unpackxaf(SndRdG* r, int n, int unused, float* dst)
 {
     int ret;
     float* d = dst;
@@ -498,9 +498,9 @@ extern "C" void fn_803B7644(SndRdG* r)
         fn_803B8240(r->m1C);
 }
 
-extern "C" void fn_803B7670(SndRdG* r, SndSrc* s)
+extern "C" void SFILTER_unpackxafinit(SndRdG* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B75A8;
+    r->m0 = (void*)SFILTER_unpackxaf;
     r->m4 = (void*)fn_803B7644;
     r->m20 = (float*)s->m0;
     r->m24 = s->mC;
@@ -510,7 +510,7 @@ extern "C" void fn_803B7670(SndRdG* r, SndSrc* s)
     fn_803B8294(r->m1C, r->m20, r->m24 * 4, r->m24);
 }
 
-/* family H: fn_803B7700 / fn_803B7988 / fn_803B7990 / fn_803B79BC */
+/* family H: SFILTER_unpackxalf / fn_803B7988 / fn_803B7990 / SFILTER_unpackxalfinit */
 struct SndRdH {
     void* m0;
     void* m4;
@@ -533,7 +533,7 @@ struct SndRdH {
 
 
 /* near-miss: 4 instructions differ (r0/r9 swap in the `d += k` pointer update after the first-frame read) */
-extern "C" int fn_803B7700(SndRdH* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackxalf(SndRdH* r, int n, int unused, float* dst)
 {
     float buf[30];
     float* d = dst;
@@ -613,9 +613,9 @@ extern "C" void fn_803B7990(SndRdH* r)
         fn_803B8240(r->m1C);
 }
 
-extern "C" void fn_803B79BC(SndRdH* r, SndSrc* s)
+extern "C" void SFILTER_unpackxalfinit(SndRdH* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B7700;
+    r->m0 = (void*)SFILTER_unpackxalf;
     r->m4 = (void*)fn_803B7990;
     r->m2C = (float*)s->m4;
     r->m20 = 0;
@@ -636,7 +636,7 @@ extern "C" void fn_803B79BC(SndRdH* r, SndSrc* s)
     fn_803B8294(r->m1C, s->m0, r->m24 * 4, r->m24);
 }
 
-/* family I: fn_803B7A94 / fn_803B7C4C / fn_803B7C78 */
+/* family I: SFILTER_unpackxapf / fn_803B7C4C / SFILTER_unpackxapfinit */
 struct SndRdI {
     void* m0;
     void* m4;
@@ -652,7 +652,7 @@ struct SndRdI {
 };
 
 
-extern "C" int fn_803B7A94(SndRdI* r, int n, int unused, float* dst)
+extern "C" int SFILTER_unpackxapf(SndRdI* r, int n, int unused, float* dst)
 {
     float* d = dst;
     int flag;
@@ -703,12 +703,12 @@ extern "C" void fn_803B7C4C(SndRdI* r)
         fn_803B8240(r->m1C);
 }
 
-extern "C" void fn_803B7C78(SndRdI* r, SndSrc* s)
+extern "C" void SFILTER_unpackxapfinit(SndRdI* r, SndSrc* s)
 {
-    r->m0 = (void*)fn_803B7A94;
+    r->m0 = (void*)SFILTER_unpackxapf;
     r->m4 = (void*)fn_803B7C4C;
     SNDDRV_getmastervoice(s->m1C, s);
-    r->m30 = fn_803B4BEC();
+    r->m30 = SNDPKTPLAYI_voicetopackethandle();
     r->m38 = SNDDRV_getsamplechan(s->m1C);
     r->m2C = s->m24;
     r->m20 = 0;

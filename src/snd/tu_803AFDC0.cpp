@@ -13,8 +13,8 @@ extern "C" void OSInitMutex(void* p);
 
 extern char lbl_806AA030[];
 
-extern "C" void fn_803B5D30(int a);
-extern "C" void* fn_803B5B6C(int a);
+extern "C" void SNDARAM_free(int a);
+extern "C" void* SNDARAM_alloc(int a);
 extern "C" void DCFlushRange(int a, int b);
 extern "C" void SNDDRV_dmapost(int a, int b, int c, int d, int e);
 extern int* lbl_806AA2C4;
@@ -69,7 +69,7 @@ extern "C" void MIX_create();
 extern "C" void MIX_destroy();
 extern "C" void MIX_audioslice();
 extern "C" void MIX_playinit(int slot, int kind, int mode, int a3, int a4, int a5, int a6, int a7, int p8, int p9, int p10, int p11, int p12, int p13);
-extern "C" void fn_803B5F9C(void* head, void* node);
+extern "C" void SFILTER_add(void* head, void* node);
 extern "C" int SFILTER_timestretchinit(void* obj, int a, int b);
 extern unsigned char lbl_8069C9EB;
 /* near-miss: 41 insns, identical except scratch register choice for the early li 0 / lis constants (retail: li r11,0 right after the lwz; ours li r0,0 after the lfs); statement-order variants tried */
@@ -84,7 +84,7 @@ extern void* lbl_806AA4D8;
 extern void* lbl_806AA4DC;
 extern void* lbl_806AA4E0;
 
-extern "C" void fn_803B6AF8();
+extern "C" void mixc();
 extern "C" void decode16x87();
 
 struct Unk803B18C0_B4 {
@@ -326,13 +326,13 @@ extern "C" void* fn_803B1118(int unused, int size)
     size = (size + 0x1f) & ~0x1f;
     if (sndgs.sso.vec.aramalloc != 0)
         return (void*)sndgs.sso.vec.aramalloc(size);
-    return fn_803B5B6C(size);
+    return SNDARAM_alloc(size);
 }
 
 extern "C" int fn_803B115C(int unused, int p)
 {
     if (sndgs.sso.vec.aramfree == 0)
-        fn_803B5D30(p);
+        SNDARAM_free(p);
     else
         sndgs.sso.vec.aramfree(p);
     return 0;
@@ -574,7 +574,7 @@ extern "C" void MIX_destroy()
 
 extern "C" void fn_803B1EC8()
 {
-    lbl_806AA2D4.m1E0 = (void*)fn_803B6AF8;
+    lbl_806AA2D4.m1E0 = (void*)mixc;
     lbl_806AA2D4.m1E4 = (void*)decode16x87;
     lbl_806AA2D4.mC = 0x140;
 }
@@ -628,7 +628,7 @@ extern "C" void MIX_playinit(int slot, int kind, int mode, int a3, int a4, int a
         e->m48->m1A = p13;
         ((void (*)(void*, void*))lbl_806AA2D4.m18[k][idx])(e->m48, &args);
         e->m44 = args.m28;
-        fn_803B5F9C(&e->m40, e->m48);
+        SFILTER_add(&e->m40, e->m48);
     }
     if (a5 != 0) {
         if (mode != 0)
@@ -638,7 +638,7 @@ extern "C" void MIX_playinit(int slot, int kind, int mode, int a3, int a4, int a
         e->m4C->m18 = 0xC8;
         e->m4C->m1A = p13;
         SFILTER_timestretchinit(e->m4C, a5, slot);
-        fn_803B5F9C(&e->m40, e->m4C);
+        SFILTER_add(&e->m40, e->m4C);
     }
     e->m0 = 1;
 }

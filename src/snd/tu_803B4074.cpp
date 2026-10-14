@@ -24,9 +24,9 @@ struct Unk803B4074_Parser {
     unsigned int m10;
 };
 
-extern "C" int fn_803B3F60(const unsigned char* p, int n);
+extern "C" int SNDI_getb(const unsigned char* p, int n);
 
-extern "C" int fn_803B4074(Unk803B4074_Parser* s)
+extern "C" int SNDI_gettag(Unk803B4074_Parser* s)
 {
     int c;
     while (*s->m0 == 0xFC)
@@ -42,13 +42,13 @@ extern "C" int fn_803B4074(Unk803B4074_Parser* s)
         return 1;
     s->m10 = *s->m0;
     if (s->m10 == 0xFF) {
-        s->m10 = fn_803B3F60(s->m0 + 1, 4);
+        s->m10 = SNDI_getb(s->m0 + 1, 4);
         s->m0 = s->m0 + 4;
     }
     s->m0 = s->m0 + 1;
     s->mC = s->m0;
     if (s->m10 <= 4)
-        s->m8 = fn_803B3F60(s->m0, s->m10);
+        s->m8 = SNDI_getb(s->m0, s->m10);
     s->m0 = s->m0 + s->m10;
     return 1;
 }
@@ -84,7 +84,7 @@ struct Unk803B41C8_Ch {
 };
 extern Unk803B41C8_Ch* lbl_8069CA48;
 
-extern "C" void fn_803B41C8(int ch)
+extern "C" void iSNDcalcvol(int ch)
 {
     Unk803B41C8_Ch* pv = &lbl_8069CA48[ch];
     float v = (float)pv->m2B * pv->m38 * (float)pv->m40 * 6.200012e-05f;
@@ -106,7 +106,7 @@ extern "C" void fn_803B4330(SNDLINKLIST* list)
     list->items = 0;
 }
 
-extern "C" void fn_803B4344(SNDLINKLIST* list, SNDLINKNODE* node)
+extern "C" void SNDLINKI_push(SNDLINKLIST* list, SNDLINKNODE* node)
 {
     SNDLINKNODE* head = list->phead;
     node->pprev = 0;
@@ -119,7 +119,7 @@ extern "C" void fn_803B4344(SNDLINKLIST* list, SNDLINKNODE* node)
     list->items++;
 }
 
-extern "C" void fn_803B4380(SNDLINKLIST* list, SNDLINKNODE* node)
+extern "C" void SNDLINKI_pushtail(SNDLINKLIST* list, SNDLINKNODE* node)
 {
     node->pnext = 0;
     node->pprev = list->ptail;
@@ -131,7 +131,7 @@ extern "C" void fn_803B4380(SNDLINKLIST* list, SNDLINKNODE* node)
     list->items++;
 }
 
-extern "C" SNDLINKNODE* fn_803B43BC(SNDLINKLIST* list)
+extern "C" SNDLINKNODE* SNDLINKI_pop(SNDLINKLIST* list)
 {
     SNDLINKNODE* node = list->phead;
     if (node != 0) {
@@ -145,7 +145,7 @@ extern "C" SNDLINKNODE* fn_803B43BC(SNDLINKLIST* list)
     return node;
 }
 
-extern "C" void fn_803B43FC(SNDLINKLIST* list, SNDLINKNODE* node)
+extern "C" void SNDLINKI_remove(SNDLINKLIST* list, SNDLINKNODE* node)
 {
     if (node == list->phead)
         list->phead = node->pnext;
@@ -170,7 +170,7 @@ extern "C" int fn_803B445C(int shandle, int cutoff)
     return voice;
 }
 
-extern "C" float fn_803B44E4(float x)
+extern "C" float SNDI_cos(float x)
 {
     while (x > 6.2831855f)
         x -= 6.2831855f;
@@ -183,7 +183,7 @@ extern "C" float fn_803B44E4(float x)
     return x12 * 2.0876758e-09f + (x8 * 2.4801588e-05f + ((x4 * 0.041666668f + (1.0f - x2 * 0.5f)) - x6 * 0.0013888889f) - x10 * 2.755732e-07f);
 }
 
-extern "C" float fn_803B457C(float x)
+extern "C" float SNDI_sin(float x)
 {
     while (x > 6.2831855f)
         x -= 6.2831855f;
