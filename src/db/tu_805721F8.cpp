@@ -200,6 +200,139 @@ zero:
 }
 
 /* near-miss: 5 slots; same code, float registers f12/f13 swapped in the select */
+extern const float lbl_805FFE50;
+extern "C" int rand(void);
+struct Db80572CB0_Pri {
+    int v[5];
+};
+extern Db80572CB0_Pri lbl_805FFE3C;
+extern char lbl_8064B298[];
+extern "C" int fn_805730F4(DbMgr* self, int k, void* ring, int idx, int flag);
+extern "C" void fn_8056CAC4(void* o, int a, int b, int c);
+extern "C" void fn_8009984C(void* team, int a, int b, int c, int d, int e);
+/* Small id ring (data, count, capacity, cursor, vptr slot at +0x10). */
+struct Db80572CB0_R {
+    int* m0;
+    unsigned m4;
+    int m8;
+    int mC;
+    const void* vp;
+};
+/* K3: picks a replacement (pitcher) for the side to act: sums the two teams' 128-byte tables at +0x1B4, tries the candidate kinds in a
+ * priority order (fn_805730F4 fills `ring` with ids), then draws one of the ring entries with rand() % count and applies it
+ * (fn_8056CAC4 / fn_8009984C). Returns 1 when something was chosen. near-miss: 95.0%; same structure, the callee-saved registers of
+ * the sub-object / ring pointers are swapped (r28/r30) and the argument-move order differs in the first branches. */
+extern "C" DB_OVERLAY int fn_80572CB0(DbMgr* self)
+{
+    int buf[8];
+    Db80572CB0_R ring;
+    Db80572CB0_R* rp = &ring;
+    DbSub50* sub = &self->m50;
+    DbG* g = self->m8->m14;
+    DbT* ta = TeamAt(g, sub->m4);
+    DbT* tb = TeamAt(g, sub->m0);
+    ring.vp = lbl_8064B298;
+    ring.m0 = buf;
+    rp->m8 = 8;
+    fn_8040074C(ring.m0, ring.m8 * 4);
+    rp->m4 = 0;
+    rp->mC = 0;
+    int sa = 0;
+    int i;
+    int rnd = self->m8->m10->m1C - 1 - self->m8->m14->m1CC8;
+    int la = self->m8->m14->m1CC8;
+    for (i = 0; i < 0x80; i++) {
+        unsigned char* tab = (unsigned char*)ta + 0x1B4;
+        sa += tab[(unsigned char)i];
+    }
+    int sb = 0;
+    for (i = 0; i < 0x80; i++) {
+        unsigned char* tab = (unsigned char*)tb + 0x1B4;
+        sb += tab[(unsigned char)i];
+    }
+    unsigned char cur = ta->m17C;
+    int d = sa - sb;
+    int own = 0;
+    int c5 = fn_8008CFD8((char*)ta + 0xC9C, 5, cur);
+    if (c5 == 0 || c5 == 10)
+        own = 1;
+    if (rnd <= 0 && d > 0 && d <= 3) {
+        fn_805730F4(self, 4, rp, sub->m4, 0);
+    } else if (rnd == 1 && d > 0 && d <= 3) {
+        fn_805730F4(self, 3, rp, sub->m4, 0);
+    } else if (rnd > 3) {
+        fn_805730F4(self, 1, rp, sub->m4, 0);
+        if (ring.m4 <= 1)
+            fn_805730F4(self, 2, rp, sub->m4, 0);
+    } else {
+        fn_805730F4(self, 2, rp, sub->m4, 0);
+        if (ring.m4 <= 1)
+            fn_805730F4(self, 3, rp, sub->m4, 0);
+        if (ring.m4 == 0)
+            fn_805730F4(self, 1, rp, sub->m4, 0);
+    }
+    if (ring.m4 == 0) {
+        int go = 0;
+        int t3;
+        if (own == 0 || fn_8057375C(self) < lbl_805FFE50 || (t3 = fn_80097148(ta, cur)) == 3 || t3 == 1)
+            go = 1;
+        if (go == 1) {
+            Db80572CB0_Pri pri = lbl_805FFE3C;
+            if (rnd <= 2) {
+                pri.v[3] = 4;
+                pri.v[4] = 0;
+            }
+            if (ring.m4 == 0) {
+                DbSub50* s2;
+                Db80572CB0_R* r2;
+                int* pp = pri.v;
+                int pe = (int)&pri.v[4];
+                do {
+                    s2 = &self->m50;
+                    r2 = &ring;
+                    fn_805730F4(self, *pp, r2, s2->m4, 0);
+                    pp++;
+                } while (ring.m4 == 0 && (int)pp <= pe);
+                int j = 0;
+                if (ring.m4 == 0) {
+                    int* qq = pri.v;
+                    do {
+                        fn_805730F4(self, *qq, r2, s2->m4, 1);
+                        qq++;
+                        j++;
+                    } while (ring.m4 == 0 && j <= 4);
+                }
+            }
+        }
+    }
+    int res = 0;
+    if (ring.m4 != 0) {
+        int pick = ring.m0[rand() % ring.m4];
+        int ca = 0;
+        for (i = 0; i < 0x80; i++) {
+            unsigned char* tab = (unsigned char*)ta + 0x1B4;
+            ca += tab[(unsigned char)i];
+        }
+        int cb = 0;
+        for (i = 0; i < 0x80; i++) {
+            unsigned char* tab = (unsigned char*)tb + 0x1B4;
+            cb += tab[(unsigned char)i];
+        }
+        int cnt = 0;
+        Unk8006A138_It<2> it(0);
+        int idx = 0;
+        do {
+            if (fn_80081CF8__FP13Unk8007FF8C_Yi(self->mC, idx)->m0 != 0xFF)
+                cnt++;
+            idx = it.Next();
+        } while (idx <= 2);
+        fn_8056CAC4(&self->mFC, pick, self->m50.m8, 0);
+        fn_8009984C(ta, pick, ca, cb, la, cnt);
+        res = 1;
+    }
+    return res;
+}
+
 extern "C" DB_OVERLAY int fn_80573440(DbMgr* self, int side, int id, float thr)
 {
     DbT* t = TeamAt(self->m8->m14, side);

@@ -146,15 +146,36 @@ extern int lbl_8061F92C, lbl_8061C688, lbl_806204F0;
 extern char lbl_8068BE40[];
 inline int Byte1CC9(unsigned char c) { return c; }
 inline int Unk8017A930_At(int* t, int i) { int o = i << 2; return *(int*)((char*)t + o); }
+/* Setup record at +0x194..+0x1D4 (fields copied into Unk801800FC by fn_8017C068). */
 struct Unk8017A930_S {
     char pad0[0x6C];
     int m6C;
     int m70;
-    char pad74[0x22C - 0x74];
+    char pad74[0x194 - 0x74];
+    int m194;
+    int m198;
+    int m19C;
+    int m1A0;
+    int m1A4;
+    int m1A8[2];
+    int m1B0[2];
+    int m1B8;
+    int m1BC;
+    int m1C0;
+    int m1C4;
+    int m1C8;
+    int m1CC;
+    int m1D0;
+    char pad1D4[0x22C - 0x1D4];
     int m22C;
 };
+struct Unk8017C068_X {
+    char pad0[0x600];
+    int m600;
+};
 struct Unk8017A930_Mid {
-    char pad0[0x10];
+    char pad0[0xC];
+    Unk8017C068_X* mC;
     Unk8017A930_S* m10;
     Unk8017C954_Rec* m14;
 };
@@ -701,6 +722,99 @@ void fn_8017BE28(Unk8017A930_T* p)
     fn_801C20CC(p->m3A4);
     fn_80235294(p->m3B0);
     fn_801DBD80(p->m3B8);
+}
+
+/* Same 0x5C-byte record as include/game/tu_801800FC.h (that header conflicts with this unit's Ctx types). */
+struct Unk801800FC {
+    int m0;
+    int m4;
+    int m8;
+    int mC;
+    int m10;
+    int m14;
+    int m18;
+    int m1C;
+    int m20;
+    unsigned char m24[20];
+    unsigned char m38;
+    unsigned char m39;
+    unsigned char m3A;
+    unsigned char m3B;
+    unsigned char m3C;
+    char pad3D[0x58 - 0x3D];
+    void* m58;
+    ~Unk801800FC();
+};
+struct Unk8017C068_Pair {
+    int a;
+    int b;
+};
+extern Unk8017C068_Pair lbl_805CC7D4;
+extern "C" void* fn_80180088__FPv(void* s, void* o);
+extern "C" int rand();
+
+/* near-miss: 99.9%, only the order of two li instructions at loop entry (k = 2 and the offset giv) differs.
+ * Byte fields are stored from int locals (a direct `rec.m39 = s->m1A0` narrows to lbz); k counts down
+ * and `s->m1A8[k]` after the loop reads element 0 through the counter register, as retail does
+ * (h[k] gives the lwzx operands in the other order). Tried: shared/separate j, base local, loop forms
+ * (do/while, k > 0), order of cnt/n, pointer-based side, k declared early or late. */
+extern "C" void fn_8017C068(void* self)
+{
+    Unk8017A930_T* p = (Unk8017A930_T*)self;
+    Unk8017A930_Mid* mid = ((Unk8017A930_Ctx*)p->m4)->m6F8;
+    Unk8017A930_S* s = mid->m10;
+    Unk801800FC rec;
+    fn_80180088__FPv(&rec, p->m4);
+    int a = s->m1A0;
+    rec.m39 = a;
+    int b = s->m1A4;
+    rec.m3A = b;
+    int c = s->m19C;
+    rec.m38 = c;
+    int d = s->m194 - 1;
+    rec.m3B = d;
+    int e = 1;
+    if (s->m198 == 0)
+        e = 0;
+    Unk801800FC* pr = &rec;
+    rec.m3C = e;
+    Unk8017C068_Pair ord = lbl_805CC7D4;
+    int j;
+    int k;
+    for (k = 2; k != 0; k--) {
+        int side = ((int*)&ord)[2 - k];
+        for (j = 0; j < 10; j++)
+            rec.m24[j + side * 10] = 0;
+        int cnt = s->m1B0[side];
+        int n;
+        if (rec.m3C == 0 && side == 0)
+            n = rec.m3B;
+        else
+            n = rec.m3B + 1;
+        for (j = 0; j < cnt; j++) {
+            int v;
+            if (n > 0)
+                v = rand() % n;
+            else
+                v = 0;
+            if (v > 9)
+                v = 9;
+            rec.m24[v + side * 10]++;
+        }
+    }
+    int* g = &s->m1B8;
+    int* h = &s->m1A8[0];
+    rec.m10 = g[2];
+    rec.m14 = g[4];
+    rec.m18 = g[5];
+    rec.m1C = g[6];
+    rec.m20 = g[3];
+    rec.m0 = s->m1B8;
+    rec.m4 = s->m1A8[k];
+    rec.m8 = g[1];
+    rec.mC = h[1];
+    mid->mC->m600 = 1;
+    fn_8018019C(pr);
 }
 
 void fn_8017C5F0(Unk8017A930_T* p, int a)
