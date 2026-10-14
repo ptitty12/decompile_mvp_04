@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">52.10% of code matched as of 2026-10-13: 21,100 of 24,158 functions, 3,071,740 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 847 units linked).</desc>
+<desc id="desc">52.10% of code matched as of 2026-10-13: 21,101 of 24,158 functions, 3,072,196 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 847 units linked).</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
@@ -31,7 +31,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="24.0" y="96.0" class="t1" font-size="44" font-weight="600" text-anchor="start">52.10%</text>
 <text x="26.0" y="118.0" class="t2" font-size="13" font-weight="400" text-anchor="start">of code matched</text>
 <text x="260.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Functions matched</text>
-<text x="260.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">21,100 / 24,158</text>
+<text x="260.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">21,101 / 24,158</text>
 <text x="429.0" y="72.0" class="t3" font-size="12" font-weight="400" text-anchor="start">Code matched</text>
 <text x="429.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">3.07 MB / 5.90 MB</text>
 <rect x="598.0" y="62" width="10" height="10" rx="2" class="k2"/>
@@ -41,7 +41,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <text x="767.0" y="96.0" class="t1" font-size="16" font-weight="600" text-anchor="start">12.7 KB / 1.37 MB</text>
 <clipPath id="bar"><rect x="24" y="140" width="912" height="12" rx="6.0"/></clipPath>
 <rect x="24" y="140" width="912" height="12" rx="6.0" class="b0"/>
-<rect x="24" y="140" width="475.1" height="12" class="b5" clip-path="url(#bar)"/>
+<rect x="24" y="140" width="475.2" height="12" class="b5" clip-path="url(#bar)"/>
 <rect x="24" y="140" width="59.7" height="12" class="k2" clip-path="url(#bar)"/>
 <text x="24.0" y="184.0" class="t1" font-size="14" font-weight="600" text-anchor="start">Code by unit</text>
 <text x="122.0" y="184.0" class="t3" font-size="12" font-weight="400" text-anchor="start">area = code size, shade = fuzzy match</text>
@@ -174,7 +174,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <rect x="341.0" y="314.6" width="28.4" height="26.4" rx="2" class="b2"><title>game/tu_80300848: 16,400 bytes of code, 28.1% fuzzy match</title></rect>
 <rect x="341.0" y="343.0" width="28.4" height="26.4" rx="2" class="b2"><title>game/tu_80338ECC: 16,396 bytes of code, 42.3% fuzzy match</title></rect>
 <rect x="341.0" y="371.4" width="28.4" height="26.4" rx="2" class="b3"><title>game/tu_801E2D84: 16,388 bytes of code, 63.6% fuzzy match</title></rect>
-<rect x="341.0" y="399.8" width="28.4" height="26.4" rx="2" class="b2"><title>game/tu_802BF974: 16,384 bytes of code, 28.3% fuzzy match</title></rect>
+<rect x="341.0" y="399.8" width="28.4" height="26.4" rx="2" class="b2"><title>game/tu_802BF974: 16,384 bytes of code, 28.4% fuzzy match</title></rect>
 <rect x="341.0" y="428.1" width="28.4" height="26.3" rx="2" class="b3"><title>game/tu_802B5234: 16,356 bytes of code, 52.2% fuzzy match</title></rect>
 <rect x="341.0" y="456.4" width="28.4" height="26.3" rx="2" class="b3"><title>fe/tu_8048E6A0: 16,352 bytes of code, 56.0% fuzzy match</title></rect>
 <rect x="341.0" y="484.7" width="28.4" height="26.2" rx="2" class="b2"><title>fe/tu_804D6180: 16,268 bytes of code, 48.3% fuzzy match</title></rect>
@@ -768,7 +768,7 @@ text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 <circle cx="68.0" cy="739.8" r="4" class="dot" stroke-width="2"><title>2026-10-10: 0.18% of code, 120 / 24,158 functions</title></circle>
 <circle cx="357.3" cy="699.2" r="4" class="dot" stroke-width="2"><title>2026-10-11: 29.15% of code, 16,053 / 24,158 functions</title></circle>
 <circle cx="646.7" cy="670.0" r="4" class="dot" stroke-width="2"><title>2026-10-12: 49.98% of code, 20,740 / 24,158 functions</title></circle>
-<circle cx="936.0" cy="667.1" r="4" class="dot" stroke-width="2"><title>2026-10-13: 52.10% of code, 21,100 / 24,158 functions</title></circle>
+<circle cx="936.0" cy="667.1" r="4" class="dot" stroke-width="2"><title>2026-10-13: 52.10% of code, 21,101 / 24,158 functions</title></circle>
 <circle cx="936.0" cy="730.8" r="4" class="dot2" stroke-width="2"><title>2026-10-13: 6.55% of code built from source</title></circle>
 <text x="936.0" y="720.8" class="t1" font-size="12" font-weight="600" text-anchor="end">6.55%</text>
 <text x="936.0" y="657.1" class="t1" font-size="12" font-weight="600" text-anchor="end">52.10%</text>
