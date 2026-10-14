@@ -60,7 +60,7 @@ included, can never break a mod. It only makes the game easier to understand.
   - The 18 database tables in `database.big` are **plain-text tables** (RefPack-compressed). The tools round-trip them byte for byte.
   - Rows are keyed by a djb2 hash of "Last,First" for players and of the 3-letter team code for teams.
   - The player arrays hold 3,250, with 2,921 used. Teams are fixed at 126 (30 MLB, 2 All-Star, 90 minor-league, 4 specials), so new teams replace slots until code hooks raise the limit.
-- **Engine:** E0a and **E0b are done.** The retail code, translated by our own translator, boots natively and deterministically to the frame loop (`docs/engine/E0B_LOG.md`). Next: E1 (renderer: GX command stream to WebGPU) and the E2 in-browser compile spike.
+- **Engine:** E0a and **E0b are done.** The retail code, translated by our own translator, boots natively and deterministically to the frame loop (`docs/engine/E0B_LOG.md`). **E1 is done:** the GX command stream renders through Dawn/WebGPU natively (loading screen, EA SPORTS logo, intro movie, title screen; `docs/engine/E1_LOG.md`). Next: E2 (browser boot), then E3 (playable: audio mixing, menus, the first match).
 - **Decomp** (main `d0a166c2`): 21,109 / 24,158 functions matched (87.4%);
   3,075,304 / 5,896,176 code bytes (52.2%); 234 of 847 units built from source. The
   live card is in `README.md`.
