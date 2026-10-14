@@ -207,7 +207,7 @@ struct Db8054C814_S {
 };
 extern "C" void fn_8057DF80(int* p);
 extern "C" void fn_8055A3B0(Db8054C814_N* p);
-extern "C" void fn_8055EAFC(int x);
+extern "C" void fn_8055EAFC(void* x);
 extern "C" void fn_80400CE4(int a);
 extern "C" int fn_8054C958(Db8054C814_S* o, int a, int b);
 int fn_8054C814(Db8054C814_S* o);
@@ -721,7 +721,7 @@ DB_OVERLAY int fn_8054C814(Db8054C814_S* o)
         case 3:
             goto next;
         case 2:
-            fn_8055EAFC(o->m18->m14);
+            fn_8055EAFC((void*)o->m18->m14);
             break;
         case 1:
             o->m4 = 3;
@@ -755,5 +755,73 @@ DB_OVERLAY int fn_8054C94C(H* o)
 {
     return o->m18->m1C;
 }
+
+extern "C" int fn_800A2AE8(void*);
+extern "C" int fn_8007F674__FP13Unk8007F198_Aii(Unk8007F198_A*, int, int);
+extern "C" int fn_8007F6C4__FP13Unk8007F198_Aiii(Unk8007F198_A*, int, int, int);
+extern "C" int fn_8007F724__FP13Unk8007F198_Aiiii(Unk8007F198_A*, int, int, int, int);
+extern "C" int fn_8007B320__18Unk8007B2B0_Screenii(void*, int, int);
+extern "C" int fn_80075948__18Unk8007B2B0_Screeni(void*, int);
+extern "C" int fn_80078A38__18Unk8007B2B0_Screeni(void*, int);
+extern "C" void fn_805601F0(int, int);
+
+DB_OVERLAY int fn_8054C958(Db8054C814_S* out, int a, int b)
+{
+    Unk8007A4DC_Screen* screen = (Unk8007A4DC_Screen*)lbl_8061930C;
+    Db8053E240_Tmp list;
+    int values[0x82];
+    list.C1(values, 0x82);
+    list.C2();
+    list.C3(lbl_8064A2A8);
+    fn_805371C4(&list, 0x01FFFFFF);
+    int token = fn_800A2AE8(lbl_80619948);
+    Db8053E240_Tmp* q = &list;
+    int result = 0;
+    unsigned x = 0;
+    if (x < q->m4) {
+        int off = 0;
+        do {
+            int id = *(int*)((char*)list.m0 + off);
+            unsigned mode = 0;
+            do {
+                unsigned n = fn_8007F674__FP13Unk8007F198_Aii((Unk8007F198_A*)screen, id, mode);
+                unsigned i = 0;
+                if (i < n) {
+                    do {
+                        int value = fn_8007F6C4__FP13Unk8007F198_Aiii((Unk8007F198_A*)screen, id, mode, i);
+                        if (fn_8007F724__FP13Unk8007F198_Aiiii((Unk8007F198_A*)screen, id, mode, value, token) <= 0) {
+                            int category = fn_8007F7D0((Unk8007F198_B*)screen, 0);
+                            int c0 = fn_8007B320__18Unk8007B2B0_Screenii(screen, 0, category);
+                            int c1 = fn_8007B320__18Unk8007B2B0_Screenii(screen, 1, category);
+                            int c2 = fn_8007B320__18Unk8007B2B0_Screenii(screen, 2, category);
+                            int c3 = fn_8007B320__18Unk8007B2B0_Screenii(screen, 3, category);
+                            int known = id == c0 || id == c1 || id == c2 || id == c3;
+                            if ((known && a != 0) || (!known && b != 0)) {
+                                int sub = fn_80075948__18Unk8007B2B0_Screeni(lbl_8061930C, id);
+                                int kind = fn_80078A38__18Unk8007B2B0_Screeni(lbl_8061930C, id);
+                                fn_805601F0(sub, kind);
+                                fn_8055EAFC((void*)sub);
+                                goto nextMode;
+                            } else {
+                                *(int*)((char*)out + 8) = value;
+                                result = 1;
+                                *(int*)((char*)out + 0xC) = id;
+                                *(int*)((char*)out + 0x10) = mode;
+                            }
+                        }
+                        ++i;
+                    } while (i < n);
+                }
+nextMode:
+                ++mode;
+            } while (mode <= 1);
+            ++x;
+            off += 4;
+        } while (x < q->m4);
+    }
+    list.vp = lbl_8064A550;
+    return result;
+}
+
 
 }
