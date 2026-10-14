@@ -126,8 +126,8 @@ TEST_CASE("DOL header parse") {
   CHECK(dol->sections()[1].slot == 7);
   CHECK(dol->entry() == 0x80003100);
   CHECK(dol->bss_address() == 0x80007000);
-  CHECK(dol->at(0x80003100)[0] == u8(0x100));
-  CHECK(dol->at(0x80005004)[0] == u8(0x144));
+  CHECK(dol->at(0x80003100)[0] == u8(0x100 & 0xFF));  // make_dol fills byte i with i
+  CHECK(dol->at(0x80005004)[0] == u8(0x144 & 0xFF));
   CHECK(dol->at(0x80003140) == nullptr);       // one past the text section
   CHECK(dol->at(0x8000313E, 4) == nullptr);    // straddles the end
 }
