@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="782" viewBox="0 0 960 782" role="img" aria-labelledby="title desc">
 <title id="title">Decompilation progress</title>
-<desc id="desc">52.43% of code matched as of 2026-10-14: 21,141 of 24,158 functions, 3,091,588 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 849 units linked).</desc>
+<desc id="desc">52.43% of code matched as of 2026-10-14: 21,141 of 24,158 functions, 3,091,588 of 5,896,176 code bytes, 762 units with code; 6.55% of code built from source (234 of 850 units linked).</desc>
 <style>
 text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
 .surface { fill: #fcfcfb; }
