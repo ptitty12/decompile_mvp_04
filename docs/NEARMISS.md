@@ -365,3 +365,7 @@ evidence and worktree mapping: `docs/SWARM_SESSION_2026-10-13.md`.
 - db/tu_805721F8::fn_805744D4: 99.966446%, 149/149 instructions; eight source forms leave one local edge at slot 55 (retail +0xE4, candidate +0xEC), skipping the pointer-bound compare. Candidate reverted.
 - 2026-10-13 | db/tu_80565FD4 fn_8056693C | 99.71654%, 127/127 words, five differences after eight ordinary forms: initial day-store address and table-address temporary registers. |
 - 2026-10-13 | db/tu_80565FD4 fn_80568940 | 98.234375%, 128/128 words after eight forms: saved-register and counter lifetimes, reversed-pair score-load order. |
+
+- `snd/tu_803B4BEC` `fn_803B66D4` (728 B): 97.58242%, seven forms; 182/182 words, seven arithmetic/register and zero-fill scheduling differences; best draft `build/swarm53/B66D4-v6.cpp`.
+
+- `ealib/tu_803DBFF4` `fn_803DD068` (568 B): 99.788734%, eight forms; 142/142 words, six register differences in the final direct-texture branch; draft `build/swarm53/DD068-v8.cpp`.
