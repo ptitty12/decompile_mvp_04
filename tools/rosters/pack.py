@@ -11,7 +11,8 @@ tables read from the player's own disc.
     pack.py new DIR --id ID [--name NAME]                    # scaffold an empty pack
 
 IMAGE is an ISO/CISO disc image or a directory holding an extracted disc
-(`<dir>/data/database/database.big`, `<dir>/data/FEENG.LOC`, ...). PACKs apply in the
+(`<dir>/data/database/database.big`, `<dir>/data/FEENG.LOC`, ..., and `<dir>/sys/main.dol`
+for team.names). PACKs apply in the
 order given. DIR must not be inside a git work tree unless git ignores it.
 
 Exit status: 0 ok (warnings allowed), 1 errors found, 2 usage or I/O problem.
@@ -44,7 +45,16 @@ LIMITS = {"players": 3250, "pitchers": 1800, "teams": 126, "managers": 36}
 
 DATABASE_PATH = "/data/database/database.big"
 LOC_FILES = ("FEENG.LOC", "IGENG.LOC", "MC_ENG.loc")       # spelled as on the disc, in /data/
-ASSET_ROOTS = ("/data/frontend/",)                        # v1 allow-list for asset targets
+# v1 allow-list for asset targets: the file-overridable team art and audio (ROSTERS.md 12.2)
+ASSET_ROOTS = ("/data/frontend/", "/data/models.big", "/data/stadium/", "/data/audio/spch_pbp/",
+               "/data/audio/spch_pa/")
+DOL_SHA1 = "da6becdbea614d03c4b5eae9f8a0fb08e0a184dd"      # main.dol of GV4E69 rev 0
+# Team-slot tables in main.dol (ROSTERS.md 12.3, 12.6): `count` entries per tid, big-endian
+# words. tid_names holds pointers to the unique_team strings; tid_row the team.dat row; the
+# other four the LOC string id of each text. Retail addresses are contract 1 (ARCHITECTURE 2).
+SLOT_TABLES = {"count": 124, "tid_names": 0x80619D34, "tid_row": 0x805C36C0,
+               "full": 0x805C2F00, "nickname": 0x805C30F0, "abbreviation": 0x805C32E0,
+               "city": 0x805C34D0}
 DEFAULT_NAME = "Default,Default"                          # protected row 0 of attrib/pitcher/manager
 ALLSTAR_TEAMS = ("AL", "NL")                              # unique_team codes of the All-Star sides
 MAX_PATCH_BYTES = 16 << 20
@@ -645,6 +655,7 @@ OP_FIELDS = {
     "manager.edit": ({"op", "set"}, {"manager", "team"}),
     "manager.rename": ({"op", "to"}, {"manager", "team"}),
     "loc.set": ({"op", "file", "strings"}, set()),
+    "team.names": ({"op", "team"}, {"location", "nickname", "abbreviation", "full_name"}),
 }
 SET_GROUPS = {
     "player.add": PLAYER_TABLES,
@@ -700,6 +711,26 @@ def check_op(op, report, where):
         ok = check_entries(op["entries"], report, where) is not None and ok
     if kind == "loc.set":
         ok = check_loc(op, report, where) and ok
+    if kind == "team.names":
+        ok = check_names_op(op, report, where) and ok
+    return ok
+
+
+TEAM_NAME_FIELDS = (("location", "team_location"), ("nickname", "team_long_name"),
+                    ("abbreviation", "team_short_name"))
+
+
+def check_names_op(op, report, where):
+    if len(op) == 2:
+        report.error("E-OP", where, "team.names needs at least one of location, nickname, "
+                     "abbreviation, full_name")
+        return False
+    ok = True
+    for field, col in TEAM_NAME_FIELDS:
+        if field in op:
+            ok = check_value(COLUMNS["team"][col], op[field], report, "%s %s" % (where, field)) and ok
+    if "full_name" in op:
+        ok = check_loc({"file": "FEENG.LOC", "strings": {"0": op["full_name"]}}, report, where) and ok
     return ok
 
 
@@ -903,6 +934,17 @@ class Disc:
             return self._dir_path(path) is not None
         return path.lower() in self._files
 
+    def dol(self):
+        """main.dol: the image's boot file, or sys/main.dol or main.dol in a directory."""
+        if self.root is None:
+            return self.image.d.read(self.image.dol_off, self.image.dol_size())
+        for rel in ("sys/main.dol", "main.dol"):
+            p = self._dir_path("/" + rel)
+            if p is not None:
+                with open(p, "rb") as f:
+                    return f.read()
+        raise PackError("no main.dol (sys/main.dol) in %s" % self.spec)
+
     def read(self, path):
         if self.root is not None:
             p = self._dir_path(path)
@@ -914,6 +956,47 @@ class Disc:
             raise PackError("%s not found on %s" % (path, self.spec))
         off, size = self._files[path.lower()]
         return self.image.d.read(off, size)
+
+
+class SlotTables:
+    """The team-slot tables of main.dol (ROSTERS.md 12): tid of each team.dat row and the
+    LOC string ids of its texts. Read from the player's own disc, never shipped."""
+
+    def __init__(self, dol, team_codes):
+        if hashlib.sha1(dol).hexdigest() != DOL_SHA1:
+            raise PackError("main.dol is not GV4E69 rev 0 (SHA-1 mismatch)")
+        offs = [int.from_bytes(dol[i:i + 4], "big") for i in range(0, 0x48, 4)]
+        addrs = [int.from_bytes(dol[i:i + 4], "big") for i in range(0x48, 0x90, 4)]
+        sizes = [int.from_bytes(dol[i:i + 4], "big") for i in range(0x90, 0xD8, 4)]
+
+        def read(addr, n):
+            for o, a, z in zip(offs, addrs, sizes):
+                if z and a <= addr and addr + n <= a + z:
+                    return dol[o + addr - a:o + addr - a + n]
+            raise PackError("address %#x is not in main.dol" % addr)
+
+        def words(addr):
+            data = read(addr, 4 * n)
+            return [int.from_bytes(data[i:i + 4], "big") for i in range(0, 4 * n, 4)]
+
+        n = SLOT_TABLES["count"]
+        rows = words(SLOT_TABLES["tid_row"])
+        self.ids = {k: words(SLOT_TABLES[k]) for k in ("full", "nickname", "abbreviation", "city")}
+        self.tid_of_row = {}
+        for t, ptr in enumerate(words(SLOT_TABLES["tid_names"])):
+            end = ptr
+            while read(end, 1) != b"\0":
+                end += 1
+            name = read(ptr, end - ptr).decode("latin-1")
+            if rows[t] >= len(team_codes) or team_codes[rows[t]] != name:
+                raise PackError("main.dol tid %d (%s) does not match team.dat" % (t, name))
+            self.tid_of_row[rows[t]] = t
+        self.row_of_tid = rows
+
+    def sharers(self, kind, tid):
+        """Other tids whose `kind` text uses the same LOC id."""
+        v = self.ids[kind][tid]
+        return [t for t, x in enumerate(self.ids[kind]) if x == v and t != tid]
 
 
 # ------------------------------------------------------------------ game data model
@@ -1038,6 +1121,7 @@ COL_INDEX = {t: {c.name: i for i, c in enumerate(cols)} for t, cols in SCHEMA.it
 
 
 def load_model(disc):
+    """The tables of the disc as a Model (the slot tables are read on first use)."""
     try:
         arc = big.BigArchive.from_bytes(disc.read(DATABASE_PATH))
         db = dbtables.Database(arc)
@@ -1046,7 +1130,10 @@ def load_model(disc):
             locs[f] = loc.Loc.parse(disc.read("/data/" + f))
     except (big.BigError, dbtables.TableError, loc.LocError, refpack.RefPackError) as e:
         raise PackError("cannot read the disc tables: %s" % e)
-    return Model(db, locs)
+    m = Model(db, locs)
+    m.disc = disc
+    m.slots = None
+    return m
 
 
 # ------------------------------------------------------------------ applying ops
@@ -1329,6 +1416,10 @@ class Applier:
                     v = str(int(mk, 16) - (1 << 32) if int(mk, 16) >= (1 << 31) else int(mk, 16))
                 if self.write(("T", code, table, col), ("T", code)):
                     row[COL_INDEX[table][col]] = dbtables._to_text(v)
+                    if (table == "team" and self.m.code_index[code] >= SLOT_TABLES["count"]
+                            and col in ("team_location", "team_long_name", "team_short_name")):
+                        self.r.warn("W-NOT-A-SLOT", self.where, "team %s has no slot in the game's "
+                                    "team list; the front end shows the first slot's names" % code)
 
     def _get_manager(self, op):
         if "team" in op:
@@ -1389,20 +1480,60 @@ class Applier:
 
     def op_loc_set(self, op):
         f = next(x for x in LOC_FILES if x.upper() == op["file"].upper())
-        L = self.m.locs[f]
-        index = {sid: i for i, (sid, _) in enumerate(L.entries)}
         for k, text in op["strings"].items():
-            sid = int(k)
-            if sid not in index:
-                self.r.error("E-NOT-FOUND", self.where, "%s has no string id %d" % (f, sid))
+            self._set_string(f, int(k), text)
+
+    def _set_string(self, f, sid, text):
+        L = self.m.locs[f]
+        index = {s: i for i, (s, _) in enumerate(L.entries)}
+        if sid not in index:
+            self.r.error("E-NOT-FOUND", self.where, "%s has no string id %d" % (f, sid))
+            return
+        if self.write(("L", f.upper(), sid), ("L", f.upper(), sid)):
+            L.entries[index[sid]] = (sid, text)
+            orig = self.m.loc_orig[f][sid]
+            if len(text) > len(orig):
+                self.r.warn("W-LOC-LENGTH", self.where, "%s string %d is longer than the original "
+                            "(%d > %d characters); it may not fit its box"
+                            % (f, sid, len(text), len(orig)))
+
+    def _slots(self):
+        if self.m.slots is None:
+            self.m.slots = SlotTables(self.m.disc.dol(), [r[0] for r in self.m.teams])
+        return self.m.slots
+
+    def op_team_names(self, op):
+        code = op["team"]
+        if not self._team(code):
+            return
+        row = self.m.team_row(code)
+        for field, col in TEAM_NAME_FIELDS:
+            if field in op and self.write(("T", code, "team", col), ("T", code)):
+                row[COL_INDEX["team"][col]] = op[field]
+        slots = self._slots()
+        tid = slots.tid_of_row.get(self.m.code_index[code])
+        if tid is None:
+            self.r.warn("W-NOT-A-SLOT", self.where, "team %s has no slot in the game's team list "
+                        "(rows 124, 125); only team.dat changes, and the front end shows the "
+                        "first slot's names and art for it" % code)
+            return
+        loc_name = row[COL_INDEX["team"]["team_location"]]
+        nick = row[COL_INDEX["team"]["team_long_name"]]
+        texts = {"nickname": op.get("nickname"), "abbreviation": op.get("abbreviation"),
+                 "city": op.get("location"), "full": op.get("full_name")}
+        if texts["full"] is None and ("location" in op or "nickname" in op):
+            texts["full"] = "%s %s" % (loc_name, nick)
+        for kind in ("full", "nickname", "abbreviation", "city"):
+            text = texts[kind]
+            if text is None:
                 continue
-            if self.write(("L", f.upper(), sid), ("L", f.upper(), sid)):
-                L.entries[index[sid]] = (sid, text)
-                orig = self.m.loc_orig[f][sid]
-                if len(text) > len(orig):
-                    self.r.warn("W-LOC-LENGTH", self.where, "%s string %d is longer than the "
-                                "original (%d > %d characters); it may not fit its box"
-                                % (f, sid, len(text), len(orig)))
+            other = [self.m.teams[slots.row_of_tid[t]][0] for t in slots.sharers(kind, tid)]
+            if other:
+                self.r.warn("W-LOC-SHARED", self.where, "the %s text of %s is shared with %s; "
+                            "changing it renames them too" % (kind, code, ", ".join(other)))
+            files = ("FEENG.LOC",) if kind == "city" else ("FEENG.LOC", "IGENG.LOC")
+            for f in files:
+                self._set_string(f, slots.ids[kind][tid], text)
 
 
 def _cell_label(cell):
@@ -1631,7 +1762,7 @@ def apply_assets(disc, by_file, files, texts, report):
             replace[e.name] = a["data"]
             texts["%s:%s" % (path, entry)] = a["data"]
         if replace:
-            files[real] = arc.to_bytes(replace)
+            files[real] = arc.to_bytes(replace, align=arc.payload_alignment() or 4)
 
 
 def _disc_name(disc, path):

@@ -3,9 +3,11 @@
 Synthetic data only: every table, name and number here is built by the test.
 Run:  python -I -m unittest discover -s tools/rosters/tests -v
 """
+import hashlib
 import json
 import os
 import shutil
+import struct
 import sys
 import tempfile
 import unittest
@@ -128,17 +130,56 @@ def make_disc(root):
     for name in pack.TABLE_ORDER:
         t = dbtables.Table(name, [c.name for c in pack.SCHEMA[name]], tables[name])
         items.append((name + ".dat", refpack.compress(t.serialize())))
-    os.makedirs(os.path.join(root, "data", "database"))
-    os.makedirs(os.path.join(root, "data", "frontend"))
+    for d in ("database", "frontend", "audio/spch_pbp"):
+        os.makedirs(os.path.join(root, "data", *d.split("/")))
+    os.makedirs(os.path.join(root, "sys"))
     with open(os.path.join(root, "data", "database", "database.big"), "wb") as f:
         f.write(big.build(items, flag=1))
-    for fn, strings in (("FEENG.LOC", [(2000, "Testers"), (2040, "Testville Testers"), (7, "Menu")]),
-                        ("IGENG.LOC", [(2000, "Testers")]), ("MC_ENG.loc", [(1, "Card")])):
+    names = [(i, "Team text %d" % i) for i in sorted(set(sum(SLOT_IDS.values(), [])))]
+    fe = names + [(7, "Menu")]
+    ig = [(i, t) for i, t in names if i not in SLOT_IDS["city"]]
+    for fn, strings in (("FEENG.LOC", fe), ("IGENG.LOC", ig), ("MC_ENG.loc", [(1, "Card")])):
         with open(os.path.join(root, "data", fn), "wb") as f:
             f.write(loc.Loc(strings).serialize())
     with open(os.path.join(root, "data", "frontend", "logos.big"), "wb") as f:
         f.write(big.build([("l000.gsh", b"synthetic logo 0"), ("l001.gsh", b"synthetic logo 1")]))
+    with open(os.path.join(root, "data", "audio", "spch_pbp", "tnamedat.big"), "wb") as f:
+        f.write(big.build([("01.dat", b"clip one"), ("02.dat", b"clip two")], flag=2, align=128))
+    with open(os.path.join(root, "sys", "main.dol"), "wb") as f:
+        f.write(make_dol())
     return rosters
+
+
+# Team-slot tables of the synthetic main.dol: tids 0-2 are rows 0-2 (Aaa, Bbb, AL); row 3
+# (Ccc) has no tid. Aaa and AL share their city string, as some retail teams do.
+SLOT_IDS = {"full": [2040, 2041, 2042], "nickname": [2000, 2001, 2002],
+            "abbreviation": [7200, 7201, 7202], "city": [17618, 17619, 17618]}
+
+
+def make_dol():
+    """A minimal DOL whose two data sections hold the slot tables at the retail addresses."""
+    st = pack.SLOT_TABLES
+    n = 3
+    sec0 = b"".join(struct.pack(">%dI" % n, *v) for v in (
+        SLOT_IDS["full"], SLOT_IDS["nickname"], SLOT_IDS["abbreviation"], SLOT_IDS["city"],
+        [0, 1, 2]))
+    assert st["nickname"] - st["full"] == 0x1F0      # retail spacing: 124 words per table
+    sec0 = b"".join(sec0[i * 4 * n:(i + 1) * 4 * n] + b"\0" * (0x1F0 - 4 * n) for i in range(5))
+    strings = b""
+    ptrs = []
+    base = st["tid_names"] + 4 * n
+    for code in ("Aaa", "Bbb", "AL"):
+        ptrs.append(base + len(strings))
+        strings += code.encode() + b"\0"
+    sec1 = struct.pack(">%dI" % n, *ptrs) + strings
+    head = bytearray(0x100)
+    struct.pack_into(">I", head, 0x1C, 0x100)                       # data 0 offset
+    struct.pack_into(">I", head, 0x20, 0x100 + len(sec0))           # data 1 offset
+    struct.pack_into(">I", head, 0x64, st["full"])                  # data 0 address
+    struct.pack_into(">I", head, 0x68, st["tid_names"])             # data 1 address
+    struct.pack_into(">I", head, 0xAC, len(sec0))
+    struct.pack_into(">I", head, 0xB0, len(sec1))
+    return bytes(head) + sec0 + sec1
 
 
 def write_pack(root, pid, patches, **manifest):
@@ -169,11 +210,15 @@ class PackTestCase(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.mkdtemp(prefix="packtest-")
         self.disc_dir = os.path.join(self.tmp, "disc")
+        self.saved = (pack.DOL_SHA1, pack.SLOT_TABLES["count"])
+        pack.SLOT_TABLES["count"] = 3
         self.rosters = make_disc(self.disc_dir)
+        pack.DOL_SHA1 = hashlib.sha1(make_dol()).hexdigest()
         self.disc = pack.Disc(self.disc_dir)
         self.n = 0
 
     def tearDown(self):
+        pack.DOL_SHA1, pack.SLOT_TABLES["count"] = self.saved
         shutil.rmtree(self.tmp, ignore_errors=True)
 
     def mk(self, pid, patches, **manifest):
@@ -601,6 +646,59 @@ class CompositionTests(PackTestCase):
                               "release": "remove"}]])
         report, *_ = self.run_set([edit, rm])
         self.assertEqual(self.codes(report)[0], "E-CONFLICT", report.render())
+
+
+class SlotTests(PackTestCase):
+    def loc(self, out, fn):
+        data = out[0].get("/data/" + fn) or self.disc.read("/data/" + fn)
+        return dict(loc.Loc.parse(data).entries)
+
+    def test_team_names_sets_table_and_loc_through_main_dol(self):
+        report, _, model, out = self.run_set([self.mk("names", [[
+            {"op": "team.names", "team": "Bbb", "location": "Elm Bay", "nickname": "Herons",
+             "abbreviation": "EBH"}]])])
+        self.assertClean(report)
+        row = model.team_row("Bbb")
+        self.assertEqual(row[1:4], ["Elm Bay", "Herons", "EBH"])
+        fe, ig = self.loc(out, "FEENG.LOC"), self.loc(out, "IGENG.LOC")
+        for d in (fe, ig):
+            self.assertEqual((d[2041], d[2001], d[7201]), ("Elm Bay Herons", "Herons", "EBH"))
+            self.assertEqual(d[2040], "Team text 2040")              # other slots untouched
+        self.assertEqual(fe[17619], "Elm Bay")                       # city: FEENG only
+        self.assertNotIn(17619, ig)
+
+    def test_team_names_warnings(self):
+        report, _, _, out = self.run_set([self.mk("shared", [[
+            {"op": "team.names", "team": "Aaa", "location": "Elm Bay", "full_name": "The Elm Bay Nine"},
+            {"op": "team.names", "team": "Ccc", "nickname": "Owls"}]])])
+        self.assertClean(report)
+        warns = [i[1] for i in report.issues]
+        self.assertIn("W-LOC-SHARED", warns)                         # Aaa's city is AL's too
+        self.assertIn("W-NOT-A-SLOT", warns)                         # Ccc has no tid
+        self.assertEqual(self.loc(out, "FEENG.LOC")[2040], "The Elm Bay Nine")
+
+    def test_team_names_needs_the_retail_main_dol(self):
+        pack.DOL_SHA1 = "0" * 40
+        with self.assertRaises(pack.PackError):
+            self.run_set([self.mk("names", [[{"op": "team.names", "team": "Bbb", "nickname": "Owls"}]])])
+
+    def test_team_names_conflicts_with_loc_set(self):
+        a = self.mk("names-a", [[{"op": "team.names", "team": "Bbb", "nickname": "Owls"}]])
+        b = self.mk("names-b", [[{"op": "loc.set", "file": "IGENG.LOC", "strings": {"2001": "Hawks"}}]])
+        report, *_ = self.run_set([a, b])
+        self.assertOnlyErrors(report, "E-CONFLICT")
+
+    def test_asset_rebuild_keeps_the_archive_alignment(self):
+        root = self.mk("clip", [[]], assets=[{"path": "/data/audio/spch_pbp/tnamedat.big",
+                                              "entry": "01.dat", "file": "clip.dat"}])
+        with open(os.path.join(root, "clip.dat"), "wb") as f:
+            f.write(b"an authored clip that is longer than the old one")
+        report, _, _, out = self.run_set([root])
+        self.assertClean(report)
+        arc = big.BigArchive.from_bytes(out[0]["/data/audio/spch_pbp/tnamedat.big"])
+        self.assertEqual([e.offset % 128 for e in arc.entries], [0, 0])
+        self.assertEqual(arc.payload_alignment(), 128)
+        self.assertEqual(arc.raw("02.dat"), b"clip two")
 
 
 class CliTests(PackTestCase):

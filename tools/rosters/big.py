@@ -159,18 +159,35 @@ class BigArchive:
             out.append("payloads end at %#x, file size %#x" % (pos, self.file_size))
         return out
 
-    def to_bytes(self, replace=None):
+    def payload_alignment(self):
+        """The largest power of two A (4..4096) for which the archive is canonical
+        with payloads aligned to A, or None. Most archives use 4; the audio name
+        archives use 64 or 128 (docs/ROSTERS.md 2.1)."""
+        for a in (4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4):
+            pos = self.header_size
+            for e in self.entries:
+                if e.offset != (pos + a - 1) & ~(a - 1):
+                    break
+                pos = e.offset + e.size
+            else:
+                if pos == self.file_size:
+                    return a
+        return None
+
+    def to_bytes(self, replace=None, align=4):
         """Rebuild the archive. `replace` maps entry name -> new raw payload.
-        With no replacements and a canonical source this reproduces the input."""
+        With no replacements and a canonical source this reproduces the input
+        (pass align=payload_alignment() for archives aligned beyond 4)."""
         replace = replace or {}
         payloads = []
         for e in self.entries:
             payloads.append(replace[e.name] if e.name in replace else self.raw(e.name))
-        return build(list(zip(self.names(), payloads)), self.flag)
+        return build(list(zip(self.names(), payloads)), self.flag, align)
 
 
-def build(items, flag=1):
-    """Build an archive from [(name, raw payload)] with the game's layout."""
+def build(items, flag=1, align=4):
+    """Build an archive from [(name, raw payload)] with the game's layout; payloads
+    start on multiples of `align` (a power of two, 4 for most archives)."""
     table = bytearray()
     for name, _ in items:
         table += b"\0\0\0\0\0\0\0\0" + name.encode("latin-1") + b"\0"
@@ -178,7 +195,7 @@ def build(items, flag=1):
     pos = hs
     offs = []
     for _, data in items:
-        pos = (pos + 3) & ~3
+        pos = (pos + align - 1) & ~(align - 1)
         offs.append(pos)
         pos += len(data)
     total = pos
