@@ -28,7 +28,7 @@ u32 fn_80406C74(double x);
 
 void fn_8042F93C(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
 void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4]);
-void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table);
+void fn_8042FD00(GXBool enable, u16 center, const GXFogAdjTable* table);
 void fn_8042FE24(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
 void fn_8042FE78(GXBool update_enable);
 void fn_8042FEA4(GXBool update_enable);
@@ -148,7 +148,7 @@ void GXInitFogAdjTable(GXFogAdjTable* table, u16 width, const f32 projmtx[4][4])
     }
 }
 
-void fn_8042FD00(GXBool enable, u16 center, GXFogAdjTable* table) {
+void fn_8042FD00(GXBool enable, u16 center, const GXFogAdjTable* table) {
     u32 fogRangeReg;
     u32 fogRangeRegK;
     u32 i;
