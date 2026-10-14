@@ -304,31 +304,25 @@ extern "C" DB_OVERLAY int fn_805825BC(DbSubX* self, int a, int* o1, int* o2)
     return 0;
 }
 
-/* near-miss: ~25 slots (register naming); retail forms a second address pseudo for the record object after the ctor call */
 extern "C" DB_OVERLAY int fn_805826AC(DbSubX* self, DbRec12* rec)
 {
     if (fn_80582578(self, (int)rec) != 0) {
         DbTbl16i t = lbl_80600590;
         int w = t.w[rec->a];
         if (w != 0) {
-            char obj[0x18];
-            fn_8052E408(obj, rec);
-            char* p = obj;
+            Db805849D0_Ent obj(rec);
+            Db805849D0_Ent* p = &obj;
             int id = fn_80587728(p);
             int k = fn_8007F7D0__FP13Unk8007F198_BUi(lbl_8061930C, 0);
             if ((w & 1) && fn_8058320C(self, id, k) == 0) {
-                fn_80360AF0(p, 2);
                 return 7;
             }
             if ((w & 2) && fn_80583324((int)self, id) != 0) {
-                fn_80360AF0(obj, 2);
                 return 8;
             }
             if ((w & 4) && fn_80583354((int)self, id, k) != 0) {
-                fn_80360AF0(obj, 2);
                 return 9;
             }
-            fn_80360AF0(obj, 2);
         }
         return 1;
     }
