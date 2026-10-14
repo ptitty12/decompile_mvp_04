@@ -8,11 +8,7 @@
  * declared as virtuals that are never defined, so no vtable is emitted.
  */
 
-struct Unk803D2B20Key {
-    unsigned short m0;
-    Unk803D2B20Key(int v) : m0(v) {}
-    Unk803D2B20Key(const Unk803D2B20Key& other) : m0(other.m0) {}
-};
+#include "../../include/game/eagl_key_803d2d74.h"
 
 extern "C" {
 int fn_803D2D74(void* table, Unk803D2B20Key* key, int* out);
