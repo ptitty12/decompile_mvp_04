@@ -435,6 +435,13 @@
     - six contract commits so the placeholders' prototypes agree with the SDK headers: __OSMaskInterrupts (u32), DVDInquiryAsync (DVDDriveInfo*, DVDCBCallback), OSDefaultExceptionHandler, __OSErrorTable (OSErrorHandler[17]), the three __OSLastInterrupt* variables (volatile: fn_8043402C 98.46% -> 99.53%), EXIImm/EXIDma (EXICallback);
     - dvd.c's BB2 overlay without its `#define BB2` macro; fn_8042515C's parameter renamed so it can't shadow the static autoInvalidation;
     - .bss data splits for the two linked units: fstload.c (bb2Buf, __fstLoad's static block) and EXIBios.c (Ecb);
+    - stateBusy's switch table in dvd's split, so that dtk keeps the static's name once it is local;
     - `tools/goals/renames/k1c.tsv` with the evidence for both names.
-  - Held: the name commit. A trial of the dtk cascade (152 renames: 2 explicit, 150 by dtk) needs three things only the owner or the lead can change: common-symbol modeling for errno.c and eleven ealib units so the .sbss statics can be split; four linker-defined symbols in the protected ldscript.ld; and dvd.c's .data for stateBusy's jump table. Details and options: docs/DECISIONS.md, 2026-10-14 K1c entry. The common-symbol fix and the .sbss splits are staged on the local branch `staged/k1c-scommon` (VERIFY PASS).
+  - Held: the name commit. The dtk cascade has 152 renames (2 explicit, 150 by dtk: 82 functions, 68 data). It needs two things only the owner or the lead can change:
+    - common-symbol modeling for errno.c and eleven ealib units, so that fstload.c and EXIBios.c can own their .sbss statics;
+    - four linker-defined symbols in the protected ldscript.ld.
+  - Details and options: docs/DECISIONS.md, 2026-10-14 K1c entry.
+  - Staged on local branches, not for merge as they stand:
+    - `staged/k1c-scommon`: the common-symbol fix and the .sbss splits (VERIFY PASS);
+    - `staged/k1c-names`: the generated name commit. It does not link until ldscript.ld defines the four symbols. Its objdiff report has 21,141 matched and no drops, and OSInit goes from 96.5% to 97.4%.
   | Owner: the K1c entry in DECISIONS.md "Open questions for owner".
