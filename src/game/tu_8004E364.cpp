@@ -108,6 +108,112 @@ void fn_80012254();
 void fn_80012050(int a);
 void fn_800106F8(int a);
 
+/* Event record passed as the 4th argument (r6) of fn_8004E364: m8 is compared with the entry's object, mC and m10 are
+ * passed through fn_80044D3C / fn_80045920 into the 7-argument event call fn_80012B00. Evidence: fn_8004E364 only. */
+struct Unk8004E364_Rec {
+    char pad0[0x8];
+    int m8;
+    int mC;
+    int m10;
+};
+/* Float block at (record + 0x58C): three floats at +0xC/+0x14/+0x18 compared with the constant lbl_805A925C. */
+struct Unk8004E364_Q {
+    char padC[0xC];
+    float mC;
+    float m10pad;
+    float m14;
+    float m18;
+};
+/* Entry in the object's 0x18-byte table at (a + 0x48C): kind at +0, record pointer at +8 (cf. fn_8004E28C). */
+struct Unk8004E364_E {
+    int m0;
+    char pad4[4];
+    int m8;
+};
+struct Unk80056970_Obj;
+struct Unk80056970_Entry;
+Unk80056970_Entry* fn_80056E34(Unk80056970_Obj* r, int id);
+extern Unk80056970_Obj* lbl_80687600;
+extern float lbl_805A925C;
+void fn_800114E0();
+void fn_800174EC();
+void fn_80012BF0(int a);
+void fn_80012B00(int a0, int a1, int a2, int a3, int a4, int a5, int a6);
+int fn_80045920(int a);
+int fn_80044240(int a);
+int fn_8004E248(Unk800493D4_Sm* s, int idx);
+void fn_8004FC60(Unk800493D4_Sm* s, Unk80044C10_A* a);
+
+void fn_8004E364(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a, Unk8004E364_Rec* rec)
+{
+    int e = fn_8004FF78(s, s->m9D8, 0x2B);
+    int p = fn_8005000C(s, idx, 0xB);
+    if (e == -1 && p != -1) {
+        char* b = (char*)s + 4;
+        if (*(int*)(b + p * 0x48) != rec->m8)
+            p = fn_8004FF78(s, idx, 0xB);
+        if (p != -1) {
+            int op = p * 0x48;
+            if (*(int*)(b + op) == rec->m8) {
+                int q = fn_8005000C(s, idx, 0xA);
+                if (q != -1) {
+                    int oq = q * 0x48;
+                    char* b8 = (char*)s + 8;
+                    int x = *(int*)(b8 + oq);
+                    if (x == *(int*)(b + op)) {
+                        int y = *(int*)(b + oq);
+                        if (rec->m10 == 0 && *(int*)(y + 0x460) == 2 && *(int*)(x + 0x460) == 0) {
+                            fn_800114E0();
+                        } else if (rand() % 100 > 0x32) {
+                            int a1 = fn_80044D3C(rec->mC);
+                            int a2 = fn_80045920(rec->m10);
+                            int a3 = fn_8001F3FC(a, *(int*)(b + oq));
+                            char* bc = (char*)s + 0xC;
+                            int a4 = fn_80044240(*(int*)(bc + oq));
+                            int a5 = fn_80045F28(fn_8025454C((Unk8024EF40_W*)(*(int*)(b + oq) + 0x588), 0xE));
+                            fn_80012B00(a1, a2, a3, a4, a5, fn_8001F45C(a, *(int*)(b + oq)), 0);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (a->m4D8 == 1 && a->m3BC != 0) {
+        int t1 = fn_8004FF78(s, s->m9D8, 0xA);
+        int t2 = fn_8004FF78(s, s->m9D8, 0x14);
+        Unk8004E364_E* o = 0;
+        if (t2 >= 0)
+        {
+            char* b4 = (char*)s + 4;
+            int ko = *(int*)(b4 + t2 * 0x48) * 0x18 + 0x48C;
+            o = (Unk8004E364_E*)((char*)a + ko);
+        }
+        if (o != 0 && o->m8 != 0) {
+            Unk8004E364_Q* q = (Unk8004E364_Q*)(o->m8 + 0x58C);
+            int flag = 0;
+            if (q->m18 != lbl_805A925C || q->mC != lbl_805A925C || q->m14 != lbl_805A925C)
+                flag = 1;
+            if (flag != 0 && (o->m0 == 4 || o->m0 == 1)) {
+                fn_800174EC();
+                return;
+            }
+        }
+        if (e > -1) {
+            int off = ((int (*)(Unk800493D4_Sm*, int, Unk80044C10_A*))fn_8004E248)(s, idx, a) * 0x18 + 0x48C;
+            if (fn_80056E34(lbl_80687600, 0x1A9) == 0) {
+                int v = *(int*)((char*)a + off);
+                if (v == 4 || v == 1)
+                {
+                    char* b4 = (char*)s + 4;
+                    fn_80012BF0(fn_8001F45C(a, *(int*)(b4 + t1 * 0x48)));
+                }
+            }
+        } else if (a->m448 == 4 && t1 > -1 && fn_8004FF78(s, t1, 0x14) == idx) {
+            fn_8004FC60(s, a);
+        }
+    }
+}
+
 void fn_8004E954(Unk800493D4_Sm* s, int idx, Unk80044C10_A* a)
 {
     if (a->m4D8 == 2 && s->mA5C == 0) {
