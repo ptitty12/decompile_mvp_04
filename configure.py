@@ -1189,7 +1189,7 @@ config.libs = [
             Object(Matching, "libc/strtol.c"),
             Object(Matching, "libc/isdigit.c"),
             Object(Matching, "libc/isspace.c"),
-            Object(Matching, "libc/errno.c"),
+            Object(Matching, "libc/errno.c", cflags=[*cflags_libc, "-fcommon"]),  # errno is a common symbol: the linker put it last in .sbss
             Object(Matching, "libc/locale.c"),
             Object(Matching, "libc/math_support.c"),
             Object(Matching, "libc/closer.c"),
