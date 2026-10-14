@@ -753,11 +753,11 @@ extern Unk8017C068_Pair lbl_805CC7D4;
 extern "C" void* fn_80180088__FPv(void* s, void* o);
 extern "C" int rand();
 
-/* near-miss: 99.6%, one register swap. Retail keeps the counter k in r26 and side * 10 in r25;
- * here they swap (global-alloc priority tie). Byte fields are stored from int locals
- * (a direct `rec.m39 = s->m1A0` narrows to lbz); k counts down and `h[k]` after the loop reads
- * element 0 through the counter register, as retail does. Tried: shared/separate j, base local,
- * loop forms (do/while, k > 0), statement order of cnt/n, pointer-based side. */
+/* near-miss: 99.9%, only the order of two li instructions at loop entry (k = 2 and the offset giv) differs.
+ * Byte fields are stored from int locals (a direct `rec.m39 = s->m1A0` narrows to lbz); k counts down
+ * and `s->m1A8[k]` after the loop reads element 0 through the counter register, as retail does
+ * (h[k] gives the lwzx operands in the other order). Tried: shared/separate j, base local, loop forms
+ * (do/while, k > 0), order of cnt/n, pointer-based side, k declared early or late. */
 extern "C" void fn_8017C068(void* self)
 {
     Unk8017A930_T* p = (Unk8017A930_T*)self;
@@ -776,6 +776,7 @@ extern "C" void fn_8017C068(void* self)
     int e = 1;
     if (s->m198 == 0)
         e = 0;
+    Unk801800FC* pr = &rec;
     rec.m3C = e;
     Unk8017C068_Pair ord = lbl_805CC7D4;
     int j;
@@ -809,11 +810,11 @@ extern "C" void fn_8017C068(void* self)
     rec.m1C = g[6];
     rec.m20 = g[3];
     rec.m0 = s->m1B8;
-    rec.m4 = h[k];
+    rec.m4 = s->m1A8[k];
     rec.m8 = g[1];
     rec.mC = h[1];
     mid->mC->m600 = 1;
-    fn_8018019C(&rec);
+    fn_8018019C(pr);
 }
 
 void fn_8017C5F0(Unk8017A930_T* p, int a)
