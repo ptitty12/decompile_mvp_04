@@ -23,7 +23,7 @@ char* fn_80090880(Unk80090880* p, int id)
         s = p->m8;
     if (s) {
         char buf[0x80];
-        char* r = (char*)fn_80402CAC((const unsigned char*)s, id);
+        char* r = (char*)LOCALE_getstr((const unsigned char*)s, id);
         if (!r) {
             fn_804089B4(buf, lbl_805B5734);
             fn_804031BC(lbl_806877CC, buf);

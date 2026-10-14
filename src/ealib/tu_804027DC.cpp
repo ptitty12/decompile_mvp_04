@@ -13,8 +13,8 @@ struct V3 {
     float x, y, z;
 };
 
-extern "C" void fn_80402ACC(const V3* a, const V3* b, V3* out);
-extern "C" void fn_80402B48(const V3* v, V3* out);
+extern "C" void v3crossprod(const V3* a, const V3* b, V3* out);
+extern "C" void v3unit(const V3* v, V3* out);
 
 extern "C" int sprintf(char*, const char*, ...);
 extern const char lbl_8060E9A0[];
@@ -82,14 +82,14 @@ extern "C" float fn_8040293C(float x)
     return (float)cos((double)x * 6.2831855f);
 }
 
-extern "C" void fn_80402970(const float* a, float* s, float* c)
+extern "C" void rsincos(const float* a, float* s, float* c)
 {
     *s = fn_80402908(*a);
     *c = fn_8040293C(*a);
 }
 
 /* Vec3 array helpers of the EA math library */
-extern "C" void fn_804029B8(int n, const V3* a, const V3* b, V3* out)
+extern "C" void v3add(int n, const V3* a, const V3* b, V3* out)
 {
     int i;
     for (i = 0; i < n; i++) {
@@ -99,7 +99,7 @@ extern "C" void fn_804029B8(int n, const V3* a, const V3* b, V3* out)
     }
 }
 
-extern "C" void fn_80402A04(int n, const V3* a, const V3* b, V3* out)
+extern "C" void v3sub(int n, const V3* a, const V3* b, V3* out)
 {
     int i;
     for (i = 0; i < n; i++) {
@@ -109,7 +109,7 @@ extern "C" void fn_80402A04(int n, const V3* a, const V3* b, V3* out)
     }
 }
 
-extern "C" void fn_80402A50(int n, const V3* a, V3* out, float k)
+extern "C" void v3scale(int n, const V3* a, V3* out, float k)
 {
     int i;
     for (i = 0; i < n; i++) {
@@ -119,7 +119,7 @@ extern "C" void fn_80402A50(int n, const V3* a, V3* out, float k)
     }
 }
 
-extern "C" float fn_80402A90(const V3* v)
+extern "C" float v3length(const V3* v)
 {
     float y = v->y;
     float x = v->x;
@@ -130,7 +130,7 @@ extern "C" float fn_80402A90(const V3* v)
 }
 
 /* near-miss: same length; retail interleaves the six loads and three products differently (locals in draft order tried). */
-extern "C" void fn_80402ACC(const V3* a, const V3* b, V3* out)
+extern "C" void v3crossprod(const V3* a, const V3* b, V3* out)
 {
     float bx = b->x;
     float ax = a->x;
@@ -146,19 +146,19 @@ extern "C" void fn_80402ACC(const V3* a, const V3* b, V3* out)
 extern "C" void fn_80402B0C(const V3* a, const V3* b, V3* out)
 {
     V3 t;
-    fn_80402ACC(a, b, &t);
-    fn_80402B48(&t, out);
+    v3crossprod(a, b, &t);
+    v3unit(&t, out);
 }
 
-extern "C" void fn_80402B48(const V3* v, V3* out)
+extern "C" void v3unit(const V3* v, V3* out)
 {
-    float s = 1.0f / fn_80402A90(v);
+    float s = 1.0f / v3length(v);
     out->x = v->x * s;
     out->y = v->y * s;
     out->z = v->z * s;
 }
 
-extern "C" void fn_80402BA8(int n, const V3* a, const V3* b, float* out)
+extern "C" void v3dot(int n, const V3* a, const V3* b, float* out)
 {
     int i;
     for (i = 0; i < n; i++)
@@ -184,11 +184,11 @@ extern "C" int fn_80402C08(const unsigned short* a, const unsigned char* b)
     return *a - ((b[1] << 8) | b[0]);
 }
 
-extern "C" int fn_80402C24(unsigned short key, const unsigned char* t);
+extern "C" int getstringidbyindex(unsigned short key, const unsigned char* t);
 
 extern "C" void* bsearch(const void* key, const void* base, unsigned n, unsigned sz, int (*cmp)(const void*, const void*));
 
-extern "C" int fn_80402C24(unsigned short key, const unsigned char* t)
+extern "C" int getstringidbyindex(unsigned short key, const unsigned char* t)
 {
     unsigned short k = key;
     const unsigned char* r = (const unsigned char*)bsearch(&k, t + 0x10, ReadLE32(t + 8), 4, (int (*)(const void*, const void*))fn_80402C08);
@@ -201,11 +201,11 @@ extern "C" int fn_80402C24(unsigned short key, const unsigned char* t)
     return v;
 }
 
-extern "C" const unsigned char* fn_80402CAC(const unsigned char* t, int id)
+extern "C" const unsigned char* LOCALE_getstr(const unsigned char* t, int id)
 {
     int k = id;
     if (t[8] & 1)
-        k = fn_80402C24(k, t + ReadLE32(t + 4));
+        k = getstringidbyindex(k, t + ReadLE32(t + 4));
     const unsigned char* sec = t + ReadLE32(t + 0x10 + ReadLE16(t + 0xE) * 4);
     const unsigned char* r;
     if (k >= 0 && (unsigned)k < ReadLE32(sec + 0xC))
@@ -215,7 +215,7 @@ extern "C" const unsigned char* fn_80402CAC(const unsigned char* t, int id)
     return r;
 }
 
-extern "C" void fn_80402DE4(unsigned char* t, int flag)
+extern "C" void LOCALE_create(unsigned char* t, int flag)
 {
     if (flag == 0)
         return;
@@ -366,11 +366,11 @@ extern "C" unsigned short* fn_80403310(unsigned short* end, int v, unsigned base
     return fn_804032D8(end, v, base, digits);
 }
 
-extern "C" void fn_80403534(unsigned short* dst, const unsigned short* fmt, va_list ap);
+extern "C" void USTR_vsprintf(unsigned short* dst, const unsigned short* fmt, va_list ap);
 
 extern "C" void fn_80403DE4(unsigned short* dst, const unsigned short* fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-    fn_80403534(dst, fmt, ap);
+    USTR_vsprintf(dst, fmt, ap);
 }

@@ -35,7 +35,7 @@ float fn_802CF5CC(int a, int b, float x, float y, float z);
 extern "C" void fn_802CC0E8(Unk802CC48C* o, Unk802CC48C_Mat* out);
 
 extern "C" void fn_802CBE5C(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, Unk802CBD04_Vec3* c);
-extern "C" void fn_80402A04(int a, int b, Unk802CBD04_Vec3* c, void* d);
+extern "C" void v3sub(int a, int b, Unk802CBD04_Vec3* c, void* d);
 extern "C" void fn_80402B0C(void* m, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b);
 class Unk802CC608_Obj;
 void fn_802CC748(Unk802CC608_Obj* o, Unk802CC608_Obj** best, float* bestD, Unk802CBD04_Vec3* p);
@@ -107,7 +107,7 @@ void fn_802CC064(Unk802CBD04* o, Unk802CBD04_Vec3* a, Unk802CBD04_Vec3* b, int c
     Unk802CBD04_Vec3 sp28;
     Unk802CBD04_Vec3 sp38 = o->m60;
     fn_802CBE04(o, &sp18, a, &sp28);
-    fn_80402A04(1, c, &sp38, sp8);
+    v3sub(1, c, &sp38, sp8);
     fn_80402B0C(sp8, a, b);
 }
 
@@ -243,7 +243,7 @@ struct Unk802CE2C4_Obj {
 };
 Unk802CE2C4_Obj* fn_801A6D84(Unk8019F8C0_Owner* o, int i);
 extern "C" Unk802CBD04_Vec3 fn_80183918(int a, int b, int c);
-extern "C" void fn_80402B48(const Unk802CBD04_Vec3* v, Unk802CBD04_Vec3* out);
+extern "C" void v3unit(const Unk802CBD04_Vec3* v, Unk802CBD04_Vec3* out);
 extern Unk802CBD04_Vec3 lbl_806055AC;
 inline Unk802CBD04_Vec3 Unk802CE2C4_Sub(const Unk802CBD04_Vec3& a, const Unk802CBD04_Vec3& b)
 {
@@ -269,7 +269,7 @@ void fn_802CE2C4(Unk802CBD04* o, int k, int kind, Unk802CBD04_Vec3* out)
                 a = fn_80183918(o->mD8->m6B8, h, 0);
                 b = fn_80183918(o->mD8->m6B8, h, 2);
                 *out = Unk802CE2C4_Sub(b, a);
-                fn_80402B48(out, out);
+                v3unit(out, out);
             }
         } else {
             *out = lbl_806055AC;

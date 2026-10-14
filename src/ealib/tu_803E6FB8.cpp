@@ -437,7 +437,7 @@ extern "C" int fn_803E910C(Unk803E910C_Obj* o, const char* key2, const char* key
 }
 
 /* near-miss: 3 slots; the bound t->m10 is loaded into r6 (ours r0) and the entry address is ents + i*16 in the other operand order */
-extern "C" int fn_803E945C(Unk803E945C_T* t, const char* name)
+extern "C" int dlsym(Unk803E945C_T* t, const char* name)
 {
     const char* p = name;
     Unk803E945C_Ent* ents = t->m14;

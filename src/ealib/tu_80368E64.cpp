@@ -35,7 +35,7 @@ struct Unk80373AD8Mtx {
 };
 
 /*
- * Object built by fn_803E3C08 (x, -1). Offsets seen in fn_80369554 (stack
+ * Object built by fn_803E3C08 (x, -1). Offsets seen in RenderSingleDrawGouraud (stack
  * object, 0xC0 bytes) and fn_80368E64.
  */
 struct Unk803E3C08 {
@@ -326,7 +326,7 @@ extern "C" void fn_80368E64(Unk803E3C08* a, Unk8062326C* b)
     }
 }
 
-extern "C" void fn_80369554(void* x)
+extern "C" void RenderSingleDrawGouraud(void* x)
 {
     Unk803E3C08 a;
     a.m8 = &lbl_806EFA74;
@@ -382,4 +382,4 @@ extern "C" void fn_80369554(void* x)
     }
 }
 
-Unk803DA440 lbl_80693CFC((void (*)())fn_80369554, (void*)lbl_80623230, (void*)lbl_80623248, (void*)lbl_80603718);
+Unk803DA440 lbl_80693CFC((void (*)())RenderSingleDrawGouraud, (void*)lbl_80623230, (void*)lbl_80623248, (void*)lbl_80603718);

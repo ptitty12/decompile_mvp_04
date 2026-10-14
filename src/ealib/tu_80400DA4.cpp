@@ -300,20 +300,20 @@ extern "C" int fixedmult(int a, int b)
     return (int)(((long long)a * b + 0x8000) >> 16);
 }
 
-extern "C" void fn_80402970(const float* a, float* s, float* c);
+extern "C" void rsincos(const float* a, float* s, float* c);
 
-extern "C" void fn_80402970(const float* a, float* s, float* c);
+extern "C" void rsincos(const float* a, float* s, float* c);
 
-extern "C" void fn_80402970(const float* a, float* s, float* c);
+extern "C" void rsincos(const float* a, float* s, float* c);
 
-extern "C" void fn_80402970(const float* a, float* s, float* c);
+extern "C" void rsincos(const float* a, float* s, float* c);
 
 extern "C" void MATRIX4_multyrot(const Unk80402288_Mtx* in, Unk80402288_Mtx* out, float angle)
 {
     float s;
     float c;
     float a;
-    fn_80402970(&angle, &s, &c);
+    rsincos(&angle, &s, &c);
     a = in->m00;
     out->m00 = a * c + in->m02 * s;
     out->m01 = in->m01;

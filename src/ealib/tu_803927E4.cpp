@@ -176,7 +176,7 @@ extern "C" void iSPCH_PostGlobalMatchParms(int*, McBufB*, McHdrP*);
 
 extern "C" void iSPCH_ClearEvent(unsigned);
 
-extern "C" void fn_80392BC0(int);
+extern "C" void iSPCH_MemFree(int);
 
 struct McEnt8W {
     unsigned m0;
@@ -242,7 +242,7 @@ extern "C" void iSPCH_ClearEvent(unsigned n)
         int off = n * 16;
         int v = *(int*)((char*)pc + off);
         if (v != 0) {
-            fn_80392BC0(v);
+            iSPCH_MemFree(v);
             *(int*)((char*)pc + off) = 0;
         }
         unsigned char* q = (unsigned char*)(t + off);
@@ -367,7 +367,7 @@ extern "C" int fn_80392B80(int x)
     return r;
 }
 
-extern "C" void fn_80392BC0(int v)
+extern "C" void iSPCH_MemFree(int v)
 {
     if (lbl_806243E4[0] != 0)
         ((void (*)(int))lbl_806243E4[0])(v);
@@ -1013,7 +1013,7 @@ extern "C" void iSPCH_ClearSentenceChoiceChannel(unsigned n)
     int* c12 = (int*)(t + 0xc);
     int v = *(int*)((char*)c12 + off);
     if (v != 0) {
-        fn_80392BC0(v);
+        iSPCH_MemFree(v);
         *(int*)((char*)c12 + off) = 0;
     }
     int* c4 = (int*)(t + 4);

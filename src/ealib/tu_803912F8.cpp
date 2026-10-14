@@ -77,7 +77,7 @@ struct McState {
 extern McState lbl_8069B80C;
 extern int lbl_8069B9B8[];
 extern short lbl_8069B9BC[];
-extern "C" void fn_80392BC0(void* p);
+extern "C" void iSPCH_MemFree(void* p);
 extern "C" void iSPCH_InitInGame();
 
 /* Declared as arrays of unknown size: retail reaches these with lis/lwz (not r13), i.e. this part of the
@@ -496,7 +496,7 @@ extern "C" void iSPCH_InitEventQueue()
         lbl_8069B80C.ch[i].m8 = 0;
         p->m47 = 0xFF;
         if (lbl_8069B80C.ch[i].mC != 0)
-            fn_80392BC0(lbl_8069B80C.ch[i].mC);
+            iSPCH_MemFree(lbl_8069B80C.ch[i].mC);
         lbl_8069B80C.ch[i].mC = 0;
     }
     lbl_8069B9B8[0] = 0;
@@ -606,7 +606,7 @@ extern "C" int iSPCH_AddEvent(int* arg0)
                         lbl_8069B9B8[0] = now;
                         lbl_8069B80C.ch[ch].m0 = now;
                         if (lbl_8069B80C.ch[ch].mC != 0)
-                            fn_80392BC0(lbl_8069B80C.ch[ch].mC);
+                            iSPCH_MemFree(lbl_8069B80C.ch[ch].mC);
                         lbl_8069B80C.ch[ch].mC = arg0;
                         lbl_8069B80C.cnt[spC] += 1;
                         p->m46 = 1;
@@ -638,7 +638,7 @@ extern "C" int SPCH_AddEventV(int first, int n, ...)
             buf[i] = va_arg(ap, int);
         r = iSPCH_AddEvent(buf);
         if (r == 0)
-            fn_80392BC0(buf);
+            iSPCH_MemFree(buf);
     }
     return r;
 }
@@ -675,7 +675,7 @@ extern "C" void SPCH_ClearEventQueue()
         if (p->m46 != 0) {
             p->m46 = 0;
             if (lbl_8069B80C.ch[i].mC != 0) {
-                fn_80392BC0(lbl_8069B80C.ch[i].mC);
+                iSPCH_MemFree(lbl_8069B80C.ch[i].mC);
                 lbl_8069B80C.ch[i].mC = 0;
             }
             lbl_8069B80C.cnt[p->m47]--;

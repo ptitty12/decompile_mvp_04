@@ -86,7 +86,7 @@ extern Unk80379324 lbl_806055E8;
 extern Unk80379324_Vec3 lbl_806055AC;
 extern "C" Unk803793D4_Vec4 fn_803793D4(float w, const Unk80379324_Vec3* v);
 
-extern "C" float fn_80402A90(const Unk80379324_Vec3* v);
+extern "C" float v3length(const Unk80379324_Vec3* v);
 extern "C" float acosf(float x);
 
 extern "C" float asinf(float x);
@@ -657,8 +657,8 @@ extern "C" float fn_80379F1C(const Unk80379324_Vec3* a, const Unk80379324_Vec3* 
 
 extern "C" float fn_8037A9AC(const Unk80379324_Vec3* a, const Unk80379324_Vec3* b)
 {
-    float la = fn_80402A90(a);
-    float lb = fn_80402A90(b);
+    float la = v3length(a);
+    float lb = v3length(b);
     if (la <= 0.000001f || lb <= 0.000001f)
         return 0.0f;
     float c = (a->x * b->x + a->y * b->y + a->z * b->z) / (la * lb);
