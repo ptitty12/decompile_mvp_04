@@ -1,7 +1,7 @@
 # PROGRESS
 
 ## Snapshot (update each session)
-- Phase: **2 (matching decompilation), in progress**
+- Direction (owner, 2026-10-14): **browser play, browser netplay, easy roster/team mods**, on a foundation without tech debt. Plan: `docs/ROADMAP.md`. Engine track: not started, E0 next. Knowledge track: the decomp, prioritized by targets K1-K5 (`tools/goals/targets.py`; K1 48%, K2 7%, K3 0%, K4 1% done on 2026-10-14).
 - Target: MVP Baseball **2005**, GameCube `GV4E69` (USA, rev 0). `main.dol` SHA-1 `da6becdbea614d03c4b5eae9f8a0fb08e0a184dd`
 - Build: `python configure.py && ninja` rebuilds a byte-identical `build/GV4E69/main.dol` from compiled source plus remaining dtk-split assembly (24,158 functions, 5,896,176 code bytes).
 - Toolchain:
@@ -373,3 +373,16 @@
     - verify fails on a leftover `build/_baseline/wt` from an interrupted run; integ.sh now clears it inside the lock.
     - Two of the lead's own integrations under the same agent name ran at once: `coord.py run-locked` treated a second run under the same name as re-entrant, and the first to finish released the lock while the other was still verifying. Fixed: `run-locked` is no longer re-entrant, so a second run under the same name waits (tested with two overlapping runs in a scratch COORD_DIR). The explicit `lock` command is unchanged.
   - Notes for every function attempted: docs/notes/fable-2026-10-13/.
+- 2026-10-14 | Claude Opus 5.5 ("claude-side-goals" side session) | repo reframe around the owner's end goals; no unit | matched 0 | None. The owner set the goals in chat (browser play, browser netplay with VPS matchmaking, easy roster/team mods, no tech debt) and asked for the repo to be rebuilt around them.
+  - New: `docs/ROADMAP.md` (replaces `docs/PHASES.md`): the goal, two tracks, three stable mod contracts, milestones E0-E7 and K1-K5 with exits, ordered next steps, and what is paused.
+  - New: `docs/ARCHITECTURE.md`: in-browser PowerPC-to-WebAssembly translation of the retail code; the runtime and SDK replacements; GX command stream to WebGPU; audio; virtual disc; roster/team packs as semantic patches; input-lockstep netplay over WebRTC with the VPS for lobby, signaling and TURN; decisions D1-D8.
+  - New: `tools/goals/targets.py`, which measures K1-K4 from a build.
+  - New: `engine/README.md`.
+  - Rewritten: `CLAUDE.md` (goal, tracks, rules for both; name and contract commits) and `README.md`.
+  - Updated: `AGENTS.md`, `DECISIONS.md` (three Decided entries; two open contract questions unblocked), the HANDOFF banner, SPEEDUPS, the worker brief, and references to PHASES.md.
+  - Findings:
+    - most K-target code is matched but unnamed;
+    - the roster database is `/data/database/database.big`;
+    - the game reloads its code overlays from `/data/ovlay.big` at runtime (same bytes as the DOL);
+    - the disc carries two unreferenced, larger overlay builds (`ovlay_d.big`, `ovlay_m.big`), noted in REFERENCE_SOURCES as a possible naming source.
+  | Owner: nothing pending. D1 (adopt or write the translator) is decided by the E0a survey.
