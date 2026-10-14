@@ -256,7 +256,7 @@ void OSPanic(const char* file, int line, const char* msg, ...)
 }
 
 extern u32 lbl_806EF2D8;               /* __OSFpscrEnableBits */
-extern void* lbl_806DF090[17];         /* __OSErrorTable */
+extern OSErrorHandler lbl_806DF090[17]; /* __OSErrorTable */
 
 extern void fn_80433644(OSContext* context);           /* OSSaveFPUContext wrapper (original code) */
 
@@ -270,8 +270,8 @@ OSErrorHandler OSSetErrorHandler(OSError error, OSErrorHandler handler)
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
-    oldHandler = (OSErrorHandler)lbl_806DF090[error];
-    lbl_806DF090[error] = (void*)handler;
+    oldHandler = lbl_806DF090[error];
+    lbl_806DF090[error] = handler;
 
     if (error == 16) {
         u32 msr;
@@ -326,7 +326,7 @@ typedef OSErrorHandler ErrHandler;
 /* __OSUnhandledException */
 void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar)
 {
-    void** table = lbl_806DF090;
+    OSErrorHandler* table = lbl_806DF090;
     OSTime tb = OSGetTime();
 
     if (!(context->srr1 & 2)) {

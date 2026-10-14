@@ -37,7 +37,7 @@ extern void fn_80435B38(void);                         /* Config48MB (original c
 extern void fn_8043402C(u8 exception, OSContext* context, u32 dsisr, u32 dar);
 extern u32 fn_80435350(u32 global);
 extern OSResetFunctionInfo lbl_80637128;
-extern void* lbl_806DF090[17];                         /* __OSErrorTable */
+extern OSErrorHandler lbl_806DF090[17];                 /* __OSErrorTable */
 
 /* ==== OSMemory ==== */
 
