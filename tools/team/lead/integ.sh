@@ -13,8 +13,9 @@ if [ -n "$wt" ] && git -C "$wt" log --format=%s origin/main..HEAD | grep -q "^wi
   git -C "$wt" update-ref -d "refs/original/refs/heads/$b" 2>/dev/null
 fi
 for i in 1 2 3; do
-  git checkout -q -f integrate/auto
-  out=$(python tools/coord.py run-locked claude-lead --purpose "merge $b" -- python tools/team/integrate.py "$b" --allow config/GV4E69/symbols.txt "$@" --push 2>&1)
+  # Inside the lock: clear a baseline worktree left by an interrupted verify (it makes the next
+  # `git worktree add` fail), then check out the integration branch (queued merges share this worktree).
+  out=$(python tools/coord.py run-locked claude-lead --purpose "merge $b" -- bash -c 'python -c "import shutil; shutil.rmtree(\"build/_baseline/wt\", ignore_errors=True)" && git worktree prune && git checkout -q -f integrate/auto && exec python tools/team/integrate.py "$@"' _ "$b" --allow config/GV4E69/symbols.txt "$@" --push 2>&1)
   echo "$out" | grep -E "REFUSED|regressions|VERIFY|-> main|failed|mismatch|hunk" | tail -4
   # success only on a real ref update ("abc..def  HEAD -> main"), not "[remote rejected] HEAD -> main"
   echo "$out" | grep -qE "^ +[0-9a-f]+\.\.[0-9a-f]+ +HEAD -> main" && exit 0

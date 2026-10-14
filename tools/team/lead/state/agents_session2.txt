@@ -84,3 +84,16 @@ W10 p6-28 ab6a32a7948829d81
 W11 p6-07 a20eb6b68905799ce
 W12 p6-13 a95b570b56481112d
 W4 nm-07 a52ce2c302a9679dd  (00:03, END 01:50)
+# Fable hard-function pass 2026-10-13 21:30 (owner: "go hard with Fable"; END 01:30; notes in scratchpad/notes/W<n>.md)
+W1 hard-00 a46575adbfb210c42
+W2 hard-01 a21cb90d89d47eab6
+W3 hard-02 af50d5cce34a4a28a
+W5 hard-03 ad0ccbb07c16df607
+W6 hard-04 aad62c85f196979f9
+W7 hard-05 a4ec3ee7ccf370afa
+W8 hard-06 a9f8ea4fb41431c1d
+W9 hard-07 a1abdb65f823169ed
+W10 hard-08 a76975d26a8e975dc
+W11 hard-09 a3ac9af7412f52b13
+W12 decl-02 ac32b3450939adaed
+# 22:12 all spun down (weekly all-models limit 100%); 9 matches merged by 23:10; notes -> docs/notes/fable-2026-10-13/
