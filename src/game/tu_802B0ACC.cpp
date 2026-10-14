@@ -717,7 +717,7 @@ Unk802B2C58_S* fn_802B2C58(Unk802B2C58_S* self)
     return self;
 }
 
-/* near-miss (2 slots): retail stores m10 before m8 among the float zeros; the head stores' order is the best found by search */
+/* Float-store order found by brute force over the five float stores (the scheduler emits the last-written first). */
 void* fn_802AFA54(Mgr* m, const char* s);
 void* fn_803DD628(void* a, void* b);
 extern void* (*lbl_8062C668)(int size, int heap);
@@ -726,11 +726,11 @@ extern const char lbl_805E0324[];
 
 void fn_802B2C98(Unk802B2C58_S* self)
 {
-    self->m10 = 0.0f;
+    self->m8 = 0.0f;
     self->m4 = -1.0f;
     self->m18 = -1.0f;
     self->mC = 0.0f;
-    self->m8 = 0.0f;
+    self->m10 = 0.0f;
     self->m1C = 0;
     self->m0 = 0;
     self->m24 = 0;
