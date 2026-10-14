@@ -1,0 +1,109 @@
+# Renderer (E1): the GX command stream rendered with WebGPU.
+#
+# engine_gfx is the data-free core (GX state machine, vertex decoding and
+# transform, texture decoders, TEV -> WGSL); it needs nothing outside the repo
+# and its tests run everywhere. engine_gfx_wgpu is the WebGPU backend: Dawn
+# natively (SDL3 for the window), browser WebGPU under Emscripten later (E2).
+# Dawn and SDL3 are prebuilt SDKs outside the repository, pinned in
+# docs/engine/TOOLCHAIN.md; without them the backend is skipped and the rest of
+# the engine builds as before.
+
+add_library(engine_gfx STATIC png.cpp)
+target_link_libraries(engine_gfx PUBLIC engine_common)
+target_compile_options(engine_gfx PRIVATE ${ENGINE_WARN})
+
+engine_test(test_gfx_png SOURCES tests/test_png.cpp LIBS engine_gfx)
+
+# ---- WebGPU backend (Dawn + SDL3) ----
+# Pinned versions (docs/engine/TOOLCHAIN.md). The defaults point at the pinned
+# packages under %USERPROFILE%\tools-ext; MVP_DAWN_DIR / MVP_SDL3_DIR (cache or
+# environment) override them.
+set(MVP_DAWN_RELEASE "v20261013.193955")
+set(MVP_DAWN_COMMIT "f63db59722e8c1c0da9a3bcea0e40fb5c817a059")
+set(MVP_SDL3_VERSION "3.4.18")
+file(TO_CMAKE_PATH "$ENV{USERPROFILE}" _mvp_home)
+set(_mvp_dawn_default "${_mvp_home}/tools-ext/dawn/${MVP_DAWN_RELEASE}/Dawn-${MVP_DAWN_COMMIT}-windows-latest-Release")
+set(_mvp_sdl3_default "${_mvp_home}/tools-ext/sdl3/${MVP_SDL3_VERSION}/SDL3-${MVP_SDL3_VERSION}")
+if(NOT "$ENV{MVP_DAWN_DIR}" STREQUAL "")
+  set(_mvp_dawn_default "$ENV{MVP_DAWN_DIR}")
+endif()
+if(NOT "$ENV{MVP_SDL3_DIR}" STREQUAL "")
+  set(_mvp_sdl3_default "$ENV{MVP_SDL3_DIR}")
+endif()
+set(MVP_DAWN_DIR "${_mvp_dawn_default}" CACHE PATH "Dawn release package (the directory holding lib/cmake/Dawn)")
+set(MVP_SDL3_DIR "${_mvp_sdl3_default}" CACHE PATH "SDL3 development package (the directory holding cmake/SDL3Config.cmake)")
+option(MVP_GFX_WEBGPU "Build the WebGPU renderer when Dawn and SDL3 are found" ON)
+
+set(MVP_HAVE_WEBGPU OFF)
+if(MVP_GFX_WEBGPU)
+  if(EXISTS "${MVP_DAWN_DIR}/lib/cmake/Dawn/DawnConfig.cmake" AND EXISTS "${MVP_SDL3_DIR}/cmake/SDL3Config.cmake")
+    set(MVP_HAVE_WEBGPU ON)
+  else()
+    message(STATUS "gfx: Dawn or SDL3 not found (MVP_DAWN_DIR=${MVP_DAWN_DIR}, MVP_SDL3_DIR=${MVP_SDL3_DIR}); "
+                   "the WebGPU renderer is not built")
+  endif()
+endif()
+
+if(MVP_HAVE_WEBGPU)
+  find_package(Threads REQUIRED)
+  find_package(Dawn CONFIG REQUIRED PATHS "${MVP_DAWN_DIR}/lib/cmake/Dawn" NO_DEFAULT_PATH)
+  find_package(SDL3 CONFIG REQUIRED PATHS "${MVP_SDL3_DIR}/cmake" NO_DEFAULT_PATH)
+  message(STATUS "gfx: WebGPU renderer with Dawn ${MVP_DAWN_RELEASE} and SDL3 ${MVP_SDL3_VERSION}")
+
+  set(_mvp_wgpu_sources wgpu/gpu.cpp wgpu/window.cpp)
+  # The prebuilt Dawn may come from a newer MSVC STL than the installed one
+  # (wgpu/msvc_stl_compat.cpp explains); add the forwarding shim only when
+  # the toolset lacks the split min/max_element entry points.
+  if(MSVC)
+    include(CheckCXXSourceCompiles)
+    check_cxx_source_compiles([[
+      extern "C" const void* __stdcall __std_min_element_4u(const void*, const void*) noexcept;
+      int main() { int a[2] = {1, 0}; return __std_min_element_4u(a, a + 2) == a + 1 ? 0 : 1; }
+    ]] MVP_MSVC_HAS_SPLIT_MINMAX)
+    if(NOT MVP_MSVC_HAS_SPLIT_MINMAX)
+      list(APPEND _mvp_wgpu_sources wgpu/msvc_stl_compat.cpp)
+    endif()
+  endif()
+  add_library(engine_gfx_wgpu STATIC ${_mvp_wgpu_sources})
+  target_link_libraries(engine_gfx_wgpu PUBLIC engine_gfx dawn::webgpu_dawn SDL3::SDL3)
+  target_compile_options(engine_gfx_wgpu PRIVATE ${ENGINE_WARN})
+
+  # Dawn's D3D12 backend loads the DirectX shader compiler (dxcompiler.dll and
+  # dxil.dll) from the executable's directory. The Windows SDK that the MSVC
+  # toolchain already uses ships both; MVP_DXC_DIR overrides it.
+  set(_mvp_dxc_default "")
+  if(WIN32)
+    if(NOT "$ENV{WindowsSdkVerBinPath}" STREQUAL "" AND EXISTS "$ENV{WindowsSdkVerBinPath}/x64/dxcompiler.dll")
+      file(TO_CMAKE_PATH "$ENV{WindowsSdkVerBinPath}/x64" _mvp_dxc_default)
+    else()
+      file(TO_CMAKE_PATH "$ENV{ProgramFiles\(x86\)}/Windows Kits/10/bin" _mvp_kits_bin)
+      file(GLOB _mvp_dxc_found "${_mvp_kits_bin}/10.*/x64/dxcompiler.dll")
+      if(_mvp_dxc_found)
+        list(SORT _mvp_dxc_found COMPARE NATURAL)
+        list(GET _mvp_dxc_found -1 _mvp_dxc_last)
+        get_filename_component(_mvp_dxc_default "${_mvp_dxc_last}" DIRECTORY)
+      endif()
+    endif()
+  endif()
+  set(MVP_DXC_DIR "${_mvp_dxc_default}" CACHE PATH "Directory holding dxcompiler.dll and dxil.dll (default: the Windows SDK's)")
+  set(_mvp_runtime_dlls $<TARGET_FILE:SDL3::SDL3>)
+  if(WIN32)
+    if(EXISTS "${MVP_DXC_DIR}/dxcompiler.dll" AND EXISTS "${MVP_DXC_DIR}/dxil.dll")
+      list(APPEND _mvp_runtime_dlls "${MVP_DXC_DIR}/dxcompiler.dll" "${MVP_DXC_DIR}/dxil.dll")
+      message(STATUS "gfx: DirectX shader compiler from ${MVP_DXC_DIR}")
+    else()
+      message(STATUS "gfx: no dxcompiler.dll/dxil.dll found (MVP_DXC_DIR); D3D12 device creation will fail")
+    endif()
+  endif()
+
+  # Copy the runtime DLLs next to every executable that uses the backend.
+  function(mvp_copy_sdl3 target)
+    add_custom_command(TARGET ${target} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_mvp_runtime_dlls} $<TARGET_FILE_DIR:${target}>
+      VERBATIM)
+  endfunction()
+
+  # Needs a GPU adapter; exits 77 (skipped) where there is none.
+  engine_test(test_gfx_gpu SOURCES tests/test_gpu.cpp LIBS engine_gfx_wgpu)
+  mvp_copy_sdl3(test_gfx_gpu)
+endif()
