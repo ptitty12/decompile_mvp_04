@@ -1,7 +1,7 @@
 # Determinism check (E0b items 9 and 10): boots the game twice with the same
 # budget and compares the reports, including the SDK call log's SHA-1. Run by
 # ctest as `local_boot_twice` (needs the disc); the logs stay in the build tree.
-#   cmake -DBOOT=<mvp-boot> -DWORK=<dir> [-DUNTIL=0xADDR] [-DENTRIES=N] [-DTICKS=N] -P twice.cmake
+#   cmake -DBOOT=<mvp-boot> [-DEMULATOR=<runner, e.g. node>] -DWORK=<dir> [-DUNTIL=0xADDR] [-DENTRIES=N] [-DTICKS=N] -P twice.cmake
 # With UNTIL the run must reach that function entry; without it, use up the budget.
 if(NOT ENTRIES)
   set(ENTRIES 30000000)
@@ -14,7 +14,7 @@ if(NOT TICKS)
 endif()
 foreach(run 1 2)
   execute_process(
-    COMMAND "${BOOT}" run --until ${UNTIL} --mmio 0 --max-entries ${ENTRIES} --max-ticks ${TICKS} --log "${WORK}/twice_${run}.log"
+    COMMAND ${EMULATOR} "${BOOT}" run --until ${UNTIL} --mmio 0 --max-entries ${ENTRIES} --max-ticks ${TICKS} --log "${WORK}/twice_${run}.log"
     WORKING_DIRECTORY "${WORK}"
     OUTPUT_VARIABLE out_${run}
     RESULT_VARIABLE rc_${run})

@@ -2,7 +2,7 @@
 # PRESS must change the run after that frame and not before, and two runs with the
 # same script must be byte-identical. Run by ctest as `local_input_start` (needs
 # the disc); the script is written here, the logs stay in the build tree.
-#   cmake -DBOOT=<mvp-boot> -DWORK=<dir> -DPRESS=F -DFRAMES=N -P input.cmake
+#   cmake -DBOOT=<mvp-boot> [-DEMULATOR=<runner, e.g. node>] -DWORK=<dir> -DPRESS=F -DFRAMES=N -P input.cmake
 if(NOT PRESS)
   set(PRESS 280)
 endif()
@@ -17,7 +17,7 @@ foreach(run a1 a2 b)
     set(input_args --input "${script}")
   endif()
   execute_process(
-    COMMAND "${BOOT}" run --until none --mmio 0 --max-entries 4000000000 --max-ticks 40000000000 --frames ${FRAMES}
+    COMMAND ${EMULATOR} "${BOOT}" run --until none --mmio 0 --max-entries 4000000000 --max-ticks 40000000000 --frames ${FRAMES}
             ${input_args} --log "${WORK}/input_${run}.log" --frame-log "${WORK}/input_${run}.frames"
     WORKING_DIRECTORY "${WORK}"
     OUTPUT_VARIABLE out_${run}
