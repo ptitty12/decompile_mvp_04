@@ -892,6 +892,159 @@ void fn_8030E72C(Unk8030C5D8_At18* p, int c)
     fn_80328374(p, c);
 }
 
+extern "C" int fn_8030EBC8(Unk8030EBC8_Obj* p, int st, int fl);
+void fn_8030F9DC(Unk8030C5D8_Em2* p);
+extern "C" void fn_8030FC1C(Unk8030FC1C_P* p, Unk8030FC1C_Src* src);
+extern const float lbl_805E8FE8;
+extern const float lbl_805E8FEC;
+extern const float lbl_805E8FF0;
+extern const float lbl_805E8FF4;
+extern const float lbl_805E8FF8;
+extern const float lbl_805E8FFC;
+extern const float lbl_805E9000;
+extern const float lbl_805E9004;
+extern const float lbl_805E9008;
+extern const float lbl_805E900C;
+extern const float lbl_805E9010;
+extern const float lbl_805E9014;
+extern const float lbl_805E9018;
+extern const float lbl_805E901C;
+extern int lbl_8062157C;
+extern char lbl_805E89D4[];
+extern char lbl_805E89E0[];
+extern char lbl_805E89F0[];
+extern char lbl_805E89F8[];
+extern char lbl_8061FDD0[];
+extern void* (*lbl_8062C668)(int size, int heap);
+extern "C" {
+int fn_803E67A0(void* o, void* h);
+int fn_803E6950(void* o, const char* name);
+int fn_803E69D8(void* o, const char* name, void* data, int stride, int count);
+int fn_803E68B0(void* o, int k);
+int fn_803DBDD8(void* o, int v);
+void fn_803DBF40(void* o, int a, int b, int c, int d);
+int fn_803DBE18(void* o, int v);
+int fn_803DBE20(void* o, int v);
+int fn_803DBE2C(void* o, int v);
+int fn_803DBE38(void* o, int v);
+int fn_803DBE44(void* o, int v);
+int fn_803DBE68(void* o, int v);
+int fn_803DBE78(void* o, int v);
+void fn_803DBF00(void* o, int v);
+}
+/* Emitter object: flags at +0x38/+0x3C, particle count at +0x60, constants and tuning floats at +0x64..+0xC0,
+ * the "Coordinates" and "Colours" arrays at +0xB8/+0xBC (count-prefixed, allocated through lbl_8062C668), the
+ * EAGL::DrawArray at +0x114 and its GeoPrimState at +0x150. */
+struct Unk8030E78C_Obj {
+    char pad0[0x38];
+    int m38;
+    int m3C;
+    char pad40[0x58 - 0x40];
+    int m58;
+    int m5C;
+    int m60;
+    float m64;
+    float m68;
+    float m6C;
+    float m70;
+    float m74;
+    float m78;
+    float m7C;
+    char pad80[0x9C - 0x80];
+    float m9C;
+    float mA0;
+    float mA4;
+    float mA8;
+    float mAC;
+    float mB0;
+    float mB4;
+    int* mB8;
+    int* mBC;
+    float mC0;
+};
+/* K3: setup of an ambient particle emitter (a point-sprite EAGL::DrawArray with the named vars "Parameters", "Coordinates",
+ * "Colours" and "State"): picks the effect variant with rand() (rand() % 4 when m38 == 0x3E, else rand() % 9 kept only if <= 2), stores
+ * it in lbl_8062157C and calls fn_8030EBC8 with it, fills 2 * 512 coordinate/colour slots and seeds them with fn_8030FD50 (rand-driven).
+ * near-miss: 98.6%; same code, the float constants land in different FPRs and the lis/lfs pairs are scheduled differently. */
+void fn_8030E78C(void* pp, int a)
+{
+    Unk8030E78C_Obj* p = (Unk8030E78C_Obj*)pp;
+    int r = 0;
+    p->m60 = 0x200;
+    p->m58 = 0x6C79800F;
+    p->m5C = 0x6C79804B;
+    int flag = p->m38 == 0x3E;
+    p->m68 = lbl_805E8FE8;
+    p->m6C = lbl_805E8FEC;
+    p->m74 = lbl_805E8FF4;
+    p->m78 = lbl_805E8FF8;
+    p->m7C = lbl_805E8FF0;
+    p->mC0 = lbl_805E8FFC;
+    p->m64 = lbl_805E9000;
+    p->m70 = lbl_805E8FF0;
+    if (flag) {
+        r = rand() % 4;
+        p->m3C = 1;
+    } else {
+        int t = rand() % 9;
+        if (t <= 2)
+            r = t;
+    }
+    fn_8030EBC8((Unk8030EBC8_Obj*)p, r, 0);
+    lbl_8062157C = r;
+    p->m9C = lbl_805E9004;
+    p->mA0 = lbl_805E9008;
+    p->mA4 = lbl_805E900C;
+    if (!flag)
+        p->mA4 = p->mA4 * lbl_805E9010;
+    p->mA8 = lbl_805E9014;
+    p->mB0 = lbl_805E901C;
+    p->mAC = lbl_805E9018;
+    p->mB4 = p->mA8 * p->mB0;
+    fn_8030F9DC((Unk8030C5D8_Em2*)p);
+    int n = p->m60 * 2;
+    int* q = (int*)lbl_8062C668(n * 12 + 8, 0) + 2;
+    q[-2] = n;
+    p->mB8 = q;
+    int* z = (int*)lbl_8062C668(n * 4 + 8, 0) + 2;
+    z[-2] = n;
+    int* zz = z;
+    if (n != 0) {
+        int c = n - 1;
+        do {
+            *zz = 0;
+            zz++;
+        } while (c-- != 0);
+    }
+    p->mBC = z;
+    for (int i = 0; i < p->m60; i++)
+        fn_8030FD50((Unk8030FD50_Obj*)p, i);
+    char* h = (char*)p + 0x114;
+    fn_8030FA9C((Unk8030C5D8_Em*)p);
+    char* s = (char*)p + 0x150;
+    fn_8030FB5C((Unk8030C5D8_Em*)p);
+    fn_8030FC1C((Unk8030FC1C_P*)p, (Unk8030FC1C_Src*)a);
+    fn_803E67A0(h, (char*)p + 0x18C);
+    fn_803E6B3C(h);
+    fn_803E6950(h, lbl_805E89D4);
+    fn_803E69D8(h, lbl_805E89D4, lbl_8061FDD0, 0x10, 1);
+    fn_803E69D8(h, lbl_805E89E0, p->mB8, 0xC, n);
+    fn_803E69D8(h, lbl_805E89F0, p->mBC, 4, n);
+    fn_803DBDD8(s, 0xA8);
+    fn_803E68B0(h, 0xA8);
+    fn_803DBF40(s, 1, 4, 1, 5);
+    fn_803DBE38(s, 1);
+    fn_803DBE78(s, 1);
+    fn_803DBE18(s, 1);
+    fn_803DBE68(s, 0);
+    fn_803DBE44(s, 0);
+    fn_803DBE20(s, 0);
+    fn_803DBE2C(s, 3);
+    fn_803DBF00(s, 0);
+    fn_803E69D8(h, lbl_805E89F8, s, 0x3C, 1);
+    fn_803E6B74(h);
+}
+
 extern "C" void fn_8030EB38(void* pp)
 {
     Unk8030C5D8_Dl* p = (Unk8030C5D8_Dl*)pp;
