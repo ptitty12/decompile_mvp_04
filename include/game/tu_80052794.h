@@ -1070,7 +1070,7 @@ void fn_800403EC(void* p);
 void fn_8005C75C(Unk8005BA1C_Obj* o, int a, int b);
 int fn_8005C654(Unk8005BA1C_Obj* o, int a, int b, int c);
 extern "C" void fn_803AB480(int h);
-extern "C" void fn_803ADA2C(int h, int v);
+extern "C" void SNDvol(int h, int v);
 
 void fn_8005AEB0(Unk8005ADD0_Obj* o, int ch);
 /* fn_80053C88 */

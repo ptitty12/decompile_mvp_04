@@ -11,7 +11,7 @@
 
 extern "C" void* fn_803774A8(unsigned n, int heap);
 extern "C" int fn_803AC11C();
-extern "C" int fn_803AD9BC();
+extern "C" int SNDSYS_vectortoreal();
 extern "C" int fn_803AC164(int a, char* buf, int size);
 extern "C" int fn_803B9D50(Unk8001BA78* a);
 extern "C" int fn_803B9D84();
@@ -28,7 +28,7 @@ int Unk8001C314::fn_8001CACC()
     if (m6C == 0) {
         m64 = new (0x400) char[0x32000];
         if (fn_803AC11C() == 0) {
-            if (fn_8001CC7C() == 0 || fn_803AD9BC() < 0) {
+            if (fn_8001CC7C() == 0 || SNDSYS_vectortoreal() < 0) {
                 ok = 0;
             }
             if (ok) {

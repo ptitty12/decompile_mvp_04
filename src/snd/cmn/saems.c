@@ -13,7 +13,7 @@ int fn_803BA44C(Csis::Class*, int*);
 int fn_803BA80C(Csis::GlobalVariableHandle*, void*);
 int fn_803A9204(SNDPLAYOPTS*);
 int fn_803AB480(int);
-int fn_803ADA2C(int, int);
+int SNDvol(int, int);
 int fn_803A8648(int);
 void fn_803A975C(void);
 void fn_803A979C(void);
@@ -805,7 +805,7 @@ void SNDAEMSI_playerstopbank(AemsDef::PLAYERSTATE *pplayerstate) {
 }
 
 void SNDAEMSI_playerpausebank(AemsDef::PLAYERHANDLE pplayerstate) {
-    fn_803ADA2C(pplayerstate.u.shandle, 0);
+    SNDvol(pplayerstate.u.shandle, 0);
     SNDpitchmult(pplayerstate.u.shandle, 0);
 }
 

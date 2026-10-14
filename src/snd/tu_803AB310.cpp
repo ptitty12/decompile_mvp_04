@@ -17,7 +17,7 @@ extern "C" int fn_803FD944(int a, int b, int c);
 extern "C" void fn_803AA810(int h, int a, void* b, int c, int d);
 extern "C" int fn_803FE914(int h);
 extern "C" void fn_803FDD78(int h, int v);
-extern "C" void fn_803AD258(int shandle, int v);
+extern "C" void SNDCTRL_timemult(int shandle, int v);
 
 extern unsigned char lbl_8069C9E4[7];
 extern int lbl_8062543C;
@@ -31,7 +31,7 @@ extern int lbl_80625448;
 
 extern int lbl_8062544C;
 extern int lbl_80625450;
-extern "C" int fn_803AF374();
+extern "C" int SNDPLATFORM_outputcaps();
 extern "C" int fn_803AC214(SNDSYSOPTS* sso);
 
 static inline void ErrNop(int) { }
@@ -55,7 +55,7 @@ struct Unk8069CB9C {
 extern Unk8069CB9C lbl_8069CB9C;
 extern int lbl_80625440;
 
-extern "C" int fn_803AF934(int a);
+extern "C" int SNDPLATFORM_restore(int a);
 extern "C" void fn_803B39A4();
 extern "C" void fn_803B12CC();
 extern "C" int SNDMEMI_restore();
@@ -242,7 +242,7 @@ extern "C" int fn_803AB984(int h, int v)
     if (pssc == 0)
         return -8;
     pssc->po.timemult = v;
-    fn_803AD258(pssc->shandle, v);
+    SNDCTRL_timemult(pssc->shandle, v);
     return 0;
 }
 
@@ -477,20 +477,20 @@ extern "C" int fn_803AC214(SNDSYSOPTS* sso)
         sndgs.sso.set.compatibility = 0;
         sndgs.sso.set.updateperiod = -1.0f;
         sndgs.prevset = sndgs.sso.set;
-        lbl_80625450 = fn_803AF374();
+        lbl_80625450 = SNDPLATFORM_outputcaps();
         lbl_8062544C = 1;
     }
     *sso = sndgs.sso;
     return lbl_80625450;
 }
 
-extern "C" void fn_803AF42C();
+extern "C" void SNDPLATFORM_outputset();
 
 extern "C" int fn_803AC368(SNDSYSOPTS* sso)
 {
     sndgs.sso.set = sso->set;
     sndgs.sso.vec = sso->vec;
-    fn_803AF42C();
+    SNDPLATFORM_outputset();
     sndgs.prevset = sndgs.sso.set;
     return 0;
 }
@@ -512,7 +512,7 @@ extern "C" int fn_803AC5CC()
     fn_803B39A4();
     if (sndgs.bankremove != 0)
         sndgs.bankremove(-1);
-    fn_803AF934(0);
+    SNDPLATFORM_restore(0);
     fn_803A975C();
     SNDMEMI_free(sndgs.chan);
     SNDMEMI_free(sndgs.banklist);

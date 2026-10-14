@@ -18,11 +18,11 @@ extern int lbl_8069CAD4;
 extern const float lbl_80609598;
 
 extern "C" int fn_803B0798();
-extern "C" void fn_803AF9C0();
+extern "C" void iSNDserve();
 extern "C" void fn_803AB480(int handle);
 extern "C" void fn_803B41C8(int voice);
 extern "C" int fn_803AD2F0(void** pptp, SNDIPATCHHEADER* pph);
-extern "C" int fn_803AFD88(SNDIPATCHHEADER* pph, int a, int b);
+extern "C" int SNDPLATFORM_asyncresolvetimbre(SNDIPATCHHEADER* pph, int a, int b);
 extern "C" void fn_803A81E0(SNDIPATCHHEADER* pph, int a);
 extern "C" void fn_803B12D0(void* s, int chrg);
 extern "C" void fn_803B12F8(void* s, int chrg);
@@ -91,7 +91,7 @@ unsigned int iSNDrandom()
     return x;
 }
 
-/* near-miss: all 32 insns, but retail loads r4 (a) before the addi r3 for &pph in the fn_803AFD88 call; inline wrapper, local pointer and != / > 0 loop forms did not move it */
+/* near-miss: all 32 insns, but retail loads r4 (a) before the addi r3 for &pph in the SNDPLATFORM_asyncresolvetimbre call; inline wrapper, local pointer and != / > 0 loop forms did not move it */
 extern "C" int fn_803A93D0(unsigned int rendermodes, void* ptp, int a, int b)
 {
     SNDIPATCHHEADER pph;
@@ -100,7 +100,7 @@ extern "C" int fn_803A93D0(unsigned int rendermodes, void* ptp, int a, int b)
     do {
         more = fn_803AD2F0(&p, &pph);
         if (pph.rendermode & rendermodes) {
-            fn_803AFD88(&pph, a, b);
+            SNDPLATFORM_asyncresolvetimbre(&pph, a, b);
             fn_803A81E0(&pph, 0);
         }
     } while (more != 0);
@@ -126,7 +126,7 @@ extern "C" void fn_803A94BC()
 {
     int i = 0;
     sndgs.audiotick++;
-    fn_803AF9C0();
+    iSNDserve();
     for (i = 0; i < sndgs.numserverclients100hz; i++)
         sndgs.serverclient100hz[i]();
     for (i = 0; i < sndgs.voicestotal; i++) {
