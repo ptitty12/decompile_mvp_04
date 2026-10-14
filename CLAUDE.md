@@ -100,6 +100,18 @@ decide. Be honest: report failures and unmatched functions plainly.
 - "Stop and ask" below means: record the question in `docs/DECISIONS.md`,
   mention it once in your report, and continue with other work.
 
+## Working alongside Codex and other agents (owner, 2026-10-13)
+
+Claude and Codex agents work on this repo at the same time and coordinate
+through `tools/coord.py`. Follow `docs/COORDINATION.md`:
+- register at the start of a session (`claude-lead`, `claude-w<N>`,
+  `claude-side-<topic>`), run `who`, and read your `inbox`;
+- claim units before editing them, and release them when they're merged;
+- push to main only inside `python tools/coord.py run-locked <you> --purpose
+  "..." -- <gate and push>`, docs-only pushes included;
+- message Codex agents with `send <you> codex "..."` or by name.
+`claude-lead` settles conflicts over units, shared files and integration order.
+
 ## When to stop and ask
 
 - The verifier disagrees with something you're confident about.

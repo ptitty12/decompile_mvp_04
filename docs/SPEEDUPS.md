@@ -128,7 +128,7 @@ Roughly ordered by expected payoff for the effort.
     526 `COMPILER-DIFF` notes are a catalog of source tricks for this compiler,
     to be distilled into docs/PATTERNS.md. Also check its SDK/libsn sources
     against our remaining SDK functions.
-16. **The strongest model on the big-function tail.** `trying` (owner 2026-10-13: a few test cases before any broad use)
+16. **The strongest model on the big-function tail.** `adopted` (owner 2026-10-13: Fable 5.1 "when needed": after a Sonnet attempt parks a function, or up front for large functions with no useful twin)
     Melee's AI co-author lines were mostly Claude Fable 5 (per an analysis of
     its commits), and the RE4 author credits Fable 5.1. Test: three never-
     attempted 1.4-2.5 KB functions with Fable 5.1, plus a Sonnet 5.5 control on
@@ -144,7 +144,7 @@ Roughly ordered by expected payoff for the effort.
     so tools/decompctx.py output doesn't parse. It needs a C-flattened header
     export. twins.py's callee prototypes cover part of the need.
 
-19. **An integration lock shared by every integrator.** `needs owner` (Codex sessions are outside the Claude team)
+19. **An integration lock shared by every integrator.** `adopted` (owner 2026-10-13; tools/coord.py, docs/COORDINATION.md, AGENTS.md for Codex)
     The lead, the Codex swarm's integrator and side sessions all push to main.
     The verify gate takes 6-20 min, so a gated push loses whenever someone else
     pushes in that window. On 2026-10-13 one batch passed verify three times
