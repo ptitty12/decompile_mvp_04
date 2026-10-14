@@ -746,6 +746,26 @@ inline void psq_stux(Cpu& c, Insn i) {
   c.gpr[i.rA()] = ea;
 }
 
+// ---- system ----
+
+// rfi: restore MSR from SRR1 and continue at SRR0 (the caller transfers control).
+inline void rfi(Cpu& c) {
+  constexpr u32 kMask = 0x87C0FFFFu;  // MSR bits restored from SRR1
+  u32 old = c.msr;
+  c.msr = ((c.msr & ~kMask) | (c.spr[spr::SRR1] & kMask)) & ~(1u << 18);
+  c.pc = c.spr[spr::SRR0] & ~3u;
+  c.hooks->msr_changed(c, old);
+}
+inline bool trap_cond(u32 to, s32 a, s32 b) {
+  return ((to & 16) && a < b) || ((to & 8) && a > b) || ((to & 4) && a == b) ||
+         ((to & 2) && static_cast<u32>(a) < static_cast<u32>(b)) ||
+         ((to & 1) && static_cast<u32>(a) > static_cast<u32>(b));
+}
+inline bool tw_taken(const Cpu& c, Insn i) {
+  return trap_cond(i.to(), static_cast<s32>(c.gpr[i.rA()]), static_cast<s32>(c.gpr[i.rB()]));
+}
+inline bool twi_taken(const Cpu& c, Insn i) { return trap_cond(i.to(), static_cast<s32>(c.gpr[i.rA()]), i.simm()); }
+
 // ---- branches: condition and target only ----
 
 // bc/bclr/bcctr condition. Decrements CTR when BO[2] is clear (never for bcctr,

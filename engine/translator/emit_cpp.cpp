@@ -1,0 +1,327 @@
+#include "translator/emit_cpp.h"
+
+#include <algorithm>
+#include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <set>
+#include <sstream>
+
+#include "ppc/disasm.h"
+
+namespace mvp::xlat {
+
+using ppc::Insn;
+using ppc::Op;
+
+namespace {
+
+std::string h8(u32 v) {
+  char b[16];
+  std::snprintf(b, sizeof b, "0x%08Xu", v);
+  return b;
+}
+std::string fname(u32 entry) {
+  char b[16];
+  std::snprintf(b, sizeof b, "f_%08X", entry);
+  return b;
+}
+std::string label(u32 a) {
+  char b[16];
+  std::snprintf(b, sizeof b, "L_%08X", a);
+  return b;
+}
+std::string insn(u32 w) { return "Insn{" + h8(w) + "}"; }
+
+// The sem:: function for a plain (non-control) instruction, or "" for no effect.
+const char* sem_name(Op op) {
+  switch (op) {
+    case Op::dcbf: case Op::dcbi: case Op::dcbst: case Op::dcbt: case Op::dcbtst: case Op::eieio: case Op::isync:
+    case Op::sync: case Op::tlbie: case Op::tlbsync:
+      return "";
+    case Op::dcbz_l:
+      return "dcbz";
+    default:
+      return ppc::op_info(op).name;
+  }
+}
+
+// C++ identifier of an Op (the sem:: functions use the enum's spelling).
+std::string op_ident(Op op) {
+  switch (op) {
+#define MVP_X(name, pattern, mask) \
+  case Op::name: return #name;
+    MVP_PPC_OPS(MVP_X)
+#undef MVP_X
+    default: return "";
+  }
+}
+
+class Writer {
+ public:
+  explicit Writer(const EmitOptions& o) : opt_(o) {}
+
+  void function(const FunctionCfg& f, const FunctionIndex& fx) {
+    std::set<u32> labels;
+    for (std::size_t k = 0; k < f.insns.size(); ++k) {
+      if (!f.reachable[k]) continue;
+      const InsnInfo& x = f.insns[k];
+      if ((x.flow == Flow::Jump || x.flow == Flow::CondJump) && f.contains(x.target)) labels.insert(x.target);
+    }
+    for (const auto& t : f.tables) labels.insert(t.targets.begin(), t.targets.end());
+    bool multi = f.entries.size() > 1;
+    if (multi) labels.insert(f.entries.begin(), f.entries.end());
+
+    out_ << "// " << f.sym->name << "\n";
+    if (multi) {
+      out_ << "static void b_" << std::string(fname(f.start)).substr(2) << "(Cpu& c, u32 entry) {\n";
+      out_ << "  switch (entry) {\n";
+      for (u32 e : f.entries) out_ << "    case " << h8(e) << ": goto " << label(e) << ";\n";
+      out_ << "    default: rt::trap(c, entry, \"bad entry\");\n  }\n";
+    } else {
+      out_ << "void " << fname(f.start) << "(Cpu& c) {\n";
+      out_ << "  c.pc = " << h8(f.start) << ";\n  rt::on_entry(c, " << h8(f.start) << ");\n";
+    }
+    bool prev_falls = false;
+    for (std::size_t k = 0; k < f.insns.size(); ++k) {
+      if (!f.reachable[k]) {
+        prev_falls = false;
+        continue;
+      }
+      const InsnInfo& x = f.insns[k];
+      if (labels.count(x.addr)) out_ << label(x.addr) << ":\n";
+      ++stats_.instructions;
+      emit_insn(f, x, fx);
+      prev_falls = falls_through(x);
+    }
+    if (prev_falls) {
+      if (f.falls_into) {
+        out_ << "  " << fname(f.falls_into) << "(c);\n  return;\n";
+      } else {
+        out_ << "  rt::trap(c, " << h8(f.end) << ", \"ran off the end of a function\");\n";
+      }
+    }
+    out_ << "}\n";
+    if (multi) {
+      for (u32 e : f.entries) {
+        out_ << "void " << fname(e) << "(Cpu& c) {\n  c.pc = " << h8(e) << ";\n  rt::on_entry(c, " << h8(e)
+             << ");\n  b_" << std::string(fname(f.start)).substr(2) << "(c, " << h8(e) << ");\n}\n";
+      }
+    }
+    out_ << "\n";
+    ++stats_.functions;
+    stats_.entries += f.entries.size();
+  }
+
+  std::string take() {
+    std::string s = out_.str();
+    out_.str("");
+    return s;
+  }
+  const EmitStats& stats() const { return stats_; }
+
+ private:
+  static bool falls_through(const InsnInfo& x) {
+    switch (x.flow) {
+      case Flow::Jump: case Flow::JumpTable: case Flow::Rfi: case Flow::Trap: return false;
+      case Flow::TailCall: case Flow::IndirectJump: case Flow::Return: case Flow::CondReturn:
+        return x.conditional;
+      default: return true;
+    }
+  }
+
+  void call_and_check(u32 ret, const std::string& call, const std::string& indent) {
+    out_ << indent << call << "\n" << indent << "if (c.pc != " << h8(ret) << ") rt::unwind(c);\n";
+  }
+
+  void emit_insn(const FunctionCfg& f, const InsnInfo& x, const FunctionIndex& fx) {
+    (void)f;
+    (void)fx;
+    const u32 a = x.addr, w = x.word, ret = a + 4;
+    out_ << "  // " << ppc::disasm(w, a) << "\n";
+    if (opt_.pc_per_insn) out_ << "  c.pc = " << h8(a) << ";\n";
+    const std::string cond = "sem::branch_cond(c, " + insn(w) + ")";
+    switch (x.flow) {
+      case Flow::Plain: {
+        switch (x.op) {
+          case Op::sc:
+            out_ << "  c.pc = " << h8(ret) << ";\n  c.hooks->system_call(c);\n  if (c.pc != " << h8(ret)
+                 << ") rt::unwind(c);\n";
+            return;
+          case Op::tw:
+            out_ << "  if (sem::tw_taken(c, " << insn(w) << ")) rt::trap(c, " << h8(a) << ", \"tw\");\n";
+            return;
+          case Op::twi:
+            out_ << "  if (sem::twi_taken(c, " << insn(w) << ")) rt::trap(c, " << h8(a) << ", \"twi\");\n";
+            return;
+          case Op::eciwx: case Op::ecowx:
+            out_ << "  rt::trap(c, " << h8(a) << ", \"external control instruction\");\n";
+            return;
+          default: break;
+        }
+        std::string n = sem_name(x.op);
+        if (n.empty()) return;
+        out_ << "  sem::" << (x.op == Op::dcbz_l ? std::string("dcbz") : op_ident(x.op)) << "(c, " << insn(w)
+             << ");\n";
+        return;
+      }
+      case Flow::Jump:
+        out_ << "  goto " << label(x.target) << ";\n";
+        return;
+      case Flow::CondJump:
+        out_ << "  if (" << cond << ") goto " << label(x.target) << ";\n";
+        return;
+      case Flow::Call: {
+        std::string call = fname(x.target) + "(c);";
+        if (x.conditional) {
+          out_ << "  {\n    bool t = " << cond << ";\n    c.lr = " << h8(ret) << ";\n    if (t) {\n";
+          call_and_check(ret, call, "      ");
+          out_ << "    }\n  }\n";
+        } else {
+          out_ << "  c.lr = " << h8(ret) << ";\n";
+          call_and_check(ret, call, "  ");
+        }
+        return;
+      }
+      case Flow::TailCall:
+        if (x.conditional)
+          out_ << "  if (" << cond << ") {\n    " << fname(x.target) << "(c);\n    return;\n  }\n";
+        else
+          out_ << "  " << fname(x.target) << "(c);\n  return;\n";
+        return;
+      case Flow::Return:
+        out_ << "  c.pc = c.lr & ~3u;\n  return;\n";
+        return;
+      case Flow::CondReturn:
+        out_ << "  if (" << cond << ") {\n    c.pc = c.lr & ~3u;\n    return;\n  }\n";
+        return;
+      case Flow::IndirectCall: {
+        const char* reg = x.op == Op::bclr ? "c.lr" : "c.ctr";
+        out_ << "  {\n    bool t = " << cond << ";\n    u32 target = " << reg << " & ~3u;\n    c.lr = " << h8(ret)
+             << ";\n    if (t) {\n";
+        call_and_check(ret, "rt::call_indirect(c, target);", "      ");
+        out_ << "    }\n  }\n";
+        return;
+      }
+      case Flow::JumpTable: {
+        out_ << "  switch (c.ctr & ~3u) {\n";
+        std::set<u32> seen;
+        for (const auto& jt : f.tables)
+          if (jt.site == a)
+            for (u32 t : jt.targets)
+              if (seen.insert(t).second) out_ << "    case " << h8(t) << ": goto " << label(t) << ";\n";
+        out_ << "    default: rt::trap(c, " << h8(a) << ", \"jump outside its table\");\n  }\n";
+        return;
+      }
+      case Flow::IndirectJump:
+        out_ << "  if (" << cond << ") {\n    rt::call_indirect(c, c.ctr & ~3u);\n    return;\n  }\n";
+        return;
+      case Flow::AbsoluteCall:
+        out_ << "  c.lr = " << h8(ret) << ";\n";
+        call_and_check(ret, "rt::absolute_call(c, " + h8(x.target) + ");", "  ");
+        return;
+      case Flow::Rfi:
+        out_ << "  sem::rfi(c);\n  rt::unwind(c);\n";
+        return;
+      case Flow::Trap:
+        out_ << "  rt::trap(c, " << h8(a) << ", \""
+             << (x.op == Op::invalid ? "invalid instruction" : "unconditional trap") << "\");\n";
+        return;
+    }
+  }
+
+  const EmitOptions& opt_;
+  std::ostringstream out_;
+  EmitStats stats_;
+};
+
+const char* kPrelude =
+    "// Generated by mvp-xlat from the player's disc. Do not commit (CLAUDE.md).\n"
+    "#include \"game_decls.h\"\n"
+    "#include \"ppc/sem.h\"\n"
+    "#include \"runtime/native.h\"\n\n"
+    "using namespace mvp;\n"
+    "using namespace mvp::ppc;\n"
+    "using u32 = std::uint32_t;\n\n";
+
+bool write(const std::filesystem::path& p, const std::string& text, std::string* error) {
+  // Leave an identical file alone so the build does not recompile it.
+  std::ifstream in(p, std::ios::binary);
+  if (in) {
+    std::ostringstream old;
+    old << in.rdbuf();
+    if (old.str() == text) return true;
+  }
+  std::ofstream out(p, std::ios::binary);
+  out << text;
+  if (!out) {
+    if (error) *error = "cannot write " + p.string();
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
+
+bool emit_cpp(const ProgramCfg& p, const std::string& dir, const EmitOptions& opt, EmitStats* stats,
+              std::string* error) {
+  namespace fs = std::filesystem;
+  std::error_code ec;
+  fs::create_directories(dir, ec);
+  // Declarations of every entry function.
+  std::ostringstream decls;
+  decls << "// Generated by mvp-xlat. Do not commit.\n#pragma once\n#include \"ppc/cpu.h\"\n\n";
+  std::vector<u32> all_entries;
+  for (const auto& f : p.functions)
+    for (u32 e : f.entries) {
+      decls << "void " << fname(e) << "(mvp::ppc::Cpu& c);\n";
+      all_entries.push_back(e);
+    }
+  if (!write(fs::path(dir) / "game_decls.h", decls.str(), error)) return false;
+
+  // Shards balanced by instruction count, functions in address order.
+  std::size_t total = 0;
+  for (const auto& f : p.functions)
+    for (bool r : f.reachable) total += r ? 1 : 0;
+  std::size_t per = total / static_cast<std::size_t>(opt.shards) + 1;
+  Writer w(opt);
+  int shard = 0;
+  std::size_t in_shard = 0, bytes = 0;
+  std::string body = kPrelude;
+  auto flush = [&]() -> bool {
+    char name[32];
+    std::snprintf(name, sizeof name, "game_%02d.cpp", shard);
+    bytes += body.size();
+    if (!write(fs::path(dir) / name, body, error)) return false;
+    body = kPrelude;
+    in_shard = 0;
+    ++shard;
+    return true;
+  };
+  for (const auto& f : p.functions) {
+    w.function(f, p.index);
+    body += w.take();
+    for (bool r : f.reachable) in_shard += r ? 1 : 0;
+    if (in_shard >= per && shard < opt.shards - 1 && !flush()) return false;
+  }
+  while (shard < opt.shards)
+    if (!flush()) return false;
+
+  // Entry table.
+  std::sort(all_entries.begin(), all_entries.end());
+  std::ostringstream table;
+  table << "// Generated by mvp-xlat. Do not commit.\n#include \"game_decls.h\"\n#include \"runtime/native.h\"\n\n"
+        << "static const mvp::rt::NativeEntry kEntries[] = {\n";
+  for (u32 e : all_entries) table << "  {" << h8(e) << ", &" << fname(e) << "},\n";
+  table << "};\n\nvoid mvp_register_game() { mvp::rt::g_native.set(kEntries, sizeof kEntries / sizeof kEntries[0]); }\n";
+  bytes += table.str().size();
+  if (!write(fs::path(dir) / "game_table.cpp", table.str(), error)) return false;
+
+  if (stats) {
+    *stats = w.stats();
+    stats->bytes = bytes;
+  }
+  return true;
+}
+
+}  // namespace mvp::xlat

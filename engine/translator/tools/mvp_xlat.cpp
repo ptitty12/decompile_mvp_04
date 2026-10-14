@@ -1,14 +1,17 @@
 // mvp-xlat: the translator's development CLI.
 //
 //   mvp-xlat cfg [--errors] [--tables]   recover functions and CFGs, print a summary
+//   mvp-xlat emit-cpp <dir> [--shards N]  translate the whole DOL to C++ in <dir> (under build/)
 //
 // Reads the disc from MVP_DISC (or the build's default) and config/GV4E69/symbols.txt.
 // Output describes the retail binary's structure only; it stays in the terminal
 // or under build/.
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 
+#include "translator/emit_cpp.h"
 #include "translator/program.h"
 
 using namespace mvp;
@@ -16,7 +19,7 @@ using namespace mvp::xlat;
 
 int main(int argc, char** argv) {
   if (argc < 2) {
-    std::fprintf(stderr, "usage: mvp-xlat cfg [--errors] [--tables]\n");
+    std::fprintf(stderr, "usage: mvp-xlat cfg [--errors] [--tables] | emit-cpp <dir> [--shards N]\n");
     return 2;
   }
   std::string cmd = argv[1];
@@ -50,6 +53,25 @@ int main(int argc, char** argv) {
     if (show_errors)
       for (const auto& e : p.error_list) std::printf("  %s\n", e.c_str());
     return p.errors ? 1 : 0;
+  }
+  if (cmd == "emit-cpp") {
+    if (argc < 3) return 2;
+    EmitOptions opt;
+    for (int k = 3; k + 1 < argc; ++k)
+      if (!std::strcmp(argv[k], "--shards")) opt.shards = std::atoi(argv[k + 1]);
+    ProgramCfg p = build_cfg(in->disc.dol, in->symbols);
+    if (p.errors) {
+      std::fprintf(stderr, "mvp-xlat: the CFG has %zu errors; not emitting\n", p.errors);
+      return 1;
+    }
+    EmitStats st;
+    if (!emit_cpp(p, argv[2], opt, &st, &err)) {
+      std::fprintf(stderr, "mvp-xlat: %s\n", err.c_str());
+      return 1;
+    }
+    std::printf("emitted %zu functions (%zu entry points), %zu instructions, %zu bytes of C++ in %d shards\n",
+                st.functions, st.entries, st.instructions, st.bytes, opt.shards);
+    return 0;
   }
   std::fprintf(stderr, "mvp-xlat: unknown command %s\n", cmd.c_str());
   return 2;

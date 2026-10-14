@@ -14,12 +14,6 @@ namespace {
   throw GuestFault(c.pc, b);
 }
 
-bool trap_cond(u32 to, s32 a, s32 b) {
-  return ((to & 16) && a < b) || ((to & 8) && a > b) || ((to & 4) && a == b) ||
-         ((to & 2) && static_cast<u32>(a) < static_cast<u32>(b)) ||
-         ((to & 1) && static_cast<u32>(a) > static_cast<u32>(b));
-}
-
 }  // namespace
 
 u32 slow_read(Cpu& c, u32 ea, int size) {
@@ -144,21 +138,15 @@ Op execute(Cpu& c, u32 w) {
       c.pc = next;
       c.hooks->system_call(c);
       return op;
-    case Op::rfi: {
-      constexpr u32 kMask = 0x87C0FFFFu;  // MSR bits restored from SRR1
-      u32 old = c.msr;
-      c.msr = ((c.msr & ~kMask) | (c.spr[spr::SRR1] & kMask)) & ~(1u << 18);
-      c.pc = c.spr[spr::SRR0] & ~3u;
-      c.hooks->msr_changed(c, old);
+    case Op::rfi:
+      sem::rfi(c);
       return op;
-    }
     case Op::tw:
-      if (trap_cond(i.to(), static_cast<s32>(c.gpr[i.rA()]), static_cast<s32>(c.gpr[i.rB()])))
-        fault(c, "guest trap (tw)", w);
+      if (sem::tw_taken(c, i)) fault(c, "guest trap (tw)", w);
       c.pc = next;
       return op;
     case Op::twi:
-      if (trap_cond(i.to(), static_cast<s32>(c.gpr[i.rA()]), i.simm())) fault(c, "guest trap (twi)", w);
+      if (sem::twi_taken(c, i)) fault(c, "guest trap (twi)", w);
       c.pc = next;
       return op;
     case Op::eciwx:

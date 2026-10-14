@@ -13,7 +13,7 @@ A later session resumes from "Next step".
 | 3 | Decoder and disassembler | Done | see git log |
 | 4 | Semantics library and reference interpreter | Done | see git log |
 | 5 | Functions and CFGs | Done | see git log |
-| 6 | IR and C++ emitter | | |
+| 6 | IR and C++ emitter | Done | see git log |
 | 7 | Boot environment | | |
 | 8 | HLE boundary and SDK log | | |
 | 9 | Virtual clock, interrupts, threads (D4) | | |
@@ -43,6 +43,7 @@ A later session resumes from "Next step".
 | `engine/vfs/` | Disc image sources (file, memory, CISO), GCM header + FST, DOL, ELF section headers, disc identity check; `mvp-disc` CLI |
 | `engine/ppc/` | Gekko ISA: opcode table (pattern + mask per opcode), decoder, disassembler (`isa.h`, `decode.cpp`, `disasm.cpp`); CPU state, guest memory page table, runtime hooks (`cpu.h`, `mem_access.h`); floating-point core (`fp.h/.cpp`); per-opcode semantics (`sem.h`); reference interpreter (`interp.h/.cpp`). Shared by translator and runtime, so it sits beside them (an addition to ARCHITECTURE §11) |
 | `engine/translator/` | Symbol map parser (`symbols.h/.cpp`), function and CFG recovery (`cfg.h/.cpp`), input loading (`program.h/.cpp`), `mvp-xlat` CLI |
+| `engine/runtime/` | `native.h/.cpp` (what translated code calls: entry hook, unwind, indirect calls, the entry table, the run loop), `machine.h/.cpp` (MEM1 + DOL loading), `lockstep.h/.cpp` (translated vs interpreter checker), `mvp-boot` CLI |
 | `engine/third_party/` | Vendored code (`docs/REUSE.md` §6) |
 | `engine/tools/` | Build helpers |
 
@@ -227,6 +228,48 @@ A later session resumes from "Next step".
 - Counts differ slightly from the survey's §4 (it counted 46 cross-function `b`;
   the 55 tail calls here include conditional ones and those of the gap function).
 
+### 6. IR and C++ emitter (done)
+
+- **IR = the CFG of item 5 plus the semantics library.** `xlat::emit_cpp` writes one
+  C++ function per entry point (`f_XXXXXXXX(Cpu&)`); every non-branch instruction
+  becomes `sem::op(c, Insn{word});` with the constant word, so translated code and
+  the interpreter share one definition of every instruction. Local branches are
+  `goto`s, jump tables `switch`es on CTR, calls are C++ calls.
+- **Call protocol** (`runtime/native.h`): the caller sets LR and calls; the guest
+  `blr` sets `c.pc = LR & ~3` and returns; the caller then checks `c.pc` against
+  its own return address and throws `rt::Unwind` on any other value (a context
+  switch, a longjmp). `rt::run` catches it and resumes at `c.pc` in the reference
+  interpreter, which enters translated code again at the next entry point it
+  reaches (D4's resume path). Indirect calls go through a dense address -> function
+  table; a target without translated code runs in the interpreter until it
+  returns. Functions with secondary entries get one body with an entry `switch`.
+  The guest PC is stored before every instruction (precise faults; to optimize
+  later).
+- **Build:** `mvp-xlat emit-cpp` writes `build/engine/<preset>/gen/` (48 shards plus
+  a table and a declarations header), driven by a CMake custom command that exists
+  only when the disc is configured. 24,159 functions, 24,167 entry points,
+  1,473,997 instructions, 128 MB of C++ (with a disassembly comment per
+  instruction). With MSVC `/Od` and `-j 8` the whole DOL compiles and links into
+  `mvp-boot` in about 35 seconds.
+- **Lockstep** (`runtime/lockstep.h`): two machines, one running translated code,
+  one the interpreter. At every translated function entry the interpreter runs to
+  its next function-entry event (control reaching an entry point other than by a
+  branch inside the same function); every register (GPRs, both FPR halves, CR, XER,
+  LR, CTR, FPSCR, MSR, SRs, all 1,024 SPRs) must match; all of MEM1 is compared
+  every 16 events and at the end. Both stop at their first MMIO access, which must
+  be the same access in the same state. The time base is a placeholder (+1000 per
+  read) until item 9.
+- **Exit evidence (2026-10-14):** `mvp-boot lockstep` (`local_lockstep`): 153
+  function-entry events, 219,257 reference instructions, 10 full MEM1 comparisons,
+  **0 divergences**; both stop at the first MMIO access, a 4-byte write to
+  0xCC003004 (PI interrupt mask) from 0x8043504C in fn_80435004.
+- **CI:** `test_emit_lockstep` translates a synthetic program at build time
+  (`translator/tests/synth.h`: recursion, a jump table, a counted loop, calls
+  through CTR and LR, a tail call, a conditional return, a secondary entry, a
+  function running into the next, floating point, and a function that returns
+  past its call) and runs it in lockstep with MEM1 compared at every entry: it
+  must unwind exactly once and store 14 expected results.
+
 ## Decisions to record (for the lead)
 
 - E0b-FP1: the FP model above (exact integer softfloat as the single source of
@@ -237,4 +280,6 @@ A later session resumes from "Next step".
 
 ## Next step
 
-Item 6: IR and C++ emitter.
+Item 7: boot environment (low memory as the IPL/apploader leave it), then the run
+past the first MMIO access. Rebase onto origin/main first: the K1 names landed
+(f699f32f) and `local_disasm` resolves dtk's listing with symbols.txt.
