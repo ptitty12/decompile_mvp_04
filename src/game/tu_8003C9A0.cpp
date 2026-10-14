@@ -524,17 +524,18 @@ void fn_8003DD7C(Unk8003A5DC* self)
     }
 }
 
-/* near-miss: 79/79 slots; self is r31 and the index r30 in retail, swapped
- * here. found/v/i declaration order and i<0x44 vs i<=0x43 did not change it. */
+/* Table scan on the first word of each 8-byte entry in lbl_805B1A8C (0x44 entries); the local struct copy (found by the permuter) fixes the callee-saved order. */
 void fn_8003DE44(Unk8003A5DC* self, int a)
 {
+    Unk805B1A8C_Ent new_var;
     if (self->m184 == -1 && fn_8003E844(self) == 1) {
         int i = 0;
         int v = fn_8025416C((void*)(self->m130 + 0x588), 0);
         int found = 0;
         int x;
         for (i = 0; i <= 0x43; i++) {
-            if (v == lbl_805B1A8C[i].m0) {
+            new_var = lbl_805B1A8C[i];
+            if (v == new_var.m0) {
                 found = 1;
                 break;
             }
