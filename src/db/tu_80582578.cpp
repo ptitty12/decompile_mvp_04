@@ -520,7 +520,6 @@ extern "C" DB_OVERLAY int fn_8058313C(int a, Db8058313C_L* l, int c)
     return 0;
 }
 
-/* near-miss: ~14 slots; same structure, retail reads t.m0 and the final vptr store directly off sp and orders the C3 stores m4, mC, m14 */
 extern "C" DB_OVERLAY int fn_8058320C(void* unused, int id, int k)
 {
     DbStkList t;
@@ -528,20 +527,23 @@ extern "C" DB_OVERLAY int fn_8058320C(void* unused, int id, int k)
     DbStkList* q = &t;
     q->C1(buf, 0x78);
     q->C2();
-    q->C3(lbl_8064A440);
+    q->m4 = 0;
+    q->vp = lbl_8064A440;
+    q->mC = 0;
+    q->m14 = 0;
     fn_80535360(&t, k);
     unsigned n = q->m4;
-    unsigned i = 0;
     q->mC = 0;
+    unsigned i = 0;
     for (; i < n; i++) {
         int c = q->mC;
-        if (t.At(c) == id) {
-            q->D();
+        if (*(int*)((c * 4) + (char*)t.m0) == id) {
+            q->vp = lbl_8064A550;
             return 1;
         }
         q->mC = (c + 1) % q->m4;
     }
-    t.D();
+    t.vp = lbl_8064A550;
     return 0;
 }
 
