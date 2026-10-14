@@ -429,7 +429,7 @@ extern "C" int fn_803FB9E8(int a)
     return fn_803FA3B4(fn_803FB978, 0, lbl_806EEAA0, &q);
 }
 
-/* near-miss: 99.7%, 2 slots; the reloaded p->a4 test uses r5/r0 in retail, r0/r9 here */
+/* The allocator callback takes the request flags (p->a4) as a third argument: retail reloads them into r5. */
 extern "C" int fn_803FBA28(int n, RcReq* p)
 {
     int out;
@@ -441,7 +441,7 @@ extern "C" int fn_803FBA28(int n, RcReq* p)
         int len = fn_803FECF8(out, m);
         if (p->a4 & 0x40)
             len = (len + 0x7ff) & ~0x7ff;
-        int r = ((int (*)(int, int))lbl_806ADE90[0])(p->a0, len);
+        int r = ((int (*)(int, int, int))lbl_806ADE90[0])(p->a0, len, p->a4);
         if (r != 0) {
             fn_803FEC4C(out, 0, r, len, m);
             fn_803FEC9C(out, m);
