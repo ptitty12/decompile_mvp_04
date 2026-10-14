@@ -343,3 +343,4 @@
   - Owner decisions recorded tonight: Fable 5.1 when needed; no codeless asm; Claude/Codex coordinate via tools/coord.py; names from related EA builds count as tier-E2 evidence.
   - Best remaining reference hope: MVP Baseball 2004 for GameCube (owner's copy), then demo discs and MVP 06 NCAA (PS2).
   | Owner: nothing pending from this session
+- 2026-10-13: snd/tu_803B4BEC copy callback contract preparation (zero matching gain). Added a shared native callback type matching the actual memcpy provider and its retail default pointer; normalized lbl_80626518 and fn_803B5A18 together. All 43 compiled functions, allocated sections and 304 relocations are identical to baseline. Full Ninja and 152 literal references pass with zero mismatch/unresolved. This prepares two pending packet-copy consumers without callable casts or GAME edits. Final committed-HEAD regression verification follows.

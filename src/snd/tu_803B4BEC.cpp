@@ -6,6 +6,7 @@
  * Reference source: the port/mvp2005 branch (ported from mitsevox/mvp2005, CC0; see docs/DECISIONS.md).
  */
 #include "snd/cmn/sndcmn.h"
+#include "snd/copy_callback.h"
 
 extern SNDPACKETSTATE lbl_806AA500;
 /* Existing retail symbol for snd packet-state pointer table at +0x304, 32 entries. */
@@ -70,7 +71,6 @@ struct Unk803B5F9C {
 extern Unk806AA88C lbl_806AA88C;
 extern int lbl_806AA884;
 extern int lbl_806AA888;
-extern int lbl_80626518;
 extern float lbl_80609B98;
 
 extern "C" void fn_803A975C();
@@ -571,7 +571,7 @@ extern "C" void fn_803B5A0C(int v)
     lbl_806AA888 = v;
 }
 
-extern "C" int fn_803B5A18(int v)
+extern "C" int fn_803B5A18(SndCopyCallback v)
 {
     lbl_80626518 = v;
     return 0;
