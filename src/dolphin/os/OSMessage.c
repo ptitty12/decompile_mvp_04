@@ -2,13 +2,13 @@
 #include <dolphin.h>
 #include <dolphin/os.h>
 
-extern void fn_80437434(OSThreadQueue* queue);
-extern void fn_804382CC(OSThreadQueue* queue);
+extern void OSInitThreadQueue(OSThreadQueue* queue);
+extern void OSSleepThread(OSThreadQueue* queue);
 extern void OSWakeupThread(OSThreadQueue* queue);
 
 void OSInitMessageQueue(OSMessageQueue* mq, void* msgArray, s32 msgCount) {
-    fn_80437434(&mq->queueSend);
-    fn_80437434(&mq->queueReceive);
+    OSInitThreadQueue(&mq->queueSend);
+    OSInitThreadQueue(&mq->queueReceive);
     mq->msgArray = msgArray;
     mq->msgCount = msgCount;
     mq->firstIndex = 0;
@@ -25,7 +25,7 @@ int OSSendMessage(OSMessageQueue* mq, void* msg, s32 flags) {
             OSRestoreInterrupts(enabled);
             return 0;
         }
-        fn_804382CC(&mq->queueSend);
+        OSSleepThread(&mq->queueSend);
     }
     lastIndex = (mq->firstIndex + mq->usedCount) % mq->msgCount;
     ((u32*)mq->msgArray)[lastIndex] = (u32)msg;
@@ -43,7 +43,7 @@ int OSReceiveMessage(OSMessageQueue* mq, void* msg, s32 flags) {
             OSRestoreInterrupts(enabled);
             return 0;
         }
-        fn_804382CC(&mq->queueReceive);
+        OSSleepThread(&mq->queueReceive);
     }
     if(msg != NULL) {
        *(u32*)msg = ((u32*)mq->msgArray)[mq->firstIndex];

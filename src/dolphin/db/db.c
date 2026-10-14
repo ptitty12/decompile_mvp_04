@@ -8,23 +8,23 @@
 #include <dolphin/db.h>
 #include <dolphin/os.h>
 
-extern DBInterface* lbl_806EF608;
-extern BOOL lbl_806EF60C;
+extern DBInterface* __DBInterface;
+extern BOOL DBVerbose;
 extern char lbl_80633660[];
 
-void fn_804338F4(OSContext* context); /* OSDumpContext */
-void fn_8041A5E4(void);               /* PPCHalt */
+void OSDumpContext(OSContext* context);
+void PPCHalt(void);
 
-void fn_80421B84(void);
+void DBInit(void);
 void fn_80421BAC(void);
-void fn_80421BF4(void);
+void __DBExceptionDestination(void);
 BOOL fn_80421C04(__OSException exception);
-void fn_80421C20(char* format, ...);
+void DBPrintf(char* format, ...);
 
-void fn_80421B84(void) {
-    lbl_806EF608 = (DBInterface*)OSPhysicalToCached(OS_DBINTERFACE_ADDR);
-    lbl_806EF608->ExceptionDestination = (void (*)(void))OSCachedToPhysical(fn_80421BF4);
-    lbl_806EF60C = TRUE;
+void DBInit(void) {
+    __DBInterface = (DBInterface*)OSPhysicalToCached(OS_DBINTERFACE_ADDR);
+    __DBInterface->ExceptionDestination = (void (*)(void))OSCachedToPhysical(__DBExceptionDestination);
+    DBVerbose = TRUE;
 }
 
 void fn_80421BAC(void) {
@@ -32,14 +32,14 @@ void fn_80421BAC(void) {
     OSContext* context = (OSContext*)(*contextAddr + 0x80000000);
 
     OSReport(lbl_80633660);
-    fn_804338F4(context);
-    fn_8041A5E4();
+    OSDumpContext(context);
+    PPCHalt();
 }
 
 BOOL fn_80421C04(__OSException exception) {
     u32 mask = 1 << exception;
-    return (BOOL)(lbl_806EF608->exceptionMask & mask);
+    return (BOOL)(__DBInterface->exceptionMask & mask);
 }
 
-void fn_80421C20(char* format, ...) {
+void DBPrintf(char* format, ...) {
 }

@@ -8,9 +8,9 @@
 #include <dolphin/si.h>
 
 #include "__si.h"
-extern void fn_80433814(OSContext*);
-extern void fn_8043364C(OSContext*);
-extern OSTime fn_80438628(void);
+extern void OSClearContext(OSContext*);
+extern void OSSetCurrentContext(OSContext*);
+extern OSTime OSGetTime(void);
 extern void fn_80437080(s32, u16);
 extern u32 lbl_806EF8A8;
 
@@ -380,7 +380,7 @@ BOOL PADInit() {
     lbl_806EF870 = TRUE;
 
     if (lbl_806EF8A8 != 0) {
-        OSTime time = fn_80438628();
+        OSTime time = OSGetTime();
         __OSWirelessPadFixMode
             = (u16)((((time)&0xffff) + ((time >> 16) & 0xffff) + ((time >> 32) & 0xffff) + ((time >> 48) & 0xffff))
                     & 0x3fffu);
@@ -717,11 +717,11 @@ static void SamplingHandler(__OSInterrupt interrupt, OSContext* context) {
     OSContext exceptionContext;
 
     if (lbl_806EF894) {
-        fn_80433814(&exceptionContext);
-        fn_8043364C(&exceptionContext);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(&exceptionContext);
         lbl_806EF894();
-        fn_80433814(&exceptionContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptionContext);
+        OSSetCurrentContext(context);
     }
 }
 

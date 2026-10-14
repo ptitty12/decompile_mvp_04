@@ -38,7 +38,7 @@ extern "C" void fn_803EDA0C();
 void fn_8033E958(const char* fmt, ...);
 extern "C" void fn_803EDC74();
 extern "C" int fn_803EE3D4(int a);
-extern "C" int fn_80436404();
+extern "C" int OSGetResetCode();
 int fn_8043D6A8();
 extern "C" void OSSetProgressiveMode(int a);
 extern "C" int OSGetProgressiveMode();
@@ -80,7 +80,7 @@ void fn_8000D650()
 
 void fn_8000D6D4()
 {
-    if (fn_80436404() >= 0) {
+    if (OSGetResetCode() >= 0) {
         if (fn_8043D6A8() != 1) {
             OSSetProgressiveMode(0);
         }

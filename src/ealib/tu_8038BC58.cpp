@@ -171,7 +171,7 @@ VdMain::~VdMain()
 }
 
 extern "C" void GXInitTlutObj(void* obj, void* data, int fmt, int n);
-extern "C" void fn_80432FD4(void* p, int n);
+extern "C" void DCFlushRange(void* p, int n);
 extern "C" int fn_8038D170(int x);
 /* near-miss (96.4%): retail loads the 0x4330 high word into r4 and the byte 255 into r5; ours has them swapped (4 slots). */
 extern "C" unsigned char* fn_8038C7D4(int a, int b)
@@ -189,9 +189,9 @@ extern "C" unsigned char* fn_8038C7D4(int a, int b)
         t[0x400 + i * 2] = (int)(((float)i - 128.0f) * -0.17205f + 42.666668f);
         t[0x401 + i * 2] = (int)(((float)i - 128.0f) * 0.886f + 128.0f);
     }
-    fn_80432FD4(t, 0x200);
-    fn_80432FD4(u, 0x200);
-    fn_80432FD4(v, 0x200);
+    DCFlushRange(t, 0x200);
+    DCFlushRange(u, 0x200);
+    DCFlushRange(v, 0x200);
     GXInitTlutObj(t + 0x608, t, 0, 0x100);
     GXInitTlutObj(t + 0x614, u, 0, 0x100);
     GXInitTlutObj(t + 0x620, v, 0, 0x100);
@@ -456,8 +456,8 @@ extern "C" int fn_8038D170(int tex)
     }
     GXInitTexObj((char*)p + 0x40, p->m3C, (unsigned short)p->m34, (unsigned short)p->m38, 3, 0, 1, 0);
     GXInitTexObjLOD((char*)p + 0x40, 0, 0, 0.0f, 0.0f, 0.0f, 0, 0, 0);
-    fn_80432FD4(p->m10, p->m8 * p->mC * 2);
-    fn_80432FD4(p->m3C, p->m34 * p->m38 * 2);
+    DCFlushRange(p->m10, p->m8 * p->mC * 2);
+    DCFlushRange(p->m3C, p->m34 * p->m38 * 2);
     return (int)p;
 }
 
@@ -569,6 +569,75 @@ extern "C" void fn_8038D57C(VdM2* self, int a, int b, int c, int d, int e, int f
     }
 }
 
+struct VdRes2;
+extern "C" VdRes2* fn_8038E534(VdRes2* o, int a, int b);
+extern "C" int fn_803FB764(int id, int* p1, int* p2);
+extern "C" int fn_8038E3EC(int a, int* b);
+extern "C" int fn_8038E440(int a, int* b, int c);
+extern "C" int fn_8038DF3C(I* s, unsigned rate);
+extern "C" int fn_8038E6F0(VdRes* o);
+extern char lbl_80605F88[];
+
+static inline int VdReady(VdC* c)
+{
+    int ok = 0;
+    if (c->m0 != 0 && c->m4 != 0)
+        ok = 1;
+    return ok;
+}
+
+/* near-miss (94.7%): in retail the three zero stores (+0x5C/+0x50/+0x54) follow the __udivdi3 call and use a fresh
+   `li r0,0`; written after the division, cse reuses the divisor's high-word zero (a callee-saved register), written
+   before it the scheduler hoists them above the call. Everything else matches. */
+extern "C" int fn_8038DB54(char* s, int a, int b)
+{
+    int sp18;
+    int sp1C;
+    fn_803FDD28(*(int*)(s + 0x34), 0x97, 0x33);
+    fn_803FDD28(*(int*)(s + 0x30), 0x97, 0x33);
+    if (*(int*)(s + 0x24) != 0) {
+        fn_803FB764(*(int*)(s + 0x24), (int*)(s + 0x20), &sp18);
+        *(int*)(s + 0x38) = fn_803FDFB4(*(int*)(s + 0x30), *(int*)(s + 0x20), sp18, 0);
+    }
+    if (*(int*)(s + 0x2C) != 0) {
+        fn_803FB764(*(int*)(s + 0x2C), (int*)(s + 0x28), &sp1C);
+        *(int*)(s + 0x3C) = fn_803FDFB4(*(int*)(s + 0x34), *(int*)(s + 0x28), sp1C, 0);
+    }
+    if (*(int*)(s + 0x14) == 0)
+        *(int*)(s + 0x3C) = *(int*)(s + 0x38);
+    if (*(int*)(s + 0x1C) == 0) {
+        VdRes2* r = (VdRes2*)lbl_80699B94.m0(lbl_80605F88, 0x14, 0, 0, lbl_80699B94.m8);
+        r = fn_8038E534(r, *(int*)(s + 0x34), *(int*)(s + 0x3C));
+        *(VdRes2**)s = r;
+        *(int*)(s + 0x58) = *(int*)((char*)r + 0xC) >= 0;
+    } else {
+        *(int*)(s + 0x58) = 0;
+    }
+    *(int*)(s + 0x68) = 0;
+    if (VdReady(&lbl_80699B94) != 0) {
+        *(char**)(s + 0x64) = s;
+        VdB tmp((int)(s + 0x64), (int)fn_8038E3EC, (int)fn_8038E440, a);
+        VdD* d = (VdD*)lbl_80699B94.m0(lbl_80605F88, 0x1C, 0, 0, lbl_80699B94.m8);
+        *(VdD**)(s + 0x68) = new (d) VdD(&tmp);
+    }
+    *(int*)(s + 0x78) = fn_8038E9D8(*(VdCbObj**)(s + 0x68), 0);
+    VdClock* c = (VdClock*)lbl_80699B94.m0(lbl_80605F88, 0x18, 0, 0, lbl_80699B94.m8);
+    c->m8 = 0;
+    c->m0 = OSGetTime();
+    c->m10 = 0x1000;
+    *(VdClock**)(s + 0x60) = c;
+    fn_8038E468(c);
+    *(int*)(s + 0x5C) = 0;
+    *(int*)(s + 0x50) = 0;
+    *(int*)(s + 0x54) = 0;
+    *(int*)(s + 0x4C) = (unsigned)(c->m8 / (LOWMEM->busClock / 4000));
+    *(int*)(s + 0x40) = b;
+    if (*(int*)s != 0)
+        fn_8038E6F0(*(VdRes**)s);
+    fn_8038DF3C((I*)s, 0x1000);
+    return *(int*)(s + 0x78);
+}
+
 extern "C" int fn_8038DDE8(VdMain* s, float f)
 {
     s->m48 = f;
@@ -602,7 +671,7 @@ extern "C" int fn_8038DF3C(I* s, unsigned rate)
     if (s->m0 != 0)
         fn_8038E694(s->m0, rate);
     VdClock* c = s->m60;
-    unsigned long long t = fn_80438628();
+    unsigned long long t = OSGetTime();
     if (c->m10 == 0x1000)
         c->m8 += t - c->m0;
     else
@@ -676,7 +745,7 @@ extern "C" int fn_8038E440(int a, int* b, int c)
 
 extern "C" int fn_8038E468(VdClock* c)
 {
-    unsigned long long t = fn_80438628();
+    unsigned long long t = OSGetTime();
     if (c->m10 == 0x1000)
         c->m8 += t - c->m0;
     else
@@ -841,9 +910,11 @@ extern "C" int fn_8038EA64(VdCbObj* h, int)
 
 extern "C" int fn_8038EA9C(VdCbObj* s)
 {
-    int v = s->m0;
-    if (v != 0) {
+    int v;
+    int r = s->m0;
+    if (r != 0) {
         s->m0 = 0;
+        v = r;
         return v;
     }
     s->m8(s, s->m4, &v);

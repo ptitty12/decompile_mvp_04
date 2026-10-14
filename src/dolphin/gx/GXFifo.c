@@ -12,19 +12,19 @@
 
 /* GXFifo.c part of this unit. Placeholder names (symbols.txt) with the likely SDK names:
  * fn_80429FF0 GXCPInterruptHandler, fn_8042A190 GXInitFifoPtrs, fn_8042A200 GXInitFifoLimits,
- * GXGetFifoPtrs GXGetFifoPtrs, fn_8042A544 GXSetBreakPtCallback, GXEnableBreakPt GXEnableBreakPt,
+ * GXGetFifoPtrs GXGetFifoPtrs, GXSetBreakPtCallback, GXEnableBreakPt GXEnableBreakPt,
  * GXDisableBreakPt GXDisableBreakPt, fn_8042A6B4 __GXFifoReadEnable, fn_8042A6D8 __GXFifoReadDisable,
  * fn_8042A6FC __GXFifoLink, fn_8042A730 __GXWriteFifoIntEnable, fn_8042A760 __GXWriteFifoIntReset,
  * fn_8042A790 __GXCleanGPFifo, GXGetCPUFifo GXGetCPUFifo, fn_8042A898 GXGetGPFifo,
  * GXRedirectWriteGatherPipe GXRedirectWriteGatherPipe, GXRestoreWriteGatherPipe GXRestoreWriteGatherPipe.
  * Other placeholder callees: OSResumeThread OSResumeThread, fn_8043815C OSSuspendThread,
- * OSGetCurrentThread OSGetCurrentThread, fn_80433814 OSClearContext, fn_8043364C OSSetCurrentContext,
+ * OSGetCurrentThread OSGetCurrentThread, OSClearContext, OSSetCurrentContext,
  * PPCSync PPCSync, fn_8041A680 PPCMfwpar, GXFlush GXFlush. */
 s32 OSResumeThread(OSThread* thread);
 s32 fn_8043815C(OSThread* thread);
 OSThread* OSGetCurrentThread(void);
-void fn_80433814(OSContext* context);
-void fn_8043364C(OSContext* context);
+void OSClearContext(OSContext* context);
+void OSSetCurrentContext(OSContext* context);
 void PPCSync(void);
 u32 fn_8041A680(void);
 void GXFlush(void);
@@ -42,7 +42,7 @@ void fn_80429FF0(__OSInterrupt interrupt, OSContext* context);
 void fn_8042A190(GXFifoObj* fifo, void* rd, void* wr);
 void fn_8042A200(GXFifoObj* fifo, u32 hi, u32 lo);
 void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr);
-GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb);
+GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb);
 void GXEnableBreakPt(void* break_pt);
 void GXDisableBreakPt(void);
 void fn_8042A6B4(void);
@@ -77,11 +77,11 @@ static inline void GXBreakPointHandler(OSContext* context) {
     __GXData->cpEnable = (u32)__rlwimi(__GXData->cpEnable, 0, 5, 26, 26);
     GX_SET_CP_REG(1, __GXData->cpEnable);
     if (lbl_806EF774) {
-        fn_80433814(&exceptContext);
-        fn_8043364C(&exceptContext);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(&exceptContext);
         lbl_806EF774();
-        fn_80433814(&exceptContext);
-        fn_8043364C(context);
+        OSClearContext(&exceptContext);
+        OSSetCurrentContext(context);
     }
 }
 
@@ -223,7 +223,7 @@ void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
     *writePtr = realFifo->wrPtr;
 }
 
-GXBreakPtCallback fn_8042A544(GXBreakPtCallback cb) {
+GXBreakPtCallback GXSetBreakPtCallback(GXBreakPtCallback cb) {
     GXBreakPtCallback oldCB;
     BOOL enabled;
 

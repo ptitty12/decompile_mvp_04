@@ -22,7 +22,7 @@ typedef unsigned char u8;
 
 extern void fn_80407604(void);
 extern void fn_80407624(void);
-extern int fn_80432014(int, void *);
+extern int __OSSetExceptionHandler(int, void *);
 extern void fn_804077B4(void);
 
 extern int lbl_8062F200;
@@ -94,7 +94,7 @@ void fn_80407B24(void)
         lbl_806C3271 = 1;
         lbl_806C3270 = 1;
         fn_80407624();
-        lbl_806C3274 = fn_80432014(2, fn_804077B4);
+        lbl_806C3274 = __OSSetExceptionHandler(2, fn_804077B4);
     }
 }
 

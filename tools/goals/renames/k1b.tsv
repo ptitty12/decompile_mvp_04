@@ -1,0 +1,63 @@
+# K1b (docs/ROADMAP.md K1): SDK functions named from evidence. old<TAB>new<TAB>evidence
+# mitsevox: mitsevox/mvp2005 (CC0, f1e1763b), a matching decomp of this DOL, names this address.
+# dtk-signature: dtk has a built-in signature for the name (its split then names callees and data).
+# re4: the name is in the RE4 decomp's dolsdk2004 symbols. comment: our source named it in a comment.
+# Apply: python tools/goals/rename_symbols.py --from-dtk tools/goals/renames/k1b.tsv
+fn_8040ABC4	free	mitsevox+dtk-signature
+fn_804103C0	ceil	mitsevox+dtk-signature
+fn_80421B84	DBInit	mitsevox+dtk-signature+re4
+fn_80425064	DVDGetCommandBlockStatus	mitsevox+dtk-signature+re4+comment
+fn_804250B0	DVDGetDriveStatus	mitsevox+dtk-signature+re4
+fn_80425508	DVDGetCurrentDiskID	mitsevox+re4+comment
+fn_8042A544	GXSetBreakPtCallback	mitsevox+re4
+fn_8042B460	GXClearVtxDesc	mitsevox+dtk-signature+re4
+fn_8042C62C	GXSetDrawSyncCallback	mitsevox+re4
+fn_8042D9EC	GXInitLightColor	mitsevox+re4
+fn_8042DA74	GXSetChanAmbColor	mitsevox+dtk-signature+re4
+fn_8042DB5C	GXSetChanMatColor	mitsevox+dtk-signature+re4
+fn_8042DC44	GXSetNumChans	mitsevox+dtk-signature+re4
+fn_8042DC80	GXSetChanCtrl	mitsevox+dtk-signature+re4
+fn_8042F93C	GXSetFog	mitsevox+dtk-signature+re4
+fn_8042FD00	GXSetFogRangeAdj	mitsevox+dtk-signature+re4
+fn_8042FE24	GXSetBlendMode	mitsevox+dtk-signature+re4
+fn_8042FE78	GXSetColorUpdate	mitsevox+dtk-signature+re4
+fn_8042FEA4	GXSetAlphaUpdate	mitsevox+dtk-signature+re4
+fn_8042FED0	GXSetZMode	mitsevox+dtk-signature+re4
+fn_8042FF04	GXSetZCompLoc	mitsevox+dtk-signature+re4
+fn_8042FF38	GXSetPixelFmt	mitsevox+dtk-signature+re4
+fn_8043000C	GXSetDither	mitsevox+dtk-signature+re4
+fn_804302C4	GXLoadPosMtxImm	mitsevox+dtk-signature+re4
+fn_80430314	GXLoadNrmMtxImm	mitsevox+dtk-signature+re4
+fn_80430364	GXSetCurrentMtx	mitsevox+dtk-signature+re4
+fn_80430398	GXLoadTexMtxImm	mitsevox+dtk-signature+re4
+fn_804304DC	GXSetViewportJitter	mitsevox+re4
+fn_80430534	GXSetViewport	mitsevox+dtk-signature+re4
+fn_8043057C	GXSetScissor	mitsevox+dtk-signature+re4
+fn_80431700	__OSFPRInit	mitsevox+dtk-signature+re4
+fn_80432138	__OSPSInit	mitsevox+dtk-signature+re4
+fn_804321CC	OSInitAlarm	mitsevox+dtk-signature+re4+comment
+fn_80432224	OSCreateAlarm	mitsevox+dtk-signature+re4+comment
+fn_80432484	OSSetAlarm	mitsevox+dtk-signature+re4+comment
+fn_804324EC	OSSetPeriodicAlarm	mitsevox+dtk-signature
+fn_80432A50	OSAllocFromHeap	mitsevox+re4
+fn_80432B4C	OSFreeToHeap	mitsevox+re4
+fn_80432BC8	OSSetCurrentHeap	mitsevox+re4
+fn_80432C48	OSCreateHeap	mitsevox+re4
+fn_80432CB4	OSGetArenaHi	mitsevox+dtk-signature+re4+comment
+fn_80432CBC	OSGetArenaLo	mitsevox+dtk-signature+re4+comment
+fn_80432CCC	OSSetArenaLo	mitsevox+dtk-signature+re4+comment
+fn_80432FA8	DCInvalidateRange	mitsevox+dtk-signature+re4+comment
+fn_80432FD4	DCFlushRange	mitsevox+dtk-signature+re4+comment
+fn_80433034	DCFlushRangeNoSync	mitsevox+dtk-signature+re4+comment
+fn_80433304	__OSCacheInit	mitsevox+dtk-signature+re4+comment
+fn_8043364C	OSSetCurrentContext	mitsevox+dtk-signature+re4+comment
+fn_80433814	OSClearContext	mitsevox+dtk-signature+re4+comment
+fn_80433CE8	OSPanic	mitsevox+dtk-signature+re4
+fn_80433E14	OSSetErrorHandler	mitsevox+dtk-signature+re4
+fn_80434F9C	OSEnableInterrupts	mitsevox+dtk-signature+re4+comment
+fn_80436204	OSResetSystem	mitsevox+dtk-signature+re4
+fn_80436404	OSGetResetCode	mitsevox+dtk-signature+re4+comment
+fn_80437434	OSInitThreadQueue	mitsevox+dtk-signature+re4+comment
+fn_80437D18	OSCancelThread	mitsevox+dtk-signature+re4+comment
+fn_804382CC	OSSleepThread	mitsevox+dtk-signature+re4+comment
+fn_80438628	OSGetTime	mitsevox+dtk-signature+re4+comment

@@ -72,8 +72,8 @@ struct Unk8062300C {
 
 extern "C" {
 void fn_803EA338(void* a, void* b, void* c, void* d);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
-void fn_8042DC44(int n);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
+void GXSetNumChans(int n);
 void fn_803DD794(void* tex);
 void fn_803DB5A0(void* state);
 void fn_803DB9C0(int a, int b);
@@ -81,9 +81,9 @@ void fn_803DDCD4(void);
 void GXCallDisplayList(void* list, int nbytes);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
-void fn_8042B460(void);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB88(int a, int b, int c, int d, int e, int f);
@@ -115,12 +115,12 @@ extern "C" void fn_80367140(Unk803E3C08* a, Unk8062300C* b)
     if (a->mB0) {
         b->m4 = a->m0[8].m4;
         if (b->m70) {
-            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
-            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+            GXSetChanCtrl(4, 0, 1, 1, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 1, 1, 0, 0, 2);
         } else {
-            fn_8042DC44(1);
-            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
-            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+            GXSetNumChans(1);
+            GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 0, 0, 0, 0, 2);
         }
         fn_803DB5A0(b->m4);
         if (b->m6C == 0) {
@@ -155,15 +155,15 @@ extern "C" void fn_803672A0(void* x)
     fn_803E3C08(&a, x, -1);
     if (a.mB0) {
         GXColor c = { 0xff, 0xff, 0xff, 0xff };
-        fn_8042DA74(4, c);
-        fn_8042DB5C(4, c);
+        GXSetChanAmbColor(4, c);
+        GXSetChanMatColor(4, c);
         fn_803DDE7C();
         fn_803DDBF0();
     }
     if (a.mB4 != 0 || a.m50[10] != lbl_8062300C.m34 || a.m50[14] != lbl_8062300C.m44
         || a.m50[16] != lbl_8062300C.m4C) {
         a.mB8 = 0;
-        fn_8042B460();
+        GXClearVtxDesc();
         GXSetVtxDesc(0, 1);
         lbl_80623040 = a.m50[10];
         if (lbl_80623040) {
@@ -190,7 +190,7 @@ extern "C" void fn_803672A0(void* x)
         fn_803DBF78(0, 0xd, 1, 4, 0);
         fn_803DDB88(0, 1, 4, 0x3c, 0, 0x7d);
         fn_803DDB5C(1);
-        fn_8042DC44(1);
+        GXSetNumChans(1);
         lbl_8062300C.m0 = 3;
         lbl_8062300C.m8 = 0x5201;
         lbl_8062300C.m6C = 1;

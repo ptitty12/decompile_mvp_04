@@ -246,8 +246,8 @@ extern u32 lbl_806EF55C;
 extern u32 lbl_806EF560;
 extern u32 lbl_806EF578; /* __AXOutputBufferMode? (AX step mode) */
 
-extern void fn_80432FA8(void* addr, u32 nBytes); /* DCInvalidateRange */
-extern void fn_80433034(void* addr, u32 nBytes); /* DCFlushRangeNoSync / DCStoreRangeNoSync */
+extern void DCInvalidateRange(void* addr, u32 nBytes);
+extern void DCFlushRangeNoSync(void* addr, u32 nBytes); /* DCFlushRangeNoSync / DCStoreRangeNoSync */
 
 /* __AXAuxInit */
 void fn_80417D04(void)
@@ -365,18 +365,18 @@ void fn_80417F50(void)
             auxDataDpl2.r = (s32*)bufs->a[lbl_806EF560][1];
             auxDataDpl2.ls = (s32*)bufs->a[lbl_806EF560][2];
             auxDataDpl2.rs = (s32*)bufs->b[lbl_806EF560][-1 + 3];
-            fn_80432FA8(auxDataDpl2.l, 0x780);
-            fn_80432FA8(auxDataDpl2.rs, 0x280);
+            DCInvalidateRange(auxDataDpl2.l, 0x780);
+            DCInvalidateRange(auxDataDpl2.rs, 0x280);
             lbl_806EF530(&auxDataDpl2, lbl_806EF538);
-            fn_80433034(auxDataDpl2.l, 0x780);
-            fn_80433034(auxDataDpl2.rs, 0x280);
+            DCFlushRangeNoSync(auxDataDpl2.l, 0x780);
+            DCFlushRangeNoSync(auxDataDpl2.rs, 0x280);
         } else {
             auxDataA.l = (s32*)bufs->a[lbl_806EF560][0];
             auxDataA.r = (s32*)bufs->a[lbl_806EF560][1];
             auxDataA.s = (s32*)bufs->a[lbl_806EF560][2];
-            fn_80432FA8(auxDataA.l, 0x780);
+            DCInvalidateRange(auxDataA.l, 0x780);
             lbl_806EF530(&auxDataA, lbl_806EF538);
-            fn_80433034(auxDataA.l, 0x780);
+            DCFlushRangeNoSync(auxDataA.l, 0x780);
         }
     }
 
@@ -384,9 +384,9 @@ void fn_80417F50(void)
         auxDataB.l = (s32*)bufs->b[lbl_806EF560][0];
         auxDataB.r = (s32*)bufs->b[lbl_806EF560][1];
         auxDataB.s = (s32*)bufs->b[lbl_806EF560][2];
-        fn_80432FA8(auxDataB.l, 0x780);
+        DCInvalidateRange(auxDataB.l, 0x780);
         lbl_806EF534(&auxDataB, lbl_806EF53C);
-        fn_80433034(auxDataB.l, 0x780);
+        DCFlushRangeNoSync(auxDataB.l, 0x780);
     }
 
     lbl_806EF550++;
@@ -483,11 +483,11 @@ extern u32 lbl_806EF5B0; /* __AXOutputBufferMode */
 extern u16 lbl_80631560[]; /* axDspSlave */
 extern u16 lbl_806EF168;   /* axDspSlaveLength */
 
-extern OSTime fn_80438628(void);               /* OSGetTime */
-extern void fn_80437434(OSThreadQueue* queue); /* OSInitThreadQueue */
-extern void fn_804382CC(OSThreadQueue* queue); /* OSSleepThread */
+extern OSTime OSGetTime(void);
+extern void OSInitThreadQueue(OSThreadQueue* queue);
+extern void OSSleepThread(OSThreadQueue* queue);
 extern void OSWakeupThread(OSThreadQueue* queue);
-extern void fn_80432FD4(void* addr, u32 nBytes); /* DCFlushRange */
+extern void DCFlushRange(void* addr, u32 nBytes);
 extern void fn_80419CB4(u32 lessDspCycles);    /* __AXSyncPBs */
 extern void fn_804190A4(void);
 extern u32 fn_80419560(void);                  /* __AXGetNumVoices */
@@ -505,7 +505,7 @@ void fn_804188D0(u32 lessDspCycles)
     u32 cl;
     AXPROFILE* profile;
 
-    lbl_806C6C40.profile.axFrameStart = fn_80438628();
+    lbl_806C6C40.profile.axFrameStart = OSGetTime();
     fn_80419CB4(lessDspCycles);
     fn_804190A4();
     cl = fn_804181A0();
@@ -516,14 +516,14 @@ void fn_804188D0(u32 lessDspCycles)
     while (DSPCheckMailToDSP() != 0)
         ;
     fn_80417854();
-    lbl_806C6C40.profile.auxProcessingStart = fn_80438628();
+    lbl_806C6C40.profile.auxProcessingStart = OSGetTime();
     fn_80417F50();
-    lbl_806C6C40.profile.auxProcessingEnd = fn_80438628();
-    lbl_806C6C40.profile.userCallbackStart = fn_80438628();
+    lbl_806C6C40.profile.auxProcessingEnd = OSGetTime();
+    lbl_806C6C40.profile.userCallbackStart = OSGetTime();
     if (lbl_806EF598 != NULL) {
         lbl_806EF598();
     }
-    lbl_806C6C40.profile.userCallbackEnd = fn_80438628();
+    lbl_806C6C40.profile.userCallbackEnd = OSGetTime();
     fn_804181DC(lbl_806C6C40.sBuffer, lbl_806C6C40.outBuffer[lbl_806EF580]);
     lbl_806EF580++;
     if (lbl_806EF5B0 == 1) {
@@ -532,7 +532,7 @@ void fn_804188D0(u32 lessDspCycles)
         lbl_806EF580 &= 1;
         AIInitDMA((u32)lbl_806C6C40.outBuffer[lbl_806EF580], 0x280);
     }
-    lbl_806C6C40.profile.axFrameEnd = fn_80438628();
+    lbl_806C6C40.profile.axFrameEnd = OSGetTime();
     lbl_806C6C40.profile.axNumVoices = fn_80419560();
     profile = fn_8041A55C();
     if (profile != NULL) {
@@ -544,7 +544,7 @@ void fn_804188D0(u32 lessDspCycles)
 void fn_80418A88(void)
 {
     if (lbl_806EF588 == 0) {
-        lbl_806EF590 = fn_80438628();
+        lbl_806EF590 = OSGetTime();
     }
     if (lbl_806EF588 == 1) {
         lbl_806EF588 = 0;
@@ -571,7 +571,7 @@ void fn_80418B50(void)
 {
     if (lbl_806EF588 == 2) {
         lbl_806EF588 = 0;
-        fn_804188D0((u32)(fn_80438628() - lbl_806EF590) >> 2);
+        fn_804188D0((u32)(OSGetTime() - lbl_806EF590) >> 2);
         return;
     }
     lbl_806EF588 = 1;
@@ -604,7 +604,7 @@ void fn_80418BD4(void)
     o->task.priority = 0;
     lbl_806EF59C = 0;
     lbl_806EF5A0 = 0;
-    fn_80437434(&lbl_806EF5A8);
+    OSInitThreadQueue(&lbl_806EF5A8);
     if (DSPCheckInit() == 0) {
         DSPInit();
     }
@@ -629,12 +629,12 @@ void fn_80418CA0(u32 outputBufferMode)
     for (i = 0; i < 0x1E0; i++) {
         *p++ = 0;
     }
-    fn_80432FD4(lbl_806C6C40.outBuffer, 0x780);
+    DCFlushRange(lbl_806C6C40.outBuffer, 0x780);
     p = lbl_806C6C40.sBuffer;
     for (i = 0; i < 0xA0; i++) {
         *p++ = 0;
     }
-    fn_80432FD4(lbl_806C6C40.sBuffer, 0x280);
+    DCFlushRange(lbl_806C6C40.sBuffer, 0x280);
     fn_80418BD4();
     AIRegisterDMACallback((AIDCallback)fn_80418A88);
     if (lbl_806EF5B0 == 1) {
@@ -662,7 +662,7 @@ void fn_80419040(void)
     old = OSDisableInterrupts();
     lbl_806EF598 = NULL;
     DSPCancelTask(&lbl_806CB640);
-    fn_804382CC(&lbl_806EF5A8);
+    OSSleepThread(&lbl_806EF5A8);
     AIStopDMA();
     OSRestoreInterrupts(old);
 }
@@ -726,7 +726,7 @@ void fn_804190A4(void)
     __AXDepopFade(&lbl_806EF5D0, (s32*)&studio->dpopBLHi, &studio->dpopBLDelta);
     __AXDepopFade(&lbl_806EF5D4, (s32*)&studio->dpopBRHi, &studio->dpopBRDelta);
     __AXDepopFade(&lbl_806EF5D8, (s32*)&studio->dpopBSHi, &studio->dpopBSDelta);
-    fn_80432FD4(studio, 0x36);
+    DCFlushRange(studio, 0x36);
 }
 
 /* __AXSPBInit */

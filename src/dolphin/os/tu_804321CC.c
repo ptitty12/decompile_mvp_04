@@ -2,9 +2,9 @@
  * Dolphin SDK OS (OSAlarm, OSAlloc, OSArena, OSAudioSystem, OSCache; MWCC GC/1.2.5n),
  * .text 0x804321CC-0x804330D0 (code-only unit, 33 functions; TU boundaries approximate, placeholder).
  * Every data object is extern by its lbl_ name.
- * Not reproduced (original code, no C equivalent): fn_804328B4 (DecrementerExceptionHandler),
- * fn_80432F94 (DCEnable), fn_80432FA8 (DCInvalidateRange), fn_80432FD4 (DCFlushRange), DCStoreRange (DCStoreRange),
- * fn_80433034 (DCFlushRangeNoSync), DCStoreRangeNoSync (DCStoreRangeNoSync), ICInvalidateRange, fn_804330C0 (ICFlashInvalidate).
+ * Not reproduced (original code, no C equivalent): DecrementerExceptionHandler,
+ * DCEnable, DCInvalidateRange, DCFlushRange, DCStoreRange (DCStoreRange),
+ * DCFlushRangeNoSync, DCStoreRangeNoSync (DCStoreRangeNoSync), ICInvalidateRange, ICFlashInvalidate.
  */
 #include <dolphin.h>
 #include <dolphin/os.h>
@@ -13,22 +13,22 @@
 
 /* ---- OSAlarm ---- */
 
-typedef struct AlarmQueue {
+typedef struct OSAlarmQueue {
     OSAlarm* head;
     OSAlarm* tail;
-} AlarmQueue;
+} OSAlarmQueue;
 
-extern AlarmQueue lbl_806EF7D8;
-extern OSResetFunctionInfo lbl_80635850;
+extern OSAlarmQueue AlarmQueue;
+extern OSResetFunctionInfo ResetFunctionInfo;
 
-void fn_804321CC(void);
-void fn_80432224(OSAlarm* alarm);
-void fn_80432234(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler);
-void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
-void fn_804324EC(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler);
+void OSInitAlarm(void);
+void OSCreateAlarm(OSAlarm* alarm);
+void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler);
+void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler);
+void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler);
 void OSCancelAlarm(OSAlarm* alarm);
-void fn_80432684(u8 exception, OSContext* context);
-void fn_804328B4(u8 exception, OSContext* context);
+void DecrementerExceptionCallback(u8 exception, OSContext* context);
+void DecrementerExceptionHandler(u8 exception, OSContext* context);
 BOOL fn_80432904(BOOL final);
 
 static void SetTimer(OSAlarm* alarm)
@@ -37,33 +37,33 @@ static void SetTimer(OSAlarm* alarm)
 
     delta = alarm->fire - __OSGetSystemTime();
     if (delta < 0) {
-        fn_8041A5D4(0);
+        PPCMtdec(0);
     } else if (delta < 0x80000000) {
-        fn_8041A5D4((u32)delta);
+        PPCMtdec((u32)delta);
     } else {
-        fn_8041A5D4(0x7FFFFFFF);
+        PPCMtdec(0x7FFFFFFF);
     }
 }
 
 /* OSInitAlarm */
-void fn_804321CC(void)
+void OSInitAlarm(void)
 {
-    if (fn_80432030(8) != (void*)fn_804328B4) {
-        lbl_806EF7D8.head = lbl_806EF7D8.tail = NULL;
-        fn_80432014(8, (void*)fn_804328B4);
-        OSRegisterResetFunction(&lbl_80635850);
+    if (__OSGetExceptionHandler(8) != DecrementerExceptionHandler) {
+        AlarmQueue.head = AlarmQueue.tail = NULL;
+        __OSSetExceptionHandler(8, DecrementerExceptionHandler);
+        OSRegisterResetFunction(&ResetFunctionInfo);
     }
 }
 
 /* OSCreateAlarm */
-void fn_80432224(OSAlarm* alarm)
+void OSCreateAlarm(OSAlarm* alarm)
 {
     alarm->handler = NULL;
     alarm->tag = 0;
 }
 
 /* InsertAlarm */
-void fn_80432234(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler)
+void InsertAlarm(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler)
 {
     OSAlarm* next;
     OSAlarm* prev;
@@ -80,7 +80,7 @@ void fn_80432234(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler)
     alarm->handler = handler;
     alarm->fire = fire;
 
-    for (next = lbl_806EF7D8.head; next; next = next->next) {
+    for (next = AlarmQueue.head; next; next = next->next) {
         if (next->fire <= fire) {
             continue;
         }
@@ -91,43 +91,43 @@ void fn_80432234(OSAlarm* alarm, OSTime fire, OSAlarmHandler handler)
         if (prev) {
             prev->next = alarm;
         } else {
-            lbl_806EF7D8.head = alarm;
+            AlarmQueue.head = alarm;
             SetTimer(alarm);
         }
         return;
     }
     alarm->next = NULL;
-    prev = lbl_806EF7D8.tail;
-    lbl_806EF7D8.tail = alarm;
+    prev = AlarmQueue.tail;
+    AlarmQueue.tail = alarm;
     alarm->prev = prev;
     if (prev) {
         prev->next = alarm;
     } else {
-        lbl_806EF7D8.head = lbl_806EF7D8.tail = alarm;
+        AlarmQueue.head = AlarmQueue.tail = alarm;
         SetTimer(alarm);
     }
 }
 
 /* OSSetAlarm */
-void fn_80432484(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler)
+void OSSetAlarm(OSAlarm* alarm, OSTime tick, OSAlarmHandler handler)
 {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
     alarm->period = 0;
-    fn_80432234(alarm, __OSGetSystemTime() + tick, handler);
+    InsertAlarm(alarm, __OSGetSystemTime() + tick, handler);
     OSRestoreInterrupts(enabled);
 }
 
 /* OSSetPeriodicAlarm */
-void fn_804324EC(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler)
+void OSSetPeriodicAlarm(OSAlarm* alarm, OSTime start, OSTime period, OSAlarmHandler handler)
 {
     BOOL enabled;
 
     enabled = OSDisableInterrupts();
     alarm->period = period;
     alarm->start = fn_804386AC(start);
-    fn_80432234(alarm, 0, handler);
+    InsertAlarm(alarm, 0, handler);
     OSRestoreInterrupts(enabled);
 }
 
@@ -144,14 +144,14 @@ void OSCancelAlarm(OSAlarm* alarm)
     }
     next = alarm->next;
     if (next == NULL) {
-        lbl_806EF7D8.tail = alarm->prev;
+        AlarmQueue.tail = alarm->prev;
     } else {
         next->prev = alarm->prev;
     }
     if (alarm->prev) {
         alarm->prev->next = next;
     } else {
-        lbl_806EF7D8.head = next;
+        AlarmQueue.head = next;
         if (next) {
             SetTimer(next);
         }
@@ -161,7 +161,7 @@ void OSCancelAlarm(OSAlarm* alarm)
 }
 
 /* DecrementerExceptionCallback */
-void fn_80432684(u8 exception, OSContext* context)
+void DecrementerExceptionCallback(u8 exception, OSContext* context)
 {
     OSAlarm* alarm;
     OSAlarm* next;
@@ -170,20 +170,20 @@ void fn_80432684(u8 exception, OSContext* context)
     OSContext exceptionContext;
 
     time = __OSGetSystemTime();
-    alarm = lbl_806EF7D8.head;
+    alarm = AlarmQueue.head;
     if (alarm == NULL) {
-        fn_80433734(context);
+        OSLoadContext(context);
     }
 
     if (time < alarm->fire) {
         SetTimer(alarm);
-        fn_80433734(context);
+        OSLoadContext(context);
     }
 
     next = alarm->next;
-    lbl_806EF7D8.head = next;
+    AlarmQueue.head = next;
     if (next == NULL) {
-        lbl_806EF7D8.tail = NULL;
+        AlarmQueue.tail = NULL;
     } else {
         next->prev = NULL;
     }
@@ -191,22 +191,22 @@ void fn_80432684(u8 exception, OSContext* context)
     handler = alarm->handler;
     alarm->handler = NULL;
     if (0 < alarm->period) {
-        fn_80432234(alarm, 0, handler);
+        InsertAlarm(alarm, 0, handler);
     }
 
-    if (lbl_806EF7D8.head) {
-        SetTimer(lbl_806EF7D8.head);
+    if (AlarmQueue.head) {
+        SetTimer(AlarmQueue.head);
     }
 
-    fn_80437484();
-    fn_80433814(&exceptionContext);
-    fn_8043364C(&exceptionContext);
+    OSDisableScheduler();
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(&exceptionContext);
     handler(alarm, context);
-    fn_80433814(&exceptionContext);
-    fn_8043364C(context);
-    fn_804374C4();
-    fn_804379E0();
-    fn_80433734(context);
+    OSClearContext(&exceptionContext);
+    OSSetCurrentContext(context);
+    OSEnableScheduler();
+    __OSReschedule();
+    OSLoadContext(context);
 }
 
 /* OnReset (OSAlarm) */
@@ -217,7 +217,7 @@ BOOL fn_80432904(BOOL final)
     OSAlarm* next;
 
     if (final != FALSE) {
-        alarm = lbl_806EF7D8.head;
+        alarm = AlarmQueue.head;
         next = (alarm) ? alarm->next : NULL;
 
         while (alarm != 0) {
@@ -248,7 +248,7 @@ typedef struct HeapDesc {
     Cell* allocated;
 } HeapDesc;
 
-extern volatile long lbl_806EF2C8;   /* __OSCurrHeap */
+extern volatile OSHeapHandle lbl_806EF2C8; /* __OSCurrHeap */
 extern HeapDesc* lbl_806EF7E0;       /* HeapArray */
 extern int lbl_806EF7E4;             /* NumHeaps */
 extern void* lbl_806EF7E8;           /* ArenaStart */
@@ -277,11 +277,11 @@ static Cell* DLAddFront(Cell* list, Cell* cell)
 }
 
 Cell* fn_804329A4(Cell* list, Cell* cell);
-void* fn_80432A50(long heap, u32 size);
-void fn_80432B4C(long heap, void* ptr);
-long fn_80432BC8(long heap);
+void* OSAllocFromHeap(OSHeapHandle heap, u32 size);
+void OSFreeToHeap(OSHeapHandle heap, void* ptr);
+OSHeapHandle OSSetCurrentHeap(OSHeapHandle heap);
 void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps);
-long fn_80432C48(void* start, void* end);
+OSHeapHandle OSCreateHeap(void* start, void* end);
 
 /* DLInsert */
 Cell* fn_804329A4(Cell* list, Cell* cell)
@@ -323,7 +323,7 @@ Cell* fn_804329A4(Cell* list, Cell* cell)
 }
 
 /* OSAllocFromHeap */
-void* fn_80432A50(long heap, u32 size)
+void* OSAllocFromHeap(OSHeapHandle heap, u32 size)
 {
     HeapDesc* hd = &lbl_806EF7E0[heap];
     long sz = (long)(((size + 32) + 31) & ~31);
@@ -365,7 +365,7 @@ void* fn_80432A50(long heap, u32 size)
 
 /* OSFreeToHeap */
 /* near-miss: same instructions, stack frame 32 bytes vs retail 24 */
-void fn_80432B4C(long heap, void* ptr)
+void OSFreeToHeap(OSHeapHandle heap, void* ptr)
 {
     Cell* cell = (Cell*)((char*)ptr - 32);
     HeapDesc* hd = &lbl_806EF7E0[heap];
@@ -375,9 +375,9 @@ void fn_80432B4C(long heap, void* ptr)
 }
 
 /* OSSetCurrentHeap */
-long fn_80432BC8(long heap)
+OSHeapHandle OSSetCurrentHeap(OSHeapHandle heap)
 {
-    long prev = lbl_806EF2C8;
+    OSHeapHandle prev = lbl_806EF2C8;
     lbl_806EF2C8 = heap;
     return prev;
 }
@@ -408,9 +408,9 @@ void* OSInitAlloc(void* arenaStart, void* arenaEnd, int maxHeaps)
 }
 
 /* OSCreateHeap */
-long fn_80432C48(void* start, void* end)
+OSHeapHandle OSCreateHeap(void* start, void* end)
 {
-    long heap;
+    OSHeapHandle heap;
     HeapDesc* hd;
     Cell* cell;
 
@@ -435,13 +435,13 @@ long fn_80432C48(void* start, void* end)
 
 /* ---- OSAudioSystem: __OSInitAudioSystem ----
  * Emitted ahead of the OSArena block on purpose: in the original OSAudioSystem.c is its own file and calls
- * OSGetArenaHi (fn_80432CB4) out of line; defined after fn_80432CB4 here, the compiler expands that call inline.
+ * OSGetArenaHi out of line; defined after OSGetArenaHi here, the compiler expands that call inline.
  * Body: dolsdk2004 OSAudioSystem.c (adonis-singh/re4 src/lib/OSAudioSystem.c), instruction stream equal. */
 
 extern u8 lbl_80635DE0[0x80];        /* DSPInitCode */
 
 void fn_80432D00(void);
-void fn_80432EBC(void);
+void __OSStopAudioSystem(void);
 
 /* __OSInitAudioSystem */
 void fn_80432D00(void)
@@ -450,9 +450,9 @@ void fn_80432D00(void)
     u16 reg16;
     u32 start_tick;
 
-    memcpy((void*)((u32)fn_80432CB4() - 0x80), (void*)0x81000000, 0x80);
+    memcpy((void*)((u32)OSGetArenaHi() - 0x80), (void*)0x81000000, 0x80);
     memcpy((void*)0x81000000, (void*)lbl_80635DE0, 0x80);
-    fn_80432FD4((void*)0x81000000, 0x80);
+    DCFlushRange((void*)0x81000000, 0x80);
 
     __DSPRegs[9] = 0x43;
 
@@ -508,30 +508,30 @@ void fn_80432D00(void)
     __DSPRegs[5] |= 1;
     while (__DSPRegs[5] & 1);
 
-    memcpy((void*)0x81000000, (void*)((u32)fn_80432CB4() - 0x80), 0x80);
+    memcpy((void*)0x81000000, (void*)((u32)OSGetArenaHi() - 0x80), 0x80);
 }
 
 /* ---- OSArena ---- */
 
 extern void* lbl_806EF7F0;           /* __OSArenaHi */
-extern void* lbl_806EF2D0;           /* __OSArenaLo */
+extern void* __OSArenaLo;
 
-void* fn_80432CB4(void);
-void* fn_80432CBC(void);
+void* OSGetArenaHi(void);
+void* OSGetArenaLo(void);
 void fn_80432CC4(void* hi);
-void fn_80432CCC(void* lo);
+void OSSetArenaLo(void* lo);
 void* fn_80432CD4(u32 size, u32 align);
 
 /* OSGetArenaHi */
-void* fn_80432CB4(void)
+void* OSGetArenaHi(void)
 {
     return lbl_806EF7F0;
 }
 
 /* OSGetArenaLo */
-void* fn_80432CBC(void)
+void* OSGetArenaLo(void)
 {
-    return lbl_806EF2D0;
+    return __OSArenaLo;
 }
 
 /* OSSetArenaHi */
@@ -541,9 +541,9 @@ void fn_80432CC4(void* hi)
 }
 
 /* OSSetArenaLo */
-void fn_80432CCC(void* lo)
+void OSSetArenaLo(void* lo)
 {
-    lbl_806EF2D0 = lo;
+    __OSArenaLo = lo;
 }
 
 /* OSAllocFromArenaLo */
@@ -552,18 +552,18 @@ void* fn_80432CD4(u32 size, u32 align)
     void* ptr;
     u8* arenaLo;
 
-    arenaLo = (u8*)lbl_806EF2D0;
+    arenaLo = (u8*)__OSArenaLo;
     ptr = (void*)(((u32)arenaLo + align - 1) & ~(align - 1));
     arenaLo = (u8*)ptr + size;
     arenaLo = (u8*)(((u32)arenaLo + align - 1) & ~(align - 1));
-    lbl_806EF2D0 = arenaLo;
+    __OSArenaLo = arenaLo;
     return ptr;
 }
 
 /* ---- OSAudioSystem: __OSStopAudioSystem ---- */
 
 /* __OSStopAudioSystem */
-void fn_80432EBC(void)
+void __OSStopAudioSystem(void)
 {
     u16 reg16;
     u32 start_tick;

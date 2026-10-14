@@ -82,9 +82,9 @@ struct Unk80623C2C {
 
 extern "C" {
 void fn_803DFBAC(Unk80371D9CMtx* in, Unk80371D9CMtx* out);
-void fn_804302C4(Unk80371D9CMtx* m, int id);
-void fn_80430364(int id);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void GXLoadPosMtxImm(Unk80371D9CMtx* m, int id);
+void GXSetCurrentMtx(int id);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
 void fn_803DB5A0(void* state);
 void fn_803DDCD4(void);
 void GXCallDisplayList(void* list, int nbytes);
@@ -98,7 +98,7 @@ void fn_803DE300(Unk803DE1BC* o, int a);
 void fn_803DB5A0(void* state);
 void fn_803DDCD4(void);
 void GXCallDisplayList(void* list, int nbytes);
-void fn_8042DC80(int a, int b, int c, int d, int e, int f, int g);
+void GXSetChanCtrl(int a, int b, int c, int d, int e, int f, int g);
 void fn_803DBE2C(void* state, int a);
 void fn_803DBBE0(void* tex);
 }
@@ -141,13 +141,13 @@ inline void Unk803DBE08Out::Begin(int n)
 
 
 extern "C" {
-void fn_8042DC44(int n);
+void GXSetNumChans(int n);
 void fn_803DB9C0(int a, int b);
 void fn_803DDBF0(void);
 void fn_803DDE7C(void);
-void fn_8042DA74(int chan, GXColor c);
-void fn_8042DB5C(int chan, GXColor c);
-void fn_8042B460(void);
+void GXSetChanAmbColor(int chan, GXColor c);
+void GXSetChanMatColor(int chan, GXColor c);
+void GXClearVtxDesc(void);
 void GXSetVtxDesc(int attr, int type);
 void fn_803DBF78(int a, int b, int c, int d, int e);
 void fn_803DDB5C(int n);
@@ -180,12 +180,12 @@ extern "C" void fn_80371D9C(Unk803E3C08* a, Unk80623C2C* b)
     if (a->mB0) {
         b->m4 = a->m0[6].m4;
         if (b->m70) {
-            fn_8042DC80(4, 0, 1, 1, 0, 2, 2);
-            fn_8042DC80(5, 0, 1, 1, 0, 0, 2);
+            GXSetChanCtrl(4, 0, 1, 1, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 1, 1, 0, 0, 2);
         } else {
-            fn_8042DC44(1);
-            fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
-            fn_8042DC80(5, 0, 0, 0, 0, 0, 2);
+            GXSetNumChans(1);
+            GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
+            GXSetChanCtrl(5, 0, 0, 0, 0, 0, 2);
         }
         fn_803DDB5C(0);
         fn_803DE1BC(&o);
@@ -200,9 +200,9 @@ extern "C" void fn_80371D9C(Unk803E3C08* a, Unk80623C2C* b)
         c2.g = (unsigned char)(((float*)p[5].m4)[1] * 255.0f);
         c2.b = (unsigned char)(((float*)p[5].m4)[2] * 255.0f);
         c2.a = (unsigned char)(((float*)p[5].m4)[3] * 255.0f);
-        fn_8042DA74(4, c1);
-        fn_8042DB5C(4, c2);
-        fn_8042DC80(4, 0, 0, 0, 0, 2, 2);
+        GXSetChanAmbColor(4, c1);
+        GXSetChanMatColor(4, c2);
+        GXSetChanCtrl(4, 0, 0, 0, 0, 2, 2);
         fn_803DBE2C(b->m4, 1);
         fn_803DB5A0(b->m4);
         if (b->m6C == 0) {
@@ -210,14 +210,14 @@ extern "C" void fn_80371D9C(Unk803E3C08* a, Unk80623C2C* b)
         }
         Unk80371D9CMtx mtx = *(Unk80371D9CMtx*)a->m0[2].m4;
         fn_803DFBAC(&mtx, &mtx);
-        fn_804302C4(&mtx, 0);
-        fn_80430364(0);
+        GXLoadPosMtxImm(&mtx, 0);
+        GXSetCurrentMtx(0);
         fn_803DBBE0(a->m0[4].m4);
         lbl_806279C8 = fn_803DBF98;
         mtx = *(Unk80371D9CMtx*)a->m0[1].m4;
         fn_803DFBAC(&mtx, &mtx);
-        fn_804302C4(&mtx, 0);
-        fn_80430364(0);
+        GXLoadPosMtxImm(&mtx, 0);
+        GXSetCurrentMtx(0);
     }
     fn_803DDCD4();
     if (a->mBC == 0) {
@@ -352,14 +352,14 @@ extern "C" void fn_80372638(void* x)
     fn_803E3C08(&a, x, -1);
     if (a.mB0) {
         GXColor c = { 0xff, 0xff, 0xff, 0xff };
-        fn_8042DA74(4, c);
-        fn_8042DB5C(4, c);
+        GXSetChanAmbColor(4, c);
+        GXSetChanMatColor(4, c);
         fn_803DDE7C();
         fn_803DDBF0();
     }
     if (a.mB4 != 0 || a.m50[10] != lbl_80623C2C.m34) {
         a.mB8 = 0;
-        fn_8042B460();
+        GXClearVtxDesc();
         lbl_80623C60 = a.m50[10];
         if (lbl_80623C60) {
             GXSetVtxDesc(9, 2);
@@ -370,7 +370,7 @@ extern "C" void fn_80372638(void* x)
     if (a.mB4) {
         fn_803DBF78(0, 9, 1, 4, 0);
         fn_803DDB5C(0);
-        fn_8042DC44(0);
+        GXSetNumChans(0);
         lbl_80623C2C.m8 = 0x200;
         lbl_80623C2C.m0 = 1;
         lbl_80623C2C.m6C = 1;
