@@ -29,7 +29,7 @@ DECISIONS "Open questions for owner"; then keep working.
   - It never commits. A match is saved as `<farm>/build/permute_farm/runs/<fn>/match.patch`; list them with `python tools/match/permute_farm.py --status`.
   - To collect a match: apply the patch in a worker worktree, build, verify, commit `match(...)`, then integrate.
   - To stop it: `--uninstall`, then end its pythonw process.
-- **Dashboard**: scheduled task "MVP decomp live dashboard" (every minute, worktree `decompile_mvp_04-dash`) publishes https://github.com/ptitty12/decompile_mvp_04/tree/dashboard. The local view is `python tools/fleet_dashboard.py --watch 5`.
+- **Dashboard**: scheduled task "MVP decomp live dashboard" (every minute, worktree `decompile_mvp_04-dash`) publishes https://github.com/ptitty12/mvp2005-decomp/tree/dashboard. The local view is `python tools/fleet_dashboard.py --watch 5`.
 - **Progress bot**: scheduled task "MVP decomp progress card", every 2 minutes.
 - Do not delete the `-farm` or `-dash` worktrees: the scheduled tasks run from them.
 
@@ -59,11 +59,11 @@ DECISIONS "Open questions for owner"; then keep working.
 - `rmfn.py` parks into `$QDIR`.
 
 ### Owner questions (DECISIONS, Open questions)
-- verify keys regressions by (unit, function), so unit splits count as regressions. Instances:
-  - the SDK splits;
+- ~~verify keys regressions by (unit, function), so unit splits count as regressions.~~ Fixed by PR #135 (d71a9076, 2026-10-13): verify now follows moved functions. Still to do with it:
+  - the card/ax/mtx SDK splits on `staged/sdk-resplit`;
   - dolphin/dvd/tu_804227D4, which merges dvdfs.c and dvd.c; its fn_804227D4 is defined at the end of the file.
 - Extra usage: the owner said not yet.
-- The repo is public, but the docs say private.
+- ~~The repo is public, but the docs say private.~~ Settled 2026-10-13: the repo stays public as `ptitty12/mvp2005-decomp` (DECISIONS).
 - Does the owner have MVP 2004/2005 discs for other platforms (symbols)?
 
 ### Recurring unsolved shapes (for whoever continues)
@@ -103,8 +103,8 @@ Daily history: `docs/progress/history.csv` (10-10: 120, 10-11: 16,053, 10-12: 19
 
 ## 2. Repo and environment layout
 
-All paths are under `C:\Users\Patrick Taylor\` (Git Bash: `/c/Users/Patrick Taylor/`). Remote: private GitHub
-`ptitty12/decompile_mvp_04` (`gh` is logged in). Host is native Windows; the Bash tool is Git Bash.
+All paths are under `C:\Users\Patrick Taylor\` (Git Bash: `/c/Users/Patrick Taylor/`). Remote: public GitHub
+`ptitty12/mvp2005-decomp` (renamed from `decompile_mvp_04` on 2026-10-13; local folder names are unchanged; `gh` is logged in). Host is native Windows; the Bash tool is Git Bash.
 
 | Path | Branch / HEAD | Purpose | State |
 |---|---|---|---|
@@ -123,7 +123,7 @@ commit says it polls every 2 min). It builds origin/main, redraws `docs/progress
 "docs: update progress card" to main. **main therefore moves on its own.** integrate.py rebases over these
 commits. Log: `build/_progress/bot.log`.
 
-### Lead scripts (were in the session scratchpad; copied to `tools/team/lead/`, uncommitted)
+### Lead scripts (were in the session scratchpad; now committed in `tools/team/lead/`)
 The old scratchpad is
 `C:\Users\PATRIC~1\AppData\Local\Temp\claude\C--Users-Patrick-Taylor-decompile-mvp-04\ddf206fc-...\scratchpad\`.
 It is session temp and will not survive cleanup or a reboot. The running workers' prompts still point there
@@ -214,7 +214,7 @@ Decided, one line each:
 2. prodg-hybrid: ProDG for game/EA, MWCC for the Dolphin SDK.
 3. Native Windows host.
 4. Phase 1 tool downloads approved.
-5. Private GitHub repo.
+5. GitHub repo (private at first; public since 2026-10-13, renamed `ptitty12/mvp2005-decomp`).
 6. Blanket owner approval.
 7. Build pipeline approved.
 8. Compilers: ProDG 3.9.3 = g++ 2.95.3 SN v1.76.

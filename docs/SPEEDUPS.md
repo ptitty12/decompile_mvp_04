@@ -34,7 +34,23 @@ What this means:
 
 Unit issues on GitHub (126 provisional units): 54 `game`, 55 `ea-lib`, 13
 `sdk`, 4 `runtime`. Nearly half the units are EA shared libraries, so item 6
-matters a lot.
+matters a lot. (Those were the 2026-10-10 provisional units. There are 847
+split units now, and the issues are no longer used for tracking.)
+
+### What's left (2026-10-13, main `68d25430`)
+
+| Function size | Unmatched functions | Unmatched code |
+|---|---:|---:|
+| ≤ 32 B | 77 | 1,028 B |
+| 33–64 B | 69 | 3,476 B |
+| 65–256 B | 598 | 95,208 B |
+| 257 B – 1 KB | 1,457 | 862,512 B |
+| > 1 KB | 853 | 1,859,984 B |
+| **All** | **3,054** | **2,822,208 B** |
+
+The small tiers are nearly done. 66% of the remaining code is in the 853
+functions over 1 KB, which earlier passes skipped by size cap; item 16's
+test showed they do match. 507 functions sit at 95-99.99%.
 
 ## Candidate speed-ups
 

@@ -1,5 +1,10 @@
 # Phase 0 Recon Report: MVP Baseball **2005** (GameCube, GV4E69)
 
+> **Snapshot from 2026-10-10, kept as written.** The owner approved the `prodg-hybrid` path the same day.
+> ProDG 3.9.3 turned out to be the exact compiler (`SN BUILD v1.76`). A public decomp of this game does
+> exist (mitsevox/mvp2005, see `docs/REUSE.md`), despite §5. The current state is in `README.md` and
+> `docs/DECISIONS.md`.
+
 - Date: 2026-10-10
 - Agent: Claude Opus 5.5 (Claude Code), single session, read-only analysis
 - Status: **Phase 0 complete. STOPPED, waiting for owner approval.** No scaffold, no decompiled code.

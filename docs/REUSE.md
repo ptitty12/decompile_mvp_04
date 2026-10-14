@@ -1,6 +1,11 @@
 # Reuse map: public code we can port instead of writing
 
 > Every reference source checked since, with its verdict: `docs/REFERENCE_SOURCES.md` (2026-10-13).
+>
+> What was used (as of 2026-10-13): mitsevox/mvp2005 sources were ported unit by unit (Dolphin SDK,
+> libc, libm, libsn, SND; commits say "ported from mitsevox/mvp2005"), its EA reference names became
+> `config/GV4E69/refnames/`, and Dolphin SDK bodies came from adonis-singh/re4. Unit counts below
+> (126 units) are the 2026-10-10 provisional split; there are 847 units now.
 
 Researched 2026-10-10 for `docs/SPEEDUPS.md` item 6. **Verified** facts were
 checked directly (gh api, the repo's README). Everything else was **reported**

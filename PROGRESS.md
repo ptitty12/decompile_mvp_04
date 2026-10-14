@@ -8,8 +8,10 @@
   - game + EA libs: SN ProDG 3.9.3, `GNU C++ 2.95.3 SN BUILD v1.76`. Flags by library/unit are recorded in `configure.py` and `docs/DECISIONS.md`.
   - Dolphin SDK: MWCC GC/1.2.5n and GC/2.0, with evidence-backed per-library/unit flags.
   - linker: SN ngcld 1.5.1.692 + `config/GV4E69/ldscript.ld`; DOL packed by `tools/mkdol.py --layout`
-- Functions matched: **20,915 / 24,158 (86.58%)**; code matched: **3,003,604 / 5,896,176 bytes (50.94%)**.
-- Source-linked: **232 units, 373,512 code bytes (6.33%)**, plus 12,486 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+- As of main `68d25430` (2026-10-13 22:53 CDT, the progress bot's verified build):
+  - Functions matched: **21,104 / 24,158 (87.36%)**; code matched: **3,073,968 / 5,896,176 bytes (52.13%)**.
+  - Source-linked: **234 of 847 units, 386,148 code bytes (6.55%)**, plus 13,826 data bytes. Matched functions in unlinked units still use extracted assembly in the final DOL.
+  - Left: 3,054 functions / 2.82 MB. The 853 functions over 1 KB hold 1.86 MB of it, and 507 functions sit at 95-99.99%.
 - Last audit: 2026-10-13, retail DOL hash + literal checks + unmodified verifier PASS; per-commit integration gate required before push.
 
 ## Session log (newest last)
@@ -345,3 +347,12 @@
   | Owner: nothing pending from this session
 
 - 2026-10-13 21:15 CDT | Final Codex wind-down matching batch: local61, local69 and B12 add five exact functions /2808 code bytes. Source field snapshots, row-base lifetime, native bounded iterators and nested DB scans match retail. ROOT21 adds the provider-grounded shared sound-copy callback contract with zero matching gain. Required one-line near misses from batches61/68/69/71 are retained; obsolete notes for newly exact functions are removed. Worker full Ninja builds, zero literal mismatches and committed-HEAD stock verifiers pass; unchanged inherited allocation-name unresolved imports are disclosed in worker evidence. Combined stock integration gates and pushes under the shared lock. Owner requested a usage-saving stop: no new functions or batches; successful work committed and unsuccessful drafts restored.
+
+- 2026-10-13 | Claude Opus 5.5 ("claude-side-docs" side session) | docs refresh, no unit | matched 0, abandoned 0 | None. Owner asked for the README and docs to be brought up to date, with their note at the top of the README. Changes, docs only:
+  - README.md rewritten: the owner's note at the top; current numbers and a per-library table; toolchain, build, gate, who does the work (Claude lead/workers/Fable, Codex, coord.py, scheduled jobs), rules, phase status, layout, docs index and credits. The old setup-kit sections are gone.
+  - Status banners on the 2026-10-10 snapshots (RECON_REPORT, UNITS, REUSE, 00_KICKOFF); phase status in PHASES; a "what's left by size" table in SPEEDUPS; the PROGRESS snapshot refreshed.
+  - prompts/10_WORKER.md now describes the current flow (coord.py claims, verify, push under run-locked) instead of PRs and GitHub unit issues; 20_AUDIT samples commits instead of PRs.
+  - Fixed double-encoded characters in DECISIONS.md and tools/match/README.md. Added status notes, without moving anything to Decided, to three open questions that PR #135 (d71a9076) settled on the verifier side: the pragma allowlist, cross-unit moves, and the dvdfs/dvd split. The card/ax/mtx splits on `staged/sdk-resplit` and the tu_804227D4 split are still not done.
+  - "private" wording removed from AGENTS.md and prompts/11_TEAM_WORKER.md (DECISIONS 2026-10-13); HANDOFF.md points at `ptitty12/mvp2005-decomp`. The lead-owned briefs in tools/team/lead/worker_prompt_*.md still say "private"; claude-lead was told.
+  - Tool READMEs: check_literals.py, passthru.py, branch_targets.py (match) and units.py (recon) added; the swarm README's done item marked.
+  | Owner: nothing new. The 125 still-open provisional unit issues on GitHub are unused (claims live in coord.py); closing them is a possible cleanup.

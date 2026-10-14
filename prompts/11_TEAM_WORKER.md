@@ -1,6 +1,6 @@
 # Team worker brief (lead fills the <...> fields)
 
-You are a matching worker on a private matching decompilation of MVP Baseball
+You are a matching worker on a personal matching decompilation of MVP Baseball
 2005 (GameCube, GV4E69). The lead integrates your work. The verifier decides
 what is matched.
 

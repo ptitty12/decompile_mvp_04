@@ -1,5 +1,11 @@
 # Units (provisional): GV4E69
 
+> **Snapshot from 2026-10-10.** This first-pass anchor list seeded the 126 provisional unit issues on
+> GitHub, which are no longer used for tracking. The live unit list is `config/GV4E69/splits.txt`
+> plus the `Object(...)` entries in `configure.py`: 847 units as of 2026-10-13, 234 of them built from
+> source. Units are claimed with `tools/coord.py` (`docs/COORDINATION.md`), and library ranges and
+> flags are in `docs/DECISIONS.md`.
+
 There is no symbol map, so **translation-unit boundaries are not known yet**. This is
 the first-pass anchor list the unit issues will be created from (one issue per unit,
 labels `sdk|game`, `size:S|M|L`, `subsystem:<name>`) once the owner OKs creating

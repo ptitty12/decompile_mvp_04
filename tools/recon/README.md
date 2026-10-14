@@ -14,6 +14,7 @@ game data).
 | `shape.py` | Function-start estimate and prologue-style classification (GCC vs CodeWarrior) by address range |
 | `xref.py` | String cross-references from code (`lis`/`addi` pairs and r13-relative) to build the subsystem map |
 | `srcpaths.py` | Source-file path strings embedded in the DOL |
+| `units.py` | First-pass translation-unit anchors (SDK version strings, `.ctors`/`.dtors` TU ends, `__FILE__` paths) that produced `docs/UNITS.md` |
 
 Examples (Git Bash; set `MSYS_NO_PATHCONV=1` when passing disc-internal paths like `/mvp.elf`):
 

@@ -1,6 +1,6 @@
 # AGENTS.md (for Codex and any other non-Claude agent)
 
-This is a private matching decompilation of MVP Baseball 2005 (GameCube,
+This is a personal matching decompilation of MVP Baseball 2005 (GameCube,
 GV4E69). Claude Code agents and Codex agents work on it at the same time.
 
 1. **Project rules:** read `CLAUDE.md` and follow it exactly. Its hard rules

@@ -1,9 +1,10 @@
 # Near-miss and parked queue
 
 Functions a worker parked (8 attempts used) that are worth another pass, best
-first. A stronger model (Opus, high effort) takes these; for C units the
-permuter is an option too. decomp-permuter parses C only, so it can't run on
-our C++ game units as they are.
+first. A stronger model (Fable 5.1 or Opus) takes these. decomp-permuter runs on
+both C and C++ units through `tools/match/permute.py` (C++ via `cxx2c.py`), and
+the permuter farm (`permute_farm.py`) works through main's >= 95% functions
+unattended.
 
 | Function | Unit | Best | What differs | Tried |
 |---|---|---|---|---|

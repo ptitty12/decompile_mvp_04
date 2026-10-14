@@ -1,5 +1,8 @@
 # Kickoff prompt — paste this into Claude Code in the empty private repo
 
+> **Historical (done 2026-10-10).** Phase 0 and Phase 1 are complete: see `docs/RECON_REPORT.md`,
+> `docs/DECISIONS.md` and `README.md`. Kept as the record of how the project started; don't run it again.
+
 ---
 
 Read `CLAUDE.md` fully before doing anything else. Then read `docs/RECON_CHECKLIST.md`

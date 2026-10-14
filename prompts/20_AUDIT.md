@@ -20,8 +20,9 @@ Check and report on each of the following. Cite file paths and commits.
 4. **Regression check.** Clean build + full match check. Compare matched-function
    count to the last audit's number in PROGRESS.md. Any decrease must be explained.
 5. **Claims vs. reality.** Pick 10 random functions marked matched and confirm
-   each passes the verifier on its own. Pick 5 PRs and check their descriptions
-   match what was actually committed.
+   each passes the verifier on its own. Pick 5 recent `match(` commits (agents push
+   straight to main, so there are few PRs) and check their messages match
+   what was actually committed.
 6. **Naming hygiene.** Sample 20 non-placeholder names; flag any without
    recorded evidence.
 7. **Drift.** Any architectural "improvements," refactors, or modernization

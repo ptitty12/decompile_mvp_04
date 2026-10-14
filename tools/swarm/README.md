@@ -37,5 +37,7 @@ both sides instead of conflicting.
 - `configure.py` still merges by text, and parallel `Object(...)` additions at
   the end of the same list conflict. A per-unit registry file that
   `configure.py` reads would make those line additions.
-- Unit-assignment queue (claim and release GitHub unit issues), and a
-  near-miss queue.
+- ~~Unit-assignment queue (claim and release GitHub unit issues), and a
+  near-miss queue.~~ Done another way: units are claimed with
+  `tools/coord.py` (`docs/COORDINATION.md`), and near-miss batches live in
+  `tools/team/lead/queue/` and `docs/NEARMISS.md`.
